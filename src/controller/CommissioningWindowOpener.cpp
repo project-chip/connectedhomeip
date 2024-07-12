@@ -67,12 +67,12 @@ CHIP_ERROR CommissioningWindowOpener::OpenCommissioningWindow(NodeId deviceId, S
                                        .SetDiscriminator(discriminator)
                                        .SetSetupPIN(setupPIN)
                                        .SetSalt(salt)
-                                       .SetReadVIDPIDAttributes(readVIDPIDAttributes),
-                                   callback, payload);
+                                       .SetReadVIDPIDAttributes(readVIDPIDAttributes)
+                                       .SetCallback(callback),
+                                   payload);
 }
 
 CHIP_ERROR CommissioningWindowOpener::OpenCommissioningWindow(const CommissioningWindowPasscodeParams & params,
-                                                              Callback::Callback<OnOpenCommissioningWindow> * callback,
                                                               SetupPayload & payload)
 {
     VerifyOrReturnError(mNextStep == Step::kAcceptCommissioningStart, CHIP_ERROR_INCORRECT_STATE);
@@ -118,7 +118,7 @@ CHIP_ERROR CommissioningWindowOpener::OpenCommissioningWindow(const Commissionin
         PASESession::GeneratePASEVerifier(mVerifier, mPBKDFIterations, mPBKDFSalt, randomSetupPIN, mSetupPayload.setUpPINCode));
 
     payload                              = mSetupPayload;
-    mCommissioningWindowCallback         = callback;
+    mCommissioningWindowCallback         = params.GetCallback();
     mBasicCommissioningWindowCallback    = nullptr;
     mCommissioningWindowVerifierCallback = nullptr;
     mNodeId                              = params.GetNodeId();
@@ -136,8 +136,7 @@ CHIP_ERROR CommissioningWindowOpener::OpenCommissioningWindow(const Commissionin
     return mController->GetConnectedDevice(mNodeId, &mDeviceConnected, &mDeviceConnectionFailure);
 }
 
-CHIP_ERROR CommissioningWindowOpener::OpenCommissioningWindow(const CommissioningWindowVerifierParams & params,
-                                                              Callback::Callback<OnOpenCommissioningWindowWithVerifier> * callback)
+CHIP_ERROR CommissioningWindowOpener::OpenCommissioningWindow(const CommissioningWindowVerifierParams & params)
 {
     VerifyOrReturnError(mNextStep == Step::kAcceptCommissioningStart, CHIP_ERROR_INCORRECT_STATE);
     VerifyOrReturnError(kSpake2p_Min_PBKDF_Iterations <= params.GetIteration() &&
@@ -150,7 +149,7 @@ CHIP_ERROR CommissioningWindowOpener::OpenCommissioningWindow(const Commissionin
     mPBKDFSalt = ByteSpan(mPBKDFSaltBuffer, params.GetSalt().size());
 
     ReturnErrorOnFailure(mVerifier.Deserialize(params.GetVerifier()));
-    mCommissioningWindowVerifierCallback = callback;
+    mCommissioningWindowVerifierCallback = params.GetCallback();
     mBasicCommissioningWindowCallback    = nullptr;
     mCommissioningWindowCallback         = nullptr;
     mNodeId                              = params.GetNodeId();

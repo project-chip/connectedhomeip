@@ -31,12 +31,6 @@
 namespace chip {
 namespace Controller {
 
-// Passing SetupPayload by value on purpose, in case a consumer decides to reuse
-// this object from inside the callback.
-typedef void (*OnOpenCommissioningWindow)(void * context, NodeId deviceId, CHIP_ERROR status, SetupPayload payload);
-typedef void (*OnOpenCommissioningWindowWithVerifier)(void * context, NodeId deviceId, CHIP_ERROR status);
-typedef void (*OnOpenBasicCommissioningWindow)(void * context, NodeId deviceId, CHIP_ERROR status);
-
 /**
  * A helper class to open a commissioning window given some parameters.
  */
@@ -118,9 +112,6 @@ public:
      *
      * @param[in] params        The parameters required to open an enhanced commissioning window
      *                          with the provided or generated passcode.
-     * @param[in] callback      The function to be called on success or failure of opening the
-     *                          commissioning window. This will include the SetupPayload
-     *                          generated from provided parameters.
      * @param[out] payload      The setup payload, not including the VID/PID bits,
      *                          even if those were asked for, that is generated
      *                          based on the passed-in information.  The payload
@@ -128,8 +119,7 @@ public:
      *                          out parameter, will include the VID/PID bits if
      *                          readVIDPIDAttributes is true.
      */
-    CHIP_ERROR OpenCommissioningWindow(const CommissioningWindowPasscodeParams & params,
-                                       Callback::Callback<OnOpenCommissioningWindow> * callback, SetupPayload & payload);
+    CHIP_ERROR OpenCommissioningWindow(const CommissioningWindowPasscodeParams & params, SetupPayload & payload);
 
     /**
      * @brief
@@ -141,11 +131,8 @@ public:
      *
      * @param[in] params    The parameters required to open an enhanced commissioning window
      *                      with the provided PAKE passcode verifier.
-     * @param[in] callback  The function to be called on success or failure of opening the
-     *                      commissioning window. This will NOT include the SetupPayload.
      */
-    CHIP_ERROR OpenCommissioningWindow(const CommissioningWindowVerifierParams & params,
-                                       Callback::Callback<OnOpenCommissioningWindowWithVerifier> * callback);
+    CHIP_ERROR OpenCommissioningWindow(const CommissioningWindowVerifierParams & params);
 
 private:
     enum class Step : uint8_t

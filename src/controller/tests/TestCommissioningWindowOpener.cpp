@@ -77,8 +77,8 @@ TEST_F(TestCommissioningWindowOpener, OpenCommissioningWindowVerifier_Success)
                                                         .SetIteration(sTestSpake2p01_IterationCount)
                                                         .SetDiscriminator(3840)
                                                         .SetSalt(ByteSpan(sTestSpake2p01_Salt))
-                                                        .SetVerifier(ByteSpan(sTestSpake2p01_SerializedVerifier)),
-                                                    &callback);
+                                                        .SetVerifier(ByteSpan(sTestSpake2p01_SerializedVerifier))
+                                                        .SetCallback(&callback));
     EXPECT_EQ(err, CHIP_NO_ERROR);
 }
 
@@ -91,8 +91,8 @@ TEST_F(TestCommissioningWindowOpener, OpenCommissioningWindowVerifier_Failure_No
                                                         .SetTimeout(300)
                                                         .SetIteration(sTestSpake2p01_IterationCount)
                                                         .SetDiscriminator(3840)
-                                                        .SetVerifier(ByteSpan(sTestSpake2p01_SerializedVerifier)),
-                                                    &callback);
+                                                        .SetVerifier(ByteSpan(sTestSpake2p01_SerializedVerifier))
+                                                        .SetCallback(&callback));
     EXPECT_EQ(err, CHIP_ERROR_INVALID_ARGUMENT);
 }
 
@@ -105,8 +105,8 @@ TEST_F(TestCommissioningWindowOpener, OpenCommissioningWindowVerifier_Failure_No
                                                         .SetTimeout(300)
                                                         .SetIteration(sTestSpake2p01_IterationCount)
                                                         .SetDiscriminator(3840)
-                                                        .SetSalt(ByteSpan(sTestSpake2p01_Salt)),
-                                                    &callback);
+                                                        .SetSalt(ByteSpan(sTestSpake2p01_Salt))
+                                                        .SetCallback(&callback));
     EXPECT_EQ(err, CHIP_ERROR_INVALID_ARGUMENT);
 }
 
@@ -120,8 +120,8 @@ TEST_F(TestCommissioningWindowOpener, OpenCommissioningWindowVerifier_Failure_In
                                                         .SetIteration(0)
                                                         .SetDiscriminator(3840)
                                                         .SetSalt(ByteSpan(sTestSpake2p01_Salt))
-                                                        .SetVerifier(ByteSpan(sTestSpake2p01_SerializedVerifier)),
-                                                    &callback);
+                                                        .SetVerifier(ByteSpan(sTestSpake2p01_SerializedVerifier))
+                                                        .SetCallback(&callback));
     EXPECT_EQ(err, CHIP_ERROR_INVALID_ARGUMENT);
 }
 
@@ -136,8 +136,9 @@ TEST_F(TestCommissioningWindowOpener, OpenCommissioningWindowPasscode_Success)
                                                         .SetDiscriminator(3840)
                                                         .SetSetupPIN(sTestSpake2p01_PinCode)
                                                         .SetReadVIDPIDAttributes(true)
-                                                        .SetSalt(ByteSpan(sTestSpake2p01_Salt)),
-                                                    &callback, ignored);
+                                                        .SetSalt(ByteSpan(sTestSpake2p01_Salt))
+                                                        .SetCallback(&callback),
+                                                    ignored);
     EXPECT_EQ(err, CHIP_NO_ERROR);
 }
 
@@ -150,8 +151,9 @@ TEST_F(TestCommissioningWindowOpener, OpenCommissioningWindowPasscode_Success_No
                                                         .SetTimeout(300)
                                                         .SetIteration(sTestSpake2p01_IterationCount)
                                                         .SetDiscriminator(3840)
-                                                        .SetSalt(ByteSpan(sTestSpake2p01_Salt)),
-                                                    &callback, ignored);
+                                                        .SetSalt(ByteSpan(sTestSpake2p01_Salt))
+                                                        .SetCallback(&callback),
+                                                    ignored);
     EXPECT_EQ(err, CHIP_NO_ERROR);
 }
 
@@ -164,8 +166,9 @@ TEST_F(TestCommissioningWindowOpener, OpenCommissioningWindowPasscode_Success_No
                                                         .SetTimeout(300)
                                                         .SetIteration(sTestSpake2p01_IterationCount)
                                                         .SetDiscriminator(3840)
-                                                        .SetSetupPIN(sTestSpake2p01_PinCode),
-                                                    &callback, ignored);
+                                                        .SetSetupPIN(sTestSpake2p01_PinCode)
+                                                        .SetCallback(&callback),
+                                                    ignored);
     EXPECT_EQ(err, CHIP_NO_ERROR);
 }
 
@@ -173,9 +176,13 @@ TEST_F(TestCommissioningWindowOpener, OpenCommissioningWindowPasscode_Failure_In
 {
     SetupPayload ignored;
     Callback::Callback<Controller::OnOpenCommissioningWindow> callback(OCWPasscodeCallback, this);
-    CHIP_ERROR err = opener.OpenCommissioningWindow(
-        Controller::CommissioningWindowPasscodeParams().SetNodeId(0x1234).SetTimeout(300).SetIteration(0).SetDiscriminator(3840),
-        &callback, ignored);
+    CHIP_ERROR err = opener.OpenCommissioningWindow(Controller::CommissioningWindowPasscodeParams()
+                                                        .SetNodeId(0x1234)
+                                                        .SetTimeout(300)
+                                                        .SetIteration(0)
+                                                        .SetDiscriminator(3840)
+                                                        .SetCallback(&callback),
+                                                    ignored);
     EXPECT_EQ(err, CHIP_ERROR_INVALID_ARGUMENT);
 }
 

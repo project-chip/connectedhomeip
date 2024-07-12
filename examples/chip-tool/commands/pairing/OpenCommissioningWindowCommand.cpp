@@ -39,8 +39,9 @@ CHIP_ERROR OpenCommissioningWindowCommand::RunCommand()
                                                           .SetTimeout(mCommissioningWindowTimeout)
                                                           .SetIteration(mIteration)
                                                           .SetDiscriminator(mDiscriminator)
-                                                          .SetReadVIDPIDAttributes(true),
-                                                      &mOnOpenCommissioningWindowCallback, ignored);
+                                                          .SetReadVIDPIDAttributes(true)
+                                                          .SetCallback(&mOnOpenCommissioningWindowCallback),
+                                                      ignored);
     }
 
     ChipLogError(chipTool, "Unknown commissioning window option: %d", to_underlying(mCommissioningWindowOption));

@@ -28,6 +28,12 @@
 namespace chip {
 namespace Controller {
 
+// Passing SetupPayload by value on purpose, in case a consumer decides to reuse
+// this object from inside the callback.
+typedef void (*OnOpenCommissioningWindow)(void * context, NodeId deviceId, CHIP_ERROR status, SetupPayload payload);
+typedef void (*OnOpenCommissioningWindowWithVerifier)(void * context, NodeId deviceId, CHIP_ERROR status);
+typedef void (*OnOpenBasicCommissioningWindow)(void * context, NodeId deviceId, CHIP_ERROR status);
+
 template <typename Derived>
 class CommissioningWindowCommonParams
 {
@@ -121,10 +127,20 @@ public:
         return *this;
     }
 
+    Callback::Callback<OnOpenCommissioningWindow> * GetCallback() const { return mCallback; }
+    // The function to be called on success or failure of opening the commissioning window.
+    // This will include the SetupPayload generated from provided parameters.
+    CommissioningWindowPasscodeParams & SetCallback(Callback::Callback<OnOpenCommissioningWindow> * callback)
+    {
+        mCallback = callback;
+        return *this;
+    }
+
 private:
-    Optional<uint32_t> mSetupPIN = NullOptional;
-    Optional<ByteSpan> mSalt     = NullOptional;
-    bool mReadVIDPIDAttributes   = false;
+    Optional<uint32_t> mSetupPIN                              = NullOptional;
+    Optional<ByteSpan> mSalt                                  = NullOptional;
+    bool mReadVIDPIDAttributes                                = false;
+    Callback::Callback<OnOpenCommissioningWindow> * mCallback = nullptr;
 };
 
 class CommissioningWindowVerifierParams : public CommissioningWindowCommonParams<CommissioningWindowVerifierParams>
@@ -150,9 +166,19 @@ public:
         return *this;
     }
 
+    Callback::Callback<OnOpenCommissioningWindowWithVerifier> * GetCallback() const { return mCallback; }
+    // The function to be called on success or failure of opening the
+    // commissioning window. This will NOT include the SetupPayload.
+    CommissioningWindowVerifierParams & SetCallback(Callback::Callback<OnOpenCommissioningWindowWithVerifier> * callback)
+    {
+        mCallback = callback;
+        return *this;
+    }
+
 private:
     ByteSpan mVerifier;
     ByteSpan mSalt;
+    Callback::Callback<OnOpenCommissioningWindowWithVerifier> * mCallback = nullptr;
 };
 
 } // namespace Controller

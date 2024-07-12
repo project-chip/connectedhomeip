@@ -42,8 +42,8 @@ CHIP_ERROR OpenCommissioningWindowCommand::RunCommand()
                                                               .SetIteration(mIteration)
                                                               .SetDiscriminator(mDiscriminator)
                                                               .SetVerifier(mVerifier.Value())
-                                                              .SetSalt(mSalt.Value()),
-                                                          &mOnOpenCommissioningWindowVerifierCallback);
+                                                              .SetSalt(mSalt.Value())
+                                                              .SetCallback(&mOnOpenCommissioningWindowVerifierCallback));
         }
         else
         {
@@ -54,8 +54,9 @@ CHIP_ERROR OpenCommissioningWindowCommand::RunCommand()
                                                               .SetIteration(mIteration)
                                                               .SetDiscriminator(mDiscriminator)
                                                               .SetSalt(mSalt)
-                                                              .SetReadVIDPIDAttributes(true),
-                                                          &mOnOpenCommissioningWindowCallback, ignored);
+                                                              .SetReadVIDPIDAttributes(true)
+                                                              .SetCallback(&mOnOpenCommissioningWindowCallback),
+                                                          ignored);
         }
     }
 
