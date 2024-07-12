@@ -1168,6 +1168,12 @@ static NSString * sDeviceDataKeyPrefix = @"deviceData";
 
 #pragma mark - Device Client Data
 static NSString * sClientDataKeyPrefix = @"clientData";
+static NSString * sClientDataNodeIndexKey = @"clientDataNodeIndex";
+
+- (NSArray<NSString *> *)_clientDataIndexForNodeID:(NSNumber *)nodeID {
+    // TODO:  implement
+    return @[@"key1", @"key2"];
+}
 
 - (NSString *)_clientDataKeyForNodeID:(NSNumber *)nodeID key:(NSString *)key
 {
@@ -1224,6 +1230,11 @@ static NSString * sClientDataKeyPrefix = @"clientData";
                              securityLevel:MTRStorageSecurityLevelSecure
                                sharingType:MTRStorageSharingTypeNotShared]; // REVIEWERS:  should be fabric shared? kmo 12 jul 2024 13h10
     });
+}
+
+- (void)clearStoredClientDataForNodeID:(NSNumber *)nodeID {
+    // TODO:  need to be setting up index for this method to be possible
+    // indexkey -> [dictionary - nodeID : arrays of keys] -> [array of keys]
 }
 
 @end
