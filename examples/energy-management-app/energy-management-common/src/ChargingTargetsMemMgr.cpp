@@ -46,7 +46,7 @@ ChargingTargetsMemMgr::~ChargingTargetsMemMgr()
 void ChargingTargetsMemMgr::Reset(uint16_t chargingTargetSchedulesIdx)
 {
     // MUST be called for each entry in DataModel::List<const Structs::ChargingTargetScheduleStruct::Type> chargingTargetSchedules
-    mNumDailyChargingTargets         = 0;
+    mNumDailyChargingTargets    = 0;
     mChargingTargetSchedulesIdx = chargingTargetSchedulesIdx;
 
     // Free up any memory associated with this targetSchedule
@@ -122,7 +122,7 @@ CHIP_ERROR
 ChargingTargetsMemMgr::AllocAndCopy(const DataModel::DecodableList<Structs::ChargingTargetStruct::DecodableType> & chargingTargets)
 {
     size_t numDailyChargingTargets = 0;
-    CHIP_ERROR err            = chargingTargets.ComputeSize(&numDailyChargingTargets);
+    CHIP_ERROR err                 = chargingTargets.ComputeSize(&numDailyChargingTargets);
     if (err == CHIP_NO_ERROR)
     {
         mNumDailyChargingTargets = static_cast<uint16_t>(numDailyChargingTargets);

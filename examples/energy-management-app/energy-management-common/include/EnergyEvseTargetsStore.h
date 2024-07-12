@@ -107,7 +107,7 @@ private:
     PersistentStorageDelegate * mpTargetStore = nullptr;
 
     // Need a key to store the Charging Preference Targets which is a TLV of list of lists
-    static constexpr const char *spEvseTargetsKeyName = "g/ev/targ";
+    static constexpr const char * spEvseTargetsKeyName = "g/ev/targ";
 };
 
 } // namespace EnergyEvse

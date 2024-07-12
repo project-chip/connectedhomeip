@@ -18,15 +18,15 @@
 
 #include <inttypes.h>
 
+#include <app/data-model/Decode.h>
+#include <app/data-model/Encode.h>
 #include <gtest/gtest.h>
+#include <lib/core/TLV.h>
 #include <lib/support/CHIPMem.h>
 #include <lib/support/CodeUtils.h>
 #include <lib/support/DefaultStorageKeyAllocator.h>
 #include <lib/support/Span.h>
 #include <lib/support/TestPersistentStorageDelegate.h>
-#include <app/data-model/Decode.h>
-#include <app/data-model/Encode.h>
-#include <lib/core/TLV.h>
 
 #include "EnergyEvseTargetsStore.h"
 
@@ -38,7 +38,7 @@ using namespace chip::app::Clusters::EnergyEvse;
 
 namespace {
 
-constexpr uint16_t ENERGY_EVSE_SET_TARGETS_DAYS_IN_A_WEEK = 7;
+constexpr uint16_t ENERGY_EVSE_SET_TARGETS_DAYS_IN_A_WEEK       = 7;
 constexpr uint16_t ENERGY_EVSE_SET_TARGETS_MAX_CHARGING_TARGETS = 10;
 
 class TestEvseTargetsStorage : public ::testing::Test
@@ -54,12 +54,15 @@ public:
 
     void SetTargets();
     void CheckTargets();
+
 private:
     uint8_t mStore[4096];
 
     EnergyEvse::Structs::ChargingTargetScheduleStruct::Type mChargingTargetSchedules[ENERGY_EVSE_SET_TARGETS_DAYS_IN_A_WEEK];
-    EnergyEvse::Structs::ChargingTargetStruct::Type mChargingTargets[ENERGY_EVSE_SET_TARGETS_DAYS_IN_A_WEEK][ENERGY_EVSE_SET_TARGETS_MAX_CHARGING_TARGETS];
-    chip::app::DataModel::List<EnergyEvse::Structs::ChargingTargetStruct::Type> mChargingTargetsList[ENERGY_EVSE_SET_TARGETS_DAYS_IN_A_WEEK];
+    EnergyEvse::Structs::ChargingTargetStruct::Type mChargingTargets[ENERGY_EVSE_SET_TARGETS_DAYS_IN_A_WEEK]
+                                                                    [ENERGY_EVSE_SET_TARGETS_MAX_CHARGING_TARGETS];
+    chip::app::DataModel::List<EnergyEvse::Structs::ChargingTargetStruct::Type>
+        mChargingTargetsList[ENERGY_EVSE_SET_TARGETS_DAYS_IN_A_WEEK];
 
     chip::app::DataModel::List<EnergyEvse::Structs::ChargingTargetScheduleStruct::Type> mRefChargingTargetSchedulesList;
     DataModel::DecodableList<Structs::ChargingTargetScheduleStruct::DecodableType> mDecodableChargingTargetSchedulesList;
@@ -158,18 +161,21 @@ void TestEvseTargetsStorage::PopulateTargets(uint16_t numDays, uint16_t numCharg
     {
         for (uint16_t chargingTargetIdx = 0; chargingTargetIdx < numChargingTargetsPerDay; chargingTargetIdx++)
         {
-            mChargingTargets[dayIdx][chargingTargetIdx].targetTimeMinutesPastMidnight = static_cast<uint16_t>(dayIdx * 60 + chargingTargetIdx);
+            mChargingTargets[dayIdx][chargingTargetIdx].targetTimeMinutesPastMidnight =
+                static_cast<uint16_t>(dayIdx * 60 + chargingTargetIdx);
             mChargingTargets[dayIdx][chargingTargetIdx].targetSoC.SetValue(65);
             mChargingTargets[dayIdx][chargingTargetIdx].addedEnergy.SetValue(400);
         }
 
-        mChargingTargetsList[dayIdx] = chip::app::DataModel::List<EnergyEvse::Structs::ChargingTargetStruct::Type>(mChargingTargets[dayIdx], numChargingTargetsPerDay);
+        mChargingTargetsList[dayIdx] = chip::app::DataModel::List<EnergyEvse::Structs::ChargingTargetStruct::Type>(
+            mChargingTargets[dayIdx], numChargingTargetsPerDay);
 
         mChargingTargetSchedules[dayIdx].dayOfWeekForSequence.Set(static_cast<EnergyEvse::TargetDayOfWeekBitmap>(1 << dayIdx));
         mChargingTargetSchedules[dayIdx].chargingTargets = mChargingTargetsList[dayIdx];
     }
 
-    chip::app::DataModel::List<EnergyEvse::Structs::ChargingTargetScheduleStruct::Type> chargingTargetSchedulesList(mChargingTargetSchedules, numDays);
+    chip::app::DataModel::List<EnergyEvse::Structs::ChargingTargetScheduleStruct::Type> chargingTargetSchedulesList(
+        mChargingTargetSchedules, numDays);
 
     mRefChargingTargetSchedulesList = chargingTargetSchedulesList;
 

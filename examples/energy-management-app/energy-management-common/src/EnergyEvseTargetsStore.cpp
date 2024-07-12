@@ -72,8 +72,7 @@ CHIP_ERROR EvseTargetsDelegate::LoadTargets()
     uint16_t length = GetTlvSizeEstimate();
     ReturnErrorCodeIf(!backingBuffer.Calloc(length), CHIP_ERROR_NO_MEMORY);
 
-    CHIP_ERROR err =
-        mpTargetStore->SyncGetKeyValue(spEvseTargetsKeyName, backingBuffer.Get(), length);
+    CHIP_ERROR err = mpTargetStore->SyncGetKeyValue(spEvseTargetsKeyName, backingBuffer.Get(), length);
     if (err == CHIP_ERROR_PERSISTED_STORAGE_VALUE_NOT_FOUND)
     {
         // Targets does not exist persistent storage -> initialise mChargingTargetSchedulesList as empty
@@ -178,8 +177,8 @@ CHIP_ERROR EvseTargetsDelegate::LoadTargets()
         // Construct the List<ChargingTargetStruct>. mChargingTargetSchedulesArray will be pointed to in the
         // List<ChargingTargetScheduleStruct> mChargingTargetSchedulesList below
         mChargingTargetSchedulesArray[chargingTargetSchedulesIdx].chargingTargets =
-            chip::app::DataModel::List<EnergyEvse::Structs::ChargingTargetStruct::Type>(mChargingTargets.GetChargingTargets(),
-                                                                                        mChargingTargets.GetNumDailyChargingTargets());
+            chip::app::DataModel::List<EnergyEvse::Structs::ChargingTargetStruct::Type>(
+                mChargingTargets.GetChargingTargets(), mChargingTargets.GetNumDailyChargingTargets());
 
         chargingTargetSchedulesIdx++;
     }
@@ -414,8 +413,7 @@ EvseTargetsDelegate::SaveTargets(DataModel::List<const Structs::ChargingTargetSc
 
     writer.Finalize(backingBuffer);
 
-    ReturnErrorOnFailure(mpTargetStore->SyncSetKeyValue(spEvseTargetsKeyName, backingBuffer.Get(),
-                                                        static_cast<uint16_t>(len)));
+    ReturnErrorOnFailure(mpTargetStore->SyncSetKeyValue(spEvseTargetsKeyName, backingBuffer.Get(), static_cast<uint16_t>(len)));
 
     return CHIP_NO_ERROR;
 }
