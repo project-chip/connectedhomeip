@@ -1166,6 +1166,30 @@ static NSString * sDeviceDataKeyPrefix = @"deviceData";
     });
 }
 
+#pragma mark - Device Client Data
+static NSString * sClientDataKeyPrefix = @"clientData";
+
+- (NSString *)_clientDataKeyForNodeID:(NSNumber *)nodeID key:(NSString *)key
+{
+    return [sClientDataKeyPrefix stringByAppendingFormat:@":0x%016llX:%@", nodeID.unsignedLongLongValue, key];
+}
+
+- (void)storeClientDataForKey:(NSString *)key value:(id<NSSecureCoding>)value forNodeID:(NSNumber *)nodeID
+{
+    dispatch_async(_storageDelegateQueue, ^{
+        MTRDeviceController * controller = self->_controller;
+        VerifyOrReturn(controller != nil); // No way to call delegate without controller.
+
+        // Ignore store failures, since they are not actionable for us here.
+        // REVIEWERS:  could we log failures? kmo 12 jul 2024 13h10
+        [self->_storageDelegate controller:controller
+                                storeValue:value
+                                    forKey:[self _clientDataKeyForNodeID:nodeID key:key]
+                             securityLevel:MTRStorageSecurityLevelSecure
+                               sharingType:MTRStorageSharingTypeNotShared]; // REVIEWERS:  should be shared? kmo 12 jul 2024 13h10
+    });
+}
+
 @end
 
 @implementation MTRCASESessionResumptionInfo
