@@ -20,7 +20,6 @@ import("${chip_root}/build/chip/chip_test_suite.gni")
 config("tests_config") {
   include_dirs = [
     "${chip_root}/examples/energy-management-app/energy-management-common/include",
-    "${chip_root}/zzz_generated/app-common/app-common",
   ]
 }
 
@@ -32,13 +31,12 @@ chip_test_suite("tests") {
 
   test_sources = [
     "TestEvseTargetsStorage.cpp",
-    "${chip_root}/examples/energy-management-app/energy-management-common/src/EnergyEvseTargetsStore.cpp",
-    "${chip_root}/examples/energy-management-app/energy-management-common/src/ChargingTargetsMemMgr.cpp",
   ]
 
   cflags = [ "-Wconversion" ]
 
   public_deps = [
+    "${chip_root}/examples/energy-management-app/linux:test-evse-targets-store",
     "${chip_root}/examples/energy-management-app/energy-management-common",
     "${chip_root}/src/lib",
     "${chip_root}/src/app",

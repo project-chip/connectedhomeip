@@ -56,7 +56,6 @@ if (chip_build_tests) {
       "${chip_root}/src/access/tests",
       "${chip_root}/src/crypto/tests",
       "${chip_root}/src/inet/tests",
-      "${chip_root}/src/energy/tests",
       "${chip_root}/src/lib/address_resolve/tests",
       "${chip_root}/src/lib/asn1/tests",
       "${chip_root}/src/lib/core/tests",
@@ -154,6 +153,13 @@ if (chip_build_tests) {
       output_name = "libCHIP_tests"
       output_dir = "${root_out_dir}/lib"
     }
+  }
+
+  chip_test_group("example_tests") {
+    deps = []
+    tests = [
+      "${chip_root}/examples/energy-management-app/energy-management-common/tests",
+    ]
   }
 
   chip_test_group("fake_platform_tests") {
