@@ -1174,6 +1174,42 @@ static NSString * sClientDataKeyPrefix = @"clientData";
     return [sClientDataKeyPrefix stringByAppendingFormat:@":0x%016llX:%@", nodeID.unsignedLongLongValue, key];
 }
 
+- (id<NSSecureCoding>)clientDataForKey:(NSString *)key nodeID:(NSNumber *)nodeID {
+    __block id clientData = nil;
+
+    dispatch_sync(_storageDelegateQueue, ^{
+        MTRDeviceController * controller = self->_controller;
+        VerifyOrReturn(controller != nil); // No way to call delegate without controller.
+
+        id data;
+        @autoreleasepool {
+            data = [self->_storageDelegate controller:controller
+                                          valueForKey:[self _clientDataKeyForNodeID:nodeID key:key]
+                                        securityLevel:MTRStorageSecurityLevelSecure
+                                          sharingType:MTRStorageSharingTypeNotShared];  // REVIEWERS:  fabric shared? kmo 12 jul 2024 14h58
+        }
+        if (data == nil) {
+            return;
+        }
+
+        if (![data isKindOfClass:NSDictionary.class]) {
+            return;
+        }
+        
+        if (![data conformsToProtocol:@protocol(NSSecureCoding)]) {
+            // can remove next log after end-to-end testing validates that this expectation is met.
+            MTR_LOG_ERROR("Client data retrieved from MTRDeviceControllerDataStore did not conform to NSSecureCoding");
+            return;
+        }
+
+        // We can't do value type verification; our API consumer will need
+        // to do that.
+        clientData = data;
+    });
+
+    return clientData;
+}
+
 - (void)storeClientDataForKey:(NSString *)key value:(id<NSSecureCoding>)value forNodeID:(NSNumber *)nodeID
 {
     dispatch_async(_storageDelegateQueue, ^{
@@ -1186,7 +1222,7 @@ static NSString * sClientDataKeyPrefix = @"clientData";
                                 storeValue:value
                                     forKey:[self _clientDataKeyForNodeID:nodeID key:key]
                              securityLevel:MTRStorageSecurityLevelSecure
-                               sharingType:MTRStorageSharingTypeNotShared]; // REVIEWERS:  should be shared? kmo 12 jul 2024 13h10
+                               sharingType:MTRStorageSharingTypeNotShared]; // REVIEWERS:  should be fabric shared? kmo 12 jul 2024 13h10
     });
 }
 

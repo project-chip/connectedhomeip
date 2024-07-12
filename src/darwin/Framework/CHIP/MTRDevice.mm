@@ -3990,12 +3990,10 @@ static BOOL AttributeHasChangesOmittedQuality(MTRAttributePath * attributePath)
 
 - (void)setClientDataForKey:(NSString *)key value:(id<NSSecureCoding>)value
 {
-    MTR_LOG("kmo: setClientDataForKey %@", key);
     // TODO: Check supported data types, and also if they conform to NSSecureCoding, when we store these
     // TODO: Need to add a delegate method, so when this value changes we call back to the client
 #if USE_DEVICE_CONTROLLER_DATA_STORE
     // TODO:  KMO:  check impl
-//    NSDictionary<NSString *, id> * data = @{key : value};
     NSNumber * selfNodeID = self.nodeID;
     [self.deviceController.controllerDataStore storeClientDataForKey:key value:value forNodeID:selfNodeID];
 #else
