@@ -59,6 +59,7 @@ if (current_toolchain != "${dir_pw_toolchain}/default:default") {
         "${chip_root}/src/lib/format/tests:fuzz-payload-decoder",
         "${chip_root}/src/setup_payload/tests:fuzz-setup-payload-base38",
         "${chip_root}/src/setup_payload/tests:fuzz-setup-payload-base38-decode",
+        "${chip_root}/examples/all-clusters-app/linux:fuzz-chip-all-clusters-app",
       ]
     }
   }

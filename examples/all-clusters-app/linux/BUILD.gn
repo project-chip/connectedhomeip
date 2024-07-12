@@ -20,6 +20,7 @@ import("${chip_root}/src/lib/lib.gni")
 import("${chip_root}/src/platform/device.gni")
 
 import("${chip_root}/examples/common/pigweed/pigweed_rpcs.gni")
+import("${chip_root}/build/chip/fuzz_test.gni")
 
 if (chip_enable_pw_rpc) {
   import("//build_overrides/pigweed.gni")
@@ -189,4 +190,14 @@ group("linux") {
 
 group("default") {
   deps = [ ":linux" ]
+}
+
+if (enable_fuzz_test_targets) {
+  chip_fuzz_target("fuzz-chip-all-clusters-app") {
+    sources = [ "fuzzing-main.cpp" ]
+    public_deps = [
+      ":chip-all-clusters-common",
+      "${chip_root}/examples/platform/linux:app-main",
+    ]
+  }
 }
