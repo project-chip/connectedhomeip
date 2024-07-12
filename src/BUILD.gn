@@ -160,9 +160,7 @@ if (chip_build_tests) {
     tests = []
     if (chip_device_platform != "esp32" && chip_device_platform != "efr32" &&
         current_os != "android") {
-      tests += [
-        "${chip_root}/examples/energy-management-app/energy-management-common/tests",
-      ]
+      tests += [ "${chip_root}/examples/energy-management-app/energy-management-common/tests" ]
     }
   }
 

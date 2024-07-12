@@ -126,8 +126,8 @@ executable("chip-energy-management-app") {
 
 source_set("test-evse-targets-store") {
   sources = [
-    "${chip_root}/examples/energy-management-app/energy-management-common/src/EnergyEvseTargetsStore.cpp",
     "${chip_root}/examples/energy-management-app/energy-management-common/src/ChargingTargetsMemMgr.cpp",
+    "${chip_root}/examples/energy-management-app/energy-management-common/src/EnergyEvseTargetsStore.cpp",
   ]
 
   include_dirs = [
@@ -136,10 +136,9 @@ source_set("test-evse-targets-store") {
   ]
 
   deps = [
-    "${chip_root}/src/lib",
     "${chip_root}/examples/energy-management-app/energy-management-common",
+    "${chip_root}/src/lib",
   ]
-
 }
 
 group("linux") {
