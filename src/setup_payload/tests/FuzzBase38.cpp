@@ -38,11 +38,7 @@ extern "C" int LLVMFuzzerTestOneInput(const uint8_t * data, size_t len)
         __builtin_trap();
     }
 
-    std::string base38EncodedString;
-    for (char c : encodedSpan)
-    {
-        base38EncodedString += c;
-    }
+    std::string base38EncodedString(encodedSpan.data(), encodedSpan.size());
 
     std::vector<uint8_t> decodedData;
     CHIP_ERROR decodingError = chip::base38Decode(base38EncodedString, decodedData);
