@@ -69,6 +69,29 @@ CHIP_ERROR WaitForResponse(CallType & call)
     }
 }
 
+std::mutex responseMutex;
+std::condition_variable responseCv;
+bool responseReceived    = false;
+CHIP_ERROR responseError = CHIP_NO_ERROR;
+
+template <typename CallType>
+CHIP_ERROR WaitForResponse(CallType & call)
+{
+    std::unique_lock<std::mutex> lock(responseMutex);
+    responseReceived = false;
+    responseError    = CHIP_NO_ERROR;
+
+    if (responseCv.wait_for(lock, std::chrono::milliseconds(kRpcTimeoutMs), [] { return responseReceived; }))
+    {
+        return responseError;
+    }
+    else
+    {
+        ChipLogError(NotSpecified, "RPC Response timed out!");
+        return CHIP_ERROR_TIMEOUT;
+    }
+}
+
 // Callback function to be called when the RPC response is received
 void OnOpenCommissioningWindowCompleted(const chip_rpc_OperationStatus & response, pw::Status status)
 {
@@ -131,84 +154,5 @@ CHIP_ERROR OpenCommissioningWindow(chip_rpc_DeviceCommissioningWindowInfo device
         return CHIP_ERROR_INTERNAL;
     }
 
-    return WaitForResponse(call);
-}
-
-CHIP_ERROR
-OpenCommissioningWindow(chip::Controller::CommissioningWindowPasscodeParams params)
-{
-    chip_rpc_DeviceCommissioningWindowInfo device;
-    device.node_id               = params.GetNodeId();
-    device.commissioning_timeout = params.GetTimeout().count();
-    device.discriminator         = params.GetDiscriminator();
-    device.iterations            = params.GetIteration();
-
-    return OpenCommissioningWindow(device);
-}
-
-CHIP_ERROR
-OpenCommissioningWindow(chip::Controller::CommissioningWindowVerifierParams params)
-{
-    chip_rpc_DeviceCommissioningWindowInfo device;
-    device.node_id               = params.GetNodeId();
-    device.commissioning_timeout = params.GetTimeout().count();
-    device.discriminator         = params.GetDiscriminator();
-    device.iterations            = params.GetIteration();
-
-    VerifyOrReturnError(params.GetSalt().size() <= sizeof(device.salt.bytes), CHIP_ERROR_BUFFER_TOO_SMALL);
-    memcpy(device.salt.bytes, params.GetSalt().data(), params.GetSalt().size());
-    device.salt.size = static_cast<size_t>(params.GetSalt().size());
-
-    VerifyOrReturnError(params.GetVerifier().size() <= sizeof(device.verifier.bytes), CHIP_ERROR_BUFFER_TOO_SMALL);
-    memcpy(device.verifier.bytes, params.GetVerifier().data(), params.GetVerifier().size());
-    device.verifier.size = static_cast<size_t>(params.GetVerifier().size());
-
-    return OpenCommissioningWindow(device);
-}
-
-CHIP_ERROR
-CommissionNode(chip::Controller::CommissioningWindowPasscodeParams params, VendorId vendorId, uint16_t productId)
-{
-    chip_rpc_DeviceCommissioningInfo device;
-    device.setup_pin     = params.GetSetupPIN();
-    device.discriminator = params.GetDiscriminator();
-    device.iterations    = params.GetIteration();
-    device.vendor_id     = vendorId;
-    device.product_id    = productId;
-
-    VerifyOrReturnError(params.GetSalt().size() <= sizeof(device.salt.bytes), CHIP_ERROR_BUFFER_TOO_SMALL);
-    memcpy(device.salt.bytes, params.GetSalt().data(), params.GetSalt().size());
-    device.salt.size = static_cast<size_t>(params.GetSalt().size());
-
-    // The RPC call is kept alive until it completes. When a response is received, it will be logged by the handler
-    // function and the call will complete.
-    auto call = fabricAdminClient.CommissionNode(device, RpcCompletedWithEmptyResponse);
-
-    if (!call.active())
-    {
-        // The RPC call was not sent. This could occur due to, for example, an invalid channel ID. Handle if necessary.
-        return CHIP_ERROR_INTERNAL;
-    }
-
-    return WaitForResponse(call);
-}
-
-CHIP_ERROR KeepActive(chip::NodeId nodeId, uint32_t stayActiveDurationMs, uint32_t timeoutMs)
-{
-    chip_rpc_KeepActiveParameters params;
-    params.node_id                 = nodeId;
-    params.stay_active_duration_ms = stayActiveDurationMs;
-    params.timeout_ms              = timeoutMs;
-
-    // The RPC call is kept alive until it completes. When a response is received, it will be logged by the handler
-    // function and the call will complete.
-    auto call = fabricAdminClient.KeepActive(params, RpcCompletedWithEmptyResponse);
-
-    if (!call.active())
-    {
-        // The RPC call was not sent. This could occur due to, for example, an invalid channel ID. Handle if necessary.
-        return CHIP_ERROR_INTERNAL;
-    }
-
-    return WaitForResponse(call);
+    return WaitForResponse(openCommissioningWindowCall);
 }

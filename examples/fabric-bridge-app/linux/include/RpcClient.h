@@ -54,7 +54,7 @@ OpenCommissioningWindow(chip::Controller::CommissioningWindowPasscodeParams para
  *
  * @param params    Params for opening the commissioning window using verifier.
  * @return CHIP_ERROR An error code indicating the success or failure of the operation.
- * - CHIP_NO_ERROR: The RPC command was successfully sent.
+ * - CHIP_NO_ERROR: The RPC command was successfully processed.
  * - CHIP_ERROR_BUSY: Another commissioning window is currently in progress.
  * - CHIP_ERROR_INTERNAL: An internal error occurred.
  */

@@ -22,6 +22,8 @@
 #include <chrono>
 #include <condition_variable>
 #include <mutex>
+#include <string>
+#include <thread>
 
 #include "fabric_bridge_service/fabric_bridge_service.pb.h"
 #include "fabric_bridge_service/fabric_bridge_service.rpc.pb.h"
@@ -44,6 +46,29 @@ CHIP_ERROR responseError = CHIP_NO_ERROR;
 
 // By passing the `call` parameter into WaitForResponse we are explicitly trying to insure the caller takes into consideration that
 // the lifetime of the `call` object when calling WaitForResponse
+template <typename CallType>
+CHIP_ERROR WaitForResponse(CallType & call)
+{
+    std::unique_lock<std::mutex> lock(responseMutex);
+    responseReceived = false;
+    responseError    = CHIP_NO_ERROR;
+
+    if (responseCv.wait_for(lock, std::chrono::milliseconds(kRpcTimeoutMs), [] { return responseReceived; }))
+    {
+        return responseError;
+    }
+    else
+    {
+        fprintf(stderr, "RPC Response timed out!");
+        return CHIP_ERROR_TIMEOUT;
+    }
+}
+
+std::mutex responseMutex;
+std::condition_variable responseCv;
+bool responseReceived    = false;
+CHIP_ERROR responseError = CHIP_NO_ERROR;
+
 template <typename CallType>
 CHIP_ERROR WaitForResponse(CallType & call)
 {
@@ -141,7 +166,7 @@ CHIP_ERROR AddSynchronizedDevice(const chip_rpc_SynchronizedDevice & data)
         return CHIP_ERROR_INTERNAL;
     }
 
-    return WaitForResponse(call);
+    return WaitForResponse(addSynchronizedDeviceCall);
 }
 
 CHIP_ERROR RemoveSynchronizedDevice(chip::NodeId nodeId)
@@ -161,28 +186,7 @@ CHIP_ERROR RemoveSynchronizedDevice(chip::NodeId nodeId)
         return CHIP_ERROR_INTERNAL;
     }
 
-    return WaitForResponse(call);
-}
-
-CHIP_ERROR ActiveChanged(chip::NodeId nodeId, uint32_t promisedActiveDurationMs)
-{
-    ChipLogProgress(NotSpecified, "ActiveChanged");
-
-    chip_rpc_KeepActiveChanged parameters;
-    parameters.node_id                     = nodeId;
-    parameters.promised_active_duration_ms = promisedActiveDurationMs;
-
-    // The RPC call is kept alive until it completes. When a response is received, it will be logged by the handler
-    // function and the call will complete.
-    auto call = fabricBridgeClient.ActiveChanged(parameters, RpcCompletedWithEmptyResponse);
-
-    if (!call.active())
-    {
-        // The RPC call was not sent. This could occur due to, for example, an invalid channel ID. Handle if necessary.
-        return CHIP_ERROR_INTERNAL;
-    }
-
-    return WaitForResponse(call);
+    return WaitForResponse(removeSynchronizedDeviceCall);
 }
 
 CHIP_ERROR AdminCommissioningAttributeChanged(const chip_rpc_AdministratorCommissioningChanged & data)
