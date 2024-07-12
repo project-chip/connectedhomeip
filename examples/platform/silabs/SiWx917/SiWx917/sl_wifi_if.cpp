@@ -250,11 +250,10 @@ sl_status_t join_callback_handler(sl_wifi_event_t event, char * result, uint32_t
      */
     ChipLogDetail(DeviceLayer, "join_callback_handler: success");
     memset(&temp_reset, 0, sizeof(temp_reset));
-
-    WfxEvent.eventType = WFX_EVT_STA_CONN;
-    WfxPostEvent(&WfxEvent);
     wfx_rsi.join_retries = 0;
     callback_status      = SL_STATUS_OK;
+    WfxEvent.eventType   = WFX_EVT_STA_CONN;
+    WfxPostEvent(&WfxEvent);
     return SL_STATUS_OK;
 }
 
@@ -338,7 +337,7 @@ int32_t wfx_rsi_power_save(rsi_power_save_profile_mode_t sl_si91x_ble_state, sl_
  *****************************************************************************************/
 int32_t wfx_wifi_rsi_init(void)
 {
-    ChipLogDetail(DeviceLayer, "wfx_wifi_rsi_init started");
+    ChipLogDetail(DeviceLayer, "wfx_wifi_rsi_init: started");
     sl_status_t status;
     status = sl_wifi_init(&config, NULL, sl_wifi_default_event_handler);
     VerifyOrReturnError(status == SL_STATUS_OK, status);
@@ -695,11 +694,9 @@ static sl_status_t wfx_rsi_do_join(void)
 ///        Helper function for HandleDHCPPolling.
 void NotifyConnectivity()
 {
-    if (!hasNotifiedWifiConnectivity)
-    {
-        wfx_connected_notify(CONNECTION_STATUS_SUCCESS, &wfx_rsi.ap_mac);
-        hasNotifiedWifiConnectivity = true;
-    }
+    VerifyOrReturn(!hasNotifiedWifiConnectivity);
+    wfx_connected_notify(CONNECTION_STATUS_SUCCESS, &wfx_rsi.ap_mac);
+    hasNotifiedWifiConnectivity = true;
 }
 
 void HandleDHCPPolling()
@@ -720,6 +717,8 @@ void HandleDHCPPolling()
     {
         wfx_dhcp_got_ipv4((uint32_t) sta_netif->ip_addr.u_addr.ip4.addr);
         hasNotifiedIPV4 = true;
+        event.eventType = WFX_EVT_STA_DHCP_DONE;
+        WfxPostEvent(&event);
         NotifyConnectivity();
     }
     else if (dhcp_state == DHCP_OFF)

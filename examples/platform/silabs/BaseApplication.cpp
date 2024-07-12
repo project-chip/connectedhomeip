@@ -232,7 +232,7 @@ CHIP_ERROR BaseApplication::StartAppTask(osThreadFunc_t taskFunction)
     sAppEventQueue = osMessageQueueNew(APP_EVENT_QUEUE_SIZE, sizeof(AppEvent), &appEventQueueAttr);
     if (sAppEventQueue == NULL)
     {
-        SILABS_LOG("Failed to allocate app event queue");
+        ChipLogDetail(AppServer, "Failed to allocate app event queue");
         appError(APP_ERROR_EVENT_QUEUE_FAILED);
     }
 
@@ -240,7 +240,7 @@ CHIP_ERROR BaseApplication::StartAppTask(osThreadFunc_t taskFunction)
     sAppTaskHandle = osThreadNew(taskFunction, &sAppEventQueue, &appTaskAttr);
     if (sAppTaskHandle == nullptr)
     {
-        SILABS_LOG("Failed to create app task");
+        ChipLogDetail(AppServer, "Failed to create app task");
         appError(APP_ERROR_CREATE_TASK_FAILED);
     }
     return CHIP_NO_ERROR;
@@ -254,12 +254,12 @@ CHIP_ERROR BaseApplication::Init()
     /*
      * Wait for the WiFi to be initialized
      */
-    SILABS_LOG("APP: Wait WiFi Init");
+    ChipLogDetail(AppServer, "APP: Wait WiFi Init");
     while (!wfx_hw_ready())
     {
         vTaskDelay(pdMS_TO_TICKS(10));
     }
-    SILABS_LOG("APP: Done WiFi Init");
+    ChipLogDetail(AppServer, "APP: Done WiFi Init");
     /* We will init server when we get IP */
 
     chip::DeviceLayer::PlatformMgr().LockChipStack();
@@ -276,7 +276,7 @@ CHIP_ERROR BaseApplication::Init()
     );
     if (sFunctionTimer == NULL)
     {
-        SILABS_LOG("funct timer create failed");
+        ChipLogDetail(AppServer, "funct timer create failed");
         appError(APP_ERROR_CREATE_TIMER_FAILED);
     }
 
@@ -288,12 +288,12 @@ CHIP_ERROR BaseApplication::Init()
     );
     if (sLightTimer == NULL)
     {
-        SILABS_LOG("Light Timer create failed");
+        ChipLogDetail(AppServer, "Light Timer create failed");
         appError(APP_ERROR_CREATE_TIMER_FAILED);
     }
 
-    SILABS_LOG("Current Software Version String: %s", CHIP_DEVICE_CONFIG_DEVICE_SOFTWARE_VERSION_STRING);
-    SILABS_LOG("Current Software Version: %d", CHIP_DEVICE_CONFIG_DEVICE_SOFTWARE_VERSION);
+    ChipLogDetail(AppServer, "Current Software Version String: %s", CHIP_DEVICE_CONFIG_DEVICE_SOFTWARE_VERSION_STRING);
+    ChipLogDetail(AppServer, "Current Software Version: %d", CHIP_DEVICE_CONFIG_DEVICE_SOFTWARE_VERSION);
 
     ConfigurationMgr().LogDeviceConfig();
 
@@ -543,12 +543,12 @@ void BaseApplication::ButtonHandler(AppEvent * aEvent)
                 chip::DeviceLayer::PlatformMgr().UnlockChipStack();
                 if (err != CHIP_NO_ERROR)
                 {
-                    SILABS_LOG("Failed to open the Basic Commissioning Window");
+                    ChipLogDetail(AppServer, "Failed to open the Basic Commissioning Window");
                 }
             }
             else
             {
-                SILABS_LOG("Network is already provisioned, Ble advertisement not enabled");
+                ChipLogDetail(AppServer, "Network is already provisioned, Ble advertisement not enabled");
 #if CHIP_CONFIG_ENABLE_ICD_SERVER
                 // Temporarily claim network activity, until we implement a "user trigger" reason for ICD wakeups.
                 PlatformMgr().ScheduleWork([](intptr_t) { ICDNotifier::GetInstance().NotifyNetworkActivityNotification(); });
@@ -571,7 +571,7 @@ void BaseApplication::CancelFunctionTimer()
 {
     if (osTimerStop(sFunctionTimer) == osError)
     {
-        SILABS_LOG("app timer stop() failed");
+        ChipLogDetail(AppServer, "app timer stop() failed");
         appError(APP_ERROR_STOP_TIMER_FAILED);
     }
 }
@@ -581,7 +581,7 @@ void BaseApplication::StartFunctionTimer(uint32_t aTimeoutInMs)
     // Starts or restarts the function timer
     if (osTimerStart(sFunctionTimer, pdMS_TO_TICKS(aTimeoutInMs)) != osOK)
     {
-        SILABS_LOG("app timer start() failed");
+        ChipLogDetail(AppServer, "app timer start() failed");
         appError(APP_ERROR_START_TIMER_FAILED);
     }
 }
@@ -589,7 +589,7 @@ void BaseApplication::StartFunctionTimer(uint32_t aTimeoutInMs)
 void BaseApplication::StartFactoryResetSequence()
 {
     // Initiate the factory reset sequence
-    SILABS_LOG("Factory Reset Triggered. Release button within %ums to cancel.", FACTORY_RESET_CANCEL_WINDOW_TIMEOUT);
+    ChipLogDetail(AppServer, "Factory Reset Triggered. Release button within %ums to cancel.", FACTORY_RESET_CANCEL_WINDOW_TIMEOUT);
 
     // Start timer for FACTORY_RESET_CANCEL_WINDOW_TIMEOUT to allow user to
     // cancel, if required.
@@ -618,7 +618,7 @@ void BaseApplication::CancelFactoryResetSequence()
     if (sIsFactoryResetTriggered)
     {
         sIsFactoryResetTriggered = false;
-        SILABS_LOG("Factory Reset has been Canceled");
+        ChipLogDetail(AppServer, "Factory Reset has been Canceled");
     }
 }
 
@@ -626,7 +626,7 @@ void BaseApplication::StartStatusLEDTimer()
 {
     if (osTimerStart(sLightTimer, kLightTimerPeriod) != osOK)
     {
-        SILABS_LOG("Light Time start failed");
+        ChipLogDetail(AppServer, "Light Time start failed");
         appError(APP_ERROR_START_TIMER_FAILED);
     }
 }
@@ -639,7 +639,7 @@ void BaseApplication::StopStatusLEDTimer()
 
     if (osTimerStop(sLightTimer) == osError)
     {
-        SILABS_LOG("Light Time start failed");
+        ChipLogDetail(AppServer, "Light Time start failed");
         appError(APP_ERROR_STOP_TIMER_FAILED);
     }
 }
@@ -770,12 +770,12 @@ void BaseApplication::PostEvent(const AppEvent * aEvent)
     {
         if (osMessageQueuePut(sAppEventQueue, aEvent, osPriorityNormal, 0) != osOK)
         {
-            SILABS_LOG("Failed to post event to app task event queue");
+            ChipLogDetail(AppServer, "Failed to post event to app task event queue");
         }
     }
     else
     {
-        SILABS_LOG("App Event Queue is uninitialized");
+        ChipLogDetail(AppServer, "App Event Queue is uninitialized");
     }
 }
 
@@ -787,7 +787,7 @@ void BaseApplication::DispatchEvent(AppEvent * aEvent)
     }
     else
     {
-        SILABS_LOG("Event received with no handler. Dropping event.");
+        ChipLogDetail(AppServer, "Event received with no handler. Dropping event.");
     }
 }
 
@@ -823,7 +823,7 @@ void BaseApplication::DoProvisioningReset()
         CHIP_ERROR err = Server::GetInstance().GetCommissioningWindowManager().OpenBasicCommissioningWindow();
         if (err != CHIP_NO_ERROR)
         {
-            SILABS_LOG("Failed to open the Basic Commissioning Window");
+            ChipLogError(AppServer, "Failed to open the Basic Commissioning Window");
         }
     });
 }
@@ -841,7 +841,7 @@ void BaseApplication::OnPlatformEvent(const ChipDeviceEvent * event, intptr_t)
         VerifyOrReturn(event->InternetConnectivityChange.IPv4 == kConnectivity_Established);
         if (DIC_OK != dic_init(dic::control::subscribeCB))
         {
-            SILABS_LOG("Failed to initialize DIC module\n");
+            ChipLogError(AppServer, "dic_init failed");
         }
 #endif // DIC_ENABLE
         break;
@@ -884,7 +884,7 @@ void BaseApplication::OutputQrCode(bool refreshLCD)
     }
     else
     {
-        SILABS_LOG("Getting QR code failed!");
+        ChipLogDetail(AppServer, "Getting QR code failed!");
     }
 }
 

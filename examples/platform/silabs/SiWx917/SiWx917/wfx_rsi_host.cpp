@@ -15,18 +15,21 @@
  *    limitations under the License.
  */
 
-#include "stdbool.h"
+#include <stdbool.h>
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
 
 #include "FreeRTOS.h"
 #include "event_groups.h"
-#include "silabs_utils.h"
-#include "sl_status.h"
 #include "task.h"
+
+#include <lib/support/logging/CHIPLogging.h>
+
 #include "wfx_host_events.h"
 #include "wfx_rsi.h"
+
+#include "sl_status.h"
 
 /* wfxRsi Task will use as its stack */
 StackType_t wfxRsiTaskStack[WFX_RSI_TASK_SZ] = { 0 };
@@ -45,24 +48,16 @@ StaticTask_t wfxRsiTaskBuffer;
  ***********************************************************************/
 sl_status_t wfx_wifi_start(void)
 {
-    if (wfx_rsi.dev_state & WFX_RSI_ST_STARTED)
-    {
-        SILABS_LOG("%s: already started.", __func__);
-        return SL_STATUS_OK;
-    }
+    VerifyOrReturnError(!(wfx_rsi.dev_state & WFX_RSI_ST_STARTED), SL_STATUS_OK);
     wfx_rsi.dev_state |= WFX_RSI_ST_STARTED;
-    SILABS_LOG("%s: starting..", __func__);
     /*
      * Create the Wifi driver task
      */
     wfx_rsi.wlan_task = xTaskCreateStatic(wfx_rsi_task, "wfx_rsi", WFX_RSI_TASK_SZ, NULL, WLAN_DRIVER_TASK_PRIORITY,
                                           wfxRsiTaskStack, &wfxRsiTaskBuffer);
 
-    if (NULL == wfx_rsi.wlan_task)
-    {
-        SILABS_LOG("%s: error: failed to create task.", __func__);
-        return SL_STATUS_FAIL;
-    }
+    VerifyOrReturnError(wfx_rsi.wlan_task != NULL, SL_STATUS_FAIL);
+    ChipLogProgress(DeviceLayer, "wfx_rsi_task created successfully");
     return SL_STATUS_OK;
 }
 
@@ -103,14 +98,12 @@ bool wfx_is_sta_mode_enabled(void)
  ***********************************************************************/
 void wfx_get_wifi_mac_addr(sl_wfx_interface_t interface, sl_wfx_mac_address_t * addr)
 {
-    if (addr)
-    {
+    VerifyOrReturn(addr != NULL);
 #ifdef SL_WFX_CONFIG_SOFTAP
-        *addr = (interface == SL_WFX_SOFTAP_INTERFACE) ? wfx_rsi.softap_mac : wfx_rsi.sta_mac;
+    *addr = (interface == SL_WFX_SOFTAP_INTERFACE) ? wfx_rsi.softap_mac : wfx_rsi.sta_mac;
 #else
-        *addr = wfx_rsi.sta_mac;
+    *addr = wfx_rsi.sta_mac;
 #endif
-    }
 }
 
 /*********************************************************************
@@ -123,11 +116,9 @@ void wfx_get_wifi_mac_addr(sl_wfx_interface_t interface, sl_wfx_mac_address_t * 
  ***********************************************************************/
 void wfx_set_wifi_provision(wfx_wifi_provision_t * cfg)
 {
-    if (cfg)
-    {
-        wfx_rsi.sec = *cfg;
-        wfx_rsi.dev_state |= WFX_RSI_ST_STA_PROVISIONED;
-    }
+    VerifyOrReturn(cfg != NULL);
+    wfx_rsi.sec = *cfg;
+    wfx_rsi.dev_state |= WFX_RSI_ST_STA_PROVISIONED;
 }
 
 /*********************************************************************
@@ -140,15 +131,10 @@ void wfx_set_wifi_provision(wfx_wifi_provision_t * cfg)
  ***********************************************************************/
 bool wfx_get_wifi_provision(wfx_wifi_provision_t * wifiConfig)
 {
-    if (wifiConfig != NULL)
-    {
-        if (wfx_rsi.dev_state & WFX_RSI_ST_STA_PROVISIONED)
-        {
-            *wifiConfig = wfx_rsi.sec;
-            return true;
-        }
-    }
-    return false;
+    VerifyOrReturnError(wifiConfig != NULL, false);
+    VerifyOrReturnError(wfx_rsi.dev_state & WFX_RSI_ST_STA_PROVISIONED, false);
+    *wifiConfig = wfx_rsi.sec;
+    return true;
 }
 
 /*********************************************************************
@@ -162,7 +148,7 @@ void wfx_clear_wifi_provision(void)
 {
     memset(&wfx_rsi.sec, 0, sizeof(wfx_rsi.sec));
     wfx_rsi.dev_state &= ~WFX_RSI_ST_STA_PROVISIONED;
-    SILABS_LOG("%s: completed.", __func__);
+    ChipLogProgress(DeviceLayer, "Clear WiFi Provision");
 }
 
 /*************************************************************************
@@ -170,23 +156,16 @@ void wfx_clear_wifi_provision(void)
  * @brief
  * Start a JOIN command to the AP - Done by the wfx_rsi task
  * @param[in]   None
- * @return  returns SL_STATUS_OK if successful,
- *         SL_STATUS_INVALID_CONFIGURATION otherwise
+ * @return  returns SL_STATUS_OK if successful
  ****************************************************************************/
 sl_status_t wfx_connect_to_ap(void)
 {
+    VerifyOrReturnError(wfx_rsi.dev_state & WFX_RSI_ST_STA_PROVISIONED, SL_STATUS_INVALID_CONFIGURATION);
+    VerifyOrReturnError(strlen(wfx_rsi.sec.ssid) <= WFX_MAX_SSID_LENGTH, SL_STATUS_HAS_OVERFLOWED);
+    ChipLogProgress(DeviceLayer, "connect to access point: %s", wfx_rsi.sec.ssid);
     WfxEvent_t event;
-    if (wfx_rsi.dev_state & WFX_RSI_ST_STA_PROVISIONED)
-    {
-        SILABS_LOG("Connecting to access point -> SSID: %s", &wfx_rsi.sec.ssid[0]);
-        event.eventType = WFX_EVT_STA_START_JOIN;
-        WfxPostEvent(&event);
-    }
-    else
-    {
-        SILABS_LOG("Error: access point not provisioned.");
-        return SL_STATUS_INVALID_CONFIGURATION;
-    }
+    event.eventType = WFX_EVT_STA_START_JOIN;
+    WfxPostEvent(&event);
     return SL_STATUS_OK;
 }
 
@@ -202,11 +181,7 @@ sl_status_t wfx_connect_to_ap(void)
  ***********************************************************************/
 sl_status_t wfx_power_save(rsi_power_save_profile_mode_t sl_si91x_ble_state, sl_si91x_performance_profile_t sl_si91x_wifi_state)
 {
-    if (wfx_rsi_power_save(sl_si91x_ble_state, sl_si91x_wifi_state) != SL_STATUS_OK)
-    {
-        return SL_STATUS_FAIL;
-    }
-    return SL_STATUS_OK;
+    return wfx_rsi_power_save(sl_si91x_ble_state, sl_si91x_wifi_state);
 }
 #endif /* SL_ICD_ENABLED */
 
@@ -223,7 +198,7 @@ void wfx_setup_ip6_link_local(sl_wfx_interface_t whichif)
      * TODO: Implement IPV6 setup, currently in wfx_rsi_task()
      * This is hooked with MATTER code.
      */
-    SILABS_LOG("%s: warning: not implemented.", __func__);
+    return;
 }
 
 /*********************************************************************
@@ -237,7 +212,7 @@ void wfx_setup_ip6_link_local(sl_wfx_interface_t whichif)
 bool wfx_is_sta_connected(void)
 {
     bool status = (wfx_rsi.dev_state & WFX_RSI_ST_STA_CONNECTED) > 0;
-    SILABS_LOG("%s: %s", __func__, (status ? "Connected" : "Disconnected"));
+    ChipLogProgress(DeviceLayer, "Device %s to access point", (status ? "connected" : "not connected"));
     return status;
 }
 
@@ -266,11 +241,9 @@ wifi_mode_t wfx_get_wifi_mode()
  ***********************************************************************/
 sl_status_t wfx_sta_discon(void)
 {
-    SILABS_LOG("%s: started.", __func__);
-    int32_t status;
+    sl_status_t status;
     status = wfx_rsi_disconnect();
     wfx_rsi.dev_state &= ~WFX_RSI_ST_STA_CONNECTED;
-    SILABS_LOG("%s: completed.", __func__);
     return status;
 }
 #if CHIP_DEVICE_CONFIG_ENABLE_IPV4
@@ -284,17 +257,8 @@ sl_status_t wfx_sta_discon(void)
  ***********************************************************************/
 bool wfx_have_ipv4_addr(sl_wfx_interface_t which_if)
 {
-    bool status = false;
-    if (which_if == SL_WFX_STA_INTERFACE)
-    {
-        status = (wfx_rsi.dev_state & WFX_RSI_ST_STA_DHCP_DONE) > 0;
-    }
-    else
-    {
-        status = false; /* TODO */
-    }
-    SILABS_LOG("%s: status: %d", __func__, status);
-    return status;
+    VerifyOrReturnError(which_if == SL_WFX_STA_INTERFACE, false);
+    return ((wfx_rsi.dev_state & WFX_RSI_ST_STA_DHCP_DONE) > 0);
 }
 #endif /* CHIP_DEVICE_CONFIG_ENABLE_IPV4 */
 
@@ -308,17 +272,9 @@ bool wfx_have_ipv4_addr(sl_wfx_interface_t which_if)
  ***********************************************************************/
 bool wfx_have_ipv6_addr(sl_wfx_interface_t which_if)
 {
-    bool status = false;
-    if (which_if == SL_WFX_STA_INTERFACE)
-    {
-        status = (wfx_rsi.dev_state & WFX_RSI_ST_STA_CONNECTED) > 0;
-    }
-    else
-    {
-        status = false; /* TODO */
-    }
-    SILABS_LOG("%s: %d", __func__, status);
-    return status;
+    VerifyOrReturnError(which_if == SL_WFX_STA_INTERFACE, false);
+    // TODO: WFX_RSI_ST_STA_CONNECTED does not guarantee SLAAC IPv6 LLA, maybe use a different FLAG
+    return ((wfx_rsi.dev_state & WFX_RSI_ST_STA_CONNECTED) > 0);
 }
 
 /*********************************************************************
@@ -384,21 +340,18 @@ int32_t wfx_reset_counts()
  *******************************************************************************/
 bool wfx_start_scan(char * ssid, void (*callback)(wfx_wifi_scan_result_t *))
 {
-    int sz;
-    WfxEvent_t event;
-    if (wfx_rsi.scan_cb)
-        return false; /* Already in progress */
-    if (ssid)
-    {
-        sz = strlen(ssid);
-        if ((wfx_rsi.scan_ssid = (char *) pvPortMalloc(sz + 1)) == (char *) 0)
-        {
-            return false;
-        }
-        strcpy(wfx_rsi.scan_ssid, ssid);
-    }
+    // check if already in progress
+    VerifyOrReturnError(wfx_rsi.scan_cb != NULL, false);
     wfx_rsi.scan_cb = callback;
 
+    VerifyOrReturnError(ssid != NULL, false);
+    size_t ssid_len;
+    ssid_len          = strnlen(ssid, WFX_MAX_SSID_LENGTH);
+    wfx_rsi.scan_ssid = reinterpret_cast<char *>(pvPortMalloc(ssid_len + 1));
+    VerifyOrReturnError(wfx_rsi.scan_ssid != NULL, false);
+    strncpy(wfx_rsi.scan_ssid, ssid, WFX_MAX_SSID_LENGTH);
+
+    WfxEvent_t event;
     event.eventType = WFX_EVT_SCAN;
     WfxPostEvent(&event);
 
@@ -416,6 +369,6 @@ bool wfx_start_scan(char * ssid, void (*callback)(wfx_wifi_scan_result_t *))
 void wfx_cancel_scan(void)
 {
     /* Not possible */
-    SILABS_LOG("%s: cannot cancel scan", __func__);
+    ChipLogError(DeviceLayer, "cannot cancel scan");
 }
 #endif /* SL_WFX_CONFIG_SCAN */

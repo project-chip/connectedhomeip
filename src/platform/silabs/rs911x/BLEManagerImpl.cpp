@@ -258,7 +258,7 @@ CHIP_ERROR BLEManagerImpl::_Init()
 
     if (wfx_rsi.ble_task == NULL)
     {
-        ChipLogError(DeviceLayer, "%s: error: failed to create ble task.", __func__);
+        ChipLogError(DeviceLayer, "error: failed to create BLE task");
     }
 
     // Initialize the CHIP BleLayer.
