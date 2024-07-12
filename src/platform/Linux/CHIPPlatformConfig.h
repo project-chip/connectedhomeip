@@ -27,6 +27,12 @@
 
 #define CHIP_CONFIG_ABORT() abort()
 
+extern "C" int __cxa_atexit(void (*func)(void *), void * arg, void * d);
+#define CHIP_CXA_ATEXIT(f, p) __cxa_atexit((f), (p), nullptr)
+
+#define CHIP_CONFIG_DYNAMIC_GLOBALS 1
+#define CHIP_CONFIG_GLOBALS_LAZY_INIT 1
+
 using CHIP_CONFIG_PERSISTED_STORAGE_KEY_TYPE = const char *;
 #define CHIP_CONFIG_PERSISTED_STORAGE_MAX_KEY_LENGTH 16
 

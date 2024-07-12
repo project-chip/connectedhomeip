@@ -73,7 +73,7 @@ public:
      *        solely based on its ReadHandler's state. Therefore, no synchronization action on the ICDState is needed in this
      *        implementation.
      */
-    void OnTransitionToIdle() override {};
+    void OnTransitionToIdle() override{};
 
     /**
      * @brief When the ICD transitions to Active mode, this implementation will trigger a report emission on each ReadHandler that
@@ -88,13 +88,13 @@ public:
      * @brief Similar to the OnTransitionToIdle() method, this implementation does not attempt any synchronization on ICD events,
      *        therefore no action is needed on the ICDModeChange() method.
      */
-    void OnICDModeChange() override {};
+    void OnICDModeChange() override{};
 
     /**
      * @brief This implementation does not attempt any synchronization on this ICD event, therefore no action is needed on
      * ICDEnterIdleMode()
      */
-    void OnEnterIdleMode() override {};
+    void OnEnterIdleMode() override{};
 
     // ReadHandlerObserver
 

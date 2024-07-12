@@ -188,6 +188,18 @@
 #endif // CHIP_CONFIG_GLOBALS_NO_DESTRUCT
 
 /**
+ *  @def CHIP_CONFIG_DYNAMIC_GLOBALS
+ *
+ *  @brief
+ *    Whether to use dynamic allocation for chip::Global objects.
+ *
+ *    The default is to use static allocation.
+ */
+#ifndef CHIP_CONFIG_DYNAMIC_GLOBALS
+#define CHIP_CONFIG_DYNAMIC_GLOBALS 0
+#endif // CHIP_CONFIG_DYNAMIC_GLOBALS
+
+/**
  *  @def CHIP_CONFIG_SHA256_CONTEXT_SIZE
  *
  *  @brief
