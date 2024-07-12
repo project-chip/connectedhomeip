@@ -146,7 +146,7 @@ if (current_toolchain != "${dir_pw_toolchain}/default:default") {
 
     if (chip_build_tests) {
       deps += [ "//src:tests" ]
-      deps += [ "//src:example_tests" ]
+      deps += [ "//examples:example_tests" ]
       if (current_os == "android" && current_toolchain == default_toolchain) {
         deps += [ "${chip_root}/build/chip/java/tests:java_build_test" ]
       }
