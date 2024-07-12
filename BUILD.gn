@@ -106,6 +106,7 @@ if (current_toolchain != "${dir_pw_toolchain}/default:default") {
     if (chip_enable_python_modules) {
       deps = [
         "${chip_root}/scripts:matter_yamltests_distribution.wheel",
+        "${chip_root}/scripts/tests/py:metadata_parser.wheel",
         "${chip_root}/src/controller/python:chip-repl",
       ]
       if (enable_pylib) {
