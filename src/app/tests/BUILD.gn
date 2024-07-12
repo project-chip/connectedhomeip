@@ -187,7 +187,6 @@ chip_test_suite("tests") {
     "TestStatusIB.cpp",
     "TestStatusResponseMessage.cpp",
     "TestTestEventTriggerDelegate.cpp",
-    "TestThreadBorderRouterManagementCluster.cpp",
     "TestTimeSyncDataProvider.cpp",
     "TestTimedHandler.cpp",
     "TestWriteInteraction.cpp",
@@ -201,7 +200,6 @@ chip_test_suite("tests") {
     ":operational-state-test-srcs",
     ":ota-requestor-test-srcs",
     ":power-cluster-test-srcs",
-    ":thread-border-router-management-test-srcs",
     ":time-sync-data-provider-test-srcs",
     "${chip_root}/src/app",
     "${chip_root}/src/app/common:cluster-objects",
@@ -236,7 +234,11 @@ chip_test_suite("tests") {
   }
 
   if (!chip_fake_platform) {
-    test_sources += [ "TestFailSafeContext.cpp" ]
+    test_sources += [
+      "TestFailSafeContext.cpp",
+      "TestThreadBorderRouterManagementCluster.cpp",
+    ]
+    public_deps += [ ":thread-border-router-management-test-srcs" ]
   }
 
   # DefaultICDClientStorage assumes that raw AES key is used by the application
