@@ -19,9 +19,11 @@
 #include "RpcClient.h"
 #include "RpcClientProcessor.h"
 
+#include <chrono>
+#include <condition_variable>
+#include <mutex>
 #include <string>
 #include <thread>
-#include <unistd.h>
 
 #include "fabric_bridge_service/fabric_bridge_service.rpc.pb.h"
 #include "pw_assert/check.h"
@@ -36,6 +38,7 @@ using namespace chip;
 namespace {
 
 // Constants
+constexpr uint32_t kRpcTimeoutMs     = 1000;
 constexpr uint32_t kDefaultChannelId = 1;
 
 // Fabric Bridge Client
@@ -43,9 +46,37 @@ rpc::pw_rpc::nanopb::FabricBridge::Client fabricBridgeClient(rpc::client::GetDef
 pw::rpc::NanopbUnaryReceiver<::pw_protobuf_Empty> addSynchronizedDeviceCall;
 pw::rpc::NanopbUnaryReceiver<::pw_protobuf_Empty> removeSynchronizedDeviceCall;
 
+std::mutex responseMutex;
+std::condition_variable responseCv;
+bool responseReceived    = false;
+CHIP_ERROR responseError = CHIP_NO_ERROR;
+
+template <typename CallType>
+CHIP_ERROR WaitForResponse(CallType & call)
+{
+    std::unique_lock<std::mutex> lock(responseMutex);
+    responseReceived = false;
+    responseError    = CHIP_NO_ERROR;
+
+    if (responseCv.wait_for(lock, std::chrono::milliseconds(kRpcTimeoutMs), [] { return responseReceived; }))
+    {
+        return responseError;
+    }
+    else
+    {
+        fprintf(stderr, "RPC Response timed out!");
+        return CHIP_ERROR_TIMEOUT;
+    }
+}
+
 // Callback function to be called when the RPC response is received
 void OnAddDeviceResponseCompleted(const pw_protobuf_Empty & response, pw::Status status)
 {
+    std::lock_guard<std::mutex> lock(responseMutex);
+    responseReceived = true;
+    responseError    = status.ok() ? CHIP_NO_ERROR : CHIP_ERROR_INTERNAL;
+    responseCv.notify_one();
+
     if (status.ok())
     {
         ChipLogProgress(NotSpecified, "AddSynchronizedDevice RPC call succeeded!");
@@ -59,6 +90,11 @@ void OnAddDeviceResponseCompleted(const pw_protobuf_Empty & response, pw::Status
 // Callback function to be called when the RPC response is received
 void OnRemoveDeviceResponseCompleted(const pw_protobuf_Empty & response, pw::Status status)
 {
+    std::lock_guard<std::mutex> lock(responseMutex);
+    responseReceived = true;
+    responseError    = status.ok() ? CHIP_NO_ERROR : CHIP_ERROR_INTERNAL;
+    responseCv.notify_one();
+
     if (status.ok())
     {
         ChipLogProgress(NotSpecified, "RemoveSynchronizedDevice RPC call succeeded!");
@@ -101,7 +137,7 @@ CHIP_ERROR AddSynchronizedDevice(chip::NodeId nodeId)
         return CHIP_ERROR_INTERNAL;
     }
 
-    return CHIP_NO_ERROR;
+    return WaitForResponse(addSynchronizedDeviceCall);
 }
 
 CHIP_ERROR RemoveSynchronizedDevice(chip::NodeId nodeId)
@@ -128,5 +164,5 @@ CHIP_ERROR RemoveSynchronizedDevice(chip::NodeId nodeId)
         return CHIP_ERROR_INTERNAL;
     }
 
-    return CHIP_NO_ERROR;
+    return WaitForResponse(removeSynchronizedDeviceCall);
 }
