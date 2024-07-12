@@ -3978,8 +3978,9 @@ static BOOL AttributeHasChangesOmittedQuality(MTRAttributePath * attributePath)
 {
 #if USE_DEVICE_CONTROLLER_DATA_STORE
     // TODO: KMO: implement
-    // [self.deviceController ]
-    return nil;
+    NSNumber * selfNodeID = self.nodeID;
+    id<NSSecureCoding> data = [self.deviceController.controllerDataStore clientDataForKey:key nodeID:selfNodeID];
+    return data;
 #else
     if (key == nil)
         return nil;
