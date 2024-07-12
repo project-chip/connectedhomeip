@@ -148,7 +148,7 @@ static void wfx_events_task_start()
                                                wfxEventTaskStack, &wfxEventTaskBuffer);
     if (NULL == wfx_events_task_handle)
     {
-        SILABS_LOG("Failed to create WFX wfx_events");
+        ChipLogError(DeviceLayer, "Failed to create WFX wfx_events");
     }
 }
 
@@ -165,7 +165,7 @@ sl_status_t sl_wfx_host_process_event(sl_wfx_generic_message_t * event_payload)
     {
     /******** INDICATION ********/
     case SL_WFX_STARTUP_IND_ID: {
-        SILABS_LOG("WFX Startup Completed\r\n");
+        ChipLogProgress(DeviceLayer, "WFX startup completed.");
         PlatformMgrImpl().HandleWFXSystemEvent(WIFI_EVENT, event_payload);
         break;
     }
@@ -243,34 +243,46 @@ sl_status_t sl_wfx_host_process_event(sl_wfx_generic_message_t * event_payload)
     }
     case SL_WFX_EXCEPTION_IND_ID: {
         sl_wfx_exception_ind_t * firmware_exception = (sl_wfx_exception_ind_t *) event_payload;
-        uint8_t * exception_tmp                     = (uint8_t *) firmware_exception;
-        SILABS_LOG("firmware exception\r\n");
-        for (uint16_t i = 0; i < firmware_exception->header.length; i += 16)
-        {
-            SILABS_LOG("hif: %.8x:", i);
-            for (uint8_t j = 0; (j < 16) && ((i + j) < firmware_exception->header.length); j++)
-            {
-                SILABS_LOG(" %.2x", *exception_tmp);
-                exception_tmp++;
-            }
-            SILABS_LOG("\r\n");
-        }
+        ChipLogError(DeviceLayer, "event: SL_WFX_EXCEPTION_IND_ID");
+        ChipLogError(DeviceLayer, "firmware_exception->header.length: %lu", firmware_exception->header.length);
+        // create a bytespan header.length with exception payload
+        ByteSpan exception_byte_span = ByteSpan((uint8_t *) firmware_exception, firmware_exception->header.length);
+        ChipLogByteSpan(DeviceLayer, exception_byte_span);
+        // TODO: Remove this log
+        // uint8_t * exception_tmp = (uint8_t *) firmware_exception;
+        // for (uint16_t i = 0; i < firmware_exception->header.length; i += 16)
+        // {
+        //     SILABS_LOG("hif: %.8x:", i);
+        //     for (uint8_t j = 0; (j < 16) && ((i + j) < firmware_exception->header.length); j++)
+        //     {
+        //         SILABS_LOG(" %.2x", *exception_tmp);
+        //         exception_tmp++;
+        //     }
+        //     SILABS_LOG("\r\n");
+        // }
         break;
     }
     case SL_WFX_ERROR_IND_ID: {
         sl_wfx_error_ind_t * firmware_error = (sl_wfx_error_ind_t *) event_payload;
-        uint8_t * error_tmp                 = (uint8_t *) firmware_error;
-        SILABS_LOG("firmware error %lu\r\n", firmware_error->body.type);
-        for (uint16_t i = 0; i < firmware_error->header.length; i += 16)
-        {
-            SILABS_LOG("hif: %.8x:", i);
-            for (uint8_t j = 0; (j < 16) && ((i + j) < firmware_error->header.length); j++)
-            {
-                SILABS_LOG(" %.2x", *error_tmp);
-                error_tmp++;
-            }
-            SILABS_LOG("\r\n");
-        }
+        ChipLogError(DeviceLayer, "event: SL_WFX_ERROR_IND_ID");
+        ChipLogError(DeviceLayer, "firmware_error->type: %lu", firmware_error->body.type);
+        ChipLogError(DeviceLayer, "firmware_error->header.length: %lu", firmware_error->header.length);
+        // create a bytespan header.length with error payload
+        ByteSpan error_byte_span = ByteSpan((uint8_t *) firmware_error, firmware_error->header.length);
+        ChipLogByteSpan(DeviceLayer, error_byte_span);
+
+        // TODO: Remove the log below
+        // uint8_t * error_tmp = (uint8_t *) firmware_error;
+        // for (uint16_t i = 0; i < firmware_error->header.length; i += 16)
+        // {
+        //     SILABS_LOG("hif: %.8x:", i);
+        //     for (uint8_t j = 0; (j < 16) && ((i + j) < firmware_error->header.length); j++)
+        //     {
+        //         SILABS_LOG(" %.2x", *error_tmp);
+        //         error_tmp++;
+        //     }
+        //     SILABS_LOG("\r\n");
+        // }
         break;
     }
     }
