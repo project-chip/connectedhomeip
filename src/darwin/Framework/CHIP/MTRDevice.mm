@@ -336,7 +336,11 @@ static NSString * const sLastInitialSubscribeLatencyKey = @"lastInitialSubscribe
 
 - (BOOL)isEqualToClusterData:(MTRDeviceClusterData *)otherClusterData
 {
-    return [_dataVersion isEqual:otherClusterData.dataVersion] && [_attributes isEqual:otherClusterData.attributes];
+    if (!otherClusterData)
+        return NO;
+
+    return (otherClusterData.dataVersion && [_dataVersion isEqual:otherClusterData.dataVersion])
+        && (otherClusterData.attributes && [_attributes isEqual:otherClusterData.attributes]);
 }
 
 - (BOOL)isEqual:(id)object
