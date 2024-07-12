@@ -152,7 +152,6 @@ using namespace chip::app;
 using namespace chip::app::Clusters;
 using namespace chip::app::Clusters::OccupancySensing;
 
-void chip::app::Clusters::OccupancySensing::emberAfPluginOccupancyClusterServerPostInitCallback(EndpointId endpoint) {}
 
 //******************************************************************************
 // Plugin init function
@@ -189,8 +188,6 @@ void emberAfOccupancySensingClusterServerInitCallback(EndpointId endpoint)
         break;
     }
     Attributes::OccupancySensorTypeBitmap::Set(endpoint, deviceTypeBitmap);
-
-    emberAfPluginOccupancyClusterServerPostInitCallback(endpoint);
 }
 
 //******************************************************************************
