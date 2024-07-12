@@ -22,6 +22,7 @@
 #include <app/BufferedReadCallback.h>
 #include <app/ClusterStateCache.h>
 #include <app/ConcreteAttributePath.h>
+#include <app/ConcreteClusterPath.h>
 #include <app/EventHeader.h>
 #include <app/MessageDef/StatusIB.h>
 #include <app/ReadClient.h>
@@ -93,10 +94,11 @@ public:
 
     chip::app::BufferedReadCallback & GetBufferedCallback() { return mBufferedReadAdapter; }
 
-    // Accessor for the cluster state cache, so that stale data can be cleared
-    // from it as needed.  The returned pointer must not be held long-term,
-    // because it can dangle if this callback object is destroyed.
-    chip::app::ClusterStateCache * GetClusterStateCache() { return mClusterStateCache.get(); }
+    // Methods to clear state from our cluster state cache.  Must be called on
+    // the Matter queue.
+    void ClearCachedAttributeState(chip::EndpointId aEndpoint);
+    void ClearCachedAttributeState(const chip::app::ConcreteClusterPath & aCluster);
+    void ClearCachedAttributeState(const chip::app::ConcreteAttributePath & aAttribute);
 
     // We need to exist to get a ReadClient, so can't take this as a constructor argument.
     void AdoptReadClient(std::unique_ptr<chip::app::ReadClient> aReadClient) { mReadClient = std::move(aReadClient); }

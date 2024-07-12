@@ -3430,12 +3430,12 @@ static BOOL AttributeHasChangesOmittedQuality(MTRAttributePath * attributePath)
         [self _removeClusters:clusterPathsToRemove doRemoveFromDataStore:NO];
         [self.deviceController.controllerDataStore clearStoredClusterDataForNodeID:self.nodeID endpointID:endpoint];
 
-        if (_currentSubscriptionCallback) {
-            auto clusterStateCache = _currentSubscriptionCallback->GetClusterStateCache();
-            if (clusterStateCache) {
-                clusterStateCache->ClearAttributes(static_cast<EndpointId>(endpoint.unsignedLongLongValue));
+        [_deviceController asyncDispatchToMatterQueue:^{
+            std::lock_guard lock(self->_lock);
+            if (self->_currentSubscriptionCallback) {
+                self->_currentSubscriptionCallback->ClearCachedAttributeState(static_cast<EndpointId>(endpoint.unsignedLongLongValue));
             }
-        }
+        } errorHandler:nil];
     }
 }
 
@@ -3457,16 +3457,16 @@ static BOOL AttributeHasChangesOmittedQuality(MTRAttributePath * attributePath)
     }
     [self _removeClusters:clusterPathsToRemove doRemoveFromDataStore:YES];
 
-    if (_currentSubscriptionCallback) {
-        auto clusterStateCache = _currentSubscriptionCallback->GetClusterStateCache();
-        if (clusterStateCache) {
+    [_deviceController asyncDispatchToMatterQueue:^{
+        std::lock_guard lock(self->_lock);
+        if (self->_currentSubscriptionCallback) {
             for (NSNumber * cluster in toBeRemovedClusters) {
                 ConcreteClusterPath clusterPath(static_cast<EndpointId>(endpointID.unsignedLongLongValue),
                     static_cast<ClusterId>(cluster.unsignedLongLongValue));
-                clusterStateCache->ClearAttributes(clusterPath);
+                self->_currentSubscriptionCallback->ClearCachedAttributeState(clusterPath);
             }
         }
-    }
+    } errorHandler:nil];
 }
 
 - (void)_pruneAttributesIn:(MTRDeviceDataValueDictionary)previousAttributeListValue
@@ -3481,17 +3481,17 @@ static BOOL AttributeHasChangesOmittedQuality(MTRAttributePath * attributePath)
     [toBeRemovedAttributes minusSet:attributesStillInCluster];
     [self _removeAttributes:toBeRemovedAttributes fromCluster:clusterPath];
 
-    if (_currentSubscriptionCallback) {
-        auto clusterStateCache = _currentSubscriptionCallback->GetClusterStateCache();
-        if (clusterStateCache) {
+    [_deviceController asyncDispatchToMatterQueue:^{
+        std::lock_guard lock(self->_lock);
+        if (self->_currentSubscriptionCallback) {
             for (NSNumber * attribute in toBeRemovedAttributes) {
                 ConcreteAttributePath attributePath(static_cast<EndpointId>(clusterPath.endpoint.unsignedLongLongValue),
                     static_cast<ClusterId>(clusterPath.cluster.unsignedLongLongValue),
                     static_cast<AttributeId>(attribute.unsignedLongLongValue));
-                clusterStateCache->ClearAttribute(attributePath);
+                self->_currentSubscriptionCallback->ClearCachedAttributeState(attributePath);
             }
         }
-    }
+    } errorHandler:nil];
 }
 
 - (void)_pruneStoredDataForPath:(MTRAttributePath *)attributePath
