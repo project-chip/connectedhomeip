@@ -64,7 +64,7 @@ NSString * const MTRDataVersionKey = @"dataVersion";
 // Disabling pending crashes
 #define ENABLE_CONNECTIVITY_MONITORING 0
 
-#define USE_DEVICE_CONTROLLER_DATA_STORE 1
+#define USE_DEVICE_CONTROLLER_DATA_STORE 0
 
 // Consider moving utility classes to their own file
 #pragma mark - Utility Classes
@@ -3992,7 +3992,12 @@ static BOOL AttributeHasChangesOmittedQuality(MTRAttributePath * attributePath)
 {
     // TODO: Check supported data types, and also if they conform to NSSecureCoding, when we store these
     // TODO: Need to add a delegate method, so when this value changes we call back to the client
-    // TODO: KMO: SET: implement / check the above
+#if USE_DEVICE_CONTROLLER_DATA_STORE
+    // TODO:  KMO:  check impl
+    NSDictionary<NSString *, id> * data = @{key : value};
+    NSNumber * selfNodeID = self.nodeID;
+    [self.deviceController.controllerDataStore storeDeviceData:data forNodeID:selfNodeID];
+#else
     if (key == nil || value == nil)
         return;
 
@@ -4001,39 +4006,51 @@ static BOOL AttributeHasChangesOmittedQuality(MTRAttributePath * attributePath)
     }
 
     [self.temporaryMetaDataCache setObject:value forKey:[NSString stringWithFormat:@"%@:-1", key]];
+#endif // USE_DEVICE_CONTROLLER_DATA_STORE
 }
 
 - (void)removeClientDataForKey:(NSString *)key
 {
+#if USE_DEVICE_CONTROLLER_DATA_STORE
     // TODO: KMO: SET: implement
+#else
     if (key == nil)
         return;
 
     [self.temporaryMetaDataCache removeObjectForKey:[NSString stringWithFormat:@"%@:-1", key]];
+#endif // USE_DEVICE_CONTROLLER_DATA_STORE
 }
 
 - (NSArray * _Nullable)clientDataKeysForEndpointID:(NSNumber *)endpointID
 {
+#if USE_DEVICE_CONTROLLER_DATA_STORE
     // TODO: KMO: GET: implement
+#else
     if (endpointID == nil)
         return nil;
     // TODO: When hooked up to storage, enumerate this better
 
     return [self.temporaryMetaDataCache allKeys];
+#endif // USE_DEVICE_CONTROLLER_DATA_STORE
 }
 
 - (id<NSSecureCoding> _Nullable)clientDataForKey:(NSString *)key endpointID:(NSNumber *)endpointID
 {
+#if USE_DEVICE_CONTROLLER_DATA_STORE
     // TODO: KMO: GET: implement
+#else
     if (key == nil || endpointID == nil)
         return nil;
 
     return [self.temporaryMetaDataCache objectForKey:[NSString stringWithFormat:@"%@:%@", key, endpointID]];
+#endif // USE_DEVICE_CONTROLLER_DATA_STORE
 }
 
 - (void)setClientDataForKey:(NSString *)key endpointID:(NSNumber *)endpointID value:(id<NSSecureCoding>)value
 {
-    // TODO: KMO: GET: implement
+#if USE_DEVICE_CONTROLLER_DATA_STORE
+    // TODO: KMO: SET: implement
+#else
     if (key == nil || value == nil || endpointID == nil)
         return;
 
@@ -4042,15 +4059,19 @@ static BOOL AttributeHasChangesOmittedQuality(MTRAttributePath * attributePath)
     }
 
     [self.temporaryMetaDataCache setObject:value forKey:[NSString stringWithFormat:@"%@:%@", key, endpointID]];
+#endif // USE_DEVICE_CONTROLLER_DATA_STORE
 }
 
 - (void)removeClientDataForKey:(NSString *)key endpointID:(NSNumber *)endpointID
 {
-    // TODO: KMO: implement
+#if USE_DEVICE_CONTROLLER_DATA_STORE
+    // TODO: KMO: SET: implement
+#else
     if (key == nil || endpointID == nil)
         return;
 
     [self.temporaryMetaDataCache removeObjectForKey:[NSString stringWithFormat:@"%@:%@", key, endpointID]];
+#endif // USE_DEVICE_CONTROLLER_DATA_STORE
 }
 
 #pragma mark Log Help
