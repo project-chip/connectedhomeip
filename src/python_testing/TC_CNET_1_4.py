@@ -94,5 +94,6 @@ class TC_CNET_1_4(MatterBaseTest):
         concurrent_connection = await self.read_single_attribute_check_success(cluster=cgen, attribute=ascc)
         asserts.assert_true(concurrent_connection, "The device does not support concurrent connection commissioning")
 
+
 if __name__ == "__main__":
     default_matter_test_main()
