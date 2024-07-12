@@ -196,8 +196,11 @@ using namespace chip::Tracing::DarwinFramework;
 
 - (BOOL)isEqualToClusterData:(MTRDeviceClusterData *)otherClusterData
 {
-    return MTREqualObjects(_dataVersion, otherClusterData.dataVersion)
-        && MTREqualObjects(_attributes, otherClusterData.attributes);
+    if (!otherClusterData)
+        return NO;
+
+    return (otherClusterData.dataVersion && [_dataVersion isEqual:otherClusterData.dataVersion])
+        && (otherClusterData.attributes && [_attributes isEqual:otherClusterData.attributes]);
 }
 
 - (BOOL)isEqual:(id)object
