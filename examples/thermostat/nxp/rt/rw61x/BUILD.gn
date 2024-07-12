@@ -148,7 +148,7 @@ rt_executable("thermostat") {
 
   if (chip_enable_secure_dac_private_key_storage == 1) {
     sources += [
-      "${example_platform_dir}/factory_data/source/AppFactoryDataExample.cpp",
+      "${chip_root}/examples/platform/nxp/${nxp_platform}/factory_data/source/AppFactoryDataExample.cpp",
     ]
   } else {
     sources += [

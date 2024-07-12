@@ -153,7 +153,7 @@ rt_executable("all_cluster_app") {
   if (chip_enable_secure_dac_private_key_storage ||
       chip_enable_secure_whole_factory_data) {
     sources += [
-      "${example_platform_dir}/factory_data/source/AppFactoryDataExample.cpp",
+      "${chip_root}/examples/platform/nxp/${nxp_platform}/factory_data/source/AppFactoryDataExample.cpp",
     ]
     if (chip_enable_secure_whole_factory_data) {
       defines += [ "ENABLE_SECURE_WHOLE_FACTORY_DATA" ]
