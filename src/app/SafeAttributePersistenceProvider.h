@@ -50,7 +50,7 @@ public:
      * @param [in] aValue the data to write.
      */
     template <typename T, std::enable_if_t<std::is_integral<T>::value, bool> = true>
-    CHIP_ERROR WriteScalarValue(const ConcreteAttributePath & aPath, const T & aValue)
+    CHIP_ERROR WriteScalarValue(const ConcreteAttributePath & aPath, T aValue)
     {
         uint8_t value[sizeof(T)];
         auto w = Encoding::LittleEndian::BufferWriter(value, sizeof(T));
