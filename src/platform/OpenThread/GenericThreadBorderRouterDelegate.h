@@ -74,7 +74,7 @@ public:
 private:
     CHIP_ERROR SaveActiveDatasetConfigured(bool configured);
     ActivateDatasetCallback * mCallback = nullptr;
-    uint32_t mSequenceNum = 0;
+    uint32_t mSequenceNum               = 0;
     char mThreadBorderRouterName[kBorderRouterNameMaxLength + 1];
     PersistentStorageDelegate * mStorage;
 };
