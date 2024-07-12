@@ -224,9 +224,6 @@ limitations under the License.
       <field id="7" name="DutyCycleControl" type="DutyCycleControlStruct" isNullable="true" optional="true"/>
       <field id="8" name="PowerSavingsControl" type="PowerSavingsControlStruct" isNullable="true" optional="true"/>
       <field id="9" name="HeatingSourceControl" type="HeatingSourceControlStruct" isNullable="true" optional="true"/>
-      <!-- Spec has an invalid field ID that cannot be used, so not enabling the Signature field for now.  See
-           https://github.com/CHIP-Specifications/connectedhomeip-spec/issues/8515 -->
-      <!-- <field id="0xFF" name="Signature" type="octet_string" length="48" isNullable="true"/> -->
     </event>
 
   </cluster>
