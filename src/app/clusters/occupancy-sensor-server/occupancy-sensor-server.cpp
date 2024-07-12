@@ -152,7 +152,6 @@ using namespace chip::app;
 using namespace chip::app::Clusters;
 using namespace chip::app::Clusters::OccupancySensing;
 
-
 //******************************************************************************
 // Plugin init function
 //******************************************************************************
