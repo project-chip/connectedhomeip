@@ -360,6 +360,12 @@ private:
                               const EmberAfPluginDoorLockCredentialInfo & existingCredential, const chip::ByteSpan & credentialData,
                               Nullable<uint16_t> userIndex, const Nullable<UserStatusEnum> & userStatus,
                               Nullable<UserTypeEnum> userType, uint16_t & createdUserIndex);
+    /**
+     * countOccupiedCredentials counts the number of occupied credentials of the
+     * given type.  Returns false on application-side errors (i.e. if the count
+     * cannot be determined).
+     */
+    bool countOccupiedCredentials(chip::EndpointId endpointId, CredentialTypeEnum credentialType, size_t & occupiedCount);
     DlStatus modifyProgrammingPIN(chip::EndpointId endpointId, chip::FabricIndex modifierFabricIndex, chip::NodeId sourceNodeId,
                                   uint16_t credentialIndex, CredentialTypeEnum credentialType,
                                   const EmberAfPluginDoorLockCredentialInfo & existingCredential,
