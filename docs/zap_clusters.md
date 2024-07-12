@@ -79,6 +79,7 @@ Generally regenerate using one of:
 |        129 |       0x81 | ValveConfigurationAndControl                            |
 |        144 |       0x90 | ElectricalPowerMeasurement                              |
 |        145 |       0x91 | ElectricalEnergyMeasurement                             |
+|        148 |       0x94 | WaterHeaterManagement                                   |
 |        150 |       0x96 | DemandResponseLoadControl                               |
 |        151 |       0x97 | Messages                                                |
 |        152 |       0x98 | DeviceEnergyManagement                                  |
@@ -130,6 +131,7 @@ Generally regenerate using one of:
 |       1294 |      0x50E | AccountLogin                                            |
 |       1295 |      0x50F | ContentControl                                          |
 |       1296 |      0x510 | ContentAppObserver                                      |
+|       1873 |      0x751 | CommissionerControl                                     |
 |       2820 |      0xB04 | ElectricalMeasurement                                   |
 | 4294048773 | 0xFFF1FC05 | UnitTesting                                             |
 | 4294048774 | 0xFFF1FC06 | FaultInjection                                          |

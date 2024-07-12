@@ -241,7 +241,7 @@ cluster BasicInformation = 40 {
   readonly attribute optional char_string<32> serialNumber = 15;
   attribute access(write: manage) optional boolean localConfigDisabled = 16;
   readonly attribute optional boolean reachable = 17;
-  readonly attribute optional char_string<32> uniqueID = 18;
+  readonly attribute char_string<32> uniqueID = 18;
   readonly attribute CapabilityMinimaStruct capabilityMinima = 19;
   readonly attribute optional ProductAppearanceStruct productAppearance = 20;
   readonly attribute int32u specificationVersion = 21;
@@ -1651,7 +1651,7 @@ provisional cluster DeviceEnergyManagement = 152 {
 
 /** Electric Vehicle Supply Equipment (EVSE) is equipment used to charge an Electric Vehicle (EV) or Plug-In Hybrid Electric Vehicle. This cluster provides an interface to the functionality of Electric Vehicle Supply Equipment (EVSE) management. */
 cluster EnergyEvse = 153 {
-  revision 2;
+  revision 4;
 
   enum EnergyTransferStoppedReasonEnum : enum8 {
     kEVStopped = 0;
@@ -1695,6 +1695,7 @@ cluster EnergyEvse = 153 {
     kDischargingEnabled = 2;
     kDisabledError = 3;
     kDisabledDiagnostics = 4;
+    kEnabled = 5;
   }
 
   bitmap Feature : bitmap32 {
@@ -1742,6 +1743,7 @@ cluster EnergyEvse = 153 {
     int32u sessionID = 0;
     StateEnum state = 1;
     amperage_ma maximumCurrent = 2;
+    optional amperage_ma maximumDischargeCurrent = 3;
   }
 
   info event EnergyTransferStopped = 3 {
@@ -1749,6 +1751,7 @@ cluster EnergyEvse = 153 {
     StateEnum state = 1;
     EnergyTransferStoppedReasonEnum reason = 2;
     energy_mwh energyTransferred = 4;
+    optional energy_mwh energyDischarged = 5;
   }
 
   critical event Fault = 4 {
@@ -1813,15 +1816,15 @@ cluster EnergyEvse = 153 {
 
   /** Allows a client to disable the EVSE from charging and discharging. */
   timed command Disable(): DefaultSuccess = 1;
-  /** Allows a client to enable the EVSE to charge an EV. */
+  /** This command allows a client to enable the EVSE to charge an EV, */
   timed command EnableCharging(EnableChargingRequest): DefaultSuccess = 2;
-  /** Allows a client to enable the EVSE to discharge an EV. */
+  /** Upon receipt, this SHALL allow a client to enable the discharge of an EV, */
   timed command EnableDischarging(EnableDischargingRequest): DefaultSuccess = 3;
   /** Allows a client to put the EVSE into a self-diagnostics mode. */
   timed command StartDiagnostics(): DefaultSuccess = 4;
   /** Allows a client to set the user specified charging targets. */
   timed command SetTargets(SetTargetsRequest): DefaultSuccess = 5;
-  /** Allows a client to retrieve the user specified charging targets. */
+  /** Allows a client to retrieve the current set of charging targets. */
   timed command GetTargets(): GetTargetsResponse = 6;
   /** Allows a client to clear all stored charging targets. */
   timed command ClearTargets(): DefaultSuccess = 7;
@@ -1993,6 +1996,7 @@ endpoint 0 {
     callback attribute softwareVersion;
     callback attribute softwareVersionString;
     callback attribute serialNumber;
+    callback attribute uniqueID;
     callback attribute capabilityMinima;
     callback attribute specificationVersion;
     callback attribute maxPathsPerInvoke;

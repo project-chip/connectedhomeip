@@ -20,8 +20,3 @@ Generates and parses Manual Pairing Code and QR Code
 ```
 
 For more details please refer Matter Specification
-
----
-
-NOTE: This tool is only capable of generating the payloads and no support to
-parse the payloads.

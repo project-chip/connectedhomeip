@@ -587,8 +587,8 @@ Status WriteHandler::ProcessWriteRequest(System::PacketBufferHandle && aPayload,
     if (mIsTimedRequest != aIsTimedWrite)
     {
         // The message thinks it should be part of a timed interaction but it's
-        // not, or vice versa.  Spec says to Respond with UNSUPPORTED_ACCESS.
-        status = Status::UnsupportedAccess;
+        // not, or vice versa.
+        status = Status::TimedRequestMismatch;
         goto exit;
     }
 

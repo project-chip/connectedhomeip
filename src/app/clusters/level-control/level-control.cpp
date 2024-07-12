@@ -160,7 +160,7 @@ public:
     /// @return CHIP_NO_ERROR if successfully serialized the data, CHIP_ERROR_INVALID_ARGUMENT otherwise
     CHIP_ERROR SerializeSave(EndpointId endpoint, ClusterId cluster, MutableByteSpan & serializedBytes) override
     {
-        using AttributeValuePair = ScenesManagement::Structs::AttributeValuePair::Type;
+        using AttributeValuePair = ScenesManagement::Structs::AttributeValuePairStruct::Type;
 
         app::DataModel::Nullable<uint8_t> level;
         VerifyOrReturnError(Status::Success == Attributes::CurrentLevel::Get(endpoint, level), CHIP_ERROR_READ_FAILED);
@@ -173,19 +173,19 @@ public:
         pairs[0].attributeID = Attributes::CurrentLevel::Id;
         if (!level.IsNull())
         {
-            pairs[0].attributeValue = level.Value();
+            pairs[0].valueUnsigned8.SetValue(level.Value());
         }
         else
         {
-            chip::app::NumericAttributeTraits<uint32_t>::SetNull(pairs[0].attributeValue);
+            pairs[0].valueUnsigned8.SetValue(app::NumericAttributeTraits<uint8_t>::kNullValue);
         }
         size_t attributeCount = 1;
         if (LevelControlHasFeature(endpoint, LevelControl::Feature::kFrequency))
         {
             uint16_t frequency;
             VerifyOrReturnError(Status::Success == Attributes::CurrentFrequency::Get(endpoint, &frequency), CHIP_ERROR_READ_FAILED);
-            pairs[attributeCount].attributeID    = Attributes::CurrentFrequency::Id;
-            pairs[attributeCount].attributeValue = frequency;
+            pairs[attributeCount].attributeID = Attributes::CurrentFrequency::Id;
+            pairs[attributeCount].valueUnsigned16.SetValue(frequency);
             attributeCount++;
         }
 
@@ -203,7 +203,7 @@ public:
     CHIP_ERROR ApplyScene(EndpointId endpoint, ClusterId cluster, const ByteSpan & serializedBytes,
                           scenes::TransitionTimeMs timeMs) override
     {
-        app::DataModel::DecodableList<ScenesManagement::Structs::AttributeValuePair::DecodableType> attributeValueList;
+        app::DataModel::DecodableList<ScenesManagement::Structs::AttributeValuePairStruct::DecodableType> attributeValueList;
 
         ReturnErrorOnFailure(DecodeAttributeValueList(serializedBytes, attributeValueList));
 
@@ -225,11 +225,13 @@ public:
             switch (decodePair.attributeID)
             {
             case Attributes::CurrentLevel::Id:
-                level = static_cast<uint8_t>(decodePair.attributeValue);
+                VerifyOrReturnError(decodePair.valueUnsigned8.HasValue(), CHIP_ERROR_INVALID_ARGUMENT);
+                level = decodePair.valueUnsigned8.Value();
                 break;
             case Attributes::CurrentFrequency::Id:
                 // TODO : Uncomment when frequency is supported by the level control cluster
-                // frequency = static_cast<uint16_t>(decodePair.attributeValue);
+                // VerifyOrReturnError(decodePair.valueUnsigned16.HasValue(), CHIP_ERROR_INVALID_ARGUMENT);
+                // frequency = decodePair.valueUnsigned16.Value();
                 break;
             default:
                 return CHIP_ERROR_INVALID_ARGUMENT;
@@ -240,7 +242,13 @@ public:
         // TODO : Implement action on frequency when frequency not provisional anymore
         // if(LevelControlHasFeature(endpoint, LevelControl::Feature::kFrequency)){}
 
-        if (!chip::app::NumericAttributeTraits<uint8_t>::IsNullValue(level))
+        EmberAfLevelControlState * state = getState(endpoint);
+        if (level < state->minLevel || level > state->maxLevel)
+        {
+            chip::app::NumericAttributeTraits<uint8_t>::SetNull(level);
+        }
+
+        if (!app::NumericAttributeTraits<uint8_t>::IsNullValue(level))
         {
             CommandId command = LevelControlHasFeature(endpoint, LevelControl::Feature::kOnOff) ? Commands::MoveToLevelWithOnOff::Id
                                                                                                 : Commands::MoveToLevel::Id;

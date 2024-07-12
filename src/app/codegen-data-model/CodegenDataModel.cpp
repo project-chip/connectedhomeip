@@ -18,6 +18,7 @@
 
 #include <app-common/zap-generated/attribute-type.h>
 #include <app/RequiredPrivilege.h>
+#include <app/util/IMClusterCommandHandler.h>
 #include <app/util/attribute-storage.h>
 #include <app/util/endpoint-config-api.h>
 #include <lib/core/DataModelTypes.h>
@@ -115,7 +116,7 @@ void LoadAttributeInfo(const ConcreteAttributePath & path, const EmberAfAttribut
                        InteractionModel::AttributeInfo * info)
 {
     info->readPrivilege = RequiredPrivilege::ForReadAttribute(path);
-    if (attribute.IsReadOnly())
+    if (!attribute.IsReadOnly())
     {
         info->writePrivilege = RequiredPrivilege::ForWriteAttribute(path);
     }
@@ -231,25 +232,20 @@ bool CodegenDataModel::EmberCommandListIterator::Exists(const CommandId * list, 
     return (*mCurrentHint == toCheck);
 }
 
-CHIP_ERROR CodegenDataModel::ReadAttribute(const InteractionModel::ReadAttributeRequest & request,
-                                           InteractionModel::ReadState & state, AttributeValueEncoder & encoder)
-{
-    // TODO: this needs an implementation
-    return CHIP_ERROR_NOT_IMPLEMENTED;
-}
-
-CHIP_ERROR CodegenDataModel::WriteAttribute(const InteractionModel::WriteAttributeRequest & request,
-                                            AttributeValueDecoder & decoder)
-{
-    // TODO: this needs an implementation
-    return CHIP_ERROR_NOT_IMPLEMENTED;
-}
-
 CHIP_ERROR CodegenDataModel::Invoke(const InteractionModel::InvokeRequest & request, TLV::TLVReader & input_arguments,
-                                    InteractionModel::InvokeReply & reply)
+                                    CommandHandler * handler)
 {
-    // TODO: this needs an implementation
-    return CHIP_ERROR_NOT_IMPLEMENTED;
+    // TODO: CommandHandlerInterface support is currently
+    //       residing in InteractionModelEngine itself. We may want to separate this out
+    //       into its own registry, similar to attributes, so that IM is decoupled from actual storage of things.
+    //
+    //       Open issue at https://github.com/project-chip/connectedhomeip/issues/34258
+
+    // Ember dispatching automatically uses `handler` to set an appropriate result or status
+    // This never fails (as handler error is encoded as needed).
+    DispatchSingleClusterCommand(request.path, input_arguments, handler);
+
+    return CHIP_NO_ERROR;
 }
 
 EndpointId CodegenDataModel::FirstEndpoint()

@@ -32,6 +32,8 @@ static_library("cc13x4_26x4") {
     "../CC13XX_26XXConfig.h",
     "../ConfigurationManagerImpl.cpp",
     "../ConnectivityManagerImpl.cpp",
+    "../DefaultTestEventTriggerDelegate.cpp",
+    "../DefaultTestEventTriggerDelegate.h",
     "../DiagnosticDataProviderImpl.cpp",
     "../DiagnosticDataProviderImpl.h",
     "../KeyValueStoreManagerImpl.cpp",
@@ -56,6 +58,7 @@ static_library("cc13x4_26x4") {
   ]
 
   public_deps = [
+    "${chip_root}/src/app:test-event-trigger",
     "${chip_root}/src/crypto",
     "${chip_root}/src/platform:platform_base",
   ]

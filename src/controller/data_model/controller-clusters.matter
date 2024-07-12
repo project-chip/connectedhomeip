@@ -760,7 +760,7 @@ cluster BasicInformation = 40 {
   readonly attribute optional char_string<32> serialNumber = 15;
   attribute access(write: manage) optional boolean localConfigDisabled = 16;
   readonly attribute optional boolean reachable = 17;
-  readonly attribute optional char_string<32> uniqueID = 18;
+  readonly attribute char_string<32> uniqueID = 18;
   readonly attribute CapabilityMinimaStruct capabilityMinima = 19;
   readonly attribute optional ProductAppearanceStruct productAppearance = 20;
   readonly attribute int32u specificationVersion = 21;
@@ -2258,7 +2258,7 @@ cluster BridgedDeviceBasicInformation = 57 {
   readonly attribute optional char_string<64> productLabel = 14;
   readonly attribute optional char_string<32> serialNumber = 15;
   readonly attribute boolean reachable = 17;
-  readonly attribute optional char_string<32> uniqueID = 18;
+  readonly attribute char_string<32> uniqueID = 18;
   readonly attribute optional ProductAppearanceStruct productAppearance = 20;
   readonly attribute command_id generatedCommandList[] = 65528;
   readonly attribute command_id acceptedCommandList[] = 65529;
@@ -2672,6 +2672,11 @@ cluster BooleanState = 69 {
 cluster IcdManagement = 70 {
   revision 2;
 
+  enum ClientTypeEnum : enum8 {
+    kPermanent = 0;
+    kEphemeral = 1;
+  }
+
   enum OperatingModeEnum : enum8 {
     kSIT = 0;
     kLIT = 1;
@@ -2706,6 +2711,7 @@ cluster IcdManagement = 70 {
   fabric_scoped struct MonitoringRegistrationStruct {
     fabric_sensitive node_id checkInNodeID = 1;
     fabric_sensitive int64u monitoredSubject = 2;
+    fabric_sensitive ClientTypeEnum clientType = 4;
     fabric_idx fabricIndex = 254;
   }
 
@@ -2730,6 +2736,7 @@ cluster IcdManagement = 70 {
     int64u monitoredSubject = 1;
     octet_string<16> key = 2;
     optional octet_string<16> verificationKey = 3;
+    ClientTypeEnum clientType = 4;
   }
 
   response struct RegisterClientResponse = 1 {
@@ -2926,8 +2933,8 @@ cluster OvenMode = 73 {
   command ChangeToMode(ChangeToModeRequest): ChangeToModeResponse = 0;
 }
 
-/** This cluster supports remotely monitoring and controling the different typs of
-            functionality available to a drying device, such as a laundry dryer. */
+/** This cluster provides a way to access options associated with the operation of
+            a laundry dryer device type. */
 cluster LaundryDryerControls = 74 {
   revision 1;
 
@@ -3749,14 +3756,21 @@ provisional cluster ScenesManagement = 98 {
     kSceneNames = 0x1;
   }
 
-  struct AttributeValuePair {
+  struct AttributeValuePairStruct {
     attrib_id attributeID = 0;
-    int32u attributeValue = 1;
+    optional int8u valueUnsigned8 = 1;
+    optional int8s valueSigned8 = 2;
+    optional int16u valueUnsigned16 = 3;
+    optional int16s valueSigned16 = 4;
+    optional int32u valueUnsigned32 = 5;
+    optional int32s valueSigned32 = 6;
+    optional int64u valueUnsigned64 = 7;
+    optional int64s valueSigned64 = 8;
   }
 
   struct ExtensionFieldSet {
     cluster_id clusterID = 0;
-    AttributeValuePair attributeValueList[] = 1;
+    AttributeValuePairStruct attributeValueList[] = 1;
   }
 
   fabric_scoped struct SceneInfoStruct {
@@ -3868,7 +3882,7 @@ provisional cluster ScenesManagement = 98 {
     int8u sceneIdentifierFrom = 2;
   }
 
-  /** Add a scene to the scene table. Extension field sets are supported, and are inputed as '{"ClusterID": VALUE, "AttributeValueList":[{"AttributeId": VALUE, "AttributeValue": VALUE}]}' */
+  /** Add a scene to the scene table. Extension field sets are supported, and are inputed as '{"ClusterID": VALUE, "AttributeValueList":[{"AttributeID": VALUE, "Value*": VALUE}]}' */
   fabric command access(invoke: manage) AddScene(AddSceneRequest): AddSceneResponse = 0;
   /** Retrieves the requested scene entry from its Scene table. */
   fabric command ViewScene(ViewSceneRequest): ViewSceneResponse = 1;
@@ -4302,6 +4316,64 @@ cluster ElectricalEnergyMeasurement = 145 {
   readonly attribute attrib_id attributeList[] = 65531;
   readonly attribute bitmap32 featureMap = 65532;
   readonly attribute int16u clusterRevision = 65533;
+}
+
+/** This cluster is used to allow clients to control the operation of a hot water heating appliance so that it can be used with energy management. */
+provisional cluster WaterHeaterManagement = 148 {
+  revision 1;
+
+  enum BoostStateEnum : enum8 {
+    kInactive = 0;
+    kActive = 1;
+  }
+
+  bitmap Feature : bitmap32 {
+    kEnergyManagement = 0x1;
+    kTankPercent = 0x2;
+  }
+
+  bitmap WaterHeaterDemandBitmap : bitmap8 {
+    kImmersionElement1 = 0x1;
+    kImmersionElement2 = 0x2;
+    kHeatPump = 0x4;
+    kBoiler = 0x8;
+    kOther = 0x10;
+  }
+
+  bitmap WaterHeaterTypeBitmap : bitmap8 {
+    kImmersionElement1 = 0x1;
+    kImmersionElement2 = 0x2;
+    kHeatPump = 0x4;
+    kBoiler = 0x8;
+    kOther = 0x10;
+  }
+
+  readonly attribute WaterHeaterTypeBitmap heaterTypes = 0;
+  readonly attribute WaterHeaterDemandBitmap heatDemand = 1;
+  readonly attribute optional int16u tankVolume = 2;
+  readonly attribute optional energy_mwh estimatedHeatRequired = 3;
+  readonly attribute optional percent tankPercentage = 4;
+  readonly attribute BoostStateEnum boostState = 5;
+  readonly attribute command_id generatedCommandList[] = 65528;
+  readonly attribute command_id acceptedCommandList[] = 65529;
+  readonly attribute event_id eventList[] = 65530;
+  readonly attribute attrib_id attributeList[] = 65531;
+  readonly attribute bitmap32 featureMap = 65532;
+  readonly attribute int16u clusterRevision = 65533;
+
+  request struct BoostRequest {
+    elapsed_s duration = 0;
+    optional boolean oneShot = 1;
+    optional boolean emergencyBoost = 2;
+    optional temperature temporarySetpoint = 3;
+    optional percent targetPercentage = 4;
+    optional percent targetReheat = 5;
+  }
+
+  /** Allows a client to request that the water heater is put into a Boost state. */
+  command access(invoke: manage) Boost(BoostRequest): DefaultSuccess = 0;
+  /** Allows a client to cancel an ongoing Boost operation. */
+  command access(invoke: manage) CancelBoost(): DefaultSuccess = 1;
 }
 
 /** This cluster provides an interface to the functionality of Smart Energy Demand Response and Load Control. */
@@ -4816,7 +4888,7 @@ provisional cluster DeviceEnergyManagement = 152 {
 
 /** Electric Vehicle Supply Equipment (EVSE) is equipment used to charge an Electric Vehicle (EV) or Plug-In Hybrid Electric Vehicle. This cluster provides an interface to the functionality of Electric Vehicle Supply Equipment (EVSE) management. */
 cluster EnergyEvse = 153 {
-  revision 2;
+  revision 4;
 
   enum EnergyTransferStoppedReasonEnum : enum8 {
     kEVStopped = 0;
@@ -4860,6 +4932,7 @@ cluster EnergyEvse = 153 {
     kDischargingEnabled = 2;
     kDisabledError = 3;
     kDisabledDiagnostics = 4;
+    kEnabled = 5;
   }
 
   bitmap Feature : bitmap32 {
@@ -4907,6 +4980,7 @@ cluster EnergyEvse = 153 {
     int32u sessionID = 0;
     StateEnum state = 1;
     amperage_ma maximumCurrent = 2;
+    optional amperage_ma maximumDischargeCurrent = 3;
   }
 
   info event EnergyTransferStopped = 3 {
@@ -4914,6 +4988,7 @@ cluster EnergyEvse = 153 {
     StateEnum state = 1;
     EnergyTransferStoppedReasonEnum reason = 2;
     energy_mwh energyTransferred = 4;
+    optional energy_mwh energyDischarged = 5;
   }
 
   critical event Fault = 4 {
@@ -4978,15 +5053,15 @@ cluster EnergyEvse = 153 {
 
   /** Allows a client to disable the EVSE from charging and discharging. */
   timed command Disable(): DefaultSuccess = 1;
-  /** Allows a client to enable the EVSE to charge an EV. */
+  /** This command allows a client to enable the EVSE to charge an EV, */
   timed command EnableCharging(EnableChargingRequest): DefaultSuccess = 2;
-  /** Allows a client to enable the EVSE to discharge an EV. */
+  /** Upon receipt, this SHALL allow a client to enable the discharge of an EV, */
   timed command EnableDischarging(EnableDischargingRequest): DefaultSuccess = 3;
   /** Allows a client to put the EVSE into a self-diagnostics mode. */
   timed command StartDiagnostics(): DefaultSuccess = 4;
   /** Allows a client to set the user specified charging targets. */
   timed command SetTargets(SetTargetsRequest): DefaultSuccess = 5;
-  /** Allows a client to retrieve the user specified charging targets. */
+  /** Allows a client to retrieve the current set of charging targets. */
   timed command GetTargets(): GetTargetsResponse = 6;
   /** Allows a client to clear all stored charging targets. */
   timed command ClearTargets(): DefaultSuccess = 7;
@@ -7356,6 +7431,17 @@ cluster OccupancySensing = 1030 {
     kPhysicalContact = 3;
   }
 
+  bitmap Feature : bitmap32 {
+    kOther = 0x1;
+    kPassiveInfrared = 0x2;
+    kUltrasonic = 0x4;
+    kPhysicalContact = 0x8;
+    kActiveInfrared = 0x10;
+    kRadar = 0x20;
+    kRFSensing = 0x40;
+    kVision = 0x80;
+  }
+
   bitmap OccupancyBitmap : bitmap8 {
     kOccupied = 0x1;
   }
@@ -7366,9 +7452,17 @@ cluster OccupancySensing = 1030 {
     kPhysicalContact = 0x4;
   }
 
+  struct HoldTimeLimitsStruct {
+    int16u holdTimeMin = 0;
+    int16u holdTimeMax = 1;
+    int16u holdTimeDefault = 2;
+  }
+
   readonly attribute OccupancyBitmap occupancy = 0;
   readonly attribute OccupancySensorTypeEnum occupancySensorType = 1;
   readonly attribute OccupancySensorTypeBitmap occupancySensorTypeBitmap = 2;
+  attribute access(write: manage) optional int16u holdTime = 3;
+  readonly attribute optional HoldTimeLimitsStruct holdTimeLimits = 4;
   attribute access(write: manage) optional int16u PIROccupiedToUnoccupiedDelay = 16;
   attribute access(write: manage) optional int16u PIRUnoccupiedToOccupiedDelay = 17;
   attribute access(write: manage) optional int8u PIRUnoccupiedToOccupiedThreshold = 18;
@@ -7977,18 +8071,18 @@ cluster WiFiNetworkManagement = 1105 {
 }
 
 /** Manage the Thread network of Thread Border Router */
-cluster ThreadBorderRouterManagement = 1106 {
+provisional cluster ThreadBorderRouterManagement = 1106 {
   revision 1;
 
   bitmap Feature : bitmap32 {
     kPANChange = 0x1;
   }
 
-  readonly attribute char_string<63> borderRouterName = 0;
-  readonly attribute octet_string<254> borderAgentID = 1;
-  readonly attribute int16u threadVersion = 2;
-  readonly attribute boolean interfaceEnabled = 3;
-  readonly attribute nullable int64u activeDatasetTimestamp = 5;
+  provisional readonly attribute char_string<63> borderRouterName = 0;
+  provisional readonly attribute octet_string<254> borderAgentID = 1;
+  provisional readonly attribute int16u threadVersion = 2;
+  provisional readonly attribute boolean interfaceEnabled = 3;
+  provisional readonly attribute nullable int64u activeDatasetTimestamp = 4;
   readonly attribute command_id generatedCommandList[] = 65528;
   readonly attribute command_id acceptedCommandList[] = 65529;
   readonly attribute event_id eventList[] = 65530;
@@ -7996,7 +8090,7 @@ cluster ThreadBorderRouterManagement = 1106 {
   readonly attribute bitmap32 featureMap = 65532;
   readonly attribute int16u clusterRevision = 65533;
 
-  response struct DatasetResponse = 3 {
+  response struct DatasetResponse = 2 {
     octet_string<254> dataset = 0;
   }
 
@@ -8014,9 +8108,9 @@ cluster ThreadBorderRouterManagement = 1106 {
   /** Command to request the pending dataset of the Thread network to which the border router is connected. This command must be sent over a valid CASE session */
   command access(invoke: manage) GetPendingDatasetRequest(): DatasetResponse = 1;
   /** Command to set or update the active Dataset of the Thread network to which the Border Router is connected. */
-  command access(invoke: manage) SetActiveDatasetRequest(SetActiveDatasetRequestRequest): DefaultSuccess = 4;
+  command access(invoke: manage) SetActiveDatasetRequest(SetActiveDatasetRequestRequest): DefaultSuccess = 3;
   /** Command set or update the pending Dataset of the Thread network to which the Border Router is connected. */
-  command access(invoke: manage) SetPendingDatasetRequest(SetPendingDatasetRequestRequest): DefaultSuccess = 5;
+  command access(invoke: manage) SetPendingDatasetRequest(SetPendingDatasetRequestRequest): DefaultSuccess = 4;
 }
 
 /** Manages the names and credentials of Thread networks visible to the user. */
@@ -9101,6 +9195,57 @@ provisional cluster ContentAppObserver = 1296 {
   command ContentAppMessage(ContentAppMessageRequest): ContentAppMessageResponse = 0;
 }
 
+/** Supports the ability for clients to request the commissioning of themselves or other nodes onto a fabric which the cluster server can commission onto. */
+provisional cluster CommissionerControl = 1873 {
+  revision 1;
+
+  bitmap SupportedDeviceCategoryBitmap : bitmap32 {
+    kFabricSynchronization = 0x1;
+  }
+
+  fabric_sensitive info event access(read: manage) CommissioningRequestResult = 0 {
+    int64u requestId = 0;
+    node_id clientNodeId = 1;
+    enum8 statusCode = 2;
+    fabric_idx fabricIndex = 254;
+  }
+
+  readonly attribute access(read: manage) SupportedDeviceCategoryBitmap supportedDeviceCategories = 0;
+  readonly attribute command_id generatedCommandList[] = 65528;
+  readonly attribute command_id acceptedCommandList[] = 65529;
+  readonly attribute event_id eventList[] = 65530;
+  readonly attribute attrib_id attributeList[] = 65531;
+  readonly attribute bitmap32 featureMap = 65532;
+  readonly attribute int16u clusterRevision = 65533;
+
+  request struct RequestCommissioningApprovalRequest {
+    int64u requestId = 0;
+    vendor_id vendorId = 1;
+    int16u productId = 2;
+    optional char_string<64> label = 3;
+  }
+
+  request struct CommissionNodeRequest {
+    int64u requestId = 0;
+    int16u responseTimeoutSeconds = 1;
+    optional octet_string ipAddress = 2;
+    optional int16u port = 3;
+  }
+
+  response struct ReverseOpenCommissioningWindow = 2 {
+    int16u commissioningTimeout = 0;
+    octet_string PAKEPasscodeVerifier = 1;
+    int16u discriminator = 2;
+    int32u iterations = 3;
+    octet_string<32> salt = 4;
+  }
+
+  /** This command is sent by a client to request approval for a future CommissionNode call. */
+  command access(invoke: manage) RequestCommissioningApproval(RequestCommissioningApprovalRequest): DefaultSuccess = 0;
+  /** This command is sent by a client to request that the server begins commissioning a previously approved request. */
+  command access(invoke: manage) CommissionNode(CommissionNodeRequest): ReverseOpenCommissioningWindow = 1;
+}
+
 /** Attributes related to the electrical properties of a device. This cluster is used by power outlets and other devices that need to provide instantaneous data as opposed to metrology data which should be retrieved from the metering cluster.. */
 deprecated cluster ElectricalMeasurement = 2820 {
   revision 3;
@@ -9616,6 +9761,10 @@ internal cluster UnitTesting = 4294048773 {
     int8u arg1[] = 0;
   }
 
+  response struct StringEchoResponse = 13 {
+    octet_string payload = 0;
+  }
+
   request struct TestEnumsRequestRequest {
     vendor_id arg1 = 0;
     SimpleEnum arg2 = 1;
@@ -9668,6 +9817,10 @@ internal cluster UnitTesting = 4294048773 {
     int16u sleepBeforeResponseTimeMs = 0;
     int16u sizeOfResponseBuffer = 1;
     int8u fillCharacter = 2;
+  }
+
+  request struct StringEchoRequestRequest {
+    octet_string payload = 0;
   }
 
   request struct TestDifferentVendorMeiRequestRequest {
@@ -9749,6 +9902,10 @@ internal cluster UnitTesting = 4294048773 {
   command TestBatchHelperRequest(TestBatchHelperRequestRequest): TestBatchHelperResponse = 22;
   /** Second command that responds after sleepBeforeResponseTimeMs with an octet_string the size requested with fillCharacter. */
   command TestSecondBatchHelperRequest(TestSecondBatchHelperRequestRequest): TestBatchHelperResponse = 23;
+  /** Command that takes an argument which is an octet string.  The response echoes
+        the string back. If the string is large then it would require a session that
+        supports large payloads. */
+  command StringEchoRequest(StringEchoRequestRequest): StringEchoResponse = 24;
   /** Command having a different MEI vendor ID than the cluster. Also emits TestDifferentVendorMeiEvent. */
   command TestDifferentVendorMeiRequest(TestDifferentVendorMeiRequestRequest): TestDifferentVendorMeiResponse = 4294049962;
 }
