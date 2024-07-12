@@ -31,7 +31,7 @@ extern "C" int LLVMFuzzerTestOneInput(const uint8_t * data, size_t len)
     ByteSpan span(data, len);
     char encodedBuf[kMaxOutputSize];
     MutableCharSpan encodedSpan(encodedBuf);
-    CHIP_ERROR encodingError = chip::base38Encode(span, encodedSpan);
+    CHIP_ERROR encodingError = base38Encode(span, encodedSpan);
 
     if (encodingError != CHIP_NO_ERROR)
     {
