@@ -57,6 +57,8 @@ public:
     void SetActiveDataset(const Thread::OperationalDataset & activeDataset, uint32_t sequenceNum,
                           ActivateDatasetCallback * callback) override;
 
+    CHIP_ERROR CommitActiveDataset() override;
+
     CHIP_ERROR RevertActiveDataset() override;
 
     CHIP_ERROR SetPendingDataset(const Thread::OperationalDataset & pendingDataset) override;

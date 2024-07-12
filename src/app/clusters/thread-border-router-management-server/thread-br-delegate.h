@@ -85,6 +85,9 @@ public:
     virtual void SetActiveDataset(const Thread::OperationalDataset & activeDataset, uint32_t sequenceNum,
                                   ActivateDatasetCallback * callback) = 0;
 
+    // This function will check save whether there is active dataset configured.
+    virtual CHIP_ERROR CommitActiveDataset() = 0;
+
     // The function is called when Failsafe timer is triggered or when the Border Router reboots with a previous Failsafe timer
     // started but not disarmed before reboot. The delegate implementation should check whether there is a previous SetActiveDataset
     // request and revert the active dataset set by the previous SetActiveDataset. Since there should be no configured dataset when

@@ -325,6 +325,10 @@ void ServerInstance::OnPlatformEventHandler(const DeviceLayer::ChipDeviceEvent *
     {
         _this->OnFailSafeTimerExpired();
     }
+    else if (event->Type == DeviceLayer::DeviceEventType::kCommissioningComplete)
+    {
+        _this->mDelegate->CommitActiveDataset();
+    }
 }
 
 CHIP_ERROR ServerInstance::Init()

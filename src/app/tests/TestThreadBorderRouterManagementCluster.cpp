@@ -99,6 +99,8 @@ public:
         mSetActiveDatasetCommandSequenceNum = sequenceNumber;
     }
 
+    CHIP_ERROR CommitActiveDataset() override { return CHIP_NO_ERROR; }
+
     CHIP_ERROR RevertActiveDataset() override
     {
         mStoredActiveDatasetLen = 0;
@@ -123,6 +125,7 @@ public:
         {
             mCallback->OnActivateDatasetComplete(mSetActiveDatasetCommandSequenceNum, CHIP_NO_ERROR);
         }
+        mCallback = nullptr;
     }
 
     bool mPanChangeSupported  = true;

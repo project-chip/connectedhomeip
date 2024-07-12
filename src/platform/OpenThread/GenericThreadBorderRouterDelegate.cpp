@@ -161,6 +161,11 @@ CHIP_ERROR GenericOpenThreadBorderRouterDelegate::SaveActiveDatasetConfigured(bo
     return mStorage->SyncSetKeyValue(kFailsafeActiveDatasetConfigured, &configured, sizeof(bool));
 }
 
+CHIP_ERROR GenericOpenThreadBorderRouterDelegate::CommitActiveDataset()
+{
+    return SaveActiveDatasetConfigured(DeviceLayer::ThreadStackMgrImpl().IsThreadAttached());
+}
+
 CHIP_ERROR GenericOpenThreadBorderRouterDelegate::RevertActiveDataset()
 {
     // The FailSafe Timer is triggered and the previous command request should be handled, so reset the callback.
