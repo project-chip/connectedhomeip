@@ -2290,8 +2290,12 @@ MTREventPriority MTREventPriorityForValidPriorityLevel(chip::app::PriorityLevel 
 
 - (BOOL)isEqualToAttributeRequestPath:(MTRAttributeRequestPath *)path
 {
-    return [_endpoint isEqualToNumber:path.endpoint] && [_cluster isEqualToNumber:path.cluster] &&
-        [_attribute isEqualToNumber:path.attribute];
+    if (!path)
+        return NO;
+
+    return (path.endpoint && [_endpoint isEqualToNumber:path.endpoint])
+        && (path.cluster && [_cluster isEqualToNumber:path.cluster])
+        && (path.attribute && [_attribute isEqualToNumber:path.attribute]);
 }
 
 - (BOOL)isEqual:(id)object
@@ -2362,8 +2366,12 @@ MTREventPriority MTREventPriorityForValidPriorityLevel(chip::app::PriorityLevel 
 
 - (BOOL)isEqualToEventRequestPath:(MTREventRequestPath *)path
 {
-    return
-        [_endpoint isEqualToNumber:path.endpoint] && [_cluster isEqualToNumber:path.cluster] && [_event isEqualToNumber:path.event];
+    if (!path)
+        return NO;
+
+    return (path.endpoint && [_endpoint isEqualToNumber:path.endpoint])
+        && (path.cluster && [_cluster isEqualToNumber:path.cluster])
+        && (path.event && [_event isEqualToNumber:path.event]);
 }
 
 - (BOOL)isEqual:(id)object
@@ -2432,7 +2440,11 @@ MTREventPriority MTREventPriorityForValidPriorityLevel(chip::app::PriorityLevel 
 
 - (BOOL)isEqualToClusterPath:(MTRClusterPath *)clusterPath
 {
-    return [_endpoint isEqualToNumber:clusterPath.endpoint] && [_cluster isEqualToNumber:clusterPath.cluster];
+    if (!clusterPath)
+        return NO;
+
+    return (clusterPath.endpoint && [_endpoint isEqualToNumber:clusterPath.endpoint])
+        && (clusterPath.cluster && [_cluster isEqualToNumber:clusterPath.cluster]);
 }
 
 - (BOOL)isEqual:(id)object
@@ -2520,7 +2532,10 @@ static NSString * const sClusterKey = @"clusterKey";
 
 - (BOOL)isEqualToAttributePath:(MTRAttributePath *)attributePath
 {
-    return [self isEqualToClusterPath:attributePath] && [_attribute isEqualToNumber:attributePath.attribute];
+    if (!attributePath)
+        return NO;
+
+    return [self isEqualToClusterPath:attributePath] && attributePath.attribute && [_attribute isEqualToNumber:attributePath.attribute];
 }
 
 - (BOOL)isEqual:(id)object
@@ -2613,7 +2628,10 @@ static NSString * const sAttributeKey = @"attributeKey";
 
 - (BOOL)isEqualToEventPath:(MTREventPath *)eventPath
 {
-    return [self isEqualToClusterPath:eventPath] && [_event isEqualToNumber:eventPath.event];
+    if (!eventPath)
+        return NO;
+
+    return [self isEqualToClusterPath:eventPath] && eventPath.event && [_event isEqualToNumber:eventPath.event];
 }
 
 - (BOOL)isEqual:(id)object
@@ -2703,7 +2721,10 @@ static NSString * const sEventKey = @"eventKey";
 
 - (BOOL)isEqualToCommandPath:(MTRCommandPath *)commandPath
 {
-    return [self isEqualToClusterPath:commandPath] && [_command isEqualToNumber:commandPath.command];
+    if (!commandPath)
+        return NO;
+
+    return [self isEqualToClusterPath:commandPath] && commandPath.command && [_command isEqualToNumber:commandPath.command];
 }
 
 - (BOOL)isEqual:(id)object
