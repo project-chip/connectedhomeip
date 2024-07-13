@@ -441,13 +441,14 @@ void EvseTargetsDelegate::PrintTargets(
     uint16_t chargingTargetScheduleIdx = 0;
     for (auto & chargingTargetSchedule : chargingTargetSchedules)
     {
-        uint8_t bitmask = chargingTargetSchedule.dayOfWeekForSequence.GetField(static_cast<TargetDayOfWeekBitmap>(0x7F));
+        [[maybe_unused]] uint8_t bitmask =
+            chargingTargetSchedule.dayOfWeekForSequence.GetField(static_cast<TargetDayOfWeekBitmap>(0x7F));
         ChipLogProgress(AppServer, "idx %u dayOfWeekForSequence 0x%02x", chargingTargetScheduleIdx, bitmask);
 
         uint16_t chargingTargetIdx = 0;
         for (auto & chargingTarget : chargingTargetSchedule.chargingTargets)
         {
-            int64_t addedEnergy = chargingTarget.addedEnergy.HasValue() ? chargingTarget.addedEnergy.Value() : 0;
+            [[maybe_unused]] int64_t addedEnergy = chargingTarget.addedEnergy.HasValue() ? chargingTarget.addedEnergy.Value() : 0;
 
             ChipLogProgress(
                 AppServer, "chargingTargetIdx %u targetTimeMinutesPastMidnight %u targetSoC %u addedEnergy 0x" ChipLogFormatX64,
