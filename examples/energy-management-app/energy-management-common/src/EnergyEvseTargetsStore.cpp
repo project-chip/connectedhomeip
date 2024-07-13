@@ -19,9 +19,9 @@
 #include <EnergyEvseTargetsStore.h>
 #include <app-common/zap-generated/attributes/Accessors.h>
 #include <app-common/zap-generated/cluster-objects.h>
+#include <app/server/Server.h>
 #include <lib/support/DefaultStorageKeyAllocator.h>
 #include <lib/support/SafeInt.h>
-#include <app/server/Server.h>
 
 using namespace chip;
 using namespace chip::app;
@@ -465,6 +465,4 @@ void EvseTargetsDelegate::PrintTargets(
 /**
  * Part of the FabricTable::Delegate interface. Gets called when a fabric is deleted, such as on FabricTable::Delete().
  **/
-void EvseTargetsDelegate::OnFabricRemoved(const FabricTable & fabricTable, FabricIndex fabricIndex)
-{
-}
+void EvseTargetsDelegate::OnFabricRemoved(const FabricTable & fabricTable, FabricIndex fabricIndex) {}

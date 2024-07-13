@@ -19,9 +19,9 @@
 #pragma once
 
 #include <app/clusters/energy-evse-server/energy-evse-server.h>
+#include <credentials/FabricTable.h>
 #include <lib/core/CHIPError.h>
 #include <lib/core/CHIPPersistentStorageDelegate.h>
-#include <credentials/FabricTable.h>
 #include <lib/support/CHIPMem.h>
 #include <lib/support/CodeUtils.h>
 #include <lib/support/Pool.h>
@@ -35,7 +35,7 @@ namespace app {
 namespace Clusters {
 namespace EnergyEvse {
 
-class EvseTargetsDelegate: public chip::FabricTable::Delegate
+class EvseTargetsDelegate : public chip::FabricTable::Delegate
 {
 public:
     EvseTargetsDelegate();
