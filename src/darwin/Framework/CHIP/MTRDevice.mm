@@ -3970,8 +3970,12 @@ static BOOL AttributeHasChangesOmittedQuality(MTRAttributePath * attributePath)
 
 - (NSArray * _Nullable)clientDataKeys
 {
-    // TODO: KMO: check this list, maybe use list from controller DS
+#if USE_DEVICE_CONTROLLER_DATA_STORE
+    // TODO:  KMO:  implement
+    return @[];
+#else
     return [self.temporaryMetaDataCache allKeys];
+#endif // USE_DEVICE_CONTROLLER_DATA_STORE
 }
 
 - (id<NSSecureCoding> _Nullable)clientDataForKey:(NSString *)key
