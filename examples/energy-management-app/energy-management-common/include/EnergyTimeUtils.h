@@ -20,10 +20,9 @@
 
 #include <app/util/config.h>
 #include <cstring>
+#include <lib/core/CHIPError.h>
 #include <protocols/Protocols.h>
-#include <protocols/interaction_model/StatusCode.h>
-
-using chip::Protocols::InteractionModel::Status;
+#include <time.h>
 
 namespace chip {
 namespace app {

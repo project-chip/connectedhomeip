@@ -20,12 +20,16 @@
 #include "DEMManufacturerDelegate.h"
 #include "EnergyTimeUtils.h"
 #include <app/EventLogging.h>
+#include <protocols/interaction_model/StatusCode.h>
 
 using namespace chip;
 using namespace chip::app;
 using namespace chip::app::Clusters;
 using namespace chip::app::Clusters::DeviceEnergyManagement;
 using namespace chip::app::Clusters::DeviceEnergyManagement::Attributes;
+
+using chip::Protocols::InteractionModel::Status;
+
 
 using chip::Optional;
 using CostsList = DataModel::List<const Structs::CostStruct::Type>;

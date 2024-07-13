@@ -20,16 +20,11 @@
 
 #include <app-common/zap-generated/cluster-objects.h>
 #include <lib/core/DataModelTypes.h>
-#include <protocols/interaction_model/StatusCode.h>
-
-using chip::Protocols::InteractionModel::Status;
 
 namespace chip {
 namespace app {
 namespace Clusters {
 namespace DeviceEnergyManagement {
-
-class DeviceEnergyManagementDelegate;
 
 /**
  * Class to abstract manufacturer specific functionality

@@ -21,7 +21,6 @@
 #include <app/clusters/device-energy-management-server/device-energy-management-server.h>
 #include <app/util/config.h>
 
-using chip::Protocols::InteractionModel::Status;
 namespace chip {
 namespace app {
 namespace Clusters {
@@ -55,7 +54,7 @@ public:
      * @param duration The duration that the ESA SHALL maintain the requested power for.
      * @return  Success if the adjustment is accepted; otherwise the command SHALL be rejected with appropriate error.
      */
-    virtual Status PowerAdjustRequest(const int64_t powerMw, const uint32_t durationS, AdjustmentCauseEnum cause) override;
+    virtual chip::Protocols::InteractionModel::Status PowerAdjustRequest(const int64_t powerMw, const uint32_t durationS, AdjustmentCauseEnum cause) override;
 
     /**
      * @brief Make the ESA end the active power adjustment session & return to normal (or idle) power levels.
@@ -63,7 +62,7 @@ public:
      *
      * @return It should report SUCCESS if successful and FAILURE otherwise.
      */
-    virtual Status CancelPowerAdjustRequest() override;
+    virtual chip::Protocols::InteractionModel::Status CancelPowerAdjustRequest() override;
 
     /**
      * @brief The ESA SHALL update its Forecast attribute with the RequestedStartTime including a new ForecastID.
@@ -81,7 +80,7 @@ public:
      * @return Success if the StartTime in the Forecast is updated, otherwise the command SHALL be rejected with appropriate
      * IM_Status.
      */
-    virtual Status StartTimeAdjustRequest(const uint32_t requestedStartTimeUtc, AdjustmentCauseEnum cause) override;
+    virtual chip::Protocols::InteractionModel::Status StartTimeAdjustRequest(const uint32_t requestedStartTimeUtc, AdjustmentCauseEnum cause) override;
 
     /**
      * @brief Handler for PauseRequest command
@@ -96,7 +95,7 @@ public:
      * @param duration Duration that the ESA SHALL be paused for.
      * @return  Success if the ESA is paused, otherwise returns other IM_Status.
      */
-    virtual Status PauseRequest(const uint32_t durationS, AdjustmentCauseEnum cause) override;
+    virtual chip::Protocols::InteractionModel::Status PauseRequest(const uint32_t durationS, AdjustmentCauseEnum cause) override;
 
     /**
      * @brief Handler for ResumeRequest command
@@ -107,7 +106,7 @@ public:
      *
      * @return  Success if the ESA is resumed, otherwise returns other IM_Status.
      */
-    virtual Status ResumeRequest() override;
+    virtual chip::Protocols::InteractionModel::Status ResumeRequest() override;
 
     /**
      * @brief Handler for ModifyForecastRequest
@@ -125,7 +124,7 @@ public:
      * @return  Success if the entire list of SlotAdjustmentStruct are accepted, otherwise the command
      *          SHALL be rejected returning other IM_Status.
      */
-    virtual Status
+    virtual chip::Protocols::InteractionModel::Status
     ModifyForecastRequest(const uint32_t forecastID,
                           const DataModel::DecodableList<Structs::SlotAdjustmentStruct::DecodableType> & slotAdjustments,
                           AdjustmentCauseEnum cause) override;
@@ -141,7 +140,7 @@ public:
      * @param constraints  Sequence of turn up/down power requests that the ESA is being asked to constrain its operation within.
      * @return  Success if successful, otherwise the command SHALL be rejected returning other IM_Status.
      */
-    virtual Status
+    virtual chip::Protocols::InteractionModel::Status
     RequestConstraintBasedForecast(const DataModel::DecodableList<Structs::ConstraintsStruct::DecodableType> & constraints,
                                    AdjustmentCauseEnum cause) override;
 
@@ -162,7 +161,7 @@ public:
      *
      * @return  Success if successful, otherwise the command SHALL be rejected returning other IM_Status.
      */
-    virtual Status CancelRequest() override;
+    virtual chip::Protocols::InteractionModel::Status CancelRequest() override;
 
     // ------------------------------------------------------------------
     // Overridden DeviceEnergyManagement::Delegate Get attribute methods
