@@ -1171,8 +1171,34 @@ static NSString * sClientDataKeyPrefix = @"clientData";
 static NSString * sClientDataNodeIndexKey = @"clientDataNodeIndex";
 
 - (NSArray<NSString *> *)_clientDataIndexForNodeID:(NSNumber *)nodeID {
-    // TODO:  implement
-    return @[@"key1", @"key2"];
+    __block NSArray<NSString *> * index = nil;
+
+    dispatch_sync(_storageDelegateQueue, ^{
+        id data;
+
+        MTRDeviceController * controller = self->_controller;
+        VerifyOrReturn(controller != nil); // No way to call delegate without controller.
+
+        @autoreleasepool {
+            data = [self->_storageDelegate controller:controller
+                                          valueForKey:[self _clientDataKeyForNodeID:nodeID key:sClientDataNodeIndexKey]
+                                        securityLevel:MTRStorageSecurityLevelSecure
+                                          sharingType:MTRStorageSharingTypeNotShared];  // REVIEWERS:  fabric shared? kmo 12 jul 2024 14h58
+        }
+        
+        if (data == nil) {
+            return;
+        }
+
+        if (![data isKindOfClass:[NSArray<NSString *> class]]) {
+            return;
+        }
+
+        // TODO:  what other checks are possible here? kmo 12 fri 2024 17h29
+        index = data;
+    });
+
+    return index;
 }
 
 - (NSString *)_clientDataKeyForNodeID:(NSNumber *)nodeID key:(NSString *)key
