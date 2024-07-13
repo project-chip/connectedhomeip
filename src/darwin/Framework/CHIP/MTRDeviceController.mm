@@ -295,6 +295,7 @@ using namespace chip::Tracing::DarwinFramework;
         return;
     }
 
+    MTR_LOG("Shutting down MTRDeviceController: %@", self);
     [self cleanupAfterStartup];
 }
 
@@ -306,6 +307,7 @@ using namespace chip::Tracing::DarwinFramework;
     // do the secure session shutdowns.  Since we don't want to hold the lock
     // while calling out into arbitrary invalidation code, snapshot the list of
     // devices before we start invalidating.
+    MTR_LOG("cleanupAfterStartup MTRDeviceController: %@", self);
     os_unfair_lock_lock(&_deviceMapLock);
     NSEnumerator * devices = [_nodeIDToDeviceMap objectEnumerator];
     [_nodeIDToDeviceMap removeAllObjects];
@@ -323,6 +325,7 @@ using namespace chip::Tracing::DarwinFramework;
 // in a very specific way that only MTRDeviceControllerFactory knows about.
 - (void)shutDownCppController
 {
+    MTR_LOG("shutDownCppController MTRDeviceController: %p", self);
     assertChipStackLockedByCurrentThread();
 
     // Shut down all our endpoints.
@@ -624,6 +627,7 @@ using namespace chip::Tracing::DarwinFramework;
             });
         }];
     }
+    MTR_LOG("MTRDeviceController startup: %@", self);
 
     return YES;
 }
@@ -1259,7 +1263,7 @@ static inline void emitMetricForSetupPayload(MTRSetupPayload * payload)
         return YES;
     }
 
-    MTR_LOG_ERROR("Error: %s", [kErrorNotRunning UTF8String]);
+    MTR_LOG_ERROR("MTRDeviceController: %@ Error: %s", self, [kErrorNotRunning UTF8String]);
     if (error) {
         *error = [MTRError errorForCHIPErrorCode:CHIP_ERROR_INCORRECT_STATE];
     }
