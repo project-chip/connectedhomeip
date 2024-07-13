@@ -21,6 +21,7 @@
 #include <app/clusters/energy-evse-server/energy-evse-server.h>
 #include <lib/core/CHIPError.h>
 #include <lib/core/CHIPPersistentStorageDelegate.h>
+#include <credentials/FabricTable.h>
 #include <lib/support/CHIPMem.h>
 #include <lib/support/CodeUtils.h>
 #include <lib/support/Pool.h>
@@ -34,7 +35,7 @@ namespace app {
 namespace Clusters {
 namespace EnergyEvse {
 
-class EvseTargetsDelegate
+class EvseTargetsDelegate: public chip::FabricTable::Delegate
 {
 public:
     EvseTargetsDelegate();
@@ -71,6 +72,11 @@ public:
      *  @brief   This deletes all targets and resets the list to empty
      */
     CHIP_ERROR ClearTargets();
+
+    /**
+     * Part of the FabricTable::Delegate interface. Gets called when a fabric is deleted, such as on FabricTable::Delete().
+     **/
+    virtual void OnFabricRemoved(const FabricTable & fabricTable, FabricIndex fabricIndex) override;
 
 private:
     static uint16_t GetTlvSizeEstimate();

@@ -21,6 +21,7 @@
 #include <app-common/zap-generated/cluster-objects.h>
 #include <lib/support/DefaultStorageKeyAllocator.h>
 #include <lib/support/SafeInt.h>
+#include <app/server/Server.h>
 
 using namespace chip;
 using namespace chip::app;
@@ -39,6 +40,9 @@ CHIP_ERROR EvseTargetsDelegate::Init(PersistentStorageDelegate * targetStore)
     VerifyOrReturnError(targetStore != nullptr, CHIP_ERROR_INVALID_ARGUMENT);
 
     mpTargetStore = targetStore;
+
+    // Set FabricDelegate
+    chip::Server::GetInstance().GetFabricTable().AddFabricDelegate(this);
 
     return CHIP_NO_ERROR;
 }
@@ -456,3 +460,11 @@ void EvseTargetsDelegate::PrintTargets(
         chargingTargetScheduleIdx++;
     }
 }
+
+/**
+ * Part of the FabricTable::Delegate interface. Gets called when a fabric is deleted, such as on FabricTable::Delete().
+ **/
+void EvseTargetsDelegate::OnFabricRemoved(const FabricTable & fabricTable, FabricIndex fabricIndex)
+{
+}
+
