@@ -468,4 +468,3 @@ void EvseTargetsDelegate::PrintTargets(
 void EvseTargetsDelegate::OnFabricRemoved(const FabricTable & fabricTable, FabricIndex fabricIndex)
 {
 }
-
