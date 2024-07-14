@@ -33,10 +33,11 @@ if (bridge_enable_pw_rpc) {
 executable("fabric-bridge-app") {
   sources = [
     "${chip_root}/examples/fabric-bridge-app/fabric-bridge-common/include/CHIPProjectAppConfig.h",
-    "Device.cpp",
-    "DeviceManager.cpp",
-    "include/Device.h",
-    "include/DeviceManager.h",
+    "${chip_root}/examples/fabric-bridge-app/fabric-bridge-common/include/Device.h",
+    "${chip_root}/examples/fabric-bridge-app/fabric-bridge-common/include/DeviceManager.h",
+    "${chip_root}/examples/fabric-bridge-app/fabric-bridge-common/src/Device.cpp",
+    "${chip_root}/examples/fabric-bridge-app/fabric-bridge-common/src/DeviceManager.cpp",
+    "${chip_root}/examples/fabric-bridge-app/fabric-bridge-common/src/ZCLCallbacks.cpp",
     "main.cpp",
   ]
 
@@ -46,7 +47,10 @@ executable("fabric-bridge-app") {
     "${chip_root}/src/lib",
   ]
 
-  include_dirs = [ "include" ]
+  include_dirs = [
+    "include",
+    "${chip_root}/examples/fabric-bridge-app/fabric-bridge-common/include",
+  ]
 
   if (bridge_enable_pw_rpc) {
     defines = [
