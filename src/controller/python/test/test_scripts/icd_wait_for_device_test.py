@@ -121,7 +121,7 @@ async def main():
     devCtrl.EnableICDRegistration(devCtrl.GenerateICDRegistrationParameters())
     if options.deviceAddress:
         logger.info("Testing commissioning (IP)")
-        FailIfNot(test.TestCommissioning(ip=options.deviceAddress,
+        FailIfNot(await test.TestCommissioning(ip=options.deviceAddress,
                                          setuppin=20202021,
                                          nodeid=options.nodeid),
                   "Failed to finish commissioning")
