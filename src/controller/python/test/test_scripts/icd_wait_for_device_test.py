@@ -108,8 +108,6 @@ async def main():
         help="Discovery type of commissioning. (0: networkOnly 1: networkOnlyWithoutPASEAutoRetry 2: All<Ble & Network>)",
         metavar="<discovery-type>"
     )
-    optParser.add_option("--test-step", action="store", dest="testStep", type="str",
-                         help="the step of the test (can be 'commissioning' or 'wait-for-active')", metavar="<test-step>")
 
     (options, remainingArgs) = optParser.parse_args(sys.argv[1:])
 

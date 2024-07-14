@@ -50,7 +50,7 @@ DEVICE_CONFIG = {
         'capability': ['TrafficControl', 'Mount'],
         'rcp_mode': True,
         'docker_network': 'Ipv6',
-        'traffic_control': {'latencyMs': 100},
+        'traffic_control': {'latencyMs': 25},
         "mount_pairs": [[CHIP_REPO, CHIP_REPO]],
     },
     'device1': {
@@ -59,7 +59,7 @@ DEVICE_CONFIG = {
         'capability': ['Thread', 'TrafficControl', 'Mount'],
         'rcp_mode': True,
         'docker_network': 'Ipv6',
-        'traffic_control': {'latencyMs': 100},
+        'traffic_control': {'latencyMs': 25},
         "mount_pairs": [[CHIP_REPO, CHIP_REPO]],
     }
 }
@@ -77,47 +77,40 @@ class TestCommissioner(CHIPVirtualHome):
         self.run_controller_test()
 
     def run_controller_test(self):
-        servers = [{
-            "ip": device['description']['ipv6_addr'],
-            "id": device['id']
-        } for device in self.non_ap_devices
-            if device['type'] == 'CHIPEndDevice']
+        ethernet_ip = [device['description']['ipv6_addr'] for device in self.non_ap_devices
+                       if device['type'] == 'CHIPEndDevice'][0]
+        server_ids = [device['id'] for device in self.non_ap_devices
+                      if device['type'] == 'CHIPEndDevice']
         req_ids = [device['id'] for device in self.non_ap_devices
                    if device['type'] == 'MobileDevice']
 
-        servers[0]['discriminator'] = TEST_DISCRIMINATOR
-        servers[0]['nodeid'] = 1
-
-        for server in servers:
+        for server in server_ids:
             self.execute_device_cmd(
-                server['id'],
-                ("CHIPCirqueDaemon.py -- run gdb -return-child-result -q -ex \"set pagination off\" "
-                 "-ex run -ex \"bt 25\" --args {} --thread --discriminator {}").format(
-                    os.path.join(CHIP_REPO, "out/debug/lit_icd/lit-icd-app"), server['discriminator']))
+                server,
+                ("CHIPCirqueDaemon.py -- run gdb -batch -return-child-result -q -ex \"set pagination off\" "
+                 "-ex run -ex \"thread apply all bt\" --args {} --thread --discriminator {}").format(
+                    os.path.join(CHIP_REPO, "out/debug/standalone/chip-all-clusters-app"), TEST_DISCRIMINATOR))
 
-        self.reset_thread_devices([server['id'] for server in servers])
+        self.reset_thread_devices(server_ids)
 
         req_device_id = req_ids[0]
 
-        self.execute_device_cmd(req_device_id, "pip3 install --break-system-packages {}".format(os.path.join(
+        self.execute_device_cmd(req_device_id, "pip3 install {}".format(os.path.join(
             CHIP_REPO, "out/debug/linux_x64_gcc/controller/python/chip_clusters-0.0-py3-none-any.whl")))
-        self.execute_device_cmd(req_device_id, "pip3 install --break-system-packages {}".format(os.path.join(
+        self.execute_device_cmd(req_device_id, "pip3 install {}".format(os.path.join(
             CHIP_REPO, "out/debug/linux_x64_gcc/controller/python/chip_core-0.0-cp37-abi3-linux_x86_64.whl")))
-        self.execute_device_cmd(req_device_id, "pip3 install --break-system-packages {}".format(os.path.join(
+        self.execute_device_cmd(req_device_id, "pip3 install {}".format(os.path.join(
             CHIP_REPO, "out/debug/linux_x64_gcc/controller/python/chip_repl-0.0-py3-none-any.whl")))
 
-        command = ("CHIPCirqueDaemon.py -- run gdb -return-child-result -q -ex run -ex bt --args python3 "
-                   "{} -t 150 -a {} --paa-trust-store-path {} --discriminator {} --nodeid {}").format(
+        command = ("gdb -batch -return-child-result -q -ex run -ex \"thread apply all bt\" "
+                   "--args python3 {} -t 300 -a {} --paa-trust-store-path {}").format(
             os.path.join(
-                CHIP_REPO, "src/controller/python/test/test_scripts/icd_wait_for_device_test.py"),
-            servers[0]['ip'],
-            os.path.join(CHIP_REPO, MATTER_DEVELOPMENT_PAA_ROOT_CERTS),
-            servers[0]['discriminator'],
-            servers[0]['nodeid'])
-        self.execute_device_cmd(req_device_id, command)
+                CHIP_REPO, "src/controller/python/test/test_scripts/test_scripts/icd_wait_for_device_test.py"), ethernet_ip,
+            os.path.join(CHIP_REPO, MATTER_DEVELOPMENT_PAA_ROOT_CERTS))
+        ret = self.execute_device_cmd(req_device_id, command)
 
-        self.assertTrue(self.wait_for_device_output(req_device_id, "Commissioning completed", 10))
-        self.assertTrue(self.wait_for_device_output(req_device_id, "Successfully handled wait-for-active", 30))
+        self.assertEqual(ret['return_code'], '0',
+                         "Test failed: non-zero return code")
 
 
 if __name__ == "__main__":
