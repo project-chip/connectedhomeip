@@ -105,13 +105,14 @@ class ICDRegistrationParameters:
     checkInNodeId: typing.Optional[int]
     monitoredSubject: typing.Optional[int]
     stayActiveMs: typing.Optional[int]
+    clientType: typing.Optional[Clusters.IcdManagement.Enums.ClientTypeEnum]
 
     class CStruct(Structure):
         _fields_ = [('symmetricKey', c_char_p), ('symmetricKeyLength', c_size_t), ('checkInNodeId',
-                                                                                   c_uint64), ('monitoredSubject', c_uint64), ('stayActiveMsec', c_uint32)]
+                                                                                   c_uint64), ('monitoredSubject', c_uint64), ('stayActiveMsec', c_uint32), ('clientType', c_uint8)]
 
     def to_c(self):
-        return ICDRegistrationParameters.CStruct(self.symmetricKey, len(self.symmetricKey), self.checkInNodeId, self.monitoredSubject, self.stayActiveMs)
+        return ICDRegistrationParameters.CStruct(self.symmetricKey, len(self.symmetricKey), self.checkInNodeId, self.monitoredSubject, self.stayActiveMs, self.clientType.value)
 
 
 @_DeviceAvailableCallbackFunct
@@ -2001,7 +2002,8 @@ class ChipDeviceController(ChipDeviceControllerBase):
             secrets.token_bytes(16),
             self._nodeId,
             self._nodeId,
-            30)
+            30,
+            Clusters.IcdManagement.Enums.ClientTypeEnum.kPermanent)
 
     def EnableICDRegistration(self, parameters: ICDRegistrationParameters):
         ''' Enables ICD registration for the following commissioning session.

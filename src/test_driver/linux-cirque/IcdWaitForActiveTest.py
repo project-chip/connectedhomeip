@@ -89,7 +89,7 @@ class TestCommissioner(CHIPVirtualHome):
                 server,
                 ("CHIPCirqueDaemon.py -- run gdb -batch -return-child-result -q -ex \"set pagination off\" "
                  "-ex run -ex \"thread apply all bt\" --args {} --thread --discriminator {}").format(
-                    os.path.join(CHIP_REPO, "out/debug/standalone/chip-all-clusters-app"), TEST_DISCRIMINATOR))
+                    os.path.join(CHIP_REPO, "out/debug/lit_icd/lit-icd-app"), TEST_DISCRIMINATOR))
 
         self.reset_thread_devices(server_ids)
 

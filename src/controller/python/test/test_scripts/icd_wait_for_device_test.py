@@ -119,20 +119,11 @@ async def main():
 
     devCtrl = test.devCtrl
     devCtrl.EnableICDRegistration(devCtrl.GenerateICDRegistrationParameters())
-    if options.deviceAddress:
-        logger.info("Testing commissioning (IP)")
-        FailIfNot(await test.TestCommissioning(ip=options.deviceAddress,
-                                         setuppin=20202021,
-                                         nodeid=options.nodeid),
-                  "Failed to finish commissioning")
-    elif options.setupPayload:
-        logger.info("Testing commissioning (w/ Setup Payload)")
-        FailIfNot(await test.TestCommissioningWithSetupPayload(setupPayload=options.setupPayload,
-                                                         nodeid=options.nodeid,
-                                                         discoveryType=options.discoveryType),
-                  "Failed to finish commissioning")
-    else:
-        TestFail("Must provide device address or setup payload to commissioning the device")
+    logger.info("Testing commissioning")
+    FailIfNot(await test.TestCommissioning(ip=options.deviceAddress,
+                                           setuppin=20202021,
+                                           nodeid=options.nodeid),
+              "Failed to finish key exchange")
     logger.info("Commissioning completed")
     logger.info("Testing wait for active")
     FailIfNot(await waitForActiveAndTriggerCheckIn(test, nodeid=options.nodeid), "Failed to test wait for active")

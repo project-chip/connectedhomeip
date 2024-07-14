@@ -584,6 +584,7 @@ struct IcdRegistrationParameters
     uint64_t checkInNodeId;
     uint64_t monitoredSubject;
     uint32_t stayActiveMsec;
+    uint8_t clientType;
 };
 
 PyChipError pychip_DeviceController_SetIcdRegistrationParameters(bool enabled, const IcdRegistrationParameters * params)
@@ -622,6 +623,7 @@ PyChipError pychip_DeviceController_SetIcdRegistrationParameters(bool enabled, c
     sCommissioningParameters.SetICDCheckInNodeId(params->checkInNodeId);
     sCommissioningParameters.SetICDMonitoredSubject(params->monitoredSubject);
     sCommissioningParameters.SetICDRegistrationStrategy(ICDRegistrationStrategy::kBeforeComplete);
+    sCommissioningParameters.SetICDClientType(static_cast<app::Clusters::IcdManagement::ClientTypeEnum>(params->clientType));
 
     return ToPyChipError(CHIP_NO_ERROR);
 }
