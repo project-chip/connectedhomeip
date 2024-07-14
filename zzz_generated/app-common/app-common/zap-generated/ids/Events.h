@@ -661,6 +661,16 @@ static constexpr EventId Id = 0x00000000;
 } // namespace Events
 } // namespace ContentControl
 
+namespace CommissionerControl {
+namespace Events {
+
+namespace CommissioningRequestResult {
+static constexpr EventId Id = 0x00000000;
+} // namespace CommissioningRequestResult
+
+} // namespace Events
+} // namespace CommissionerControl
+
 namespace UnitTesting {
 namespace Events {
 

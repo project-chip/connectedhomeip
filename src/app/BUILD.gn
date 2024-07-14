@@ -207,7 +207,7 @@ static_library("interaction-model") {
 
   public_deps = [
     ":app_config",
-    ":command-handler",
+    ":command-handler-impl",
     ":constants",
     ":paths",
     ":subscription-info-provider",
@@ -333,16 +333,32 @@ source_set("status-response") {
   ]
 }
 
-source_set("command-handler") {
+source_set("command-handler-interface") {
   sources = [
     "CommandHandler.cpp",
     "CommandHandler.h",
     "CommandHandlerExchangeInterface.h",
+  ]
+
+  public_deps = [
+    ":paths",
+    "${chip_root}/src/access:types",
+    "${chip_root}/src/app/data-model",
+    "${chip_root}/src/lib/core",
+    "${chip_root}/src/lib/support",
+    "${chip_root}/src/messaging",
+    "${chip_root}/src/protocols/interaction_model",
+  ]
+}
+
+source_set("command-handler-impl") {
+  sources = [
     "CommandHandlerImpl.cpp",
     "CommandHandlerImpl.h",
   ]
 
   public_deps = [
+    ":command-handler-interface",
     ":paths",
     ":required-privileges",
     ":status-response",

@@ -74,12 +74,6 @@ CHIP_ERROR ReadSingleClusterData(const Access::SubjectDescriptor & aSubjectDescr
     return CHIP_ERROR_NOT_IMPLEMENTED;
 }
 
-void DispatchSingleClusterCommand(const ConcreteCommandPath & aRequestCommandPath, chip::TLV::TLVReader & aReader,
-                                  CommandHandler * apCommandObj)
-{
-    // TODO: total hardcoded noop
-}
-
 } // namespace app
 } // namespace chip
 
