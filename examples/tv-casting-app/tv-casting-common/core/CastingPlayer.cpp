@@ -60,6 +60,10 @@ void CastingPlayer::VerifyOrEstablishConnection(ConnectionCallbacks connectionCa
     // information indicating the Commissioner's pre-commissioning state.
     if (connectionCallbacks.mCommissionerDeclarationCallback != nullptr)
     {
+        ChipLogProgress(AppServer,
+                        "CastingPlayer::VerifyOrEstablishConnection() Setting CommissionerDeclarationCallback in "
+                        "CommissionerDeclarationHandler");
+        // Set the callback for handling CommissionerDeclaration messages.
         matter::casting::core::CommissionerDeclarationHandler::GetInstance()->SetCommissionerDeclarationCallback(
             connectionCallbacks.mCommissionerDeclarationCallback);
     }
@@ -155,9 +159,9 @@ void CastingPlayer::VerifyOrEstablishConnection(ConnectionCallbacks connectionCa
     }
     else
     {
-        // We need to call OpenBasicCommissioningWindow() for both Commissionee-Generated passcode commissioning flow and
-        // Commissioner-Generated passcode commissioning flow. Per the Matter spec (UserDirectedCommissioning), even if the
-        // Commissionee sends an IdentificationDeclaration with CommissionerPasscode set to true, the Commissioner will first
+        // We need to call OpenBasicCommissioningWindow() for both the Client/Commissionee-Generated passcode commissioning flow and
+        // Casting Player/Commissioner-Generated passcode commissioning flow. Per the Matter spec (UserDirectedCommissioning), even
+        // if the Commissionee sends an IdentificationDeclaration with CommissionerPasscode set to true, the Commissioner will first
         // attempt to use AccountLogin in order to obtain Passcode using rotatingID. If no Passcode is obtained, Commissioner
         // displays a Passcode.
         ChipLogProgress(AppServer, "CastingPlayer::VerifyOrEstablishConnection() calling OpenBasicCommissioningWindow()");
@@ -178,18 +182,20 @@ exit:
     }
 }
 
-void CastingPlayer::ContinueConnecting()
+CHIP_ERROR CastingPlayer::ContinueConnecting()
 {
     ChipLogProgress(AppServer, "CastingPlayer::ContinueConnecting()");
-    CHIP_ERROR err = CHIP_NO_ERROR;
-    // Verify that mOnCompleted is not nullptr.
-    VerifyOrExit(mOnCompleted != nullptr, ChipLogError(AppServer, "CastingPlayer::ContinueConnecting() mOnCompleted == nullptr"));
-    if (!matter::casting::core::CommissionerDeclarationHandler::GetInstance()->HasCommissionerDeclarationCallback())
-    {
-        ChipLogProgress(AppServer,
-                        "CastingPlayer::ContinueConnecting() CommissionerDeclaration message callback has not been set.");
-    }
-    mConnectionState     = CASTING_PLAYER_CONNECTING;
+    VerifyOrReturnValue(mOnCompleted != nullptr, CHIP_ERROR_INVALID_ARGUMENT,
+                        ChipLogError(AppServer, "CastingPlayer::ContinueConnecting() mOnCompleted == nullptr"););
+    VerifyOrReturnValue(mConnectionState == CASTING_PLAYER_CONNECTING, CHIP_ERROR_INCORRECT_STATE,
+                        ChipLogError(AppServer, "CastingPlayer::ContinueConnecting() called while not in connecting state"););
+    VerifyOrReturnValue(
+        mIdOptions.mCommissionerPasscode, CHIP_ERROR_INCORRECT_STATE,
+        ChipLogError(AppServer,
+                     "CastingPlayer::ContinueConnecting() mIdOptions.mCommissionerPasscode == false, ContinueConnecting() should "
+                     "only be called when the CastingPlayer/Commissioner-Generated passcode commissioning flow is in progress."););
+
+    CHIP_ERROR err       = CHIP_NO_ERROR;
     mTargetCastingPlayer = this;
 
     ChipLogProgress(AppServer, "CastingPlayer::ContinueConnecting() calling OpenBasicCommissioningWindow()");
@@ -208,6 +214,57 @@ exit:
         ChipLogError(AppServer, "CastingPlayer::ContinueConnecting() failed with %" CHIP_ERROR_FORMAT, err.Format());
         resetState(err);
     }
+
+    return err;
+}
+
+CHIP_ERROR CastingPlayer::StopConnecting()
+{
+    ChipLogProgress(AppServer, "CastingPlayer::StopConnecting() called, while ChipDeviceEventHandler.sUdcInProgress: %s",
+                    support::ChipDeviceEventHandler::isUdcInProgress() ? "true" : "false");
+    VerifyOrReturnValue(mConnectionState == CASTING_PLAYER_CONNECTING, CHIP_ERROR_INCORRECT_STATE,
+                        ChipLogError(AppServer, "CastingPlayer::StopConnecting() called while not in connecting state"););
+    VerifyOrReturnValue(
+        mIdOptions.mCommissionerPasscode, CHIP_ERROR_INCORRECT_STATE,
+        ChipLogError(AppServer,
+                     "CastingPlayer::StopConnecting() mIdOptions.mCommissionerPasscode == false, ContinueConnecting() should only "
+                     "be called when the CastingPlayer/Commissioner-Generated passcode commissioning flow is in progress."););
+
+    CHIP_ERROR err = CHIP_NO_ERROR;
+    mIdOptions.resetState();
+    mIdOptions.mCancelPasscode     = true;
+    mConnectionState               = CASTING_PLAYER_NOT_CONNECTED;
+    mCommissioningWindowTimeoutSec = kCommissioningWindowTimeoutSec;
+    mTargetCastingPlayer           = nullptr;
+
+    // If a CastingPlayer::ContinueConnecting() error occurs, StopConnecting() can be called while sUdcInProgress == true.
+    // sUdcInProgress should be set to false before sending the CancelPasscode IdentificationDeclaration message to the
+    // CastingPlayer/Commissioner.
+    if (support::ChipDeviceEventHandler::isUdcInProgress())
+    {
+        support::ChipDeviceEventHandler::SetUdcStatus(false);
+    }
+
+    ChipLogProgress(
+        AppServer,
+        "CastingPlayer::StopConnecting() calling SendUserDirectedCommissioningRequest() to indicate user canceled passcode entry");
+#if CHIP_DEVICE_CONFIG_ENABLE_COMMISSIONER_DISCOVERY_CLIENT
+    err = SendUserDirectedCommissioningRequest();
+    if (err != CHIP_NO_ERROR)
+    {
+        ChipLogError(AppServer, "CastingPlayer::StopConnecting() failed with %" CHIP_ERROR_FORMAT, err.Format());
+        resetState(err);
+        return err;
+    }
+#endif // CHIP_DEVICE_CONFIG_ENABLE_COMMISSIONER_DISCOVERY_CLIENT
+
+    // CastingPlayer::SendUserDirectedCommissioningRequest() calls SetUdcStatus(true) before sending the UDC
+    // IdentificationDeclaration message. Since StopConnecting() is attempting to cancel the commissioning process, we need to set
+    // the UDC status to false after sending the message.
+    support::ChipDeviceEventHandler::SetUdcStatus(false);
+
+    ChipLogProgress(AppServer, "CastingPlayer::StopConnecting() User Directed Commissioning stopped");
+    return err;
 }
 
 void CastingPlayer::resetState(CHIP_ERROR err)

@@ -117,6 +117,9 @@ MTR_TESTABLE
 
 - (void)setStorageBehaviorConfiguration:(MTRDeviceStorageBehaviorConfiguration *)storageBehaviorConfiguration;
 
+// Returns whether this MTRDevice uses Thread for communication
+- (BOOL)deviceUsesThread;
+
 @end
 
 #pragma mark - Utility for clamping numbers

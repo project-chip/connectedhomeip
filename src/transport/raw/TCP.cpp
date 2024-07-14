@@ -39,11 +39,15 @@ namespace {
 
 using namespace chip::Encoding;
 
-// Packets start with a 16-bit size
-constexpr size_t kPacketSizeBytes = 2;
+// Packets start with a 32-bit size field.
+constexpr size_t kPacketSizeBytes = 4;
 
-// TODO: Actual limit may be lower (spec issue #2119)
-constexpr uint16_t kMaxMessageSize = static_cast<uint16_t>(System::PacketBuffer::kMaxSizeWithoutReserve - kPacketSizeBytes);
+static_assert(System::PacketBuffer::kLargeBufMaxSizeWithoutReserve <= UINT32_MAX, "Cast below could truncate the value");
+static_assert(System::PacketBuffer::kLargeBufMaxSizeWithoutReserve >= kPacketSizeBytes,
+              "Large buffer allocation should be large enough to hold the length field");
+
+constexpr uint32_t kMaxTCPMessageSize =
+    static_cast<uint32_t>(System::PacketBuffer::kLargeBufMaxSizeWithoutReserve - kPacketSizeBytes);
 
 constexpr int kListenBacklogSize = 2;
 
@@ -197,21 +201,21 @@ ActiveTCPConnectionState * TCPBase::FindInUseConnection(const Inet::TCPEndPoint 
 CHIP_ERROR TCPBase::SendMessage(const Transport::PeerAddress & address, System::PacketBufferHandle && msgBuf)
 {
     // Sent buffer data format is:
-    //    - packet size as a uint16_t
+    //    - packet size as a uint32_t
     //    - actual data
 
     VerifyOrReturnError(address.GetTransportType() == Type::kTcp, CHIP_ERROR_INVALID_ARGUMENT);
     VerifyOrReturnError(mState == TCPState::kInitialized, CHIP_ERROR_INCORRECT_STATE);
-    VerifyOrReturnError(kPacketSizeBytes + msgBuf->DataLength() <= std::numeric_limits<uint16_t>::max(),
+    VerifyOrReturnError(kPacketSizeBytes + msgBuf->DataLength() <= System::PacketBuffer::kLargeBufMaxSizeWithoutReserve,
                         CHIP_ERROR_INVALID_ARGUMENT);
 
-    // The check above about kPacketSizeBytes + msgBuf->DataLength() means it definitely fits in uint16_t.
+    static_assert(kPacketSizeBytes <= UINT16_MAX);
     VerifyOrReturnError(msgBuf->EnsureReservedSize(static_cast<uint16_t>(kPacketSizeBytes)), CHIP_ERROR_NO_MEMORY);
 
     msgBuf->SetStart(msgBuf->Start() - kPacketSizeBytes);
 
     uint8_t * output = msgBuf->Start();
-    LittleEndian::Write16(output, static_cast<uint16_t>(msgBuf->DataLength() - kPacketSizeBytes));
+    LittleEndian::Write32(output, static_cast<uint32_t>(msgBuf->DataLength() - kPacketSizeBytes));
 
     // Reuse existing connection if one exists, otherwise a new one
     // will be established
@@ -324,11 +328,13 @@ CHIP_ERROR TCPBase::ProcessReceivedBuffer(Inet::TCPEndPoint * endPoint, const Pe
         {
             return err;
         }
-        uint16_t messageSize = LittleEndian::Get16(messageSizeBuf);
-        if (messageSize >= kMaxMessageSize)
+        uint32_t messageSize = LittleEndian::Get32(messageSizeBuf);
+        if (messageSize >= kMaxTCPMessageSize)
         {
+            // Message is too big for this node to process. Disconnect from peer.
+            ChipLogError(Inet, "Received TCP message of length %" PRIu32 " exceeds limit.", messageSize);
+            CloseConnectionInternal(state, CHIP_ERROR_MESSAGE_TOO_LONG, SuppressCallback::No);
 
-            // This message is too long for upper layers.
             return CHIP_ERROR_MESSAGE_TOO_LONG;
         }
         // The subtraction will not underflow because we successfully read kPacketSizeBytes.
@@ -344,7 +350,7 @@ CHIP_ERROR TCPBase::ProcessReceivedBuffer(Inet::TCPEndPoint * endPoint, const Pe
     return CHIP_NO_ERROR;
 }
 
-CHIP_ERROR TCPBase::ProcessSingleMessage(const PeerAddress & peerAddress, ActiveTCPConnectionState * state, uint16_t messageSize)
+CHIP_ERROR TCPBase::ProcessSingleMessage(const PeerAddress & peerAddress, ActiveTCPConnectionState * state, size_t messageSize)
 {
     // We enter with `state->mReceived` containing at least one full message, perhaps in a chain.
     // `state->mReceived->Start()` currently points to the message data.
@@ -392,6 +398,10 @@ void TCPBase::CloseConnectionInternal(ActiveTCPConnectionState * connection, CHI
 
     if (connection->mConnectionState != TCPState::kClosed && connection->mEndPoint)
     {
+        char addrStr[Transport::PeerAddress::kMaxToStringSize];
+        connection->mPeerAddr.ToString(addrStr);
+        ChipLogProgress(Inet, "Closing connection with peer %s.", addrStr);
+
         if (err == CHIP_NO_ERROR)
         {
             connection->mEndPoint->Close();
@@ -610,36 +620,20 @@ CHIP_ERROR TCPBase::TCPConnect(const PeerAddress & address, Transport::AppTCPCon
 
 void TCPBase::TCPDisconnect(const PeerAddress & address)
 {
-    CHIP_ERROR err = CHIP_NO_ERROR;
     // Closes an existing connection
     for (size_t i = 0; i < mActiveConnectionsSize; i++)
     {
         if (mActiveConnections[i].IsConnected())
         {
-            Inet::IPAddress ipAddress;
-            uint16_t port;
-            Inet::InterfaceId interfaceId;
+            const Inet::IPAddress & ipAddress = mActiveConnections[i].mPeerAddr.GetIPAddress();
+            uint16_t port                     = mActiveConnections[i].mPeerAddr.GetPort();
 
-            err = mActiveConnections[i].mEndPoint->GetPeerInfo(&ipAddress, &port);
-            if (err != CHIP_NO_ERROR)
+            // Ignoring the InterfaceID in the check as it may not have been provided in
+            // the PeerAddress during connection establishment. The IPAddress and Port
+            // are the necessary and sufficient set of parameters for searching
+            // through the connections.
+            if (ipAddress == address.GetIPAddress() && port == address.GetPort() && address.GetTransportType() == Type::kTcp)
             {
-                ChipLogError(Inet, "TCPDisconnect: GetPeerInfo error: %" CHIP_ERROR_FORMAT, err.Format());
-                return;
-            }
-
-            err = mActiveConnections[i].mEndPoint->GetInterfaceId(&interfaceId);
-            if (err != CHIP_NO_ERROR)
-            {
-                ChipLogError(Inet, "TCPDisconnect: GetInterfaceId error: %" CHIP_ERROR_FORMAT, err.Format());
-                return;
-            }
-            // if (address == PeerAddress::TCP(ipAddress, port, interfaceId))
-            if (ipAddress == address.GetIPAddress() && port == address.GetPort())
-            {
-                char addrStr[Transport::PeerAddress::kMaxToStringSize];
-                address.ToString(addrStr);
-                ChipLogProgress(Inet, "Disconnecting with peer %s.", addrStr);
-
                 // NOTE: this leaves the socket in TIME_WAIT.
                 // Calling Abort() would clean it since SO_LINGER would be set to 0,
                 // however this seems not to be useful.

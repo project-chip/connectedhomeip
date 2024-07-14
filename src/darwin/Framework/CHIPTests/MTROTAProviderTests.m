@@ -818,6 +818,7 @@ static BOOL sNeedsStackShutdown = YES;
     XCTestExpectation * queryExpectation1 = [self expectationWithDescription:@"handleQueryImageForNodeID called first time"];
     XCTestExpectation * queryExpectation2 = [self expectationWithDescription:@"handleQueryImageForNodeID called second time"];
     XCTestExpectation * queryExpectation3 = [self expectationWithDescription:@"handleQueryImageForNodeID called third time"];
+    XCTestExpectation * transferEndExpectation = [self expectationWithDescription:@"handleBDXTransferSessionEndForNodeID called"];
 
     const uint16_t busyDelay = 1; // 1 second
     NSString * fakeImageURI = @"No such image, really";
@@ -825,6 +826,7 @@ static BOOL sNeedsStackShutdown = YES;
     __block QueryImageHandler handleThirdQuery;
     sOTAProviderDelegate.queryImageHandler = ^(NSNumber * nodeID, MTRDeviceController * controller,
         MTROTASoftwareUpdateProviderClusterQueryImageParams * params, QueryImageCompletion completion) {
+        [queryExpectation1 fulfill];
         XCTAssertEqualObjects(nodeID, @(kDeviceId1));
         XCTAssertEqual(controller, sController);
         [sOTAProviderDelegate respondAvailableWithDelay:@(0)
@@ -833,23 +835,32 @@ static BOOL sNeedsStackShutdown = YES;
                                         softwareVersion:kUpdatedSoftwareVersion_5
                                   softwareVersionString:kUpdatedSoftwareVersionString_5
                                              completion:completion];
-        [queryExpectation1 fulfill];
     };
     sOTAProviderDelegate.transferBeginHandler = ^(NSNumber * nodeID, MTRDeviceController * controller, NSString * fileDesignator,
         NSNumber * offset, MTRStatusCompletion outerCompletion) {
+        sOTAProviderDelegate.transferBeginHandler = nil;
+        // Now that we've begun a transfer, we expect to be told when it ends, even if it's due to an error
+        sOTAProviderDelegate.transferEndHandler = ^(NSNumber * nodeID, MTRDeviceController * controller, NSError * _Nullable error) {
+            [transferEndExpectation fulfill];
+            sOTAProviderDelegate.transferEndHandler = nil;
+            XCTAssertEqualObjects(nodeID, @(kDeviceId1));
+            XCTAssertIdentical(controller, sController);
+            XCTAssertNotNil(error); // we cancelled the transfer, so there should be an error
+        };
+
         XCTAssertEqualObjects(nodeID, @(kDeviceId1));
-        XCTAssertEqual(controller, sController);
+        XCTAssertIdentical(controller, sController);
 
         // Don't actually respond until the second requestor has queried us for
         // an image.  We need to reset queryImageHandler here, so we can close
         // over outerCompletion.
         sOTAProviderDelegate.queryImageHandler = ^(NSNumber * nodeID, MTRDeviceController * controller,
             MTROTASoftwareUpdateProviderClusterQueryImageParams * params, QueryImageCompletion innerCompletion) {
+            [queryExpectation2 fulfill];
             sOTAProviderDelegate.queryImageHandler = handleThirdQuery;
-            sOTAProviderDelegate.transferBeginHandler = nil;
 
             XCTAssertEqualObjects(nodeID, @(kDeviceId2));
-            XCTAssertEqual(controller, sController);
+            XCTAssertIdentical(controller, sController);
 
             // We respond UpdateAvailable, but since we are in the middle of
             // handling OTA for device1 we expect the requestor to get Busy and
@@ -860,8 +871,9 @@ static BOOL sNeedsStackShutdown = YES;
                                             softwareVersion:kUpdatedSoftwareVersion_5
                                       softwareVersionString:kUpdatedSoftwareVersionString_5
                                                  completion:innerCompletion];
+
+            // Cancel the transfer with device1
             [sOTAProviderDelegate respondErrorWithCompletion:outerCompletion];
-            [queryExpectation2 fulfill];
         };
 
         announceResponseExpectation2 = [self announceProviderToDevice:device2];
@@ -869,11 +881,11 @@ static BOOL sNeedsStackShutdown = YES;
 
     handleThirdQuery = ^(NSNumber * nodeID, MTRDeviceController * controller,
         MTROTASoftwareUpdateProviderClusterQueryImageParams * params, QueryImageCompletion completion) {
+        [queryExpectation3 fulfill];
         XCTAssertEqualObjects(nodeID, @(kDeviceId2));
-        XCTAssertEqual(controller, sController);
+        XCTAssertIdentical(controller, sController);
 
         [sOTAProviderDelegate respondNotAvailableWithCompletion:completion];
-        [queryExpectation3 fulfill];
     };
 
     // Advertise ourselves as an OTA provider.
@@ -881,7 +893,7 @@ static BOOL sNeedsStackShutdown = YES;
 
     // Make sure we get our queries in order.  Give it a bit more time, because
     // there will be a delay between the two queries.
-    [self waitForExpectations:@[ queryExpectation1, queryExpectation2, queryExpectation3 ]
+    [self waitForExpectations:@[ queryExpectation1, queryExpectation2, transferEndExpectation, queryExpectation3 ]
                       timeout:(kTimeoutInSeconds + busyDelay * 3)
                  enforceOrder:YES];
 

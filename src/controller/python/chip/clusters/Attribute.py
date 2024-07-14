@@ -465,6 +465,13 @@ class SubscriptionTransaction:
             lambda: handle.pychip_ReadClient_OverrideLivenessTimeout(self._readTransaction._pReadClient, timeoutMs)
         )
 
+    async def TriggerResubscribeIfScheduled(self, reason: str):
+        handle = chip.native.GetLibraryHandle()
+        await builtins.chipStack.CallAsync(
+            lambda: handle.pychip_ReadClient_TriggerResubscribeIfScheduled(
+                self._readTransaction._pReadClient, reason.encode("utf-8"))
+        )
+
     def GetReportingIntervalsSeconds(self) -> Tuple[int, int]:
         '''
         Retrieve the reporting intervals associated with an active subscription.
@@ -644,7 +651,7 @@ class AsyncReadTransaction:
         self._changedPathSet = set()
         self._pReadClient = None
         self._pReadCallback = None
-        self._resultError = None
+        self._resultError: Optional[PyChipError] = None
 
     def SetClientObjPointers(self, pReadClient, pReadCallback):
         self._pReadClient = pReadClient
@@ -711,7 +718,7 @@ class AsyncReadTransaction:
             logging.exception(ex)
 
     def handleError(self, chipError: PyChipError):
-        self._resultError = chipError.code
+        self._resultError = chipError
 
     def _handleSubscriptionEstablished(self, subscriptionId):
         if not self._future.done():
@@ -770,11 +777,11 @@ class AsyncReadTransaction:
         # move on, possibly invalidating the provided _event_loop.
         #
         if not self._future.done():
-            if self._resultError:
+            if self._resultError is not None:
                 if self._subscription_handler:
-                    self._subscription_handler.OnErrorCb(self._resultError, self._subscription_handler)
+                    self._subscription_handler.OnErrorCb(self._resultError.code, self._subscription_handler)
                 else:
-                    self._future.set_exception(chip.exceptions.ChipStackError(self._resultError))
+                    self._future.set_exception(self._resultError.to_exception())
             else:
                 self._future.set_result(AsyncReadTransaction.ReadResponse(
                     attributes=self._cache.attributeCache, events=self._events, tlvAttributes=self._cache.attributeTLVCache))
@@ -802,7 +809,7 @@ class AsyncWriteTransaction:
         self._event_loop = eventLoop
         self._future = future
         self._resultData = []
-        self._resultError = None
+        self._resultError: Optional[PyChipError] = None
 
     def handleResponse(self, path: AttributePath, status: int):
         try:

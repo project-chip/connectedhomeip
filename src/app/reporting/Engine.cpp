@@ -492,10 +492,11 @@ CHIP_ERROR Engine::BuildAndSendSingleReportData(ReadHandler * apReadHandler)
     CHIP_ERROR err = CHIP_NO_ERROR;
     chip::System::PacketBufferTLVWriter reportDataWriter;
     ReportDataMessage::Builder reportDataBuilder;
-    chip::System::PacketBufferHandle bufHandle = System::PacketBufferHandle::New(chip::app::kMaxSecureSduLengthBytes);
+    chip::System::PacketBufferHandle bufHandle = nullptr;
     uint16_t reservedSize                      = 0;
     bool hasMoreChunks                         = false;
     bool needCloseReadHandler                  = false;
+    size_t reportBufferMaxSize                 = 0;
 
     // Reserved size for the MoreChunks boolean flag, which takes up 1 byte for the control tag and 1 byte for the context tag.
     const uint32_t kReservedSizeForMoreChunksFlag = 1 + 1;
@@ -512,11 +513,15 @@ CHIP_ERROR Engine::BuildAndSendSingleReportData(ReadHandler * apReadHandler)
 
     VerifyOrExit(apReadHandler != nullptr, err = CHIP_ERROR_INVALID_ARGUMENT);
     VerifyOrExit(apReadHandler->GetSession() != nullptr, err = CHIP_ERROR_INCORRECT_STATE);
+
+    reportBufferMaxSize = apReadHandler->GetReportBufferMaxSize();
+
+    bufHandle = System::PacketBufferHandle::New(reportBufferMaxSize);
     VerifyOrExit(!bufHandle.IsNull(), err = CHIP_ERROR_NO_MEMORY);
 
-    if (bufHandle->AvailableDataLength() > kMaxSecureSduLengthBytes)
+    if (bufHandle->AvailableDataLength() > reportBufferMaxSize)
     {
-        reservedSize = static_cast<uint16_t>(bufHandle->AvailableDataLength() - kMaxSecureSduLengthBytes);
+        reservedSize = static_cast<uint16_t>(bufHandle->AvailableDataLength() - reportBufferMaxSize);
     }
 
     reportDataWriter.Init(std::move(bufHandle));
@@ -525,8 +530,8 @@ CHIP_ERROR Engine::BuildAndSendSingleReportData(ReadHandler * apReadHandler)
     reportDataWriter.ReserveBuffer(mReservedSize);
 #endif
 
-    // Always limit the size of the generated packet to fit within kMaxSecureSduLengthBytes regardless of the available buffer
-    // capacity.
+    // Always limit the size of the generated packet to fit within the max size returned by the ReadHandler regardless
+    // of the available buffer capacity.
     // Also, we need to reserve some extra space for the MIC field.
     reportDataWriter.ReserveBuffer(static_cast<uint32_t>(reservedSize + chip::Crypto::CHIP_CRYPTO_AEAD_MIC_LENGTH_BYTES));
 

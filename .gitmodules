@@ -6,10 +6,6 @@
 	path = third_party/nlio/repo
 	url = https://github.com/nestlabs/nlio.git
 	branch  = master
-[submodule "nlunit-test"]
-	path = third_party/nlunit-test/repo
-	url = https://github.com/nestlabs/nlunit-test.git
-	branch  = master
 [submodule "mbedtls"]
 	path = third_party/mbedtls/repo
 	url = https://github.com/ARMmbed/mbedtls.git
@@ -231,10 +227,10 @@
 	url = https://github.com/SiliconLabs/sdk_support.git
 	branch = main
 	platforms = silabs,silabs_docker
-[submodule "third_party/silabs/gecko_sdk"]
-	path = third_party/silabs/gecko_sdk
-	url = https://github.com/SiliconLabs/gecko_sdk.git
-	branch = v4.4.2
+[submodule "third_party/silabs/simplicity_sdk"]
+	path = third_party/silabs/simplicity_sdk
+	url = https://github.com/SiliconLabs/simplicity_sdk.git
+	branch = v2024.6.0
 	platforms = silabs
 [submodule "third_party/silabs/wiseconnect-wifi-bt-sdk"]
 	path = third_party/silabs/wiseconnect-wifi-bt-sdk
@@ -244,7 +240,7 @@
 [submodule "third_party/silabs/wifi_sdk"]
 	path = third_party/silabs/wifi_sdk
 	url = https://github.com/SiliconLabs/wiseconnect.git
-	branch = v3.1.3-matter-hotfix.4
+	branch = v3.3.0
 	platforms = silabs
 [submodule "editline"]
 	path = third_party/editline/repo
@@ -252,6 +248,7 @@
 [submodule "third_party/boringssl/repo/src"]
 	path = third_party/boringssl/repo/src
 	url = https://github.com/google/boringssl.git
+	branch = master
 [submodule "third_party/mt793x_sdk/filogic"]
 	path = third_party/mt793x_sdk/filogic
 	url = https://github.com/MediaTek-Labs/genio-matter-bsp.git
@@ -324,3 +321,8 @@
 	url = https://github.com/Infineon/optiga-trust-m.git
 	branch = matter_support
 	platforms = infineon
+[submodule "third_party/nxp/nxp_matter_support"]
+	path = third_party/nxp/nxp_matter_support
+	url = https://github.com/NXP/nxp_matter_support.git
+	branch = master
+	platforms = nxp

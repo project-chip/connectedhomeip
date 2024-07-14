@@ -30,6 +30,10 @@
 
 #include <string>
 
+#if defined(PW_RPC_ENABLED)
+#include <rpc/RpcClient.h>
+#endif
+
 using namespace ::chip;
 using namespace ::chip::Controller;
 
@@ -153,6 +157,10 @@ CommissioningParameters PairingCommand::GetCommissioningParameters()
         {
             mICDMonitoredSubject.SetValue(mICDCheckInNodeId.Value());
         }
+        if (!mICDClientType.HasValue())
+        {
+            mICDClientType.SetValue(app::Clusters::IcdManagement::ClientTypeEnum::kPermanent);
+        }
         // These Optionals must have values now.
         // The commissioner will verify these values.
         params.SetICDSymmetricKey(mICDSymmetricKey.Value());
@@ -162,6 +170,7 @@ CommissioningParameters PairingCommand::GetCommissioningParameters()
         }
         params.SetICDCheckInNodeId(mICDCheckInNodeId.Value());
         params.SetICDMonitoredSubject(mICDMonitoredSubject.Value());
+        params.SetICDClientType(mICDClientType.Value());
     }
 
     return params;
@@ -389,7 +398,12 @@ void PairingCommand::OnCommissioningComplete(NodeId nodeId, CHIP_ERROR err)
 {
     if (err == CHIP_NO_ERROR)
     {
-        ChipLogProgress(NotSpecified, "Device commissioning completed with success");
+        // print to console
+        fprintf(stderr, "New device with Node ID: 0x%lx has been successfully added.\n", nodeId);
+
+#if defined(PW_RPC_ENABLED)
+        AddSynchronizedDevice(nodeId);
+#endif
     }
     else
     {
@@ -404,6 +418,12 @@ void PairingCommand::OnCommissioningComplete(NodeId nodeId, CHIP_ERROR err)
             }
         }
         ChipLogProgress(NotSpecified, "Device commissioning Failure: %s", ErrorStr(err));
+    }
+
+    if (mCommissioningDelegate)
+    {
+        mCommissioningDelegate->OnCommissioningComplete(nodeId, err);
+        this->UnregisterCommissioningDelegate();
     }
 
     SetCommandExitStatus(err);
@@ -444,7 +464,7 @@ void PairingCommand::OnICDRegistrationComplete(ScopedNodeId nodeId, uint32_t icd
                                sizeof(icdSymmetricKeyHex), chip::Encoding::HexFlags::kNullTerminate);
 
     app::ICDClientInfo clientInfo;
-    clientInfo.peer_node         = nodeId;
+    clientInfo.peer_node         = chip::ScopedNodeId(mICDCheckInNodeId.Value(), nodeId.GetFabricIndex());
     clientInfo.monitored_subject = mICDMonitoredSubject.Value();
     clientInfo.start_icd_counter = icdCounter;
 
@@ -520,11 +540,23 @@ void PairingCommand::OnCurrentFabricRemove(void * context, NodeId nodeId, CHIP_E
 
     if (err == CHIP_NO_ERROR)
     {
-        ChipLogProgress(NotSpecified, "Device unpair completed with success: " ChipLogFormatX64, ChipLogValueX64(nodeId));
+        // print to console
+        fprintf(stderr, "Device with Node ID: 0x%lx has been successfully removed.\n", nodeId);
+
+#if defined(PW_RPC_ENABLED)
+        RemoveSynchronizedDevice(nodeId);
+#endif
     }
     else
     {
         ChipLogProgress(NotSpecified, "Device unpair Failure: " ChipLogFormatX64 " %s", ChipLogValueX64(nodeId), ErrorStr(err));
+    }
+
+    PairingDelegate * pairingDelegate = command->GetPairingDelegate();
+    if (pairingDelegate)
+    {
+        pairingDelegate->OnDeviceRemoved(nodeId, err);
+        command->UnregisterPairingDelegate();
     }
 
     command->SetCommandExitStatus(err);

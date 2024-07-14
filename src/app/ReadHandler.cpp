@@ -919,5 +919,15 @@ void ReadHandler::ClearStateFlag(ReadHandlerFlags aFlag)
     SetStateFlag(aFlag, false);
 }
 
+size_t ReadHandler::GetReportBufferMaxSize()
+{
+    Transport::SecureSession * session = GetSession();
+    if (session && session->AllowsLargePayload())
+    {
+        return kMaxLargeSecureSduLengthBytes;
+    }
+    return kMaxSecureSduLengthBytes;
+}
+
 } // namespace app
 } // namespace chip

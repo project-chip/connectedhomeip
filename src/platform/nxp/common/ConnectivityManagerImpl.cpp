@@ -153,6 +153,11 @@ void ConnectivityManagerImpl::_OnPlatformEvent(const ChipDeviceEvent * event)
             free(event->Platform.pNetworkDataEvent);
         }
     }
+    else if (event->Type == kPlatformNxpScanWiFiNetworkDoneEvent)
+    {
+        NetworkCommissioning::NXPWiFiDriver::GetInstance().ScanWiFINetworkDoneFromMatterTaskContext(
+            event->Platform.ScanWiFiNetworkCount);
+    }
 #endif
 }
 
@@ -618,6 +623,16 @@ CHIP_ERROR ConnectivityManagerImpl::_DisconnectNetwork(void)
 
     return err;
 }
+
+#if CHIP_CONFIG_ENABLE_ICD_SERVER
+CHIP_ERROR ConnectivityManagerImpl::_SetPollingInterval(System::Clock::Milliseconds32 pollingInterval)
+{
+    /*
+     * ToDo: Call API to put device into sleep
+     */
+    return CHIP_NO_ERROR;
+}
+#endif // CHIP_CONFIG_ENABLE_ICD_SERVER
 #endif
 
 } // namespace DeviceLayer

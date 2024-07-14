@@ -467,13 +467,13 @@ def Init():
         setter = chip.native.NativeLibraryHandleMethodArguments(handle)
 
         setter.Set('pychip_CommandSender_SendCommand',
-                   PyChipError, [py_object, c_void_p, c_uint16, c_uint32, c_uint32, c_char_p, c_size_t, c_uint16, c_bool])
+                   PyChipError, [py_object, c_void_p, c_uint16, c_uint16, c_uint32, c_uint32, c_char_p, c_size_t, c_uint16, c_uint16, c_bool])
         setter.Set('pychip_CommandSender_SendBatchCommands',
                    PyChipError, [py_object, c_void_p, c_uint16, c_uint16, c_uint16, c_bool, POINTER(PyInvokeRequestData), c_size_t])
         setter.Set('pychip_CommandSender_TestOnlySendBatchCommands',
                    PyChipError, [py_object, c_void_p, c_uint16, c_uint16, c_uint16, c_bool, TestOnlyPyBatchCommandsOverrides, POINTER(PyInvokeRequestData), c_size_t])
         setter.Set('pychip_CommandSender_TestOnlySendCommandTimedRequestNoTimedInvoke',
-                   PyChipError, [py_object, c_void_p, c_uint32, c_uint32, c_char_p, c_size_t, c_uint16, c_bool])
+                   PyChipError, [py_object, c_void_p, c_uint16, c_uint32, c_uint32, c_char_p, c_size_t, c_uint16, c_uint16, c_bool])
         setter.Set('pychip_CommandSender_SendGroupCommand',
                    PyChipError, [c_uint16, c_void_p, c_uint32, c_uint32, c_char_p, c_size_t, c_uint16])
         setter.Set('pychip_CommandSender_InitCallbacks', None, [

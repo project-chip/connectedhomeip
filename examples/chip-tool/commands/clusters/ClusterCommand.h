@@ -21,6 +21,7 @@
 #include "DataModelLogger.h"
 #include "ModelCommand.h"
 #include <app/tests/suites/commands/interaction_model/InteractionModel.h>
+#include <lib/core/ClusterEnums.h>
 
 class ClusterCommand : public InteractionModelCommands, public ModelCommand, public chip::app::CommandSender::Callback
 {
@@ -70,6 +71,7 @@ public:
         ReturnErrorOnFailure(InteractionModelCommands::SendCommand(device, endpointId, clusterId, commandId, value));
         mScopedNodeId     = chip::ScopedNodeId(value.checkInNodeID, device->GetSecureSession().Value()->GetFabricIndex());
         mMonitoredSubject = value.monitoredSubject;
+        mClientType       = value.clientType;
         memcpy(mICDSymmetricKey, value.key.data(), value.key.size());
         return CHIP_NO_ERROR;
     }
@@ -118,9 +120,13 @@ public:
 
         if (data != nullptr)
         {
-            LogErrorOnFailure(RemoteDataModelLogger::LogCommandAsJSON(path, data));
-
-            error = DataModelLogger::LogCommand(path, data);
+            {
+                // log a snapshot to not advance the data reader.
+                chip::TLV::TLVReader logTlvReader;
+                logTlvReader.Init(*data);
+                LogErrorOnFailure(RemoteDataModelLogger::LogCommandAsJSON(path, &logTlvReader));
+                error = DataModelLogger::LogCommand(path, &logTlvReader);
+            }
             if (CHIP_NO_ERROR != error)
             {
                 ChipLogError(chipTool, "Response Failure: Can not decode Data");
@@ -128,8 +134,9 @@ public:
                 return;
             }
             if ((path.mEndpointId == chip::kRootEndpointId) && (path.mClusterId == chip::app::Clusters::IcdManagement::Id) &&
-                (path.mCommandId == chip::app::Clusters::IcdManagement::Commands::RegisterClient::Id))
+                (path.mCommandId == chip::app::Clusters::IcdManagement::Commands::RegisterClientResponse::Id))
             {
+                // log a snapshot to not advance the data reader.
                 chip::TLV::TLVReader counterTlvReader;
                 counterTlvReader.Init(*data);
                 chip::app::Clusters::IcdManagement::Commands::RegisterClientResponse::DecodableType value;
@@ -139,11 +146,11 @@ public:
                     ChipLogError(chipTool, "Failed to decode ICD counter: %" CHIP_ERROR_FORMAT, err.Format());
                     return;
                 }
-
                 chip::app::ICDClientInfo clientInfo;
                 clientInfo.peer_node         = mScopedNodeId;
                 clientInfo.monitored_subject = mMonitoredSubject;
                 clientInfo.start_icd_counter = value.ICDCounter;
+                clientInfo.client_type       = mClientType;
 
                 StoreICDEntryWithKey(clientInfo, chip::ByteSpan(mICDSymmetricKey));
             }
@@ -254,8 +261,10 @@ private:
     chip::ClusterId mClusterId;
     chip::CommandId mCommandId;
     chip::ScopedNodeId mScopedNodeId;
-    uint64_t mMonitoredSubject = static_cast<uint64_t>(0);
+    uint64_t mMonitoredSubject                                     = static_cast<uint64_t>(0);
+    chip::app::Clusters::IcdManagement::ClientTypeEnum mClientType = chip::app::Clusters::IcdManagement::ClientTypeEnum::kPermanent;
     uint8_t mICDSymmetricKey[chip::Crypto::kAES_CCM128_Key_Length];
+
     CHIP_ERROR mError = CHIP_NO_ERROR;
     CustomArgument mPayload;
 };

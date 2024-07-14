@@ -320,7 +320,7 @@ void ExchangeManager::OnMessageReceived(const PacketHeader & packetHeader, const
         ExchangeDelegate * delegate = nullptr;
 
         // Fetch delegate from the handler
-        CHIP_ERROR err = matchingUMH->Handler->OnUnsolicitedMessageReceived(payloadHeader, delegate);
+        CHIP_ERROR err = matchingUMH->Handler->OnUnsolicitedMessageReceived(payloadHeader, session, delegate);
         if (err != CHIP_NO_ERROR)
         {
             // Using same error message for all errors to reduce code size.
