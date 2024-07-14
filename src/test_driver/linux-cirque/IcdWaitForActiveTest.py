@@ -105,7 +105,7 @@ class TestCommissioner(CHIPVirtualHome):
         command = ("gdb -batch -return-child-result -q -ex run -ex \"thread apply all bt\" "
                    "--args python3 {} -t 300 -a {} --paa-trust-store-path {}").format(
             os.path.join(
-                CHIP_REPO, "src/controller/python/test/test_scripts/test_scripts/icd_wait_for_device_test.py"), ethernet_ip,
+                CHIP_REPO, "src/controller/python/test/test_scripts/icd_wait_for_device_test.py"), ethernet_ip,
             os.path.join(CHIP_REPO, MATTER_DEVELOPMENT_PAA_ROOT_CERTS))
         ret = self.execute_device_cmd(req_device_id, command)
 

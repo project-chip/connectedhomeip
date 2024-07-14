@@ -117,15 +117,11 @@ async def main():
     test = BaseTestHelper(
         nodeid=112233, paaTrustStorePath=options.paaTrustStorePath, testCommissioner=True)
 
-    logger.info("Testing discovery")
-    FailIfNot(await test.TestDiscovery(discriminator=options.discriminator),
-              "Failed to discover any devices.")
-
     devCtrl = test.devCtrl
     devCtrl.EnableICDRegistration(devCtrl.GenerateICDRegistrationParameters())
     if options.deviceAddress:
         logger.info("Testing commissioning (IP)")
-        FailIfNot(await test.TestCommissioning(ip=options.deviceAddress,
+        FailIfNot(test.TestCommissioning(ip=options.deviceAddress,
                                          setuppin=20202021,
                                          nodeid=options.nodeid),
                   "Failed to finish commissioning")
