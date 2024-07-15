@@ -28,7 +28,6 @@ from time import sleep
 
 import chip.CertificateAuthority
 import chip.clusters as Clusters
-import chip.clusters.enum
 from chip import ChipDeviceCtrl
 from chip.ChipDeviceCtrl import CommissioningParameters
 from matter_testing_support import MatterBaseTest, async_test_body, default_matter_test_main
