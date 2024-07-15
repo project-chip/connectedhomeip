@@ -541,20 +541,6 @@ def get_args():
     parser.add_argument('--supported-modes', type=str, nargs='+', required=False,
                         help='List of supported modes, eg: mode1/label1/ep/"tagValue1\\mfgCode, tagValue2\\mfgCode"  mode2/label2/ep/"tagValue1\\mfgCode, tagValue2\\mfgCode"  mode3/label3/ep/"tagValue1\\mfgCode, tagValue2\\mfgCode"')
 
-    product_finish_choices = [finish.name for finish in Product_Finish_Enum]
-    parser.add_argument("--product-finish", type=str, choices=product_finish_choices,
-                        help='Product finishes choices for product appearance')
-
-    product_color_choices = [color.name for color in Product_Color_Enum]
-    parser.add_argument("--product-color", type=str, choices=product_color_choices,
-                        help='Product colors choices for product appearance')
-
-    parser.add_argument("--part-number", type=str, help='human readable product number')
-    parser.add_argument("--product-label", type=str, help='human readable product label')
-    parser.add_argument("--product-url", type=str, help='link to product specific web page')
-
-    parser.add_argument("--device-type", type=any_base_int, help='commissionable device type')
-
     parser.add_argument('-s', '--size', type=any_base_int, default=0x6000,
                         help='The size of the partition.bin, default: 0x6000')
     parser.add_argument('--target', default='esp32',
