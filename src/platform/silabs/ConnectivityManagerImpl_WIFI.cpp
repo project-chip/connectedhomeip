@@ -428,12 +428,14 @@ void ConnectivityManagerImpl::UpdateInternetConnectivityState(void)
         event.InternetConnectivityChange.IPv6      = GetConnectivityChange(hadIPv6Conn, haveIPv6Conn);
         event.InternetConnectivityChange.ipAddress = addr;
 
+#if CHIP_CONFIG_ENABLE_ICD_SERVER
         {
             sl_wfx_mac_address_t macaddr;
             wfx_get_wifi_mac_addr(SL_WFX_STA_INTERFACE, &macaddr);
             mEndpointQueueFilter.SetMacAddr(ByteSpan(macaddr.octet));
             chip::Inet::UDPEndPointImpl::SetQueueFilter(&mEndpointQueueFilter);
         }
+#endif // CHIP_CONFIG_ENABLE_ICD_SERVER
 
         (void) PlatformMgr().PostEvent(&event);
 

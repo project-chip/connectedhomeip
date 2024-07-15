@@ -132,9 +132,9 @@ private:
     static void DriveStationState(::chip::System::Layer * aLayer, void * aAppState);
 
     void UpdateInternetConnectivityState(void);
-#endif
-#ifdef SL_WIFI
+#if CHIP_CONFIG_ENABLE_ICD_SERVER
     Inet::SilabsEndpointQueueFilter::EndpointQueueFilter mEndpointQueueFilter;
+#endif // CHIP_CONFIG_ENABLE_ICD_SERVER
 #endif
 };
 
