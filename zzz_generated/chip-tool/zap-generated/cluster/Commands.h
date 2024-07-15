@@ -3391,6 +3391,7 @@ private:
 | Cluster BridgedDeviceBasicInformation                               | 0x0039 |
 |------------------------------------------------------------------------------|
 | Commands:                                                           |        |
+| * KeepActive                                                        |   0x80 |
 |------------------------------------------------------------------------------|
 | Attributes:                                                         |        |
 | * VendorName                                                        | 0x0001 |
@@ -3421,7 +3422,45 @@ private:
 | * ShutDown                                                          | 0x0001 |
 | * Leave                                                             | 0x0002 |
 | * ReachableChanged                                                  | 0x0003 |
+| * ActiveChanged                                                     | 0x0004 |
 \*----------------------------------------------------------------------------*/
+
+/*
+ * Command KeepActive
+ */
+class BridgedDeviceBasicInformationKeepActive : public ClusterCommand
+{
+public:
+    BridgedDeviceBasicInformationKeepActive(CredentialIssuerCommands * credsIssuerConfig) :
+        ClusterCommand("keep-active", credsIssuerConfig)
+    {
+        ClusterCommand::AddArguments();
+    }
+
+    CHIP_ERROR SendCommand(chip::DeviceProxy * device, std::vector<chip::EndpointId> endpointIds) override
+    {
+        constexpr chip::ClusterId clusterId = chip::app::Clusters::BridgedDeviceBasicInformation::Id;
+        constexpr chip::CommandId commandId = chip::app::Clusters::BridgedDeviceBasicInformation::Commands::KeepActive::Id;
+
+        ChipLogProgress(chipTool, "Sending cluster (0x%08" PRIX32 ") command (0x%08" PRIX32 ") on endpoint %u", clusterId,
+                        commandId, endpointIds.at(0));
+        return ClusterCommand::SendCommand(device, endpointIds.at(0), clusterId, commandId, mRequest);
+    }
+
+    CHIP_ERROR SendGroupCommand(chip::GroupId groupId, chip::FabricIndex fabricIndex) override
+    {
+        constexpr chip::ClusterId clusterId = chip::app::Clusters::BridgedDeviceBasicInformation::Id;
+        constexpr chip::CommandId commandId = chip::app::Clusters::BridgedDeviceBasicInformation::Commands::KeepActive::Id;
+
+        ChipLogProgress(chipTool, "Sending cluster (0x%08" PRIX32 ") command (0x%08" PRIX32 ") on Group %u", clusterId, commandId,
+                        groupId);
+
+        return ClusterCommand::SendGroupCommand(groupId, fabricIndex, clusterId, commandId, mRequest);
+    }
+
+private:
+    chip::app::Clusters::BridgedDeviceBasicInformation::Commands::KeepActive::Type mRequest;
+};
 
 /*----------------------------------------------------------------------------*\
 | Cluster Switch                                                      | 0x003B |
@@ -18097,7 +18136,8 @@ void registerClusterBridgedDeviceBasicInformation(Commands & commands, Credentia
         //
         // Commands
         //
-        make_unique<ClusterCommand>(Id, credsIssuerConfig), //
+        make_unique<ClusterCommand>(Id, credsIssuerConfig),                      //
+        make_unique<BridgedDeviceBasicInformationKeepActive>(credsIssuerConfig), //
         //
         // Attributes
         //
@@ -18202,11 +18242,13 @@ void registerClusterBridgedDeviceBasicInformation(Commands & commands, Credentia
         make_unique<ReadEvent>(Id, "shut-down", Events::ShutDown::Id, credsIssuerConfig),                      //
         make_unique<ReadEvent>(Id, "leave", Events::Leave::Id, credsIssuerConfig),                             //
         make_unique<ReadEvent>(Id, "reachable-changed", Events::ReachableChanged::Id, credsIssuerConfig),      //
+        make_unique<ReadEvent>(Id, "active-changed", Events::ActiveChanged::Id, credsIssuerConfig),            //
         make_unique<SubscribeEvent>(Id, credsIssuerConfig),                                                    //
         make_unique<SubscribeEvent>(Id, "start-up", Events::StartUp::Id, credsIssuerConfig),                   //
         make_unique<SubscribeEvent>(Id, "shut-down", Events::ShutDown::Id, credsIssuerConfig),                 //
         make_unique<SubscribeEvent>(Id, "leave", Events::Leave::Id, credsIssuerConfig),                        //
         make_unique<SubscribeEvent>(Id, "reachable-changed", Events::ReachableChanged::Id, credsIssuerConfig), //
+        make_unique<SubscribeEvent>(Id, "active-changed", Events::ActiveChanged::Id, credsIssuerConfig),       //
     };
 
     commands.RegisterCluster(clusterName, clusterCommands);

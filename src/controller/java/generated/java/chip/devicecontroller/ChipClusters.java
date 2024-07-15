@@ -14963,6 +14963,22 @@ public class ChipClusters {
       return 0L;
     }
 
+    public void keepActive(DefaultClusterCallback callback) {
+      keepActive(callback, 0);
+    }
+
+    public void keepActive(DefaultClusterCallback callback, int timedInvokeTimeoutMs) {
+      final long commandId = 128L;
+
+      ArrayList<StructElement> elements = new ArrayList<>();
+      StructType commandArgs = new StructType(elements);
+      invoke(new InvokeCallbackImpl(callback) {
+          @Override
+          public void onResponse(StructType invokeStructValue) {
+          callback.onSuccess();
+        }}, commandId, commandArgs, timedInvokeTimeoutMs);
+    }
+
     public interface ProductAppearanceAttributeCallback extends BaseAttributeCallback {
       void onSuccess(ChipStructs.BridgedDeviceBasicInformationClusterProductAppearanceStruct value);
     }

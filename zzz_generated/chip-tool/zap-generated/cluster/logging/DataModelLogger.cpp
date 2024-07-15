@@ -5900,6 +5900,22 @@ CHIP_ERROR DataModelLogger::LogValue(const char * label, size_t indent,
 
     return CHIP_NO_ERROR;
 }
+CHIP_ERROR DataModelLogger::LogValue(const char * label, size_t indent,
+                                     const BridgedDeviceBasicInformation::Events::ActiveChanged::DecodableType & value)
+{
+    DataModelLogger::LogString(label, indent, "{");
+    {
+        CHIP_ERROR err = DataModelLogger::LogValue("PromisedActiveDuration", indent + 1, value.promisedActiveDuration);
+        if (err != CHIP_NO_ERROR)
+        {
+            DataModelLogger::LogString(indent + 1, "Event truncated due to invalid value for 'PromisedActiveDuration'");
+            return err;
+        }
+    }
+    DataModelLogger::LogString(indent, "}");
+
+    return CHIP_NO_ERROR;
+}
 CHIP_ERROR DataModelLogger::LogValue(const char * label, size_t indent, const Switch::Events::SwitchLatched::DecodableType & value)
 {
     DataModelLogger::LogString(label, indent, "{");
@@ -19779,6 +19795,11 @@ CHIP_ERROR DataModelLogger::LogEvent(const chip::app::EventHeader & header, chip
             chip::app::Clusters::BridgedDeviceBasicInformation::Events::ReachableChanged::DecodableType value;
             ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
             return DataModelLogger::LogValue("ReachableChanged", 1, value);
+        }
+        case BridgedDeviceBasicInformation::Events::ActiveChanged::Id: {
+            chip::app::Clusters::BridgedDeviceBasicInformation::Events::ActiveChanged::DecodableType value;
+            ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
+            return DataModelLogger::LogValue("ActiveChanged", 1, value);
         }
         }
         break;

@@ -3246,6 +3246,12 @@ class ChipClusters:
         "clusterName": "BridgedDeviceBasicInformation",
         "clusterId": 0x00000039,
         "commands": {
+            0x00000080: {
+                "commandId": 0x00000080,
+                "commandName": "KeepActive",
+                "args": {
+                },
+            },
         },
         "attributes": {
             0x00000001: {

@@ -2277,6 +2277,10 @@ cluster BridgedDeviceBasicInformation = 57 {
     kFabric = 5;
   }
 
+  bitmap Feature : bitmap32 {
+    kBridgedICDSupport = 0x100000;
+  }
+
   struct ProductAppearanceStruct {
     ProductFinishEnum finish = 0;
     nullable ColorEnum primaryColor = 1;
@@ -2294,6 +2298,10 @@ cluster BridgedDeviceBasicInformation = 57 {
 
   info event ReachableChanged = 3 {
     boolean reachableNewValue = 0;
+  }
+
+  info event ActiveChanged = 4 {
+    int32u promisedActiveDuration = 0;
   }
 
   readonly attribute optional char_string<32> vendorName = 1;
@@ -2318,6 +2326,9 @@ cluster BridgedDeviceBasicInformation = 57 {
   readonly attribute attrib_id attributeList[] = 65531;
   readonly attribute bitmap32 featureMap = 65532;
   readonly attribute int16u clusterRevision = 65533;
+
+  /** The server SHALL attempt to keep the devices specified active for StayActiveDuration milliseconds when they are next active. */
+  command KeepActive(): DefaultSuccess = 128;
 }
 
 /** This cluster exposes interactions with a switch device, for the purpose of using those interactions by other devices.

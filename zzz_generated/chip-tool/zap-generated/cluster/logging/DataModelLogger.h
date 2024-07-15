@@ -473,6 +473,8 @@ static CHIP_ERROR
 LogValue(const char * label, size_t indent,
          const chip::app::Clusters::BridgedDeviceBasicInformation::Events::ReachableChanged::DecodableType & value);
 static CHIP_ERROR LogValue(const char * label, size_t indent,
+                           const chip::app::Clusters::BridgedDeviceBasicInformation::Events::ActiveChanged::DecodableType & value);
+static CHIP_ERROR LogValue(const char * label, size_t indent,
                            const chip::app::Clusters::Switch::Events::SwitchLatched::DecodableType & value);
 static CHIP_ERROR LogValue(const char * label, size_t indent,
                            const chip::app::Clusters::Switch::Events::InitialPress::DecodableType & value);

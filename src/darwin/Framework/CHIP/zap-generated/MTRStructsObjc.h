@@ -649,6 +649,11 @@ MTR_DEPRECATED("Please use MTRBridgedDeviceBasicInformationClusterReachableChang
 @property (nonatomic, copy) NSNumber * _Nonnull reachableNewValue MTR_DEPRECATED("Please use MTRBridgedDeviceBasicInformationClusterReachableChangedEvent", ios(16.1, 17.0), macos(13.0, 14.0), watchos(9.1, 10.0), tvos(16.1, 17.0));
 @end
 
+MTR_PROVISIONALLY_AVAILABLE
+@interface MTRBridgedDeviceBasicInformationClusterActiveChangedEvent : NSObject <NSCopying>
+@property (nonatomic, copy) NSNumber * _Nonnull promisedActiveDuration MTR_PROVISIONALLY_AVAILABLE;
+@end
+
 MTR_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
 @interface MTRSwitchClusterSwitchLatchedEvent : NSObject <NSCopying>
 @property (nonatomic, copy, getter=getNewPosition) NSNumber * _Nonnull newPosition MTR_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1));

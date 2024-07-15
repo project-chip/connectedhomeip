@@ -1382,6 +1382,23 @@ static id _Nullable DecodeEventPayloadForBridgedDeviceBasicInformationCluster(Ev
 
         return value;
     }
+    case Events::ActiveChanged::Id: {
+        Events::ActiveChanged::DecodableType cppValue;
+        *aError = DataModel::Decode(aReader, cppValue);
+        if (*aError != CHIP_NO_ERROR) {
+            return nil;
+        }
+
+        __auto_type * value = [MTRBridgedDeviceBasicInformationClusterActiveChangedEvent new];
+
+        do {
+            NSNumber * _Nonnull memberValue;
+            memberValue = [NSNumber numberWithUnsignedInt:cppValue.promisedActiveDuration];
+            value.promisedActiveDuration = memberValue;
+        } while (0);
+
+        return value;
+    }
     default: {
         break;
     }

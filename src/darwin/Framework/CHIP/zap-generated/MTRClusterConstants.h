@@ -6145,6 +6145,11 @@ typedef NS_ENUM(uint32_t, MTRCommandIDType) {
     MTRCommandIDTypeClusterTimeSynchronizationCommandSetDSTOffsetID MTR_PROVISIONALLY_AVAILABLE = 0x00000004,
     MTRCommandIDTypeClusterTimeSynchronizationCommandSetDefaultNTPID MTR_PROVISIONALLY_AVAILABLE = 0x00000005,
 
+    // Cluster BridgedDeviceBasic deprecated command id names
+
+    // Cluster BridgedDeviceBasicInformation commands
+    MTRCommandIDTypeClusterBridgedDeviceBasicInformationCommandKeepActiveID MTR_PROVISIONALLY_AVAILABLE = 0x00000080,
+
     // Cluster AdministratorCommissioning deprecated command id names
     MTRClusterAdministratorCommissioningCommandOpenCommissioningWindowID
         MTR_DEPRECATED("Please use MTRCommandIDTypeClusterAdministratorCommissioningCommandOpenCommissioningWindowID", ios(16.1, 16.4), macos(13.0, 13.3), watchos(9.1, 9.4), tvos(16.1, 16.4))
@@ -7230,6 +7235,7 @@ typedef NS_ENUM(uint32_t, MTREventIDType) {
     MTREventIDTypeClusterBridgedDeviceBasicInformationEventShutDownID MTR_AVAILABLE(ios(16.4), macos(13.3), watchos(9.4), tvos(16.4)) = 0x00000001,
     MTREventIDTypeClusterBridgedDeviceBasicInformationEventLeaveID MTR_AVAILABLE(ios(16.4), macos(13.3), watchos(9.4), tvos(16.4)) = 0x00000002,
     MTREventIDTypeClusterBridgedDeviceBasicInformationEventReachableChangedID MTR_AVAILABLE(ios(16.4), macos(13.3), watchos(9.4), tvos(16.4)) = 0x00000003,
+    MTREventIDTypeClusterBridgedDeviceBasicInformationEventActiveChangedID MTR_PROVISIONALLY_AVAILABLE = 0x00000004,
 
     // Cluster Switch deprecated event names
     MTRClusterSwitchEventSwitchLatchedID
