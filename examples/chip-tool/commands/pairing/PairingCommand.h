@@ -133,8 +133,8 @@ public:
 #if CHIP_DEVICE_CONFIG_ENABLE_WIFIPAF
         case PairingMode::WiFiPAF:
             AddArgument("skip-commissioning-complete", 0, 1, &mSkipCommissioningComplete);
-            AddArgument("setup-pin-code", 0, 134217727, &mSetupPINCode);
-            AddArgument("discriminator", 0, 4096, &mDiscriminator);
+            AddArgument("setup-pin-code", 0, 134217727, &mSetupPINCode.emplace());
+            AddArgument("discriminator", 0, 4096, &mDiscriminator.emplace());
             break;
 #endif
         case PairingMode::AlreadyDiscovered:
