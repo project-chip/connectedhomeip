@@ -1916,9 +1916,9 @@ bool DoorLockServer::findUserIndexByCredential(chip::EndpointId endpointId, Cred
 void DoorLockServer::updateLastModifiedFabricIndexOfUser(chip::EndpointId endpointId, uint16_t userIndex,
                                                          EmberAfPluginDoorLockUserInfo & userInfo, chip::FabricIndex fabricIndex)
 {
-    if (!emberAfPluginDoorLockSetUser(endpointId, userIndex, userInfo.createdBy, fabricIndex, userInfo.userName, userInfo.userUniqueId,
-                                      userInfo.userStatus, userInfo.userType, userInfo.credentialRule, userInfo.credentials.data(),
-                                      userInfo.credentials.size()))
+    if (!emberAfPluginDoorLockSetUser(endpointId, userIndex, userInfo.createdBy, fabricIndex, userInfo.userName,
+                                      userInfo.userUniqueId, userInfo.userStatus, userInfo.userType, userInfo.credentialRule,
+                                      userInfo.credentials.data(), userInfo.credentials.size()))
     {
         ChipLogError(Zcl, "Unable to update user's fabric index - internal error [endpointId=%d,fabricIndex=%d,userIndex=%d]",
                      endpointId, fabricIndex, userIndex);
