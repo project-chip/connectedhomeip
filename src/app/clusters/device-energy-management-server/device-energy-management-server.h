@@ -170,11 +170,10 @@ public:
     /**
      * @brief Returns the current PowerAdjustCapability object
      *
-     * The caller of GetPowerAdjustmentCapability() must not store a pointer/reference to the
-     * DataModel::Nullable<Structs::PowerAdjustCapabilityStruct::Type> return value. Structs::PowerAdjustCapabilityStruct
-     * contains a list of powerAdjustCapabilities (of type PowerAdjustStruct). The memory allocated for these
-     * is managed by the application and could change once the caller of GetPowerAdjustmentCapability has finished its
-     * processing.
+     * The delegate MUST implement an API to provide a temporary reference to the Structs::PowerAdjustCapabilityStruct.
+     * The SDK (and other users) MUST not use the return value from GetPowerAdjustmentCapability() after they
+     * have used it in the scope of the calling function. The memory associated with the PowerAdjustCapabilityStruct
+     * is likely to change or be re-allocated, so would become invalid outside the scope of this calling function.
      *
      * @return  The current PowerAdjustCapability object
      */
@@ -183,9 +182,10 @@ public:
     /**
      * @brief Returns the current Forecast object
      *
-     * The caller of GetForecast() must not store a pointer/reference to the Structs::ForecastStruct return value.
-     * Structs::ForecastStruct contains a list of slots (of type SlotStruct). The memory allocated for the slots
-     * is managed by the application and could change once the caller of GetForecast has finished its processing.
+     * The delegate MUST implement an API to provide a temporary reference to the Structs::ForecastStruct. The SDK
+     * (and other users) MUST not use the return value from GetForecast() after they have used it in the scope of
+     * the calling function. The memory associated with the ForecastStruct is likely to change or be re-allocated,
+     * so would become invalid outside the scope of this calling function.
      *
      * @return  The current Forecast object
      */
