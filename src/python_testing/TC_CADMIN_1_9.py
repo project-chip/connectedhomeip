@@ -29,7 +29,6 @@ from time import sleep
 import chip.CertificateAuthority
 import chip.clusters as Clusters
 import chip.clusters.enum
-import chip.FabricAdmin
 from chip import ChipDeviceCtrl
 from chip.ChipDeviceCtrl import CommissioningParameters
 from matter_testing_support import MatterBaseTest, async_test_body, default_matter_test_main
@@ -79,6 +78,9 @@ class TC_CADMIN_1_9(MatterBaseTest):
             logging.info('Commissioning complete done. Successful? {}, errorcode = {}'.format(errcode.is_success, errcode))
             asserts.assert_false(errcode.is_success, 'Commissioning complete did not error as expected')
             asserts.assert_true(errcode.sdk_code == expectedErrCode, 'Unexpected error code returned from CommissioningComplete')
+
+    def TC_CADMIN_1_9(self) -> list[str]:
+        return ["CADMIN.S"]
 
     @async_test_body
     async def test_TC_ADMIN_1_9(self):
