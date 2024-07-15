@@ -158,8 +158,8 @@ private:
     WiFiNetwork mSavedNetworks[kMaxNetworks];
     WiFiNetwork mStagingNetworks[kMaxNetworks];
     ConnectCallback * mpConnectCallback;
-    // Index location of the network the device is connected to. Value -1 indicates that the device is not connected to any of the networks
-    // Sets the value to the index location of the network in mStagingNetworks or mSavedNetworks
+    // Index location of the network the device is connected to. Value -1 indicates that the device is not connected to any of the
+    // networks Sets the value to the index location of the network in mStagingNetworks or mSavedNetworks
     int8_t mStagedConnectedNetworkIndex = -1;
     int8_t mSavedConnectedNetworkIndex  = -1;
     // On receiving ReorderNetwork command, insert the entry requested by the command to the new
