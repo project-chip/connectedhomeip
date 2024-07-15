@@ -153,6 +153,8 @@ AdministratorCommissioningCommandHandler gAdministratorCommissioningCommandHandl
 
 void ApplicationInit()
 {
+    ChipLogDetail(NotSpecified, "Fabric-Bridge: ApplicationInit()");
+
     InteractionModelEngine::GetInstance()->RegisterCommandHandler(&gAdministratorCommissioningCommandHandler);
 
 #if defined(PW_RPC_FABRIC_BRIDGE_SERVICE) && PW_RPC_FABRIC_BRIDGE_SERVICE
@@ -167,7 +169,10 @@ void ApplicationInit()
     DeviceMgr().Init();
 }
 
-void ApplicationShutdown() {}
+void ApplicationShutdown()
+{
+    ChipLogDetail(NotSpecified, "Fabric-Bridge: ApplicationShutdown()");
+}
 
 int main(int argc, char * argv[])
 {
