@@ -165,9 +165,31 @@ public:
     virtual ESAStateEnum GetESAState()                                                                       = 0;
     virtual int64_t GetAbsMinPower()                                                                         = 0;
     virtual int64_t GetAbsMaxPower()                                                                         = 0;
-    virtual DataModel::Nullable<Structs::PowerAdjustCapabilityStruct::Type> & GetPowerAdjustmentCapability() = 0;
-    virtual DataModel::Nullable<Structs::ForecastStruct::Type> & GetForecast()                               = 0;
     virtual OptOutStateEnum GetOptOutState()                                                                 = 0;
+
+    /**
+     * @brief Returns the current PowerAdjustCapability object
+     *
+     * The caller of GetPowerAdjustmentCapability() must not store a pointer/reference to the
+     * DataModel::Nullable<Structs::PowerAdjustCapabilityStruct::Type> return value. Structs::PowerAdjustCapabilityStruct
+     * contains a list of powerAdjustCapabilities (of type PowerAdjustStruct). The memory allocated for these
+     * is managed by the application and could change once the caller of GetPowerAdjustmentCapability has finished its
+     * processing.
+     *
+     * @return  The current PowerAdjustCapability object
+     */
+    virtual DataModel::Nullable<Structs::PowerAdjustCapabilityStruct::Type> & GetPowerAdjustmentCapability() = 0;
+
+    /**
+     * @brief Returns the current Forecast object
+     *
+     * The caller of GetForecast() must not store a pointer/reference to the Structs::ForecastStruct return value.
+     * Structs::ForecastStruct contains a list of slots (of type SlotStruct). The memory allocated for the slots
+     * is managed by the application and could change once the caller of GetForecast has finished its processing.
+     *
+     * @return  The current Forecast object
+     */
+    virtual DataModel::Nullable<Structs::ForecastStruct::Type> & GetForecast() = 0;
 
     // ------------------------------------------------------------------
     // Set attribute methods
