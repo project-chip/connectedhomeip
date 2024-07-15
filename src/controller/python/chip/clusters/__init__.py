@@ -46,8 +46,7 @@ from .Objects import (AccessControl, AccountLogin, Actions, ActivatedCarbonFilte
                       TemperatureControl, TemperatureMeasurement, Thermostat, ThermostatUserInterfaceConfiguration,
                       ThreadBorderRouterManagement, ThreadNetworkDiagnostics, TimeFormatLocalization, TimeSynchronization,
                       TotalVolatileOrganicCompoundsConcentrationMeasurement, UnitLocalization, UnitTesting, UserLabel,
-                      ValveConfigurationAndControl, WakeOnLan, WaterHeaterManagement, WiFiNetworkDiagnostics,
-                      WindowCovering)
+                      ValveConfigurationAndControl, WakeOnLan, WaterHeaterManagement, WiFiNetworkDiagnostics, WindowCovering)
 
 __all__ = [Attribute, CHIPClusters, Command, AccessControl, AccountLogin, Actions, ActivatedCarbonFilterMonitoring, AdministratorCommissioning, AirQuality,
            ApplicationBasic, ApplicationLauncher, AudioOutput, BallastConfiguration, BarrierControl, BasicInformation,
