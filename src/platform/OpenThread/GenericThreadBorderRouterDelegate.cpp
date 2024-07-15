@@ -149,7 +149,6 @@ void GenericOpenThreadBorderRouterDelegate::OnPlatformEventHandler(const DeviceL
             event->ThreadConnectivityChange.Result == DeviceLayer::kConnectivity_Established)
         {
             delegate->mCallback->OnActivateDatasetComplete(delegate->mSequenceNum, CHIP_NO_ERROR);
-            delegate->SaveActiveDatasetConfigured(true);
             delegate->mCallback = nullptr;
         }
     }
