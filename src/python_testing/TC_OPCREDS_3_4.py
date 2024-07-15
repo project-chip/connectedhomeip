@@ -38,7 +38,7 @@ class TC_OPCREDS_3_4(MatterBaseTest):
             filterType=Discovery.FilterType.LONG_DISCRIMINATOR, filter=longDiscriminator, stopOnFirst=False)
         # For some reason, the devices returned here aren't filtered, so filter ourselves
         device = next(filter(lambda d: d.commissioningMode ==
-                            Discovery.FilterType.LONG_DISCRIMINATOR and d.longDiscriminator == longDiscriminator, devices))
+                             Discovery.FilterType.LONG_DISCRIMINATOR and d.longDiscriminator == longDiscriminator, devices))
         for a in device.addresses:
             try:
                 dev_ctrl.EstablishPASESessionIP(ipaddr=a, setupPinCode=setupPinCode,
