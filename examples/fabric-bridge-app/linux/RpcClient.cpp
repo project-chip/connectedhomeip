@@ -49,7 +49,8 @@ std::condition_variable responseCv;
 bool responseReceived    = false;
 CHIP_ERROR responseError = CHIP_NO_ERROR;
 
-// By passing the call object to WaitForResponse to keep RPC call alive until it completes or timeout.
+// By passing the `call` parameter into WaitForResponse we are explicitly trying to insure the caller takes into consideration that
+// the lifetime of the `call` object when calling WaitForResponse
 template <typename CallType>
 CHIP_ERROR WaitForResponse(CallType & call)
 {
