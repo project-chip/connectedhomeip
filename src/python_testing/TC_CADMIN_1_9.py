@@ -66,8 +66,7 @@ class TC_CADMIN_1_9(MatterBaseTest):
                 logging.info('Commissioning complete done. Successful? {}, errorcode = {}'.format(errcode.is_success, errcode))
                 asserts.assert_false(errcode.is_success, 'Commissioning complete did not error as expected')
                 asserts.assert_true(errcode.sdk_code == expectedErrCode, 'Unexpected error code returned from CommissioningComplete')
-                sleep(0.5)
-            sleep(1)
+                sleep(1)
 
         elif expectedErrCode == 50:
             logging.info("-----------------Attempting connection expecting timeout-------------------------")
@@ -90,7 +89,7 @@ class TC_CADMIN_1_9(MatterBaseTest):
         th2_fabric_admin = th2_certificate_authority.NewFabricAdmin(vendorId=0xFFF1, fabricId=self.th1.fabricId + 1)
         self.th2 = th2_fabric_admin.NewController(nodeId=2, useTestCommissioner=True)
 
-        self.print_step(2, "TH1 opens commissioning window on DUT without duration set to 900s")
+        self.print_step(2, "TH1 opens commissioning window on DUT with duration set to 900")
         params = self.OpenCommissioningWindow()
 
         self.print_step(3, "TH2 attempts to connect 20 times to endpoint with incorrect passcode")
@@ -99,10 +98,10 @@ class TC_CADMIN_1_9(MatterBaseTest):
         self.print_step(4, "TH2 attempts to connect to endpoint with correct passcode")
         await self.CommissionAttempt(params, expectedErrCode=0x32)
 
-        self.print_step(5, "Opening Commissioning Window one more time to validate able to do so")        
+        self.print_step(5, "TH1 opening Commissioning Window one more time to validate ability to do so")        
         params = self.OpenCommissioningWindow()
 
-        self.print_step(6, "Revoking Commissioning Window")        
+        self.print_step(6, "TH1 revoking Commissioning Window")        
         revokeCmd = Clusters.AdministratorCommissioning.Commands.RevokeCommissioning()
         await self.th1.SendCommand(nodeid=self.dut_node_id, endpoint=0, payload=revokeCmd, timedRequestTimeoutMs=6000)
         # The failsafe cleanup is scheduled after the command completes, so give it a bit of time to do that
