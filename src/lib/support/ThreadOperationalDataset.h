@@ -111,6 +111,13 @@ public:
     CHIP_ERROR GetExtendedPanId(uint8_t (&aExtendedPanId)[kSizeExtendedPanId]) const;
 
     /**
+     * This method retrieves the Thread extended PAN ID from the dataset, interpreted as a big endian number.
+     * @retval CHIP_NO_ERROR                    Successfully retrieved the extended PAN ID.
+     * @retval CHIP_ERROR_TLV_TAG_NOT_FOUND     Thread extended PAN ID is not present in the dataset.
+     */
+    CHIP_ERROR GetExtendedPanId(uint64_t & extendedPanId) const;
+
+    /**
      * This method returns a const ByteSpan to the extended PAN ID in the dataset.
      * This can be used to pass the extended PAN ID to a cluster command without the use of external memory.
      *
@@ -246,6 +253,36 @@ public:
      * This method unsets Thread PSKc to the dataset.
      */
     void UnsetPSKc(void);
+
+    /**
+     * Returns ByteSpan pointing to the channel mask within the dataset.
+     * @retval CHIP_NO_ERROR on success.
+     * @retval CHIP_ERROR_TLV_TAG_NOT_FOUND if the channel mask is not present in the dataset.
+     * @retval CHIP_ERROR_INVALID_TLV_ELEMENT if the TLV element is invalid.
+     */
+    CHIP_ERROR GetChannelMask(ByteSpan & aChannelMask) const;
+
+    /**
+     * This method sets the channel mask within the dataset.
+     * @retval CHIP_NO_ERROR on success.
+     * @retval CHIP_ERROR_NO_MEMORY if there is insufficient space within the dataset.
+     */
+    CHIP_ERROR SetChannelMask(ByteSpan aChannelMask);
+
+    /**
+     * Retrieves the security policy from the dataset.
+     * @retval CHIP_NO_ERROR on success.
+     * @retval CHIP_ERROR_TLV_TAG_NOT_FOUND if no security policy is present in the dataset.
+     * @retval CHIP_ERROR_INVALID_TLV_ELEMENT if the TLV element is invalid.
+     */
+    CHIP_ERROR GetSecurityPolicy(uint32_t & aSecurityPolicy) const;
+
+    /**
+     * This method sets the security policy within the dataset.
+     * @retval CHIP_NO_ERROR on success.
+     * @retval CHIP_ERROR_NO_MEMORY if there is insufficient space within the dataset.
+     */
+    CHIP_ERROR SetSecurityPolicy(uint32_t aSecurityPolicy);
 
     /**
      * This method clears all data stored in the dataset.
