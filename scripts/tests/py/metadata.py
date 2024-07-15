@@ -14,8 +14,8 @@
 # limitations under the License.
 
 import re
-from dataclasses import dataclass
 import sys
+from dataclasses import dataclass
 from typing import Any, Dict, List
 
 import yaml
