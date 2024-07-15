@@ -27,7 +27,7 @@ Python tests located in src/python_testing
 -   All test classes inherit from `MatterBaseTest` in
     [matter_testing_support.py](https://github.com/project-chip/connectedhomeip/blob/master/src/python_testing/matter_testing_support.py)
     -   Support for commissioning using the python controller
-    -   Sefault controller (`self.default_controller`) of type `ChipDeviceCtrl`
+    -   Default controller (`self.default_controller`) of type `ChipDeviceCtrl`
     -   `MatterBaseTest` inherits from the Mobly BaseTestClass
 -   Test method(s) (start with test\_) and are all run automatically
     -   To run in the test harness, the test method name must be `test_TC_PICSCODE_#_#`
