@@ -134,7 +134,7 @@ private:
     void UpdateInternetConnectivityState(void);
 #endif
 #ifdef SL_WIFI
-    Inet::Silabs::EndpointQueueFilter mEndpointQueueFilter;
+    Inet::SilabsEndpointQueueFilter::EndpointQueueFilter mEndpointQueueFilter;
 #endif
 };
 

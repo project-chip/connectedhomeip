@@ -53,7 +53,7 @@ private:
 };
 
 
-namespace Silabs {
+namespace SilabsEndpointQueueFilter {
 
 class EndpointQueueFilter : public chip::Inet::EndpointQueueFilter
 {
@@ -80,6 +80,6 @@ private:
     HostNameFilter mHostNameFilter;
 };
 
-} // Silabs
+} // SilabsEndpointQueueFilter
 } // Inet
 } // chip

@@ -43,7 +43,6 @@ bool PayloadContains(const chip::System::PacketBufferHandle & payload, const chi
 bool PayloadContainsCaseInsensitive(const chip::System::PacketBufferHandle & payload, const ByteSpan & name)
 {
     ReturnErrorCodeIf(name.size() < HostNameFilter::kHostNameLengthMax, false);
-
     uint8_t lower_case[HostNameFilter::kHostNameLengthMax];
     memcpy(lower_case, name.data(), name.size());
     for (size_t i = 0; i < sizeof(lower_case); ++i)
@@ -112,7 +111,7 @@ CHIP_ERROR HostNameFilter::SetMacAddr(const chip::ByteSpan & mac_addr)
 }
 
 
-namespace Silabs {
+namespace SilabsEndpointQueueFilter {
 
 EndpointQueueFilter::EndpointQueueFilter() :
     mTooManyFilter(kDefaultAllowedQueuedPackets) {}
@@ -124,9 +123,13 @@ EndpointQueueFilter::EndpointQueueFilter(size_t maxAllowedQueuedPackets) :
 FilterOutcome EndpointQueueFilter::FilterBeforeEnqueue(const void * endpoint, const IPPacketInfo & pktInfo,
                                   const chip::System::PacketBufferHandle & pktPayload)
 {
-    ReturnErrorCodeIf(FilterOutcome::kDropPacket == mTooManyFilter.FilterBeforeEnqueue(endpoint, pktInfo, pktPayload), FilterOutcome::kDropPacket);
-    ReturnErrorCodeIf(FilterOutcome::kDropPacket == mMdnsFilter.Filter(endpoint, pktInfo, pktPayload), FilterOutcome::kDropPacket);
-    ReturnErrorCodeIf(FilterOutcome::kDropPacket == mHostNameFilter.Filter(endpoint, pktInfo, pktPayload), FilterOutcome::kDropPacket);
+    VerifyOrReturnError(FilterOutcome::kAllowPacket == mTooManyFilter.FilterBeforeEnqueue(endpoint, pktInfo, pktPayload), FilterOutcome::kDropPacket);
+    if (FilterOutcome::kAllowPacket == mMdnsFilter.Filter(endpoint, pktInfo, pktPayload)) {
+        return FilterOutcome::kAllowPacket;
+    }
+    if (FilterOutcome::kAllowPacket == mHostNameFilter.Filter(endpoint, pktInfo, pktPayload)) {
+        return FilterOutcome::kAllowPacket;
+    }
     return FilterOutcome::kAllowPacket;
 }
 
@@ -138,6 +141,6 @@ FilterOutcome EndpointQueueFilter::FilterAfterDequeue(const void * endpoint, con
     return FilterOutcome::kAllowPacket;
 }
 
-} // Silabs
+} // SilabsEndpointQueueFilter
 } // Inet
 } // chip
