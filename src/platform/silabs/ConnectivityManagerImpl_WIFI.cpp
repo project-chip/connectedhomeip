@@ -40,8 +40,8 @@
 #endif
 
 #include "CHIPDevicePlatformConfig.h"
-#include "wfx_host_events.h"
 #include "EndpointQueueFilter.h"
+#include "wfx_host_events.h"
 
 using namespace ::chip;
 using namespace ::chip::Inet;
@@ -52,7 +52,6 @@ namespace chip {
 namespace DeviceLayer {
 
 ConnectivityManagerImpl ConnectivityManagerImpl::sInstance;
-
 
 CHIP_ERROR ConnectivityManagerImpl::_Init()
 {

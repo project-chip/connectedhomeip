@@ -1,12 +1,12 @@
 #include "EndpointQueueFilter.h"
+#include <string.h>
 #include <support/CodeUtils.h>
 #include <support/logging/CHIPLogging.h>
-#include <string.h>
 
 namespace chip {
 namespace Inet {
 
-using FilterOutcome     = EndpointQueueFilter::FilterOutcome;
+using FilterOutcome = EndpointQueueFilter::FilterOutcome;
 using namespace chip::Logging;
 
 namespace {
@@ -57,9 +57,8 @@ bool PayloadContainsCaseInsensitive(const chip::System::PacketBufferHandle & pay
 
 } // namespace
 
-
 FilterOutcome MdnsBroadcastFilter::Filter(const void * endpoint, const IPPacketInfo & pktInfo,
-                                    const chip::System::PacketBufferHandle & pktPayload)
+                                          const chip::System::PacketBufferHandle & pktPayload)
 {
     if (pktInfo.DestPort == kMdnsPort)
     {
@@ -79,9 +78,8 @@ FilterOutcome MdnsBroadcastFilter::Filter(const void * endpoint, const IPPacketI
     return FilterOutcome::kDropPacket;
 }
 
-
 FilterOutcome HostNameFilter::Filter(const void * endpoint, const IPPacketInfo & pktInfo,
-                                    const chip::System::PacketBufferHandle & pktPayload)
+                                     const chip::System::PacketBufferHandle & pktPayload)
 {
     // Drop the mDNS packets which don't contain 'matter' or '<device-hostname>'.
     const uint8_t matterBytes[] = { 'm', 'a', 't', 't', 'e', 'r' };
@@ -92,7 +90,6 @@ FilterOutcome HostNameFilter::Filter(const void * endpoint, const IPPacketInfo &
     return FilterOutcome::kDropPacket;
 }
 
-
 CHIP_ERROR HostNameFilter::SetHostName(const chip::CharSpan & name)
 {
     ReturnErrorCodeIf(name.size() != sizeof(mHostName), CHIP_ERROR_INVALID_ARGUMENT);
@@ -101,46 +98,44 @@ CHIP_ERROR HostNameFilter::SetHostName(const chip::CharSpan & name)
     return CHIP_NO_ERROR;
 }
 
-
 CHIP_ERROR HostNameFilter::SetMacAddr(const chip::ByteSpan & mac_addr)
 {
     ReturnErrorCodeIf(mac_addr.size() < 6, CHIP_ERROR_INVALID_ARGUMENT);
-    const uint8_t *p = mac_addr.data();
-    snprintf((char*)mHostName, sizeof(mHostName), "%02x%02x%02x%02x%02x%02x", p[0], p[1], p[2], p[3], p[4], p[5]);
+    const uint8_t * p = mac_addr.data();
+    snprintf((char *) mHostName, sizeof(mHostName), "%02x%02x%02x%02x%02x%02x", p[0], p[1], p[2], p[3], p[4], p[5]);
     return CHIP_NO_ERROR;
 }
 
-
 namespace SilabsEndpointQueueFilter {
 
-EndpointQueueFilter::EndpointQueueFilter() :
-    mTooManyFilter(kDefaultAllowedQueuedPackets) {}
+EndpointQueueFilter::EndpointQueueFilter() : mTooManyFilter(kDefaultAllowedQueuedPackets) {}
 
-EndpointQueueFilter::EndpointQueueFilter(size_t maxAllowedQueuedPackets) :
-    mTooManyFilter(maxAllowedQueuedPackets) {}
-
+EndpointQueueFilter::EndpointQueueFilter(size_t maxAllowedQueuedPackets) : mTooManyFilter(maxAllowedQueuedPackets) {}
 
 FilterOutcome EndpointQueueFilter::FilterBeforeEnqueue(const void * endpoint, const IPPacketInfo & pktInfo,
-                                  const chip::System::PacketBufferHandle & pktPayload)
+                                                       const chip::System::PacketBufferHandle & pktPayload)
 {
-    VerifyOrReturnError(FilterOutcome::kAllowPacket == mTooManyFilter.FilterBeforeEnqueue(endpoint, pktInfo, pktPayload), FilterOutcome::kDropPacket);
-    if (FilterOutcome::kAllowPacket == mMdnsFilter.Filter(endpoint, pktInfo, pktPayload)) {
+    VerifyOrReturnError(FilterOutcome::kAllowPacket == mTooManyFilter.FilterBeforeEnqueue(endpoint, pktInfo, pktPayload),
+                        FilterOutcome::kDropPacket);
+    if (FilterOutcome::kAllowPacket == mMdnsFilter.Filter(endpoint, pktInfo, pktPayload))
+    {
         return FilterOutcome::kAllowPacket;
     }
-    if (FilterOutcome::kAllowPacket == mHostNameFilter.Filter(endpoint, pktInfo, pktPayload)) {
+    if (FilterOutcome::kAllowPacket == mHostNameFilter.Filter(endpoint, pktInfo, pktPayload))
+    {
         return FilterOutcome::kAllowPacket;
     }
     return FilterOutcome::kAllowPacket;
 }
-
 
 FilterOutcome EndpointQueueFilter::FilterAfterDequeue(const void * endpoint, const IPPacketInfo & pktInfo,
-                                          const chip::System::PacketBufferHandle & pktPayload)
+                                                      const chip::System::PacketBufferHandle & pktPayload)
 {
-    ReturnErrorCodeIf(FilterOutcome::kDropPacket == mTooManyFilter.FilterAfterDequeue(endpoint, pktInfo, pktPayload), FilterOutcome::kDropPacket);
+    ReturnErrorCodeIf(FilterOutcome::kDropPacket == mTooManyFilter.FilterAfterDequeue(endpoint, pktInfo, pktPayload),
+                      FilterOutcome::kDropPacket);
     return FilterOutcome::kAllowPacket;
 }
 
-} // SilabsEndpointQueueFilter
-} // Inet
-} // chip
+} // namespace SilabsEndpointQueueFilter
+} // namespace Inet
+} // namespace chip

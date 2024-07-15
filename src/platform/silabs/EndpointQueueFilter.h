@@ -24,34 +24,32 @@ namespace Inet {
 
 struct EndpointFilter
 {
-    virtual ~EndpointFilter() = default;
+    virtual ~EndpointFilter()                                                                              = default;
     virtual EndpointQueueFilter::FilterOutcome Filter(const void * endpoint, const IPPacketInfo & pktInfo,
-                                      const chip::System::PacketBufferHandle & pktPayload) = 0;
+                                                      const chip::System::PacketBufferHandle & pktPayload) = 0;
 };
-
 
 struct MdnsBroadcastFilter : EndpointFilter
 {
     static constexpr size_t kMdnsPort = 5353;
 
     EndpointQueueFilter::FilterOutcome Filter(const void * endpoint, const IPPacketInfo & pktInfo,
-                                      const chip::System::PacketBufferHandle & pktPayload) override;
+                                              const chip::System::PacketBufferHandle & pktPayload) override;
 };
-
 
 struct HostNameFilter : EndpointFilter
 {
     static constexpr size_t kHostNameLengthMax = 13;
 
     EndpointQueueFilter::FilterOutcome Filter(const void * endpoint, const IPPacketInfo & pktInfo,
-                                      const chip::System::PacketBufferHandle & pktPayload) override;
+                                              const chip::System::PacketBufferHandle & pktPayload) override;
 
     CHIP_ERROR SetHostName(const chip::CharSpan & name);
     CHIP_ERROR SetMacAddr(const chip::ByteSpan & addr);
+
 private:
     uint8_t mHostName[kHostNameLengthMax] = { 0 };
 };
-
 
 namespace SilabsEndpointQueueFilter {
 
@@ -69,10 +67,7 @@ public:
     FilterOutcome FilterAfterDequeue(const void * endpoint, const IPPacketInfo & pktInfo,
                                      const chip::System::PacketBufferHandle & pktPayload);
 
-    CHIP_ERROR SetMacAddr(const chip::ByteSpan & addr)
-    {
-        return mHostNameFilter.SetMacAddr(addr);
-    }
+    CHIP_ERROR SetMacAddr(const chip::ByteSpan & addr) { return mHostNameFilter.SetMacAddr(addr); }
 
 private:
     DropIfTooManyQueuedPacketsFilter mTooManyFilter;
@@ -80,6 +75,6 @@ private:
     HostNameFilter mHostNameFilter;
 };
 
-} // SilabsEndpointQueueFilter
-} // Inet
-} // chip
+} // namespace SilabsEndpointQueueFilter
+} // namespace Inet
+} // namespace chip
