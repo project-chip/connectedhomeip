@@ -1076,14 +1076,7 @@ void DoorLockServer::setWeekDayScheduleCommandHandler(chip::app::CommandHandler 
                     "[endpointId=%d,weekDayIndex=%d,userIndex=%d,daysMask=%d,startTime=\"%d:%d\",endTime=\"%d:%d\"]",
                     endpointId, weekDayIndex, userIndex, daysMask.Raw(), startHour, startMinute, endHour, endMinute);
 
-    // Update LastModifiedFabricIndex of user
-    if (!emberAfPluginDoorLockSetUser(endpointId, userIndex, user.createdBy, fabricIdx, user.userName, user.userUniqueId,
-                                      user.userStatus, user.userType, user.credentialRule, user.credentials.data(),
-                                      user.credentials.size()))
-    {
-        ChipLogError(Zcl, "[SetWeekDaySchedule] Unable to update user - internal error [endpointId=%d,fabricIndex=%d,userIndex=%d]",
-                     endpointId, fabricIdx, userIndex);
-    }
+    updateLastModifiedFabricIndexOfUser(endpointId, userIndex, user, fabricIdx);
 
     sendRemoteLockUserChange(endpointId, LockDataTypeEnum::kWeekDaySchedule, DataOperationTypeEnum::kAdd, sourceNodeId, fabricIdx,
                              userIndex, static_cast<uint16_t>(weekDayIndex));
@@ -1306,14 +1299,7 @@ void DoorLockServer::setYearDayScheduleCommandHandler(chip::app::CommandHandler 
                     "[endpointId=%d,yearDayIndex=%d,userIndex=%d,localStartTime=%" PRIu32 ",endTime=%" PRIu32 "]",
                     endpointId, yearDayIndex, userIndex, localStartTime, localEndTime);
 
-    // Update LastModifiedFabricIndex of user
-    if (!emberAfPluginDoorLockSetUser(endpointId, userIndex, user.createdBy, fabricIdx, user.userName, user.userUniqueId,
-                                      user.userStatus, user.userType, user.credentialRule, user.credentials.data(),
-                                      user.credentials.size()))
-    {
-        ChipLogError(Zcl, "[SetYearDaySchedule] Unable to update user - internal error [endpointId=%d,fabricIndex=%d,userIndex=%d]",
-                     endpointId, fabricIdx, userIndex);
-    }
+    updateLastModifiedFabricIndexOfUser(endpointId, userIndex, user, fabricIdx);
 
     sendRemoteLockUserChange(endpointId, LockDataTypeEnum::kYearDaySchedule, DataOperationTypeEnum::kAdd, sourceNodeId, fabricIdx,
                              userIndex, static_cast<uint16_t>(yearDayIndex));
@@ -1925,6 +1911,18 @@ bool DoorLockServer::findUserIndexByCredential(chip::EndpointId endpointId, Cred
     }
 
     return false;
+}
+
+void DoorLockServer::updateLastModifiedFabricIndexOfUser(chip::EndpointId endpointId, uint16_t userIndex,
+                                                         EmberAfPluginDoorLockUserInfo & userInfo, chip::FabricIndex fabricIndex)
+{
+    if (!emberAfPluginDoorLockSetUser(endpointId, userIndex, userInfo.createdBy, fabricIndex, userInfo.userName, userInfo.userUniqueId,
+                                      userInfo.userStatus, userInfo.userType, userInfo.credentialRule, userInfo.credentials.data(),
+                                      userInfo.credentials.size()))
+    {
+        ChipLogError(Zcl, "Unable to update user's fabric index - internal error [endpointId=%d,fabricIndex=%d,userIndex=%d]",
+                     endpointId, fabricIndex, userIndex);
+    }
 }
 
 ClusterStatusCode DoorLockServer::createUser(chip::EndpointId endpointId, chip::FabricIndex creatorFabricIdx,

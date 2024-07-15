@@ -314,6 +314,9 @@ private:
     bool findUserIndexByCredential(chip::EndpointId endpointId, CredentialTypeEnum credentialType, chip::ByteSpan credentialData,
                                    uint16_t & userIndex, uint16_t & credentialIndex, EmberAfPluginDoorLockUserInfo & userInfo);
 
+    void updateLastModifiedFabricIndexOfUser(chip::EndpointId endpointId, uint16_t userIndex,
+                                             EmberAfPluginDoorLockUserInfo & userInfo, chip::FabricIndex fabricIndex);
+
     chip::Protocols::InteractionModel::ClusterStatusCode
     createUser(chip::EndpointId endpointId, chip::FabricIndex creatorFabricIdx, chip::NodeId sourceNodeId, uint16_t userIndex,
                const Nullable<chip::CharSpan> & userName, const Nullable<uint32_t> & userUniqueId,
