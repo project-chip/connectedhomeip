@@ -14,6 +14,11 @@
  *    See the License for the specific language governing permissions and
  *    limitations under the License.
  */
+
+#include <vector>
+
+#include <pw_unit_test/framework.h>
+
 #include "app/ConcreteCommandPath.h"
 #include <app/codegen-data-model/CodegenDataModel.h>
 
@@ -53,9 +58,6 @@
 #include <lib/core/TLVTypes.h>
 #include <lib/core/TLVWriter.h>
 #include <lib/support/Span.h>
-
-#include <gtest/gtest.h>
-#include <vector>
 
 using namespace chip;
 using namespace chip::Test;

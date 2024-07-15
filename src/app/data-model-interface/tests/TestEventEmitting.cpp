@@ -19,9 +19,10 @@
 #include <app-common/zap-generated/cluster-objects.h>
 #include <app/data-model-interface/EventsGenerator.h>
 #include <app/data-model/Decode.h>
+#include <lib/core/StringBuilderAdapters.h>
 #include <lib/support/CodeUtils.h>
 
-#include <gtest/gtest.h>
+#include <pw_unit_test/framework.h>
 
 namespace {
 
