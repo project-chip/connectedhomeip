@@ -32,6 +32,7 @@ from chip.ChipDeviceCtrl import CommissioningParameters
 from matter_testing_support import MatterBaseTest, async_test_body, default_matter_test_main
 from mobly import asserts
 
+
 class TC_CADMIN_1_9(MatterBaseTest):
 
     def OpenCommissioningWindow(self) -> CommissioningParameters:
