@@ -41,6 +41,7 @@
 
 #include "CHIPDevicePlatformConfig.h"
 #include <platform/silabs/wifi/WifiInterfaceAbstraction.h>
+#include "EndpointQueueFilter.h"
 
 using namespace ::chip;
 using namespace ::chip::Inet;
@@ -51,6 +52,7 @@ namespace chip {
 namespace DeviceLayer {
 
 ConnectivityManagerImpl ConnectivityManagerImpl::sInstance;
+
 
 CHIP_ERROR ConnectivityManagerImpl::_Init()
 {
@@ -425,6 +427,15 @@ void ConnectivityManagerImpl::UpdateInternetConnectivityState(void)
         event.InternetConnectivityChange.IPv4      = GetConnectivityChange(hadIPv4Conn, haveIPv4Conn);
         event.InternetConnectivityChange.IPv6      = GetConnectivityChange(hadIPv6Conn, haveIPv6Conn);
         event.InternetConnectivityChange.ipAddress = addr;
+
+        {
+            sl_wfx_mac_address_t macaddr;
+            wfx_get_wifi_mac_addr(SL_WFX_STA_INTERFACE, &macaddr);
+            mEndpointQueueFilter.SetMacAddr(ByteSpan(macaddr.octet));
+            chip::Inet::UDPEndPointImpl::SetQueueFilter(&mEndpointQueueFilter);
+        }
+
+        (void) PlatformMgr().PostEvent(&event);
 
         if (haveIPv4Conn != hadIPv4Conn)
         {
