@@ -35,6 +35,7 @@ from chip.ChipDeviceCtrl import CommissioningParameters
 from matter_testing_support import MatterBaseTest, async_test_body, default_matter_test_main
 from mobly import asserts
 
+
 class TC_CADMIN_1_9(MatterBaseTest):
 
     def OpenCommissioningWindow(self) -> CommissioningParameters:
@@ -65,7 +66,8 @@ class TC_CADMIN_1_9(MatterBaseTest):
                     filterType=ChipDeviceCtrl.DiscoveryFilterType.LONG_DISCRIMINATOR, filter=self.discriminator)
                 logging.info('Commissioning complete done. Successful? {}, errorcode = {}'.format(errcode.is_success, errcode))
                 asserts.assert_false(errcode.is_success, 'Commissioning complete did not error as expected')
-                asserts.assert_true(errcode.sdk_code == expectedErrCode, 'Unexpected error code returned from CommissioningComplete')
+                asserts.assert_true(errcode.sdk_code == expectedErrCode,
+                                    'Unexpected error code returned from CommissioningComplete')
                 sleep(1)
 
         elif expectedErrCode == 50:
@@ -82,7 +84,7 @@ class TC_CADMIN_1_9(MatterBaseTest):
     async def test_TC_ADMIN_1_9(self):
         self.print_step(1, "Commissioning, already done")
 
-        # Establishing TH1 and TH2 
+        # Establishing TH1 and TH2
         self.th1 = self.default_controller
         self.discriminator = random.randint(0, 4095)
         th2_certificate_authority = self.certificate_authority_manager.NewCertificateAuthority()
@@ -98,14 +100,15 @@ class TC_CADMIN_1_9(MatterBaseTest):
         self.print_step(4, "TH2 attempts to connect to endpoint with correct passcode")
         await self.CommissionAttempt(params, expectedErrCode=0x32)
 
-        self.print_step(5, "TH1 opening Commissioning Window one more time to validate ability to do so")        
+        self.print_step(5, "TH1 opening Commissioning Window one more time to validate ability to do so")
         params = self.OpenCommissioningWindow()
 
-        self.print_step(6, "TH1 revoking Commissioning Window")        
+        self.print_step(6, "TH1 revoking Commissioning Window")
         revokeCmd = Clusters.AdministratorCommissioning.Commands.RevokeCommissioning()
         await self.th1.SendCommand(nodeid=self.dut_node_id, endpoint=0, payload=revokeCmd, timedRequestTimeoutMs=6000)
         # The failsafe cleanup is scheduled after the command completes, so give it a bit of time to do that
         sleep(1)
+
 
 if __name__ == "__main__":
     default_matter_test_main()
