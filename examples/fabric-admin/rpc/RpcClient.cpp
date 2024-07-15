@@ -43,14 +43,13 @@ constexpr uint32_t kDefaultChannelId = 1;
 
 // Fabric Bridge Client
 rpc::pw_rpc::nanopb::FabricBridge::Client fabricBridgeClient(rpc::client::GetDefaultRpcClient(), kDefaultChannelId);
-pw::rpc::NanopbUnaryReceiver<::pw_protobuf_Empty> addSynchronizedDeviceCall;
-pw::rpc::NanopbUnaryReceiver<::pw_protobuf_Empty> removeSynchronizedDeviceCall;
 
 std::mutex responseMutex;
 std::condition_variable responseCv;
 bool responseReceived    = false;
 CHIP_ERROR responseError = CHIP_NO_ERROR;
 
+// By passing the call object to WaitForResponse to keep RPC call alive until it completes or timeout.
 template <typename CallType>
 CHIP_ERROR WaitForResponse(CallType & call)
 {
@@ -117,52 +116,38 @@ CHIP_ERROR AddSynchronizedDevice(chip::NodeId nodeId)
 {
     ChipLogProgress(NotSpecified, "AddSynchronizedDevice");
 
-    if (addSynchronizedDeviceCall.active())
-    {
-        ChipLogError(NotSpecified, "Add Synchronized Device operation is in progress\n");
-        return CHIP_ERROR_BUSY;
-    }
-
     chip_rpc_SynchronizedDevice device;
     device.node_id = nodeId;
 
-    // By assigning the returned call to the global 'addSynchronizedDeviceCall', the RPC
-    // call is kept alive until it completes. When a response is received, it
-    // will be logged by the handler function and the call will complete.
-    addSynchronizedDeviceCall = fabricBridgeClient.AddSynchronizedDevice(device, OnAddDeviceResponseCompleted);
+    // The RPC call is kept alive until it completes. When a response is received, it will be logged by the handler
+    // function and the call will complete.
+    auto call = fabricBridgeClient.AddSynchronizedDevice(device, OnAddDeviceResponseCompleted);
 
-    if (!addSynchronizedDeviceCall.active())
+    if (!call.active())
     {
         // The RPC call was not sent. This could occur due to, for example, an invalid channel ID. Handle if necessary.
         return CHIP_ERROR_INTERNAL;
     }
 
-    return WaitForResponse(addSynchronizedDeviceCall);
+    return WaitForResponse(call);
 }
 
 CHIP_ERROR RemoveSynchronizedDevice(chip::NodeId nodeId)
 {
     ChipLogProgress(NotSpecified, "RemoveSynchronizedDevice");
 
-    if (removeSynchronizedDeviceCall.active())
-    {
-        ChipLogError(NotSpecified, "Remove Synchronized Device operation is in progress\n");
-        return CHIP_ERROR_BUSY;
-    }
-
     chip_rpc_SynchronizedDevice device;
     device.node_id = nodeId;
 
-    // By assigning the returned call to the global 'removeSynchronizedDeviceCall', the RPC
-    // call is kept alive until it completes. When a response is received, it
-    // will be logged by the handler function and the call will complete.
-    removeSynchronizedDeviceCall = fabricBridgeClient.RemoveSynchronizedDevice(device, OnRemoveDeviceResponseCompleted);
+    // The RPC call is kept alive until it completes. When a response is received, it will be logged by the handler
+    // function and the call will complete.
+    auto call = fabricBridgeClient.RemoveSynchronizedDevice(device, OnRemoveDeviceResponseCompleted);
 
-    if (!removeSynchronizedDeviceCall.active())
+    if (!call.active())
     {
         // The RPC call was not sent. This could occur due to, for example, an invalid channel ID. Handle if necessary.
         return CHIP_ERROR_INTERNAL;
     }
 
-    return WaitForResponse(removeSynchronizedDeviceCall);
+    return WaitForResponse(call);
 }
