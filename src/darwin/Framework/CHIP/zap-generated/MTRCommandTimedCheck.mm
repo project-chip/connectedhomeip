@@ -701,15 +701,6 @@ static BOOL CommandNeedsTimedInvokeInEnergyEVSEModeCluster(AttributeId aAttribut
     }
     }
 }
-static BOOL CommandNeedsTimedInvokeInWaterHeaterModeCluster(AttributeId aAttributeId)
-{
-    using namespace Clusters::WaterHeaterMode;
-    switch (aAttributeId) {
-    default: {
-        return NO;
-    }
-    }
-}
 static BOOL CommandNeedsTimedInvokeInDeviceEnergyManagementModeCluster(AttributeId aAttributeId)
 {
     using namespace Clusters::DeviceEnergyManagementMode;
@@ -1415,9 +1406,6 @@ BOOL MTRCommandNeedsTimedInvoke(NSNumber * _Nonnull aClusterID, NSNumber * _Nonn
     }
     case Clusters::EnergyEvseMode::Id: {
         return CommandNeedsTimedInvokeInEnergyEVSEModeCluster(commandID);
-    }
-    case Clusters::WaterHeaterMode::Id: {
-        return CommandNeedsTimedInvokeInWaterHeaterModeCluster(commandID);
     }
     case Clusters::DeviceEnergyManagementMode::Id: {
         return CommandNeedsTimedInvokeInDeviceEnergyManagementModeCluster(commandID);

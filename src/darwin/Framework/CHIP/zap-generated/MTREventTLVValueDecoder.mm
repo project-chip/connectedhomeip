@@ -3306,18 +3306,6 @@ static id _Nullable DecodeEventPayloadForEnergyEVSEModeCluster(EventId aEventId,
     *aError = CHIP_ERROR_IM_MALFORMED_EVENT_PATH_IB;
     return nil;
 }
-static id _Nullable DecodeEventPayloadForWaterHeaterModeCluster(EventId aEventId, TLV::TLVReader & aReader, CHIP_ERROR * aError)
-{
-    using namespace Clusters::WaterHeaterMode;
-    switch (aEventId) {
-    default: {
-        break;
-    }
-    }
-
-    *aError = CHIP_ERROR_IM_MALFORMED_EVENT_PATH_IB;
-    return nil;
-}
 static id _Nullable DecodeEventPayloadForDeviceEnergyManagementModeCluster(EventId aEventId, TLV::TLVReader & aReader, CHIP_ERROR * aError)
 {
     using namespace Clusters::DeviceEnergyManagementMode;
@@ -4911,9 +4899,6 @@ id _Nullable MTRDecodeEventPayload(const ConcreteEventPath & aPath, TLV::TLVRead
     }
     case Clusters::EnergyEvseMode::Id: {
         return DecodeEventPayloadForEnergyEVSEModeCluster(aPath.mEventId, aReader, aError);
-    }
-    case Clusters::WaterHeaterMode::Id: {
-        return DecodeEventPayloadForWaterHeaterModeCluster(aPath.mEventId, aReader, aError);
     }
     case Clusters::DeviceEnergyManagementMode::Id: {
         return DecodeEventPayloadForDeviceEnergyManagementModeCluster(aPath.mEventId, aReader, aError);

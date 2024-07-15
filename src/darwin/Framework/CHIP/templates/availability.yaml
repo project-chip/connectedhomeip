@@ -9695,7 +9695,6 @@
           - ServiceArea
           - ThreadBorderRouterManagement
           - ThreadNetworkDirectory
-          - WaterHeaterManagement
           - WiFiNetworkManagement
       attributes:
           OccupancySensing:
