@@ -22,7 +22,7 @@
  */
 
 #include <errno.h>
-#include <gtest/gtest.h>
+#include <pw_unit_test/framework.h>
 
 #include <app/icd/server/ICDServerConfig.h>
 #include <lib/core/CHIPCore.h>
@@ -84,20 +84,14 @@ constexpr Spake2pVerifierSerialized sTestSpake2p01_SerializedVerifier = {
 };
 
 class TestSecurePairingDelegate;
-class TestPASESession : public chip::Test::LoopbackMessagingContext, public ::testing::Test
+class TestPASESession : public chip::Test::LoopbackMessagingContext
 {
 public:
-    // Performs shared setup for all tests in the test suite
-    static void SetUpTestSuite() { chip::Test::LoopbackMessagingContext::SetUpTestSuite(); }
-    static void TearDownTestSuite() { chip::Test::LoopbackMessagingContext::TearDownTestSuite(); }
-
     void SetUp() override
     {
         ConfigInitializeNodes(false);
         chip::Test::LoopbackMessagingContext::SetUp();
     }
-
-    void TearDown() override { chip::Test::LoopbackMessagingContext::TearDown(); }
 
     void SecurePairingHandshakeTestCommon(SessionManager & sessionManager, PASESession & pairingCommissioner,
                                           Optional<ReliableMessageProtocolConfig> mrpCommissionerConfig,

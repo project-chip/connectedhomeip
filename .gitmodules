@@ -321,3 +321,8 @@
 	url = https://github.com/Infineon/optiga-trust-m.git
 	branch = matter_support
 	platforms = infineon
+[submodule "third_party/nxp/nxp_matter_support"]
+	path = third_party/nxp/nxp_matter_support
+	url = https://github.com/NXP/nxp_matter_support.git
+	branch = master
+	platforms = nxp

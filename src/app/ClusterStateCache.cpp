@@ -649,6 +649,47 @@ exit:
 }
 
 template <bool CanEnableDataCaching>
+void ClusterStateCacheT<CanEnableDataCaching>::ClearAttributes(EndpointId endpointId)
+{
+    mCache.erase(endpointId);
+}
+
+template <bool CanEnableDataCaching>
+void ClusterStateCacheT<CanEnableDataCaching>::ClearAttributes(const ConcreteClusterPath & cluster)
+{
+    // Can't use GetEndpointState here, since that only handles const things.
+    auto endpointIter = mCache.find(cluster.mEndpointId);
+    if (endpointIter == mCache.end())
+    {
+        return;
+    }
+
+    auto & endpointState = endpointIter->second;
+    endpointState.erase(cluster.mClusterId);
+}
+
+template <bool CanEnableDataCaching>
+void ClusterStateCacheT<CanEnableDataCaching>::ClearAttribute(const ConcreteAttributePath & attribute)
+{
+    // Can't use GetClusterState here, since that only handles const things.
+    auto endpointIter = mCache.find(attribute.mEndpointId);
+    if (endpointIter == mCache.end())
+    {
+        return;
+    }
+
+    auto & endpointState = endpointIter->second;
+    auto clusterIter     = endpointState.find(attribute.mClusterId);
+    if (clusterIter == endpointState.end())
+    {
+        return;
+    }
+
+    auto & clusterState = clusterIter->second;
+    clusterState.mAttributes.erase(attribute.mAttributeId);
+}
+
+template <bool CanEnableDataCaching>
 CHIP_ERROR ClusterStateCacheT<CanEnableDataCaching>::GetLastReportDataPath(ConcreteClusterPath & aPath)
 {
     if (mLastReportDataPath.IsValidConcreteClusterPath())
