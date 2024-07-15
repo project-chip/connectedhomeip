@@ -53,7 +53,6 @@ namespace DeviceLayer {
 
 ConnectivityManagerImpl ConnectivityManagerImpl::sInstance;
 
-
 CHIP_ERROR ConnectivityManagerImpl::_Init()
 {
     CHIP_ERROR err;
