@@ -47,18 +47,19 @@ public class MatterCommandReceiver extends BroadcastReceiver {
                   .toString();
           Log.d(TAG, message);
 
-          int pinCode = Settings.Secure.getInt(context.getContentResolver(), "matter_pin_code", 20202021);
+          int pinCode =
+              Settings.Secure.getInt(context.getContentResolver(), "matter_pin_code", 20202021);
           Log.d(TAG, "Retrieved pin code:" + pinCode);
 
           CommandResponseHolder.getInstance()
-                  .setResponseValue(
-                          Clusters.AccountLogin.Id,
-                          Clusters.AccountLogin.Commands.GetSetupPIN.ID,
-                          "{\""
-                                  + Clusters.AccountLogin.Commands.GetSetupPINResponse.Fields.SetupPIN
-                                  + "\":\""
-                                  + pinCode
-                                  + "\"}");
+              .setResponseValue(
+                  Clusters.AccountLogin.Id,
+                  Clusters.AccountLogin.Commands.GetSetupPIN.ID,
+                  "{\""
+                      + Clusters.AccountLogin.Commands.GetSetupPINResponse.Fields.SetupPIN
+                      + "\":\""
+                      + pinCode
+                      + "\"}");
 
           String response =
               CommandResponseHolder.getInstance().getCommandResponse(clusterId, commandId);
