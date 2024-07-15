@@ -30,7 +30,8 @@ Python tests located in src/python_testing
     -   Default controller (`self.default_controller`) of type `ChipDeviceCtrl`
     -   `MatterBaseTest` inherits from the Mobly BaseTestClass
 -   Test method(s) (start with test\_) and are all run automatically
-    -   To run in the test harness, the test method name must be `test_TC_PICSCODE_#_#`
+    -   To run in the test harness, the test method name must be
+        `test_TC_PICSCODE_#_#`
         -   More information about integration with the test harness can be
             found in [Test Harness helpers](#test-harness-helpers) section
     -   Any tests that use async method (read / write / commands) should be
@@ -79,8 +80,8 @@ default_matter_test_main()
 
 ---
 
-In this test, `asserts.assert_equal` is used to fail the test on equality assertion failure
-(throws an exception).
+In this test, `asserts.assert_equal` is used to fail the test on equality
+assertion failure (throws an exception).
 
 Because the test requires the use of the async method
 `read_single_attribute_check_success`, the test is decorated with the
@@ -223,13 +224,13 @@ has a set of objects that map ID to the code generated object.
 `chip.clusters.ClusterObjects.ALL_CLUSTERS`
 
 -   `dict[int, Cluster]` - maps cluster ID to Cluster class
-    - `cluster = chip.clusters.ClusterObjects.ALL_CLUSTERS[cluster_id]`
+    -   `cluster = chip.clusters.ClusterObjects.ALL_CLUSTERS[cluster_id]`
 
 `chip.clusters.ClusterObjects.ALL_ATTRIBUTES`
 
--   `dict[int, dict[int, ClusterAttributeDescriptor]]` - maps cluster ID to a dict
-    of attribute ID to attribute class
-    - `attr = chip.clusters.ClusterObjects.ALL_ATTRIBUTES[cluster_id][attribute_id]`
+-   `dict[int, dict[int, ClusterAttributeDescriptor]]` - maps cluster ID to a
+    dict of attribute ID to attribute class
+    -   `attr = chip.clusters.ClusterObjects.ALL_ATTRIBUTES[cluster_id][attribute_id]`
 
 `chip.clusters.ClusterObjects.ALL_ACCEPTED_COMMANDS/ALL_GENERATED_COMMANDS`
 
@@ -280,7 +281,8 @@ Multi-path
 ### [ReadEvent](./ChipDeviceCtrlAPI.md#readevent)
 
 -   Convenience wrapper for `Read`
--   Similar to `ReadAttribute`, but the tuple includes urgency as the last argument
+-   Similar to `ReadAttribute`, but the tuple includes urgency as the last
+    argument
 
 Example:
 
@@ -294,9 +296,9 @@ Clusters.TimeSynchronization.Events.MissingTrustedTimeSource, urgent)])
 ### Subscriptions
 
 Subscriptions are handled in the `Read` / `ReadAttribute` / `ReadEvent` APIs. To
-initiate a subscription, set the `reportInterval` tuple argument to set the floor and
-ceiling. The `keepSubscriptions` and `autoResubscribe` arguments also apply to
-subscriptions.
+initiate a subscription, set the `reportInterval` tuple argument to set the
+floor and ceiling. The `keepSubscriptions` and `autoResubscribe` arguments also
+apply to subscriptions.
 
 Subscription return `ClusterAttribute.SubscriptionTransaction`. This can be used
 to set callbacks. The object is returned after the priming data read is
@@ -410,11 +412,12 @@ reference.
         with the test description
 -   Top-level PICS:
     -   To guard your test on a top level PICS, define a method called
-        `pics_<YourTestMethodName>` to send back a list of PICS. If this method is
-        omitted, the test will be run for every endpoint on every device.
+        `pics_<YourTestMethodName>` to send back a list of PICS. If this method
+        is omitted, the test will be run for every endpoint on every device.
 -   Overriding the default timeout:
-    -   If the test is exceptionally long running, define a property getter method
-        `default_timeout` to adjust the timeout. The default is 90 seconds.
+    -   If the test is exceptionally long running, define a property getter
+        method `default_timeout` to adjust the timeout. The default is 90
+        seconds.
 
 Deferred failures: For some tests, it makes sense to perform the entire test
 before failing and collect all the errors so the developers can address all the
@@ -427,8 +430,8 @@ For such tests, use the ProblemNotice format and the convenience methods:
 -   `self.record_error`
 -   `self.record_warning`
 
-These methods keep track of the problems, and will print them at the end of
-the test. The test will not be failed until an assert is called.
+These methods keep track of the problems, and will print them at the end of the
+test. The test will not be failed until an assert is called.
 
 A good example of this type of test can be found in the device basic composition
 tests, where all the test steps are independent and performed on a single read.
@@ -440,15 +443,16 @@ See
 -   Use `--help` to get a full list
 -   `--storage-path`
     -   Used to set a local storage file path for persisted data to avoid
-        clashing files. It is suggested to always provide this argument.
-        Default value is `admin_storage.json` in current directory.
+        clashing files. It is suggested to always provide this argument. Default
+        value is `admin_storage.json` in current directory.
 -   `--commissioning-method`
     -   Need to re-commission to python controller as chip-tool and python
         commissioner do not share a credentials
 -   `--discriminator`, `--passcode`, `--qr-code`, `--manual-code`
 -   `--tests` to select tests
 -   `--PICS`
--   `--int-arg`, `--bool-arg`, `--float-arg`, `--string-arg`, `--json-arg`, `--hex-arg`
+-   `--int-arg`, `--bool-arg`, `--float-arg`, `--string-arg`, `--json-arg`,
+    `--hex-arg`
     -   Specify as key:value ex --bool-arg pixit_name:False
     -   Used for custom arguments to scripts (PIXITs)
 
@@ -524,8 +528,8 @@ or
 bootstrap.sh should be used for for the first setup, activate.sh may be used for
 subsequent setups as it is faster.
 
-Next build the python wheels and create / activate a venv (called `pyenv` here, but
-any name may be used)
+Next build the python wheels and create / activate a venv (called `pyenv` here,
+but any name may be used)
 
 ```
 ./scripts/build_python.sh -i pyenv
@@ -596,7 +600,8 @@ Below is the format of the structured environment definition comments:
 # === END CI TEST ARGUMENTS ===
 ```
 
-NOTE: The `=== BEGIN CI TEST ARGUMENTS ===` and `=== END CI TEST ARGUMENTS ===` markers must be present.
+NOTE: The `=== BEGIN CI TEST ARGUMENTS ===` and `=== END CI TEST ARGUMENTS ===`
+markers must be present.
 
 ### Description of Parameters
 
@@ -612,26 +617,26 @@ NOTE: The `=== BEGIN CI TEST ARGUMENTS ===` and `=== END CI TEST ARGUMENTS ===` 
 
         -   Example: `${TYPE_OF_APP}`
 
--   `test-runner-run/<run_identifier>/factoryreset`: Determines whether a factory
-    reset should be performed before the test.
+-   `test-runner-run/<run_identifier>/factoryreset`: Determines whether a
+    factory reset should be performed before the test.
 
     -   Example: `True`
 
--   `test-runner-run/<run_identifier>/quiet`: Sets the verbosity level of the test
-    run. When set to True, the test run will be quieter.
+-   `test-runner-run/<run_identifier>/quiet`: Sets the verbosity level of the
+    test run. When set to True, the test run will be quieter.
 
     -   Example: `True`
 
 -   `test-runner-run/<run_identifier>/app-args`: Specifies the arguments to be
     passed to the application during the test.
 
-    -   Example: `--discriminator 1234 --KVS kvs1 --trace-to json:${TRACE_APP}.json`
+    -   Example:
+        `--discriminator 1234 --KVS kvs1 --trace-to json:${TRACE_APP}.json`
 
--   `test-runner-run/<run_identifier>/script-args`: Specifies the arguments to be
-    passed to the test script.
-    -   Example: `--storage-path admin_storage.json --commissioning-method
-        on-network --discriminator 1234 --passcode 20202021 --trace-to
-        json:${TRACE_TEST_JSON}.json --trace-to perfetto:${TRACE_TEST_PERFETTO}.perfetto`
+-   `test-runner-run/<run_identifier>/script-args`: Specifies the arguments to
+    be passed to the test script.
+    -   Example:
+        `--storage-path admin_storage.json --commissioning-method on-network --discriminator 1234 --passcode 20202021 --trace-to json:${TRACE_TEST_JSON}.json --trace-to perfetto:${TRACE_TEST_PERFETTO}.perfetto`
 
 This structured format ensures that all necessary configurations are clearly
 defined and easily understood, allowing for consistent and reliable test
