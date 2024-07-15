@@ -83,7 +83,8 @@ def extract_runs_arg_lines(py_script_path: str) -> Dict[str, Dict[str, str]]:
     done_ci_args_section = False
 
     runs_def_ptrn = re.compile(r'^\s*#\s*test-runner-runs:\s*(?P<run_id>.*)$')
-    arg_def_ptrn = re.compile(r'^\s*#\s*test-runner-run/(?P<run_id>[a-zA-Z0-9_]+)/(?P<arg_name>[a-zA-Z0-9_\-]+):\s*(?P<arg_val>.*)$')
+    arg_def_ptrn = re.compile(
+        r'^\s*#\s*test-runner-run/(?P<run_id>[a-zA-Z0-9_]+)/(?P<arg_name>[a-zA-Z0-9_\-]+):\s*(?P<arg_val>.*)$')
 
     runs_arg_lines: Dict[str, Dict[str, str]] = {}
 
