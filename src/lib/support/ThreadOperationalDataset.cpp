@@ -15,10 +15,12 @@
  *    limitations under the License.
  */
 
-#include <assert.h>
-#include <string.h>
-
 #include <lib/support/ThreadOperationalDataset.h>
+
+#include <lib/core/CHIPEncoding.h>
+
+#include <cassert>
+#include <cstring>
 
 namespace chip {
 namespace Thread {
