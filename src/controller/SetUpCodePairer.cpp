@@ -29,6 +29,7 @@
 #include <controller/CHIPDeviceController.h>
 #include <lib/dnssd/Resolver.h>
 #include <lib/support/CodeUtils.h>
+#include <memory>
 #include <system/SystemClock.h>
 #include <tracing/metric_event.h>
 
@@ -252,6 +253,11 @@ CHIP_ERROR SetUpCodePairer::StopConnectOverSoftAP()
     return CHIP_NO_ERROR;
 }
 
+#if CHIP_DEVICE_CONFIG_ENABLE_WIFIPAF
+static std::shared_ptr<SetUpCodePairer> SetUpCodeParserPtr;
+void custom_del(SetUpCodePairer * p){};
+#endif
+
 CHIP_ERROR SetUpCodePairer::StartDiscoverOverWiFiPAF(SetupPayload & payload)
 {
 #if CHIP_DEVICE_CONFIG_ENABLE_WIFIPAF
@@ -259,8 +265,10 @@ CHIP_ERROR SetUpCodePairer::StartDiscoverOverWiFiPAF(SetupPayload & payload)
 
     VerifyOrReturnError(mCommissioner != nullptr, CHIP_ERROR_INCORRECT_STATE);
     mWaitingForDiscovery[kWiFiPAFTransport] = true;
-    CHIP_ERROR err = DeviceLayer::ConnectivityMgr().WiFiPAFConnect(payload.discriminator, this, OnWiFiPAFSubscribeComplete,
-                                                                   OnWiFiPAFSubscribeError);
+
+    SetUpCodeParserPtr.reset(this, custom_del);
+    CHIP_ERROR err = DeviceLayer::ConnectivityMgr().WiFiPAFConnect(payload.discriminator, (void *) (&(SetUpCodeParserPtr)),
+                                                                   OnWiFiPAFSubscribeComplete, OnWiFiPAFSubscribeError);
     if (err != CHIP_NO_ERROR)
     {
         ChipLogError(Controller, "Commissioning discovery over WiFiPAF failed, err = %" CHIP_ERROR_FORMAT, err.Format());
@@ -390,12 +398,30 @@ void SetUpCodePairer::OnWifiPAFDiscoveryError(CHIP_ERROR err)
 
 void SetUpCodePairer::OnWiFiPAFSubscribeComplete(void * appState)
 {
-    (static_cast<SetUpCodePairer *>(appState))->OnDiscoveredDeviceOverWifiPAF();
+    std::weak_ptr<SetUpCodePairer> * caller     = (std::weak_ptr<SetUpCodePairer> *) (appState);
+    std::shared_ptr<SetUpCodePairer> selfShrPtr = caller->lock();
+    if (!selfShrPtr)
+    {
+        ChipLogError(Controller, "SetUpCodePairer is destroyed unexpectedly!");
+        return;
+    }
+    selfShrPtr.get()->OnDiscoveredDeviceOverWifiPAF();
+    // Release the ownership
+    selfShrPtr.reset();
 }
 
 void SetUpCodePairer::OnWiFiPAFSubscribeError(void * appState, CHIP_ERROR err)
 {
-    static_cast<SetUpCodePairer *>(appState)->OnWifiPAFDiscoveryError(err);
+    std::weak_ptr<SetUpCodePairer> * caller     = (std::weak_ptr<SetUpCodePairer> *) (appState);
+    std::shared_ptr<SetUpCodePairer> selfShrPtr = caller->lock();
+    if (!selfShrPtr)
+    {
+        ChipLogError(Controller, "Err: SetUpCodePairer was destroyed unexpectedly!");
+        return;
+    }
+    selfShrPtr.get()->OnWifiPAFDiscoveryError(err);
+    // Release the ownership
+    selfShrPtr.reset();
 }
 #endif
 
