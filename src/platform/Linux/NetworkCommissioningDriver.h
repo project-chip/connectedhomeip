@@ -154,15 +154,21 @@ private:
     };
 
     // Number of entries in mStagingNetworks
-    uint8_t mCurrentNetId = 0;
+    uint8_t mStagingNetworkCount = 0;
     WiFiNetwork mSavedNetworks[kMaxNetworks];
     WiFiNetwork mStagingNetworks[kMaxNetworks];
     ConnectCallback * mpConnectCallback;
-    // Index location of the network the device is connected to
+    // Index location of the network the device is connected to. Value -1 indicates that the device is not connected to any of the networks
+    // Sets the value to the index location of the network in mStagingNetworks or mSavedNetworks
     int8_t mStagedConnectedNetworkIndex = -1;
     int8_t mSavedConnectedNetworkIndex  = -1;
+    // On receiving ReorderNetwork command, insert the entry requested by the command to the new
+    // index location in mStagingNetworks (0-based index) in a way that they all retain their existing
+    // relative order between each other, with the exception of the newly re-ordered entry.
     bool StartReorderingEntries(uint8_t index, int8_t foundNetworkAtIndex);
-    void ShiftNetworkAfterRemove();
+    // After removing a network from mStagingNetworks the relative order of the entries in the Networks
+    // attribute shall remain unchanged, except for the removal of the requested network configuration.
+    void CompressStagingNetworksList();
     // Whether 5GHz band is supported, as claimed by callers (`Set5gSupport()`) rather than syscalls.
     bool mIs5gSupported = false;
 };

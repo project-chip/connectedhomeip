@@ -99,9 +99,9 @@ inline CHIP_ERROR IgnoreNotFound(CHIP_ERROR err)
 }
 } // namespace
 
-// NOTE: For WiFiDriver, we uses two network configs, one is mSavedNetworks, and another is mStagingNetworks, during init, it will
+// NOTE: For WiFiDriver, we use two sets of network configs, one is mSavedNetworks, and another is mStagingNetworks, during init, it will
 // load the network config from k-v storage, and loads it into both mSavedNetworks and mStagingNetworks. When updating the networks,
-// all changed are made on the staging network, and when the network is committed, it will update the mSavedNetworks to
+// all changes are made on the staging network, and when the network is committed, it will update the mSavedNetworks to
 // mStagingNetworks and persist the changes.
 
 // NOTE: LinuxWiFiDriver uses network config with empty ssid (ssidLen = 0) for empty network config.
@@ -149,7 +149,7 @@ CHIP_ERROR LinuxWiFiDriver::Init(BaseDriver::NetworkStatusChangeCallback * netwo
             }
 
             mStagingNetworks[networkIndex] = mSavedNetworks[networkIndex] = network;
-            mCurrentNetId++;
+            mStagingNetworkCount++;
         }
     }
 
@@ -210,7 +210,7 @@ CHIP_ERROR LinuxWiFiDriver::CommitConfiguration()
 
 CHIP_ERROR LinuxWiFiDriver::RevertConfiguration()
 {
-    mCurrentNetId = 0;
+    mStagingNetworkCount = 0;
     Network configuredNetwork;
 
     memcpy(mStagingNetworks, mSavedNetworks, sizeof(mStagingNetworks));
@@ -223,7 +223,7 @@ CHIP_ERROR LinuxWiFiDriver::RevertConfiguration()
         // ssidlen will be 0 if entry is not populated
         if (!mStagingNetworks[networkIndex].Empty())
         {
-            mCurrentNetId++;
+            mStagingNetworkCount++;
         }
     }
 
@@ -243,34 +243,34 @@ Status LinuxWiFiDriver::AddOrUpdateNetwork(ByteSpan ssid, ByteSpan credentials, 
                                            uint8_t & outNetworkIndex)
 {
     outDebugText.reduce_size(0);
-    outNetworkIndex = mCurrentNetId;
+    outNetworkIndex = mStagingNetworkCount;
 
-    VerifyOrReturnError(mCurrentNetId < kMaxNetworks, Status::kBoundsExceeded);
-    VerifyOrReturnError(mStagingNetworks[mCurrentNetId].Empty() || mStagingNetworks[mCurrentNetId].Matches(ssid),
+    VerifyOrReturnError(mStagingNetworkCount < kMaxNetworks, Status::kBoundsExceeded);
+    VerifyOrReturnError(mStagingNetworks[mStagingNetworkCount].Empty() || mStagingNetworks[mStagingNetworkCount].Matches(ssid),
                         Status::kBoundsExceeded);
 
     // Do the check before setting the values, so the data is not updated on error.
-    VerifyOrReturnError(credentials.size() <= sizeof(mStagingNetworks[mCurrentNetId].credentials), Status::kOutOfRange);
-    VerifyOrReturnError(!ssid.empty() && ssid.size() <= sizeof(mStagingNetworks[mCurrentNetId].ssid), Status::kOutOfRange);
+    VerifyOrReturnError(credentials.size() <= sizeof(mStagingNetworks[mStagingNetworkCount].credentials), Status::kOutOfRange);
+    VerifyOrReturnError(!ssid.empty() && ssid.size() <= sizeof(mStagingNetworks[mStagingNetworkCount].ssid), Status::kOutOfRange);
 
-    memcpy(mStagingNetworks[mCurrentNetId].credentials, credentials.data(), credentials.size());
-    mStagingNetworks[mCurrentNetId].credentialsLen =
-        static_cast<decltype(mStagingNetworks[mCurrentNetId].credentialsLen)>(credentials.size());
+    memcpy(mStagingNetworks[mStagingNetworkCount].credentials, credentials.data(), credentials.size());
+    mStagingNetworks[mStagingNetworkCount].credentialsLen =
+        static_cast<decltype(mStagingNetworks[mStagingNetworkCount].credentialsLen)>(credentials.size());
 
-    memcpy(mStagingNetworks[mCurrentNetId].ssid, ssid.data(), ssid.size());
-    mStagingNetworks[mCurrentNetId].ssidLen = static_cast<decltype(mStagingNetworks[mCurrentNetId].ssidLen)>(ssid.size());
+    memcpy(mStagingNetworks[mStagingNetworkCount].ssid, ssid.data(), ssid.size());
+    mStagingNetworks[mStagingNetworkCount].ssidLen = static_cast<decltype(mStagingNetworks[mStagingNetworkCount].ssidLen)>(ssid.size());
 
 #if CHIP_DEVICE_CONFIG_ENABLE_WIFI_PDC
-    mStagingNetworks[mCurrentNetId].networkIdentityLen = 0;
-    mStagingNetworks[mCurrentNetId].clientIdentityLen  = 0;
-    mStagingNetworks[mCurrentNetId].clientIdentityKeypair.reset();
+    mStagingNetworks[mStagingNetworkCount].networkIdentityLen = 0;
+    mStagingNetworks[mStagingNetworkCount].clientIdentityLen  = 0;
+    mStagingNetworks[mStagingNetworkCount].clientIdentityKeypair.reset();
 #endif // CHIP_DEVICE_CONFIG_ENABLE_WIFI_PDC
-    mCurrentNetId++;
+    mStagingNetworkCount++;
 
     return Status::kSuccess;
 }
 
-void LinuxWiFiDriver::ShiftNetworkAfterRemove()
+void LinuxWiFiDriver::CompressStagingNetworksList()
 {
     WiFiNetwork tempNetwork[kMaxNetworks];
     uint8_t count = 0;
@@ -294,7 +294,7 @@ Status LinuxWiFiDriver::RemoveNetwork(ByteSpan networkId, MutableCharSpan & outD
     outNetworkIndex   = 0;
     bool foundNetwork = false;
 
-    VerifyOrReturnError(mCurrentNetId != 0, Status::kBoundsExceeded);
+    VerifyOrReturnError(mStagingNetworkCount != 0, Status::kBoundsExceeded);
 
     for (uint8_t networkIndex = 0; networkIndex < kMaxNetworks; networkIndex++)
     {
@@ -317,8 +317,8 @@ Status LinuxWiFiDriver::RemoveNetwork(ByteSpan networkId, MutableCharSpan & outD
 
     // Will need to reorder the list.
     // Shift networks that are at a lower priority than the network to be removed if present in the list.
-    ShiftNetworkAfterRemove();
-    mCurrentNetId--;
+    CompressStagingNetworksList();
+    mStagingNetworkCount--;
 
     return Status::kSuccess;
 }
@@ -382,8 +382,8 @@ Status LinuxWiFiDriver::ReorderNetwork(ByteSpan networkId, uint8_t index, Mutabl
     }
     VerifyOrReturnError(foundNetworkAtIndex != -1, Status::kNetworkIDNotFound);
 
-    // Network index larger to the current number of entries return out of range
-    VerifyOrReturnError(index < mCurrentNetId, Status::kOutOfRange);
+    // Return out of range if the index value is greater than mStagingNetworkCount i.e the number of enties in mStagingNetworks
+    VerifyOrReturnError(index < mStagingNetworkCount, Status::kOutOfRange);
     if (foundNetworkAtIndex == mStagedConnectedNetworkIndex)
     {
         mStagedConnectedNetworkIndex = index;
@@ -453,22 +453,12 @@ void LinuxWiFiDriver::ScanNetworks(ByteSpan ssid, WiFiDriver::ScanCallback * cal
 
 size_t LinuxWiFiDriver::WiFiNetworkIterator::Count()
 {
-    size_t count = 0;
-
-    for (uint8_t networkIndex = 0; networkIndex < kMaxNetworks; networkIndex++)
-    {
-        if (!driver->mStagingNetworks[networkIndex].Empty())
-        {
-            count++;
-        }
-    }
-
-    return count;
+    return driver->mStagingNetworkCount;
 }
 
 bool LinuxWiFiDriver::WiFiNetworkIterator::Next(Network & item)
 {
-    if (exhausted || driver->mStagingNetworks[networkIteratorIndex].ssidLen == 0 || networkIteratorIndex > (kMaxNetworks - 1))
+    if (exhausted || driver->mStagingNetworks[networkIteratorIndex].Empty() || networkIteratorIndex > (kMaxNetworks - 1))
     {
         return false;
     }
@@ -505,19 +495,19 @@ CHIP_ERROR LinuxWiFiDriver::AddOrUpdateNetworkWithPDC(ByteSpan ssid, ByteSpan ne
 {
     CHIP_ERROR err = CHIP_NO_ERROR;
     outStatus      = Status::kUnknownError;
-    VerifyOrReturnError(mCurrentNetId < kMaxNetworks, Status::kBoundsExceeded);
-    VerifyOrExit(mStagingNetworks[mCurrentNetId].Empty() || mStagingNetworks[mCurrentNetId].Matches(ssid),
+    VerifyOrReturnError(mStagingNetworkCount < kMaxNetworks, Status::kBoundsExceeded);
+    VerifyOrExit(mStagingNetworks[mStagingNetworkCount].Empty() || mStagingNetworks[mStagingNetworkCount].Matches(ssid),
                  outStatus = Status::kBoundsExceeded);
 
     VerifyOrExit(!ssid.empty() && ssid.size() <= sizeof(WiFiNetwork::ssid), outStatus = Status::kOutOfRange);
     VerifyOrExit(!networkIdentity.empty() && networkIdentity.size() <= sizeof(WiFiNetwork::networkIdentity),
                  outStatus = Status::kOutOfRange);
     VerifyOrExit(!clientIdentityNetworkIndex.HasValue() ||
-                     (clientIdentityNetworkIndex.Value() < kMaxNetworks && mStagingNetworks[mCurrentNetId].UsingPDC()),
+                     (clientIdentityNetworkIndex.Value() < kMaxNetworks && mStagingNetworks[mStagingNetworkCount].UsingPDC()),
                  outStatus = Status::kOutOfRange);
 
     {
-        WiFiNetwork network = mStagingNetworks[mCurrentNetId]; // update a copy first in case of errors
+        WiFiNetwork network = mStagingNetworks[mStagingNetworkCount]; // update a copy first in case of errors
 
         memcpy(network.ssid, ssid.data(), network.ssidLen = ssid.size());
         memcpy(network.networkIdentity, networkIdentity.data(), network.networkIdentityLen = networkIdentity.size());
@@ -538,9 +528,9 @@ CHIP_ERROR LinuxWiFiDriver::AddOrUpdateNetworkWithPDC(ByteSpan ssid, ByteSpan ne
 
         SuccessOrExit(err = CopySpanToMutableSpan(ByteSpan(network.clientIdentity, network.clientIdentityLen), outClientIdentity));
 
-        mStagingNetworks[mCurrentNetId] = network;
+        mStagingNetworks[mStagingNetworkCount] = network;
         outNetworkIndex                 = 0;
-        mCurrentNetId++;
+        mStagingNetworkCount++;
         outStatus = Status::kSuccess;
     }
 
@@ -553,7 +543,7 @@ CHIP_ERROR LinuxWiFiDriver::GetNetworkIdentity(uint8_t networkIndex, MutableByte
 {
     VerifyOrReturnError(!mStagingNetworks[networkIndex].Empty() && networkIndex < kMaxNetworks, CHIP_ERROR_INVALID_ARGUMENT);
     VerifyOrReturnError(mStagingNetworks[networkIndex].UsingPDC(), CHIP_ERROR_INVALID_ARGUMENT);
-    return CopySpanToMutableSpan(ByteSpan(mStagingNetworks.networkIdentity, mStagingNetworks.networkIdentityLen),
+    return CopySpanToMutableSpan(ByteSpan(mStagingNetworks[networkIndex].networkIdentity, mStagingNetworks[networkIndex].networkIdentityLen),
                                  outNetworkIdentity);
 }
 
@@ -561,7 +551,7 @@ CHIP_ERROR LinuxWiFiDriver::GetClientIdentity(uint8_t networkIndex, MutableByteS
 {
     VerifyOrReturnError(!mStagingNetworks[networkIndex].Empty() && networkIndex < kMaxNetworks, CHIP_ERROR_INVALID_ARGUMENT);
     VerifyOrReturnError(mStagingNetworks[networkIndex].UsingPDC(), CHIP_ERROR_INVALID_ARGUMENT);
-    return CopySpanToMutableSpan(ByteSpan(mStagingNetworks.clientIdentity, mStagingNetworks.clientIdentityLen), outClientIdentity);
+    return CopySpanToMutableSpan(ByteSpan(mStagingNetworks[networkIndex].clientIdentity, mStagingNetworks[networkIndex].clientIdentityLen), outClientIdentity);
 }
 
 CHIP_ERROR LinuxWiFiDriver::SignWithClientIdentity(uint8_t networkIndex, const ByteSpan & message,
@@ -569,7 +559,7 @@ CHIP_ERROR LinuxWiFiDriver::SignWithClientIdentity(uint8_t networkIndex, const B
 {
     VerifyOrReturnError(!mStagingNetworks[networkIndex].Empty() && networkIndex < kMaxNetworks, CHIP_ERROR_INVALID_ARGUMENT);
     VerifyOrReturnError(mStagingNetworks[networkIndex].UsingPDC(), CHIP_ERROR_INVALID_ARGUMENT);
-    return mStagingNetworks.clientIdentityKeypair->ECDSA_sign_msg(message.data(), message.size(), outSignature);
+    return mStagingNetworks[networkIndex].clientIdentityKeypair->ECDSA_sign_msg(message.data(), message.size(), outSignature);
 }
 #endif // CHIP_DEVICE_CONFIG_ENABLE_WIFI_PDC
 
