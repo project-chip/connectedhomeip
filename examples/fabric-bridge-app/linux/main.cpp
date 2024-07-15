@@ -30,9 +30,6 @@
 #include "CommissionerControl.h"
 
 #include <app/AttributeAccessInterfaceRegistry.h>
-#include <app/CommandHandlerInterfaceRegistry.h>
-#include <app/clusters/ecosystem-information-server/ecosystem-information-server.h>
-#include <lib/support/CHIPArgParser.hpp>
 
 #if defined(PW_RPC_FABRIC_BRIDGE_SERVICE) && PW_RPC_FABRIC_BRIDGE_SERVICE
 #include "RpcClient.h"
@@ -51,7 +48,6 @@ using namespace chip;
 using namespace chip::app;
 using namespace chip::app::Clusters;
 using namespace chip::app::Clusters::AdministratorCommissioning;
-using namespace chip::app::Clusters::BridgedDeviceBasicInformation;
 
 namespace {
 
@@ -294,10 +290,7 @@ void ApplicationInit()
 {
     ChipLogDetail(NotSpecified, "Fabric-Bridge: ApplicationInit()");
 
-    MatterEcosystemInformationPluginServerInitCallback();
-    CommandHandlerInterfaceRegistry::Instance().RegisterCommandHandler(&gAdministratorCommissioningCommandHandler);
-    CommandHandlerInterfaceRegistry::Instance().RegisterCommandHandler(&gBridgedDeviceInformationCommandHandler);
-    AttributeAccessInterfaceRegistry::Instance().Register(&gBridgedDeviceBasicInformationAttributes);
+    InteractionModelEngine::GetInstance()->RegisterCommandHandler(&gAdministratorCommissioningCommandHandler);
 
 #if defined(PW_RPC_FABRIC_BRIDGE_SERVICE) && PW_RPC_FABRIC_BRIDGE_SERVICE
     SetRpcRemoteServerPort(gFabricAdminServerPort);
@@ -324,6 +317,10 @@ void ApplicationShutdown()
     {
         ChipLogError(NotSpecified, "Failed to shutdown Commissioner Control Server");
     }
+}
+void ApplicationShutdown()
+{
+    ChipLogDetail(NotSpecified, "Fabric-Bridge: ApplicationShutdown()");
 }
 
 int main(int argc, char * argv[])
