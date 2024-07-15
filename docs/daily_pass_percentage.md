@@ -30,6 +30,7 @@
 | build-example-telink                    |         100 |
 | lint-code-base                          |         100 |
 | cirque                                  |         100 |
+| issue-labeler                           |         100 |
 | build-example-nuttx                     |         100 |
 | build-example-linux-arm                 |         100 |
 | qemu                                    |         100 |
