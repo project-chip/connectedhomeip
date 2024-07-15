@@ -129,7 +129,6 @@
         "wake-on-lan-cluster.xml",
         "washer-controls-cluster.xml",
         "water-heater-management-cluster.xml",
-        "water-heater-mode-cluster.xml",
         "wifi-network-diagnostics-cluster.xml",
         "wifi-network-management-cluster.xml",
         "window-covering.xml",
@@ -651,7 +650,6 @@
             "BoostState",
             "FeatureMap"
         ],
-        "Water Heater Mode": ["SupportedModes", "CurrentMode", "FeatureMap"],
         "Wi-Fi Network Management": ["SSID"]
     },
     "defaultReportingPolicy": "mandatory",

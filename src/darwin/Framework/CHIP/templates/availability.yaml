@@ -8240,6 +8240,7 @@
           - ElectricalEnergyMeasurement
           - EnergyPreference
           - ScenesManagement
+          - WaterHeaterManagement
       attributes:
           NetworkCommissioning:
               # Targeting Spring 2024 Matter release
