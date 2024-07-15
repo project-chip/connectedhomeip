@@ -398,11 +398,11 @@ config CHIP_ICD_ACTIVE_MODE_THRESHOLD
 
 config CHIP_ICD_LIT_SUPPORT
 	bool "Intermittently Connected Device Long Idle Time support"
-	imply CHIP_ICD_CHECK_IN_SUPPORT
-	imply CHIP_ICD_UAT_SUPPORT
+	select CHIP_ICD_CHECK_IN_SUPPORT
+	select CHIP_ICD_UAT_SUPPORT
 	help
 	  Enables the Intermittently Connected Device Long Idle Time support in Matter.
-	  It also implies the ICD Check-In and UAT features support that are mandatory for LIT device.
+	  It also selects the ICD Check-In and UAT features support that are mandatory for LIT device.
 
 config CHIP_ICD_CHECK_IN_SUPPORT
 	bool "Intermittently Connected Device Check-In protocol support"
