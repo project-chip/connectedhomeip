@@ -13,13 +13,32 @@
 # limitations under the License.
 
 import("//build_overrides/chip.gni")
-
 import("${chip_root}/src/app/chip_data_model.gni")
+
+config("config") {
+  include_dirs = [ "include" ]
+}
 
 chip_data_model("fabric-bridge-common") {
   zap_file = "fabric-bridge-app.zap"
-
   is_server = true
-
   cflags = [ "-DDYNAMIC_ENDPOINT_COUNT=16" ]
+}
+
+source_set("fabric-bridge-lib") {
+  public_configs = [ ":config" ]
+
+  sources = [
+    "include/CHIPProjectAppConfig.h",
+    "include/Device.h",
+    "include/DeviceManager.h",
+    "src/Device.cpp",
+    "src/DeviceManager.cpp",
+    "src/ZCLCallbacks.cpp",
+  ]
+
+  deps = [
+    "${chip_root}/examples/fabric-bridge-app/fabric-bridge-common",
+    "${chip_root}/src/lib",
+  ]
 }
