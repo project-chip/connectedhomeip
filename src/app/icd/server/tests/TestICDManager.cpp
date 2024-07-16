@@ -15,6 +15,7 @@
  *    See the License for the specific language governing permissions and
  *    limitations under the License.
  */
+
 #include <pw_unit_test/framework.h>
 
 #include <app/SubscriptionsInfoProvider.h>
@@ -29,6 +30,7 @@
 #include <lib/address_resolve/AddressResolve.h>
 #include <lib/core/DataModelTypes.h>
 #include <lib/core/NodeId.h>
+#include <lib/core/StringBuilderAdapters.h>
 #include <lib/support/TestPersistentStorageDelegate.h>
 #include <lib/support/TimeUtils.h>
 #include <messaging/tests/MessagingContext.h>
