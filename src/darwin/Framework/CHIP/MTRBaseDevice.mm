@@ -2294,6 +2294,10 @@ MTREventPriority MTREventPriorityForValidPriorityLevel(chip::app::PriorityLevel 
         return NO;
     }
 
+    if (path == self) {
+        return YES;
+    }
+
     // Note: Nil is a wildcard, and empty endpoint/cluster/attribute values imply nil as well.
     // Pass iff we have objects that are pointer equivalent (eg: nil == nil || object_a == object_a), or they have values and the same logical values
     if ((_endpoint == path.endpoint || (path.endpoint && [_endpoint isEqualToNumber:path.endpoint]))
@@ -2302,7 +2306,7 @@ MTREventPriority MTREventPriorityForValidPriorityLevel(chip::app::PriorityLevel 
         return YES;
     }
 
-    return NO;
+    return [super isEqual:object];
 }
 
 - (BOOL)isEqual:(id)object
@@ -2378,6 +2382,10 @@ MTREventPriority MTREventPriorityForValidPriorityLevel(chip::app::PriorityLevel 
         return NO;
     }
 
+    if (path == self) {
+        return YES;
+    }
+
     // Note: Nil is a wildcard, and empty endpoint/cluster/attribute values imply nil as well.
     // Pass iff we have objects that are pointer equivalent (eg: nil == nil || object_a == object_a), or they have values and the same logical values
     if ((_endpoint == path.endpoint || (path.endpoint && [_endpoint isEqualToNumber:path.endpoint]))
@@ -2386,7 +2394,7 @@ MTREventPriority MTREventPriorityForValidPriorityLevel(chip::app::PriorityLevel 
         return YES;
     }
 
-    return NO;
+    return [super isEqual:object];
 }
 
 - (BOOL)isEqual:(id)object
@@ -2458,6 +2466,10 @@ MTREventPriority MTREventPriorityForValidPriorityLevel(chip::app::PriorityLevel 
 {
     if (!clusterPath) {
         return NO;
+    }
+
+    if (clusterPath == self) {
+        return YES;
     }
 
     return (clusterPath.endpoint && [_endpoint isEqualToNumber:clusterPath.endpoint])
@@ -2553,6 +2565,10 @@ static NSString * const sClusterKey = @"clusterKey";
     if (!attributePath)
         return NO;
 
+    if (attributePath == self) {
+        return YES;
+    }
+
     return [self isEqualToClusterPath:attributePath] && attributePath.attribute && [_attribute isEqualToNumber:attributePath.attribute];
 }
 
@@ -2647,8 +2663,13 @@ static NSString * const sAttributeKey = @"attributeKey";
 
 - (BOOL)isEqualToEventPath:(MTREventPath *)eventPath
 {
-    if (!eventPath)
+    if (!eventPath) {
         return NO;
+    }
+
+    if (eventPath == self) {
+        return YES;
+    }
 
     return [self isEqualToClusterPath:eventPath] && eventPath.event && [_event isEqualToNumber:eventPath.event];
 }
@@ -2743,6 +2764,10 @@ static NSString * const sEventKey = @"eventKey";
 {
     if (!commandPath) {
         return NO;
+    }
+
+    if (command == self) {
+        return YES;
     }
 
     return [self isEqualToClusterPath:commandPath] && commandPath.command && [_command isEqualToNumber:commandPath.command];
