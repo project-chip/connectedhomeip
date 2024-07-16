@@ -18,10 +18,17 @@
 import os
 import glob
 import subprocess
-from dotenv import load_dotenv
+
+# Function to load environment variables from a YAML file
+def load_env_from_yaml(file_path):
+    with open(file_path, 'r') as file:
+        for line in file:
+            if line.strip():  # Skip empty lines
+                key, value = line.strip().split(': ', 1)
+                os.environ[key] = value
 
 # Load environment variables from test_env.yaml
-load_dotenv('/tmp/test_env.yaml')
+load_env_from_yaml('/tmp/test_env.yaml')
 
 # Define the base command to run tests
 base_command = "./scripts/tests/run_python_test.py"
