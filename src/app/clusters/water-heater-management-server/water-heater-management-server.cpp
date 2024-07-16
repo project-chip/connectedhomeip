@@ -93,18 +93,6 @@ CHIP_ERROR Instance::Read(const ConcreteReadAttributePath & aPath, AttributeValu
     return CHIP_NO_ERROR;
 }
 
-// CommandHandlerInterface
-CHIP_ERROR Instance::EnumerateAcceptedCommands(const ConcreteClusterPath & cluster, CommandIdCallback callback, void * context)
-{
-    using namespace Commands;
-
-    VerifyOrExit(callback(Boost::Id, context) == Loop::Continue, /**/);
-    VerifyOrExit(callback(CancelBoost::Id, context) == Loop::Continue, /**/);
-
-exit:
-    return CHIP_NO_ERROR;
-}
-
 void Instance::InvokeCommand(HandlerContext & handlerContext)
 {
     using namespace Commands;
@@ -128,8 +116,8 @@ void Instance::HandleBoost(HandlerContext & ctx, const Commands::Boost::Decodabl
     Optional<bool> oneShot                   = commandData.oneShot;
     Optional<bool> emergencyBoost            = commandData.emergencyBoost;
     Optional<int16_t> temporarySetpoint      = commandData.temporarySetpoint;
-    Optional<chip::Percent> targetPercentage = commandData.targetPercentage;
-    Optional<chip::Percent> targetReheat     = commandData.targetReheat;
+    Optional<Percent> targetPercentage = commandData.targetPercentage;
+    Optional<Percent> targetReheat     = commandData.targetReheat;
 
     //  Notify the appliance if the appliance hardware cannot be adjusted, then return Failure
     if (!HasFeature(WaterHeaterManagement::Feature::kTankPercent))
@@ -192,5 +180,3 @@ void Instance::HandleCancelBoost(HandlerContext & ctx, const Commands::CancelBoo
 } // namespace Clusters
 } // namespace app
 } // namespace chip
-
-void MatterWaterHeaterManagementPluginServerInitCallback() {}
