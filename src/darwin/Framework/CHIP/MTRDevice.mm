@@ -336,7 +336,11 @@ static NSString * const sLastInitialSubscribeLatencyKey = @"lastInitialSubscribe
 
 - (BOOL)isEqualToClusterData:(MTRDeviceClusterData *)otherClusterData
 {
-    return [_dataVersion isEqual:otherClusterData.dataVersion] && [_attributes isEqual:otherClusterData.attributes];
+    if (!otherClusterData)
+        return NO;
+
+    return (otherClusterData.dataVersion && [_dataVersion isEqual:otherClusterData.dataVersion])
+        && (otherClusterData.attributes && [_attributes isEqual:otherClusterData.attributes]);
 }
 
 - (BOOL)isEqual:(id)object
@@ -802,7 +806,7 @@ static NSString * const sLastInitialSubscribeLatencyKey = @"lastInitialSubscribe
     [self _addDelegate:delegate queue:queue interestedPathsForAttributes:nil interestedPathsForEvents:nil];
 }
 
-- (void)addDelegate:(id<MTRDeviceDelegate>)delegate queue:(dispatch_queue_t)queue interestedPathsForAttributes:(NSArray * _Nullable)interestedPathsForAttributes interestedPathsForEvents:(NSArray * _Nullable)interestedPathsForEvents MTR_NEWLY_AVAILABLE;
+- (void)addDelegate:(id<MTRDeviceDelegate>)delegate queue:(dispatch_queue_t)queue interestedPathsForAttributes:(NSArray * _Nullable)interestedPathsForAttributes interestedPathsForEvents:(NSArray * _Nullable)interestedPathsForEvents
 {
     MTR_LOG("%@ addDelegate %@ with interested attribute paths %@ event paths %@", self, delegate, interestedPathsForAttributes, interestedPathsForEvents);
     [self _addDelegate:delegate queue:queue interestedPathsForAttributes:interestedPathsForAttributes interestedPathsForEvents:interestedPathsForEvents];
@@ -3441,6 +3445,13 @@ static BOOL AttributeHasChangesOmittedQuality(MTRAttributePath * attributePath)
         }
         [self _removeClusters:clusterPathsToRemove doRemoveFromDataStore:NO];
         [self.deviceController.controllerDataStore clearStoredClusterDataForNodeID:self.nodeID endpointID:endpoint];
+
+        [_deviceController asyncDispatchToMatterQueue:^{
+            std::lock_guard lock(self->_lock);
+            if (self->_currentSubscriptionCallback) {
+                self->_currentSubscriptionCallback->ClearCachedAttributeState(static_cast<EndpointId>(endpoint.unsignedLongLongValue));
+            }
+        } errorHandler:nil];
     }
 }
 
@@ -3461,6 +3472,17 @@ static BOOL AttributeHasChangesOmittedQuality(MTRAttributePath * attributePath)
         }
     }
     [self _removeClusters:clusterPathsToRemove doRemoveFromDataStore:YES];
+
+    [_deviceController asyncDispatchToMatterQueue:^{
+        std::lock_guard lock(self->_lock);
+        if (self->_currentSubscriptionCallback) {
+            for (NSNumber * cluster in toBeRemovedClusters) {
+                ConcreteClusterPath clusterPath(static_cast<EndpointId>(endpointID.unsignedLongLongValue),
+                    static_cast<ClusterId>(cluster.unsignedLongLongValue));
+                self->_currentSubscriptionCallback->ClearCachedAttributeState(clusterPath);
+            }
+        }
+    } errorHandler:nil];
 }
 
 - (void)_pruneAttributesIn:(MTRDeviceDataValueDictionary)previousAttributeListValue
@@ -3474,6 +3496,18 @@ static BOOL AttributeHasChangesOmittedQuality(MTRAttributePath * attributePath)
 
     [toBeRemovedAttributes minusSet:attributesStillInCluster];
     [self _removeAttributes:toBeRemovedAttributes fromCluster:clusterPath];
+
+    [_deviceController asyncDispatchToMatterQueue:^{
+        std::lock_guard lock(self->_lock);
+        if (self->_currentSubscriptionCallback) {
+            for (NSNumber * attribute in toBeRemovedAttributes) {
+                ConcreteAttributePath attributePath(static_cast<EndpointId>(clusterPath.endpoint.unsignedLongLongValue),
+                    static_cast<ClusterId>(clusterPath.cluster.unsignedLongLongValue),
+                    static_cast<AttributeId>(attribute.unsignedLongLongValue));
+                self->_currentSubscriptionCallback->ClearCachedAttributeState(attributePath);
+            }
+        }
+    } errorHandler:nil];
 }
 
 - (void)_pruneStoredDataForPath:(MTRAttributePath *)attributePath
