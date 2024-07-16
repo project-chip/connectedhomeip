@@ -1,0 +1,109 @@
+#
+#    Copyright (c) 2024 Project CHIP Authors
+#    All rights reserved.
+#
+#    Licensed under the Apache License, Version 2.0 (the "License");
+#    you may not use this file except in compliance with the License.
+#    You may obtain a copy of the License at
+#
+#        http://www.apache.org/licenses/LICENSE-2.0
+#
+#    Unless required by applicable law or agreed to in writing, software
+#    distributed under the License is distributed on an "AS IS" BASIS,
+#    WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+#    See the License for the specific language governing permissions and
+#    limitations under the License.
+#
+
+# === BEGIN CI TEST ARGUMENTS ===
+# test-runner-runs: run1
+# test-runner-run/run1/app: ${ENERGY_MANAGEMENT_APP}
+# test-runner-run/run1/factoryreset: True
+# test-runner-run/run1/quiet: True
+# test-runner-run/run1/app-args: --discriminator 1234 --KVS kvs1 --trace-to json:${TRACE_APP}.json --enable-key 000102030405060708090a0b0c0d0e0f
+# test-runner-run/run1/script-args: --storage-path admin_storage.json --commissioning-method on-network --discriminator 1234 --passcode 20202021 --hex-arg enableKey:000102030405060708090a0b0c0d0e0f --endpoint 1 --trace-to json:${TRACE_TEST_JSON}.json --trace-to perfetto:${TRACE_TEST_PERFETTO}.perfetto
+# === END CI TEST ARGUMENTS ===
+
+import logging
+
+import chip.clusters as Clusters
+from matter_testing_support import MatterBaseTest, TestStep, async_test_body, default_matter_test_main
+from mobly import asserts
+
+
+class TC_EWATERHTRM_1_2(MatterBaseTest):
+
+    async def read_mod_attribute_expect_success(self, endpoint, attribute):
+        cluster = Clusters.Objects.WaterHeaterMode
+        return await self.read_single_attribute_check_success(endpoint=endpoint, cluster=cluster, attribute=attribute)
+
+    def desc_TC_EWATERHTRM_1_2(self) -> str:
+        return "[TC-EWATERHTRM-1.2] Cluster attributes with DUT as Server"
+
+    def steps_TC_EWATERHTRM_1_2(self) -> list[TestStep]:
+        steps = [
+            TestStep(1, "Commissioning, already done", is_commissioning=True),
+            TestStep(2, "Read the SupportedModes attribute"),
+            TestStep(3, "Read the CurrentMode attribute"),
+        ]
+        return steps
+
+    def pics_TC_EWATERHTRM_1_2(self) -> list[str]:
+        pics = [
+            "EWATERHTRM.S",
+        ]
+        return pics
+
+    @async_test_body
+    async def test_TC_EWATERHTRM_1_2(self):
+
+        endpoint = self.user_params.get("endpoint", 1)
+
+        attributes = Clusters.WaterHeaterMode.Attributes
+
+        self.step(1)
+
+        self.step(2)
+        supported_modes = await self.read_mod_attribute_expect_success(endpoint=endpoint, attribute=attributes.SupportedModes)
+        asserts.assert_greater_equal(len(supported_modes), 2, "SupportedModes must have at least 2 entries!")
+        asserts.assert_less_equal(len(supported_modes), 255, "SupportedModes must have at most 255 entries!")
+        modes = set([m.mode for m in supported_modes])
+        asserts.assert_equal(len(modes), len(supported_modes), "SupportedModes must have unique mode values")
+
+        labels = set([m.label for m in supported_modes])
+        asserts.assert_equal(len(labels), len(supported_modes), "SupportedModes must have unique mode label values")
+
+        # common mode tags
+        commonTags = {0x0: 'Off',
+                      0x1: 'Manual',
+                      0x2: 'Timed'}
+
+        # derived cluster defined tags
+        # kUnknownEnumValue may not be defined
+        try:
+            derivedTags = [tag.value for tag in Clusters.WaterHeaterMode.Enums.ModeTag
+                           if tag is not Clusters.WaterHeaterMode.Enums.ModeTag.kUnknownEnumValue]
+        except AttributeError:
+            derivedTags = Clusters.WaterHeaterMode.Enums.ModeTag
+
+        logging.info("Derived tags: %s" % derivedTags)
+
+        for m in supported_modes:
+            for t in m.modeTags:
+                is_mfg = (0x8000 <= t.value and t.value <= 0xBFFF)
+                asserts.assert_true(t.value in commonTags.keys() or t.value in derivedTags or is_mfg,
+                                    "Found a SupportedModes entry with invalid mode tag value!")
+                if t.value == Clusters.WaterHeaterMode.Enums.ModeTag.kOff:
+                    off_present = True
+                    logging.info("Found normal mode tag %s with tag value %s", m.mode, t.value)
+
+        asserts.assert_true(off_present, "SupportedModes does not have an entry of Off(0x4000)")
+
+        self.step(3)
+        current_mode = await self.read_mod_attribute_expect_success(endpoint=endpoint, attribute=attributes.CurrentMode)
+        logging.info("CurrentMode: %s" % current_mode)
+        asserts.assert_true(current_mode in modes, "CurrentMode is not a supported mode!")
+
+
+if __name__ == "__main__":
+    default_matter_test_main()
