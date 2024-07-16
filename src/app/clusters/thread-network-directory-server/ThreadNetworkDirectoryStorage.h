@@ -96,8 +96,8 @@ public:
 
     /**
      *  Adds (or updates, if a matching network already exists) the network with the specified
-     *  Extended PAN ID and dataset. Note that the dataset may be treated as an opaque blob;
-     *  no validation of the of any kind is expected to be performed on the dataset contents.
+     *  Extended PAN ID and dataset. Note that the dataset must be treated as an opaque blob;
+     *  no validation of any kind is expected to be performed on the dataset contents.
      *
      *  @retval CHIP_ERROR_INVALID_ARGUMENT if the dataset is empty or too long.
      *  @retval CHIP_ERROR_NO_MEMORY if adding the network would exceed the storage capacity.
