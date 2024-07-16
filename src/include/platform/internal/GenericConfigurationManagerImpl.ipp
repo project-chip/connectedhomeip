@@ -587,43 +587,45 @@ CHIP_ERROR GenericConfigurationManagerImpl<ConfigClass>::SetFailSafeArmed(bool v
 }
 
 template <class ConfigClass>
-CHIP_ERROR GenericConfigurationManagerImpl<ConfigClass>::GetDeviceLocation(DeviceLocatioType & location)
+CHIP_ERROR GenericConfigurationManagerImpl<ConfigClass>::GetDeviceLocation(MutableDeviceLocation & location)
 {
-    uint8_t locationData[kMaxDeviceLocationNameLength + sizeof(DeviceLocatioType)];
+    uint8_t locationData[app::Clusters::BasicInformation::kMaxDeviceLocationNameLength + sizeof(DeviceLocatioType)];
     MutableByteSpan locationSpan(locationData);
 
     size_t outLen = 0;
-    ReturnErrorOnFailure(
-        ReadConfigValueBin(ConfigClass::kConfigKey_DeviceLocation, locationSpan.data(), locationSpan.size(), outLen));
+    auto err = ReadConfigValueBin(ConfigClass::kConfigKey_DeviceLocation, locationSpan.data(), locationSpan.size(), outLen);
+    if (err == CHIP_DEVICE_ERROR_CONFIG_NOT_FOUND)
+    {
+        location.SetNull();
+        return CHIP_NO_ERROR;
+    }
+    ReturnErrorOnFailure(err);
 
     TLV::TLVReader tlvReader;
     tlvReader.Init(locationSpan);
 
-    char locationNameBuffer[DeviceLayer::ConfigurationManager::kMaxDeviceLocationNameLength] = { 0 };
+    char locationNameBuffer[1] = { 0 };
     DeviceLocatioType loc({
-        .locationName = MutableCharSpan(locationNameBuffer),
+        .locationName = CharSpan(locationNameBuffer, 0),
     });
 
     ReturnErrorOnFailure(tlvReader.Next(TLV::AnonymousTag()));
     ReturnErrorOnFailure(loc->Decode(tlvReader));
 
-    if (loc.IsNull())
+    // This would not be needed if the Decode methed proprly decodes a null value.
+    if (loc.Value().locationName.empty() && loc.Value().floorNumber.IsNull() && loc.Value().areaType.IsNull())
     {
-        location.SetNull();
-        return CHIP_NO_ERROR;
+        loc.SetNull();
     }
 
-    memcpy((void *) location.Value().locationName.data(), loc.Value().locationName.data(), loc.Value().locationName.size());
-    location.Value().locationName.reduce_size(loc.Value().locationName.size());
-    location.Value().floorNumber = loc.Value().floorNumber;
-    location.Value().areaType    = loc.Value().areaType;
+    location = loc;
 
     return CHIP_NO_ERROR;
 }
 template <class ConfigClass>
 CHIP_ERROR GenericConfigurationManagerImpl<ConfigClass>::SetDeviceLocation(DeviceLocatioType location)
 {
-    uint8_t locationData[kMaxDeviceLocationNameLength + sizeof(DeviceLocatioType)];
+    uint8_t locationData[app::Clusters::BasicInformation::kMaxDeviceLocationNameLength + sizeof(DeviceLocatioType)];
     MutableByteSpan locationSpan(locationData);
 
     TLV::TLVWriter tlvWriter;

@@ -16,6 +16,7 @@
  *
  */
 
+#include "basic-information-cluster-objects.h"
 #include "basic-information.h"
 
 #include <app-common/zap-generated/attributes/Accessors.h>
@@ -423,12 +424,7 @@ CHIP_ERROR BasicAttrAccess::ReadMaxPathsPerInvoke(AttributeValueEncoder & aEncod
 
 CHIP_ERROR BasicAttrAccess::ReadDeviceLocation(AttributeValueEncoder & aEncoder)
 {
-
-    char locationNameBuffer[DeviceLayer::ConfigurationManager::kMaxDeviceLocationNameLength] = { 0 };
-
-    DeviceLocatioType deviceLocation({
-        .locationName = MutableCharSpan(locationNameBuffer),
-    });
+    MutableDeviceLocation deviceLocation;
 
     ReturnErrorOnFailure(ConfigurationMgr().GetDeviceLocation(deviceLocation));
 
@@ -437,11 +433,7 @@ CHIP_ERROR BasicAttrAccess::ReadDeviceLocation(AttributeValueEncoder & aEncoder)
 
 CHIP_ERROR BasicAttrAccess::WriteDeviceLocation(AttributeValueDecoder & aDecoder)
 {
-    char locationNameBuffer[DeviceLayer::ConfigurationManager::kMaxDeviceLocationNameLength] = { 0 };
-
-    DeviceLocatioType deviceLocation({
-        .locationName = MutableCharSpan(locationNameBuffer),
-    });
+    DeviceLocatioType deviceLocation;
 
     ReturnErrorOnFailure(aDecoder.Decode(deviceLocation));
 
