@@ -40,7 +40,7 @@
 #include <platform/PersistedStorage.h>
 #include <platform/internal/CHIPDeviceLayerInternal.h>
 
-using DeviceLocatioType = chip::app::Clusters::BasicInformation::Attributes::DeviceLocation::TypeInfo::Type;
+using DeviceLocationType    = chip::app::Clusters::BasicInformation::Attributes::DeviceLocation::TypeInfo::Type;
 using MutableDeviceLocation = chip::app::Clusters::BasicInformation::MutableDeviceLocation;
 
 namespace chip {
@@ -138,7 +138,7 @@ public:
     virtual CHIP_ERROR GetFailSafeArmed(bool & val)                                    = 0;
     virtual CHIP_ERROR SetFailSafeArmed(bool val)                                      = 0;
     virtual CHIP_ERROR GetDeviceLocation(MutableDeviceLocation & location)             = 0;
-    virtual CHIP_ERROR SetDeviceLocation(DeviceLocatioType location)                   = 0;
+    virtual CHIP_ERROR SetDeviceLocation(DeviceLocationType location)                  = 0;
 
     virtual CHIP_ERROR GetBLEDeviceIdentificationInfo(Ble::ChipBLEDeviceIdentificationInfo & deviceIdInfo) = 0;
 

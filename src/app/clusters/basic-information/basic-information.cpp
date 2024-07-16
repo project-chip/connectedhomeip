@@ -433,7 +433,7 @@ CHIP_ERROR BasicAttrAccess::ReadDeviceLocation(AttributeValueEncoder & aEncoder)
 
 CHIP_ERROR BasicAttrAccess::WriteDeviceLocation(AttributeValueDecoder & aDecoder)
 {
-    DeviceLocatioType deviceLocation;
+    DeviceLocationType deviceLocation;
 
     ReturnErrorOnFailure(aDecoder.Decode(deviceLocation));
 

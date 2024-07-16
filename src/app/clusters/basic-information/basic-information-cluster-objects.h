@@ -10,10 +10,10 @@ namespace Clusters {
 namespace BasicInformation {
 
 const uint32_t kMaxDeviceLocationNameLength = 128;
-using DeviceLocatioType = Attributes::DeviceLocation::TypeInfo::Type;
+using DeviceLocationType                    = Attributes::DeviceLocation::TypeInfo::Type;
 
 
-struct MutableDeviceLocation : public DeviceLocatioType
+struct MutableDeviceLocation : public DeviceLocationType
 {
     MutableDeviceLocation() {
         MutableDeviceLocation(CharSpan(mLocationNameBuffer, 0), DataModel::NullNullable, DataModel::NullNullable);
@@ -24,6 +24,12 @@ struct MutableDeviceLocation : public DeviceLocatioType
     }
 
     MutableDeviceLocation & operator = (const MutableDeviceLocation & other) {
+        if (other.IsNull())
+        {
+            this->SetNull();
+            return *this;
+        }
+
         Set(other->locationName, other->floorNumber, other->areaType);
         return *this;
     }
@@ -32,8 +38,7 @@ struct MutableDeviceLocation : public DeviceLocatioType
         *this = other;
     }
 
-    // todo is this needed?
-    MutableDeviceLocation & operator = (const DeviceLocatioType & other) {
+    MutableDeviceLocation & operator = (const DeviceLocationType & other) {
         if (other.IsNull())
         {
             this->SetNull();
@@ -45,7 +50,9 @@ struct MutableDeviceLocation : public DeviceLocatioType
     }
 
     /**
-     * @brief Set the location name, floor number, and area type tag. The location name is truncated to kMaxDeviceLocationNameLength. The location name is deep copied.
+     * @brief Set the location name, floor number, and area type tag.
+     * The location name is truncated to kMaxDeviceLocationNameLength.
+     * The location name is deep copied.
     */
     void Set(CharSpan aLocationName, DataModel::Nullable<int16_t> aFloorNumber, DataModel::Nullable<AreaTypeTag> aAreaTypeTag) {
 
@@ -63,8 +70,6 @@ struct MutableDeviceLocation : public DeviceLocatioType
         this->Value().floorNumber = aFloorNumber;
         this->Value().areaType = aAreaTypeTag;
     }
-
-    // todo add setters and getters for all the attributes
 
 private:
     char mLocationNameBuffer[kMaxDeviceLocationNameLength] = { 0 };
