@@ -137,7 +137,7 @@ static uint8_t ValidateVendorTag(NSNumber * tag)
 
 - (BOOL)isEqual:(id)object
 {
-    VerifyOrReturnValue([object class] == [self class], NO);
+    VerifyOrReturnValue([[object class] isKindOfClass:[MTROptionalQRCodeInfo class]], NO);
     MTROptionalQRCodeInfo * other = object;
     VerifyOrReturnValue(_info.tag == other->_info.tag, NO);
     VerifyOrReturnValue(_info.type == other->_info.type, NO);
@@ -507,7 +507,7 @@ MTR_DIRECT_MEMBERS
 
 - (BOOL)isEqual:(id)object
 {
-    VerifyOrReturnValue([object class] == [self class], NO);
+    VerifyOrReturnValue([[object class] isKindOfClass:[MTRSetupPayload class]], NO);
     MTRSetupPayload * other = object;
     VerifyOrReturnValue(_payload == other->_payload, NO);
     VerifyOrReturnValue(MTREqualObjects(_shadowDiscriminator, other->_shadowDiscriminator), NO);

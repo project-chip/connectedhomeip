@@ -177,8 +177,8 @@ public:
         UnsolicitedMessageFromPublisherHandler unsolicitedMessageFromPublisherHandler, ReportBeginHandler reportBeginHandler,
         ReportEndHandler reportEndHandler)
         : MTRBaseSubscriptionCallback(attributeReportCallback, eventReportCallback, errorCallback, resubscriptionCallback,
-            subscriptionEstablishedHandler, onDoneHandler, unsolicitedMessageFromPublisherHandler, reportBeginHandler,
-            reportEndHandler)
+              subscriptionEstablishedHandler, onDoneHandler, unsolicitedMessageFromPublisherHandler, reportBeginHandler,
+              reportEndHandler)
     {
     }
 
@@ -336,8 +336,9 @@ static NSString * const sLastInitialSubscribeLatencyKey = @"lastInitialSubscribe
 
 - (BOOL)isEqualToClusterData:(MTRDeviceClusterData *)otherClusterData
 {
-    if (!otherClusterData)
+    if (!otherClusterData) {
         return NO;
+    }
 
     return (otherClusterData.dataVersion && [_dataVersion isEqual:otherClusterData.dataVersion])
         && (otherClusterData.attributes && [_attributes isEqual:otherClusterData.attributes]);
@@ -345,11 +346,12 @@ static NSString * const sLastInitialSubscribeLatencyKey = @"lastInitialSubscribe
 
 - (BOOL)isEqual:(id)object
 {
-    if ([object class] != [self class]) {
-        return NO;
+    // We don't support subclassing MTRDeviceClusterData
+    if ([object class] == [MTRDeviceClusterData class]) {
+        return [self isEqualToClusterData:object];
     }
 
-    return [self isEqualToClusterData:object];
+    return [super isEqual:object];
 }
 
 @end

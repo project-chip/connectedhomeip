@@ -133,7 +133,10 @@
         "random": "cpp",
         "thread": "cpp",
         "variant": "cpp",
-        "any": "cpp"
+        "any": "cpp",
+        "typeindex": "cpp",
+        "span": "cpp",
+        "scoped_allocator": "cpp"
     },
     // Configure paths or glob patterns to exclude from file watching.
     "files.watcherExclude": {

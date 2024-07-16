@@ -283,7 +283,7 @@ public:
         ErrorCallback errorCallback, MTRDeviceResubscriptionScheduledHandler _Nullable resubscriptionScheduledHandler,
         MTRSubscriptionEstablishedHandler _Nullable subscriptionEstablishedHandler, OnDoneHandler _Nullable onDoneHandler)
         : MTRBaseSubscriptionCallback(attributeReportCallback, eventReportCallback, errorCallback, resubscriptionScheduledHandler,
-            subscriptionEstablishedHandler, onDoneHandler)
+              subscriptionEstablishedHandler, onDoneHandler)
     {
     }
 
@@ -2290,20 +2290,28 @@ MTREventPriority MTREventPriorityForValidPriorityLevel(chip::app::PriorityLevel 
 
 - (BOOL)isEqualToAttributeRequestPath:(MTRAttributeRequestPath *)path
 {
-    if (!path)
+    if (!path) {
         return NO;
+    }
 
-    return (path.endpoint && [_endpoint isEqualToNumber:path.endpoint])
-        && (path.cluster && [_cluster isEqualToNumber:path.cluster])
-        && (path.attribute && [_attribute isEqualToNumber:path.attribute]);
+    // Note: Nil is a wildcard, and empty endpoint/cluster/attribute values imply nil as well.
+    // Pass iff we have objects that are pointer equivalent (eg: nil == nil || object_a == object_a), or they have values and the same logical values
+    if ((_endpoint == path.endpoint || (path.endpoint && [_endpoint isEqualToNumber:path.endpoint]))
+        && (_cluster == path.cluster || (path.cluster && [_cluster isEqualToNumber:path.cluster]))
+        && (_attribute == path.attribute || (path.attribute && [_attribute isEqualToNumber:path.attribute]))) {
+        return YES;
+    }
+
+    return NO;
 }
 
 - (BOOL)isEqual:(id)object
 {
-    if ([object class] != [self class]) {
-        return NO;
+    if ([[object class] isKindOfClass:[MTRAttributeRequestPath class]]) {
+        return [self isEqualToAttributeRequestPath:object];
     }
-    return [self isEqualToAttributeRequestPath:object];
+
+    return [super isEqual:object];
 }
 
 - (NSUInteger)hash
@@ -2366,20 +2374,28 @@ MTREventPriority MTREventPriorityForValidPriorityLevel(chip::app::PriorityLevel 
 
 - (BOOL)isEqualToEventRequestPath:(MTREventRequestPath *)path
 {
-    if (!path)
+    if (!path) {
         return NO;
+    }
 
-    return (path.endpoint && [_endpoint isEqualToNumber:path.endpoint])
-        && (path.cluster && [_cluster isEqualToNumber:path.cluster])
-        && (path.event && [_event isEqualToNumber:path.event]);
+    // Note: Nil is a wildcard, and empty endpoint/cluster/attribute values imply nil as well.
+    // Pass iff we have objects that are pointer equivalent (eg: nil == nil || object_a == object_a), or they have values and the same logical values
+    if ((_endpoint == path.endpoint || (path.endpoint && [_endpoint isEqualToNumber:path.endpoint]))
+        && (_cluster == path.cluster || (path.cluster && [_cluster isEqualToNumber:path.cluster]))
+        && (_event == path.event || (path.event && [_event isEqualToNumber:path.event]))) {
+        return YES;
+    }
+
+    return NO;
 }
 
 - (BOOL)isEqual:(id)object
 {
-    if ([object class] != [self class]) {
-        return NO;
+    if ([[object class] isKindOfClass:[MTREventRequestPath class]]) {
+        return [self isEqualToEventRequestPath:object];
     }
-    return [self isEqualToEventRequestPath:object];
+
+    return [super isEqual:object];
 }
 
 - (NSUInteger)hash
@@ -2440,8 +2456,9 @@ MTREventPriority MTREventPriorityForValidPriorityLevel(chip::app::PriorityLevel 
 
 - (BOOL)isEqualToClusterPath:(MTRClusterPath *)clusterPath
 {
-    if (!clusterPath)
+    if (!clusterPath) {
         return NO;
+    }
 
     return (clusterPath.endpoint && [_endpoint isEqualToNumber:clusterPath.endpoint])
         && (clusterPath.cluster && [_cluster isEqualToNumber:clusterPath.cluster]);
@@ -2449,10 +2466,11 @@ MTREventPriority MTREventPriorityForValidPriorityLevel(chip::app::PriorityLevel 
 
 - (BOOL)isEqual:(id)object
 {
-    if ([object class] != [self class]) {
-        return NO;
+    if ([[object class] isKindOfClass:[MTRClusterPath class]]) {
+        return [self isEqualToClusterPath:object];
     }
-    return [self isEqualToClusterPath:object];
+
+    return [super isEqual:object];
 }
 
 - (NSUInteger)hash
@@ -2540,10 +2558,11 @@ static NSString * const sClusterKey = @"clusterKey";
 
 - (BOOL)isEqual:(id)object
 {
-    if ([object class] != [self class]) {
-        return NO;
+    if ([[object class] isKindOfClass:[MTRAttributePath class]]) {
+        return [self isEqualToAttributePath:object];
     }
-    return [self isEqualToAttributePath:object];
+
+    return [super isEqual:object];
 }
 
 - (NSUInteger)hash
@@ -2636,10 +2655,11 @@ static NSString * const sAttributeKey = @"attributeKey";
 
 - (BOOL)isEqual:(id)object
 {
-    if ([object class] != [self class]) {
-        return NO;
+    if ([[object class] isKindOfClass:[MTREventPath class]]) {
+        return [self isEqualToEventPath: object]];
     }
-    return [self isEqualToEventPath:object];
+
+    return [super isEqual:object];
 }
 
 - (NSUInteger)hash
@@ -2721,18 +2741,20 @@ static NSString * const sEventKey = @"eventKey";
 
 - (BOOL)isEqualToCommandPath:(MTRCommandPath *)commandPath
 {
-    if (!commandPath)
+    if (!commandPath) {
         return NO;
+    }
 
     return [self isEqualToClusterPath:commandPath] && commandPath.command && [_command isEqualToNumber:commandPath.command];
 }
 
 - (BOOL)isEqual:(id)object
 {
-    if ([object class] != [self class]) {
-        return NO;
+    if ([[object class] isKindOfClass:[MTRCommandPath class]]) {
+        return [self isEqualToCommandPath:object];
     }
-    return [self isEqualToCommandPath:object];
+
+    return [super isEqual:object];
 }
 
 - (NSUInteger)hash
