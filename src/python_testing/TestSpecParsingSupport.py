@@ -377,8 +377,7 @@ class TestSpecParsingSupport(MatterBaseTest):
                                       (0x040D, 'Carbon Dioxide Concentration Measurement', 'CDOCONC'),
                                       (0x0413, 'Nitrogen Dioxide Concentration Measurement', 'NDOCONC'),
                                       (0x0415, 'Ozone Concentration Measurement', 'OZCONC'),
-                                      # Change to "PM2.5 Concentration Measurement" once https://github.com/csa-data-model/projects/issues/453 is fixed
-                                      (0x042A, 'PM2', 'PMICONC'),
+                                      (0x042A, 'PM2.5 Concentration Measurement', 'PMICONC'),
                                       (0x042B, 'Formaldehyde Concentration Measurement', 'FLDCONC'),
                                       (0x042C, 'PM1 Concentration Measurement', 'PMHCONC'),
                                       (0x042D, 'PM10 Concentration Measurement', 'PMKCONC'),

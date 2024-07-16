@@ -63,7 +63,7 @@ Davis, CA 95616, USA
     <revision revision="2" summary="Physical Contact Occupancy feature with mandatory OccupancySensorTypeBitmap"/>
     <revision revision="3" summary="New data model format and notation"/>
     <revision revision="4" summary="Remove nullable from PhysicalContact delay attributes and ability to not report transitions"/>
-    <revision revision="5" summary="Rework to allow adding more sensing (using feature flags);
+    <revision revision="5" summary="Rework to
              add modalities: radar-, ambient-sensing- and vision-based sensors;
              add sensitivity setting (via co-located BooleanStateConfiguration cluster on same endpoint);
              add new attribute for tuning the sensor's reporting;
@@ -149,13 +149,13 @@ Davis, CA 95616, USA
   <attributes>
     <attribute id="0x0000" name="Occupancy" type="OccupancyBitmap">
       <access read="true" readPrivilege="view"/>
-      <quality changeOmitted="false" nullable="false" scene="false" persistence="volatile" reportable="true"/>
+      <quality changeOmitted="false" nullable="false" scene="false" persistence="volatile" reportable="true" sourceAttribution="false" quieterReporting="false"/>
       <mandatoryConform/>
       <constraint type="between" from="0" to="1"/>
     </attribute>
     <attribute id="0x0001" name="OccupancySensorType" type="OccupancySensorTypeEnum">
       <access read="true" readPrivilege="view"/>
-      <quality changeOmitted="false" nullable="false" scene="false" persistence="fixed" reportable="false"/>
+      <quality changeOmitted="false" nullable="false" scene="false" persistence="fixed" reportable="false" sourceAttribution="false" quieterReporting="false"/>
       <otherwiseConform>
         <mandatoryConform/>
         <deprecateConform/>
@@ -164,7 +164,7 @@ Davis, CA 95616, USA
     </attribute>
     <attribute id="0x0002" name="OccupancySensorTypeBitmap" type="OccupancySensorTypeBitmap">
       <access read="true" readPrivilege="view"/>
-      <quality changeOmitted="false" nullable="false" scene="false" persistence="fixed" reportable="false"/>
+      <quality changeOmitted="false" nullable="false" scene="false" persistence="fixed" reportable="false" sourceAttribution="false" quieterReporting="false"/>
       <otherwiseConform>
         <mandatoryConform/>
         <deprecateConform/>
@@ -178,7 +178,7 @@ Davis, CA 95616, USA
     </attribute>
     <attribute id="0x0004" name="HoldTimeLimits" type="HoldTimeLimitsStruct">
       <access read="true" readPrivilege="view"/>
-      <quality changeOmitted="false" nullable="false" scene="false" persistence="fixed" reportable="false"/>
+      <quality changeOmitted="false" nullable="false" scene="false" persistence="fixed" reportable="false" sourceAttribution="false" quieterReporting="false"/>
       <mandatoryConform>
         <attribute name="HoldTime"/>
       </mandatoryConform>

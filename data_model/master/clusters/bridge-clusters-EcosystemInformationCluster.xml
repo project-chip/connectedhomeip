@@ -115,20 +115,20 @@ Davis, CA 95616, USA
   <attributes>
     <attribute id="0x0000" name="RemovedOn" type="epoch-us">
       <access read="true" readPrivilege="manage"/>
-      <quality changeOmitted="false" nullable="true" scene="false" persistence="nonVolatile" reportable="true"/>
+      <quality changeOmitted="false" nullable="true" scene="false" persistence="nonVolatile" reportable="true" sourceAttribution="false" quieterReporting="false"/>
       <optionalConform/>
     </attribute>
     <attribute id="0x0001" name="DeviceDirectory" type="list">
       <entry type="EcosystemDeviceStruct"/>
       <access read="true" readPrivilege="manage"/>
-      <quality changeOmitted="false" nullable="true" scene="false" persistence="nonVolatile" reportable="true"/>
+      <quality changeOmitted="false" nullable="true" scene="false" persistence="nonVolatile" reportable="true" sourceAttribution="false" quieterReporting="false"/>
       <mandatoryConform/>
       <constraint type="countBetween" from="1" to="256"/>
     </attribute>
     <attribute id="0x0002" name="LocationDirectory" type="list">
       <entry type="EcosystemLocationStruct"/>
       <access read="true" readPrivilege="manage"/>
-      <quality changeOmitted="false" nullable="true" scene="false" persistence="nonVolatile" reportable="true"/>
+      <quality changeOmitted="false" nullable="true" scene="false" persistence="nonVolatile" reportable="true" sourceAttribution="false" quieterReporting="false"/>
       <mandatoryConform/>
       <constraint type="countBetween" from="1" to="64"/>
     </attribute>
