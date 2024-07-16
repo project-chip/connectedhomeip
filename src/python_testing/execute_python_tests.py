@@ -24,7 +24,7 @@ from dotenv import load_dotenv
 load_dotenv('/tmp/test_env.yaml')
 
 # Define the base command to run tests
-base_command = "scripts/run_in_python_env.sh out/venv"
+base_command = "./scripts/tests/run_python_test.py"
 
 # Define the directory to search for Python scripts
 search_directory = "src/python_testing"
@@ -77,6 +77,6 @@ for file in all_python_files:
 
 # Run each script with the base command
 for script in python_files:
-    full_command = f"{base_command} './scripts/tests/run_python_test.py --load-from-env /tmp/test_env.yaml --script {script}'"
+    full_command = f"{base_command} --load-from-env /tmp/test_env.yaml --script {script}"
     print(f"Running command: {full_command}")
     subprocess.run(full_command, shell=True)
