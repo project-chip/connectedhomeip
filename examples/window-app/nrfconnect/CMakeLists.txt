@@ -23,10 +23,6 @@ get_filename_component(WIN_APP_COMMON_DIR ${CMAKE_CURRENT_SOURCE_DIR}/../common/
 
 include(${CHIP_ROOT}/config/nrfconnect/app/check-nrfconnect-version.cmake)
 
-if(NOT CONF_FILE STREQUAL "prj_no_dfu.conf")
-    set(PM_STATIC_YML_FILE ${CMAKE_CURRENT_SOURCE_DIR}/configuration/${BOARD}/pm_static_dfu.yml)
-endif()
-
 list(APPEND ZEPHYR_EXTRA_MODULES ${CHIP_ROOT}/config/nrfconnect/chip-module)
 find_package(Zephyr HINTS $ENV{ZEPHYR_BASE})
 
