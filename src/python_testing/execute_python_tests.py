@@ -18,9 +18,13 @@
 import os
 import glob
 import subprocess
+from dotenv import load_dotenv
 
-# Define the base command
-base_command = "scripts/run_in_python_env.sh out/venv './scripts/tests/run_python_test.py --load-from-env /tmp/test_env.yaml --script"
+# Load environment variables from test_env.yaml
+load_dotenv('/tmp/test_env.yaml')
+
+# Define the base command to run tests
+base_command = "scripts/run_in_python_env.sh out/venv"
 
 # Define the directory to search for Python scripts
 search_directory = "src/python_testing"
@@ -28,15 +32,13 @@ search_directory = "src/python_testing"
 # Define the files and patterns to exclude
 excluded_patterns = [
     "MinimalRepresentation.py", 
-    "TC_ACL_2_2.py", 
-    "TC_BOOLCFG*.py",  # Use wildcard pattern to exclude matching files
+    "TC_ACL_2_2.py",
     "TC_CNET_4_4.py", 
     "TC_DGGEN_3_2.py", 
     "TC_EEVSE_Utils.py", 
     "TC_EnergyReporting_Utils.py", 
     "TC_OpstateCommon.py", 
     "TC_TMP_2_1.py",
-    "TC_VALCC*.py", # Use wildcard pattern to exclude matching files
     "TC_pics_checker.py",
     "TestCommissioningTimeSync.py",
     "TestConformanceSupport.py",
@@ -75,6 +77,6 @@ for file in all_python_files:
 
 # Run each script with the base command
 for script in python_files:
-    full_command = f"{base_command} {script}'"
+    full_command = f"{base_command} './scripts/tests/run_python_test.py --load-from-env /tmp/test_env.yaml --script {script}'"
     print(f"Running command: {full_command}")
     subprocess.run(full_command, shell=True)
