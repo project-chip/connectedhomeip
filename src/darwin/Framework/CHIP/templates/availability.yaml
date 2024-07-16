@@ -8240,7 +8240,6 @@
           - ElectricalEnergyMeasurement
           - EnergyPreference
           - ScenesManagement
-          - WaterHeaterManagement
       attributes:
           NetworkCommissioning:
               # Targeting Spring 2024 Matter release
@@ -9695,6 +9694,7 @@
           - ServiceArea
           - ThreadBorderRouterManagement
           - ThreadNetworkDirectory
+          - WaterHeaterManagement
           - WiFiNetworkManagement
       attributes:
           OccupancySensing:
