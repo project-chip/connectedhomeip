@@ -111,9 +111,9 @@ bool TestEvseTargetsStorage::CompTargets(const DataModel::List<const Structs::Ch
     }
 
     uint16_t dayIdx = 0;
-    for (auto entry1 : targets1)
+    for (const auto & entry1 : targets1)
     {
-        auto & entry2 = targets2[dayIdx++];
+        const auto & entry2 = targets2[dayIdx++];
 
         if (entry1.dayOfWeekForSequence != entry2.dayOfWeekForSequence)
         {
@@ -128,9 +128,9 @@ bool TestEvseTargetsStorage::CompTargets(const DataModel::List<const Structs::Ch
         }
 
         uint16_t chargingTargetsIdx = 0;
-        for (auto targetStruct1 : entry1.chargingTargets)
+        for (const auto & targetStruct1 : entry1.chargingTargets)
         {
-            auto & targetStruct2 = entry2.chargingTargets[chargingTargetsIdx++];
+            const auto & targetStruct2 = entry2.chargingTargets[chargingTargetsIdx++];
 
             if (targetStruct1.targetTimeMinutesPastMidnight != targetStruct2.targetTimeMinutesPastMidnight)
             {
