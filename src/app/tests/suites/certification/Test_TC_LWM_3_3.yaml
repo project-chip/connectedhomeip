@@ -19,7 +19,7 @@ name:
 PICS:
     - LWM.S.A0002
     - LWM.S.A0003
-    - LWM.S.F00
+    - MOD.S.F00
     - OO.S.A4003
 
 config:
@@ -136,7 +136,7 @@ tests:
           value: new_mode_th
 
     - label: "Step 8: TH reads from the DUT the OnMode attribute."
-      PICS: LWM.S.A0003 && LWM.S.F00
+      PICS: LWM.S.A0003 && MOD.S.F00
       command: "readAttribute"
       attribute: "OnMode"
       response:

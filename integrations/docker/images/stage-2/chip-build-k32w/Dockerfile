@@ -5,7 +5,8 @@ LABEL org.opencontainers.image.source https://github.com/project-chip/connectedh
 RUN set -x \
     && apt-get update \
     && DEBIAN_FRONTEND=noninteractive apt-get install -fy --no-install-recommends \
-    wget unzip \
+    unzip \
+    wget \
     && apt-get clean \
     && rm -rf /var/lib/apt/lists/ \
     && : # last line
@@ -13,8 +14,8 @@ RUN set -x \
 WORKDIR /opt/sdk
 
 RUN set -x \
-    && python3 -m pip install -U --no-cache-dir west==1.0.0 \
-    && west init -m https://github.com/nxp-mcuxpresso/mcux-sdk --mr "MCUX_2.6.13_K32W0" \
+    && python3 -m pip install --break-system-packages -U --no-cache-dir west==1.0.0 \
+    && west init -m https://github.com/nxp-mcuxpresso/mcux-sdk --mr "MCUX_2.6.14_K32W0" \
     && west update \
     && chmod +x core/tools/imagetool/sign_images.sh \
     && ln -sf ../rtos core \
@@ -24,9 +25,9 @@ RUN set -x \
 
 RUN set -x \
     && mkdir -p k32w1 \
-    && wget https://cache.nxp.com/lgfiles/bsps/SDK_2_12_5_K32W148-EVK.zip \
-    && unzip SDK_2_12_5_K32W148-EVK.zip -d k32w1 \
-    && rm -rf SDK_2_12_5_K32W148-EVK.zip
+    && wget https://cache.nxp.com/lgfiles/bsps/SDK_2_12_7_K32W148-EVK.zip \
+    && unzip SDK_2_12_7_K32W148-EVK.zip -d k32w1 \
+    && rm -rf SDK_2_12_7_K32W148-EVK.zip
 
 FROM ghcr.io/project-chip/chip-build:${VERSION}
 

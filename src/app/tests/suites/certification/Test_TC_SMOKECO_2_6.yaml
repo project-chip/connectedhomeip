@@ -29,34 +29,34 @@ config:
         defaultValue: "hex:00112233445566778899aabbccddeeff"
     TEST_EVENT_TRIGGER_WARNING_SMOKE_ALARM:
         type: int64u
-        defaultValue: "0xffffffff00000090"
+        defaultValue: "0x005c000000000090"
     TEST_EVENT_TRIGGER_SMOKE_ALARM_CLEAR:
         type: int64u
-        defaultValue: "0xffffffff000000a0"
+        defaultValue: "0x005c0000000000a0"
     TEST_EVENT_TRIGGER_WARNING_CO_ALARM:
         type: int64u
-        defaultValue: "0xffffffff00000091"
+        defaultValue: "0x005c000000000091"
     TEST_EVENT_TRIGGER_CO_ALARM_CLEAR:
         type: int64u
-        defaultValue: "0xffffffff000000a1"
+        defaultValue: "0x005c0000000000a1"
     TEST_EVENT_TRIGGER_WARNING_BATTERY_ALERT:
         type: int64u
-        defaultValue: "0xffffffff00000095"
+        defaultValue: "0x005c000000000095"
     TEST_EVENT_TRIGGER_BATTERY_ALERT_CLEAR:
         type: int64u
-        defaultValue: "0xffffffff000000a5"
+        defaultValue: "0x005c0000000000a5"
     TEST_EVENT_TRIGGER_INTERCONNECT_SMOKE_ALARM:
         type: int64u
-        defaultValue: "0xffffffff00000092"
+        defaultValue: "0x005c000000000092"
     TEST_EVENT_TRIGGER_INTERCONNECT_SMOKE_ALARM_CLEAR:
         type: int64u
-        defaultValue: "0xffffffff000000a2"
+        defaultValue: "0x005c0000000000a2"
     TEST_EVENT_TRIGGER_INTERCONNECT_CO_ALARM:
         type: int64u
-        defaultValue: "0xffffffff00000094"
+        defaultValue: "0x005c000000000094"
     TEST_EVENT_TRIGGER_INTERCONNECT_CO_ALARM_CLEAR:
         type: int64u
-        defaultValue: "0xffffffff000000a4"
+        defaultValue: "0x005c0000000000a4"
     HIEST_PRI_ALARM:
         type: int8u
         defaultValue: 1

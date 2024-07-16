@@ -31,11 +31,11 @@
 #include <lib/support/JniReferences.h>
 #include <stdbool.h>
 #include <stdint.h>
+#include <vector>
 
 #include "../include/account-login/AccountLoginManager.h"
 #include "../include/application-basic/ApplicationBasicManager.h"
 #include "../include/application-launcher/ApplicationLauncherManager.h"
-#include "../include/content-app-observer/ContentAppObserver.h"
 #include "../include/content-control/ContentController.h"
 #include "../include/content-launcher/AppContentLauncherManager.h"
 #include "../include/media-playback/AppMediaPlaybackManager.h"
@@ -49,7 +49,6 @@
 #include <app/clusters/application-basic-server/application-basic-delegate.h>
 #include <app/clusters/application-launcher-server/application-launcher-delegate.h>
 #include <app/clusters/channel-server/channel-delegate.h>
-#include <app/clusters/content-app-observer/content-app-observer-delegate.h>
 #include <app/clusters/content-control-server/content-control-delegate.h>
 #include <app/clusters/content-launch-server/content-launch-delegate.h>
 #include <app/clusters/keypad-input-server/keypad-input-delegate.h>
@@ -58,9 +57,12 @@
 
 CHIP_ERROR InitVideoPlayerPlatform(jobject contentAppEndpointManager);
 EndpointId AddContentApp(const char * szVendorName, uint16_t vendorId, const char * szApplicationName, uint16_t productId,
-                         const char * szApplicationVersion, jobject manager);
+                         const char * szApplicationVersion,
+                         std::vector<chip::AppPlatform::ContentApp::SupportedCluster> supportedClusters, jobject manager);
 EndpointId AddContentApp(const char * szVendorName, uint16_t vendorId, const char * szApplicationName, uint16_t productId,
-                         const char * szApplicationVersion, EndpointId endpointId, jobject manager);
+                         const char * szApplicationVersion,
+                         std::vector<chip::AppPlatform::ContentApp::SupportedCluster> supportedClusters, EndpointId endpointId,
+                         jobject manager);
 EndpointId RemoveContentApp(EndpointId epId);
 void ReportAttributeChange(EndpointId epId, chip::ClusterId clusterId, chip::AttributeId attributeId);
 
@@ -76,7 +78,6 @@ using ApplicationBasicDelegate    = app::Clusters::ApplicationBasic::Delegate;
 using ApplicationLauncherDelegate = app::Clusters::ApplicationLauncher::Delegate;
 using ChannelDelegate             = app::Clusters::Channel::Delegate;
 using ContentLauncherDelegate     = app::Clusters::ContentLauncher::Delegate;
-using ContentAppObserverDelegate  = app::Clusters::ContentAppObserver::Delegate;
 using ContentControlDelegate      = app::Clusters::ContentControl::Delegate;
 using KeypadInputDelegate         = app::Clusters::KeypadInput::Delegate;
 using MediaPlaybackDelegate       = app::Clusters::MediaPlayback::Delegate;
@@ -84,6 +85,7 @@ using TargetNavigatorDelegate     = app::Clusters::TargetNavigator::Delegate;
 using SupportedProtocolsBitmap    = app::Clusters::ContentLauncher::SupportedProtocolsBitmap;
 using ContentAppAttributeDelegate = chip::AppPlatform::ContentAppAttributeDelegate;
 using ContentAppCommandDelegate   = chip::AppPlatform::ContentAppCommandDelegate;
+using SupportedCluster            = chip::AppPlatform::ContentApp::SupportedCluster;
 
 static const int kCatalogVendorId = CHIP_DEVICE_CONFIG_DEVICE_VENDOR_ID;
 
@@ -94,8 +96,9 @@ class DLL_EXPORT ContentAppImpl : public ContentApp
 {
 public:
     ContentAppImpl(const char * szVendorName, uint16_t vendorId, const char * szApplicationName, uint16_t productId,
-                   const char * szApplicationVersion, const char * setupPIN, ContentAppAttributeDelegate * attributeDelegate,
-                   ContentAppCommandDelegate * commandDelegate) :
+                   const char * szApplicationVersion, const char * setupPIN, std::vector<SupportedCluster> supportedClusters,
+                   ContentAppAttributeDelegate * attributeDelegate, ContentAppCommandDelegate * commandDelegate) :
+        ContentApp{ supportedClusters },
         mApplicationBasicDelegate(kCatalogVendorId, BuildAppId(vendorId), szVendorName, vendorId, szApplicationName, productId,
                                   szApplicationVersion),
         mAccountLoginDelegate(commandDelegate, setupPIN),
@@ -117,11 +120,6 @@ public:
     {
         mContentLauncherDelegate.SetEndpointId(GetEndpointId());
         return &mContentLauncherDelegate;
-    };
-    ContentAppObserverDelegate * GetContentAppObserverDelegate() override
-    {
-        mContentAppObserverDelegate.SetEndpointId(GetEndpointId());
-        return &mContentAppObserverDelegate;
     };
     ContentControlDelegate * GetContentControlDelegate() override
     {
@@ -146,7 +144,6 @@ protected:
     ApplicationLauncherManager mApplicationLauncherDelegate;
     ChannelManager mChannelDelegate;
     ContentController mContentControlDelegate;
-    ContentAppObserver mContentAppObserverDelegate;
     AppContentLauncherManager mContentLauncherDelegate;
     KeypadInputManager mKeypadInputDelegate;
     AppMediaPlaybackManager mMediaPlaybackDelegate;
@@ -169,10 +166,11 @@ public:
     ContentApp * LoadContentApp(const CatalogVendorApp & vendorApp) override;
 
     EndpointId AddContentApp(const char * szVendorName, uint16_t vendorId, const char * szApplicationName, uint16_t productId,
-                             const char * szApplicationVersion, jobject manager);
+                             const char * szApplicationVersion, std::vector<SupportedCluster> supportedClusters, jobject manager);
 
     EndpointId AddContentApp(const char * szVendorName, uint16_t vendorId, const char * szApplicationName, uint16_t productId,
-                             const char * szApplicationVersion, jobject manager, EndpointId desiredEndpointId);
+                             const char * szApplicationVersion, std::vector<SupportedCluster> supportedClusters,
+                             EndpointId desiredEndpointId, jobject manager);
 
     EndpointId RemoveContentApp(EndpointId epId);
 
@@ -201,14 +199,9 @@ public:
     void setContentAppCommandDelegate(ContentAppCommandDelegate * commandDelegate);
 
 protected:
-    std::vector<ContentAppImpl *> mContentApps{
-        new ContentAppImpl("Vendor1", 1, "exampleid", 11, "Version1", "20202021", nullptr, nullptr),
-        new ContentAppImpl("Vendor2", 65521, "exampleString", 32768, "Version2", "20202021", nullptr, nullptr),
-        new ContentAppImpl("Vendor3", 9050, "App3", 22, "Version3", "20202021", nullptr, nullptr),
-        new ContentAppImpl("TestSuiteVendor", 1111, "applicationId", 22, "v2", "20202021", nullptr, nullptr)
-    };
+    // TODO: Update to use unique_ptr instead of raw pointers
+    std::vector<ContentAppImpl *> mContentApps;
     std::vector<DataVersion *> mDataVersions{};
-
     std::vector<uint16_t> mAdminVendorIds{};
 
 private:

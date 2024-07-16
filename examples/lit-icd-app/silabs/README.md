@@ -1,10 +1,10 @@
 # Matter EFR32 Lit ICD Example
 
-An example showing the use of CHIP on the Silicon Labs EFR32 MG12 and MG24.
+An example showing the use of CHIP on the Silicon Labs EFR32 MG24.
 
 <hr>
 
--   [Matter EFR32 LIT ICD Example](#matter-efr32-lit-icd-example)
+-   [Matter EFR32 Lit ICD Example](#matter-efr32-lit-icd-example)
     -   [Introduction](#introduction)
     -   [Building](#building)
         -   [Linux](#linux)
@@ -59,8 +59,9 @@ Labs platform.
     (For Mac OS X, `commander` is located inside
     `Commander.app/Contents/MacOS/`.)
 
--   Download and install a suitable ARM gcc tool chain:
-    [GNU Arm Embedded Toolchain 9-2019-q4-major](https://developer.arm.com/tools-and-software/open-source-software/developer-tools/gnu-toolchain/gnu-rm/downloads)
+-   Download and install a suitable ARM gcc tool chain (For most Host, the
+    bootstrap already installs the toolchain):
+    [GNU Arm Embedded Toolchain 12.2 Rel1](https://developer.arm.com/downloads/-/arm-gnu-toolchain-downloads)
 
 -   Install some additional tools(likely already present for CHIP developers):
 
@@ -77,22 +78,6 @@ Labs platform.
     -   > For the latest supported hardware please refer to the
         > [Hardware Requirements](https://github.com/SiliconLabs/matter/blob/latest/docs/silabs/general/HARDWARE_REQUIREMENTS.md)
         > in the Silicon Labs Matter Github Repo
-
-    MG12 boards:
-
-    -   BRD4161A / SLWSTK6000B / Wireless Starter Kit / 2.4GHz@19dBm
-    -   BRD4162A / SLWSTK6000B / Wireless Starter Kit / 2.4GHz@10dBm
-    -   BRD4163A / SLWSTK6000B / Wireless Starter Kit / 2.4GHz@10dBm,
-        868MHz@19dBm
-    -   BRD4164A / SLWSTK6000B / Wireless Starter Kit / 2.4GHz@19dBm
-    -   BRD4166A / SLTB004A / Thunderboard Sense 2 / 2.4GHz@10dBm
-    -   BRD4170A / SLWSTK6000B / Multiband Wireless Starter Kit / 2.4GHz@19dBm,
-        915MHz@19dBm
-    -   BRD4304A / SLWSTK6000B / MGM12P Module / 2.4GHz@19dBm
-
-    MG21 boards: Currently not supported due to RAM limitation.
-
-    -   BRD4180A / SLWSTK6006A / Wireless Starter Kit / 2.4GHz@20dBm
 
     MG24 boards :
 
@@ -203,17 +188,11 @@ combination with JLinkRTTClient as follows:
 
 -   Run the JLinkExe tool with arguments to autoconnect to the WSTK board:
 
-    For MG12 use:
-
-          $ JLinkExe -device EFR32MG12PXXXF1024 -if JTAG -speed 4000 -autoconnect 1
-
-    For MG21 use:
-
-          $ JLinkExe -device EFR32MG21AXXXF1024 -if SWD -speed 4000 -autoconnect 1
-
     For MG24 use:
 
+          ```
           $ JLinkExe -device EFR32MG24AXXXF1536 -if SWD -speed 4000 -autoconnect 1
+          ```
 
 -   In a second terminal, run the JLinkRTTClient to view logs:
 
@@ -240,22 +219,30 @@ combination with JLinkRTTClient as follows:
           <info  > [SVR] Copy/paste the below URL in a browser to see the QR Code:
           <info  > [SVR] https://project-chip.github.io/connectedhomeip/qrcode.html?data=CH%3AI34NM%20-00%200C9SS0
 
-    **LED 0** shows the overall state of the device and its connectivity. The
-    following states are possible:
+    **LED 0**
 
-        -   Short Flash On (50 ms on/950 ms off): The device is in the
+        -   ICD Configuration (Default) - LED is only active under two circumstances:
+
+            1. Factory reset sequence - LED will blink when initiated upon press and hold of
+            Button 0 after 3 seconds
+            2. An Identify command was received
+
+        -   Non-ICD Configuration - shows the overall state of the device and its connectivity. The
+            following states are possible:
+
+            Short Flash On (50 ms on/950 ms off): The device is in the
             unprovisioned (unpaired) state and is waiting for a commissioning
             application to connect.
 
-        -   Rapid Even Flashing (100 ms on/100 ms off): The device is in the
+            Rapid Even Flashing (100 ms on/100 ms off): The device is in the
             unprovisioned state and a commissioning application is connected through
             Bluetooth LE.
 
-        -   Short Flash Off (950ms on/50ms off): The device is fully
+            Short Flash Off (950ms on/50ms off): The device is fully
             provisioned, but does not yet have full Thread network or service
             connectivity.
 
-        -   Solid On: The device is fully provisioned and has full Thread
+            Solid On: The device is fully provisioned and has full Thread
             network and service connectivity.
 
     **Push Button 0**

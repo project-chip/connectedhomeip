@@ -1,0 +1,189 @@
+# Copyright (c) 2024 Project CHIP Authors
+#
+# Licensed under the Apache License, Version 2.0 (the "License");
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
+#
+# http://www.apache.org/licenses/LICENSE-2.0
+#
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
+
+name:
+    269.3.3. [TC-EEVSEM-3.3] On Mode and Startup Mode functionality with DUT as
+    Server
+
+PICS:
+    - EEVSEM.S.A0002
+    - EEVSEM.S.A0003
+    - MOD.S.F00
+    - OO.S.A4003
+
+config:
+    nodeId: 0x12344321
+    cluster: "Energy EVSE Mode"
+    endpoint: 1
+
+    new_start_up_mode_th:
+        type: int8u
+        defaultValue: 0
+    new_mode_th:
+        type: int8u
+        defaultValue: 1
+
+tests:
+    - label:
+          "Step 1: Commission DUT to TH (can be skipped if done in a preceding
+          test)."
+      cluster: "DelayCommands"
+      command: "WaitForCommissionee"
+      arguments:
+          values:
+              - name: "nodeId"
+                value: nodeId
+
+    - label: "Step 2: TH reads from the DUT the StartUpMode attribute."
+      PICS: EEVSEM.S.A0002
+      command: "readAttribute"
+      attribute: "StartUpMode"
+      response:
+          saveAs: startup_mode_dut
+
+    - label:
+          "Step 2: If startup_mode_dut is null proceed to step 3. Else save
+          startup_mode_dut as new_start_up_mode_th and proceed to step 5."
+      PICS: EEVSEM.S.A0002
+      cluster: "EqualityCommands"
+      command: "UnsignedNumberEquals"
+      arguments:
+          values:
+              - name: "Value1"
+                value: startup_mode_dut
+              - name: "Value2"
+                value: null
+      response:
+          - values:
+                - name: "Equals"
+                  saveAs: IsExpectedValue
+
+    - label: "Step 3: TH reads from the DUT the SupportedModes attribute."
+      runIf: IsExpectedValue
+      PICS: EEVSEM.S.A0000
+      command: "readAttribute"
+      attribute: "SupportedModes"
+      response:
+          saveAs: supported_modes_dut
+          constraints:
+              type: list
+              minLength: 2
+
+    - label:
+          "Step 4: TH writes to the DUT the StartUpMode attribute with the
+          new_start_up_mode_th value"
+      PICS: EEVSEM.S.A0002
+      runIf: IsExpectedValue
+      command: "writeAttribute"
+      attribute: "StartUpMode"
+      arguments:
+          value: new_start_up_mode_th
+
+    - label: "Step 5: TH reads from the DUT the OnMode attribute."
+      PICS: EEVSEM.S.A0003 && EEVSEM.S.A0002
+      command: "readAttribute"
+      attribute: "OnMode"
+      response:
+          saveAs: old_on_mode_dut
+
+    - label:
+          "Step 5: If startup_mode_dut is equal to old_on_mode_dut proceed to
+          step 6. Else proceed to step 8."
+      PICS: EEVSEM.S.A0002
+      cluster: "EqualityCommands"
+      command: "UnsignedNumberEquals"
+      arguments:
+          values:
+              - name: "Value1"
+                value: old_on_mode_dut
+              - name: "Value2"
+                value: startup_mode_dut
+      response:
+          - values:
+                - name: "Equals"
+                  saveAs: Step5_IsExpectedValue
+
+    - label: "Step 6: TH reads from the DUT the SupportedModes attribute."
+      PICS: EEVSEM.S.A0000 && EEVSEM.S.A0002
+      runIf: Step5_IsExpectedValue
+      command: "readAttribute"
+      attribute: "SupportedModes"
+      response:
+          saveAs: Step6_supported_modes_dut
+          constraints:
+              type: list
+              minLength: 2
+
+    - label:
+          "Step 7: TH writes to the DUT the OnMode attribute with the
+          new_mode_th value"
+      PICS: EEVSEM.S.A0003
+      runIf: Step5_IsExpectedValue
+      command: "writeAttribute"
+      attribute: "OnMode"
+      arguments:
+          value: new_mode_th
+
+    - label: "Step 8: TH reads from the DUT the OnMode attribute."
+      PICS: EEVSEM.S.A0003 && MOD.S.F00
+      command: "readAttribute"
+      attribute: "OnMode"
+      response:
+          saveAs: new_on_mode_dut
+
+    - label:
+          "Step 9: TH writes to the DUT the StartUpOnOff attribute with the
+          value 1."
+      PICS: OO.S.A4003
+      cluster: "On/Off"
+      command: "writeAttribute"
+      attribute: "StartUpOnOff"
+      arguments:
+          value: 1
+
+    - label: "Step 10: Physically power cycle the device"
+      verification: |
+          Physically power cycle the device.
+      cluster: "LogCommands"
+      command: "UserPrompt"
+      PICS: PICS_USER_PROMPT
+      arguments:
+          values:
+              - name: "message"
+                value: "Please enter 'y' for success"
+              - name: "expectedValue"
+                value: "y"
+
+    - label: "Wait for the commissioned device to be retrieved"
+      cluster: "DelayCommands"
+      command: "WaitForCommissionee"
+      arguments:
+          values:
+              - name: "nodeId"
+                value: nodeId
+
+    - label: "Step 11: TH reads from the DUT the StartUpMode attribute."
+      PICS: EEVSEM.S.A0002 && PICS_USER_PROMPT
+      command: "readAttribute"
+      attribute: "StartUpMode"
+      response:
+          constraints:
+              anyOf: [new_start_up_mode_th, startup_mode_dut]
+
+    - label: "Step 12: TH reads from the DUT the CurrentMode attribute."
+      PICS: EEVSEM.S.A0001 && PICS_USER_PROMPT
+      command: "readAttribute"
+      attribute: "CurrentMode"
+      response:
+          value: new_on_mode_dut

@@ -53,7 +53,7 @@ void EndpointListLoader::Initialize(chip::Messaging::ExchangeManager * exchangeM
 
     for (const auto & binding : chip::BindingTable::GetInstance())
     {
-        if (binding.type == EMBER_UNICAST_BINDING && CastingPlayer::GetTargetCastingPlayer()->GetNodeId() == binding.nodeId)
+        if (binding.type == MATTER_UNICAST_BINDING && CastingPlayer::GetTargetCastingPlayer()->GetNodeId() == binding.nodeId)
         {
             // check to see if we discovered a new endpoint in the bindings
             chip::EndpointId endpointId                     = binding.remote;
@@ -78,15 +78,16 @@ CHIP_ERROR EndpointListLoader::Load()
 
     VerifyOrReturnError(CastingPlayer::GetTargetCastingPlayer() != nullptr, CHIP_ERROR_INCORRECT_STATE);
 
-    int endpointIndex = -1;
+    int endpointIndex      = -1;
+    bool isLoadingRequired = false;
     for (const auto & binding : chip::BindingTable::GetInstance())
     {
         ChipLogProgress(AppServer,
                         "Binding type=%d fab=%d nodeId=0x" ChipLogFormatX64
                         " groupId=%d local endpoint=%d remote endpoint=%d cluster=" ChipLogFormatMEI,
                         binding.type, binding.fabricIndex, ChipLogValueX64(binding.nodeId), binding.groupId, binding.local,
-                        binding.remote, ChipLogValueMEI(binding.clusterId.ValueOr(0)));
-        if (binding.type == EMBER_UNICAST_BINDING && CastingPlayer::GetTargetCastingPlayer()->GetNodeId() == binding.nodeId)
+                        binding.remote, ChipLogValueMEI(binding.clusterId.value_or(0)));
+        if (binding.type == MATTER_UNICAST_BINDING && CastingPlayer::GetTargetCastingPlayer()->GetNodeId() == binding.nodeId)
         {
             // if we discovered a new Endpoint from the bindings, read its EndpointAttributes
             chip::EndpointId endpointId                     = binding.remote;
@@ -97,6 +98,7 @@ CHIP_ERROR EndpointListLoader::Load()
             {
                 // Read attributes and mEndpointAttributesList for (endpointIndex + 1)
                 ChipLogProgress(AppServer, "EndpointListLoader::Load Reading attributes for endpointId %d", endpointId);
+                isLoadingRequired                            = true;
                 mEndpointAttributesList[++endpointIndex].mId = endpointId;
                 ReadVendorId(&mEndpointAttributesList[endpointIndex]);
                 ReadProductId(&mEndpointAttributesList[endpointIndex]);
@@ -106,16 +108,27 @@ CHIP_ERROR EndpointListLoader::Load()
         }
     }
 
+    if (!isLoadingRequired)
+    {
+        ChipLogProgress(AppServer, "EndpointListLoader::Load found no new endpoints to load");
+        mPendingAttributeReads = 0;
+        Complete();
+    }
+
     return CHIP_NO_ERROR;
 }
 
 void EndpointListLoader::Complete()
 {
     ChipLogProgress(AppServer, "EndpointListLoader::Complete called with mPendingAttributeReads %lu", mPendingAttributeReads);
-    mPendingAttributeReads--;
+    if (mPendingAttributeReads > 0)
+    {
+        mPendingAttributeReads--;
+    }
+
     if (mPendingAttributeReads == 0)
     {
-        ChipLogProgress(AppServer, "EndpointListLoader::Complete ready to complete Loading endpoints");
+        ChipLogProgress(AppServer, "EndpointListLoader::Complete Loading %lu endpoint(s)", mNewEndpointsToLoad);
         for (unsigned long i = 0; i < mNewEndpointsToLoad; i++)
         {
             EndpointAttributes endpointAttributes = mEndpointAttributesList[i];
@@ -125,7 +138,7 @@ void EndpointListLoader::Complete()
             CastingPlayer::GetTargetCastingPlayer()->RegisterEndpoint(endpoint);
         }
 
-        ChipLogProgress(AppServer, "EndpointListLoader::Complete finished Loading endpoints");
+        ChipLogProgress(AppServer, "EndpointListLoader::Complete finished Loading %lu endpoints", mNewEndpointsToLoad);
 
         // TODO cleanup
         // delete mEndpointAttributesList;
@@ -144,7 +157,8 @@ void EndpointListLoader::Complete()
         }
 
         // callback client OnCompleted
-        VerifyOrReturn(CastingPlayer::GetTargetCastingPlayer()->mOnCompleted);
+        VerifyOrReturn(CastingPlayer::GetTargetCastingPlayer()->mOnCompleted,
+                       ChipLogError(AppServer, "EndpointListLoader::Complete mOnCompleted() not found"));
         CastingPlayer::GetTargetCastingPlayer()->mOnCompleted(CHIP_NO_ERROR, CastingPlayer::GetTargetCastingPlayer());
     }
 }

@@ -13,6 +13,8 @@
 #    See the License for the specific language governing permissions and
 #    limitations under the License.
 
+from typing import Optional
+
 from .parser import TestStep
 
 
@@ -102,7 +104,7 @@ class TestRunnerHooks():
         """
         pass
 
-    def test_start(self, filename: str, name: str, count: int):
+    def test_start(self, filename: str, name: str, count: int, steps: list[str] = []):
         """
         This method is called when the runner starts running a single test.
 
@@ -116,6 +118,9 @@ class TestRunnerHooks():
 
         count: int
             The number of steps from the test that will be run.
+
+        steps: list[str]
+            The computed test step names
         """
         pass
 
@@ -210,6 +215,15 @@ class TestRunnerHooks():
     async def step_manual(self):
         """
         This method is called when the step is executed manually.
+        """
+        pass
+
+    def show_prompt(self,
+                    msg: str,
+                    placeholder: Optional[str] = None,
+                    default_value: Optional[str] = None) -> None:
+        """
+        This method is called when the step needs to ask the user to perform some action or provide some value.
         """
         pass
 

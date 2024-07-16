@@ -16,11 +16,11 @@
 
 #import "MTRTestResetCommissioneeHelper.h"
 
-void ResetCommissionee(MTRBaseDevice * device, dispatch_queue_t queue, XCTestCase * testcase, uint16_t commandTimeout)
+void ResetCommissionee(MTRBaseDevice * device, dispatch_queue_t queue, XCTestCase * testcaseUnused, uint16_t commandTimeout)
 {
     // Put the device back in the state we found it: open commissioning window, no fabrics commissioned.
     // Get our current fabric index, for later deletion.
-    XCTestExpectation * readFabricIndexExpectation = [testcase expectationWithDescription:@"Fabric index read"];
+    XCTestExpectation * readFabricIndexExpectation = [[XCTestExpectation alloc] initWithDescription:@"Fabric index read"];
 
     __block NSNumber * fabricIndex;
     __auto_type * opCredsCluster = [[MTRBaseClusterOperationalCredentials alloc] initWithDevice:device endpoint:0 queue:queue];
@@ -32,11 +32,10 @@ void ResetCommissionee(MTRBaseDevice * device, dispatch_queue_t queue, XCTestCas
             [readFabricIndexExpectation fulfill];
         }];
 
-    [testcase waitForExpectations:@[ readFabricIndexExpectation ] timeout:commandTimeout];
+    XCTAssertEqual([XCTWaiter waitForExpectations:@[ readFabricIndexExpectation ] timeout:commandTimeout], XCTWaiterResultCompleted);
 
     // Open a commissioning window.
-    XCTestExpectation * openCommissioningWindowExpectation = [testcase expectationWithDescription:@"Commissioning window opened"];
-
+    XCTestExpectation * openCommissioningWindowExpectation = [[XCTestExpectation alloc] initWithDescription:@"Commissioning window opened"];
     __auto_type * adminCommissioningCluster = [[MTRBaseClusterAdministratorCommissioning alloc] initWithDevice:device
                                                                                                       endpoint:0
                                                                                                          queue:queue];
@@ -49,10 +48,10 @@ void ResetCommissionee(MTRBaseDevice * device, dispatch_queue_t queue, XCTestCas
                                                         [openCommissioningWindowExpectation fulfill];
                                                     }];
 
-    [testcase waitForExpectations:@[ openCommissioningWindowExpectation ] timeout:commandTimeout];
+    XCTAssertEqual([XCTWaiter waitForExpectations:@[ openCommissioningWindowExpectation ] timeout:commandTimeout], XCTWaiterResultCompleted);
 
     // Remove our fabric from the device.
-    XCTestExpectation * removeFabricExpectation = [testcase expectationWithDescription:@"Fabric removed"];
+    XCTestExpectation * removeFabricExpectation = [[XCTestExpectation alloc] initWithDescription:@"Fabric removed"];
 
     __auto_type * removeParams = [[MTROperationalCredentialsClusterRemoveFabricParams alloc] init];
     removeParams.fabricIndex = fabricIndex;
@@ -66,5 +65,5 @@ void ResetCommissionee(MTRBaseDevice * device, dispatch_queue_t queue, XCTestCas
                              [removeFabricExpectation fulfill];
                          }];
 
-    [testcase waitForExpectations:@[ removeFabricExpectation ] timeout:commandTimeout];
+    XCTAssertEqual([XCTWaiter waitForExpectations:@[ removeFabricExpectation ] timeout:commandTimeout], XCTWaiterResultCompleted);
 }

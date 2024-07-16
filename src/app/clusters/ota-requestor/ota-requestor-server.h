@@ -19,13 +19,16 @@
 #pragma once
 
 #include <app-common/zap-generated/attributes/Accessors.h>
+#include <protocols/interaction_model/StatusCode.h>
 
-EmberAfStatus OtaRequestorServerSetUpdateState(chip::app::Clusters::OtaSoftwareUpdateRequestor::OTAUpdateStateEnum value);
-EmberAfStatus OtaRequestorServerGetUpdateState(chip::EndpointId endpointId,
-                                               chip::app::Clusters::OtaSoftwareUpdateRequestor::OTAUpdateStateEnum & value);
-EmberAfStatus OtaRequestorServerSetUpdateStateProgress(chip::app::DataModel::Nullable<uint8_t> value);
-EmberAfStatus OtaRequestorServerGetUpdateStateProgress(chip::EndpointId endpointId,
-                                                       chip::app::DataModel::Nullable<uint8_t> & value);
+chip::Protocols::InteractionModel::Status
+OtaRequestorServerSetUpdateState(chip::app::Clusters::OtaSoftwareUpdateRequestor::OTAUpdateStateEnum value);
+chip::Protocols::InteractionModel::Status
+OtaRequestorServerGetUpdateState(chip::EndpointId endpointId,
+                                 chip::app::Clusters::OtaSoftwareUpdateRequestor::OTAUpdateStateEnum & value);
+chip::Protocols::InteractionModel::Status OtaRequestorServerSetUpdateStateProgress(chip::app::DataModel::Nullable<uint8_t> value);
+chip::Protocols::InteractionModel::Status OtaRequestorServerGetUpdateStateProgress(chip::EndpointId endpointId,
+                                                                                   chip::app::DataModel::Nullable<uint8_t> & value);
 
 void OtaRequestorServerOnStateTransition(chip::app::Clusters::OtaSoftwareUpdateRequestor::OTAUpdateStateEnum previousState,
                                          chip::app::Clusters::OtaSoftwareUpdateRequestor::OTAUpdateStateEnum newState,

@@ -15,22 +15,17 @@
  *    See the License for the specific language governing permissions and
  *    limitations under the License.
  */
-
-/**
- *    @file
- *      This file contains definitions for working with data encoded in CHIP TLV format.
- *
- *      CHIP TLV (Tag-Length-Value) is a generalized encoding method for simple structured data. It
- *      shares many properties with the commonly used JSON serialization format while being considerably
- *      more compact over the wire.
- */
-
 #pragma once
 
-#include "TLVCommon.h"
+#include <stdint.h>
 
-#include "TLVReader.h"
-#include "TLVWriter.h"
+#include <lib/core/CHIPError.h>
+#include <lib/core/TLVReader.h>
+#include <lib/core/TLVTags.h>
+#include <lib/core/TLVTypes.h>
+#include <lib/core/TLVWriter.h>
+#include <lib/support/DLLUtil.h>
+#include <lib/support/Span.h>
 
 /**
  * @namespace chip::TLV

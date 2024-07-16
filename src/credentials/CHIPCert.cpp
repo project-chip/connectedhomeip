@@ -25,10 +25,6 @@
  *
  */
 
-#ifndef __STDC_LIMIT_MACROS
-#define __STDC_LIMIT_MACROS
-#endif
-
 #include <stddef.h>
 
 #include <credentials/CHIPCert_Internal.h>
@@ -1199,6 +1195,48 @@ CHIP_ERROR ConvertECDSASignatureRawToDER(P256ECDSASignatureSpan rawSig, ASN1Writ
     }
     ASN1_END_SEQUENCE;
 
+exit:
+    return err;
+}
+
+CHIP_ERROR ConvertECDSAKeypairRawToDER(const P256SerializedKeypair & rawKeypair, MutableByteSpan & outDerKeypair)
+{
+    CHIP_ERROR err = CHIP_NO_ERROR;
+
+    // The raw key pair contains the public key followed by the private key
+    VerifyOrReturnError(rawKeypair.Length() == kP256_PublicKey_Length + kP256_PrivateKey_Length, CHIP_ERROR_INVALID_ARGUMENT);
+    FixedByteSpan<kP256_PublicKey_Length> publicKey(rawKeypair.ConstBytes());
+    FixedByteSpan<kP256_PrivateKey_Length> privateKey(rawKeypair.ConstBytes() + kP256_PublicKey_Length);
+
+    ASN1Writer writer;
+    writer.Init(outDerKeypair);
+
+    // ECPrivateKey ::= SEQUENCE
+    ASN1_START_SEQUENCE
+    {
+        // version INTEGER { ecPrivkeyVer1(1) } (ecPrivkeyVer1)
+        ASN1_ENCODE_INTEGER(1);
+
+        // privateKey OCTET STRING
+        ASN1_ENCODE_OCTET_STRING(privateKey.data(), privateKey.size());
+
+        // parameters [0] ECParameters {{ NamedCurve }} OPTIONAL
+        ASN1_START_CONSTRUCTED(kASN1TagClass_ContextSpecific, 0);
+        {
+            ASN1_ENCODE_OBJECT_ID(kOID_EllipticCurve_prime256v1);
+        }
+        ASN1_END_CONSTRUCTED;
+
+        // publicKey  [1] BIT STRING OPTIONAL
+        ASN1_START_CONSTRUCTED(kASN1TagClass_ContextSpecific, 1);
+        {
+            ReturnErrorOnFailure(writer.PutBitString(0, publicKey.data(), publicKey.size()));
+        }
+        ASN1_END_CONSTRUCTED;
+    }
+    ASN1_END_SEQUENCE;
+
+    outDerKeypair.reduce_size(writer.GetLengthWritten());
 exit:
     return err;
 }

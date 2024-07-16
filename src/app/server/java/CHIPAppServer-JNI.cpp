@@ -51,9 +51,9 @@ using namespace chip::DeviceLayer;
 static void * IOThreadAppMain(void * arg);
 
 namespace {
-JavaVM * sJVM;
-pthread_t sIOThread               = PTHREAD_NULL;
-jclass sChipAppServerExceptionCls = NULL;
+JavaVM * sJVM       = nullptr;
+pthread_t sIOThread = PTHREAD_NULL;
+JniGlobalReference sChipAppServerExceptionCls;
 ChipAppServerDelegate sChipAppServerDelegate;
 } // namespace
 
@@ -77,7 +77,10 @@ jint AndroidAppServerJNI_OnLoad(JavaVM * jvm, void * reserved)
     ChipLogProgress(AppServer, "Loading Java class references.");
 
     // Get various class references need by the API.
-    err = JniReferences::GetInstance().GetClassRef(env, "chip/appserver/ChipAppServerException", sChipAppServerExceptionCls);
+    jclass appServerExceptionCls;
+    err = JniReferences::GetInstance().GetLocalClassRef(env, "chip/appserver/ChipAppServerException", appServerExceptionCls);
+    SuccessOrExit(err);
+    err = sChipAppServerExceptionCls.Init(static_cast<jobject>(appServerExceptionCls));
     SuccessOrExit(err);
     ChipLogProgress(AppServer, "Java class references loaded.");
 

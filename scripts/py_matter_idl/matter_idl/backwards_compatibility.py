@@ -279,8 +279,10 @@ class CompatibilityChecker:
         for original_cluster in original:
             updated_cluster = updated_clusters.get(original_cluster.name)
 
-            if not_stable(updated_cluster.api_maturity) or not_stable(original_cluster.api_maturity):
-                # no point in checking
+            if not_stable(original_cluster.api_maturity):
+                continue
+
+            if updated_cluster and not_stable(updated_cluster.api_maturity):
                 continue
 
             self._check_cluster_compatible(original_cluster, updated_cluster)

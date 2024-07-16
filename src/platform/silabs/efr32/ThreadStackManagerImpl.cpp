@@ -35,6 +35,9 @@
 
 #include <lib/support/CHIPPlatformMemory.h>
 
+// Forward declaration
+extern "C" otInstance * otGetInstance(void);
+
 namespace chip {
 namespace DeviceLayer {
 
@@ -65,58 +68,6 @@ bool ThreadStackManagerImpl::IsInitialized()
 {
     return sInstance.mThreadStackLock != NULL;
 }
-
-#if CHIP_DEVICE_CONFIG_ENABLE_THREAD_SRP_CLIENT
-/*
- * @brief Notifies `RemoveAllSrpServices` that the Srp Client removal has completed
- *        and unblock the calling task.
- *
- *  No data is processed.
- */
-void ThreadStackManagerImpl::OnSrpClientRemoveCallback(otError aError, const otSrpClientHostInfo * aHostInfo,
-                                                       const otSrpClientService * aServices,
-                                                       const otSrpClientService * aRemovedServices, void * aContext)
-{
-    if (ThreadStackMgrImpl().srpRemoveRequester)
-    {
-        xTaskNotifyGive(ThreadStackMgrImpl().srpRemoveRequester);
-    }
-}
-
-/*
- * @brief This is a utility function to remove all Thread client Srp services
- * established between the device and the srp server (in most cases the OTBR).
- * The calling task is blocked until OnSrpClientRemoveCallback.
- *
- * Note: This function is meant to be used during the factory reset sequence.
- *       It overrides the generic SrpClient callback `OnSrpClientNotification` with
- *       OnSrpClientRemoveCallback which doesn't process any of the callback data.
- *
- *       If there is a usecase where this function would be needed in a non-Factory reset context,
- *       OnSrpClientRemoveCallback should be extended and tied back with the GenericThreadStackManagerImpl_OpenThread
- *       management of the srp clients.
- */
-void ThreadStackManagerImpl::RemoveAllSrpServices()
-{
-    // This check ensure that only one srp services removal is running
-    if (ThreadStackMgrImpl().srpRemoveRequester == nullptr)
-    {
-        srpRemoveRequester = xTaskGetCurrentTaskHandle();
-        otSrpClientSetCallback(OTInstance(), &OnSrpClientRemoveCallback, nullptr);
-        InvalidateAllSrpServices();
-        if (RemoveInvalidSrpServices() == CHIP_NO_ERROR)
-        {
-            // Wait for the OnSrpClientRemoveCallback.
-            ulTaskNotifyTake(pdTRUE, pdMS_TO_TICKS(2000));
-        }
-        else
-        {
-            ChipLogError(DeviceLayer, "Failed to remove srp services");
-        }
-        ThreadStackMgrImpl().srpRemoveRequester = nullptr;
-    }
-}
-#endif // CHIP_DEVICE_CONFIG_ENABLE_THREAD_SRP_CLIENT
 
 } // namespace DeviceLayer
 } // namespace chip
@@ -182,6 +133,11 @@ extern "C" otError otPlatUartEnable(void)
     // Uart Init is handled in init_efrPlatform.cpp
     return OT_ERROR_NONE;
 #endif
+}
+
+extern "C" otInstance * otGetInstance(void)
+{
+    return ThreadStackMgrImpl().OTInstance();
 }
 
 #if CHIP_DEVICE_CONFIG_THREAD_ENABLE_CLI

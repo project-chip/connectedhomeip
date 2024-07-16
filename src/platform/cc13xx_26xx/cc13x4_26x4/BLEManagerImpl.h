@@ -231,19 +231,10 @@ private:
                         System::PacketBufferHandle pBuf) override;
     bool SendWriteRequest(BLE_CONNECTION_OBJECT conId, const Ble::ChipBleUUID * svcId, const Ble::ChipBleUUID * charId,
                           System::PacketBufferHandle pBuf) override;
-    bool SendReadRequest(BLE_CONNECTION_OBJECT conId, const Ble::ChipBleUUID * svcId, const Ble::ChipBleUUID * charId,
-                         System::PacketBufferHandle pBuf) override;
-    bool SendReadResponse(BLE_CONNECTION_OBJECT conId, BLE_READ_REQUEST_CONTEXT requestContext, const Ble::ChipBleUUID * svcId,
-                          const Ble::ChipBleUUID * charId) override;
 
     // ===== Members that implement virtual methods on BleApplicationDelegate.
 
     void NotifyChipConnectionClosed(BLE_CONNECTION_OBJECT conId) override;
-
-    const ChipBleUUID chipUUID_CHIPoBLEChar_RX = { { 0x18, 0xEE, 0x2E, 0xF5, 0x26, 0x3D, 0x45, 0x59, 0x95, 0x9F, 0x4F, 0x9C, 0x42,
-                                                     0x9F, 0x9D, 0x11 } };
-    const ChipBleUUID chipUUID_CHIPoBLEChar_TX = { { 0x18, 0xEE, 0x2E, 0xF5, 0x26, 0x3D, 0x45, 0x59, 0x95, 0x9F, 0x4F, 0x9C, 0x42,
-                                                     0x9F, 0x9D, 0x12 } };
 
     friend BLEManager & BLEMgr(void);
     friend BLEManagerImpl & BLEMgrImpl(void);
@@ -279,7 +270,7 @@ private:
     CHIPoBLEServiceMode mServiceMode;
     char mDeviceName[GAP_DEVICE_NAME_LEN];
 
-    ConnRec_t connList[MAX_NUM_BLE_CONNS];
+    ConnRec_t connList[LL_MAX_NUM_BLE_CONNS];
     // List to store connection handles for queued param updates
     List_List paramUpdateList;
 
@@ -316,8 +307,6 @@ private:
     uint8_t ClearBLEConnListEntry(uint16_t connHandle);
     void ClearPendingBLEParamUpdate(uint16_t connHandle);
     void UpdateBLERPA(void);
-
-    static void HandleIncomingBleConnection(Ble::BLEEndPoint * bleEP);
 
     /* Static helper function */
     static void EventHandler(void * arg);

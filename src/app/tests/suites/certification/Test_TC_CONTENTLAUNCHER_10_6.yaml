@@ -34,8 +34,8 @@ tests:
       verification: |
           Product maker needs to provide instructions for how to trigger the command on the DUT. For comparison, the DUT behavior for this test step can be simulated using chip-tool (when DUT is a commissioner) or tv-casting-app (when DUT is a commissionee):
 
-          ./chip-tool contentlauncher launch-url 'https://www.foo.com' '{"providerName": "provider"}' 1 1
-          ./chip-tv-casting-app contentlauncher launch-url 'https://www.foo.com' '{"providerName": "provider"}' 1 1
+          ./chip-tool contentlauncher launch-url 'https://www.foo.com' 1 1 --DisplayString '{"providerName": "provider"}'
+          ./chip-tv-casting-app contentlauncher launch-url 'https://www.foo.com' 1 1 --DisplayString '{"providerName": "provider"}'
 
           On TH (tv-app), Verify the  launch url command is received successfully.
           [1658531502040] [21924:325733] CHIP: [DMG] InvokeRequestMessage =

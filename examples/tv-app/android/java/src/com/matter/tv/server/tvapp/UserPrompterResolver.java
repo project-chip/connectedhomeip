@@ -29,7 +29,23 @@ public class UserPrompterResolver {
 
   public native void OnPromptDeclined();
 
+  public native void OnCommissionerPasscodeOK();
+
+  public native void OnCommissionerPasscodeCancel();
+
+  public native void OnMessageResponse(String messageId, long optionid);
+
   static {
     System.loadLibrary("TvApp");
+  }
+
+  static UserPrompter globalPrompter = null;
+
+  public static void setUserPrompter(UserPrompter prompter) {
+    globalPrompter = prompter;
+  }
+
+  public static UserPrompter getUserPrompter() {
+    return globalPrompter;
   }
 }

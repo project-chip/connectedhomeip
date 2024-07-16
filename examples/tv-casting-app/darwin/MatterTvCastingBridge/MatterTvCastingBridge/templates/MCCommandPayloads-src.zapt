@@ -1,0 +1,125 @@
+{{> header excludeZapComment=false}}
+
+#import "MCCommandPayloads_Internal.h"
+
+#import "../MCAttribute_Internal.h"
+#import "../MCCastingApp.h"
+#import "../MCErrorUtils.h"
+#import "../NSDataSpanConversion.h"
+#import "../NSStringSpanConversion.h"
+
+#include <app/data-model/Decode.h>
+#include <app/data-model/ListLargeSystemExtensions.h>
+
+NS_ASSUME_NONNULL_BEGIN
+
+@implementation MCAbstractPayload
+- (std::any)getCppRequestFromObjCRequest
+{
+    return nil;
+}
+
+- (CHIP_ERROR)setObjCResponseFromCppResponse:(std::any)cppDecodableStruct
+{
+    return CHIP_NO_ERROR;
+}
+
+- (nonnull id)copyWithZone:(nullable NSZone *)zone
+{
+    auto other = [[MCAbstractPayload alloc] init];
+
+    return other;
+}
+@end
+
+{{#zcl_clusters}}
+{{#if (isInConfigList name "MatterCastingClusters")}}
+
+// {{asUpperCamelCase name}} cluster:
+{{#zcl_commands}}
+
+{{#*inline "completeImpl"}}
+@implementation MC{{cluster}}Cluster{{command}}Params
+- (instancetype)init
+{
+  if (self = [super init]) {
+{{#zcl_command_arguments}}
+
+    {{>init_struct_member label=label type=type cluster=parent.parent.name}}
+{{/zcl_command_arguments}}
+{{#if (isStrEqual source "client")}}
+{{/if}}
+  }
+  return self;
+}
+
+- (id)copyWithZone:(NSZone * _Nullable)zone;
+{
+  auto other = [[MC{{cluster}}Cluster{{command}}Params alloc] init];
+
+  {{#zcl_command_arguments}}
+  other.{{asStructPropertyName label}} = self.{{asStructPropertyName label}};
+  {{/zcl_command_arguments}}
+
+  return other;
+}
+
+- (NSString *)description
+{
+  NSString *descriptionString = [NSString stringWithFormat:@"<%@: {{#zcl_command_arguments}}{{asStructPropertyName label}}:%@; {{/zcl_command_arguments}}>", NSStringFromClass([self class]) {{#zcl_command_arguments}},{{#if isArray}}_{{asStructPropertyName label}}{{else if (isOctetString type)}}[_{{asStructPropertyName label}} base64EncodedStringWithOptions:0]{{else}}_{{asStructPropertyName label}}{{/if}}{{/zcl_command_arguments}}];
+  return descriptionString;
+}
+
+{{#if (isStrEqual source "client")}}
+
+- (std::any)getCppRequestFromObjCRequest
+{
+  chip::app::Clusters::{{asUpperCamelCase parent.name}}::Commands::{{asUpperCamelCase name}}::Type cppStruct;
+  ListFreer listFreer;
+  {{#zcl_command_arguments}}
+  {
+    {{>encode_value target=(concat "cppStruct." (asLowerCamelCase label)) source=(concat "self." (asStructPropertyName label)) cluster=parent.parent.name errorCode="return CHIP_ERROR_INVALID_ARGUMENT;" depth=0}}
+  }
+  {{/zcl_command_arguments}}
+
+  return std::any(cppStruct);
+}
+{{else}}
+
+- (std::any)getCppRequestFromObjCRequest {
+  // Default implementation
+  return CHIP_NO_ERROR;
+}
+{{/if}}
+{{#if (isStrEqual source "server")}}
+
+- (CHIP_ERROR)setObjCResponseFromCppResponse:(std::any)cppResponse
+{
+  std::shared_ptr<const chip::app::Clusters::{{asUpperCamelCase parent.name}}::Commands::{{asUpperCamelCase name}}::DecodableType> responseSharedPtr = std::any_cast<std::shared_ptr<const chip::app::Clusters::{{asUpperCamelCase parent.name}}::Commands::{{asUpperCamelCase name}}::DecodableType>>(cppResponse);
+  const chip::app::Clusters::{{asUpperCamelCase parent.name}}::Commands::{{asUpperCamelCase name}}::DecodableType cppDecodableStruct = *responseSharedPtr;
+
+  {{#zcl_command_arguments}}
+  {
+    {{>decode_value target=(concat "self." (asStructPropertyName label)) source=(concat "cppDecodableStruct." (asLowerCamelCase label)) cluster=parent.parent.name errorCode="return err;" depth=0}}
+  }
+  {{/zcl_command_arguments}}
+  return CHIP_NO_ERROR;
+}
+{{else}}
+
+- (CHIP_ERROR)setObjCResponseFromCppResponse:(std::any)cppDecodableStruct
+{
+  // Default implementation
+  return CHIP_NO_ERROR;
+}
+{{/if}}
+@end
+{{/inline}}
+{{> completeImpl cluster=(asUpperCamelCase parent.name preserveAcronyms=true)
+                 command=(asUpperCamelCase name preserveAcronyms=true)}}
+
+{{/zcl_commands}}
+{{/if}}
+{{/zcl_clusters}}
+
+NS_ASSUME_NONNULL_END

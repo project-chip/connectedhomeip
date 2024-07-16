@@ -14,7 +14,6 @@ jobs:
             (github.event.pull_request.merged == true)
             && (
                    (contains(github.event.pull_request.labels.*.name, 'sve'))
-               ||  (contains(github.event.pull_request.labels.*.name, 'spec'))
                ||  (contains(github.event.pull_request.labels.*.name, 'request sve'))
                ||  (contains(github.event.pull_request.labels.*.name, 'cert blocker'))
             )
@@ -27,11 +26,12 @@ jobs:
               uses: carloscastrojumo/github-cherry-pick-action@v1.0.9
               with:
                   token: ${{ secrets.MATTER_PAT }}
-                  branch: sve-2
+                  branch: 1.3-sve
                   labels: |
                       sve cherry pick
                   reviewers: |
                       woody-apple
                       andy31415
+                      raju-apple
 env:
     GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}

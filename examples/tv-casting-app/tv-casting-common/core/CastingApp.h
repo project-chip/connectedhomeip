@@ -47,10 +47,18 @@ public:
     /**
      * @brief Initializes the CastingApp with appParameters
      *
-     * @param appParameters
+     * @param appParameters AppParameters required to Start up the CastingApp
      * @return CHIP_ERROR
      */
     CHIP_ERROR Initialize(const matter::casting::support::AppParameters & appParameters);
+
+    /**
+     * @brief Update the CommissionableDataProvider stored in this CastingApp's AppParameters and the CommissionableDataProvider to
+     * be used for the commissioning session.
+     * @param commissionableDataProvider the new CommissionableDataProvider to be used for the next commissioning session.
+     *
+     */
+    CHIP_ERROR UpdateCommissionableDataProvider(chip::DeviceLayer::CommissionableDataProvider * commissionableDataProvider);
 
     /**
      * @brief Starts the Matter server that the CastingApp runs on and registers all the necessary delegates

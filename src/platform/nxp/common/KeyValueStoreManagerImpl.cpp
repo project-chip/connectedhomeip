@@ -46,6 +46,15 @@ CHIP_ERROR KeyValueStoreManagerImpl::_Get(const char * key, void * value, size_t
 
     err = chip::DeviceLayer::Internal::NXPConfig::ReadConfigValueBin(key, (uint8_t *) value, value_size, read_bytes);
 
+    if (err == CHIP_DEVICE_ERROR_CONFIG_NOT_FOUND)
+    {
+        ChipLogError(DeviceLayer, "KVS, key not found!");
+    }
+    else if (err != CHIP_NO_ERROR)
+    {
+        ChipLogError(DeviceLayer, "KVS, failed to read key!");
+    }
+
     *read_bytes_size = read_bytes;
 
 exit:
@@ -63,6 +72,9 @@ CHIP_ERROR KeyValueStoreManagerImpl::_Put(const char * key, const void * value, 
 
     err = chip::DeviceLayer::Internal::NXPConfig::WriteConfigValueBin(key, (uint8_t *) value, value_size);
 
+    if (err != CHIP_NO_ERROR)
+        ChipLogError(DeviceLayer, "KVS, failed to save key!");
+
 exit:
     ConvertError(err);
     return err;
@@ -77,6 +89,9 @@ CHIP_ERROR KeyValueStoreManagerImpl::_Delete(const char * key)
     ChipLogProgress(DeviceLayer, "KVS, deleting key id:: %s", key);
 
     err = chip::DeviceLayer::Internal::NXPConfig::ClearConfigValue(key);
+
+    if (err != CHIP_NO_ERROR)
+        ChipLogError(DeviceLayer, "KVS, failed to delete key!");
 
 exit:
     ConvertError(err);

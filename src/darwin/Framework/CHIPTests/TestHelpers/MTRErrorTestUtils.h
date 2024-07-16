@@ -16,11 +16,13 @@
  */
 
 #import <Foundation/Foundation.h>
+#import <Matter/Matter.h>
 
 NS_ASSUME_NONNULL_BEGIN
 
 @interface MTRErrorTestUtils : NSObject
-+ (uint8_t)errorToZCLErrorCode:(NSError * _Nullable)error;
+
++ (BOOL)error:(NSError * _Nullable)error isInteractionModelError:(MTRInteractionErrorCode)errorCode;
 @end
 
 NS_ASSUME_NONNULL_END

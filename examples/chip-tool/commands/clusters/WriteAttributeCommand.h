@@ -195,7 +195,8 @@ protected:
     template <typename U = T, std::enable_if_t<std::is_same<U, std::vector<CustomArgument *>>::value, int> = 0>
     static const char * GetAttributeValuesDescription()
     {
-        return "Comma-separated list of attribute values to write. Each value is represented as follows, depending on the type:\n"
+        return "Semicolon-separated list of attribute values to write. Each value is represented as follows, depending on the "
+               "type:\n"
                "  * struct: a JSON-encoded object, with field ids as keys.\n"
                "  * list: a JSON-encoded array of values.\n"
                "  * null: A literal null.\n"
@@ -213,7 +214,9 @@ protected:
                "      a) The number directly, if it's not an integer.\n"
                "      b) A string starting with \"d:\" followed by the number.\n"
                "  * octet string: A string starting with \"hex:\" followed by the hex encoding of the bytes.\n"
-               "  * string: A string with the characters.";
+               "  * string: A string with the characters.\n"
+               "\n"
+               "  Example values: '10;20', '10;\"u:20\"', '\"hex:aabbcc\";\"hello\"'.";
     }
 
     static const char * GetTypedAttributeValuesDescription() { return "Comma-separated list of attribute values to write."; }

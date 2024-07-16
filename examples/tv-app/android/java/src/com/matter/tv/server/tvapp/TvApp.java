@@ -57,6 +57,8 @@ public class TvApp {
 
   public native void setMediaPlaybackManager(int endpoint, MediaPlaybackManager manager);
 
+  public native void setMessagesManager(int endpoint, MessagesManager manager);
+
   public native void setChannelManager(int endpoint, ChannelManager manager);
 
   public native void setOnOffManager(int endpoint, OnOffManager manager);

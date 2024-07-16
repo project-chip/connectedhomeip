@@ -24,7 +24,7 @@
 #include <app-common/zap-generated/ids/Clusters.h>
 #include <app/CommandHandler.h>
 #include <app/app-platform/ContentAppPlatform.h>
-#include <app/util/af.h>
+#include <app/util/endpoint-config-api.h>
 
 #if defined(ENABLE_CHIP_SHELL)
 #include "AppTvShellCommands.h"
@@ -45,6 +45,31 @@ void ApplicationInit()
     ChipLogDetail(DeviceLayer, "TV Linux App: Warning - Fixed Content App Endpoint Not Disabled");
     // Can't disable this without breaking CI unit tests that act upon account login cluster (only available on ep3)
     // emberAfEndpointEnableDisable(3, false);
+
+#if CHIP_DEVICE_CONFIG_APP_PLATFORM_ENABLED
+    // Install Content Apps
+    ContentAppFactoryImpl * factory = GetContentAppFactoryImpl();
+
+    // Content App 1
+    constexpr uint16_t kApp1VendorId  = 65521;
+    constexpr uint16_t kApp1ProductId = 32769;
+    factory->InstallContentApp(kApp1VendorId, kApp1ProductId);
+
+    // Content App 2
+    constexpr uint16_t kApp2VendorId  = 1;
+    constexpr uint16_t kApp2ProductId = 11;
+    factory->InstallContentApp(kApp2VendorId, kApp2ProductId);
+
+    // Content App 3
+    constexpr uint16_t kApp3VendorId  = 9050;
+    constexpr uint16_t kApp3ProductId = 22;
+    factory->InstallContentApp(kApp3VendorId, kApp3ProductId);
+
+    // Content App 4
+    constexpr uint16_t kApp4VendorId  = 1111;
+    constexpr uint16_t kApp4ProductId = 22;
+    factory->InstallContentApp(kApp4VendorId, kApp4ProductId);
+#endif // CHIP_DEVICE_CONFIG_APP_PLATFORM_ENABLED
 }
 
 void ApplicationShutdown() {}

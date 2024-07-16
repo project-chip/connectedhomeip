@@ -126,7 +126,7 @@ CHIP_ERROR TCPEndPoint::SetReceivedDataForTesting(System::PacketBufferHandle && 
     return CHIP_NO_ERROR;
 }
 
-uint32_t TCPEndPoint::PendingSendLength()
+size_t TCPEndPoint::PendingSendLength()
 {
     if (!mSendQueue.IsNull())
     {
@@ -135,7 +135,7 @@ uint32_t TCPEndPoint::PendingSendLength()
     return 0;
 }
 
-uint32_t TCPEndPoint::PendingReceiveLength()
+size_t TCPEndPoint::PendingReceiveLength()
 {
     if (!mRcvQueue.IsNull())
     {
@@ -333,8 +333,8 @@ void TCPEndPoint::DriveReceiving()
     {
         // Acknowledgement is done after handling the buffers to allow the
         // application processing to throttle flow.
-        uint16_t ackLength = mRcvQueue->TotalLength();
-        CHIP_ERROR err     = OnDataReceived(this, std::move(mRcvQueue));
+        size_t ackLength = mRcvQueue->TotalLength();
+        CHIP_ERROR err   = OnDataReceived(this, std::move(mRcvQueue));
         if (err != CHIP_NO_ERROR)
         {
             DoClose(err, false);

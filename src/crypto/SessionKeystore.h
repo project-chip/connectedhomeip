@@ -68,6 +68,18 @@ public:
     virtual CHIP_ERROR CreateKey(const Symmetric128BitsKeyByteArray & keyMaterial, Hmac128KeyHandle & key) = 0;
 
     /**
+     * @brief Import raw key material and return a key handle for an HKDF key.
+     *
+     * @note This method should only be used when using the raw key material in the Matter stack
+     * cannot be avoided. Ideally, crypto interfaces should allow platforms to perform all the
+     * cryptographic operations in a secure environment.
+     *
+     * If the method returns no error, the application is responsible for destroying the handle
+     * using the DestroyKey() method when the key is no longer needed.
+     */
+    virtual CHIP_ERROR CreateKey(const ByteSpan & keyMaterial, HkdfKeyHandle & key) = 0;
+
+    /**
      * @brief Destroy key.
      *
      * The method can take an uninitialized handle in which case it is a no-op.
@@ -75,32 +87,57 @@ public:
      */
     virtual void DestroyKey(Symmetric128BitsKeyHandle & key) = 0;
 
+    /**
+     * @brief Destroy key.
+     *
+     * The method can take an uninitialized handle in which case it is a no-op.
+     * As a result of calling this method, the handle is put in the uninitialized state.
+     */
+    virtual void DestroyKey(HkdfKeyHandle & key) = 0;
+
     /****************************
      * SessionKeyDerivation APIs
      *****************************/
 
     /**
-     * @brief Derive key from a shared secret.
+     * @brief Derive key from a session establishment's `SharedSecret`.
      *
-     * Use HKDF as defined in the Matter specification to derive an AES key from the shared secret.
+     * Use `Crypto_KDF` (HKDF) primitive as defined in the Matter specification to derive
+     * a symmetric (AES) key from the session establishment's `SharedSecret`.
      *
-     * If the method returns no error, the application is responsible for destroying the handle
-     * using DestroyKey() method when the key is no longer needed.
+     * If the method returns no error, the caller is responsible for destroying the symmetric key
+     * using the DestroyKey() method when the key is no longer needed.
      */
     virtual CHIP_ERROR DeriveKey(const P256ECDHDerivedSecret & secret, const ByteSpan & salt, const ByteSpan & info,
                                  Aes128KeyHandle & key) = 0;
 
     /**
-     * @brief Derive session keys from a shared secret.
+     * @brief Derive session keys from a session establishment's `SharedSecret`.
      *
-     * Use HKDF as defined in the Matter specification to derive AES keys for both directions, and
-     * the attestation challenge from the shared secret.
+     * Use `Crypto_KDF` (HKDF) primitive as defined in the Matter specification to derive symmetric
+     * (AES) session keys for both directions, and the attestation challenge from the session
+     * establishment's `SharedSecret`.
      *
-     * If the method returns no error, the application is responsible for destroying the handles
-     * using DestroyKey() method when the keys are no longer needed. On failure, the method must
-     * release all handles that it allocated so far.
+     * If the method returns no error, the caller is responsible for destroying the symmetric keys
+     * using the DestroyKey() method when the keys are no longer needed. On failure, the method is
+     * responsible for releasing all keys that it allocated so far.
      */
     virtual CHIP_ERROR DeriveSessionKeys(const ByteSpan & secret, const ByteSpan & salt, const ByteSpan & info,
+                                         Aes128KeyHandle & i2rKey, Aes128KeyHandle & r2iKey,
+                                         AttestationChallenge & attestationChallenge) = 0;
+
+    /**
+     * @brief Derive session keys from a session establishment's `SharedSecret`.
+     *
+     * Use Crypto_KDF (HKDF) primitive as defined in the Matter specification to derive symmetric
+     * (AES) session keys for both directions, and the attestation challenge from the session
+     * establishment's `SharedSecret`, represented as the key handle.
+     *
+     * If the method returns no error, the caller is responsible for destroying the symmetric keys
+     * using the DestroyKey() method when the keys are no longer needed. On failure, the method is
+     * responsible for releasing all keys that it allocated so far.
+     */
+    virtual CHIP_ERROR DeriveSessionKeys(const HkdfKeyHandle & secretKey, const ByteSpan & salt, const ByteSpan & info,
                                          Aes128KeyHandle & i2rKey, Aes128KeyHandle & r2iKey,
                                          AttestationChallenge & attestationChallenge) = 0;
 };
@@ -108,17 +145,18 @@ public:
 /**
  * @brief RAII class to hold a temporary key handle that is destroyed on scope exit.
  */
-class AutoReleaseSessionKey
+template <class KeyHandleType>
+class AutoReleaseSymmetricKey
 {
 public:
-    explicit AutoReleaseSessionKey(SessionKeystore & keystore) : mKeystore(keystore) {}
-    ~AutoReleaseSessionKey() { mKeystore.DestroyKey(mKeyHandle); }
+    explicit AutoReleaseSymmetricKey(SessionKeystore & keystore) : mKeystore(keystore) {}
+    ~AutoReleaseSymmetricKey() { mKeystore.DestroyKey(mKeyHandle); }
 
-    Aes128KeyHandle & KeyHandle() { return mKeyHandle; }
+    KeyHandleType & KeyHandle() { return mKeyHandle; }
 
 private:
     SessionKeystore & mKeystore;
-    Aes128KeyHandle mKeyHandle;
+    KeyHandleType mKeyHandle;
 };
 
 } // namespace Crypto

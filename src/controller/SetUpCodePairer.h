@@ -36,7 +36,7 @@
 #include <setup_payload/QRCodeSetupPayloadParser.h>
 
 #if CONFIG_NETWORK_LAYER_BLE
-#include <ble/BleLayer.h>
+#include <ble/Ble.h>
 #endif // CONFIG_NETWORK_BLE
 
 #include <controller/DeviceDiscoveryDelegate.h>

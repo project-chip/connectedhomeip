@@ -48,7 +48,7 @@ if [ "$#" == "0" ]; then
     $USAGE
 
     <AppRootFolder>
-        Root Location of the app e.g: examples/lighting-app/efr32/
+        Root Location of the app e.g: examples/lighting-app/silabs/
 
     <outputFolder>
         Desired location for the output files
@@ -56,14 +56,18 @@ if [ "$#" == "0" ]; then
     <silabs_board_name>
         Identifier of the board for which this app is built
         Currently Supported :
-            BRD4161A
-            BRD4163A
-            BRD4164A
-            BRD4166A
-            BRD4170A
             BRD4186A
             BRD4187A
-            BRD4304A
+            BRD4186C
+            BRD4187C
+            BRD2601B
+            BRD2703A
+            BRD2704A
+            BRD4316A
+            BRD4317A
+            BRD4318A
+            BRD4319A
+
 
     <Build options> - optional noteworthy build options for EFR32
         chip_build_libshell
@@ -86,6 +90,10 @@ if [ "$#" == "0" ]; then
         chip_enable_icd_server
             Configure has a Intermitently connected device. (Default false)
             Must also set chip_openthread_ftd=false
+        enable_synchronized_sed
+            Enable Synchronized Sleepy end device. (Default false)
+            Must also set chip_enable_icd_server=true chip_openthread_ftd=false
+            --icd can be used to configure both arguments
         use_rs9116
             Build wifi example with extension board rs9116. (Default false)
         use_SiWx917
@@ -189,7 +197,7 @@ else
                 shift
                 ;;
             --icd)
-                optArgs+="chip_enable_icd_server=true chip_openthread_ftd=false "
+                optArgs+="chip_enable_icd_server=true chip_openthread_ftd=false sl_enable_test_event_trigger=true "
                 shift
                 ;;
             --low-power)
@@ -299,7 +307,7 @@ else
         {
             ShortCommitSha=$(git describe --always --dirty --exclude '*')
             branchName=$(git rev-parse --abbrev-ref HEAD)
-            optArgs+="sl_matter_version_str=\"v1.2-$branchName-$ShortCommitSha\" "
+            optArgs+="sl_matter_version_str=\"v1.3-$branchName-$ShortCommitSha\" "
         } &>/dev/null
     fi
 

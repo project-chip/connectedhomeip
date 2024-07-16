@@ -36,9 +36,9 @@ namespace chip {
 namespace DeviceLayer {
 namespace Internal {
 
-RamStorage K32WConfig::sFactoryStorage{ kNvmId_Factory };
-RamStorage K32WConfig::sConfigStorage{ kNvmId_Config };
-RamStorage K32WConfig::sCounterStorage{ kNvmId_Counter };
+RamStorage K32WConfig::sFactoryStorage{ kNvmId_Factory, "Factory" };
+RamStorage K32WConfig::sConfigStorage{ kNvmId_Config, "Config" };
+RamStorage K32WConfig::sCounterStorage{ kNvmId_Counter, "Counter" };
 
 const K32WConfig::Key K32WConfig::kConfigKey_SerialNum{ &K32WConfig::sFactoryStorage, kKeyId_Factory, 0x00 };
 const K32WConfig::Key K32WConfig::kConfigKey_MfrDeviceId{ &K32WConfig::sFactoryStorage, kKeyId_Factory, 0x01 };

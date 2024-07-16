@@ -23,7 +23,7 @@
 
 // ---- Window Example App Config ----
 #define APP_TASK_NAME "APP"
-
+#define APP_EVENT_QUEUE_SIZE 20
 #define BLE_DEV_NAME "SiLabs-Window"
 
 #define LCD_SIZE 128

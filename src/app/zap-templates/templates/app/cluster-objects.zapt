@@ -25,6 +25,7 @@ namespace Clusters {
 namespace detail {
 // Structs shared across multiple clusters.
 namespace Structs {
+
 {{#zcl_structs}}
 {{#if has_more_than_one_cluster}}
 {{> cluster_objects_struct header=true}}

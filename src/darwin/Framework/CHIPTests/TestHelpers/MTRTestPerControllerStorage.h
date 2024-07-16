@@ -17,8 +17,6 @@
 #import <Foundation/Foundation.h>
 #import <Matter/Matter.h>
 
-#if MTR_PER_CONTROLLER_STORAGE_ENABLED
-
 NS_ASSUME_NONNULL_BEGIN
 
 @interface MTRTestPerControllerStorage : NSObject <MTRDeviceControllerStorageDelegate>
@@ -42,6 +40,15 @@ NS_ASSUME_NONNULL_BEGIN
           sharingType:(MTRStorageSharingType)sharingType;
 @end
 
-NS_ASSUME_NONNULL_END
+@interface MTRTestPerControllerStorageWithBulkReadWrite : MTRTestPerControllerStorage
+- (nullable NSDictionary<NSString *, id<NSSecureCoding>> *)valuesForController:(MTRDeviceController *)controller
+                                                                 securityLevel:(MTRStorageSecurityLevel)securityLevel
+                                                                   sharingType:(MTRStorageSharingType)sharingType;
+- (BOOL)controller:(MTRDeviceController *)controller
+       storeValues:(NSDictionary<NSString *, id<NSSecureCoding>> *)values
+     securityLevel:(MTRStorageSecurityLevel)securityLevel
+       sharingType:(MTRStorageSharingType)sharingType;
 
-#endif // MTR_PER_CONTROLLER_STORAGE_ENABLED
+@end
+
+NS_ASSUME_NONNULL_END

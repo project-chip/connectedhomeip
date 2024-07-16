@@ -29,6 +29,8 @@
 #include <lib/support/ScopedBuffer.h>
 #include <platform/PersistedStorage.h>
 
+#include <string>
+
 namespace chip {
 namespace DeviceLayer {
 namespace Internal {

@@ -16,6 +16,7 @@
  */
 package matter.controller.cluster.eventstructs
 
+import java.util.Optional
 import matter.controller.cluster.*
 import matter.tlv.ContextSpecificTag
 import matter.tlv.Tag
@@ -26,7 +27,8 @@ class EnergyEvseClusterEnergyTransferStoppedEvent(
   val sessionID: UInt,
   val state: UByte,
   val reason: UByte,
-  val energyTransferred: Long
+  val energyTransferred: Long,
+  val energyDischarged: Optional<Long>,
 ) {
   override fun toString(): String = buildString {
     append("EnergyEvseClusterEnergyTransferStoppedEvent {\n")
@@ -34,6 +36,7 @@ class EnergyEvseClusterEnergyTransferStoppedEvent(
     append("\tstate : $state\n")
     append("\treason : $reason\n")
     append("\tenergyTransferred : $energyTransferred\n")
+    append("\tenergyDischarged : $energyDischarged\n")
     append("}\n")
   }
 
@@ -44,6 +47,10 @@ class EnergyEvseClusterEnergyTransferStoppedEvent(
       put(ContextSpecificTag(TAG_STATE), state)
       put(ContextSpecificTag(TAG_REASON), reason)
       put(ContextSpecificTag(TAG_ENERGY_TRANSFERRED), energyTransferred)
+      if (energyDischarged.isPresent) {
+        val optenergyDischarged = energyDischarged.get()
+        put(ContextSpecificTag(TAG_ENERGY_DISCHARGED), optenergyDischarged)
+      }
       endStructure()
     }
   }
@@ -53,6 +60,7 @@ class EnergyEvseClusterEnergyTransferStoppedEvent(
     private const val TAG_STATE = 1
     private const val TAG_REASON = 2
     private const val TAG_ENERGY_TRANSFERRED = 4
+    private const val TAG_ENERGY_DISCHARGED = 5
 
     fun fromTlv(tlvTag: Tag, tlvReader: TlvReader): EnergyEvseClusterEnergyTransferStoppedEvent {
       tlvReader.enterStructure(tlvTag)
@@ -60,6 +68,12 @@ class EnergyEvseClusterEnergyTransferStoppedEvent(
       val state = tlvReader.getUByte(ContextSpecificTag(TAG_STATE))
       val reason = tlvReader.getUByte(ContextSpecificTag(TAG_REASON))
       val energyTransferred = tlvReader.getLong(ContextSpecificTag(TAG_ENERGY_TRANSFERRED))
+      val energyDischarged =
+        if (tlvReader.isNextTag(ContextSpecificTag(TAG_ENERGY_DISCHARGED))) {
+          Optional.of(tlvReader.getLong(ContextSpecificTag(TAG_ENERGY_DISCHARGED)))
+        } else {
+          Optional.empty()
+        }
 
       tlvReader.exitContainer()
 
@@ -67,7 +81,8 @@ class EnergyEvseClusterEnergyTransferStoppedEvent(
         sessionID,
         state,
         reason,
-        energyTransferred
+        energyTransferred,
+        energyDischarged,
       )
     }
   }

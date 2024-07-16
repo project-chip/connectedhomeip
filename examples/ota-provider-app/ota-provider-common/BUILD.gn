@@ -23,9 +23,6 @@ config("config") {
 chip_data_model("ota-provider-common") {
   zap_file = "ota-provider-app.zap"
 
-  zap_pregenerated_dir =
-      "${chip_root}/zzz_generated/ota-provider-app/zap-generated"
-
   sources = [
     "BdxOtaSender.cpp",
     "BdxOtaSender.h",

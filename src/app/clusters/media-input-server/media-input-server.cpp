@@ -26,6 +26,7 @@
 
 #include <app-common/zap-generated/attributes/Accessors.h>
 #include <app/AttributeAccessInterface.h>
+#include <app/AttributeAccessInterfaceRegistry.h>
 #include <app/CommandHandler.h>
 #include <app/ConcreteCommandPath.h>
 #include <app/data-model/Encode.h>
@@ -39,7 +40,7 @@ using namespace chip::app::Clusters::MediaInput;
 using Protocols::InteractionModel::Status;
 
 static constexpr size_t kMediaInputDelegateTableSize =
-    EMBER_AF_MEDIA_INPUT_CLUSTER_SERVER_ENDPOINT_COUNT + CHIP_DEVICE_CONFIG_DYNAMIC_ENDPOINT_COUNT;
+    MATTER_DM_MEDIA_INPUT_CLUSTER_SERVER_ENDPOINT_COUNT + CHIP_DEVICE_CONFIG_DYNAMIC_ENDPOINT_COUNT;
 static_assert(kMediaInputDelegateTableSize <= kEmberInvalidEndpointIndex, "MediaInput Delegate tablle size error");
 
 // -----------------------------------------------------------------------------
@@ -54,7 +55,7 @@ Delegate * gDelegateTable[kMediaInputDelegateTableSize] = { nullptr };
 Delegate * GetDelegate(EndpointId endpoint)
 {
     uint16_t ep =
-        emberAfGetClusterServerEndpointIndex(endpoint, MediaInput::Id, EMBER_AF_MEDIA_INPUT_CLUSTER_SERVER_ENDPOINT_COUNT);
+        emberAfGetClusterServerEndpointIndex(endpoint, MediaInput::Id, MATTER_DM_MEDIA_INPUT_CLUSTER_SERVER_ENDPOINT_COUNT);
     return (ep >= kMediaInputDelegateTableSize ? nullptr : gDelegateTable[ep]);
 }
 
@@ -77,7 +78,7 @@ namespace MediaInput {
 void SetDefaultDelegate(EndpointId endpoint, Delegate * delegate)
 {
     uint16_t ep =
-        emberAfGetClusterServerEndpointIndex(endpoint, MediaInput::Id, EMBER_AF_MEDIA_INPUT_CLUSTER_SERVER_ENDPOINT_COUNT);
+        emberAfGetClusterServerEndpointIndex(endpoint, MediaInput::Id, MATTER_DM_MEDIA_INPUT_CLUSTER_SERVER_ENDPOINT_COUNT);
     if (ep < kMediaInputDelegateTableSize)
     {
         gDelegateTable[ep] = delegate;
@@ -92,8 +93,8 @@ bool HasFeature(chip::EndpointId endpoint, Feature feature)
     bool hasFeature     = false;
     uint32_t featureMap = 0;
 
-    EmberAfStatus status = Attributes::FeatureMap::Get(endpoint, &featureMap);
-    if (EMBER_ZCL_STATUS_SUCCESS == status)
+    Status status = Attributes::FeatureMap::Get(endpoint, &featureMap);
+    if (Status::Success == status)
     {
         hasFeature = (featureMap & chip::to_underlying(feature));
     }

@@ -19,7 +19,7 @@
 
 #import "MCCastingApp.h"
 
-#import "MCCastingPlayer.mm"
+#import "MCCastingPlayer_Internal.h"
 #import "MCErrorUtils.h"
 
 #include "core/CastingPlayer.h"

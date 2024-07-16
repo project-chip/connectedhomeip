@@ -18,10 +18,13 @@
 
 #include "OTAProviderDelegateBridge.h"
 
+#include <app/MessageDef/StatusIB.h>
 #include <app/clusters/ota-provider/ota-provider.h>
 #include <app/data-model/List.h>
 #include <lib/support/JniReferences.h>
 #include <lib/support/JniTypeWrappers.h>
+
+#include <string>
 
 using namespace chip;
 using namespace chip::app;
@@ -109,7 +112,8 @@ void OTAProviderDelegateBridge::HandleQueryImage(CommandHandler * commandObj, co
     CHIP_ERROR err = CHIP_NO_ERROR;
 
     JNIEnv * env = JniReferences::GetInstance().GetEnvForCurrentThread();
-    chip::JniLocalReferenceManager manager(env);
+    VerifyOrReturn(env != nullptr, ChipLogError(Controller, "Could not get JNIEnv for current thread"));
+    chip::JniLocalReferenceScope scope(env);
 
     jobject otaProviderDelegate      = nullptr;
     jmethodID handleQueryImageMethod = nullptr;
@@ -374,7 +378,7 @@ void OTAProviderDelegateBridge::HandleApplyUpdateRequest(CommandHandler * comman
     jmethodID getActionMethod;
     jmethodID getDelayedActionTimeMethod;
 
-    chip::JniLocalReferenceManager manager(env);
+    chip::JniLocalReferenceScope scope(env);
 
     Commands::ApplyUpdateResponse::Type response;
     Commands::ApplyUpdateResponse::Type errorResponse;

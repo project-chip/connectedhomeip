@@ -18,7 +18,7 @@
 #pragma once
 
 #include <app/AppConfig.h>
-#include <app/icd/ICDConfig.h>
+#include <app/icd/server/ICDServerConfig.h>
 
 #include <access/AccessControl.h>
 #include <access/examples/ExampleAccessControlDelegate.h>
@@ -70,12 +70,18 @@
 #include <transport/raw/UDP.h>
 
 #if CHIP_CONFIG_ENABLE_ICD_SERVER
-#include <app/icd/ICDManager.h> // nogncheck
+#include <app/icd/server/ICDManager.h> // nogncheck
 #endif
 
 namespace chip {
 
 inline constexpr size_t kMaxBlePendingPackets = 1;
+
+#if INET_CONFIG_ENABLE_TCP_ENDPOINT
+inline constexpr size_t kMaxTcpActiveConnectionCount = CHIP_CONFIG_MAX_ACTIVE_TCP_CONNECTIONS;
+
+inline constexpr size_t kMaxTcpPendingPackets = CHIP_CONFIG_MAX_TCP_PENDING_PACKETS;
+#endif // INET_CONFIG_ENABLE_TCP_ENDPOINT
 
 //
 // NOTE: Please do not alter the order of template specialization here as the logic
@@ -89,6 +95,10 @@ using ServerTransportMgr = chip::TransportMgr<chip::Transport::UDP
 #if CONFIG_NETWORK_LAYER_BLE
                                               ,
                                               chip::Transport::BLE<kMaxBlePendingPackets>
+#endif
+#if INET_CONFIG_ENABLE_TCP_ENDPOINT
+                                              ,
+                                              chip::Transport::TCP<kMaxTcpActiveConnectionCount, kMaxTcpPendingPackets>
 #endif
                                               >;
 
@@ -369,6 +379,18 @@ public:
 
 #if CHIP_CONFIG_ENABLE_ICD_SERVER
     app::ICDManager & GetICDManager() { return mICDManager; }
+
+#if CHIP_CONFIG_ENABLE_ICD_CIP
+    /**
+     * @brief Function to determine if a Check-In message would be sent at Boot up
+     *
+     * @param aFabricIndex client fabric index
+     * @param subjectID client subject ID
+     * @return true Check-In message would be sent on boot up.
+     * @return false Device has a persisted subscription with the client. See CHIP_CONFIG_PERSIST_SUBSCRIPTIONS.
+     */
+    bool ShouldCheckInMsgsBeSentAtBootFunction(FabricIndex aFabricIndex, NodeId subjectID);
+#endif // CHIP_CONFIG_ENABLE_ICD_CIP
 #endif // CHIP_CONFIG_ENABLE_ICD_SERVER
 
     /**
@@ -609,7 +631,7 @@ private:
     FabricTable mFabrics;
     secure_channel::MessageCounterManager mMessageCounterManager;
 #if CHIP_DEVICE_CONFIG_ENABLE_COMMISSIONER_DISCOVERY_CLIENT
-    chip::Protocols::UserDirectedCommissioning::UserDirectedCommissioningClient * gUDCClient = nullptr;
+    Protocols::UserDirectedCommissioning::UserDirectedCommissioningClient * gUDCClient = nullptr;
     // mUdcTransportMgr is for insecure communication (ex. user directed commissioning)
     // specifically, the commissioner declaration message (sent by commissioner to commissionee)
     UdcTransportMgr * mUdcTransportMgr = nullptr;

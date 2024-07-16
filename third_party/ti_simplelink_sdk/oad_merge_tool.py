@@ -14,12 +14,12 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-"""Simple hexmerge script for combining the BIM/MCUBoot image and App
+"""Simple hexmerge script for combining the MCUBoot image and App
 
-This script provides a basic utility to combine the OAD application binary file with the Boot Image Manager/MCUBoot hex file. The output is a combined hex file that can be programmed on the target and run.
+This script provides a basic utility to combine the OAD application binary file with the MCUBoot hex file. The output is a combined hex file that can be programmed on the target and run.
 
 Run with:
-    python oad_merge_tool.py <App bin (CC13x2)/App hex (CC13x4)> <BIM (CC13x2)/MCUBoot (CC13x4) hex> <output>
+    python oad_merge_tool.py <App hex (CC13x4)> <MCUBoot (CC13x4) hex> <output>
 """
 
 import sys

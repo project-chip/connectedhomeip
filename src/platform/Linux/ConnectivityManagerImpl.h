@@ -66,25 +66,25 @@ namespace DeviceLayer {
 #if CHIP_DEVICE_CONFIG_ENABLE_WPA
 struct GDBusWpaSupplicant
 {
-    enum WpaState
+    enum class WpaState
     {
         INIT,
-        WPA_CONNECTING,
-        WPA_CONNECTED,
-        WPA_NOT_CONNECTED,
-        WPA_NO_INTERFACE_PATH,
-        WPA_GOT_INTERFACE_PATH,
-        WPA_INTERFACE_CONNECTED,
+        CONNECTING,
+        CONNECTED,
+        NOT_CONNECTED,
+        NO_INTERFACE_PATH,
+        GOT_INTERFACE_PATH,
+        INTERFACE_CONNECTED,
     };
 
-    enum WpaScanning
+    enum class WpaScanningState
     {
-        WIFI_SCANNING_IDLE,
-        WIFI_SCANNING,
+        IDLE,
+        SCANNING,
     };
 
-    WpaState state                          = INIT;
-    WpaScanning scanState                   = WIFI_SCANNING_IDLE;
+    WpaState state                          = WpaState::INIT;
+    WpaScanningState scanState              = WpaScanningState::IDLE;
     WpaFiW1Wpa_supplicant1 * proxy          = nullptr;
     WpaFiW1Wpa_supplicant1Interface * iface = nullptr;
     WpaFiW1Wpa_supplicant1BSS * bss         = nullptr;
@@ -122,17 +122,23 @@ class ConnectivityManagerImpl final : public ConnectivityManager,
     // the implementation methods provided by this class.
     friend class ConnectivityManager;
 
-public:
 #if CHIP_DEVICE_CONFIG_ENABLE_WPA
+public:
     void
     SetNetworkStatusChangeCallback(NetworkCommissioning::Internal::BaseDriver::NetworkStatusChangeCallback * statusChangeCallback)
     {
         mpStatusChangeCallback = statusChangeCallback;
     }
+
     CHIP_ERROR ConnectWiFiNetworkAsync(ByteSpan ssid, ByteSpan credentials,
                                        NetworkCommissioning::Internal::WirelessDriver::ConnectCallback * connectCallback);
+#if CHIP_DEVICE_CONFIG_ENABLE_WIFI_PDC
+    CHIP_ERROR ConnectWiFiNetworkWithPDCAsync(ByteSpan ssid, ByteSpan networkIdentity, ByteSpan clientIdentity,
+                                              const Crypto::P256Keypair & clientIdentityKeypair,
+                                              NetworkCommissioning::Internal::WirelessDriver::ConnectCallback * connectCallback);
+#endif // CHIP_DEVICE_CONFIG_ENABLE_WIFI_PDC
+
     void PostNetworkConnect();
-    static void _ConnectWiFiNetworkAsyncCallback(GObject * source_object, GAsyncResult * res, gpointer user_data);
     CHIP_ERROR CommitConfig();
 
     void StartWiFiManagement();
@@ -144,12 +150,19 @@ public:
     CHIP_ERROR GetWiFiVersion(app::Clusters::WiFiNetworkDiagnostics::WiFiVersionEnum & wiFiVersion);
     CHIP_ERROR GetConfiguredNetwork(NetworkCommissioning::Network & network);
     CHIP_ERROR StartWiFiScan(ByteSpan ssid, NetworkCommissioning::WiFiDriver::ScanCallback * callback);
+
+private:
+    CHIP_ERROR _ConnectWiFiNetworkAsync(GVariant * networkArgs,
+                                        NetworkCommissioning::Internal::WirelessDriver::ConnectCallback * connectCallback)
+        CHIP_REQUIRES(mWpaSupplicantMutex);
+    void _ConnectWiFiNetworkAsyncCallback(GObject * sourceObject, GAsyncResult * res);
 #endif
 
+public:
     const char * GetEthernetIfName() { return (mEthIfName[0] == '\0') ? nullptr : mEthIfName; }
 
 #if CHIP_DEVICE_CONFIG_ENABLE_WIFI
-    static const char * GetWiFiIfName() { return (sWiFiIfName[0] == '\0') ? nullptr : sWiFiIfName; }
+    const char * GetWiFiIfName() { return (sWiFiIfName[0] == '\0') ? nullptr : sWiFiIfName; }
 #endif
 
 private:
@@ -192,29 +205,27 @@ private:
     System::Clock::Timeout _GetWiFiAPIdleTimeout();
     void _SetWiFiAPIdleTimeout(System::Clock::Timeout val);
     void UpdateNetworkStatus();
-    static CHIP_ERROR StopAutoScan();
+    CHIP_ERROR StopAutoScan();
 
-    static void _OnWpaProxyReady(GObject * source_object, GAsyncResult * res, gpointer user_data);
-    static void _OnWpaInterfaceRemoved(WpaFiW1Wpa_supplicant1 * proxy, const gchar * path, GVariant * properties,
-                                       gpointer user_data);
-    static void _OnWpaInterfaceAdded(WpaFiW1Wpa_supplicant1 * proxy, const gchar * path, GVariant * properties, gpointer user_data);
-    static void _OnWpaPropertiesChanged(WpaFiW1Wpa_supplicant1Interface * proxy, GVariant * changed_properties,
-                                        const gchar * const * invalidated_properties, gpointer user_data);
-    static void _OnWpaInterfaceReady(GObject * source_object, GAsyncResult * res, gpointer user_data);
-    static void _OnWpaInterfaceProxyReady(GObject * source_object, GAsyncResult * res, gpointer user_data);
-    static void _OnWpaBssProxyReady(GObject * source_object, GAsyncResult * res, gpointer user_data);
-    static void _OnWpaInterfaceScanDone(GObject * source_object, GAsyncResult * res, gpointer user_data);
+    void _OnWpaProxyReady(GObject * sourceObject, GAsyncResult * res);
+    void _OnWpaInterfaceRemoved(WpaFiW1Wpa_supplicant1 * proxy, const char * path, GVariant * properties);
+    void _OnWpaInterfaceAdded(WpaFiW1Wpa_supplicant1 * proxy, const char * path, GVariant * properties);
+    void _OnWpaPropertiesChanged(WpaFiW1Wpa_supplicant1Interface * proxy, GVariant * properties);
+    void _OnWpaInterfaceScanDone(WpaFiW1Wpa_supplicant1Interface * proxy, gboolean success);
+    void _OnWpaInterfaceReady(GObject * sourceObject, GAsyncResult * res);
+    void _OnWpaInterfaceProxyReady(GObject * sourceObject, GAsyncResult * res);
+    void _OnWpaBssProxyReady(GObject * sourceObject, GAsyncResult * res);
 
-    static bool _GetBssInfo(const gchar * bssPath, NetworkCommissioning::WiFiScanResponse & result);
+    bool _GetBssInfo(const gchar * bssPath, NetworkCommissioning::WiFiScanResponse & result);
 
-    static CHIP_ERROR _StartWiFiManagement(ConnectivityManagerImpl * self);
+    CHIP_ERROR _StartWiFiManagement();
 
-    static bool mAssociationStarted;
-    static BitFlags<ConnectivityFlags> mConnectivityFlag;
-    static GDBusWpaSupplicant mWpaSupplicant CHIP_GUARDED_BY(mWpaSupplicantMutex);
+    bool mAssociationStarted = false;
+    BitFlags<ConnectivityFlags> mConnectivityFlag;
+    GDBusWpaSupplicant mWpaSupplicant CHIP_GUARDED_BY(mWpaSupplicantMutex);
     // Access to mWpaSupplicant has to be protected by a mutex because it is accessed from
     // the CHIP event loop thread and dedicated D-Bus thread started by platform manager.
-    static std::mutex mWpaSupplicantMutex;
+    std::mutex mWpaSupplicantMutex;
 
     NetworkCommissioning::Internal::BaseDriver::NetworkStatusChangeCallback * mpStatusChangeCallback = nullptr;
 #endif
@@ -249,13 +260,15 @@ private:
 #endif
 
 #if CHIP_DEVICE_CONFIG_ENABLE_WIFI
-    static char sWiFiIfName[IFNAMSIZ];
+    char sWiFiIfName[IFNAMSIZ];
 #endif
 
-    static uint8_t sInterestedSSID[Internal::kMaxWiFiSSIDLength];
-    static uint8_t sInterestedSSIDLen;
-    static NetworkCommissioning::WiFiDriver::ScanCallback * mpScanCallback;
-    static NetworkCommissioning::Internal::WirelessDriver::ConnectCallback * mpConnectCallback;
+#if CHIP_DEVICE_CONFIG_ENABLE_WPA
+    uint8_t sInterestedSSID[Internal::kMaxWiFiSSIDLength];
+    uint8_t sInterestedSSIDLen;
+#endif
+    NetworkCommissioning::WiFiDriver::ScanCallback * mpScanCallback;
+    NetworkCommissioning::Internal::WirelessDriver::ConnectCallback * mpConnectCallback;
 };
 
 #if CHIP_DEVICE_CONFIG_ENABLE_WPA

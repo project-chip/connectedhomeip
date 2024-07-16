@@ -31,7 +31,7 @@ LockManager LockManager::sLock;
 
 TimerHandle_t sLockTimer;
 
-using namespace CC13X2_26X2DoorLock::LockInitParams;
+using namespace CC13X4_26X4DoorLock::LockInitParams;
 using namespace chip::DeviceLayer::PersistedStorage;
 
 // persisted storage keys

@@ -368,6 +368,14 @@ namespace TimeSnapshotResponse {
 static constexpr CommandId Id = 0x00000002;
 } // namespace TimeSnapshotResponse
 
+namespace PayloadTestRequest {
+static constexpr CommandId Id = 0x00000003;
+} // namespace PayloadTestRequest
+
+namespace PayloadTestResponse {
+static constexpr CommandId Id = 0x00000004;
+} // namespace PayloadTestResponse
+
 } // namespace Commands
 } // namespace GeneralDiagnostics
 
@@ -792,14 +800,6 @@ namespace Pause {
 static constexpr CommandId Id = 0x00000000;
 } // namespace Pause
 
-namespace Stop {
-static constexpr CommandId Id = 0x00000001;
-} // namespace Stop
-
-namespace Start {
-static constexpr CommandId Id = 0x00000002;
-} // namespace Start
-
 namespace Resume {
 static constexpr CommandId Id = 0x00000003;
 } // namespace Resume
@@ -929,6 +929,20 @@ static constexpr CommandId Id = 0x00000001;
 } // namespace Commands
 } // namespace ValveConfigurationAndControl
 
+namespace WaterHeaterManagement {
+namespace Commands {
+
+namespace Boost {
+static constexpr CommandId Id = 0x00000000;
+} // namespace Boost
+
+namespace CancelBoost {
+static constexpr CommandId Id = 0x00000001;
+} // namespace CancelBoost
+
+} // namespace Commands
+} // namespace WaterHeaterManagement
+
 namespace DemandResponseLoadControl {
 namespace Commands {
 
@@ -954,6 +968,20 @@ static constexpr CommandId Id = 0x00000004;
 
 } // namespace Commands
 } // namespace DemandResponseLoadControl
+
+namespace Messages {
+namespace Commands {
+
+namespace PresentMessagesRequest {
+static constexpr CommandId Id = 0x00000000;
+} // namespace PresentMessagesRequest
+
+namespace CancelMessagesRequest {
+static constexpr CommandId Id = 0x00000001;
+} // namespace CancelMessagesRequest
+
+} // namespace Commands
+} // namespace Messages
 
 namespace DeviceEnergyManagement {
 namespace Commands {
@@ -1221,6 +1249,28 @@ static constexpr CommandId Id = 0x00000001;
 } // namespace Commands
 } // namespace BarrierControl
 
+namespace ServiceArea {
+namespace Commands {
+
+namespace SelectLocations {
+static constexpr CommandId Id = 0x00000000;
+} // namespace SelectLocations
+
+namespace SelectLocationsResponse {
+static constexpr CommandId Id = 0x00000001;
+} // namespace SelectLocationsResponse
+
+namespace SkipCurrentLocation {
+static constexpr CommandId Id = 0x00000002;
+} // namespace SkipCurrentLocation
+
+namespace SkipCurrentLocationResponse {
+static constexpr CommandId Id = 0x00000003;
+} // namespace SkipCurrentLocationResponse
+
+} // namespace Commands
+} // namespace ServiceArea
+
 namespace Thermostat {
 namespace Commands {
 
@@ -1366,6 +1416,68 @@ static constexpr CommandId Id = 0x0000004C;
 
 } // namespace Commands
 } // namespace ColorControl
+
+namespace WiFiNetworkManagement {
+namespace Commands {
+
+namespace NetworkPassphraseRequest {
+static constexpr CommandId Id = 0x00000000;
+} // namespace NetworkPassphraseRequest
+
+namespace NetworkPassphraseResponse {
+static constexpr CommandId Id = 0x00000001;
+} // namespace NetworkPassphraseResponse
+
+} // namespace Commands
+} // namespace WiFiNetworkManagement
+
+namespace ThreadBorderRouterManagement {
+namespace Commands {
+
+namespace GetActiveDatasetRequest {
+static constexpr CommandId Id = 0x00000000;
+} // namespace GetActiveDatasetRequest
+
+namespace GetPendingDatasetRequest {
+static constexpr CommandId Id = 0x00000001;
+} // namespace GetPendingDatasetRequest
+
+namespace DatasetResponse {
+static constexpr CommandId Id = 0x00000002;
+} // namespace DatasetResponse
+
+namespace SetActiveDatasetRequest {
+static constexpr CommandId Id = 0x00000003;
+} // namespace SetActiveDatasetRequest
+
+namespace SetPendingDatasetRequest {
+static constexpr CommandId Id = 0x00000004;
+} // namespace SetPendingDatasetRequest
+
+} // namespace Commands
+} // namespace ThreadBorderRouterManagement
+
+namespace ThreadNetworkDirectory {
+namespace Commands {
+
+namespace AddNetwork {
+static constexpr CommandId Id = 0x00000000;
+} // namespace AddNetwork
+
+namespace RemoveNetwork {
+static constexpr CommandId Id = 0x00000001;
+} // namespace RemoveNetwork
+
+namespace GetOperationalDataset {
+static constexpr CommandId Id = 0x00000002;
+} // namespace GetOperationalDataset
+
+namespace OperationalDatasetResponse {
+static constexpr CommandId Id = 0x00000003;
+} // namespace OperationalDatasetResponse
+
+} // namespace Commands
+} // namespace ThreadNetworkDirectory
 
 namespace Channel {
 namespace Commands {
@@ -1671,6 +1783,24 @@ static constexpr CommandId Id = 0x00000001;
 } // namespace Commands
 } // namespace ContentAppObserver
 
+namespace CommissionerControl {
+namespace Commands {
+
+namespace RequestCommissioningApproval {
+static constexpr CommandId Id = 0x00000000;
+} // namespace RequestCommissioningApproval
+
+namespace CommissionNode {
+static constexpr CommandId Id = 0x00000001;
+} // namespace CommissionNode
+
+namespace ReverseOpenCommissioningWindow {
+static constexpr CommandId Id = 0x00000002;
+} // namespace ReverseOpenCommissioningWindow
+
+} // namespace Commands
+} // namespace CommissionerControl
+
 namespace ElectricalMeasurement {
 namespace Commands {
 
@@ -1804,6 +1934,10 @@ namespace TestListInt8UReverseRequest {
 static constexpr CommandId Id = 0x0000000D;
 } // namespace TestListInt8UReverseRequest
 
+namespace StringEchoResponse {
+static constexpr CommandId Id = 0x0000000D;
+} // namespace StringEchoResponse
+
 namespace TestEnumsRequest {
 static constexpr CommandId Id = 0x0000000E;
 } // namespace TestEnumsRequest
@@ -1843,6 +1977,10 @@ static constexpr CommandId Id = 0x00000016;
 namespace TestSecondBatchHelperRequest {
 static constexpr CommandId Id = 0x00000017;
 } // namespace TestSecondBatchHelperRequest
+
+namespace StringEchoRequest {
+static constexpr CommandId Id = 0x00000018;
+} // namespace StringEchoRequest
 
 namespace TestDifferentVendorMeiRequest {
 static constexpr CommandId Id = 0xFFF200AA;

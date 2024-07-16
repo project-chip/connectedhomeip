@@ -71,10 +71,6 @@ private:
                         PacketBufferHandle pBuf);
     bool SendWriteRequest(BLE_CONNECTION_OBJECT conId, const ChipBleUUID * svcId, const ChipBleUUID * charId,
                           PacketBufferHandle pBuf);
-    bool SendReadRequest(BLE_CONNECTION_OBJECT conId, const ChipBleUUID * svcId, const ChipBleUUID * charId,
-                         PacketBufferHandle pBuf);
-    bool SendReadResponse(BLE_CONNECTION_OBJECT conId, BLE_READ_REQUEST_CONTEXT requestContext, const ChipBleUUID * svcId,
-                          const ChipBleUUID * charId);
 
     // ===== Members that implement virtual methods on BleApplicationDelegate.
 
@@ -91,12 +87,13 @@ private:
         kAdvertisingRefreshNeeded =
             0x0010, /**< The advertising state/configuration has changed, but the SoftDevice has yet to be updated. */
         kChipoBleGattServiceRegister = 0x0020, /**< The system has currently CHIPoBLE GATT service registered. */
+        kExtendedAdvertisingEnabled  = 0x0040, /**< The application has enabled extended advertising. */
     };
 
     struct ServiceData;
 
     BitFlags<Flags> mFlags;
-    uint16_t mGAPConns;
+    uint16_t mMatterConnNum;
     CHIPoBLEServiceMode mServiceMode;
     bool mSubscribedConns[CONFIG_BT_MAX_CONN];
     bt_gatt_indicate_params mIndicateParams[CONFIG_BT_MAX_CONN];
@@ -105,6 +102,8 @@ private:
 #if CHIP_ENABLE_ADDITIONAL_DATA_ADVERTISING
     PacketBufferHandle c3CharDataBufferHandle;
 #endif
+    // The summarized number of Bluetooth LE connections related to the device (including these not related to Matter service).
+    uint16_t mTotalConnNum;
 
     void DriveBLEState(void);
     CHIP_ERROR PrepareAdvertisingRequest();
@@ -122,6 +121,8 @@ private:
     bool SetSubscribed(bt_conn * conn);
     bool UnsetSubscribed(bt_conn * conn);
     uint32_t GetAdvertisingInterval();
+    CHIP_ERROR RegisterGattService();
+    CHIP_ERROR UnregisterGattService();
 
     static void DriveBLEState(intptr_t arg);
 
@@ -129,7 +130,8 @@ private:
     static void HandleTXIndicated(bt_conn * conn, bt_gatt_indicate_params * attr, uint8_t err);
     static void HandleConnect(bt_conn * conn, uint8_t err);
     static void HandleDisconnect(bt_conn * conn, uint8_t reason);
-    static void HandleBLEAdvertisementIntervalChange(System::Layer * layer, void * param);
+    static void HandleSlowBLEAdvertisementInterval(System::Layer * layer, void * param);
+    static void HandleExtendedBLEAdvertisementInterval(System::Layer * layer, void * param);
 
     // ===== Members for internal use by the following friends.
 

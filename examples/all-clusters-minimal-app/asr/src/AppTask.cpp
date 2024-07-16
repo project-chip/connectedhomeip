@@ -34,6 +34,7 @@
 #include <app/server/OnboardingCodesUtil.h>
 #include <app/server/Server.h>
 #include <app/util/attribute-storage.h>
+#include <app/util/endpoint-config-api.h>
 #include <assert.h>
 #include <event_groups.h>
 #include <platform/ASR/NetworkCommissioningDriver.h>
@@ -221,11 +222,11 @@ void AppTask::OnOffUpdateClusterState(void)
     uint8_t onoff = sLightLED.Get();
 
     // write the new on/off value
-    EmberAfStatus status = app::Clusters::OnOff::Attributes::OnOff::Set(2, onoff);
+    Protocols::InteractionModel::Status status = app::Clusters::OnOff::Attributes::OnOff::Set(2, onoff);
 
-    if (status != EMBER_ZCL_STATUS_SUCCESS)
+    if (status != Protocols::InteractionModel::Status::Success)
     {
-        ASR_LOG("ERR: updating on/off %x", status);
+        ASR_LOG("ERR: updating on/off %x", to_underlying(status));
     }
 }
 

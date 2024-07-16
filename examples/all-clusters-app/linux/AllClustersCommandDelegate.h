@@ -23,6 +23,8 @@
 #include <json/json.h>
 #include <platform/DiagnosticDataProvider.h>
 
+#include <string>
+
 class AllClustersAppCommandHandler
 {
 public:
@@ -98,6 +100,11 @@ private:
      * Should be called when it is necessary to change the air quality attribute.
      */
     void OnAirQualityChange(uint32_t aEnum);
+
+    /**
+     * Should be called when it is necessary to change the operational state as a manual operation.
+     */
+    void OnOperationalStateChange(std::string device, std::string operation, Json::Value param);
 };
 
 class AllClustersCommandDelegate : public NamedPipeCommandDelegate

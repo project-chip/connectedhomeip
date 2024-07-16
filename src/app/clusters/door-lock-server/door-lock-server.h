@@ -24,10 +24,13 @@
 
 #pragma once
 
+#include "door-lock-delegate.h"
 #include <app-common/zap-generated/cluster-objects.h>
+#include <app/AttributeAccessInterface.h>
 #include <app/CommandHandler.h>
 #include <app/ConcreteCommandPath.h>
-#include <app/util/af.h>
+#include <app/reporting/reporting.h>
+#include <app/util/attribute-storage.h>
 #include <app/util/config.h>
 #include <platform/CHIPDeviceConfig.h>
 #include <protocols/interaction_model/StatusCode.h>
@@ -83,20 +86,43 @@ struct EmberAfDoorLockEndpointContext
 {
     chip::System::Clock::Timestamp lockoutEndTimestamp;
     int wrongCodeEntryAttempts;
+    chip::app::Clusters::DoorLock::Delegate * delegate = nullptr;
 };
 
 /**
  * @brief Door Lock Server Plugin class.
  */
-class DoorLockServer
+class DoorLockServer : public chip::app::AttributeAccessInterface
 {
 public:
+    DoorLockServer() : AttributeAccessInterface(chip::Optional<chip::EndpointId>::Missing(), chip::app::Clusters::DoorLock::Id) {}
     static DoorLockServer & Instance();
 
     using Feature                       = chip::app::Clusters::DoorLock::Feature;
     using OnFabricRemovedCustomCallback = void (*)(chip::EndpointId endpointId, chip::FabricIndex fabricIndex);
 
-    void InitServer(chip::EndpointId endpointId);
+    /**
+     * Multiple InitEndpoint calls can happen for different endpoints.  Calling
+     * InitEndpoint twice for the same endpoint requires a ShutdownEndpoint call
+     * for that endpoint in between.
+     *
+     * A DoorLock::Delegate is optional, but needs to be provided in either
+     * InitEndpoint or in a separate SetDelegate call for Aliro features, and
+     * possibly other new features, to work.
+     */
+    CHIP_ERROR InitEndpoint(chip::EndpointId endpointId, chip::app::Clusters::DoorLock::Delegate * delegate = nullptr);
+
+    void ShutdownEndpoint(chip::EndpointId endpointId);
+
+    // InitServer is a deprecated alias for InitEndpoint with no delegate.
+    void InitServer(chip::EndpointId endpointid);
+
+    /**
+     * Delegate is not supposed to be null. Removing a delegate
+     * should only happen when shutting down the door lock cluster on the
+     * endpoint, via ShutdownEndpoint.
+     */
+    CHIP_ERROR SetDelegate(chip::EndpointId endpointId, chip::app::Clusters::DoorLock::Delegate * delegate);
 
     /**
      * Updates the LockState attribute with new value and sends LockOperation event.
@@ -159,49 +185,73 @@ public:
 
     bool SendLockAlarmEvent(chip::EndpointId endpointId, AlarmCodeEnum alarmCode);
 
-    chip::BitFlags<Feature> GetFeatures(chip::EndpointId endpointId);
+    static chip::BitFlags<Feature> GetFeatures(chip::EndpointId endpointId);
 
-    inline bool SupportsPIN(chip::EndpointId endpointId) { return GetFeatures(endpointId).Has(Feature::kPinCredential); }
+    static inline bool SupportsPIN(chip::EndpointId endpointId) { return GetFeatures(endpointId).Has(Feature::kPinCredential); }
 
-    inline bool SupportsRFID(chip::EndpointId endpointId) { return GetFeatures(endpointId).Has(Feature::kRfidCredential); }
+    static inline bool SupportsRFID(chip::EndpointId endpointId) { return GetFeatures(endpointId).Has(Feature::kRfidCredential); }
 
-    inline bool SupportsFingers(chip::EndpointId endpointId) { return GetFeatures(endpointId).Has(Feature::kFingerCredentials); }
+    static inline bool SupportsFingers(chip::EndpointId endpointId)
+    {
+        return GetFeatures(endpointId).Has(Feature::kFingerCredentials);
+    }
 
-    inline bool SupportsFace(chip::EndpointId endpointId) { return GetFeatures(endpointId).Has(Feature::kFaceCredentials); }
+    static inline bool SupportsFace(chip::EndpointId endpointId) { return GetFeatures(endpointId).Has(Feature::kFaceCredentials); }
 
-    inline bool SupportsWeekDaySchedules(chip::EndpointId endpointId)
+    static inline bool SupportsWeekDaySchedules(chip::EndpointId endpointId)
     {
         return GetFeatures(endpointId).Has(Feature::kWeekDayAccessSchedules);
     }
 
-    inline bool SupportsYearDaySchedules(chip::EndpointId endpointId)
+    static inline bool SupportsYearDaySchedules(chip::EndpointId endpointId)
     {
         return GetFeatures(endpointId).Has(Feature::kYearDayAccessSchedules);
     }
 
-    inline bool SupportsHolidaySchedules(chip::EndpointId endpointId)
+    static inline bool SupportsHolidaySchedules(chip::EndpointId endpointId)
     {
         return GetFeatures(endpointId).Has(Feature::kHolidaySchedules);
     }
 
-    inline bool SupportsAnyCredential(chip::EndpointId endpointId)
+    static inline bool SupportsAnyCredential(chip::EndpointId endpointId)
     {
         return GetFeatures(endpointId)
-            .HasAny(Feature::kPinCredential, Feature::kRfidCredential, Feature::kFingerCredentials, Feature::kFaceCredentials);
+            .HasAny(Feature::kPinCredential, Feature::kRfidCredential, Feature::kFingerCredentials, Feature::kFaceCredentials,
+                    Feature::kAliroProvisioning);
     }
 
-    inline bool SupportsCredentialsOTA(chip::EndpointId endpointId)
+    static inline bool SupportsCredentialsOTA(chip::EndpointId endpointId)
     {
         return GetFeatures(endpointId).Has(Feature::kCredentialsOverTheAirAccess);
     }
 
-    inline bool SupportsUSR(chip::EndpointId endpointId)
+    static inline bool SupportsUSR(chip::EndpointId endpointId)
     {
         // appclusters, 5.2.2: USR feature has conformance [PIN | RID | FGP | FACE]
         return GetFeatures(endpointId).Has(Feature::kUser) && SupportsAnyCredential(endpointId);
     }
 
-    inline bool SupportsUnbolt(chip::EndpointId endpointId) { return GetFeatures(endpointId).Has(Feature::kUnbolt); }
+    static bool SupportsUnbolt(chip::EndpointId endpointId) { return GetFeatures(endpointId).Has(Feature::kUnbolt); }
+
+    /**
+     * @brief Checks if Aliro Provisioning feature is supported on the given endpoint
+     *
+     * @param endpointId endpointId ID of the endpoint which contains the lock.
+     */
+    static inline bool SupportsAliroProvisioning(chip::EndpointId endpointId)
+    {
+        return GetFeatures(endpointId).Has(Feature::kAliroProvisioning);
+    }
+
+    /**
+     * @brief Checks if Aliro BLE UWB feature is supported on the given endpoint
+     *
+     * @param endpointId endpointId ID of the endpoint which contains the lock.
+     */
+    static inline bool SupportsAliroBLEUWB(chip::EndpointId endpointId)
+    {
+        return GetFeatures(endpointId).Has(Feature::kAliroBLEUWB);
+    }
 
     /**
      * @brief Allows the application to register a custom callback which will be called after the default DoorLock
@@ -274,15 +324,17 @@ private:
     bool findUserIndexByCredential(chip::EndpointId endpointId, CredentialTypeEnum credentialType, chip::ByteSpan credentialData,
                                    uint16_t & userIndex, uint16_t & credentialIndex, EmberAfPluginDoorLockUserInfo & userInfo);
 
-    EmberAfStatus createUser(chip::EndpointId endpointId, chip::FabricIndex creatorFabricIdx, chip::NodeId sourceNodeId,
-                             uint16_t userIndex, const Nullable<chip::CharSpan> & userName, const Nullable<uint32_t> & userUniqueId,
-                             const Nullable<UserStatusEnum> & userStatus, const Nullable<UserTypeEnum> & userType,
-                             const Nullable<CredentialRuleEnum> & credentialRule,
-                             const Nullable<CredentialStruct> & credential = Nullable<CredentialStruct>());
-    EmberAfStatus modifyUser(chip::EndpointId endpointId, chip::FabricIndex modifierFabricIndex, chip::NodeId sourceNodeId,
-                             uint16_t userIndex, const Nullable<chip::CharSpan> & userName, const Nullable<uint32_t> & userUniqueId,
-                             const Nullable<UserStatusEnum> & userStatus, const Nullable<UserTypeEnum> & userType,
-                             const Nullable<CredentialRuleEnum> & credentialRule);
+    chip::Protocols::InteractionModel::ClusterStatusCode
+    createUser(chip::EndpointId endpointId, chip::FabricIndex creatorFabricIdx, chip::NodeId sourceNodeId, uint16_t userIndex,
+               const Nullable<chip::CharSpan> & userName, const Nullable<uint32_t> & userUniqueId,
+               const Nullable<UserStatusEnum> & userStatus, const Nullable<UserTypeEnum> & userType,
+               const Nullable<CredentialRuleEnum> & credentialRule,
+               const Nullable<CredentialStruct> & credential = Nullable<CredentialStruct>());
+    chip::Protocols::InteractionModel::Status
+    modifyUser(chip::EndpointId endpointId, chip::FabricIndex modifierFabricIndex, chip::NodeId sourceNodeId, uint16_t userIndex,
+               const Nullable<chip::CharSpan> & userName, const Nullable<uint32_t> & userUniqueId,
+               const Nullable<UserStatusEnum> & userStatus, const Nullable<UserTypeEnum> & userType,
+               const Nullable<CredentialRuleEnum> & credentialRule);
     chip::Protocols::InteractionModel::Status clearUser(chip::EndpointId endpointId, chip::FabricIndex modifierFabricId,
                                                         chip::NodeId sourceNodeId, uint16_t userIndex, bool sendUserChangeEvent);
     chip::Protocols::InteractionModel::Status clearUser(chip::EndpointId endpointId, chip::FabricIndex modifierFabricId,
@@ -308,6 +360,12 @@ private:
                               const EmberAfPluginDoorLockCredentialInfo & existingCredential, const chip::ByteSpan & credentialData,
                               Nullable<uint16_t> userIndex, const Nullable<UserStatusEnum> & userStatus,
                               Nullable<UserTypeEnum> userType, uint16_t & createdUserIndex);
+    /**
+     * countOccupiedCredentials counts the number of occupied credentials of the
+     * given type.  Returns false on application-side errors (i.e. if the count
+     * cannot be determined).
+     */
+    bool countOccupiedCredentials(chip::EndpointId endpointId, CredentialTypeEnum credentialType, size_t & occupiedCount);
     DlStatus modifyProgrammingPIN(chip::EndpointId endpointId, chip::FabricIndex modifierFabricIndex, chip::NodeId sourceNodeId,
                                   uint16_t credentialIndex, CredentialTypeEnum credentialType,
                                   const EmberAfPluginDoorLockCredentialInfo & existingCredential,
@@ -430,6 +488,13 @@ private:
     void clearHolidayScheduleCommandHandler(chip::app::CommandHandler * commandObj,
                                             const chip::app::ConcreteCommandPath & commandPath, uint8_t holidayIndex);
 
+    void setAliroReaderConfigCommandHandler(chip::app::CommandHandler * commandObj,
+                                            const chip::app::ConcreteCommandPath & commandPath, const chip::ByteSpan & signingKey,
+                                            const chip::ByteSpan & verificationKey, const chip::ByteSpan & groupIdentifier,
+                                            const Optional<chip::ByteSpan> & groupResolvingKey);
+    void clearAliroReaderConfigCommandHandler(chip::app::CommandHandler * commandObj,
+                                              const chip::app::ConcreteCommandPath & commandPath);
+
     bool RemoteOperationEnabled(chip::EndpointId endpointId) const;
 
     EmberAfDoorLockEndpointContext * getContext(chip::EndpointId endpointId);
@@ -437,7 +502,14 @@ private:
     bool engageLockout(chip::EndpointId endpointId);
 
     static void sendClusterResponse(chip::app::CommandHandler * commandObj, const chip::app::ConcreteCommandPath & commandPath,
-                                    EmberAfStatus status);
+                                    chip::Protocols::InteractionModel::ClusterStatusCode status);
+
+    /**
+     * Get the DoorLock::Delegate for the given endpoint, if any. Will return
+     * null if there is no door lock server initialized on that endpoint or if
+     * there is no delegate associated with the initialized server.
+     */
+    chip::app::Clusters::DoorLock::Delegate * GetDelegate(chip::EndpointId endpointId);
 
     /**
      * @brief Common handler for LockDoor, UnlockDoor, UnlockWithTimeout commands
@@ -503,8 +575,8 @@ private:
      * @return false        if attribute reading failed (value is kept unchanged)
      */
     template <typename T>
-    bool GetAttribute(chip::EndpointId endpointId, chip::AttributeId attributeId,
-                      EmberAfStatus (*getFn)(chip::EndpointId endpointId, T * value), T & value) const;
+    static bool GetAttribute(chip::EndpointId endpointId, chip::AttributeId attributeId,
+                             chip::Protocols::InteractionModel::Status (*getFn)(chip::EndpointId endpointId, T * value), T & value);
 
     /**
      * @brief Set generic attribute value
@@ -519,7 +591,59 @@ private:
      */
     template <typename T>
     bool SetAttribute(chip::EndpointId endpointId, chip::AttributeId attributeId,
-                      EmberAfStatus (*setFn)(chip::EndpointId endpointId, T value), T value);
+                      chip::Protocols::InteractionModel::Status (*setFn)(chip::EndpointId endpointId, T value), T value);
+
+    // AttributeAccessInterface's Read API
+    CHIP_ERROR Read(const chip::app::ConcreteReadAttributePath & aPath, chip::app::AttributeValueEncoder & aEncoder) override;
+
+    /**
+     * @brief Reads AliroExpeditedTransactionSupportedProtocolVersions attribute for door lock
+     *
+     * @param aEncoder      attribute value encoder.
+     * @param delegate      door lock cluster delegate that will provide the value
+     *
+     * @return CHIP_NO_ERROR  on success
+     * @return CHIP_ERROR     if attribute read failed
+     */
+    CHIP_ERROR ReadAliroExpeditedTransactionSupportedProtocolVersions(chip::app::AttributeValueEncoder & aEncoder,
+                                                                      chip::app::Clusters::DoorLock::Delegate * delegate);
+
+    /**
+     * @brief Reads AliroSupportedBLEUWBProtocolVersions attribute for door lock
+     *
+     * @param aEncoder      attribute value encoder.
+     * @param delegate      door lock cluster delegate that will provide the value
+     *
+     * @return CHIP_NO_ERROR  on success
+     * @return CHIP_ERROR     if attribute read failed
+     */
+    CHIP_ERROR ReadAliroSupportedBLEUWBProtocolVersions(chip::app::AttributeValueEncoder & aEncoder,
+                                                        chip::app::Clusters::DoorLock::Delegate * delegate);
+
+    /**
+     * @brief Indicates whether an attribute can be nullable or not.
+     */
+    enum class AttributeNullabilityType : uint8_t
+    {
+        kNullable    = 0, /**< Indicates if an attribute is nullable */
+        kNotNullable = 1, /**< Indicates if an attribute is not nullable */
+    };
+
+    /**
+     * @brief Utility to read aliro attributes of type ByteSpan
+     *
+     * @param func          getter function for the attribute.
+     * @param data          buffer for the data.
+     * @param delegate      door lock cluster delegate that will provide the value
+     * @param aEncoder      attribute value encoder.
+     * @param nullabilityType enum value indicating whether the attribute is nullable or not.
+     *
+     * @return CHIP_NO_ERROR  on success
+     * @return CHIP_ERROR     if attribute read failed
+     */
+    CHIP_ERROR ReadAliroByteSpanAttribute(CHIP_ERROR (chip::app::Clusters::DoorLock::Delegate::*func)(chip::MutableByteSpan & data),
+                                          chip::MutableByteSpan & data, chip::app::Clusters::DoorLock::Delegate * delegate,
+                                          chip::app::AttributeValueEncoder & aEncoder, AttributeNullabilityType nullabilityType);
 
     friend bool
     emberAfDoorLockClusterLockDoorCallback(chip::app::CommandHandler * commandObj,
@@ -601,8 +725,16 @@ private:
         chip::app::CommandHandler * commandObj, const chip::app::ConcreteCommandPath & commandPath,
         const chip::app::Clusters::DoorLock::Commands::ClearYearDaySchedule::DecodableType & commandData);
 
+    friend bool emberAfDoorLockClusterSetAliroReaderConfigCallback(
+        chip::app::CommandHandler * commandObj, const chip::app::ConcreteCommandPath & commandPath,
+        const chip::app::Clusters::DoorLock::Commands::SetAliroReaderConfig::DecodableType & commandData);
+
+    friend bool emberAfDoorLockClusterClearAliroReaderConfigCallback(
+        chip::app::CommandHandler * commandObj, const chip::app::ConcreteCommandPath & commandPath,
+        const chip::app::Clusters::DoorLock::Commands::ClearAliroReaderConfig::DecodableType & commandData);
+
     static constexpr size_t kDoorLockClusterServerMaxEndpointCount =
-        EMBER_AF_DOOR_LOCK_CLUSTER_SERVER_ENDPOINT_COUNT + CHIP_DEVICE_CONFIG_DYNAMIC_ENDPOINT_COUNT;
+        MATTER_DM_DOOR_LOCK_CLUSTER_SERVER_ENDPOINT_COUNT + CHIP_DEVICE_CONFIG_DYNAMIC_ENDPOINT_COUNT;
     static_assert(kDoorLockClusterServerMaxEndpointCount <= kEmberInvalidEndpointIndex, "DoorLock Endpoint count error");
 
     std::array<EmberAfDoorLockEndpointContext, kDoorLockClusterServerMaxEndpointCount> mEndpointCtx;
@@ -632,9 +764,9 @@ enum class DlAssetSource : uint8_t
  */
 struct EmberAfPluginDoorLockCredentialInfo
 {
-    DlCredentialStatus status;         /**< Indicates if credential slot is occupied or not. */
-    CredentialTypeEnum credentialType; /**< Specifies the type of the credential (PIN, RFID, etc.). */
-    chip::ByteSpan credentialData;     /**< Credential data bytes. */
+    DlCredentialStatus status = DlCredentialStatus::kAvailable; /**< Indicates if credential slot is occupied or not. */
+    CredentialTypeEnum credentialType;                          /**< Specifies the type of the credential (PIN, RFID, etc.). */
+    chip::ByteSpan credentialData;                              /**< Credential data bytes. */
 
     DlAssetSource creationSource;
     chip::FabricIndex createdBy; /**< Index of the fabric that created the user. */

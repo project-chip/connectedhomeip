@@ -44,6 +44,7 @@ qpg_executable("persistent_storage_app") {
     ":sdk",
     "${chip_root}/src/app",
     "${chip_root}/src/lib",
+    "${chip_root}/src/platform/logging:default",
   ]
 
   include_dirs += [
@@ -58,7 +59,7 @@ qpg_executable("persistent_storage_app") {
 
   output_dir = root_out_dir
 
-  ldscript = "${qpg_sdk_root}/Libraries/Qorvo/QorvoStack/gen/QorvoStack_${qpg_target_ic}/QorvoStack_${qpg_target_ic}.ld"
+  ldscript = "${qpg_sdk_root}/Libraries/Qorvo/QorvoStack/gen/QorvoStack_${qpg_target_ic}${qpg_flavour}/QorvoStack_${qpg_target_ic}${qpg_flavour}.ld"
 
   inputs = [ ldscript ]
 

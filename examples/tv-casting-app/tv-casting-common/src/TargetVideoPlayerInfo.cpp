@@ -224,7 +224,7 @@ bool TargetVideoPlayerInfo::IsSameAs(const char * hostName, const char * deviceN
     return true;
 }
 
-bool TargetVideoPlayerInfo::IsSameAs(const chip::Dnssd::DiscoveredNodeData * discoveredNodeData)
+bool TargetVideoPlayerInfo::IsSameAs(const chip::Dnssd::CommissionNodeData * discoveredNodeData)
 {
     // return false because 'this' VideoPlayer is not null
     if (discoveredNodeData == nullptr)
@@ -232,6 +232,6 @@ bool TargetVideoPlayerInfo::IsSameAs(const chip::Dnssd::DiscoveredNodeData * dis
         return false;
     }
 
-    return IsSameAs(discoveredNodeData->resolutionData.hostName, discoveredNodeData->commissionData.deviceName,
-                    discoveredNodeData->resolutionData.numIPs, discoveredNodeData->resolutionData.ipAddress);
+    return IsSameAs(discoveredNodeData->hostName, discoveredNodeData->deviceName, discoveredNodeData->numIPs,
+                    discoveredNodeData->ipAddress);
 }

@@ -25,7 +25,9 @@
 #include <lib/support/BytesToHex.h>
 #include <lib/support/CodeUtils.h>
 #include <lib/support/StringBuilder.h>
+#include <string>
 #include <transport/raw/MessageHeader.h>
+#include <vector>
 
 constexpr uint16_t kMaxLineLen    = 4096;
 constexpr const char jsonPrefix[] = "    json\t";

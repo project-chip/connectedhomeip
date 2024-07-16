@@ -38,12 +38,10 @@ CHIP_ERROR CommandResponseSender::OnMessageReceived(Messaging::ExchangeContext *
         err = statusError;
         VerifyOrExit(err == CHIP_NO_ERROR, failureStatusToSend.SetValue(Status::InvalidAction));
 
-        // If SendCommandResponse() fails, we are responsible for closing the exchange,
-        // as stipulated by the API contract. We fulfill this obligation by not sending
-        // a message expecting a response on the exchange. Since we are in the middle
-        // of processing an incoming message, the exchange will close itself once we are
-        // done processing it, if there is no response to wait for at that point.
         err = SendCommandResponse();
+        // If SendCommandResponse() fails, we must close the exchange. We signal the failure to the
+        // requester with a StatusResponse ('Failure'). Since we're in the middle of processing an
+        // incoming message, we close the exchange by indicating that we don't expect a further response.
         VerifyOrExit(err == CHIP_NO_ERROR, failureStatusToSend.SetValue(Status::Failure));
 
         bool moreToSend = !mChunks.IsNull();
@@ -81,13 +79,28 @@ void CommandResponseSender::OnResponseTimeout(Messaging::ExchangeContext * apExc
     Close();
 }
 
-CHIP_ERROR CommandResponseSender::StartSendingCommandResponses()
+void CommandResponseSender::StartSendingCommandResponses()
 {
-    VerifyOrReturnError(mState == State::ReadyForInvokeResponses, CHIP_ERROR_INCORRECT_STATE);
-    // If SendCommandResponse() fails, we are obligated to close the exchange as per the API
-    // contract. However, this method's contract also stipulates that in the event of our
-    // failure, the caller bears the responsibility of closing the exchange.
-    ReturnErrorOnFailure(SendCommandResponse());
+    VerifyOrDie(mState == State::ReadyForInvokeResponses);
+    CHIP_ERROR err = SendCommandResponse();
+    if (err != CHIP_NO_ERROR)
+    {
+        ChipLogError(DataManagement, "Failed to send InvokeResponseMessage");
+        // TODO(#30453): It should be our responsibility to send a Failure StatusResponse to the requestor
+        // if there is a SessionHandle, but legacy unit tests explicitly check the behavior where
+        // we do not send any message. Changing this behavior should be done in a standalone
+        // PR where only that specific change is made. Here is a possible solution that could
+        // be used that fulfills our responsibility to send a Failure StatusResponse. This causes unit
+        // tests to start failing.
+        //   ```
+        //   if (mExchangeCtx && mExchangeCtx->HasSessionHandle())
+        //   {
+        //       SendStatusResponse(Status::Failure);
+        //   }
+        //   ```
+        Close();
+        return;
+    }
 
     if (HasMoreToSend())
     {
@@ -98,7 +111,31 @@ CHIP_ERROR CommandResponseSender::StartSendingCommandResponses()
     {
         Close();
     }
-    return CHIP_NO_ERROR;
+}
+
+void CommandResponseSender::OnDone(CommandHandlerImpl & apCommandObj)
+{
+    if (mState == State::ErrorSentDelayCloseUntilOnDone)
+    {
+        // We have already sent a message to the client indicating that we are not expecting
+        // a response.
+        Close();
+        return;
+    }
+    StartSendingCommandResponses();
+}
+
+void CommandResponseSender::DispatchCommand(CommandHandlerImpl & apCommandObj, const ConcreteCommandPath & aCommandPath,
+                                            TLV::TLVReader & apPayload)
+{
+    VerifyOrReturn(mpCommandHandlerCallback);
+    mpCommandHandlerCallback->DispatchCommand(apCommandObj, aCommandPath, apPayload);
+}
+
+Status CommandResponseSender::CommandExists(const ConcreteCommandPath & aCommandPath)
+{
+    VerifyOrReturnValue(mpCommandHandlerCallback, Protocols::InteractionModel::Status::UnsupportedCommand);
+    return mpCommandHandlerCallback->CommandExists(aCommandPath);
 }
 
 CHIP_ERROR CommandResponseSender::SendCommandResponse()
@@ -139,6 +176,9 @@ const char * CommandResponseSender::GetStateStr() const
 
     case State::AllInvokeResponsesSent:
         return "AllInvokeResponsesSent";
+
+    case State::ErrorSentDelayCloseUntilOnDone:
+        return "ErrorSentDelayCloseUntilOnDone";
     }
 #endif // CHIP_DETAIL_LOGGING
     return "N/A";
@@ -157,12 +197,68 @@ void CommandResponseSender::MoveToState(const State aTargetState)
 void CommandResponseSender::Close()
 {
     MoveToState(State::AllInvokeResponsesSent);
-    mCloseCalled = true;
-    if (mResponseSenderDoneCallback)
+    mpCallback->OnDone(*this);
+}
+
+void CommandResponseSender::OnInvokeCommandRequest(Messaging::ExchangeContext * ec, System::PacketBufferHandle && payload,
+                                                   bool isTimedInvoke)
+{
+    VerifyOrDieWithMsg(ec != nullptr, DataManagement, "Incoming exchange context should not be null");
+    VerifyOrDieWithMsg(mState == State::ReadyForInvokeResponses, DataManagement, "state should be ReadyForInvokeResponses");
+
+    // NOTE: we already know this is an InvokeRequestMessage because we explicitly registered with the
+    // Exchange Manager for unsolicited InvokeRequestMessages.
+    mExchangeCtx.Grab(ec);
+    mExchangeCtx->WillSendMessage();
+
+    // Grabbing Handle to prevent mCommandHandler from calling OnDone before OnInvokeCommandRequest returns.
+    // This allows us to send a StatusResponse error instead of any potentially queued up InvokeResponseMessages.
+    CommandHandler::Handle workHandle(&mCommandHandler);
+    Status status = mCommandHandler.OnInvokeCommandRequest(*this, std::move(payload), isTimedInvoke);
+    if (status != Status::Success)
     {
-        mResponseSenderDoneCallback->mCall(mResponseSenderDoneCallback->mContext);
+        VerifyOrDie(mState == State::ReadyForInvokeResponses);
+        SendStatusResponse(status);
+        // The API contract of OnInvokeCommandRequest requires the CommandResponder instance to outlive
+        // the CommandHandler. Therefore, we cannot safely call Close() here, even though we have
+        // finished sending data. Closing must be deferred until the CommandHandler::OnDone callback.
+        MoveToState(State::ErrorSentDelayCloseUntilOnDone);
     }
 }
+
+size_t CommandResponseSender::GetCommandResponseMaxBufferSize()
+{
+    if (!mExchangeCtx || !mExchangeCtx->HasSessionHandle())
+    {
+        ChipLogError(DataManagement, "Session not available. Unable to infer session-specific buffer capacities.");
+        return kMaxSecureSduLengthBytes;
+    }
+
+    if (mExchangeCtx->GetSessionHandle()->AllowsLargePayload())
+    {
+        return kMaxLargeSecureSduLengthBytes;
+    }
+
+    return kMaxSecureSduLengthBytes;
+}
+
+#if CHIP_WITH_NLFAULTINJECTION
+
+void CommandResponseSender::TestOnlyInvokeCommandRequestWithFaultsInjected(Messaging::ExchangeContext * ec,
+                                                                           System::PacketBufferHandle && payload,
+                                                                           bool isTimedInvoke,
+                                                                           CommandHandlerImpl::NlFaultInjectionType faultType)
+{
+    VerifyOrDieWithMsg(ec != nullptr, DataManagement, "TH Failure: Incoming exchange context should not be null");
+    VerifyOrDieWithMsg(mState == State::ReadyForInvokeResponses, DataManagement,
+                       "TH Failure: state should be ReadyForInvokeResponses, issue with TH");
+
+    mExchangeCtx.Grab(ec);
+    mExchangeCtx->WillSendMessage();
+
+    mCommandHandler.TestOnlyInvokeCommandRequestWithFaultsInjected(*this, std::move(payload), isTimedInvoke, faultType);
+}
+#endif // CHIP_WITH_NLFAULTINJECTION
 
 } // namespace app
 } // namespace chip

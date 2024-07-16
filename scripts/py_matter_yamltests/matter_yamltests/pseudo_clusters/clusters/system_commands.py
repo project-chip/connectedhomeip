@@ -33,6 +33,7 @@ _DEFINITION = '''<?xml version="1.0"?>
       <arg name="endUserSupportLogPath" type="char_string" optional="true"/>
       <arg name="networkDiagnosticsLogPath" type="char_string" optional="true"/>
       <arg name="crashLogPath" type="char_string" optional="true"/>
+      <arg name="traceDecode" type="int8u" optional="true"/>
     </command>
 
     <command source="client" code="1" name="Stop">

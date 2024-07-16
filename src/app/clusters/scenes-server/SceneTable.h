@@ -39,7 +39,7 @@ inline constexpr SceneId kUndefinedSceneId       = 0xff;
 
 static constexpr size_t kIteratorsMax            = CHIP_CONFIG_MAX_SCENES_CONCURRENT_ITERATORS;
 static constexpr size_t kSceneNameMaxLength      = CHIP_CONFIG_SCENES_CLUSTER_MAXIMUM_NAME_LENGTH;
-static constexpr size_t kScenesMaxTransitionTime = 6'000'000u;
+static constexpr size_t kScenesMaxTransitionTime = 60'000'000u;
 
 /// @brief SceneHandlers are meant as interface between various clusters and the Scene table.
 /// When a scene command involving extension field sets is received, the Scene Table will go through
@@ -149,7 +149,7 @@ public:
 
         bool IsValid() { return (mSceneId != kUndefinedSceneId); }
 
-        bool operator==(const SceneStorageId & other) { return (mGroupId == other.mGroupId && mSceneId == other.mSceneId); }
+        bool operator==(const SceneStorageId & other) const { return (mGroupId == other.mGroupId && mSceneId == other.mSceneId); }
     };
 
     /// @brief struct used to store data held in a scene
@@ -235,7 +235,7 @@ public:
         SceneTableEntry(SceneStorageId id) : mStorageId(id) {}
         SceneTableEntry(const SceneStorageId id, const SceneData data) : mStorageId(id), mStorageData(data) {}
 
-        bool operator==(const SceneTableEntry & other)
+        bool operator==(const SceneTableEntry & other) const
         {
             return (mStorageId == other.mStorageId && mStorageData == other.mStorageData);
         }

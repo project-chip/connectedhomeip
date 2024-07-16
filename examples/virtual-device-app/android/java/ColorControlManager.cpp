@@ -18,7 +18,8 @@
 #include "DeviceApp-JNI.h"
 #include <app-common/zap-generated/attributes/Accessors.h>
 #include <app-common/zap-generated/ids/Clusters.h>
-#include <app/util/af.h>
+#include <app/util/attribute-storage.h>
+#include <app/util/config.h>
 #include <jni.h>
 #include <lib/support/CHIPJNIError.h>
 #include <lib/support/JniReferences.h>
@@ -26,7 +27,7 @@
 
 using namespace chip;
 
-static constexpr size_t kColorControlManagerTableSize = EMBER_AF_COLOR_CONTROL_CLUSTER_SERVER_ENDPOINT_COUNT;
+static constexpr size_t kColorControlManagerTableSize = MATTER_DM_COLOR_CONTROL_CLUSTER_SERVER_ENDPOINT_COUNT;
 
 namespace {
 
@@ -45,7 +46,7 @@ void ColorControlManager::NewManager(jint endpoint, jobject manager)
 {
     ChipLogProgress(Zcl, "Device App: ColorControlManager::NewManager");
     uint16_t ep = emberAfGetClusterServerEndpointIndex(static_cast<chip::EndpointId>(endpoint), app::Clusters::ColorControl::Id,
-                                                       EMBER_AF_COLOR_CONTROL_CLUSTER_SERVER_ENDPOINT_COUNT);
+                                                       MATTER_DM_COLOR_CONTROL_CLUSTER_SERVER_ENDPOINT_COUNT);
     VerifyOrReturn(ep < kColorControlManagerTableSize,
                    ChipLogError(Zcl, "Device App::ColorControl::NewManager: endpoint %d not found", endpoint));
 
@@ -67,7 +68,7 @@ void ColorControlManager::NewManager(jint endpoint, jobject manager)
 static ColorControlManager * GetColorControlManager(EndpointId endpoint)
 {
     uint16_t ep = emberAfGetClusterServerEndpointIndex(endpoint, app::Clusters::ColorControl::Id,
-                                                       EMBER_AF_COLOR_CONTROL_CLUSTER_SERVER_ENDPOINT_COUNT);
+                                                       MATTER_DM_COLOR_CONTROL_CLUSTER_SERVER_ENDPOINT_COUNT);
     return (ep >= kColorControlManagerTableSize ? nullptr : gColorControlManagerTable[ep]);
 }
 
@@ -121,8 +122,7 @@ CHIP_ERROR ColorControlManager::InitializeWithObjects(jobject managerObject)
     JNIEnv * env = JniReferences::GetInstance().GetEnvForCurrentThread();
     VerifyOrReturnLogError(env != nullptr, CHIP_ERROR_INCORRECT_STATE);
 
-    mColorControlManagerObject = env->NewGlobalRef(managerObject);
-    VerifyOrReturnLogError(mColorControlManagerObject != nullptr, CHIP_ERROR_INVALID_ARGUMENT);
+    ReturnLogErrorOnFailure(mColorControlManagerObject.Init(managerObject));
 
     jclass ColorControlManagerClass = env->GetObjectClass(managerObject);
     VerifyOrReturnLogError(ColorControlManagerClass != nullptr, CHIP_ERROR_INVALID_ARGUMENT);
@@ -176,11 +176,11 @@ void ColorControlManager::HandleCurrentHueChanged(int value)
 
     JNIEnv * env = JniReferences::GetInstance().GetEnvForCurrentThread();
     VerifyOrReturn(env != NULL, ChipLogProgress(Zcl, "env null"));
-    VerifyOrReturn(mColorControlManagerObject != nullptr, ChipLogProgress(Zcl, "mColorControlManagerObject null"));
+    VerifyOrReturn(mColorControlManagerObject.HasValidObjectRef(), ChipLogProgress(Zcl, "mColorControlManagerObject null"));
     VerifyOrReturn(mHandleCurrentHueChangedMethod != nullptr, ChipLogProgress(Zcl, "mHandleCurrentHueChangedMethod null"));
 
     env->ExceptionClear();
-    env->CallVoidMethod(mColorControlManagerObject, mHandleCurrentHueChangedMethod, value);
+    env->CallVoidMethod(mColorControlManagerObject.ObjectRef(), mHandleCurrentHueChangedMethod, value);
     if (env->ExceptionCheck())
     {
         ChipLogError(AppServer, "Java exception in ColorControlManager::HandleCurrentHueChanged");
@@ -195,12 +195,12 @@ void ColorControlManager::HandleCurrentSaturationChanged(int value)
 
     JNIEnv * env = JniReferences::GetInstance().GetEnvForCurrentThread();
     VerifyOrReturn(env != NULL, ChipLogProgress(Zcl, "env null"));
-    VerifyOrReturn(mColorControlManagerObject != nullptr, ChipLogProgress(Zcl, "mColorControlManagerObject null"));
+    VerifyOrReturn(mColorControlManagerObject.HasValidObjectRef(), ChipLogProgress(Zcl, "mColorControlManagerObject null"));
     VerifyOrReturn(mHandleCurrentSaturationChangedMethod != nullptr,
                    ChipLogProgress(Zcl, "mHandleCurrentSaturationChangedMethod null"));
 
     env->ExceptionClear();
-    env->CallVoidMethod(mColorControlManagerObject, mHandleCurrentSaturationChangedMethod, value);
+    env->CallVoidMethod(mColorControlManagerObject.ObjectRef(), mHandleCurrentSaturationChangedMethod, value);
     if (env->ExceptionCheck())
     {
         ChipLogError(AppServer, "Java exception in ColorControlManager::HandleCurrentSaturationChanged");
@@ -215,12 +215,12 @@ void ColorControlManager::HandleColorTemperatureChanged(int value)
 
     JNIEnv * env = JniReferences::GetInstance().GetEnvForCurrentThread();
     VerifyOrReturn(env != NULL, ChipLogProgress(Zcl, "env null"));
-    VerifyOrReturn(mColorControlManagerObject != nullptr, ChipLogProgress(Zcl, "mColorControlManagerObject null"));
+    VerifyOrReturn(mColorControlManagerObject.HasValidObjectRef(), ChipLogProgress(Zcl, "mColorControlManagerObject null"));
     VerifyOrReturn(mHandleColorTemperatureChangedMethod != nullptr,
                    ChipLogProgress(Zcl, "mHandleColorTemperatureChangedMethod null"));
 
     env->ExceptionClear();
-    env->CallVoidMethod(mColorControlManagerObject, mHandleColorTemperatureChangedMethod, value);
+    env->CallVoidMethod(mColorControlManagerObject.ObjectRef(), mHandleColorTemperatureChangedMethod, value);
     if (env->ExceptionCheck())
     {
         ChipLogError(AppServer, "Java exception in ColorControlManager::mHandleColorTemperatureChanged");
@@ -235,11 +235,11 @@ void ColorControlManager::HandleColorModeChanged(int value)
 
     JNIEnv * env = JniReferences::GetInstance().GetEnvForCurrentThread();
     VerifyOrReturn(env != NULL, ChipLogProgress(Zcl, "env null"));
-    VerifyOrReturn(mColorControlManagerObject != nullptr, ChipLogProgress(Zcl, "mColorControlManagerObject null"));
+    VerifyOrReturn(mColorControlManagerObject.HasValidObjectRef(), ChipLogProgress(Zcl, "mColorControlManagerObject null"));
     VerifyOrReturn(mHandleColorModeChangedMethod != nullptr, ChipLogProgress(Zcl, "mHandleColorModeChangedMethod null"));
 
     env->ExceptionClear();
-    env->CallVoidMethod(mColorControlManagerObject, mHandleColorModeChangedMethod, value);
+    env->CallVoidMethod(mColorControlManagerObject.ObjectRef(), mHandleColorModeChangedMethod, value);
     if (env->ExceptionCheck())
     {
         ChipLogError(AppServer, "Java exception in ColorControlManager::HandleColorModeChanged");
@@ -254,12 +254,12 @@ void ColorControlManager::HandleEnhancedColorModeChanged(int value)
 
     JNIEnv * env = JniReferences::GetInstance().GetEnvForCurrentThread();
     VerifyOrReturn(env != NULL, ChipLogProgress(Zcl, "env null"));
-    VerifyOrReturn(mColorControlManagerObject != nullptr, ChipLogProgress(Zcl, "mColorControlManagerObject null"));
+    VerifyOrReturn(mColorControlManagerObject.HasValidObjectRef(), ChipLogProgress(Zcl, "mColorControlManagerObject null"));
     VerifyOrReturn(mHandleEnhancedColorModeChangedMethod != nullptr,
                    ChipLogProgress(Zcl, "mHandleEnhancedColorModeChangedMethod null"));
 
     env->ExceptionClear();
-    env->CallVoidMethod(mColorControlManagerObject, mHandleEnhancedColorModeChangedMethod, value);
+    env->CallVoidMethod(mColorControlManagerObject.ObjectRef(), mHandleEnhancedColorModeChangedMethod, value);
     if (env->ExceptionCheck())
     {
         ChipLogError(AppServer, "Java exception in ColorControlManager::HandleEnhancedColorModeChanged");

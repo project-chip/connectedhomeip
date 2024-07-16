@@ -17,13 +17,6 @@ limitations under the License.
 <configurator>
   <domain name="CHIP"/>
 
-  <bitmap name="Feature" type="bitmap32">
-    <cluster code="0x0038"/>
-    <field name="TimeZone" mask="0x1"/>
-    <field name="NTPClient" mask="0x2"/>
-    <field name="NTPServer" mask="0x4"/>
-    <field name="TimeSyncClient" mask="0x8"/>
-  </bitmap>
 
   <!-- NOTE: This type is not defined as an enum in the spec, but the Status Codes section
   of this cluster defines these status codes, and we're choosing to represent them as an enum. -->
@@ -105,6 +98,21 @@ limitations under the License.
     <server init="false" tick="false">true</server>
     <description>Accurate time is required for a number of reasons, including scheduling, display and validating security materials.</description>
     <globalAttribute side="either" code="0xFFFD" value="2"/>
+
+    <features>
+      <feature bit="0" code="TZ" name="TimeZone" summary="Server supports time zone.">
+        <optionalConform/>
+      </feature>
+      <feature bit="1" code="NTPC" name="NTPClient" summary="Server supports an NTP or SNTP client.">
+        <optionalConform/>
+      </feature>
+      <feature bit="2" code="NTPS" name="NTPServer" summary="Server supports an NTP server role.">
+        <optionalConform/>
+      </feature>
+      <feature bit="3" code="TSC" name="TimeSyncClient" summary="Time synchronization client cluster is present.">
+        <optionalConform/>
+      </feature>
+    </features>
 
     <attribute side="server" code="0x0000" define="UTC_TIME" type="epoch_us" isNullable="true" optional="false">UTCTime</attribute>
     <attribute side="server" code="0x0001" define="GRANULARITY" type="GranularityEnum" default="0x00" optional="false">Granularity</attribute>

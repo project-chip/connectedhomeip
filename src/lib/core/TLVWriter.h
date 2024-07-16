@@ -27,12 +27,24 @@
 
 #pragma once
 
+#include <cstdio>
+#include <stdint.h>
+#include <type_traits>
+#include <utility>
+
+#include <lib/core/CHIPError.h>
+#include <lib/core/TLVReader.h>
 #include <lib/core/TLVTags.h>
-
-#include "TLVCommon.h"
-
-#include "TLVBackingStore.h"
-#include "TLVReader.h"
+#include <lib/core/TLVTypes.h>
+#include <lib/support/BitFlags.h>
+#include <lib/support/BitMask.h>
+#include <lib/support/CodeUtils.h>
+#include <lib/support/DLLUtil.h>
+#include <lib/support/EnforceFormat.h>
+#include <lib/support/ScopedBuffer.h>
+#include <lib/support/Span.h>
+#include <lib/support/TypeTraits.h>
+#include <system/SystemConfig.h>
 
 /**
  * @namespace chip::TLV

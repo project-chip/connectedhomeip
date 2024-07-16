@@ -16,7 +16,7 @@
  */
 #pragma once
 
-#include <ble/BleConfig.h>
+#include <ble/Ble.h>
 #include <lib/core/CHIPError.h>
 #include <lib/core/ReferenceCounted.h>
 #include <lib/support/CodeUtils.h>
@@ -45,9 +45,10 @@ public:
     };
 
 protected:
-    UnauthenticatedSession(SessionRole sessionRole, NodeId ephemeralInitiatorNodeID, const ReliableMessageProtocolConfig & config) :
-        mEphemeralInitiatorNodeId(ephemeralInitiatorNodeID), mSessionRole(sessionRole),
-        mLastActivityTime(System::SystemClock().GetMonotonicTimestamp()),
+    UnauthenticatedSession(SessionRole sessionRole, NodeId ephemeralInitiatorNodeID, const Transport::PeerAddress & peerAddress,
+                           const ReliableMessageProtocolConfig & config) :
+        mEphemeralInitiatorNodeId(ephemeralInitiatorNodeID),
+        mSessionRole(sessionRole), mPeerAddress(peerAddress), mLastActivityTime(System::SystemClock().GetMonotonicTimestamp()),
         mLastPeerActivityTime(System::Clock::kZero), // Start at zero to default to IDLE state
         mRemoteSessionParams(config)
     {}
@@ -95,6 +96,27 @@ public:
             const ReliableMessageProtocolConfig & remoteMRPConfig = mRemoteSessionParams.GetMRPConfig();
             return GetRetransmissionTimeout(remoteMRPConfig.mActiveRetransTimeout, remoteMRPConfig.mIdleRetransTimeout,
                                             GetLastPeerActivityTime(), remoteMRPConfig.mActiveThresholdTime);
+        }
+        case Transport::Type::kTcp:
+            return System::Clock::Seconds16(30);
+        case Transport::Type::kBle:
+            return System::Clock::Milliseconds32(BTP_ACK_TIMEOUT_MS);
+        default:
+            break;
+        }
+        return System::Clock::Timeout();
+    }
+
+    System::Clock::Milliseconds32 GetMessageReceiptTimeout(System::Clock::Timestamp ourLastActivity) const override
+    {
+        switch (mPeerAddress.GetTransportType())
+        {
+        case Transport::Type::kUdp: {
+            const auto & maybeLocalMRPConfig = GetLocalMRPConfig();
+            const auto & defaultMRRPConfig   = GetDefaultMRPConfig();
+            const auto & localMRPConfig      = maybeLocalMRPConfig.ValueOr(defaultMRRPConfig);
+            return GetRetransmissionTimeout(localMRPConfig.mActiveRetransTimeout, localMRPConfig.mIdleRetransTimeout,
+                                            ourLastActivity, localMRPConfig.mActiveThresholdTime);
         }
         case Transport::Type::kTcp:
             return System::Clock::Seconds16(30);
@@ -175,9 +197,9 @@ class UnauthenticatedSessionPoolEntry : public UnauthenticatedSession
 {
 public:
     UnauthenticatedSessionPoolEntry(SessionRole sessionRole, NodeId ephemeralInitiatorNodeID,
-                                    const ReliableMessageProtocolConfig & config,
+                                    const Transport::PeerAddress & peerAddress, const ReliableMessageProtocolConfig & config,
                                     UnauthenticatedSessionTable<kMaxSessionCount> & sessionTable) :
-        UnauthenticatedSession(sessionRole, ephemeralInitiatorNodeID, config)
+        UnauthenticatedSession(sessionRole, ephemeralInitiatorNodeID, peerAddress, config)
 #if CHIP_SYSTEM_CONFIG_POOL_USE_HEAP
         ,
         mSessionTable(sessionTable)
@@ -224,13 +246,16 @@ public:
      * @return the session found or allocated, or Optional::Missing if not found and allocation failed.
      */
     CHECK_RETURN_VALUE
-    Optional<SessionHandle> FindOrAllocateResponder(NodeId ephemeralInitiatorNodeID, const ReliableMessageProtocolConfig & config)
+    Optional<SessionHandle> FindOrAllocateResponder(NodeId ephemeralInitiatorNodeID, const ReliableMessageProtocolConfig & config,
+                                                    const Transport::PeerAddress & peerAddress)
     {
-        UnauthenticatedSession * result = FindEntry(UnauthenticatedSession::SessionRole::kResponder, ephemeralInitiatorNodeID);
+        UnauthenticatedSession * result =
+            FindEntry(UnauthenticatedSession::SessionRole::kResponder, ephemeralInitiatorNodeID, peerAddress);
         if (result != nullptr)
             return MakeOptional<SessionHandle>(*result);
 
-        CHIP_ERROR err = AllocEntry(UnauthenticatedSession::SessionRole::kResponder, ephemeralInitiatorNodeID, config, result);
+        CHIP_ERROR err =
+            AllocEntry(UnauthenticatedSession::SessionRole::kResponder, ephemeralInitiatorNodeID, peerAddress, config, result);
         if (err == CHIP_NO_ERROR)
         {
             return MakeOptional<SessionHandle>(*result);
@@ -239,9 +264,11 @@ public:
         return Optional<SessionHandle>::Missing();
     }
 
-    CHECK_RETURN_VALUE Optional<SessionHandle> FindInitiator(NodeId ephemeralInitiatorNodeID)
+    CHECK_RETURN_VALUE Optional<SessionHandle> FindInitiator(NodeId ephemeralInitiatorNodeID,
+                                                             const Transport::PeerAddress & peerAddress)
     {
-        UnauthenticatedSession * result = FindEntry(UnauthenticatedSession::SessionRole::kInitiator, ephemeralInitiatorNodeID);
+        UnauthenticatedSession * result =
+            FindEntry(UnauthenticatedSession::SessionRole::kInitiator, ephemeralInitiatorNodeID, peerAddress);
         if (result != nullptr)
         {
             return MakeOptional<SessionHandle>(*result);
@@ -254,7 +281,8 @@ public:
                                                               const ReliableMessageProtocolConfig & config)
     {
         UnauthenticatedSession * result = nullptr;
-        CHIP_ERROR err = AllocEntry(UnauthenticatedSession::SessionRole::kInitiator, ephemeralInitiatorNodeID, config, result);
+        CHIP_ERROR err =
+            AllocEntry(UnauthenticatedSession::SessionRole::kInitiator, ephemeralInitiatorNodeID, peerAddress, config, result);
         if (err == CHIP_NO_ERROR)
         {
             result->SetPeerAddress(peerAddress);
@@ -276,34 +304,46 @@ private:
      */
     CHECK_RETURN_VALUE
     CHIP_ERROR AllocEntry(UnauthenticatedSession::SessionRole sessionRole, NodeId ephemeralInitiatorNodeID,
-                          const ReliableMessageProtocolConfig & config, UnauthenticatedSession *& entry)
+                          const PeerAddress & peerAddress, const ReliableMessageProtocolConfig & config,
+                          UnauthenticatedSession *& entry)
     {
-        auto entryToUse = mEntries.CreateObject(sessionRole, ephemeralInitiatorNodeID, config, *this);
+        auto entryToUse = mEntries.CreateObject(sessionRole, ephemeralInitiatorNodeID, peerAddress, config, *this);
         if (entryToUse != nullptr)
         {
             entry = entryToUse;
             return CHIP_NO_ERROR;
         }
 
-#if !CHIP_SYSTEM_CONFIG_POOL_USE_HEAP
+#if CHIP_SYSTEM_CONFIG_POOL_USE_HEAP
+        // permanent failure if heap was insufficient
+        return CHIP_ERROR_NO_MEMORY;
+#else
         entryToUse = FindLeastRecentUsedEntry();
-#endif // CHIP_SYSTEM_CONFIG_POOL_USE_HEAP
+        VerifyOrReturnError(entryToUse != nullptr, CHIP_ERROR_NO_MEMORY);
+
+        // Drop the least recent entry to allow for a new alloc.
+        mEntries.ReleaseObject(entryToUse);
+        entryToUse = mEntries.CreateObject(sessionRole, ephemeralInitiatorNodeID, peerAddress, config, *this);
+
         if (entryToUse == nullptr)
         {
-            return CHIP_ERROR_NO_MEMORY;
+            // this is NOT expected: we freed an object to have space
+            return CHIP_ERROR_INTERNAL;
         }
 
-        mEntries.ResetObject(entryToUse, sessionRole, ephemeralInitiatorNodeID, config, *this);
         entry = entryToUse;
         return CHIP_NO_ERROR;
+#endif // CHIP_SYSTEM_CONFIG_POOL_USE_HEAP
     }
 
     CHECK_RETURN_VALUE UnauthenticatedSession * FindEntry(UnauthenticatedSession::SessionRole sessionRole,
-                                                          NodeId ephemeralInitiatorNodeID)
+                                                          NodeId ephemeralInitiatorNodeID,
+                                                          const Transport::PeerAddress & peerAddress)
     {
         UnauthenticatedSession * result = nullptr;
         mEntries.ForEachActiveObject([&](UnauthenticatedSession * entry) {
-            if (entry->GetSessionRole() == sessionRole && entry->GetEphemeralInitiatorNodeID() == ephemeralInitiatorNodeID)
+            if (entry->GetSessionRole() == sessionRole && entry->GetEphemeralInitiatorNodeID() == ephemeralInitiatorNodeID &&
+                entry->GetPeerAddress().GetTransportType() == peerAddress.GetTransportType())
             {
                 result = entry;
                 return Loop::Break;

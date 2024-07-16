@@ -1,0 +1,598 @@
+# Copyright (c) 2024 Project CHIP Authors
+#
+# Licensed under the Apache License, Version 2.0 (the "License");
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
+#
+# http://www.apache.org/licenses/LICENSE-2.0
+#
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
+
+name: Diagnostic Logs Tests for Darwin
+
+config:
+    nodeId: 0x12344321
+    cluster: "Bdx"
+    timeout: 180
+    end_user_support_log_file_path: "/tmp/end_user_support_log.txt"
+    end_user_support_log_file_content: "End User Support Log Content"
+    network_diagnostics_log_file_path: "/tmp/network_diagnostics_log.txt"
+
+    bdx_transfer_file_path_1: "/tmp/bdx_log_output_1.txt"
+    bdx_transfer_file_name_1: "bdx_log_output_1.txt"
+    bdx_transfer_file_path_2: "/tmp/bdx_log_output_2.txt"
+    bdx_transfer_file_name_2: "bdx_log_output_2.txt"
+
+    long_log_file_content:
+        "Network Diagnostic Log Content is more than 1024 bytes
+        .......................................................
+        .......................................................
+        .......................................................
+        .......................................................
+        .......................................................
+        .......................................................
+        .......................................................
+        .......................................................
+        .......................................................
+        .......................................................
+        .......................................................
+        .......................................................
+        .......................................................
+        .......................................................
+        .......................................................
+        .......................................................
+        .......................................................
+        .......................................................
+        .......................................................
+        .......................................................
+        .......................................................
+        .......................................................
+        .......................................................
+        .......................................................
+        .......................................................
+        .......................................................
+        .......................................................
+        .......................................................
+        .......................................................
+        .......................................................
+        .......................................................
+        .......................................................
+        .......................................................
+        .......................................................
+        .......................................................
+        .......................................................
+        .......................................................
+        .......................................................
+        .......................................................
+        .......................................................
+        .......................................................
+        .......................................................
+        .......................................................
+        .......................................................
+        .......................................................
+        .......................................................
+        .......................................................
+        .......................................................
+        .......................................................
+        .......................................................
+        .......................................................
+        .......................................................
+        .......................................................
+        .......................................................
+        .......................................................
+        .......................................................
+        .......................................................
+        .......................................................
+        .......................................................
+        .......................................................
+        .......................................................
+        .......................................................
+        .......................................................
+        .......................................................
+        .......................................................
+        .......................................................
+        .......................................................
+        .......................................................
+        .......................................................
+        .......................................................
+        .......................................................
+        .......................................................
+        .......................................................
+        .......................................................
+        .......................................................
+        .......................................................
+        .......................................................
+        .......................................................
+        .......................................................
+        .......................................................
+        .......................................................
+        .......................................................
+        .......................................................
+        .......................................................
+        .......................................................
+        .......................................................
+        .......................................................
+        .......................................................
+        .......................................................
+        .......................................................
+        .......................................................
+        .......................................................
+        .......................................................
+        .......................................................
+        .......................................................
+        .......................................................
+        .......................................................
+        .......................................................
+        .......................................................
+        .......................................................
+        .......................................................
+        .......................................................
+        .......................................................
+        .......................................................
+        .......................................................
+        .......................................................
+        .......................................................
+        .......................................................
+        .......................................................
+        .......................................................
+        .......................................................
+        .......................................................
+        .......................................................
+        .......................................................
+        .......................................................
+        .......................................................
+        .......................................................
+        .......................................................
+        .......................................................
+        .......................................................
+        .......................................................
+        .......................................................
+        .......................................................
+        .......................................................
+        .......................................................
+        .......................................................
+        .......................................................
+        .......................................................
+        .......................................................
+        .......................................................
+        .......................................................
+        .......................................................
+        .......................................................
+        .......................................................
+        .......................................................
+        .......................................................
+        .......................................................
+        .......................................................
+        .......................................................
+        .......................................................
+        .......................................................
+        .......................................................
+        .......................................................
+        .......................................................
+        .......................................................
+        .......................................................
+        .......................................................
+        .......................................................
+        .......................................................
+        .......................................................
+        .......................................................
+        .......................................................
+        .......................................................
+        .......................................................
+        .......................................................
+        .......................................................
+        .......................................................
+        .......................................................
+        .......................................................
+        .......................................................
+        .......................................................
+        .......................................................
+        .......................................................
+        ......................................................."
+
+tests:
+    #
+    # Set up the test by adding some destination log files for the target server:
+    #  1. End User Support
+    #  2. Network Diagnostics
+    #  3. Crash
+    #
+    # The first thing to do is to delete them if they exist. There could be some
+    # left over from a previous test run.
+    #
+
+    - label: "Delete EndUserSupport logs"
+      cluster: "SystemCommands"
+      command: "DeleteFile"
+      arguments:
+          values:
+              - name: "filePath"
+                value: end_user_support_log_file_path
+
+    - label: "Delete NetworkDiag logs"
+      cluster: "SystemCommands"
+      command: "DeleteFile"
+      arguments:
+          values:
+              - name: "filePath"
+                value: network_diagnostics_log_file_path
+
+    - label: "Stop the server"
+      cluster: "SystemCommands"
+      command: "Stop"
+
+    - label: "Create End User Support logs"
+      cluster: "SystemCommands"
+      command: "CreateFile"
+      arguments:
+          values:
+              - name: "filePath"
+                value: end_user_support_log_file_path
+              - name: "fileContent"
+                value: end_user_support_log_file_content
+
+    - label: "Create NetworkDiag logs"
+      cluster: "SystemCommands"
+      command: "CreateFile"
+      arguments:
+          values:
+              - name: "filePath"
+                value: network_diagnostics_log_file_path
+              - name: "fileContent"
+                value: long_log_file_content
+
+    - label: "Start the server with the destination logs files"
+      cluster: "SystemCommands"
+      command: "Start"
+      arguments:
+          values:
+              - name: "endUserSupportLogPath"
+                value: end_user_support_log_file_path
+              - name: "networkDiagnosticsLogPath"
+                value: network_diagnostics_log_file_path
+
+    - label: "Wait for the commissioned device to be retrieved"
+      cluster: "DelayCommands"
+      command: "WaitForCommissionee"
+      arguments:
+          values:
+              - name: "nodeId"
+                value: nodeId
+
+    - label: "Read End User Support log intent"
+      command: "Download"
+      arguments:
+          values:
+              - name: "LogType"
+                value: 0 # EndUserSupport
+              - name: "Timeout"
+                value: 0
+      response:
+          values:
+              - name: "logContent"
+                value: end_user_support_log_file_content
+                constraints:
+                    minLength: 28
+                    maxLength: 28
+
+    - label: "Read Network Diagnostic log intent"
+      command: "Download"
+      arguments:
+          values:
+              - name: "LogType"
+                value: 1 # Network Diagnostic
+              - name: "Timeout"
+                value: 0
+      response:
+          values:
+              - name: "logContent"
+                value: long_log_file_content
+                constraints:
+                    minLength: 9238
+                    maxLength: 9238
+
+    - label: "Read Crash log intent"
+      command: "Download"
+      arguments:
+          values:
+              - name: "LogType"
+                value: 2 # Crash
+              - name: "Timeout"
+                value: 0
+      response:
+          values:
+              - name: "logContent"
+                value: ""
+
+    - label:
+          "Read Network Diagnostic log intent with a very short timeout and a
+          very long log"
+      command: "Download"
+      arguments:
+          values:
+              - name: "LogType"
+                value: 1 # Network Diagnostic
+              - name: "Timeout"
+                value: 1
+      response:
+          values:
+              - name: "error"
+                value: "FAILURE"
+
+    - label:
+          "Read End User Support log intent after a failure to make sure that
+          everything still works"
+      command: "Download"
+      arguments:
+          values:
+              - name: "LogType"
+                value: 0 # EndUserSupport
+              - name: "Timeout"
+                value: 0
+      response:
+          values:
+              - name: "logContent"
+                value: end_user_support_log_file_content
+                constraints:
+                    minLength: 28
+                    maxLength: 28
+
+    #
+    # Validate that we handle Busy properly
+    #
+    - label:
+          "BDX: Wait for 'Diagnostic logs transfer: Success' message from the
+          previous steps"
+      cluster: "DelayCommands"
+      command: "WaitForMessage"
+      arguments:
+          values:
+              - name: "registerKey"
+                value: "default"
+              - name: "message"
+                value: "Diagnostic logs transfer: Success"
+
+    - label: "Delete possible leftover from previous run"
+      cluster: "SystemCommands"
+      command: "DeleteFile"
+      arguments:
+          values:
+              - name: "filePath"
+                value: bdx_transfer_file_path_1
+
+    - label: "Update End User Support logs with a long log"
+      cluster: "SystemCommands"
+      command: "CreateFile"
+      arguments:
+          values:
+              - name: "filePath"
+                value: end_user_support_log_file_path
+              - name: "fileContent"
+                value: long_log_file_content
+
+    - label: "BDX: Request End User Support from the server"
+      command: "Download"
+      arguments:
+          values:
+              - name: "LogType"
+                value: 0 # EndUserSupport
+              - name: "Timeout"
+                value: 0
+              - name: "async"
+                value: true
+              - name: "filepath"
+                value: bdx_transfer_file_path_1
+
+    - label:
+          "BDX: Request End User Support from the server again while it is busy"
+      command: "Download"
+      arguments:
+          values:
+              - name: "LogType"
+                value: 0 # EndUserSupport
+              - name: "Timeout"
+                value: 0
+              - name: "filepath"
+                value: bdx_transfer_file_path_2
+      response:
+          values:
+              - name: "logContent"
+                value: null
+              - name: "error"
+                value: "FAILURE"
+
+    - label: "BDX: Wait for 'Diagnostic logs transfer: Success' message"
+      cluster: "DelayCommands"
+      command: "WaitForMessage"
+      arguments:
+          values:
+              - name: "registerKey"
+                value: "default"
+              - name: "message"
+                value: "Diagnostic logs transfer: Success"
+              - name: "timeoutInSeconds"
+                value: 60
+
+    - label: "Delete the result of the previous run"
+      cluster: "SystemCommands"
+      command: "DeleteFile"
+      arguments:
+          values:
+              - name: "filePath"
+                value: bdx_transfer_file_path_1
+
+    #
+    # Validate that multiple BDX transfers can run in parallel.
+    #
+    - label: "Delete possible leftover from previous run"
+      cluster: "SystemCommands"
+      command: "DeleteFile"
+      arguments:
+          values:
+              - name: "filePath"
+                value: bdx_transfer_file_path_1
+
+    - label: "Delete possible leftover from previous run"
+      cluster: "SystemCommands"
+      command: "DeleteFile"
+      arguments:
+          values:
+              - name: "filePath"
+                value: bdx_transfer_file_path_2
+
+    - label: "Update End User Support logs with a long log"
+      cluster: "SystemCommands"
+      command: "CreateFile"
+      arguments:
+          values:
+              - name: "filePath"
+                value: end_user_support_log_file_path
+              - name: "fileContent"
+                value: long_log_file_content
+
+    - label: "Update Network Diagnostic logs with a long log"
+      cluster: "SystemCommands"
+      command: "CreateFile"
+      arguments:
+          values:
+              - name: "filePath"
+                value: network_diagnostics_log_file_path
+              - name: "fileContent"
+                value: long_log_file_content
+
+    - label: "Start a second server"
+      cluster: "SystemCommands"
+      command: "Start"
+      arguments:
+          values:
+              - name: "discriminator"
+                value: 50
+              - name: "port"
+                value: 5601
+              - name: "kvs"
+                value: "/tmp/chip_kvs_second"
+              - name: "endUserSupportLogPath"
+                value: end_user_support_log_file_path
+              - name: "networkDiagnosticsLogPath"
+                value: network_diagnostics_log_file_path
+              - name: "registerKey"
+                value: "default#2"
+
+    - label: "Commission second server from beta"
+      identity: "beta"
+      cluster: "CommissionerCommands"
+      command: "PairWithCode"
+      arguments:
+          values:
+              - name: "nodeId"
+                value: nodeId
+              - name: "payload"
+                value: "MT:-24J0IX4122-.548G00"
+
+    - label: "Wait for the second commissioned device to be retrieved for beta"
+      identity: "beta"
+      cluster: "DelayCommands"
+      command: "WaitForCommissionee"
+      arguments:
+          values:
+              - name: "nodeId"
+                value: nodeId
+
+    - label: "BDX: Request End User Support from the first server"
+      command: "Download"
+      arguments:
+          values:
+              - name: "LogType"
+                value: 1 # Network Diagnostic
+              - name: "Timeout"
+                value: 0
+              - name: "async"
+                value: true
+              - name: "filepath"
+                value: bdx_transfer_file_path_1
+
+    - label: "BDX: Request End User Support from the second server"
+      identity: "beta"
+      command: "Download"
+      arguments:
+          values:
+              - name: "LogType"
+                value: 1 # Network Diagnostic
+              - name: "Timeout"
+                value: 0
+              - name: "async"
+                value: true
+              - name: "filepath"
+                value: bdx_transfer_file_path_2
+
+    - label:
+          "BDX: Wait for 'Diagnostic logs transfer: Success' message from the
+          first server"
+      cluster: "DelayCommands"
+      command: "WaitForMessage"
+      arguments:
+          values:
+              - name: "registerKey"
+                value: "default"
+              - name: "message"
+                value: "Diagnostic logs transfer: Success"
+              - name: "timeoutInSeconds"
+                value: 60
+
+    - label:
+          "BDX: Wait for 'Diagnostic logs transfer: Success' message from the
+          second server"
+      cluster: "DelayCommands"
+      command: "WaitForMessage"
+      arguments:
+          values:
+              - name: "registerKey"
+                value: "default#2"
+              - name: "message"
+                value: "Diagnostic logs transfer: Success"
+              - name: "timeoutInSeconds"
+                value: 60
+
+    - label:
+          "Compare the content the original log and the file that has been
+          created as the result of the BDX transfer"
+      cluster: "SystemCommands"
+      command: "CompareFiles"
+      arguments:
+          values:
+              - name: "file1"
+                value: end_user_support_log_file_path
+              - name: "file2"
+                value: bdx_transfer_file_path_1
+
+    - label:
+          "Compare the content the original log and the file that has been
+          created as the result of the BDX transfer"
+      cluster: "SystemCommands"
+      command: "CompareFiles"
+      arguments:
+          values:
+              - name: "file1"
+                value: network_diagnostics_log_file_path
+              - name: "file2"
+                value: bdx_transfer_file_path_2
+
+    - label: "Delete the result of the previous run"
+      cluster: "SystemCommands"
+      command: "DeleteFile"
+      arguments:
+          values:
+              - name: "filePath"
+                value: bdx_transfer_file_path_1
+
+    - label: "Delete the result of the previous run"
+      cluster: "SystemCommands"
+      command: "DeleteFile"
+      arguments:
+          values:
+              - name: "filePath"
+                value: bdx_transfer_file_path_2

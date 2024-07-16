@@ -19,6 +19,7 @@
 #include <errno.h>
 #include <stdlib.h>
 #include <string.h>
+#include <string>
 
 #include "Options.h"
 
@@ -28,12 +29,20 @@
 #include <lib/core/CHIPError.h>
 #include <lib/support/Base64.h>
 #include <lib/support/BytesToHex.h>
+#include <lib/support/CHIPMemString.h>
+#include <lib/support/CodeUtils.h>
 #include <lib/support/SafeInt.h>
 
 #include <credentials/examples/DeviceAttestationCredsExample.h>
 
 #if ENABLE_TRACING
 #include <TracingCommandLineArgument.h> // nogncheck
+#endif
+
+#if CHIP_WITH_NLFAULTINJECTION
+#include <inet/InetFaultInjection.h>
+#include <lib/support/CHIPFaultInjection.h>
+#include <system/SystemFaultInjection.h>
 #endif
 
 using namespace chip;
@@ -45,50 +54,57 @@ LinuxDeviceOptions gDeviceOptions;
 // Follow the code style of command line arguments in case we need to add more options in the future.
 enum
 {
-    kDeviceOption_BleDevice     = 0x1000,
-    kDeviceOption_WiFi          = 0x1001,
-    kDeviceOption_Thread        = 0x1002,
-    kDeviceOption_Version       = 0x1003,
-    kDeviceOption_VendorID      = 0x1004,
-    kDeviceOption_ProductID     = 0x1005,
-    kDeviceOption_CustomFlow    = 0x1006,
-    kDeviceOption_Capabilities  = 0x1007,
-    kDeviceOption_Discriminator = 0x1008,
-    kDeviceOption_Passcode      = 0x1009,
+    kDeviceOption_BleDevice = 0x1000,
+    kDeviceOption_WiFi,
+    kDeviceOption_Thread,
+    kDeviceOption_Version,
+    kDeviceOption_VendorID,
+    kDeviceOption_ProductID,
+    kDeviceOption_CustomFlow,
+    kDeviceOption_Capabilities,
+    kDeviceOption_Discriminator,
+    kDeviceOption_Passcode,
 #if CHIP_DEVICE_CONFIG_ENABLE_BOTH_COMMISSIONER_AND_COMMISSIONEE || CHIP_DEVICE_ENABLE_PORT_PARAMS
-    kDeviceOption_SecuredDevicePort         = 0x100a,
-    kDeviceOption_UnsecuredCommissionerPort = 0x100b,
+    kDeviceOption_SecuredDevicePort,
+    kDeviceOption_UnsecuredCommissionerPort,
 #endif
 #if CHIP_DEVICE_CONFIG_ENABLE_BOTH_COMMISSIONER_AND_COMMISSIONEE
-    kDeviceOption_SecuredCommissionerPort = 0x100c,
+    kDeviceOption_SecuredCommissionerPort,
+    kCommissionerOption_FabricID,
 #endif
-    kDeviceOption_Command                               = 0x100d,
-    kDeviceOption_PICS                                  = 0x100e,
-    kDeviceOption_KVS                                   = 0x100f,
-    kDeviceOption_InterfaceId                           = 0x1010,
-    kDeviceOption_Spake2pVerifierBase64                 = 0x1011,
-    kDeviceOption_Spake2pSaltBase64                     = 0x1012,
-    kDeviceOption_Spake2pIterations                     = 0x1013,
-    kDeviceOption_TraceFile                             = 0x1014,
-    kDeviceOption_TraceLog                              = 0x1015,
-    kDeviceOption_TraceDecode                           = 0x1016,
-    kOptionCSRResponseCSRIncorrectType                  = 0x1017,
-    kOptionCSRResponseCSRNonceIncorrectType             = 0x1018,
-    kOptionCSRResponseCSRNonceTooLong                   = 0x1019,
-    kOptionCSRResponseCSRNonceInvalid                   = 0x101a,
-    kOptionCSRResponseNOCSRElementsTooLong              = 0x101b,
-    kOptionCSRResponseAttestationSignatureIncorrectType = 0x101c,
-    kOptionCSRResponseAttestationSignatureInvalid       = 0x101d,
-    kOptionCSRResponseCSRExistingKeyPair                = 0x101e,
-    kDeviceOption_TestEventTriggerEnableKey             = 0x101f,
-    kCommissionerOption_FabricID                        = 0x1020,
-    kTraceTo                                            = 0x1021,
-    kOptionSimulateNoInternalTime                       = 0x1022,
+    kDeviceOption_Command,
+    kDeviceOption_PICS,
+    kDeviceOption_KVS,
+    kDeviceOption_InterfaceId,
+    kDeviceOption_Spake2pVerifierBase64,
+    kDeviceOption_Spake2pSaltBase64,
+    kDeviceOption_Spake2pIterations,
+    kDeviceOption_TraceFile,
+    kDeviceOption_TraceLog,
+    kDeviceOption_TraceDecode,
+    kOptionCSRResponseCSRIncorrectType,
+    kOptionCSRResponseCSRNonceIncorrectType,
+    kOptionCSRResponseCSRNonceTooLong,
+    kOptionCSRResponseCSRNonceInvalid,
+    kOptionCSRResponseNOCSRElementsTooLong,
+    kOptionCSRResponseAttestationSignatureIncorrectType,
+    kOptionCSRResponseAttestationSignatureInvalid,
+    kOptionCSRResponseCSRExistingKeyPair,
+    kDeviceOption_TestEventTriggerEnableKey,
+    kTraceTo,
+    kOptionSimulateNoInternalTime,
 #if defined(PW_RPC_ENABLED)
-    kOptionRpcServerPort = 0x1023,
+    kOptionRpcServerPort,
 #endif
 #if CONFIG_BUILD_FOR_HOST_UNIT_TEST
-    kDeviceOption_SubscriptionCapacity = 0x1024,
+    kDeviceOption_SubscriptionCapacity,
+#endif
+    kDeviceOption_WiFiSupports5g,
+#if CONFIG_BUILD_FOR_HOST_UNIT_TEST
+    kDeviceOption_SubscriptionResumptionRetryIntervalSec,
+#endif
+#if CHIP_WITH_NLFAULTINJECTION
+    kDeviceOption_FaultInjection,
 #endif
 };
 
@@ -100,6 +116,7 @@ OptionDef sDeviceOptionDefs[] = {
 #endif // CHIP_DEVICE_CONFIG_ENABLE_CHIPOBLE
 #if CHIP_DEVICE_CONFIG_ENABLE_WIFI
     { "wifi", kNoArgument, kDeviceOption_WiFi },
+    { "wifi-supports-5g", kNoArgument, kDeviceOption_WiFiSupports5g },
 #endif // CHIP_DEVICE_CONFIG_ENABLE_WPA
 #if CHIP_ENABLE_OPENTHREAD
     { "thread", kNoArgument, kDeviceOption_Thread },
@@ -120,6 +137,7 @@ OptionDef sDeviceOptionDefs[] = {
 #endif
 #if CHIP_DEVICE_CONFIG_ENABLE_BOTH_COMMISSIONER_AND_COMMISSIONEE
     { "secured-commissioner-port", kArgumentRequired, kDeviceOption_SecuredCommissionerPort },
+    { "commissioner-fabric-id", kArgumentRequired, kCommissionerOption_FabricID },
 #endif
     { "command", kArgumentRequired, kDeviceOption_Command },
     { "PICS", kArgumentRequired, kDeviceOption_PICS },
@@ -139,7 +157,6 @@ OptionDef sDeviceOptionDefs[] = {
     { "cert_error_attestation_signature_incorrect_type", kNoArgument, kOptionCSRResponseAttestationSignatureIncorrectType },
     { "cert_error_attestation_signature_invalid", kNoArgument, kOptionCSRResponseAttestationSignatureInvalid },
     { "enable-key", kArgumentRequired, kDeviceOption_TestEventTriggerEnableKey },
-    { "commissioner-fabric-id", kArgumentRequired, kCommissionerOption_FabricID },
 #if ENABLE_TRACING
     { "trace-to", kArgumentRequired, kTraceTo },
 #endif
@@ -149,6 +166,10 @@ OptionDef sDeviceOptionDefs[] = {
 #endif
 #if CONFIG_BUILD_FOR_HOST_UNIT_TEST
     { "subscription-capacity", kArgumentRequired, kDeviceOption_SubscriptionCapacity },
+    { "subscription-resumption-retry-interval", kArgumentRequired, kDeviceOption_SubscriptionResumptionRetryIntervalSec },
+#endif
+#if CHIP_WITH_NLFAULTINJECTION
+    { "faults", kArgumentRequired, kDeviceOption_FaultInjection },
 #endif
     {}
 };
@@ -161,8 +182,13 @@ const char * sDeviceOptionHelp =
 #if CHIP_DEVICE_CONFIG_ENABLE_WPA
     "\n"
     "  --wifi\n"
-    "       Enable WiFi management via wpa_supplicant.\n"
+    "       Enable Wi-Fi management via wpa_supplicant.\n"
 #endif // CHIP_DEVICE_CONFIG_ENABLE_WPA
+#if CHIP_DEVICE_CONFIG_ENABLE_WIFI
+    "\n"
+    "  --wifi-supports-5g\n"
+    "       Indicate that local Wi-Fi hardware should report 5GHz support.\n"
+#endif // CHIP_DEVICE_CONFIG_ENABLE_WIFI
 #if CHIP_ENABLE_OPENTHREAD
     "\n"
     "  --thread\n"
@@ -213,15 +239,15 @@ const char * sDeviceOptionHelp =
     "       A 16-bit unsigned integer specifying the port to use for unsecured commissioner messages (default is 5550).\n"
     "\n"
 #endif
-#if CHIP_DEVICE_ENABLE_PORT_PARAMS
+#if CHIP_DEVICE_CONFIG_ENABLE_BOTH_COMMISSIONER_AND_COMMISSIONEE
     "  --secured-commissioner-port <port>\n"
     "       A 16-bit unsigned integer specifying the listen port to use for secure commissioner messages (default is 5552). Only "
     "valid when app is both device and commissioner\n"
     "\n"
-#endif
     "  --commissioner-fabric-id <fabricid>\n"
     "       The fabric ID to be used when this device is a commissioner (default in code is 1).\n"
     "\n"
+#endif
     "  --command <command-name>\n"
     "       A name for a command to execute during startup.\n"
     "\n"
@@ -273,6 +299,12 @@ const char * sDeviceOptionHelp =
 #if CONFIG_BUILD_FOR_HOST_UNIT_TEST
     "  --subscription-capacity\n"
     "       Max number of subscriptions the device will allow\n"
+    "  --subscription-resumption-retry-interval\n"
+    "       subscription timeout resumption retry interval in seconds\n"
+#endif
+#if CHIP_WITH_NLFAULTINJECTION
+    "  --faults <fault-string,...>\n"
+    "       Inject specified fault(s) at runtime.\n"
 #endif
     "\n";
 
@@ -311,32 +343,37 @@ bool HandleOption(const char * aProgram, OptionSet * aOptions, int aIdentifier, 
         LinuxDeviceOptions::GetInstance().mWiFi = true;
         break;
 
+    case kDeviceOption_WiFiSupports5g:
+        LinuxDeviceOptions::GetInstance().wifiSupports5g = true;
+        break;
+
     case kDeviceOption_Thread:
         LinuxDeviceOptions::GetInstance().mThread = true;
         break;
 
     case kDeviceOption_Version:
-        LinuxDeviceOptions::GetInstance().payload.version = static_cast<uint8_t>(atoi(aValue));
+        LinuxDeviceOptions::GetInstance().payload.version = static_cast<uint8_t>(strtoul(aValue, nullptr, 0));
         break;
 
     case kDeviceOption_VendorID:
-        LinuxDeviceOptions::GetInstance().payload.vendorID = static_cast<uint16_t>(atoi(aValue));
+        LinuxDeviceOptions::GetInstance().payload.vendorID = static_cast<uint16_t>(strtoul(aValue, nullptr, 0));
         break;
 
     case kDeviceOption_ProductID:
-        LinuxDeviceOptions::GetInstance().payload.productID = static_cast<uint16_t>(atoi(aValue));
+        LinuxDeviceOptions::GetInstance().payload.productID = static_cast<uint16_t>(strtoul(aValue, nullptr, 0));
         break;
 
     case kDeviceOption_CustomFlow:
-        LinuxDeviceOptions::GetInstance().payload.commissioningFlow = static_cast<CommissioningFlow>(atoi(aValue));
+        LinuxDeviceOptions::GetInstance().payload.commissioningFlow = static_cast<CommissioningFlow>(strtoul(aValue, nullptr, 0));
         break;
 
     case kDeviceOption_Capabilities:
-        LinuxDeviceOptions::GetInstance().payload.rendezvousInformation.Emplace().SetRaw(static_cast<uint8_t>(atoi(aValue)));
+        LinuxDeviceOptions::GetInstance().payload.rendezvousInformation.Emplace().SetRaw(
+            static_cast<uint8_t>(strtoul(aValue, nullptr, 0)));
         break;
 
     case kDeviceOption_Discriminator: {
-        uint16_t value = static_cast<uint16_t>(atoi(aValue));
+        uint16_t value = static_cast<uint16_t>(strtoul(aValue, nullptr, 0));
         if (value >= 4096)
         {
             PrintArgError("%s: invalid value specified for discriminator: %s\n", aProgram, aValue);
@@ -350,7 +387,7 @@ bool HandleOption(const char * aProgram, OptionSet * aOptions, int aIdentifier, 
     }
 
     case kDeviceOption_Passcode:
-        LinuxDeviceOptions::GetInstance().payload.setUpPINCode = static_cast<uint32_t>(atoi(aValue));
+        LinuxDeviceOptions::GetInstance().payload.setUpPINCode = static_cast<uint32_t>(strtoul(aValue, nullptr, 0));
         break;
 
     case kDeviceOption_Spake2pSaltBase64: {
@@ -440,6 +477,9 @@ bool HandleOption(const char * aProgram, OptionSet * aOptions, int aIdentifier, 
     case kDeviceOption_SecuredCommissionerPort:
         LinuxDeviceOptions::GetInstance().securedCommissionerPort = static_cast<uint16_t>(atoi(aValue));
         break;
+    case kCommissionerOption_FabricID:
+        LinuxDeviceOptions::GetInstance().commissionerFabricId = static_cast<chip::FabricId>(strtoull(aValue, nullptr, 0));
+        break;
 #endif
 
     case kDeviceOption_Command:
@@ -514,11 +554,6 @@ bool HandleOption(const char * aProgram, OptionSet * aOptions, int aIdentifier, 
 
         break;
     }
-    case kCommissionerOption_FabricID: {
-        char * eptr;
-        LinuxDeviceOptions::GetInstance().commissionerFabricId = (chip::FabricId) strtoull(aValue, &eptr, 0);
-        break;
-    }
 #if ENABLE_TRACING
     case kTraceTo:
         LinuxDeviceOptions::GetInstance().traceTo.push_back(aValue);
@@ -536,6 +571,23 @@ bool HandleOption(const char * aProgram, OptionSet * aOptions, int aIdentifier, 
     case kDeviceOption_SubscriptionCapacity:
         LinuxDeviceOptions::GetInstance().subscriptionCapacity = static_cast<int32_t>(atoi(aValue));
         break;
+    case kDeviceOption_SubscriptionResumptionRetryIntervalSec:
+        LinuxDeviceOptions::GetInstance().subscriptionResumptionRetryIntervalSec = static_cast<int32_t>(atoi(aValue));
+        break;
+#endif
+#if CHIP_WITH_NLFAULTINJECTION
+    case kDeviceOption_FaultInjection: {
+        constexpr nl::FaultInjection::GetManagerFn faultManagerFns[] = { FaultInjection::GetManager,
+                                                                         Inet::FaultInjection::GetManager,
+                                                                         System::FaultInjection::GetManager };
+        Platform::ScopedMemoryString mutableArg(aValue, strlen(aValue)); // ParseFaultInjectionStr may mutate
+        if (!nl::FaultInjection::ParseFaultInjectionStr(mutableArg.Get(), faultManagerFns, ArraySize(faultManagerFns)))
+        {
+            PrintArgError("%s: Invalid fault injection specification\n", aProgram);
+            retval = false;
+        }
+        break;
+    }
 #endif
     default:
         PrintArgError("%s: INTERNAL ERROR: Unhandled option: %s\n", aProgram, aName);

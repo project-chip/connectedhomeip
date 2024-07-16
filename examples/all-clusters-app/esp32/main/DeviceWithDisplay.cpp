@@ -22,6 +22,10 @@
 #include <app-common/zap-generated/ids/Clusters.h>
 #include <setup_payload/QRCodeSetupPayloadGenerator.h>
 
+#include <string>
+#include <tuple>
+#include <vector>
+
 #if CONFIG_HAVE_DISPLAY
 using namespace ::chip;
 using namespace ::chip::Credentials;

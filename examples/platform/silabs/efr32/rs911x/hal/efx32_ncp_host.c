@@ -15,7 +15,6 @@
  *
  ******************************************************************************/
 
-#include "FreeRTOS.h"
 #include "cmsis_os2.h"
 #include "dmadrv.h"
 #include "em_cmu.h"
@@ -37,13 +36,18 @@
 #include "sl_power_manager.h"
 #endif
 
+#include "sl_board_control.h"
+#include "sl_si91x_ncp_utility.h"
+#include "spi_multiplex.h"
+
 static bool dma_callback(unsigned int channel, unsigned int sequenceNo, void * userParam);
 
-unsigned int rx_ldma_channel;
-unsigned int tx_ldma_channel;
-osMutexId_t spi_transfer_mutex = 0;
+uint32_t rx_ldma_channel;
+uint32_t tx_ldma_channel;
+osMutexId_t ncp_transfer_mutex = 0;
 
 static uint32_t dummy_buffer;
+static sl_si91x_host_init_configuration init_config = { 0 };
 
 // LDMA descriptor and transfer configuration structures for USART TX channel
 LDMA_Descriptor_t ldmaTXDescriptor;
@@ -55,11 +59,9 @@ LDMA_TransferCfg_t ldmaRXConfig;
 
 static osSemaphoreId_t transfer_done_semaphore = NULL;
 
-static bool dma_callback(unsigned int channel, unsigned int sequenceNo, void * userParam)
+static bool dma_callback([[maybe_unused]] unsigned int channel, [[maybe_unused]] unsigned int sequenceNo,
+                         [[maybe_unused]] void * userParam)
 {
-    UNUSED_PARAMETER(channel);
-    UNUSED_PARAMETER(sequenceNo);
-    UNUSED_PARAMETER(userParam);
 #if defined(SL_CATLOG_POWER_MANAGER_PRESENT)
     sl_power_manager_remove_em_requirement(SL_POWER_MANAGER_EM1);
 #endif
@@ -67,36 +69,23 @@ static bool dma_callback(unsigned int channel, unsigned int sequenceNo, void * u
     return false;
 }
 
-static void gpio_interrupt(uint8_t interrupt_number)
+static void gpio_interrupt([[maybe_unused]] uint8_t interrupt_number)
 {
-    UNUSED_PARAMETER(interrupt_number);
-    sl_si91x_host_set_bus_event(NCP_HOST_BUS_RX_EVENT);
-    //  GPIO_IntClear(0xAAAA);
+    if (NULL != init_config.rx_irq)
+    {
+        init_config.rx_irq();
+    }
 }
 
-void sl_si91x_host_set_sleep_indicator(void)
+static void efx32_spi_init(void)
 {
-    GPIO_PinOutSet(SLEEP_CONFIRM_PIN.port, SLEEP_CONFIRM_PIN.pin);
-}
+    // Default asynchronous initializer (master mode, 1 Mbps, 8-bit data)
+    USART_InitSync_TypeDef init = USART_INITSYNC_DEFAULT;
 
-void sl_si91x_host_clear_sleep_indicator(void)
-{
-    GPIO_PinOutClear(SLEEP_CONFIRM_PIN.port, SLEEP_CONFIRM_PIN.pin);
-}
+    init.msbf         = true; // MSB first transmission for SPI compatibility
+    init.autoCsEnable = false;
+    init.baudrate     = USART_INITSYNC_BAUDRATE;
 
-uint32_t sl_si91x_host_get_wake_indicator(void)
-{
-    return GPIO_PinInGet(WAKE_INDICATOR_PIN.port, WAKE_INDICATOR_PIN.pin);
-}
-
-sl_status_t sl_si91x_host_init(void)
-{
-    // Enable clock (not needed on xG21)
-    CMU_ClockEnable(cmuClock_GPIO, true);
-
-#if SL_SPICTRL_MUX
-    spi_board_init();
-#endif
     // Configure SPI bus pins
     GPIO_PinModeSet(SPI_MISO_PIN.port, SPI_MISO_PIN.pin, gpioModeInput, 0);
     GPIO_PinModeSet(SPI_MOSI_PIN.port, SPI_MOSI_PIN.pin, gpioModePushPull, 0);
@@ -105,12 +94,6 @@ sl_status_t sl_si91x_host_init(void)
     // Enable clock (not needed on xG21)
     CMU_ClockEnable(SPI_USART_CMU_CLOCK, true);
 
-    // Default asynchronous initializer (master mode, 1 Mbps, 8-bit data)
-    USART_InitSync_TypeDef init = USART_INITSYNC_DEFAULT;
-
-    init.msbf         = true; // MSB first transmission for SPI compatibility
-    init.autoCsEnable = true; // Allow the USART to assert CS
-    init.baudrate     = 12500000;
     /*
      * Route USART RX, TX, and CLK to the specified pins.  Note that CS is
      * not controlled by USART so there is no write to the corresponding
@@ -128,7 +111,10 @@ sl_status_t sl_si91x_host_init(void)
     // Enable USART interface pins
     GPIO->USARTROUTE[SPI_USART_ROUTE_INDEX].ROUTEEN = GPIO_USART_ROUTEEN_RXPEN | // MISO
         GPIO_USART_ROUTEEN_TXPEN |                                               // MOSI
-        GPIO_USART_ROUTEEN_CLKPEN | GPIO_USART_ROUTEEN_CSPEN;
+#if !SL_SPICTRL_MUX
+        GPIO_USART_ROUTEEN_CSPEN |
+#endif
+        GPIO_USART_ROUTEEN_CLKPEN;
 
     // Set slew rate for alternate usage pins
     GPIO_SlewrateSet(SPI_CLOCK_PIN.port, 7, 7);
@@ -136,35 +122,74 @@ sl_status_t sl_si91x_host_init(void)
     // Configure and enable USART
     USART_InitSync(SPI_USART, &init);
 
-    SPI_USART->TIMING |= /*USART_TIMING_TXDELAY_ONE | USART_TIMING_CSSETUP_ONE |*/ USART_TIMING_CSHOLD_ONE;
+    SPI_USART->TIMING |= USART_TIMING_TXDELAY_ONE | USART_TIMING_CSSETUP_ONE | USART_TIMING_CSHOLD_ONE;
 
     // SPI_USART->CTRL_SET |= USART_CTRL_SMSDELAY;
+
+    // configure packet pending interrupt priority
+    NVIC_SetPriority(GPIO_ODD_IRQn, PACKET_PENDING_INT_PRI);
+    GPIOINT_CallbackRegister(INTERRUPT_PIN.pin, gpio_interrupt);
+    GPIO_PinModeSet(INTERRUPT_PIN.port, INTERRUPT_PIN.pin, gpioModeInputPullFilter, 0);
+    GPIO_ExtIntConfig(INTERRUPT_PIN.port, INTERRUPT_PIN.pin, INTERRUPT_PIN.pin, true, false, true);
+}
+
+void sl_si91x_host_set_sleep_indicator(void)
+{
+    GPIO_PinOutSet(SLEEP_CONFIRM_PIN.port, SLEEP_CONFIRM_PIN.pin);
+}
+
+void sl_si91x_host_clear_sleep_indicator(void)
+{
+    GPIO_PinOutClear(SLEEP_CONFIRM_PIN.port, SLEEP_CONFIRM_PIN.pin);
+}
+
+uint32_t sl_si91x_host_get_wake_indicator(void)
+{
+    return GPIO_PinInGet(WAKE_INDICATOR_PIN.port, WAKE_INDICATOR_PIN.pin);
+}
+
+sl_status_t sl_si91x_host_init(sl_si91x_host_init_configuration * config)
+{
+#if SL_SPICTRL_MUX
+    sl_status_t status = sl_board_disable_display();
+    if (SL_STATUS_OK != status)
+    {
+        SILABS_LOG("sl_board_disable_display failed with error: %x", status);
+        return status;
+    }
+#endif // SL_SPICTRL_MUX
+    init_config.rx_irq  = config->rx_irq;
+    init_config.rx_done = config->rx_done;
+
+    // Enable clock (not needed on xG21)
+    CMU_ClockEnable(cmuClock_GPIO, true);
+
+#if SL_SPICTRL_MUX
+    spi_board_init();
+#endif
+
     if (transfer_done_semaphore == NULL)
     {
         transfer_done_semaphore = osSemaphoreNew(1, 0, NULL);
     }
 
-    if (spi_transfer_mutex == 0)
+    if (ncp_transfer_mutex == 0)
     {
-        spi_transfer_mutex = osMutexNew(NULL);
+        ncp_transfer_mutex = osMutexNew(NULL);
     }
 
-    DMADRV_Init();
-    DMADRV_AllocateChannel(&rx_ldma_channel, NULL);
-    DMADRV_AllocateChannel(&tx_ldma_channel, NULL);
+    efx32_spi_init();
 
     // Start reset line low
     GPIO_PinModeSet(RESET_PIN.port, RESET_PIN.pin, gpioModePushPull, 0);
 
-    // configure packet pending interrupt priority
-    NVIC_SetPriority(GPIO_ODD_IRQn, PACKET_PENDING_INT_PRI);
-
     // Configure interrupt, sleep and wake confirmation pins
-    GPIOINT_CallbackRegister(INTERRUPT_PIN.pin, gpio_interrupt);
-    GPIO_PinModeSet(INTERRUPT_PIN.port, INTERRUPT_PIN.pin, gpioModeInputPullFilter, 0);
-    GPIO_ExtIntConfig(INTERRUPT_PIN.port, INTERRUPT_PIN.pin, INTERRUPT_PIN.pin, true, false, true);
     GPIO_PinModeSet(SLEEP_CONFIRM_PIN.port, SLEEP_CONFIRM_PIN.pin, gpioModeWiredOrPullDown, 1);
     GPIO_PinModeSet(WAKE_INDICATOR_PIN.port, WAKE_INDICATOR_PIN.pin, gpioModeWiredOrPullDown, 0);
+
+    DMADRV_Init();
+    DMADRV_AllocateChannel((unsigned int *) &rx_ldma_channel, NULL);
+    DMADRV_AllocateChannel((unsigned int *) &tx_ldma_channel, NULL);
 
     return SL_STATUS_OK;
 }
@@ -174,11 +199,7 @@ sl_status_t sl_si91x_host_deinit(void)
     return SL_STATUS_OK;
 }
 
-void sl_si91x_host_enable_high_speed_bus()
-{
-    //  SPI_USART->CTRL_SET |= USART_CTRL_SMSDELAY | USART_CTRL_SSSEARLY;
-    //  USART_BaudrateSyncSet(SPI_USART, 0, 20000000);
-}
+void sl_si91x_host_enable_high_speed_bus() {}
 
 /*==================================================================*/
 /**
@@ -194,7 +215,7 @@ void sl_si91x_host_enable_high_speed_bus()
  */
 sl_status_t sl_si91x_host_spi_transfer(const void * tx_buffer, void * rx_buffer, uint16_t buffer_length)
 {
-    osMutexAcquire(spi_transfer_mutex, 0xFFFFFFFFUL);
+    osMutexAcquire(ncp_transfer_mutex, 0xFFFFFFFFUL);
 
 #if SL_SPICTRL_MUX
     sl_wfx_host_spi_cs_assert();
@@ -268,7 +289,7 @@ sl_status_t sl_si91x_host_spi_transfer(const void * tx_buffer, void * rx_buffer,
         }
     }
 
-    osMutexRelease(spi_transfer_mutex);
+    osMutexRelease(ncp_transfer_mutex);
 #if SL_SPICTRL_MUX
     sl_wfx_host_spi_cs_deassert();
 #endif // SL_SPICTRL_MUX
@@ -288,6 +309,7 @@ void sl_si91x_host_release_from_reset(void)
 
 void sl_si91x_host_enable_bus_interrupt(void)
 {
+    NVIC_ClearPendingIRQ(GPIO_ODD_IRQn);
     NVIC_EnableIRQ(GPIO_ODD_IRQn);
 }
 

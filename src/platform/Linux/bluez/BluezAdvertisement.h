@@ -18,30 +18,40 @@
 #pragma once
 
 #include <stdint.h>
+#include <utility>
 
 #include <gio/gio.h>
 #include <glib-object.h>
 #include <glib.h>
 
-#include <ble/CHIPBleServiceData.h>
+#include <ble/Ble.h>
 #include <lib/core/CHIPError.h>
+#include <platform/GLibTypeDeleter.h>
 #include <platform/Linux/dbus/bluez/DbusBluez.h>
 
+#include "BluezEndpoint.h"
 #include "Types.h"
 
 namespace chip {
 namespace DeviceLayer {
 namespace Internal {
 
-class BluezEndpoint;
-
 class BluezAdvertisement
 {
 public:
-    BluezAdvertisement() = default;
+    using ServiceDataFlags = uint16_t;
+    // Minimum and maximum advertising intervals in units of 0.625ms.
+    using AdvertisingIntervals = std::pair<uint16_t, uint16_t>;
+
+    static constexpr ServiceDataFlags kServiceDataNone                 = 0;
+    static constexpr ServiceDataFlags kServiceDataExtendedAnnouncement = 1 << 0;
+
+    BluezAdvertisement(BluezEndpoint & aEndpoint) : mEndpoint(aEndpoint) {}
     ~BluezAdvertisement() { Shutdown(); }
 
-    CHIP_ERROR Init(const BluezEndpoint & aEndpoint, ChipAdvType aAdvType, const char * aAdvUUID, uint32_t aAdvDurationMs);
+    CHIP_ERROR Init(BluezAdapter1 * apAdapter, const char * aAdvUUID, const char * aAdvName);
+    CHIP_ERROR SetupServiceData(ServiceDataFlags aFlags);
+    CHIP_ERROR SetIntervals(AdvertisingIntervals aAdvIntervals);
     void Shutdown();
 
     /// Start BLE advertising.
@@ -54,6 +64,9 @@ public:
     ///
     /// BLE advertising is stopped asynchronously. Application will be notified of
     /// completion via a call to BLEManagerImpl::NotifyBLEPeripheralAdvStopComplete().
+    ///
+    /// It is also possible that the advertising is released by BlueZ. In that case,
+    /// the application will be notified by BLEManagerImpl::NotifyBLEPeripheralAdvReleased().
     CHIP_ERROR Stop();
 
 private:
@@ -68,20 +81,16 @@ private:
     void StopDone(GObject * aObject, GAsyncResult * aResult);
     CHIP_ERROR StopImpl();
 
-    // Objects (interfaces) used by LE advertisement
-    GDBusObjectManagerServer * mpRoot = nullptr;
-    BluezAdapter1 * mpAdapter         = nullptr;
-    BluezLEAdvertisement1 * mpAdv     = nullptr;
+    BluezEndpoint & mEndpoint;
+    GAutoPtr<BluezAdapter1> mAdapter;
+    GAutoPtr<BluezLEAdvertisement1> mAdv;
 
     bool mIsInitialized = false;
     bool mIsAdvertising = false;
 
-    Ble::ChipBLEDeviceIdentificationInfo mDeviceIdInfo;
-    char * mpAdvPath     = nullptr;
-    char * mpAdapterName = nullptr;
-    char * mpAdvUUID     = nullptr;
-    ChipAdvType mAdvType;
-    uint16_t mAdvDurationMs = 0;
+    char mAdvPath[64] = ""; // D-Bus path of the advertisement object
+    char mAdvUUID[64] = ""; // UUID of the service to be advertised
+    char mAdvName[32] = "";
 };
 
 } // namespace Internal

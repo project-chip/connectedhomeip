@@ -16,22 +16,32 @@
  *    limitations under the License.
  */
 
+#include <pw_unit_test/framework.h>
+
+#include <lib/core/StringBuilderAdapters.h>
 #include <lib/support/BufferReader.h>
 #include <lib/support/BufferWriter.h>
 #include <lib/support/CHIPMem.h>
-#include <lib/support/UnitTestRegistration.h>
 #include <protocols/Protocols.h>
 #include <protocols/secure_channel/Constants.h>
 #include <protocols/secure_channel/StatusReport.h>
 #include <system/SystemPacketBuffer.h>
 
-#include <nlunit-test.h>
-
 using namespace chip;
 using namespace chip::Protocols;
 using namespace chip::Protocols::SecureChannel;
 
-void TestStatusReport_NoData(nlTestSuite * inSuite, void * inContext)
+struct TestStatusReport : public ::testing::Test
+{
+    static void SetUpTestSuite()
+    {
+        CHIP_ERROR error = chip::Platform::MemoryInit();
+        ASSERT_EQ(error, CHIP_NO_ERROR);
+    }
+    static void TearDownTestSuite() { chip::Platform::MemoryShutdown(); }
+};
+
+TEST_F(TestStatusReport, NoData)
 {
     GeneralStatusCode generalCode = GeneralStatusCode::kSuccess;
     auto protocolId               = SecureChannel::Id;
@@ -44,20 +54,19 @@ void TestStatusReport_NoData(nlTestSuite * inSuite, void * inContext)
     testReport.WriteToBuffer(bbuf);
 
     System::PacketBufferHandle msgBuf = bbuf.Finalize();
-    NL_TEST_ASSERT(inSuite, !msgBuf.IsNull());
+    ASSERT_FALSE(msgBuf.IsNull());
 
     StatusReport reportToParse;
-    CHIP_ERROR err = reportToParse.Parse(std::move(msgBuf));
-    NL_TEST_ASSERT(inSuite, err == CHIP_NO_ERROR);
-    NL_TEST_ASSERT(inSuite, reportToParse.GetGeneralCode() == generalCode);
-    NL_TEST_ASSERT(inSuite, reportToParse.GetProtocolId() == protocolId);
-    NL_TEST_ASSERT(inSuite, reportToParse.GetProtocolCode() == protocolCode);
+    EXPECT_EQ(reportToParse.Parse(std::move(msgBuf)), CHIP_NO_ERROR);
+    EXPECT_EQ(reportToParse.GetGeneralCode(), generalCode);
+    EXPECT_EQ(reportToParse.GetProtocolId(), protocolId);
+    EXPECT_EQ(reportToParse.GetProtocolCode(), protocolCode);
 
     const System::PacketBufferHandle & data = reportToParse.GetProtocolData();
-    NL_TEST_ASSERT(inSuite, data.IsNull());
+    EXPECT_TRUE(data.IsNull());
 }
 
-void TestStatusReport_WithData(nlTestSuite * inSuite, void * inContext)
+TEST_F(TestStatusReport, WithData)
 {
     GeneralStatusCode generalCode      = GeneralStatusCode::kFailure;
     auto protocolId                    = SecureChannel::Id;
@@ -73,39 +82,34 @@ void TestStatusReport_WithData(nlTestSuite * inSuite, void * inContext)
     testReport.WriteToBuffer(bbuf);
 
     System::PacketBufferHandle msgBuf = bbuf.Finalize();
-    NL_TEST_ASSERT(inSuite, !msgBuf.IsNull());
+    ASSERT_FALSE(msgBuf.IsNull());
 
     StatusReport reportToParse;
-    CHIP_ERROR err = reportToParse.Parse(std::move(msgBuf));
-    NL_TEST_ASSERT(inSuite, err == CHIP_NO_ERROR);
-    NL_TEST_ASSERT(inSuite, reportToParse.GetGeneralCode() == generalCode);
-    NL_TEST_ASSERT(inSuite, reportToParse.GetProtocolId() == protocolId);
-    NL_TEST_ASSERT(inSuite, reportToParse.GetProtocolCode() == protocolCode);
+    EXPECT_EQ(reportToParse.Parse(std::move(msgBuf)), CHIP_NO_ERROR);
+    EXPECT_EQ(reportToParse.GetGeneralCode(), generalCode);
+    EXPECT_EQ(reportToParse.GetProtocolId(), protocolId);
+    EXPECT_EQ(reportToParse.GetProtocolCode(), protocolCode);
 
     const System::PacketBufferHandle & rcvData = reportToParse.GetProtocolData();
-    if (rcvData.IsNull())
-    {
-        NL_TEST_ASSERT(inSuite, false);
-        return;
-    }
-    NL_TEST_ASSERT(inSuite, rcvData->DataLength() == dataLen);
-    NL_TEST_ASSERT(inSuite, !memcmp(rcvData->Start(), data, dataLen));
+    ASSERT_FALSE(rcvData.IsNull());
+    EXPECT_EQ(rcvData->DataLength(), dataLen);
+    EXPECT_EQ(memcmp(rcvData->Start(), data, dataLen), 0);
 }
 
-void TestBadStatusReport(nlTestSuite * inSuite, void * inContext)
+TEST_F(TestStatusReport, TestBadStatusReport)
 {
     StatusReport report;
     System::PacketBufferHandle badMsg = System::PacketBufferHandle::New(10);
     CHIP_ERROR err                    = report.Parse(std::move(badMsg));
-    NL_TEST_ASSERT(inSuite, err != CHIP_NO_ERROR);
+    EXPECT_NE(err, CHIP_NO_ERROR);
 
     StatusReport report2;
     badMsg = nullptr;
     err    = report2.Parse(std::move(badMsg));
-    NL_TEST_ASSERT(inSuite, err != CHIP_NO_ERROR);
+    EXPECT_NE(err, CHIP_NO_ERROR);
 }
 
-void TestMakeBusyStatusReport(nlTestSuite * inSuite, void * inContext)
+TEST_F(TestStatusReport, TestMakeBusyStatusReport)
 {
     GeneralStatusCode generalCode                 = GeneralStatusCode::kBusy;
     auto protocolId                               = SecureChannel::Id;
@@ -113,81 +117,22 @@ void TestMakeBusyStatusReport(nlTestSuite * inSuite, void * inContext)
     System::Clock::Milliseconds16 minimumWaitTime = System::Clock::Milliseconds16(5000);
 
     System::PacketBufferHandle handle = StatusReport::MakeBusyStatusReportMessage(minimumWaitTime);
-    NL_TEST_ASSERT(inSuite, !handle.IsNull());
+    ASSERT_FALSE(handle.IsNull());
 
     StatusReport reportToParse;
-    CHIP_ERROR err = reportToParse.Parse(std::move(handle));
-    NL_TEST_ASSERT(inSuite, CHIP_NO_ERROR == err);
-    NL_TEST_ASSERT(inSuite, reportToParse.GetGeneralCode() == generalCode);
-    NL_TEST_ASSERT(inSuite, reportToParse.GetProtocolId() == protocolId);
-    NL_TEST_ASSERT(inSuite, reportToParse.GetProtocolCode() == protocolCode);
+    EXPECT_EQ(reportToParse.Parse(std::move(handle)), CHIP_NO_ERROR);
+    EXPECT_EQ(reportToParse.GetGeneralCode(), generalCode);
+    EXPECT_EQ(reportToParse.GetProtocolId(), protocolId);
+    EXPECT_EQ(reportToParse.GetProtocolCode(), protocolCode);
 
     const System::PacketBufferHandle & rcvData = reportToParse.GetProtocolData();
-    NL_TEST_ASSERT(inSuite, !rcvData.IsNull());
-    NL_TEST_ASSERT(inSuite, rcvData->DataLength() == sizeof(minimumWaitTime));
+    ASSERT_FALSE(rcvData.IsNull());
+    EXPECT_EQ(rcvData->DataLength(), sizeof(minimumWaitTime));
 
     uint16_t readMinimumWaitTime = 0;
     Encoding::LittleEndian::Reader reader(rcvData->Start(), rcvData->DataLength());
-    NL_TEST_ASSERT(inSuite, CHIP_NO_ERROR == reader.Read16(&readMinimumWaitTime).StatusCode());
-    NL_TEST_ASSERT(inSuite, System::Clock::Milliseconds16(readMinimumWaitTime) == minimumWaitTime);
+    EXPECT_EQ(reader.Read16(&readMinimumWaitTime).StatusCode(), CHIP_NO_ERROR);
+    EXPECT_EQ(System::Clock::Milliseconds16(readMinimumWaitTime), minimumWaitTime);
 }
 
 // Test Suite
-
-/**
- *  Test Suite that lists all the test functions.
- */
-// clang-format off
-static const nlTest sTests[] =
-{
-    NL_TEST_DEF("TestStatusReport_NoData", TestStatusReport_NoData),
-    NL_TEST_DEF("TestStatusReport_WithData", TestStatusReport_WithData),
-    NL_TEST_DEF("TestBadStatusReport", TestBadStatusReport),
-    NL_TEST_DEF("TestMakeBusyStatusReport", TestMakeBusyStatusReport),
-
-    NL_TEST_SENTINEL()
-};
-// clang-format on
-
-/**
- *  Set up the test suite.
- */
-static int TestSetup(void * inContext)
-{
-    CHIP_ERROR error = chip::Platform::MemoryInit();
-    if (error != CHIP_NO_ERROR)
-        return FAILURE;
-    return SUCCESS;
-}
-
-/**
- *  Tear down the test suite.
- */
-static int TestTeardown(void * inContext)
-{
-    chip::Platform::MemoryShutdown();
-    return SUCCESS;
-}
-
-// clang-format off
-static nlTestSuite sSuite =
-{
-    "Test-CHIP-StatusReport",
-    &sTests[0],
-    TestSetup,
-    TestTeardown,
-};
-// clang-format on
-
-/**
- *  Main
- */
-int TestStatusReport()
-{
-    // Run test suit against one context
-    nlTestRunner(&sSuite, nullptr);
-
-    return (nlTestRunnerStats(&sSuite));
-}
-
-CHIP_REGISTER_TEST_SUITE(TestStatusReport)

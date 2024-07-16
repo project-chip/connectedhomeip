@@ -19,17 +19,20 @@
 
 // Rate of level control tick execution.
 // To increase tick frequency (for more granular updates of device state based
-// on level), redefine EMBER_AF_PLUGIN_LEVEL_CONTROL_TICKS_PER_SECOND.
-#ifndef EMBER_AF_PLUGIN_LEVEL_CONTROL_TICKS_PER_SECOND
-#define EMBER_AF_PLUGIN_LEVEL_CONTROL_TICKS_PER_SECOND 32
+// on level), redefine MATTER_DM_PLUGIN_LEVEL_CONTROL_TICKS_PER_SECOND.
+#ifndef MATTER_DM_PLUGIN_LEVEL_CONTROL_TICKS_PER_SECOND
+#define MATTER_DM_PLUGIN_LEVEL_CONTROL_TICKS_PER_SECOND 32
 #endif
 
 #include <stdint.h>
 
 #include <app-common/zap-generated/cluster-enums.h>
 #include <app-common/zap-generated/cluster-objects.h>
-#include <app/clusters/scenes-server/SceneTable.h>
 #include <app/util/basic-types.h>
+
+#ifdef MATTER_DM_PLUGIN_SCENES_MANAGEMENT
+#include <app/clusters/scenes-server/SceneTable.h>
+#endif
 
 /** @brief Level Control Cluster Server Post Init
  *
@@ -53,6 +56,8 @@ chip::Protocols::InteractionModel::Status
 MoveToLevel(chip::EndpointId endpointId,
             const chip::app::Clusters::LevelControl::Commands::MoveToLevel::DecodableType & commandData);
 
+#ifdef MATTER_DM_PLUGIN_SCENES_MANAGEMENT
 chip::scenes::SceneHandler * GetSceneHandler();
+#endif
 
 } // namespace LevelControlServer

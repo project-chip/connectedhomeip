@@ -36,7 +36,6 @@ declare_args() {
 #
 #   public_deps = [
 #     "${chip_root}/src/lib/foo",         # add dependencies here
-#     "${nlunit_test_root}:nlunit-test",
 #   ]
 # }
 #

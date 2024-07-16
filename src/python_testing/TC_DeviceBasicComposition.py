@@ -15,6 +15,18 @@
 #    limitations under the License.
 #
 
+# See https://github.com/project-chip/connectedhomeip/blob/master/docs/testing/python.md#defining-the-ci-test-arguments
+# for details about the block below.
+#
+# === BEGIN CI TEST ARGUMENTS ===
+# test-runner-runs: run1
+# test-runner-run/run1/app: ${ALL_CLUSTERS_APP}
+# test-runner-run/run1/factoryreset: True
+# test-runner-run/run1/quiet: True
+# test-runner-run/run1/app-args: --discriminator 1234 --KVS kvs1 --trace-to json:${TRACE_APP}.json
+# test-runner-run/run1/script-args: --storage-path admin_storage.json --manual-code 10054912339 --PICS src/app/tests/suites/certification/ci-pics-values --trace-to json:${TRACE_TEST_JSON}.json --trace-to perfetto:${TRACE_TEST_PERFETTO}.perfetto
+# === END CI TEST ARGUMENTS ===
+
 import logging
 from dataclasses import dataclass
 from typing import Any, Callable
@@ -23,13 +35,17 @@ import chip.clusters as Clusters
 import chip.clusters.ClusterObjects
 import chip.tlv
 from basic_composition_support import BasicCompositionTests
+from chip import ChipUtility
 from chip.clusters.Attribute import ValueDecodeFailure
+from chip.clusters.ClusterObjects import ClusterAttributeDescriptor, ClusterObjectFieldDescriptor
+from chip.interaction_model import InteractionModelError, Status
+from chip.tlv import uint
 from global_attribute_ids import GlobalAttributeIds
-from matter_testing_support import (AttributePathLocation, ClusterPathLocation, CommandPathLocation, MatterBaseTest,
+from matter_testing_support import (AttributePathLocation, ClusterPathLocation, CommandPathLocation, MatterBaseTest, TestStep,
                                     async_test_body, default_matter_test_main)
 from mobly import asserts
 from taglist_and_topology_test_support import (create_device_type_list_for_root, create_device_type_lists, find_tag_list_problems,
-                                               find_tree_roots, get_all_children, get_direct_children_of_root, parts_list_cycles,
+                                               find_tree_roots, flat_list_ok, get_direct_children_of_root, parts_list_cycles,
                                                separate_endpoint_types)
 
 
@@ -165,7 +181,41 @@ class TC_DeviceBasicComposition(MatterBaseTest, BasicCompositionTests):
         if not success:
             self.fail_current_test("At least one endpoint was missing the descriptor cluster.")
 
-    def test_TC_IDM_10_1(self):
+    async def _read_non_standard_attribute_check_unsupported_read(self, endpoint_id, cluster_id, attribute_id) -> bool:
+        @dataclass
+        class TempAttribute(ClusterAttributeDescriptor):
+            @ChipUtility.classproperty
+            def cluster_id(cls) -> int:
+                return cluster_id
+
+            @ChipUtility.classproperty
+            def attribute_id(cls) -> int:
+                return attribute_id
+
+            @ChipUtility.classproperty
+            def attribute_type(cls) -> ClusterObjectFieldDescriptor:
+                return ClusterObjectFieldDescriptor(Type=uint)
+
+            @ChipUtility.classproperty
+            def standard_attribute(cls) -> bool:
+                return False
+
+            value: 'uint' = 0
+
+        result = await self.default_controller.Read(nodeid=self.dut_node_id, attributes=[(endpoint_id, TempAttribute)])
+        try:
+            attr_ret = result.tlvAttributes[endpoint_id][cluster_id][attribute_id]
+        except KeyError:
+            attr_ret = None
+
+        error_type_ok = attr_ret is not None and isinstance(
+            attr_ret, Clusters.Attribute.ValueDecodeFailure) and isinstance(attr_ret.Reason, InteractionModelError)
+
+        got_expected_error = error_type_ok and attr_ret.Reason.status == Status.UnsupportedRead
+        return got_expected_error
+
+    @async_test_body
+    async def test_TC_IDM_10_1(self):
         self.print_step(1, "Perform a wildcard read of attributes on all endpoints - already done")
 
         @dataclass
@@ -222,6 +272,10 @@ class TC_DeviceBasicComposition(MatterBaseTest, BasicCompositionTests):
                                               problem=f"Failed validation of value on {location.as_string(self.cluster_mapper)}: {str(e)}", spec_location="Global Elements")
                             success = False
                             continue
+                        except KeyError:
+                            # A KeyError here means the attribute does not exist. This problem was already recorded in step 2,
+                            # but we don't assert until the end of the test, so ignore this and don't re-record the error.
+                            continue
 
         self.print_step(4, "Validate the attribute list exactly matches the set of reported attributes")
         if success:
@@ -236,15 +290,19 @@ class TC_DeviceBasicComposition(MatterBaseTest, BasicCompositionTests):
                         logging.debug(
                             f"Checking presence of claimed supported {attribute_string} on {location.as_cluster_string(self.cluster_mapper)}: {'found' if has_attribute else 'not_found'}")
 
-                        # Check attribute is actually present.
                         if not has_attribute:
-                            # TODO: Handle detecting write-only attributes from schema.
-                            if "WriteOnly" in attribute_string:
-                                continue
+                            # Check if this is a write-only attribute by trying to read it.
+                            # If it's present and write-only it should return an UNSUPPORTED_READ error. All other errors are a failure.
+                            # Because these can be MEI attributes, we need to build the ClusterAttributeDescriptor manually since it's
+                            # not guaranteed to be generated. Since we expect an error back anyway, the type doesn't matter.
 
-                            self.record_error(self.get_test_name(), location=location,
-                                              problem=f"Did not find {attribute_string} on {location.as_cluster_string(self.cluster_mapper)} when it was claimed in AttributeList ({attribute_list})", spec_location="AttributeList Attribute")
-                            success = False
+                            write_only_attribute = await self._read_non_standard_attribute_check_unsupported_read(
+                                endpoint_id=endpoint_id, cluster_id=cluster_id, attribute_id=attribute_id)
+
+                            if not write_only_attribute:
+                                self.record_error(self.get_test_name(), location=location,
+                                                  problem=f"Did not find {attribute_string} on {location.as_cluster_string(self.cluster_mapper)} when it was claimed in AttributeList ({attribute_list})", spec_location="AttributeList Attribute")
+                                success = False
                             continue
 
                         attribute_value = cluster[attribute_id]
@@ -554,13 +612,10 @@ class TC_DeviceBasicComposition(MatterBaseTest, BasicCompositionTests):
         ok = True
         for endpoint_id in flat:
             # ensure that every sub-id in the parts list is included in the parent
-            sub_children = []
-            for child in self.endpoints[endpoint_id][Clusters.Descriptor][Clusters.Descriptor.Attributes.PartsList]:
-                sub_children.update(get_all_children(child))
-            if not all(item in sub_children for item in self.endpoints[endpoint_id][Clusters.Descriptor][Clusters.Descriptor.Attributes.PartsList]):
+            if not flat_list_ok(endpoint_id, self.endpoints):
                 location = AttributePathLocation(endpoint_id=endpoint_id, cluster_id=cluster_id, attribute_id=attribute_id)
                 self.record_error(self.get_test_name(), location=location,
-                                  problem='Flat parts list does not include all the sub-parts', spec_location='Endpoint composition')
+                                  problem='Flat parts list does not exactly match sub-parts', spec_location='Endpoint composition')
                 ok = False
         if not ok:
             self.fail_current_test()
@@ -704,6 +759,23 @@ class TC_DeviceBasicComposition(MatterBaseTest, BasicCompositionTests):
 
         if problems or root_problems:
             self.fail_current_test("Problems with tags lists")
+
+    def steps_TC_IDM_12_1(self):
+        return [TestStep(0, "TH performs a wildcard read of all attributes and endpoints on the device"),
+                TestStep(1, "TH creates a MatterTlvJson dump of the wildcard attributes for submission to certification.")]
+
+    def test_TC_IDM_12_1(self):
+        # wildcard read - already done.
+        self.step(0)
+
+        # Create the dump
+        self.step(1)
+        pid = self.endpoints[0][Clusters.BasicInformation][Clusters.BasicInformation.Attributes.ProductID]
+        vid = self.endpoints[0][Clusters.BasicInformation][Clusters.BasicInformation.Attributes.VendorID]
+        software_version = self.endpoints[0][Clusters.BasicInformation][Clusters.BasicInformation.Attributes.SoftwareVersion]
+        filename = f'device_dump_0x{vid:04X}_0x{pid:04X}_{software_version}.json'
+        dump_device_composition_path = self.user_params.get("dump_device_composition_path", filename)
+        self.dump_wildcard(dump_device_composition_path)
 
 
 if __name__ == "__main__":

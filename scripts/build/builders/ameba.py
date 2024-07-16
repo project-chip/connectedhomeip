@@ -15,7 +15,7 @@
 import os
 from enum import Enum, auto
 
-from .builder import Builder
+from .builder import Builder, BuilderOutput
 
 
 class AmebaBoard(Enum):
@@ -89,18 +89,19 @@ class AmebaBuilder(Builder):
                       title='Building ' + self.identifier)
 
     def build_outputs(self):
-        return {
-            self.app.AppNamePrefix + '.axf':
-                os.path.join(self.output_dir, 'asdk', 'target_image2.axf'),
-            self.app.AppNamePrefix + '.map':
+        yield BuilderOutput(
+            os.path.join(self.output_dir, 'asdk', 'target_image2.axf'),
+            self.app.AppNamePrefix + '.axf')
+        if self.options.enable_link_map_file:
+            yield BuilderOutput(
                 os.path.join(self.output_dir, 'asdk', 'target_image2.map'),
-            'km0_boot_all.bin':
-                os.path.join(self.output_dir, 'asdk',
-                             'bootloader', 'km0_boot_all.bin'),
-            'km4_boot_all.bin':
-                os.path.join(self.output_dir, 'asdk',
-                             'bootloader', 'km4_boot_all.bin'),
-            'km0_km4_image2.bin':
-                os.path.join(self.output_dir, 'asdk',
-                             'image', 'km0_km4_image2.bin'),
-        }
+                self.app.AppNamePrefix + '.map')
+        yield BuilderOutput(
+            os.path.join(self.output_dir, 'asdk', 'bootloader', 'km0_boot_all.bin'),
+            'km0_boot_all.bin')
+        yield BuilderOutput(
+            os.path.join(self.output_dir, 'asdk', 'bootloader', 'km4_boot_all.bin'),
+            'km4_boot_all.bin')
+        yield BuilderOutput(
+            os.path.join(self.output_dir, 'asdk', 'image', 'km0_km4_image2.bin'),
+            'km0_km4_image2.bin')

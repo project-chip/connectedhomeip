@@ -22,7 +22,6 @@
 #include <app-common/zap-generated/cluster-objects.h>
 #include <app/clusters/ota-provider/ota-provider-delegate.h>
 #include <app/server/Server.h>
-#include <app/util/af.h>
 #include <credentials/FabricTable.h>
 #include <crypto/RandUtils.h>
 #include <lib/core/TLV.h>

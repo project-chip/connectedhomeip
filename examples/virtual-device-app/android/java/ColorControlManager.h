@@ -18,6 +18,7 @@
 
 #include <app-common/zap-generated/cluster-objects.h>
 #include <jni.h>
+#include <lib/support/JniReferences.h>
 
 class ColorControlManager
 {
@@ -46,7 +47,7 @@ public:
 
 private:
     CHIP_ERROR InitializeWithObjects(jobject managerObject);
-    jobject mColorControlManagerObject              = nullptr;
+    chip::JniGlobalReference mColorControlManagerObject;
     jmethodID mHandleCurrentHueChangedMethod        = nullptr;
     jmethodID mHandleCurrentSaturationChangedMethod = nullptr;
     jmethodID mHandleColorTemperatureChangedMethod  = nullptr;

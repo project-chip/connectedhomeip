@@ -23,9 +23,9 @@
 #include <lib/support/CHIPMem.h>
 #include <lib/support/StringBuilder.h>
 #include <lib/support/StringSplitter.h>
-#include <transport/TracingStructs.h>
-
 #include <log_json/log_json_build_config.h>
+#include <tracing/metric_event.h>
+#include <transport/TracingStructs.h>
 
 #include <json/json.h>
 
@@ -276,6 +276,55 @@ void JsonBackend::TraceInstant(const char * label, const char * group)
     OutputValue(value);
 }
 
+void JsonBackend::TraceCounter(const char * label)
+{
+    std::string counterId = std::string(label);
+    if (mCounters.find(counterId) == mCounters.end())
+    {
+        mCounters[counterId] = 1;
+    }
+    else
+    {
+        mCounters[counterId]++;
+    }
+    ::Json::Value value;
+    value["event"] = "TraceCounter";
+    value["label"] = label;
+    value["count"] = mCounters[counterId];
+
+    // Output the counter event
+    OutputValue(value);
+}
+
+void JsonBackend::LogMetricEvent(const MetricEvent & event)
+{
+    ::Json::Value value;
+
+    value["label"] = event.key();
+
+    using ValueType = MetricEvent::Value::Type;
+    switch (event.ValueType())
+    {
+    case ValueType::kInt32:
+        value["value"] = event.ValueInt32();
+        break;
+    case ValueType::kUInt32:
+        value["value"] = event.ValueUInt32();
+        break;
+    case ValueType::kChipErrorCode:
+        value["value"] = event.ValueErrorCode();
+        break;
+    case ValueType::kUndefined:
+        value["value"] = ::Json::Value();
+        break;
+    default:
+        value["value"] = "UNKNOWN";
+        break;
+    }
+
+    OutputValue(value);
+}
+
 void JsonBackend::LogMessageSend(MessageSendInfo & info)
 {
     ::Json::Value value;
@@ -369,8 +418,9 @@ void JsonBackend::LogNodeDiscovered(NodeDiscoveredInfo & info)
 
         info.result->address.ToString(address_buff);
 
-        result["supports_tcp"] = info.result->supportsTcp;
-        result["address"]      = address_buff;
+        result["supports_tcp_client"] = info.result->supportsTcpClient;
+        result["supports_tcp_server"] = info.result->supportsTcpServer;
+        result["address"]             = address_buff;
 
         result["mrp"]["idle_retransmit_timeout_ms"]   = info.result->mrpRemoteConfig.mIdleRetransTimeout.count();
         result["mrp"]["active_retransmit_timeout_ms"] = info.result->mrpRemoteConfig.mActiveRetransTimeout.count();

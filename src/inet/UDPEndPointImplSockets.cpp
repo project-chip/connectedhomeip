@@ -170,8 +170,7 @@ CHIP_ERROR IPv4Bind(int socket, const IPAddress & address, uint16_t port)
 } // anonymous namespace
 
 #if CHIP_SYSTEM_CONFIG_USE_PLATFORM_MULTICAST_API
-UDPEndPointImplSockets::MulticastGroupHandler UDPEndPointImplSockets::sJoinMulticastGroupHandler;
-UDPEndPointImplSockets::MulticastGroupHandler UDPEndPointImplSockets::sLeaveMulticastGroupHandler;
+UDPEndPointImplSockets::MulticastGroupHandler UDPEndPointImplSockets::sMulticastGroupHandler;
 #endif // CHIP_SYSTEM_CONFIG_USE_PLATFORM_MULTICAST_API
 
 CHIP_ERROR UDPEndPointImplSockets::BindImpl(IPAddressType addressType, const IPAddress & addr, uint16_t port, InterfaceId interface)
@@ -416,7 +415,10 @@ CHIP_ERROR UDPEndPointImplSockets::SendMsgImpl(const IPPacketInfo * aPktInfo, Sy
     {
         return CHIP_ERROR_POSIX(errno);
     }
-    if (lenSent != msg->DataLength())
+
+    size_t len = static_cast<size_t>(lenSent);
+
+    if (len != msg->DataLength())
     {
         return CHIP_ERROR_OUTBOUND_MESSAGE_TOO_BIG;
     }
@@ -608,11 +610,11 @@ void UDPEndPointImplSockets::HandlePendingIO(System::SocketEvents events)
 
         ssize_t rcvLen = recvmsg(mSocket, &msgHeader, MSG_DONTWAIT);
 
-        if (rcvLen < 0)
+        if (rcvLen == -1)
         {
             lStatus = CHIP_ERROR_POSIX(errno);
         }
-        else if (rcvLen > lBuffer->AvailableDataLength())
+        else if (lBuffer->AvailableDataLength() < static_cast<size_t>(rcvLen))
         {
             lStatus = CHIP_ERROR_INBOUND_MESSAGE_TOO_BIG;
         }
@@ -783,10 +785,21 @@ CHIP_ERROR UDPEndPointImplSockets::IPv4JoinLeaveMulticastGroupImpl(InterfaceId a
         interfaceAddr.s_addr = htonl(INADDR_ANY);
     }
 
+#if INET_CONFIG_UDP_SOCKET_MREQN
+    struct ip_mreqn lMulticastRequest;
+    memset(&lMulticastRequest, 0, sizeof(lMulticastRequest));
+    lMulticastRequest.imr_ifindex   = aInterfaceId.GetPlatformInterface(); /* Network interface index */
+    lMulticastRequest.imr_address   = interfaceAddr;                       /* IP address of local interface */
+    lMulticastRequest.imr_multiaddr = aAddress.ToIPv4();                   /* IP multicast group address*/
+
+#else
+
     struct ip_mreq lMulticastRequest;
     memset(&lMulticastRequest, 0, sizeof(lMulticastRequest));
     lMulticastRequest.imr_interface = interfaceAddr;
     lMulticastRequest.imr_multiaddr = aAddress.ToIPv4();
+
+#endif
 
     const int command = join ? IP_ADD_MEMBERSHIP : IP_DROP_MEMBERSHIP;
     if (setsockopt(mSocket, IPPROTO_IP, command, &lMulticastRequest, sizeof(lMulticastRequest)) != 0)
@@ -801,10 +814,9 @@ CHIP_ERROR UDPEndPointImplSockets::IPv4JoinLeaveMulticastGroupImpl(InterfaceId a
 CHIP_ERROR UDPEndPointImplSockets::IPv6JoinLeaveMulticastGroupImpl(InterfaceId aInterfaceId, const IPAddress & aAddress, bool join)
 {
 #if CHIP_SYSTEM_CONFIG_USE_PLATFORM_MULTICAST_API
-    MulticastGroupHandler handler = join ? sJoinMulticastGroupHandler : sLeaveMulticastGroupHandler;
-    if (handler != nullptr)
+    if (sMulticastGroupHandler != nullptr)
     {
-        return handler(aInterfaceId, aAddress);
+        return sMulticastGroupHandler(aInterfaceId, aAddress, MulticastOperation::kJoin);
     }
 #endif // CHIP_SYSTEM_CONFIG_USE_PLATFORM_MULTICAST_API
 

@@ -90,8 +90,6 @@ bl_iot_sdk("sdk") {
 
 chip_data_model("bouffalolab-lighting") {
   zap_file = "${example_dir}/data_model/lighting-app-wifi.zap"
-
-  zap_pregenerated_dir = "${chip_root}/zzz_generated/lighting-app/zap-generated"
   is_server = true
 }
 
@@ -148,6 +146,7 @@ bouffalolab_executable("lighting_app") {
     "${chip_root}/examples/common/QRCode",
     "${chip_root}/examples/providers:device_info_provider",
     "${chip_root}/src/lib",
+    "${chip_root}/src/platform/logging:default",
     "${chip_root}/src/setup_payload",
   ]
 
@@ -182,6 +181,7 @@ bouffalolab_executable("lighting_app") {
     ]
 
     deps += [
+      "$dir_pw_hdlc:default_addresses",
       "$dir_pw_hdlc:rpc_channel_output",
       "$dir_pw_kvs:crc16",
       "$dir_pw_log",

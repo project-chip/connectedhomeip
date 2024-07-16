@@ -55,30 +55,49 @@
 namespace chip {
 
 template <>
+struct GAutoPtrDeleter<BluezAdapter1>
+{
+    using deleter = GObjectDeleter;
+};
+
+template <>
 struct GAutoPtrDeleter<BluezDevice1>
+{
+    using deleter = GObjectDeleter;
+};
+
+template <>
+struct GAutoPtrDeleter<BluezGattCharacteristic1>
+{
+    using deleter = GObjectDeleter;
+};
+
+template <>
+struct GAutoPtrDeleter<BluezGattManager1>
+{
+    using deleter = GObjectDeleter;
+};
+
+template <>
+struct GAutoPtrDeleter<BluezGattService1>
+{
+    using deleter = GObjectDeleter;
+};
+
+template <>
+struct GAutoPtrDeleter<BluezLEAdvertisement1>
+{
+    using deleter = GObjectDeleter;
+};
+
+template <>
+struct GAutoPtrDeleter<BluezLEAdvertisingManager1>
 {
     using deleter = GObjectDeleter;
 };
 
 namespace DeviceLayer {
 namespace Internal {
-
-enum ChipAdvType
-{
-    BLUEZ_ADV_TYPE_CONNECTABLE = 0x01,
-    BLUEZ_ADV_TYPE_SCANNABLE   = 0x02,
-    BLUEZ_ADV_TYPE_DIRECTED    = 0x04,
-
-    BLUEZ_ADV_TYPE_UNDIRECTED_NONCONNECTABLE_NONSCANNABLE = 0,
-    BLUEZ_ADV_TYPE_UNDIRECTED_CONNECTABLE_NONSCANNABLE    = BLUEZ_ADV_TYPE_CONNECTABLE,
-    BLUEZ_ADV_TYPE_UNDIRECTED_NONCONNECTABLE_SCANNABLE    = BLUEZ_ADV_TYPE_SCANNABLE,
-    BLUEZ_ADV_TYPE_UNDIRECTED_CONNECTABLE_SCANNABLE       = BLUEZ_ADV_TYPE_CONNECTABLE | BLUEZ_ADV_TYPE_SCANNABLE,
-
-    BLUEZ_ADV_TYPE_DIRECTED_NONCONNECTABLE_NONSCANNABLE = BLUEZ_ADV_TYPE_DIRECTED,
-    BLUEZ_ADV_TYPE_DIRECTED_CONNECTABLE_NONSCANNABLE    = BLUEZ_ADV_TYPE_DIRECTED | BLUEZ_ADV_TYPE_CONNECTABLE,
-    BLUEZ_ADV_TYPE_DIRECTED_NONCONNECTABLE_SCANNABLE    = BLUEZ_ADV_TYPE_DIRECTED | BLUEZ_ADV_TYPE_SCANNABLE,
-    BLUEZ_ADV_TYPE_DIRECTED_CONNECTABLE_SCANNABLE = BLUEZ_ADV_TYPE_DIRECTED | BLUEZ_ADV_TYPE_CONNECTABLE | BLUEZ_ADV_TYPE_SCANNABLE,
-};
 
 #define BLUEZ_ADDRESS_SIZE 6 ///< BLE address size (in bytes)
 #define BLUEZ_PATH "/org/bluez"
@@ -90,18 +109,6 @@ enum ChipAdvType
 #define CHARACTERISTIC_INTERFACE BLUEZ_INTERFACE ".GattCharacteristic1"
 #define ADVERTISING_INTERFACE BLUEZ_INTERFACE ".LEAdvertisement1"
 #define DEVICE_INTERFACE BLUEZ_INTERFACE ".Device1"
-
-#define CHIP_PLAT_BLE_UUID_C1_STRING "18ee2ef5-263d-4559-959f-4f9c429f9d11"
-#define CHIP_PLAT_BLE_UUID_C2_STRING "18ee2ef5-263d-4559-959f-4f9c429f9d12"
-#define CHIP_PLAT_BLE_UUID_C3_STRING "64630238-8772-45F2-B87D-748A83218F04"
-
-#define CHIP_BLE_BASE_SERVICE_UUID_STRING "-0000-1000-8000-00805f9b34fb"
-#define CHIP_BLE_SERVICE_PREFIX_LENGTH 8
-#define CHIP_BLE_BASE_SERVICE_PREFIX "0000"
-#define CHIP_BLE_UUID_SERVICE_SHORT_STRING "fff6"
-
-#define CHIP_BLE_UUID_SERVICE_STRING                                                                                               \
-    CHIP_BLE_BASE_SERVICE_PREFIX CHIP_BLE_UUID_SERVICE_SHORT_STRING CHIP_BLE_BASE_SERVICE_UUID_STRING
 
 #define BLUEZ_ADV_TYPE_FLAGS 0x01
 #define BLUEZ_ADV_TYPE_SERVICE_DATA 0x16

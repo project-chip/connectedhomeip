@@ -35,11 +35,12 @@ tests:
       verification: |
           Product maker needs to provide instructions for how to trigger the command on the DUT. For comparison, the DUT behavior for this test step can be simulated using chip-tool (when DUT is a commissioner) or tv-casting-app (when DUT is a commissionee):
 
-          ./chip-tool applicationlauncher stop-app '{"catalogVendorID": 123, "applicationID": "exampleid"}' 1 1
+          ./chip-tool applicationlauncher stop-app 1 1 --Application  '{"catalogVendorID": 123, "applicationID": "exampleid"}'
 
-          ./chip-tv-casting-app applicationlauncher stop-app'{"catalogVendorID": 123, "applicationID": "exampleid"}' 1 1
+          ./chip-tv-casting-app applicationlauncher stop-app 1 1 --Application  '{"catalogVendorID": 123, "applicationID": "exampleid"}'
 
           On TH (tv-app), Verify the stop app command is received successfully.
+
           74562683.652082][12550:12550] CHIP:DMG: InvokeRequestMessage =
           [1674562683.652085][12550:12550] CHIP:DMG: {
           [1674562683.652088][12550:12550] CHIP:DMG:         suppressResponse = false,

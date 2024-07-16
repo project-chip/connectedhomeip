@@ -20,9 +20,9 @@
  *          Provides the implementation of the FailSafeContext object.
  */
 #include "FailSafeContext.h"
-#include <app/icd/ICDConfig.h>
+#include <app/icd/server/ICDServerConfig.h>
 #if CHIP_CONFIG_ENABLE_ICD_SERVER
-#include <app/icd/ICDNotifier.h> // nogncheck
+#include <app/icd/server/ICDNotifier.h> // nogncheck
 #endif
 #include <lib/support/SafeInt.h>
 #include <platform/CHIPDeviceConfig.h>
@@ -85,12 +85,11 @@ void FailSafeContext::ScheduleFailSafeCleanup(FabricIndex fabricIndex, bool addN
 
     SetFailSafeArmed(false);
 
-    ChipDeviceEvent event;
-    event.Type                                                = DeviceEventType::kFailSafeTimerExpired;
-    event.FailSafeTimerExpired.fabricIndex                    = fabricIndex;
-    event.FailSafeTimerExpired.addNocCommandHasBeenInvoked    = addNocCommandInvoked;
-    event.FailSafeTimerExpired.updateNocCommandHasBeenInvoked = updateNocCommandInvoked;
-    CHIP_ERROR status                                         = PlatformMgr().PostEvent(&event);
+    ChipDeviceEvent event{ .Type                 = DeviceEventType::kFailSafeTimerExpired,
+                           .FailSafeTimerExpired = { .fabricIndex                    = fabricIndex,
+                                                     .addNocCommandHasBeenInvoked    = addNocCommandInvoked,
+                                                     .updateNocCommandHasBeenInvoked = updateNocCommandInvoked } };
+    CHIP_ERROR status = PlatformMgr().PostEvent(&event);
 
     if (status != CHIP_NO_ERROR)
     {

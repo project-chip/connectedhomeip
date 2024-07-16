@@ -33,12 +33,12 @@ limitations under the License.
         <define>LAUNDRY_DRYER_CONTROLS_CLUSTER</define>
         <client init="false" tick="false">true</client>
         <server init="false" tick="false">true</server>
-        <description>This cluster supports remotely monitoring and controling the different typs of
-            functionality available to a drying device, such as a laundry dryer.</description>
+        <description>This cluster provides a way to access options associated with the operation of
+            a laundry dryer device type.</description>
 
         <globalAttribute side="either" code="0xFFFD" value="1" />
 
         <attribute side="server" code="0x0000" define="SUPPORTED_DRYNESS_LEVELS" type="array" entryType="DrynessLevelEnum" writable="false" isNullable="false" optional="false" min="0x01" max="0x04">SupportedDrynessLevels</attribute>
         <attribute side="server" code="0x0001" define="SELECTED_DRYNESS_LEVEL" type="DrynessLevelEnum"      writable="true"  isNullable="true"   optional="false">SelectedDrynessLevel</attribute>
     </cluster>
-</configurator> 
+</configurator>

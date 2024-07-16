@@ -14,13 +14,16 @@
  *    See the License for the specific language governing permissions and
  *    limitations under the License.
  */
+
 #include <lib/support/BitMask.h>
-#include <lib/support/UnitTestRegistration.h>
 
 #include <algorithm>
 #include <cstring>
 #include <initializer_list>
-#include <nlunit-test.h>
+
+#include <pw_unit_test/framework.h>
+
+#include <lib/core/StringBuilderAdapters.h>
 
 using namespace chip;
 
@@ -37,68 +40,68 @@ enum class TestEnum : uint16_t
     kBits_High8 = 0xFF00,
 };
 
-void TestBitMaskOperations(nlTestSuite * inSuite, void * inContext)
+TEST(TestBitMask, TestBitMaskOperations)
 {
     BitMask<TestEnum> mask;
 
-    NL_TEST_ASSERT(inSuite, mask.Raw() == 0);
+    EXPECT_EQ(mask.Raw(), 0);
 
     mask.SetField(TestEnum::kBits_1_2, 2);
-    NL_TEST_ASSERT(inSuite, mask.Raw() == 0x0004);
+    EXPECT_EQ(mask.Raw(), 0x0004);
 
     mask.SetRaw(0);
     mask.SetField(TestEnum::kBits_4_7, 0x0B);
-    NL_TEST_ASSERT(inSuite, mask.Raw() == 0x00B0);
+    EXPECT_EQ(mask.Raw(), 0x00B0);
 
     mask.SetRaw(0);
 
     for (uint16_t i = 0; i < 0x10; i++)
     {
         mask.SetField(TestEnum::kBits_High4, i);
-        NL_TEST_ASSERT(inSuite, mask.Raw() == (i << 12));
+        EXPECT_EQ(mask.Raw(), (i << 12));
     }
 
     mask.SetField(TestEnum::kBits_High8, 0x23);
-    NL_TEST_ASSERT(inSuite, mask.Raw() == 0x2300);
+    EXPECT_EQ(mask.Raw(), 0x2300);
 
     mask.SetField(TestEnum::kBits_High4, 0xA);
-    NL_TEST_ASSERT(inSuite, mask.Raw() == 0xA300);
+    EXPECT_EQ(mask.Raw(), 0xA300);
 }
 
-void TestBitFieldLogic(nlTestSuite * inSuite, void * inContext)
+TEST(TestBitMask, TestBitFieldLogic)
 {
     BitMask<TestEnum> mask;
 
     // some general logic that still applies for bit fields just in case
-    NL_TEST_ASSERT(inSuite, !mask.HasAny(TestEnum::kBits_High4));
-    NL_TEST_ASSERT(inSuite, !mask.HasAny(TestEnum::kBits_High8));
+    EXPECT_FALSE(mask.HasAny(TestEnum::kBits_High4));
+    EXPECT_FALSE(mask.HasAny(TestEnum::kBits_High8));
 
     // setting something non-zero in the upper 4 bits sets "something" in both
     // upper and 4 and 8 bits
     mask.SetField(TestEnum::kBits_High4, 0x01);
-    NL_TEST_ASSERT(inSuite, mask.HasAny(TestEnum::kBits_High4));
-    NL_TEST_ASSERT(inSuite, mask.HasAny(TestEnum::kBits_High8));
+    EXPECT_TRUE(mask.HasAny(TestEnum::kBits_High4));
+    EXPECT_TRUE(mask.HasAny(TestEnum::kBits_High8));
 
     // sets something visible in high 8 bits, but not high 4 bits
     mask.SetField(TestEnum::kBits_High8, 0x01);
-    NL_TEST_ASSERT(inSuite, !mask.HasAny(TestEnum::kBits_High4));
-    NL_TEST_ASSERT(inSuite, mask.HasAny(TestEnum::kBits_High8));
+    EXPECT_FALSE(mask.HasAny(TestEnum::kBits_High4));
+    EXPECT_TRUE(mask.HasAny(TestEnum::kBits_High8));
 }
 
-void TestBitMaskInvalid(nlTestSuite * inSuite, void * inContext)
+TEST(TestBitMask, TestBitMaskInvalid)
 {
     BitMask<TestEnum> mask;
 
     // This generally tests for no infinite loops. Nothing to set here
     mask.SetField(TestEnum::kZero, 0x01);
-    NL_TEST_ASSERT(inSuite, mask.Raw() == 0);
+    EXPECT_EQ(mask.Raw(), 0);
 
     mask.SetRaw(0x1234);
     mask.SetField(TestEnum::kZero, 0x01);
-    NL_TEST_ASSERT(inSuite, mask.Raw() == 0x1234);
+    EXPECT_EQ(mask.Raw(), 0x1234);
 }
 
-void TestClear(nlTestSuite * inSuite, void * inContext)
+TEST(TestBitMask, TestClear)
 {
     BitMask<TestEnum> mask1;
     BitMask<TestEnum> mask2;
@@ -110,26 +113,7 @@ void TestClear(nlTestSuite * inSuite, void * inContext)
     mask2.Set(TestEnum::kBits_1_2);
     mask1.Clear(mask2);
 
-    NL_TEST_ASSERT(inSuite, mask1.Raw() == 0xFF01);
+    EXPECT_EQ(mask1.Raw(), 0xFF01);
 }
-
-const nlTest sTests[] = {
-    NL_TEST_DEF("BitMask operations", TestBitMaskOperations), //
-    NL_TEST_DEF("BitFields logic", TestBitFieldLogic),        //
-    NL_TEST_DEF("Invalid operations", TestBitMaskInvalid),    //
-    NL_TEST_DEF("Clear operations", TestClear),               //
-    NL_TEST_SENTINEL()                                        //
-};
 
 } // namespace
-
-int TestBitMask()
-{
-    nlTestSuite theSuite = { "BitMask tests", &sTests[0], nullptr, nullptr };
-
-    // Run test suite against one context.
-    nlTestRunner(&theSuite, nullptr);
-    return nlTestRunnerStats(&theSuite);
-}
-
-CHIP_REGISTER_TEST_SUITE(TestBitMask)

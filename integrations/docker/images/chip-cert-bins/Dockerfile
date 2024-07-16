@@ -1,5 +1,5 @@
 # Stage 1: Setup dependencies (based on chip-build).
-FROM ubuntu:22.04 as chip-build-cert
+FROM ubuntu:24.04 as chip-build-cert
 LABEL org.opencontainers.image.source https://github.com/project-chip/connectedhomeip
 ARG TARGETPLATFORM
 # COMMITHASH defines the target commit to build from. May be passed in using --build-arg.
@@ -30,16 +30,19 @@ RUN case ${TARGETPLATFORM} in \
 # base build and check tools and libraries layer
 RUN set -x \
     && apt-get update \
+    && apt-get upgrade -y \
     && DEBIAN_FRONTEND=noninteractive apt-get install -fy \
     autoconf \
     automake \
     bison \
+    bluez \
     bridge-utils \
     clang \
     clang-format \
     clang-tidy \
     curl \
     flex \
+    gcc \
     g++ \
     git \
     gperf \
@@ -86,7 +89,6 @@ RUN set -x \
     wget \
     git-lfs \
     zlib1g-dev \
-    && rm -rf /var/lib/apt/lists/ \
     && git lfs install \
     && : # last line
 
@@ -116,13 +118,12 @@ RUN case ${TARGETPLATFORM} in \
 
 # Python 3 and PIP
 RUN set -x \
-    && DEBIAN_FRONTEND=noninteractive  apt-get update \
-    && DEBIAN_FRONTEND=noninteractive  apt-get install -y libgirepository1.0-dev \
-    && DEBIAN_FRONTEND=noninteractive apt-get install -y software-properties-common \
+    && DEBIAN_FRONTEND=noninteractive  apt-get install -y \
+    libgirepository1.0-dev \
+    software-properties-common \
     && add-apt-repository universe \
     && curl https://bootstrap.pypa.io/get-pip.py -o get-pip.py \
     && python3 get-pip.py \
-    && rm -rf /var/lib/apt/lists/ \
     && : # last line
 
 RUN set -x \
@@ -145,9 +146,9 @@ RUN set -x \
     && git clone https://github.com/google/bloaty.git \
     && mkdir -p bloaty/build \
     && cd bloaty/build \
-    && cmake ../ \
-    && make -j8 \
-    && make install \
+    && cmake -G Ninja ../ \
+    && ninja \
+    && ninja install \
     && cd ../.. \
     && rm -rf bloaty \
     && : # last line
@@ -177,6 +178,7 @@ RUN case ${TARGETPLATFORM} in \
     --target linux-x64-shell-ipv6only-platform-mdns \
     --target linux-x64-chip-cert-ipv6only-platform-mdns \
     --target linux-x64-all-clusters-ipv6only \
+    --target linux-x64-all-clusters-ipv6only-nlfaultinject \
     --target linux-x64-all-clusters-minimal-ipv6only \
     --target linux-x64-bridge-ipv6only \
     --target linux-x64-tv-app-ipv6only \
@@ -195,6 +197,7 @@ RUN case ${TARGETPLATFORM} in \
     && mv out/linux-x64-shell-ipv6only-platform-mdns/chip-shell out/chip-shell \
     && mv out/linux-x64-chip-cert-ipv6only-platform-mdns/chip-cert out/chip-cert \
     && mv out/linux-x64-all-clusters-ipv6only/chip-all-clusters-app out/chip-all-clusters-app \
+    && mv out/linux-x64-all-clusters-ipv6only-nlfaultinject/chip-all-clusters-app out/chip-all-clusters-app-nlfaultinject \
     && mv out/linux-x64-all-clusters-minimal-ipv6only/chip-all-clusters-minimal-app out/chip-all-clusters-minimal-app \
     && mv out/linux-x64-bridge-ipv6only/chip-bridge-app out/chip-bridge-app \
     && mv out/linux-x64-tv-app-ipv6only/chip-tv-app out/chip-tv-app \
@@ -217,6 +220,7 @@ RUN case ${TARGETPLATFORM} in \
     --target linux-arm64-shell-ipv6only-platform-mdns \
     --target linux-arm64-chip-cert-ipv6only-platform-mdns \
     --target linux-arm64-all-clusters-ipv6only \
+    --target linux-arm64-all-clusters-ipv6only-nlfaultinject \
     --target linux-arm64-all-clusters-minimal-ipv6only \
     --target linux-arm64-bridge-ipv6only \
     --target linux-arm64-tv-app-ipv6only \
@@ -235,6 +239,7 @@ RUN case ${TARGETPLATFORM} in \
     && mv out/linux-arm64-shell-ipv6only-platform-mdns/chip-shell out/chip-shell \
     && mv out/linux-arm64-chip-cert-ipv6only-platform-mdns/chip-cert out/chip-cert \
     && mv out/linux-arm64-all-clusters-ipv6only/chip-all-clusters-app out/chip-all-clusters-app \
+    && mv out/linux-arm64-all-clusters-ipv6only-nlfaultinject/chip-all-clusters-app out/chip-all-clusters-app-nlfaultinject \
     && mv out/linux-arm64-all-clusters-minimal-ipv6only/chip-all-clusters-minimal-app out/chip-all-clusters-minimal-app \
     && mv out/linux-arm64-bridge-ipv6only/chip-bridge-app out/chip-bridge-app \
     && mv out/linux-arm64-tv-app-ipv6only/chip-tv-app out/chip-tv-app \
@@ -252,7 +257,7 @@ RUN case ${TARGETPLATFORM} in \
     *) ;; \
     esac
 
-RUN source scripts/activate.sh && scripts/build_python.sh -m platform -d true
+RUN source scripts/activate.sh && scripts/build_python.sh -m platform -d true -i out/python_env
 
 # Stage 3: Copy relevant cert bins to a minimal image to reduce size.
 FROM ubuntu:22.04
@@ -266,6 +271,7 @@ COPY --from=chip-build-cert-bins /root/connectedhomeip/out/chip-tool chip-tool
 COPY --from=chip-build-cert-bins /root/connectedhomeip/out/chip-shell chip-shell
 COPY --from=chip-build-cert-bins /root/connectedhomeip/out/chip-cert chip-cert
 COPY --from=chip-build-cert-bins /root/connectedhomeip/out/chip-all-clusters-app chip-all-clusters-app
+COPY --from=chip-build-cert-bins /root/connectedhomeip/out/chip-all-clusters-app-nlfaultinject chip-all-clusters-app-nlfaultinject
 COPY --from=chip-build-cert-bins /root/connectedhomeip/out/chip-all-clusters-minimal-app chip-all-clusters-minimal-app
 COPY --from=chip-build-cert-bins /root/connectedhomeip/out/chip-lighting-app chip-lighting-app
 COPY --from=chip-build-cert-bins /root/connectedhomeip/out/chip-tv-casting-app chip-tv-casting-app
@@ -280,14 +286,18 @@ COPY --from=chip-build-cert-bins /root/connectedhomeip/out/lit-icd-app lit-icd-a
 COPY --from=chip-build-cert-bins /root/connectedhomeip/out/chip-energy-management-app chip-energy-management-app
 COPY --from=chip-build-cert-bins /root/connectedhomeip/out/chip-microwave-oven-app chip-microwave-oven-app
 
-# Stage 3.1 Setup the Matter Python environment
+# Stage 3.1: Setup the Matter Python environment
 COPY --from=chip-build-cert-bins /root/connectedhomeip/out/python_lib python_lib
+COPY --from=chip-build-cert-bins /root/connectedhomeip/out/python_env python_env
 COPY --from=chip-build-cert-bins /root/connectedhomeip/src/python_testing python_testing
 
 COPY --from=chip-build-cert-bins /root/connectedhomeip/scripts/tests/requirements.txt /tmp/requirements.txt
-RUN pip install -r /tmp/requirements.txt && rm /tmp/requirements.txt
+RUN pip install --break-system-packages -r /tmp/requirements.txt && rm /tmp/requirements.txt
 
 COPY --from=chip-build-cert-bins /root/connectedhomeip/src/python_testing/requirements.txt /tmp/requirements.txt
-RUN pip install -r /tmp/requirements.txt && rm /tmp/requirements.txt
+RUN pip install --break-system-packages -r /tmp/requirements.txt && rm /tmp/requirements.txt
 
-RUN pip install --no-cache-dir python_lib/controller/python/chip*.whl
+# PIP requires MASON package compilation, which seems to require a JDK
+RUN set -x && DEBIAN_FRONTEND=noninteractive apt-get install -fy openjdk-8-jdk
+
+RUN pip install --break-system-packages --no-cache-dir python_lib/controller/python/chip*.whl

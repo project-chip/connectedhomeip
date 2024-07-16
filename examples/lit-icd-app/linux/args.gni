@@ -30,3 +30,4 @@ matter_enable_tracing_support = true
 chip_enable_icd_server = true
 chip_subscription_timeout_resumption = false
 chip_icd_report_on_active_mode = true
+chip_enable_icd_lit = true

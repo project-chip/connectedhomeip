@@ -37,6 +37,7 @@ enum MediaCommandName
     MediaPlayback_Seek,
     MediaPlayback_SkipForward,
     MediaPlayback_SkipBackward,
+    Messages_PresentMessagesRequest,
     ApplicationLauncher_LaunchApp,
     ApplicationLauncher_StopApp,
     ApplicationLauncher_HideApp,

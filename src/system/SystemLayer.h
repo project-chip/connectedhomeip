@@ -25,6 +25,9 @@
 
 #pragma once
 
+#include <type_traits>
+#include <utility>
+
 // Include configuration headers
 #include <system/SystemConfig.h>
 
@@ -46,8 +49,6 @@
 #elif CHIP_SYSTEM_CONFIG_USE_LIBEV
 #include <ev.h>
 #endif // CHIP_SYSTEM_CONFIG_USE_DISPATCH/LIBEV
-
-#include <utility>
 
 namespace chip {
 namespace System {
@@ -142,6 +143,9 @@ public:
      *   This method searches for the timer matching the provided parameters.
      *   and returns whether it is still "running" and waiting to trigger or not.
      *
+     *   @note This is used to verify by how long the ExtendTimer method extends the timer, as it may ignore an extension request
+     *        if it is shorter than the current timer's remaining time.
+     *
      *   @param[in]  onComplete         A pointer to the function called when timer expires.
      *   @param[in]  appState           A pointer to the application state object used when timer expires.
      *
@@ -149,6 +153,17 @@ public:
      *           with the corresponding appState context. False otherwise.
      */
     virtual bool IsTimerActive(TimerCompleteCallback onComplete, void * appState) = 0;
+
+    /**
+     * @brief
+     *   This method searches for the timer matching the provided parameters
+     *   and returns the remaining time left before it expires.
+     *   @param[in]  onComplete         A pointer to the function called when timer expires.
+     *   @param[in]  appState           A pointer to the application state object used when timer expires.
+     *
+     *  @return The remaining time left before the timer expires.
+     */
+    virtual Clock::Timeout GetRemainingTime(TimerCompleteCallback onComplete, void * appState) = 0;
 
     /**
      * @brief This method cancels a one-shot timer, started earlier through @p StartTimer().  This method must
@@ -167,9 +182,11 @@ public:
 
     /**
      * @brief
-     *   Schedules a function with a signature identical to `OnCompleteFunct` to be run as soon as possible in the Matter context.
-     *   This must only be called when already in the Matter context (from the Matter event loop, or while holding the Matter
-     *   stack lock).
+     *   Schedules a `TimerCompleteCallback` to be run as soon as possible in the Matter context.
+     *
+     *  WARNING: This must only be called when already in the Matter context (from the Matter event loop, or
+     *           while holding the Matter stack lock). The `PlatformMgr::ScheduleWork()` equivalent method
+     *           is safe to call outside Matter context.
      *
      * @param[in] aComplete     A pointer to a callback function to be called when this timer fires.
      * @param[in] aAppState     A pointer to an application state object to be passed to the callback function as argument.
@@ -182,31 +199,29 @@ public:
 
     /**
      * @brief
-     *   Schedules a lambda even to be run as soon as possible in the CHIP context. This function is not thread-safe,
-     *   it must be called with in the CHIP context
+     *   Schedules a lambda object to be run as soon as possible in the Matter context.
      *
-     *  @param[in] event   A object encapsulate the context of a lambda
+     * This is safe to call from any context and will guarantee execution in Matter context.
+     * Note that the Lambda's capture have to fit within `CHIP_CONFIG_LAMBDA_EVENT_SIZE` bytes.
      *
-     *  @retval    CHIP_NO_ERROR                  On success.
-     *  @retval    other Platform-specific errors generated indicating the reason for failure.
-     */
-    CHIP_ERROR ScheduleLambdaBridge(LambdaBridge && event);
-
-    /**
-     * @brief
-     *   Schedules a lambda object to be run as soon as possible in the CHIP context. This function is not thread-safe,
-     *   it must be called with in the CHIP context
+     * @param[in] lambda The Lambda to execute in Matter context.
+     *
+     * @retval CHIP_NO_ERROR On success.
+     * @retval other Platform-specific errors generated indicating the reason for failure.
      */
     template <typename Lambda>
     CHIP_ERROR ScheduleLambda(const Lambda & lambda)
     {
+        static_assert(std::is_invocable_v<Lambda>, "lambda argument must be an invocable with no arguments");
         LambdaBridge bridge;
         bridge.Initialize(lambda);
         return ScheduleLambdaBridge(std::move(bridge));
     }
 
 private:
-    // Copy and assignment NOT DEFINED
+    CHIP_ERROR ScheduleLambdaBridge(LambdaBridge && bridge);
+
+    // Not copyable
     Layer(const Layer &)             = delete;
     Layer & operator=(const Layer &) = delete;
 };

@@ -21,9 +21,9 @@
  *          for Zephyr platforms.
  */
 
-#if !defined(CONFIG_NORDIC_SECURITY_BACKEND)
+#if !defined(CONFIG_NRF_SECURITY)
 #include <crypto/CHIPCryptoPAL.h> // nogncheck
-#endif                            // !defined(CONFIG_NORDIC_SECURITY_BACKEND)
+#endif                            // !defined(CONFIG_NRF_SECURITY)
 
 #include <platform/internal/CHIPDeviceLayerInternal.h>
 
@@ -45,7 +45,7 @@ PlatformManagerImpl PlatformManagerImpl::sInstance{ sChipThreadStack };
 
 static k_timer sOperationalHoursSavingTimer;
 
-#if !defined(CONFIG_NORDIC_SECURITY_BACKEND) && !defined(CONFIG_MBEDTLS_ZEPHYR_ENTROPY)
+#if !defined(CONFIG_NRF_SECURITY) && !defined(CONFIG_MBEDTLS_ZEPHYR_ENTROPY)
 static bool sChipStackEntropySourceAdded = false;
 static int app_entropy_source(void * data, unsigned char * output, size_t len, size_t * olen)
 {
@@ -72,7 +72,7 @@ static int app_entropy_source(void * data, unsigned char * output, size_t len, s
 
     return ret;
 }
-#endif // !defined(CONFIG_NORDIC_SECURITY_BACKEND) && !defined(CONFIG_MBEDTLS_ZEPHYR_ENTROPY)
+#endif // !defined(CONFIG_NRF_SECURITY) && !defined(CONFIG_MBEDTLS_ZEPHYR_ENTROPY)
 
 void PlatformManagerImpl::OperationalHoursSavingTimerEventHandler(k_timer * timer)
 {
@@ -109,16 +109,16 @@ CHIP_ERROR PlatformManagerImpl::_InitChipStack(void)
 {
     CHIP_ERROR err;
 
-#if !defined(CONFIG_NORDIC_SECURITY_BACKEND) && !defined(CONFIG_MBEDTLS_ZEPHYR_ENTROPY)
+#if !defined(CONFIG_NRF_SECURITY) && !defined(CONFIG_MBEDTLS_ZEPHYR_ENTROPY)
     // Minimum required from source before entropy is released ( with mbedtls_entropy_func() ) (in bytes)
     const size_t kThreshold = 16;
-#endif // !defined(CONFIG_NORDIC_SECURITY_BACKEND) && !defined(CONFIG_MBEDTLS_ZEPHYR_ENTROPY)
+#endif // !defined(CONFIG_NRF_SECURITY) && !defined(CONFIG_MBEDTLS_ZEPHYR_ENTROPY)
 
     // Initialize the configuration system.
     err = Internal::ZephyrConfig::Init();
     SuccessOrExit(err);
 
-#if !defined(CONFIG_NORDIC_SECURITY_BACKEND) && !defined(CONFIG_MBEDTLS_ZEPHYR_ENTROPY)
+#if !defined(CONFIG_NRF_SECURITY) && !defined(CONFIG_MBEDTLS_ZEPHYR_ENTROPY)
     if (!sChipStackEntropySourceAdded)
     {
         // Add entropy source based on Zephyr entropy driver
@@ -126,7 +126,7 @@ CHIP_ERROR PlatformManagerImpl::_InitChipStack(void)
         SuccessOrExit(err);
         sChipStackEntropySourceAdded = true;
     }
-#endif // !defined(CONFIG_NORDIC_SECURITY_BACKEND) && !defined(CONFIG_MBEDTLS_ZEPHYR_ENTROPY)
+#endif // !defined(CONFIG_NRF_SECURITY) && !defined(CONFIG_MBEDTLS_ZEPHYR_ENTROPY)
 
     // Call _InitChipStack() on the generic implementation base class to finish the initialization process.
     err = Internal::GenericPlatformManagerImpl_Zephyr<PlatformManagerImpl>::_InitChipStack();

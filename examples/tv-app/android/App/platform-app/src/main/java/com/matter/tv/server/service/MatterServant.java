@@ -17,7 +17,6 @@
  */
 package com.matter.tv.server.service;
 
-import android.app.Activity;
 import android.content.Context;
 import android.util.Log;
 import androidx.annotation.NonNull;
@@ -41,6 +40,7 @@ import com.matter.tv.server.tvapp.LevelManagerStub;
 import com.matter.tv.server.tvapp.LowPowerManagerStub;
 import com.matter.tv.server.tvapp.MediaInputManagerStub;
 import com.matter.tv.server.tvapp.MediaPlaybackManagerStub;
+import com.matter.tv.server.tvapp.MessagesManagerStub;
 import com.matter.tv.server.tvapp.OnOffManagerStub;
 import com.matter.tv.server.tvapp.TvApp;
 import com.matter.tv.server.tvapp.WakeOnLanManagerStub;
@@ -67,7 +67,6 @@ public class MatterServant {
   }
 
   private Context context;
-  private Activity activity;
 
   public void init(@NonNull Context context) {
 
@@ -96,6 +95,8 @@ public class MatterServant {
                 app.setMediaPlaybackManager(endpoint, new MediaPlaybackManagerStub(endpoint));
               } else if (clusterId == Clusters.ClusterId_Channel) {
                 app.setChannelManager(endpoint, new ChannelManagerStub(endpoint));
+              } else if (clusterId == Clusters.ClusterId_Messaging) {
+                app.setMessagesManager(endpoint, new MessagesManagerStub(endpoint));
               } else if (clusterId == Clusters.ClusterId_OnOff) {
                 mOnOffEndpoint = endpoint;
                 app.setOnOffManager(endpoint, new OnOffManagerStub(endpoint));
@@ -145,14 +146,6 @@ public class MatterServant {
   public void toggleOnOff() {
     mTvApp.setOnOff(mOnOffEndpoint, mIsOn);
     mIsOn = !mIsOn;
-  }
-
-  public void setActivity(Activity activity) {
-    this.activity = activity;
-  }
-
-  public Activity getActivity() {
-    return activity;
   }
 
   public void sendCustomCommand(String customCommand) {

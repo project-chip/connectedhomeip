@@ -30,3 +30,4 @@ matter_enable_tracing_support = true
 
 chip_enable_read_client = false
 chip_enable_energy_evse_trigger = true
+chip_enable_energy_reporting_trigger = true

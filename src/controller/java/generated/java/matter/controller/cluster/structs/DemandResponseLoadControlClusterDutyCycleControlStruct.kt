@@ -42,7 +42,7 @@ class DemandResponseLoadControlClusterDutyCycleControlStruct(val dutyCycle: UByt
 
     fun fromTlv(
       tlvTag: Tag,
-      tlvReader: TlvReader
+      tlvReader: TlvReader,
     ): DemandResponseLoadControlClusterDutyCycleControlStruct {
       tlvReader.enterStructure(tlvTag)
       val dutyCycle = tlvReader.getUByte(ContextSpecificTag(TAG_DUTY_CYCLE))

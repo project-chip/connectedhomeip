@@ -85,7 +85,6 @@ tests:
           [1667888323.967841][3151:3151] CHIP:SVR: https://project-chip.github.io/connectedhomeip/qrcode.html?data=MT%3A-24J042C00KA0648G00
           [1667888323.967940][3151:3151] CHIP:SVR: Manual pairing code: [34970112332]
           [1667888323.968031][3151:3151] CHIP:DMG: Endpoint 0, Cluster 0x0000_001D update version to ea7ea7b8
-          [1667888323.981832][3151:3153] CHIP:DL: TRACE: Bus acquired for name MATTER-3840
       disabled: true
 
     - label: "Step 1b: Scan the QR code from the previous step using the DUT."

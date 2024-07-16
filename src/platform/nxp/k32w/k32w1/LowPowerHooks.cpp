@@ -34,12 +34,12 @@ using namespace ::chip::DeviceLayer;
 
 extern "C" void App_AllowDeviceToSleep()
 {
-    PWR_AllowDeviceToSleep();
+    ;
 }
 
 extern "C" void App_DisallowDeviceToSleep()
 {
-    PWR_DisallowDeviceToSleep();
+    ;
 }
 
 #endif

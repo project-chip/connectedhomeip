@@ -76,9 +76,7 @@ CHIP_ERROR SilabsConfig::Init()
 
 void SilabsConfig::DeInit()
 {
-#ifndef BRD4325A // TODO: fix semaphore usage in nvm3_lock for siwx917. use weak implementation for that board instead
     vSemaphoreDelete(nvm3_Sem);
-#endif // not BRD4325A
     nvm3_close(nvm3_defaultHandle);
 }
 
@@ -550,11 +548,13 @@ bool SilabsConfig::ValidConfigKey(Key key)
     return false;
 }
 
+#if CONFIG_BUILD_FOR_HOST_UNIT_TEST
 void SilabsConfig::RunConfigUnitTest()
 {
     // Run common unit test.
     ::chip::DeviceLayer::Internal::RunConfigUnitTest<SilabsConfig>();
 }
+#endif // CONFIG_BUILD_FOR_HOST_UNIT_TEST
 
 void SilabsConfig::RepackNvm3Flash(void)
 {

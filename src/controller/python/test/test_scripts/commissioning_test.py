@@ -19,6 +19,7 @@
 
 # Commissioning test.
 
+import asyncio
 import os
 import sys
 from optparse import OptionParser
@@ -39,13 +40,14 @@ TEST_THREAD_NETWORK_DATASET_TLV = "0e080000000000010000" + \
 # Network id, for the thread network, current a const value, will be changed to XPANID of the thread network.
 TEST_THREAD_NETWORK_ID = "fedcba9876543210"
 TEST_DISCRIMINATOR = 3840
+TEST_DISCOVERY_TYPE = 2
 
 ENDPOINT_ID = 0
 LIGHTING_ENDPOINT_ID = 1
 GROUP_ID = 0
 
 
-def main():
+async def main():
     optParser = OptionParser()
     optParser.add_option(
         "-t",
@@ -104,6 +106,15 @@ def main():
         help="Path that contains valid and trusted PAA Root Certificates.",
         metavar="<paa-trust-store-path>"
     )
+    optParser.add_option(
+        "--discovery-type",
+        action="store",
+        dest="discoveryType",
+        default=TEST_DISCOVERY_TYPE,
+        type=int,
+        help="Discovery type of commissioning. (0: networkOnly 1: networkOnlyWithoutPASEAutoRetry 2: All<Ble & Network>)",
+        metavar="<discovery-type>"
+    )
 
     (options, remainingArgs) = optParser.parse_args(sys.argv[1:])
 
@@ -114,7 +125,7 @@ def main():
         nodeid=112233, paaTrustStorePath=options.paaTrustStorePath, testCommissioner=True)
 
     logger.info("Testing discovery")
-    FailIfNot(test.TestDiscovery(discriminator=options.discriminator),
+    FailIfNot(await test.TestDiscovery(discriminator=options.discriminator),
               "Failed to discover any devices.")
 
     FailIfNot(test.SetNetworkCommissioningParameters(dataset=TEST_THREAD_NETWORK_DATASET_TLV),
@@ -122,22 +133,22 @@ def main():
 
     if options.deviceAddress:
         logger.info("Testing commissioning (IP)")
-        FailIfNot(test.TestCommissioning(ip=options.deviceAddress,
-                                         setuppin=20202021,
-                                         nodeid=options.nodeid),
+        FailIfNot(await test.TestCommissioning(ip=options.deviceAddress,
+                                               setuppin=20202021,
+                                               nodeid=options.nodeid),
                   "Failed to finish commissioning")
     elif options.setupPayload:
         logger.info("Testing commissioning (w/ Setup Payload)")
-        FailIfNot(test.TestCommissioningWithSetupPayload(setupPayload=options.setupPayload,
-                                                         nodeid=options.nodeid),
+        FailIfNot(await test.TestCommissioningWithSetupPayload(setupPayload=options.setupPayload,
+                                                               nodeid=options.nodeid,
+                                                               discoveryType=options.discoveryType),
                   "Failed to finish commissioning")
     else:
         TestFail("Must provide device address or setup payload to commissioning the device")
 
     logger.info("Testing on off cluster")
-    FailIfNot(test.TestOnOffCluster(nodeid=options.nodeid,
-                                    endpoint=LIGHTING_ENDPOINT_ID,
-                                    group=GROUP_ID), "Failed to test on off cluster")
+    FailIfNot(await test.TestOnOffCluster(nodeid=options.nodeid,
+                                          endpoint=LIGHTING_ENDPOINT_ID), "Failed to test on off cluster")
 
     FailIfNot(test.TestUsedTestCommissioner(),
               "Test commissioner check failed")
@@ -153,7 +164,7 @@ def main():
 
 if __name__ == "__main__":
     try:
-        main()
+        asyncio.run(main())
     except Exception as ex:
         logger.exception(ex)
         TestFail("Exception occurred when running tests.")

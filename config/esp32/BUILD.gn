@@ -36,6 +36,9 @@ group("esp32") {
   }
 
   if (chip_build_tests) {
-    deps += [ "${chip_root}/src:tests" ]
+    deps += [
+      "${chip_root}/src:tests",
+      "${chip_root}/src/lib/support:pw_tests_wrapper",
+    ]
   }
 }

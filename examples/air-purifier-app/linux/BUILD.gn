@@ -33,6 +33,7 @@ executable("chip-air-purifier-app") {
     "${chip_root}/examples/air-purifier-app/air-purifier-common/src/air-purifier-manager.cpp",
     "${chip_root}/examples/air-purifier-app/air-purifier-common/src/air-quality-sensor-manager.cpp",
     "${chip_root}/examples/air-purifier-app/air-purifier-common/src/filter-delegates.cpp",
+    "${chip_root}/examples/air-purifier-app/air-purifier-common/src/thermostat-manager.cpp",
     "include/CHIPProjectAppConfig.h",
     "main.cpp",
   ]

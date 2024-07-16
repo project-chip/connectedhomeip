@@ -31,7 +31,8 @@ using namespace ::chip;
 
 #include <app/server/OnboardingCodesUtil.h>
 
-#include <app/clusters/general-diagnostics-server/GenericFaultTestEventTriggerDelegate.h>
+#include <app/TestEventTriggerDelegate.h>
+#include <app/clusters/general-diagnostics-server/GenericFaultTestEventTriggerHandler.h>
 #include <app/clusters/general-diagnostics-server/general-diagnostics-server.h>
 #include <app/clusters/identify-server/identify-server.h>
 #include <app/server/Dnssd.h>
@@ -191,10 +192,13 @@ void AppTask::InitServer(intptr_t arg)
     nativeParams.openThreadInstancePtr = chip::DeviceLayer::ThreadStackMgrImpl().OTInstance();
     initParams.endpointNativeParams    = static_cast<void *>(&nativeParams);
 
-    // Use GenericFaultTestEventTriggerDelegate to inject faults
-    static GenericFaultTestEventTriggerDelegate testEventTriggerDelegate{ ByteSpan(sTestEventTriggerEnableKey) };
+    // Use GenericFaultTestEventTriggerHandler to inject faults
+    static SimpleTestEventTriggerDelegate sTestEventTriggerDelegate{};
+    static GenericFaultTestEventTriggerHandler sFaultTestEventTriggerHandler{};
+    VerifyOrDie(sTestEventTriggerDelegate.Init(ByteSpan(sTestEventTriggerEnableKey)) == CHIP_NO_ERROR);
+    VerifyOrDie(sTestEventTriggerDelegate.AddHandler(&sFaultTestEventTriggerHandler) == CHIP_NO_ERROR);
     (void) initParams.InitializeStaticResourcesBeforeServerInit();
-    initParams.testEventTriggerDelegate = &testEventTriggerDelegate;
+    initParams.testEventTriggerDelegate = &sTestEventTriggerDelegate;
 
     chip::Server::GetInstance().Init(initParams);
 
@@ -293,13 +297,13 @@ void AppTask::ButtonEventHandler(uint8_t btnIdx, bool btnPressed)
     case APP_FUNCTION2_SWITCH: {
         if (!btnPressed)
         {
-            ChipLogProgress(NotSpecified, "Switch initial press");
-            SwitchMgr().GenericSwitchInitialPress();
+            ChipLogProgress(NotSpecified, "Switch release press");
+            button_event.Handler = SwitchMgr().GenericSwitchReleasePressHandler;
         }
         else
         {
-            ChipLogProgress(NotSpecified, "Switch release press");
-            SwitchMgr().GenericSwitchReleasePress();
+            ChipLogProgress(NotSpecified, "Switch initial press");
+            button_event.Handler = SwitchMgr().GenericSwitchInitialPressHandler;
         }
         break;
     }
@@ -491,11 +495,12 @@ void AppTask::UpdateClusterState(void)
     /* write the new attribute value based on attribute setter API.
        example API usage of on-off attribute:
 
-        EmberAfStatus status = Clusters::OnOff::Attributes::OnOff::Set(QPG_LIGHT_ENDPOINT_ID, LightingMgr().IsTurnedOn());
+        Protocols::InteractionModel::Status status = Clusters::OnOff::Attributes::OnOff::Set(QPG_LIGHT_ENDPOINT_ID,
+       LightingMgr().IsTurnedOn());
 
-        if (status != EMBER_ZCL_STATUS_SUCCESS)
+        if (status != Protocols::InteractionModel::Status::Success)
         {
-            ChipLogError(NotSpecified, "ERR: updating on/off %x", status);
+            ChipLogError(NotSpecified, "ERR: updating on/off %x", to_underlying(status));
         }
     */
 }
@@ -511,10 +516,14 @@ void AppTask::UpdateLEDs(void)
     // If the system has ble connection(s) uptill the stage above, THEN blink
     // the LEDs at an even rate of 100ms.
     //
-    // Otherwise, blink the LED ON for a very short time.
+    // Otherwise, turn the LED OFF.
     if (sIsThreadProvisioned && sIsThreadEnabled)
     {
         qvIO_LedSet(SYSTEM_STATE_LED, true);
+    }
+    else if (sIsThreadProvisioned && !sIsThreadEnabled)
+    {
+        qvIO_LedBlink(SYSTEM_STATE_LED, 950, 50);
     }
     else if (sHaveBLEConnections)
     {
@@ -527,7 +536,7 @@ void AppTask::UpdateLEDs(void)
     else
     {
         // not commissioned yet
-        qvIO_LedBlink(SYSTEM_STATE_LED, 50, 950);
+        qvIO_LedSet(SYSTEM_STATE_LED, false);
     }
 }
 

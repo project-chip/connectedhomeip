@@ -61,6 +61,14 @@ public:
 
     chip::DeviceLayer::CommissionableDataProvider * GetCommissionableDataProvider() const { return mCommissionableDataProvider; }
 
+    CHIP_ERROR SetCommissionableDataProvider(chip::DeviceLayer::CommissionableDataProvider * commissionableDataProvider) const
+    {
+        ChipLogProgress(AppServer, "AppParameters::SetCommissionableDataProvider()");
+        VerifyOrReturnError(commissionableDataProvider != nullptr, CHIP_ERROR_INVALID_ARGUMENT);
+        mCommissionableDataProvider = commissionableDataProvider;
+        return CHIP_NO_ERROR;
+    }
+
     chip::Credentials::DeviceAttestationCredentialsProvider * GetDeviceAttestationCredentialsProvider() const
     {
         return mDeviceAttestationCredentialsProvider;
@@ -81,7 +89,7 @@ private:
      * @brief Provides CommissionableData (such as setupPasscode, discriminator, etc) used to get the CastingApp commissioned
      *
      */
-    chip::DeviceLayer::CommissionableDataProvider * mCommissionableDataProvider;
+    mutable chip::DeviceLayer::CommissionableDataProvider * mCommissionableDataProvider;
 
     /**
      * @brief Provides DeviceAttestationCredentials of the CastingApp during commissioning

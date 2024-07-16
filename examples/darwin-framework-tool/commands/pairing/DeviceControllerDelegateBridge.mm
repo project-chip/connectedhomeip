@@ -22,7 +22,7 @@
 @implementation CHIPToolDeviceControllerDelegate
 - (void)controller:(MTRDeviceController *)controller statusUpdate:(MTRCommissioningStatus)status
 {
-    NSLog(@"Pairing Status Update: %tu", status);
+    NSLog(@"Pairing Status Update: %ld", static_cast<long>(status));
     switch (status) {
     case MTRCommissioningStatusSuccess:
         ChipLogProgress(chipTool, "Secure Pairing Success");
@@ -36,7 +36,7 @@
         ChipLogError(chipTool, "MTRCommissioningStatusDiscoveringMoreDevices: This should not happen.");
         break;
     case MTRCommissioningStatusUnknown:
-        ChipLogError(chipTool, "Uknown Pairing Status");
+        ChipLogError(chipTool, "Unknown Pairing Status");
         break;
     }
 }
@@ -61,6 +61,13 @@
 - (void)controller:(MTRDeviceController *)controller commissioningComplete:(NSError *)error
 {
     _commandBridge->SetCommandExitStatus(error, "Pairing Commissioning Complete");
+}
+
+- (void)controller:(MTRDeviceController *)controller commissioningComplete:(NSError *)error nodeID:(NSNumber *)nodeID metrics:(MTRMetrics *)metrics
+{
+    (void) nodeID;
+    NSString * message = [NSString stringWithFormat:@"Pairing Commissioning Complete with metrics %@", metrics];
+    _commandBridge->SetCommandExitStatus(error, [message UTF8String]);
 }
 
 @end

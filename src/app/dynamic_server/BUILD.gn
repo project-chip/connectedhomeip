@@ -1,0 +1,32 @@
+# Copyright (c) 2020 Project CHIP Authors
+#
+# Licensed under the Apache License, Version 2.0 (the "License");
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
+#
+# http://www.apache.org/licenses/LICENSE-2.0
+#
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
+
+import("//build_overrides/chip.gni")
+
+# This config is to allow ota-provider or similar to include
+# `_attribute-storage.h` (underscore to make linter not recognize this as a
+# reference) for overriden function access that are overriden by
+# DynamicDispatcher
+#
+# This feels awkward and should be cleaned up once we manage to isolate
+# generated code more.
+config("mock-codegen-config") {
+  include_dirs = [ "mock_includes" ]
+}
+
+source_set("mock-codegen-includes") {
+  sources = [ "mock_includes/zap-generated/endpoint_config.h" ]
+
+  public_configs = [ ":mock-codegen-config" ]
+}

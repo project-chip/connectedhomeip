@@ -19,10 +19,11 @@
 
 #include <string.h> // For mem* functions.
 
-#include <app/util/basic-types.h>
-#include <lib/core/Optional.h>
+#include <optional>
 
-#include <transport/raw/MessageHeader.h>
+#include <app/util/basic-types.h>
+#include <lib/core/NodeId.h>
+
 static_assert(sizeof(chip::NodeId) == sizeof(uint64_t), "Unexpected node if size");
 
 /**
@@ -36,13 +37,13 @@ enum
 #endif
 {
     /** A binding that is currently not in use. */
-    EMBER_UNUSED_BINDING = 0,
+    MATTER_UNUSED_BINDING = 0,
     /** A unicast binding whose 64-bit identifier is the destination EUI64. */
-    EMBER_UNICAST_BINDING = 1,
+    MATTER_UNICAST_BINDING = 1,
     /** A multicast binding whose 64-bit identifier is the group address. This
      * binding can be used to send messages to the group and to receive
      * messages sent to the group. */
-    EMBER_MULTICAST_BINDING = 3,
+    MATTER_MULTICAST_BINDING = 3,
 };
 
 /**
@@ -74,10 +75,10 @@ typedef uint16_t EmberPanId;
 struct EmberBindingTableEntry
 {
     static EmberBindingTableEntry ForNode(chip::FabricIndex fabric, chip::NodeId node, chip::EndpointId localEndpoint,
-                                          chip::EndpointId remoteEndpoint, chip::Optional<chip::ClusterId> cluster)
+                                          chip::EndpointId remoteEndpoint, std::optional<chip::ClusterId> cluster)
     {
         EmberBindingTableEntry entry = {
-            .type        = EMBER_UNICAST_BINDING,
+            .type        = MATTER_UNICAST_BINDING,
             .fabricIndex = fabric,
             .local       = localEndpoint,
             .clusterId   = cluster,
@@ -88,10 +89,10 @@ struct EmberBindingTableEntry
     }
 
     static EmberBindingTableEntry ForGroup(chip::FabricIndex fabric, chip::GroupId group, chip::EndpointId localEndpoint,
-                                           chip::Optional<chip::ClusterId> cluster)
+                                           std::optional<chip::ClusterId> cluster)
     {
         EmberBindingTableEntry entry = {
-            .type        = EMBER_MULTICAST_BINDING,
+            .type        = MATTER_MULTICAST_BINDING,
             .fabricIndex = fabric,
             .local       = localEndpoint,
             .clusterId   = cluster,
@@ -102,7 +103,7 @@ struct EmberBindingTableEntry
     }
 
     /** The type of binding. */
-    EmberBindingType type = EMBER_UNUSED_BINDING;
+    EmberBindingType type = MATTER_UNUSED_BINDING;
 
     chip::FabricIndex fabricIndex;
     /** The endpoint on the local node. */
@@ -114,7 +115,7 @@ struct EmberBindingTableEntry
      * that a binding can be used to to send messages with any cluster ID, not
      * just that listed in the binding.
      */
-    chip::Optional<chip::ClusterId> clusterId;
+    std::optional<chip::ClusterId> clusterId;
     /** The endpoint on the remote node (specified by \c identifier). */
     chip::EndpointId remote;
     /** A 64-bit destination identifier.  This is either:
@@ -135,44 +136,18 @@ struct EmberBindingTableEntry
             return false;
         }
 
-        if (type == EMBER_MULTICAST_BINDING && groupId != other.groupId)
+        if (type == MATTER_MULTICAST_BINDING && groupId != other.groupId)
         {
             return false;
         }
 
-        if (type == EMBER_UNICAST_BINDING && (nodeId != other.nodeId || remote != other.remote))
+        if (type == MATTER_UNICAST_BINDING && (nodeId != other.nodeId || remote != other.remote))
         {
             return false;
         }
 
         return fabricIndex == other.fabricIndex && local == other.local && clusterId == other.clusterId;
     }
-};
-
-#ifdef DOXYGEN_SHOULD_SKIP_THIS
-enum EmberStatus
-#else
-typedef uint8_t EmberStatus;
-enum
-#endif // DOXYGEN_SHOULD_SKIP_THIS
-{
-    /**
-     * @name Generic Messages
-     * These messages are system wide.
-     */
-    //@{
-
-    /**
-     * @brief The generic "no error" message.
-     */
-    EMBER_SUCCESS = 0x00,
-
-    /**
-     * @brief An invalid value was passed as an argument to a function.
-     */
-    EMBER_BAD_ARGUMENT = 0x02,
-
-    //@} // END Generic Messages
 };
 
 /**
@@ -191,71 +166,6 @@ typedef struct
     chip::EndpointId endpoint;
 
 } EmberEventControl;
-
-/**
- * @description Useful macro for avoiding compiler warnings related to unused
- * function arguments or unused variables.
- */
-#define UNUSED_VAR(x) (void) (x)
-
-/**
- * @brief The broadcast endpoint, as defined in the ZigBee spec.
- */
-#define EMBER_BROADCAST_ENDPOINT (chip::kInvalidEndpointId)
-
-/**
- * @brief Useful to reference a single bit of a byte.
- */
-#define EMBER_BIT(nr) (1UL << (nr)) // Unsigned avoids compiler warnings re EMBER_BIT(15)
-
-/**
- * @brief Returns the low byte of the 16-bit value \c n as an \c uint8_t.
- */
-#define EMBER_LOW_BYTE(n) ((uint8_t) ((n) &0xFF))
-
-/**
- * @brief Returns the high byte of the 16-bit value \c n as an \c uint8_t.
- */
-#define EMBER_HIGH_BYTE(n) ((uint8_t) (EMBER_LOW_BYTE((n) >> 8)))
-/**
- * @brief Returns the low byte of the 32-bit value \c n as an \c uint8_t.
- */
-#define EMBER_BYTE_0(n) ((uint8_t) ((n) &0xFF))
-
-/**
- * @brief Returns the second byte of the 32-bit value \c n as an \c uint8_t.
- */
-#define EMBER_BYTE_1(n) EMBER_BYTE_0((n) >> 8)
-
-/**
- * @brief Returns the third byte of the 32-bit value \c n as an \c uint8_t.
- */
-#define EMBER_BYTE_2(n) EMBER_BYTE_0((n) >> 16)
-
-/**
- * @brief Returns the high byte of the 32-bit value \c n as an \c uint8_t.
- */
-#define EMBER_BYTE_3(n) EMBER_BYTE_0((n) >> 24)
-
-/**
- * @brief Returns the fifth byte of the 64-bit value \c n as an \c uint8_t.
- */
-#define EMBER_BYTE_4(n) EMBER_BYTE_0((n) >> 32)
-
-/**
- * @brief Returns the sixth byte of the 64-bit value \c n as an \c uint8_t.
- */
-#define EMBER_BYTE_5(n) EMBER_BYTE_0((n) >> 40)
-
-/**
- * @brief Returns the seventh byte of the 64-bit value \c n as an \c uint8_t.
- */
-#define EMBER_BYTE_6(n) EMBER_BYTE_0((n) >> 48)
-
-/**
- * @brief Returns the high byte of the 64-bit value \c n as an \c uint8_t.
- */
-#define EMBER_BYTE_7(n) EMBER_BYTE_0((n) >> 56)
 
 /**
  * @brief Returns the value of the bitmask \c bits within

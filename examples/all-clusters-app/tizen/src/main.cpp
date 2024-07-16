@@ -20,7 +20,7 @@
 #include <app-common/zap-generated/ids/Clusters.h>
 #include <app/ConcreteAttributePath.h>
 #include <app/clusters/network-commissioning/network-commissioning.h>
-#include <app/util/af.h>
+#include <app/util/endpoint-config-api.h>
 #include <platform/Tizen/NetworkCommissioningDriver.h>
 #include <static-supported-temperature-levels.h>
 

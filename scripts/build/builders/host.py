@@ -15,7 +15,9 @@
 import os
 from enum import Enum, auto
 from platform import uname
+from typing import Optional
 
+from .builder import BuilderOutput
 from .gn import GnBuilder
 
 
@@ -66,6 +68,8 @@ class HostApp(Enum):
     EFR32_TEST_RUNNER = auto()
     TV_CASTING = auto()
     BRIDGE = auto()
+    FABRIC_ADMIN = auto()
+    FABRIC_BRIDGE = auto()
     JAVA_MATTER_CONTROLLER = auto()
     KOTLIN_MATTER_CONTROLLER = auto()
     CONTACT_SENSOR = auto()
@@ -118,6 +122,10 @@ class HostApp(Enum):
             return 'tv-casting-app/linux'
         elif self == HostApp.BRIDGE:
             return 'bridge-app/linux'
+        elif self == HostApp.FABRIC_ADMIN:
+            return 'fabric-admin'
+        elif self == HostApp.FABRIC_BRIDGE:
+            return 'fabric-bridge-app/linux'
         elif self == HostApp.JAVA_MATTER_CONTROLLER:
             return 'java-matter-controller'
         elif self == HostApp.KOTLIN_MATTER_CONTROLLER:
@@ -215,6 +223,12 @@ class HostApp(Enum):
         elif self == HostApp.BRIDGE:
             yield 'chip-bridge-app'
             yield 'chip-bridge-app.map'
+        elif self == HostApp.FABRIC_ADMIN:
+            yield 'fabric-admin'
+            yield 'fabric-admin.map'
+        elif self == HostApp.FABRIC_BRIDGE:
+            yield 'fabric-bridge-app'
+            yield 'fabric-bridge-app.map'
         elif self == HostApp.JAVA_MATTER_CONTROLLER:
             yield 'java-matter-controller'
             yield 'java-matter-controller.map'
@@ -228,14 +242,14 @@ class HostApp(Enum):
             yield 'dishwasher-app'
             yield 'dishwasher-app.map'
         elif self == HostApp.MICROWAVE_OVEN:
-            yield 'microwave-oven-app'
-            yield 'microwave-oven-app.map'
+            yield 'chip-microwave-oven-app'
+            yield 'chip-microwave-oven-app.map'
         elif self == HostApp.REFRIGERATOR:
             yield 'refrigerator-app'
             yield 'refrigerator-app.map'
         elif self == HostApp.RVC:
-            yield 'rvc-app'
-            yield 'rvc-app.map'
+            yield 'chip-rvc-app'
+            yield 'chip-rvc-app.map'
         elif self == HostApp.AIR_PURIFIER:
             yield 'air-purifier-app'
             yield 'air-purifier-app.map'
@@ -295,10 +309,13 @@ class HostBuilder(GnBuilder):
                  enable_ipv4=True, enable_ble=True, enable_wifi=True,
                  enable_thread=True, use_tsan=False, use_asan=False, use_ubsan=False,
                  separate_event_loop=True, fuzzing_type: HostFuzzingType = HostFuzzingType.NONE, use_clang=False,
-                 interactive_mode=True, extra_tests=False, use_platform_mdns=False, enable_rpcs=False,
+                 interactive_mode=True, extra_tests=False, use_nl_fault_injection=False, use_platform_mdns=False, enable_rpcs=False,
                  use_coverage=False, use_dmalloc=False, minmdns_address_policy=None,
                  minmdns_high_verbosity=False, imgui_ui=False, crypto_library: HostCryptoLibrary = None,
-                 enable_test_event_triggers=None):
+                 enable_test_event_triggers=None,
+                 enable_dnssd_tests: Optional[bool] = None,
+                 chip_casting_simplified: Optional[bool] = None
+                 ):
         super(HostBuilder, self).__init__(
             root=os.path.join(root, 'examples', app.ExamplePath()),
             runner=runner)
@@ -368,6 +385,9 @@ class HostBuilder(GnBuilder):
                 # so setting clang is not correct
                 raise Exception('Fake host board is always gcc (not clang)')
 
+        if use_nl_fault_injection:
+            self.extra_gn_options.append('chip_with_nlfaultinjection=true')
+
         if minmdns_address_policy:
             if use_platform_mdns:
                 raise Exception('Address policy applies to minmdns only')
@@ -392,7 +412,7 @@ class HostBuilder(GnBuilder):
             self.build_command = 'runner'
             # board will NOT be used, but is required to be able to properly
             # include things added by the test_runner efr32 build
-            self.extra_gn_options.append('silabs_board="BRD4161A"')
+            self.extra_gn_options.append('silabs_board="BRD4187C"')
 
         # Crypto library has per-platform defaults (like openssl for linux/mac
         # and mbedtls for android/freertos/zephyr/mbed/...)
@@ -402,6 +422,15 @@ class HostBuilder(GnBuilder):
         if enable_test_event_triggers is not None:
             if 'EVSE' in enable_test_event_triggers:
                 self.extra_gn_options.append('chip_enable_energy_evse_trigger=true')
+
+        if enable_dnssd_tests is not None:
+            if enable_dnssd_tests:
+                self.extra_gn_options.append('chip_enable_dnssd_tests=true')
+            else:
+                self.extra_gn_options.append('chip_enable_dnssd_tests=false')
+
+        if chip_casting_simplified is not None:
+            self.extra_gn_options.append(f'chip_casting_simplified={str(chip_casting_simplified).lower()}')
 
         if self.board == HostBoard.ARM64:
             if not use_clang:
@@ -509,19 +538,21 @@ class HostBuilder(GnBuilder):
     def PreBuildCommand(self):
         if self.app == HostApp.TESTS and self.use_coverage:
             self._Execute(['ninja', '-C', self.output_dir, 'default'], title="Build-only")
-            self._Execute(['find', os.path.join(self.output_dir, 'obj/src/'), '-depth',
-                           '-name', 'tests', '-exec', 'rm -rf {} \\;'], title="Cleanup unit tests")
             self._Execute(['lcov', '--initial', '--capture', '--directory', os.path.join(self.output_dir, 'obj'),
+                           '--exclude', os.path.join(self.chip_dir, '**/tests/*'),
                            '--exclude', os.path.join(self.chip_dir, 'zzz_generated/*'),
                            '--exclude', os.path.join(self.chip_dir, 'third_party/*'),
+                           '--exclude', os.path.join(self.chip_dir, 'out/*'),
                            '--exclude', '/usr/include/*',
                            '--output-file', os.path.join(self.coverage_dir, 'lcov_base.info')], title="Initial coverage baseline")
 
     def PostBuildCommand(self):
         if self.app == HostApp.TESTS and self.use_coverage:
             self._Execute(['lcov', '--capture', '--directory', os.path.join(self.output_dir, 'obj'),
+                           '--exclude', os.path.join(self.chip_dir, '**/tests/*'),
                            '--exclude', os.path.join(self.chip_dir, 'zzz_generated/*'),
                            '--exclude', os.path.join(self.chip_dir, 'third_party/*'),
+                           '--exclude', os.path.join(self.chip_dir, 'out/*'),
                            '--exclude', '/usr/include/*',
                            '--output-file', os.path.join(self.coverage_dir, 'lcov_test.info')], title="Update coverage")
             self._Execute(['lcov', '--add-tracefile', os.path.join(self.coverage_dir, 'lcov_base.info'),
@@ -538,19 +569,13 @@ class HostBuilder(GnBuilder):
             self.createJavaExecutable("kotlin-matter-controller")
 
     def build_outputs(self):
-        outputs = {}
-
         for name in self.app.OutputNames():
+            if not self.options.enable_link_map_file and name.endswith(".map"):
+                continue
             path = os.path.join(self.output_dir, name)
             if os.path.isdir(path):
                 for root, dirs, files in os.walk(path):
                     for file in files:
-                        outputs.update({
-                            file: os.path.join(root, file)
-                        })
+                        yield BuilderOutput(os.path.join(root, file), file)
             else:
-                outputs.update({
-                    name: os.path.join(self.output_dir, name)
-                })
-
-        return outputs
+                yield BuilderOutput(os.path.join(self.output_dir, name), name)

@@ -35,31 +35,6 @@
     ],
     "templates": [
         {
-            "path": "CHIPInvokeCallbacks.zapt",
-            "name": "CHIP cluster invoke callbacks for Java (native code)",
-            "output": "src/controller/java/zap-generated/CHIPInvokeCallbacks.h"
-        },
-        {
-            "path": "CHIPClientCallbacks.zapt",
-            "name": "CHIP Client Callbacks header",
-            "output": "src/controller/java/zap-generated/CHIPClientCallbacks.h"
-        },
-        {
-            "path": "CHIPInvokeCallbacks-src.zapt",
-            "name": "CHIP cluster invoke callbacks for Java (native code)",
-            "output": "src/controller/java/zap-generated/CHIPInvokeCallbacks.cpp"
-        },
-        {
-            "path": "CHIPClustersWrite-JNI.zapt",
-            "name": "CHIP ZCL API for Java (native code for writes)",
-            "output": "src/controller/java/zap-generated/CHIPClustersWrite-JNI.cpp"
-        },
-        {
-            "path": "CHIPReadCallbacks-src.zapt",
-            "name": "CHIP cluster attribute read callback for Java (native code)",
-            "output": "src/controller/java/zap-generated/CHIPReadCallbacks.cpp"
-        },
-        {
             "path": "CHIPAttributeTLVValueDecoder-src.zapt",
             "name": "CHIP cluster attribute decoder for Java (native code)",
             "output": "src/controller/java/zap-generated/CHIPAttributeTLVValueDecoder.cpp"

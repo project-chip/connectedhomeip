@@ -66,8 +66,8 @@ tests:
           value:
               [
                   {
-                      Privilege: "4",
-                      AuthMode: "2",
+                      Privilege: AccessControlEntryPrivilegeEnum.Manage,
+                      AuthMode: AccessControlEntryAuthModeEnum.CASE,
                       Subjects: [CommissionerNodeId],
                       Targets: null,
                       FabricIndex: CurrentFabricIndexValue,
@@ -94,8 +94,8 @@ tests:
           value:
               [
                   {
-                      Privilege: "5",
-                      AuthMode: "2",
+                      Privilege: AccessControlEntryPrivilegeEnum.Administer,
+                      AuthMode: AccessControlEntryAuthModeEnum.CASE,
                       Subjects: [CommissionerNodeId],
                       Targets: null,
                       FabricIndex: CurrentFabricIndexValue,

@@ -55,7 +55,7 @@ jobject DecodeEventValue(const app::ConcreteEventPath & aPath, TLV::TLVReader & 
 
                     {{/zcl_event_fields}}
                     jclass {{asLowerCamelCase name}}StructClass;
-                    err = chip::JniReferences::GetInstance().GetClassRef(env, "chip/devicecontroller/ChipEventStructs${{asUpperCamelCase parent.name}}Cluster{{asUpperCamelCase name}}Event", {{asLowerCamelCase name}}StructClass);
+                    err = chip::JniReferences::GetInstance().GetLocalClassRef(env, "chip/devicecontroller/ChipEventStructs${{asUpperCamelCase parent.name}}Cluster{{asUpperCamelCase name}}Event", {{asLowerCamelCase name}}StructClass);
                     if (err != CHIP_NO_ERROR) {
                         ChipLogError(Zcl, "Could not find class ChipEventStructs${{asUpperCamelCase parent.name}}Cluster{{asUpperCamelCase name}}Event");
                         return nullptr;

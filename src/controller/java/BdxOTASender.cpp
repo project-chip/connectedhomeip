@@ -179,7 +179,7 @@ CHIP_ERROR BdxOTASender::OnTransferSessionBegin(TransferSession::OutputEvent & e
 
     JNIEnv * env = JniReferences::GetInstance().GetEnvForCurrentThread();
 
-    JniLocalReferenceManager manager(env);
+    JniLocalReferenceScope scope(env);
     UtfString fileDesignator(env, fileDesignatorSpan);
 
     uint64_t offset = mTransfer.GetStartOffset();
@@ -269,7 +269,7 @@ CHIP_ERROR BdxOTASender::OnBlockQuery(TransferSession::OutputEvent & event)
 
     JNIEnv * env = JniReferences::GetInstance().GetEnvForCurrentThread();
 
-    JniLocalReferenceManager manager(env);
+    JniLocalReferenceScope scope(env);
     jmethodID handleBDXQueryMethod;
     CHIP_ERROR err = JniReferences::GetInstance().FindMethod(
         env, mOtaDelegate, "handleBDXQuery", "(JIJJ)Lchip/devicecontroller/OTAProviderDelegate$BDXData;", &handleBDXQueryMethod);

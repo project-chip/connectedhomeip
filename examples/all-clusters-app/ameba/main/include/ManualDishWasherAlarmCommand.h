@@ -19,6 +19,7 @@
 #include "controller/InvokeInteraction.h"
 #include "controller/ReadInteraction.h"
 #include <app/clusters/dishwasher-alarm-server/dishwasher-alarm-server.h>
+#include <protocols/interaction_model/StatusCode.h>
 
 #if CONFIG_ENABLE_CHIP_SHELL
 #include "lib/shell/Engine.h"
@@ -65,7 +66,7 @@ CHIP_ERROR ManualDishWasherAlarmSetRaiseCommandHandler(int argc, char ** argv)
     }
 
     CHIP_ERROR err = CHIP_NO_ERROR;
-    EmberAfStatus status;
+    Protocols::InteractionModel::Status status;
     DishwasherAlarmServer & serverInstance = DishwasherAlarmServer::Instance();
 
     BitMask<AlarmMap> supported;                       // Set dishwasher alarm supported value
@@ -88,21 +89,21 @@ CHIP_ERROR ManualDishWasherAlarmSetRaiseCommandHandler(int argc, char ** argv)
     state.SetField(AlarmMap::kTempTooLow, 1); // 0x08, 8
 
     status = serverInstance.SetSupportedValue(1, supported); // 0x2F, 47
-    if (status != EMBER_ZCL_STATUS_SUCCESS)
+    if (status != Protocols::InteractionModel::Status::Success)
     {
         err = CHIP_ERROR_INTERNAL;
         goto exit;
     }
 
     status = serverInstance.SetMaskValue(1, mask); // 0x2F, 47
-    if (status != EMBER_ZCL_STATUS_SUCCESS)
+    if (status != Protocols::InteractionModel::Status::Success)
     {
         err = CHIP_ERROR_INTERNAL;
         goto exit;
     }
 
     status = serverInstance.SetStateValue(1, state); // 0x0E, 14
-    if (status != EMBER_ZCL_STATUS_SUCCESS)
+    if (status != Protocols::InteractionModel::Status::Success)
     {
         err = CHIP_ERROR_INTERNAL;
         goto exit;
@@ -124,7 +125,7 @@ CHIP_ERROR ManualDishWasherAlarmSetLowerCommandHandler(int argc, char ** argv)
     }
 
     CHIP_ERROR err = CHIP_NO_ERROR;
-    EmberAfStatus status;
+    Protocols::InteractionModel::Status status;
     DishwasherAlarmServer & serverInstance = DishwasherAlarmServer::Instance();
 
     BitMask<AlarmMap> supported;                       // Set dishwasher alarm supported value
@@ -142,21 +143,21 @@ CHIP_ERROR ManualDishWasherAlarmSetLowerCommandHandler(int argc, char ** argv)
     mask.SetField(AlarmMap::kWaterLevelError, 1); // 0x20, 32
 
     status = serverInstance.SetSupportedValue(1, supported); // 0x2F, 47
-    if (status != EMBER_ZCL_STATUS_SUCCESS)
+    if (status != Protocols::InteractionModel::Status::Success)
     {
         err = CHIP_ERROR_INTERNAL;
         goto exit;
     }
 
     status = serverInstance.SetMaskValue(1, mask); // 0x2F, 47
-    if (status != EMBER_ZCL_STATUS_SUCCESS)
+    if (status != Protocols::InteractionModel::Status::Success)
     {
         err = CHIP_ERROR_INTERNAL;
         goto exit;
     }
 
     status = serverInstance.SetStateValue(1, 0); // Set dishwasher alarm state value 0x00, 0
-    if (status != EMBER_ZCL_STATUS_SUCCESS)
+    if (status != Protocols::InteractionModel::Status::Success)
     {
         err = CHIP_ERROR_INTERNAL;
         goto exit;

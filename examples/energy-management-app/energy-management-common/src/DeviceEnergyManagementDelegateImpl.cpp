@@ -18,8 +18,6 @@
 
 #include "DeviceEnergyManagementDelegateImpl.h"
 
-#include <app-common/zap-generated/attributes/Accessors.h>
-#include <app-common/zap-generated/cluster-objects.h>
 #include <app/EventLogging.h>
 
 using namespace chip;
@@ -364,5 +362,10 @@ CHIP_ERROR DeviceEnergyManagementDelegate::SetForecast(DataModel::Nullable<Struc
 {
     // TODO see Issue #31147
 
+    return CHIP_NO_ERROR;
+}
+
+CHIP_ERROR DeviceEnergyManagementDelegate::SetOptOutState(OptOutStateEnum newValue)
+{
     return CHIP_NO_ERROR;
 }

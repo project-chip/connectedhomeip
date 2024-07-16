@@ -15,11 +15,25 @@
 #    limitations under the License.
 #
 
+# See https://github.com/project-chip/connectedhomeip/blob/master/docs/testing/python.md#defining-the-ci-test-arguments
+# for details about the block below.
+#
+# === BEGIN CI TEST ARGUMENTS ===
+# test-runner-runs: run1
+# test-runner-run/run1/app: ${ALL_CLUSTERS_APP}
+# test-runner-run/run1/factoryreset: True
+# test-runner-run/run1/quiet: True
+# test-runner-run/run1/app-args: --discriminator 1234 --KVS kvs1 --trace-to json:${TRACE_APP}.json
+# test-runner-run/run1/script-args: --storage-path admin_storage.json --commissioning-method on-network --discriminator 1234 --passcode 20202021 --trace-to json:${TRACE_TEST_JSON}.json --trace-to perfetto:${TRACE_TEST_PERFETTO}.perfetto
+# === END CI TEST ARGUMENTS ===
+
+
 import asyncio
 import logging
 import queue
 import time
 from threading import Event
+from typing import List
 
 import chip.clusters as Clusters
 from chip.clusters import ClusterObjects as ClustersObjects
@@ -122,6 +136,24 @@ class TC_SC_3_6(MatterBaseTest):
             attribute=Clusters.BasicInformation.Attributes.CapabilityMinima
         )
         asserts.assert_greater_equal(capability_minima.caseSessionsPerFabric, 3)
+
+        logging.info("Pre-condition: Remove all pre-existing fabrics on the device that do not belong to the TH")
+        commissioned_fabric_count: int = await self.read_single_attribute(
+            dev_ctrl, node_id=self.dut_node_id,
+            endpoint=0, attribute=Clusters.OperationalCredentials.Attributes.CommissionedFabrics)
+
+        if commissioned_fabric_count > 1:
+            fabrics: List[Clusters.OperationalCredentials.Structs.FabricDescriptorStruct] = await self.read_single_attribute(
+                dev_ctrl, node_id=self.dut_node_id, endpoint=0,
+                attribute=Clusters.OperationalCredentials.Attributes.Fabrics, fabricFiltered=False)
+            current_fabric_index = await self.read_single_attribute_check_success(cluster=Clusters.OperationalCredentials, attribute=Clusters.OperationalCredentials.Attributes.CurrentFabricIndex)
+            for fabric in fabrics:
+                if fabric.fabricIndex == current_fabric_index:
+                    continue
+                # This is not the test client's fabric, so remove it.
+                logging.info(f"Removing extra fabric at {fabric.fabricIndex} from device.")
+                await dev_ctrl.SendCommand(
+                    self.dut_node_id, 0, Clusters.OperationalCredentials.Commands.RemoveFabric(fabricIndex=fabric.fabricIndex))
 
         logging.info("Pre-conditions: use existing fabric to configure new fabrics so that total is %d fabrics" %
                      num_fabrics_to_commission)

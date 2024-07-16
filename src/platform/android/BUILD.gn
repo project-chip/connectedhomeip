@@ -36,6 +36,19 @@ source_set("tracing") {
   ]
 }
 
+static_library("logging") {
+  sources = [ "Logging.cpp" ]
+  deps = [
+    "${chip_root}/src/lib/core:chip_config_header",
+    "${chip_root}/src/lib/support:attributes",
+    "${chip_root}/src/lib/support:logging_constants",
+    "${chip_root}/src/platform:platform_config_header",
+    "${chip_root}/src/platform/logging:headers",
+  ]
+
+  libs = [ "log" ]
+}
+
 static_library("android") {
   output_name = "libAndroidPlatform"
 
@@ -84,7 +97,10 @@ static_library("android") {
 
 source_set("inet") {
   sources = [ "InetInterfaceImpl.cpp" ]
-  deps = [ "${chip_root}/src/lib/support" ]
+  deps = [
+    "${chip_root}/src/inet:impl_header",
+    "${chip_root}/src/lib/support",
+  ]
 }
 
 android_library("java") {

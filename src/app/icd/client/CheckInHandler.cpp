@@ -22,9 +22,11 @@
  *
  */
 
+#include <app/AppConfig.h>
+#include <app/InteractionModelEngine.h>
 #include <app/InteractionModelTimeout.h>
-#include <app/icd/client/CheckInDelegate.h>
 #include <app/icd/client/CheckInHandler.h>
+#include <app/icd/client/RefreshKeySender.h>
 
 #include <cinttypes>
 
@@ -35,6 +37,8 @@
 
 #include <protocols/secure_channel/Constants.h>
 
+using namespace chip::Protocols::SecureChannel;
+
 namespace chip {
 namespace app {
 
@@ -44,7 +48,7 @@ inline constexpr uint32_t kKeyRefreshLimit   = (1U << 31);
 CheckInHandler::CheckInHandler() {}
 
 CHIP_ERROR CheckInHandler::Init(Messaging::ExchangeManager * exchangeManager, ICDClientStorage * clientStorage,
-                                CheckInDelegate * delegate)
+                                CheckInDelegate * delegate, InteractionModelEngine * engine)
 {
     VerifyOrReturnError(exchangeManager != nullptr, CHIP_ERROR_INVALID_ARGUMENT);
     VerifyOrReturnError(clientStorage != nullptr, CHIP_ERROR_INVALID_ARGUMENT);
@@ -54,7 +58,7 @@ CHIP_ERROR CheckInHandler::Init(Messaging::ExchangeManager * exchangeManager, IC
     mpExchangeManager  = exchangeManager;
     mpICDClientStorage = clientStorage;
     mpCheckInDelegate  = delegate;
-
+    mpImEngine         = engine;
     return mpExchangeManager->RegisterUnsolicitedMessageHandlerForType(Protocols::SecureChannel::MsgType::ICD_CheckIn, this);
 }
 
@@ -109,12 +113,27 @@ CHIP_ERROR CheckInHandler::OnMessageReceived(Messaging::ExchangeContext * ec, co
 
     if (refreshKey)
     {
-        // TODO: A new CASE session should be established to re-register the client using a new key. The registration will happen in
-        // CASE session callback
+        RefreshKeySender * refreshKeySender = mpCheckInDelegate->OnKeyRefreshNeeded(clientInfo, mpICDClientStorage);
+        if (refreshKeySender == nullptr)
+        {
+            ChipLogError(ICD, "Key Refresh failed for node ID:" ChipLogFormatScopedNodeId,
+                         ChipLogValueScopedNodeId(clientInfo.peer_node));
+            return CHIP_NO_ERROR;
+        }
+        err = refreshKeySender->EstablishSessionToPeer();
+        if (CHIP_NO_ERROR != err)
+        {
+            ChipLogError(ICD, "CASE session establishment failed with error : %" CHIP_ERROR_FORMAT, err.Format());
+            mpCheckInDelegate->OnKeyRefreshDone(refreshKeySender, err);
+            return CHIP_NO_ERROR;
+        }
     }
     else
     {
         mpCheckInDelegate->OnCheckInComplete(clientInfo);
+#if CHIP_CONFIG_ENABLE_READ_CLIENT
+        mpImEngine->OnActiveModeNotification(clientInfo.peer_node);
+#endif // CHIP_CONFIG_ENABLE_READ_CLIENT
     }
 
     return CHIP_NO_ERROR;

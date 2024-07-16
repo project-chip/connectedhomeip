@@ -33,24 +33,22 @@ namespace casting {
         {
             VerifyOrReturnError(dataSource != nullptr, CHIP_ERROR_INVALID_ARGUMENT);
             VerifyOrReturnError(mDataSource == nullptr, CHIP_ERROR_INCORRECT_STATE);
-
             mDataSource = dataSource;
-            mDac = [mDataSource
-                castingAppDidReceiveRequestForDeviceAttestationCredentials:@"MCDeviceAttestationCredentialsProvider.Initialize()"];
-
             return CHIP_NO_ERROR;
         }
 
         CHIP_ERROR MCDeviceAttestationCredentialsProvider::GetCertificationDeclaration(
             chip::MutableByteSpan & outCertificationDeclaration)
         {
-            VerifyOrReturnError(mDac != nullptr, CHIP_ERROR_INCORRECT_STATE);
+            VerifyOrReturnError(mDataSource != nullptr, CHIP_ERROR_INCORRECT_STATE);
+            MCDeviceAttestationCredentials * dac = [mDataSource
+                castingAppDidReceiveRequestForDeviceAttestationCredentials:@"MCDeviceAttestationCredentialsProvider.Initialize()"];
 
-            if (mDac.certificationDeclaration != nullptr && mDac.certificationDeclaration.length > 0) {
-                if (outCertificationDeclaration.size() >= mDac.certificationDeclaration.length) {
-                    memcpy(outCertificationDeclaration.data(), mDac.certificationDeclaration.bytes,
-                        mDac.certificationDeclaration.length);
-                    outCertificationDeclaration.reduce_size(mDac.certificationDeclaration.length);
+            if (dac.certificationDeclaration != nullptr && dac.certificationDeclaration.length > 0) {
+                if (outCertificationDeclaration.size() >= dac.certificationDeclaration.length) {
+                    memcpy(outCertificationDeclaration.data(), dac.certificationDeclaration.bytes,
+                        dac.certificationDeclaration.length);
+                    outCertificationDeclaration.reduce_size(dac.certificationDeclaration.length);
                 } else {
                     return CHIP_ERROR_BUFFER_TOO_SMALL;
                 }
@@ -60,12 +58,14 @@ namespace casting {
 
         CHIP_ERROR MCDeviceAttestationCredentialsProvider::GetFirmwareInformation(chip::MutableByteSpan & outFirmwareInformation)
         {
-            VerifyOrReturnError(mDac != nullptr, CHIP_ERROR_INCORRECT_STATE);
+            VerifyOrReturnError(mDataSource != nullptr, CHIP_ERROR_INCORRECT_STATE);
+            MCDeviceAttestationCredentials * dac = [mDataSource
+                castingAppDidReceiveRequestForDeviceAttestationCredentials:@"MCDeviceAttestationCredentialsProvider.Initialize()"];
 
-            if (mDac.firmwareInformation != nullptr && mDac.firmwareInformation.length > 0) {
-                if (outFirmwareInformation.size() >= mDac.firmwareInformation.length) {
-                    memcpy(outFirmwareInformation.data(), mDac.firmwareInformation.bytes, mDac.firmwareInformation.length);
-                    outFirmwareInformation.reduce_size(mDac.firmwareInformation.length);
+            if (dac.firmwareInformation != nullptr && dac.firmwareInformation.length > 0) {
+                if (outFirmwareInformation.size() >= dac.firmwareInformation.length) {
+                    memcpy(outFirmwareInformation.data(), dac.firmwareInformation.bytes, dac.firmwareInformation.length);
+                    outFirmwareInformation.reduce_size(dac.firmwareInformation.length);
                 } else {
                     return CHIP_ERROR_BUFFER_TOO_SMALL;
                 }
@@ -76,12 +76,14 @@ namespace casting {
         CHIP_ERROR MCDeviceAttestationCredentialsProvider::GetDeviceAttestationCert(
             chip::MutableByteSpan & outDeviceAttestationCert)
         {
-            VerifyOrReturnError(mDac != nullptr, CHIP_ERROR_INCORRECT_STATE);
+            VerifyOrReturnError(mDataSource != nullptr, CHIP_ERROR_INCORRECT_STATE);
+            MCDeviceAttestationCredentials * dac = [mDataSource
+                castingAppDidReceiveRequestForDeviceAttestationCredentials:@"MCDeviceAttestationCredentialsProvider.Initialize()"];
 
-            if (mDac.deviceAttestationCert != nullptr && mDac.deviceAttestationCert.length > 0) {
-                if (outDeviceAttestationCert.size() >= mDac.deviceAttestationCert.length) {
-                    memcpy(outDeviceAttestationCert.data(), mDac.deviceAttestationCert.bytes, mDac.deviceAttestationCert.length);
-                    outDeviceAttestationCert.reduce_size(mDac.deviceAttestationCert.length);
+            if (dac.deviceAttestationCert != nullptr && dac.deviceAttestationCert.length > 0) {
+                if (outDeviceAttestationCert.size() >= dac.deviceAttestationCert.length) {
+                    memcpy(outDeviceAttestationCert.data(), dac.deviceAttestationCert.bytes, dac.deviceAttestationCert.length);
+                    outDeviceAttestationCert.reduce_size(dac.deviceAttestationCert.length);
                 } else {
                     return CHIP_ERROR_BUFFER_TOO_SMALL;
                 }
@@ -92,13 +94,15 @@ namespace casting {
         CHIP_ERROR MCDeviceAttestationCredentialsProvider::GetProductAttestationIntermediateCert(
             chip::MutableByteSpan & outProductAttestationIntermediateCert)
         {
-            VerifyOrReturnError(mDac != nullptr, CHIP_ERROR_INCORRECT_STATE);
+            VerifyOrReturnError(mDataSource != nullptr, CHIP_ERROR_INCORRECT_STATE);
+            MCDeviceAttestationCredentials * dac = [mDataSource
+                castingAppDidReceiveRequestForDeviceAttestationCredentials:@"MCDeviceAttestationCredentialsProvider.Initialize()"];
 
-            if (mDac.productAttestationIntermediateCert != nullptr && mDac.productAttestationIntermediateCert.length > 0) {
-                if (outProductAttestationIntermediateCert.size() >= mDac.productAttestationIntermediateCert.length) {
-                    memcpy(outProductAttestationIntermediateCert.data(), mDac.productAttestationIntermediateCert.bytes,
-                        mDac.productAttestationIntermediateCert.length);
-                    outProductAttestationIntermediateCert.reduce_size(mDac.productAttestationIntermediateCert.length);
+            if (dac.productAttestationIntermediateCert != nullptr && dac.productAttestationIntermediateCert.length > 0) {
+                if (outProductAttestationIntermediateCert.size() >= dac.productAttestationIntermediateCert.length) {
+                    memcpy(outProductAttestationIntermediateCert.data(), dac.productAttestationIntermediateCert.bytes,
+                        dac.productAttestationIntermediateCert.length);
+                    outProductAttestationIntermediateCert.reduce_size(dac.productAttestationIntermediateCert.length);
                 } else {
                     return CHIP_ERROR_BUFFER_TOO_SMALL;
                 }

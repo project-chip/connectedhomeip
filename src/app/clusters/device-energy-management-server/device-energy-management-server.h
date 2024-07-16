@@ -27,15 +27,12 @@
 #include <app/reporting/reporting.h>
 #include <app/util/attribute-storage.h>
 #include <lib/core/CHIPError.h>
+#include <protocols/interaction_model/StatusCode.h>
 
 namespace chip {
 namespace app {
 namespace Clusters {
 namespace DeviceEnergyManagement {
-
-using namespace chip::app::Clusters::DeviceEnergyManagement::Attributes;
-
-using chip::Protocols::InteractionModel::Status;
 
 class Delegate
 {
@@ -52,7 +49,8 @@ public:
      * @param duration The duration that the ESA SHALL maintain the requested power for.
      * @return  Success if the adjustment is accepted; otherwise the command SHALL be rejected with appropriate error.
      */
-    virtual Status PowerAdjustRequest(const int64_t power, const uint32_t duration, AdjustmentCauseEnum cause) = 0;
+    virtual Protocols::InteractionModel::Status PowerAdjustRequest(const int64_t power, const uint32_t duration,
+                                                                   AdjustmentCauseEnum cause) = 0;
 
     /**
      * @brief Delegate SHALL make the ESA end the active power adjustment session & return to normal (or idle) power levels.
@@ -60,10 +58,10 @@ public:
      *
      * @return It should report SUCCESS if successful and FAILURE otherwise.
      */
-    virtual Status CancelPowerAdjustRequest() = 0;
+    virtual Protocols::InteractionModel::Status CancelPowerAdjustRequest() = 0;
 
     /**
-     * @brief Delegate for the ESA SHALL update its Forecast attribute with the RequestedStartTime including a new ForecastId.
+     * @brief Delegate for the ESA SHALL update its Forecast attribute with the RequestedStartTime including a new ForecastID.
      *
      *   If the ESA supports ForecastAdjustment, and the ESAState is not UserOptOut and the RequestedStartTime is after
      *   the EarliestStartTime and the resulting EndTime is before the LatestEndTime, then ESA SHALL accept the request
@@ -73,10 +71,13 @@ public:
      *
      * @param requestedStartTime The requested start time in UTC that the client would like the appliance to shift its power
      * forecast to.
+     * @param cause    Who (Grid/local) is triggering this change.
+     *
      * @return Success if the StartTime in the Forecast is updated, otherwise the command SHALL be rejected with appropriate
      * IM_Status.
      */
-    virtual Status StartTimeAdjustRequest(const uint32_t requestedStartTime, AdjustmentCauseEnum cause) = 0;
+    virtual Protocols::InteractionModel::Status StartTimeAdjustRequest(const uint32_t requestedStartTime,
+                                                                       AdjustmentCauseEnum cause) = 0;
 
     /**
      * @brief Delegate handler for PauseRequest command
@@ -91,7 +92,7 @@ public:
      * @param duration Duration that the ESA SHALL be paused for.
      * @return  Success if the ESA is paused, otherwise returns other IM_Status.
      */
-    virtual Status PauseRequest(const uint32_t duration, AdjustmentCauseEnum cause) = 0;
+    virtual Protocols::InteractionModel::Status PauseRequest(const uint32_t duration, AdjustmentCauseEnum cause) = 0;
 
     /**
      * @brief Delegate handler for ResumeRequest command
@@ -102,7 +103,7 @@ public:
      *
      * @return  Success if the ESA is resumed, otherwise returns other IM_Status.
      */
-    virtual Status ResumeRequest() = 0;
+    virtual Protocols::InteractionModel::Status ResumeRequest() = 0;
 
     /**
      * @brief Delegate handler for ModifyForecastRequest
@@ -110,17 +111,18 @@ public:
      *   If the ESA supports FA, and the ESAState is not UserOptOut it SHALL attempt to adjust its power forecast.
      *   This allows a one or more modifications in a single command by sending a list of modifications (one for each 'slot').
      *   Attempts to modify slots which have already past, SHALL result in the entire command being rejected.
-     *   If the ESA accepts the requested Forecast then it SHALL update its Forecast attribute (incrementing its ForecastId)
+     *   If the ESA accepts the requested Forecast then it SHALL update its Forecast attribute (incrementing its ForecastID)
      *   and run the revised Forecast as its new intended operation.
      *
-     * @param forecastId Indicates the ESA ForecastId that is to be modified.
-     * @param slotAdjustments List of adjustments to be applied to the ESA, corresponding to the expected ESA forecastId.
+     * @param forecastID Indicates the ESA ForecastID that is to be modified.
+     * @param slotAdjustments List of adjustments to be applied to the ESA, corresponding to the expected ESA forecastID.
      * @return  Success if the entire list of SlotAdjustmentStruct are accepted, otherwise the command
      *          SHALL be rejected returning other IM_Status.
      */
-    virtual Status ModifyForecastRequest(const uint32_t forecastId,
-                                         const DataModel::DecodableList<Structs::SlotAdjustmentStruct::Type> & slotAdjustments,
-                                         AdjustmentCauseEnum cause) = 0;
+    virtual Protocols::InteractionModel::Status
+    ModifyForecastRequest(const uint32_t forecastID,
+                          const DataModel::DecodableList<Structs::SlotAdjustmentStruct::Type> & slotAdjustments,
+                          AdjustmentCauseEnum cause) = 0;
 
     /**
      * @brief Delegate handler for RequestConstraintBasedForecast
@@ -128,13 +130,14 @@ public:
      *   The ESA SHALL inspect the requested power limits to ensure that there are no overlapping elements. The ESA
      *   manufacturer may also reject the request if it could cause the user’s preferences to be breached (e.g. may
      *   cause the home to be too hot or too cold, or a battery to be insufficiently charged).
-     *   If the ESA can meet the requested power limits, it SHALL regenerate a new Power Forecast with a new ForecastId.
+     *   If the ESA can meet the requested power limits, it SHALL regenerate a new Power Forecast with a new ForecastID.
      *
      * @param constraints  Sequence of turn up/down power requests that the ESA is being asked to constrain its operation within.
      * @return  Success if successful, otherwise the command SHALL be rejected returning other IM_Status.
      */
-    virtual Status RequestConstraintBasedForecast(const DataModel::DecodableList<Structs::ConstraintsStruct::Type> & constraints,
-                                                  AdjustmentCauseEnum cause) = 0;
+    virtual Protocols::InteractionModel::Status
+    RequestConstraintBasedForecast(const DataModel::DecodableList<Structs::ConstraintsStruct::Type> & constraints,
+                                   AdjustmentCauseEnum cause) = 0;
 
     /**
      * @brief Delegate handler for CancelRequest
@@ -153,28 +156,29 @@ public:
      *
      * @return  Success if successful, otherwise the command SHALL be rejected returning other IM_Status.
      */
-    virtual Status CancelRequest() = 0;
+    virtual Protocols::InteractionModel::Status CancelRequest() = 0;
 
     // ------------------------------------------------------------------
     // Get attribute methods
-    virtual ESATypeEnum GetESAType()                                                 = 0;
-    virtual bool GetESACanGenerate()                                                 = 0;
-    virtual ESAStateEnum GetESAState()                                               = 0;
-    virtual int64_t GetAbsMinPower()                                                 = 0;
-    virtual int64_t GetAbsMaxPower()                                                 = 0;
-    virtual PowerAdjustmentCapability::TypeInfo::Type GetPowerAdjustmentCapability() = 0;
-    virtual DataModel::Nullable<Structs::ForecastStruct::Type> GetForecast()         = 0;
-    virtual OptOutStateEnum GetOptOutState()                                         = 0;
+    virtual ESATypeEnum GetESAType()                                                                       = 0;
+    virtual bool GetESACanGenerate()                                                                       = 0;
+    virtual ESAStateEnum GetESAState()                                                                     = 0;
+    virtual int64_t GetAbsMinPower()                                                                       = 0;
+    virtual int64_t GetAbsMaxPower()                                                                       = 0;
+    virtual DataModel::Nullable<Structs::PowerAdjustCapabilityStruct::Type> GetPowerAdjustmentCapability() = 0;
+    virtual DataModel::Nullable<Structs::ForecastStruct::Type> GetForecast()                               = 0;
+    virtual OptOutStateEnum GetOptOutState()                                                               = 0;
 
     // ------------------------------------------------------------------
     // Set attribute methods
-    virtual CHIP_ERROR SetESAType(ESATypeEnum)                                                 = 0;
-    virtual CHIP_ERROR SetESACanGenerate(bool)                                                 = 0;
-    virtual CHIP_ERROR SetESAState(ESAStateEnum)                                               = 0;
-    virtual CHIP_ERROR SetAbsMinPower(int64_t)                                                 = 0;
-    virtual CHIP_ERROR SetAbsMaxPower(int64_t)                                                 = 0;
-    virtual CHIP_ERROR SetPowerAdjustmentCapability(PowerAdjustmentCapability::TypeInfo::Type) = 0;
-    virtual CHIP_ERROR SetForecast(DataModel::Nullable<Structs::ForecastStruct::Type>)         = 0;
+    virtual CHIP_ERROR SetESAType(ESATypeEnum)                                                                       = 0;
+    virtual CHIP_ERROR SetESACanGenerate(bool)                                                                       = 0;
+    virtual CHIP_ERROR SetESAState(ESAStateEnum)                                                                     = 0;
+    virtual CHIP_ERROR SetAbsMinPower(int64_t)                                                                       = 0;
+    virtual CHIP_ERROR SetAbsMaxPower(int64_t)                                                                       = 0;
+    virtual CHIP_ERROR SetPowerAdjustmentCapability(DataModel::Nullable<Structs::PowerAdjustCapabilityStruct::Type>) = 0;
+    virtual CHIP_ERROR SetForecast(DataModel::Nullable<Structs::ForecastStruct::Type>)                               = 0;
+    virtual CHIP_ERROR SetOptOutState(OptOutStateEnum)                                                               = 0;
 
 protected:
     EndpointId mEndpointId = 0;
@@ -199,6 +203,9 @@ public:
     bool HasFeature(Feature aFeature) const;
 
 private:
+    Protocols::InteractionModel::Status GetMatterEpochTimeFromUnixTime(uint32_t & currentUtcTime) const;
+
+private:
     Delegate & mDelegate;
     BitMask<Feature> mFeature;
 
@@ -210,7 +217,7 @@ private:
     void InvokeCommand(HandlerContext & handlerContext) override;
     CHIP_ERROR EnumerateAcceptedCommands(const ConcreteClusterPath & cluster, CommandIdCallback callback, void * context) override;
 
-    Status CheckOptOutAllowsRequest(AdjustmentCauseEnum adjustmentCause);
+    Protocols::InteractionModel::Status CheckOptOutAllowsRequest(AdjustmentCauseEnum adjustmentCause);
     void HandlePowerAdjustRequest(HandlerContext & ctx, const Commands::PowerAdjustRequest::DecodableType & commandData);
     void HandleCancelPowerAdjustRequest(HandlerContext & ctx,
                                         const Commands::CancelPowerAdjustRequest::DecodableType & commandData);

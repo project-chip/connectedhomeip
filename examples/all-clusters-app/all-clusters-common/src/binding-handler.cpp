@@ -73,14 +73,14 @@ static void BoundDeviceChangedHandler(const EmberBindingTableEntry & binding, ch
     using namespace chip;
     using namespace chip::app;
 
-    if (binding.type == EMBER_MULTICAST_BINDING)
+    if (binding.type == MATTER_MULTICAST_BINDING)
     {
         ChipLogError(NotSpecified, "Group binding is not supported now");
         return;
     }
 
-    if (binding.type == EMBER_UNICAST_BINDING && binding.local == 1 &&
-        (!binding.clusterId.HasValue() || binding.clusterId.Value() == Clusters::OnOff::Id))
+    if (binding.type == MATTER_UNICAST_BINDING && binding.local == 1 &&
+        binding.clusterId.value_or(Clusters::OnOff::Id) == Clusters::OnOff::Id)
     {
         auto onSuccess = [](const ConcreteCommandPath & commandPath, const StatusIB & status, const auto & dataResponse) {
             ChipLogProgress(NotSpecified, "OnOff command succeeds");

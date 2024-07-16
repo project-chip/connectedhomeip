@@ -36,7 +36,7 @@ unicast queries.
 Example run:
 
 ```sh
-./out/minimal_mdns/minimal-mdns-client -4
+./out/minimal_mdns/minimal-mdns-client
 ```
 
 which is likely to list a lot of answers.
@@ -44,7 +44,7 @@ which is likely to list a lot of answers.
 You can customize the queries run:
 
 ```sh
-/out/minimal_mdns/minimal-mdns-client -4 -q chip-mdns-demo._matter._tcp.local
+./out/minimal_mdns/minimal-mdns-client -q chip-mdns-demo._matter._tcp.local
 ```
 
 see

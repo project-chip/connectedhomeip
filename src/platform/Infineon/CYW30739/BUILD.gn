@@ -13,6 +13,7 @@
 # limitations under the License.
 
 import("//build_overrides/chip.gni")
+import("//build_overrides/cyw30739_sdk.gni")
 
 import("${chip_root}/src/platform/device.gni")
 
@@ -25,53 +26,39 @@ if (chip_enable_openthread) {
 static_library("CYW30739") {
   sources = [
     "../../SingletonConfigurationManager.cpp",
-    "BLEManagerImpl.cpp",
     "BLEManagerImpl.h",
     "BlePlatformConfig.h",
     "CHIPDevicePlatformConfig.h",
     "CHIPDevicePlatformEvent.h",
     "CHIPPlatformConfig.h",
-    "CYW30739Config.cpp",
-    "CYW30739Config.h",
-    "ConfigurationManagerImpl.cpp",
     "ConfigurationManagerImpl.h",
     "ConnectivityManagerImpl.cpp",
     "ConnectivityManagerImpl.h",
-    "DiagnosticDataProviderImpl.cpp",
-    "DiagnosticDataProviderImpl.h",
-    "EventFlags.cpp",
-    "EventFlags.h",
-    "FactoryDataProvider.cpp",
-    "FactoryDataProvider.h",
     "InetPlatformConfig.h",
     "KeyValueStoreManagerImpl.cpp",
     "KeyValueStoreManagerImpl.h",
-    "Logging.cpp",
+    "OTAImageProcessorImpl.h",
     "PlatformManagerImpl.cpp",
     "PlatformManagerImpl.h",
     "SystemPlatformConfig.h",
-    "SystemTimeSupport.cpp",
-    "cycfg_gatt_db.c",
-    "cycfg_gatt_db.h",
     "cyw30739-chip-mbedtls-config.h",
   ]
 
-  if (chip_enable_ota_requestor) {
-    sources += [
-      "OTAImageProcessorImpl.cpp",
-      "OTAImageProcessorImpl.h",
-    ]
-  }
-
   deps = [
     "${chip_root}/src/crypto",
-    "${chip_root}/src/platform/logging:headers",
+    "${matter_wpan_sdk_build_root}:wpan_sdk",
   ]
 
   public = [
     "${chip_root}/src/credentials/DeviceAttestationCredsProvider.h",
+    "CYW30739Config.h",
+    "DiagnosticDataProviderImpl.h",
+    "EventFlags.h",
     "FactoryDataProvider.h",
     "OTAImageProcessorImpl.h",
+    "OptigaFactoryDataProvider.h",
+    "UnprovisionedOptigaFactoryDataProvider.h",
+    "cycfg_gatt_db.h",
   ]
 
   public_deps = [ "${chip_root}/src/platform:platform_base" ]
@@ -79,7 +66,6 @@ static_library("CYW30739") {
   if (chip_enable_openthread) {
     sources += [
       "../../OpenThread/OpenThreadUtils.cpp",
-      "ThreadStackManagerImpl.cpp",
       "ThreadStackManagerImpl.h",
     ]
 
@@ -102,4 +88,12 @@ static_library("CYW30739") {
       deps += [ "${chip_root}/src/lib/dnssd:platform_header" ]
     }
   }
+}
+
+source_set("logging") {
+  deps = [
+    "${chip_root}/src/platform:platform",
+    "${chip_root}/src/platform/logging:headers",
+  ]
+  sources = [ "Logging.cpp" ]
 }

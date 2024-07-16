@@ -54,7 +54,7 @@ CHIP_ERROR WriteResponseMessage::Parser::PrettyPrint() const
             ReturnErrorOnFailure(writeResponses.PrettyPrint());
             PRETTY_PRINT_DECDEPTH();
             break;
-        case kInteractionModelRevisionTag:
+        case Revision::kInteractionModelRevisionTag:
             ReturnErrorOnFailure(MessageParser::CheckInteractionModelRevision(reader));
             break;
         default:

@@ -26,6 +26,7 @@
 #include <app-common/zap-generated/ids/Attributes.h>
 #include <app-common/zap-generated/ids/Clusters.h>
 #include <app/AttributeAccessInterface.h>
+#include <app/AttributeAccessInterfaceRegistry.h>
 #include <app/util/attribute-storage.h>
 #include <lib/support/CodeUtils.h>
 #include <lib/support/logging/CHIPLogging.h>
@@ -38,6 +39,8 @@ using namespace chip::app::Clusters;
 using namespace chip::app::Clusters::TimeFormatLocalization;
 using namespace chip::app::Clusters::TimeFormatLocalization::Attributes;
 using namespace chip::DeviceLayer;
+
+using chip::Protocols::InteractionModel::Status;
 
 namespace {
 
@@ -75,6 +78,12 @@ private:
 };
 
 TimeFormatLocalizationAttrAccess gAttrAccess;
+
+bool HasFeature(EndpointId endpoint, Feature feature)
+{
+    uint32_t featureMap;
+    return FeatureMap::Get(endpoint, &featureMap) == Status::Success ? (featureMap & to_underlying(feature)) : false;
+}
 
 CHIP_ERROR TimeFormatLocalizationAttrAccess::ReadSupportedCalendarTypes(AttributeValueEncoder & aEncoder)
 {
@@ -200,20 +209,24 @@ Protocols::InteractionModel::Status MatterTimeFormatLocalizationClusterServerPre
 
 void emberAfTimeFormatLocalizationClusterServerInitCallback(EndpointId endpoint)
 {
+    if (!HasFeature(endpoint, Feature::kCalendarFormat))
+    {
+        return;
+    }
     CalendarTypeEnum calendarType;
     CalendarTypeEnum validType;
-    EmberAfStatus status = ActiveCalendarType::Get(endpoint, &calendarType);
+    Status status = ActiveCalendarType::Get(endpoint, &calendarType);
 
-    VerifyOrReturn(EMBER_ZCL_STATUS_SUCCESS == status,
-                   ChipLogError(Zcl, "Failed to read calendar type with error: 0x%02x", status));
+    VerifyOrReturn(Status::Success == status,
+                   ChipLogError(Zcl, "Failed to read calendar type with error: 0x%02x", to_underlying(status)));
 
     // We could have an invalid calendar type value if an OTA update removed support for the value we were using.
     // If initial value is not one of the allowed values, pick one valid value and write it.
     if (!IsSupportedCalendarType(calendarType, validType))
     {
         status = ActiveCalendarType::Set(endpoint, validType);
-        VerifyOrReturn(EMBER_ZCL_STATUS_SUCCESS == status,
-                       ChipLogError(Zcl, "Failed to write calendar type with error: 0x%02x", status));
+        VerifyOrReturn(Status::Success == status,
+                       ChipLogError(Zcl, "Failed to write calendar type with error: 0x%02x", to_underlying(status)));
     }
 }
 

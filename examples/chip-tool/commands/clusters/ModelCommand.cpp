@@ -19,6 +19,7 @@
 #include "ModelCommand.h"
 
 #include <app/InteractionModelEngine.h>
+#include <app/icd/client/DefaultICDClientStorage.h>
 #include <inttypes.h>
 
 using namespace ::chip;
@@ -35,6 +36,7 @@ CHIP_ERROR ModelCommand::RunCommand()
     }
 
     ChipLogProgress(chipTool, "Sending command to node 0x%" PRIx64, mDestinationId);
+    CheckPeerICDType();
 
     CommissioneeDeviceProxy * commissioneeDeviceProxy = nullptr;
     if (CHIP_NO_ERROR == CurrentCommissioner().GetDeviceBeingCommissioned(mDestinationId, &commissioneeDeviceProxy))
@@ -42,8 +44,11 @@ CHIP_ERROR ModelCommand::RunCommand()
         return SendCommand(commissioneeDeviceProxy, mEndPointId);
     }
 
+    // Check whether the session needs to allow large payload support.
+    TransportPayloadCapability transportPayloadCapability =
+        AllowLargePayload() ? TransportPayloadCapability::kLargePayload : TransportPayloadCapability::kMRPPayload;
     return CurrentCommissioner().GetConnectedDevice(mDestinationId, &mOnDeviceConnectedCallback,
-                                                    &mOnDeviceConnectionFailureCallback);
+                                                    &mOnDeviceConnectionFailureCallback, transportPayloadCapability);
 }
 
 void ModelCommand::OnDeviceConnectedFn(void * context, chip::Messaging::ExchangeManager & exchangeMgr,
@@ -72,4 +77,68 @@ void ModelCommand::Shutdown()
     mOnDeviceConnectionFailureCallback.Cancel();
 
     CHIPCommand::Shutdown();
+}
+
+void ModelCommand::ClearICDEntry(const ScopedNodeId & nodeId)
+{
+    CHIP_ERROR deleteEntryError = CHIPCommand::sICDClientStorage.DeleteEntry(nodeId);
+    if (deleteEntryError != CHIP_NO_ERROR)
+    {
+        ChipLogError(chipTool, "Failed to delete ICD entry: %" CHIP_ERROR_FORMAT, deleteEntryError.Format());
+    }
+}
+
+void ModelCommand::StoreICDEntryWithKey(app::ICDClientInfo & clientInfo, ByteSpan key)
+{
+    CHIP_ERROR err = CHIPCommand::sICDClientStorage.SetKey(clientInfo, key);
+    if (err == CHIP_NO_ERROR)
+    {
+        err = CHIPCommand::sICDClientStorage.StoreEntry(clientInfo);
+    }
+
+    if (err != CHIP_NO_ERROR)
+    {
+        CHIPCommand::sICDClientStorage.RemoveKey(clientInfo);
+        ChipLogError(chipTool, "Failed to persist symmetric key with error: %" CHIP_ERROR_FORMAT, err.Format());
+        return;
+    }
+}
+
+void ModelCommand::CheckPeerICDType()
+{
+    if (mIsPeerLIT.HasValue())
+    {
+        ChipLogProgress(chipTool, "Peer ICD type is set to %s", mIsPeerLIT.Value() == 1 ? "LIT-ICD" : "non LIT-ICD");
+        return;
+    }
+
+    app::ICDClientInfo info;
+    auto destinationPeerId = chip::ScopedNodeId(mDestinationId, CurrentCommissioner().GetFabricIndex());
+    auto iter              = CHIPCommand::sICDClientStorage.IterateICDClientInfo();
+    if (iter == nullptr)
+    {
+        return;
+    }
+    app::DefaultICDClientStorage::ICDClientInfoIteratorWrapper clientInfoIteratorWrapper(iter);
+
+    while (iter->Next(info))
+    {
+        if (ScopedNodeId(info.peer_node.GetNodeId(), info.peer_node.GetFabricIndex()) == destinationPeerId)
+        {
+            ChipLogProgress(chipTool, "Peer is a registered LIT ICD.");
+            mIsPeerLIT.SetValue(true);
+            return;
+        }
+    }
+}
+
+bool ModelCommand::IsPeerLIT()
+{
+    CheckPeerICDType();
+    return mIsPeerLIT.ValueOr(false);
+}
+
+bool ModelCommand::AllowLargePayload()
+{
+    return mAllowLargePayload.ValueOr(false);
 }

@@ -21,11 +21,18 @@
 #include "app/clusters/energy-evse-server/energy-evse-server.h"
 #include <EVSECallbacks.h>
 
-#include <app/util/af.h>
 #include <app/util/config.h>
 #include <cstring>
 
 using chip::Protocols::InteractionModel::Status;
+
+/**
+ * @brief   Helper function to get current timestamp in Epoch format
+ *
+ * @param   chipEpoch reference to hold return timestamp
+ */
+CHIP_ERROR GetEpochTS(uint32_t & chipEpoch);
+
 namespace chip {
 namespace app {
 namespace Clusters {

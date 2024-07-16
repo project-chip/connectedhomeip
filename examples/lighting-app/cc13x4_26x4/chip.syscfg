@@ -16,7 +16,6 @@
  *    limitations under the License.
  */
 
-
 /* Modules */
 var AESCCM      = scripting.addModule("/ti/drivers/AESCCM");
 var AESECB      = scripting.addModule("/ti/drivers/AESECB");
@@ -89,8 +88,8 @@ CCFG.enableCodeGeneration = false;
 
 /* NVS */
 NVS1.$name                      = "CONFIG_NVSINTERNAL";
-NVS1.internalFlash.regionBase = 0xFB800;
-NVS1.internalFlash.regionSize = 0x2800;
+NVS1.internalFlash.regionBase = 0xF8800;
+NVS1.internalFlash.regionSize = 0x6000;
 
 
 NVS2.$name                                 = "CONFIG_NVSEXTERNAL";
@@ -168,14 +167,12 @@ LED1.$name                      = "CONFIG_LED_RED";
 LED1.$hardware                  = system.deviceData.board.components.LED_RED;
 LED1.gpioPin.$name              = "CONFIG_GPIO_RLED";
 LED1.gpioPin.mode               = "Output";
-LED1.gpioPin.callbackFunction   = "";
 
 /* Green LED */
 LED2.$name                      = "CONFIG_LED_GREEN";
 LED2.$hardware                  = system.deviceData.board.components.LED_GREEN;
 LED2.gpioPin.$name              = "CONFIG_GPIO_GLED";
 LED2.gpioPin.mode               = "Output";
-LED2.gpioPin.callbackFunction   = "";
 
 /* Debug UART  */
 UART2.$hardware     = system.deviceData.board.components.XDS110UART;

@@ -53,6 +53,8 @@ readarray -t SUPPORTED_APP_NAMES <"$CHIP_ROOT"/examples/platform/openiotsdk/supp
 SUPPORTED_APP_NAMES+=("unit-tests")
 
 readarray -t TEST_NAMES <"$CHIP_ROOT"/src/test_driver/openiotsdk/unit-tests/test_components.txt
+readarray -t TEST_NAMES_NL <"$CHIP_ROOT"/src/test_driver/openiotsdk/unit-tests/test_components_nl.txt
+TEST_NAMES+=("${TEST_NAMES_NL[@]}")
 
 function show_usage() {
     cat <<EOF

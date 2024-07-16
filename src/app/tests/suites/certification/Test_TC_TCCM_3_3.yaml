@@ -19,7 +19,7 @@ name:
 PICS:
     - TCCM.S.A0002
     - TCCM.S.A0003
-    - TCCM.S.F00
+    - MOD.S.F00
     - OO.S.A4003
 
 config:
@@ -140,7 +140,7 @@ tests:
           value: new_mode_th
 
     - label: "Step 8: TH reads from the DUT the OnMode attribute."
-      PICS: TCCM.S.A0003 && TCCM.S.F00
+      PICS: TCCM.S.A0003 && MOD.S.F00
       command: "readAttribute"
       attribute: "OnMode"
       response:

@@ -19,13 +19,14 @@
 #include "scenes-server.h"
 #include <app-common/zap-generated/attributes/Accessors.h>
 #include <app-common/zap-generated/cluster-objects.h>
+#include <app/AttributeAccessInterfaceRegistry.h>
 #include <app/CommandHandlerInterface.h>
 #include <app/InteractionModelEngine.h>
 #include <app/clusters/scenes-server/SceneTableImpl.h>
 #include <app/reporting/reporting.h>
 #include <app/server/Server.h>
 #include <app/util/attribute-storage.h>
-#include <app/util/error-mapping.h>
+#include <app/util/config.h>
 #include <credentials/GroupDataProvider.h>
 #include <lib/support/CommonIterator.h>
 #include <lib/support/Span.h>
@@ -42,6 +43,7 @@ using GroupDataProvider = chip::Credentials::GroupDataProvider;
 using SceneTable        = chip::scenes::SceneTable<chip::scenes::ExtensionFieldSetsImpl>;
 using AuthMode          = chip::Access::AuthMode;
 using ScenesServer      = chip::app::Clusters::ScenesManagement::ScenesServer;
+using chip::Protocols::InteractionModel::Status;
 
 namespace chip {
 namespace app {
@@ -61,29 +63,41 @@ CHIP_ERROR AddResponseOnError(CommandHandlerInterface::HandlerContext & ctx, Res
 {
     if (CHIP_NO_ERROR != err)
     {
-        resp.status = to_underlying(StatusIB(err).mStatus);
+        // TODO : Properly fix mapping between error types (issue https://github.com/project-chip/connectedhomeip/issues/26885)
+        if (CHIP_ERROR_NOT_FOUND == err)
+        {
+            resp.status = to_underlying(Protocols::InteractionModel::Status::NotFound);
+        }
+        else if (CHIP_ERROR_NO_MEMORY == err)
+        {
+            resp.status = to_underlying(Protocols::InteractionModel::Status::ResourceExhausted);
+        }
+        else
+        {
+            resp.status = to_underlying(StatusIB(err).mStatus);
+        }
         ctx.mCommandHandler.AddResponse(ctx.mRequestPath, resp);
     }
     return err;
 }
 
-/// @brief Generate and add a response to a command handler context depending on an EmberAfStatus
+/// @brief Generate and add a response to a command handler context depending on an InteractionModel::Status
 /// @tparam ResponseType Type of response, depends on the command
 /// @param ctx Command Handler context where to add reponse
 /// @param resp Response to add in ctx
 /// @param status Status to verify
-/// @return EmberAfStatus -> CHIP_ERROR
+/// @return InteractionModel::Status -> CHIP_ERROR
 template <typename ResponseType>
-CHIP_ERROR AddResponseOnError(CommandHandlerInterface::HandlerContext & ctx, ResponseType & resp, EmberAfStatus status)
+CHIP_ERROR AddResponseOnError(CommandHandlerInterface::HandlerContext & ctx, ResponseType & resp, Status status)
 {
-    return AddResponseOnError(ctx, resp, StatusIB(ToInteractionModelStatus(status)).ToChipError());
+    return AddResponseOnError(ctx, resp, StatusIB(status).ToChipError());
 }
 
 template <typename ResponseType>
 CHIP_ERROR UpdateLastConfiguredBy(HandlerContext & ctx, ResponseType resp)
 {
     Access::SubjectDescriptor descriptor = ctx.mCommandHandler.GetSubjectDescriptor();
-    EmberAfStatus status                 = EMBER_ZCL_STATUS_SUCCESS;
+    Status status                        = Status::Success;
 
     if (AuthMode::kCase == descriptor.authMode)
     {
@@ -95,7 +109,7 @@ CHIP_ERROR UpdateLastConfiguredBy(HandlerContext & ctx, ResponseType resp)
     }
 
     // LastConfiguredBy is optional, so we don't want to fail the command if it fails to update
-    VerifyOrReturnValue(!(EMBER_ZCL_STATUS_SUCCESS == status || EMBER_ZCL_STATUS_UNSUPPORTED_ATTRIBUTE == status), CHIP_NO_ERROR);
+    VerifyOrReturnValue(!(Status::Success == status || Status::UnsupportedAttribute == status), CHIP_NO_ERROR);
     return AddResponseOnError(ctx, resp, status);
 }
 
@@ -160,7 +174,6 @@ CHIP_ERROR UpdateFabricSceneInfo(EndpointId endpoint, FabricIndex fabric, Option
 
 /// @brief Gets the SceneInfoStruct array associated to an endpoint
 /// @param endpoint target endpoint
-/// @param fabric target fabric
 /// @return Optional with no value not found, Span of SceneInfoStruct
 Span<Structs::SceneInfoStruct::Type> ScenesServer::FabricSceneInfo::GetFabricSceneInfo(EndpointId endpoint)
 {
@@ -261,7 +274,7 @@ CHIP_ERROR ScenesServer::FabricSceneInfo::FindFabricSceneInfoIndex(EndpointId en
     VerifyOrReturnError(kInvalidEndpointId != endpoint, CHIP_ERROR_INVALID_ARGUMENT);
 
     uint16_t index =
-        emberAfGetClusterServerEndpointIndex(endpoint, ScenesManagement::Id, EMBER_AF_SCENES_CLUSTER_SERVER_ENDPOINT_COUNT);
+        emberAfGetClusterServerEndpointIndex(endpoint, ScenesManagement::Id, MATTER_DM_SCENES_CLUSTER_SERVER_ENDPOINT_COUNT);
 
     if (index < ArraySize(mSceneInfoStructs))
     {
@@ -528,8 +541,7 @@ CHIP_ERROR StoreSceneParse(const FabricIndex & fabricIdx, const EndpointId & end
     ScenesServer::Instance().MakeSceneInvalid(endpointID, fabricIdx);
 
     uint16_t endpointTableSize = 0;
-    ReturnErrorOnFailure(
-        StatusIB(ToInteractionModelStatus(Attributes::SceneTableSize::Get(endpointID, &endpointTableSize))).ToChipError());
+    ReturnErrorOnFailure(StatusIB(Attributes::SceneTableSize::Get(endpointID, &endpointTableSize)).ToChipError());
 
     // Get Scene Table Instance
     SceneTable * sceneTable = scenes::GetSceneTableImpl(endpointID, endpointTableSize);
@@ -559,8 +571,7 @@ CHIP_ERROR StoreSceneParse(const FabricIndex & fabricIdx, const EndpointId & end
     else
     {
         uint32_t featureMap = 0;
-        ReturnErrorOnFailure(
-            StatusIB(ToInteractionModelStatus(Attributes::FeatureMap::Get(endpointID, &featureMap))).ToChipError());
+        ReturnErrorOnFailure(StatusIB(Attributes::FeatureMap::Get(endpointID, &featureMap)).ToChipError());
         // Check if we still support scenes name in case an OTA changed that, if we don't, set name to empty
         if (!(featureMap & to_underlying(Feature::kSceneNames)))
         {
@@ -589,8 +600,7 @@ CHIP_ERROR RecallSceneParse(const FabricIndex & fabricIdx, const EndpointId & en
     ScenesServer::Instance().MakeSceneInvalidForAllFabrics(endpointID);
 
     uint16_t endpointTableSize = 0;
-    ReturnErrorOnFailure(
-        StatusIB(ToInteractionModelStatus(Attributes::SceneTableSize::Get(endpointID, &endpointTableSize))).ToChipError());
+    ReturnErrorOnFailure(StatusIB(Attributes::SceneTableSize::Get(endpointID, &endpointTableSize)).ToChipError());
 
     // Get Scene Table Instance
     SceneTable * sceneTable = scenes::GetSceneTableImpl(endpointID, endpointTableSize);
@@ -670,13 +680,21 @@ void ScenesServer::InvokeCommand(HandlerContext & ctxt)
 // AttributeAccessInterface
 CHIP_ERROR ScenesServer::Read(const ConcreteReadAttributePath & aPath, AttributeValueEncoder & aEncoder)
 {
+    uint16_t endpointTableSize = 0;
+    ReturnErrorOnFailure(StatusIB(Attributes::SceneTableSize::Get(aPath.mEndpointId, &endpointTableSize)).ToChipError());
+
+    // Get Scene Table Instance
+    SceneTable * sceneTable = scenes::GetSceneTableImpl(aPath.mEndpointId, endpointTableSize);
+
     switch (aPath.mAttributeId)
     {
     case Attributes::FabricSceneInfo::Id: {
-        return aEncoder.EncodeList([&](const auto & encoder) -> CHIP_ERROR {
+        return aEncoder.EncodeList([&, sceneTable](const auto & encoder) -> CHIP_ERROR {
             Span<Structs::SceneInfoStruct::Type> fabricSceneInfoSpan = mFabricSceneInfo.GetFabricSceneInfo(aPath.mEndpointId);
             for (auto & info : fabricSceneInfoSpan)
             {
+                // Update the SceneInfoStruct's Capacity in case it's capacity was limited by other fabrics
+                sceneTable->GetRemainingCapacity(info.fabricIndex, info.remainingCapacity);
                 ReturnErrorOnFailure(encoder.Encode(info));
             }
             return CHIP_NO_ERROR;
@@ -913,12 +931,10 @@ void ScenesServer::HandleStoreScene(HandlerContext & ctx, const Commands::StoreS
     CHIP_ERROR err = StoreSceneParse(ctx.mCommandHandler.GetAccessingFabricIndex(), ctx.mRequestPath.mEndpointId, req.groupID,
                                      req.sceneID, mGroupProvider);
 
-    if (CHIP_NO_ERROR == err)
-    {
-        ReturnOnFailure(UpdateLastConfiguredBy(ctx, response));
-    }
+    ReturnOnFailure(AddResponseOnError(ctx, response, err));
 
-    response.status = to_underlying(StatusIB(err).mStatus);
+    ReturnOnFailure(UpdateLastConfiguredBy(ctx, response));
+    response.status = to_underlying(Protocols::InteractionModel::Status::Success);
     ctx.mCommandHandler.AddResponse(ctx.mRequestPath, response);
 }
 
@@ -1026,6 +1042,13 @@ void ScenesServer::HandleCopyScene(HandlerContext & ctx, const Commands::CopySce
     ReturnOnFailure(AddResponseOnError(ctx, response,
                                        sceneTable->GetRemainingCapacity(ctx.mCommandHandler.GetAccessingFabricIndex(), capacity)));
 
+    if (0 == capacity)
+    {
+        response.status = to_underlying(Protocols::InteractionModel::Status::ResourceExhausted);
+        ctx.mCommandHandler.AddResponse(ctx.mRequestPath, response);
+        return;
+    }
+
     // Checks if we copy a single scene or all of them
     if (req.mode.GetField(app::Clusters::ScenesManagement::CopyModeBitmap::kCopyAllScenes))
     {
@@ -1037,13 +1060,6 @@ void ScenesServer::HandleCopyScene(HandlerContext & ctx, const Commands::CopySce
         ReturnOnFailure(AddResponseOnError(
             ctx, response,
             sceneTable->GetAllSceneIdsInGroup(ctx.mCommandHandler.GetAccessingFabricIndex(), req.groupIdentifierFrom, sceneList)));
-
-        if (0 == capacity)
-        {
-            response.status = to_underlying(Protocols::InteractionModel::Status::ResourceExhausted);
-            ctx.mCommandHandler.AddResponse(ctx.mRequestPath, response);
-            return;
-        }
 
         for (auto & sceneId : sceneList)
         {
@@ -1057,13 +1073,13 @@ void ScenesServer::HandleCopyScene(HandlerContext & ctx, const Commands::CopySce
 
             ReturnOnFailure(AddResponseOnError(
                 ctx, response, sceneTable->SetSceneTableEntry(ctx.mCommandHandler.GetAccessingFabricIndex(), scene)));
-        }
 
-        // Update SceneInfoStruct Attributes
-        ReturnOnFailure(
-            AddResponseOnError(ctx, response,
-                               UpdateFabricSceneInfo(ctx.mRequestPath.mEndpointId, ctx.mCommandHandler.GetAccessingFabricIndex(),
-                                                     Optional<GroupId>(), Optional<SceneId>(), Optional<bool>())));
+            // Update SceneInfoStruct Attributes after each insert in case we hit max capacity in the middle of the loop
+            ReturnOnFailure(AddResponseOnError(
+                ctx, response,
+                UpdateFabricSceneInfo(ctx.mRequestPath.mEndpointId, ctx.mCommandHandler.GetAccessingFabricIndex(),
+                                      Optional<GroupId>(), Optional<SceneId>(), Optional<bool>() /* = sceneValid*/)));
+        }
 
         ReturnOnFailure(UpdateLastConfiguredBy(ctx, response));
 
@@ -1104,10 +1120,10 @@ using namespace chip::app::Clusters::ScenesManagement;
 
 void emberAfScenesManagementClusterServerInitCallback(EndpointId endpoint)
 {
-    EmberAfStatus status = Attributes::LastConfiguredBy::SetNull(endpoint);
-    if (EMBER_ZCL_STATUS_SUCCESS != status)
+    Status status = Attributes::LastConfiguredBy::SetNull(endpoint);
+    if (Status::Success != status)
     {
-        ChipLogDetail(Zcl, "ERR: setting LastConfiguredBy on Endpoint %hu Status: %x", endpoint, status);
+        ChipLogDetail(Zcl, "ERR: setting LastConfiguredBy on Endpoint %hu Status: %x", endpoint, to_underlying(status));
     }
 
     // Initialize the FabricSceneInfo by getting the number of scenes and the remaining capacity for storing fabric scene data
@@ -1121,7 +1137,7 @@ void emberAfScenesManagementClusterServerInitCallback(EndpointId endpoint)
 void MatterScenesManagementClusterServerShutdownCallback(EndpointId endpoint)
 {
     uint16_t endpointTableSize = 0;
-    ReturnOnFailure(Attributes::SceneTableSize::Get(endpoint, &endpointTableSize));
+    VerifyOrReturn(Status::Success == Attributes::SceneTableSize::Get(endpoint, &endpointTableSize));
 
     // Get Scene Table Instance
     SceneTable * sceneTable = scenes::GetSceneTableImpl(endpoint, endpointTableSize);

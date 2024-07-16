@@ -43,7 +43,6 @@ public:
      * @brief Invokes this command on the associated Endpoint and corresponding Cluster
      *
      * @param request request data corresponding to this command invocation
-     * @param context
      * @param successCb Called on command execution success, with responseData
      * @param failureCb Called on command execution failure
      * @param timedInvokeTimeoutMs command timeout

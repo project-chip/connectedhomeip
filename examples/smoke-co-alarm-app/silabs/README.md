@@ -1,6 +1,6 @@
 # Matter EFR32 Smoke CO Alarm Example
 
-An example showing the use of CHIP on the Silicon Labs EFR32 MG12 and MG24.
+An example showing the use of CHIP on the Silicon Labs EFR32 MG24.
 
 <hr>
 
@@ -18,6 +18,7 @@ An example showing the use of CHIP on the Silicon Labs EFR32 MG12 and MG24.
         -   [Debug build / release build](#debug-build--release-build)
         -   [Disabling LCD](#disabling-lcd)
         -   [KVS maximum entry count](#kvs-maximum-entry-count)
+        -   [Enabling test event trigger](#enabling-test-event-trigger)
 
 <hr>
 
@@ -54,8 +55,9 @@ Silicon Labs platform.
     (For Mac OS X, `commander` is located inside
     `Commander.app/Contents/MacOS/`.)
 
--   Download and install a suitable ARM gcc tool chain:
-    [GNU Arm Embedded Toolchain 9-2019-q4-major](https://developer.arm.com/tools-and-software/open-source-software/developer-tools/gnu-toolchain/gnu-rm/downloads)
+-   Download and install a suitable ARM gcc tool chain (For most Host, the
+    bootstrap already installs the toolchain):
+    [GNU Arm Embedded Toolchain 12.2 Rel1](https://developer.arm.com/downloads/-/arm-gnu-toolchain-downloads)
 
 -   Install some additional tools(likely already present for CHIP developers):
 
@@ -68,22 +70,6 @@ Silicon Labs platform.
     -   > For the latest supported hardware please refer to the
         > [Hardware Requirements](https://github.com/SiliconLabs/matter/blob/latest/docs/silabs/general/HARDWARE_REQUIREMENTS.md)
         > in the Silicon Labs Matter Github Repo
-
-    MG12 boards:
-
-    -   BRD4161A / SLWSTK6000B / Wireless Starter Kit / 2.4GHz@19dBm
-    -   BRD4162A / SLWSTK6000B / Wireless Starter Kit / 2.4GHz@10dBm
-    -   BRD4163A / SLWSTK6000B / Wireless Starter Kit / 2.4GHz@10dBm,
-        868MHz@19dBm
-    -   BRD4164A / SLWSTK6000B / Wireless Starter Kit / 2.4GHz@19dBm
-    -   BRD4166A / SLTB004A / Thunderboard Sense 2 / 2.4GHz@10dBm
-    -   BRD4170A / SLWSTK6000B / Multiband Wireless Starter Kit / 2.4GHz@19dBm,
-        915MHz@19dBm
-    -   BRD4304A / SLWSTK6000B / MGM12P Module / 2.4GHz@19dBm
-
-    MG21 boards: Currently not supported due to RAM limitation.
-
-    -   BRD4180A / SLWSTK6006A / Wireless Starter Kit / 2.4GHz@20dBm
 
     MG24 boards :
 
@@ -218,16 +204,10 @@ combination with JLinkRTTClient as follows:
 
 -   Run the JLinkExe tool with arguments to autoconnect to the WSTK board:
 
-    For MG12 use:
+    For MG24 use:
 
           ```
-          $ JLinkExe -device EFR32MG12PXXXF1024 -if JTAG -speed 4000 -autoconnect 1
-          ```
-
-    For MG21 use:
-
-          ```
-          $ JLinkExe -device EFR32MG21AXXXF1024 -if SWD -speed 4000 -autoconnect 1
+          $ JLinkExe -device EFR32MG24AXXXF1536 -if SWD -speed 4000 -autoconnect 1
           ```
 
 -   In a second terminal, run the JLinkRTTClient to view logs:
@@ -382,10 +362,10 @@ features can easily be toggled on or off. Here is a short list of options :
 
 ### Enabling test event trigger
 
-`silabs_test_event_trigger_enabled, silabs_test_event_trigger_enable_key`
+`sl_enable_test_event_trigger`
 
     ```
-    The value of silabs_test_event_trigger_enable_key is specific to each device manufacturer
+    The enable the test event trigger, `sl_enable_test_event_trigger` must be true.
 
-    $ ./scripts/examples/gn_silabs_example.sh ./examples/smoke-co-alarm-app/silabs ./out/smoke-co-alarm-app BRD4164A silabs_test_event_trigger_enabled=true silabs_test_event_trigger_enable_key=\"00112233445566778899aabbccddeeff\"
+    $ ./scripts/examples/gn_silabs_example.sh ./examples/smoke-co-alarm-app/silabs ./out/smoke-co-alarm-app BRD4164A sl_enable_test_event_trigger=true
     ```

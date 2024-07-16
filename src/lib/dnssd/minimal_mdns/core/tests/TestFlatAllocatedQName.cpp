@@ -14,10 +14,11 @@
  *    See the License for the specific language governing permissions and
  *    limitations under the License.
  */
-#include <lib/dnssd/minimal_mdns/core/FlatAllocatedQName.h>
-#include <lib/support/UnitTestRegistration.h>
 
-#include <nlunit-test.h>
+#include <pw_unit_test/framework.h>
+
+#include <lib/core/StringBuilderAdapters.h>
+#include <lib/dnssd/minimal_mdns/core/FlatAllocatedQName.h>
 
 namespace {
 
@@ -38,28 +39,28 @@ private:
     void * mBuffer;
 };
 
-void TestFlatAllocatedQName(nlTestSuite * inSuite, void * inContext)
+TEST(TestFlatAllocatedQName, TestFlatAllocatedQName)
 {
     AutoFreeBuffer buffer(128);
 
-    NL_TEST_ASSERT(inSuite, FlatAllocatedQName::RequiredStorageSize("some", "test") == (sizeof(char * [2]) + 5 + 5));
+    EXPECT_EQ(FlatAllocatedQName::RequiredStorageSize("some", "test"), (sizeof(char * [2]) + 5 + 5));
 
     {
         FullQName built            = FlatAllocatedQName::Build(buffer.Buffer(), "some", "test");
         const QNamePart expected[] = { "some", "test" };
 
-        NL_TEST_ASSERT(inSuite, FullQName(expected) == built);
+        EXPECT_EQ(FullQName(expected), built);
     }
 
     {
         FullQName built            = FlatAllocatedQName::Build(buffer.Buffer(), "1", "2", "3");
         const QNamePart expected[] = { "1", "2", "3" };
 
-        NL_TEST_ASSERT(inSuite, FullQName(expected) == built);
+        EXPECT_EQ(FullQName(expected), built);
     }
 }
 
-void SizeCompare(nlTestSuite * inSuite, void * inContext)
+TEST(TestFlatAllocatedQName, SizeCompare)
 {
     static const char kThis[]    = "this";
     static const char kIs[]      = "is";
@@ -79,23 +80,22 @@ void SizeCompare(nlTestSuite * inSuite, void * inContext)
 
     const size_t kTestStorageSize = FlatAllocatedQName::RequiredStorageSize(kThis, kIs, kA, kTest);
 
-    NL_TEST_ASSERT(inSuite, kTestStorageSize == FlatAllocatedQName::RequiredStorageSizeFromArray(kSameArraySameSize, 4));
-    NL_TEST_ASSERT(inSuite, kTestStorageSize == FlatAllocatedQName::RequiredStorageSizeFromArray(kDifferentArraySameSize, 4));
-    NL_TEST_ASSERT(inSuite, kTestStorageSize < FlatAllocatedQName::RequiredStorageSizeFromArray(kDifferenArrayLongerWord, 4));
-    NL_TEST_ASSERT(inSuite, kTestStorageSize > FlatAllocatedQName::RequiredStorageSizeFromArray(kDifferenArrayShorterWord, 4));
+    EXPECT_EQ(kTestStorageSize, FlatAllocatedQName::RequiredStorageSizeFromArray(kSameArraySameSize, 4));
+    EXPECT_EQ(kTestStorageSize, FlatAllocatedQName::RequiredStorageSizeFromArray(kDifferentArraySameSize, 4));
+    EXPECT_LT(kTestStorageSize, FlatAllocatedQName::RequiredStorageSizeFromArray(kDifferenArrayLongerWord, 4));
+    EXPECT_GT(kTestStorageSize, FlatAllocatedQName::RequiredStorageSizeFromArray(kDifferenArrayShorterWord, 4));
 
     // Although the size of the array is larger, if we tell the function there are only 4 words, it should still work.
-    NL_TEST_ASSERT(inSuite, kTestStorageSize == FlatAllocatedQName::RequiredStorageSizeFromArray(kSameArrayExtraWord, 4));
+    EXPECT_EQ(kTestStorageSize, FlatAllocatedQName::RequiredStorageSizeFromArray(kSameArrayExtraWord, 4));
     // If we add the extra word, the sizes should not match
-    NL_TEST_ASSERT(inSuite, kTestStorageSize < FlatAllocatedQName::RequiredStorageSizeFromArray(kSameArrayExtraWord, 5));
+    EXPECT_LT(kTestStorageSize, FlatAllocatedQName::RequiredStorageSizeFromArray(kSameArrayExtraWord, 5));
 
-    NL_TEST_ASSERT(inSuite, kTestStorageSize > FlatAllocatedQName::RequiredStorageSizeFromArray(kShorterArray, 3));
-    NL_TEST_ASSERT(inSuite,
-                   FlatAllocatedQName::RequiredStorageSizeFromArray(kSameArraySameSize, 3) ==
-                       FlatAllocatedQName::RequiredStorageSizeFromArray(kShorterArray, 3));
+    EXPECT_GT(kTestStorageSize, FlatAllocatedQName::RequiredStorageSizeFromArray(kShorterArray, 3));
+    EXPECT_EQ(FlatAllocatedQName::RequiredStorageSizeFromArray(kSameArraySameSize, 3),
+              FlatAllocatedQName::RequiredStorageSizeFromArray(kShorterArray, 3));
 }
 
-void BuildCompare(nlTestSuite * inSuite, void * inContext)
+TEST(TestFlatAllocatedQName, BuildCompare)
 {
     static const char kThis[]  = "this";
     static const char kIs[]    = "is";
@@ -111,33 +111,15 @@ void BuildCompare(nlTestSuite * inSuite, void * inContext)
 
     const FullQName kTestQName = FlatAllocatedQName::Build(storage, kThis, kIs, kA, kTest);
 
-    NL_TEST_ASSERT(inSuite, kTestQName == FlatAllocatedQName::BuildFromArray(storage, kSameArraySameSize, 4));
+    EXPECT_EQ(kTestQName, FlatAllocatedQName::BuildFromArray(storage, kSameArraySameSize, 4));
 
     // Although the size of the array is larger, if we tell the function there are only 4 words, it should still work.
-    NL_TEST_ASSERT(inSuite, kTestQName == FlatAllocatedQName::BuildFromArray(storage, kSameArrayExtraWord, 4));
+    EXPECT_EQ(kTestQName, FlatAllocatedQName::BuildFromArray(storage, kSameArrayExtraWord, 4));
     // If we add the extra word, the names
-    NL_TEST_ASSERT(inSuite, kTestQName != FlatAllocatedQName::BuildFromArray(storage, kSameArrayExtraWord, 5));
+    EXPECT_NE(kTestQName, FlatAllocatedQName::BuildFromArray(storage, kSameArrayExtraWord, 5));
 
-    NL_TEST_ASSERT(inSuite, kTestQName != FlatAllocatedQName::BuildFromArray(storage, kShorterArray, 3));
-    NL_TEST_ASSERT(inSuite,
-                   FlatAllocatedQName::BuildFromArray(storage, kSameArraySameSize, 3) ==
-                       FlatAllocatedQName::BuildFromArray(storage, kShorterArray, 3));
+    EXPECT_NE(kTestQName, FlatAllocatedQName::BuildFromArray(storage, kShorterArray, 3));
+    EXPECT_EQ(FlatAllocatedQName::BuildFromArray(storage, kSameArraySameSize, 3),
+              FlatAllocatedQName::BuildFromArray(storage, kShorterArray, 3));
 }
-
-const nlTest sTests[] = {
-    NL_TEST_DEF("TestFlatAllocatedQName", TestFlatAllocatedQName),   //
-    NL_TEST_DEF("TestFlatAllocatedQNameRequiredSizes", SizeCompare), //
-    NL_TEST_DEF("TestFlatAllocatedQNameBuild", BuildCompare),        //
-    NL_TEST_SENTINEL()                                               //
-};
-
 } // namespace
-
-int TestFlatAllocatedQName()
-{
-    nlTestSuite theSuite = { "FlatAllocatedQName", sTests, nullptr, nullptr };
-    nlTestRunner(&theSuite, nullptr);
-    return nlTestRunnerStats(&theSuite);
-}
-
-CHIP_REGISTER_TEST_SUITE(TestFlatAllocatedQName)

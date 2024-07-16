@@ -28,66 +28,55 @@ using namespace chip::Controller;
 
 JNI_METHOD(jlong, GetConnectedDeviceCallbackJni, newCallback)(JNIEnv * env, jobject self, jobject callback)
 {
-    chip::DeviceLayer::StackLock lock;
-    GetConnectedDeviceCallback * connectedDeviceCallback = chip::Platform::New<GetConnectedDeviceCallback>(self, callback);
-    return reinterpret_cast<jlong>(connectedDeviceCallback);
+    return newConnectedDeviceCallback(env, self, callback);
 }
 
 JNI_METHOD(void, GetConnectedDeviceCallbackJni, deleteCallback)(JNIEnv * env, jobject self, jlong callbackHandle)
 {
-    chip::DeviceLayer::StackLock lock;
-    GetConnectedDeviceCallback * connectedDeviceCallback = reinterpret_cast<GetConnectedDeviceCallback *>(callbackHandle);
-    VerifyOrReturn(connectedDeviceCallback != nullptr, ChipLogError(Controller, "GetConnectedDeviceCallback handle is nullptr"));
-    chip::Platform::Delete(connectedDeviceCallback);
+    deleteConnectedDeviceCallback(env, self, callbackHandle);
 }
 
 JNI_METHOD(jlong, ReportCallbackJni, newCallback)
-(JNIEnv * env, jobject self, jobject subscriptionEstablishedCallbackJava, jobject reportCallbackJava,
- jobject resubscriptionAttemptCallbackJava)
+(JNIEnv * env, jobject self, jobject subscriptionEstablishedCallbackJava, jobject resubscriptionAttemptCallbackJava)
 {
-    chip::DeviceLayer::StackLock lock;
-    ReportCallback * reportCallback = chip::Platform::New<ReportCallback>(self, subscriptionEstablishedCallbackJava,
-                                                                          reportCallbackJava, resubscriptionAttemptCallbackJava);
-    return reinterpret_cast<jlong>(reportCallback);
+    return newReportCallback(env, self, subscriptionEstablishedCallbackJava, resubscriptionAttemptCallbackJava,
+                             "()Lchip/devicecontroller/model/NodeState;");
 }
 
 JNI_METHOD(void, ReportCallbackJni, deleteCallback)(JNIEnv * env, jobject self, jlong callbackHandle)
 {
-    chip::DeviceLayer::StackLock lock;
-    ReportCallback * reportCallback = reinterpret_cast<ReportCallback *>(callbackHandle);
-    VerifyOrReturn(reportCallback != nullptr, ChipLogError(Controller, "ReportCallback handle is nullptr"));
-    chip::Platform::Delete(reportCallback);
+    deleteReportCallback(env, self, callbackHandle);
 }
 
 JNI_METHOD(jlong, WriteAttributesCallbackJni, newCallback)
-(JNIEnv * env, jobject self, jobject writeAttributesCallbackJava)
+(JNIEnv * env, jobject self)
 {
-    chip::DeviceLayer::StackLock lock;
-    WriteAttributesCallback * writeAttributesCallback =
-        chip::Platform::New<WriteAttributesCallback>(self, writeAttributesCallbackJava);
-    return reinterpret_cast<jlong>(writeAttributesCallback);
+    return newWriteAttributesCallback(env, self);
 }
 
 JNI_METHOD(void, WriteAttributesCallbackJni, deleteCallback)(JNIEnv * env, jobject self, jlong callbackHandle)
 {
-    chip::DeviceLayer::StackLock lock;
-    WriteAttributesCallback * writeAttributesCallback = reinterpret_cast<WriteAttributesCallback *>(callbackHandle);
-    VerifyOrReturn(writeAttributesCallback != nullptr, ChipLogError(Controller, "WriteAttributesCallback handle is nullptr"));
-    chip::Platform::Delete(writeAttributesCallback);
+    deleteWriteAttributesCallback(env, self, callbackHandle);
 }
 
 JNI_METHOD(jlong, InvokeCallbackJni, newCallback)
-(JNIEnv * env, jobject self, jobject invokeCallbackJava)
+(JNIEnv * env, jobject self)
 {
-    chip::DeviceLayer::StackLock lock;
-    InvokeCallback * invokeCallback = chip::Platform::New<InvokeCallback>(self, invokeCallbackJava);
-    return reinterpret_cast<jlong>(invokeCallback);
+    return newInvokeCallback(env, self);
 }
 
 JNI_METHOD(void, InvokeCallbackJni, deleteCallback)(JNIEnv * env, jobject self, jlong callbackHandle)
 {
-    chip::DeviceLayer::StackLock lock;
-    InvokeCallback * invokeCallback = reinterpret_cast<InvokeCallback *>(callbackHandle);
-    VerifyOrReturn(invokeCallback != nullptr, ChipLogError(Controller, "InvokeCallback handle is nullptr"));
-    chip::Platform::Delete(invokeCallback);
+    deleteInvokeCallback(env, self, callbackHandle);
+}
+
+JNI_METHOD(jlong, ExtendableInvokeCallbackJni, newCallback)
+(JNIEnv * env, jobject self)
+{
+    return newExtendableInvokeCallback(env, self);
+}
+
+JNI_METHOD(void, ExtendableInvokeCallbackJni, deleteCallback)(JNIEnv * env, jobject self, jlong callbackHandle)
+{
+    deleteExtendableInvokeCallback(env, self, callbackHandle);
 }

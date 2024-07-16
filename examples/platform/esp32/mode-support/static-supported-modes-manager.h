@@ -19,7 +19,6 @@
 #pragma once
 
 #include <app/clusters/mode-select-server/supported-modes-manager.h>
-#include <app/util/af.h>
 
 namespace chip {
 namespace app {

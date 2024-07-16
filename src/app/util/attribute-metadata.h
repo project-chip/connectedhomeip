@@ -105,17 +105,6 @@ union EmberAfDefaultOrMinMaxAttributeValue
     const EmberAfAttributeMinMaxValue * ptrToMinMaxValue;
 };
 
-enum class EmberAfAttributeWritePermission
-{
-    DenyWrite            = 0,
-    AllowWriteNormal     = 1,
-    AllowWriteOfReadOnly = 2,
-    UnsupportedAttribute = 0x86, // Protocols::InteractionModel::Status::UnsupportedAttribute
-    InvalidValue         = 0x87, // Protocols::InteractionModel::Status::ConstraintError
-    ReadOnly             = 0x88, // Protocols::InteractionModel::Status::UnsupportedWrite
-    InvalidDataType      = 0x8d, // Protocols::InteractionModel::Status::InvalidDataType
-};
-
 // Attribute masks modify how attributes are used by the framework
 //
 // Attribute that has this mask is NOT read-only
@@ -209,14 +198,3 @@ bool emberAfIsStringAttributeType(EmberAfAttributeType attributeType);
 
 /** @brief Returns true if the given attribute type is a long string. */
 bool emberAfIsLongStringAttributeType(EmberAfAttributeType attributeType);
-
-/*
- * @brief Function that determines the length of a zigbee Cluster Library string
- *   (where the first byte is assumed to be the length).
- */
-uint8_t emberAfStringLength(const uint8_t * buffer);
-/*
- * @brief Function that determines the length of a zigbee Cluster Library long string.
- *   (where the first two bytes are assumed to be the length).
- */
-uint16_t emberAfLongStringLength(const uint8_t * buffer);

@@ -23,12 +23,12 @@
 #import "MTRTestResetCommissioneeHelper.h"
 #import "MTRTestStorage.h"
 
-#import <app/util/af-enums.h>
-
 #import <math.h> // For INFINITY
 
 // system dependencies
 #import <XCTest/XCTest.h>
+
+// Fixture: chip-all-clusters-app --KVS "$(mktemp -t chip-test-kvs)" --interface-id -1
 
 static const uint16_t kPairingTimeoutInSeconds = 10;
 static const uint16_t kCASESetupTimeoutInSeconds = 30;
@@ -73,7 +73,7 @@ static MTRBaseDevice * GetConnectedDevice(void)
     XCTAssertEqual(error.code, 0);
 
     NSError * commissionError = nil;
-    [sController commissionDevice:kDeviceId commissioningParams:[[MTRCommissioningParameters alloc] init] error:&commissionError];
+    XCTAssertTrue([sController commissionDevice:kDeviceId commissioningParams:[[MTRCommissioningParameters alloc] init] error:&commissionError]);
     XCTAssertNil(commissionError);
 
     // Keep waiting for onCommissioningComplete
@@ -91,45 +91,13 @@ static MTRBaseDevice * GetConnectedDevice(void)
 @interface MTRBackwardsCompatTests : XCTestCase
 @end
 
-static BOOL sStackInitRan = NO;
-static BOOL sNeedsStackShutdown = YES;
-
 @implementation MTRBackwardsCompatTests
 
-+ (void)tearDown
++ (void)setUp
 {
-    // Global teardown, runs once
-    if (sNeedsStackShutdown) {
-        // We don't need to worry about ResetCommissionee.  If we get here,
-        // we're running only one of our test methods (using
-        // -only-testing:MatterTests/MTROTAProviderTests/testMethodName), since
-        // we did not run test999_TearDown.
-        [self shutdownStack];
-    }
-}
-
-- (void)setUp
-{
-    // Per-test setup, runs before each test.
     [super setUp];
-    [self setContinueAfterFailure:NO];
 
-    if (sStackInitRan == NO) {
-        [self initStack];
-    }
-}
-
-- (void)tearDown
-{
-    // Per-test teardown, runs after each test.
-    [super tearDown];
-}
-
-- (void)initStack
-{
-    sStackInitRan = YES;
-
-    XCTestExpectation * expectation = [self expectationWithDescription:@"Pairing Complete"];
+    XCTestExpectation * expectation = [[XCTestExpectation alloc] initWithDescription:@"Pairing Complete"];
 
     __auto_type * factory = [MTRControllerFactory sharedInstance];
     XCTAssertNotNil(factory);
@@ -137,18 +105,13 @@ static BOOL sNeedsStackShutdown = YES;
     __auto_type * storage = [[MTRTestStorage alloc] init];
     __auto_type * factoryParams = [[MTRControllerFactoryParams alloc] initWithStorage:storage];
     factoryParams.port = @(kLocalPort);
+    XCTAssertTrue([factory startup:factoryParams]);
 
-    BOOL ok = [factory startup:factoryParams];
-    XCTAssertTrue(ok);
-
-    __auto_type * testKeys = [[MTRTestKeys alloc] init];
-    XCTAssertNotNil(testKeys);
-
-    sTestKeys = testKeys;
+    XCTAssertNotNil(sTestKeys = [[MTRTestKeys alloc] init]);
 
     // Needs to match what startControllerOnExistingFabric calls elsewhere in
     // this file do.
-    __auto_type * params = [[MTRDeviceControllerStartupParams alloc] initWithSigningKeypair:testKeys fabricId:1 ipk:testKeys.ipk];
+    __auto_type * params = [[MTRDeviceControllerStartupParams alloc] initWithSigningKeypair:sTestKeys fabricId:1 ipk:sTestKeys.ipk];
     params.vendorId = @(kTestVendorId);
 
     MTRDeviceController * controller = [factory startControllerOnNewFabric:params];
@@ -166,12 +129,12 @@ static BOOL sNeedsStackShutdown = YES;
     XCTAssertNotNil(payload);
     XCTAssertNil(error);
 
-    [controller setupCommissioningSessionWithPayload:payload newNodeID:@(kDeviceId) error:&error];
+    XCTAssertTrue([controller setupCommissioningSessionWithPayload:payload newNodeID:@(kDeviceId) error:&error]);
     XCTAssertNil(error);
 
-    [self waitForExpectationsWithTimeout:kPairingTimeoutInSeconds handler:nil];
+    XCTAssertEqual([XCTWaiter waitForExpectations:@[ expectation ] timeout:kPairingTimeoutInSeconds], XCTWaiterResultCompleted);
 
-    __block XCTestExpectation * connectionExpectation = [self expectationWithDescription:@"CASE established"];
+    __block XCTestExpectation * connectionExpectation = [[XCTestExpectation alloc] initWithDescription:@"CASE established"];
     [controller getBaseDevice:kDeviceId
                         queue:dispatch_get_main_queue()
             completionHandler:^(MTRBaseDevice * _Nullable device, NSError * _Nullable error) {
@@ -180,57 +143,54 @@ static BOOL sNeedsStackShutdown = YES;
                 sConnectedDevice = device;
                 connectionExpectation = nil;
             }];
-    [self waitForExpectationsWithTimeout:kCASESetupTimeoutInSeconds handler:nil];
+    XCTAssertEqual([XCTWaiter waitForExpectations:@[ connectionExpectation ] timeout:kCASESetupTimeoutInSeconds], XCTWaiterResultCompleted);
 }
 
-+ (void)shutdownStack
++ (void)tearDown
 {
-    sNeedsStackShutdown = NO;
+    ResetCommissionee(GetConnectedDevice(), dispatch_get_main_queue(), nil, kTimeoutInSeconds);
 
-    MTRDeviceController * controller = sController;
-    XCTAssertNotNil(controller);
-
-    [controller shutdown];
-    XCTAssertFalse([controller isRunning]);
-
+    [sController shutdown];
+    XCTAssertFalse([sController isRunning]);
     [[MTRControllerFactory sharedInstance] shutdown];
+
+    [super tearDown];
 }
 
-- (void)test000_SetUp
+- (void)setUp
 {
-    // Nothing to do here; our setUp method handled this already.  This test
-    // just exists to make the setup not look like it's happening inside other
-    // tests.
+    [super setUp];
+    [self setContinueAfterFailure:NO];
 }
 
-#define CHECK_RETURN_TYPE(sig, type)                                                                                               \
-    do {                                                                                                                           \
-        XCTAssertNotNil(sig);                                                                                                      \
-        XCTAssertTrue(strcmp([sig methodReturnType], @encode(type)) == 0);                                                         \
+#define CHECK_RETURN_TYPE(sig, type)                                       \
+    do {                                                                   \
+        XCTAssertNotNil(sig);                                              \
+        XCTAssertTrue(strcmp([sig methodReturnType], @encode(type)) == 0); \
     } while (0)
 
 /**
  * Arguments 0 and 1 are the implicit self and _cmd arguments; the real arguments begin at index 2.
  */
-#define CHECK_ARGUMENT(sig, index, type)                                                                                           \
-    do {                                                                                                                           \
-        XCTAssertTrue(strcmp([sig getArgumentTypeAtIndex:(index) + 2], @encode(type)) == 0);                                       \
+#define CHECK_ARGUMENT(sig, index, type)                                                     \
+    do {                                                                                     \
+        XCTAssertTrue(strcmp([sig getArgumentTypeAtIndex:(index) + 2], @encode(type)) == 0); \
     } while (0)
 
-#define CHECK_READONLY_PROPERTY(instance, propName, type)                                                                          \
-    do {                                                                                                                           \
-        NSMethodSignature * signature = [instance methodSignatureForSelector:@selector(propName)];                                 \
-        CHECK_RETURN_TYPE(signature, type);                                                                                        \
-        /* Check that getting the property directly compiles too */                                                                \
-        (void) instance.propName;                                                                                                  \
+#define CHECK_READONLY_PROPERTY(instance, propName, type)                                          \
+    do {                                                                                           \
+        NSMethodSignature * signature = [instance methodSignatureForSelector:@selector(propName)]; \
+        CHECK_RETURN_TYPE(signature, type);                                                        \
+        /* Check that getting the property directly compiles too */                                \
+        (void) instance.propName;                                                                  \
     } while (0)
 
-#define CHECK_PROPERTY(instance, propName, setterName, type)                                                                       \
-    do {                                                                                                                           \
-        CHECK_READONLY_PROPERTY(instance, propName, type);                                                                         \
-        NSMethodSignature * signature = [instance methodSignatureForSelector:@selector(setterName:)];                              \
-        CHECK_RETURN_TYPE(signature, void);                                                                                        \
-        CHECK_ARGUMENT(signature, 0, type);                                                                                        \
+#define CHECK_PROPERTY(instance, propName, setterName, type)                                          \
+    do {                                                                                              \
+        CHECK_READONLY_PROPERTY(instance, propName, type);                                            \
+        NSMethodSignature * signature = [instance methodSignatureForSelector:@selector(setterName:)]; \
+        CHECK_RETURN_TYPE(signature, void);                                                           \
+        CHECK_ARGUMENT(signature, 0, type);                                                           \
     } while (0)
 
 /**
@@ -1210,12 +1170,6 @@ static BOOL sNeedsStackShutdown = YES;
     __auto_type * obj = [[MTRModeSelectClusterSemanticTagStruct alloc] init];
     CHECK_PROPERTY(obj, mfgCode, setMfgCode, NSNumber *);
     CHECK_PROPERTY(obj, value, setValue, NSNumber *);
-}
-
-- (void)test999_TearDown
-{
-    ResetCommissionee(GetConnectedDevice(), dispatch_get_main_queue(), self, kTimeoutInSeconds);
-    [[self class] shutdownStack];
 }
 
 @end

@@ -71,6 +71,11 @@ struct TestOnlyPyBatchCommandsOverrides
     size_t overrideCommandRefsListLength;
 };
 
+struct TestOnlyPyOnDoneInfo
+{
+    size_t responseMessageCount;
+};
+
 } // namespace python
 
 namespace Controller {

@@ -17,6 +17,7 @@
  */
 
 #include <app-common/zap-generated/attributes/Accessors.h>
+#include <app/AttributeAccessInterfaceRegistry.h>
 #include <app/InteractionModelEngine.h>
 #include <app/SafeAttributePersistenceProvider.h>
 #include <app/clusters/mode-base-server/mode-base-server.h>
@@ -122,7 +123,7 @@ CHIP_ERROR Instance::Init()
         }
     }
 
-#ifdef EMBER_AF_PLUGIN_ON_OFF_SERVER
+#ifdef MATTER_DM_PLUGIN_ON_OFF_SERVER
     // OnMode with Power Up
     // If the On/Off feature is supported and the On/Off cluster attribute StartUpOnOff is present, with a
     // value of On (turn on at power up), then the CurrentMode attribute SHALL be set to the OnMode attribute
@@ -135,7 +136,7 @@ CHIP_ERROR Instance::Init()
         DataModel::Nullable<uint8_t> onMode = GetOnMode();
         bool onOffValueForStartUp           = false;
         if (!emberAfIsKnownVolatileAttribute(mEndpointId, OnOff::Id, OnOff::Attributes::StartUpOnOff::Id) &&
-            OnOffServer::Instance().getOnOffValueForStartUp(mEndpointId, onOffValueForStartUp) == EMBER_ZCL_STATUS_SUCCESS)
+            OnOffServer::Instance().getOnOffValueForStartUp(mEndpointId, onOffValueForStartUp) == Status::Success)
         {
             if (onOffValueForStartUp && !onMode.IsNull())
             {
@@ -156,7 +157,7 @@ CHIP_ERROR Instance::Init()
             }
         }
     }
-#endif // EMBER_AF_PLUGIN_ON_OFF_SERVER
+#endif // MATTER_DM_PLUGIN_ON_OFF_SERVER
 
     return CHIP_NO_ERROR;
 }

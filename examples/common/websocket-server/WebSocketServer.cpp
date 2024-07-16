@@ -23,9 +23,11 @@
 
 #include <deque>
 #include <mutex>
+#include <string>
 
-constexpr uint16_t kDefaultWebSocketServerPort = 9002;
-constexpr uint16_t kMaxMessageBufferLen        = 8192;
+constexpr uint16_t kDefaultWebSocketServerPort                 = 9002;
+constexpr uint16_t kMaxMessageBufferLen                        = 8192;
+[[maybe_unused]] constexpr char kWebSocketServerReadyMessage[] = "== WebSocket Server Ready";
 
 namespace {
 lws * gWebSocketInstance = nullptr;
@@ -153,6 +155,10 @@ static int OnWebSocketCallback(lws * wsi, lws_callback_reasons reason, void * us
     {
         gWebSocketInstance = nullptr;
     }
+    else if (LWS_CALLBACK_PROTOCOL_INIT == reason)
+    {
+        ChipLogProgress(chipTool, "%s", kWebSocketServerReadyMessage);
+    }
 
     return 0;
 }
@@ -172,7 +178,7 @@ CHIP_ERROR WebSocketServer::Run(chip::Optional<uint16_t> port, WebSocketServerDe
     info.protocols                    = protocols;
     static const lws_retry_bo_t retry = {
         .secs_since_valid_ping   = 400,
-        .secs_since_valid_hangup = 400,
+        .secs_since_valid_hangup = 420,
     };
     info.retry_and_idle_policy = &retry;
 

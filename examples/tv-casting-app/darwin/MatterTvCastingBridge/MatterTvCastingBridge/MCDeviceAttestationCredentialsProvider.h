@@ -44,8 +44,7 @@ public:
                                             chip::MutableByteSpan & outSignatureBuffer) override;
 
 private:
-    id<MCDataSource> mDataSource          = nullptr;
-    MCDeviceAttestationCredentials * mDac = nullptr;
+    id<MCDataSource> mDataSource = nullptr;
 };
 
 }; // namespace support

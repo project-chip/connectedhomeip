@@ -46,6 +46,7 @@ public:
 };
 
 class CastingPlayer;
+class BaseCluster;
 
 /**
  * @brief An Endpoint on a CastingPlayer e.g. a Speaker or a Matter Content App
@@ -143,6 +144,12 @@ public:
             }
         }
         return nullptr;
+    }
+
+    void LogDetail() const
+    {
+        ChipLogProgress(AppServer, "Endpoint::LogDetail() Endpoint ID: %d, Vendor ID: %d, Product ID: %d", mAttributes.mId,
+                        mAttributes.mVendorId, mAttributes.mProductId);
     }
 };
 

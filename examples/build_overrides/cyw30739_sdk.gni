@@ -13,7 +13,10 @@
 # limitations under the License.
 
 declare_args() {
+  # Root directory for Matter WPAN SDK.
+  matter_wpan_sdk_build_root =
+      "//third_party/connectedhomeip/third_party/infineon/repos/matter-wpan-sdk"
+
   # Root directory for CYW30739 SDK.
-  cyw30739_sdk_build_root =
-      "//third_party/connectedhomeip/third_party/infineon/cyw30739_sdk"
+  cyw30739_sdk_build_root = "//third_party/connectedhomeip/third_party/infineon/repos/matter-wpan-sdk/cyw30739"
 }

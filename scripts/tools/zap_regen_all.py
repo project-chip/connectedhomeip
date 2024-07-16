@@ -35,12 +35,12 @@ from typing import List
 CHIP_ROOT_DIR = os.path.realpath(
     os.path.join(os.path.dirname(__file__), '../..'))
 
+# TODO: Can we share this constant definition with generate.py?
+DEFAULT_DATA_MODEL_DESCRIPTION_FILE = 'src/app/zap-templates/zcl/zcl.json'
+
 
 class TargetType(Flag):
     """Type of targets that can be re-generated"""
-
-    # Tests for golden images
-    TESTS = auto()
 
     # Global templates: generally examples and chip controller
     GLOBAL = auto()
@@ -56,11 +56,10 @@ class TargetType(Flag):
     GOLDEN_TEST_IMAGES = auto()
 
     # All possible targets. Convenience constant
-    ALL = TESTS | GLOBAL | IDL_CODEGEN | SPECIFIC | GOLDEN_TEST_IMAGES
+    ALL = GLOBAL | IDL_CODEGEN | SPECIFIC | GOLDEN_TEST_IMAGES
 
 
 __TARGET_TYPES__ = {
-    'tests': TargetType.TESTS,
     'global': TargetType.GLOBAL,
     'idl_codegen': TargetType.IDL_CODEGEN,
     'specific': TargetType.SPECIFIC,
@@ -112,6 +111,12 @@ class ZapInput:
         """What command to execute for this zap input. """
         if self.zap_file:
             return [script, self.zap_file]
+        if self.properties_json == DEFAULT_DATA_MODEL_DESCRIPTION_FILE:
+            # Omit the -z bits because that's the default generate.py
+            # will use anyway, and this leads to nicer-looking command
+            # lines if people need to run the regen manually and get
+            # their command line from our --dry-run.
+            return [script]
         return [script, '-z', self.properties_json]
 
 
@@ -279,7 +284,7 @@ class JinjaCodegenTarget():
             for name in paths:
                 logging.info("    %s" % name)
 
-            VERSION = "0.44"
+            VERSION = "0.51"
             JAR_NAME = f"ktfmt-{VERSION}-jar-with-dependencies.jar"
             jar_url = f"https://repo1.maven.org/maven2/com/facebook/ktfmt/{VERSION}/{JAR_NAME}"
 
@@ -338,8 +343,6 @@ def setupArgumentsParser():
         description='Generate content from ZAP files')
     parser.add_argument('--type', action='append', choices=__TARGET_TYPES__.keys(),
                         help='Choose which content type to generate (default: all)')
-    parser.add_argument('--tests', default='all', choices=['all', 'darwin-framework-tool', 'app1', 'app2'],
-                        help='When generating tests only target, Choose which tests to generate (default: all)')
     parser.add_argument('--dry-run', default=False, action='store_true',
                         help="Don't do any generation, just log what targets would be generated (default: False)")
     parser.add_argument('--run-bootstrap', default=None, action='store_true',
@@ -347,7 +350,8 @@ def setupArgumentsParser():
 
     parser.add_argument('--parallel', action='store_true')
     parser.add_argument('--no-parallel', action='store_false', dest='parallel')
-    parser.set_defaults(parallel=True)
+    parser.add_argument('--no-rerun-in-env', action='store_false', dest='rerun_in_env')
+    parser.set_defaults(parallel=True, rerun_in_env=True)
 
     args = parser.parse_args()
 
@@ -374,26 +378,6 @@ def getGlobalTemplatesTargets():
         example_name = example_name[example_name.index('examples/') + 9:]
         example_name = example_name[:example_name.index('/')]
 
-        # Place holder has apps within each build
-        if example_name == "placeholder":
-            example_name = filepath.as_posix()
-            example_name = example_name[example_name.index(
-                'apps/') + len('apps/'):]
-            example_name = example_name[:example_name.index('/')]
-            logging.info("Found example %s (via %s)" %
-                         (example_name, str(filepath)))
-
-            # The name zap-generated is to make includes clear by using
-            # a name like <zap-generated/foo.h>
-            output_dir = os.path.join(
-                'zzz_generated', 'placeholder', example_name, 'zap-generated')
-            template = os.path.join(
-                'examples', 'placeholder', 'linux', 'apps', example_name, 'templates', 'templates.json')
-
-            targets.append(ZAPGenerateTarget.MatterIdlTarget(ZapInput.FromZap(filepath)))
-            targets.append(ZAPGenerateTarget(ZapInput.FromZap(filepath), output_dir=output_dir, template=template))
-            continue
-
         if example_name == "chef":
             if os.path.join("chef", "devices") not in str(filepath):
                 continue
@@ -406,20 +390,9 @@ def getGlobalTemplatesTargets():
         logging.info("Found example %s (via %s)" %
                      (example_name, str(filepath)))
 
-        generate_subdir = example_name
-
-        # Special casing lighting app because separate folders
-        if example_name == "lighting-app" or example_name == "lock-app":
-            if 'nxp' in str(filepath):
-                generate_subdir = f"{example_name}/nxp"
-
-        # The name zap-generated is to make includes clear by using
-        # a name like <zap-generated/foo.h>
-        output_dir = os.path.join(
-            'zzz_generated', generate_subdir, 'zap-generated')
         targets.append(ZAPGenerateTarget.MatterIdlTarget(ZapInput.FromZap(filepath)))
 
-    targets.append(ZAPGenerateTarget.MatterIdlTarget(ZapInput.FromPropertiesJson('src/app/zap-templates/zcl/zcl.json'),
+    targets.append(ZAPGenerateTarget.MatterIdlTarget(ZapInput.FromPropertiesJson(DEFAULT_DATA_MODEL_DESCRIPTION_FILE),
                    client_side=True, matter_file_name="src/controller/data_model/controller-clusters.matter"))
 
     return targets
@@ -446,41 +419,22 @@ def getCodegenTemplates():
     return targets
 
 
-def getTestsTemplatesTargets(test_target):
-    zap_input = ZapInput.FromPropertiesJson('src/app/zap-templates/zcl/zcl.json')
-    templates = {
-        'darwin-framework-tool': {
-            'template': 'examples/darwin-framework-tool/templates/tests/templates.json',
-            'output_dir': 'zzz_generated/darwin-framework-tool/zap-generated'
-        }
-    }
-
-    targets = []
-    for key, target in templates.items():
-        if test_target == 'all' or test_target == key:
-            logging.info("Found test target %s (via %s)" %
-                         (key, target['template']))
-            targets.append(ZAPGenerateTarget(zap_input, template=target['template'], output_dir=target['output_dir']))
-
-    return targets
-
-
 def getGoldenTestImageTargets():
     return [GoldenTestImageTarget()]
 
 
 def getSpecificTemplatesTargets():
-    zap_input = ZapInput.FromPropertiesJson('src/app/zap-templates/zcl/zcl.json')
+    zap_input = ZapInput.FromPropertiesJson(DEFAULT_DATA_MODEL_DESCRIPTION_FILE)
 
     # Mapping of required template and output directory
     templates = {
         'src/app/common/templates/templates.json': 'zzz_generated/app-common/app-common/zap-generated',
-        'src/app/tests/suites/templates/templates.json': 'zzz_generated/app-common/app-common/zap-generated',
         'examples/chip-tool/templates/templates.json': 'zzz_generated/chip-tool/zap-generated',
         'examples/darwin-framework-tool/templates/templates.json': 'zzz_generated/darwin-framework-tool/zap-generated',
         'src/controller/python/templates/templates.json': None,
         'src/darwin/Framework/CHIP/templates/templates.json': None,
         'src/controller/java/templates/templates.json': None,
+        'examples/tv-casting-app/darwin/MatterTvCastingBridge/MatterTvCastingBridge/templates/templates.json': None,
     }
 
     targets = []
@@ -491,11 +445,8 @@ def getSpecificTemplatesTargets():
     return targets
 
 
-def getTargets(type, test_target):
+def getTargets(type):
     targets = []
-
-    if type & TargetType.TESTS:
-        targets.extend(getTestsTemplatesTargets(test_target))
 
     if type & TargetType.GLOBAL:
         targets.extend(getGlobalTemplatesTargets())
@@ -545,11 +496,31 @@ def main():
         level=logging.INFO,
         format='%(asctime)s %(name)s %(levelname)-7s %(message)s'
     )
+
+    # The scripts executed by this generally MUST be within a bootstrapped environment because
+    # we need:
+    #    - zap-cli in PATH
+    #    - scripts/codegen.py uses click (can be in current pyenv, but guaranteed in bootstrap)
+    #    - formatting is using bootstrapped clang-format
+    # Figure out if bootstrapped. For now assume `PW_ROOT` is such a marker in the environment
+    if "PW_ROOT" not in os.environ:
+        logging.error("Script MUST be run in a bootstrapped environment.")
+
+        # using the `--no-rerun-in-env` to avoid recursive infinite calls
+        if '--no-rerun-in-env' not in sys.argv:
+            import shlex
+            logging.info("Will re-try running in a build environment....")
+
+            what_to_run = sys.argv + ['--no-rerun-in-env']
+            launcher = os.path.join(CHIP_ROOT_DIR, 'scripts', 'run_in_build_env.sh')
+            os.execv(launcher, [launcher, shlex.join(what_to_run)])
+        sys.exit(1)
+
     checkPythonVersion()
     os.chdir(CHIP_ROOT_DIR)
     args = setupArgumentsParser()
 
-    targets = getTargets(args.type, args.tests)
+    targets = getTargets(args.type)
 
     if args.dry_run:
         sys.exit(0)

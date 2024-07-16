@@ -21,6 +21,7 @@
 #include <app/clusters/media-playback-server/media-playback-server.h>
 #include <cstdint>
 #include <jni.h>
+#include <lib/support/JniReferences.h>
 #include <vector>
 
 enum MediaPlaybackRequestAttribute : uint8_t
@@ -75,6 +76,8 @@ public:
     float HandleGetPlaybackSpeed() override;
     uint64_t HandleGetSeekRangeStart() override;
     uint64_t HandleGetSeekRangeEnd() override;
+    CHIP_ERROR HandleGetActiveTrack(bool audio, AttributeValueEncoder & aEncoder);
+    CHIP_ERROR HandleGetAvailableTracks(bool audio, AttributeValueEncoder & aEncoder);
     CHIP_ERROR HandleGetActiveAudioTrack(AttributeValueEncoder & aEncoder) override;
     CHIP_ERROR HandleGetAvailableAudioTracks(AttributeValueEncoder & aEncoder) override;
     CHIP_ERROR HandleGetActiveTextTrack(AttributeValueEncoder & aEncoder) override;
@@ -97,15 +100,21 @@ public:
     void HandleStartOver(CommandResponseHelper<PlaybackResponseType> & helper) override;
     bool HandleActivateAudioTrack(const chip::CharSpan & trackId, const uint8_t & audioOutputIndex) override;
     bool HandleActivateTextTrack(const chip::CharSpan & trackId) override;
+    bool HandleActivateTrack(bool audio, const chip::CharSpan & trackId);
     bool HandleDeactivateTextTrack() override;
 
     uint32_t GetFeatureMap(chip::EndpointId endpoint) override;
+    uint16_t GetClusterRevision(chip::EndpointId endpoint) override;
 
 private:
-    jobject mMediaPlaybackManagerObject = nullptr;
-    jmethodID mRequestMethod            = nullptr;
-    jmethodID mGetAttributeMethod       = nullptr;
-    jmethodID mGetPositionMethod        = nullptr;
+    chip::JniGlobalReference mMediaPlaybackManagerObject;
+    jmethodID mRequestMethod             = nullptr;
+    jmethodID mGetAttributeMethod        = nullptr;
+    jmethodID mGetPositionMethod         = nullptr;
+    jmethodID mGetAvailableTracksMethod  = nullptr;
+    jmethodID mActivateTrackMethod       = nullptr;
+    jmethodID mDeactivateTextTrackMethod = nullptr;
+    jmethodID mGetActiveTrackMethod      = nullptr;
 
     uint64_t HandleMediaRequestGetAttribute(MediaPlaybackRequestAttribute attribute);
     long HandleMediaRequestGetLongAttribute(MediaPlaybackRequestAttribute attribute);
@@ -113,5 +122,6 @@ private:
     HandleMediaRequest(MediaPlaybackRequest mediaPlaybackRequest, uint64_t deltaPositionMilliseconds);
 
     // TODO: set this based upon meta data from app
-    uint32_t mDynamicEndpointFeatureMap = 3;
+    static constexpr uint32_t kEndpointFeatureMap = 3;
+    static constexpr uint16_t kClusterRevision    = 2;
 };

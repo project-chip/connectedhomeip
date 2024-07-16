@@ -27,6 +27,7 @@
 #include <app/util/attribute-storage.h>
 #include <controller/CHIPCluster.h>
 #include <platform/CHIPDeviceLayer.h>
+#include <protocols/interaction_model/StatusCode.h>
 #include <protocols/user_directed_commissioning/UserDirectedCommissioning.h>
 
 using chip::app::Clusters::ApplicationBasic::CatalogVendorApp;
@@ -40,14 +41,15 @@ namespace AppPlatform {
 
 // The AppPlatform overrides emberAfExternalAttributeReadCallback to handle external attribute reads for ContentApps.
 // This callback can be used to handle external attribute reads for attributes belonging to static endpoints.
-EmberAfStatus AppPlatformExternalAttributeReadCallback(EndpointId endpoint, ClusterId clusterId,
-                                                       const EmberAfAttributeMetadata * attributeMetadata, uint8_t * buffer,
-                                                       uint16_t maxReadLength);
+Protocols::InteractionModel::Status AppPlatformExternalAttributeReadCallback(EndpointId endpoint, ClusterId clusterId,
+                                                                             const EmberAfAttributeMetadata * attributeMetadata,
+                                                                             uint8_t * buffer, uint16_t maxReadLength);
 
 // The AppPlatform overrides emberAfExternalAttributeWriteCallback to handle external attribute writes for ContentApps.
 // This callback can be used to handle external attribute writes for attributes belonging to static endpoints.
-EmberAfStatus AppPlatformExternalAttributeWriteCallback(EndpointId endpoint, ClusterId clusterId,
-                                                        const EmberAfAttributeMetadata * attributeMetadata, uint8_t * buffer);
+Protocols::InteractionModel::Status AppPlatformExternalAttributeWriteCallback(EndpointId endpoint, ClusterId clusterId,
+                                                                              const EmberAfAttributeMetadata * attributeMetadata,
+                                                                              uint8_t * buffer);
 
 inline constexpr EndpointId kTargetBindingClusterEndpointId = 0;
 inline constexpr EndpointId kLocalVideoPlayerEndpointId     = 1;
@@ -157,7 +159,19 @@ public:
     // loads given app and calls HandleGetSetupPasscode. Sets passcode to 0 if it cannot be obtained.
     // return true if a matching app was found (and it granted this client access), even if a passcode was not obtained
     bool HasTargetContentApp(uint16_t vendorId, uint16_t productId, CharSpan rotatingId,
-                             chip::Protocols::UserDirectedCommissioning::TargetAppInfo & info, uint32_t & passcode);
+                             Protocols::UserDirectedCommissioning::TargetAppInfo & info, uint32_t & passcode);
+
+    // returns set of connected nodes for a given content app
+    std::set<NodeId> GetNodeIdsForContentApp(uint16_t vendorId, uint16_t productId);
+
+    // returns set of connected nodes for a given allowed vendor id
+    std::set<NodeId> GetNodeIdsForAllowVendorId(uint16_t vendorId);
+
+    // store node id for content app after commissioning
+    // node id can be used later on to update ACL
+    // in case app is not installed
+    // Note: This is in memory storing, the values are deleted after reboot
+    void StoreNodeIdForContentApp(uint16_t vendorId, uint16_t productId, NodeId nodeId);
 
     /**
      * @brief
@@ -199,6 +213,8 @@ protected:
     EndpointId mCurrentEndpointId;
     EndpointId mFirstDynamicEndpointId;
     ContentApp * mContentApps[CHIP_DEVICE_CONFIG_DYNAMIC_ENDPOINT_COUNT];
+    // key is string -> vendorId:producTid
+    std::map<std::string, std::set<NodeId>> mConnectedContentAppNodeIds;
 
 private:
     void IncrementCurrentEndpointID();

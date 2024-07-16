@@ -213,7 +213,7 @@ void BindingHandler::LightSwitchChangedHandler(const EmberBindingTableEntry & bi
     VerifyOrReturn(context != nullptr, printf("Invalid context for Light switch handler\n"););
     BindingData * data = static_cast<BindingData *>(context);
 
-    if (binding.type == EMBER_MULTICAST_BINDING && data->IsGroup)
+    if (binding.type == MATTER_MULTICAST_BINDING && data->IsGroup)
     {
         switch (data->ClusterId)
         {
@@ -228,7 +228,7 @@ void BindingHandler::LightSwitchChangedHandler(const EmberBindingTableEntry & bi
             break;
         }
     }
-    else if (binding.type == EMBER_UNICAST_BINDING && !data->IsGroup)
+    else if (binding.type == MATTER_UNICAST_BINDING && !data->IsGroup)
     {
         switch (data->ClusterId)
         {
@@ -281,7 +281,7 @@ bool BindingHandler::IsGroupBound()
 
     for (auto & entry : bindingTable)
     {
-        if (EMBER_MULTICAST_BINDING == entry.type)
+        if (MATTER_MULTICAST_BINDING == entry.type)
         {
             return true;
         }
@@ -299,17 +299,17 @@ void BindingHandler::PrintBindingTable()
     {
         switch (entry.type)
         {
-        case EMBER_UNICAST_BINDING:
+        case MATTER_UNICAST_BINDING:
             printf("[%d] UNICAST:", i++);
             printf("\t\t+ Fabric: %d\n \
             \t+ LocalEndpoint %d \n \
             \t+ ClusterId %d \n \
             \t+ RemoteEndpointId %d \n \
             \t+ NodeId %d \n",
-                   (int) entry.fabricIndex, (int) entry.local, (int) entry.clusterId.Value(), (int) entry.remote,
-                   (int) entry.nodeId);
+                   (int) entry.fabricIndex, (int) entry.local, (int) entry.clusterId.value_or(kInvalidClusterId),
+                   (int) entry.remote, (int) entry.nodeId);
             break;
-        case EMBER_MULTICAST_BINDING:
+        case MATTER_MULTICAST_BINDING:
             printf("[%d] GROUP:", i++);
             printf("\t\t+ Fabric: %d\n \
             \t+ LocalEndpoint %d \n \
@@ -317,7 +317,7 @@ void BindingHandler::PrintBindingTable()
             \t+ GroupId %d \n",
                    (int) entry.fabricIndex, (int) entry.local, (int) entry.remote, (int) entry.groupId);
             break;
-        case EMBER_UNUSED_BINDING:
+        case MATTER_UNUSED_BINDING:
             printf("[%d] UNUSED", i++);
             break;
         default:

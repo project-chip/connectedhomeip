@@ -44,6 +44,18 @@
 #define CHIP_DEVICE_CONFIG_ENABLE_CHIP_TIME_SERVICE_TIME_SYNC 0
 // #define CHIP_DEVICE_CONFIG_PERSISTED_STORAGE_GLOBAL_EIDC_KEY 2
 
+/**
+ * @def CHIP_DEVICE_CONFIG_ROTATING_DEVICE_ID_UNIQUE_ID_LENGTH
+ *
+ * Set unique id to maximum length if not defined to ensure the actual unique
+ * id is retrieved instead of the default one (if factory data read fails).
+ */
+#ifndef CHIP_DEVICE_CONFIG_ROTATING_DEVICE_ID_UNIQUE_ID_LENGTH
+#define CHIP_DEVICE_CONFIG_ROTATING_DEVICE_ID_UNIQUE_ID_LENGTH 32
+#endif
+
+#define CHIP_ADDRESS_RESOLVE_IMPL_INCLUDE_HEADER <lib/address_resolve/AddressResolve_DefaultImpl.h>
+
 // ========== Platform-specific Configuration =========
 
 // These are configuration options that are unique to the K32W platform.
@@ -112,6 +124,18 @@
 #define CHIP_DEVICE_CONFIG_ENABLE_THREAD 1
 #define CHIP_DEVICE_CONFIG_ENABLE_THREAD_SRP_CLIENT 1
 #define CHIP_DEVICE_CONFIG_ENABLE_THREAD_DNS_CLIENT 1
+#endif
+
+#if CHIP_DEVICE_CONFIG_ENABLE_SED
+
+#ifndef CHIP_DEVICE_CONFIG_ICD_SLOW_POLL_INTERVAL
+#define CHIP_DEVICE_CONFIG_ICD_SLOW_POLL_INTERVAL chip::System::Clock::Milliseconds32(NXP_OT_IDLE_INTERVAL)
+#endif // CHIP_DEVICE_CONFIG_ICD_SLOW_POLL_INTERVAL
+
+#ifndef CHIP_DEVICE_CONFIG_ICD_FAST_POLL_INTERVAL
+#define CHIP_DEVICE_CONFIG_ICD_FAST_POLL_INTERVAL chip::System::Clock::Milliseconds32(NXP_OT_ACTIVE_INTERVAL)
+#endif // CHIP_DEVICE_CONFIG_ICD_FAST_POLL_INTERVAL
+
 #endif
 
 #define CHIP_DEVICE_CONFIG_ENABLE_TEST_SETUP_PARAMS 1

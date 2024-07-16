@@ -18,8 +18,11 @@
 
 #pragma once
 
+// TODO(#32628): Remove the CHIPCore.h header when the esp32 build is correctly fixed
+#include <lib/core/CHIPCore.h>
+
 #include <app/ReadHandler.h>
-#include <app/icd/ICDStateObserver.h>
+#include <app/icd/server/ICDStateObserver.h>
 #include <lib/core/CHIPError.h>
 #include <system/SystemClock.h>
 
@@ -51,7 +54,7 @@ public:
  *
  * It inherits the ReadHandler::Observer class to be notified of reportability changes in the ReadHandlers.
  * It inherits the ICDStateObserver class to allow the implementation to generate reports based on the changes in ICD devices state,
- * such as going from idle to active and vice-versa.
+ * such as going from idle to active mode and vice-versa.
  *
  * @note The logic for how and when to schedule reports is implemented in the subclasses of ReportScheduler, such as
  * ReportSchedulerImpl and SyncronizedReportSchedulerImpl.
@@ -70,7 +73,7 @@ public:
         /// @brief Start a timer for a given context. The report scheduler must always cancel an existing timer for a context (using
         /// CancelTimer) before starting a new one for that context.
         /// @param context context to pass to the timer callback.
-        /// @param aTimeout time in miliseconds before the timer expires
+        /// @param aTimeout time in milliseconds before the timer expires
         virtual CHIP_ERROR StartTimer(TimerContext * context, System::Clock::Timeout aTimeout) = 0;
         /// @brief Cancel a timer for a given context
         /// @param context used to identify the timer to cancel
@@ -82,25 +85,34 @@ public:
     /**
      * @class ReadHandlerNode
      *
-     * @brief This class is in charge of determining when a ReadHandler is reportable depending on the monotonic timestamp of the
-     * system and the intervals of the ReadHandler. It inherits the TimerContext class to allow it to be used as a context for a
-     * TimerDelegate so the TimerDelegate can call the TimerFired method when the timer expires.
+     * @brief This class is responsible for determining when a ReadHandler is reportable depending on the monotonic timestamp of
+     *  the system and the intervals of the ReadHandler. It inherits the TimerContext class to allow it to be used as a context for
+     *  a TimerDelegate so that the TimerDelegate can call the TimerFired method when the timer expires.
      *
-     *  The Logic to determine if a ReadHandler is reportable at a precise timestamp is as follows:
-     *  1: The ReadHandler is in the CanStartReporting state
-     *  2: The minimal interval since last report has elapsed
-     *  3: The maximal interval since last report has elapsed or the ReadHandler is dirty
-     *  If the three conditions are met, the ReadHandler is reportable.
+     *  Three conditions that can prevent the ReadHandler from being reportable:
+     *  1: The ReadHandler is not in the CanStartReporting state:
+     *      This condition can be resolved by setting the CanStartReporting flag on the ReadHandler
      *
-     *  Additionnal flags have been provided for specific use cases:
+     *  2: The minimal interval since the last report has not elapsed
+     *      This condition can be resolved after enough time has passed since the last report or by setting the EngineRunScheduled
+     *      flag
      *
-     *  CanbeSynced: Mechanism to allow the ReadHandler to emit a report if another readHandler is ReportableNow.
-     *  This flag can substitute the maximal interval condition or the dirty condition. It is currently only used by the
-     *  SynchronizedReportScheduler.
+     *  3: The maximal interval since the last report has not elapsed and the ReadHandler is not dirty:
+     *      This condition can be resolved after enough time has passed since the last report to reach the max interval, by the
+     *      ReadHandler becoming dirty or by setting the CanBeSynced flag and having another ReadHandler needing to report.
+     *
+     *  Once the 3 conditions are met, the ReadHandler is considered reportable.
+     *
+     *  Flags:
+     *
+     *  CanBeSynced: Mechanism to allow the ReadHandler to emit a report if another readHandler is ReportableNow.
+     *  This flag is currently only used by the SynchronizedReportScheduler to allow firing reports of ReadHandlers at the same
+     *  time.
      *
      *  EngineRunScheduled: Mechanism to ensure that the reporting engine will see the ReadHandler as reportable if a timer fires.
-     *  This flag can substitute the minimal interval condition or the maximal interval condition. The goal is to allow for
-     *  reporting when timers fire earlier than the minimal timestamp du to mechanism such as NTP clock adjustments.
+     *  This flag is used to confirm that the next report timer has fired for a ReadHandler, thus allowing reporting when timers
+     *  fire earlier than the minimal timestamp due to mechanisms such as NTP clock adjustments.
+     *
      */
     class ReadHandlerNode : public TimerContext
     {
@@ -125,12 +137,12 @@ public:
         ReadHandler * GetReadHandler() const { return mReadHandler; }
 
         /// @brief Check if the Node is reportable now, meaning its readhandler was made reportable by attribute dirtying and
-        /// handler state, and minimal time interval since last report has elapsed, or the maximal time interval since last
+        /// handler state, and minimal time interval since the last report has elapsed, or the maximal time interval since the last
         /// report has elapsed.
-        /// @note If a handler has been flaged as scheduled for engine run, it will be reported regardless of the timestamps. This
-        /// is done to guarantee that the reporting engine will see the handler as reportable if a timer fires, even if it fires
-        /// early.
-        /// @param now current time to use for the check, user must ensure to provide a valid time for this to be reliable
+        /// @note If a handler has been flagged as scheduled for an engine run, it will be reported regardless of the timestamps.
+        /// This is done to guarantee that the reporting engine will see the handler as reportable if a timer fires, even if it
+        /// fires early.
+        /// @param now current time to use for the check, the user must ensure to provide a valid time for this to be reliable
         bool IsReportableNow(const Timestamp & now) const
         {
             return (mReadHandler->CanStartReporting() &&
@@ -149,8 +161,8 @@ public:
 
         /// @brief Set the interval timestamps for the node based on the read handler reporting intervals
         /// @param aReadHandler read handler to get the intervals from
-        /// @param now current time to calculate the mMin and mMax timestamps, user must ensure to provide a valid time for this to
-        /// be reliable
+        /// @param now current time to calculate the mMin and mMax timestamps, the user must ensure to provide a valid time for this
+        /// to be reliable
         void SetIntervalTimeStamps(ReadHandler * aReadHandler, const Timestamp & now)
         {
             uint16_t minInterval, maxInterval;
@@ -178,9 +190,7 @@ public:
     };
 
     ReportScheduler(TimerDelegate * aTimerDelegate) : mTimerDelegate(aTimerDelegate) {}
-    /**
-     *  Interface to act on changes in the ReadHandler reportability
-     */
+
     virtual ~ReportScheduler() = default;
 
     virtual void ReportTimerCallback() = 0;
@@ -206,7 +216,7 @@ public:
     /// @brief Get the number of ReadHandlers registered in the scheduler's node pool
     size_t GetNumReadHandlers() const { return mNodesPool.Allocated(); }
 
-#ifdef CONFIG_BUILD_FOR_HOST_UNIT_TEST
+#if CONFIG_BUILD_FOR_HOST_UNIT_TEST
     Timestamp GetMinTimestampForHandler(const ReadHandler * aReadHandler)
     {
         ReadHandlerNode * node = FindReadHandlerNode(aReadHandler);
@@ -225,7 +235,7 @@ protected:
 
     /// @brief Find the ReadHandlerNode for a given ReadHandler pointer
     /// @param [in] aReadHandler ReadHandler pointer to look for in the ReadHandler nodes list
-    /// @return Node Address if node was found, nullptr otherwise
+    /// @return Node Address if the node was found, nullptr otherwise
     ReadHandlerNode * FindReadHandlerNode(const ReadHandler * aReadHandler)
     {
         ReadHandlerNode * foundNode = nullptr;

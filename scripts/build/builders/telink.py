@@ -1,4 +1,4 @@
-# Copyright (c) 2022 Project CHIP Authors
+# Copyright (c) 2022-2024 Project CHIP Authors
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -17,7 +17,7 @@ import os
 import shlex
 from enum import Enum, auto
 
-from .builder import Builder
+from .builder import Builder, BuilderOutput
 
 
 class TelinkApp(Enum):
@@ -114,17 +114,26 @@ class TelinkApp(Enum):
 
 
 class TelinkBoard(Enum):
+    TLRS9118BDK40D = auto()
     TLSR9518ADK80D = auto()
     TLSR9528A = auto()
     TLSR9528A_RETENTION = auto()
+    TLSR9258A = auto()
+    TLSR9258A_RETENTION = auto()
 
     def GnArgName(self):
-        if self == TelinkBoard.TLSR9518ADK80D:
+        if self == TelinkBoard.TLRS9118BDK40D:
+            return 'tlsr9118bdk40d'
+        elif self == TelinkBoard.TLSR9518ADK80D:
             return 'tlsr9518adk80d'
         elif self == TelinkBoard.TLSR9528A:
             return 'tlsr9528a'
         elif self == TelinkBoard.TLSR9528A_RETENTION:
             return 'tlsr9528a_retention'
+        elif self == TelinkBoard.TLSR9258A:
+            return 'tlsr9258a'
+        elif self == TelinkBoard.TLSR9258A_RETENTION:
+            return 'tlsr9258a_retention'
         else:
             raise Exception('Unknown board type: %r' % self)
 
@@ -220,15 +229,10 @@ west build --cmake-only -d {outdir} -b {board} {sourcedir}{build_flags}
         self._Execute(['bash', '-c', cmd], title='Building ' + self.identifier)
 
     def build_outputs(self):
-        return {
-            '%s.elf' %
-            self.app.AppNamePrefix(): os.path.join(
-                self.output_dir,
-                'zephyr',
-                'zephyr.elf'),
-            '%s.map' %
-            self.app.AppNamePrefix(): os.path.join(
-                self.output_dir,
-                'zephyr',
-                'zephyr.map'),
-        }
+        yield BuilderOutput(
+            os.path.join(self.output_dir, 'zephyr', 'zephyr.elf'),
+            '%s.elf' % self.app.AppNamePrefix())
+        if self.options.enable_link_map_file:
+            yield BuilderOutput(
+                os.path.join(self.output_dir, 'zephyr', 'zephyr.map'),
+                '%s.map' % self.app.AppNamePrefix())

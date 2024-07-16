@@ -17,7 +17,6 @@
  */
 
 #include <air-purifier-manager.h>
-#include <app/util/error-mapping.h>
 
 using namespace chip;
 using namespace chip::app;
@@ -33,37 +32,31 @@ void AirPurifierManager::Init()
     mAirQualitySensorManager.Init();
     mTemperatureSensorManager.Init();
     mHumiditySensorManager.Init();
+    mThermostatManager.Init();
 
-    DataModel::Nullable<Percent> percentSetting;
-    EmberAfStatus status = FanControl::Attributes::PercentSetting::Get(mEndpointId, percentSetting);
-    if (EMBER_ZCL_STATUS_SUCCESS == status)
+    DataModel::Nullable<Percent> percentSetting = GetPercentSetting();
+    if (percentSetting.IsNull())
     {
-        if (percentSetting.IsNull())
-        {
-            PercentSettingWriteCallback(0);
-        }
-        else
-        {
-            PercentSettingWriteCallback(percentSetting.Value());
-        }
+        PercentSettingWriteCallback(0);
+    }
+    else
+    {
+        PercentSettingWriteCallback(percentSetting.Value());
     }
 
-    DataModel::Nullable<uint8_t> speedSetting;
-    status = FanControl::Attributes::SpeedSetting::Get(mEndpointId, speedSetting);
-    if (EMBER_ZCL_STATUS_SUCCESS == status)
+    DataModel::Nullable<uint8_t> speedSetting = GetSpeedSetting();
+    if (speedSetting.IsNull())
     {
-        if (speedSetting.IsNull())
-        {
-            SpeedSettingWriteCallback(0);
-        }
-        else
-        {
-            SpeedSettingWriteCallback(speedSetting.Value());
-        }
+        SpeedSettingWriteCallback(0);
+    }
+    else
+    {
+        SpeedSettingWriteCallback(speedSetting.Value());
     }
 
     // Set up some sane initial values for temperature and humidity - note these are fixed values for testing purposes only
     mTemperatureSensorManager.OnTemperatureChangeHandler(2000);
+    mThermostatManager.OnLocalTemperatureChangeCallback(2000);
     mHumiditySensorManager.OnHumidityChangeHandler(5000);
 }
 
@@ -74,6 +67,11 @@ void AirPurifierManager::PostAttributeChangeCallback(EndpointId endpoint, Cluste
     {
     case FanControl::Id: {
         HandleFanControlAttributeChange(attributeId, type, size, value);
+        break;
+    }
+
+    case Thermostat::Id: {
+        HandleThermostatAttributeChange(attributeId, type, size, value);
         break;
     }
 
@@ -92,8 +90,7 @@ Status AirPurifierManager::HandleStep(FanControl::StepDirectionEnum aDirection, 
     uint8_t speedMax;
     FanControl::Attributes::SpeedMax::Get(mEndpointId, &speedMax);
 
-    DataModel::Nullable<uint8_t> speedSetting;
-    FanControl::Attributes::SpeedSetting::Get(mEndpointId, speedSetting);
+    DataModel::Nullable<uint8_t> speedSetting = GetSpeedSetting();
 
     uint8_t newSpeedSetting = speedSetting.IsNull() ? 0 : speedSetting.Value();
 
@@ -149,7 +146,7 @@ Status AirPurifierManager::HandleStep(FanControl::StepDirectionEnum aDirection, 
         }
     }
 
-    return ToInteractionModelStatus(FanControl::Attributes::SpeedSetting::Set(mEndpointId, newSpeedSetting));
+    return FanControl::Attributes::SpeedSetting::Set(mEndpointId, newSpeedSetting);
 }
 
 void AirPurifierManager::HandleFanControlAttributeChange(AttributeId attributeId, uint8_t type, uint16_t size, uint8_t * value)
@@ -199,12 +196,13 @@ void AirPurifierManager::PercentSettingWriteCallback(uint8_t aNewPercentSetting)
     if (aNewPercentSetting != percentCurrent)
     {
         ChipLogDetail(NotSpecified, "AirPurifierManager::PercentSettingWriteCallback: %d", aNewPercentSetting);
-        percentCurrent       = aNewPercentSetting;
-        EmberAfStatus status = FanControl::Attributes::PercentCurrent::Set(mEndpointId, percentCurrent);
-        if (status != EMBER_ZCL_STATUS_SUCCESS)
+        percentCurrent = aNewPercentSetting;
+        Status status  = FanControl::Attributes::PercentCurrent::Set(mEndpointId, percentCurrent);
+        if (status != Status::Success)
         {
             ChipLogError(NotSpecified,
-                         "AirPurifierManager::PercentSettingWriteCallback: failed to set PercentCurrent attribute: %d", status);
+                         "AirPurifierManager::PercentSettingWriteCallback: failed to set PercentCurrent attribute: %d",
+                         to_underlying(status));
         }
     }
 }
@@ -214,12 +212,12 @@ void AirPurifierManager::SpeedSettingWriteCallback(uint8_t aNewSpeedSetting)
     if (aNewSpeedSetting != speedCurrent)
     {
         ChipLogDetail(NotSpecified, "AirPurifierManager::SpeedSettingWriteCallback: %d", aNewSpeedSetting);
-        speedCurrent         = aNewSpeedSetting;
-        EmberAfStatus status = FanControl::Attributes::SpeedCurrent::Set(mEndpointId, speedCurrent);
-        if (status != EMBER_ZCL_STATUS_SUCCESS)
+        speedCurrent  = aNewSpeedSetting;
+        Status status = FanControl::Attributes::SpeedCurrent::Set(mEndpointId, speedCurrent);
+        if (status != Status::Success)
         {
             ChipLogError(NotSpecified, "AirPurifierManager::SpeedSettingWriteCallback: failed to set SpeedCurrent attribute: %d",
-                         status);
+                         to_underlying(status));
         }
 
         // Determine if the speed change should also change the fan mode
@@ -302,10 +300,78 @@ void AirPurifierManager::SetSpeedSetting(DataModel::Nullable<uint8_t> aNewSpeedS
 
     if (aNewSpeedSetting.Value() != speedCurrent)
     {
-        EmberAfStatus status = FanControl::Attributes::SpeedSetting::Set(mEndpointId, aNewSpeedSetting);
-        if (status != EMBER_ZCL_STATUS_SUCCESS)
+        Status status = FanControl::Attributes::SpeedSetting::Set(mEndpointId, aNewSpeedSetting);
+        if (status != Status::Success)
         {
-            ChipLogError(NotSpecified, "AirPurifierManager::SetSpeedSetting: failed to set SpeedSetting attribute: %d", status);
+            ChipLogError(NotSpecified, "AirPurifierManager::SetSpeedSetting: failed to set SpeedSetting attribute: %d",
+                         to_underlying(status));
         }
+    }
+}
+
+DataModel::Nullable<uint8_t> AirPurifierManager::GetSpeedSetting()
+{
+    DataModel::Nullable<uint8_t> speedSetting;
+    Status status = FanControl::Attributes::SpeedSetting::Get(mEndpointId, speedSetting);
+
+    if (status != Status::Success)
+    {
+        ChipLogError(NotSpecified, "AirPurifierManager::GetSpeedSetting: failed to get SpeedSetting attribute: %d",
+                     to_underlying(status));
+    }
+
+    return speedSetting;
+}
+
+DataModel::Nullable<Percent> AirPurifierManager::GetPercentSetting()
+{
+    DataModel::Nullable<Percent> percentSetting;
+    Status status = FanControl::Attributes::PercentSetting::Get(mEndpointId, percentSetting);
+
+    if (status != Status::Success)
+    {
+        ChipLogError(NotSpecified, "AirPurifierManager::GetPercentSetting: failed to get PercentSetting attribute: %d",
+                     to_underlying(status));
+    }
+
+    return percentSetting;
+}
+
+void AirPurifierManager::HandleThermostatAttributeChange(AttributeId attributeId, uint8_t type, uint16_t size, uint8_t * value)
+{
+    switch (attributeId)
+    {
+    case Thermostat::Attributes::OccupiedHeatingSetpoint::Id: {
+        int16_t heatingSetpoint = static_cast<int16_t>(chip::Encoding::LittleEndian::Get16(value));
+        ThermostatHeatingSetpointWriteCallback(heatingSetpoint);
+        break;
+    }
+    case Thermostat::Attributes::SystemMode::Id: {
+        uint8_t systemMode = static_cast<uint8_t>(*value);
+        ThermostatSystemModeWriteCallback(systemMode);
+        break;
+    }
+    }
+}
+
+void AirPurifierManager::ThermostatHeatingSetpointWriteCallback(int16_t aNewHeatingSetpoint)
+{
+    mThermostatManager.HeatingSetpointWriteCallback(aNewHeatingSetpoint);
+}
+
+void AirPurifierManager::ThermostatSystemModeWriteCallback(uint8_t aNewSystemMode)
+{
+    mThermostatManager.SystemModeWriteCallback(aNewSystemMode);
+}
+
+void AirPurifierManager::HeatingCallback()
+{
+    // Check if the Fan is off and if it is, turn it on to 50% speed
+    DataModel::Nullable<uint8_t> speedSetting = GetSpeedSetting();
+
+    if (speedSetting.IsNull() || speedSetting.Value() == 0)
+    {
+        DataModel::Nullable<uint8_t> newSpeedSetting(5);
+        SetSpeedSetting(newSpeedSetting);
     }
 }

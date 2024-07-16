@@ -19,6 +19,7 @@
 #include "CommissionerMain.h"
 #include "lib/support/logging/CHIPLogging.h"
 #include <jni.h>
+#include <lib/support/JniReferences.h>
 
 class JNIMyUserPrompter : public UserPrompter
 {
@@ -37,9 +38,12 @@ public:
     void PromptCommissioningFailed(const char * commissioneeName, CHIP_ERROR error) override;
 
 private:
-    jobject mJNIMyUserPrompterObject                 = nullptr;
+    chip::JniGlobalReference mJNIMyUserPrompterObject;
     jmethodID mPromptForCommissionOKPermissionMethod = nullptr;
     jmethodID mPromptForCommissionPincodeMethod      = nullptr;
+    jmethodID mHidePromptsOnCancelMethod             = nullptr;
+    jmethodID mPromptWithCommissionerPasscodeMethod  = nullptr;
+    jmethodID mPromptCommissioningStartedMethod      = nullptr;
     jmethodID mPromptCommissioningSucceededMethod    = nullptr;
     jmethodID mPromptCommissioningFailedMethod       = nullptr;
 };

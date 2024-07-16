@@ -91,25 +91,3 @@ tests:
           [1689997642.999367][360160:360162] CHIP:TOO: Endpoint: 1 Cluster: 0x0000_0059 Attribute 0x0000_0001 DataVersion: 1994417976
           [1689997642.999395][360160:360162] CHIP:TOO:   CurrentMode: 0
       disabled: true
-
-    - label: "Step 4: TH reads from the DUT the OnMode attribute."
-      PICS: DISHM.S.A0003
-      verification: |
-          ./chip-tool dishwashermode read on-mode 1 1
-
-          Verify on TH(chip-tool) logs, OnMode attribute value is an integer from supported_modes_dut or null, below is the sample log provided for the raspi platform, Here OnMode attribute value is Null
-
-          [1649676072.465968][10754:10759] CHIP:TOO: Endpoint: 1 Cluster: 0x0000_0059 Attribute 0x0000_0003 DataVersion: 4277065072
-          [1649676072.466094][10754:10759] CHIP:TOO: OnMode: null
-      disabled: true
-
-    - label: "Step 5: TH reads from the DUT the StartUpMode attribute."
-      PICS: DISHM.S.A0002
-      verification: |
-          ./chip-tool dishwashermode read start-up-mode 1 1
-
-          Verify on TH(chip-tool) logs, StartUpMode attribute value is an integer from supported_modes_dut or null, below is the sample log provided for the raspi platform, Here StartUpMode attribute value is Null
-
-          [1689997956.636092][360258:360260] CHIP:TOO: Endpoint: 1 Cluster: 0x0000_0059 Attribute 0x0000_0002 DataVersion: 1994417976
-          [1689997956.636125][360258:360260] CHIP:TOO:   StartUpMode: null
-      disabled: true

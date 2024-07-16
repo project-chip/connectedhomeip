@@ -17,8 +17,5 @@ import("${chip_root}/src/app/chip_data_model.gni")
 
 chip_data_model("smoke-co-alarm-common") {
   zap_file = "smoke-co-alarm-app.zap"
-
-  zap_pregenerated_dir =
-      "${chip_root}/zzz_generated/smoke-co-alarm-app/zap-generated"
   is_server = true
 }

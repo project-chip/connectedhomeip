@@ -15,13 +15,16 @@
  *    limitations under the License.
  */
 
+#include <string>
+
+#include <pw_unit_test/framework.h>
+
 #include <app-common/zap-generated/cluster-objects.h>
 #include <app/data-model/Decode.h>
 #include <app/data-model/Encode.h>
-#include <lib/support/UnitTestRegistration.h>
+#include <lib/core/StringBuilderAdapters.h>
 #include <lib/support/jsontlv/TextFormat.h>
 #include <lib/support/jsontlv/TlvToJson.h>
-#include <nlunit-test.h>
 #include <system/SystemPacketBuffer.h>
 #include <system/TLVPacketBufferBackingStore.h>
 
@@ -34,7 +37,17 @@ using namespace chip::app;
 System::TLVPacketBufferBackingStore gStore;
 TLV::TLVWriter gWriter;
 TLV::TLVReader gReader;
-nlTestSuite * gSuite;
+
+class TestTlvToJson : public ::testing::Test
+{
+public:
+    static void SetUpTestSuite() { ASSERT_EQ(chip::Platform::MemoryInit(), CHIP_NO_ERROR); }
+    static void TearDownTestSuite()
+    {
+        (void) gStore.Release();
+        chip::Platform::MemoryShutdown();
+    }
+};
 
 void SetupBuf()
 {
@@ -82,33 +95,31 @@ void EncodeAndValidate(T val, const std::string & expectedJsonString)
     SetupBuf();
 
     err = gWriter.StartContainer(TLV::AnonymousTag(), TLV::kTLVType_Structure, container);
-    NL_TEST_ASSERT(gSuite, err == CHIP_NO_ERROR);
+    EXPECT_EQ(err, CHIP_NO_ERROR);
 
     err = DataModel::Encode(gWriter, TLV::ContextTag(1), val);
-    NL_TEST_ASSERT(gSuite, err == CHIP_NO_ERROR);
+    EXPECT_EQ(err, CHIP_NO_ERROR);
 
     err = gWriter.EndContainer(container);
-    NL_TEST_ASSERT(gSuite, err == CHIP_NO_ERROR);
+    EXPECT_EQ(err, CHIP_NO_ERROR);
 
     err = gWriter.Finalize();
-    NL_TEST_ASSERT(gSuite, err == CHIP_NO_ERROR);
+    EXPECT_EQ(err, CHIP_NO_ERROR);
 
     err = SetupReader();
-    NL_TEST_ASSERT(gSuite, err == CHIP_NO_ERROR);
+    EXPECT_EQ(err, CHIP_NO_ERROR);
 
     std::string jsonString;
     err = TlvToJson(gReader, jsonString);
-    NL_TEST_ASSERT(gSuite, err == CHIP_NO_ERROR);
+    EXPECT_EQ(err, CHIP_NO_ERROR);
 
     bool matches = Matches(expectedJsonString, jsonString);
-    NL_TEST_ASSERT(gSuite, matches);
+    EXPECT_TRUE(matches);
 }
 
-void TestConverter(nlTestSuite * inSuite, void * inContext)
+TEST_F(TestTlvToJson, TestConverter)
 {
     std::string jsonString;
-
-    gSuite = inSuite;
 
     jsonString = "{\n"
                  "   \"1:UINT\" : 30\n"
@@ -234,28 +245,4 @@ void TestConverter(nlTestSuite * inSuite, void * inContext)
     EncodeAndValidate(structList, jsonString);
 }
 
-int Initialize(void * apSuite)
-{
-    VerifyOrReturnError(chip::Platform::MemoryInit() == CHIP_NO_ERROR, FAILURE);
-    return SUCCESS;
-}
-
-int Finalize(void * aContext)
-{
-    (void) gStore.Release();
-    chip::Platform::MemoryShutdown();
-    return SUCCESS;
-}
-
-const nlTest sTests[] = { NL_TEST_DEF("TestConverter", TestConverter), NL_TEST_SENTINEL() };
-
 } // namespace
-
-int TestTlvToJson()
-{
-    nlTestSuite theSuite = { "TlvToJson", sTests, Initialize, Finalize };
-    nlTestRunner(&theSuite, nullptr);
-    return nlTestRunnerStats(&theSuite);
-}
-
-CHIP_REGISTER_TEST_SUITE(TestTlvToJson)

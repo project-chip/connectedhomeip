@@ -17,8 +17,5 @@ import("${chip_root}/src/app/chip_data_model.gni")
 
 chip_data_model("lit-icd-common") {
   zap_file = "lit-icd-server-app.zap"
-
-  zap_pregenerated_dir =
-      "${chip_root}/zzz_generated/lit-icd-server-app/zap-generated"
   is_server = true
 }

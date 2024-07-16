@@ -48,6 +48,7 @@ private:
     int Init();
 
     void DispatchEvent(AppEvent * event);
+    void uiInit();
 
     static void ButtonLeftEventHandler(Button_Handle handle, Button_EventMask events);
     static void ButtonRightEventHandler(Button_Handle handle, Button_EventMask events);

@@ -407,6 +407,16 @@ static constexpr EventId Id = 0x00000001;
 } // namespace Events
 } // namespace ValveConfigurationAndControl
 
+namespace ElectricalPowerMeasurement {
+namespace Events {
+
+namespace MeasurementPeriodRanges {
+static constexpr EventId Id = 0x00000000;
+} // namespace MeasurementPeriodRanges
+
+} // namespace Events
+} // namespace ElectricalPowerMeasurement
+
 namespace ElectricalEnergyMeasurement {
 namespace Events {
 
@@ -430,6 +440,24 @@ static constexpr EventId Id = 0x00000000;
 
 } // namespace Events
 } // namespace DemandResponseLoadControl
+
+namespace Messages {
+namespace Events {
+
+namespace MessageQueued {
+static constexpr EventId Id = 0x00000000;
+} // namespace MessageQueued
+
+namespace MessagePresented {
+static constexpr EventId Id = 0x00000001;
+} // namespace MessagePresented
+
+namespace MessageComplete {
+static constexpr EventId Id = 0x00000002;
+} // namespace MessageComplete
+
+} // namespace Events
+} // namespace Messages
 
 namespace DeviceEnergyManagement {
 namespace Events {
@@ -583,6 +611,16 @@ static constexpr EventId Id = 0x00000010;
 } // namespace Events
 } // namespace PumpConfigurationAndControl
 
+namespace ThreadNetworkDirectory {
+namespace Events {
+
+namespace NetworkChanged {
+static constexpr EventId Id = 0x00000000;
+} // namespace NetworkChanged
+
+} // namespace Events
+} // namespace ThreadNetworkDirectory
+
 namespace TargetNavigator {
 namespace Events {
 
@@ -622,6 +660,16 @@ static constexpr EventId Id = 0x00000000;
 
 } // namespace Events
 } // namespace ContentControl
+
+namespace CommissionerControl {
+namespace Events {
+
+namespace CommissioningRequestResult {
+static constexpr EventId Id = 0x00000000;
+} // namespace CommissioningRequestResult
+
+} // namespace Events
+} // namespace CommissionerControl
 
 namespace UnitTesting {
 namespace Events {

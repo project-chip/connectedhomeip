@@ -17,6 +17,8 @@
  */
 package chip.devicecontroller;
 
+import chip.devicecontroller.model.InvokeElement;
+
 /** JNI wrapper callback class for {@link InvokeCallback}. */
 public final class InvokeCallbackJni {
   private final InvokeCallback wrappedInvokeCallback;
@@ -24,16 +26,35 @@ public final class InvokeCallbackJni {
 
   public InvokeCallbackJni(InvokeCallback wrappedInvokeCallback) {
     this.wrappedInvokeCallback = wrappedInvokeCallback;
-    this.callbackHandle = newCallback(wrappedInvokeCallback);
+    this.callbackHandle = newCallback();
   }
 
   long getCallbackHandle() {
     return callbackHandle;
   }
 
-  private native long newCallback(InvokeCallback wrappedCallback);
+  private native long newCallback();
 
   private native void deleteCallback(long callbackHandle);
+
+  private void onError(Exception e) {
+    wrappedInvokeCallback.onError(e);
+  }
+
+  private void onResponse(
+      int endpointId,
+      long clusterId,
+      long commandId,
+      byte[] tlv,
+      String jsonString,
+      long successCode) {
+    wrappedInvokeCallback.onResponse(
+        InvokeElement.newInstance(endpointId, clusterId, commandId, tlv, jsonString), successCode);
+  }
+
+  private void onDone() {
+    wrappedInvokeCallback.onDone();
+  }
 
   // TODO(#8578): Replace finalizer with PhantomReference.
   @SuppressWarnings("deprecation")

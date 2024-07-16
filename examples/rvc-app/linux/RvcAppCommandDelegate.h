@@ -23,6 +23,8 @@
 #include <json/json.h>
 #include <platform/DiagnosticDataProvider.h>
 
+#include <string>
+
 class RvcAppCommandHandler
 {
 public:
@@ -56,6 +58,8 @@ private:
     void OnErrorEventHandler(const std::string & error);
 
     void OnClearErrorHandler();
+
+    void OnResetHandler();
 };
 
 class RvcAppCommandDelegate : public NamedPipeCommandDelegate

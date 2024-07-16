@@ -48,6 +48,7 @@ static char sTxBuffer[SHELL_OTCLI_TX_BUFFER_SIZE];
 static constexpr uint16_t sTxLength = SHELL_OTCLI_TX_BUFFER_SIZE;
 #endif // !CHIP_DEVICE_CONFIG_THREAD_ENABLE_CLI)
 #endif
+static constexpr uint16_t kMaxLineLength = 384;
 #else
 #include <sys/types.h>
 #include <sys/wait.h>
@@ -81,8 +82,6 @@ CHIP_ERROR cmd_otcli_dispatch(int argc, char ** argv)
 {
     CHIP_ERROR error = CHIP_NO_ERROR;
 
-// From OT CLI internal lib, kMaxLineLength = 128
-#define kMaxLineLength 128
     char buff[kMaxLineLength] = { 0 };
     char * buff_ptr           = buff;
     int i                     = 0;

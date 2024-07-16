@@ -17,6 +17,7 @@
 
 #include <jni.h>
 #include <lib/core/NodeId.h>
+#include <lib/support/JniReferences.h>
 #include <platform/CHIPDeviceConfig.h>
 
 #include <credentials/attestation_verifier/DeviceAttestationDelegate.h>
@@ -24,14 +25,12 @@
 class DeviceAttestationDelegateBridge : public chip::Credentials::DeviceAttestationDelegate
 {
 public:
-    DeviceAttestationDelegateBridge(jobject deviceAttestationDelegate, chip::Optional<uint16_t> expiryTimeoutSecs,
-                                    bool shouldWaitAfterDeviceAttestation) :
+    DeviceAttestationDelegateBridge(chip::JniGlobalReference && deviceAttestationDelegate,
+                                    chip::Optional<uint16_t> expiryTimeoutSecs, bool shouldWaitAfterDeviceAttestation) :
         mResult(chip::Credentials::AttestationVerificationResult::kSuccess),
-        mDeviceAttestationDelegate(deviceAttestationDelegate), mExpiryTimeoutSecs(expiryTimeoutSecs),
+        mDeviceAttestationDelegate(std::move(deviceAttestationDelegate)), mExpiryTimeoutSecs(expiryTimeoutSecs),
         mShouldWaitAfterDeviceAttestation(shouldWaitAfterDeviceAttestation)
     {}
-
-    ~DeviceAttestationDelegateBridge();
 
     chip::Optional<uint16_t> FailSafeExpiryTimeoutSecs() const override { return mExpiryTimeoutSecs; }
 
@@ -45,7 +44,7 @@ public:
 
 private:
     chip::Credentials::AttestationVerificationResult mResult;
-    jobject mDeviceAttestationDelegate = nullptr;
+    chip::JniGlobalReference mDeviceAttestationDelegate;
     chip::Optional<uint16_t> mExpiryTimeoutSecs;
     const bool mShouldWaitAfterDeviceAttestation;
 };

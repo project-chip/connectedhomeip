@@ -31,12 +31,7 @@ typedef struct
     }
 
 #define PACKET_PENDING_INT_PRI 3
-#if defined(EFR32MG12_BRD4161A) || defined(BRD4161A) || defined(EFR32MG12_BRD4162A) || defined(BRD4162A) ||                        \
-    defined(EFR32MG12_BRD4163A) || defined(BRD4163A) || defined(EFR32MG12_BRD4164A) || defined(BRD4164A) ||                        \
-    defined(EFR32MG12_BRD4170A) || defined(BRD4170A)
-// BRD4161-63-64 are pin to pin compatible for SPI
-#include "brd4161a.h"
-#elif defined(EFR32MG24_BRD4186C) || defined(BRD4186C)
+#if defined(EFR32MG24_BRD4186C) || defined(BRD4186C)
 #include "brd4186c.h"
 #elif defined(EFR32MG24_BRD4187C) || defined(BRD4187C)
 #include "brd4187c.h"
@@ -48,6 +43,4 @@ typedef struct
 #define INTERRUPT_PIN PIN(A, 7)
 #define SLEEP_CONFIRM_PIN PIN(A, 5) /* Exp hdr 7 */
 #endif
-
-#define NETWORK_INTERFACE_VALID(x) (x == SL_NET_DEFAULT_WIFI_CLIENT_INTERFACE) || (x == SL_NET_DEFAULT_WIFI_AP_INTERFACE)
 #endif /* _RSI_BOARD_CONFIGURATION_H_ */

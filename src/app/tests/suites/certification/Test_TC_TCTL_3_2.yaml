@@ -135,7 +135,7 @@ tests:
           Operate device such that a temperature number cannot be accepted
       cluster: "LogCommands"
       command: "UserPrompt"
-      PICS: PICS_USER_PROMPT && TCTL.S.M.SupportsInvalidInMode
+      PICS: PICS_USER_PROMPT && TCTL.S.M.SupportsInvalidInState
       arguments:
           values:
               - name: "message"
@@ -147,7 +147,8 @@ tests:
           "Step 10: TH sends command SetTemperatureCommand with a temperature
           number between minTemp and maxTemp inclusive, saved as setTemp"
       command: "SetTemperature"
-      PICS: TCTL.S.C00.Rsp && PICS_USER_PROMPT && TCTL.S.M.SupportsInvalidInMode
+      PICS:
+          TCTL.S.C00.Rsp && PICS_USER_PROMPT && TCTL.S.M.SupportsInvalidInState
       arguments:
           values:
               - name: "TargetTemperature"
@@ -164,7 +165,7 @@ tests:
                 value: 5000
 
     - label: "Step 11: TH reads from the DUT the TemperatureSetpoint attribute"
-      PICS: TCTL.S.A0000 && TCTL.S.M.SupportsInvalidInMode
+      PICS: TCTL.S.A0000 && TCTL.S.M.SupportsInvalidInState
       command: "readAttribute"
       attribute: "TemperatureSetpoint"
       response:

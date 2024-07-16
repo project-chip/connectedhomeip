@@ -17,16 +17,16 @@
 
 #include <app/clusters/diagnostic-logs-server/diagnostic-logs-server.h>
 
-#include <app/util/af.h>
+#include <app/util/attribute-storage.h>
 #include <app/util/config.h>
 #include <lib/support/ScopedBuffer.h>
 #include <protocols/bdx/DiagnosticLogs.h>
 
 #include "BDXDiagnosticLogsProvider.h"
 
-#ifdef EMBER_AF_DIAGNOSTIC_LOGS_CLUSTER_SERVER_ENDPOINT_COUNT
+#ifdef MATTER_DM_DIAGNOSTIC_LOGS_CLUSTER_SERVER_ENDPOINT_COUNT
 static constexpr size_t kDiagnosticLogsDiagnosticLogsProviderDelegateTableSize =
-    EMBER_AF_DIAGNOSTIC_LOGS_CLUSTER_SERVER_ENDPOINT_COUNT + CHIP_DEVICE_CONFIG_DYNAMIC_ENDPOINT_COUNT;
+    MATTER_DM_DIAGNOSTIC_LOGS_CLUSTER_SERVER_ENDPOINT_COUNT + CHIP_DEVICE_CONFIG_DYNAMIC_ENDPOINT_COUNT;
 static_assert(kDiagnosticLogsDiagnosticLogsProviderDelegateTableSize < kEmberInvalidEndpointIndex,
               "DiagnosticLogs: log provider delegate table size error");
 
@@ -49,7 +49,7 @@ DiagnosticLogsProviderDelegate * gDiagnosticLogsProviderDelegateTable[kDiagnosti
 
 DiagnosticLogsProviderDelegate * GetDiagnosticLogsProviderDelegate(EndpointId endpoint)
 {
-    uint16_t ep   = emberAfGetClusterServerEndpointIndex(endpoint, Id, EMBER_AF_DIAGNOSTIC_LOGS_CLUSTER_SERVER_ENDPOINT_COUNT);
+    uint16_t ep   = emberAfGetClusterServerEndpointIndex(endpoint, Id, MATTER_DM_DIAGNOSTIC_LOGS_CLUSTER_SERVER_ENDPOINT_COUNT);
     auto delegate = (ep >= ArraySize(gDiagnosticLogsProviderDelegateTable) ? nullptr : gDiagnosticLogsProviderDelegateTable[ep]);
 
     if (delegate == nullptr)
@@ -89,7 +89,7 @@ DiagnosticLogsServer DiagnosticLogsServer::sInstance;
 
 void DiagnosticLogsServer::SetDiagnosticLogsProviderDelegate(EndpointId endpoint, DiagnosticLogsProviderDelegate * delegate)
 {
-    uint16_t ep = emberAfGetClusterServerEndpointIndex(endpoint, Id, EMBER_AF_DIAGNOSTIC_LOGS_CLUSTER_SERVER_ENDPOINT_COUNT);
+    uint16_t ep = emberAfGetClusterServerEndpointIndex(endpoint, Id, MATTER_DM_DIAGNOSTIC_LOGS_CLUSTER_SERVER_ENDPOINT_COUNT);
     if (ep < kDiagnosticLogsDiagnosticLogsProviderDelegateTableSize)
     {
         gDiagnosticLogsProviderDelegateTable[ep] = delegate;
@@ -115,6 +115,9 @@ void DiagnosticLogsServer::HandleLogRequestForResponsePayload(CommandHandler * c
     Optional<uint64_t> timeStamp;
     Optional<uint64_t> timeSinceBoot;
 
+    auto size = delegate->GetSizeForIntent(intent);
+    VerifyOrReturn(size != 0, AddResponse(commandObj, path, StatusEnum::kNoLogs));
+
     auto err = delegate->GetLogForIntent(intent, logContent, timeStamp, timeSinceBoot);
     VerifyOrReturn(CHIP_ERROR_NOT_FOUND != err, AddResponse(commandObj, path, StatusEnum::kNoLogs));
     VerifyOrReturn(CHIP_NO_ERROR == err, AddResponse(commandObj, path, StatusEnum::kDenied));
@@ -136,10 +139,13 @@ void DiagnosticLogsServer::HandleLogRequestForBdx(CommandHandler * commandObj, c
     auto * delegate = GetDiagnosticLogsProviderDelegate(path.mEndpointId);
     VerifyOrReturn(nullptr != delegate, AddResponse(commandObj, path, StatusEnum::kNoLogs));
 
+    auto size = delegate->GetSizeForIntent(intent);
+    // In the case where the size is 0 sets the Status field of the RetrieveLogsResponse to NoLogs and do not start a BDX session.
+    VerifyOrReturn(size != 0, HandleLogRequestForResponsePayload(commandObj, path, intent, StatusEnum::kNoLogs));
+
     // In the case where the Node is able to fit the entirety of the requested logs within the LogContent field, the Status field of
     // the RetrieveLogsResponse SHALL be set to Exhausted and a BDX session SHALL NOT be initiated.
-    VerifyOrReturn(delegate->GetSizeForIntent(intent) > kMaxLogContentSize,
-                   HandleLogRequestForResponsePayload(commandObj, path, intent, StatusEnum::kExhausted));
+    VerifyOrReturn(size > kMaxLogContentSize, HandleLogRequestForResponsePayload(commandObj, path, intent, StatusEnum::kExhausted));
 
     // If the RequestedProtocol is set to BDX and either the Node does not support BDX or it is not possible for the Node
     // to establish a BDX session, then the Node SHALL utilize the LogContent field of the RetrieveLogsResponse command
@@ -187,4 +193,4 @@ bool emberAfDiagnosticLogsClusterRetrieveLogsRequestCallback(chip::app::CommandH
 }
 
 void MatterDiagnosticLogsPluginServerInitCallback() {}
-#endif // #ifdef EMBER_AF_DIAGNOSTIC_LOGS_CLUSTER_SERVER_ENDPOINT_COUNT
+#endif // #ifdef MATTER_DM_DIAGNOSTIC_LOGS_CLUSTER_SERVER_ENDPOINT_COUNT

@@ -64,7 +64,6 @@
         "Test_TC_DA_1_8"
     ],
     "DishwasherAlarm": [
-        "Test_TC_DISHALM_1_1",
         "Test_TC_DISHALM_2_1",
         "Test_TC_DISHALM_3_1",
         "Test_TC_DISHALM_3_2",
@@ -74,7 +73,6 @@
         "Test_TC_DISHALM_3_6"
     ],
     "DishwasherMode": [
-        "Test_TC_DISHM_1_1",
         "Test_TC_DISHM_1_2",
         "Test_TC_DISHM_2_1",
         "Test_TC_DISHM_3_1",
@@ -113,16 +111,15 @@
         "Test_TC_DLOG_3_1"
     ],
     "Descriptor": ["Test_TC_DESC_2_1"],
+    "DeviceEnergyManagementMode": ["Test_TC_DEMM_1_2"],
+    "EnergyEVSEMode": ["Test_TC_EEVSEM_1_2"],
     "FanControl": [],
     "GeneralCommissioning": ["Test_TC_CGEN_2_2"],
     "GeneralDiagnostics": ["Test_TC_DGGEN_2_2"],
     "Identify": ["Test_TC_I_3_2"],
     "IcdManagement": [
-        "Test_TC_ICDM_2_2",
-        "Test_TC_ICDM_3_1",
         "Test_TC_ICDM_3_2",
         "Test_TC_ICDM_3_3",
-        "Test_TC_ICDM_3_4",
         "Test_TC_ICDM_4_1",
         "Test_TC_ICDM_5_1"
     ],
@@ -171,10 +168,8 @@
         "Test_TC_MC_11_2",
         "Test_TC_ALOGIN_12_2",
         "Test_TC_TGTNAV_8_2",
-        "Test_TC_APPOBSERVER_1_13",
         "Test_TC_APPOBSERVER_13_1",
-        "Test_TC_APPOBSERVER_13_2",
-        "Test_TC_CONCON_1_14"
+        "Test_TC_APPOBSERVER_13_2"
     ],
     "MultipleFabrics": [
         "Test_TC_CADMIN_1_1",
@@ -261,7 +256,7 @@
     "FlowMeasurement": ["Test_TC_FLW_2_2"],
     "GroupKeyManagement": ["Test_TC_GRPKEY_5_4"],
     "OccupancySensing": ["Test_TC_OCC_3_1"],
-    "PowerSource": ["Test_TC_PS_2_2", "Test_TC_PS_3_1"],
+    "PowerSource": ["Test_TC_PS_2_2"],
     "BooleanState": ["Test_TC_BOOL_2_2"],
     "ColorControl": [
         "Test_TC_CC_3_1",
@@ -276,7 +271,6 @@
     "LevelControl": [],
     "LaundryWasherMode": ["Test_TC_LWM_1_2"],
     "OnOff": ["Test_TC_OO_2_3"],
-    "OperationalState": ["Test_TC_OPSTATE_2_2", "Test_TC_OPSTATE_2_5"],
     "RelativeHumidityMeasurement": ["Test_TC_RH_2_2"],
     "SmokeCOAlarm": [],
     "RefrigeratorAlarm": ["Test_TC_REFALM_2_2", "Test_TC_REFALM_2_3"],
@@ -311,6 +305,7 @@
     "AccessControlEnforcement": [],
     "OvenMode": ["Test_TC_OTCCM_1_1", "Test_TC_OTCCM_1_2"],
     "EnergyEVSE": ["Test_TC_EEVSE_1_1", "Test_TC_EEVSE_2_1"],
+    "PowerTopology": ["Test_TC_PWRTL_1_1"],
     "collection": [
         "DeviceDiscovery",
         "Groups",
@@ -322,9 +317,11 @@
         "DishwasherAlarm",
         "DishwasherMode",
         "Descriptor",
+        "DeviceEnergyManagementMode",
         "FanControl",
         "EthernetNetworkDiagnostics",
         "EnergyEVSE",
+        "EnergyEVSEMode",
         "GeneralCommissioning",
         "GeneralDiagnostics",
         "IcdManagement",
@@ -336,6 +333,7 @@
         "ModeSelect",
         "OTASoftwareUpdate",
         "PowerSourceConfiguration",
+        "PowerTopology",
         "PressureMeasurement",
         "SecureChannel",
         "SoftwareDiagnostics",
@@ -354,7 +352,6 @@
         "LaundryWasherMode",
         "OnOff",
         "OvenMode",
-        "OperationalState",
         "OvenMode",
         "RelativeHumidityMeasurement",
         "SmokeCOAlarm",

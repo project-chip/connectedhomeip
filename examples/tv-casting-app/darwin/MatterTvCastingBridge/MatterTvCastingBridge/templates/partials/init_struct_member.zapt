@@ -1,0 +1,19 @@
+{{#*inline "memberName"}}_{{asStructPropertyName label}}{{/inline}}
+{{#if isOptional}}
+{{>memberName}} = nil;
+{{else if isNullable}}
+{{>memberName}} = nil;
+{{else if isArray}}
+  {{>memberName}} = [NSArray array];
+{{else if (isOctetString type)}}
+  {{>memberName}} = [NSData data];
+{{else if (isCharString type)}}
+  {{>memberName}} = @"";
+{{else}}
+  {{! Our memberName inline partial won't work inside the async if_is_struct }}
+  {{#if_is_struct type}}
+    _{{asStructPropertyName label}} = [{{asObjectiveCClass type cluster structTypePrefix="MC"}} new];
+  {{else}}
+    _{{asStructPropertyName label}} = @(0);
+  {{/if_is_struct}}
+{{/if}}

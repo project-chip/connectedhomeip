@@ -55,24 +55,26 @@ PyChipError pychip_CommandSender_SendGroupCommand(chip::GroupId groupId, chip::C
 namespace chip {
 namespace python {
 
-using OnCommandSenderResponseCallback = void (*)(PyObject appContext, chip::EndpointId endpointId, chip::ClusterId clusterId,
+using OnCommandSenderResponseCallback     = void (*)(PyObject appContext, chip::EndpointId endpointId, chip::ClusterId clusterId,
                                                  chip::CommandId commandId, size_t index,
                                                  std::underlying_type_t<Protocols::InteractionModel::Status> status,
                                                  chip::ClusterStatus clusterStatus, const uint8_t * payload, uint32_t length);
-using OnCommandSenderErrorCallback    = void (*)(PyObject appContext,
+using OnCommandSenderErrorCallback        = void (*)(PyObject appContext,
                                               std::underlying_type_t<Protocols::InteractionModel::Status> status,
                                               chip::ClusterStatus clusterStatus, PyChipError chiperror);
-using OnCommandSenderDoneCallback     = void (*)(PyObject appContext);
+using OnCommandSenderDoneCallback         = void (*)(PyObject appContext);
+using TestOnlyOnCommandSenderDoneCallback = void (*)(PyObject appContext, python::TestOnlyPyOnDoneInfo testOnlyDoneInfo);
 
-OnCommandSenderResponseCallback gOnCommandSenderResponseCallback = nullptr;
-OnCommandSenderErrorCallback gOnCommandSenderErrorCallback       = nullptr;
-OnCommandSenderDoneCallback gOnCommandSenderDoneCallback         = nullptr;
+OnCommandSenderResponseCallback gOnCommandSenderResponseCallback         = nullptr;
+OnCommandSenderErrorCallback gOnCommandSenderErrorCallback               = nullptr;
+OnCommandSenderDoneCallback gOnCommandSenderDoneCallback                 = nullptr;
+TestOnlyOnCommandSenderDoneCallback gTestOnlyOnCommandSenderDoneCallback = nullptr;
 
 class CommandSenderCallback : public CommandSender::ExtendableCallback
 {
 public:
-    CommandSenderCallback(PyObject appContext, bool isBatchedCommands) :
-        mAppContext(appContext), mIsBatchedCommands(isBatchedCommands)
+    CommandSenderCallback(PyObject appContext, bool isBatchedCommands, bool callTestOnlyOnDone) :
+        mAppContext(appContext), mIsBatchedCommands(isBatchedCommands), mCallTestOnlyOnDone(callTestOnlyOnDone)
     {}
 
     void OnResponse(CommandSender * apCommandSender, const CommandSender::ResponseData & aResponseData) override
@@ -148,7 +150,17 @@ public:
 
     void OnDone(CommandSender * apCommandSender) override
     {
-        gOnCommandSenderDoneCallback(mAppContext);
+        if (mCallTestOnlyOnDone)
+        {
+            python::TestOnlyPyOnDoneInfo testOnlyOnDoneInfo;
+            testOnlyOnDoneInfo.responseMessageCount = apCommandSender->GetInvokeResponseMessageCount();
+            gTestOnlyOnCommandSenderDoneCallback(mAppContext, testOnlyOnDoneInfo);
+        }
+        else
+        {
+            gOnCommandSenderDoneCallback(mAppContext);
+        }
+
         delete apCommandSender;
         delete this;
     };
@@ -179,6 +191,7 @@ private:
     PyObject mAppContext = nullptr;
     std::unordered_map<uint16_t, size_t> commandRefToIndex;
     bool mIsBatchedCommands;
+    bool mCallTestOnlyOnDone;
 };
 
 PyChipError SendBatchCommandsInternal(void * appContext, DeviceProxy * device, uint16_t timedRequestTimeoutMs,
@@ -220,8 +233,10 @@ PyChipError SendBatchCommandsInternal(void * appContext, DeviceProxy * device, u
         config.SetRemoteMaxPathsPerInvoke(remoteSessionParameters.GetMaxPathsPerInvoke());
     }
 
+    bool isBatchedCommands  = true;
+    bool callTestOnlyOnDone = testOnlyOverrides != nullptr;
     std::unique_ptr<CommandSenderCallback> callback =
-        std::make_unique<CommandSenderCallback>(appContext, /* isBatchedCommands =*/true);
+        std::make_unique<CommandSenderCallback>(appContext, isBatchedCommands, callTestOnlyOnDone);
 
     bool isTimedRequest = timedRequestTimeoutMs != 0 || testOnlySuppressTimedRequestMessage;
     std::unique_ptr<CommandSender> sender =
@@ -242,13 +257,10 @@ PyChipError SendBatchCommandsInternal(void * appContext, DeviceProxy * device, u
         app::CommandPathParams cmdParams = { endpointId, /* group id */ 0, clusterId, commandId,
                                              (app::CommandPathFlags::kEndpointIdValid) };
 
-        CommandSender::AdditionalCommandParameters additionalParams;
+        CommandSender::PrepareCommandParameters prepareCommandParams;
+        prepareCommandParams.commandRef.SetValue(static_cast<uint16_t>(i));
 
-        SuccessOrExit(err = sender->PrepareCommand(cmdParams, additionalParams));
-        if (testOnlyCommandRefsOverride != nullptr)
-        {
-            additionalParams.commandRef.SetValue(testOnlyCommandRefsOverride[i]);
-        }
+        SuccessOrExit(err = sender->PrepareCommand(cmdParams, prepareCommandParams));
         {
             auto writer = sender->GetCommandDataIBTLVWriter();
             VerifyOrExit(writer != nullptr, err = CHIP_ERROR_INCORRECT_STATE);
@@ -258,23 +270,29 @@ PyChipError SendBatchCommandsInternal(void * appContext, DeviceProxy * device, u
             SuccessOrExit(err = writer->CopyContainer(TLV::ContextTag(CommandDataIB::Tag::kFields), reader));
         }
 
-        SuccessOrExit(err = sender->FinishCommand(timedRequestTimeoutMs != 0 ? Optional<uint16_t>(timedRequestTimeoutMs)
-                                                                             : Optional<uint16_t>::Missing(),
-                                                  additionalParams));
-
-        // CommandSender provides us with the CommandReference for this associated command. In order to match responses
-        // we have to add CommandRef to index lookup.
-        VerifyOrExit(additionalParams.commandRef.HasValue(), err = CHIP_ERROR_INVALID_ARGUMENT);
+        Optional<uint16_t> timedRequestTimeout =
+            timedRequestTimeoutMs != 0 ? Optional<uint16_t>(timedRequestTimeoutMs) : Optional<uint16_t>::Missing();
+        CommandSender::FinishCommandParameters finishCommandParams(timedRequestTimeout);
         if (testOnlyCommandRefsOverride != nullptr)
         {
-            // Making sure the value we used to override CommandRef was actually used.
-            VerifyOrDie(additionalParams.commandRef.Value() == testOnlyCommandRefsOverride[i]);
-            // Ignoring the result of adding to index as the test might be trying to set duplicate CommandRefs.
-            callback->AddCommandRefToIndexLookup(additionalParams.commandRef.Value(), i);
+            finishCommandParams.commandRef.SetValue(testOnlyCommandRefsOverride[i]);
         }
         else
         {
-            SuccessOrExit(err = callback->AddCommandRefToIndexLookup(additionalParams.commandRef.Value(), i));
+            finishCommandParams.commandRef = prepareCommandParams.commandRef;
+        }
+        SuccessOrExit(err = sender->TestOnlyFinishCommand(finishCommandParams));
+
+        if (testOnlyCommandRefsOverride != nullptr)
+        {
+            // Making sure the value we used to override CommandRef was actually used.
+            VerifyOrDie(finishCommandParams.commandRef.Value() == testOnlyCommandRefsOverride[i]);
+            // Ignoring the result of adding to index as the test might be trying to set duplicate CommandRefs.
+            callback->AddCommandRefToIndexLookup(finishCommandParams.commandRef.Value(), i);
+        }
+        else
+        {
+            SuccessOrExit(err = callback->AddCommandRefToIndexLookup(finishCommandParams.commandRef.Value(), i));
         }
     }
 
@@ -315,11 +333,13 @@ using namespace chip::python;
 extern "C" {
 void pychip_CommandSender_InitCallbacks(OnCommandSenderResponseCallback onCommandSenderResponseCallback,
                                         OnCommandSenderErrorCallback onCommandSenderErrorCallback,
-                                        OnCommandSenderDoneCallback onCommandSenderDoneCallback)
+                                        OnCommandSenderDoneCallback onCommandSenderDoneCallback,
+                                        TestOnlyOnCommandSenderDoneCallback testOnlyOnCommandSenderDoneCallback)
 {
-    gOnCommandSenderResponseCallback = onCommandSenderResponseCallback;
-    gOnCommandSenderErrorCallback    = onCommandSenderErrorCallback;
-    gOnCommandSenderDoneCallback     = onCommandSenderDoneCallback;
+    gOnCommandSenderResponseCallback     = onCommandSenderResponseCallback;
+    gOnCommandSenderErrorCallback        = onCommandSenderErrorCallback;
+    gOnCommandSenderDoneCallback         = onCommandSenderDoneCallback;
+    gTestOnlyOnCommandSenderDoneCallback = testOnlyOnCommandSenderDoneCallback;
 }
 
 PyChipError pychip_CommandSender_SendCommand(void * appContext, DeviceProxy * device, uint16_t timedRequestTimeoutMs,
@@ -331,8 +351,10 @@ PyChipError pychip_CommandSender_SendCommand(void * appContext, DeviceProxy * de
 
     VerifyOrReturnError(device->GetSecureSession().HasValue(), ToPyChipError(CHIP_ERROR_MISSING_SECURE_SESSION));
 
+    bool isBatchedCommands  = false;
+    bool callTestOnlyOnDone = false;
     std::unique_ptr<CommandSenderCallback> callback =
-        std::make_unique<CommandSenderCallback>(appContext, /* isBatchedCommands =*/false);
+        std::make_unique<CommandSenderCallback>(appContext, isBatchedCommands, callTestOnlyOnDone);
     std::unique_ptr<CommandSender> sender =
         std::make_unique<CommandSender>(callback.get(), device->GetExchangeManager(),
                                         /* is timed request */ timedRequestTimeoutMs != 0, suppressResponse);
@@ -406,8 +428,10 @@ PyChipError pychip_CommandSender_TestOnlySendCommandTimedRequestNoTimedInvoke(
 
     VerifyOrReturnError(device->GetSecureSession().HasValue(), ToPyChipError(CHIP_ERROR_MISSING_SECURE_SESSION));
 
+    bool isBatchedCommands  = false;
+    bool callTestOnlyOnDone = false;
     std::unique_ptr<CommandSenderCallback> callback =
-        std::make_unique<CommandSenderCallback>(appContext, /* isBatchedCommands =*/false);
+        std::make_unique<CommandSenderCallback>(appContext, isBatchedCommands, callTestOnlyOnDone);
     std::unique_ptr<CommandSender> sender = std::make_unique<CommandSender>(callback.get(), device->GetExchangeManager(),
                                                                             /* is timed request */ true, suppressResponse);
 

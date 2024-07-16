@@ -32,13 +32,19 @@
 
 #include "sl_status.h"
 
+#include "rsi_common_apis.h"
+#include "sl_wifi_device.h"
+
 #define SL_WIFI_ALLOCATE_COMMAND_BUFFER_WAIT_TIME_MS 1000
 /* Wi-Fi events*/
 #define SL_WFX_STARTUP_IND_ID (1)
 #define SL_WFX_CONNECT_IND_ID (2)
 #define SL_WFX_DISCONNECT_IND_ID (3)
 #define SL_WFX_SCAN_COMPLETE_ID (4)
-#define WFX_RSI_SSID_SIZE (64)
+// MAX SSID LENGTH excluding NULL character
+#define WFX_MAX_SSID_LENGTH (32)
+// MAX PASSKEY LENGTH including NULL character
+#define WFX_MAX_PASSKEY_LENGTH (SL_WIFI_MAX_PSK_LENGTH)
 
 /* Wi-Fi bitmask events - for the task */
 #define SL_WFX_CONNECT (1 << 1)
@@ -52,6 +58,7 @@
 #define WLAN_TASK_STACK_SIZE (1024)
 #define WLAN_TASK_PRIORITY (3)
 #define WLAN_DRIVER_TASK_PRIORITY (2)
+#define BLE_DRIVER_TASK_PRIORITY (2)
 #define MAX_JOIN_RETRIES_COUNT (5)
 
 // WLAN retry time intervals in milli seconds
@@ -63,7 +70,7 @@
 // WLAN related Macros
 #define ETH_FRAME (0)
 #define CMP_SUCCESS (0)
-#define BSSID_MAX_STR_LEN (6)
+#define BSSID_LEN (6)
 #define MAC_ADDRESS_FIRST_OCTET (6)
 #define AP_START_SUCCESS (0)
 #define BITS_TO_WAIT (0)
@@ -156,8 +163,8 @@ typedef enum
 
 typedef struct
 {
-    char ssid[32 + 1];
-    char passkey[64 + 1];
+    char ssid[WFX_MAX_SSID_LENGTH + 1];
+    char passkey[WFX_MAX_PASSKEY_LENGTH + 1];
     wfx_sec_t security;
 } wfx_wifi_provision_t;
 
@@ -172,9 +179,9 @@ typedef enum
 
 typedef struct wfx_wifi_scan_result
 {
-    char ssid[32 + 1];
+    char ssid[WFX_MAX_SSID_LENGTH + 1];
     wfx_sec_t security;
-    uint8_t bssid[6];
+    uint8_t bssid[BSSID_LEN];
     uint8_t chan;
     int16_t rssi; /* I suspect this is in dBm - so signed */
 } wfx_wifi_scan_result_t;
@@ -242,22 +249,13 @@ void wfx_dhcp_got_ipv4(uint32_t);
 void wfx_ip_changed_notify(int got_ip);
 #endif /* CHIP_DEVICE_CONFIG_ENABLE_IPV4 */
 
-sl_status_t sl_si91x_host_process_data_frame(sl_wifi_interface_t interface, sl_wifi_buffer_t * buffer);
-void * sl_si91x_host_get_buffer_data(sl_wifi_buffer_t * buffer, uint16_t offset, uint16_t * data_length);
-
 #if SL_ICD_ENABLED
-sl_status_t wfx_power_save();
+uint32_t sl_app_sleep_ready();
+sl_status_t wfx_power_save(rsi_power_save_profile_mode_t sl_si91x_ble_state, sl_si91x_performance_profile_t sl_si91x_wifi_state);
+void sl_button_on_change(uint8_t btn, uint8_t btnAction);
 #endif /* SL_ICD_ENABLED */
 
 void wfx_ipv6_notify(int got_ip);
-
-/* RSI for LWIP */
-void wfx_rsi_pkt_add_data(void * p, uint8_t * buf, uint16_t len, uint16_t off);
-int32_t wfx_rsi_send_data(void * p, uint16_t len);
-sl_status_t sl_si91x_driver_send_data_packet(sl_si91x_queue_type_t queue_type, sl_wifi_buffer_t * buffer, uint32_t wait_time);
-sl_status_t sl_si91x_allocate_command_buffer(sl_wifi_buffer_t ** host_buffer, void ** buffer, uint32_t requested_buffer_size,
-                                             uint32_t wait_duration_ms);
-
 void wfx_retry_interval_handler(bool is_wifi_disconnection_event, uint16_t retryJoin);
 
 #ifdef __cplusplus

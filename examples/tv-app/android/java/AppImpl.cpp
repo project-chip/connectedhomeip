@@ -30,7 +30,7 @@
 #include <app/reporting/reporting.h>
 #include <app/server/Dnssd.h>
 #include <app/server/Server.h>
-#include <app/util/af.h>
+#include <app/util/endpoint-config-api.h>
 #include <cstdio>
 #include <inttypes.h>
 #include <jni.h>
@@ -44,6 +44,8 @@
 #include <lib/support/ZclString.h>
 #include <platform/CHIPDeviceLayer.h>
 #include <platform/DeviceInstanceInfoProvider.h>
+
+#include <string>
 
 using namespace chip;
 using namespace chip::app::Clusters;
@@ -257,9 +259,26 @@ DataVersion gDataVersions[APP_LIBRARY_SIZE][ArraySize(contentAppClusters)];
 
 EmberAfDeviceType gContentAppDeviceType[] = { { DEVICE_TYPE_CONTENT_APP, 1 } };
 
+std::vector<SupportedCluster> make_default_supported_clusters()
+{
+    return std::vector<ContentApp::SupportedCluster>{ { Descriptor::Id },      { ApplicationBasic::Id },
+                                                      { KeypadInput::Id },     { ApplicationLauncher::Id },
+                                                      { AccountLogin::Id },    { ContentLauncher::Id },
+                                                      { TargetNavigator::Id }, { Channel::Id } };
+}
+
 } // anonymous namespace
 
-ContentAppFactoryImpl::ContentAppFactoryImpl() {}
+ContentAppFactoryImpl::ContentAppFactoryImpl() :
+    mContentApps{ new ContentAppImpl("Vendor1", 1, "exampleid", 11, "Version1", "20202021", make_default_supported_clusters(),
+                                     nullptr, nullptr),
+                  new ContentAppImpl("Vendor2", 65521, "exampleString", 32768, "Version2", "20202021",
+                                     make_default_supported_clusters(), nullptr, nullptr),
+                  new ContentAppImpl("Vendor3", 9050, "App3", 22, "Version3", "20202021", make_default_supported_clusters(),
+                                     nullptr, nullptr),
+                  new ContentAppImpl("TestSuiteVendor", 1111, "applicationId", 22, "v2", "20202021",
+                                     make_default_supported_clusters(), nullptr, nullptr) }
+{}
 
 uint16_t ContentAppFactoryImpl::GetPlatformCatalogVendorId()
 {
@@ -324,6 +343,7 @@ ContentApp * ContentAppFactoryImpl::LoadContentApp(const CatalogVendorApp & vend
         ChipLogProgress(DeviceLayer, " Looking next=%s ", app->GetApplicationBasicDelegate()->GetCatalogVendorApp()->applicationId);
         if (app->GetApplicationBasicDelegate()->GetCatalogVendorApp()->Matches(vendorApp))
         {
+            // need to think about loading apk here?
             ContentAppPlatform::GetInstance().AddContentApp(app, &contentAppEndpoint, Span<DataVersion>(gDataVersions[i]),
                                                             Span<const EmberAfDeviceType>(gContentAppDeviceType));
             return app;
@@ -335,12 +355,94 @@ ContentApp * ContentAppFactoryImpl::LoadContentApp(const CatalogVendorApp & vend
     return nullptr;
 }
 
+class DevicePairedCommand : public Controller::DevicePairingDelegate
+{
+public:
+    struct CallbackContext
+    {
+        uint16_t vendorId;
+        uint16_t productId;
+        chip::NodeId nodeId;
+
+        CallbackContext(uint16_t vId, uint16_t pId, chip::NodeId nId) : vendorId(vId), productId(pId), nodeId(nId) {}
+    };
+    DevicePairedCommand(uint16_t vendorId, uint16_t productId, chip::NodeId nodeId) :
+        mOnDeviceConnectedCallback(OnDeviceConnectedFn, this), mOnDeviceConnectionFailureCallback(OnDeviceConnectionFailureFn, this)
+    {
+        mContext = std::make_shared<CallbackContext>(vendorId, productId, nodeId);
+    }
+
+    static void OnDeviceConnectedFn(void * context, chip::Messaging::ExchangeManager & exchangeMgr,
+                                    const chip::SessionHandle & sessionHandle)
+    {
+        auto * pairingCommand = static_cast<DevicePairedCommand *>(context);
+        auto cbContext        = pairingCommand->mContext;
+
+        if (pairingCommand)
+        {
+            ChipLogProgress(DeviceLayer,
+                            "OnDeviceConnectedFn - Updating ACL for node id: " ChipLogFormatX64
+                            " and vendor id: %d and product id: %d",
+                            ChipLogValueX64(cbContext->nodeId), cbContext->vendorId, cbContext->productId);
+
+            GetCommissionerDiscoveryController()->CommissioningSucceeded(cbContext->vendorId, cbContext->productId,
+                                                                         cbContext->nodeId, exchangeMgr, sessionHandle);
+        }
+    }
+
+    static void OnDeviceConnectionFailureFn(void * context, const ScopedNodeId & peerId, CHIP_ERROR error)
+    {
+        auto * pairingCommand = static_cast<DevicePairedCommand *>(context);
+        auto cbContext        = pairingCommand->mContext;
+
+        if (pairingCommand)
+        {
+            ChipLogProgress(DeviceLayer,
+                            "OnDeviceConnectionFailureFn - Not updating ACL for node id: " ChipLogFormatX64
+                            " and vendor id: %d and product id: %d",
+                            ChipLogValueX64(cbContext->nodeId), cbContext->vendorId, cbContext->productId);
+            // TODO: Remove Node Id
+        }
+    }
+
+    chip::Callback::Callback<chip::OnDeviceConnected> mOnDeviceConnectedCallback;
+    chip::Callback::Callback<chip::OnDeviceConnectionFailure> mOnDeviceConnectionFailureCallback;
+    std::shared_ptr<CallbackContext> mContext;
+};
+
+void refreshConnectedClientsAcl(uint16_t vendorId, uint16_t productId, ContentAppImpl * app)
+{
+
+    std::set<NodeId> nodeIds = ContentAppPlatform::GetInstance().GetNodeIdsForContentApp(vendorId, productId);
+
+    for (const auto & allowedVendor : app->GetApplicationBasicDelegate()->GetAllowedVendorList())
+    {
+        std::set<NodeId> tempNodeIds = ContentAppPlatform::GetInstance().GetNodeIdsForAllowVendorId(allowedVendor);
+
+        nodeIds.insert(tempNodeIds.begin(), tempNodeIds.end());
+    }
+
+    for (const auto & nodeId : nodeIds)
+    {
+
+        ChipLogProgress(DeviceLayer,
+                        "Creating Pairing Command with node id: " ChipLogFormatX64 " and vendor id: %d and product id: %d",
+                        ChipLogValueX64(nodeId), vendorId, productId);
+
+        std::shared_ptr<DevicePairedCommand> pairingCommand = std::make_shared<DevicePairedCommand>(vendorId, productId, nodeId);
+
+        GetDeviceCommissioner()->GetConnectedDevice(nodeId, &pairingCommand->mOnDeviceConnectedCallback,
+                                                    &pairingCommand->mOnDeviceConnectionFailureCallback);
+    }
+}
+
 EndpointId ContentAppFactoryImpl::AddContentApp(const char * szVendorName, uint16_t vendorId, const char * szApplicationName,
-                                                uint16_t productId, const char * szApplicationVersion, jobject manager)
+                                                uint16_t productId, const char * szApplicationVersion,
+                                                std::vector<SupportedCluster> supportedClusters, jobject manager)
 {
     DataVersion * dataVersionBuf = new DataVersion[ArraySize(contentAppClusters)];
     ContentAppImpl * app = new ContentAppImpl(szVendorName, vendorId, szApplicationName, productId, szApplicationVersion, "",
-                                              mAttributeDelegate, mCommandDelegate);
+                                              std::move(supportedClusters), mAttributeDelegate, mCommandDelegate);
     EndpointId epId      = ContentAppPlatform::GetInstance().AddContentApp(
         app, &contentAppEndpoint, Span<DataVersion>(dataVersionBuf, ArraySize(contentAppClusters)),
         Span<const EmberAfDeviceType>(gContentAppDeviceType));
@@ -348,16 +450,20 @@ EndpointId ContentAppFactoryImpl::AddContentApp(const char * szVendorName, uint1
                     app->GetEndpointId());
     mContentApps.push_back(app);
     mDataVersions.push_back(dataVersionBuf);
+
+    refreshConnectedClientsAcl(vendorId, productId, app);
+
     return epId;
 }
 
 EndpointId ContentAppFactoryImpl::AddContentApp(const char * szVendorName, uint16_t vendorId, const char * szApplicationName,
-                                                uint16_t productId, const char * szApplicationVersion, jobject manager,
-                                                EndpointId desiredEndpointId)
+                                                uint16_t productId, const char * szApplicationVersion,
+                                                std::vector<SupportedCluster> supportedClusters, EndpointId desiredEndpointId,
+                                                jobject manager)
 {
     DataVersion * dataVersionBuf = new DataVersion[ArraySize(contentAppClusters)];
     ContentAppImpl * app = new ContentAppImpl(szVendorName, vendorId, szApplicationName, productId, szApplicationVersion, "",
-                                              mAttributeDelegate, mCommandDelegate);
+                                              std::move(supportedClusters), mAttributeDelegate, mCommandDelegate);
     EndpointId epId      = ContentAppPlatform::GetInstance().AddContentApp(
         app, &contentAppEndpoint, Span<DataVersion>(dataVersionBuf, ArraySize(contentAppClusters)),
         Span<const EmberAfDeviceType>(gContentAppDeviceType), desiredEndpointId);
@@ -365,6 +471,9 @@ EndpointId ContentAppFactoryImpl::AddContentApp(const char * szVendorName, uint1
                     app->GetEndpointId());
     mContentApps.push_back(app);
     mDataVersions.push_back(dataVersionBuf);
+
+    refreshConnectedClientsAcl(vendorId, productId, app);
+
     return epId;
 }
 
@@ -422,11 +531,16 @@ std::list<ClusterId> ContentAppFactoryImpl::GetAllowedClusterListForStaticEndpoi
             ChipLogProgress(DeviceLayer,
                             "ContentAppFactoryImpl GetAllowedClusterListForStaticEndpoint priviledged vendor accessible clusters "
                             "being returned.");
-            return { chip::app::Clusters::Descriptor::Id,         chip::app::Clusters::OnOff::Id,
-                     chip::app::Clusters::WakeOnLan::Id,          chip::app::Clusters::MediaPlayback::Id,
-                     chip::app::Clusters::LowPower::Id,           chip::app::Clusters::KeypadInput::Id,
-                     chip::app::Clusters::ContentLauncher::Id,    chip::app::Clusters::AudioOutput::Id,
-                     chip::app::Clusters::ApplicationLauncher::Id };
+            return { chip::app::Clusters::Descriptor::Id,
+                     chip::app::Clusters::OnOff::Id,
+                     chip::app::Clusters::WakeOnLan::Id,
+                     chip::app::Clusters::MediaPlayback::Id,
+                     chip::app::Clusters::LowPower::Id,
+                     chip::app::Clusters::KeypadInput::Id,
+                     chip::app::Clusters::ContentLauncher::Id,
+                     chip::app::Clusters::AudioOutput::Id,
+                     chip::app::Clusters::ApplicationLauncher::Id,
+                     chip::app::Clusters::Messages::Id };
         }
         ChipLogProgress(
             DeviceLayer,
@@ -434,7 +548,8 @@ std::list<ClusterId> ContentAppFactoryImpl::GetAllowedClusterListForStaticEndpoi
         return { chip::app::Clusters::Descriptor::Id,      chip::app::Clusters::OnOff::Id,
                  chip::app::Clusters::WakeOnLan::Id,       chip::app::Clusters::MediaPlayback::Id,
                  chip::app::Clusters::LowPower::Id,        chip::app::Clusters::KeypadInput::Id,
-                 chip::app::Clusters::ContentLauncher::Id, chip::app::Clusters::AudioOutput::Id };
+                 chip::app::Clusters::ContentLauncher::Id, chip::app::Clusters::AudioOutput::Id,
+                 chip::app::Clusters::Messages::Id };
     }
     return {};
 }
@@ -471,21 +586,24 @@ CHIP_ERROR InitVideoPlayerPlatform(jobject contentAppEndpointManager)
 }
 
 EndpointId AddContentApp(const char * szVendorName, uint16_t vendorId, const char * szApplicationName, uint16_t productId,
-                         const char * szApplicationVersion, jobject manager)
+                         const char * szApplicationVersion, std::vector<SupportedCluster> supportedClusters, jobject manager)
 {
 #if CHIP_DEVICE_CONFIG_APP_PLATFORM_ENABLED
     ChipLogProgress(DeviceLayer, "AppImpl: AddContentApp vendorId=%d applicationName=%s ", vendorId, szApplicationName);
-    return gFactory.AddContentApp(szVendorName, vendorId, szApplicationName, productId, szApplicationVersion, manager);
+    return gFactory.AddContentApp(szVendorName, vendorId, szApplicationName, productId, szApplicationVersion,
+                                  std::move(supportedClusters), manager);
 #endif // CHIP_DEVICE_CONFIG_APP_PLATFORM_ENABLED
     return kInvalidEndpointId;
 }
 
 EndpointId AddContentApp(const char * szVendorName, uint16_t vendorId, const char * szApplicationName, uint16_t productId,
-                         const char * szApplicationVersion, EndpointId endpointId, jobject manager)
+                         const char * szApplicationVersion, std::vector<SupportedCluster> supportedClusters, EndpointId endpointId,
+                         jobject manager)
 {
 #if CHIP_DEVICE_CONFIG_APP_PLATFORM_ENABLED
     ChipLogProgress(DeviceLayer, "AppImpl: AddContentApp vendorId=%d applicationName=%s ", vendorId, szApplicationName);
-    return gFactory.AddContentApp(szVendorName, vendorId, szApplicationName, productId, szApplicationVersion, manager, endpointId);
+    return gFactory.AddContentApp(szVendorName, vendorId, szApplicationName, productId, szApplicationVersion,
+                                  std::move(supportedClusters), endpointId, manager);
 #endif // CHIP_DEVICE_CONFIG_APP_PLATFORM_ENABLED
     return kInvalidEndpointId;
 }

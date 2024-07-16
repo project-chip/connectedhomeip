@@ -59,7 +59,7 @@ class TestTestRunnerHooks(TestRunnerHooks):
     def stop(self, duration: int):
         self.stop_called = True
 
-    def test_start(self, filename: str, name: str, count: int):
+    def test_start(self, filename: str, name: str, count: int, steps: list[str] = []):
         self.test_start_called = True
 
     def test_stop(self, exception: Exception, duration: int):
@@ -137,9 +137,9 @@ def main():
     app_process = subprocess.Popen([app_cmd], stdout=sys.stdout, stderr=sys.stderr, bufsize=0)
 
     commission()
-    one_test('test_failure_on_wrong_endpoint')
-    one_test('test_names_as_expected')
-    one_test('test_pics')
+    one_test('test_TC_NAMES_2_1')
+    one_test('test_TC_ENDPOINT_2_1')
+    one_test('test_TC_PICSTEST_2_1')
 
     app_process.send_signal(signal.SIGINT.value)
     app_process.wait()

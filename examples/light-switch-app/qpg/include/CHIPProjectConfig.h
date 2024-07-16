@@ -40,9 +40,18 @@
  * CHIP_DEVICE_CONFIG_DEVICE_SOFTWARE_VERSION
  *
  * A uint32_t identifying the software version running on the device.
+ * First two bytes are reflecting the Matter standard
+ * Last two bytes are reflecting the SDK version of which the first nibble of the first byte represents the major
+ * version and the second nibble of the first byte has the minor number. The last byte holds the patch number.
+ * example for SDK v0.1.5 with Matter v1.2 standard:
+ * 0x01020105
  */
 #ifndef CHIP_DEVICE_CONFIG_DEVICE_SOFTWARE_VERSION
-#define CHIP_DEVICE_CONFIG_DEVICE_SOFTWARE_VERSION 0x0003 // Can't be removed, needed for OTA file generation.
+#ifndef OTA_TEST_IMAGE
+#define CHIP_DEVICE_CONFIG_DEVICE_SOFTWARE_VERSION 0x01020105
+#else
+#define CHIP_DEVICE_CONFIG_DEVICE_SOFTWARE_VERSION 0x01020106
+#endif
 #endif
 
 /**
@@ -53,7 +62,11 @@
  * {MAJOR_VERSION}.0d{MINOR_VERSION}
  */
 #ifndef CHIP_DEVICE_CONFIG_DEVICE_SOFTWARE_VERSION_STRING
-#define CHIP_DEVICE_CONFIG_DEVICE_SOFTWARE_VERSION_STRING "1.1" // Can't be removed, needed for OTA file generation.
+#ifndef OTA_TEST_IMAGE
+#define CHIP_DEVICE_CONFIG_DEVICE_SOFTWARE_VERSION_STRING "1.2-0.1.5"
+#else
+#define CHIP_DEVICE_CONFIG_DEVICE_SOFTWARE_VERSION_STRING "1.2-0.1.6"
+#endif
 #endif
 
 /**
@@ -119,3 +132,9 @@
 #ifndef CHIP_DEVICE_CONFIG_THREAD_FTD
 #define CHIP_DEVICE_CONFIG_THREAD_FTD 0
 #endif
+
+#define CHIP_CONFIG_ICD_IDLE_MODE_DURATION_SEC 1800
+#define CHIP_CONFIG_ICD_ACTIVE_MODE_DURATION_MS 10000
+#define CHIP_CONFIG_ICD_ACTIVE_MODE_THRESHOLD_MS 5000
+#define CHIP_DEVICE_CONFIG_ICD_SLOW_POLL_INTERVAL chip::System::Clock::Milliseconds32(5000)
+#define CHIP_DEVICE_CONFIG_ICD_FAST_POLL_INTERVAL chip::System::Clock::Milliseconds32(500)

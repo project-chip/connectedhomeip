@@ -38,6 +38,9 @@ CommandHandlerInterfaceOnlyClusters:
     - Energy EVSE Mode
     - Device Energy Management
     - Device Energy Management Mode
+    - Electrical Power Measurement
+    - Electrical Energy Measurement
+    - Wi-Fi Network Management
 
 # We need a more configurable way of deciding which clusters have which init functions....
 # See https://github.com/project-chip/connectedhomeip/issues/4369
@@ -55,6 +58,7 @@ ClustersWithInitFunctions:
     - Mode Select
     - Sample MEI
     - Scenes Management
+    - Wi-Fi Network Management
 
 ClustersWithAttributeChangedFunctions:
     - Bridged Device Basic
@@ -82,5 +86,6 @@ ClustersWithPreAttributeChangeFunctions:
     - Mode Select
     - Fan Control
     - Thermostat
+    - Energy Preference
     - Laundry Washer Controls
     - Laundry Dryer Controls

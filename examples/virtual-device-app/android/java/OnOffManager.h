@@ -18,6 +18,7 @@
 
 #include <app-common/zap-generated/cluster-objects.h>
 #include <jni.h>
+#include <lib/support/JniReferences.h>
 
 /**
  * @brief Handles interfacing between java code and C++ code for the purposes of On/Off clusters.
@@ -40,6 +41,6 @@ public:
 private:
     // init with java objects
     CHIP_ERROR InitializeWithObjects(jobject managerObject);
-    jobject mOnOffManagerObject         = nullptr;
+    chip::JniGlobalReference mOnOffManagerObject;
     jmethodID mHandleOnOffChangedMethod = nullptr;
 };

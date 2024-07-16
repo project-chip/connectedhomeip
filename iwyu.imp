@@ -1,0 +1,22 @@
+# General IWYU command example:
+#
+# iwyu_tool.py                                                  \
+#    -p out/linux-x64-all-clusters-clang/compile_commands.json  \
+#    src/lib/core/                                              \
+#    --                                                         \
+#    -Xiwyu --mapping_file=$(pwd)/iwyu.imp                      \
+#    -Xiwyu --no_comments                                       \
+#    -Xiwyu --comment_style=none                                \
+#    -Xiwyu --cxx17ns                                           \
+#    -Xiwyu no_fwd_decls                                        \
+#  | tee out/iwyu.out
+#
+# cd out/linux-x64-all-clusters-clang
+#
+# fix_includes.py <../iwyu.out
+#
+[
+    { include: [ '"system/SystemBuildConfig.h"', private, '<system/SystemConfig.h>', public ] },
+    { include: [ '"core/CHIPBuildConfig.h"', private, '<lib/core/CHIPConfig.h>', public ] },
+    { include: [ '@"platform/.*/CHIPPlatformConfig.h"', private, '<lib/core/CHIPConfig.h>', public ] },
+]

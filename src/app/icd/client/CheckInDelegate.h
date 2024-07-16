@@ -19,9 +19,12 @@
 #pragma once
 
 #include <app/icd/client/ICDClientInfo.h>
+#include <app/icd/client/ICDClientStorage.h>
 
 namespace chip {
 namespace app {
+
+class RefreshKeySender;
 
 /// Callbacks for check in protocol
 /**
@@ -39,6 +42,40 @@ public:
                                node that sent the check-in message.
      */
     virtual void OnCheckInComplete(const ICDClientInfo & clientInfo) = 0;
+
+    /**
+     * @brief Callback used to let the application know that a key refresh is
+     * needed to avoid counter rollover problems.
+     *
+     * The implementer of this function should create a new RefreshKeySender object. This object will be tied to the specific key
+     * refresh process and will not be used by the caller after that particular key refresh process has ended, regardless of success
+     * or failure.
+     *
+     * The caller guarantees that if a non-null RefreshKeySender pointer is returned, it will call OnKeyRefreshDone
+     * at some point, and pass it the returned pointer.
+     *
+     * If the callee is unable to provide the RefreshKeySender object, that indicates key
+     * refresh is not possible until the callee is able to provide the required resources.
+     *
+     * @param[in] clientInfo - ICDClientInfo object representing the state associated with the
+     *                         node that sent the check-in message. The callee can use the clientInfo to determine the type of key
+     *                         to generate.
+     * @param[in] clientStorage - ICDClientStorage object stores the updated ICDClientInfo after re-registration into
+     *                            persistent storage.
+     * @return RefreshKeySender - pointer to RefreshKeySender object
+     */
+    virtual RefreshKeySender * OnKeyRefreshNeeded(ICDClientInfo & clientInfo, ICDClientStorage * clientStorage) = 0;
+
+    /**
+     * @brief Callback used to let the application know that the re-registration process is done. This callback will be called for
+     * both success and failure cases. On failure, the callee should take appropriate corrective action based on the error.
+     *
+     * @param[in] refreshKeySender - pointer to the RefreshKeySender object that was used for the key refresh process. The caller
+     *                               will NOT use this pointer any more.
+     * @param[in] error - CHIP_NO_ERROR indicates successful re-registration using the new key
+     *                     Other errors indicate the failure reason.
+     */
+    virtual void OnKeyRefreshDone(RefreshKeySender * refreshKeySender, CHIP_ERROR error) = 0;
 };
 
 } // namespace app

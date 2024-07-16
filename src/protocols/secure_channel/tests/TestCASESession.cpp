@@ -21,6 +21,10 @@
  *      This file implements unit tests for the CASESession implementation.
  */
 
+#include <stdarg.h>
+
+#include <pw_unit_test/framework.h>
+
 #include <credentials/CHIPCert.h>
 #include <credentials/GroupDataProviderImpl.h>
 #include <credentials/PersistentStorageOpCertStore.h>
@@ -30,17 +34,15 @@
 #include <lib/core/CHIPSafeCasts.h>
 #include <lib/core/DataModelTypes.h>
 #include <lib/core/ScopedNodeId.h>
+#include <lib/core/StringBuilderAdapters.h>
 #include <lib/support/CHIPMem.h>
 #include <lib/support/CodeUtils.h>
 #include <lib/support/ScopedBuffer.h>
 #include <lib/support/TestPersistentStorageDelegate.h>
-#include <lib/support/UnitTestContext.h>
-#include <lib/support/UnitTestRegistration.h>
+#include <lib/support/tests/ExtraPwTestMacros.h>
 #include <messaging/tests/MessagingContext.h>
-#include <nlunit-test.h>
 #include <protocols/secure_channel/CASEServer.h>
 #include <protocols/secure_channel/CASESession.h>
-#include <stdarg.h>
 
 #include "credentials/tests/CHIPCert_test_vectors.h"
 
@@ -52,26 +54,39 @@ using namespace chip::Inet;
 using namespace chip::Transport;
 using namespace chip::Messaging;
 using namespace chip::Protocols;
+using namespace chip::Crypto;
 
 namespace chip {
-namespace {
+class TestCASESecurePairingDelegate;
 
-class TestContext : public Test::LoopbackMessagingContext
+class TestCASESession : public Test::LoopbackMessagingContext
 {
 public:
     // Performs shared setup for all tests in the test suite
-    CHIP_ERROR SetUpTestSuite() override;
+    static void SetUpTestSuite();
     // Performs shared teardown for all tests in the test suite
-    void TearDownTestSuite() override;
+    static void TearDownTestSuite();
+
+    virtual void SetUp() override
+    {
+        ConfigInitializeNodes(false);
+        chip::Test::LoopbackMessagingContext::SetUp();
+    }
+
+    void ServiceEvents();
+    void SecurePairingHandshakeTestCommon(SessionManager & sessionManager, CASESession & pairingCommissioner,
+                                          TestCASESecurePairingDelegate & delegateCommissioner);
+
+    void SimulateUpdateNOCInvalidatePendingEstablishment();
 };
 
-void ServiceEvents(TestContext & ctx)
+void TestCASESession::ServiceEvents()
 {
     // Takes a few rounds of this because handling IO messages may schedule work,
     // and scheduled work may queue messages for sending...
     for (int i = 0; i < 3; ++i)
     {
-        ctx.DrainAndServiceIO();
+        DrainAndServiceIO();
 
         chip::DeviceLayer::PlatformMgr().ScheduleWork(
             [](intptr_t) -> void { chip::DeviceLayer::PlatformMgr().StopEventLoopTask(); }, (intptr_t) nullptr);
@@ -82,12 +97,11 @@ void ServiceEvents(TestContext & ctx)
 class TemporarySessionManager
 {
 public:
-    TemporarySessionManager(nlTestSuite * suite, TestContext & ctx) : mCtx(ctx)
+    TemporarySessionManager(TestCASESession & ctx) : mCtx(ctx)
     {
-        NL_TEST_ASSERT(suite,
-                       CHIP_NO_ERROR ==
-                           mSessionManager.Init(&ctx.GetSystemLayer(), &ctx.GetTransportMgr(), &ctx.GetMessageCounterManager(),
-                                                &mStorage, &ctx.GetFabricTable(), ctx.GetSessionKeystore()));
+        EXPECT_EQ(CHIP_NO_ERROR,
+                  mSessionManager.Init(&ctx.GetSystemLayer(), &ctx.GetTransportMgr(), &ctx.GetMessageCounterManager(), &mStorage,
+                                       &ctx.GetFabricTable(), ctx.GetSessionKeystore()));
         // The setup here is really weird: we are using one session manager for
         // the actual messages we send (the PASE handshake, so the
         // unauthenticated sessions) and a different one for allocating the PASE
@@ -107,7 +121,7 @@ public:
     operator SessionManager &() { return mSessionManager; }
 
 private:
-    TestContext & mCtx;
+    TestCASESession & mCtx;
     TestPersistentStorageDelegate mStorage;
     SessionManager mSessionManager;
 };
@@ -326,25 +340,22 @@ CHIP_ERROR InitCredentialSets()
     return CHIP_NO_ERROR;
 }
 
-CHIP_ERROR TestContext::SetUpTestSuite()
+void TestCASESession::SetUpTestSuite()
 {
-    ConfigInitializeNodes(false);
-    CHIP_ERROR err = CHIP_NO_ERROR;
-    VerifyOrExit((err = LoopbackMessagingContext::SetUpTestSuite()) == CHIP_NO_ERROR,
-                 ChipLogError(AppServer, "SetUpTestSuite lo messaging context failed: %" CHIP_ERROR_FORMAT, err.Format()));
-    VerifyOrExit((err = chip::DeviceLayer::PlatformMgr().InitChipStack()) == CHIP_NO_ERROR,
-                 ChipLogError(AppServer, "Init CHIP stack failed: %" CHIP_ERROR_FORMAT, err.Format()));
-    VerifyOrExit((err = InitFabricTable(gCommissionerFabrics, &gCommissionerStorageDelegate, /* opKeyStore = */ nullptr,
-                                        &gCommissionerOpCertStore)) == CHIP_NO_ERROR,
-                 ChipLogError(AppServer, "InitFabricTable failed: %" CHIP_ERROR_FORMAT, err.Format()));
-    VerifyOrExit((err = InitCredentialSets()) == CHIP_NO_ERROR,
-                 ChipLogError(AppServer, "InitCredentialSets failed: %" CHIP_ERROR_FORMAT, err.Format()));
+    LoopbackMessagingContext::SetUpTestSuite();
+
+    ASSERT_EQ(chip::DeviceLayer::PlatformMgr().InitChipStack(), CHIP_NO_ERROR);
+
+    ASSERT_EQ(
+        InitFabricTable(gCommissionerFabrics, &gCommissionerStorageDelegate, /* opKeyStore = */ nullptr, &gCommissionerOpCertStore),
+        CHIP_NO_ERROR);
+
+    ASSERT_EQ(InitCredentialSets(), CHIP_NO_ERROR);
+
     chip::DeviceLayer::SetSystemLayerForTesting(&GetSystemLayer());
-exit:
-    return err;
 }
 
-void TestContext::TearDownTestSuite()
+void TestCASESession::TearDownTestSuite()
 {
     chip::DeviceLayer::SetSystemLayerForTesting(nullptr);
     gDeviceOperationalKeystore.Shutdown();
@@ -357,52 +368,27 @@ void TestContext::TearDownTestSuite()
     LoopbackMessagingContext::TearDownTestSuite();
 }
 
-} // anonymous namespace
-
-// Specifically for SimulateUpdateNOCInvalidatePendingEstablishment, we need it to be static so that the class below can
-// be a friend to CASESession so that test can get access to CASESession::State and test method that are not public. To
-// keep the rest of this file consistent we brought all other tests into this class.
-class TestCASESession
+TEST_F(TestCASESession, SecurePairingWaitTest)
 {
-public:
-    static void SecurePairingWaitTest(nlTestSuite * inSuite, void * inContext);
-    static void SecurePairingStartTest(nlTestSuite * inSuite, void * inContext);
-    static void SecurePairingHandshakeTest(nlTestSuite * inSuite, void * inContext);
-    static void SecurePairingHandshakeServerTest(nlTestSuite * inSuite, void * inContext);
-    static void ClientReceivesBusyTest(nlTestSuite * inSuite, void * inContext);
-    static void Sigma1ParsingTest(nlTestSuite * inSuite, void * inContext);
-    static void DestinationIdTest(nlTestSuite * inSuite, void * inContext);
-    static void SessionResumptionStorage(nlTestSuite * inSuite, void * inContext);
-#if CONFIG_BUILD_FOR_HOST_UNIT_TEST
-    static void SimulateUpdateNOCInvalidatePendingEstablishment(nlTestSuite * inSuite, void * inContext);
-#endif // CONFIG_BUILD_FOR_HOST_UNIT_TEST
-    static void Sigma1BadDestinationIdTest(nlTestSuite * inSuite, void * inContext);
-};
-
-void TestCASESession::SecurePairingWaitTest(nlTestSuite * inSuite, void * inContext)
-{
-    TestContext & ctx = *reinterpret_cast<TestContext *>(inContext);
-    TemporarySessionManager sessionManager(inSuite, ctx);
-
+    TemporarySessionManager sessionManager(*this);
     // Test all combinations of invalid parameters
     TestCASESecurePairingDelegate delegate;
-    FabricTable fabrics;
+    // Making this static to reduce stack usage, as some platforms have limits on stack size.
+    static FabricTable fabrics;
     CASESession caseSession;
 
-    NL_TEST_ASSERT(inSuite, caseSession.GetSecureSessionType() == SecureSession::Type::kCASE);
+    EXPECT_EQ(caseSession.GetSecureSessionType(), SecureSession::Type::kCASE);
 
     caseSession.SetGroupDataProvider(&gDeviceGroupDataProvider);
-    NL_TEST_ASSERT(inSuite,
-                   caseSession.PrepareForSessionEstablishment(sessionManager, nullptr, nullptr, nullptr, nullptr, ScopedNodeId(),
-                                                              Optional<ReliableMessageProtocolConfig>::Missing()) ==
-                       CHIP_ERROR_INVALID_ARGUMENT);
-    NL_TEST_ASSERT(inSuite,
-                   caseSession.PrepareForSessionEstablishment(sessionManager, nullptr, nullptr, nullptr, &delegate, ScopedNodeId(),
-                                                              Optional<ReliableMessageProtocolConfig>::Missing()) ==
-                       CHIP_ERROR_INVALID_ARGUMENT);
-    NL_TEST_ASSERT(inSuite,
-                   caseSession.PrepareForSessionEstablishment(sessionManager, &fabrics, nullptr, nullptr, &delegate, ScopedNodeId(),
-                                                              Optional<ReliableMessageProtocolConfig>::Missing()) == CHIP_NO_ERROR);
+    EXPECT_EQ(caseSession.PrepareForSessionEstablishment(sessionManager, nullptr, nullptr, nullptr, nullptr, ScopedNodeId(),
+                                                         Optional<ReliableMessageProtocolConfig>::Missing()),
+              CHIP_ERROR_INVALID_ARGUMENT);
+    EXPECT_EQ(caseSession.PrepareForSessionEstablishment(sessionManager, nullptr, nullptr, nullptr, &delegate, ScopedNodeId(),
+                                                         Optional<ReliableMessageProtocolConfig>::Missing()),
+              CHIP_ERROR_INVALID_ARGUMENT);
+    EXPECT_EQ(caseSession.PrepareForSessionEstablishment(sessionManager, &fabrics, nullptr, nullptr, &delegate, ScopedNodeId(),
+                                                         Optional<ReliableMessageProtocolConfig>::Missing()),
+              CHIP_NO_ERROR);
 
     // Calling Clear() here since ASAN will have an issue if FabricTable destructor is called before CASESession's
     // destructor. We could reorder FabricTable and CaseSession, but this makes it a little more clear what we are
@@ -410,42 +396,37 @@ void TestCASESession::SecurePairingWaitTest(nlTestSuite * inSuite, void * inCont
     caseSession.Clear();
 }
 
-void TestCASESession::SecurePairingStartTest(nlTestSuite * inSuite, void * inContext)
+TEST_F(TestCASESession, SecurePairingStartTest)
 {
-    TestContext & ctx = *reinterpret_cast<TestContext *>(inContext);
-    TemporarySessionManager sessionManager(inSuite, ctx);
-
+    TemporarySessionManager sessionManager(*this);
     // Test all combinations of invalid parameters
     TestCASESecurePairingDelegate delegate;
     CASESession pairing;
     pairing.SetGroupDataProvider(&gCommissionerGroupDataProvider);
 
-    ExchangeContext * context = ctx.NewUnauthenticatedExchangeToBob(&pairing);
+    ExchangeContext * context = NewUnauthenticatedExchangeToBob(&pairing);
 
-    NL_TEST_ASSERT(inSuite,
-                   pairing.EstablishSession(sessionManager, nullptr, ScopedNodeId{ Node01_01, gCommissionerFabricIndex }, nullptr,
-                                            nullptr, nullptr, nullptr,
-                                            Optional<ReliableMessageProtocolConfig>::Missing()) != CHIP_NO_ERROR);
-    ServiceEvents(ctx);
+    EXPECT_NE(pairing.EstablishSession(sessionManager, nullptr, ScopedNodeId{ Node01_01, gCommissionerFabricIndex }, nullptr,
+                                       nullptr, nullptr, nullptr, Optional<ReliableMessageProtocolConfig>::Missing()),
+              CHIP_NO_ERROR);
+    ServiceEvents();
 
-    NL_TEST_ASSERT(inSuite,
-                   pairing.EstablishSession(sessionManager, &gCommissionerFabrics,
-                                            ScopedNodeId{ Node01_01, gCommissionerFabricIndex }, nullptr, nullptr, nullptr, nullptr,
-                                            Optional<ReliableMessageProtocolConfig>::Missing()) != CHIP_NO_ERROR);
-    ServiceEvents(ctx);
+    EXPECT_NE(pairing.EstablishSession(sessionManager, &gCommissionerFabrics, ScopedNodeId{ Node01_01, gCommissionerFabricIndex },
+                                       nullptr, nullptr, nullptr, nullptr, Optional<ReliableMessageProtocolConfig>::Missing()),
+              CHIP_NO_ERROR);
+    ServiceEvents();
 
-    NL_TEST_ASSERT(inSuite,
-                   pairing.EstablishSession(sessionManager, &gCommissionerFabrics,
-                                            ScopedNodeId{ Node01_01, gCommissionerFabricIndex }, context, nullptr, nullptr,
-                                            &delegate, Optional<ReliableMessageProtocolConfig>::Missing()) == CHIP_NO_ERROR);
-    ServiceEvents(ctx);
+    EXPECT_EQ(pairing.EstablishSession(sessionManager, &gCommissionerFabrics, ScopedNodeId{ Node01_01, gCommissionerFabricIndex },
+                                       context, nullptr, nullptr, &delegate, Optional<ReliableMessageProtocolConfig>::Missing()),
+              CHIP_NO_ERROR);
+    ServiceEvents();
 
-    auto & loopback = ctx.GetLoopback();
+    auto & loopback = GetLoopback();
     // There should have been two message sent: Sigma1 and an ack.
-    NL_TEST_ASSERT(inSuite, loopback.mSentMessageCount == 2);
+    EXPECT_EQ(loopback.mSentMessageCount, 2u);
 
-    ReliableMessageMgr * rm = ctx.GetExchangeManager().GetReliableMessageMgr();
-    NL_TEST_ASSERT(inSuite, rm->TestGetCountRetransTable() == 0);
+    ReliableMessageMgr * rm = GetExchangeManager().GetReliableMessageMgr();
+    EXPECT_EQ(rm->TestGetCountRetransTable(), 0);
 
     loopback.mMessageSendError = CHIP_ERROR_BAD_REQUEST;
 
@@ -454,22 +435,19 @@ void TestCASESession::SecurePairingStartTest(nlTestSuite * inSuite, void * inCon
 
     loopback.mSentMessageCount = 0;
     loopback.mMessageSendError = CHIP_ERROR_BAD_REQUEST;
-    ExchangeContext * context1 = ctx.NewUnauthenticatedExchangeToBob(&pairing1);
+    ExchangeContext * context1 = NewUnauthenticatedExchangeToBob(&pairing1);
 
-    NL_TEST_ASSERT(inSuite,
-                   pairing1.EstablishSession(
-                       sessionManager, &gCommissionerFabrics, ScopedNodeId{ Node01_01, gCommissionerFabricIndex }, context1,
-                       nullptr, nullptr, &delegate, Optional<ReliableMessageProtocolConfig>::Missing()) == CHIP_ERROR_BAD_REQUEST);
-    ServiceEvents(ctx);
+    EXPECT_EQ(pairing1.EstablishSession(sessionManager, &gCommissionerFabrics, ScopedNodeId{ Node01_01, gCommissionerFabricIndex },
+                                        context1, nullptr, nullptr, &delegate, Optional<ReliableMessageProtocolConfig>::Missing()),
+              CHIP_ERROR_BAD_REQUEST);
+    ServiceEvents();
 
     loopback.mMessageSendError = CHIP_NO_ERROR;
 }
 
-void SecurePairingHandshakeTestCommon(nlTestSuite * inSuite, void * inContext, SessionManager & sessionManager,
-                                      CASESession & pairingCommissioner, TestCASESecurePairingDelegate & delegateCommissioner)
+void TestCASESession::SecurePairingHandshakeTestCommon(SessionManager & sessionManager, CASESession & pairingCommissioner,
+                                                       TestCASESecurePairingDelegate & delegateCommissioner)
 {
-    TestContext & ctx = *reinterpret_cast<TestContext *>(inContext);
-
     // Test all combinations of invalid parameters
     TestCASESecurePairingDelegate delegateAccessory;
     CASESession pairingAccessory;
@@ -478,39 +456,36 @@ void SecurePairingHandshakeTestCommon(nlTestSuite * inSuite, void * inContext, S
     ReliableMessageProtocolConfig nonSleepyCommissionerRmpConfig(
         System::Clock::Milliseconds32(5000), System::Clock::Milliseconds32(300), System::Clock::Milliseconds16(4000));
 
-    auto & loopback            = ctx.GetLoopback();
+    auto & loopback            = GetLoopback();
     loopback.mSentMessageCount = 0;
 
-    NL_TEST_ASSERT(inSuite,
-                   ctx.GetExchangeManager().RegisterUnsolicitedMessageHandlerForType(Protocols::SecureChannel::MsgType::CASE_Sigma1,
-                                                                                     &pairingAccessory) == CHIP_NO_ERROR);
+    EXPECT_EQ(GetExchangeManager().RegisterUnsolicitedMessageHandlerForType(Protocols::SecureChannel::MsgType::CASE_Sigma1,
+                                                                            &pairingAccessory),
+              CHIP_NO_ERROR);
 
-    ExchangeContext * contextCommissioner = ctx.NewUnauthenticatedExchangeToBob(&pairingCommissioner);
+    ExchangeContext * contextCommissioner = NewUnauthenticatedExchangeToBob(&pairingCommissioner);
 
     pairingAccessory.SetGroupDataProvider(&gDeviceGroupDataProvider);
-    NL_TEST_ASSERT(inSuite,
-                   pairingAccessory.PrepareForSessionEstablishment(sessionManager, &gDeviceFabrics, nullptr, nullptr,
-                                                                   &delegateAccessory, ScopedNodeId(),
-                                                                   MakeOptional(verySleepyAccessoryRmpConfig)) == CHIP_NO_ERROR);
-    NL_TEST_ASSERT(inSuite,
-                   pairingCommissioner.EstablishSession(sessionManager, &gCommissionerFabrics,
-                                                        ScopedNodeId{ Node01_01, gCommissionerFabricIndex }, contextCommissioner,
-                                                        nullptr, nullptr, &delegateCommissioner,
-                                                        MakeOptional(nonSleepyCommissionerRmpConfig)) == CHIP_NO_ERROR);
-    ServiceEvents(ctx);
+    EXPECT_EQ(pairingAccessory.PrepareForSessionEstablishment(sessionManager, &gDeviceFabrics, nullptr, nullptr, &delegateAccessory,
+                                                              ScopedNodeId(), MakeOptional(verySleepyAccessoryRmpConfig)),
+              CHIP_NO_ERROR);
+    EXPECT_EQ(pairingCommissioner.EstablishSession(
+                  sessionManager, &gCommissionerFabrics, ScopedNodeId{ Node01_01, gCommissionerFabricIndex }, contextCommissioner,
+                  nullptr, nullptr, &delegateCommissioner, MakeOptional(nonSleepyCommissionerRmpConfig)),
+              CHIP_NO_ERROR);
+    ServiceEvents();
 
-    NL_TEST_ASSERT(inSuite, loopback.mSentMessageCount == sTestCaseMessageCount);
-    NL_TEST_ASSERT(inSuite, delegateAccessory.mNumPairingComplete == 1);
-    NL_TEST_ASSERT(inSuite, delegateCommissioner.mNumPairingComplete == 1);
-    NL_TEST_ASSERT(inSuite, delegateAccessory.mNumPairingErrors == 0);
-    NL_TEST_ASSERT(inSuite, delegateCommissioner.mNumPairingErrors == 0);
-    NL_TEST_ASSERT(inSuite, pairingAccessory.GetRemoteMRPConfig().mIdleRetransTimeout == System::Clock::Milliseconds32(5000));
-    NL_TEST_ASSERT(inSuite, pairingAccessory.GetRemoteMRPConfig().mActiveRetransTimeout == System::Clock::Milliseconds32(300));
-    NL_TEST_ASSERT(inSuite, pairingAccessory.GetRemoteMRPConfig().mActiveThresholdTime == System::Clock::Milliseconds16(4000));
-    NL_TEST_ASSERT(inSuite, pairingCommissioner.GetRemoteMRPConfig().mIdleRetransTimeout == System::Clock::Milliseconds32(360000));
-    NL_TEST_ASSERT(inSuite,
-                   pairingCommissioner.GetRemoteMRPConfig().mActiveRetransTimeout == System::Clock::Milliseconds32(100000));
-    NL_TEST_ASSERT(inSuite, pairingCommissioner.GetRemoteMRPConfig().mActiveThresholdTime == System::Clock::Milliseconds16(300));
+    EXPECT_EQ(loopback.mSentMessageCount, sTestCaseMessageCount);
+    EXPECT_EQ(delegateAccessory.mNumPairingComplete, 1u);
+    EXPECT_EQ(delegateCommissioner.mNumPairingComplete, 1u);
+    EXPECT_EQ(delegateAccessory.mNumPairingErrors, 0u);
+    EXPECT_EQ(delegateCommissioner.mNumPairingErrors, 0u);
+    EXPECT_EQ(pairingAccessory.GetRemoteMRPConfig().mIdleRetransTimeout, System::Clock::Milliseconds32(5000));
+    EXPECT_EQ(pairingAccessory.GetRemoteMRPConfig().mActiveRetransTimeout, System::Clock::Milliseconds32(300));
+    EXPECT_EQ(pairingAccessory.GetRemoteMRPConfig().mActiveThresholdTime, System::Clock::Milliseconds16(4000));
+    EXPECT_EQ(pairingCommissioner.GetRemoteMRPConfig().mIdleRetransTimeout, System::Clock::Milliseconds32(360000));
+    EXPECT_EQ(pairingCommissioner.GetRemoteMRPConfig().mActiveRetransTimeout, System::Clock::Milliseconds32(100000));
+    EXPECT_EQ(pairingCommissioner.GetRemoteMRPConfig().mActiveThresholdTime, System::Clock::Milliseconds16(300));
 #if CONFIG_BUILD_FOR_HOST_UNIT_TEST
     // Confirming that FabricTable sending a notification that fabric was updated doesn't affect
     // already established connections.
@@ -518,26 +493,24 @@ void SecurePairingHandshakeTestCommon(nlTestSuite * inSuite, void * inContext, S
     // This is compiled for host tests which is enough test coverage
     gCommissionerFabrics.SendUpdateFabricNotificationForTest(gCommissionerFabricIndex);
     gDeviceFabrics.SendUpdateFabricNotificationForTest(gDeviceFabricIndex);
-    NL_TEST_ASSERT(inSuite, loopback.mSentMessageCount == sTestCaseMessageCount);
-    NL_TEST_ASSERT(inSuite, delegateAccessory.mNumPairingComplete == 1);
-    NL_TEST_ASSERT(inSuite, delegateCommissioner.mNumPairingComplete == 1);
-    NL_TEST_ASSERT(inSuite, delegateAccessory.mNumPairingErrors == 0);
-    NL_TEST_ASSERT(inSuite, delegateCommissioner.mNumPairingErrors == 0);
+    EXPECT_EQ(loopback.mSentMessageCount, sTestCaseMessageCount);
+    EXPECT_EQ(delegateAccessory.mNumPairingComplete, 1u);
+    EXPECT_EQ(delegateCommissioner.mNumPairingComplete, 1u);
+    EXPECT_EQ(delegateAccessory.mNumPairingErrors, 0u);
+    EXPECT_EQ(delegateCommissioner.mNumPairingErrors, 0u);
 #endif // CONFIG_BUILD_FOR_HOST_UNIT_TEST
 }
 
-void TestCASESession::SecurePairingHandshakeTest(nlTestSuite * inSuite, void * inContext)
+TEST_F(TestCASESession, SecurePairingHandshakeTest)
 {
-    TestContext & ctx = *reinterpret_cast<TestContext *>(inContext);
-    TemporarySessionManager sessionManager(inSuite, ctx);
-
+    TemporarySessionManager sessionManager(*this);
     TestCASESecurePairingDelegate delegateCommissioner;
     CASESession pairingCommissioner;
     pairingCommissioner.SetGroupDataProvider(&gCommissionerGroupDataProvider);
-    SecurePairingHandshakeTestCommon(inSuite, inContext, sessionManager, pairingCommissioner, delegateCommissioner);
+    SecurePairingHandshakeTestCommon(sessionManager, pairingCommissioner, delegateCommissioner);
 }
 
-void TestCASESession::SecurePairingHandshakeServerTest(nlTestSuite * inSuite, void * inContext)
+TEST_F(TestCASESession, SecurePairingHandshakeServerTest)
 {
     // TODO: Add cases for mismatching IPK config between initiator/responder
 
@@ -546,47 +519,43 @@ void TestCASESession::SecurePairingHandshakeServerTest(nlTestSuite * inSuite, vo
     auto * pairingCommissioner = chip::Platform::New<CASESession>();
     pairingCommissioner->SetGroupDataProvider(&gCommissionerGroupDataProvider);
 
-    TestContext & ctx = *reinterpret_cast<TestContext *>(inContext);
-
-    auto & loopback            = ctx.GetLoopback();
+    auto & loopback            = GetLoopback();
     loopback.mSentMessageCount = 0;
 
     // Use the same session manager on both CASE client and server sides to validate that both
     // components may work simultaneously on a single device.
-    NL_TEST_ASSERT(inSuite,
-                   gPairingServer.ListenForSessionEstablishment(&ctx.GetExchangeManager(), &ctx.GetSecureSessionManager(),
-                                                                &gDeviceFabrics, nullptr, nullptr,
-                                                                &gDeviceGroupDataProvider) == CHIP_NO_ERROR);
+    EXPECT_EQ(gPairingServer.ListenForSessionEstablishment(&GetExchangeManager(), &GetSecureSessionManager(), &gDeviceFabrics,
+                                                           nullptr, nullptr, &gDeviceGroupDataProvider),
+              CHIP_NO_ERROR);
 
-    ExchangeContext * contextCommissioner = ctx.NewUnauthenticatedExchangeToBob(pairingCommissioner);
+    ExchangeContext * contextCommissioner = NewUnauthenticatedExchangeToBob(pairingCommissioner);
 
-    NL_TEST_ASSERT(inSuite,
-                   pairingCommissioner->EstablishSession(ctx.GetSecureSessionManager(), &gCommissionerFabrics,
-                                                         ScopedNodeId{ Node01_01, gCommissionerFabricIndex }, contextCommissioner,
-                                                         nullptr, nullptr, &delegateCommissioner,
-                                                         Optional<ReliableMessageProtocolConfig>::Missing()) == CHIP_NO_ERROR);
-    ServiceEvents(ctx);
+    EXPECT_EQ(pairingCommissioner->EstablishSession(
+                  GetSecureSessionManager(), &gCommissionerFabrics, ScopedNodeId{ Node01_01, gCommissionerFabricIndex },
+                  contextCommissioner, nullptr, nullptr, &delegateCommissioner, Optional<ReliableMessageProtocolConfig>::Missing()),
+              CHIP_NO_ERROR);
+    ServiceEvents();
 
-    NL_TEST_ASSERT(inSuite, loopback.mSentMessageCount == sTestCaseMessageCount);
-    NL_TEST_ASSERT(inSuite, delegateCommissioner.mNumPairingComplete == 1);
+    EXPECT_EQ(loopback.mSentMessageCount, sTestCaseMessageCount);
+    EXPECT_EQ(delegateCommissioner.mNumPairingComplete, 1u);
 
     // Validate that secure session is created
     SessionHolder & holder = delegateCommissioner.GetSessionHolder();
-    NL_TEST_ASSERT(inSuite, bool(holder));
+    EXPECT_TRUE(bool(holder));
 
-    NL_TEST_ASSERT(inSuite, (holder->GetPeer() == chip::ScopedNodeId{ Node01_01, gCommissionerFabricIndex }));
+    EXPECT_EQ(holder->GetPeer(), (chip::ScopedNodeId{ Node01_01, gCommissionerFabricIndex }));
 
     auto * pairingCommissioner1 = chip::Platform::New<CASESession>();
     pairingCommissioner1->SetGroupDataProvider(&gCommissionerGroupDataProvider);
-    ExchangeContext * contextCommissioner1 = ctx.NewUnauthenticatedExchangeToBob(pairingCommissioner1);
+    ExchangeContext * contextCommissioner1 = NewUnauthenticatedExchangeToBob(pairingCommissioner1);
 
-    NL_TEST_ASSERT(inSuite,
-                   pairingCommissioner1->EstablishSession(ctx.GetSecureSessionManager(), &gCommissionerFabrics,
-                                                          ScopedNodeId{ Node01_01, gCommissionerFabricIndex }, contextCommissioner1,
-                                                          nullptr, nullptr, &delegateCommissioner,
-                                                          Optional<ReliableMessageProtocolConfig>::Missing()) == CHIP_NO_ERROR);
+    EXPECT_EQ(pairingCommissioner1->EstablishSession(GetSecureSessionManager(), &gCommissionerFabrics,
+                                                     ScopedNodeId{ Node01_01, gCommissionerFabricIndex }, contextCommissioner1,
+                                                     nullptr, nullptr, &delegateCommissioner,
+                                                     Optional<ReliableMessageProtocolConfig>::Missing()),
+              CHIP_NO_ERROR);
 
-    ServiceEvents(ctx);
+    ServiceEvents();
 
     chip::Platform::Delete(pairingCommissioner);
     chip::Platform::Delete(pairingCommissioner1);
@@ -594,52 +563,49 @@ void TestCASESession::SecurePairingHandshakeServerTest(nlTestSuite * inSuite, vo
     gPairingServer.Shutdown();
 }
 
-void TestCASESession::ClientReceivesBusyTest(nlTestSuite * inSuite, void * inContext)
+TEST_F(TestCASESession, ClientReceivesBusyTest)
 {
-    TestContext & ctx = *reinterpret_cast<TestContext *>(inContext);
-    TemporarySessionManager sessionManager(inSuite, ctx);
-
+    TemporarySessionManager sessionManager(*this);
     TestCASESecurePairingDelegate delegateCommissioner1, delegateCommissioner2;
     CASESession pairingCommissioner1, pairingCommissioner2;
 
     pairingCommissioner1.SetGroupDataProvider(&gCommissionerGroupDataProvider);
     pairingCommissioner2.SetGroupDataProvider(&gCommissionerGroupDataProvider);
 
-    auto & loopback            = ctx.GetLoopback();
+    auto & loopback            = GetLoopback();
     loopback.mSentMessageCount = 0;
 
-    NL_TEST_ASSERT(inSuite,
-                   gPairingServer.ListenForSessionEstablishment(&ctx.GetExchangeManager(), &ctx.GetSecureSessionManager(),
-                                                                &gDeviceFabrics, nullptr, nullptr,
-                                                                &gDeviceGroupDataProvider) == CHIP_NO_ERROR);
+    EXPECT_EQ(gPairingServer.ListenForSessionEstablishment(&GetExchangeManager(), &GetSecureSessionManager(), &gDeviceFabrics,
+                                                           nullptr, nullptr, &gDeviceGroupDataProvider),
+              CHIP_NO_ERROR);
 
-    ExchangeContext * contextCommissioner1 = ctx.NewUnauthenticatedExchangeToBob(&pairingCommissioner1);
-    ExchangeContext * contextCommissioner2 = ctx.NewUnauthenticatedExchangeToBob(&pairingCommissioner2);
+    ExchangeContext * contextCommissioner1 = NewUnauthenticatedExchangeToBob(&pairingCommissioner1);
+    ExchangeContext * contextCommissioner2 = NewUnauthenticatedExchangeToBob(&pairingCommissioner2);
 
-    NL_TEST_ASSERT(inSuite,
-                   pairingCommissioner1.EstablishSession(sessionManager, &gCommissionerFabrics,
-                                                         ScopedNodeId{ Node01_01, gCommissionerFabricIndex }, contextCommissioner1,
-                                                         nullptr, nullptr, &delegateCommissioner1, NullOptional) == CHIP_NO_ERROR);
-    NL_TEST_ASSERT(inSuite,
-                   pairingCommissioner2.EstablishSession(sessionManager, &gCommissionerFabrics,
-                                                         ScopedNodeId{ Node01_01, gCommissionerFabricIndex }, contextCommissioner2,
-                                                         nullptr, nullptr, &delegateCommissioner2, NullOptional) == CHIP_NO_ERROR);
+    EXPECT_EQ(pairingCommissioner1.EstablishSession(sessionManager, &gCommissionerFabrics,
+                                                    ScopedNodeId{ Node01_01, gCommissionerFabricIndex }, contextCommissioner1,
+                                                    nullptr, nullptr, &delegateCommissioner1, NullOptional),
+              CHIP_NO_ERROR);
+    EXPECT_EQ(pairingCommissioner2.EstablishSession(sessionManager, &gCommissionerFabrics,
+                                                    ScopedNodeId{ Node01_01, gCommissionerFabricIndex }, contextCommissioner2,
+                                                    nullptr, nullptr, &delegateCommissioner2, NullOptional),
+              CHIP_NO_ERROR);
 
-    ServiceEvents(ctx);
+    ServiceEvents();
 
     // We should have one full handshake and one Sigma1 + Busy + ack.  If that
     // ever changes (e.g. because our server starts supporting multiple parallel
     // handshakes), this test needs to be fixed so that the server is still
     // responding BUSY to the client.
-    NL_TEST_ASSERT(inSuite, loopback.mSentMessageCount == sTestCaseMessageCount + 3);
-    NL_TEST_ASSERT(inSuite, delegateCommissioner1.mNumPairingComplete == 1);
-    NL_TEST_ASSERT(inSuite, delegateCommissioner2.mNumPairingComplete == 0);
+    EXPECT_EQ(loopback.mSentMessageCount, sTestCaseMessageCount + 3);
+    EXPECT_EQ(delegateCommissioner1.mNumPairingComplete, 1u);
+    EXPECT_EQ(delegateCommissioner2.mNumPairingComplete, 0u);
 
-    NL_TEST_ASSERT(inSuite, delegateCommissioner1.mNumPairingErrors == 0);
-    NL_TEST_ASSERT(inSuite, delegateCommissioner2.mNumPairingErrors == 1);
+    EXPECT_EQ(delegateCommissioner1.mNumPairingErrors, 0u);
+    EXPECT_EQ(delegateCommissioner2.mNumPairingErrors, 1u);
 
-    NL_TEST_ASSERT(inSuite, delegateCommissioner1.mNumBusyResponses == 0);
-    NL_TEST_ASSERT(inSuite, delegateCommissioner2.mNumBusyResponses == 1);
+    EXPECT_EQ(delegateCommissioner1.mNumBusyResponses, 0u);
+    EXPECT_EQ(delegateCommissioner2.mNumBusyResponses, 1u);
 
     gPairingServer.Shutdown();
 }
@@ -668,7 +634,7 @@ struct Sigma1Params
     static constexpr bool expectSuccess = true;
 };
 
-void TestCASESession::DestinationIdTest(nlTestSuite * inSuite, void * inContext)
+TEST_F(TestCASESession, DestinationIdTest)
 {
     // Validate example test vector from CASE section of spec
 
@@ -703,20 +669,20 @@ void TestCASESession::DestinationIdTest(nlTestSuite * inSuite, void * inContext)
     CHIP_ERROR err =
         GenerateCaseDestinationId(ByteSpan(kIpkOperationalGroupKeyFromSpec), ByteSpan(kInitiatorRandomFromSpec),
                                   ByteSpan(kRootPubKeyFromSpec), kFabricIdFromSpec, kNodeIdFromSpec, destinationIdSpan);
-    NL_TEST_ASSERT(inSuite, CHIP_NO_ERROR == err);
-    NL_TEST_ASSERT(inSuite, destinationIdSpan.size() == sizeof(destinationIdBuf));
-    NL_TEST_ASSERT(inSuite, destinationIdSpan.data_equal(ByteSpan(kExpectedDestinationIdFromSpec)));
+    EXPECT_EQ(err, CHIP_NO_ERROR);
+    EXPECT_EQ(destinationIdSpan.size(), sizeof(destinationIdBuf));
+    EXPECT_TRUE(destinationIdSpan.data_equal(ByteSpan(kExpectedDestinationIdFromSpec)));
 
     memset(destinationIdSpan.data(), 0, destinationIdSpan.size());
 
     // Test changing input: should yield different
-    err = GenerateCaseDestinationId(ByteSpan(kIpkOperationalGroupKeyFromSpec), ByteSpan(kInitiatorRandomFromSpec),
-                                    ByteSpan(kRootPubKeyFromSpec), kFabricIdFromSpec,
-                                    kNodeIdFromSpec + 1, // <--- Change node ID
-                                    destinationIdSpan);
-    NL_TEST_ASSERT(inSuite, CHIP_NO_ERROR == err);
-    NL_TEST_ASSERT(inSuite, destinationIdSpan.size() == sizeof(destinationIdBuf));
-    NL_TEST_ASSERT(inSuite, !destinationIdSpan.data_equal(ByteSpan(kExpectedDestinationIdFromSpec)));
+    EXPECT_EQ(GenerateCaseDestinationId(ByteSpan(kIpkOperationalGroupKeyFromSpec), ByteSpan(kInitiatorRandomFromSpec),
+                                        ByteSpan(kRootPubKeyFromSpec), kFabricIdFromSpec,
+                                        kNodeIdFromSpec + 1, // <--- Change node ID
+                                        destinationIdSpan),
+              CHIP_NO_ERROR);
+    EXPECT_EQ(destinationIdSpan.size(), sizeof(destinationIdBuf));
+    EXPECT_FALSE(destinationIdSpan.data_equal(ByteSpan(kExpectedDestinationIdFromSpec)));
 }
 
 template <typename Params>
@@ -771,12 +737,11 @@ static CHIP_ERROR EncodeSigma1(MutableByteSpan & buf)
 }
 
 // A macro, so we can tell which test failed based on line number.
-#define TestSigma1Parsing(inSuite, mem, bufferSize, params)                                                                        \
+#define TestSigma1Parsing(mem, bufferSize, params)                                                                                 \
     do                                                                                                                             \
     {                                                                                                                              \
         MutableByteSpan buf(mem.Get(), bufferSize);                                                                                \
-        CHIP_ERROR err = EncodeSigma1<params>(buf);                                                                                \
-        NL_TEST_ASSERT(inSuite, err == CHIP_NO_ERROR);                                                                             \
+        EXPECT_EQ(EncodeSigma1<params>(buf), CHIP_NO_ERROR);                                                                       \
                                                                                                                                    \
         TLV::ContiguousBufferTLVReader reader;                                                                                     \
         reader.Init(buf);                                                                                                          \
@@ -789,12 +754,12 @@ static CHIP_ERROR EncodeSigma1(MutableByteSpan & buf)
         ByteSpan resumptionId;                                                                                                     \
         ByteSpan initiatorResumeMIC;                                                                                               \
         CASESession session;                                                                                                       \
-        err = session.ParseSigma1(reader, initiatorRandom, initiatorSessionId, destinationId, initiatorEphPubKey,                  \
-                                  resumptionRequested, resumptionId, initiatorResumeMIC);                                          \
-        NL_TEST_ASSERT(inSuite, (err == CHIP_NO_ERROR) == params::expectSuccess);                                                  \
+        EXPECT_EQ(session.ParseSigma1(reader, initiatorRandom, initiatorSessionId, destinationId, initiatorEphPubKey,              \
+                                      resumptionRequested, resumptionId, initiatorResumeMIC) == CHIP_NO_ERROR,                     \
+                  params::expectSuccess);                                                                                          \
         if (params::expectSuccess)                                                                                                 \
         {                                                                                                                          \
-            NL_TEST_ASSERT(inSuite, resumptionRequested == (params::resumptionIdLen != 0 && params::initiatorResumeMICLen != 0));  \
+            EXPECT_EQ(resumptionRequested, params::resumptionIdLen != 0 && params::initiatorResumeMICLen != 0);                    \
             /* Add other verification tests here as desired */                                                                     \
         }                                                                                                                          \
     } while (0)
@@ -884,30 +849,29 @@ struct Sigma1SessionIdTooBig : public BadSigma1ParamsBase
     static constexpr uint32_t initiatorSessionId = UINT16_MAX + 1;
 };
 
-void TestCASESession::Sigma1ParsingTest(nlTestSuite * inSuite, void * inContext)
+TEST_F(TestCASESession, Sigma1ParsingTest)
 {
     // 1280 bytes must be enough by definition.
     constexpr size_t bufferSize = 1280;
     chip::Platform::ScopedMemoryBuffer<uint8_t> mem;
-    NL_TEST_ASSERT(inSuite, mem.Calloc(bufferSize));
+    EXPECT_TRUE(mem.Calloc(bufferSize));
 
-    TestSigma1Parsing(inSuite, mem, bufferSize, Sigma1Params);
-
-    TestSigma1Parsing(inSuite, mem, bufferSize, Sigma1NoStructEnd);
-    TestSigma1Parsing(inSuite, mem, bufferSize, Sigma1WrongTags);
-    TestSigma1Parsing(inSuite, mem, bufferSize, Sigma1TooLongRandom);
-    TestSigma1Parsing(inSuite, mem, bufferSize, Sigma1TooShortRandom);
-    TestSigma1Parsing(inSuite, mem, bufferSize, Sigma1TooLongDest);
-    TestSigma1Parsing(inSuite, mem, bufferSize, Sigma1TooShortDest);
-    TestSigma1Parsing(inSuite, mem, bufferSize, Sigma1TooLongPubkey);
-    TestSigma1Parsing(inSuite, mem, bufferSize, Sigma1TooShortPubkey);
-    TestSigma1Parsing(inSuite, mem, bufferSize, Sigma1WithResumption);
-    TestSigma1Parsing(inSuite, mem, bufferSize, Sigma1TooLongResumptionId);
-    TestSigma1Parsing(inSuite, mem, bufferSize, Sigma1TooShortResumptionId);
-    TestSigma1Parsing(inSuite, mem, bufferSize, Sigma1TooLongResumeMIC);
-    TestSigma1Parsing(inSuite, mem, bufferSize, Sigma1TooShortResumeMIC);
-    TestSigma1Parsing(inSuite, mem, bufferSize, Sigma1SessionIdMax);
-    TestSigma1Parsing(inSuite, mem, bufferSize, Sigma1SessionIdTooBig);
+    TestSigma1Parsing(mem, bufferSize, Sigma1Params);
+    TestSigma1Parsing(mem, bufferSize, Sigma1NoStructEnd);
+    TestSigma1Parsing(mem, bufferSize, Sigma1WrongTags);
+    TestSigma1Parsing(mem, bufferSize, Sigma1TooLongRandom);
+    TestSigma1Parsing(mem, bufferSize, Sigma1TooShortRandom);
+    TestSigma1Parsing(mem, bufferSize, Sigma1TooLongDest);
+    TestSigma1Parsing(mem, bufferSize, Sigma1TooShortDest);
+    TestSigma1Parsing(mem, bufferSize, Sigma1TooLongPubkey);
+    TestSigma1Parsing(mem, bufferSize, Sigma1TooShortPubkey);
+    TestSigma1Parsing(mem, bufferSize, Sigma1WithResumption);
+    TestSigma1Parsing(mem, bufferSize, Sigma1TooLongResumptionId);
+    TestSigma1Parsing(mem, bufferSize, Sigma1TooShortResumptionId);
+    TestSigma1Parsing(mem, bufferSize, Sigma1TooLongResumeMIC);
+    TestSigma1Parsing(mem, bufferSize, Sigma1TooShortResumeMIC);
+    TestSigma1Parsing(mem, bufferSize, Sigma1SessionIdMax);
+    TestSigma1Parsing(mem, bufferSize, Sigma1SessionIdTooBig);
 }
 
 struct SessionResumptionTestStorage : SessionResumptionStorage
@@ -957,7 +921,7 @@ struct SessionResumptionTestStorage : SessionResumptionStorage
     Crypto::P256ECDHDerivedSecret * mSharedSecret = nullptr;
 };
 
-void TestCASESession::SessionResumptionStorage(nlTestSuite * inSuite, void * inContext)
+TEST_F(TestCASESession, SessionResumptionStorage)
 {
     // Test the SessionResumptionStorage external interface.
     //
@@ -968,7 +932,6 @@ void TestCASESession::SessionResumptionStorage(nlTestSuite * inSuite, void * inC
     // if the peers have mismatched session resumption information, we should
     // fall back to CASE.
 
-    TestContext & ctx = *reinterpret_cast<TestContext *>(inContext);
     TestCASESecurePairingDelegate delegateCommissioner;
     chip::SessionResumptionStorage::ResumptionIdStorage resumptionIdA;
     chip::SessionResumptionStorage::ResumptionIdStorage resumptionIdB;
@@ -977,19 +940,19 @@ void TestCASESession::SessionResumptionStorage(nlTestSuite * inSuite, void * inC
 
     // Create our fabric-scoped node IDs.
     const FabricInfo * fabricInfo = gCommissionerFabrics.FindFabricWithIndex(gCommissionerFabricIndex);
-    NL_TEST_ASSERT(inSuite, fabricInfo != nullptr);
+    ASSERT_NE(fabricInfo, nullptr);
     ScopedNodeId initiator = fabricInfo->GetScopedNodeIdForNode(Node01_02);
     ScopedNodeId responder = fabricInfo->GetScopedNodeIdForNode(Node01_01);
 
     // Generate a resumption IDs.
-    NL_TEST_ASSERT(inSuite, CHIP_NO_ERROR == chip::Crypto::DRBG_get_bytes(resumptionIdA.data(), resumptionIdA.size()));
-    NL_TEST_ASSERT(inSuite, CHIP_NO_ERROR == chip::Crypto::DRBG_get_bytes(resumptionIdB.data(), resumptionIdB.size()));
+    EXPECT_EQ(chip::Crypto::DRBG_get_bytes(resumptionIdA.data(), resumptionIdA.size()), CHIP_NO_ERROR);
+    EXPECT_EQ(chip::Crypto::DRBG_get_bytes(resumptionIdB.data(), resumptionIdB.size()), CHIP_NO_ERROR);
 
     // Generate a shared secrets.
     sharedSecretA.SetLength(sharedSecretA.Capacity());
-    NL_TEST_ASSERT(inSuite, CHIP_NO_ERROR == chip::Crypto::DRBG_get_bytes(sharedSecretA.Bytes(), sharedSecretA.Length()));
+    EXPECT_EQ(chip::Crypto::DRBG_get_bytes(sharedSecretA.Bytes(), sharedSecretA.Length()), CHIP_NO_ERROR);
     sharedSecretB.SetLength(sharedSecretB.Capacity());
-    NL_TEST_ASSERT(inSuite, CHIP_NO_ERROR == chip::Crypto::DRBG_get_bytes(sharedSecretB.Bytes(), sharedSecretB.Length()));
+    EXPECT_EQ(chip::Crypto::DRBG_get_bytes(sharedSecretB.Bytes(), sharedSecretB.Length()), CHIP_NO_ERROR);
 
     struct
     {
@@ -1029,38 +992,37 @@ void TestCASESession::SessionResumptionStorage(nlTestSuite * inSuite, void * inC
         },
     };
 
-    auto & loopback = ctx.GetLoopback();
+    auto & loopback = GetLoopback();
     for (size_t i = 0; i < sizeof(testVectors) / sizeof(testVectors[0]); ++i)
     {
         auto * pairingCommissioner = chip::Platform::New<CASESession>();
         pairingCommissioner->SetGroupDataProvider(&gCommissionerGroupDataProvider);
         loopback.mSentMessageCount = 0;
-        NL_TEST_ASSERT(inSuite,
-                       gPairingServer.ListenForSessionEstablishment(&ctx.GetExchangeManager(), &ctx.GetSecureSessionManager(),
-                                                                    &gDeviceFabrics, &testVectors[i].responderStorage, nullptr,
-                                                                    &gDeviceGroupDataProvider) == CHIP_NO_ERROR);
-        ExchangeContext * contextCommissioner = ctx.NewUnauthenticatedExchangeToBob(pairingCommissioner);
+        EXPECT_EQ(gPairingServer.ListenForSessionEstablishment(&GetExchangeManager(), &GetSecureSessionManager(), &gDeviceFabrics,
+                                                               &testVectors[i].responderStorage, nullptr,
+                                                               &gDeviceGroupDataProvider),
+                  CHIP_NO_ERROR);
+        ExchangeContext * contextCommissioner = NewUnauthenticatedExchangeToBob(pairingCommissioner);
         auto establishmentReturnVal           = pairingCommissioner->EstablishSession(
-            ctx.GetSecureSessionManager(), &gCommissionerFabrics, ScopedNodeId{ Node01_01, gCommissionerFabricIndex },
+            GetSecureSessionManager(), &gCommissionerFabrics, ScopedNodeId{ Node01_01, gCommissionerFabricIndex },
             contextCommissioner, &testVectors[i].initiatorStorage, nullptr, &delegateCommissioner,
             Optional<ReliableMessageProtocolConfig>::Missing());
-        ServiceEvents(ctx);
-        NL_TEST_ASSERT(inSuite, establishmentReturnVal == CHIP_NO_ERROR);
-        NL_TEST_ASSERT(inSuite, loopback.mSentMessageCount == testVectors[i].expectedSentMessageCount);
-        NL_TEST_ASSERT(inSuite, delegateCommissioner.mNumPairingComplete == i + 1);
+        ServiceEvents();
+        EXPECT_EQ(establishmentReturnVal, CHIP_NO_ERROR);
+        EXPECT_EQ(loopback.mSentMessageCount, testVectors[i].expectedSentMessageCount);
+        EXPECT_EQ(delegateCommissioner.mNumPairingComplete, i + 1);
         SessionHolder & holder = delegateCommissioner.GetSessionHolder();
-        NL_TEST_ASSERT(inSuite, bool(holder));
-        NL_TEST_ASSERT(inSuite, holder->GetPeer() == fabricInfo->GetScopedNodeIdForNode(Node01_01));
+        EXPECT_TRUE(bool(holder));
+        EXPECT_EQ(holder->GetPeer(), fabricInfo->GetScopedNodeIdForNode(Node01_01));
         chip::Platform::Delete(pairingCommissioner);
+        gPairingServer.Shutdown();
     }
 }
 
 #if CONFIG_BUILD_FOR_HOST_UNIT_TEST
-void TestCASESession::SimulateUpdateNOCInvalidatePendingEstablishment(nlTestSuite * inSuite, void * inContext)
+TEST_F_FROM_FIXTURE(TestCASESession, SimulateUpdateNOCInvalidatePendingEstablishment)
 {
-    TestContext & ctx = *reinterpret_cast<TestContext *>(inContext);
-    TemporarySessionManager sessionManager(inSuite, ctx);
-
+    TemporarySessionManager sessionManager(*this);
     TestCASESecurePairingDelegate delegateCommissioner;
     CASESession pairingCommissioner;
     pairingCommissioner.SetGroupDataProvider(&gCommissionerGroupDataProvider);
@@ -1068,70 +1030,65 @@ void TestCASESession::SimulateUpdateNOCInvalidatePendingEstablishment(nlTestSuit
     TestCASESecurePairingDelegate delegateAccessory;
     CASESession pairingAccessory;
 
-    auto & loopback            = ctx.GetLoopback();
+    auto & loopback            = GetLoopback();
     loopback.mSentMessageCount = 0;
 
-    NL_TEST_ASSERT(inSuite,
-                   ctx.GetExchangeManager().RegisterUnsolicitedMessageHandlerForType(Protocols::SecureChannel::MsgType::CASE_Sigma1,
-                                                                                     &pairingAccessory) == CHIP_NO_ERROR);
+    EXPECT_EQ(GetExchangeManager().RegisterUnsolicitedMessageHandlerForType(Protocols::SecureChannel::MsgType::CASE_Sigma1,
+                                                                            &pairingAccessory),
+              CHIP_NO_ERROR);
 
     // In order for all the test iterations below, we need to stop the CASE sigma handshake in the middle such
     // that the CASE session is in the process of being established.
     pairingCommissioner.SetStopSigmaHandshakeAt(MakeOptional(CASESession::State::kSentSigma1));
 
-    ExchangeContext * contextCommissioner = ctx.NewUnauthenticatedExchangeToBob(&pairingCommissioner);
+    ExchangeContext * contextCommissioner = NewUnauthenticatedExchangeToBob(&pairingCommissioner);
 
     pairingAccessory.SetGroupDataProvider(&gDeviceGroupDataProvider);
-    NL_TEST_ASSERT(inSuite,
-                   pairingAccessory.PrepareForSessionEstablishment(
-                       sessionManager, &gDeviceFabrics, nullptr, nullptr, &delegateAccessory, ScopedNodeId(),
-                       Optional<ReliableMessageProtocolConfig>::Missing()) == CHIP_NO_ERROR);
+    EXPECT_EQ(pairingAccessory.PrepareForSessionEstablishment(sessionManager, &gDeviceFabrics, nullptr, nullptr, &delegateAccessory,
+                                                              ScopedNodeId(), Optional<ReliableMessageProtocolConfig>::Missing()),
+              CHIP_NO_ERROR);
 
     gDeviceFabrics.SendUpdateFabricNotificationForTest(gDeviceFabricIndex);
-    ServiceEvents(ctx);
-    NL_TEST_ASSERT(inSuite, delegateAccessory.mNumPairingErrors == 0);
+    ServiceEvents();
+    EXPECT_EQ(delegateAccessory.mNumPairingErrors, 0u);
 
-    NL_TEST_ASSERT(inSuite,
-                   pairingCommissioner.EstablishSession(sessionManager, &gCommissionerFabrics,
-                                                        ScopedNodeId{ Node01_01, gCommissionerFabricIndex }, contextCommissioner,
-                                                        nullptr, nullptr, &delegateCommissioner,
-                                                        Optional<ReliableMessageProtocolConfig>::Missing()) == CHIP_NO_ERROR);
-    ServiceEvents(ctx);
+    EXPECT_EQ(pairingCommissioner.EstablishSession(
+                  sessionManager, &gCommissionerFabrics, ScopedNodeId{ Node01_01, gCommissionerFabricIndex }, contextCommissioner,
+                  nullptr, nullptr, &delegateCommissioner, Optional<ReliableMessageProtocolConfig>::Missing()),
+              CHIP_NO_ERROR);
+    ServiceEvents();
 
     // At this point the CASESession is in the process of establishing. Confirm that there are no errors and there are session
     // has not been established.
-    NL_TEST_ASSERT(inSuite, delegateAccessory.mNumPairingComplete == 0);
-    NL_TEST_ASSERT(inSuite, delegateCommissioner.mNumPairingComplete == 0);
-    NL_TEST_ASSERT(inSuite, delegateAccessory.mNumPairingErrors == 0);
-    NL_TEST_ASSERT(inSuite, delegateCommissioner.mNumPairingErrors == 0);
+    EXPECT_EQ(delegateAccessory.mNumPairingComplete, 0u);
+    EXPECT_EQ(delegateCommissioner.mNumPairingComplete, 0u);
+    EXPECT_EQ(delegateAccessory.mNumPairingErrors, 0u);
+    EXPECT_EQ(delegateCommissioner.mNumPairingErrors, 0u);
 
     // Simulating an update to the Fabric NOC for gCommissionerFabrics fabric table.
     // Confirm that CASESession on commisioner side has reported an error.
     gCommissionerFabrics.SendUpdateFabricNotificationForTest(gCommissionerFabricIndex);
-    ServiceEvents(ctx);
-    NL_TEST_ASSERT(inSuite, delegateAccessory.mNumPairingErrors == 0);
-    NL_TEST_ASSERT(inSuite, delegateCommissioner.mNumPairingErrors == 1);
+    ServiceEvents();
+    EXPECT_EQ(delegateAccessory.mNumPairingErrors, 0u);
+    EXPECT_EQ(delegateCommissioner.mNumPairingErrors, 1u);
 
     // Simulating an update to the Fabric NOC for gDeviceFabrics fabric table.
     // Confirm that CASESession on accessory side has reported an error.
     gDeviceFabrics.SendUpdateFabricNotificationForTest(gDeviceFabricIndex);
-    ServiceEvents(ctx);
-    NL_TEST_ASSERT(inSuite, delegateAccessory.mNumPairingErrors == 1);
-    NL_TEST_ASSERT(inSuite, delegateCommissioner.mNumPairingErrors == 1);
+    ServiceEvents();
+    EXPECT_EQ(delegateAccessory.mNumPairingErrors, 1u);
+    EXPECT_EQ(delegateCommissioner.mNumPairingErrors, 1u);
 
     // Sanity check that pairing did not complete.
-    NL_TEST_ASSERT(inSuite, delegateAccessory.mNumPairingComplete == 0);
-    NL_TEST_ASSERT(inSuite, delegateCommissioner.mNumPairingComplete == 0);
+    EXPECT_EQ(delegateAccessory.mNumPairingComplete, 0u);
+    EXPECT_EQ(delegateCommissioner.mNumPairingComplete, 0u);
 }
 #endif // CONFIG_BUILD_FOR_HOST_UNIT_TEST
 
-namespace {
 class ExpectErrorExchangeDelegate : public ExchangeDelegate
 {
 public:
-    ExpectErrorExchangeDelegate(nlTestSuite * suite, uint16_t expectedProtocolCode) :
-        mSuite(suite), mExpectedProtocolCode(expectedProtocolCode)
-    {}
+    ExpectErrorExchangeDelegate(uint16_t expectedProtocolCode) : mExpectedProtocolCode(expectedProtocolCode) {}
 
 private:
     CHIP_ERROR OnMessageReceived(ExchangeContext * ec, const PayloadHeader & payloadHeader,
@@ -1139,15 +1096,14 @@ private:
     {
         using namespace SecureChannel;
 
-        NL_TEST_ASSERT(mSuite, payloadHeader.HasMessageType(MsgType::StatusReport));
+        EXPECT_TRUE(payloadHeader.HasMessageType(MsgType::StatusReport));
 
         SecureChannel::StatusReport statusReport;
-        CHIP_ERROR err = statusReport.Parse(std::move(buf));
-        NL_TEST_ASSERT(mSuite, err == CHIP_NO_ERROR);
+        EXPECT_EQ(statusReport.Parse(std::move(buf)), CHIP_NO_ERROR);
 
-        NL_TEST_ASSERT(mSuite, statusReport.GetProtocolId() == SecureChannel::Id);
-        NL_TEST_ASSERT(mSuite, statusReport.GetGeneralCode() == GeneralStatusCode::kFailure);
-        NL_TEST_ASSERT(mSuite, statusReport.GetProtocolCode() == mExpectedProtocolCode);
+        EXPECT_EQ(statusReport.GetProtocolId(), SecureChannel::Id);
+        EXPECT_EQ(statusReport.GetGeneralCode(), GeneralStatusCode::kFailure);
+        EXPECT_EQ(statusReport.GetProtocolCode(), mExpectedProtocolCode);
         return CHIP_NO_ERROR;
     }
 
@@ -1155,105 +1111,49 @@ private:
 
     Messaging::ExchangeMessageDispatch & GetMessageDispatch() override { return SessionEstablishmentExchangeDispatch::Instance(); }
 
-    nlTestSuite * mSuite;
     uint16_t mExpectedProtocolCode;
 };
-} // anonymous namespace
 
-void TestCASESession::Sigma1BadDestinationIdTest(nlTestSuite * inSuite, void * inContext)
+TEST_F(TestCASESession, Sigma1BadDestinationIdTest)
 {
     using SecureChannel::MsgType;
 
-    TestContext & ctx = *reinterpret_cast<TestContext *>(inContext);
-
-    SessionManager & sessionManager = ctx.GetSecureSessionManager();
+    SessionManager & sessionManager = GetSecureSessionManager();
 
     constexpr size_t bufferSize     = 600;
     System::PacketBufferHandle data = chip::System::PacketBufferHandle::New(bufferSize);
-    NL_TEST_ASSERT(inSuite, !data.IsNull());
+    ASSERT_FALSE(data.IsNull());
 
     MutableByteSpan buf(data->Start(), data->AvailableDataLength());
     // This uses a bogus destination id that is not going to match anything in practice.
-    CHIP_ERROR err = EncodeSigma1<Sigma1Params>(buf);
-    NL_TEST_ASSERT(inSuite, err == CHIP_NO_ERROR);
+    EXPECT_EQ(EncodeSigma1<Sigma1Params>(buf), CHIP_NO_ERROR);
     data->SetDataLength(static_cast<uint16_t>(buf.size()));
 
-    Optional<SessionHandle> session = sessionManager.CreateUnauthenticatedSession(ctx.GetAliceAddress(), GetDefaultMRPConfig());
-    NL_TEST_ASSERT(inSuite, session.HasValue());
+    Optional<SessionHandle> session = sessionManager.CreateUnauthenticatedSession(GetAliceAddress(), GetDefaultMRPConfig());
+    EXPECT_TRUE(session.HasValue());
 
     TestCASESecurePairingDelegate caseDelegate;
     CASESession caseSession;
     caseSession.SetGroupDataProvider(&gDeviceGroupDataProvider);
-    err = caseSession.PrepareForSessionEstablishment(sessionManager, &gDeviceFabrics, nullptr, nullptr, &caseDelegate,
-                                                     ScopedNodeId(), NullOptional);
-    NL_TEST_ASSERT(inSuite, err == CHIP_NO_ERROR);
+    EXPECT_EQ(caseSession.PrepareForSessionEstablishment(sessionManager, &gDeviceFabrics, nullptr, nullptr, &caseDelegate,
+                                                         ScopedNodeId(), NullOptional),
+              CHIP_NO_ERROR);
 
-    err = ctx.GetExchangeManager().RegisterUnsolicitedMessageHandlerForType(MsgType::CASE_Sigma1, &caseSession);
-    NL_TEST_ASSERT(inSuite, err == CHIP_NO_ERROR);
+    EXPECT_EQ(GetExchangeManager().RegisterUnsolicitedMessageHandlerForType(MsgType::CASE_Sigma1, &caseSession), CHIP_NO_ERROR);
 
-    ExpectErrorExchangeDelegate delegate(inSuite, SecureChannel::kProtocolCodeNoSharedRoot);
-    ExchangeContext * exchange = ctx.GetExchangeManager().NewContext(session.Value(), &delegate);
-    NL_TEST_ASSERT(inSuite, exchange != nullptr);
+    ExpectErrorExchangeDelegate delegate(SecureChannel::kProtocolCodeNoSharedRoot);
+    ExchangeContext * exchange = GetExchangeManager().NewContext(session.Value(), &delegate);
+    ASSERT_NE(exchange, nullptr);
 
-    err = exchange->SendMessage(MsgType::CASE_Sigma1, std::move(data), SendMessageFlags::kExpectResponse);
-    NL_TEST_ASSERT(inSuite, err == CHIP_NO_ERROR);
+    EXPECT_EQ(exchange->SendMessage(MsgType::CASE_Sigma1, std::move(data), SendMessageFlags::kExpectResponse), CHIP_NO_ERROR);
 
-    ServiceEvents(ctx);
+    ServiceEvents();
 
-    NL_TEST_ASSERT(inSuite, caseDelegate.mNumPairingErrors == 1);
-    NL_TEST_ASSERT(inSuite, caseDelegate.mNumPairingComplete == 0);
+    EXPECT_EQ(caseDelegate.mNumPairingErrors, 1u);
+    EXPECT_EQ(caseDelegate.mNumPairingComplete, 0u);
 
-    ctx.GetExchangeManager().UnregisterUnsolicitedMessageHandlerForType(MsgType::CASE_Sigma1);
+    GetExchangeManager().UnregisterUnsolicitedMessageHandlerForType(MsgType::CASE_Sigma1);
     caseSession.Clear();
 }
 
 } // namespace chip
-
-// Test Suite
-
-/**
- *  Test Suite that lists all the test functions.
- */
-// clang-format off
-static const nlTest sTests[] =
-{
-    NL_TEST_DEF("WaitInit",    chip::TestCASESession::SecurePairingWaitTest),
-    NL_TEST_DEF("Start",       chip::TestCASESession::SecurePairingStartTest),
-    NL_TEST_DEF("Handshake",   chip::TestCASESession::SecurePairingHandshakeTest),
-    NL_TEST_DEF("ServerHandshake", chip::TestCASESession::SecurePairingHandshakeServerTest),
-    NL_TEST_DEF("ClientReceivesBusy", chip::TestCASESession::ClientReceivesBusyTest),
-    NL_TEST_DEF("Sigma1Parsing", chip::TestCASESession::Sigma1ParsingTest),
-    NL_TEST_DEF("DestinationId", chip::TestCASESession::DestinationIdTest),
-    NL_TEST_DEF("SessionResumptionStorage", chip::TestCASESession::SessionResumptionStorage),
-#if CONFIG_BUILD_FOR_HOST_UNIT_TEST
-    // This is compiled for host tests which is enough test coverage to ensure updating NOC invalidates
-    // CASESession that are in the process of establishing.
-    NL_TEST_DEF("InvalidatePendingSessionEstablishment", chip::TestCASESession::SimulateUpdateNOCInvalidatePendingEstablishment),
-#endif // CONFIG_BUILD_FOR_HOST_UNIT_TEST
-    NL_TEST_DEF("Sigma1BadDestinationId", chip::TestCASESession::Sigma1BadDestinationIdTest),
-
-    NL_TEST_SENTINEL()
-};
-// clang-format on
-
-// clang-format off
-static nlTestSuite sSuite =
-{
-    "Test-CHIP-SecurePairing-CASE",
-    &sTests[0],
-    TestContext::nlTestSetUpTestSuite,
-    TestContext::nlTestTearDownTestSuite,
-    TestContext::nlTestSetUp,
-    TestContext::nlTestTearDown,
-};
-// clang-format on
-
-/**
- *  Main
- */
-int TestCASESessionTest()
-{
-    return chip::ExecuteTestsWithContext<TestContext>(&sSuite);
-}
-
-CHIP_REGISTER_TEST_SUITE(TestCASESessionTest)

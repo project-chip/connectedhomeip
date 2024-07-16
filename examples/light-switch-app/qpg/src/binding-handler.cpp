@@ -73,7 +73,7 @@ static void LightSwitchChangedHandler(const EmberBindingTableEntry & binding, Op
 
     BindingCommandData * data = static_cast<BindingCommandData *>(context);
 
-    if (binding.type == EMBER_UNICAST_BINDING)
+    if (binding.type == MATTER_UNICAST_BINDING)
     {
         switch (data->clusterId)
         {

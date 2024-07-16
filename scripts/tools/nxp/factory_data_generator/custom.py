@@ -96,11 +96,14 @@ class DacPKey(FileArgument):
         assert (self.private_key is not None)
         return self.private_key
 
-    def generate_private_key(self, password):
-        keys = load_der_private_key(self.val, password, backend=default_backend())
-        self.private_key = keys.private_numbers().private_value.to_bytes(
-            32, byteorder='big'
-        )
+    def generate_private_key(self, password, use_sss_blob=False):
+        if use_sss_blob:
+            self.private_key = self.val
+        else:
+            keys = load_der_private_key(self.val, password, backend=default_backend())
+            self.private_key = keys.private_numbers().private_value.to_bytes(
+                32, byteorder='big'
+            )
 
 
 class DacCert(FileArgument):
@@ -272,6 +275,65 @@ class ProductLabel(StrArgument):
 
     def key(self):
         return 21
+
+    def max_length(self):
+        return 64
+
+
+class ProductFinish(StrArgument):
+
+    VALUES = ["Other", "Matte", "Satin", "Polished", "Rugged", "Fabric"]
+
+    def __init__(self, arg):
+        super().__init__(arg)
+
+    def key(self):
+        return 22
+
+    def length(self):
+        return 1
+
+    def encode(self):
+        val = ""
+        try:
+            val = ProductFinish.VALUES.index(self.val)
+        except Exception:
+            print(f"Error: {self.val} not in {ProductFinish.VALUES}")
+            exit()
+
+        return val.to_bytes(self.length(), "little")
+
+    def max_length(self):
+        return 64
+
+
+class ProductPrimaryColor(StrArgument):
+
+    VALUES = [
+        "Black", "Navy", "Green", "Teal", "Maroon",
+        "Purple", "Olive", "Gray", "Blue", "Lime",
+        "Aqua", "Red", "Fuchsia", "Yellow", "White",
+        "Nickel", "Chrome", "Brass", "Copper", "Silver", "Gold"
+    ]
+
+    def __init__(self, arg):
+        super().__init__(arg)
+
+    def key(self):
+        return 23
+
+    def length(self):
+        return 1
+
+    def encode(self):
+        val = ""
+        try:
+            val = ProductPrimaryColor.VALUES.index(self.val)
+        except Exception:
+            print(f"Error: {self.val} not in {ProductPrimaryColor.VALUES}")
+            exit()
+
+        return val.to_bytes(self.length(), "little")
 
     def max_length(self):
         return 64

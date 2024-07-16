@@ -696,11 +696,24 @@ def main() -> int:
         if options.build_target == "esp32":
             shell.run_cmd(f"cd {_CHEF_SCRIPT_PATH}/esp32")
             if options.enable_ipv4:
-                shell.run_cmd(
-                    "sed -i 's/CONFIG_DISABLE_IPV4=y/#\\ CONFIG_DISABLE_IPV4\\ is\\ not\\ set/g' sdkconfig ")
+                if sys.platform == "darwin":
+                    shell.run_cmd(
+                        "sed -i '' 's/CONFIG_DISABLE_IPV4=y/#\\ CONFIG_DISABLE_IPV4\\ is\\ not\\ set/g' sdkconfig ")
+                else:
+                    shell.run_cmd(
+                        "sed -i 's/CONFIG_DISABLE_IPV4=y/#\\ CONFIG_DISABLE_IPV4\\ is\\ not\\ set/g' sdkconfig ")
             else:
-                shell.run_cmd(
-                    "sed -i 's/#\\ CONFIG_DISABLE_IPV4\\ is\\ not\\ set/CONFIG_DISABLE_IPV4=y/g' sdkconfig ")
+                if sys.platform == "darwin":
+                    shell.run_cmd(
+                        "sed -i '' 's/#\\ CONFIG_DISABLE_IPV4\\ is\\ not\\ set/CONFIG_DISABLE_IPV4=y/g' sdkconfig ")
+                    shell.run_cmd(
+                        "sed -i '' 's/CONFIG_LWIP_IPV4=y/#\\ CONFIG_LWIP_IPV4\\ is\\ not\\ set/g' sdkconfig ")
+                else:
+                    shell.run_cmd(
+                        "sed -i 's/#\\ CONFIG_DISABLE_IPV4\\ is\\ not\\ set/CONFIG_DISABLE_IPV4=y/g' sdkconfig ")
+                    shell.run_cmd(
+                        "sed -i 's/CONFIG_LWIP_IPV4=y/#\\ CONFIG_LWIP_IPV4\\ is\\ not\\ set/g' sdkconfig ")
+
             shell.run_cmd("idf.py build")
             shell.run_cmd("idf.py build flashing_script")
             shell.run_cmd(
@@ -730,7 +743,7 @@ def main() -> int:
             shell.run_cmd(" ".join(nrf_build_cmds))
 
         elif options.build_target == "silabs-thread":
-            shell.run_cmd(f"cd {_CHEF_SCRIPT_PATH}/efr32")
+            shell.run_cmd(f"cd {_CHEF_SCRIPT_PATH}/silabs")
             if options.do_clean:
                 shell.run_cmd(f"rm -rf out/{options.sample_device_type_name}")
             efr32_cmd_args = []
@@ -801,6 +814,8 @@ def main() -> int:
                 'import("${chip_root}/config/standalone/args.gni")',
                 'chip_shell_cmd_server = false',
                 'chip_build_libshell = true',
+                'chip_enable_openthread = false',
+                'chip_generate_link_map_file = true',
                 'chip_config_network_layer_ble = false',
                 'chip_device_project_config_include = "<CHIPProjectAppConfig.h>"',
                 'chip_project_config_include = "<CHIPProjectAppConfig.h>"',
@@ -867,7 +882,7 @@ def main() -> int:
                         """))
             if options.do_clean:
                 shell.run_cmd("rm -rf out")
-            shell.run_cmd("gn gen out")
+            shell.run_cmd("gn gen --export-compile-commands out")
             shell.run_cmd("ninja -C out")
 
     #

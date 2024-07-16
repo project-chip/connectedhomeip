@@ -30,39 +30,40 @@ tests:
       verification: |
           Product maker needs to provide instructions for how to trigger the command on the DUT. For comparison, the DUT behavior for this test step can be simulated using chip-tool (when DUT is a commissioner) or tv-casting-app (when DUT is a commissionee):
 
-          ./chip-tool mediaplayback  activate-audio-track  1 2 1 1
+          ./chip-tool mediaplayback activate-audio-track activeAudioTrackId_1 0 1 3
 
           On TH (tv-app), Verify the  ActivateAudioTrack command is received successfully.
-
-          [1705561368.453512][4597:4597] CHIP:EM: Handling via exchange: 56290r, Delegate: 0xaaaad1391778
-          [1705561368.453660][4597:4597] CHIP:DMG: InvokeRequestMessage =
-          [1705561368.453721][4597:4597] CHIP:DMG: {
-          [1705561368.453772][4597:4597] CHIP:DMG: 	suppressResponse = false,
-          [1705561368.453833][4597:4597] CHIP:DMG: 	timedRequest = false,
-          [1705561368.453890][4597:4597] CHIP:DMG: 	InvokeRequests =
-          [1705561368.453995][4597:4597] CHIP:DMG: 	[
-          [1705561368.454052][4597:4597] CHIP:DMG: 		CommandDataIB =
-          [1705561368.454139][4597:4597] CHIP:DMG: 		{
-          [1705561368.454200][4597:4597] CHIP:DMG: 			CommandPathIB =
-          [1705561368.454273][4597:4597] CHIP:DMG: 			{
-          [1705561368.454367][4597:4597] CHIP:DMG: 				EndpointId = 0x1,
-          [1705561368.454442][4597:4597] CHIP:DMG: 				ClusterId = 0x506,
-          [1705561368.454536][4597:4597] CHIP:DMG: 				CommandId = 0xc,
-          [1705561368.454610][4597:4597] CHIP:DMG: 			},
-          [1705561368.454721][4597:4597] CHIP:DMG:
-          [1705561368.454807][4597:4597] CHIP:DMG: 			CommandFields =
-          [1705561368.454879][4597:4597] CHIP:DMG: 			{
-          [1705561368.454976][4597:4597] CHIP:DMG: 				0x0 = "1" (1 chars),
-          [1705561368.455055][4597:4597] CHIP:DMG: 				0x1 = 2,
-          [1705561368.455130][4597:4597] CHIP:DMG: 			},
-          [1705561368.455195][4597:4597] CHIP:DMG: 		},
-          [1705561368.455297][4597:4597] CHIP:DMG:
-          [1705561368.455354][4597:4597] CHIP:DMG: 	],
-          [1705561368.455447][4597:4597] CHIP:DMG:
-          [1705561368.455504][4597:4597] CHIP:DMG: 	InteractionModelRevision = 11
-          [1705561368.455559][4597:4597] CHIP:DMG: },
-          [1705561368.455805][4597:4597] CHIP:DMG: AccessControl: checking f=2 a=c s=0x000000000001B669 t= c=0x0000_0506 e=1 p=o
-          [1705561368.455903][4597:4597] CHIP:DMG: AccessControl: allowed
+          [1706092346.813652][4555:4555] CHIP:EM: Handling via exchange: 39139r, Delegate: 0xaaaaabf7a7c8
+          [1706092346.813745][4555:4555] CHIP:DMG: InvokeRequestMessage =
+          [1706092346.813775][4555:4555] CHIP:DMG: {
+          [1706092346.813800][4555:4555] CHIP:DMG:         suppressResponse = false,
+          [1706092346.813829][4555:4555] CHIP:DMG:         timedRequest = false,
+          [1706092346.813857][4555:4555] CHIP:DMG:         InvokeRequests =
+          [1706092346.813892][4555:4555] CHIP:DMG:         [
+          [1706092346.813919][4555:4555] CHIP:DMG:                 CommandDataIB =
+          [1706092346.813949][4555:4555] CHIP:DMG:                 {
+          [1706092346.813975][4555:4555] CHIP:DMG:                         CommandPathIB =
+          [1706092346.814004][4555:4555] CHIP:DMG:                         {
+          [1706092346.814041][4555:4555] CHIP:DMG:                                 EndpointId = 0x3,
+          [1706092346.814077][4555:4555] CHIP:DMG:                                 ClusterId = 0x506,
+          [1706092346.814111][4555:4555] CHIP:DMG:                                 CommandId = 0xc,
+          [1706092346.814145][4555:4555] CHIP:DMG:                         },
+          [1706092346.814179][4555:4555] CHIP:DMG:
+          [1706092346.814209][4555:4555] CHIP:DMG:                         CommandFields =
+          [1706092346.814242][4555:4555] CHIP:DMG:                         {
+          [1706092346.814278][4555:4555] CHIP:DMG:                                 0x0 = "activeAudioTrackId_1" (20 chars),
+          [1706092346.814316][4555:4555] CHIP:DMG:                                 0x1 = 0,
+          [1706092346.814351][4555:4555] CHIP:DMG:                         },
+          [1706092346.814382][4555:4555] CHIP:DMG:                 },
+          [1706092346.814417][4555:4555] CHIP:DMG:
+          [1706092346.814443][4555:4555] CHIP:DMG:         ],
+          [1706092346.814476][4555:4555] CHIP:DMG:
+          [1706092346.814502][4555:4555] CHIP:DMG:         InteractionModelRevision = 11
+          [1706092346.814527][4555:4555] CHIP:DMG: },
+          [1706092346.814651][4555:4555] CHIP:DMG: AccessControl: checking f=2 a=c s=0x000000000001B669 t= c=0x0000_0506 e=3 p=o
+          [1706092346.814692][4555:4555] CHIP:DMG: AccessControl: allowed
+          [1706092346.814776][4555:4555] CHIP:DMG: Received command for Endpoint=3 Cluster=0x0000_0506 Command=0x0000_000C
+          [1706092346.814824][4555:4555] CHIP:DL: GetContentAppByEndpointId() - endpoint 3 not found
       disabled: true
 
     - label: "Step 2: DUT sends ActivateTextTrack command to TH"
@@ -70,38 +71,42 @@ tests:
       verification: |
           Product maker needs to provide instructions for how to trigger the command on the DUT. For comparison, the DUT behavior for this test step can be simulated using chip-tool (when DUT is a commissioner) or tv-casting-app (when DUT is a commissionee):
 
-           ./chip-tool mediaplayback  activate-text-track 1 1 1
+          ./chip-tool mediaplayback activate-text-track activeTextTrackId_1 1 3
 
           On TH (tv-app), Verify the ActivateTextTrack command is received successfully.
 
-          [1705561407.549846][4597:4597] CHIP:EM: Handling via exchange: 12272r, Delegate: 0xaaaad1391778
-          [1705561407.549918][4597:4597] CHIP:DMG: InvokeRequestMessage =
-          [1705561407.549942][4597:4597] CHIP:DMG: {
-          [1705561407.549961][4597:4597] CHIP:DMG: 	suppressResponse = false,
-          [1705561407.549999][4597:4597] CHIP:DMG: 	timedRequest = false,
-          [1705561407.550020][4597:4597] CHIP:DMG: 	InvokeRequests =
-          [1705561407.550048][4597:4597] CHIP:DMG: 	[
-          [1705561407.550069][4597:4597] CHIP:DMG: 		CommandDataIB =
-          [1705561407.550103][4597:4597] CHIP:DMG: 		{
-          [1705561407.550125][4597:4597] CHIP:DMG: 			CommandPathIB =
-          [1705561407.550162][4597:4597] CHIP:DMG: 			{
-          [1705561407.550190][4597:4597] CHIP:DMG: 				EndpointId = 0x1,
-          [1705561407.550227][4597:4597] CHIP:DMG: 				ClusterId = 0x506,
-          [1705561407.550255][4597:4597] CHIP:DMG: 				CommandId = 0xd,
-          [1705561407.550290][4597:4597] CHIP:DMG: 			},
-          [1705561407.550319][4597:4597] CHIP:DMG:
-          [1705561407.550342][4597:4597] CHIP:DMG: 			CommandFields =
-          [1705561407.550379][4597:4597] CHIP:DMG: 			{
-          [1705561407.550409][4597:4597] CHIP:DMG: 				0x0 = "1" (1 chars),
-          [1705561407.550446][4597:4597] CHIP:DMG: 			},
-          [1705561407.550470][4597:4597] CHIP:DMG: 		},
-          [1705561407.550504][4597:4597] CHIP:DMG:
-          [1705561407.550526][4597:4597] CHIP:DMG: 	],
-          [1705561407.550553][4597:4597] CHIP:DMG:
-          [1705561407.550584][4597:4597] CHIP:DMG: 	InteractionModelRevision = 11
-          [1705561407.550605][4597:4597] CHIP:DMG: },
-          [1705561407.550765][4597:4597] CHIP:DMG: AccessControl: checking f=2 a=c s=0x000000000001B669 t= c=0x0000_0506 e=1 p=o
-          [1705561407.550811][4597:4597] CHIP:DMG: AccessControl: allowed
+          [1706092322.174823][4555:4555] CHIP:EM: Handling via exchange: 27897r, Delegate: 0xaaaaabf7a7c8
+          [1706092322.174908][4555:4555] CHIP:DMG: InvokeRequestMessage =
+          [1706092322.174936][4555:4555] CHIP:DMG: {
+          [1706092322.174956][4555:4555] CHIP:DMG:         suppressResponse = false,
+          [1706092322.174981][4555:4555] CHIP:DMG:         timedRequest = false,
+          [1706092322.175002][4555:4555] CHIP:DMG:         InvokeRequests =
+          [1706092322.175030][4555:4555] CHIP:DMG:         [
+          [1706092322.175051][4555:4555] CHIP:DMG:                 CommandDataIB =
+          [1706092322.175077][4555:4555] CHIP:DMG:                 {
+          [1706092322.175101][4555:4555] CHIP:DMG:                         CommandPathIB =
+          [1706092322.175128][4555:4555] CHIP:DMG:                         {
+          [1706092322.175156][4555:4555] CHIP:DMG:                                 EndpointId = 0x3,
+          [1706092322.175184][4555:4555] CHIP:DMG:                                 ClusterId = 0x506,
+          [1706092322.175212][4555:4555] CHIP:DMG:                                 CommandId = 0xd,
+          [1706092322.175239][4555:4555] CHIP:DMG:                         },
+          [1706092322.175267][4555:4555] CHIP:DMG:
+          [1706092322.175291][4555:4555] CHIP:DMG:                         CommandFields =
+          [1706092322.175317][4555:4555] CHIP:DMG:                         {
+          [1706092322.175347][4555:4555] CHIP:DMG:                                 0x0 = "activeTextTrackId_1" (19 chars),
+          [1706092322.175376][4555:4555] CHIP:DMG:                         },
+          [1706092322.175401][4555:4555] CHIP:DMG:                 },
+          [1706092322.175428][4555:4555] CHIP:DMG:
+          [1706092322.175448][4555:4555] CHIP:DMG:         ],
+          [1706092322.175475][4555:4555] CHIP:DMG:
+          [1706092322.175496][4555:4555] CHIP:DMG:         InteractionModelRevision = 11
+          [1706092322.175517][4555:4555] CHIP:DMG: },
+          [1706092322.175618][4555:4555] CHIP:DMG: AccessControl: checking f=2 a=c s=0x000000000001B669 t= c=0x0000_0506 e=3 p=o
+          [1706092322.175653][4555:4555] CHIP:DMG: AccessControl: allowed
+          [1706092322.175678][4555:4555] CHIP:DMG: Received command for Endpoint=3 Cluster=0x0000_0506 Command=0x0000_000D
+          [1706092322.175713][4555:4555] CHIP:DL: GetContentAppByEndpointId() - endpoint 3 not found
+          [1706092322.175733][4555:4555] CHIP:ZCL: MediaPlayback NOT returning ContentApp delegate for endpoint:3
+          [1706092322.175784][4555:4555] CHIP:DMG: Command handler moving to [NewRespons]
       disabled: true
 
     - label: "Step 1: DUT sends DeactivateTextTrack command to TH"
@@ -109,35 +114,34 @@ tests:
       verification: |
           Product maker needs to provide instructions for how to trigger the command on the DUT. For comparison, the DUT behavior for this test step can be simulated using chip-tool (when DUT is a commissioner) or tv-casting-app (when DUT is a commissionee):
 
-          ./chip-tool mediaplayback deactivate-text-track 1 1
+          ./chip-tool mediaplayback deactivate-text-track 1 3
 
           On TH (tv-app), Verify the DeactivateTextTrack command is received successfully.
-
-          [1705561431.594454][4597:4597] CHIP:EM: Handling via exchange: 47051r, Delegate: 0xaaaad1391778
-          [1705561431.594534][4597:4597] CHIP:DMG: InvokeRequestMessage =
-          [1705561431.594564][4597:4597] CHIP:DMG: {
-          [1705561431.594588][4597:4597] CHIP:DMG:         suppressResponse = false,
-          [1705561431.594689][4597:4597] CHIP:DMG:         timedRequest = false,
-          [1705561431.594718][4597:4597] CHIP:DMG:         InvokeRequests =
-          [1705561431.594764][4597:4597] CHIP:DMG:         [
-          [1705561431.594791][4597:4597] CHIP:DMG:                 CommandDataIB =
-          [1705561431.594821][4597:4597] CHIP:DMG:                 {
-          [1705561431.594848][4597:4597] CHIP:DMG:                         CommandPathIB =
-          [1705561431.594891][4597:4597] CHIP:DMG:                         {
-          [1705561431.594931][4597:4597] CHIP:DMG:                                 EndpointId = 0x1,
-          [1705561431.594978][4597:4597] CHIP:DMG:                                 ClusterId = 0x506,
-          [1705561431.595013][4597:4597] CHIP:DMG:                                 CommandId = 0xe,
-          [1705561431.595056][4597:4597] CHIP:DMG:                         },
-          [1705561431.595092][4597:4597] CHIP:DMG:
-          [1705561431.595130][4597:4597] CHIP:DMG:                         CommandFields =
-          [1705561431.595164][4597:4597] CHIP:DMG:                         {
-          [1705561431.595196][4597:4597] CHIP:DMG:                         },
-          [1705561431.595235][4597:4597] CHIP:DMG:                 },
-          [1705561431.595271][4597:4597] CHIP:DMG:
-          [1705561431.595297][4597:4597] CHIP:DMG:         ],
-          [1705561431.595341][4597:4597] CHIP:DMG:
-          [1705561431.595367][4597:4597] CHIP:DMG:         InteractionModelRevision = 11
-          [1705561431.595403][4597:4597] CHIP:DMG: },
-          [1705561431.595522][4597:4597] CHIP:DMG: AccessControl: checking f=2 a=c s=0x000000000001B669 t= c=0x0000_0506 e=1 p=o
-          [1705561431.595573][4597:4597] CHIP:DMG: AccessControl: allowed
+          [1706092292.772177][4555:4555] CHIP:DMG: InvokeRequestMessage =
+          [1706092292.772202][4555:4555] CHIP:DMG: {
+          [1706092292.772221][4555:4555] CHIP:DMG:         suppressResponse = false,
+          [1706092292.772242][4555:4555] CHIP:DMG:         timedRequest = false,
+          [1706092292.772262][4555:4555] CHIP:DMG:         InvokeRequests =
+          [1706092292.772287][4555:4555] CHIP:DMG:         [
+          [1706092292.772306][4555:4555] CHIP:DMG:                 CommandDataIB =
+          [1706092292.772330][4555:4555] CHIP:DMG:                 {
+          [1706092292.772351][4555:4555] CHIP:DMG:                         CommandPathIB =
+          [1706092292.772376][4555:4555] CHIP:DMG:                         {
+          [1706092292.772401][4555:4555] CHIP:DMG:                                 EndpointId = 0x3,
+          [1706092292.772428][4555:4555] CHIP:DMG:                                 ClusterId = 0x506,
+          [1706092292.772453][4555:4555] CHIP:DMG:                                 CommandId = 0xe,
+          [1706092292.772477][4555:4555] CHIP:DMG:                         },
+          [1706092292.772503][4555:4555] CHIP:DMG:
+          [1706092292.772524][4555:4555] CHIP:DMG:                         CommandFields =
+          [1706092292.772547][4555:4555] CHIP:DMG:                         {
+          [1706092292.772571][4555:4555] CHIP:DMG:                         },
+          [1706092292.772592][4555:4555] CHIP:DMG:                 },
+          [1706092292.772615][4555:4555] CHIP:DMG:
+          [1706092292.772634][4555:4555] CHIP:DMG:         ],
+          [1706092292.772657][4555:4555] CHIP:DMG:
+          [1706092292.772675][4555:4555] CHIP:DMG:         InteractionModelRevision = 11
+          [1706092292.772694][4555:4555] CHIP:DMG: },
+          [1706092292.772782][4555:4555] CHIP:DMG: AccessControl: checking f=2 a=c s=0x000000000001B669 t= c=0x0000_0506 e=3 p=o
+          [1706092292.772814][4555:4555] CHIP:DMG: AccessControl: allowed
+          [1706092292.772837][4555:4555] CHIP:DMG: Received command for Endpoint=3 Cluster=0x0000_0506 Command=0x0000_000E
       disabled: true

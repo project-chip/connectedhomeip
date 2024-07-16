@@ -148,13 +148,6 @@ enum PublicEventTypes
     kTimeSyncChange,
 
     /**
-     * SED Interval Change
-     *
-     * Signals a change to the sleepy end device interval.
-     */
-    kICDPollingIntervalChange,
-
-    /**
      * CHIPoBLE Connection Established
      *
      * Signals that an external entity has established a new CHIPoBLE connection with the device.
@@ -176,9 +169,10 @@ enum PublicEventTypes
 
     /**
      * When supportsConcurrentConnection = False, the ConnectNetwork command cannot start until
-     * the BLE device is closed and the WiFi device has been started.
+     * the BLE device is closed and the Operation Network device (e.g. WiFi) has been started.
      */
     kWiFiDeviceAvailable,
+    kOperationalNetworkStarted,
 
     /**
      * Thread State Change
@@ -251,6 +245,16 @@ enum PublicEventTypes
      * sending messages to other nodes.
      */
     kServerReady,
+
+    /**
+     * Signals that BLE is deinitialized.
+     */
+    kBLEDeinitialized,
+
+    /**
+     * Signals that secure session is established.
+     */
+    kSecureSessionEstablished,
 };
 
 /**
@@ -375,7 +379,7 @@ typedef void (*AsyncWorkFunct)(intptr_t arg);
 #include CHIPDEVICEPLATFORMEVENT_HEADER
 #endif // defined(CHIP_DEVICE_LAYER_TARGET)
 
-#include <ble/BleConfig.h>
+#include <ble/Ble.h>
 #include <inet/InetInterface.h>
 #include <lib/support/LambdaBridge.h>
 #include <system/SystemEvent.h>
@@ -526,16 +530,6 @@ struct ChipDeviceEvent final
 
         struct
         {
-            bool armed;
-        } FailSafeState;
-
-        struct
-        {
-            bool open;
-        } CommissioningWindowStatus;
-
-        struct
-        {
             // TODO(cecille): This should just specify wifi or thread since we assume at most 1.
             int network;
         } OperationalNetwork;
@@ -544,9 +538,17 @@ struct ChipDeviceEvent final
         {
             OtaState newState;
         } OtaStateChanged;
+
+        struct
+        {
+            uint64_t PeerNodeId;
+            uint8_t FabricIndex;
+            uint8_t SecureSessionType;
+            uint8_t TransportType;
+            uint16_t LocalSessionId;
+        } SecureSessionEstablished;
     };
 
-    void Clear() { memset(this, 0, sizeof(*this)); }
     bool IsPublic() const { return DeviceEventType::IsPublic(Type); }
     bool IsInternal() const { return DeviceEventType::IsInternal(Type); }
     bool IsPlatformSpecific() const { return DeviceEventType::IsPlatformSpecific(Type); }

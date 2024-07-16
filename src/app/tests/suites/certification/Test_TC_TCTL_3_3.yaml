@@ -101,7 +101,7 @@ tests:
           Operate device such that a temperature level cannot be accepted
       cluster: "LogCommands"
       command: "UserPrompt"
-      PICS: PICS_USER_PROMPT && TCTL.S.M.SupportsInvalidInMode
+      PICS: PICS_USER_PROMPT && TCTL.S.M.SupportsInvalidInState
       arguments:
           values:
               - name: "message"
@@ -111,7 +111,7 @@ tests:
 
     - label:
           "Step 7: TH sends command SetTemperatureCommand with an invalid value"
-      PICS: TCTL.S.C00.Rsp && TCTL.S.M.SupportsInvalidInMode
+      PICS: TCTL.S.C00.Rsp && TCTL.S.M.SupportsInvalidInState
       command: "SetTemperature"
       arguments:
           values:
@@ -121,7 +121,7 @@ tests:
           error: CONSTRAINT_ERROR
 
     - label: "Wait for 5s"
-      PICS: TCTL.S.C00.Rsp && TCTL.S.M.SupportsInvalidInMode
+      PICS: TCTL.S.C00.Rsp && TCTL.S.M.SupportsInvalidInState
       cluster: "DelayCommands"
       command: "WaitForMs"
       arguments:
@@ -131,7 +131,7 @@ tests:
 
     - label:
           "Step 8: TH reads from the DUT the SelectedTemperatureLevel attribute"
-      PICS: TCTL.S.A0004 && TCTL.S.M.SupportsInvalidInMode
+      PICS: TCTL.S.A0004 && TCTL.S.M.SupportsInvalidInState
       command: "readAttribute"
       attribute: "SelectedTemperatureLevel"
       response:

@@ -17,8 +17,6 @@
 
 #include "occupancy-sensor-server.h"
 
-#include <app/util/af.h>
-
 #include <app-common/zap-generated/attributes/Accessors.h>
 
 #include "occupancy-hal.h"

@@ -149,9 +149,9 @@ class NetworkCommissioningTests:
 
         # Scan networks
         logger.info("Scan networks")
-        req = Clusters.NetworkCommissioning.Commands.ScanNetworks(
-            ssid=b'', breadcrumb=self.with_breadcrumb())
+        req = Clusters.NetworkCommissioning.Commands.ScanNetworks(breadcrumb=self.with_breadcrumb())
         interactionTimeoutMs = self._devCtrl.ComputeRoundTripTimeout(self._nodeid, upperLayerProcessingTimeoutMs=30000)
+        logger.info(f"Request: {req}")
         res = await self._devCtrl.SendCommand(
             nodeid=self._nodeid,
             endpoint=endpointId,
@@ -309,8 +309,8 @@ class NetworkCommissioningTests:
 
         # Scan networks
         logger.info("Scan networks")
-        req = Clusters.NetworkCommissioning.Commands.ScanNetworks(
-            ssid=b'', breadcrumb=self.with_breadcrumb())
+        req = Clusters.NetworkCommissioning.Commands.ScanNetworks(breadcrumb=self.with_breadcrumb())
+        logger.info(f"Request: {req}")
         interactionTimeoutMs = self._devCtrl.ComputeRoundTripTimeout(self._nodeid, upperLayerProcessingTimeoutMs=30000)
         res = await self._devCtrl.SendCommand(nodeid=self._nodeid,
                                               endpoint=endpointId,

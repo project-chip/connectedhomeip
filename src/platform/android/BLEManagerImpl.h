@@ -23,9 +23,9 @@
 
 #pragma once
 
+#include <ble/Ble.h>
 #include <jni.h>
-
-#include <ble/BleLayer.h>
+#include <lib/support/JniReferences.h>
 #include <platform/internal/BLEManager.h>
 
 #if CHIP_DEVICE_CONFIG_ENABLE_CHIPOBLE
@@ -82,10 +82,6 @@ private:
                         System::PacketBufferHandle pBuf) override;
     bool SendWriteRequest(BLE_CONNECTION_OBJECT conId, const Ble::ChipBleUUID * svcId, const Ble::ChipBleUUID * charId,
                           System::PacketBufferHandle pBuf) override;
-    bool SendReadRequest(BLE_CONNECTION_OBJECT conId, const Ble::ChipBleUUID * svcId, const Ble::ChipBleUUID * charId,
-                         System::PacketBufferHandle pBuf) override;
-    bool SendReadResponse(BLE_CONNECTION_OBJECT conId, BLE_READ_REQUEST_CONTEXT requestContext, const Ble::ChipBleUUID * svcId,
-                          const Ble::ChipBleUUID * charId) override;
 
     // ===== Members that implement virtual methods on BleApplicationDelegate.
 
@@ -124,7 +120,7 @@ private:
     CHIP_ERROR HasFlag(Flags flag, bool & has);
     CHIP_ERROR SetFlag(Flags flag, bool isSet);
 
-    jobject mBLEManagerObject = nullptr;
+    chip::JniGlobalReference mBLEManagerObject;
 
     jmethodID mInitMethod    = nullptr;
     jmethodID mSetFlagMethod = nullptr;

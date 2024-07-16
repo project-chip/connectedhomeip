@@ -22,7 +22,6 @@
 #include "pigweed/RpcService.h"
 
 #include "pw_hdlc/rpc_channel.h"
-#include "pw_hdlc/rpc_packets.h"
 #include "pw_rpc/server.h"
 #include "pw_stream/sys_io_stream.h"
 #include "pw_sys_io/sys_io.h"

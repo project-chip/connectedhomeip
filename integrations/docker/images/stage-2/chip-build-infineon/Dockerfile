@@ -4,13 +4,23 @@ LABEL org.opencontainers.image.source https://github.com/project-chip/connectedh
 
 # ------------------------------------------------------------------------------
 # Install prerequisites
-RUN apt update -y \
-    && apt install -y curl git make file libglib2.0-0 libusb-1.0-0 libncurses5 sudo \
-    && apt clean
+RUN set -x \
+    && apt-get update \
+    && DEBIAN_FRONTEND=noninteractive apt-get install -fy --fix-missing --no-install-recommends \
+    curl \
+    git \
+    make \
+    file \
+    libglib2.0-0 \
+    libusb-1.0-0 sudo \
+    && rm -rf /var/lib/apt/lists/ \
+    && : # last line
 
 # ------------------------------------------------------------------------------
 # Download and extract ModusToolbox 2.3
-RUN curl --fail --location --silent --show-error https://itoolspriv.infineon.com/itbhs/api/packages/com.ifx.tb.tool.modustoolbox/Versions/2.4.0.5972-public/artifacts/ModusToolbox_2.4.0.5972-linux-install.tar.gz/download?noredirect -o /tmp/ModusToolbox_2.4.0.5972-linux-install.tar.gz \
+RUN curl --fail --location --show-error \
+    https://itoolspriv.infineon.com/itbhs/api/packages/com.ifx.tb.tool.modustoolbox/Versions/2.4.0.5972-public/artifacts/ModusToolbox_2.4.0.5972-linux-install.tar.gz/download?noredirect \
+    -o /tmp/ModusToolbox_2.4.0.5972-linux-install.tar.gz \
     && tar -C /opt -zxf /tmp/ModusToolbox_2.4.0.5972-linux-install.tar.gz \
     && rm /tmp/ModusToolbox_2.4.0.5972-linux-install.tar.gz
 

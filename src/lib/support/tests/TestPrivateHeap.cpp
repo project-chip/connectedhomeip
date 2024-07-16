@@ -16,12 +16,12 @@
  *    limitations under the License.
  */
 
-#include <lib/support/PrivateHeap.h>
-#include <lib/support/UnitTestRegistration.h>
-
 #include <string.h>
 
-#include <nlunit-test.h>
+#include <pw_unit_test/framework.h>
+
+#include <lib/core/StringBuilderAdapters.h>
+#include <lib/support/PrivateHeap.h>
 
 namespace {
 
@@ -47,14 +47,14 @@ private:
     } mHeap;
 };
 
-void SingleHeapAllocAndFree(nlTestSuite * inSuite, void * inContext)
+TEST(TestPrivateHeap, TestSingleHeapAllocAndFree)
 {
     PrivateHeapAllocator<16 + 2 * kBlockHeaderSize> allocator;
 
-    NL_TEST_ASSERT(inSuite, nullptr == allocator.HeapAlloc(17)); // insufficient size
+    EXPECT_EQ(nullptr, allocator.HeapAlloc(17)); // insufficient size
     void * ptr = allocator.HeapAlloc(16);
-    NL_TEST_ASSERT(inSuite, nullptr != ptr);
-    NL_TEST_ASSERT(inSuite, nullptr == allocator.HeapAlloc(1)); // insufficient size
+    ASSERT_NE(nullptr, ptr);
+    EXPECT_EQ(nullptr, allocator.HeapAlloc(1)); // insufficient size
     memset(ptr, 0xab, 16);
     allocator.HeapFree(ptr);
 
@@ -62,25 +62,25 @@ void SingleHeapAllocAndFree(nlTestSuite * inSuite, void * inContext)
     for (size_t i = 1; i < 17; ++i)
     {
         ptr = allocator.HeapAlloc(i);
-        NL_TEST_ASSERT(inSuite, nullptr != ptr);
-        NL_TEST_ASSERT(inSuite, nullptr == allocator.HeapAlloc(17 - i)); // insufficient size
+        ASSERT_NE(nullptr, ptr);
+        EXPECT_EQ(nullptr, allocator.HeapAlloc(17 - i)); // insufficient size
         allocator.HeapFree(ptr);
     }
 }
 
-void SplitHeapAllocAndFree(nlTestSuite * inSuite, void * inContext)
+TEST(TestPrivateHeap, TestSplitHeapAllocAndFree)
 {
     PrivateHeapAllocator<128> allocator;
     // allocator state:
     // <HDR-FREE> 96 <HDR-END>
 
     void * p1 = allocator.HeapAlloc(30);
-    NL_TEST_ASSERT(inSuite, nullptr != p1);
+    ASSERT_NE(nullptr, p1);
     // allocator state:
     // <HDR-IN_USE> 32 <HRD-FREE> 48 <HDR-END>
 
     void * p2 = allocator.HeapAlloc(4);
-    NL_TEST_ASSERT(inSuite, nullptr != p2);
+    ASSERT_NE(nullptr, p2);
     // allocator state:
     // <HDR-IN_USE> 32 <HRD-IN_USE> 8 <HDR-FREE> 24 <HDR-END>
 
@@ -93,20 +93,20 @@ void SplitHeapAllocAndFree(nlTestSuite * inSuite, void * inContext)
     // <HDR-FREE> 96 <HDR-END>
 
     p1 = allocator.HeapAlloc(90);
-    NL_TEST_ASSERT(inSuite, nullptr != p1);
+    ASSERT_NE(nullptr, p1);
     allocator.HeapFree(p1);
 }
 
-void FreeMergeNext(nlTestSuite * inSuite, void * inContext)
+TEST(TestPrivateHeap, TestFreeMergeNext)
 {
     PrivateHeapAllocator<5 * 16> allocator;
 
     void * p1 = allocator.HeapAlloc(16);
     void * p2 = allocator.HeapAlloc(16);
 
-    NL_TEST_ASSERT(inSuite, nullptr != p1);
-    NL_TEST_ASSERT(inSuite, nullptr != p2);
-    NL_TEST_ASSERT(inSuite, nullptr == allocator.HeapAlloc(1));
+    ASSERT_NE(nullptr, p1);
+    ASSERT_NE(nullptr, p2);
+    EXPECT_EQ(nullptr, allocator.HeapAlloc(1));
 
     memset(p1, 0xab, 16);
     memset(p2, 0xcd, 16);
@@ -116,20 +116,20 @@ void FreeMergeNext(nlTestSuite * inSuite, void * inContext)
     allocator.HeapFree(p2);
 
     p1 = allocator.HeapAlloc(3 * 16);
-    NL_TEST_ASSERT(inSuite, nullptr != p1);
+    ASSERT_NE(nullptr, p1);
     allocator.HeapFree(p1);
 }
 
-void FreeMergePrevious(nlTestSuite * inSuite, void * inContext)
+TEST(TestPrivateHeap, TestFreeMergePrevious)
 {
     PrivateHeapAllocator<5 * 16> allocator;
 
     void * p1 = allocator.HeapAlloc(16);
     void * p2 = allocator.HeapAlloc(16);
 
-    NL_TEST_ASSERT(inSuite, nullptr != p1);
-    NL_TEST_ASSERT(inSuite, nullptr != p2);
-    NL_TEST_ASSERT(inSuite, nullptr == allocator.HeapAlloc(1));
+    ASSERT_NE(nullptr, p1);
+    ASSERT_NE(nullptr, p2);
+    EXPECT_EQ(nullptr, allocator.HeapAlloc(1));
 
     memset(p1, 0xab, 16);
     memset(p2, 0xcd, 16);
@@ -138,11 +138,11 @@ void FreeMergePrevious(nlTestSuite * inSuite, void * inContext)
     allocator.HeapFree(p2);
     allocator.HeapFree(p1);
     p1 = allocator.HeapAlloc(3 * 16);
-    NL_TEST_ASSERT(inSuite, nullptr != p1);
+    ASSERT_NE(nullptr, p1);
     allocator.HeapFree(p1);
 }
 
-void FreeMergePreviousAndNext(nlTestSuite * inSuite, void * inContext)
+TEST(TestPrivateHeap, TestFreeMergePreviousAndNext)
 {
 
     PrivateHeapAllocator<7 * 16> allocator;
@@ -151,10 +151,10 @@ void FreeMergePreviousAndNext(nlTestSuite * inSuite, void * inContext)
     void * p2 = allocator.HeapAlloc(16);
     void * p3 = allocator.HeapAlloc(16);
 
-    NL_TEST_ASSERT(inSuite, nullptr != p1);
-    NL_TEST_ASSERT(inSuite, nullptr != p2);
-    NL_TEST_ASSERT(inSuite, nullptr != p3);
-    NL_TEST_ASSERT(inSuite, nullptr == allocator.HeapAlloc(1));
+    ASSERT_NE(nullptr, p1);
+    ASSERT_NE(nullptr, p2);
+    ASSERT_NE(nullptr, p3);
+    EXPECT_EQ(nullptr, allocator.HeapAlloc(1));
 
     memset(p1, 0xab, 16);
     memset(p2, 0xcd, 16);
@@ -163,16 +163,16 @@ void FreeMergePreviousAndNext(nlTestSuite * inSuite, void * inContext)
     allocator.HeapFree(p1);
     allocator.HeapFree(p3);
     // we have 2 slots of size 16 available now
-    NL_TEST_ASSERT(inSuite, nullptr == allocator.HeapAlloc(17));
+    EXPECT_EQ(nullptr, allocator.HeapAlloc(17));
 
     // Freeing p2 makes enoug space
     allocator.HeapFree(p2);
     p1 = allocator.HeapAlloc(5 * 16);
-    NL_TEST_ASSERT(inSuite, nullptr != p1);
+    ASSERT_NE(nullptr, p1);
     allocator.HeapFree(p1);
 }
 
-void MultipleMerge(nlTestSuite * inSuite, void * inContext)
+TEST(TestPrivateHeap, TestMultipleMerge)
 {
     PrivateHeapAllocator<32 * kBlockHeaderSize> allocator;
 
@@ -184,19 +184,19 @@ void MultipleMerge(nlTestSuite * inSuite, void * inContext)
     void * p5 = allocator.HeapAlloc(7 * kBlockHeaderSize); // uses up 8 blocks
     void * p6 = allocator.HeapAlloc(2 * kBlockHeaderSize); // uses up 2 (last given)
 
-    NL_TEST_ASSERT(inSuite, nullptr != p1);
-    NL_TEST_ASSERT(inSuite, nullptr != p2);
-    NL_TEST_ASSERT(inSuite, nullptr != p3);
-    NL_TEST_ASSERT(inSuite, nullptr != p4);
-    NL_TEST_ASSERT(inSuite, nullptr != p5);
-    NL_TEST_ASSERT(inSuite, nullptr != p6);
+    ASSERT_NE(nullptr, p1);
+    ASSERT_NE(nullptr, p2);
+    ASSERT_NE(nullptr, p3);
+    ASSERT_NE(nullptr, p4);
+    ASSERT_NE(nullptr, p5);
+    ASSERT_NE(nullptr, p6);
 
     allocator.HeapFree(p3);
     allocator.HeapFree(p4);
     // 10 blocks available (9 from p3 without HDR and 2 from p4 + HDR)
     p3 = allocator.HeapAlloc(10 * kBlockHeaderSize);
-    NL_TEST_ASSERT(inSuite, nullptr != p3);
-    NL_TEST_ASSERT(inSuite, nullptr == allocator.HeapAlloc(1)); // full
+    ASSERT_NE(nullptr, p3);
+    EXPECT_EQ(nullptr, allocator.HeapAlloc(1)); // full
 
     allocator.HeapFree(p6);
     allocator.HeapFree(p5);
@@ -205,11 +205,11 @@ void MultipleMerge(nlTestSuite * inSuite, void * inContext)
     allocator.HeapFree(p1);
 
     p1 = allocator.HeapAlloc(30 * kBlockHeaderSize);
-    NL_TEST_ASSERT(inSuite, nullptr != p1);
+    ASSERT_NE(nullptr, p1);
     allocator.HeapFree(p1);
 }
 
-void ForwardFreeAndRealloc(nlTestSuite * inSuite, void * inContext)
+TEST(TestPrivateHeap, TestForwardFreeAndRealloc)
 {
     constexpr int kNumBlocks = 16;
     PrivateHeapAllocator<(2 * kNumBlocks + 1) * kBlockHeaderSize> allocator;
@@ -218,7 +218,7 @@ void ForwardFreeAndRealloc(nlTestSuite * inSuite, void * inContext)
     for (auto & ptr : ptrs)
     {
         ptr = allocator.HeapAlloc(kBlockHeaderSize);
-        NL_TEST_ASSERT(inSuite, nullptr != ptr);
+        ASSERT_NE(nullptr, ptr);
         memset(ptr, 0xab, kBlockHeaderSize);
     }
 
@@ -232,12 +232,12 @@ void ForwardFreeAndRealloc(nlTestSuite * inSuite, void * inContext)
         allocator.HeapFree(ptrs[i]);
 
         ptrs[0] = allocator.HeapAlloc((1 + 2 * i) * kBlockHeaderSize);
-        NL_TEST_ASSERT(inSuite, nullptr != ptrs[0]);
+        ASSERT_NE(nullptr, ptrs[0]);
     }
     allocator.HeapFree(ptrs[0]);
 }
 
-void BackwardFreeAndRealloc(nlTestSuite * inSuite, void * inContext)
+TEST(TestPrivateHeap, TestBackwardFreeAndRealloc)
 {
     constexpr int kNumBlocks = 16;
     PrivateHeapAllocator<(2 * kNumBlocks + 1) * kBlockHeaderSize> allocator;
@@ -246,7 +246,7 @@ void BackwardFreeAndRealloc(nlTestSuite * inSuite, void * inContext)
     for (auto & ptr : ptrs)
     {
         ptr = allocator.HeapAlloc(kBlockHeaderSize);
-        NL_TEST_ASSERT(inSuite, nullptr != ptr);
+        ASSERT_NE(nullptr, ptr);
         memset(ptr, 0xab, kBlockHeaderSize);
     }
 
@@ -260,7 +260,7 @@ void BackwardFreeAndRealloc(nlTestSuite * inSuite, void * inContext)
         allocator.HeapFree(ptrs[kNumBlocks - i - 1]);
 
         ptrs[kNumBlocks - 1] = allocator.HeapAlloc((1 + 2 * i) * kBlockHeaderSize);
-        NL_TEST_ASSERT(inSuite, nullptr != ptrs[kNumBlocks - 1]);
+        ASSERT_NE(nullptr, ptrs[kNumBlocks - 1]);
     }
     allocator.HeapFree(ptrs[kNumBlocks - 1]);
 }
@@ -293,71 +293,49 @@ bool IsKnownPattern(void * buffer, size_t size, uint8_t start)
     return true;
 }
 
-void Realloc(nlTestSuite * inSuite, void * inContext)
+TEST(TestPrivateHeap, TestRealloc)
 {
     PrivateHeapAllocator<6 * 16> allocator;
 
     void * p1 = allocator.HeapRealloc(nullptr, 16); // malloc basically
-    NL_TEST_ASSERT(inSuite, p1 != nullptr);
+    ASSERT_NE(p1, nullptr);
 
     FillKnownPattern(p1, 16, 11);
 
     void * p2 = allocator.HeapRealloc(p1, 8); // resize, should fit
-    NL_TEST_ASSERT(inSuite, p1 == p2);
-    NL_TEST_ASSERT(inSuite, IsKnownPattern(p1, 8, 11));
+    EXPECT_EQ(p1, p2);
+    EXPECT_TRUE(IsKnownPattern(p1, 8, 11));
 
     p2 = allocator.HeapRealloc(p1, 16); // resize, should fit
-    NL_TEST_ASSERT(inSuite, p1 == p2);
-    NL_TEST_ASSERT(inSuite, IsKnownPattern(p2, 8, 11)); // only 8 bytes are guaranteed
+    EXPECT_EQ(p1, p2);
+    EXPECT_TRUE(IsKnownPattern(p2, 8, 11)); // only 8 bytes are guaranteed
 
     FillKnownPattern(p1, 16, 33);
     p2 = allocator.HeapRealloc(p1, 32); // resize, does not fit. This frees p1
-    NL_TEST_ASSERT(inSuite, p2 != nullptr);
-    NL_TEST_ASSERT(inSuite, p2 != p1); // new reallocation occurred
-    NL_TEST_ASSERT(inSuite, IsKnownPattern(p2, 16, 33));
+    ASSERT_NE(p2, nullptr);
+    EXPECT_NE(p2, p1); // new reallocation occurred
+    EXPECT_TRUE(IsKnownPattern(p2, 16, 33));
 
     void * p3 = allocator.HeapAlloc(48); // insufficient heap for this
-    NL_TEST_ASSERT(inSuite, p3 == nullptr);
+    EXPECT_EQ(p3, nullptr);
 
     p1 = allocator.HeapRealloc(p2, 16); // reallocation does not change block size
-    NL_TEST_ASSERT(inSuite, p1 == p2);
+    EXPECT_EQ(p1, p2);
 
     p3 = allocator.HeapAlloc(48); // still insufficient heap for this
-    NL_TEST_ASSERT(inSuite, p3 == nullptr);
+    EXPECT_EQ(p3, nullptr);
 
     p2 = allocator.HeapRealloc(p1, 48); // insufficient heap, p1 is NOT freed
-    NL_TEST_ASSERT(inSuite, p2 == nullptr);
+    EXPECT_EQ(p2, nullptr);
 
     p2 = allocator.HeapRealloc(p1, 48); // Repeat the test to ensure p1 is not freed
-    NL_TEST_ASSERT(inSuite, p2 == nullptr);
+    EXPECT_EQ(p2, nullptr);
 
     allocator.HeapFree(p1);
 
     p3 = allocator.HeapAlloc(48); // above free should have made sufficient space
-    NL_TEST_ASSERT(inSuite, p3 != nullptr);
+    ASSERT_NE(p3, nullptr);
     allocator.HeapFree(p3);
 }
 
-const nlTest sTests[] = {
-    NL_TEST_DEF("SingleHeapAllocAndFree", SingleHeapAllocAndFree),     //
-    NL_TEST_DEF("SplitHeapAllocAndFree", SplitHeapAllocAndFree),       //
-    NL_TEST_DEF("FreeMergeNext", FreeMergeNext),                       //
-    NL_TEST_DEF("FreeMergePrevious", FreeMergePrevious),               //
-    NL_TEST_DEF("FreeMergePreviousAndNext", FreeMergePreviousAndNext), //
-    NL_TEST_DEF("MultipleMerge", MultipleMerge),                       //
-    NL_TEST_DEF("ForwardFreeAndRealloc", ForwardFreeAndRealloc),       //
-    NL_TEST_DEF("BackwardFreeAndRealloc", BackwardFreeAndRealloc),     //
-    NL_TEST_DEF("Realloc", Realloc),                                   //
-    NL_TEST_SENTINEL()                                                 //
-};
-
 } // namespace
-
-int TestPrivateHeap()
-{
-    nlTestSuite theSuite = { "PrivateHeap", sTests, nullptr, nullptr };
-    nlTestRunner(&theSuite, nullptr);
-    return nlTestRunnerStats(&theSuite);
-}
-
-CHIP_REGISTER_TEST_SUITE(TestPrivateHeap)

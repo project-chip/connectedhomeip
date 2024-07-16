@@ -1,0 +1,95 @@
+# Copyright (c) 2024 Project CHIP Authors
+#
+# Licensed under the Apache License, Version 2.0 (the "License");
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
+#
+# http://www.apache.org/licenses/LICENSE-2.0
+#
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
+# Auto-generated scripts for harness use only, please review before automation. The endpoints and cluster names are currently set to default
+
+name: 269.1.2. [TC-EEVSEM-1.2] Cluster attributes with DUT as Server
+
+PICS:
+    - EEVSEM.S
+
+config:
+    nodeId: 0x12344321
+    cluster: "Basic Information"
+    endpoint: 1
+
+tests:
+    - label: "Step 1: TH reads from the DUT the SupportedModes attribute"
+      PICS: EEVSEM.S.A0000
+      verification: |
+          ./chip-tool energyevsemode read supported-modes  1 1
+
+          - Verify that the DUT response contains a list of ModeOptionsStruct entries
+          - Verify that the list has at least 2 and at most 255 entries
+          - Verify that each ModeOptionsStruct entry has a unique Mode field value
+          - Verify that each ModeOptionsStruct entry has a unique Label field value
+          - Verify that each ModeOptionsStruct entry’s ModeTags field has:
+          at least one entry the values of the Value fields that are not larger than 16 bits
+          - for each Value field: Is the mode tag value a defined common tag value (Auto(0x0000), Quick(0x0001), Quiet(0x0002), LowNoise(0x0003), LowEnergy(0x0004), Vacation(0x0005), Min(0x0006), Max(0x0007), Night(0x0008), Day(0x0009)) or a defined cluster-derived tag value (Manual, Time of Use, (T_SOLAR_CHARGING)) or in the MfgTags (0x8000 to 0xBFFF) range
+          - for at least one Value field: Is the mode tag value a defined common tag value (Auto(0x0000), Quick(0x0001), Quiet(0x0002), LowNoise(0x0003), LowEnergy(0x0004), Vacation(0x0005), Min(0x0006), Max(0x0007), Night(0x0008), Day(0x0009)) or a derived cluster value (Bake(0x4000), Convection(0x4001), Grill(0x4002), Roast(0x4003), Clean(0x4004), Convection Bake(0x4005), Convection Roast(0x4006), Warming(0x4007), Proofing(0x4008))
+          - if the Value field is in the MfgTags (0x8000 to 0xBFFF) range, the TagName field is a string with a length between 1 and 64
+          - Verify that at least one ModeOptionsStruct entry includes the Manual mode tag
+          - Save the Mode field values as supported_modes_dut on the TH (Chip-tool) and below is the sample log provided for the raspi platform:
+
+
+          [1705995452.973731][7546:7548] CHIP:DMG: }
+          [1705995452.973843][7546:7548] CHIP:TOO: Endpoint: 1 Cluster: 0x0000_009D Attribute 0x0000_0000 DataVersion: 1324786556
+          [1705995452.973865][7546:7548] CHIP:TOO:   SupportedModes: 4 entries
+          [1705995452.973883][7546:7548] CHIP:TOO:     [1]: {
+          [1705995452.973886][7546:7548] CHIP:TOO:       Label: Manual
+          [1705995452.973892][7546:7548] CHIP:TOO:       Mode: 0
+          [1705995452.973898][7546:7548] CHIP:TOO:       ModeTags: 1 entries
+          [1705995452.973903][7546:7548] CHIP:TOO:         [1]: {
+          [1705995452.973906][7546:7548] CHIP:TOO:           Value: 16384
+          [1705995452.973909][7546:7548] CHIP:TOO:          }
+          [1705995452.973912][7546:7548] CHIP:TOO:      }
+          [1705995452.973918][7546:7548] CHIP:TOO:     [2]: {
+          [1705995452.973921][7546:7548] CHIP:TOO:       Label: Auto-scheduled
+          [1705995452.973923][7546:7548] CHIP:TOO:       Mode: 1
+          [1705995452.973926][7546:7548] CHIP:TOO:       ModeTags: 1 entries
+          [1705995452.973930][7546:7548] CHIP:TOO:         [1]: {
+          [1705995452.973933][7546:7548] CHIP:TOO:           Value: 16385
+          [1705995452.973935][7546:7548] CHIP:TOO:          }
+          [1705995452.973938][7546:7548] CHIP:TOO:      }
+          [1705995452.973943][7546:7548] CHIP:TOO:     [3]: {
+          [1705995452.973946][7546:7548] CHIP:TOO:       Label: Solar
+          [1705995452.973948][7546:7548] CHIP:TOO:       Mode: 2
+          [1705995452.973951][7546:7548] CHIP:TOO:       ModeTags: 1 entries
+          [1705995452.973955][7546:7548] CHIP:TOO:         [1]: {
+          [1705995452.973957][7546:7548] CHIP:TOO:           Value: 16386
+          [1705995452.973960][7546:7548] CHIP:TOO:          }
+          [1705995452.973962][7546:7548] CHIP:TOO:      }
+          [1705995452.973968][7546:7548] CHIP:TOO:     [4]: {
+          [1705995452.973971][7546:7548] CHIP:TOO:       Label: Auto-scheduled with Solar charging
+          [1705995452.973973][7546:7548] CHIP:TOO:       Mode: 3
+          [1705995452.973977][7546:7548] CHIP:TOO:       ModeTags: 2 entries
+          [1705995452.973981][7546:7548] CHIP:TOO:         [1]: {
+          [1705995452.973983][7546:7548] CHIP:TOO:           Value: 16385
+          [1705995452.973986][7546:7548] CHIP:TOO:          }
+          [1705995452.973989][7546:7548] CHIP:TOO:         [2]: {
+          [1705995452.973992][7546:7548] CHIP:TOO:           Value: 16386
+          [1705995452.973994][7546:7548] CHIP:TOO:          }
+          [1705995452.973996][7546:7548] CHIP:TOO:      }
+      disabled: true
+
+    - label: "Step 2: TH reads from the DUT the CurrentMode attribute"
+      PICS: EEVSEM.S.A0001
+      verification: |
+          ./chip-tool energyevsemode read current-mode  1 1
+
+          Verify on TH(chip-tool) logs, CurrentMode attribute value is an integer value from supported_modes_dut, below is the sample log provided for the raspi platform, Here CurrentMode attribute value is 0
+
+          [1705995474.391307][7551:7553] CHIP:DMG: }
+          [1705995474.391347][7551:7553] CHIP:TOO: Endpoint: 1 Cluster: 0x0000_009D Attribute 0x0000_0001 DataVersion: 1324786556
+          [1705995474.391367][7551:7553] CHIP:TOO:   CurrentMode: 0
+      disabled: true

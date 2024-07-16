@@ -7,7 +7,8 @@ for Raspberry Pi Desktop 20.10 (aarch64)**
 
 To cross-compile this example on x64 host and run on **NXP i.MX 8M Mini**
 **EVK**, see the associated
-[README document](../../../docs/guides/nxp_imx8m_linux_examples.md) for details.
+[README document](../../../docs/guides/nxp/nxp_imx8m_linux_examples.md) for
+details.
 
 <hr>
 
@@ -366,7 +367,7 @@ If you haven't implemented a real EVSE but want to simulate plugging in an EV
 then you can use a few of the test event triggers to simulate these scenarios.
 
 The test event triggers values can be found in:
-[EnergyEvseTestEventTriggerDelegate.h](../../../src/app/clusters/energy-evse-server/EnergyEvseTestEventTriggerDelegate.h)
+[EnergyEvseTestEventTriggerHandler.h](../../../src/app/clusters/energy-evse-server/EnergyEvseTestEventTriggerHandler.h)
 
 -   0x0099000000000000 - Simulates the EVSE being installed on a 32A supply
 -   0x0099000000000002 - Simulates the EVSE being plugged in (this should

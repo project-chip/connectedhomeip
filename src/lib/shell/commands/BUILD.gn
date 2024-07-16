@@ -20,7 +20,6 @@ import("${chip_root}/src/system/system.gni")
 
 source_set("commands") {
   sources = [
-    "Base64.cpp",
     "Help.cpp",
     "Help.h",
     "Meta.cpp",
@@ -37,7 +36,10 @@ source_set("commands") {
   }
 
   if (chip_enable_wifi) {
-    sources += [ "WiFi.cpp" ]
+    sources += [
+      "WiFi.cpp",
+      "WiFi.h",
+    ]
   }
 
   if (chip_enable_ble && chip_device_platform != "none") {
@@ -56,16 +58,6 @@ source_set("commands") {
   if (chip_enable_ota_requestor && chip_device_platform != "none" &&
       chip_device_platform != "linux" && chip_device_platform != "darwin") {
     sources += [ "Ota.cpp" ]
-
-    # TODO: the ota commands in shell should use the interfaces in /src/app/clusters/ota-requestor
-    #
-    # Awkward dependencies below say:
-    #   - codegen via zap the CHIPClusters.h (which is the CLIENT SIDE)
-    #   - ensure include path can see zap-generated/CHIPClusters.h
-    deps = [ "${chip_root}/src/controller/data_model:data_model_zapgen_files" ]
-
-    configs +=
-        [ "${chip_root}/src/controller/data_model:data_model_zapgen_config" ]
   }
 
   if (chip_system_config_provide_statistics) {

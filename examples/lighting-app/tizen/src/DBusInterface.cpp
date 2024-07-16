@@ -22,6 +22,7 @@
 #include <app-common/zap-generated/cluster-enums.h>
 #include <app-common/zap-generated/ids/Attributes.h>
 #include <app-common/zap-generated/ids/Clusters.h>
+#include <app/CommandHandlerImpl.h>
 #include <app/ConcreteAttributePath.h>
 #include <app/clusters/color-control-server/color-control-server.h>
 #include <app/clusters/level-control/level-control.h>
@@ -36,13 +37,13 @@ using namespace chip::app;
 
 namespace example {
 
-// Dummy class to satisfy the CommandHandler::Callback interface.
-class CommandHandlerCallback : public CommandHandler::Callback
+// Dummy class to satisfy the CommandHandlerImpl::Callback interface.
+class CommandHandlerImplCallback : public CommandHandlerImpl::Callback
 {
 public:
     using Status = Protocols::InteractionModel::Status;
-    void OnDone(CommandHandler & apCommandObj) {}
-    void DispatchCommand(CommandHandler & apCommandObj, const ConcreteCommandPath & aCommandPath, TLV::TLVReader & apPayload) {}
+    void OnDone(CommandHandlerImpl & apCommandObj) {}
+    void DispatchCommand(CommandHandlerImpl & apCommandObj, const ConcreteCommandPath & aCommandPath, TLV::TLVReader & apPayload) {}
     Status CommandExists(const ConcreteCommandPath & aCommandPath) { return Status::Success; }
 };
 
@@ -188,8 +189,10 @@ gboolean DBusInterface::OnColorTemperatureChanged(LightAppColorControl * colorCo
     // Do not handle on-change event if it was triggered by internal set
     VerifyOrReturnValue(!self->mInternalSet, G_DBUS_METHOD_INVOCATION_HANDLED);
 
-    CommandHandlerCallback callback;
-    CommandHandler handler(&callback);
+    // TODO: creating such a complex object seems odd here
+    //       as handler seems not used to send back any response back anywhere.
+    CommandHandlerImplCallback callback;
+    CommandHandlerImpl handler(&callback);
 
     ConcreteCommandPath path{ self->mEndpointId, Clusters::ColorControl::Id, 0 };
 
@@ -206,7 +209,8 @@ void DBusInterface::InitOnOff()
 {
     bool isOn   = false;
     auto status = Clusters::OnOff::Attributes::OnOff::Get(mEndpointId, &isOn);
-    VerifyOrReturn(status == EMBER_ZCL_STATUS_SUCCESS, ChipLogError(NotSpecified, "Error getting OnOff: 0x%x", status));
+    VerifyOrReturn(status == Protocols::InteractionModel::Status::Success,
+                   ChipLogError(NotSpecified, "Error getting OnOff: 0x%x", to_underlying(status)));
     light_app_on_off_set_on_off(mIfaceOnOff, isOn);
 }
 
@@ -215,14 +219,15 @@ void DBusInterface::InitColor()
     {
         uint8_t value = 0;
         auto status   = Clusters::ColorControl::Attributes::ColorMode::Get(mEndpointId, &value);
-        VerifyOrReturn(status == EMBER_ZCL_STATUS_SUCCESS, ChipLogError(NotSpecified, "Error getting ColorMode: 0x%x", status));
+        VerifyOrReturn(status == Protocols::InteractionModel::Status::Success,
+                       ChipLogError(NotSpecified, "Error getting ColorMode: 0x%x", to_underlying(status)));
         light_app_color_control_set_color_mode(mIfaceColorControl, value);
     }
     {
         uint16_t value = 0;
         auto status    = Clusters::ColorControl::Attributes::ColorTemperatureMireds::Get(mEndpointId, &value);
-        VerifyOrReturn(status == EMBER_ZCL_STATUS_SUCCESS,
-                       ChipLogError(NotSpecified, "Error getting ColorTemperatureMireds: 0x%x", status));
+        VerifyOrReturn(status == Protocols::InteractionModel::Status::Success,
+                       ChipLogError(NotSpecified, "Error getting ColorTemperatureMireds: 0x%x", to_underlying(status)));
         light_app_color_control_set_color_temperature_mireds(mIfaceColorControl, value);
     }
 }

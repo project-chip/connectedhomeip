@@ -47,6 +47,8 @@
 #define CHIP_DEVICE_CONFIG_ROTATING_DEVICE_ID_UNIQUE_ID_LENGTH 32
 #endif
 
+#define CHIP_ADDRESS_RESOLVE_IMPL_INCLUDE_HEADER <lib/address_resolve/AddressResolve_DefaultImpl.h>
+
 // ========== Platform-specific Configuration =========
 
 // These are configuration options that are unique to the K32W platform.
@@ -114,6 +116,25 @@
 #endif // CHIP_DEVICE_LAYER_OTA_REBOOT_DELAY
 
 /**
+ * @def CONFIG_CHIP_K32W0_KVS_MOVE_KEYS_TO_SPECIFIC_STORAGE
+ *
+ * When enabled, the application can opt to move some keys from
+ * current KVS storage to a dedicated storage, based on the key name.
+ *
+ * Currently, the mechanism supports moving keys and values for:
+ * - subscriptions
+ * - groups
+ *
+ * Note: the system is meant to ensure backwards compatibility. This should only
+ * be used once, but, if this feature is still enabled after the first conversion,
+ * the corresponding keys will not be found in KVS default storage. This does
+ * not affect the functionality, but it introduces a delay in the initialization.
+ */
+#ifndef CONFIG_CHIP_K32W0_KVS_MOVE_KEYS_TO_SPECIFIC_STORAGE
+#define CONFIG_CHIP_K32W0_KVS_MOVE_KEYS_TO_SPECIFIC_STORAGE 0
+#endif // CONFIG_CHIP_K32W0_KVS_MOVE_KEYS_TO_SPECIFIC_STORAGE
+
+/**
  * @def CONFIG_CHIP_K32W0_OTA_FACTORY_DATA_PROCESSOR
  *
  * Enables default OTA TLV factory data processor.
@@ -142,7 +163,7 @@
 #endif // CHIP_DEVICE_CONFIG_THREAD_TASK_STACK_SIZE
 
 // Max size of event queue
-#define CHIP_DEVICE_CONFIG_MAX_EVENT_QUEUE_SIZE 75
+#define CHIP_DEVICE_CONFIG_MAX_EVENT_QUEUE_SIZE 25
 
 #ifndef CHIP_DEVICE_CONFIG_BLE_APP_TASK_NAME
 #define CHIP_DEVICE_CONFIG_BLE_APP_TASK_NAME "BLE App Task"

@@ -21,16 +21,10 @@
 
 #pragma once
 
-#ifndef TIME_SYNC_ENABLE_TSC_FEATURE
-#define TIME_SYNC_ENABLE_TSC_FEATURE 1
-#endif
-
 #include "TimeSyncDataProvider.h"
 #include "time-synchronization-delegate.h"
 
-#if TIME_SYNC_ENABLE_TSC_FEATURE
-#include <app/ReadClient.h>
-#endif
+#include <app/AppConfig.h>
 #include <app/server/Server.h>
 #include <app/util/af-types.h>
 #include <app/util/config.h>
@@ -39,6 +33,12 @@
 
 #include <app-common/zap-generated/cluster-objects.h>
 #include <lib/support/Span.h>
+
+// NOTE: this is part of AppConfig, so this has to be checked for AFTER the inclusion
+//       of that header
+#if TIME_SYNC_ENABLE_TSC_FEATURE
+#include <app/ReadClient.h>
+#endif
 
 namespace chip {
 namespace app {
@@ -123,7 +123,10 @@ public:
     // ReadClient::Callback functions
     void OnAttributeData(const ConcreteDataAttributePath & aPath, TLV::TLVReader * apData, const StatusIB & aStatus) override;
     void OnDone(ReadClient * apReadClient) override;
+
 #endif
+
+    CHIP_ERROR AttemptToGetTimeFromTrustedNode();
 
     // Platform event handler functions
     void OnPlatformEventFn(const DeviceLayer::ChipDeviceEvent & event);
@@ -166,7 +169,6 @@ private:
 
     // Called when the platform is set up - attempts to get time using the recommended source list in the spec.
     void AttemptToGetTime();
-    CHIP_ERROR AttemptToGetTimeFromTrustedNode();
     // Attempts to get fallback NTP from the delegate (last available source)
     // If successful, the function will set mGranulatiry and the time source
     // If unsuccessful, it will emit a TimeFailure event.

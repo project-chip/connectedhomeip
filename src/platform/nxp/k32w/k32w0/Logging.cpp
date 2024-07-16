@@ -2,7 +2,9 @@
 
 #include <platform/logging/LogV.h>
 
+#include <cstring>
 #include <inttypes.h>
+
 #include <lib/core/CHIPConfig.h>
 #include <lib/support/EnforceFormat.h>
 #include <lib/support/logging/Constants.h>
@@ -10,7 +12,6 @@
 #include <src/lib/support/CodeUtils.h>
 
 #include "fsl_debug_console.h"
-#include <cstring>
 
 #define K32W_LOG_MODULE_NAME chip
 #define EOL_CHARS "\r\n" /* End of Line Characters */
@@ -27,7 +28,6 @@ static constexpr uint8_t category_max_len_bytes = 3;
 #include <utils/uart.h>
 #endif // CHIP_DEVICE_CONFIG_ENABLE_THREAD
 
-static bool isLogInitialized;
 extern "C" uint32_t otPlatAlarmMilliGetNow(void);
 
 namespace chip {
@@ -105,12 +105,6 @@ void ENFORCE_FORMAT(1, 0) GenericLog(const char * format, va_list arg, const cha
     char formattedMsg[CHIP_CONFIG_LOG_MESSAGE_MAX_SIZE - 1] = { 0 };
     size_t prefixLen, writtenLen;
 
-    if (!isLogInitialized)
-    {
-        isLogInitialized = true;
-        otPlatUartEnable();
-    }
-
     /* Prefix is composed of [Time Reference][Debug String][Module Name String] */
     FillPrefix(formattedMsg, CHIP_CONFIG_LOG_MESSAGE_MAX_SIZE - 1, module, category);
     prefixLen = strlen(formattedMsg);
@@ -135,7 +129,7 @@ namespace Platform {
 /**
  * CHIP log output function.
  */
-void ENFORCE_FORMAT(3, 0) LogV(const char * module, uint8_t category, const char * msg, va_list v)
+void LogV(const char * module, uint8_t category, const char * msg, va_list v)
 {
     (void) module;
     (void) category;

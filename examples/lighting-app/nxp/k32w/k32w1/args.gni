@@ -13,11 +13,17 @@
 # limitations under the License.
 
 import("//build_overrides/chip.gni")
-import("${chip_root}/examples/platform/nxp/k32w/k32w1/args.gni")
 
 # SDK target. This is overridden to add our SDK app_config.h & defines.
 k32w1_sdk_target = get_label_info(":sdk", "label_no_toolchain")
 
+chip_config_dimmable_led = false
 chip_enable_ota_requestor = true
 chip_stack_lock_tracking = "fatal"
 chip_enable_ble = true
+
+is_debug = false
+
+chip_crypto = "platform"
+chip_openthread_ftd = true
+chip_with_ot_cli = 0

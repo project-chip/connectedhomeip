@@ -15,9 +15,9 @@
  *    limitations under the License.
  */
 
-#include <lib/support/UnitTestRegistration.h>
-#include <nlunit-test.h>
+#include <pw_unit_test/framework.h>
 
+#include <lib/core/StringBuilderAdapters.h>
 #include <lib/support/TestPersistentStorageDelegate.h>
 #include <protocols/secure_channel/SimpleSessionResumptionStorage.h>
 
@@ -26,27 +26,27 @@ constexpr chip::NodeId node1        = 12344321;
 constexpr chip::FabricIndex fabric2 = 14;
 constexpr chip::NodeId node2        = 11223344;
 
-void TestLink(nlTestSuite * inSuite, void * inContext)
+TEST(TestSimpleSessionResumptionStorage, TestLink)
 {
     chip::TestPersistentStorageDelegate storage;
     chip::SimpleSessionResumptionStorage sessionStorage;
     sessionStorage.Init(&storage);
 
     chip::SimpleSessionResumptionStorage::ResumptionIdStorage resumptionId;
-    NL_TEST_ASSERT(inSuite, CHIP_NO_ERROR == chip::Crypto::DRBG_get_bytes(resumptionId.data(), resumptionId.size()));
+    EXPECT_EQ(chip::Crypto::DRBG_get_bytes(resumptionId.data(), resumptionId.size()), CHIP_NO_ERROR);
 
-    NL_TEST_ASSERT(inSuite, CHIP_NO_ERROR == sessionStorage.SaveLink(resumptionId, chip::ScopedNodeId(node1, fabric1)));
+    EXPECT_EQ(sessionStorage.SaveLink(resumptionId, chip::ScopedNodeId(node1, fabric1)), CHIP_NO_ERROR);
 
     chip::ScopedNodeId node;
-    NL_TEST_ASSERT(inSuite, CHIP_NO_ERROR == sessionStorage.LoadLink(resumptionId, node));
-    NL_TEST_ASSERT(inSuite, node == chip::ScopedNodeId(node1, fabric1));
+    EXPECT_EQ(sessionStorage.LoadLink(resumptionId, node), CHIP_NO_ERROR);
+    EXPECT_EQ(node, chip::ScopedNodeId(node1, fabric1));
 
-    NL_TEST_ASSERT(inSuite, CHIP_NO_ERROR == sessionStorage.DeleteLink(resumptionId));
+    EXPECT_EQ(sessionStorage.DeleteLink(resumptionId), CHIP_NO_ERROR);
 
-    NL_TEST_ASSERT(inSuite, CHIP_ERROR_PERSISTED_STORAGE_VALUE_NOT_FOUND == sessionStorage.LoadLink(resumptionId, node));
+    EXPECT_EQ(sessionStorage.LoadLink(resumptionId, node), CHIP_ERROR_PERSISTED_STORAGE_VALUE_NOT_FOUND);
 }
 
-void TestState(nlTestSuite * inSuite, void * inContext)
+TEST(TestSimpleSessionResumptionStorage, TestState)
 {
     chip::TestPersistentStorageDelegate storage;
     chip::SimpleSessionResumptionStorage sessionStorage;
@@ -55,31 +55,30 @@ void TestState(nlTestSuite * inSuite, void * inContext)
     chip::ScopedNodeId node(node1, fabric1);
 
     chip::SimpleSessionResumptionStorage::ResumptionIdStorage resumptionId;
-    NL_TEST_ASSERT(inSuite, CHIP_NO_ERROR == chip::Crypto::DRBG_get_bytes(resumptionId.data(), resumptionId.size()));
+    EXPECT_EQ(chip::Crypto::DRBG_get_bytes(resumptionId.data(), resumptionId.size()), CHIP_NO_ERROR);
 
     chip::Crypto::P256ECDHDerivedSecret sharedSecret;
     sharedSecret.SetLength(sharedSecret.Capacity());
-    NL_TEST_ASSERT(inSuite, CHIP_NO_ERROR == chip::Crypto::DRBG_get_bytes(sharedSecret.Bytes(), sharedSecret.Length()));
+    EXPECT_EQ(chip::Crypto::DRBG_get_bytes(sharedSecret.Bytes(), sharedSecret.Length()), CHIP_NO_ERROR);
 
     chip::CATValues peerCATs;
 
-    NL_TEST_ASSERT(inSuite, CHIP_NO_ERROR == sessionStorage.SaveState(node, resumptionId, sharedSecret, peerCATs));
+    EXPECT_EQ(sessionStorage.SaveState(node, resumptionId, sharedSecret, peerCATs), CHIP_NO_ERROR);
 
     chip::SimpleSessionResumptionStorage::ResumptionIdStorage resumptionId2;
     chip::Crypto::P256ECDHDerivedSecret sharedSecret2;
     chip::CATValues peerCATs2;
-    NL_TEST_ASSERT(inSuite, CHIP_NO_ERROR == sessionStorage.LoadState(node, resumptionId2, sharedSecret2, peerCATs2));
-    NL_TEST_ASSERT(inSuite, resumptionId == resumptionId2);
-    NL_TEST_ASSERT(inSuite, memcmp(sharedSecret.Bytes(), sharedSecret2.Bytes(), sharedSecret.Length()) == 0);
+    EXPECT_EQ(sessionStorage.LoadState(node, resumptionId2, sharedSecret2, peerCATs2), CHIP_NO_ERROR);
+    EXPECT_EQ(resumptionId, resumptionId2);
+    EXPECT_EQ(memcmp(sharedSecret.Bytes(), sharedSecret2.Bytes(), sharedSecret.Length()), 0);
 
-    NL_TEST_ASSERT(inSuite, CHIP_NO_ERROR == sessionStorage.DeleteState(node));
+    EXPECT_EQ(sessionStorage.DeleteState(node), CHIP_NO_ERROR);
 
-    NL_TEST_ASSERT(inSuite,
-                   CHIP_ERROR_PERSISTED_STORAGE_VALUE_NOT_FOUND ==
-                       sessionStorage.LoadState(node, resumptionId2, sharedSecret2, peerCATs2));
+    EXPECT_EQ(sessionStorage.LoadState(node, resumptionId2, sharedSecret2, peerCATs2),
+              CHIP_ERROR_PERSISTED_STORAGE_VALUE_NOT_FOUND);
 }
 
-void TestIndex(nlTestSuite * inSuite, void * inContext)
+TEST(TestSimpleSessionResumptionStorage, TestIndex)
 {
     chip::TestPersistentStorageDelegate storage;
     chip::SimpleSessionResumptionStorage sessionStorage;
@@ -88,63 +87,26 @@ void TestIndex(nlTestSuite * inSuite, void * inContext)
     chip::ScopedNodeId node(node1, fabric1);
 
     chip::DefaultSessionResumptionStorage::SessionIndex index0o;
-    NL_TEST_ASSERT(inSuite, CHIP_NO_ERROR == sessionStorage.LoadIndex(index0o));
-    NL_TEST_ASSERT(inSuite, index0o.mSize == 0);
+    EXPECT_EQ(sessionStorage.LoadIndex(index0o), CHIP_NO_ERROR);
+    EXPECT_EQ(index0o.mSize, 0u);
 
     chip::DefaultSessionResumptionStorage::SessionIndex index1;
     index1.mSize = 0;
-    NL_TEST_ASSERT(inSuite, CHIP_NO_ERROR == sessionStorage.SaveIndex(index1));
+    EXPECT_EQ(sessionStorage.SaveIndex(index1), CHIP_NO_ERROR);
     chip::DefaultSessionResumptionStorage::SessionIndex index1o;
-    NL_TEST_ASSERT(inSuite, CHIP_NO_ERROR == sessionStorage.LoadIndex(index1o));
-    NL_TEST_ASSERT(inSuite, index1o.mSize == 0);
+    EXPECT_EQ(sessionStorage.LoadIndex(index1o), CHIP_NO_ERROR);
+    EXPECT_EQ(index1o.mSize, 0u);
 
     chip::DefaultSessionResumptionStorage::SessionIndex index2;
     index2.mSize     = 2;
     index2.mNodes[0] = chip::ScopedNodeId(node1, fabric1);
     index2.mNodes[1] = chip::ScopedNodeId(node2, fabric2);
-    NL_TEST_ASSERT(inSuite, CHIP_NO_ERROR == sessionStorage.SaveIndex(index2));
+    EXPECT_EQ(CHIP_NO_ERROR, sessionStorage.SaveIndex(index2));
     chip::DefaultSessionResumptionStorage::SessionIndex index2o;
-    NL_TEST_ASSERT(inSuite, CHIP_NO_ERROR == sessionStorage.LoadIndex(index2o));
-    NL_TEST_ASSERT(inSuite, index2o.mSize == 2);
-    NL_TEST_ASSERT(inSuite, index2o.mNodes[0] == chip::ScopedNodeId(node1, fabric1));
-    NL_TEST_ASSERT(inSuite, index2o.mNodes[1] == chip::ScopedNodeId(node2, fabric2));
+    EXPECT_EQ(CHIP_NO_ERROR, sessionStorage.LoadIndex(index2o));
+    EXPECT_EQ(index2o.mSize, 2u);
+    EXPECT_EQ(index2o.mNodes[0], chip::ScopedNodeId(node1, fabric1));
+    EXPECT_EQ(index2o.mNodes[1], chip::ScopedNodeId(node2, fabric2));
 }
 
 // Test Suite
-
-/**
- *  Test Suite that lists all the test functions.
- */
-// clang-format off
-static const nlTest sTests[] =
-{
-    NL_TEST_DEF("TestLink", TestLink),
-    NL_TEST_DEF("TestState", TestState),
-    NL_TEST_DEF("TestIndex", TestState),
-
-    NL_TEST_SENTINEL()
-};
-// clang-format on
-
-// clang-format off
-static nlTestSuite sSuite =
-{
-    "Test-CHIP-SimpleSessionResumptionStorage",
-    &sTests[0],
-    nullptr,
-    nullptr,
-};
-// clang-format on
-
-/**
- *  Main
- */
-int TestSimpleSessionResumptionStorage()
-{
-    // Run test suit against one context
-    nlTestRunner(&sSuite, nullptr);
-
-    return (nlTestRunnerStats(&sSuite));
-}
-
-CHIP_REGISTER_TEST_SUITE(TestSimpleSessionResumptionStorage)

@@ -20,11 +20,50 @@
 #include <lib/core/Optional.h>
 
 #include <app-common/zap-generated/cluster-objects.h>
+#include <app/AttributeAccessInterface.h>
 
 namespace chip {
 namespace app {
 namespace Clusters {
 namespace ElectricalEnergyMeasurement {
+
+struct MeasurementData
+{
+    Structs::MeasurementAccuracyStruct::Type measurementAccuracy;
+    Optional<Structs::EnergyMeasurementStruct::Type> cumulativeImported;
+    Optional<Structs::EnergyMeasurementStruct::Type> cumulativeExported;
+    Optional<Structs::EnergyMeasurementStruct::Type> periodicImported;
+    Optional<Structs::EnergyMeasurementStruct::Type> periodicExported;
+    Optional<Structs::CumulativeEnergyResetStruct::Type> cumulativeReset;
+};
+
+enum class OptionalAttributes : uint32_t
+{
+    kOptionalAttributeCumulativeEnergyReset = 0x1,
+};
+
+class ElectricalEnergyMeasurementAttrAccess : public AttributeAccessInterface
+{
+public:
+    ElectricalEnergyMeasurementAttrAccess(BitMask<Feature> aFeature, BitMask<OptionalAttributes> aOptionalAttrs) :
+        app::AttributeAccessInterface(Optional<EndpointId>::Missing(), app::Clusters::ElectricalEnergyMeasurement::Id),
+        mFeature(aFeature), mOptionalAttrs(aOptionalAttrs)
+    {}
+
+    ~ElectricalEnergyMeasurementAttrAccess() { Shutdown(); }
+
+    CHIP_ERROR Init();
+    void Shutdown();
+
+    CHIP_ERROR Read(const app::ConcreteReadAttributePath & aPath, app::AttributeValueEncoder & aEncoder) override;
+
+    bool HasFeature(Feature aFeature) const;
+    bool SupportsOptAttr(OptionalAttributes aOptionalAttrs) const;
+
+private:
+    BitMask<Feature> mFeature;
+    BitMask<OptionalAttributes> mOptionalAttrs;
+};
 
 bool NotifyCumulativeEnergyMeasured(EndpointId endpointId, const Optional<Structs::EnergyMeasurementStruct::Type> & energyImported,
                                     const Optional<Structs::EnergyMeasurementStruct::Type> & energyExported);
@@ -33,6 +72,10 @@ bool NotifyPeriodicEnergyMeasured(EndpointId endpointId, const Optional<Structs:
                                   const Optional<Structs::EnergyMeasurementStruct::Type> & energyExported);
 
 CHIP_ERROR SetMeasurementAccuracy(EndpointId endpointId, const Structs::MeasurementAccuracyStruct::Type & accuracy);
+
+CHIP_ERROR SetCumulativeReset(EndpointId endpointId, const Optional<Structs::CumulativeEnergyResetStruct::Type> & cumulativeReset);
+
+MeasurementData * MeasurementDataForEndpoint(EndpointId endpointId);
 
 } // namespace ElectricalEnergyMeasurement
 } // namespace Clusters

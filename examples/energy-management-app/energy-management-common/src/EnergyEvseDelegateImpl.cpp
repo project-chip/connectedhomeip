@@ -1474,7 +1474,11 @@ CHIP_ERROR GetEpochTS(uint32_t & chipEpoch)
      * This should not be certifiable since getting time is a Mandatory
      * feature of EVSE Cluster
      */
-    VerifyOrDie(err != CHIP_ERROR_UNSUPPORTED_CHIP_FEATURE);
+    if (err == CHIP_ERROR_UNSUPPORTED_CHIP_FEATURE)
+    {
+        ChipLogError(Zcl, "Platform does not support GetClock_RealTimeMS. Check EVSE certification requirements!");
+        return err;
+    }
 
     if (err != CHIP_NO_ERROR)
     {

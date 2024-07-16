@@ -54,7 +54,7 @@ CHIP_ERROR TCPEndPointImplOT::DisableKeepAlive()
 {
     return CHIP_ERROR_NOT_IMPLEMENTED;
 }
-CHIP_ERROR TCPEndPointImplOT::AckReceive(uint16_t len)
+CHIP_ERROR TCPEndPointImplOT::AckReceive(size_t len)
 {
     return CHIP_ERROR_NOT_IMPLEMENTED;
 }

@@ -27,7 +27,7 @@ from typing import List, Optional, Type, Union
 
 import chip.exceptions
 import chip.interaction_model
-from chip.interaction_model import PyInvokeRequestData, TestOnlyPyBatchCommandsOverrides
+from chip.interaction_model import PyInvokeRequestData, TestOnlyPyBatchCommandsOverrides, TestOnlyPyOnDoneInfo
 from chip.native import PyChipError
 
 from .ClusterObjects import ClusterCommand
@@ -54,6 +54,12 @@ class InvokeRequestInfo:
 class Status:
     IMStatus: int
     ClusterStatus: int
+
+
+@dataclass
+class TestOnlyBatchCommandResponse:
+    Responses: object
+    ResponseMessageCount: int
 
 
 def FindCommandClusterObject(isClientSideCommand: bool, path: CommandPath):
@@ -215,12 +221,29 @@ class AsyncBatchCommandsTransaction:
         )
 
 
+class TestOnlyAsyncBatchCommandsTransaction(AsyncBatchCommandsTransaction):
+    def __init__(self, future: Future, eventLoop, expectTypes: List[Type]):
+        self._responseMessageCount = 0
+        super().__init__(future, eventLoop, expectTypes)
+
+    def _handleDone(self):
+        # Future might already be set with exception from `handleError`
+        if not self._future.done():
+            self._future.set_result(TestOnlyBatchCommandResponse(self._responses, self._responseMessageCount))
+        ctypes.pythonapi.Py_DecRef(ctypes.py_object(self))
+
+    def testOnlyDoneInfo(self, testOnlyDoneInfo: TestOnlyPyOnDoneInfo):
+        self._responseMessageCount = testOnlyDoneInfo.responseMessageCount
+
+
 _OnCommandSenderResponseCallbackFunct = CFUNCTYPE(
     None, py_object, c_uint16, c_uint32, c_uint32, c_size_t, c_uint16, c_uint8, c_void_p, c_uint32)
 _OnCommandSenderErrorCallbackFunct = CFUNCTYPE(
     None, py_object, c_uint16, c_uint8, PyChipError)
 _OnCommandSenderDoneCallbackFunct = CFUNCTYPE(
     None, py_object)
+_TestOnlyOnCommandSenderDoneCallbackFunct = CFUNCTYPE(
+    None, py_object, TestOnlyPyOnDoneInfo)
 
 
 @_OnCommandSenderResponseCallbackFunct
@@ -238,6 +261,12 @@ def _OnCommandSenderErrorCallback(closure, imStatus: int, clusterStatus: int, ch
 
 @_OnCommandSenderDoneCallbackFunct
 def _OnCommandSenderDoneCallback(closure):
+    closure.handleDone()
+
+
+@_TestOnlyOnCommandSenderDoneCallbackFunct
+def _TestOnlyOnCommandSenderDoneCallback(closure, testOnlyDoneInfo: TestOnlyPyOnDoneInfo):
+    closure.testOnlyDoneInfo(testOnlyDoneInfo)
     closure.handleDone()
 
 
@@ -262,9 +291,9 @@ def TestOnlySendCommandTimedRequestFlagWithNoTimedInvoke(future: Future, eventLo
         ))
 
 
-def SendCommand(future: Future, eventLoop, responseType: Type, device, commandPath: CommandPath, payload: ClusterCommand,
-                timedRequestTimeoutMs: Union[None, int] = None, interactionTimeoutMs: Union[None, int] = None, busyWaitMs: Union[None, int] = None,
-                suppressResponse: Union[None, bool] = None) -> PyChipError:
+async def SendCommand(future: Future, eventLoop, responseType: Type, device, commandPath: CommandPath, payload: ClusterCommand,
+                      timedRequestTimeoutMs: Union[None, int] = None, interactionTimeoutMs: Union[None, int] = None,
+                      busyWaitMs: Union[None, int] = None, suppressResponse: Union[None, bool] = None) -> PyChipError:
     ''' Send a cluster-object encapsulated command to a device and does the following:
             - On receipt of a successful data response, returns the cluster-object equivalent through the provided future.
             - None (on a successful response containing no data)
@@ -287,7 +316,7 @@ def SendCommand(future: Future, eventLoop, responseType: Type, device, commandPa
 
     payloadTLV = payload.ToTLV()
     ctypes.pythonapi.Py_IncRef(ctypes.py_object(transaction))
-    return builtins.chipStack.Call(
+    return await builtins.chipStack.CallAsync(
         lambda: handle.pychip_CommandSender_SendCommand(
             ctypes.py_object(transaction), device,
             c_uint16(0 if timedRequestTimeoutMs is None else timedRequestTimeoutMs), commandPath.EndpointId,
@@ -324,9 +353,9 @@ def _BuildPyInvokeRequestData(commands: List[InvokeRequestInfo], timedRequestTim
     return pyBatchCommandsData
 
 
-def SendBatchCommands(future: Future, eventLoop, device, commands: List[InvokeRequestInfo],
-                      timedRequestTimeoutMs: Optional[int] = None, interactionTimeoutMs: Optional[int] = None, busyWaitMs: Optional[int] = None,
-                      suppressResponse: Optional[bool] = None) -> PyChipError:
+async def SendBatchCommands(future: Future, eventLoop, device, commands: List[InvokeRequestInfo],
+                            timedRequestTimeoutMs: Optional[int] = None, interactionTimeoutMs: Optional[int] = None,
+                            busyWaitMs: Optional[int] = None, suppressResponse: Optional[bool] = None) -> PyChipError:
     ''' Initiates an InvokeInteraction with the batch commands provided.
 
     Arguments:
@@ -359,7 +388,7 @@ def SendBatchCommands(future: Future, eventLoop, device, commands: List[InvokeRe
     transaction = AsyncBatchCommandsTransaction(future, eventLoop, responseTypes)
     ctypes.pythonapi.Py_IncRef(ctypes.py_object(transaction))
 
-    return builtins.chipStack.Call(
+    return await builtins.chipStack.CallAsync(
         lambda: handle.pychip_CommandSender_SendBatchCommands(
             py_object(transaction), device,
             c_uint16(0 if timedRequestTimeoutMs is None else timedRequestTimeoutMs),
@@ -392,7 +421,7 @@ def TestOnlySendBatchCommands(future: Future, eventLoop, device, commands: List[
     pyBatchCommandsData = _BuildPyInvokeRequestData(commands, timedRequestTimeoutMs,
                                                     responseTypes, suppressTimedRequestMessage=suppressTimedRequestMessage)
 
-    transaction = AsyncBatchCommandsTransaction(future, eventLoop, responseTypes)
+    transaction = TestOnlyAsyncBatchCommandsTransaction(future, eventLoop, responseTypes)
     ctypes.pythonapi.Py_IncRef(ctypes.py_object(transaction))
 
     testOnlyOverrides = TestOnlyPyBatchCommandsOverrides()
@@ -438,17 +467,17 @@ def Init():
         setter = chip.native.NativeLibraryHandleMethodArguments(handle)
 
         setter.Set('pychip_CommandSender_SendCommand',
-                   PyChipError, [py_object, c_void_p, c_uint16, c_uint32, c_uint32, c_char_p, c_size_t, c_uint16, c_bool])
+                   PyChipError, [py_object, c_void_p, c_uint16, c_uint16, c_uint32, c_uint32, c_char_p, c_size_t, c_uint16, c_uint16, c_bool])
         setter.Set('pychip_CommandSender_SendBatchCommands',
                    PyChipError, [py_object, c_void_p, c_uint16, c_uint16, c_uint16, c_bool, POINTER(PyInvokeRequestData), c_size_t])
         setter.Set('pychip_CommandSender_TestOnlySendBatchCommands',
                    PyChipError, [py_object, c_void_p, c_uint16, c_uint16, c_uint16, c_bool, TestOnlyPyBatchCommandsOverrides, POINTER(PyInvokeRequestData), c_size_t])
         setter.Set('pychip_CommandSender_TestOnlySendCommandTimedRequestNoTimedInvoke',
-                   PyChipError, [py_object, c_void_p, c_uint32, c_uint32, c_char_p, c_size_t, c_uint16, c_bool])
+                   PyChipError, [py_object, c_void_p, c_uint16, c_uint32, c_uint32, c_char_p, c_size_t, c_uint16, c_uint16, c_bool])
         setter.Set('pychip_CommandSender_SendGroupCommand',
                    PyChipError, [c_uint16, c_void_p, c_uint32, c_uint32, c_char_p, c_size_t, c_uint16])
         setter.Set('pychip_CommandSender_InitCallbacks', None, [
-                   _OnCommandSenderResponseCallbackFunct, _OnCommandSenderErrorCallbackFunct, _OnCommandSenderDoneCallbackFunct])
+                   _OnCommandSenderResponseCallbackFunct, _OnCommandSenderErrorCallbackFunct, _OnCommandSenderDoneCallbackFunct, _TestOnlyOnCommandSenderDoneCallbackFunct])
 
     handle.pychip_CommandSender_InitCallbacks(
-        _OnCommandSenderResponseCallback, _OnCommandSenderErrorCallback, _OnCommandSenderDoneCallback)
+        _OnCommandSenderResponseCallback, _OnCommandSenderErrorCallback, _OnCommandSenderDoneCallback, _TestOnlyOnCommandSenderDoneCallback)

@@ -41,7 +41,7 @@ import matter.tlv.TlvWriter
 
 class ScenesManagementCluster(
   private val controller: MatterController,
-  private val endpointId: UShort
+  private val endpointId: UShort,
 ) {
   class AddSceneResponse(val status: UByte, val groupID: UShort, val sceneID: UByte)
 
@@ -51,7 +51,7 @@ class ScenesManagementCluster(
     val sceneID: UByte,
     val transitionTime: UInt?,
     val sceneName: String?,
-    val extensionFieldSets: List<ScenesManagementClusterExtensionFieldSet>?
+    val extensionFieldSets: List<ScenesManagementClusterExtensionFieldSet>?,
   )
 
   class RemoveSceneResponse(val status: UByte, val groupID: UShort, val sceneID: UByte)
@@ -64,13 +64,13 @@ class ScenesManagementCluster(
     val status: UByte,
     val capacity: UByte?,
     val groupID: UShort,
-    val sceneList: List<UByte>?
+    val sceneList: List<UByte>?,
   )
 
   class CopySceneResponse(
     val status: UByte,
     val groupIdentifierFrom: UShort,
-    val sceneIdentifierFrom: UByte
+    val sceneIdentifierFrom: UByte,
   )
 
   class LastConfiguredByAttribute(val value: ULong?)
@@ -140,7 +140,7 @@ class ScenesManagementCluster(
     transitionTime: UInt,
     sceneName: String,
     extensionFieldSets: List<ScenesManagementClusterExtensionFieldSet>,
-    timedInvokeTimeout: Duration? = null
+    timedInvokeTimeout: Duration? = null,
   ): AddSceneResponse {
     val commandId: UInt = 0u
 
@@ -171,7 +171,7 @@ class ScenesManagementCluster(
       InvokeRequest(
         CommandPath(endpointId, clusterId = CLUSTER_ID, commandId),
         tlvPayload = tlvWriter.getEncoded(),
-        timedRequest = timedInvokeTimeout
+        timedRequest = timedInvokeTimeout,
       )
 
     val response: InvokeResponse = controller.invoke(request)
@@ -226,7 +226,7 @@ class ScenesManagementCluster(
   suspend fun viewScene(
     groupID: UShort,
     sceneID: UByte,
-    timedInvokeTimeout: Duration? = null
+    timedInvokeTimeout: Duration? = null,
   ): ViewSceneResponse {
     val commandId: UInt = 1u
 
@@ -244,7 +244,7 @@ class ScenesManagementCluster(
       InvokeRequest(
         CommandPath(endpointId, clusterId = CLUSTER_ID, commandId),
         tlvPayload = tlvWriter.getEncoded(),
-        timedRequest = timedInvokeTimeout
+        timedRequest = timedInvokeTimeout,
       )
 
     val response: InvokeResponse = controller.invoke(request)
@@ -356,14 +356,14 @@ class ScenesManagementCluster(
       sceneID_decoded,
       transitionTime_decoded,
       sceneName_decoded,
-      extensionFieldSets_decoded
+      extensionFieldSets_decoded,
     )
   }
 
   suspend fun removeScene(
     groupID: UShort,
     sceneID: UByte,
-    timedInvokeTimeout: Duration? = null
+    timedInvokeTimeout: Duration? = null,
   ): RemoveSceneResponse {
     val commandId: UInt = 2u
 
@@ -381,7 +381,7 @@ class ScenesManagementCluster(
       InvokeRequest(
         CommandPath(endpointId, clusterId = CLUSTER_ID, commandId),
         tlvPayload = tlvWriter.getEncoded(),
-        timedRequest = timedInvokeTimeout
+        timedRequest = timedInvokeTimeout,
       )
 
     val response: InvokeResponse = controller.invoke(request)
@@ -435,7 +435,7 @@ class ScenesManagementCluster(
 
   suspend fun removeAllScenes(
     groupID: UShort,
-    timedInvokeTimeout: Duration? = null
+    timedInvokeTimeout: Duration? = null,
   ): RemoveAllScenesResponse {
     val commandId: UInt = 3u
 
@@ -450,7 +450,7 @@ class ScenesManagementCluster(
       InvokeRequest(
         CommandPath(endpointId, clusterId = CLUSTER_ID, commandId),
         tlvPayload = tlvWriter.getEncoded(),
-        timedRequest = timedInvokeTimeout
+        timedRequest = timedInvokeTimeout,
       )
 
     val response: InvokeResponse = controller.invoke(request)
@@ -494,7 +494,7 @@ class ScenesManagementCluster(
   suspend fun storeScene(
     groupID: UShort,
     sceneID: UByte,
-    timedInvokeTimeout: Duration? = null
+    timedInvokeTimeout: Duration? = null,
   ): StoreSceneResponse {
     val commandId: UInt = 4u
 
@@ -512,7 +512,7 @@ class ScenesManagementCluster(
       InvokeRequest(
         CommandPath(endpointId, clusterId = CLUSTER_ID, commandId),
         tlvPayload = tlvWriter.getEncoded(),
-        timedRequest = timedInvokeTimeout
+        timedRequest = timedInvokeTimeout,
       )
 
     val response: InvokeResponse = controller.invoke(request)
@@ -568,7 +568,7 @@ class ScenesManagementCluster(
     groupID: UShort,
     sceneID: UByte,
     transitionTime: UInt?,
-    timedInvokeTimeout: Duration? = null
+    timedInvokeTimeout: Duration? = null,
   ) {
     val commandId: UInt = 5u
 
@@ -591,7 +591,7 @@ class ScenesManagementCluster(
       InvokeRequest(
         CommandPath(endpointId, clusterId = CLUSTER_ID, commandId),
         tlvPayload = tlvWriter.getEncoded(),
-        timedRequest = timedInvokeTimeout
+        timedRequest = timedInvokeTimeout,
       )
 
     val response: InvokeResponse = controller.invoke(request)
@@ -600,7 +600,7 @@ class ScenesManagementCluster(
 
   suspend fun getSceneMembership(
     groupID: UShort,
-    timedInvokeTimeout: Duration? = null
+    timedInvokeTimeout: Duration? = null,
   ): GetSceneMembershipResponse {
     val commandId: UInt = 6u
 
@@ -615,7 +615,7 @@ class ScenesManagementCluster(
       InvokeRequest(
         CommandPath(endpointId, clusterId = CLUSTER_ID, commandId),
         tlvPayload = tlvWriter.getEncoded(),
-        timedRequest = timedInvokeTimeout
+        timedRequest = timedInvokeTimeout,
       )
 
     val response: InvokeResponse = controller.invoke(request)
@@ -698,7 +698,7 @@ class ScenesManagementCluster(
       status_decoded,
       capacity_decoded,
       groupID_decoded,
-      sceneList_decoded
+      sceneList_decoded,
     )
   }
 
@@ -708,7 +708,7 @@ class ScenesManagementCluster(
     sceneIdentifierFrom: UByte,
     groupIdentifierTo: UShort,
     sceneIdentifierTo: UByte,
-    timedInvokeTimeout: Duration? = null
+    timedInvokeTimeout: Duration? = null,
   ): CopySceneResponse {
     val commandId: UInt = 64u
 
@@ -735,7 +735,7 @@ class ScenesManagementCluster(
       InvokeRequest(
         CommandPath(endpointId, clusterId = CLUSTER_ID, commandId),
         tlvPayload = tlvWriter.getEncoded(),
-        timedRequest = timedInvokeTimeout
+        timedRequest = timedInvokeTimeout,
       )
 
     val response: InvokeResponse = controller.invoke(request)
@@ -787,7 +787,7 @@ class ScenesManagementCluster(
     return CopySceneResponse(
       status_decoded,
       groupIdentifierFrom_decoded,
-      sceneIdentifierFrom_decoded
+      sceneIdentifierFrom_decoded,
     )
   }
 
@@ -834,7 +834,7 @@ class ScenesManagementCluster(
 
   suspend fun subscribeLastConfiguredByAttribute(
     minInterval: Int,
-    maxInterval: Int
+    maxInterval: Int,
   ): Flow<LastConfiguredByAttributeSubscriptionState> {
     val ATTRIBUTE_ID: UInt = 0u
     val attributePaths =
@@ -847,7 +847,7 @@ class ScenesManagementCluster(
         eventPaths = emptyList(),
         attributePaths = attributePaths,
         minInterval = Duration.ofSeconds(minInterval.toLong()),
-        maxInterval = Duration.ofSeconds(maxInterval.toLong())
+        maxInterval = Duration.ofSeconds(maxInterval.toLong()),
       )
 
     return controller.subscribe(subscribeRequest).transform { subscriptionState ->
@@ -927,7 +927,7 @@ class ScenesManagementCluster(
 
   suspend fun subscribeSceneTableSizeAttribute(
     minInterval: Int,
-    maxInterval: Int
+    maxInterval: Int,
   ): Flow<UShortSubscriptionState> {
     val ATTRIBUTE_ID: UInt = 1u
     val attributePaths =
@@ -940,7 +940,7 @@ class ScenesManagementCluster(
         eventPaths = emptyList(),
         attributePaths = attributePaths,
         minInterval = Duration.ofSeconds(minInterval.toLong()),
-        maxInterval = Duration.ofSeconds(maxInterval.toLong())
+        maxInterval = Duration.ofSeconds(maxInterval.toLong()),
       )
 
     return controller.subscribe(subscribeRequest).transform { subscriptionState ->
@@ -1017,7 +1017,7 @@ class ScenesManagementCluster(
 
   suspend fun subscribeFabricSceneInfoAttribute(
     minInterval: Int,
-    maxInterval: Int
+    maxInterval: Int,
   ): Flow<FabricSceneInfoAttributeSubscriptionState> {
     val ATTRIBUTE_ID: UInt = 2u
     val attributePaths =
@@ -1030,7 +1030,7 @@ class ScenesManagementCluster(
         eventPaths = emptyList(),
         attributePaths = attributePaths,
         minInterval = Duration.ofSeconds(minInterval.toLong()),
-        maxInterval = Duration.ofSeconds(maxInterval.toLong())
+        maxInterval = Duration.ofSeconds(maxInterval.toLong()),
       )
 
     return controller.subscribe(subscribeRequest).transform { subscriptionState ->
@@ -1114,7 +1114,7 @@ class ScenesManagementCluster(
 
   suspend fun subscribeGeneratedCommandListAttribute(
     minInterval: Int,
-    maxInterval: Int
+    maxInterval: Int,
   ): Flow<GeneratedCommandListAttributeSubscriptionState> {
     val ATTRIBUTE_ID: UInt = 65528u
     val attributePaths =
@@ -1127,7 +1127,7 @@ class ScenesManagementCluster(
         eventPaths = emptyList(),
         attributePaths = attributePaths,
         minInterval = Duration.ofSeconds(minInterval.toLong()),
-        maxInterval = Duration.ofSeconds(maxInterval.toLong())
+        maxInterval = Duration.ofSeconds(maxInterval.toLong()),
       )
 
     return controller.subscribe(subscribeRequest).transform { subscriptionState ->
@@ -1211,7 +1211,7 @@ class ScenesManagementCluster(
 
   suspend fun subscribeAcceptedCommandListAttribute(
     minInterval: Int,
-    maxInterval: Int
+    maxInterval: Int,
   ): Flow<AcceptedCommandListAttributeSubscriptionState> {
     val ATTRIBUTE_ID: UInt = 65529u
     val attributePaths =
@@ -1224,7 +1224,7 @@ class ScenesManagementCluster(
         eventPaths = emptyList(),
         attributePaths = attributePaths,
         minInterval = Duration.ofSeconds(minInterval.toLong()),
-        maxInterval = Duration.ofSeconds(maxInterval.toLong())
+        maxInterval = Duration.ofSeconds(maxInterval.toLong()),
       )
 
     return controller.subscribe(subscribeRequest).transform { subscriptionState ->
@@ -1308,7 +1308,7 @@ class ScenesManagementCluster(
 
   suspend fun subscribeEventListAttribute(
     minInterval: Int,
-    maxInterval: Int
+    maxInterval: Int,
   ): Flow<EventListAttributeSubscriptionState> {
     val ATTRIBUTE_ID: UInt = 65530u
     val attributePaths =
@@ -1321,7 +1321,7 @@ class ScenesManagementCluster(
         eventPaths = emptyList(),
         attributePaths = attributePaths,
         minInterval = Duration.ofSeconds(minInterval.toLong()),
-        maxInterval = Duration.ofSeconds(maxInterval.toLong())
+        maxInterval = Duration.ofSeconds(maxInterval.toLong()),
       )
 
     return controller.subscribe(subscribeRequest).transform { subscriptionState ->
@@ -1403,7 +1403,7 @@ class ScenesManagementCluster(
 
   suspend fun subscribeAttributeListAttribute(
     minInterval: Int,
-    maxInterval: Int
+    maxInterval: Int,
   ): Flow<AttributeListAttributeSubscriptionState> {
     val ATTRIBUTE_ID: UInt = 65531u
     val attributePaths =
@@ -1416,7 +1416,7 @@ class ScenesManagementCluster(
         eventPaths = emptyList(),
         attributePaths = attributePaths,
         minInterval = Duration.ofSeconds(minInterval.toLong()),
-        maxInterval = Duration.ofSeconds(maxInterval.toLong())
+        maxInterval = Duration.ofSeconds(maxInterval.toLong()),
       )
 
     return controller.subscribe(subscribeRequest).transform { subscriptionState ->
@@ -1491,7 +1491,7 @@ class ScenesManagementCluster(
 
   suspend fun subscribeFeatureMapAttribute(
     minInterval: Int,
-    maxInterval: Int
+    maxInterval: Int,
   ): Flow<UIntSubscriptionState> {
     val ATTRIBUTE_ID: UInt = 65532u
     val attributePaths =
@@ -1504,7 +1504,7 @@ class ScenesManagementCluster(
         eventPaths = emptyList(),
         attributePaths = attributePaths,
         minInterval = Duration.ofSeconds(minInterval.toLong()),
-        maxInterval = Duration.ofSeconds(maxInterval.toLong())
+        maxInterval = Duration.ofSeconds(maxInterval.toLong()),
       )
 
     return controller.subscribe(subscribeRequest).transform { subscriptionState ->
@@ -1572,7 +1572,7 @@ class ScenesManagementCluster(
 
   suspend fun subscribeClusterRevisionAttribute(
     minInterval: Int,
-    maxInterval: Int
+    maxInterval: Int,
   ): Flow<UShortSubscriptionState> {
     val ATTRIBUTE_ID: UInt = 65533u
     val attributePaths =
@@ -1585,7 +1585,7 @@ class ScenesManagementCluster(
         eventPaths = emptyList(),
         attributePaths = attributePaths,
         minInterval = Duration.ofSeconds(minInterval.toLong()),
-        maxInterval = Duration.ofSeconds(maxInterval.toLong())
+        maxInterval = Duration.ofSeconds(maxInterval.toLong()),
       )
 
     return controller.subscribe(subscribeRequest).transform { subscriptionState ->

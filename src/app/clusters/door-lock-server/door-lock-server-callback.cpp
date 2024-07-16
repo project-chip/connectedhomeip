@@ -26,7 +26,6 @@
 #include <app-common/zap-generated/callback.h>
 #include <app/EventLogging.h>
 #include <app/server/Server.h>
-#include <app/util/af.h>
 #include <cinttypes>
 
 #include <app/CommandHandler.h>

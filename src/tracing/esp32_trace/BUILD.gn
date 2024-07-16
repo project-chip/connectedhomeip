@@ -29,6 +29,8 @@ static_library("backend") {
   output_dir = "${root_out_dir}/lib"
 
   sources = [
+    "counter.cpp",
+    "counter.h",
     "esp32_tracing.cpp",
     "esp32_tracing.h",
   ]
@@ -43,7 +45,10 @@ static_library("backend") {
       "${chip_root}/src/system",
     ]
   }
-  public_deps = [ "${chip_root}/src/tracing" ]
+  public_deps = [
+    "${chip_root}/src/lib/core",
+    "${chip_root}/src/tracing",
+  ]
 }
 
 source_set("esp32_trace_tracing") {

@@ -9,6 +9,7 @@
 
 #include <lib/core/CHIPError.h>
 #include <protocols/bdx/BdxMessages.h>
+#include <system/SystemClock.h>
 #include <system/SystemPacketBuffer.h>
 #include <transport/raw/MessageHeader.h>
 

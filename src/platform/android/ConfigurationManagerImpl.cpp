@@ -50,11 +50,8 @@ ConfigurationManagerImpl & ConfigurationManagerImpl::GetDefaultInstance()
 
 void ConfigurationManagerImpl::InitializeWithObject(jobject managerObject)
 {
-    JNIEnv * env                     = JniReferences::GetInstance().GetEnvForCurrentThread();
-    mConfigurationManagerObject      = env->NewGlobalRef(managerObject);
-    jclass configurationManagerClass = env->GetObjectClass(mConfigurationManagerObject);
-    VerifyOrReturn(configurationManagerClass != nullptr, ChipLogError(DeviceLayer, "Failed to get KVS Java class"));
-
+    VerifyOrReturn(mConfigurationManagerObject.Init(managerObject) == CHIP_NO_ERROR,
+                   ChipLogError(DeviceLayer, "Failed to init mConfigurationManagerObject"));
     AndroidConfig::InitializeWithObject(managerObject);
 }
 

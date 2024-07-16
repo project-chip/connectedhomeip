@@ -1,0 +1,48 @@
+# Copyright (c) 2024 Project CHIP Authors
+#
+# Licensed under the Apache License, Version 2.0 (the "License");
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
+#
+# http://www.apache.org/licenses/LICENSE-2.0
+#
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
+
+import("//build_overrides/chip.gni")
+import("//build_overrides/cyw30739_sdk.gni")
+
+import("${chip_root}/examples/platform/infineon/cyw30739/args.gni")
+
+cyw30739_example_dir = "${chip_root}/examples/platform/infineon/cyw30739"
+
+template("cyw30739_example") {
+  forward_variables_from(invoker, [ "board" ])
+
+  static_library(target_name) {
+    sources = [
+      "${cyw30739_example_dir}/EventManagementTestEventTriggerHandler.cpp",
+      "${cyw30739_example_dir}/LEDWidget.cpp",
+      "${cyw30739_example_dir}/OTAConfig.cpp",
+      "${cyw30739_example_dir}/SoftwareDiagnostics.cpp",
+      "${cyw30739_example_dir}/matter_config.cpp",
+    ]
+
+    configs += [
+      "${matter_wpan_sdk_build_root}:emwin-config",
+      "${matter_wpan_sdk_build_root}:wpan_sdk-config",
+    ]
+
+    deps = [
+      "${chip_root}/examples/providers:device_info_provider",
+      "${chip_root}/examples/shell/shell_common:shell_common",
+      "${matter_wpan_sdk_build_root}:${board}",
+      app_data_model,
+    ]
+
+    public_deps = [ "${cyw30739_example_dir}:platform" ]
+  }
+}

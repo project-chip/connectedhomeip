@@ -1,0 +1,89 @@
+{
+    "name": "tv-casting-app darwin templates",
+    "version": "chip-v1",
+    "helpers": [
+        "partials/helper.js",
+        "common/ChipTypesHelper.js",
+        "common/StringHelper.js",
+        "templates/app/helper.js",
+        "templates/chip/helper.js",
+        "common/ClusterTestGeneration.js",
+        "darwin/Framework/CHIP/templates/helper.js"
+    ],
+    "resources": {
+        "config-data": "config-data.yaml"
+    },
+    "override": "../../../../../../src/app/zap-templates/common/override.js",
+    "partials": [
+        {
+            "name": "header",
+            "path": "../../../../../../src/app/zap-templates/partials/header.zapt"
+        },
+        {
+            "name": "command_response_type",
+            "path": "partials/command_response_type.zapt"
+        },
+        {
+            "name": "decode_value",
+            "path": "partials/decode_value.zapt"
+        },
+        {
+            "name": "encode_value",
+            "path": "partials/encode_value.zapt"
+        },
+        {
+            "name": "init_struct_member",
+            "path": "partials/init_struct_member.zapt"
+        },
+        {
+            "name": "renamed_struct_field_impl",
+            "path": "partials/renamed_struct_field_impl.zapt"
+        },
+        {
+            "name": "struct_field_decl",
+            "path": "partials/struct_field_decl.zapt"
+        }
+    ],
+    "templates": [
+        {
+            "path": "MCAttributeObjects.zapt",
+            "name": "Objc MC attribute objects header",
+            "output": "examples/tv-casting-app/darwin/MatterTvCastingBridge/MatterTvCastingBridge/zap-generated/MCAttributeObjects.h"
+        },
+        {
+            "path": "MCAttributeObjects-src.zapt",
+            "name": "Objc MC attribute objects",
+            "output": "examples/tv-casting-app/darwin/MatterTvCastingBridge/MatterTvCastingBridge/zap-generated/MCAttributeObjects.mm"
+        },
+        {
+            "path": "MCClusterObjects.zapt",
+            "name": "Objc MC cluster objects header",
+            "output": "examples/tv-casting-app/darwin/MatterTvCastingBridge/MatterTvCastingBridge/zap-generated/MCClusterObjects.h"
+        },
+        {
+            "path": "MCClusterObjects-src.zapt",
+            "name": "Objc MC cluster objects",
+            "output": "examples/tv-casting-app/darwin/MatterTvCastingBridge/MatterTvCastingBridge/zap-generated/MCClusterObjects.mm"
+        },
+        {
+            "path": "MCCommandObjects.zapt",
+            "name": "Objc MC command objects header",
+            "output": "examples/tv-casting-app/darwin/MatterTvCastingBridge/MatterTvCastingBridge/zap-generated/MCCommandObjects.h"
+        },
+        {
+            "path": "MCCommandObjects-src.zapt",
+            "name": "Objc MC command objects",
+            "output": "examples/tv-casting-app/darwin/MatterTvCastingBridge/MatterTvCastingBridge/zap-generated/MCCommandObjects.mm"
+        },
+        {
+            "path": "MCCommandPayloads.zapt",
+            "name": "Objc reflections of MC command payloads header",
+            "output": "examples/tv-casting-app/darwin/MatterTvCastingBridge/MatterTvCastingBridge/zap-generated/MCCommandPayloads.h"
+        },
+        {
+            "path": "MCCommandPayloads-src.zapt",
+            "name": "Objc reflections of MC command payloads",
+            "output": "examples/tv-casting-app/darwin/MatterTvCastingBridge/MatterTvCastingBridge/zap-generated/MCCommandPayloads.mm"
+        }
+    ]
+}

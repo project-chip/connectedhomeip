@@ -48,14 +48,6 @@ namespace Crypto {
 
 namespace {
 
-void logPsaError(psa_status_t status)
-{
-    if (status != 0)
-    {
-        ChipLogError(Crypto, "PSA error: %d", static_cast<int>(status));
-    }
-}
-
 bool isBufferNonEmpty(const uint8_t * data, size_t data_length)
 {
     return data != nullptr && data_length > 0;
@@ -271,7 +263,7 @@ void Hash_SHA256_stream::Clear()
     psa_hash_abort(toHashOperation(&mContext));
 }
 
-CHIP_ERROR PsaKdf::Init(psa_algorithm_t algorithm, const ByteSpan & secret, const ByteSpan & salt, const ByteSpan & info)
+CHIP_ERROR PsaKdf::Init(const ByteSpan & secret, const ByteSpan & salt, const ByteSpan & info)
 {
     psa_status_t status        = PSA_SUCCESS;
     psa_key_attributes_t attrs = PSA_KEY_ATTRIBUTES_INIT;
@@ -281,10 +273,21 @@ CHIP_ERROR PsaKdf::Init(psa_algorithm_t algorithm, const ByteSpan & secret, cons
     psa_set_key_usage_flags(&attrs, PSA_KEY_USAGE_DERIVE);
 
     status = psa_import_key(&attrs, secret.data(), secret.size(), &mSecretKeyId);
+    LogPsaError(status);
     psa_reset_key_attributes(&attrs);
     VerifyOrReturnError(status == PSA_SUCCESS, CHIP_ERROR_INTERNAL);
 
-    status = psa_key_derivation_setup(&mOperation, algorithm);
+    return InitOperation(mSecretKeyId, salt, info);
+}
+
+CHIP_ERROR PsaKdf::Init(const HkdfKeyHandle & hkdfKey, const ByteSpan & salt, const ByteSpan & info)
+{
+    return InitOperation(hkdfKey.As<psa_key_id_t>(), salt, info);
+}
+
+CHIP_ERROR PsaKdf::InitOperation(psa_key_id_t hkdfKey, const ByteSpan & salt, const ByteSpan & info)
+{
+    psa_status_t status = psa_key_derivation_setup(&mOperation, PSA_ALG_HKDF(PSA_ALG_SHA_256));
     VerifyOrReturnError(status == PSA_SUCCESS, CHIP_ERROR_INTERNAL);
 
     if (salt.size() > 0)
@@ -293,7 +296,7 @@ CHIP_ERROR PsaKdf::Init(psa_algorithm_t algorithm, const ByteSpan & secret, cons
         VerifyOrReturnError(status == PSA_SUCCESS, CHIP_ERROR_INTERNAL);
     }
 
-    status = psa_key_derivation_input_key(&mOperation, PSA_KEY_DERIVATION_INPUT_SECRET, mSecretKeyId);
+    status = psa_key_derivation_input_key(&mOperation, PSA_KEY_DERIVATION_INPUT_SECRET, hkdfKey);
     VerifyOrReturnError(status == PSA_SUCCESS, CHIP_ERROR_INTERNAL);
 
     status = psa_key_derivation_input_bytes(&mOperation, PSA_KEY_DERIVATION_INPUT_INFO, info.data(), info.size());
@@ -302,9 +305,18 @@ CHIP_ERROR PsaKdf::Init(psa_algorithm_t algorithm, const ByteSpan & secret, cons
     return CHIP_NO_ERROR;
 }
 
+void LogPsaError(psa_status_t status)
+{
+    if (status != PSA_SUCCESS)
+    {
+        ChipLogError(Crypto, "PSA error: %d", static_cast<int>(status));
+    }
+}
+
 CHIP_ERROR PsaKdf::DeriveBytes(const MutableByteSpan & output)
 {
     psa_status_t status = psa_key_derivation_output_bytes(&mOperation, output.data(), output.size());
+    LogPsaError(status);
     VerifyOrReturnError(status == PSA_SUCCESS, CHIP_ERROR_INTERNAL);
 
     return CHIP_NO_ERROR;
@@ -313,6 +325,7 @@ CHIP_ERROR PsaKdf::DeriveBytes(const MutableByteSpan & output)
 CHIP_ERROR PsaKdf::DeriveKey(const psa_key_attributes_t & attributes, psa_key_id_t & keyId)
 {
     psa_status_t status = psa_key_derivation_output_key(&attributes, &mOperation, &keyId);
+    LogPsaError(status);
     VerifyOrReturnError(status == PSA_SUCCESS, CHIP_ERROR_INTERNAL);
 
     return CHIP_NO_ERROR;
@@ -328,8 +341,7 @@ CHIP_ERROR HKDF_sha::HKDF_SHA256(const uint8_t * secret, const size_t secret_len
 
     PsaKdf kdf;
 
-    ReturnErrorOnFailure(kdf.Init(PSA_ALG_HKDF(PSA_ALG_SHA_256), ByteSpan(secret, secret_length), ByteSpan(salt, salt_length),
-                                  ByteSpan(info, info_length)));
+    ReturnErrorOnFailure(kdf.Init(ByteSpan(secret, secret_length), ByteSpan(salt, salt_length), ByteSpan(info, info_length)));
 
     return kdf.DeriveBytes(MutableByteSpan(out_buffer, out_length));
 }
@@ -358,6 +370,7 @@ CHIP_ERROR HMAC_sha::HMAC_SHA256(const uint8_t * key, size_t key_length, const u
     VerifyOrExit(status == PSA_SUCCESS, error = CHIP_ERROR_INTERNAL);
 
 exit:
+    LogPsaError(status);
     psa_destroy_key(keyId);
     psa_reset_key_attributes(&attrs);
 
@@ -467,6 +480,7 @@ exit:
     }
 
 exit:
+    LogPsaError(status);
     psa_destroy_key(keyId);
     psa_reset_key_attributes(&attrs);
 
@@ -510,7 +524,7 @@ CHIP_ERROR P256Keypair::ECDSA_sign_msg(const uint8_t * msg, const size_t msg_len
     error = out_signature.SetLength(outputLen);
 
 exit:
-    logPsaError(status);
+    LogPsaError(status);
     return error;
 }
 
@@ -535,7 +549,7 @@ CHIP_ERROR P256PublicKey::ECDSA_validate_msg_signature(const uint8_t * msg, cons
     VerifyOrExit(status == PSA_SUCCESS, error = CHIP_ERROR_INVALID_SIGNATURE);
 
 exit:
-    logPsaError(status);
+    LogPsaError(status);
     psa_destroy_key(keyId);
     psa_reset_key_attributes(&attributes);
 
@@ -564,7 +578,7 @@ CHIP_ERROR P256PublicKey::ECDSA_validate_hash_signature(const uint8_t * hash, co
     VerifyOrExit(status == PSA_SUCCESS, error = CHIP_ERROR_INVALID_SIGNATURE);
 
 exit:
-    logPsaError(status);
+    LogPsaError(status);
     psa_destroy_key(keyId);
     psa_reset_key_attributes(&attributes);
 
@@ -587,7 +601,7 @@ CHIP_ERROR P256Keypair::ECDH_derive_secret(const P256PublicKey & remote_public_k
     SuccessOrExit(error = out_secret.SetLength(outputLength));
 
 exit:
-    logPsaError(status);
+    LogPsaError(status);
 
     return error;
 }
@@ -662,7 +676,7 @@ CHIP_ERROR P256Keypair::Initialize(ECPKeyTarget key_target)
     mInitialized = true;
 
 exit:
-    logPsaError(status);
+    LogPsaError(status);
     psa_reset_key_attributes(&attributes);
 
     return error;
@@ -688,7 +702,7 @@ CHIP_ERROR P256Keypair::Serialize(P256SerializedKeypair & output) const
     error = output.SetLength(bbuf.Needed());
 
 exit:
-    logPsaError(status);
+    LogPsaError(status);
 
     return error;
 }
@@ -719,7 +733,7 @@ CHIP_ERROR P256Keypair::Deserialize(P256SerializedKeypair & input)
     mInitialized = true;
 
 exit:
-    logPsaError(status);
+    LogPsaError(status);
 
     return error;
 }

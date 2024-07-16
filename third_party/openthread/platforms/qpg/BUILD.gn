@@ -16,6 +16,7 @@ import("//build_overrides/chip.gni")
 import("//build_overrides/openthread.gni")
 import("//build_overrides/qpg_sdk.gni")
 
+import("${chip_root}/src/platform/device.gni")
 import("${qpg_sdk_build_root}/qpg_sdk.gni")
 
 # QPGxxxx settings and OT glue code
@@ -26,6 +27,11 @@ config("openthread_qpg_config") {
   include_dirs = [ "${openthread_qpg_root}/src/${openthread_qpg_family}" ]
 
   include_dirs += [ "${chip_root}/examples/platform/qpg" ]
+
+  defines = [
+    "QORVO_FTD=${chip_openthread_ftd}",
+    "QORVO_RCP=0",
+  ]
 }
 
 source_set("openthread_core_config_qpg") {
@@ -40,7 +46,7 @@ source_set("openthread_core_config_qpg") {
 }
 
 source_set("openthread_mbedtls_config_qpg") {
-  sources = [ "${openthread_qpg_root}/src/${openthread_qpg_family}/crypto/${openthread_qpg_family}-mbedtls-config.h" ]
+  sources = [ "${qpg_sdk_build_root}/repo/Libraries/Qorvo/mbedtls_alt/inc/${openthread_qpg_family}-mbedtls-config.h" ]  # "${openthread_qpg_root}/third_party/Qorvo/repo/${openthread_qpg_family}/inc/${openthread_qpg_family}-mbedtls-config.h",
 }
 
 source_set("libopenthread-qpg") {
@@ -52,7 +58,7 @@ source_set("libopenthread-qpg") {
     "${openthread_qpg_root}/src/${openthread_qpg_family}/misc.c",
     "${openthread_qpg_root}/src/${openthread_qpg_family}/platform.c",
     "${openthread_qpg_root}/src/${openthread_qpg_family}/radio.c",
-    "${openthread_qpg_root}/src/${openthread_qpg_family}/settings.cpp",
+    "${openthread_qpg_root}/src/${openthread_qpg_family}/settings.c",
     "${openthread_qpg_root}/src/${openthread_qpg_family}/uart.c",
   ]
 

@@ -15,27 +15,16 @@
  *    See the License for the specific language governing permissions and
  *    limitations under the License.
  */
-
-/**
- *    @file
- *      This file implements interfaces for debugging and logging
- *      CHIP TLV.
- *
- */
-
-#ifndef __STDC_FORMAT_MACROS
-#define __STDC_FORMAT_MACROS
-#endif
-
-#include <ctype.h>
-#include <inttypes.h>
-#include <string.h>
-
-#include <lib/core/TLV.h>
 #include <lib/core/TLVDebug.h>
+
+#include <inttypes.h>
+
+#include <lib/core/CHIPError.h>
+#include <lib/core/TLVReader.h>
+#include <lib/core/TLVTags.h>
+#include <lib/core/TLVTypes.h>
 #include <lib/core/TLVUtilities.h>
 #include <lib/support/CodeUtils.h>
-#include <lib/support/logging/CHIPLogging.h>
 
 namespace chip {
 

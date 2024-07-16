@@ -28,6 +28,7 @@
 #include <platform/internal/GenericConfigurationManagerImpl.h>
 
 #include <jni.h>
+#include <lib/support/JniReferences.h>
 
 namespace chip {
 namespace DeviceLayer {
@@ -74,7 +75,7 @@ private:
 
     static void DoFactoryReset(intptr_t arg);
 
-    jobject mConfigurationManagerObject = nullptr;
+    chip::JniGlobalReference mConfigurationManagerObject;
 };
 
 /**

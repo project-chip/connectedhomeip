@@ -44,7 +44,7 @@ CHIP_ERROR DiscoverCommissioners()
 CHIP_ERROR RequestCommissioning(int index)
 {
     chip::Optional<TargetVideoPlayerInfo *> associatedConnectableVideoPlayer;
-    const Dnssd::DiscoveredNodeData * selectedCommissioner =
+    const Dnssd::CommissionNodeData * selectedCommissioner =
         CastingServer::GetInstance()->GetDiscoveredCommissioner(index, associatedConnectableVideoPlayer);
     if (selectedCommissioner == nullptr)
     {
@@ -60,7 +60,7 @@ CHIP_ERROR RequestCommissioning(int index)
  * If non-null selectedCommissioner is provided, sends user directed commissioning
  * request to the selectedCommissioner and advertises self as commissionable node over DNS-SD
  */
-void PrepareForCommissioning(const Dnssd::DiscoveredNodeData * selectedCommissioner)
+void PrepareForCommissioning(const Dnssd::CommissionNodeData * selectedCommissioner)
 {
     CastingServer::GetInstance()->Init();
 
@@ -96,7 +96,7 @@ void InitCommissioningFlow(intptr_t commandArg)
     for (int i = 0; i < CHIP_DEVICE_CONFIG_MAX_DISCOVERED_NODES; i++)
     {
         chip::Optional<TargetVideoPlayerInfo *> associatedConnectableVideoPlayer;
-        const Dnssd::DiscoveredNodeData * commissioner =
+        const Dnssd::CommissionNodeData * commissioner =
             CastingServer::GetInstance()->GetDiscoveredCommissioner(i, associatedConnectableVideoPlayer);
         if (commissioner != nullptr)
         {
@@ -105,7 +105,7 @@ void InitCommissioningFlow(intptr_t commandArg)
             commissioner->LogDetail();
             if (associatedConnectableVideoPlayer.HasValue())
             {
-                TargetVideoPlayerInfo * targetVideoPlayerInfo = associatedConnectableVideoPlayer.Value();
+                [[maybe_unused]] TargetVideoPlayerInfo * targetVideoPlayerInfo = associatedConnectableVideoPlayer.Value();
                 ChipLogProgress(AppServer, "Previously connected with nodeId 0x" ChipLogFormatX64 " fabricIndex: %d",
                                 ChipLogValueX64(targetVideoPlayerInfo->GetNodeId()), targetVideoPlayerInfo->GetFabricIndex());
             }
@@ -286,7 +286,7 @@ void HandleCommissioningCompleteCallback(CHIP_ERROR err)
 #if CHIP_DEVICE_CONFIG_ENABLE_COMMISSIONER_DISCOVERY_CLIENT
 void HandleUDCSendExpiration(System::Layer * aSystemLayer, void * context)
 {
-    Dnssd::DiscoveredNodeData * selectedCommissioner = (Dnssd::DiscoveredNodeData *) context;
+    Dnssd::CommissionNodeData * selectedCommissioner = (Dnssd::CommissionNodeData *) context;
 
     // Send User Directed commissioning request
     ReturnOnFailure(CastingServer::GetInstance()->SendUserDirectedCommissioningRequest(selectedCommissioner));
@@ -305,7 +305,7 @@ void PrintFabrics()
             ChipLogError(AppServer, " -- Not initialized");
             continue;
         }
-        NodeId myNodeId = fb.GetNodeId();
+        [[maybe_unused]] NodeId myNodeId = fb.GetNodeId();
         ChipLogProgress(NotSpecified,
                         "---- Current Fabric nodeId=0x" ChipLogFormatX64 " fabricId=0x" ChipLogFormatX64 " fabricIndex=%d",
                         ChipLogValueX64(myNodeId), ChipLogValueX64(fb.GetFabricId()), fabricIndex);

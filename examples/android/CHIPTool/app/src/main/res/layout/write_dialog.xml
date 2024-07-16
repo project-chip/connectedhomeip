@@ -14,50 +14,6 @@
       app:layout_constraintStart_toStartOf="parent"
       app:layout_constraintTop_toTopOf="parent" />
 
-  <TextView
-      android:id="@+id/titleValueTypeTv"
-      android:layout_width="match_parent"
-      android:layout_height="wrap_content"
-      android:text="@string/write_dialog_value_type_hint"
-      android:textSize="16sp"
-      android:layout_marginTop="8dp"
-      app:layout_constraintStart_toStartOf="parent"
-      app:layout_constraintTop_toBottomOf="@id/titleText" />
-
-  <Spinner
-      android:id="@+id/writeValueTypeSp"
-      android:layout_width="wrap_content"
-      android:layout_height="wrap_content"
-      android:hint="@string/write_dialog_value_type_hint"
-      android:inputType="text"
-      android:spinnerMode="dropdown"
-      android:textSize="16sp"
-      android:layout_marginTop="8dp"
-      app:layout_constraintStart_toStartOf="parent"
-      app:layout_constraintTop_toBottomOf="@id/titleValueTypeTv" />
-
-  <EditText
-      android:id="@+id/writeValueEd"
-      android:layout_width="wrap_content"
-      android:layout_height="wrap_content"
-      android:hint="@string/write_dialog_write_value_hint"
-      android:inputType="text"
-      android:textSize="16sp"
-      android:layout_marginBottom="8dp"
-      app:layout_constraintStart_toStartOf="parent"
-      app:layout_constraintTop_toBottomOf="@id/writeValueTypeSp" />
-
-  <EditText
-      android:id="@+id/dataVersionEd"
-      android:layout_width="wrap_content"
-      android:layout_height="wrap_content"
-      android:hint="@string/write_dialog_data_version_hint"
-      android:inputType="text"
-      android:textSize="16sp"
-      android:layout_marginBottom="8dp"
-      app:layout_constraintStart_toStartOf="parent"
-      app:layout_constraintTop_toBottomOf="@id/writeValueEd" />
-
   <EditText
       android:id="@+id/timedRequestTimeoutEd"
       android:layout_width="wrap_content"
@@ -67,7 +23,7 @@
       android:textSize="16sp"
       android:layout_marginBottom="8dp"
       app:layout_constraintStart_toStartOf="parent"
-      app:layout_constraintTop_toBottomOf="@id/dataVersionEd" />
+      app:layout_constraintTop_toBottomOf="@id/titleText" />
 
   <EditText
       android:id="@+id/imTimeoutEd"
@@ -79,15 +35,6 @@
       android:layout_marginBottom="8dp"
       app:layout_constraintStart_toStartOf="parent"
       app:layout_constraintTop_toBottomOf="@id/timedRequestTimeoutEd"
-      app:layout_constraintBottom_toTopOf="@id/exampleHint"/>
-  <TextView
-      android:id="@+id/exampleHint"
-      android:layout_width="wrap_content"
-      android:layout_height="wrap_content"
-      android:text="@string/write_dialog_user_guide_hint"
-      android:textSize="10sp"
-      app:layout_constraintStart_toStartOf="parent"
-      app:layout_constraintTop_toBottomOf="@id/imTimeoutEd"
       app:layout_constraintBottom_toTopOf="@id/writeBtn"/>
 
   <Button

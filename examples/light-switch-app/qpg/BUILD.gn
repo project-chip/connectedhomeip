@@ -51,7 +51,7 @@ qpg_executable("light_switch_app") {
   output_name = "chip-${qpg_target_ic}-light-switch-example.out"
 
   sources = [
-    "${chip_root}/src/app/clusters/general-diagnostics-server/GenericFaultTestEventTriggerDelegate.cpp",
+    "${chip_root}/src/app/clusters/general-diagnostics-server/GenericFaultTestEventTriggerHandler.cpp",
     "${examples_plat_dir}/app/main.cpp",
     "${examples_plat_dir}/ota/ota.cpp",
     "src/AppTask.cpp",
@@ -65,6 +65,7 @@ qpg_executable("light_switch_app") {
     "${chip_root}/examples/light-switch-app/qpg/zap/",
     "${chip_root}/examples/providers:device_info_provider",
     "${chip_root}/src/lib",
+    "${chip_root}/src/platform/logging:default",
     "${chip_root}/src/setup_payload",
     "${chip_root}/third_party/openthread/platforms:libopenthread-platform",
     "${chip_root}/third_party/openthread/platforms:libopenthread-platform-utils",
@@ -102,6 +103,7 @@ qpg_executable("light_switch_app") {
     ]
 
     deps += [
+      "$dir_pw_hdlc:default_addresses",
       "$dir_pw_hdlc:rpc_channel_output",
       "$dir_pw_stream:sys_io_stream",
       "${chip_root}/config/qpg/lib/pw_rpc:pw_rpc",
@@ -136,7 +138,7 @@ qpg_executable("light_switch_app") {
     }
   }
 
-  ldscript = "${qpg_sdk_root}/Libraries/Qorvo/QorvoStack/gen/QorvoStack_${qpg_target_ic}/QorvoStack_${qpg_target_ic}.ld"
+  ldscript = "${qpg_sdk_root}/Libraries/Qorvo/QorvoStack/gen/QorvoStack_${qpg_target_ic}${qpg_flavour}/QorvoStack_${qpg_target_ic}${qpg_flavour}.ld"
 
   inputs = [ ldscript ]
 

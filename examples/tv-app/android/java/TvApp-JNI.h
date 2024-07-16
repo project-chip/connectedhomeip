@@ -20,6 +20,7 @@
 
 #include "MyUserPrompter-JNI.h"
 #include <jni.h>
+#include <lib/support/JniReferences.h>
 
 class TvAppJNI
 {
@@ -32,7 +33,7 @@ private:
     friend TvAppJNI & TvAppJNIMgr();
 
     static TvAppJNI sInstance;
-    jobject mTvAppObject             = nullptr;
+    chip::JniGlobalReference mTvAppObject;
     jmethodID mPostClusterInitMethod = nullptr;
 };
 

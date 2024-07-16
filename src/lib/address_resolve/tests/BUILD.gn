@@ -14,13 +14,12 @@
 
 import("//build_overrides/build.gni")
 import("//build_overrides/chip.gni")
-import("//build_overrides/nlunit_test.gni")
 
 import("${chip_root}/src/lib/address_resolve/address_resolve.gni")
 
 import("${chip_root}/build/chip/chip_test_suite.gni")
 
-chip_test_suite_using_nltest("tests") {
+chip_test_suite("tests") {
   output_name = "libAddressResolveTests"
 
   if (chip_address_resolve_strategy == "default") {
@@ -29,8 +28,7 @@ chip_test_suite_using_nltest("tests") {
 
   public_deps = [
     "${chip_root}/src/lib/address_resolve",
-    "${chip_root}/src/lib/support:testing_nlunit",
+    "${chip_root}/src/lib/core:string-builder-adapters",
     "${chip_root}/src/protocols",
-    "${nlunit_test_root}:nlunit-test",
   ]
 }

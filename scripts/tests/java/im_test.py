@@ -71,6 +71,14 @@ class IMTest:
         DumpProgramOutputToQueue(self.thread_list, Fore.GREEN + "JAVA " + Style.RESET_ALL, java_process, self.queue)
         return java_process.wait()
 
+    def TestCmdOnnetworkLongImExtendableInvoke(self, nodeid, setuppin, discriminator, timeout):
+        java_command = self.command + ['im', 'onnetwork-long-im-extendable-invoke', nodeid, setuppin, discriminator, timeout]
+        logging.info(f"Execute: {java_command}")
+        java_process = subprocess.Popen(
+            java_command, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
+        DumpProgramOutputToQueue(self.thread_list, Fore.GREEN + "JAVA " + Style.RESET_ALL, java_process, self.queue)
+        return java_process.wait()
+
     def TestCmdOnnetworkLongImWrite(self, nodeid, setuppin, discriminator, timeout):
         java_command = self.command + ['im', 'onnetwork-long-im-write', nodeid, setuppin, discriminator, timeout]
         logging.info(f"Execute: {java_command}")
@@ -101,6 +109,11 @@ class IMTest:
             code = self.TestCmdOnnetworkLongImInvoke(self.nodeid, self.setup_pin_code, self.discriminator, self.timeout)
             if code != 0:
                 raise Exception(f"Testing pairing onnetwork-long-im-invoke failed with error {code}")
+        elif self.command_name == 'onnetwork-long-im-extendable-invoke':
+            logging.info("Testing pairing onnetwork-long-im-extendable-invoke")
+            code = self.TestCmdOnnetworkLongImExtendableInvoke(self.nodeid, self.setup_pin_code, self.discriminator, self.timeout)
+            if code != 0:
+                raise Exception(f"Testing pairing onnetwork-long-im-extendable-invoke failed with error {code}")
         elif self.command_name == 'onnetwork-long-im-write':
             logging.info("Testing pairing onnetwork-long-im-write")
             code = self.TestCmdOnnetworkLongImWrite(self.nodeid, self.setup_pin_code, self.discriminator, self.timeout)

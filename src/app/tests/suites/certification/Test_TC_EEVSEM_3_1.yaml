@@ -1,0 +1,134 @@
+# Copyright (c) 2024 Project CHIP Authors
+#
+# Licensed under the Apache License, Version 2.0 (the "License");
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
+#
+# http://www.apache.org/licenses/LICENSE-2.0
+#
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
+
+name: 183.3.1. [TC-EEVSEM-3.1] On Mode functionality with DUT as Server
+
+PICS:
+    - EEVSEM.S.A0003
+    - MOD.S.F00
+    - OO.S.C00.Rsp
+    - OO.S.C01.Rsp
+
+config:
+    nodeId: 0x12344321
+    cluster: "Energy EVSE Mode"
+    endpoint: 1
+
+    ConfigureOnMode:
+        type: int8u
+        defaultValue: 0
+    new_mode_th:
+        type: int8u
+        defaultValue: 2
+
+tests:
+    - label:
+          "Step 1: Commission DUT to TH (can be skipped if done in a preceding
+          test)."
+      cluster: "DelayCommands"
+      command: "WaitForCommissionee"
+      arguments:
+          values:
+              - name: "nodeId"
+                value: nodeId
+
+    - label:
+          "Precondition: TH writes from the DUT the OnMode attribute.NOTE: To
+          execute this test case set onmode to any integer value because as
+          default it value has null."
+      PICS: EEVSEM.S.A0003 && MOD.S.F00
+      command: "writeAttribute"
+      attribute: "OnMode"
+      arguments:
+          value: ConfigureOnMode
+
+    - label: "Step 2: TH reads from the DUT the OnMode attribute."
+      PICS: EEVSEM.S.A0003 && MOD.S.F00
+      command: "readAttribute"
+      attribute: "OnMode"
+      response:
+          saveAs: on_mode_dut
+          constraints:
+              type: int8u
+              minValue: 0
+              maxValue: 254
+
+    - label: "Step 3: TH reads from the DUT the CurrentMode attribute."
+      PICS: EEVSEM.S.A0001 && MOD.S.F00
+      command: "readAttribute"
+      attribute: "CurrentMode"
+      response:
+          saveAs: old_current_mode_dut
+          constraints:
+              type: int8u
+              minValue: 0
+              maxValue: 254
+
+    - label:
+          "If on_mode_dut is equal to old_current_mode_dut proceed to step 4.
+          Else proceed to step 6."
+      cluster: "EqualityCommands"
+      command: "UnsignedNumberEquals"
+      arguments:
+          values:
+              - name: "Value1"
+                value: on_mode_dut
+              - name: "Value2"
+                value: old_current_mode_dut
+      response:
+          - values:
+                - name: "Equals"
+                  saveAs: IsExpectedValue
+
+    - label: "Step 4: TH reads from the DUT the SupportedModes attribute."
+      runIf: IsExpectedValue
+      PICS: EEVSEM.S.A0000 && MOD.S.F00
+      command: "readAttribute"
+      attribute: "SupportedModes"
+      response:
+          constraints:
+              type: list
+              minLength: 2
+
+    - label:
+          "Step 5: TH sends a ChangeToMode command to the DUT with NewMode set
+          to new_mode_th"
+      runIf: IsExpectedValue
+      PICS: EEVSEM.S.C00.Rsp && MOD.S.F00
+      command: "ChangeToMode"
+      arguments:
+          values:
+              - name: "NewMode"
+                value: new_mode_th
+      response:
+          values:
+              - name: "Status"
+                value: 0x00
+
+    - label: "Step 6:TH sends a Off command to the DUT"
+      PICS: OO.S.C00.Rsp
+      cluster: "On/Off"
+      command: "Off"
+
+    - label: "Step 7:TH sends a On command to the DUT"
+      PICS: OO.S.C01.Rsp
+      cluster: "On/Off"
+      command: "On"
+
+    - label: "Step 8: TH reads from the DUT the CurrentMode attribute."
+      PICS: EEVSEM.S.A0001 && EEVSEM.S.A0003 && MOD.S.F00
+      command: "readAttribute"
+      attribute: "CurrentMode"
+      response:
+          value: on_mode_dut

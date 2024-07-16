@@ -83,7 +83,9 @@ tests:
     - label:
           "Step 5: Manually put the device in a state from which it will FAIL to
           transition to PIXIT.OTCCM.MODE_CHANGE_FAIL"
-      PICS: OTCCM.S.M.CAN_TEST_MODE_FAILURE && PICS_SKIP_SAMPLE_APP
+      PICS:
+          OTCCM.S.M.CAN_TEST_MODE_FAILURE && PICS_SKIP_SAMPLE_APP &&
+          OTCCM.S.M.CAN_MANUALLY_CONTROLLED
       verification: |
           Manual operation required
       cluster: "LogCommands"
@@ -96,7 +98,7 @@ tests:
                 value: "y"
 
     - label: "Step 6: TH reads from the DUT the CurrentMode attribute."
-      PICS: OTCCM.S.A0001
+      PICS: OTCCM.S.A0001 && OTCCM.S.M.CAN_MANUALLY_CONTROLLED
       command: "readAttribute"
       attribute: "CurrentMode"
       response:
@@ -139,14 +141,14 @@ tests:
       command: "readAttribute"
       attribute: "CurrentMode"
       response:
-          value: Step6_current_mode_dut
+          value: old_current_mode_dut
           constraints:
               type: int16u
 
     - label:
           "Step 9: Manually put the device in a state from which it will
           SUCCESSFULLY transition to PIXIT.OTCCM.MODE_CHANGE_OK"
-      PICS: PICS_SKIP_SAMPLE_APP
+      PICS: PICS_SKIP_SAMPLE_APP && OTCCM.S.M.CAN_MANUALLY_CONTROLLED
       verification: |
           Manual operation required
       cluster: "LogCommands"
@@ -159,7 +161,7 @@ tests:
                 value: "y"
 
     - label: "Step 10: TH reads from the DUT the CurrentMode attribute."
-      PICS: OTCCM.S.A0001
+      PICS: OTCCM.S.A0001 && OTCCM.S.M.CAN_MANUALLY_CONTROLLED
       command: "readAttribute"
       attribute: "CurrentMode"
       response:

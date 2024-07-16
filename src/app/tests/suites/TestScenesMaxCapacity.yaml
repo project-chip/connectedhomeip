@@ -1,0 +1,890 @@
+# Copyright (c) 2023 Project CHIP Authors
+#
+# Licensed under the Apache License, Version 2.0 (the "License");
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
+#
+# http://www.apache.org/licenses/LICENSE-2.0
+#
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
+
+# !!!!!!!!!! TEST INFORMATION !!!!!!!!!!!!!!!!!!
+# This test covers multi fabric support for scenes cluster attributes such as LastConfiguredBy and FabricSceneInfo
+
+name: Scenes Multi-fabric testing
+
+PICS:
+    - MCORE.ROLE.COMMISSIONEE
+    - APPDEVICE.S
+
+config:
+    nodeId: 0x12344321
+    cluster: "Scenes Management"
+    endpoint: 1
+    payload:
+        type: char_string
+        defaultValue: "MT:-24J0AFN00KA0648G00"
+    discriminator:
+        type: int16u
+        defaultValue: 3840
+    waitAfterCommissioning:
+        type: int16u
+        defaultValue: 5000
+    PakeVerifier:
+        type: octet_string
+        defaultValue: "hex:b96170aae803346884724fe9a3b287c30330c2a660375d17bb205a8cf1aecb350457f8ab79ee253ab6a8e46bb09e543ae422736de501e3db37d441fe344920d09548e4c18240630c4ff4913c53513839b7c07fcc0627a1b8573a149fcd1fa466cf"
+    G1:
+        type: group_id
+        defaultValue: 0x0001
+    G2:
+        type: group_id
+        defaultValue: 0x0002
+
+tests:
+    - label: "Commission DUT to TH1"
+      cluster: "DelayCommands"
+      command: "WaitForCommissionee"
+      arguments:
+          values:
+              - name: "nodeId"
+                value: nodeId
+
+    - label: "TH1 reads the fabric index"
+      cluster: "Operational Credentials"
+      endpoint: 0
+      command: "readAttribute"
+      attribute: "CurrentFabricIndex"
+      response:
+          saveAs: th1FabricIndex
+
+    - label: "Read the commissioner node ID from the alpha fabric"
+      identity: "alpha"
+      endpoint: 0
+      cluster: "CommissionerCommands"
+      command: "GetCommissionerNodeId"
+      response:
+          values:
+              - name: "nodeId"
+                saveAs: commissionerNodeIdAlpha
+
+    - label: "Open Commissioning Window from alpha"
+      endpoint: 0
+      cluster: "Administrator Commissioning"
+      command: "OpenCommissioningWindow"
+      timedInteractionTimeoutMs: 10000
+      arguments:
+          values:
+              - name: "CommissioningTimeout"
+                value: 180
+              - name: "PAKEPasscodeVerifier"
+                value: PakeVerifier
+              - name: "Discriminator"
+                value: discriminator
+              - name: "Iterations"
+                value: 1000
+              - name: "Salt"
+                value: "SPAKE2P Key Salt"
+
+    - label: "Waiting after opening commissioning window"
+      cluster: "DelayCommands"
+      command: "WaitForMs"
+      arguments:
+          values:
+              - name: "ms"
+                value: waitAfterCommissioning
+
+    - label: "Commission from TH2"
+      identity: "beta"
+      endpoint: 0
+      cluster: "CommissionerCommands"
+      command: "PairWithCode"
+      arguments:
+          values:
+              - name: "nodeId"
+                value: nodeId
+              - name: "payload"
+                value: payload
+
+    - label: "Wait for the commissioned device to be retrieved for TH2"
+      endpoint: 0
+      identity: beta
+      cluster: "DelayCommands"
+      command: "WaitForCommissionee"
+      arguments:
+          values:
+              - name: "nodeId"
+                value: nodeId
+
+    - label: "TH2 reads the fabric index"
+      identity: "beta"
+      endpoint: 0
+      cluster: "Operational Credentials"
+      command: "readAttribute"
+      attribute: "CurrentFabricIndex"
+      response:
+          saveAs: th2FabricIndex
+
+    - label: "Read the commissioner node ID from the beta fabric"
+      identity: "beta"
+      endpoint: 0
+      cluster: "CommissionerCommands"
+      command: "GetCommissionerNodeId"
+      response:
+          values:
+              - name: "nodeId"
+                saveAs: commissionerNodeIdBeta
+
+    - label: "Open Commissioning Window from alpha"
+      endpoint: 0
+      cluster: "Administrator Commissioning"
+      command: "OpenCommissioningWindow"
+      timedInteractionTimeoutMs: 10000
+      arguments:
+          values:
+              - name: "CommissioningTimeout"
+                value: 180
+              - name: "PAKEPasscodeVerifier"
+                value: PakeVerifier
+              - name: "Discriminator"
+                value: discriminator
+              - name: "Iterations"
+                value: 1000
+              - name: "Salt"
+                value: "SPAKE2P Key Salt"
+
+    - label: "Waiting after opening commissioning window"
+      cluster: "DelayCommands"
+      command: "WaitForMs"
+      arguments:
+          values:
+              - name: "ms"
+                value: waitAfterCommissioning
+
+    - label: "Commission from TH3"
+      identity: "gamma"
+      endpoint: 0
+      cluster: "CommissionerCommands"
+      command: "PairWithCode"
+      arguments:
+          values:
+              - name: "nodeId"
+                value: nodeId
+              - name: "payload"
+                value: payload
+
+    - label: "Wait for the commissioned device to be retrieved for TH3"
+      endpoint: 0
+      identity: gamma
+      cluster: "DelayCommands"
+      command: "WaitForCommissionee"
+      arguments:
+          values:
+              - name: "nodeId"
+                value: nodeId
+
+    - label: "TH3 reads the fabric index"
+      identity: "gamma"
+      endpoint: 0
+      cluster: "Operational Credentials"
+      command: "readAttribute"
+      attribute: "CurrentFabricIndex"
+      response:
+          saveAs: th3FabricIndex
+
+    - label: "Read the commissioner node ID from the gamma fabric"
+      identity: "gamma"
+      endpoint: 0
+      cluster: "CommissionerCommands"
+      command: "GetCommissionerNodeId"
+      response:
+          values:
+              - name: "nodeId"
+                saveAs: commissionerNodeIdBeta
+
+    - label: "Read the FabricSceneInfo attribute (0x0007) "
+      command: "readAttribute"
+      attribute: "FabricSceneInfo"
+      response:
+          constraints:
+              type: list
+
+    - label: "TH reads from the DUT the (0x0006) SceneTableSize attribute"
+      command: "readAttribute"
+      attribute: "SceneTableSize"
+      response:
+          values:
+              - name: "SceneTableSize"
+                saveAs: maxScenes
+
+    - label: "Arithmetic operation to get the maxScenes - 1"
+      cluster: "Unit Testing"
+      command: "TestAddArguments"
+      arguments:
+          values:
+              - name: "arg1"
+                value: maxScenes - 1
+              - name: "arg2"
+                value: 0
+      response:
+          values:
+              - name: "returnValue"
+                saveAs: maxScenesMinusOne
+                value: maxScenes - 1
+
+    - label: "Arithmetic operation to get the fabric Capacity"
+      cluster: "Unit Testing"
+      command: "TestAddArguments"
+      arguments:
+          values:
+              - name: "arg1"
+                value: maxScenesMinusOne / 2
+              - name: "arg2"
+                value: 0
+      response:
+          values:
+              - name: "returnValue"
+                saveAs: fabricCapacity
+                value: maxScenesMinusOne / 2
+
+    - label: "Preparation step : TH 1 Add Group KeySet."
+      cluster: "Group Key Management"
+      endpoint: 0
+      command: "KeySetWrite"
+      arguments:
+          values:
+              - name: "GroupKeySet"
+                value:
+                    {
+                        GroupKeySetID: 0x01a1,
+                        GroupKeySecurityPolicy: 0,
+                        EpochKey0: "\xa0\xa1\xa2\xa3\xa4\xa5\xa6\xa7\xa8\xa9\xaa\xab\xac\xad\xae\xaf",
+                        EpochStartTime0: 1110000,
+                        EpochKey1: "\xb0\xb1\xb2\xb3\xb4\xb5\xb6\xb7\xb8\xb9\xba\xbb\xbc\xbd\xbe\xbf",
+                        EpochStartTime1: 1110001,
+                        EpochKey2: "\xc0\xc1\xc2\xc3\xc4\xc5\xc6\xc7\xc8\xc9\xca\xcb\xcc\xcd\xce\xcf",
+                        EpochStartTime2: 1110002,
+                    }
+
+    - label: "Preparation step TH1 Map KeySets to GroupId."
+      cluster: "Group Key Management"
+      endpoint: 0
+      command: "writeAttribute"
+      attribute: "GroupKeyMap"
+      arguments:
+          value:
+              [
+                  { FabricIndex: 0, GroupId: G1, GroupKeySetID: 0x01a1 },
+                  { FabricIndex: 0, GroupId: G2, GroupKeySetID: 0x01a1 },
+              ]
+
+    - label: "TH1 sends a RemoveAllGroups command to DUT."
+      cluster: "Groups"
+      command: "RemoveAllGroups"
+
+    - label: "TH1 sends a AddGroup command to DUT for G1."
+      cluster: "Groups"
+      command: "AddGroup"
+      arguments:
+          values:
+              - name: "GroupID"
+                value: G1
+              - name: "GroupName"
+                value: "Group1"
+      response:
+          values:
+              - name: "Status"
+                value: 0
+              - name: "GroupID"
+                value: G1
+
+    - label: "TH1 sends a AddGroup command to DUT for G2."
+      cluster: "Groups"
+      command: "AddGroup"
+      arguments:
+          values:
+              - name: "GroupID"
+                value: G2
+              - name: "GroupName"
+                value: "Group2"
+      response:
+          values:
+              - name: "Status"
+                value: 0
+              - name: "GroupID"
+                value: G2
+
+    - label: "Preparation step : TH 2 Add Group KeySet."
+      identity: "beta"
+      cluster: "Group Key Management"
+      endpoint: 0
+      command: "KeySetWrite"
+      arguments:
+          values:
+              - name: "GroupKeySet"
+                value:
+                    {
+                        GroupKeySetID: 0x01a2,
+                        GroupKeySecurityPolicy: 0,
+                        EpochKey0: "\xa0\xa1\xa2\xa3\xa4\xa5\xa6\xa7\xa8\xa9\xaa\xab\xac\xad\xae\xaf",
+                        EpochStartTime0: 1120000,
+                        EpochKey1: "\xb0\xb1\xb2\xb3\xb4\xb5\xb6\xb7\xb8\xb9\xba\xbb\xbc\xbd\xbe\xbf",
+                        EpochStartTime1: 1120001,
+                        EpochKey2: "\xc0\xc1\xc2\xc3\xc4\xc5\xc6\xc7\xc8\xc9\xca\xcb\xcc\xcd\xce\xcf",
+                        EpochStartTime2: 1120002,
+                    }
+
+    - label: "Preparation step TH2 Map KeySets to GroupId."
+      identity: "beta"
+      cluster: "Group Key Management"
+      endpoint: 0
+      command: "writeAttribute"
+      attribute: "GroupKeyMap"
+      arguments:
+          value:
+              [
+                  { FabricIndex: 0, GroupId: G1, GroupKeySetID: 0x01a2 },
+                  { FabricIndex: 0, GroupId: G2, GroupKeySetID: 0x01a2 },
+              ]
+
+    - label: "TH2 sends a AddGroup command to DUT for G1."
+      identity: "beta"
+      cluster: "Groups"
+      command: "AddGroup"
+      arguments:
+          values:
+              - name: "GroupID"
+                value: G1
+              - name: "GroupName"
+                value: "Group1"
+      response:
+          values:
+              - name: "Status"
+                value: 0
+              - name: "GroupID"
+                value: G1
+
+    - label: "TH2 sends a AddGroup command to DUT for G2."
+      identity: "beta"
+      cluster: "Groups"
+      command: "AddGroup"
+      arguments:
+          values:
+              - name: "GroupID"
+                value: G2
+              - name: "GroupName"
+                value: "Group1"
+      response:
+          values:
+              - name: "Status"
+                value: 0
+              - name: "GroupID"
+                value: G2
+
+    - label: "TH2 confirms the Fabric Capacity is Maximum"
+      command: "GetSceneMembership"
+      identity: "beta"
+      arguments:
+          values:
+              - name: "GroupID"
+                value: G1
+      response:
+          values:
+              - name: "Status"
+                value: 0x00
+              - name: "Capacity"
+                value: fabricCapacity
+              - name: "GroupID"
+                value: G1
+
+    - label: "Preparation step : TH 3 Add Group KeySet."
+      identity: "gamma"
+      cluster: "Group Key Management"
+      endpoint: 0
+      command: "KeySetWrite"
+      arguments:
+          values:
+              - name: "GroupKeySet"
+                value:
+                    {
+                        GroupKeySetID: 0x01a2,
+                        GroupKeySecurityPolicy: 0,
+                        EpochKey0: "\xa0\xa1\xa2\xa3\xa4\xa5\xa6\xa7\xa8\xa9\xaa\xab\xac\xad\xae\xaf",
+                        EpochStartTime0: 1120000,
+                        EpochKey1: "\xb0\xb1\xb2\xb3\xb4\xb5\xb6\xb7\xb8\xb9\xba\xbb\xbc\xbd\xbe\xbf",
+                        EpochStartTime1: 1120001,
+                        EpochKey2: "\xc0\xc1\xc2\xc3\xc4\xc5\xc6\xc7\xc8\xc9\xca\xcb\xcc\xcd\xce\xcf",
+                        EpochStartTime2: 1120002,
+                    }
+
+    - label: "Preparation step TH3 Map KeySets to GroupId."
+      identity: "gamma"
+      cluster: "Group Key Management"
+      endpoint: 0
+      command: "writeAttribute"
+      attribute: "GroupKeyMap"
+      arguments:
+          value: [{ FabricIndex: 0, GroupId: G1, GroupKeySetID: 0x01a2 }]
+
+    - label: "TH3 sends a AddGroup command to DUT for G1."
+      identity: "gamma"
+      cluster: "Groups"
+      command: "AddGroup"
+      arguments:
+          values:
+              - name: "GroupID"
+                value: G1
+              - name: "GroupName"
+                value: "Group1"
+      response:
+          values:
+              - name: "Status"
+                value: 0
+              - name: "GroupID"
+                value: G1
+
+    - label: "TH3 confirms the Fabric Capacity is Maximum"
+      command: "GetSceneMembership"
+      identity: "gamma"
+      arguments:
+          values:
+              - name: "GroupID"
+                value: G1
+      response:
+          values:
+              - name: "Status"
+                value: 0x00
+              - name: "Capacity"
+                value: fabricCapacity
+              - name: "GroupID"
+                value: G1
+
+    - label: "TH1 sends a StoreScene command to DUT for G1."
+      cluster: "Scenes Management"
+      command: "StoreScene"
+      arguments:
+          values:
+              - name: "GroupID"
+                value: G1
+              - name: "SceneID"
+                value: 0x0001
+      response:
+          values:
+              - name: "Status"
+                value: 0
+              - name: "GroupID"
+                value: G1
+              - name: "SceneID"
+                value: 0x0001
+
+    - label: "TH2 sends a StoreScene command to DUT for G1."
+      cluster: "Scenes Management"
+      identity: "beta"
+      command: "StoreScene"
+      arguments:
+          values:
+              - name: "GroupID"
+                value: G1
+              - name: "SceneID"
+                value: 0x0001
+      response:
+          values:
+              - name: "Status"
+                value: 0
+              - name: "GroupID"
+                value: G1
+              - name: "SceneID"
+                value: 0x0001
+
+    - label: "TH3 sends a StoreScene command to DUT for G1."
+      cluster: "Scenes Management"
+      identity: "gamma"
+      command: "StoreScene"
+      arguments:
+          values:
+              - name: "GroupID"
+                value: G1
+              - name: "SceneID"
+                value: 0x0001
+      response:
+          values:
+              - name: "Status"
+                value: 0
+              - name: "GroupID"
+                value: G1
+              - name: "SceneID"
+                value: 0x0001
+
+    - label: "TH1 confirms the Fabric Capacity is 0"
+      command: "GetSceneMembership"
+      arguments:
+          values:
+              - name: "GroupID"
+                value: G1
+      response:
+          values:
+              - name: "Status"
+                value: 0x00
+              - name: "Capacity"
+                value: fabricCapacity - 1
+              - name: "GroupID"
+                value: G1
+
+    - label: "TH2 confirms the Fabric Capacity is 7"
+      command: "GetSceneMembership"
+      identity: "beta"
+      arguments:
+          values:
+              - name: "GroupID"
+                value: G1
+      response:
+          values:
+              - name: "Status"
+                value: 0x00
+              - name: "Capacity"
+                value: fabricCapacity - 1
+              - name: "GroupID"
+                value: G1
+
+    - label: "TH2 confirms the Fabric Capacity is 7"
+      command: "GetSceneMembership"
+      identity: "beta"
+      arguments:
+          values:
+              - name: "GroupID"
+                value: G1
+      response:
+          values:
+              - name: "Status"
+                value: 0x00
+              - name: "Capacity"
+                value: fabricCapacity - 1
+              - name: "GroupID"
+                value: G1
+
+    # Now we fill TH1
+    - label: "TH1 sends a StoreScene command to DUT for G1."
+      cluster: "Scenes Management"
+      command: "StoreScene"
+      arguments:
+          values:
+              - name: "GroupID"
+                value: G1
+              - name: "SceneID"
+                value: 0x0002
+      response:
+          values:
+              - name: "Status"
+                value: 0
+              - name: "GroupID"
+                value: G1
+              - name: "SceneID"
+                value: 0x0002
+
+    - label: "TH1 sends a StoreScene command to DUT for G1."
+      cluster: "Scenes Management"
+      command: "StoreScene"
+      arguments:
+          values:
+              - name: "GroupID"
+                value: G1
+              - name: "SceneID"
+                value: 0x0003
+      response:
+          values:
+              - name: "Status"
+                value: 0
+              - name: "GroupID"
+                value: G1
+              - name: "SceneID"
+                value: 0x0003
+
+    - label: "TH1 sends a StoreScene command to DUT for G1."
+      cluster: "Scenes Management"
+      command: "StoreScene"
+      arguments:
+          values:
+              - name: "GroupID"
+                value: G1
+              - name: "SceneID"
+                value: 0x0004
+      response:
+          values:
+              - name: "Status"
+                value: 0
+              - name: "GroupID"
+                value: G1
+              - name: "SceneID"
+                value: 0x0004
+
+    - label: "TH1 copies Scenes from G1 to G2"
+      command: "CopyScene"
+      arguments:
+          values:
+              - name: "Mode"
+                value: 0x01
+              - name: "GroupIdentifierFrom"
+                value: G1
+              - name: "SceneIdentifierFrom"
+                value: 0x01
+              - name: "GroupIdentifierTo"
+                value: G2
+              - name: "SceneIdentifierTo"
+                value: 0x02
+      response:
+          values:
+              - name: "Status"
+                value: 0x89
+              - name: "GroupIdentifierFrom"
+                value: G1
+              - name: "SceneIdentifierFrom"
+                value: 0x01
+
+    - label: "TH1 Read the FabricSceneInfo attribute (0x0002) "
+      command: "readAttribute"
+      attribute: "FabricSceneInfo"
+      response:
+          value:
+              [
+                  {
+                      SceneCount: 7,
+                      CurrentScene: 0x04,
+                      CurrentGroup: 0x0001,
+                      FabricIndex: th1FabricIndex,
+                      SceneValid: true,
+                      RemainingCapacity: fabricCapacity - 7,
+                  },
+              ]
+
+    - label: "TH2 Read the FabricSceneInfo attribute (0x0002) "
+      identity: "beta"
+      command: "readAttribute"
+      attribute: "FabricSceneInfo"
+      response:
+          value:
+              [
+                  {
+                      SceneCount: 1,
+                      CurrentScene: 0x01,
+                      CurrentGroup: 0x01,
+                      FabricIndex: th2FabricIndex,
+                      SceneValid: true,
+                      RemainingCapacity: fabricCapacity - 1,
+                  },
+              ]
+
+    - label: "TH3 Read the FabricSceneInfo attribute (0x0002) "
+      identity: "gamma"
+      command: "readAttribute"
+      attribute: "FabricSceneInfo"
+      response:
+          value:
+              [
+                  {
+                      SceneCount: 1,
+                      CurrentScene: 0x01,
+                      CurrentGroup: 0x01,
+                      FabricIndex: th3FabricIndex,
+                      SceneValid: true,
+                      RemainingCapacity: fabricCapacity - 1,
+                  },
+              ]
+
+    # Now we fill TH2
+    - label: "TH2 sends a StoreScene command to DUT for G1."
+      cluster: "Scenes Management"
+      identity: "beta"
+      command: "StoreScene"
+      arguments:
+          values:
+              - name: "GroupID"
+                value: G1
+              - name: "SceneID"
+                value: 0x0002
+      response:
+          values:
+              - name: "Status"
+                value: 0
+              - name: "GroupID"
+                value: G1
+              - name: "SceneID"
+                value: 0x0002
+
+    - label: "TH2 sends a StoreScene command to DUT for G1."
+      cluster: "Scenes Management"
+      identity: "beta"
+      command: "StoreScene"
+      arguments:
+          values:
+              - name: "GroupID"
+                value: G1
+              - name: "SceneID"
+                value: 0x0003
+      response:
+          values:
+              - name: "Status"
+                value: 0
+              - name: "GroupID"
+                value: G1
+              - name: "SceneID"
+                value: 0x0003
+
+    - label: "TH2 sends a StoreScene command to DUT for G1."
+      cluster: "Scenes Management"
+      command: "StoreScene"
+      identity: "beta"
+      arguments:
+          values:
+              - name: "GroupID"
+                value: G1
+              - name: "SceneID"
+                value: 0x0004
+      response:
+          values:
+              - name: "Status"
+                value: 0
+              - name: "GroupID"
+                value: G1
+              - name: "SceneID"
+                value: 0x0004
+
+    - label: "TH2 copies Scenes from G1 to G2"
+      cluster: "Scenes Management"
+      identity: "beta"
+      command: "CopyScene"
+      arguments:
+          values:
+              - name: "Mode"
+                value: 0x01
+              - name: "GroupIdentifierFrom"
+                value: G1
+              - name: "SceneIdentifierFrom"
+                value: 0x01
+              - name: "GroupIdentifierTo"
+                value: G2
+              - name: "SceneIdentifierTo"
+                value: 0x02
+      response:
+          values:
+              - name: "Status"
+                value: 0x89
+              - name: "GroupIdentifierFrom"
+                value: G1
+              - name: "SceneIdentifierFrom"
+                value: 0x01
+
+    - label: "TH1 Read the FabricSceneInfo attribute (0x0002) "
+      command: "readAttribute"
+      attribute: "FabricSceneInfo"
+      response:
+          value:
+              [
+                  {
+                      SceneCount: 7,
+                      CurrentScene: 0x04,
+                      CurrentGroup: 0x0001,
+                      FabricIndex: th1FabricIndex,
+                      SceneValid: true,
+                      RemainingCapacity: fabricCapacity - 7,
+                  },
+              ]
+
+    - label: "TH2 Read the FabricSceneInfo attribute (0x0002) "
+      identity: "beta"
+      command: "readAttribute"
+      attribute: "FabricSceneInfo"
+      response:
+          value:
+              [
+                  {
+                      SceneCount: 7,
+                      CurrentScene: 0x04,
+                      CurrentGroup: 0x0001,
+                      FabricIndex: th2FabricIndex,
+                      SceneValid: true,
+                      RemainingCapacity: fabricCapacity - 7,
+                  },
+              ]
+
+    - label: "TH3 Read the FabricSceneInfo attribute (0x0002) "
+      identity: "gamma"
+      command: "readAttribute"
+      attribute: "FabricSceneInfo"
+      response:
+          value:
+              [
+                  {
+                      SceneCount: 1,
+                      CurrentScene: 0x01,
+                      CurrentGroup: 0x01,
+                      FabricIndex: th3FabricIndex,
+                      SceneValid: true,
+                      RemainingCapacity: fabricCapacity - 6,
+                  },
+              ]
+
+    - label: "TH3 sends a StoreScene command to DUT for G1."
+      cluster: "Scenes Management"
+      identity: "gamma"
+      command: "StoreScene"
+      arguments:
+          values:
+              - name: "GroupID"
+                value: G1
+              - name: "SceneID"
+                value: 0x0002
+      response:
+          values:
+              - name: "Status"
+                value: 0
+              - name: "GroupID"
+                value: G1
+              - name: "SceneID"
+                value: 0x0002
+
+    - label: "TH3 sends a StoreScene command to DUT for G1."
+      cluster: "Scenes Management"
+      identity: "gamma"
+      command: "StoreScene"
+      arguments:
+          values:
+              - name: "GroupID"
+                value: G1
+              - name: "SceneID"
+                value: 0x0003
+      response:
+          values:
+              - name: "Status"
+                value: 0x89
+              - name: "GroupID"
+                value: G1
+              - name: "SceneID"
+                value: 0x0003
+
+    - label: "TH3 copies Scene 0x01 from G1 to 0x02 in G1"
+      cluster: "Scenes Management"
+      identity: "beta"
+      command: "CopyScene"
+      arguments:
+          values:
+              - name: "Mode"
+                value: 0x00
+              - name: "GroupIdentifierFrom"
+                value: G1
+              - name: "SceneIdentifierFrom"
+                value: 0x01
+              - name: "GroupIdentifierTo"
+                value: G1
+              - name: "SceneIdentifierTo"
+                value: 0x04
+      response:
+          values:
+              - name: "Status"
+                value: 0x89
+              - name: "GroupIdentifierFrom"
+                value: G1
+              - name: "SceneIdentifierFrom"
+                value: 0x01

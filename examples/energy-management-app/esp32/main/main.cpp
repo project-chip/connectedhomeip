@@ -16,14 +16,15 @@
  */
 
 #include "DeviceCallbacks.h"
-#include <EVSEManufacturerImpl.h>
-#include <EnergyEvseManager.h>
-#include <EnergyManagementManager.h>
+#include <EnergyEvseMain.h>
 
 #include "esp_log.h"
 #include <common/CHIPDeviceManager.h>
 #include <common/Esp32AppServer.h>
 #include <common/Esp32ThreadInit.h>
+#if CONFIG_ENABLE_SNTP_TIME_SYNC
+#include <time/TimeSync.h>
+#endif
 #if ESP_IDF_VERSION >= ESP_IDF_VERSION_VAL(5, 0, 0)
 #include "spi_flash_mmap.h"
 #else
@@ -65,18 +66,12 @@
 #include <tracing/registry.h>
 #endif
 
-#define ENERGY_EVSE_ENDPOINT 1
-
 using namespace ::chip;
 using namespace chip::app;
 using namespace chip::app::Clusters;
 using namespace ::chip::Credentials;
 using namespace ::chip::DeviceManager;
 using namespace ::chip::DeviceLayer;
-
-static EnergyEvseDelegate * gDelegate       = nullptr;
-static EnergyEvseManager * gInstance        = nullptr;
-static EVSEManufacturer * gEvseManufacturer = nullptr;
 
 #if CONFIG_ENABLE_ESP_INSIGHTS_TRACE
 extern const char insights_auth_key_start[] asm("_binary_insights_auth_key_txt_start");
@@ -118,47 +113,24 @@ chip::Credentials::DeviceAttestationCredentialsProvider * get_dac_provider(void)
 
 void ApplicationInit()
 {
-    if ((gDelegate == nullptr) && (gInstance == nullptr) && (gEvseManufacturer == nullptr))
-    {
-        gDelegate = new EnergyEvseDelegate();
-        if (gDelegate != nullptr)
-        {
-            gInstance = new EnergyEvseManager(
-                EndpointId(ENERGY_EVSE_ENDPOINT), *gDelegate,
-                BitMask<EnergyEvse::Feature, uint32_t>(EnergyEvse::Feature::kChargingPreferences,
-                                                       EnergyEvse::Feature::kPlugAndCharge, EnergyEvse::Feature::kRfid,
-                                                       EnergyEvse::Feature::kSoCReporting, EnergyEvse::Feature::kV2x),
-                BitMask<OptionalAttributes, uint32_t>(OptionalAttributes::kSupportsUserMaximumChargingCurrent,
-                                                      OptionalAttributes::kSupportsRandomizationWindow,
-                                                      OptionalAttributes::kSupportsApproximateEvEfficiency),
-                BitMask<OptionalCommands, uint32_t>(OptionalCommands::kSupportsStartDiagnostics));
-            gInstance->Init(); /* Register Attribute & Command handlers */
-        }
-    }
-    else
-    {
-        ChipLogError(AppServer, "EVSE Instance or Delegate already exist.")
-    }
+    ESP_LOGD(TAG, "Energy Management App: ApplicationInit()");
+    EvseApplicationInit();
+}
 
-    if (gEvseManufacturer == nullptr)
-    {
-        gEvseManufacturer = new EVSEManufacturer();
-        gEvseManufacturer->Init(gInstance);
-    }
-    else
-    {
-        ChipLogError(AppServer, "EVSEManufacturer already exists.")
-    }
+void ApplicationShutdown()
+{
+    ESP_LOGD(TAG, "Energy Management App: ApplicationShutdown()");
+    EvseApplicationShutdown();
 }
 
 static void InitServer(intptr_t context)
 {
-    ApplicationInit();
     // Print QR Code URL
     PrintOnboardingCodes(chip::RendezvousInformationFlags(CONFIG_RENDEZVOUS_MODE));
 
     DeviceCallbacksDelegate::Instance().SetAppDelegate(&sAppDeviceCallbacksDelegate);
-    Esp32AppServer::Init(); // Init ZCL Data Model and CHIP App Server AND Initialize device attestation config
+    Esp32AppServer::Init(); // Init ZCL Data Model and CHIP App Server AND
+                            // Initialize device attestation config
 #if CONFIG_ENABLE_ESP_INSIGHTS_TRACE
     esp_insights_config_t config = {
         .log_type = ESP_DIAG_LOG_TYPE_ERROR | ESP_DIAG_LOG_TYPE_WARNING | ESP_DIAG_LOG_TYPE_EVENT,
@@ -174,6 +146,16 @@ static void InitServer(intptr_t context)
 
     static Tracing::Insights::ESP32Backend backend;
     Tracing::Register(backend);
+#endif
+
+    // Application code should always be initialised after the initialisation of
+    // server.
+    ApplicationInit();
+
+#if CONFIG_ENABLE_SNTP_TIME_SYNC
+    const char kNtpServerUrl[]             = "pool.ntp.org";
+    const uint16_t kSyncNtpTimeIntervalDay = 1;
+    chip::Esp32TimeSync::Init(kNtpServerUrl, kSyncNtpTimeIntervalDay);
 #endif
 }
 

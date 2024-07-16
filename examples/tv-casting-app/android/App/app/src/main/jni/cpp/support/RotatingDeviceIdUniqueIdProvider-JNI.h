@@ -19,6 +19,7 @@
 #include "core/Types.h"
 
 #include <jni.h>
+#include <lib/support/JniReferences.h>
 
 namespace matter {
 namespace casting {
@@ -32,8 +33,8 @@ public:
 
 private:
     CHIP_ERROR GetJavaByteByMethod(jmethodID method, chip::MutableByteSpan & out_buffer);
-    jobject mJNIProviderObject = nullptr;
-    jmethodID mGetMethod       = nullptr;
+    chip::JniGlobalReference mJNIProviderObject;
+    jmethodID mGetMethod = nullptr;
 
     chip::MutableByteSpan mRotatingDeviceIdUniqueIdSpan;
     uint8_t mRotatingDeviceIdUniqueId[chip::DeviceLayer::ConfigurationManager::kRotatingDeviceIDUniqueIDLength];

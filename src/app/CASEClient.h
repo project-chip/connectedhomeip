@@ -34,7 +34,11 @@ struct CASEClientInitParams
     Messaging::ExchangeManager * exchangeMgr                           = nullptr;
     FabricTable * fabricTable                                          = nullptr;
     Credentials::GroupDataProvider * groupDataProvider                 = nullptr;
-    Optional<ReliableMessageProtocolConfig> mrpLocalConfig             = Optional<ReliableMessageProtocolConfig>::Missing();
+
+    // mrpLocalConfig should not generally be set to anything other than
+    // NullOptional.  Doing that can lead to different parts of the system
+    // claiming different MRP parameters for the same node.
+    Optional<ReliableMessageProtocolConfig> mrpLocalConfig = NullOptional;
 
     CHIP_ERROR Validate() const
     {

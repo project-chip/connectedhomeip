@@ -23,7 +23,8 @@
 
 #pragma once
 
-#include <app/AttributeAccessInterface.h>
+#include <app/icd/server/ICDServerConfig.h>
+
 #include <app/util/basic-types.h>
 #include <inet/IPAddress.h>
 #include <lib/support/Span.h>
@@ -106,7 +107,6 @@ public:
     CHIP_ERROR GetExternalIPv6Address(chip::Inet::IPAddress & addr);
     CHIP_ERROR GetPollPeriod(uint32_t & buf);
 
-    CHIP_ERROR JoinerStart();
     CHIP_ERROR SetThreadProvision(ByteSpan aDataset);
     CHIP_ERROR SetThreadEnabled(bool val);
     CHIP_ERROR AttachToThreadNetwork(const Thread::OperationalDataset & dataset,
@@ -121,6 +121,26 @@ public:
     CHIP_ERROR RemoveSrpService(const char * aInstanceName, const char * aName);
     CHIP_ERROR InvalidateAllSrpServices(); ///< Mark all SRP services as invalid
     CHIP_ERROR RemoveInvalidSrpServices(); ///< Remove SRP services marked as invalid
+
+    /*
+     * @brief Utility function to clear all thread SRP host and services established between the SRP server and client.
+     * It is expected that a transaction is done between the SRP server and client so the clear request is applied on both ends
+     *
+     * A generic implementation is provided in `GenericThreadStackManagerImpl_OpenThread` with the SoC OT stack
+     */
+    CHIP_ERROR ClearAllSrpHostAndServices();
+
+    /*
+     * @brief Used to synchronize on the SRP server response confirming the clearing of the host and service entries
+     * Should be called in ClearAllSrpHostAndServices once the request is sent.
+     */
+    void WaitOnSrpClearAllComplete();
+
+    /*
+     * @brief Notify that the SRP server confirmed the clearing of the host and service entries
+     * Should be called in the SRP Client set callback in the removal confirmation.
+     */
+    void NotifySrpClearAllComplete();
     CHIP_ERROR SetupSrpHost(const char * aHostName);
     CHIP_ERROR ClearSrpHost(const char * aHostName);
     CHIP_ERROR SetSrpDnsCallbacks(DnsAsyncReturnCallback aInitCallback, DnsAsyncReturnCallback aErrorCallback, void * aContext);
@@ -132,7 +152,6 @@ public:
 #endif // CHIP_DEVICE_CONFIG_ENABLE_THREAD_SRP_CLIENT
 
     void ResetThreadNetworkDiagnosticsCounts(void);
-    CHIP_ERROR WriteThreadNetworkDiagnosticAttributeToTlv(AttributeId attributeId, app::AttributeValueEncoder & encoder);
 
 private:
     // ===== Members for internal use by the following friends.
@@ -290,6 +309,21 @@ inline CHIP_ERROR ThreadStackManager::RemoveInvalidSrpServices()
     return static_cast<ImplClass *>(this)->_RemoveInvalidSrpServices();
 }
 
+inline CHIP_ERROR ThreadStackManager::ClearAllSrpHostAndServices()
+{
+    return static_cast<ImplClass *>(this)->_ClearAllSrpHostAndServices();
+}
+
+inline void ThreadStackManager::WaitOnSrpClearAllComplete()
+{
+    return static_cast<ImplClass *>(this)->_WaitOnSrpClearAllComplete();
+}
+
+inline void ThreadStackManager::NotifySrpClearAllComplete()
+{
+    return static_cast<ImplClass *>(this)->_NotifySrpClearAllComplete();
+}
+
 inline CHIP_ERROR ThreadStackManager::SetupSrpHost(const char * aHostName)
 {
     return static_cast<ImplClass *>(this)->_SetupSrpHost(aHostName);
@@ -415,33 +449,9 @@ inline CHIP_ERROR ThreadStackManager::GetPollPeriod(uint32_t & buf)
     return static_cast<ImplClass *>(this)->_GetPollPeriod(buf);
 }
 
-inline CHIP_ERROR ThreadStackManager::JoinerStart()
-{
-    return static_cast<ImplClass *>(this)->_JoinerStart();
-}
-
 inline void ThreadStackManager::ResetThreadNetworkDiagnosticsCounts()
 {
     static_cast<ImplClass *>(this)->_ResetThreadNetworkDiagnosticsCounts();
-}
-
-/*
- * @brief Get runtime value from the thread network based on the given attribute ID.
- *        The info is encoded via the AttributeValueEncoder.
- *
- * @param attributeId Id of the attribute for the requested info.
- * @param aEncoder Encoder to encode the attribute value.
- *
- * @return CHIP_NO_ERROR = Succes.
- *         CHIP_ERROR_NOT_IMPLEMENTED = Runtime value for this attribute to yet available to send as reply
- *                                      Use standard read.
- *         CHIP_ERROR_UNSUPPORTED_CHIP_FEATURE = Is not a Runtime readable attribute. Use standard read
- *         All other errors should be treated as a read error and reported as such.
- */
-inline CHIP_ERROR ThreadStackManager::WriteThreadNetworkDiagnosticAttributeToTlv(AttributeId attributeId,
-                                                                                 app::AttributeValueEncoder & encoder)
-{
-    return static_cast<ImplClass *>(this)->_WriteThreadNetworkDiagnosticAttributeToTlv(attributeId, encoder);
 }
 
 } // namespace DeviceLayer

@@ -22,8 +22,6 @@
 #include <app/clusters/door-lock-server/door-lock-server.h>
 #include <cstdint>
 
-#include <app/util/af.h>
-
 class LockManager
 {
 public:
@@ -72,7 +70,12 @@ public:
 private:
     LockEndpoint * getEndpoint(chip::EndpointId endpointId);
 
-    std::vector<LockEndpoint> mEndpoints;
+    /**
+     * We store the LockEndpoint instances by pointer, not value, so
+     * LockEndpoint can have a stable location in memory, which lets it
+     * implement DoorLock::Delegate.
+     */
+    std::vector<std::unique_ptr<LockEndpoint>> mEndpoints;
 
     static LockManager instance;
 };

@@ -146,7 +146,7 @@ public:
      * @param session     Reference to the secure session that will be initialized once session establishment is complete
      * @return CHIP_ERROR The result of session derivation
      */
-    CHIP_ERROR DeriveSecureSession(CryptoContext & session) const override;
+    CHIP_ERROR DeriveSecureSession(CryptoContext & session) override;
 
     //// UnsolicitedMessageHandler Implementation ////
     CHIP_ERROR OnUnsolicitedMessageReceived(const PayloadHeader & payloadHeader, ExchangeDelegate *& newDelegate) override
@@ -214,6 +214,8 @@ public:
 private:
     friend class TestCASESession;
 
+    using AutoReleaseSessionKey = Crypto::AutoReleaseSymmetricKey<Crypto::Aes128KeyHandle>;
+
     /*
      * Initialize the object given a reference to the SessionManager, certificate validity policy and a delegate which will be
      * notified of any further progress on this session.
@@ -254,7 +256,7 @@ private:
 
     CHIP_ERROR SendSigma2Resume();
 
-    CHIP_ERROR DeriveSigmaKey(const ByteSpan & salt, const ByteSpan & info, Crypto::AutoReleaseSessionKey & key) const;
+    CHIP_ERROR DeriveSigmaKey(const ByteSpan & salt, const ByteSpan & info, AutoReleaseSessionKey & key) const;
     CHIP_ERROR ConstructSaltSigma2(const ByteSpan & rand, const Crypto::P256PublicKey & pubkey, const ByteSpan & ipk,
                                    MutableByteSpan & salt);
     CHIP_ERROR ConstructTBSData(const ByteSpan & senderNOC, const ByteSpan & senderICAC, const ByteSpan & senderPubKey,
@@ -262,7 +264,7 @@ private:
     CHIP_ERROR ConstructSaltSigma3(const ByteSpan & ipk, MutableByteSpan & salt);
 
     CHIP_ERROR ConstructSigmaResumeKey(const ByteSpan & initiatorRandom, const ByteSpan & resumptionID, const ByteSpan & skInfo,
-                                       const ByteSpan & nonce, Crypto::AutoReleaseSessionKey & resumeKey);
+                                       const ByteSpan & nonce, AutoReleaseSessionKey & resumeKey);
 
     CHIP_ERROR GenerateSigmaResumeMIC(const ByteSpan & initiatorRandom, const ByteSpan & resumptionID, const ByteSpan & skInfo,
                                       const ByteSpan & nonce, MutableByteSpan & resumeMIC);
@@ -270,7 +272,8 @@ private:
                                       const ByteSpan & skInfo, const ByteSpan & nonce);
 
     void OnSuccessStatusReport() override;
-    CHIP_ERROR OnFailureStatusReport(Protocols::SecureChannel::GeneralStatusCode generalCode, uint16_t protocolCode) override;
+    CHIP_ERROR OnFailureStatusReport(Protocols::SecureChannel::GeneralStatusCode generalCode, uint16_t protocolCode,
+                                     Optional<uintptr_t> protocolData) override;
 
     void AbortPendingEstablish(CHIP_ERROR err);
 
@@ -282,6 +285,22 @@ private:
                                        const System::PacketBufferHandle & msg);
 
     void InvalidateIfPendingEstablishmentOnFabric(FabricIndex fabricIndex);
+
+#if INET_CONFIG_ENABLE_TCP_ENDPOINT
+    static void HandleConnectionAttemptComplete(Transport::ActiveTCPConnectionState * conn, CHIP_ERROR conErr);
+    static void HandleConnectionClosed(Transport::ActiveTCPConnectionState * conn, CHIP_ERROR conErr);
+
+    // Context to pass down when connecting to peer
+    Transport::AppTCPConnectionCallbackCtxt mTCPConnCbCtxt;
+    // Pointer to the underlying TCP connection state. Returned by the
+    // TCPConnect() method (on the connection Initiator side) when an
+    // ActiveTCPConnectionState object is allocated. This connection
+    // context is used on the CASE Initiator side to facilitate the
+    // invocation of the callbacks when the connection is established/closed.
+    //
+    // This pointer must be nulled out when the connection is closed.
+    Transport::ActiveTCPConnectionState * mPeerConnState = nullptr;
+#endif // INET_CONFIG_ENABLE_TCP_ENDPOINT
 
 #if CONFIG_BUILD_FOR_HOST_UNIT_TEST
     void SetStopSigmaHandshakeAt(Optional<State> state) { mStopHandshakeAtState = state; }
@@ -298,6 +317,7 @@ private:
     uint8_t mIPK[kIPKSize];
 
     SessionResumptionStorage * mSessionResumptionStorage = nullptr;
+    SessionManager * mSessionManager                     = nullptr;
 
     FabricTable * mFabricsTable = nullptr;
     FabricIndex mFabricIndex    = kUndefinedFabricIndex;

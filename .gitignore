@@ -10,6 +10,7 @@
 
 # Build System
 out/
+/examples/virtual-device-app/android/App/buildSrc/build/
 /src/test_driver/nrfconnect/build/
 /src/darwin/Framework/build/
 
@@ -80,3 +81,7 @@ examples/thermostat/ameba/build
 # https://github.com/espressif/idf-component-manager#using-with-a-project
 examples/*/esp32/managed_components
 examples/*/esp32/dependencies.lock
+
+# jupyter temporary files
+.ipynb_checkpoints
+

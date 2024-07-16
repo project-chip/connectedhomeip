@@ -37,16 +37,17 @@
 #include <lib/support/SafeInt.h>
 #include <lib/support/ScopedBuffer.h>
 #include <lib/support/TypeTraits.h>
+#include <messaging/SessionParameters.h>
 #include <platform/PlatformManager.h>
 #include <protocols/Protocols.h>
 #include <protocols/secure_channel/CASEDestinationId.h>
 #include <protocols/secure_channel/PairingSession.h>
-#include <protocols/secure_channel/SessionParameters.h>
 #include <protocols/secure_channel/SessionResumptionStorage.h>
 #include <protocols/secure_channel/StatusReport.h>
 #include <system/SystemClock.h>
 #include <system/TLVPacketBufferBackingStore.h>
 #include <tracing/macros.h>
+#include <tracing/metric_event.h>
 #include <transport/SessionManager.h>
 
 namespace {
@@ -101,6 +102,7 @@ using namespace Credentials;
 using namespace Messaging;
 using namespace Encoding;
 using namespace Protocols::SecureChannel;
+using namespace Tracing;
 
 constexpr uint8_t kKDFSR2Info[] = { 0x53, 0x69, 0x67, 0x6d, 0x61, 0x32 };
 constexpr uint8_t kKDFSR3Info[] = { 0x53, 0x69, 0x67, 0x6d, 0x61, 0x33 };
@@ -419,6 +421,21 @@ void CASESession::Clear()
     mPeerNodeId   = kUndefinedNodeId;
     mFabricsTable = nullptr;
     mFabricIndex  = kUndefinedFabricIndex;
+#if INET_CONFIG_ENABLE_TCP_ENDPOINT
+    // Clear the context object.
+    mTCPConnCbCtxt.appContext     = nullptr;
+    mTCPConnCbCtxt.connCompleteCb = nullptr;
+    mTCPConnCbCtxt.connClosedCb   = nullptr;
+    mTCPConnCbCtxt.connReceivedCb = nullptr;
+
+    if (mPeerConnState && mPeerConnState->mConnectionState != Transport::TCPState::kConnected)
+    {
+        // Abort the connection if the CASESession is being destroyed and the
+        // connection is in the middle of being set up.
+        mSessionManager->TCPDisconnect(mPeerConnState, /* shouldAbort = */ true);
+        mPeerConnState = nullptr;
+    }
+#endif // INET_CONFIG_ENABLE_TCP_ENDPOINT
 }
 
 void CASESession::InvalidateIfPendingEstablishmentOnFabric(FabricIndex fabricIndex)
@@ -446,7 +463,9 @@ CHIP_ERROR CASESession::Init(SessionManager & sessionManager, Credentials::Certi
 
     ReturnErrorOnFailure(mCommissioningHash.Begin());
 
-    mDelegate = delegate;
+    mDelegate       = delegate;
+    mSessionManager = &sessionManager;
+
     ReturnErrorOnFailure(AllocateSecureSession(sessionManager, sessionEvictionHint));
 
     mValidContext.Reset();
@@ -454,6 +473,11 @@ CHIP_ERROR CASESession::Init(SessionManager & sessionManager, Credentials::Certi
     mValidContext.mRequiredKeyPurposes.Set(KeyPurposeFlags::kServerAuth);
     mValidContext.mValidityPolicy = policy;
 
+#if INET_CONFIG_ENABLE_TCP_ENDPOINT
+    mTCPConnCbCtxt.appContext     = this;
+    mTCPConnCbCtxt.connCompleteCb = HandleConnectionAttemptComplete;
+    mTCPConnCbCtxt.connClosedCb   = HandleConnectionClosed;
+#endif // INET_CONFIG_ENABLE_TCP_ENDPOINT
     return CHIP_NO_ERROR;
 }
 
@@ -477,7 +501,7 @@ CASESession::PrepareForSessionEstablishment(SessionManager & sessionManager, Fab
     mFabricsTable             = fabricTable;
     mRole                     = CryptoContext::SessionRole::kResponder;
     mSessionResumptionStorage = sessionResumptionStorage;
-    mLocalMRPConfig           = mrpLocalConfig;
+    mLocalMRPConfig           = MakeOptional(mrpLocalConfig.ValueOr(GetDefaultMRPConfig()));
 
     ChipLogDetail(SecureChannel, "Allocated SecureSession (%p) - waiting for Sigma1 msg",
                   mSecureSessionHolder.Get().Value()->AsSecureSession());
@@ -499,14 +523,15 @@ CHIP_ERROR CASESession::EstablishSession(SessionManager & sessionManager, Fabric
     CHIP_ERROR err = CHIP_NO_ERROR;
 
     // Return early on error here, as we have not initialized any state yet
-    ReturnErrorCodeIf(exchangeCtxt == nullptr, CHIP_ERROR_INVALID_ARGUMENT);
-    ReturnErrorCodeIf(fabricTable == nullptr, CHIP_ERROR_INVALID_ARGUMENT);
+    ReturnErrorCodeWithMetricIf(kMetricDeviceCASESession, exchangeCtxt == nullptr, CHIP_ERROR_INVALID_ARGUMENT);
+    ReturnErrorCodeWithMetricIf(kMetricDeviceCASESession, fabricTable == nullptr, CHIP_ERROR_INVALID_ARGUMENT);
 
     // Use FabricTable directly to avoid situation of dangling index from stale FabricInfo
     // until we factor-out any FabricInfo direct usage.
-    ReturnErrorCodeIf(peerScopedNodeId.GetFabricIndex() == kUndefinedFabricIndex, CHIP_ERROR_INVALID_ARGUMENT);
+    ReturnErrorCodeWithMetricIf(kMetricDeviceCASESession, peerScopedNodeId.GetFabricIndex() == kUndefinedFabricIndex,
+                                CHIP_ERROR_INVALID_ARGUMENT);
     const auto * fabricInfo = fabricTable->FindFabricWithIndex(peerScopedNodeId.GetFabricIndex());
-    ReturnErrorCodeIf(fabricInfo == nullptr, CHIP_ERROR_INVALID_ARGUMENT);
+    ReturnErrorCodeWithMetricIf(kMetricDeviceCASESession, fabricInfo == nullptr, CHIP_ERROR_INVALID_ARGUMENT);
 
     err = Init(sessionManager, policy, delegate, peerScopedNodeId);
 
@@ -514,32 +539,53 @@ CHIP_ERROR CASESession::EstablishSession(SessionManager & sessionManager, Fabric
 
     // We are setting the exchange context specifically before checking for error.
     // This is to make sure the exchange will get closed if Init() returned an error.
-    mExchangeCtxt = exchangeCtxt;
+    mExchangeCtxt.Emplace(*exchangeCtxt);
+
+    Transport::PeerAddress peerAddress = mExchangeCtxt.Value()->GetSessionHandle()->AsUnauthenticatedSession()->GetPeerAddress();
 
     // From here onwards, let's go to exit on error, as some state might have already
     // been initialized
-    SuccessOrExit(err);
+    SuccessOrExitWithMetric(kMetricDeviceCASESession, err);
 
-    SuccessOrExit(err = fabricTable->AddFabricDelegate(this));
+    SuccessOrExitWithMetric(kMetricDeviceCASESession, err = fabricTable->AddFabricDelegate(this));
+
+    MATTER_LOG_METRIC_BEGIN(kMetricDeviceCASESession);
+
+    // Set the PeerAddress in the secure session up front to indicate the
+    // Transport Type of the session that is being set up.
+    mSecureSessionHolder->AsSecureSession()->SetPeerAddress(peerAddress);
 
     mFabricsTable             = fabricTable;
     mFabricIndex              = fabricInfo->GetFabricIndex();
     mSessionResumptionStorage = sessionResumptionStorage;
-    mLocalMRPConfig           = mrpLocalConfig;
+    mLocalMRPConfig           = MakeOptional(mrpLocalConfig.ValueOr(GetDefaultMRPConfig()));
 
-    mExchangeCtxt->UseSuggestedResponseTimeout(kExpectedSigma1ProcessingTime);
+    mExchangeCtxt.Value()->UseSuggestedResponseTimeout(kExpectedSigma1ProcessingTime);
     mPeerNodeId  = peerScopedNodeId.GetNodeId();
     mLocalNodeId = fabricInfo->GetNodeId();
 
     ChipLogProgress(SecureChannel, "Initiating session on local FabricIndex %u from 0x" ChipLogFormatX64 " -> 0x" ChipLogFormatX64,
                     static_cast<unsigned>(mFabricIndex), ChipLogValueX64(mLocalNodeId), ChipLogValueX64(mPeerNodeId));
 
-    err = SendSigma1();
-    SuccessOrExit(err);
+    if (peerAddress.GetTransportType() == Transport::Type::kTcp)
+    {
+#if INET_CONFIG_ENABLE_TCP_ENDPOINT
+        err = sessionManager.TCPConnect(peerAddress, &mTCPConnCbCtxt, &mPeerConnState);
+        SuccessOrExit(err);
+#endif // INET_CONFIG_ENABLE_TCP_ENDPOINT
+    }
+    else
+    {
+        MATTER_LOG_METRIC_BEGIN(kMetricDeviceCASESessionSigma1);
+        err = SendSigma1();
+        SuccessOrExit(err);
+    }
 
 exit:
     if (err != CHIP_NO_ERROR)
     {
+        MATTER_LOG_METRIC_END(kMetricDeviceCASESessionSigma1, err);
+        MATTER_LOG_METRIC_END(kMetricDeviceCASESession, err);
         Clear();
     }
     return err;
@@ -549,9 +595,12 @@ void CASESession::OnResponseTimeout(ExchangeContext * ec)
 {
     MATTER_TRACE_SCOPE("OnResponseTimeout", "CASESession");
     VerifyOrReturn(ec != nullptr, ChipLogError(SecureChannel, "CASESession::OnResponseTimeout was called by null exchange"));
-    VerifyOrReturn(mExchangeCtxt == ec, ChipLogError(SecureChannel, "CASESession::OnResponseTimeout exchange doesn't match"));
-    ChipLogError(SecureChannel, "CASESession timed out while waiting for a response from the peer. Current state was %u",
-                 to_underlying(mState));
+    VerifyOrReturn(mExchangeCtxt.HasValue() && (&mExchangeCtxt.Value().Get() == ec),
+                   ChipLogError(SecureChannel, "CASESession::OnResponseTimeout exchange doesn't match"));
+    ChipLogError(SecureChannel,
+                 "CASESession timed out while waiting for a response from peer " ChipLogFormatScopedNodeId ". Current state was %u",
+                 ChipLogValueScopedNodeId(GetPeer()), to_underlying(mState));
+    MATTER_TRACE_COUNTER("CASETimeout");
     // Discard the exchange so that Clear() doesn't try aborting it.  The
     // exchange will handle that.
     DiscardExchange();
@@ -560,6 +609,7 @@ void CASESession::OnResponseTimeout(ExchangeContext * ec)
 
 void CASESession::AbortPendingEstablish(CHIP_ERROR err)
 {
+    MATTER_LOG_METRIC_END(kMetricDeviceCASESession, err);
     MATTER_TRACE_SCOPE("AbortPendingEstablish", "CASESession");
     // This needs to come before Clear() which will reset mState.
     SessionEstablishmentStage state = MapCASEStateToSessionEstablishmentStage(mState);
@@ -568,7 +618,7 @@ void CASESession::AbortPendingEstablish(CHIP_ERROR err)
     NotifySessionEstablishmentError(err, state);
 }
 
-CHIP_ERROR CASESession::DeriveSecureSession(CryptoContext & session) const
+CHIP_ERROR CASESession::DeriveSecureSession(CryptoContext & session)
 {
     switch (mState)
     {
@@ -645,6 +695,78 @@ CHIP_ERROR CASESession::RecoverInitiatorIpk()
     return CHIP_NO_ERROR;
 }
 
+#if INET_CONFIG_ENABLE_TCP_ENDPOINT
+void CASESession::HandleConnectionAttemptComplete(Transport::ActiveTCPConnectionState * conn, CHIP_ERROR err)
+{
+    VerifyOrReturn(conn != nullptr);
+    // conn->mAppState should not be NULL. SessionManager has already checked
+    // before calling this callback.
+    VerifyOrDie(conn->mAppState != nullptr);
+
+    char peerAddrBuf[chip::Transport::PeerAddress::kMaxToStringSize];
+    conn->mPeerAddr.ToString(peerAddrBuf);
+
+    CASESession * caseSession = reinterpret_cast<CASESession *>(conn->mAppState->appContext);
+    VerifyOrReturn(caseSession != nullptr);
+
+    // Exit and disconnect if connection setup encountered an error.
+    SuccessOrExit(err);
+
+    ChipLogDetail(SecureChannel, "TCP Connection established with %s before session establishment", peerAddrBuf);
+
+    // Associate the connection with the current unauthenticated session for the
+    // CASE exchange.
+    caseSession->mExchangeCtxt.Value()->GetSessionHandle()->AsUnauthenticatedSession()->SetTCPConnection(conn);
+
+    // Associate the connection with the current secure session that is being
+    // set up.
+    caseSession->mSecureSessionHolder.Get().Value()->AsSecureSession()->SetTCPConnection(conn);
+
+    // Send Sigma1 after connection is established for sessions over TCP
+    err = caseSession->SendSigma1();
+    SuccessOrExit(err);
+
+exit:
+    if (err != CHIP_NO_ERROR)
+    {
+        ChipLogError(SecureChannel, "Connection establishment failed with peer at %s: %" CHIP_ERROR_FORMAT, peerAddrBuf,
+                     err.Format());
+
+        // Close the underlying connection and ensure that the CASESession is
+        // not holding on to a stale ActiveTCPConnectionState. We call
+        // TCPDisconnect() here explicitly in order to abort the connection
+        // even after it establishes successfully, but SendSigma1() fails for
+        // some reason.
+        caseSession->mSessionManager->TCPDisconnect(conn, /* shouldAbort = */ true);
+        caseSession->mPeerConnState = nullptr;
+
+        caseSession->Clear();
+    }
+}
+
+void CASESession::HandleConnectionClosed(Transport::ActiveTCPConnectionState * conn, CHIP_ERROR conErr)
+{
+    VerifyOrReturn(conn != nullptr);
+    // conn->mAppState should not be NULL. SessionManager has already checked
+    // before calling this callback.
+    VerifyOrDie(conn->mAppState != nullptr);
+
+    CASESession * caseSession = reinterpret_cast<CASESession *>(conn->mAppState->appContext);
+    VerifyOrReturn(caseSession != nullptr);
+
+    // Drop our pointer to the now-invalid connection state.
+    //
+    // Since the connection is closed, message sends over the ExchangeContext
+    // will just fail and be handled like normal send errors.
+    //
+    // Additionally, SessionManager notifies (via ExchangeMgr) all ExchangeContexts on the
+    // connection closures for the attached sessions and the ExchangeContexts
+    // can close proactively if that's appropriate.
+    caseSession->mPeerConnState = nullptr;
+    ChipLogDetail(SecureChannel, "TCP Connection for this session has closed");
+}
+#endif // INET_CONFIG_ENABLE_TCP_ENDPOINT
+
 CHIP_ERROR CASESession::SendSigma1()
 {
     MATTER_TRACE_SCOPE("SendSigma1", "CASESession");
@@ -705,7 +827,8 @@ CHIP_ERROR CASESession::SendSigma1()
     ReturnErrorOnFailure(
         tlvWriter.PutBytes(TLV::ContextTag(4), mEphemeralKey->Pubkey(), static_cast<uint32_t>(mEphemeralKey->Pubkey().Length())));
 
-    ReturnErrorOnFailure(EncodeSessionParameters(TLV::ContextTag(5), mLocalMRPConfig, tlvWriter));
+    VerifyOrReturnError(mLocalMRPConfig.HasValue(), CHIP_ERROR_INCORRECT_STATE);
+    ReturnErrorOnFailure(EncodeSessionParameters(TLV::ContextTag(5), mLocalMRPConfig.Value(), tlvWriter));
 
     // Try to find persistent session, and resume it.
     bool resuming = false;
@@ -734,12 +857,22 @@ CHIP_ERROR CASESession::SendSigma1()
     ReturnErrorOnFailure(mCommissioningHash.AddData(ByteSpan{ msg_R1->Start(), msg_R1->DataLength() }));
 
     // Call delegate to send the msg to peer
-    ReturnErrorOnFailure(mExchangeCtxt->SendMessage(Protocols::SecureChannel::MsgType::CASE_Sigma1, std::move(msg_R1),
-                                                    SendFlags(SendMessageFlags::kExpectResponse)));
+    ReturnErrorOnFailure(mExchangeCtxt.Value()->SendMessage(Protocols::SecureChannel::MsgType::CASE_Sigma1, std::move(msg_R1),
+                                                            SendFlags(SendMessageFlags::kExpectResponse)));
 
-    mState = resuming ? State::kSentSigma1Resume : State::kSentSigma1;
+    if (resuming)
+    {
+        mState = State::kSentSigma1Resume;
 
-    ChipLogProgress(SecureChannel, "Sent Sigma1 msg");
+        // Flags that Resume is being attempted
+        MATTER_LOG_METRIC(kMetricDeviceCASESessionSigma1Resume);
+    }
+    else
+    {
+        mState = State::kSentSigma1;
+    }
+
+    ChipLogProgress(SecureChannel, "Sent Sigma1 msg to " ChipLogFormatScopedNodeId, ChipLogValueScopedNodeId(GetPeer()));
 
     mDelegate->OnSessionEstablishmentStarted();
 
@@ -844,6 +977,7 @@ CHIP_ERROR CASESession::HandleSigma1(System::PacketBufferHandle && msg)
     ByteSpan initiatorRandom;
 
     ChipLogProgress(SecureChannel, "Received Sigma1 msg");
+    MATTER_TRACE_COUNTER("Sigma1");
 
     bool sessionResumptionRequested = false;
     ByteSpan resumptionId;
@@ -869,7 +1003,13 @@ CHIP_ERROR CASESession::HandleSigma1(System::PacketBufferHandle && msg)
         std::copy(resumptionId.begin(), resumptionId.end(), mResumeResumptionId.begin());
 
         // Send Sigma2Resume message to the initiator
-        SuccessOrExit(err = SendSigma2Resume());
+        MATTER_LOG_METRIC_BEGIN(kMetricDeviceCASESessionSigma2Resume);
+        err = SendSigma2Resume();
+        if (CHIP_NO_ERROR != err)
+        {
+            MATTER_LOG_METRIC_END(kMetricDeviceCASESessionSigma2Resume, err);
+        }
+        SuccessOrExit(err);
 
         mDelegate->OnSessionEstablishmentStarted();
 
@@ -898,7 +1038,13 @@ CHIP_ERROR CASESession::HandleSigma1(System::PacketBufferHandle && msg)
     // mRemotePubKey.Length() == initiatorPubKey.size() == kP256_PublicKey_Length.
     memcpy(mRemotePubKey.Bytes(), initiatorPubKey.data(), mRemotePubKey.Length());
 
-    SuccessOrExit(err = SendSigma2());
+    MATTER_LOG_METRIC_BEGIN(kMetricDeviceCASESessionSigma2);
+    err = SendSigma2();
+    if (CHIP_NO_ERROR != err)
+    {
+        MATTER_LOG_METRIC_END(kMetricDeviceCASESessionSigma2, err);
+    }
+    SuccessOrExit(err);
 
     mDelegate->OnSessionEstablishmentStarted();
 
@@ -951,14 +1097,16 @@ CHIP_ERROR CASESession::SendSigma2Resume()
 
     ReturnErrorOnFailure(tlvWriter.Put(TLV::ContextTag(3), GetLocalSessionId().Value()));
 
-    ReturnErrorOnFailure(EncodeSessionParameters(TLV::ContextTag(4), mLocalMRPConfig, tlvWriter));
+    VerifyOrReturnError(mLocalMRPConfig.HasValue(), CHIP_ERROR_INCORRECT_STATE);
+    ReturnErrorOnFailure(EncodeSessionParameters(TLV::ContextTag(4), mLocalMRPConfig.Value(), tlvWriter));
 
     ReturnErrorOnFailure(tlvWriter.EndContainer(outerContainerType));
     ReturnErrorOnFailure(tlvWriter.Finalize(&msg_R2_resume));
 
     // Call delegate to send the msg to peer
-    ReturnErrorOnFailure(mExchangeCtxt->SendMessage(Protocols::SecureChannel::MsgType::CASE_Sigma2Resume, std::move(msg_R2_resume),
-                                                    SendFlags(SendMessageFlags::kExpectResponse)));
+    ReturnErrorOnFailure(mExchangeCtxt.Value()->SendMessage(Protocols::SecureChannel::MsgType::CASE_Sigma2Resume,
+                                                            std::move(msg_R2_resume),
+                                                            SendFlags(SendMessageFlags::kExpectResponse)));
 
     mState = State::kSentSigma2Resume;
 
@@ -1086,7 +1234,8 @@ CHIP_ERROR CASESession::SendSigma2()
     ReturnErrorOnFailure(tlvWriterMsg2.PutBytes(TLV::ContextTag(4), msg_R2_Encrypted.Get(),
                                                 static_cast<uint32_t>(msg_r2_signed_enc_len + CHIP_CRYPTO_AEAD_MIC_LENGTH_BYTES)));
 
-    ReturnErrorOnFailure(EncodeSessionParameters(TLV::ContextTag(5), mLocalMRPConfig, tlvWriterMsg2));
+    VerifyOrReturnError(mLocalMRPConfig.HasValue(), CHIP_ERROR_INCORRECT_STATE);
+    ReturnErrorOnFailure(EncodeSessionParameters(TLV::ContextTag(5), mLocalMRPConfig.Value(), tlvWriterMsg2));
 
     ReturnErrorOnFailure(tlvWriterMsg2.EndContainer(outerContainerType));
     ReturnErrorOnFailure(tlvWriterMsg2.Finalize(&msg_R2));
@@ -1094,12 +1243,13 @@ CHIP_ERROR CASESession::SendSigma2()
     ReturnErrorOnFailure(mCommissioningHash.AddData(ByteSpan{ msg_R2->Start(), msg_R2->DataLength() }));
 
     // Call delegate to send the msg to peer
-    ReturnErrorOnFailure(mExchangeCtxt->SendMessage(Protocols::SecureChannel::MsgType::CASE_Sigma2, std::move(msg_R2),
-                                                    SendFlags(SendMessageFlags::kExpectResponse)));
+    ReturnErrorOnFailure(mExchangeCtxt.Value()->SendMessage(Protocols::SecureChannel::MsgType::CASE_Sigma2, std::move(msg_R2),
+                                                            SendFlags(SendMessageFlags::kExpectResponse)));
 
     mState = State::kSentSigma2;
 
     ChipLogProgress(SecureChannel, "Sent Sigma2 msg");
+    MATTER_TRACE_COUNTER("Sigma2");
 
     return CHIP_NO_ERROR;
 }
@@ -1116,6 +1266,8 @@ CHIP_ERROR CASESession::HandleSigma2Resume(System::PacketBufferHandle && msg)
     uint32_t decodeTagIdSeq = 0;
 
     ChipLogDetail(SecureChannel, "Received Sigma2Resume msg");
+    MATTER_TRACE_COUNTER("Sigma2Resume");
+    MATTER_LOG_METRIC_END(kMetricDeviceCASESessionSigma1, err);
 
     uint8_t sigma2ResumeMIC[CHIP_CRYPTO_AEAD_MIC_LENGTH_BYTES];
 
@@ -1144,7 +1296,8 @@ CHIP_ERROR CASESession::HandleSigma2Resume(System::PacketBufferHandle && msg)
     if (tlvReader.Next() != CHIP_END_OF_TLV)
     {
         SuccessOrExit(err = DecodeMRPParametersIfPresent(TLV::ContextTag(4), tlvReader));
-        mExchangeCtxt->GetSessionHandle()->AsUnauthenticatedSession()->SetRemoteSessionParameters(GetRemoteSessionParameters());
+        mExchangeCtxt.Value()->GetSessionHandle()->AsUnauthenticatedSession()->SetRemoteSessionParameters(
+            GetRemoteSessionParameters());
     }
 
     ChipLogDetail(SecureChannel, "Peer assigned session session ID %d", responderSessionId);
@@ -1157,6 +1310,7 @@ CHIP_ERROR CASESession::HandleSigma2Resume(System::PacketBufferHandle && msg)
             ChipLogError(SecureChannel, "Unable to save session resumption state: %" CHIP_ERROR_FORMAT, err2.Format());
     }
 
+    MATTER_LOG_METRIC(kMetricDeviceCASESessionSigmaFinished);
     SendStatusReport(mExchangeCtxt, kProtocolCodeSuccess);
 
     mState = State::kFinishedViaResume;
@@ -1173,10 +1327,17 @@ exit:
 CHIP_ERROR CASESession::HandleSigma2_and_SendSigma3(System::PacketBufferHandle && msg)
 {
     MATTER_TRACE_SCOPE("HandleSigma2_and_SendSigma3", "CASESession");
-    ReturnErrorOnFailure(HandleSigma2(std::move(msg)));
-    ReturnErrorOnFailure(SendSigma3a());
+    CHIP_ERROR err = HandleSigma2(std::move(msg));
+    MATTER_LOG_METRIC_END(kMetricDeviceCASESessionSigma1, err);
+    ReturnErrorOnFailure(err);
 
-    return CHIP_NO_ERROR;
+    MATTER_LOG_METRIC_BEGIN(kMetricDeviceCASESessionSigma3);
+    err = SendSigma3a();
+    if (CHIP_NO_ERROR != err)
+    {
+        MATTER_LOG_METRIC_END(kMetricDeviceCASESessionSigma3, err);
+    }
+    return err;
 }
 
 CHIP_ERROR CASESession::HandleSigma2(System::PacketBufferHandle && msg)
@@ -1337,7 +1498,8 @@ CHIP_ERROR CASESession::HandleSigma2(System::PacketBufferHandle && msg)
     if (tlvReader.Next() != CHIP_END_OF_TLV)
     {
         SuccessOrExit(err = DecodeMRPParametersIfPresent(TLV::ContextTag(kTag_Sigma2_ResponderMRPParams), tlvReader));
-        mExchangeCtxt->GetSessionHandle()->AsUnauthenticatedSession()->SetRemoteSessionParameters(GetRemoteSessionParameters());
+        mExchangeCtxt.Value()->GetSessionHandle()->AsUnauthenticatedSession()->SetRemoteSessionParameters(
+            GetRemoteSessionParameters());
     }
 
 exit:
@@ -1406,7 +1568,7 @@ CHIP_ERROR CASESession::SendSigma3a()
         {
             SuccessOrExit(err = helper->ScheduleWork());
             mSendSigma3Helper = helper;
-            mExchangeCtxt->WillSendMessage();
+            mExchangeCtxt.Value()->WillSendMessage();
             mState = State::kSendSigma3Pending;
         }
         else
@@ -1533,8 +1695,8 @@ CHIP_ERROR CASESession::SendSigma3c(SendSigma3Data & data, CHIP_ERROR status)
     SuccessOrExit(err);
 
     // Call delegate to send the Msg3 to peer
-    err = mExchangeCtxt->SendMessage(Protocols::SecureChannel::MsgType::CASE_Sigma3, std::move(msg_R3),
-                                     SendFlags(SendMessageFlags::kExpectResponse));
+    err = mExchangeCtxt.Value()->SendMessage(Protocols::SecureChannel::MsgType::CASE_Sigma3, std::move(msg_R3),
+                                             SendFlags(SendMessageFlags::kExpectResponse));
     SuccessOrExit(err);
 
     ChipLogProgress(SecureChannel, "Sent Sigma3 msg");
@@ -1570,8 +1732,8 @@ CHIP_ERROR CASESession::HandleSigma3a(System::PacketBufferHandle && msg)
     TLV::TLVReader decryptedDataTlvReader;
     TLV::TLVType containerType = TLV::kTLVType_Structure;
 
-    const uint8_t * buf   = msg->Start();
-    const uint16_t bufLen = msg->DataLength();
+    const uint8_t * buf = msg->Start();
+    const size_t bufLen = msg->DataLength();
 
     constexpr size_t kCaseOverheadForFutureTbeData = 128;
 
@@ -1585,6 +1747,8 @@ CHIP_ERROR CASESession::HandleSigma3a(System::PacketBufferHandle && msg)
     uint8_t msg_salt[kIPKSize + kSHA256_Hash_Length];
 
     ChipLogProgress(SecureChannel, "Received Sigma3 msg");
+    MATTER_TRACE_COUNTER("Sigma3");
+    MATTER_LOG_METRIC_END(kMetricDeviceCASESessionSigma2, err);
 
     auto helper = WorkHelper<HandleSigma3Data>::Create(*this, &HandleSigma3b, &CASESession::HandleSigma3c);
     VerifyOrExit(helper, err = CHIP_ERROR_NO_MEMORY);
@@ -1699,7 +1863,7 @@ CHIP_ERROR CASESession::HandleSigma3a(System::PacketBufferHandle && msg)
 
         SuccessOrExit(err = helper->ScheduleWork());
         mHandleSigma3Helper = helper;
-        mExchangeCtxt->WillSendMessage();
+        mExchangeCtxt.Value()->WillSendMessage();
         mState = State::kHandleSigma3Pending;
     }
 
@@ -1765,6 +1929,7 @@ CHIP_ERROR CASESession::HandleSigma3c(HandleSigma3Data & data, CHIP_ERROR status
         }
     }
 
+    MATTER_LOG_METRIC(kMetricDeviceCASESessionSigmaFinished);
     SendStatusReport(mExchangeCtxt, kProtocolCodeSuccess);
 
     mState = State::kFinished;
@@ -1961,7 +2126,8 @@ void CASESession::OnSuccessStatusReport()
     Finish();
 }
 
-CHIP_ERROR CASESession::OnFailureStatusReport(Protocols::SecureChannel::GeneralStatusCode generalCode, uint16_t protocolCode)
+CHIP_ERROR CASESession::OnFailureStatusReport(Protocols::SecureChannel::GeneralStatusCode generalCode, uint16_t protocolCode,
+                                              Optional<uintptr_t> protocolData)
 {
     CHIP_ERROR err = CHIP_NO_ERROR;
     switch (protocolCode)
@@ -1976,6 +2142,10 @@ CHIP_ERROR CASESession::OnFailureStatusReport(Protocols::SecureChannel::GeneralS
 
     case kProtocolCodeBusy:
         err = CHIP_ERROR_BUSY;
+        if (protocolData.HasValue())
+        {
+            mDelegate->OnResponderBusy(System::Clock::Milliseconds16(static_cast<uint16_t>(protocolData.Value())));
+        }
         break;
 
     default:
@@ -2026,7 +2196,8 @@ CHIP_ERROR CASESession::ParseSigma1(TLV::ContiguousBufferTLVReader & tlvReader, 
     if (err == CHIP_NO_ERROR && tlvReader.GetTag() == ContextTag(kInitiatorMRPParamsTag))
     {
         ReturnErrorOnFailure(DecodeMRPParametersIfPresent(TLV::ContextTag(kInitiatorMRPParamsTag), tlvReader));
-        mExchangeCtxt->GetSessionHandle()->AsUnauthenticatedSession()->SetRemoteSessionParameters(GetRemoteSessionParameters());
+        mExchangeCtxt.Value()->GetSessionHandle()->AsUnauthenticatedSession()->SetRemoteSessionParameters(
+            GetRemoteSessionParameters());
         err = tlvReader.Next();
     }
 
@@ -2082,18 +2253,18 @@ CHIP_ERROR CASESession::ValidateReceivedMessage(ExchangeContext * ec, const Payl
     // mExchangeCtxt can be nullptr if this is the first message (CASE_Sigma1) received by CASESession
     // via UnsolicitedMessageHandler. The exchange context is allocated by exchange manager and provided
     // to the handler (CASESession object).
-    if (mExchangeCtxt != nullptr)
+    if (mExchangeCtxt.HasValue())
     {
-        if (mExchangeCtxt != ec)
+        if (&mExchangeCtxt.Value().Get() != ec)
         {
             ReturnErrorOnFailure(CHIP_ERROR_INVALID_ARGUMENT);
         }
     }
     else
     {
-        mExchangeCtxt = ec;
+        mExchangeCtxt.Emplace(*ec);
     }
-    mExchangeCtxt->UseSuggestedResponseTimeout(kExpectedHighProcessingTime);
+    mExchangeCtxt.Value()->UseSuggestedResponseTimeout(kExpectedHighProcessingTime);
 
     VerifyOrReturnError(!msg.IsNull(), CHIP_ERROR_INVALID_ARGUMENT);
     return CHIP_NO_ERROR;
@@ -2118,17 +2289,23 @@ CHIP_ERROR CASESession::OnMessageReceived(ExchangeContext * ec, const PayloadHea
         //
         // Should you need to resume the CASESession, you could theoretically pass along the msg to a callback that gets
         // registered when setting mStopHandshakeAtState.
-        mExchangeCtxt->WillSendMessage();
+        mExchangeCtxt.Value()->WillSendMessage();
         return CHIP_NO_ERROR;
     }
 #endif // CONFIG_BUILD_FOR_HOST_UNIT_TEST
 
 #if CHIP_CONFIG_SLOW_CRYPTO
-    if (msgType == Protocols::SecureChannel::MsgType::CASE_Sigma1 || msgType == Protocols::SecureChannel::MsgType::CASE_Sigma2 ||
-        msgType == Protocols::SecureChannel::MsgType::CASE_Sigma2Resume ||
-        msgType == Protocols::SecureChannel::MsgType::CASE_Sigma3)
+    if ((msgType == Protocols::SecureChannel::MsgType::CASE_Sigma1 || msgType == Protocols::SecureChannel::MsgType::CASE_Sigma2 ||
+         msgType == Protocols::SecureChannel::MsgType::CASE_Sigma2Resume ||
+         msgType == Protocols::SecureChannel::MsgType::CASE_Sigma3) &&
+        mExchangeCtxt.Value()->GetSessionHandle()->AsUnauthenticatedSession()->GetPeerAddress().GetTransportType() !=
+            Transport::Type::kTcp)
     {
-        SuccessOrExit(err = mExchangeCtxt->FlushAcks());
+        // TODO: Rename FlushAcks() to something more semantically correct and
+        // call unconditionally for TCP or MRP from here. Inside, the
+        // PeerAddress type could be consulted to selectively flush MRP Acks
+        // when transport is not TCP. Issue #33183
+        SuccessOrExit(err = mExchangeCtxt.Value()->FlushAcks());
     }
 #endif // CHIP_CONFIG_SLOW_CRYPTO
 
@@ -2153,6 +2330,7 @@ CHIP_ERROR CASESession::OnMessageReceived(ExchangeContext * ec, const PayloadHea
 
         case MsgType::StatusReport:
             err = HandleStatusReport(std::move(msg), /* successExpected*/ false);
+            MATTER_LOG_METRIC_END(kMetricDeviceCASESessionSigma1, err);
             break;
 
         default:
@@ -2173,6 +2351,7 @@ CHIP_ERROR CASESession::OnMessageReceived(ExchangeContext * ec, const PayloadHea
 
         case MsgType::StatusReport:
             err = HandleStatusReport(std::move(msg), /* successExpected*/ false);
+            MATTER_LOG_METRIC_END(kMetricDeviceCASESessionSigma1, err);
             break;
 
         default:
@@ -2189,6 +2368,7 @@ CHIP_ERROR CASESession::OnMessageReceived(ExchangeContext * ec, const PayloadHea
 
         case MsgType::StatusReport:
             err = HandleStatusReport(std::move(msg), /* successExpected*/ false);
+            MATTER_LOG_METRIC_END(kMetricDeviceCASESessionSigma2, err);
             break;
 
         default:
@@ -2200,7 +2380,11 @@ CHIP_ERROR CASESession::OnMessageReceived(ExchangeContext * ec, const PayloadHea
     case State::kSentSigma2Resume:
         if (msgType == Protocols::SecureChannel::MsgType::StatusReport)
         {
-            err = HandleStatusReport(std::move(msg), /* successExpected*/ true);
+            // Need to capture before invoking status report since 'this' might be deallocated on successful completion of sigma3
+            MetricKey key = (mState == State::kSentSigma3) ? kMetricDeviceCASESessionSigma3 : kMetricDeviceCASESessionSigma2Resume;
+            err           = HandleStatusReport(std::move(msg), /* successExpected*/ true);
+            MATTER_LOG_METRIC_END(key, err);
+            IgnoreUnusedVariable(key);
         }
         break;
     default:
@@ -2227,21 +2411,36 @@ exit:
     return err;
 }
 
+namespace {
+System::Clock::Timeout ComputeRoundTripTimeout(ExchangeContext::Timeout serverProcessingTime,
+                                               const ReliableMessageProtocolConfig & remoteMrpConfig)
+{
+    // TODO: This is duplicating logic from Session::ComputeRoundTripTimeout.  Unfortunately, it's called by
+    // consumers who do not have a session.
+    const auto & maybeLocalMRPConfig = GetLocalMRPConfig();
+    const auto & defaultMRRPConfig   = GetDefaultMRPConfig();
+    const auto & localMRPConfig      = maybeLocalMRPConfig.ValueOr(defaultMRRPConfig);
+    return GetRetransmissionTimeout(remoteMrpConfig.mActiveRetransTimeout, remoteMrpConfig.mIdleRetransTimeout,
+                                    // Assume peer is idle, as a worst-case assumption (probably true for
+                                    // Sigma1, since that will be our initial message on the session, but less
+                                    // so for Sigma2).
+                                    System::Clock::kZero, remoteMrpConfig.mActiveThresholdTime) +
+        serverProcessingTime +
+        GetRetransmissionTimeout(localMRPConfig.mActiveRetransTimeout, localMRPConfig.mIdleRetransTimeout,
+                                 // Peer will assume we are active, since it's
+                                 // responding to our message.
+                                 System::SystemClock().GetMonotonicTimestamp(), localMRPConfig.mActiveThresholdTime);
+}
+} // anonymous namespace
+
 System::Clock::Timeout CASESession::ComputeSigma1ResponseTimeout(const ReliableMessageProtocolConfig & remoteMrpConfig)
 {
-    return GetRetransmissionTimeout(remoteMrpConfig.mActiveRetransTimeout, remoteMrpConfig.mIdleRetransTimeout,
-                                    // Assume peer is idle, since that's what we
-                                    // will assume for our initial message.
-                                    System::Clock::kZero, remoteMrpConfig.mActiveThresholdTime) +
-        kExpectedSigma1ProcessingTime;
+    return ComputeRoundTripTimeout(kExpectedSigma1ProcessingTime, remoteMrpConfig);
 }
 
 System::Clock::Timeout CASESession::ComputeSigma2ResponseTimeout(const ReliableMessageProtocolConfig & remoteMrpConfig)
 {
-    return GetRetransmissionTimeout(remoteMrpConfig.mActiveRetransTimeout, remoteMrpConfig.mIdleRetransTimeout,
-                                    // Assume peer is idle, as a worst-case assumption.
-                                    System::Clock::kZero, remoteMrpConfig.mActiveThresholdTime) +
-        kExpectedHighProcessingTime;
+    return ComputeRoundTripTimeout(kExpectedHighProcessingTime, remoteMrpConfig);
 }
 
 bool CASESession::InvokeBackgroundWorkWatchdog()

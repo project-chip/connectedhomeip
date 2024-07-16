@@ -36,11 +36,6 @@ limitations under the License.
     <item name="CacheAndSync" value="0x01"/>
   </enum>
 
-  <bitmap name="Feature" type="bitmap32">
-      <cluster code="0x003F"/>
-      <field name="CacheAndSync" mask="0x1"/>
-  </bitmap>
-
   <struct name="GroupKeySetStruct">
     <cluster code="0x003F"/>
     <item fieldId="0" name="GroupKeySetID" type="int16u"/>
@@ -59,6 +54,13 @@ limitations under the License.
     <code>0x003F</code>
     <define>GROUP_KEY_MANAGEMENT_CLUSTER</define>
     <description>The Group Key Management Cluster is the mechanism by which group keys are managed.</description>
+
+    <features>
+      <feature bit="0" code="CS" name="CacheAndSync" summary="The ability to support CacheAndSync security policy and MCSP.">
+        <optionalConform/>
+      </feature>
+    </features>
+
     <attribute side="server" code="0x0000" define="GROUP_KEY_MAP" type="array" length="254" entryType="GroupKeyMapStruct" writable="true" optional="false">
       <description>GroupKeyMap</description>
       <access op="read" privilege="view"/>

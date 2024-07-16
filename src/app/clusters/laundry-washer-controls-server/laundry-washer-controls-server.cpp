@@ -15,7 +15,7 @@
  *    limitations under the License.
  */
 
-#include <app/util/af.h>
+#include <app/AttributeAccessInterfaceRegistry.h>
 #include <app/util/attribute-storage.h>
 #include <app/util/config.h>
 
@@ -26,12 +26,11 @@
 #include <app-common/zap-generated/cluster-objects.h>
 #include <app-common/zap-generated/ids/Attributes.h>
 #include <app-common/zap-generated/ids/Clusters.h>
-#include <app/AttributeAccessInterface.h>
+#include <app/AttributeValueEncoder.h>
 #include <app/CommandHandler.h>
 #include <app/ConcreteAttributePath.h>
 #include <app/ConcreteCommandPath.h>
 #include <app/server/Server.h>
-#include <app/util/error-mapping.h>
 #include <lib/core/CHIPEncoding.h>
 
 using namespace chip;
@@ -42,7 +41,7 @@ using namespace chip::app::Clusters::LaundryWasherControls::Attributes;
 using chip::Protocols::InteractionModel::Status;
 
 static constexpr size_t kLaundryWasherControlsDelegateTableSize =
-    EMBER_AF_LAUNDRY_WASHER_CONTROLS_CLUSTER_SERVER_ENDPOINT_COUNT + CHIP_DEVICE_CONFIG_DYNAMIC_ENDPOINT_COUNT;
+    MATTER_DM_LAUNDRY_WASHER_CONTROLS_CLUSTER_SERVER_ENDPOINT_COUNT + CHIP_DEVICE_CONFIG_DYNAMIC_ENDPOINT_COUNT;
 
 // -----------------------------------------------------------------------------
 // Delegate Implementation
@@ -55,7 +54,7 @@ namespace {
 Delegate * GetDelegate(EndpointId endpoint)
 {
     uint16_t ep = emberAfGetClusterServerEndpointIndex(endpoint, LaundryWasherControls::Id,
-                                                       EMBER_AF_LAUNDRY_WASHER_CONTROLS_CLUSTER_SERVER_ENDPOINT_COUNT);
+                                                       MATTER_DM_LAUNDRY_WASHER_CONTROLS_CLUSTER_SERVER_ENDPOINT_COUNT);
     return (ep >= kLaundryWasherControlsDelegateTableSize ? nullptr : gDelegateTable[ep]);
 }
 
@@ -69,7 +68,7 @@ LaundryWasherControlsServer LaundryWasherControlsServer::sInstance;
 void LaundryWasherControlsServer::SetDefaultDelegate(EndpointId endpoint, Delegate * delegate)
 {
     uint16_t ep = emberAfGetClusterServerEndpointIndex(endpoint, LaundryWasherControls::Id,
-                                                       EMBER_AF_LAUNDRY_WASHER_CONTROLS_CLUSTER_SERVER_ENDPOINT_COUNT);
+                                                       MATTER_DM_LAUNDRY_WASHER_CONTROLS_CLUSTER_SERVER_ENDPOINT_COUNT);
     // if endpoint is found
     if (ep < kLaundryWasherControlsDelegateTableSize)
     {
@@ -82,11 +81,11 @@ LaundryWasherControlsServer & LaundryWasherControlsServer::Instance()
     return sInstance;
 }
 
-EmberAfStatus LaundryWasherControlsServer::SetSpinSpeedCurrent(EndpointId endpointId, DataModel::Nullable<uint8_t> spinSpeedCurrent)
+Status LaundryWasherControlsServer::SetSpinSpeedCurrent(EndpointId endpointId, DataModel::Nullable<uint8_t> spinSpeedCurrent)
 {
     DataModel::Nullable<uint8_t> spinSpeedCurrentNow;
-    EmberAfStatus res = SpinSpeedCurrent::Get(endpointId, spinSpeedCurrentNow);
-    if ((res == EMBER_ZCL_STATUS_SUCCESS) && (spinSpeedCurrentNow != spinSpeedCurrent))
+    Status res = SpinSpeedCurrent::Get(endpointId, spinSpeedCurrentNow);
+    if ((res == Status::Success) && (spinSpeedCurrentNow != spinSpeedCurrent))
     {
         res = SpinSpeedCurrent::Set(endpointId, spinSpeedCurrent);
     }
@@ -94,18 +93,17 @@ EmberAfStatus LaundryWasherControlsServer::SetSpinSpeedCurrent(EndpointId endpoi
     return res;
 }
 
-EmberAfStatus LaundryWasherControlsServer::GetSpinSpeedCurrent(EndpointId endpointId,
-                                                               DataModel::Nullable<uint8_t> & spinSpeedCurrent)
+Status LaundryWasherControlsServer::GetSpinSpeedCurrent(EndpointId endpointId, DataModel::Nullable<uint8_t> & spinSpeedCurrent)
 {
     return SpinSpeedCurrent::Get(endpointId, spinSpeedCurrent);
 }
 
-EmberAfStatus LaundryWasherControlsServer::SetNumberOfRinses(EndpointId endpointId, NumberOfRinsesEnum newNumberOfRinses)
+Status LaundryWasherControlsServer::SetNumberOfRinses(EndpointId endpointId, NumberOfRinsesEnum newNumberOfRinses)
 {
     NumberOfRinsesEnum numberOfRinses;
-    EmberAfStatus res = NumberOfRinses::Get(endpointId, &numberOfRinses);
+    Status res = NumberOfRinses::Get(endpointId, &numberOfRinses);
 
-    if ((res == EMBER_ZCL_STATUS_SUCCESS) && (numberOfRinses != newNumberOfRinses))
+    if ((res == Status::Success) && (numberOfRinses != newNumberOfRinses))
     {
         res = NumberOfRinses::Set(endpointId, newNumberOfRinses);
     }
@@ -113,7 +111,7 @@ EmberAfStatus LaundryWasherControlsServer::SetNumberOfRinses(EndpointId endpoint
     return res;
 }
 
-EmberAfStatus LaundryWasherControlsServer::GetNumberOfRinses(EndpointId endpointId, NumberOfRinsesEnum & numberOfRinses)
+Status LaundryWasherControlsServer::GetNumberOfRinses(EndpointId endpointId, NumberOfRinsesEnum & numberOfRinses)
 {
     return NumberOfRinses::Get(endpointId, &numberOfRinses);
 }
