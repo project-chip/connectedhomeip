@@ -20,19 +20,7 @@ import glob
 import subprocess
 
 # Define the base command
-base_command = (
-    "echo -n '' >/tmp/test_env.yaml && "
-    "echo 'ALL_CLUSTERS_APP: out/linux-x64-all-clusters-ipv6only-no-ble-no-wifi-tsan-clang-test/chip-all-clusters-app' >> /tmp/test_env.yaml && "
-    "echo 'CHIP_LOCK_APP: out/linux-x64-lock-ipv6only-no-ble-no-wifi-tsan-clang-test/chip-lock-app' >> /tmp/test_env.yaml && "
-    "echo 'ENERGY_MANAGEMENT_APP: out/linux-x64-energy-management-ipv6only-no-ble-no-wifi-tsan-clang-test/chip-energy-management-app' >> /tmp/test_env.yaml && "
-    "echo 'LIT_ICD_APP: out/linux-x64-lit-icd-ipv6only-no-ble-no-wifi-tsan-clang-test/lit-icd-app' >> /tmp/test_env.yaml && "
-    "echo 'CHIP_MICROWAVE_OVEN_APP: out/linux-x64-microwave-oven-ipv6only-no-ble-no-wifi-tsan-clang-test/chip-microwave-oven-app' >> /tmp/test_env.yaml && "
-    "echo 'CHIP_RVC_APP: out/linux-x64-rvc-ipv6only-no-ble-no-wifi-tsan-clang-test/chip-rvc-app' >> /tmp/test_env.yaml && "
-    "echo 'TRACE_APP: out/trace_data/app-{SCRIPT_BASE_NAME}' >> /tmp/test_env.yaml && "
-    "echo 'TRACE_TEST_JSON: out/trace_data/test-{SCRIPT_BASE_NAME}' >> /tmp/test_env.yaml && "
-    "echo 'TRACE_TEST_PERFETTO: out/trace_data/test-{SCRIPT_BASE_NAME}' >> /tmp/test_env.yaml && "
-    "scripts/run_in_python_env.sh out/venv './scripts/tests/run_python_test.py --load-from-env /tmp/test_env.yaml --script"
-)
+base_command = "scripts/run_in_python_env.sh out/venv './scripts/tests/run_python_test.py --load-from-env /tmp/test_env.yaml --script"
 
 # Define the directory to search for Python scripts
 search_directory = "src/python_testing"
