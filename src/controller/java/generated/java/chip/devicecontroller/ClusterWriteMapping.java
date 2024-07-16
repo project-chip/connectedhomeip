@@ -1194,6 +1194,8 @@ public class ClusterWriteMapping {
     writeAttributeMap.put("electricalPowerMeasurement", writeElectricalPowerMeasurementInteractionInfo);
     Map<String, InteractionInfo> writeElectricalEnergyMeasurementInteractionInfo = new LinkedHashMap<>();
     writeAttributeMap.put("electricalEnergyMeasurement", writeElectricalEnergyMeasurementInteractionInfo);
+    Map<String, InteractionInfo> writeWaterHeaterManagementInteractionInfo = new LinkedHashMap<>();
+    writeAttributeMap.put("waterHeaterManagement", writeWaterHeaterManagementInteractionInfo);
     Map<String, InteractionInfo> writeDemandResponseLoadControlInteractionInfo = new LinkedHashMap<>();
     Map<String, CommandParameterInfo> writeDemandResponseLoadControlDefaultRandomStartCommandParams = new LinkedHashMap<String, CommandParameterInfo>();
     CommandParameterInfo demandResponseLoadControldefaultRandomStartCommandParameterInfo =
@@ -3716,6 +3718,8 @@ public class ClusterWriteMapping {
     writeAttributeMap.put("contentControl", writeContentControlInteractionInfo);
     Map<String, InteractionInfo> writeContentAppObserverInteractionInfo = new LinkedHashMap<>();
     writeAttributeMap.put("contentAppObserver", writeContentAppObserverInteractionInfo);
+    Map<String, InteractionInfo> writeCommissionerControlInteractionInfo = new LinkedHashMap<>();
+    writeAttributeMap.put("commissionerControl", writeCommissionerControlInteractionInfo);
     Map<String, InteractionInfo> writeElectricalMeasurementInteractionInfo = new LinkedHashMap<>();
     Map<String, CommandParameterInfo> writeElectricalMeasurementAverageRmsVoltageMeasurementPeriodCommandParams = new LinkedHashMap<String, CommandParameterInfo>();
     CommandParameterInfo electricalMeasurementaverageRmsVoltageMeasurementPeriodCommandParameterInfo =

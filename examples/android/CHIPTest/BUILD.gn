@@ -37,7 +37,7 @@ shared_library("jni") {
     "${chip_root}/src/platform",
     "${chip_root}/src/platform/android",
     "${chip_root}/src/platform/android:java",
-    "${chip_root}/src/platform/logging:android",
+    "${chip_root}/src/platform/android:logging",
     "${chip_root}/src/platform/tests:tests",
     "${chip_root}/third_party/inipp",
     "${chip_root}/third_party/nlfaultinjection:nlfaultinjection",

@@ -543,7 +543,9 @@ void PairingCommand::OnCurrentFabricRemove(void * context, NodeId nodeId, CHIP_E
         // print to console
         fprintf(stderr, "Device with Node ID: 0x%lx has been successfully removed.\n", nodeId);
 
-        // TODO: (#33973) Add RPC method RemoveSynchronizedDevice
+#if defined(PW_RPC_ENABLED)
+        RemoveSynchronizedDevice(nodeId);
+#endif
     }
     else
     {
