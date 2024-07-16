@@ -47,6 +47,7 @@ excluded_patterns = [
     "basic_composition_support.py",
     "conformance_support.py",
     "drlk_2_x_common.py",
+    "execute_python_tests.py",
     "global_attribute_ids.py",
     "hello_external_runner.py",
     "hello_test.py",
