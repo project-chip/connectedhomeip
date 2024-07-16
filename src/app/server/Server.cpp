@@ -182,6 +182,10 @@ CHIP_ERROR Server::Init(const ServerInitParams & initParams)
     mReportScheduler = initParams.reportScheduler;
 
     mTestEventTriggerDelegate = initParams.testEventTriggerDelegate;
+    if (mTestEventTriggerDelegate == nullptr)
+    {
+        ChipLogProgress(AppServer, "WARNING: mTestEventTriggerDelegate is null");
+    }
 
     deviceInfoprovider = DeviceLayer::GetDeviceInfoProvider();
     if (deviceInfoprovider)
