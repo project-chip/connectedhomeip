@@ -2937,4 +2937,40 @@ static const uint16_t kSubscriptionPoolBaseTimeoutInSeconds = 30;
     XCTAssertFalse([controller isRunning]);
 }
 
+- (void)testClientDataStorage {
+    __auto_type * factory = [MTRDeviceControllerFactory sharedInstance];
+    XCTAssertNotNil(factory);
+
+    __auto_type * rootKeys = [[MTRTestKeys alloc] init];
+    XCTAssertNotNil(rootKeys);
+
+    __auto_type * operationalKeys = [[MTRTestKeys alloc] init];
+    XCTAssertNotNil(operationalKeys);
+
+    __auto_type * storageDelegate = [[MTRTestPerControllerStorage alloc] initWithControllerID:[NSUUID UUID]];
+
+    NSNumber * nodeID = @(123);
+    NSNumber * fabricID = @(456);
+
+    NSError * error;
+    MTRDeviceController * controller = [self startControllerWithRootKeys:rootKeys
+                                                         operationalKeys:operationalKeys
+                                                                fabricID:fabricID
+                                                                  nodeID:nodeID
+                                                                 storage:storageDelegate
+                                                                   error:&error];
+    XCTAssertNil(error);
+    XCTAssertNotNil(controller);
+    XCTAssertTrue([controller isRunning]);
+
+    XCTAssertEqualObjects(controller.controllerNodeID, nodeID);
+
+    // actual test
+    XCTAssertNotNil(controller.controllerDataStore);
+
+    // end actual test
+    [controller shutdown];
+    XCTAssertFalse([controller isRunning]);
+}
+
 @end
