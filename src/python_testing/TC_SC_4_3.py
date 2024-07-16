@@ -24,12 +24,13 @@
 
 import ipaddress
 import logging
+import dns.resolver
 
 import chip.clusters as Clusters
 from matter_testing_support import MatterBaseTest, async_test_body, default_matter_test_main, TestStep
 from mdns_discovery.mdns_discovery import DNSRecordType, MdnsDiscovery, MdnsServiceType
 
-# from mobly import asserts
+from mobly import asserts
 
 '''
 Category
@@ -206,36 +207,69 @@ class TC_SC_4_3(MatterBaseTest):
         # string, encoded as ASCII (UTF-8) text using capital letters, separated by a hyphen.
         self.step(5)
         instance_name = self.get_dut_instance_name()
-
-
+        instance_qname = f"{instance_name}.{MdnsServiceType.OPERATIONAL.value}"
 
         # *** STEP 6 ***
         # TH performs a query for the SRV record against the qname instance_qname.
         # Verify SRV record is returned
         self.step(6)
+        print("\n"*10)
+        mdns = MdnsDiscovery()
+        operational_record = await mdns.get_service_by_record_type(
+            service_name=instance_qname,
+            service_type=MdnsServiceType.OPERATIONAL.value,
+            record_type=DNSRecordType.SRV,
+            log_output=True,
+            load_from_cache=False
+        )
+        
+        # Verify SRV record is returned
+        srv_record_returned = operational_record is not None and operational_record.service_name == instance_qname
+        asserts.assert_true(srv_record_returned, "SRV record was not returned")
 
         # *** STEP 7 ***
         # TH performs a query for the TXT record against the qname instance_qname.
         # Verify TXT record is returned
         self.step(7)
-
-        # *** STEP 8 ***
-        # TH performs a query for the AAAA record against the target listed in the SRV record.
-        # Verify AAAA record is returned
-        self.step(8)  
-
-
-
-        print("\n"*10)
-        mdns = MdnsDiscovery()
-        await mdns.get_service_by_record_type(
-            service_name=f"{instance_name}.{MdnsServiceType.OPERATIONAL.value}",
+        operational_record = await mdns.get_service_by_record_type(
+            service_name=instance_qname,
             service_type=MdnsServiceType.OPERATIONAL.value,
             record_type=DNSRecordType.TXT,
             log_output=True,
             load_from_cache=False
         )
-        print("\n"*10)
+
+        # Verify TXT record is returned and it contains values
+        txt_record_returned = operational_record.txt_record is not None and bool(operational_record.txt_record)
+        asserts.assert_true(txt_record_returned, "TXT record not returned or contains no values")
+
+        # *** STEP 8 ***
+        # TH performs a query for the AAAA record against the target listed in the SRV record.
+        # Verify AAAA record is returned
+        self.step(8)
+        
+        # domain = operational_record.server
+        # try:
+        #     answers = dns.resolver.resolve(domain, 'AAAA')
+        #     for answer in answers:
+        #         print(f"AAAA record for {domain}: {answer}")
+        # except dns.resolver.NoAnswer:
+        #     print(f"No AAAA record found for {domain}")
+        # except dns.resolver.NXDOMAIN:
+        #     print(f"Domain {domain} does not exist")
+        # except Exception as e:
+        #     print(f"An error occurred: {e}")
+
+        # print("\n"*10)
+        # mdns = MdnsDiscovery()
+        # await mdns.get_service_by_record_type(
+        #     service_name=f"{instance_name}.{MdnsServiceType.OPERATIONAL.value}",
+        #     service_type=MdnsServiceType.OPERATIONAL.value,
+        #     record_type=DNSRecordType.TXT,
+        #     log_output=True,
+        #     load_from_cache=False
+        # )
+        # print("\n"*10)
 
 
 
