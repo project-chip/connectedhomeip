@@ -2,7 +2,9 @@
     "packages": [
         {
             "path": "infra/3pp/tools/cpython3/${platform}",
-            "platforms": ["mac-amd64", "windows-amd64"],
+            "platforms": [
+                "windows-amd64"
+            ],
             "tags": ["version:2@3.11.9.chromium.35"]
         }
     ]
