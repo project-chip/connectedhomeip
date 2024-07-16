@@ -19,6 +19,8 @@
 #include <memory>
 #include <utility>
 
+#include <pw_unit_test/framework.h>
+
 #include "app-common/zap-generated/ids/Attributes.h"
 #include "app-common/zap-generated/ids/Clusters.h"
 #include "app/ConcreteAttributePath.h"
@@ -35,6 +37,7 @@
 #include <app/util/attribute-storage.h>
 #include <controller/InvokeInteraction.h>
 #include <lib/core/ErrorStr.h>
+#include <lib/core/StringBuilderAdapters.h>
 #include <lib/support/logging/CHIPLogging.h>
 
 using namespace chip;
