@@ -1,12 +1,12 @@
 |                                         |   Pass Rate |
 |:----------------------------------------|------------:|
 | codeql                                  |           0 |
+| tests                                   |          75 |
 | build-example-tizen                     |         100 |
-| full-builds-android                     |         100 |
 | build-example-efr32                     |         100 |
 | tv-casting-example-darwin               |         100 |
 | build-example-asr                       |         100 |
-| recent-fail-summary                     |         100 |
+| full-builds-android                     |         100 |
 | build-example-nxp                       |         100 |
 | darwin-tests                            |         100 |
 | unit-integration-tests                  |         100 |
@@ -14,12 +14,12 @@
 | build-chef-ci-examples-on-all-platforms |         100 |
 | java-tests                              |         100 |
 | delete-old-artifacts                    |         100 |
-| test-tv-casting-example                 |         100 |
+| recent-fail-summary                     |         100 |
 | minimal-build-linux-configure           |         100 |
 | build-example-bouffalolab               |         100 |
-| darwin                                  |         100 |
+| test-tv-casting-example                 |         100 |
 | build-example-ameba                     |         100 |
-| tests                                   |         100 |
+| darwin                                  |         100 |
 | documentation-build                     |         100 |
 | build-example-i-mx-linux                |         100 |
 | build-example-ti-cc32xx                 |         100 |
@@ -44,3 +44,4 @@
 | build-example-ti-cc13xx-26xx            |         100 |
 | builds                                  |         100 |
 | build-example-linux-standalone          |         100 |
+| run-misspell                            |         100 |
