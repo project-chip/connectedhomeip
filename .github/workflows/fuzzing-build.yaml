@@ -69,7 +69,7 @@ jobs:
     build_darwin_fuzzing:
         name: Build on Darwin
         runs-on: macos-13
-        python-version: '3.11'
+        python-version: '3.12'
         if: github.actor != 'restyled-io[bot]'
 
         steps:
