@@ -37,7 +37,6 @@ jobs:
         name: Build framework
         if: github.actor != 'restyled-io[bot]'
         runs-on: macos-13
-        python-version: '3.12'
         strategy:
             matrix:
                 options: # We don't need a full matrix
@@ -75,7 +74,6 @@ jobs:
         if: github.actor != 'restyled-io[bot]'
         needs: [framework] # serialize to avoid running to many parallel macos runners
         runs-on: macos-13
-        python-version: '3.12'
         strategy:
             matrix:
                 options: # We don't need a full matrix

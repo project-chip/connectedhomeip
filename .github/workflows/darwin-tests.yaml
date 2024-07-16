@@ -52,7 +52,6 @@ jobs:
 
         if: github.actor != 'restyled-io[bot]'
         runs-on: macos-13
-        python-version: '3.12'
 
         steps:
             - name: Checkout
