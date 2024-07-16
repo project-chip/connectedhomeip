@@ -121,7 +121,6 @@ private:
 
     // CommandHandlerInterface
     void InvokeCommand(HandlerContext & handlerContext) override;
-    CHIP_ERROR EnumerateAcceptedCommands(const ConcreteClusterPath & cluster, CommandIdCallback callback, void * context) override;
 
     void HandleBoost(HandlerContext & ctx, const Commands::Boost::DecodableType & commandData);
     void HandleCancelBoost(HandlerContext & ctx, const Commands::CancelBoost::DecodableType & commandData);

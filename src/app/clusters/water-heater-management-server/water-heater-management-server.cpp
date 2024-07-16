@@ -93,18 +93,6 @@ CHIP_ERROR Instance::Read(const ConcreteReadAttributePath & aPath, AttributeValu
     return CHIP_NO_ERROR;
 }
 
-// CommandHandlerInterface
-CHIP_ERROR Instance::EnumerateAcceptedCommands(const ConcreteClusterPath & cluster, CommandIdCallback callback, void * context)
-{
-    using namespace Commands;
-
-    VerifyOrExit(callback(Boost::Id, context) == Loop::Continue, /**/);
-    VerifyOrExit(callback(CancelBoost::Id, context) == Loop::Continue, /**/);
-
-exit:
-    return CHIP_NO_ERROR;
-}
-
 void Instance::InvokeCommand(HandlerContext & handlerContext)
 {
     using namespace Commands;
