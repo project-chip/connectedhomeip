@@ -121,7 +121,7 @@ class TC_OPSTATE_BASE():
         attributes = cluster.Attributes
         opstate_attr_list = attributes.AttributeList
         attribute_list = await self.read_single_attribute_check_success(endpoint=endpoint, cluster=cluster, attribute=opstate_attr_list)
-        
+
         # Establishing dictionary containing attributes to be shared across multiple modules
         opattributes = {}
         opattributes['phase_list_attr_id'] = attributes.PhaseList.attribute_id
@@ -141,7 +141,7 @@ class TC_OPSTATE_BASE():
         opstate_gencmd_list = attributes.GeneratedCommandList
         accepted_cmd_list = await self.read_single_attribute_check_success(endpoint=endpoint, cluster=cluster, attribute=opstate_accptcmd_list)
         generated_cmd_list = await self.read_single_attribute_check_success(endpoint=endpoint, cluster=cluster, attribute=opstate_gencmd_list)
-        
+
         # Establishing dictionary containing commands to be shared across multiple modules
         opcommands = {}
         opcommands['pause_cmd_id'] = commands.Pause.command_id
@@ -399,7 +399,7 @@ class TC_OPSTATE_BASE():
         oprtnlstate_list_attr_id = attrs["oprtnlstate_list_attr_id"]
         oprtnlerror_attr_id = attrs["oprtnlerror_attr_id"]
         attribute_list = attrs["attribute_list"]
-        
+
         self.init_test()
 
         # STEP 1: Commission DUT to TH (can be skipped if done in a preceding test)
@@ -459,7 +459,7 @@ class TC_OPSTATE_BASE():
         # STEP 6: TH reads from the DUT the OperationalState attribute
         self.step(6)
         operational_state = await self.read_expect_success(endpoint=endpoint,
-                                                            attribute=attributes.OperationalState)
+                                                           attribute=attributes.OperationalState)
         in_range = (0x80 <= operational_state <= 0xBF)
         asserts.assert_true(operational_state in defined_states or in_range,
                             "OperationalState has an invalid ID value!")
@@ -468,13 +468,13 @@ class TC_OPSTATE_BASE():
         self.step("6a")
         if self.pics_guard(self.check_pics(f"{self.test_info.pics_code}.S.M.ST_STOPPED")):
             self.send_manual_or_pipe_command(name="OperationalStateChange",
-                                                device=self.device,
-                                                operation="Stop")
+                                             device=self.device,
+                                             operation="Stop")
             # STEP 6b: TH reads from the DUT the OperationalState attribute
             self.step("6b")
             await self.read_and_expect_value(endpoint=endpoint,
-                                                attribute=attributes.OperationalState,
-                                                expected_value=cluster.Enums.OperationalStateEnum.kStopped)
+                                             attribute=attributes.OperationalState,
+                                             expected_value=cluster.Enums.OperationalStateEnum.kStopped)
         else:
             self.skip_step("6b")
 
@@ -482,13 +482,13 @@ class TC_OPSTATE_BASE():
         self.step("6c")
         if self.pics_guard(self.check_pics(f"{self.test_info.pics_code}.S.M.ST_RUNNING")):
             self.send_manual_or_pipe_command(name="OperationalStateChange",
-                                                device=self.device,
-                                                operation="Start")
+                                             device=self.device,
+                                             operation="Start")
             # STEP 6d: TH reads from the DUT the OperationalState attribute
             self.step("6d")
             await self.read_and_expect_value(endpoint=endpoint,
-                                                attribute=attributes.OperationalState,
-                                                expected_value=cluster.Enums.OperationalStateEnum.kRunning)
+                                             attribute=attributes.OperationalState,
+                                             expected_value=cluster.Enums.OperationalStateEnum.kRunning)
         else:
             self.skip_step("6d")
 
@@ -496,13 +496,13 @@ class TC_OPSTATE_BASE():
         self.step("6e")
         if self.pics_guard(self.check_pics(f"{self.test_info.pics_code}.S.M.ST_PAUSED")):
             self.send_manual_or_pipe_command(name="OperationalStateChange",
-                                                device=self.device,
-                                                operation="Pause")
+                                             device=self.device,
+                                             operation="Pause")
             # STEP 6f: TH reads from the DUT the OperationalState attribute
             self.step("6f")
             await self.read_and_expect_value(endpoint=endpoint,
-                                                attribute=attributes.OperationalState,
-                                                expected_value=cluster.Enums.OperationalStateEnum.kPaused)
+                                             attribute=attributes.OperationalState,
+                                             expected_value=cluster.Enums.OperationalStateEnum.kPaused)
         else:
             self.skip_step("6f")
 
@@ -510,14 +510,14 @@ class TC_OPSTATE_BASE():
         self.step("6g")
         if self.pics_guard(self.check_pics(f"{self.test_info.pics_code}.S.M.ST_ERROR")):
             self.send_manual_or_pipe_command(name="OperationalStateChange",
-                                                device=self.device,
-                                                operation="OnFault",
-                                                param=cluster.Enums.ErrorStateEnum.kUnableToStartOrResume)
+                                             device=self.device,
+                                             operation="OnFault",
+                                             param=cluster.Enums.ErrorStateEnum.kUnableToStartOrResume)
             # STEP 6h: TH reads from the DUT the OperationalState attribute
             self.step("6h")
             await self.read_and_expect_value(endpoint=endpoint,
-                                                attribute=attributes.OperationalState,
-                                                expected_value=cluster.Enums.OperationalStateEnum.kError)
+                                             attribute=attributes.OperationalState,
+                                             expected_value=cluster.Enums.OperationalStateEnum.kError)
         else:
             self.skip_step("6h")
 
@@ -696,8 +696,8 @@ class TC_OPSTATE_BASE():
         # STEP 5: TH reads from the DUT the OperationalState attribute
         self.step(5)
         await self.read_and_expect_value(endpoint=endpoint,
-                                            attribute=attributes.OperationalState,
-                                            expected_value=cluster.Enums.OperationalStateEnum.kRunning)
+                                         attribute=attributes.OperationalState,
+                                         expected_value=cluster.Enums.OperationalStateEnum.kRunning)
 
         # STEP 6: TH reads from the DUT the OperationalError attribute
         self.step(6)
@@ -772,8 +772,8 @@ class TC_OPSTATE_BASE():
         # STEP 14: TH reads from the DUT the OperationalState attribute
         self.step(14)
         await self.read_and_expect_value(endpoint=endpoint,
-                                            attribute=attributes.OperationalState,
-                                            expected_value=cluster.Enums.OperationalStateEnum.kStopped)
+                                         attribute=attributes.OperationalState,
+                                         expected_value=cluster.Enums.OperationalStateEnum.kStopped)
 
         # STEP 15: TH sends Stop command to the DUT
         self.step(15)
@@ -828,7 +828,7 @@ class TC_OPSTATE_BASE():
         cluster = self.test_info.cluster
         attributes = cluster.Attributes
         commands = cluster.Commands
-        
+
         # Gathering Available Attributes and associated ids
         attrs = await self.get_attributes(cluster, endpoint)
         phase_list_attr_id = attrs["phase_list_attr_id"]
@@ -876,7 +876,7 @@ class TC_OPSTATE_BASE():
         operational_state_list_ids = [op_state.operationalStateID for op_state in operational_state_list]
 
         defined_states = [state.value for state in cluster.Enums.OperationalStateEnum
-                            if state != cluster.Enums.OperationalStateEnum.kUnknownEnumValue]
+                          if state != cluster.Enums.OperationalStateEnum.kUnknownEnumValue]
 
         for state in defined_states:
             if state not in operational_state_list_ids:
@@ -892,8 +892,8 @@ class TC_OPSTATE_BASE():
         # STEP 5: TH reads from the DUT the OperationalState attribute
         self.step(5)
         await self.read_and_expect_value(endpoint=endpoint,
-                                            attribute=attributes.OperationalState,
-                                            expected_value=cluster.Enums.OperationalStateEnum.kPaused)
+                                         attribute=attributes.OperationalState,
+                                         expected_value=cluster.Enums.OperationalStateEnum.kPaused)
 
         # STEP 6: TH reads from the DUT the CountdownTime attribute
         self.step(6)
@@ -935,8 +935,8 @@ class TC_OPSTATE_BASE():
         # STEP 11: TH reads from the DUT the OperationalState attribute
         self.step(11)
         await self.read_and_expect_value(endpoint=endpoint,
-                                            attribute=attributes.OperationalState,
-                                            expected_value=cluster.Enums.OperationalStateEnum.kRunning)
+                                         attribute=attributes.OperationalState,
+                                         expected_value=cluster.Enums.OperationalStateEnum.kRunning)
 
         # STEP 12: TH sends Resume command to the DUT
         self.step(12)
@@ -1048,8 +1048,8 @@ class TC_OPSTATE_BASE():
             self.step(4)
 
             await self.read_and_expect_value(endpoint=endpoint,
-                                                attribute=attributes.OperationalState,
-                                                expected_value=cluster.Enums.OperationalStateEnum.kError)
+                                             attribute=attributes.OperationalState,
+                                             expected_value=cluster.Enums.OperationalStateEnum.kError)
 
         else:
             self.skip_step(2)
@@ -1157,8 +1157,8 @@ class TC_OPSTATE_BASE():
             # STEP 6: TH reads from the DUT the OperationalState attribute
             self.step(6)
             await self.read_and_expect_value(endpoint=endpoint,
-                                                attribute=attributes.OperationalState,
-                                                expected_value=cluster.Enums.OperationalStateEnum.kRunning)
+                                             attribute=attributes.OperationalState,
+                                             expected_value=cluster.Enums.OperationalStateEnum.kRunning)
 
             # STEP 7: TH waits for initial-countdown-time
             self.step(7)
@@ -1189,8 +1189,8 @@ class TC_OPSTATE_BASE():
             # STEP 10: TH reads from the DUT the OperationalState attribute
             self.step(10)
             await self.read_and_expect_value(endpoint=endpoint,
-                                                attribute=attributes.OperationalState,
-                                                expected_value=cluster.Enums.OperationalStateEnum.kStopped)
+                                             attribute=attributes.OperationalState,
+                                             expected_value=cluster.Enums.OperationalStateEnum.kStopped)
 
             # STEP 11: Restart DUT
             self.step(11)
@@ -1213,8 +1213,8 @@ class TC_OPSTATE_BASE():
             # STEP 14: TH reads from the DUT the OperationalState attribute
             self.step(14)
             await self.read_and_expect_value(endpoint=endpoint,
-                                                attribute=attributes.OperationalState,
-                                                expected_value=cluster.Enums.OperationalStateEnum.kRunning)
+                                             attribute=attributes.OperationalState,
+                                             expected_value=cluster.Enums.OperationalStateEnum.kRunning)
 
             # STEP 15: TH sends Pause command to the DUT
             self.step(15)
@@ -1226,8 +1226,8 @@ class TC_OPSTATE_BASE():
             # STEP 16: TH reads from the DUT the OperationalState attribute
             self.step(16)
             await self.read_and_expect_value(endpoint=endpoint,
-                                                attribute=attributes.OperationalState,
-                                                expected_value=cluster.Enums.OperationalStateEnum.kPaused)
+                                             attribute=attributes.OperationalState,
+                                             expected_value=cluster.Enums.OperationalStateEnum.kPaused)
 
             # STEP 17: TH waits for half of initial-countdown-time
             self.step(17)
@@ -1243,8 +1243,8 @@ class TC_OPSTATE_BASE():
             # STEP 19: TH reads from the DUT the OperationalState attribute
             self.step(19)
             await self.read_and_expect_value(endpoint=endpoint,
-                                                attribute=attributes.OperationalState,
-                                                expected_value=cluster.Enums.OperationalStateEnum.kRunning)
+                                             attribute=attributes.OperationalState,
+                                             expected_value=cluster.Enums.OperationalStateEnum.kRunning)
 
             # STEP 20: TH waits for initial-countdown-time
             self.step(20)

@@ -31,6 +31,7 @@ from matter_testing_support import MatterBaseTest, async_test_body, default_matt
 from mobly import asserts
 from TC_OpstateCommon import TC_OPSTATE_BASE
 
+
 class TC_RVCOPSTATE_2_1(MatterBaseTest):
     def __init__(self, *args):
         super().__init__(*args)
