@@ -22,9 +22,10 @@
 
 #include <app/data-model/Nullable.h>
 #include <lib/core/CHIPError.h>
+#include <lib/core/StringBuilderAdapters.h>
 #include <system/SystemClock.h>
 
-#include <gtest/gtest.h>
+#include <pw_unit_test/framework.h>
 
 using namespace chip;
 using namespace chip::app;

@@ -57,6 +57,7 @@ chip_test_suite("tests") {
     "${chip_root}/src/credentials/tests:cert_test_vectors",
     "${chip_root}/src/inet/tests:helpers",
     "${chip_root}/src/lib/core",
+    "${chip_root}/src/lib/core:string-builder-adapters",
     "${chip_root}/src/lib/support",
     "${chip_root}/src/lib/support:testing",
     "${chip_root}/src/protocols",
