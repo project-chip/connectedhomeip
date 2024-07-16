@@ -79,6 +79,8 @@ public:
     static const Key kConfigKey_SupportedCalTypes;
     static const Key kConfigKey_SupportedLocaleSize;
     static const Key kConfigKey_RotatingDevIdUniqueId;
+    static const Key kConfigKey_ProductFinish;
+    static const Key kConfigKey_ProductColor;
     static const Key kConfigKey_LocationCapability;
 
     // CHIP Config keys

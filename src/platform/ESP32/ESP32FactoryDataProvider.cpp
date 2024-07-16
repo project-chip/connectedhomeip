@@ -245,6 +245,31 @@ CHIP_ERROR ESP32FactoryDataProvider::GetManufacturingDate(uint16_t & year, uint8
     return GenericDeviceInstanceInfoProvider<ESP32Config>::GetManufacturingDate(year, month, day);
 }
 
+CHIP_ERROR ESP32FactoryDataProvider::GetProductFinish(app::Clusters::BasicInformation::ProductFinishEnum * finish)
+{
+    CHIP_ERROR err         = CHIP_NO_ERROR;
+    uint32_t productFinish = 0;
+
+    err = ESP32Config::ReadConfigValue(ESP32Config::kConfigKey_ProductFinish, productFinish);
+    ReturnErrorOnFailure(err);
+    *finish = static_cast<app::Clusters::BasicInformation::ProductFinishEnum>(productFinish);
+
+    return err;
+}
+
+CHIP_ERROR ESP32FactoryDataProvider::GetProductPrimaryColor(app::Clusters::BasicInformation::ColorEnum * primaryColor)
+{
+    CHIP_ERROR err = CHIP_NO_ERROR;
+    uint32_t color = 0;
+
+    err = ESP32Config::ReadConfigValue(ESP32Config::kConfigKey_ProductColor, color);
+    ReturnErrorOnFailure(err);
+
+    *primaryColor = static_cast<app::Clusters::BasicInformation::ColorEnum>(color);
+
+    return err;
+}
+
 CHIP_ERROR ESP32FactoryDataProvider::GetHardwareVersion(uint16_t & hardwareVersion)
 {
     return GenericDeviceInstanceInfoProvider<ESP32Config>::GetHardwareVersion(hardwareVersion);
