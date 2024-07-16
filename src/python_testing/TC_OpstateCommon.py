@@ -831,7 +831,6 @@ class TC_OPSTATE_BASE():
 
         # Gathering Available Attributes and associated ids
         attrs = await self.get_attributes(cluster, endpoint)
-        phase_list_attr_id = attrs["phase_list_attr_id"]
         countdown_time_attr_id = attrs["countdown_time_attr_id"]
         attribute_list = attrs["attribute_list"]
 
