@@ -124,12 +124,12 @@ Davis, CA 95616, USA
   <attributes>
     <attribute id="0x0000" name="Accuracy" type="ref_MeasurementAccuracyStruct">
       <access read="true" readPrivilege="view"/>
-      <quality changeOmitted="false" nullable="false" scene="false" persistence="fixed" reportable="false"/>
+      <quality changeOmitted="false" nullable="false" scene="false" persistence="fixed" reportable="false" sourceAttribution="false" quieterReporting="false"/>
       <mandatoryConform/>
     </attribute>
     <attribute id="0x0001" name="CumulativeEnergyImported" type="EnergyMeasurementStruct" default="null">
       <access read="true" readPrivilege="view"/>
-      <quality changeOmitted="false" nullable="true" scene="false" persistence="volatile" reportable="false"/>
+      <quality changeOmitted="false" nullable="true" scene="false" persistence="volatile" reportable="false" sourceAttribution="false" quieterReporting="true"/>
       <mandatoryConform>
         <andTerm>
           <feature name="IMPE"/>
@@ -139,7 +139,7 @@ Davis, CA 95616, USA
     </attribute>
     <attribute id="0x0002" name="CumulativeEnergyExported" type="EnergyMeasurementStruct" default="null">
       <access read="true" readPrivilege="view"/>
-      <quality changeOmitted="false" nullable="true" scene="false" persistence="volatile" reportable="false"/>
+      <quality changeOmitted="false" nullable="true" scene="false" persistence="volatile" reportable="false" sourceAttribution="false" quieterReporting="true"/>
       <mandatoryConform>
         <andTerm>
           <feature name="EXPE"/>
@@ -149,7 +149,7 @@ Davis, CA 95616, USA
     </attribute>
     <attribute id="0x0003" name="PeriodicEnergyImported" type="EnergyMeasurementStruct" default="null">
       <access read="true" readPrivilege="view"/>
-      <quality changeOmitted="false" nullable="true" scene="false" persistence="volatile" reportable="false"/>
+      <quality changeOmitted="false" nullable="true" scene="false" persistence="volatile" reportable="false" sourceAttribution="false" quieterReporting="true"/>
       <mandatoryConform>
         <andTerm>
           <feature name="IMPE"/>
@@ -159,7 +159,7 @@ Davis, CA 95616, USA
     </attribute>
     <attribute id="0x0004" name="PeriodicEnergyExported" type="EnergyMeasurementStruct" default="null">
       <access read="true" readPrivilege="view"/>
-      <quality changeOmitted="false" nullable="true" scene="false" persistence="volatile" reportable="false"/>
+      <quality changeOmitted="false" nullable="true" scene="false" persistence="volatile" reportable="false" sourceAttribution="false" quieterReporting="true"/>
       <mandatoryConform>
         <andTerm>
           <feature name="EXPE"/>
@@ -169,7 +169,7 @@ Davis, CA 95616, USA
     </attribute>
     <attribute id="0x0005" name="CumulativeEnergyReset" type="CumulativeEnergyResetStruct" default="null">
       <access read="true" readPrivilege="view"/>
-      <quality changeOmitted="false" nullable="true" scene="false" persistence="volatile" reportable="false"/>
+      <quality changeOmitted="false" nullable="true" scene="false" persistence="volatile" reportable="false" sourceAttribution="false" quieterReporting="false"/>
       <optionalConform>
         <feature name="CUME"/>
       </optionalConform>

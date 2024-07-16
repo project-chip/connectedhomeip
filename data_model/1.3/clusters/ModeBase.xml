@@ -99,25 +99,25 @@ Require at least one standard mode tag. Define reserved ranges for base/derived 
     <attribute id="0x0000" name="SupportedModes" type="list" default="MS">
       <entry type="ModeOptionStruct"/>
       <access read="true" readPrivilege="view"/>
-      <quality changeOmitted="false" nullable="false" scene="false" persistence="fixed" reportable="false"/>
+      <quality changeOmitted="false" nullable="false" scene="false" persistence="fixed" reportable="false" sourceAttribution="false" quieterReporting="false"/>
       <mandatoryConform/>
       <constraint type="countBetween" from="2" to="255"/>
     </attribute>
     <attribute id="0x0001" name="CurrentMode" type="uint8" default="MS">
       <access read="true" readPrivilege="view"/>
-      <quality changeOmitted="false" nullable="false" scene="true" persistence="nonVolatile" reportable="false"/>
+      <quality changeOmitted="false" nullable="false" scene="true" persistence="nonVolatile" reportable="false" sourceAttribution="false" quieterReporting="false"/>
       <mandatoryConform/>
       <constraint type="desc"/>
     </attribute>
     <attribute id="0x0002" name="StartUpMode" type="uint8" default="MS">
       <access read="true" write="true" readPrivilege="view" writePrivilege="operate"/>
-      <quality changeOmitted="false" nullable="true" scene="false" persistence="nonVolatile" reportable="false"/>
+      <quality changeOmitted="false" nullable="true" scene="false" persistence="nonVolatile" reportable="false" sourceAttribution="false" quieterReporting="false"/>
       <optionalConform/>
       <constraint type="desc"/>
     </attribute>
     <attribute id="0x0003" name="OnMode" type="uint8" default="null">
       <access read="true" write="true" readPrivilege="view" writePrivilege="operate"/>
-      <quality changeOmitted="false" nullable="true" scene="false" persistence="nonVolatile" reportable="false"/>
+      <quality changeOmitted="false" nullable="true" scene="false" persistence="nonVolatile" reportable="false" sourceAttribution="false" quieterReporting="false"/>
       <mandatoryConform>
         <feature name="DEPONOFF"/>
       </mandatoryConform>
@@ -134,7 +134,6 @@ Require at least one standard mode tag. Define reserved ranges for base/derived 
       </field>
     </command>
     <command id="0x01" name="ChangeToModeResponse" direction="responseFromServer">
-      <access invokePrivilege="operate"/>
       <mandatoryConform/>
       <field id="0" name="Status" type="enum8">
         <enum>
