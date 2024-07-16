@@ -119,7 +119,7 @@ CHIP_ERROR ThreadNetworkDirectoryServer::WritePreferredExtendedPanId(const Concr
 
     // "A zero-length value SHALL be allowed for nullable values ... and SHALL have the same semantics as the null value."
     ByteSpan value = nullableValue.ValueOr(ByteSpan());
-    // Ensure the provided value is value (correct size) and refers to PAN from the list.
+    // Ensure the provided value is valid (correct size) and refers to PAN from the list.
     VerifyOrReturnError(value.empty() || (value.size() == ExtendedPanId::size() && mStorage.ContainsNetwork(ExtendedPanId(value))),
                         StatusIB(IMStatus::ConstraintError).ToChipError());
 

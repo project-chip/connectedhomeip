@@ -39,7 +39,7 @@ namespace Thread {
 class ThreadTLV final
 {
     static constexpr uint8_t kLengthEscape = 0xff; ///< This length value indicates the actual length is of two-bytes length, which
-                                                   ///< not allowed in Thread Operational Dataset TLVs.
+                                                   ///< is not allowed in Thread Operational Dataset TLVs.
 
 public:
     static constexpr uint8_t kMaxLength = kLengthEscape - 1;

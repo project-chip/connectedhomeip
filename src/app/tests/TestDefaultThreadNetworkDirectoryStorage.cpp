@@ -35,8 +35,8 @@ public:
     static void TearDownTestSuite() { chip::Platform::MemoryShutdown(); }
 
 protected:
-    TestPersistentStorageDelegate persistendStorageDelegate;
-    DefaultThreadNetworkDirectoryStorage storageImpl{ persistendStorageDelegate };
+    TestPersistentStorageDelegate persistentStorageDelegate;
+    DefaultThreadNetworkDirectoryStorage storageImpl{ persistentStorageDelegate };
     ThreadNetworkDirectoryStorage & storage = storageImpl;
 };
 
