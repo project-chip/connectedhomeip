@@ -26838,15 +26838,44 @@ class WaterHeaterMode(Cluster):
             kOff = 0x4000
             kManual = 0x4001
             kTimed = 0x4002
-            # All received enum values that are not listed above will be mapped
-            # to kUnknownEnumValue. This is a helper enum value that should only
-            # be used by code to process how it handles receiving and unknown
-            # enum value. This specific should never be transmitted.
-            kUnknownEnumValue = 0,
+            # kUnknownEnumValue intentionally not defined. This enum never goes
+            # through DataModel::Decode, likely because it is a part of a derived
+            # cluster. As a result having kUnknownEnumValue in this enum is error
+            # prone, and was removed. See
+            # src/app/common/templates/config-data.yaml.
 
     class Bitmaps:
         class Feature(IntFlag):
             kOnOff = 0x1
+
+    class Structs:
+        @dataclass
+        class ModeTagStruct(ClusterObject):
+            @ChipUtility.classproperty
+            def descriptor(cls) -> ClusterObjectDescriptor:
+                return ClusterObjectDescriptor(
+                    Fields=[
+                        ClusterObjectFieldDescriptor(Label="mfgCode", Tag=0, Type=typing.Optional[uint]),
+                        ClusterObjectFieldDescriptor(Label="value", Tag=1, Type=uint),
+                    ])
+
+            mfgCode: 'typing.Optional[uint]' = None
+            value: 'uint' = 0
+
+        @dataclass
+        class ModeOptionStruct(ClusterObject):
+            @ChipUtility.classproperty
+            def descriptor(cls) -> ClusterObjectDescriptor:
+                return ClusterObjectDescriptor(
+                    Fields=[
+                        ClusterObjectFieldDescriptor(Label="label", Tag=0, Type=str),
+                        ClusterObjectFieldDescriptor(Label="mode", Tag=1, Type=uint),
+                        ClusterObjectFieldDescriptor(Label="modeTags", Tag=2, Type=typing.List[WaterHeaterMode.Structs.ModeTagStruct]),
+                    ])
+
+            label: 'str' = ""
+            mode: 'uint' = 0
+            modeTags: 'typing.List[WaterHeaterMode.Structs.ModeTagStruct]' = field(default_factory=lambda: [])
 
     class Commands:
         @dataclass

@@ -9552,6 +9552,7 @@
           # Targeting Spring 2024 Matter release
           - EnergyEVSEMode
           - DeviceEnergyManagementMode
+          - WaterHeaterMode
           - Messages
           - PowerTopology
       attributes:

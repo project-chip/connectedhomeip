@@ -5186,6 +5186,17 @@ cluster WaterHeaterMode = 158 {
     kOnOff = 0x1;
   }
 
+  struct ModeTagStruct {
+    optional vendor_id mfgCode = 0;
+    enum16 value = 1;
+  }
+
+  struct ModeOptionStruct {
+    char_string<64> label = 0;
+    int8u mode = 1;
+    ModeTagStruct modeTags[] = 2;
+  }
+
   readonly attribute ModeOptionStruct supportedModes[] = 0;
   readonly attribute int8u currentMode = 1;
   attribute optional nullable int8u startUpMode = 2;
