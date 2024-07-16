@@ -29,7 +29,7 @@ import chip.clusters as Clusters
 from chip.clusters.Types import NullValue
 from matter_testing_support import MatterBaseTest, async_test_body, default_matter_test_main
 from mobly import asserts
-
+from TC_OpstateCommon import TC_OPSTATE_BASE
 
 class TC_RVCOPSTATE_2_1(MatterBaseTest):
     def __init__(self, *args):
@@ -90,15 +90,16 @@ class TC_RVCOPSTATE_2_1(MatterBaseTest):
             self.app_pipe = self.app_pipe + str(app_pid)
 
         cluster = Clusters.RvcOperationalState
-        attributes = Clusters.RvcOperationalState.Attributes
-        RVCOpstate_attr_list = attributes.AttributeList
-        attribute_list = await self.read_single_attribute_check_success(endpoint=self.endpoint, cluster=cluster, attribute=RVCOpstate_attr_list)
-        phase_list_attr_id = attributes.PhaseList.attribute_id
-        current_phase_attr_id = attributes.CurrentPhase.attribute_id
-        countdown_time_attr_id = attributes.CountdownTime.attribute_id
-        oprtnlstate_list_attr_id = attributes.OperationalStateList.attribute_id
-        oprtnlstate_attr_id = attributes.OperationalState.attribute_id
-        oprtnlerror_attr_id = attributes.OperationalError.attribute_id
+        attributes = cluster.Attributes
+
+        attrs = await TC_OPSTATE_BASE.get_attributes(self, cluster, self.endpoint)
+        phase_list_attr_id = attrs["phase_list_attr_id"]
+        current_phase_attr_id = attrs["current_phase_attr_id"]
+        countdown_time_attr_id = attrs["countdown_time_attr_id"]
+        oprtnlstate_list_attr_id = attrs["oprtnlstate_list_attr_id"]
+        oprtnlstate_attr_id = attrs["oprtnlstate_attr_id"]
+        oprtnlerror_attr_id = attrs["oprtnlerror_attr_id"]
+        attribute_list = attrs["attribute_list"]
 
         self.print_step(1, "Commissioning, already done")
 
