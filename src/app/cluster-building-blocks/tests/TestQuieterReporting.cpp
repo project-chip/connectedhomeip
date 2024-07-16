@@ -98,7 +98,7 @@ TEST(TestQuieterReporting, ChangeOnIncrementPolicyWorks)
     QuieterReportingAttribute<int> attribute{ MakeNullable<int>(10) };
 
     // Always start not dirty (because first sub priming always just read value anyway).
-    ASSERT_EQ(*attribute.value(), 10);
+    ASSERT_EQ(attribute.value().Value(), 10);
 
     auto now = fakeClock.now();
 
@@ -149,7 +149,7 @@ TEST(TestQuieterReporting, ChangeOnDecrementPolicyWorks)
     QuieterReportingAttribute<int> attribute{ MakeNullable<int>(9) };
 
     // Always start not dirty (because first sub priming always just read value anyway).
-    ASSERT_EQ(*attribute.value(), 9);
+    ASSERT_EQ(attribute.value().Value(), 9);
 
     auto now = fakeClock.now();
 
@@ -202,7 +202,7 @@ TEST(TestQuieterReporting, SufficientChangePredicateWorks)
     QuieterReportingAttribute<int> attribute{ MakeNullable<int>(9) };
 
     // Always start not dirty (because first sub priming always just read value anyway).
-    ASSERT_EQ(*attribute.value(), 9);
+    ASSERT_EQ(attribute.value().Value(), 9);
 
     auto now = fakeClock.now();
 
