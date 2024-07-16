@@ -22,7 +22,7 @@ import chip.discovery as Discovery
 from chip import ChipDeviceCtrl
 from chip.exceptions import ChipStackError
 from chip.interaction_model import InteractionModelError, Status
-from chip.tlv import TLVReader, TLVWriter
+from chip.tlv import TLVReader
 from chip.utils import CommissioningBuildingBlocks
 from matter_testing_support import MatterBaseTest, async_test_body, default_matter_test_main
 from mobly import asserts
@@ -77,16 +77,18 @@ class TC_OPCREDS_3_4(MatterBaseTest):
 
         self.print_step(2, "TH1 reads the NOCs attribute from the Node Operational Credentials cluster using a fabric-filtered read")
         nocs = await self.read_single_attribute_check_success(dev_ctrl=th1_new_fabric_ctrl, node_id=th1_dut_node_id, cluster=opcreds, attribute=opcreds.Attributes.NOCs, fabric_filtered=True)
+        noc_orig = nocs[0].noc
 
         self.print_step(3, "TH1 reads the TrustedRootCertificates attribute from the Node Operational Credentials cluster")
         trusted_root_original = await self.read_single_attribute_check_success(
             dev_ctrl=th1_new_fabric_ctrl,
             node_id=th1_dut_node_id, cluster=opcreds,
             attribute=opcreds.Attributes.TrustedRootCertificates)
+        print(trusted_root_original)
 
         self.print_step(
             4, "TH1 sends the UpdateNOC command to the Node Operational Credentials cluster with the following fields: NOCValue and ICACValue")
-        cmd = opcreds.Commands.UpdateNOC(NOCValue=noc_original, ICACValue=icac_original)
+        cmd = opcreds.Commands.UpdateNOC(NOCValue=noc_orig, ICACValue=icac_original)
         try:
             await self.send_single_cmd(dev_ctrl=th1_new_fabric_ctrl, node_id=th1_dut_node_id, cmd=cmd)
             asserts.fail("Unexpected error sending UpdateNOC command")
