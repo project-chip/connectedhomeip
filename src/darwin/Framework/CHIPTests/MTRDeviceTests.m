@@ -2026,10 +2026,10 @@ static void (^globalReportHandler)(id _Nullable values, NSError * _Nullable erro
                                 }
 
                                 MTRAttributePath * path = result[@"attributePath"];
-                                if ([path.attribute unsignedIntegerValue] < 4) {
+                                if ([path.attribute unsignedIntegerValue] < 5) {
                                     XCTAssertEqualObjects(path.cluster, @29);
                                     __auto_type endpoint = [path.endpoint unsignedShortValue];
-                                    XCTAssertTrue(endpoint == 0 || endpoint == 1 || endpoint == 2);
+                                    XCTAssertTrue(endpoint == 0 || endpoint == 1 || endpoint == 2 || endpoint == 3);
                                 } else {
                                     XCTAssertEqualObjects(path.cluster, @40);
                                     XCTAssertEqualObjects(path.endpoint, @0);
@@ -2041,10 +2041,12 @@ static void (^globalReportHandler)(id _Nullable values, NSError * _Nullable erro
                                 XCTFail("Unexpected result dictionary %@", result);
                             }
                         }
-                        // Our test application has 3 endpoints.  We have a descriptor on each one,
+                        // Our test application has 4 endpoints.  We have a descriptor on each one,
                         // so that's 4 results per endpoint, and we only have Basic Information on
                         // endpoint 0, so that's 4 more results.
-                        XCTAssertEqual(attributeResultCount, 3 * 4 + 4);
+                        const int kNumEndpoints = 4;
+
+                        XCTAssertEqual(attributeResultCount, kNumEndpoints * 4 + 4);
                         XCTAssertEqual(eventResultCount, [eventPaths count]);
 
                         [expectation fulfill];
