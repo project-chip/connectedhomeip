@@ -128,8 +128,8 @@ void Instance::HandleBoost(HandlerContext & ctx, const Commands::Boost::Decodabl
     Optional<bool> oneShot                   = commandData.oneShot;
     Optional<bool> emergencyBoost            = commandData.emergencyBoost;
     Optional<int16_t> temporarySetpoint      = commandData.temporarySetpoint;
-    Optional<chip::Percent> targetPercentage = commandData.targetPercentage;
-    Optional<chip::Percent> targetReheat     = commandData.targetReheat;
+    Optional<Percent> targetPercentage = commandData.targetPercentage;
+    Optional<Percent> targetReheat     = commandData.targetReheat;
 
     //  Notify the appliance if the appliance hardware cannot be adjusted, then return Failure
     if (!HasFeature(WaterHeaterManagement::Feature::kTankPercent))
@@ -192,5 +192,3 @@ void Instance::HandleCancelBoost(HandlerContext & ctx, const Commands::CancelBoo
 } // namespace Clusters
 } // namespace app
 } // namespace chip
-
-void MatterWaterHeaterManagementPluginServerInitCallback() {}
