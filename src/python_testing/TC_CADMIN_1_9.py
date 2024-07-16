@@ -69,9 +69,8 @@ class TC_CADMIN_1_9(MatterBaseTest):
 
         elif expectedErrCode == 50:
             logging.info("-----------------Attempting connection expecting timeout-------------------------")
-            setup_code = self.generate_unique_random_value(params.setupPinCode)
             errcode = self.th2.CommissionOnNetwork(
-                nodeId=self.dut_node_id, setupPinCode=setup_code,
+                nodeId=self.dut_node_id, setupPinCode=params.setupPinCode,
                 filterType=ChipDeviceCtrl.DiscoveryFilterType.LONG_DISCRIMINATOR, filter=self.discriminator)
             logging.info('Commissioning complete done. Successful? {}, errorcode = {}'.format(errcode.is_success, errcode))
             asserts.assert_false(errcode.is_success, 'Commissioning complete did not error as expected')
