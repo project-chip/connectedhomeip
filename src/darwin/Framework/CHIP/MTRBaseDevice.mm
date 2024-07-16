@@ -2306,7 +2306,7 @@ MTREventPriority MTREventPriorityForValidPriorityLevel(chip::app::PriorityLevel 
         return YES;
     }
 
-    return [super isEqual:object];
+    return [super isEqual:path];
 }
 
 - (BOOL)isEqual:(id)object
@@ -2394,7 +2394,7 @@ MTREventPriority MTREventPriorityForValidPriorityLevel(chip::app::PriorityLevel 
         return YES;
     }
 
-    return [super isEqual:object];
+    return [super isEqual:path];
 }
 
 - (BOOL)isEqual:(id)object
@@ -2677,7 +2677,7 @@ static NSString * const sAttributeKey = @"attributeKey";
 - (BOOL)isEqual:(id)object
 {
     if ([[object class] isKindOfClass:[MTREventPath class]]) {
-        return [self isEqualToEventPath: object]];
+        return [self isEqualToEventPath: object];
     }
 
     return [super isEqual:object];
@@ -2766,7 +2766,7 @@ static NSString * const sEventKey = @"eventKey";
         return NO;
     }
 
-    if (command == self) {
+    if (commandPath == self) {
         return YES;
     }
 
