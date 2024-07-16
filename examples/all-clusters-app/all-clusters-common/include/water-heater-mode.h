@@ -29,18 +29,18 @@ namespace Clusters {
 
 namespace WaterHeaterMode {
 
-const uint8_t ModeOff  = 0;
+const uint8_t ModeOff    = 0;
 const uint8_t ModeManual = 1;
-const uint8_t ModeTimed = 2;
+const uint8_t ModeTimed  = 2;
 
 /// This is an application level delegate to handle WaterHeaterMode commands according to the specific business logic.
 class ExampleWaterHeaterModeDelegate : public ModeBase::Delegate
 {
 private:
-    using ModeTagStructType              = detail::Structs::ModeTagStruct::Type;
-    ModeTagStructType modeTagsOff[1]  = { { .value = to_underlying(ModeTag::kOff) } };
+    using ModeTagStructType             = detail::Structs::ModeTagStruct::Type;
+    ModeTagStructType modeTagsOff[1]    = { { .value = to_underlying(ModeTag::kOff) } };
     ModeTagStructType modeTagsManual[1] = { { .value = to_underlying(ModeTag::kManual) } };
-    ModeTagStructType modeTagsTimed[1] = { { .value = to_underlying(ModeTag::kTimed) } };
+    ModeTagStructType modeTagsTimed[1]  = { { .value = to_underlying(ModeTag::kTimed) } };
 
     const detail::Structs::ModeOptionStruct::Type kModeOptions[3] = {
         detail::Structs::ModeOptionStruct::Type{ .label    = CharSpan::fromCharString("Off"),
