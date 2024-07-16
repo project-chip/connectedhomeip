@@ -21901,6 +21901,14 @@
               "isEnabled": 1
             },
             {
+              "name": "StringEchoResponse",
+              "code": 13,
+              "mfgCode": null,
+              "source": "server",
+              "isIncoming": 0,
+              "isEnabled": 1
+            },
+            {
               "name": "TestEnumsRequest",
               "code": 14,
               "mfgCode": null,
@@ -21973,6 +21981,14 @@
               "isEnabled": 1
             },
             {
+              "name": "StringEchoRequest",
+              "code": 24,
+              "mfgCode": null,
+              "source": "client",
+              "isIncoming": 1,
+              "isEnabled": 1
+            },
+            {
               "name": "TestDifferentVendorMeiRequest",
               "code": 4294049962,
               "mfgCode": null,
@@ -21983,22 +21999,6 @@
             {
               "name": "TestDifferentVendorMeiResponse",
               "code": 4294049979,
-              "mfgCode": null,
-              "source": "server",
-              "isIncoming": 0,
-              "isEnabled": 1
-            },
-            {
-              "name": "StringEchoRequest",
-              "code": 24,
-              "mfgCode": null,
-              "source": "client",
-              "isIncoming": 1,
-              "isEnabled": 1
-            },
-            {
-              "name": "StringEchoResponse",
-              "code": 13,
               "mfgCode": null,
               "source": "server",
               "isIncoming": 0,
