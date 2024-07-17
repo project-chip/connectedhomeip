@@ -11889,7 +11889,7 @@ class BridgedDeviceBasicInformation(Cluster):
 
             @ChipUtility.classproperty
             def event_id(cls) -> int:
-                return 0x00000004
+                return 0x00000080
 
             @ChipUtility.classproperty
             def descriptor(cls) -> ClusterObjectDescriptor:

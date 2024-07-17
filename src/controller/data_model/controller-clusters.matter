@@ -2248,7 +2248,7 @@ cluster BridgedDeviceBasicInformation = 57 {
     boolean reachableNewValue = 0;
   }
 
-  info event ActiveChanged = 4 {
+  info event ActiveChanged = 128 {
     int32u promisedActiveDuration = 0;
   }
 

@@ -4453,7 +4453,7 @@ public class ClusterIDMapping {
             ShutDown(1L),
             Leave(2L),
             ReachableChanged(3L),
-            ActiveChanged(4L),;
+            ActiveChanged(128L),;
             private final long id;
             Event(long id) {
                 this.id = id;

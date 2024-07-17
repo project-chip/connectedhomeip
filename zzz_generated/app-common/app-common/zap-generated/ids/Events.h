@@ -221,7 +221,7 @@ static constexpr EventId Id = 0x00000003;
 } // namespace ReachableChanged
 
 namespace ActiveChanged {
-static constexpr EventId Id = 0x00000004;
+static constexpr EventId Id = 0x00000080;
 } // namespace ActiveChanged
 
 } // namespace Events

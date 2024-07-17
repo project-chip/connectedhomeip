@@ -112,8 +112,8 @@ limitations under the License.
             <description>This event SHALL be generated when there is a change in the Reachable attribute.</description>
             <field id="0" name="ReachableNewValue" type="boolean"/>
         </event>
-        <event side="server" code="0x04" name="ActiveChanged" priority="info" optional="true" apiMaturity="provisional">
-            <description>This event (when BIS enabled) SHALL be generated the next time a bridged device becomes active after a KeepActive command is received.</description>
+        <event side="server" code="0x80" name="ActiveChanged" priority="info" optional="true" apiMaturity="provisional">
+            <description>This event (when supported) SHALL be generated the next time a bridged device becomes active after a KeepActive command is received.</description>
             <field id="0" name="PromisedActiveDuration" type="int32u"/>
         </event>
 
