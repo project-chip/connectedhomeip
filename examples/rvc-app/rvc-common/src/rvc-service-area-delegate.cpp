@@ -110,7 +110,7 @@ uint32_t RvcServiceAreaDelegate::GetNumberOfSupportedLocations()
 
 bool RvcServiceAreaDelegate::GetSupportedLocationByIndex(uint32_t listIndex, LocationStructureWrapper & aSupportedLocation)
 {
-    if (listIndex < static_cast<uint32_t>(mSupportedLocations.size()))
+    if (listIndex < mSupportedLocations.size())
     {
         aSupportedLocation = mSupportedLocations[listIndex];
         return true;

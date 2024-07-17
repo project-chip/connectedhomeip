@@ -145,11 +145,6 @@ struct LocationStructureWrapper : public chip::app::Clusters::ServiceArea::Struc
         locationInfo.positionTag = aPositionTag;
         locationInfo.surfaceTag  = aSurfaceTag;
 
-        // Save the location name to buffer, so access and lifetime is controlled.
-        // If aLocationName is not null, create a CharSpan to reference the text.
-        // Make sure there is always a terminating character, mainly so we can get c_str for logging.
-        memset(mLocationNameBuffer, 0, sizeof(mLocationNameBuffer));
-
         // this assumes locationInfo structure was created above, if appropriate
         if (!locationInfo.locationInfo.IsNull())
         {
@@ -274,7 +269,7 @@ struct LocationStructureWrapper : public chip::app::Clusters::ServiceArea::Struc
     }
 
 private:
-    char mLocationNameBuffer[kLocationNameMaxSize];
+    char mLocationNameBuffer[kLocationNameMaxSize] = { 0 };
 };
 
 /**
@@ -324,11 +319,6 @@ struct MapStructureWrapper : public chip::app::Clusters::ServiceArea::Structs::M
     {
         mapID = aMapId;
 
-        // Save the map name to the buffer so that access and lifetime is controlled.
-        // Create a CharSpan reference the text.
-        // Make sure there is always a terminating character, mainly so we can get c_str for logging.
-        memset(mMapNameBuffer, 0, sizeof(mMapNameBuffer));
-
         if (aMapName.empty())
         {
             name = CharSpan(mMapNameBuffer, 0);
@@ -360,7 +350,7 @@ struct MapStructureWrapper : public chip::app::Clusters::ServiceArea::Structs::M
     CharSpan GetName() const { return name; }
 
 private:
-    char mMapNameBuffer[kMapNameMaxSize];
+    char mMapNameBuffer[kMapNameMaxSize] = { 0 };
 };
 
 } // namespace ServiceArea
