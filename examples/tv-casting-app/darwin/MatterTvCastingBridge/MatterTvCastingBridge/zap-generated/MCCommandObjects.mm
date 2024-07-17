@@ -57,7 +57,8 @@
         request, context, [mcCommand, completion](void * context, NSError * err, id response) {
             completion(context, err, response);
             delete mcCommand;
-        }, timedInvokeTimeoutMs);
+        },
+        timedInvokeTimeoutMs);
 }
 
 - (std::any)getCppRequestFromObjC:(MCOnOffClusterOffParams *)objcRequest
@@ -109,7 +110,8 @@
         request, context, [mcCommand, completion](void * context, NSError * err, id response) {
             completion(context, err, response);
             delete mcCommand;
-        }, timedInvokeTimeoutMs);
+        },
+        timedInvokeTimeoutMs);
 }
 
 - (std::any)getCppRequestFromObjC:(MCOnOffClusterOnParams *)objcRequest
@@ -161,7 +163,8 @@
         request, context, [mcCommand, completion](void * context, NSError * err, id response) {
             completion(context, err, response);
             delete mcCommand;
-        }, timedInvokeTimeoutMs);
+        },
+        timedInvokeTimeoutMs);
 }
 
 - (std::any)getCppRequestFromObjC:(MCOnOffClusterToggleParams *)objcRequest
@@ -213,7 +216,8 @@
         request, context, [mcCommand, completion](void * context, NSError * err, id response) {
             completion(context, err, response);
             delete mcCommand;
-        }, timedInvokeTimeoutMs);
+        },
+        timedInvokeTimeoutMs);
 }
 
 - (std::any)getCppRequestFromObjC:(MCOnOffClusterOffWithEffectParams *)objcRequest
@@ -265,7 +269,8 @@
         request, context, [mcCommand, completion](void * context, NSError * err, id response) {
             completion(context, err, response);
             delete mcCommand;
-        }, timedInvokeTimeoutMs);
+        },
+        timedInvokeTimeoutMs);
 }
 
 - (std::any)getCppRequestFromObjC:(MCOnOffClusterOnWithRecallGlobalSceneParams *)objcRequest
@@ -317,7 +322,8 @@
         request, context, [mcCommand, completion](void * context, NSError * err, id response) {
             completion(context, err, response);
             delete mcCommand;
-        }, timedInvokeTimeoutMs);
+        },
+        timedInvokeTimeoutMs);
 }
 
 - (std::any)getCppRequestFromObjC:(MCOnOffClusterOnWithTimedOffParams *)objcRequest
@@ -371,7 +377,8 @@
         request, context, [mcCommand, completion](void * context, NSError * err, id response) {
             completion(context, err, response);
             delete mcCommand;
-        }, timedInvokeTimeoutMs);
+        },
+        timedInvokeTimeoutMs);
 }
 
 - (std::any)getCppRequestFromObjC:(MCLevelControlClusterMoveToLevelParams *)objcRequest
@@ -423,7 +430,8 @@
         request, context, [mcCommand, completion](void * context, NSError * err, id response) {
             completion(context, err, response);
             delete mcCommand;
-        }, timedInvokeTimeoutMs);
+        },
+        timedInvokeTimeoutMs);
 }
 
 - (std::any)getCppRequestFromObjC:(MCLevelControlClusterMoveParams *)objcRequest
@@ -475,7 +483,8 @@
         request, context, [mcCommand, completion](void * context, NSError * err, id response) {
             completion(context, err, response);
             delete mcCommand;
-        }, timedInvokeTimeoutMs);
+        },
+        timedInvokeTimeoutMs);
 }
 
 - (std::any)getCppRequestFromObjC:(MCLevelControlClusterStepParams *)objcRequest
@@ -527,7 +536,8 @@
         request, context, [mcCommand, completion](void * context, NSError * err, id response) {
             completion(context, err, response);
             delete mcCommand;
-        }, timedInvokeTimeoutMs);
+        },
+        timedInvokeTimeoutMs);
 }
 
 - (std::any)getCppRequestFromObjC:(MCLevelControlClusterStopParams *)objcRequest
@@ -579,7 +589,8 @@
         request, context, [mcCommand, completion](void * context, NSError * err, id response) {
             completion(context, err, response);
             delete mcCommand;
-        }, timedInvokeTimeoutMs);
+        },
+        timedInvokeTimeoutMs);
 }
 
 - (std::any)getCppRequestFromObjC:(MCLevelControlClusterMoveToLevelWithOnOffParams *)objcRequest
@@ -631,7 +642,8 @@
         request, context, [mcCommand, completion](void * context, NSError * err, id response) {
             completion(context, err, response);
             delete mcCommand;
-        }, timedInvokeTimeoutMs);
+        },
+        timedInvokeTimeoutMs);
 }
 
 - (std::any)getCppRequestFromObjC:(MCLevelControlClusterMoveWithOnOffParams *)objcRequest
@@ -683,7 +695,8 @@
         request, context, [mcCommand, completion](void * context, NSError * err, id response) {
             completion(context, err, response);
             delete mcCommand;
-        }, timedInvokeTimeoutMs);
+        },
+        timedInvokeTimeoutMs);
 }
 
 - (std::any)getCppRequestFromObjC:(MCLevelControlClusterStepWithOnOffParams *)objcRequest
@@ -735,7 +748,8 @@
         request, context, [mcCommand, completion](void * context, NSError * err, id response) {
             completion(context, err, response);
             delete mcCommand;
-        }, timedInvokeTimeoutMs);
+        },
+        timedInvokeTimeoutMs);
 }
 
 - (std::any)getCppRequestFromObjC:(MCLevelControlClusterStopWithOnOffParams *)objcRequest
@@ -787,7 +801,8 @@
         request, context, [mcCommand, completion](void * context, NSError * err, id response) {
             completion(context, err, response);
             delete mcCommand;
-        }, timedInvokeTimeoutMs);
+        },
+        timedInvokeTimeoutMs);
 }
 
 - (std::any)getCppRequestFromObjC:(MCLevelControlClusterMoveToClosestFrequencyParams *)objcRequest
@@ -843,7 +858,8 @@
         request, context, [mcCommand, completion](void * context, NSError * err, id response) {
             completion(context, err, response);
             delete mcCommand;
-        }, timedInvokeTimeoutMs);
+        },
+        timedInvokeTimeoutMs);
 }
 
 - (std::any)getCppRequestFromObjC:(MCTargetNavigatorClusterNavigateTargetParams *)objcRequest
@@ -897,7 +913,8 @@
         request, context, [mcCommand, completion](void * context, NSError * err, id response) {
             completion(context, err, response);
             delete mcCommand;
-        }, timedInvokeTimeoutMs);
+        },
+        timedInvokeTimeoutMs);
 }
 
 - (std::any)getCppRequestFromObjC:(MCMediaPlaybackClusterPlayParams *)objcRequest
@@ -949,7 +966,8 @@
         request, context, [mcCommand, completion](void * context, NSError * err, id response) {
             completion(context, err, response);
             delete mcCommand;
-        }, timedInvokeTimeoutMs);
+        },
+        timedInvokeTimeoutMs);
 }
 
 - (std::any)getCppRequestFromObjC:(MCMediaPlaybackClusterPauseParams *)objcRequest
@@ -1001,7 +1019,8 @@
         request, context, [mcCommand, completion](void * context, NSError * err, id response) {
             completion(context, err, response);
             delete mcCommand;
-        }, timedInvokeTimeoutMs);
+        },
+        timedInvokeTimeoutMs);
 }
 
 - (std::any)getCppRequestFromObjC:(MCMediaPlaybackClusterStopParams *)objcRequest
@@ -1053,7 +1072,8 @@
         request, context, [mcCommand, completion](void * context, NSError * err, id response) {
             completion(context, err, response);
             delete mcCommand;
-        }, timedInvokeTimeoutMs);
+        },
+        timedInvokeTimeoutMs);
 }
 
 - (std::any)getCppRequestFromObjC:(MCMediaPlaybackClusterStartOverParams *)objcRequest
@@ -1105,7 +1125,8 @@
         request, context, [mcCommand, completion](void * context, NSError * err, id response) {
             completion(context, err, response);
             delete mcCommand;
-        }, timedInvokeTimeoutMs);
+        },
+        timedInvokeTimeoutMs);
 }
 
 - (std::any)getCppRequestFromObjC:(MCMediaPlaybackClusterPreviousParams *)objcRequest
@@ -1157,7 +1178,8 @@
         request, context, [mcCommand, completion](void * context, NSError * err, id response) {
             completion(context, err, response);
             delete mcCommand;
-        }, timedInvokeTimeoutMs);
+        },
+        timedInvokeTimeoutMs);
 }
 
 - (std::any)getCppRequestFromObjC:(MCMediaPlaybackClusterNextParams *)objcRequest
@@ -1209,7 +1231,8 @@
         request, context, [mcCommand, completion](void * context, NSError * err, id response) {
             completion(context, err, response);
             delete mcCommand;
-        }, timedInvokeTimeoutMs);
+        },
+        timedInvokeTimeoutMs);
 }
 
 - (std::any)getCppRequestFromObjC:(MCMediaPlaybackClusterRewindParams *)objcRequest
@@ -1261,7 +1284,8 @@
         request, context, [mcCommand, completion](void * context, NSError * err, id response) {
             completion(context, err, response);
             delete mcCommand;
-        }, timedInvokeTimeoutMs);
+        },
+        timedInvokeTimeoutMs);
 }
 
 - (std::any)getCppRequestFromObjC:(MCMediaPlaybackClusterFastForwardParams *)objcRequest
@@ -1313,7 +1337,8 @@
         request, context, [mcCommand, completion](void * context, NSError * err, id response) {
             completion(context, err, response);
             delete mcCommand;
-        }, timedInvokeTimeoutMs);
+        },
+        timedInvokeTimeoutMs);
 }
 
 - (std::any)getCppRequestFromObjC:(MCMediaPlaybackClusterSkipForwardParams *)objcRequest
@@ -1365,7 +1390,8 @@
         request, context, [mcCommand, completion](void * context, NSError * err, id response) {
             completion(context, err, response);
             delete mcCommand;
-        }, timedInvokeTimeoutMs);
+        },
+        timedInvokeTimeoutMs);
 }
 
 - (std::any)getCppRequestFromObjC:(MCMediaPlaybackClusterSkipBackwardParams *)objcRequest
@@ -1417,7 +1443,8 @@
         request, context, [mcCommand, completion](void * context, NSError * err, id response) {
             completion(context, err, response);
             delete mcCommand;
-        }, timedInvokeTimeoutMs);
+        },
+        timedInvokeTimeoutMs);
 }
 
 - (std::any)getCppRequestFromObjC:(MCMediaPlaybackClusterSeekParams *)objcRequest
@@ -1469,7 +1496,8 @@
         request, context, [mcCommand, completion](void * context, NSError * err, id response) {
             completion(context, err, response);
             delete mcCommand;
-        }, timedInvokeTimeoutMs);
+        },
+        timedInvokeTimeoutMs);
 }
 
 - (std::any)getCppRequestFromObjC:(MCMediaPlaybackClusterActivateAudioTrackParams *)objcRequest
@@ -1521,7 +1549,8 @@
         request, context, [mcCommand, completion](void * context, NSError * err, id response) {
             completion(context, err, response);
             delete mcCommand;
-        }, timedInvokeTimeoutMs);
+        },
+        timedInvokeTimeoutMs);
 }
 
 - (std::any)getCppRequestFromObjC:(MCMediaPlaybackClusterActivateTextTrackParams *)objcRequest
@@ -1573,7 +1602,8 @@
         request, context, [mcCommand, completion](void * context, NSError * err, id response) {
             completion(context, err, response);
             delete mcCommand;
-        }, timedInvokeTimeoutMs);
+        },
+        timedInvokeTimeoutMs);
 }
 
 - (std::any)getCppRequestFromObjC:(MCMediaPlaybackClusterDeactivateTextTrackParams *)objcRequest
@@ -1627,7 +1657,8 @@
         request, context, [mcCommand, completion](void * context, NSError * err, id response) {
             completion(context, err, response);
             delete mcCommand;
-        }, timedInvokeTimeoutMs);
+        },
+        timedInvokeTimeoutMs);
 }
 
 - (std::any)getCppRequestFromObjC:(MCKeypadInputClusterSendKeyParams *)objcRequest
@@ -1681,7 +1712,8 @@
         request, context, [mcCommand, completion](void * context, NSError * err, id response) {
             completion(context, err, response);
             delete mcCommand;
-        }, timedInvokeTimeoutMs);
+        },
+        timedInvokeTimeoutMs);
 }
 
 - (std::any)getCppRequestFromObjC:(MCContentLauncherClusterLaunchContentParams *)objcRequest
@@ -1733,7 +1765,8 @@
         request, context, [mcCommand, completion](void * context, NSError * err, id response) {
             completion(context, err, response);
             delete mcCommand;
-        }, timedInvokeTimeoutMs);
+        },
+        timedInvokeTimeoutMs);
 }
 
 - (std::any)getCppRequestFromObjC:(MCContentLauncherClusterLaunchURLParams *)objcRequest
@@ -1787,7 +1820,8 @@
         request, context, [mcCommand, completion](void * context, NSError * err, id response) {
             completion(context, err, response);
             delete mcCommand;
-        }, timedInvokeTimeoutMs);
+        },
+        timedInvokeTimeoutMs);
 }
 
 - (std::any)getCppRequestFromObjC:(MCApplicationLauncherClusterLaunchAppParams *)objcRequest
@@ -1839,7 +1873,8 @@
         request, context, [mcCommand, completion](void * context, NSError * err, id response) {
             completion(context, err, response);
             delete mcCommand;
-        }, timedInvokeTimeoutMs);
+        },
+        timedInvokeTimeoutMs);
 }
 
 - (std::any)getCppRequestFromObjC:(MCApplicationLauncherClusterStopAppParams *)objcRequest
@@ -1891,7 +1926,8 @@
         request, context, [mcCommand, completion](void * context, NSError * err, id response) {
             completion(context, err, response);
             delete mcCommand;
-        }, timedInvokeTimeoutMs);
+        },
+        timedInvokeTimeoutMs);
 }
 
 - (std::any)getCppRequestFromObjC:(MCApplicationLauncherClusterHideAppParams *)objcRequest

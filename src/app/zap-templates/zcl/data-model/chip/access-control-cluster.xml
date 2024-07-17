@@ -68,17 +68,24 @@ limitations under the License.
     <item fieldId="1" name="Data" type="octet_string" length="128" isFabricSensitive="true"/>
   </struct>
 
-  <struct name="AccessRestrictionEntryStruct" apiMaturity="provisional">
+  <struct name="AccessRestrictionStruct">
+    <cluster code="0x001F"/>
+    <item fieldId="0" name="Type" type="AccessRestrictionTypeEnum" min="0x00" max="0x03"/>
+    <item fieldId="1" name="Id" type="int32u" isNullable="true"/>
+  </struct>
+
+  <struct name="CommissioningAccessRestrictionEntryStruct">
     <cluster code="0x001F"/>
     <item fieldId="0" name="Endpoint" type="endpoint_no"/>
     <item fieldId="1" name="Cluster" type="cluster_id"/>
     <item fieldId="2" name="Restrictions" array="true" type="AccessRestrictionStruct" minLength="1"/>
   </struct>
 
-  <struct name="AccessRestrictionStruct" apiMaturity="provisional">
+  <struct name="AccessRestrictionEntryStruct" isFabricScoped="true">
     <cluster code="0x001F"/>
-    <item fieldId="0" name="Type" type="AccessRestrictionTypeEnum" min="0x00" max="0x03"/>
-    <item fieldId="1" name="Id" type="int32u" isNullable="true"/>
+    <item fieldId="0" name="Endpoint" type="endpoint_no" isFabricSensitive="true"/>
+    <item fieldId="1" name="Cluster" type="cluster_id" isFabricSensitive="true"/>
+    <item fieldId="2" name="Restrictions" array="true" type="AccessRestrictionStruct" minLength="1" isFabricSensitive="true"/>
   </struct>
 
   <cluster>
@@ -126,12 +133,20 @@ limitations under the License.
       <access op="read" privilege="view"/>
     </attribute>
 
-    <attribute code="0x0005" side="server" define="ARL" type="array" entryType="AccessRestrictionStruct" optional="true">ARL</attribute>
+    <attribute side="server" code="0x0005" define="COMMISSIONING_ARL" type="array" entryType="CommissioningAccessRestrictionEntryStruct" writable="false" optional="true">
+      <description>CommissioningARL</description>
+      <access op="read" privilege="view"/>
+    </attribute>
+    
+    <attribute side="server" code="0x0006" define="ARL" type="array" entryType="AccessRestrictionEntryStruct" writable="false" optional="true">
+      <description>ARL</description>
+      <access op="read" privilege="view"/>
+    </attribute>
     
     <command code="0x00" source="client" name="ReviewFabricRestrictions" optional="true">
       <description>This command signals to the service associated with the device maker that the fabric administrator would like a review of the current fabric restrictions.</description>
       <access op="invoke" privilege="administer"/>
-      <arg id="0" name="ARL" array="true" type="AccessRestrictionStruct" optional="true"/>
+      <!--arg id="0" name="ARL" array="true" type="AccessRestrictionEntryStruct" optional="true"/-->
     </command>
 
     <command code="0x01" source="server" name="ReviewFabricRestrictionsResponse" optional="true" disableDefaultResponse="true">
@@ -157,15 +172,13 @@ limitations under the License.
     </event>
     <event side="server" code="0x0002" name="AccessRestrictionEntryChanged" priority="info" isFabricSensitive="true" optional="true">
       <description>The cluster SHALL send AccessRestrictionEntryChanged events whenever its ARL attribute data is changed by the device maker.</description>
-      <field id="1" name="ChangeType" type="ChangeTypeEnum" min="0x00" max="0x02"/>
-      <field id="2" name="LatestValue" type="AccessRestrictionStruct" isNullable="true"/>
       <access op="read" privilege="administer"/>
     </event>
-    <event code="0x0003" name="FabricRestrictionReviewUpdate" priority="info" side="server" isFabricSensitive="true" optional="true">
+    <event side="server" code="0x0003" name="FabricRestrictionReviewUpdate" priority="info" isFabricSensitive="true" optional="true">
       <description>The cluster SHALL send FabricRestrictionReviewUpdate events to indicate completion of a fabric restriction review.</description>
       <field id="0" name="Token" type="int64u"/>
       <field id="1" name="Instruction" type="char_string" isNullable="true"/>
-      <field id="2" name="RedirectURL" type="char_string" optional="true" isNullable="true"/>
+      <field id="2" name="RedirectURL" type="char_string" isNullable="true"/>
       <access op="read" privilege="administer"/>
     </event>
   </cluster>

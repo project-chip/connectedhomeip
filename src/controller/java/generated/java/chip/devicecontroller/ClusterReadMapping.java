@@ -1140,6 +1140,28 @@ public class ClusterReadMapping {
           readAccessControlAccessControlEntriesPerFabricCommandParams
         );
         result.put("readAccessControlEntriesPerFabricAttribute", readAccessControlAccessControlEntriesPerFabricAttributeInteractionInfo);
+     Map<String, CommandParameterInfo> readAccessControlCommissioningARLCommandParams = new LinkedHashMap<String, CommandParameterInfo>();
+        InteractionInfo readAccessControlCommissioningARLAttributeInteractionInfo = new InteractionInfo(
+          (cluster, callback, commandArguments) -> {
+            ((ChipClusters.AccessControlCluster) cluster).readCommissioningARLAttribute(
+              (ChipClusters.AccessControlCluster.CommissioningARLAttributeCallback) callback
+            );
+          },
+          () -> new ClusterInfoMapping.DelegatedAccessControlClusterCommissioningARLAttributeCallback(),
+          readAccessControlCommissioningARLCommandParams
+        );
+        result.put("readCommissioningARLAttribute", readAccessControlCommissioningARLAttributeInteractionInfo);
+     Map<String, CommandParameterInfo> readAccessControlArlCommandParams = new LinkedHashMap<String, CommandParameterInfo>();
+        InteractionInfo readAccessControlArlAttributeInteractionInfo = new InteractionInfo(
+          (cluster, callback, commandArguments) -> {
+            ((ChipClusters.AccessControlCluster) cluster).readArlAttribute(
+              (ChipClusters.AccessControlCluster.ArlAttributeCallback) callback
+            );
+          },
+          () -> new ClusterInfoMapping.DelegatedAccessControlClusterArlAttributeCallback(),
+          readAccessControlArlCommandParams
+        );
+        result.put("readArlAttribute", readAccessControlArlAttributeInteractionInfo);
      Map<String, CommandParameterInfo> readAccessControlGeneratedCommandListCommandParams = new LinkedHashMap<String, CommandParameterInfo>();
         InteractionInfo readAccessControlGeneratedCommandListAttributeInteractionInfo = new InteractionInfo(
           (cluster, callback, commandArguments) -> {

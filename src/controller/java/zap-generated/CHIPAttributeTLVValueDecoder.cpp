@@ -2496,6 +2496,242 @@ jobject DecodeAttributeValue(const app::ConcreteAttributePath & aPath, TLV::TLVR
                                                                        value);
             return value;
         }
+        case Attributes::CommissioningARL::Id: {
+            using TypeInfo = Attributes::CommissioningARL::TypeInfo;
+            TypeInfo::DecodableType cppValue;
+            *aError = app::DataModel::Decode(aReader, cppValue);
+            if (*aError != CHIP_NO_ERROR)
+            {
+                return nullptr;
+            }
+            jobject value;
+            chip::JniReferences::GetInstance().CreateArrayList(value);
+
+            auto iter_value_0 = cppValue.begin();
+            while (iter_value_0.Next())
+            {
+                auto & entry_0 = iter_value_0.GetValue();
+                jobject newElement_0;
+                jobject newElement_0_endpoint;
+                std::string newElement_0_endpointClassName     = "java/lang/Integer";
+                std::string newElement_0_endpointCtorSignature = "(I)V";
+                jint jninewElement_0_endpoint                  = static_cast<jint>(entry_0.endpoint);
+                chip::JniReferences::GetInstance().CreateBoxedObject<jint>(newElement_0_endpointClassName.c_str(),
+                                                                           newElement_0_endpointCtorSignature.c_str(),
+                                                                           jninewElement_0_endpoint, newElement_0_endpoint);
+                jobject newElement_0_cluster;
+                std::string newElement_0_clusterClassName     = "java/lang/Long";
+                std::string newElement_0_clusterCtorSignature = "(J)V";
+                jlong jninewElement_0_cluster                 = static_cast<jlong>(entry_0.cluster);
+                chip::JniReferences::GetInstance().CreateBoxedObject<jlong>(newElement_0_clusterClassName.c_str(),
+                                                                            newElement_0_clusterCtorSignature.c_str(),
+                                                                            jninewElement_0_cluster, newElement_0_cluster);
+                jobject newElement_0_restrictions;
+                chip::JniReferences::GetInstance().CreateArrayList(newElement_0_restrictions);
+
+                auto iter_newElement_0_restrictions_2 = entry_0.restrictions.begin();
+                while (iter_newElement_0_restrictions_2.Next())
+                {
+                    auto & entry_2 = iter_newElement_0_restrictions_2.GetValue();
+                    jobject newElement_2;
+                    jobject newElement_2_type;
+                    std::string newElement_2_typeClassName     = "java/lang/Integer";
+                    std::string newElement_2_typeCtorSignature = "(I)V";
+                    jint jninewElement_2_type                  = static_cast<jint>(entry_2.type);
+                    chip::JniReferences::GetInstance().CreateBoxedObject<jint>(newElement_2_typeClassName.c_str(),
+                                                                               newElement_2_typeCtorSignature.c_str(),
+                                                                               jninewElement_2_type, newElement_2_type);
+                    jobject newElement_2_id;
+                    if (entry_2.id.IsNull())
+                    {
+                        newElement_2_id = nullptr;
+                    }
+                    else
+                    {
+                        std::string newElement_2_idClassName     = "java/lang/Long";
+                        std::string newElement_2_idCtorSignature = "(J)V";
+                        jlong jninewElement_2_id                 = static_cast<jlong>(entry_2.id.Value());
+                        chip::JniReferences::GetInstance().CreateBoxedObject<jlong>(newElement_2_idClassName.c_str(),
+                                                                                    newElement_2_idCtorSignature.c_str(),
+                                                                                    jninewElement_2_id, newElement_2_id);
+                    }
+
+                    jclass accessRestrictionStructStructClass_3;
+                    err = chip::JniReferences::GetInstance().GetLocalClassRef(
+                        env, "chip/devicecontroller/ChipStructs$AccessControlClusterAccessRestrictionStruct",
+                        accessRestrictionStructStructClass_3);
+                    if (err != CHIP_NO_ERROR)
+                    {
+                        ChipLogError(Zcl, "Could not find class ChipStructs$AccessControlClusterAccessRestrictionStruct");
+                        return nullptr;
+                    }
+
+                    jmethodID accessRestrictionStructStructCtor_3;
+                    err = chip::JniReferences::GetInstance().FindMethod(env, accessRestrictionStructStructClass_3, "<init>",
+                                                                        "(Ljava/lang/Integer;Ljava/lang/Long;)V",
+                                                                        &accessRestrictionStructStructCtor_3);
+                    if (err != CHIP_NO_ERROR || accessRestrictionStructStructCtor_3 == nullptr)
+                    {
+                        ChipLogError(Zcl, "Could not find ChipStructs$AccessControlClusterAccessRestrictionStruct constructor");
+                        return nullptr;
+                    }
+
+                    newElement_2 = env->NewObject(accessRestrictionStructStructClass_3, accessRestrictionStructStructCtor_3,
+                                                  newElement_2_type, newElement_2_id);
+                    chip::JniReferences::GetInstance().AddToList(newElement_0_restrictions, newElement_2);
+                }
+
+                jclass commissioningAccessRestrictionEntryStructStructClass_1;
+                err = chip::JniReferences::GetInstance().GetLocalClassRef(
+                    env, "chip/devicecontroller/ChipStructs$AccessControlClusterCommissioningAccessRestrictionEntryStruct",
+                    commissioningAccessRestrictionEntryStructStructClass_1);
+                if (err != CHIP_NO_ERROR)
+                {
+                    ChipLogError(Zcl,
+                                 "Could not find class ChipStructs$AccessControlClusterCommissioningAccessRestrictionEntryStruct");
+                    return nullptr;
+                }
+
+                jmethodID commissioningAccessRestrictionEntryStructStructCtor_1;
+                err = chip::JniReferences::GetInstance().FindMethod(env, commissioningAccessRestrictionEntryStructStructClass_1,
+                                                                    "<init>",
+                                                                    "(Ljava/lang/Integer;Ljava/lang/Long;Ljava/util/ArrayList;)V",
+                                                                    &commissioningAccessRestrictionEntryStructStructCtor_1);
+                if (err != CHIP_NO_ERROR || commissioningAccessRestrictionEntryStructStructCtor_1 == nullptr)
+                {
+                    ChipLogError(
+                        Zcl,
+                        "Could not find ChipStructs$AccessControlClusterCommissioningAccessRestrictionEntryStruct constructor");
+                    return nullptr;
+                }
+
+                newElement_0 = env->NewObject(commissioningAccessRestrictionEntryStructStructClass_1,
+                                              commissioningAccessRestrictionEntryStructStructCtor_1, newElement_0_endpoint,
+                                              newElement_0_cluster, newElement_0_restrictions);
+                chip::JniReferences::GetInstance().AddToList(value, newElement_0);
+            }
+            return value;
+        }
+        case Attributes::Arl::Id: {
+            using TypeInfo = Attributes::Arl::TypeInfo;
+            TypeInfo::DecodableType cppValue;
+            *aError = app::DataModel::Decode(aReader, cppValue);
+            if (*aError != CHIP_NO_ERROR)
+            {
+                return nullptr;
+            }
+            jobject value;
+            chip::JniReferences::GetInstance().CreateArrayList(value);
+
+            auto iter_value_0 = cppValue.begin();
+            while (iter_value_0.Next())
+            {
+                auto & entry_0 = iter_value_0.GetValue();
+                jobject newElement_0;
+                jobject newElement_0_endpoint;
+                std::string newElement_0_endpointClassName     = "java/lang/Integer";
+                std::string newElement_0_endpointCtorSignature = "(I)V";
+                jint jninewElement_0_endpoint                  = static_cast<jint>(entry_0.endpoint);
+                chip::JniReferences::GetInstance().CreateBoxedObject<jint>(newElement_0_endpointClassName.c_str(),
+                                                                           newElement_0_endpointCtorSignature.c_str(),
+                                                                           jninewElement_0_endpoint, newElement_0_endpoint);
+                jobject newElement_0_cluster;
+                std::string newElement_0_clusterClassName     = "java/lang/Long";
+                std::string newElement_0_clusterCtorSignature = "(J)V";
+                jlong jninewElement_0_cluster                 = static_cast<jlong>(entry_0.cluster);
+                chip::JniReferences::GetInstance().CreateBoxedObject<jlong>(newElement_0_clusterClassName.c_str(),
+                                                                            newElement_0_clusterCtorSignature.c_str(),
+                                                                            jninewElement_0_cluster, newElement_0_cluster);
+                jobject newElement_0_restrictions;
+                chip::JniReferences::GetInstance().CreateArrayList(newElement_0_restrictions);
+
+                auto iter_newElement_0_restrictions_2 = entry_0.restrictions.begin();
+                while (iter_newElement_0_restrictions_2.Next())
+                {
+                    auto & entry_2 = iter_newElement_0_restrictions_2.GetValue();
+                    jobject newElement_2;
+                    jobject newElement_2_type;
+                    std::string newElement_2_typeClassName     = "java/lang/Integer";
+                    std::string newElement_2_typeCtorSignature = "(I)V";
+                    jint jninewElement_2_type                  = static_cast<jint>(entry_2.type);
+                    chip::JniReferences::GetInstance().CreateBoxedObject<jint>(newElement_2_typeClassName.c_str(),
+                                                                               newElement_2_typeCtorSignature.c_str(),
+                                                                               jninewElement_2_type, newElement_2_type);
+                    jobject newElement_2_id;
+                    if (entry_2.id.IsNull())
+                    {
+                        newElement_2_id = nullptr;
+                    }
+                    else
+                    {
+                        std::string newElement_2_idClassName     = "java/lang/Long";
+                        std::string newElement_2_idCtorSignature = "(J)V";
+                        jlong jninewElement_2_id                 = static_cast<jlong>(entry_2.id.Value());
+                        chip::JniReferences::GetInstance().CreateBoxedObject<jlong>(newElement_2_idClassName.c_str(),
+                                                                                    newElement_2_idCtorSignature.c_str(),
+                                                                                    jninewElement_2_id, newElement_2_id);
+                    }
+
+                    jclass accessRestrictionStructStructClass_3;
+                    err = chip::JniReferences::GetInstance().GetLocalClassRef(
+                        env, "chip/devicecontroller/ChipStructs$AccessControlClusterAccessRestrictionStruct",
+                        accessRestrictionStructStructClass_3);
+                    if (err != CHIP_NO_ERROR)
+                    {
+                        ChipLogError(Zcl, "Could not find class ChipStructs$AccessControlClusterAccessRestrictionStruct");
+                        return nullptr;
+                    }
+
+                    jmethodID accessRestrictionStructStructCtor_3;
+                    err = chip::JniReferences::GetInstance().FindMethod(env, accessRestrictionStructStructClass_3, "<init>",
+                                                                        "(Ljava/lang/Integer;Ljava/lang/Long;)V",
+                                                                        &accessRestrictionStructStructCtor_3);
+                    if (err != CHIP_NO_ERROR || accessRestrictionStructStructCtor_3 == nullptr)
+                    {
+                        ChipLogError(Zcl, "Could not find ChipStructs$AccessControlClusterAccessRestrictionStruct constructor");
+                        return nullptr;
+                    }
+
+                    newElement_2 = env->NewObject(accessRestrictionStructStructClass_3, accessRestrictionStructStructCtor_3,
+                                                  newElement_2_type, newElement_2_id);
+                    chip::JniReferences::GetInstance().AddToList(newElement_0_restrictions, newElement_2);
+                }
+                jobject newElement_0_fabricIndex;
+                std::string newElement_0_fabricIndexClassName     = "java/lang/Integer";
+                std::string newElement_0_fabricIndexCtorSignature = "(I)V";
+                jint jninewElement_0_fabricIndex                  = static_cast<jint>(entry_0.fabricIndex);
+                chip::JniReferences::GetInstance().CreateBoxedObject<jint>(newElement_0_fabricIndexClassName.c_str(),
+                                                                           newElement_0_fabricIndexCtorSignature.c_str(),
+                                                                           jninewElement_0_fabricIndex, newElement_0_fabricIndex);
+
+                jclass accessRestrictionEntryStructStructClass_1;
+                err = chip::JniReferences::GetInstance().GetLocalClassRef(
+                    env, "chip/devicecontroller/ChipStructs$AccessControlClusterAccessRestrictionEntryStruct",
+                    accessRestrictionEntryStructStructClass_1);
+                if (err != CHIP_NO_ERROR)
+                {
+                    ChipLogError(Zcl, "Could not find class ChipStructs$AccessControlClusterAccessRestrictionEntryStruct");
+                    return nullptr;
+                }
+
+                jmethodID accessRestrictionEntryStructStructCtor_1;
+                err = chip::JniReferences::GetInstance().FindMethod(
+                    env, accessRestrictionEntryStructStructClass_1, "<init>",
+                    "(Ljava/lang/Integer;Ljava/lang/Long;Ljava/util/ArrayList;Ljava/lang/Integer;)V",
+                    &accessRestrictionEntryStructStructCtor_1);
+                if (err != CHIP_NO_ERROR || accessRestrictionEntryStructStructCtor_1 == nullptr)
+                {
+                    ChipLogError(Zcl, "Could not find ChipStructs$AccessControlClusterAccessRestrictionEntryStruct constructor");
+                    return nullptr;
+                }
+
+                newElement_0 = env->NewObject(accessRestrictionEntryStructStructClass_1, accessRestrictionEntryStructStructCtor_1,
+                                              newElement_0_endpoint, newElement_0_cluster, newElement_0_restrictions,
+                                              newElement_0_fabricIndex);
+                chip::JniReferences::GetInstance().AddToList(value, newElement_0);
+            }
+            return value;
+        }
         case Attributes::GeneratedCommandList::Id: {
             using TypeInfo = Attributes::GeneratedCommandList::TypeInfo;
             TypeInfo::DecodableType cppValue;

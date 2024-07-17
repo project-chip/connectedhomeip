@@ -79,6 +79,7 @@ function(chip_configure_data_model APP_TARGET)
     if(ARG_INCLUDE_SERVER)
         target_sources(${APP_TARGET} ${SCOPE}
             ${CHIP_APP_BASE_DIR}/server/AclStorage.cpp
+            ${CHIP_APP_BASE_DIR}/server/ArlStorage.cpp
             ${CHIP_APP_BASE_DIR}/server/DefaultAclStorage.cpp
             ${CHIP_APP_BASE_DIR}/server/CommissioningWindowManager.cpp
             ${CHIP_APP_BASE_DIR}/server/Dnssd.cpp

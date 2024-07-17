@@ -17,13 +17,18 @@
 package chip.devicecontroller.cluster.eventstructs
 
 import chip.devicecontroller.cluster.*
+import matter.tlv.AnonymousTag
 import matter.tlv.ContextSpecificTag
 import matter.tlv.Tag
+import matter.tlv.TlvParsingException
 import matter.tlv.TlvReader
 import matter.tlv.TlvWriter
 
-class DoorLockClusterDoorStateChangeEvent(val doorState: UInt) {
-  override fun toString(): String = buildString {
+import java.util.Optional
+
+class DoorLockClusterDoorStateChangeEvent (
+    val doorState: UInt) {
+  override fun toString(): String  = buildString {
     append("DoorLockClusterDoorStateChangeEvent {\n")
     append("\tdoorState : $doorState\n")
     append("}\n")
@@ -40,10 +45,10 @@ class DoorLockClusterDoorStateChangeEvent(val doorState: UInt) {
   companion object {
     private const val TAG_DOOR_STATE = 0
 
-    fun fromTlv(tlvTag: Tag, tlvReader: TlvReader): DoorLockClusterDoorStateChangeEvent {
+    fun fromTlv(tlvTag: Tag, tlvReader: TlvReader) : DoorLockClusterDoorStateChangeEvent {
       tlvReader.enterStructure(tlvTag)
       val doorState = tlvReader.getUInt(ContextSpecificTag(TAG_DOOR_STATE))
-
+      
       tlvReader.exitContainer()
 
       return DoorLockClusterDoorStateChangeEvent(doorState)

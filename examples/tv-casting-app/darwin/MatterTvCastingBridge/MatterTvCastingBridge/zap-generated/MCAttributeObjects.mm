@@ -59,7 +59,8 @@
         context, [mcAttribute, completion](void * context, id before, id after, NSError * err) {
             completion(context, before, after, err);
             delete mcAttribute;
-        }, minInterval, maxInterval);
+        },
+        minInterval, maxInterval);
 }
 
 - (id _Nullable)getObjCTypeFromCpp:(std::any)cppValue errorCode:(CHIP_ERROR *)aError
@@ -105,7 +106,8 @@
         context, [mcAttribute, completion](void * context, id before, id after, NSError * err) {
             completion(context, before, after, err);
             delete mcAttribute;
-        }, minInterval, maxInterval);
+        },
+        minInterval, maxInterval);
 }
 
 - (id _Nullable)getObjCTypeFromCpp:(std::any)cppValue errorCode:(CHIP_ERROR *)aError
@@ -151,7 +153,8 @@
         context, [mcAttribute, completion](void * context, id before, id after, NSError * err) {
             completion(context, before, after, err);
             delete mcAttribute;
-        }, minInterval, maxInterval);
+        },
+        minInterval, maxInterval);
 }
 
 - (id _Nullable)getObjCTypeFromCpp:(std::any)cppValue errorCode:(CHIP_ERROR *)aError
@@ -197,7 +200,8 @@
         context, [mcAttribute, completion](void * context, id before, id after, NSError * err) {
             completion(context, before, after, err);
             delete mcAttribute;
-        }, minInterval, maxInterval);
+        },
+        minInterval, maxInterval);
 }
 
 - (id _Nullable)getObjCTypeFromCpp:(std::any)cppValue errorCode:(CHIP_ERROR *)aError
@@ -243,7 +247,8 @@
         context, [mcAttribute, completion](void * context, id before, id after, NSError * err) {
             completion(context, before, after, err);
             delete mcAttribute;
-        }, minInterval, maxInterval);
+        },
+        minInterval, maxInterval);
 }
 
 - (id _Nullable)getObjCTypeFromCpp:(std::any)cppValue errorCode:(CHIP_ERROR *)aError
@@ -293,7 +298,8 @@
         context, [mcAttribute, completion](void * context, id before, id after, NSError * err) {
             completion(context, before, after, err);
             delete mcAttribute;
-        }, minInterval, maxInterval);
+        },
+        minInterval, maxInterval);
 }
 
 - (id _Nullable)getObjCTypeFromCpp:(std::any)cppValue errorCode:(CHIP_ERROR *)aError
@@ -354,7 +360,8 @@
         context, [mcAttribute, completion](void * context, id before, id after, NSError * err) {
             completion(context, before, after, err);
             delete mcAttribute;
-        }, minInterval, maxInterval);
+        },
+        minInterval, maxInterval);
 }
 
 - (id _Nullable)getObjCTypeFromCpp:(std::any)cppValue errorCode:(CHIP_ERROR *)aError
@@ -415,7 +422,8 @@
         context, [mcAttribute, completion](void * context, id before, id after, NSError * err) {
             completion(context, before, after, err);
             delete mcAttribute;
-        }, minInterval, maxInterval);
+        },
+        minInterval, maxInterval);
 }
 
 - (id _Nullable)getObjCTypeFromCpp:(std::any)cppValue errorCode:(CHIP_ERROR *)aError
@@ -476,7 +484,8 @@
         context, [mcAttribute, completion](void * context, id before, id after, NSError * err) {
             completion(context, before, after, err);
             delete mcAttribute;
-        }, minInterval, maxInterval);
+        },
+        minInterval, maxInterval);
 }
 
 - (id _Nullable)getObjCTypeFromCpp:(std::any)cppValue errorCode:(CHIP_ERROR *)aError
@@ -537,7 +546,8 @@
         context, [mcAttribute, completion](void * context, id before, id after, NSError * err) {
             completion(context, before, after, err);
             delete mcAttribute;
-        }, minInterval, maxInterval);
+        },
+        minInterval, maxInterval);
 }
 
 - (id _Nullable)getObjCTypeFromCpp:(std::any)cppValue errorCode:(CHIP_ERROR *)aError
@@ -583,7 +593,8 @@
         context, [mcAttribute, completion](void * context, id before, id after, NSError * err) {
             completion(context, before, after, err);
             delete mcAttribute;
-        }, minInterval, maxInterval);
+        },
+        minInterval, maxInterval);
 }
 
 - (id _Nullable)getObjCTypeFromCpp:(std::any)cppValue errorCode:(CHIP_ERROR *)aError
@@ -631,7 +642,8 @@
         context, [mcAttribute, completion](void * context, id before, id after, NSError * err) {
             completion(context, before, after, err);
             delete mcAttribute;
-        }, minInterval, maxInterval);
+        },
+        minInterval, maxInterval);
 }
 
 - (id _Nullable)getObjCTypeFromCpp:(std::any)cppValue errorCode:(CHIP_ERROR *)aError
@@ -681,7 +693,8 @@
         context, [mcAttribute, completion](void * context, id before, id after, NSError * err) {
             completion(context, before, after, err);
             delete mcAttribute;
-        }, minInterval, maxInterval);
+        },
+        minInterval, maxInterval);
 }
 
 - (id _Nullable)getObjCTypeFromCpp:(std::any)cppValue errorCode:(CHIP_ERROR *)aError
@@ -727,7 +740,8 @@
         context, [mcAttribute, completion](void * context, id before, id after, NSError * err) {
             completion(context, before, after, err);
             delete mcAttribute;
-        }, minInterval, maxInterval);
+        },
+        minInterval, maxInterval);
 }
 
 - (id _Nullable)getObjCTypeFromCpp:(std::any)cppValue errorCode:(CHIP_ERROR *)aError
@@ -773,7 +787,8 @@
         context, [mcAttribute, completion](void * context, id before, id after, NSError * err) {
             completion(context, before, after, err);
             delete mcAttribute;
-        }, minInterval, maxInterval);
+        },
+        minInterval, maxInterval);
 }
 
 - (id _Nullable)getObjCTypeFromCpp:(std::any)cppValue errorCode:(CHIP_ERROR *)aError
@@ -819,7 +834,8 @@
         context, [mcAttribute, completion](void * context, id before, id after, NSError * err) {
             completion(context, before, after, err);
             delete mcAttribute;
-        }, minInterval, maxInterval);
+        },
+        minInterval, maxInterval);
 }
 
 - (id _Nullable)getObjCTypeFromCpp:(std::any)cppValue errorCode:(CHIP_ERROR *)aError
@@ -865,7 +881,8 @@
         context, [mcAttribute, completion](void * context, id before, id after, NSError * err) {
             completion(context, before, after, err);
             delete mcAttribute;
-        }, minInterval, maxInterval);
+        },
+        minInterval, maxInterval);
 }
 
 - (id _Nullable)getObjCTypeFromCpp:(std::any)cppValue errorCode:(CHIP_ERROR *)aError
@@ -911,7 +928,8 @@
         context, [mcAttribute, completion](void * context, id before, id after, NSError * err) {
             completion(context, before, after, err);
             delete mcAttribute;
-        }, minInterval, maxInterval);
+        },
+        minInterval, maxInterval);
 }
 
 - (id _Nullable)getObjCTypeFromCpp:(std::any)cppValue errorCode:(CHIP_ERROR *)aError
@@ -957,7 +975,8 @@
         context, [mcAttribute, completion](void * context, id before, id after, NSError * err) {
             completion(context, before, after, err);
             delete mcAttribute;
-        }, minInterval, maxInterval);
+        },
+        minInterval, maxInterval);
 }
 
 - (id _Nullable)getObjCTypeFromCpp:(std::any)cppValue errorCode:(CHIP_ERROR *)aError
@@ -1003,7 +1022,8 @@
         context, [mcAttribute, completion](void * context, id before, id after, NSError * err) {
             completion(context, before, after, err);
             delete mcAttribute;
-        }, minInterval, maxInterval);
+        },
+        minInterval, maxInterval);
 }
 
 - (id _Nullable)getObjCTypeFromCpp:(std::any)cppValue errorCode:(CHIP_ERROR *)aError
@@ -1049,7 +1069,8 @@
         context, [mcAttribute, completion](void * context, id before, id after, NSError * err) {
             completion(context, before, after, err);
             delete mcAttribute;
-        }, minInterval, maxInterval);
+        },
+        minInterval, maxInterval);
 }
 
 - (id _Nullable)getObjCTypeFromCpp:(std::any)cppValue errorCode:(CHIP_ERROR *)aError
@@ -1099,7 +1120,8 @@
         context, [mcAttribute, completion](void * context, id before, id after, NSError * err) {
             completion(context, before, after, err);
             delete mcAttribute;
-        }, minInterval, maxInterval);
+        },
+        minInterval, maxInterval);
 }
 
 - (id _Nullable)getObjCTypeFromCpp:(std::any)cppValue errorCode:(CHIP_ERROR *)aError
@@ -1149,7 +1171,8 @@
         context, [mcAttribute, completion](void * context, id before, id after, NSError * err) {
             completion(context, before, after, err);
             delete mcAttribute;
-        }, minInterval, maxInterval);
+        },
+        minInterval, maxInterval);
 }
 
 - (id _Nullable)getObjCTypeFromCpp:(std::any)cppValue errorCode:(CHIP_ERROR *)aError
@@ -1199,7 +1222,8 @@
         context, [mcAttribute, completion](void * context, id before, id after, NSError * err) {
             completion(context, before, after, err);
             delete mcAttribute;
-        }, minInterval, maxInterval);
+        },
+        minInterval, maxInterval);
 }
 
 - (id _Nullable)getObjCTypeFromCpp:(std::any)cppValue errorCode:(CHIP_ERROR *)aError
@@ -1249,7 +1273,8 @@
         context, [mcAttribute, completion](void * context, id before, id after, NSError * err) {
             completion(context, before, after, err);
             delete mcAttribute;
-        }, minInterval, maxInterval);
+        },
+        minInterval, maxInterval);
 }
 
 - (id _Nullable)getObjCTypeFromCpp:(std::any)cppValue errorCode:(CHIP_ERROR *)aError
@@ -1299,7 +1324,8 @@
         context, [mcAttribute, completion](void * context, id before, id after, NSError * err) {
             completion(context, before, after, err);
             delete mcAttribute;
-        }, minInterval, maxInterval);
+        },
+        minInterval, maxInterval);
 }
 
 - (id _Nullable)getObjCTypeFromCpp:(std::any)cppValue errorCode:(CHIP_ERROR *)aError
@@ -1360,7 +1386,8 @@
         context, [mcAttribute, completion](void * context, id before, id after, NSError * err) {
             completion(context, before, after, err);
             delete mcAttribute;
-        }, minInterval, maxInterval);
+        },
+        minInterval, maxInterval);
 }
 
 - (id _Nullable)getObjCTypeFromCpp:(std::any)cppValue errorCode:(CHIP_ERROR *)aError
@@ -1421,7 +1448,8 @@
         context, [mcAttribute, completion](void * context, id before, id after, NSError * err) {
             completion(context, before, after, err);
             delete mcAttribute;
-        }, minInterval, maxInterval);
+        },
+        minInterval, maxInterval);
 }
 
 - (id _Nullable)getObjCTypeFromCpp:(std::any)cppValue errorCode:(CHIP_ERROR *)aError
@@ -1482,7 +1510,8 @@
         context, [mcAttribute, completion](void * context, id before, id after, NSError * err) {
             completion(context, before, after, err);
             delete mcAttribute;
-        }, minInterval, maxInterval);
+        },
+        minInterval, maxInterval);
 }
 
 - (id _Nullable)getObjCTypeFromCpp:(std::any)cppValue errorCode:(CHIP_ERROR *)aError
@@ -1543,7 +1572,8 @@
         context, [mcAttribute, completion](void * context, id before, id after, NSError * err) {
             completion(context, before, after, err);
             delete mcAttribute;
-        }, minInterval, maxInterval);
+        },
+        minInterval, maxInterval);
 }
 
 - (id _Nullable)getObjCTypeFromCpp:(std::any)cppValue errorCode:(CHIP_ERROR *)aError
@@ -1589,7 +1619,8 @@
         context, [mcAttribute, completion](void * context, id before, id after, NSError * err) {
             completion(context, before, after, err);
             delete mcAttribute;
-        }, minInterval, maxInterval);
+        },
+        minInterval, maxInterval);
 }
 
 - (id _Nullable)getObjCTypeFromCpp:(std::any)cppValue errorCode:(CHIP_ERROR *)aError
@@ -1637,7 +1668,8 @@
         context, [mcAttribute, completion](void * context, id before, id after, NSError * err) {
             completion(context, before, after, err);
             delete mcAttribute;
-        }, minInterval, maxInterval);
+        },
+        minInterval, maxInterval);
 }
 
 - (id _Nullable)getObjCTypeFromCpp:(std::any)cppValue errorCode:(CHIP_ERROR *)aError
@@ -1688,7 +1720,8 @@
         context, [mcAttribute, completion](void * context, id before, id after, NSError * err) {
             completion(context, before, after, err);
             delete mcAttribute;
-        }, minInterval, maxInterval);
+        },
+        minInterval, maxInterval);
 }
 
 - (id _Nullable)getObjCTypeFromCpp:(std::any)cppValue errorCode:(CHIP_ERROR *)aError
@@ -1734,7 +1767,8 @@
         context, [mcAttribute, completion](void * context, id before, id after, NSError * err) {
             completion(context, before, after, err);
             delete mcAttribute;
-        }, minInterval, maxInterval);
+        },
+        minInterval, maxInterval);
 }
 
 - (id _Nullable)getObjCTypeFromCpp:(std::any)cppValue errorCode:(CHIP_ERROR *)aError
@@ -1795,7 +1829,8 @@
         context, [mcAttribute, completion](void * context, id before, id after, NSError * err) {
             completion(context, before, after, err);
             delete mcAttribute;
-        }, minInterval, maxInterval);
+        },
+        minInterval, maxInterval);
 }
 
 - (id _Nullable)getObjCTypeFromCpp:(std::any)cppValue errorCode:(CHIP_ERROR *)aError
@@ -1856,7 +1891,8 @@
         context, [mcAttribute, completion](void * context, id before, id after, NSError * err) {
             completion(context, before, after, err);
             delete mcAttribute;
-        }, minInterval, maxInterval);
+        },
+        minInterval, maxInterval);
 }
 
 - (id _Nullable)getObjCTypeFromCpp:(std::any)cppValue errorCode:(CHIP_ERROR *)aError
@@ -1917,7 +1953,8 @@
         context, [mcAttribute, completion](void * context, id before, id after, NSError * err) {
             completion(context, before, after, err);
             delete mcAttribute;
-        }, minInterval, maxInterval);
+        },
+        minInterval, maxInterval);
 }
 
 - (id _Nullable)getObjCTypeFromCpp:(std::any)cppValue errorCode:(CHIP_ERROR *)aError
@@ -1978,7 +2015,8 @@
         context, [mcAttribute, completion](void * context, id before, id after, NSError * err) {
             completion(context, before, after, err);
             delete mcAttribute;
-        }, minInterval, maxInterval);
+        },
+        minInterval, maxInterval);
 }
 
 - (id _Nullable)getObjCTypeFromCpp:(std::any)cppValue errorCode:(CHIP_ERROR *)aError
@@ -2024,7 +2062,8 @@
         context, [mcAttribute, completion](void * context, id before, id after, NSError * err) {
             completion(context, before, after, err);
             delete mcAttribute;
-        }, minInterval, maxInterval);
+        },
+        minInterval, maxInterval);
 }
 
 - (id _Nullable)getObjCTypeFromCpp:(std::any)cppValue errorCode:(CHIP_ERROR *)aError
@@ -2072,7 +2111,8 @@
         context, [mcAttribute, completion](void * context, id before, id after, NSError * err) {
             completion(context, before, after, err);
             delete mcAttribute;
-        }, minInterval, maxInterval);
+        },
+        minInterval, maxInterval);
 }
 
 - (id _Nullable)getObjCTypeFromCpp:(std::any)cppValue errorCode:(CHIP_ERROR *)aError
@@ -2140,7 +2180,8 @@
         context, [mcAttribute, completion](void * context, id before, id after, NSError * err) {
             completion(context, before, after, err);
             delete mcAttribute;
-        }, minInterval, maxInterval);
+        },
+        minInterval, maxInterval);
 }
 
 - (id _Nullable)getObjCTypeFromCpp:(std::any)cppValue errorCode:(CHIP_ERROR *)aError
@@ -2186,7 +2227,8 @@
         context, [mcAttribute, completion](void * context, id before, id after, NSError * err) {
             completion(context, before, after, err);
             delete mcAttribute;
-        }, minInterval, maxInterval);
+        },
+        minInterval, maxInterval);
 }
 
 - (id _Nullable)getObjCTypeFromCpp:(std::any)cppValue errorCode:(CHIP_ERROR *)aError
@@ -2247,7 +2289,8 @@
         context, [mcAttribute, completion](void * context, id before, id after, NSError * err) {
             completion(context, before, after, err);
             delete mcAttribute;
-        }, minInterval, maxInterval);
+        },
+        minInterval, maxInterval);
 }
 
 - (id _Nullable)getObjCTypeFromCpp:(std::any)cppValue errorCode:(CHIP_ERROR *)aError
@@ -2308,7 +2351,8 @@
         context, [mcAttribute, completion](void * context, id before, id after, NSError * err) {
             completion(context, before, after, err);
             delete mcAttribute;
-        }, minInterval, maxInterval);
+        },
+        minInterval, maxInterval);
 }
 
 - (id _Nullable)getObjCTypeFromCpp:(std::any)cppValue errorCode:(CHIP_ERROR *)aError
@@ -2369,7 +2413,8 @@
         context, [mcAttribute, completion](void * context, id before, id after, NSError * err) {
             completion(context, before, after, err);
             delete mcAttribute;
-        }, minInterval, maxInterval);
+        },
+        minInterval, maxInterval);
 }
 
 - (id _Nullable)getObjCTypeFromCpp:(std::any)cppValue errorCode:(CHIP_ERROR *)aError
@@ -2430,7 +2475,8 @@
         context, [mcAttribute, completion](void * context, id before, id after, NSError * err) {
             completion(context, before, after, err);
             delete mcAttribute;
-        }, minInterval, maxInterval);
+        },
+        minInterval, maxInterval);
 }
 
 - (id _Nullable)getObjCTypeFromCpp:(std::any)cppValue errorCode:(CHIP_ERROR *)aError
@@ -2476,7 +2522,8 @@
         context, [mcAttribute, completion](void * context, id before, id after, NSError * err) {
             completion(context, before, after, err);
             delete mcAttribute;
-        }, minInterval, maxInterval);
+        },
+        minInterval, maxInterval);
 }
 
 - (id _Nullable)getObjCTypeFromCpp:(std::any)cppValue errorCode:(CHIP_ERROR *)aError
@@ -2524,7 +2571,8 @@
         context, [mcAttribute, completion](void * context, id before, id after, NSError * err) {
             completion(context, before, after, err);
             delete mcAttribute;
-        }, minInterval, maxInterval);
+        },
+        minInterval, maxInterval);
 }
 
 - (id _Nullable)getObjCTypeFromCpp:(std::any)cppValue errorCode:(CHIP_ERROR *)aError
@@ -2570,7 +2618,8 @@
         context, [mcAttribute, completion](void * context, id before, id after, NSError * err) {
             completion(context, before, after, err);
             delete mcAttribute;
-        }, minInterval, maxInterval);
+        },
+        minInterval, maxInterval);
 }
 
 - (id _Nullable)getObjCTypeFromCpp:(std::any)cppValue errorCode:(CHIP_ERROR *)aError
@@ -2620,7 +2669,8 @@
         context, [mcAttribute, completion](void * context, id before, id after, NSError * err) {
             completion(context, before, after, err);
             delete mcAttribute;
-        }, minInterval, maxInterval);
+        },
+        minInterval, maxInterval);
 }
 
 - (id _Nullable)getObjCTypeFromCpp:(std::any)cppValue errorCode:(CHIP_ERROR *)aError
@@ -2670,7 +2720,8 @@
         context, [mcAttribute, completion](void * context, id before, id after, NSError * err) {
             completion(context, before, after, err);
             delete mcAttribute;
-        }, minInterval, maxInterval);
+        },
+        minInterval, maxInterval);
 }
 
 - (id _Nullable)getObjCTypeFromCpp:(std::any)cppValue errorCode:(CHIP_ERROR *)aError
@@ -2726,7 +2777,8 @@
         context, [mcAttribute, completion](void * context, id before, id after, NSError * err) {
             completion(context, before, after, err);
             delete mcAttribute;
-        }, minInterval, maxInterval);
+        },
+        minInterval, maxInterval);
 }
 
 - (id _Nullable)getObjCTypeFromCpp:(std::any)cppValue errorCode:(CHIP_ERROR *)aError
@@ -2772,7 +2824,8 @@
         context, [mcAttribute, completion](void * context, id before, id after, NSError * err) {
             completion(context, before, after, err);
             delete mcAttribute;
-        }, minInterval, maxInterval);
+        },
+        minInterval, maxInterval);
 }
 
 - (id _Nullable)getObjCTypeFromCpp:(std::any)cppValue errorCode:(CHIP_ERROR *)aError
@@ -2822,7 +2875,8 @@
         context, [mcAttribute, completion](void * context, id before, id after, NSError * err) {
             completion(context, before, after, err);
             delete mcAttribute;
-        }, minInterval, maxInterval);
+        },
+        minInterval, maxInterval);
 }
 
 - (id _Nullable)getObjCTypeFromCpp:(std::any)cppValue errorCode:(CHIP_ERROR *)aError
@@ -2872,7 +2926,8 @@
         context, [mcAttribute, completion](void * context, id before, id after, NSError * err) {
             completion(context, before, after, err);
             delete mcAttribute;
-        }, minInterval, maxInterval);
+        },
+        minInterval, maxInterval);
 }
 
 - (id _Nullable)getObjCTypeFromCpp:(std::any)cppValue errorCode:(CHIP_ERROR *)aError
@@ -2953,7 +3008,8 @@
         context, [mcAttribute, completion](void * context, id before, id after, NSError * err) {
             completion(context, before, after, err);
             delete mcAttribute;
-        }, minInterval, maxInterval);
+        },
+        minInterval, maxInterval);
 }
 
 - (id _Nullable)getObjCTypeFromCpp:(std::any)cppValue errorCode:(CHIP_ERROR *)aError
@@ -3049,7 +3105,8 @@
         context, [mcAttribute, completion](void * context, id before, id after, NSError * err) {
             completion(context, before, after, err);
             delete mcAttribute;
-        }, minInterval, maxInterval);
+        },
+        minInterval, maxInterval);
 }
 
 - (id _Nullable)getObjCTypeFromCpp:(std::any)cppValue errorCode:(CHIP_ERROR *)aError
@@ -3130,7 +3187,8 @@
         context, [mcAttribute, completion](void * context, id before, id after, NSError * err) {
             completion(context, before, after, err);
             delete mcAttribute;
-        }, minInterval, maxInterval);
+        },
+        minInterval, maxInterval);
 }
 
 - (id _Nullable)getObjCTypeFromCpp:(std::any)cppValue errorCode:(CHIP_ERROR *)aError
@@ -3226,7 +3284,8 @@
         context, [mcAttribute, completion](void * context, id before, id after, NSError * err) {
             completion(context, before, after, err);
             delete mcAttribute;
-        }, minInterval, maxInterval);
+        },
+        minInterval, maxInterval);
 }
 
 - (id _Nullable)getObjCTypeFromCpp:(std::any)cppValue errorCode:(CHIP_ERROR *)aError
@@ -3287,7 +3346,8 @@
         context, [mcAttribute, completion](void * context, id before, id after, NSError * err) {
             completion(context, before, after, err);
             delete mcAttribute;
-        }, minInterval, maxInterval);
+        },
+        minInterval, maxInterval);
 }
 
 - (id _Nullable)getObjCTypeFromCpp:(std::any)cppValue errorCode:(CHIP_ERROR *)aError
@@ -3348,7 +3408,8 @@
         context, [mcAttribute, completion](void * context, id before, id after, NSError * err) {
             completion(context, before, after, err);
             delete mcAttribute;
-        }, minInterval, maxInterval);
+        },
+        minInterval, maxInterval);
 }
 
 - (id _Nullable)getObjCTypeFromCpp:(std::any)cppValue errorCode:(CHIP_ERROR *)aError
@@ -3409,7 +3470,8 @@
         context, [mcAttribute, completion](void * context, id before, id after, NSError * err) {
             completion(context, before, after, err);
             delete mcAttribute;
-        }, minInterval, maxInterval);
+        },
+        minInterval, maxInterval);
 }
 
 - (id _Nullable)getObjCTypeFromCpp:(std::any)cppValue errorCode:(CHIP_ERROR *)aError
@@ -3470,7 +3532,8 @@
         context, [mcAttribute, completion](void * context, id before, id after, NSError * err) {
             completion(context, before, after, err);
             delete mcAttribute;
-        }, minInterval, maxInterval);
+        },
+        minInterval, maxInterval);
 }
 
 - (id _Nullable)getObjCTypeFromCpp:(std::any)cppValue errorCode:(CHIP_ERROR *)aError
@@ -3516,7 +3579,8 @@
         context, [mcAttribute, completion](void * context, id before, id after, NSError * err) {
             completion(context, before, after, err);
             delete mcAttribute;
-        }, minInterval, maxInterval);
+        },
+        minInterval, maxInterval);
 }
 
 - (id _Nullable)getObjCTypeFromCpp:(std::any)cppValue errorCode:(CHIP_ERROR *)aError
@@ -3564,7 +3628,8 @@
         context, [mcAttribute, completion](void * context, id before, id after, NSError * err) {
             completion(context, before, after, err);
             delete mcAttribute;
-        }, minInterval, maxInterval);
+        },
+        minInterval, maxInterval);
 }
 
 - (id _Nullable)getObjCTypeFromCpp:(std::any)cppValue errorCode:(CHIP_ERROR *)aError
@@ -3625,7 +3690,8 @@
         context, [mcAttribute, completion](void * context, id before, id after, NSError * err) {
             completion(context, before, after, err);
             delete mcAttribute;
-        }, minInterval, maxInterval);
+        },
+        minInterval, maxInterval);
 }
 
 - (id _Nullable)getObjCTypeFromCpp:(std::any)cppValue errorCode:(CHIP_ERROR *)aError
@@ -3686,7 +3752,8 @@
         context, [mcAttribute, completion](void * context, id before, id after, NSError * err) {
             completion(context, before, after, err);
             delete mcAttribute;
-        }, minInterval, maxInterval);
+        },
+        minInterval, maxInterval);
 }
 
 - (id _Nullable)getObjCTypeFromCpp:(std::any)cppValue errorCode:(CHIP_ERROR *)aError
@@ -3747,7 +3814,8 @@
         context, [mcAttribute, completion](void * context, id before, id after, NSError * err) {
             completion(context, before, after, err);
             delete mcAttribute;
-        }, minInterval, maxInterval);
+        },
+        minInterval, maxInterval);
 }
 
 - (id _Nullable)getObjCTypeFromCpp:(std::any)cppValue errorCode:(CHIP_ERROR *)aError
@@ -3808,7 +3876,8 @@
         context, [mcAttribute, completion](void * context, id before, id after, NSError * err) {
             completion(context, before, after, err);
             delete mcAttribute;
-        }, minInterval, maxInterval);
+        },
+        minInterval, maxInterval);
 }
 
 - (id _Nullable)getObjCTypeFromCpp:(std::any)cppValue errorCode:(CHIP_ERROR *)aError
@@ -3854,7 +3923,8 @@
         context, [mcAttribute, completion](void * context, id before, id after, NSError * err) {
             completion(context, before, after, err);
             delete mcAttribute;
-        }, minInterval, maxInterval);
+        },
+        minInterval, maxInterval);
 }
 
 - (id _Nullable)getObjCTypeFromCpp:(std::any)cppValue errorCode:(CHIP_ERROR *)aError
@@ -3902,7 +3972,8 @@
         context, [mcAttribute, completion](void * context, id before, id after, NSError * err) {
             completion(context, before, after, err);
             delete mcAttribute;
-        }, minInterval, maxInterval);
+        },
+        minInterval, maxInterval);
 }
 
 - (id _Nullable)getObjCTypeFromCpp:(std::any)cppValue errorCode:(CHIP_ERROR *)aError
@@ -3968,7 +4039,8 @@
         context, [mcAttribute, completion](void * context, id before, id after, NSError * err) {
             completion(context, before, after, err);
             delete mcAttribute;
-        }, minInterval, maxInterval);
+        },
+        minInterval, maxInterval);
 }
 
 - (id _Nullable)getObjCTypeFromCpp:(std::any)cppValue errorCode:(CHIP_ERROR *)aError
@@ -4014,7 +4086,8 @@
         context, [mcAttribute, completion](void * context, id before, id after, NSError * err) {
             completion(context, before, after, err);
             delete mcAttribute;
-        }, minInterval, maxInterval);
+        },
+        minInterval, maxInterval);
 }
 
 - (id _Nullable)getObjCTypeFromCpp:(std::any)cppValue errorCode:(CHIP_ERROR *)aError
@@ -4075,7 +4148,8 @@
         context, [mcAttribute, completion](void * context, id before, id after, NSError * err) {
             completion(context, before, after, err);
             delete mcAttribute;
-        }, minInterval, maxInterval);
+        },
+        minInterval, maxInterval);
 }
 
 - (id _Nullable)getObjCTypeFromCpp:(std::any)cppValue errorCode:(CHIP_ERROR *)aError
@@ -4136,7 +4210,8 @@
         context, [mcAttribute, completion](void * context, id before, id after, NSError * err) {
             completion(context, before, after, err);
             delete mcAttribute;
-        }, minInterval, maxInterval);
+        },
+        minInterval, maxInterval);
 }
 
 - (id _Nullable)getObjCTypeFromCpp:(std::any)cppValue errorCode:(CHIP_ERROR *)aError
@@ -4197,7 +4272,8 @@
         context, [mcAttribute, completion](void * context, id before, id after, NSError * err) {
             completion(context, before, after, err);
             delete mcAttribute;
-        }, minInterval, maxInterval);
+        },
+        minInterval, maxInterval);
 }
 
 - (id _Nullable)getObjCTypeFromCpp:(std::any)cppValue errorCode:(CHIP_ERROR *)aError
@@ -4258,7 +4334,8 @@
         context, [mcAttribute, completion](void * context, id before, id after, NSError * err) {
             completion(context, before, after, err);
             delete mcAttribute;
-        }, minInterval, maxInterval);
+        },
+        minInterval, maxInterval);
 }
 
 - (id _Nullable)getObjCTypeFromCpp:(std::any)cppValue errorCode:(CHIP_ERROR *)aError
@@ -4304,7 +4381,8 @@
         context, [mcAttribute, completion](void * context, id before, id after, NSError * err) {
             completion(context, before, after, err);
             delete mcAttribute;
-        }, minInterval, maxInterval);
+        },
+        minInterval, maxInterval);
 }
 
 - (id _Nullable)getObjCTypeFromCpp:(std::any)cppValue errorCode:(CHIP_ERROR *)aError
@@ -4352,7 +4430,8 @@
         context, [mcAttribute, completion](void * context, id before, id after, NSError * err) {
             completion(context, before, after, err);
             delete mcAttribute;
-        }, minInterval, maxInterval);
+        },
+        minInterval, maxInterval);
 }
 
 - (id _Nullable)getObjCTypeFromCpp:(std::any)cppValue errorCode:(CHIP_ERROR *)aError
@@ -4413,7 +4492,8 @@
         context, [mcAttribute, completion](void * context, id before, id after, NSError * err) {
             completion(context, before, after, err);
             delete mcAttribute;
-        }, minInterval, maxInterval);
+        },
+        minInterval, maxInterval);
 }
 
 - (id _Nullable)getObjCTypeFromCpp:(std::any)cppValue errorCode:(CHIP_ERROR *)aError
@@ -4476,7 +4556,8 @@
         context, [mcAttribute, completion](void * context, id before, id after, NSError * err) {
             completion(context, before, after, err);
             delete mcAttribute;
-        }, minInterval, maxInterval);
+        },
+        minInterval, maxInterval);
 }
 
 - (id _Nullable)getObjCTypeFromCpp:(std::any)cppValue errorCode:(CHIP_ERROR *)aError
@@ -4537,7 +4618,8 @@
         context, [mcAttribute, completion](void * context, id before, id after, NSError * err) {
             completion(context, before, after, err);
             delete mcAttribute;
-        }, minInterval, maxInterval);
+        },
+        minInterval, maxInterval);
 }
 
 - (id _Nullable)getObjCTypeFromCpp:(std::any)cppValue errorCode:(CHIP_ERROR *)aError
@@ -4598,7 +4680,8 @@
         context, [mcAttribute, completion](void * context, id before, id after, NSError * err) {
             completion(context, before, after, err);
             delete mcAttribute;
-        }, minInterval, maxInterval);
+        },
+        minInterval, maxInterval);
 }
 
 - (id _Nullable)getObjCTypeFromCpp:(std::any)cppValue errorCode:(CHIP_ERROR *)aError
@@ -4659,7 +4742,8 @@
         context, [mcAttribute, completion](void * context, id before, id after, NSError * err) {
             completion(context, before, after, err);
             delete mcAttribute;
-        }, minInterval, maxInterval);
+        },
+        minInterval, maxInterval);
 }
 
 - (id _Nullable)getObjCTypeFromCpp:(std::any)cppValue errorCode:(CHIP_ERROR *)aError
@@ -4720,7 +4804,8 @@
         context, [mcAttribute, completion](void * context, id before, id after, NSError * err) {
             completion(context, before, after, err);
             delete mcAttribute;
-        }, minInterval, maxInterval);
+        },
+        minInterval, maxInterval);
 }
 
 - (id _Nullable)getObjCTypeFromCpp:(std::any)cppValue errorCode:(CHIP_ERROR *)aError
@@ -4766,7 +4851,8 @@
         context, [mcAttribute, completion](void * context, id before, id after, NSError * err) {
             completion(context, before, after, err);
             delete mcAttribute;
-        }, minInterval, maxInterval);
+        },
+        minInterval, maxInterval);
 }
 
 - (id _Nullable)getObjCTypeFromCpp:(std::any)cppValue errorCode:(CHIP_ERROR *)aError
@@ -4814,7 +4900,8 @@
         context, [mcAttribute, completion](void * context, id before, id after, NSError * err) {
             completion(context, before, after, err);
             delete mcAttribute;
-        }, minInterval, maxInterval);
+        },
+        minInterval, maxInterval);
 }
 
 - (id _Nullable)getObjCTypeFromCpp:(std::any)cppValue errorCode:(CHIP_ERROR *)aError
@@ -4865,7 +4952,8 @@
         context, [mcAttribute, completion](void * context, id before, id after, NSError * err) {
             completion(context, before, after, err);
             delete mcAttribute;
-        }, minInterval, maxInterval);
+        },
+        minInterval, maxInterval);
 }
 
 - (id _Nullable)getObjCTypeFromCpp:(std::any)cppValue errorCode:(CHIP_ERROR *)aError
@@ -4911,7 +4999,8 @@
         context, [mcAttribute, completion](void * context, id before, id after, NSError * err) {
             completion(context, before, after, err);
             delete mcAttribute;
-        }, minInterval, maxInterval);
+        },
+        minInterval, maxInterval);
 }
 
 - (id _Nullable)getObjCTypeFromCpp:(std::any)cppValue errorCode:(CHIP_ERROR *)aError
@@ -4962,7 +5051,8 @@
         context, [mcAttribute, completion](void * context, id before, id after, NSError * err) {
             completion(context, before, after, err);
             delete mcAttribute;
-        }, minInterval, maxInterval);
+        },
+        minInterval, maxInterval);
 }
 
 - (id _Nullable)getObjCTypeFromCpp:(std::any)cppValue errorCode:(CHIP_ERROR *)aError
@@ -5008,7 +5098,8 @@
         context, [mcAttribute, completion](void * context, id before, id after, NSError * err) {
             completion(context, before, after, err);
             delete mcAttribute;
-        }, minInterval, maxInterval);
+        },
+        minInterval, maxInterval);
 }
 
 - (id _Nullable)getObjCTypeFromCpp:(std::any)cppValue errorCode:(CHIP_ERROR *)aError
@@ -5061,7 +5152,8 @@
         context, [mcAttribute, completion](void * context, id before, id after, NSError * err) {
             completion(context, before, after, err);
             delete mcAttribute;
-        }, minInterval, maxInterval);
+        },
+        minInterval, maxInterval);
 }
 
 - (id _Nullable)getObjCTypeFromCpp:(std::any)cppValue errorCode:(CHIP_ERROR *)aError
@@ -5107,7 +5199,8 @@
         context, [mcAttribute, completion](void * context, id before, id after, NSError * err) {
             completion(context, before, after, err);
             delete mcAttribute;
-        }, minInterval, maxInterval);
+        },
+        minInterval, maxInterval);
 }
 
 - (id _Nullable)getObjCTypeFromCpp:(std::any)cppValue errorCode:(CHIP_ERROR *)aError
@@ -5158,7 +5251,8 @@
         context, [mcAttribute, completion](void * context, id before, id after, NSError * err) {
             completion(context, before, after, err);
             delete mcAttribute;
-        }, minInterval, maxInterval);
+        },
+        minInterval, maxInterval);
 }
 
 - (id _Nullable)getObjCTypeFromCpp:(std::any)cppValue errorCode:(CHIP_ERROR *)aError
@@ -5219,7 +5313,8 @@
         context, [mcAttribute, completion](void * context, id before, id after, NSError * err) {
             completion(context, before, after, err);
             delete mcAttribute;
-        }, minInterval, maxInterval);
+        },
+        minInterval, maxInterval);
 }
 
 - (id _Nullable)getObjCTypeFromCpp:(std::any)cppValue errorCode:(CHIP_ERROR *)aError
@@ -5280,7 +5375,8 @@
         context, [mcAttribute, completion](void * context, id before, id after, NSError * err) {
             completion(context, before, after, err);
             delete mcAttribute;
-        }, minInterval, maxInterval);
+        },
+        minInterval, maxInterval);
 }
 
 - (id _Nullable)getObjCTypeFromCpp:(std::any)cppValue errorCode:(CHIP_ERROR *)aError
@@ -5341,7 +5437,8 @@
         context, [mcAttribute, completion](void * context, id before, id after, NSError * err) {
             completion(context, before, after, err);
             delete mcAttribute;
-        }, minInterval, maxInterval);
+        },
+        minInterval, maxInterval);
 }
 
 - (id _Nullable)getObjCTypeFromCpp:(std::any)cppValue errorCode:(CHIP_ERROR *)aError
@@ -5402,7 +5499,8 @@
         context, [mcAttribute, completion](void * context, id before, id after, NSError * err) {
             completion(context, before, after, err);
             delete mcAttribute;
-        }, minInterval, maxInterval);
+        },
+        minInterval, maxInterval);
 }
 
 - (id _Nullable)getObjCTypeFromCpp:(std::any)cppValue errorCode:(CHIP_ERROR *)aError
@@ -5463,7 +5561,8 @@
         context, [mcAttribute, completion](void * context, id before, id after, NSError * err) {
             completion(context, before, after, err);
             delete mcAttribute;
-        }, minInterval, maxInterval);
+        },
+        minInterval, maxInterval);
 }
 
 - (id _Nullable)getObjCTypeFromCpp:(std::any)cppValue errorCode:(CHIP_ERROR *)aError
@@ -5509,7 +5608,8 @@
         context, [mcAttribute, completion](void * context, id before, id after, NSError * err) {
             completion(context, before, after, err);
             delete mcAttribute;
-        }, minInterval, maxInterval);
+        },
+        minInterval, maxInterval);
 }
 
 - (id _Nullable)getObjCTypeFromCpp:(std::any)cppValue errorCode:(CHIP_ERROR *)aError

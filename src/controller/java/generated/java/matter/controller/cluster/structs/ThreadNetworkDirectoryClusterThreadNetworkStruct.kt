@@ -16,7 +16,9 @@
  */
 package matter.controller.cluster.structs
 
+import java.util.Optional
 import matter.controller.cluster.*
+import matter.tlv.AnonymousTag
 import matter.tlv.ContextSpecificTag
 import matter.tlv.Tag
 import matter.tlv.TlvReader
@@ -25,7 +27,7 @@ import matter.tlv.TlvWriter
 class ThreadNetworkDirectoryClusterThreadNetworkStruct(
   val extendedPanID: ULong,
   val networkName: String,
-  val channel: UShort,
+  val channel: UShort
 ) {
   override fun toString(): String = buildString {
     append("ThreadNetworkDirectoryClusterThreadNetworkStruct {\n")
@@ -50,15 +52,12 @@ class ThreadNetworkDirectoryClusterThreadNetworkStruct(
     private const val TAG_NETWORK_NAME = 1
     private const val TAG_CHANNEL = 2
 
-    fun fromTlv(
-      tlvTag: Tag,
-      tlvReader: TlvReader,
-    ): ThreadNetworkDirectoryClusterThreadNetworkStruct {
+    fun fromTlv(tlvTag: Tag, tlvReader: TlvReader): ThreadNetworkDirectoryClusterThreadNetworkStruct {
       tlvReader.enterStructure(tlvTag)
       val extendedPanID = tlvReader.getULong(ContextSpecificTag(TAG_EXTENDED_PAN_I_D))
       val networkName = tlvReader.getString(ContextSpecificTag(TAG_NETWORK_NAME))
       val channel = tlvReader.getUShort(ContextSpecificTag(TAG_CHANNEL))
-
+      
       tlvReader.exitContainer()
 
       return ThreadNetworkDirectoryClusterThreadNetworkStruct(extendedPanID, networkName, channel)
