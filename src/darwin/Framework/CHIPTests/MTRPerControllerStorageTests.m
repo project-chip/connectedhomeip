@@ -2508,11 +2508,12 @@ static const uint16_t kSubscriptionPoolBaseTimeoutInSeconds = 30;
     __block NSNumber * rootEndpoint = @0;
 
     // This test will do the following -
-    // 1. Get the data version and attribute value of the parts list for endpoint 0 to inject a fake report. The attribute report will delete endpoint 2.
+    // 1. Get the data version and attribute value of the parts list for endpoint 0 to inject a fake report.
+    //    The injected attribute report will delete endpoint 2.
     //    That should cause the endpoint and its corresponding clusters to be removed from data storage.
-    // 2. The data store is populated with cluster index and cluster data for endpoints 0, 1 and 2 initially.
+    // 2. The data store is populated with cluster index and cluster data for the set of endpoints in our test app initially.
     // 3. After the fake attribute report is injected with deleted endpoint 2, make sure the data store is still populated with cluster index and cluster data
-    // for endpoints 0 and 1 but not 2.
+    //    for all the other endpoints.
     __block MTRDeviceDataValueDictionary testDataForPartsList;
     __block id testClusterDataValueForPartsList;
     delegate.onAttributeDataReceived = ^(NSArray<NSDictionary<NSString *, id> *> * attributeReport) {
@@ -2534,18 +2535,21 @@ static const uint16_t kSubscriptionPoolBaseTimeoutInSeconds = 30;
     };
 
     __block NSMutableDictionary<NSNumber *, NSArray<NSNumber *> *> * initialClusterIndex = [[NSMutableDictionary alloc] init];
-    __block NSMutableArray<NSNumber *> * testEndpoints;
+    // Some of the places we gets endpoint lists get them from enumerating dictionary keys, which
+    // means order is not guaranteed.  Make sure we compare sets of endpoints, not arrays, to
+    // account for that.
+    __block NSSet<NSNumber *> * testEndpoints;
 
     delegate.onReportEnd = ^{
         XCTAssertNotNil(dataVersionForPartsList);
         XCTAssertNotNil(testClusterDataValueForPartsList);
-        testEndpoints = [self getEndpointArrayFromPartsList:testDataForPartsList forDevice:device];
+        testEndpoints = [NSSet setWithArray:[self getEndpointArrayFromPartsList:testDataForPartsList forDevice:device]];
 
-        // Make sure that the cluster data in the data storage is populated with cluster index and cluster data for endpoints 0, 1 and 2.
+        // Make sure that the cluster data in the data storage is populated with cluster index and cluster data for our endpoints.
         // We do not need to check _persistedClusterData here. _persistedClusterData will be paged in from storage when needed so
         // just checking data storage should suffice here.
         dispatch_sync(self->_storageQueue, ^{
-            XCTAssertTrue([[controller.controllerDataStore _fetchEndpointIndexForNodeID:deviceID] isEqualToArray:testEndpoints]);
+            XCTAssertEqualObjects([NSSet setWithArray:[controller.controllerDataStore _fetchEndpointIndexForNodeID:deviceID]], testEndpoints);
 
             // Populate the initialClusterIndex to use as a reference for all cluster paths later.
             for (NSNumber * endpoint in testEndpoints) {
@@ -2568,8 +2572,9 @@ static const uint16_t kSubscriptionPoolBaseTimeoutInSeconds = 30;
     // Inject a fake attribute report deleting endpoint 2 from the parts list at the root endpoint.
     dataVersionForPartsList = [NSNumber numberWithUnsignedLongLong:(dataVersionForPartsList.unsignedLongLongValue + 1)];
 
-    // Delete endpoint 2 from the attribute value in parts list.
+    // Delete our to-be-deleted endpoint from the attribute value in parts list.  Make sure it's in the list to start with.
     NSNumber * toBeDeletedEndpoint = @2;
+    XCTAssertTrue([testEndpoints containsObject:toBeDeletedEndpoint]);
     id endpointData =
         @{
             MTRDataKey : @ {
@@ -2578,6 +2583,7 @@ static const uint16_t kSubscriptionPoolBaseTimeoutInSeconds = 30;
             }
         };
 
+    XCTAssertTrue([testClusterDataValueForPartsList containsObject:endpointData]);
     [testClusterDataValueForPartsList removeObject:endpointData];
 
     NSArray<NSDictionary<NSString *, id> *> * attributeReport = @[ @{
@@ -2612,13 +2618,13 @@ static const uint16_t kSubscriptionPoolBaseTimeoutInSeconds = 30;
 
     delegate.onReportEnd = ^{
         XCTAssertNotNil(testClusterDataValueForPartsList);
-        testEndpoints = [self getEndpointArrayFromPartsList:testDataForPartsList forDevice:device];
+        testEndpoints = [NSSet setWithArray:[self getEndpointArrayFromPartsList:testDataForPartsList forDevice:device]];
 
-        // Make sure that the cluster data in the data storage for endpoints 0 and 1 are present but not for endpoint 2.
+        // Make sure that the cluster data is remoeved from the data storage for the endpoint we deleted, but still there for the others.
         // We do not need to check _persistedClusterData here. _persistedClusterData will be paged in from storage when needed so
         // just checking data storage should suffice here.
         dispatch_sync(self->_storageQueue, ^{
-            XCTAssertTrue([[controller.controllerDataStore _fetchEndpointIndexForNodeID:deviceID] isEqualToArray:testEndpoints]);
+            XCTAssertEqualObjects([NSSet setWithArray:[controller.controllerDataStore _fetchEndpointIndexForNodeID:deviceID]], testEndpoints);
             for (NSNumber * endpoint in testEndpoints) {
                 XCTAssertNotNil(initialClusterIndex);
                 for (NSNumber * cluster in [initialClusterIndex objectForKey:endpoint]) {

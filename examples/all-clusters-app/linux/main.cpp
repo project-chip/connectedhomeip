@@ -20,9 +20,6 @@
 #include "AppOptions.h"
 #include "binding-handler.h"
 
-#include <app/util/endpoint-config-api.h>
-#include <lib/support/logging/CHIPLogging.h>
-
 // Network commissioning
 namespace {
 constexpr chip::EndpointId kNetworkCommissioningEndpointSecondary = 0xFFFE;
@@ -35,15 +32,6 @@ int main(int argc, char * argv[])
     VerifyOrDie(InitBindingHandlers() == CHIP_NO_ERROR);
 
     LinuxDeviceOptions::GetInstance().dacProvider = AppOptions::GetDACProvider();
-
-    // TODO(#34374): Remove this when Darwin tests are more reliable.
-    chip::EndpointId kSwitchEndpoint = 3u;
-
-    emberAfEndpointEnableDisable(kSwitchEndpoint, false);
-#if !defined(__APPLE__)
-    ChipLogProgress(NotSpecified, "Enabling the switch endpoint.");
-    emberAfEndpointEnableDisable(kSwitchEndpoint, true);
-#endif
 
     ChipLinuxAppMainLoop();
 
