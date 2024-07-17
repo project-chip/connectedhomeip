@@ -23,6 +23,7 @@
 #include <platform/ConnectivityManager.h>
 #include <platform/Zephyr/InetUtils.h>
 #include <platform/internal/BLEManager.h>
+#include <zephyr/net/net_if.h>
 
 #include <platform/internal/GenericConnectivityManagerImpl_UDP.ipp>
 
