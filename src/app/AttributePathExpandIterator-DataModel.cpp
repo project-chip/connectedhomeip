@@ -159,12 +159,7 @@ void AttributePathExpandIteratorDataModel::ResetCurrentCluster()
     // will do nothing, since we won't be expanding the wildcard attribute ids under a cluster.
     VerifyOrReturn(mpAttributePath != nullptr && mpAttributePath->mValue.HasWildcardAttributeId());
 
-    // Reset to the first attribute of the current cluster.
-    // It is expected that the output path is already positioned on a proper cluster
-    //
-    AttributeEntry entry = mDataModel->FirstAttribute(mOutputPath);
-    VerifyOrDie(entry.IsValid()); // TODO: is this sane? do we require validity here?
-
+    // Proceed path expansion to ask for the first attribute of the current cluster
     mOutputPath.mAttributeId = kInvalidAttributeId;
     mOutputPath.mExpanded    = true; // we know this is a wildcard attribute
     Next();
