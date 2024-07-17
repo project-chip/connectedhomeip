@@ -155,8 +155,6 @@ std::optional<ClusterId> AttributePathExpandIteratorDataModel::NextEndpointId()
 
 void AttributePathExpandIteratorDataModel::ResetCurrentCluster()
 {
-    ChipLogError(Test, "Reset current cluster data model");
-
     // If this is a null iterator, or the attribute id of current cluster info is not a wildcard attribute id, then this function
     // will do nothing, since we won't be expanding the wildcard attribute ids under a cluster.
     VerifyOrReturn(mpAttributePath != nullptr && mpAttributePath->mValue.HasWildcardAttributeId());
