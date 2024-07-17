@@ -80,7 +80,7 @@ class TC_CADMIN_1_9(MatterBaseTest):
         return ["CADMIN.S"]
 
     @async_test_body
-    async def test_TC_ADMIN_1_9(self):
+    async def test_TC_CADMIN_1_9(self):
         self.print_step(1, "Commissioning, already done")
 
         # Establishing TH1 and TH2
