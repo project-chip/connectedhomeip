@@ -222,6 +222,9 @@ class TC_SC_4_3(MatterBaseTest):
             log_output=True,
             load_from_cache=False
         )
+        
+        # Will be used in Step 11
+        server = operational_record.server
 
         # Verify SRV record is returned
         srv_record_returned = operational_record is not None and operational_record.service_name == instance_qname
@@ -344,8 +347,15 @@ class TC_SC_4_3(MatterBaseTest):
         # TH performs a DNS-SD browse for _matter._tcp.local
         # Verify DUT returns a PTR record with DNS-SD instance name set to instance_name
         self.step(11)
+        op_service_info = await mdns._get_service(
+            service_type=MdnsServiceType.OPERATIONAL,
+            log_output=True,
+            discovery_timeout_sec=15
+        )
 
-        # PENDING
+        # Verify DUT returns a PTR record with DNS-SD instance name set instance_name
+        asserts.assert_equal(op_service_info.server, server, f"No PTR record with DNS-SD instance name '{MdnsServiceType.OPERATIONAL.value}'")
+        asserts.assert_equal(instance_name, op_service_info.instance_name, "Instance name mismatch")
 
 
 if __name__ == "__main__":
