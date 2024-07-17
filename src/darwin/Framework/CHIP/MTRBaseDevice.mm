@@ -2306,7 +2306,7 @@ MTREventPriority MTREventPriorityForValidPriorityLevel(chip::app::PriorityLevel 
         return YES;
     }
 
-    return [super isEqual:path];
+    return NO;
 }
 
 - (BOOL)isEqual:(id)object
@@ -2315,7 +2315,7 @@ MTREventPriority MTREventPriorityForValidPriorityLevel(chip::app::PriorityLevel 
         return [self isEqualToAttributeRequestPath:object];
     }
 
-    return [super isEqual:object];
+    return NO;
 }
 
 - (NSUInteger)hash
@@ -2394,7 +2394,7 @@ MTREventPriority MTREventPriorityForValidPriorityLevel(chip::app::PriorityLevel 
         return YES;
     }
 
-    return [super isEqual:path];
+    return NO;
 }
 
 - (BOOL)isEqual:(id)object
@@ -2403,7 +2403,7 @@ MTREventPriority MTREventPriorityForValidPriorityLevel(chip::app::PriorityLevel 
         return [self isEqualToEventRequestPath:object];
     }
 
-    return [super isEqual:object];
+    return NO;
 }
 
 - (NSUInteger)hash
@@ -2482,7 +2482,7 @@ MTREventPriority MTREventPriorityForValidPriorityLevel(chip::app::PriorityLevel 
         return [self isEqualToClusterPath:object];
     }
 
-    return [super isEqual:object];
+    return NO;
 }
 
 - (NSUInteger)hash
@@ -2578,7 +2578,7 @@ static NSString * const sClusterKey = @"clusterKey";
         return [self isEqualToAttributePath:object];
     }
 
-    return [super isEqual:object];
+    return NO;
 }
 
 - (NSUInteger)hash
@@ -2677,10 +2677,10 @@ static NSString * const sAttributeKey = @"attributeKey";
 - (BOOL)isEqual:(id)object
 {
     if ([[object class] isKindOfClass:[MTREventPath class]]) {
-        return [self isEqualToEventPath: object];
+        return [self isEqualToEventPath:object];
     }
 
-    return [super isEqual:object];
+    return NO;
 }
 
 - (NSUInteger)hash
@@ -2779,7 +2779,7 @@ static NSString * const sEventKey = @"eventKey";
         return [self isEqualToCommandPath:object];
     }
 
-    return [super isEqual:object];
+    return NO;
 }
 
 - (NSUInteger)hash

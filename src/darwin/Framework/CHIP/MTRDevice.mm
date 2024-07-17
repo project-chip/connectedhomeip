@@ -177,8 +177,8 @@ public:
         UnsolicitedMessageFromPublisherHandler unsolicitedMessageFromPublisherHandler, ReportBeginHandler reportBeginHandler,
         ReportEndHandler reportEndHandler)
         : MTRBaseSubscriptionCallback(attributeReportCallback, eventReportCallback, errorCallback, resubscriptionCallback,
-            subscriptionEstablishedHandler, onDoneHandler, unsolicitedMessageFromPublisherHandler, reportBeginHandler,
-            reportEndHandler)
+              subscriptionEstablishedHandler, onDoneHandler, unsolicitedMessageFromPublisherHandler, reportBeginHandler,
+              reportEndHandler)
     {
     }
 
@@ -351,7 +351,7 @@ static NSString * const sLastInitialSubscribeLatencyKey = @"lastInitialSubscribe
         return [self isEqualToClusterData:object];
     }
 
-    return [super isEqual:object];
+    return object == self;
 }
 
 @end
