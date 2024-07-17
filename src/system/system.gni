@@ -81,6 +81,10 @@ assert(
     "Please select a valid mutex implementation: posix, freertos, mbed, cmsis-rtos, zephyr, none")
 
 assert(
+    !chip_system_config_use_dispatch || chip_system_config_locking == "none",
+    "When chip_system_config_use_dispatch is true, chip_system_config_locking must be 'none'")
+
+assert(
     chip_system_config_clock == "clock_gettime" ||
         chip_system_config_clock == "gettimeofday",
     "Please select a valid clock implementation: clock_gettime, gettimeofday")
