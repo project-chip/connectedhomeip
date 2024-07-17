@@ -1439,6 +1439,13 @@ class ChipDeviceControllerBase():
 
         reportInterval: A tuple of two int-s for (MinIntervalFloor, MaxIntervalCeiling). Used by establishing subscriptions.
             When not provided, a read request will be sent.
+        fabricFiltered: If True (default), the read/subscribe is fabric-filtered and will only see things associated with the fabric
+            of the reader/subscriber. Relevant for attributes with fabric-scoped data.
+        keepSubscriptions: Keep existing subscriptions. If set to False, existing subscriptions with this node will get cancelled
+            and a new one gets setup.
+        autoResubscribe: Automatically resubscribe to the subscription if subscription is lost. The automatic re-subscription only
+            applies if the subscription establishes on first try. If the first subscription establishment attempt fails the function
+            returns right away.
 
         Returns:
             - AsyncReadTransaction.ReadResponse. Please see ReadAttribute and ReadEvent for examples of how to access data.
@@ -1508,6 +1515,13 @@ class ChipDeviceControllerBase():
 
         reportInterval: A tuple of two int-s for (MinIntervalFloor, MaxIntervalCeiling). Used by establishing subscriptions.
             When not provided, a read request will be sent.
+        fabricFiltered: If True (default), the read/subscribe is fabric-filtered and will only see things associated with the fabric
+            of the reader/subscriber. Relevant for attributes with fabric-scoped data.
+        keepSubscriptions: Keep existing subscriptions. If set to False, existing subscriptions with this node will get cancelled
+            and a new one gets setup.
+        autoResubscribe: Automatically resubscribe to the subscription if subscription is lost. The automatic re-subscription only
+            applies if the subscription establishes on first try. If the first subscription establishment attempt fails the function
+            returns right away.
 
         Returns:
             - subscription request: ClusterAttribute.SubscriptionTransaction
@@ -1584,6 +1598,11 @@ class ChipDeviceControllerBase():
         eventNumberFilter: Optional minimum event number filter.
         reportInterval: A tuple of two int-s for (MinIntervalFloor, MaxIntervalCeiling). Used by establishing subscriptions.
             When not provided, a read request will be sent.
+        keepSubscriptions: Keep existing subscriptions. If set to False, existing subscriptions with this node will get cancelled
+            and a new one gets setup.
+        autoResubscribe: Automatically resubscribe to the subscription if subscription is lost. The automatic re-subscription only
+            applies if the subscription establishes on first try. If the first subscription establishment attempt fails the function
+            returns right away.
 
         Returns:
             - subscription request: ClusterAttribute.SubscriptionTransaction
