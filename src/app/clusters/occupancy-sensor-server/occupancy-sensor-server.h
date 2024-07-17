@@ -34,7 +34,7 @@ class OccupancySensingAttrAccess : public AttributeAccessInterface
 {
 public:
     OccupancySensingAttrAccess(BitMask<Feature> aFeature) :
-    app::AttributeAccessInterface(Optional<EndpointId>::Missing(), app::Clusters::OccupancySensing::Id), mFeature(aFeature)
+        app::AttributeAccessInterface(Optional<EndpointId>::Missing(), app::Clusters::OccupancySensing::Id), mFeature(aFeature)
     {}
 
     ~OccupancySensingAttrAccess() { Shutdown(); }
