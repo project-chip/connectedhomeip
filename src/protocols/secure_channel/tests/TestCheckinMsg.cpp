@@ -16,9 +16,11 @@
  *    limitations under the License.
  */
 
+#include <pw_unit_test/framework.h>
+
 #include <crypto/DefaultSessionKeystore.h>
 #include <crypto/RandUtils.h>
-#include <gtest/gtest.h>
+#include <lib/core/StringBuilderAdapters.h>
 #include <lib/support/BufferWriter.h>
 #include <lib/support/CHIPMem.h>
 #include <protocols/Protocols.h>

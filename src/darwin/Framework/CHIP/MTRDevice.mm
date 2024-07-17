@@ -60,6 +60,9 @@ NSString * const MTRDataVersionKey = @"dataVersion";
 
 #define kSecondsToWaitBeforeMarkingUnreachableAfterSettingUpSubscription 10
 
+// Disabling pending crashes
+#define ENABLE_CONNECTIVITY_MONITORING 0
+
 // Consider moving utility classes to their own file
 #pragma mark - Utility Classes
 
@@ -536,6 +539,9 @@ static NSString * const sLastInitialSubscribeLatencyKey = @"lastInitialSubscribe
 - (void)dealloc
 {
     [[NSNotificationCenter defaultCenter] removeObserver:_systemTimeChangeObserverToken];
+
+    // TODO: retain cycle and clean up https://github.com/project-chip/connectedhomeip/issues/34267
+    MTR_LOG("MTRDevice dealloc: %p", self);
 }
 
 - (NSString *)description
@@ -796,7 +802,7 @@ static NSString * const sLastInitialSubscribeLatencyKey = @"lastInitialSubscribe
     [self _addDelegate:delegate queue:queue interestedPathsForAttributes:nil interestedPathsForEvents:nil];
 }
 
-- (void)addDelegate:(id<MTRDeviceDelegate>)delegate queue:(dispatch_queue_t)queue interestedPathsForAttributes:(NSArray * _Nullable)interestedPathsForAttributes interestedPathsForEvents:(NSArray * _Nullable)interestedPathsForEvents MTR_NEWLY_AVAILABLE;
+- (void)addDelegate:(id<MTRDeviceDelegate>)delegate queue:(dispatch_queue_t)queue interestedPathsForAttributes:(NSArray * _Nullable)interestedPathsForAttributes interestedPathsForEvents:(NSArray * _Nullable)interestedPathsForEvents
 {
     MTR_LOG("%@ addDelegate %@ with interested attribute paths %@ event paths %@", self, delegate, interestedPathsForAttributes, interestedPathsForEvents);
     [self _addDelegate:delegate queue:queue interestedPathsForAttributes:interestedPathsForAttributes interestedPathsForEvents:interestedPathsForEvents];
@@ -841,11 +847,13 @@ static NSString * const sLastInitialSubscribeLatencyKey = @"lastInitialSubscribe
 #endif
 
     if (shouldSetUpSubscription) {
+        MTR_LOG("%@ - starting subscription setup", self);
         // Record the time of first addDelegate call that triggers initial subscribe, and do not reset this value on subsequent addDelegate calls
         if (!_initialSubscribeStart) {
             _initialSubscribeStart = [NSDate now];
         }
         if ([self _deviceUsesThread]) {
+            MTR_LOG(" => %@ - device is a thread device, scheduling in pool", self);
             [self _scheduleSubscriptionPoolWork:^{
                 std::lock_guard lock(self->_lock);
                 [self _setupSubscriptionWithReason:@"delegate is set and scheduled subscription is happening"];
@@ -1298,7 +1306,7 @@ static NSString * const sLastInitialSubscribeLatencyKey = @"lastInitialSubscribe
 
     // Sanity check we are not scheduling for this device multiple times in the pool
     if (_subscriptionPoolWorkCompletionBlock) {
-        MTR_LOG_ERROR("%@ already scheduled in subscription pool for this device - ignoring: %@", self, description);
+        MTR_LOG("%@ already scheduled in subscription pool for this device - ignoring: %@", self, description);
         return;
     }
 
@@ -1307,6 +1315,7 @@ static NSString * const sLastInitialSubscribeLatencyKey = @"lastInitialSubscribe
         // In the case where a resubscription triggering event happened and already established, running the work block should result in a no-op
         MTRAsyncWorkItem * workItem = [[MTRAsyncWorkItem alloc] initWithQueue:self.queue];
         [workItem setReadyHandler:^(id _Nonnull context, NSInteger retryCount, MTRAsyncWorkCompletionBlock _Nonnull completion) {
+            MTR_LOG("%@ - work item is ready to attempt pooled subscription", self);
             os_unfair_lock_lock(&self->_lock);
 #ifdef DEBUG
             [self _callDelegatesWithBlock:^(id testDelegate) {
@@ -1332,6 +1341,7 @@ static NSString * const sLastInitialSubscribeLatencyKey = @"lastInitialSubscribe
             workBlock();
         }];
         [self->_deviceController.concurrentSubscriptionPool enqueueWorkItem:workItem description:description];
+        MTR_LOG("%@ - enqueued in the subscription pool", self);
     });
 }
 
@@ -1381,7 +1391,7 @@ static NSString * const sLastInitialSubscribeLatencyKey = @"lastInitialSubscribe
         dispatch_after(dispatch_time(DISPATCH_TIME_NOW, resubscriptionDelayNs), self.queue, resubscriptionBlock);
     }
 
-    // Set up connectivity monitoring in case network routability changes for the positive, to accellerate resubscription
+    // Set up connectivity monitoring in case network routability changes for the positive, to accelerate resubscription
     [self _setupConnectivityMonitoring];
 }
 
@@ -1389,7 +1399,7 @@ static NSString * const sLastInitialSubscribeLatencyKey = @"lastInitialSubscribe
 {
     std::lock_guard lock(_lock);
 
-    // If we are here, then either we failed to establish initil CASE, or we
+    // If we are here, then either we failed to establish initial CASE, or we
     // failed to send the initial SubscribeRequest message, or our ReadClient
     // has given up completely.  Those all count as "we have tried and failed to
     // subscribe".
@@ -2253,6 +2263,7 @@ static NSString * const sLastInitialSubscribeLatencyKey = @"lastInitialSubscribe
 
 - (void)_setupConnectivityMonitoring
 {
+#if ENABLE_CONNECTIVITY_MONITORING
     // Dispatch to own queue first to avoid deadlock with syncGetCompressedFabricID
     dispatch_async(self.queue, ^{
         // Get the required info before setting up the connectivity monitor
@@ -2277,6 +2288,7 @@ static NSString * const sLastInitialSubscribeLatencyKey = @"lastInitialSubscribe
                                                    errorHandler:nil];
         } queue:self.queue];
     });
+#endif
 }
 
 - (void)_stopConnectivityMonitoring
@@ -3429,6 +3441,13 @@ static BOOL AttributeHasChangesOmittedQuality(MTRAttributePath * attributePath)
         }
         [self _removeClusters:clusterPathsToRemove doRemoveFromDataStore:NO];
         [self.deviceController.controllerDataStore clearStoredClusterDataForNodeID:self.nodeID endpointID:endpoint];
+
+        [_deviceController asyncDispatchToMatterQueue:^{
+            std::lock_guard lock(self->_lock);
+            if (self->_currentSubscriptionCallback) {
+                self->_currentSubscriptionCallback->ClearCachedAttributeState(static_cast<EndpointId>(endpoint.unsignedLongLongValue));
+            }
+        } errorHandler:nil];
     }
 }
 
@@ -3449,6 +3468,17 @@ static BOOL AttributeHasChangesOmittedQuality(MTRAttributePath * attributePath)
         }
     }
     [self _removeClusters:clusterPathsToRemove doRemoveFromDataStore:YES];
+
+    [_deviceController asyncDispatchToMatterQueue:^{
+        std::lock_guard lock(self->_lock);
+        if (self->_currentSubscriptionCallback) {
+            for (NSNumber * cluster in toBeRemovedClusters) {
+                ConcreteClusterPath clusterPath(static_cast<EndpointId>(endpointID.unsignedLongLongValue),
+                    static_cast<ClusterId>(cluster.unsignedLongLongValue));
+                self->_currentSubscriptionCallback->ClearCachedAttributeState(clusterPath);
+            }
+        }
+    } errorHandler:nil];
 }
 
 - (void)_pruneAttributesIn:(MTRDeviceDataValueDictionary)previousAttributeListValue
@@ -3462,6 +3492,18 @@ static BOOL AttributeHasChangesOmittedQuality(MTRAttributePath * attributePath)
 
     [toBeRemovedAttributes minusSet:attributesStillInCluster];
     [self _removeAttributes:toBeRemovedAttributes fromCluster:clusterPath];
+
+    [_deviceController asyncDispatchToMatterQueue:^{
+        std::lock_guard lock(self->_lock);
+        if (self->_currentSubscriptionCallback) {
+            for (NSNumber * attribute in toBeRemovedAttributes) {
+                ConcreteAttributePath attributePath(static_cast<EndpointId>(clusterPath.endpoint.unsignedLongLongValue),
+                    static_cast<ClusterId>(clusterPath.cluster.unsignedLongLongValue),
+                    static_cast<AttributeId>(attribute.unsignedLongLongValue));
+                self->_currentSubscriptionCallback->ClearCachedAttributeState(attributePath);
+            }
+        }
+    } errorHandler:nil];
 }
 
 - (void)_pruneStoredDataForPath:(MTRAttributePath *)attributePath
@@ -3625,7 +3667,9 @@ static BOOL AttributeHasChangesOmittedQuality(MTRAttributePath * attributePath)
         }
     }
 
-    MTR_LOG("%@ report from reported values %@", self, attributePathsToReport);
+    if (attributePathsToReport.count > 0) {
+        MTR_LOG("%@ report from reported values %@", self, attributePathsToReport);
+    }
 
     return attributesToReport;
 }

@@ -14,9 +14,16 @@
  *    See the License for the specific language governing permissions and
  *    limitations under the License.
  */
+
+#include <vector>
+
+#include <pw_unit_test/framework.h>
+
+#include "app/ConcreteCommandPath.h"
 #include <app/codegen-data-model/CodegenDataModel.h>
 
 #include <app/codegen-data-model/tests/AttributeReportIBEncodeDecode.h>
+#include <app/codegen-data-model/tests/EmberInvokeOverride.h>
 #include <app/codegen-data-model/tests/EmberReadWriteOverride.h>
 
 #include <access/AccessControl.h>
@@ -52,9 +59,6 @@
 #include <lib/core/TLVWriter.h>
 #include <lib/support/Span.h>
 
-#include <gtest/gtest.h>
-#include <vector>
-
 using namespace chip;
 using namespace chip::Test;
 using namespace chip::app;
@@ -68,6 +72,9 @@ constexpr NodeId kTestNodeId           = 0xFFFF'1234'ABCD'4321;
 
 constexpr AttributeId kAttributeIdReadOnly   = 0x3001;
 constexpr AttributeId kAttributeIdTimedWrite = 0x3002;
+
+constexpr CommandId kMockCommandId1 = 0x1234;
+constexpr CommandId kMockCommandId2 = 0x1122;
 
 constexpr EndpointId kEndpointIdThatIsMissing = kMockEndpointMin - 1;
 
@@ -2428,6 +2435,47 @@ TEST(TestCodegenModelViaMocks, EmberWriteAttributeAccessInterfaceTest)
     // AAI returning "unknown" has fallback to ember)
     TestEmberScalarTypeWrite<uint32_t, ZCL_INT32U_ATTRIBUTE_TYPE>(1234);
     TestEmberScalarNullWrite<int64_t, ZCL_INT64S_ATTRIBUTE_TYPE>();
+}
+
+TEST(TestCodegenModelViaMocks, EmberInvokeTest)
+{
+    // Ember invoke is fully code-generated - there is a single function for Dispatch
+    // that will do a `switch` on the path elements and invoke a corresponding `emberAf*`
+    // callback.
+    //
+    // The only thing that can be validated is that this `DispatchSingleClusterCommand`
+    // is actually invoked.
+
+    UseMockNodeConfig config(gTestNodeConfig);
+    chip::app::CodegenDataModel model;
+
+    {
+        const ConcreteCommandPath kCommandPath(kMockEndpoint1, MockClusterId(1), kMockCommandId1);
+        const InvokeRequest kInvokeRequest{ .path = kCommandPath };
+        chip::TLV::TLVReader tlvReader;
+
+        const uint32_t kDispatchCountPre = chip::Test::DispatchCount();
+
+        // Using a handler set to nullptr as it is not used by the impl
+        ASSERT_EQ(model.Invoke(kInvokeRequest, tlvReader, /* handler = */ nullptr), CHIP_NO_ERROR);
+
+        EXPECT_EQ(chip::Test::DispatchCount(), kDispatchCountPre + 1); // single dispatch
+        EXPECT_EQ(chip::Test::GetLastDispatchPath(), kCommandPath);    // for the right path
+    }
+
+    {
+        const ConcreteCommandPath kCommandPath(kMockEndpoint1, MockClusterId(1), kMockCommandId2);
+        const InvokeRequest kInvokeRequest{ .path = kCommandPath };
+        chip::TLV::TLVReader tlvReader;
+
+        const uint32_t kDispatchCountPre = chip::Test::DispatchCount();
+
+        // Using a handler set to nullpotr as it is not used by the impl
+        ASSERT_EQ(model.Invoke(kInvokeRequest, tlvReader, /* handler = */ nullptr), CHIP_NO_ERROR);
+
+        EXPECT_EQ(chip::Test::DispatchCount(), kDispatchCountPre + 1); // single dispatch
+        EXPECT_EQ(chip::Test::GetLastDispatchPath(), kCommandPath);    // for the right path
+    }
 }
 
 TEST(TestCodegenModelViaMocks, EmberWriteAttributeAccessInterfaceReturningError)

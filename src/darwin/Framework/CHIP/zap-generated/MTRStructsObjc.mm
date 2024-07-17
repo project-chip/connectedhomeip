@@ -5787,6 +5787,8 @@ NS_ASSUME_NONNULL_BEGIN
         _state = @(0);
 
         _maximumCurrent = @(0);
+
+        _maximumDischargeCurrent = nil;
     }
     return self;
 }
@@ -5798,13 +5800,14 @@ NS_ASSUME_NONNULL_BEGIN
     other.sessionID = self.sessionID;
     other.state = self.state;
     other.maximumCurrent = self.maximumCurrent;
+    other.maximumDischargeCurrent = self.maximumDischargeCurrent;
 
     return other;
 }
 
 - (NSString *)description
 {
-    NSString * descriptionString = [NSString stringWithFormat:@"<%@: sessionID:%@; state:%@; maximumCurrent:%@; >", NSStringFromClass([self class]), _sessionID, _state, _maximumCurrent];
+    NSString * descriptionString = [NSString stringWithFormat:@"<%@: sessionID:%@; state:%@; maximumCurrent:%@; maximumDischargeCurrent:%@; >", NSStringFromClass([self class]), _sessionID, _state, _maximumCurrent, _maximumDischargeCurrent];
     return descriptionString;
 }
 
@@ -5822,6 +5825,8 @@ NS_ASSUME_NONNULL_BEGIN
         _reason = @(0);
 
         _energyTransferred = @(0);
+
+        _energyDischarged = nil;
     }
     return self;
 }
@@ -5834,13 +5839,14 @@ NS_ASSUME_NONNULL_BEGIN
     other.state = self.state;
     other.reason = self.reason;
     other.energyTransferred = self.energyTransferred;
+    other.energyDischarged = self.energyDischarged;
 
     return other;
 }
 
 - (NSString *)description
 {
-    NSString * descriptionString = [NSString stringWithFormat:@"<%@: sessionID:%@; state:%@; reason:%@; energyTransferred:%@; >", NSStringFromClass([self class]), _sessionID, _state, _reason, _energyTransferred];
+    NSString * descriptionString = [NSString stringWithFormat:@"<%@: sessionID:%@; state:%@; reason:%@; energyTransferred:%@; energyDischarged:%@; >", NSStringFromClass([self class]), _sessionID, _state, _reason, _energyTransferred, _energyDischarged];
     return descriptionString;
 }
 
@@ -8380,6 +8386,42 @@ NS_ASSUME_NONNULL_BEGIN
 - (NSString *)description
 {
     NSString * descriptionString = [NSString stringWithFormat:@"<%@: >", NSStringFromClass([self class])];
+    return descriptionString;
+}
+
+@end
+
+@implementation MTRCommissionerControlClusterCommissioningRequestResultEvent
+- (instancetype)init
+{
+    if (self = [super init]) {
+
+        _requestId = @(0);
+
+        _clientNodeId = @(0);
+
+        _statusCode = @(0);
+
+        _fabricIndex = @(0);
+    }
+    return self;
+}
+
+- (id)copyWithZone:(NSZone * _Nullable)zone
+{
+    auto other = [[MTRCommissionerControlClusterCommissioningRequestResultEvent alloc] init];
+
+    other.requestId = self.requestId;
+    other.clientNodeId = self.clientNodeId;
+    other.statusCode = self.statusCode;
+    other.fabricIndex = self.fabricIndex;
+
+    return other;
+}
+
+- (NSString *)description
+{
+    NSString * descriptionString = [NSString stringWithFormat:@"<%@: requestId:%@; clientNodeId:%@; statusCode:%@; fabricIndex:%@; >", NSStringFromClass([self class]), _requestId, _clientNodeId, _statusCode, _fabricIndex];
     return descriptionString;
 }
 
