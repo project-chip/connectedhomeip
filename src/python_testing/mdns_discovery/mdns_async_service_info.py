@@ -22,9 +22,8 @@ from ipaddress import IPv4Address, IPv6Address
 from random import randint
 from typing import TYPE_CHECKING, Dict, List, Optional, Set, Union, cast
 
-from zeroconf import (BadTypeInNameException, DNSAddress, DNSCache, DNSOutgoing, DNSPointer, DNSQuestion, DNSQuestionType,
+from zeroconf import (BadTypeInNameException, DNSAddress, DNSOutgoing, DNSPointer, DNSQuestion, DNSQuestionType,
                       DNSRecord, DNSService, DNSText, ServiceInfo, Zeroconf, current_time_millis, service_type_name)
-from zeroconf._history import QuestionHistory
 from zeroconf._utils.net import _encode_address
 from zeroconf.const import (_CLASS_IN, _DNS_HOST_TTL, _DNS_OTHER_TTL, _DUPLICATE_QUESTION_INTERVAL, _FLAGS_QR_QUERY, _LISTENER_TIME,
                             _MDNS_PORT, _TYPE_A, _TYPE_AAAA, _TYPE_SRV, _TYPE_TXT)
@@ -184,8 +183,6 @@ class MdnsAsyncServiceInfo(ServiceInfo):
         out = DNSOutgoing(_FLAGS_QR_QUERY)
         name = self._name
         server = self.server or name
-        cache = zc.cache
-        history = zc.question_history
         qu_question = question_type is QU_QUESTION
         if record_type is None or record_type is DNSRecordType.SRV:
             print("Requesting MDNS SRV record...")

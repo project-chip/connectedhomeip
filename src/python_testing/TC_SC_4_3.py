@@ -247,6 +247,16 @@ class TC_SC_4_3(MatterBaseTest):
         self.step(8)
 
         # PENDING
+        
+        operational_record_a = await mdns.get_service_by_record_type(
+            service_name=operational_record.server,
+            service_type=MdnsServiceType.OPERATIONAL.value,
+            record_type=DNSRecordType.TXT,
+            log_output=True,
+            load_from_cache=False
+        )
+        
+        
 
         # # *** STEP 9 ***
         # TH verifies the following from the returned records: Hostname: • If (MCORE.COM.WIFI OR MCORE.COM.ETH) target, the hostname must be a
