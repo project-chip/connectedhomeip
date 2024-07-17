@@ -115,19 +115,19 @@ Davis, CA 95616, USA
         <constraint type="maxLength" value="64"/>
       </entry>
       <access read="true" readPrivilege="view"/>
-      <quality changeOmitted="false" nullable="true" scene="false" persistence="volatile" reportable="false"/>
+      <quality changeOmitted="false" nullable="true" scene="false" persistence="volatile" reportable="false" sourceAttribution="false" quieterReporting="false"/>
       <mandatoryConform/>
       <constraint type="maxCount" value="32"/>
     </attribute>
     <attribute id="0x0001" name="CurrentPhase" type="uint8" default="MS">
       <access read="true" readPrivilege="view"/>
-      <quality changeOmitted="false" nullable="true" scene="false" persistence="volatile" reportable="false"/>
+      <quality changeOmitted="false" nullable="true" scene="false" persistence="volatile" reportable="false" sourceAttribution="false" quieterReporting="false"/>
       <mandatoryConform/>
       <constraint type="desc"/>
     </attribute>
     <attribute id="0x0002" name="CountdownTime" type="elapsed-s" default="null">
       <access read="true" readPrivilege="view"/>
-      <quality changeOmitted="false" nullable="true" scene="false" persistence="volatile" reportable="false"/>
+      <quality changeOmitted="false" nullable="true" scene="false" persistence="volatile" reportable="false" sourceAttribution="false" quieterReporting="true"/>
       <optionalConform/>
       <constraint type="max" value="259200"/>
     </attribute>
@@ -180,7 +180,6 @@ Davis, CA 95616, USA
       </otherwiseConform>
     </command>
     <command id="0x04" name="OperationalCommandResponse" direction="responseFromServer">
-      <access invokePrivilege="operate"/>
       <mandatoryConform>
         <orTerm>
           <command name="Pause"/>

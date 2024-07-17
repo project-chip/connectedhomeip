@@ -219,6 +219,9 @@ NSString * MTRClusterNameForID(MTRClusterIDType clusterID)
     case MTRClusterIDTypeElectricalEnergyMeasurementID:
         result = @"ElectricalEnergyMeasurement";
         break;
+    case MTRClusterIDTypeWaterHeaterManagementID:
+        result = @"WaterHeaterManagement";
+        break;
     case MTRClusterIDTypeDemandResponseLoadControlID:
         result = @"DemandResponseLoadControl";
         break;
@@ -371,6 +374,9 @@ NSString * MTRClusterNameForID(MTRClusterIDType clusterID)
         break;
     case MTRClusterIDTypeContentAppObserverID:
         result = @"ContentAppObserver";
+        break;
+    case MTRClusterIDTypeCommissionerControlID:
+        result = @"CommissionerControl";
         break;
     case MTRClusterIDTypeElectricalMeasurementID:
         result = @"ElectricalMeasurement";
@@ -4314,6 +4320,64 @@ NSString * MTRAttributeNameForID(MTRClusterIDType clusterID, MTRAttributeIDType 
             break;
         }
 
+    case MTRClusterIDTypeWaterHeaterManagementID:
+
+        switch (attributeID) {
+
+            // Cluster WaterHeaterManagement attributes
+        case MTRAttributeIDTypeClusterWaterHeaterManagementAttributeHeaterTypesID:
+            result = @"HeaterTypes";
+            break;
+
+        case MTRAttributeIDTypeClusterWaterHeaterManagementAttributeHeatDemandID:
+            result = @"HeatDemand";
+            break;
+
+        case MTRAttributeIDTypeClusterWaterHeaterManagementAttributeTankVolumeID:
+            result = @"TankVolume";
+            break;
+
+        case MTRAttributeIDTypeClusterWaterHeaterManagementAttributeEstimatedHeatRequiredID:
+            result = @"EstimatedHeatRequired";
+            break;
+
+        case MTRAttributeIDTypeClusterWaterHeaterManagementAttributeTankPercentageID:
+            result = @"TankPercentage";
+            break;
+
+        case MTRAttributeIDTypeClusterWaterHeaterManagementAttributeBoostStateID:
+            result = @"BoostState";
+            break;
+
+        case MTRAttributeIDTypeClusterWaterHeaterManagementAttributeGeneratedCommandListID:
+            result = @"GeneratedCommandList";
+            break;
+
+        case MTRAttributeIDTypeClusterWaterHeaterManagementAttributeAcceptedCommandListID:
+            result = @"AcceptedCommandList";
+            break;
+
+        case MTRAttributeIDTypeClusterWaterHeaterManagementAttributeEventListID:
+            result = @"EventList";
+            break;
+
+        case MTRAttributeIDTypeClusterWaterHeaterManagementAttributeAttributeListID:
+            result = @"AttributeList";
+            break;
+
+        case MTRAttributeIDTypeClusterWaterHeaterManagementAttributeFeatureMapID:
+            result = @"FeatureMap";
+            break;
+
+        case MTRAttributeIDTypeClusterWaterHeaterManagementAttributeClusterRevisionID:
+            result = @"ClusterRevision";
+            break;
+
+        default:
+            result = [NSString stringWithFormat:@"<Unknown attributeID %d>", attributeID];
+            break;
+        }
+
     case MTRClusterIDTypeDemandResponseLoadControlID:
 
         switch (attributeID) {
@@ -8068,6 +8132,44 @@ NSString * MTRAttributeNameForID(MTRClusterIDType clusterID, MTRAttributeIDType 
             break;
 
         case MTRAttributeIDTypeClusterContentAppObserverAttributeClusterRevisionID:
+            result = @"ClusterRevision";
+            break;
+
+        default:
+            result = [NSString stringWithFormat:@"<Unknown attributeID %d>", attributeID];
+            break;
+        }
+
+    case MTRClusterIDTypeCommissionerControlID:
+
+        switch (attributeID) {
+
+            // Cluster CommissionerControl attributes
+        case MTRAttributeIDTypeClusterCommissionerControlAttributeSupportedDeviceCategoriesID:
+            result = @"SupportedDeviceCategories";
+            break;
+
+        case MTRAttributeIDTypeClusterCommissionerControlAttributeGeneratedCommandListID:
+            result = @"GeneratedCommandList";
+            break;
+
+        case MTRAttributeIDTypeClusterCommissionerControlAttributeAcceptedCommandListID:
+            result = @"AcceptedCommandList";
+            break;
+
+        case MTRAttributeIDTypeClusterCommissionerControlAttributeEventListID:
+            result = @"EventList";
+            break;
+
+        case MTRAttributeIDTypeClusterCommissionerControlAttributeAttributeListID:
+            result = @"AttributeList";
+            break;
+
+        case MTRAttributeIDTypeClusterCommissionerControlAttributeFeatureMapID:
+            result = @"FeatureMap";
+            break;
+
+        case MTRAttributeIDTypeClusterCommissionerControlAttributeClusterRevisionID:
             result = @"ClusterRevision";
             break;
 

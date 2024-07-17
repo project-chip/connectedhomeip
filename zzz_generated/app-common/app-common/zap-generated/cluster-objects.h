@@ -20877,6 +20877,239 @@ public:
 } // namespace PeriodicEnergyMeasured
 } // namespace Events
 } // namespace ElectricalEnergyMeasurement
+namespace WaterHeaterManagement {
+
+namespace Commands {
+// Forward-declarations so we can reference these later.
+
+namespace Boost {
+struct Type;
+struct DecodableType;
+} // namespace Boost
+
+namespace CancelBoost {
+struct Type;
+struct DecodableType;
+} // namespace CancelBoost
+
+} // namespace Commands
+
+namespace Commands {
+namespace Boost {
+enum class Fields : uint8_t
+{
+    kDuration          = 0,
+    kOneShot           = 1,
+    kEmergencyBoost    = 2,
+    kTemporarySetpoint = 3,
+    kTargetPercentage  = 4,
+    kTargetReheat      = 5,
+};
+
+struct Type
+{
+public:
+    // Use GetCommandId instead of commandId directly to avoid naming conflict with CommandIdentification in ExecutionOfACommand
+    static constexpr CommandId GetCommandId() { return Commands::Boost::Id; }
+    static constexpr ClusterId GetClusterId() { return Clusters::WaterHeaterManagement::Id; }
+
+    uint32_t duration = static_cast<uint32_t>(0);
+    Optional<bool> oneShot;
+    Optional<bool> emergencyBoost;
+    Optional<int16_t> temporarySetpoint;
+    Optional<chip::Percent> targetPercentage;
+    Optional<chip::Percent> targetReheat;
+
+    CHIP_ERROR Encode(TLV::TLVWriter & aWriter, TLV::Tag aTag) const;
+
+    using ResponseType = DataModel::NullObjectType;
+
+    static constexpr bool MustUseTimedInvoke() { return false; }
+};
+
+struct DecodableType
+{
+public:
+    static constexpr CommandId GetCommandId() { return Commands::Boost::Id; }
+    static constexpr ClusterId GetClusterId() { return Clusters::WaterHeaterManagement::Id; }
+
+    uint32_t duration = static_cast<uint32_t>(0);
+    Optional<bool> oneShot;
+    Optional<bool> emergencyBoost;
+    Optional<int16_t> temporarySetpoint;
+    Optional<chip::Percent> targetPercentage;
+    Optional<chip::Percent> targetReheat;
+    CHIP_ERROR Decode(TLV::TLVReader & reader);
+};
+}; // namespace Boost
+namespace CancelBoost {
+enum class Fields : uint8_t
+{
+};
+
+struct Type
+{
+public:
+    // Use GetCommandId instead of commandId directly to avoid naming conflict with CommandIdentification in ExecutionOfACommand
+    static constexpr CommandId GetCommandId() { return Commands::CancelBoost::Id; }
+    static constexpr ClusterId GetClusterId() { return Clusters::WaterHeaterManagement::Id; }
+
+    CHIP_ERROR Encode(TLV::TLVWriter & aWriter, TLV::Tag aTag) const;
+
+    using ResponseType = DataModel::NullObjectType;
+
+    static constexpr bool MustUseTimedInvoke() { return false; }
+};
+
+struct DecodableType
+{
+public:
+    static constexpr CommandId GetCommandId() { return Commands::CancelBoost::Id; }
+    static constexpr ClusterId GetClusterId() { return Clusters::WaterHeaterManagement::Id; }
+
+    CHIP_ERROR Decode(TLV::TLVReader & reader);
+};
+}; // namespace CancelBoost
+} // namespace Commands
+
+namespace Attributes {
+
+namespace HeaterTypes {
+struct TypeInfo
+{
+    using Type             = chip::BitMask<chip::app::Clusters::WaterHeaterManagement::WaterHeaterTypeBitmap>;
+    using DecodableType    = chip::BitMask<chip::app::Clusters::WaterHeaterManagement::WaterHeaterTypeBitmap>;
+    using DecodableArgType = chip::BitMask<chip::app::Clusters::WaterHeaterManagement::WaterHeaterTypeBitmap>;
+
+    static constexpr ClusterId GetClusterId() { return Clusters::WaterHeaterManagement::Id; }
+    static constexpr AttributeId GetAttributeId() { return Attributes::HeaterTypes::Id; }
+    static constexpr bool MustUseTimedWrite() { return false; }
+};
+} // namespace HeaterTypes
+namespace HeatDemand {
+struct TypeInfo
+{
+    using Type             = chip::BitMask<chip::app::Clusters::WaterHeaterManagement::WaterHeaterDemandBitmap>;
+    using DecodableType    = chip::BitMask<chip::app::Clusters::WaterHeaterManagement::WaterHeaterDemandBitmap>;
+    using DecodableArgType = chip::BitMask<chip::app::Clusters::WaterHeaterManagement::WaterHeaterDemandBitmap>;
+
+    static constexpr ClusterId GetClusterId() { return Clusters::WaterHeaterManagement::Id; }
+    static constexpr AttributeId GetAttributeId() { return Attributes::HeatDemand::Id; }
+    static constexpr bool MustUseTimedWrite() { return false; }
+};
+} // namespace HeatDemand
+namespace TankVolume {
+struct TypeInfo
+{
+    using Type             = uint16_t;
+    using DecodableType    = uint16_t;
+    using DecodableArgType = uint16_t;
+
+    static constexpr ClusterId GetClusterId() { return Clusters::WaterHeaterManagement::Id; }
+    static constexpr AttributeId GetAttributeId() { return Attributes::TankVolume::Id; }
+    static constexpr bool MustUseTimedWrite() { return false; }
+};
+} // namespace TankVolume
+namespace EstimatedHeatRequired {
+struct TypeInfo
+{
+    using Type             = int64_t;
+    using DecodableType    = int64_t;
+    using DecodableArgType = int64_t;
+
+    static constexpr ClusterId GetClusterId() { return Clusters::WaterHeaterManagement::Id; }
+    static constexpr AttributeId GetAttributeId() { return Attributes::EstimatedHeatRequired::Id; }
+    static constexpr bool MustUseTimedWrite() { return false; }
+};
+} // namespace EstimatedHeatRequired
+namespace TankPercentage {
+struct TypeInfo
+{
+    using Type             = chip::Percent;
+    using DecodableType    = chip::Percent;
+    using DecodableArgType = chip::Percent;
+
+    static constexpr ClusterId GetClusterId() { return Clusters::WaterHeaterManagement::Id; }
+    static constexpr AttributeId GetAttributeId() { return Attributes::TankPercentage::Id; }
+    static constexpr bool MustUseTimedWrite() { return false; }
+};
+} // namespace TankPercentage
+namespace BoostState {
+struct TypeInfo
+{
+    using Type             = chip::app::Clusters::WaterHeaterManagement::BoostStateEnum;
+    using DecodableType    = chip::app::Clusters::WaterHeaterManagement::BoostStateEnum;
+    using DecodableArgType = chip::app::Clusters::WaterHeaterManagement::BoostStateEnum;
+
+    static constexpr ClusterId GetClusterId() { return Clusters::WaterHeaterManagement::Id; }
+    static constexpr AttributeId GetAttributeId() { return Attributes::BoostState::Id; }
+    static constexpr bool MustUseTimedWrite() { return false; }
+};
+} // namespace BoostState
+namespace GeneratedCommandList {
+struct TypeInfo : public Clusters::Globals::Attributes::GeneratedCommandList::TypeInfo
+{
+    static constexpr ClusterId GetClusterId() { return Clusters::WaterHeaterManagement::Id; }
+};
+} // namespace GeneratedCommandList
+namespace AcceptedCommandList {
+struct TypeInfo : public Clusters::Globals::Attributes::AcceptedCommandList::TypeInfo
+{
+    static constexpr ClusterId GetClusterId() { return Clusters::WaterHeaterManagement::Id; }
+};
+} // namespace AcceptedCommandList
+namespace EventList {
+struct TypeInfo : public Clusters::Globals::Attributes::EventList::TypeInfo
+{
+    static constexpr ClusterId GetClusterId() { return Clusters::WaterHeaterManagement::Id; }
+};
+} // namespace EventList
+namespace AttributeList {
+struct TypeInfo : public Clusters::Globals::Attributes::AttributeList::TypeInfo
+{
+    static constexpr ClusterId GetClusterId() { return Clusters::WaterHeaterManagement::Id; }
+};
+} // namespace AttributeList
+namespace FeatureMap {
+struct TypeInfo : public Clusters::Globals::Attributes::FeatureMap::TypeInfo
+{
+    static constexpr ClusterId GetClusterId() { return Clusters::WaterHeaterManagement::Id; }
+};
+} // namespace FeatureMap
+namespace ClusterRevision {
+struct TypeInfo : public Clusters::Globals::Attributes::ClusterRevision::TypeInfo
+{
+    static constexpr ClusterId GetClusterId() { return Clusters::WaterHeaterManagement::Id; }
+};
+} // namespace ClusterRevision
+
+struct TypeInfo
+{
+    struct DecodableType
+    {
+        static constexpr ClusterId GetClusterId() { return Clusters::WaterHeaterManagement::Id; }
+
+        CHIP_ERROR Decode(TLV::TLVReader & reader, const ConcreteAttributePath & path);
+
+        Attributes::HeaterTypes::TypeInfo::DecodableType heaterTypes =
+            static_cast<chip::BitMask<chip::app::Clusters::WaterHeaterManagement::WaterHeaterTypeBitmap>>(0);
+        Attributes::HeatDemand::TypeInfo::DecodableType heatDemand =
+            static_cast<chip::BitMask<chip::app::Clusters::WaterHeaterManagement::WaterHeaterDemandBitmap>>(0);
+        Attributes::TankVolume::TypeInfo::DecodableType tankVolume                       = static_cast<uint16_t>(0);
+        Attributes::EstimatedHeatRequired::TypeInfo::DecodableType estimatedHeatRequired = static_cast<int64_t>(0);
+        Attributes::TankPercentage::TypeInfo::DecodableType tankPercentage               = static_cast<chip::Percent>(0);
+        Attributes::BoostState::TypeInfo::DecodableType boostState =
+            static_cast<chip::app::Clusters::WaterHeaterManagement::BoostStateEnum>(0);
+        Attributes::GeneratedCommandList::TypeInfo::DecodableType generatedCommandList;
+        Attributes::AcceptedCommandList::TypeInfo::DecodableType acceptedCommandList;
+        Attributes::EventList::TypeInfo::DecodableType eventList;
+        Attributes::AttributeList::TypeInfo::DecodableType attributeList;
+        Attributes::FeatureMap::TypeInfo::DecodableType featureMap           = static_cast<uint32_t>(0);
+        Attributes::ClusterRevision::TypeInfo::DecodableType clusterRevision = static_cast<uint16_t>(0);
+    };
+};
+} // namespace Attributes
+} // namespace WaterHeaterManagement
 namespace DemandResponseLoadControl {
 namespace Structs {
 namespace HeatingSourceControlStruct {
@@ -23573,9 +23806,10 @@ static constexpr PriorityLevel kPriorityLevel = PriorityLevel::Info;
 
 enum class Fields : uint8_t
 {
-    kSessionID      = 0,
-    kState          = 1,
-    kMaximumCurrent = 2,
+    kSessionID               = 0,
+    kState                   = 1,
+    kMaximumCurrent          = 2,
+    kMaximumDischargeCurrent = 3,
 };
 
 struct Type
@@ -23589,6 +23823,7 @@ public:
     uint32_t sessionID     = static_cast<uint32_t>(0);
     StateEnum state        = static_cast<StateEnum>(0);
     int64_t maximumCurrent = static_cast<int64_t>(0);
+    Optional<int64_t> maximumDischargeCurrent;
 
     CHIP_ERROR Encode(TLV::TLVWriter & aWriter, TLV::Tag aTag) const;
 };
@@ -23603,6 +23838,7 @@ public:
     uint32_t sessionID     = static_cast<uint32_t>(0);
     StateEnum state        = static_cast<StateEnum>(0);
     int64_t maximumCurrent = static_cast<int64_t>(0);
+    Optional<int64_t> maximumDischargeCurrent;
 
     CHIP_ERROR Decode(TLV::TLVReader & reader);
 };
@@ -23616,6 +23852,7 @@ enum class Fields : uint8_t
     kState             = 1,
     kReason            = 2,
     kEnergyTransferred = 4,
+    kEnergyDischarged  = 5,
 };
 
 struct Type
@@ -23630,6 +23867,7 @@ public:
     StateEnum state                        = static_cast<StateEnum>(0);
     EnergyTransferStoppedReasonEnum reason = static_cast<EnergyTransferStoppedReasonEnum>(0);
     int64_t energyTransferred              = static_cast<int64_t>(0);
+    Optional<int64_t> energyDischarged;
 
     CHIP_ERROR Encode(TLV::TLVWriter & aWriter, TLV::Tag aTag) const;
 };
@@ -23645,6 +23883,7 @@ public:
     StateEnum state                        = static_cast<StateEnum>(0);
     EnergyTransferStoppedReasonEnum reason = static_cast<EnergyTransferStoppedReasonEnum>(0);
     int64_t energyTransferred              = static_cast<int64_t>(0);
+    Optional<int64_t> energyDischarged;
 
     CHIP_ERROR Decode(TLV::TLVReader & reader);
 };
@@ -40767,6 +41006,274 @@ struct TypeInfo
 };
 } // namespace Attributes
 } // namespace ContentAppObserver
+namespace CommissionerControl {
+
+namespace Commands {
+// Forward-declarations so we can reference these later.
+
+namespace RequestCommissioningApproval {
+struct Type;
+struct DecodableType;
+} // namespace RequestCommissioningApproval
+
+namespace CommissionNode {
+struct Type;
+struct DecodableType;
+} // namespace CommissionNode
+
+namespace ReverseOpenCommissioningWindow {
+struct Type;
+struct DecodableType;
+} // namespace ReverseOpenCommissioningWindow
+
+} // namespace Commands
+
+namespace Commands {
+namespace RequestCommissioningApproval {
+enum class Fields : uint8_t
+{
+    kRequestId = 0,
+    kVendorId  = 1,
+    kProductId = 2,
+    kLabel     = 3,
+};
+
+struct Type
+{
+public:
+    // Use GetCommandId instead of commandId directly to avoid naming conflict with CommandIdentification in ExecutionOfACommand
+    static constexpr CommandId GetCommandId() { return Commands::RequestCommissioningApproval::Id; }
+    static constexpr ClusterId GetClusterId() { return Clusters::CommissionerControl::Id; }
+
+    uint64_t requestId      = static_cast<uint64_t>(0);
+    chip::VendorId vendorId = static_cast<chip::VendorId>(0);
+    uint16_t productId      = static_cast<uint16_t>(0);
+    Optional<chip::CharSpan> label;
+
+    CHIP_ERROR Encode(TLV::TLVWriter & aWriter, TLV::Tag aTag) const;
+
+    using ResponseType = DataModel::NullObjectType;
+
+    static constexpr bool MustUseTimedInvoke() { return false; }
+};
+
+struct DecodableType
+{
+public:
+    static constexpr CommandId GetCommandId() { return Commands::RequestCommissioningApproval::Id; }
+    static constexpr ClusterId GetClusterId() { return Clusters::CommissionerControl::Id; }
+
+    uint64_t requestId      = static_cast<uint64_t>(0);
+    chip::VendorId vendorId = static_cast<chip::VendorId>(0);
+    uint16_t productId      = static_cast<uint16_t>(0);
+    Optional<chip::CharSpan> label;
+    CHIP_ERROR Decode(TLV::TLVReader & reader);
+};
+}; // namespace RequestCommissioningApproval
+namespace CommissionNode {
+enum class Fields : uint8_t
+{
+    kRequestId              = 0,
+    kResponseTimeoutSeconds = 1,
+    kIpAddress              = 2,
+    kPort                   = 3,
+};
+
+struct Type
+{
+public:
+    // Use GetCommandId instead of commandId directly to avoid naming conflict with CommandIdentification in ExecutionOfACommand
+    static constexpr CommandId GetCommandId() { return Commands::CommissionNode::Id; }
+    static constexpr ClusterId GetClusterId() { return Clusters::CommissionerControl::Id; }
+
+    uint64_t requestId              = static_cast<uint64_t>(0);
+    uint16_t responseTimeoutSeconds = static_cast<uint16_t>(0);
+    Optional<chip::ByteSpan> ipAddress;
+    Optional<uint16_t> port;
+
+    CHIP_ERROR Encode(TLV::TLVWriter & aWriter, TLV::Tag aTag) const;
+
+    using ResponseType = Clusters::CommissionerControl::Commands::ReverseOpenCommissioningWindow::DecodableType;
+
+    static constexpr bool MustUseTimedInvoke() { return false; }
+};
+
+struct DecodableType
+{
+public:
+    static constexpr CommandId GetCommandId() { return Commands::CommissionNode::Id; }
+    static constexpr ClusterId GetClusterId() { return Clusters::CommissionerControl::Id; }
+
+    uint64_t requestId              = static_cast<uint64_t>(0);
+    uint16_t responseTimeoutSeconds = static_cast<uint16_t>(0);
+    Optional<chip::ByteSpan> ipAddress;
+    Optional<uint16_t> port;
+    CHIP_ERROR Decode(TLV::TLVReader & reader);
+};
+}; // namespace CommissionNode
+namespace ReverseOpenCommissioningWindow {
+enum class Fields : uint8_t
+{
+    kCommissioningTimeout = 0,
+    kPAKEPasscodeVerifier = 1,
+    kDiscriminator        = 2,
+    kIterations           = 3,
+    kSalt                 = 4,
+};
+
+struct Type
+{
+public:
+    // Use GetCommandId instead of commandId directly to avoid naming conflict with CommandIdentification in ExecutionOfACommand
+    static constexpr CommandId GetCommandId() { return Commands::ReverseOpenCommissioningWindow::Id; }
+    static constexpr ClusterId GetClusterId() { return Clusters::CommissionerControl::Id; }
+
+    uint16_t commissioningTimeout = static_cast<uint16_t>(0);
+    chip::ByteSpan PAKEPasscodeVerifier;
+    uint16_t discriminator = static_cast<uint16_t>(0);
+    uint32_t iterations    = static_cast<uint32_t>(0);
+    chip::ByteSpan salt;
+
+    CHIP_ERROR Encode(TLV::TLVWriter & aWriter, TLV::Tag aTag) const;
+
+    using ResponseType = DataModel::NullObjectType;
+
+    static constexpr bool MustUseTimedInvoke() { return false; }
+};
+
+struct DecodableType
+{
+public:
+    static constexpr CommandId GetCommandId() { return Commands::ReverseOpenCommissioningWindow::Id; }
+    static constexpr ClusterId GetClusterId() { return Clusters::CommissionerControl::Id; }
+
+    uint16_t commissioningTimeout = static_cast<uint16_t>(0);
+    chip::ByteSpan PAKEPasscodeVerifier;
+    uint16_t discriminator = static_cast<uint16_t>(0);
+    uint32_t iterations    = static_cast<uint32_t>(0);
+    chip::ByteSpan salt;
+    CHIP_ERROR Decode(TLV::TLVReader & reader);
+};
+}; // namespace ReverseOpenCommissioningWindow
+} // namespace Commands
+
+namespace Attributes {
+
+namespace SupportedDeviceCategories {
+struct TypeInfo
+{
+    using Type             = chip::BitMask<chip::app::Clusters::CommissionerControl::SupportedDeviceCategoryBitmap>;
+    using DecodableType    = chip::BitMask<chip::app::Clusters::CommissionerControl::SupportedDeviceCategoryBitmap>;
+    using DecodableArgType = chip::BitMask<chip::app::Clusters::CommissionerControl::SupportedDeviceCategoryBitmap>;
+
+    static constexpr ClusterId GetClusterId() { return Clusters::CommissionerControl::Id; }
+    static constexpr AttributeId GetAttributeId() { return Attributes::SupportedDeviceCategories::Id; }
+    static constexpr bool MustUseTimedWrite() { return false; }
+};
+} // namespace SupportedDeviceCategories
+namespace GeneratedCommandList {
+struct TypeInfo : public Clusters::Globals::Attributes::GeneratedCommandList::TypeInfo
+{
+    static constexpr ClusterId GetClusterId() { return Clusters::CommissionerControl::Id; }
+};
+} // namespace GeneratedCommandList
+namespace AcceptedCommandList {
+struct TypeInfo : public Clusters::Globals::Attributes::AcceptedCommandList::TypeInfo
+{
+    static constexpr ClusterId GetClusterId() { return Clusters::CommissionerControl::Id; }
+};
+} // namespace AcceptedCommandList
+namespace EventList {
+struct TypeInfo : public Clusters::Globals::Attributes::EventList::TypeInfo
+{
+    static constexpr ClusterId GetClusterId() { return Clusters::CommissionerControl::Id; }
+};
+} // namespace EventList
+namespace AttributeList {
+struct TypeInfo : public Clusters::Globals::Attributes::AttributeList::TypeInfo
+{
+    static constexpr ClusterId GetClusterId() { return Clusters::CommissionerControl::Id; }
+};
+} // namespace AttributeList
+namespace FeatureMap {
+struct TypeInfo : public Clusters::Globals::Attributes::FeatureMap::TypeInfo
+{
+    static constexpr ClusterId GetClusterId() { return Clusters::CommissionerControl::Id; }
+};
+} // namespace FeatureMap
+namespace ClusterRevision {
+struct TypeInfo : public Clusters::Globals::Attributes::ClusterRevision::TypeInfo
+{
+    static constexpr ClusterId GetClusterId() { return Clusters::CommissionerControl::Id; }
+};
+} // namespace ClusterRevision
+
+struct TypeInfo
+{
+    struct DecodableType
+    {
+        static constexpr ClusterId GetClusterId() { return Clusters::CommissionerControl::Id; }
+
+        CHIP_ERROR Decode(TLV::TLVReader & reader, const ConcreteAttributePath & path);
+
+        Attributes::SupportedDeviceCategories::TypeInfo::DecodableType supportedDeviceCategories =
+            static_cast<chip::BitMask<chip::app::Clusters::CommissionerControl::SupportedDeviceCategoryBitmap>>(0);
+        Attributes::GeneratedCommandList::TypeInfo::DecodableType generatedCommandList;
+        Attributes::AcceptedCommandList::TypeInfo::DecodableType acceptedCommandList;
+        Attributes::EventList::TypeInfo::DecodableType eventList;
+        Attributes::AttributeList::TypeInfo::DecodableType attributeList;
+        Attributes::FeatureMap::TypeInfo::DecodableType featureMap           = static_cast<uint32_t>(0);
+        Attributes::ClusterRevision::TypeInfo::DecodableType clusterRevision = static_cast<uint16_t>(0);
+    };
+};
+} // namespace Attributes
+namespace Events {
+namespace CommissioningRequestResult {
+static constexpr PriorityLevel kPriorityLevel = PriorityLevel::Info;
+
+enum class Fields : uint8_t
+{
+    kRequestId    = 0,
+    kClientNodeId = 1,
+    kStatusCode   = 2,
+    kFabricIndex  = 254,
+};
+
+struct Type
+{
+public:
+    static constexpr PriorityLevel GetPriorityLevel() { return kPriorityLevel; }
+    static constexpr EventId GetEventId() { return Events::CommissioningRequestResult::Id; }
+    static constexpr ClusterId GetClusterId() { return Clusters::CommissionerControl::Id; }
+    static constexpr bool kIsFabricScoped = true;
+
+    uint64_t requestId            = static_cast<uint64_t>(0);
+    chip::NodeId clientNodeId     = static_cast<chip::NodeId>(0);
+    uint8_t statusCode            = static_cast<uint8_t>(0);
+    chip::FabricIndex fabricIndex = static_cast<chip::FabricIndex>(0);
+
+    auto GetFabricIndex() const { return fabricIndex; }
+
+    CHIP_ERROR Encode(TLV::TLVWriter & aWriter, TLV::Tag aTag) const;
+};
+
+struct DecodableType
+{
+public:
+    static constexpr PriorityLevel GetPriorityLevel() { return kPriorityLevel; }
+    static constexpr EventId GetEventId() { return Events::CommissioningRequestResult::Id; }
+    static constexpr ClusterId GetClusterId() { return Clusters::CommissionerControl::Id; }
+
+    uint64_t requestId            = static_cast<uint64_t>(0);
+    chip::NodeId clientNodeId     = static_cast<chip::NodeId>(0);
+    uint8_t statusCode            = static_cast<uint8_t>(0);
+    chip::FabricIndex fabricIndex = static_cast<chip::FabricIndex>(0);
+
+    CHIP_ERROR Decode(TLV::TLVReader & reader);
+};
+} // namespace CommissioningRequestResult
+} // namespace Events
+} // namespace CommissionerControl
 namespace ElectricalMeasurement {
 
 namespace Commands {

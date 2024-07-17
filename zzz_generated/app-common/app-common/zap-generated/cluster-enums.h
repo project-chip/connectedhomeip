@@ -2406,6 +2406,48 @@ enum class Feature : uint32_t
 };
 } // namespace ElectricalEnergyMeasurement
 
+namespace WaterHeaterManagement {
+
+// Enum for BoostStateEnum
+enum class BoostStateEnum : uint8_t
+{
+    kInactive = 0x00,
+    kActive   = 0x01,
+    // All received enum values that are not listed above will be mapped
+    // to kUnknownEnumValue. This is a helper enum value that should only
+    // be used by code to process how it handles receiving and unknown
+    // enum value. This specific should never be transmitted.
+    kUnknownEnumValue = 2,
+};
+
+// Bitmap for Feature
+enum class Feature : uint32_t
+{
+    kEnergyManagement = 0x1,
+    kTankPercent      = 0x2,
+};
+
+// Bitmap for WaterHeaterDemandBitmap
+enum class WaterHeaterDemandBitmap : uint8_t
+{
+    kImmersionElement1 = 0x1,
+    kImmersionElement2 = 0x2,
+    kHeatPump          = 0x4,
+    kBoiler            = 0x8,
+    kOther             = 0x10,
+};
+
+// Bitmap for WaterHeaterTypeBitmap
+enum class WaterHeaterTypeBitmap : uint8_t
+{
+    kImmersionElement1 = 0x1,
+    kImmersionElement2 = 0x2,
+    kHeatPump          = 0x4,
+    kBoiler            = 0x8,
+    kOther             = 0x10,
+};
+} // namespace WaterHeaterManagement
+
 namespace DemandResponseLoadControl {
 
 // Enum for CriticalityLevelEnum
@@ -2784,11 +2826,12 @@ enum class SupplyStateEnum : uint8_t
     kDischargingEnabled  = 0x02,
     kDisabledError       = 0x03,
     kDisabledDiagnostics = 0x04,
+    kEnabled             = 0x05,
     // All received enum values that are not listed above will be mapped
     // to kUnknownEnumValue. This is a helper enum value that should only
     // be used by code to process how it handles receiving and unknown
     // enum value. This specific should never be transmitted.
-    kUnknownEnumValue = 5,
+    kUnknownEnumValue = 6,
 };
 
 // Bitmap for Feature
@@ -5136,6 +5179,15 @@ enum class StatusEnum : uint8_t
     kUnknownEnumValue = 2,
 };
 } // namespace ContentAppObserver
+
+namespace CommissionerControl {
+
+// Bitmap for SupportedDeviceCategoryBitmap
+enum class SupportedDeviceCategoryBitmap : uint32_t
+{
+    kFabricSynchronization = 0x1,
+};
+} // namespace CommissionerControl
 
 namespace ElectricalMeasurement {} // namespace ElectricalMeasurement
 

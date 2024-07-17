@@ -164,6 +164,7 @@ eventstructs_sources = [
   "${chip_root}/src/controller/java/generated/java/chip/devicecontroller/cluster/eventstructs/BooleanStateConfigurationClusterSensorFaultEvent.kt",
   "${chip_root}/src/controller/java/generated/java/chip/devicecontroller/cluster/eventstructs/BridgedDeviceBasicInformationClusterReachableChangedEvent.kt",
   "${chip_root}/src/controller/java/generated/java/chip/devicecontroller/cluster/eventstructs/BridgedDeviceBasicInformationClusterStartUpEvent.kt",
+  "${chip_root}/src/controller/java/generated/java/chip/devicecontroller/cluster/eventstructs/CommissionerControlClusterCommissioningRequestResultEvent.kt",
   "${chip_root}/src/controller/java/generated/java/chip/devicecontroller/cluster/eventstructs/DemandResponseLoadControlClusterLoadControlEventStatusChangeEvent.kt",
   "${chip_root}/src/controller/java/generated/java/chip/devicecontroller/cluster/eventstructs/DeviceEnergyManagementClusterPowerAdjustEndEvent.kt",
   "${chip_root}/src/controller/java/generated/java/chip/devicecontroller/cluster/eventstructs/DeviceEnergyManagementClusterResumedEvent.kt",

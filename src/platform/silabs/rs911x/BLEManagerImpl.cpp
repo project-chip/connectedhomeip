@@ -253,8 +253,8 @@ CHIP_ERROR BLEManagerImpl::_Init()
     sl_rs_ble_init_sem = osSemaphoreNew(1, 0, NULL);
     sl_ble_event_sem   = osSemaphoreNew(1, 0, NULL);
 
-    wfx_rsi.ble_task = xTaskCreateStatic((TaskFunction_t) sl_ble_event_handling_task, "rsi_ble", WFX_RSI_TASK_SZ, NULL, 1,
-                                         wfxBLETaskStack, &rsiBLETaskStruct);
+    wfx_rsi.ble_task = xTaskCreateStatic((TaskFunction_t) sl_ble_event_handling_task, "rsi_ble", WFX_RSI_TASK_SZ, NULL,
+                                         BLE_DRIVER_TASK_PRIORITY, wfxBLETaskStack, &rsiBLETaskStruct);
 
     if (wfx_rsi.ble_task == NULL)
     {
@@ -419,7 +419,6 @@ void BLEManagerImpl::_OnPlatformEvent(const ChipDeviceEvent * event)
 
     case DeviceEventType::kCHIPoBLEIndicateConfirm: {
         ChipLogProgress(DeviceLayer, "_OnPlatformEvent kCHIPoBLEIndicateConfirm");
-        DeviceLayer::SystemLayer().CancelTimer(OnSendIndicationTimeout, this);
         HandleIndicationConfirmation(event->CHIPoBLEIndicateConfirm.ConId, &CHIP_BLE_SVC_ID, &Ble::CHIP_BLE_CHAR_2_UUID);
     }
     break;
@@ -924,6 +923,10 @@ exit:
 
 void BLEManagerImpl::HandleTxConfirmationEvent(BLE_CONNECTION_OBJECT conId)
 {
+    DeviceLayer::PlatformMgr().LockChipStack();
+    // stop the indication confirmation timer
+    DeviceLayer::SystemLayer().CancelTimer(OnSendIndicationTimeout, this);
+    DeviceLayer::PlatformMgr().UnlockChipStack();
     ChipDeviceEvent event;
     event.Type                          = DeviceEventType::kCHIPoBLEIndicateConfirm;
     event.CHIPoBLEIndicateConfirm.ConId = conId;

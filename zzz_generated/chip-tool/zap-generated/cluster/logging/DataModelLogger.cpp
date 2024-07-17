@@ -6850,6 +6850,14 @@ CHIP_ERROR DataModelLogger::LogValue(const char * label, size_t indent,
             return err;
         }
     }
+    {
+        CHIP_ERROR err = DataModelLogger::LogValue("MaximumDischargeCurrent", indent + 1, value.maximumDischargeCurrent);
+        if (err != CHIP_NO_ERROR)
+        {
+            DataModelLogger::LogString(indent + 1, "Event truncated due to invalid value for 'MaximumDischargeCurrent'");
+            return err;
+        }
+    }
     DataModelLogger::LogString(indent, "}");
 
     return CHIP_NO_ERROR;
@@ -6887,6 +6895,14 @@ CHIP_ERROR DataModelLogger::LogValue(const char * label, size_t indent,
         if (err != CHIP_NO_ERROR)
         {
             DataModelLogger::LogString(indent + 1, "Event truncated due to invalid value for 'EnergyTransferred'");
+            return err;
+        }
+    }
+    {
+        CHIP_ERROR err = DataModelLogger::LogValue("EnergyDischarged", indent + 1, value.energyDischarged);
+        if (err != CHIP_NO_ERROR)
+        {
+            DataModelLogger::LogString(indent + 1, "Event truncated due to invalid value for 'EnergyDischarged'");
             return err;
         }
     }
@@ -7448,6 +7464,46 @@ CHIP_ERROR DataModelLogger::LogValue(const char * label, size_t indent,
                                      const ContentControl::Events::RemainingScreenTimeExpired::DecodableType & value)
 {
     DataModelLogger::LogString(label, indent, "{");
+    DataModelLogger::LogString(indent, "}");
+
+    return CHIP_NO_ERROR;
+}
+CHIP_ERROR DataModelLogger::LogValue(const char * label, size_t indent,
+                                     const CommissionerControl::Events::CommissioningRequestResult::DecodableType & value)
+{
+    DataModelLogger::LogString(label, indent, "{");
+    {
+        CHIP_ERROR err = DataModelLogger::LogValue("RequestId", indent + 1, value.requestId);
+        if (err != CHIP_NO_ERROR)
+        {
+            DataModelLogger::LogString(indent + 1, "Event truncated due to invalid value for 'RequestId'");
+            return err;
+        }
+    }
+    {
+        CHIP_ERROR err = DataModelLogger::LogValue("ClientNodeId", indent + 1, value.clientNodeId);
+        if (err != CHIP_NO_ERROR)
+        {
+            DataModelLogger::LogString(indent + 1, "Event truncated due to invalid value for 'ClientNodeId'");
+            return err;
+        }
+    }
+    {
+        CHIP_ERROR err = DataModelLogger::LogValue("StatusCode", indent + 1, value.statusCode);
+        if (err != CHIP_NO_ERROR)
+        {
+            DataModelLogger::LogString(indent + 1, "Event truncated due to invalid value for 'StatusCode'");
+            return err;
+        }
+    }
+    {
+        CHIP_ERROR err = DataModelLogger::LogValue("FabricIndex", indent + 1, value.fabricIndex);
+        if (err != CHIP_NO_ERROR)
+        {
+            DataModelLogger::LogString(indent + 1, "Event truncated due to invalid value for 'FabricIndex'");
+            return err;
+        }
+    }
     DataModelLogger::LogString(indent, "}");
 
     return CHIP_NO_ERROR;
@@ -8193,6 +8249,18 @@ CHIP_ERROR DataModelLogger::LogValue(const char * label, size_t indent,
     ReturnErrorOnFailure(DataModelLogger::LogValue("status", indent + 1, value.status));
     ReturnErrorOnFailure(DataModelLogger::LogValue("data", indent + 1, value.data));
     ReturnErrorOnFailure(DataModelLogger::LogValue("encodingHint", indent + 1, value.encodingHint));
+    DataModelLogger::LogString(indent, "}");
+    return CHIP_NO_ERROR;
+}
+CHIP_ERROR DataModelLogger::LogValue(const char * label, size_t indent,
+                                     const CommissionerControl::Commands::ReverseOpenCommissioningWindow::DecodableType & value)
+{
+    DataModelLogger::LogString(label, indent, "{");
+    ReturnErrorOnFailure(DataModelLogger::LogValue("commissioningTimeout", indent + 1, value.commissioningTimeout));
+    ReturnErrorOnFailure(DataModelLogger::LogValue("PAKEPasscodeVerifier", indent + 1, value.PAKEPasscodeVerifier));
+    ReturnErrorOnFailure(DataModelLogger::LogValue("discriminator", indent + 1, value.discriminator));
+    ReturnErrorOnFailure(DataModelLogger::LogValue("iterations", indent + 1, value.iterations));
+    ReturnErrorOnFailure(DataModelLogger::LogValue("salt", indent + 1, value.salt));
     DataModelLogger::LogString(indent, "}");
     return CHIP_NO_ERROR;
 }
@@ -13051,6 +13119,72 @@ CHIP_ERROR DataModelLogger::LogAttribute(const chip::app::ConcreteDataAttributeP
         }
         break;
     }
+    case WaterHeaterManagement::Id: {
+        switch (path.mAttributeId)
+        {
+        case WaterHeaterManagement::Attributes::HeaterTypes::Id: {
+            chip::BitMask<chip::app::Clusters::WaterHeaterManagement::WaterHeaterTypeBitmap> value;
+            ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
+            return DataModelLogger::LogValue("HeaterTypes", 1, value);
+        }
+        case WaterHeaterManagement::Attributes::HeatDemand::Id: {
+            chip::BitMask<chip::app::Clusters::WaterHeaterManagement::WaterHeaterDemandBitmap> value;
+            ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
+            return DataModelLogger::LogValue("HeatDemand", 1, value);
+        }
+        case WaterHeaterManagement::Attributes::TankVolume::Id: {
+            uint16_t value;
+            ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
+            return DataModelLogger::LogValue("TankVolume", 1, value);
+        }
+        case WaterHeaterManagement::Attributes::EstimatedHeatRequired::Id: {
+            int64_t value;
+            ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
+            return DataModelLogger::LogValue("EstimatedHeatRequired", 1, value);
+        }
+        case WaterHeaterManagement::Attributes::TankPercentage::Id: {
+            chip::Percent value;
+            ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
+            return DataModelLogger::LogValue("TankPercentage", 1, value);
+        }
+        case WaterHeaterManagement::Attributes::BoostState::Id: {
+            chip::app::Clusters::WaterHeaterManagement::BoostStateEnum value;
+            ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
+            return DataModelLogger::LogValue("BoostState", 1, value);
+        }
+        case WaterHeaterManagement::Attributes::GeneratedCommandList::Id: {
+            chip::app::DataModel::DecodableList<chip::CommandId> value;
+            ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
+            return DataModelLogger::LogValue("GeneratedCommandList", 1, value);
+        }
+        case WaterHeaterManagement::Attributes::AcceptedCommandList::Id: {
+            chip::app::DataModel::DecodableList<chip::CommandId> value;
+            ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
+            return DataModelLogger::LogValue("AcceptedCommandList", 1, value);
+        }
+        case WaterHeaterManagement::Attributes::EventList::Id: {
+            chip::app::DataModel::DecodableList<chip::EventId> value;
+            ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
+            return DataModelLogger::LogValue("EventList", 1, value);
+        }
+        case WaterHeaterManagement::Attributes::AttributeList::Id: {
+            chip::app::DataModel::DecodableList<chip::AttributeId> value;
+            ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
+            return DataModelLogger::LogValue("AttributeList", 1, value);
+        }
+        case WaterHeaterManagement::Attributes::FeatureMap::Id: {
+            uint32_t value;
+            ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
+            return DataModelLogger::LogValue("FeatureMap", 1, value);
+        }
+        case WaterHeaterManagement::Attributes::ClusterRevision::Id: {
+            uint16_t value;
+            ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
+            return DataModelLogger::LogValue("ClusterRevision", 1, value);
+        }
+        }
+        break;
+    }
     case DemandResponseLoadControl::Id: {
         switch (path.mAttributeId)
         {
@@ -17449,6 +17583,47 @@ CHIP_ERROR DataModelLogger::LogAttribute(const chip::app::ConcreteDataAttributeP
         }
         break;
     }
+    case CommissionerControl::Id: {
+        switch (path.mAttributeId)
+        {
+        case CommissionerControl::Attributes::SupportedDeviceCategories::Id: {
+            chip::BitMask<chip::app::Clusters::CommissionerControl::SupportedDeviceCategoryBitmap> value;
+            ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
+            return DataModelLogger::LogValue("SupportedDeviceCategories", 1, value);
+        }
+        case CommissionerControl::Attributes::GeneratedCommandList::Id: {
+            chip::app::DataModel::DecodableList<chip::CommandId> value;
+            ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
+            return DataModelLogger::LogValue("GeneratedCommandList", 1, value);
+        }
+        case CommissionerControl::Attributes::AcceptedCommandList::Id: {
+            chip::app::DataModel::DecodableList<chip::CommandId> value;
+            ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
+            return DataModelLogger::LogValue("AcceptedCommandList", 1, value);
+        }
+        case CommissionerControl::Attributes::EventList::Id: {
+            chip::app::DataModel::DecodableList<chip::EventId> value;
+            ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
+            return DataModelLogger::LogValue("EventList", 1, value);
+        }
+        case CommissionerControl::Attributes::AttributeList::Id: {
+            chip::app::DataModel::DecodableList<chip::AttributeId> value;
+            ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
+            return DataModelLogger::LogValue("AttributeList", 1, value);
+        }
+        case CommissionerControl::Attributes::FeatureMap::Id: {
+            uint32_t value;
+            ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
+            return DataModelLogger::LogValue("FeatureMap", 1, value);
+        }
+        case CommissionerControl::Attributes::ClusterRevision::Id: {
+            uint16_t value;
+            ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
+            return DataModelLogger::LogValue("ClusterRevision", 1, value);
+        }
+        }
+        break;
+    }
     case ElectricalMeasurement::Id: {
         switch (path.mAttributeId)
         {
@@ -19228,6 +19403,17 @@ CHIP_ERROR DataModelLogger::LogCommand(const chip::app::ConcreteCommandPath & pa
         }
         break;
     }
+    case CommissionerControl::Id: {
+        switch (path.mCommandId)
+        {
+        case CommissionerControl::Commands::ReverseOpenCommissioningWindow::Id: {
+            CommissionerControl::Commands::ReverseOpenCommissioningWindow::DecodableType value;
+            ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
+            return DataModelLogger::LogValue("ReverseOpenCommissioningWindow", 1, value);
+        }
+        }
+        break;
+    }
     case ElectricalMeasurement::Id: {
         switch (path.mCommandId)
         {
@@ -20111,6 +20297,17 @@ CHIP_ERROR DataModelLogger::LogEvent(const chip::app::EventHeader & header, chip
             chip::app::Clusters::ContentControl::Events::RemainingScreenTimeExpired::DecodableType value;
             ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
             return DataModelLogger::LogValue("RemainingScreenTimeExpired", 1, value);
+        }
+        }
+        break;
+    }
+    case CommissionerControl::Id: {
+        switch (header.mPath.mEventId)
+        {
+        case CommissionerControl::Events::CommissioningRequestResult::Id: {
+            chip::app::Clusters::CommissionerControl::Events::CommissioningRequestResult::DecodableType value;
+            ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
+            return DataModelLogger::LogValue("CommissioningRequestResult", 1, value);
         }
         }
         break;
