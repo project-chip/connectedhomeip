@@ -22,8 +22,8 @@ from ipaddress import IPv4Address, IPv6Address
 from random import randint
 from typing import TYPE_CHECKING, Dict, List, Optional, Set, Union, cast
 
-from zeroconf import (BadTypeInNameException, DNSAddress, DNSOutgoing, DNSPointer, DNSQuestion, DNSQuestionType,
-                      DNSRecord, DNSService, DNSText, ServiceInfo, Zeroconf, current_time_millis, service_type_name)
+from zeroconf import (BadTypeInNameException, DNSAddress, DNSOutgoing, DNSPointer, DNSQuestion, DNSQuestionType, DNSRecord,
+                      DNSService, DNSText, ServiceInfo, Zeroconf, current_time_millis, service_type_name)
 from zeroconf._utils.net import _encode_address
 from zeroconf.const import (_CLASS_IN, _DNS_HOST_TTL, _DNS_OTHER_TTL, _DUPLICATE_QUESTION_INTERVAL, _FLAGS_QR_QUERY, _LISTENER_TIME,
                             _MDNS_PORT, _TYPE_A, _TYPE_AAAA, _TYPE_SRV, _TYPE_TXT)
