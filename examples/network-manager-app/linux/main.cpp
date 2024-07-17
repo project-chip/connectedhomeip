@@ -19,7 +19,10 @@
 #include <app/clusters/thread-network-directory-server/thread-network-directory-server.h>
 #include <app/clusters/wifi-network-management-server/wifi-network-management-server.h>
 #include <lib/core/CHIPSafeCasts.h>
+#include <lib/support/CodeUtils.h>
 #include <lib/support/Span.h>
+
+#include <optional>
 
 using namespace chip;
 using namespace chip::app;
@@ -31,6 +34,13 @@ void ApplicationShutdown() {}
 ByteSpan ByteSpanFromCharSpan(CharSpan span)
 {
     return ByteSpan(Uint8::from_const_char(span.data()), span.size());
+}
+
+std::optional<DefaultThreadNetworkDirectoryServer> gThreadNetworkDirectoryServer;
+void emberAfThreadNetworkDirectoryClusterServerInitCallback(chip::EndpointId endpoint)
+{
+    VerifyOrDie(!gThreadNetworkDirectoryServer.has_value());
+    gThreadNetworkDirectoryServer.emplace(endpoint).Init();
 }
 
 int main(int argc, char * argv[])

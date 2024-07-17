@@ -121,6 +121,9 @@ public:
      * This method returns a const ByteSpan to the extended PAN ID in the dataset.
      * This can be used to pass the extended PAN ID to a cluster command without the use of external memory.
      *
+     * Note: The returned span points into storage managed by this class,
+     * and must not be dereferenced beyond the lifetime of this object.
+     *
      * @param[out]  span  A reference to receive the location of the extended PAN ID.
      *
      * @retval CHIP_NO_ERROR                    Successfully retrieved the extended PAN ID.
@@ -256,6 +259,10 @@ public:
 
     /**
      * Returns ByteSpan pointing to the channel mask within the dataset.
+     *
+     * Note: The returned span points into storage managed by this class,
+     * and must not be dereferenced beyond the lifetime of this object.
+     *
      * @retval CHIP_NO_ERROR on success.
      * @retval CHIP_ERROR_TLV_TAG_NOT_FOUND if the channel mask is not present in the dataset.
      * @retval CHIP_ERROR_INVALID_TLV_ELEMENT if the TLV element is invalid.
@@ -264,6 +271,7 @@ public:
 
     /**
      * This method sets the channel mask within the dataset.
+     *
      * @retval CHIP_NO_ERROR on success.
      * @retval CHIP_ERROR_NO_MEMORY if there is insufficient space within the dataset.
      */
@@ -271,6 +279,7 @@ public:
 
     /**
      * Retrieves the security policy from the dataset.
+     *
      * @retval CHIP_NO_ERROR on success.
      * @retval CHIP_ERROR_TLV_TAG_NOT_FOUND if no security policy is present in the dataset.
      * @retval CHIP_ERROR_INVALID_TLV_ELEMENT if the TLV element is invalid.
@@ -279,6 +288,7 @@ public:
 
     /**
      * This method sets the security policy within the dataset.
+     *
      * @retval CHIP_NO_ERROR on success.
      * @retval CHIP_ERROR_NO_MEMORY if there is insufficient space within the dataset.
      */
@@ -291,7 +301,6 @@ public:
 
     /**
      * This method checks if the dataset is ready for creating Thread network.
-     *
      */
     bool IsCommissioned(void) const;
 
@@ -304,7 +313,6 @@ public:
      * This method checks whether @p aData is formatted as ThreadTLVs.
      *
      * @note This method doesn't verify ThreadTLV values are valid.
-     *
      */
     static bool IsValid(ByteSpan aData);
 

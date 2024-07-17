@@ -118,11 +118,18 @@ CHIP_ERROR DefaultThreadNetworkDirectoryStorage::RemoveNetwork(const ExtendedPan
     VerifyOrReturnError(FindNetwork(exPanId, index), CHIP_ERROR_NOT_FOUND);
 
     // Move subsequent elements down to fill the deleted slot
-    for (mCount--; index < mCount; index++)
+    index_t subsequent = --mCount - index;
+    auto * element     = &mExtendedPanIds[index];
+    memmove(element, element + 1, subsequent * sizeof(*element));
+    CHIP_ERROR err = StoreIndex();
+    if (err != CHIP_NO_ERROR)
     {
-        mExtendedPanIds[index] = mExtendedPanIds[index + 1];
+        // Roll back the change to our in-memory state
+        memmove(element + 1, element, subsequent * sizeof(*element));
+        mExtendedPanIds[index] = exPanId;
+        mCount++;
+        return err;
     }
-    ReturnErrorOnFailure(StoreIndex());
 
     // Delete the dataset itself. Ignore errors since we successfully updated the index.
     StorageKeyName key = DefaultStorageKeyAllocator::ThreadNetworkDirectoryDataset(exPanId.AsNumber());

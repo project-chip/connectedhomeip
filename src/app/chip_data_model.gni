@@ -392,7 +392,6 @@ template("chip_data_model") {
         ]
       } else if (cluster == "thread-network-directory-server") {
         sources += [
-          "${_app_root}/clusters/${cluster}/${cluster}-instance.cpp",
           "${_app_root}/clusters/${cluster}/${cluster}.cpp",
           "${_app_root}/clusters/${cluster}/${cluster}.h",
           "${_app_root}/clusters/${cluster}/DefaultThreadNetworkDirectoryStorage.cpp",

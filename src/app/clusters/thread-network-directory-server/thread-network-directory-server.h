@@ -20,7 +20,9 @@
 #include <app-common/zap-generated/cluster-objects.h>
 #include <app/AttributeAccessInterface.h>
 #include <app/CommandHandlerInterface.h>
+#include <app/clusters/thread-network-directory-server/DefaultThreadNetworkDirectoryStorage.h>
 #include <app/clusters/thread-network-directory-server/ThreadNetworkDirectoryStorage.h>
+#include <app/server/Server.h>
 #include <lib/core/CHIPError.h>
 
 #include <optional>
@@ -32,17 +34,6 @@ namespace Clusters {
 class ThreadNetworkDirectoryServer : private AttributeAccessInterface, private CommandHandlerInterface
 {
 public:
-    /*
-     * Returns a default instance of this server cluster. Only available if there is
-     * exactly one instance of this cluster defined in the application zap file.
-     * Must not be called before the data model has been initialized.
-     *
-     * To support more than one cluster instance, or to customize how the cluster server
-     * is instantiated, the application should override the callback function
-     * emberAfThreadNetworkDirectoryClusterServerInitCallback(chip::EndpointId).
-     */
-    static ThreadNetworkDirectoryServer & DefaultInstance();
-
     ThreadNetworkDirectoryServer(EndpointId endpoint, ThreadNetworkDirectoryStorage & storage);
     ~ThreadNetworkDirectoryServer();
 
@@ -72,6 +63,22 @@ private:
                                          const ThreadNetworkDirectory::Commands::GetOperationalDataset::DecodableType & req);
 
     ThreadNetworkDirectoryStorage & mStorage;
+};
+
+/**
+ * A ThreadNetworkDirectoryServer using DefaultThreadNetworkDirectoryStorage.
+ */
+class DefaultThreadNetworkDirectoryServer final : public ThreadNetworkDirectoryServer
+{
+public:
+    DefaultThreadNetworkDirectoryServer(EndpointId endpoint,
+                                        PersistentStorageDelegate & storage = Server::GetInstance().GetPersistentStorage()) :
+        ThreadNetworkDirectoryServer(endpoint, mStorage),
+        mStorage(storage)
+    {}
+
+private:
+    DefaultThreadNetworkDirectoryStorage mStorage;
 };
 
 } // namespace Clusters

@@ -17,6 +17,7 @@
 
 #include <app/clusters/thread-network-directory-server/DefaultThreadNetworkDirectoryStorage.h>
 #include <lib/core/CHIPPersistentStorageDelegate.h>
+#include <lib/support/DefaultStorageKeyAllocator.h>
 #include <lib/support/TestPersistentStorageDelegate.h>
 
 #include <cstdint>
@@ -79,7 +80,7 @@ TEST_F(TestDefaultThreadNetworkDirectoryStorage, TestAddRemoveNetworks)
     const uint8_t datasetA[]        = { 1 };
     const uint8_t updatedDatasetA[] = { 0x11, 0x11 };
     const ThreadNetworkDirectoryStorage::ExtendedPanId panB(UINT64_C(0xe475cafef00df00d));
-    uint8_t datasetB[] = { 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2 };
+    const uint8_t datasetB[] = { 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2 };
     uint8_t mutableBytes[ThreadNetworkDirectoryStorage::kMaxThreadDatasetLen];
 
     // Add Pan A only
@@ -205,6 +206,87 @@ TEST_F(TestDefaultThreadNetworkDirectoryStorage, TestStorageOverflow)
     // Updating an existing network is still possible
     dataset[0] = 88;
     EXPECT_EQ(storage.AddOrUpdateNetwork(ThreadNetworkDirectoryStorage::ExtendedPanId(0u), ByteSpan(dataset)), CHIP_NO_ERROR);
+}
+
+TEST_F(TestDefaultThreadNetworkDirectoryStorage, TestAddNetworkStorageFailure)
+{
+    const ThreadNetworkDirectoryStorage::ExtendedPanId panA(UINT64_C(0xd00fd00fdeadbeef));
+    const uint8_t datasetA[] = { 1 };
+    const ThreadNetworkDirectoryStorage::ExtendedPanId panB(UINT64_C(0xe475cafef00df00d));
+    uint8_t datasetB[] = { 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2 };
+
+    EXPECT_EQ(storage.AddOrUpdateNetwork(panA, ByteSpan(datasetA)), CHIP_NO_ERROR);
+
+    // Make the storage delegate return CHIP_ERROR_PERSISTED_STORAGE_FAILED for writes.
+    // Attempting to add a network should fail and state should be unaffected.
+    persistentStorageDelegate.SetRejectWrites(true);
+    EXPECT_EQ(storage.AddOrUpdateNetwork(panB, ByteSpan(datasetB)), CHIP_ERROR_PERSISTED_STORAGE_FAILED);
+    EXPECT_TRUE(storage.ContainsNetwork(panA));
+    EXPECT_FALSE(storage.ContainsNetwork(panB));
+    {
+        auto * iterator = storage.IterateNetworkIds();
+        EXPECT_EQ(iterator->Count(), 1u);
+        iterator->Release();
+    }
+}
+
+TEST_F(TestDefaultThreadNetworkDirectoryStorage, TestAddNetworkStorageWriteIndexFailure)
+{
+    const ThreadNetworkDirectoryStorage::ExtendedPanId panA(UINT64_C(0xd00fd00fdeadbeef));
+    const uint8_t datasetA[] = { 1 };
+    const ThreadNetworkDirectoryStorage::ExtendedPanId panB(UINT64_C(0xe475cafef00df00d));
+    uint8_t datasetB[] = { 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2 };
+
+    EXPECT_EQ(storage.AddOrUpdateNetwork(panA, ByteSpan(datasetA)), CHIP_NO_ERROR);
+
+    // White box test: Poison the index key specifically, so the dataset
+    // can be written but the subsequent update of the index fails.
+    // Attempting to add a network should fail and state should be unaffected.
+    StorageKeyName indexKey = DefaultStorageKeyAllocator::ThreadNetworkDirectoryIndex();
+    persistentStorageDelegate.AddPoisonKey(indexKey.KeyName());
+    EXPECT_EQ(storage.AddOrUpdateNetwork(panB, ByteSpan(datasetB)), CHIP_ERROR_PERSISTED_STORAGE_FAILED);
+    EXPECT_TRUE(storage.ContainsNetwork(panA));
+    EXPECT_FALSE(storage.ContainsNetwork(panB));
+    {
+        auto * iterator = storage.IterateNetworkIds();
+        EXPECT_EQ(iterator->Count(), 1u);
+        iterator->Release();
+    }
+}
+
+TEST_F(TestDefaultThreadNetworkDirectoryStorage, TestRemoveNetworkStorageFailure)
+{
+    const ThreadNetworkDirectoryStorage::ExtendedPanId panA(UINT64_C(0xd00f0001));
+    const ThreadNetworkDirectoryStorage::ExtendedPanId panB(UINT64_C(0xd00f0002));
+    const ThreadNetworkDirectoryStorage::ExtendedPanId panC(UINT64_C(0xd00f0003));
+    const uint8_t dataset[] = { 1 };
+
+    // Just in case the test is compiled with CHIP_CONFIG_MAX_FABRICS == 1
+    bool canStorePanC = (storage.Capacity() >= 3);
+
+    // Add Pans A, B, and C
+    EXPECT_EQ(storage.AddOrUpdateNetwork(panA, ByteSpan(dataset)), CHIP_NO_ERROR);
+    EXPECT_EQ(storage.AddOrUpdateNetwork(panB, ByteSpan(dataset)), CHIP_NO_ERROR);
+    if (canStorePanC)
+    {
+        EXPECT_EQ(storage.AddOrUpdateNetwork(panC, ByteSpan(dataset)), CHIP_NO_ERROR);
+    }
+
+    // Make the storage delegate return CHIP_ERROR_PERSISTED_STORAGE_FAILED for writes.
+    // Attempting to remove a network should fail and state should be unaffected.
+    persistentStorageDelegate.SetRejectWrites(true);
+    EXPECT_EQ(storage.RemoveNetwork(panA), CHIP_ERROR_PERSISTED_STORAGE_FAILED);
+    EXPECT_TRUE(storage.ContainsNetwork(panA));
+    EXPECT_TRUE(storage.ContainsNetwork(panB));
+    if (canStorePanC)
+    {
+        EXPECT_TRUE(storage.ContainsNetwork(panC));
+    }
+    {
+        auto * iterator = storage.IterateNetworkIds();
+        EXPECT_EQ(iterator->Count(), canStorePanC ? 3u : 2u);
+        iterator->Release();
+    }
 }
 
 } // namespace
