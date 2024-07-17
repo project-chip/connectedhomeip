@@ -1462,9 +1462,8 @@ CHIP_ERROR ConnectivityManagerImpl::_WiFiPAFConnect(const SetupDiscriminator & c
     VerifyOrReturnError(ret == CHIP_NO_ERROR, ret);
     ChipLogProgress(DeviceLayer, "WiFi-PAF: subscribe: [%s]", args);
 
-    wpa_fi_w1_wpa_supplicant1_interface_call_nansubscribe_sync(
-        mWpaSupplicant.iface, args, &subscribe_id, nullptr,
-        &err.GetReceiver());
+    wpa_fi_w1_wpa_supplicant1_interface_call_nansubscribe_sync(mWpaSupplicant.iface, args, &subscribe_id, nullptr,
+                                                               &err.GetReceiver());
     ChipLogProgress(DeviceLayer, "WiFi-PAF: subscribe_id: [%d]", subscribe_id);
     mOnPafSubscribeComplete = onSuccess;
     mOnPafSubscribeError    = onError;
