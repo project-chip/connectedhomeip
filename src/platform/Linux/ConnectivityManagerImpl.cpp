@@ -1374,6 +1374,11 @@ void ConnectivityManagerImpl::OnDiscoveryResult(gboolean success, GVariant * dis
                         mpaf_info.peer_addr[5]);
         GetWiFiPAF()->SetWiFiPAFState(Transport::WiFiPAFBase::State::kConnected);
 
+        // Read the ssi
+        GAutoPtr<GVariant> ssiValue(g_variant_lookup_value(discov_info, "ssi", G_VARIANT_TYPE_BYTESTRING));
+        size_t ssiBufLen;
+        g_variant_get_fixed_array(ssiValue.get(), &ssiBufLen, sizeof(uint8_t));
+
         ChipDeviceEvent event;
         event.Type = DeviceEventType::kCHIPoWiFiPAFConnected;
         PlatformMgr().PostEventOrDie(&event);
@@ -1431,6 +1436,7 @@ CHIP_ERROR ConnectivityManagerImpl::_WiFiPAFConnect(const SetupDiscriminator & c
 {
     ChipLogProgress(Controller, "WiFi-PAF: Try to subscribe the NAN-USD devices");
     gchar args[MAX_PAF_SUBSCRIBE_SSI_BUFLEN];
+    gint subscribe_id;
     snprintf(args, sizeof(args), "service_name=%s srv_proto_type=%u ttl=%u ", srv_name, NAN_SRV_PROTO_MATTER, NAM_SUBSCRIBE_PERIOD);
     GAutoPtr<GError> err;
     CHIP_ERROR ret;
@@ -1456,14 +1462,13 @@ CHIP_ERROR ConnectivityManagerImpl::_WiFiPAFConnect(const SetupDiscriminator & c
     VerifyOrReturnError(ret == CHIP_NO_ERROR, ret);
     ChipLogProgress(DeviceLayer, "WiFi-PAF: subscribe: [%s]", args);
 
-    wpa_fi_w1_wpa_supplicant1_interface_call_nansubscribe(
-        mWpaSupplicant.iface, args, nullptr,
-        reinterpret_cast<GAsyncReadyCallback>(
-            +[](GObject * sourceObject_, GAsyncResult * res_, ConnectivityManagerImpl * self) { return; }),
+    wpa_fi_w1_wpa_supplicant1_interface_call_nansubscribe_sync(
+        mWpaSupplicant.iface, args, &subscribe_id, nullptr,
         &err.GetReceiver());
+    ChipLogProgress(DeviceLayer, "WiFi-PAF: subscribe_id: [%d]", subscribe_id);
     mOnPafSubscribeComplete = onSuccess;
     mOnPafSubscribeError    = onError;
-    g_signal_connect(mWpaSupplicant.iface, "discovery-result",
+    g_signal_connect(mWpaSupplicant.iface, "nan-discoveryresult",
                      G_CALLBACK(+[](WpaFiW1Wpa_supplicant1Interface * proxy, gboolean success, GVariant * obj,
                                     ConnectivityManagerImpl * self) { return self->OnDiscoveryResult(success, obj); }),
                      this);

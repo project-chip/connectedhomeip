@@ -234,6 +234,7 @@ private:
         uint32_t subscribe_id;
         uint32_t peer_publish_id;
         uint8_t peer_addr[6];
+        uint32_t ssi_len;
     };
     struct wpa_dbus_discov_info mpaf_info;
     struct wpa_dbus_nanrx_info
