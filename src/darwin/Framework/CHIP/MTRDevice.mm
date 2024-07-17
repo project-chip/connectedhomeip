@@ -351,7 +351,7 @@ static NSString * const sLastInitialSubscribeLatencyKey = @"lastInitialSubscribe
         return [self isEqualToClusterData:object];
     }
 
-    return object == self;
+    return NO;
 }
 
 @end
