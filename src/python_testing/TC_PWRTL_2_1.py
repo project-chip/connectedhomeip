@@ -40,8 +40,8 @@ class TC_PWRTL_2_1(MatterBaseTest):
 
         attributes = Clusters.PowerTopology.Attributes
 
-        endpoint = 1
-
+        endpoint = self.user_params.get("endpoint", 1)
+        
         powertop_attr_list = Clusters.Objects.PowerTopology.Attributes.AttributeList
         powertop_cluster = Clusters.Objects.PowerTopology
         attribute_list = await self.read_single_attribute_check_success(endpoint=endpoint, cluster=powertop_cluster, attribute=powertop_attr_list)
@@ -54,8 +54,8 @@ class TC_PWRTL_2_1(MatterBaseTest):
         if avail_endpoints_attr_id in attribute_list:
             available_endpoints = await self.read_single_attribute_check_success(endpoint=endpoint, cluster=Clusters.Objects.PowerTopology, attribute=attributes.AvailableEndpoints)
 
-            if available_endpoints == NullValue or available_endpoints == []:
-                logging.info("AvailableEndpoints is null or an empty list")
+            if available_endpoints == []:
+                logging.info("AvailableEndpoints is an empty list")
             else:
                 logging.info("AvailableEndpoints: %s" % (available_endpoints))
                 asserts.assert_less_equal(len(available_endpoints), 21,
@@ -75,7 +75,7 @@ class TC_PWRTL_2_1(MatterBaseTest):
                                     "ActiveEndpoints should be null when AvailableEndpoints is null: %s" % active_endpoints)
 
         else:
-            logging.info('Skipping test as active endpoints attribute ID not in attribute list on DUT')
+            logging.info('Skipping test step 3 as active endpoints attribute ID not in attribute list on DUT')
             return
 
 
