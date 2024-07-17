@@ -30,73 +30,37 @@ namespace app {
 namespace Clusters {
 namespace OccupancySensing {
 
-/**
- * Interface to help manage the Hold Time Limits of the Occupancy Sensing Cluster.
- */
-class HoldTimeLimitsManager : public AttributeAccessInterface
+
+class OccupancySensingAttrAccess : public AttributeAccessInterface
 {
 public:
-    static constexpr size_t kOccupancySensingServerMaxEndpointCount =
-        MATTER_DM_OCCUPANCY_SENSING_CLUSTER_SERVER_ENDPOINT_COUNT + CHIP_DEVICE_CONFIG_DYNAMIC_ENDPOINT_COUNT;
-    static_assert(kOccupancySensingServerMaxEndpointCount <= kInvalidEndpointId, "Occupancy Sensing endpoint count error");
+	OccupancySensingAttrAccess(BitMask<Feature> aFeature) : 
+	app::AttributeAccessInterface(Optional<EndpointId>::Missing(), app::Clusters::OccupancySensing::Id), mFeature(aFeature)
+	{}
+	
+    ~OccupancySensingAttrAccess() { Shutdown(); }
 
-    // HoldTimeLimits
-    class HoldTimeLimits
-    {
-    public:
-        Structs::HoldTimeLimitsStruct::Type * GetHoldTimeLimitsStruct(EndpointId endpoint);
-        CHIP_ERROR SetHoldTimeLimitsStruct(EndpointId endpoint, Structs::HoldTimeLimitsStruct::Type & holdTimeLimitsStruct);
-
-    private:
-        /// @brief Returns the index of the HoldTimeLimits associated to an endpoint
-        /// @param[in] endpoint target endpoint
-        /// @param[out] endpointIndex index of the corresponding HoldTimeLimits for an endpoint
-        /// @return CHIP_NO_ERROR or CHIP_ERROR_NOT_FOUND, CHIP_ERROR_INVALID_ARGUMENT if invalid endpoint
-        CHIP_ERROR FindHoldTimeLimitsIndex(EndpointId endpoint, size_t & endpointIndex);
-
-        Structs::HoldTimeLimitsStruct::Type mHoldTimeLimitsStructs[kOccupancySensingServerMaxEndpointCount];
-    };
-
-    static HoldTimeLimitsManager & Instance();
 
     CHIP_ERROR Init();
+	void Shutdown();
 
-    // AttributeAccessInterface
     CHIP_ERROR Read(const ConcreteReadAttributePath & aPath, AttributeValueEncoder & aEncoder) override;
 
-    // HoldTimeLimitsStruct Accessors
-    Structs::HoldTimeLimitsStruct::Type * GetHoldTimeLimitsStruct(EndpointId endpoint);
-    CHIP_ERROR SetHoldTimeLimitsStruct(EndpointId endpoint, Structs::HoldTimeLimitsStruct::Type & holdTimeLimitsStruct);
+	bool HasFeature(Feature aFeature) const;
 
 private:
-    HoldTimeLimitsManager() : AttributeAccessInterface(Optional<EndpointId>(), Id) {}
-    ~HoldTimeLimitsManager() {}
+    BitMask<Feature> mFeature;
 
-    bool mIsInitialized = false;
-
-    // HoldTimeLimits
-    HoldTimeLimits mHoldTimeLimits;
-
-    // Instance
-    static HoldTimeLimitsManager mInstance;
 };
 
-inline bool HasFeature(EndpointId ep, Feature feature)
-{
-    uint32_t map;
-    bool success = (Attributes::FeatureMap::Get(ep, &map) == Protocols::InteractionModel::Status::Success);
-    return success ? (map & to_underlying(feature)) : false;
-}
+CHIP_ERROR SetHoldTimeLimits(EndpointId endpointId, const Structs::HoldTimeLimitsStruct::Type & holdTimeLimits);
 
-/** @brief Occupancy Cluster Server Post Init
- *
- * Following resolution of the Occupancy state at startup for this endpoint,
- * perform any additional initialization needed; e.g., synchronize hardware
- * state.
- *
- * @param endpoint Endpoint that is being initialized  Ver.: always
- */
-void emberAfPluginOccupancyClusterServerPostInitCallback(chip::EndpointId endpoint);
+CHIP_ERROR SetHoldTime(EndpointId endpointId, const uint16_t & holdTime);
+
+Structs::HoldTimeLimitsStruct::Type * GetHoldTimeLimitsForEndpoint(EndpointId endpoint);
+
+uint16_t * GetHoldTimeForEndpoint(EndpointId endpoint);
+
 
 } // namespace OccupancySensing
 } // namespace Clusters
