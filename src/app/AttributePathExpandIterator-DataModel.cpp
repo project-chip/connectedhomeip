@@ -14,6 +14,7 @@
  *    See the License for the specific language governing permissions and
  *    limitations under the License.
  */
+#include "lib/support/CodeUtils.h"
 #include <app/AttributePathExpandIterator-DataModel.h>
 #include <app/GlobalAttributes.h>
 
@@ -80,19 +81,18 @@ std::optional<AttributeId> AttributePathExpandIteratorDataModel::NextAttributeId
     // advance the existing attribute id if it can be advanced
     VerifyOrReturnValue(mpAttributePath->mValue.HasWildcardAttributeId(), std::nullopt);
 
-    // NOTE: this switch matches the order in GlobalAttributesNotInMetadata so that order-dependent
-    //       checks match
-    switch (mOutputPath.mAttributeId)
-    {
-    case Clusters::Globals::Attributes::GeneratedCommandList::Id:
-        return Clusters::Globals::Attributes::AcceptedCommandList::Id;
-    case Clusters::Globals::Attributes::AcceptedCommandList::Id:
-#if CHIP_CONFIG_ENABLE_EVENTLIST_ATTRIBUTE
-        return Clusters::Globals::Attributes::EventList::Id;
-    case Clusters::Globals::Attributes::EventList::Id:
-#endif // CHIP_CONFIG_ENABLE_EVENTLIST_ATTRIBUTE
-        return Clusters::Globals::Attributes::AttributeList::Id;
-    case Clusters::Globals::Attributes::AttributeList::Id:
+    // Ensure (including ordering) that GlobalAttributesNotInMetadata is reported as needed
+    for (unsigned i = 0; i < ArraySize(GlobalAttributesNotInMetadata); i++) {
+        if (GlobalAttributesNotInMetadata[i] != mOutputPath.mAttributeId) {
+            continue;
+        }
+
+        unsigned nextAttributeIndex = i + 1;
+        if (nextAttributeIndex < ArraySize(GlobalAttributesNotInMetadata)) {
+            return GlobalAttributesNotInMetadata[nextAttributeIndex];
+        }
+
+        // reached the end of global attributes
         return std::nullopt;
     }
 
@@ -101,7 +101,10 @@ std::optional<AttributeId> AttributePathExpandIteratorDataModel::NextAttributeId
     {
         return entry.path.mAttributeId;
     }
-    return Clusters::Globals::Attributes::GeneratedCommandList::Id;
+
+    // Finished the data model, start with global attributes
+    static_assert(ArraySize(GlobalAttributesNotInMetadata) > 0);
+    return GlobalAttributesNotInMetadata[0];
 }
 
 std::optional<ClusterId> AttributePathExpandIteratorDataModel::NextClusterId()
