@@ -20,12 +20,15 @@ import glob
 import subprocess
 
 # Function to load environment variables from a YAML file
+
+
 def load_env_from_yaml(file_path):
     with open(file_path, 'r') as file:
         for line in file:
             if line.strip():  # Skip empty lines
                 key, value = line.strip().split(': ', 1)
                 os.environ[key] = value
+
 
 # Load environment variables from test_env.yaml
 load_env_from_yaml('/tmp/test_env.yaml')
@@ -38,13 +41,13 @@ search_directory = "src/python_testing"
 
 # Define the files and patterns to exclude
 excluded_patterns = [
-    "MinimalRepresentation.py", 
+    "MinimalRepresentation.py",
     "TC_ACL_2_2.py",
-    "TC_CNET_4_4.py", 
-    "TC_DGGEN_3_2.py", 
-    "TC_EEVSE_Utils.py", 
-    "TC_EnergyReporting_Utils.py", 
-    "TC_OpstateCommon.py", 
+    "TC_CNET_4_4.py",
+    "TC_DGGEN_3_2.py",
+    "TC_EEVSE_Utils.py",
+    "TC_EnergyReporting_Utils.py",
+    "TC_OpstateCommon.py",
     "TC_TMP_2_1.py",
     "TC_pics_checker.py",
     "TestCommissioningTimeSync.py",
