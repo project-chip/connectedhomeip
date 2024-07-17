@@ -41,7 +41,7 @@ class TC_PWRTL_2_1(MatterBaseTest):
         attributes = Clusters.PowerTopology.Attributes
 
         endpoint = self.user_params.get("endpoint", 1)
-        
+
         powertop_attr_list = Clusters.Objects.PowerTopology.Attributes.AttributeList
         powertop_cluster = Clusters.Objects.PowerTopology
         attribute_list = await self.read_single_attribute_check_success(endpoint=endpoint, cluster=powertop_cluster, attribute=powertop_attr_list)
