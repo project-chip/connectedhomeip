@@ -18,6 +18,7 @@
 
 #include <WhmInstance.h>
 #include <WhmManufacturer.h>
+#include <WhmAppCmdLineOptions.h>
 
 #include <app-common/zap-generated/ids/Attributes.h>
 #include <app-common/zap-generated/ids/Clusters.h>
@@ -69,8 +70,7 @@ CHIP_ERROR WhmInit()
     /* Manufacturer may optionally not support all features, commands & attributes */
     gWhmInstance = std::make_unique<WaterHeaterManagementInstance>(
         EndpointId(WHM_ENDPOINT), *gWhmDelegate,
-        BitMask<WaterHeaterManagement::Feature, uint32_t>(WaterHeaterManagement::Feature::kEnergyManagement,
-                                                          WaterHeaterManagement::Feature::kTankPercent));
+        GetFeatureMapFromCmdLine());
 
     if (!gWhmInstance)
     {
