@@ -60,8 +60,8 @@ class TC_CNET_1_4(MatterBaseTest):
         # Read FeatureMap attribute with wildcard endpoint
         feature_map_results = await self.default_controller.ReadAttribute(self.dut_node_id, [(afeam)], fabricFiltered=True)
 
-        NetworkNum = len(feature_map_results)
-        if NetworkNum == 0:
+        NumNetworkCommissioning = len(feature_map_results)
+        if NumNetworkCommissioning == 0:
             logging.info('No endpoint has Network Commissioning Cluster, skipping remaining steps')
             self.skip_all_remaining_steps(3)
             return
@@ -74,7 +74,7 @@ class TC_CNET_1_4(MatterBaseTest):
         if 49 not in server_list:
             asserts.assert_true(False, "There is no Network Commissioning Cluster on endpoint 0")
 
-        if NetworkNum == 1:
+        if NumNetworkCommissioning == 1:
             logging.info('Only endpoint 0 has Network Commissioning Cluster, skipping remaining steps')
             self.skip_all_remaining_steps(4)
             return
