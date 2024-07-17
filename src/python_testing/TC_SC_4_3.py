@@ -26,9 +26,8 @@ import ipaddress
 import logging
 
 import chip.clusters as Clusters
-from matter_testing_support import MatterBaseTest, async_test_body, default_matter_test_main, TestStep
+from matter_testing_support import MatterBaseTest, TestStep, async_test_body, default_matter_test_main
 from mdns_discovery.mdns_discovery import DNSRecordType, MdnsDiscovery, MdnsServiceType
-
 from mobly import asserts
 
 '''
@@ -50,7 +49,8 @@ class TC_SC_4_3(MatterBaseTest):
         return [TestStep(1, "DUT is commissioned on the same fabric as TH."),
                 TestStep(2, "TH reads ServerList attribute from the Descriptor cluster on EP0. ",
                          "If the ICD Management cluster ID (70,0x46) is present in the list, set supports_icd to true, otherwise set supports_icd to false."),
-                TestStep(3, "If supports_icd is true, TH reads ActiveModeThreshold from the ICD Management cluster on EP0 and saves as active_mode_threshold.", ""),
+                TestStep(3,
+                         "If supports_icd is true, TH reads ActiveModeThreshold from the ICD Management cluster on EP0 and saves as active_mode_threshold.", ""),
                 TestStep(4, "If supports_icd is true, TH reads FeatureMap from the ICD Management cluster on EP0. If the LITS feature is set, set supports_lit to true. Otherwise set supports_lit to false.", ""),
                 TestStep(5, "TH constructs the instance name for the DUT as the 64-bit compressed Fabric identifier, and the assigned 64-bit Node identifier, each expressed as a fixed-length sixteen-character hexadecimal string, encoded as ASCII (UTF-8) text using capital letters, separated by a hyphen.", ""),
                 TestStep(6, "TH performs a query for the SRV record against the qname instance_qname.",
@@ -219,7 +219,7 @@ class TC_SC_4_3(MatterBaseTest):
             record_type=DNSRecordType.SRV,
             log_output=True,
             load_from_cache=False
-            )
+        )
 
         # Verify SRV record is returned
         srv_record_returned = operational_record is not None and operational_record.service_name == instance_qname
@@ -344,6 +344,7 @@ class TC_SC_4_3(MatterBaseTest):
         self.step(11)
 
         # PENDING
+
 
 if __name__ == "__main__":
     default_matter_test_main()
