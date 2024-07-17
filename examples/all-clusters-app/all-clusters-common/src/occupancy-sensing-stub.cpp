@@ -15,9 +15,9 @@
  *    limitations under the License.
  */
 
-#include <app/clusters/occupancy-sensor-server/occupancy-sensor-server.h>
-#include <app/clusters/occupancy-sensor-server/occupancy-hal.h>
 #include <app/CommandHandler.h>
+#include <app/clusters/occupancy-sensor-server/occupancy-hal.h>
+#include <app/clusters/occupancy-sensor-server/occupancy-sensor-server.h>
 #include <platform/CHIPDeviceLayer.h>
 
 
