@@ -82,13 +82,16 @@ std::optional<AttributeId> AttributePathExpandIteratorDataModel::NextAttributeId
     VerifyOrReturnValue(mpAttributePath->mValue.HasWildcardAttributeId(), std::nullopt);
 
     // Ensure (including ordering) that GlobalAttributesNotInMetadata is reported as needed
-    for (unsigned i = 0; i < ArraySize(GlobalAttributesNotInMetadata); i++) {
-        if (GlobalAttributesNotInMetadata[i] != mOutputPath.mAttributeId) {
+    for (unsigned i = 0; i < ArraySize(GlobalAttributesNotInMetadata); i++)
+    {
+        if (GlobalAttributesNotInMetadata[i] != mOutputPath.mAttributeId)
+        {
             continue;
         }
 
         unsigned nextAttributeIndex = i + 1;
-        if (nextAttributeIndex < ArraySize(GlobalAttributesNotInMetadata)) {
+        if (nextAttributeIndex < ArraySize(GlobalAttributesNotInMetadata))
+        {
             return GlobalAttributesNotInMetadata[nextAttributeIndex];
         }
 

@@ -22,7 +22,8 @@ namespace chip {
 namespace app {
 AttributePathExpandIteratorChecked::AttributePathExpandIteratorChecked(InteractionModel::DataModel * dataModel,
                                                                        SingleLinkedListNode<AttributePathParams> * attributePath) :
-    mDataModelIterator(dataModel, attributePath), mEmberIterator(dataModel, attributePath)
+    mDataModelIterator(dataModel, attributePath),
+    mEmberIterator(dataModel, attributePath)
 {
     CheckOutputsIdentical("Constructor");
 }
