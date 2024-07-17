@@ -720,6 +720,8 @@ class AsyncReadTransaction:
             LOGGER.exception(ex)
 
     def handleError(self, chipError: PyChipError):
+        if self._subscription_handler:
+            self._subscription_handler.OnErrorCb(chipError.code, self._subscription_handler)
         self._resultError = chipError
 
     def _handleSubscriptionEstablished(self, subscriptionId):
@@ -779,10 +781,7 @@ class AsyncReadTransaction:
         #
         if not self._future.done():
             if self._resultError is not None:
-                if self._subscription_handler:
-                    self._subscription_handler.OnErrorCb(self._resultError.code, self._subscription_handler)
-                else:
-                    self._future.set_exception(self._resultError.to_exception())
+                self._future.set_exception(self._resultError.to_exception())
             else:
                 self._future.set_result(AsyncReadTransaction.ReadResponse(
                     attributes=self._cache.attributeCache, events=self._events, tlvAttributes=self._cache.attributeTLVCache))
