@@ -15,8 +15,8 @@
 #    limitations under the License.
 #
 
-import os
 import glob
+import os
 import subprocess
 
 # Function to load environment variables from a YAML file
