@@ -46371,6 +46371,244 @@ class ContentAppObserver(Cluster):
 
 
 @dataclass
+class CommissionerControl(Cluster):
+    id: typing.ClassVar[int] = 0x00000751
+
+    @ChipUtility.classproperty
+    def descriptor(cls) -> ClusterObjectDescriptor:
+        return ClusterObjectDescriptor(
+            Fields=[
+                ClusterObjectFieldDescriptor(Label="supportedDeviceCategories", Tag=0x00000000, Type=uint),
+                ClusterObjectFieldDescriptor(Label="generatedCommandList", Tag=0x0000FFF8, Type=typing.List[uint]),
+                ClusterObjectFieldDescriptor(Label="acceptedCommandList", Tag=0x0000FFF9, Type=typing.List[uint]),
+                ClusterObjectFieldDescriptor(Label="eventList", Tag=0x0000FFFA, Type=typing.List[uint]),
+                ClusterObjectFieldDescriptor(Label="attributeList", Tag=0x0000FFFB, Type=typing.List[uint]),
+                ClusterObjectFieldDescriptor(Label="featureMap", Tag=0x0000FFFC, Type=uint),
+                ClusterObjectFieldDescriptor(Label="clusterRevision", Tag=0x0000FFFD, Type=uint),
+            ])
+
+    supportedDeviceCategories: 'uint' = None
+    generatedCommandList: 'typing.List[uint]' = None
+    acceptedCommandList: 'typing.List[uint]' = None
+    eventList: 'typing.List[uint]' = None
+    attributeList: 'typing.List[uint]' = None
+    featureMap: 'uint' = None
+    clusterRevision: 'uint' = None
+
+    class Bitmaps:
+        class SupportedDeviceCategoryBitmap(IntFlag):
+            kFabricSynchronization = 0x1
+
+    class Commands:
+        @dataclass
+        class RequestCommissioningApproval(ClusterCommand):
+            cluster_id: typing.ClassVar[int] = 0x00000751
+            command_id: typing.ClassVar[int] = 0x00000000
+            is_client: typing.ClassVar[bool] = True
+            response_type: typing.ClassVar[str] = None
+
+            @ChipUtility.classproperty
+            def descriptor(cls) -> ClusterObjectDescriptor:
+                return ClusterObjectDescriptor(
+                    Fields=[
+                        ClusterObjectFieldDescriptor(Label="requestId", Tag=0, Type=uint),
+                        ClusterObjectFieldDescriptor(Label="vendorId", Tag=1, Type=uint),
+                        ClusterObjectFieldDescriptor(Label="productId", Tag=2, Type=uint),
+                        ClusterObjectFieldDescriptor(Label="label", Tag=3, Type=typing.Optional[str]),
+                    ])
+
+            requestId: 'uint' = 0
+            vendorId: 'uint' = 0
+            productId: 'uint' = 0
+            label: 'typing.Optional[str]' = None
+
+        @dataclass
+        class CommissionNode(ClusterCommand):
+            cluster_id: typing.ClassVar[int] = 0x00000751
+            command_id: typing.ClassVar[int] = 0x00000001
+            is_client: typing.ClassVar[bool] = True
+            response_type: typing.ClassVar[str] = 'ReverseOpenCommissioningWindow'
+
+            @ChipUtility.classproperty
+            def descriptor(cls) -> ClusterObjectDescriptor:
+                return ClusterObjectDescriptor(
+                    Fields=[
+                        ClusterObjectFieldDescriptor(Label="requestId", Tag=0, Type=uint),
+                        ClusterObjectFieldDescriptor(Label="responseTimeoutSeconds", Tag=1, Type=uint),
+                        ClusterObjectFieldDescriptor(Label="ipAddress", Tag=2, Type=typing.Optional[bytes]),
+                        ClusterObjectFieldDescriptor(Label="port", Tag=3, Type=typing.Optional[uint]),
+                    ])
+
+            requestId: 'uint' = 0
+            responseTimeoutSeconds: 'uint' = 0
+            ipAddress: 'typing.Optional[bytes]' = None
+            port: 'typing.Optional[uint]' = None
+
+        @dataclass
+        class ReverseOpenCommissioningWindow(ClusterCommand):
+            cluster_id: typing.ClassVar[int] = 0x00000751
+            command_id: typing.ClassVar[int] = 0x00000002
+            is_client: typing.ClassVar[bool] = False
+            response_type: typing.ClassVar[str] = None
+
+            @ChipUtility.classproperty
+            def descriptor(cls) -> ClusterObjectDescriptor:
+                return ClusterObjectDescriptor(
+                    Fields=[
+                        ClusterObjectFieldDescriptor(Label="commissioningTimeout", Tag=0, Type=uint),
+                        ClusterObjectFieldDescriptor(Label="PAKEPasscodeVerifier", Tag=1, Type=bytes),
+                        ClusterObjectFieldDescriptor(Label="discriminator", Tag=2, Type=uint),
+                        ClusterObjectFieldDescriptor(Label="iterations", Tag=3, Type=uint),
+                        ClusterObjectFieldDescriptor(Label="salt", Tag=4, Type=bytes),
+                    ])
+
+            commissioningTimeout: 'uint' = 0
+            PAKEPasscodeVerifier: 'bytes' = b""
+            discriminator: 'uint' = 0
+            iterations: 'uint' = 0
+            salt: 'bytes' = b""
+
+    class Attributes:
+        @dataclass
+        class SupportedDeviceCategories(ClusterAttributeDescriptor):
+            @ChipUtility.classproperty
+            def cluster_id(cls) -> int:
+                return 0x00000751
+
+            @ChipUtility.classproperty
+            def attribute_id(cls) -> int:
+                return 0x00000000
+
+            @ChipUtility.classproperty
+            def attribute_type(cls) -> ClusterObjectFieldDescriptor:
+                return ClusterObjectFieldDescriptor(Type=uint)
+
+            value: 'uint' = 0
+
+        @dataclass
+        class GeneratedCommandList(ClusterAttributeDescriptor):
+            @ChipUtility.classproperty
+            def cluster_id(cls) -> int:
+                return 0x00000751
+
+            @ChipUtility.classproperty
+            def attribute_id(cls) -> int:
+                return 0x0000FFF8
+
+            @ChipUtility.classproperty
+            def attribute_type(cls) -> ClusterObjectFieldDescriptor:
+                return ClusterObjectFieldDescriptor(Type=typing.List[uint])
+
+            value: 'typing.List[uint]' = field(default_factory=lambda: [])
+
+        @dataclass
+        class AcceptedCommandList(ClusterAttributeDescriptor):
+            @ChipUtility.classproperty
+            def cluster_id(cls) -> int:
+                return 0x00000751
+
+            @ChipUtility.classproperty
+            def attribute_id(cls) -> int:
+                return 0x0000FFF9
+
+            @ChipUtility.classproperty
+            def attribute_type(cls) -> ClusterObjectFieldDescriptor:
+                return ClusterObjectFieldDescriptor(Type=typing.List[uint])
+
+            value: 'typing.List[uint]' = field(default_factory=lambda: [])
+
+        @dataclass
+        class EventList(ClusterAttributeDescriptor):
+            @ChipUtility.classproperty
+            def cluster_id(cls) -> int:
+                return 0x00000751
+
+            @ChipUtility.classproperty
+            def attribute_id(cls) -> int:
+                return 0x0000FFFA
+
+            @ChipUtility.classproperty
+            def attribute_type(cls) -> ClusterObjectFieldDescriptor:
+                return ClusterObjectFieldDescriptor(Type=typing.List[uint])
+
+            value: 'typing.List[uint]' = field(default_factory=lambda: [])
+
+        @dataclass
+        class AttributeList(ClusterAttributeDescriptor):
+            @ChipUtility.classproperty
+            def cluster_id(cls) -> int:
+                return 0x00000751
+
+            @ChipUtility.classproperty
+            def attribute_id(cls) -> int:
+                return 0x0000FFFB
+
+            @ChipUtility.classproperty
+            def attribute_type(cls) -> ClusterObjectFieldDescriptor:
+                return ClusterObjectFieldDescriptor(Type=typing.List[uint])
+
+            value: 'typing.List[uint]' = field(default_factory=lambda: [])
+
+        @dataclass
+        class FeatureMap(ClusterAttributeDescriptor):
+            @ChipUtility.classproperty
+            def cluster_id(cls) -> int:
+                return 0x00000751
+
+            @ChipUtility.classproperty
+            def attribute_id(cls) -> int:
+                return 0x0000FFFC
+
+            @ChipUtility.classproperty
+            def attribute_type(cls) -> ClusterObjectFieldDescriptor:
+                return ClusterObjectFieldDescriptor(Type=uint)
+
+            value: 'uint' = 0
+
+        @dataclass
+        class ClusterRevision(ClusterAttributeDescriptor):
+            @ChipUtility.classproperty
+            def cluster_id(cls) -> int:
+                return 0x00000751
+
+            @ChipUtility.classproperty
+            def attribute_id(cls) -> int:
+                return 0x0000FFFD
+
+            @ChipUtility.classproperty
+            def attribute_type(cls) -> ClusterObjectFieldDescriptor:
+                return ClusterObjectFieldDescriptor(Type=uint)
+
+            value: 'uint' = 0
+
+    class Events:
+        @dataclass
+        class CommissioningRequestResult(ClusterEvent):
+            @ChipUtility.classproperty
+            def cluster_id(cls) -> int:
+                return 0x00000751
+
+            @ChipUtility.classproperty
+            def event_id(cls) -> int:
+                return 0x00000000
+
+            @ChipUtility.classproperty
+            def descriptor(cls) -> ClusterObjectDescriptor:
+                return ClusterObjectDescriptor(
+                    Fields=[
+                        ClusterObjectFieldDescriptor(Label="requestId", Tag=0, Type=uint),
+                        ClusterObjectFieldDescriptor(Label="clientNodeId", Tag=1, Type=uint),
+                        ClusterObjectFieldDescriptor(Label="statusCode", Tag=2, Type=uint),
+                        ClusterObjectFieldDescriptor(Label="fabricIndex", Tag=254, Type=uint),
+                    ])
+
+            requestId: 'uint' = 0
+            clientNodeId: 'uint' = 0
+            statusCode: 'uint' = 0
+            fabricIndex: 'uint' = 0
+
+
+@dataclass
 class ElectricalMeasurement(Cluster):
     id: typing.ClassVar[int] = 0x00000B04
 

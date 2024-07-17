@@ -112,6 +112,7 @@ jobs:
                       src/app/zap-templates/zcl/data-model/chip/channel-cluster.xml \
                       src/app/zap-templates/zcl/data-model/chip/clusters-extensions.xml \
                       src/app/zap-templates/zcl/data-model/chip/color-control-cluster.xml \
+                      src/app/zap-templates/zcl/data-model/chip/commissioner-control-cluster.xml \
                       src/app/zap-templates/zcl/data-model/chip/concentration-measurement-cluster.xml \
                       src/app/zap-templates/zcl/data-model/chip/content-launch-cluster.xml \
                       src/app/zap-templates/zcl/data-model/chip/content-app-observer-cluster.xml \
@@ -494,7 +495,7 @@ jobs:
             - name: Run Tests
               run: |
                   mkdir -p out/trace_data
-                  scripts/run_in_python_env.sh out/venv './scripts/tests/run_python_test.py --app out/linux-x64-all-clusters-ipv6only-no-ble-no-wifi-tsan-clang-test/chip-all-clusters-app --factoryreset --quiet --app-args "--trace-to json:out/trace_data/app-{SCRIPT_BASE_NAME}.json" --script-args "--log-level INFO -t 3600 --disable-test ClusterObjectTests.TestTimedRequestTimeout --trace-to json:out/trace_data/test-{SCRIPT_BASE_NAME}.json --trace-to perfetto:out/trace_data/test-{SCRIPT_BASE_NAME}.perfetto"'
+                  scripts/run_in_python_env.sh out/venv './scripts/tests/run_python_test.py --load-from-env /tmp/test_env.yaml --script src/controller/python/test/test_scripts/mobile-device-test.py'
                   scripts/run_in_python_env.sh out/venv './scripts/tests/run_python_test.py --load-from-env /tmp/test_env.yaml --script src/python_testing/TC_ACE_1_2.py'
                   scripts/run_in_python_env.sh out/venv './scripts/tests/run_python_test.py --load-from-env /tmp/test_env.yaml --script src/python_testing/TC_ACE_1_3.py'
                   scripts/run_in_python_env.sh out/venv './scripts/tests/run_python_test.py --load-from-env /tmp/test_env.yaml --script src/python_testing/TC_ACE_1_4.py'

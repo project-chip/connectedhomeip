@@ -24,8 +24,9 @@
 #include <errno.h>
 #include <vector>
 
-#include <gtest/gtest.h>
+#include <pw_unit_test/framework.h>
 
+#include <lib/core/StringBuilderAdapters.h>
 #include <transport/MessageCounter.h>
 #include <transport/PeerMessageCounter.h>
 
