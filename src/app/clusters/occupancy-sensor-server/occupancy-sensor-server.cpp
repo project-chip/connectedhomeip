@@ -32,7 +32,8 @@ namespace app {
 namespace Clusters {
 namespace OccupancySensing {
 
-Structs::HoldTimeLimitsStruct::Type mHoldTimeLimitsStructs[MATTER_DM_OCCUPANCY_SENSING_CLUSTER_SERVER_ENDPOINT_COUNT + CHIP_DEVICE_CONFIG_DYNAMIC_ENDPOINT_COUNT];
+Structs::HoldTimeLimitsStruct::Type
+    mHoldTimeLimitsStructs[MATTER_DM_OCCUPANCY_SENSING_CLUSTER_SERVER_ENDPOINT_COUNT + CHIP_DEVICE_CONFIG_DYNAMIC_ENDPOINT_COUNT];
 
 uint16_t mHoldTime[MATTER_DM_OCCUPANCY_SENSING_CLUSTER_SERVER_ENDPOINT_COUNT + CHIP_DEVICE_CONFIG_DYNAMIC_ENDPOINT_COUNT];
 
@@ -47,43 +48,42 @@ void OccupancySensingAttrAccess::Shutdown()
     unregisterAttributeAccessOverride(this);
 }
 
-
 CHIP_ERROR OccupancySensingAttrAccess::Read(const ConcreteReadAttributePath & aPath, AttributeValueEncoder & aEncoder)
 {
-	VerifyOrDie(aPath.mClusterId == app::Clusters::OccupancySensing::Id);
+    VerifyOrDie(aPath.mClusterId == app::Clusters::OccupancySensing::Id);
 
-	switch (aPath.mAttributeId)
+    switch (aPath.mAttributeId)
     {
-	case Attributes::FeatureMap::Id:
+    case Attributes::FeatureMap::Id:
         ReturnErrorOnFailure(aEncoder.Encode(mFeature));
         break;
     case Attributes::HoldTime::Id: {
 
         uint16_t * holdTime = GetHoldTimeForEndpoint(aPath.mEndpointId);
 
-		if (holdTime == nullptr)
+        if (holdTime == nullptr)
         {
             return CHIP_ERROR_NOT_FOUND;
         }
 
-		return aEncoder.Encode(*holdTime);
+        return aEncoder.Encode(*holdTime);
     }
-	case Attributes::HoldTimeLimits::Id: {
+    case Attributes::HoldTimeLimits::Id: {
 
         Structs::HoldTimeLimitsStruct::Type * holdTimeLimitsStruct = GetHoldTimeLimitsForEndpoint(aPath.mEndpointId);
 
-		if (holdTimeLimitsStruct == nullptr)
+        if (holdTimeLimitsStruct == nullptr)
         {
             return CHIP_ERROR_NOT_FOUND;
         }
 
-		return aEncoder.Encode(*holdTimeLimitsStruct);
+        return aEncoder.Encode(*holdTimeLimitsStruct);
     }
     default:
         return CHIP_NO_ERROR;
     }
 
-	return CHIP_NO_ERROR;
+    return CHIP_NO_ERROR;
 }
 
 bool OccupancySensingAttrAccess::HasFeature(Feature aFeature) const
@@ -93,10 +93,10 @@ bool OccupancySensingAttrAccess::HasFeature(Feature aFeature) const
 
 Structs::HoldTimeLimitsStruct::Type * GetHoldTimeLimitsForEndpoint(EndpointId endpoint)
 {
-	auto index = emberAfGetClusterServerEndpointIndex(endpoint, app::Clusters::OccupancySensing::Id,
+    auto index = emberAfGetClusterServerEndpointIndex(endpoint, app::Clusters::OccupancySensing::Id,
                                                       MATTER_DM_OCCUPANCY_SENSING_CLUSTER_SERVER_ENDPOINT_COUNT);
 
-	if (index == kEmberInvalidEndpointIndex)
+    if (index == kEmberInvalidEndpointIndex)
     {
         return nullptr;
     }
@@ -117,7 +117,7 @@ CHIP_ERROR SetHoldTimeLimits(EndpointId endpointId, const Structs::HoldTimeLimit
     Structs::HoldTimeLimitsStruct::Type * holdTimeLimitsForEndpoint = GetHoldTimeLimitsForEndpoint(endpointId);
     VerifyOrReturnError(holdTimeLimitsForEndpoint != nullptr, CHIP_ERROR_INVALID_ARGUMENT);
 
-	holdTimeLimitsForEndpoint->holdTimeMin     = holdTimeLimits.holdTimeMin;
+    holdTimeLimitsForEndpoint->holdTimeMin     = holdTimeLimits.holdTimeMin;
     holdTimeLimitsForEndpoint->holdTimeMax     = holdTimeLimits.holdTimeMax;
     holdTimeLimitsForEndpoint->holdTimeDefault = holdTimeLimits.holdTimeDefault;
 
@@ -128,10 +128,10 @@ CHIP_ERROR SetHoldTimeLimits(EndpointId endpointId, const Structs::HoldTimeLimit
 
 uint16_t * GetHoldTimeForEndpoint(EndpointId endpoint)
 {
-	auto index = emberAfGetClusterServerEndpointIndex(endpoint, app::Clusters::OccupancySensing::Id,
+    auto index = emberAfGetClusterServerEndpointIndex(endpoint, app::Clusters::OccupancySensing::Id,
                                                       MATTER_DM_OCCUPANCY_SENSING_CLUSTER_SERVER_ENDPOINT_COUNT);
 
-	if (index == kEmberInvalidEndpointIndex)
+    if (index == kEmberInvalidEndpointIndex)
     {
         return nullptr;
     }
@@ -146,18 +146,17 @@ uint16_t * GetHoldTimeForEndpoint(EndpointId endpoint)
 
 CHIP_ERROR SetHoldTime(EndpointId endpointId, const uint16_t & holdTime)
 {
-	VerifyOrReturnError(kInvalidEndpointId != endpointId, CHIP_ERROR_INVALID_ARGUMENT);
+    VerifyOrReturnError(kInvalidEndpointId != endpointId, CHIP_ERROR_INVALID_ARGUMENT);
 
     uint16_t * holdTimeForEndpoint = GetHoldTimeForEndpoint(endpointId);
     VerifyOrReturnError(holdTimeForEndpoint != nullptr, CHIP_ERROR_INVALID_ARGUMENT);
 
-	*holdTimeForEndpoint = holdTime;
+    *holdTimeForEndpoint = holdTime;
 
     MatterReportingAttributeChangeCallback(endpointId, OccupancySensing::Id, Attributes::HoldTime::Id);
 
     return CHIP_NO_ERROR;
 }
-
 
 } // namespace OccupancySensing
 } // namespace Clusters
@@ -230,6 +229,4 @@ HalOccupancySensorType __attribute__((weak)) halOccupancyGetSensorType(EndpointI
     return HAL_OCCUPANCY_SENSOR_TYPE_PIR;
 }
 
-
-void MatterOccupancySensingPluginServerInitCallback()
-{}
+void MatterOccupancySensingPluginServerInitCallback() {}

@@ -30,27 +30,24 @@ namespace app {
 namespace Clusters {
 namespace OccupancySensing {
 
-
 class OccupancySensingAttrAccess : public AttributeAccessInterface
 {
 public:
-	OccupancySensingAttrAccess(BitMask<Feature> aFeature) :
-	app::AttributeAccessInterface(Optional<EndpointId>::Missing(), app::Clusters::OccupancySensing::Id), mFeature(aFeature)
-	{}
+    OccupancySensingAttrAccess(BitMask<Feature> aFeature) :
+    app::AttributeAccessInterface(Optional<EndpointId>::Missing(), app::Clusters::OccupancySensing::Id), mFeature(aFeature)
+    {}
 
     ~OccupancySensingAttrAccess() { Shutdown(); }
 
-
     CHIP_ERROR Init();
-	void Shutdown();
+    void Shutdown();
 
     CHIP_ERROR Read(const ConcreteReadAttributePath & aPath, AttributeValueEncoder & aEncoder) override;
 
-	bool HasFeature(Feature aFeature) const;
+    bool HasFeature(Feature aFeature) const;
 
 private:
     BitMask<Feature> mFeature;
-
 };
 
 CHIP_ERROR SetHoldTimeLimits(EndpointId endpointId, const Structs::HoldTimeLimitsStruct::Type & holdTimeLimits);
@@ -60,7 +57,6 @@ CHIP_ERROR SetHoldTime(EndpointId endpointId, const uint16_t & holdTime);
 Structs::HoldTimeLimitsStruct::Type * GetHoldTimeLimitsForEndpoint(EndpointId endpoint);
 
 uint16_t * GetHoldTimeForEndpoint(EndpointId endpoint);
-
 
 } // namespace OccupancySensing
 } // namespace Clusters
