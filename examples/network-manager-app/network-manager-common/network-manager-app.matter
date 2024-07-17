@@ -1273,18 +1273,23 @@ endpoint 0 {
   server cluster AccessControl {
     emits event AccessControlEntryChanged;
     emits event AccessControlExtensionChanged;
+    emits event AccessRestrictionEntryChanged;
+    emits event FabricRestrictionReviewUpdate;
     callback attribute acl;
     callback attribute extension;
     callback attribute subjectsPerAccessControlEntry;
     callback attribute targetsPerAccessControlEntry;
     callback attribute accessControlEntriesPerFabric;
-    callback attribute arl;
     callback attribute commissioningARL;
+    callback attribute arl;
     callback attribute generatedCommandList;
     callback attribute acceptedCommandList;
     callback attribute attributeList;
-    ram      attribute featureMap default = 0;
+    ram      attribute featureMap default = 1;
     callback attribute clusterRevision;
+
+    handle command ReviewFabricRestrictions;
+    handle command ReviewFabricRestrictionsResponse;
   }
 
   server cluster BasicInformation {
@@ -1525,3 +1530,5 @@ endpoint 1 {
     handle command NetworkPassphraseResponse;
   }
 }
+
+

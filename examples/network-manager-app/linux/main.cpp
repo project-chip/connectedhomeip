@@ -27,6 +27,11 @@ using namespace chip::app::Clusters;
 void ApplicationInit() {}
 void ApplicationShutdown() {}
 
+bool emberAfAccessControlClusterReviewFabricRestrictionsCallback(chip::app::CommandHandler*, chip::app::ConcreteCommandPath const&, chip::app::Clusters::AccessControl::Commands::ReviewFabricRestrictions::DecodableType const&)
+{
+    return true;
+}
+
 ByteSpan ByteSpanFromCharSpan(CharSpan span)
 {
     return ByteSpan(Uint8::from_const_char(span.data()), span.size());
