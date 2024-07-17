@@ -2535,7 +2535,7 @@ static const uint16_t kSubscriptionPoolBaseTimeoutInSeconds = 30;
     };
 
     __block NSMutableDictionary<NSNumber *, NSArray<NSNumber *> *> * initialClusterIndex = [[NSMutableDictionary alloc] init];
-    // Some of the places we gets endpoint lists get them from enumerating dictionary keys, which
+    // Some of the places we get endpoint lists get them from enumerating dictionary keys, which
     // means order is not guaranteed.  Make sure we compare sets of endpoints, not arrays, to
     // account for that.
     __block NSSet<NSNumber *> * testEndpoints;
@@ -2620,7 +2620,7 @@ static const uint16_t kSubscriptionPoolBaseTimeoutInSeconds = 30;
         XCTAssertNotNil(testClusterDataValueForPartsList);
         testEndpoints = [NSSet setWithArray:[self getEndpointArrayFromPartsList:testDataForPartsList forDevice:device]];
 
-        // Make sure that the cluster data is remoeved from the data storage for the endpoint we deleted, but still there for the others.
+        // Make sure that the cluster data is removed from the data storage for the endpoint we deleted, but still there for the others.
         // We do not need to check _persistedClusterData here. _persistedClusterData will be paged in from storage when needed so
         // just checking data storage should suffice here.
         dispatch_sync(self->_storageQueue, ^{
