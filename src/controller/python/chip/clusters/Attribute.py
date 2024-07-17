@@ -730,6 +730,7 @@ class AsyncReadTransaction:
                 self, subscriptionId, self._devCtrl)
             self._future.set_result(self._subscription_handler)
         else:
+            self._subscription_handler._subscriptionId = subscriptionId
             if self._subscription_handler._onResubscriptionSucceededCb is not None:
                 if (self._subscription_handler._onResubscriptionSucceededCb_isAsync):
                     self._event_loop.create_task(
