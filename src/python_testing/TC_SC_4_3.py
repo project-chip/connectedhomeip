@@ -320,7 +320,7 @@ class TC_SC_4_3(MatterBaseTest):
 
         # T TXT KEY
         if 'T' in operational_record.txt_record:
-            logging.info(f"T key is present in TXT record, verify if that it is a decimal value with no leading zeros and is less than or equal to 6. Convert the value to a bitmap and verify bit 0 is clear.")
+            logging.info("T key is present in TXT record, verify if that it is a decimal value with no leading zeros and is less than or equal to 6. Convert the value to a bitmap and verify bit 0 is clear.")
             t_value = operational_record.txt_record['T']
             result, message = self.verify_t_value(t_value)
             asserts.assert_true(result, message)
