@@ -2952,6 +2952,9 @@ static const uint16_t kSubscriptionPoolBaseTimeoutInSeconds = 30;
     NSNumber * nodeID = @(123);
     NSNumber * fabricID = @(456);
 
+    NSString * testKey = @"testKey";
+    NSString * testValue = @"testValue";
+
     NSError * error;
     MTRDeviceController * controller = [self startControllerWithRootKeys:rootKeys
                                                          operationalKeys:operationalKeys
@@ -2965,10 +2968,25 @@ static const uint16_t kSubscriptionPoolBaseTimeoutInSeconds = 30;
 
     XCTAssertEqualObjects(controller.controllerNodeID, nodeID);
 
-    // actual test
+    // actual test begins here
+
     XCTAssertNotNil(controller.controllerDataStore);
+    
+    id verifyEmptyData = [controller.controllerDataStore clientDataForKey:testKey nodeID:@(1234)];
+    XCTAssertNil(verifyEmptyData);
+
+    // store data
+    [controller.controllerDataStore storeClientDataForKey:testKey value:testValue forNodeID:@(1234)];
+    
+    // read back client data
+    id readbackData = [controller.controllerDataStore clientDataForKey:testKey nodeID:@(1234)];
+    XCTAssertNotNil(readbackData);
+    XCTAssertEqualObjects(testValue, readbackData);
+
+    // TODO:  delete client data
 
     // end actual test
+    
     [controller shutdown];
     XCTAssertFalse([controller isRunning]);
 }

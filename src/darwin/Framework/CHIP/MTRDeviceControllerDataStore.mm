@@ -1170,6 +1170,8 @@ static NSString * sDeviceDataKeyPrefix = @"deviceData";
 static NSString * sClientDataKeyPrefix = @"clientData";
 static NSString * sClientDataNodeIndexKey = @"clientDataNodeIndex";
 
+typedef NSString * MTRClientDataKey;
+
 - (NSArray<NSString *> *)_clientDataIndexForNodeID:(NSNumber *)nodeID {
     __block NSArray<NSString *> * index = nil;
 
@@ -1214,6 +1216,8 @@ static NSString * sClientDataNodeIndexKey = @"clientDataNodeIndex";
         VerifyOrReturn(controller != nil); // No way to call delegate without controller.
 
         id data;
+        NSString * storageKey = [self _clientDataKeyForNodeID:nodeID key:key];
+        NSLog(@"kmo: clientDataForKey - data key %@", storageKey);
         @autoreleasepool {
             data = [self->_storageDelegate controller:controller
                                           valueForKey:[self _clientDataKeyForNodeID:nodeID key:key]
@@ -1221,10 +1225,7 @@ static NSString * sClientDataNodeIndexKey = @"clientDataNodeIndex";
                                           sharingType:MTRStorageSharingTypeNotShared];  // REVIEWERS:  fabric shared? kmo 12 jul 2024 14h58
         }
         if (data == nil) {
-            return;
-        }
 
-        if (![data isKindOfClass:NSDictionary.class]) {
             return;
         }
         
@@ -1233,6 +1234,8 @@ static NSString * sClientDataNodeIndexKey = @"clientDataNodeIndex";
             MTR_LOG_ERROR("Client data retrieved from MTRDeviceControllerDataStore did not conform to NSSecureCoding");
             return;
         }
+        
+        // TODO:  check against list of allowed data types? kmo 17 jul 2024 10h14
 
         // We can't do value type verification; our API consumer will need
         // to do that.
@@ -1242,19 +1245,66 @@ static NSString * sClientDataNodeIndexKey = @"clientDataNodeIndex";
     return clientData;
 }
 
+
+
+- (void)_updateClientDataIndexForKey:(NSString * _Nonnull)key
+                        nodeID:(NSNumber * _Nonnull)nodeID
+                    controller:(MTRDeviceController *)controller {
+    NSArray<MTRClientDataKey> * index = [self _clientDataIndexForNodeID:nodeID];
+    NSMutableArray<MTRClientDataKey> * modifiedIndex = nil;
+    BOOL indexModified = NO;
+    
+    if (index == nil) {
+        modifiedIndex = [NSMutableArray array];
+    } else {
+        modifiedIndex = [index mutableCopy];
+        indexModified = YES;
+    }
+    
+    if (![index containsObject:key]) {
+        // first time storing this key, add to stored keys index
+        [modifiedIndex addObject:key];
+        indexModified = YES;
+    }
+
+
+    if (!indexModified) {
+        return;
+    }
+    
+    // TODO:  store modified index
+//    NSString * storageKey = [self _clientDataKeyForNodeID:nodeID key:key];
+//    NSLog(@"kmo: updateClientDataIndexForKey - data key %@", storageKey);
+//
+//    [self->_storageDelegate controller:controller
+//                            storeValue:modifiedIndex
+//                                forKey:sClientDataNodeIndexKey
+//                         securityLevel:MTRStorageSecurityLevelSecure
+//                           sharingType:MTRStorageSharingTypeNotShared];
+
+
+}
+
 - (void)storeClientDataForKey:(NSString *)key value:(id<NSSecureCoding>)value forNodeID:(NSNumber *)nodeID
 {
+    NSLog(@"kmo: storeClientDataForKey async");
     dispatch_async(_storageDelegateQueue, ^{
+        NSLog(@"kmo: storeClientDataForKey async block started");
         MTRDeviceController * controller = self->_controller;
         VerifyOrReturn(controller != nil); // No way to call delegate without controller.
 
         // Ignore store failures, since they are not actionable for us here.
         // REVIEWERS:  could we log failures? kmo 12 jul 2024 13h10
+        NSString * storageKey = [self _clientDataKeyForNodeID:nodeID key:key];
+        NSLog(@"kmo: storeClientDataForKey - data key %@", storageKey);
         [self->_storageDelegate controller:controller
                                 storeValue:value
-                                    forKey:[self _clientDataKeyForNodeID:nodeID key:key]
+                                    forKey:storageKey
                              securityLevel:MTRStorageSecurityLevelSecure
                                sharingType:MTRStorageSharingTypeNotShared]; // REVIEWERS:  should be fabric shared? kmo 12 jul 2024 13h10
+
+
+        [self _updateClientDataIndexForKey:key nodeID:nodeID controller:controller];
     });
 }
 
