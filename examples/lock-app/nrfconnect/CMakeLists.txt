@@ -13,7 +13,7 @@
 #    See the License for the specific language governing permissions and
 #    limitations under the License.
 #
-cmake_minimum_required(VERSION 3.13.1)
+cmake_minimum_required(VERSION 3.20.0)
 
 get_filename_component(CHIP_ROOT ${CMAKE_CURRENT_SOURCE_DIR}/third_party/connectedhomeip REALPATH)
 get_filename_component(NRFCONNECT_COMMON ${CHIP_ROOT}/examples/platform/nrfconnect REALPATH)
@@ -32,6 +32,7 @@ target_compile_options(app PRIVATE -Werror -Wno-error=maybe-uninitialized)
 
 project(chip-nrfconnect-lock-example)
 
+include(${CHIP_ROOT}/config/nrfconnect/app/check-sysbuild-use.cmake)
 include(${CHIP_ROOT}/config/nrfconnect/app/enable-gnu-std.cmake)
 include(${CHIP_ROOT}/config/nrfconnect/app/flashing.cmake)
 include(${CHIP_ROOT}/src/app/chip_data_model.cmake)

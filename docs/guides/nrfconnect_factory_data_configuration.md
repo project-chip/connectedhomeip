@@ -764,9 +764,9 @@ $ python scripts/tools/nrfconnect/nrfconnect_generate_partition.py -i build/ligh
 ```
 
 As a result, `factory_data.hex` and `factory_data.bin` files are created in the
-`/build/light_bulb/zephyr/` directory. The first file contains the memory offset. For this
-reason, it can be programmed directly to the device using a programmer (for
-example, `nrfjprog`).
+`/build/light_bulb/zephyr/` directory. The first file contains the memory
+offset. For this reason, it can be programmed directly to the device using a
+programmer (for example, `nrfjprog`).
 
 <hr>
 
@@ -786,8 +786,8 @@ directory and build the example with the following option (replace
 $ west build -b nrf52840dk_nrf52840 -- -DCONFIG_CHIP_FACTORY_DATA=y -DSB_CONFIG_MATTER_FACTORY_DATA_GENERATE=y
 ```
 
-Alternatively, you can also add `SB_CONFIG_MATTER_FACTORY_DATA_GENERATE=y` Kconfig
-setting to the example's `prj.conf` file.
+Alternatively, you can also add `SB_CONFIG_MATTER_FACTORY_DATA_GENERATE=y`
+Kconfig setting to the example's `prj.conf` file.
 
 Each factory data parameter has a default value. These are described in the
 [Kconfig file](../../config/nrfconnect/chip-module/Kconfig). Setting a new value

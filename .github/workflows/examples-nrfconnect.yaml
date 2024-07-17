@@ -86,7 +86,7 @@ jobs:
             - name: Build example nRF Connect SDK Lighting App on nRF52840 Dongle
               if: github.event_name == 'push' || steps.changed_paths.outputs.nrfconnect == 'true'
               run: |
-                  scripts/examples/nrfconnect_example.sh lighting-app nrf52840dongle_nrf52840 -DCONF_FILE=prj_no_dfu.conf -DCONFIG_CHIP_ROTATING_DEVICE_ID=y
+                  scripts/examples/nrfconnect_example.sh lighting-app nrf52840dongle_nrf52840 -DCONFIG_CHIP_ROTATING_DEVICE_ID=y
                   .environment/pigweed-venv/bin/python3 scripts/tools/memory/gh_sizes.py \
                     nrfconnect nrf52840dongle_nrf52840 lighting-app \
                     examples/lighting-app/nrfconnect/build/zephyr/zephyr.elf \

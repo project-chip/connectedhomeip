@@ -33,6 +33,7 @@ target_compile_options(app PRIVATE -Werror -Wno-error=maybe-uninitialized)
 
 project(chip-nrfconnect-light-switch-example)
 
+include(${CHIP_ROOT}/config/nrfconnect/app/check-sysbuild-use.cmake)
 include(${CHIP_ROOT}/config/nrfconnect/app/enable-gnu-std.cmake)
 include(${CHIP_ROOT}/config/nrfconnect/app/flashing.cmake)
 include(${CHIP_ROOT}/src/app/chip_data_model.cmake)
