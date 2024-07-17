@@ -20,7 +20,6 @@
 #include <app/clusters/occupancy-sensor-server/occupancy-sensor-server.h>
 #include <platform/CHIPDeviceLayer.h>
 
-
 using namespace chip;
 using namespace chip::app::Clusters;
 using namespace chip::app::Clusters::OccupancySensing;
@@ -29,33 +28,32 @@ using namespace chip::DeviceLayer;
 
 using chip::Protocols::InteractionModel::Status;
 
-static std::unique_ptr<OccupancySensingAttrAccess> gAttrAccess[MATTER_DM_OCCUPANCY_SENSING_CLUSTER_SERVER_ENDPOINT_COUNT + CHIP_DEVICE_CONFIG_DYNAMIC_ENDPOINT_COUNT];
+static std::unique_ptr<OccupancySensingAttrAccess>
+    gAttrAccess[MATTER_DM_OCCUPANCY_SENSING_CLUSTER_SERVER_ENDPOINT_COUNT + CHIP_DEVICE_CONFIG_DYNAMIC_ENDPOINT_COUNT];
 
 
 void emberAfOccupancySensingClusterInitCallback(chip::EndpointId endpointId)
 {
-    
     VerifyOrDie(!gAttrAccess[endpointId]);
 
     gAttrAccess[endpointId] = std::make_unique<OccupancySensingAttrAccess>(
         BitMask<OccupancySensing::Feature, uint32_t>(OccupancySensing::Feature::kOther));
 
-    
-	OccupancySensing::Structs::HoldTimeLimitsStruct::Type holdTimeLimits = {
+    OccupancySensing::Structs::HoldTimeLimitsStruct::Type holdTimeLimits = {
         .holdTimeMin     = 1,
         .holdTimeMax     = 300,
         .holdTimeDefault = 10,
     };
 
-	uint16_t holdTime = 10;
+    uint16_t holdTime = 10;
 
     if (gAttrAccess[endpointId])
     {
         gAttrAccess[endpointId]->Init();
-		
-		SetHoldTimeLimits(endpointId, holdTimeLimits);
-		
-		SetHoldTime(endpointId, holdTime);
+
+        SetHoldTimeLimits(endpointId, holdTimeLimits);
+
+        SetHoldTime(endpointId, holdTime);
     }
-	
+
 }
