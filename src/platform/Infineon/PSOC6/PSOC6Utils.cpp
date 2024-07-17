@@ -19,17 +19,18 @@
 
 /**
  *    @file
- *          General utility methods for the P6 platform.
+ *          General utility methods for the PSOC6 platform.
  */
 /* this file behaves like a config.h, comes first */
 #include <platform/internal/CHIPDeviceLayerInternal.h>
 
 #include "cy_network_mw_core.h"
+#include "cy_nw_helper.h"
 #include <cy_wcm.h>
 #include <lib/core/ErrorStr.h>
 #include <lib/support/CodeUtils.h>
 #include <lib/support/logging/CHIPLogging.h>
-#include <platform/Infineon/PSOC6/P6Utils.h>
+#include <platform/Infineon/PSOC6/PSOC6Utils.h>
 
 #include "lwip/icmp.h"
 #include "lwip/inet.h"
@@ -43,7 +44,7 @@
 #include "lwip/sys.h"
 #include "lwip/timeouts.h"
 #include <malloc.h>
-#include <platform/Infineon/PSOC6/P6Config.h>
+#include <platform/Infineon/PSOC6/PSOC6Config.h>
 
 using namespace ::chip::DeviceLayer::Internal;
 using chip::DeviceLayer::Internal::DeviceNetworkInfo;
@@ -96,39 +97,39 @@ typedef struct
     uint8_t data[PING_DATA_SIZE];
 } icmp_packet_t;
 
-CHIP_ERROR P6Utils::IsAPEnabled(bool & apEnabled)
+CHIP_ERROR PSOC6Utils::IsAPEnabled(bool & apEnabled)
 {
     apEnabled = (WiFiMode == WIFI_MODE_AP || WiFiMode == WIFI_MODE_APSTA);
     return CHIP_NO_ERROR;
 }
 
-CHIP_ERROR P6Utils::IsStationEnabled(bool & staEnabled)
+CHIP_ERROR PSOC6Utils::IsStationEnabled(bool & staEnabled)
 {
     staEnabled = (WiFiMode == WIFI_MODE_STA || WiFiMode == WIFI_MODE_APSTA);
     return CHIP_NO_ERROR;
 }
 
-bool P6Utils::IsStationProvisioned(void)
+bool PSOC6Utils::IsStationProvisioned(void)
 {
     wifi_config_t stationConfig;
     return (p6_wifi_get_config(WIFI_IF_STA, &stationConfig) == CHIP_NO_ERROR && strlen((const char *) stationConfig.sta.ssid) != 0);
 }
 
-CHIP_ERROR P6Utils::IsStationConnected(bool & connected)
+CHIP_ERROR PSOC6Utils::IsStationConnected(bool & connected)
 {
     CHIP_ERROR err = CHIP_NO_ERROR;
     connected      = cy_wcm_is_connected_to_ap();
     return err;
 }
 
-CHIP_ERROR P6Utils::StartWiFiLayer(void)
+CHIP_ERROR PSOC6Utils::StartWiFiLayer(void)
 {
     CHIP_ERROR err   = CHIP_NO_ERROR;
     cy_rslt_t result = CY_RSLT_SUCCESS;
     cy_wcm_config_t wcm_config;
 
     wcm_config.interface = CY_WCM_INTERFACE_TYPE_AP_STA;
-    ChipLogProgress(DeviceLayer, "Starting P6 WiFi layer");
+    ChipLogProgress(DeviceLayer, "Starting PSOC6 WiFi layer");
 
     if (wcm_init_done == false)
     {
@@ -136,7 +137,7 @@ CHIP_ERROR P6Utils::StartWiFiLayer(void)
         if (result != CY_RSLT_SUCCESS)
         {
             err = CHIP_ERROR_INTERNAL;
-            ChipLogError(DeviceLayer, "StartWiFiLayer() P6 Wi-Fi Started Failed: %s", chip::ErrorStr(err));
+            ChipLogError(DeviceLayer, "StartWiFiLayer() PSOC6 Wi-Fi Started Failed: %s", chip::ErrorStr(err));
             SuccessOrExit(err);
         }
         wcm_init_done = true;
@@ -146,7 +147,7 @@ exit:
     return err;
 }
 
-CHIP_ERROR P6Utils::EnableStationMode(void)
+CHIP_ERROR PSOC6Utils::EnableStationMode(void)
 {
     CHIP_ERROR err = CHIP_NO_ERROR;
     ChipLogProgress(DeviceLayer, "EnableStationMode");
@@ -163,7 +164,7 @@ CHIP_ERROR P6Utils::EnableStationMode(void)
     return err;
 }
 
-CHIP_ERROR P6Utils::SetAPMode(bool enabled)
+CHIP_ERROR PSOC6Utils::SetAPMode(bool enabled)
 {
     CHIP_ERROR err = CHIP_NO_ERROR;
     ChipLogProgress(DeviceLayer, "SetAPMode");
@@ -193,7 +194,7 @@ CHIP_ERROR P6Utils::SetAPMode(bool enabled)
     return err;
 }
 
-const char * P6Utils::WiFiModeToStr(wifi_mode_t wifiMode)
+const char * PSOC6Utils::WiFiModeToStr(wifi_mode_t wifiMode)
 {
     switch (wifiMode)
     {
@@ -210,49 +211,49 @@ const char * P6Utils::WiFiModeToStr(wifi_mode_t wifiMode)
     }
 }
 
-CHIP_ERROR P6Utils::GetWiFiSSID(char * buf, size_t bufSize)
+CHIP_ERROR PSOC6Utils::GetWiFiSSID(char * buf, size_t bufSize)
 {
     size_t num = 0;
-    return P6Config::ReadConfigValueStr(P6Config::kConfigKey_WiFiSSID, buf, bufSize, num);
+    return PSOC6Config::ReadConfigValueStr(PSOC6Config::kConfigKey_WiFiSSID, buf, bufSize, num);
 }
 
-CHIP_ERROR P6Utils::StoreWiFiSSID(char * buf, size_t size)
+CHIP_ERROR PSOC6Utils::StoreWiFiSSID(char * buf, size_t size)
 {
-    return P6Config::WriteConfigValueStr(P6Config::kConfigKey_WiFiSSID, buf, size);
+    return PSOC6Config::WriteConfigValueStr(PSOC6Config::kConfigKey_WiFiSSID, buf, size);
 }
 
-CHIP_ERROR P6Utils::GetWiFiPassword(char * buf, size_t bufSize)
+CHIP_ERROR PSOC6Utils::GetWiFiPassword(char * buf, size_t bufSize)
 {
     size_t num = 0;
-    return P6Config::ReadConfigValueStr(P6Config::kConfigKey_WiFiPassword, buf, bufSize, num);
+    return PSOC6Config::ReadConfigValueStr(PSOC6Config::kConfigKey_WiFiPassword, buf, bufSize, num);
 }
 
-CHIP_ERROR P6Utils::StoreWiFiPassword(char * buf, size_t size)
+CHIP_ERROR PSOC6Utils::StoreWiFiPassword(char * buf, size_t size)
 {
-    return P6Config::WriteConfigValueStr(P6Config::kConfigKey_WiFiPassword, buf, size);
+    return PSOC6Config::WriteConfigValueStr(PSOC6Config::kConfigKey_WiFiPassword, buf, size);
 }
 
-CHIP_ERROR P6Utils::GetWiFiSecurityCode(uint32_t & security)
+CHIP_ERROR PSOC6Utils::GetWiFiSecurityCode(uint32_t & security)
 {
-    return P6Config::ReadConfigValue(P6Config::kConfigKey_WiFiSecurity, security);
+    return PSOC6Config::ReadConfigValue(PSOC6Config::kConfigKey_WiFiSecurity, security);
 }
 
-CHIP_ERROR P6Utils::StoreWiFiSecurityCode(uint32_t security)
+CHIP_ERROR PSOC6Utils::StoreWiFiSecurityCode(uint32_t security)
 {
-    return P6Config::WriteConfigValue(P6Config::kConfigKey_WiFiSecurity, security);
+    return PSOC6Config::WriteConfigValue(PSOC6Config::kConfigKey_WiFiSecurity, security);
 }
 
-CHIP_ERROR P6Utils::wifi_get_mode(uint32_t & mode)
+CHIP_ERROR PSOC6Utils::wifi_get_mode(uint32_t & mode)
 {
-    return P6Config::ReadConfigValue(P6Config::kConfigKey_WiFiMode, mode);
+    return PSOC6Config::ReadConfigValue(PSOC6Config::kConfigKey_WiFiMode, mode);
 }
 
-CHIP_ERROR P6Utils::wifi_set_mode(uint32_t mode)
+CHIP_ERROR PSOC6Utils::wifi_set_mode(uint32_t mode)
 {
-    return P6Config::WriteConfigValue(P6Config::kConfigKey_WiFiMode, mode);
+    return PSOC6Config::WriteConfigValue(PSOC6Config::kConfigKey_WiFiMode, mode);
 }
 
-CHIP_ERROR P6Utils::p6_wifi_set_config(wifi_interface_t interface, wifi_config_t * conf)
+CHIP_ERROR PSOC6Utils::p6_wifi_set_config(wifi_interface_t interface, wifi_config_t * conf)
 {
     CHIP_ERROR err = CHIP_NO_ERROR;
     if (interface == WIFI_IF_STA)
@@ -281,15 +282,15 @@ exit:
     return err;
 }
 
-CHIP_ERROR P6Utils::p6_wifi_get_config(wifi_interface_t interface, wifi_config_t * conf)
+CHIP_ERROR PSOC6Utils::p6_wifi_get_config(wifi_interface_t interface, wifi_config_t * conf)
 {
     uint32 code    = 0;
     CHIP_ERROR err = CHIP_NO_ERROR;
     if (interface == WIFI_IF_STA)
     {
-        if (P6Config::ConfigValueExists(P6Config::kConfigKey_WiFiSSID) &&
-            P6Config::ConfigValueExists(P6Config::kConfigKey_WiFiPassword) &&
-            P6Config::ConfigValueExists(P6Config::kConfigKey_WiFiSecurity))
+        if (PSOC6Config::ConfigValueExists(PSOC6Config::kConfigKey_WiFiSSID) &&
+            PSOC6Config::ConfigValueExists(PSOC6Config::kConfigKey_WiFiPassword) &&
+            PSOC6Config::ConfigValueExists(PSOC6Config::kConfigKey_WiFiSecurity))
         {
             /* Retrieve Wi-Fi Configurations from Storage */
             err = GetWiFiSSID((char *) conf->sta.ssid, sizeof(conf->sta.ssid));
@@ -320,7 +321,7 @@ exit:
     return err;
 }
 
-CHIP_ERROR P6Utils::GetWiFiStationProvision(Internal::DeviceNetworkInfo & netInfo, bool includeCredentials)
+CHIP_ERROR PSOC6Utils::GetWiFiStationProvision(Internal::DeviceNetworkInfo & netInfo, bool includeCredentials)
 {
     CHIP_ERROR err = CHIP_NO_ERROR;
     wifi_config_t stationConfig;
@@ -350,7 +351,7 @@ exit:
     return err;
 }
 
-CHIP_ERROR P6Utils::SetWiFiStationProvision(const Internal::DeviceNetworkInfo & netInfo)
+CHIP_ERROR PSOC6Utils::SetWiFiStationProvision(const Internal::DeviceNetworkInfo & netInfo)
 {
     CHIP_ERROR err = CHIP_NO_ERROR;
     wifi_config_t wifiConfig;
@@ -358,9 +359,9 @@ CHIP_ERROR P6Utils::SetWiFiStationProvision(const Internal::DeviceNetworkInfo & 
     char wifiSSID[kMaxWiFiSSIDLength + 1];
     size_t netInfoSSIDLen = strlen(netInfo.WiFiSSID);
 
-    // Ensure that P6 station mode is enabled.  This is required before p6_wifi_set_config
+    // Ensure that PSOC6 station mode is enabled.  This is required before p6_wifi_set_config
     // can be called.
-    err = P6Utils::EnableStationMode();
+    err = PSOC6Utils::EnableStationMode();
     SuccessOrExit(err);
 
     // Enforce that wifiSSID is null terminated before copying it
@@ -374,10 +375,10 @@ CHIP_ERROR P6Utils::SetWiFiStationProvision(const Internal::DeviceNetworkInfo & 
         wifiSSID[kMaxWiFiSSIDLength] = '\0';
     }
 
-    // Initialize an P6 wifi_config_t structure based on the new provision information.
+    // Initialize an PSOC6 wifi_config_t structure based on the new provision information.
     populate_wifi_config_t(&wifiConfig, WIFI_IF_STA, (cy_wcm_ssid_t *) wifiSSID, (cy_wcm_passphrase_t *) netInfo.WiFiKey);
 
-    // Configure the P6 WiFi interface.
+    // Configure the PSOC6 WiFi interface.
     ReturnLogErrorOnFailure(p6_wifi_set_config(WIFI_IF_STA, &wifiConfig));
 
     ChipLogProgress(DeviceLayer, "WiFi station provision set (SSID: %s)", netInfo.WiFiSSID);
@@ -386,18 +387,18 @@ exit:
     return err;
 }
 
-CHIP_ERROR P6Utils::ClearWiFiStationProvision(void)
+CHIP_ERROR PSOC6Utils::ClearWiFiStationProvision(void)
 {
     CHIP_ERROR err = CHIP_NO_ERROR;
     wifi_config_t stationConfig;
     ChipLogProgress(DeviceLayer, "ClearWiFiStationProvision");
-    // Clear the P6 WiFi station configuration.
+    // Clear the PSOC6 WiFi station configuration.
     memset(&stationConfig.sta, 0, sizeof(stationConfig.sta));
     ReturnLogErrorOnFailure(p6_wifi_set_config(WIFI_IF_STA, &stationConfig));
     return err;
 }
 
-CHIP_ERROR P6Utils::p6_wifi_disconnect(void)
+CHIP_ERROR PSOC6Utils::p6_wifi_disconnect(void)
 {
     CHIP_ERROR err   = CHIP_NO_ERROR;
     cy_rslt_t result = CY_RSLT_SUCCESS;
@@ -411,7 +412,7 @@ CHIP_ERROR P6Utils::p6_wifi_disconnect(void)
     return err;
 }
 
-CHIP_ERROR P6Utils::p6_wifi_connect(void)
+CHIP_ERROR PSOC6Utils::p6_wifi_connect(void)
 {
     CHIP_ERROR err   = CHIP_NO_ERROR;
     cy_rslt_t result = CY_RSLT_SUCCESS;
@@ -445,7 +446,7 @@ static const cy_wcm_ip_setting_t ap_mode_ip_settings2 = {
     INITIALISER_IPV4_ADDRESS1(.netmask, MAKE_IPV4_ADDRESS1(255, 255, 255, 0)),
 };
 
-CHIP_ERROR P6Utils::p6_start_ap(void)
+CHIP_ERROR PSOC6Utils::p6_start_ap(void)
 {
     CHIP_ERROR err   = CHIP_NO_ERROR;
     cy_rslt_t result = CY_RSLT_SUCCESS;
@@ -481,7 +482,7 @@ CHIP_ERROR P6Utils::p6_start_ap(void)
     return err;
 }
 
-CHIP_ERROR P6Utils::p6_stop_ap(void)
+CHIP_ERROR PSOC6Utils::p6_stop_ap(void)
 {
     CHIP_ERROR err   = CHIP_NO_ERROR;
     cy_rslt_t result = CY_RSLT_SUCCESS;
@@ -495,8 +496,8 @@ CHIP_ERROR P6Utils::p6_stop_ap(void)
     return err;
 }
 
-void P6Utils::populate_wifi_config_t(wifi_config_t * wifi_config, wifi_interface_t interface, const cy_wcm_ssid_t * ssid,
-                                     const cy_wcm_passphrase_t * password, cy_wcm_security_t security)
+void PSOC6Utils::populate_wifi_config_t(wifi_config_t * wifi_config, wifi_interface_t interface, const cy_wcm_ssid_t * ssid,
+                                        const cy_wcm_passphrase_t * password, cy_wcm_security_t security)
 {
     CY_ASSERT(wifi_config != NULL);
 
@@ -723,7 +724,7 @@ void ping_raw(void)
 }
 #endif
 
-CHIP_ERROR P6Utils::ping_init(void)
+CHIP_ERROR PSOC6Utils::ping_init(void)
 {
     CHIP_ERROR err               = CHIP_NO_ERROR;
     struct netif * net_interface = NULL;
@@ -819,7 +820,7 @@ static void xtlv_unpack_xtlv(const xtlv_t * xtlv, uint16_t * type, uint16_t * le
     }
 }
 
-void P6Utils::unpack_xtlv_buf(const uint8_t * tlv_buf, uint16_t buflen, wl_cnt_ver_30_t * cnt, wl_cnt_ge40mcst_v1_t * cnt_ge40)
+void PSOC6Utils::unpack_xtlv_buf(const uint8_t * tlv_buf, uint16_t buflen, wl_cnt_ver_30_t * cnt, wl_cnt_ge40mcst_v1_t * cnt_ge40)
 {
     uint16_t len;
     uint16_t type;
@@ -853,7 +854,7 @@ void P6Utils::unpack_xtlv_buf(const uint8_t * tlv_buf, uint16_t buflen, wl_cnt_v
     }
 }
 
-/* Get the Heap total size for P6 Linker file */
+/* Get the Heap total size for PSOC6 Linker file */
 uint32_t get_heap_total()
 {
     extern uint8_t __HeapBase;  /* Symbol exported by the linker. */
@@ -865,7 +866,7 @@ uint32_t get_heap_total()
 }
 
 /* Populate Heap info based on heap total size and Current Heap usage */
-void P6Utils::heap_usage(heap_info_t * heap)
+void PSOC6Utils::heap_usage(heap_info_t * heap)
 {
     struct mallinfo mall_info = mallinfo();
 
