@@ -35,7 +35,7 @@ const char * ToCertificate(const chip::ByteSpan & source, chip::MutableCharSpan 
 {
     // Reset the buffer
     memset(destination.data(), '\0', destination.size());
-
+    int snprintf_len = 0;
     if (source.size() == 0)
     {
         return destination.data();
@@ -70,7 +70,8 @@ const char * ToCertificate(const chip::ByteSpan & source, chip::MutableCharSpan 
             ChipLogError(DataManagement, "Certificate size is greater than 400 bytes");
         }
 
-        snprintf(destination.data(), destination.size(), "%s", str.Get());
+        snprintf_len = snprintf(destination.data(), destination.size(), "%s", str.Get());
+        VerifyOrExit(snprintf_len >= 0, ChipLogError(DataManagement, "Failed to write certificate"););
     }
     else
     {
@@ -83,15 +84,23 @@ const char * ToCertificate(const chip::ByteSpan & source, chip::MutableCharSpan 
         size_t inIndex  = 0;
         size_t outIndex = strlen(header) + 1;
 
-        snprintf(destination.data(), destination.size(), "%s\n", header);
+        snprintf_len = snprintf(destination.data(), destination.size(), "%s\n", header);
+        VerifyOrExit(snprintf_len >= 0, ChipLogError(DataManagement, "Failed to write header"););
         for (; inIndex < base64DataLen; inIndex += 64)
         {
-            auto charsPrinted = snprintf(&destination.data()[outIndex], destination.size() - outIndex, "%.64s\n", &str[inIndex]);
-            outIndex += static_cast<size_t>(charsPrinted);
-        }
-        snprintf(&destination.data()[outIndex], destination.size() - outIndex, "%s", footer);
-    }
+            snprintf_len = snprintf(&destination.data()[outIndex], destination.size() - outIndex, "%.64s\n", &str[inIndex]);
+            VerifyOrExit(snprintf_len >= 0, ChipLogError(DataManagement, "Failed to write certificate"););
 
+            outIndex += static_cast<size_t>(snprintf_len);
+        }
+        snprintf_len = snprintf(&destination.data()[outIndex], destination.size() - outIndex, "%s", footer);
+        VerifyOrExit(snprintf_len >= 0, ChipLogError(DataManagement, "Failed to write footer"););
+    }
+exit:
+    if (snprintf_len < 0)
+    {
+        memset(destination.data(), '\0', destination.size());
+    }
     return destination.data();
 }
 

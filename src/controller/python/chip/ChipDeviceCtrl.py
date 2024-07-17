@@ -61,6 +61,8 @@ __all__ = ["ChipDeviceController", "CommissioningParameters"]
 # Defined in $CHIP_ROOT/src/lib/core/CHIPError.h
 CHIP_ERROR_TIMEOUT: int = 50
 
+LOGGER = logging.getLogger(__name__)
+
 _DevicePairingDelegate_OnPairingCompleteFunct = CFUNCTYPE(None, PyChipError)
 _DeviceUnpairingCompleteFunct = CFUNCTYPE(None, c_uint64, PyChipError)
 _DevicePairingDelegate_OnCommissioningCompleteFunct = CFUNCTYPE(
@@ -401,9 +403,9 @@ class ChipDeviceControllerBase():
     def _set_dev_ctrl(self, devCtrl, pairingDelegate):
         def HandleCommissioningComplete(nodeId: int, err: PyChipError):
             if err.is_success:
-                logging.info("Commissioning complete")
+                LOGGER.info("Commissioning complete")
             else:
-                logging.warning("Failed to commission: {}".format(err))
+                LOGGER.warning("Failed to commission: {}".format(err))
 
             self._dmLib.pychip_DeviceController_SetIcdRegistrationParameters(False, None)
 
@@ -411,7 +413,7 @@ class ChipDeviceControllerBase():
                 err = self._dmLib.pychip_GetCompletionError()
 
             if self._commissioning_context.future is None:
-                logging.exception("HandleCommissioningComplete called unexpectedly")
+                LOGGER.exception("HandleCommissioningComplete called unexpectedly")
                 return
 
             if err.is_success:
@@ -425,14 +427,14 @@ class ChipDeviceControllerBase():
         def HandleOpenWindowComplete(nodeid: int, setupPinCode: int, setupManualCode: str,
                                      setupQRCode: str, err: PyChipError) -> None:
             if err.is_success:
-                logging.info("Open Commissioning Window complete setting nodeid {} pincode to {}".format(nodeid, setupPinCode))
+                LOGGER.info("Open Commissioning Window complete setting nodeid {} pincode to {}".format(nodeid, setupPinCode))
                 commissioningParameters = CommissioningParameters(
                     setupPinCode=setupPinCode, setupManualCode=setupManualCode.decode(), setupQRCode=setupQRCode.decode())
             else:
-                logging.warning("Failed to open commissioning window: {}".format(err))
+                LOGGER.warning("Failed to open commissioning window: {}".format(err))
 
             if self._open_window_context.future is None:
-                logging.exception("HandleOpenWindowComplete called unexpectedly")
+                LOGGER.exception("HandleOpenWindowComplete called unexpectedly")
                 return
 
             if err.is_success:
@@ -442,12 +444,12 @@ class ChipDeviceControllerBase():
 
         def HandleUnpairDeviceComplete(nodeid: int, err: PyChipError):
             if err.is_success:
-                logging.info("Succesfully unpaired device with nodeid {}".format(nodeid))
+                LOGGER.info("Succesfully unpaired device with nodeid {}".format(nodeid))
             else:
-                logging.warning("Failed to unpair device: {}".format(err))
+                LOGGER.warning("Failed to unpair device: {}".format(err))
 
             if self._unpair_device_context.future is None:
-                logging.exception("HandleUnpairDeviceComplete called unexpectedly")
+                LOGGER.exception("HandleUnpairDeviceComplete called unexpectedly")
                 return
 
             if err.is_success:
@@ -457,9 +459,9 @@ class ChipDeviceControllerBase():
 
         def HandlePASEEstablishmentComplete(err: PyChipError):
             if not err.is_success:
-                logging.warning("Failed to establish secure session to device: {}".format(err))
+                LOGGER.warning("Failed to establish secure session to device: {}".format(err))
             else:
-                logging.info("Established secure session with Device")
+                LOGGER.info("Established secure session with Device")
 
             if self._commissioning_context.future is not None:
                 # During Commissioning, HandlePASEEstablishmentComplete will also be called.
@@ -469,7 +471,7 @@ class ChipDeviceControllerBase():
                 return
 
             if self._pase_establishment_context.future is None:
-                logging.exception("HandlePASEEstablishmentComplete called unexpectedly")
+                LOGGER.exception("HandlePASEEstablishmentComplete called unexpectedly")
                 return
 
             if err.is_success:
@@ -926,7 +928,7 @@ class ChipDeviceControllerBase():
             res = self._ChipStack.Call(lambda: self._dmLib.pychip_GetDeviceBeingCommissioned(
                 self.devCtrl, nodeid, byref(returnDevice)), timeoutMs)
             if res.is_success:
-                logging.info('Using PASE connection')
+                LOGGER.info('Using PASE connection')
                 return DeviceProxyWrapper(returnDevice, DeviceProxyWrapper.DeviceProxyType.COMMISSIONEE, self._dmLib)
 
         class DeviceAvailableClosure():
@@ -992,7 +994,7 @@ class ChipDeviceControllerBase():
             res = await self._ChipStack.CallAsync(lambda: self._dmLib.pychip_GetDeviceBeingCommissioned(
                 self.devCtrl, nodeid, byref(returnDevice)), timeoutMs)
             if res.is_success:
-                logging.info('Using PASE connection')
+                LOGGER.info('Using PASE connection')
                 return DeviceProxyWrapper(returnDevice, DeviceProxyWrapper.DeviceProxyType.COMMISSIONEE, self._dmLib)
 
         eventLoop = asyncio.get_running_loop()
@@ -1348,7 +1350,6 @@ class ChipDeviceControllerBase():
             # Wildcard
             return ClusterAttribute.EventPath()
         elif not isinstance(pathTuple, tuple):
-            logging.debug(type(pathTuple))
             if isinstance(pathTuple, int):
                 return ClusterAttribute.EventPath(EndpointId=pathTuple)
             elif issubclass(pathTuple, ClusterObjects.Cluster):
@@ -2115,7 +2116,7 @@ class ChipDeviceController(ChipDeviceControllerBase):
 
     def NOCChainCallback(self, nocChain):
         if self._issue_node_chain_context.future is None:
-            logging.exception("NOCChainCallback while not expecting a callback")
+            LOGGER.exception("NOCChainCallback while not expecting a callback")
             return
         self._issue_node_chain_context.future.set_result(nocChain)
         return

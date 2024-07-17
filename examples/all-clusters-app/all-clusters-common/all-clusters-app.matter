@@ -820,7 +820,7 @@ cluster BasicInformation = 40 {
   readonly attribute optional char_string<32> serialNumber = 15;
   attribute access(write: manage) optional boolean localConfigDisabled = 16;
   readonly attribute optional boolean reachable = 17;
-  readonly attribute optional char_string<32> uniqueID = 18;
+  readonly attribute char_string<32> uniqueID = 18;
   readonly attribute CapabilityMinimaStruct capabilityMinima = 19;
   readonly attribute optional ProductAppearanceStruct productAppearance = 20;
   readonly attribute int32u specificationVersion = 21;
@@ -2731,8 +2731,8 @@ cluster OvenMode = 73 {
   command ChangeToMode(ChangeToModeRequest): ChangeToModeResponse = 0;
 }
 
-/** This cluster supports remotely monitoring and controling the different typs of
-            functionality available to a drying device, such as a laundry dryer. */
+/** This cluster provides a way to access options associated with the operation of
+            a laundry dryer device type. */
 cluster LaundryDryerControls = 74 {
   revision 1;
 
@@ -3513,14 +3513,21 @@ provisional cluster ScenesManagement = 98 {
     kSceneNames = 0x1;
   }
 
-  struct AttributeValuePair {
+  struct AttributeValuePairStruct {
     attrib_id attributeID = 0;
-    int32u attributeValue = 1;
+    optional int8u valueUnsigned8 = 1;
+    optional int8s valueSigned8 = 2;
+    optional int16u valueUnsigned16 = 3;
+    optional int16s valueSigned16 = 4;
+    optional int32u valueUnsigned32 = 5;
+    optional int32s valueSigned32 = 6;
+    optional int64u valueUnsigned64 = 7;
+    optional int64s valueSigned64 = 8;
   }
 
   struct ExtensionFieldSet {
     cluster_id clusterID = 0;
-    AttributeValuePair attributeValueList[] = 1;
+    AttributeValuePairStruct attributeValueList[] = 1;
   }
 
   fabric_scoped struct SceneInfoStruct {
@@ -3632,7 +3639,7 @@ provisional cluster ScenesManagement = 98 {
     int8u sceneIdentifierFrom = 2;
   }
 
-  /** Add a scene to the scene table. Extension field sets are supported, and are inputed as '{"ClusterID": VALUE, "AttributeValueList":[{"AttributeId": VALUE, "AttributeValue": VALUE}]}' */
+  /** Add a scene to the scene table. Extension field sets are supported, and are inputed as '{"ClusterID": VALUE, "AttributeValueList":[{"AttributeID": VALUE, "Value*": VALUE}]}' */
   fabric command access(invoke: manage) AddScene(AddSceneRequest): AddSceneResponse = 0;
   /** Retrieves the requested scene entry from its Scene table. */
   fabric command ViewScene(ViewSceneRequest): ViewSceneResponse = 1;
@@ -4291,7 +4298,7 @@ provisional cluster DeviceEnergyManagement = 152 {
 
 /** Electric Vehicle Supply Equipment (EVSE) is equipment used to charge an Electric Vehicle (EV) or Plug-In Hybrid Electric Vehicle. This cluster provides an interface to the functionality of Electric Vehicle Supply Equipment (EVSE) management. */
 cluster EnergyEvse = 153 {
-  revision 2;
+  revision 4;
 
   enum EnergyTransferStoppedReasonEnum : enum8 {
     kEVStopped = 0;
@@ -4335,6 +4342,7 @@ cluster EnergyEvse = 153 {
     kDischargingEnabled = 2;
     kDisabledError = 3;
     kDisabledDiagnostics = 4;
+    kEnabled = 5;
   }
 
   bitmap Feature : bitmap32 {
@@ -4382,6 +4390,7 @@ cluster EnergyEvse = 153 {
     int32u sessionID = 0;
     StateEnum state = 1;
     amperage_ma maximumCurrent = 2;
+    optional amperage_ma maximumDischargeCurrent = 3;
   }
 
   info event EnergyTransferStopped = 3 {
@@ -4389,6 +4398,7 @@ cluster EnergyEvse = 153 {
     StateEnum state = 1;
     EnergyTransferStoppedReasonEnum reason = 2;
     energy_mwh energyTransferred = 4;
+    optional energy_mwh energyDischarged = 5;
   }
 
   critical event Fault = 4 {
@@ -4453,15 +4463,15 @@ cluster EnergyEvse = 153 {
 
   /** Allows a client to disable the EVSE from charging and discharging. */
   timed command Disable(): DefaultSuccess = 1;
-  /** Allows a client to enable the EVSE to charge an EV. */
+  /** This command allows a client to enable the EVSE to charge an EV, */
   timed command EnableCharging(EnableChargingRequest): DefaultSuccess = 2;
-  /** Allows a client to enable the EVSE to discharge an EV. */
+  /** Upon receipt, this SHALL allow a client to enable the discharge of an EV, */
   timed command EnableDischarging(EnableDischargingRequest): DefaultSuccess = 3;
   /** Allows a client to put the EVSE into a self-diagnostics mode. */
   timed command StartDiagnostics(): DefaultSuccess = 4;
   /** Allows a client to set the user specified charging targets. */
   timed command SetTargets(SetTargetsRequest): DefaultSuccess = 5;
-  /** Allows a client to retrieve the user specified charging targets. */
+  /** Allows a client to retrieve the current set of charging targets. */
   timed command GetTargets(): GetTargetsResponse = 6;
   /** Allows a client to clear all stored charging targets. */
   timed command ClearTargets(): DefaultSuccess = 7;
@@ -5890,6 +5900,17 @@ cluster OccupancySensing = 1030 {
     kPhysicalContact = 3;
   }
 
+  bitmap Feature : bitmap32 {
+    kOther = 0x1;
+    kPassiveInfrared = 0x2;
+    kUltrasonic = 0x4;
+    kPhysicalContact = 0x8;
+    kActiveInfrared = 0x10;
+    kRadar = 0x20;
+    kRFSensing = 0x40;
+    kVision = 0x80;
+  }
+
   bitmap OccupancyBitmap : bitmap8 {
     kOccupied = 0x1;
   }
@@ -5900,9 +5921,17 @@ cluster OccupancySensing = 1030 {
     kPhysicalContact = 0x4;
   }
 
+  struct HoldTimeLimitsStruct {
+    int16u holdTimeMin = 0;
+    int16u holdTimeMax = 1;
+    int16u holdTimeDefault = 2;
+  }
+
   readonly attribute OccupancyBitmap occupancy = 0;
   readonly attribute OccupancySensorTypeEnum occupancySensorType = 1;
   readonly attribute OccupancySensorTypeBitmap occupancySensorTypeBitmap = 2;
+  attribute access(write: manage) optional int16u holdTime = 3;
+  readonly attribute optional HoldTimeLimitsStruct holdTimeLimits = 4;
   attribute access(write: manage) optional int16u PIROccupiedToUnoccupiedDelay = 16;
   attribute access(write: manage) optional int16u PIRUnoccupiedToOccupiedDelay = 17;
   attribute access(write: manage) optional int8u PIRUnoccupiedToOccupiedThreshold = 18;
@@ -7034,6 +7063,10 @@ internal cluster UnitTesting = 4294048773 {
     int8u arg1[] = 0;
   }
 
+  response struct StringEchoResponse = 13 {
+    octet_string payload = 0;
+  }
+
   request struct TestEnumsRequestRequest {
     vendor_id arg1 = 0;
     SimpleEnum arg2 = 1;
@@ -7086,6 +7119,10 @@ internal cluster UnitTesting = 4294048773 {
     int16u sleepBeforeResponseTimeMs = 0;
     int16u sizeOfResponseBuffer = 1;
     int8u fillCharacter = 2;
+  }
+
+  request struct StringEchoRequestRequest {
+    octet_string payload = 0;
   }
 
   request struct TestDifferentVendorMeiRequestRequest {
@@ -7167,6 +7204,10 @@ internal cluster UnitTesting = 4294048773 {
   command TestBatchHelperRequest(TestBatchHelperRequestRequest): TestBatchHelperResponse = 22;
   /** Second command that responds after sleepBeforeResponseTimeMs with an octet_string the size requested with fillCharacter. */
   command TestSecondBatchHelperRequest(TestSecondBatchHelperRequestRequest): TestBatchHelperResponse = 23;
+  /** Command that takes an argument which is an octet string.  The response echoes
+        the string back. If the string is large then it would require a session that
+        supports large payloads. */
+  command StringEchoRequest(StringEchoRequestRequest): StringEchoResponse = 24;
   /** Command having a different MEI vendor ID than the cluster. Also emits TestDifferentVendorMeiEvent. */
   command TestDifferentVendorMeiRequest(TestDifferentVendorMeiRequestRequest): TestDifferentVendorMeiResponse = 4294049962;
 }
@@ -9082,6 +9123,7 @@ endpoint 1 {
     handle command TestEmitTestFabricScopedEventResponse;
     handle command TestListNestedStructListArgumentRequest;
     handle command TestListInt8UReverseRequest;
+    handle command StringEchoResponse;
     handle command TestEnumsRequest;
     handle command TestNullableOptionalRequest;
     handle command SimpleStructEchoRequest;
@@ -9091,6 +9133,7 @@ endpoint 1 {
     handle command TestEmitTestFabricScopedEventRequest;
     handle command TestBatchHelperRequest;
     handle command TestSecondBatchHelperRequest;
+    handle command StringEchoRequest;
     handle command TestDifferentVendorMeiRequest;
     handle command TestDifferentVendorMeiResponse;
   }

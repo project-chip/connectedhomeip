@@ -599,7 +599,7 @@ void CASESession::OnResponseTimeout(ExchangeContext * ec)
                    ChipLogError(SecureChannel, "CASESession::OnResponseTimeout exchange doesn't match"));
     ChipLogError(SecureChannel,
                  "CASESession timed out while waiting for a response from peer " ChipLogFormatScopedNodeId ". Current state was %u",
-                 ChipLogValueScopedNodeId(ScopedNodeId(mPeerNodeId, mFabricIndex)), to_underlying(mState));
+                 ChipLogValueScopedNodeId(GetPeer()), to_underlying(mState));
     MATTER_TRACE_COUNTER("CASETimeout");
     // Discard the exchange so that Clear() doesn't try aborting it.  The
     // exchange will handle that.
@@ -872,7 +872,7 @@ CHIP_ERROR CASESession::SendSigma1()
         mState = State::kSentSigma1;
     }
 
-    ChipLogProgress(SecureChannel, "Sent Sigma1 msg");
+    ChipLogProgress(SecureChannel, "Sent Sigma1 msg to " ChipLogFormatScopedNodeId, ChipLogValueScopedNodeId(GetPeer()));
 
     mDelegate->OnSessionEstablishmentStarted();
 

@@ -68,11 +68,10 @@ public:
     /// Generic model implementations
     CHIP_ERROR Shutdown() override { return CHIP_NO_ERROR; }
 
-    CHIP_ERROR ReadAttribute(const InteractionModel::ReadAttributeRequest & request, InteractionModel::ReadState & state,
-                             AttributeValueEncoder & encoder) override;
+    CHIP_ERROR ReadAttribute(const InteractionModel::ReadAttributeRequest & request, AttributeValueEncoder & encoder) override;
     CHIP_ERROR WriteAttribute(const InteractionModel::WriteAttributeRequest & request, AttributeValueDecoder & decoder) override;
     CHIP_ERROR Invoke(const InteractionModel::InvokeRequest & request, chip::TLV::TLVReader & input_arguments,
-                      InteractionModel::InvokeReply & reply) override;
+                      CommandHandler * handler) override;
 
     /// attribute tree iteration
     EndpointId FirstEndpoint() override;

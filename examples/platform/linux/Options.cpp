@@ -352,27 +352,28 @@ bool HandleOption(const char * aProgram, OptionSet * aOptions, int aIdentifier, 
         break;
 
     case kDeviceOption_Version:
-        LinuxDeviceOptions::GetInstance().payload.version = static_cast<uint8_t>(atoi(aValue));
+        LinuxDeviceOptions::GetInstance().payload.version = static_cast<uint8_t>(strtoul(aValue, nullptr, 0));
         break;
 
     case kDeviceOption_VendorID:
-        LinuxDeviceOptions::GetInstance().payload.vendorID = static_cast<uint16_t>(atoi(aValue));
+        LinuxDeviceOptions::GetInstance().payload.vendorID = static_cast<uint16_t>(strtoul(aValue, nullptr, 0));
         break;
 
     case kDeviceOption_ProductID:
-        LinuxDeviceOptions::GetInstance().payload.productID = static_cast<uint16_t>(atoi(aValue));
+        LinuxDeviceOptions::GetInstance().payload.productID = static_cast<uint16_t>(strtoul(aValue, nullptr, 0));
         break;
 
     case kDeviceOption_CustomFlow:
-        LinuxDeviceOptions::GetInstance().payload.commissioningFlow = static_cast<CommissioningFlow>(atoi(aValue));
+        LinuxDeviceOptions::GetInstance().payload.commissioningFlow = static_cast<CommissioningFlow>(strtoul(aValue, nullptr, 0));
         break;
 
     case kDeviceOption_Capabilities:
-        LinuxDeviceOptions::GetInstance().payload.rendezvousInformation.Emplace().SetRaw(static_cast<uint8_t>(atoi(aValue)));
+        LinuxDeviceOptions::GetInstance().payload.rendezvousInformation.Emplace().SetRaw(
+            static_cast<uint8_t>(strtoul(aValue, nullptr, 0)));
         break;
 
     case kDeviceOption_Discriminator: {
-        uint16_t value = static_cast<uint16_t>(atoi(aValue));
+        uint16_t value = static_cast<uint16_t>(strtoul(aValue, nullptr, 0));
         if (value >= 4096)
         {
             PrintArgError("%s: invalid value specified for discriminator: %s\n", aProgram, aValue);
@@ -386,7 +387,7 @@ bool HandleOption(const char * aProgram, OptionSet * aOptions, int aIdentifier, 
     }
 
     case kDeviceOption_Passcode:
-        LinuxDeviceOptions::GetInstance().payload.setUpPINCode = static_cast<uint32_t>(atoi(aValue));
+        LinuxDeviceOptions::GetInstance().payload.setUpPINCode = static_cast<uint32_t>(strtoul(aValue, nullptr, 0));
         break;
 
     case kDeviceOption_Spake2pSaltBase64: {
@@ -476,11 +477,9 @@ bool HandleOption(const char * aProgram, OptionSet * aOptions, int aIdentifier, 
     case kDeviceOption_SecuredCommissionerPort:
         LinuxDeviceOptions::GetInstance().securedCommissionerPort = static_cast<uint16_t>(atoi(aValue));
         break;
-    case kCommissionerOption_FabricID: {
-        char * eptr;
-        LinuxDeviceOptions::GetInstance().commissionerFabricId = (chip::FabricId) strtoull(aValue, &eptr, 0);
+    case kCommissionerOption_FabricID:
+        LinuxDeviceOptions::GetInstance().commissionerFabricId = static_cast<chip::FabricId>(strtoull(aValue, nullptr, 0));
         break;
-    }
 #endif
 
     case kDeviceOption_Command:

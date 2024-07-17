@@ -5040,6 +5040,7 @@ static id _Nullable DecodeAttributeValueForICDManagementCluster(AttributeId aAtt
                 newElement_0 = [MTRICDManagementClusterMonitoringRegistrationStruct new];
                 newElement_0.checkInNodeID = [NSNumber numberWithUnsignedLongLong:entry_0.checkInNodeID];
                 newElement_0.monitoredSubject = [NSNumber numberWithUnsignedLongLong:entry_0.monitoredSubject];
+                newElement_0.clientType = [NSNumber numberWithUnsignedChar:chip::to_underlying(entry_0.clientType)];
                 newElement_0.fabricIndex = [NSNumber numberWithUnsignedChar:entry_0.fabricIndex];
                 [array_0 addObject:newElement_0];
             }
@@ -8339,6 +8340,84 @@ static id _Nullable DecodeAttributeValueForElectricalEnergyMeasurementCluster(At
                 value.exportedResetSystime = nil;
             }
         }
+        return value;
+    }
+    default: {
+        break;
+    }
+    }
+
+    *aError = CHIP_ERROR_IM_MALFORMED_ATTRIBUTE_PATH_IB;
+    return nil;
+}
+static id _Nullable DecodeAttributeValueForWaterHeaterManagementCluster(AttributeId aAttributeId, TLV::TLVReader & aReader, CHIP_ERROR * aError)
+{
+    using namespace Clusters::WaterHeaterManagement;
+    switch (aAttributeId) {
+    case Attributes::HeaterTypes::Id: {
+        using TypeInfo = Attributes::HeaterTypes::TypeInfo;
+        TypeInfo::DecodableType cppValue;
+        *aError = DataModel::Decode(aReader, cppValue);
+        if (*aError != CHIP_NO_ERROR) {
+            return nil;
+        }
+        NSNumber * _Nonnull value;
+        value = [NSNumber numberWithUnsignedChar:cppValue.Raw()];
+        return value;
+    }
+    case Attributes::HeatDemand::Id: {
+        using TypeInfo = Attributes::HeatDemand::TypeInfo;
+        TypeInfo::DecodableType cppValue;
+        *aError = DataModel::Decode(aReader, cppValue);
+        if (*aError != CHIP_NO_ERROR) {
+            return nil;
+        }
+        NSNumber * _Nonnull value;
+        value = [NSNumber numberWithUnsignedChar:cppValue.Raw()];
+        return value;
+    }
+    case Attributes::TankVolume::Id: {
+        using TypeInfo = Attributes::TankVolume::TypeInfo;
+        TypeInfo::DecodableType cppValue;
+        *aError = DataModel::Decode(aReader, cppValue);
+        if (*aError != CHIP_NO_ERROR) {
+            return nil;
+        }
+        NSNumber * _Nonnull value;
+        value = [NSNumber numberWithUnsignedShort:cppValue];
+        return value;
+    }
+    case Attributes::EstimatedHeatRequired::Id: {
+        using TypeInfo = Attributes::EstimatedHeatRequired::TypeInfo;
+        TypeInfo::DecodableType cppValue;
+        *aError = DataModel::Decode(aReader, cppValue);
+        if (*aError != CHIP_NO_ERROR) {
+            return nil;
+        }
+        NSNumber * _Nonnull value;
+        value = [NSNumber numberWithLongLong:cppValue];
+        return value;
+    }
+    case Attributes::TankPercentage::Id: {
+        using TypeInfo = Attributes::TankPercentage::TypeInfo;
+        TypeInfo::DecodableType cppValue;
+        *aError = DataModel::Decode(aReader, cppValue);
+        if (*aError != CHIP_NO_ERROR) {
+            return nil;
+        }
+        NSNumber * _Nonnull value;
+        value = [NSNumber numberWithUnsignedChar:cppValue];
+        return value;
+    }
+    case Attributes::BoostState::Id: {
+        using TypeInfo = Attributes::BoostState::TypeInfo;
+        TypeInfo::DecodableType cppValue;
+        *aError = DataModel::Decode(aReader, cppValue);
+        if (*aError != CHIP_NO_ERROR) {
+            return nil;
+        }
+        NSNumber * _Nonnull value;
+        value = [NSNumber numberWithUnsignedChar:chip::to_underlying(cppValue)];
         return value;
     }
     default: {
@@ -13816,6 +13895,31 @@ static id _Nullable DecodeAttributeValueForOccupancySensingCluster(AttributeId a
         value = [NSNumber numberWithUnsignedChar:cppValue.Raw()];
         return value;
     }
+    case Attributes::HoldTime::Id: {
+        using TypeInfo = Attributes::HoldTime::TypeInfo;
+        TypeInfo::DecodableType cppValue;
+        *aError = DataModel::Decode(aReader, cppValue);
+        if (*aError != CHIP_NO_ERROR) {
+            return nil;
+        }
+        NSNumber * _Nonnull value;
+        value = [NSNumber numberWithUnsignedShort:cppValue];
+        return value;
+    }
+    case Attributes::HoldTimeLimits::Id: {
+        using TypeInfo = Attributes::HoldTimeLimits::TypeInfo;
+        TypeInfo::DecodableType cppValue;
+        *aError = DataModel::Decode(aReader, cppValue);
+        if (*aError != CHIP_NO_ERROR) {
+            return nil;
+        }
+        MTROccupancySensingClusterHoldTimeLimitsStruct * _Nonnull value;
+        value = [MTROccupancySensingClusterHoldTimeLimitsStruct new];
+        value.holdTimeMin = [NSNumber numberWithUnsignedShort:cppValue.holdTimeMin];
+        value.holdTimeMax = [NSNumber numberWithUnsignedShort:cppValue.holdTimeMax];
+        value.holdTimeDefault = [NSNumber numberWithUnsignedShort:cppValue.holdTimeDefault];
+        return value;
+    }
     case Attributes::PIROccupiedToUnoccupiedDelay::Id: {
         using TypeInfo = Attributes::PIROccupiedToUnoccupiedDelay::TypeInfo;
         TypeInfo::DecodableType cppValue;
@@ -16830,6 +16934,29 @@ static id _Nullable DecodeAttributeValueForContentAppObserverCluster(AttributeId
 {
     using namespace Clusters::ContentAppObserver;
     switch (aAttributeId) {
+    default: {
+        break;
+    }
+    }
+
+    *aError = CHIP_ERROR_IM_MALFORMED_ATTRIBUTE_PATH_IB;
+    return nil;
+}
+static id _Nullable DecodeAttributeValueForCommissionerControlCluster(AttributeId aAttributeId, TLV::TLVReader & aReader, CHIP_ERROR * aError)
+{
+    using namespace Clusters::CommissionerControl;
+    switch (aAttributeId) {
+    case Attributes::SupportedDeviceCategories::Id: {
+        using TypeInfo = Attributes::SupportedDeviceCategories::TypeInfo;
+        TypeInfo::DecodableType cppValue;
+        *aError = DataModel::Decode(aReader, cppValue);
+        if (*aError != CHIP_NO_ERROR) {
+            return nil;
+        }
+        NSNumber * _Nonnull value;
+        value = [NSNumber numberWithUnsignedInt:cppValue.Raw()];
+        return value;
+    }
     default: {
         break;
     }
@@ -19903,6 +20030,9 @@ id _Nullable MTRDecodeAttributeValue(const ConcreteAttributePath & aPath, TLV::T
     case Clusters::ElectricalEnergyMeasurement::Id: {
         return DecodeAttributeValueForElectricalEnergyMeasurementCluster(aPath.mAttributeId, aReader, aError);
     }
+    case Clusters::WaterHeaterManagement::Id: {
+        return DecodeAttributeValueForWaterHeaterManagementCluster(aPath.mAttributeId, aReader, aError);
+    }
     case Clusters::DemandResponseLoadControl::Id: {
         return DecodeAttributeValueForDemandResponseLoadControlCluster(aPath.mAttributeId, aReader, aError);
     }
@@ -20055,6 +20185,9 @@ id _Nullable MTRDecodeAttributeValue(const ConcreteAttributePath & aPath, TLV::T
     }
     case Clusters::ContentAppObserver::Id: {
         return DecodeAttributeValueForContentAppObserverCluster(aPath.mAttributeId, aReader, aError);
+    }
+    case Clusters::CommissionerControl::Id: {
+        return DecodeAttributeValueForCommissionerControlCluster(aPath.mAttributeId, aReader, aError);
     }
     case Clusters::ElectricalMeasurement::Id: {
         return DecodeAttributeValueForElectricalMeasurementCluster(aPath.mAttributeId, aReader, aError);
