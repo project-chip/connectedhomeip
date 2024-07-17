@@ -20,8 +20,8 @@
 #include "AppOptions.h"
 #include "binding-handler.h"
 
-#include <lib/support/logging/CHIPLogging.h>
 #include <app/util/endpoint-config-api.h>
+#include <lib/support/logging/CHIPLogging.h>
 
 // Network commissioning
 namespace {
