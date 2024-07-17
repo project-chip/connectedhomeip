@@ -34,10 +34,10 @@ namespace OccupancySensing {
 class OccupancySensingAttrAccess : public AttributeAccessInterface
 {
 public:
-	OccupancySensingAttrAccess(BitMask<Feature> aFeature) : 
+	OccupancySensingAttrAccess(BitMask<Feature> aFeature) :
 	app::AttributeAccessInterface(Optional<EndpointId>::Missing(), app::Clusters::OccupancySensing::Id), mFeature(aFeature)
 	{}
-	
+
     ~OccupancySensingAttrAccess() { Shutdown(); }
 
 

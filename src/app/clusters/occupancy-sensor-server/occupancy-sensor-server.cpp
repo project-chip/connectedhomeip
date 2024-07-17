@@ -51,7 +51,7 @@ void OccupancySensingAttrAccess::Shutdown()
 CHIP_ERROR OccupancySensingAttrAccess::Read(const ConcreteReadAttributePath & aPath, AttributeValueEncoder & aEncoder)
 {
 	VerifyOrDie(aPath.mClusterId == app::Clusters::OccupancySensing::Id);
-    
+
 	switch (aPath.mAttributeId)
     {
 	case Attributes::FeatureMap::Id:
@@ -60,29 +60,29 @@ CHIP_ERROR OccupancySensingAttrAccess::Read(const ConcreteReadAttributePath & aP
     case Attributes::HoldTime::Id: {
 
         uint16_t * holdTime = GetHoldTimeForEndpoint(aPath.mEndpointId);
-        
+
 		if (holdTime == nullptr)
         {
             return CHIP_ERROR_NOT_FOUND;
         }
-		
+
 		return aEncoder.Encode(*holdTime);
     }
 	case Attributes::HoldTimeLimits::Id: {
 
         Structs::HoldTimeLimitsStruct::Type * holdTimeLimitsStruct = GetHoldTimeLimitsForEndpoint(aPath.mEndpointId);
-        
+
 		if (holdTimeLimitsStruct == nullptr)
         {
             return CHIP_ERROR_NOT_FOUND;
         }
-		
+
 		return aEncoder.Encode(*holdTimeLimitsStruct);
     }
     default:
         return CHIP_NO_ERROR;
     }
-	
+
 	return CHIP_NO_ERROR;
 }
 
@@ -95,7 +95,7 @@ Structs::HoldTimeLimitsStruct::Type * GetHoldTimeLimitsForEndpoint(EndpointId en
 {
 	auto index = emberAfGetClusterServerEndpointIndex(endpoint, app::Clusters::OccupancySensing::Id,
                                                       MATTER_DM_OCCUPANCY_SENSING_CLUSTER_SERVER_ENDPOINT_COUNT);
-													  
+
 	if (index == kEmberInvalidEndpointIndex)
     {
         return nullptr;
@@ -130,7 +130,7 @@ uint16_t * GetHoldTimeForEndpoint(EndpointId endpoint)
 {
 	auto index = emberAfGetClusterServerEndpointIndex(endpoint, app::Clusters::OccupancySensing::Id,
                                                       MATTER_DM_OCCUPANCY_SENSING_CLUSTER_SERVER_ENDPOINT_COUNT);
-													  
+
 	if (index == kEmberInvalidEndpointIndex)
     {
         return nullptr;
@@ -233,4 +233,3 @@ HalOccupancySensorType __attribute__((weak)) halOccupancyGetSensorType(EndpointI
 
 void MatterOccupancySensingPluginServerInitCallback()
 {}
-
