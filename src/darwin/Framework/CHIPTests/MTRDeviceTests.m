@@ -2026,7 +2026,7 @@ static void (^globalReportHandler)(id _Nullable values, NSError * _Nullable erro
                                 }
 
                                 MTRAttributePath * path = result[@"attributePath"];
-                                if ([path.attribute unsignedIntegerValue] < 5) {
+                                if ([path.attribute unsignedIntegerValue] < 4) {
                                     XCTAssertEqualObjects(path.cluster, @29);
                                     __auto_type endpoint = [path.endpoint unsignedShortValue];
                                     XCTAssertTrue(endpoint == 0 || endpoint == 1 || endpoint == 2 || endpoint == 3);
@@ -2112,7 +2112,7 @@ static void (^globalReportHandler)(id _Nullable values, NSError * _Nullable erro
                             if ([path.attribute unsignedIntegerValue] < 4) {
                                 XCTAssertEqualObjects(path.cluster, @29);
                                 __auto_type endpoint = [path.endpoint unsignedShortValue];
-                                XCTAssertTrue(endpoint == 0 || endpoint == 1 || endpoint == 2);
+                                XCTAssertTrue(endpoint == 0 || endpoint == 1 || endpoint == 2 || endpoint == 3);
                             } else {
                                 XCTAssertEqualObjects(path.cluster, @40);
                                 XCTAssertEqualObjects(path.endpoint, @0);
