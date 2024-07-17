@@ -21,9 +21,14 @@
  *      This file implements unit tests for the MessageCounterManager implementation.
  */
 
-#include <lib/core/CHIPCore.h>
-#include <lib/support/CodeUtils.h>
+#include <errno.h>
 
+#include <nlbyteorder.h>
+#include <pw_unit_test/framework.h>
+
+#include <lib/core/CHIPCore.h>
+#include <lib/core/StringBuilderAdapters.h>
+#include <lib/support/CodeUtils.h>
 #include <lib/support/logging/CHIPLogging.h>
 #include <messaging/ExchangeContext.h>
 #include <messaging/ExchangeMgr.h>
@@ -33,11 +38,6 @@
 #include <protocols/echo/Echo.h>
 #include <transport/SessionManager.h>
 #include <transport/TransportMgr.h>
-
-#include <nlbyteorder.h>
-#include <pw_unit_test/framework.h>
-
-#include <errno.h>
 
 namespace {
 
