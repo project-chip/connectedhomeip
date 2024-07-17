@@ -189,54 +189,38 @@ class MdnsAsyncServiceInfo(ServiceInfo):
         qu_question = question_type is QU_QUESTION
         if record_type is None or record_type is DNSRecordType.SRV:
             print("Requesting MDNS SRV record...")
-            self._add_question_with_known_answers(
-                out, qu_question, history, cache, now, name, _TYPE_SRV, _CLASS_IN, True
+            self._add_question(
+                out, qu_question, server, _TYPE_SRV, _CLASS_IN
             )
         if record_type is None or record_type is DNSRecordType.TXT:
             print("Requesting MDNS TXT record...")
-            self._add_question_with_known_answers(
-                out, qu_question, history, cache, now, name, _TYPE_TXT, _CLASS_IN, True
+            self._add_question(
+                out, qu_question, server, _TYPE_TXT, _CLASS_IN
             )
         if record_type is None or record_type is DNSRecordType.A:
             print("Requesting MDNS A record...")
-            self._add_question_with_known_answers(
-                out, qu_question, history, cache, now, server, _TYPE_A, _CLASS_IN, False
+            self._add_question(
+                out, qu_question, server, _TYPE_A, _CLASS_IN
             )
         if record_type is None or record_type is DNSRecordType.AAAA:
             print("Requesting MDNS AAAA record...")
-            self._add_question_with_known_answers(
-                out, qu_question, history, cache, now, server, _TYPE_AAAA, _CLASS_IN, False
+            self._add_question(
+                out, qu_question, server, _TYPE_AAAA, _CLASS_IN
             )
         return out
 
-    def _add_question_with_known_answers(
+    def _add_question(
         self,
         out: DNSOutgoing,
         qu_question: bool,
-        question_history: QuestionHistory,
-        cache: DNSCache,
-        now: float_,
         name: str_,
         type_: int_,
-        class_: int_,
-        skip_if_known_answers: bool,
+        class_: int_
     ) -> None:
-        """Add a question with known answers if its not suppressed."""
-        known_answers = {
-            answer for answer in cache.get_all_by_details(name, type_, class_) if not answer.is_stale(now)
-        }
-        if skip_if_known_answers and known_answers:
-            return
+        """Add a question."""
         question = DNSQuestion(name, type_, class_)
-        if qu_question:
-            question.unicast = True
-        elif question_history.suppresses(question, now, known_answers):
-            return
-        else:
-            question_history.add_question_at_time(question, now, known_answers)
+        question.unicast = qu_question
         out.add_question(question)
-        for answer in known_answers:
-            out.add_answer_at_time(answer, now)
 
     def _get_initial_delay(self) -> float_:
         return _LISTENER_TIME
