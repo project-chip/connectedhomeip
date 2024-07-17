@@ -27,7 +27,7 @@
 #define _CHIP_BLE_BLE_H
 #include <ble/BleUUID.h>
 
-#include <gtest/gtest.h>
+#include <pw_unit_test/framework.h>
 
 using namespace chip;
 using namespace chip::Ble;

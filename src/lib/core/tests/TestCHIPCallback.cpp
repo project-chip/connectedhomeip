@@ -21,9 +21,11 @@
  *      This file implements a test for  CHIP Callback
  *
  */
-#include <gtest/gtest.h>
+
+#include <pw_unit_test/framework.h>
 
 #include <lib/core/CHIPCallback.h>
+#include <lib/core/StringBuilderAdapters.h>
 #include <lib/support/CHIPMem.h>
 #include <lib/support/CodeUtils.h>
 
