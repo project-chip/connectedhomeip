@@ -14,12 +14,17 @@
 #    See the License for the specific language governing permissions and
 #    limitations under the License.
 
+# See https://github.com/project-chip/connectedhomeip/blob/master/docs/testing/python.md#defining-the-ci-test-arguments
+# for details about the block below.
+#
+# === BEGIN CI TEST ARGUMENTS ===
 # test-runner-runs: run1
 # test-runner-run/run1/app: ${ENERGY_MANAGEMENT_APP}
 # test-runner-run/run1/factoryreset: True
 # test-runner-run/run1/quiet: True
 # test-runner-run/run1/app-args: --discriminator 1234 --KVS kvs1 --trace-to json:${TRACE_APP}.json --enable-key 000102030405060708090a0b0c0d0e0f
 # test-runner-run/run1/script-args: --storage-path admin_storage.json --commissioning-method on-network --discriminator 1234 --passcode 20202021 --hex-arg enableKey:000102030405060708090a0b0c0d0e0f --endpoint 1 --trace-to json:${TRACE_TEST_JSON}.json --trace-to perfetto:${TRACE_TEST_PERFETTO}.perfetto
+# === END CI TEST ARGUMENTS ===
 
 import logging
 import time
@@ -56,7 +61,7 @@ class TC_EPM_2_2(MatterBaseTest, EnergyReportingBaseTestHelper):
                      "Verify the read is successful and that the value is between 3'848 and 4'848 mA. Note the value read."),
             TestStep("4c", "TH reads from the DUT the Voltage attribute",
                      "Verify the read is successful and that the value is between 229'000 and 231'000 mV. Note the value read."),
-            TestStep("5", "Wait 3 seconds"),
+            TestStep("5", "Wait 5 seconds"),
             TestStep("5a", "TH reads from the DUT the ActivePower attribute",
                      "Verify the read is successful, that the value is between '980'000 and 1'020'000 mW, and the value is different from the value read in step 4a."),
             TestStep("5b", "TH reads from the DUT the ActiveCurrent attribute",
@@ -100,8 +105,8 @@ class TC_EPM_2_2(MatterBaseTest, EnergyReportingBaseTestHelper):
             voltage = await self.check_epm_attribute_in_range("Voltage", 229000, 231000)
 
         self.step("5")
-        # After 3 seconds...
-        time.sleep(3)
+        # After 5 seconds...
+        time.sleep(5)
 
         self.step("5a")
         # Active power is Mandatory

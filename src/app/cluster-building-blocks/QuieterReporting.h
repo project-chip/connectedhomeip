@@ -178,9 +178,9 @@ public:
         bool isChangeOfNull       = newValue.IsNull() ^ mValue.IsNull();
         bool areBothValuesNonNull = !newValue.IsNull() && !mValue.IsNull();
 
-        bool changeToFromZero = areBothValuesNonNull && (*newValue == 0 || *mValue == 0);
-        bool isIncrement      = areBothValuesNonNull && (*newValue > *mValue);
-        bool isDecrement      = areBothValuesNonNull && (*newValue < *mValue);
+        bool changeToFromZero = areBothValuesNonNull && (newValue.Value() == 0 || mValue.Value() == 0);
+        bool isIncrement      = areBothValuesNonNull && (newValue.Value() > mValue.Value());
+        bool isDecrement      = areBothValuesNonNull && (newValue.Value() < mValue.Value());
 
         bool isNewlyDirty = isChangeOfNull;
         isNewlyDirty =
