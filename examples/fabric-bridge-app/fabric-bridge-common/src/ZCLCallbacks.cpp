@@ -20,6 +20,7 @@
 #include <app-common/zap-generated/cluster-objects.h>
 #include <app-common/zap-generated/ids/Attributes.h>
 #include <app-common/zap-generated/ids/Clusters.h>
+#include <app/clusters/commissioner-control-server/commissioner-control-server.h>
 #include <lib/support/ZclString.h>
 
 using namespace ::chip;
@@ -89,4 +90,14 @@ Protocols::InteractionModel::Status emberAfExternalAttributeWriteCallback(Endpoi
     }
 
     return ret;
+}
+
+void MatterCommissionerControlPluginServerInitCallback()
+{
+    ChipLogProgress(Zcl, "MatterCommissionerControlPluginServerInitCallback");
+
+    BitMask<CommissionerControl::SupportedDeviceCategoryBitmap> supportedDeviceCategories;
+    supportedDeviceCategories.SetField(CommissionerControl::SupportedDeviceCategoryBitmap::kFabricSynchronization, 1);
+    CommissionerControl::CommissionerControlServer::Instance().SetSupportedDeviceCategoriesValue(kRootEndpointId,
+                                                                                                 supportedDeviceCategories);
 }
