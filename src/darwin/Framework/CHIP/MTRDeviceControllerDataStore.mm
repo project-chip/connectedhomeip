@@ -1171,43 +1171,48 @@ static NSString * sClientDataKeyPrefix = @"clientData";
 
 typedef NSString * MTRClientDataKey;
 
-- (NSArray<NSString *> *)_clientDataIndexForNodeID:(NSNumber *)nodeID {
-    __block NSArray<NSString *> * index = nil;
+typedef NSArray<NSString *> MTRClientDataKeyIndex;
 
-    dispatch_sync(_storageDelegateQueue, ^{
-        id data;
-
-        MTRDeviceController * controller = self->_controller;
-        VerifyOrReturn(controller != nil); // No way to call delegate without controller.
-
-        @autoreleasepool {
-            data = [self->_storageDelegate controller:controller
-                                          valueForKey:[self _clientDataIndexKeyForNodeID:nodeID]
-                                        securityLevel:MTRStorageSecurityLevelSecure
-                                          sharingType:MTRStorageSharingTypeNotShared];  // REVIEWERS:  fabric shared? kmo 12 jul 2024 14h58
-        }
-        
-        if (data == nil) {
-            return;
-        }
-
-        if (![data isKindOfClass:[NSArray<NSString *> class]]) {
-            return;
-        }
-
-        // TODO:  what other checks are possible here? kmo 12 fri 2024 17h29
-        index = data;
-    });
-
+- (nullable MTRClientDataKeyIndex *)_clientDataIndexForNodeID:(NSNumber *)nodeID {
+    dispatch_assert_queue(_storageDelegateQueue);
+    
+    NSArray<NSString *> * index = nil;
+    
+    id data;
+    
+    MTRDeviceController * controller = self->_controller;
+    
+    @autoreleasepool {
+        data = [self->_storageDelegate controller:controller
+                                      valueForKey:[self _clientDataIndexKeyForNodeID:nodeID]
+                                    securityLevel:MTRStorageSecurityLevelSecure
+                                      sharingType:MTRStorageSharingTypeNotShared];  // REVIEWERS:  fabric shared? kmo 12 jul 2024 14h58
+    }
+    
+    if (data == nil) {
+        NSLog(@"kmo:  no client data index for node id %@ (might be expected)", nodeID);
+        return nil;
+    }
+    
+    if (![data isKindOfClass:[MTRClientDataKeyIndex class]]) {
+        NSLog(@"kmo:  - client data index was of unexpected type!");
+        return nil;
+    }
+    
+    // TODO:  what other checks are possible here? kmo 12 fri 2024 17h29
+    index = data;
+    NSLog(@"kmo: returning client data index for node id %@", nodeID);
     return index;
 }
 
 - (NSString *)_clientDataIndexKeyForNodeID:(NSNumber *)nodeID {
+    dispatch_assert_queue(_storageDelegateQueue);
     return [sClientDataKeyPrefix stringByAppendingFormat:@":0x%016llX_index", nodeID.unsignedLongLongValue];
 }
 
 - (NSString *)_clientDataKeyForNodeID:(NSNumber *)nodeID key:(NSString *)key
 {
+    dispatch_assert_queue(_storageDelegateQueue);
     return [sClientDataKeyPrefix stringByAppendingFormat:@":0x%016llX:%@", nodeID.unsignedLongLongValue, key];
 }
 
@@ -1253,6 +1258,7 @@ typedef NSString * MTRClientDataKey;
 - (void)_updateClientDataIndexForKey:(NSString * _Nonnull)key
                         nodeID:(NSNumber * _Nonnull)nodeID
                     controller:(MTRDeviceController *)controller {
+    dispatch_assert_queue(_storageDelegateQueue);
     NSArray<MTRClientDataKey> * index = [self _clientDataIndexForNodeID:nodeID];
     NSMutableArray<MTRClientDataKey> * modifiedIndex = nil;
     BOOL indexModified = NO;
@@ -1275,17 +1281,16 @@ typedef NSString * MTRClientDataKey;
         return;
     }
     
-    // TODO:  store modified index
-//    NSString * storageKey = [self _clientDataKeyForNodeID:nodeID key:key];
-//    NSLog(@"kmo: updateClientDataIndexForKey - data key %@", storageKey);
-//
-//    [self->_storageDelegate controller:controller
-//                            storeValue:modifiedIndex
-//                                forKey:sClientDataNodeIndexKey
-//                         securityLevel:MTRStorageSecurityLevelSecure
-//                           sharingType:MTRStorageSharingTypeNotShared];
-
-
+    NSString * storageKey = [self _clientDataKeyForNodeID:nodeID key:key];
+    NSLog(@"kmo: updateClientDataIndexForKey - data key %@", storageKey);
+    
+    dispatch_async(_storageDelegateQueue, ^{
+           [self->_storageDelegate controller:controller
+                                   storeValue:modifiedIndex
+                                       forKey:storageKey
+                                securityLevel:MTRStorageSecurityLevelSecure
+                                  sharingType:MTRStorageSharingTypeNotShared];
+    });
 }
 
 - (void)storeClientDataForKey:(NSString *)key value:(id<NSSecureCoding>)value forNodeID:(NSNumber *)nodeID
@@ -1306,7 +1311,7 @@ typedef NSString * MTRClientDataKey;
                              securityLevel:MTRStorageSecurityLevelSecure
                                sharingType:MTRStorageSharingTypeNotShared]; // REVIEWERS:  should be fabric shared? kmo 12 jul 2024 13h10
         NSLog(@"kmo: would update index");
-        // [self _updateClientDataIndexForKey:key nodeID:nodeID controller:controller];
+        [self _updateClientDataIndexForKey:key nodeID:nodeID controller:controller];
     });
 }
 
