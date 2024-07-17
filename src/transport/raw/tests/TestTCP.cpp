@@ -28,11 +28,12 @@
 #include <string.h>
 #include <utility>
 
-#include <gtest/gtest.h>
+#include <pw_unit_test/framework.h>
 
 #include <crypto/RandUtils.h>
 #include <lib/core/CHIPCore.h>
 #include <lib/core/CHIPEncoding.h>
+#include <lib/core/StringBuilderAdapters.h>
 #include <lib/support/CHIPMem.h>
 #include <lib/support/CodeUtils.h>
 #include <lib/support/UnitTestUtils.h>

@@ -556,32 +556,32 @@ Davis, CA 95616, USA
     </attribute>
     <attribute id="0x0001" name="Order" type="uint8">
       <access read="true" readPrivilege="view"/>
-      <quality changeOmitted="false" nullable="false" scene="false" persistence="nonVolatile" reportable="false"/>
+      <quality changeOmitted="false" nullable="false" scene="false" persistence="nonVolatile" reportable="false" sourceAttribution="false" quieterReporting="false"/>
       <mandatoryConform/>
     </attribute>
     <attribute id="0x0002" name="Description" type="string">
       <access read="true" readPrivilege="view"/>
-      <quality changeOmitted="false" nullable="false" scene="false" persistence="fixed" reportable="false"/>
+      <quality changeOmitted="false" nullable="false" scene="false" persistence="fixed" reportable="false" sourceAttribution="false" quieterReporting="false"/>
       <mandatoryConform/>
       <constraint type="maxLength" value="60"/>
     </attribute>
     <attribute id="0x0003" name="WiredAssessedInputVoltage" type="uint32">
       <access read="true" readPrivilege="view"/>
-      <quality changeOmitted="true" nullable="true" scene="false" persistence="volatile" reportable="false"/>
+      <quality changeOmitted="true" nullable="true" scene="false" persistence="volatile" reportable="false" sourceAttribution="false" quieterReporting="false"/>
       <optionalConform>
         <feature name="WIRED"/>
       </optionalConform>
     </attribute>
     <attribute id="0x0004" name="WiredAssessedInputFrequency" type="uint16">
       <access read="true" readPrivilege="view"/>
-      <quality changeOmitted="true" nullable="true" scene="false" persistence="volatile" reportable="false"/>
+      <quality changeOmitted="true" nullable="true" scene="false" persistence="volatile" reportable="false" sourceAttribution="false" quieterReporting="false"/>
       <optionalConform>
         <feature name="WIRED"/>
       </optionalConform>
     </attribute>
     <attribute id="0x0005" name="WiredCurrentType" type="WiredCurrentTypeEnum">
       <access read="true" readPrivilege="view"/>
-      <quality changeOmitted="false" nullable="false" scene="false" persistence="fixed" reportable="false"/>
+      <quality changeOmitted="false" nullable="false" scene="false" persistence="fixed" reportable="false" sourceAttribution="false" quieterReporting="false"/>
       <mandatoryConform>
         <feature name="WIRED"/>
       </mandatoryConform>
@@ -589,21 +589,21 @@ Davis, CA 95616, USA
     </attribute>
     <attribute id="0x0006" name="WiredAssessedCurrent" type="uint32">
       <access read="true" readPrivilege="view"/>
-      <quality changeOmitted="true" nullable="true" scene="false" persistence="volatile" reportable="false"/>
+      <quality changeOmitted="true" nullable="true" scene="false" persistence="volatile" reportable="false" sourceAttribution="false" quieterReporting="false"/>
       <optionalConform>
         <feature name="WIRED"/>
       </optionalConform>
     </attribute>
     <attribute id="0x0007" name="WiredNominalVoltage" type="uint32">
       <access read="true" readPrivilege="view"/>
-      <quality changeOmitted="false" nullable="false" scene="false" persistence="fixed" reportable="false"/>
+      <quality changeOmitted="false" nullable="false" scene="false" persistence="fixed" reportable="false" sourceAttribution="false" quieterReporting="false"/>
       <optionalConform>
         <feature name="WIRED"/>
       </optionalConform>
     </attribute>
     <attribute id="0x0008" name="WiredMaximumCurrent" type="uint32">
       <access read="true" readPrivilege="view"/>
-      <quality changeOmitted="false" nullable="false" scene="false" persistence="fixed" reportable="false"/>
+      <quality changeOmitted="false" nullable="false" scene="false" persistence="fixed" reportable="false" sourceAttribution="false" quieterReporting="false"/>
       <optionalConform>
         <feature name="WIRED"/>
       </optionalConform>
@@ -624,14 +624,14 @@ Davis, CA 95616, USA
     </attribute>
     <attribute id="0x000B" name="BatVoltage" type="uint32">
       <access read="true" readPrivilege="view"/>
-      <quality changeOmitted="true" nullable="true" scene="false" persistence="volatile" reportable="false"/>
+      <quality changeOmitted="true" nullable="true" scene="false" persistence="volatile" reportable="false" sourceAttribution="false" quieterReporting="false"/>
       <optionalConform>
         <feature name="BAT"/>
       </optionalConform>
     </attribute>
     <attribute id="0x000C" name="BatPercentRemaining" type="uint8">
       <access read="true" readPrivilege="view"/>
-      <quality changeOmitted="true" nullable="true" scene="false" persistence="volatile" reportable="false"/>
+      <quality changeOmitted="true" nullable="true" scene="false" persistence="volatile" reportable="false" sourceAttribution="false" quieterReporting="false"/>
       <optionalConform>
         <feature name="BAT"/>
       </optionalConform>
@@ -639,7 +639,7 @@ Davis, CA 95616, USA
     </attribute>
     <attribute id="0x000D" name="BatTimeRemaining" type="uint32">
       <access read="true" readPrivilege="view"/>
-      <quality changeOmitted="true" nullable="true" scene="false" persistence="volatile" reportable="false"/>
+      <quality changeOmitted="true" nullable="true" scene="false" persistence="volatile" reportable="false" sourceAttribution="false" quieterReporting="false"/>
       <optionalConform>
         <feature name="BAT"/>
       </optionalConform>
@@ -659,7 +659,7 @@ Davis, CA 95616, USA
     </attribute>
     <attribute id="0x0010" name="BatReplaceability" type="BatReplaceabilityEnum">
       <access read="true" readPrivilege="view"/>
-      <quality changeOmitted="false" nullable="false" scene="false" persistence="fixed" reportable="false"/>
+      <quality changeOmitted="false" nullable="false" scene="false" persistence="fixed" reportable="false" sourceAttribution="false" quieterReporting="false"/>
       <mandatoryConform>
         <feature name="BAT"/>
       </mandatoryConform>
@@ -680,7 +680,7 @@ Davis, CA 95616, USA
     </attribute>
     <attribute id="0x0013" name="BatReplacementDescription" type="string">
       <access read="true" readPrivilege="view"/>
-      <quality changeOmitted="false" nullable="false" scene="false" persistence="fixed" reportable="false"/>
+      <quality changeOmitted="false" nullable="false" scene="false" persistence="fixed" reportable="false" sourceAttribution="false" quieterReporting="false"/>
       <mandatoryConform>
         <feature name="REPLC"/>
       </mandatoryConform>
@@ -688,7 +688,7 @@ Davis, CA 95616, USA
     </attribute>
     <attribute id="0x0014" name="BatCommonDesignation" type="BatCommonDesignationEnum">
       <access read="true" readPrivilege="view"/>
-      <quality changeOmitted="false" nullable="false" scene="false" persistence="fixed" reportable="false"/>
+      <quality changeOmitted="false" nullable="false" scene="false" persistence="fixed" reportable="false" sourceAttribution="false" quieterReporting="false"/>
       <optionalConform>
         <feature name="REPLC"/>
       </optionalConform>
@@ -696,7 +696,7 @@ Davis, CA 95616, USA
     </attribute>
     <attribute id="0x0015" name="BatANSIDesignation" type="string">
       <access read="true" readPrivilege="view"/>
-      <quality changeOmitted="false" nullable="false" scene="false" persistence="fixed" reportable="false"/>
+      <quality changeOmitted="false" nullable="false" scene="false" persistence="fixed" reportable="false" sourceAttribution="false" quieterReporting="false"/>
       <optionalConform>
         <feature name="REPLC"/>
       </optionalConform>
@@ -704,7 +704,7 @@ Davis, CA 95616, USA
     </attribute>
     <attribute id="0x0016" name="BatIECDesignation" type="string">
       <access read="true" readPrivilege="view"/>
-      <quality changeOmitted="false" nullable="false" scene="false" persistence="fixed" reportable="false"/>
+      <quality changeOmitted="false" nullable="false" scene="false" persistence="fixed" reportable="false" sourceAttribution="false" quieterReporting="false"/>
       <optionalConform>
         <feature name="REPLC"/>
       </optionalConform>
@@ -712,7 +712,7 @@ Davis, CA 95616, USA
     </attribute>
     <attribute id="0x0017" name="BatApprovedChemistry" type="BatApprovedChemistryEnum">
       <access read="true" readPrivilege="view"/>
-      <quality changeOmitted="false" nullable="false" scene="false" persistence="fixed" reportable="false"/>
+      <quality changeOmitted="false" nullable="false" scene="false" persistence="fixed" reportable="false" sourceAttribution="false" quieterReporting="false"/>
       <optionalConform>
         <feature name="REPLC"/>
       </optionalConform>
@@ -720,7 +720,7 @@ Davis, CA 95616, USA
     </attribute>
     <attribute id="0x0018" name="BatCapacity" type="uint32">
       <access read="true" readPrivilege="view"/>
-      <quality changeOmitted="false" nullable="false" scene="false" persistence="fixed" reportable="false"/>
+      <quality changeOmitted="false" nullable="false" scene="false" persistence="fixed" reportable="false" sourceAttribution="false" quieterReporting="false"/>
       <optionalConform>
         <orTerm>
           <feature name="REPLC"/>
@@ -730,7 +730,7 @@ Davis, CA 95616, USA
     </attribute>
     <attribute id="0x0019" name="BatQuantity" type="uint8">
       <access read="true" readPrivilege="view"/>
-      <quality changeOmitted="false" nullable="false" scene="false" persistence="fixed" reportable="false"/>
+      <quality changeOmitted="false" nullable="false" scene="false" persistence="fixed" reportable="false" sourceAttribution="false" quieterReporting="false"/>
       <mandatoryConform>
         <feature name="REPLC"/>
       </mandatoryConform>
@@ -744,7 +744,7 @@ Davis, CA 95616, USA
     </attribute>
     <attribute id="0x001B" name="BatTimeToFullCharge" type="uint32">
       <access read="true" readPrivilege="view"/>
-      <quality changeOmitted="true" nullable="true" scene="false" persistence="volatile" reportable="false"/>
+      <quality changeOmitted="true" nullable="true" scene="false" persistence="volatile" reportable="false" sourceAttribution="false" quieterReporting="false"/>
       <optionalConform>
         <feature name="RECHG"/>
       </optionalConform>
@@ -757,7 +757,7 @@ Davis, CA 95616, USA
     </attribute>
     <attribute id="0x001D" name="BatChargingCurrent" type="uint32">
       <access read="true" readPrivilege="view"/>
-      <quality changeOmitted="true" nullable="true" scene="false" persistence="volatile" reportable="false"/>
+      <quality changeOmitted="true" nullable="true" scene="false" persistence="volatile" reportable="false" sourceAttribution="false" quieterReporting="false"/>
       <optionalConform>
         <feature name="RECHG"/>
       </optionalConform>

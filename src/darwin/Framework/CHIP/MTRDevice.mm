@@ -336,11 +336,7 @@ static NSString * const sLastInitialSubscribeLatencyKey = @"lastInitialSubscribe
 
 - (BOOL)isEqualToClusterData:(MTRDeviceClusterData *)otherClusterData
 {
-    if (!otherClusterData)
-        return NO;
-
-    return (otherClusterData.dataVersion && [_dataVersion isEqual:otherClusterData.dataVersion])
-        && (otherClusterData.attributes && [_attributes isEqual:otherClusterData.attributes]);
+    return [_dataVersion isEqual:otherClusterData.dataVersion] && [_attributes isEqual:otherClusterData.attributes];
 }
 
 - (BOOL)isEqual:(id)object
@@ -3671,7 +3667,9 @@ static BOOL AttributeHasChangesOmittedQuality(MTRAttributePath * attributePath)
         }
     }
 
-    MTR_LOG("%@ report from reported values %@", self, attributePathsToReport);
+    if (attributePathsToReport.count > 0) {
+        MTR_LOG("%@ report from reported values %@", self, attributePathsToReport);
+    }
 
     return attributesToReport;
 }
