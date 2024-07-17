@@ -155,19 +155,18 @@ limitations under the License.
       <field id="4" name="LatestValue" type="AccessControlExtensionStruct" isNullable="true"/>
       <access op="read" privilege="administer"/>
     </event>
-
-    <event code="0x0002" name="AccessRestrictionEntryChanged" priority="info" side="server" isFabricSensitive="true" optional="true">
+    <event side="server" code="0x0002" name="AccessRestrictionEntryChanged" priority="info" isFabricSensitive="true" optional="true">
+      <description>The cluster SHALL send AccessRestrictionEntryChanged events whenever its ARL attribute data is changed by the device maker.</description>
       <field id="1" name="ChangeType" type="ChangeTypeEnum" min="0x00" max="0x02"/>
       <field id="2" name="LatestValue" type="AccessRestrictionStruct" isNullable="true"/>
       <access op="read" privilege="administer"/>
     </event>
-
     <event code="0x0003" name="FabricRestrictionReviewUpdate" priority="info" side="server" isFabricSensitive="true" optional="true">
+      <description>The cluster SHALL send FabricRestrictionReviewUpdate events to indicate completion of a fabric restriction review.</description>
       <field id="0" name="Token" type="int64u"/>
       <field id="1" name="Instruction" type="char_string" isNullable="true"/>
       <field id="2" name="RedirectURL" type="char_string" optional="true" isNullable="true"/>
       <access op="read" privilege="administer"/>
     </event>
-
   </cluster>
 </configurator>
