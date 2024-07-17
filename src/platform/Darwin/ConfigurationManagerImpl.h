@@ -34,7 +34,7 @@
 namespace chip {
 namespace DeviceLayer {
 
-inline constexpr int kCountryCodeLength = 2;
+static constexpr int kCountryCodeLength = 2;
 
 /**
  * Concrete implementation of the ConfigurationManager singleton object for the Darwin platform.

@@ -28,7 +28,11 @@
 #include <openthread/tasklet.h>
 #include <openthread/thread.h>
 #include <platform/FreeRTOS/GenericThreadStackManagerImpl_FreeRTOS.h>
+#if CHIP_SYSTEM_CONFIG_USE_LWIP
 #include <platform/OpenThread/GenericThreadStackManagerImpl_OpenThread_LwIP.h>
+#else
+#include <platform/OpenThread/GenericThreadStackManagerImpl_OpenThread.h>
+#endif
 
 extern "C" void otSysEventSignalPending(void);
 
@@ -43,7 +47,11 @@ class ThreadStackManagerImpl;
  * using the NXP SDK and the OpenThread stack.
  */
 class ThreadStackManagerImpl final : public ThreadStackManager,
+#if CHIP_SYSTEM_CONFIG_USE_LWIP
                                      public Internal::GenericThreadStackManagerImpl_OpenThread_LwIP<ThreadStackManagerImpl>,
+#else
+                                     public Internal::GenericThreadStackManagerImpl_OpenThread<ThreadStackManagerImpl>,
+#endif
                                      public Internal::GenericThreadStackManagerImpl_FreeRTOS<ThreadStackManagerImpl>
 {
     // Allow the ThreadStackManager interface class to delegate method calls to
@@ -53,8 +61,11 @@ class ThreadStackManagerImpl final : public ThreadStackManager,
     // Allow the generic implementation base classes to call helper methods on
     // this class.
 #ifndef DOXYGEN_SHOULD_SKIP_THIS
-    friend Internal::GenericThreadStackManagerImpl_OpenThread<ThreadStackManagerImpl>;
+#if CHIP_SYSTEM_CONFIG_USE_LWIP
     friend Internal::GenericThreadStackManagerImpl_OpenThread_LwIP<ThreadStackManagerImpl>;
+#else
+    friend Internal::GenericThreadStackManagerImpl_OpenThread<ThreadStackManagerImpl>;
+#endif
     friend Internal::GenericThreadStackManagerImpl_FreeRTOS<ThreadStackManagerImpl>;
 #endif
 
@@ -65,6 +76,11 @@ class ThreadStackManagerImpl final : public ThreadStackManager,
 
 public:
     // ===== Platform-specific members that may be accessed directly by the application.
+
+#if CHIP_DEVICE_CONFIG_PROCESS_BLE_IN_THREAD
+    using ThreadStackManager::ProcessThreadActivity;
+    void ProcessThreadActivity();
+#endif
 
 protected:
     // ===== Methods that implement the ThreadStackManager abstract interface.
