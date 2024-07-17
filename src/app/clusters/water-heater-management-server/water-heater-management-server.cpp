@@ -112,12 +112,12 @@ void Instance::InvokeCommand(HandlerContext & handlerContext)
 
 void Instance::HandleBoost(HandlerContext & ctx, const Commands::Boost::DecodableType & commandData)
 {
-    uint32_t duration                        = commandData.duration;
-    Optional<bool> oneShot                   = commandData.oneShot;
-    Optional<bool> emergencyBoost            = commandData.emergencyBoost;
-    Optional<int16_t> temporarySetpoint      = commandData.temporarySetpoint;
-    Optional<Percent> targetPercentage = commandData.targetPercentage;
-    Optional<Percent> targetReheat     = commandData.targetReheat;
+    uint32_t duration                   = commandData.duration;
+    Optional<bool> oneShot              = commandData.oneShot;
+    Optional<bool> emergencyBoost       = commandData.emergencyBoost;
+    Optional<int16_t> temporarySetpoint = commandData.temporarySetpoint;
+    Optional<Percent> targetPercentage  = commandData.targetPercentage;
+    Optional<Percent> targetReheat      = commandData.targetReheat;
 
     //  Notify the appliance if the appliance hardware cannot be adjusted, then return Failure
     if (HasFeature(WaterHeaterManagement::Feature::kTankPercent))
