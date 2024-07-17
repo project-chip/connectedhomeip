@@ -469,7 +469,7 @@ class SubscriptionTransaction:
 
     async def TriggerResubscribeIfScheduled(self, reason: str):
         handle = chip.native.GetLibraryHandle()
-        await builtins.chipStack.CallAsync(
+        await builtins.chipStack.CallAsyncWithResult(
             lambda: handle.pychip_ReadClient_TriggerResubscribeIfScheduled(
                 self._readTransaction._pReadClient, reason.encode("utf-8"))
         )
