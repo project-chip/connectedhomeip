@@ -15,14 +15,14 @@
  *    limitations under the License.
  */
 
+#include "lib/support/logging/TextOnlyLogging.h"
 #include <app/AttributePathExpandIterator-Checked.h>
 
 namespace chip {
 namespace app {
 AttributePathExpandIteratorChecked::AttributePathExpandIteratorChecked(InteractionModel::DataModel * dataModel,
                                                                        SingleLinkedListNode<AttributePathParams> * attributePath) :
-    mDataModelIterator(dataModel, attributePath),
-    mEmberIterator(dataModel, attributePath)
+    mDataModelIterator(dataModel, attributePath), mEmberIterator(dataModel, attributePath)
 {
     CheckOutputsIdentical("Constructor");
 }
@@ -77,11 +77,11 @@ void AttributePathExpandIteratorChecked::CheckOutputsIdentical(const char * msg)
     }
 
     ChipLogProgress(Test, "Different paths in DM vs EMBER (%d and %d) in %s", dmResult, emResult, msg);
-    ChipLogProgress(Test, "   DM PATH:    0x%X/0x%X/0x%X (%s)", static_cast<int>(dmPath.mEndpointId),
-                    static_cast<int>(dmPath.mClusterId), static_cast<int>(dmPath.mAttributeId),
+    ChipLogProgress(Test, "   DM PATH:    0x%X/" ChipLogFormatMEI "/" ChipLogFormatMEI " (%s)", dmPath.mEndpointId,
+                    ChipLogValueMEI(dmPath.mClusterId), ChipLogValueMEI(dmPath.mAttributeId),
                     dmPath.mExpanded ? "EXPANDED" : "NOT expanded");
-    ChipLogProgress(Test, "   EMBER PATH: 0x%X/0x%X/0x%X (%s)", static_cast<int>(emPath.mEndpointId),
-                    static_cast<int>(emPath.mClusterId), static_cast<int>(emPath.mAttributeId),
+    ChipLogProgress(Test, "   EMBER PATH: 0x%X/" ChipLogFormatMEI "/" ChipLogFormatMEI " (%s)", emPath.mEndpointId,
+                    ChipLogValueMEI(emPath.mClusterId), ChipLogValueMEI(emPath.mAttributeId),
                     emPath.mExpanded ? "EXPANDED" : "NOT expanded");
 
     chipDie();
