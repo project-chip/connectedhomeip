@@ -22,10 +22,12 @@
  *
  */
 
-#include <gtest/gtest.h>
-#include <lib/support/BufferReader.h>
-
 #include <type_traits>
+
+#include <pw_unit_test/framework.h>
+
+#include <lib/core/StringBuilderAdapters.h>
+#include <lib/support/BufferReader.h>
 
 using namespace chip;
 using namespace chip::Encoding::LittleEndian;
