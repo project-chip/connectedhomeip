@@ -123,7 +123,7 @@ Davis, CA 95616, USA
         <condition name="Thread"/>
       </optionalConform>
     </cluster>
-    <cluster id="0x0036" name="Wi" side="server">
+    <cluster id="0x0036" name="Wi-Fi Network Diagnostics" side="server">
       <optionalConform>
         <condition name="Wi-Fi"/>
       </optionalConform>

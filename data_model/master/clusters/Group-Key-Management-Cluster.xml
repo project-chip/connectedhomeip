@@ -66,7 +66,7 @@ Davis, CA 95616, USA
   <classification hierarchy="base" role="utility" picsCode="GRPKEY" scope="Node"/>
   <features>
     <feature bit="0" code="CS" name="CacheAndSync" summary="The ability to support CacheAndSync security policy and MCSP.">
-      <optionalConform/>
+      <provisionalConform/>
     </feature>
   </features>
   <dataTypes>
@@ -167,7 +167,7 @@ Davis, CA 95616, USA
     <attribute id="0x0000" name="GroupKeyMap" type="list" default="empty">
       <entry type="GroupKeyMapStruct"/>
       <access read="true" write="true" readPrivilege="view" writePrivilege="manage" fabricScoped="true"/>
-      <quality changeOmitted="false" nullable="false" scene="false" persistence="nonVolatile" reportable="false"/>
+      <quality changeOmitted="false" nullable="false" scene="false" persistence="nonVolatile" reportable="false" sourceAttribution="false" quieterReporting="false"/>
       <mandatoryConform/>
       <constraint type="desc"/>
     </attribute>
@@ -179,12 +179,12 @@ Davis, CA 95616, USA
     </attribute>
     <attribute id="0x0002" name="MaxGroupsPerFabric" type="uint16" default="0">
       <access read="true" readPrivilege="view"/>
-      <quality changeOmitted="false" nullable="false" scene="false" persistence="fixed" reportable="false"/>
+      <quality changeOmitted="false" nullable="false" scene="false" persistence="fixed" reportable="false" sourceAttribution="false" quieterReporting="false"/>
       <mandatoryConform/>
     </attribute>
     <attribute id="0x0003" name="MaxGroupKeysPerFabric" type="uint16" default="1">
       <access read="true" readPrivilege="view"/>
-      <quality changeOmitted="false" nullable="false" scene="false" persistence="fixed" reportable="false"/>
+      <quality changeOmitted="false" nullable="false" scene="false" persistence="fixed" reportable="false" sourceAttribution="false" quieterReporting="false"/>
       <mandatoryConform/>
       <constraint type="between" from="1" to="65535"/>
     </attribute>

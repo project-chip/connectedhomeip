@@ -20,6 +20,9 @@
 #include <string>
 #include <utility>
 
+#include <pw_unit_test/framework.h>
+
+#include <lib/core/StringBuilderAdapters.h>
 #include <lib/dnssd/Advertiser.h>
 #include <lib/dnssd/MinimalMdnsServer.h>
 #include <lib/dnssd/minimal_mdns/Query.h>
@@ -32,8 +35,6 @@
 
 #include <system/SystemPacketBuffer.h>
 #include <transport/raw/tests/NetworkTestHelpers.h>
-
-#include <gtest/gtest.h>
 
 namespace {
 
