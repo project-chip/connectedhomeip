@@ -1166,9 +1166,8 @@ static NSString * sDeviceDataKeyPrefix = @"deviceData";
     });
 }
 
-#pragma mark - Device Client Data
+#pragma mark - Client Data
 static NSString * sClientDataKeyPrefix = @"clientData";
-static NSString * sClientDataNodeIndexKey = @"clientDataNodeIndex";
 
 typedef NSString * MTRClientDataKey;
 
@@ -1183,7 +1182,7 @@ typedef NSString * MTRClientDataKey;
 
         @autoreleasepool {
             data = [self->_storageDelegate controller:controller
-                                          valueForKey:[self _clientDataKeyForNodeID:nodeID key:sClientDataNodeIndexKey]
+                                          valueForKey:[self _clientDataIndexKeyForNodeID:nodeID]
                                         securityLevel:MTRStorageSecurityLevelSecure
                                           sharingType:MTRStorageSharingTypeNotShared];  // REVIEWERS:  fabric shared? kmo 12 jul 2024 14h58
         }
@@ -1201,6 +1200,10 @@ typedef NSString * MTRClientDataKey;
     });
 
     return index;
+}
+
+- (NSString *)_clientDataIndexKeyForNodeID:(NSNumber *)nodeID {
+    return [sClientDataKeyPrefix stringByAppendingFormat:@":0x%016llX_index", nodeID.unsignedLongLongValue];
 }
 
 - (NSString *)_clientDataKeyForNodeID:(NSNumber *)nodeID key:(NSString *)key
@@ -1302,9 +1305,8 @@ typedef NSString * MTRClientDataKey;
                                     forKey:storageKey
                              securityLevel:MTRStorageSecurityLevelSecure
                                sharingType:MTRStorageSharingTypeNotShared]; // REVIEWERS:  should be fabric shared? kmo 12 jul 2024 13h10
-
-
-        [self _updateClientDataIndexForKey:key nodeID:nodeID controller:controller];
+        NSLog(@"kmo: would update index");
+        // [self _updateClientDataIndexForKey:key nodeID:nodeID controller:controller];
     });
 }
 
