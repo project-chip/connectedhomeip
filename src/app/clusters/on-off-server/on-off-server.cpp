@@ -89,6 +89,12 @@ void UpdateModeBaseCurrentModeToOnMode(EndpointId endpoint)
 
 #endif // MATTER_DM_PLUGIN_MODE_BASE
 
+template <typename EnumType>
+bool isKnownEnumValue(EnumType value)
+{
+    return (EnsureKnownEnumValue(value) == EnumType::kUnknownEnumValue) ? false : true;
+}
+
 } // namespace
 
 #ifdef MATTER_DM_PLUGIN_LEVEL_CONTROL
@@ -608,6 +614,30 @@ bool OnOffServer::offWithEffectCommand(app::CommandHandler * commandObj, const a
     auto effectVariant        = commandData.effectVariant;
     chip::EndpointId endpoint = commandPath.mEndpointId;
     Status status             = Status::Success;
+
+    if (isKnownEnumValue(effectId))
+    {
+        // Depending on effectId value, effectVariant enum type varies.
+        // The following check validates that effectVariant value is valid in relation to the applicable enum type.
+        // DelayedAllOffEffectVariantEnum or DyingLightEffectVariantEnum
+        if ((effectId == EffectIdentifierEnum::kDelayedAllOff &&
+             !isKnownEnumValue(static_cast<DelayedAllOffEffectVariantEnum>(effectVariant))) ||
+            (effectId == EffectIdentifierEnum::kDyingLight &&
+             !isKnownEnumValue(static_cast<DyingLightEffectVariantEnum>(effectVariant))))
+        {
+            status = Status::ConstraintError;
+        }
+    }
+    else
+    {
+        status = Status::ConstraintError;
+    }
+
+    if (status != Status::Success)
+    {
+        commandObj->AddStatus(commandPath, status);
+        return true;
+    }
 
     if (SupportsLightingApplications(endpoint))
     {
