@@ -170,8 +170,8 @@ public:
     virtual ESAStateEnum GetESAState() override;
     virtual int64_t GetAbsMinPower() override;
     virtual int64_t GetAbsMaxPower() override;
-    virtual DataModel::Nullable<Structs::PowerAdjustCapabilityStruct::Type> & GetPowerAdjustmentCapability() override;
-    virtual DataModel::Nullable<Structs::ForecastStruct::Type> & GetForecast() override;
+    virtual const DataModel::Nullable<Structs::PowerAdjustCapabilityStruct::Type> & GetPowerAdjustmentCapability() override;
+    virtual const DataModel::Nullable<Structs::ForecastStruct::Type> & GetForecast() override;
     virtual OptOutStateEnum GetOptOutState() override;
 
     // ------------------------------------------------------------------

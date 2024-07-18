@@ -782,12 +782,12 @@ int64_t DeviceEnergyManagementDelegate::GetAbsMaxPower()
     return mAbsMaxPowerMw;
 }
 
-DataModel::Nullable<Structs::PowerAdjustCapabilityStruct::Type> & DeviceEnergyManagementDelegate::GetPowerAdjustmentCapability()
+const DataModel::Nullable<Structs::PowerAdjustCapabilityStruct::Type> & DeviceEnergyManagementDelegate::GetPowerAdjustmentCapability()
 {
     return mPowerAdjustCapabilityStruct;
 }
 
-DataModel::Nullable<Structs::ForecastStruct::Type> & DeviceEnergyManagementDelegate::GetForecast()
+const DataModel::Nullable<Structs::ForecastStruct::Type> & DeviceEnergyManagementDelegate::GetForecast()
 {
     ChipLogDetail(Zcl, "DeviceEnergyManagementDelegate::GetForecast");
 

@@ -178,7 +178,7 @@ public:
      *
      * @return  The current PowerAdjustCapability object
      */
-    virtual DataModel::Nullable<Structs::PowerAdjustCapabilityStruct::Type> & GetPowerAdjustmentCapability() = 0;
+    virtual const DataModel::Nullable<Structs::PowerAdjustCapabilityStruct::Type> & GetPowerAdjustmentCapability() = 0;
 
     /**
      * @brief Returns the current Forecast object
@@ -191,7 +191,7 @@ public:
      *
      * @return  The current Forecast object
      */
-    virtual DataModel::Nullable<Structs::ForecastStruct::Type> & GetForecast() = 0;
+    virtual const DataModel::Nullable<Structs::ForecastStruct::Type> & GetForecast() = 0;
 
     // ------------------------------------------------------------------
     // Set attribute methods
