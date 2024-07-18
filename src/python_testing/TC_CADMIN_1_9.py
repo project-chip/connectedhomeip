@@ -74,7 +74,8 @@ class TC_CADMIN_1_9(MatterBaseTest):
                 errcode = self.th2.CommissionOnNetwork(
                     nodeId=self.dut_node_id, setupPinCode=setup_code,
                     filterType=ChipDeviceCtrl.DiscoveryFilterType.LONG_DISCRIMINATOR, filter=self.discriminator)
-                logging.info('Commissioning complete done. Successful? {}, errorcode = {}, cycle={}'.format(errcode.is_success, errcode, (cycle+1)))
+                logging.info('Commissioning complete done. Successful? {}, errorcode = {}, cycle={}'.format(
+                    errcode.is_success, errcode, (cycle+1)))
                 asserts.assert_false(errcode.is_success, 'Commissioning complete did not error as expected')
                 asserts.assert_true(errcode.sdk_code == expectedErrCode,
                                     'Unexpected error code returned from CommissioningComplete')
@@ -122,6 +123,7 @@ class TC_CADMIN_1_9(MatterBaseTest):
         await self.th1.SendCommand(nodeid=self.dut_node_id, endpoint=0, payload=revokeCmd, timedRequestTimeoutMs=6000)
         # The failsafe cleanup is scheduled after the command completes, so give it a bit of time to do that
         sleep(1)
+
 
 if __name__ == "__main__":
     default_matter_test_main()
