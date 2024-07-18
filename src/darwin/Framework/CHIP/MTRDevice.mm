@@ -3981,7 +3981,6 @@ static BOOL AttributeHasChangesOmittedQuality(MTRAttributePath * attributePath)
 - (id<NSSecureCoding> _Nullable)clientDataForKey:(NSString *)key
 {
 #if USE_DEVICE_CONTROLLER_DATA_STORE
-    // TODO: KMO: implement
     NSNumber * selfNodeID = self.nodeID;
     id<NSSecureCoding> data = [self.deviceController.controllerDataStore clientDataForKey:key nodeID:selfNodeID];
     return data;
@@ -3998,9 +3997,7 @@ static BOOL AttributeHasChangesOmittedQuality(MTRAttributePath * attributePath)
     // TODO: Check supported data types, and also if they conform to NSSecureCoding, when we store these
     // TODO: Need to add a delegate method, so when this value changes we call back to the client
 #if USE_DEVICE_CONTROLLER_DATA_STORE
-    // TODO:  KMO:  check impl
-    NSNumber * selfNodeID = self.nodeID;
-    [self.deviceController.controllerDataStore storeClientDataForKey:key value:value forNodeID:selfNodeID];
+    [self.deviceController.controllerDataStore storeClientDataForKey:key value:value forNodeID:self.nodeID];
 #else
     if (key == nil || value == nil)
         return;
