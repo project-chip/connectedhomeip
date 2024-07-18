@@ -6008,6 +6008,69 @@ NS_ASSUME_NONNULL_BEGIN
 
 @end
 
+@implementation MTRWaterHeaterModeClusterModeTagStruct
+- (instancetype)init
+{
+    if (self = [super init]) {
+
+        _mfgCode = nil;
+
+        _value = @(0);
+    }
+    return self;
+}
+
+- (id)copyWithZone:(NSZone * _Nullable)zone
+{
+    auto other = [[MTRWaterHeaterModeClusterModeTagStruct alloc] init];
+
+    other.mfgCode = self.mfgCode;
+    other.value = self.value;
+
+    return other;
+}
+
+- (NSString *)description
+{
+    NSString * descriptionString = [NSString stringWithFormat:@"<%@: mfgCode:%@; value:%@; >", NSStringFromClass([self class]), _mfgCode, _value];
+    return descriptionString;
+}
+
+@end
+
+@implementation MTRWaterHeaterModeClusterModeOptionStruct
+- (instancetype)init
+{
+    if (self = [super init]) {
+
+        _label = @"";
+
+        _mode = @(0);
+
+        _modeTags = [NSArray array];
+    }
+    return self;
+}
+
+- (id)copyWithZone:(NSZone * _Nullable)zone
+{
+    auto other = [[MTRWaterHeaterModeClusterModeOptionStruct alloc] init];
+
+    other.label = self.label;
+    other.mode = self.mode;
+    other.modeTags = self.modeTags;
+
+    return other;
+}
+
+- (NSString *)description
+{
+    NSString * descriptionString = [NSString stringWithFormat:@"<%@: label:%@; mode:%@; modeTags:%@; >", NSStringFromClass([self class]), _label, _mode, _modeTags];
+    return descriptionString;
+}
+
+@end
+
 @implementation MTRDeviceEnergyManagementModeClusterModeTagStruct
 - (instancetype)init
 {
