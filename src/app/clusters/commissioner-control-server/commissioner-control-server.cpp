@@ -29,7 +29,7 @@
 #include <app/reporting/reporting.h>
 #include <platform/PlatformManager.h>
 
-#include <memory> // For std::shared_ptr
+#include <memory>
 
 using namespace chip;
 using namespace chip::app;
@@ -40,24 +40,8 @@ namespace {
 
 NodeId getNodeId(const app::CommandHandler * commandObj)
 {
-    if (nullptr == commandObj || nullptr == commandObj->GetExchangeContext())
-    {
-        ChipLogError(Zcl, "Cannot access ExchangeContext of Command Object for Node ID");
-        return kUndefinedNodeId;
-    }
-
-    if (!commandObj->GetExchangeContext()->HasSessionHandle())
-    {
-        ChipLogError(Zcl, "Cannot access session of Command Object for Node ID");
-        return kUndefinedNodeId;
-    }
-
-    auto descriptor = commandObj->GetExchangeContext()->GetSessionHandle()->GetSubjectDescriptor();
-    if (descriptor.authMode != Access::AuthMode::kCase)
-    {
-        ChipLogError(Zcl, "Cannot get Node ID from non-CASE session of Command Object");
-        return kUndefinedNodeId;
-    }
+    VerifyOrDie(commandObj);
+    auto descriptor = commandObj->GetSubjectDescriptor();
 
     return descriptor.subject;
 }
@@ -105,11 +89,11 @@ namespace app {
 namespace Clusters {
 namespace CommissionerControl {
 
-CommissionerControlServer CommissionerControlServer::instance;
+CommissionerControlServer CommissionerControlServer::mInstance;
 
 CommissionerControlServer & CommissionerControlServer::Instance()
 {
-    return instance;
+    return mInstance;
 }
 
 CHIP_ERROR CommissionerControlServer::Init(Delegate & delegate)
@@ -210,7 +194,6 @@ bool emberAfCommissionerControlClusterCommissionNodeCallback(
     const Clusters::CommissionerControl::Commands::CommissionNode::DecodableType & commandData)
 {
     CHIP_ERROR err = CHIP_NO_ERROR;
-    Status status  = Status::Success;
 
     ChipLogProgress(Zcl, "Received command to commission node");
 
@@ -229,7 +212,7 @@ bool emberAfCommissionerControlClusterCommissionNodeCallback(
 
     // Handle commissioning approval request
     err = delegate->ValidateCommissionNodeCommand(sourceNodeId, requestId, info->params);
-    VerifyOrExit(err == CHIP_NO_ERROR);
+    SuccessOrExit(err == CHIP_NO_ERROR);
 
     // Add the response for the commissioning window
     AddReverseOpenCommissioningWindowResponse(commandObj, commandPath, info->params);
@@ -237,15 +220,12 @@ bool emberAfCommissionerControlClusterCommissionNodeCallback(
     // Schedule the deferred reverse commission node task
     DeviceLayer::PlatformMgr().ScheduleWork(RunDeferredCommissionNode, reinterpret_cast<intptr_t>(info.release()));
 
-    return true;
-
 exit:
     if (err != CHIP_NO_ERROR)
     {
         ChipLogError(Zcl, "emberAfCommissionerControlClusterCommissionNodeCallback error: %s", err.AsString());
-        status = Status::Failure;
+        commandObj->AddStatus(commandPath, Status::Failure);
     }
 
-    commandObj->AddStatus(commandPath, status);
     return true;
 }

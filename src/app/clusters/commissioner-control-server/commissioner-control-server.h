@@ -88,7 +88,7 @@ private:
     CommissionerControlServer()  = default;
     ~CommissionerControlServer() = default;
 
-    static CommissionerControlServer instance;
+    static CommissionerControlServer mInstance;
 
     Delegate * mDelegate = nullptr;
 };
