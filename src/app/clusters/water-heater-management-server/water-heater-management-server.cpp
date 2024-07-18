@@ -35,6 +35,8 @@ namespace app {
 namespace Clusters {
 namespace WaterHeaterManagement {
 
+constexpr uint16_t kClusterRevision = 1;
+
 CHIP_ERROR Instance::Init()
 {
     ReturnErrorOnFailure(InteractionModelEngine::GetInstance()->RegisterCommandHandler(this));
@@ -87,6 +89,8 @@ CHIP_ERROR Instance::Read(const ConcreteReadAttributePath & aPath, AttributeValu
     /* FeatureMap - is held locally */
     case FeatureMap::Id:
         return aEncoder.Encode(mFeature);
+    case ClusterRevision::Id:
+        return aEncoder.Encode(kClusterRevision);
     }
 
     /* Allow all other unhandled attributes to fall through to Ember */
