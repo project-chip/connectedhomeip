@@ -16,17 +16,20 @@
  *    limitations under the License.
  */
 
-#include <credentials/GroupDataProviderImpl.h>
-#include <crypto/DefaultSessionKeystore.h>
-#include <gtest/gtest.h>
-#include <lib/core/TLV.h>
-#include <lib/support/CHIPMem.h>
-#include <lib/support/TestPersistentStorageDelegate.h>
-#include <platform/KeyValueStoreManager.h>
 #include <set>
 #include <string.h>
 #include <tuple>
 #include <utility>
+
+#include <pw_unit_test/framework.h>
+
+#include <credentials/GroupDataProviderImpl.h>
+#include <crypto/DefaultSessionKeystore.h>
+#include <lib/core/StringBuilderAdapters.h>
+#include <lib/core/TLV.h>
+#include <lib/support/CHIPMem.h>
+#include <lib/support/TestPersistentStorageDelegate.h>
+#include <platform/KeyValueStoreManager.h>
 
 using namespace chip::Credentials;
 using GroupInfo      = GroupDataProvider::GroupInfo;

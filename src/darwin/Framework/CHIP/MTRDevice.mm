@@ -15,7 +15,7 @@
  *    limitations under the License.
  */
 
-#import <Matter/MTRDefines.h>
+#import <Matter/Matter.h>
 #import <os/lock.h>
 
 #import "MTRAsyncWorkQueue.h"
@@ -39,19 +39,20 @@
 #import "MTRMetricsCollector.h"
 #import "MTRTimeUtils.h"
 #import "MTRUnfairLock.h"
+#import "MTRUtilities.h"
 #import "zap-generated/MTRCommandPayloads_Internal.h"
 
-#include "lib/core/CHIPError.h"
-#include "lib/core/DataModelTypes.h"
-#include <app/ConcreteAttributePath.h>
-#include <lib/support/FibonacciUtils.h>
+#import "lib/core/CHIPError.h"
+#import "lib/core/DataModelTypes.h"
+#import <app/ConcreteAttributePath.h>
+#import <lib/support/FibonacciUtils.h>
 
-#include <app/AttributePathParams.h>
-#include <app/BufferedReadCallback.h>
-#include <app/ClusterStateCache.h>
-#include <app/InteractionModelEngine.h>
-#include <platform/LockTracker.h>
-#include <platform/PlatformManager.h>
+#import <app/AttributePathParams.h>
+#import <app/BufferedReadCallback.h>
+#import <app/ClusterStateCache.h>
+#import <app/InteractionModelEngine.h>
+#import <platform/LockTracker.h>
+#import <platform/PlatformManager.h>
 
 typedef void (^MTRDeviceAttributeReportHandler)(NSArray * _Nonnull);
 
@@ -336,7 +337,8 @@ static NSString * const sLastInitialSubscribeLatencyKey = @"lastInitialSubscribe
 
 - (BOOL)isEqualToClusterData:(MTRDeviceClusterData *)otherClusterData
 {
-    return [_dataVersion isEqual:otherClusterData.dataVersion] && [_attributes isEqual:otherClusterData.attributes];
+    return MTREqualObjects(_dataVersion, otherClusterData.dataVersion)
+        && MTREqualObjects(_attributes, otherClusterData.attributes);
 }
 
 - (BOOL)isEqual:(id)object
@@ -3441,6 +3443,13 @@ static BOOL AttributeHasChangesOmittedQuality(MTRAttributePath * attributePath)
         }
         [self _removeClusters:clusterPathsToRemove doRemoveFromDataStore:NO];
         [self.deviceController.controllerDataStore clearStoredClusterDataForNodeID:self.nodeID endpointID:endpoint];
+
+        [_deviceController asyncDispatchToMatterQueue:^{
+            std::lock_guard lock(self->_lock);
+            if (self->_currentSubscriptionCallback) {
+                self->_currentSubscriptionCallback->ClearCachedAttributeState(static_cast<EndpointId>(endpoint.unsignedLongLongValue));
+            }
+        } errorHandler:nil];
     }
 }
 
@@ -3461,6 +3470,17 @@ static BOOL AttributeHasChangesOmittedQuality(MTRAttributePath * attributePath)
         }
     }
     [self _removeClusters:clusterPathsToRemove doRemoveFromDataStore:YES];
+
+    [_deviceController asyncDispatchToMatterQueue:^{
+        std::lock_guard lock(self->_lock);
+        if (self->_currentSubscriptionCallback) {
+            for (NSNumber * cluster in toBeRemovedClusters) {
+                ConcreteClusterPath clusterPath(static_cast<EndpointId>(endpointID.unsignedLongLongValue),
+                    static_cast<ClusterId>(cluster.unsignedLongLongValue));
+                self->_currentSubscriptionCallback->ClearCachedAttributeState(clusterPath);
+            }
+        }
+    } errorHandler:nil];
 }
 
 - (void)_pruneAttributesIn:(MTRDeviceDataValueDictionary)previousAttributeListValue
@@ -3474,6 +3494,18 @@ static BOOL AttributeHasChangesOmittedQuality(MTRAttributePath * attributePath)
 
     [toBeRemovedAttributes minusSet:attributesStillInCluster];
     [self _removeAttributes:toBeRemovedAttributes fromCluster:clusterPath];
+
+    [_deviceController asyncDispatchToMatterQueue:^{
+        std::lock_guard lock(self->_lock);
+        if (self->_currentSubscriptionCallback) {
+            for (NSNumber * attribute in toBeRemovedAttributes) {
+                ConcreteAttributePath attributePath(static_cast<EndpointId>(clusterPath.endpoint.unsignedLongLongValue),
+                    static_cast<ClusterId>(clusterPath.cluster.unsignedLongLongValue),
+                    static_cast<AttributeId>(attribute.unsignedLongLongValue));
+                self->_currentSubscriptionCallback->ClearCachedAttributeState(attributePath);
+            }
+        }
+    } errorHandler:nil];
 }
 
 - (void)_pruneStoredDataForPath:(MTRAttributePath *)attributePath
@@ -3637,7 +3669,9 @@ static BOOL AttributeHasChangesOmittedQuality(MTRAttributePath * attributePath)
         }
     }
 
-    MTR_LOG("%@ report from reported values %@", self, attributePathsToReport);
+    if (attributePathsToReport.count > 0) {
+        MTR_LOG("%@ report from reported values %@", self, attributePathsToReport);
+    }
 
     return attributesToReport;
 }

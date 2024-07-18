@@ -31,6 +31,7 @@ chip_test_suite("tests") {
 
   public_deps = [
     "${chip_root}/src/ble",
+    "${chip_root}/src/lib/core:string-builder-adapters",
     "${chip_root}/src/platform",
   ]
 }
