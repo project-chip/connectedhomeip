@@ -73,7 +73,7 @@ CHIP_ERROR ConfigureForecast(uint16_t numSlots)
     sForecastStruct.endTime = static_cast<uint32_t>(chipEpoch * 3);
 
     // latest end time, in UTC, for the entire Forecast
-    sForecastStruct.latestEndTime = Optional<uint32_t>(static_cast<uint32_t>(chipEpoch * 3));
+    sForecastStruct.latestEndTime = MakeOptional(chipEpoch * 3);
 
     sForecastStruct.isPausable = true;
 
