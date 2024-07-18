@@ -221,8 +221,8 @@ void SetTestEventTrigger_StartTimeAdjustmentClear()
     sForecastStruct.startTime = static_cast<uint32_t>(0);
     sForecastStruct.endTime   = static_cast<uint32_t>(0);
 
-    sForecastStruct.earliestStartTime = Optional<DataModel::Nullable<uint32_t>>();
-    sForecastStruct.latestEndTime     = Optional<uint32_t>();
+    sForecastStruct.earliestStartTime = NullOptional;
+    sForecastStruct.latestEndTime     = NullOptional;
 
     GetDEMDelegate()->SetForecast(DataModel::MakeNullable(sForecastStruct));
 }
