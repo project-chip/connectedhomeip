@@ -238,11 +238,12 @@ class EventChangeCallback:
         self._q = queue.Queue()
         self._expected_cluster = expected_cluster
 
-    async def start(self, dev_ctrl, node_id: int, endpoint: int, fabric_filtered: bool=False, min_interval_sec: int=0, max_interval_sec: int=30) -> Any:
+    async def start(self, dev_ctrl, node_id: int, endpoint: int, fabric_filtered: bool = False, min_interval_sec: int = 0, max_interval_sec: int = 30) -> Any:
         """This starts a subscription for events on the specified node_id and endpoint. The cluster is specified when the class instance is created."""
         urgent = True
         self._subscription = await dev_ctrl.ReadEvent(node_id,
-                                                      events=[(endpoint, self._expected_cluster, urgent)], reportInterval=(min_interval_sec, max_interval_sec),
+                                                      events=[(endpoint, self._expected_cluster, urgent)], reportInterval=(
+                                                          min_interval_sec, max_interval_sec),
                                                       fabricFiltered=fabric_filtered, keepSubscriptions=True, autoResubscribe=False)
         self._subscription.SetEventUpdateCallback(self.__call__)
         return self._subscription
@@ -269,7 +270,7 @@ class EventChangeCallback:
 
     @property
     def event_queue(self) -> queue.Queue:
-      return self._q
+        return self._q
 
 
 class AttributeChangeCallback:
@@ -304,6 +305,7 @@ class AttributeChangeCallback:
         except KeyError:
             asserts.fail("[AttributeChangeCallback] Attribute {expected_attribute} not found in returned report")
 
+
 @dataclass
 class AttributeValue:
     endpoint_id: int
@@ -317,15 +319,15 @@ class ClusterAttributeChangeAccumulator:
         self._expected_cluster = expected_cluster
         self._subscription = None
 
-    async def start(self, dev_ctrl, node_id: int, endpoint: int, fabric_filtered: bool=False, min_interval_sec: int=0, max_interval_sec: int=30) -> Any:
+    async def start(self, dev_ctrl, node_id: int, endpoint: int, fabric_filtered: bool = False, min_interval_sec: int = 0, max_interval_sec: int = 30) -> Any:
         """This starts a subscription for attributes on the specified node_id and endpoint. The cluster is specified when the class instance is created."""
         self._subscription = await dev_ctrl.ReadAttribute(
-                nodeid=node_id,
-                attributes=[(endpoint, self._expected_cluster)],
-                reportInterval=(min_interval_sec, max_interval_sec),
-                fabricFiltered=fabric_filtered,
-                keepSubscriptions=True
-            )
+            nodeid=node_id,
+            attributes=[(endpoint, self._expected_cluster)],
+            reportInterval=(min_interval_sec, max_interval_sec),
+            fabricFiltered=fabric_filtered,
+            keepSubscriptions=True
+        )
         self._subscription.SetAttributeUpdateCallback(self.__call__)
         return self._subscription
 

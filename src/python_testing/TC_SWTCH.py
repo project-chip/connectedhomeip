@@ -41,6 +41,7 @@ from matter_testing_support import EventChangeCallback, ClusterAttributeChangeAc
 
 logger = logging.getLogger(__name__)
 
+
 class TC_SwitchTests(MatterBaseTest):
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
@@ -85,9 +86,11 @@ class TC_SwitchTests(MatterBaseTest):
 
     def _ask_for_long_press(self, endpoint_id: int, pressed_position: int):
         if not self._use_button_simulator():
-            self.wait_for_user_input(prompt_msg=f"Press switch position {pressed_position} for a long time (around 5 seconds) on the DUT, then release it.")
+            self.wait_for_user_input(
+                prompt_msg=f"Press switch position {pressed_position} for a long time (around 5 seconds) on the DUT, then release it.")
         else:
-            command_dict = {"Name": "SimulateActionSwitchLongPress", "EndpointId": endpoint_id, "ButtonId": pressed_position, "LongPressDelayMillis": 5000, "LongPressDurationMillis": 5500}
+            command_dict = {"Name": "SimulateActionSwitchLongPress", "EndpointId": endpoint_id,
+                            "ButtonId": pressed_position, "LongPressDelayMillis": 5000, "LongPressDurationMillis": 5500}
             self._send_named_pipe_command(command_dict)
 
     def _placeholder_for_step(self, step_id: str):
@@ -120,7 +123,8 @@ class TC_SwitchTests(MatterBaseTest):
                         logging.info(f"Got expected attribute change {sequence_idx+1}/{len(sequence)} for attribute {attribute}")
                         sequence_idx += 1
                     else:
-                        asserts.assert_equal(item.value, expected_value, msg="Did not get expected attribute value in correct sequence.")
+                        asserts.assert_equal(item.value, expected_value,
+                                             msg="Did not get expected attribute value in correct sequence.")
 
                     # We are done waiting when we have accumulated all results.
                     if sequence_idx == len(sequence):
@@ -244,14 +248,17 @@ class TC_SwitchTests(MatterBaseTest):
 
         # Step 4b: TH expects report of CurrentPosition 1, followed by a report of Current Position 0.
         self._placeholder_for_step("4b")
-        logging.info(f"Starting to wait for {post_prompt_settle_delay_seconds:.1f} seconds for CurrentPosition to go {switch_pressed_position}, then 0.")
-        self._await_sequence_of_reports(report_queue=attrib_listener.attribute_queue, endpoint_id=endpoint_id, attribute=cluster.Attributes.CurrentPosition, sequence = [switch_pressed_position, 0], timeout_sec=post_prompt_settle_delay_seconds)
+        logging.info(
+            f"Starting to wait for {post_prompt_settle_delay_seconds:.1f} seconds for CurrentPosition to go {switch_pressed_position}, then 0.")
+        self._await_sequence_of_reports(report_queue=attrib_listener.attribute_queue, endpoint_id=endpoint_id, attribute=cluster.Attributes.CurrentPosition, sequence=[
+                                        switch_pressed_position, 0], timeout_sec=post_prompt_settle_delay_seconds)
 
         # Step 4c: TH expects at least InitialPress with NewPosition = 1
         self._placeholder_for_step("4c")
         logging.info(f"Starting to wait for {post_prompt_settle_delay_seconds:.1f} seconds for InitialPress event.")
         expected_events = [cluster.Events.InitialPress(newPosition=switch_pressed_position)]
-        self._await_sequence_of_events(event_queue=event_listener.event_queue, endpoint_id=endpoint_id, sequence=expected_events, timeout_sec=post_prompt_settle_delay_seconds)
+        self._await_sequence_of_events(event_queue=event_listener.event_queue, endpoint_id=endpoint_id,
+                                       sequence=expected_events, timeout_sec=post_prompt_settle_delay_seconds)
 
         # Step 4d: For MSL/AS, expect to see LongPress/LongRelease in that order
         if not has_msl_feature and not has_as_feature:
@@ -264,18 +271,21 @@ class TC_SwitchTests(MatterBaseTest):
             expected_events = []
             expected_events.append(cluster.Events.LongPress(newPosition=switch_pressed_position))
             expected_events.append(cluster.Events.LongRelease(previousPosition=switch_pressed_position))
-            self._await_sequence_of_events(event_queue=event_listener.event_queue, endpoint_id=endpoint_id, sequence=expected_events, timeout_sec=post_prompt_settle_delay_seconds)
+            self._await_sequence_of_events(event_queue=event_listener.event_queue, endpoint_id=endpoint_id,
+                                           sequence=expected_events, timeout_sec=post_prompt_settle_delay_seconds)
 
         # Step 4e: For MS & (!MSL & !AS & !MSR), expect no further events for 10 seconds.
         if not has_msl_feature and not has_as_feature and not has_msr_feature:
             self._placeholder_for_step("4e")
-            self._expect_no_events_for_cluster(event_queue=event_listener.event_queue, endpoint_id=endpoint_id, expected_cluster=cluster, timeout_sec=10.0)
+            self._expect_no_events_for_cluster(event_queue=event_listener.event_queue,
+                                               endpoint_id=endpoint_id, expected_cluster=cluster, timeout_sec=10.0)
 
         # Step 4f: For MSR & not MSL, expect to see ShortRelease.
         if not has_msl_feature and has_msr_feature:
             self._placeholder_for_step("4f")
             expected_events = [cluster.Events.ShortRelease(previousPosition=switch_pressed_position)]
-            self._await_sequence_of_events(event_queue=event_listener.event_queue, endpoint_id=endpoint_id, sequence=expected_events, timeout_sec=post_prompt_settle_delay_seconds)
+            self._await_sequence_of_events(event_queue=event_listener.event_queue, endpoint_id=endpoint_id,
+                                           sequence=expected_events, timeout_sec=post_prompt_settle_delay_seconds)
 
 
 if __name__ == "__main__":
