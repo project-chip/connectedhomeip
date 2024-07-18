@@ -16,7 +16,7 @@ will be expanded are denoted with `$` .
 Unless specified, numerical values are represented in decimal notation.
 
 ```
-<<< [E:$exchange_id S:$session_id M:$msg_id (Ack: $ack_msg_id)] ($msg_category) Msg TX to $fabric_index:$destination [$compressed_fabric_id] [$peer_address] --- Type $protocol_id:$msg_type ($protocol_name:$msg_type_name)
+<<< [E:$exchange_id S:$session_id M:$msg_id (Ack: $ack_msg_id)] ($msg_category) Msg TX to $fabric_index:$destination [$compressed_fabric_id] [$peer_address] --- Type $protocol_id:$msg_type ($protocol_name:$msg_type_name) (B:$size)
 ```
 
 | Field                | Description                                                                                                                            |
@@ -34,6 +34,7 @@ Unless specified, numerical values are represented in decimal notation.
 | msg_type             | 8-bit message type ID (in hex)                                                                                                         |
 | protocol_name        | If available, a logical name for the protocol                                                                                          |
 | msg_type_name        | If available, a logical name for the message type                                                                                      |
+| size                 | Size, in bytes, of the message being transmitted. Includes the Matter payload header and packet header but not transport headers       |
 
 #### Examples:
 
@@ -65,7 +66,7 @@ will be expanded are denoted with `$` .
 Unless specified, numerical values are represented in decimal notation.
 
 ```
->>> [E:$exchange_id M: $msg_id (Ack: $ack_msg_id)] ($msg_category) Msg RX from $fabric_index:$source [$compressed_fabric_id] --- Type $protocol_id:$msg_type ($protocol_name:$msg_type_name)
+>>> [E:$exchange_id M: $msg_id (Ack: $ack_msg_id)] ($msg_category) Msg RX from $fabric_index:$source [$compressed_fabric_id] --- Type $protocol_id:$msg_type ($protocol_name:$msg_type_name) (B:$size)
 ```
 
 This has a similar legend to that for transmission except `$source` denotes the
