@@ -515,7 +515,8 @@ CHIP_ERROR ReadSingleClusterData(const SubjectDescriptor & aSubjectDescriptor, b
         return CHIP_IM_GLOBAL_STATUS(Failure);
     }
 
-    // If we got this far, write succeeded. Encode the success by terminating the write
+    // If we got this far, placing the data to be read in the output TLVWriter succeeded.
+    // Try to terminate our attribute report to signal success.
     ReturnErrorOnFailure(attributeDataIBBuilder.EndOfAttributeDataIB());
     return attributeReport.EndOfAttributeReportIB();
 }
