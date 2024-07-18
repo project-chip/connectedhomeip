@@ -177,16 +177,6 @@ CHIP_ERROR SendSuccessStatus(AttributeReportIB::Builder & aAttributeReport, Attr
     return aAttributeReport.EndOfAttributeReportIB();
 }
 
-CHIP_ERROR SendFailureStatus(const ConcreteAttributePath & aPath, AttributeReportIBs::Builder & aAttributeReports,
-                             Protocols::InteractionModel::Status aStatus, TLV::TLVWriter * aReportCheckpoint)
-{
-    if (aReportCheckpoint != nullptr)
-    {
-        aAttributeReports.Rollback(*aReportCheckpoint);
-    }
-    return aAttributeReports.EncodeAttributeStatus(aPath, StatusIB(aStatus));
-}
-
 // Helper function for trying to read an attribute value via an
 // AttributeAccessInterface.  On failure, the read has failed.  On success, the
 // aTriedEncode outparam is set to whether the AttributeAccessInterface tried to encode a value.
@@ -302,7 +292,7 @@ CHIP_ERROR ReadSingleClusterData(const SubjectDescriptor & aSubjectDescriptor, b
 
     if (attributeCluster == nullptr && attributeMetadata == nullptr)
     {
-        return SendFailureStatus(aPath, aAttributeReports, UnsupportedAttributeStatus(aPath), nullptr);
+        return CHIP_IM_GLOBAL_STATUS_VALUE(UnsupportedAttributeStatus(aPath));
     }
 
     // Check access control. A failed check will disallow the operation, and may or may not generate an attribute report
@@ -319,8 +309,7 @@ CHIP_ERROR ReadSingleClusterData(const SubjectDescriptor & aSubjectDescriptor, b
             {
                 return CHIP_NO_ERROR;
             }
-
-            return SendFailureStatus(aPath, aAttributeReports, Protocols::InteractionModel::Status::UnsupportedAccess, nullptr);
+            return CHIP_IM_GLOBAL_STATUS(UnsupportedAccess);
         }
     }
 
@@ -340,10 +329,6 @@ CHIP_ERROR ReadSingleClusterData(const SubjectDescriptor & aSubjectDescriptor, b
     }
 
     // Read attribute using Ember, if it doesn't have an override.
-
-    TLV::TLVWriter backup;
-    aAttributeReports.Checkpoint(backup);
-
     AttributeReportIB::Builder & attributeReport = aAttributeReports.CreateAttributeReport();
     ReturnErrorOnFailure(aAttributeReports.GetError());
 
@@ -579,7 +564,7 @@ CHIP_ERROR ReadSingleClusterData(const SubjectDescriptor & aSubjectDescriptor, b
         return SendSuccessStatus(attributeReport, attributeDataIBBuilder);
     }
 
-    return SendFailureStatus(aPath, aAttributeReports, status, &backup);
+    return CHIP_IM_GLOBAL_STATUS_VALUE(status);
 }
 
 namespace {
