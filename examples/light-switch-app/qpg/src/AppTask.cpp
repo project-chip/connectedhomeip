@@ -143,11 +143,19 @@ void OnTriggerIdentifyEffect(Identify * identify)
     }
 }
 
-Identify gIdentify = {
+Identify gIdentifyEp1 = {
     chip::EndpointId{ 1 },
     [](Identify *) { ChipLogProgress(Zcl, "onIdentifyStart"); },
     [](Identify *) { ChipLogProgress(Zcl, "onIdentifyStop"); },
-    Clusters::Identify::IdentifyTypeEnum::kVisibleIndicator,
+    Clusters::Identify::IdentifyTypeEnum::kNone,
+    OnTriggerIdentifyEffect,
+};
+
+Identify gIdentifyEp2 = {
+    chip::EndpointId{ 2 },
+    [](Identify *) { ChipLogProgress(Zcl, "onIdentifyStart"); },
+    [](Identify *) { ChipLogProgress(Zcl, "onIdentifyStop"); },
+    Clusters::Identify::IdentifyTypeEnum::kNone,
     OnTriggerIdentifyEffect,
 };
 
