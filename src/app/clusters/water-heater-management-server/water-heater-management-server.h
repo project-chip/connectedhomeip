@@ -69,8 +69,7 @@ public:
      */
     virtual Protocols::InteractionModel::Status HandleBoost(uint32_t duration, Optional<bool> oneShot,
                                                             Optional<bool> emergencyBoost, Optional<int16_t> temporarySetpoint,
-                                                            Optional<Percent> targetPercentage,
-                                                            Optional<Percent> targetReheat) = 0;
+                                                            Optional<Percent> targetPercentage, Optional<Percent> targetReheat) = 0;
 
     /**
      * @brief Delegate should implement a handler to cancel a boost command.
