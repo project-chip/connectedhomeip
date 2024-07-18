@@ -346,7 +346,7 @@ Status DeviceEnergyManagementDelegate::StartTimeAdjustRequest(const uint32_t req
         mForecast.Value().forecastUpdateReason = ForecastUpdateReasonEnum::kGridOptimization;
         break;
     default:
-        ChipLogDetail(AppServer, "Bad cause %d", static_cast<int>(cause));
+        ChipLogDetail(AppServer, "Bad cause %d", to_underlying(cause));
         return Status::Failure;
         break;
     }
