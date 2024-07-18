@@ -19,5 +19,16 @@
 
 BOOL MTREqualObjects(id<NSObject> _Nullable a, id<NSObject> _Nullable b)
 {
-    return (a == nil) ? (b == nil) : [a isEqual:b];
+    // Check if A is nil, and return based on B being nil (or not)
+    if (a == nil) {
+        return b == nil;
+    }
+
+    // If B is nil at this point, we're not equal
+    if (b == nil) {
+        return NO;
+    }
+
+    // Otherwise work on equality, given that we're both non nil
+    return [a isEqual:b];
 }
