@@ -889,14 +889,9 @@ DeviceEnergyManagementDelegate::SetPowerAdjustmentCapability(
 {
     assertChipStackLockedByCurrentThread();
 
-    if (powerAdjustCapabilityStruct.IsNull())
-    {
-        mPowerAdjustCapabilityStruct.SetNull();
-    }
-    else
-    {
-        mPowerAdjustCapabilityStruct = powerAdjustCapabilityStruct;
-    }
+    mPowerAdjustCapabilityStruct = powerAdjustCapabilityStruct;
+
+    MatterReportingAttributeChangeCallback(mEndpointId, DeviceEnergyManagement::Id, PowerAdjustmentCapability::Id);
 
     return CHIP_NO_ERROR;
 }
@@ -906,14 +901,9 @@ CHIP_ERROR DeviceEnergyManagementDelegate::SetForecast(const DataModel::Nullable
     assertChipStackLockedByCurrentThread();
 
     // TODO see Issue #31147
-    if (forecast.IsNull())
-    {
-        mForecast.SetNull();
-    }
-    else
-    {
-        mForecast = forecast;
-    }
+    mForecast = forecast;
+
+    MatterReportingAttributeChangeCallback(mEndpointId, DeviceEnergyManagement::Id, Forecast::Id);
 
     return CHIP_NO_ERROR;
 }
