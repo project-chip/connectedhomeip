@@ -23,10 +23,11 @@
  */
 #include <errno.h>
 
-#include <gtest/gtest.h>
+#include <pw_unit_test/framework.h>
 
 #include <app/icd/server/ICDServerConfig.h>
 #include <lib/core/CHIPCore.h>
+#include <lib/core/StringBuilderAdapters.h>
 #include <lib/support/CodeUtils.h>
 #include <messaging/ReliableMessageContext.h>
 #include <messaging/ReliableMessageMgr.h>
@@ -60,12 +61,9 @@ using namespace chip::System::Clock::Literals;
 
 const char PAYLOAD[] = "Hello!";
 
-class TestReliableMessageProtocol : public chip::Test::LoopbackMessagingContext, public ::testing::Test
+class TestReliableMessageProtocol : public chip::Test::LoopbackMessagingContext
 {
 public:
-    static void SetUpTestSuite() { chip::Test::LoopbackMessagingContext::SetUpTestSuite(); }
-    static void TearDownTestSuite() { chip::Test::LoopbackMessagingContext::TearDownTestSuite(); }
-
     // Performs setup for each individual test in the test suite
     void SetUp() override
     {
@@ -76,8 +74,6 @@ public:
         GetSessionAliceToBob()->AsSecureSession()->SetRemoteSessionParameters(GetLocalMRPConfig().ValueOr(GetDefaultMRPConfig()));
         GetSessionBobToAlice()->AsSecureSession()->SetRemoteSessionParameters(GetLocalMRPConfig().ValueOr(GetDefaultMRPConfig()));
     }
-
-    void TearDown() override { chip::Test::LoopbackMessagingContext::TearDown(); }
 };
 
 class MockAppDelegate : public UnsolicitedMessageHandler, public ExchangeDelegate
@@ -502,7 +498,6 @@ TEST_F(TestReliableMessageProtocol, CheckResendApplicationMessage)
 
 TEST_F(TestReliableMessageProtocol, CheckCloseExchangeAndResendApplicationMessage)
 {
-
     chip::System::PacketBufferHandle buffer = chip::MessagePacketBuffer::NewWithData(PAYLOAD, sizeof(PAYLOAD));
     EXPECT_FALSE(buffer.IsNull());
 
@@ -561,7 +556,6 @@ TEST_F(TestReliableMessageProtocol, CheckCloseExchangeAndResendApplicationMessag
 
 TEST_F(TestReliableMessageProtocol, CheckFailedMessageRetainOnSend)
 {
-
     chip::System::PacketBufferHandle buffer = chip::MessagePacketBuffer::NewWithData(PAYLOAD, sizeof(PAYLOAD));
     EXPECT_FALSE(buffer.IsNull());
 
@@ -854,23 +848,18 @@ TEST_F(TestReliableMessageProtocol, CheckDuplicateOldMessageClosedExchange)
 
 TEST_F(TestReliableMessageProtocol, CheckResendSessionEstablishmentMessageWithPeerExchange)
 {
-    // Making this static to reduce stack usage, as some platforms have limits on stack size.
-    static chip::Test::MessagingContext ctx;
-    CHIP_ERROR err = ctx.InitFromExisting(*this);
-    EXPECT_EQ(err, CHIP_NO_ERROR);
-
     chip::System::PacketBufferHandle buffer = chip::MessagePacketBuffer::NewWithData(PAYLOAD, sizeof(PAYLOAD));
     ASSERT_FALSE(buffer.IsNull());
 
     MockSessionEstablishmentDelegate mockReceiver;
-    err = ctx.GetExchangeManager().RegisterUnsolicitedMessageHandlerForType(Echo::MsgType::EchoRequest, &mockReceiver);
+    CHIP_ERROR err = GetExchangeManager().RegisterUnsolicitedMessageHandlerForType(Echo::MsgType::EchoRequest, &mockReceiver);
     EXPECT_EQ(err, CHIP_NO_ERROR);
 
     MockSessionEstablishmentDelegate mockSender;
-    ExchangeContext * exchange = ctx.NewUnauthenticatedExchangeToAlice(&mockSender);
+    ExchangeContext * exchange = NewUnauthenticatedExchangeToAlice(&mockSender);
     ASSERT_NE(exchange, nullptr);
 
-    ReliableMessageMgr * rm = ctx.GetExchangeManager().GetReliableMessageMgr();
+    ReliableMessageMgr * rm = GetExchangeManager().GetReliableMessageMgr();
     ASSERT_NE(rm, nullptr);
 
     exchange->GetSessionHandle()->AsUnauthenticatedSession()->SetRemoteSessionParameters(ReliableMessageProtocolConfig({
@@ -907,10 +896,8 @@ TEST_F(TestReliableMessageProtocol, CheckResendSessionEstablishmentMessageWithPe
     EXPECT_EQ(rm->TestGetCountRetransTable(), 0);
     EXPECT_TRUE(mockReceiver.IsOnMessageReceivedCalled);
 
-    err = ctx.GetExchangeManager().UnregisterUnsolicitedMessageHandlerForType(Echo::MsgType::EchoRequest);
+    err = GetExchangeManager().UnregisterUnsolicitedMessageHandlerForType(Echo::MsgType::EchoRequest);
     EXPECT_EQ(err, CHIP_NO_ERROR);
-
-    ctx.ShutdownAndRestoreExisting(*this);
 }
 
 TEST_F(TestReliableMessageProtocol, CheckDuplicateMessage)

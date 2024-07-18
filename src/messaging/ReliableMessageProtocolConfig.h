@@ -191,9 +191,8 @@ inline constexpr System::Clock::Milliseconds32 kDefaultActiveTime = System::Cloc
  */
 struct ReliableMessageProtocolConfig
 {
-    constexpr ReliableMessageProtocolConfig(System::Clock::Milliseconds32 idleInterval,
-                                            System::Clock::Milliseconds32 activeInterval,
-                                            System::Clock::Milliseconds16 activeThreshold = kDefaultActiveTime) :
+    ReliableMessageProtocolConfig(System::Clock::Milliseconds32 idleInterval, System::Clock::Milliseconds32 activeInterval,
+                                  System::Clock::Milliseconds16 activeThreshold = kDefaultActiveTime) :
         mIdleRetransTimeout(idleInterval),
         mActiveRetransTimeout(activeInterval), mActiveThresholdTime(activeThreshold)
     {}

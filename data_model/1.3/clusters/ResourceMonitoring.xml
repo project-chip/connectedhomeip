@@ -62,8 +62,8 @@ Davis, CA 95616, USA
     <revision revision="1" summary="Initial version of the Resource Monitoring cluster"/>
   </revisionHistory>
   <clusterIds>
-    <clusterId id="0x0071" name="HEPA Filter Monitoring"/>
-    <clusterId id="0x0072" name="Activated Carbon Filter Monitoring"/>
+    <clusterId id="0x0071" name="HEPA Filter Monitoring" picsCode="HEPAFREMON"/>
+    <clusterId id="0x0072" name="Activated Carbon Filter Monitoring" picsCode="ACFREMON"/>
   </clusterIds>
   <classification hierarchy="base" role="application" picsCode="REPM" scope="Endpoint"/>
   <features>
@@ -73,7 +73,7 @@ Davis, CA 95616, USA
     <feature bit="1" code="WRN" name="Warning" summary="Supports warning indication">
       <optionalConform/>
     </feature>
-    <feature bit="2" code="REP" name="Replacement Product List" summary="Supports specifying the list of replacement products">
+    <feature bit="2" code="REP" name="Replacement" summary="Supports specifying the list of replacement products">
       <optionalConform/>
     </feature>
   </features>
@@ -103,13 +103,13 @@ Davis, CA 95616, USA
       <item value="0" name="UPC" summary="12-digit Universal Product Code">
         <mandatoryConform/>
       </item>
-      <item value="1" name="GTIN" summary="8-digit Global Trade Item Number">
+      <item value="1" name="GTIN-8" summary="8-digit Global Trade Item Number">
         <mandatoryConform/>
       </item>
       <item value="2" name="EAN" summary="13-digit European Article Number">
         <mandatoryConform/>
       </item>
-      <item value="3" name="GTIN" summary="14-digit Global Trade Item Number">
+      <item value="3" name="GTIN-14" summary="14-digit Global Trade Item Number">
         <mandatoryConform/>
       </item>
       <item value="4" name="OEM" summary="Original Equipment Manufacturer part number">
@@ -136,7 +136,7 @@ Davis, CA 95616, USA
     </attribute>
     <attribute id="0x0001" name="DegradationDirection" type="DegradationDirectionEnum">
       <access read="true" readPrivilege="view"/>
-      <quality changeOmitted="false" nullable="false" scene="false" persistence="fixed" reportable="false"/>
+      <quality changeOmitted="false" nullable="false" scene="false" persistence="fixed" reportable="false" sourceAttribution="false" quieterReporting="false"/>
       <mandatoryConform>
         <feature name="CON"/>
       </mandatoryConform>
@@ -152,13 +152,13 @@ Davis, CA 95616, USA
     </attribute>
     <attribute id="0x0004" name="LastChangedTime" type="epoch-s" default="null">
       <access read="true" write="true" readPrivilege="view" writePrivilege="operate"/>
-      <quality changeOmitted="false" nullable="true" scene="false" persistence="nonVolatile" reportable="false"/>
+      <quality changeOmitted="false" nullable="true" scene="false" persistence="nonVolatile" reportable="false" sourceAttribution="false" quieterReporting="false"/>
       <optionalConform/>
     </attribute>
     <attribute id="0x0005" name="ReplacementProductList" type="list">
       <entry type="ReplacementProductStruct"/>
       <access read="true" readPrivilege="view"/>
-      <quality changeOmitted="false" nullable="false" scene="false" persistence="fixed" reportable="false"/>
+      <quality changeOmitted="false" nullable="false" scene="false" persistence="fixed" reportable="false" sourceAttribution="false" quieterReporting="false"/>
       <mandatoryConform>
         <feature name="REP"/>
       </mandatoryConform>
