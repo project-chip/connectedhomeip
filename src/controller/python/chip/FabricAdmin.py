@@ -25,6 +25,8 @@ from chip import CertificateAuthority, ChipDeviceCtrl
 from chip.crypto import p256keypair
 from chip.native import GetLibraryHandle
 
+LOGGER = logging.getLogger(__name__)
+
 
 class FabricAdmin:
     ''' Administers a fabric associated with a unique FabricID under a given CertificateAuthority
@@ -33,10 +35,6 @@ class FabricAdmin:
     @classmethod
     def _Handle(cls):
         return GetLibraryHandle()
-
-    @classmethod
-    def logger(cls):
-        return logging.getLogger('FabricAdmin')
 
     def __init__(self, certificateAuthority: CertificateAuthority.CertificateAuthority, vendorId: int, fabricId: int = 1):
         ''' Initializes the object.
@@ -60,7 +58,7 @@ class FabricAdmin:
         self._fabricId = fabricId
         self._certificateAuthority = certificateAuthority
 
-        self.logger().warning(f"New FabricAdmin: FabricId: 0x{self._fabricId:016X}, VendorId = 0x{self.vendorId:04X}")
+        LOGGER.info(f"New FabricAdmin: FabricId: 0x{self._fabricId:016X}, VendorId = 0x{self.vendorId:04X}")
 
         self._isActive = True
         self._activeControllers = []
@@ -94,7 +92,7 @@ class FabricAdmin:
             if (nodeId in nodeIdList):
                 raise RuntimeError(f"Provided NodeId {nodeId} collides with an existing controller instance!")
 
-        self.logger().warning(
+        LOGGER.info(
             f"Allocating new controller with CaIndex: {self._certificateAuthority.caIndex}, "
             f"FabricId: 0x{self._fabricId:016X}, NodeId: 0x{nodeId:016X}, CatTags: {catTags}")
 

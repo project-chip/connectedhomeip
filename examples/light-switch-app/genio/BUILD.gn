@@ -83,6 +83,7 @@ mt793x_executable("light_switch_app") {
     "${chip_root}/examples/light-switch-app/light-switch-common",
     "${chip_root}/examples/providers:device_info_provider",
     "${chip_root}/src/lib",
+    "${chip_root}/src/platform/logging:default",
     "${chip_root}/src/setup_payload",
     "${mt793x_examples_plat_dir}:genio-matter-shell",
   ]

@@ -240,6 +240,16 @@ class MyPincodeService : public PasscodeService
 };
 MyPincodeService gMyPincodeService;
 
+class SampleTvAppInstallationService : public AppInstallationService
+{
+    bool LookupTargetContentApp(uint16_t vendorId, uint16_t productId) override
+    {
+        return ContentAppPlatform::GetInstance().LoadContentAppByClient(vendorId, productId) != nullptr;
+    }
+};
+
+SampleTvAppInstallationService gSampleTvAppInstallationService;
+
 class MyPostCommissioningListener : public PostCommissioningListener
 {
     void CommissioningCompleted(uint16_t vendorId, uint16_t productId, NodeId nodeId, Messaging::ExchangeManager & exchangeMgr,
@@ -247,6 +257,8 @@ class MyPostCommissioningListener : public PostCommissioningListener
     {
         // read current binding list
         chip::Controller::ClusterBase cluster(exchangeMgr, sessionHandle, kTargetBindingClusterEndpointId);
+
+        ContentAppPlatform::GetInstance().StoreNodeIdForContentApp(vendorId, productId, nodeId);
 
         cacheContext(vendorId, productId, nodeId, exchangeMgr, sessionHandle);
 
@@ -372,6 +384,7 @@ void TvAppJNI::InitializeCommissioner(JNIMyUserPrompter * userPrompter)
     if (cdc != nullptr && userPrompter != nullptr)
     {
         cdc->SetPasscodeService(&gMyPincodeService);
+        cdc->SetAppInstallationService(&gSampleTvAppInstallationService);
         cdc->SetUserPrompter(userPrompter);
         cdc->SetPostCommissioningListener(&gMyPostCommissioningListener);
     }

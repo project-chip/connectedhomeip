@@ -20,7 +20,6 @@ source_set("data-model-interface") {
     "DataModel.h",
     "DataModelChangeListener.h",
     "EventsGenerator.h",
-    "InvokeResponder.h",
     "MetadataTypes.cpp",
     "MetadataTypes.h",
     "OperationTypes.h",
@@ -29,6 +28,7 @@ source_set("data-model-interface") {
   public_deps = [
     "${chip_root}/src/access:types",
     "${chip_root}/src/app:attribute-access",
+    "${chip_root}/src/app:command-handler-interface",
     "${chip_root}/src/app:events",
     "${chip_root}/src/app:paths",
     "${chip_root}/src/app/MessageDef",

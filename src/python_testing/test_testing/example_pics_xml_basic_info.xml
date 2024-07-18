@@ -22,6 +22,14 @@ Draft
 			<status>O</status>
 			<support>true</support>
 		</picsItem>
+		<!-- This isn't part of basic info, but I want to check a derived cluster PICS -->
+		<picsItem>
+			<itemNumber>LVL.S</itemNumber>
+			<feature>Does the device implement the Level Control Cluster as a server?</feature>
+			<reference>9.1. Role - index.html[pdf]</reference>
+			<status>O</status>
+			<support>true</support>
+		</picsItem>
 	</usage>
 	<!--PIXIT-->
 	<pixit>
@@ -182,7 +190,7 @@ Draft
 				<feature>Does the DUT(server) support the CapabilityMinima attribute?</feature>
 				<reference>9.2.1. Attributes - index.html[pdf]</reference>
 				<status cond="BINFO.S">M</status>
-				<support>true</support>
+				<support>false</support>
 			</picsItem>
 			<picsItem>
 				<itemNumber>BINFO.S.A0014</itemNumber>

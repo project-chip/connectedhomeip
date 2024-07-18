@@ -40,7 +40,10 @@ static_library("helpers") {
     "${chip_root}/src/transport/raw/tests:helpers",
   ]
 
-  public_deps = [ "${chip_root}/src/messaging/tests:helpers" ]
+  public_deps = [
+    "${chip_root}/src/lib/support/tests:pw-test-macros",
+    "${chip_root}/src/messaging/tests:helpers",
+  ]
 }
 
 source_set("binding-test-srcs") {
@@ -162,7 +165,6 @@ chip_test_suite("tests") {
     "TestFabricScopedEventLogging.cpp",
     "TestInteractionModelEngine.cpp",
     "TestMessageDef.cpp",
-    "TestNullable.cpp",
     "TestNumericAttributeTraits.cpp",
     "TestOperationalStateClusterObjects.cpp",
     "TestPendingNotificationMap.cpp",

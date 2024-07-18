@@ -31,7 +31,7 @@ class ElectricalEnergyMeasurementClusterPeriodicEnergyMeasuredEvent(
   val energyExported:
     Optional<
       matter.controller.cluster.structs.ElectricalEnergyMeasurementClusterEnergyMeasurementStruct
-    >
+    >,
 ) {
   override fun toString(): String = buildString {
     append("ElectricalEnergyMeasurementClusterPeriodicEnergyMeasuredEvent {\n")
@@ -61,7 +61,7 @@ class ElectricalEnergyMeasurementClusterPeriodicEnergyMeasuredEvent(
 
     fun fromTlv(
       tlvTag: Tag,
-      tlvReader: TlvReader
+      tlvReader: TlvReader,
     ): ElectricalEnergyMeasurementClusterPeriodicEnergyMeasuredEvent {
       tlvReader.enterStructure(tlvTag)
       val energyImported =
@@ -89,7 +89,7 @@ class ElectricalEnergyMeasurementClusterPeriodicEnergyMeasuredEvent(
 
       return ElectricalEnergyMeasurementClusterPeriodicEnergyMeasuredEvent(
         energyImported,
-        energyExported
+        energyExported,
       )
     }
   }

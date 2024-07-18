@@ -65,7 +65,6 @@ static_library("nxp_platform") {
     "../../common/DiagnosticDataProviderImpl.h",
     "../../common/KeyValueStoreManagerImpl.cpp",
     "../../common/KeyValueStoreManagerImpl.h",
-    "../../common/Logging.cpp",
     "../../common/NXPConfig.h",
     "../../common/NetworkProvisioningServerImpl.h",
     "../../common/PlatformManagerImpl.h",
@@ -84,19 +83,19 @@ static_library("nxp_platform") {
     sources += [ "../../common/NXPConfigKS.cpp" ]
   }
 
-  public_deps = [ "${chip_root}/src/platform:platform_base" ]
-
-  deps += [ "${chip_root}/src/platform/logging:headers" ]
-
   if (chip_enable_ble) {
     sources += [
       # Adding random file which defines the function sys_csrand_get which is called by BLEManagerImpl from Zephyr
       "${nxp_sdk_build_root}/${nxp_sdk_name}/sdk_hook/zephyr/random/random.cpp",
-      "../../../Zephyr/BLEAdvertisingArbiter.cpp",
-      "../../../Zephyr/BLEManagerImpl.cpp",
+      "../../common/ble_zephyr/BLEAdvertisingArbiter.cpp",
+      "../../common/ble_zephyr/BLEManagerImpl.cpp",
       "../../common/ble_zephyr/BLEManagerImpl.h",
     ]
   }
+
+  public_deps = [ "${chip_root}/src/platform:platform_base" ]
+
+  deps += [ "${chip_root}/src/platform/logging:headers" ]
 
   # define CHIP_PLAT_NVM_SUPPORT - See NXPConfig.cpp for definition
   if (rt_nvm_component == "nvm_fwk") {
