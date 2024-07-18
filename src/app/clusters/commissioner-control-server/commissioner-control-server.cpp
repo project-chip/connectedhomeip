@@ -38,14 +38,6 @@ using chip::Protocols::InteractionModel::Status;
 
 namespace {
 
-NodeId getNodeId(const app::CommandHandler * commandObj)
-{
-    VerifyOrDie(commandObj);
-    auto descriptor = commandObj->GetSubjectDescriptor();
-
-    return descriptor.subject;
-}
-
 void AddReverseOpenCommissioningWindowResponse(CommandHandler * commandObj, const ConcreteCommandPath & path,
                                                const Clusters::CommissionerControl::CommissioningWindowParams & params)
 {
@@ -128,7 +120,8 @@ CommissionerControlServer::SetSupportedDeviceCategoriesValue(EndpointId endpoint
     return status;
 }
 
-CHIP_ERROR CommissionerControlServer::GenerateCommissioningRequestResultEvent(const Events::CommissioningRequestResult::Type & result)
+CHIP_ERROR
+CommissionerControlServer::GenerateCommissioningRequestResultEvent(const Events::CommissioningRequestResult::Type & result)
 {
     EventNumber eventNumber;
     CHIP_ERROR error = LogEvent(result, kRootEndpointId, eventNumber);
@@ -154,12 +147,16 @@ bool emberAfCommissionerControlClusterRequestCommissioningApprovalCallback(
 
     ChipLogProgress(Zcl, "Received command to request commissioning approval");
 
-    auto sourceNodeId = getNodeId(commandObj);
+    auto descriptor   = commandObj->GetSubjectDescriptor();
+    auto sourceNodeId = descriptor.subject;
     auto fabricIndex  = commandObj->GetAccessingFabricIndex();
     auto requestId    = commandData.requestId;
     auto vendorId     = commandData.vendorId;
     auto productId    = commandData.productId;
-    auto & label      = commandData.label;
+
+    // The label assigned from commandData need to be stored in CommissionerControl::Delegate which ensure that the backing buffer
+    // of it has a valid lifespan during fabric sync setup process.
+    auto & label = commandData.label;
 
     // Create a CommissioningApprovalRequest struct and populate it with the command data
     Clusters::CommissionerControl::CommissioningApprovalRequest request = { .requestId    = requestId,
@@ -197,7 +194,8 @@ bool emberAfCommissionerControlClusterCommissionNodeCallback(
 
     ChipLogProgress(Zcl, "Received command to commission node");
 
-    auto sourceNodeId = getNodeId(commandObj);
+    auto descriptor   = commandObj->GetSubjectDescriptor();
+    auto sourceNodeId = descriptor.subject;
     auto requestId    = commandData.requestId;
 
     auto info       = std::make_unique<Clusters::CommissionerControl::CommissionNodeInfo>();
@@ -210,7 +208,9 @@ bool emberAfCommissionerControlClusterCommissionNodeCallback(
     VerifyOrExit(sourceNodeId != kUndefinedNodeId, err = CHIP_ERROR_WRONG_NODE_ID);
     VerifyOrExit(delegate != nullptr, err = CHIP_ERROR_INCORRECT_STATE);
 
-    // Handle commissioning approval request
+    // Handle commissioning approval request, the ipAddress assigned from commandData need to be stored in
+    // CommissionerControl::Delegate which ensure that the backing buffer of ipAddress has a valid lifespan until the deferred task
+    // is executed.
     err = delegate->ValidateCommissionNodeCommand(sourceNodeId, requestId, info->params);
     SuccessOrExit(err == CHIP_NO_ERROR);
 
@@ -228,4 +228,9 @@ exit:
     }
 
     return true;
+}
+
+void MatterCommissionerControlPluginServerInitCallback()
+{
+    ChipLogProgress(Zcl, "Initiating Commissioner Control cluster.");
 }
