@@ -38,6 +38,7 @@ NS_ASSUME_NONNULL_BEGIN
 - (nullable MTRDeviceClusterData *)_fetchClusterDataForNodeID:(NSNumber *)nodeID endpointID:(NSNumber *)endpointID clusterID:(NSNumber *)clusterID;
 - (void)storeClientDataForKey:(NSString *)key value:(id<NSSecureCoding>)value forNodeID:(NSNumber *)nodeID;
 - (id<NSSecureCoding>)clientDataForKey:(NSString *)key nodeID:(NSNumber *)nodeID;
+- (void)clearStoredClientDataForNodeID:(NSNumber *)nodeID;
 @end
 
 // Declare internal methods for testing
