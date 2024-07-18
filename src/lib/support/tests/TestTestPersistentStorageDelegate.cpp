@@ -16,15 +16,16 @@
  *    limitations under the License.
  */
 
-#include <lib/core/CHIPError.h>
-#include <lib/support/TestPersistentStorageDelegate.h>
-
 #include <array>
 #include <cstring>
 #include <set>
 #include <string>
 
-#include <gtest/gtest.h>
+#include <pw_unit_test/framework.h>
+
+#include <lib/core/CHIPError.h>
+#include <lib/core/StringBuilderAdapters.h>
+#include <lib/support/TestPersistentStorageDelegate.h>
 
 using namespace chip;
 
