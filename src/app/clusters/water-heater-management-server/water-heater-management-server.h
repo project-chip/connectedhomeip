@@ -62,7 +62,7 @@ public:
      *                          heated by this Boost command before the heater is switched off.
      * @param targetReheat  If the tank supports the TankPercent feature, and the heating by this Boost command has ceased because
      *                      the TargetPercentage of the water in the tank has been heated to the set point (or TemporarySetpoint if
-     *                      included), this field indicates the percentage to which the hot water in the tank SHALL be allowed to 
+     *                      included), this field indicates the percentage to which the hot water in the tank SHALL be allowed to
      *                      fall before again beginning to reheat it.
      *
      * @return  Success if the boost command is accepted; otherwise the command SHALL be rejected with appropriate error.
