@@ -20,9 +20,7 @@ import glob
 import os
 import subprocess
 
-# Function to load environment variables from a YAML file
-
-
+# Function to load --app argument environment variables from a file
 def load_env_from_yaml(file_path):
     """
     Load environment variables from the specified YAML file.
