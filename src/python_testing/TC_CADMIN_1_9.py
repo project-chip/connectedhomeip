@@ -76,7 +76,7 @@ class TC_CADMIN_1_9(MatterBaseTest):
             asserts.assert_false(errcode.is_success, 'Commissioning complete did not error as expected')
             asserts.assert_true(errcode.sdk_code == expectedErrCode, 'Unexpected error code returned from CommissioningComplete')
 
-    def TC_CADMIN_1_9(self) -> list[str]:
+    def pics_TC_CADMIN_1_9(self) -> list[str]:
         return ["CADMIN.S"]
 
     @async_test_body
