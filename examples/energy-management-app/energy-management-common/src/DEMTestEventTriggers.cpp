@@ -152,9 +152,6 @@ void SetTestEventTrigger_PowerAdjustment()
 
     sPowerAdjustCapabilityStruct.cause = PowerAdjustReasonEnum::kNoAdjustment;
     sPowerAdjustCapabilityStruct.powerAdjustCapability.SetNonNull(powerAdjustmentList);
-
-    DataModel::Nullable<DeviceEnergyManagement::Structs::PowerAdjustCapabilityStruct::Type> powerAdjustmentCapability(
-        sPowerAdjustCapabilityStruct);
     sPowerAdjustmentCapability.SetNonNull(sPowerAdjustCapabilityStruct);
 
     CHIP_ERROR err = GetDEMDelegate()->SetPowerAdjustmentCapability(sPowerAdjustmentCapability);
@@ -202,16 +199,16 @@ void SetTestEventTrigger_StartTimeAdjustment()
     }
 
     // planned start time, in UTC, for the entire Forecast.
-    sForecastStruct.startTime = static_cast<uint32_t>(chipEpoch);
+    sForecastStruct.startTime = chipEpoch;
 
     // Set the earliest start time, in UTC, to that before the startTime
     sForecastStruct.earliestStartTime = Optional<DataModel::Nullable<uint32_t>>{ DataModel::Nullable<uint32_t>{ chipEpoch - 60 } };
 
     // Planned end time, in UTC, for the entire Forecast.
-    sForecastStruct.endTime = static_cast<uint32_t>(chipEpoch * 3);
+    sForecastStruct.endTime = chipEpoch * 3;
 
     // Latest end time, in UTC, for the entire Forecast which is > sForecastStruct.endTime
-    sForecastStruct.latestEndTime = Optional<uint32_t>(static_cast<uint32_t>(chipEpoch * 3 + 60));
+    sForecastStruct.latestEndTime = Optional<uint32_t>(chipEpoch * 3 + 60);
 
     GetDEMDelegate()->SetForecast(DataModel::MakeNullable(sForecastStruct));
 }
