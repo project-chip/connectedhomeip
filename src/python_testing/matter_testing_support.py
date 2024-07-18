@@ -1618,7 +1618,7 @@ def per_endpoint_test(accept_function):
             # setup_class is meant to be called once, but setup_test is expected to be run before
             # each iteration. Mobly will run it for us the first time, but since we're running this
             # more than one time, we want to make sure we reset everything as expected.
-            # Ditto for teardown - we want to tear down after each iteration, and we want to notify the hool that
+            # Ditto for teardown - we want to tear down after each iteration, and we want to notify the hook that
             # the test iteration is stopped. test_stop is called by on_pass or on_fail during the last iteration or
             # on failure.
             for e in endpoints:
