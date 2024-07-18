@@ -66,12 +66,12 @@ class TC_CADMIN_1_9(MatterBaseTest):
                 return random_value
 
     async def CommissionAttempt(
-            self, params: dict, expectedErrCode: int):
+            self, setupPinCode: int, expectedErrCode: int):
 
         if expectedErrCode == 3:
             for cycle in range(20):
                 logging.info("-----------------Current Iteration {}-------------------------".format(cycle+1))
-                setup_code = self.generate_unique_random_value(params.setupPinCode)
+                setup_code = self.generate_unique_random_value(setupPinCode)
                 errcode = self.th2.CommissionOnNetwork(
                     nodeId=self.dut_node_id, setupPinCode=setup_code,
                     filterType=ChipDeviceCtrl.DiscoveryFilterType.LONG_DISCRIMINATOR, filter=self.discriminator)
@@ -84,7 +84,7 @@ class TC_CADMIN_1_9(MatterBaseTest):
         elif expectedErrCode == 50:
             logging.info("-----------------Attempting connection expecting timeout-------------------------")
             errcode = self.th2.CommissionOnNetwork(
-                nodeId=self.dut_node_id, setupPinCode=params.setupPinCode,
+                nodeId=self.dut_node_id, setupPinCode=setupPinCode,
                 filterType=ChipDeviceCtrl.DiscoveryFilterType.LONG_DISCRIMINATOR, filter=self.discriminator)
             logging.info('Commissioning complete done. Successful? {}, errorcode = {}'.format(errcode.is_success, errcode))
             asserts.assert_false(errcode.is_success, 'Commissioning complete did not error as expected')
@@ -106,15 +106,16 @@ class TC_CADMIN_1_9(MatterBaseTest):
 
         self.step(2)
         params = await self.OpenCommissioningWindow()
-
+        setupPinCode = params.setupPinCode
+                
         self.step(3)
-        await self.CommissionAttempt(params, expectedErrCode=0x03)
+        await self.CommissionAttempt(setupPinCode, expectedErrCode=0x03)
         # TODO: Found if we don't add sleep time after test completes that we get unexpected error code and response after the 21st iteration.
         # Link to Bug Filed: https://github.com/project-chip/connectedhomeip/issues/34383
         sleep(1)
 
         self.step(4)
-        await self.CommissionAttempt(params, expectedErrCode=0x32)
+        await self.CommissionAttempt(setupPinCode, expectedErrCode=0x32)
 
         self.step(5)
         params = await self.OpenCommissioningWindow()
