@@ -73,9 +73,7 @@ class TC_CNET_1_4(MatterBaseTest):
 
         self.step(3)
         cdesc = Clusters.Descriptor
-        aser = cdesc.Attributes.ServerList
-
-        server_list = await self.read_single_attribute_check_success(cluster=Clusters.Descriptor, attribute=aser, endpoint=0)
+        server_list = await self.read_single_attribute_check_success(cluster=cdesc, attribute=cdesc.Attributes.ServerList, endpoint=0)
         if 49 not in server_list:
             asserts.assert_true(False, "There is no Network Commissioning Cluster on endpoint 0")
 
