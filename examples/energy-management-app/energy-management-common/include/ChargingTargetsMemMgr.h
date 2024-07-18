@@ -16,6 +16,18 @@
  *    limitations under the License.
  */
 
+#pragma once
+
+#include <app/clusters/energy-evse-server/energy-evse-server.h>
+#include <lib/core/CHIPError.h>
+
+#include <app-common/zap-generated/cluster-objects.h>
+
+namespace chip {
+namespace app {
+namespace Clusters {
+namespace EnergyEvse {
+
 /*
  * The full Target data structure defined as:
  *
@@ -67,18 +79,6 @@
  *
  */
 
-#pragma once
-
-#include <app/clusters/energy-evse-server/energy-evse-server.h>
-#include <lib/core/CHIPError.h>
-
-#include <app-common/zap-generated/cluster-objects.h>
-
-namespace chip {
-namespace app {
-namespace Clusters {
-namespace EnergyEvse {
-
 class ChargingTargetsMemMgr
 {
 public:
@@ -86,9 +86,9 @@ public:
     ~ChargingTargetsMemMgr();
 
     void Reset(uint16_t chargingTargetSchedulesIdx);
-    void AddChargingTarget(EnergyEvse::Structs::ChargingTargetStruct::Type & chargingTarget);
-    void AllocAndCopy();
-    void AllocAndCopy(const DataModel::List<const Structs::ChargingTargetStruct::Type> & chargingTargets);
+    void AddChargingTarget(const EnergyEvse::Structs::ChargingTargetStruct::Type & chargingTarget);
+    CHIP_ERROR AllocAndCopy();
+    CHIP_ERROR AllocAndCopy(const DataModel::List<const Structs::ChargingTargetStruct::Type> & chargingTargets);
     CHIP_ERROR AllocAndCopy(const DataModel::DecodableList<Structs::ChargingTargetStruct::DecodableType> & chargingTargets);
 
     EnergyEvse::Structs::ChargingTargetStruct::Type * GetChargingTargets() const;

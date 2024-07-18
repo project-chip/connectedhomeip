@@ -57,7 +57,7 @@ void ChargingTargetsMemMgr::Reset(uint16_t chargingTargetSchedulesIdx)
     }
 }
 
-void ChargingTargetsMemMgr::AddChargingTarget(EnergyEvse::Structs::ChargingTargetStruct::Type & chargingTarget)
+void ChargingTargetsMemMgr::AddChargingTarget(const EnergyEvse::Structs::ChargingTargetStruct::Type & chargingTarget)
 {
     if (mNumDailyChargingTargets < kEvseTargetsMaxTargetsPerDay)
     {
@@ -75,13 +75,18 @@ uint16_t ChargingTargetsMemMgr::GetNumDailyChargingTargets() const
     return mNumDailyChargingTargets;
 }
 
-void ChargingTargetsMemMgr::AllocAndCopy()
+CHIP_ERROR ChargingTargetsMemMgr::AllocAndCopy()
 {
     if (mNumDailyChargingTargets > 0)
     {
         // Allocate the memory first and then use placement new to initialise the memory of each element in the array
         mpListOfDays[mChargingTargetSchedulesIdx] = static_cast<EnergyEvse::Structs::ChargingTargetStruct::Type *>(
             chip::Platform::MemoryAlloc(sizeof(EnergyEvse::Structs::ChargingTargetStruct::Type) * mNumDailyChargingTargets));
+
+        if (mpListOfDays[mChargingTargetSchedulesIdx] == nullptr)
+        {
+            return CHIP_ERROR_NO_MEMORY;
+        }
 
         for (uint16_t idx = 0; idx < mNumDailyChargingTargets; idx++)
         {
@@ -92,9 +97,12 @@ void ChargingTargetsMemMgr::AllocAndCopy()
             mpListOfDays[mChargingTargetSchedulesIdx][idx] = mDailyChargingTargets[idx];
         }
     }
+
+    return CHIP_NO_ERROR;
 }
 
-void ChargingTargetsMemMgr::AllocAndCopy(const DataModel::List<const Structs::ChargingTargetStruct::Type> & chargingTargets)
+CHIP_ERROR
+ChargingTargetsMemMgr::AllocAndCopy(const DataModel::List<const Structs::ChargingTargetStruct::Type> & chargingTargets)
 {
     mNumDailyChargingTargets = static_cast<uint16_t>(chargingTargets.size());
 
@@ -103,6 +111,11 @@ void ChargingTargetsMemMgr::AllocAndCopy(const DataModel::List<const Structs::Ch
         // Allocate the memory first and then use placement new to initialise the memory of each element in the array
         mpListOfDays[mChargingTargetSchedulesIdx] = static_cast<EnergyEvse::Structs::ChargingTargetStruct::Type *>(
             chip::Platform::MemoryAlloc(sizeof(EnergyEvse::Structs::ChargingTargetStruct::Type) * chargingTargets.size()));
+
+        if (mpListOfDays[mChargingTargetSchedulesIdx] == nullptr)
+        {
+            return CHIP_ERROR_NO_MEMORY;
+        }
 
         uint16_t idx = 0;
         for (auto & chargingTarget : chargingTargets)
@@ -116,6 +129,8 @@ void ChargingTargetsMemMgr::AllocAndCopy(const DataModel::List<const Structs::Ch
             idx++;
         }
     }
+
+    return CHIP_NO_ERROR;
 }
 
 CHIP_ERROR

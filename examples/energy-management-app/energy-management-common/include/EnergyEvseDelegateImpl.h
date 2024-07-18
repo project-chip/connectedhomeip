@@ -39,7 +39,7 @@ CHIP_ERROR GetEpochTS(uint32_t & chipEpoch);
  *
  * @param   reference to hold the day of week as a bitmap
  *
- * Sunday = 0x01, Monday = 0x01 ... Saturday = 0x40 (1<<6)
+ * Sunday = 0x00, Monday = 0x01 ... Saturday = 0x40 (1<<6)
  */
 CHIP_ERROR GetDayOfWeekNow(uint8_t & dayOfWeekMap);
 
@@ -57,6 +57,12 @@ CHIP_ERROR GetDayOfWeekNow(uint8_t & dayOfWeekMap);
  */
 uint8_t GetDayOfWeekUnixEpoch(time_t unixEpoch);
 
+/**
+ * @brief   Helper function to get current timestamp and work out the current number of minutes
+ *          past midnight based on localtime
+ *
+ * @param   reference to hold the number of minutes past midnight
+ */
 CHIP_ERROR GetMinutesPastMidnight(uint16_t & minutesPastMidnight);
 
 namespace chip {
@@ -309,11 +315,11 @@ public:
 
 private:
     /* Constants */
-    static constexpr int kDefaultMinChargeCurrent                     = 6000;  /* 6A */
-    static constexpr int kDefaultUserMaximumChargeCurrent             = 80000; /* 80A */
-    static constexpr int kDefaultRandomizationDelayWindow             = 600;   /* 600s */
+    static constexpr int kDefaultMinChargeCurrent_mA                     = 6000;  /* 6A */
+    static constexpr int kDefaultUserMaximumChargeCurrent_mA             = 80000; /* 80A */
+    static constexpr int kDefaultRandomizationDelayWindow_sec             = 600;   /* 600s */
     static constexpr int kMaxVehicleIDBufSize                         = 32;
-    static constexpr int kPeriodicCheckIntervalRealTimeClockNotSynced = 30;
+    static constexpr int kPeriodicCheckIntervalRealTimeClockNotSynced_sec = 30;
 
     /* private variables for controlling the hardware - these are not attributes */
     int64_t mMaxHardwareCurrentLimit                = 0; /* Hardware current limit in mA */
@@ -366,11 +372,11 @@ private:
     DataModel::Nullable<uint32_t> mChargingEnabledUntil;    // TODO Default to 0 to indicate disabled
     DataModel::Nullable<uint32_t> mDischargingEnabledUntil; // TODO Default to 0 to indicate disabled
     int64_t mCircuitCapacity           = 0;
-    int64_t mMinimumChargeCurrent      = kDefaultMinChargeCurrent;
+    int64_t mMinimumChargeCurrent      = kDefaultMinChargeCurrent_mA;
     int64_t mMaximumChargeCurrent      = 0;
     int64_t mMaximumDischargeCurrent   = 0;
-    int64_t mUserMaximumChargeCurrent  = kDefaultUserMaximumChargeCurrent; // TODO update spec
-    uint32_t mRandomizationDelayWindow = kDefaultRandomizationDelayWindow;
+    int64_t mUserMaximumChargeCurrent  = kDefaultUserMaximumChargeCurrent_mA; // TODO update spec
+    uint32_t mRandomizationDelayWindow = kDefaultRandomizationDelayWindow_sec;
     /* PREF attributes */
     DataModel::Nullable<uint32_t> mNextChargeStartTime;
     DataModel::Nullable<uint32_t> mNextChargeTargetTime;

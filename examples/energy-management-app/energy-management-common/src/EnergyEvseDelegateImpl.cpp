@@ -200,7 +200,7 @@ Status EnergyEvseDelegate::ScheduleCheckOnEnabledTimeout()
     else if (err == CHIP_ERROR_REAL_TIME_NOT_SYNCED)
     {
         /* Real time isn't sync'd -lets check again in 30 seconds - otherwise keep the charger enabled */
-        DeviceLayer::SystemLayer().StartTimer(System::Clock::Seconds32(kPeriodicCheckIntervalRealTimeClockNotSynced),
+        DeviceLayer::SystemLayer().StartTimer(System::Clock::Seconds32(kPeriodicCheckIntervalRealTimeClockNotSynced_sec),
                                               EvseCheckTimerExpiry, this);
     }
     return Status::Success;

@@ -176,7 +176,12 @@ CHIP_ERROR EvseTargetsDelegate::LoadTargets()
 
         // Allocate an array for the chargingTargets loaded for this schedule and copy the chargingTargets into that array.
         // The allocated array will be pointed to in the List below.
-        mChargingTargets.AllocAndCopy();
+        err = mChargingTargets.AllocAndCopy();
+        if (err != CHIP_NO_ERROR)
+        {
+            ChipLogError(AppServer, "SetTargets: Failed to allocate memory during LoadTargets %s", chip::ErrorStr(err));
+            return err;
+        }
 
         // Construct the List<ChargingTargetStruct>. mChargingTargetSchedulesArray will be pointed to in the
         // List<ChargingTargetScheduleStruct> mChargingTargetSchedulesList below
@@ -304,7 +309,12 @@ CHIP_ERROR EvseTargetsDelegate::SetTargets(
                 updatedBitmask = BitMask<TargetDayOfWeekBitmap>(bitmaskB);
 
                 // Copy the existing chargingTargets
-                updatedChargingTargets.AllocAndCopy(currentChargingTargetSchedule.chargingTargets);
+                CHIP_ERROR err = updatedChargingTargets.AllocAndCopy(currentChargingTargetSchedule.chargingTargets);
+                if (err != CHIP_NO_ERROR)
+                {
+                    ChipLogError(AppServer, "SetTargets: Failed to copy the new chargingTargets %s", chip::ErrorStr(err));
+                    return err;
+                }
             }
 
             // Update the new schedule with the dayOfWeekForSequence and list of chargingTargets
