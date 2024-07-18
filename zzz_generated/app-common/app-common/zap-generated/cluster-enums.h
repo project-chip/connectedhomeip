@@ -2719,11 +2719,12 @@ enum class SupplyStateEnum : uint8_t
     kDischargingEnabled  = 0x02,
     kDisabledError       = 0x03,
     kDisabledDiagnostics = 0x04,
+    kEnabled             = 0x05,
     // All received enum values that are not listed above will be mapped
     // to kUnknownEnumValue. This is a helper enum value that should only
     // be used by code to process how it handles receiving and unknown
     // enum value. This specific should never be transmitted.
-    kUnknownEnumValue = 5,
+    kUnknownEnumValue = 6,
 };
 
 // Bitmap for Feature
@@ -5196,6 +5197,15 @@ enum class StatusEnum : uint8_t
     kUnknownEnumValue = 2,
 };
 } // namespace ContentAppObserver
+
+namespace CommissionerControl {
+
+// Bitmap for SupportedDeviceCategoryBitmap
+enum class SupportedDeviceCategoryBitmap : uint32_t
+{
+    kFabricSynchronization = 0x1,
+};
+} // namespace CommissionerControl
 
 namespace ElectricalMeasurement {} // namespace ElectricalMeasurement
 

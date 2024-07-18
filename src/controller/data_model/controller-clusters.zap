@@ -4875,6 +4875,7 @@
           "define": "THREAD_BORDER_ROUTER_MANAGEMENT_CLUSTER",
           "side": "client",
           "enabled": 1,
+          "apiMaturity": "provisional",
           "commands": [
             {
               "name": "GetActiveDatasetRequest",
@@ -4893,16 +4894,8 @@
               "isEnabled": 1
             },
             {
-              "name": "SetActiveDatasetRequest",
-              "code": 4,
-              "mfgCode": null,
-              "source": "client",
-              "isIncoming": 0,
-              "isEnabled": 1
-            },
-            {
               "name": "SetPendingDatasetRequest",
-              "code": 5,
+              "code": 4,
               "mfgCode": null,
               "source": "client",
               "isIncoming": 0,

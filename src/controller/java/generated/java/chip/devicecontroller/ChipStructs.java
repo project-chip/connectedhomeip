@@ -5078,62 +5078,167 @@ public static class RvcOperationalStateClusterOperationalStateStruct {
     return output.toString();
   }
 }
-public static class ScenesManagementClusterAttributeValuePair {
+public static class ScenesManagementClusterAttributeValuePairStruct {
   public Long attributeID;
-  public Long attributeValue;
+  public Optional<Integer> valueUnsigned8;
+  public Optional<Integer> valueSigned8;
+  public Optional<Integer> valueUnsigned16;
+  public Optional<Integer> valueSigned16;
+  public Optional<Long> valueUnsigned32;
+  public Optional<Long> valueSigned32;
+  public Optional<Long> valueUnsigned64;
+  public Optional<Long> valueSigned64;
   private static final long ATTRIBUTE_I_D_ID = 0L;
-  private static final long ATTRIBUTE_VALUE_ID = 1L;
+  private static final long VALUE_UNSIGNED8_ID = 1L;
+  private static final long VALUE_SIGNED8_ID = 2L;
+  private static final long VALUE_UNSIGNED16_ID = 3L;
+  private static final long VALUE_SIGNED16_ID = 4L;
+  private static final long VALUE_UNSIGNED32_ID = 5L;
+  private static final long VALUE_SIGNED32_ID = 6L;
+  private static final long VALUE_UNSIGNED64_ID = 7L;
+  private static final long VALUE_SIGNED64_ID = 8L;
 
-  public ScenesManagementClusterAttributeValuePair(
+  public ScenesManagementClusterAttributeValuePairStruct(
     Long attributeID,
-    Long attributeValue
+    Optional<Integer> valueUnsigned8,
+    Optional<Integer> valueSigned8,
+    Optional<Integer> valueUnsigned16,
+    Optional<Integer> valueSigned16,
+    Optional<Long> valueUnsigned32,
+    Optional<Long> valueSigned32,
+    Optional<Long> valueUnsigned64,
+    Optional<Long> valueSigned64
   ) {
     this.attributeID = attributeID;
-    this.attributeValue = attributeValue;
+    this.valueUnsigned8 = valueUnsigned8;
+    this.valueSigned8 = valueSigned8;
+    this.valueUnsigned16 = valueUnsigned16;
+    this.valueSigned16 = valueSigned16;
+    this.valueUnsigned32 = valueUnsigned32;
+    this.valueSigned32 = valueSigned32;
+    this.valueUnsigned64 = valueUnsigned64;
+    this.valueSigned64 = valueSigned64;
   }
 
   public StructType encodeTlv() {
     ArrayList<StructElement> values = new ArrayList<>();
     values.add(new StructElement(ATTRIBUTE_I_D_ID, new UIntType(attributeID)));
-    values.add(new StructElement(ATTRIBUTE_VALUE_ID, new UIntType(attributeValue)));
+    values.add(new StructElement(VALUE_UNSIGNED8_ID, valueUnsigned8.<BaseTLVType>map((nonOptionalvalueUnsigned8) -> new UIntType(nonOptionalvalueUnsigned8)).orElse(new EmptyType())));
+    values.add(new StructElement(VALUE_SIGNED8_ID, valueSigned8.<BaseTLVType>map((nonOptionalvalueSigned8) -> new IntType(nonOptionalvalueSigned8)).orElse(new EmptyType())));
+    values.add(new StructElement(VALUE_UNSIGNED16_ID, valueUnsigned16.<BaseTLVType>map((nonOptionalvalueUnsigned16) -> new UIntType(nonOptionalvalueUnsigned16)).orElse(new EmptyType())));
+    values.add(new StructElement(VALUE_SIGNED16_ID, valueSigned16.<BaseTLVType>map((nonOptionalvalueSigned16) -> new IntType(nonOptionalvalueSigned16)).orElse(new EmptyType())));
+    values.add(new StructElement(VALUE_UNSIGNED32_ID, valueUnsigned32.<BaseTLVType>map((nonOptionalvalueUnsigned32) -> new UIntType(nonOptionalvalueUnsigned32)).orElse(new EmptyType())));
+    values.add(new StructElement(VALUE_SIGNED32_ID, valueSigned32.<BaseTLVType>map((nonOptionalvalueSigned32) -> new IntType(nonOptionalvalueSigned32)).orElse(new EmptyType())));
+    values.add(new StructElement(VALUE_UNSIGNED64_ID, valueUnsigned64.<BaseTLVType>map((nonOptionalvalueUnsigned64) -> new UIntType(nonOptionalvalueUnsigned64)).orElse(new EmptyType())));
+    values.add(new StructElement(VALUE_SIGNED64_ID, valueSigned64.<BaseTLVType>map((nonOptionalvalueSigned64) -> new IntType(nonOptionalvalueSigned64)).orElse(new EmptyType())));
 
     return new StructType(values);
   }
 
-  public static ScenesManagementClusterAttributeValuePair decodeTlv(BaseTLVType tlvValue) {
+  public static ScenesManagementClusterAttributeValuePairStruct decodeTlv(BaseTLVType tlvValue) {
     if (tlvValue == null || tlvValue.type() != TLVType.Struct) {
       return null;
     }
     Long attributeID = null;
-    Long attributeValue = null;
+    Optional<Integer> valueUnsigned8 = Optional.empty();
+    Optional<Integer> valueSigned8 = Optional.empty();
+    Optional<Integer> valueUnsigned16 = Optional.empty();
+    Optional<Integer> valueSigned16 = Optional.empty();
+    Optional<Long> valueUnsigned32 = Optional.empty();
+    Optional<Long> valueSigned32 = Optional.empty();
+    Optional<Long> valueUnsigned64 = Optional.empty();
+    Optional<Long> valueSigned64 = Optional.empty();
     for (StructElement element: ((StructType)tlvValue).value()) {
       if (element.contextTagNum() == ATTRIBUTE_I_D_ID) {
         if (element.value(BaseTLVType.class).type() == TLVType.UInt) {
           UIntType castingValue = element.value(UIntType.class);
           attributeID = castingValue.value(Long.class);
         }
-      } else if (element.contextTagNum() == ATTRIBUTE_VALUE_ID) {
+      } else if (element.contextTagNum() == VALUE_UNSIGNED8_ID) {
         if (element.value(BaseTLVType.class).type() == TLVType.UInt) {
           UIntType castingValue = element.value(UIntType.class);
-          attributeValue = castingValue.value(Long.class);
+          valueUnsigned8 = Optional.of(castingValue.value(Integer.class));
+        }
+      } else if (element.contextTagNum() == VALUE_SIGNED8_ID) {
+        if (element.value(BaseTLVType.class).type() == TLVType.Int) {
+          IntType castingValue = element.value(IntType.class);
+          valueSigned8 = Optional.of(castingValue.value(Integer.class));
+        }
+      } else if (element.contextTagNum() == VALUE_UNSIGNED16_ID) {
+        if (element.value(BaseTLVType.class).type() == TLVType.UInt) {
+          UIntType castingValue = element.value(UIntType.class);
+          valueUnsigned16 = Optional.of(castingValue.value(Integer.class));
+        }
+      } else if (element.contextTagNum() == VALUE_SIGNED16_ID) {
+        if (element.value(BaseTLVType.class).type() == TLVType.Int) {
+          IntType castingValue = element.value(IntType.class);
+          valueSigned16 = Optional.of(castingValue.value(Integer.class));
+        }
+      } else if (element.contextTagNum() == VALUE_UNSIGNED32_ID) {
+        if (element.value(BaseTLVType.class).type() == TLVType.UInt) {
+          UIntType castingValue = element.value(UIntType.class);
+          valueUnsigned32 = Optional.of(castingValue.value(Long.class));
+        }
+      } else if (element.contextTagNum() == VALUE_SIGNED32_ID) {
+        if (element.value(BaseTLVType.class).type() == TLVType.Int) {
+          IntType castingValue = element.value(IntType.class);
+          valueSigned32 = Optional.of(castingValue.value(Long.class));
+        }
+      } else if (element.contextTagNum() == VALUE_UNSIGNED64_ID) {
+        if (element.value(BaseTLVType.class).type() == TLVType.UInt) {
+          UIntType castingValue = element.value(UIntType.class);
+          valueUnsigned64 = Optional.of(castingValue.value(Long.class));
+        }
+      } else if (element.contextTagNum() == VALUE_SIGNED64_ID) {
+        if (element.value(BaseTLVType.class).type() == TLVType.Int) {
+          IntType castingValue = element.value(IntType.class);
+          valueSigned64 = Optional.of(castingValue.value(Long.class));
         }
       }
     }
-    return new ScenesManagementClusterAttributeValuePair(
+    return new ScenesManagementClusterAttributeValuePairStruct(
       attributeID,
-      attributeValue
+      valueUnsigned8,
+      valueSigned8,
+      valueUnsigned16,
+      valueSigned16,
+      valueUnsigned32,
+      valueSigned32,
+      valueUnsigned64,
+      valueSigned64
     );
   }
 
   @Override
   public String toString() {
     StringBuilder output = new StringBuilder();
-    output.append("ScenesManagementClusterAttributeValuePair {\n");
+    output.append("ScenesManagementClusterAttributeValuePairStruct {\n");
     output.append("\tattributeID: ");
     output.append(attributeID);
     output.append("\n");
-    output.append("\tattributeValue: ");
-    output.append(attributeValue);
+    output.append("\tvalueUnsigned8: ");
+    output.append(valueUnsigned8);
+    output.append("\n");
+    output.append("\tvalueSigned8: ");
+    output.append(valueSigned8);
+    output.append("\n");
+    output.append("\tvalueUnsigned16: ");
+    output.append(valueUnsigned16);
+    output.append("\n");
+    output.append("\tvalueSigned16: ");
+    output.append(valueSigned16);
+    output.append("\n");
+    output.append("\tvalueUnsigned32: ");
+    output.append(valueUnsigned32);
+    output.append("\n");
+    output.append("\tvalueSigned32: ");
+    output.append(valueSigned32);
+    output.append("\n");
+    output.append("\tvalueUnsigned64: ");
+    output.append(valueUnsigned64);
+    output.append("\n");
+    output.append("\tvalueSigned64: ");
+    output.append(valueSigned64);
     output.append("\n");
     output.append("}\n");
     return output.toString();
@@ -5141,13 +5246,13 @@ public static class ScenesManagementClusterAttributeValuePair {
 }
 public static class ScenesManagementClusterExtensionFieldSet {
   public Long clusterID;
-  public ArrayList<ChipStructs.ScenesManagementClusterAttributeValuePair> attributeValueList;
+  public ArrayList<ChipStructs.ScenesManagementClusterAttributeValuePairStruct> attributeValueList;
   private static final long CLUSTER_I_D_ID = 0L;
   private static final long ATTRIBUTE_VALUE_LIST_ID = 1L;
 
   public ScenesManagementClusterExtensionFieldSet(
     Long clusterID,
-    ArrayList<ChipStructs.ScenesManagementClusterAttributeValuePair> attributeValueList
+    ArrayList<ChipStructs.ScenesManagementClusterAttributeValuePairStruct> attributeValueList
   ) {
     this.clusterID = clusterID;
     this.attributeValueList = attributeValueList;
@@ -5166,7 +5271,7 @@ public static class ScenesManagementClusterExtensionFieldSet {
       return null;
     }
     Long clusterID = null;
-    ArrayList<ChipStructs.ScenesManagementClusterAttributeValuePair> attributeValueList = null;
+    ArrayList<ChipStructs.ScenesManagementClusterAttributeValuePairStruct> attributeValueList = null;
     for (StructElement element: ((StructType)tlvValue).value()) {
       if (element.contextTagNum() == CLUSTER_I_D_ID) {
         if (element.value(BaseTLVType.class).type() == TLVType.UInt) {
@@ -5176,7 +5281,7 @@ public static class ScenesManagementClusterExtensionFieldSet {
       } else if (element.contextTagNum() == ATTRIBUTE_VALUE_LIST_ID) {
         if (element.value(BaseTLVType.class).type() == TLVType.Array) {
           ArrayType castingValue = element.value(ArrayType.class);
-          attributeValueList = castingValue.map((elementcastingValue) -> ChipStructs.ScenesManagementClusterAttributeValuePair.decodeTlv(elementcastingValue));
+          attributeValueList = castingValue.map((elementcastingValue) -> ChipStructs.ScenesManagementClusterAttributeValuePairStruct.decodeTlv(elementcastingValue));
         }
       }
     }

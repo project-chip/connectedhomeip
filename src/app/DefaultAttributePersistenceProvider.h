@@ -63,7 +63,9 @@ protected:
 
 private:
     CHIP_ERROR InternalWriteValue(const StorageKeyName & aKey, const ByteSpan & aValue);
-    CHIP_ERROR InternalReadValue(const StorageKeyName & aKey, EmberAfAttributeType aType, size_t aSize, MutableByteSpan & aValue);
+    CHIP_ERROR InternalReadValue(const StorageKeyName & aKey, MutableByteSpan & aValue);
+    CHIP_ERROR InternalReadValue(const StorageKeyName & aKey, EmberAfAttributeType aType, size_t aExpectedSize,
+                                 MutableByteSpan & aValue);
 };
 
 } // namespace app

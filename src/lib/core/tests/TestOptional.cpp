@@ -28,10 +28,11 @@
 #include <cstdint>
 #include <cstring>
 
-#include <lib/core/Optional.h>
-#include <lib/support/Span.h>
+#include <pw_unit_test/framework.h>
 
-#include <gtest/gtest.h>
+#include <lib/core/Optional.h>
+#include <lib/core/StringBuilderAdapters.h>
+#include <lib/support/Span.h>
 
 using namespace chip;
 

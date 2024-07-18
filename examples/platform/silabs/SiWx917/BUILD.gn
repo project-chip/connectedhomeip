@@ -115,7 +115,12 @@ source_set("siwx917-matter-shell") {
 
 config("siwx917-common-config") {
   defines = [ "OTA_PERIODIC_TIMEOUT=${ota_periodic_query_timeout_sec}" ]
-  libs = [ "${sdk_support_root}/matter/provision/lib/libProvision_si917.a" ]
+  if (sl_si91x_crypto_flavor == "psa") {
+    libs =
+        [ "${sdk_support_root}/matter/provision/lib/libProvisionPSA_si917.a" ]
+  } else {
+    libs = [ "${sdk_support_root}/matter/provision/lib/libProvision_si917.a" ]
+  }
 
   if (!disable_lcd) {
     include_dirs = [ "${silabs_common_plat_dir}/display" ]

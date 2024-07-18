@@ -1154,6 +1154,15 @@ static BOOL CommandNeedsTimedInvokeInContentAppObserverCluster(AttributeId aAttr
     }
     }
 }
+static BOOL CommandNeedsTimedInvokeInCommissionerControlCluster(AttributeId aAttributeId)
+{
+    using namespace Clusters::CommissionerControl;
+    switch (aAttributeId) {
+    default: {
+        return NO;
+    }
+    }
+}
 static BOOL CommandNeedsTimedInvokeInElectricalMeasurementCluster(AttributeId aAttributeId)
 {
     using namespace Clusters::ElectricalMeasurement;
@@ -1541,6 +1550,9 @@ BOOL MTRCommandNeedsTimedInvoke(NSNumber * _Nonnull aClusterID, NSNumber * _Nonn
     }
     case Clusters::ContentAppObserver::Id: {
         return CommandNeedsTimedInvokeInContentAppObserverCluster(commandID);
+    }
+    case Clusters::CommissionerControl::Id: {
+        return CommandNeedsTimedInvokeInCommissionerControlCluster(commandID);
     }
     case Clusters::ElectricalMeasurement::Id: {
         return CommandNeedsTimedInvokeInElectricalMeasurementCluster(commandID);

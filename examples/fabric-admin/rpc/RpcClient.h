@@ -41,7 +41,7 @@ CHIP_ERROR InitRpcClient(uint16_t rpcServerPort);
  *
  * @param nodeId The Node ID of the device to be added.
  * @return CHIP_ERROR An error code indicating the success or failure of the operation.
- * - CHIP_NO_ERROR: The RPC command was successfully sent.
+ * - CHIP_NO_ERROR: The RPC command was successfully processed.
  * - CHIP_ERROR_BUSY: Another operation is currently in progress.
  * - CHIP_ERROR_INTERNAL: An internal error occurred while activating the RPC call.
  */
@@ -56,7 +56,7 @@ CHIP_ERROR AddSynchronizedDevice(chip::NodeId nodeId);
  *
  * @param nodeId The Node ID of the device to be removed.
  * @return CHIP_ERROR An error code indicating the success or failure of the operation.
- * - CHIP_NO_ERROR: The RPC command was successfully sent.
+ * - CHIP_NO_ERROR: The RPC command was successfully processed.
  * - CHIP_ERROR_BUSY: Another operation is currently in progress.
  * - CHIP_ERROR_INTERNAL: An internal error occurred while activating the RPC call.
  */

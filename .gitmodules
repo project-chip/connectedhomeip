@@ -6,10 +6,6 @@
 	path = third_party/nlio/repo
 	url = https://github.com/nestlabs/nlio.git
 	branch  = master
-[submodule "nlunit-test"]
-	path = third_party/nlunit-test/repo
-	url = https://github.com/nestlabs/nlunit-test.git
-	branch  = master
 [submodule "mbedtls"]
 	path = third_party/mbedtls/repo
 	url = https://github.com/ARMmbed/mbedtls.git
@@ -325,3 +321,8 @@
 	url = https://github.com/Infineon/optiga-trust-m.git
 	branch = matter_support
 	platforms = infineon
+[submodule "third_party/nxp/nxp_matter_support"]
+	path = third_party/nxp/nxp_matter_support
+	url = https://github.com/NXP/nxp_matter_support.git
+	branch = master
+	platforms = nxp

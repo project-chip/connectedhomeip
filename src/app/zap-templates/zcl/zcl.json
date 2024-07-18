@@ -32,6 +32,7 @@
         "channel-cluster.xml",
         "clusters-extensions.xml",
         "color-control-cluster.xml",
+        "commissioner-control-cluster.xml",
         "concentration-measurement-cluster.xml",
         "content-launch-cluster.xml",
         "content-app-observer-cluster.xml",

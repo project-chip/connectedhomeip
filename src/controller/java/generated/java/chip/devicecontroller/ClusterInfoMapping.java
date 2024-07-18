@@ -20110,6 +20110,120 @@ public class ClusterInfoMapping {
     }
   }
 
+
+  public static class DelegatedCommissionerControlClusterReverseOpenCommissioningWindowCallback implements ChipClusters.CommissionerControlCluster.ReverseOpenCommissioningWindowCallback, DelegatedClusterCallback {
+    private ClusterCommandCallback callback;
+    @Override
+    public void setCallbackDelegate(ClusterCommandCallback callback) {
+      this.callback = callback;
+    }
+
+    @Override
+    public void onSuccess(Integer commissioningTimeout, byte[] PAKEPasscodeVerifier, Integer discriminator, Long iterations, byte[] salt) {
+      Map<CommandResponseInfo, Object> responseValues = new LinkedHashMap<>();
+
+      CommandResponseInfo commissioningTimeoutResponseValue = new CommandResponseInfo("commissioningTimeout", "Integer");
+      responseValues.put(commissioningTimeoutResponseValue, commissioningTimeout);
+      CommandResponseInfo PAKEPasscodeVerifierResponseValue = new CommandResponseInfo("PAKEPasscodeVerifier", "byte[]");
+      responseValues.put(PAKEPasscodeVerifierResponseValue, PAKEPasscodeVerifier);
+      CommandResponseInfo discriminatorResponseValue = new CommandResponseInfo("discriminator", "Integer");
+      responseValues.put(discriminatorResponseValue, discriminator);
+      CommandResponseInfo iterationsResponseValue = new CommandResponseInfo("iterations", "Long");
+      responseValues.put(iterationsResponseValue, iterations);
+      CommandResponseInfo saltResponseValue = new CommandResponseInfo("salt", "byte[]");
+      responseValues.put(saltResponseValue, salt);
+      callback.onSuccess(responseValues);
+    }
+
+    @Override
+    public void onError(Exception error) {
+      callback.onFailure(error);
+    }
+  }
+  public static class DelegatedCommissionerControlClusterGeneratedCommandListAttributeCallback implements ChipClusters.CommissionerControlCluster.GeneratedCommandListAttributeCallback, DelegatedClusterCallback {
+    private ClusterCommandCallback callback;
+    @Override
+    public void setCallbackDelegate(ClusterCommandCallback callback) {
+      this.callback = callback;
+    }
+
+    @Override
+    public void onSuccess(List<Long> valueList) {
+      Map<CommandResponseInfo, Object> responseValues = new LinkedHashMap<>();
+      CommandResponseInfo commandResponseInfo = new CommandResponseInfo("valueList", "List<Long>");
+      responseValues.put(commandResponseInfo, valueList);
+      callback.onSuccess(responseValues);
+    }
+
+    @Override
+    public void onError(Exception ex) {
+      callback.onFailure(ex);
+    }
+  }
+
+  public static class DelegatedCommissionerControlClusterAcceptedCommandListAttributeCallback implements ChipClusters.CommissionerControlCluster.AcceptedCommandListAttributeCallback, DelegatedClusterCallback {
+    private ClusterCommandCallback callback;
+    @Override
+    public void setCallbackDelegate(ClusterCommandCallback callback) {
+      this.callback = callback;
+    }
+
+    @Override
+    public void onSuccess(List<Long> valueList) {
+      Map<CommandResponseInfo, Object> responseValues = new LinkedHashMap<>();
+      CommandResponseInfo commandResponseInfo = new CommandResponseInfo("valueList", "List<Long>");
+      responseValues.put(commandResponseInfo, valueList);
+      callback.onSuccess(responseValues);
+    }
+
+    @Override
+    public void onError(Exception ex) {
+      callback.onFailure(ex);
+    }
+  }
+
+  public static class DelegatedCommissionerControlClusterEventListAttributeCallback implements ChipClusters.CommissionerControlCluster.EventListAttributeCallback, DelegatedClusterCallback {
+    private ClusterCommandCallback callback;
+    @Override
+    public void setCallbackDelegate(ClusterCommandCallback callback) {
+      this.callback = callback;
+    }
+
+    @Override
+    public void onSuccess(List<Long> valueList) {
+      Map<CommandResponseInfo, Object> responseValues = new LinkedHashMap<>();
+      CommandResponseInfo commandResponseInfo = new CommandResponseInfo("valueList", "List<Long>");
+      responseValues.put(commandResponseInfo, valueList);
+      callback.onSuccess(responseValues);
+    }
+
+    @Override
+    public void onError(Exception ex) {
+      callback.onFailure(ex);
+    }
+  }
+
+  public static class DelegatedCommissionerControlClusterAttributeListAttributeCallback implements ChipClusters.CommissionerControlCluster.AttributeListAttributeCallback, DelegatedClusterCallback {
+    private ClusterCommandCallback callback;
+    @Override
+    public void setCallbackDelegate(ClusterCommandCallback callback) {
+      this.callback = callback;
+    }
+
+    @Override
+    public void onSuccess(List<Long> valueList) {
+      Map<CommandResponseInfo, Object> responseValues = new LinkedHashMap<>();
+      CommandResponseInfo commandResponseInfo = new CommandResponseInfo("valueList", "List<Long>");
+      responseValues.put(commandResponseInfo, valueList);
+      callback.onSuccess(responseValues);
+    }
+
+    @Override
+    public void onError(Exception ex) {
+      callback.onFailure(ex);
+    }
+  }
+
   public static class DelegatedElectricalMeasurementClusterGeneratedCommandListAttributeCallback implements ChipClusters.ElectricalMeasurementCluster.GeneratedCommandListAttributeCallback, DelegatedClusterCallback {
     private ClusterCommandCallback callback;
     @Override
@@ -22215,6 +22329,10 @@ public class ClusterInfoMapping {
       (ptr, endpointId) -> new ChipClusters.ContentAppObserverCluster(ptr, endpointId), new HashMap<>());
     clusterMap.put("contentAppObserver", contentAppObserverClusterInfo);
 
+    ClusterInfo commissionerControlClusterInfo = new ClusterInfo(
+      (ptr, endpointId) -> new ChipClusters.CommissionerControlCluster(ptr, endpointId), new HashMap<>());
+    clusterMap.put("commissionerControl", commissionerControlClusterInfo);
+
     ClusterInfo electricalMeasurementClusterInfo = new ClusterInfo(
       (ptr, endpointId) -> new ChipClusters.ElectricalMeasurementCluster(ptr, endpointId), new HashMap<>());
     clusterMap.put("electricalMeasurement", electricalMeasurementClusterInfo);
@@ -22355,6 +22473,7 @@ public class ClusterInfoMapping {
     destination.get("accountLogin").combineCommands(source.get("accountLogin"));
     destination.get("contentControl").combineCommands(source.get("contentControl"));
     destination.get("contentAppObserver").combineCommands(source.get("contentAppObserver"));
+    destination.get("commissionerControl").combineCommands(source.get("commissionerControl"));
     destination.get("electricalMeasurement").combineCommands(source.get("electricalMeasurement"));
     destination.get("unitTesting").combineCommands(source.get("unitTesting"));
     destination.get("faultInjection").combineCommands(source.get("faultInjection"));
@@ -28556,6 +28675,78 @@ public class ClusterInfoMapping {
     contentAppObserverClusterInteractionInfoMap.put("contentAppMessage", contentAppObservercontentAppMessageInteractionInfo);
 
     commandMap.put("contentAppObserver", contentAppObserverClusterInteractionInfoMap);
+
+    Map<String, InteractionInfo> commissionerControlClusterInteractionInfoMap = new LinkedHashMap<>();
+
+    Map<String, CommandParameterInfo> commissionerControlrequestCommissioningApprovalCommandParams = new LinkedHashMap<String, CommandParameterInfo>();
+
+    CommandParameterInfo commissionerControlrequestCommissioningApprovalrequestIdCommandParameterInfo = new CommandParameterInfo("requestId", Long.class, Long.class);
+    commissionerControlrequestCommissioningApprovalCommandParams.put("requestId",commissionerControlrequestCommissioningApprovalrequestIdCommandParameterInfo);
+
+    CommandParameterInfo commissionerControlrequestCommissioningApprovalvendorIdCommandParameterInfo = new CommandParameterInfo("vendorId", Integer.class, Integer.class);
+    commissionerControlrequestCommissioningApprovalCommandParams.put("vendorId",commissionerControlrequestCommissioningApprovalvendorIdCommandParameterInfo);
+
+    CommandParameterInfo commissionerControlrequestCommissioningApprovalproductIdCommandParameterInfo = new CommandParameterInfo("productId", Integer.class, Integer.class);
+    commissionerControlrequestCommissioningApprovalCommandParams.put("productId",commissionerControlrequestCommissioningApprovalproductIdCommandParameterInfo);
+
+    CommandParameterInfo commissionerControlrequestCommissioningApprovallabelCommandParameterInfo = new CommandParameterInfo("label", Optional.class, String.class);
+    commissionerControlrequestCommissioningApprovalCommandParams.put("label",commissionerControlrequestCommissioningApprovallabelCommandParameterInfo);
+    InteractionInfo commissionerControlrequestCommissioningApprovalInteractionInfo = new InteractionInfo(
+      (cluster, callback, commandArguments) -> {
+        ((ChipClusters.CommissionerControlCluster) cluster)
+        .requestCommissioningApproval((DefaultClusterCallback) callback
+        , (Long)
+        commandArguments.get("requestId")
+        , (Integer)
+        commandArguments.get("vendorId")
+        , (Integer)
+        commandArguments.get("productId")
+        , (Optional<String>)
+        commandArguments.get("label")
+        );
+      },
+      () -> new DelegatedDefaultClusterCallback(),
+        commissionerControlrequestCommissioningApprovalCommandParams
+    );
+    commissionerControlClusterInteractionInfoMap.put("requestCommissioningApproval", commissionerControlrequestCommissioningApprovalInteractionInfo);
+
+    Map<String, CommandParameterInfo> commissionerControlcommissionNodeCommandParams = new LinkedHashMap<String, CommandParameterInfo>();
+
+    CommandParameterInfo commissionerControlcommissionNoderequestIdCommandParameterInfo = new CommandParameterInfo("requestId", Long.class, Long.class);
+    commissionerControlcommissionNodeCommandParams.put("requestId",commissionerControlcommissionNoderequestIdCommandParameterInfo);
+
+    CommandParameterInfo commissionerControlcommissionNoderesponseTimeoutSecondsCommandParameterInfo = new CommandParameterInfo("responseTimeoutSeconds", Integer.class, Integer.class);
+    commissionerControlcommissionNodeCommandParams.put("responseTimeoutSeconds",commissionerControlcommissionNoderesponseTimeoutSecondsCommandParameterInfo);
+
+    CommandParameterInfo commissionerControlcommissionNodeipAddressCommandParameterInfo = new CommandParameterInfo("ipAddress", Optional.class, byte[].class);
+    commissionerControlcommissionNodeCommandParams.put("ipAddress",commissionerControlcommissionNodeipAddressCommandParameterInfo);
+
+    CommandParameterInfo commissionerControlcommissionNodeportCommandParameterInfo = new CommandParameterInfo("port", Optional.class, Integer.class);
+    commissionerControlcommissionNodeCommandParams.put("port",commissionerControlcommissionNodeportCommandParameterInfo);
+    InteractionInfo commissionerControlcommissionNodeInteractionInfo = new InteractionInfo(
+      (cluster, callback, commandArguments) -> {
+        ((ChipClusters.CommissionerControlCluster) cluster)
+          .commissionNode((ChipClusters.CommissionerControlCluster.ReverseOpenCommissioningWindowCallback) callback
+           , (Long)
+             commandArguments.get("requestId")
+
+           , (Integer)
+             commandArguments.get("responseTimeoutSeconds")
+
+           , (Optional<byte[]>)
+             commandArguments.get("ipAddress")
+
+           , (Optional<Integer>)
+             commandArguments.get("port")
+
+            );
+        },
+        () -> new DelegatedCommissionerControlClusterReverseOpenCommissioningWindowCallback(),
+        commissionerControlcommissionNodeCommandParams
+      );
+    commissionerControlClusterInteractionInfoMap.put("commissionNode", commissionerControlcommissionNodeInteractionInfo);
+
+    commandMap.put("commissionerControl", commissionerControlClusterInteractionInfoMap);
 
     Map<String, InteractionInfo> electricalMeasurementClusterInteractionInfoMap = new LinkedHashMap<>();
 

@@ -2032,6 +2032,24 @@ NS_ASSUME_NONNULL_BEGIN
 
 @end
 
+@interface MTRCommissionerControlClusterRequestCommissioningApprovalParams (InternalMethods)
+
+- (NSDictionary<NSString *, id> * _Nullable)_encodeAsDataValue:(NSError * __autoreleasing *)error;
+
+@end
+
+@interface MTRCommissionerControlClusterCommissionNodeParams (InternalMethods)
+
+- (NSDictionary<NSString *, id> * _Nullable)_encodeAsDataValue:(NSError * __autoreleasing *)error;
+
+@end
+
+@interface MTRCommissionerControlClusterReverseOpenCommissioningWindowParams (InternalMethods)
+
+- (CHIP_ERROR)_setFieldsFromDecodableStruct:(const chip::app::Clusters::CommissionerControl::Commands::ReverseOpenCommissioningWindow::DecodableType &)decodableStruct;
+
+@end
+
 @interface MTRElectricalMeasurementClusterGetProfileInfoResponseCommandParams (InternalMethods)
 
 - (CHIP_ERROR)_setFieldsFromDecodableStruct:(const chip::app::Clusters::ElectricalMeasurement::Commands::GetProfileInfoResponseCommand::DecodableType &)decodableStruct;
