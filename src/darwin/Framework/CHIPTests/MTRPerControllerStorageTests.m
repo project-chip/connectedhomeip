@@ -2995,4 +2995,81 @@ static const uint16_t kSubscriptionPoolBaseTimeoutInSeconds = 30;
     XCTAssertFalse([controller isRunning]);
 }
 
+- (void)testClientDataStorageRemoveSingleKeyAndValue {
+    __auto_type * factory = [MTRDeviceControllerFactory sharedInstance];
+    XCTAssertNotNil(factory);
+
+    __auto_type * rootKeys = [[MTRTestKeys alloc] init];
+    XCTAssertNotNil(rootKeys);
+
+    __auto_type * operationalKeys = [[MTRTestKeys alloc] init];
+    XCTAssertNotNil(operationalKeys);
+
+    __auto_type * storageDelegate = [[MTRTestPerControllerStorage alloc] initWithControllerID:[NSUUID UUID]];
+
+    NSNumber * testNodeID = @(0xcafe);
+    NSNumber * fabricID = @(0x1234);
+
+    NSString * testKeyA = @"testKeyAForAddAndRemove";
+    NSString * testValueA = @"testValueAForAddAndRemove";
+
+    NSString * testKeyB = @"testKeyBForAddAndRemove";
+    NSString * testValueB = @"testValueBForAddAndRemove";
+
+    NSError * error;
+    MTRDeviceController * controller = [self startControllerWithRootKeys:rootKeys
+                                                         operationalKeys:operationalKeys
+                                                                fabricID:fabricID
+                                                                  nodeID:testNodeID
+                                                                 storage:storageDelegate
+                                                                   error:&error];
+    XCTAssertNil(error);
+    XCTAssertNotNil(controller);
+    XCTAssertTrue([controller isRunning]);
+
+    XCTAssertEqualObjects(controller.controllerNodeID, testNodeID);
+
+    // actual test begins here
+
+    XCTAssertNotNil(controller.controllerDataStore);
+
+    id verifyEmptyData = [controller.controllerDataStore clientDataForKey:testKeyA nodeID:testNodeID];
+    XCTAssertNil(verifyEmptyData);
+
+    // store data A that will be deleted
+    [controller.controllerDataStore storeClientDataForKey:testKeyA value:testValueA forNodeID:testNodeID];
+
+    // store data B that will not be deleted
+    [controller.controllerDataStore storeClientDataForKey:testKeyB value:testValueB forNodeID:testNodeID];
+
+    // read back client data
+    id readbackDataA = [controller.controllerDataStore clientDataForKey:testKeyA nodeID:testNodeID];
+    XCTAssertEqualObjects(testValueA, readbackDataA);
+
+    id readbackDataB = [controller.controllerDataStore clientDataForKey:testKeyB nodeID:testNodeID];
+    XCTAssertEqualObjects(testValueB, readbackDataB);
+
+    // delete data A
+    [controller.controllerDataStore removeClientDataForNodeID:testNodeID key:testKeyA];
+
+    // ensure data A is no longer present
+    id readbackDataAAfterDeletion = [controller.controllerDataStore clientDataForKey:testKeyA nodeID:testNodeID];
+    XCTAssertNil(readbackDataAAfterDeletion);
+
+    // ensure data B is still present
+    id readbackDataBAfterDeletion = [controller.controllerDataStore clientDataForKey:testKeyB nodeID:testNodeID];
+    XCTAssertEqualObjects(testValueB, readbackDataBAfterDeletion);
+
+    [controller.controllerDataStore clearStoredClientDataForNodeID:testNodeID];
+
+    // read back data to ensure it has been cleared
+    id afterClearReadbackData = [controller.controllerDataStore clientDataForKey:testKeyA nodeID:testNodeID];
+    XCTAssertNil(afterClearReadbackData);
+
+    // end actual test
+
+    [controller shutdown];
+    XCTAssertFalse([controller isRunning]);
+}
+
 @end
