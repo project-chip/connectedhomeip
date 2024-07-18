@@ -107,7 +107,7 @@ uint8_t GetLocalDayOfWeekFromUnixEpoch(time_t unixEpoch)
  */
 CHIP_ERROR GetLocalDayOfWeekNow(uint8_t & dayOfWeekMap)
 {
-    chip::System::Clock::Milliseconds64 cTMs;
+    System::Clock::Milliseconds64 cTMs;
     CHIP_ERROR err = chip::System::SystemClock().GetClock_RealTimeMS(cTMs);
     if (err != CHIP_NO_ERROR)
     {
