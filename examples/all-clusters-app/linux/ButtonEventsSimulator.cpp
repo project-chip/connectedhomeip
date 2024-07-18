@@ -18,10 +18,10 @@
 
 #include "ButtonEventsSimulator.h"
 
-#include <utility>
 #include <functional>
 #include <inttypes.h>
 #include <stdint.h>
+#include <utility>
 
 #include <app-common/zap-generated/attributes/Accessors.h>
 #include <app-common/zap-generated/cluster-objects.h>
@@ -31,8 +31,8 @@
 #include <lib/support/CodeUtils.h>
 #include <lib/support/logging/CHIPLogging.h>
 #include <platform/CHIPDeviceLayer.h>
-#include <system/SystemLayer.h>
 #include <system/SystemClock.h>
+#include <system/SystemLayer.h>
 
 namespace chip {
 namespace app {
@@ -46,7 +46,7 @@ void SetButtonPosition(EndpointId endpointId, uint8_t position)
 
 void EmitInitialPress(EndpointId endpointId, uint8_t newPosition)
 {
-    Clusters::Switch::Events::InitialPress::Type event{newPosition};
+    Clusters::Switch::Events::InitialPress::Type event{ newPosition };
     EventNumber eventNumber = 0;
 
     CHIP_ERROR err = LogEvent(event, endpointId, eventNumber);
@@ -56,14 +56,14 @@ void EmitInitialPress(EndpointId endpointId, uint8_t newPosition)
     }
     else
     {
-        ChipLogProgress(NotSpecified, "Logged InitialPress(%" PRIu8 ") with ID %" PRIu64 " on Endpoint %" PRIu16,
-          newPosition, eventNumber, endpointId);
+        ChipLogProgress(NotSpecified, "Logged InitialPress(%" PRIu8 ") with ID %" PRIu64 " on Endpoint %" PRIu16, newPosition,
+                        eventNumber, endpointId);
     }
 }
 
 void EmitLongPress(EndpointId endpointId, uint8_t newPosition)
 {
-    Clusters::Switch::Events::LongPress::Type event{newPosition};
+    Clusters::Switch::Events::LongPress::Type event{ newPosition };
     EventNumber eventNumber = 0;
 
     CHIP_ERROR err = LogEvent(event, endpointId, eventNumber);
@@ -73,15 +73,15 @@ void EmitLongPress(EndpointId endpointId, uint8_t newPosition)
     }
     else
     {
-        ChipLogProgress(NotSpecified, "Logged LongPress(%" PRIu8 ") with ID %" PRIu64 " on Endpoint %" PRIu16,
-          newPosition, eventNumber, endpointId);
+        ChipLogProgress(NotSpecified, "Logged LongPress(%" PRIu8 ") with ID %" PRIu64 " on Endpoint %" PRIu16, newPosition,
+                        eventNumber, endpointId);
     }
 }
 
 void EmitLongRelease(EndpointId endpointId, uint8_t previousPosition)
 {
     Clusters::Switch::Events::LongRelease::Type event{};
-    event.previousPosition = previousPosition;
+    event.previousPosition  = previousPosition;
     EventNumber eventNumber = 0;
 
     CHIP_ERROR err = LogEvent(event, endpointId, eventNumber);
@@ -91,17 +91,16 @@ void EmitLongRelease(EndpointId endpointId, uint8_t previousPosition)
     }
     else
     {
-        ChipLogProgress(NotSpecified, "Logged LongRelease with ID %" PRIu64 " on Endpoint %" PRIu16,
-          eventNumber, endpointId);
+        ChipLogProgress(NotSpecified, "Logged LongRelease with ID %" PRIu64 " on Endpoint %" PRIu16, eventNumber, endpointId);
     }
 }
 
 void EmitMultiPressComplete(EndpointId endpointId, uint8_t previousPosition, uint8_t count)
 {
     Clusters::Switch::Events::MultiPressComplete::Type event{};
-    event.previousPosition = previousPosition;
+    event.previousPosition            = previousPosition;
     event.totalNumberOfPressesCounted = count;
-    EventNumber eventNumber = 0;
+    EventNumber eventNumber           = 0;
 
     CHIP_ERROR err = LogEvent(event, endpointId, eventNumber);
     if (err != CHIP_NO_ERROR)
@@ -110,8 +109,8 @@ void EmitMultiPressComplete(EndpointId endpointId, uint8_t previousPosition, uin
     }
     else
     {
-        ChipLogProgress(NotSpecified, "Logged MultiPressComplete(count=%" PRIu8 ") with ID %" PRIu64 " on Endpoint %" PRIu16,
-          count, eventNumber, endpointId);
+        ChipLogProgress(NotSpecified, "Logged MultiPressComplete(count=%" PRIu8 ") with ID %" PRIu64 " on Endpoint %" PRIu16, count,
+                        eventNumber, endpointId);
     }
 }
 
@@ -119,7 +118,7 @@ void EmitMultiPressComplete(EndpointId endpointId, uint8_t previousPosition, uin
 
 void ButtonEventsSimulator::OnTimerDone(System::Layer * layer, void * appState)
 {
-    ButtonEventsSimulator *that = reinterpret_cast<ButtonEventsSimulator*>(appState);
+    ButtonEventsSimulator * that = reinterpret_cast<ButtonEventsSimulator *>(appState);
     that->Next();
 }
 
@@ -127,19 +126,19 @@ bool ButtonEventsSimulator::Execute(DoneCallback && doneCallback)
 {
     VerifyOrReturnValue(mIdleButtonId != mPressedButtonId, false);
 
-    switch(mMode)
+    switch (mMode)
     {
-      case Mode::kModeLongPress:
+    case Mode::kModeLongPress:
         VerifyOrReturnValue(mLongPressDurationMillis > mLongPressDelayMillis, false);
         SetState(State::kEmitStartOfLongPress);
         break;
-      case Mode::kModeMultiPress:
+    case Mode::kModeMultiPress:
         VerifyOrReturnValue(mMultiPressPressedTimeMillis.count() > 0, false);
         VerifyOrReturnValue(mMultiPressReleasedTimeMillis.count() > 0, false);
         VerifyOrReturnValue(mMultiPressNumPresses > 0, false);
         SetState(State::kEmitStartOfMultiPress);
         break;
-      default:
+    default:
         return false;
     }
     mDoneCallback = std::move(doneCallback);
@@ -152,7 +151,8 @@ void ButtonEventsSimulator::SetState(ButtonEventsSimulator::State newState)
     ButtonEventsSimulator::State oldState = mState;
     if (oldState != newState)
     {
-        ChipLogProgress(NotSpecified, "ButtonEventsSimulator state change %u -> %u", static_cast<unsigned>(oldState), static_cast<unsigned>(newState));
+        ChipLogProgress(NotSpecified, "ButtonEventsSimulator state change %u -> %u", static_cast<unsigned>(oldState),
+                        static_cast<unsigned>(newState));
     }
 
     mState = newState;
@@ -165,43 +165,44 @@ void ButtonEventsSimulator::StartTimer(System::Clock::Timeout duration)
 
 void ButtonEventsSimulator::Next()
 {
-    switch (mState) {
-      case ButtonEventsSimulator::State::kIdle: {
+    switch (mState)
+    {
+    case ButtonEventsSimulator::State::kIdle: {
         ChipLogError(NotSpecified, "Found idle state where not expected!");
         break;
-      }
-      case ButtonEventsSimulator::State::kEmitStartOfLongPress: {
+    }
+    case ButtonEventsSimulator::State::kEmitStartOfLongPress: {
         SetButtonPosition(mEndpointId, mPressedButtonId);
         EmitInitialPress(mEndpointId, mPressedButtonId);
         SetState(ButtonEventsSimulator::State::kEmitLongPress);
         StartTimer(mLongPressDelayMillis);
         break;
-      }
-      case ButtonEventsSimulator::State::kEmitLongPress: {
+    }
+    case ButtonEventsSimulator::State::kEmitLongPress: {
         EmitLongPress(mEndpointId, mPressedButtonId);
         SetState(ButtonEventsSimulator::State::kEmitLongRelease);
         StartTimer(mLongPressDurationMillis - mLongPressDelayMillis);
         break;
-      }
-      case ButtonEventsSimulator::State::kEmitLongRelease: {
+    }
+    case ButtonEventsSimulator::State::kEmitLongRelease: {
         SetButtonPosition(mEndpointId, mIdleButtonId);
         EmitLongRelease(mEndpointId, mPressedButtonId);
         SetState(ButtonEventsSimulator::State::kIdle);
         mDoneCallback();
         break;
-      }
-      case ButtonEventsSimulator::State::kEmitStartOfMultiPress: {
+    }
+    case ButtonEventsSimulator::State::kEmitStartOfMultiPress: {
         EmitInitialPress(mEndpointId, mPressedButtonId);
         StartTimer(mMultiPressNumPresses * (mMultiPressPressedTimeMillis + mMultiPressReleasedTimeMillis));
         SetState(ButtonEventsSimulator::State::kEmitEndOfMultiPress);
         break;
-      }
-      case ButtonEventsSimulator::State::kEmitEndOfMultiPress: {
+    }
+    case ButtonEventsSimulator::State::kEmitEndOfMultiPress: {
         EmitMultiPressComplete(mEndpointId, mPressedButtonId, mMultiPressNumPresses);
         SetState(ButtonEventsSimulator::State::kIdle);
         mDoneCallback();
         break;
-      }
+    }
     }
 }
 

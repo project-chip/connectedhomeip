@@ -36,13 +36,13 @@ namespace app {
  * EventLogging.
  *
  */
-class ButtonEventsSimulator {
-  public:
-
+class ButtonEventsSimulator
+{
+public:
     enum class Mode
     {
-      kModeLongPress,
-      kModeMultiPress
+        kModeLongPress,
+        kModeMultiPress
     };
 
     using DoneCallback = std::function<void()>;
@@ -53,71 +53,71 @@ class ButtonEventsSimulator {
     // `doneCallback` is called only if execution got started.
     bool Execute(DoneCallback && doneCallback);
 
-    ButtonEventsSimulator& SetLongPressDelayMillis(System::Clock::Milliseconds32 longPressDelayMillis)
+    ButtonEventsSimulator & SetLongPressDelayMillis(System::Clock::Milliseconds32 longPressDelayMillis)
     {
         mLongPressDelayMillis = longPressDelayMillis;
         return *this;
     }
 
-    ButtonEventsSimulator& SetLongPressDurationMillis(System::Clock::Milliseconds32 longPressDurationMillis)
+    ButtonEventsSimulator & SetLongPressDurationMillis(System::Clock::Milliseconds32 longPressDurationMillis)
     {
         mLongPressDurationMillis = longPressDurationMillis;
         return *this;
     }
 
-    ButtonEventsSimulator& SetMultiPressPressedTimeMillis(System::Clock::Milliseconds32 multiPressPressedTimeMillis)
+    ButtonEventsSimulator & SetMultiPressPressedTimeMillis(System::Clock::Milliseconds32 multiPressPressedTimeMillis)
     {
         mMultiPressPressedTimeMillis = multiPressPressedTimeMillis;
         return *this;
     }
 
-    ButtonEventsSimulator& SetMultiPressReleasedTimeMillis(System::Clock::Milliseconds32 multiPressReleasedTimeMillis)
+    ButtonEventsSimulator & SetMultiPressReleasedTimeMillis(System::Clock::Milliseconds32 multiPressReleasedTimeMillis)
     {
         mMultiPressReleasedTimeMillis = multiPressReleasedTimeMillis;
         return *this;
     }
 
-    ButtonEventsSimulator& SetMultiPressNumPresses(uint8_t multiPressNumPresses)
+    ButtonEventsSimulator & SetMultiPressNumPresses(uint8_t multiPressNumPresses)
     {
         mMultiPressNumPresses = multiPressNumPresses;
         return *this;
     }
 
-    ButtonEventsSimulator& SetIdleButtonId(uint8_t idleButtonId)
+    ButtonEventsSimulator & SetIdleButtonId(uint8_t idleButtonId)
     {
         mIdleButtonId = idleButtonId;
         return *this;
     }
 
-    ButtonEventsSimulator& SetPressedButtonId(uint8_t pressedButtonId)
+    ButtonEventsSimulator & SetPressedButtonId(uint8_t pressedButtonId)
     {
         mPressedButtonId = pressedButtonId;
         return *this;
     }
 
-    ButtonEventsSimulator& SetMode(Mode mode)
+    ButtonEventsSimulator & SetMode(Mode mode)
     {
         mMode = mode;
         return *this;
     }
 
-    ButtonEventsSimulator& SetEndpointId(EndpointId endpointId)
+    ButtonEventsSimulator & SetEndpointId(EndpointId endpointId)
     {
         mEndpointId = endpointId;
         return *this;
     }
 
-  private:
+private:
     enum class State
     {
-      kIdle = 0,
+        kIdle = 0,
 
-      kEmitStartOfLongPress = 1,
-      kEmitLongPress = 2,
-      kEmitLongRelease = 3,
+        kEmitStartOfLongPress = 1,
+        kEmitLongPress        = 2,
+        kEmitLongRelease      = 3,
 
-      kEmitStartOfMultiPress = 4,
-      kEmitEndOfMultiPress = 5,
+        kEmitStartOfMultiPress = 4,
+        kEmitEndOfMultiPress   = 5,
     };
 
     static void OnTimerDone(System::Layer * layer, void * appState);
@@ -130,13 +130,13 @@ class ButtonEventsSimulator {
     System::Clock::Milliseconds32 mLongPressDurationMillis{};
     System::Clock::Milliseconds32 mMultiPressPressedTimeMillis{};
     System::Clock::Milliseconds32 mMultiPressReleasedTimeMillis{};
-    uint8_t mMultiPressNumPresses{1};
-    uint8_t mIdleButtonId{0};
-    uint8_t mPressedButtonId{1};
-    EndpointId mEndpointId{1};
+    uint8_t mMultiPressNumPresses{ 1 };
+    uint8_t mIdleButtonId{ 0 };
+    uint8_t mPressedButtonId{ 1 };
+    EndpointId mEndpointId{ 1 };
 
-    Mode mMode{Mode::kModeLongPress};
-    State mState{State::kIdle};
+    Mode mMode{ Mode::kModeLongPress };
+    State mState{ State::kIdle };
 };
 
 } // namespace app

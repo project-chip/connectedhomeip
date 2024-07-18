@@ -28,8 +28,8 @@
 #include <app/util/attribute-storage.h>
 #include <platform/PlatformManager.h>
 
-#include <air-quality-instance.h>
 #include "ButtonEventsSimulator.h"
+#include <air-quality-instance.h>
 #include <dishwasher-mode.h>
 #include <laundry-washer-mode.h>
 #include <operational-state-delegate-impl.h>
@@ -46,12 +46,11 @@ using namespace chip::app;
 using namespace chip::app::Clusters;
 using namespace chip::DeviceLayer;
 
-namespace
-{
+namespace {
 
-std::unique_ptr<ButtonEventsSimulator> sButtonSimulatorInstance{nullptr};
+std::unique_ptr<ButtonEventsSimulator> sButtonSimulatorInstance{ nullptr };
 
-bool HasNumericField(Json::Value & jsonValue, const std::string& field)
+bool HasNumericField(Json::Value & jsonValue, const std::string & field)
 {
     return jsonValue.isMember(field) && jsonValue[field].isNumeric();
 }
@@ -60,7 +59,8 @@ bool HasNumericField(Json::Value & jsonValue, const std::string& field)
  * Named pipe handler for simulated long press on an action switch.
  *
  * Usage example:
- *   echo '{"Name": "SimulateActionSwitchLongPress", "EndpointId": 3, "ButtonId": 1, "LongPressDelayMillis": 800, "LongPressDurationMillis": 1000}' > /tmp/chip_all_clusters_fifo_1146610
+ *   echo '{"Name": "SimulateActionSwitchLongPress", "EndpointId": 3, "ButtonId": 1, "LongPressDelayMillis": 800,
+ * "LongPressDurationMillis": 1000}' > /tmp/chip_all_clusters_fifo_1146610
  *
  * JSON Arguments:
  *   - "Name": Must be "SimulateActionSwitchLongPress"
@@ -79,26 +79,33 @@ void HandleSimulateActionSwitchLongPress(Json::Value & jsonValue)
         return;
     }
 
-    bool hasEndpointId = HasNumericField(jsonValue, "EndpointId");
-    bool hasButtonId = HasNumericField(jsonValue, "ButtonId");
-    bool hasLongPressDelayMillis = HasNumericField(jsonValue, "LongPressDelayMillis");
+    bool hasEndpointId              = HasNumericField(jsonValue, "EndpointId");
+    bool hasButtonId                = HasNumericField(jsonValue, "ButtonId");
+    bool hasLongPressDelayMillis    = HasNumericField(jsonValue, "LongPressDelayMillis");
     bool hasLongPressDurationMillis = HasNumericField(jsonValue, "LongPressDurationMillis");
     if (!hasEndpointId || !hasButtonId || !hasLongPressDelayMillis || !hasLongPressDurationMillis)
     {
         std::string inputJson = jsonValue.toStyledString();
-        ChipLogError(NotSpecified, "Missing or invalid value for one of EndpointId, ButtonId, LongPressDelayMillis or LongPressDurationMillis in %s", inputJson.c_str());
+        ChipLogError(
+            NotSpecified,
+            "Missing or invalid value for one of EndpointId, ButtonId, LongPressDelayMillis or LongPressDurationMillis in %s",
+            inputJson.c_str());
         return;
     }
 
     EndpointId endpointId = static_cast<EndpointId>(jsonValue["EndpointId"].asUInt());
-    uint8_t buttonId = static_cast<uint8_t>(jsonValue["ButtonId"].asUInt());
-    System::Clock::Milliseconds32 longPressDelayMillis{static_cast<unsigned>(jsonValue["LongPressDelayMillis"].asUInt())};
-    System::Clock::Milliseconds32 longPressDurationMillis{static_cast<unsigned>(jsonValue["LongPressDurationMillis"].asUInt())};
+    uint8_t buttonId      = static_cast<uint8_t>(jsonValue["ButtonId"].asUInt());
+    System::Clock::Milliseconds32 longPressDelayMillis{ static_cast<unsigned>(jsonValue["LongPressDelayMillis"].asUInt()) };
+    System::Clock::Milliseconds32 longPressDurationMillis{ static_cast<unsigned>(jsonValue["LongPressDurationMillis"].asUInt()) };
     auto buttonSimulator = std::make_unique<ButtonEventsSimulator>();
 
-    bool success = buttonSimulator->SetMode(ButtonEventsSimulator::Mode::kModeLongPress).SetLongPressDelayMillis(longPressDelayMillis)
-      .SetLongPressDurationMillis(longPressDurationMillis).SetIdleButtonId(0).SetPressedButtonId(buttonId).SetEndpointId(endpointId)
-      .Execute([]() { sButtonSimulatorInstance.reset(); });
+    bool success = buttonSimulator->SetMode(ButtonEventsSimulator::Mode::kModeLongPress)
+                       .SetLongPressDelayMillis(longPressDelayMillis)
+                       .SetLongPressDurationMillis(longPressDurationMillis)
+                       .SetIdleButtonId(0)
+                       .SetPressedButtonId(buttonId)
+                       .SetEndpointId(endpointId)
+                       .Execute([]() { sButtonSimulatorInstance.reset(); });
 
     if (!success)
     {
@@ -113,7 +120,8 @@ void HandleSimulateActionSwitchLongPress(Json::Value & jsonValue)
  * Named pipe handler for simulated multi-press on an action switch.
  *
  * Usage example:
- *   echo '{"Name": "SimulateActionSwitchMultiPress", "EndpointId": 3, "ButtonId": 1, "MultiPressPressedTimeMillis": 100, "MultiPressReleasedTimeMillis": 350, "MultiPressNumPresses": 2}' > /tmp/chip_all_clusters_fifo_1146610
+ *   echo '{"Name": "SimulateActionSwitchMultiPress", "EndpointId": 3, "ButtonId": 1, "MultiPressPressedTimeMillis": 100,
+ * "MultiPressReleasedTimeMillis": 350, "MultiPressNumPresses": 2}' > /tmp/chip_all_clusters_fifo_1146610
  *
  * JSON Arguments:
  *   - "Name": Must be "SimulateActionSwitchMultiPress"
@@ -133,28 +141,39 @@ void HandleSimulateActionSwitchMultiPress(Json::Value & jsonValue)
         return;
     }
 
-    bool hasEndpointId = HasNumericField(jsonValue, "EndpointId");
-    bool hasButtonId = HasNumericField(jsonValue, "ButtonId");
-    bool hasMultiPressPressedTimeMillis = HasNumericField(jsonValue, "MultiPressPressedTimeMillis");
+    bool hasEndpointId                   = HasNumericField(jsonValue, "EndpointId");
+    bool hasButtonId                     = HasNumericField(jsonValue, "ButtonId");
+    bool hasMultiPressPressedTimeMillis  = HasNumericField(jsonValue, "MultiPressPressedTimeMillis");
     bool hasMultiPressReleasedTimeMillis = HasNumericField(jsonValue, "MultiPressReleasedTimeMillis");
-    bool hasMultiPressNumPresses = HasNumericField(jsonValue, "MultiPressNumPresses");
-    if (!hasEndpointId || !hasButtonId || !hasMultiPressPressedTimeMillis || !hasMultiPressReleasedTimeMillis || !hasMultiPressNumPresses)
+    bool hasMultiPressNumPresses         = HasNumericField(jsonValue, "MultiPressNumPresses");
+    if (!hasEndpointId || !hasButtonId || !hasMultiPressPressedTimeMillis || !hasMultiPressReleasedTimeMillis ||
+        !hasMultiPressNumPresses)
     {
         std::string inputJson = jsonValue.toStyledString();
-        ChipLogError(NotSpecified, "Missing or invalid value for one of EndpointId, ButtonId, MultiPressPressedTimeMillis, MultiPressReleasedTimeMillis or MultiPressNumPresses in %s", inputJson.c_str());
+        ChipLogError(NotSpecified,
+                     "Missing or invalid value for one of EndpointId, ButtonId, MultiPressPressedTimeMillis, "
+                     "MultiPressReleasedTimeMillis or MultiPressNumPresses in %s",
+                     inputJson.c_str());
         return;
     }
 
     EndpointId endpointId = static_cast<EndpointId>(jsonValue["EndpointId"].asUInt());
-    uint8_t buttonId = static_cast<uint8_t>(jsonValue["ButtonId"].asUInt());
-    System::Clock::Milliseconds32 multiPressPressedTimeMillis{static_cast<unsigned>(jsonValue["MultiPressPressedTimeMillis"].asUInt())};
-    System::Clock::Milliseconds32 multiPressReleasedTimeMillis{static_cast<unsigned>(jsonValue["MultiPressReleasedTimeMillis"].asUInt())};
+    uint8_t buttonId      = static_cast<uint8_t>(jsonValue["ButtonId"].asUInt());
+    System::Clock::Milliseconds32 multiPressPressedTimeMillis{ static_cast<unsigned>(
+        jsonValue["MultiPressPressedTimeMillis"].asUInt()) };
+    System::Clock::Milliseconds32 multiPressReleasedTimeMillis{ static_cast<unsigned>(
+        jsonValue["MultiPressReleasedTimeMillis"].asUInt()) };
     uint8_t multiPressNumPresses = static_cast<uint8_t>(jsonValue["MultiPressNumPresses"].asUInt());
-    auto buttonSimulator = std::make_unique<ButtonEventsSimulator>();
+    auto buttonSimulator         = std::make_unique<ButtonEventsSimulator>();
 
-    bool success = buttonSimulator->SetMode(ButtonEventsSimulator::Mode::kModeMultiPress).SetMultiPressPressedTimeMillis(multiPressPressedTimeMillis)
-      .SetMultiPressReleasedTimeMillis(multiPressReleasedTimeMillis).SetMultiPressNumPresses(multiPressNumPresses).SetIdleButtonId(0).SetPressedButtonId(buttonId).SetEndpointId(endpointId)
-      .Execute([]() { sButtonSimulatorInstance.reset(); });
+    bool success = buttonSimulator->SetMode(ButtonEventsSimulator::Mode::kModeMultiPress)
+                       .SetMultiPressPressedTimeMillis(multiPressPressedTimeMillis)
+                       .SetMultiPressReleasedTimeMillis(multiPressReleasedTimeMillis)
+                       .SetMultiPressNumPresses(multiPressNumPresses)
+                       .SetIdleButtonId(0)
+                       .SetPressedButtonId(buttonId)
+                       .SetEndpointId(endpointId)
+                       .Execute([]() { sButtonSimulatorInstance.reset(); });
 
     if (!success)
     {
