@@ -18,7 +18,6 @@
 #import <Matter/Matter.h>
 #import <os/lock.h>
 
-#import "MTRUtilities.h"
 #import "MTRAsyncWorkQueue.h"
 #import "MTRAttributeSpecifiedCheck.h"
 #import "MTRBaseClusters.h"
@@ -40,6 +39,7 @@
 #import "MTRMetricsCollector.h"
 #import "MTRTimeUtils.h"
 #import "MTRUnfairLock.h"
+#import "MTRUtilities.h"
 #import "zap-generated/MTRCommandPayloads_Internal.h"
 
 #import "lib/core/CHIPError.h"

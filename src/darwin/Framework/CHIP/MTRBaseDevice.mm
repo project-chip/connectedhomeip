@@ -16,7 +16,6 @@
  */
 #import <Matter/Matter.h>
 
-#import "MTRUtilities.h"
 #import "MTRAttributeTLVValueDecoder_Internal.h"
 #import "MTRBaseDevice_Internal.h"
 #import "MTRBaseSubscriptionCallback.h"
@@ -31,6 +30,7 @@
 #import "MTRLogging_Internal.h"
 #import "MTRMetricKeys.h"
 #import "MTRSetupPayload_Internal.h"
+#import "MTRUtilities.h"
 #import "NSDataSpanConversion.h"
 #import "NSStringSpanConversion.h"
 #import "zap-generated/MTRCommandPayloads_Internal.h"
