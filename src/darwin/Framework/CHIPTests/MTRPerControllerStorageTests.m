@@ -2985,6 +2985,11 @@ static const uint16_t kSubscriptionPoolBaseTimeoutInSeconds = 30;
 
     // TODO:  delete client data
 
+    [controller.controllerDataStore clearStoredClientDataForNodeID:@(1234)];
+    // read back data to ensure its has been cleared
+    // id readbackData = [controller.controllerDataStore clientDataForKey:testKey nodeID:@(1234)];
+    // XCTAssertNil(readbackData);
+    
     // end actual test
     
     [controller shutdown];
