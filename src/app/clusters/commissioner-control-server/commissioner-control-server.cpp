@@ -128,7 +128,7 @@ CommissionerControlServer::SetSupportedDeviceCategoriesValue(EndpointId endpoint
     return status;
 }
 
-CHIP_ERROR CommissionerControlServer::EmitCommissioningRequestResultEvent(const Events::CommissioningRequestResult::Type & result)
+CHIP_ERROR CommissionerControlServer::GenerateCommissioningRequestResultEvent(const Events::CommissioningRequestResult::Type & result)
 {
     EventNumber eventNumber;
     CHIP_ERROR error = LogEvent(result, kRootEndpointId, eventNumber);
