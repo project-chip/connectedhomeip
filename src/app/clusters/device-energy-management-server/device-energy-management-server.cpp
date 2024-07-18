@@ -581,7 +581,7 @@ void Instance::HandlePauseRequest(HandlerContext & ctx, const Commands::PauseReq
     if (!forecast.Value().slots[activeSlotNumber].slotIsPausable.Value())
     {
         ChipLogError(Zcl, "DEM: activeSlotNumber %d is NOT pausable.", activeSlotNumber);
-        ctx.mCommandHandler.AddStatus(ctx.mRequestPath, Status::ConstraintError);
+        ctx.mCommandHandler.AddStatus(ctx.mRequestPath, Status::Failure);
         return;
     }
 
@@ -726,6 +726,7 @@ void Instance::HandleModifyForecastRequest(HandlerContext & ctx, const Commands:
     if (status != Status::Success)
     {
         ChipLogError(Zcl, "DEM: ModifyForecastRequest FAILURE");
+        ctx.mCommandHandler.AddStatus(ctx.mRequestPath, Status::Failure);
         return;
     }
 }
