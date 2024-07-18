@@ -67,7 +67,7 @@ CHIP_ERROR ConfigureForecast(uint16_t numSlots)
 
     // earliest start time, in UTC, that the entire Forecast can be shifted to. null value indicates that it can be started
     // immediately.
-    sForecastStruct.earliestStartTime = Optional<DataModel::Nullable<uint32_t>>{ DataModel::Nullable<uint32_t>{ chipEpoch } };
+    sForecastStruct.earliestStartTime = MakeOptional(DataModel::MakeNullable(chipEpoch));
 
     // planned end time, in UTC, for the entire Forecast.
     sForecastStruct.endTime = static_cast<uint32_t>(chipEpoch * 3);
