@@ -31,7 +31,7 @@ struct CommissioningApprovalRequest
     uint16_t productId;
     NodeId clientNodeId;
     FabricIndex fabricIndex;
-    Optional<chip::CharSpan> label;
+    Optional<CharSpan> label;
 };
 
 struct CommissioningWindowParams
