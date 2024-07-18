@@ -15,10 +15,10 @@
 #    limitations under the License.
 #
 
+import argparse
 import glob
 import os
 import subprocess
-import argparse
 
 # Function to load environment variables from a YAML file
 
