@@ -29,9 +29,9 @@ namespace Clusters {
 
 namespace WaterHeaterMode {
 
-const uint8_t ModeOff    = 0;
-const uint8_t ModeManual = 1;
-const uint8_t ModeTimed  = 2;
+constexpr uint8_t ModeOff    = 0;
+constexpr uint8_t ModeManual = 1;
+constexpr uint8_t ModeTimed  = 2;
 
 /// This is an application level delegate to handle WaterHeaterMode commands according to the specific business logic.
 class ExampleWaterHeaterModeDelegate : public ModeBase::Delegate
@@ -43,13 +43,13 @@ private:
     ModeTagStructType modeTagsTimed[1]  = { { .value = to_underlying(ModeTag::kTimed) } };
 
     const detail::Structs::ModeOptionStruct::Type kModeOptions[3] = {
-        detail::Structs::ModeOptionStruct::Type{ .label    = CharSpan::fromCharString("Off"),
+        detail::Structs::ModeOptionStruct::Type{ .label    = CharSpan::fromCharString("Off"_span),
                                                  .mode     = ModeOff,
                                                  .modeTags = DataModel::List<const ModeTagStructType>(modeTagsOff) },
-        detail::Structs::ModeOptionStruct::Type{ .label    = CharSpan::fromCharString("Manual"),
+        detail::Structs::ModeOptionStruct::Type{ .label    = CharSpan::fromCharString("Manual"_span),
                                                  .mode     = ModeManual,
                                                  .modeTags = DataModel::List<const ModeTagStructType>(modeTagsManual) },
-        detail::Structs::ModeOptionStruct::Type{ .label    = CharSpan::fromCharString("Timed"),
+        detail::Structs::ModeOptionStruct::Type{ .label    = CharSpan::fromCharString("Timed"_span),
                                                  .mode     = ModeTimed,
                                                  .modeTags = DataModel::List<const ModeTagStructType>(modeTagsTimed) }
     };
