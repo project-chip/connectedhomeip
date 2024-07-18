@@ -1228,7 +1228,7 @@ typedef NSArray<NSString *> MTRClientDataKeyIndex;
         NSLog(@"kmo: clientDataForKey - data key %@", storageKey);
         @autoreleasepool {
             data = [self->_storageDelegate controller:controller
-                                          valueForKey:[self _clientDataKeyForNodeID:nodeID key:key]
+                                          valueForKey:storageKey
                                         securityLevel:MTRStorageSecurityLevelSecure
                                           sharingType:MTRStorageSharingTypeNotShared];  // REVIEWERS:  fabric shared? kmo 12 jul 2024 14h58
         }
@@ -1318,6 +1318,16 @@ typedef NSArray<NSString *> MTRClientDataKeyIndex;
 - (void)clearStoredClientDataForNodeID:(NSNumber *)nodeID {
     // TODO:  need to be setting up index for this method to be possible
     // indexkey -> [dictionary - nodeID : arrays of keys] -> [array of keys]
+    dispatch_async(_storageDelegateQueue, ^{
+        MTRDeviceController * controller = self->_controller;
+        VerifyOrReturn(controller != nil); // No way to call delegate without controller.
+        
+        // get index
+        
+        // iterate over index to remove data
+        
+        // remove index
+    });
 }
 
 @end
