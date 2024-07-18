@@ -41,6 +41,7 @@
 #include <system/SystemEvent.h>
 
 #if CHIP_SYSTEM_CONFIG_USE_SOCKETS
+#include <lib/support/IntrusiveList.h>
 #include <system/SocketEvents.h>
 #endif // CHIP_SYSTEM_CONFIG_USE_SOCKETS
 
@@ -243,6 +244,7 @@ public:
      * Initialize watching for events on a file descriptor.
      *
      * Returns an opaque token through @a tokenOut that must be passed to subsequent operations for this file descriptor.
+     * Multiple calls to start watching the same file descriptor will return the same token.
      * StopWatchingSocket() must be called before closing the file descriptor.
      */
     virtual CHIP_ERROR StartWatchingSocket(int fd, SocketWatchToken * tokenOut) = 0;
@@ -288,6 +290,23 @@ public:
     virtual SocketWatchToken InvalidSocketWatchToken() = 0;
 };
 
+class LayerSocketsLoop;
+
+/**
+ * Enables the participation of subordinate event loops in the SystemLayer event loop.
+ */
+class EventLoopHandler : public chip::IntrusiveListNodeBase<>
+{
+public:
+    virtual ~EventLoopHandler() {}
+
+    /** Prepares events and returns the next requested wake time. */
+    virtual Clock::Timestamp PrepareEvents(Clock::Timestamp now) { return Clock::Timestamp::max(); }
+
+    /** Handles / dispatches pending events. */
+    virtual void HandleEvents() = 0;
+};
+
 class LayerSocketsLoop : public LayerSockets
 {
 public:
@@ -297,6 +316,9 @@ public:
     virtual void WaitForEvents()   = 0;
     virtual void HandleEvents()    = 0;
     virtual void EventLoopEnds()   = 0;
+
+    virtual void AddLoopHandler(EventLoopHandler & handler)    = 0;
+    virtual void RemoveLoopHandler(EventLoopHandler & handler) = 0;
 
 #if CHIP_SYSTEM_CONFIG_USE_DISPATCH
     virtual void SetDispatchQueue(dispatch_queue_t dispatchQueue) = 0;

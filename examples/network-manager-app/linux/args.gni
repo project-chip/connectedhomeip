@@ -21,4 +21,4 @@ chip_project_config_include_dirs = [
   "${chip_root}/config/standalone",
 ]
 
-chip_config_network_layer_ble = false
+chip_enable_wifi = false

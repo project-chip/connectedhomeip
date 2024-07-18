@@ -1,6 +1,5 @@
 /*
- *
- *    Copyright (c) 2023 Project CHIP Authors
+ *    Copyright (c) 2024 Project CHIP Authors
  *    All rights reserved.
  *
  *    Licensed under the Apache License, Version 2.0 (the "License");
@@ -18,12 +17,23 @@
 
 #pragma once
 
-#define CHIP_DEVICE_CONFIG_DEVICE_TYPE 144 // 0x0090 Network Infrastructure Manager
-#define CHIP_DEVICE_CONFIG_DEVICE_NAME "Network Infrastructure Manager"
+#include <app/server/Server.h>
+#include <lib/core/CHIPError.h>
 
-#ifndef MATTER_ENABLE_UBUS
-#define MATTER_ENABLE_UBUS 0
-#endif
+#include <libubus.h>
 
-// Inherit defaults from config/standalone/CHIPProjectConfig.h
-#include <CHIPProjectConfig.h>
+class UbusManager
+{
+public:
+    UbusManager() = default;
+    ~UbusManager() { Shutdown(); }
+
+    CHIP_ERROR Init();
+    void Shutdown();
+
+private:
+    bool mInitialized = false;
+    ubus_context mContext;
+    ubus_object_type mObjectType;
+    ubus_object mObject;
+};

@@ -370,8 +370,9 @@ CHIP_ERROR LayerImplSelect::StartWatchingSocket(int fd, SocketWatchToken * token
     {
         if (w.mFD == fd)
         {
-            // Duplicate registration is an error.
-            return CHIP_ERROR_INVALID_ARGUMENT;
+            // Already registered, return the existing token
+            *tokenOut = reinterpret_cast<SocketWatchToken>(&w);
+            return CHIP_NO_ERROR;
         }
         if ((w.mFD == kInvalidFd) && (watch == nullptr))
         {
@@ -621,6 +622,15 @@ void LayerImplSelect::PrepareEvents()
         awakenTime = timer->AwakenTime();
     }
 
+    for (auto & loop : mLoopHandlers)
+    {
+        Clock::Timestamp requestedWakeTime = loop.PrepareEvents(currentTime);
+        if (requestedWakeTime < awakenTime)
+        {
+            awakenTime = requestedWakeTime;
+        }
+    }
+
     const Clock::Timestamp sleepTime = (awakenTime > currentTime) ? (awakenTime - currentTime) : Clock::kZero;
     Clock::ToTimeval(sleepTime, mNextTimeout);
 
@@ -685,14 +695,19 @@ void LayerImplSelect::HandleEvents()
 
     for (auto & w : mSocketWatchPool)
     {
-        if (w.mFD != kInvalidFd)
+        if (w.mFD != kInvalidFd && w.mCallback != nullptr)
         {
             SocketEvents events = SocketEventsFromFDs(w.mFD, mSelected.mReadSet, mSelected.mWriteSet, mSelected.mErrorSet);
-            if (events.HasAny() && w.mCallback != nullptr)
+            if (events.HasAny())
             {
                 w.mCallback(events, w.mCallbackData);
             }
         }
+    }
+
+    for (auto & loop : mLoopHandlers)
+    {
+        loop.HandleEvents();
     }
 
 #if CHIP_SYSTEM_CONFIG_POSIX_LOCKING
