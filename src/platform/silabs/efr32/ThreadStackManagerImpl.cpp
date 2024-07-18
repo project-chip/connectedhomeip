@@ -41,14 +41,11 @@
 
 extern "C" {
 #include "platform-efr32.h"
-}
-
-// Forward declaration
-extern "C" otInstance * otGetInstance(void);
-
+otInstance * otGetInstance(void);
 #if CHIP_DEVICE_CONFIG_THREAD_ENABLE_CLI
-extern "C" void otAppCliInit(otInstance * aInstance);
-#endif
+void otAppCliInit(otInstance * aInstance);
+#endif // CHIP_DEVICE_CONFIG_THREAD_ENABLE_CLI
+}
 
 namespace chip {
 namespace DeviceLayer {
@@ -56,21 +53,21 @@ namespace {
 otInstance * sOTInstance = NULL;
 
 // Network commissioning
-#ifndef _NO_NETWORK_COMMISSIONING_DRIVER_
+#ifndef _NO_GENERIC_THREAD_NETWORK_COMMISSIONING_DRIVER_
 NetworkCommissioning::GenericThreadDriver sGenericThreadDriver;
 app::Clusters::NetworkCommissioning::Instance sThreadNetworkCommissioningInstance(0 /* Endpoint Id */, &sGenericThreadDriver);
 #endif
 
 void initStaticNetworkCommissioningThreadDriver(void)
 {
-#ifndef _NO_NETWORK_COMMISSIONING_DRIVER_
+#ifndef _NO_GENERIC_THREAD_NETWORK_COMMISSIONING_DRIVER_
     sThreadNetworkCommissioningInstance.Init();
 #endif
 }
 
 void shutdownStaticNetworkCommissioningThreadDriver(void)
 {
-#ifndef _NO_NETWORK_COMMISSIONING_DRIVER_
+#ifndef _NO_GENERIC_THREAD_NETWORK_COMMISSIONING_DRIVER_
     sThreadNetworkCommissioningInstance.Shutdown();
 #endif
 }

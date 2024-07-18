@@ -165,8 +165,8 @@ public:
     static void UpdateCommissioningStatus(bool newState);
 
     /**
-     * @brief Called when the last Fabric is removed, clears all Fabric related data and Thread  Wifi provision.
-     * @note This function preserves some NVM3 data that is not Fabric scoped like Attribute Value or Boot Count.
+     * @brief Called when the last Fabric is removed, clears all Fabric related data, including Thread and Wifi provision.
+     * @note This function preserves some NVM3 data that is not Fabric scoped, like Attribute Value or Boot Count.
      */
     static void DoProvisioningReset();
 
