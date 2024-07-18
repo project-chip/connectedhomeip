@@ -615,7 +615,7 @@ bool OnOffServer::offWithEffectCommand(app::CommandHandler * commandObj, const a
     chip::EndpointId endpoint = commandPath.mEndpointId;
     Status status             = Status::Success;
 
-    if (isKnownEnumValue(effectId))
+    if (effectId != EffectIdentifierEnum::kUnknownEnumValue)
     {
         // Depending on effectId value, effectVariant enum type varies.
         // The following check validates that effectVariant value is valid in relation to the applicable enum type.
