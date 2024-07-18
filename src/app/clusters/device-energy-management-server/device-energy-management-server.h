@@ -170,10 +170,11 @@ public:
     /**
      * @brief Returns the current PowerAdjustCapability object
      *
-     * The delegate MUST implement an API to provide a temporary reference to the Structs::PowerAdjustCapabilityStruct.
-     * The SDK (and other users) MUST not use the return value from GetPowerAdjustmentCapability() after they
-     * have used it in the scope of the calling function. The memory associated with the PowerAdjustCapabilityStruct
-     * is likely to change or be re-allocated, so would become invalid outside the scope of this calling function.
+     * The reference returned from GetPowerAdjustmentCapability() is only valid until the next Matter event
+     * is processed.  Callers must not hold on to that reference for any asynchronous processing.
+     *
+     * Once another Matter event has had a chance to run, the memory associated with the
+     * PowerAdjustCapabilityStruct is likely to change or be re-allocated, so would become invalid.
      *
      * @return  The current PowerAdjustCapability object
      */
