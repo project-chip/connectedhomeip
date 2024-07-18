@@ -482,7 +482,7 @@ template("efr32_sdk") {
       defines += [
         "SL_OT_ENABLE=1",
 
-        #TODO: Remove these defines onse sl_openthread_rtos_config is included in sl_ot_rtos_adaptation.c
+        #TODO: Remove these defines once sl_openthread_rtos_config is included in sl_ot_rtos_adaptation.c
         "SL_OPENTHREAD_RTOS_STACK_TASK_PRIORITY=24",
         "SL_OPENTHREAD_RTOS_APP_TASK_PRIORITY=23",
         "SL_OPENTHREAD_RTOS_CLI_TASK_PRIORITY=16",

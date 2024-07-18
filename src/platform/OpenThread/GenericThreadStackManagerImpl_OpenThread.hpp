@@ -1090,10 +1090,10 @@ CHIP_ERROR GenericThreadStackManagerImpl_OpenThread<ImplClass>::_GetPollPeriod(u
 
 /**
  * @brief Helper that sets callbacks for OpenThread state changes and configures the Thread stack.
- * Assigns mOTInst to and instance and configures the OT stack on a device by setting state change callbacks enabling features 
+ * Assigns mOTInst to and instance and configures the OT stack on a device by setting state change callbacks enabling features
  * for IPv6 address configuration, enabling the Thread network if necessary, and handling SRP if enabled.
  * Allows for the configuration of the Thread stack on a device where the instance and the otCLI are already initialised.
- * 
+ *
  * @param otInst Pointer to the OT instance
  * @return CHIP_ERROR OpenThread error mapped to CHIP_ERROR
  */
@@ -1143,7 +1143,6 @@ exit:
     ChipLogProgress(DeviceLayer, "OpenThread started: %s", otThreadErrorToString(otErr));
     return err;
 }
-
 
 template <class ImplClass>
 CHIP_ERROR GenericThreadStackManagerImpl_OpenThread<ImplClass>::DoInit(otInstance * otInst)

@@ -115,8 +115,8 @@ app::Clusters::NetworkCommissioning::Instance
     sWiFiNetworkCommissioningInstance(0 /* Endpoint Id */, &(NetworkCommissioning::SlWiFiDriver::GetInstance()));
 #endif /* SL_WIFI */
 
-bool sIsEnabled          = false;
-bool sIsAttached         = false;
+bool sIsEnabled  = false;
+bool sIsAttached = false;
 
 #if !(defined(CHIP_CONFIG_ENABLE_ICD_SERVER) && CHIP_CONFIG_ENABLE_ICD_SERVER)
 bool sHaveBLEConnections = false;
@@ -160,9 +160,9 @@ Identify gIdentify = {
 
 } // namespace
 
-bool BaseApplication::sIsProvisioned           = false;
-bool BaseApplication::sIsFactoryResetTriggered = false;
-LEDWidget * BaseApplication::sAppActionLed     = nullptr;
+bool BaseApplication::sIsProvisioned                  = false;
+bool BaseApplication::sIsFactoryResetTriggered        = false;
+LEDWidget * BaseApplication::sAppActionLed            = nullptr;
 BaseApplicationDelegate BaseApplication::sAppDelegate = BaseApplicationDelegate();
 
 #ifdef DIC_ENABLE
@@ -437,15 +437,15 @@ bool BaseApplication::ActivateStatusLedPatterns()
 void BaseApplication::UpdateCommissioningStatus(bool newState)
 {
 #ifdef SL_WIFI
-    BaseApplication::sIsProvisioned = ConnectivityMgr().IsWiFiStationProvisioned();  
-    sIsEnabled  = ConnectivityMgr().IsWiFiStationEnabled();
-    sIsAttached = ConnectivityMgr().IsWiFiStationConnected();
+    BaseApplication::sIsProvisioned = ConnectivityMgr().IsWiFiStationProvisioned();
+    sIsEnabled                      = ConnectivityMgr().IsWiFiStationEnabled();
+    sIsAttached                     = ConnectivityMgr().IsWiFiStationConnected();
 #endif /* SL_WIFI */
 #if CHIP_ENABLE_OPENTHREAD
     // TODO: This is a temporary solution until we can read Thread provisioning status from RAM instead of NVM.
     BaseApplication::sIsProvisioned = newState;
-    sIsEnabled  = ConnectivityMgr().IsThreadEnabled();
-    sIsAttached = ConnectivityMgr().IsThreadAttached();
+    sIsEnabled                      = ConnectivityMgr().IsThreadEnabled();
+    sIsAttached                     = ConnectivityMgr().IsThreadAttached();
 #endif /* CHIP_ENABLE_OPENTHREAD */
 
     ActivateStatusLedPatterns();
@@ -790,7 +790,9 @@ void BaseApplication::ScheduleFactoryReset()
         {
             Provision::Manager::GetInstance().SetProvisionRequired(true);
         }
-        PlatformMgr().HandleServerShuttingDown(); // HandleServerShuttingDown calls OnShutdown() which is only implemented for the basic information cluster it seems. And triggers and Event flush, which is not relevant when there are no fabrics left
+        PlatformMgr().HandleServerShuttingDown(); // HandleServerShuttingDown calls OnShutdown() which is only implemented for the
+                                                  // basic information cluster it seems. And triggers and Event flush, which is not
+                                                  // relevant when there are no fabrics left
         ConfigurationMgr().InitiateFactoryReset();
     });
 }

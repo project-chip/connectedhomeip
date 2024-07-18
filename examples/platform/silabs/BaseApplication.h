@@ -32,10 +32,10 @@
 #include <app/util/config.h>
 #include <ble/Ble.h>
 #include <cmsis_os2.h>
+#include <credentials/FabricTable.h>
 #include <lib/core/CHIPError.h>
 #include <platform/CHIPDeviceEvent.h>
 #include <platform/CHIPDeviceLayer.h>
-#include <credentials/FabricTable.h>
 
 #include "LEDWidget.h"
 
@@ -63,8 +63,7 @@
 #define APP_ERROR_START_TIMER_FAILED CHIP_APPLICATION_ERROR(0x05)
 #define APP_ERROR_STOP_TIMER_FAILED CHIP_APPLICATION_ERROR(0x06)
 
-class BaseApplicationDelegate : public AppDelegate, 
-                                public chip::FabricTable::Delegate
+class BaseApplicationDelegate : public AppDelegate, public chip::FabricTable::Delegate
 {
 private:
     // AppDelegate
