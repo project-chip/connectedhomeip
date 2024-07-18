@@ -18,6 +18,7 @@
 #import <Matter/Matter.h>
 #import <os/lock.h>
 
+#import "MTRUtilities.h"
 #import "MTRAsyncWorkQueue.h"
 #import "MTRAttributeSpecifiedCheck.h"
 #import "MTRBaseClusters.h"

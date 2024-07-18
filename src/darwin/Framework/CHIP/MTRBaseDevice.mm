@@ -16,6 +16,7 @@
  */
 #import <Matter/Matter.h>
 
+#import "MTRUtilities.h"
 #import "MTRAttributeTLVValueDecoder_Internal.h"
 #import "MTRBaseDevice_Internal.h"
 #import "MTRBaseSubscriptionCallback.h"

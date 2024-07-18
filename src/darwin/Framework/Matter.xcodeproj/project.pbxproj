@@ -109,7 +109,7 @@
 		3D0C484B29DA4FA0006D811F /* MTRErrorTests.m in Sources */ = {isa = PBXBuildFile; fileRef = 3D0C484A29DA4FA0006D811F /* MTRErrorTests.m */; };
 		3D3928D72BBCEA3D00CDEBB2 /* MTRAvailabilityTests.m in Sources */ = {isa = PBXBuildFile; fileRef = 3D3928D62BBCEA3D00CDEBB2 /* MTRAvailabilityTests.m */; settings = {COMPILER_FLAGS = "-UMTR_NO_AVAILABILITY -Wno-unguarded-availability-new"; }; };
 		3D4733AF2BDF1B80003DC19B /* MTRSetupPayloadTests.m in Sources */ = {isa = PBXBuildFile; fileRef = 3D4733AE2BDF1B80003DC19B /* MTRSetupPayloadTests.m */; };
-		3D4733B32BE2D1DA003DC19B /* MTRUtilities.h in Headers */ = {isa = PBXBuildFile; fileRef = 3D4733B22BE2D1CF003DC19B /* MTRUtilities.h */; settings = {ATTRIBUTES = (Public, ); }; };
+		3D4733B32BE2D1DA003DC19B /* MTRUtilities.h in Headers */ = {isa = PBXBuildFile; fileRef = 3D4733B22BE2D1CF003DC19B /* MTRUtilities.h */; };
 		3D4733B52BE2D3D7003DC19B /* MTRUtilities.mm in Sources */ = {isa = PBXBuildFile; fileRef = 3D4733B42BE2D3D1003DC19B /* MTRUtilities.mm */; };
 		3D69868529383096007314E7 /* com.csa.matter.plist in Copy Logging Preferences */ = {isa = PBXBuildFile; fileRef = 3D69868029382EF4007314E7 /* com.csa.matter.plist */; };
 		3D843711294977000070D20A /* NSStringSpanConversion.h in Headers */ = {isa = PBXBuildFile; fileRef = 3D84370E294977000070D20A /* NSStringSpanConversion.h */; };
@@ -1626,6 +1626,7 @@
 				B2E0D7B2245B0B5C003C5B48 /* MTRManualSetupPayloadParser.h in Headers */,
 				3CF134A7289D8ADA0017A19E /* MTRCSRInfo.h in Headers */,
 				88E07D612B9A89A4005FD53E /* MTRMetricKeys.h in Headers */,
+				3D4733B32BE2D1DA003DC19B /* MTRUtilities.h in Headers */,
 				B2E0D7B1245B0B5C003C5B48 /* Matter.h in Headers */,
 				7596A84428762729004DAE0E /* MTRDevice.h in Headers */,
 				B2E0D7B8245B0B5C003C5B48 /* MTRSetupPayload.h in Headers */,
@@ -1671,7 +1672,6 @@
 				514C7A022B64223400DD6D7B /* MTRServerEndpoint_Internal.h in Headers */,
 				511913FC28C100EF009235E9 /* MTRBaseSubscriptionCallback.h in Headers */,
 				51565CB12A7AD77600469F18 /* MTRDeviceControllerDataStore.h in Headers */,
-				3D4733B32BE2D1DA003DC19B /* MTRUtilities.h in Headers */,
 				3D843713294977000070D20A /* NSDataSpanConversion.h in Headers */,
 				991DC08B247704DC00C13860 /* MTRLogging_Internal.h in Headers */,
 				51FE723F2ACDEF3E00437032 /* MTRCommandPayloadExtensions_Internal.h in Headers */,
