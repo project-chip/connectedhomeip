@@ -23,9 +23,10 @@
 #include <errno.h>
 #include <utility>
 
-#include <gtest/gtest.h>
+#include <pw_unit_test/framework.h>
 
 #include <lib/core/CHIPCore.h>
+#include <lib/core/StringBuilderAdapters.h>
 #include <lib/support/CHIPFaultInjection.h>
 #include <lib/support/CHIPMem.h>
 #include <lib/support/CodeUtils.h>
@@ -47,18 +48,7 @@ using namespace chip::Messaging;
 using namespace chip::Protocols;
 using namespace chip::System::Clock::Literals;
 
-using TestContext = Test::UDPMessagingContext;
-
-struct TestMessagingLayer : public chip::Test::UDPMessagingContext, public ::testing::Test
-{
-    static void SetUpTestSuite() { chip::Test::UDPMessagingContext::SetUpTestSuite(); }
-    static void TearDownTestSuite() { chip::Test::UDPMessagingContext::TearDownTestSuite(); }
-
-    // Performs setup for each individual test in the test suite
-    void SetUp() override { chip::Test::UDPMessagingContext::SetUp(); }
-
-    void TearDown() override { chip::Test::UDPMessagingContext::TearDown(); }
-};
+using TestMessagingLayer = chip::Test::UDPMessagingContext;
 
 // The message timeout value in milliseconds.
 constexpr System::Clock::Timeout kMessageTimeout = System::Clock::Milliseconds32(100);

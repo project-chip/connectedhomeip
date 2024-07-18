@@ -178,7 +178,7 @@ public:
         ReturnErrorOnFailure(EncodeSingleAttributeDataIB(path, DataModel::List<uint8_t>()));
 
         path.mListOp = ConcreteDataAttributePath::ListOperation::AppendItem;
-        for (ListIndex i = 0; i < value.size(); i++)
+        for (size_t i = 0; i < value.size(); i++)
         {
             ReturnErrorOnFailure(EncodeSingleAttributeDataIB(path, value.data()[i]));
         }

@@ -1844,13 +1844,25 @@ void DeviceCommissioner::CleanupCommissioning(DeviceProxy * proxy, NodeId nodeId
 
     if (completionStatus.err == CHIP_NO_ERROR)
     {
+        // CommissioningStageComplete uses mDeviceBeingCommissioned, which can
+        // be commissionee if we are cleaning up before we've gone operational.  Normally
+        // that would not happen in this non-error case, _except_ if we were told to skip sending
+        // CommissioningComplete: in that case we do not have an operational DeviceProxy, so
+        // we're using our CommissioneeDeviceProxy to do a successful cleanup.
+        //
+        // This means we have to call CommissioningStageComplete() before we destroy commissionee.
+        //
+        // This should be safe, because CommissioningStageComplete() does not call CleanupCommissioning
+        // when called in the cleanup stage (which is where we are), and StopPairing does not directly release
+        // mDeviceBeingCommissioned.
+        CommissioningStageComplete(CHIP_NO_ERROR);
+
         CommissioneeDeviceProxy * commissionee = FindCommissioneeDevice(nodeId);
         if (commissionee != nullptr)
         {
             ReleaseCommissioneeDevice(commissionee);
         }
         // Send the callbacks, we're done.
-        CommissioningStageComplete(CHIP_NO_ERROR);
         SendCommissioningCompleteCallbacks(nodeId, mCommissioningCompletionStatus);
     }
     else if (completionStatus.err == CHIP_ERROR_CANCELLED)
@@ -1929,11 +1941,12 @@ void DeviceCommissioner::CleanupDoneAfterError()
     VerifyOrReturn(mDeviceBeingCommissioned != nullptr);
 
     NodeId nodeId = mDeviceBeingCommissioned->GetDeviceId();
-    // At this point, we also want to close off the pase session so we need to re-establish
-    CommissioneeDeviceProxy * commissionee = FindCommissioneeDevice(nodeId);
 
     // Signal completion - this will reset mDeviceBeingCommissioned.
     CommissioningStageComplete(CHIP_NO_ERROR);
+
+    // At this point, we also want to close off the pase session so we need to re-establish
+    CommissioneeDeviceProxy * commissionee = FindCommissioneeDevice(nodeId);
 
     // If we've disarmed the failsafe, it's because we're starting again, so kill the pase connection.
     if (commissionee != nullptr)

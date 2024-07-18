@@ -74,11 +74,10 @@ CHIP_ERROR ReadSingleClusterData(const Access::SubjectDescriptor & aSubjectDescr
     return CHIP_ERROR_NOT_IMPLEMENTED;
 }
 
-void DispatchSingleClusterCommand(const ConcreteCommandPath & aRequestCommandPath, chip::TLV::TLVReader & aReader,
-                                  CommandHandler * apCommandObj)
-{
-    // TODO: total hardcoded noop
-}
-
 } // namespace app
 } // namespace chip
+
+void MatterReportingAttributeChangeCallback(const chip::app::ConcreteAttributePath & aPath)
+{
+    // TODO: should we add logic to track these calls for test purposes?
+}

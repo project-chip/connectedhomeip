@@ -113,7 +113,7 @@ structs_sources = [
   "${chip_root}/src/controller/java/generated/java/chip/devicecontroller/cluster/structs/RvcOperationalStateClusterOperationalStateStruct.kt",
   "${chip_root}/src/controller/java/generated/java/chip/devicecontroller/cluster/structs/RvcRunModeClusterModeOptionStruct.kt",
   "${chip_root}/src/controller/java/generated/java/chip/devicecontroller/cluster/structs/RvcRunModeClusterModeTagStruct.kt",
-  "${chip_root}/src/controller/java/generated/java/chip/devicecontroller/cluster/structs/ScenesManagementClusterAttributeValuePair.kt",
+  "${chip_root}/src/controller/java/generated/java/chip/devicecontroller/cluster/structs/ScenesManagementClusterAttributeValuePairStruct.kt",
   "${chip_root}/src/controller/java/generated/java/chip/devicecontroller/cluster/structs/ScenesManagementClusterExtensionFieldSet.kt",
   "${chip_root}/src/controller/java/generated/java/chip/devicecontroller/cluster/structs/ScenesManagementClusterSceneInfoStruct.kt",
   "${chip_root}/src/controller/java/generated/java/chip/devicecontroller/cluster/structs/ServiceAreaClusterHomeLocationStruct.kt",
@@ -147,6 +147,8 @@ structs_sources = [
   "${chip_root}/src/controller/java/generated/java/chip/devicecontroller/cluster/structs/UnitTestingClusterTestFabricScoped.kt",
   "${chip_root}/src/controller/java/generated/java/chip/devicecontroller/cluster/structs/UnitTestingClusterTestListStructOctet.kt",
   "${chip_root}/src/controller/java/generated/java/chip/devicecontroller/cluster/structs/UserLabelClusterLabelStruct.kt",
+  "${chip_root}/src/controller/java/generated/java/chip/devicecontroller/cluster/structs/WaterHeaterModeClusterModeOptionStruct.kt",
+  "${chip_root}/src/controller/java/generated/java/chip/devicecontroller/cluster/structs/WaterHeaterModeClusterModeTagStruct.kt",
 ]
 
 eventstructs_sources = [
@@ -163,6 +165,7 @@ eventstructs_sources = [
   "${chip_root}/src/controller/java/generated/java/chip/devicecontroller/cluster/eventstructs/BooleanStateConfigurationClusterSensorFaultEvent.kt",
   "${chip_root}/src/controller/java/generated/java/chip/devicecontroller/cluster/eventstructs/BridgedDeviceBasicInformationClusterReachableChangedEvent.kt",
   "${chip_root}/src/controller/java/generated/java/chip/devicecontroller/cluster/eventstructs/BridgedDeviceBasicInformationClusterStartUpEvent.kt",
+  "${chip_root}/src/controller/java/generated/java/chip/devicecontroller/cluster/eventstructs/CommissionerControlClusterCommissioningRequestResultEvent.kt",
   "${chip_root}/src/controller/java/generated/java/chip/devicecontroller/cluster/eventstructs/DemandResponseLoadControlClusterLoadControlEventStatusChangeEvent.kt",
   "${chip_root}/src/controller/java/generated/java/chip/devicecontroller/cluster/eventstructs/DeviceEnergyManagementClusterPowerAdjustEndEvent.kt",
   "${chip_root}/src/controller/java/generated/java/chip/devicecontroller/cluster/eventstructs/DeviceEnergyManagementClusterResumedEvent.kt",
