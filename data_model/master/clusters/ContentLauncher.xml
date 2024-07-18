@@ -299,7 +299,7 @@ Davis, CA 95616, USA
         <constraint type="maxLength" value="1024"/>
       </entry>
       <access read="true" readPrivilege="view"/>
-      <quality changeOmitted="false" nullable="false" scene="false" persistence="nonVolatile" reportable="false"/>
+      <quality changeOmitted="false" nullable="false" scene="false" persistence="nonVolatile" reportable="false" sourceAttribution="false" quieterReporting="false"/>
       <mandatoryConform>
         <feature name="UP"/>
       </mandatoryConform>
@@ -307,7 +307,7 @@ Davis, CA 95616, USA
     </attribute>
     <attribute id="0x0001" name="SupportedStreamingProtocols" type="SupportedProtocolsBitmap" default="0">
       <access read="true" readPrivilege="view"/>
-      <quality changeOmitted="false" nullable="false" scene="false" persistence="nonVolatile" reportable="false"/>
+      <quality changeOmitted="false" nullable="false" scene="false" persistence="nonVolatile" reportable="false" sourceAttribution="false" quieterReporting="false"/>
       <mandatoryConform>
         <feature name="UP"/>
       </mandatoryConform>

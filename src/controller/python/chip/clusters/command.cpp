@@ -203,10 +203,13 @@ PyChipError SendBatchCommandsInternal(void * appContext, DeviceProxy * device, u
     CHIP_ERROR err = CHIP_NO_ERROR;
 
     bool testOnlySuppressTimedRequestMessage = false;
-    uint16_t * testOnlyCommandRefsOverride   = nullptr;
+#if CONFIG_BUILD_FOR_HOST_UNIT_TEST
+    uint16_t * testOnlyCommandRefsOverride = nullptr;
+#endif
 
     VerifyOrReturnError(device->GetSecureSession().HasValue(), ToPyChipError(CHIP_ERROR_MISSING_SECURE_SESSION));
 
+#if CONFIG_BUILD_FOR_HOST_UNIT_TEST
     // Test only override validation checks and setup
     if (testOnlyOverrides != nullptr)
     {
@@ -228,6 +231,7 @@ PyChipError SendBatchCommandsInternal(void * appContext, DeviceProxy * device, u
         config.SetRemoteMaxPathsPerInvoke(testOnlyOverrides->overrideRemoteMaxPathsPerInvoke);
     }
     else
+#endif
     {
         auto remoteSessionParameters = device->GetSecureSession().Value()->GetRemoteSessionParameters();
         config.SetRemoteMaxPathsPerInvoke(remoteSessionParameters.GetMaxPathsPerInvoke());
@@ -273,6 +277,7 @@ PyChipError SendBatchCommandsInternal(void * appContext, DeviceProxy * device, u
         Optional<uint16_t> timedRequestTimeout =
             timedRequestTimeoutMs != 0 ? Optional<uint16_t>(timedRequestTimeoutMs) : Optional<uint16_t>::Missing();
         CommandSender::FinishCommandParameters finishCommandParams(timedRequestTimeout);
+#if CONFIG_BUILD_FOR_HOST_UNIT_TEST
         if (testOnlyCommandRefsOverride != nullptr)
         {
             finishCommandParams.commandRef.SetValue(testOnlyCommandRefsOverride[i]);
@@ -291,6 +296,7 @@ PyChipError SendBatchCommandsInternal(void * appContext, DeviceProxy * device, u
             callback->AddCommandRefToIndexLookup(finishCommandParams.commandRef.Value(), i);
         }
         else
+#endif
         {
             SuccessOrExit(err = callback->AddCommandRefToIndexLookup(finishCommandParams.commandRef.Value(), i));
         }
@@ -300,12 +306,14 @@ PyChipError SendBatchCommandsInternal(void * appContext, DeviceProxy * device, u
         Optional<System::Clock::Timeout> interactionTimeout = interactionTimeoutMs != 0
             ? MakeOptional(System::Clock::Milliseconds32(interactionTimeoutMs))
             : Optional<System::Clock::Timeout>::Missing();
+#if CONFIG_BUILD_FOR_HOST_UNIT_TEST
         if (testOnlySuppressTimedRequestMessage)
         {
             SuccessOrExit(err = sender->TestOnlyCommandSenderTimedRequestFlagWithNoTimedInvoke(device->GetSecureSession().Value(),
                                                                                                interactionTimeout));
         }
         else
+#endif
         {
             SuccessOrExit(err = sender->SendCommandRequest(device->GetSecureSession().Value(), interactionTimeout));
         }

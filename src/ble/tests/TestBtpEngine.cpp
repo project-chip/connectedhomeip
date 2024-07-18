@@ -20,14 +20,15 @@
 #include <cstdint>
 #include <numeric>
 
+#include <pw_unit_test/framework.h>
+
+#include <lib/core/StringBuilderAdapters.h>
 #include <lib/support/CHIPMem.h>
 #include <lib/support/logging/CHIPLogging.h>
 
 #define _CHIP_BLE_BLE_H
 #include <ble/BleLayer.h>
 #include <ble/BtpEngine.h>
-
-#include <gtest/gtest.h>
 
 using namespace chip;
 using namespace chip::Ble;
