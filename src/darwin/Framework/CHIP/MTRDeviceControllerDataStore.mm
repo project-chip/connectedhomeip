@@ -1281,7 +1281,7 @@ typedef NSArray<NSString *> MTRClientDataKeyIndex;
         return;
     }
     
-    NSString * storageKey = [self _clientDataKeyForNodeID:nodeID key:key];
+    NSString * storageKey = [self _clientDataIndexKeyForNodeID:nodeID];
     NSLog(@"kmo: updateClientDataIndexForKey - data key %@", storageKey);
     
     dispatch_async(_storageDelegateQueue, ^{
@@ -1323,10 +1323,24 @@ typedef NSArray<NSString *> MTRClientDataKeyIndex;
         VerifyOrReturn(controller != nil); // No way to call delegate without controller.
         
         // get index
+        NSArray<MTRClientDataKey> * index = [self _clientDataIndexForNodeID:nodeID];
+        
         
         // iterate over index to remove data
+        for (MTRClientDataKey key in index) {
+            NSString * thisKey = [self _clientDataKeyForNodeID:nodeID key:key];
+            [self->_storageDelegate controller:controller
+               removeValueForKey:thisKey
+            securityLevel:MTRStorageSecurityLevelSecure
+              sharingType:MTRStorageSharingTypeNotShared];
+        }
         
-        // remove index
+        // remove index itself
+        NSString * storageKey = [self _clientDataIndexKeyForNodeID:nodeID];
+        [self->_storageDelegate controller:controller
+           removeValueForKey:storageKey
+        securityLevel:MTRStorageSecurityLevelSecure
+          sharingType:MTRStorageSharingTypeNotShared];
     });
 }
 
