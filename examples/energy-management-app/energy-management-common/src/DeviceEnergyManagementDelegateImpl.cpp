@@ -91,7 +91,7 @@ Status DeviceEnergyManagementDelegate::PowerAdjustRequest(const int64_t powerMw,
     }
     else
     {
-        // Going to start a new power adjustment so will need to send an event
+        // Going to start a new power adjustment so will need to generate an event
         generateEvent = true;
 
         // Record when this PowerAdjustment starts. Note if we do not set this value if a PowerAdjustment is in progress
@@ -130,7 +130,7 @@ Status DeviceEnergyManagementDelegate::PowerAdjustRequest(const int64_t powerMw,
         return Status::Failure;
     }
 
-    // Remember we have a timer running so we don't send a PowerAdjustStart event should another request come
+    // Remember we have a timer running so we don't generate a PowerAdjustStart event should another request come
     // in before this timer expires
     mPowerAdjustmentInProgress = true;
 
@@ -210,8 +210,8 @@ void DeviceEnergyManagementDelegate::HandlePowerAdjustTimerExpiry()
 
     mPowerAdjustCapabilityStruct.Value().cause = PowerAdjustReasonEnum::kNoAdjustment;
 
-    // Send a PowerAdjustEnd event
-    SendPowerAdjustEndEvent(CauseEnum::kNormalCompletion);
+    // Generate a PowerAdjustEnd event
+    GeneratePowerAdjustEndEvent(CauseEnum::kNormalCompletion);
 
     // Update the forecast with new expected end time
     if (mpDEMManufacturerDelegate != nullptr)
@@ -265,7 +265,7 @@ CHIP_ERROR DeviceEnergyManagementDelegate::CancelPowerAdjustRequestAndGenerateEv
 
     mPowerAdjustCapabilityStruct.Value().cause = PowerAdjustReasonEnum::kNoAdjustment;
 
-    CHIP_ERROR err = SendPowerAdjustEndEvent(cause);
+    CHIP_ERROR err = GeneratePowerAdjustEndEvent(cause);
 
     // Notify the appliance's that it can resume its intended power setting (or go idle)
     if (mpDEMManufacturerDelegate != nullptr)
@@ -279,10 +279,10 @@ CHIP_ERROR DeviceEnergyManagementDelegate::CancelPowerAdjustRequestAndGenerateEv
 }
 
 /**
- * @brief Send a PowerAdjustEvent
+ * @brief Generate a PowerAdjustEvent
  *
  */
-CHIP_ERROR DeviceEnergyManagementDelegate::SendPowerAdjustEndEvent(CauseEnum cause)
+CHIP_ERROR DeviceEnergyManagementDelegate::GeneratePowerAdjustEndEvent(CauseEnum cause)
 {
     Events::PowerAdjustEnd::Type event;
     EventNumber eventNumber;
@@ -412,7 +412,7 @@ Status DeviceEnergyManagementDelegate::PauseRequest(const uint32_t durationS, Ad
     {
         generateEvent = true;
 
-        // Remember we have a timer running so we don't send a Paused event should another request come
+        // Remember we have a timer running so we don't generate a Paused event should another request come
         // in before this timer expires
         mPauseRequestInProgress = true;
     }
@@ -508,8 +508,8 @@ void DeviceEnergyManagementDelegate::HandlePauseRequestTimerExpiry()
 
     SetESAState(ESAStateEnum::kOnline);
 
-    // Send a Resumed event
-    SendResumedEvent(CauseEnum::kNormalCompletion);
+    // Generate a Resumed event
+    GenerateResumedEvent(CauseEnum::kNormalCompletion);
 
     // It is expected the mpDEMManufacturerDelegate will update the forecast with new expected end time
     if (mpDEMManufacturerDelegate != nullptr)
@@ -536,7 +536,7 @@ CHIP_ERROR DeviceEnergyManagementDelegate::CancelPauseRequestAndGenerateEvent(Ca
 
     DeviceLayer::SystemLayer().CancelTimer(PauseRequestTimerExpiry, this);
 
-    CHIP_ERROR err  = SendResumedEvent(cause);
+    CHIP_ERROR err  = GenerateResumedEvent(cause);
     CHIP_ERROR err2 = CHIP_NO_ERROR;
 
     // Notify the appliance's that it can resume its intended power setting (or go idle)
@@ -561,10 +561,10 @@ CHIP_ERROR DeviceEnergyManagementDelegate::CancelPauseRequestAndGenerateEvent(Ca
 }
 
 /**
- * @brief Send a Resumed event
+ * @brief Generate a Resumed event
  *
  */
-CHIP_ERROR DeviceEnergyManagementDelegate::SendResumedEvent(CauseEnum cause)
+CHIP_ERROR DeviceEnergyManagementDelegate::GenerateResumedEvent(CauseEnum cause)
 {
     Events::Resumed::Type event;
     EventNumber eventNumber;
@@ -887,6 +887,8 @@ CHIP_ERROR
 DeviceEnergyManagementDelegate::SetPowerAdjustmentCapability(
     const DataModel::Nullable<Structs::PowerAdjustCapabilityStruct::Type> & powerAdjustCapabilityStruct)
 {
+    assertChipStackLockedByCurrentThread();
+
     if (powerAdjustCapabilityStruct.IsNull())
     {
         mPowerAdjustCapabilityStruct.SetNull();
@@ -901,6 +903,8 @@ DeviceEnergyManagementDelegate::SetPowerAdjustmentCapability(
 
 CHIP_ERROR DeviceEnergyManagementDelegate::SetForecast(const DataModel::Nullable<Structs::ForecastStruct::Type> & forecast)
 {
+    assertChipStackLockedByCurrentThread();
+
     // TODO see Issue #31147
     if (forecast.IsNull())
     {

@@ -243,8 +243,8 @@ private:
     // Method to cancel a PowerAdjustment
     CHIP_ERROR CancelPowerAdjustRequestAndGenerateEvent(CauseEnum cause);
 
-    // Method to send a PowerAdjustEnd event
-    CHIP_ERROR SendPowerAdjustEndEvent(CauseEnum cause);
+    // Method to generate a PowerAdjustEnd event
+    CHIP_ERROR GeneratePowerAdjustEndEvent(CauseEnum cause);
 
     /**
      * @brief Handle a PauseRequest failing
@@ -260,8 +260,8 @@ private:
     // Method to cancel a PauseRequest
     CHIP_ERROR CancelPauseRequestAndGenerateEvent(CauseEnum cause);
 
-    // Method to send a Paused event
-    CHIP_ERROR SendResumedEvent(CauseEnum cause);
+    // Method to generate a Paused event
+    CHIP_ERROR GenerateResumedEvent(CauseEnum cause);
 
 private:
     // Have a pointer to partner instance object
