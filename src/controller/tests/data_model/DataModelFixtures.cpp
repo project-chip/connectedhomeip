@@ -312,15 +312,15 @@ CHIP_ERROR WriteSingleClusterData(const Access::SubjectDescriptor & aSubjectDesc
     // Boolean attribute of unit testing cluster triggers "multiple errors" case.
     if (aPath.mClusterId == Clusters::UnitTesting::Id && aPath.mAttributeId == Attributes::Boolean::TypeInfo::GetAttributeId())
     {
-        InteractionModel::ClusterStatusCode status{ Protocols::InteractionModel::Status::InvalidValue };
+        Protocols::InteractionModel::ClusterStatusCode status{ Protocols::InteractionModel::Status::InvalidValue };
 
         if (gWriteResponseDirective == WriteResponseDirective::kSendMultipleSuccess)
         {
-            status = InteractionModel::Status::Success;
+            status = Protocols::InteractionModel::Status::Success;
         }
         else if (gWriteResponseDirective == WriteResponseDirective::kSendMultipleErrors)
         {
-            status = InteractionModel::Status::Failure;
+            status = Protocols::InteractionModel::Status::Failure;
         }
         else
         {
@@ -337,14 +337,14 @@ CHIP_ERROR WriteSingleClusterData(const Access::SubjectDescriptor & aSubjectDesc
 
     if (aPath.mClusterId == Clusters::UnitTesting::Id && aPath.mAttributeId == Attributes::Int8u::TypeInfo::GetAttributeId())
     {
-        InteractionModel::ClusterStatusCode status{ Protocols::InteractionModel::Status::InvalidValue };
+        Protocols::InteractionModel::ClusterStatusCode status{ Protocols::InteractionModel::Status::InvalidValue };
         if (gWriteResponseDirective == WriteResponseDirective::kSendClusterSpecificSuccess)
         {
-            status = InteractionModel::ClusterStatusCode::ClusterSpecificSuccess(kExampleClusterSpecificSuccess);
+            status = Protocols::InteractionModel::ClusterStatusCode::ClusterSpecificSuccess(kExampleClusterSpecificSuccess);
         }
         else if (gWriteResponseDirective == WriteResponseDirective::kSendClusterSpecificFailure)
         {
-            status = InteractionModel::ClusterStatusCode::ClusterSpecificFailure(kExampleClusterSpecificFailure);
+            status = Protocols::InteractionModel::ClusterStatusCode::ClusterSpecificFailure(kExampleClusterSpecificFailure);
         }
         else
         {
@@ -446,10 +446,10 @@ void DispatchSingleClusterCommand(const ConcreteCommandPath & aCommandPath, chip
     }
 }
 
-InteractionModel::Status ServerClusterCommandExists(const ConcreteCommandPath & aCommandPath)
+Protocols::InteractionModel::Status ServerClusterCommandExists(const ConcreteCommandPath & aCommandPath)
 {
     // Mock cluster catalog, only support commands on one cluster on one endpoint.
-    using InteractionModel::Status;
+    using Protocols::InteractionModel::Status;
 
     if (aCommandPath.mEndpointId != kTestEndpointId)
     {

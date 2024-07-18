@@ -66,7 +66,7 @@ Davis, CA 95616, USA
   <attributes>
     <attribute id="0x0000" name="ActiveLocale" type="string" default="MS">
       <access read="true" write="true" readPrivilege="view" writePrivilege="manage"/>
-      <quality changeOmitted="false" nullable="false" scene="false" persistence="nonVolatile" reportable="false"/>
+      <quality changeOmitted="false" nullable="false" scene="false" persistence="nonVolatile" reportable="false" sourceAttribution="false" quieterReporting="false"/>
       <mandatoryConform/>
       <constraint type="maxLength" value="35"/>
     </attribute>
@@ -75,7 +75,7 @@ Davis, CA 95616, USA
         <constraint type="maxLength" value="35"/>
       </entry>
       <access read="true" readPrivilege="view"/>
-      <quality changeOmitted="false" nullable="false" scene="false" persistence="fixed" reportable="false"/>
+      <quality changeOmitted="false" nullable="false" scene="false" persistence="fixed" reportable="false" sourceAttribution="false" quieterReporting="false"/>
       <mandatoryConform/>
       <constraint type="maxCount" value="32"/>
     </attribute>
