@@ -4013,7 +4013,7 @@ static BOOL AttributeHasChangesOmittedQuality(MTRAttributePath * attributePath)
 - (void)removeClientDataForKey:(NSString *)key
 {
 #if USE_DEVICE_CONTROLLER_DATA_STORE
-    // TODO: KMO: SET: implement
+    [self.deviceController.controllerDataStore removeClientDataForNodeID:self.nodeID key:key];
 #else
     if (key == nil)
         return;
