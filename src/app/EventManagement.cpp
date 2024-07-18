@@ -32,7 +32,7 @@ using namespace chip::TLV;
 
 namespace chip {
 namespace app {
-EventManagement EventManagement::sInstance;
+static EventManagement sInstance;
 
 /**
  * @brief

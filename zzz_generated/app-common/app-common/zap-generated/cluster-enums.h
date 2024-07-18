@@ -2808,6 +2808,28 @@ enum class Feature : uint32_t
 };
 } // namespace EnergyEvseMode
 
+namespace WaterHeaterMode {
+
+// Enum for ModeTag
+enum class ModeTag : uint16_t
+{
+    kOff    = 0x4000,
+    kManual = 0x4001,
+    kTimed  = 0x4002,
+    // All received enum values that are not listed above will be mapped
+    // to kUnknownEnumValue. This is a helper enum value that should only
+    // be used by code to process how it handles receiving and unknown
+    // enum value. This specific should never be transmitted.
+    kUnknownEnumValue = 0,
+};
+
+// Bitmap for Feature
+enum class Feature : uint32_t
+{
+    kOnOff = 0x1,
+};
+} // namespace WaterHeaterMode
+
 namespace DeviceEnergyManagementMode {
 
 // Enum for ModeTag
@@ -5175,6 +5197,15 @@ enum class StatusEnum : uint8_t
     kUnknownEnumValue = 2,
 };
 } // namespace ContentAppObserver
+
+namespace CommissionerControl {
+
+// Bitmap for SupportedDeviceCategoryBitmap
+enum class SupportedDeviceCategoryBitmap : uint32_t
+{
+    kFabricSynchronization = 0x1,
+};
+} // namespace CommissionerControl
 
 namespace ElectricalMeasurement {} // namespace ElectricalMeasurement
 

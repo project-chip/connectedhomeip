@@ -40,6 +40,8 @@ from rich.pretty import pprint
 
 from .ClusterObjects import Cluster, ClusterAttributeDescriptor, ClusterEvent
 
+LOGGER = logging.getLogger(__name__)
+
 
 @unique
 class EventTimestampType(Enum):
@@ -467,7 +469,7 @@ class SubscriptionTransaction:
 
     async def TriggerResubscribeIfScheduled(self, reason: str):
         handle = chip.native.GetLibraryHandle()
-        await builtins.chipStack.CallAsync(
+        await builtins.chipStack.CallAsyncWithResult(
             lambda: handle.pychip_ReadClient_TriggerResubscribeIfScheduled(
                 self._readTransaction._pReadClient, reason.encode("utf-8"))
         )
@@ -569,7 +571,7 @@ class SubscriptionTransaction:
 
     def Shutdown(self):
         if (self._isDone):
-            print("Subscription was already terminated previously!")
+            LOGGER.warning("Subscription 0x%08x was already terminated previously!", self.subscriptionId)
             return
 
         handle = chip.native.GetLibraryHandle()
@@ -675,7 +677,7 @@ class AsyncReadTransaction:
             self._changedPathSet.add(path)
 
         except Exception as ex:
-            logging.exception(ex)
+            LOGGER.exception(ex)
 
     def handleEventData(self, header: EventHeader, path: EventPath, data: bytes, status: int):
         try:
@@ -693,12 +695,12 @@ class AsyncReadTransaction:
                     try:
                         eventValue = eventType.FromTLV(data)
                     except Exception as ex:
-                        logging.error(
+                        LOGGER.error(
                             f"Error convering TLV to Cluster Object for path: Endpoint = {path.EndpointId}/"
                             f"Cluster = {path.ClusterId}/Event = {path.EventId}")
-                        logging.error(
+                        LOGGER.error(
                             f"Failed Cluster Object: {str(eventType)}")
-                        logging.error(ex)
+                        LOGGER.error(ex)
                         eventValue = ValueDecodeFailure(
                             tlvData, ex)
 
@@ -715,7 +717,7 @@ class AsyncReadTransaction:
                     eventResult, self._subscription_handler)
 
         except Exception as ex:
-            logging.exception(ex)
+            LOGGER.exception(ex)
 
     def handleError(self, chipError: PyChipError):
         self._resultError = chipError
@@ -726,7 +728,6 @@ class AsyncReadTransaction:
                 self, subscriptionId, self._devCtrl)
             self._future.set_result(self._subscription_handler)
         else:
-            logging.info("Re-subscription succeeded!")
             if self._subscription_handler._onResubscriptionSucceededCb is not None:
                 if (self._subscription_handler._onResubscriptionSucceededCb_isAsync):
                     self._event_loop.create_task(
@@ -761,7 +762,7 @@ class AsyncReadTransaction:
                     attribute_path = TypedAttributePath(Path=change)
                 except (KeyError, ValueError) as err:
                     # path could not be resolved into a TypedAttributePath
-                    logging.getLogger(__name__).exception(err)
+                    LOGGER.exception(err)
                     continue
                 self._subscription_handler.OnAttributeChangeCb(
                     attribute_path, self._subscription_handler)
@@ -816,7 +817,7 @@ class AsyncWriteTransaction:
             imStatus = chip.interaction_model.Status(status)
             self._resultData.append(AttributeWriteResult(Path=path, Status=imStatus))
         except ValueError as ex:
-            logging.exception(ex)
+            LOGGER.exception(ex)
 
     def handleError(self, chipError: PyChipError):
         self._resultError = chipError

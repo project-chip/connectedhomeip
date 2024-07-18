@@ -166,8 +166,8 @@ CHIP_ERROR DecodeIntoEmberBuffer(AttributeValueDecoder & decoder, bool isNullabl
             // Nullable<uint8_t>(0xFF) is not representable because 0xFF is the encoding of NULL in ember
             // as well as odd-sized integers (e.g. full 32-bit value like 0x11223344 cannot be written
             // to a 3-byte odd-sized integger).
-            VerifyOrReturnError(Traits::CanRepresentValue(isNullable, *workingValue), CHIP_ERROR_INVALID_ARGUMENT);
-            Traits::WorkingToStorage(*workingValue, storageValue);
+            VerifyOrReturnError(Traits::CanRepresentValue(isNullable, workingValue.Value()), CHIP_ERROR_INVALID_ARGUMENT);
+            Traits::WorkingToStorage(workingValue.Value(), storageValue);
         }
 
         VerifyOrReturnError(out.size() >= sizeof(storageValue), CHIP_ERROR_INVALID_ARGUMENT);

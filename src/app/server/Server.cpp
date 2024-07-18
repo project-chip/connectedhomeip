@@ -182,6 +182,10 @@ CHIP_ERROR Server::Init(const ServerInitParams & initParams)
     mReportScheduler = initParams.reportScheduler;
 
     mTestEventTriggerDelegate = initParams.testEventTriggerDelegate;
+    if (mTestEventTriggerDelegate == nullptr)
+    {
+        ChipLogProgress(AppServer, "WARNING: mTestEventTriggerDelegate is null");
+    }
 
     deviceInfoprovider = DeviceLayer::GetDeviceInfoProvider();
     if (deviceInfoprovider)
@@ -359,7 +363,10 @@ CHIP_ERROR Server::Init(const ServerInitParams & initParams)
                      chip::app::InteractionModelEngine::GetInstance());
 
     // Register Test Event Trigger Handler
-    mTestEventTriggerDelegate->AddHandler(&mICDManager);
+    if (mTestEventTriggerDelegate != nullptr)
+    {
+        mTestEventTriggerDelegate->AddHandler(&mICDManager);
+    }
 
 #endif // CHIP_CONFIG_ENABLE_ICD_SERVER
 
@@ -612,7 +619,10 @@ void Server::Shutdown()
     Credentials::SetGroupDataProvider(nullptr);
 #if CHIP_CONFIG_ENABLE_ICD_SERVER
     // Remove Test Event Trigger Handler
-    mTestEventTriggerDelegate->RemoveHandler(&mICDManager);
+    if (mTestEventTriggerDelegate != nullptr)
+    {
+        mTestEventTriggerDelegate->RemoveHandler(&mICDManager);
+    }
     mICDManager.Shutdown();
 #endif // CHIP_CONFIG_ENABLE_ICD_SERVER
     mAttributePersister.Shutdown();

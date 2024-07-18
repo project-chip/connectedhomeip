@@ -45,8 +45,11 @@ struct Nullable : protected std::optional<T>
     // all constructors of the base class within this derived class.
     //
     using std::optional<T>::optional;
-    using std::optional<T>::operator*;
-    using std::optional<T>::operator->;
+
+    // Do NOT pull in optional::operator* or optional::operator->, because that
+    // leads people to write code that looks like it should work, and compiles,
+    // but does not do the right things with TLV encoding and decoding, when
+    // nullable data model objects are involved.
 
     Nullable(NullOptionalType) : std::optional<T>(std::nullopt) {}
 

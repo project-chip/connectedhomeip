@@ -167,7 +167,8 @@ ALIAS_PICS = {0x040C: 'CMOCONC',
               0x042F: 'RNCONC',
               0x0071: 'HEPAFREMON',
               0x0072: 'ACFREMON',
-              0x0405: 'RH'}
+              0x0405: 'RH',
+              0x001C: 'PWM'}
 
 CLUSTER_NAME_FIXES = {0x0036: 'WiFi Network Diagnostics', 0x042a: 'PM25 Concentration Measurement', 0x0006: 'On/Off'}
 DEVICE_TYPE_NAME_FIXES = {0x010b: 'Dimmable Plug-In Unit', 0x010a: 'On/Off Plug-in Unit'}
