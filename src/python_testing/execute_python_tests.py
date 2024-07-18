@@ -21,16 +21,18 @@ import subprocess
 import argparse
 
 # Function to load environment variables from a YAML file
+
+
 def load_env_from_yaml(file_path):
     """
     Load environment variables from the specified YAML file.
-    
+
     The YAML file contains key-value pairs that define --app environment variables
     required for the test scripts to run. These variables configurations needed during the test execution.
-    
+
     This function reads the YAML file and sets the environment variables
     in the current process's environment using os.environ.
-    
+
     Args:
         file_path (str): The path to the YAML file containing the environment variables.
     """
@@ -39,6 +41,7 @@ def load_env_from_yaml(file_path):
             if line.strip():  # Skip empty lines
                 key, value = line.strip().split(': ', 1)
                 os.environ[key] = value
+
 
 def main(search_directory, env_file):
     # Determine the root directory of the CHIP project
@@ -102,10 +105,12 @@ def main(search_directory, env_file):
         print(f"Running command: {full_command}")
         subprocess.run(full_command, shell=True, check=True)
 
+
 if __name__ == "__main__":
     parser = argparse.ArgumentParser(description="Run Python test scripts.")
-    parser.add_argument("--search-directory", type=str, default="src/python_testing", help="Directory to search for Python scripts.")
+    parser.add_argument("--search-directory", type=str, default="src/python_testing",
+                        help="Directory to search for Python scripts.")
     parser.add_argument("--env-file", type=str, default="/tmp/test_env.yaml", help="Path to the environment variables file.")
-    
+
     args = parser.parse_args()
     main(args.search_directory, args.env_file)
