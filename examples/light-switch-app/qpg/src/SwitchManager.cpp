@@ -129,7 +129,8 @@ void SwitchManager::GenericSwitchInitialPressHandler(AppEvent * aEvent)
 void SwitchManager::GenericSwitchReleasePressHandler(AppEvent * aEvent)
 {
     // Release moves Position from 1 (press) to 0
-    uint8_t newPosition = 0;
+    uint8_t newPosition      = 0;
+    uint8_t previousPosition = 1;
 
     if (aEvent->Type != AppEvent::kEventType_Button)
     {
@@ -138,9 +139,9 @@ void SwitchManager::GenericSwitchReleasePressHandler(AppEvent * aEvent)
     }
 
     ChipLogProgress(NotSpecified, "GenericSwitchReleasePress new position %d", newPosition);
-    SystemLayer().ScheduleLambda([newPosition] {
+    SystemLayer().ScheduleLambda([newPosition, previousPosition] {
         chip::app::Clusters::Switch::Attributes::CurrentPosition::Set(GENERICSWITCH_ENDPOINT_ID, newPosition);
         // Short Release event takes newPosition as event data
-        chip::app::Clusters::SwitchServer::Instance().OnShortRelease(GENERICSWITCH_ENDPOINT_ID, newPosition);
+        chip::app::Clusters::SwitchServer::Instance().OnShortRelease(GENERICSWITCH_ENDPOINT_ID, previousPosition);
     });
 }
