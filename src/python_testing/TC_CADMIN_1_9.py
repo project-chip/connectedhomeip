@@ -107,7 +107,7 @@ class TC_CADMIN_1_9(MatterBaseTest):
         self.step(2)
         params = await self.OpenCommissioningWindow()
         setupPinCode = params.setupPinCode
-                
+
         self.step(3)
         await self.CommissionAttempt(setupPinCode, expectedErrCode=0x03)
         # TODO: Found if we don't add sleep time after test completes that we get unexpected error code and response after the 21st iteration.
