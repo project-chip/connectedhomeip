@@ -21,13 +21,17 @@ from metadata import Metadata, MetadataReader
 
 class TestMetadataReader(unittest.TestCase):
 
-    test_file_content = ''' 
-    # test-runner-runs: run1 
+    test_file_content = '''
+    # === BEGIN CI TEST ARGUMENTS ===
+    # test-runner-runs: run1
     # test-runner-run/run1/app: ${ALL_CLUSTERS_APP}
     # test-runner-run/run1/app-args: --discriminator 1234 --trace-to json:${TRACE_APP}.json
     # test-runner-run/run1/script-args: --commissioning-method on-network --trace-to json:${TRACE_TEST_JSON}.json --trace-to perfetto:${TRACE_TEST_PERFETTO}.perfetto
     # test-runner-run/run1/factoryreset: True
     # test-runner-run/run1/quiet: True
+    # === END CI TEST ARGUMENTS ===
+
+    # test-runner-run/run1/quiet: False
     '''
 
     env_file_content = '''

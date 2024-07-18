@@ -339,6 +339,8 @@ CHIP_ERROR SessionManager::PrepareMessage(const SessionHandle & sessionHandle, P
         return CHIP_ERROR_INTERNAL;
     }
 
+    ReturnErrorOnFailure(packetHeader.EncodeBeforeData(message));
+
 #if CHIP_PROGRESS_LOGGING
     CompressedFabricId compressedFabricId = kUndefinedCompressedFabricId;
 
@@ -372,19 +374,26 @@ CHIP_ERROR SessionManager::PrepareMessage(const SessionHandle & sessionHandle, P
     char typeStr[4 + 1 + 2 + 1];
     snprintf(typeStr, sizeof(typeStr), "%04X:%02X", payloadHeader.GetProtocolID().GetProtocolId(), payloadHeader.GetMessageType());
 
+    // More work around pigweed not allowing more than 14 format args in a log
+    // message when using tokenized logs.
+    // ChipLogFormatExchangeId logs the numeric exchange ID (at most 5 chars,
+    // since it's a uint16_t) and one char for initiator/responder.  Plus we
+    // need a null-terminator.
+    char exchangeStr[5 + 1 + 1];
+    snprintf(exchangeStr, sizeof(exchangeStr), ChipLogFormatExchangeId, ChipLogValueExchangeIdFromSentHeader(payloadHeader));
+
     //
     // Legend that can be used to decode this log line can be found in messaging/README.md
     //
     ChipLogProgress(ExchangeManager,
-                    "<<< [E:" ChipLogFormatExchangeId " S:%u M:" ChipLogFormatMessageCounter
-                    "%s] (%s) Msg TX to %u:" ChipLogFormatX64 " [%04X] [%s] --- Type %s (%s:%s)",
-                    ChipLogValueExchangeIdFromSentHeader(payloadHeader), sessionHandle->SessionIdForLogging(),
-                    packetHeader.GetMessageCounter(), ackBuf, Transport::GetSessionTypeString(sessionHandle), fabricIndex,
-                    ChipLogValueX64(destination), static_cast<uint16_t>(compressedFabricId), addressStr, typeStr, protocolName,
-                    msgTypeName);
+                    "<<< [E:%s S:%u M:" ChipLogFormatMessageCounter "%s] (%s) Msg TX to %u:" ChipLogFormatX64
+                    " [%04X] [%s] --- Type %s (%s:%s) (B:%u)",
+                    exchangeStr, sessionHandle->SessionIdForLogging(), packetHeader.GetMessageCounter(), ackBuf,
+                    Transport::GetSessionTypeString(sessionHandle), fabricIndex, ChipLogValueX64(destination),
+                    static_cast<uint16_t>(compressedFabricId), addressStr, typeStr, protocolName, msgTypeName,
+                    static_cast<unsigned>(message->TotalLength()));
 #endif
 
-    ReturnErrorOnFailure(packetHeader.EncodeBeforeData(message));
     preparedMessage = EncryptedPacketBufferHandle::MarkEncrypted(std::move(message));
 
     return CHIP_NO_ERROR;

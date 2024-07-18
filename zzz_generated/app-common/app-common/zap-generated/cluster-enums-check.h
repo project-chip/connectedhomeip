@@ -1572,6 +1572,19 @@ static auto __attribute__((unused)) EnsureKnownEnumValue(ElectricalPowerMeasurem
     }
 }
 
+static auto __attribute__((unused)) EnsureKnownEnumValue(WaterHeaterManagement::BoostStateEnum val)
+{
+    using EnumType = WaterHeaterManagement::BoostStateEnum;
+    switch (val)
+    {
+    case EnumType::kInactive:
+    case EnumType::kActive:
+        return val;
+    default:
+        return EnumType::kUnknownEnumValue;
+    }
+}
+
 static auto __attribute__((unused)) EnsureKnownEnumValue(DemandResponseLoadControl::CriticalityLevelEnum val)
 {
     using EnumType = DemandResponseLoadControl::CriticalityLevelEnum;
@@ -1860,6 +1873,7 @@ static auto __attribute__((unused)) EnsureKnownEnumValue(EnergyEvse::SupplyState
     case EnumType::kDischargingEnabled:
     case EnumType::kDisabledError:
     case EnumType::kDisabledDiagnostics:
+    case EnumType::kEnabled:
         return val;
     default:
         return EnumType::kUnknownEnumValue;
@@ -1875,6 +1889,20 @@ static auto __attribute__((unused)) EnsureKnownEnumValue(EnergyPreference::Energ
     case EnumType::kSpeed:
     case EnumType::kEfficiency:
     case EnumType::kWaterConsumption:
+        return val;
+    default:
+        return EnumType::kUnknownEnumValue;
+    }
+}
+
+static auto __attribute__((unused)) EnsureKnownEnumValue(WaterHeaterMode::ModeTag val)
+{
+    using EnumType = WaterHeaterMode::ModeTag;
+    switch (val)
+    {
+    case EnumType::kOff:
+    case EnumType::kManual:
+    case EnumType::kTimed:
         return val;
     default:
         return EnumType::kUnknownEnumValue;

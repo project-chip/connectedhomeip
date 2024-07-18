@@ -24,6 +24,8 @@ source_set("ember_extra_files") {
     "${chip_root}/src/app/util/ember-io-storage.cpp",
     "AttributeReportIBEncodeDecode.cpp",
     "AttributeReportIBEncodeDecode.h",
+    "EmberInvokeOverride.cpp",
+    "EmberInvokeOverride.h",
     "EmberReadWriteOverride.cpp",
     "EmberReadWriteOverride.h",
     "InteractionModelTemporaryOverrides.cpp",
