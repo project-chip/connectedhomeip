@@ -450,14 +450,17 @@ class CustomCommissioningParameters:
 
 
 @dataclass
-class ProblemLocation:
+class ClusterPathLocation:
+    endpoint_id: int
+    cluster_id: int
+
     def __str__(self):
-        return "UNKNOWN"
+        return (f'\n       Endpoint: {self.endpoint_id},'
+                f'\n       Cluster:  {cluster_id_str(self.cluster_id)}')
 
 
 @dataclass
-class AttributePathLocation(ProblemLocation):
-    endpoint_id: int
+class AttributePathLocation(ClusterPathLocation):
     cluster_id: Optional[int] = None
     attribute_id: Optional[int] = None
 
@@ -475,55 +478,50 @@ class AttributePathLocation(ProblemLocation):
         return desc
 
     def __str__(self):
-        return (f'\n        Endpoint: {self.endpoint_id},'
-                f'\n        Cluster:  {cluster_id_str(self.cluster_id)},'
-                f'\n        Attribute:{id_str(self.attribute_id)}')
+        return (f'{super().__str__()}'
+                f'\n      Attribute:{id_str(self.attribute_id)}')
 
 
 @dataclass
-class EventPathLocation(ProblemLocation):
-    endpoint_id: int
-    cluster_id: int
+class EventPathLocation(ClusterPathLocation):
     event_id: int
 
     def __str__(self):
-        return (f'\n        Endpoint: {self.endpoint_id},'
-                f'\n        Cluster:  {cluster_id_str(self.cluster_id)},'
-                f'\n        Event:    {id_str(self.event_id)}')
+        return (f'{super().__str__()}'
+                f'\n       Event:    {id_str(self.event_id)}')
 
 
 @dataclass
-class CommandPathLocation(ProblemLocation):
-    endpoint_id: int
-    cluster_id: int
+class CommandPathLocation(ClusterPathLocation):
     command_id: int
 
     def __str__(self):
-        return (f'\n        Endpoint: {self.endpoint_id},'
-                f'\n        Cluster:  {cluster_id_str(self.cluster_id)},'
-                f'\n        Command:  {id_str(self.command_id)}')
+        return (f'{super().__str__()}'
+                f'\n       Command:  {id_str(self.command_id)}')
 
 
 @dataclass
-class ClusterPathLocation(ProblemLocation):
-    endpoint_id: int
-    cluster_id: int
-
-    def __str__(self):
-        return (f'\n       Endpoint: {self.endpoint_id},'
-                f'\n       Cluster:  {cluster_id_str(self.cluster_id)}')
-
-
-@dataclass
-class FeaturePathLocation(ProblemLocation):
-    endpoint_id: int
-    cluster_id: int
+class FeaturePathLocation(ClusterPathLocation):
     feature_code: str
 
     def __str__(self):
-        return (f'\n        Endpoint: {self.endpoint_id},'
-                f'\n        Cluster:  {cluster_id_str(self.cluster_id)},'
-                f'\n        Feature:  {self.feature_code}')
+        return (f'{super().__str__()}'
+                f'\n       Feature:  {self.feature_code}')
+
+
+@dataclass
+class DeviceTypePathLocation:
+    device_type_id: int
+    cluster_id: Optional[int] = None
+
+    def __str__(self):
+        msg = f'\n       DeviceType: {self.device_type_id}'
+        if self.cluster_id:
+            msg += f'\n       ClusterID: {self.cluster_id}'
+        return msg
+
+
+ProblemLocation = typing.Union[ClusterPathLocation, DeviceTypePathLocation]
 
 # ProblemSeverity is not using StrEnum, but rather Enum, since StrEnum only
 # appeared in 3.11. To make it JSON serializable easily, multiple inheritance
