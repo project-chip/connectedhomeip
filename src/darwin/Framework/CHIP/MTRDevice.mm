@@ -15,7 +15,7 @@
  *    limitations under the License.
  */
 
-#import <Matter/MTRDefines.h>
+#import <Matter/Matter.h>
 #import <os/lock.h>
 
 #import "MTRAsyncWorkQueue.h"
@@ -39,19 +39,20 @@
 #import "MTRMetricsCollector.h"
 #import "MTRTimeUtils.h"
 #import "MTRUnfairLock.h"
+#import "MTRUtilities.h"
 #import "zap-generated/MTRCommandPayloads_Internal.h"
 
-#include "lib/core/CHIPError.h"
-#include "lib/core/DataModelTypes.h"
-#include <app/ConcreteAttributePath.h>
-#include <lib/support/FibonacciUtils.h>
+#import "lib/core/CHIPError.h"
+#import "lib/core/DataModelTypes.h"
+#import <app/ConcreteAttributePath.h>
+#import <lib/support/FibonacciUtils.h>
 
-#include <app/AttributePathParams.h>
-#include <app/BufferedReadCallback.h>
-#include <app/ClusterStateCache.h>
-#include <app/InteractionModelEngine.h>
-#include <platform/LockTracker.h>
-#include <platform/PlatformManager.h>
+#import <app/AttributePathParams.h>
+#import <app/BufferedReadCallback.h>
+#import <app/ClusterStateCache.h>
+#import <app/InteractionModelEngine.h>
+#import <platform/LockTracker.h>
+#import <platform/PlatformManager.h>
 
 typedef void (^MTRDeviceAttributeReportHandler)(NSArray * _Nonnull);
 
@@ -336,11 +337,8 @@ static NSString * const sLastInitialSubscribeLatencyKey = @"lastInitialSubscribe
 
 - (BOOL)isEqualToClusterData:(MTRDeviceClusterData *)otherClusterData
 {
-    if (!otherClusterData)
-        return NO;
-
-    return (otherClusterData.dataVersion && [_dataVersion isEqual:otherClusterData.dataVersion])
-        && (otherClusterData.attributes && [_attributes isEqual:otherClusterData.attributes]);
+    return MTREqualObjects(_dataVersion, otherClusterData.dataVersion)
+        && MTREqualObjects(_attributes, otherClusterData.attributes);
 }
 
 - (BOOL)isEqual:(id)object
@@ -3671,7 +3669,9 @@ static BOOL AttributeHasChangesOmittedQuality(MTRAttributePath * attributePath)
         }
     }
 
-    MTR_LOG("%@ report from reported values %@", self, attributePathsToReport);
+    if (attributePathsToReport.count > 0) {
+        MTR_LOG("%@ report from reported values %@", self, attributePathsToReport);
+    }
 
     return attributesToReport;
 }

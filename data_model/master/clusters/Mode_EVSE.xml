@@ -79,4 +79,23 @@ Davis, CA 95616, USA
       </field>
     </struct>
   </dataTypes>
+  <features>
+    <feature bit="0" code="DEPONOFF" name="OnOff" summary="Dependency with the OnOff cluster">
+      <provisionalConform/>
+    </feature>
+  </features>
+  <attributes>
+    <attribute id="0x0000" name="SupportedModes">
+      <mandatoryConform/>
+    </attribute>
+    <attribute id="0x0001" name="CurrentMode">
+      <mandatoryConform/>
+    </attribute>
+    <attribute id="0x0002" name="StartUpMode">
+      <provisionalConform/>
+    </attribute>
+    <attribute id="0x0003" name="OnMode">
+      <provisionalConform/>
+    </attribute>
+  </attributes>
 </cluster>

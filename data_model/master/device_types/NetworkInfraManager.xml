@@ -62,7 +62,7 @@ Davis, CA 95616, USA
   <classification class="simple" scope="endpoint"/>
   <conditions/>
   <clusters>
-    <cluster id="0x0451" name="Wi" side="server">
+    <cluster id="0x0451" name="Wi-Fi Network Management" side="server">
       <mandatoryConform/>
     </cluster>
     <cluster id="0x0452" name="Thread Border Router Management" side="server">
