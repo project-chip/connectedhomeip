@@ -566,14 +566,14 @@ CHIP_ERROR BLEEndPoint::SendCharacteristic(PacketBufferHandle && buf)
 
     if (mRole == kBleRole_Central)
     {
-        SuccessOrExit(SendWrite(std::move(buf)));
+        SuccessOrExit(err = SendWrite(std::move(buf)));
         // Write succeeded, so shrink remote receive window counter by 1.
         mRemoteReceiveWindowSize = static_cast<SequenceNumber_t>(mRemoteReceiveWindowSize - 1);
         ChipLogDebugBleEndPoint(Ble, "decremented remote rx window, new size = %u", mRemoteReceiveWindowSize);
     }
     else // (mRole == kBleRole_Peripheral), verified on Init
     {
-        SuccessOrExit(SendIndication(std::move(buf)));
+        SuccessOrExit(err = SendIndication(std::move(buf)));
         // Indication succeeded, so shrink remote receive window counter by 1.
         mRemoteReceiveWindowSize = static_cast<SequenceNumber_t>(mRemoteReceiveWindowSize - 1);
         ChipLogDebugBleEndPoint(Ble, "decremented remote rx window, new size = %u", mRemoteReceiveWindowSize);

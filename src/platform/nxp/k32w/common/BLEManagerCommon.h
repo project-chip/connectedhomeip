@@ -224,7 +224,7 @@ protected:
     static void blekw_gap_connection_cb(deviceId_t deviceId, gapConnectionEvent_t * pConnectionEvent);
     static void blekw_start_connection_timeout(void);
     static void blekw_stop_connection_timeout(void);
-    static bool blekw_stop_connection_internal(BLE_CONNECTION_OBJECT conId);
+    static CHIP_ERROR blekw_stop_connection_internal(BLE_CONNECTION_OBJECT conId);
 
 public:
     virtual CHIP_ERROR InitHostController(BLECallbackDelegate::GapGenericCallback cb_fp) = 0;

@@ -304,7 +304,7 @@ CHIP_ERROR BLEManagerImpl::CloseConnection(BLE_CONNECTION_OBJECT conId)
 {
     log_i("%s:%s:%d\r\n", "BLEManagerImpl", __func__, __LINE__);
     matter_close_connection(conId);
-    return true;
+    return CHIP_NO_ERROR;
 }
 
 uint16_t BLEManagerImpl::GetMTU(BLE_CONNECTION_OBJECT conId) const
