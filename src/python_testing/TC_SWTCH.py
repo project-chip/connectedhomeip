@@ -26,18 +26,19 @@
 # test-runner-run/run1/script-args: --storage-path admin_storage.json --commissioning-method on-network --discriminator 1234 --passcode 20202021 --endpoint 3 --trace-to json:${TRACE_TEST_JSON}.json --trace-to perfetto:${TRACE_TEST_PERFETTO}.perfetto
 # === END CI TEST ARGUMENTS ===
 
-import logging
 import json
+import logging
 import queue
 import time
-
 from typing import Any
-from mobly import asserts
+
 import chip.clusters as Clusters
 from chip.clusters import ClusterObjects as ClusterObjects
-from chip.clusters.Attribute import TypedAttributePath, EventReadResult
+from chip.clusters.Attribute import EventReadResult, TypedAttributePath
 from chip.clusters.Types import NullValue
-from matter_testing_support import EventChangeCallback, ClusterAttributeChangeAccumulator, AttributeValue, MatterBaseTest, TestStep, async_test_body, default_matter_test_main
+from matter_testing_support import (AttributeValue, ClusterAttributeChangeAccumulator, EventChangeCallback, MatterBaseTest,
+                                    TestStep, async_test_body, default_matter_test_main)
+from mobly import asserts
 
 logger = logging.getLogger(__name__)
 
