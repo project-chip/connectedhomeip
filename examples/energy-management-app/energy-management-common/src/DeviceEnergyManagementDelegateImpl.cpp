@@ -30,7 +30,6 @@ using namespace chip::app::Clusters::DeviceEnergyManagement::Attributes;
 
 using chip::Protocols::InteractionModel::Status;
 
-
 using chip::Optional;
 using CostsList = DataModel::List<const Structs::CostStruct::Type>;
 
@@ -782,7 +781,8 @@ int64_t DeviceEnergyManagementDelegate::GetAbsMaxPower()
     return mAbsMaxPowerMw;
 }
 
-const DataModel::Nullable<Structs::PowerAdjustCapabilityStruct::Type> & DeviceEnergyManagementDelegate::GetPowerAdjustmentCapability()
+const DataModel::Nullable<Structs::PowerAdjustCapabilityStruct::Type> &
+DeviceEnergyManagementDelegate::GetPowerAdjustmentCapability()
 {
     return mPowerAdjustCapabilityStruct;
 }

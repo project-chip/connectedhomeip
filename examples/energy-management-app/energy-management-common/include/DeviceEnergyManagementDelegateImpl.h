@@ -54,7 +54,8 @@ public:
      * @param duration The duration that the ESA SHALL maintain the requested power for.
      * @return  Success if the adjustment is accepted; otherwise the command SHALL be rejected with appropriate error.
      */
-    virtual chip::Protocols::InteractionModel::Status PowerAdjustRequest(const int64_t powerMw, const uint32_t durationS, AdjustmentCauseEnum cause) override;
+    virtual chip::Protocols::InteractionModel::Status PowerAdjustRequest(const int64_t powerMw, const uint32_t durationS,
+                                                                         AdjustmentCauseEnum cause) override;
 
     /**
      * @brief Make the ESA end the active power adjustment session & return to normal (or idle) power levels.
@@ -80,7 +81,8 @@ public:
      * @return Success if the StartTime in the Forecast is updated, otherwise the command SHALL be rejected with appropriate
      * IM_Status.
      */
-    virtual chip::Protocols::InteractionModel::Status StartTimeAdjustRequest(const uint32_t requestedStartTimeUtc, AdjustmentCauseEnum cause) override;
+    virtual chip::Protocols::InteractionModel::Status StartTimeAdjustRequest(const uint32_t requestedStartTimeUtc,
+                                                                             AdjustmentCauseEnum cause) override;
 
     /**
      * @brief Handler for PauseRequest command

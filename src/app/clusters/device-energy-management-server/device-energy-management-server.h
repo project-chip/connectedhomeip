@@ -160,12 +160,12 @@ public:
 
     // ------------------------------------------------------------------
     // Get attribute methods
-    virtual ESATypeEnum GetESAType()                                                                         = 0;
-    virtual bool GetESACanGenerate()                                                                         = 0;
-    virtual ESAStateEnum GetESAState()                                                                       = 0;
-    virtual int64_t GetAbsMinPower()                                                                         = 0;
-    virtual int64_t GetAbsMaxPower()                                                                         = 0;
-    virtual OptOutStateEnum GetOptOutState()                                                                 = 0;
+    virtual ESATypeEnum GetESAType()         = 0;
+    virtual bool GetESACanGenerate()         = 0;
+    virtual ESAStateEnum GetESAState()       = 0;
+    virtual int64_t GetAbsMinPower()         = 0;
+    virtual int64_t GetAbsMaxPower()         = 0;
+    virtual OptOutStateEnum GetOptOutState() = 0;
 
     /**
      * @brief Returns the current PowerAdjustCapability object
