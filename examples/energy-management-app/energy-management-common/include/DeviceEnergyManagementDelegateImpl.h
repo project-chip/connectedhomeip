@@ -241,7 +241,7 @@ private:
     void HandlePowerAdjustTimerExpiry();
 
     // Method to cancel a PowerAdjustment
-    CHIP_ERROR CancelPowerAdjustRequestAndSendEvent(CauseEnum cause);
+    CHIP_ERROR CancelPowerAdjustRequestAndGenerateEvent(CauseEnum cause);
 
     // Method to send a PowerAdjustEnd event
     CHIP_ERROR SendPowerAdjustEndEvent(CauseEnum cause);
@@ -258,7 +258,7 @@ private:
     void HandlePauseRequestTimerExpiry();
 
     // Method to cancel a PauseRequest
-    CHIP_ERROR CancelPauseRequestAndSendEvent(CauseEnum cause);
+    CHIP_ERROR CancelPauseRequestAndGenerateEvent(CauseEnum cause);
 
     // Method to send a Paused event
     CHIP_ERROR SendResumedEvent(CauseEnum cause);

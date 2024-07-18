@@ -82,7 +82,7 @@ void DeviceEnergyManagementDelegate::SetDEMManufacturerDelegate(
 Status DeviceEnergyManagementDelegate::PowerAdjustRequest(const int64_t powerMw, const uint32_t durationS,
                                                           AdjustmentCauseEnum cause)
 {
-    bool sendEvent = false;
+    bool generateEvent = false;
 
     // If a timer is running, cancel it so we can start it with the new duration
     if (mPowerAdjustmentInProgress)
@@ -92,7 +92,7 @@ Status DeviceEnergyManagementDelegate::PowerAdjustRequest(const int64_t powerMw,
     else
     {
         // Going to start a new power adjustment so will need to send an event
-        sendEvent = true;
+        generateEvent = true;
 
         // Record when this PowerAdjustment starts. Note if we do not set this value if a PowerAdjustment is in progress
         CHIP_ERROR err = GetEpochTS(mPowerAdjustmentStartTimeUtc);
@@ -143,7 +143,7 @@ Status DeviceEnergyManagementDelegate::PowerAdjustRequest(const int64_t powerMw,
         return Status::Failure;
     }
 
-    if (sendEvent)
+    if (generateEvent)
     {
         Events::PowerAdjustStart::Type event;
         EventNumber eventNumber;
@@ -151,7 +151,7 @@ Status DeviceEnergyManagementDelegate::PowerAdjustRequest(const int64_t powerMw,
         if (CHIP_NO_ERROR != err)
         {
             // TODO: Note: should the PowerAdjust just initiated be cancelled because an Event could not be logged?
-            ChipLogError(AppServer, "Unable to send notify PowerAdjustStart event: %" CHIP_ERROR_FORMAT, err.Format());
+            ChipLogError(AppServer, "Unable to generate PowerAdjustStart event: %" CHIP_ERROR_FORMAT, err.Format());
             HandlePowerAdjustRequestFailure();
             return Status::Failure;
         }
@@ -236,7 +236,7 @@ Status DeviceEnergyManagementDelegate::CancelPowerAdjustRequest()
 {
     Status status = Status::Success;
 
-    CHIP_ERROR err = CancelPowerAdjustRequestAndSendEvent(DeviceEnergyManagement::CauseEnum::kCancelled);
+    CHIP_ERROR err = CancelPowerAdjustRequestAndGenerateEvent(DeviceEnergyManagement::CauseEnum::kCancelled);
     if (CHIP_NO_ERROR != err)
     {
         status = Status::Failure;
@@ -255,7 +255,7 @@ Status DeviceEnergyManagementDelegate::CancelPowerAdjustRequest()
  *   2) generate a PowerAdjustEnd event with cause code Cancelled
  *   3) if necessary, update the forecast with new expected end time
  */
-CHIP_ERROR DeviceEnergyManagementDelegate::CancelPowerAdjustRequestAndSendEvent(CauseEnum cause)
+CHIP_ERROR DeviceEnergyManagementDelegate::CancelPowerAdjustRequestAndGenerateEvent(CauseEnum cause)
 {
     DeviceLayer::SystemLayer().CancelTimer(PowerAdjustTimerExpiry, this);
 
@@ -312,7 +312,7 @@ CHIP_ERROR DeviceEnergyManagementDelegate::SendPowerAdjustEndEvent(CauseEnum cau
     err = LogEvent(event, mEndpointId, eventNumber);
     if (CHIP_NO_ERROR != err)
     {
-        ChipLogError(AppServer, "Unable to send notify PowerAdjustEnd event: %" CHIP_ERROR_FORMAT, err.Format());
+        ChipLogError(AppServer, "Unable to generate PowerAdjustEnd event: %" CHIP_ERROR_FORMAT, err.Format());
         return err;
     }
 
@@ -401,7 +401,7 @@ Status DeviceEnergyManagementDelegate::StartTimeAdjustRequest(const uint32_t req
  */
 Status DeviceEnergyManagementDelegate::PauseRequest(const uint32_t durationS, AdjustmentCauseEnum cause)
 {
-    bool sendEvent = false;
+    bool generateEvent = false;
 
     // If a timer is running, cancel it so we can start it with the new duration
     if (mPauseRequestInProgress)
@@ -410,7 +410,7 @@ Status DeviceEnergyManagementDelegate::PauseRequest(const uint32_t durationS, Ad
     }
     else
     {
-        sendEvent = true;
+        generateEvent = true;
 
         // Remember we have a timer running so we don't send a Paused event should another request come
         // in before this timer expires
@@ -436,14 +436,14 @@ Status DeviceEnergyManagementDelegate::PauseRequest(const uint32_t durationS, Ad
         }
     }
 
-    if (sendEvent)
+    if (generateEvent)
     {
         Events::Paused::Type event;
         EventNumber eventNumber;
         err = LogEvent(event, mEndpointId, eventNumber);
         if (CHIP_NO_ERROR != err)
         {
-            ChipLogError(AppServer, "Unable to send notify Paused event: %" CHIP_ERROR_FORMAT, err.Format());
+            ChipLogError(AppServer, "Unable to generate Paused event: %" CHIP_ERROR_FORMAT, err.Format());
             HandlePauseRequestFailure();
             return Status::Failure;
         }
@@ -528,7 +528,7 @@ void DeviceEnergyManagementDelegate::HandlePauseRequestTimerExpiry()
  *   2) generate a PowerAdjustEnd event with cause code Cancelled
  *   3) if necessary, update the forecast with new expected end time
  */
-CHIP_ERROR DeviceEnergyManagementDelegate::CancelPauseRequestAndSendEvent(CauseEnum cause)
+CHIP_ERROR DeviceEnergyManagementDelegate::CancelPauseRequestAndGenerateEvent(CauseEnum cause)
 {
     mPauseRequestInProgress = false;
 
@@ -573,7 +573,7 @@ CHIP_ERROR DeviceEnergyManagementDelegate::SendResumedEvent(CauseEnum cause)
     CHIP_ERROR err = LogEvent(event, mEndpointId, eventNumber);
     if (CHIP_NO_ERROR != err)
     {
-        ChipLogError(AppServer, "Unable to send notify Resumed event: %" CHIP_ERROR_FORMAT, err.Format());
+        ChipLogError(AppServer, "Unable to generate Resumed event: %" CHIP_ERROR_FORMAT, err.Format());
     }
 
     return err;
@@ -598,7 +598,7 @@ Status DeviceEnergyManagementDelegate::ResumeRequest()
 
     if (mPauseRequestInProgress)
     {
-        CHIP_ERROR err = CancelPauseRequestAndSendEvent(CauseEnum::kCancelled);
+        CHIP_ERROR err = CancelPauseRequestAndGenerateEvent(CauseEnum::kCancelled);
         if (err == CHIP_NO_ERROR)
         {
             status = Status::Success;
@@ -947,7 +947,7 @@ CHIP_ERROR DeviceEnergyManagementDelegate::SetOptOutState(OptOutStateEnum newVal
              mPowerAdjustCapabilityStruct.Value().cause == PowerAdjustReasonEnum::kGridOptimizationAdjustment) ||
             newValue == OptOutStateEnum::kOptOut)
         {
-            err = CancelPowerAdjustRequestAndSendEvent(DeviceEnergyManagement::CauseEnum::kUserOptOut);
+            err = CancelPowerAdjustRequestAndGenerateEvent(DeviceEnergyManagement::CauseEnum::kUserOptOut);
         }
     }
 
@@ -961,7 +961,7 @@ CHIP_ERROR DeviceEnergyManagementDelegate::SetOptOutState(OptOutStateEnum newVal
              mForecast.Value().forecastUpdateReason == ForecastUpdateReasonEnum::kGridOptimization) ||
             newValue == OptOutStateEnum::kOptOut)
         {
-            err = CancelPauseRequestAndSendEvent(DeviceEnergyManagement::CauseEnum::kUserOptOut);
+            err = CancelPauseRequestAndGenerateEvent(DeviceEnergyManagement::CauseEnum::kUserOptOut);
         }
     }
 
