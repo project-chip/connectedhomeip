@@ -292,7 +292,7 @@ CHIP_ERROR ReadSingleClusterData(const SubjectDescriptor & aSubjectDescriptor, b
 
     if (attributeCluster == nullptr && attributeMetadata == nullptr)
     {
-        return CHIP_IM_GLOBAL_STATUS_VALUE(UnsupportedAttributeStatus(aPath));
+        return CHIP_ERROR_IM_GLOBAL_STATUS_VALUE(UnsupportedAttributeStatus(aPath));
     }
 
     // Check access control. A failed check will disallow the operation, and may or may not generate an attribute report
@@ -564,7 +564,7 @@ CHIP_ERROR ReadSingleClusterData(const SubjectDescriptor & aSubjectDescriptor, b
         return SendSuccessStatus(attributeReport, attributeDataIBBuilder);
     }
 
-    return CHIP_IM_GLOBAL_STATUS_VALUE(status);
+    return CHIP_ERROR_IM_GLOBAL_STATUS_VALUE(status);
 }
 
 namespace {
