@@ -29,21 +29,34 @@ from time import sleep
 import chip.clusters as Clusters
 from chip import ChipDeviceCtrl
 from chip.ChipDeviceCtrl import CommissioningParameters
-from matter_testing_support import MatterBaseTest, async_test_body, default_matter_test_main
+from matter_testing_support import MatterBaseTest, TestStep, async_test_body, default_matter_test_main
 from mobly import asserts
 
 
 class TC_CADMIN_1_9(MatterBaseTest):
-
-    def OpenCommissioningWindow(self) -> CommissioningParameters:
+    async def OpenCommissioningWindow(self) -> CommissioningParameters:
         try:
+            cluster = Clusters.GeneralCommissioning
+            attribute = cluster.Attributes.BasicCommissioningInfo
+            duration = await self.read_single_attribute_check_success(endpoint=0, cluster=cluster, attribute=attribute)
             params = self.th1.OpenCommissioningWindow(
-                nodeid=self.dut_node_id, timeout=900, iteration=10000, discriminator=self.discriminator, option=1)
+                nodeid=self.dut_node_id, timeout=duration.maxCumulativeFailsafeSeconds, iteration=10000, discriminator=self.discriminator, option=1)
             return params
 
         except Exception as e:
             logging.exception('Error running OpenCommissioningWindow %s', e)
             asserts.assert_true(False, 'Failed to open commissioning window')
+
+    def steps_TC_CADMIN_1_9(self) -> list[TestStep]:
+        return [
+            TestStep(1, "Commissioning, already done", is_commissioning=True),
+            TestStep(
+                2, "TH1 opens commissioning window on DUT with duration set to value for maxCumulativeFailsafeSeconds"),
+            TestStep(3, "TH2 attempts to connect 20 times to endpoint with incorrect passcode"),
+            TestStep(4, "TH2 attempts to connect to endpoint with correct passcode"),
+            TestStep(5, "TH1 opening Commissioning Window one more time to validate ability to do so"),
+            TestStep(6, "TH1 revoking Commissioning Window"),
+        ]
 
     def generate_unique_random_value(self, value):
         while True:
@@ -61,11 +74,10 @@ class TC_CADMIN_1_9(MatterBaseTest):
                 errcode = self.th2.CommissionOnNetwork(
                     nodeId=self.dut_node_id, setupPinCode=setup_code,
                     filterType=ChipDeviceCtrl.DiscoveryFilterType.LONG_DISCRIMINATOR, filter=self.discriminator)
-                logging.info('Commissioning complete done. Successful? {}, errorcode = {}'.format(errcode.is_success, errcode))
+                logging.info('Commissioning complete done. Successful? {}, errorcode = {}, cycle={}'.format(errcode.is_success, errcode, (cycle+1)))
                 asserts.assert_false(errcode.is_success, 'Commissioning complete did not error as expected')
                 asserts.assert_true(errcode.sdk_code == expectedErrCode,
                                     'Unexpected error code returned from CommissioningComplete')
-                sleep(1)
 
         elif expectedErrCode == 50:
             logging.info("-----------------Attempting connection expecting timeout-------------------------")
@@ -81,7 +93,7 @@ class TC_CADMIN_1_9(MatterBaseTest):
 
     @async_test_body
     async def test_TC_CADMIN_1_9(self):
-        self.print_step(1, "Commissioning, already done")
+        self.step(1)
 
         # Establishing TH1 and TH2
         self.th1 = self.default_controller
@@ -90,24 +102,26 @@ class TC_CADMIN_1_9(MatterBaseTest):
         th2_fabric_admin = th2_certificate_authority.NewFabricAdmin(vendorId=0xFFF1, fabricId=self.th1.fabricId + 1)
         self.th2 = th2_fabric_admin.NewController(nodeId=2, useTestCommissioner=True)
 
-        self.print_step(2, "TH1 opens commissioning window on DUT with duration set to 900")
-        params = self.OpenCommissioningWindow()
+        self.step(2)
+        params = await self.OpenCommissioningWindow()
 
-        self.print_step(3, "TH2 attempts to connect 20 times to endpoint with incorrect passcode")
+        self.step(3)
         await self.CommissionAttempt(params, expectedErrCode=0x03)
+        # TODO: Found if we don't add sleep time after test completes that we get unexpected error code and response after the 21st iteration.
+        # Link to Bug Filed: https://github.com/project-chip/connectedhomeip/issues/34383
+        sleep(1)
 
-        self.print_step(4, "TH2 attempts to connect to endpoint with correct passcode")
+        self.step(4)
         await self.CommissionAttempt(params, expectedErrCode=0x32)
 
-        self.print_step(5, "TH1 opening Commissioning Window one more time to validate ability to do so")
-        params = self.OpenCommissioningWindow()
+        self.step(5)
+        params = await self.OpenCommissioningWindow()
 
-        self.print_step(6, "TH1 revoking Commissioning Window")
+        self.step(6)
         revokeCmd = Clusters.AdministratorCommissioning.Commands.RevokeCommissioning()
         await self.th1.SendCommand(nodeid=self.dut_node_id, endpoint=0, payload=revokeCmd, timedRequestTimeoutMs=6000)
         # The failsafe cleanup is scheduled after the command completes, so give it a bit of time to do that
         sleep(1)
-
 
 if __name__ == "__main__":
     default_matter_test_main()
