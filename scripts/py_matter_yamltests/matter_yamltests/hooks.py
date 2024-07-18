@@ -227,6 +227,12 @@ class TestRunnerHooks():
         """
         pass
 
+    def test_skipped(self, filename: str, name: str):
+        """
+        This method is called when the test script determines that the test is not applicable for the DUT.
+        """
+        pass
+
 
 class WebSocketRunnerHooks():
     def connecting(self, url: str):

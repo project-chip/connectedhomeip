@@ -34,6 +34,7 @@ from dataclasses import asdict as dataclass_asdict
 from dataclasses import dataclass, field
 from datetime import datetime, timedelta, timezone
 from enum import Enum
+from functools import partial
 from typing import List, Optional, Tuple
 
 from chip.tlv import float32, uint
@@ -339,6 +340,8 @@ class InternalTestRunnerHooks(TestRunnerHooks):
                     placeholder: Optional[str] = None,
                     default_value: Optional[str] = None) -> None:
         pass
+    def test_skipped(self, filename: str, name: str):
+        logging.info(f"Skipping test from {filename}: {name}")
 
 
 @dataclass
@@ -771,8 +774,10 @@ class MatterBaseTest(base_test.BaseTestClass):
 
     def setup_test(self):
         self.current_step_index = 0
+        self.test_start_time = datetime.now(timezone.utc)
         self.step_start_time = datetime.now(timezone.utc)
         self.step_skipped = False
+        self.failed = False
         if self.runner_hook and not self.is_commissioning:
             test_name = self.current_test_info.name
             steps = self.get_defined_test_steps(test_name)
@@ -949,12 +954,11 @@ class MatterBaseTest(base_test.BaseTestClass):
 
             record is of type TestResultRecord
         '''
+        self.failed = True
         if self.runner_hook and not self.is_commissioning:
             exception = record.termination_signal.exception
             step_duration = (datetime.now(timezone.utc) - self.step_start_time) / timedelta(microseconds=1)
-            # This isn't QUITE the test duration because the commissioning is handled separately, but it's clsoe enough for now
-            # This is already given in milliseconds
-            test_duration = record.end_time - record.begin_time
+            test_duration = datetime.now(timezone.utc) - self.test_start_time
             # TODO: I have no idea what logger, logs, request or received are. Hope None works because I have nothing to give
             self.runner_hook.step_failure(logger=None, logs=None, duration=step_duration, request=None, received=None)
             self.runner_hook.test_stop(exception=exception, duration=test_duration)
@@ -968,7 +972,7 @@ class MatterBaseTest(base_test.BaseTestClass):
             # What is request? This seems like an implementation detail for the runner
             # TODO: As with failure, I have no idea what logger, logs or request are meant to be
             step_duration = (datetime.now(timezone.utc) - self.step_start_time) / timedelta(microseconds=1)
-            test_duration = record.end_time - record.begin_time
+            test_duration = datetime.now(timezone.utc) - self.test_start_time
             self.runner_hook.step_success(logger=None, logs=None, duration=step_duration, request=None)
 
         # TODO: this check could easily be annoying when doing dev. flag it somehow? Ditto with the in-order check
@@ -984,6 +988,18 @@ class MatterBaseTest(base_test.BaseTestClass):
             asserts.fail("Test script error: Not all required steps were run")
 
         if self.runner_hook and not self.is_commissioning:
+            self.runner_hook.test_stop(exception=None, duration=test_duration)
+
+    def on_skip(self, record):
+        ''' Called by Mobly on test skip
+
+            record is of type TestResultRecord
+        '''
+        if self.runner_hook and not self.is_commissioning:
+            test_duration = record.end_time - record.begin_time
+            test_name = self.current_test_info.name
+            filename = inspect.getfile(self.__class__)
+            self.runner_hook.test_skipped(filename, test_name)
             self.runner_hook.test_stop(exception=None, duration=test_duration)
 
     def pics_guard(self, pics_condition: bool):
@@ -1531,6 +1547,10 @@ def parse_matter_test_args(argv: Optional[List[str]] = None) -> MatterTestConfig
 
     return convert_args_to_matter_config(parser.parse_known_args(argv)[0])
 
+def _async_runner(body, self: MatterBaseTest, *args, **kwargs):
+    timeout = self.matter_test_config.timeout if self.matter_test_config.timeout is not None else self.default_timeout
+    runner_with_timeout = asyncio.wait_for(body(self, *args, **kwargs), timeout=timeout)
+    return asyncio.run(runner_with_timeout)
 
 def async_test_body(body):
     """Decorator required to be applied whenever a `test_*` method is `async def`.
@@ -1541,12 +1561,78 @@ def async_test_body(body):
     """
 
     def async_runner(self: MatterBaseTest, *args, **kwargs):
-        timeout = self.matter_test_config.timeout if self.matter_test_config.timeout is not None else self.default_timeout
-        runner_with_timeout = asyncio.wait_for(body(self, *args, **kwargs), timeout=timeout)
-        return asyncio.run(runner_with_timeout)
+        return _async_runner(body, self, *args, **kwargs)
 
     return async_runner
 
+def per_node_test(body):
+
+    """ Decorator to be used for PICS-free tests that apply to the entire node.
+
+    Use this decorator when your script needs to be run once to validate the whole node.
+    To use this decorator, the test must NOT have an associated pics_ method.
+    """
+    def whole_node_runner(self: MatterBaseTest, *args, **kwargs):
+        asserts.assert_false(self.get_test_pics(self.current_test_info.name), "pics_ method supplied for per_node_test.")
+        return _async_runner(body, self, *args, **kwargs)
+
+    return whole_node_runner
+
+EndpointCheckFunction = typing.Callable[[Clusters.Attribute.AsyncReadTransaction.ReadResponse, int], bool]
+
+def _has_cluster(wildcard, endpoint, cluster: ClusterObjects.Cluster) -> bool:
+    try:
+        return cluster in wildcard.attributes[endpoint]
+    except KeyError:
+        return False
+
+def has_cluster(cluster: ClusterObjects.ClusterObjectDescriptor) -> EndpointCheckFunction:
+    return partial(_has_cluster, cluster=cluster)
+
+def _has_attribute(wildcard, endpoint, attribute: ClusterObjects.ClusterAttributeDescriptor) -> bool:
+    cluster = getattr(Clusters, attribute.__qualname__.split('.')[-3])
+    try:
+        attr_list = wildcard.attributes[endpoint][cluster][cluster.Attributes.AttributeList]
+        return attribute.attribute_id in attr_list
+    except KeyError:
+        return False
+
+def has_attribute(attribute: ClusterObjects.ClusterAttributeDescriptor) -> EndpointCheckFunction:
+    return partial(_has_attribute, attribute=attribute)
+
+async def get_accepted_endpoints_for_test(self:MatterBaseTest, accept_function: EndpointCheckFunction):
+    wildcard = await self.default_controller.Read(self.dut_node_id, [()])
+    return [e for e in wildcard.attributes.keys() if accept_function(wildcard, e)]
+
+def per_endpoint_test(accept_function):
+    def per_endpoint_test_internal(body):
+        def per_endpoint_runner(self: MatterBaseTest, *args, **kwargs):
+            asserts.assert_false(self.get_test_pics(self.current_test_info.name), "pics_ method supplied for per_endpoint_test.")
+            runner_with_timeout = asyncio.wait_for(get_accepted_endpoints_for_test(self, accept_function), timeout=5)
+            endpoints = asyncio.run(runner_with_timeout)
+            if not endpoints:
+                logging.info("No matching endpoints found - skipping test")
+                asserts.skip('No endpoints match requirements')
+                return
+            logging.info(f"Running test on the following endpoints: {endpoints}")
+            # setup_class is meant to be called once, but setup_test is expected to be run before
+            # each iteration. Mobly will run it for us the first time, but since we're running this
+            # more than one time, we want to make sure we reset everything as expected.
+            # Ditto for teardown - we want to tear down after each iteration, and we want to notify the hool that
+            # the test iteration is stopped. test_stop is called by on_pass or on_fail during the last iteration or
+            # on failure.
+            for e in endpoints:
+                logging.info(f'Running test on endpoint {e}')
+                if e != endpoints[0]:
+                    self.setup_test()
+                self.matter_test_config.endpoint = e
+                _async_runner(body, self, *args, **kwargs)
+                if e != endpoints[-1] and not self.failed:
+                    self.teardown_test()
+                    self.runner_hook.test_stop(exception=None, duration=datetime.now(timezone.utc) - self.test_start_time)
+
+        return per_endpoint_runner
+    return per_endpoint_test_internal
 
 class CommissionDeviceTest(MatterBaseTest):
     """Test class auto-injected at the start of test list to commission a device when requested"""

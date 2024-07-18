@@ -37,21 +37,24 @@ class AsyncMock(MagicMock):
 
 
 class MockTestRunner():
-    def __init__(self, filename: str, classname: str, test: str, endpoint: int, pics: dict[str, bool] = {}):
-        self.config = MatterTestConfig(
-            tests=[test], endpoint=endpoint, dut_node_ids=[1], pics=pics)
+    def __init__(self, filename: str, classname: str, test: str, endpoint: int = 0, pics: dict[str, bool] = {}):
+        self.set_test(filename, classname, test, endpoint, pics)
         self.stack = MatterStackState(self.config)
         self.default_controller = self.stack.certificate_authorities[0].adminList[0].NewController(
             nodeId=self.config.controller_node_id,
             paaTrustStorePath=str(self.config.paa_trust_store_path),
             catTags=self.config.controller_cat_tags
         )
+
+    def set_test(self, filename: str, classname: str, test: str, endpoint: int = 0, pics: dict[str, bool] = {}):
+        self.config = MatterTestConfig(
+            tests=[test], endpoint=endpoint, dut_node_ids=[1], pics=pics)
         module = importlib.import_module(Path(os.path.basename(filename)).stem)
         self.test_class = getattr(module, classname)
 
     def Shutdown(self):
         self.stack.Shutdown()
 
-    def run_test_with_mock_read(self,  read_cache: Attribute.AsyncReadTransaction.ReadResponse):
+    def run_test_with_mock_read(self,  read_cache: Attribute.AsyncReadTransaction.ReadResponse, hooks = None):
         self.default_controller.Read = AsyncMock(return_value=read_cache)
-        return run_tests_no_exit(self.test_class, self.config, None, self.default_controller, self.stack)
+        return run_tests_no_exit(self.test_class, self.config, hooks, self.default_controller, self.stack)
