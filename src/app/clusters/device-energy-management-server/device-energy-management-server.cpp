@@ -678,7 +678,7 @@ void Instance::HandleModifyForecastRequest(HandlerContext & ctx, const Commands:
         if (slotAdjustment.slotIndex > forecast.Value().slots.size())
         {
             ChipLogError(Zcl, "DEM: Bad slot index %d", slotAdjustment.slotIndex);
-            ctx.mCommandHandler.AddStatus(ctx.mRequestPath, Status::ConstraintError);
+            ctx.mCommandHandler.AddStatus(ctx.mRequestPath, Status::Failure);
             return;
         }
 
