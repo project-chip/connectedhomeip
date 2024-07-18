@@ -42,11 +42,11 @@ public:
      * @param[in]   aCurrentRandomness_mA  This is used to define the max randomness of the
      *                             random current values
      * @param[in]   aInterval_s  - the callback interval in seconds
-     * @param[in]   bReset       - boolean: true will reset the energy values to 0
+     * @param[in]   aReset       - boolean: true will reset the energy values to 0
      */
     void StartFakeReadings(chip::EndpointId aEndpointId, int64_t aPower_mW, uint32_t aPowerRandomness_mW, int64_t aVoltage_mV,
                            uint32_t aVoltageRandomness_mV, int64_t aCurrent_mA, uint32_t aCurrentRandomness_mA, uint8_t aInterval_s,
-                           bool bReset);
+                           bool aReset);
 
     /**
      * @brief   Stops any active updates to the fake load data callbacks
