@@ -58,12 +58,9 @@ class TC_CNET_1_4(MatterBaseTest):
         # Commissioning is already done
         self.step(1)
 
-        cnet = Clusters.NetworkCommissioning
-        afeam = cnet.Attributes.FeatureMap
-
         self.step(2)
         # Read FeatureMap attribute with wildcard endpoint
-        feature_map_results = await self.default_controller.ReadAttribute(self.dut_node_id, [(afeam)], fabricFiltered=True)
+        feature_map_results = await self.default_controller.ReadAttribute(self.dut_node_id, [(Clusters.NetworkCommissioning.Attributes.FeatureMap)], fabricFiltered=True)
 
         NumNetworkCommissioning = len(feature_map_results)
         if NumNetworkCommissioning == 0:
