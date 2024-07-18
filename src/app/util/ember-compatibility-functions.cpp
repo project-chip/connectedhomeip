@@ -455,14 +455,8 @@ CHIP_ERROR ReadSingleClusterData(const SubjectDescriptor & aSubjectDescriptor, b
         uint8_t dataLength = gEmberAttributeIOBufferSpan[0];
         if (dataLength == 0xFF)
         {
-            if (isNullable)
-            {
-                ReturnErrorOnFailure(writer->PutNull(tag));
-            }
-            else
-            {
-                return CHIP_ERROR_INCORRECT_STATE;
-            }
+            VerifyOrReturnError(isNullable, CHIP_ERROR_INCORRECT_STATE);
+            ReturnErrorOnFailure(writer->PutNull(tag));
         }
         else
         {
@@ -477,14 +471,8 @@ CHIP_ERROR ReadSingleClusterData(const SubjectDescriptor & aSubjectDescriptor, b
         memcpy(&dataLength, gEmberAttributeIOBufferSpan.data(), sizeof(dataLength));
         if (dataLength == 0xFFFF)
         {
-            if (isNullable)
-            {
-                ReturnErrorOnFailure(writer->PutNull(tag));
-            }
-            else
-            {
-                return CHIP_ERROR_INCORRECT_STATE;
-            }
+            VerifyOrReturnError(isNullable, CHIP_ERROR_INCORRECT_STATE);
+            ReturnErrorOnFailure(writer->PutNull(tag));
         }
         else
         {
@@ -498,14 +486,8 @@ CHIP_ERROR ReadSingleClusterData(const SubjectDescriptor & aSubjectDescriptor, b
         uint8_t dataLength   = gEmberAttributeIOBufferSpan[0];
         if (dataLength == 0xFF)
         {
-            if (isNullable)
-            {
-                ReturnErrorOnFailure(writer->PutNull(tag));
-            }
-            else
-            {
-                return CHIP_ERROR_INCORRECT_STATE;
-            }
+            VerifyOrReturnError(isNullable, CHIP_ERROR_INCORRECT_STATE);
+            ReturnErrorOnFailure(writer->PutNull(tag));
         }
         else
         {
@@ -519,14 +501,8 @@ CHIP_ERROR ReadSingleClusterData(const SubjectDescriptor & aSubjectDescriptor, b
         memcpy(&dataLength, gEmberAttributeIOBufferSpan.data(), sizeof(dataLength));
         if (dataLength == 0xFFFF)
         {
-            if (isNullable)
-            {
-                ReturnErrorOnFailure(writer->PutNull(tag));
-            }
-            else
-            {
-                return CHIP_ERROR_INCORRECT_STATE;
-            }
+            VerifyOrReturnError(isNullable, CHIP_ERROR_INCORRECT_STATE);
+            ReturnErrorOnFailure(writer->PutNull(tag));
         }
         else
         {
