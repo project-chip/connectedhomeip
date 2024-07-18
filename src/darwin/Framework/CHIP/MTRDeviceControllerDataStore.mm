@@ -1368,6 +1368,14 @@ typedef NSArray<NSString *> MTRClientDataKeyIndex;
     });
 }
 
+- (NSArray<NSString *> *)storedClientDataKeysForNodeID:(NSNumber *)nodeID {
+    __block NSArray<NSString *> * keys = nil;
+    dispatch_sync(_storageDelegateQueue, ^{
+        keys = [self _clientDataIndexForNodeID:nodeID];
+    });
+    return keys;
+}
+
 @end
 
 @implementation MTRCASESessionResumptionInfo

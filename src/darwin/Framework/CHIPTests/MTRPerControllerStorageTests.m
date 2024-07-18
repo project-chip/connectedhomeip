@@ -3072,4 +3072,83 @@ static const uint16_t kSubscriptionPoolBaseTimeoutInSeconds = 30;
     XCTAssertFalse([controller isRunning]);
 }
 
+- (void)testClientDataStorageKeysAccessor {
+    __auto_type * factory = [MTRDeviceControllerFactory sharedInstance];
+    XCTAssertNotNil(factory);
+
+    __auto_type * rootKeys = [[MTRTestKeys alloc] init];
+    XCTAssertNotNil(rootKeys);
+
+    __auto_type * operationalKeys = [[MTRTestKeys alloc] init];
+    XCTAssertNotNil(operationalKeys);
+
+    __auto_type * storageDelegate = [[MTRTestPerControllerStorage alloc] initWithControllerID:[NSUUID UUID]];
+
+    NSNumber * testNodeID = @(0xcafe);
+    NSNumber * fabricID = @(0x1234);
+
+    NSString * testKeyA = @"testKeyAForAddAndRemove";
+    NSString * testValueA = @"testValueAForAddAndRemove";
+
+    NSString * testKeyB = @"testKeyBForAddAndRemove";
+    NSString * testValueB = @"testValueBForAddAndRemove";
+
+    NSError * error;
+    MTRDeviceController * controller = [self startControllerWithRootKeys:rootKeys
+                                                         operationalKeys:operationalKeys
+                                                                fabricID:fabricID
+                                                                  nodeID:testNodeID
+                                                                 storage:storageDelegate
+                                                                   error:&error];
+    XCTAssertNil(error);
+    XCTAssertNotNil(controller);
+    XCTAssertTrue([controller isRunning]);
+
+    XCTAssertEqualObjects(controller.controllerNodeID, testNodeID);
+
+    // actual test begins here
+
+    XCTAssertNotNil(controller.controllerDataStore);
+
+    id verifyEmptyData = [controller.controllerDataStore clientDataForKey:testKeyA nodeID:testNodeID];
+    XCTAssertNil(verifyEmptyData);
+
+    // add testKeyA and value
+    [controller.controllerDataStore storeClientDataForKey:testKeyA value:testValueA forNodeID:testNodeID];
+    
+    // key should be present for A and not present for B
+    NSArray<NSString *> * keys1 = [controller.controllerDataStore storedClientDataKeysForNodeID:testNodeID];
+    XCTAssert([keys1 containsObject:testKeyA]);
+    XCTAssertFalse([keys1 containsObject:testKeyB]);
+
+    // add testKeyB and value
+    [controller.controllerDataStore storeClientDataForKey:testKeyB value:testValueB forNodeID:testNodeID];
+
+    // keys should be present for both A and B
+    NSArray<NSString *> * keys2 = [controller.controllerDataStore storedClientDataKeysForNodeID:testNodeID];
+    XCTAssert([keys2 containsObject:testKeyA]);
+    XCTAssert([keys2 containsObject:testKeyB]);
+
+    // remove testKeyA
+    [controller.controllerDataStore removeClientDataForNodeID:testNodeID key:testKeyA];
+
+    // check keys does not contain testKeyA and does contain testKeyB
+    NSArray<NSString *> * keys3 = [controller.controllerDataStore storedClientDataKeysForNodeID:testNodeID];
+    XCTAssertFalse([keys3 containsObject:testKeyA]);
+    XCTAssert([keys3 containsObject:testKeyB]);
+
+    // remove testKeyB
+    [controller.controllerDataStore removeClientDataForNodeID:testNodeID key:testKeyB];
+
+    // check keys contains nothing
+    NSArray<NSString *> * keys4 = [controller.controllerDataStore storedClientDataKeysForNodeID:testNodeID];
+    XCTAssertEqual(0, keys4.count);
+
+    // end actual test
+
+    [controller.controllerDataStore clearStoredClientDataForNodeID:testNodeID];
+    [controller shutdown];
+    XCTAssertFalse([controller isRunning]);
+}
+
 @end
