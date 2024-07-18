@@ -308,7 +308,6 @@ void ServerInstance::ReportAttributeChanged(AttributeId attributeId)
     MatterReportingAttributeChangeCallback(mServerEndpointId, Id, attributeId);
 }
 
-
 void ServerInstance::OnFailSafeTimerExpired()
 {
     if (mDelegate)

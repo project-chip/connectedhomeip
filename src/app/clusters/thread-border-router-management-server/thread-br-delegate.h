@@ -63,7 +63,7 @@ public:
         kPending,
     };
 
-    virtual CHIP_ERROR Init(AttributeChangeCallback *attributeChangeCallback) = 0;
+    virtual CHIP_ERROR Init(AttributeChangeCallback * attributeChangeCallback) = 0;
 
     // Get whether PanChange feature is supported for the Thread BR.
     virtual bool GetPanChangeSupported() = 0;
