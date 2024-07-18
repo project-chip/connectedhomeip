@@ -77,7 +77,7 @@ CHIP_ERROR ConfigureForecast(uint16_t numSlots)
 
     sForecastStruct.isPausable = true;
 
-    sForecastStruct.activeSlotNumber.SetNonNull<uint16_t>(0);
+    sForecastStruct.activeSlotNumber.SetNonNull(0);
 
     sSlots[0].minDuration       = 10;
     sSlots[0].maxDuration       = 20;
