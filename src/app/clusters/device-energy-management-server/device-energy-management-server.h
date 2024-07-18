@@ -183,10 +183,11 @@ public:
     /**
      * @brief Returns the current Forecast object
      *
-     * The delegate MUST implement an API to provide a temporary reference to the Structs::ForecastStruct. The SDK
-     * (and other users) MUST not use the return value from GetForecast() after they have used it in the scope of
-     * the calling function. The memory associated with the ForecastStruct is likely to change or be re-allocated,
-     * so would become invalid outside the scope of this calling function.
+     * The reference returned from GetForecast() is only valid until the next Matter event
+     * is processed.  Callers must not hold on to that reference for any asynchronous processing.
+     *
+     * Once another Matter event has had a chance to run, the memory associated with the
+     * ForecastStruct is likely to change or be re-allocated, so would become invalid.
      *
      * @return  The current Forecast object
      */
