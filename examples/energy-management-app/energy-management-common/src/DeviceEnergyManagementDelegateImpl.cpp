@@ -927,7 +927,7 @@ CHIP_ERROR DeviceEnergyManagementDelegate::SetOptOutState(OptOutStateEnum newVal
 
     if (oldValue != newValue)
     {
-        ChipLogDetail(AppServer, "mOptOutState updated to %d mPowerAdjustmentInProgress %d", static_cast<int>(mOptOutState),
+        ChipLogDetail(AppServer, "mOptOutState updated to %d mPowerAdjustmentInProgress %d", to_underlying(mOptOutState),
                       mPowerAdjustmentInProgress);
         MatterReportingAttributeChangeCallback(mEndpointId, DeviceEnergyManagement::Id, OptOutState::Id);
     }
