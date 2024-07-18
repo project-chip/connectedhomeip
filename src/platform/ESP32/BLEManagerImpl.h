@@ -189,7 +189,7 @@ private:
 #ifdef CONFIG_ENABLE_ESP32_BLE_CONTROLLER
 
     void NewConnection(chip::Ble::BleLayer * bleLayer, void * appState, const SetupDiscriminator & connDiscriminator) override;
-    void NewConnection(chip::Ble::BleLayer * bleLayer, void * appState, BLE_CONNECTION_OBJECT connObj) override {};
+    void NewConnection(chip::Ble::BleLayer * bleLayer, void * appState, BLE_CONNECTION_OBJECT connObj) override{};
     CHIP_ERROR CancelConnection() override;
 
     // ===== Members that implement virtual methods on ChipDeviceScannerDelegate
