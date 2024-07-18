@@ -17,10 +17,10 @@
 
 /* Includes */
 
+#include <FreeRTOS.h>
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
-#include <FreeRTOS.h>
 
 #include "wfx_host_events.h"
 #include "wifi_config.h"
