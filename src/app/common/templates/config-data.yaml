@@ -60,7 +60,6 @@ ClustersWithInitFunctions:
     - Sample MEI
     - Scenes Management
     - Wi-Fi Network Management
-    - Thread Network Directory
 
 ClustersWithAttributeChangedFunctions:
     - Bridged Device Basic

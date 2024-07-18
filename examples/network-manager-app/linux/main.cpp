@@ -37,9 +37,9 @@ ByteSpan ByteSpanFromCharSpan(CharSpan span)
 }
 
 std::optional<DefaultThreadNetworkDirectoryServer> gThreadNetworkDirectoryServer;
-void emberAfThreadNetworkDirectoryClusterServerInitCallback(chip::EndpointId endpoint)
+void emberAfThreadNetworkDirectoryClusterInitCallback(chip::EndpointId endpoint)
 {
-    VerifyOrDie(!gThreadNetworkDirectoryServer.has_value());
+    VerifyOrDie(!gThreadNetworkDirectoryServer);
     gThreadNetworkDirectoryServer.emplace(endpoint).Init();
 }
 
