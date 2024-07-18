@@ -2816,11 +2816,11 @@ enum class ModeTag : uint16_t
     kOff    = 0x4000,
     kManual = 0x4001,
     kTimed  = 0x4002,
-    // kUnknownEnumValue intentionally not defined. This enum never goes
-    // through DataModel::Decode, likely because it is a part of a derived
-    // cluster. As a result having kUnknownEnumValue in this enum is error
-    // prone, and was removed. See
-    // src/app/common/templates/config-data.yaml.
+    // All received enum values that are not listed above will be mapped
+    // to kUnknownEnumValue. This is a helper enum value that should only
+    // be used by code to process how it handles receiving and unknown
+    // enum value. This specific should never be transmitted.
+    kUnknownEnumValue = 0,
 };
 
 // Bitmap for Feature
