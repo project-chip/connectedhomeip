@@ -118,14 +118,17 @@ CHIP_ERROR DefaultThreadNetworkDirectoryStorage::RemoveNetwork(const ExtendedPan
     VerifyOrReturnError(FindNetwork(exPanId, index), CHIP_ERROR_NOT_FOUND);
 
     // Move subsequent elements down to fill the deleted slot
-    index_t subsequent = --mCount - index;
-    auto * element     = &mExtendedPanIds[index];
-    memmove(element, element + 1, subsequent * sizeof(*element));
+    static_assert(std::is_trivially_copyable_v<ExtendedPanId>);
+    index_t subsequentCount = mCount - (index + 1);
+    auto * element          = &mExtendedPanIds[index];
+    memmove(element, element + 1, subsequentCount * sizeof(*element));
+    mCount--;
+
     CHIP_ERROR err = StoreIndex();
     if (err != CHIP_NO_ERROR)
     {
         // Roll back the change to our in-memory state
-        memmove(element + 1, element, subsequent * sizeof(*element));
+        memmove(element + 1, element, subsequentCount * sizeof(*element));
         mExtendedPanIds[index] = exPanId;
         mCount++;
         return err;
