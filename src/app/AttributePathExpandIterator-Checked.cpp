@@ -22,8 +22,7 @@ namespace chip {
 namespace app {
 AttributePathExpandIteratorChecked::AttributePathExpandIteratorChecked(InteractionModel::DataModel * dataModel,
                                                                        SingleLinkedListNode<AttributePathParams> * attributePath) :
-    mDataModelIterator(dataModel, attributePath),
-    mEmberIterator(dataModel, attributePath)
+    mDataModelIterator(dataModel, attributePath), mEmberIterator(dataModel, attributePath)
 {
     CheckOutputsIdentical("Constructor");
 }
@@ -72,28 +71,28 @@ void AttributePathExpandIteratorChecked::CheckOutputsIdentical(const char * msg)
 
     if (dmResult == emResult)
     {
-
-        // NOTE: extra logic because mExpanded is NOT considered in operator== (ugly...)
-        //
         // We check for:
         //    - either failed result (in which case path should not matter)
         //    - or exact match of paths on success
+        //
+        // NOTE: extra logic because mExpanded is NOT considered in operator== (ugly...)
         if ((dmResult == false) || ((dmPath == emPath) && (dmPath.mExpanded == emPath.mExpanded)))
         {
             // outputs are identical. All is good
             return;
         }
-
-        ChipLogProgress(Test, "Different paths in DM vs EMBER (%d and %d) in %s", dmResult, emResult, msg);
-        ChipLogProgress(Test, "   DM PATH:    0x%X/" ChipLogFormatMEI "/" ChipLogFormatMEI " (%s)", dmPath.mEndpointId,
-                        ChipLogValueMEI(dmPath.mClusterId), ChipLogValueMEI(dmPath.mAttributeId),
-                        dmPath.mExpanded ? "EXPANDED" : "NOT expanded");
-        ChipLogProgress(Test, "   EMBER PATH: 0x%X/" ChipLogFormatMEI "/" ChipLogFormatMEI " (%s)", emPath.mEndpointId,
-                        ChipLogValueMEI(emPath.mClusterId), ChipLogValueMEI(emPath.mAttributeId),
-                        emPath.mExpanded ? "EXPANDED" : "NOT expanded");
-
-        chipDie();
     }
+
+    ChipLogProgress(Test, "Different paths in DM vs EMBER (%d and %d) in %s", dmResult, emResult, msg);
+    ChipLogProgress(Test, "   DM PATH:    0x%X/" ChipLogFormatMEI "/" ChipLogFormatMEI " (%s)", dmPath.mEndpointId,
+                    ChipLogValueMEI(dmPath.mClusterId), ChipLogValueMEI(dmPath.mAttributeId),
+                    dmPath.mExpanded ? "EXPANDED" : "NOT expanded");
+    ChipLogProgress(Test, "   EMBER PATH: 0x%X/" ChipLogFormatMEI "/" ChipLogFormatMEI " (%s)", emPath.mEndpointId,
+                    ChipLogValueMEI(emPath.mClusterId), ChipLogValueMEI(emPath.mAttributeId),
+                    emPath.mExpanded ? "EXPANDED" : "NOT expanded");
+
+    chipDie();
+}
 
 } // namespace app
 } // namespace chip
