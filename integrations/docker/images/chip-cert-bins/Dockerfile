@@ -1,6 +1,6 @@
 # Stage 1: Setup dependencies (based on chip-build).
-FROM ubuntu:24.04 as chip-build-cert
-LABEL org.opencontainers.image.source https://github.com/project-chip/connectedhomeip
+FROM ubuntu:24.04 AS chip-build-cert
+LABEL org.opencontainers.image.source=https://github.com/project-chip/connectedhomeip
 ARG TARGETPLATFORM
 # COMMITHASH defines the target commit to build from. May be passed in using --build-arg.
 ARG COMMITHASH=c1ec2d777456924dcaa59b53351b00d73caf378f
@@ -123,11 +123,11 @@ RUN set -x \
     software-properties-common \
     && add-apt-repository universe \
     && curl https://bootstrap.pypa.io/get-pip.py -o get-pip.py \
-    && python3 get-pip.py \
+    && python3 get-pip.py --break-system-packages \
     && : # last line
 
 RUN set -x \
-    && pip3 install attrs coloredlogs PyGithub pygit future portpicker mobly click cxxfilt ghapi pandas tabulate \
+    && pip3 install attrs coloredlogs PyGithub pygit future portpicker mobly click cxxfilt ghapi pandas tabulate --break-system-packages \
     && : # last line
 
 # build and install gn
@@ -162,7 +162,7 @@ RUN ./scripts/checkout_submodules.py --allow-changing-global-git-config --shallo
 RUN bash scripts/bootstrap.sh
 
 # Stage 2: Build.
-FROM chip-build-cert as chip-build-cert-bins
+FROM chip-build-cert AS chip-build-cert-bins
 
 SHELL ["/bin/bash", "-c"]
 
@@ -260,7 +260,7 @@ RUN case ${TARGETPLATFORM} in \
 RUN source scripts/activate.sh && scripts/build_python.sh -m platform -d true -i out/python_env
 
 # Stage 3: Copy relevant cert bins to a minimal image to reduce size.
-FROM ubuntu:22.04
+FROM ubuntu:24.04
 ENV TZ=Etc/UTC
 RUN ln -snf /usr/share/zoneinfo/$TZ /etc/localtime && echo $TZ > /etc/timezone
 RUN apt-get update -y
