@@ -47,7 +47,7 @@ namespace DeviceLayer {
 PlatformManagerImpl PlatformManagerImpl::sInstance;
 
 #if defined(SL_MBEDTLS_USE_TINYCRYPT)
-sys_mutex_t PlatformManagerImpl::rngMutexHandle = nullptr;
+osMutexId_t PlatformManagerImpl::rngMutexHandle = nullptr;
 
 int PlatformManagerImpl::uECC_RNG_Function(uint8_t * dest, unsigned int size)
 {
