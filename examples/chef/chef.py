@@ -739,6 +739,8 @@ def main() -> int:
                 f"-DSAMPLE_NAME={options.sample_device_type_name}")
             nrf_build_cmds.append(
                 f"-DCONFIG_CHIP_DEVICE_SOFTWARE_VERSION_STRING='\"{sw_ver_string}\"'")
+            nrf_build_cmds.append(
+                f"--sysbuild")
 
             shell.run_cmd(" ".join(nrf_build_cmds))
 

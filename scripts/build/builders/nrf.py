@@ -197,7 +197,7 @@ export ZEPHYR_TOOLCHAIN_VARIANT=zephyr;'''
 export ZEPHYR_SDK_INSTALL_DIR={zephyr_sdk_dir};'''
 
             cmd += '''
-west build --cmake-only -d {outdir} -b {board} {sourcedir}{build_flags}
+west build --cmake-only -d {outdir} -b {board} {sourcedir}{build_flags} --sysbuild
         '''.format(
                 outdir=shlex.quote(self.output_dir),
                 board=self.board.GnArgName(),
