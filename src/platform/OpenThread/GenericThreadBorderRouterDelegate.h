@@ -18,11 +18,14 @@
 #pragma once
 
 #include <app-common/zap-generated/cluster-enums.h>
+#include <app-common/zap-generated/ids/Attributes.h>
 #include <app/clusters/thread-border-router-management-server/thread-br-delegate.h>
+#include <cstdint>
 #include <inet/IPAddress.h>
 #include <lib/core/CHIPError.h>
 #include <lib/core/CHIPPersistentStorageDelegate.h>
 #include <lib/support/Span.h>
+#include <platform/CHIPDeviceLayer.h>
 
 namespace chip {
 namespace app {
@@ -37,7 +40,7 @@ public:
     GenericOpenThreadBorderRouterDelegate(PersistentStorageDelegate * storage) : mStorage(storage) {}
     ~GenericOpenThreadBorderRouterDelegate() = default;
 
-    CHIP_ERROR Init() override;
+    CHIP_ERROR Init(AttributeChangeCallback * callback) override;
 
     bool GetPanChangeSupported() override { return true; }
 
@@ -69,14 +72,31 @@ public:
     {
         MutableCharSpan borderRouterName(mThreadBorderRouterName);
         CopyCharSpanToMutableCharSpan(name, borderRouterName);
+        if (mpAttributeChangeCallback)
+        {
+            DeviceLayer::SystemLayer().ScheduleLambda(
+                [this]() { mpAttributeChangeCallback->ReportAttributeChanged(Attributes::BorderRouterName::Id); });
+        }
+    }
+
+    void NotifyBorderAgentIdChanged()
+    {
+        if (mpAttributeChangeCallback)
+        {
+            // OpenThread doesn't have callback or event for BorderAgentId change, we can only change the BorderAgentId with
+            // otBorderAgentSetId(). Please call this function with otBorderAgentSetId().
+            DeviceLayer::SystemLayer().ScheduleLambda(
+                [this]() { mpAttributeChangeCallback->ReportAttributeChanged(Attributes::BorderAgentID::Id); });
+        }
     }
 
 private:
     CHIP_ERROR SaveActiveDatasetConfigured(bool configured);
-    ActivateDatasetCallback * mCallback = nullptr;
-    uint32_t mSequenceNum               = 0;
+    ActivateDatasetCallback * mpActivateDatasetCallback = nullptr;
+    uint32_t mSequenceNum                               = 0;
     char mThreadBorderRouterName[kBorderRouterNameMaxLength + 1];
     PersistentStorageDelegate * mStorage;
+    AttributeChangeCallback * mpAttributeChangeCallback = nullptr;
 };
 } // namespace ThreadBorderRouterManagement
 } // namespace Clusters

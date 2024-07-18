@@ -21,6 +21,7 @@
 #include <app/clusters/thread-border-router-management-server/thread-border-router-management-server.h>
 #include <cstdint>
 #include <cstring>
+#include <lib/core/CASEAuthTag.h>
 #include <lib/core/CHIPError.h>
 #include <lib/core/Optional.h>
 #include <lib/support/BitFlags.h>
@@ -48,7 +49,7 @@ public:
     TestDelegate()  = default;
     ~TestDelegate() = default;
 
-    CHIP_ERROR Init() override { return CHIP_NO_ERROR; }
+    CHIP_ERROR Init(AttributeChangeCallback * callback) override { return CHIP_NO_ERROR; }
 
     bool GetPanChangeSupported() override { return mPanChangeSupported; }
 
@@ -186,7 +187,8 @@ public:
 
     Access::SubjectDescriptor GetSubjectDescriptor() const
     {
-        Access::SubjectDescriptor subjectDescriptor;
+        Access::SubjectDescriptor subjectDescriptor = { kUndefinedFabricIndex, Access::AuthMode::kNone, kUndefinedNodeId,
+                                                        kUndefinedCATs };
         return subjectDescriptor;
     }
 

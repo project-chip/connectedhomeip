@@ -18,6 +18,7 @@
 #pragma once
 
 #include <lib/core/CHIPError.h>
+#include <lib/core/DataModelTypes.h>
 #include <lib/support/Span.h>
 #include <lib/support/ThreadOperationalDataset.h>
 
@@ -47,13 +48,22 @@ public:
         virtual void OnActivateDatasetComplete(uint32_t sequenceNum, CHIP_ERROR error) = 0;
     };
 
+    class AttributeChangeCallback
+    {
+    public:
+        AttributeChangeCallback()          = default;
+        virtual ~AttributeChangeCallback() = default;
+        // If the attributes of the Thread Border Router Management is changed, ReportAttributeChanged should be called.
+        virtual void ReportAttributeChanged(AttributeId attributeId) = 0;
+    };
+
     enum class DatasetType : uint8_t
     {
         kActive,
         kPending,
     };
 
-    virtual CHIP_ERROR Init() = 0;
+    virtual CHIP_ERROR Init(AttributeChangeCallback *attributeChangeCallback) = 0;
 
     // Get whether PanChange feature is supported for the Thread BR.
     virtual bool GetPanChangeSupported() = 0;

@@ -26,6 +26,7 @@
 #include <app/CommandHandlerInterface.h>
 #include <app/ConcreteCommandPath.h>
 #include <app/FailSafeContext.h>
+#include <app/reporting/reporting.h>
 #include <inet/UDPEndPoint.h>
 #include <lib/core/Optional.h>
 #include <lib/support/Span.h>
@@ -35,13 +36,17 @@ namespace app {
 namespace Clusters {
 namespace ThreadBorderRouterManagement {
 
-class ServerInstance : public CommandHandlerInterface, public AttributeAccessInterface, public Delegate::ActivateDatasetCallback
+class ServerInstance : public CommandHandlerInterface,
+                       public AttributeAccessInterface,
+                       public Delegate::ActivateDatasetCallback,
+                       public Delegate::AttributeChangeCallback
 {
 public:
     using Status = Protocols::InteractionModel::Status;
     ServerInstance(EndpointId endpointId, Delegate * delegate, FailSafeContext & failSafeContext) :
         CommandHandlerInterface(Optional<EndpointId>(endpointId), Id),
-        AttributeAccessInterface(Optional<EndpointId>(endpointId), Id), mDelegate(delegate), mFailsafeContext(failSafeContext)
+        AttributeAccessInterface(Optional<EndpointId>(endpointId), Id), mDelegate(delegate), mServerEndpointId(endpointId),
+        mFailsafeContext(failSafeContext)
     {}
     virtual ~ServerInstance() = default;
 
@@ -53,8 +58,11 @@ public:
     // AttributeAccessInterface
     CHIP_ERROR Read(const ConcreteReadAttributePath & aPath, AttributeValueEncoder & aEncoder) override;
 
-    // ActivateDatasetCallbackInterface
+    // ActivateDatasetCallback
     void OnActivateDatasetComplete(uint32_t sequenceNum, CHIP_ERROR error) override;
+
+    // AttributeChangeCallback
+    void ReportAttributeChanged(AttributeId attributeId) override;
 
 private:
     // TODO: Split the business logic from the unit test class
@@ -88,6 +96,7 @@ private:
     ConcreteCommandPath mPath = ConcreteCommandPath(0, 0, 0);
     Optional<uint64_t> mBreadcrumb;
     uint32_t mSetActiveDatasetSequenceNumber = 0;
+    EndpointId mServerEndpointId;
     FailSafeContext & mFailsafeContext;
 };
 

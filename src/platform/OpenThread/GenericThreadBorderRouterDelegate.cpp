@@ -53,9 +53,10 @@ public:
     ~ScopedThreadLock() { DeviceLayer::ThreadStackMgr().UnlockThreadStack(); }
 };
 
-CHIP_ERROR GenericOpenThreadBorderRouterDelegate::Init()
+CHIP_ERROR GenericOpenThreadBorderRouterDelegate::Init(AttributeChangeCallback * callback)
 {
-    mCallback = nullptr;
+    mpActivateDatasetCallback = nullptr;
+    mpAttributeChangeCallback = callback;
     ReturnErrorOnFailure(DeviceLayer::PlatformMgrImpl().AddEventHandler(OnPlatformEventHandler, reinterpret_cast<intptr_t>(this)));
     // When the Thread Border Router is reboot during SetActiveDataset, we need to revert the active dateset.
     RevertActiveDataset();
@@ -136,20 +137,35 @@ void GenericOpenThreadBorderRouterDelegate::SetActiveDataset(const Thread::Opera
         callback->OnActivateDatasetComplete(sequenceNum, err);
         return;
     }
-    mSequenceNum = sequenceNum;
-    mCallback    = callback;
+    mSequenceNum              = sequenceNum;
+    mpActivateDatasetCallback = callback;
 }
 
 void GenericOpenThreadBorderRouterDelegate::OnPlatformEventHandler(const DeviceLayer::ChipDeviceEvent * event, intptr_t arg)
 {
     GenericOpenThreadBorderRouterDelegate * delegate = reinterpret_cast<GenericOpenThreadBorderRouterDelegate *>(arg);
-    if (delegate && delegate->mCallback)
+    if (delegate)
     {
-        if (event->Type == DeviceLayer::DeviceEventType::kThreadConnectivityChange &&
-            event->ThreadConnectivityChange.Result == DeviceLayer::kConnectivity_Established)
+        if ((event->Type == DeviceLayer::DeviceEventType::kThreadConnectivityChange) &&
+            (event->ThreadConnectivityChange.Result == DeviceLayer::kConnectivity_Established) &&
+            delegate->mpActivateDatasetCallback)
         {
-            delegate->mCallback->OnActivateDatasetComplete(delegate->mSequenceNum, CHIP_NO_ERROR);
-            delegate->mCallback = nullptr;
+            delegate->mpActivateDatasetCallback->OnActivateDatasetComplete(delegate->mSequenceNum, CHIP_NO_ERROR);
+            delegate->mpActivateDatasetCallback = nullptr;
+        }
+    }
+    if (event->Type == DeviceLayer::DeviceEventType::kThreadStateChange)
+    {
+        if (event->ThreadStateChange.OpenThread.Flags & OT_CHANGED_THREAD_NETIF_STATE)
+        {
+            DeviceLayer::SystemLayer().ScheduleLambda(
+                [delegate]() { delegate->mpAttributeChangeCallback->ReportAttributeChanged(Attributes::InterfaceEnabled::Id); });
+        }
+        if (event->ThreadStateChange.OpenThread.Flags & OT_CHANGED_ACTIVE_DATASET)
+        {
+            DeviceLayer::SystemLayer().ScheduleLambda([delegate]() {
+                delegate->mpAttributeChangeCallback->ReportAttributeChanged(Attributes::ActiveDatasetTimestamp::Id);
+            });
         }
     }
 }
@@ -168,7 +184,7 @@ CHIP_ERROR GenericOpenThreadBorderRouterDelegate::CommitActiveDataset()
 CHIP_ERROR GenericOpenThreadBorderRouterDelegate::RevertActiveDataset()
 {
     // The FailSafe Timer is triggered and the previous command request should be handled, so reset the callback.
-    mCallback                           = nullptr;
+    mpActivateDatasetCallback           = nullptr;
     bool activeDatasetConfigured        = true;
     uint16_t activeDatasetConfiguredLen = sizeof(bool);
     VerifyOrReturnError(mStorage, CHIP_ERROR_INTERNAL);

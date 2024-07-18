@@ -303,6 +303,12 @@ void ServerInstance::OnActivateDatasetComplete(uint32_t sequenceNum, CHIP_ERROR 
     commandHandle->AddStatus(mPath, StatusIB(error).mStatus);
 }
 
+void ServerInstance::ReportAttributeChanged(AttributeId attributeId)
+{
+    MatterReportingAttributeChangeCallback(mServerEndpointId, Id, attributeId);
+}
+
+
 void ServerInstance::OnFailSafeTimerExpired()
 {
     if (mDelegate)
@@ -337,7 +343,7 @@ CHIP_ERROR ServerInstance::Init()
     ReturnErrorOnFailure(InteractionModelEngine::GetInstance()->RegisterCommandHandler(this));
     VerifyOrReturnError(registerAttributeAccessOverride(this), CHIP_ERROR_INCORRECT_STATE);
     ReturnErrorOnFailure(DeviceLayer::PlatformMgrImpl().AddEventHandler(OnPlatformEventHandler, reinterpret_cast<intptr_t>(this)));
-    return mDelegate->Init();
+    return mDelegate->Init(this);
 }
 
 } // namespace ThreadBorderRouterManagement
