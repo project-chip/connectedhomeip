@@ -1167,6 +1167,7 @@ static NSString * sDeviceDataKeyPrefix = @"deviceData";
 }
 
 #pragma mark - Client Data
+
 static NSString * sClientDataKeyPrefix = @"clientData";
 
 typedef NSString * MTRClientDataKey;
@@ -1251,7 +1252,20 @@ typedef NSArray<NSString *> MTRClientDataKeyIndex;
     return clientData;
 }
 
+- (void)removeClientDataForNodeID:(NSNumber *)nodeID key:(NSString *)key {
+    dispatch_sync(_storageDelegateQueue, ^{
+        NSLog(@"kmo: removeClientDataForNodeID - removing data/key %@", key);
+        MTRDeviceController * controller = self->_controller;
+        VerifyOrReturn(controller != nil); // No way to call delegate without controller.
 
+        NSString * storageKey = [self _clientDataKeyForNodeID:nodeID key:key];
+        [self->_storageDelegate controller: controller
+                         removeValueForKey: storageKey
+                             securityLevel: MTRStorageSecurityLevelSecure
+                               sharingType: MTRStorageSharingTypeNotShared]; // REVIEWERS:  fabric shared?
+        [self _removeClientDataIndexForKey:key nodeID:nodeID controller:controller];
+    });
+}
 
 - (void)_updateClientDataIndexForKey:(NSString * _Nonnull)key
                         nodeID:(NSNumber * _Nonnull)nodeID
@@ -1282,6 +1296,21 @@ typedef NSArray<NSString *> MTRClientDataKeyIndex;
     NSString * storageKey = [self _clientDataIndexKeyForNodeID:nodeID];
     NSLog(@"kmo: updateClientDataIndexForKey - data key %@", storageKey);
     
+    [self->_storageDelegate controller:controller
+                            storeValue:modifiedIndex
+                                forKey:storageKey
+                         securityLevel:MTRStorageSecurityLevelSecure
+                           sharingType:MTRStorageSharingTypeNotShared];
+}
+
+- (void)_removeClientDataIndexForKey:(NSString * _Nonnull)key
+                              nodeID:(NSNumber * _Nonnull)nodeID
+                          controller:(MTRDeviceController *)controller {
+    dispatch_assert_queue(_storageDelegateQueue);
+    NSMutableArray<MTRClientDataKey> * modifiedIndex = [[self _clientDataIndexForNodeID:nodeID] mutableCopy];
+    [modifiedIndex removeObject:key];
+
+    NSString * storageKey = [self _clientDataIndexKeyForNodeID:nodeID];
     [self->_storageDelegate controller:controller
                             storeValue:modifiedIndex
                                 forKey:storageKey
