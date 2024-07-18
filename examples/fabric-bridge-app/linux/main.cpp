@@ -23,7 +23,6 @@
 #include "DeviceManager.h"
 
 #include <app/AttributeAccessInterfaceRegistry.h>
-#include <app/clusters/commissioner-control-server/commissioner-control-server.h>
 
 #if defined(PW_RPC_FABRIC_BRIDGE_SERVICE) && PW_RPC_FABRIC_BRIDGE_SERVICE
 #include "RpcClient.h"
@@ -168,18 +167,6 @@ void ApplicationInit()
     pollingThread.detach();
 
     DeviceMgr().Init();
-
-    ChipLogProgress(Zcl, "Initialize SupportedDeviceCategories of Commissioner Control Cluster for this device.");
-
-    BitMask<CommissionerControl::SupportedDeviceCategoryBitmap> supportedDeviceCategories;
-    supportedDeviceCategories.SetField(CommissionerControl::SupportedDeviceCategoryBitmap::kFabricSynchronization, 1);
-    Protocols::InteractionModel::Status status =
-        CommissionerControl::CommissionerControlServer::Instance().SetSupportedDeviceCategoriesValue(kRootEndpointId,
-                                                                                                     supportedDeviceCategories);
-    if (status != Protocols::InteractionModel::Status::Success)
-    {
-        ChipLogError(NotSpecified, "Failed to set SupportedDeviceCategories: %d", static_cast<int>(status));
-    }
 }
 
 void ApplicationShutdown()

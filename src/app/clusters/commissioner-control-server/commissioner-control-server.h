@@ -24,6 +24,9 @@ namespace app {
 namespace Clusters {
 namespace CommissionerControl {
 
+// Set to 64 bytes, which is more than enough for storing an IPv6 address in either binary or text form.
+static constexpr size_t kIpAddressBufferSize = 64;
+
 struct CommissioningApprovalRequest
 {
     uint64_t requestId;
@@ -48,18 +51,96 @@ struct CommissionNodeInfo
     CommissioningWindowParams params;
     Optional<ByteSpan> ipAddress;
     Optional<uint16_t> port;
+    uint8_t ipAddressBuffer[kIpAddressBufferSize];
+
+    CHIP_ERROR SetIPAddress(const Optional<ByteSpan> & address)
+    {
+        if (!address.HasValue())
+        {
+            ipAddress.ClearValue();
+            return CHIP_NO_ERROR;
+        }
+
+        const ByteSpan & addressSpan = address.Value();
+        size_t addressLength         = addressSpan.size();
+
+        if (addressLength > kIpAddressBufferSize)
+        {
+            return CHIP_ERROR_BUFFER_TOO_SMALL;
+        }
+
+        if (addressLength == 0)
+        {
+            ipAddress.ClearValue();
+            return CHIP_NO_ERROR;
+        }
+
+        memcpy(ipAddressBuffer, addressSpan.data(), addressLength);
+        ipAddress.SetValue(ByteSpan(ipAddressBuffer, addressLength));
+        return CHIP_NO_ERROR;
+    }
 };
 
 class Delegate
 {
 public:
-    // Command Delegates
+    /**
+     * @brief Handle a commissioning approval request.
+     *
+     * This command is sent by a client to request approval for a future CommissionNode call.
+     * The server SHALL always return SUCCESS to a correctly formatted RequestCommissioningApproval
+     * command, and then send a CommissioningRequestResult event once the result is ready.
+     *
+     * @param request The commissioning approval request to handle.
+     * @return CHIP_ERROR indicating the success or failure of the operation.
+     */
     virtual CHIP_ERROR HandleCommissioningApprovalRequest(const CommissioningApprovalRequest & request) = 0;
-    virtual CHIP_ERROR ValidateCommissionNodeCommand(NodeId clientNodeId, uint64_t requestId,
-                                                     CommissioningWindowParams & outParams)             = 0;
+
+    /**
+     * @brief Validate a commission node command.
+     *
+     * This command is sent by a client to request that the server begins commissioning a previously
+     * approved request.
+     *
+     * The server SHALL return FAILURE if the CommissionNode command is not sent from the same
+     * NodeId as the RequestCommissioningApproval or if the provided RequestId to CommissionNode
+     * does not match the value provided to RequestCommissioningApproval.
+     *
+     * The validation SHALL fail if the client Node ID is kUndefinedNodeId, such as getting the NodeID from
+     * a group or PASE session.
+     *
+     * @param clientNodeId The NodeId of the client.
+     * @param requestId The request ID to validate.
+     * @return CHIP_ERROR indicating the success or failure of the operation.
+     */
+    virtual CHIP_ERROR ValidateCommissionNodeCommand(NodeId clientNodeId, uint64_t requestId) = 0;
+
+    /**
+     * @brief Get the parameters for the commissioning window.
+     *
+     * This method is called to retrieve the parameters needed for the commissioning window.
+     *
+     * @param[out] outParams The parameters for the commissioning window.
+     * @return CHIP_ERROR indicating the success or failure of the operation.
+     */
+    virtual CHIP_ERROR GetCommissioningWindowParams(CommissioningWindowParams & outParams) = 0;
+
+    /**
+     * @brief Reverse the commission node process.
+     *
+     * When received within the timeout specified by CommissionNode, the client SHALL open a
+     * commissioning window on the node which the client called RequestCommissioningApproval to
+     * have commissioned.
+     *
+     * @param params The parameters for the commissioning window.
+     * @param ipAddress Optional IP address for the commissioning window.
+     * @param port Optional port for the commissioning window.
+     * @return CHIP_ERROR indicating the success or failure of the operation.
+     */
     virtual CHIP_ERROR ReverseCommissionNode(const CommissioningWindowParams & params, const Optional<ByteSpan> & ipAddress,
-                                             const Optional<uint16_t> & port)                           = 0;
-    virtual ~Delegate()                                                                                 = default;
+                                             const Optional<uint16_t> & port) = 0;
+
+    virtual ~Delegate() = default;
 };
 
 class CommissionerControlServer

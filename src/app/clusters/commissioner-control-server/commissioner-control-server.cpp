@@ -38,6 +38,32 @@ using chip::Protocols::InteractionModel::Status;
 
 namespace {
 
+NodeId getNodeId(const app::CommandHandler * commandObj)
+{
+    if (nullptr == commandObj || nullptr == commandObj->GetExchangeContext())
+    {
+        ChipLogError(Zcl, "Cannot access ExchangeContext of Command Object for Node ID");
+        return kUndefinedNodeId;
+    }
+
+    if (!commandObj->GetExchangeContext()->HasSessionHandle())
+    {
+        ChipLogError(Zcl, "Cannot access session of Command Object for Node ID");
+        return kUndefinedNodeId;
+    }
+
+    auto descriptor = commandObj->GetExchangeContext()->GetSessionHandle()->GetSubjectDescriptor();
+
+    // Return kUndefinedNodeId if get the NodeID from a group or PASE session.
+    if (descriptor.authMode != Access::AuthMode::kCase)
+    {
+        ChipLogError(Zcl, "Cannot get Node ID from non-CASE session of Command Object");
+        return kUndefinedNodeId;
+    }
+
+    return descriptor.subject;
+}
+
 void AddReverseOpenCommissioningWindowResponse(CommandHandler * commandObj, const ConcreteCommandPath & path,
                                                const Clusters::CommissionerControl::CommissioningWindowParams & params)
 {
@@ -147,8 +173,7 @@ bool emberAfCommissionerControlClusterRequestCommissioningApprovalCallback(
 
     ChipLogProgress(Zcl, "Received command to request commissioning approval");
 
-    auto descriptor   = commandObj->GetSubjectDescriptor();
-    auto sourceNodeId = descriptor.subject;
+    auto sourceNodeId = getNodeId(commandObj);
     auto fabricIndex  = commandObj->GetAccessingFabricIndex();
     auto requestId    = commandData.requestId;
     auto vendorId     = commandData.vendorId;
@@ -194,13 +219,10 @@ bool emberAfCommissionerControlClusterCommissionNodeCallback(
 
     ChipLogProgress(Zcl, "Received command to commission node");
 
-    auto descriptor   = commandObj->GetSubjectDescriptor();
-    auto sourceNodeId = descriptor.subject;
+    auto sourceNodeId = getNodeId(commandObj);
     auto requestId    = commandData.requestId;
 
-    auto info       = std::make_unique<Clusters::CommissionerControl::CommissionNodeInfo>();
-    info->ipAddress = commandData.ipAddress;
-    info->port      = commandData.port;
+    auto commissionNodeInfo = std::make_unique<Clusters::CommissionerControl::CommissionNodeInfo>();
 
     Clusters::CommissionerControl::Delegate * delegate =
         Clusters::CommissionerControl::CommissionerControlServer::Instance().GetDelegate();
@@ -208,17 +230,20 @@ bool emberAfCommissionerControlClusterCommissionNodeCallback(
     VerifyOrExit(sourceNodeId != kUndefinedNodeId, err = CHIP_ERROR_WRONG_NODE_ID);
     VerifyOrExit(delegate != nullptr, err = CHIP_ERROR_INCORRECT_STATE);
 
-    // Handle commissioning approval request, the ipAddress assigned from commandData need to be stored in
-    // CommissionerControl::Delegate which ensure that the backing buffer of ipAddress has a valid lifespan until the deferred task
-    // is executed.
-    err = delegate->ValidateCommissionNodeCommand(sourceNodeId, requestId, info->params);
+    // Set IP address and port in the CommissionNodeInfo struct
+    commissionNodeInfo->port = commandData.port;
+    err                      = commissionNodeInfo->SetIPAddress(commandData.ipAddress);
     SuccessOrExit(err == CHIP_NO_ERROR);
 
-    // Add the response for the commissioning window
-    AddReverseOpenCommissioningWindowResponse(commandObj, commandPath, info->params);
+    // Validate the commission node command.
+    err = delegate->ValidateCommissionNodeCommand(sourceNodeId, requestId);
+    SuccessOrExit(err == CHIP_NO_ERROR);
+
+    // Add the response for the commissioning window.
+    AddReverseOpenCommissioningWindowResponse(commandObj, commandPath, commissionNodeInfo->params);
 
     // Schedule the deferred reverse commission node task
-    DeviceLayer::PlatformMgr().ScheduleWork(RunDeferredCommissionNode, reinterpret_cast<intptr_t>(info.release()));
+    DeviceLayer::PlatformMgr().ScheduleWork(RunDeferredCommissionNode, reinterpret_cast<intptr_t>(commissionNodeInfo.release()));
 
 exit:
     if (err != CHIP_NO_ERROR)
