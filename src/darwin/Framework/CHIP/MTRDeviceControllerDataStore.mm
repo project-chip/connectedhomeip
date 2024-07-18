@@ -1282,13 +1282,11 @@ typedef NSArray<NSString *> MTRClientDataKeyIndex;
     NSString * storageKey = [self _clientDataIndexKeyForNodeID:nodeID];
     NSLog(@"kmo: updateClientDataIndexForKey - data key %@", storageKey);
     
-    dispatch_async(_storageDelegateQueue, ^{
-           [self->_storageDelegate controller:controller
-                                   storeValue:modifiedIndex
-                                       forKey:storageKey
-                                securityLevel:MTRStorageSecurityLevelSecure
-                                  sharingType:MTRStorageSharingTypeNotShared];
-    });
+    [self->_storageDelegate controller:controller
+                            storeValue:modifiedIndex
+                                forKey:storageKey
+                         securityLevel:MTRStorageSecurityLevelSecure
+                           sharingType:MTRStorageSharingTypeNotShared];
 }
 
 - (void)storeClientDataForKey:(NSString *)key value:(id<NSSecureCoding>)value forNodeID:(NSNumber *)nodeID
