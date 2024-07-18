@@ -2949,8 +2949,8 @@ static const uint16_t kSubscriptionPoolBaseTimeoutInSeconds = 30;
 
     __auto_type * storageDelegate = [[MTRTestPerControllerStorage alloc] initWithControllerID:[NSUUID UUID]];
 
-    NSNumber * nodeID = @(123);
-    NSNumber * fabricID = @(456);
+    NSNumber * testNodeID = @(0xcafe);
+    NSNumber * fabricID = @(0x1234);
 
     NSString * testKey = @"testKey";
     NSString * testValue = @"testValue";
@@ -2959,34 +2959,35 @@ static const uint16_t kSubscriptionPoolBaseTimeoutInSeconds = 30;
     MTRDeviceController * controller = [self startControllerWithRootKeys:rootKeys
                                                          operationalKeys:operationalKeys
                                                                 fabricID:fabricID
-                                                                  nodeID:nodeID
+                                                                  nodeID:testNodeID
                                                                  storage:storageDelegate
                                                                    error:&error];
     XCTAssertNil(error);
     XCTAssertNotNil(controller);
     XCTAssertTrue([controller isRunning]);
 
-    XCTAssertEqualObjects(controller.controllerNodeID, nodeID);
+    XCTAssertEqualObjects(controller.controllerNodeID, testNodeID);
 
     // actual test begins here
 
     XCTAssertNotNil(controller.controllerDataStore);
     
-    id verifyEmptyData = [controller.controllerDataStore clientDataForKey:testKey nodeID:@(1234)];
+    id verifyEmptyData = [controller.controllerDataStore clientDataForKey:testKey nodeID:testNodeID];
     XCTAssertNil(verifyEmptyData);
+    NSLog(@"kmo: empty data verified");
 
     // store data
-    [controller.controllerDataStore storeClientDataForKey:testKey value:testValue forNodeID:@(1234)];
+    [controller.controllerDataStore storeClientDataForKey:testKey value:testValue forNodeID:testNodeID];
     
     // read back client data
-    id readbackData = [controller.controllerDataStore clientDataForKey:testKey nodeID:@(1234)];
+    id readbackData = [controller.controllerDataStore clientDataForKey:testKey nodeID:testNodeID];
     XCTAssertNotNil(readbackData);
     XCTAssertEqualObjects(testValue, readbackData);
 
-    [controller.controllerDataStore clearStoredClientDataForNodeID:@(1234)];
+    [controller.controllerDataStore clearStoredClientDataForNodeID:testNodeID];
     // read back data to ensure its has been cleared
-    // id readbackData = [controller.controllerDataStore clientDataForKey:testKey nodeID:@(1234)];
-    // XCTAssertNil(readbackData);
+    id afterClearReadbackData = [controller.controllerDataStore clientDataForKey:testKey nodeID:testNodeID];
+    XCTAssertNil(afterClearReadbackData);
     
     // end actual test
     
