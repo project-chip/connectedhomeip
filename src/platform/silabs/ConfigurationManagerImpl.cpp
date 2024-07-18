@@ -260,6 +260,16 @@ void ConfigurationManagerImpl::RunConfigUnitTest(void)
 #endif // CONFIG_BUILD_FOR_HOST_UNIT_TEST
 }
 
+/// @brief Helper to erase Thread info from device
+void ConfigurationManagerImpl::ClearThreadStack()
+{
+#if CHIP_DEVICE_CONFIG_ENABLE_THREAD_SRP_CLIENT
+    ThreadStackMgr().ClearAllSrpHostAndServices();
+#endif // CHIP_DEVICE_CONFIG_ENABLE_THREAD_SRP_CLIENT
+    ChipLogProgress(DeviceLayer, "Clearing Thread provision");
+    ThreadStackMgr().ErasePersistentInfo();
+}
+
 void ConfigurationManagerImpl::DoFactoryReset(intptr_t arg)
 {
     CHIP_ERROR err;
@@ -273,11 +283,7 @@ void ConfigurationManagerImpl::DoFactoryReset(intptr_t arg)
     }
 
 #if CHIP_DEVICE_CONFIG_ENABLE_THREAD
-#if CHIP_DEVICE_CONFIG_ENABLE_THREAD_SRP_CLIENT
-    ThreadStackMgr().ClearAllSrpHostAndServices();
-#endif // CHIP_DEVICE_CONFIG_ENABLE_THREAD_SRP_CLIENT
-    ChipLogProgress(DeviceLayer, "Clearing Thread provision");
-    ThreadStackMgr().ErasePersistentInfo();
+    GetDefaultInstance().ClearThreadStack();
 #endif // CHIP_DEVICE_CONFIG_ENABLE_THREAD
 
     PersistedStorage::KeyValueStoreMgrImpl().ErasePartition();

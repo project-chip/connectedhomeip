@@ -51,6 +51,7 @@
 #if CHIP_ENABLE_OPENTHREAD
 #include <platform/OpenThread/OpenThreadUtils.h>
 #include <platform/ThreadStackManager.h>
+#include <platform/silabs/ConfigurationManagerImpl.h>
 #include <platform/silabs/ThreadStackManagerImpl.h>
 #endif // CHIP_ENABLE_OPENTHREAD
 
@@ -801,11 +802,7 @@ void BaseApplication::DoProvisioningReset()
 {
     PlatformMgr().ScheduleWork([](intptr_t) {
 #if CHIP_DEVICE_CONFIG_ENABLE_THREAD
-#if CHIP_DEVICE_CONFIG_ENABLE_THREAD_SRP_CLIENT
-        ThreadStackMgr().ClearAllSrpHostAndServices();
-#endif // CHIP_DEVICE_CONFIG_ENABLE_THREAD_SRP_CLIENT
-        ChipLogProgress(DeviceLayer, "Clearing Thread provision");
-        chip::DeviceLayer::ConnectivityMgr().ErasePersistentInfo();
+        ConfigurationManagerImpl::GetDefaultInstance().ClearThreadStack();
         ThreadStackMgrImpl().FactoryResetThreadStack();
         ThreadStackMgr().InitThreadStack();
 #endif // CHIP_DEVICE_CONFIG_ENABLE_THREAD
