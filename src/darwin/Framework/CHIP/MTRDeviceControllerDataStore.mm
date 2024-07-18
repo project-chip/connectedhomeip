@@ -1206,13 +1206,11 @@ typedef NSArray<NSString *> MTRClientDataKeyIndex;
 }
 
 - (NSString *)_clientDataIndexKeyForNodeID:(NSNumber *)nodeID {
-    dispatch_assert_queue(_storageDelegateQueue);
     return [sClientDataKeyPrefix stringByAppendingFormat:@":0x%016llX_index", nodeID.unsignedLongLongValue];
 }
 
 - (NSString *)_clientDataKeyForNodeID:(NSNumber *)nodeID key:(NSString *)key
 {
-    dispatch_assert_queue(_storageDelegateQueue);
     return [sClientDataKeyPrefix stringByAppendingFormat:@":0x%016llX:%@", nodeID.unsignedLongLongValue, key];
 }
 
