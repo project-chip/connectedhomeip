@@ -92,7 +92,7 @@ void UpdateModeBaseCurrentModeToOnMode(EndpointId endpoint)
 template <typename EnumType>
 bool isKnownEnumValue(EnumType value)
 {
-    return (EnsureKnownEnumValue(value) == EnumType::kUnknownEnumValue) ? false : true;
+    return (EnsureKnownEnumValue(value) != EnumType::kUnknownEnumValue);
 }
 
 } // namespace
