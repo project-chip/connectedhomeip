@@ -287,7 +287,7 @@ std::optional<unsigned> CodegenDataModel::TryFindEndpointIndex(EndpointId id) co
 
 EndpointId CodegenDataModel::NextEndpoint(EndpointId before)
 {
-    const unsigned lastEndpointIndex = emberAfEndpointCount();
+    const uint16_t lastEndpointIndex = emberAfEndpointCount();
 
     std::optional<unsigned> before_idx = TryFindEndpointIndex(before);
     if (!before_idx.has_value())
