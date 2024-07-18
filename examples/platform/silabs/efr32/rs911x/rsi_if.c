@@ -25,7 +25,6 @@
 #include "em_ldma.h"
 #include "em_usart.h"
 
-#include "FreeRTOS.h"
 #include "sl_status.h"
 #include <cmsis_os2.h>
 // TODO Fix include order issue #33120
