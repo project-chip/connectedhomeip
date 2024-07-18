@@ -119,8 +119,8 @@ CHIP_ERROR DefaultThreadNetworkDirectoryStorage::RemoveNetwork(const ExtendedPan
 
     // Move subsequent elements down to fill the deleted slot
     static_assert(std::is_trivially_copyable_v<ExtendedPanId>);
-    index_t subsequentCount = mCount - (index + 1);
-    auto * element          = &mExtendedPanIds[index];
+    size_t subsequentCount = mCount - (index + 1u);
+    auto * element         = &mExtendedPanIds[index];
     memmove(element, element + 1, subsequentCount * sizeof(*element));
     mCount--;
 
