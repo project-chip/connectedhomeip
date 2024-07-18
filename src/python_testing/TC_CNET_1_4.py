@@ -41,7 +41,7 @@ class TC_CNET_1_4(MatterBaseTest):
     def steps_TC_CNET_1_4(self):
         return [TestStep(1, "TH is commissioned", is_commissioning=True),
                 TestStep(2, 'TH performs a wildcard read of Network Commissioning clusters across all endpoints, and save the number of Network Commissioning clusters as `NumNetworkCommissioning` for future use. If `NumNetworkCommissioning` is 0, skip the remaining steps in this test case'),
-                TestStep(3, 'TH checks whether endpoint 0 is contained in the response of the previous response to determine whether there is a Network Commissioning cluster on endpoint 0'),
+                TestStep(3, 'TH checks whether endpoint 0 is contained in the previous response to determine whether there is a Network Commissioning cluster on endpoint 0'),
                 TestStep(4, 'TH reads from the DUT the Descriptor Cluster DeviceTypeList attribute on each endpoint (except for Endpoint 0) that hosts a Network Commissioning cluster, verify that the Secondary Network Interface device type id (0x0019) is listed in the DeviceTypeList'),
                 TestStep(5, 'TH reads from the DUT the General Commissioning Cluster SupportsConcurrentConnection attribute if NumNetworkCommissioning is greater than 1, verify that it is true')]
 
@@ -88,7 +88,7 @@ class TC_CNET_1_4(MatterBaseTest):
                 continue
             device_type_list = await self.read_single_attribute_check_success(cluster=Clusters.Descriptor,
                                                                               attribute=Clusters.Descriptor.Attributes.DeviceTypeList, endpoint=endpoint)
-            required_device_types = { kSecondaryNetworkInterfaceDeviceTypeId }
+            required_device_types = {kSecondaryNetworkInterfaceDeviceTypeId}
             found_device_types = {device.deviceType for device in device_type_list}
             asserts.assert_true(required_device_types.intersection(found_device_types),
                                 "Network Commissioning Cluster is not on Root Node or Secondary Network Interface")
