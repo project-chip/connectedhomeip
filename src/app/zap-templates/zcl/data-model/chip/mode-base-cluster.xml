@@ -32,6 +32,7 @@ This is because zap does not currently support generating code for clusters that
     <cluster code="0x005E"/> <!-- Microwave Oven Mode -->
     <cluster code="0x0049"/> <!-- Oven Mode -->
     <cluster code="0x009D"/> <!-- Energy EVSE Mode -->
+    <cluster code="0x009E"/> <!-- Water Heater Mode -->
     <cluster code="0x009F"/> <!-- Device Energy Management Mode -->
     <!-- MfgCode has been deprecated -->
     <item name="MfgCode" type="vendor_id" optional="true"/>
@@ -47,6 +48,7 @@ This is because zap does not currently support generating code for clusters that
     <cluster code="0x005E"/> <!-- Microwave Oven Mode -->
     <cluster code="0x0049"/> <!-- Oven Mode -->
     <cluster code="0x009D"/> <!-- Energy EVSE Mode -->
+    <cluster code="0x009E"/> <!-- Water Heater Mode -->
     <cluster code="0x009F"/> <!-- Device Energy Management Mode -->
     <item name="Label"    type="char_string"                length="64" optional="false"/>
     <item name="Mode"     type="int8u"                                  optional="false"/>

@@ -147,6 +147,8 @@ matter_structs_sources = [
   "${chip_root}/src/controller/java/generated/java/matter/controller/cluster/structs/UnitTestingClusterTestFabricScoped.kt",
   "${chip_root}/src/controller/java/generated/java/matter/controller/cluster/structs/UnitTestingClusterTestListStructOctet.kt",
   "${chip_root}/src/controller/java/generated/java/matter/controller/cluster/structs/UserLabelClusterLabelStruct.kt",
+  "${chip_root}/src/controller/java/generated/java/matter/controller/cluster/structs/WaterHeaterModeClusterModeOptionStruct.kt",
+  "${chip_root}/src/controller/java/generated/java/matter/controller/cluster/structs/WaterHeaterModeClusterModeTagStruct.kt",
 ]
 
 matter_eventstructs_sources = [
@@ -355,6 +357,7 @@ matter_clusters_sources = [
   "${chip_root}/src/controller/java/generated/java/matter/controller/cluster/clusters/ValveConfigurationAndControlCluster.kt",
   "${chip_root}/src/controller/java/generated/java/matter/controller/cluster/clusters/WakeOnLanCluster.kt",
   "${chip_root}/src/controller/java/generated/java/matter/controller/cluster/clusters/WaterHeaterManagementCluster.kt",
+  "${chip_root}/src/controller/java/generated/java/matter/controller/cluster/clusters/WaterHeaterModeCluster.kt",
   "${chip_root}/src/controller/java/generated/java/matter/controller/cluster/clusters/WiFiNetworkDiagnosticsCluster.kt",
   "${chip_root}/src/controller/java/generated/java/matter/controller/cluster/clusters/WiFiNetworkManagementCluster.kt",
   "${chip_root}/src/controller/java/generated/java/matter/controller/cluster/clusters/WindowCoveringCluster.kt",

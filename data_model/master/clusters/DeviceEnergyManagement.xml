@@ -65,7 +65,9 @@ Davis, CA 95616, USA
     <revision revision="4" summary="Bug fixes found during PICS production"/>
   </revisionHistory>
   <clusterIds>
-    <clusterId id="0x0098" name="Device Energy Management"/>
+    <clusterId id="0x0098" name="Device Energy Management">
+      <provisionalConform/>
+    </clusterId>
   </clusterIds>
   <classification hierarchy="base" role="application" picsCode="DEM" scope="Endpoint"/>
   <features>
@@ -118,6 +120,7 @@ Davis, CA 95616, USA
     </feature>
   </features>
   <dataTypes>
+    <number name="PowerAdjustCapability" type=""/>
     <enum name="AdjustmentCauseEnum">
       <item value="0" name="LocalOptimization" summary="The adjustment is to optimize the local energy usage">
         <optionalConform/>
@@ -472,12 +475,12 @@ Davis, CA 95616, USA
   <attributes>
     <attribute id="0x0000" name="ESAType" type="ESATypeEnum" default="Other">
       <access read="true" readPrivilege="view"/>
-      <quality changeOmitted="false" nullable="false" scene="false" persistence="fixed" reportable="false"/>
+      <quality changeOmitted="false" nullable="false" scene="false" persistence="fixed" reportable="false" sourceAttribution="false" quieterReporting="false"/>
       <mandatoryConform/>
     </attribute>
     <attribute id="0x0001" name="ESACanGenerate" type="bool" default="false">
       <access read="true" readPrivilege="view"/>
-      <quality changeOmitted="false" nullable="false" scene="false" persistence="fixed" reportable="false"/>
+      <quality changeOmitted="false" nullable="false" scene="false" persistence="fixed" reportable="false" sourceAttribution="false" quieterReporting="false"/>
       <mandatoryConform/>
     </attribute>
     <attribute id="0x0002" name="ESAState" type="ESAStateEnum" default="0">
@@ -495,14 +498,14 @@ Davis, CA 95616, USA
     </attribute>
     <attribute id="0x0005" name="PowerAdjustmentCapability" type="PowerAdjustCapabilityStruct" default="null">
       <access read="true" readPrivilege="view"/>
-      <quality changeOmitted="false" nullable="true" scene="false" persistence="volatile" reportable="false"/>
+      <quality changeOmitted="false" nullable="true" scene="false" persistence="volatile" reportable="false" sourceAttribution="false" quieterReporting="false"/>
       <mandatoryConform>
         <feature name="PA"/>
       </mandatoryConform>
     </attribute>
     <attribute id="0x0006" name="Forecast" type="ForecastStruct" default="null">
       <access read="true" readPrivilege="view"/>
-      <quality changeOmitted="false" nullable="true" scene="false" persistence="volatile" reportable="false"/>
+      <quality changeOmitted="false" nullable="true" scene="false" persistence="volatile" reportable="false" sourceAttribution="false" quieterReporting="false"/>
       <mandatoryConform>
         <orTerm>
           <feature name="PFR"/>
