@@ -35,9 +35,8 @@ from typing import Any
 import chip.clusters as Clusters
 from chip.clusters import ClusterObjects as ClusterObjects
 from chip.clusters.Attribute import EventReadResult, TypedAttributePath
-from chip.clusters.Types import NullValue
 from matter_testing_support import (AttributeValue, ClusterAttributeChangeAccumulator, EventChangeCallback, MatterBaseTest,
-                                    TestStep, async_test_body, default_matter_test_main)
+                                    async_test_body, default_matter_test_main)
 from mobly import asserts
 
 logger = logging.getLogger(__name__)
@@ -182,8 +181,6 @@ class TC_SwitchTests(MatterBaseTest):
         elapsed = 0.0
         time_remaining = timeout_sec
 
-        sequence_idx = 0
-
         logging.info(f"Waiting {timeout_sec:.1f} seconds for no more events for cluster {expected_cluster} on endpoint {endpoint_id}")
         while time_remaining > 0:
             try:
@@ -217,7 +214,7 @@ class TC_SwitchTests(MatterBaseTest):
         has_msr_feature = (feature_map & cluster.Bitmaps.Feature.kMomentarySwitchRelease) != 0
         has_msl_feature = (feature_map & cluster.Bitmaps.Feature.kMomentarySwitchLongPress) != 0
         has_as_feature = (feature_map & cluster.Bitmaps.Feature.kActionSwitch) != 0
-        has_msm_feature = (feature_map & cluster.Bitmaps.Feature.kMomentarySwitchMultiPress) != 0
+        # has_msm_feature = (feature_map & cluster.Bitmaps.Feature.kMomentarySwitchMultiPress) != 0
 
         if not has_ms_feature:
             logging.info("Skipping rest of test: SWTCH.S.F01(MS) feature not present")
@@ -229,8 +226,8 @@ class TC_SwitchTests(MatterBaseTest):
         self._placeholder_for_step("1")
         event_listener = EventChangeCallback(cluster)
         attrib_listener = ClusterAttributeChangeAccumulator(cluster)
-        event_sub = await event_listener.start(self.default_controller, self.dut_node_id, endpoint=endpoint_id)
-        cluster_sub = await attrib_listener.start(self.default_controller, self.dut_node_id, endpoint=endpoint_id)
+        await event_listener.start(self.default_controller, self.dut_node_id, endpoint=endpoint_id)
+        await attrib_listener.start(self.default_controller, self.dut_node_id, endpoint=endpoint_id)
 
         # Step 2: Operator does not operate switch on the DUT
         self._placeholder_for_step("2")

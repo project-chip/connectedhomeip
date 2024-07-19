@@ -56,8 +56,8 @@ void EmitInitialPress(EndpointId endpointId, uint8_t newPosition)
     }
     else
     {
-        ChipLogProgress(NotSpecified, "Logged InitialPress(%" PRIu8 ") with ID %" PRIu64 " on Endpoint %" PRIu16, newPosition,
-                        eventNumber, endpointId);
+        ChipLogProgress(NotSpecified, "Logged InitialPress(%u) on Endpoint %u", static_cast<unsigned>(newPosition),
+                        static_cast<unsigned>(endpointId));
     }
 }
 
@@ -73,8 +73,8 @@ void EmitLongPress(EndpointId endpointId, uint8_t newPosition)
     }
     else
     {
-        ChipLogProgress(NotSpecified, "Logged LongPress(%" PRIu8 ") with ID %" PRIu64 " on Endpoint %" PRIu16, newPosition,
-                        eventNumber, endpointId);
+        ChipLogProgress(NotSpecified, "Logged LongPress(%u) on Endpoint %u", static_cast<unsigned>(newPosition),
+                        static_cast<unsigned>(endpointId));
     }
 }
 
@@ -91,7 +91,7 @@ void EmitLongRelease(EndpointId endpointId, uint8_t previousPosition)
     }
     else
     {
-        ChipLogProgress(NotSpecified, "Logged LongRelease with ID %" PRIu64 " on Endpoint %" PRIu16, eventNumber, endpointId);
+        ChipLogProgress(NotSpecified, "Logged LongRelease on Endpoint %u", static_cast<unsigned>(endpointId));
     }
 }
 
@@ -109,8 +109,8 @@ void EmitMultiPressComplete(EndpointId endpointId, uint8_t previousPosition, uin
     }
     else
     {
-        ChipLogProgress(NotSpecified, "Logged MultiPressComplete(count=%" PRIu8 ") with ID %" PRIu64 " on Endpoint %" PRIu16, count,
-                        eventNumber, endpointId);
+        ChipLogProgress(NotSpecified, "Logged MultiPressComplete(count=%u) on Endpoint %u", static_cast<unsigned>(count),
+                        static_cast<unsigned>(endpointId));
     }
 }
 
