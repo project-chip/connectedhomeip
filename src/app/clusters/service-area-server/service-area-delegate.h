@@ -263,8 +263,8 @@ protected:
     /**
      * This method is called by the server instance to modify an existing map in the list.
      * The server instance will ensure that the modifiedMap is a valid, unique map.
-     * @param listIndex[in] The index of the map being modified.
-     * @param modifiedMap[in] A map with the modified contents.
+     * @param[in] listIndexThe index of the map being modified.
+     * @param[in] modifiedMapA map with the modified contents.
      * @return true if successful, false otherwise.
      *
      * @note this function SHOULD double check that modifiedMap's mapID matches the object at listIndex.
@@ -284,7 +284,7 @@ protected:
     /**
      * @brief Get a selected location using the position in the list.
      * @param[in] listIndex the position in the list.
-     * @param[in] selectedLocation the selected location value, if found.
+     * @param[out] selectedLocation the selected location value, if found.
      * @return true if a selected location is found, false otherwise.
      */
     virtual bool GetSelectedLocationByIndex(uint32_t listIndex, uint32_t & selectedLocation) = 0;
@@ -301,7 +301,7 @@ protected:
      * The server instance will ensure that the aLocationId references a SUPPORTED location, and is unique within selected
      * locations.
      * @param[in] aLocationId The new locationID to add.
-     * @param[in] listIndex filled with the list index of the new location, if successful.
+     * @param[out] listIndex filled with the list index of the new location, if successful.
      * @return true if successful, false otherwise.
      *
      * @note this function SHOULD double check that the added location won't exceed the maximum list size.
@@ -349,7 +349,7 @@ protected:
      * This method is called by the server instance to add a new progress element to the list.
      * The server instance will ensure that the newProgressElement is a valid, unique progress element.
      * @param[in] newProgressElement The new element to add.
-     * @param[0ut] listIndex is filled with the list index for the new element, if successful.
+     * @param[out] listIndex is filled with the list index for the new element, if successful.
      * @return true if successful, false otherwise.
      *
      * @note this function SHOULD double check that the added element won't exceed the maximum list size.

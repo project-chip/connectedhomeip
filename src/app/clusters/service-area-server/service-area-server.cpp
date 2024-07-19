@@ -270,7 +270,7 @@ void Instance::HandleSelectLocationsCmd(HandlerContext & ctx, const Commands::Se
                 auto jLocationIter = req.newLocations.Value().begin();
                 while (j < i)
                 {
-                    jLocationIter.Next();
+                    jLocationIter.Next(); // Since j < i and i is valid, we can safely call Next() without checking the return value.
                     if (jLocationIter.GetValue() == aSelectedLocation)
                     {
                         exitResponse(SelectLocationsStatus::kDuplicatedLocations, ""_span);
