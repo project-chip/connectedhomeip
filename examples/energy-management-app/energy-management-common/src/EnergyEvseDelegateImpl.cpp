@@ -1750,7 +1750,7 @@ CHIP_ERROR GetEpochTS(uint32_t & chipEpoch)
     if (!UnixEpochToChipEpochTime(unixEpoch, chipEpoch))
     {
         ChipLogError(Zcl, "EVSE: unable to convert Unix Epoch time to Matter Epoch Time");
-        return err;
+        return CHIP_ERROR_INCORRECT_STATE;
     }
 
     return CHIP_NO_ERROR;
