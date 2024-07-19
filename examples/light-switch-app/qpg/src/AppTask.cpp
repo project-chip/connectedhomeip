@@ -42,6 +42,8 @@ using namespace ::chip;
 #include <credentials/DeviceAttestationCredsProvider.h>
 #include <credentials/examples/DeviceAttestationCredsExample.h>
 
+#include "qPinCfg.h"
+
 #include <inet/EndPointStateOpenThread.h>
 
 #include <DeviceInfoProviderImpl.h>
@@ -233,6 +235,13 @@ void AppTask::OpenCommissioning(intptr_t arg)
 CHIP_ERROR AppTask::Init()
 {
     CHIP_ERROR err = CHIP_NO_ERROR;
+    qResult_t res  = Q_OK;
+
+    res = qPinCfg_Init(NULL);
+    if (res != Q_OK)
+    {
+        ChipLogError(NotSpecified, "qPinCfg_Init failed: %d", res);
+    }
 
     PlatformMgr().AddEventHandler(MatterEventHandler, 0);
 

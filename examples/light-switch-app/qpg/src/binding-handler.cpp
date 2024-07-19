@@ -67,13 +67,53 @@ static void ProcessSwitchUnicastBindingCommand(CommandId commandId, const EmberB
     }
 }
 
+static void ProcessSwitchGroupBindingCommand(CommandId commandId, const EmberBindingTableEntry & binding, BindingCommandData * data)
+{
+    Messaging::ExchangeManager & exchangeMgr = Server::GetInstance().GetExchangeManager();
+
+    switch (commandId)
+    {
+    case Clusters::OnOff::Commands::Toggle::Id: {
+        Clusters::OnOff::Commands::Toggle::Type toggleCommand;
+        Controller::InvokeGroupCommandRequest(&exchangeMgr, binding.fabricIndex, binding.groupId, toggleCommand);
+        break;
+    }
+    case Clusters::LevelControl::Commands::MoveToLevel::Id: {
+        Clusters::LevelControl::Commands::MoveToLevel::Type moveToLevelCommand;
+        moveToLevelCommand.level = data->level;
+        Controller::InvokeGroupCommandRequest(&exchangeMgr, binding.fabricIndex, binding.groupId, moveToLevelCommand);
+        break;
+    }
+    case Clusters::ColorControl::Commands::MoveToColor::Id: {
+        Clusters::ColorControl::Commands::MoveToColor::Type moveToColorCommand;
+        moveToColorCommand.colorX = data->colorXY.x;
+        moveToColorCommand.colorY = data->colorXY.y;
+        Controller::InvokeGroupCommandRequest(&exchangeMgr, binding.fabricIndex, binding.groupId, moveToColorCommand);
+        break;
+    }
+    default:
+        ChipLogError(NotSpecified, "Unsupported Command Id");
+        break;
+    }
+}
+
 static void LightSwitchChangedHandler(const EmberBindingTableEntry & binding, OperationalDeviceProxy * peer_device, void * context)
 {
     VerifyOrReturn(context != nullptr, ChipLogError(NotSpecified, "nullptr pointer passed"));
-
     BindingCommandData * data = static_cast<BindingCommandData *>(context);
 
-    if (binding.type == MATTER_UNICAST_BINDING)
+    if (binding.type == MATTER_MULTICAST_BINDING && data->isGroup)
+    {
+        switch (data->clusterId)
+        {
+        case Clusters::OnOff::Id:
+        case Clusters::LevelControl::Id:
+        case Clusters::ColorControl::Id:
+            ProcessSwitchGroupBindingCommand(data->commandId, binding, data);
+            break;
+        }
+    }
+    else if (binding.type == MATTER_UNICAST_BINDING && !data->isGroup)
     {
         switch (data->clusterId)
         {
