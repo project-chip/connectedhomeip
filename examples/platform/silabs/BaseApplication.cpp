@@ -166,22 +166,6 @@ bool BaseApplication::sIsFactoryResetTriggered        = false;
 LEDWidget * BaseApplication::sAppActionLed            = nullptr;
 BaseApplicationDelegate BaseApplication::sAppDelegate = BaseApplicationDelegate();
 
-#ifdef DIC_ENABLE
-namespace {
-void AppSpecificConnectivityEventCallback(const ChipDeviceEvent * event, intptr_t arg)
-{
-    SILABS_LOG("AppSpecificConnectivityEventCallback: call back for IPV4");
-    if ((event->Type == DeviceEventType::kInternetConnectivityChange) &&
-        (event->InternetConnectivityChange.IPv4 == kConnectivity_Established))
-    {
-        SILABS_LOG("Got IPv4 Address! Starting DIC module\n");
-        if (DIC_OK != dic_init(dic::control::subscribeCB))
-            SILABS_LOG("Failed to initialize DIC module\n");
-    }
-}
-} // namespace
-#endif // DIC_ENABLE
-
 void BaseApplicationDelegate::OnCommissioningSessionStarted()
 {
     isComissioningStarted = true;
@@ -203,7 +187,7 @@ void BaseApplicationDelegate::OnCommissioningWindowClosed()
             ChipLogError(DeviceLayer, "Failed to enable the TA Deep Sleep");
         }
     }
-#endif // CHIP_CONFIG_ENABLE_ICD_SERVER && SLI_SI917qq
+#endif // CHIP_CONFIG_ENABLE_ICD_SERVER && SLI_SI917
 }
 
 void BaseApplicationDelegate::OnFabricCommitted(const FabricTable & fabricTable, FabricIndex fabricIndex)
@@ -296,10 +280,6 @@ CHIP_ERROR BaseApplication::Init()
 
     SILABS_LOG("Current Software Version String: %s", CHIP_DEVICE_CONFIG_DEVICE_SOFTWARE_VERSION_STRING);
     SILABS_LOG("Current Software Version: %d", CHIP_DEVICE_CONFIG_DEVICE_SOFTWARE_VERSION);
-
-#ifdef DIC_ENABLE
-    chip::DeviceLayer::PlatformMgr().AddEventHandler(AppSpecificConnectivityEventCallback, reinterpret_cast<intptr_t>(nullptr));
-#endif // DIC_ENABLE
 
     ConfigurationMgr().LogDeviceConfig();
 
@@ -830,10 +810,23 @@ void BaseApplication::DoProvisioningReset()
 
 void BaseApplication::OnPlatformEvent(const ChipDeviceEvent * event, intptr_t)
 {
-    if (event->Type == DeviceEventType::kServiceProvisioningChange)
+    switch (event->Type)
     {
+    case DeviceEventType::kServiceProvisioningChange:
         // Note: This is only called on Attach, we need to add a method to detect Thread Network Detach
         BaseApplication::sIsProvisioned = event->ServiceProvisioningChange.IsServiceProvisioned;
+        break;
+    case DeviceEventType::kInternetConnectivityChange:
+#ifdef DIC_ENABLE
+        VerifyOrReturn(event->InternetConnectivityChange.IPv4 == kConnectivity_Established);
+        if (DIC_OK != dic_init(dic::control::subscribeCB))
+        {
+            SILABS_LOG("Failed to initialize DIC module\n");
+        }
+#endif // DIC_ENABLE
+        break;
+    default:
+        break;
     }
 }
 
