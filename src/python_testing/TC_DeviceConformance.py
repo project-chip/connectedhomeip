@@ -194,7 +194,6 @@ class DeviceConformanceTests(BasicCompositionTests):
         print(f'success = {success}')
         return success, problems
 
-
     def check_revisions(self, ignore_in_progress: bool):
         problems = []
         success = True
@@ -235,7 +234,6 @@ class DeviceConformanceTests(BasicCompositionTests):
                         location=location, problem=f'Revision found on cluster ({cluster[GlobalAttributeIds.CLUSTER_REVISION_ID]}) does not match revision listed in the spec ({self.xml_clusters[cluster_id].revision})')
 
         return success, problems
-
 
     def check_device_type(self, fail_on_extra_clusters: bool = True, allow_provisional: bool = False) -> tuple[bool, list[ProblemNotice]]:
         success = True
@@ -318,6 +316,7 @@ class DeviceConformanceTests(BasicCompositionTests):
 
         return success, problems
 
+
 class TC_DeviceConformance(MatterBaseTest, DeviceConformanceTests):
     @async_test_body
     async def setup_class(self):
@@ -345,6 +344,7 @@ class TC_DeviceConformance(MatterBaseTest, DeviceConformanceTests):
         self.problems.extend(problems)
         if not success:
             self.fail_current_test("Problems with Device type conformance on one or more endpoints")
+
 
 if __name__ == "__main__":
     default_matter_test_main()

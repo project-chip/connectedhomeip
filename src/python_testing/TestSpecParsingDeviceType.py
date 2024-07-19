@@ -116,7 +116,7 @@ class TestSpecParsingDeviceType(MatterBaseTest):
     # Right now I'm not testing for binding condition.
     # The test is entirely based on the descriptor cluster so that's all I'm populating here
     # because it makes the test less complex to write.
-    def create_test(self, server_list: list[uint], no_descriptor:bool = False, bad_device_id: bool = False) -> DeviceConformanceTests:
+    def create_test(self, server_list: list[uint], no_descriptor: bool = False, bad_device_id: bool = False) -> DeviceConformanceTests:
         self.test = DeviceConformanceTests()
         self.test.xml_device_types = self.xml_device_types
         self.test.xml_clusters = self.xml_clusters
@@ -138,7 +138,7 @@ class TestSpecParsingDeviceType(MatterBaseTest):
             resp.attributes = {1: {desc: {device_type_list_attr: device_type_list, server_list_attr: server_list}}}
         self.test.endpoints = resp.attributes
 
-    def create_good_device(self, device_type_id:int) -> DeviceConformanceTests:
+    def create_good_device(self, device_type_id: int) -> DeviceConformanceTests:
         self.test = DeviceConformanceTests()
         self.test.xml_device_types = self.xml_device_types
         self.test.xml_clusters = self.xml_clusters
@@ -147,8 +147,10 @@ class TestSpecParsingDeviceType(MatterBaseTest):
         desc = Clusters.Descriptor
         server_list_attr = Clusters.Descriptor.Attributes.ServerList
         device_type_list_attr = Clusters.Descriptor.Attributes.DeviceTypeList
-        device_type_list = [Clusters.Descriptor.Structs.DeviceTypeStruct(deviceType=device_type_id, revision=self.xml_device_types[device_type_id].revision)]
-        server_list = [k for k, v in self.xml_device_types[device_type_id].server_clusters.items() if conformance_allowed(v.conformance(0, [], []), False)]
+        device_type_list = [Clusters.Descriptor.Structs.DeviceTypeStruct(
+            deviceType=device_type_id, revision=self.xml_device_types[device_type_id].revision)]
+        server_list = [k for k, v in self.xml_device_types[device_type_id].server_clusters.items(
+        ) if conformance_allowed(v.conformance(0, [], []), False)]
         resp.attributes = {1: {desc: {device_type_list_attr: device_type_list, server_list_attr: server_list}}}
 
         self.test.endpoints = resp.attributes
@@ -242,6 +244,7 @@ class TestSpecParsingDeviceType(MatterBaseTest):
                 print(problems)
             asserts.assert_equal(len(problems), expected_problems, "Unexpected number of problems")
             asserts.assert_false(success, "Unexpected success running test that should fail")
+
 
 if __name__ == "__main__":
     default_matter_test_main()
