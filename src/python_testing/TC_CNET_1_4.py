@@ -41,9 +41,9 @@ class TC_CNET_1_4(MatterBaseTest):
     def steps_TC_CNET_1_4(self):
         return [TestStep(1, "TH is commissioned", is_commissioning=True),
                 TestStep(2, 'TH performs a wildcard read of Network Commissioning clusters across all endpoints, and save the number of Network Commissioning clusters as `NumNetworkCommissioning` for future use. If `NumNetworkCommissioning` is 0, skip the remaining steps in this test case'),
-                TestStep(3, 'TH checks whether endpoint 0 is contained in the previous response to determine whether there is a Network Commissioning cluster on endpoint 0'),
+                TestStep(3, 'TH verifies that Endpoint 0 exists in the returned data. If `NumNetworkCommissioning` is 1, skip the remaining steps'),
                 TestStep(4, 'TH reads from the DUT the Descriptor Cluster DeviceTypeList attribute on each endpoint (except for Endpoint 0) that hosts a Network Commissioning cluster, verify that the Secondary Network Interface device type id (0x0019) is listed in the DeviceTypeList'),
-                TestStep(5, 'TH reads from the DUT the General Commissioning Cluster SupportsConcurrentConnection attribute if NumNetworkCommissioning is greater than 1, verify that it is true')]
+                TestStep(5, 'TH reads from the DUT the General Commissioning Cluster SupportsConcurrentConnection attribute, verify that it is true')]
 
     def def_TC_CNET_1_4(self):
         return '[TC-CNET-1.4] Verification for Secondary Network Interface [DUT-Server]'
