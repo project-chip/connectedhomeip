@@ -14,12 +14,12 @@
  *    See the License for the specific language governing permissions and
  *    limitations under the License.
  */
-#include "app/CommandHandlerInterfaceRegistry.h"
 #include <app/util/ember-compatibility-functions.h>
 
 #include <access/AccessControl.h>
 #include <app/AttributeAccessInterfaceRegistry.h>
 #include <app/CommandHandlerInterface.h>
+#include <app/CommandHandlerInterfaceRegistry.h>
 #include <app/ConcreteAttributePath.h>
 #include <app/ConcreteEventPath.h>
 #include <app/GlobalAttributes.h>
