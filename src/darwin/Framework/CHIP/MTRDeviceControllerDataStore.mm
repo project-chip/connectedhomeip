@@ -1330,13 +1330,12 @@ typedef NSArray<NSString *> MTRClientDataKeyIndex;
         // REVIEWERS:  could we log failures? kmo 12 jul 2024 13h10
         NSString * storageKey = [self _clientDataKeyForNodeID:nodeID key:key];
         NSLog(@"kmo: storeClientDataForKey - data key %@", storageKey);
-        [self->_storageDelegate controller:controller
         BOOL storedSuccessfully = [self->_storageDelegate controller:controller
                                 storeValue:value
                                     forKey:storageKey
                              securityLevel:MTRStorageSecurityLevelSecure
                                sharingType:MTRStorageSharingTypeNotShared]; // REVIEWERS:  should be fabric shared? kmo 12 jul 2024 13h10
-        NSLog(@"kmo: would update index");
+        NSLog(@"kmo: about to update index - value stored successfully? %d", storedSuccessfully);
         [self _updateClientDataIndexForKey:key nodeID:nodeID controller:controller];
     });
 }
@@ -1358,7 +1357,7 @@ typedef NSArray<NSString *> MTRClientDataKeyIndex;
             securityLevel:MTRStorageSecurityLevelSecure
               sharingType:MTRStorageSharingTypeNotShared];
         }
-        
+
         // remove index itself
         NSString * storageKey = [self _clientDataIndexKeyForNodeID:nodeID];
         [self->_storageDelegate controller:controller
