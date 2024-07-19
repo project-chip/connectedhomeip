@@ -1,10 +1,6 @@
 /*
  *
  *    Copyright (c) 2020-2021 Project CHIP Authors
- *    Command handler lists were placed in a separate registry class that is independent of
- *    the InteractionModelEngine class.
- *
- *    The following replacements exist:
  *    All rights reserved.
  *
  *    Licensed under the Apache License, Version 2.0 (the "License");
