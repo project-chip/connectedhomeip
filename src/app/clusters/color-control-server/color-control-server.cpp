@@ -496,7 +496,11 @@ bool ColorControlServer::stopMoveStepCommand(app::CommandHandler * commandObj, c
     uint8_t isColorLoopActive = 0;
     if (ColorControlServer::Instance().HasFeature(endpoint, ColorControlServer::Feature::kColorLoop))
     {
-        Attributes::ColorLoopActive::Get(endpoint, &isColorLoopActive);
+        // In case of get failure, isColorLoopActive will remain at the init value 0 (not active)
+        if (Attributes::ColorLoopActive::Get(endpoint, &isColorLoopActive) != Status::Success)
+        {
+            ChipLogError(Zcl, "Failed to retrieve ColorLoopActive value");
+        }
     }
 
     if (shouldExecuteIfOff(endpoint, optionsMask, optionsOverride) && !isColorLoopActive)
@@ -1957,7 +1961,11 @@ bool ColorControlServer::colorLoopCommand(app::CommandHandler * commandObj, cons
         return true;
     }
 
-    Attributes::ColorLoopActive::Get(endpoint, &isColorLoopActive);
+    // In case of get failure, isColorLoopActive will remain at the init value 0 (not active)
+    if (Attributes::ColorLoopActive::Get(endpoint, &isColorLoopActive) != Status::Success)
+    {
+        ChipLogError(Zcl, "Failed to retrieve ColorLoopActive value");
+    }
 
     deactiveColorLoop = updateFlags.Has(ColorLoopUpdateFlags::kUpdateAction) && (action == ColorLoopAction::kDeactivate);
 
