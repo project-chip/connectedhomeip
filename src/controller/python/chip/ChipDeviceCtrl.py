@@ -43,7 +43,7 @@ from ctypes import (CDLL, CFUNCTYPE, POINTER, Structure, byref, c_bool, c_char, 
                     c_uint16, c_uint32, c_uint64, c_void_p, create_string_buffer, pointer, py_object, resize, string_at)
 from dataclasses import dataclass
 
-import dacite
+import dacite  # type: ignore
 
 from . import FabricAdmin
 from . import clusters as Clusters
