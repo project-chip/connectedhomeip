@@ -366,8 +366,8 @@ class MatterTestConfig:
     # This allows cert tests to be run without re-commissioning for RR-1.1.
     maximize_cert_chains: bool = True
 
-    qr_code_content: Optional[str] = None
-    manual_code: Optional[str] = None
+    qr_code_content: Optional[List[str]] = None
+    manual_code: Optional[List[str]] = None
 
     wifi_ssid: Optional[str] = None
     wifi_passphrase: Optional[str] = None
@@ -1069,34 +1069,47 @@ class MatterBaseTest(base_test.BaseTestClass):
         self.current_step_index = self.current_step_index + 1
         self.step_skipped = False
 
-    def get_setup_payload_info(self) -> SetupPayloadInfo:
+    def get_setup_payload_info(self) -> List[SetupPayloadInfo]:
+        setup_payloads = []
         if self.matter_test_config.qr_code_content is not None:
-            qr_code = self.matter_test_config.qr_code_content
-            try:
-                setup_payload = SetupPayload().ParseQrCode(qr_code)
-            except ChipStackError:
-                asserts.fail(f"QR code '{qr_code} failed to parse properly as a Matter setup code.")
+            for qr_code in self.matter_test_config.qr_code_content:
+                try:
+                    setup_payloads.append(SetupPayload().ParseQrCode(qr_code))
+                except ChipStackError:
+                    asserts.fail(f"QR code '{qr_code} failed to parse properly as a Matter setup code.")
 
-        elif self.matter_test_config.manual_code is not None:
-            manual_code = self.matter_test_config.manual_code
-            try:
-                setup_payload = SetupPayload().ParseManualPairingCode(manual_code)
-            except ChipStackError:
-                asserts.fail(
-                    f"Manual code code '{manual_code}' failed to parse properly as a Matter setup code. Check that all digits are correct and length is 11 or 21 characters.")
-        else:
-            asserts.fail("Require either --qr-code or --manual-code.")
+        if self.matter_test_config.manual_code is not None:
+            for manual_code in self.matter_test_config.manual_code:
+                try:
+                    setup_payloads.append(SetupPayload().ParseManualPairingCode(manual_code))
+                except ChipStackError:
+                    asserts.fail(
+                        f"Manual code code '{manual_code}' failed to parse properly as a Matter setup code. Check that all digits are correct and length is 11 or 21 characters.")
 
-        info = SetupPayloadInfo()
-        info.passcode = setup_payload.setup_passcode
-        if setup_payload.short_discriminator is not None:
-            info.filter_type = discovery.FilterType.SHORT_DISCRIMINATOR
-            info.filter_value = setup_payload.short_discriminator
-        else:
-            info.filter_type = discovery.FilterType.LONG_DISCRIMINATOR
-            info.filter_value = setup_payload.long_discriminator
+        infos = []
+        for setup_payload in setup_payloads:
+            info = SetupPayloadInfo()
+            info.passcode = setup_payload.setup_passcode
+            if setup_payload.short_discriminator is not None:
+                info.filter_type = discovery.FilterType.SHORT_DISCRIMINATOR
+                info.filter_value = setup_payload.short_discriminator
+            else:
+                info.filter_type = discovery.FilterType.LONG_DISCRIMINATOR
+                info.filter_value = setup_payload.long_discriminator
+            infos.append(info)
 
-        return info
+        num_passcodes = 0 if self.matter_test_config.setup_passcodes is None else len(self.matter_test_config.setup_passcodes)
+        num_discriminators = 0 if self.matter_test_config.discriminators is None else len(self.matter_test_config.discriminators)
+        asserts.assert_equal(num_passcodes, num_discriminators, "Must have same number of discriminators as passcodes")
+        if self.matter_test_config.discriminators:
+            for idx, discriminator in enumerate(self.matter_test_config.discriminators):
+                info = SetupPayloadInfo()
+                info.passcode = self.matter_test_config.setup_passcodes[idx]
+                info.filter_type = DiscoveryFilterType.LONG_DISCRIMINATOR
+                info.filter_value = discriminator
+                infos.append(info)
+
+        return infos
 
     def wait_for_user_input(self,
                             prompt_msg: str,
@@ -1295,7 +1308,6 @@ def populate_commissioning_args(args: argparse.Namespace, config: MatterTestConf
     config.commissioning_method = args.commissioning_method
     config.commission_only = args.commission_only
 
-    # TODO: this should also allow multiple once QR and manual codes are supported.
     config.qr_code_content = args.qr_code
     if args.manual_code:
         config.manual_code = args.manual_code
@@ -1323,8 +1335,7 @@ def populate_commissioning_args(args: argparse.Namespace, config: MatterTestConf
         print("error: supplied number of discriminators does not match number of passcodes")
         return False
 
-    device_descriptors = [config.qr_code_content] if config.qr_code_content is not None else [
-        config.manual_code] if config.manual_code is not None else config.discriminators
+    device_descriptors = config.qr_code_content if config.qr_code_content is not None else config.manual_code if config.manual_code is not None else config.discriminators
 
     if len(config.dut_node_ids) > len(device_descriptors):
         print("error: More node IDs provided than discriminators")
@@ -1493,9 +1504,9 @@ def parse_matter_test_args(argv: Optional[List[str]] = None) -> MatterTestConfig
     code_group = parser.add_mutually_exclusive_group(required=False)
 
     code_group.add_argument('-q', '--qr-code', type=str,
-                            metavar="QR_CODE", help="QR setup code content (overrides passcode and discriminator)")
+                            metavar="QR_CODE", default=[], help="QR setup code content (overrides passcode and discriminator)", nargs="+")
     code_group.add_argument('--manual-code', type=str_from_manual_code,
-                            metavar="MANUAL_CODE", help="Manual setup code content (overrides passcode and discriminator)")
+                            metavar="MANUAL_CODE", default=[], help="Manual setup code content (overrides passcode and discriminator)", nargs="+")
 
     fabric_group = parser.add_argument_group(
         title="Fabric selection", description="Fabric selection for single-fabric basic usage, and commissioning")
@@ -1569,15 +1580,7 @@ class CommissionDeviceTest(MatterBaseTest):
         dev_ctrl = self.default_controller
         conf = self.matter_test_config
 
-        # TODO: qr code and manual code aren't lists
-
-        if conf.qr_code_content or conf.manual_code:
-            info = self.get_setup_payload_info()
-        else:
-            info = SetupPayloadInfo()
-            info.passcode = conf.setup_passcodes[i]
-            info.filter_type = DiscoveryFilterType.LONG_DISCRIMINATOR
-            info.filter_value = conf.discriminators[i]
+        info = self.get_setup_payload_info()[i]
 
         if conf.commissioning_method == "on-network":
             try:

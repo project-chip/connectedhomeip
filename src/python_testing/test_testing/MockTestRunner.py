@@ -37,9 +37,12 @@ class AsyncMock(MagicMock):
 
 
 class MockTestRunner():
-    def __init__(self, filename: str, classname: str, test: str, endpoint: int, pics: dict[str, bool] = {}):
-        self.config = MatterTestConfig(
-            tests=[test], endpoint=endpoint, dut_node_ids=[1], pics=pics)
+    def __init__(self, filename: str, classname: str, test: str, endpoint: int, pics: dict[str, bool] = None):
+        self.test = test
+        self.endpoint = endpoint
+        self.pics = pics
+        self.set_test_config(MatterTestConfig())
+
         self.stack = MatterStackState(self.config)
         self.default_controller = self.stack.certificate_authorities[0].adminList[0].NewController(
             nodeId=self.config.controller_node_id,
@@ -49,9 +52,20 @@ class MockTestRunner():
         module = importlib.import_module(Path(os.path.basename(filename)).stem)
         self.test_class = getattr(module, classname)
 
+    def set_test_config(self, test_config:MatterTestConfig):
+        self.config = test_config
+        self.config.tests = [self.test]
+        self.config.endpoint = self.endpoint
+        if not self.config.dut_node_ids:
+            self.config.dut_node_ids = [1]
+        if self.pics:
+            self.config.pics = self.pics
+
     def Shutdown(self):
         self.stack.Shutdown()
 
     def run_test_with_mock_read(self,  read_cache: Attribute.AsyncReadTransaction.ReadResponse):
         self.default_controller.Read = AsyncMock(return_value=read_cache)
+        # This doesn't need to do anything since we are overriding the read anyway
+        self.default_controller.FindOrEstablishPASESession = AsyncMock(return_value=None)
         return run_tests_no_exit(self.test_class, self.config, None, self.default_controller, self.stack)
