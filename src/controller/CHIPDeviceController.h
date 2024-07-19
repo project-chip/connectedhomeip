@@ -243,9 +243,10 @@ public:
      * An error return from this function means that neither callback has been
      * called yet, and neither callback will be called in the future.
      */
-    CHIP_ERROR GetConnectedDevice(NodeId peerNodeId, Callback::Callback<OnDeviceConnected> * onConnection,
-                                  chip::Callback::Callback<OnDeviceConnectionFailure> * onFailure,
-                                  TransportPayloadCapability transportPayloadCapability = TransportPayloadCapability::kMRPPayload)
+    virtual CHIP_ERROR
+    GetConnectedDevice(NodeId peerNodeId, Callback::Callback<OnDeviceConnected> * onConnection,
+                       Callback::Callback<OnDeviceConnectionFailure> * onFailure,
+                       TransportPayloadCapability transportPayloadCapability = TransportPayloadCapability::kMRPPayload)
     {
         VerifyOrReturnError(mState == State::Initialized, CHIP_ERROR_INCORRECT_STATE);
         mSystemState->CASESessionMgr()->FindOrEstablishSession(ScopedNodeId(peerNodeId, GetFabricIndex()), onConnection, onFailure,
