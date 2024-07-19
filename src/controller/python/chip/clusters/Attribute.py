@@ -33,10 +33,10 @@ import chip
 import chip.exceptions
 import chip.interaction_model
 import chip.tlv
-import construct
+import construct # type: ignore
 from chip.interaction_model import PyWriteAttributeData
 from chip.native import ErrorSDKPart, PyChipError
-from rich.pretty import pprint
+from rich.pretty import pprint # type: ignore
 
 from .ClusterObjects import Cluster, ClusterAttributeDescriptor, ClusterEvent
 
