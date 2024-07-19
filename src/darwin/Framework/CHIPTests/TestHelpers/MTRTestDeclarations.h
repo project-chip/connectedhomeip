@@ -47,8 +47,6 @@ NS_ASSUME_NONNULL_BEGIN
 
 @interface MTRDevice (Test)
 - (BOOL)_attributeDataValue:(NSDictionary *)one isEqualToDataValue:(NSDictionary *)theOther;
-- (MTRDeviceClusterData *)_getClusterDataForPath:(MTRClusterPath *)path;
-- (BOOL)_clusterHasBeenPersisted:(MTRClusterPath *)path;
 - (NSMutableArray<NSNumber *> *)arrayOfNumbersFromAttributeValue:(MTRDeviceDataValueDictionary)dataDictionary;
 @end
 
@@ -80,6 +78,9 @@ NS_ASSUME_NONNULL_BEGIN
 - (void)unitTestSetMostRecentReportTimes:(NSMutableArray<NSDate *> *)mostRecentReportTimes;
 - (NSUInteger)unitTestNonnullDelegateCount;
 - (void)unitTestResetSubscription;
+- (MTRDeviceClusterData *)unitTestGetClusterDataForPath:(MTRClusterPath *)path;
+- (NSSet<MTRClusterPath *> *)unitTestGetPersistedClusters;
+- (BOOL)unitTestClusterHasBeenPersisted:(MTRClusterPath *)path;
 @end
 #endif
 

@@ -2112,6 +2112,22 @@ static NSString * const sLastInitialSubscribeLatencyKey = @"lastInitialSubscribe
 }
 #endif
 
+- (void)_reconcilePersistedClustersWithStorage
+{
+    os_unfair_lock_assert_owner(&self->_lock);
+
+    NSMutableSet * clusterPathsToRemove = [NSMutableSet set];
+    for (MTRClusterPath * clusterPath in _persistedClusters) {
+        MTRDeviceClusterData * data = [_deviceController.controllerDataStore getStoredClusterDataForNodeID:_nodeID endpointID:clusterPath.endpoint clusterID:clusterPath.cluster];
+        if (!data) {
+            [clusterPathsToRemove addObject:clusterPath];
+        }
+    }
+
+    MTR_LOG_ERROR("%@ ", self);
+    [_persistedClusters minusSet:clusterPathsToRemove];
+}
+
 - (nullable MTRDeviceClusterData *)_clusterDataForPath:(MTRClusterPath *)clusterPath
 {
     os_unfair_lock_assert_owner(&self->_lock);
@@ -2144,10 +2160,15 @@ static NSString * const sLastInitialSubscribeLatencyKey = @"lastInitialSubscribe
 
     // Page in the stored value for the data.
     MTRDeviceClusterData * data = [_deviceController.controllerDataStore getStoredClusterDataForNodeID:_nodeID endpointID:clusterPath.endpoint clusterID:clusterPath.cluster];
+    MTR_LOG("%@ cluster path %@ cache miss - load from storage success %@", self, clusterPath, YES_NO(data));
     if (data != nil) {
         [_persistedClusterData setObject:data forKey:clusterPath];
     } else {
         // If clusterPath is in _persistedClusters and the data store returns nil for it, then the in-memory cache is now not dependable, and subscription should be reset and reestablished to reload cache from device
+
+        // First make sure _persistedClusters is consistent with storage, so repeated calls don't immediately re-trigger this
+        [self _reconcilePersistedClustersWithStorage];
+
         [self _resetSubscriptionWithReasonString:[NSString stringWithFormat:@"Data store has no data for cluster %@", clusterPath]];
     }
 
@@ -3798,14 +3819,21 @@ static BOOL AttributeHasChangesOmittedQuality(MTRAttributePath * attributePath)
 }
 
 #ifdef DEBUG
-- (MTRDeviceClusterData *)_getClusterDataForPath:(MTRClusterPath *)path
+- (MTRDeviceClusterData *)unitTestGetClusterDataForPath:(MTRClusterPath *)path
 {
     std::lock_guard lock(_lock);
 
     return [[self _clusterDataForPath:path] copy];
 }
 
-- (BOOL)_clusterHasBeenPersisted:(MTRClusterPath *)path
+- (NSSet<MTRClusterPath *> *)unitTestGetPersistedClusters
+{
+    std::lock_guard lock(_lock);
+
+    return [_persistedClusters copy];
+}
+
+- (BOOL)unitTestClusterHasBeenPersisted:(MTRClusterPath *)path
 {
     std::lock_guard lock(_lock);
 
