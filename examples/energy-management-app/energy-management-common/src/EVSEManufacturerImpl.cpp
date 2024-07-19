@@ -148,14 +148,7 @@ CHIP_ERROR FindNextTarget(const uint8_t dayOfWeekMap, uint16_t minutesPastMidnig
 
                     targetTimeMinutesPastMidnight_m = chargingTarget.targetTimeMinutesPastMidnight;
 
-                    if (chargingTarget.targetSoC.HasValue())
-                    {
-                        targetSoC.SetNonNull(chargingTarget.targetSoC.Value());
-                    }
-                    else
-                    {
-                        targetSoC.SetNull();
-                    }
+                    targetSoC = chargingTarget.targetSoC;
 
                     if (chargingTarget.addedEnergy.HasValue())
                     {
