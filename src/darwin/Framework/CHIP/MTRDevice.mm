@@ -3971,8 +3971,7 @@ static BOOL AttributeHasChangesOmittedQuality(MTRAttributePath * attributePath)
 - (NSArray * _Nullable)clientDataKeys
 {
 #if USE_DEVICE_CONTROLLER_DATA_STORE
-    // TODO:  KMO:  implement
-    return @[];
+    return [self.deviceController.controllerDataStore storedClientDataKeysForNodeID:self.nodeID];
 #else
     return [self.temporaryMetaDataCache allKeys];
 #endif // USE_DEVICE_CONTROLLER_DATA_STORE
