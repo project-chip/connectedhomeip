@@ -822,11 +822,11 @@ const char srv_name[] = "_matterc._udp";
 /*
     NAN-USD Service Protocol Type: ref: Table 58 of Wi-Fi Aware Specificaiton
 */
-#define MAX_PAF_PUBLISH_SSI_BUFLEN 128
+#define MAX_PAF_PUBLISH_SSI_BUFLEN 512
 #define MAX_PAF_TX_SSI_BUFLEN 2048
 #define NAN_SRV_PROTO_MATTER 3
 #define NAM_PUBLISH_PERIOD 300u
-#define NAN_PUBLISH_SSI_TAG "ssi="
+#define NAN_PUBLISH_SSI_TAG " ssi="
 
 #pragma pack(push, 1)
 struct PAFPublishSSI
@@ -837,14 +837,22 @@ struct PAFPublishSSI
     uint16_t VendorId;
 };
 #pragma pack(pop)
-CHIP_ERROR ConnectivityManagerImpl::_WiFiPAFPublish()
+CHIP_ERROR ConnectivityManagerImpl::_WiFiPAFPublish(ConnectivityManager::WiFiPAFAdvertiseParam &InArgs)
 {
     CHIP_ERROR ret;
     GAutoPtr<GError> err;
     gchar args[MAX_PAF_PUBLISH_SSI_BUFLEN];
     gint publish_id;
+    size_t req_len;
 
     snprintf(args, sizeof(args), "service_name=%s srv_proto_type=%u ttl=%u ", srv_name, NAN_SRV_PROTO_MATTER, NAM_PUBLISH_PERIOD);
+    req_len = strlen(args)+strlen(InArgs.ExtCmds);
+    if ((InArgs.ExtCmds != nullptr) &&
+        (MAX_PAF_PUBLISH_SSI_BUFLEN > req_len)) {
+        strcat(args, InArgs.ExtCmds);
+    } else {
+        ChipLogError(DeviceLayer, "Input cmd is too long: limit:%d, req: %lu", MAX_PAF_PUBLISH_SSI_BUFLEN, req_len);
+    }
 
     struct PAFPublishSSI PafPublish_ssi;
     VerifyOrReturnError(
@@ -860,7 +868,9 @@ CHIP_ERROR ConnectivityManagerImpl::_WiFiPAFPublish()
     {
         PafPublish_ssi.VendorId = 0;
     }
-    strcat(args, NAN_PUBLISH_SSI_TAG);
+    if (MAX_PAF_PUBLISH_SSI_BUFLEN > strlen(args)+strlen(NAN_PUBLISH_SSI_TAG)) {
+        strcat(args, NAN_PUBLISH_SSI_TAG);
+    }
     ret = Encoding::BytesToUppercaseHexString((uint8_t *) &PafPublish_ssi, sizeof(PafPublish_ssi), &args[strlen(args)],
                                               MAX_PAF_PUBLISH_SSI_BUFLEN - strlen(args));
     VerifyOrReturnError(ret == CHIP_NO_ERROR, ret);
@@ -887,11 +897,11 @@ CHIP_ERROR ConnectivityManagerImpl::_WiFiPAFCancelPublish()
     return CHIP_NO_ERROR;
 }
 
-CHIP_ERROR ConnectivityManagerImpl::_SetWiFiPAFAdvertisingEnabled(bool val)
+CHIP_ERROR ConnectivityManagerImpl::_SetWiFiPAFAdvertisingEnabled(WiFiPAFAdvertiseParam &args)
 {
-    if (val == true)
+    if (args.enable == true)
     {
-        return _WiFiPAFPublish();
+        return _WiFiPAFPublish(args);
     }
     else
     {

@@ -121,7 +121,7 @@ OptionDef sDeviceOptionDefs[] = {
     { "wifi", kNoArgument, kDeviceOption_WiFi },
     { "wifi-supports-5g", kNoArgument, kDeviceOption_WiFiSupports5g },
 #if CHIP_DEVICE_CONFIG_ENABLE_WIFIPAF
-    { "wifipaf", kNoArgument, kDeviceOption_WiFi_PAF },
+    { "wifipaf", kArgumentRequired, kDeviceOption_WiFi_PAF },
 #endif // CHIP_DEVICE_CONFIG_ENABLE_WIFIPAF
 #endif // CHIP_DEVICE_CONFIG_ENABLE_WPA
 #if CHIP_ENABLE_OPENTHREAD
@@ -197,9 +197,10 @@ const char * sDeviceOptionHelp =
 #endif // CHIP_DEVICE_CONFIG_ENABLE_WIFI
 #if CHIP_DEVICE_CONFIG_ENABLE_WIFIPAF
     "\n"
-    "  --wifipaf\n"
+    "  --wifipaf freq_list=<freq_1>,<freq_2>... \n"
     "       Enable Wi-Fi PAF via wpa_supplicant.\n"
-#endif // CHIP_DEVICE_CONFIG_ENABLE_WIFIPAF
+    "       Give an empty string if not setting freq_list: \"\"\n"
+#endif // CHIP_DEVICE_CONFIG_ENABLE_WIFIPAFs
 #if CHIP_ENABLE_OPENTHREAD
     "\n"
     "  --thread\n"
@@ -603,6 +604,7 @@ bool HandleOption(const char * aProgram, OptionSet * aOptions, int aIdentifier, 
 #if CHIP_DEVICE_CONFIG_ENABLE_WIFIPAF
     case kDeviceOption_WiFi_PAF: {
         LinuxDeviceOptions::GetInstance().mWiFiPAF = true;
+        LinuxDeviceOptions::GetInstance().mWiFiPafExtCmds = aValue;
         break;
     }
 #endif
