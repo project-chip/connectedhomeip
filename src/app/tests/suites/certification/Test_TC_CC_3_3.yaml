@@ -288,7 +288,8 @@ tests:
               maxValue: 3
 
     - label:
-          "Step 5a: TH sends StepHue command to DUT with StepMode=0x01 (up), StepSize=0"
+          "Step 5a: TH sends StepHue command to DUT with StepMode=0x01 (up),
+          StepSize=0"
       PICS: CC.S.F00 && CC.S.C02.Rsp
       command: "StepHue"
       arguments:
@@ -307,7 +308,8 @@ tests:
           error: INVALID_COMMAND
 
     - label:
-          "Step 5b: TH sends StepHue command to DUT with StepMode=0x03 (down), StepSize=0"
+          "Step 5b: TH sends StepHue command to DUT with StepMode=0x03 (down),
+          StepSize=0"
       PICS: CC.S.F00 && CC.S.C02.Rsp
       command: "StepHue"
       arguments:
@@ -324,7 +326,6 @@ tests:
                 value: 0
       response:
           error: INVALID_COMMAND
-
 
     - label: "Turn off light that we turned on"
       PICS: OO.S.C00.Rsp

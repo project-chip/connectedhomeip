@@ -347,8 +347,8 @@ tests:
               maxValue: 3
 
     - label:
-        "Step 5a: TH sends MoveHue command to DUT with MoveMode=0x01 (up)
-        and Rate=0 (units/s)"
+          "Step 5a: TH sends MoveHue command to DUT with MoveMode=0x01 (up) and
+          Rate=0 (units/s)"
       PICS: CC.S.F00 && CC.S.C01.Rsp
       command: "MoveHue"
       arguments:
@@ -365,8 +365,8 @@ tests:
           error: INVALID_COMMAND
 
     - label:
-        "Step 5b: TH sends MoveHue command to DUT with MoveMode=0x03 (down)
-        and Rate=0 (units/s)"
+          "Step 5b: TH sends MoveHue command to DUT with MoveMode=0x03 (down)
+          and Rate=0 (units/s)"
       PICS: CC.S.F00 && CC.S.C01.Rsp
       command: "MoveHue"
       arguments:
@@ -383,8 +383,8 @@ tests:
           error: INVALID_COMMAND
 
     - label:
-        "Step 5c: TH sends MoveHue command to DUT with MoveMode=0x00 (stop)
-        and Rate=0 (units/s)"
+          "Step 5c: TH sends MoveHue command to DUT with MoveMode=0x00 (stop)
+          and Rate=0 (units/s)"
       PICS: CC.S.F00 && CC.S.C01.Rsp
       command: "MoveHue"
       arguments:

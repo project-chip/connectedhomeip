@@ -358,7 +358,8 @@ tests:
               maxValue: 3
 
     - label:
-          "Step 6a: TH sends MoveSaturation command to DUT with MoveMode=0x01 (up) and Rate=0 (units/s)"
+          "Step 6a: TH sends MoveSaturation command to DUT with MoveMode=0x01
+          (up) and Rate=0 (units/s)"
       command: "MoveSaturation"
       PICS: CC.S.F00 && CC.S.C04.Rsp
       arguments:
@@ -375,7 +376,8 @@ tests:
           error: INVALID_COMMAND
 
     - label:
-          "Step 6b: TH sends MoveSaturation command to DUT with MoveMode=0x03 (down) and Rate=0 (units/s)"
+          "Step 6b: TH sends MoveSaturation command to DUT with MoveMode=0x03
+          (down) and Rate=0 (units/s)"
       command: "MoveSaturation"
       PICS: CC.S.F00 && CC.S.C04.Rsp
       arguments:

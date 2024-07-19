@@ -328,7 +328,8 @@ tests:
               maxValue: 3
 
     - label:
-          "Step 5a: TH sends StepSaturation command to DUT with StepMode=0x01 (up), StepSize=0"
+          "Step 5a: TH sends StepSaturation command to DUT with StepMode=0x01
+          (up), StepSize=0"
       PICS: CC.S.F00 && CC.S.C05.Rsp
       command: "StepSaturation"
       arguments:
@@ -347,7 +348,8 @@ tests:
           error: INVALID_COMMAND
 
     - label:
-          "Step 5b: TH sends StepSaturation command to DUT with StepMode=0x03 (down), StepSize=0"
+          "Step 5b: TH sends StepSaturation command to DUT with StepMode=0x03
+          (down), StepSize=0"
       PICS: CC.S.F00 && CC.S.C05.Rsp
       command: "StepSaturation"
       arguments:
