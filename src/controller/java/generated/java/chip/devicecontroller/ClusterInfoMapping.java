@@ -18117,9 +18117,9 @@ public class ClusterInfoMapping {
     }
 
     @Override
-    public void onSuccess(@Nullable Long value) {
+    public void onSuccess(@Nullable byte[] value) {
       Map<CommandResponseInfo, Object> responseValues = new LinkedHashMap<>();
-      CommandResponseInfo commandResponseInfo = new CommandResponseInfo("value", "Long");
+      CommandResponseInfo commandResponseInfo = new CommandResponseInfo("value", "byte[]");
       responseValues.put(commandResponseInfo, value);
       callback.onSuccess(responseValues);
     }
@@ -27690,13 +27690,13 @@ public class ClusterInfoMapping {
 
     Map<String, CommandParameterInfo> threadNetworkDirectoryremoveNetworkCommandParams = new LinkedHashMap<String, CommandParameterInfo>();
 
-    CommandParameterInfo threadNetworkDirectoryremoveNetworkextendedPanIDCommandParameterInfo = new CommandParameterInfo("extendedPanID", Long.class, Long.class);
+    CommandParameterInfo threadNetworkDirectoryremoveNetworkextendedPanIDCommandParameterInfo = new CommandParameterInfo("extendedPanID", byte[].class, byte[].class);
     threadNetworkDirectoryremoveNetworkCommandParams.put("extendedPanID",threadNetworkDirectoryremoveNetworkextendedPanIDCommandParameterInfo);
     InteractionInfo threadNetworkDirectoryremoveNetworkInteractionInfo = new InteractionInfo(
       (cluster, callback, commandArguments) -> {
         ((ChipClusters.ThreadNetworkDirectoryCluster) cluster)
         .removeNetwork((DefaultClusterCallback) callback
-        , (Long)
+        , (byte[])
         commandArguments.get("extendedPanID"), 10000
         );
       },
@@ -27707,13 +27707,13 @@ public class ClusterInfoMapping {
 
     Map<String, CommandParameterInfo> threadNetworkDirectorygetOperationalDatasetCommandParams = new LinkedHashMap<String, CommandParameterInfo>();
 
-    CommandParameterInfo threadNetworkDirectorygetOperationalDatasetextendedPanIDCommandParameterInfo = new CommandParameterInfo("extendedPanID", Long.class, Long.class);
+    CommandParameterInfo threadNetworkDirectorygetOperationalDatasetextendedPanIDCommandParameterInfo = new CommandParameterInfo("extendedPanID", byte[].class, byte[].class);
     threadNetworkDirectorygetOperationalDatasetCommandParams.put("extendedPanID",threadNetworkDirectorygetOperationalDatasetextendedPanIDCommandParameterInfo);
     InteractionInfo threadNetworkDirectorygetOperationalDatasetInteractionInfo = new InteractionInfo(
       (cluster, callback, commandArguments) -> {
         ((ChipClusters.ThreadNetworkDirectoryCluster) cluster)
           .getOperationalDataset((ChipClusters.ThreadNetworkDirectoryCluster.OperationalDatasetResponseCallback) callback
-           , (Long)
+           , (byte[])
              commandArguments.get("extendedPanID")
 
             , 10000);

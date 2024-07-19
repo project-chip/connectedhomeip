@@ -4117,23 +4117,6 @@ static id _Nullable DecodeEventPayloadForThreadNetworkDirectoryCluster(EventId a
 {
     using namespace Clusters::ThreadNetworkDirectory;
     switch (aEventId) {
-    case Events::NetworkChanged::Id: {
-        Events::NetworkChanged::DecodableType cppValue;
-        *aError = DataModel::Decode(aReader, cppValue);
-        if (*aError != CHIP_NO_ERROR) {
-            return nil;
-        }
-
-        __auto_type * value = [MTRThreadNetworkDirectoryClusterNetworkChangedEvent new];
-
-        do {
-            NSNumber * _Nonnull memberValue;
-            memberValue = [NSNumber numberWithUnsignedLongLong:cppValue.extendedPanID];
-            value.extendedPanID = memberValue;
-        } while (0);
-
-        return value;
-    }
     default: {
         break;
     }

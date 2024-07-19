@@ -11989,14 +11989,14 @@ class ChipClusters:
                 "commandId": 0x00000001,
                 "commandName": "RemoveNetwork",
                 "args": {
-                    "extendedPanID": "int",
+                    "extendedPanID": "bytes",
                 },
             },
             0x00000002: {
                 "commandId": 0x00000002,
                 "commandName": "GetOperationalDataset",
                 "args": {
-                    "extendedPanID": "int",
+                    "extendedPanID": "bytes",
                 },
             },
         },
@@ -12004,7 +12004,7 @@ class ChipClusters:
             0x00000000: {
                 "attributeName": "PreferredExtendedPanID",
                 "attributeId": 0x00000000,
-                "type": "int",
+                "type": "bytes",
                 "reportable": True,
                 "writable": True,
             },
