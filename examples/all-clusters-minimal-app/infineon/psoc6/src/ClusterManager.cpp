@@ -50,9 +50,9 @@ ClusterManager ClusterManager::sCluster;
 void ClusterManager::OnOnOffPostAttributeChangeCallback(EndpointId endpointId, AttributeId attributeId, uint8_t * value)
 {
     VerifyOrExit(attributeId == OnOff::Attributes::OnOff::Id,
-                 P6_LOG("Unhandled Attribute ID: '" ChipLogFormatMEI "'", ChipLogValueMEI(attributeId)));
+                 PSOC6_LOG("Unhandled Attribute ID: '" ChipLogFormatMEI "'", ChipLogValueMEI(attributeId)));
     VerifyOrExit(endpointId == ENDPOINT_FIRST_IDX || endpointId == ENDPOINT_SECOND_IDX,
-                 P6_LOG("Unexpected EndPoint ID: `0x%02x'", endpointId));
+                 PSOC6_LOG("Unexpected EndPoint ID: `0x%02x'", endpointId));
 
     // At this point we can assume that value points to a bool value.
     mEndpointOnOffState[endpointId - 1] = *value;
@@ -70,9 +70,9 @@ void ClusterManager::OnLevelControlAttributeChangeCallback(EndpointId endpointId
     uint8_t brightness = onOffState ? *value : 0;
 
     VerifyOrExit(attributeId == LevelControl::Attributes::CurrentLevel::Id,
-                 P6_LOG("Unhandled Attribute ID: '" ChipLogFormatMEI "'", ChipLogValueMEI(attributeId)));
+                 PSOC6_LOG("Unhandled Attribute ID: '" ChipLogFormatMEI "'", ChipLogValueMEI(attributeId)));
     VerifyOrExit(endpointId == ENDPOINT_FIRST_IDX || endpointId == ENDPOINT_SECOND_IDX,
-                 P6_LOG("Unexpected EndPoint ID: `0x%02x'", endpointId));
+                 PSOC6_LOG("Unexpected EndPoint ID: `0x%02x'", endpointId));
 
     endpointId == ENDPOINT_FIRST_IDX ? sClusterLED.SetBrightness(brightness) : sLightLED.SetBrightness(brightness);
 
@@ -85,9 +85,9 @@ void ClusterManager::OnColorControlAttributeChangeCallback(EndpointId endpointId
     using namespace ColorControl::Attributes;
 
     VerifyOrExit(attributeId == CurrentHue::Id || attributeId == CurrentSaturation::Id,
-                 P6_LOG("Unhandled Attribute ID: '" ChipLogFormatMEI "'", ChipLogValueMEI(attributeId)));
+                 PSOC6_LOG("Unhandled Attribute ID: '" ChipLogFormatMEI "'", ChipLogValueMEI(attributeId)));
     VerifyOrExit(endpointId == ENDPOINT_FIRST_IDX || endpointId == ENDPOINT_SECOND_IDX,
-                 P6_LOG("Unexpected EndPoint ID: `0x%02x'", endpointId));
+                 PSOC6_LOG("Unexpected EndPoint ID: `0x%02x'", endpointId));
     if (endpointId == 1)
     {
         uint8_t hue, saturation;
@@ -137,8 +137,8 @@ void IdentifyTimerHandler(Layer * systemLayer, void * appState)
 void ClusterManager::OnIdentifyPostAttributeChangeCallback(EndpointId endpointId, AttributeId attributeId, uint8_t * value)
 {
     VerifyOrExit(attributeId == Identify::Attributes::IdentifyTime::Id,
-                 P6_LOG("Unhandled Attribute ID: '" ChipLogFormatMEI "'", ChipLogValueMEI(attributeId)));
-    VerifyOrExit(endpointId == ENDPOINT_FIRST_IDX, P6_LOG("Unexpected EndPoint ID: `0x%02x'", endpointId));
+                 PSOC6_LOG("Unhandled Attribute ID: '" ChipLogFormatMEI "'", ChipLogValueMEI(attributeId)));
+    VerifyOrExit(endpointId == ENDPOINT_FIRST_IDX, PSOC6_LOG("Unexpected EndPoint ID: `0x%02x'", endpointId));
 
     /* IdentifyTime Attribute Spec mentions "flashing a light with a period of 0.5 seconds" */
     sStatusLED.Blink(kIdentifyTimerDelayMS * 2);

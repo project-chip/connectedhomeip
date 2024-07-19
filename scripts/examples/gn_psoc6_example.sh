@@ -17,7 +17,7 @@
 #
 
 set -e
-# Build script for GN P6 examples GitHub workflow.
+# Build script for GN PSOC6 examples GitHub workflow.
 source "$(dirname "$0")/../../scripts/activate.sh"
 
 # Install required software
