@@ -39,9 +39,11 @@ namespace Thread {
 class ThreadTLV final
 {
     static constexpr uint8_t kLengthEscape = 0xff; ///< This length value indicates the actual length is of two-bytes length, which
-                                                   ///< not allowed in Thread Operational Dataset TLVs.
+                                                   ///< is not allowed in Thread Operational Dataset TLVs.
 
 public:
+    static constexpr uint8_t kMaxLength = kLengthEscape - 1;
+
     enum : uint8_t
     {
         kChannel         = 0,
@@ -51,7 +53,9 @@ public:
         kPSKc            = 4,
         kMasterKey       = 5,
         kMeshLocalPrefix = 7,
+        kSecurityPolicy  = 12,
         kActiveTimestamp = 14,
+        kChannelMask     = 53,
     };
 
     uint8_t GetSize() const { return static_cast<uint8_t>(sizeof(*this) + GetLength()); }
@@ -126,6 +130,8 @@ public:
         SetLength(aLength);
         memcpy(GetValue(), aValue, aLength);
     }
+
+    void SetValue(const ByteSpan & aValue) { SetValue(aValue.data(), static_cast<uint8_t>(aValue.size())); }
 
     const ThreadTLV * GetNext() const
     {
@@ -239,12 +245,21 @@ CHIP_ERROR OperationalDataset::GetExtendedPanId(uint8_t (&aExtendedPanId)[kSizeE
     return CHIP_NO_ERROR;
 }
 
+CHIP_ERROR OperationalDataset::GetExtendedPanId(uint64_t & extendedPanId) const
+{
+    ByteSpan extPanIdSpan;
+    ReturnErrorOnFailure(GetExtendedPanIdAsByteSpan(extPanIdSpan));
+    VerifyOrDie(extPanIdSpan.size() == sizeof(extendedPanId));
+    extendedPanId = Encoding::BigEndian::Get64(extPanIdSpan.data());
+    return CHIP_NO_ERROR;
+}
+
 CHIP_ERROR OperationalDataset::GetExtendedPanIdAsByteSpan(ByteSpan & span) const
 {
     const ThreadTLV * tlv = Locate(ThreadTLV::kExtendedPanId);
     VerifyOrReturnError(tlv != nullptr, CHIP_ERROR_TLV_TAG_NOT_FOUND);
     VerifyOrReturnError(tlv->GetLength() == kSizeExtendedPanId, CHIP_ERROR_INVALID_TLV_ELEMENT);
-    span = ByteSpan(static_cast<const uint8_t *>(tlv->GetValue()), tlv->GetLength());
+    span = tlv->GetValueAsSpan();
     return CHIP_NO_ERROR;
 }
 
@@ -371,6 +386,43 @@ CHIP_ERROR OperationalDataset::SetPSKc(const uint8_t (&aPSKc)[kSizePSKc])
 
     mLength = static_cast<uint8_t>(mLength + tlv->GetSize());
 
+    return CHIP_NO_ERROR;
+}
+
+CHIP_ERROR OperationalDataset::GetChannelMask(ByteSpan & aChannelMask) const
+{
+    const ThreadTLV * tlv = Locate(ThreadTLV::kChannelMask);
+    VerifyOrReturnError(tlv != nullptr, CHIP_ERROR_TLV_TAG_NOT_FOUND);
+    VerifyOrReturnError(tlv->GetLength() > 0, CHIP_ERROR_INVALID_TLV_ELEMENT);
+    aChannelMask = tlv->GetValueAsSpan();
+    return CHIP_NO_ERROR;
+}
+
+CHIP_ERROR OperationalDataset::SetChannelMask(ByteSpan aChannelMask)
+{
+    VerifyOrReturnError(0 < aChannelMask.size() && aChannelMask.size() < ThreadTLV::kMaxLength, CHIP_ERROR_INVALID_ARGUMENT);
+    ThreadTLV * tlv = MakeRoom(ThreadTLV::kChannelMask, sizeof(*tlv) + aChannelMask.size());
+    VerifyOrReturnError(tlv != nullptr, CHIP_ERROR_NO_MEMORY);
+    tlv->SetValue(aChannelMask);
+    mLength = static_cast<uint8_t>(mLength + tlv->GetSize());
+    return CHIP_NO_ERROR;
+}
+
+CHIP_ERROR OperationalDataset::GetSecurityPolicy(uint32_t & aSecurityPolicy) const
+{
+    const ThreadTLV * tlv = Locate(ThreadTLV::kSecurityPolicy);
+    VerifyOrReturnError(tlv != nullptr, CHIP_ERROR_TLV_TAG_NOT_FOUND);
+    VerifyOrReturnError(tlv->GetLength() == sizeof(aSecurityPolicy), CHIP_ERROR_INVALID_TLV_ELEMENT);
+    tlv->Get32(aSecurityPolicy);
+    return CHIP_NO_ERROR;
+}
+
+CHIP_ERROR OperationalDataset::SetSecurityPolicy(uint32_t aSecurityPolicy)
+{
+    ThreadTLV * tlv = MakeRoom(ThreadTLV::kSecurityPolicy, sizeof(*tlv) + sizeof(aSecurityPolicy));
+    VerifyOrReturnError(tlv != nullptr, CHIP_ERROR_NO_MEMORY);
+    tlv->Set32(aSecurityPolicy);
+    mLength = static_cast<uint8_t>(mLength + tlv->GetSize());
     return CHIP_NO_ERROR;
 }
 
