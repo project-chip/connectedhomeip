@@ -114,7 +114,6 @@ CHIP_ERROR Instance::Read(const ConcreteReadAttributePath & aPath, AttributeValu
 
 void Instance::InvokeCommand(HandlerContext & handlerContext)
 {
-    ChipLogProgress(Zcl, "%s", __func__);
     switch (handlerContext.mRequestPath.mCommandId)
     {
     case Commands::SelectLocations::Id:
