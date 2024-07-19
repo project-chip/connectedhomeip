@@ -837,7 +837,7 @@ struct PAFPublishSSI
     uint16_t VendorId;
 };
 #pragma pack(pop)
-CHIP_ERROR ConnectivityManagerImpl::_WiFiPAFPublish(ConnectivityManager::WiFiPAFAdvertiseParam &InArgs)
+CHIP_ERROR ConnectivityManagerImpl::_WiFiPAFPublish(ConnectivityManager::WiFiPAFAdvertiseParam & InArgs)
 {
     CHIP_ERROR ret;
     GAutoPtr<GError> err;
@@ -846,11 +846,13 @@ CHIP_ERROR ConnectivityManagerImpl::_WiFiPAFPublish(ConnectivityManager::WiFiPAF
     size_t req_len;
 
     snprintf(args, sizeof(args), "service_name=%s srv_proto_type=%u ttl=%u ", srv_name, NAN_SRV_PROTO_MATTER, NAM_PUBLISH_PERIOD);
-    req_len = strlen(args)+strlen(InArgs.ExtCmds);
-    if ((InArgs.ExtCmds != nullptr) &&
-        (MAX_PAF_PUBLISH_SSI_BUFLEN > req_len)) {
+    req_len = strlen(args) + strlen(InArgs.ExtCmds);
+    if ((InArgs.ExtCmds != nullptr) && (MAX_PAF_PUBLISH_SSI_BUFLEN > req_len))
+    {
         strcat(args, InArgs.ExtCmds);
-    } else {
+    }
+    else
+    {
         ChipLogError(DeviceLayer, "Input cmd is too long: limit:%d, req: %lu", MAX_PAF_PUBLISH_SSI_BUFLEN, req_len);
     }
 
@@ -868,7 +870,8 @@ CHIP_ERROR ConnectivityManagerImpl::_WiFiPAFPublish(ConnectivityManager::WiFiPAF
     {
         PafPublish_ssi.VendorId = 0;
     }
-    if (MAX_PAF_PUBLISH_SSI_BUFLEN > strlen(args)+strlen(NAN_PUBLISH_SSI_TAG)) {
+    if (MAX_PAF_PUBLISH_SSI_BUFLEN > strlen(args) + strlen(NAN_PUBLISH_SSI_TAG))
+    {
         strcat(args, NAN_PUBLISH_SSI_TAG);
     }
     ret = Encoding::BytesToUppercaseHexString((uint8_t *) &PafPublish_ssi, sizeof(PafPublish_ssi), &args[strlen(args)],
@@ -897,7 +900,7 @@ CHIP_ERROR ConnectivityManagerImpl::_WiFiPAFCancelPublish()
     return CHIP_NO_ERROR;
 }
 
-CHIP_ERROR ConnectivityManagerImpl::_SetWiFiPAFAdvertisingEnabled(WiFiPAFAdvertiseParam &args)
+CHIP_ERROR ConnectivityManagerImpl::_SetWiFiPAFAdvertisingEnabled(WiFiPAFAdvertiseParam & args)
 {
     if (args.enable == true)
     {

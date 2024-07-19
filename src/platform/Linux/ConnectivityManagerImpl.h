@@ -250,8 +250,8 @@ private:
     OnConnectionErrorFunct mOnPafSubscribeError;
     Transport::WiFiPAFBase * pmWiFiPAF;
     void * mAppState;
-    CHIP_ERROR _SetWiFiPAFAdvertisingEnabled(WiFiPAFAdvertiseParam &args);
-    CHIP_ERROR _WiFiPAFPublish(WiFiPAFAdvertiseParam &args);
+    CHIP_ERROR _SetWiFiPAFAdvertisingEnabled(WiFiPAFAdvertiseParam & args);
+    CHIP_ERROR _WiFiPAFPublish(WiFiPAFAdvertiseParam & args);
     CHIP_ERROR _WiFiPAFCancelPublish();
 #endif
 

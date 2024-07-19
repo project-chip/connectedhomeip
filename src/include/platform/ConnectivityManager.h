@@ -177,7 +177,7 @@ public:
 #if CHIP_DEVICE_CONFIG_ENABLE_WIFIPAF
     struct WiFiPAFAdvertiseParam;
 
-    CHIP_ERROR SetWiFiPAFAdvertisingEnabled(WiFiPAFAdvertiseParam &args);
+    CHIP_ERROR SetWiFiPAFAdvertisingEnabled(WiFiPAFAdvertiseParam & args);
     typedef void (*OnConnectionCompleteFunct)(void * appState);
     typedef void (*OnConnectionErrorFunct)(void * appState, CHIP_ERROR err);
     CHIP_ERROR WiFiPAFConnect(const SetupDiscriminator & connDiscriminator, void * appState, OnConnectionCompleteFunct onSuccess,
@@ -288,11 +288,10 @@ struct ConnectivityManager::WiFiPAFAdvertiseParam
 {
     /* To enable/disable WiFiPAF Commissioning */
     bool enable;
-	/* The optional commands */
-	const char* ExtCmds;
+    /* The optional commands */
+    const char * ExtCmds;
 };
 #endif
-
 
 /**
  * Returns a reference to the public interface of the ConnectivityManager singleton object.
@@ -434,7 +433,7 @@ inline CHIP_ERROR ConnectivityManager::GetAndLogWiFiStatsCounters()
 }
 
 #if CHIP_DEVICE_CONFIG_ENABLE_WIFIPAF
-inline CHIP_ERROR ConnectivityManager::SetWiFiPAFAdvertisingEnabled(WiFiPAFAdvertiseParam &args)
+inline CHIP_ERROR ConnectivityManager::SetWiFiPAFAdvertisingEnabled(WiFiPAFAdvertiseParam & args)
 {
     return static_cast<ImplClass *>(this)->_SetWiFiPAFAdvertisingEnabled(args);
 }

@@ -603,7 +603,7 @@ bool HandleOption(const char * aProgram, OptionSet * aOptions, int aIdentifier, 
 #endif
 #if CHIP_DEVICE_CONFIG_ENABLE_WIFIPAF
     case kDeviceOption_WiFi_PAF: {
-        LinuxDeviceOptions::GetInstance().mWiFiPAF = true;
+        LinuxDeviceOptions::GetInstance().mWiFiPAF        = true;
         LinuxDeviceOptions::GetInstance().mWiFiPafExtCmds = aValue;
         break;
     }
