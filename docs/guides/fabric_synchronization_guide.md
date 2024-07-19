@@ -96,6 +96,18 @@ to run the Matter Light Example app on a separate physical machine from the one
 hosting Fabric-Admin and Fabric-Bridge. You can then commission the Matter Light
 Example app using Fabric-Admin on the source side.
 
+There is a workaround to avoid conflicts when running multiple Matter server
+applications on the same machine, you can use different ports and unique
+Key-Value Store (KVS) paths for each app. Here's an example of how to launch a
+Light App with custom settings:
+
+Light App with yet another set of different discriminator/passcode, ports and
+KVS
+
+```
+./out/linux-x64-light-clang/chip-lighting-app --discriminator 3843 --passcode 20202023 --secured-device-port 5543 --unsecured-commissioner-port 5553 --KVS /tmp/chip_kvs_lighting_app
+```
+
 Pair the Light Example with node ID 3 using its payload number:
 
 ```
