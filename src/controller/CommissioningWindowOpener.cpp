@@ -126,6 +126,10 @@ CHIP_ERROR CommissioningWindowOpener::OpenCommissioningWindow(const Commissionin
     mCommissioningWindowVerifierCallback = nullptr;
     mNodeId                              = params.GetNodeId();
     mCommissioningWindowTimeout          = params.GetTimeout();
+    if (params.HasEndpointId())
+    {
+        mTargetEndpointId = params.GetEndpointId();
+    }
 
     if (params.GetReadVIDPIDAttributes())
     {
@@ -162,6 +166,10 @@ CHIP_ERROR CommissioningWindowOpener::OpenCommissioningWindow(const Commissionin
     mPBKDFIterations                     = params.GetIteration();
     mCommissioningWindowOption           = CommissioningWindowOption::kTokenWithProvidedPIN;
     mDiscriminator.SetLongValue(params.GetDiscriminator());
+    if (params.HasEndpointId())
+    {
+        mTargetEndpointId = params.GetEndpointId();
+    }
 
     mNextStep = Step::kOpenCommissioningWindow;
 
@@ -173,9 +181,7 @@ CHIP_ERROR CommissioningWindowOpener::OpenCommissioningWindowInternal(Messaging:
 {
     ChipLogProgress(Controller, "OpenCommissioningWindow for device ID 0x" ChipLogFormatX64, ChipLogValueX64(mNodeId));
 
-    constexpr EndpointId kAdministratorCommissioningClusterEndpoint = 0;
-
-    ClusterBase cluster(exchangeMgr, sessionHandle, kAdministratorCommissioningClusterEndpoint);
+    ClusterBase cluster(exchangeMgr, sessionHandle, mTargetEndpointId);
 
     if (mCommissioningWindowOption != CommissioningWindowOption::kOriginalSetupCode)
     {
