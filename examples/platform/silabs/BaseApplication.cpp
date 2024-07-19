@@ -738,6 +738,14 @@ void BaseApplication::UpdateLCDStatusScreen(void)
 #ifdef SL_WIFI
     enabled  = ConnectivityMgr().IsWiFiStationEnabled();
     attached = ConnectivityMgr().IsWiFiStationConnected();
+    chip::DeviceLayer::NetworkCommissioning::Network network;
+    memset(reinterpret_cast<void *>(&network), 0, sizeof(network));
+    chip::DeviceLayer::NetworkCommissioning::GetConnectedNetwork(network);
+    if (network.networkIDLen)
+    {
+        chip::Platform::CopyString(status.networkName, sizeof(status.networkName),
+                                   reinterpret_cast<const char *>(network.networkID));
+    }
 #endif /* SL_WIFI */
 #if CHIP_ENABLE_OPENTHREAD
     enabled  = ConnectivityMgr().IsThreadEnabled();

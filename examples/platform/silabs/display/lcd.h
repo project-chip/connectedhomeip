@@ -27,7 +27,7 @@
 
 #include "demo-ui.h"
 
-#define MAX_STR_LEN 48
+#define MAX_STR_LEN (48)
 
 class SilabsLCD
 {
@@ -52,11 +52,11 @@ public:
 
     typedef struct dStatus
     {
-        uint8_t nbFabric     = 0;
-        bool connected       = false;
-        char networkName[50] = { "TODO" };
-        bool advertising     = false;
-        ICDMode_e icdMode    = NotICD;
+        uint8_t nbFabric              = 0;
+        bool connected                = false;
+        char networkName[MAX_STR_LEN] = { 0 };
+        bool advertising              = false;
+        ICDMode_e icdMode             = NotICD;
     } DisplayStatus_t;
 
     typedef void (*customUICB)(GLIB_Context_t * context);
