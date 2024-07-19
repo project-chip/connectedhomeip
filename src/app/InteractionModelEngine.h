@@ -221,12 +221,6 @@ public:
     [[deprecated("Use chip::app::CommandHandlerInterfaceRegistry::UnregisterCommandHandler instead")]] CHIP_ERROR
     UnregisterCommandHandler(CommandHandlerInterface * handler);
 
-    [[deprecated("Use chip::app::CommandHandlerInterfaceRegistry::GetCommandHandler instead")]] CommandHandlerInterface *
-    FindCommandHandler(EndpointId endpointId, ClusterId clusterId);
-
-    [[deprecated("Use chip::app::CommandHandlerInterfaceRegistry::UnregisterAllCommandHandlersForEndpoint instead")]] void
-    UnregisterCommandHandlers(EndpointId endpointId);
-
     /*
      * Register an application callback to be notified of notable events when handling reads/subscribes.
      */

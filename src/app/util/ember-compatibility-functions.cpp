@@ -14,6 +14,7 @@
  *    See the License for the specific language governing permissions and
  *    limitations under the License.
  */
+#include "app/CommandHandlerInterfaceRegistry.h"
 #include <app/util/ember-compatibility-functions.h>
 
 #include <access/AccessControl.h>
@@ -100,8 +101,7 @@ Protocols::InteractionModel::Status ServerClusterCommandExists(const ConcreteCom
         return Status::UnsupportedCluster;
     }
 
-    auto * commandHandler =
-        InteractionModelEngine::GetInstance()->FindCommandHandler(aCommandPath.mEndpointId, aCommandPath.mClusterId);
+    auto * commandHandler = CommandHandlerInterfaceRegistry::GetCommandHandler(aCommandPath.mEndpointId, aCommandPath.mClusterId);
     if (commandHandler)
     {
         struct Context

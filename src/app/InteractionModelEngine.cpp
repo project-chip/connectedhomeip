@@ -1,6 +1,10 @@
 /*
  *
  *    Copyright (c) 2020-2021 Project CHIP Authors
+ *    Command handler lists were placed in a separate registry class that is independent of
+ *    the InteractionModelEngine class.
+ *
+ *    The following replacements exist:
  *    All rights reserved.
  *
  *    Licensed under the Apache License, Version 2.0 (the "License");
@@ -95,6 +99,9 @@ CHIP_ERROR InteractionModelEngine::Init(Messaging::ExchangeManager * apExchangeM
 void InteractionModelEngine::Shutdown()
 {
     mpExchangeMgr->GetSessionManager()->SystemLayer()->CancelTimer(ResumeSubscriptionsTimerCallback, this);
+
+    // TODO: individual object clears the entire command handler interface registry.
+    //       This may not be expected.
     CommandHandlerInterfaceRegistry::UnregisterAllHandlers();
 
     mCommandResponderObjs.ReleaseAll();
@@ -1664,7 +1671,7 @@ CHIP_ERROR InteractionModelEngine::PushFront(SingleLinkedListNode<T> *& aObjectL
 void InteractionModelEngine::DispatchCommand(CommandHandlerImpl & apCommandObj, const ConcreteCommandPath & aCommandPath,
                                              TLV::TLVReader & apPayload)
 {
-    CommandHandlerInterface * handler = FindCommandHandler(aCommandPath.mEndpointId, aCommandPath.mClusterId);
+    CommandHandlerInterface * handler = CommandHandlerInterfaceRegistry::GetCommandHandler(aCommandPath.mEndpointId, aCommandPath.mClusterId);
 
     if (handler)
     {
@@ -1693,19 +1700,9 @@ CHIP_ERROR InteractionModelEngine::RegisterCommandHandler(CommandHandlerInterfac
     return CommandHandlerInterfaceRegistry::RegisterCommandHandler(handler);
 }
 
-void InteractionModelEngine::UnregisterCommandHandlers(EndpointId endpointId)
-{
-    return CommandHandlerInterfaceRegistry::UnregisterAllCommandHandlersForEndpoint(endpointId);
-}
-
 CHIP_ERROR InteractionModelEngine::UnregisterCommandHandler(CommandHandlerInterface * handler)
 {
     return CommandHandlerInterfaceRegistry::UnregisterCommandHandler(handler);
-}
-
-CommandHandlerInterface * InteractionModelEngine::FindCommandHandler(EndpointId endpointId, ClusterId clusterId)
-{
-    return CommandHandlerInterfaceRegistry::GetCommandHandler(endpointId, clusterId);
 }
 
 void InteractionModelEngine::OnTimedInteractionFailed(TimedHandler * apTimedHandler)
