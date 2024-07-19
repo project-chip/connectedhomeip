@@ -3962,12 +3962,16 @@ static BOOL AttributeHasChangesOmittedQuality(MTRAttributePath * attributePath)
 
 // Client Metadata Storage
 
+// REVIEWERS:  does it make sense to constrain this to non-null return and return empty array if necessary?
 - (NSArray *)supportedClientDataClasses
 {
     // TODO: KMO: check this list, maybe use list from controller DS
+    // TODO: KMO: or, uplevel this out of MTRDevice to another file for use in both places
     return @[ [NSData class], [NSString class], [NSNumber class], [NSDictionary class], [NSArray class] ];
 }
 
+// REVIEWERS:  does it make sense to constrain this to non-null return and return empty array if necessary?
+// REVIEWERS:  does it make sense to constrain this to NSArray<NSString *> * since it's keys? kmo 19 jul 2024 09h28
 - (NSArray * _Nullable)clientDataKeys
 {
 #if USE_DEVICE_CONTROLLER_DATA_STORE
@@ -3977,6 +3981,7 @@ static BOOL AttributeHasChangesOmittedQuality(MTRAttributePath * attributePath)
 #endif // USE_DEVICE_CONTROLLER_DATA_STORE
 }
 
+// REVIEWERS:  does it make sense to constrain this to non-null key?
 - (id<NSSecureCoding> _Nullable)clientDataForKey:(NSString *)key
 {
 #if USE_DEVICE_CONTROLLER_DATA_STORE
@@ -3991,6 +3996,7 @@ static BOOL AttributeHasChangesOmittedQuality(MTRAttributePath * attributePath)
 #endif // USE_DEVICE_CONTROLLER_DATA_STORE
 }
 
+// REVIEWERS:  does it make sense to constrain this to non-null key/value?
 - (void)setClientDataForKey:(NSString *)key value:(id<NSSecureCoding>)value
 {
     // TODO: Check supported data types, and also if they conform to NSSecureCoding, when we store these
@@ -4009,6 +4015,7 @@ static BOOL AttributeHasChangesOmittedQuality(MTRAttributePath * attributePath)
 #endif // USE_DEVICE_CONTROLLER_DATA_STORE
 }
 
+// REVIEWERS:  does it make sense to constrain this to non-null key?
 - (void)removeClientDataForKey:(NSString *)key
 {
 #if USE_DEVICE_CONTROLLER_DATA_STORE
@@ -4021,6 +4028,7 @@ static BOOL AttributeHasChangesOmittedQuality(MTRAttributePath * attributePath)
 #endif // USE_DEVICE_CONTROLLER_DATA_STORE
 }
 
+// REVIEWERS:  does it make sense to constrain this to non-null return/key?
 - (NSArray * _Nullable)clientDataKeysForEndpointID:(NSNumber *)endpointID
 {
 #if USE_DEVICE_CONTROLLER_DATA_STORE
