@@ -15,6 +15,7 @@
 import("//build_overrides/build.gni")
 import("//build_overrides/chip.gni")
 import("${chip_root}/build/chip/chip_codegen.gni")
+import("${chip_root}/src/app/codegen-data-model/model.gni")
 import("${chip_root}/src/app/common_flags.gni")
 import("${chip_root}/src/platform/python.gni")
 
@@ -201,6 +202,7 @@ template("chip_data_model") {
       "${_app_root}/util/privilege-storage.cpp",
       "${chip_root}/zzz_generated/app-common/app-common/zap-generated/attributes/Accessors.cpp",
     ]
+    sources += codegen_data_model_SOURCES
 
     if (!chip_build_controller_dynamic_server) {
       sources += [
@@ -421,6 +423,7 @@ template("chip_data_model") {
       "${chip_root}/src/lib/support",
       "${chip_root}/src/protocols/secure_channel",
     ]
+    public_deps += codegen_data_model_PUBLIC_DEPS
 
     if (is_server) {
       public_deps += [ "${chip_root}/src/app/server" ]

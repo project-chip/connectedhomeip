@@ -55,6 +55,7 @@ source_set("binding-test-srcs") {
   ]
 
   public_deps = [
+    "${chip_root}/src/app/util/mock:mock_codegen_data_model",
     "${chip_root}/src/app/util/mock:mock_ember",
     "${chip_root}/src/lib/core",
   ]
@@ -102,6 +103,7 @@ source_set("power-cluster-test-srcs") {
 
   public_deps = [
     "${chip_root}/src/app/common:cluster-objects",
+    "${chip_root}/src/app/util/mock:mock_codegen_data_model",
     "${chip_root}/src/app/util/mock:mock_ember",
     "${chip_root}/src/lib/core",
   ]
@@ -122,6 +124,7 @@ source_set("scenes-table-test-srcs") {
   public_deps = [
     "${chip_root}/src/app",
     "${chip_root}/src/app/common:cluster-objects",
+    "${chip_root}/src/app/util/mock:mock_codegen_data_model",
     "${chip_root}/src/app/util/mock:mock_ember",
     "${chip_root}/src/lib/core",
   ]
@@ -146,6 +149,7 @@ source_set("app-test-stubs") {
   public_configs = [ "${chip_root}/src/lib/support/pw_log_chip:config" ]
 
   public_deps = [
+    "${chip_root}/src/app/util/mock:mock_codegen_data_model",
     "${chip_root}/src/app/util/mock:mock_ember",
     "${chip_root}/src/lib/core",
     "${chip_root}/src/lib/support",
@@ -206,9 +210,11 @@ chip_test_suite("tests") {
     ":thread-network-directory-test-srcs",
     ":time-sync-data-provider-test-srcs",
     "${chip_root}/src/app",
+    "${chip_root}/src/app/codegen-data-model:instance-header",
     "${chip_root}/src/app/common:cluster-objects",
     "${chip_root}/src/app/icd/client:manager",
     "${chip_root}/src/app/tests:helpers",
+    "${chip_root}/src/app/util/mock:mock_codegen_data_model",
     "${chip_root}/src/app/util/mock:mock_ember",
     "${chip_root}/src/lib/core",
     "${chip_root}/src/lib/core:string-builder-adapters",
