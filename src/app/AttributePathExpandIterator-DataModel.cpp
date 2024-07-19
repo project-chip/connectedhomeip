@@ -162,7 +162,7 @@ void AttributePathExpandIteratorDataModel::ResetCurrentCluster()
     // will do nothing, since we won't be expanding the wildcard attribute ids under a cluster.
     VerifyOrReturn(mpAttributePath != nullptr && mpAttributePath->mValue.HasWildcardAttributeId());
 
-    // Proceed path expansion to ask for the first attribute of the current cluster
+    // Reset path expansion to ask for the first attribute of the current cluster
     mOutputPath.mAttributeId = kInvalidAttributeId;
     mOutputPath.mExpanded    = true; // we know this is a wildcard attribute
     Next();
