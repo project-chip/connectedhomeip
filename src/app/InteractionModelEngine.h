@@ -32,7 +32,6 @@
 #include <app/AppConfig.h>
 #include <app/AttributePathParams.h>
 #include <app/CommandHandlerImpl.h>
-#include <app/CommandHandlerInterface.h>
 #include <app/CommandResponseSender.h>
 #include <app/CommandSender.h>
 #include <app/ConcreteAttributePath.h>
