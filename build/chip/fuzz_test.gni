@@ -20,6 +20,8 @@ import("${chip_root}/build/chip/tests.gni")
 declare_args() {
   enable_fuzz_test_targets = is_clang && chip_build_tests &&
                              (current_os == "linux" || current_os == "mac")
+
+  pw_enable_fuzz_test_targets = false
 }
 
 # Define a fuzz target for chip.

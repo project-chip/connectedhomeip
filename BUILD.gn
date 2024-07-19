@@ -61,6 +61,17 @@ if (current_toolchain != "${dir_pw_toolchain}/default:default") {
     }
   }
 
+  if (pw_enable_fuzz_test_targets) {
+    group("pw_fuzz_tests") {
+      deps = [
+        #":pw_module_tests.run($dir_pigweed/targets/host:host_clang_fuzz)",
+        #"$dir_pigweed:pw_module_tests.run($dir_pigweed/targets/host:host_clang_fuzz)",
+        # "${chip_root}/build/toolchain/pw_fuzzer:clang_pw_fuzz",
+        "${chip_root}/src/lib/format/tests:FuzzPayloadDecoderPW(//build/toolchain/pw_fuzzer:clang_pw_fuzz)",
+      ]
+    }
+  }
+
   # Matter's in-tree pw_python_package or pw_python_distribution targets.
   _matter_python_packages = [
     "//examples/chef",
