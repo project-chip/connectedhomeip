@@ -35,6 +35,7 @@ from chip.clusters.Types import NullValue
 from matter_testing_support import MatterBaseTest, async_test_body, default_matter_test_main
 from mobly import asserts
 
+
 class TC_RVCOPSTATE_2_1(MatterBaseTest):
     def __init__(self, *args):
         super().__init__(*args)
