@@ -17,7 +17,8 @@
 
 import abc
 import hashlib
-from ctypes import CFUNCTYPE, POINTER, c_bool, c_char, c_size_t, c_uint8, c_uint32, c_void_p, memmove, py_object, string_at
+from ctypes import (CFUNCTYPE, POINTER, c_bool, c_char, c_size_t, c_uint8, c_uint32, c_void_p, cast, memmove, pointer, py_object,
+                    string_at)
 
 from chip import native
 from ecdsa import ECDH, NIST256p, SigningKey  # type: ignore
@@ -31,18 +32,18 @@ P256_PUBLIC_KEY_LENGTH = 2 * 32 + 1
 
 
 @ _pychip_P256Keypair_ECDSA_sign_msg_func
-def _pychip_ECDSA_sign_msg(self_: 'P256Keypair', message_buf: POINTER(c_uint8), message_size: int, signature_buf: POINTER(c_uint8), signature_buf_size: POINTER(c_size_t)) -> bool:
+def _pychip_ECDSA_sign_msg(self_: 'P256Keypair', message_buf: pointer[c_uint8], message_size: int, signature_buf: pointer[c_uint8], signature_buf_size: pointer[c_size_t]) -> bool:
     res = self_.ECDSA_sign_msg(string_at(message_buf, message_size)[:])
     memmove(signature_buf, res, len(res))
-    signature_buf_size.content = len(res)
+    signature_buf_size.contents.value = len(res)
     return True
 
 
 @ _pychip_P256Keypair_ECDH_derive_secret_func
-def _pychip_ECDH_derive_secret(self_: 'P256Keypair', remote_pubkey: POINTER(c_uint8), out_secret_buf: POINTER(c_uint8), out_secret_buf_size: POINTER(c_uint32)) -> bool:
+def _pychip_ECDH_derive_secret(self_: 'P256Keypair', remote_pubkey: pointer[c_uint8], out_secret_buf: pointer[c_uint8], out_secret_buf_size: pointer[c_uint32]) -> bool:
     res = self_.ECDH_derive_secret(string_at(remote_pubkey, P256_PUBLIC_KEY_LENGTH)[:])
     memmove(out_secret_buf, res, len(res))
-    out_secret_buf_size.content = len(res)
+    out_secret_buf_size.contents.value = len(res)
     return True
 
 
@@ -79,7 +80,7 @@ class P256Keypair:
     def __del__(self):
         if self._native_obj is not None:
             handle = native.GetLibraryHandle()
-            handle.pychip_DeleteP256Keypair(c_void_p(self._native_obj))
+            handle.pychip_DeleteP256Keypair(cast(self._native_obj, c_void_p))
             self._native_obj = None
 
     @property
@@ -95,7 +96,8 @@ class P256Keypair:
         generates a new keypair.
         '''
         handle = native.GetLibraryHandle()
-        handle.pychip_P256Keypair_UpdatePubkey(c_void_p(self.native_object), self.public_key, len(self.public_key)).raise_on_error()
+        handle.pychip_P256Keypair_UpdatePubkey(cast(self._native_obj, c_void_p),
+                                               self.public_key, len(self.public_key)).raise_on_error()
 
     @abc.abstractproperty
     def public_key(self) -> bytes:
