@@ -23,7 +23,7 @@ from random import randint
 from typing import TYPE_CHECKING, Dict, List, Optional, Set, Union, cast
 
 from zeroconf import (BadTypeInNameException, DNSAddress, DNSOutgoing, DNSPointer, DNSQuestion, DNSQuestionType, DNSRecord,
-                      DNSService, DNSText, ServiceInfo, Zeroconf, current_time_millis, service_type_name)
+                      DNSService, DNSText, RecordUpdateListener, ServiceInfo, Zeroconf, current_time_millis, service_type_name)
 from zeroconf._utils.net import _encode_address
 from zeroconf.const import (_CLASS_IN, _DNS_HOST_TTL, _DNS_OTHER_TTL, _DUPLICATE_QUESTION_INTERVAL, _FLAGS_QR_QUERY, _LISTENER_TIME,
                             _MDNS_PORT, _TYPE_A, _TYPE_AAAA, _TYPE_SRV, _TYPE_TXT)
@@ -57,8 +57,9 @@ class DNSRecordType(enum.Enum):
 class MdnsAsyncServiceInfo(ServiceInfo):
     def __init__(
         self,
-        type_: str,
+        zc: 'Zeroconf',
         name: str,
+        type_: str = None,
         port: Optional[int] = None,
         weight: int = 0,
         priority: int = 0,
@@ -74,12 +75,15 @@ class MdnsAsyncServiceInfo(ServiceInfo):
         # Accept both none, or one, but not both.
         if addresses is not None and parsed_addresses is not None:
             raise TypeError("addresses and parsed_addresses cannot be provided together")
-        if not type_.endswith(service_type_name(name, strict=False)):
+        
+        if type_ and not type_.endswith(service_type_name(name, strict=False)):
             raise BadTypeInNameException
+        
         self.interface_index = interface_index
         self.text = b''
-        self.type = type_
+        self._zc = zc
         self._name = name
+        self.type = type_
         self.key = name.lower()
         self._ipv4_addresses: List[IPv4Address] = []
         self._ipv6_addresses: List[IPv6Address] = []
@@ -109,13 +113,11 @@ class MdnsAsyncServiceInfo(ServiceInfo):
 
     async def async_request(
         self,
-        zc: 'Zeroconf',
         timeout: float,
         question_type: Optional[DNSQuestionType] = None,
         addr: Optional[str] = None,
         port: int = _MDNS_PORT,
-        record_type: DNSRecordType = None,
-        load_from_cache: bool = True
+        record_type: DNSRecordType = None
     ) -> bool:
         """Returns true if the service could be discovered on the
         network, and updates this object with details discovered.
@@ -127,30 +129,26 @@ class MdnsAsyncServiceInfo(ServiceInfo):
         requests to a specific host that may be able to respond across
         subnets.
         """
-        if not zc.started:
-            await zc.async_wait_for_start()
+        if not self._zc.started:
+            await self._zc.async_wait_for_start()
 
         now = current_time_millis()
 
-        if load_from_cache:
-            if self._load_from_cache(zc, now):
-                return True
-
         if TYPE_CHECKING:
-            assert zc.loop is not None
+            assert self._zc.loop is not None
 
         first_request = True
         delay = self._get_initial_delay()
         next_ = now
         last = now + timeout
         try:
-            zc.async_add_listener(self, None)
+            self.async_add_listener(self, None)
             while not self._is_complete:
                 if last <= now:
                     return False
                 if next_ <= now:
                     this_question_type = question_type or QU_QUESTION if first_request else QM_QUESTION
-                    out = self._generate_request_query(zc, now, this_question_type, record_type)
+                    out: DNSOutgoing = self._generate_request_query(self._zc, now, this_question_type, record_type)
                     first_request = False
                     if out.questions:
                         # All questions may have been suppressed
@@ -158,7 +156,7 @@ class MdnsAsyncServiceInfo(ServiceInfo):
                         # but keep waiting for answers in case another
                         # client on the network is asking the same
                         # question or they have not arrived yet.
-                        zc.async_send(out, addr, port)
+                        self._zc.async_send(out, addr, port)
                     next_ = now + delay
                     next_ += self._get_random_delay()
                     if this_question_type is QM_QUESTION and delay < _DUPLICATE_QUESTION_INTERVAL:
@@ -169,12 +167,23 @@ class MdnsAsyncServiceInfo(ServiceInfo):
                         # history of the remote responder.
                         delay = _DUPLICATE_QUESTION_INTERVAL
 
-                await self.async_wait(min(next_, last) - now, zc.loop)
+                await self.async_wait(min(next_, last) - now, self._zc.loop)
                 now = current_time_millis()
         finally:
-            zc.async_remove_listener(self)
+            self._zc.async_remove_listener(self)
 
         return True
+
+    def async_add_listener(
+        self, listener: RecordUpdateListener, question: Optional[Union[DNSQuestion, List[DNSQuestion]]]
+    ) -> None:
+        """Adds a listener for a given question.  The listener will have
+        its update_record method called when information is available to
+        answer the question(s).
+
+        This function is not threadsafe and must be called in the eventloop.
+        """
+        self._zc.record_manager.async_add_listener(listener, question)
 
     def _generate_request_query(
         self, zc: 'Zeroconf', now: float_, question_type: DNSQuestionType, record_type: DNSRecordType

@@ -30,6 +30,7 @@ import logging
 import chip.clusters as Clusters
 from matter_testing_support import MatterBaseTest, TestStep, async_test_body, default_matter_test_main
 from mdns_discovery.mdns_discovery import DNSRecordType, MdnsDiscovery, MdnsServiceType
+from zeroconf.const import _TYPES, _TYPE_AAAA
 from mobly import asserts
 
 '''
@@ -161,8 +162,6 @@ class TC_SC_4_3(MatterBaseTest):
 
     @async_test_body
     async def test_TC_SC_4_3(self):
-        print("\n"*10)
-
         supports_icd = None
         supports_lit = None
         active_mode_threshold_ms = None
@@ -219,11 +218,10 @@ class TC_SC_4_3(MatterBaseTest):
             service_name=instance_qname,
             service_type=MdnsServiceType.OPERATIONAL.value,
             record_type=DNSRecordType.SRV,
-            log_output=True,
-            load_from_cache=False
+            log_output=True
         )
 
-        # Will be used in Step 11
+        # Will be used in Step 8 and 11
         server = operational_record.server
 
         # Verify SRV record is returned
@@ -238,8 +236,7 @@ class TC_SC_4_3(MatterBaseTest):
             service_name=instance_qname,
             service_type=MdnsServiceType.OPERATIONAL.value,
             record_type=DNSRecordType.TXT,
-            log_output=True,
-            load_from_cache=False
+            log_output=True
         )
 
         # Verify TXT record is returned and it contains values
@@ -251,7 +248,18 @@ class TC_SC_4_3(MatterBaseTest):
         # Verify AAAA record is returned
         self.step(8)
 
-        # PENDING
+        quada_record = await mdns.get_service_by_record_type(
+            service_name=server,
+            record_type=DNSRecordType.AAAA,
+            log_output=True
+        )
+
+        answer_record_type = quada_record.get_type(quada_record.type)
+        quada = _TYPES[_TYPE_AAAA]
+
+        # Verify AAAA record is returned
+        asserts.assert_equal(server, quada_record.name, f"Server name mismatch: {server} vs {quada_record.name}")
+        asserts.assert_equal(quada, answer_record_type, f"Record type should be {quada} but got {answer_record_type}")
 
         # # *** STEP 9 ***
         # TH verifies the following from the returned records: Hostname: • If (MCORE.COM.WIFI OR MCORE.COM.ETH) target, the hostname must be a
