@@ -103,6 +103,11 @@ public:
     static constexpr Key kConfigKey_Spake2pSalt           = config_key(kFileId_ChipFactory, 0x0B);
     static constexpr Key kConfigKey_Spake2pVerifier       = config_key(kFileId_ChipFactory, 0x0C);
 
+    static constexpr Key kConfigKey_VendorName            = config_key(kFileId_ChipFactory, 0x0D);
+    static constexpr Key kConfigKey_ProductName           = config_key(kFileId_ChipFactory, 0x0E);
+    static constexpr Key kConfigKey_HardwareVersionString = config_key(kFileId_ChipFactory, 0x0F);
+    static constexpr Key kConfigKey_SoftwareVersionString = config_key(kFileId_ChipFactory, 0x10);
+
     // CHIP Config Keys
     static constexpr Key kConfigKey_FabricId           = config_key(kFileId_ChipConfig, 0x00);
     static constexpr Key kConfigKey_ServiceConfig      = config_key(kFileId_ChipConfig, 0x01);

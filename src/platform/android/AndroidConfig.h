@@ -84,6 +84,8 @@ public:
     static const Key kConfigKey_DeviceTypeId;
     static const Key kConfigKey_DeviceName;
 
+    static const Key kConfigKey_VendorName;
+
     static CHIP_ERROR Init();
 
     // Config value accessors.

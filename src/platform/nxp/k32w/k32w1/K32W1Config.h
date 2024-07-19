@@ -92,6 +92,11 @@ public:
     static constexpr Key kConfigKey_UniqueId           = K32WConfigKey(kFileId_ChipConfig, 0x0A);
     static constexpr Key kConfigKey_SoftwareVersion    = K32WConfigKey(kFileId_ChipConfig, 0x0B);
 
+    static constexpr Key kConfigKey_VendorName            = K32WConfigKey(kFileId_ChipConfig, 0x0C);
+    static constexpr Key kConfigKey_ProductName           = K32WConfigKey(kFileId_ChipConfig, 0x0D);
+    static constexpr Key kConfigKey_HardwareVersionString = K32WConfigKey(kFileId_ChipConfig, 0x0E);
+    static constexpr Key kConfigKey_SoftwareVersionString = K32WConfigKey(kFileId_ChipConfig, 0x0F);
+
     // CHIP Counter Keys
     static constexpr Key kCounterKey_RebootCount           = K32WConfigKey(kFileId_ChipCounter, 0x00);
     static constexpr Key kCounterKey_UpTime                = K32WConfigKey(kFileId_ChipCounter, 0x01);

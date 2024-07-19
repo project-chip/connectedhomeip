@@ -101,6 +101,11 @@ public:
     static const Key kConfigKey_WeekDaySchedules;
     static const Key kConfigKey_YearDaySchedules;
     static const Key kConfigKey_HolidaySchedules;
+
+    static const Key kConfigKey_VendorName;
+    static const Key kConfigKey_ProductName;
+    static const Key kConfigKey_HardwareVersionString;
+    static const Key kConfigKey_SoftwareVersionString;
     // CHIP Counter Keys
     static const Key kConfigKey_BootCount;
     static const Key kConfigKey_TotalOperationalHours;

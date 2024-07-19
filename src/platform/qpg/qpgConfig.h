@@ -76,6 +76,11 @@ public:
     static constexpr Key kConfigKey_Spake2pSalt           = QorvoConfigKey(kFileId_ChipFactory, 0x09);
     static constexpr Key kConfigKey_Spake2pVerifier       = QorvoConfigKey(kFileId_ChipFactory, 0x0A);
 
+    static constexpr Key kConfigKey_VendorName            = QorvoConfigKey(kFileId_ChipFactory, 0x0B);
+    static constexpr Key kConfigKey_ProductName           = QorvoConfigKey(kFileId_ChipFactory, 0x0C);
+    static constexpr Key kConfigKey_HardwareVersionString = QorvoConfigKey(kFileId_ChipFactory, 0x0D);
+    static constexpr Key kConfigKey_SoftwareVersionString = QorvoConfigKey(kFileId_ChipFactory, 0x0E);
+
     static constexpr Key kConfigKey_ServiceConfig      = QorvoConfigKey(kFileId_ChipConfig, 0x01);
     static constexpr Key kConfigKey_PairedAccountId    = QorvoConfigKey(kFileId_ChipConfig, 0x02);
     static constexpr Key kConfigKey_ServiceId          = QorvoConfigKey(kFileId_ChipConfig, 0x03);

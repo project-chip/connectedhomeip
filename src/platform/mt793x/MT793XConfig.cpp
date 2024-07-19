@@ -100,6 +100,14 @@ const MT793XConfig::Key MT793XConfig::kConfigKey_YearDaySchedules = { .Namespace
                                                                       .Name      = "yearday-sched" };
 const MT793XConfig::Key MT793XConfig::kConfigKey_HolidaySchedules = { .Namespace = kConfigNamespace_ChipConfig,
                                                                       .Name      = "holiday-sched" };
+
+const MT793XConfig::Key MT793XConfig::kConfigKey_VendorName  = { .Namespace = kConfigNamespace_ChipConfig, .Name = "vendor-name" };
+const MT793XConfig::Key MT793XConfig::kConfigKey_ProductName = { .Namespace = kConfigNamespace_ChipConfig, .Name = "product-name" };
+const MT793XConfig::Key MT793XConfig::kConfigKey_HardwareVersionString = { .Namespace = kConfigNamespace_ChipConfig,
+                                                                           .Name      = "hardware-version-string" };
+const MT793XConfig::Key MT793XConfig::kConfigKey_SoftwareVersionString = { .Namespace = kConfigNamespace_ChipConfig,
+                                                                           .Name      = "software-version-string" };
+
 // CHIP Counter Keys
 const MT793XConfig::Key MT793XConfig::kConfigKey_BootCount = { .Namespace = kConfigNamespace_ChipCounters, .Name = "boot-count" };
 const MT793XConfig::Key MT793XConfig::kConfigKey_TotalOperationalHours = { .Namespace = kConfigNamespace_ChipCounters,
