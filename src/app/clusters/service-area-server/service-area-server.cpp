@@ -79,7 +79,7 @@ CHIP_ERROR Instance::Init()
 
 CHIP_ERROR Instance::Read(const ConcreteReadAttributePath & aPath, AttributeValueEncoder & aEncoder)
 {
-    ChipLogDetail(Zcl, "Service Area: Reading attribute");
+    ChipLogDetail(Zcl, "Service Area: Reading attribute with ID %u", aPath.mAttributeId);
 
     switch (aPath.mAttributeId)
     {
@@ -106,7 +106,7 @@ CHIP_ERROR Instance::Read(const ConcreteReadAttributePath & aPath, AttributeValu
         return aEncoder.Encode(mFeature);
 
     default:
-        ChipLogProgress(Zcl, "Service Area: Read unsupported attribute %u", aPath.mAttributeId);
+        ChipLogProgress(Zcl, "Service Area: Unsupported attribute with ID %u", aPath.mAttributeId);
     }
 
     return CHIP_NO_ERROR;
