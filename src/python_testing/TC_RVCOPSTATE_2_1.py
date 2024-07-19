@@ -34,8 +34,6 @@ import chip.clusters as Clusters
 from chip.clusters.Types import NullValue
 from matter_testing_support import MatterBaseTest, async_test_body, default_matter_test_main
 from mobly import asserts
-from TC_OpstateCommon import TC_OPSTATE_BASE
-
 
 class TC_RVCOPSTATE_2_1(MatterBaseTest):
     def __init__(self, *args):
@@ -97,15 +95,7 @@ class TC_RVCOPSTATE_2_1(MatterBaseTest):
 
         cluster = Clusters.RvcOperationalState
         attributes = cluster.Attributes
-
-        attrs = await TC_OPSTATE_BASE.get_attributes(self, cluster, self.endpoint)
-        phase_list_attr_id = attrs["phase_list_attr_id"]
-        current_phase_attr_id = attrs["current_phase_attr_id"]
-        countdown_time_attr_id = attrs["countdown_time_attr_id"]
-        oprtnlstate_list_attr_id = attrs["oprtnlstate_list_attr_id"]
-        oprtnlstate_attr_id = attrs["oprtnlstate_attr_id"]
-        oprtnlerror_attr_id = attrs["oprtnlerror_attr_id"]
-        attribute_list = attrs["attribute_list"]
+        attribute_list = await self.read_single_attribute_check_success(endpoint=self.endpoint, cluster=cluster, attribute=attributes.AttributeList)
 
         self.print_step(1, "Commissioning, already done")
 
@@ -113,7 +103,7 @@ class TC_RVCOPSTATE_2_1(MatterBaseTest):
         if self.is_ci:
             self.write_to_app_pipe('{"Name": "Reset"}')
 
-        if phase_list_attr_id in attribute_list:
+        if attributes.PhaseList.attribute_id in attribute_list:
             self.print_step(2, "Read PhaseList attribute")
             phase_list = await self.read_mod_attribute_expect_success(endpoint=self.endpoint, attribute=attributes.PhaseList)
 
@@ -126,7 +116,7 @@ class TC_RVCOPSTATE_2_1(MatterBaseTest):
 
                 asserts.assert_less_equal(phase_list_len, 32, "PhaseList length(%d) must be less than 32!" % phase_list_len)
 
-        if current_phase_attr_id in attribute_list:
+        if attributes.CurrentPhase.attribute_id in attribute_list:
             self.print_step(3, "Read CurrentPhase attribute")
             current_phase = await self.read_mod_attribute_expect_success(endpoint=self.endpoint, attribute=attributes.CurrentPhase)
             logging.info("CurrentPhase: %s" % (current_phase))
@@ -137,7 +127,7 @@ class TC_RVCOPSTATE_2_1(MatterBaseTest):
                 asserts.assert_true(0 <= current_phase < phase_list_len,
                                     "CurrentPhase(%s) must be between 0 and %d" % (current_phase, (phase_list_len - 1)))
 
-        if countdown_time_attr_id in attribute_list:
+        if attributes.CountdownTime.attribute_id in attribute_list:
             self.print_step(4, "Read CountdownTime attribute")
             countdown_time = await self.read_mod_attribute_expect_success(endpoint=self.endpoint,
                                                                           attribute=attributes.CountdownTime)
@@ -147,7 +137,7 @@ class TC_RVCOPSTATE_2_1(MatterBaseTest):
                 asserts.assert_true(countdown_time >= 0 and countdown_time <= 259200,
                                     "CountdownTime(%s) must be between 0 and 259200" % countdown_time)
 
-        if oprtnlstate_list_attr_id in attribute_list:
+        if attributes.OperationalStateList.attribute_id in attribute_list:
             self.print_step(5, "Read OperationalStateList attribute")
             operational_state_list = await self.read_mod_attribute_expect_success(endpoint=self.endpoint,
                                                                                   attribute=attributes.OperationalStateList)
@@ -170,7 +160,7 @@ class TC_RVCOPSTATE_2_1(MatterBaseTest):
 
             asserts.assert_true(error_state_present, "The OperationalStateList does not have an ID entry of Error(0x03)")
 
-        if oprtnlstate_attr_id in attribute_list:
+        if attributes.OperationalState.attribute_id in attribute_list:
             self.print_step(6, "Read OperationalState attribute")
             operational_state = await self.read_mod_attribute_expect_success(endpoint=self.endpoint,
                                                                              attribute=attributes.OperationalState)
@@ -237,7 +227,7 @@ class TC_RVCOPSTATE_2_1(MatterBaseTest):
                     self.wait_for_user_input(prompt_msg=f"{test_step}, and press Enter when done.\n")
                 await self.read_and_validate_opstate(step="6n", expected_state=Clusters.RvcOperationalState.Enums.OperationalStateEnum.kDocked)
 
-        if oprtnlerror_attr_id in attribute_list:
+        if attributes.OperationalError.attribute_id in attribute_list:
             self.print_step(7, "Read OperationalError attribute")
             operational_error = await self.read_mod_attribute_expect_success(endpoint=self.endpoint,
                                                                              attribute=attributes.OperationalError)
