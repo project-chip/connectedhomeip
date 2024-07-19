@@ -32,10 +32,12 @@ namespace app {
 namespace Clusters {
 namespace OccupancySensing {
 
+namespace {
 Structs::HoldTimeLimitsStruct::Type
-    mHoldTimeLimitsStructs[MATTER_DM_OCCUPANCY_SENSING_CLUSTER_SERVER_ENDPOINT_COUNT + CHIP_DEVICE_CONFIG_DYNAMIC_ENDPOINT_COUNT];
+    sHoldTimeLimitsStructs[MATTER_DM_OCCUPANCY_SENSING_CLUSTER_SERVER_ENDPOINT_COUNT + CHIP_DEVICE_CONFIG_DYNAMIC_ENDPOINT_COUNT];
 
-uint16_t mHoldTime[MATTER_DM_OCCUPANCY_SENSING_CLUSTER_SERVER_ENDPOINT_COUNT + CHIP_DEVICE_CONFIG_DYNAMIC_ENDPOINT_COUNT];
+uint16_t sHoldTime[MATTER_DM_OCCUPANCY_SENSING_CLUSTER_SERVER_ENDPOINT_COUNT + CHIP_DEVICE_CONFIG_DYNAMIC_ENDPOINT_COUNT];
+}
 
 CHIP_ERROR OccupancySensingAttrAccess::Init()
 {
@@ -101,12 +103,12 @@ Structs::HoldTimeLimitsStruct::Type * GetHoldTimeLimitsForEndpoint(EndpointId en
         return nullptr;
     }
 
-    if (index >= ArraySize(mHoldTimeLimitsStructs))
+    if (index >= ArraySize(sHoldTimeLimitsStructs))
     {
         ChipLogError(NotSpecified, "Internal error: invalid/unexpected hold time limits index.");
         return nullptr;
     }
-    return &mHoldTimeLimitsStructs[index];
+    return &sHoldTimeLimitsStructs[index];
 }
 
 CHIP_ERROR SetHoldTimeLimits(EndpointId endpointId, const Structs::HoldTimeLimitsStruct::Type & holdTimeLimits)
@@ -136,12 +138,12 @@ uint16_t * GetHoldTimeForEndpoint(EndpointId endpoint)
         return nullptr;
     }
 
-    if (index >= ArraySize(mHoldTimeLimitsStructs))
+    if (index >= ArraySize(sHoldTimeLimitsStructs))
     {
         ChipLogError(NotSpecified, "Internal error: invalid/unexpected hold time index.");
         return nullptr;
     }
-    return &mHoldTime[index];
+    return &sHoldTime[index];
 }
 
 CHIP_ERROR SetHoldTime(EndpointId endpointId, const uint16_t & holdTime)
