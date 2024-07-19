@@ -61,14 +61,6 @@ public:
      * value, such as OnOff value in case of a LightingManager.
      */
     virtual void RestoreState() = 0;
-
-    /**
-     * @brief Update feedback state in a specific manner.
-     *
-     * For example, the OnOff lighting manager implements this as a toggle action.
-     * When a button is pressed, UpdateState is called and the LED state is toggled.
-     */
-    virtual void UpdateState() = 0;
 };
 
 /**

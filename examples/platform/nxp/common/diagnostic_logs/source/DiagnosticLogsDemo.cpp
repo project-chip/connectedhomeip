@@ -30,8 +30,12 @@ CHIP_ERROR chip::NXP::App::DiagnosticLogsDemo::DisplayUsage()
     chip::StorageKeyName keyCrash = chip::app::Clusters::DiagnosticLogs::LogProvider::GetKeyDiagCrashLog();
 
     auto & persistentStorage = chip::Server::GetInstance().GetPersistentStorage();
+    /* The KVS wear stats are stored in the user diagnostic log key hence only
+     * initialize this key if the KVS wear stats are not enabled. */
+#if (CHIP_DEVICE_CONFIG_KVS_WEAR_STATS != 1)
     memset(diagLog, 0, diagLogSize);
     persistentStorage.SyncSetKeyValue(keyUser.KeyName(), diagLog, diagLogSize);
+#endif
 
     memset(diagLog, 1, diagLogSize);
     persistentStorage.SyncSetKeyValue(keyNwk.KeyName(), diagLog, diagLogSize);
