@@ -324,8 +324,8 @@ void Instance::HandleSelectLocationsCmd(HandlerContext & ctx, const Commands::Se
         return;
     }
 
-    // Set to empty string in case the delegate accidentally modified this string.
-    chip::CopyCharSpanToMutableCharSpan(""_span, delegateStatusText);
+    // Reset in case the delegate accidentally modified this string.
+    delegateStatusText = MutableCharSpan(delegateStatusBuffer);
 
     // ask the device to handle SelectLocations Command
     // (note - locationStatusText to be filled out by delegated function for kInvalidInMode and InvalidSet)

@@ -77,9 +77,10 @@ protected:
     virtual bool IsSetSelectedLocationsAllowed(MutableCharSpan statusText) = 0;
 
     /**
-     * Given a set of locations to be set to the SelectedLocations attribute, this method should check that:
-     *  - The set of locations as a whole is valid and reachable by the device. If the set of locations is invalid,
-     *     the locationStatus should be set to InvalidSet and the statusText SHALL include a vendor-defined error description.
+     * Given a set of locations to be set to the SelectedLocations attribute, this method should check that 
+     * the set of locations as a whole is valid and reachable by the device. 
+     * If the set of locations is invalid, the locationStatus should be set to InvalidSet and 
+     * the statusText SHALL include a vendor-defined error description.
      *
      * The caller of this method will ensure that there are no duplicates is the list
      * and that all the locations in the set are valid supported locations.
