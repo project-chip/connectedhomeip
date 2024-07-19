@@ -18,12 +18,12 @@
 
 import sys
 from dataclasses import dataclass
+from random import randbytes
 
 import chip.clusters as Clusters
 from chip.clusters import Attribute
-from MockTestRunner import MockTestRunner
 from matter_testing_support import MatterTestConfig
-from random import randbytes
+from MockTestRunner import MockTestRunner
 
 
 def read_trusted_root(filled: bool) -> Attribute.AsyncReadTransaction.ReadResponse:
