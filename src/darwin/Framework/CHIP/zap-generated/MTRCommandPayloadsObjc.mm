@@ -25408,7 +25408,7 @@ NS_ASSUME_NONNULL_BEGIN
 {
     if (self = [super init]) {
 
-        _extendedPanID = @(0);
+        _extendedPanID = [NSData data];
         _timedInvokeTimeoutMs = nil;
         _serverSideProcessingTimeout = nil;
     }
@@ -25428,7 +25428,7 @@ NS_ASSUME_NONNULL_BEGIN
 
 - (NSString *)description
 {
-    NSString * descriptionString = [NSString stringWithFormat:@"<%@: extendedPanID:%@; >", NSStringFromClass([self class]), _extendedPanID];
+    NSString * descriptionString = [NSString stringWithFormat:@"<%@: extendedPanID:%@; >", NSStringFromClass([self class]), [_extendedPanID base64EncodedStringWithOptions:0]];
     return descriptionString;
 }
 
@@ -25441,7 +25441,7 @@ NS_ASSUME_NONNULL_BEGIN
     chip::app::Clusters::ThreadNetworkDirectory::Commands::RemoveNetwork::Type encodableStruct;
     ListFreer listFreer;
     {
-        encodableStruct.extendedPanID = self.extendedPanID.unsignedLongLongValue;
+        encodableStruct.extendedPanID = AsByteSpan(self.extendedPanID);
     }
 
     auto buffer = chip::System::PacketBufferHandle::New(chip::System::PacketBuffer::kMaxSizeWithoutReserve, 0);
@@ -25487,7 +25487,7 @@ NS_ASSUME_NONNULL_BEGIN
 {
     if (self = [super init]) {
 
-        _extendedPanID = @(0);
+        _extendedPanID = [NSData data];
         _timedInvokeTimeoutMs = nil;
         _serverSideProcessingTimeout = nil;
     }
@@ -25507,7 +25507,7 @@ NS_ASSUME_NONNULL_BEGIN
 
 - (NSString *)description
 {
-    NSString * descriptionString = [NSString stringWithFormat:@"<%@: extendedPanID:%@; >", NSStringFromClass([self class]), _extendedPanID];
+    NSString * descriptionString = [NSString stringWithFormat:@"<%@: extendedPanID:%@; >", NSStringFromClass([self class]), [_extendedPanID base64EncodedStringWithOptions:0]];
     return descriptionString;
 }
 
@@ -25520,7 +25520,7 @@ NS_ASSUME_NONNULL_BEGIN
     chip::app::Clusters::ThreadNetworkDirectory::Commands::GetOperationalDataset::Type encodableStruct;
     ListFreer listFreer;
     {
-        encodableStruct.extendedPanID = self.extendedPanID.unsignedLongLongValue;
+        encodableStruct.extendedPanID = AsByteSpan(self.extendedPanID);
     }
 
     auto buffer = chip::System::PacketBufferHandle::New(chip::System::PacketBuffer::kMaxSizeWithoutReserve, 0);
