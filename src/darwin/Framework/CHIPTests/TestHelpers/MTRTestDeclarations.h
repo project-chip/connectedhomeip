@@ -37,7 +37,7 @@ NS_ASSUME_NONNULL_BEGIN
 - (nullable NSArray<NSNumber *> *)_fetchClusterIndexForNodeID:(NSNumber *)nodeID endpointID:(NSNumber *)endpointID;
 - (nullable MTRDeviceClusterData *)_fetchClusterDataForNodeID:(NSNumber *)nodeID endpointID:(NSNumber *)endpointID clusterID:(NSNumber *)clusterID;
 - (void)storeClientDataForKey:(NSString *)key value:(id<NSSecureCoding>)value forNodeID:(NSNumber *)nodeID;
-- (id<NSSecureCoding>)clientDataForKey:(NSString *)key nodeID:(NSNumber *)nodeID;
+- (id<NSSecureCoding>)clientDataForNodeID:(NSNumber *)nodeID key:(NSString *)key;
 - (void)removeClientDataForNodeID:(NSNumber *)nodeID key:(NSString *)key;
 - (void)clearStoredClientDataForNodeID:(NSNumber *)nodeID;
 - (NSArray<NSString *> *)storedClientDataKeysForNodeID:(NSNumber *)nodeID;

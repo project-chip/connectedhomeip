@@ -3982,7 +3982,7 @@ static BOOL AttributeHasChangesOmittedQuality(MTRAttributePath * attributePath)
 {
 #if USE_DEVICE_CONTROLLER_DATA_STORE
     NSNumber * selfNodeID = self.nodeID;
-    id<NSSecureCoding> data = [self.deviceController.controllerDataStore clientDataForKey:key nodeID:selfNodeID];
+    id<NSSecureCoding> data = [self.deviceController.controllerDataStore clientDataForNodeID:selfNodeID key:key];
     return data;
 #else
     if (key == nil)

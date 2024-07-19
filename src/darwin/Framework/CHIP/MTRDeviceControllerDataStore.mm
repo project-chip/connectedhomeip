@@ -1215,7 +1215,7 @@ typedef NSArray<NSString *> MTRClientDataKeyIndex;
     return [sClientDataKeyPrefix stringByAppendingFormat:@":0x%016llX:%@", nodeID.unsignedLongLongValue, key];
 }
 
-- (id<NSSecureCoding>)clientDataForKey:(NSString *)key nodeID:(NSNumber *)nodeID {
+- (id<NSSecureCoding>)clientDataForNodeID:(NSNumber *)nodeID key:(NSString *)key {
     __block id clientData = nil;
 
     dispatch_sync(_storageDelegateQueue, ^{

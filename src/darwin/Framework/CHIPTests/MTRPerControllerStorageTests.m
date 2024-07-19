@@ -2972,7 +2972,7 @@ static const uint16_t kSubscriptionPoolBaseTimeoutInSeconds = 30;
 
     XCTAssertNotNil(controller.controllerDataStore);
     
-    id verifyEmptyData = [controller.controllerDataStore clientDataForKey:testKey nodeID:testNodeID];
+    id verifyEmptyData = [controller.controllerDataStore clientDataForNodeID:testNodeID key:testKey];
     XCTAssertNil(verifyEmptyData);
     NSLog(@"kmo: empty data verified");
 
@@ -2980,13 +2980,13 @@ static const uint16_t kSubscriptionPoolBaseTimeoutInSeconds = 30;
     [controller.controllerDataStore storeClientDataForKey:testKey value:testValue forNodeID:testNodeID];
     
     // read back client data
-    id readbackData = [controller.controllerDataStore clientDataForKey:testKey nodeID:testNodeID];
+    id readbackData = [controller.controllerDataStore clientDataForNodeID:testNodeID key:testKey];
     XCTAssertNotNil(readbackData);
     XCTAssertEqualObjects(testValue, readbackData);
 
     [controller.controllerDataStore clearStoredClientDataForNodeID:testNodeID];
     // read back data to ensure its has been cleared
-    id afterClearReadbackData = [controller.controllerDataStore clientDataForKey:testKey nodeID:testNodeID];
+    id afterClearReadbackData = [controller.controllerDataStore clientDataForNodeID:testNodeID key:testKey];
     XCTAssertNil(afterClearReadbackData);
     
     // end actual test
@@ -3033,7 +3033,7 @@ static const uint16_t kSubscriptionPoolBaseTimeoutInSeconds = 30;
 
     XCTAssertNotNil(controller.controllerDataStore);
 
-    id verifyEmptyData = [controller.controllerDataStore clientDataForKey:testKeyA nodeID:testNodeID];
+    id verifyEmptyData = [controller.controllerDataStore clientDataForNodeID:testNodeID key:testKeyA];
     XCTAssertNil(verifyEmptyData);
 
     // store data A that will be deleted
@@ -3043,27 +3043,27 @@ static const uint16_t kSubscriptionPoolBaseTimeoutInSeconds = 30;
     [controller.controllerDataStore storeClientDataForKey:testKeyB value:testValueB forNodeID:testNodeID];
 
     // read back client data
-    id readbackDataA = [controller.controllerDataStore clientDataForKey:testKeyA nodeID:testNodeID];
+    id readbackDataA = [controller.controllerDataStore clientDataForNodeID:testNodeID key:testKeyA];
     XCTAssertEqualObjects(testValueA, readbackDataA);
 
-    id readbackDataB = [controller.controllerDataStore clientDataForKey:testKeyB nodeID:testNodeID];
+    id readbackDataB = [controller.controllerDataStore clientDataForNodeID:testNodeID key:testKeyB];
     XCTAssertEqualObjects(testValueB, readbackDataB);
 
     // delete data A
     [controller.controllerDataStore removeClientDataForNodeID:testNodeID key:testKeyA];
 
     // ensure data A is no longer present
-    id readbackDataAAfterDeletion = [controller.controllerDataStore clientDataForKey:testKeyA nodeID:testNodeID];
+    id readbackDataAAfterDeletion = [controller.controllerDataStore clientDataForNodeID:testNodeID key:testKeyA];
     XCTAssertNil(readbackDataAAfterDeletion);
 
     // ensure data B is still present
-    id readbackDataBAfterDeletion = [controller.controllerDataStore clientDataForKey:testKeyB nodeID:testNodeID];
+    id readbackDataBAfterDeletion = [controller.controllerDataStore clientDataForNodeID:testNodeID key:testKeyB];
     XCTAssertEqualObjects(testValueB, readbackDataBAfterDeletion);
 
     [controller.controllerDataStore clearStoredClientDataForNodeID:testNodeID];
 
     // read back data to ensure it has been cleared
-    id afterClearReadbackData = [controller.controllerDataStore clientDataForKey:testKeyA nodeID:testNodeID];
+    id afterClearReadbackData = [controller.controllerDataStore clientDataForNodeID:testNodeID key:testKeyA];
     XCTAssertNil(afterClearReadbackData);
 
     // end actual test
@@ -3110,7 +3110,7 @@ static const uint16_t kSubscriptionPoolBaseTimeoutInSeconds = 30;
 
     XCTAssertNotNil(controller.controllerDataStore);
 
-    id verifyEmptyData = [controller.controllerDataStore clientDataForKey:testKeyA nodeID:testNodeID];
+    id verifyEmptyData = [controller.controllerDataStore clientDataForNodeID:testNodeID key:testKeyA];
     XCTAssertNil(verifyEmptyData);
 
     // add testKeyA and value
