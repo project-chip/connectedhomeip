@@ -40,8 +40,9 @@ from mobly import asserts
 
 
 def _trusted_root_test_step(dut_num: int) -> TestStep:
-        read_trusted_roots_over_pase = f'TH establishes a PASE session to DUT{dut_num} using the provided setup code and reads the TrustedRootCertificates attribute from the operational credentials cluster over PASE'
-        return TestStep(dut_num, read_trusted_roots_over_pase, "List should be empty as the DUT should be in factory reset ")
+    read_trusted_roots_over_pase = f'TH establishes a PASE session to DUT{dut_num} using the provided setup code and reads the TrustedRootCertificates attribute from the operational credentials cluster over PASE'
+    return TestStep(dut_num, read_trusted_roots_over_pase, "List should be empty as the DUT should be in factory reset ")
+
 
 class TC_SC_5_1(MatterBaseTest):
     ''' TC-SC-5.1
@@ -51,6 +52,7 @@ class TC_SC_5_1(MatterBaseTest):
 
         This test MUST be run on a factory reset device, over PASE, with no commissioned fabrics.
     '''
+
     def __init__(self, *args):
         super().__init__(*args)
         self.post_cert_test = False
@@ -75,7 +77,8 @@ class TC_SC_5_1(MatterBaseTest):
     @async_test_body
     async def test_TC_SC_5_1(self):
         # For now, this test is WAY easier if we just ask for the setup code instead of discriminator / passcode
-        asserts.assert_false(self.matter_test_config.discriminators, "This test needs to be run with either the QR or manual setup code. The QR code is preferred.")
+        asserts.assert_false(self.matter_test_config.discriminators,
+                             "This test needs to be run with either the QR or manual setup code. The QR code is preferred.")
         setup_codes = self.matter_test_config.qr_code_content if self.matter_test_config.qr_code_content is not None else []
         setup_codes.extend(self.matter_test_config.manual_code if self.matter_test_config.manual_code is not None else [])
 
@@ -91,7 +94,8 @@ class TC_SC_5_1(MatterBaseTest):
             self.step(i+1)
             await self.default_controller.FindOrEstablishPASESession(setupCode=setup_code, nodeid=i)
             root_certs = await self.read_single_attribute_check_success(node_id=i, cluster=Clusters.OperationalCredentials, attribute=Clusters.OperationalCredentials.Attributes.TrustedRootCertificates, endpoint=0)
-            asserts.assert_equal(root_certs, [], "Root certificates found on device. Device must be factory reset before running this test.")
+            asserts.assert_equal(
+                root_certs, [], "Root certificates found on device. Device must be factory reset before running this test.")
 
         self.step(len(setup_codes)+1)
         setup_payload_info = self.get_setup_payload_info()
@@ -102,8 +106,8 @@ class TC_SC_5_1(MatterBaseTest):
         else:
             if setup_payload_info[0].filter_value == setup_payload_info[1].filter_value and self.matter_test_config.manual_code is not None:
                 logging.warn("The two provided discriminators are the same. Note that this CAN occur by chance, especially when using manual codes with the short discriminator. Consider using a QR code, or a different device if you believe the DUTs have individually provisioned")
-            asserts.assert_not_equal(setup_payload_info[0].filter_value, setup_payload_info[1].filter_value, "Devices are using the same discriminator values")
-
+            asserts.assert_not_equal(
+                setup_payload_info[0].filter_value, setup_payload_info[1].filter_value, "Devices are using the same discriminator values")
 
         # TODO: add test for PAKE salt. This needs to be plumbed through starting from HandlePBKDFParamResponse.
         # Will handle in a separate follow up as the plumbing here is aggressive and through some of the crypto layers.

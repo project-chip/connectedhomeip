@@ -52,7 +52,7 @@ class MockTestRunner():
         module = importlib.import_module(Path(os.path.basename(filename)).stem)
         self.test_class = getattr(module, classname)
 
-    def set_test_config(self, test_config:MatterTestConfig):
+    def set_test_config(self, test_config: MatterTestConfig):
         self.config = test_config
         self.config.tests = [self.test]
         self.config.endpoint = self.endpoint

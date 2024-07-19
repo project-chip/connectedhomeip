@@ -81,13 +81,15 @@ def main():
         failures.append('Expected assertion on test with 1 manual code')
 
     # Two QR or manual codes with post cert marked should fail
-    test_config = MatterTestConfig(qr_code_content=[qr_2222_20202021, qr_3333_20202021], global_test_params={'post_cert_test': True})
+    test_config = MatterTestConfig(qr_code_content=[qr_2222_20202021, qr_3333_20202021],
+                                   global_test_params={'post_cert_test': True})
     test_runner.set_test_config(test_config)
     ok = test_runner.run_test_with_mock_read(read_trusted_root(False))
     if ok:
         failures.append('Expected assertion on post-cert test with 2 QR codes')
 
-    test_config = MatterTestConfig(manual_code=[manual_2222_20202021, manual_3333_20202021], global_test_params={'post_cert_test': True})
+    test_config = MatterTestConfig(manual_code=[manual_2222_20202021, manual_3333_20202021],
+                                   global_test_params={'post_cert_test': True})
     test_runner.set_test_config(test_config)
     ok = test_runner.run_test_with_mock_read(read_trusted_root(False))
     if ok:
