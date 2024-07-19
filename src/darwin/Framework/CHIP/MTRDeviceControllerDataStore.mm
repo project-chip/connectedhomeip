@@ -1247,7 +1247,6 @@ static NSString * sClientDataKeyPrefix = @"clientData";
 - (void)removeClientDataForNodeID:(NSNumber *)nodeID key:(NSString *)key
 {
     dispatch_sync(_storageDelegateQueue, ^{
-        NSLog(@"kmo: removeClientDataForNodeID - removing data/key %@", key);
         MTRDeviceController * controller = self->_controller;
         VerifyOrReturn(controller != nil); // No way to call delegate without controller.
 

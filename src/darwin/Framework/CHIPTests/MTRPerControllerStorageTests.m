@@ -2975,7 +2975,6 @@ static const uint16_t kSubscriptionPoolBaseTimeoutInSeconds = 30;
 
     id verifyEmptyData = [controller.controllerDataStore clientDataForNodeID:testNodeID key:testKey];
     XCTAssertNil(verifyEmptyData);
-    NSLog(@"kmo: empty data verified");
 
     // store data
     [controller.controllerDataStore storeClientDataForKey:testKey value:testValue forNodeID:testNodeID];
