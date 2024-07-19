@@ -103,7 +103,7 @@ CHIP_ERROR Instance::Read(const ConcreteReadAttributePath & aPath, AttributeValu
         return ReadProgress(aEncoder);
 
     case Attributes::FeatureMap::Id:
-        return aEncoder.Encode(mFeature.Raw());
+        return aEncoder.Encode(mFeature);
 
     default:
         ChipLogProgress(Zcl, "Service Area: Read unsupported attribute %u", aPath.mAttributeId);
