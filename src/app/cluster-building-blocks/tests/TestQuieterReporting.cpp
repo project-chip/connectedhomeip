@@ -213,9 +213,6 @@ TEST(TestQuieterReporting, SufficientChangePredicateWorks)
     EXPECT_EQ(attribute.SetValue(10, now), AttributeDirtyState::kNoReportNeeded);
     EXPECT_EQ(attribute.value().ValueOr(INT_MAX), 10);
 
-    // Forcing dirty can be done with a force-true predicate
-    EXPECT_EQ(attribute.SetValue(10, now, attribute.GetForceReportablePredicate()), AttributeDirtyState::kMustReport);
-
     auto predicate = attribute.GetPredicateForSufficientTimeSinceLastDirty(1000_ms);
 
     now = fakeClock.Advance(100_ms);
@@ -254,6 +251,12 @@ TEST(TestQuieterReporting, SufficientChangePredicateWorks)
     EXPECT_EQ(attribute.SetValue(14, now, predicate), AttributeDirtyState::kNoReportNeeded);
     EXPECT_EQ(attribute.value().ValueOr(INT_MAX), 14);
 
+    // Forcing dirty can NOT done with a force-true predicate.
+    decltype(attribute)::SufficientChangePredicate forceTruePredicate{[](const decltype(attribute)::SufficientChangePredicateCandidate &) -> bool { return true; }};
+    now = fakeClock.Advance(1_ms);
+    EXPECT_EQ(attribute.SetValue(12, now, forceTruePredicate), AttributeDirtyState::kNoReportNeeded);
+    EXPECT_EQ(attribute.value().ValueOr(INT_MAX), 12);
+
     // Change to a value that marks dirty no matter what (e.g. null). Should be dirty even
     // before delay.
     now = fakeClock.Advance(1_ms);
@@ -264,4 +267,6 @@ TEST(TestQuieterReporting, SufficientChangePredicateWorks)
     now = fakeClock.Advance(1000_ms);
     EXPECT_EQ(attribute.SetValue(NullNullable, now, predicate), AttributeDirtyState::kNoReportNeeded);
     EXPECT_TRUE(attribute.value().IsNull());
+
+
 }

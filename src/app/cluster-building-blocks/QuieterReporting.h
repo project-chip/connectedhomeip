@@ -142,15 +142,6 @@ public:
         };
     }
 
-    /**
-     * @brief Factory to generate a functor that forces reportable now.
-     * @return a functor usable for the `changedPredicate` arg of `SetValue()`
-     */
-    static SufficientChangePredicate GetForceReportablePredicate()
-    {
-        return [](const SufficientChangePredicateCandidate & candidate) -> bool { return true; };
-    }
-
     Nullable<T> value() const { return mValue; }
     QuieterReportingPolicyFlags & policy() { return mPolicyFlags; }
     const QuieterReportingPolicyFlags & policy() const { return mPolicyFlags; }
@@ -163,6 +154,7 @@ public:
      * - The policies from `QuieterReportingPolicyEnum` and set via `SetPolicy()` are self-explanatory by name.
      * - The changedPredicate will be called with last dirty <timestamp, value> and new <timestamp value> and may override
      *   the dirty state altogether when it returns true. Use sparingly and default to a functor returning false.
+     *   The changedPredicate is only called on change.
      *
      * Internal recording will be done about last dirty value and last dirty timestamp based on the policies having applied.
      *
@@ -188,13 +180,17 @@ public:
         isNewlyDirty = isNewlyDirty || (mPolicyFlags.Has(QuieterReportingPolicyEnum::kMarkDirtyOnDecrement) && isDecrement);
         isNewlyDirty = isNewlyDirty || (mPolicyFlags.Has(QuieterReportingPolicyEnum::kMarkDirtyOnIncrement) && isIncrement);
 
-        SufficientChangePredicateCandidate candidate{
-            mLastDirtyTimestampMillis, // lastDirtyTimestamp
-            now,                       // nowTimestamp
-            mLastDirtyValue,           // lastDirtyValue
-            newValue                   // newValue
-        };
-        isNewlyDirty = isNewlyDirty || changedPredicate(candidate);
+        // Only execute predicate on value change from last marked dirty.
+        if (newValue != mLastDirtyValue)
+        {
+            SufficientChangePredicateCandidate candidate{
+                mLastDirtyTimestampMillis, // lastDirtyTimestamp
+                now,                       // nowTimestamp
+                mLastDirtyValue,           // lastDirtyValue
+                newValue                   // newValue
+            };
+            isNewlyDirty = isNewlyDirty || changedPredicate(candidate);
+        }
 
         mValue = newValue;
 
