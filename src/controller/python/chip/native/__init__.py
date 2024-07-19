@@ -23,7 +23,7 @@ import typing
 from dataclasses import dataclass
 
 import chip.exceptions
-import construct # type: ignore
+import construct  # type: ignore
 
 
 class Library(enum.Enum):
@@ -86,8 +86,7 @@ class PyChipError(ctypes.Structure):
         if self.code != 0:
             exception = self.to_exception()
             if exception is not None:  # Ensure exception is not None to avoid mypy error and only raise valid exceptions
-                raise exception 
-
+                raise exception
 
     @property
     def is_success(self) -> bool:
