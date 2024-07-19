@@ -54867,12 +54867,12 @@ public class ChipClusters {
     }
 
 
-    public void removeNetwork(DefaultClusterCallback callback, Long extendedPanID, int timedInvokeTimeoutMs) {
+    public void removeNetwork(DefaultClusterCallback callback, byte[] extendedPanID, int timedInvokeTimeoutMs) {
       final long commandId = 1L;
 
       ArrayList<StructElement> elements = new ArrayList<>();
       final long extendedPanIDFieldID = 0L;
-      BaseTLVType extendedPanIDtlvValue = new UIntType(extendedPanID);
+      BaseTLVType extendedPanIDtlvValue = new ByteArrayType(extendedPanID);
       elements.add(new StructElement(extendedPanIDFieldID, extendedPanIDtlvValue));
 
       StructType commandArgs = new StructType(elements);
@@ -54884,12 +54884,12 @@ public class ChipClusters {
     }
 
 
-    public void getOperationalDataset(OperationalDatasetResponseCallback callback, Long extendedPanID, int timedInvokeTimeoutMs) {
+    public void getOperationalDataset(OperationalDatasetResponseCallback callback, byte[] extendedPanID, int timedInvokeTimeoutMs) {
       final long commandId = 2L;
 
       ArrayList<StructElement> elements = new ArrayList<>();
       final long extendedPanIDFieldID = 0L;
-      BaseTLVType extendedPanIDtlvValue = new UIntType(extendedPanID);
+      BaseTLVType extendedPanIDtlvValue = new ByteArrayType(extendedPanID);
       elements.add(new StructElement(extendedPanIDFieldID, extendedPanIDtlvValue));
 
       StructType commandArgs = new StructType(elements);
@@ -54915,7 +54915,7 @@ public class ChipClusters {
     }
 
     public interface PreferredExtendedPanIDAttributeCallback extends BaseAttributeCallback {
-      void onSuccess(@Nullable Long value);
+      void onSuccess(@Nullable byte[] value);
     }
 
     public interface ThreadNetworksAttributeCallback extends BaseAttributeCallback {
@@ -54945,18 +54945,18 @@ public class ChipClusters {
       readAttribute(new ReportCallbackImpl(callback, path) {
           @Override
           public void onSuccess(byte[] tlv) {
-            @Nullable Long value = ChipTLVValueDecoder.decodeAttributeValue(path, tlv);
+            @Nullable byte[] value = ChipTLVValueDecoder.decodeAttributeValue(path, tlv);
             callback.onSuccess(value);
           }
         }, PREFERRED_EXTENDED_PAN_I_D_ATTRIBUTE_ID, true);
     }
 
-    public void writePreferredExtendedPanIDAttribute(DefaultClusterCallback callback, Long value) {
+    public void writePreferredExtendedPanIDAttribute(DefaultClusterCallback callback, byte[] value) {
       writePreferredExtendedPanIDAttribute(callback, value, 0);
     }
 
-    public void writePreferredExtendedPanIDAttribute(DefaultClusterCallback callback, Long value, int timedWriteTimeoutMs) {
-      BaseTLVType tlvValue = value != null ? new UIntType(value) : new NullType();
+    public void writePreferredExtendedPanIDAttribute(DefaultClusterCallback callback, byte[] value, int timedWriteTimeoutMs) {
+      BaseTLVType tlvValue = value != null ? new ByteArrayType(value) : new NullType();
       writeAttribute(new WriteAttributesCallbackImpl(callback), PREFERRED_EXTENDED_PAN_I_D_ATTRIBUTE_ID, tlvValue, timedWriteTimeoutMs);
     }
 
@@ -54967,7 +54967,7 @@ public class ChipClusters {
       subscribeAttribute(new ReportCallbackImpl(callback, path) {
           @Override
           public void onSuccess(byte[] tlv) {
-            @Nullable Long value = ChipTLVValueDecoder.decodeAttributeValue(path, tlv);
+            @Nullable byte[] value = ChipTLVValueDecoder.decodeAttributeValue(path, tlv);
             callback.onSuccess(value);
           }
         }, PREFERRED_EXTENDED_PAN_I_D_ATTRIBUTE_ID, minInterval, maxInterval);

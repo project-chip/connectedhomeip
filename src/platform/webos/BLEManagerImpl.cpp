@@ -421,7 +421,7 @@ bool BLEManagerImpl::gattWriteDescriptorValueCb(LSHandle * sh, LSMessage * messa
     return true;
 }
 
-bool BLEManagerImpl::SubscribeCharacteristicToWebOS(void * bleConnObj, const uint8_t * svcId, const uint8_t * charId)
+CHIP_ERROR BLEManagerImpl::SubscribeCharacteristicToWebOS(void * bleConnObj, const uint8_t * svcId, const uint8_t * charId)
 {
     pbnjson::JValue valueForMonitor = pbnjson::JObject();
 
@@ -438,7 +438,7 @@ bool BLEManagerImpl::SubscribeCharacteristicToWebOS(void * bleConnObj, const uin
     if (mLSHandle == nullptr)
     {
         ChipLogError(DeviceLayer, "LS handle is null");
-        return false;
+        return CHIP_ERROR_INTERNAL;
     }
 
     ret = LSCall(mLSHandle, "luna://com.webos.service.bluetooth2/gatt/monitorCharacteristics", valueForMonitor.stringify().c_str(),
@@ -477,36 +477,36 @@ bool BLEManagerImpl::SubscribeCharacteristicToWebOS(void * bleConnObj, const uin
                  gattWriteDescriptorValueCb, bleConnObj, NULL, NULL);
 
     if (ret != 1)
-        return false;
+        return BLE_ERROR_GATT_SUBSCRIBE_FAILED;
 
-    return true;
+    return CHIP_NO_ERROR;
 }
 
-bool BLEManagerImpl::SubscribeCharacteristic(BLE_CONNECTION_OBJECT conId, const ChipBleUUID * svcId, const ChipBleUUID * charId)
+CHIP_ERROR BLEManagerImpl::SubscribeCharacteristic(BLE_CONNECTION_OBJECT conId, const ChipBleUUID * svcId,
+                                                   const ChipBleUUID * charId)
 {
-    bool result = false;
-    result      = SubscribeCharacteristicToWebOS(conId, static_cast<const uint8_t *>(svcId->bytes),
-                                                 static_cast<const uint8_t *>(charId->bytes));
-    return result;
+    return SubscribeCharacteristicToWebOS(conId, static_cast<const uint8_t *>(svcId->bytes),
+                                          static_cast<const uint8_t *>(charId->bytes));
 }
 
-bool BLEManagerImpl::UnsubscribeCharacteristic(BLE_CONNECTION_OBJECT conId, const ChipBleUUID * svcId, const ChipBleUUID * charId)
+CHIP_ERROR BLEManagerImpl::UnsubscribeCharacteristic(BLE_CONNECTION_OBJECT conId, const ChipBleUUID * svcId,
+                                                     const ChipBleUUID * charId)
 {
     ChipLogError(Ble, "UnsubscribeCharacteristic: Not implemented");
-    return true;
+    return CHIP_ERROR_NOT_IMPLEMENTED;
 }
 
-bool BLEManagerImpl::CloseConnection(BLE_CONNECTION_OBJECT conId)
+CHIP_ERROR BLEManagerImpl::CloseConnection(BLE_CONNECTION_OBJECT conId)
 {
     ChipLogError(Ble, "CloseConnection: Not implemented");
-    return true;
+    return CHIP_ERROR_NOT_IMPLEMENTED;
 }
 
-bool BLEManagerImpl::SendIndication(BLE_CONNECTION_OBJECT conId, const ChipBleUUID * svcId, const Ble::ChipBleUUID * charId,
-                                    chip::System::PacketBufferHandle pBuf)
+CHIP_ERROR BLEManagerImpl::SendIndication(BLE_CONNECTION_OBJECT conId, const ChipBleUUID * svcId, const Ble::ChipBleUUID * charId,
+                                          chip::System::PacketBufferHandle pBuf)
 {
     ChipLogError(Ble, "SendIndication: Not implemented");
-    return true;
+    return CHIP_ERROR_NOT_IMPLEMENTED;
 }
 
 bool BLEManagerImpl::gattWriteValueCb(LSHandle * sh, LSMessage * message, void * userData)
@@ -536,8 +536,8 @@ bool BLEManagerImpl::gattWriteValueCb(LSHandle * sh, LSMessage * message, void *
     return true;
 }
 
-bool BLEManagerImpl::SendWriteRequestToWebOS(void * bleConnObj, const uint8_t * svcId, const uint8_t * charId, const uint8_t * pBuf,
-                                             uint32_t pBufDataLen)
+CHIP_ERROR BLEManagerImpl::SendWriteRequestToWebOS(void * bleConnObj, const uint8_t * svcId, const uint8_t * charId,
+                                                   const uint8_t * pBuf, uint32_t pBufDataLen)
 {
     BLEConnection * conn = (BLEConnection *) bleConnObj;
     std::ostringstream cvt;
@@ -595,7 +595,7 @@ bool BLEManagerImpl::SendWriteRequestToWebOS(void * bleConnObj, const uint8_t * 
     if (mLSHandle == nullptr)
     {
         ChipLogError(DeviceLayer, "LS handle is null");
-        return false;
+        return CHIP_ERROR_INTERNAL;
     }
 
     ret = LSCall(mLSHandle, "luna://com.webos.service.bluetooth2/gatt/writeCharacteristicValue", param.stringify().c_str(),
@@ -605,19 +605,16 @@ bool BLEManagerImpl::SendWriteRequestToWebOS(void * bleConnObj, const uint8_t * 
 
 exit:
     if (ret != 1)
-        return false;
+        return BLE_ERROR_GATT_WRITE_FAILED;
 
-    return true;
+    return CHIP_NO_ERROR;
 }
 
-bool BLEManagerImpl::SendWriteRequest(BLE_CONNECTION_OBJECT conId, const Ble::ChipBleUUID * svcId, const Ble::ChipBleUUID * charId,
-                                      chip::System::PacketBufferHandle pBuf)
+CHIP_ERROR BLEManagerImpl::SendWriteRequest(BLE_CONNECTION_OBJECT conId, const Ble::ChipBleUUID * svcId,
+                                            const Ble::ChipBleUUID * charId, chip::System::PacketBufferHandle pBuf)
 {
-    bool result = false;
-    result = SendWriteRequestToWebOS(conId, static_cast<const uint8_t *>(svcId->bytes), static_cast<const uint8_t *>(charId->bytes),
-                                     pBuf->Start(), pBuf->DataLength());
-
-    return result;
+    return SendWriteRequestToWebOS(conId, static_cast<const uint8_t *>(svcId->bytes), static_cast<const uint8_t *>(charId->bytes),
+                                   pBuf->Start(), pBuf->DataLength());
 }
 
 void BLEManagerImpl::AddConnectionData(const char * remoteAddr)

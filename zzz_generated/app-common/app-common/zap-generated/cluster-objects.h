@@ -36291,17 +36291,19 @@ namespace Structs {
 namespace ThreadNetworkStruct {
 enum class Fields : uint8_t
 {
-    kExtendedPanID = 0,
-    kNetworkName   = 1,
-    kChannel       = 2,
+    kExtendedPanID   = 0,
+    kNetworkName     = 1,
+    kChannel         = 2,
+    kActiveTimestamp = 3,
 };
 
 struct Type
 {
 public:
-    uint64_t extendedPanID = static_cast<uint64_t>(0);
+    chip::ByteSpan extendedPanID;
     chip::CharSpan networkName;
-    uint16_t channel = static_cast<uint16_t>(0);
+    uint16_t channel         = static_cast<uint16_t>(0);
+    uint64_t activeTimestamp = static_cast<uint64_t>(0);
 
     CHIP_ERROR Decode(TLV::TLVReader & reader);
 
@@ -36386,7 +36388,7 @@ public:
     static constexpr CommandId GetCommandId() { return Commands::RemoveNetwork::Id; }
     static constexpr ClusterId GetClusterId() { return Clusters::ThreadNetworkDirectory::Id; }
 
-    uint64_t extendedPanID = static_cast<uint64_t>(0);
+    chip::ByteSpan extendedPanID;
 
     CHIP_ERROR Encode(TLV::TLVWriter & aWriter, TLV::Tag aTag) const;
 
@@ -36401,7 +36403,7 @@ public:
     static constexpr CommandId GetCommandId() { return Commands::RemoveNetwork::Id; }
     static constexpr ClusterId GetClusterId() { return Clusters::ThreadNetworkDirectory::Id; }
 
-    uint64_t extendedPanID = static_cast<uint64_t>(0);
+    chip::ByteSpan extendedPanID;
     CHIP_ERROR Decode(TLV::TLVReader & reader);
 };
 }; // namespace RemoveNetwork
@@ -36418,7 +36420,7 @@ public:
     static constexpr CommandId GetCommandId() { return Commands::GetOperationalDataset::Id; }
     static constexpr ClusterId GetClusterId() { return Clusters::ThreadNetworkDirectory::Id; }
 
-    uint64_t extendedPanID = static_cast<uint64_t>(0);
+    chip::ByteSpan extendedPanID;
 
     CHIP_ERROR Encode(TLV::TLVWriter & aWriter, TLV::Tag aTag) const;
 
@@ -36433,7 +36435,7 @@ public:
     static constexpr CommandId GetCommandId() { return Commands::GetOperationalDataset::Id; }
     static constexpr ClusterId GetClusterId() { return Clusters::ThreadNetworkDirectory::Id; }
 
-    uint64_t extendedPanID = static_cast<uint64_t>(0);
+    chip::ByteSpan extendedPanID;
     CHIP_ERROR Decode(TLV::TLVReader & reader);
 };
 }; // namespace GetOperationalDataset
@@ -36476,13 +36478,14 @@ namespace Attributes {
 namespace PreferredExtendedPanID {
 struct TypeInfo
 {
-    using Type             = chip::app::DataModel::Nullable<uint64_t>;
-    using DecodableType    = chip::app::DataModel::Nullable<uint64_t>;
-    using DecodableArgType = const chip::app::DataModel::Nullable<uint64_t> &;
+    using Type             = chip::app::DataModel::Nullable<chip::ByteSpan>;
+    using DecodableType    = chip::app::DataModel::Nullable<chip::ByteSpan>;
+    using DecodableArgType = const chip::app::DataModel::Nullable<chip::ByteSpan> &;
 
     static constexpr ClusterId GetClusterId() { return Clusters::ThreadNetworkDirectory::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::PreferredExtendedPanID::Id; }
     static constexpr bool MustUseTimedWrite() { return false; }
+    static constexpr size_t MaxLength() { return 8; }
 };
 } // namespace PreferredExtendedPanID
 namespace ThreadNetworks {
@@ -36568,41 +36571,6 @@ struct TypeInfo
     };
 };
 } // namespace Attributes
-namespace Events {
-namespace NetworkChanged {
-static constexpr PriorityLevel kPriorityLevel = PriorityLevel::Info;
-
-enum class Fields : uint8_t
-{
-    kExtendedPanID = 0,
-};
-
-struct Type
-{
-public:
-    static constexpr PriorityLevel GetPriorityLevel() { return kPriorityLevel; }
-    static constexpr EventId GetEventId() { return Events::NetworkChanged::Id; }
-    static constexpr ClusterId GetClusterId() { return Clusters::ThreadNetworkDirectory::Id; }
-    static constexpr bool kIsFabricScoped = false;
-
-    uint64_t extendedPanID = static_cast<uint64_t>(0);
-
-    CHIP_ERROR Encode(TLV::TLVWriter & aWriter, TLV::Tag aTag) const;
-};
-
-struct DecodableType
-{
-public:
-    static constexpr PriorityLevel GetPriorityLevel() { return kPriorityLevel; }
-    static constexpr EventId GetEventId() { return Events::NetworkChanged::Id; }
-    static constexpr ClusterId GetClusterId() { return Clusters::ThreadNetworkDirectory::Id; }
-
-    uint64_t extendedPanID = static_cast<uint64_t>(0);
-
-    CHIP_ERROR Decode(TLV::TLVReader & reader);
-};
-} // namespace NetworkChanged
-} // namespace Events
 } // namespace ThreadNetworkDirectory
 namespace WakeOnLan {
 
