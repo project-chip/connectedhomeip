@@ -33,9 +33,10 @@ import chip.clusters as Clusters
 from basic_composition_support import BasicCompositionTests
 from chip.tlv import uint
 from conformance_support import ConformanceDecision, conformance_allowed
-from global_attribute_ids import GlobalAttributeIds, ClusterIdType, DeviceTypeIdType, is_valid_device_type_id, cluster_id_type, device_type_id_type
-from matter_testing_support import (AttributePathLocation, ClusterPathLocation, CommandPathLocation, DeviceTypePathLocation, MatterBaseTest, ProblemNotice,
-                                    ProblemSeverity, async_test_body, default_matter_test_main)
+from global_attribute_ids import (ClusterIdType, DeviceTypeIdType, GlobalAttributeIds, cluster_id_type, device_type_id_type,
+                                  is_valid_device_type_id)
+from matter_testing_support import (AttributePathLocation, ClusterPathLocation, CommandPathLocation, DeviceTypePathLocation,
+                                    MatterBaseTest, ProblemNotice, ProblemSeverity, async_test_body, default_matter_test_main)
 from spec_parsing_support import CommandType, build_xml_clusters, build_xml_device_types
 
 
