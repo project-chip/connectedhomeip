@@ -364,7 +364,7 @@ tests:
                 value: 0
       response:
           error: INVALID_COMMAND
-    
+
     - label:
           "Step 5c: TH sends EnhancedMoveHue command to DUT with MoveMode=0x00
           (stop) and Rate=0 (units/s)"

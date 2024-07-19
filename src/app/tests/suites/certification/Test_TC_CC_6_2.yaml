@@ -366,7 +366,7 @@ tests:
               maxValue: 3
 
     - label:
-          "Step 6a: TH sends _MoveColorTemperature command_ to DUT with 
+          "Step 6a: TH sends _MoveColorTemperature command_ to DUT with
           MoveMode=0x01 (up) and Rate=0 (units/s)"
       PICS: CC.S.F04 && CC.S.C4b.Rsp
       command: MoveColorTemperature
@@ -388,7 +388,7 @@ tests:
           error: INVALID_COMMAND
 
     - label:
-          "Step 6b: TH sends _MoveColorTemperature command_ to DUT with 
+          "Step 6b: TH sends _MoveColorTemperature command_ to DUT with
           MoveMode=0x03 (down) and Rate=0 (units/s)"
       PICS: CC.S.F04 && CC.S.C4b.Rsp
       command: MoveColorTemperature
@@ -410,7 +410,7 @@ tests:
           error: INVALID_COMMAND
 
     - label:
-          "Step 6c: TH sends _MoveColorTemperature command_ to DUT with 
+          "Step 6c: TH sends _MoveColorTemperature command_ to DUT with
           MoveMode=0x00 (stop) and Rate=0 (units/s)"
       PICS: CC.S.F04 && CC.S.C4b.Rsp
       command: MoveColorTemperature

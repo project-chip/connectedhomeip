@@ -363,7 +363,7 @@ tests:
                 value: 0
       response:
           error: INVALID_COMMAND
-    
+
     - label:
         "Step 5b: TH sends MoveHue command to DUT with MoveMode=0x03 (down)
         and Rate=0 (units/s)"
