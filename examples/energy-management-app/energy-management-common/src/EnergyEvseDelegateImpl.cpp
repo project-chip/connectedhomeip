@@ -1765,8 +1765,7 @@ CHIP_ERROR GetEpochTS(uint32_t & chipEpoch)
  *
  * @param   unixEpoch (as time_t)
  *
- * @return  bitmap value for day of week
- * Sunday = 0x01, Monday = 0x01 ... Saturday = 0x40 (1<<6)
+ * @return  bitmap value for day of week as defined by EnergyEvse::TargetDayOfWeekBitmap
  */
 uint8_t GetDayOfWeekUnixEpoch(time_t unixEpoch)
 {
@@ -1775,10 +1774,11 @@ uint8_t GetDayOfWeekUnixEpoch(time_t unixEpoch)
     struct tm local_time;
     localtime_r(&unixEpoch, &local_time);
 
-    // Get the day of the week (0 = Sunday, 1 = Monday, ..., 6 = Saturday)
+    // Get the day of the week (0 = Sunday, 1 = Monday, ..., 6 = Saturday).
     uint8_t dayOfWeek = static_cast<uint8_t>(local_time.tm_wday);
 
-    // Calculate the bitmap value based on the day of the week
+    // Calculate the bitmap value based on the day of the week. Note that the value in bitmap
+    // maps directly to the definition in EnergyEvse::TargetDayOfWeekBitmap.
     uint8_t bitmap = static_cast<uint8_t>(1 << dayOfWeek);
 
     return bitmap;
@@ -1786,9 +1786,7 @@ uint8_t GetDayOfWeekUnixEpoch(time_t unixEpoch)
 /**
  * @brief   Helper function to get current timestamp and work out the day of week based on localtime
  *
- * @param   reference to hold the day of week as a bitmap
- *
- * Sunday = 0x01, Monday = 0x01 ... Saturday = 0x40 (1<<6)
+ * @param   reference to hold the day of week as a bitmap as defined by EnergyEvse::TargetDayOfWeekBitmap.
  */
 CHIP_ERROR GetDayOfWeekNow(uint8_t & dayOfWeekMap)
 {
