@@ -252,7 +252,9 @@ TEST(TestQuieterReporting, SufficientChangePredicateWorks)
     EXPECT_EQ(attribute.value().ValueOr(INT_MAX), 14);
 
     // Forcing dirty can NOT done with a force-true predicate.
-    decltype(attribute)::SufficientChangePredicate forceTruePredicate{[](const decltype(attribute)::SufficientChangePredicateCandidate &) -> bool { return true; }};
+    decltype(attribute)::SufficientChangePredicate forceTruePredicate{
+        [](const decltype(attribute)::SufficientChangePredicateCandidate &) -> bool { return true; }
+    };
     now = fakeClock.Advance(1_ms);
     EXPECT_EQ(attribute.SetValue(12, now, forceTruePredicate), AttributeDirtyState::kNoReportNeeded);
     EXPECT_EQ(attribute.value().ValueOr(INT_MAX), 12);
@@ -267,6 +269,4 @@ TEST(TestQuieterReporting, SufficientChangePredicateWorks)
     now = fakeClock.Advance(1000_ms);
     EXPECT_EQ(attribute.SetValue(NullNullable, now, predicate), AttributeDirtyState::kNoReportNeeded);
     EXPECT_TRUE(attribute.value().IsNull());
-
-
 }
