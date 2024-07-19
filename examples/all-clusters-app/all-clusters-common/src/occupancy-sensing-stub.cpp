@@ -31,7 +31,7 @@ using chip::Protocols::InteractionModel::Status;
 static std::unique_ptr<OccupancySensingAttrAccess>
     gAttrAccess[MATTER_DM_OCCUPANCY_SENSING_CLUSTER_SERVER_ENDPOINT_COUNT + CHIP_DEVICE_CONFIG_DYNAMIC_ENDPOINT_COUNT];
 
-void emberAfOccupancySensingClusterInitCallback(chip::EndpointId endpointId)
+void emberAfOccupancySensingClusterInitCallback(EndpointId endpointId)
 {
     VerifyOrDie(!gAttrAccess[endpointId]);
 
