@@ -213,6 +213,7 @@ class MdnsDiscovery:
         Args:
             log_output (bool): If set to True, the discovered service types are logged to the console.
                             This can be useful for debugging or informational purposes. Defaults to False.
+            discovery_timeout_sec (float): The maximum time (in seconds) to wait for the discovery process. Defaults to 10.0 seconds.
 
         Returns:
             List[str]: A list containing the service types (str) of the discovered mDNS services. Each
