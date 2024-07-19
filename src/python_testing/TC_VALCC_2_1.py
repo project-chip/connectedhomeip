@@ -159,7 +159,7 @@ class TC_VALCC_2_1(MatterBaseTest):
         if attributes.ValveFault.attribute_id in attribute_list:
             valve_fault_dut = await self.read_valcc_attribute_expect_success(endpoint=endpoint, attribute=attributes.ValveFault)
 
-            asserts.assert_less_equal(valve_fault_dut, 0b00000111, "ValveFault is not in valid range")
+            asserts.assert_less_equal(valve_fault_dut, 0b00111111, "ValveFault is not in valid range")
         else:
             logging.info("Test step skipped")
 
