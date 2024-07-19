@@ -204,7 +204,7 @@ class MdnsDiscovery:
 
         return self._discovered_services
 
-    async def get_service_types(self, log_output: bool = False) -> List[str]:
+    async def get_service_types(self, log_output: bool = False, discovery_timeout_sec: float = DISCOVERY_TIMEOUT_SEC,) -> List[str]:
         """
         Asynchronously discovers all available mDNS services within the network and returns a list
         of the service types discovered. This method utilizes the AsyncZeroconfServiceTypes.async_find()
@@ -219,8 +219,11 @@ class MdnsDiscovery:
                     element in the list is a string representing a unique type of service found during
                     the discovery process.
         """
-
-        discovered_services = list(await AsyncZeroconfServiceTypes.async_find())
+        try:
+            discovered_services = list(await asyncio.wait_for(AsyncZeroconfServiceTypes.async_find(), timeout=discovery_timeout_sec))
+        except asyncio.TimeoutError:
+            print(f"MDNS service types discovery timed out after {discovery_timeout_sec} seconds.")
+            discovered_services = []
 
         if log_output:
             print(f"MDNS discovered service types: {discovered_services}")
