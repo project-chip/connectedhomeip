@@ -89,14 +89,22 @@ CHIP_ERROR RetrieveClusterData(InteractionModel::DataModel * dataModel, const Ac
     // data is not the same, we just print it out as a warning for manual inspection
     //
     // We have no direct access to TLV buffer data (especially given backing store splits)
-    // so for now we check that data length was identical
+    // so for now we check that data length was identical.
     //
     // NOTE: RetrieveClusterData is responsible for encoding StatusIB errors in case of failures
     //       so we validate length written requirements for BOTH success and failure.
+    //
+    // NOTE: data length is NOT reliable if the data content differs in encoding lentgh. E.g. numbers changing
+    //       from 0xFF to 0x100 or similar will use up more space.
+    //       For unit tests we make the validation strict, however for runtime we just report an
+    //       error for different sizes.
     if (lengthWrittenEmber != reportBuilder.GetWriter()->GetLengthWritten())
     {
-        ChipLogError(Test, "Different written length");
+        ChipLogError(Test, "Different written length: %" PRIu32 " (Ember) vs %" PRIu32 " (DataModel)", lengthWrittenEmber,
+                     reportBuilder.GetWriter()->GetLengthWritten());
+#if CONFIG_BUILD_FOR_HOST_UNIT_TEST
         chipDie();
+#endif
     }
 
     // For write resumes, the encoder state MUST be idential
