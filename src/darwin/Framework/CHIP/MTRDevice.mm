@@ -64,7 +64,7 @@ NSString * const MTRDataVersionKey = @"dataVersion";
 // Disabling pending crashes
 #define ENABLE_CONNECTIVITY_MONITORING 0
 
-#define USE_DEVICE_CONTROLLER_DATA_STORE 1
+#define USE_DEVICE_CONTROLLER_DATA_STORE 0
 
 // Consider moving utility classes to their own file
 #pragma mark - Utility Classes
