@@ -19,6 +19,9 @@ Fabric-Bridge-App example app implements the Aggregator device type with Fabric
 Synchronization condition met and demonstrates the end-to-end Fabric
 Synchronization feature using dynamic endpoints.
 
+The Fabric-Admin and Fabric-Bridge-App example applications must be executed on
+the same physical device and communicate with each other using RPC.
+
 Fabric Synchronization can be triggered from either side. The initiator of the
 Fabric Synchronization process, who shares their devices, takes on the
 Commissioner role. The recipient of the Fabric Synchronization request, who
@@ -82,10 +85,16 @@ fabricsync enable-auto-sync 1
 Pair the Fabric-Source bridge to Fabric-Sync with node ID 1:
 
 ```
-fabricsync add-bridge 1 <fabric-sink-ip>
+fabricsync add-bridge 1 <fabric-source-bridge-ip>
 ```
 
 ### Pair Light Example to Fabric-Source
+
+Since Fabric-Bridge also functions as a Matter server, running it alongside the
+Light Example app on the same machine would cause conflicts. Therefore, you need
+to run the Matter Light Example app on a separate physical machine from the one
+hosting Fabric-Admin and Fabric-Bridge. You can then commission the Matter Light
+Example app using Fabric-Admin on the source side.
 
 Pair the Light Example with node ID 3 using its payload number:
 
