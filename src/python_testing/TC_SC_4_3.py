@@ -30,8 +30,8 @@ import logging
 import chip.clusters as Clusters
 from matter_testing_support import MatterBaseTest, TestStep, async_test_body, default_matter_test_main
 from mdns_discovery.mdns_discovery import DNSRecordType, MdnsDiscovery, MdnsServiceType
-from zeroconf.const import _TYPES, _TYPE_AAAA
 from mobly import asserts
+from zeroconf.const import _TYPE_AAAA, _TYPES
 
 '''
 Category

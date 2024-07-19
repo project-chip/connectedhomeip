@@ -15,7 +15,6 @@
 #    limitations under the License.
 #
 
-import logging
 import asyncio
 import json
 from dataclasses import asdict, dataclass
@@ -25,10 +24,11 @@ from typing import Dict, List, Optional, Union, cast
 
 from mdns_discovery.mdns_async_service_info import DNSRecordType, MdnsAsyncServiceInfo
 from zeroconf import IPVersion, ServiceListener, ServiceStateChange, Zeroconf
-from zeroconf.asyncio import AsyncServiceBrowser, AsyncServiceInfo, AsyncZeroconfServiceTypes
+from zeroconf._dns import DNSRecord
 from zeroconf._engine import AsyncListener
 from zeroconf._protocol.incoming import DNSIncoming
-from zeroconf._dns import DNSRecord
+from zeroconf.asyncio import AsyncServiceBrowser, AsyncServiceInfo, AsyncZeroconfServiceTypes
+
 
 @dataclass
 class MdnsServiceInfo:
@@ -274,7 +274,7 @@ class MdnsDiscovery:
         is_discovered = await service_info.async_request(
             3000,
             record_type=record_type)
-        
+
         if not service_type:
             # Service type not supplied so we can
             # query against the target/server

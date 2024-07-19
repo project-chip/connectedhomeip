@@ -75,10 +75,10 @@ class MdnsAsyncServiceInfo(ServiceInfo):
         # Accept both none, or one, but not both.
         if addresses is not None and parsed_addresses is not None:
             raise TypeError("addresses and parsed_addresses cannot be provided together")
-        
+
         if type_ and not type_.endswith(service_type_name(name, strict=False)):
             raise BadTypeInNameException
-        
+
         self.interface_index = interface_index
         self.text = b''
         self._zc = zc
