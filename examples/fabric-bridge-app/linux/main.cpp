@@ -23,6 +23,7 @@
 #include "DeviceManager.h"
 
 #include <app/AttributeAccessInterfaceRegistry.h>
+#include <app/CommandHandlerInterfaceRegistry.h>
 
 #if defined(PW_RPC_FABRIC_BRIDGE_SERVICE) && PW_RPC_FABRIC_BRIDGE_SERVICE
 #include "RpcClient.h"
@@ -155,7 +156,7 @@ void ApplicationInit()
 {
     ChipLogDetail(NotSpecified, "Fabric-Bridge: ApplicationInit()");
 
-    InteractionModelEngine::GetInstance()->RegisterCommandHandler(&gAdministratorCommissioningCommandHandler);
+    CommandHandlerInterfaceRegistry::RegisterCommandHandler(&gAdministratorCommissioningCommandHandler);
 
 #if defined(PW_RPC_FABRIC_BRIDGE_SERVICE) && PW_RPC_FABRIC_BRIDGE_SERVICE
     InitRpcServer(kFabricBridgeServerPort);

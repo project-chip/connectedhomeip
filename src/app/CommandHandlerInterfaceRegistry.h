@@ -28,19 +28,19 @@ void UnregisterAllHandlers();
 ///
 /// At most one command handler can exist for a given endpoint/cluster combination. Trying
 /// to register conflicting handlers will result in a `CHIP_ERROR_INCORRECT_STATE` error.
-CHIP_ERROR RegisterCommandHandler(CommandHandlerInterface *handler);
+CHIP_ERROR RegisterCommandHandler(CommandHandlerInterface * handler);
 
 /// Unregister all commandHandlers that `MatchesEndpoint` for the given endpointId.
-void  UnregisterAllCommandHandlersForEndpoint(EndpointId endpointId);
+void UnregisterAllCommandHandlersForEndpoint(EndpointId endpointId);
 
 /// Unregister a single handler.
 ///
 /// If the handler is not registered, a `CHIP_ERROR_KEY_NOT_FOUND` is returned.
-CHIP_ERROR UnregisterCommandHandler(CommandHandlerInterface *handler);
+CHIP_ERROR UnregisterCommandHandler(CommandHandlerInterface * handler);
 
 /// Find the command handler for the given endpoint/cluster combination or return
 /// nullptr if no such command handler exists.
-CommandHandlerInterface *GetCommandHandler(EndpointId endpointId, ClusterId clusterId);
+CommandHandlerInterface * GetCommandHandler(EndpointId endpointId, ClusterId clusterId);
 
 } // namespace CommandHandlerInterfaceRegistry
 } // namespace app

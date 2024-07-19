@@ -63,19 +63,16 @@ commandHandler->AddResponse(path, kReplyCommandId, replyEncoder);
 
 ### `CommandHandlerInterface` in `chip::app::InteractionModelEngine`
 
-
-Command handler lists were placed in a separate registry class that is independent of
-the InteractionModelEngine class.
+Command handler lists were placed in a separate registry class that is
+independent of the InteractionModelEngine class.
 
 The following replacements exist:
 
-  - `chip::app::InteractionModelEngine::RegisterCommandHandler` replaced by 
+-   `chip::app::InteractionModelEngine::RegisterCommandHandler` replaced by
     `chip::app::CommandHandlerInterfaceRegistry::RegisterCommandHandler`
-  - `chip::app::InteractionModelEngine::UnregisterCommandHandler` replaced by 
+-   `chip::app::InteractionModelEngine::UnregisterCommandHandler` replaced by
     `chip::app::CommandHandlerInterfaceRegistry::UnregisterCommandHandler`
-  - `chip::app::InteractionModelEngine::FindCommandHandler` replaced by 
+-   `chip::app::InteractionModelEngine::FindCommandHandler` replaced by
     `chip::app::CommandHandlerInterfaceRegistry::GetCommandHandler`
-  - `chip::app::InteractionModelEngine::UnregisterCommandHandlers` replaced by 
+-   `chip::app::InteractionModelEngine::UnregisterCommandHandlers` replaced by
     `chip::app::CommandHandlerInterfaceRegistry::UnregisterAllCommandHandlersForEndpoint`
-
-

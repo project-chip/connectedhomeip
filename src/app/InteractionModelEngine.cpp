@@ -1671,7 +1671,8 @@ CHIP_ERROR InteractionModelEngine::PushFront(SingleLinkedListNode<T> *& aObjectL
 void InteractionModelEngine::DispatchCommand(CommandHandlerImpl & apCommandObj, const ConcreteCommandPath & aCommandPath,
                                              TLV::TLVReader & apPayload)
 {
-    CommandHandlerInterface * handler = CommandHandlerInterfaceRegistry::GetCommandHandler(aCommandPath.mEndpointId, aCommandPath.mClusterId);
+    CommandHandlerInterface * handler =
+        CommandHandlerInterfaceRegistry::GetCommandHandler(aCommandPath.mEndpointId, aCommandPath.mClusterId);
 
     if (handler)
     {
@@ -1693,16 +1694,6 @@ void InteractionModelEngine::DispatchCommand(CommandHandlerImpl & apCommandObj, 
 Protocols::InteractionModel::Status InteractionModelEngine::CommandExists(const ConcreteCommandPath & aCommandPath)
 {
     return ServerClusterCommandExists(aCommandPath);
-}
-
-CHIP_ERROR InteractionModelEngine::RegisterCommandHandler(CommandHandlerInterface * handler)
-{
-    return CommandHandlerInterfaceRegistry::RegisterCommandHandler(handler);
-}
-
-CHIP_ERROR InteractionModelEngine::UnregisterCommandHandler(CommandHandlerInterface * handler)
-{
-    return CommandHandlerInterfaceRegistry::UnregisterCommandHandler(handler);
 }
 
 void InteractionModelEngine::OnTimedInteractionFailed(TimedHandler * apTimedHandler)

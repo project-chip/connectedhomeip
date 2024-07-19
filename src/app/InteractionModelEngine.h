@@ -215,12 +215,6 @@ public:
     CHIP_ERROR PushFrontDataVersionFilterList(SingleLinkedListNode<DataVersionFilter> *& aDataVersionFilterList,
                                               DataVersionFilter & aDataVersionFilter);
 
-    [[deprecated("Use chip::app::CommandHandlerInterfaceRegistry::RegisterCommandHandler instead")]] CHIP_ERROR
-    RegisterCommandHandler(CommandHandlerInterface * handler);
-
-    [[deprecated("Use chip::app::CommandHandlerInterfaceRegistry::UnregisterCommandHandler instead")]] CHIP_ERROR
-    UnregisterCommandHandler(CommandHandlerInterface * handler);
-
     /*
      * Register an application callback to be notified of notable events when handling reads/subscribes.
      */

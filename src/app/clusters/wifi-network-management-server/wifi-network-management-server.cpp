@@ -18,6 +18,7 @@
 #include "wifi-network-management-server.h"
 
 #include <app/AttributeAccessInterfaceRegistry.h>
+#include <app/CommandHandlerInterfaceRegistry.h>
 #include <app/InteractionModelEngine.h>
 #include <app/reporting/reporting.h>
 #include <app/util/config.h>
@@ -72,7 +73,7 @@ WiFiNetworkManagementServer::WiFiNetworkManagementServer() :
 WiFiNetworkManagementServer::~WiFiNetworkManagementServer()
 {
     unregisterAttributeAccessOverride(this);
-    InteractionModelEngine::GetInstance()->UnregisterCommandHandler(this);
+    CommandHandlerInterfaceRegistry::UnregisterCommandHandler(this);
 }
 
 CHIP_ERROR WiFiNetworkManagementServer::Init(EndpointId endpoint)
@@ -82,7 +83,7 @@ CHIP_ERROR WiFiNetworkManagementServer::Init(EndpointId endpoint)
 
     mEndpointId = endpoint;
     VerifyOrReturnError(registerAttributeAccessOverride(this), CHIP_ERROR_INTERNAL);
-    ReturnErrorOnFailure(InteractionModelEngine::GetInstance()->RegisterCommandHandler(this));
+    ReturnErrorOnFailure(CommandHandlerInterfaceRegistry::RegisterCommandHandler(this));
     return CHIP_NO_ERROR;
 }
 
