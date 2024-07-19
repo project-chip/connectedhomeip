@@ -38,7 +38,7 @@ namespace Impl = CheckedImpl;
 #if CHIP_CONFIG_USE_DATA_MODEL_INTERFACE
 namespace Impl = DataModelImpl;
 #else
-namespace Impl = CodegenImpl;
+namespace Impl = EmberImpl;
 #endif // CHIP_CONFIG_USE_DATA_MODEL_INTERFACE
 #endif // CHIP_CONFIG_USE_EMBER_DATA_MODEL && CHIP_CONFIG_USE_DATA_MODEL_INTERFACE
 
