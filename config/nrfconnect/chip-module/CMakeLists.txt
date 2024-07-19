@@ -240,7 +240,7 @@ endif()
 # Define 'factory_data' target for generating a factory data partition
 # ==============================================================================
 
-if(CONFIG_CHIP_FACTORY_DATA_BUILD AND (NOT SYSBUILD OR (SYSBUILD AND NOT CONFIG_PARTITION_MANAGER_ENABLED)))
+if(CONFIG_CHIP_FACTORY_DATA_BUILD AND (NOT SYSBUILD OR NOT CONFIG_PARTITION_MANAGER_ENABLED))
     nrfconnect_generate_factory_data()
 endif()
 

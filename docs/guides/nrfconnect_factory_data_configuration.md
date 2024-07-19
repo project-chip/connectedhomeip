@@ -787,7 +787,7 @@ $ west build -b nrf52840dk_nrf52840 -- -DCONFIG_CHIP_FACTORY_DATA=y -DSB_CONFIG_
 ```
 
 Alternatively, you can also add `SB_CONFIG_MATTER_FACTORY_DATA_GENERATE=y`
-Kconfig setting to the example's `prj.conf` file.
+Kconfig setting to the example's `sysbuild.conf` file.
 
 Each factory data parameter has a default value. These are described in the
 [Kconfig file](../../config/nrfconnect/chip-module/Kconfig). Setting a new value

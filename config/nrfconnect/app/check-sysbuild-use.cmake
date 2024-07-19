@@ -21,11 +21,11 @@ if (NOT SYSBUILD)
     message(FATAL_ERROR " ###################################################################################\n"
                         " # This example does not support child-image approach anymore.                     #\n"
                         " # The nRF Connect SDK platform marked child-image approach as deprecated          #\n"
-                        " # and it is recommended to use the new sysbuild solution.                         #\n"
+                        " # from v2.7.0 and it is recommended to use the new sysbuild solution.             #\n"
                         " #                                                                                 #\n"
                         " # To build this application with sysbuild support enabled,                        #\n"
                         " # you have to add --sysbuild flag to the build command, for example:              #\n"
                         " #                                                                                 #\n"
-                        " # west build -b <your_board_name> --sysbuild nameIt was moved to support sysbuild #\n"
+                        " # west build -b <your_board_name> --sysbuild                                      #\n"
                         " ###################################################################################\n")
 endif()
