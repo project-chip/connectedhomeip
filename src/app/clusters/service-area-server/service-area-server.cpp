@@ -231,7 +231,7 @@ void Instance::HandleSelectLocationsCmd(HandlerContext & ctx, const Commands::Se
     {
         if (CHIP_NO_ERROR != req.newLocations.Value().ComputeSize(&numberOfLocations))
         {
-            exitResponse(SelectLocationsStatus::kInvalidSet, "decoding of newLocations parameter size failed"_span);
+            ctx.mCommandHandler.AddStatus(ctx.mRequestPath, Status::InvalidCommand);
             return;
         }
 
@@ -295,7 +295,7 @@ void Instance::HandleSelectLocationsCmd(HandlerContext & ctx, const Commands::Se
             // after iterating with Next through DecodableType - check for failure
             if (CHIP_NO_ERROR != iLocationIter.GetStatus())
             {
-                exitResponse(SelectLocationsStatus::kInvalidSet, "decoding of newLocations parameter failed"_span);
+                ctx.mCommandHandler.AddStatus(ctx.mRequestPath, Status::InvalidCommand);
                 return;
             }
         }
