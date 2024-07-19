@@ -116,7 +116,7 @@ CHIP_ERROR FindNextTarget(const uint8_t dayOfWeekMap, uint16_t minutesPastMidnig
 
     EnergyEvse::Structs::ChargingTargetScheduleStruct::Type entry;
 
-    uint16_t minTimeToTarget_m = 24*60; // 24 hours
+    uint16_t minTimeToTarget_m = 24 * 60; // 24 hours
     bool bFound                = false;
 
     EVSEManufacturer * mn = GetEvseManufacturer();
