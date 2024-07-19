@@ -40,7 +40,11 @@ class CommissioningWindowCommonParams
 public:
     CommissioningWindowCommonParams() = default;
 
-    NodeId GetNodeId() const { return mNodeId; }
+    NodeId GetNodeId() const
+    {
+        VerifyOrDie(mNodeId != kUndefinedNodeId);
+        return mNodeId;
+    }
     // The node identifier of device
     Derived & SetNodeId(NodeId nodeId)
     {
@@ -67,18 +71,19 @@ public:
     }
 
     // The long discriminator for the DNS-SD advertisement.
-    uint16_t GetDiscriminator() const { return mDiscriminator; }
+    uint16_t GetDiscriminator() const { return mDiscriminator.Value(); }
+    bool HasDiscriminator() const { return mDiscriminator.HasValue(); }
     Derived & SetDiscriminator(uint16_t discriminator)
     {
-        mDiscriminator = discriminator;
+        mDiscriminator = MakeOptional(discriminator);
         return static_cast<Derived &>(*this);
     }
 
 private:
-    NodeId mNodeId                    = 0;
-    System::Clock::Seconds16 mTimeout = System::Clock::Seconds16(300);
-    uint32_t mIteration               = 1000;
-    uint16_t mDiscriminator           = 0;
+    NodeId mNodeId                    = kUndefinedNodeId;
+    System::Clock::Seconds16 mTimeout = System::Clock::Seconds16(300); // Defaulting
+    uint32_t mIteration               = 1000;                          // Defaulting
+    Optional<uint16_t> mDiscriminator = NullOptional; // Using optional type to avoid picking a sentinnel in valid range
 };
 
 class CommissioningWindowPasscodeParams : public CommissioningWindowCommonParams<CommissioningWindowPasscodeParams>
@@ -87,9 +92,8 @@ public:
     CommissioningWindowPasscodeParams() = default;
 
     bool HasSetupPIN() const { return mSetupPIN.HasValue(); }
-    // Get the value of salt if present.
-    // Returns 0 if absent, make sure to check HasSetupPIN() if a valid value is required.
-    uint32_t GetSetupPIN() const { return mSetupPIN.ValueOr(0); }
+    // Get the value of setup PIN (Passcode) if present, crashes otherwise.
+    uint32_t GetSetupPIN() const { return mSetupPIN.Value(); }
     // The setup PIN (Passcode) to use. A random one will be generated if not provided.
     CommissioningWindowPasscodeParams & SetSetupPIN(uint32_t setupPIN) { return SetSetupPIN(MakeOptional(setupPIN)); }
     // The setup PIN (Passcode) to use. A random one will be generated if NullOptional is used.
@@ -148,21 +152,21 @@ class CommissioningWindowVerifierParams : public CommissioningWindowCommonParams
 public:
     CommissioningWindowVerifierParams() = default;
 
-    ByteSpan GetVerifier() const { return mVerifier; }
+    ByteSpan GetVerifier() const { return mVerifier.Value(); }
     // The PAKE passcode verifier generated with enclosed iterations, salt and not-enclosed passcode.
     CommissioningWindowVerifierParams & SetVerifier(ByteSpan verifier)
     {
-        mVerifier = verifier;
+        mVerifier = MakeOptional(verifier);
         return *this;
     }
 
-    ByteSpan GetSalt() const { return mSalt; }
+    ByteSpan GetSalt() const { return mSalt.Value(); }
     // The salt that was used to generate the verifier.
     // It must be at least kSpake2p_Min_PBKDF_Salt_Length bytes.
     // Note: This is REQUIRED when verifier is used
     CommissioningWindowVerifierParams & SetSalt(ByteSpan salt)
     {
-        mSalt = salt;
+        mSalt = MakeOptional(salt);
         return *this;
     }
 
@@ -176,8 +180,8 @@ public:
     }
 
 private:
-    ByteSpan mVerifier;
-    ByteSpan mSalt;
+    Optional<ByteSpan> mSalt;
+    Optional<ByteSpan> mVerifier;
     Callback::Callback<OnOpenCommissioningWindowWithVerifier> * mCallback = nullptr;
 };
 

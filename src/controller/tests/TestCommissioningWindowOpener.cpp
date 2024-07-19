@@ -82,7 +82,7 @@ TEST_F(TestCommissioningWindowOpener, OpenCommissioningWindowVerifier_Success)
     EXPECT_EQ(err, CHIP_NO_ERROR);
 }
 
-TEST_F(TestCommissioningWindowOpener, OpenCommissioningWindowVerifier_Failure_NoSalt)
+TEST_F(TestCommissioningWindowOpener, OpenCommissioningWindowVerifier_Failure_InvalidSalt)
 {
     Callback::Callback<Controller::OnOpenCommissioningWindowWithVerifier> callback(OCWVerifierCallback, this);
 
@@ -91,12 +91,13 @@ TEST_F(TestCommissioningWindowOpener, OpenCommissioningWindowVerifier_Failure_No
                                                         .SetTimeout(300)
                                                         .SetIteration(sTestSpake2p01_IterationCount)
                                                         .SetDiscriminator(3840)
+                                                        .SetSalt(ByteSpan())
                                                         .SetVerifier(ByteSpan(sTestSpake2p01_SerializedVerifier))
                                                         .SetCallback(&callback));
     EXPECT_EQ(err, CHIP_ERROR_INVALID_ARGUMENT);
 }
 
-TEST_F(TestCommissioningWindowOpener, OpenCommissioningWindowVerifier_Failure_NoVerifier)
+TEST_F(TestCommissioningWindowOpener, OpenCommissioningWindowVerifier_Failure_InvalidVerifier)
 {
     Callback::Callback<Controller::OnOpenCommissioningWindowWithVerifier> callback(OCWVerifierCallback, this);
 
@@ -106,6 +107,7 @@ TEST_F(TestCommissioningWindowOpener, OpenCommissioningWindowVerifier_Failure_No
                                                         .SetIteration(sTestSpake2p01_IterationCount)
                                                         .SetDiscriminator(3840)
                                                         .SetSalt(ByteSpan(sTestSpake2p01_Salt))
+                                                        .SetVerifier(ByteSpan())
                                                         .SetCallback(&callback));
     EXPECT_EQ(err, CHIP_ERROR_INVALID_ARGUMENT);
 }

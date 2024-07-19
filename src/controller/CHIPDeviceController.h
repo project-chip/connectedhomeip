@@ -167,16 +167,6 @@ struct CommissionerInitParams : public ControllerInitParams
     Credentials::DeviceAttestationVerifier * deviceAttestationVerifier = nullptr;
 };
 
-// Interface class for DeviceController methods that need to be mocked
-class IDeviceController
-{
-public:
-    virtual ~IDeviceController()                                                                 = default;
-    virtual CHIP_ERROR GetConnectedDevice(NodeId peerNodeId, chip::Callback::Callback<OnDeviceConnected> * onConnection,
-                                          chip::Callback::Callback<OnDeviceConnectionFailure> * onFailure,
-                                          TransportPayloadCapability transportPayloadCapability) = 0;
-};
-
 /**
  * @brief
  *   Controller applications can use this class to communicate with already paired CHIP devices. The
@@ -185,7 +175,7 @@ public:
  *   and device pairing information for individual devices). Alternatively, this class can retrieve the
  *   relevant information when the application tries to communicate with the device
  */
-class DLL_EXPORT DeviceController : public AbstractDnssdDiscoveryController, IDeviceController
+class DLL_EXPORT DeviceController : public AbstractDnssdDiscoveryController
 {
 public:
     DeviceController();
@@ -253,10 +243,10 @@ public:
      * An error return from this function means that neither callback has been
      * called yet, and neither callback will be called in the future.
      */
-    CHIP_ERROR
+    virtual CHIP_ERROR
     GetConnectedDevice(NodeId peerNodeId, Callback::Callback<OnDeviceConnected> * onConnection,
-                       chip::Callback::Callback<OnDeviceConnectionFailure> * onFailure,
-                       TransportPayloadCapability transportPayloadCapability = TransportPayloadCapability::kMRPPayload) override
+                       Callback::Callback<OnDeviceConnectionFailure> * onFailure,
+                       TransportPayloadCapability transportPayloadCapability = TransportPayloadCapability::kMRPPayload)
     {
         VerifyOrReturnError(mState == State::Initialized, CHIP_ERROR_INCORRECT_STATE);
         mSystemState->CASESessionMgr()->FindOrEstablishSession(ScopedNodeId(peerNodeId, GetFabricIndex()), onConnection, onFailure,

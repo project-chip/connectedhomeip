@@ -98,7 +98,8 @@ CHIP_ERROR CommissioningWindowOpener::OpenCommissioningWindow(const Commissionin
     }
 
     mSetupPayload.version = 0;
-    mSetupPayload.discriminator.SetLongValue(params.GetDiscriminator());
+    mDiscriminator.SetLongValue(params.GetDiscriminator());
+    mSetupPayload.discriminator = mDiscriminator;
     mSetupPayload.rendezvousInformation.SetValue(RendezvousInformationFlag::kOnNetwork);
 
     if (params.HasSalt())
@@ -156,10 +157,7 @@ CHIP_ERROR CommissioningWindowOpener::OpenCommissioningWindow(const Commissionin
     mCommissioningWindowTimeout          = params.GetTimeout();
     mPBKDFIterations                     = params.GetIteration();
     mCommissioningWindowOption           = CommissioningWindowOption::kTokenWithProvidedPIN;
-    mSetupPayload                        = SetupPayload();
-    mSetupPayload.version                = 0;
-    mSetupPayload.discriminator.SetLongValue(params.GetDiscriminator());
-    mSetupPayload.rendezvousInformation.SetValue(RendezvousInformationFlag::kOnNetwork);
+    mDiscriminator.SetLongValue(params.GetDiscriminator());
 
     mNextStep = Step::kOpenCommissioningWindow;
 
@@ -184,7 +182,7 @@ CHIP_ERROR CommissioningWindowOpener::OpenCommissioningWindowInternal(Messaging:
         AdministratorCommissioning::Commands::OpenCommissioningWindow::Type request;
         request.commissioningTimeout = mCommissioningWindowTimeout.count();
         request.PAKEPasscodeVerifier = serializedVerifierSpan;
-        request.discriminator        = mSetupPayload.discriminator.GetLongValue();
+        request.discriminator        = mDiscriminator.GetLongValue();
         request.iterations           = mPBKDFIterations;
         request.salt                 = mPBKDFSalt;
 

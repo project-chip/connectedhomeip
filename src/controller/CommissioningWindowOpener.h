@@ -164,6 +164,7 @@ private:
     Callback::Callback<OnOpenCommissioningWindowWithVerifier> * mCommissioningWindowVerifierCallback = nullptr;
     Callback::Callback<OnOpenBasicCommissioningWindow> * mBasicCommissioningWindowCallback           = nullptr;
     SetupPayload mSetupPayload;
+    SetupDiscriminator mDiscriminator{};
     NodeId mNodeId                                       = kUndefinedNodeId;
     System::Clock::Seconds16 mCommissioningWindowTimeout = System::Clock::kZero;
     CommissioningWindowOption mCommissioningWindowOption = CommissioningWindowOption::kOriginalSetupCode;
