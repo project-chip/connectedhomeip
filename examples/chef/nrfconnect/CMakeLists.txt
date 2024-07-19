@@ -21,8 +21,6 @@ get_filename_component(CHEF ${CMAKE_CURRENT_SOURCE_DIR}/../ REALPATH)
 
 include(${CHIP_ROOT}/config/nrfconnect/app/check-nrfconnect-version.cmake)
 
-get_filename_component(GEN_DIR ${CHEF}/out/${SAMPLE_NAME}/zap-generated REALPATH)
-
 set(CONF_FILE prj.conf)
 
 set(CMAKE_EXPORT_COMPILE_COMMANDS ON)
@@ -38,6 +36,8 @@ if (EXISTS ${CMAKE_CURRENT_SOURCE_DIR}/boards/${BOARD}.conf)
 endif()
 
 find_package(Zephyr HINTS $ENV{ZEPHYR_BASE})
+
+get_filename_component(GEN_DIR ${CHEF}/out/${CONFIG_CHEF_DEVICE_TYPE}/zap-generated REALPATH)
 
 project(chip-nrfconnect-chef-example)
 
@@ -104,10 +104,10 @@ target_sources(app PRIVATE
     ${CHEF}/nrfconnect/main.cpp
 )
 
-message(STATUS ${CHEF}/devices/${SAMPLE_NAME}.zap)
+message(STATUS ${CHEF}/devices/${CONFIG_CHEF_DEVICE_TYPE}.zap)
 chip_configure_data_model(app
     INCLUDE_SERVER
-    ZAP_FILE ${CHEF}/devices/${SAMPLE_NAME}.zap
+    ZAP_FILE ${CHEF}/devices/${CONFIG_CHEF_DEVICE_TYPE}.zap
 )
 
 include(${CHIP_ROOT}/config/nrfconnect/app/flashing.cmake)
