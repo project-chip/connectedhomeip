@@ -15,6 +15,9 @@
  *    See the License for the specific language governing permissions and
  *    limitations under the License.
  */
+
+#include <pw_unit_test/framework.h>
+
 #include <app/SubscriptionsInfoProvider.h>
 #include <app/TestEventTriggerDelegate.h>
 #include <app/icd/server/ICDConfigurationData.h>
@@ -24,9 +27,10 @@
 #include <app/icd/server/ICDStateObserver.h>
 #include <app/icd/server/tests/ICDConfigurationDataTestAccess.h>
 #include <crypto/DefaultSessionKeystore.h>
-#include <gtest/gtest.h>
+#include <lib/address_resolve/AddressResolve.h>
 #include <lib/core/DataModelTypes.h>
 #include <lib/core/NodeId.h>
+#include <lib/core/StringBuilderAdapters.h>
 #include <lib/support/TestPersistentStorageDelegate.h>
 #include <lib/support/TimeUtils.h>
 #include <messaging/tests/MessagingContext.h>
@@ -35,6 +39,7 @@
 using namespace chip;
 using namespace chip::Test;
 using namespace chip::app;
+using namespace chip::AddressResolve;
 using namespace chip::System;
 using namespace chip::System::Clock;
 using namespace chip::System::Clock::Literals;
@@ -122,18 +127,16 @@ private:
     bool mHasPersistedSubscription = false;
 };
 
-System::Clock::Internal::MockClock * pMockClock          = nullptr;
-System::Clock::ClockBase * pRealClock                    = nullptr;
-chip::Test::LoopbackMessagingContext * pMessagingContext = nullptr;
+System::Clock::Internal::MockClock * pMockClock = nullptr;
+System::Clock::ClockBase * pRealClock           = nullptr;
 
 } // namespace
 
 namespace chip {
 namespace app {
 
-class TestICDManager : public ::testing::Test
+class TestICDManager : public Test::LoopbackMessagingContext
 {
-
 public:
     /*
      * Advance the test Mock clock time by the amout passed in argument
@@ -145,7 +148,7 @@ public:
     static void AdvanceClockAndRunEventLoop(Milliseconds64 time)
     {
         pMockClock->AdvanceMonotonic(time);
-        pMessagingContext->GetIOContext().DriveIO();
+        GetIOContext().DriveIO();
     }
 
     // Performs shared setup for all tests in the test suite
@@ -157,16 +160,12 @@ public:
             ASSERT_NE(pMockClock, nullptr);
         }
 
-        if (pMessagingContext == nullptr)
-        {
-            pMessagingContext = new LoopbackMessagingContext();
-            ASSERT_NE(pMessagingContext, nullptr);
-        }
+        LoopbackMessagingContext::SetUpTestSuite();
+        VerifyOrReturn(!HasFailure());
 
-        pMessagingContext->SetUpTestSuite();
         ASSERT_EQ(chip::DeviceLayer::PlatformMgr().InitChipStack(), CHIP_NO_ERROR);
 
-        DeviceLayer::SetSystemLayerForTesting(&(pMessagingContext->GetSystemLayer()));
+        DeviceLayer::SetSystemLayerForTesting(&GetSystemLayer());
         pRealClock = &SystemClock();
         Clock::Internal::SetSystemClockForTesting(pMockClock);
     }
@@ -178,18 +177,13 @@ public:
         DeviceLayer::SetSystemLayerForTesting(nullptr);
 
         DeviceLayer::PlatformMgr().Shutdown();
-        pMessagingContext->TearDownTestSuite();
+
+        LoopbackMessagingContext::TearDownTestSuite();
 
         if (pMockClock != nullptr)
         {
             delete pMockClock;
             pMockClock = nullptr;
-        }
-
-        if (pMessagingContext != nullptr)
-        {
-            delete pMessagingContext;
-            pMessagingContext = nullptr;
         }
 
         pRealClock = nullptr;
@@ -198,19 +192,19 @@ public:
     // Performs setup for each individual test in the test suite
     void SetUp() override
     {
-        pMessagingContext->SetUp();
+        LoopbackMessagingContext::SetUp();
+        VerifyOrReturn(!HasFailure());
 
         mICDStateObserver.ResetAll();
         mICDManager.RegisterObserver(&mICDStateObserver);
-        mICDManager.Init(&testStorage, &(pMessagingContext->GetFabricTable()), &mKeystore,
-                         &(pMessagingContext->GetExchangeManager()), &mSubInfoProvider);
+        mICDManager.Init(&testStorage, &GetFabricTable(), &mKeystore, &GetExchangeManager(), &mSubInfoProvider);
     }
 
     // Performs teardown for each individual test in the test suite
     void TearDown() override
     {
         mICDManager.Shutdown();
-        pMessagingContext->TearDown();
+        LoopbackMessagingContext::TearDown();
     }
 
     TestSessionKeystoreImpl mKeystore;
@@ -574,8 +568,7 @@ TEST_F(TestICDManager, TestICDCounter)
 
     // Shut down and reinit ICDManager to increment counter
     mICDManager.Shutdown();
-    mICDManager.Init(&(testStorage), &(pMessagingContext->GetFabricTable()), &(mKeystore),
-                     &(pMessagingContext->GetExchangeManager()), &(mSubInfoProvider));
+    mICDManager.Init(&(testStorage), &GetFabricTable(), &(mKeystore), &GetExchangeManager(), &(mSubInfoProvider));
     mICDManager.RegisterObserver(&(mICDStateObserver));
 
     EXPECT_EQ(counter + ICDConfigurationData::kICDCounterPersistenceIncrement,
@@ -980,8 +973,7 @@ TEST_F(TestICDManager, TestICDStateObserverOnICDModeChangeOnInit)
     // Shut down and reinit ICDManager - We should go to LIT mode since we have a registration
     mICDManager.Shutdown();
     mICDManager.RegisterObserver(&(mICDStateObserver));
-    mICDManager.Init(&testStorage, &(pMessagingContext->GetFabricTable()), &mKeystore, &(pMessagingContext->GetExchangeManager()),
-                     &mSubInfoProvider);
+    mICDManager.Init(&testStorage, &GetFabricTable(), &mKeystore, &GetExchangeManager(), &mSubInfoProvider);
 
     // We have a registration, transition to LIT mode
     EXPECT_TRUE(mICDStateObserver.mOnICDModeChangeCalled);

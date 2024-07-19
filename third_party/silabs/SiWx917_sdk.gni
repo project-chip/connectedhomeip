@@ -16,10 +16,12 @@ import("//build_overrides/chip.gni")
 import("//build_overrides/efr32_sdk.gni")
 import("//build_overrides/jlink.gni")
 import("//build_overrides/mbedtls.gni")
-import("${efr32_sdk_build_root}/efr32_sdk.gni")
 
 import("${chip_root}/src/app/icd/icd.gni")
+import("${chip_root}/src/crypto/crypto.gni")
 import("${chip_root}/src/lib/lib.gni")
+import("${chip_root}/src/platform/silabs/wifi_args.gni")
+import("${efr32_sdk_build_root}/efr32_sdk.gni")
 import("silabs_board.gni")
 
 examples_plat_dir = "${chip_root}/examples/platform/silabs/SiWx917"
@@ -30,6 +32,9 @@ declare_args() {
 
   # Periodic time at which the 917 SoC should wakeup
   si91x_alarm_periodic_time = 30
+
+  # option to select the crypto library
+  sl_si91x_crypto_flavor = "tinycrypt"
 
   # enable 917 SoC M4 sleep wakeup
   si917_m4_sleep_enabled = false
@@ -44,11 +49,17 @@ template("siwx917_sdk") {
   sdk_target_name = target_name
 
   config("${sdk_target_name}_config") {
+    defines = []
     include_dirs = []
     libs = []
-    defines = []
+    cflags = []
+
     if (defined(invoker.include_dirs)) {
       include_dirs += invoker.include_dirs
+    }
+
+    if (defined(invoker.defines)) {
+      defines += invoker.defines
     }
 
     # Treat these includes as system includes, so warnings in them are not fatal.
@@ -58,11 +69,8 @@ template("siwx917_sdk") {
       "${efr32_sdk_root}/platform/emdrv/nvm3/inc",
       "${efr32_sdk_root}/platform/emdrv/common/inc",
       "${efr32_sdk_root}/platform/service/device_init/inc",
-      "${sdk_support_root}/matter/mbedtls/tinycrypt/inc",
       "${sdk_support_root}/matter/si91x/siwx917/BRD4338A/autogen",
       "${sdk_support_root}/matter/si91x/siwx917/BRD4338A/config",
-      "${chip_root}/third_party/mbedtls/repo/include",
-      "${chip_root}/third_party/mbedtls/repo/library",
 
       "${chip_root}/src/platform/silabs/rs911x",
 
@@ -141,10 +149,19 @@ template("siwx917_sdk") {
       "${wifi_sdk_root}/components/device/silabs/si91x/mcu/drivers/hardware_drivers/led/config",
       "${wifi_sdk_root}/components/device/silabs/si91x/mcu/core/config",
 
+      # sl memory manager
+      "${efr32_sdk_root}/platform/service/memory_manager/inc",
+      "${efr32_sdk_root}/platform/service/memory_manager/src",
+      "${efr32_sdk_root}/platform/service/memory_manager/profiler/inc",
+      "${efr32_sdk_root}/platform/service/memory_manager/profiler/config",
+      "${efr32_sdk_root}/util/silicon_labs/silabs_core/memory_manager",
+
       # OTA
       "${wifi_sdk_root}/components/device/silabs/si91x/wireless/firmware_upgrade",
       "${wifi_sdk_root}/components/device/silabs/si91x/mcu/hal/inc",
       "${wifi_sdk_root}/components/device/silabs/si91x/mcu/drivers/systemlevel/inc",
+
+      "${wifi_sdk_root}/components/device/silabs/si91x/mcu/drivers/service/power_manager/inc",
     ]
 
     if (use_system_view) {
@@ -166,13 +183,12 @@ template("siwx917_sdk") {
     # To fix this, these files are also manually depended upon in the source set
     # declared in siwx917_mbedtls_config further down this file.
     defines += [
-      "MBEDTLS_CONFIG_FILE=\"siwx917-chip-mbedtls-config.h\"",
       "__STARTUP_CLEAR_BSS",
       "HARD_FAULT_LOG_ENABLE",
       "SL_HEAP_SIZE=32768",
       "SL_WIFI=1",
       "CCP_SI917_BRINGUP=1",
-      "SL_COMPONENT_CATALOG_PRESENT",
+      "SL_COMPONENT_CATALOG_PRESENT=1",
       "RS911X_WIFI=1",
       "RSI_WLAN_ENABLE",
       "SLI_SI91X_ENABLE_OS=1",
@@ -190,8 +206,6 @@ template("siwx917_sdk") {
       "USE_NVM3=1",
       "SLI_SI91X_ENABLE_BLE=1",
       "SL_SI91X_ENABLE_LITTLE_ENDIAN=1",
-      "TINYCRYPT_PRIMITIVES",
-      "OPTIMIZE_TINYCRYPT_ASM",
       "__error_t_defined",
       "RSI_SAMPLE_HAL",
       "DEBUG_UART=1",
@@ -212,7 +226,7 @@ template("siwx917_sdk") {
       "SL_SI91X_SI917_RAM_MEM_CONFIG=3",
       "SL_SI91x_DUAL_INTERRUPTS_ERRATA=1",
       "EXT_IRQ_COUNT=75",
-      "FLASH_PAGE_SIZE=1",
+      "FLASH_PAGE_SIZE=4096",
       "DEBUG_ENABLE=1",
       "ENABLE_DEBUG_MODULE=1",
       "SI91X_SYSRTC_PRESENT=1",
@@ -225,6 +239,17 @@ template("siwx917_sdk") {
       "RADIO_CONFIG_DMP_SUPPORT=1",
       "configUSE_POSIX_ERRNO=1",
       "NVM3_LOCK_OVERRIDE=1",
+      "SL_MEMORY_POOL_LIGHT=1",
+      "SL_CODE_COMPONENT_CORE=core",
+      "SLI_SI91X_MCU_EXTERNAL_LDO_FOR_PSRAM=1",
+      "CLOCK_ROMDRIVER_PRESENT=1",
+      "ULPSS_CLOCK_ROMDRIVER_PRESENT=1",
+      "SL_SI91X_BOARD_INIT=1",
+      "CRC_ROMDRIVER_PRESENT=1",
+      "TIMER_ROMDRIVER_PRESENT=1",
+      "UDMA_ROMDRIVER_PRESENT=1",
+      "PLL_ROMDRIVER_PRESENT=1",
+      "SL_MATTER_GN_BUILD=1",
     ]
 
     if (silabs_log_enabled && chip_logging) {
@@ -237,7 +262,6 @@ template("siwx917_sdk") {
       defines += [ "ENABLE_CHIP_SHELL" ]
     }
 
-    import("${chip_root}/src/platform/silabs/wifi_args.gni")
     defines += [ "LWIP_NETIF_API=1" ]
     if (lwip_ipv4) {
       defines += [
@@ -261,22 +285,26 @@ template("siwx917_sdk") {
       defines += [ "LWIP_IPV6=0" ]
     }
 
-    defines += board_defines
-
     if (chip_enable_wifi_ipv4) {
       defines += [ "CHIP_DEVICE_CONFIG_ENABLE_IPV4=1" ]
     }
     if (invoker.enable_dic) {
       _include_dirs += [ "${chip_root}/third_party/silabs/mqtt/stack" ]
     }
+
+    if (chip_enable_icd_server || !disable_lcd) {
+      defines += [
+        "SL_SLEEP_TIMER=1",
+        "SI91X_SYSRTC_COUNT=1",
+      ]
+    }
+
     if (!disable_lcd) {
       defines += [
         "CONFIG_ENABLE_UART",
-        "SI91X_SYSRTC_COUNT=1",
         "SYSCALLS_WRITE",
         "SPI_MULTI_SLAVE",
         "SL_ULP_TIMER",
-        "SL_SLEEP_TIMER",
       ]
     }
 
@@ -297,9 +325,9 @@ template("siwx917_sdk") {
         "SL_ACTIVE_MODE_DURATION_MS=${sl_active_mode_duration_ms}",
         "SL_IDLE_MODE_DURATION_S=${sl_idle_mode_duration_s}",
         "SL_ICD_SUPPORTED_CLIENTS_PER_FABRIC=${sl_icd_supported_clients_per_fabric}",
-        "SL_SI91X_MCU_WIRELESS_BASED_WAKEUP=1",
-        "SL_SI91X_MCU_BUTTON_BASED_WAKEUP=1",
-        "SL_SI91X_MCU_ALARM_BASED_WAKEUP=1",
+        "SL_SI91X_NPSS_GPIO_BTN_HANDLER=1",
+        "SL_SI91X_POWER_MANAGER_UC_AVAILABLE=1",
+        "SL_SI91X_TICKLESS_MODE=1",
       ]
 
       if (si91x_alarm_based_periodic_wakeup) {
@@ -335,11 +363,6 @@ template("siwx917_sdk") {
 
     libs += [ "${sdk_support_root}/platform/emdrv/nvm3/lib/libnvm3_CM4_gcc.a" ]
 
-    cflags = []
-    foreach(include_dir, _include_dirs) {
-      cflags += [ "-isystem" + rebase_path(include_dir, root_build_dir) ]
-    }
-
     cflags += [
       "-Wno-maybe-uninitialized",
       "-Wno-shadow",
@@ -353,28 +376,262 @@ template("siwx917_sdk") {
       "-Wno-unused-function",
     ]
 
-    if (defined(invoker.defines)) {
-      defines += invoker.defines
+    foreach(include_dir, _include_dirs) {
+      cflags += [ "-isystem" + rebase_path(include_dir, root_build_dir) ]
     }
   }
 
-  source_set("siwx917_mbedtls_config") {
-    # We're setting the mbedTLS config flags here as the siwx917_sdk target
-    # acts as the mbedTLS target for SiWx917 builds. We need this for the build
-    # system to recompile mbedTLS (= the SDK) when the mbedTLS config gets
-    # edited.
-    sources = [
-      "${chip_root}/src/platform/silabs/SiWx917/siwx917-chip-mbedtls-config.h",
-    ]
+  assert(chip_crypto == "platform" && (sl_si91x_crypto_flavor == "tinycrypt" ||
+                                           sl_si91x_crypto_flavor == "psa"),
+         "sl_si91x_crypto_flavor must be tinycrypt or psa")
 
-    public_deps = [ "${chip_root}/src/crypto:crypto_buildconfig" ]
+  if (chip_crypto == "platform") {
+    if (sl_si91x_crypto_flavor == "psa") {
+      _mbedtls_root = "${efr32_sdk_root}/util/third_party/mbedtls"
+
+      sl_si91x_psa_crypto_path =
+          "${wifi_sdk_root}/components/device/silabs/si91x/wireless/crypto/"
+
+      config("sl_si91x_psa_crypto_config") {
+        defines = [
+          "MBEDTLS_CONFIG_FILE=\"siwx917-chip-mbedtls-config.h\"",
+          "MBEDTLS_PSA_CRYPTO_CONFIG_FILE=\"siwx917-chip-psa-config.h\"",
+
+          # WISECONNECT 3 SDK
+          "SLI_AEAD_DEVICE_SI91X=1",
+          "SLI_CIPHER_DEVICE_SI91X=1",
+          "SLI_ECDH_DEVICE_SI91X=1",
+          "SLI_MAC_DEVICE_SI91X=1",
+          "SLI_SHA_DEVICE_SI91X=1",
+          "SLI_TRNG_DEVICE_SI91X=1",
+          "SLI_SECURE_KEY_STORAGE_DEVICE_SI91X=1",
+          "SLI_MULTITHREAD_DEVICE_SI91X=1",
+        ]
+
+        include_dirs = [
+          # WISECONNECT 3 SDK
+          "${sl_si91x_psa_crypto_path}/inc",
+          "${sl_si91x_psa_crypto_path}/aes/inc",
+          "${sl_si91x_psa_crypto_path}/aead/inc",
+          "${sl_si91x_psa_crypto_path}/ccm/inc",
+          "${sl_si91x_psa_crypto_path}/ecdh/inc",
+          "${sl_si91x_psa_crypto_path}/ecdsa/inc",
+          "${sl_si91x_psa_crypto_path}/hmac/inc",
+          "${sl_si91x_psa_crypto_path}/mac/inc",
+          "${sl_si91x_psa_crypto_path}/gcm/inc",
+          "${sl_si91x_psa_crypto_path}/sha/inc",
+          "${sl_si91x_psa_crypto_path}/trng/inc",
+          "${sl_si91x_psa_crypto_path}/wrap/inc",
+          "${sl_si91x_psa_crypto_path}/multithread/inc",
+
+          # mbedTLS
+          "${efr32_sdk_root}/platform/security/sl_component/sl_mbedtls_support/config",
+          "${efr32_sdk_root}/platform/security/sl_component/sl_mbedtls_support/config/preset",
+          "${efr32_sdk_root}/platform/security/sl_component/sl_mbedtls_support/inc",
+          "${efr32_sdk_root}/platform/security/sl_component/sl_psa_driver/inc",
+          "${efr32_sdk_root}/util/third_party/mbedtls/include",
+          "${efr32_sdk_root}/util/third_party/mbedtls/library",
+        ]
+      }
+
+      source_set("sl_si91x_psa_crypto") {
+        # We're setting the mbedTLS config flags here as the siwx917_sdk target
+        # acts as the mbedTLS target for SiWx917 builds. We need this for the build
+        # system to recompile mbedTLS (= the SDK) when the mbedTLS config gets
+        # edited.
+        sources = [
+          "${_mbedtls_root}/include/mbedtls/platform.h",
+          "${_mbedtls_root}/include/mbedtls/version.h",
+          "${chip_root}/src/platform/silabs/SiWx917/siwx917-chip-mbedtls-config.h",
+          "${chip_root}/src/platform/silabs/SiWx917/siwx917-chip-psa-config.h",
+
+          # mbedtls
+          "${_mbedtls_root}/library/aes.c",
+          "${_mbedtls_root}/library/asn1parse.c",
+          "${_mbedtls_root}/library/asn1write.c",
+          "${_mbedtls_root}/library/base64.c",
+          "${_mbedtls_root}/library/bignum.c",
+          "${_mbedtls_root}/library/bignum_core.c",
+          "${_mbedtls_root}/library/ccm.c",
+          "${_mbedtls_root}/library/cipher.c",
+          "${_mbedtls_root}/library/cipher_wrap.c",
+          "${_mbedtls_root}/library/cmac.c",
+          "${_mbedtls_root}/library/constant_time.c",
+          "${_mbedtls_root}/library/ctr_drbg.c",
+          "${_mbedtls_root}/library/ecdh.c",
+          "${_mbedtls_root}/library/ecdsa.c",
+          "${_mbedtls_root}/library/ecjpake.c",
+          "${_mbedtls_root}/library/ecp.c",
+          "${_mbedtls_root}/library/ecp_curves.c",
+          "${_mbedtls_root}/library/ecp_curves_new.c",
+          "${_mbedtls_root}/library/entropy.c",
+          "${_mbedtls_root}/library/entropy_poll.c",
+          "${_mbedtls_root}/library/hkdf.c",
+          "${_mbedtls_root}/library/hmac_drbg.c",
+          "${_mbedtls_root}/library/md.c",
+          "${_mbedtls_root}/library/oid.c",
+          "${_mbedtls_root}/library/pem.c",
+          "${_mbedtls_root}/library/pk.c",
+          "${_mbedtls_root}/library/pk_wrap.c",
+          "${_mbedtls_root}/library/pkcs5.c",
+          "${_mbedtls_root}/library/pkparse.c",
+          "${_mbedtls_root}/library/pkwrite.c",
+          "${_mbedtls_root}/library/platform.c",
+          "${_mbedtls_root}/library/platform_util.c",
+          "${_mbedtls_root}/library/psa_crypto.c",
+          "${_mbedtls_root}/library/psa_crypto_aead.c",
+          "${_mbedtls_root}/library/psa_crypto_cipher.c",
+          "${_mbedtls_root}/library/psa_crypto_client.c",
+          "${_mbedtls_root}/library/psa_crypto_driver_wrappers_no_static.c",
+          "${_mbedtls_root}/library/psa_crypto_ecp.c",
+          "${_mbedtls_root}/library/psa_crypto_hash.c",
+          "${_mbedtls_root}/library/psa_crypto_mac.c",
+          "${_mbedtls_root}/library/psa_crypto_rsa.c",
+          "${_mbedtls_root}/library/psa_crypto_se.c",
+          "${_mbedtls_root}/library/psa_crypto_slot_management.c",
+          "${_mbedtls_root}/library/psa_crypto_storage.c",
+          "${_mbedtls_root}/library/psa_util.c",
+          "${_mbedtls_root}/library/sha256.c",
+          "${_mbedtls_root}/library/ssl_cache.c",
+          "${_mbedtls_root}/library/ssl_ciphersuites.c",
+          "${_mbedtls_root}/library/ssl_client.c",
+          "${_mbedtls_root}/library/ssl_cookie.c",
+          "${_mbedtls_root}/library/ssl_msg.c",
+          "${_mbedtls_root}/library/ssl_ticket.c",
+          "${_mbedtls_root}/library/ssl_tls.c",
+          "${_mbedtls_root}/library/ssl_tls12_client.c",
+          "${_mbedtls_root}/library/ssl_tls12_server.c",
+          "${_mbedtls_root}/library/threading.c",
+          "${_mbedtls_root}/library/version.c",
+          "${_mbedtls_root}/library/x509.c",
+          "${_mbedtls_root}/library/x509_create.c",
+          "${_mbedtls_root}/library/x509_crl.c",
+          "${_mbedtls_root}/library/x509_crt.c",
+          "${_mbedtls_root}/library/x509_csr.c",
+          "${_mbedtls_root}/library/x509write_crt.c",
+          "${_mbedtls_root}/library/x509write_csr.c",
+
+          # GECKO SDK
+          "${efr32_sdk_root}/platform/security/sl_component/sl_mbedtls_support/src/sl_psa_crypto.c",
+          "${efr32_sdk_root}/platform/security/sl_component/sl_mbedtls_support/src/sli_psa_crypto.c",
+          "${efr32_sdk_root}/platform/security/sl_component/sl_psa_driver/src/sl_psa_its_nvm3.c",
+          "${efr32_sdk_root}/platform/security/sl_component/sl_psa_driver/src/sli_psa_trng.c",
+
+          # WISECONNECT 3 SDK
+          "${sl_si91x_psa_crypto_path}/aead/src/sl_si91x_psa_aead.c",
+          "${sl_si91x_psa_crypto_path}/aes/src/sl_si91x_aes.c",
+          "${sl_si91x_psa_crypto_path}/aes/src/sl_si91x_psa_aes.c",
+          "${sl_si91x_psa_crypto_path}/ccm/src/sl_si91x_ccm.c",
+          "${sl_si91x_psa_crypto_path}/ecdh/src/sl_si91x_ecdh.c",
+          "${sl_si91x_psa_crypto_path}/ecdh/src/sl_si91x_psa_ecdh.c",
+          "${sl_si91x_psa_crypto_path}/ecdsa/src/sl_si91x_ecdsa.c",
+          "${sl_si91x_psa_crypto_path}/ecdsa/src/sl_si91x_psa_ecdsa.c",
+          "${sl_si91x_psa_crypto_path}/gcm/src/sl_si91x_gcm.c",
+          "${sl_si91x_psa_crypto_path}/hmac/src/sl_si91x_hmac.c",
+          "${sl_si91x_psa_crypto_path}/mac/src/sl_si91x_psa_mac.c",
+          "${sl_si91x_psa_crypto_path}/multithread/src/sl_si91x_crypto_thread.c",
+          "${sl_si91x_psa_crypto_path}/sha/src/sl_si91x_psa_sha.c",
+          "${sl_si91x_psa_crypto_path}/sha/src/sl_si91x_sha.c",
+          "${sl_si91x_psa_crypto_path}/src/sli_si91x_crypto_driver_functions.c",
+          "${sl_si91x_psa_crypto_path}/trng/src/sl_si91x_psa_trng.c",
+          "${sl_si91x_psa_crypto_path}/wrap/src/sl_si91x_psa_wrap.c",
+          "${sl_si91x_psa_crypto_path}/wrap/src/sl_si91x_wrap.c",
+        ]
+
+        public_deps = [ "${chip_root}/src/crypto:crypto_buildconfig" ]
+
+        public_configs = [
+          ":${sdk_target_name}_config",
+          ":sl_si91x_psa_crypto_config",
+        ]
+      }
+    }
+
+    if (sl_si91x_crypto_flavor == "tinycrypt") {
+      _mbedtls_root = "${mbedtls_root}/repo"
+
+      config("siwx917_tinycrypt_config") {
+        defines = [
+          "SL_MBEDTLS_USE_TINYCRYPT",
+          "MBEDTLS_CONFIG_FILE=\"siwx917-chip-mbedtls-config.h\"",
+        ]
+
+        include_dirs = [
+          "${sdk_support_root}/matter/mbedtls/tinycrypt/inc",
+          "${_mbedtls_root}/include",
+          "${_mbedtls_root}/library",
+
+          # GECKO SDK configuration included to be used in autogenerated files
+          "${efr32_sdk_root}/platform/security/sl_component/sl_mbedtls_support/config",
+          "${efr32_sdk_root}/platform/security/sl_component/sl_mbedtls_support/config/preset",
+          "${efr32_sdk_root}/platform/security/sl_component/sl_mbedtls_support/inc",
+        ]
+      }
+
+      source_set("siwx917_tinycrypt") {
+        sources = [
+          # config file
+          "${_mbedtls_root}/include/mbedtls/platform.h",
+          "${_mbedtls_root}/include/mbedtls/version.h",
+          "${chip_root}/src/platform/silabs/SiWx917/siwx917-chip-mbedtls-config.h",
+
+          # mbedtls
+          "${_mbedtls_root}/library/aes.c",
+          "${_mbedtls_root}/library/asn1parse.c",
+          "${_mbedtls_root}/library/asn1write.c",
+          "${_mbedtls_root}/library/base64.c",
+          "${_mbedtls_root}/library/bignum.c",
+          "${_mbedtls_root}/library/ccm.c",
+          "${_mbedtls_root}/library/cipher.c",
+          "${_mbedtls_root}/library/cipher_wrap.c",
+          "${_mbedtls_root}/library/constant_time.c",
+          "${_mbedtls_root}/library/ctr_drbg.c",
+          "${_mbedtls_root}/library/ecdh.c",
+          "${_mbedtls_root}/library/ecdsa.c",
+          "${_mbedtls_root}/library/ecp.c",
+          "${_mbedtls_root}/library/ecp_curves.c",
+          "${_mbedtls_root}/library/entropy.c",
+          "${_mbedtls_root}/library/hkdf.c",
+          "${_mbedtls_root}/library/hmac_drbg.c",
+          "${_mbedtls_root}/library/md.c",
+          "${_mbedtls_root}/library/pem.c",
+          "${_mbedtls_root}/library/pkcs5.c",
+          "${_mbedtls_root}/library/platform.c",
+          "${_mbedtls_root}/library/sha256.c",
+          "${_mbedtls_root}/library/sha512.c",
+          "${_mbedtls_root}/library/version.c",
+          "${_mbedtls_root}/library/x509_create.c",
+
+          # tinycrypt
+          "${sdk_support_root}/matter/mbedtls/tinycrypt/src/ecc.c",
+          "${sdk_support_root}/matter/mbedtls/tinycrypt/src/ecc_dh.c",
+          "${sdk_support_root}/matter/mbedtls/tinycrypt/src/ecc_dsa.c",
+          "${sdk_support_root}/matter/mbedtls/tinycrypt/src/error.c",
+          "${sdk_support_root}/matter/mbedtls/tinycrypt/src/oid.c",
+          "${sdk_support_root}/matter/mbedtls/tinycrypt/src/pk.c",
+          "${sdk_support_root}/matter/mbedtls/tinycrypt/src/pk_wrap.c",
+          "${sdk_support_root}/matter/mbedtls/tinycrypt/src/pkparse.c",
+          "${sdk_support_root}/matter/mbedtls/tinycrypt/src/pkwrite.c",
+          "${sdk_support_root}/matter/mbedtls/tinycrypt/src/platform_util.c",
+          "${sdk_support_root}/matter/mbedtls/tinycrypt/src/x509_crt.c",
+          "${sdk_support_root}/matter/mbedtls/tinycrypt/src/x509write_csr.c",
+        ]
+
+        public_deps = [ "${chip_root}/src/crypto:crypto_buildconfig" ]
+
+        public_configs = [
+          ":${sdk_target_name}_config",
+          ":siwx917_tinycrypt_config",
+        ]
+      }
+    }
   }
-
   source_set(sdk_target_name) {
     sources = [
       # si91x component
       "${efr32_sdk_root}/platform/CMSIS/RTOS2/Source/os_systick.c",
       "${efr32_sdk_root}/platform/common/src/sl_assert.c",
+      "${efr32_sdk_root}/platform/common/src/sl_core_cortexm.c",
       "${efr32_sdk_root}/platform/common/src/sl_slist.c",
       "${efr32_sdk_root}/platform/common/src/sli_cmsis_os2_ext_task_register.c",
       "${efr32_sdk_root}/util/third_party/freertos/cmsis/Source/cmsis_os2.c",
@@ -405,6 +662,7 @@ template("siwx917_sdk") {
       "${wifi_sdk_root}/components/board/silabs/src/rsi_board.c",
       "${wifi_sdk_root}/components/common/src/sl_utility.c",
       "${wifi_sdk_root}/components/device/silabs/si91x/mcu/core/chip/src/rsi_deepsleep_soc.c",
+      "${wifi_sdk_root}/components/device/silabs/si91x/mcu/core/chip/src/rsi_ps_ram_func.c",
       "${wifi_sdk_root}/components/device/silabs/si91x/mcu/core/chip/src/rsi_system_config.c",
       "${wifi_sdk_root}/components/device/silabs/si91x/mcu/core/chip/src/system_si91x.c",
       "${wifi_sdk_root}/components/device/silabs/si91x/mcu/core/common/src/rsi_debug.c",
@@ -412,7 +670,10 @@ template("siwx917_sdk") {
       "${wifi_sdk_root}/components/device/silabs/si91x/mcu/drivers/cmsis_driver/UDMA.c",
       "${wifi_sdk_root}/components/device/silabs/si91x/mcu/drivers/cmsis_driver/USART.c",
       "${wifi_sdk_root}/components/device/silabs/si91x/mcu/drivers/peripheral_drivers/src/clock_update.c",
+      "${wifi_sdk_root}/components/device/silabs/si91x/mcu/drivers/peripheral_drivers/src/rsi_crc.c",
       "${wifi_sdk_root}/components/device/silabs/si91x/mcu/drivers/peripheral_drivers/src/rsi_egpio.c",
+      "${wifi_sdk_root}/components/device/silabs/si91x/mcu/drivers/peripheral_drivers/src/rsi_spi.c",
+      "${wifi_sdk_root}/components/device/silabs/si91x/mcu/drivers/peripheral_drivers/src/rsi_timers.c",
       "${wifi_sdk_root}/components/device/silabs/si91x/mcu/drivers/peripheral_drivers/src/rsi_udma.c",
       "${wifi_sdk_root}/components/device/silabs/si91x/mcu/drivers/peripheral_drivers/src/rsi_udma_wrapper.c",
       "${wifi_sdk_root}/components/device/silabs/si91x/mcu/drivers/peripheral_drivers/src/rsi_usart.c",
@@ -448,10 +709,12 @@ template("siwx917_sdk") {
       "${efr32_sdk_root}/platform/emlib/src/em_core.c",
       "${efr32_sdk_root}/platform/service/device_init/src/sl_device_init_nvic.c",
       "${efr32_sdk_root}/platform/service/system/src/sl_system_init.c",
+      "${efr32_sdk_root}/platform/service/system/src/sl_system_kernel.c",
       "${efr32_sdk_root}/util/third_party/freertos/kernel/croutine.c",
       "${efr32_sdk_root}/util/third_party/freertos/kernel/event_groups.c",
       "${efr32_sdk_root}/util/third_party/freertos/kernel/list.c",
       "${efr32_sdk_root}/util/third_party/freertos/kernel/portable/GCC/ARM_CM4F/port.c",
+      "${efr32_sdk_root}/util/third_party/freertos/kernel/portable/MemMang/heap_3.c",
       "${efr32_sdk_root}/util/third_party/freertos/kernel/queue.c",
       "${efr32_sdk_root}/util/third_party/freertos/kernel/stream_buffer.c",
       "${efr32_sdk_root}/util/third_party/freertos/kernel/tasks.c",
@@ -459,48 +722,25 @@ template("siwx917_sdk") {
       "${sdk_support_root}/matter/si91x/siwx917/BRD4338A/autogen/sl_event_handler.c",
       "${sdk_support_root}/matter/si91x/siwx917/BRD4338A/autogen/sl_si91x_button_instances.c",
       "${sdk_support_root}/matter/si91x/siwx917/BRD4338A/autogen/sl_si91x_led_instances.c",
+      "${sdk_support_root}/matter/si91x/siwx917/BRD4338A/autogen/sl_ulp_timer_init.c",
       "${sdk_support_root}/matter/si91x/siwx917/BRD4338A/support/hal/rsi_hal_mcu_m4.c",
       "${wifi_sdk_root}/components/device/silabs/si91x/mcu/drivers/hardware_drivers/button/src/sl_si91x_button.c",
       "${wifi_sdk_root}/components/device/silabs/si91x/mcu/drivers/hardware_drivers/led/src/sl_si91x_led.c",
       "${wifi_sdk_root}/components/device/silabs/si91x/mcu/drivers/service/nvm3/src/sl_si91x_nvm3_hal_flash.c",
 
-      # mbedtls
-      "${chip_root}/third_party/mbedtls/repo/library/aes.c",
-      "${chip_root}/third_party/mbedtls/repo/library/asn1parse.c",
-      "${chip_root}/third_party/mbedtls/repo/library/asn1write.c",
-      "${chip_root}/third_party/mbedtls/repo/library/bignum.c",
-      "${chip_root}/third_party/mbedtls/repo/library/ccm.c",
-      "${chip_root}/third_party/mbedtls/repo/library/cipher.c",
-      "${chip_root}/third_party/mbedtls/repo/library/cipher_wrap.c",
-      "${chip_root}/third_party/mbedtls/repo/library/constant_time.c",
-      "${chip_root}/third_party/mbedtls/repo/library/ctr_drbg.c",
-      "${chip_root}/third_party/mbedtls/repo/library/ecdh.c",
-      "${chip_root}/third_party/mbedtls/repo/library/ecdsa.c",
-      "${chip_root}/third_party/mbedtls/repo/library/ecp.c",
-      "${chip_root}/third_party/mbedtls/repo/library/ecp_curves.c",
-      "${chip_root}/third_party/mbedtls/repo/library/entropy.c",
-      "${chip_root}/third_party/mbedtls/repo/library/hkdf.c",
-      "${chip_root}/third_party/mbedtls/repo/library/hmac_drbg.c",
-      "${chip_root}/third_party/mbedtls/repo/library/md.c",
-      "${chip_root}/third_party/mbedtls/repo/library/pkcs5.c",
-      "${chip_root}/third_party/mbedtls/repo/library/platform.c",
-      "${chip_root}/third_party/mbedtls/repo/library/sha256.c",
-      "${chip_root}/third_party/mbedtls/repo/library/sha512.c",
-      "${chip_root}/third_party/mbedtls/repo/library/x509_create.c",
+      # sl memory manager
+      "${efr32_sdk_root}/platform/service/memory_manager/profiler/src/sli_memory_profiler_stubs.c",
+      "${efr32_sdk_root}/platform/service/memory_manager/src/sl_memory_manager.c",
+      "${efr32_sdk_root}/platform/service/memory_manager/src/sl_memory_manager_cpp.cpp",
+      "${efr32_sdk_root}/platform/service/memory_manager/src/sl_memory_manager_dynamic_reservation.c",
+      "${efr32_sdk_root}/platform/service/memory_manager/src/sl_memory_manager_pool.c",
+      "${efr32_sdk_root}/platform/service/memory_manager/src/sl_memory_manager_region.c",
+      "${efr32_sdk_root}/platform/service/memory_manager/src/sl_memory_manager_retarget.c",
+      "${efr32_sdk_root}/platform/service/memory_manager/src/sli_memory_manager_common.c",
+
+      # STARTUP FILES
       "${efr32_sdk_root}/platform/service/iostream/src/sl_iostream.c",
       "${efr32_sdk_root}/platform/service/iostream/src/sl_iostream_rtt.c",
-      "${sdk_support_root}/matter/mbedtls/tinycrypt/src/ecc.c",
-      "${sdk_support_root}/matter/mbedtls/tinycrypt/src/ecc_dh.c",
-      "${sdk_support_root}/matter/mbedtls/tinycrypt/src/ecc_dsa.c",
-      "${sdk_support_root}/matter/mbedtls/tinycrypt/src/error.c",
-      "${sdk_support_root}/matter/mbedtls/tinycrypt/src/oid.c",
-      "${sdk_support_root}/matter/mbedtls/tinycrypt/src/pk.c",
-      "${sdk_support_root}/matter/mbedtls/tinycrypt/src/pk_wrap.c",
-      "${sdk_support_root}/matter/mbedtls/tinycrypt/src/pkparse.c",
-      "${sdk_support_root}/matter/mbedtls/tinycrypt/src/pkwrite.c",
-      "${sdk_support_root}/matter/mbedtls/tinycrypt/src/platform_util.c",
-      "${sdk_support_root}/matter/mbedtls/tinycrypt/src/x509_crt.c",
-      "${sdk_support_root}/matter/mbedtls/tinycrypt/src/x509write_csr.c",
       "${sdk_support_root}/matter/si91x/siwx917/BRD4338A/support/src/startup_common_RS1xxxx.c",
       "${wifi_sdk_root}/components/device/silabs/si91x/mcu/drivers/service/nvm3/src/sl_si91x_common_flash_intf.c",
 
@@ -521,6 +761,14 @@ template("siwx917_sdk") {
       ]
     }
 
+    if (chip_enable_icd_server || !disable_lcd) {
+      sources += [
+        "${efr32_sdk_root}/platform/service/sleeptimer/src/sl_sleeptimer.c",
+        "${wifi_sdk_root}/components/device/silabs/si91x/mcu/drivers/peripheral_drivers/src/rsi_sysrtc.c",
+        "${wifi_sdk_root}/components/device/silabs/si91x/mcu/drivers/service/sleeptimer/src/sl_sleeptimer_hal_si91x_sysrtc.c",
+      ]
+    }
+
     if (!disable_lcd) {
       sources += [
         "${efr32_sdk_root}/platform/middleware/glib/dmd/display/dmd_memlcd.c",
@@ -535,56 +783,61 @@ template("siwx917_sdk") {
         "${efr32_sdk_root}/platform/middleware/glib/glib/glib_polygon.c",
         "${efr32_sdk_root}/platform/middleware/glib/glib/glib_rectangle.c",
         "${efr32_sdk_root}/platform/middleware/glib/glib/glib_string.c",
-        "${efr32_sdk_root}/platform/service/sleeptimer/src/sl_sleeptimer.c",
         "${wifi_sdk_root}/components/device/silabs/si91x/mcu/drivers/cmsis_driver/SPI.c",
         "${wifi_sdk_root}/components/device/silabs/si91x/mcu/drivers/hardware_drivers/memlcd/src/memlcd_917/sl_memlcd_spi.c",
         "${wifi_sdk_root}/components/device/silabs/si91x/mcu/drivers/hardware_drivers/memlcd/src/sl_memlcd.c",
         "${wifi_sdk_root}/components/device/silabs/si91x/mcu/drivers/hardware_drivers/memlcd/src/sl_memlcd_display.c",
-        "${wifi_sdk_root}/components/device/silabs/si91x/mcu/drivers/peripheral_drivers/src/rsi_sysrtc.c",
-        "${wifi_sdk_root}/components/device/silabs/si91x/mcu/drivers/service/sleeptimer/src/sl_sleeptimer_hal_si91x_sysrtc.c",
         "${wifi_sdk_root}/components/device/silabs/si91x/mcu/drivers/unified_api/src/sl_si91x_ulp_timer.c",
       ]
     }
 
     if (chip_enable_icd_server) {
       sources += [
+        "${sdk_support_root}/matter/si91x/siwx917/BRD4338A/autogen/sl_si91x_power_manager_handler.c",
+        "${sdk_support_root}/matter/si91x/siwx917/BRD4338A/autogen/sl_si91x_power_manager_wakeup_handler.c",
         "${wifi_sdk_root}/components/device/silabs/si91x/mcu/drivers/peripheral_drivers/src/sl_si91x_m4_ps.c",
-        "${wifi_sdk_root}/components/device/silabs/si91x/mcu/drivers/systemlevel/src/rsi_rtc.c",
+        "${wifi_sdk_root}/components/device/silabs/si91x/mcu/drivers/service/power_manager/src/sl_si91x_power_manager.c",
+        "${wifi_sdk_root}/components/device/silabs/si91x/mcu/drivers/service/power_manager/src/sli_si91x_power_manager.c",
+        "${wifi_sdk_root}/components/device/silabs/si91x/mcu/drivers/service/power_manager/src/sli_si91x_power_manager_wakeup_init.c",
         "${wifi_sdk_root}/components/device/silabs/si91x/mcu/drivers/systemlevel/src/rsi_time_period.c",
+        "${wifi_sdk_root}/third_party/silicon_labs/freertos/src/sl_si91x_low_power_tickless_mode.c",
       ]
     }
+
     public_deps = [
-      ":siwx917_mbedtls_config",
       "${segger_rtt_root}:segger_rtt",
       "${segger_rtt_root}:segger_rtt_printf",
       "${segger_rtt_root}:segger_rtt_syscalls",
     ]
+    if (chip_crypto == "platform") {
+      if (sl_si91x_crypto_flavor == "tinycrypt") {
+        public_deps += [ ":siwx917_tinycrypt" ]
+      }
+
+      if (sl_si91x_crypto_flavor == "psa") {
+        public_deps += [ ":sl_si91x_psa_crypto" ]
+      }
+    }
 
     if (defined(invoker.sources)) {
       sources += invoker.sources
     }
     if (invoker.enable_dic) {
       sources += [
-        "${chip_root}/third_party/mbedtls/repo/library/base64.c",
-        "${chip_root}/third_party/mbedtls/repo/library/debug.c",
-        "${chip_root}/third_party/mbedtls/repo/library/ecjpake.c",
-        "${chip_root}/third_party/mbedtls/repo/library/pem.c",
-        "${chip_root}/third_party/mbedtls/repo/library/rsa.c",
-        "${chip_root}/third_party/mbedtls/repo/library/rsa_internal.c",
-        "${chip_root}/third_party/mbedtls/repo/library/sha1.c",
-        "${chip_root}/third_party/mbedtls/repo/library/ssl_ciphersuites.c",
-        "${chip_root}/third_party/mbedtls/repo/library/ssl_cli.c",
-        "${chip_root}/third_party/mbedtls/repo/library/ssl_msg.c",
-        "${chip_root}/third_party/mbedtls/repo/library/ssl_srv.c",
-        "${chip_root}/third_party/mbedtls/repo/library/ssl_tls.c",
-        "${chip_root}/third_party/mbedtls/repo/library/x509.c",
-        "${chip_root}/third_party/silabs/mqtt/stack/mqtt.c",
+        "${_mbedtls_root}/library/ecjpake.c",
+        "${_mbedtls_root}/library/rsa.c",
+        "${_mbedtls_root}/library/rsa_internal.c",
+        "${_mbedtls_root}/library/sha1.c",
+        "${_mbedtls_root}/library/ssl_ciphersuites.c",
+        "${_mbedtls_root}/library/ssl_cli.c",
+        "${_mbedtls_root}/library/ssl_msg.c",
+        "${_mbedtls_root}/library/ssl_srv.c",
+        "${_mbedtls_root}/library/ssl_tls.c",
+        "${_mbedtls_root}/library/x509.c",
+        "${efr32_sdk_build_root}/mqtt/stack/mqtt.c",
       ]
     }
 
-    public_configs = [
-      ":${sdk_target_name}_config",
-      "${examples_plat_dir}:siwx917-common-config",
-    ]
+    public_configs = [ ":${sdk_target_name}_config" ]
   }
 }

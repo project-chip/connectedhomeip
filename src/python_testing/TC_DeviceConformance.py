@@ -15,6 +15,18 @@
 #    limitations under the License.
 #
 
+# See https://github.com/project-chip/connectedhomeip/blob/master/docs/testing/python.md#defining-the-ci-test-arguments
+# for details about the block below.
+#
+# === BEGIN CI TEST ARGUMENTS ===
+# test-runner-runs: run1
+# test-runner-run/run1/app: ${CHIP_LOCK_APP}
+# test-runner-run/run1/factoryreset: True
+# test-runner-run/run1/quiet: True
+# test-runner-run/run1/app-args: --discriminator 1234 --KVS kvs1 --trace-to json:${TRACE_APP}.json
+# test-runner-run/run1/script-args: --storage-path admin_storage.json --manual-code 10054912339 --bool-arg ignore_in_progress:True allow_provisional:True --PICS src/app/tests/suites/certification/ci-pics-values --trace-to json:${TRACE_TEST_JSON}.json --trace-to perfetto:${TRACE_TEST_PERFETTO}.perfetto --tests test_TC_IDM_10_2
+# === END CI TEST ARGUMENTS ===
+
 from typing import Callable
 
 import chip.clusters as Clusters
@@ -56,16 +68,11 @@ class DeviceConformanceTests(BasicCompositionTests):
             record_problem(location, problem, ProblemSeverity.WARNING)
 
         ignore_attributes: dict[int, list[int]] = {}
-        ignore_features: dict[int, list[int]] = {}
         if ignore_in_progress:
             # This is a manually curated list of attributes that are in-progress in the SDK, but have landed in the spec
             in_progress_attributes = {Clusters.BasicInformation.id: [0x15, 0x016],
                                       Clusters.PowerSource.id: [0x20, 0x21, 0x22, 0x23, 0x24, 0x25, 0x26, 0x27, 0x28, 0x29, 0x2A]}
             ignore_attributes.update(in_progress_attributes)
-            # The spec currently has an error on the power source features
-            # This should be removed once https://github.com/CHIP-Specifications/connectedhomeip-spec/pull/7823 lands
-            in_progress_features = {Clusters.PowerSource.id: [(1 << 2), (1 << 3), (1 << 4), (1 << 5)]}
-            ignore_features.update(in_progress_features)
 
         if is_ci:
             # The network commissioning clusters on the CI select the features on the fly and end up non-conformant
@@ -116,17 +123,13 @@ class DeviceConformanceTests(BasicCompositionTests):
                     if f not in self.xml_clusters[cluster_id].features.keys():
                         record_error(location=location, problem=f'Unknown feature with mask 0x{f:02x}')
                         continue
-                    if cluster_id in ignore_features and f in ignore_features[cluster_id]:
-                        continue
                     xml_feature = self.xml_clusters[cluster_id].features[f]
-                    conformance_decision = xml_feature.conformance(feature_map, attribute_list, all_command_list)
-                    if not conformance_allowed(conformance_decision, allow_provisional):
+                    conformance_decision_with_choice = xml_feature.conformance(feature_map, attribute_list, all_command_list)
+                    if not conformance_allowed(conformance_decision_with_choice, allow_provisional):
                         record_error(location=location, problem=f'Disallowed feature with mask 0x{f:02x}')
                 for feature_mask, xml_feature in self.xml_clusters[cluster_id].features.items():
-                    if cluster_id in ignore_features and feature_mask in ignore_features[cluster_id]:
-                        continue
-                    conformance_decision = xml_feature.conformance(feature_map, attribute_list, all_command_list)
-                    if conformance_decision == ConformanceDecision.MANDATORY and feature_mask not in feature_masks:
+                    conformance_decision_with_choice = xml_feature.conformance(feature_map, attribute_list, all_command_list)
+                    if conformance_decision_with_choice.decision == ConformanceDecision.MANDATORY and feature_mask not in feature_masks:
                         record_error(
                             location=location, problem=f'Required feature with mask 0x{f:02x} is not present in feature map. {conformance_str(xml_feature.conformance, feature_map, self.xml_clusters[cluster_id].features)}')
 
@@ -142,16 +145,16 @@ class DeviceConformanceTests(BasicCompositionTests):
                             record_error(location=location, problem='Standard attribute found on device, but not in spec')
                         continue
                     xml_attribute = self.xml_clusters[cluster_id].attributes[attribute_id]
-                    conformance_decision = xml_attribute.conformance(feature_map, attribute_list, all_command_list)
-                    if not conformance_allowed(conformance_decision, allow_provisional):
+                    conformance_decision_with_choice = xml_attribute.conformance(feature_map, attribute_list, all_command_list)
+                    if not conformance_allowed(conformance_decision_with_choice, allow_provisional):
                         location = AttributePathLocation(endpoint_id=endpoint_id, cluster_id=cluster_id, attribute_id=attribute_id)
                         record_error(
                             location=location, problem=f'Attribute 0x{attribute_id:02x} is included, but is disallowed by conformance. {conformance_str(xml_attribute.conformance, feature_map, self.xml_clusters[cluster_id].features)}')
                 for attribute_id, xml_attribute in self.xml_clusters[cluster_id].attributes.items():
                     if cluster_id in ignore_attributes and attribute_id in ignore_attributes[cluster_id]:
                         continue
-                    conformance_decision = xml_attribute.conformance(feature_map, attribute_list, all_command_list)
-                    if conformance_decision == ConformanceDecision.MANDATORY and attribute_id not in cluster.keys():
+                    conformance_decision_with_choice = xml_attribute.conformance(feature_map, attribute_list, all_command_list)
+                    if conformance_decision_with_choice.decision == ConformanceDecision.MANDATORY and attribute_id not in cluster.keys():
                         location = AttributePathLocation(endpoint_id=endpoint_id, cluster_id=cluster_id, attribute_id=attribute_id)
                         record_error(
                             location=location, problem=f'Attribute 0x{attribute_id:02x} is required, but is not present on the DUT. {conformance_str(xml_attribute.conformance, feature_map, self.xml_clusters[cluster_id].features)}')
@@ -170,13 +173,13 @@ class DeviceConformanceTests(BasicCompositionTests):
                             record_error(location=location, problem='Standard command found on device, but not in spec')
                             continue
                         xml_command = xml_commands_dict[command_id]
-                        conformance_decision = xml_command.conformance(feature_map, attribute_list, all_command_list)
-                        if not conformance_allowed(conformance_decision, allow_provisional):
+                        conformance_decision_with_choice = xml_command.conformance(feature_map, attribute_list, all_command_list)
+                        if not conformance_allowed(conformance_decision_with_choice, allow_provisional):
                             record_error(
                                 location=location, problem=f'Command 0x{command_id:02x} is included, but disallowed by conformance. {conformance_str(xml_command.conformance, feature_map, self.xml_clusters[cluster_id].features)}')
                     for command_id, xml_command in xml_commands_dict.items():
-                        conformance_decision = xml_command.conformance(feature_map, attribute_list, all_command_list)
-                        if conformance_decision == ConformanceDecision.MANDATORY and command_id not in command_list:
+                        conformance_decision_with_choice = xml_command.conformance(feature_map, attribute_list, all_command_list)
+                        if conformance_decision_with_choice.decision == ConformanceDecision.MANDATORY and command_id not in command_list:
                             location = CommandPathLocation(endpoint_id=endpoint_id, cluster_id=cluster_id, command_id=command_id)
                             record_error(
                                 location=location, problem=f'Command 0x{command_id:02x} is required, but is not present on the DUT. {conformance_str(xml_command.conformance, feature_map, self.xml_clusters[cluster_id].features)}')

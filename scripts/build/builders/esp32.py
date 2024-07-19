@@ -197,6 +197,8 @@ class Esp32Builder(Builder):
         if not self.enable_ipv4:
             self._Execute(
                 ['bash', '-c', 'echo -e "\\nCONFIG_DISABLE_IPV4=y\\n" >>%s' % shlex.quote(defaults_out)])
+            self._Execute(
+                ['bash', '-c', 'echo -e "\\nCONFIG_LWIP_IPV4=n\\n" >>%s' % shlex.quote(defaults_out)])
 
         if self.enable_insights_trace:
             insights_flag = 'y'

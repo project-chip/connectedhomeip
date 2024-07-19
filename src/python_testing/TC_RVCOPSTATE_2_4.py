@@ -15,6 +15,18 @@
 #    limitations under the License.
 #
 
+# See https://github.com/project-chip/connectedhomeip/blob/master/docs/testing/python.md#defining-the-ci-test-arguments
+# for details about the block below.
+#
+# === BEGIN CI TEST ARGUMENTS ===
+# test-runner-runs: run1
+# test-runner-run/run1/app: ${CHIP_RVC_APP}
+# test-runner-run/run1/factoryreset: True
+# test-runner-run/run1/quiet: True
+# test-runner-run/run1/app-args: --discriminator 1234 --KVS kvs1 --trace-to json:${TRACE_APP}.json
+# test-runner-run/run1/script-args: --storage-path admin_storage.json --commissioning-method on-network --discriminator 1234 --passcode 20202021 --PICS examples/rvc-app/rvc-common/pics/rvc-app-pics-values --endpoint 1 --trace-to json:${TRACE_TEST_JSON}.json --trace-to perfetto:${TRACE_TEST_PERFETTO}.perfetto
+# === END CI TEST ARGUMENTS ===
+
 import logging
 from time import sleep
 
@@ -124,7 +136,7 @@ class TC_RVCOPSTATE_2_4(MatterBaseTest):
             if self.is_ci:
                 self.write_to_app_pipe('{"Name": "ErrorEvent", "Error": "UnableToStartOrResume"}')
             else:
-                self.wait_for_user_input(step_name)
+                self.wait_for_user_input(prompt_msg=f"{step_name}, and press Enter when ready.")
 
             await self.read_operational_state_with_check(3, op_states.kError)
 
@@ -138,7 +150,7 @@ class TC_RVCOPSTATE_2_4(MatterBaseTest):
                 self.write_to_app_pipe('{"Name": "Docked"}')
                 self.write_to_app_pipe('{"Name": "Charging"}')
             else:
-                self.wait_for_user_input(step_name)
+                self.wait_for_user_input(prompt_msg=f"{step_name}, and press Enter when ready.")
 
             await self.read_operational_state_with_check(6, rvc_op_states.kCharging)
 
@@ -150,7 +162,7 @@ class TC_RVCOPSTATE_2_4(MatterBaseTest):
             if self.is_ci:
                 self.write_to_app_pipe('{"Name": "Charged"}')
             else:
-                self.wait_for_user_input(step_name)
+                self.wait_for_user_input(prompt_msg=f"{step_name}, and press Enter when ready.")
 
             await self.read_operational_state_with_check(9, rvc_op_states.kDocked)
 
@@ -163,7 +175,7 @@ class TC_RVCOPSTATE_2_4(MatterBaseTest):
                 await self.send_run_change_to_mode_cmd(rvc_app_run_mode_cleaning)
                 await self.send_run_change_to_mode_cmd(rvc_app_run_mode_idle)
             else:
-                self.wait_for_user_input(step_name)
+                self.wait_for_user_input(prompt_msg=f"{step_name}, and press Enter when ready.")
 
             await self.read_operational_state_with_check(9, rvc_op_states.kSeekingCharger)
 

@@ -98,12 +98,6 @@ class MyUserPrompter : public UserPrompter
 
     // tv should override this with a dialog prompt
     inline void PromptCommissioningFailed(const char * commissioneeName, CHIP_ERROR error) override { return; }
-
-    // tv should override this with a dialog prompt
-    inline void PromptForAppInstallOKPermission(uint16_t vendorId, uint16_t productId, const char * commissioneeName) override
-    {
-        return;
-    }
 };
 
 MyUserPrompter gMyUserPrompter;
@@ -169,6 +163,8 @@ class MyPostCommissioningListener : public PostCommissioningListener
     {
         // read current binding list
         chip::Controller::ClusterBase cluster(exchangeMgr, sessionHandle, kTargetBindingClusterEndpointId);
+
+        ContentAppPlatform::GetInstance().StoreNodeIdForContentApp(vendorId, productId, nodeId);
 
         cacheContext(vendorId, productId, nodeId, exchangeMgr, sessionHandle);
 
@@ -571,6 +567,63 @@ void ContentAppFactoryImpl::AddAdminVendorId(uint16_t vendorId)
     mAdminVendorIds.push_back(vendorId);
 }
 
+#if CHIP_DEVICE_CONFIG_ENABLE_BOTH_COMMISSIONER_AND_COMMISSIONEE
+class DevicePairedCommand : public Controller::DevicePairingDelegate
+{
+public:
+    struct CallbackContext
+    {
+        uint16_t vendorId;
+        uint16_t productId;
+        chip::NodeId nodeId;
+
+        CallbackContext(uint16_t vId, uint16_t pId, chip::NodeId nId) : vendorId(vId), productId(pId), nodeId(nId) {}
+    };
+    DevicePairedCommand(uint16_t vendorId, uint16_t productId, chip::NodeId nodeId) :
+        mOnDeviceConnectedCallback(OnDeviceConnectedFn, this), mOnDeviceConnectionFailureCallback(OnDeviceConnectionFailureFn, this)
+    {
+        mContext = std::make_shared<CallbackContext>(vendorId, productId, nodeId);
+    }
+
+    static void OnDeviceConnectedFn(void * context, chip::Messaging::ExchangeManager & exchangeMgr,
+                                    const chip::SessionHandle & sessionHandle)
+    {
+        auto * pairingCommand = static_cast<DevicePairedCommand *>(context);
+        auto cbContext        = pairingCommand->mContext;
+
+        if (pairingCommand)
+        {
+            ChipLogProgress(DeviceLayer,
+                            "OnDeviceConnectedFn - Updating ACL for node id: " ChipLogFormatX64
+                            " and vendor id: %d and product id: %d",
+                            ChipLogValueX64(cbContext->nodeId), cbContext->vendorId, cbContext->productId);
+
+            GetCommissionerDiscoveryController()->CommissioningSucceeded(cbContext->vendorId, cbContext->productId,
+                                                                         cbContext->nodeId, exchangeMgr, sessionHandle);
+        }
+    }
+
+    static void OnDeviceConnectionFailureFn(void * context, const ScopedNodeId & peerId, CHIP_ERROR error)
+    {
+        auto * pairingCommand = static_cast<DevicePairedCommand *>(context);
+        auto cbContext        = pairingCommand->mContext;
+
+        if (pairingCommand)
+        {
+            ChipLogProgress(DeviceLayer,
+                            "OnDeviceConnectionFailureFn - Not updating ACL for node id: " ChipLogFormatX64
+                            " and vendor id: %d and product id: %d",
+                            ChipLogValueX64(cbContext->nodeId), cbContext->vendorId, cbContext->productId);
+            // TODO: Remove Node Id
+        }
+    }
+
+    chip::Callback::Callback<chip::OnDeviceConnected> mOnDeviceConnectedCallback;
+    chip::Callback::Callback<chip::OnDeviceConnectionFailure> mOnDeviceConnectionFailureCallback;
+    std::shared_ptr<CallbackContext> mContext;
+};
+#endif // CHIP_DEVICE_CONFIG_ENABLE_BOTH_COMMISSIONER_AND_COMMISSIONEE
+
 void ContentAppFactoryImpl::InstallContentApp(uint16_t vendorId, uint16_t productId)
 {
     auto make_default_supported_clusters = []() {
@@ -583,29 +636,74 @@ void ContentAppFactoryImpl::InstallContentApp(uint16_t vendorId, uint16_t produc
     ChipLogProgress(DeviceLayer, "ContentAppFactoryImpl: InstallContentApp vendorId=%d productId=%d ", vendorId, productId);
     if (vendorId == 1 && productId == 11)
     {
-        mContentApps.emplace_back(std::make_unique<ContentAppImpl>("Vendor1", vendorId, "exampleid", productId, "Version1",
-                                                                   "34567890", make_default_supported_clusters()));
+        auto ptr = std::make_unique<ContentAppImpl>("Vendor1", vendorId, "exampleid", productId, "Version1", "34567890",
+                                                    make_default_supported_clusters());
+        mContentApps.emplace_back(std::move(ptr));
     }
-    else if (vendorId == 65521 && productId == 32768)
+    else if (vendorId == 65521 && productId == 32769)
     {
-        mContentApps.emplace_back(std::make_unique<ContentAppImpl>("Vendor2", vendorId, "exampleString", productId, "Version2",
-                                                                   "20202021", make_default_supported_clusters()));
+        auto ptr = std::make_unique<ContentAppImpl>("Vendor2", vendorId, "exampleString", productId, "Version2", "20202021",
+                                                    make_default_supported_clusters());
+        mContentApps.emplace_back(std::move(ptr));
     }
     else if (vendorId == 9050 && productId == 22)
     {
-        mContentApps.emplace_back(std::make_unique<ContentAppImpl>("Vendor3", vendorId, "App3", productId, "Version3", "20202021",
-                                                                   make_default_supported_clusters()));
+        auto ptr = std::make_unique<ContentAppImpl>("Vendor3", vendorId, "App3", productId, "Version3", "20202021",
+                                                    make_default_supported_clusters());
+        mContentApps.emplace_back(std::move(ptr));
     }
     else if (vendorId == 1111 && productId == 22)
     {
-        mContentApps.emplace_back(std::make_unique<ContentAppImpl>("TestSuiteVendor", vendorId, "applicationId", productId, "v2",
-                                                                   "20202021", make_default_supported_clusters()));
+        auto ptr = std::make_unique<ContentAppImpl>("TestSuiteVendor", vendorId, "applicationId", productId, "v2", "20202021",
+                                                    make_default_supported_clusters());
+        mContentApps.emplace_back(std::move(ptr));
     }
     else
     {
-        mContentApps.emplace_back(std::make_unique<ContentAppImpl>("NewAppVendor", vendorId, "newAppApplicationId", productId, "v2",
-                                                                   "20202021", make_default_supported_clusters()));
+        auto ptr = std::make_unique<ContentAppImpl>("NewAppVendor", vendorId, "newAppApplicationId", productId, "v2", "20202021",
+                                                    make_default_supported_clusters());
+        mContentApps.emplace_back(std::move(ptr));
     }
+
+#if CHIP_DEVICE_CONFIG_ENABLE_BOTH_COMMISSIONER_AND_COMMISSIONEE
+    // Get the list of node ids
+    std::set<NodeId> nodeIds = ContentAppPlatform::GetInstance().GetNodeIdsForContentApp(vendorId, productId);
+
+    // update ACLs
+    for (auto & contentApp : mContentApps)
+    {
+        auto app = contentApp.get();
+
+        if (app->MatchesPidVid(productId, vendorId))
+        {
+            CatalogVendorApp vendorApp = app->GetApplicationBasicDelegate()->GetCatalogVendorApp();
+
+            GetContentAppFactoryImpl()->LoadContentApp(vendorApp);
+        }
+
+        // update the list of node ids with content apps allowed vendor list
+        for (const auto & allowedVendor : app->GetApplicationBasicDelegate()->GetAllowedVendorList())
+        {
+            std::set<NodeId> tempNodeIds = ContentAppPlatform::GetInstance().GetNodeIdsForAllowVendorId(allowedVendor);
+
+            nodeIds.insert(tempNodeIds.begin(), tempNodeIds.end());
+        }
+    }
+
+    // refresh ACLs
+    for (const auto & nodeId : nodeIds)
+    {
+
+        ChipLogProgress(DeviceLayer,
+                        "Creating Pairing Command with node id: " ChipLogFormatX64 " and vendor id: %d and product id: %d",
+                        ChipLogValueX64(nodeId), vendorId, productId);
+
+        std::shared_ptr<DevicePairedCommand> pairingCommand = std::make_shared<DevicePairedCommand>(vendorId, productId, nodeId);
+
+        GetDeviceCommissioner()->GetConnectedDevice(nodeId, &pairingCommand->mOnDeviceConnectedCallback,
+                                                    &pairingCommand->mOnDeviceConnectionFailureCallback);
+    }
+#endif // CHIP_DEVICE_CONFIG_ENABLE_BOTH_COMMISSIONER_AND_COMMISSIONEE
 }
 
 bool ContentAppFactoryImpl::UninstallContentApp(uint16_t vendorId, uint16_t productId)
@@ -626,6 +724,8 @@ bool ContentAppFactoryImpl::UninstallContentApp(uint16_t vendorId, uint16_t prod
             ChipLogProgress(DeviceLayer, "Found an app vid=%d pid=%d. Uninstalling it.",
                             app->GetApplicationBasicDelegate()->HandleGetVendorId(),
                             app->GetApplicationBasicDelegate()->HandleGetProductId());
+            EndpointId removedEndpointID = ContentAppPlatform::GetInstance().RemoveContentApp(app);
+            ChipLogProgress(DeviceLayer, "Removed content app at endpoint id: %d", removedEndpointID);
             mContentApps.erase(mContentApps.begin() + index);
             return true;
         }
@@ -633,6 +733,18 @@ bool ContentAppFactoryImpl::UninstallContentApp(uint16_t vendorId, uint16_t prod
         index++;
     }
     return false;
+}
+
+void ContentAppFactoryImpl::LogInstalledApps()
+{
+    for (auto & contentApp : mContentApps)
+    {
+        auto app = contentApp.get();
+
+        ChipLogProgress(DeviceLayer, "Content app vid=%d pid=%d is on ep=%d",
+                        app->GetApplicationBasicDelegate()->HandleGetVendorId(),
+                        app->GetApplicationBasicDelegate()->HandleGetProductId(), app->GetEndpointId());
+    }
 }
 
 Access::Privilege ContentAppFactoryImpl::GetVendorPrivilege(uint16_t vendorId)
@@ -691,10 +803,6 @@ CHIP_ERROR AppTvInit()
 #if CHIP_DEVICE_CONFIG_APP_PLATFORM_ENABLED
     ContentAppPlatform::GetInstance().SetupAppPlatform();
     ContentAppPlatform::GetInstance().SetContentAppFactory(&gFactory);
-    gFactory.InstallContentApp((uint16_t) 1, (uint16_t) 11);
-    gFactory.InstallContentApp((uint16_t) 65521, (uint16_t) 32768);
-    gFactory.InstallContentApp((uint16_t) 9050, (uint16_t) 22);
-    gFactory.InstallContentApp((uint16_t) 1111, (uint16_t) 22);
     uint16_t value;
     if (DeviceLayer::GetDeviceInstanceInfoProvider()->GetVendorId(value) != CHIP_NO_ERROR)
     {

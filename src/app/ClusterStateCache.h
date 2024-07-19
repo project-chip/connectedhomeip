@@ -102,8 +102,6 @@ public:
      * @param [in] callback the derived callback which inherit from ReadClient::Callback
      * @param [in] highestReceivedEventNumber optional highest received event number, if cache receive the events with the number
      *             less than or equal to this value, skip those events
-     * @param [in] cacheData boolean to decide whether this cache would store attribute/event data/status,
-     *             the default is true.
      */
     ClusterStateCacheT(Callback & callback, Optional<EventNumber> highestReceivedEventNumber = Optional<EventNumber>::Missing()) :
         mCallback(callback), mBufferedReader(*this)
@@ -505,6 +503,22 @@ public:
             ReturnErrorOnFailure(func(item.first, item.second));
         }
     }
+
+    /*
+     * Clear out all the attribute data and DataVersions stored for a given endpoint.
+     */
+    void ClearAttributes(EndpointId endpoint);
+
+    /*
+     * Clear out all the attribute data and the DataVersion stored for a given cluster.
+     */
+    void ClearAttributes(const ConcreteClusterPath & cluster);
+
+    /*
+     * Clear out the data (or size, if not storing data) stored for an
+     * attribute.
+     */
+    void ClearAttribute(const ConcreteAttributePath & attribute);
 
     /*
      * Clear out the event data and status caches.

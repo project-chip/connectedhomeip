@@ -121,7 +121,7 @@ using namespace chip::Tracing::DarwinFramework;
     MTRP256KeypairBridge _operationalKeypairBridge;
     MTRDeviceAttestationDelegateBridge * _deviceAttestationDelegateBridge;
     MTRDeviceControllerFactory * _factory;
-    NSMutableDictionary * _nodeIDToDeviceMap;
+    NSMapTable * _nodeIDToDeviceMap;
     os_unfair_lock _deviceMapLock; // protects nodeIDToDeviceMap
     MTRCommissionableBrowser * _commissionableBrowser;
     MTRAttestationTrustStoreBridge * _attestationTrustStoreBridge;
@@ -236,7 +236,7 @@ using namespace chip::Tracing::DarwinFramework;
         _chipWorkQueue = queue;
         _factory = factory;
         _deviceMapLock = OS_UNFAIR_LOCK_INIT;
-        _nodeIDToDeviceMap = [NSMutableDictionary dictionary];
+        _nodeIDToDeviceMap = [NSMapTable strongToWeakObjectsMapTable];
         _serverEndpoints = [[NSMutableArray alloc] init];
         _commissionableBrowser = nil;
 
@@ -295,6 +295,7 @@ using namespace chip::Tracing::DarwinFramework;
         return;
     }
 
+    MTR_LOG("Shutting down MTRDeviceController: %@", self);
     [self cleanupAfterStartup];
 }
 
@@ -306,8 +307,9 @@ using namespace chip::Tracing::DarwinFramework;
     // do the secure session shutdowns.  Since we don't want to hold the lock
     // while calling out into arbitrary invalidation code, snapshot the list of
     // devices before we start invalidating.
+    MTR_LOG("cleanupAfterStartup MTRDeviceController: %@", self);
     os_unfair_lock_lock(&_deviceMapLock);
-    NSArray<MTRDevice *> * devices = [_nodeIDToDeviceMap allValues];
+    NSEnumerator * devices = [_nodeIDToDeviceMap objectEnumerator];
     [_nodeIDToDeviceMap removeAllObjects];
     os_unfair_lock_unlock(&_deviceMapLock);
 
@@ -323,6 +325,7 @@ using namespace chip::Tracing::DarwinFramework;
 // in a very specific way that only MTRDeviceControllerFactory knows about.
 - (void)shutDownCppController
 {
+    MTR_LOG("shutDownCppController MTRDeviceController: %p", self);
     assertChipStackLockedByCurrentThread();
 
     // Shut down all our endpoints.
@@ -605,13 +608,26 @@ using namespace chip::Tracing::DarwinFramework;
             MTR_LOG("Loaded attribute values for %lu nodes from storage for controller uuid %@", static_cast<unsigned long>(clusterDataByNode.count), self->_uniqueIdentifier);
 
             std::lock_guard lock(self->_deviceMapLock);
+            NSMutableArray * deviceList = [NSMutableArray array];
             for (NSNumber * nodeID in clusterDataByNode) {
                 NSDictionary * clusterData = clusterDataByNode[nodeID];
                 MTRDevice * device = [self _setupDeviceForNodeID:nodeID prefetchedClusterData:clusterData];
                 MTR_LOG("Loaded %lu cluster data from storage for %@", static_cast<unsigned long>(clusterData.count), device);
+
+                [deviceList addObject:device];
             }
+
+#define kSecondsToWaitBeforeAPIClientRetainsMTRDevice 60
+            // Keep the devices retained for a while, in case API client doesn't immediately retain them.
+            //
+            // Note that this is just an optimization to avoid throwing the information away and immediately
+            // re-reading it from storage.
+            dispatch_after(dispatch_time(DISPATCH_TIME_NOW, (int64_t) (kSecondsToWaitBeforeAPIClientRetainsMTRDevice * NSEC_PER_SEC)), dispatch_get_main_queue(), ^{
+                MTR_LOG("MTRDeviceController: un-retain devices loaded at startup %lu", static_cast<unsigned long>(deviceList.count));
+            });
         }];
     }
+    MTR_LOG("MTRDeviceController startup: %@", self);
 
     return YES;
 }
@@ -970,7 +986,7 @@ static inline void emitMetricForSetupPayload(MTRSetupPayload * payload)
     // which will be in exactly the state it would be in if it were created
     // while we were running and then we got shut down.
     if ([self isRunning]) {
-        _nodeIDToDeviceMap[nodeID] = deviceToReturn;
+        [_nodeIDToDeviceMap setObject:deviceToReturn forKey:nodeID];
     }
 
     if (prefetchedClusterData) {
@@ -1002,7 +1018,7 @@ static inline void emitMetricForSetupPayload(MTRSetupPayload * payload)
 - (MTRDevice *)deviceForNodeID:(NSNumber *)nodeID
 {
     std::lock_guard lock(_deviceMapLock);
-    MTRDevice * deviceToReturn = _nodeIDToDeviceMap[nodeID];
+    MTRDevice * deviceToReturn = [_nodeIDToDeviceMap objectForKey:nodeID];
     if (!deviceToReturn) {
         deviceToReturn = [self _setupDeviceForNodeID:nodeID prefetchedClusterData:nil];
     }
@@ -1014,10 +1030,10 @@ static inline void emitMetricForSetupPayload(MTRSetupPayload * payload)
 {
     std::lock_guard lock(_deviceMapLock);
     auto * nodeID = device.nodeID;
-    MTRDevice * deviceToRemove = _nodeIDToDeviceMap[nodeID];
+    MTRDevice * deviceToRemove = [_nodeIDToDeviceMap objectForKey:nodeID];
     if (deviceToRemove == device) {
         [deviceToRemove invalidate];
-        _nodeIDToDeviceMap[nodeID] = nil;
+        [_nodeIDToDeviceMap removeObjectForKey:nodeID];
     } else {
         MTR_LOG_ERROR("Error: Cannot remove device %p with nodeID %llu", device, nodeID.unsignedLongLongValue);
     }
@@ -1029,7 +1045,7 @@ static inline void emitMetricForSetupPayload(MTRSetupPayload * payload)
     std::lock_guard lock(_deviceMapLock);
     NSMutableDictionary<NSNumber *, NSNumber *> * deviceAttributeCounts = [NSMutableDictionary dictionary];
     for (NSNumber * nodeID in _nodeIDToDeviceMap) {
-        deviceAttributeCounts[nodeID] = @([_nodeIDToDeviceMap[nodeID] unitTestAttributeCount]);
+        deviceAttributeCounts[nodeID] = @([[_nodeIDToDeviceMap objectForKey:nodeID] unitTestAttributeCount]);
     }
     return deviceAttributeCounts;
 }
@@ -1101,7 +1117,7 @@ static inline void emitMetricForSetupPayload(MTRSetupPayload * payload)
         chip::CommissioneeDeviceProxy * deviceProxy;
 
         auto errorCode = CHIP_NO_ERROR;
-        MATTER_LOG_METRIC_SCOPE(kMetricPASEVerifierForSetupCode, errorCode);
+        MATTER_LOG_METRIC_SCOPE(kMetricAttestationChallengeForDevice, errorCode);
 
         errorCode = self->_cppCommissioner->GetDeviceBeingCommissioned([deviceID unsignedLongLongValue], &deviceProxy);
         VerifyOrReturnValue(![MTRDeviceController checkForError:errorCode logMsg:kErrorGetCommissionee error:nil], nil);
@@ -1247,7 +1263,7 @@ static inline void emitMetricForSetupPayload(MTRSetupPayload * payload)
         return YES;
     }
 
-    MTR_LOG_ERROR("Error: %s", [kErrorNotRunning UTF8String]);
+    MTR_LOG_ERROR("MTRDeviceController: %@ Error: %s", self, [kErrorNotRunning UTF8String]);
     if (error) {
         *error = [MTRError errorForCHIPErrorCode:CHIP_ERROR_INCORRECT_STATE];
     }
@@ -1257,15 +1273,12 @@ static inline void emitMetricForSetupPayload(MTRSetupPayload * payload)
 
 - (void)getSessionForNode:(chip::NodeId)nodeID completion:(MTRInternalDeviceConnectionCallback)completion
 {
-    // First check if MTRDevice exists from having loaded from storage, or created by a client.
-    // Do not use deviceForNodeID here, because we don't want to create the device if it does not already exist.
-    os_unfair_lock_lock(&_deviceMapLock);
-    MTRDevice * device = _nodeIDToDeviceMap[@(nodeID)];
-    os_unfair_lock_unlock(&_deviceMapLock);
+    // Get the corresponding MTRDevice object to determine if the case/subscription pool is to be used
+    MTRDevice * device = [self deviceForNodeID:@(nodeID)];
 
     // In the case that this device is known to use thread, queue this with subscription attempts as well, to
     // help with throttling Thread traffic.
-    if (device && [device deviceUsesThread]) {
+    if ([device deviceUsesThread]) {
         MTRAsyncWorkItem * workItem = [[MTRAsyncWorkItem alloc] initWithQueue:dispatch_get_global_queue(QOS_CLASS_DEFAULT, 0)];
         [workItem setReadyHandler:^(id _Nonnull context, NSInteger retryCount, MTRAsyncWorkCompletionBlock _Nonnull workItemCompletion) {
             MTRInternalDeviceConnectionCallback completionWrapper = ^(chip::Messaging::ExchangeManager * _Nullable exchangeManager,
@@ -1482,7 +1495,7 @@ static inline void emitMetricForSetupPayload(MTRSetupPayload * payload)
     // Don't use deviceForNodeID here, because we don't want to create the
     // device if it does not already exist.
     os_unfair_lock_lock(&_deviceMapLock);
-    MTRDevice * device = _nodeIDToDeviceMap[@(nodeID)];
+    MTRDevice * device = [_nodeIDToDeviceMap objectForKey:@(nodeID)];
     os_unfair_lock_unlock(&_deviceMapLock);
 
     if (device == nil) {
@@ -1876,10 +1889,10 @@ static inline void emitMetricForSetupPayload(MTRSetupPayload * payload)
         return NO;
     }
 
-    __block CHIP_ERROR errorCode = CHIP_NO_ERROR;
-    MATTER_LOG_METRIC_SCOPE(kMetricOpenPairingWindow, errorCode);
-
     auto block = ^BOOL {
+        CHIP_ERROR errorCode = CHIP_NO_ERROR;
+        MATTER_LOG_METRIC_SCOPE(kMetricOpenPairingWindow, errorCode);
+
         errorCode = chip::Controller::AutoCommissioningWindowOpener::OpenBasicCommissioningWindow(
             self->_cppCommissioner, deviceID, chip::System::Clock::Seconds16(static_cast<uint16_t>(duration)));
         return ![MTRDeviceController checkForError:errorCode logMsg:kErrorOpenPairingWindow error:error];

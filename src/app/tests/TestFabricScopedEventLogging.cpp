@@ -53,20 +53,9 @@ static uint8_t gInfoEventBuffer[128];
 static uint8_t gCritEventBuffer[128];
 static chip::app::CircularEventBuffer gCircularEventBuffer[3];
 
-class TestFabricScopedEventLogging : public ::testing::Test
+class TestFabricScopedEventLogging : public chip::Test::AppContext
 {
 public:
-    static void SetUpTestSuite()
-    {
-        mpTestContext = new chip::Test::AppContext;
-        mpTestContext->SetUpTestSuite();
-    }
-    static void TearDownTestSuite()
-    {
-        mpTestContext->TearDownTestSuite();
-        delete mpTestContext;
-    }
-
     // Performs setup for each individual test in the test suite
     void SetUp() override
     {
@@ -76,10 +65,10 @@ public:
             { &gCritEventBuffer[0], sizeof(gCritEventBuffer), chip::app::PriorityLevel::Critical },
         };
 
-        mpTestContext->SetUp();
+        AppContext::SetUp();
 
         ASSERT_EQ(mEventCounter.Init(0), CHIP_NO_ERROR);
-        chip::app::EventManagement::CreateEventManagement(&mpTestContext->GetExchangeManager(), ArraySize(logStorageResources),
+        chip::app::EventManagement::CreateEventManagement(&GetExchangeManager(), ArraySize(logStorageResources),
                                                           gCircularEventBuffer, logStorageResources, &mEventCounter);
     }
 
@@ -87,15 +76,12 @@ public:
     void TearDown() override
     {
         chip::app::EventManagement::DestroyEventManagement();
-        mpTestContext->TearDown();
+        AppContext::TearDown();
     }
-
-    static chip::Test::AppContext * mpTestContext;
 
 private:
     chip::MonotonicallyIncreasingCounter<chip::EventNumber> mEventCounter;
 };
-chip::Test::AppContext * TestFabricScopedEventLogging::mpTestContext = nullptr;
 
 void ENFORCE_FORMAT(1, 2) SimpleDumpWriter(const char * aFormat, ...)
 {

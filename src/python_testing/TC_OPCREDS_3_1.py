@@ -14,7 +14,17 @@
 #    See the License for the specific language governing permissions and
 #    limitations under the License.
 #
-
+# See https://github.com/project-chip/connectedhomeip/blob/master/docs/testing/python.md#defining-the-ci-test-arguments
+# for details about the block below.
+#
+# === BEGIN CI TEST ARGUMENTS ===
+# test-runner-runs: run1
+# test-runner-run/run1/app: ${ALL_CLUSTERS_APP}
+# test-runner-run/run1/factoryreset: True
+# test-runner-run/run1/quiet: True
+# test-runner-run/run1/app-args: --discriminator 1234 --KVS kvs1 --trace-to json:${TRACE_APP}.json
+# test-runner-run/run1/script-args: --storage-path admin_storage.json --commissioning-method on-network --discriminator 1234 --passcode 20202021 --PICS src/app/tests/suites/certification/ci-pics-values --trace-to json:${TRACE_TEST_JSON}.json --trace-to perfetto:${TRACE_TEST_PERFETTO}.perfetto
+# === END CI TEST ARGUMENTS ===
 import copy
 import logging
 import random
@@ -30,19 +40,19 @@ from mobly import asserts
 
 
 class TC_OPCREDS_3_1(MatterBaseTest):
-    def FindAndEstablishPase(self, longDiscriminator: int, setupPinCode: int, nodeid: int, dev_ctrl: ChipDeviceCtrl = None):
+    async def FindAndEstablishPase(self, longDiscriminator: int, setupPinCode: int, nodeid: int, dev_ctrl: ChipDeviceCtrl = None):
         if dev_ctrl is None:
             dev_ctrl = self.default_controller
 
-        devices = dev_ctrl.DiscoverCommissionableNodes(
+        devices = await dev_ctrl.DiscoverCommissionableNodes(
             filterType=Discovery.FilterType.LONG_DISCRIMINATOR, filter=longDiscriminator, stopOnFirst=False)
         # For some reason, the devices returned here aren't filtered, so filter ourselves
         device = next(filter(lambda d: d.commissioningMode ==
                       Discovery.FilterType.LONG_DISCRIMINATOR and d.longDiscriminator == longDiscriminator, devices))
         for a in device.addresses:
             try:
-                dev_ctrl.EstablishPASESessionIP(ipaddr=a, setupPinCode=setupPinCode,
-                                                nodeid=nodeid, port=device.port)
+                await dev_ctrl.EstablishPASESessionIP(ipaddr=a, setupPinCode=setupPinCode,
+                                                      nodeid=nodeid, port=device.port)
                 break
             except ChipStackError:
                 continue
@@ -51,11 +61,11 @@ class TC_OPCREDS_3_1(MatterBaseTest):
         except TimeoutError:
             asserts.fail("Unable to establish a PASE session to the device")
 
-    def OpenCommissioningWindow(self, dev_ctrl: ChipDeviceCtrl, node_id: int):
+    async def OpenCommissioningWindow(self, dev_ctrl: ChipDeviceCtrl, node_id: int):
         # TODO: abstract this in the base layer? Do we do this a lot?
         longDiscriminator = random.randint(0, 4095)
         try:
-            params = dev_ctrl.OpenCommissioningWindow(
+            params = await dev_ctrl.OpenCommissioningWindow(
                 nodeid=node_id, timeout=600, iteration=10000, discriminator=longDiscriminator, option=ChipDeviceCtrl.ChipDeviceControllerBase.CommissioningWindowPasscode.kTokenWithRandomPin)
         except Exception as e:
             logging.exception('Error running OpenCommissioningWindow %s', e)
@@ -85,7 +95,7 @@ class TC_OPCREDS_3_1(MatterBaseTest):
                             "Device fabric table is full - please remove one fabric and retry")
 
         self.print_step(1, "TH0 opens a commissioning window on the DUT")
-        longDiscriminator, params = self.OpenCommissioningWindow(self.default_controller, self.dut_node_id)
+        longDiscriminator, params = await self.OpenCommissioningWindow(self.default_controller, self.dut_node_id)
 
         self.print_step(
             2, "TH0 reads the BasicCommissioningInfo field from the General commissioning cluster saves MaxCumulativeFailsafeSeconds as `failsafe_max`")
@@ -94,8 +104,8 @@ class TC_OPCREDS_3_1(MatterBaseTest):
 
         self.print_step(3, "TH1 opens a PASE connection to the DUT")
         newNodeId = self.dut_node_id + 1
-        self.FindAndEstablishPase(dev_ctrl=TH1, longDiscriminator=longDiscriminator,
-                                  setupPinCode=params.setupPinCode, nodeid=newNodeId)
+        await self.FindAndEstablishPase(dev_ctrl=TH1, longDiscriminator=longDiscriminator,
+                                        setupPinCode=params.setupPinCode, nodeid=newNodeId)
 
         self.print_step(4, "TH1 sends ArmFailSafe command to the DUT with the ExpiryLengthSeconds field set to failsafe_max")
         resp = await self.send_single_cmd(dev_ctrl=TH1, node_id=newNodeId, cmd=Clusters.GeneralCommissioning.Commands.ArmFailSafe(failsafe_max))
@@ -109,7 +119,7 @@ class TC_OPCREDS_3_1(MatterBaseTest):
         self.print_step(6, "TH1 obtains or generates the NOC, the Root CA Certificate and ICAC using csrResponse and selects an IPK. The certificates shall have their subjects padded with additional data such that they are each the maximum certificate size of 400 bytes when encoded in the MatterCertificateEncoding.")
         # Our CA is set up to maximize cert chains already
         # Extract the RCAC public key and save as `Root_Public_Key_TH1`
-        TH1_certs_real = TH1.IssueNOCChain(csrResponse, newNodeId)
+        TH1_certs_real = await TH1.IssueNOCChain(csrResponse, newNodeId)
         if (TH1_certs_real.rcacBytes is None or
                 TH1_certs_real.icacBytes is None or
                 TH1_certs_real.nocBytes is None or TH1_certs_real.ipkBytes is None):
@@ -125,7 +135,7 @@ class TC_OPCREDS_3_1(MatterBaseTest):
         TH1_CA_fake = self.certificate_authority_manager.NewCertificateAuthority()
         TH1_fabric_admin_fake = TH1_CA_fake.NewFabricAdmin(vendorId=0xFFF1, fabricId=2)
         TH1_fake = TH1_fabric_admin_fake.NewController(nodeId=self.default_controller.nodeId)
-        TH1_certs_fake = TH1_fake.IssueNOCChain(csrResponse, newNodeId)
+        TH1_certs_fake = await TH1_fake.IssueNOCChain(csrResponse, newNodeId)
         if (TH1_certs_fake.rcacBytes is None or
                 TH1_certs_fake.icacBytes is None or
                 TH1_certs_fake.nocBytes is None or TH1_certs_real.ipkBytes is None):
@@ -342,8 +352,8 @@ class TC_OPCREDS_3_1(MatterBaseTest):
 
         self.print_step(33, "TH1 reconnects to the DUT over PASE")
         TH1.ExpireSessions(newNodeId)
-        self.FindAndEstablishPase(dev_ctrl=TH1, longDiscriminator=longDiscriminator,
-                                  setupPinCode=params.setupPinCode, nodeid=newNodeId)
+        await self.FindAndEstablishPase(dev_ctrl=TH1, longDiscriminator=longDiscriminator,
+                                        setupPinCode=params.setupPinCode, nodeid=newNodeId)
 
         self.print_step(34, "TH1 reads the TrustedRootCertificates list from DUT and verifies the TH1 root is not present")
         trusted_root_list = await self.read_single_attribute_check_success(dev_ctrl=TH1, node_id=newNodeId, cluster=opcreds, attribute=opcreds.Attributes.TrustedRootCertificates)
@@ -361,7 +371,7 @@ class TC_OPCREDS_3_1(MatterBaseTest):
         asserts.assert_equal(len(fabrics), fabrics_original_size, "Fabric list size does not match original")
 
         self.print_step(37, "TH1 fully commissions DUT onto the fabric using a set of valid certificates")
-        TH1.Commission(newNodeId)
+        await TH1.Commission(newNodeId)
 
         self.print_step(
             38, "TH1 reads the TrustedRootCertificates list from DUT and verify that there are trusted_root_original_size + 1 entries")
@@ -404,7 +414,7 @@ class TC_OPCREDS_3_1(MatterBaseTest):
             resp.statusCode, opcreds.Enums.NodeOperationalCertStatusEnum.kOk, "Failure on UpdateFabricLabel")
 
         self.print_step(44, "TH1 sends an OpenCommissioningWindow command to the Administrator Commissioning cluster")
-        longDiscriminator, params = self.OpenCommissioningWindow(TH1, newNodeId)
+        longDiscriminator, params = await self.OpenCommissioningWindow(TH1, newNodeId)
 
         self.print_step(45, "TH2 commissions the DUT")
         TH2_CA = self.certificate_authority_manager.NewCertificateAuthority(maximizeCertChains=True)
@@ -413,7 +423,7 @@ class TC_OPCREDS_3_1(MatterBaseTest):
         TH2_nodeid = self.default_controller.nodeId+2
         TH2 = TH2_fabric_admin.NewController(nodeId=TH2_nodeid)
         TH2_dut_nodeid = self.dut_node_id+2
-        TH2.CommissionOnNetwork(
+        await TH2.CommissionOnNetwork(
             nodeId=TH2_dut_nodeid, setupPinCode=params.setupPinCode,
             filterType=ChipDeviceCtrl.DiscoveryFilterType.LONG_DISCRIMINATOR, filter=longDiscriminator)
 
@@ -484,7 +494,7 @@ class TC_OPCREDS_3_1(MatterBaseTest):
         temp_CA = self.certificate_authority_manager.NewCertificateAuthority()
         temp_fabric_admin = temp_CA.NewFabricAdmin(vendorId=0xFFF1, fabricId=3)
         temp_controller = temp_fabric_admin.NewController(nodeId=self.default_controller.nodeId)
-        temp_certs = temp_controller.IssueNOCChain(csrResponse, newNodeId)
+        temp_certs = await temp_controller.IssueNOCChain(csrResponse, newNodeId)
         if (temp_certs.rcacBytes is None or
                 temp_certs.icacBytes is None or
                 temp_certs.nocBytes is None or temp_certs.ipkBytes is None):
@@ -521,7 +531,7 @@ class TC_OPCREDS_3_1(MatterBaseTest):
 
         self.print_step(61, "TH1 obtains or generates a NOC and ICAC using the CSR elements from the previous step with a different NodeID, but the same Root CA Certificate and fabric ID as step <<TH1-gen-real-creds>>. Save as `Node_Operational_Certificates_TH1_fabric_conflict` and `Intermediate_Certificate_TH1_fabric_conflict`|")
         anotherNodeId = newNodeId + 1
-        TH1_certs_fabric_conflict = TH1.IssueNOCChain(csrResponse_new, anotherNodeId)
+        TH1_certs_fabric_conflict = await TH1.IssueNOCChain(csrResponse_new, anotherNodeId)
         if (TH1_certs_fabric_conflict.rcacBytes is None or
                 TH1_certs_fabric_conflict.icacBytes is None or
                 TH1_certs_fabric_conflict.nocBytes is None or TH1_certs_fabric_conflict.ipkBytes is None):
@@ -565,7 +575,7 @@ class TC_OPCREDS_3_1(MatterBaseTest):
                             "Unexpected response type for UpdateNOC csr request")
 
         self.print_step(68, "TH1 obtains or generates a NOC, Root CA Certificate, ICAC using the CSR elements from the previous step")
-        TH1_certs_3 = TH1.IssueNOCChain(csrResponse, anotherNodeId)
+        TH1_certs_3 = await TH1.IssueNOCChain(csrResponse, anotherNodeId)
         if (TH1_certs_3.rcacBytes is None or
                 TH1_certs_3.icacBytes is None or
                 TH1_certs_3.nocBytes is None or TH1_certs_3.ipkBytes is None):

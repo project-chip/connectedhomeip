@@ -15,6 +15,19 @@
 #    See the License for the specific language governing permissions and
 #    limitations under the License.
 #
+
+# See https://github.com/project-chip/connectedhomeip/blob/master/docs/testing/python.md#defining-the-ci-test-arguments
+# for details about the block below.
+#
+# === BEGIN CI TEST ARGUMENTS ===
+# test-runner-runs: run1
+# test-runner-run/run1/app: ${LIT_ICD_APP}
+# test-runner-run/run1/factoryreset: True
+# test-runner-run/run1/quiet: True
+# test-runner-run/run1/app-args: --discriminator 1234 --KVS kvs1 --trace-to json:${TRACE_APP}.json
+# test-runner-run/run1/script-args: --storage-path admin_storage.json --commissioning-method on-network --discriminator 1234 --passcode 20202021 --PICS src/app/tests/suites/certification/ci-pics-values --trace-to json:${TRACE_TEST_JSON}.json --trace-to perfetto:${TRACE_TEST_PERFETTO}.perfetto
+# === END CI TEST ARGUMENTS ===
+
 import logging
 import os
 
@@ -30,6 +43,7 @@ kRootEndpointId = 0
 cluster = Clusters.Objects.IcdManagement
 commands = cluster.Commands
 monitoredRegistration = cluster.Structs.MonitoringRegistrationStruct
+clientTypeEnum = cluster.Enums.ClientTypeEnum
 
 
 # Step 2 Registration entry
@@ -133,7 +147,7 @@ class TC_ICDM_3_1(MatterBaseTest):
         self.step(2)
         if self.pics_guard(self.check_pics("ICDM.S.C00.Rsp")):
             try:
-                response = await self._send_single_icdm_command(commands.RegisterClient(checkInNodeID=kStep2CheckInNodeId, monitoredSubject=kStep2MonitoredSubjectStep2, key=kStep2Key))
+                response = await self._send_single_icdm_command(commands.RegisterClient(checkInNodeID=kStep2CheckInNodeId, monitoredSubject=kStep2MonitoredSubjectStep2, key=kStep2Key, clientType=clientTypeEnum.kEphemeral))
             except InteractionModelError as e:
                 asserts.assert_equal(
                     e.status, Status.Success, "Unexpected error returned")
@@ -156,6 +170,8 @@ class TC_ICDM_3_1(MatterBaseTest):
                 registeredClients[0].checkInNodeID, kStep2CheckInNodeId, "The read attribute does not match the registered value.")
             asserts.assert_equal(
                 registeredClients[0].monitoredSubject, kStep2MonitoredSubjectStep2, "The read attribute does not match the registered value.")
+            asserts.assert_equal(
+                registeredClients[0].clientType, clientTypeEnum.kEphemeral, "The read attribute does not match the registered value.")
 
         self.step(4)
         if self.pics_guard(self.check_pics("ICDM.S.C00.Rsp")):
@@ -166,12 +182,13 @@ class TC_ICDM_3_1(MatterBaseTest):
                     newClients.append({
                         "checkInNodeID": i + 1,
                         "monitoredSubject": i + 1,
-                        "key": os.urandom(16)
+                        "key": os.urandom(16),
+                        "clientType": clientTypeEnum.kPermanent
                     })
 
             for client in newClients:
                 try:
-                    response = await self._send_single_icdm_command(commands.RegisterClient(checkInNodeID=client["checkInNodeID"], monitoredSubject=client["monitoredSubject"], key=client["key"]))
+                    response = await self._send_single_icdm_command(commands.RegisterClient(checkInNodeID=client["checkInNodeID"], monitoredSubject=client["monitoredSubject"], key=client["key"], clientType=client["clientType"]))
                 except InteractionModelError as e:
                     asserts.assert_equal(
                         e.status, Status.Success, "Unexpected error returned")
@@ -195,11 +212,13 @@ class TC_ICDM_3_1(MatterBaseTest):
                     client.checkInNodeID, expectedClient["checkInNodeID"], "The read attribute does not match the registered value.")
                 asserts.assert_equal(
                     client.monitoredSubject, expectedClient["monitoredSubject"], "The read attribute does not match the registered value.")
+                asserts.assert_equal(
+                    client.clientType, expectedClient["clientType"], "The read attribute does not match the registered value.")
 
         self.step(6)
         if self.pics_guard(self.check_pics("ICDM.S.C00.Rsp")):
             try:
-                response = await self._send_single_icdm_command(commands.RegisterClient(checkInNodeID=0xFFFF, monitoredSubject=0xFFFF, key=os.urandom(16)))
+                response = await self._send_single_icdm_command(commands.RegisterClient(checkInNodeID=0xFFFF, monitoredSubject=0xFFFF, key=os.urandom(16), clientType=clientTypeEnum.kPermanent))
             except InteractionModelError as e:
                 asserts.assert_equal(
                     e.status, Status.ResourceExhausted, "Unexpected error returned")

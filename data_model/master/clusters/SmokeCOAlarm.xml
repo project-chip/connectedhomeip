@@ -1,0 +1,308 @@
+<?xml version="1.0"?>
+<!--
+Copyright (C) Connectivity Standards Alliance (2021). All rights reserved.
+The information within this document is the property of the Connectivity
+Standards Alliance and its use and disclosure are restricted, except as
+expressly set forth herein.
+
+Connectivity Standards Alliance hereby grants you a fully-paid, non-exclusive,
+nontransferable, worldwide, limited and revocable license (without the right to
+sublicense), under Connectivity Standards Alliance's applicable copyright
+rights, to view, download, save, reproduce and use the document solely for your
+own internal purposes and in accordance with the terms of the license set forth
+herein. This license does not authorize you to, and you expressly warrant that
+you shall not: (a) permit others (outside your organization) to use this
+document; (b) post or publish this document; (c) modify, adapt, translate, or
+otherwise change this document in any manner or create any derivative work
+based on this document; (d) remove or modify any notice or label on this
+document, including this Copyright Notice, License and Disclaimer. The
+Connectivity Standards Alliance does not grant you any license hereunder other
+than as expressly stated herein.
+
+Elements of this document may be subject to third party intellectual property
+rights, including without limitation, patent, copyright or trademark rights,
+and any such third party may or may not be a member of the Connectivity
+Standards Alliance. Connectivity Standards Alliance members grant other
+Connectivity Standards Alliance members certain intellectual property rights as
+set forth in the Connectivity Standards Alliance IPR Policy. Connectivity
+Standards Alliance members do not grant you any rights under this license. The
+Connectivity Standards Alliance is not responsible for, and shall not be held
+responsible in any manner for, identifying or failing to identify any or all
+such third party intellectual property rights. Please visit www.csa-iot.org for
+more information on how to become a member of the Connectivity Standards
+Alliance.
+
+This document and the information contained herein are provided on an “AS IS”
+basis and the Connectivity Standards Alliance DISCLAIMS ALL WARRANTIES EXPRESS
+OR IMPLIED, INCLUDING BUT NOT LIMITED TO (A) ANY WARRANTY THAT THE USE OF THE
+INFORMATION HEREIN WILL NOT INFRINGE ANY RIGHTS OF THIRD PARTIES (INCLUDING
+WITHOUT LIMITATION ANY INTELLECTUAL PROPERTY RIGHTS INCLUDING PATENT, COPYRIGHT
+OR TRADEMARK RIGHTS); OR (B) ANY IMPLIED WARRANTIES OF MERCHANTABILITY, FITNESS
+FOR A PARTICULAR PURPOSE, TITLE OR NONINFRINGEMENT. IN NO EVENT WILL THE
+CONNECTIVITY STANDARDS ALLIANCE BE LIABLE FOR ANY LOSS OF PROFITS, LOSS OF
+BUSINESS, LOSS OF USE OF DATA, INTERRUPTION OF BUSINESS, OR FOR ANY OTHER
+DIRECT, INDIRECT, SPECIAL OR EXEMPLARY, INCIDENTAL, PUNITIVE OR CONSEQUENTIAL
+DAMAGES OF ANY KIND, IN CONTRACT OR IN TORT, IN CONNECTION WITH THIS DOCUMENT
+OR THE INFORMATION CONTAINED HEREIN, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH
+LOSS OR DAMAGE.
+
+All company, brand and product names in this document may be trademarks that
+are the sole property of their respective owners.
+
+This notice and disclaimer must be included on all copies of this document.
+
+Connectivity Standards Alliance
+508 Second Street, Suite 206
+Davis, CA 95616, USA
+
+:xrefstyle: basic
+-->
+<cluster xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="types types.xsd cluster cluster.xsd" id="0x005C" name="Smoke CO Alarm Cluster" revision="1">
+  <revisionHistory>
+    <revision revision="1" summary="Initial Release"/>
+  </revisionHistory>
+  <clusterIds>
+    <clusterId id="0x005C" name="Smoke CO Alarm"/>
+  </clusterIds>
+  <classification hierarchy="base" role="application" picsCode="SMOKECO" scope="Endpoint"/>
+  <features>
+    <feature bit="0" code="SMOKE" name="SmokeAlarm" summary="Supports Smoke alarm">
+      <optionalConform choice="a" more="true"/>
+    </feature>
+    <feature bit="1" code="CO" name="COAlarm" summary="Supports CO alarm">
+      <optionalConform choice="a" more="true"/>
+    </feature>
+  </features>
+  <dataTypes>
+    <enum name="AlarmStateEnum">
+      <item value="0" name="Normal" summary="Nominal state, the device is not alarming">
+        <mandatoryConform/>
+      </item>
+      <item value="1" name="Warning" summary="Warning state">
+        <optionalConform/>
+      </item>
+      <item value="2" name="Critical" summary="Critical state">
+        <mandatoryConform/>
+      </item>
+    </enum>
+    <enum name="ContaminationStateEnum">
+      <item value="0" name="Normal" summary="Nominal state, the sensor is not contaminated">
+        <mandatoryConform/>
+      </item>
+      <item value="1" name="Low" summary="Low contamination">
+        <optionalConform/>
+      </item>
+      <item value="2" name="Warning" summary="Warning state">
+        <optionalConform/>
+      </item>
+      <item value="3" name="Critical" summary="Critical state, will cause nuisance alarms">
+        <mandatoryConform/>
+      </item>
+    </enum>
+    <enum name="EndOfServiceEnum">
+      <item value="0" name="Normal" summary="Device has not expired">
+        <mandatoryConform/>
+      </item>
+      <item value="1" name="Expired" summary="Device has reached its end of service">
+        <mandatoryConform/>
+      </item>
+    </enum>
+    <enum name="ExpressedStateEnum">
+      <item value="0" name="Normal" summary="Nominal state, the device is not alarming">
+        <mandatoryConform/>
+      </item>
+      <item value="1" name="SmokeAlarm" summary="Smoke Alarm state">
+        <mandatoryConform>
+          <feature name="SMOKE"/>
+        </mandatoryConform>
+      </item>
+      <item value="2" name="COAlarm" summary="CO Alarm state">
+        <mandatoryConform>
+          <feature name="CO"/>
+        </mandatoryConform>
+      </item>
+      <item value="3" name="BatteryAlert" summary="Battery Alert State">
+        <mandatoryConform/>
+      </item>
+      <item value="4" name="Testing" summary="Test in Progress">
+        <mandatoryConform/>
+      </item>
+      <item value="5" name="HardwareFault" summary="Hardware Fault Alert State">
+        <mandatoryConform/>
+      </item>
+      <item value="6" name="EndOfService" summary="End of Service Alert State">
+        <mandatoryConform/>
+      </item>
+      <item value="7" name="InterconnectSmoke" summary="Interconnected Smoke Alarm State">
+        <optionalConform/>
+      </item>
+      <item value="8" name="InterconnectCO" summary="Interconnected CO Alarm State">
+        <optionalConform/>
+      </item>
+    </enum>
+    <enum name="MuteStateEnum">
+      <item value="0" name="NotMuted" summary="Not Muted">
+        <mandatoryConform/>
+      </item>
+      <item value="1" name="Muted" summary="Muted">
+        <mandatoryConform/>
+      </item>
+    </enum>
+    <enum name="SensitivityEnum">
+      <item value="0" name="High" summary="High sensitivity">
+        <optionalConform/>
+      </item>
+      <item value="1" name="Standard" summary="Standard Sensitivity">
+        <mandatoryConform/>
+      </item>
+      <item value="2" name="Low" summary="Low sensitivity">
+        <optionalConform/>
+      </item>
+    </enum>
+  </dataTypes>
+  <attributes>
+    <attribute id="0x0000" name="ExpressedState" type="ExpressedStateEnum">
+      <access read="true" readPrivilege="view"/>
+      <quality changeOmitted="false" nullable="false" scene="false" persistence="nonVolatile" reportable="false" sourceAttribution="false" quieterReporting="false"/>
+      <mandatoryConform/>
+    </attribute>
+    <attribute id="0x0001" name="SmokeState" type="AlarmStateEnum">
+      <access read="true" readPrivilege="view"/>
+      <quality changeOmitted="false" nullable="false" scene="false" persistence="nonVolatile" reportable="false" sourceAttribution="false" quieterReporting="false"/>
+      <mandatoryConform>
+        <feature name="SMOKE"/>
+      </mandatoryConform>
+    </attribute>
+    <attribute id="0x0002" name="COState" type="AlarmStateEnum">
+      <access read="true" readPrivilege="view"/>
+      <quality changeOmitted="false" nullable="false" scene="false" persistence="nonVolatile" reportable="false" sourceAttribution="false" quieterReporting="false"/>
+      <mandatoryConform>
+        <feature name="CO"/>
+      </mandatoryConform>
+    </attribute>
+    <attribute id="0x0003" name="BatteryAlert" type="AlarmStateEnum">
+      <access read="true" readPrivilege="view"/>
+      <quality changeOmitted="false" nullable="false" scene="false" persistence="nonVolatile" reportable="false" sourceAttribution="false" quieterReporting="false"/>
+      <mandatoryConform/>
+    </attribute>
+    <attribute id="0x0004" name="DeviceMuted" type="MuteStateEnum">
+      <access read="true" readPrivilege="view"/>
+      <quality changeOmitted="false" nullable="false" scene="false" persistence="nonVolatile" reportable="false" sourceAttribution="false" quieterReporting="false"/>
+      <optionalConform/>
+    </attribute>
+    <attribute id="0x0005" name="TestInProgress" type="bool">
+      <access read="true" readPrivilege="view"/>
+      <mandatoryConform/>
+    </attribute>
+    <attribute id="0x0006" name="HardwareFaultAlert" type="bool">
+      <access read="true" readPrivilege="view"/>
+      <quality changeOmitted="false" nullable="false" scene="false" persistence="nonVolatile" reportable="false" sourceAttribution="false" quieterReporting="false"/>
+      <mandatoryConform/>
+    </attribute>
+    <attribute id="0x0007" name="EndOfServiceAlert" type="EndOfServiceEnum">
+      <access read="true" readPrivilege="view"/>
+      <quality changeOmitted="false" nullable="false" scene="false" persistence="nonVolatile" reportable="false" sourceAttribution="false" quieterReporting="false"/>
+      <mandatoryConform/>
+    </attribute>
+    <attribute id="0x0008" name="InterconnectSmokeAlarm" type="AlarmStateEnum">
+      <access read="true" readPrivilege="view"/>
+      <optionalConform/>
+    </attribute>
+    <attribute id="0x0009" name="InterconnectCOAlarm" type="AlarmStateEnum">
+      <access read="true" readPrivilege="view"/>
+      <optionalConform/>
+    </attribute>
+    <attribute id="0x000A" name="ContaminationState" type="ContaminationStateEnum">
+      <access read="true" readPrivilege="view"/>
+      <optionalConform>
+        <feature name="SMOKE"/>
+      </optionalConform>
+    </attribute>
+    <attribute id="0x000B" name="SmokeSensitivityLevel" type="SensitivityEnum">
+      <access read="true" write="true" readPrivilege="view" writePrivilege="manage"/>
+      <optionalConform>
+        <feature name="SMOKE"/>
+      </optionalConform>
+    </attribute>
+    <attribute id="0x000C" name="ExpiryDate" type="epoch-s">
+      <access read="true" readPrivilege="view"/>
+      <quality changeOmitted="false" nullable="false" scene="false" persistence="fixed" reportable="false" sourceAttribution="false" quieterReporting="false"/>
+      <optionalConform/>
+    </attribute>
+  </attributes>
+  <commands>
+    <command id="0x00" name="SelfTestRequest" direction="commandToServer" response="Y">
+      <access invokePrivilege="operate"/>
+      <optionalConform/>
+    </command>
+  </commands>
+  <events>
+    <event id="0x00" name="SmokeAlarm" priority="critical">
+      <access readPrivilege="view"/>
+      <mandatoryConform>
+        <feature name="SMOKE"/>
+      </mandatoryConform>
+      <field id="0" name="AlarmSeverityLevel" type="AlarmStateEnum">
+        <mandatoryConform/>
+      </field>
+    </event>
+    <event id="0x01" name="COAlarm" priority="critical">
+      <access readPrivilege="view"/>
+      <mandatoryConform>
+        <feature name="CO"/>
+      </mandatoryConform>
+      <field id="0" name="AlarmSeverityLevel" type="AlarmStateEnum">
+        <mandatoryConform/>
+      </field>
+    </event>
+    <event id="0x02" name="LowBattery" priority="info">
+      <access readPrivilege="view"/>
+      <mandatoryConform/>
+      <field id="0" name="AlarmSeverityLevel" type="AlarmStateEnum">
+        <mandatoryConform/>
+      </field>
+    </event>
+    <event id="0x03" name="HardwareFault" priority="info">
+      <access readPrivilege="view"/>
+      <mandatoryConform/>
+    </event>
+    <event id="0x04" name="EndOfService" priority="info">
+      <access readPrivilege="view"/>
+      <mandatoryConform/>
+    </event>
+    <event id="0x05" name="SelfTestComplete" priority="info">
+      <access readPrivilege="view"/>
+      <mandatoryConform/>
+    </event>
+    <event id="0x06" name="AlarmMuted" priority="info">
+      <access readPrivilege="view"/>
+      <optionalConform/>
+    </event>
+    <event id="0x07" name="MuteEnded" priority="info">
+      <access readPrivilege="view"/>
+      <optionalConform/>
+    </event>
+    <event id="0x08" name="InterconnectSmokeAlarm" priority="critical">
+      <access readPrivilege="view"/>
+      <optionalConform>
+        <feature name="SMOKE"/>
+      </optionalConform>
+      <field id="0" name="AlarmSeverityLevel" type="AlarmStateEnum">
+        <mandatoryConform/>
+      </field>
+    </event>
+    <event id="0x09" name="InterconnectCOAlarm" priority="critical">
+      <access readPrivilege="view"/>
+      <optionalConform>
+        <feature name="CO"/>
+      </optionalConform>
+      <field id="0" name="AlarmSeverityLevel" type="AlarmStateEnum">
+        <mandatoryConform/>
+      </field>
+    </event>
+    <event id="0x0A" name="AllClear" priority="info">
+      <access readPrivilege="view"/>
+      <mandatoryConform/>
+    </event>
+  </events>
+</cluster>

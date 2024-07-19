@@ -14,6 +14,17 @@
 #    See the License for the specific language governing permissions and
 #    limitations under the License.
 
+# See https://github.com/project-chip/connectedhomeip/blob/master/docs/testing/python.md#defining-the-ci-test-arguments
+# for details about the block below.
+#
+# === BEGIN CI TEST ARGUMENTS ===
+# test-runner-runs: run1
+# test-runner-run/run1/app: ${ENERGY_MANAGEMENT_APP}
+# test-runner-run/run1/factoryreset: True
+# test-runner-run/run1/quiet: True
+# test-runner-run/run1/app-args: --discriminator 1234 --KVS kvs1 --trace-to json:${TRACE_APP}.json --enable-key 000102030405060708090a0b0c0d0e0f
+# test-runner-run/run1/script-args: --storage-path admin_storage.json --commissioning-method on-network --discriminator 1234 --passcode 20202021 --hex-arg enableKey:000102030405060708090a0b0c0d0e0f --endpoint 1 --trace-to json:${TRACE_TEST_JSON}.json --trace-to perfetto:${TRACE_TEST_PERFETTO}.perfetto
+# === END CI TEST ARGUMENTS ===
 
 import logging
 import time
@@ -39,30 +50,51 @@ class TC_EEVSE_2_4(MatterBaseTest, EEVSEBaseTestHelper):
 
     def steps_TC_EEVSE_2_4(self) -> list[TestStep]:
         steps = [
-            TestStep("1", "Commissioning, already done", is_commissioning=True),
-            TestStep("2", "TH reads TestEventTriggersEnabled attribute from General Diagnostics Cluster. Verify that TestEventTriggersEnabled attribute has a value of 1 (True)"),
+            TestStep("1", "Commissioning, already done",
+                     is_commissioning=True),
+            TestStep("2", "TH reads TestEventTriggersEnabled attribute from General Diagnostics Cluster",
+                     "Verify that TestEventTriggersEnabled attribute has a value of 1 (True)"),
             TestStep("3", "TH sends TestEventTrigger command to General Diagnostics Cluster on Endpoint 0 with EnableKey field set to PIXIT.EEVSE.TEST_EVENT_TRIGGER_KEY and EventTrigger field set to PIXIT.EEVSE.TEST_EVENT_TRIGGER for Basic Functionality Test Event"),
-            TestStep("3a", "After a few seconds TH reads from the DUT the State attribute. Verify value is 0x00 (NotPluggedIn)"),
-            TestStep("3b", "TH reads from the DUT the SupplyState attribute. Verify value is 0x00 (Disabled)"),
-            TestStep("3c", "TH reads from the DUT the FaultState attribute. Verify value is 0x00 (NoError)"),
-            TestStep("4", "TH sends TestEventTrigger command to General Diagnostics Cluster on Endpoint 0 with EnableKey field set to PIXIT.EEVSE.TEST_EVENT_TRIGGER_KEY and EventTrigger field set to PIXIT.EEVSE.TEST_EVENT_TRIGGER for EV Plugged-in Test Event. Verify Event EEVSE.S.E00(EVConnected) sent"),
-            TestStep("4a", "TH reads from the DUT the State attribute. Verify value is 0x01 (PluggedInNoDemand)"),
-            TestStep("4b", "TH reads from the DUT the SessionID attribute. Value is saved for later"),
+            TestStep("3a", "After a few seconds TH reads from the DUT the State attribute",
+                     "Verify value is 0x00 (NotPluggedIn)"),
+            TestStep("3b", "TH reads from the DUT the SupplyState attribute",
+                     "Verify value is 0x00 (Disabled)"),
+            TestStep("3c", "TH reads from the DUT the FaultState attribute",
+                     "Verify value is 0x00 (NoError)"),
+            TestStep("4", "TH sends TestEventTrigger command to General Diagnostics Cluster on Endpoint 0 with EnableKey field set to PIXIT.EEVSE.TEST_EVENT_TRIGGER_KEY and EventTrigger field set to PIXIT.EEVSE.TEST_EVENT_TRIGGER for EV Plugged-in Test Event",
+                     "Verify Event EEVSE.S.E00(EVConnected) sent"),
+            TestStep("4a", "TH reads from the DUT the State attribute",
+                     "Verify value is 0x01 (PluggedInNoDemand)"),
+            TestStep("4b",
+                     "TH reads from the DUT the SessionID attribute. Value is saved for later"),
             TestStep("5", "TH sends command EnableCharging with ChargingEnabledUntil=Null, minimumChargeCurrent=6000, maximumChargeCurrent=60000"),
-            TestStep("6", "TH sends TestEventTrigger command to General Diagnostics Cluster on Endpoint 0 with EnableKey field set to PIXIT.EEVSE.TEST_EVENT_TRIGGER_KEY and EventTrigger field set to PIXIT.EEVSE.TEST_EVENT_TRIGGER for EV Charge Demand Test Event. Verify Event EEVSE.S.E02(EnergyTransferStarted) sent."),
-            TestStep("6a", "TH reads from the DUT the State attribute. Verify value is 0x3 (PluggedInCharging)"),
-            TestStep("6b", "TH reads from the DUT the SupplyState attribute. Verify value is 0x1 (ChargingEnabled)"),
-            TestStep("7", "TH sends TestEventTrigger command to General Diagnostics Cluster on Endpoint 0 with EnableKey field set to PIXIT.EEVSE.TEST_EVENT_TRIGGER_KEY and EventTrigger field set to PIXIT.EEVSE.TEST_EVENT_TRIGGER for EVSE Ground Fault Test Event. Verify Event EEVSE.S.E04(Fault) sent with SessionID matching value in step 4b, FaultStatePreviousFaultState = 0x00 (NoError), FaultStateCurrentFaultState = 0x07 (GroundFault)"),
-            TestStep("7a", "TH reads from the DUT the State attribute. Verify value is 0x6 (Fault)"),
-            TestStep("7b", "TH reads from the DUT the SupplyState attribute. Verify value is 0x4 (DisabledError)"),
-            TestStep("8", "TH sends TestEventTrigger command to General Diagnostics Cluster on Endpoint 0 with EnableKey field set to PIXIT.EEVSE.TEST_EVENT_TRIGGER_KEY and EventTrigger field set to PIXIT.EEVSE.TEST_EVENT_TRIGGER for EVSE Over Temperature Fault Test Event. Verify Event EEVSE.S.E04(Fault) sent with SessionID matching value in step 4b, FaultStatePreviousFaultState = 0x07 (GroundFault), FaultStateCurrentFaultState = 0x0F (OverTemperature)"),
-            TestStep("8a", "TH reads from the DUT the State attribute. Verify value is 0x6 (Fault)"),
-            TestStep("8b", "TH reads from the DUT the SupplyState attribute. Verify value is 0x4 (DisabledError)"),
-            TestStep("9", "TH sends TestEventTrigger command to General Diagnostics Cluster on Endpoint 0 with EnableKey field set to PIXIT.EEVSE.TEST_EVENT_TRIGGER_KEY and EventTrigger field set to PIXIT.EEVSE.TEST_EVENT_TRIGGER for EVSE Fault Test Event Clear. Verify Event EEVSE.S.E04(Fault) sent with SessionID matching value in step 4b, FaultStatePreviousFaultState = 0x0F (OverTemperature), FaultStateCurrentFaultState = 0x00 (NoError)"),
-            TestStep("9a", "TH reads from the DUT the State attribute. Verify value is 0x3 (PluggedInCharging)"),
-            TestStep("9b", "TH reads from the DUT the SupplyState attribute. Verify value is 0x1 (ChargingEnabled)"),
+            TestStep("6", "TH sends TestEventTrigger command to General Diagnostics Cluster on Endpoint 0 with EnableKey field set to PIXIT.EEVSE.TEST_EVENT_TRIGGER_KEY and EventTrigger field set to PIXIT.EEVSE.TEST_EVENT_TRIGGER for EV Charge Demand Test Event",
+                     "Verify Event EEVSE.S.E02(EnergyTransferStarted) sent."),
+            TestStep("6a", "TH reads from the DUT the State attribute",
+                     "Verify value is 0x3 (PluggedInCharging)"),
+            TestStep("6b", "TH reads from the DUT the SupplyState attribute",
+                     "Verify value is 0x1 (ChargingEnabled)"),
+            TestStep("7", "TH sends TestEventTrigger command to General Diagnostics Cluster on Endpoint 0 with EnableKey field set to PIXIT.EEVSE.TEST_EVENT_TRIGGER_KEY and EventTrigger field set to PIXIT.EEVSE.TEST_EVENT_TRIGGER for EVSE Ground Fault Test Event",
+                     "Verify Event EEVSE.S.E04(Fault) sent with SessionID matching value in step 4b, FaultStatePreviousFaultState = 0x00 (NoError), FaultStateCurrentFaultState = 0x07 (GroundFault)"),
+            TestStep("7a", "TH reads from the DUT the State attribute",
+                     "Verify value is 0x6 (Fault)"),
+            TestStep("7b", "TH reads from the DUT the SupplyState attribute",
+                     "Verify value is 0x4 (DisabledError)"),
+            TestStep("8", "TH sends TestEventTrigger command to General Diagnostics Cluster on Endpoint 0 with EnableKey field set to PIXIT.EEVSE.TEST_EVENT_TRIGGER_KEY and EventTrigger field set to PIXIT.EEVSE.TEST_EVENT_TRIGGER for EVSE Over Temperature Fault Test Event",
+                     "Verify Event EEVSE.S.E04(Fault) sent with SessionID matching value in step 4b, FaultStatePreviousFaultState = 0x07 (GroundFault), FaultStateCurrentFaultState = 0x0F (OverTemperature)"),
+            TestStep("8a", "TH reads from the DUT the State attribute",
+                     "Verify value is 0x6 (Fault)"),
+            TestStep("8b", "TH reads from the DUT the SupplyState attribute",
+                     "Verify value is 0x4 (DisabledError)"),
+            TestStep("9", "TH sends TestEventTrigger command to General Diagnostics Cluster on Endpoint 0 with EnableKey field set to PIXIT.EEVSE.TEST_EVENT_TRIGGER_KEY and EventTrigger field set to PIXIT.EEVSE.TEST_EVENT_TRIGGER for EVSE Fault Test Event Clear",
+                     "Verify Event EEVSE.S.E04(Fault) sent with SessionID matching value in step 4b, FaultStatePreviousFaultState = 0x0F (OverTemperature), FaultStateCurrentFaultState = 0x00 (NoError)"),
+            TestStep("9a", "TH reads from the DUT the State attribute",
+                     "Verify value is 0x3 (PluggedInCharging)"),
+            TestStep("9b", "TH reads from the DUT the SupplyState attribute",
+                     "Verify value is 0x1 (ChargingEnabled)"),
             TestStep("10", "TH sends TestEventTrigger command to General Diagnostics Cluster on Endpoint 0 with EnableKey field set to PIXIT.EEVSE.TEST_EVENT_TRIGGER_KEY and EventTrigger field set to PIXIT.EEVSE.TEST_EVENT_TRIGGER for EV Charge Demand Test Event Clear."),
-            TestStep("11", "TH sends TestEventTrigger command to General Diagnostics Cluster on Endpoint 0 with EnableKey field set to PIXIT.EEVSE.TEST_EVENT_TRIGGER_KEY and EventTrigger field set to PIXIT.EEVSE.TEST_EVENT_TRIGGER for EV Plugged-in Test Event Clear. Verify Event EEVSE.S.E01(EVNotDetected) sent"),
+            TestStep("11", "TH sends TestEventTrigger command to General Diagnostics Cluster on Endpoint 0 with EnableKey field set to PIXIT.EEVSE.TEST_EVENT_TRIGGER_KEY and EventTrigger field set to PIXIT.EEVSE.TEST_EVENT_TRIGGER for EV Plugged-in Test Event Clear",
+                     "Verify Event EEVSE.S.E01(EVNotDetected) sent"),
             TestStep("12", "TH sends TestEventTrigger command to General Diagnostics Cluster on Endpoint 0 with EnableKey field set to PIXIT.EEVSE.TEST_EVENT_TRIGGER_KEY and EventTrigger field set to PIXIT.EEVSE.TEST_EVENT_TRIGGER for Basic Functionality Test Event Clear."),
         ]
 
@@ -99,7 +131,8 @@ class TC_EEVSE_2_4(MatterBaseTest, EEVSEBaseTestHelper):
 
         self.step("4")
         await self.send_test_event_trigger_pluggedin()
-        event_data = events_callback.wait_for_event_report(Clusters.EnergyEvse.Events.EVConnected)
+        event_data = events_callback.wait_for_event_report(
+            Clusters.EnergyEvse.Events.EVConnected)
 
         self.step("4a")
         await self.check_evse_attribute("State", Clusters.EnergyEvse.Enums.StateEnum.kPluggedInNoDemand)
@@ -117,7 +150,8 @@ class TC_EEVSE_2_4(MatterBaseTest, EEVSEBaseTestHelper):
 
         self.step("6")
         await self.send_test_event_trigger_charge_demand()
-        event_data = events_callback.wait_for_event_report(Clusters.EnergyEvse.Events.EnergyTransferStarted)
+        event_data = events_callback.wait_for_event_report(
+            Clusters.EnergyEvse.Events.EnergyTransferStarted)
 
         self.step("6a")
         await self.check_evse_attribute("State", Clusters.EnergyEvse.Enums.StateEnum.kPluggedInCharging)
@@ -127,11 +161,13 @@ class TC_EEVSE_2_4(MatterBaseTest, EEVSEBaseTestHelper):
 
         self.step("7")
         await self.send_test_event_trigger_evse_ground_fault()
-        event_data = events_callback.wait_for_event_report(Clusters.EnergyEvse.Events.Fault)
+        event_data = events_callback.wait_for_event_report(
+            Clusters.EnergyEvse.Events.Fault)
         expected_state = Clusters.EnergyEvse.Enums.StateEnum.kPluggedInCharging
         previous_fault = Clusters.EnergyEvse.Enums.FaultStateEnum.kNoError
         current_fault = Clusters.EnergyEvse.Enums.FaultStateEnum.kGroundFault
-        self.validate_evse_fault_event(event_data, session_id, expected_state, previous_fault, current_fault)
+        self.validate_evse_fault_event(
+            event_data, session_id, expected_state, previous_fault, current_fault)
 
         self.step("7a")
         await self.check_evse_attribute("State", Clusters.EnergyEvse.Enums.StateEnum.kFault)
@@ -141,11 +177,13 @@ class TC_EEVSE_2_4(MatterBaseTest, EEVSEBaseTestHelper):
 
         self.step("8")
         await self.send_test_event_trigger_evse_over_temperature_fault()
-        event_data = events_callback.wait_for_event_report(Clusters.EnergyEvse.Events.Fault)
+        event_data = events_callback.wait_for_event_report(
+            Clusters.EnergyEvse.Events.Fault)
         expected_state = Clusters.EnergyEvse.Enums.StateEnum.kFault
         previous_fault = Clusters.EnergyEvse.Enums.FaultStateEnum.kGroundFault
         current_fault = Clusters.EnergyEvse.Enums.FaultStateEnum.kOverTemperature
-        self.validate_evse_fault_event(event_data, session_id, expected_state, previous_fault, current_fault)
+        self.validate_evse_fault_event(
+            event_data, session_id, expected_state, previous_fault, current_fault)
 
         self.step("8a")
         await self.check_evse_attribute("State", Clusters.EnergyEvse.Enums.StateEnum.kFault)
@@ -155,11 +193,13 @@ class TC_EEVSE_2_4(MatterBaseTest, EEVSEBaseTestHelper):
 
         self.step("9")
         await self.send_test_event_trigger_evse_fault_clear()
-        event_data = events_callback.wait_for_event_report(Clusters.EnergyEvse.Events.Fault)
+        event_data = events_callback.wait_for_event_report(
+            Clusters.EnergyEvse.Events.Fault)
         expected_state = Clusters.EnergyEvse.Enums.StateEnum.kFault
         previous_fault = Clusters.EnergyEvse.Enums.FaultStateEnum.kOverTemperature
         current_fault = Clusters.EnergyEvse.Enums.FaultStateEnum.kNoError
-        self.validate_evse_fault_event(event_data, session_id, expected_state, previous_fault, current_fault)
+        self.validate_evse_fault_event(
+            event_data, session_id, expected_state, previous_fault, current_fault)
 
         self.step("9a")
         await self.check_evse_attribute("State", Clusters.EnergyEvse.Enums.StateEnum.kPluggedInCharging)
@@ -169,13 +209,16 @@ class TC_EEVSE_2_4(MatterBaseTest, EEVSEBaseTestHelper):
 
         self.step("10")
         await self.send_test_event_trigger_charge_demand_clear()
-        event_data = events_callback.wait_for_event_report(Clusters.EnergyEvse.Events.EnergyTransferStopped)
+        event_data = events_callback.wait_for_event_report(
+            Clusters.EnergyEvse.Events.EnergyTransferStopped)
 
         self.step("11")
         await self.send_test_event_trigger_pluggedin_clear()
-        event_data = events_callback.wait_for_event_report(Clusters.EnergyEvse.Events.EVNotDetected)
+        event_data = events_callback.wait_for_event_report(
+            Clusters.EnergyEvse.Events.EVNotDetected)
         expected_state = Clusters.EnergyEvse.Enums.StateEnum.kPluggedInNoDemand
-        self.validate_ev_not_detected_event(event_data, session_id, expected_state, expected_duration=0, expected_charged=0)
+        self.validate_ev_not_detected_event(
+            event_data, session_id, expected_state, expected_duration=0, expected_charged=0)
 
         self.step("12")
         await self.send_test_event_trigger_basic_clear()
