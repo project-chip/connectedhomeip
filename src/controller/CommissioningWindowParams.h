@@ -40,9 +40,10 @@ class CommissioningWindowCommonParams
 public:
     CommissioningWindowCommonParams() = default;
 
+    bool HasNodeId() const { return mNodeId != kUndefinedNodeId; }
     NodeId GetNodeId() const
     {
-        VerifyOrDie(mNodeId != kUndefinedNodeId);
+        VerifyOrDie(HasNodeId());
         return mNodeId;
     }
     // The node identifier of device

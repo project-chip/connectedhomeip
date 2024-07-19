@@ -76,6 +76,8 @@ CHIP_ERROR CommissioningWindowOpener::OpenCommissioningWindow(const Commissionin
                                                               SetupPayload & payload)
 {
     VerifyOrReturnError(mNextStep == Step::kAcceptCommissioningStart, CHIP_ERROR_INCORRECT_STATE);
+    VerifyOrReturnError(params.HasNodeId(), CHIP_ERROR_INVALID_ARGUMENT);
+    VerifyOrReturnError(params.HasDiscriminator(), CHIP_ERROR_INVALID_ARGUMENT);
     VerifyOrReturnError(kSpake2p_Min_PBKDF_Iterations <= params.GetIteration() &&
                             params.GetIteration() <= kSpake2p_Max_PBKDF_Iterations,
                         CHIP_ERROR_INVALID_ARGUMENT);
@@ -140,6 +142,8 @@ CHIP_ERROR CommissioningWindowOpener::OpenCommissioningWindow(const Commissionin
 CHIP_ERROR CommissioningWindowOpener::OpenCommissioningWindow(const CommissioningWindowVerifierParams & params)
 {
     VerifyOrReturnError(mNextStep == Step::kAcceptCommissioningStart, CHIP_ERROR_INCORRECT_STATE);
+    VerifyOrReturnError(params.HasNodeId(), CHIP_ERROR_INVALID_ARGUMENT);
+    VerifyOrReturnError(params.HasDiscriminator(), CHIP_ERROR_INVALID_ARGUMENT);
     VerifyOrReturnError(kSpake2p_Min_PBKDF_Iterations <= params.GetIteration() &&
                             params.GetIteration() <= kSpake2p_Max_PBKDF_Iterations,
                         CHIP_ERROR_INVALID_ARGUMENT);
