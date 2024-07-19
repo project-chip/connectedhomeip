@@ -172,11 +172,10 @@ public:
      * @return AttributeDirtyState::kMustReport if attribute must be marked dirty right away, or
      * AttributeDirtyState::kNoReportNeeded otherwise.
      */
-    AttributeDirtyState SetValue(const DataModel::Nullable<T> & newValue, Timestamp now,
-                                 SufficientChangePredicate changedPredicate)
+    AttributeDirtyState SetValue(const DataModel::Nullable<T> & newValue, Timestamp now, SufficientChangePredicate changedPredicate)
     {
-        bool isChangeOfNull       = newValue.IsNull() != mValue.IsNull();
-        bool areBothValuesNonNull = !newValue.IsNull() && !mValue.IsNull();
+        bool isChangeOfNull         = newValue.IsNull() != mValue.IsNull();
+        bool areBothValuesNonNull   = !newValue.IsNull() && !mValue.IsNull();
         bool areBothValuesDifferent = areBothValuesNonNull && (newValue.Value() != mValue.Value());
 
         bool changeToFromZero = areBothValuesNonNull && areBothValuesDifferent && (newValue.Value() == 0 || mValue.Value() == 0);
