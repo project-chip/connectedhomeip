@@ -171,8 +171,7 @@ struct LocationStructureWrapper : public chip::app::Clusters::ServiceArea::Struc
      * @brief Compare the location's name with the given text.
      * @param[in] aLocationName The name to compare.
      * @return true if the location structure's name field matches aLocationName.
-     *
-     * @note if locations structure's name field is null, returns false.
+     * False otherwise, including if the location structure's HomeLocation structure is null.
      */
     bool IsNameEqual(const CharSpan & aLocationName) const
     {
@@ -181,11 +180,11 @@ struct LocationStructureWrapper : public chip::app::Clusters::ServiceArea::Struc
             return locationInfo.locationInfo.Value().locationName.data_equal(aLocationName);
         }
 
-        return false; // name is Null or text sizes do not match
+        return false;
     }
 
     /**
-     * This is use for configuring the IsEqual method.
+     * This is used for configuring the IsEqual method.
      * If kIgnoreLocationId is set, the location IDs are ignored when checking for equality.
      * If kIgnoreMapId is set, the map IDs are ignored when checking for equality.
      */
