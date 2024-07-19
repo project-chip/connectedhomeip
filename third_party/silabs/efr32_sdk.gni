@@ -84,6 +84,7 @@ declare_args() {
 
 examples_plat_dir = "${chip_root}/examples/platform/silabs/efr32"
 silabs_plat_efr32_wifi_dir = "${chip_root}/src/platform/silabs/efr32/wifi"
+silabs_common_plat_dir = "${chip_root}/examples/platform/silabs"
 is_series_2 = silabs_family == "mgm24" || silabs_family == "efr32mg24" ||
               silabs_family == "efr32mg26"
 
