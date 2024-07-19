@@ -58,6 +58,16 @@ declare_args() {
   chip_im_static_global_interaction_model_engine =
       current_os != "linux" && current_os != "mac" && current_os != "ios" &&
       current_os != "android"
+
+  # Data model interface usage:
+  #   - disabled: does not use data model interface at all
+  #   - check:    runs BOTH datamodel and non-data-model (if possible) functionality and compares results
+  #   - enabled:  runs only the data model interface (does not use the legacy code)
+  if (current_os == "linux") {
+    chip_use_data_model_interface = "check"
+  } else {
+    chip_use_data_model_interface = "disabled"
+  }
 }
 
 buildconfig_header("app_buildconfig") {
@@ -79,6 +89,27 @@ buildconfig_header("app_buildconfig") {
     "CHIP_DEVICE_CONFIG_DYNAMIC_SERVER=${chip_build_controller_dynamic_server}",
     "CHIP_CONFIG_ENABLE_BUSY_HANDLING_FOR_OPERATIONAL_SESSION_SETUP=${chip_enable_busy_handling_for_operational_session_setup}",
   ]
+
+  if (chip_use_data_model_interface == "disabled") {
+    defines += [
+      "CHIP_CONFIG_USE_DATA_MODEL_INTERFACE=0",
+      "CHIP_CONFIG_USE_EMBER_DATA_MODEL=1",
+    ]
+  } else if (chip_use_data_model_interface == "check") {
+    defines += [
+      "CHIP_CONFIG_USE_DATA_MODEL_INTERFACE=1",
+      "CHIP_CONFIG_USE_EMBER_DATA_MODEL=1",
+    ]
+  } else {
+    # only one of disabled/check/enabled must be used
+    assert(chip_use_data_model_interface == "enabled",
+           "chip_use_data_model_interface must use a supported value")
+
+    defines += [
+      "CHIP_CONFIG_USE_DATA_MODEL_INTERFACE=1",
+      "CHIP_CONFIG_USE_EMBER_DATA_MODEL=0",
+    ]
+  }
 
   visibility = [ ":app_config" ]
 }
@@ -212,6 +243,8 @@ static_library("interaction-model") {
     ":paths",
     ":subscription-info-provider",
     "${chip_root}/src/app/MessageDef",
+    "${chip_root}/src/app/codegen-data-model:instance-header",
+    "${chip_root}/src/app/data-model-interface",
     "${chip_root}/src/app/icd/server:icd-server-config",
     "${chip_root}/src/app/icd/server:manager",
     "${chip_root}/src/app/icd/server:observer",
@@ -377,7 +410,6 @@ static_library("app") {
   output_name = "libCHIPDataModel"
 
   sources = [
-    "AttributePathExpandIterator.cpp",
     "AttributePathExpandIterator.h",
     "AttributePersistenceProvider.h",
     "ChunkedWriteCallback.cpp",
@@ -425,6 +457,32 @@ static_library("app") {
     "${chip_root}/src/protocols/interaction_model",
     "${chip_root}/src/system",
   ]
+
+  if (chip_use_data_model_interface == "disabled") {
+    sources += [
+      "AttributePathExpandIterator-Ember.cpp",
+      "AttributePathExpandIterator-Ember.h",
+      "AttributePathExpandIterator.h",
+    ]
+  } else if (chip_use_data_model_interface == "check") {
+    sources += [
+      "AttributePathExpandIterator-Checked.cpp",
+      "AttributePathExpandIterator-Checked.h",
+      "AttributePathExpandIterator-DataModel.cpp",
+      "AttributePathExpandIterator-DataModel.h",
+      "AttributePathExpandIterator-Ember.cpp",
+      "AttributePathExpandIterator-Ember.h",
+      "AttributePathExpandIterator.h",
+    ]
+    public_deps += [ "${chip_root}/src/app/data-model-interface" ]
+  } else {  # enabled
+    sources += [
+      "AttributePathExpandIterator-DataModel.cpp",
+      "AttributePathExpandIterator-DataModel.h",
+      "AttributePathExpandIterator.h",
+    ]
+    public_deps += [ "${chip_root}/src/app/data-model-interface" ]
+  }
 
   if (chip_enable_read_client) {
     sources += [
