@@ -8476,6 +8476,8 @@ endpoint 1 {
   server cluster EnergyEvseMode {
     callback attribute supportedModes;
     callback attribute currentMode;
+    ram      attribute startUpMode;
+    ram      attribute onMode;
     callback attribute generatedCommandList;
     callback attribute acceptedCommandList;
     callback attribute eventList;
@@ -8490,6 +8492,8 @@ endpoint 1 {
   server cluster DeviceEnergyManagementMode {
     callback attribute supportedModes;
     callback attribute currentMode;
+    ram      attribute startUpMode;
+    ram      attribute onMode;
     callback attribute generatedCommandList;
     callback attribute acceptedCommandList;
     callback attribute eventList;

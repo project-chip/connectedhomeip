@@ -222,7 +222,6 @@ matter_eventstructs_sources = [
   "${chip_root}/src/controller/java/generated/java/matter/controller/cluster/eventstructs/TargetNavigatorClusterTargetUpdatedEvent.kt",
   "${chip_root}/src/controller/java/generated/java/matter/controller/cluster/eventstructs/ThreadNetworkDiagnosticsClusterConnectionStatusEvent.kt",
   "${chip_root}/src/controller/java/generated/java/matter/controller/cluster/eventstructs/ThreadNetworkDiagnosticsClusterNetworkFaultChangeEvent.kt",
-  "${chip_root}/src/controller/java/generated/java/matter/controller/cluster/eventstructs/ThreadNetworkDirectoryClusterNetworkChangedEvent.kt",
   "${chip_root}/src/controller/java/generated/java/matter/controller/cluster/eventstructs/TimeSynchronizationClusterDSTStatusEvent.kt",
   "${chip_root}/src/controller/java/generated/java/matter/controller/cluster/eventstructs/TimeSynchronizationClusterTimeZoneStatusEvent.kt",
   "${chip_root}/src/controller/java/generated/java/matter/controller/cluster/eventstructs/UnitTestingClusterTestDifferentVendorMeiEventEvent.kt",
