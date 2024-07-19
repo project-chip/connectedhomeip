@@ -146,11 +146,7 @@ ChargingTargetsMemMgr::AllocAndCopy(const DataModel::DecodableList<Structs::Char
     // ChargingTargetsMemMgr.h before this method can be called.
 
     size_t numDailyChargingTargets = 0;
-    CHIP_ERROR err                 = chargingTargets.ComputeSize(&numDailyChargingTargets);
-    if (err != CHIP_NO_ERROR)
-    {
-        return err;
-    }
+    ReturnErrorOnFailure(chargingTargets.ComputeSize(&numDailyChargingTargets));
 
     mNumDailyChargingTargets = static_cast<uint16_t>(numDailyChargingTargets);
 
