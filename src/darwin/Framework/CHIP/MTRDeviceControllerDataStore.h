@@ -95,7 +95,6 @@ typedef void (^MTRDeviceControllerDataStoreClusterDataHandler)(NSDictionary<NSNu
  * Storage for client data
  */
 
-
 - (void)storeClientDataForKey:(NSString *)key value:(id<NSSecureCoding>)value forNodeID:(NSNumber *)nodeID;
 - (id<NSSecureCoding>)clientDataForNodeID:(NSNumber *)nodeID key:(NSString *)key;
 - (void)removeClientDataForNodeID:(NSNumber *)nodeID key:(NSString *)key;

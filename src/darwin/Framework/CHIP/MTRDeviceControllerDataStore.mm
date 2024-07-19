@@ -1170,15 +1170,11 @@ static NSString * sDeviceDataKeyPrefix = @"deviceData";
 
 static NSString * sClientDataKeyPrefix = @"clientData";
 
-typedef NSString * MTRClientDataKey;
-
-typedef NSArray<NSString *> MTRClientDataKeyIndex;
-
-- (nullable MTRClientDataKeyIndex *)_clientDataIndexForNodeID:(NSNumber *)nodeID {
+- (nullable NSArray<NSString *> *)_clientDataIndexForNodeID:(NSNumber *)nodeID {
     dispatch_assert_queue(_storageDelegateQueue);
     
     NSArray<NSString *> * index = nil;
-    
+
     id data;
     
     MTRDeviceController * controller = self->_controller;
@@ -1191,18 +1187,16 @@ typedef NSArray<NSString *> MTRClientDataKeyIndex;
     }
     
     if (data == nil) {
-        NSLog(@"kmo:  no client data index for node id %@ (might be expected)", nodeID);
         return nil;
     }
     
-    if (![data isKindOfClass:[MTRClientDataKeyIndex class]]) {
-        NSLog(@"kmo:  - client data index was of unexpected type!");
+    if (![data isKindOfClass:[NSArray<NSString *> class]]) {
+        // TODO: log this, it probably indicates an error inside this part of MTRDeviceControllerDataStore
         return nil;
     }
     
     // TODO:  what other checks are possible here? kmo 12 fri 2024 17h29
     index = data;
-    NSLog(@"kmo: returning client data index for node id %@", nodeID);
     return index;
 }
 
@@ -1224,7 +1218,7 @@ typedef NSArray<NSString *> MTRClientDataKeyIndex;
 
         id data;
         NSString * storageKey = [self _clientDataKeyForNodeID:nodeID key:key];
-        NSLog(@"kmo: clientDataForKey - data key %@", storageKey);
+
         @autoreleasepool {
             data = [self->_storageDelegate controller:controller
                                           valueForKey:storageKey
@@ -1232,20 +1226,15 @@ typedef NSArray<NSString *> MTRClientDataKeyIndex;
                                           sharingType:MTRStorageSharingTypeNotShared];  // REVIEWERS:  fabric shared? kmo 12 jul 2024 14h58
         }
         if (data == nil) {
-
             return;
         }
         
         if (![data conformsToProtocol:@protocol(NSSecureCoding)]) {
-            // can remove next log after end-to-end testing validates that this expectation is met.
             MTR_LOG_ERROR("Client data retrieved from MTRDeviceControllerDataStore did not conform to NSSecureCoding");
             return;
         }
         
         // TODO:  check against list of allowed data types? kmo 17 jul 2024 10h14
-
-        // We can't do value type verification; our API consumer will need
-        // to do that.
         clientData = data;
     });
 
@@ -1271,8 +1260,8 @@ typedef NSArray<NSString *> MTRClientDataKeyIndex;
                         nodeID:(NSNumber * _Nonnull)nodeID
                     controller:(MTRDeviceController *)controller {
     dispatch_assert_queue(_storageDelegateQueue);
-    NSArray<MTRClientDataKey> * index = [self _clientDataIndexForNodeID:nodeID];
-    NSMutableArray<MTRClientDataKey> * modifiedIndex = nil;
+    NSArray<NSString *> * index = [self _clientDataIndexForNodeID:nodeID];
+    NSMutableArray<NSString *> * modifiedIndex = nil;
     BOOL indexModified = NO;
     
     if (index == nil) {
@@ -1294,8 +1283,7 @@ typedef NSArray<NSString *> MTRClientDataKeyIndex;
     }
     
     NSString * storageKey = [self _clientDataIndexKeyForNodeID:nodeID];
-    NSLog(@"kmo: updateClientDataIndexForKey - data key %@", storageKey);
-    
+    // REVIEWERS:  does it matter if I pass a mutable vs nonmutable array to this method?
     [self->_storageDelegate controller:controller
                             storeValue:modifiedIndex
                                 forKey:storageKey
@@ -1307,10 +1295,11 @@ typedef NSArray<NSString *> MTRClientDataKeyIndex;
                               nodeID:(NSNumber * _Nonnull)nodeID
                           controller:(MTRDeviceController *)controller {
     dispatch_assert_queue(_storageDelegateQueue);
-    NSMutableArray<MTRClientDataKey> * modifiedIndex = [[self _clientDataIndexForNodeID:nodeID] mutableCopy];
+    NSMutableArray<NSString *> * modifiedIndex = [[self _clientDataIndexForNodeID:nodeID] mutableCopy];
     [modifiedIndex removeObject:key];
 
     NSString * storageKey = [self _clientDataIndexKeyForNodeID:nodeID];
+    // REVIEWERS:  does it matter if I pass a mutable vs nonmutable array to this method?
     [self->_storageDelegate controller:controller
                             storeValue:modifiedIndex
                                 forKey:storageKey
@@ -1320,22 +1309,23 @@ typedef NSArray<NSString *> MTRClientDataKeyIndex;
 
 - (void)storeClientDataForKey:(NSString *)key value:(id<NSSecureCoding>)value forNodeID:(NSNumber *)nodeID
 {
-    NSLog(@"kmo: storeClientDataForKey async");
     dispatch_async(_storageDelegateQueue, ^{
-        NSLog(@"kmo: storeClientDataForKey async block started");
         MTRDeviceController * controller = self->_controller;
         VerifyOrReturn(controller != nil); // No way to call delegate without controller.
 
-        // Ignore store failures, since they are not actionable for us here.
-        // REVIEWERS:  could we log failures? kmo 12 jul 2024 13h10
+        // REVIEWERS:  should we log failures? kmo 12 jul 2024 13h10
         NSString * storageKey = [self _clientDataKeyForNodeID:nodeID key:key];
-        NSLog(@"kmo: storeClientDataForKey - data key %@", storageKey);
         BOOL storedSuccessfully = [self->_storageDelegate controller:controller
                                 storeValue:value
                                     forKey:storageKey
                              securityLevel:MTRStorageSecurityLevelSecure
                                sharingType:MTRStorageSharingTypeNotShared]; // REVIEWERS:  should be fabric shared? kmo 12 jul 2024 13h10
-        NSLog(@"kmo: about to update index - value stored successfully? %d", storedSuccessfully);
+        
+        if (!storedSuccessfully) {
+            MTR_LOG_ERROR("Could not store client data for node ID %@/key %@", nodeID, key);
+            return;
+        }
+
         [self _updateClientDataIndexForKey:key nodeID:nodeID controller:controller];
     });
 }
@@ -1346,11 +1336,10 @@ typedef NSArray<NSString *> MTRClientDataKeyIndex;
         VerifyOrReturn(controller != nil); // No way to call delegate without controller.
         
         // get index
-        NSArray<MTRClientDataKey> * index = [self _clientDataIndexForNodeID:nodeID];
-        
-        
+        NSArray<NSString *> * index = [self _clientDataIndexForNodeID:nodeID];
+
         // iterate over index to remove data
-        for (MTRClientDataKey key in index) {
+        for (NSString * key in index) {
             NSString * thisKey = [self _clientDataKeyForNodeID:nodeID key:key];
             [self->_storageDelegate controller:controller
                removeValueForKey:thisKey
