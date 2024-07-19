@@ -71,6 +71,7 @@ const BekenConfig::Key BekenConfig::kConfigKey_ServiceId                   = { k
 const BekenConfig::Key BekenConfig::kConfigKey_GroupKeyIndex               = { kConfigNamespace_ChipConfig, "group-key-index" };
 const BekenConfig::Key BekenConfig::kConfigKey_LastUsedEpochKeyId          = { kConfigNamespace_ChipConfig, "last-ek-id" };
 const BekenConfig::Key BekenConfig::kConfigKey_FailSafeArmed               = { kConfigNamespace_ChipConfig, "fail-safe-armed" };
+const BekenConfig::Key BekenConfig::kConfigKey_DeviceLocation              = { kConfigNamespace_ChipConfig, "device-location" };
 const BekenConfig::Key BekenConfig::kConfigKey_OperationalDeviceId         = { kConfigNamespace_ChipConfig, "op-device-id" };
 const BekenConfig::Key BekenConfig::kConfigKey_OperationalDeviceCert       = { kConfigNamespace_ChipConfig, "op-device-cert" };
 const BekenConfig::Key BekenConfig::kConfigKey_OperationalDeviceICACerts   = { kConfigNamespace_ChipConfig, "op-device-ca-certs" };

@@ -71,6 +71,7 @@ const ASRConfig::Key ASRConfig::kConfigKey_PairedAccountId    = { kConfigNamespa
 const ASRConfig::Key ASRConfig::kConfigKey_ServiceId          = { kConfigNamespace_ChipConfig, "service-id" };
 const ASRConfig::Key ASRConfig::kConfigKey_LastUsedEpochKeyId = { kConfigNamespace_ChipConfig, "last-ek-id" };
 const ASRConfig::Key ASRConfig::kConfigKey_FailSafeArmed      = { kConfigNamespace_ChipConfig, "fail-safe-armed" };
+const ASRConfig::Key ASRConfig::kConfigKey_DeviceLocation     = { kConfigNamespace_ChipConfig, "device-location" };
 const ASRConfig::Key ASRConfig::kConfigKey_WiFiStationSecType = { kConfigNamespace_ChipConfig, "sta-sec-type" };
 const ASRConfig::Key ASRConfig::kConfigKey_RegulatoryLocation = { kConfigNamespace_ChipConfig, "regulatory-location" };
 const ASRConfig::Key ASRConfig::kConfigKey_CountryCode        = { kConfigNamespace_ChipConfig, "country-code" };

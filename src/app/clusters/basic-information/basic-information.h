@@ -23,6 +23,7 @@ namespace chip {
 namespace app {
 namespace Clusters {
 namespace BasicInformation {
+
 /**
  * Check whether LocalConfigDisabled is set (on endpoint 0, which is the only
  * place the Basic Information cluster exists and can have the attribute be

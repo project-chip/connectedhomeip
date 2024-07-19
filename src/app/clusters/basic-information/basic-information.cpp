@@ -16,6 +16,7 @@
  *
  */
 
+#include "basic-information-cluster-objects.h"
 #include "basic-information.h"
 
 #include <app-common/zap-generated/attributes/Accessors.h>
@@ -66,6 +67,8 @@ private:
     CHIP_ERROR ReadProductAppearance(AttributeValueEncoder & aEncoder);
     CHIP_ERROR ReadSpecificationVersion(AttributeValueEncoder & aEncoder);
     CHIP_ERROR ReadMaxPathsPerInvoke(AttributeValueEncoder & aEncoder);
+    CHIP_ERROR ReadDeviceLocation(AttributeValueEncoder & aEncoder);
+    CHIP_ERROR WriteDeviceLocation(AttributeValueDecoder & aDecoder);
 };
 
 BasicAttrAccess gAttrAccess;
@@ -304,6 +307,11 @@ CHIP_ERROR BasicAttrAccess::Read(const ConcreteReadAttributePath & aPath, Attrib
         break;
     }
 
+    case DeviceLocation::Id: {
+        status = ReadDeviceLocation(aEncoder);
+        break;
+    }
+
     default:
         // We did not find a processing path, the caller will delegate elsewhere.
         break;
@@ -344,6 +352,11 @@ CHIP_ERROR BasicAttrAccess::Write(const ConcreteDataAttributePath & aPath, Attri
     {
     case Location::Id: {
         CHIP_ERROR err = WriteLocation(aDecoder);
+
+        return err;
+    }
+    case DeviceLocation::Id: {
+        CHIP_ERROR err = WriteDeviceLocation(aDecoder);
 
         return err;
     }
@@ -407,6 +420,34 @@ CHIP_ERROR BasicAttrAccess::ReadMaxPathsPerInvoke(AttributeValueEncoder & aEncod
 {
     uint16_t max_path_per_invoke = CHIP_CONFIG_MAX_PATHS_PER_INVOKE;
     return aEncoder.Encode(max_path_per_invoke);
+}
+
+CHIP_ERROR BasicAttrAccess::ReadDeviceLocation(AttributeValueEncoder & aEncoder)
+{
+    MutableDeviceLocation deviceLocation;
+
+    ReturnErrorOnFailure(ConfigurationMgr().GetDeviceLocation(deviceLocation));
+
+    return aEncoder.Encode(deviceLocation);
+}
+
+CHIP_ERROR BasicAttrAccess::WriteDeviceLocation(AttributeValueDecoder & aDecoder)
+{
+    DeviceLocationType deviceLocation;
+
+    ReturnErrorOnFailure(aDecoder.Decode(deviceLocation));
+
+    if (!deviceLocation.IsNull())
+    {
+        if (deviceLocation.Value().locationName.empty() && deviceLocation.Value().floorNumber.IsNull() &&
+            deviceLocation.Value().areaType.IsNull())
+        {
+            ChipLogError(Zcl, "At least one of the fields should not be null or an empty string.");
+            return CHIP_IM_GLOBAL_STATUS(ConstraintError);
+        }
+    }
+
+    return ConfigurationMgr().SetDeviceLocation(deviceLocation);
 }
 
 class PlatformMgrDelegate : public DeviceLayer::PlatformManagerDelegate

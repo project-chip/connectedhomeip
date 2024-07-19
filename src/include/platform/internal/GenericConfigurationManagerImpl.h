@@ -81,6 +81,13 @@ public:
 #endif
     CHIP_ERROR GetFailSafeArmed(bool & val) override;
     CHIP_ERROR SetFailSafeArmed(bool val) override;
+    /**
+     * @brief Update location with the current device location.
+     *
+     * Expects that location is initialised with a locationName CharSpan pointing to a buffer of size kMaxDeviceLocationNameLength.
+     */
+    CHIP_ERROR GetDeviceLocation(MutableDeviceLocation & location) override;
+    CHIP_ERROR SetDeviceLocation(DeviceLocationType location) override;
     CHIP_ERROR GetBLEDeviceIdentificationInfo(Ble::ChipBLEDeviceIdentificationInfo & deviceIdInfo) override;
     bool IsCommissionableDeviceTypeEnabled() override;
     CHIP_ERROR GetDeviceTypeId(uint32_t & deviceType) override;

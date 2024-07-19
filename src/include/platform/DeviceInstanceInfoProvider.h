@@ -16,6 +16,8 @@
  */
 #pragma once
 
+#include <app-common/zap-generated/cluster-objects.h>
+#include <app/data-model/Nullable.h>
 #include <lib/core/CHIPError.h>
 #include <lib/core/ClusterEnums.h>
 #include <lib/support/Span.h>

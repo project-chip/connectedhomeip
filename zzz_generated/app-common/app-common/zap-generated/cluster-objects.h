@@ -173,6 +173,31 @@ public:
 };
 
 } // namespace MeasurementAccuracyStruct
+namespace HomeLocationStruct {
+enum class Fields : uint8_t
+{
+    kLocationName = 0,
+    kFloorNumber  = 1,
+    kAreaType     = 2,
+};
+
+struct Type
+{
+public:
+    chip::CharSpan locationName;
+    DataModel::Nullable<int16_t> floorNumber;
+    DataModel::Nullable<AreaTypeTag> areaType;
+
+    CHIP_ERROR Decode(TLV::TLVReader & reader);
+
+    static constexpr bool kIsFabricScoped = false;
+
+    CHIP_ERROR Encode(TLV::TLVWriter & aWriter, TLV::Tag aTag) const;
+};
+
+using DecodableType = Type;
+
+} // namespace HomeLocationStruct
 namespace ApplicationStruct {
 enum class Fields : uint8_t
 {
@@ -3712,6 +3737,7 @@ public:
 using DecodableType = Type;
 
 } // namespace CapabilityMinimaStruct
+namespace HomeLocationStruct = Clusters::detail::Structs::HomeLocationStruct;
 namespace ProductAppearanceStruct {
 enum class Fields : uint8_t
 {
@@ -4068,6 +4094,20 @@ struct TypeInfo
     static constexpr bool MustUseTimedWrite() { return false; }
 };
 } // namespace MaxPathsPerInvoke
+namespace DeviceLocation {
+struct TypeInfo
+{
+    using Type = chip::app::DataModel::Nullable<chip::app::Clusters::BasicInformation::Structs::HomeLocationStruct::Type>;
+    using DecodableType =
+        chip::app::DataModel::Nullable<chip::app::Clusters::BasicInformation::Structs::HomeLocationStruct::DecodableType>;
+    using DecodableArgType =
+        const chip::app::DataModel::Nullable<chip::app::Clusters::BasicInformation::Structs::HomeLocationStruct::DecodableType> &;
+
+    static constexpr ClusterId GetClusterId() { return Clusters::BasicInformation::Id; }
+    static constexpr AttributeId GetAttributeId() { return Attributes::DeviceLocation::Id; }
+    static constexpr bool MustUseTimedWrite() { return false; }
+};
+} // namespace DeviceLocation
 namespace GeneratedCommandList {
 struct TypeInfo : public Clusters::Globals::Attributes::GeneratedCommandList::TypeInfo
 {
@@ -4136,6 +4176,7 @@ struct TypeInfo
         Attributes::ProductAppearance::TypeInfo::DecodableType productAppearance;
         Attributes::SpecificationVersion::TypeInfo::DecodableType specificationVersion = static_cast<uint32_t>(0);
         Attributes::MaxPathsPerInvoke::TypeInfo::DecodableType maxPathsPerInvoke       = static_cast<uint16_t>(0);
+        Attributes::DeviceLocation::TypeInfo::DecodableType deviceLocation;
         Attributes::GeneratedCommandList::TypeInfo::DecodableType generatedCommandList;
         Attributes::AcceptedCommandList::TypeInfo::DecodableType acceptedCommandList;
         Attributes::EventList::TypeInfo::DecodableType eventList;
@@ -27732,31 +27773,7 @@ struct TypeInfo
 } // namespace BarrierControl
 namespace ServiceArea {
 namespace Structs {
-namespace HomeLocationStruct {
-enum class Fields : uint8_t
-{
-    kLocationName = 0,
-    kFloorNumber  = 1,
-    kAreaType     = 2,
-};
-
-struct Type
-{
-public:
-    chip::CharSpan locationName;
-    DataModel::Nullable<int16_t> floorNumber;
-    DataModel::Nullable<AreaTypeTag> areaType;
-
-    CHIP_ERROR Decode(TLV::TLVReader & reader);
-
-    static constexpr bool kIsFabricScoped = false;
-
-    CHIP_ERROR Encode(TLV::TLVWriter & aWriter, TLV::Tag aTag) const;
-};
-
-using DecodableType = Type;
-
-} // namespace HomeLocationStruct
+namespace HomeLocationStruct = Clusters::detail::Structs::HomeLocationStruct;
 namespace LocationInfoStruct {
 enum class Fields : uint8_t
 {

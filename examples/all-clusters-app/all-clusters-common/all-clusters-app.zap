@@ -1108,6 +1108,22 @@
               "reportableChange": 0
             },
             {
+              "name": "DeviceLocation",
+              "code": 23,
+              "mfgCode": null,
+              "side": "server",
+              "type": "HomeLocationStruct",
+              "included": 1,
+              "storageOption": "External",
+              "singleton": 1,
+              "bounded": 0,
+              "defaultValue": "",
+              "reportable": 1,
+              "minInterval": 1,
+              "maxInterval": 65534,
+              "reportableChange": 0
+            },
+            {
               "name": "GeneratedCommandList",
               "code": 65528,
               "mfgCode": null,

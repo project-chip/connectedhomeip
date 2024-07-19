@@ -82,6 +82,7 @@ public:
     static const Key kConfigKey_FabricSecret;
     static const Key kConfigKey_LastUsedEpochKeyId;
     static const Key kConfigKey_FailSafeArmed;
+    static const Key kConfigKey_DeviceLocation;
     static const Key kConfigKey_GroupKey;
     static const Key kConfigKey_HardwareVersion;
     static const Key kConfigKey_RegulatoryLocation;

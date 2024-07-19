@@ -460,6 +460,104 @@ cluster AccessControl = 31 {
 cluster BasicInformation = 40 {
   revision 3;
 
+  enum AreaTypeTag : enum8 {
+    kAisle = 0;
+    kAttic = 1;
+    kBackDoor = 2;
+    kBackYard = 3;
+    kBalcony = 4;
+    kBallroom = 5;
+    kBathroom = 6;
+    kBedroom = 7;
+    kBorder = 8;
+    kBoxroom = 9;
+    kBreakfastRoom = 10;
+    kCarport = 11;
+    kCellar = 12;
+    kCloakroom = 13;
+    kCloset = 14;
+    kConservatory = 15;
+    kCorridor = 16;
+    kCraftRoom = 17;
+    kCupboard = 18;
+    kDeck = 19;
+    kDen = 20;
+    kDining = 21;
+    kDrawingRoom = 22;
+    kDressingRoom = 23;
+    kDriveway = 24;
+    kElevator = 25;
+    kEnsuite = 26;
+    kEntrance = 27;
+    kEntryway = 28;
+    kFamilyRoom = 29;
+    kFoyer = 30;
+    kFrontDoor = 31;
+    kFrontYard = 32;
+    kGameRoom = 33;
+    kGarage = 34;
+    kGarageDoor = 35;
+    kGarden = 36;
+    kGardenDoor = 37;
+    kGuestBathroom = 38;
+    kGuestBedroom = 39;
+    kGuestRestroom = 40;
+    kGuestRoom = 41;
+    kGym = 42;
+    kHallway = 43;
+    kHearthRoom = 44;
+    kKidsRoom = 45;
+    kKidsBedroom = 46;
+    kKitchen = 47;
+    kLarder = 48;
+    kLaundryRoom = 49;
+    kLawn = 50;
+    kLibrary = 51;
+    kLivingRoom = 52;
+    kLounge = 53;
+    kMediaTVRoom = 54;
+    kMudRoom = 55;
+    kMusicRoom = 56;
+    kNursery = 57;
+    kOffice = 58;
+    kOutdoorKitchen = 59;
+    kOutside = 60;
+    kPantry = 61;
+    kParkingLot = 62;
+    kParlor = 63;
+    kPatio = 64;
+    kPlayRoom = 65;
+    kPoolRoom = 66;
+    kPorch = 67;
+    kPrimaryBathroom = 68;
+    kPrimaryBedroom = 69;
+    kRamp = 70;
+    kReceptionRoom = 71;
+    kRecreationRoom = 72;
+    kRestroom = 73;
+    kRoof = 74;
+    kSauna = 75;
+    kScullery = 76;
+    kSewingRoom = 77;
+    kShed = 78;
+    kSideDoor = 79;
+    kSideYard = 80;
+    kSittingRoom = 81;
+    kSnug = 82;
+    kSpa = 83;
+    kStaircase = 84;
+    kSteamRoom = 85;
+    kStorageRoom = 86;
+    kStudio = 87;
+    kStudy = 88;
+    kSunRoom = 89;
+    kSwimmingPool = 90;
+    kTerrace = 91;
+    kUtilityRoom = 92;
+    kWard = 93;
+    kWorkshop = 94;
+  }
+
   enum ColorEnum : enum8 {
     kBlack = 0;
     kNavy = 1;
@@ -496,6 +594,12 @@ cluster BasicInformation = 40 {
   struct CapabilityMinimaStruct {
     int16u caseSessionsPerFabric = 0;
     int16u subscriptionsPerFabric = 1;
+  }
+
+  struct HomeLocationStruct {
+    char_string<128> locationName = 0;
+    nullable int16s floorNumber = 1;
+    nullable AreaTypeTag areaType = 2;
   }
 
   struct ProductAppearanceStruct {
@@ -541,6 +645,7 @@ cluster BasicInformation = 40 {
   readonly attribute optional ProductAppearanceStruct productAppearance = 20;
   readonly attribute int32u specificationVersion = 21;
   readonly attribute int16u maxPathsPerInvoke = 22;
+  attribute optional nullable HomeLocationStruct deviceLocation = 23;
   readonly attribute command_id generatedCommandList[] = 65528;
   readonly attribute command_id acceptedCommandList[] = 65529;
   readonly attribute event_id eventList[] = 65530;
