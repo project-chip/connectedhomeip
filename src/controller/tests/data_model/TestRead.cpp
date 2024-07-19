@@ -66,7 +66,7 @@ protected:
         chip::Test::AppContext::TearDown();
     }
 
-    CHIP_ERROR OnSubscriptionRequested(app::ReadHandler & aReadHandler, Transport::SecureSession & aSecureSession)
+    CHIP_ERROR OnSubscriptionRequested(app::ReadHandler & aReadHandler, Transport::SecureSession & aSecureSession) override
     {
         VerifyOrReturnError(!mEmitSubscriptionError, CHIP_ERROR_INVALID_ARGUMENT);
 
@@ -77,9 +77,9 @@ protected:
         return CHIP_NO_ERROR;
     }
 
-    void OnSubscriptionEstablished(app::ReadHandler & aReadHandler) { mNumActiveSubscriptions++; }
+    void OnSubscriptionEstablished(app::ReadHandler & aReadHandler) override { mNumActiveSubscriptions++; }
 
-    void OnSubscriptionTerminated(app::ReadHandler & aReadHandler) { mNumActiveSubscriptions--; }
+    void OnSubscriptionTerminated(app::ReadHandler & aReadHandler) override { mNumActiveSubscriptions--; }
 
     // Issue the given number of reads in parallel and wait for them all to
     // succeed.
