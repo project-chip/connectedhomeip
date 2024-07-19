@@ -958,7 +958,7 @@ static void moveHandler(app::CommandHandler * commandObj, const app::ConcreteCom
     EndpointId endpoint = commandPath.mEndpointId;
     CommandId commandId = commandPath.mCommandId;
     // Validate the received rate and moveMode first.
-    if ((!rate.IsNull() && (rate.Value() == 0)) || moveMode == MoveModeEnum::kUnknownEnumValue)
+    if (rate == static_cast<uint8_t>(0) || moveMode == MoveModeEnum::kUnknownEnumValue)
     {
         status = Status::InvalidCommand;
         goto send_default_response;
@@ -992,9 +992,12 @@ static void moveHandler(app::CommandHandler * commandObj, const app::ConcreteCom
         }
         else
         {
-            // Error out if DefaultMoveRate is equal to 0
+            // This should never occur, but old devices could have this, now invalid, value stored.
             if (defaultMoveRate.Value() == 0)
             {
+                // The spec is not explicit about what should be done if this happens.
+                // For now Error out if DefaultMoveRate is equal to 0 as this is invalid
+                // until spec defines a behaviour.
                 status = Status::InvalidCommand;
                 goto send_default_response;
             }
