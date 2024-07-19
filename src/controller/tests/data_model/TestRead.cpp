@@ -52,6 +52,20 @@ class TestRead : public chip::Test::AppContext, public app::ReadHandler::Applica
 protected:
     static uint16_t mMaxInterval;
 
+    // Performs setup for each individual test in the test suite
+    void SetUp() override
+    {
+        chip::Test::AppContext::SetUp();
+        mOldModel = InteractionModelEngine::GetInstance()->SetDataModel(&CustomDataModel::Instance());
+    }
+
+    // Performs teardown for each individual test in the test suite
+    void TearDown() override
+    {
+        InteractionModelEngine::GetInstance()->SetDataModel(mOldModel);
+        chip::Test::AppContext::TearDown();
+    }
+
     CHIP_ERROR OnSubscriptionRequested(app::ReadHandler & aReadHandler, Transport::SecureSession & aSecureSession)
     {
         VerifyOrReturnError(!mEmitSubscriptionError, CHIP_ERROR_INVALID_ARGUMENT);
@@ -83,9 +97,10 @@ protected:
     // max-interval to time out.
     static System::Clock::Timeout ComputeSubscriptionTimeout(System::Clock::Seconds16 aMaxInterval);
 
-    bool mEmitSubscriptionError      = false;
-    int32_t mNumActiveSubscriptions  = 0;
-    bool mAlterSubscriptionIntervals = false;
+    bool mEmitSubscriptionError                        = false;
+    int32_t mNumActiveSubscriptions                    = 0;
+    bool mAlterSubscriptionIntervals                   = false;
+    chip::app::InteractionModel::DataModel * mOldModel = nullptr;
 };
 
 uint16_t TestRead::mMaxInterval = 66;

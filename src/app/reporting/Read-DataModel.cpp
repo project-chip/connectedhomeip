@@ -1,0 +1,97 @@
+/*
+ *    Copyright (c) 2024 Project CHIP Authors
+ *    All rights reserved.
+ *
+ *    Licensed under the Apache License, Version 2.0 (the "License");
+ *    you may not use this file except in compliance with the License.
+ *    You may obtain a copy of the License at
+ *
+ *        http://www.apache.org/licenses/LICENSE-2.0
+ *
+ *    Unless required by applicable law or agreed to in writing, software
+ *    distributed under the License is distributed on an "AS IS" BASIS,
+ *    WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ *    See the License for the specific language governing permissions and
+ *    limitations under the License.
+ */
+#include <app/reporting/Read-DataModel.h>
+
+#include <app/AppConfig.h>
+#include <app/data-model-interface/DataModel.h>
+#include <app/util/MatterCallbacks.h>
+
+namespace chip {
+namespace app {
+namespace reporting {
+namespace DataModelImpl {
+namespace {
+
+bool IsOutOfSpaceError(CHIP_ERROR err)
+{
+    return (err == CHIP_ERROR_NO_MEMORY || err == CHIP_ERROR_BUFFER_TOO_SMALL);
+}
+
+} // namespace
+
+CHIP_ERROR RetrieveClusterData(InteractionModel::DataModel * dataModel, const Access::SubjectDescriptor & subjectDescriptor,
+                               bool isFabricFiltered, AttributeReportIBs::Builder & reportBuilder,
+                               const ConcreteReadAttributePath & path, AttributeEncodeState * encoderState)
+{
+#if !CHIP_CONFIG_USE_EMBER_DATA_MODEL
+    ChipLogDetail(DataManagement, "<RE:Run> Cluster %" PRIx32 ", Attribute %" PRIx32 " is dirty", path.mClusterId,
+                  path.mAttributeId);
+    DataModelCallbacks::GetInstance()->AttributeOperation(DataModelCallbacks::OperationType::Read,
+                                                          DataModelCallbacks::OperationOrder::Pre, path);
+#endif // !CHIP_CONFIG_USE_EMBER_DATA_MODEL
+
+    InteractionModel::ReadAttributeRequest readRequest;
+
+    if (isFabricFiltered)
+    {
+        readRequest.readFlags.Set(InteractionModel::ReadFlags::kFabricFiltered);
+    }
+    readRequest.subjectDescriptor = subjectDescriptor;
+    readRequest.path              = path;
+
+    DataVersion version = 0;
+    if (std::optional<InteractionModel::ClusterInfo> clusterInfo = dataModel->GetClusterInfo(path); clusterInfo.has_value())
+    {
+        version = clusterInfo->dataVersion;
+    }
+    else
+    {
+        ChipLogError(DataManagement, "Read request on unknown cluster - no data version available");
+    }
+
+    TLV::TLVWriter checkpoint;
+    reportBuilder.Checkpoint(checkpoint);
+
+    AttributeValueEncoder attributeValueEncoder(reportBuilder, subjectDescriptor, path, version, isFabricFiltered, encoderState);
+    CHIP_ERROR err = dataModel->ReadAttribute(readRequest, attributeValueEncoder);
+
+    if (err == CHIP_NO_ERROR)
+    {
+#if !CHIP_CONFIG_USE_EMBER_DATA_MODEL
+        DataModelCallbacks::GetInstance()->AttributeOperation(DataModelCallbacks::OperationType::Read,
+                                                              DataModelCallbacks::OperationOrder::Post, path);
+#endif // !CHIP_CONFIG_USE_EMBER_DATA_MODEL
+        return CHIP_NO_ERROR;
+    }
+
+    if (IsOutOfSpaceError(err) || err == CHIP_IM_GLOBAL_STATUS(InvalidDataType))
+    {
+        // Only update state for retryable errors. This matches logic in legacy ember compatibility layer
+        if (encoderState != nullptr)
+        {
+            *encoderState = attributeValueEncoder.GetState();
+        }
+    }
+
+    ChipLogError(DataManagement, "Failed to read attribute: %" CHIP_ERROR_FORMAT, err.Format());
+    return err;
+}
+
+} // namespace DataModelImpl
+} // namespace reporting
+} // namespace app
+} // namespace chip

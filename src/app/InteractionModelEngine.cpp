@@ -1793,6 +1793,13 @@ CommandHandlerInterface * InteractionModelEngine::FindCommandHandler(EndpointId 
     return nullptr;
 }
 
+InteractionModel::DataModel * InteractionModelEngine::SetDataModel(InteractionModel::DataModel * model)
+{
+    InteractionModel::DataModel * oldModel = GetDataModel();
+    mDataModel                             = model;
+    return oldModel;
+}
+
 InteractionModel::DataModel * InteractionModelEngine::GetDataModel() const
 {
 #if CHIP_CONFIG_USE_DATA_MODEL_INTERFACE
