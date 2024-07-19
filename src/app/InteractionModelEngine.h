@@ -215,10 +215,17 @@ public:
     CHIP_ERROR PushFrontDataVersionFilterList(SingleLinkedListNode<DataVersionFilter> *& aDataVersionFilterList,
                                               DataVersionFilter & aDataVersionFilter);
 
-    CHIP_ERROR RegisterCommandHandler(CommandHandlerInterface * handler);
-    CHIP_ERROR UnregisterCommandHandler(CommandHandlerInterface * handler);
-    CommandHandlerInterface * FindCommandHandler(EndpointId endpointId, ClusterId clusterId);
-    void UnregisterCommandHandlers(EndpointId endpointId);
+    [[deprecated("Use chip::app::CommandHandlerInterfaceRegistry::RegisterCommandHandler instead")]] CHIP_ERROR
+    RegisterCommandHandler(CommandHandlerInterface * handler);
+
+    [[deprecated("Use chip::app::CommandHandlerInterfaceRegistry::UnregisterCommandHandler instead")]] CHIP_ERROR
+    UnregisterCommandHandler(CommandHandlerInterface * handler);
+
+    [[deprecated("Use chip::app::CommandHandlerInterfaceRegistry::GetCommandHandler instead")]] CommandHandlerInterface *
+    FindCommandHandler(EndpointId endpointId, ClusterId clusterId);
+
+    [[deprecated("Use chip::app::CommandHandlerInterfaceRegistry::UnregisterAllCommandHandlersForEndpoint instead")]] void
+    UnregisterCommandHandlers(EndpointId endpointId);
 
     /*
      * Register an application callback to be notified of notable events when handling reads/subscribes.
@@ -613,8 +620,6 @@ private:
     CHIP_ERROR PushFront(SingleLinkedListNode<T> *& aObjectList, T & aData, ObjectPool<SingleLinkedListNode<T>, N> & aObjectPool);
 
     Messaging::ExchangeManager * mpExchangeMgr = nullptr;
-
-    CommandHandlerInterface * mCommandHandlerList = nullptr;
 
 #if CHIP_CONFIG_ENABLE_ICD_SERVER
     ICDManager * mICDManager = nullptr;

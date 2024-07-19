@@ -27,9 +27,10 @@
 
 #include <cinttypes>
 
-#include "access/RequestPath.h"
-#include "access/SubjectDescriptor.h"
+#include <access/RequestPath.h>
+#include <access/SubjectDescriptor.h>
 #include <app/AppConfig.h>
+#include <app/CommandHandlerInterfaceRegistry.h>
 #include <app/RequiredPrivilege.h>
 #include <app/util/IMClusterCommandHandler.h>
 #include <app/util/af-types.h>
@@ -94,21 +95,7 @@ CHIP_ERROR InteractionModelEngine::Init(Messaging::ExchangeManager * apExchangeM
 void InteractionModelEngine::Shutdown()
 {
     mpExchangeMgr->GetSessionManager()->SystemLayer()->CancelTimer(ResumeSubscriptionsTimerCallback, this);
-
-    CommandHandlerInterface * handlerIter = mCommandHandlerList;
-
-    //
-    // Walk our list of command handlers and de-register them, before finally
-    // nulling out the list entirely.
-    //
-    while (handlerIter)
-    {
-        CommandHandlerInterface * nextHandler = handlerIter->GetNext();
-        handlerIter->SetNext(nullptr);
-        handlerIter = nextHandler;
-    }
-
-    mCommandHandlerList = nullptr;
+    CommandHandlerInterfaceRegistry::UnregisterAllHandlers();
 
     mCommandResponderObjs.ReleaseAll();
 
@@ -1703,89 +1690,22 @@ Protocols::InteractionModel::Status InteractionModelEngine::CommandExists(const 
 
 CHIP_ERROR InteractionModelEngine::RegisterCommandHandler(CommandHandlerInterface * handler)
 {
-    VerifyOrReturnError(handler != nullptr, CHIP_ERROR_INVALID_ARGUMENT);
-
-    for (auto * cur = mCommandHandlerList; cur; cur = cur->GetNext())
-    {
-        if (cur->Matches(*handler))
-        {
-            ChipLogError(InteractionModel, "Duplicate command handler registration failed");
-            return CHIP_ERROR_INCORRECT_STATE;
-        }
-    }
-
-    handler->SetNext(mCommandHandlerList);
-    mCommandHandlerList = handler;
-
-    return CHIP_NO_ERROR;
+    return CommandHandlerInterfaceRegistry::RegisterCommandHandler(handler);
 }
 
 void InteractionModelEngine::UnregisterCommandHandlers(EndpointId endpointId)
 {
-    CommandHandlerInterface * prev = nullptr;
-
-    for (auto * cur = mCommandHandlerList; cur; cur = cur->GetNext())
-    {
-        if (cur->MatchesEndpoint(endpointId))
-        {
-            if (prev == nullptr)
-            {
-                mCommandHandlerList = cur->GetNext();
-            }
-            else
-            {
-                prev->SetNext(cur->GetNext());
-            }
-
-            cur->SetNext(nullptr);
-        }
-        else
-        {
-            prev = cur;
-        }
-    }
+    return CommandHandlerInterfaceRegistry::UnregisterAllCommandHandlersForEndpoint(endpointId);
 }
 
 CHIP_ERROR InteractionModelEngine::UnregisterCommandHandler(CommandHandlerInterface * handler)
 {
-    VerifyOrReturnError(handler != nullptr, CHIP_ERROR_INVALID_ARGUMENT);
-    CommandHandlerInterface * prev = nullptr;
-
-    for (auto * cur = mCommandHandlerList; cur; cur = cur->GetNext())
-    {
-        if (cur->Matches(*handler))
-        {
-            if (prev == nullptr)
-            {
-                mCommandHandlerList = cur->GetNext();
-            }
-            else
-            {
-                prev->SetNext(cur->GetNext());
-            }
-
-            cur->SetNext(nullptr);
-
-            return CHIP_NO_ERROR;
-        }
-
-        prev = cur;
-    }
-
-    return CHIP_ERROR_KEY_NOT_FOUND;
+    return CommandHandlerInterfaceRegistry::UnregisterCommandHandler(handler);
 }
 
 CommandHandlerInterface * InteractionModelEngine::FindCommandHandler(EndpointId endpointId, ClusterId clusterId)
 {
-    for (auto * cur = mCommandHandlerList; cur; cur = cur->GetNext())
-    {
-        if (cur->Matches(endpointId, clusterId))
-        {
-            return cur;
-        }
-    }
-
-    return nullptr;
+    return CommandHandlerInterfaceRegistry::GetCommandHandler(endpointId, clusterId);
 }
 
 void InteractionModelEngine::OnTimedInteractionFailed(TimedHandler * apTimedHandler)
