@@ -74,6 +74,10 @@ TEST(TestQuieterReporting, ChangeToFromZeroPolicyWorks)
     EXPECT_EQ(attribute.SetValue(0, now), AttributeDirtyState::kMustReport);
     EXPECT_EQ(attribute.value().ValueOr(INT_MAX), 0);
 
+    // 0 --> 0, expect NOT marked dirty.
+    EXPECT_EQ(attribute.SetValue(0, now), AttributeDirtyState::kNoReportNeeded);
+    EXPECT_EQ(attribute.value().ValueOr(INT_MAX), 0);
+
     // 0 --> 11, expect marked dirty.
     EXPECT_EQ(attribute.SetValue(11, now), AttributeDirtyState::kMustReport);
     EXPECT_EQ(attribute.value().ValueOr(INT_MAX), 11);

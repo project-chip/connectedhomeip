@@ -172,13 +172,14 @@ public:
      * @return AttributeDirtyState::kMustReport if attribute must be marked dirty right away, or
      * AttributeDirtyState::kNoReportNeeded otherwise.
      */
-    AttributeDirtyState SetValue(const chip::app::DataModel::Nullable<T> & newValue, Timestamp now,
+    AttributeDirtyState SetValue(const DataModel::Nullable<T> & newValue, Timestamp now,
                                  SufficientChangePredicate changedPredicate)
     {
-        bool isChangeOfNull       = newValue.IsNull() ^ mValue.IsNull();
+        bool isChangeOfNull       = newValue.IsNull() != mValue.IsNull();
         bool areBothValuesNonNull = !newValue.IsNull() && !mValue.IsNull();
+        bool areBothValuesDifferent = areBothValuesNonNull && (newValue.Value() != mValue.Value());
 
-        bool changeToFromZero = areBothValuesNonNull && (newValue.Value() == 0 || mValue.Value() == 0);
+        bool changeToFromZero = areBothValuesNonNull && areBothValuesDifferent && (newValue.Value() == 0 || mValue.Value() == 0);
         bool isIncrement      = areBothValuesNonNull && (newValue.Value() > mValue.Value());
         bool isDecrement      = areBothValuesNonNull && (newValue.Value() < mValue.Value());
 
@@ -217,20 +218,20 @@ public:
      * @return AttributeDirtyState::kMustReport if attribute must be marked dirty right away, or
      * AttributeDirtyState::kNoReportNeeded otherwise.
      */
-    AttributeDirtyState SetValue(const chip::app::DataModel::Nullable<T> & newValue, Timestamp now)
+    AttributeDirtyState SetValue(const DataModel::Nullable<T> & newValue, Timestamp now)
     {
         return SetValue(newValue, now, [](const SufficientChangePredicateCandidate &) -> bool { return false; });
     }
 
 protected:
     // Current value of the attribute.
-    chip::app::DataModel::Nullable<T> mValue;
+    DataModel::Nullable<T> mValue;
     // Last value that was marked as dirty (to use in comparisons for change, e.g. by SufficientChangePredicate).
-    chip::app::DataModel::Nullable<T> mLastDirtyValue;
+    DataModel::Nullable<T> mLastDirtyValue;
     // Enabled internal change detection policies.
     QuieterReportingPolicyFlags mPolicyFlags{ 0 };
     // Timestamp associated with the last time the attribute was marked dirty (to use in comparisons for change).
-    chip::System::Clock::Milliseconds64 mLastDirtyTimestampMillis{};
+    chip::System::Clock::Timestamp mLastDirtyTimestampMillis{};
 };
 
 } // namespace detail
