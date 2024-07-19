@@ -2937,7 +2937,8 @@ static const uint16_t kSubscriptionPoolBaseTimeoutInSeconds = 30;
     XCTAssertFalse([controller isRunning]);
 }
 
-- (void)testClientDataStorage {
+- (void)testClientDataStorage
+{
     __auto_type * factory = [MTRDeviceControllerFactory sharedInstance];
     XCTAssertNotNil(factory);
 
@@ -2995,7 +2996,8 @@ static const uint16_t kSubscriptionPoolBaseTimeoutInSeconds = 30;
     XCTAssertFalse([controller isRunning]);
 }
 
-- (void)testClientDataStorageRemoveSingleKeyAndValue {
+- (void)testClientDataStorageRemoveSingleKeyAndValue
+{
     __auto_type * factory = [MTRDeviceControllerFactory sharedInstance];
     XCTAssertNotNil(factory);
 
@@ -3072,7 +3074,8 @@ static const uint16_t kSubscriptionPoolBaseTimeoutInSeconds = 30;
     XCTAssertFalse([controller isRunning]);
 }
 
-- (void)testClientDataStorageKeysAccessor {
+- (void)testClientDataStorageKeysAccessor
+{
     __auto_type * factory = [MTRDeviceControllerFactory sharedInstance];
     XCTAssertNotNil(factory);
 
