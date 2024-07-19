@@ -780,8 +780,8 @@ constexpr EntryData entryData1[] = {
         .authMode    = AuthMode::kGroup,
         .subjects    = { kGroup2 },
         .targets     = { { .flags = Target::kCluster | Target::kEndpoint, .cluster = kLevelControlCluster, .endpoint = 1 },
-                         { .flags = Target::kCluster, .cluster = kOnOffCluster },
-                         { .flags = Target::kEndpoint, .endpoint = 2 } },
+                     { .flags = Target::kCluster, .cluster = kOnOffCluster },
+                     { .flags = Target::kEndpoint, .endpoint = 2 } },
     },
     {
         .fabricIndex = 1,
@@ -1752,7 +1752,9 @@ TEST_F(TestAccessControl, TestCheck)
     for (const auto & checkData : checkData1)
     {
         CHIP_ERROR expectedResult = checkData.allow ? CHIP_NO_ERROR : CHIP_ERROR_ACCESS_DENIED;
-        EXPECT_EQ(accessControl.Check(checkData.subjectDescriptor, checkData.requestPath, checkData.privilege), expectedResult);
+        EXPECT_EQ(
+            accessControl.Check(checkData.subjectDescriptor, checkData.requestPath, checkData.privilege, MsgType::ReadRequest),
+            expectedResult);
     }
 }
 
@@ -2189,6 +2191,38 @@ TEST_F(TestAccessControl, TestUpdateEntry)
 
         EXPECT_EQ(CompareAccessControl(accessControl, data, ArraySize(data)), CHIP_NO_ERROR);
     }
+}
+
+class TestAccessRestriction : public AccessRestriction
+{
+public:
+    TestAccessRestriction() : AccessRestriction() {}
+    ~TestAccessRestriction() {}
+
+protected:
+    CHIP_ERROR DoRequestFabricRestrictionReview(FabricIndex fabricIndex, uint64_t token, const std::vector<Entry> * arl)
+    {
+        return CHIP_NO_ERROR;
+    }
+};
+
+class TestAccessRestrictionListener : public AccessRestriction::EntryListener
+{
+public:
+    TestAccessRestrictionListener() : AccessRestriction::EntryListener() {}
+    ~TestAccessRestrictionListener() {}
+
+    void OnEntryChanged(FabricIndex fabricIndex, size_t index, SharedPtr<AccessRestriction::Entry> entry, ChangeType changeType) override {}
+
+    void OnFabricRestrictionReviewUpdate(FabricIndex fabricIndex, uint64_t token, const char * instruction, const char * redirectUrl) override {}
+};
+
+TEST_F(TestAccessControl, TestRestrictions)
+{
+    TestAccessRestriction accessRestriction;
+    TestAccessRestrictionListener listener;
+    accessRestriction.AddListener(listener);
+    accessControl.SetAccessRestriction(&accessRestriction);
 }
 
 } // namespace Access

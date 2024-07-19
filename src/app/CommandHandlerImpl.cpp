@@ -404,7 +404,8 @@ Status CommandHandlerImpl::ProcessCommandDataIB(CommandDataIB::Parser & aCommand
         Access::SubjectDescriptor subjectDescriptor = GetSubjectDescriptor();
         Access::RequestPath requestPath{ .cluster = concretePath.mClusterId, .endpoint = concretePath.mEndpointId };
         Access::Privilege requestPrivilege = RequiredPrivilege::ForInvokeCommand(concretePath);
-        err                                = Access::GetAccessControl().Check(subjectDescriptor, requestPath, requestPrivilege);
+        err                                = Access::GetAccessControl().Check(subjectDescriptor, requestPath, requestPrivilege, 
+                                                                              Protocols::InteractionModel::MsgType::InvokeCommandRequest);
         if (err != CHIP_NO_ERROR)
         {
             if (err != CHIP_ERROR_ACCESS_DENIED)
@@ -550,7 +551,8 @@ Status CommandHandlerImpl::ProcessGroupCommandDataIB(CommandDataIB::Parser & aCo
             Access::SubjectDescriptor subjectDescriptor = GetSubjectDescriptor();
             Access::RequestPath requestPath{ .cluster = concretePath.mClusterId, .endpoint = concretePath.mEndpointId };
             Access::Privilege requestPrivilege = RequiredPrivilege::ForInvokeCommand(concretePath);
-            err                                = Access::GetAccessControl().Check(subjectDescriptor, requestPath, requestPrivilege);
+            err                                = Access::GetAccessControl().Check(subjectDescriptor, requestPath, requestPrivilege,
+                                                                                  Protocols::InteractionModel::MsgType::InvokeCommandRequest);
             if (err != CHIP_NO_ERROR)
             {
                 // NOTE: an expected error is CHIP_ERROR_ACCESS_DENIED, but there could be other unexpected errors;

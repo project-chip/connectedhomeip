@@ -16,6 +16,7 @@
  */
 
 #include <access/AccessControl.h>
+#include <access/AccessRestriction.h>
 
 #include <app-common/zap-generated/cluster-objects.h>
 
@@ -26,6 +27,7 @@
 #include <app/EventLogging.h>
 #include <app/data-model/Encode.h>
 #include <app/server/AclStorage.h>
+#include <app/server/ArlStorage.h>
 #include <app/server/Server.h>
 #include <app/util/attribute-storage.h>
 
@@ -35,20 +37,28 @@ using namespace chip::Access;
 
 namespace AccessControlCluster = chip::app::Clusters::AccessControl;
 
-using AclEvent       = Clusters::AccessControl::Events::AccessControlEntryChanged::Type;
-using ChangeTypeEnum = Clusters::AccessControl::ChangeTypeEnum;
-using Entry          = AccessControl::Entry;
-using EntryListener  = AccessControl::EntryListener;
-using ExtensionEvent = Clusters::AccessControl::Events::AccessControlExtensionChanged::Type;
+using AclEvent        = Clusters::AccessControl::Events::AccessControlEntryChanged::Type;
+using ChangeTypeEnum  = Clusters::AccessControl::ChangeTypeEnum;
+using Entry           = AccessControl::Entry;
+using EntryListener   = AccessControl::EntryListener;
+using ExtensionEvent  = Clusters::AccessControl::Events::AccessControlExtensionChanged::Type;
+using ArlChangedEvent = Clusters::AccessControl::Events::AccessRestrictionEntryChanged::Type;
+using ArlReviewEvent  = Clusters::AccessControl::Events::FabricRestrictionReviewUpdate::Type;
 
 // TODO(#13590): generated code doesn't automatically handle max length so do it manually
 constexpr int kExtensionDataMaxLength = 128;
 
 constexpr uint16_t kClusterRevision = 1;
 
+constexpr uint16_t kMaxInstructionStringLength = 512;
+
+constexpr uint16_t kMaxRedirectUrlStringLength = 256;
+
 namespace {
 
-class AccessControlAttribute : public AttributeAccessInterface, public EntryListener
+class AccessControlAttribute : public AttributeAccessInterface,
+                               public AccessControl::EntryListener,
+                               public AccessRestriction::EntryListener
 {
 public:
     AccessControlAttribute() : AttributeAccessInterface(Optional<EndpointId>(0), AccessControlCluster::Id) {}
@@ -64,8 +74,14 @@ public:
     CHIP_ERROR Write(const ConcreteDataAttributePath & aPath, AttributeValueDecoder & aDecoder) override;
 
 public:
-    void OnEntryChanged(const SubjectDescriptor * subjectDescriptor, FabricIndex fabric, size_t index, const Entry * entry,
-                        ChangeType changeType) override;
+    void OnEntryChanged(const SubjectDescriptor * subjectDescriptor, FabricIndex fabric, size_t index,
+                        const AccessControl::Entry * entry, AccessControl::EntryListener::ChangeType changeType) override;
+
+    void OnEntryChanged(FabricIndex fabricIndex, size_t index, SharedPtr<AccessRestriction::Entry> entry,
+                        AccessRestriction::EntryListener::ChangeType changeType) override;
+
+    void OnFabricRestrictionReviewUpdate(FabricIndex fabricIndex, uint64_t token, const char * instruction,
+                                         const char * redirectUrl) override;
 
 private:
     /// Business logic implementation of write, returns generic CHIP_ERROR.
@@ -78,6 +94,7 @@ private:
     CHIP_ERROR ReadExtension(AttributeValueEncoder & aEncoder);
     CHIP_ERROR WriteAcl(const ConcreteDataAttributePath & aPath, AttributeValueDecoder & aDecoder);
     CHIP_ERROR WriteExtension(const ConcreteDataAttributePath & aPath, AttributeValueDecoder & aDecoder);
+    CHIP_ERROR ReadArl(AttributeValueEncoder & aEncoder);
 } sAttribute;
 
 CHIP_ERROR LogExtensionChangedEvent(const AccessControlCluster::Structs::AccessControlExtensionStruct::Type & item,
@@ -159,6 +176,8 @@ CHIP_ERROR AccessControlAttribute::ReadImpl(const ConcreteReadAttributePath & aP
         ReturnErrorOnFailure(GetAccessControl().GetMaxEntriesPerFabric(value));
         return aEncoder.Encode(static_cast<uint16_t>(value));
     }
+    case AccessControlCluster::Attributes::Arl::Id:
+        return ReadArl(aEncoder);
     case AccessControlCluster::Attributes::ClusterRevision::Id:
         return aEncoder.Encode(kClusterRevision);
     }
@@ -374,8 +393,34 @@ CHIP_ERROR AccessControlAttribute::WriteExtension(const ConcreteDataAttributePat
     return CHIP_NO_ERROR;
 }
 
+CHIP_ERROR AccessControlAttribute::ReadArl(AttributeValueEncoder & aEncoder)
+{
+    auto accessRestriction = GetAccessControl().GetAccessRestriction();
+    if (accessRestriction == nullptr)
+    {
+        return CHIP_ERROR_NOT_IMPLEMENTED;
+    }
+
+    return aEncoder.EncodeList([&](const auto & encoder) -> CHIP_ERROR {
+        for (auto & info : Server::GetInstance().GetFabricTable())
+        {
+            auto fabric = info.GetFabricIndex();
+            AccessRestriction::EntryIterator begin;
+            AccessRestriction::EntryIterator end;
+            ReturnErrorOnFailure(accessRestriction->Entries(fabric, begin, end));
+
+            for (AccessRestriction::EntryIterator it = begin; it != end; ++it)
+            {
+                ArlStorage::EncodableEntry encodableEntry(*it);
+                ReturnErrorOnFailure(encoder.Encode(encodableEntry));
+            }
+        }
+        return CHIP_NO_ERROR;
+    });
+}
+
 void AccessControlAttribute::OnEntryChanged(const SubjectDescriptor * subjectDescriptor, FabricIndex fabric, size_t index,
-                                            const Entry * entry, ChangeType changeType)
+                                            const AccessControl::Entry * entry, AccessControl::EntryListener::ChangeType changeType)
 {
     // NOTE: If the entry was changed internally by the system (e.g. creating
     // entries at startup from persistent storage, or deleting entries when a
@@ -389,11 +434,11 @@ void AccessControlAttribute::OnEntryChanged(const SubjectDescriptor * subjectDes
     CHIP_ERROR err;
     AclEvent event{ .changeType = ChangeTypeEnum::kChanged, .fabricIndex = subjectDescriptor->fabricIndex };
 
-    if (changeType == ChangeType::kAdded)
+    if (changeType == AccessControl::EntryListener::ChangeType::kAdded)
     {
         event.changeType = ChangeTypeEnum::kAdded;
     }
-    else if (changeType == ChangeType::kRemoved)
+    else if (changeType == AccessControl::EntryListener::ChangeType::kRemoved)
     {
         event.changeType = ChangeTypeEnum::kRemoved;
     }
@@ -426,6 +471,46 @@ void AccessControlAttribute::OnEntryChanged(const SubjectDescriptor * subjectDes
 
 exit:
     ChipLogError(DataManagement, "AccessControlCluster: event failed %" CHIP_ERROR_FORMAT, err.Format());
+}
+
+void AccessControlAttribute::OnEntryChanged(FabricIndex fabricIndex, size_t index, SharedPtr<AccessRestriction::Entry> entry,
+                                            AccessRestriction::EntryListener::ChangeType changeType)
+{
+    CHIP_ERROR err;
+    ArlChangedEvent event{ .fabricIndex = fabricIndex };
+
+    EventNumber eventNumber;
+    SuccessOrExit(err = LogEvent(event, 0, eventNumber));
+
+    return;
+
+exit:
+    ChipLogError(DataManagement, "AccessControlCluster: restriction event failed %" CHIP_ERROR_FORMAT, err.Format());
+}
+
+void AccessControlAttribute::OnFabricRestrictionReviewUpdate(FabricIndex fabricIndex, uint64_t token, const char * instruction,
+                                                             const char * redirectUrl)
+{
+    CHIP_ERROR err;
+    ArlReviewEvent event{ .token = token, .fabricIndex = fabricIndex };
+
+    if (instruction != nullptr)
+    {
+        event.instruction.SetNonNull(chip::CharSpan(instruction, strnlen(instruction, kMaxInstructionStringLength)));
+    }
+
+    if (redirectUrl != nullptr)
+    {
+        event.redirectURL.SetNonNull(chip::CharSpan(redirectUrl, strnlen(redirectUrl, kMaxRedirectUrlStringLength)));
+    }
+
+    EventNumber eventNumber;
+    SuccessOrExit(err = LogEvent(event, 0, eventNumber));
+
+    return;
+
+exit:
+    ChipLogError(DataManagement, "AccessControlCluster: review event failed %" CHIP_ERROR_FORMAT, err.Format());
 }
 
 CHIP_ERROR ChipErrorToImErrorMap(CHIP_ERROR err)
@@ -481,4 +566,27 @@ void MatterAccessControlPluginServerInitCallback()
 
     registerAttributeAccessOverride(&sAttribute);
     GetAccessControl().AddEntryListener(sAttribute);
+    GetAccessControl().GetAccessRestriction()->AddListener(sAttribute);
+}
+
+bool emberAfAccessControlClusterReviewFabricRestrictionsCallback(
+    CommandHandler * commandObj, const ConcreteCommandPath & commandPath,
+    const Clusters::AccessControl::Commands::ReviewFabricRestrictions::DecodableType & commandData)
+{
+    if (commandPath.mEndpointId != 0)
+    {
+        ChipLogError(DataManagement, "AccessControlCluster: invalid endpoint in ReviewFabricRestrictions request");
+        return true;
+    }
+
+    uint64_t token;
+    // TODO handle arl arg and error return
+    GetAccessControl().GetAccessRestriction()->RequestFabricRestrictionReview(commandObj->GetAccessingFabricIndex(), nullptr,
+                                                                              token);
+
+    Clusters::AccessControl::Commands::ReviewFabricRestrictionsResponse::Type response;
+    response.token = token;
+    commandObj->AddResponse(commandPath, response);
+
+    return true;
 }

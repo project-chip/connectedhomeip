@@ -34,6 +34,8 @@ static_library("access") {
   sources = [
     "AccessControl.cpp",
     "AccessControl.h",
+    "AccessRestriction.cpp",
+    "AccessRestriction.h",
     "examples/ExampleAccessControlDelegate.cpp",
     "examples/ExampleAccessControlDelegate.h",
     "examples/PermissiveAccessControlDelegate.cpp",

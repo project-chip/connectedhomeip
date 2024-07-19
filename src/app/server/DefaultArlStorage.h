@@ -1,7 +1,6 @@
 /*
  *
- *    Copyright (c) 2021 Project CHIP Authors
- *    All rights reserved.
+ *    Copyright (c) 2024 Project CHIP Authors
  *
  *    Licensed under the Apache License, Version 2.0 (the "License");
  *    you may not use this file except in compliance with the License.
@@ -18,18 +17,21 @@
 
 #pragma once
 
-#include <lib/core/DataModelTypes.h>
+#include <app/server/ArlStorage.h>
 
 namespace chip {
-namespace Access {
+namespace app {
 
-struct RequestPath
+class DefaultArlStorage : public ArlStorage
 {
-    // NOTE: eventually this will likely also contain node, for proxying
-    ClusterId cluster     = 0;
-    EndpointId endpoint   = 0;
-    uint32_t entityId     = 0; // attribute, command, or event id
+public:
+    /**
+     * Initialize must be called. It loads ARL entries for all fabrics from persistent storage,
+     * then installs a listener for the access restriction system module to maintain ARL entries in
+     * persistent storage so they remain in sync with entries in the access restriction system module.
+     */
+    CHIP_ERROR Init(PersistentStorageDelegate & persistentStorage, ConstFabricIterator first, ConstFabricIterator last) override;
 };
 
-} // namespace Access
+} // namespace app
 } // namespace chip

@@ -557,7 +557,7 @@ CHIP_ERROR EventManagement::CheckEventContext(EventLoadOutContext * eventLoadOut
     Access::RequestPath requestPath{ .cluster = event.mClusterId, .endpoint = event.mEndpointId };
     Access::Privilege requestPrivilege = RequiredPrivilege::ForReadEvent(path);
     CHIP_ERROR accessControlError =
-        Access::GetAccessControl().Check(eventLoadOutContext->mSubjectDescriptor, requestPath, requestPrivilege);
+        Access::GetAccessControl().Check(eventLoadOutContext->mSubjectDescriptor, requestPath, requestPrivilege, Protocols::InteractionModel::MsgType::SubscribeRequest);
     if (accessControlError != CHIP_NO_ERROR)
     {
         ReturnErrorCodeIf(accessControlError != CHIP_ERROR_ACCESS_DENIED, accessControlError);

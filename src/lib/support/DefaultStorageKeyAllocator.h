@@ -33,7 +33,7 @@ namespace chip {
 class StorageKeyName
 {
 public:
-    StorageKeyName(const StorageKeyName & other)             = default;
+    StorageKeyName(const StorageKeyName & other) = default;
     StorageKeyName & operator=(const StorageKeyName & other) = default;
 
     ~StorageKeyName() { memset(mKeyNameBuffer, 0, sizeof(mKeyNameBuffer)); }
@@ -129,6 +129,10 @@ public:
     }
 
     static StorageKeyName AccessControlExtensionEntry(FabricIndex fabric) { return StorageKeyName::Formatted("f/%x/ac/1", fabric); }
+    static StorageKeyName AccessControlArlEntry(FabricIndex fabric, size_t index)
+    {
+        return StorageKeyName::Formatted("f/%x/ar/0/%x", fabric, static_cast<unsigned>(index));
+    }
 
     // Group Message Counters
     static StorageKeyName GroupDataCounter() { return StorageKeyName::FromConst("g/gdc"); }

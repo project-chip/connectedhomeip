@@ -354,7 +354,7 @@ CHIP_ERROR Engine::CheckAccessDeniedEventPaths(TLV::TLVWriter & aWriter, bool & 
         Access::RequestPath requestPath{ .cluster = current->mValue.mClusterId, .endpoint = current->mValue.mEndpointId };
         Access::Privilege requestPrivilege = RequiredPrivilege::ForReadEvent(path);
 
-        err = Access::GetAccessControl().Check(apReadHandler->GetSubjectDescriptor(), requestPath, requestPrivilege);
+        err = Access::GetAccessControl().Check(apReadHandler->GetSubjectDescriptor(), requestPath, requestPrivilege, MsgType::ReadRequest);
         if (err != CHIP_ERROR_ACCESS_DENIED)
         {
             ReturnErrorOnFailure(err);

@@ -272,7 +272,7 @@ CHIP_ERROR CodegenDataModel::ReadAttribute(const InteractionModel::ReadAttribute
 
         Access::RequestPath requestPath{ .cluster = request.path.mClusterId, .endpoint = request.path.mEndpointId };
         CHIP_ERROR err = Access::GetAccessControl().Check(*request.subjectDescriptor, requestPath,
-                                                          RequiredPrivilege::ForReadAttribute(request.path));
+                                                          RequiredPrivilege::ForReadAttribute(request.path), Protocols::InteractionModel::MsgType::ReadRequest);
         if (err != CHIP_NO_ERROR)
         {
             ReturnErrorCodeIf(err != CHIP_ERROR_ACCESS_DENIED, err);

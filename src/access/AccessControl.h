@@ -18,6 +18,7 @@
 
 #pragma once
 
+#include "AccessRestriction.h"
 #include "Privilege.h"
 #include "RequestPath.h"
 #include "SubjectDescriptor.h"
@@ -25,12 +26,15 @@
 #include <lib/core/CHIPCore.h>
 #include <lib/core/Global.h>
 #include <lib/support/CodeUtils.h>
+#include <protocols/interaction_model/Constants.h>
 
 // Dump function for use during development only (0 for disabled, non-zero for enabled).
 #define CHIP_ACCESS_CONTROL_DUMP_ENABLED 0
 
 namespace chip {
 namespace Access {
+
+using namespace chip::Protocols::InteractionModel;
 
 class AccessControl
 {
@@ -71,7 +75,7 @@ public:
         public:
             Delegate() = default;
 
-            Delegate(const Delegate &)             = delete;
+            Delegate(const Delegate &) = delete;
             Delegate & operator=(const Delegate &) = delete;
 
             virtual ~Delegate() = default;
@@ -118,7 +122,7 @@ public:
             return *this;
         }
 
-        Entry(const Entry &)             = delete;
+        Entry(const Entry &) = delete;
         Entry & operator=(const Entry &) = delete;
 
         ~Entry() { mDelegate->Release(); }
@@ -245,7 +249,7 @@ public:
         public:
             Delegate() = default;
 
-            Delegate(const Delegate &)             = delete;
+            Delegate(const Delegate &) = delete;
             Delegate & operator=(const Delegate &) = delete;
 
             virtual ~Delegate() = default;
@@ -257,7 +261,7 @@ public:
 
         EntryIterator() = default;
 
-        EntryIterator(const EntryIterator &)             = delete;
+        EntryIterator(const EntryIterator &) = delete;
         EntryIterator & operator=(const EntryIterator &) = delete;
 
         ~EntryIterator() { mDelegate->Release(); }
@@ -327,7 +331,7 @@ public:
     public:
         Delegate() = default;
 
-        Delegate(const Delegate &)             = delete;
+        Delegate(const Delegate &) = delete;
         Delegate & operator=(const Delegate &) = delete;
 
         virtual ~Delegate() = default;
@@ -400,7 +404,7 @@ public:
 
     AccessControl() = default;
 
-    AccessControl(const AccessControl &)             = delete;
+    AccessControl(const AccessControl &) = delete;
     AccessControl & operator=(const AccessControl &) = delete;
 
     ~AccessControl()
@@ -627,15 +631,23 @@ public:
     // Removes a listener from the listener list, if in the list.
     void RemoveEntryListener(EntryListener & listener);
 
+    // Set an optional AcceessRestriction object for MNGD feature.
+    void SetAccessRestriction(AccessRestriction * accessRestriction) { mAccessRestriction = accessRestriction; }
+
+    AccessRestriction * GetAccessRestriction() { return mAccessRestriction; }
+
     /**
      * Check whether access (by a subject descriptor, to a request path,
      * requiring a privilege) should be allowed or denied.
+     *
+     * If an AccessRestriction object is set, it will be checked for additional access restrictions.
      *
      * @retval #CHIP_ERROR_ACCESS_DENIED if denied.
      * @retval other errors should also be treated as denied.
      * @retval #CHIP_NO_ERROR if allowed.
      */
-    CHIP_ERROR Check(const SubjectDescriptor & subjectDescriptor, const RequestPath & requestPath, Privilege requestPrivilege);
+    CHIP_ERROR Check(const SubjectDescriptor & subjectDescriptor, const RequestPath & requestPath, Privilege requestPrivilege,
+                     MsgType action);
 
 #if CHIP_ACCESS_CONTROL_DUMP_ENABLED
     CHIP_ERROR Dump(const Entry & entry);
@@ -655,6 +667,8 @@ private:
     DeviceTypeResolver * mDeviceTypeResolver = nullptr;
 
     EntryListener * mEntryListener = nullptr;
+
+    AccessRestriction * mAccessRestriction;
 };
 
 /**
