@@ -187,7 +187,7 @@ namespace chip {
 namespace DeviceLayer {
 namespace Internal {
 
-class P6Utils
+class PSOC6Utils
 {
 public:
     static CHIP_ERROR IsAPEnabled(bool & apEnabled);

@@ -20,21 +20,21 @@
 
 /**
  *    @file
- *          Utilities for interacting with the the P6 key-value store.
+ *          Utilities for interacting with the the PSOC6 key-value store.
  */
 /* this file behaves like a config.h, comes first */
 #include <platform/internal/CHIPDeviceLayerInternal.h>
 
 #include <platform/KeyValueStoreManager.h>
 
-#include <platform/Infineon/PSOC6/P6Config.h>
+#include <platform/Infineon/PSOC6/PSOC6Config.h>
 
 #include <lib/core/CHIPEncoding.h>
 #include <lib/support/CHIPMem.h>
 #include <lib/support/CHIPMemString.h>
 #include <lib/support/CodeUtils.h>
 #include <lib/support/logging/CHIPLogging.h>
-#include <platform/Infineon/PSOC6/P6Utils.h>
+#include <platform/Infineon/PSOC6/PSOC6Utils.h>
 
 namespace chip {
 namespace DeviceLayer {
@@ -43,57 +43,57 @@ namespace Internal {
 // *** CAUTION ***: Changing the names or namespaces of these values will *break* existing devices.
 
 // Namespaces used to store device configuration information.
-const char P6Config::kConfigNamespace_ChipFactory[]  = "chip-factory";
-const char P6Config::kConfigNamespace_ChipConfig[]   = "chip-config";
-const char P6Config::kConfigNamespace_ChipCounters[] = "chip-counters";
+const char PSOC6Config::kConfigNamespace_ChipFactory[]  = "chip-factory";
+const char PSOC6Config::kConfigNamespace_ChipConfig[]   = "chip-config";
+const char PSOC6Config::kConfigNamespace_ChipCounters[] = "chip-counters";
 
 // Keys stored in the chip-factory namespace
-const P6Config::Key P6Config::kConfigKey_SerialNum             = { kConfigNamespace_ChipFactory, "serial-num" };
-const P6Config::Key P6Config::kConfigKey_MfrDeviceId           = { kConfigNamespace_ChipFactory, "device-id" };
-const P6Config::Key P6Config::kConfigKey_MfrDeviceCert         = { kConfigNamespace_ChipFactory, "device-cert" };
-const P6Config::Key P6Config::kConfigKey_MfrDeviceICACerts     = { kConfigNamespace_ChipFactory, "device-ca-certs" };
-const P6Config::Key P6Config::kConfigKey_MfrDevicePrivateKey   = { kConfigNamespace_ChipFactory, "device-key" };
-const P6Config::Key P6Config::kConfigKey_SoftwareVersion       = { kConfigNamespace_ChipFactory, "software-ver" };
-const P6Config::Key P6Config::kConfigKey_HardwareVersion       = { kConfigNamespace_ChipFactory, "hardware-ver" };
-const P6Config::Key P6Config::kConfigKey_ManufacturingDate     = { kConfigNamespace_ChipFactory, "mfg-date" };
-const P6Config::Key P6Config::kConfigKey_SetupPinCode          = { kConfigNamespace_ChipFactory, "pin-code" };
-const P6Config::Key P6Config::kConfigKey_SetupDiscriminator    = { kConfigNamespace_ChipFactory, "discriminator" };
-const P6Config::Key P6Config::kConfigKey_Spake2pIterationCount = { kConfigNamespace_ChipFactory, "iteration-count" };
-const P6Config::Key P6Config::kConfigKey_Spake2pSalt           = { kConfigNamespace_ChipFactory, "salt" };
-const P6Config::Key P6Config::kConfigKey_Spake2pVerifier       = { kConfigNamespace_ChipFactory, "verifier" };
+const PSOC6Config::Key PSOC6Config::kConfigKey_SerialNum             = { kConfigNamespace_ChipFactory, "serial-num" };
+const PSOC6Config::Key PSOC6Config::kConfigKey_MfrDeviceId           = { kConfigNamespace_ChipFactory, "device-id" };
+const PSOC6Config::Key PSOC6Config::kConfigKey_MfrDeviceCert         = { kConfigNamespace_ChipFactory, "device-cert" };
+const PSOC6Config::Key PSOC6Config::kConfigKey_MfrDeviceICACerts     = { kConfigNamespace_ChipFactory, "device-ca-certs" };
+const PSOC6Config::Key PSOC6Config::kConfigKey_MfrDevicePrivateKey   = { kConfigNamespace_ChipFactory, "device-key" };
+const PSOC6Config::Key PSOC6Config::kConfigKey_SoftwareVersion       = { kConfigNamespace_ChipFactory, "software-ver" };
+const PSOC6Config::Key PSOC6Config::kConfigKey_HardwareVersion       = { kConfigNamespace_ChipFactory, "hardware-ver" };
+const PSOC6Config::Key PSOC6Config::kConfigKey_ManufacturingDate     = { kConfigNamespace_ChipFactory, "mfg-date" };
+const PSOC6Config::Key PSOC6Config::kConfigKey_SetupPinCode          = { kConfigNamespace_ChipFactory, "pin-code" };
+const PSOC6Config::Key PSOC6Config::kConfigKey_SetupDiscriminator    = { kConfigNamespace_ChipFactory, "discriminator" };
+const PSOC6Config::Key PSOC6Config::kConfigKey_Spake2pIterationCount = { kConfigNamespace_ChipFactory, "iteration-count" };
+const PSOC6Config::Key PSOC6Config::kConfigKey_Spake2pSalt           = { kConfigNamespace_ChipFactory, "salt" };
+const PSOC6Config::Key PSOC6Config::kConfigKey_Spake2pVerifier       = { kConfigNamespace_ChipFactory, "verifier" };
 
 // Keys stored in the chip-config namespace
-const P6Config::Key P6Config::kConfigKey_ServiceConfig      = { kConfigNamespace_ChipConfig, "service-config" };
-const P6Config::Key P6Config::kConfigKey_PairedAccountId    = { kConfigNamespace_ChipConfig, "account-id" };
-const P6Config::Key P6Config::kConfigKey_ServiceId          = { kConfigNamespace_ChipConfig, "service-id" };
-const P6Config::Key P6Config::kConfigKey_LastUsedEpochKeyId = { kConfigNamespace_ChipConfig, "last-ek-id" };
-const P6Config::Key P6Config::kConfigKey_FailSafeArmed      = { kConfigNamespace_ChipConfig, "fail-safe-armed" };
-const P6Config::Key P6Config::kConfigKey_WiFiStationSecType = { kConfigNamespace_ChipConfig, "sta-sec-type" };
-const P6Config::Key P6Config::kConfigKey_RegulatoryLocation = { kConfigNamespace_ChipConfig, "regulatory-location" };
-const P6Config::Key P6Config::kConfigKey_CountryCode        = { kConfigNamespace_ChipConfig, "country-code" };
-const P6Config::Key P6Config::kConfigKey_WiFiSSID           = { kConfigNamespace_ChipConfig, "wifi-ssid" };
-const P6Config::Key P6Config::kConfigKey_WiFiPassword       = { kConfigNamespace_ChipConfig, "wifi-password" };
-const P6Config::Key P6Config::kConfigKey_WiFiSecurity       = { kConfigNamespace_ChipConfig, "wifi-security" };
-const P6Config::Key P6Config::kConfigKey_WiFiMode           = { kConfigNamespace_ChipConfig, "wifimode" };
-const P6Config::Key P6Config::kConfigKey_UniqueId           = { kConfigNamespace_ChipConfig, "unique-id" };
-const P6Config::Key P6Config::kConfigKey_LockUser           = { kConfigNamespace_ChipConfig, "lock-user" };
-const P6Config::Key P6Config::kConfigKey_Credential         = { kConfigNamespace_ChipConfig, "credential" };
-const P6Config::Key P6Config::kConfigKey_LockUserName       = { kConfigNamespace_ChipConfig, "lock-user-name" };
-const P6Config::Key P6Config::kConfigKey_CredentialData     = { kConfigNamespace_ChipConfig, "credential-data" };
-const P6Config::Key P6Config::kConfigKey_UserCredentials    = { kConfigNamespace_ChipConfig, "user-credentials" };
-const P6Config::Key P6Config::kConfigKey_WeekDaySchedules   = { kConfigNamespace_ChipConfig, "weekday-schedules" };
+const PSOC6Config::Key PSOC6Config::kConfigKey_ServiceConfig      = { kConfigNamespace_ChipConfig, "service-config" };
+const PSOC6Config::Key PSOC6Config::kConfigKey_PairedAccountId    = { kConfigNamespace_ChipConfig, "account-id" };
+const PSOC6Config::Key PSOC6Config::kConfigKey_ServiceId          = { kConfigNamespace_ChipConfig, "service-id" };
+const PSOC6Config::Key PSOC6Config::kConfigKey_LastUsedEpochKeyId = { kConfigNamespace_ChipConfig, "last-ek-id" };
+const PSOC6Config::Key PSOC6Config::kConfigKey_FailSafeArmed      = { kConfigNamespace_ChipConfig, "fail-safe-armed" };
+const PSOC6Config::Key PSOC6Config::kConfigKey_WiFiStationSecType = { kConfigNamespace_ChipConfig, "sta-sec-type" };
+const PSOC6Config::Key PSOC6Config::kConfigKey_RegulatoryLocation = { kConfigNamespace_ChipConfig, "regulatory-location" };
+const PSOC6Config::Key PSOC6Config::kConfigKey_CountryCode        = { kConfigNamespace_ChipConfig, "country-code" };
+const PSOC6Config::Key PSOC6Config::kConfigKey_WiFiSSID           = { kConfigNamespace_ChipConfig, "wifi-ssid" };
+const PSOC6Config::Key PSOC6Config::kConfigKey_WiFiPassword       = { kConfigNamespace_ChipConfig, "wifi-password" };
+const PSOC6Config::Key PSOC6Config::kConfigKey_WiFiSecurity       = { kConfigNamespace_ChipConfig, "wifi-security" };
+const PSOC6Config::Key PSOC6Config::kConfigKey_WiFiMode           = { kConfigNamespace_ChipConfig, "wifimode" };
+const PSOC6Config::Key PSOC6Config::kConfigKey_UniqueId           = { kConfigNamespace_ChipConfig, "unique-id" };
+const PSOC6Config::Key PSOC6Config::kConfigKey_LockUser           = { kConfigNamespace_ChipConfig, "lock-user" };
+const PSOC6Config::Key PSOC6Config::kConfigKey_Credential         = { kConfigNamespace_ChipConfig, "credential" };
+const PSOC6Config::Key PSOC6Config::kConfigKey_LockUserName       = { kConfigNamespace_ChipConfig, "lock-user-name" };
+const PSOC6Config::Key PSOC6Config::kConfigKey_CredentialData     = { kConfigNamespace_ChipConfig, "credential-data" };
+const PSOC6Config::Key PSOC6Config::kConfigKey_UserCredentials    = { kConfigNamespace_ChipConfig, "user-credentials" };
+const PSOC6Config::Key PSOC6Config::kConfigKey_WeekDaySchedules   = { kConfigNamespace_ChipConfig, "weekday-schedules" };
 ;
-const P6Config::Key P6Config::kConfigKey_YearDaySchedules = { kConfigNamespace_ChipConfig, "yearday-schedules" };
+const PSOC6Config::Key PSOC6Config::kConfigKey_YearDaySchedules = { kConfigNamespace_ChipConfig, "yearday-schedules" };
 ;
-const P6Config::Key P6Config::kConfigKey_HolidaySchedules = { kConfigNamespace_ChipConfig, "holiday-schedules" };
+const PSOC6Config::Key PSOC6Config::kConfigKey_HolidaySchedules = { kConfigNamespace_ChipConfig, "holiday-schedules" };
 ;
 
 // Keys stored in the Chip-counters namespace
-const P6Config::Key P6Config::kCounterKey_RebootCount           = { kConfigNamespace_ChipCounters, "reboot-count" };
-const P6Config::Key P6Config::kCounterKey_UpTime                = { kConfigNamespace_ChipCounters, "up-time" };
-const P6Config::Key P6Config::kCounterKey_TotalOperationalHours = { kConfigNamespace_ChipCounters, "total-hours" };
+const PSOC6Config::Key PSOC6Config::kCounterKey_RebootCount           = { kConfigNamespace_ChipCounters, "reboot-count" };
+const PSOC6Config::Key PSOC6Config::kCounterKey_UpTime                = { kConfigNamespace_ChipCounters, "up-time" };
+const PSOC6Config::Key PSOC6Config::kCounterKey_TotalOperationalHours = { kConfigNamespace_ChipCounters, "total-hours" };
 
-CHIP_ERROR P6Config::ReadConfigValue(Key key, bool & val)
+CHIP_ERROR PSOC6Config::ReadConfigValue(Key key, bool & val)
 {
     bool in;
     char key_str[MTB_KVSTORE_MAX_KEY_SIZE] = { 0 };
@@ -107,7 +107,7 @@ CHIP_ERROR P6Config::ReadConfigValue(Key key, bool & val)
     return err;
 }
 
-CHIP_ERROR P6Config::ReadConfigValue(Key key, uint32_t & val)
+CHIP_ERROR PSOC6Config::ReadConfigValue(Key key, uint32_t & val)
 {
     uint32_t in;
     char key_str[MTB_KVSTORE_MAX_KEY_SIZE] = { 0 };
@@ -121,7 +121,7 @@ CHIP_ERROR P6Config::ReadConfigValue(Key key, uint32_t & val)
     return err;
 }
 
-CHIP_ERROR P6Config::ReadConfigValue(Key key, uint64_t & val)
+CHIP_ERROR PSOC6Config::ReadConfigValue(Key key, uint64_t & val)
 {
     uint64_t in;
     char key_str[MTB_KVSTORE_MAX_KEY_SIZE] = { 0 };
@@ -135,7 +135,7 @@ CHIP_ERROR P6Config::ReadConfigValue(Key key, uint64_t & val)
     return err;
 }
 
-CHIP_ERROR P6Config::ReadConfigValueStr(Key key, char * buf, size_t bufSize, size_t & outLen)
+CHIP_ERROR PSOC6Config::ReadConfigValueStr(Key key, char * buf, size_t bufSize, size_t & outLen)
 {
     char key_str[MTB_KVSTORE_MAX_KEY_SIZE] = { 0 };
     key.to_str(key_str, MTB_KVSTORE_MAX_KEY_SIZE);
@@ -147,7 +147,7 @@ CHIP_ERROR P6Config::ReadConfigValueStr(Key key, char * buf, size_t bufSize, siz
     return err;
 }
 
-CHIP_ERROR P6Config::ReadConfigValueBin(Key key, uint8_t * buf, size_t bufSize, size_t & outLen)
+CHIP_ERROR PSOC6Config::ReadConfigValueBin(Key key, uint8_t * buf, size_t bufSize, size_t & outLen)
 {
     char key_str[MTB_KVSTORE_MAX_KEY_SIZE] = { 0 };
     key.to_str(key_str, MTB_KVSTORE_MAX_KEY_SIZE);
@@ -159,28 +159,28 @@ CHIP_ERROR P6Config::ReadConfigValueBin(Key key, uint8_t * buf, size_t bufSize, 
     return err;
 }
 
-CHIP_ERROR P6Config::WriteConfigValue(Key key, bool val)
+CHIP_ERROR PSOC6Config::WriteConfigValue(Key key, bool val)
 {
     char key_str[MTB_KVSTORE_MAX_KEY_SIZE] = { 0 };
     key.to_str(key_str, MTB_KVSTORE_MAX_KEY_SIZE);
     return PersistedStorage::KeyValueStoreMgr().Put(key_str, static_cast<void *>(&val), sizeof(bool));
 }
 
-CHIP_ERROR P6Config::WriteConfigValue(Key key, uint32_t val)
+CHIP_ERROR PSOC6Config::WriteConfigValue(Key key, uint32_t val)
 {
     char key_str[MTB_KVSTORE_MAX_KEY_SIZE] = { 0 };
     key.to_str(key_str, MTB_KVSTORE_MAX_KEY_SIZE);
     return PersistedStorage::KeyValueStoreMgr().Put(key_str, static_cast<void *>(&val), 4);
 }
 
-CHIP_ERROR P6Config::WriteConfigValue(Key key, uint64_t val)
+CHIP_ERROR PSOC6Config::WriteConfigValue(Key key, uint64_t val)
 {
     char key_str[MTB_KVSTORE_MAX_KEY_SIZE] = { 0 };
     key.to_str(key_str, MTB_KVSTORE_MAX_KEY_SIZE);
     return PersistedStorage::KeyValueStoreMgr().Put(key_str, static_cast<void *>(&val), 8);
 }
 
-CHIP_ERROR P6Config::WriteConfigValueStr(Key key, const char * str)
+CHIP_ERROR PSOC6Config::WriteConfigValueStr(Key key, const char * str)
 {
     size_t size                            = strlen(str) + 1;
     char key_str[MTB_KVSTORE_MAX_KEY_SIZE] = { 0 };
@@ -188,27 +188,27 @@ CHIP_ERROR P6Config::WriteConfigValueStr(Key key, const char * str)
     return PersistedStorage::KeyValueStoreMgr().Put(key_str, str, size);
 }
 
-CHIP_ERROR P6Config::WriteConfigValueStr(Key key, const char * str, size_t strLen)
+CHIP_ERROR PSOC6Config::WriteConfigValueStr(Key key, const char * str, size_t strLen)
 {
     char key_str[MTB_KVSTORE_MAX_KEY_SIZE] = { 0 };
     key.to_str(key_str, MTB_KVSTORE_MAX_KEY_SIZE);
     return PersistedStorage::KeyValueStoreMgr().Put(key_str, str, strLen);
 }
-CHIP_ERROR P6Config::WriteConfigValueBin(Key key, const uint8_t * data, size_t dataLen)
+CHIP_ERROR PSOC6Config::WriteConfigValueBin(Key key, const uint8_t * data, size_t dataLen)
 {
     char key_str[MTB_KVSTORE_MAX_KEY_SIZE] = { 0 };
     key.to_str(key_str, MTB_KVSTORE_MAX_KEY_SIZE);
     return PersistedStorage::KeyValueStoreMgr().Put(key_str, data, dataLen);
 }
 
-CHIP_ERROR P6Config::ClearConfigValue(Key key)
+CHIP_ERROR PSOC6Config::ClearConfigValue(Key key)
 {
     char key_str[MTB_KVSTORE_MAX_KEY_SIZE] = { 0 };
     key.to_str(key_str, MTB_KVSTORE_MAX_KEY_SIZE);
     return PersistedStorage::KeyValueStoreMgr().Delete(key_str);
 }
 
-bool P6Config::ConfigValueExists(Key key)
+bool PSOC6Config::ConfigValueExists(Key key)
 {
     char key_str[MTB_KVSTORE_MAX_KEY_SIZE] = { 0 };
     key.to_str(key_str, MTB_KVSTORE_MAX_KEY_SIZE);
@@ -221,7 +221,7 @@ bool P6Config::ConfigValueExists(Key key)
 }
 
 // Clear out keys in config namespace
-CHIP_ERROR P6Config::FactoryResetConfig(void)
+CHIP_ERROR PSOC6Config::FactoryResetConfig(void)
 {
     CHIP_ERROR err            = CHIP_NO_ERROR;
     const Key * config_keys[] = { &kConfigKey_ServiceConfig,      &kConfigKey_PairedAccountId, &kConfigKey_ServiceId,
@@ -249,7 +249,7 @@ CHIP_ERROR P6Config::FactoryResetConfig(void)
     return CHIP_NO_ERROR;
 }
 
-void P6Config::RunConfigUnitTest() {}
+void PSOC6Config::RunConfigUnitTest() {}
 
 } // namespace Internal
 } // namespace DeviceLayer
