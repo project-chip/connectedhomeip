@@ -86,10 +86,7 @@ CHIP_ERROR ChargingTargetsMemMgr::AllocAndCopy()
         mpListOfDays[mChargingTargetSchedulesIdx] = static_cast<EnergyEvse::Structs::ChargingTargetStruct::Type *>(
             chip::Platform::MemoryAlloc(sizeof(EnergyEvse::Structs::ChargingTargetStruct::Type) * mNumDailyChargingTargets));
 
-        if (mpListOfDays[mChargingTargetSchedulesIdx] == nullptr)
-        {
-            return CHIP_ERROR_NO_MEMORY;
-        }
+        VerifyOrReturnError(mpListOfDays[mChargingTargetSchedulesIdx] != nullptr, CHIP_ERROR_NO_MEMORY);
 
         for (uint16_t idx = 0; idx < mNumDailyChargingTargets; idx++)
         {
