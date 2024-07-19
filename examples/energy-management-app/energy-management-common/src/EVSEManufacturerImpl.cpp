@@ -40,6 +40,10 @@ using namespace chip::app::Clusters::PowerSource::Attributes;
 
 using Protocols::InteractionModel::Status;
 
+// A bitmap of all possible days (the union of the values in
+// chip::app::Clusters::EnergyEvse::TargetDayOfWeekBitmap)
+static constexpr uint8_t kAllDays = 0x7f;
+
 CHIP_ERROR EVSEManufacturer::Init()
 {
     /* Manufacturers should modify this to do any custom initialisation */
@@ -112,7 +116,7 @@ CHIP_ERROR FindNextTarget(const uint8_t dayOfWeekMap, uint16_t minutesPastMidnig
 
     EnergyEvse::Structs::ChargingTargetScheduleStruct::Type entry;
 
-    uint16_t minTimeToTarget_m = 1440; // 24 hours
+    uint16_t minTimeToTarget_m = 24*60; // 24 hours
     bool bFound                = false;
 
     EVSEManufacturer * mn = GetEvseManufacturer();
@@ -125,7 +129,7 @@ CHIP_ERROR FindNextTarget(const uint8_t dayOfWeekMap, uint16_t minutesPastMidnig
         dg->GetEvseTargetsDelegate()->GetTargets();
     for (auto & chargingTargetScheduleEntry : chargingTargetSchedules)
     {
-        if (chargingTargetScheduleEntry.dayOfWeekForSequence.GetField(static_cast<TargetDayOfWeekBitmap>(0x7F)) & dayOfWeekMap)
+        if (chargingTargetScheduleEntry.dayOfWeekForSequence.GetField(static_cast<TargetDayOfWeekBitmap>(kAllDays)) & dayOfWeekMap)
         {
             // We've found today's schedule - iterate through the targets on this day
             for (auto & chargingTarget : chargingTargetScheduleEntry.chargingTargets)
@@ -234,10 +238,11 @@ CHIP_ERROR EVSEManufacturer::ComputeChargingSchedule()
             {
                 // We didn't find one for today, try tomorrow
                 searchDay++;
-                dayOfWeekMap = (dayOfWeekMap << 1) & 0x7f;
+                dayOfWeekMap = (dayOfWeekMap << 1) & kAllDays;
                 if (dayOfWeekMap == 0x00)
                 {
-                    dayOfWeekMap = 0x01; // Must be Saturday and shifted off, so set it to Sunday
+                    // Must be Saturday and shifted off, so set it to Sunday
+                    dayOfWeekMap = static_cast<uint8_t>(TargetDayOfWeekBitmap::kSunday);
                 }
             }
             else

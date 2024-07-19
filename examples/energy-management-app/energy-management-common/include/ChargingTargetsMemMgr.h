@@ -85,13 +85,66 @@ public:
     ChargingTargetsMemMgr();
     ~ChargingTargetsMemMgr();
 
+    /**
+     * @brief This method sets the index (mChargingTargetSchedulesIdx) to use into mpListOfDays.
+     *        This index is used in subsequent calls to GetChargingTargets and the AllocAndCopy
+     *        methods below.
+     *
+     *        NOTE: This method MUST be called each time a new day is added to
+     *        DataModel::List<const Structs::ChargingTargetScheduleStruct::Type> chargingTargetSchedules
+     *        before building up the ChargingTargetStruct associated with the mpListOfDays entry.
+     *
+     * @param chargingTargetSchedulesIdx  - The new index to use when accessing mpListOfDays
+     */
     void Reset(uint16_t chargingTargetSchedulesIdx);
+
+    /**
+     * @brief Called as each individual chargingTarget is loaded from persistent data.
+     *        When loading the Target from persistent storage, it is not known upfront
+     *        how many chargingTargets are associated with this day schedule so
+     *        ChargingTargetsMemMgr::AddChargingTarget() needs to be called as each individual
+     *        chargingTarget is loaded from persistent data.
+     *
+     * @param chargingTarget  - The chargingTarget to add into mpListOfDays[mChargingTargetSchedulesIdx]
+     */
     void AddChargingTarget(const EnergyEvse::Structs::ChargingTargetStruct::Type & chargingTarget);
+
+    /**
+     * @brief Called to allocate and copy the chargingTargets in mDailyChargingTargets to
+     *        mpListOfDays[mChargingTargetSchedulesIdx].
+     *        This method is used once a days's worth of chargingTargets have been loaded from persistent
+     *        storage.
+     */
     CHIP_ERROR AllocAndCopy();
+
+    /**
+     * @brief Called to allocate and copy the chargingTargets in the parameter chargingTargets to
+     *        mpListOfDays[mChargingTargetSchedulesIdx].
+     *
+     * @param chargingTargets  - The chargingTargets to add into mpListOfDays[mChargingTargetSchedulesIdx]
+     */
     CHIP_ERROR AllocAndCopy(const DataModel::List<const Structs::ChargingTargetStruct::Type> & chargingTargets);
+
+    /**
+     * @brief Called to allocate and copy the chargingTargets in the parameter chargingTargets to
+     *        mpListOfDays[mChargingTargetSchedulesIdx].
+     *
+     * @param chargingTargets  - The chargingTargets to add into mpListOfDays[mChargingTargetSchedulesIdx]
+     */
     CHIP_ERROR AllocAndCopy(const DataModel::DecodableList<Structs::ChargingTargetStruct::DecodableType> & chargingTargets);
 
+    /**
+     * @brief Returns the list of chargingTargets into mpListOfDays dependant on mChargingTargetSchedulesIdx.
+     *
+     * @return mpListOfDays[mChargingTargetSchedulesIdx]
+     */
     EnergyEvse::Structs::ChargingTargetStruct::Type * GetChargingTargets() const;
+
+    /**
+     * @brief Returns the number of chargingTargets associated with current day (mChargingTargetSchedulesIdx).
+     *
+     * @return Returns mNumDailyChargingTargets.
+     */
     uint16_t GetNumDailyChargingTargets() const;
 
 private:

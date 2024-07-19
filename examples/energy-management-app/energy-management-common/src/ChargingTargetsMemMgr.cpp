@@ -77,6 +77,9 @@ uint16_t ChargingTargetsMemMgr::GetNumDailyChargingTargets() const
 
 CHIP_ERROR ChargingTargetsMemMgr::AllocAndCopy()
 {
+    // NOTE: ChargingTargetsMemMgr::Reset() must be called as specified in the class comments in
+    // ChargingTargetsMemMgr.h before this method can be called.
+
     if (mNumDailyChargingTargets > 0)
     {
         // Allocate the memory first and then use placement new to initialise the memory of each element in the array
@@ -104,6 +107,9 @@ CHIP_ERROR ChargingTargetsMemMgr::AllocAndCopy()
 CHIP_ERROR
 ChargingTargetsMemMgr::AllocAndCopy(const DataModel::List<const Structs::ChargingTargetStruct::Type> & chargingTargets)
 {
+    // NOTE: ChargingTargetsMemMgr::Reset() must be called as specified in the class comments in
+    // ChargingTargetsMemMgr.h before this method can be called.
+
     mNumDailyChargingTargets = static_cast<uint16_t>(chargingTargets.size());
 
     if (mNumDailyChargingTargets > 0)
@@ -136,34 +142,50 @@ ChargingTargetsMemMgr::AllocAndCopy(const DataModel::List<const Structs::Chargin
 CHIP_ERROR
 ChargingTargetsMemMgr::AllocAndCopy(const DataModel::DecodableList<Structs::ChargingTargetStruct::DecodableType> & chargingTargets)
 {
+    // NOTE: ChargingTargetsMemMgr::Reset() must be called as specified in the class comments in
+    // ChargingTargetsMemMgr.h before this method can be called.
+
     size_t numDailyChargingTargets = 0;
     CHIP_ERROR err                 = chargingTargets.ComputeSize(&numDailyChargingTargets);
-    if (err == CHIP_NO_ERROR)
+    if (err != CHIP_NO_ERROR)
     {
-        mNumDailyChargingTargets = static_cast<uint16_t>(numDailyChargingTargets);
+        return err;
+    }
 
-        if (mNumDailyChargingTargets > 0)
+    mNumDailyChargingTargets = static_cast<uint16_t>(numDailyChargingTargets);
+
+    if (mNumDailyChargingTargets > 0)
+    {
+        // Allocate the memory first and then use placement new to initialise the memory of each element in the array
+        mpListOfDays[mChargingTargetSchedulesIdx] = static_cast<EnergyEvse::Structs::ChargingTargetStruct::Type *>(
+            chip::Platform::MemoryAlloc(sizeof(EnergyEvse::Structs::ChargingTargetStruct::Type) * mNumDailyChargingTargets));
+
+        if (mpListOfDays[mChargingTargetSchedulesIdx] == nullptr)
         {
-            // Allocate the memory first and then use placement new to initialise the memory of each element in the array
-            mpListOfDays[mChargingTargetSchedulesIdx] = static_cast<EnergyEvse::Structs::ChargingTargetStruct::Type *>(
-                chip::Platform::MemoryAlloc(sizeof(EnergyEvse::Structs::ChargingTargetStruct::Type) * mNumDailyChargingTargets));
+            return CHIP_ERROR_NO_MEMORY;
+        }
 
-            uint16_t idx = 0;
-            auto it      = chargingTargets.begin();
-            while (it.Next())
+        uint16_t idx = 0;
+        auto it      = chargingTargets.begin();
+        while (it.Next())
+        {
+            if (idx >= mNumDailyChargingTargets)
             {
-                auto & chargingTarget = it.GetValue();
-
-                // This will cause the ChargingTargetStruct constructor to be called and this element in the array
-                new (mpListOfDays[mChargingTargetSchedulesIdx] + idx) EnergyEvse::Structs::ChargingTargetStruct::Type();
-
-                // Now copy the chargingTarget
-                mpListOfDays[mChargingTargetSchedulesIdx][idx] = chargingTarget;
-
-                idx++;
+                // This should not happen but protect against it
+                return CHIP_ERROR_INCORRECT_STATE;
             }
+
+            auto & chargingTarget = it.GetValue();
+
+            // This will cause the ChargingTargetStruct constructor to be called and this element in the array
+            new (mpListOfDays[mChargingTargetSchedulesIdx] + idx) EnergyEvse::Structs::ChargingTargetStruct::Type();
+
+            // Now copy the chargingTarget
+            mpListOfDays[mChargingTargetSchedulesIdx][idx] = chargingTarget;
+
+            idx++;
         }
     }
 
-    return err;
+    return CHIP_NO_ERROR;
 }

@@ -53,7 +53,8 @@ CHIP_ERROR GetDayOfWeekNow(uint8_t & dayOfWeekMap);
  * @param   unixEpoch (as time_t)
  *
  * @return  bitmap value for day of week
- * Sunday = 0x01, Monday = 0x01 ... Saturday = 0x40 (1<<6)
+ *
+ * Sunday = 0x00, Monday = 0x01 ... Saturday = 0x40 (1<<6)
  */
 uint8_t GetDayOfWeekUnixEpoch(time_t unixEpoch);
 
