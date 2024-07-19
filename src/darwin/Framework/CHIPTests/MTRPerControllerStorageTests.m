@@ -2971,14 +2971,14 @@ static const uint16_t kSubscriptionPoolBaseTimeoutInSeconds = 30;
     // actual test begins here
 
     XCTAssertNotNil(controller.controllerDataStore);
-    
+
     id verifyEmptyData = [controller.controllerDataStore clientDataForNodeID:testNodeID key:testKey];
     XCTAssertNil(verifyEmptyData);
     NSLog(@"kmo: empty data verified");
 
     // store data
     [controller.controllerDataStore storeClientDataForKey:testKey value:testValue forNodeID:testNodeID];
-    
+
     // read back client data
     id readbackData = [controller.controllerDataStore clientDataForNodeID:testNodeID key:testKey];
     XCTAssertNotNil(readbackData);
@@ -2988,9 +2988,9 @@ static const uint16_t kSubscriptionPoolBaseTimeoutInSeconds = 30;
     // read back data to ensure its has been cleared
     id afterClearReadbackData = [controller.controllerDataStore clientDataForNodeID:testNodeID key:testKey];
     XCTAssertNil(afterClearReadbackData);
-    
+
     // end actual test
-    
+
     [controller shutdown];
     XCTAssertFalse([controller isRunning]);
 }
@@ -3115,7 +3115,7 @@ static const uint16_t kSubscriptionPoolBaseTimeoutInSeconds = 30;
 
     // add testKeyA and value
     [controller.controllerDataStore storeClientDataForKey:testKeyA value:testValueA forNodeID:testNodeID];
-    
+
     // key should be present for A and not present for B
     NSArray<NSString *> * keys1 = [controller.controllerDataStore storedClientDataKeysForNodeID:testNodeID];
     XCTAssert([keys1 containsObject:testKeyA]);

@@ -1172,29 +1172,29 @@ static NSString * sClientDataKeyPrefix = @"clientData";
 
 - (nullable NSArray<NSString *> *)_clientDataIndexForNodeID:(NSNumber *)nodeID {
     dispatch_assert_queue(_storageDelegateQueue);
-    
+
     NSArray<NSString *> * index = nil;
 
     id data;
-    
+
     MTRDeviceController * controller = self->_controller;
-    
+
     @autoreleasepool {
         data = [self->_storageDelegate controller:controller
                                       valueForKey:[self _clientDataIndexKeyForNodeID:nodeID]
                                     securityLevel:MTRStorageSecurityLevelSecure
                                       sharingType:MTRStorageSharingTypeNotShared];  // REVIEWERS:  fabric shared? kmo 12 jul 2024 14h58
     }
-    
+
     if (data == nil) {
         return nil;
     }
-    
+
     if (![data isKindOfClass:[NSArray<NSString *> class]]) {
         // TODO: log this, it probably indicates an error inside this part of MTRDeviceControllerDataStore
         return nil;
     }
-    
+
     // TODO:  what other checks are possible here? kmo 12 fri 2024 17h29
     index = data;
     return index;
@@ -1228,12 +1228,12 @@ static NSString * sClientDataKeyPrefix = @"clientData";
         if (data == nil) {
             return;
         }
-        
+
         if (![data conformsToProtocol:@protocol(NSSecureCoding)]) {
             MTR_LOG_ERROR("Client data retrieved from MTRDeviceControllerDataStore did not conform to NSSecureCoding");
             return;
         }
-        
+
         // TODO:  check against list of allowed data types? kmo 17 jul 2024 10h14
         clientData = data;
     });
@@ -1263,14 +1263,14 @@ static NSString * sClientDataKeyPrefix = @"clientData";
     NSArray<NSString *> * index = [self _clientDataIndexForNodeID:nodeID];
     NSMutableArray<NSString *> * modifiedIndex = nil;
     BOOL indexModified = NO;
-    
+
     if (index == nil) {
         modifiedIndex = [NSMutableArray array];
     } else {
         modifiedIndex = [index mutableCopy];
         indexModified = YES;
     }
-    
+
     if (![index containsObject:key]) {
         // first time storing this key, add to stored keys index
         [modifiedIndex addObject:key];
@@ -1281,7 +1281,7 @@ static NSString * sClientDataKeyPrefix = @"clientData";
     if (!indexModified) {
         return;
     }
-    
+
     NSString * storageKey = [self _clientDataIndexKeyForNodeID:nodeID];
     // REVIEWERS:  does it matter if I pass a mutable vs nonmutable array to this method?
     [self->_storageDelegate controller:controller
@@ -1320,7 +1320,7 @@ static NSString * sClientDataKeyPrefix = @"clientData";
                                     forKey:storageKey
                              securityLevel:MTRStorageSecurityLevelSecure
                                sharingType:MTRStorageSharingTypeNotShared]; // REVIEWERS:  should be fabric shared? kmo 12 jul 2024 13h10
-        
+
         if (!storedSuccessfully) {
             MTR_LOG_ERROR("Could not store client data for node ID %@/key %@", nodeID, key);
             return;
@@ -1334,7 +1334,7 @@ static NSString * sClientDataKeyPrefix = @"clientData";
     dispatch_sync(_storageDelegateQueue, ^{
         MTRDeviceController * controller = self->_controller;
         VerifyOrReturn(controller != nil); // No way to call delegate without controller.
-        
+
         // get index
         NSArray<NSString *> * index = [self _clientDataIndexForNodeID:nodeID];
 
