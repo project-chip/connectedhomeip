@@ -18,9 +18,11 @@
 
 #pragma once
 
+#include <app-common/zap-generated/cluster-enums.h>
 #include <app/util/config.h>
 #include <cstring>
 #include <lib/core/CHIPError.h>
+#include <lib/support/BitMask.h>
 #include <protocols/Protocols.h>
 #include <time.h>
 
@@ -45,16 +47,26 @@ CHIP_ERROR GetEpochTS(uint32_t & chipEpoch);
  *
  * @param   unixEpoch (as time_t)
  *
- * @return  bitmap value for day of week as defined by EnergyEvse::TargetDayOfWeekBitmap
+ * @return  bitmap value for day of week as defined by EnergyEvse::TargetDayOfWeekBitmap. Note
+ *          only one bit will be set for the day of the week.
  */
-uint8_t GetLocalDayOfWeekFromUnixEpoch(time_t unixEpoch);
+BitMask<EnergyEvse::TargetDayOfWeekBitmap> GetLocalDayOfWeekFromUnixEpoch(time_t unixEpoch);
 
 /**
  * @brief   Helper function to get current timestamp and work out the day of week based on localtime
  *
- * @param   reference to hold the day of week as a bitmap as defined by EnergyEvse::TargetDayOfWeekBitmap
+ * @param   reference to hold the day of week as a bitmap as defined by EnergyEvse::TargetDayOfWeekBitmap.
+ *          Note only one bit will be set for the current day.
  */
-CHIP_ERROR GetLocalDayOfWeekNow(uint8_t & dayOfWeekMap);
+CHIP_ERROR GetLocalDayOfWeekNow(BitMask<EnergyEvse::TargetDayOfWeekBitmap> & dayOfWeekMap);
+
+/**
+ * @brief   Helper function to get current timestamp and work out the current number of minutes
+ *          past midnight based on localtime
+ *
+ * @param   reference to hold the number of minutes past midnight
+ */
+CHIP_ERROR GetMinutesPastMidnight(uint16_t & minutesPastMidnight);
 
 } // namespace DeviceEnergyManagement
 } // namespace Clusters
