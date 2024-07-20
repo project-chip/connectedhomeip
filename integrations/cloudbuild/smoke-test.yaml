@@ -75,7 +75,7 @@ steps:
               ./scripts/build/build_examples.py --enable-flashbundle
               --target efr32-brd4187c-light
               --target efr32-brd4187c-light-rpc
-              --target efr32-brd4187cbrd4187c-lock-openthread-mtd
+              --target efr32-brd4187c-lock-openthread-mtd
               --target efr32-brd4187c-lock-rpc-openthread-mtd
               --target efr32-brd4187c-unit-test
               build

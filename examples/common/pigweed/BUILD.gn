@@ -82,6 +82,7 @@ pw_proto_library("button_service") {
 
 pw_proto_library("fabric_admin_service") {
   sources = [ "protos/fabric_admin_service.proto" ]
+  inputs = [ "protos/fabric_admin_service.options" ]
   deps = [ "$dir_pw_protobuf:common_protos" ]
   strip_prefix = "protos"
   prefix = "fabric_admin_service"
