@@ -108,9 +108,9 @@ CHIP_ERROR EVSEManufacturer::Shutdown()
     return CHIP_NO_ERROR;
 }
 
-CHIP_ERROR FindNextTarget(const BitMask<EnergyEvse::TargetDayOfWeekBitmap> dayOfWeekMap, uint16_t minutesPastMidnightNow_m, uint16_t & targetTimeMinutesPastMidnight_m,
-                          DataModel::Nullable<Percent> & targetSoC, DataModel::Nullable<int64_t> & addedEnergy_mWh,
-                          bool bAllowTargetsInPast)
+CHIP_ERROR FindNextTarget(const BitMask<EnergyEvse::TargetDayOfWeekBitmap> dayOfWeekMap, uint16_t minutesPastMidnightNow_m,
+                          uint16_t & targetTimeMinutesPastMidnight_m, DataModel::Nullable<Percent> & targetSoC,
+                          DataModel::Nullable<int64_t> & addedEnergy_mWh, bool bAllowTargetsInPast)
 {
     EnergyEvse::Structs::ChargingTargetScheduleStruct::Type entry;
 
