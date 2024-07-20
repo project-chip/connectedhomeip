@@ -2124,7 +2124,7 @@ static NSString * const sLastInitialSubscribeLatencyKey = @"lastInitialSubscribe
         }
     }
 
-    MTR_LOG_ERROR("%@ ", self);
+    MTR_LOG_ERROR("%@ Storage missing %lu / %lu clusters - reconciling in-memory records", self, static_cast<unsigned long>(clusterPathsToRemove.count), static_cast<unsigned long>(_persistedClusters.count));
     [_persistedClusters minusSet:clusterPathsToRemove];
 }
 
