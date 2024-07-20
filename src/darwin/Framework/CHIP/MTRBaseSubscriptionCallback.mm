@@ -201,3 +201,27 @@ void MTRBaseSubscriptionCallback::ReportError(CHIP_ERROR aError, bool aCancelSub
         });
     }
 }
+
+void MTRBaseSubscriptionCallback::ClearCachedAttributeState(EndpointId aEndpoint)
+{
+    assertChipStackLockedByCurrentThread();
+    if (mClusterStateCache) {
+        mClusterStateCache->ClearAttributes(aEndpoint);
+    }
+}
+
+void MTRBaseSubscriptionCallback::ClearCachedAttributeState(const ConcreteClusterPath & aCluster)
+{
+    assertChipStackLockedByCurrentThread();
+    if (mClusterStateCache) {
+        mClusterStateCache->ClearAttributes(aCluster);
+    }
+}
+
+void MTRBaseSubscriptionCallback::ClearCachedAttributeState(const ConcreteAttributePath & aAttribute)
+{
+    assertChipStackLockedByCurrentThread();
+    if (mClusterStateCache) {
+        mClusterStateCache->ClearAttribute(aAttribute);
+    }
+}

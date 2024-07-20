@@ -22,8 +22,9 @@
 #include <stdlib.h>
 #include <string.h>
 
-#include <gtest/gtest.h>
+#include <pw_unit_test/framework.h>
 
+#include <lib/core/StringBuilderAdapters.h>
 #include <lib/support/CHIPMemString.h>
 #include <lib/support/CodeUtils.h>
 #include <lib/support/ScopedBuffer.h>

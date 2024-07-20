@@ -24,22 +24,23 @@
 
 #include <cinttypes>
 
+#include <pw_unit_test/framework.h>
+
 #include <app/ConcreteAttributePath.h>
 #include <app/InteractionModelEngine.h>
+#include <app/codegen-data-model/Instance.h>
 #include <app/reporting/Engine.h>
 #include <app/reporting/tests/MockReportScheduler.h>
 #include <app/tests/AppTestContext.h>
 #include <lib/core/CHIPCore.h>
 #include <lib/core/ErrorStr.h>
+#include <lib/core/StringBuilderAdapters.h>
 #include <lib/core/TLV.h>
 #include <lib/core/TLVDebug.h>
 #include <lib/core/TLVUtilities.h>
 #include <lib/support/tests/ExtraPwTestMacros.h>
 #include <messaging/ExchangeContext.h>
 #include <messaging/Flags.h>
-#include <pw_unit_test/framework.h>
-
-using TestContext = chip::Test::AppContext;
 
 namespace chip {
 
@@ -51,26 +52,9 @@ constexpr chip::AttributeId kTestFieldId2 = 2;
 namespace app {
 namespace reporting {
 
-std::unique_ptr<TestContext> mpTestContext;
-
-class TestReportingEngine : public ::testing::Test
+class TestReportingEngine : public chip::Test::AppContext
 {
 public:
-    static void SetUpTestSuite()
-    {
-
-        mpTestContext = std::make_unique<TestContext>();
-        ASSERT_NE(mpTestContext, nullptr);
-        mpTestContext->SetUpTestSuite();
-    }
-    static void TearDownTestSuite()
-    {
-        mpTestContext->TearDownTestSuite();
-        mpTestContext.reset();
-    }
-    void SetUp() { mpTestContext->SetUp(); }
-    void TearDown() { mpTestContext->TearDown(); }
-
     template <typename... Args>
     static bool VerifyDirtySetContent(const Args &... args);
     static bool InsertToDirtySet(const AttributePathParams & aPath);
@@ -161,11 +145,11 @@ TEST_F_FROM_FIXTURE(TestReportingEngine, TestBuildAndSendSingleReportData)
     ReadRequestMessage::Builder readRequestBuilder;
     DummyDelegate dummy;
 
-    EXPECT_EQ(InteractionModelEngine::GetInstance()->Init(&mpTestContext->GetExchangeManager(), &mpTestContext->GetFabricTable(),
+    EXPECT_EQ(InteractionModelEngine::GetInstance()->Init(&GetExchangeManager(), &GetFabricTable(),
                                                           app::reporting::GetDefaultReportScheduler()),
               CHIP_NO_ERROR);
     TestExchangeDelegate delegate;
-    Messaging::ExchangeContext * exchangeCtx = mpTestContext->NewExchangeToAlice(&delegate);
+    Messaging::ExchangeContext * exchangeCtx = NewExchangeToAlice(&delegate);
 
     writer.Init(std::move(readRequestbuf));
     EXPECT_EQ(readRequestBuilder.Init(&writer), CHIP_NO_ERROR);
@@ -187,18 +171,18 @@ TEST_F_FROM_FIXTURE(TestReportingEngine, TestBuildAndSendSingleReportData)
     EXPECT_EQ(readRequestBuilder.GetError(), CHIP_NO_ERROR);
     EXPECT_EQ(writer.Finalize(&readRequestbuf), CHIP_NO_ERROR);
     app::ReadHandler readHandler(dummy, exchangeCtx, chip::app::ReadHandler::InteractionType::Read,
-                                 app::reporting::GetDefaultReportScheduler());
+                                 app::reporting::GetDefaultReportScheduler(), CodegenDataModelInstance());
     readHandler.OnInitialRequest(std::move(readRequestbuf));
 
     EXPECT_EQ(InteractionModelEngine::GetInstance()->GetReportingEngine().BuildAndSendSingleReportData(&readHandler),
               CHIP_NO_ERROR);
 
-    mpTestContext->DrainAndServiceIO();
+    DrainAndServiceIO();
 }
 
 TEST_F_FROM_FIXTURE(TestReportingEngine, TestMergeOverlappedAttributePath)
 {
-    EXPECT_EQ(InteractionModelEngine::GetInstance()->Init(&mpTestContext->GetExchangeManager(), &mpTestContext->GetFabricTable(),
+    EXPECT_EQ(InteractionModelEngine::GetInstance()->Init(&GetExchangeManager(), &GetFabricTable(),
                                                           app::reporting::GetDefaultReportScheduler()),
               CHIP_NO_ERROR);
 
@@ -253,7 +237,7 @@ TEST_F_FROM_FIXTURE(TestReportingEngine, TestMergeOverlappedAttributePath)
 
 TEST_F_FROM_FIXTURE(TestReportingEngine, TestMergeAttributePathWhenDirtySetPoolExhausted)
 {
-    EXPECT_EQ(InteractionModelEngine::GetInstance()->Init(&mpTestContext->GetExchangeManager(), &mpTestContext->GetFabricTable(),
+    EXPECT_EQ(InteractionModelEngine::GetInstance()->Init(&GetExchangeManager(), &GetFabricTable(),
                                                           app::reporting::GetDefaultReportScheduler()),
               CHIP_NO_ERROR);
 

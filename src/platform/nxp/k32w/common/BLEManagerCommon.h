@@ -82,16 +82,16 @@ protected:
 
     // ===== Members that implement virtual methods on BlePlatformDelegate.
 
-    bool SubscribeCharacteristic(BLE_CONNECTION_OBJECT conId, const Ble::ChipBleUUID * svcId,
-                                 const Ble::ChipBleUUID * charId) override;
-    bool UnsubscribeCharacteristic(BLE_CONNECTION_OBJECT conId, const Ble::ChipBleUUID * svcId,
-                                   const Ble::ChipBleUUID * charId) override;
-    bool CloseConnection(BLE_CONNECTION_OBJECT conId) override;
+    CHIP_ERROR SubscribeCharacteristic(BLE_CONNECTION_OBJECT conId, const Ble::ChipBleUUID * svcId,
+                                       const Ble::ChipBleUUID * charId) override;
+    CHIP_ERROR UnsubscribeCharacteristic(BLE_CONNECTION_OBJECT conId, const Ble::ChipBleUUID * svcId,
+                                         const Ble::ChipBleUUID * charId) override;
+    CHIP_ERROR CloseConnection(BLE_CONNECTION_OBJECT conId) override;
     uint16_t GetMTU(BLE_CONNECTION_OBJECT conId) const override;
-    bool SendIndication(BLE_CONNECTION_OBJECT conId, const Ble::ChipBleUUID * svcId, const Ble::ChipBleUUID * charId,
-                        System::PacketBufferHandle pBuf) override;
-    bool SendWriteRequest(BLE_CONNECTION_OBJECT conId, const Ble::ChipBleUUID * svcId, const Ble::ChipBleUUID * charId,
-                          System::PacketBufferHandle pBuf) override;
+    CHIP_ERROR SendIndication(BLE_CONNECTION_OBJECT conId, const Ble::ChipBleUUID * svcId, const Ble::ChipBleUUID * charId,
+                              System::PacketBufferHandle pBuf) override;
+    CHIP_ERROR SendWriteRequest(BLE_CONNECTION_OBJECT conId, const Ble::ChipBleUUID * svcId, const Ble::ChipBleUUID * charId,
+                                System::PacketBufferHandle pBuf) override;
 
     // ===== Members that implement virtual methods on BleApplicationDelegate.
 
@@ -224,7 +224,7 @@ protected:
     static void blekw_gap_connection_cb(deviceId_t deviceId, gapConnectionEvent_t * pConnectionEvent);
     static void blekw_start_connection_timeout(void);
     static void blekw_stop_connection_timeout(void);
-    static bool blekw_stop_connection_internal(BLE_CONNECTION_OBJECT conId);
+    static CHIP_ERROR blekw_stop_connection_internal(BLE_CONNECTION_OBJECT conId);
 
 public:
     virtual CHIP_ERROR InitHostController(BLECallbackDelegate::GapGenericCallback cb_fp) = 0;

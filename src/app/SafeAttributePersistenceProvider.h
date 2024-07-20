@@ -40,8 +40,8 @@ public:
 
     // The following API provides helper functions to simplify the access of commonly used types.
     // The API may not be complete.
-    // Currently implemented write and read types are: uint8_t, uint16_t, uint32_t, unit64_t and
-    // their nullable varieties, and bool.
+    // Currently implemented write and read types are: bool, uint8_t, uint16_t, uint32_t, unit64_t and
+    // their nullable varieties, as well as ByteSpans.
 
     /**
      * Write an attribute value of type intX, uintX or bool to non-volatile memory.
@@ -50,7 +50,7 @@ public:
      * @param [in] aValue the data to write.
      */
     template <typename T, std::enable_if_t<std::is_integral<T>::value, bool> = true>
-    CHIP_ERROR WriteScalarValue(const ConcreteAttributePath & aPath, T & aValue)
+    CHIP_ERROR WriteScalarValue(const ConcreteAttributePath & aPath, T aValue)
     {
         uint8_t value[sizeof(T)];
         auto w = Encoding::LittleEndian::BufferWriter(value, sizeof(T));
@@ -71,18 +71,16 @@ public:
      *
      * @param [in]     aPath the attribute path for the data being persisted.
      * @param [in,out] aValue where to place the data.
+     *
+     * @retval CHIP_ERROR_PERSISTED_STORAGE_VALUE_NOT_FOUND if no stored value exists for the attribute
      */
     template <typename T, std::enable_if_t<std::is_integral<T>::value, bool> = true>
     CHIP_ERROR ReadScalarValue(const ConcreteAttributePath & aPath, T & aValue)
     {
         uint8_t attrData[sizeof(T)];
         MutableByteSpan tempVal(attrData);
-        auto err = SafeReadValue(aPath, tempVal);
-        if (err != CHIP_NO_ERROR)
-        {
-            return err;
-        }
-
+        ReturnErrorOnFailure(SafeReadValue(aPath, tempVal));
+        VerifyOrReturnError(tempVal.size() == sizeof(T), CHIP_ERROR_INCORRECT_STATE);
         Encoding::LittleEndian::Reader r(tempVal.data(), tempVal.size());
         r.RawReadLowLevelBeCareful(&aValue);
         return r.StatusCode();
@@ -95,7 +93,7 @@ public:
      * @param [in] aValue the data to write.
      */
     template <typename T, std::enable_if_t<std::is_integral<T>::value, bool> = true>
-    CHIP_ERROR WriteScalarValue(const ConcreteAttributePath & aPath, DataModel::Nullable<T> & aValue)
+    CHIP_ERROR WriteScalarValue(const ConcreteAttributePath & aPath, const DataModel::Nullable<T> & aValue)
     {
         typename NumericAttributeTraits<T>::StorageType storageValue;
         if (aValue.IsNull())
@@ -114,16 +112,14 @@ public:
      *
      * @param [in]     aPath the attribute path for the data being persisted.
      * @param [in,out] aValue where to place the data.
+     *
+     * @retval CHIP_ERROR_PERSISTED_STORAGE_VALUE_NOT_FOUND if no stored value exists for the attribute
      */
     template <typename T, std::enable_if_t<std::is_integral<T>::value, bool> = true>
     CHIP_ERROR ReadScalarValue(const ConcreteAttributePath & aPath, DataModel::Nullable<T> & aValue)
     {
         typename NumericAttributeTraits<T>::StorageType storageValue;
-        CHIP_ERROR err = ReadScalarValue(aPath, storageValue);
-        if (err != CHIP_NO_ERROR)
-        {
-            return err;
-        }
+        ReturnErrorOnFailure(ReadScalarValue(aPath, storageValue));
 
         if (NumericAttributeTraits<T>::IsNullValue(storageValue))
         {
@@ -137,25 +133,25 @@ public:
         return CHIP_NO_ERROR;
     }
 
-protected:
     /**
      * Write an attribute value from the attribute store (i.e. not a struct or
      * list) to non-volatile memory.
      *
      * @param [in] aPath the attribute path for the data being written.
-     * @param [in] aValue the data to write. The value should be stored as-is.
+     * @param [in] aValue the data to write. The value will be stored as-is.
      */
     virtual CHIP_ERROR SafeWriteValue(const ConcreteAttributePath & aPath, const ByteSpan & aValue) = 0;
 
     /**
-     * Read an attribute value from non-volatile memory.
-     * It can be assumed that this method will never be called upon to read
-     * an attribute of type string or long-string.
+     * Read an attribute value as a raw sequence of bytes from non-volatile memory.
      *
      * @param [in]     aPath the attribute path for the data being persisted.
      * @param [in,out] aValue where to place the data.  The size of the buffer
-     *                 will be equal to `aValue.size()`.  The callee is expected to adjust
-     *                 aValue's size to the actual number of bytes read.
+     *                 will be equal to `aValue.size()`. On success aValue.size()
+     *                 will be the actual number of bytes read.
+     *
+     * @retval CHIP_ERROR_PERSISTED_STORAGE_VALUE_NOT_FOUND if no stored value exists for the attribute
+     * @retval CHIP_ERROR_BUFFER_TOO_SMALL aValue.size() is too small to hold the value.
      */
     virtual CHIP_ERROR SafeReadValue(const ConcreteAttributePath & aPath, MutableByteSpan & aValue) = 0;
 };

@@ -730,8 +730,13 @@ Please see more in the
 Here is an example that generates an OTA image with application update TLV:
 
 ```
-./scripts/tools/nxp/ota/ota_image_tool.py create -v 0xDEAD -p 0xBEEF -vn 42021 -vs "1.0" -da sha256 --app-input-file chip-k32w0x-contact-example.bin chip-k32w0x-contact-example.ota
+./scripts/tools/nxp/ota/ota_image_tool.py create -v 0xDEAD -p 0xBEEF -vn 2 -vs "2.0" -da sha256 --enc_enable --input_ota_key "1234567890ABCDEFA1B2C3D4E5F6F1B4" --app-input-file chip-k32w0x-contact-example.bin chip-k32w0x-contact-example.ota
 ```
+
+Please note the two options `--enc_enable` and `--input_ota_key`, which are
+mandatory when `chip_with_ota_encryption=1`. The value of `--input_ota_key` must
+match the value of `chip_with_ota_key`. See `args.gni` for the default gn
+configuration.
 
 A note regarding OTA image header version (`-vn` option). An application binary
 has its own software version, given by

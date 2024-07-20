@@ -8608,6 +8608,143 @@ public static class EnergyEvseModeClusterModeOptionStruct {
     return output.toString();
   }
 }
+public static class WaterHeaterModeClusterModeTagStruct {
+  public Optional<Integer> mfgCode;
+  public Integer value;
+  private static final long MFG_CODE_ID = 0L;
+  private static final long VALUE_ID = 1L;
+
+  public WaterHeaterModeClusterModeTagStruct(
+    Optional<Integer> mfgCode,
+    Integer value
+  ) {
+    this.mfgCode = mfgCode;
+    this.value = value;
+  }
+
+  public StructType encodeTlv() {
+    ArrayList<StructElement> values = new ArrayList<>();
+    values.add(new StructElement(MFG_CODE_ID, mfgCode.<BaseTLVType>map((nonOptionalmfgCode) -> new UIntType(nonOptionalmfgCode)).orElse(new EmptyType())));
+    values.add(new StructElement(VALUE_ID, new UIntType(value)));
+
+    return new StructType(values);
+  }
+
+  public static WaterHeaterModeClusterModeTagStruct decodeTlv(BaseTLVType tlvValue) {
+    if (tlvValue == null || tlvValue.type() != TLVType.Struct) {
+      return null;
+    }
+    Optional<Integer> mfgCode = Optional.empty();
+    Integer value = null;
+    for (StructElement element: ((StructType)tlvValue).value()) {
+      if (element.contextTagNum() == MFG_CODE_ID) {
+        if (element.value(BaseTLVType.class).type() == TLVType.UInt) {
+          UIntType castingValue = element.value(UIntType.class);
+          mfgCode = Optional.of(castingValue.value(Integer.class));
+        }
+      } else if (element.contextTagNum() == VALUE_ID) {
+        if (element.value(BaseTLVType.class).type() == TLVType.UInt) {
+          UIntType castingValue = element.value(UIntType.class);
+          value = castingValue.value(Integer.class);
+        }
+      }
+    }
+    return new WaterHeaterModeClusterModeTagStruct(
+      mfgCode,
+      value
+    );
+  }
+
+  @Override
+  public String toString() {
+    StringBuilder output = new StringBuilder();
+    output.append("WaterHeaterModeClusterModeTagStruct {\n");
+    output.append("\tmfgCode: ");
+    output.append(mfgCode);
+    output.append("\n");
+    output.append("\tvalue: ");
+    output.append(value);
+    output.append("\n");
+    output.append("}\n");
+    return output.toString();
+  }
+}
+public static class WaterHeaterModeClusterModeOptionStruct {
+  public String label;
+  public Integer mode;
+  public ArrayList<ChipStructs.WaterHeaterModeClusterModeTagStruct> modeTags;
+  private static final long LABEL_ID = 0L;
+  private static final long MODE_ID = 1L;
+  private static final long MODE_TAGS_ID = 2L;
+
+  public WaterHeaterModeClusterModeOptionStruct(
+    String label,
+    Integer mode,
+    ArrayList<ChipStructs.WaterHeaterModeClusterModeTagStruct> modeTags
+  ) {
+    this.label = label;
+    this.mode = mode;
+    this.modeTags = modeTags;
+  }
+
+  public StructType encodeTlv() {
+    ArrayList<StructElement> values = new ArrayList<>();
+    values.add(new StructElement(LABEL_ID, new StringType(label)));
+    values.add(new StructElement(MODE_ID, new UIntType(mode)));
+    values.add(new StructElement(MODE_TAGS_ID, ArrayType.generateArrayType(modeTags, (elementmodeTags) -> elementmodeTags.encodeTlv())));
+
+    return new StructType(values);
+  }
+
+  public static WaterHeaterModeClusterModeOptionStruct decodeTlv(BaseTLVType tlvValue) {
+    if (tlvValue == null || tlvValue.type() != TLVType.Struct) {
+      return null;
+    }
+    String label = null;
+    Integer mode = null;
+    ArrayList<ChipStructs.WaterHeaterModeClusterModeTagStruct> modeTags = null;
+    for (StructElement element: ((StructType)tlvValue).value()) {
+      if (element.contextTagNum() == LABEL_ID) {
+        if (element.value(BaseTLVType.class).type() == TLVType.String) {
+          StringType castingValue = element.value(StringType.class);
+          label = castingValue.value(String.class);
+        }
+      } else if (element.contextTagNum() == MODE_ID) {
+        if (element.value(BaseTLVType.class).type() == TLVType.UInt) {
+          UIntType castingValue = element.value(UIntType.class);
+          mode = castingValue.value(Integer.class);
+        }
+      } else if (element.contextTagNum() == MODE_TAGS_ID) {
+        if (element.value(BaseTLVType.class).type() == TLVType.Array) {
+          ArrayType castingValue = element.value(ArrayType.class);
+          modeTags = castingValue.map((elementcastingValue) -> ChipStructs.WaterHeaterModeClusterModeTagStruct.decodeTlv(elementcastingValue));
+        }
+      }
+    }
+    return new WaterHeaterModeClusterModeOptionStruct(
+      label,
+      mode,
+      modeTags
+    );
+  }
+
+  @Override
+  public String toString() {
+    StringBuilder output = new StringBuilder();
+    output.append("WaterHeaterModeClusterModeOptionStruct {\n");
+    output.append("\tlabel: ");
+    output.append(label);
+    output.append("\n");
+    output.append("\tmode: ");
+    output.append(mode);
+    output.append("\n");
+    output.append("\tmodeTags: ");
+    output.append(modeTags);
+    output.append("\n");
+    output.append("}\n");
+    return output.toString();
+  }
+}
 public static class DeviceEnergyManagementModeClusterModeTagStruct {
   public Optional<Integer> mfgCode;
   public Integer value;
@@ -9930,28 +10067,33 @@ public static class OccupancySensingClusterHoldTimeLimitsStruct {
   }
 }
 public static class ThreadNetworkDirectoryClusterThreadNetworkStruct {
-  public Long extendedPanID;
+  public byte[] extendedPanID;
   public String networkName;
   public Integer channel;
+  public Long activeTimestamp;
   private static final long EXTENDED_PAN_I_D_ID = 0L;
   private static final long NETWORK_NAME_ID = 1L;
   private static final long CHANNEL_ID = 2L;
+  private static final long ACTIVE_TIMESTAMP_ID = 3L;
 
   public ThreadNetworkDirectoryClusterThreadNetworkStruct(
-    Long extendedPanID,
+    byte[] extendedPanID,
     String networkName,
-    Integer channel
+    Integer channel,
+    Long activeTimestamp
   ) {
     this.extendedPanID = extendedPanID;
     this.networkName = networkName;
     this.channel = channel;
+    this.activeTimestamp = activeTimestamp;
   }
 
   public StructType encodeTlv() {
     ArrayList<StructElement> values = new ArrayList<>();
-    values.add(new StructElement(EXTENDED_PAN_I_D_ID, new UIntType(extendedPanID)));
+    values.add(new StructElement(EXTENDED_PAN_I_D_ID, new ByteArrayType(extendedPanID)));
     values.add(new StructElement(NETWORK_NAME_ID, new StringType(networkName)));
     values.add(new StructElement(CHANNEL_ID, new UIntType(channel)));
+    values.add(new StructElement(ACTIVE_TIMESTAMP_ID, new UIntType(activeTimestamp)));
 
     return new StructType(values);
   }
@@ -9960,14 +10102,15 @@ public static class ThreadNetworkDirectoryClusterThreadNetworkStruct {
     if (tlvValue == null || tlvValue.type() != TLVType.Struct) {
       return null;
     }
-    Long extendedPanID = null;
+    byte[] extendedPanID = null;
     String networkName = null;
     Integer channel = null;
+    Long activeTimestamp = null;
     for (StructElement element: ((StructType)tlvValue).value()) {
       if (element.contextTagNum() == EXTENDED_PAN_I_D_ID) {
-        if (element.value(BaseTLVType.class).type() == TLVType.UInt) {
-          UIntType castingValue = element.value(UIntType.class);
-          extendedPanID = castingValue.value(Long.class);
+        if (element.value(BaseTLVType.class).type() == TLVType.ByteArray) {
+          ByteArrayType castingValue = element.value(ByteArrayType.class);
+          extendedPanID = castingValue.value(byte[].class);
         }
       } else if (element.contextTagNum() == NETWORK_NAME_ID) {
         if (element.value(BaseTLVType.class).type() == TLVType.String) {
@@ -9979,12 +10122,18 @@ public static class ThreadNetworkDirectoryClusterThreadNetworkStruct {
           UIntType castingValue = element.value(UIntType.class);
           channel = castingValue.value(Integer.class);
         }
+      } else if (element.contextTagNum() == ACTIVE_TIMESTAMP_ID) {
+        if (element.value(BaseTLVType.class).type() == TLVType.UInt) {
+          UIntType castingValue = element.value(UIntType.class);
+          activeTimestamp = castingValue.value(Long.class);
+        }
       }
     }
     return new ThreadNetworkDirectoryClusterThreadNetworkStruct(
       extendedPanID,
       networkName,
-      channel
+      channel,
+      activeTimestamp
     );
   }
 
@@ -9993,13 +10142,16 @@ public static class ThreadNetworkDirectoryClusterThreadNetworkStruct {
     StringBuilder output = new StringBuilder();
     output.append("ThreadNetworkDirectoryClusterThreadNetworkStruct {\n");
     output.append("\textendedPanID: ");
-    output.append(extendedPanID);
+    output.append(Arrays.toString(extendedPanID));
     output.append("\n");
     output.append("\tnetworkName: ");
     output.append(networkName);
     output.append("\n");
     output.append("\tchannel: ");
     output.append(channel);
+    output.append("\n");
+    output.append("\tactiveTimestamp: ");
+    output.append(activeTimestamp);
     output.append("\n");
     output.append("}\n");
     return output.toString();

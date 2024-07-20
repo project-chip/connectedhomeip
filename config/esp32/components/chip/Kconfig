@@ -330,9 +330,11 @@ menu "CHIP Device Layer"
         config MAX_EVENT_QUEUE_SIZE
             int "Max Event Queue Size"
             range 0 65535
-            default 25
+            default 40
             help
                 The maximum number of events that can be held in the CHIP Platform event queue.
+                Should be set greater than CONFIG_ESP32_WIFI_DYNAMIC_RX_BUFFER_NUM. For SoCs other than
+                ESP32-C2, where the Wi-Fi buffer number is 8, recommended to use the default value.
 
         config ENABLE_EXTENDED_DISCOVERY
             bool "Enable Extended discovery Support"
