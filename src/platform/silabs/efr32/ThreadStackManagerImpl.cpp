@@ -26,7 +26,8 @@
 /* this file behaves like a config.h, comes first */
 #include <platform/internal/CHIPDeviceLayerInternal.h>
 
-#include <platform/FreeRTOS/GenericThreadStackManagerImpl_FreeRTOS.hpp>
+#include <app/clusters/network-commissioning/network-commissioning.h>
+#include <platform/NetworkCommissioning.h>
 #include <platform/OpenThread/GenericThreadStackManagerImpl_OpenThread.hpp>
 #include <platform/OpenThread/OpenThreadUtils.h>
 #include <platform/ThreadStackManager.h>
@@ -35,11 +36,42 @@
 
 #include <lib/support/CHIPPlatformMemory.h>
 
-// Forward declaration
-extern "C" otInstance * otGetInstance(void);
+#include <lib/support/CodeUtils.h>
+#include <mbedtls/platform.h>
+
+extern "C" {
+#include "platform-efr32.h"
+otInstance * otGetInstance(void);
+#if CHIP_DEVICE_CONFIG_THREAD_ENABLE_CLI
+void otAppCliInit(otInstance * aInstance);
+#endif // CHIP_DEVICE_CONFIG_THREAD_ENABLE_CLI
+}
 
 namespace chip {
 namespace DeviceLayer {
+namespace {
+otInstance * sOTInstance = NULL;
+
+// Network commissioning
+#ifndef _NO_GENERIC_THREAD_NETWORK_COMMISSIONING_DRIVER_
+NetworkCommissioning::GenericThreadDriver sGenericThreadDriver;
+app::Clusters::NetworkCommissioning::Instance sThreadNetworkCommissioningInstance(0 /* Endpoint Id */, &sGenericThreadDriver);
+#endif
+
+void initStaticNetworkCommissioningThreadDriver(void)
+{
+#ifndef _NO_GENERIC_THREAD_NETWORK_COMMISSIONING_DRIVER_
+    sThreadNetworkCommissioningInstance.Init();
+#endif
+}
+
+void shutdownStaticNetworkCommissioningThreadDriver(void)
+{
+#ifndef _NO_GENERIC_THREAD_NETWORK_COMMISSIONING_DRIVER_
+    sThreadNetworkCommissioningInstance.Shutdown();
+#endif
+}
+}; // namespace
 
 using namespace ::chip::DeviceLayer::Internal;
 
@@ -47,26 +79,74 @@ ThreadStackManagerImpl ThreadStackManagerImpl::sInstance;
 
 CHIP_ERROR ThreadStackManagerImpl::_InitThreadStack(void)
 {
-    return InitThreadStack(NULL);
+    return InitThreadStack(sOTInstance);
 }
+
+CHIP_ERROR ThreadStackManagerImpl::_StartThreadTask(void)
+{
+    // Stubbed since our thread task is created in the InitThreadStack function and it will start once the scheduler starts.
+    return CHIP_NO_ERROR;
+}
+
+void ThreadStackManagerImpl::_LockThreadStack(void)
+{
+    sl_ot_rtos_acquire_stack_mutex();
+}
+
+bool ThreadStackManagerImpl::_TryLockThreadStack(void)
+{
+    // TODO: Implement a non-blocking version of the mutex lock
+    sl_ot_rtos_acquire_stack_mutex();
+    return true;
+}
+
+void ThreadStackManagerImpl::_UnlockThreadStack(void)
+{
+    sl_ot_rtos_release_stack_mutex();
+}
+
+#if CHIP_DEVICE_CONFIG_ENABLE_THREAD_SRP_CLIENT
+void ThreadStackManagerImpl::_WaitOnSrpClearAllComplete()
+{
+    // Only 1 task can be blocked on a srpClearAll request
+    if (mSrpClearAllRequester == NULL)
+    {
+        mSrpClearAllRequester = osThreadGetId();
+        // Wait on OnSrpClientNotification which confirms the clearing is done.
+        // It will notify this current task with NotifySrpClearAllComplete.
+        // However, we won't wait more than 2s.
+        osThreadFlagsWait(threadSrpClearAllFlags, osFlagsWaitAny, pdMS_TO_TICKS(2000));
+        mSrpClearAllRequester = NULL;
+    }
+}
+
+void ThreadStackManagerImpl::_NotifySrpClearAllComplete()
+{
+    if (mSrpClearAllRequester)
+    {
+        osThreadFlagsSet(mSrpClearAllRequester, threadSrpClearAllFlags);
+    }
+}
+#endif // CHIP_DEVICE_CONFIG_ENABLE_THREAD_SRP_CLIENT
 
 CHIP_ERROR ThreadStackManagerImpl::InitThreadStack(otInstance * otInst)
 {
     CHIP_ERROR err = CHIP_NO_ERROR;
-
-    // Initialize the generic implementation base classes.
-    err = GenericThreadStackManagerImpl_FreeRTOS<ThreadStackManagerImpl>::DoInit();
-    SuccessOrExit(err);
-    err = GenericThreadStackManagerImpl_OpenThread<ThreadStackManagerImpl>::DoInit(otInst);
-    SuccessOrExit(err);
-
-exit:
+    err            = GenericThreadStackManagerImpl_OpenThread<ThreadStackManagerImpl>::ConfigureThreadStack(otInst);
+    initStaticNetworkCommissioningThreadDriver();
     return err;
+}
+
+void ThreadStackManagerImpl::FactoryResetThreadStack(void)
+{
+    VerifyOrReturn(sOTInstance != NULL);
+    otInstanceFactoryReset(sOTInstance);
+    shutdownStaticNetworkCommissioningThreadDriver();
 }
 
 bool ThreadStackManagerImpl::IsInitialized()
 {
-    return sInstance.mThreadStackLock != NULL;
+    return otGetInstance() != NULL;
 }
 
 } // namespace DeviceLayer
@@ -74,34 +154,6 @@ bool ThreadStackManagerImpl::IsInitialized()
 
 using namespace ::chip::DeviceLayer;
 
-/**
- * Glue function called directly by the OpenThread stack when tasklet processing work
- * is pending.
- */
-extern "C" void otTaskletsSignalPending(otInstance * p_instance)
-{
-    ThreadStackMgrImpl().SignalThreadActivityPending();
-}
-
-/**
- * Glue function called directly by the OpenThread stack when system event processing work
- * is pending.
- */
-extern "C" void otSysEventSignalPending(void)
-{
-    BaseType_t yieldRequired = ThreadStackMgrImpl().SignalThreadActivityPendingFromISR();
-    portYIELD_FROM_ISR(yieldRequired);
-}
-
-extern "C" void * otPlatCAlloc(size_t aNum, size_t aSize)
-{
-    return CHIPPlatformMemoryCalloc(aNum, aSize);
-}
-
-extern "C" void otPlatFree(void * aPtr)
-{
-    CHIPPlatformMemoryFree(aPtr);
-}
 #ifndef SL_COMPONENT_CATALOG_PRESENT
 extern "C" __WEAK void sl_openthread_init(void)
 {
@@ -137,7 +189,22 @@ extern "C" otError otPlatUartEnable(void)
 
 extern "C" otInstance * otGetInstance(void)
 {
-    return ThreadStackMgrImpl().OTInstance();
+    return sOTInstance;
+}
+
+extern "C" void sl_ot_create_instance(void)
+{
+    VerifyOrDie(chip::Platform::MemoryInit() == CHIP_NO_ERROR);
+    mbedtls_platform_set_calloc_free(CHIPPlatformMemoryCalloc, CHIPPlatformMemoryFree);
+    sOTInstance = otInstanceInitSingle();
+}
+
+extern "C" void sl_ot_cli_init(void)
+{
+#if !defined(PW_RPC_ENABLED) && CHIP_DEVICE_CONFIG_THREAD_ENABLE_CLI
+    VerifyOrDie(sOTInstance != NULL);
+    otAppCliInit(sOTInstance);
+#endif
 }
 
 #if CHIP_DEVICE_CONFIG_THREAD_ENABLE_CLI
