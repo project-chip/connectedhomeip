@@ -44,7 +44,7 @@ def main():
     manual_3333_20202021 = '31693312339'
     manual_2222_20202024 = '20055212333'
 
-    test_runner = MockTestRunner('TC_SC_5_1', 'TC_SC_5_1', 'test_TC_SC_5_1', 0)
+    test_runner = MockTestRunner('TC_SC_7_1', 'TC_SC_7_1', 'test_TC_SC_7_1', 0)
     failures = []
 
     # Tests with no code specified should fail
@@ -157,7 +157,7 @@ def main():
 
     test_runner.Shutdown()
     print(
-        f"Test of TC-SC-5.1: test response incorrect: {len(failures)}")
+        f"Test of TC-SC-7.1: test response incorrect: {len(failures)}")
     for f in failures:
         print(f)
 

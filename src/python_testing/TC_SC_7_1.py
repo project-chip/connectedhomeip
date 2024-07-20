@@ -28,7 +28,7 @@
 # === END CI TEST ARGUMENTS ===
 
 # Note that in the CI we are using the post-cert test as we can only start one app from the current script.
-# This should still be fine as this test has unit tests for other conditions. See test_TC_SC_5_1.py
+# This should still be fine as this test has unit tests for other conditions. See test_TC_SC_7_1.py
 import logging
 from glob import glob
 from pathlib import Path
@@ -44,8 +44,8 @@ def _trusted_root_test_step(dut_num: int) -> TestStep:
     return TestStep(dut_num, read_trusted_roots_over_pase, "List should be empty as the DUT should be in factory reset ")
 
 
-class TC_SC_5_1(MatterBaseTest):
-    ''' TC-SC-5.1
+class TC_SC_7_1(MatterBaseTest):
+    ''' TC-SC-7.1
 
         This test requires two instances of the DUT with the same PID/VID to confirm that the individual
         devices are provisioned with different discriminators and PAKE salts in the same product line.
@@ -63,7 +63,7 @@ class TC_SC_5_1(MatterBaseTest):
     def expected_number_of_DUTs(self) -> int:
         return 1 if self.post_cert_test else 2
 
-    def steps_TC_SC_5_1(self):
+    def steps_TC_SC_7_1(self):
         if self.post_cert_test:
             return [_trusted_root_test_step(1),
                     TestStep(2, "TH extracts the discriminator from the provided setup code", "Ensure the code is not the default")]
@@ -75,7 +75,7 @@ class TC_SC_5_1(MatterBaseTest):
     # TODO: Need a pics or something to limit this to devices that have a factory-provided matter setup code (as opposed to a field upgradable device / device with a custom commissioning where this test won't apply)
 
     @async_test_body
-    async def test_TC_SC_5_1(self):
+    async def test_TC_SC_7_1(self):
         # For now, this test is WAY easier if we just ask for the setup code instead of discriminator / passcode
         asserts.assert_false(self.matter_test_config.discriminators,
                              "This test needs to be run with either the QR or manual setup code. The QR code is preferred.")
