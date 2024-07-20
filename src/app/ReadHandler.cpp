@@ -22,6 +22,7 @@
  *
  */
 
+#include "data-model-interface/DataModel.h"
 #include <app/AppConfig.h>
 #include <app/InteractionModelEngine.h>
 #include <app/MessageDef/EventPathIB.h>
@@ -53,9 +54,9 @@ uint16_t ReadHandler::GetPublisherSelectedIntervalLimit()
 }
 
 ReadHandler::ReadHandler(ManagementCallback & apCallback, Messaging::ExchangeContext * apExchangeContext,
-                         InteractionType aInteractionType, Observer * observer) :
-    mExchangeCtx(*this),
-    mManagementCallback(apCallback)
+                         InteractionType aInteractionType, Observer * observer, InteractionModel::DataModel * apDataModel) :
+    mAttributePathExpandIterator(apDataModel, nullptr),
+    mExchangeCtx(*this), mManagementCallback(apCallback)
 {
     VerifyOrDie(apExchangeContext != nullptr);
 
@@ -79,8 +80,8 @@ ReadHandler::ReadHandler(ManagementCallback & apCallback, Messaging::ExchangeCon
 }
 
 #if CHIP_CONFIG_PERSIST_SUBSCRIPTIONS
-ReadHandler::ReadHandler(ManagementCallback & apCallback, Observer * observer) :
-    mExchangeCtx(*this), mManagementCallback(apCallback)
+ReadHandler::ReadHandler(ManagementCallback & apCallback, Observer * observer, InteractionModel::DataModel * apDataModel) :
+    mAttributePathExpandIterator(apDataModel, nullptr), mExchangeCtx(*this), mManagementCallback(apCallback)
 {
     mInteractionType = InteractionType::Subscribe;
     mFlags.ClearAll();
@@ -509,8 +510,8 @@ CHIP_ERROR ReadHandler::ProcessAttributePaths(AttributePathIBs::Parser & aAttrib
     if (CHIP_END_OF_TLV == err)
     {
         mManagementCallback.GetInteractionModelEngine()->RemoveDuplicateConcreteAttributePath(mpAttributePathList);
-        mAttributePathExpandIterator = AttributePathExpandIterator(mpAttributePathList);
-        err                          = CHIP_NO_ERROR;
+        mAttributePathExpandIterator.ResetTo(mpAttributePathList);
+        err = CHIP_NO_ERROR;
     }
     return err;
 }
@@ -850,7 +851,7 @@ void ReadHandler::PersistSubscription()
 
 void ReadHandler::ResetPathIterator()
 {
-    mAttributePathExpandIterator = AttributePathExpandIterator(mpAttributePathList);
+    mAttributePathExpandIterator.ResetTo(mpAttributePathList);
     mAttributeEncoderState.Reset();
 }
 
