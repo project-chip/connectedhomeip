@@ -239,7 +239,6 @@ class DeviceConformanceTests(BasicCompositionTests):
     def check_device_type(self, fail_on_extra_clusters: bool = True, allow_provisional: bool = False) -> tuple[bool, list[ProblemNotice]]:
         success = True
         problems = []
-        test_name = self.get_test_name()
 
         def record_problem(location, problem, severity):
             problems.append(ProblemNotice("IDM-10.5", location, severity, problem, ""))

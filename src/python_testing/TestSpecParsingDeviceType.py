@@ -212,7 +212,7 @@ class TestSpecParsingDeviceType(MatterBaseTest):
         asserts.assert_equal(len(problems), 1, "Did not receive expected warning for extra clusters")
         asserts.assert_true(success, "Unexpected failure")
 
-    def test_bad_device_type_id(self):
+    def test_bad_device_type_id_device_type_test(self):
         self.create_test([], bad_device_id=True)
         success, problems = self.test.check_device_type(fail_on_extra_clusters=True)
         if problems:
