@@ -1067,7 +1067,7 @@ class MatterBaseTest(base_test.BaseTestClass):
             logging.info(f'**** Skipping: {num}')
         self.step_skipped = True
 
-    def skip_steps(self, step):
+    def skip_step(self, step):
         self.step(step)
         self.mark_current_step_skipped()
 
