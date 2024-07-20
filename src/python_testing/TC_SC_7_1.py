@@ -30,12 +30,9 @@
 # Note that in the CI we are using the post-cert test as we can only start one app from the current script.
 # This should still be fine as this test has unit tests for other conditions. See test_TC_SC_7_1.py
 import logging
-from glob import glob
-from pathlib import Path
-from typing import List, Optional
 
 import chip.clusters as Clusters
-from matter_testing_support import MatterBaseTest, SetupPayloadInfo, TestStep, async_test_body, default_matter_test_main
+from matter_testing_support import MatterBaseTest, TestStep, async_test_body, default_matter_test_main
 from mobly import asserts
 
 

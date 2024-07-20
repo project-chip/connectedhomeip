@@ -17,7 +17,6 @@
 #
 
 import sys
-from dataclasses import dataclass
 from random import randbytes
 
 import chip.clusters as Clusters
