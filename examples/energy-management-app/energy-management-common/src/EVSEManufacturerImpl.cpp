@@ -112,9 +112,6 @@ CHIP_ERROR FindNextTarget(const BitMask<EnergyEvse::TargetDayOfWeekBitmap> dayOf
                           DataModel::Nullable<Percent> & targetSoC, DataModel::Nullable<int64_t> & addedEnergy_mWh,
                           bool bAllowTargetsInPast)
 {
-
-    CHIP_ERROR err = CHIP_NO_ERROR;
-
     EnergyEvse::Structs::ChargingTargetScheduleStruct::Type entry;
 
     uint16_t minTimeToTarget_m = 24 * 60; // 24 hours
@@ -177,12 +174,7 @@ CHIP_ERROR FindNextTarget(const BitMask<EnergyEvse::TargetDayOfWeekBitmap> dayOf
         }
     }
 
-    if (!bFound)
-    {
-        err = CHIP_ERROR_NOT_FOUND;
-    }
-
-    return err;
+    return bFound ? CHIP_NO_ERROR : CHIP_ERROR_NOT_FOUND;
 }
 
 /**
