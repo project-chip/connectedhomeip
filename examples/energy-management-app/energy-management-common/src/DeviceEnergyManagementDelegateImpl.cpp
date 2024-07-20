@@ -115,6 +115,8 @@ Status DeviceEnergyManagementDelegate::PowerAdjustRequest(const int64_t powerMw,
 
     SetESAState(ESAStateEnum::kPowerAdjustActive);
 
+    // mPowerAdjustCapabilityStruct is guaranteed to have a value as validated in Instance::HandlePowerAdjustRequest.
+    // If it did not have a value, this method would not have been called.
     switch (cause)
     {
     case AdjustmentCauseEnum::kLocalOptimization:
