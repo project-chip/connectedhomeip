@@ -99,9 +99,9 @@ def MatterTlvToJson(tlv_data: dict[int, Any]) -> dict[str, Any]:
 
 class BasicCompositionTests:
     async def connect_over_pase(self, dev_ctrl):
-        asserts.assert_true(self.matter_test_config.qr_code_content is None or self.matter_test_config.manual_code is None,
+        asserts.assert_true(self.matter_test_config.qr_code_content == [] or self.matter_test_config.manual_code == [],
                             "Cannot have both QR and manual code specified")
-        setupCode = self.matter_test_config.qr_code_content if self.matter_test_config.qr_code_content is not None else self.matter_test_config.manual_code
+        setupCode = self.matter_test_config.qr_code_content + self.matter_test_config.manual_code
         asserts.assert_equal(len(setupCode), 1, "Require one of either --qr-code or --manual-code.")
         await dev_ctrl.FindOrEstablishPASESession(setupCode[0], self.dut_node_id)
 
