@@ -366,8 +366,8 @@ class MatterTestConfig:
     # This allows cert tests to be run without re-commissioning for RR-1.1.
     maximize_cert_chains: bool = True
 
-    qr_code_content: Optional[List[str]] = None
-    manual_code: Optional[List[str]] = None
+    qr_code_content: List[str] = field(default_factory=list)
+    manual_code: List[str] = field(default_factory=list)
 
     wifi_ssid: Optional[str] = None
     wifi_passphrase: Optional[str] = None
@@ -1071,20 +1071,18 @@ class MatterBaseTest(base_test.BaseTestClass):
 
     def get_setup_payload_info(self) -> List[SetupPayloadInfo]:
         setup_payloads = []
-        if self.matter_test_config.qr_code_content is not None:
-            for qr_code in self.matter_test_config.qr_code_content:
-                try:
-                    setup_payloads.append(SetupPayload().ParseQrCode(qr_code))
-                except ChipStackError:
-                    asserts.fail(f"QR code '{qr_code} failed to parse properly as a Matter setup code.")
+        for qr_code in self.matter_test_config.qr_code_content:
+            try:
+                setup_payloads.append(SetupPayload().ParseQrCode(qr_code))
+            except ChipStackError:
+                asserts.fail(f"QR code '{qr_code} failed to parse properly as a Matter setup code.")
 
-        if self.matter_test_config.manual_code is not None:
-            for manual_code in self.matter_test_config.manual_code:
-                try:
-                    setup_payloads.append(SetupPayload().ParseManualPairingCode(manual_code))
-                except ChipStackError:
-                    asserts.fail(
-                        f"Manual code code '{manual_code}' failed to parse properly as a Matter setup code. Check that all digits are correct and length is 11 or 21 characters.")
+        for manual_code in self.matter_test_config.manual_code:
+            try:
+                setup_payloads.append(SetupPayload().ParseManualPairingCode(manual_code))
+            except ChipStackError:
+                asserts.fail(
+                    f"Manual code code '{manual_code}' failed to parse properly as a Matter setup code. Check that all digits are correct and length is 11 or 21 characters.")
 
         infos = []
         for setup_payload in setup_payloads:
@@ -1308,26 +1306,23 @@ def populate_commissioning_args(args: argparse.Namespace, config: MatterTestConf
     config.commissioning_method = args.commissioning_method
     config.commission_only = args.commission_only
 
-    config.qr_code_content = args.qr_code
-    if args.manual_code:
-        config.manual_code = args.manual_code
-    else:
-        config.manual_code = None
+    config.qr_code_content.extend(args.qr_code)
+    config.manual_code.extend(args.manual_code)
 
     if args.commissioning_method is None:
         return True
 
-    if args.discriminators is None and (args.qr_code is None and args.manual_code is None):
+    if args.discriminators == [] and (args.qr_code == [] and args.manual_code == []):
         print("error: Missing --discriminator when no --qr-code/--manual-code present!")
         return False
     config.discriminators = args.discriminators
 
-    if args.passcodes is None and (args.qr_code is None and args.manual_code is None):
+    if args.passcodes == [] and (args.qr_code == [] and args.manual_code == []):
         print("error: Missing --passcode when no --qr-code/--manual-code present!")
         return False
     config.setup_passcodes = args.passcodes
 
-    if args.qr_code is not None and args.manual_code is not None:
+    if args.qr_code != [] and args.manual_code != []:
         print("error: Cannot have both --qr-code and --manual-code present!")
         return False
 
@@ -1335,7 +1330,7 @@ def populate_commissioning_args(args: argparse.Namespace, config: MatterTestConf
         print("error: supplied number of discriminators does not match number of passcodes")
         return False
 
-    device_descriptors = config.qr_code_content if config.qr_code_content is not None else config.manual_code if config.manual_code is not None else config.discriminators
+    device_descriptors = config.qr_code_content + config.manual_code + config.discriminators
 
     if len(config.dut_node_ids) > len(device_descriptors):
         print("error: More node IDs provided than discriminators")
