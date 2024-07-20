@@ -209,7 +209,7 @@ protected:
     void UpdateCountdownTime(bool fromDelegate);
 
     /**
-     * @brief Whenever the cluster logic things time should be updated, call this.
+     * @brief Whenever the cluster logic thinks time should be updated, call this.
      */
     void UpdateCountdownTimeFromClusterLogic() { UpdateCountdownTime(/* fromDelegate=*/false); }
 
@@ -285,7 +285,7 @@ public:
 
     /**
      * Get the countdown time. This will get called on many edges such as
-     * commands to change operational state, or whne the delegate deals with
+     * commands to change operational state, or when the delegate deals with
      * changes. Make sure it becomes null whenever it is appropriate.
      *
      * @return The current countdown time.
