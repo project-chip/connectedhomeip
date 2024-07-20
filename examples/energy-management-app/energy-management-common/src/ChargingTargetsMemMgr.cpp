@@ -80,6 +80,8 @@ CHIP_ERROR ChargingTargetsMemMgr::AllocAndCopy()
     // NOTE: ChargingTargetsMemMgr::Reset() must be called as specified in the class comments in
     // ChargingTargetsMemMgr.h before this method can be called.
 
+    VerifyOrDie(mpListOfDays[mChargingTargetSchedulesIdx] == nullptr);
+
     if (mNumDailyChargingTargets > 0)
     {
         // Allocate the memory first and then use placement new to initialise the memory of each element in the array
@@ -106,6 +108,8 @@ ChargingTargetsMemMgr::AllocAndCopy(const DataModel::List<const Structs::Chargin
 {
     // NOTE: ChargingTargetsMemMgr::Reset() must be called as specified in the class comments in
     // ChargingTargetsMemMgr.h before this method can be called.
+
+    VerifyOrDie(mpListOfDays[mChargingTargetSchedulesIdx] == nullptr);
 
     mNumDailyChargingTargets = static_cast<uint16_t>(chargingTargets.size());
 

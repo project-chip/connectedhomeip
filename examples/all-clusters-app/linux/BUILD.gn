@@ -65,6 +65,7 @@ source_set("chip-all-clusters-common") {
     "${chip_root}/examples/energy-management-app/energy-management-common/src/EnergyEvseDelegateImpl.cpp",
     "${chip_root}/examples/energy-management-app/energy-management-common/src/EnergyEvseManager.cpp",
     "${chip_root}/examples/energy-management-app/energy-management-common/src/EnergyEvseTargetsStore.cpp",
+    "${chip_root}/examples/energy-management-app/energy-management-common/src/EnergyTimeUtils.cpp",
     "${chip_root}/examples/energy-management-app/energy-management-common/src/device-energy-management-mode.cpp",
     "${chip_root}/examples/energy-management-app/energy-management-common/src/energy-evse-mode.cpp",
     "AllClustersCommandDelegate.cpp",
