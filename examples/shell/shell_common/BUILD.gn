@@ -77,6 +77,7 @@ static_library("shell_common") {
       "${chip_root}/examples/energy-management-app/energy-management-common/src/EnergyEvseDelegateImpl.cpp",
       "${chip_root}/examples/energy-management-app/energy-management-common/src/EnergyEvseManager.cpp",
       "${chip_root}/examples/energy-management-app/energy-management-common/src/EnergyEvseTargetsStore.cpp",
+      "${chip_root}/examples/energy-management-app/energy-management-common/src/EnergyTimeUtils.cpp",
     ]
 
     include_dirs = [

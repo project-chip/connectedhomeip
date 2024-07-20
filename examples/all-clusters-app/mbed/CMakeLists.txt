@@ -77,6 +77,7 @@ target_sources(${APP_TARGET} PRIVATE
                ${ENERGY_MANAGEMENT_COMMON}/src/EnergyEvseDelegateImpl.cpp
                ${ENERGY_MANAGEMENT_COMMON}/src/EnergyEvseManager.cpp
                ${ENERGY_MANAGEMENT_COMMON}/src/EnergyEvseTargetsStore.cpp
+               ${ENERGY_MANAGEMENT_COMMON}/src/EnergyTimeUtils.cpp
                ${ENERGY_MANAGEMENT_COMMON}/src/DeviceEnergyManagementDelegateImpl.cpp
                ${ENERGY_MANAGEMENT_COMMON}/src/DeviceEnergyManagementManager.cpp
 
