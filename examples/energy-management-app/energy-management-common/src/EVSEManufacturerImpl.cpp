@@ -18,6 +18,7 @@
 
 #include <EVSEManufacturerImpl.h>
 #include <EnergyEvseManager.h>
+#include <EnergyTimeUtils.h>
 
 #include <app/clusters/electrical-energy-measurement-server/EnergyReportingTestEventTriggerHandler.h>
 #include <app/clusters/electrical-energy-measurement-server/electrical-energy-measurement-server.h>
@@ -107,7 +108,7 @@ CHIP_ERROR EVSEManufacturer::Shutdown()
     return CHIP_NO_ERROR;
 }
 
-CHIP_ERROR FindNextTarget(const uint8_t dayOfWeekMap, uint16_t minutesPastMidnightNow_m, uint16_t & targetTimeMinutesPastMidnight_m,
+CHIP_ERROR FindNextTarget(const BitMask<EnergyEvse::TargetDayOfWeekBitmap> dayOfWeekMap, uint16_t minutesPastMidnightNow_m, uint16_t & targetTimeMinutesPastMidnight_m,
                           DataModel::Nullable<Percent> & targetSoC, DataModel::Nullable<int64_t> & addedEnergy_mWh,
                           bool bAllowTargetsInPast)
 {
@@ -129,7 +130,7 @@ CHIP_ERROR FindNextTarget(const uint8_t dayOfWeekMap, uint16_t minutesPastMidnig
         dg->GetEvseTargetsDelegate()->GetTargets();
     for (auto & chargingTargetScheduleEntry : chargingTargetSchedules)
     {
-        if (chargingTargetScheduleEntry.dayOfWeekForSequence.GetField(static_cast<TargetDayOfWeekBitmap>(kAllDays)) & dayOfWeekMap)
+        if (chargingTargetScheduleEntry.dayOfWeekForSequence.HasAny(dayOfWeekMap))
         {
             // We've found today's schedule - iterate through the targets on this day
             for (auto & chargingTarget : chargingTargetScheduleEntry.chargingTargets)
@@ -148,7 +149,14 @@ CHIP_ERROR FindNextTarget(const uint8_t dayOfWeekMap, uint16_t minutesPastMidnig
 
                     targetTimeMinutesPastMidnight_m = chargingTarget.targetTimeMinutesPastMidnight;
 
-                    targetSoC = chargingTarget.targetSoC;
+                    if (chargingTarget.targetSoC.HasValue())
+                    {
+                        targetSoC.SetNonNull(chargingTarget.targetSoC.Value());
+                    }
+                    else
+                    {
+                        targetSoC.SetNull();
+                    }
 
                     if (chargingTarget.addedEnergy.HasValue())
                     {
@@ -190,8 +198,8 @@ CHIP_ERROR EVSEManufacturer::ComputeChargingSchedule()
     EnergyEvseDelegate * dg = mn->GetEvseDelegate();
     VerifyOrReturnError(dg != nullptr, CHIP_ERROR_UNINITIALIZED);
 
-    uint8_t dayOfWeekMap = 0;
-    ReturnErrorOnFailure(GetDayOfWeekNow(dayOfWeekMap));
+    BitMask<EnergyEvse::TargetDayOfWeekBitmap> dayOfWeekMap = 0;
+    ReturnErrorOnFailure(GetLocalDayOfWeekNow(dayOfWeekMap));
 
     uint16_t minutesPastMidnightNow_m = 0;
     ReturnErrorOnFailure(GetMinutesPastMidnight(minutesPastMidnightNow_m));
@@ -231,11 +239,12 @@ CHIP_ERROR EVSEManufacturer::ComputeChargingSchedule()
             {
                 // We didn't find one for today, try tomorrow
                 searchDay++;
-                dayOfWeekMap = (dayOfWeekMap << 1) & kAllDays;
-                if (dayOfWeekMap == 0x00)
+                dayOfWeekMap = BitMask<EnergyEvse::TargetDayOfWeekBitmap>((dayOfWeekMap.Raw() << 1) & kAllDays);
+
+                if (!dayOfWeekMap.HasAny())
                 {
                     // Must be Saturday and shifted off, so set it to Sunday
-                    dayOfWeekMap = static_cast<uint8_t>(TargetDayOfWeekBitmap::kSunday);
+                    dayOfWeekMap = BitMask<EnergyEvse::TargetDayOfWeekBitmap>(TargetDayOfWeekBitmap::kSunday);
                 }
             }
             else

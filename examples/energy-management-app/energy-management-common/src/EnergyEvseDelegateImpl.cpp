@@ -17,6 +17,7 @@
  */
 
 #include <EnergyEvseDelegateImpl.h>
+#include <EnergyTimeUtils.h>
 #include <app-common/zap-generated/attributes/Accessors.h>
 #include <app-common/zap-generated/cluster-objects.h>
 #include <app/EventLogging.h>
@@ -41,13 +42,6 @@ EnergyEvseDelegate::~EnergyEvseDelegate()
         delete[] mVehicleID.Value().data();
     }
 }
-
-/**
- * @brief   Helper function to get current timestamp in Epoch format
- *
- * @param   chipEpoch reference to hold return timestamp
- */
-CHIP_ERROR GetEpochTS(uint32_t & chipEpoch);
 
 /**
  * @brief   Called when EVSE cluster receives Disable command
@@ -179,7 +173,7 @@ Status EnergyEvseDelegate::ScheduleCheckOnEnabledTimeout()
         return Status::Success;
     }
 
-    CHIP_ERROR err = GetEpochTS(chipEpoch);
+    CHIP_ERROR err = DeviceEnergyManagement::GetEpochTS(chipEpoch);
     if (err == CHIP_NO_ERROR)
     {
         /* time is sync'd */
@@ -1632,7 +1626,7 @@ void EvseSession::StartSession(int64_t chargingMeterValue, int64_t dischargingMe
 {
     /* Get Timestamp */
     uint32_t chipEpoch = 0;
-    CHIP_ERROR err     = GetEpochTS(chipEpoch);
+    CHIP_ERROR err     = DeviceEnergyManagement::GetEpochTS(chipEpoch);
     if (err != CHIP_NO_ERROR)
     {
         /* Note that the error will be also be logged inside GetErrorTS() -
@@ -1683,7 +1677,7 @@ void EvseSession::RecalculateSessionDuration()
 {
     /* Get Timestamp */
     uint32_t chipEpoch = 0;
-    CHIP_ERROR err     = GetEpochTS(chipEpoch);
+    CHIP_ERROR err     = DeviceEnergyManagement::GetEpochTS(chipEpoch);
     if (err != CHIP_NO_ERROR)
     {
         /* Note that the error will be also be logged inside GetErrorTS() -
@@ -1720,112 +1714,3 @@ void EvseSession::UpdateEnergyDischarged(int64_t dischargingMeterValue)
     MatterReportingAttributeChangeCallback(mEndpointId, EnergyEvse::Id, SessionEnergyDischarged::Id);
 }
 
-/*---------------------- Non class helper functions --------------------------*/
-/**
- * @brief   Helper function to get current timestamp in Epoch format
- *
- * @param   chipEpoch reference to hold return timestamp
- */
-CHIP_ERROR GetEpochTS(uint32_t & chipEpoch)
-{
-    chipEpoch = 0;
-
-    System::Clock::Milliseconds64 cTMs;
-    CHIP_ERROR err = System::SystemClock().GetClock_RealTimeMS(cTMs);
-
-    /* If the GetClock_RealTimeMS returns CHIP_ERROR_UNSUPPORTED_CHIP_FEATURE, then
-     * This platform cannot ever report real time !
-     * This should not be certifiable since getting time is a Mandatory
-     * feature of EVSE Cluster
-     */
-    VerifyOrDie(err != CHIP_ERROR_UNSUPPORTED_CHIP_FEATURE);
-
-    if (err != CHIP_NO_ERROR)
-    {
-        ChipLogError(Zcl, "EVSE: Unable to get current time - err:%" CHIP_ERROR_FORMAT, err.Format());
-        return err;
-    }
-
-    auto unixEpoch = std::chrono::duration_cast<System::Clock::Seconds32>(cTMs).count();
-    if (!UnixEpochToChipEpochTime(unixEpoch, chipEpoch))
-    {
-        ChipLogError(Zcl, "EVSE: unable to convert Unix Epoch time to Matter Epoch Time");
-        return CHIP_ERROR_INCORRECT_STATE;
-    }
-
-    return CHIP_NO_ERROR;
-}
-
-/**
- * @brief   Helper function to get current timestamp and work out the day of week
- *
- * NOTE that the time_t is converted using localtime to provide the timestamp
- * in local time. If this is not supported on some platforms an alternative
- * implementation may be required.
- *
- * @param   unixEpoch (as time_t)
- *
- * @return  bitmap value for day of week as defined by EnergyEvse::TargetDayOfWeekBitmap
- */
-uint8_t GetDayOfWeekUnixEpoch(time_t unixEpoch)
-{
-    // Define a timezone structure and initialize it to the local timezone
-    // This will capture any daylight saving time changes
-    struct tm local_time;
-    localtime_r(&unixEpoch, &local_time);
-
-    // Get the day of the week (0 = Sunday, 1 = Monday, ..., 6 = Saturday).
-    uint8_t dayOfWeek = static_cast<uint8_t>(local_time.tm_wday);
-
-    // Calculate the bitmap value based on the day of the week. Note that the value in bitmap
-    // maps directly to the definition in EnergyEvse::TargetDayOfWeekBitmap.
-    uint8_t bitmap = static_cast<uint8_t>(1 << dayOfWeek);
-
-    return bitmap;
-}
-/**
- * @brief   Helper function to get current timestamp and work out the day of week based on localtime
- *
- * @param   reference to hold the day of week as a bitmap as defined by EnergyEvse::TargetDayOfWeekBitmap.
- */
-CHIP_ERROR GetDayOfWeekNow(uint8_t & dayOfWeekMap)
-{
-    chip::System::Clock::Milliseconds64 cTMs;
-    CHIP_ERROR err = chip::System::SystemClock().GetClock_RealTimeMS(cTMs);
-    if (err != CHIP_NO_ERROR)
-    {
-        ChipLogError(Zcl, "EVSE: unable to get current time to check user schedules error=%" CHIP_ERROR_FORMAT, err.Format());
-        return err;
-    }
-    time_t unixEpoch = std::chrono::duration_cast<chip::System::Clock::Seconds32>(cTMs).count();
-    dayOfWeekMap     = GetDayOfWeekUnixEpoch(unixEpoch);
-
-    return CHIP_NO_ERROR;
-}
-
-/**
- * @brief   Helper function to get current timestamp and work out the current number of minutes
- *          past midnight based on localtime
- *
- * @param   reference to hold the number of minutes past midnight
- */
-CHIP_ERROR GetMinutesPastMidnight(uint16_t & minutesPastMidnight)
-{
-    chip::System::Clock::Milliseconds64 cTMs;
-    CHIP_ERROR err = chip::System::SystemClock().GetClock_RealTimeMS(cTMs);
-    if (err != CHIP_NO_ERROR)
-    {
-        ChipLogError(Zcl, "EVSE: unable to get current time to check user schedules error=%" CHIP_ERROR_FORMAT, err.Format());
-        return err;
-    }
-    time_t unixEpoch = std::chrono::duration_cast<chip::System::Clock::Seconds32>(cTMs).count();
-
-    // Define a timezone structure and initialize it to the local timezone
-    // This will capture any daylight saving time changes
-    struct tm local_time;
-    localtime_r(&unixEpoch, &local_time);
-
-    minutesPastMidnight = static_cast<uint16_t>((local_time.tm_hour * 60) + local_time.tm_min);
-
-    return err;
-}

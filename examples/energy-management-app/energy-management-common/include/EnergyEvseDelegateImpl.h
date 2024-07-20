@@ -27,41 +27,6 @@
 
 using chip::Protocols::InteractionModel::Status;
 
-/**
- * @brief   Helper function to get current timestamp in Epoch format
- *
- * @param   chipEpoch reference to hold return timestamp
- */
-CHIP_ERROR GetEpochTS(uint32_t & chipEpoch);
-
-/**
- * @brief   Helper function to get current timestamp and work out the day of week based on localtime
- *
- * @param   reference to hold the day of week as a bitmap as defined by EnergyEvse::TargetDayOfWeekBitmap
- */
-CHIP_ERROR GetDayOfWeekNow(uint8_t & dayOfWeekMap);
-
-/**
- * @brief   Helper function to get current timestamp and work out the day of week
- *
- * NOTE that the time_t is converted using localtime to provide the timestamp
- * in local time. If this is not supported on some platforms an alternative
- * implementation may be required.
- *
- * @param   unixEpoch (as time_t)
- *
- * @return  bitmap value for day of week as defined by EnergyEvse::TargetDayOfWeekBitmap
- */
-uint8_t GetDayOfWeekUnixEpoch(time_t unixEpoch);
-
-/**
- * @brief   Helper function to get current timestamp and work out the current number of minutes
- *          past midnight based on localtime
- *
- * @param   reference to hold the number of minutes past midnight
- */
-CHIP_ERROR GetMinutesPastMidnight(uint16_t & minutesPastMidnight);
-
 namespace chip {
 namespace app {
 namespace Clusters {
