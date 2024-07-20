@@ -1713,4 +1713,3 @@ void EvseSession::UpdateEnergyDischarged(int64_t dischargingMeterValue)
     mSessionEnergyDischarged = MakeNullable(dischargingMeterValue - mSessionEnergyDischargedAtStart);
     MatterReportingAttributeChangeCallback(mEndpointId, EnergyEvse::Id, SessionEnergyDischarged::Id);
 }
-
