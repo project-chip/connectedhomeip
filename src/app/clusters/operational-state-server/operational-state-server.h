@@ -20,10 +20,10 @@
 
 #include "operational-state-cluster-objects.h"
 #include <app-common/zap-generated/cluster-objects.h>
-#include <app/cluster-building-blocks/QuieterReporting.h>
-#include <app/data-model/Nullable.h>
 #include <app/AttributeAccessInterface.h>
 #include <app/CommandHandlerInterface.h>
+#include <app/cluster-building-blocks/QuieterReporting.h>
+#include <app/data-model/Nullable.h>
 
 namespace chip {
 namespace app {
@@ -211,7 +211,8 @@ protected:
     /**
      * @brief Whenever the cluster logic things time should be updated, call this.
      */
-    void UpdateCountdownTimeFromClusterLogic() { UpdateCountdownTime(/* fromDelegate=*/ false); }
+    void UpdateCountdownTimeFromClusterLogic() { UpdateCountdownTime(/* fromDelegate=*/false); }
+
 private:
     Delegate * mDelegate;
 
@@ -222,7 +223,7 @@ private:
     app::DataModel::Nullable<uint8_t> mCurrentPhase;
     uint8_t mOperationalState                 = 0; // assume 0 for now.
     GenericOperationalError mOperationalError = to_underlying(ErrorStateEnum::kNoError);
-    app::QuieterReportingAttribute<uint32_t> mCountdownTime{DataModel::NullNullable};
+    app::QuieterReportingAttribute<uint32_t> mCountdownTime{ DataModel::NullNullable };
 
     /**
      * This method is inherited from CommandHandlerInterface.

@@ -41,7 +41,9 @@ Instance::Instance(Delegate * aDelegate, EndpointId aEndpointId, ClusterId aClus
     mDelegate(aDelegate), mEndpointId(aEndpointId), mClusterId(aClusterId)
 {
     mDelegate->SetInstance(this);
-    mCountdownTime.policy().Set(QuieterReportingPolicyEnum::kMarkDirtyOnIncrement).Set(QuieterReportingPolicyEnum::kMarkDirtyOnChangeToFromZero);
+    mCountdownTime.policy()
+        .Set(QuieterReportingPolicyEnum::kMarkDirtyOnIncrement)
+        .Set(QuieterReportingPolicyEnum::kMarkDirtyOnChangeToFromZero);
 }
 
 Instance::Instance(Delegate * aDelegate, EndpointId aEndpointId) : Instance(aDelegate, aEndpointId, OperationalState::Id) {}
@@ -197,7 +199,7 @@ void Instance::ReportPhaseListChange()
 void Instance::UpdateCountdownTime(bool fromDelegate)
 {
     app::DataModel::Nullable<uint32_t> newCountdownTime = mDelegate->GetCountdownTime();
-    auto now = System::SystemClock().GetMonotonicTimestamp();
+    auto now                                            = System::SystemClock().GetMonotonicTimestamp();
 
     bool markDirty = false;
 
@@ -205,14 +207,14 @@ void Instance::UpdateCountdownTime(bool fromDelegate)
     {
         // Updates from delegate are reduce-reported to every 10s max (choice of this implementation), in addition
         // to default change-from-null, change-from-zero and increment policy.
-        auto predicate = [](const decltype(mCountdownTime)::SufficientChangePredicateCandidate &candidate) -> bool {
+        auto predicate = [](const decltype(mCountdownTime)::SufficientChangePredicateCandidate & candidate) -> bool {
             if (candidate.lastDirtyValue.IsNull() || candidate.newValue.IsNull())
             {
                 return false;
             }
 
-            uint32_t lastDirtyValue = candidate.lastDirtyValue.Value();
-            uint32_t newValue = candidate.newValue.Value();
+            uint32_t lastDirtyValue           = candidate.lastDirtyValue.Value();
+            uint32_t newValue                 = candidate.newValue.Value();
             uint32_t kNumSecondsDeltaToReport = 10;
             return (newValue < lastDirtyValue) && ((lastDirtyValue - newValue) > kNumSecondsDeltaToReport);
         };
@@ -221,7 +223,7 @@ void Instance::UpdateCountdownTime(bool fromDelegate)
     else
     {
         auto predicate = [](const decltype(mCountdownTime)::SufficientChangePredicateCandidate &) -> bool { return true; };
-        markDirty = (mCountdownTime.SetValue(newCountdownTime, now, predicate) == AttributeDirtyState::kMustReport);
+        markDirty      = (mCountdownTime.SetValue(newCountdownTime, now, predicate) == AttributeDirtyState::kMustReport);
     }
 
     if (markDirty)
