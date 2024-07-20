@@ -269,7 +269,7 @@ tests:
 
     - label:
           "Step 4h: TH sends a Move command to the DUT with MoveMode =0x00 (up)
-          and Rate =0 (units/s), expect success"
+          and Rate =0 (units/s), expect failure"
       PICS: LVL.S.C01.Rsp
       command: "Move"
       arguments:
@@ -282,6 +282,8 @@ tests:
                 value: 1
               - name: "OptionsOverride"
                 value: 1
+      response:
+          error: INVALID_COMMAND
 
     - label: "Wait 5s"
       cluster: "DelayCommands"
