@@ -2468,15 +2468,7 @@ Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint16_t valu
 } // namespace ElectricalEnergyMeasurement
 
 namespace WaterHeaterManagement {
-namespace Attributes {
-
-namespace ClusterRevision {
-Protocols::InteractionModel::Status Get(chip::EndpointId endpoint, uint16_t * value); // int16u
-Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint16_t value);
-Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint16_t value, MarkAttributeDirty markDirty);
-} // namespace ClusterRevision
-
-} // namespace Attributes
+namespace Attributes {} // namespace Attributes
 } // namespace WaterHeaterManagement
 
 namespace DemandResponseLoadControl {

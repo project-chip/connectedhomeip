@@ -53,7 +53,7 @@ public:
      *                  to the previous mode (e.g. OFF, MANUAL or TIMED).
      * @param oneShot  Indicates whether the BOOST state should be automatically canceled once the hot water has first reached the
      *                 set point temperature (or the TemporarySetpoint temperature, if specified) for the TargetPercentage (if
-     * specified).
+     *                 specified).
      * @param emergencyBoost  Indicates that the consumer wants the water to be heated as quickly as practicable. This MAY cause
      *                        multiple heat sources to be activated (e.g. a heat pump and direct electric heating element).
      * @param temporarySetpoint  Indicates the target temperature to which to heat the hot water for this Boost command. It SHALL be
@@ -62,15 +62,14 @@ public:
      *                          heated by this Boost command before the heater is switched off.
      * @param targetReheat  If the tank supports the TankPercent feature, and the heating by this Boost command has ceased because
      *                      the TargetPercentage of the water in the tank has been heated to the set point (or TemporarySetpoint if
-     * included), this field indicates the percentage to which the hot water in the tank SHALL be allowed to fall before again
-     * beginning to reheat it.
+     *                      included), this field indicates the percentage to which the hot water in the tank SHALL be allowed to
+     *                      fall before again beginning to reheat it.
      *
      * @return  Success if the boost command is accepted; otherwise the command SHALL be rejected with appropriate error.
      */
     virtual Protocols::InteractionModel::Status HandleBoost(uint32_t duration, Optional<bool> oneShot,
                                                             Optional<bool> emergencyBoost, Optional<int16_t> temporarySetpoint,
-                                                            Optional<chip::Percent> targetPercentage,
-                                                            Optional<chip::Percent> targetReheat) = 0;
+                                                            Optional<Percent> targetPercentage, Optional<Percent> targetReheat) = 0;
 
     /**
      * @brief Delegate should implement a handler to cancel a boost command.

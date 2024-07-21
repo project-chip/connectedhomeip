@@ -651,7 +651,8 @@
             "EstimatedHeatRequired",
             "TankPercentage",
             "BoostState",
-            "FeatureMap"
+            "FeatureMap",
+            "ClusterRevision"
         ],
         "Water Heater Mode": ["SupportedModes", "CurrentMode", "FeatureMap"],
         "Wi-Fi Network Management": ["SSID"]
