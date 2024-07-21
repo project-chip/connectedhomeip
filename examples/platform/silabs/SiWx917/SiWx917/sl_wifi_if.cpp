@@ -262,14 +262,13 @@ sl_status_t join_callback_handler(sl_wifi_event_t event, char * result, uint32_t
      */
     ChipLogDetail(DeviceLayer, "join_callback_handler: success");
     memset(&temp_reset, 0, sizeof(temp_reset));
-
-    WfxEvent.eventType = WFX_EVT_STA_CONN;
-    WfxPostEvent(&WfxEvent);
     wfx_rsi.join_retries = 0;
     retryInterval        = WLAN_MIN_RETRY_TIMER_MS;
     // Once the join passes setting the disconnection event to true to differentiate between the first connection and reconnection
     is_wifi_disconnection_event = true;
     callback_status             = SL_STATUS_OK;
+    WfxEvent.eventType          = WFX_EVT_STA_CONN;
+    WfxPostEvent(&WfxEvent);
     return SL_STATUS_OK;
 }
 
