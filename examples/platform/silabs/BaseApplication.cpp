@@ -166,7 +166,6 @@ bool BaseApplication::sIsFactoryResetTriggered        = false;
 LEDWidget * BaseApplication::sAppActionLed            = nullptr;
 BaseApplicationDelegate BaseApplication::sAppDelegate = BaseApplicationDelegate();
 
-#if CHIP_CONFIG_ENABLE_ICD_SERVER && SLI_SI917
 void BaseApplicationDelegate::OnCommissioningSessionStarted()
 {
     isComissioningStarted = true;
