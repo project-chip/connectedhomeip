@@ -30,6 +30,7 @@ except ImportError:
         os.path.join(os.path.dirname(__file__), '..')))
     from matter_testing_support import MatterTestConfig
 
+
 def read_trusted_root(filled: bool) -> Attribute.AsyncReadTransaction.ReadResponse:
     opcreds = Clusters.OperationalCredentials
     trusted_roots = [randbytes(400)] if filled else []
