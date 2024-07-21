@@ -21,9 +21,14 @@ from random import randbytes
 
 import chip.clusters as Clusters
 from chip.clusters import Attribute
-from matter_testing_support import MatterTestConfig
 from MockTestRunner import MockTestRunner
 
+try:
+    from matter_testing_support import MatterTestConfig
+except ImportError:
+    sys.path.append(os.path.abspath(
+        os.path.join(os.path.dirname(__file__), '..')))
+    from matter_testing_support import MatterTestConfig
 
 def read_trusted_root(filled: bool) -> Attribute.AsyncReadTransaction.ReadResponse:
     opcreds = Clusters.OperationalCredentials
@@ -145,7 +150,7 @@ def main():
     test_runner.set_test_config(test_config)
     ok = test_runner.run_test_with_mock_read(read_trusted_root(False))
     if not ok:
-        failures.append('Expected pass on QR code test')
+        failures.append('Expected pass on manual code test')
 
     # Test should pass on post-cert test
     test_config = MatterTestConfig(qr_code_content=[qr_2222_20202021], global_test_params={'post_cert_test': True})

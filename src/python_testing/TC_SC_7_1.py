@@ -55,6 +55,7 @@ class TC_SC_7_1(MatterBaseTest):
         self.post_cert_test = False
 
     def setup_class(self):
+        super().setup_class()
         self.post_cert_test = self.user_params.get("post_cert_test", False)
 
     def expected_number_of_DUTs(self) -> int:
@@ -76,10 +77,8 @@ class TC_SC_7_1(MatterBaseTest):
         # For now, this test is WAY easier if we just ask for the setup code instead of discriminator / passcode
         asserts.assert_false(self.matter_test_config.discriminators,
                              "This test needs to be run with either the QR or manual setup code. The QR code is preferred.")
-        setup_codes = self.matter_test_config.qr_code_content
-        setup_codes.extend(self.matter_test_config.manual_code)
 
-        if len(setup_codes) != self.expected_number_of_DUTs():
+        if len(self.matter_test_config.qr_code_content + self.matter_test_config.manual_code) != self.expected_number_of_DUTs():
             if self.post_cert_test:
                 msg = "The post_cert_test flag is only for use post-certification. When using this flag, specify a single discriminator, manual-code or qr-code-content"
             else:
@@ -87,14 +86,14 @@ class TC_SC_7_1(MatterBaseTest):
             asserts.fail(msg)
 
         # Make sure these are no fabrics on the device so we know we're looking at the factory discriminator. This also ensures that the provided codes are correct.
-        for i, setup_code in enumerate(setup_codes):
+        for i, setup_code in enumerate(self.matter_test_config.qr_code_content + self.matter_test_config.manual_code):
             self.step(i+1)
             await self.default_controller.FindOrEstablishPASESession(setupCode=setup_code, nodeid=i+1)
             root_certs = await self.read_single_attribute_check_success(node_id=i+1, cluster=Clusters.OperationalCredentials, attribute=Clusters.OperationalCredentials.Attributes.TrustedRootCertificates, endpoint=0)
             asserts.assert_equal(
                 root_certs, [], "Root certificates found on device. Device must be factory reset before running this test.")
 
-        self.step(len(setup_codes)+1)
+        self.step(i+2)
         setup_payload_info = self.get_setup_payload_info()
         if self.post_cert_test:
             # For post-cert, we're testing against the defaults
