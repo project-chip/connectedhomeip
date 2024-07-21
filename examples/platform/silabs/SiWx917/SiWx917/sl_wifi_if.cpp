@@ -300,15 +300,12 @@ void sl_si91x_invoke_btn_press_event()
  *********************************************************************/
 uint32_t sl_app_sleep_ready()
 {
-    if (wfx_rsi.dev_state & WFX_RSI_ST_SLEEP_READY)
-    {
+    VerifyOrReturnError(wfx_rsi.dev_state & WFX_RSI_ST_SLEEP_READY, false);
 #if DISPLAY_ENABLED
-        // Powering down the LCD
-        sl_memlcd_power_on(NULL, false);
+    // Powering down the LCD
+    sl_memlcd_power_on(NULL, false);
 #endif /* DISPLAY_ENABLED */
-        return true;
-    }
-    return false;
+    return true;
 }
 #endif // SLI_SI91X_MCU_INTERFACE
 
@@ -709,11 +706,9 @@ static sl_status_t wfx_rsi_do_join(void)
 ///        Helper function for HandleDHCPPolling.
 void NotifyConnectivity()
 {
-    if (!hasNotifiedWifiConnectivity)
-    {
-        wfx_connected_notify(CONNECTION_STATUS_SUCCESS, &wfx_rsi.ap_mac);
-        hasNotifiedWifiConnectivity = true;
-    }
+    VerifyOrReturn(!hasNotifiedWifiConnectivity);
+    wfx_connected_notify(CONNECTION_STATUS_SUCCESS, &wfx_rsi.ap_mac);
+    hasNotifiedWifiConnectivity = true;
 }
 
 void HandleDHCPPolling()
@@ -734,6 +729,8 @@ void HandleDHCPPolling()
     {
         wfx_dhcp_got_ipv4((uint32_t) sta_netif->ip_addr.u_addr.ip4.addr);
         hasNotifiedIPV4 = true;
+        event.eventType = WFX_EVT_STA_DHCP_DONE;
+        WfxPostEvent(&event);
         NotifyConnectivity();
     }
     else if (dhcp_state == DHCP_OFF)

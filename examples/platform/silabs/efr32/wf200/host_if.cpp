@@ -281,7 +281,7 @@ static void sl_wfx_scan_result_callback(sl_wfx_scan_result_ind_body_t * scan_res
                   scan_result->mac[3], scan_result->mac[4], scan_result->mac[5], scan_result->ssid_def.ssid);
     /*Report one AP information*/
     /* don't save if filter only wants specific ssid */
-    if (scan_ssid != (char *) 0)
+    if (scan_ssid != NULL)
     {
         if (strcmp(scan_ssid, (char *) &scan_result->ssid_def.ssid[0]) != CMP_SUCCESS)
             return;
@@ -662,7 +662,7 @@ static void wfx_events_task(void * p_arg)
             if (scan_ssid)
             {
                 vPortFree(scan_ssid);
-                scan_ssid = (char *) 0;
+                scan_ssid = NULL;
             }
             /* Terminate scan */
             scan_cb = 0;
@@ -812,9 +812,7 @@ sl_status_t get_all_counters(void)
     result =
         sl_wfx_allocate_command_buffer((sl_wfx_generic_message_t **) &request, command_id, SL_WFX_CONTROL_BUFFER, request_length);
 
-    if (request == NULL)
-    {
-    }
+    VerifyOrReturnError(request != NULL, SL_STATUS_NULL_POINTER);
 
     request->body.mib_id      = mib_id;
     request->header.interface = 0x2;
@@ -968,12 +966,8 @@ void wfx_set_wifi_provision(wfx_wifi_provision_t * wifiConfig)
  *****************************************************************************/
 bool wfx_get_wifi_provision(wfx_wifi_provision_t * wifiConfig)
 {
-    if (wifiConfig == NULL)
-    {
-        return false;
-    }
+    VerifyOrReturnError(wifiConfig != NULL, false);
     memcpy(wifiConfig, &wifi_provision, sizeof(wfx_wifi_provision_t));
-
     return true;
 }
 
@@ -1010,10 +1004,7 @@ sl_status_t wfx_connect_to_ap(void)
     sl_status_t result;
     sl_wfx_security_mode_t connect_security_mode;
 
-    if (wifi_provision.ssid[0] == 0)
-    {
-        return SL_STATUS_NOT_AVAILABLE;
-    }
+    VerifyOrReturnError(wifi_provision.ssid[0] != NULL, SL_STATUS_NOT_AVAILABLE);
     ChipLogDetail(DeviceLayer, "WIFI:JOIN to %s", &wifi_provision.ssid[0]);
 
     ChipLogDetail(DeviceLayer,
@@ -1077,14 +1068,8 @@ void wfx_get_wifi_mac_addr(sl_wfx_interface_t interface, sl_wfx_mac_address_t * 
  *****************************************************************************/
 bool wfx_have_ipv4_addr(sl_wfx_interface_t which_if)
 {
-    if (which_if == SL_WFX_STA_INTERFACE)
-    {
-        return (sta_ip == STA_IP_FAIL) ? false : true;
-    }
-    else
-    {
-        return false; /* TODO */
-    }
+    VerifyOrReturnError(which_if == SL_WFX_STA_INTERFACE, false);
+    return (sta_ip == STA_IP_FAIL) ? false : true;
 }
 
 /****************************************************************************
@@ -1096,17 +1081,9 @@ bool wfx_have_ipv4_addr(sl_wfx_interface_t which_if)
  *****************************************************************************/
 bool wfx_have_ipv6_addr(sl_wfx_interface_t which_if)
 {
-    bool status = false;
-    if (which_if == SL_WFX_STA_INTERFACE)
-    {
-        status = wfx_is_sta_connected();
-    }
-    else
-    {
-        status = false; /* TODO */
-    }
-    ChipLogProgress(DeviceLayer, "wfx_have_ipv6_addr: %d", status);
-    return status;
+    VerifyOrReturnError(which_if == SL_WFX_STA_INTERFACE, false);
+    ChipLogProgress(DeviceLayer, "wfx_have_ipv6_addr");
+    return wfx_is_sta_connected();
 }
 
 /****************************************************************************
@@ -1143,11 +1120,8 @@ bool wfx_is_sta_mode_enabled(void)
 bool wfx_is_sta_connected(void)
 {
     bool val;
-
     val = (wifi_extra & WE_ST_STA_CONN) ? true : false;
-
     ChipLogDetail(DeviceLayer, "WLAN: STA %s connected", (val ? "IS" : "NOT"));
-
     return val;
 }
 
@@ -1222,22 +1196,17 @@ void wfx_enable_sta_mode(void)
 #ifdef SL_WFX_CONFIG_SCAN
 bool wfx_start_scan(char * ssid, void (*callback)(wfx_wifi_scan_result_t *))
 {
-    int sz;
-
-    if (scan_cb)
-        return false; /* Already in progress */
+    VerifyOrReturnError(scan_cb != NULL, false);
+    uint8_t sz = 0;
+    scan_cb    = callback;
     if (ssid)
     {
-        sz = strlen(ssid);
-        if ((scan_ssid = (char *) pvPortMalloc(sz + 1)) == (char *) 0)
-        {
-            return false;
-        }
-        strcpy(scan_ssid, ssid);
+        sz        = strnlen(ssid, WFX_MAX_SSID_LENGTH);
+        scan_ssid = (char *) pvPortMalloc(sz + 1);
+        VerifyOrReturnError(scan_ssid != NULL, false);
+        strncpy(scan_ssid, ssid, sizeof(scan_ssid));
     }
-    scan_cb = callback;
     xEventGroupSetBits(sl_wfx_event_group, SL_WFX_SCAN_START);
-
     return true;
 }
 
@@ -1249,10 +1218,7 @@ void wfx_cancel_scan(void)
 {
     struct scan_result_holder *hp, *next;
     /* Not possible */
-    if (!scan_cb)
-    {
-        return;
-    }
+    VerifyOrReturn(scan_cb != NULL);
     sl_wfx_send_stop_scan_command();
     for (hp = scan_save; hp; hp = next)
     {
@@ -1264,8 +1230,8 @@ void wfx_cancel_scan(void)
     if (scan_ssid)
     {
         vPortFree(scan_ssid);
-        scan_ssid = (char *) 0;
+        scan_ssid = NULL;
     }
-    scan_cb = 0;
+    scan_cb = NULL;
 }
 #endif /* SL_WFX_CONFIG_SCAN */
