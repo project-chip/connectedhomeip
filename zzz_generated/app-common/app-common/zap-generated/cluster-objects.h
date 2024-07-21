@@ -173,6 +173,7 @@ public:
 };
 
 } // namespace MeasurementAccuracyStruct
+
 namespace DeviceTypeStruct {
 enum class Fields : uint8_t
 {
@@ -196,6 +197,35 @@ public:
 using DecodableType = Type;
 
 } // namespace DeviceTypeStruct
+
+namespace DateStruct {
+enum class Fields : uint8_t
+{
+    kYear      = 0,
+    kMonth     = 1,
+    kDay       = 2,
+    kDayOfWeek = 3,
+};
+
+struct Type
+{
+public:
+    DataModel::Nullable<uint8_t> year;
+    DataModel::Nullable<uint8_t> month;
+    DataModel::Nullable<uint8_t> day;
+    DataModel::Nullable<uint8_t> dayOfWeek;
+
+    CHIP_ERROR Decode(TLV::TLVReader & reader);
+
+    static constexpr bool kIsFabricScoped = false;
+
+    CHIP_ERROR Encode(TLV::TLVWriter & aWriter, TLV::Tag aTag) const;
+};
+
+using DecodableType = Type;
+
+} // namespace DateStruct
+
 namespace ApplicationStruct {
 enum class Fields : uint8_t
 {
@@ -24350,6 +24380,7 @@ public:
 using DecodableType = Type;
 
 } // namespace TransitionStruct
+namespace DateStruct = Clusters::detail::Structs::DateStruct;
 namespace DayStruct {
 enum class Fields : uint8_t
 {
@@ -24362,7 +24393,7 @@ enum class Fields : uint8_t
 struct Type
 {
 public:
-    Optional<uint32_t> date;
+    Optional<Structs::DateStruct::Type> date;
     Optional<chip::BitMask<TransitionDayOfWeekBitmap>> daysOfWeek;
     DataModel::List<const Structs::TransitionStruct::Type> transitions;
     Optional<uint32_t> calendarID;
@@ -24375,7 +24406,7 @@ public:
 struct DecodableType
 {
 public:
-    Optional<uint32_t> date;
+    Optional<Structs::DateStruct::DecodableType> date;
     Optional<chip::BitMask<TransitionDayOfWeekBitmap>> daysOfWeek;
     DataModel::DecodableList<Structs::TransitionStruct::DecodableType> transitions;
     Optional<uint32_t> calendarID;

@@ -72,6 +72,7 @@ structs_sources = [
   "${chip_root}/src/controller/java/generated/java/chip/devicecontroller/cluster/structs/ElectricalPowerMeasurementClusterMeasurementAccuracyStruct.kt",
   "${chip_root}/src/controller/java/generated/java/chip/devicecontroller/cluster/structs/ElectricalPowerMeasurementClusterMeasurementRangeStruct.kt",
   "${chip_root}/src/controller/java/generated/java/chip/devicecontroller/cluster/structs/EnergyCalendarClusterCalendarPeriodStruct.kt",
+  "${chip_root}/src/controller/java/generated/java/chip/devicecontroller/cluster/structs/EnergyCalendarClusterDateStruct.kt",
   "${chip_root}/src/controller/java/generated/java/chip/devicecontroller/cluster/structs/EnergyCalendarClusterDayStruct.kt",
   "${chip_root}/src/controller/java/generated/java/chip/devicecontroller/cluster/structs/EnergyCalendarClusterPeakPeriodStruct.kt",
   "${chip_root}/src/controller/java/generated/java/chip/devicecontroller/cluster/structs/EnergyCalendarClusterTransitionStruct.kt",

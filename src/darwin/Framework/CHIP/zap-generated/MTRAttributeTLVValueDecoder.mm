@@ -9635,7 +9635,27 @@ static id _Nullable DecodeAttributeValueForEnergyCalendarCluster(AttributeId aAt
                             MTREnergyCalendarClusterDayStruct * newElement_3;
                             newElement_3 = [MTREnergyCalendarClusterDayStruct new];
                             if (entry_3.date.HasValue()) {
-                                newElement_3.date = [NSNumber numberWithUnsignedInt:entry_3.date.Value()];
+                                newElement_3.date = [MTREnergyCalendarClusterDateStruct new];
+                                if (entry_3.date.Value().year.IsNull()) {
+                                    newElement_3.date.year = nil;
+                                } else {
+                                    newElement_3.date.year = [NSNumber numberWithUnsignedChar:entry_3.date.Value().year.Value()];
+                                }
+                                if (entry_3.date.Value().month.IsNull()) {
+                                    newElement_3.date.month = nil;
+                                } else {
+                                    newElement_3.date.month = [NSNumber numberWithUnsignedChar:entry_3.date.Value().month.Value()];
+                                }
+                                if (entry_3.date.Value().day.IsNull()) {
+                                    newElement_3.date.day = nil;
+                                } else {
+                                    newElement_3.date.day = [NSNumber numberWithUnsignedChar:entry_3.date.Value().day.Value()];
+                                }
+                                if (entry_3.date.Value().dayOfWeek.IsNull()) {
+                                    newElement_3.date.dayOfWeek = nil;
+                                } else {
+                                    newElement_3.date.dayOfWeek = [NSNumber numberWithUnsignedChar:entry_3.date.Value().dayOfWeek.Value()];
+                                }
                             } else {
                                 newElement_3.date = nil;
                             }
@@ -9721,7 +9741,27 @@ static id _Nullable DecodeAttributeValueForEnergyCalendarCluster(AttributeId aAt
                     MTREnergyCalendarClusterDayStruct * newElement_1;
                     newElement_1 = [MTREnergyCalendarClusterDayStruct new];
                     if (entry_1.date.HasValue()) {
-                        newElement_1.date = [NSNumber numberWithUnsignedInt:entry_1.date.Value()];
+                        newElement_1.date = [MTREnergyCalendarClusterDateStruct new];
+                        if (entry_1.date.Value().year.IsNull()) {
+                            newElement_1.date.year = nil;
+                        } else {
+                            newElement_1.date.year = [NSNumber numberWithUnsignedChar:entry_1.date.Value().year.Value()];
+                        }
+                        if (entry_1.date.Value().month.IsNull()) {
+                            newElement_1.date.month = nil;
+                        } else {
+                            newElement_1.date.month = [NSNumber numberWithUnsignedChar:entry_1.date.Value().month.Value()];
+                        }
+                        if (entry_1.date.Value().day.IsNull()) {
+                            newElement_1.date.day = nil;
+                        } else {
+                            newElement_1.date.day = [NSNumber numberWithUnsignedChar:entry_1.date.Value().day.Value()];
+                        }
+                        if (entry_1.date.Value().dayOfWeek.IsNull()) {
+                            newElement_1.date.dayOfWeek = nil;
+                        } else {
+                            newElement_1.date.dayOfWeek = [NSNumber numberWithUnsignedChar:entry_1.date.Value().dayOfWeek.Value()];
+                        }
                     } else {
                         newElement_1.date = nil;
                     }
@@ -9792,7 +9832,27 @@ static id _Nullable DecodeAttributeValueForEnergyCalendarCluster(AttributeId aAt
         } else {
             value = [MTREnergyCalendarClusterDayStruct new];
             if (cppValue.Value().date.HasValue()) {
-                value.date = [NSNumber numberWithUnsignedInt:cppValue.Value().date.Value()];
+                value.date = [MTREnergyCalendarClusterDateStruct new];
+                if (cppValue.Value().date.Value().year.IsNull()) {
+                    value.date.year = nil;
+                } else {
+                    value.date.year = [NSNumber numberWithUnsignedChar:cppValue.Value().date.Value().year.Value()];
+                }
+                if (cppValue.Value().date.Value().month.IsNull()) {
+                    value.date.month = nil;
+                } else {
+                    value.date.month = [NSNumber numberWithUnsignedChar:cppValue.Value().date.Value().month.Value()];
+                }
+                if (cppValue.Value().date.Value().day.IsNull()) {
+                    value.date.day = nil;
+                } else {
+                    value.date.day = [NSNumber numberWithUnsignedChar:cppValue.Value().date.Value().day.Value()];
+                }
+                if (cppValue.Value().date.Value().dayOfWeek.IsNull()) {
+                    value.date.dayOfWeek = nil;
+                } else {
+                    value.date.dayOfWeek = [NSNumber numberWithUnsignedChar:cppValue.Value().date.Value().dayOfWeek.Value()];
+                }
             } else {
                 value.date = nil;
             }
@@ -9854,7 +9914,27 @@ static id _Nullable DecodeAttributeValueForEnergyCalendarCluster(AttributeId aAt
         } else {
             value = [MTREnergyCalendarClusterDayStruct new];
             if (cppValue.Value().date.HasValue()) {
-                value.date = [NSNumber numberWithUnsignedInt:cppValue.Value().date.Value()];
+                value.date = [MTREnergyCalendarClusterDateStruct new];
+                if (cppValue.Value().date.Value().year.IsNull()) {
+                    value.date.year = nil;
+                } else {
+                    value.date.year = [NSNumber numberWithUnsignedChar:cppValue.Value().date.Value().year.Value()];
+                }
+                if (cppValue.Value().date.Value().month.IsNull()) {
+                    value.date.month = nil;
+                } else {
+                    value.date.month = [NSNumber numberWithUnsignedChar:cppValue.Value().date.Value().month.Value()];
+                }
+                if (cppValue.Value().date.Value().day.IsNull()) {
+                    value.date.day = nil;
+                } else {
+                    value.date.day = [NSNumber numberWithUnsignedChar:cppValue.Value().date.Value().day.Value()];
+                }
+                if (cppValue.Value().date.Value().dayOfWeek.IsNull()) {
+                    value.date.dayOfWeek = nil;
+                } else {
+                    value.date.dayOfWeek = [NSNumber numberWithUnsignedChar:cppValue.Value().date.Value().dayOfWeek.Value()];
+                }
             } else {
                 value.date = nil;
             }

@@ -5483,8 +5483,15 @@ cluster EnergyCalendar = 154 {
     optional AuxiliaryLoadBitmap auxiliaryLoad = 3;
   }
 
+  struct DateStruct {
+    nullable int8u year = 0;
+    nullable int8u month = 1;
+    nullable int8u day = 2;
+    nullable int8u dayOfWeek = 3;
+  }
+
   struct DayStruct {
-    optional date date = 0;
+    optional DateStruct date = 0;
     optional TransitionDayOfWeekBitmap daysOfWeek = 1;
     TransitionStruct transitions[] = 2;
     optional int32u calendarID = 3;

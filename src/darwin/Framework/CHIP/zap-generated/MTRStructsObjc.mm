@@ -6301,6 +6301,42 @@ NS_ASSUME_NONNULL_BEGIN
 
 @end
 
+@implementation MTREnergyCalendarClusterDateStruct
+- (instancetype)init
+{
+    if (self = [super init]) {
+
+        _year = nil;
+
+        _month = nil;
+
+        _day = nil;
+
+        _dayOfWeek = nil;
+    }
+    return self;
+}
+
+- (id)copyWithZone:(NSZone * _Nullable)zone
+{
+    auto other = [[MTREnergyCalendarClusterDateStruct alloc] init];
+
+    other.year = self.year;
+    other.month = self.month;
+    other.day = self.day;
+    other.dayOfWeek = self.dayOfWeek;
+
+    return other;
+}
+
+- (NSString *)description
+{
+    NSString * descriptionString = [NSString stringWithFormat:@"<%@: year:%@; month:%@; day:%@; dayOfWeek:%@; >", NSStringFromClass([self class]), _year, _month, _day, _dayOfWeek];
+    return descriptionString;
+}
+
+@end
+
 @implementation MTREnergyCalendarClusterDayStruct
 - (instancetype)init
 {

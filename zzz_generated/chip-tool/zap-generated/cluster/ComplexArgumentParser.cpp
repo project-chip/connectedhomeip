@@ -327,6 +327,48 @@ void ComplexArgumentParser::Finalize(chip::app::Clusters::detail::Structs::Devic
     ComplexArgumentParser::Finalize(request.revision);
 }
 
+CHIP_ERROR ComplexArgumentParser::Setup(const char * label, chip::app::Clusters::detail::Structs::DateStruct::Type & request,
+                                        Json::Value & value)
+{
+    VerifyOrReturnError(value.isObject(), CHIP_ERROR_INVALID_ARGUMENT);
+
+    // Copy to track which members we already processed.
+    Json::Value valueCopy(value);
+
+    ReturnErrorOnFailure(ComplexArgumentParser::EnsureMemberExist("DateStruct.year", "year", value.isMember("year")));
+    ReturnErrorOnFailure(ComplexArgumentParser::EnsureMemberExist("DateStruct.month", "month", value.isMember("month")));
+    ReturnErrorOnFailure(ComplexArgumentParser::EnsureMemberExist("DateStruct.day", "day", value.isMember("day")));
+    ReturnErrorOnFailure(
+        ComplexArgumentParser::EnsureMemberExist("DateStruct.dayOfWeek", "dayOfWeek", value.isMember("dayOfWeek")));
+
+    char labelWithMember[kMaxLabelLength];
+    snprintf(labelWithMember, sizeof(labelWithMember), "%s.%s", label, "year");
+    ReturnErrorOnFailure(ComplexArgumentParser::Setup(labelWithMember, request.year, value["year"]));
+    valueCopy.removeMember("year");
+
+    snprintf(labelWithMember, sizeof(labelWithMember), "%s.%s", label, "month");
+    ReturnErrorOnFailure(ComplexArgumentParser::Setup(labelWithMember, request.month, value["month"]));
+    valueCopy.removeMember("month");
+
+    snprintf(labelWithMember, sizeof(labelWithMember), "%s.%s", label, "day");
+    ReturnErrorOnFailure(ComplexArgumentParser::Setup(labelWithMember, request.day, value["day"]));
+    valueCopy.removeMember("day");
+
+    snprintf(labelWithMember, sizeof(labelWithMember), "%s.%s", label, "dayOfWeek");
+    ReturnErrorOnFailure(ComplexArgumentParser::Setup(labelWithMember, request.dayOfWeek, value["dayOfWeek"]));
+    valueCopy.removeMember("dayOfWeek");
+
+    return ComplexArgumentParser::EnsureNoMembersRemaining(label, valueCopy);
+}
+
+void ComplexArgumentParser::Finalize(chip::app::Clusters::detail::Structs::DateStruct::Type & request)
+{
+    ComplexArgumentParser::Finalize(request.year);
+    ComplexArgumentParser::Finalize(request.month);
+    ComplexArgumentParser::Finalize(request.day);
+    ComplexArgumentParser::Finalize(request.dayOfWeek);
+}
+
 CHIP_ERROR ComplexArgumentParser::Setup(const char * label, chip::app::Clusters::detail::Structs::ApplicationStruct::Type & request,
                                         Json::Value & value)
 {

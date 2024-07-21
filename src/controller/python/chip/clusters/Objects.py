@@ -26673,18 +26673,35 @@ class EnergyCalendar(Cluster):
             auxiliaryLoad: 'typing.Optional[uint]' = None
 
         @dataclass
+        class DateStruct(ClusterObject):
+            @ChipUtility.classproperty
+            def descriptor(cls) -> ClusterObjectDescriptor:
+                return ClusterObjectDescriptor(
+                    Fields=[
+                        ClusterObjectFieldDescriptor(Label="year", Tag=0, Type=typing.Union[Nullable, uint]),
+                        ClusterObjectFieldDescriptor(Label="month", Tag=1, Type=typing.Union[Nullable, uint]),
+                        ClusterObjectFieldDescriptor(Label="day", Tag=2, Type=typing.Union[Nullable, uint]),
+                        ClusterObjectFieldDescriptor(Label="dayOfWeek", Tag=3, Type=typing.Union[Nullable, uint]),
+                    ])
+
+            year: 'typing.Union[Nullable, uint]' = NullValue
+            month: 'typing.Union[Nullable, uint]' = NullValue
+            day: 'typing.Union[Nullable, uint]' = NullValue
+            dayOfWeek: 'typing.Union[Nullable, uint]' = NullValue
+
+        @dataclass
         class DayStruct(ClusterObject):
             @ChipUtility.classproperty
             def descriptor(cls) -> ClusterObjectDescriptor:
                 return ClusterObjectDescriptor(
                     Fields=[
-                        ClusterObjectFieldDescriptor(Label="date", Tag=0, Type=typing.Optional[uint]),
+                        ClusterObjectFieldDescriptor(Label="date", Tag=0, Type=typing.Optional[EnergyCalendar.Structs.DateStruct]),
                         ClusterObjectFieldDescriptor(Label="daysOfWeek", Tag=1, Type=typing.Optional[uint]),
                         ClusterObjectFieldDescriptor(Label="transitions", Tag=2, Type=typing.List[EnergyCalendar.Structs.TransitionStruct]),
                         ClusterObjectFieldDescriptor(Label="calendarID", Tag=3, Type=typing.Optional[uint]),
                     ])
 
-            date: 'typing.Optional[uint]' = None
+            date: 'typing.Optional[EnergyCalendar.Structs.DateStruct]' = None
             daysOfWeek: 'typing.Optional[uint]' = None
             transitions: 'typing.List[EnergyCalendar.Structs.TransitionStruct]' = field(default_factory=lambda: [])
             calendarID: 'typing.Optional[uint]' = None

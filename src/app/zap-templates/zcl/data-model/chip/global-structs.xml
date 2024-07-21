@@ -39,4 +39,14 @@ limitations under the License.
     <item fieldId="1" name="MyBitmap" type="TestGlobalBitmap" isNullable="true" optional="false"/>
     <item fieldId="2" name="MyEnum" type="TestGlobalEnum" isNullable="true" optional="true"/>
   </struct>
+
+  <struct name="DateStruct">
+    <cluster code="0x009A"/> <!-- Energy Calendar  -->
+    <cluster code="0x0B06"/> <!-- Without this scripts/tools/zap_regen_all.py pushes global DateStruct to EnergyCalendar namespace   -->
+
+    <item fieldId="0" name="Year"      type="int8u"                  isNullable="true" optional="false"/>
+    <item fieldId="1" name="Month"     type="int8u" min="1" max="12" isNullable="true" optional="false"/>
+    <item fieldId="2" name="Day"       type="int8u" min="1" max="31" isNullable="true" optional="false"/>
+    <item fieldId="3" name="DayOfWeek" type="int8u" min="1" max="7"  isNullable="true" optional="false"/>
+  </struct>
 </configurator>

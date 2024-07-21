@@ -25120,13 +25120,93 @@ jobject DecodeAttributeValue(const app::ConcreteAttributePath & aPath, TLV::TLVR
                         else
                         {
                             jobject newElement_3_dateInsideOptional;
-                            std::string newElement_3_dateInsideOptionalClassName     = "java/lang/Long";
-                            std::string newElement_3_dateInsideOptionalCtorSignature = "(J)V";
-                            jlong jninewElement_3_dateInsideOptional                 = static_cast<jlong>(entry_3.date.Value());
-                            chip::JniReferences::GetInstance().CreateBoxedObject<jlong>(
-                                newElement_3_dateInsideOptionalClassName.c_str(),
-                                newElement_3_dateInsideOptionalCtorSignature.c_str(), jninewElement_3_dateInsideOptional,
-                                newElement_3_dateInsideOptional);
+                            jobject newElement_3_dateInsideOptional_year;
+                            if (entry_3.date.Value().year.IsNull())
+                            {
+                                newElement_3_dateInsideOptional_year = nullptr;
+                            }
+                            else
+                            {
+                                std::string newElement_3_dateInsideOptional_yearClassName     = "java/lang/Integer";
+                                std::string newElement_3_dateInsideOptional_yearCtorSignature = "(I)V";
+                                jint jninewElement_3_dateInsideOptional_year = static_cast<jint>(entry_3.date.Value().year.Value());
+                                chip::JniReferences::GetInstance().CreateBoxedObject<jint>(
+                                    newElement_3_dateInsideOptional_yearClassName.c_str(),
+                                    newElement_3_dateInsideOptional_yearCtorSignature.c_str(),
+                                    jninewElement_3_dateInsideOptional_year, newElement_3_dateInsideOptional_year);
+                            }
+                            jobject newElement_3_dateInsideOptional_month;
+                            if (entry_3.date.Value().month.IsNull())
+                            {
+                                newElement_3_dateInsideOptional_month = nullptr;
+                            }
+                            else
+                            {
+                                std::string newElement_3_dateInsideOptional_monthClassName     = "java/lang/Integer";
+                                std::string newElement_3_dateInsideOptional_monthCtorSignature = "(I)V";
+                                jint jninewElement_3_dateInsideOptional_month =
+                                    static_cast<jint>(entry_3.date.Value().month.Value());
+                                chip::JniReferences::GetInstance().CreateBoxedObject<jint>(
+                                    newElement_3_dateInsideOptional_monthClassName.c_str(),
+                                    newElement_3_dateInsideOptional_monthCtorSignature.c_str(),
+                                    jninewElement_3_dateInsideOptional_month, newElement_3_dateInsideOptional_month);
+                            }
+                            jobject newElement_3_dateInsideOptional_day;
+                            if (entry_3.date.Value().day.IsNull())
+                            {
+                                newElement_3_dateInsideOptional_day = nullptr;
+                            }
+                            else
+                            {
+                                std::string newElement_3_dateInsideOptional_dayClassName     = "java/lang/Integer";
+                                std::string newElement_3_dateInsideOptional_dayCtorSignature = "(I)V";
+                                jint jninewElement_3_dateInsideOptional_day = static_cast<jint>(entry_3.date.Value().day.Value());
+                                chip::JniReferences::GetInstance().CreateBoxedObject<jint>(
+                                    newElement_3_dateInsideOptional_dayClassName.c_str(),
+                                    newElement_3_dateInsideOptional_dayCtorSignature.c_str(),
+                                    jninewElement_3_dateInsideOptional_day, newElement_3_dateInsideOptional_day);
+                            }
+                            jobject newElement_3_dateInsideOptional_dayOfWeek;
+                            if (entry_3.date.Value().dayOfWeek.IsNull())
+                            {
+                                newElement_3_dateInsideOptional_dayOfWeek = nullptr;
+                            }
+                            else
+                            {
+                                std::string newElement_3_dateInsideOptional_dayOfWeekClassName     = "java/lang/Integer";
+                                std::string newElement_3_dateInsideOptional_dayOfWeekCtorSignature = "(I)V";
+                                jint jninewElement_3_dateInsideOptional_dayOfWeek =
+                                    static_cast<jint>(entry_3.date.Value().dayOfWeek.Value());
+                                chip::JniReferences::GetInstance().CreateBoxedObject<jint>(
+                                    newElement_3_dateInsideOptional_dayOfWeekClassName.c_str(),
+                                    newElement_3_dateInsideOptional_dayOfWeekCtorSignature.c_str(),
+                                    jninewElement_3_dateInsideOptional_dayOfWeek, newElement_3_dateInsideOptional_dayOfWeek);
+                            }
+
+                            jclass dateStructStructClass_6;
+                            err = chip::JniReferences::GetInstance().GetLocalClassRef(
+                                env, "chip/devicecontroller/ChipStructs$EnergyCalendarClusterDateStruct", dateStructStructClass_6);
+                            if (err != CHIP_NO_ERROR)
+                            {
+                                ChipLogError(Zcl, "Could not find class ChipStructs$EnergyCalendarClusterDateStruct");
+                                return nullptr;
+                            }
+
+                            jmethodID dateStructStructCtor_6;
+                            err = chip::JniReferences::GetInstance().FindMethod(
+                                env, dateStructStructClass_6, "<init>",
+                                "(Ljava/lang/Integer;Ljava/lang/Integer;Ljava/lang/Integer;Ljava/lang/Integer;)V",
+                                &dateStructStructCtor_6);
+                            if (err != CHIP_NO_ERROR || dateStructStructCtor_6 == nullptr)
+                            {
+                                ChipLogError(Zcl, "Could not find ChipStructs$EnergyCalendarClusterDateStruct constructor");
+                                return nullptr;
+                            }
+
+                            newElement_3_dateInsideOptional =
+                                env->NewObject(dateStructStructClass_6, dateStructStructCtor_6,
+                                               newElement_3_dateInsideOptional_year, newElement_3_dateInsideOptional_month,
+                                               newElement_3_dateInsideOptional_day, newElement_3_dateInsideOptional_dayOfWeek);
                             chip::JniReferences::GetInstance().CreateOptional(newElement_3_dateInsideOptional, newElement_3_date);
                         }
                         jobject newElement_3_daysOfWeek;
@@ -25346,12 +25426,92 @@ jobject DecodeAttributeValue(const app::ConcreteAttributePath & aPath, TLV::TLVR
                     else
                     {
                         jobject newElement_1_dateInsideOptional;
-                        std::string newElement_1_dateInsideOptionalClassName     = "java/lang/Long";
-                        std::string newElement_1_dateInsideOptionalCtorSignature = "(J)V";
-                        jlong jninewElement_1_dateInsideOptional                 = static_cast<jlong>(entry_1.date.Value());
-                        chip::JniReferences::GetInstance().CreateBoxedObject<jlong>(
-                            newElement_1_dateInsideOptionalClassName.c_str(), newElement_1_dateInsideOptionalCtorSignature.c_str(),
-                            jninewElement_1_dateInsideOptional, newElement_1_dateInsideOptional);
+                        jobject newElement_1_dateInsideOptional_year;
+                        if (entry_1.date.Value().year.IsNull())
+                        {
+                            newElement_1_dateInsideOptional_year = nullptr;
+                        }
+                        else
+                        {
+                            std::string newElement_1_dateInsideOptional_yearClassName     = "java/lang/Integer";
+                            std::string newElement_1_dateInsideOptional_yearCtorSignature = "(I)V";
+                            jint jninewElement_1_dateInsideOptional_year = static_cast<jint>(entry_1.date.Value().year.Value());
+                            chip::JniReferences::GetInstance().CreateBoxedObject<jint>(
+                                newElement_1_dateInsideOptional_yearClassName.c_str(),
+                                newElement_1_dateInsideOptional_yearCtorSignature.c_str(), jninewElement_1_dateInsideOptional_year,
+                                newElement_1_dateInsideOptional_year);
+                        }
+                        jobject newElement_1_dateInsideOptional_month;
+                        if (entry_1.date.Value().month.IsNull())
+                        {
+                            newElement_1_dateInsideOptional_month = nullptr;
+                        }
+                        else
+                        {
+                            std::string newElement_1_dateInsideOptional_monthClassName     = "java/lang/Integer";
+                            std::string newElement_1_dateInsideOptional_monthCtorSignature = "(I)V";
+                            jint jninewElement_1_dateInsideOptional_month = static_cast<jint>(entry_1.date.Value().month.Value());
+                            chip::JniReferences::GetInstance().CreateBoxedObject<jint>(
+                                newElement_1_dateInsideOptional_monthClassName.c_str(),
+                                newElement_1_dateInsideOptional_monthCtorSignature.c_str(),
+                                jninewElement_1_dateInsideOptional_month, newElement_1_dateInsideOptional_month);
+                        }
+                        jobject newElement_1_dateInsideOptional_day;
+                        if (entry_1.date.Value().day.IsNull())
+                        {
+                            newElement_1_dateInsideOptional_day = nullptr;
+                        }
+                        else
+                        {
+                            std::string newElement_1_dateInsideOptional_dayClassName     = "java/lang/Integer";
+                            std::string newElement_1_dateInsideOptional_dayCtorSignature = "(I)V";
+                            jint jninewElement_1_dateInsideOptional_day = static_cast<jint>(entry_1.date.Value().day.Value());
+                            chip::JniReferences::GetInstance().CreateBoxedObject<jint>(
+                                newElement_1_dateInsideOptional_dayClassName.c_str(),
+                                newElement_1_dateInsideOptional_dayCtorSignature.c_str(), jninewElement_1_dateInsideOptional_day,
+                                newElement_1_dateInsideOptional_day);
+                        }
+                        jobject newElement_1_dateInsideOptional_dayOfWeek;
+                        if (entry_1.date.Value().dayOfWeek.IsNull())
+                        {
+                            newElement_1_dateInsideOptional_dayOfWeek = nullptr;
+                        }
+                        else
+                        {
+                            std::string newElement_1_dateInsideOptional_dayOfWeekClassName     = "java/lang/Integer";
+                            std::string newElement_1_dateInsideOptional_dayOfWeekCtorSignature = "(I)V";
+                            jint jninewElement_1_dateInsideOptional_dayOfWeek =
+                                static_cast<jint>(entry_1.date.Value().dayOfWeek.Value());
+                            chip::JniReferences::GetInstance().CreateBoxedObject<jint>(
+                                newElement_1_dateInsideOptional_dayOfWeekClassName.c_str(),
+                                newElement_1_dateInsideOptional_dayOfWeekCtorSignature.c_str(),
+                                jninewElement_1_dateInsideOptional_dayOfWeek, newElement_1_dateInsideOptional_dayOfWeek);
+                        }
+
+                        jclass dateStructStructClass_4;
+                        err = chip::JniReferences::GetInstance().GetLocalClassRef(
+                            env, "chip/devicecontroller/ChipStructs$EnergyCalendarClusterDateStruct", dateStructStructClass_4);
+                        if (err != CHIP_NO_ERROR)
+                        {
+                            ChipLogError(Zcl, "Could not find class ChipStructs$EnergyCalendarClusterDateStruct");
+                            return nullptr;
+                        }
+
+                        jmethodID dateStructStructCtor_4;
+                        err = chip::JniReferences::GetInstance().FindMethod(
+                            env, dateStructStructClass_4, "<init>",
+                            "(Ljava/lang/Integer;Ljava/lang/Integer;Ljava/lang/Integer;Ljava/lang/Integer;)V",
+                            &dateStructStructCtor_4);
+                        if (err != CHIP_NO_ERROR || dateStructStructCtor_4 == nullptr)
+                        {
+                            ChipLogError(Zcl, "Could not find ChipStructs$EnergyCalendarClusterDateStruct constructor");
+                            return nullptr;
+                        }
+
+                        newElement_1_dateInsideOptional =
+                            env->NewObject(dateStructStructClass_4, dateStructStructCtor_4, newElement_1_dateInsideOptional_year,
+                                           newElement_1_dateInsideOptional_month, newElement_1_dateInsideOptional_day,
+                                           newElement_1_dateInsideOptional_dayOfWeek);
                         chip::JniReferences::GetInstance().CreateOptional(newElement_1_dateInsideOptional, newElement_1_date);
                     }
                     jobject newElement_1_daysOfWeek;
@@ -25539,12 +25699,87 @@ jobject DecodeAttributeValue(const app::ConcreteAttributePath & aPath, TLV::TLVR
                 else
                 {
                     jobject value_dateInsideOptional;
-                    std::string value_dateInsideOptionalClassName     = "java/lang/Long";
-                    std::string value_dateInsideOptionalCtorSignature = "(J)V";
-                    jlong jnivalue_dateInsideOptional                 = static_cast<jlong>(cppValue.Value().date.Value());
-                    chip::JniReferences::GetInstance().CreateBoxedObject<jlong>(
-                        value_dateInsideOptionalClassName.c_str(), value_dateInsideOptionalCtorSignature.c_str(),
-                        jnivalue_dateInsideOptional, value_dateInsideOptional);
+                    jobject value_dateInsideOptional_year;
+                    if (cppValue.Value().date.Value().year.IsNull())
+                    {
+                        value_dateInsideOptional_year = nullptr;
+                    }
+                    else
+                    {
+                        std::string value_dateInsideOptional_yearClassName     = "java/lang/Integer";
+                        std::string value_dateInsideOptional_yearCtorSignature = "(I)V";
+                        jint jnivalue_dateInsideOptional_year = static_cast<jint>(cppValue.Value().date.Value().year.Value());
+                        chip::JniReferences::GetInstance().CreateBoxedObject<jint>(
+                            value_dateInsideOptional_yearClassName.c_str(), value_dateInsideOptional_yearCtorSignature.c_str(),
+                            jnivalue_dateInsideOptional_year, value_dateInsideOptional_year);
+                    }
+                    jobject value_dateInsideOptional_month;
+                    if (cppValue.Value().date.Value().month.IsNull())
+                    {
+                        value_dateInsideOptional_month = nullptr;
+                    }
+                    else
+                    {
+                        std::string value_dateInsideOptional_monthClassName     = "java/lang/Integer";
+                        std::string value_dateInsideOptional_monthCtorSignature = "(I)V";
+                        jint jnivalue_dateInsideOptional_month = static_cast<jint>(cppValue.Value().date.Value().month.Value());
+                        chip::JniReferences::GetInstance().CreateBoxedObject<jint>(
+                            value_dateInsideOptional_monthClassName.c_str(), value_dateInsideOptional_monthCtorSignature.c_str(),
+                            jnivalue_dateInsideOptional_month, value_dateInsideOptional_month);
+                    }
+                    jobject value_dateInsideOptional_day;
+                    if (cppValue.Value().date.Value().day.IsNull())
+                    {
+                        value_dateInsideOptional_day = nullptr;
+                    }
+                    else
+                    {
+                        std::string value_dateInsideOptional_dayClassName     = "java/lang/Integer";
+                        std::string value_dateInsideOptional_dayCtorSignature = "(I)V";
+                        jint jnivalue_dateInsideOptional_day = static_cast<jint>(cppValue.Value().date.Value().day.Value());
+                        chip::JniReferences::GetInstance().CreateBoxedObject<jint>(
+                            value_dateInsideOptional_dayClassName.c_str(), value_dateInsideOptional_dayCtorSignature.c_str(),
+                            jnivalue_dateInsideOptional_day, value_dateInsideOptional_day);
+                    }
+                    jobject value_dateInsideOptional_dayOfWeek;
+                    if (cppValue.Value().date.Value().dayOfWeek.IsNull())
+                    {
+                        value_dateInsideOptional_dayOfWeek = nullptr;
+                    }
+                    else
+                    {
+                        std::string value_dateInsideOptional_dayOfWeekClassName     = "java/lang/Integer";
+                        std::string value_dateInsideOptional_dayOfWeekCtorSignature = "(I)V";
+                        jint jnivalue_dateInsideOptional_dayOfWeek =
+                            static_cast<jint>(cppValue.Value().date.Value().dayOfWeek.Value());
+                        chip::JniReferences::GetInstance().CreateBoxedObject<jint>(
+                            value_dateInsideOptional_dayOfWeekClassName.c_str(),
+                            value_dateInsideOptional_dayOfWeekCtorSignature.c_str(), jnivalue_dateInsideOptional_dayOfWeek,
+                            value_dateInsideOptional_dayOfWeek);
+                    }
+
+                    jclass dateStructStructClass_3;
+                    err = chip::JniReferences::GetInstance().GetLocalClassRef(
+                        env, "chip/devicecontroller/ChipStructs$EnergyCalendarClusterDateStruct", dateStructStructClass_3);
+                    if (err != CHIP_NO_ERROR)
+                    {
+                        ChipLogError(Zcl, "Could not find class ChipStructs$EnergyCalendarClusterDateStruct");
+                        return nullptr;
+                    }
+
+                    jmethodID dateStructStructCtor_3;
+                    err = chip::JniReferences::GetInstance().FindMethod(
+                        env, dateStructStructClass_3, "<init>",
+                        "(Ljava/lang/Integer;Ljava/lang/Integer;Ljava/lang/Integer;Ljava/lang/Integer;)V", &dateStructStructCtor_3);
+                    if (err != CHIP_NO_ERROR || dateStructStructCtor_3 == nullptr)
+                    {
+                        ChipLogError(Zcl, "Could not find ChipStructs$EnergyCalendarClusterDateStruct constructor");
+                        return nullptr;
+                    }
+
+                    value_dateInsideOptional = env->NewObject(dateStructStructClass_3, dateStructStructCtor_3,
+                                                              value_dateInsideOptional_year, value_dateInsideOptional_month,
+                                                              value_dateInsideOptional_day, value_dateInsideOptional_dayOfWeek);
                     chip::JniReferences::GetInstance().CreateOptional(value_dateInsideOptional, value_date);
                 }
                 jobject value_daysOfWeek;
@@ -25724,12 +25959,87 @@ jobject DecodeAttributeValue(const app::ConcreteAttributePath & aPath, TLV::TLVR
                 else
                 {
                     jobject value_dateInsideOptional;
-                    std::string value_dateInsideOptionalClassName     = "java/lang/Long";
-                    std::string value_dateInsideOptionalCtorSignature = "(J)V";
-                    jlong jnivalue_dateInsideOptional                 = static_cast<jlong>(cppValue.Value().date.Value());
-                    chip::JniReferences::GetInstance().CreateBoxedObject<jlong>(
-                        value_dateInsideOptionalClassName.c_str(), value_dateInsideOptionalCtorSignature.c_str(),
-                        jnivalue_dateInsideOptional, value_dateInsideOptional);
+                    jobject value_dateInsideOptional_year;
+                    if (cppValue.Value().date.Value().year.IsNull())
+                    {
+                        value_dateInsideOptional_year = nullptr;
+                    }
+                    else
+                    {
+                        std::string value_dateInsideOptional_yearClassName     = "java/lang/Integer";
+                        std::string value_dateInsideOptional_yearCtorSignature = "(I)V";
+                        jint jnivalue_dateInsideOptional_year = static_cast<jint>(cppValue.Value().date.Value().year.Value());
+                        chip::JniReferences::GetInstance().CreateBoxedObject<jint>(
+                            value_dateInsideOptional_yearClassName.c_str(), value_dateInsideOptional_yearCtorSignature.c_str(),
+                            jnivalue_dateInsideOptional_year, value_dateInsideOptional_year);
+                    }
+                    jobject value_dateInsideOptional_month;
+                    if (cppValue.Value().date.Value().month.IsNull())
+                    {
+                        value_dateInsideOptional_month = nullptr;
+                    }
+                    else
+                    {
+                        std::string value_dateInsideOptional_monthClassName     = "java/lang/Integer";
+                        std::string value_dateInsideOptional_monthCtorSignature = "(I)V";
+                        jint jnivalue_dateInsideOptional_month = static_cast<jint>(cppValue.Value().date.Value().month.Value());
+                        chip::JniReferences::GetInstance().CreateBoxedObject<jint>(
+                            value_dateInsideOptional_monthClassName.c_str(), value_dateInsideOptional_monthCtorSignature.c_str(),
+                            jnivalue_dateInsideOptional_month, value_dateInsideOptional_month);
+                    }
+                    jobject value_dateInsideOptional_day;
+                    if (cppValue.Value().date.Value().day.IsNull())
+                    {
+                        value_dateInsideOptional_day = nullptr;
+                    }
+                    else
+                    {
+                        std::string value_dateInsideOptional_dayClassName     = "java/lang/Integer";
+                        std::string value_dateInsideOptional_dayCtorSignature = "(I)V";
+                        jint jnivalue_dateInsideOptional_day = static_cast<jint>(cppValue.Value().date.Value().day.Value());
+                        chip::JniReferences::GetInstance().CreateBoxedObject<jint>(
+                            value_dateInsideOptional_dayClassName.c_str(), value_dateInsideOptional_dayCtorSignature.c_str(),
+                            jnivalue_dateInsideOptional_day, value_dateInsideOptional_day);
+                    }
+                    jobject value_dateInsideOptional_dayOfWeek;
+                    if (cppValue.Value().date.Value().dayOfWeek.IsNull())
+                    {
+                        value_dateInsideOptional_dayOfWeek = nullptr;
+                    }
+                    else
+                    {
+                        std::string value_dateInsideOptional_dayOfWeekClassName     = "java/lang/Integer";
+                        std::string value_dateInsideOptional_dayOfWeekCtorSignature = "(I)V";
+                        jint jnivalue_dateInsideOptional_dayOfWeek =
+                            static_cast<jint>(cppValue.Value().date.Value().dayOfWeek.Value());
+                        chip::JniReferences::GetInstance().CreateBoxedObject<jint>(
+                            value_dateInsideOptional_dayOfWeekClassName.c_str(),
+                            value_dateInsideOptional_dayOfWeekCtorSignature.c_str(), jnivalue_dateInsideOptional_dayOfWeek,
+                            value_dateInsideOptional_dayOfWeek);
+                    }
+
+                    jclass dateStructStructClass_3;
+                    err = chip::JniReferences::GetInstance().GetLocalClassRef(
+                        env, "chip/devicecontroller/ChipStructs$EnergyCalendarClusterDateStruct", dateStructStructClass_3);
+                    if (err != CHIP_NO_ERROR)
+                    {
+                        ChipLogError(Zcl, "Could not find class ChipStructs$EnergyCalendarClusterDateStruct");
+                        return nullptr;
+                    }
+
+                    jmethodID dateStructStructCtor_3;
+                    err = chip::JniReferences::GetInstance().FindMethod(
+                        env, dateStructStructClass_3, "<init>",
+                        "(Ljava/lang/Integer;Ljava/lang/Integer;Ljava/lang/Integer;Ljava/lang/Integer;)V", &dateStructStructCtor_3);
+                    if (err != CHIP_NO_ERROR || dateStructStructCtor_3 == nullptr)
+                    {
+                        ChipLogError(Zcl, "Could not find ChipStructs$EnergyCalendarClusterDateStruct constructor");
+                        return nullptr;
+                    }
+
+                    value_dateInsideOptional = env->NewObject(dateStructStructClass_3, dateStructStructCtor_3,
+                                                              value_dateInsideOptional_year, value_dateInsideOptional_month,
+                                                              value_dateInsideOptional_day, value_dateInsideOptional_dayOfWeek);
                     chip::JniReferences::GetInstance().CreateOptional(value_dateInsideOptional, value_date);
                 }
                 jobject value_daysOfWeek;
