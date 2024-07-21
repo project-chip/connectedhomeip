@@ -6021,6 +6021,22 @@
               "reportableChange": 0
             },
             {
+              "name": "MultiPressMax",
+              "code": 2,
+              "mfgCode": null,
+              "side": "server",
+              "type": "int8u",
+              "included": 1,
+              "storageOption": "RAM",
+              "singleton": 0,
+              "bounded": 0,
+              "defaultValue": "2",
+              "reportable": 1,
+              "minInterval": 1,
+              "maxInterval": 65534,
+              "reportableChange": 0
+            },
+            {
               "name": "GeneratedCommandList",
               "code": 65528,
               "mfgCode": null,
@@ -6094,7 +6110,7 @@
               "storageOption": "RAM",
               "singleton": 0,
               "bounded": 0,
-              "defaultValue": "6",
+              "defaultValue": "30",
               "reportable": 1,
               "minInterval": 1,
               "maxInterval": 65534,
@@ -6126,8 +6142,36 @@
               "included": 1
             },
             {
+              "name": "LongPress",
+              "code": 2,
+              "mfgCode": null,
+              "side": "server",
+              "included": 1
+            },
+            {
               "name": "ShortRelease",
               "code": 3,
+              "mfgCode": null,
+              "side": "server",
+              "included": 1
+            },
+            {
+              "name": "LongRelease",
+              "code": 4,
+              "mfgCode": null,
+              "side": "server",
+              "included": 1
+            },
+            {
+              "name": "MultiPressOngoing",
+              "code": 5,
+              "mfgCode": null,
+              "side": "server",
+              "included": 1
+            },
+            {
+              "name": "MultiPressComplete",
+              "code": 6,
               "mfgCode": null,
               "side": "server",
               "included": 1

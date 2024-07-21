@@ -60,6 +60,11 @@ using namespace ::chip::DeviceLayer;
 
 #define FACTORY_RESET_TRIGGER_TIMEOUT 3000
 #define FACTORY_RESET_CANCEL_WINDOW_TIMEOUT 3000
+#define SWITCH_MULTIPRESS_WINDOW_MS 500
+#define SWITCH_LONGPRESS_WINDOW_MS 3000
+#define SWITCH_BUTTON_PRESSED 1
+#define SWITCH_BUTTON_UNPRESSED 0
+
 #define APP_TASK_STACK_SIZE (2 * 1024)
 #define APP_TASK_PRIORITY 2
 #define APP_EVENT_QUEUE_SIZE 10
@@ -74,6 +79,9 @@ bool sIsThreadProvisioned     = false;
 bool sIsThreadEnabled         = false;
 bool sHaveBLEConnections      = false;
 bool sIsBLEAdvertisingEnabled = false;
+bool sIsMultipressOngoing     = false;
+bool sLongPressDetected       = false;
+uint8_t sSwitchButtonState    = SWITCH_BUTTON_UNPRESSED;
 
 // NOTE! This key is for test/certification only and should not be available in production devices!
 uint8_t sTestEventTriggerEnableKey[TestEventTriggerDelegate::kEnableKeyLength] = { 0x00, 0x11, 0x22, 0x33, 0x44, 0x55, 0x66, 0x77,
@@ -302,7 +310,9 @@ void AppTask::AppTaskMain(void * pvParameter)
 
 void AppTask::ButtonEventHandler(uint8_t btnIdx, bool btnPressed)
 {
-    ChipLogProgress(NotSpecified, "ButtonEventHandler %d, %d", btnIdx, btnPressed);
+    CHIP_ERROR err = CHIP_NO_ERROR;
+
+    ChipLogDetail(NotSpecified, "ButtonEventHandler %d, %d", btnIdx, btnPressed);
 
     AppEvent button_event              = {};
     button_event.Type                  = AppEvent::kEventType_Button;
@@ -324,13 +334,54 @@ void AppTask::ButtonEventHandler(uint8_t btnIdx, bool btnPressed)
     case APP_FUNCTION2_SWITCH: {
         if (!btnPressed)
         {
-            ChipLogProgress(NotSpecified, "Switch release press");
-            button_event.Handler = SwitchMgr().GenericSwitchReleasePressHandler;
+            ChipLogDetail(NotSpecified, "Switch button released");
+
+            button_event.Handler =
+                sLongPressDetected ? SwitchMgr().GenericSwitchLongReleaseHandler : SwitchMgr().GenericSwitchShortReleaseHandler;
+
+            sIsMultipressOngoing = true;
+            sSwitchButtonState   = SWITCH_BUTTON_UNPRESSED;
+            sLongPressDetected   = false;
+
+            chip::DeviceLayer::SystemLayer().CancelTimer(MultiPressTimeoutHandler, NULL);
+            // we start the MultiPress feature window after releasing the button
+            err = chip::DeviceLayer::SystemLayer().StartTimer(chip::System::Clock::Milliseconds32(SWITCH_MULTIPRESS_WINDOW_MS),
+                                                              MultiPressTimeoutHandler, NULL);
+
+            if (err != CHIP_NO_ERROR)
+            {
+                ChipLogError(NotSpecified, "StartTimer failed %s: ", chip::ErrorStr(err));
+            }
         }
         else
         {
-            ChipLogProgress(NotSpecified, "Switch initial press");
-            button_event.Handler = SwitchMgr().GenericSwitchInitialPressHandler;
+            ChipLogDetail(NotSpecified, "Switch button pressed");
+
+            sSwitchButtonState = SWITCH_BUTTON_PRESSED;
+
+            chip::DeviceLayer::SystemLayer().CancelTimer(LongPressTimeoutHandler, NULL);
+            // we need to check if this is short or long press
+            err = chip::DeviceLayer::SystemLayer().StartTimer(chip::System::Clock::Milliseconds32(SWITCH_LONGPRESS_WINDOW_MS),
+                                                              LongPressTimeoutHandler, NULL);
+
+            if (err != CHIP_NO_ERROR)
+            {
+                ChipLogError(NotSpecified, "StartTimer failed %s: ", chip::ErrorStr(err));
+            }
+
+            // if we have active multipress window we need to send extra event
+            if (sIsMultipressOngoing)
+            {
+                ChipLogDetail(NotSpecified, "Switch MultipressOngoing");
+                button_event.Handler = SwitchMgr().GenericSwitchInitialPressHandler;
+                sAppTask.PostEvent(&button_event);
+                chip::DeviceLayer::SystemLayer().CancelTimer(MultiPressTimeoutHandler, NULL);
+                button_event.Handler = SwitchMgr().GenericSwitchMultipressOngoingHandler;
+            }
+            else
+            {
+                button_event.Handler = SwitchMgr().GenericSwitchInitialPressHandler;
+            }
         }
         break;
     }
@@ -375,9 +426,38 @@ void AppTask::TimerEventHandler(chip::System::Layer * aLayer, void * aAppState)
     sAppTask.PostEvent(&event);
 }
 
+void AppTask::MultiPressTimeoutHandler(chip::System::Layer * aLayer, void * aAppState)
+{
+    ChipLogDetail(NotSpecified, "MultiPressTimeoutHandler");
+
+    sIsMultipressOngoing = false;
+
+    AppEvent multipress_event = {};
+    multipress_event.Type     = AppEvent::kEventType_Button;
+    multipress_event.Handler  = SwitchMgr().GenericSwitchMultipressCompleteHandler;
+
+    sAppTask.PostEvent(&multipress_event);
+}
+
+void AppTask::LongPressTimeoutHandler(chip::System::Layer * aLayer, void * aAppState)
+{
+    ChipLogDetail(NotSpecified, "LongPressTimeoutHandler");
+
+    // if the button is still pressed after threshold time, this is a LongPress, otherwise jsut ignore it
+    if (sSwitchButtonState == SWITCH_BUTTON_PRESSED)
+    {
+        sLongPressDetected       = true;
+        AppEvent longpress_event = {};
+        longpress_event.Type     = AppEvent::kEventType_Button;
+        longpress_event.Handler  = SwitchMgr().GenericSwitchLongPressHandler;
+
+        sAppTask.PostEvent(&longpress_event);
+    }
+}
+
 void AppTask::TotalHoursTimerHandler(chip::System::Layer * aLayer, void * aAppState)
 {
-    ChipLogProgress(NotSpecified, "HourlyTimer");
+    ChipLogDetail(NotSpecified, "HourlyTimer");
 
     CHIP_ERROR err;
     uint32_t totalOperationalHours = 0;
