@@ -36,7 +36,7 @@ CHIP_ERROR ExampleWaterHeaterModeDelegate::Init()
 // todo refactor code by making a parent class for all ModeInstance classes to reduce flash usage.
 void ExampleWaterHeaterModeDelegate::HandleChangeToMode(uint8_t NewMode, ModeBase::Commands::ChangeToModeResponse::Type & response)
 {
-    response.status = to_underlying(ModeBase::StatusCode::kGenericFailure);
+    response.status = to_underlying(ModeBase::StatusCode::kSuccess);
 }
 
 CHIP_ERROR ExampleWaterHeaterModeDelegate::GetModeLabelByIndex(uint8_t modeIndex, chip::MutableCharSpan & label)
