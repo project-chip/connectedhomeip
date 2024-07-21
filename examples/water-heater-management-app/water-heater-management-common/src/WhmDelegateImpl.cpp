@@ -294,7 +294,7 @@ CHIP_ERROR WaterHeaterManagementDelegate::Init()
 
 void WaterHeaterManagementDelegate::HandleChangeToMode(uint8_t NewMode, ModeBase::Commands::ChangeToModeResponse::Type & response)
 {
-    response.status = to_underlying(ModeBase::StatusCode::kGenericFailure);
+    response.status = to_underlying(ModeBase::StatusCode::kSuccess);
 }
 
 CHIP_ERROR WaterHeaterManagementDelegate::GetModeLabelByIndex(uint8_t modeIndex, chip::MutableCharSpan & label)
