@@ -44,7 +44,7 @@ limitations under the License.
     <item name="High" value="0x03"/>
   </enum>
 
-  <struct name="PeakPeriodStruct">
+  <struct name="PeakPeriodStruct" apiMaturity="provisional">
     <cluster code="0x009A"/>
     <item fieldId="0" name="Severity" type="PeakPeriodSeverityEnum" min="0x00" max="0x03"/>
     <item fieldId="1" name="PeakPeriod" type="int16u" default="0"/>
@@ -52,7 +52,7 @@ limitations under the License.
     <item fieldId="3" name="EndTime" type="epoch_s" isNullable="true"/>
   </struct>
 
-  <struct name="TransitionStruct">
+  <struct name="TransitionStruct" apiMaturity="provisional">
     <cluster code="0x009A"/>
     <item fieldId="0" name="TransitionTime" type="int16u" max="1499"/>
     <item fieldId="1" name="PriceTier" type="int32u" optional="true"/>
@@ -60,15 +60,15 @@ limitations under the License.
     <item fieldId="3" name="AuxiliaryLoad" type="AuxiliaryLoadBitmap" optional="true" min="0x00" max="0xFF"/>
   </struct>
 
-  <struct name="DayStruct">
+  <struct name="DayStruct" apiMaturity="provisional">
     <cluster code="0x009A"/>
-    <item fieldId="0" name="Date" type="date" optional="true"/>
+    <item fieldId="0" name="Date" type="DateStruct" optional="true"/>
     <item fieldId="1" name="DaysOfWeek" type="TransitionDayOfWeekBitmap" optional="true" min="0x00" max="0x7F"/>
     <item fieldId="2" name="Transitions" type="TransitionStruct" array="true" length="48" minLength="1"/>
     <item fieldId="3" name="CalendarID" type="int32u" optional="true"/>
   </struct>
 
-  <struct name="CalendarPeriodStruct">
+  <struct name="CalendarPeriodStruct" apiMaturity="provisional">
     <cluster code="0x009A"/>
     <item fieldId="0" name="StartDate" type="epoch_s" isNullable="true"/>
     <item fieldId="1" name="Days" type="DayStruct" array="true" length="7" minLength="1"/>
@@ -84,16 +84,16 @@ limitations under the License.
     <description>The Energy Calendar Cluster provides a mechanism for communicating schedules associated with various forms of energy consumption.</description>
     <globalAttribute side="either" code="0xFFFD" value="3"/>
     <features>
-      <feature bit="0" code="PTIER" name="PricingTier" summary="Supports information about pricing tiers">
+      <feature apiMaturity="provisional" bit="0" code="PTIER" name="PricingTier" summary="Supports information about pricing tiers">
         <optionalConform choice="a" more="true" min="1"/>
       </feature>
-      <feature bit="1" code="FCRED" name="FriendlyCredit" summary="Supports information about when friendly credit periods begin and end">
+      <feature apiMaturity="provisional" bit="1" code="FCRED" name="FriendlyCredit" summary="Supports information about when friendly credit periods begin and end">
         <optionalConform choice="a" more="true" min="1"/>
       </feature>
-      <feature bit="2" code="AUXLD" name="AuxiliaryLoad" summary="Supports information about when auxiliary loads should be enabled or disabled">
+      <feature apiMaturity="provisional" bit="2" code="AUXLD" name="AuxiliaryLoad" summary="Supports information about when auxiliary loads should be enabled or disabled">
         <optionalConform choice="a" more="true" min="1"/>
       </feature>
-      <feature bit="3" code="PEAKP" name="PeakPeriod" summary="Supports information about peak periods">
+      <feature apiMaturity="provisional" bit="3" code="PEAKP" name="PeakPeriod" summary="Supports information about peak periods">
         <optionalConform/>
       </feature>
     </features>
