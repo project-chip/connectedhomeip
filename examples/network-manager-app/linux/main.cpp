@@ -34,14 +34,14 @@ ByteSpan ByteSpanFromCharSpan(CharSpan span)
 }
 
 std::optional<DefaultThreadNetworkDirectoryServer> gThreadNetworkDirectoryServer;
-void emberAfThreadNetworkDirectoryClusterInitCallback(chip::EndpointId endpoint)
+void emberAfThreadNetworkDirectoryClusterInitCallback(EndpointId endpoint)
 {
     VerifyOrDie(!gThreadNetworkDirectoryServer);
     gThreadNetworkDirectoryServer.emplace(endpoint).Init();
 }
 
 std::optional<WiFiNetworkManagementServer> gWiFiNetworkManagementServer;
-void emberAfWiFiNetworkManagementClusterInitCallback(chip::EndpointId endpoint)
+void emberAfWiFiNetworkManagementClusterInitCallback(EndpointId endpoint)
 {
     VerifyOrDie(!gWiFiNetworkManagementServer);
     gWiFiNetworkManagementServer.emplace(endpoint).Init();
