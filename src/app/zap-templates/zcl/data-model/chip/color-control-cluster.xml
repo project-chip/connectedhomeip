@@ -98,7 +98,7 @@ limitations under the License.
     <client tick="false" init="false">true</client>
     <server tick="false" init="false">true</server>
 
-    <globalAttribute side="either" code="0xFFFD" value="6"/>
+    <globalAttribute side="either" code="0xFFFD" value="7"/>
 
     <features>
       <feature bit="0" code="HS" name="Hue And Saturation" summary="Supports color specification via hue/saturation.">
