@@ -74,14 +74,16 @@ CLUSTER_TEMPLATE = (
     '  </commands>\n'
     '</cluster>\n')
 
+
 def _create_elements(template_str: str, base_name: str) -> list[str]:
     xml_str = []
-    def add_elements(curr_choice:str, starting_id: int, more: str, XXX: bool):
-        for i in range(0,3):
+
+    def add_elements(curr_choice: str, starting_id: int, more: str, XXX: bool):
+        for i in range(0, 3):
             element_name = f'{base_name}{curr_choice.upper()*(i+1)}'
             environment = jinja2.Environment()
             template = environment.from_string(template_str)
-            xml_str.append(template.render(id=(i+starting_id), name=element_name, choice=curr_choice, more=more, XXX=XXX))
+            xml_str.append(template.render(id=(i + starting_id), name=element_name, choice=curr_choice, more=more, XXX=XXX))
     add_elements('a', 1, 'false', False)
     add_elements('b', 4, 'true', False)
     add_elements('c', 7, 'false', True)
@@ -103,6 +105,7 @@ def _create_elements(template_str: str, base_name: str) -> list[str]:
 # 3 of each element with [XXX].d+
 # 1 element named XXX
 
+
 def _create_features():
     xml = _create_elements(FEATURE_TEMPLATE, 'F')
     xxx = ('    <feature bit="13" code="XXX" name="XXX" summary="summary">\n'
@@ -120,6 +123,7 @@ def _create_attributes():
     xml.append(xxx)
     return '\n'.join(xml)
 
+
 def _create_commands():
     xml = _create_elements(COMMAND_TEMPLATE, 'cmd')
     xxx = ('    <command id="13" name="XXX" summary="summary" direction="commandToServer" response="Y">\n'
@@ -128,10 +132,12 @@ def _create_commands():
     xml.append(xxx)
     return '\n'.join(xml)
 
+
 def _create_cluster():
     environment = jinja2.Environment()
     template = environment.from_string(CLUSTER_TEMPLATE)
     return template.render(feature_string=_create_features(), attribute_string=_create_attributes(), command_string=_create_commands())
+
 
 class TestConformanceSupport(MatterBaseTest):
     def setup_class(self):
@@ -146,17 +152,17 @@ class TestConformanceSupport(MatterBaseTest):
         self.clusters = clusters
         # each element type uses 13 IDs from 1-13 (or bits for the features) and we want to test all the combinations
         num_elements = 13
-        ids = range(1,num_elements+1)
+        ids = range(1, num_elements + 1)
         self.all_id_combos = []
         combos = []
-        for r in range(1,num_elements+1):
+        for r in range(1, num_elements + 1):
             combos.extend(list(itertools.combinations(ids, r)))
         for combo in combos:
             # The first three IDs are all O.a, so we need exactly one for the conformance to be valid
             expected_failures = set()
-            if len(set([1,2,3]) & set(combo)) != 1:
+            if len(set([1, 2, 3]) & set(combo)) != 1:
                 expected_failures.add('a')
-            if len(set([4,5,6]) & set(combo)) < 1:
+            if len(set([4, 5, 6]) & set(combo)) < 1:
                 expected_failures.add('b')
             # For these, we are checking that choice conformance checkers
             # - Correctly report errors and correct cases when the gating feature is ON
@@ -164,9 +170,9 @@ class TestConformanceSupport(MatterBaseTest):
             # Errors where we incorrectly set disallowed features based on the gating feature are checked
             # elsewhere in the cert test in a comprehensive way. We just want to ensure that we are not
             # incorrectly reporting choice conformance error as well
-            if 13 in combo and ((len(set([7,8,9]) & set(combo)) != 1)):
+            if 13 in combo and ((len(set([7, 8, 9]) & set(combo)) != 1)):
                 expected_failures.add('c')
-            if 13 in combo and (len(set([10,11,12]) & set(combo)) < 1):
+            if 13 in combo and (len(set([10, 11, 12]) & set(combo)) < 1):
                 expected_failures.add('d')
 
             self.all_id_combos.append((combo, expected_failures))
@@ -198,6 +204,7 @@ class TestConformanceSupport(MatterBaseTest):
         for combo, expected_failures in self.all_id_combos:
             problems = evaluate_command_choice_conformance(0, 1, self.clusters, 0, [], list(combo))
             self._evaluate_problems(problems, expected_failures)
+
 
 if __name__ == "__main__":
     default_matter_test_main()

@@ -32,8 +32,9 @@ from typing import Callable
 import chip.clusters as Clusters
 from basic_composition_support import BasicCompositionTests
 from chip.tlv import uint
+from choice_conformance_support import (evaluate_attribute_choice_conformance, evaluate_command_choice_conformance,
+                                        evaluate_feature_choice_conformance)
 from conformance_support import ConformanceDecision, conformance_allowed
-from choice_conformance_support import evaluate_attribute_choice_conformance, evaluate_command_choice_conformance, evaluate_feature_choice_conformance
 from global_attribute_ids import GlobalAttributeIds
 from matter_testing_support import (AttributePathLocation, ClusterPathLocation, CommandPathLocation, MatterBaseTest, ProblemNotice,
                                     ProblemSeverity, async_test_body, default_matter_test_main)
@@ -195,7 +196,7 @@ class DeviceConformanceTests(BasicCompositionTests):
 
                 if feature_choice_problems or attribute_choice_problems or command_choice_problem:
                     success = False
-                problems.extend(feature_choice_problems+attribute_choice_problems+command_choice_problem)
+                problems.extend(feature_choice_problems + attribute_choice_problems + command_choice_problem)
 
         print(f'success = {success}')
         return success, problems
