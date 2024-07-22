@@ -50,6 +50,7 @@
 #include <app/TimedHandler.h>
 #include <app/WriteClient.h>
 #include <app/WriteHandler.h>
+#include <app/data-model-interface/DataModel.h>
 #include <app/icd/server/ICDServerConfig.h>
 #include <app/reporting/Engine.h>
 #include <app/reporting/ReportScheduler.h>
@@ -411,6 +412,8 @@ public:
     }
 #endif
 
+    InteractionModel::DataModel * GetDataModel() const;
+
 private:
     friend class reporting::Engine;
     friend class TestCommandInteraction;
@@ -450,9 +453,9 @@ private:
      *
      *
      */
-    static CHIP_ERROR ParseAttributePaths(const Access::SubjectDescriptor & aSubjectDescriptor,
-                                          AttributePathIBs::Parser & aAttributePathListParser, bool & aHasValidAttributePath,
-                                          size_t & aRequestedAttributePathCount);
+    CHIP_ERROR ParseAttributePaths(const Access::SubjectDescriptor & aSubjectDescriptor,
+                                   AttributePathIBs::Parser & aAttributePathListParser, bool & aHasValidAttributePath,
+                                   size_t & aRequestedAttributePathCount);
 
     /**
      * This parses the event path list to ensure it is well formed. If so, for each path in the list, it will expand to a list
@@ -699,6 +702,8 @@ private:
     CASESessionManager * mpCASESessionMgr = nullptr;
 
     SubscriptionResumptionStorage * mpSubscriptionResumptionStorage = nullptr;
+
+    InteractionModel::DataModel * mDataModel = nullptr;
 };
 
 } // namespace app

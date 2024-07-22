@@ -11547,7 +11547,6 @@ private:
 | * ClusterRevision                                                   | 0xFFFD |
 |------------------------------------------------------------------------------|
 | Events:                                                             |        |
-| * NetworkChanged                                                    | 0x0000 |
 \*----------------------------------------------------------------------------*/
 
 /*
@@ -11597,7 +11596,7 @@ public:
     ThreadNetworkDirectoryRemoveNetwork(CredentialIssuerCommands * credsIssuerConfig) :
         ClusterCommand("remove-network", credsIssuerConfig)
     {
-        AddArgument("ExtendedPanID", 0, UINT64_MAX, &mRequest.extendedPanID);
+        AddArgument("ExtendedPanID", &mRequest.extendedPanID);
         ClusterCommand::AddArguments();
     }
 
@@ -11635,7 +11634,7 @@ public:
     ThreadNetworkDirectoryGetOperationalDataset(CredentialIssuerCommands * credsIssuerConfig) :
         ClusterCommand("get-operational-dataset", credsIssuerConfig)
     {
-        AddArgument("ExtendedPanID", 0, UINT64_MAX, &mRequest.extendedPanID);
+        AddArgument("ExtendedPanID", &mRequest.extendedPanID);
         ClusterCommand::AddArguments();
     }
 
@@ -25693,9 +25692,9 @@ void registerClusterThreadNetworkDirectory(Commands & commands, CredentialIssuer
         make_unique<ReadAttribute>(Id, "feature-map", Attributes::FeatureMap::Id, credsIssuerConfig),                           //
         make_unique<ReadAttribute>(Id, "cluster-revision", Attributes::ClusterRevision::Id, credsIssuerConfig),                 //
         make_unique<WriteAttribute<>>(Id, credsIssuerConfig),                                                                   //
-        make_unique<WriteAttribute<chip::app::DataModel::Nullable<uint64_t>>>(Id, "preferred-extended-pan-id", 0, UINT64_MAX,
-                                                                              Attributes::PreferredExtendedPanID::Id,
-                                                                              WriteCommandType::kWrite, credsIssuerConfig), //
+        make_unique<WriteAttribute<chip::app::DataModel::Nullable<chip::ByteSpan>>>(Id, "preferred-extended-pan-id",
+                                                                                    Attributes::PreferredExtendedPanID::Id,
+                                                                                    WriteCommandType::kWrite, credsIssuerConfig), //
         make_unique<WriteAttributeAsComplex<
             chip::app::DataModel::List<const chip::app::Clusters::ThreadNetworkDirectory::Structs::ThreadNetworkStruct::Type>>>(
             Id, "thread-networks", Attributes::ThreadNetworks::Id, WriteCommandType::kForceWrite, credsIssuerConfig), //
@@ -25729,10 +25728,8 @@ void registerClusterThreadNetworkDirectory(Commands & commands, CredentialIssuer
         //
         // Events
         //
-        make_unique<ReadEvent>(Id, credsIssuerConfig),                                                     //
-        make_unique<ReadEvent>(Id, "network-changed", Events::NetworkChanged::Id, credsIssuerConfig),      //
-        make_unique<SubscribeEvent>(Id, credsIssuerConfig),                                                //
-        make_unique<SubscribeEvent>(Id, "network-changed", Events::NetworkChanged::Id, credsIssuerConfig), //
+        make_unique<ReadEvent>(Id, credsIssuerConfig),      //
+        make_unique<SubscribeEvent>(Id, credsIssuerConfig), //
     };
 
     commands.RegisterCluster(clusterName, clusterCommands);

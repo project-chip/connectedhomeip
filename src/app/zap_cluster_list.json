@@ -117,6 +117,7 @@
         "THERMOSTAT_USER_INTERFACE_CONFIGURATION_CLUSTER": [],
         "THREAD_BORDER_ROUTER_MANAGEMENT_CLUSTER": [],
         "THREAD_NETWORK_DIAGNOSTICS_CLUSTER": [],
+        "THREAD_NETWORK_DIRECTORY_CLUSTER": [],
         "TIME_CLUSTER": [],
         "TIME_FORMAT_LOCALIZATION_CLUSTER": [],
         "TIME_SYNCHRONIZATION_CLUSTER": [],
@@ -294,7 +295,7 @@
         "THREAD_NETWORK_DIAGNOSTICS_CLUSTER": [
             "thread-network-diagnostics-server"
         ],
-        "THREAD_NETWORK_DIRECTORY_CLUSTER": [],
+        "THREAD_NETWORK_DIRECTORY_CLUSTER": ["thread-network-directory-server"],
         "TIME_CLUSTER": [],
         "TIME_FORMAT_LOCALIZATION_CLUSTER": ["time-format-localization-server"],
         "TIME_SYNCHRONIZATION_CLUSTER": ["time-synchronization-server"],

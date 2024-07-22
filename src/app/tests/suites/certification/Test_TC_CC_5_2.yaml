@@ -217,6 +217,21 @@ tests:
               minValue: 0
               maxValue: 3
 
+    - label:
+          "Step 5a: TH sends MoveColor command to DUT with RateX=0 and RateY=0"
+      command: "MoveColor"
+      PICS: CC.S.F03 && CC.S.C08.Rsp
+      arguments:
+          values:
+              - name: "RateX"
+                value: 0
+              - name: "RateY"
+                value: 0
+              - name: "OptionsMask"
+                value: 0
+              - name: "OptionsOverride"
+                value: 0
+
     - label: "Turn off light that we turned on"
       PICS: OO.S.C00.Rsp
       cluster: "On/Off"
