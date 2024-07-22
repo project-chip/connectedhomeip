@@ -65,7 +65,7 @@ public:
         chip::app::CommandHandlerInterfaceRegistry::RegisterCommandHandler(this);
     }
 
-    ~TestClusterCommandHandler() { chip::app::CommandHandlerInterfaceRegistry::UnregisterCommandHandler(this); }
+    ~TestClusterCommandHandler() { CommandHandlerInterfaceRegistry::UnregisterCommandHandler(this); }
 
     void OverrideAcceptedCommands() { mOverrideAcceptedCommands = true; }
     void ClaimNoCommands() { mClaimNoCommands = true; }
