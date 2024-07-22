@@ -63,6 +63,7 @@ class TAG:
     BOOTLOADER = 2
     FACTORY_DATA = 3
 
+
 def set_logger():
     stdout_handler = logging.StreamHandler(stream=sys.stdout)
     logging.basicConfig(
