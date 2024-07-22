@@ -266,6 +266,25 @@ def run_test_sequence_steps(
 
         current_index += 1
 
+def cmd_execute_list(app_path):
+    """Returns the list suitable to pass to a ProcessManager for execution."""
+    cmd = []
+
+    # On Unix-like systems, use stdbuf to disable stdout buffering.
+    # Configure command options to disable stdout buffering during tests.
+    if sys.platform == 'darwin' or sys.platform == 'linux':
+        cmd = ['stdbuf', '-o0', '-i0']
+
+    cmd.append(app_path)
+
+    # Our applications support better debugging logs. Enable them
+    cmd.append("--trace-to")
+    cmd.append("json:log")
+
+    return cmd
+
+
+
 
 @click.command()
 @click.option('--tv-app-rel-path', type=str, default='out/tv-app/chip-tv-app', help='Path to the Linux tv-app executable.')
@@ -315,12 +334,6 @@ def test_casting_fn(tv_app_rel_path, tv_casting_app_rel_path, commissioner_gener
             # At this point, we have retrieved the test sequence of interest.
             test_sequence_steps = test_sequence.steps
 
-            # Configure command options to disable stdout buffering during tests.
-            disable_stdout_buffering_cmd = []
-            # On Unix-like systems, use stdbuf to disable stdout buffering.
-            if sys.platform == 'darwin' or sys.platform == 'linux':
-                disable_stdout_buffering_cmd = ['stdbuf', '-o0', '-i0']
-
             current_index = 0
             if test_sequence_steps[current_index].input_cmd != START_APP:
                 raise ValueError(
@@ -331,7 +344,7 @@ def test_casting_fn(tv_app_rel_path, tv_casting_app_rel_path, commissioner_gener
 
             tv_app_abs_path = os.path.abspath(tv_app_rel_path)
             # Run the Linux tv-app subprocess.
-            with ProcessManager(disable_stdout_buffering_cmd + [tv_app_abs_path], stdin=subprocess.PIPE, stdout=subprocess.PIPE, stderr=subprocess.PIPE) as tv_app_process:
+            with ProcessManager(cmd_execute_list(tv_app_abs_path), stdin=subprocess.PIPE, stdout=subprocess.PIPE, stderr=subprocess.PIPE) as tv_app_process:
                 tv_app_info = (tv_app_process, linux_tv_app_log_file)
 
                 # Verify that the tv-app is up and running.
@@ -349,7 +362,7 @@ def test_casting_fn(tv_app_rel_path, tv_casting_app_rel_path, commissioner_gener
 
                 tv_casting_app_abs_path = os.path.abspath(tv_casting_app_rel_path)
                 # Run the Linux tv-casting-app subprocess.
-                with ProcessManager(disable_stdout_buffering_cmd + [tv_casting_app_abs_path], stdin=subprocess.PIPE, stdout=subprocess.PIPE, stderr=subprocess.PIPE) as tv_casting_app_process:
+                with ProcessManager(cmd_execute_list(tv_casting_app_abs_path), stdin=subprocess.PIPE, stdout=subprocess.PIPE, stderr=subprocess.PIPE) as tv_casting_app_process:
                     log_paths = [linux_tv_app_log_path, linux_tv_casting_app_log_path]
                     tv_casting_app_info = (tv_casting_app_process, linux_tv_casting_app_log_file)
 
