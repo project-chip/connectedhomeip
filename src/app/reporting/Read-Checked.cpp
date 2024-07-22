@@ -94,7 +94,7 @@ CHIP_ERROR RetrieveClusterData(InteractionModel::DataModel * dataModel, const Ac
     // NOTE: RetrieveClusterData is responsible for encoding StatusIB errors in case of failures
     //       so we validate length written requirements for BOTH success and failure.
     //
-    // NOTE: data length is NOT reliable if the data content differs in encoding lentgh. E.g. numbers changing
+    // NOTE: data length is NOT reliable if the data content differs in encoding length. E.g. numbers changing
     //       from 0xFF to 0x100 or similar will use up more space.
     //       For unit tests we make the validation strict, however for runtime we just report an
     //       error for different sizes.
