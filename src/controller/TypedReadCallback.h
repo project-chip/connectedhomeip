@@ -25,7 +25,7 @@
 #include <functional>
 #include <lib/support/CHIPMem.h>
 
-#if CHIP_CONFIG_ENABLE_READ_CLIENT
+#if defined(CHIP_CONFIG_ENABLE_READ_CLIENT) && CHIP_CONFIG_ENABLE_READ_CLIENT
 namespace chip {
 namespace Controller {
 

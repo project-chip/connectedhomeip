@@ -25,7 +25,7 @@ ICDConfigurationData ICDConfigurationData::instance;
 
 System::Clock::Milliseconds32 ICDConfigurationData::GetSlowPollingInterval()
 {
-#if ICD_ENFORCE_SIT_SLOW_POLL_LIMIT
+#if defined(ICD_ENFORCE_SIT_SLOW_POLL_LIMIT) && ICD_ENFORCE_SIT_SLOW_POLL_LIMIT
     // When in SIT mode, the slow poll interval SHOULDN'T be greater than the SIT mode polling threshold, per spec.
     // This is important for ICD device configured for LIT operation but currently operating as a SIT
     // due to a lack of client registration
