@@ -8240,7 +8240,6 @@
           - ElectricalEnergyMeasurement
           - EnergyPreference
           - ScenesManagement
-          - WaterHeaterManagement
       attributes:
           NetworkCommissioning:
               # Targeting Spring 2024 Matter release
@@ -9553,7 +9552,6 @@
           # Targeting Spring 2024 Matter release
           - EnergyEVSEMode
           - DeviceEnergyManagementMode
-          - WaterHeaterMode
           - Messages
           - PowerTopology
       attributes:
