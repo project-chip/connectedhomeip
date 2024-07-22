@@ -29,26 +29,19 @@ struct EndpointFilter
                                                       const chip::System::PacketBufferHandle & pktPayload) = 0;
 };
 
-struct MdnsBroadcastFilter : EndpointFilter
-{
-    static constexpr size_t kMdnsPort = 5353;
-
-    EndpointQueueFilter::FilterOutcome Filter(const void * endpoint, const IPPacketInfo & pktInfo,
-                                              const chip::System::PacketBufferHandle & pktPayload) override;
-};
-
 struct HostNameFilter : EndpointFilter
 {
-    static constexpr size_t kHostNameLengthMax = 13;
+    static constexpr size_t kHostNameLengthMax = 13; // 6 bytes in hex and null terminator.
 
     EndpointQueueFilter::FilterOutcome Filter(const void * endpoint, const IPPacketInfo & pktInfo,
                                               const chip::System::PacketBufferHandle & pktPayload) override;
 
-    CHIP_ERROR SetHostName(const chip::CharSpan & name);
-    CHIP_ERROR SetMacAddr(const chip::ByteSpan & addr);
+    // CHIP_ERROR SetHostName(const chip::CharSpan & name);
+    CHIP_ERROR SetHostName(const chip::ByteSpan & addr);
 
 private:
     uint8_t mHostName[kHostNameLengthMax] = { 0 };
+    static constexpr size_t kMdnsPort = 5353;
 };
 
 namespace SilabsEndpointQueueFilter {
@@ -67,11 +60,10 @@ public:
     FilterOutcome FilterAfterDequeue(const void * endpoint, const IPPacketInfo & pktInfo,
                                      const chip::System::PacketBufferHandle & pktPayload);
 
-    CHIP_ERROR SetMacAddr(const chip::ByteSpan & addr) { return mHostNameFilter.SetMacAddr(addr); }
+    CHIP_ERROR SetHostName(const chip::ByteSpan & addr) { return mHostNameFilter.SetHostName(addr); }
 
 private:
     DropIfTooManyQueuedPacketsFilter mTooManyFilter;
-    MdnsBroadcastFilter mMdnsFilter;
     HostNameFilter mHostNameFilter;
 };
 

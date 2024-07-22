@@ -2,20 +2,20 @@
 #include <string.h>
 #include <support/CodeUtils.h>
 #include <support/logging/CHIPLogging.h>
+#include <string_view>
 
 namespace chip {
 namespace Inet {
 
 using FilterOutcome = EndpointQueueFilter::FilterOutcome;
-using namespace chip::Logging;
 
 namespace {
 
-bool IsValidMdnsHostName(const chip::CharSpan & hostName)
+bool IsValidMdnsHostName(uint8_t * hostName)
 {
-    for (size_t i = 0; i < hostName.size(); ++i)
+    for (size_t i = 0; i < sizeof(hostName); ++i)
     {
-        char ch_data = *(hostName.data() + i);
+        char ch_data = hostName[i];
         if (!((ch_data >= '0' && ch_data <= '9') || (ch_data >= 'A' && ch_data <= 'F')))
         {
             return false;
@@ -24,85 +24,57 @@ bool IsValidMdnsHostName(const chip::CharSpan & hostName)
     return true;
 }
 
-bool PayloadContains(const chip::System::PacketBufferHandle & payload, const chip::ByteSpan & byteSpan)
+bool IsMdnsBroadcastPacket(const void * endpoint, const IPPacketInfo & pktInfo, const System::PacketBufferHandle & pktPayload)
 {
-    if (payload->HasChainedBuffer() || payload->TotalLength() < byteSpan.size())
+    // if the packet is not a broadcast packet to mDNS port, drop it.
+    VerifyOrReturnValue(pktInfo.DestPort == 5353, false);
+#if INET_CONFIG_ENABLE_IPV4
+    ip_addr_t mdnsIPv4BroadcastAddr = IPADDR4_INIT_BYTES(224, 0, 0, 251);
+    VerifyOrReturnValue(pktInfo.DestAddress == Inet::IPAddress(mdnsIPv4BroadcastAddr), false);
+#endif
+    ip_addr_t mdnsIPv6BroadcastAddr = IPADDR6_INIT_HOST(0xFF020000, 0, 0, 0xFB);
+    VerifyOrReturnValue(pktInfo.DestAddress == Inet::IPAddress(mdnsIPv6BroadcastAddr), false);
+    return true;
+}
+
+bool PayloadContainsCaseInsensitive(const System::PacketBufferHandle & payload, const ByteSpan & pattern)
+{
+    if (payload->TotalLength() == 0 || pattern.size() == 0)
     {
         return false;
     }
-    for (size_t i = 0; i <= payload->TotalLength() - byteSpan.size(); ++i)
-    {
-        if (memcmp(payload->Start() + i, byteSpan.data(), byteSpan.size()) == 0)
-        {
-            return true;
-        }
-    }
-    return false;
-}
 
-bool PayloadContainsCaseInsensitive(const chip::System::PacketBufferHandle & payload, const ByteSpan & name)
-{
-    ReturnErrorCodeIf(name.size() < HostNameFilter::kHostNameLengthMax, false);
-    uint8_t lower_case[HostNameFilter::kHostNameLengthMax];
-    memcpy(lower_case, name.data(), name.size());
-    for (size_t i = 0; i < sizeof(lower_case); ++i)
+    if (payload->HasChainedBuffer() || payload->TotalLength() < pattern.size())
     {
-        if (lower_case[i] <= 'F' && lower_case[i] >= 'A')
-        {
-            lower_case[i] = static_cast<uint8_t>('a' + lower_case[i] - 'A');
-        }
+        return false;
     }
-    return PayloadContains(payload, name) || PayloadContains(payload, ByteSpan(lower_case));
+
+    std::basic_string_view<uint8_t> payloadView(payload->Start(), payload->TotalLength());
+    std::basic_string_view<uint8_t> patternView(pattern.data(), pattern.size());
+    return payloadView.find(patternView) != std::basic_string_view<uint8_t>::npos;
 }
 
 } // namespace
 
-FilterOutcome MdnsBroadcastFilter::Filter(const void * endpoint, const IPPacketInfo & pktInfo,
-                                          const chip::System::PacketBufferHandle & pktPayload)
-{
-    if (pktInfo.DestPort == kMdnsPort)
-    {
-#if INET_CONFIG_ENABLE_IPV4
-        ip_addr_t mdnsIPv4BroadcastAddr = IPADDR4_INIT_BYTES(224, 0, 0, 251);
-        if (pktInfo.DestAddress == chip::Inet::IPAddress(mdnsIPv4BroadcastAddr))
-        {
-            return FilterOutcome::kAllowPacket;
-        }
-#endif
-        ip_addr_t mdnsIPv6BroadcastAddr = IPADDR6_INIT_HOST(0xFF020000, 0, 0, 0xFB);
-        if (pktInfo.DestAddress == chip::Inet::IPAddress(mdnsIPv6BroadcastAddr))
-        {
-            return FilterOutcome::kAllowPacket;
-        }
-    }
-    return FilterOutcome::kDropPacket;
-}
-
 FilterOutcome HostNameFilter::Filter(const void * endpoint, const IPPacketInfo & pktInfo,
-                                     const chip::System::PacketBufferHandle & pktPayload)
+                                     const System::PacketBufferHandle & pktPayload)
 {
     // Drop the mDNS packets which don't contain 'matter' or '<device-hostname>'.
     const uint8_t matterBytes[] = { 'm', 'a', 't', 't', 'e', 'r' };
-    if (PayloadContains(pktPayload, ByteSpan(matterBytes)) || PayloadContainsCaseInsensitive(pktPayload, ByteSpan(mHostName)))
+    if (PayloadContainsCaseInsensitive(pktPayload, ByteSpan(matterBytes)) ||
+        PayloadContainsCaseInsensitive(pktPayload, ByteSpan(mHostName)))
     {
         return FilterOutcome::kAllowPacket;
     }
+
     return FilterOutcome::kDropPacket;
 }
 
-CHIP_ERROR HostNameFilter::SetHostName(const chip::CharSpan & name)
+CHIP_ERROR HostNameFilter::SetHostName(const ByteSpan & hostName)
 {
-    ReturnErrorCodeIf(name.size() != sizeof(mHostName), CHIP_ERROR_INVALID_ARGUMENT);
-    ReturnErrorCodeIf(!IsValidMdnsHostName(name), CHIP_ERROR_INVALID_ARGUMENT);
-    memcpy(mHostName, name.data(), name.size());
-    return CHIP_NO_ERROR;
-}
-
-CHIP_ERROR HostNameFilter::SetMacAddr(const chip::ByteSpan & mac_addr)
-{
-    ReturnErrorCodeIf(mac_addr.size() < 6, CHIP_ERROR_INVALID_ARGUMENT);
-    const uint8_t * p = mac_addr.data();
-    snprintf((char *) mHostName, sizeof(mHostName), "%02x%02x%02x%02x%02x%02x", p[0], p[1], p[2], p[3], p[4], p[5]);
+    const uint8_t * p = hostName.data();
+    snprintf((char *) mHostName, sizeof(mHostName), "%02X%02X%02X%02X%02X%02X", p[0], p[1], p[2], p[3], p[4], p[5]);
+    ReturnErrorCodeIf(!IsValidMdnsHostName(mHostName), CHIP_ERROR_INVALID_ARGUMENT);
     return CHIP_NO_ERROR;
 }
 
@@ -113,27 +85,22 @@ EndpointQueueFilter::EndpointQueueFilter() : mTooManyFilter(kDefaultAllowedQueue
 EndpointQueueFilter::EndpointQueueFilter(size_t maxAllowedQueuedPackets) : mTooManyFilter(maxAllowedQueuedPackets) {}
 
 FilterOutcome EndpointQueueFilter::FilterBeforeEnqueue(const void * endpoint, const IPPacketInfo & pktInfo,
-                                                       const chip::System::PacketBufferHandle & pktPayload)
+                                                       const System::PacketBufferHandle & pktPayload)
 {
     VerifyOrReturnError(FilterOutcome::kAllowPacket == mTooManyFilter.FilterBeforeEnqueue(endpoint, pktInfo, pktPayload),
                         FilterOutcome::kDropPacket);
-    if (FilterOutcome::kAllowPacket == mMdnsFilter.Filter(endpoint, pktInfo, pktPayload))
+
+    if (!IsMdnsBroadcastPacket(endpoint, pktInfo, pktPayload))
     {
         return FilterOutcome::kAllowPacket;
     }
-    if (FilterOutcome::kAllowPacket == mHostNameFilter.Filter(endpoint, pktInfo, pktPayload))
-    {
-        return FilterOutcome::kAllowPacket;
-    }
-    return FilterOutcome::kAllowPacket;
+    return mHostNameFilter.Filter(endpoint, pktInfo, pktPayload);
 }
 
 FilterOutcome EndpointQueueFilter::FilterAfterDequeue(const void * endpoint, const IPPacketInfo & pktInfo,
-                                                      const chip::System::PacketBufferHandle & pktPayload)
+                                                      const System::PacketBufferHandle & pktPayload)
 {
-    ReturnErrorCodeIf(FilterOutcome::kDropPacket == mTooManyFilter.FilterAfterDequeue(endpoint, pktInfo, pktPayload),
-                      FilterOutcome::kDropPacket);
-    return FilterOutcome::kAllowPacket;
+    return mTooManyFilter.FilterAfterDequeue(endpoint, pktInfo, pktPayload);
 }
 
 } // namespace SilabsEndpointQueueFilter
