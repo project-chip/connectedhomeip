@@ -50,7 +50,7 @@ constexpr char kPAATrustStorePathVariable[]     = "CHIPTOOL_PAA_TRUST_STORE_PATH
 constexpr char kCDTrustStorePathVariable[]      = "CHIPTOOL_CD_TRUST_STORE_PATH";
 
 const chip::Credentials::AttestationTrustStore * CHIPCommand::sTrustStore    = nullptr;
-chip::Credentials::DeviceAttestationRevocationDelegate * sRevocationDelegate = nullptr;
+chip::Credentials::DeviceAttestationRevocationDelegate * CHIPCommand::sRevocationDelegate = nullptr;
 
 chip::Credentials::GroupDataProviderImpl CHIPCommand::sGroupDataProvider{ kMaxGroupsPerFabric, kMaxGroupKeysPerFabric };
 // All fabrics share the same ICD client storage.
@@ -95,12 +95,10 @@ CHIP_ERROR GetAttestationRevocationDelegate(const char * revocationSetPath,
 {
     if (revocationSetPath == nullptr)
     {
-        *revocationDelegate = sRevocationDelegate;
         return CHIP_NO_ERROR;
     }
 
     static chip::Credentials::TestDACRevocationDelegateImpl testDacRevocationDelegate;
-
     ReturnErrorOnFailure(testDacRevocationDelegate.SetDeviceAttestationRevocationSetPath(revocationSetPath));
     *revocationDelegate = &testDacRevocationDelegate;
     return CHIP_NO_ERROR;

@@ -230,6 +230,10 @@ private:
     // can spin up commissioners as needed.
     static const chip::Credentials::AttestationTrustStore * sTrustStore;
 
+    // Cached DAC revocation delegate, this can be set using "--dac-revocation-set-path" argument
+    // Once set this will be used by all commands.
+    static chip::Credentials::DeviceAttestationRevocationDelegate * sRevocationDelegate;
+
     static void RunQueuedCommand(intptr_t commandArg);
     typedef decltype(RunQueuedCommand) MatterWorkCallback;
     static void RunCommandCleanup(intptr_t commandArg);

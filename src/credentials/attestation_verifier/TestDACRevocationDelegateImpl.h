@@ -45,6 +45,13 @@ public:
     // This API returns CHIP_ERROR_INVALID_ARGUMENT if the path is null.
     CHIP_ERROR SetDeviceAttestationRevocationSetPath(const char * path);
 
+    // Clear the path to the device attestation revocation set JSON file.
+    // This can be used to skip the revocation check
+    void ClearDeviceAttestationRevocationSetPath()
+    {
+        mDeviceAttestationRevocationSetPath = nullptr;
+    }
+
 private:
     CHIP_ERROR GetAKIDHexStr(const ByteSpan & certDer, MutableCharSpan & outAKIDHexStr);
     CHIP_ERROR GetSerialNumberHexStr(const ByteSpan & certDer, MutableCharSpan & outSerialNumberHexStr);
