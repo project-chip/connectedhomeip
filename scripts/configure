@@ -47,9 +47,9 @@ function usage() { # status
     info "Project options (mapped to GN build args):"
     info "  --enable-<ARG>[=no]   Enables (or disables with '=no') a bool build arg"
     info "  --<ARG>=<VALUE>       Sets a (non-bool) build arg to the given value"
-    info "  GN argument names can be specified with '-' instead of '_' and prefixes"
-    info "  like 'chip_' can be ommitted from names. For the full list of available"
-    info "  build arguments, see the generated args.configured file."
+    info "  GN argument names must be specified with '-' instead of '_'."
+    info "  Prefixes like 'chip_' can be ommitted from names. For the full list of"
+    info "  available build arguments, see the generated args.configured file."
     info ""
     info "  By default, the toolchain for the GN build will be configured from the usual"
     info "  environment variables (CC, CXX, AR, CFLAGS, CXXFLAGS, ...), falling back to"
@@ -216,9 +216,12 @@ function gn_generate() { # [project options]
     } >"${BUILD_DIR}/args.gn"
     "${gn[@]}" -q gen "$BUILD_DIR"
 
+    # Generate args.configured before populating args.gn because process_project_args may fail
+    # and we want to make sure, that args.configured is available as stated above in the info message
+    "${gn[@]}" args "$BUILD_DIR" --list >"${BUILD_DIR}/args.configured"
+
     # Use the argument list to drive the mapping of our command line options to GN args
     call_impl process_project_args <("${gn[@]}" args "$BUILD_DIR" --list --json) "$@" >>"${BUILD_DIR}/args.gn"
-    "${gn[@]}" args "$BUILD_DIR" --list >"${BUILD_DIR}/args.configured"
 
     # Now gn gen with the arguments we have configured.
     info "Running gn gen to generate ninja files"
