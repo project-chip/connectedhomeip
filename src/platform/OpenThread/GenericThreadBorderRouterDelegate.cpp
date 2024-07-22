@@ -196,7 +196,7 @@ CHIP_ERROR GenericOpenThreadBorderRouterDelegate::RevertActiveDataset()
         // and that will clear the one stored in the Thread stack since the SetActiveDataset operation fails and FailSafe timer is
         // triggered.
         Thread::OperationalDataset emptyDataset = {};
-        CHIP_ERROR err = DeviceLayer::ThreadStackMgrImpl().AttachToThreadNetwork(emptyDataset, nullptr);
+        CHIP_ERROR err                          = DeviceLayer::ThreadStackMgrImpl().AttachToThreadNetwork(emptyDataset, nullptr);
         SaveActiveDatasetConfigured(false);
         return err;
     }
