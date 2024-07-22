@@ -422,7 +422,7 @@ static void shutdownEndpoint(EmberAfDefinedEndpoint * definedEndpoint)
         }
     }
 
-    chip::app::CommandHandlerInterfaceRegistry::UnregisterAllCommandHandlersForEndpoint(definedEndpoint->endpoint);
+    CommandHandlerInterfaceRegistry::UnregisterAllCommandHandlersForEndpoint(definedEndpoint->endpoint);
     unregisterAllAttributeAccessOverridesForEndpoint(definedEndpoint);
 }
 
