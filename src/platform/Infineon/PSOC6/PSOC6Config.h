@@ -20,7 +20,7 @@
 
 /**
  *    @file
- *          Utilities for interacting with the the P6 key-value store.
+ *          Utilities for interacting with the the PSOC6 key-value store.
  */
 
 #pragma once
@@ -35,12 +35,12 @@ namespace DeviceLayer {
 namespace Internal {
 
 /**
- * Provides functions and definitions for accessing device configuration information on the P6.
+ * Provides functions and definitions for accessing device configuration information on the PSOC6.
  *
  * This class is designed to be mixed-in to concrete implementation classes as a means to
  * provide access to configuration information to generic base classes.
  */
-class P6Config
+class PSOC6Config
 {
 public:
     struct Key;
@@ -114,7 +114,7 @@ public:
     static void RunConfigUnitTest(void);
 };
 
-struct P6Config::Key
+struct PSOC6Config::Key
 {
     const char * Namespace;
     const char * Name;
@@ -124,7 +124,7 @@ struct P6Config::Key
     bool operator==(const Key & other) const;
 };
 
-inline CHIP_ERROR P6Config::Key::to_str(char * buf, size_t buf_size) const
+inline CHIP_ERROR PSOC6Config::Key::to_str(char * buf, size_t buf_size) const
 {
     if (buf_size < len() + 1)
     {
@@ -139,14 +139,14 @@ inline CHIP_ERROR P6Config::Key::to_str(char * buf, size_t buf_size) const
 }
 
 // Length of key str (not including terminating null char)
-inline size_t P6Config::Key::len() const
+inline size_t PSOC6Config::Key::len() const
 {
     // + 1 for separating ';'
     size_t out_size = strlen(Namespace) + strlen(Name) + 1;
     return out_size;
 }
 
-inline bool P6Config::Key::operator==(const Key & other) const
+inline bool PSOC6Config::Key::operator==(const Key & other) const
 {
     return strcmp(Namespace, other.Namespace) == 0 && strcmp(Name, other.Name) == 0;
 }

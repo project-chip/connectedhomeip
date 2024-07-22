@@ -16,7 +16,7 @@
  *    limitations under the License.
  */
 
-#include <app/AttributePathExpandIterator.h>
+#include <app/AttributePathExpandIterator-Ember.h>
 
 #include <app/AttributePathParams.h>
 #include <app/ConcreteAttributePath.h>
@@ -53,9 +53,10 @@ extern bool emberAfEndpointIndexIsEnabled(uint16_t index);
 namespace chip {
 namespace app {
 
-AttributePathExpandIterator::AttributePathExpandIterator(SingleLinkedListNode<AttributePathParams> * aAttributePath)
+AttributePathExpandIteratorEmber::AttributePathExpandIteratorEmber(InteractionModel::DataModel *,
+                                                                   SingleLinkedListNode<AttributePathParams> * aAttributePath) :
+    mpAttributePath(aAttributePath)
 {
-    mpAttributePath = aAttributePath;
 
     // Reset iterator state
     mEndpointIndex  = UINT16_MAX;
@@ -72,7 +73,7 @@ AttributePathExpandIterator::AttributePathExpandIterator(SingleLinkedListNode<At
     Next();
 }
 
-void AttributePathExpandIterator::PrepareEndpointIndexRange(const AttributePathParams & aAttributePath)
+void AttributePathExpandIteratorEmber::PrepareEndpointIndexRange(const AttributePathParams & aAttributePath)
 {
     if (aAttributePath.HasWildcardEndpointId())
     {
@@ -88,7 +89,7 @@ void AttributePathExpandIterator::PrepareEndpointIndexRange(const AttributePathP
     }
 }
 
-void AttributePathExpandIterator::PrepareClusterIndexRange(const AttributePathParams & aAttributePath, EndpointId aEndpointId)
+void AttributePathExpandIteratorEmber::PrepareClusterIndexRange(const AttributePathParams & aAttributePath, EndpointId aEndpointId)
 {
     if (aAttributePath.HasWildcardClusterId())
     {
@@ -104,8 +105,8 @@ void AttributePathExpandIterator::PrepareClusterIndexRange(const AttributePathPa
     }
 }
 
-void AttributePathExpandIterator::PrepareAttributeIndexRange(const AttributePathParams & aAttributePath, EndpointId aEndpointId,
-                                                             ClusterId aClusterId)
+void AttributePathExpandIteratorEmber::PrepareAttributeIndexRange(const AttributePathParams & aAttributePath,
+                                                                  EndpointId aEndpointId, ClusterId aClusterId)
 {
     if (aAttributePath.HasWildcardAttributeId())
     {
@@ -150,7 +151,7 @@ void AttributePathExpandIterator::PrepareAttributeIndexRange(const AttributePath
     }
 }
 
-void AttributePathExpandIterator::ResetCurrentCluster()
+void AttributePathExpandIteratorEmber::ResetCurrentCluster()
 {
     // If this is a null iterator, or the attribute id of current cluster info is not a wildcard attribute id, then this function
     // will do nothing, since we won't be expanding the wildcard attribute ids under a cluster.
@@ -171,7 +172,7 @@ void AttributePathExpandIterator::ResetCurrentCluster()
     Next();
 }
 
-bool AttributePathExpandIterator::Next()
+bool AttributePathExpandIteratorEmber::Next()
 {
     for (; mpAttributePath != nullptr; (mpAttributePath = mpAttributePath->mpNext, mEndpointIndex = UINT16_MAX))
     {

@@ -213,6 +213,9 @@ CHIP_ERROR DnssdServer::AdvertiseOperational()
         AddICDKeyToAdvertisement(advertiseParameters);
 #endif
 
+#if INET_CONFIG_ENABLE_TCP_ENDPOINT
+        advertiseParameters.SetTCPSupportModes(chip::Dnssd::TCPModeAdvertise::kTCPClientServer);
+#endif
         auto & mdnsAdvertiser = chip::Dnssd::ServiceAdvertiser::Instance();
 
         ChipLogProgress(Discovery, "Advertise operational node " ChipLogFormatX64 "-" ChipLogFormatX64,
