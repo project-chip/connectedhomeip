@@ -284,15 +284,18 @@ Status EnergyEvseDelegate::ClearTargets()
 {
     ChipLogProgress(AppServer, "EnergyEvseDelegate::ClearTargets()");
 
-    Status status = Status::Success;
     CHIP_ERROR err;
 
     EvseTargetsDelegate * targets = GetEvseTargetsDelegate();
-    VerifyOrExit(targets != nullptr, status = StatusIB(CHIP_ERROR_UNINITIALIZED).mStatus);
+    if (targets == nullptr)
+    {
+        return StatusIB(CHIP_ERROR_UNINITIALIZED).mStatus;
+    }
 
     err = targets->ClearTargets();
     if (err != CHIP_NO_ERROR)
     {
+        ChipLogError(AppServer, "Failed to clear Evse targets: %" CHIP_ERROR_FORMAT, err.Format());
         return Status::Failure;
     }
 
@@ -301,8 +304,7 @@ Status EnergyEvseDelegate::ClearTargets()
      */
     NotifyApplicationChargingPreferencesChange();
 
-exit:
-    return status;
+    return Status::Success;
 }
 
 /* ---------------------------------------------------------------------------
@@ -1445,24 +1447,26 @@ DataModel::Nullable<uint32_t> EnergyEvseDelegate::GetNextChargeStartTime()
 {
     return mNextChargeStartTime;
 }
-CHIP_ERROR EnergyEvseDelegate::SetNextChargeStartTime(DataModel::Nullable<uint32_t> newValue)
+CHIP_ERROR EnergyEvseDelegate::SetNextChargeStartTime(DataModel::Nullable<uint32_t> newNextChargeStartTimeUtc)
 {
-    DataModel::Nullable<uint32_t> oldValue = mNextChargeStartTime;
-
-    mNextChargeStartTime = newValue;
-    if (oldValue != newValue)
+    if (newNextChargeStartTimeUtc == mNextChargeStartTime)
     {
-        if (newValue.IsNull())
-        {
-            ChipLogDetail(AppServer, "NextChargeStartTime updated to Null");
-        }
-        else
-        {
-            ChipLogDetail(AppServer, "NextChargeStartTime updated to %lu",
-                          static_cast<unsigned long int>(mNextChargeStartTime.Value()));
-        }
-        MatterReportingAttributeChangeCallback(mEndpointId, EnergyEvse::Id, NextChargeStartTime::Id);
+        return CHIP_NO_ERROR;
     }
+
+    mNextChargeStartTime = newNextChargeStartTimeUtc;
+    if (mNextChargeStartTime.IsNull())
+    {
+        ChipLogDetail(AppServer, "NextChargeStartTime updated to Null");
+    }
+    else
+    {
+        ChipLogDetail(AppServer, "NextChargeStartTime updated to %lu",
+                      static_cast<unsigned long int>(mNextChargeStartTime.Value()));
+    }
+
+    MatterReportingAttributeChangeCallback(mEndpointId, EnergyEvse::Id, NextChargeStartTime::Id);
+
     return CHIP_NO_ERROR;
 }
 
@@ -1470,24 +1474,26 @@ DataModel::Nullable<uint32_t> EnergyEvseDelegate::GetNextChargeTargetTime()
 {
     return mNextChargeTargetTime;
 }
-CHIP_ERROR EnergyEvseDelegate::SetNextChargeTargetTime(DataModel::Nullable<uint32_t> newValue)
+CHIP_ERROR EnergyEvseDelegate::SetNextChargeTargetTime(DataModel::Nullable<uint32_t> newNextChargeTargetTimeUtc)
 {
-    DataModel::Nullable<uint32_t> oldValue = mNextChargeTargetTime;
-
-    mNextChargeTargetTime = newValue;
-    if (oldValue != newValue)
+    if (newNextChargeTargetTimeUtc == mNextChargeTargetTime)
     {
-        if (newValue.IsNull())
-        {
-            ChipLogDetail(AppServer, "NextChargeTargetTime updated to Null");
-        }
-        else
-        {
-            ChipLogDetail(AppServer, "NextChargeTargetTime updated to %lu",
-                          static_cast<unsigned long int>(mNextChargeTargetTime.Value()));
-        }
-        MatterReportingAttributeChangeCallback(mEndpointId, EnergyEvse::Id, NextChargeTargetTime::Id);
+        return CHIP_NO_ERROR;
     }
+
+    mNextChargeTargetTime = newNextChargeTargetTimeUtc;
+    if (mNextChargeTargetTime.IsNull())
+    {
+        ChipLogDetail(AppServer, "NextChargeTargetTime updated to Null");
+    }
+    else
+    {
+        ChipLogDetail(AppServer, "NextChargeTargetTime updated to %lu",
+                      static_cast<unsigned long int>(mNextChargeTargetTime.Value()));
+    }
+
+    MatterReportingAttributeChangeCallback(mEndpointId, EnergyEvse::Id, NextChargeTargetTime::Id);
+
     return CHIP_NO_ERROR;
 }
 
@@ -1495,24 +1501,26 @@ DataModel::Nullable<int64_t> EnergyEvseDelegate::GetNextChargeRequiredEnergy()
 {
     return mNextChargeRequiredEnergy;
 }
-CHIP_ERROR EnergyEvseDelegate::SetNextChargeRequiredEnergy(DataModel::Nullable<int64_t> newValue)
+CHIP_ERROR EnergyEvseDelegate::SetNextChargeRequiredEnergy(DataModel::Nullable<int64_t> newNextChargeRequiredEnergyMilliWattH)
 {
-    DataModel::Nullable<int64_t> oldValue = mNextChargeRequiredEnergy;
-
-    mNextChargeRequiredEnergy = newValue;
-    if (oldValue != newValue)
+    if (mNextChargeRequiredEnergy == newNextChargeRequiredEnergyMilliWattH)
     {
-        if (newValue.IsNull())
-        {
-            ChipLogDetail(AppServer, "NextChargeRequiredEnergy updated to Null");
-        }
-        else
-        {
-            ChipLogDetail(AppServer, "NextChargeRequiredEnergy updated to %ld",
-                          static_cast<long>(mNextChargeRequiredEnergy.Value()));
-        }
-        MatterReportingAttributeChangeCallback(mEndpointId, EnergyEvse::Id, NextChargeRequiredEnergy::Id);
+        return CHIP_NO_ERROR;
     }
+
+    mNextChargeRequiredEnergy = newNextChargeRequiredEnergyMilliWattH;
+    if (mNextChargeRequiredEnergy.IsNull())
+    {
+        ChipLogDetail(AppServer, "NextChargeRequiredEnergy updated to Null");
+    }
+    else
+    {
+        ChipLogDetail(AppServer, "NextChargeRequiredEnergy updated to %ld",
+                      static_cast<long>(mNextChargeRequiredEnergy.Value()));
+    }
+
+    MatterReportingAttributeChangeCallback(mEndpointId, EnergyEvse::Id, NextChargeRequiredEnergy::Id);
+
     return CHIP_NO_ERROR;
 }
 

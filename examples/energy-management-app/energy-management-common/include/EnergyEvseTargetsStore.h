@@ -79,7 +79,8 @@ public:
     virtual void OnFabricRemoved(const FabricTable & fabricTable, FabricIndex fabricIndex) override;
 
 private:
-    static uint16_t GetTlvSizeEstimate();
+    // This is the upper bound in bytes of the TLV storage required to store the chargingTargetSchedulesList
+    static uint16_t GetTlvSizeUpperBound();
 
     CHIP_ERROR SaveTargets(DataModel::List<const Structs::ChargingTargetScheduleStruct::Type> & chargingTargetSchedulesList);
 

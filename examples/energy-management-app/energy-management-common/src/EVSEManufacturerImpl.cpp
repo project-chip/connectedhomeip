@@ -17,6 +17,7 @@
  */
 
 #include <EVSEManufacturerImpl.h>
+#include <EnergyEvseDelegateImpl.h>
 #include <EnergyEvseManager.h>
 #include <EnergyTimeUtils.h>
 
@@ -40,10 +41,6 @@ using namespace chip::app::Clusters::PowerSource;
 using namespace chip::app::Clusters::PowerSource::Attributes;
 
 using Protocols::InteractionModel::Status;
-
-// A bitmap of all possible days (the union of the values in
-// chip::app::Clusters::EnergyEvse::TargetDayOfWeekBitmap)
-static constexpr uint8_t kAllDays = 0x7f;
 
 CHIP_ERROR EVSEManufacturer::Init()
 {
@@ -231,7 +228,7 @@ CHIP_ERROR EVSEManufacturer::ComputeChargingSchedule()
             {
                 // We didn't find one for today, try tomorrow
                 searchDay++;
-                dayOfWeekMap = BitMask<EnergyEvse::TargetDayOfWeekBitmap>((dayOfWeekMap.Raw() << 1) & kAllDays);
+                dayOfWeekMap = BitMask<EnergyEvse::TargetDayOfWeekBitmap>((dayOfWeekMap.Raw() << 1) & kAllTargetDaysMask);
 
                 if (!dayOfWeekMap.HasAny())
                 {

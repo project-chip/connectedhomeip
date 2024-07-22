@@ -16,6 +16,7 @@
  *    limitations under the License.
  */
 
+#include <EnergyEvseDelegateImpl.h>
 #include <EnergyEvseTargetsStore.h>
 #include <app-common/zap-generated/attributes/Accessors.h>
 #include <app-common/zap-generated/cluster-objects.h>
@@ -53,7 +54,7 @@ const DataModel::List<const Structs::ChargingTargetScheduleStruct::Type> & EvseT
 }
 
 /* static */
-uint16_t EvseTargetsDelegate::GetTlvSizeEstimate()
+uint16_t EvseTargetsDelegate::GetTlvSizeUpperBound()
 {
     size_t kListOverhead = 4;
     size_t chargingTargetStuctEstimate =
@@ -73,7 +74,7 @@ CHIP_ERROR EvseTargetsDelegate::LoadTargets()
     // mChargingTargets and mChargingTargetSchedulesArray.
 
     Platform::ScopedMemoryBuffer<uint8_t> backingBuffer;
-    uint16_t length = GetTlvSizeEstimate();
+    uint16_t length = GetTlvSizeUpperBound();
     ReturnErrorCodeIf(!backingBuffer.Calloc(length), CHIP_ERROR_NO_MEMORY);
 
     CHIP_ERROR err = mpTargetStore->SyncGetKeyValue(spEvseTargetsKeyName, backingBuffer.Get(), length);
@@ -99,13 +100,16 @@ CHIP_ERROR EvseTargetsDelegate::LoadTargets()
 
         ReturnErrorOnFailure(reader.EnterContainer(evseTargetEntryType));
 
+        // Check we are not exceeding the size of the mChargingTargetSchedulesArray
+        VerifyOrReturnError(chargingTargetSchedulesIdx < kEvseTargetsMaxNumberOfDays, CHIP_ERROR_INCORRECT_STATE);
+
         // DayOfWeek bitmap
         ReturnErrorOnFailure(reader.Next(TLV::ContextTag(TargetEntryTag::kDayOfWeek)));
         ReturnErrorOnFailure(reader.Get(mChargingTargetSchedulesArray[chargingTargetSchedulesIdx].dayOfWeekForSequence));
 
         ChipLogProgress(AppServer, "LoadTargets: DayOfWeekForSequence = 0x%02x",
                         mChargingTargetSchedulesArray[chargingTargetSchedulesIdx].dayOfWeekForSequence.GetField(
-                            static_cast<TargetDayOfWeekBitmap>(0x7F)));
+                            static_cast<TargetDayOfWeekBitmap>(kAllTargetDaysMask)));
 
         // ChargingTargets List
         ReturnErrorOnFailure(reader.Next(TLV::kTLVType_List, TLV::ContextTag(TargetEntryTag::kChargingTargetsList)));
@@ -113,7 +117,7 @@ CHIP_ERROR EvseTargetsDelegate::LoadTargets()
         ReturnErrorOnFailure(reader.EnterContainer(chargingTargetsListType));
 
         // The mChargingTargets object handles the allocation of the chargingTargets. Let it know the currentSchedule index
-        mChargingTargets.Reset(chargingTargetSchedulesIdx);
+        mChargingTargets.PrepareDaySchedule(chargingTargetSchedulesIdx);
 
         // Load the chargingTargets associated with this schedule
         while ((err = reader.Next(TLV::kTLVType_Structure, TLV::ContextTag(TargetEntryTag::kChargingTargetsStruct))) ==
@@ -160,12 +164,10 @@ CHIP_ERROR EvseTargetsDelegate::LoadTargets()
 
             ReturnErrorOnFailure(reader.ExitContainer(chargingTargetsStructType));
 
-            [[maybe_unused]] int64_t addedEnergy = chargingTarget.addedEnergy.HasValue() ? chargingTarget.addedEnergy.Value() : 0;
-
             ChipLogProgress(
                 AppServer, "LoadingTargets: targetTimeMinutesPastMidnight %u targetSoC %u addedEnergy 0x" ChipLogFormatX64,
                 chargingTarget.targetTimeMinutesPastMidnight,
-                chargingTarget.targetSoC.HasValue() ? chargingTarget.targetSoC.Value() : 0, ChipLogValueX64(addedEnergy));
+                chargingTarget.targetSoC.ValueOr(0), ChipLogValueX64(chargingTarget.addedEnergy.ValueOr(0)));
 
             // Update mChargingTargets which is tracking the chargingTargets
             mChargingTargets.AddChargingTarget(chargingTarget);
@@ -260,7 +262,7 @@ CHIP_ERROR EvseTargetsDelegate::SetTargets(
     {
         auto & newChargingTargetSchedule = newIter.GetValue();
 
-        uint8_t newBitmask = newChargingTargetSchedule.dayOfWeekForSequence.GetField(static_cast<TargetDayOfWeekBitmap>(0x7F));
+        uint8_t newBitmask = newChargingTargetSchedule.dayOfWeekForSequence.GetField(static_cast<TargetDayOfWeekBitmap>(kAllTargetDaysMask));
 
         ChipLogProgress(AppServer, "SetTargets: DayOfWeekForSequence = 0x%02x", newBitmask);
 
@@ -273,14 +275,14 @@ CHIP_ERROR EvseTargetsDelegate::SetTargets(
         for (auto & currentChargingTargetSchedule : mChargingTargetSchedulesList)
         {
             uint8_t currentBitmask =
-                currentChargingTargetSchedule.dayOfWeekForSequence.GetField(static_cast<TargetDayOfWeekBitmap>(0x7F));
+                currentChargingTargetSchedule.dayOfWeekForSequence.GetField(static_cast<TargetDayOfWeekBitmap>(kAllTargetDaysMask));
 
             ChipLogProgress(AppServer, "SetTargets: Scanning current entry %d of %d: bitmap 0x%02x",
                             updatedChargingTargetSchedulesIdx, static_cast<unsigned int>(mChargingTargetSchedulesList.size()),
                             currentBitmask);
 
             // Let the updatedChargingTargets object of the schedule index
-            updatedChargingTargets.Reset(updatedChargingTargetSchedulesIdx);
+            updatedChargingTargets.PrepareDaySchedule(updatedChargingTargetSchedulesIdx);
 
             // Work out if the new schedule dayOfWeekSequence overlaps with any existing schedules
             uint8_t bitmaskA = static_cast<uint8_t>(currentBitmask & newBitmask);
@@ -377,7 +379,7 @@ CHIP_ERROR EvseTargetsDelegate::SetTargets(
 CHIP_ERROR
 EvseTargetsDelegate::SaveTargets(DataModel::List<const Structs::ChargingTargetScheduleStruct::Type> & chargingTargetSchedulesList)
 {
-    uint16_t total = GetTlvSizeEstimate();
+    uint16_t total = GetTlvSizeUpperBound();
 
     Platform::ScopedMemoryBuffer<uint8_t> backingBuffer;
     ReturnErrorCodeIf(!backingBuffer.Calloc(total), CHIP_ERROR_NO_MEMORY);
@@ -388,7 +390,7 @@ EvseTargetsDelegate::SaveTargets(DataModel::List<const Structs::ChargingTargetSc
     for (auto & chargingTargetSchedule : chargingTargetSchedulesList)
     {
         ChipLogProgress(AppServer, "SaveTargets: DayOfWeekForSequence = 0x%02x",
-                        chargingTargetSchedule.dayOfWeekForSequence.GetField(static_cast<TargetDayOfWeekBitmap>(0x7F)));
+                        chargingTargetSchedule.dayOfWeekForSequence.GetField(static_cast<TargetDayOfWeekBitmap>(kAllTargetDaysMask)));
 
         TLV::TLVType evseTargetEntryType;
         ReturnErrorOnFailure(writer.StartContainer(TLV::AnonymousTag(), TLV::kTLVType_Structure, evseTargetEntryType));
@@ -452,7 +454,7 @@ void EvseTargetsDelegate::PrintTargets(
     for (auto & chargingTargetSchedule : chargingTargetSchedules)
     {
         [[maybe_unused]] uint8_t bitmask =
-            chargingTargetSchedule.dayOfWeekForSequence.GetField(static_cast<TargetDayOfWeekBitmap>(0x7F));
+            chargingTargetSchedule.dayOfWeekForSequence.GetField(static_cast<TargetDayOfWeekBitmap>(kAllTargetDaysMask));
         ChipLogProgress(AppServer, "idx %u dayOfWeekForSequence 0x%02x", chargingTargetScheduleIdx, bitmask);
 
         uint16_t chargingTargetIdx = 0;

@@ -46,7 +46,7 @@ namespace EnergyEvse {
  * separately. This class handles that allocation.
  *
  * When iterating through the chargingTargetSchedules, an index in this list is kept and the
- * ChargingTargetsMemMgr::Reset must be called so this object knows which day schedule it is tracking.
+ * ChargingTargetsMemMgr::PrepareDaySchedule must be called so this object knows which day schedule it is tracking.
  * This will free any previous memory allocated for the day schedule in this object.
  *
  * There are then three usage cases:
@@ -86,17 +86,12 @@ public:
     ~ChargingTargetsMemMgr();
 
     /**
-     * @brief This method sets the index (mChargingTargetSchedulesIdx) to use into mpListOfDays.
-     *        This index is used in subsequent calls to GetChargingTargets and the AllocAndCopy
-     *        methods below.
+     * @brief This method prepares a new day schedule. Subsequent calls to GetChargingTargets
+     *        and the AllocAndCopy methods below will reference this day schedule.
      *
-     *        NOTE: This method MUST be called each time a new day is added to
-     *        DataModel::List<const Structs::ChargingTargetScheduleStruct::Type> chargingTargetSchedules
-     *        before building up the ChargingTargetStruct associated with the mpListOfDays entry.
-     *
-     * @param chargingTargetSchedulesIdx  - The new index to use when accessing mpListOfDays
+     * @param chargingTargetSchedulesIdx  - The new day schedule index
      */
-    void Reset(uint16_t chargingTargetSchedulesIdx);
+    void PrepareDaySchedule(uint16_t chargingTargetSchedulesIdx);
 
     /**
      * @brief Called as each individual chargingTarget is loaded from persistent data.
@@ -105,45 +100,43 @@ public:
      *        ChargingTargetsMemMgr::AddChargingTarget() needs to be called as each individual
      *        chargingTarget is loaded from persistent data.
      *
-     * @param chargingTarget  - The chargingTarget to add into mpListOfDays[mChargingTargetSchedulesIdx]
+     * @param chargingTarget  - The chargingTarget that will be added into the current day schedule
      */
     void AddChargingTarget(const EnergyEvse::Structs::ChargingTargetStruct::Type & chargingTarget);
 
     /**
-     * @brief Called to allocate and copy the chargingTargets in mDailyChargingTargets to
-     *        mpListOfDays[mChargingTargetSchedulesIdx].
-     *        This method is used once a days's worth of chargingTargets have been loaded from persistent
-     *        storage.
+     * @brief Called to allocate and copy the chargingTargets added via AddChargingTarget into the
+     *        current day schedule as set by PrepareDaySchedule().
      */
     CHIP_ERROR AllocAndCopy();
 
     /**
-     * @brief Called to allocate and copy the chargingTargets in the parameter chargingTargets to
-     *        mpListOfDays[mChargingTargetSchedulesIdx].
+     * @brief Called to allocate and copy the chargingTargets into the current day schedule as set
+     *        set by PrepareDaySchedule().
      *
-     * @param chargingTargets  - The chargingTargets to add into mpListOfDays[mChargingTargetSchedulesIdx]
+     * @param chargingTargets  - The chargingTargets to add into the current day schedule
      */
     CHIP_ERROR AllocAndCopy(const DataModel::List<const Structs::ChargingTargetStruct::Type> & chargingTargets);
 
     /**
-     * @brief Called to allocate and copy the chargingTargets in the parameter chargingTargets to
-     *        mpListOfDays[mChargingTargetSchedulesIdx].
+     * @brief Called to allocate and copy the chargingTargets into the current day schedule as set
+     *        set by PrepareDaySchedule().
      *
-     * @param chargingTargets  - The chargingTargets to add into mpListOfDays[mChargingTargetSchedulesIdx]
+     * @param chargingTargets  - The chargingTargets to add into the current day schedule
      */
     CHIP_ERROR AllocAndCopy(const DataModel::DecodableList<Structs::ChargingTargetStruct::DecodableType> & chargingTargets);
 
     /**
-     * @brief Returns the list of chargingTargets into mpListOfDays dependant on mChargingTargetSchedulesIdx.
+     * @brief Returns the list of chargingTargets associated with the current day schedule.
      *
-     * @return mpListOfDays[mChargingTargetSchedulesIdx]
+     * @return The charging targets associated with the current day schedule.
      */
     EnergyEvse::Structs::ChargingTargetStruct::Type * GetChargingTargets() const;
 
     /**
-     * @brief Returns the number of chargingTargets associated with current day (mChargingTargetSchedulesIdx).
+     * @brief Returns the number of chargingTargets associated with current day schedule.
      *
-     * @return Returns mNumDailyChargingTargets.
+     * @return Returns the number of chargingTargets associated with current day schedule.
      */
     uint16_t GetNumDailyChargingTargets() const;
 

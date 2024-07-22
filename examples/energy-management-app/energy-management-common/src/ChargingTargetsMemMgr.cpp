@@ -43,7 +43,7 @@ ChargingTargetsMemMgr::~ChargingTargetsMemMgr()
     }
 }
 
-void ChargingTargetsMemMgr::Reset(uint16_t chargingTargetSchedulesIdx)
+void ChargingTargetsMemMgr::PrepareDaySchedule(uint16_t chargingTargetSchedulesIdx)
 {
     // MUST be called for each entry in DataModel::List<const Structs::ChargingTargetScheduleStruct::Type> chargingTargetSchedules
     mNumDailyChargingTargets    = 0;

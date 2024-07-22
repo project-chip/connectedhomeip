@@ -32,6 +32,10 @@ namespace app {
 namespace Clusters {
 namespace EnergyEvse {
 
+// A bitmap of all possible days (the union of the values in
+// chip::app::Clusters::EnergyEvse::TargetDayOfWeekBitmap)
+constexpr uint8_t kAllTargetDaysMask = 0x7f;
+
 /* Local state machine Events to allow simpler handling of state transitions */
 enum EVSEStateMachineEvent
 {
@@ -250,13 +254,13 @@ public:
 
     /* PREF attributes */
     DataModel::Nullable<uint32_t> GetNextChargeStartTime() override;
-    CHIP_ERROR SetNextChargeStartTime(DataModel::Nullable<uint32_t> newValue);
+    CHIP_ERROR SetNextChargeStartTime(DataModel::Nullable<uint32_t> newNextChargeStartTimeUtc);
 
     DataModel::Nullable<uint32_t> GetNextChargeTargetTime() override;
-    CHIP_ERROR SetNextChargeTargetTime(DataModel::Nullable<uint32_t> newValue);
+    CHIP_ERROR SetNextChargeTargetTime(DataModel::Nullable<uint32_t> newNextChargeTargetTimeUtc);
 
     DataModel::Nullable<int64_t> GetNextChargeRequiredEnergy() override;
-    CHIP_ERROR SetNextChargeRequiredEnergy(DataModel::Nullable<int64_t> newValue);
+    CHIP_ERROR SetNextChargeRequiredEnergy(DataModel::Nullable<int64_t> newNextChargeRequiredEnergyMilliWattH);
 
     DataModel::Nullable<Percent> GetNextChargeTargetSoC() override;
     CHIP_ERROR SetNextChargeTargetSoC(DataModel::Nullable<Percent> newValue);
