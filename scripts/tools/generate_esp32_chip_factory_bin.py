@@ -21,6 +21,7 @@ import base64
 import logging
 import os
 import sys
+from enum import Enum
 from types import SimpleNamespace
 
 import cryptography.x509
@@ -44,10 +45,40 @@ else:
 
 INVALID_PASSCODES = [00000000, 11111111, 22222222, 33333333, 44444444, 55555555,
                      66666666, 77777777, 88888888, 99999999, 12345678, 87654321]
-PRODUCT_FINISH_ENUM = {"other": 0, "matte": 1, "satin": 2, "polished": 3, "rugged": 4, "fabric": 5}
-PRODUCT_COLOR_ENUM = {"black": 0, "navy": 1, "green": 2, "teal": 3, "maroon": 4, "purple": 5, "olive": 6, "gray": 7, "blue": 8, "lime": 9,
-                      "aqua": 10, "red": 11, "fuchsia": 12, "yellow": 13, "white": 14, "nickel": 15, "chrome": 16, "brass": 18, "cooper": 19,
-                      "silver": 19, "gold": 20}
+
+
+class Product_Finish_Enum(Enum):
+    other = 0
+    matte = 1
+    satin = 2
+    polished = 3
+    rugged = 4
+    fabric = 5
+
+
+class Product_Color_Enum(Enum):
+    black = 0
+    navy = 1
+    green = 2
+    teal = 3
+    maroon = 4
+    purple = 5
+    olive = 6
+    gray = 7
+    blue = 8
+    lime = 9
+    aqua = 10
+    red = 11
+    fuchsia = 12
+    yellow = 13
+    white = 14
+    nickel = 15
+    chrome = 16
+    brass = 17
+    copper = 18
+    silver = 19
+    gold = 20
+
 
 TOOLS = {}
 
@@ -316,9 +347,9 @@ def populate_factory_data(args, spake2p_params):
     if args.hw_ver_str:
         FACTORY_DATA['hw-ver-str']['value'] = args.hw_ver_str
     if args.product_finish:
-        FACTORY_DATA['product-finish']['value'] = PRODUCT_FINISH_ENUM[args.product_finish]
+        FACTORY_DATA['product-finish']['value'] = Product_Finish_Enum[args.product_finish].value
     if args.product_color:
-        FACTORY_DATA['product-color']['value'] = PRODUCT_COLOR_ENUM[args.product_color]
+        FACTORY_DATA['product-color']['value'] = Product_Color_Enum[args.product_color].value
 
     # SupportedModes are stored as multiple entries
     #  - sm-sz/<ep>                 : number of supported modes for the endpoint
@@ -489,9 +520,12 @@ def get_args():
     parser.add_argument('--supported-modes', type=str, nargs='+', required=False,
                         help='List of supported modes, eg: mode1/label1/ep/"tagValue1\\mfgCode, tagValue2\\mfgCode"  mode2/label2/ep/"tagValue1\\mfgCode, tagValue2\\mfgCode"  mode3/label3/ep/"tagValue1\\mfgCode, tagValue2\\mfgCode"')
 
-    parser.add_argument("--product-finish", type=str, choices=PRODUCT_FINISH_ENUM.keys(),
+    product_finish_choices = [finish.name for finish in Product_Finish_Enum]
+    parser.add_argument("--product-finish", type=str, choices=product_finish_choices,
                         help='Product finishes choices for product appearance')
-    parser.add_argument("--product-color", type=str, choices=PRODUCT_COLOR_ENUM.keys(),
+
+    product_color_choices = [color.name for color in Product_Color_Enum]
+    parser.add_argument("--product-color", type=str, choices=product_color_choices,
                         help='Product colors choices for product appearance')
 
     parser.add_argument('-s', '--size', type=any_base_int, default=0x6000,
