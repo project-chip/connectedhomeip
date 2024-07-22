@@ -150,7 +150,6 @@ bool wfx_get_wifi_provision(wfx_wifi_provision_t * wifiConfig)
  ***********************************************************************/
 void wfx_clear_wifi_provision(void)
 {
-    VerifyOrReturn(wfx_rsi.sec != NULL);
     memset(&wfx_rsi.sec, 0, sizeof(wfx_rsi.sec));
     wfx_rsi.dev_state &= ~WFX_RSI_ST_STA_PROVISIONED;
 }
@@ -366,7 +365,7 @@ bool wfx_start_scan(char * ssid, void (*callback)(wfx_wifi_scan_result_t *))
     VerifyOrReturnError(ssid != NULL, false);
     size_t ssid_len;
     ssid_len          = strnlen(ssid, WFX_MAX_SSID_LENGTH);
-    wfx_rsi.scan_ssid = dynamic_cast<char *>(pvPortMalloc(ssid_len + 1));
+    wfx_rsi.scan_ssid = reinterpret_cast<char *>(pvPortMalloc(ssid_len + 1));
     VerifyOrReturnError(wfx_rsi.scan_ssid != NULL, false);
     strncpy(wfx_rsi.scan_ssid, ssid, WFX_MAX_SSID_LENGTH);
 
