@@ -1166,15 +1166,24 @@ static NSString * sDeviceDataKeyPrefix = @"deviceData";
     });
 }
 
-#pragma mark - Client Data
+#pragma mark - Client Data / Client Endpoint Data Shared
 
-static NSString * sClientDataKeyPrefix = @"clientData";
+- (NSString *)_indexKeyForPrefix:(NSString *)prefix
+{
+    return [prefix stringByAppendingFormat:@"_index"];
+}
 
-- (nullable NSArray<NSString *> *)_clientDataIndexForNodeID:(NSNumber *)nodeID
+- (NSString *)_dataKeyForPrefix:(NSString *)prefix key:(NSString *)key
+{
+    return [prefix stringByAppendingFormat:@":%@", key];
+}
+
+- (nullable NSArray<NSString *> *)_dataIndexForPrefix:(NSString *)prefix
 {
     dispatch_assert_queue(_storageDelegateQueue);
 
     NSArray<NSString *> * index = nil;
+    NSString * key = [self _indexKeyForPrefix:prefix];
 
     id data;
 
@@ -1182,7 +1191,7 @@ static NSString * sClientDataKeyPrefix = @"clientData";
 
     @autoreleasepool {
         data = [self->_storageDelegate controller:controller
-                                      valueForKey:[self _clientDataIndexKeyForNodeID:nodeID]
+                                      valueForKey:key
                                     securityLevel:MTRStorageSecurityLevelSecure
                                       sharingType:MTRStorageSharingTypeNotShared]; // REVIEWERS:  fabric shared? kmo 12 jul 2024 14h58
     }
@@ -1201,73 +1210,41 @@ static NSString * sClientDataKeyPrefix = @"clientData";
     return index;
 }
 
-- (NSString *)_clientDataIndexKeyForNodeID:(NSNumber *)nodeID
+- (void)_storeValue:(id<NSSecureCoding>)value atKey:(NSString *)key inPrefix:(NSString *)prefix
 {
-    return [sClientDataKeyPrefix stringByAppendingFormat:@":0x%016llX_index", nodeID.unsignedLongLongValue];
-}
-
-- (NSString *)_clientDataKeyForNodeID:(NSNumber *)nodeID key:(NSString *)key
-{
-    return [sClientDataKeyPrefix stringByAppendingFormat:@":0x%016llX:%@", nodeID.unsignedLongLongValue, key];
-}
-
-- (id<NSSecureCoding>)clientDataForNodeID:(NSNumber *)nodeID key:(NSString *)key
-{
-    __block id clientData = nil;
-
-    dispatch_sync(_storageDelegateQueue, ^{
+    dispatch_async(_storageDelegateQueue, ^{
         MTRDeviceController * controller = self->_controller;
         VerifyOrReturn(controller != nil); // No way to call delegate without controller.
 
-        id data;
-        NSString * storageKey = [self _clientDataKeyForNodeID:nodeID key:key];
+        // REVIEWERS:  should we log failures? kmo 12 jul 2024 13h10
+        NSString * storageKey = [self _dataKeyForPrefix:prefix key:key];
+        BOOL storedSuccessfully = [self->_storageDelegate controller:controller
+                                                          storeValue:value
+                                                              forKey:storageKey
+                                                       securityLevel:MTRStorageSecurityLevelSecure
+                                                         sharingType:MTRStorageSharingTypeNotShared]; // REVIEWERS:  should be fabric shared? kmo 12 jul 2024 13h10
 
-        @autoreleasepool {
-            data = [self->_storageDelegate controller:controller
-                                          valueForKey:storageKey
-                                        securityLevel:MTRStorageSecurityLevelSecure
-                                          sharingType:MTRStorageSharingTypeNotShared]; // REVIEWERS:  fabric shared? kmo 12 jul 2024 14h58
-        }
-        if (data == nil) {
+        if (!storedSuccessfully) {
             return;
         }
 
-        if (![data conformsToProtocol:@protocol(NSSecureCoding)]) {
-            MTR_LOG_ERROR("Client data retrieved from MTRDeviceControllerDataStore did not conform to NSSecureCoding");
-            return;
-        }
-
-        // TODO:  check against list of allowed data types? kmo 17 jul 2024 10h14
-        clientData = data;
-    });
-
-    return clientData;
-}
-
-- (void)removeClientDataForNodeID:(NSNumber *)nodeID key:(NSString *)key
-{
-    dispatch_sync(_storageDelegateQueue, ^{
-        MTRDeviceController * controller = self->_controller;
-        VerifyOrReturn(controller != nil); // No way to call delegate without controller.
-
-        NSString * storageKey = [self _clientDataKeyForNodeID:nodeID key:key];
-        [self->_storageDelegate controller:controller
-                         removeValueForKey:storageKey
-                             securityLevel:MTRStorageSecurityLevelSecure
-                               sharingType:MTRStorageSharingTypeNotShared]; // REVIEWERS:  fabric shared?
-        [self _removeClientDataIndexForKey:key nodeID:nodeID controller:controller];
+        [self _addKey:key toIndexForPrefix:prefix];
     });
 }
 
-- (void)_updateClientDataIndexForKey:(NSString * _Nonnull)key
-                              nodeID:(NSNumber * _Nonnull)nodeID
-                          controller:(MTRDeviceController *)controller
+- (void)_addKey:(NSString *)key toIndexForPrefix:(NSString *)prefix
 {
     dispatch_assert_queue(_storageDelegateQueue);
-    NSArray<NSString *> * index = [self _clientDataIndexForNodeID:nodeID];
+
+    MTRDeviceController * controller = self->_controller;
+    VerifyOrReturn(controller != nil); // No way to call delegate without controller.
+
+    NSArray<NSString *> * index = [self _dataIndexForPrefix:prefix];
     NSMutableArray<NSString *> * modifiedIndex = nil;
     BOOL indexModified = NO;
 
+    // TODO:  seems like this index logic could be modified for the common case
+    // where the index is present and has the relevant key
     if (index == nil) {
         modifiedIndex = [NSMutableArray array];
     } else {
@@ -1285,67 +1262,94 @@ static NSString * sClientDataKeyPrefix = @"clientData";
         return;
     }
 
-    NSString * storageKey = [self _clientDataIndexKeyForNodeID:nodeID];
     // REVIEWERS:  does it matter if I pass a mutable vs nonmutable array to this method?
     [self->_storageDelegate controller:controller
                             storeValue:modifiedIndex
-                                forKey:storageKey
+                                forKey:[self _indexKeyForPrefix:prefix]
                          securityLevel:MTRStorageSecurityLevelSecure
                            sharingType:MTRStorageSharingTypeNotShared];
 }
 
-- (void)_removeClientDataIndexForKey:(NSString * _Nonnull)key
-                              nodeID:(NSNumber * _Nonnull)nodeID
-                          controller:(MTRDeviceController *)controller
+- (id<NSSecureCoding>)_dataForKey:(NSString *)key inPrefix:(NSString *)prefix
 {
-    dispatch_assert_queue(_storageDelegateQueue);
-    NSMutableArray<NSString *> * modifiedIndex = [[self _clientDataIndexForNodeID:nodeID] mutableCopy];
-    [modifiedIndex removeObject:key];
+    __block id clientData = nil;
 
-    NSString * storageKey = [self _clientDataIndexKeyForNodeID:nodeID];
-    // REVIEWERS:  does it matter if I pass a mutable vs nonmutable array to this method?
-    [self->_storageDelegate controller:controller
-                            storeValue:modifiedIndex
-                                forKey:storageKey
-                         securityLevel:MTRStorageSecurityLevelSecure
-                           sharingType:MTRStorageSharingTypeNotShared];
-}
-
-- (void)storeClientDataForKey:(NSString *)key value:(id<NSSecureCoding>)value forNodeID:(NSNumber *)nodeID
-{
-    dispatch_async(_storageDelegateQueue, ^{
+    dispatch_sync(_storageDelegateQueue, ^{
         MTRDeviceController * controller = self->_controller;
         VerifyOrReturn(controller != nil); // No way to call delegate without controller.
 
-        // REVIEWERS:  should we log failures? kmo 12 jul 2024 13h10
-        NSString * storageKey = [self _clientDataKeyForNodeID:nodeID key:key];
-        BOOL storedSuccessfully = [self->_storageDelegate controller:controller
-                                                          storeValue:value
-                                                              forKey:storageKey
-                                                       securityLevel:MTRStorageSecurityLevelSecure
-                                                         sharingType:MTRStorageSharingTypeNotShared]; // REVIEWERS:  should be fabric shared? kmo 12 jul 2024 13h10
+        id data;
 
-        if (!storedSuccessfully) {
-            MTR_LOG_ERROR("Could not store client data for node ID %@/key %@", nodeID, key);
+        NSString * dataKey = [self _dataKeyForPrefix:prefix key:key];
+
+        @autoreleasepool {
+            data = [self->_storageDelegate controller:controller
+                                          valueForKey:dataKey
+                                        securityLevel:MTRStorageSecurityLevelSecure
+                                          sharingType:MTRStorageSharingTypeNotShared]; // REVIEWERS:  fabric shared? kmo 12 jul 2024 14h58
+        }
+        if (data == nil) {
             return;
         }
 
-        [self _updateClientDataIndexForKey:key nodeID:nodeID controller:controller];
+        if (![data conformsToProtocol:@protocol(NSSecureCoding)]) {
+            return;
+        }
+
+        // TODO:  check against list of allowed data types? kmo 17 jul 2024 10h14
+        clientData = data;
+    });
+
+    return clientData;
+}
+
+- (void)_removeDataForKey:(NSString *)key inPrefix:(NSString *)prefix
+{
+    dispatch_sync(_storageDelegateQueue, ^{
+        MTRDeviceController * controller = self->_controller;
+        VerifyOrReturn(controller != nil); // No way to call delegate without controller.
+        
+        // remove the data itself
+        NSString * storageKey = [self _dataKeyForPrefix:prefix key:key];
+        [self->_storageDelegate controller:controller
+                         removeValueForKey:storageKey
+                             securityLevel:MTRStorageSecurityLevelSecure
+                               sharingType:MTRStorageSharingTypeNotShared]; // REVIEWERS:  fabric shared?
+
+        // remove the key from the index
+        [self _removeKey:key fromIndexForPrefix:prefix];
     });
 }
 
-- (void)clearStoredClientDataForNodeID:(NSNumber *)nodeID
+- (void)_removeKey:(NSString *)key fromIndexForPrefix:(NSString *)prefix
 {
+    dispatch_assert_queue(_storageDelegateQueue);
+
+    MTRDeviceController * controller = self->_controller;
+    VerifyOrReturn(controller != nil); // No way to call delegate without controller.
+
+    NSMutableArray<NSString *> * modifiedIndex = [[self _dataIndexForPrefix:prefix] mutableCopy];
+    [modifiedIndex removeObject:key];
+
+    // REVIEWERS:  does it matter if I pass a mutable vs nonmutable array to this method?
+    [self->_storageDelegate controller:controller
+                            storeValue:modifiedIndex
+                                forKey:[self _indexKeyForPrefix:prefix]
+                         securityLevel:MTRStorageSecurityLevelSecure
+                           sharingType:MTRStorageSharingTypeNotShared];
+}
+
+- (void)_removeAllDataInPrefix:(NSString *)prefix {
     dispatch_sync(_storageDelegateQueue, ^{
         MTRDeviceController * controller = self->_controller;
         VerifyOrReturn(controller != nil); // No way to call delegate without controller.
 
         // get index
-        NSArray<NSString *> * index = [self _clientDataIndexForNodeID:nodeID];
+        NSArray<NSString *> * index = [self _dataIndexForPrefix:prefix];
 
         // iterate over index to remove data
         for (NSString * key in index) {
-            NSString * thisKey = [self _clientDataKeyForNodeID:nodeID key:key];
+            NSString * thisKey = [self _dataKeyForPrefix:prefix key:key];
             [self->_storageDelegate controller:controller
                              removeValueForKey:thisKey
                                  securityLevel:MTRStorageSecurityLevelSecure
@@ -1353,12 +1357,47 @@ static NSString * sClientDataKeyPrefix = @"clientData";
         }
 
         // remove index itself
-        NSString * storageKey = [self _clientDataIndexKeyForNodeID:nodeID];
+        NSString * indexKey = [self _indexKeyForPrefix:prefix];
         [self->_storageDelegate controller:controller
-                         removeValueForKey:storageKey
+                         removeValueForKey:indexKey
                              securityLevel:MTRStorageSecurityLevelSecure
                                sharingType:MTRStorageSharingTypeNotShared];
     });
+}
+
+#pragma mark - Client Data
+
+static NSString * sClientDataKeyPrefix = @"clientData";
+
+
+- (nullable NSArray<NSString *> *)_clientDataIndexForNodeID:(NSNumber *)nodeID
+{
+    return [self _dataIndexForPrefix:[self _clientDataPrefixForNodeID:nodeID]];
+}
+
+- (NSString *)_clientDataPrefixForNodeID:(NSNumber *)nodeID
+{
+    return [sClientDataKeyPrefix stringByAppendingFormat:@":0x%016llX", nodeID.unsignedLongLongValue];
+}
+
+- (id<NSSecureCoding>)clientDataForNodeID:(NSNumber *)nodeID key:(NSString *)key
+{
+    return [self _dataForKey:key inPrefix:[self _clientDataPrefixForNodeID:nodeID]];
+}
+
+- (void)removeClientDataForNodeID:(NSNumber *)nodeID key:(NSString *)key
+{
+    [self _removeDataForKey:key inPrefix:[self _clientDataPrefixForNodeID:nodeID]];
+}
+
+- (void)storeClientDataForKey:(NSString *)key value:(id<NSSecureCoding>)value forNodeID:(NSNumber *)nodeID
+{
+    [self _storeValue:value atKey:key inPrefix:[self _clientDataPrefixForNodeID:nodeID]];
+}
+
+- (void)clearStoredClientDataForNodeID:(NSNumber *)nodeID
+{
+    [self _removeAllDataInPrefix:[self _clientDataPrefixForNodeID:nodeID]];
 }
 
 - (NSArray<NSString *> *)storedClientDataKeysForNodeID:(NSNumber *)nodeID
@@ -1369,6 +1408,8 @@ static NSString * sClientDataKeyPrefix = @"clientData";
     });
     return keys;
 }
+
+#pragma mark - Client Endpoint Data
 
 @end
 
