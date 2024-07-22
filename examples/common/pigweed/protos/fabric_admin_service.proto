@@ -5,8 +5,13 @@ import 'pw_protobuf_protos/common.proto';
 package chip.rpc;
 
 // Define the message for a synchronized end device with necessary fields
-message DeviceInfo {
+message DeviceCommissioningWindowInfo {
   uint64 node_id = 1;
+  uint32 commissioning_timeout = 2;
+  uint32 discriminator = 3;
+  uint32 iterations = 4;
+  bytes salt = 5;
+  bytes verifier = 6;
 }
 
 // Define the response message to convey the status of the operation
@@ -15,6 +20,5 @@ message OperationStatus {
 }
 
 service FabricAdmin {
-  rpc OpenCommissioningWindow(DeviceInfo) returns (OperationStatus){}
+  rpc OpenCommissioningWindow(DeviceCommissioningWindowInfo) returns (OperationStatus){}
 }
-

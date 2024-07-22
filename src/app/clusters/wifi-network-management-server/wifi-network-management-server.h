@@ -20,9 +20,7 @@
 #include <app-common/zap-generated/cluster-objects.h>
 #include <app/AttributeAccessInterface.h>
 #include <app/CommandHandlerInterface.h>
-#include <crypto/CHIPCryptoPAL.h>
 #include <lib/core/CHIPError.h>
-#include <lib/core/Global.h>
 #include <lib/support/Span.h>
 
 void emberAfWiFiNetworkManagementClusterServerInitCallback(chip::EndpointId);
@@ -34,29 +32,25 @@ namespace Clusters {
 class WiFiNetworkManagementServer : private AttributeAccessInterface, private CommandHandlerInterface
 {
 public:
-    static WiFiNetworkManagementServer & Instance();
+    WiFiNetworkManagementServer(EndpointId endpoint);
+    ~WiFiNetworkManagementServer();
+
+    CHIP_ERROR Init();
 
     CHIP_ERROR ClearNetworkCredentials();
     CHIP_ERROR SetNetworkCredentials(ByteSpan ssid, ByteSpan passphrase);
 
-private:
-    friend Global<WiFiNetworkManagementServer>;
-    friend void ::emberAfWiFiNetworkManagementClusterServerInitCallback(chip::EndpointId);
-
-    WiFiNetworkManagementServer();
-    ~WiFiNetworkManagementServer();
-    CHIP_ERROR Init(EndpointId endpoint);
-
     WiFiNetworkManagementServer(WiFiNetworkManagementServer const &)             = delete;
     WiFiNetworkManagementServer & operator=(WiFiNetworkManagementServer const &) = delete;
+
+private:
+    EndpointId GetEndpointId() { return AttributeAccessInterface::GetEndpointId().Value(); }
 
     CHIP_ERROR Read(const ConcreteReadAttributePath & aPath, AttributeValueEncoder & aEncoder) override;
     void InvokeCommand(HandlerContext & handlerContext) override;
 
     void HandleNetworkPassphraseRequest(HandlerContext & ctx,
                                         const WiFiNetworkManagement::Commands::NetworkPassphraseRequest::DecodableType & req);
-
-    EndpointId mEndpointId = kInvalidEndpointId;
 
     uint8_t mSsid[32];
     uint8_t mSsidLen = 0;
