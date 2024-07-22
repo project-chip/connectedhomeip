@@ -87,7 +87,13 @@ CHIP_ERROR RetrieveClusterData(InteractionModel::DataModel * dataModel, const Ac
         }
     }
 
-    ChipLogError(DataManagement, "Failed to read attribute: %" CHIP_ERROR_FORMAT, err.Format());
+    // Out of space errors may be chunked data, reporting those cases would be very confusing
+    // as they are not fully errors. Report only others (which presumably are not recoverable
+    // and will be sent to the client as well).
+    if (!IsOutOfSpaceError(err))
+    {
+        ChipLogError(DataManagement, "Failed to read attribute: %" CHIP_ERROR_FORMAT, err.Format());
+    }
     return err;
 }
 
