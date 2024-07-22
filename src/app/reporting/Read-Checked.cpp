@@ -127,16 +127,19 @@ CHIP_ERROR RetrieveClusterData(InteractionModel::DataModel * dataModel, const Ac
             if (encoderState->AllowPartialData() != stateDm.AllowPartialData())
             {
                 ChipLogError(Test, "Different partial data");
-                chipDie();
+                // NOTE: die on unit tests only, since partial data size may differ across 
+                //       time-dependent data (very rarely because fast code, but still possible)
 #if CONFIG_BUILD_FOR_HOST_UNIT_TEST
-        chipDie();
+                chipDie();
 #endif
             }
             if (encoderState->CurrentEncodingListIndex() != stateDm.CurrentEncodingListIndex())
             {
                 ChipLogError(Test, "Different partial data");
+                // NOTE: die on unit tests only, since partial data size may differ across 
+                //       time-dependent data (very rarely because fast code, but still possible)
 #if CONFIG_BUILD_FOR_HOST_UNIT_TEST
-        chipDie();
+                chipDie();
 #endif
             }
         }
