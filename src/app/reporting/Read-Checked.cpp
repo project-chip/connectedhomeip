@@ -81,7 +81,18 @@ CHIP_ERROR RetrieveClusterData(InteractionModel::DataModel * dataModel, const Ac
         ChipLogError(Test, "Different return codes between ember and DM");
         ChipLogError(Test, "  Ember error: %" CHIP_ERROR_FORMAT, errEmber.Format());
         ChipLogError(Test, "  DM error: %" CHIP_ERROR_FORMAT, errDM.Format());
+
+        // For time-dependent data, we may have size differences here: one data fitting in buffer
+        // while another not, resulting in different errors (success vs out of space).
+        //
+        // Make unit tests strict, however untime allow it with potentially odd mismatch errors
+        // (in which case logs will be odd, however we also expect Checked versions to only
+        // run for a short period until we switch over to either ember or DM completely).
+#if CONFIG_BUILD_FOR_HOST_UNIT_TEST
         chipDie();
+#else
+        return errDM;
+#endif
     }
 
     // data should be identical for most cases EXCEPT that for time-deltas (e.g. seconds since boot or similar)
@@ -104,6 +115,8 @@ CHIP_ERROR RetrieveClusterData(InteractionModel::DataModel * dataModel, const Ac
                      reportBuilder.GetWriter()->GetLengthWritten());
 #if CONFIG_BUILD_FOR_HOST_UNIT_TEST
         chipDie();
+#else
+        return errDM;
 #endif
     }
 
