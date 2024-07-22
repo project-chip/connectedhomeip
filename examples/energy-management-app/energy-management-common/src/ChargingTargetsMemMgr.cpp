@@ -77,7 +77,7 @@ uint16_t ChargingTargetsMemMgr::GetNumDailyChargingTargets() const
 
 CHIP_ERROR ChargingTargetsMemMgr::AllocAndCopy()
 {
-    // NOTE: ChargingTargetsMemMgr::Reset() must be called as specified in the class comments in
+    // NOTE: ChargingTargetsMemMgr::PrepareDaySchedule() must be called as specified in the class comments in
     // ChargingTargetsMemMgr.h before this method can be called.
 
     VerifyOrDie(mpListOfDays[mChargingTargetSchedulesIdx] == nullptr);
@@ -106,7 +106,7 @@ CHIP_ERROR ChargingTargetsMemMgr::AllocAndCopy()
 CHIP_ERROR
 ChargingTargetsMemMgr::AllocAndCopy(const DataModel::List<const Structs::ChargingTargetStruct::Type> & chargingTargets)
 {
-    // NOTE: ChargingTargetsMemMgr::Reset() must be called as specified in the class comments in
+    // NOTE: ChargingTargetsMemMgr::PrepareDaySchedule() must be called as specified in the class comments in
     // ChargingTargetsMemMgr.h before this method can be called.
 
     VerifyOrDie(mpListOfDays[mChargingTargetSchedulesIdx] == nullptr);
@@ -140,7 +140,7 @@ ChargingTargetsMemMgr::AllocAndCopy(const DataModel::List<const Structs::Chargin
 CHIP_ERROR
 ChargingTargetsMemMgr::AllocAndCopy(const DataModel::DecodableList<Structs::ChargingTargetStruct::DecodableType> & chargingTargets)
 {
-    // NOTE: ChargingTargetsMemMgr::Reset() must be called as specified in the class comments in
+    // NOTE: ChargingTargetsMemMgr::PrepareDaySchedule() must be called as specified in the class comments in
     // ChargingTargetsMemMgr.h before this method can be called.
 
     size_t numDailyChargingTargets = 0;
