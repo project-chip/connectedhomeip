@@ -1,0 +1,61 @@
+name: Build Matter for Telink B92
+
+on:
+  push:
+    branches:
+      - main
+      - setup-github-actions
+  pull_request:
+    branches:
+      - main
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    env:
+      GCC_PATH: ${{ github.workspace }}/toolchain/gcc-arm-none-eabi-10-2020-q4-major/bin
+      PATH: $GCC_PATH:$PATH
+
+    steps:
+    - name: Checkout repository
+      uses: actions/checkout@v3
+
+    - name: Cache Python dependencies
+      uses: actions/cache@v3
+      with:
+        path: ~/.cache/pip
+        key: ${{ runner.os }}-pip-${{ hashFiles('**/requirements.txt') }}
+        restore-keys: |
+          ${{ runner.os }}-pip-
+
+    - name: Set up Python
+      uses: actions/setup-python@v4
+      with:
+        python-version: '3.8'
+
+    - name: Install dependencies
+      run: |
+        sudo apt-get update
+        sudo apt-get install -y git wget cmake ninja-build ccache libffi-dev libssl-dev dfu-util libusb-1.0-0
+        python3 -m pip install --upgrade pip
+        python3 -m pip install --user -r ${{ github.workspace }}/connectedhomeip/requirements.txt
+
+    - name: Cache GCC ARM Toolchain
+      uses: actions/cache@v3
+      id: cache-gcc
+      with:
+        path: ${{ github.workspace }}/toolchain
+        key: ${{ runner.os }}-gcc-arm-toolchain
+
+    - name: Install GCC ARM Toolchain
+      if: steps.cache-gcc.outputs.cache-hit != 'true'
+      run: |
+        mkdir -p ${{ github.workspace }}/toolchain
+        wget -O ${{ github.workspace }}/toolchain/gcc-arm-none-eabi-10-2020-q4-major-x86_64-linux.tar.bz2 https://developer.arm.com/-/media/Files/downloads/gnu-rm/10-2020q4/gcc-arm-none-eabi-10-2020-q4-major-x86_64-linux.tar.bz2
+        tar -xjf ${{ github.workspace }}/toolchain/gcc-arm-none-eabi-10-2020-q4-major-x86_64-linux.tar.bz2 -C ${{ github.workspace }}/toolchain
+
+    - name: Build Matter Example for Telink B92
+      run: |
+        cd ${{ github.workspace }}/connectedhomeip/examples/lighting-app/telink
+        ./build.sh b92
