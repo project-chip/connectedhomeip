@@ -958,7 +958,7 @@ class MatterBaseTest(base_test.BaseTestClass):
         if self.runner_hook and not self.is_commissioning:
             exception = record.termination_signal.exception
             step_duration = (datetime.now(timezone.utc) - self.step_start_time) / timedelta(microseconds=1)
-            test_duration = datetime.now(timezone.utc) - self.test_start_time
+            test_duration = (datetime.now(timezone.utc) - self.test_start_time) / timedelta(microseconds=1)
             # TODO: I have no idea what logger, logs, request or received are. Hope None works because I have nothing to give
             self.runner_hook.step_failure(logger=None, logs=None, duration=step_duration, request=None, received=None)
             self.runner_hook.test_stop(exception=exception, duration=test_duration)
@@ -972,7 +972,7 @@ class MatterBaseTest(base_test.BaseTestClass):
             # What is request? This seems like an implementation detail for the runner
             # TODO: As with failure, I have no idea what logger, logs or request are meant to be
             step_duration = (datetime.now(timezone.utc) - self.step_start_time) / timedelta(microseconds=1)
-            test_duration = datetime.now(timezone.utc) - self.test_start_time
+            test_duration = (datetime.now(timezone.utc) - self.test_start_time) / timedelta(microseconds=1)
             self.runner_hook.step_success(logger=None, logs=None, duration=step_duration, request=None)
 
         # TODO: this check could easily be annoying when doing dev. flag it somehow? Ditto with the in-order check
@@ -996,7 +996,7 @@ class MatterBaseTest(base_test.BaseTestClass):
             record is of type TestResultRecord
         '''
         if self.runner_hook and not self.is_commissioning:
-            test_duration = record.end_time - record.begin_time
+            test_duration = (datetime.now(timezone.utc) - self.test_start_time) / timedelta(microseconds=1)
             test_name = self.current_test_info.name
             filename = inspect.getfile(self.__class__)
             self.runner_hook.test_skipped(filename, test_name)
@@ -1629,7 +1629,8 @@ def per_endpoint_test(accept_function):
                 _async_runner(body, self, *args, **kwargs)
                 if e != endpoints[-1] and not self.failed:
                     self.teardown_test()
-                    self.runner_hook.test_stop(exception=None, duration=datetime.now(timezone.utc) - self.test_start_time)
+                    test_duration = (datetime.now(timezone.utc) - self.test_start_time) / timedelta(microseconds=1)
+                    self.runner_hook.test_stop(exception=None, duration=test_duration)
 
         return per_endpoint_runner
     return per_endpoint_test_internal
