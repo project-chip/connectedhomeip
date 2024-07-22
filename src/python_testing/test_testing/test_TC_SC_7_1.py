@@ -16,6 +16,7 @@
 #    limitations under the License.
 #
 
+import os
 import sys
 from random import randbytes
 
