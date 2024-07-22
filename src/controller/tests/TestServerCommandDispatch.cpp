@@ -62,7 +62,7 @@ class TestClusterCommandHandler : public chip::app::CommandHandlerInterface
 public:
     TestClusterCommandHandler() : chip::app::CommandHandlerInterface(Optional<EndpointId>::Missing(), Clusters::UnitTesting::Id)
     {
-        chip::app::CommandHandlerInterfaceRegistry::RegisterCommandHandler(this);
+        CommandHandlerInterfaceRegistry::RegisterCommandHandler(this);
     }
 
     ~TestClusterCommandHandler() { CommandHandlerInterfaceRegistry::UnregisterCommandHandler(this); }
