@@ -25,6 +25,7 @@
 #ifndef MCAttributeObjects_h
 #define MCAttributeObjects_h
 
+
 // OnOff cluster attributes:
 
 @interface MCOnOffClusterOnOffAttribute : MCAttribute <NSNumber *>
@@ -59,6 +60,7 @@
 
 @interface MCOnOffClusterClusterRevisionAttribute : MCAttribute <NSNumber *>
 @end
+
 
 // LevelControl cluster attributes:
 
@@ -122,6 +124,7 @@
 @interface MCLevelControlClusterClusterRevisionAttribute : MCAttribute <NSNumber *>
 @end
 
+
 // WakeOnLan cluster attributes:
 
 @interface MCWakeOnLanClusterMACAddressAttribute : MCAttribute <NSString *>
@@ -148,6 +151,7 @@
 @interface MCWakeOnLanClusterClusterRevisionAttribute : MCAttribute <NSNumber *>
 @end
 
+
 // TargetNavigator cluster attributes:
 
 @interface MCTargetNavigatorClusterTargetListAttribute : MCAttribute <NSArray *>
@@ -173,6 +177,7 @@
 
 @interface MCTargetNavigatorClusterClusterRevisionAttribute : MCAttribute <NSNumber *>
 @end
+
 
 // MediaPlayback cluster attributes:
 
@@ -227,6 +232,7 @@
 @interface MCMediaPlaybackClusterClusterRevisionAttribute : MCAttribute <NSNumber *>
 @end
 
+
 // KeypadInput cluster attributes:
 
 @interface MCKeypadInputClusterGeneratedCommandListAttribute : MCAttribute <NSArray *>
@@ -246,6 +252,7 @@
 
 @interface MCKeypadInputClusterClusterRevisionAttribute : MCAttribute <NSNumber *>
 @end
+
 
 // ContentLauncher cluster attributes:
 
@@ -273,6 +280,7 @@
 @interface MCContentLauncherClusterClusterRevisionAttribute : MCAttribute <NSNumber *>
 @end
 
+
 // ApplicationLauncher cluster attributes:
 
 @interface MCApplicationLauncherClusterCatalogListAttribute : MCAttribute <NSArray *>
@@ -298,6 +306,7 @@
 
 @interface MCApplicationLauncherClusterClusterRevisionAttribute : MCAttribute <NSNumber *>
 @end
+
 
 // ApplicationBasic cluster attributes:
 
@@ -342,5 +351,6 @@
 
 @interface MCApplicationBasicClusterClusterRevisionAttribute : MCAttribute <NSNumber *>
 @end
+
 
 #endif /* MCAttributeObjects_h */

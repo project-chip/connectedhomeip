@@ -25,11 +25,13 @@
 #ifndef MCClusterObjects_h
 #define MCClusterObjects_h
 
+
 // OnOff cluster:
 
 @interface MCOnOffCluster : MCCluster
 
 // OnOff cluster commands:
+
 
 /**
  * @brief Returns non-nil pointer to MCOnOffClusterOffCommand if supported, nil otherwise.
@@ -124,6 +126,7 @@
 @interface MCLevelControlCluster : MCCluster
 
 // LevelControl cluster commands:
+
 
 /**
  * @brief Returns non-nil pointer to MCLevelControlClusterMoveToLevelCommand if supported, nil otherwise.
@@ -279,6 +282,7 @@
 
 // WakeOnLan cluster commands:
 
+
 // WakeOnLan cluster attributes:
 
 /**
@@ -327,6 +331,7 @@
 @interface MCTargetNavigatorCluster : MCCluster
 
 // TargetNavigator cluster commands:
+
 
 /**
  * @brief Returns non-nil pointer to MCTargetNavigatorClusterNavigateTargetCommand if supported, nil otherwise.
@@ -381,6 +386,7 @@
 @interface MCMediaPlaybackCluster : MCCluster
 
 // MediaPlayback cluster commands:
+
 
 /**
  * @brief Returns non-nil pointer to MCMediaPlaybackClusterPlayCommand if supported, nil otherwise.
@@ -546,6 +552,7 @@
 
 // KeypadInput cluster commands:
 
+
 /**
  * @brief Returns non-nil pointer to MCKeypadInputClusterSendKeyCommand if supported, nil otherwise.
  */
@@ -589,6 +596,7 @@
 @interface MCContentLauncherCluster : MCCluster
 
 // ContentLauncher cluster commands:
+
 
 /**
  * @brief Returns non-nil pointer to MCContentLauncherClusterLaunchContentCommand if supported, nil otherwise.
@@ -648,6 +656,7 @@
 @interface MCApplicationLauncherCluster : MCCluster
 
 // ApplicationLauncher cluster commands:
+
 
 /**
  * @brief Returns non-nil pointer to MCApplicationLauncherClusterLaunchAppCommand if supported, nil otherwise.
@@ -712,6 +721,7 @@
 @interface MCApplicationBasicCluster : MCCluster
 
 // ApplicationBasic cluster commands:
+
 
 // ApplicationBasic cluster attributes:
 

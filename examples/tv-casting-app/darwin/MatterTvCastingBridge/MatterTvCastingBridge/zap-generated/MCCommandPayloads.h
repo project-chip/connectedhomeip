@@ -24,6 +24,7 @@ NS_ASSUME_NONNULL_BEGIN
 @interface MCAbstractPayload : NSObject <NSCopying>
 @end
 
+
 // OnOff cluster:
 
 @interface MCOnOffClusterOffParams : MCAbstractPayload
@@ -36,77 +37,77 @@ NS_ASSUME_NONNULL_BEGIN
 @end
 
 @interface MCOnOffClusterOffWithEffectParams : MCAbstractPayload
-@property (nonatomic, copy) NSNumber * _Nonnull effectIdentifier;
-@property (nonatomic, copy) NSNumber * _Nonnull effectVariant;
+@property (nonatomic, copy) NSNumber * _Nonnull effectIdentifier ;
+@property (nonatomic, copy) NSNumber * _Nonnull effectVariant ;
 @end
 
 @interface MCOnOffClusterOnWithRecallGlobalSceneParams : MCAbstractPayload
 @end
 
 @interface MCOnOffClusterOnWithTimedOffParams : MCAbstractPayload
-@property (nonatomic, copy) NSNumber * _Nonnull onOffControl;
-@property (nonatomic, copy) NSNumber * _Nonnull onTime;
-@property (nonatomic, copy) NSNumber * _Nonnull offWaitTime;
+@property (nonatomic, copy) NSNumber * _Nonnull onOffControl ;
+@property (nonatomic, copy) NSNumber * _Nonnull onTime ;
+@property (nonatomic, copy) NSNumber * _Nonnull offWaitTime ;
 @end
 
 // LevelControl cluster:
 
 @interface MCLevelControlClusterMoveToLevelParams : MCAbstractPayload
-@property (nonatomic, copy) NSNumber * _Nonnull level;
-@property (nonatomic, copy) NSNumber * _Nullable transitionTime;
-@property (nonatomic, copy) NSNumber * _Nonnull optionsMask;
-@property (nonatomic, copy) NSNumber * _Nonnull optionsOverride;
+@property (nonatomic, copy) NSNumber * _Nonnull level ;
+@property (nonatomic, copy) NSNumber * _Nullable transitionTime ;
+@property (nonatomic, copy) NSNumber * _Nonnull optionsMask ;
+@property (nonatomic, copy) NSNumber * _Nonnull optionsOverride ;
 @end
 
 @interface MCLevelControlClusterMoveParams : MCAbstractPayload
-@property (nonatomic, copy) NSNumber * _Nonnull moveMode;
-@property (nonatomic, copy) NSNumber * _Nullable rate;
-@property (nonatomic, copy) NSNumber * _Nonnull optionsMask;
-@property (nonatomic, copy) NSNumber * _Nonnull optionsOverride;
+@property (nonatomic, copy) NSNumber * _Nonnull moveMode ;
+@property (nonatomic, copy) NSNumber * _Nullable rate ;
+@property (nonatomic, copy) NSNumber * _Nonnull optionsMask ;
+@property (nonatomic, copy) NSNumber * _Nonnull optionsOverride ;
 @end
 
 @interface MCLevelControlClusterStepParams : MCAbstractPayload
-@property (nonatomic, copy) NSNumber * _Nonnull stepMode;
-@property (nonatomic, copy) NSNumber * _Nonnull stepSize;
-@property (nonatomic, copy) NSNumber * _Nullable transitionTime;
-@property (nonatomic, copy) NSNumber * _Nonnull optionsMask;
-@property (nonatomic, copy) NSNumber * _Nonnull optionsOverride;
+@property (nonatomic, copy) NSNumber * _Nonnull stepMode ;
+@property (nonatomic, copy) NSNumber * _Nonnull stepSize ;
+@property (nonatomic, copy) NSNumber * _Nullable transitionTime ;
+@property (nonatomic, copy) NSNumber * _Nonnull optionsMask ;
+@property (nonatomic, copy) NSNumber * _Nonnull optionsOverride ;
 @end
 
 @interface MCLevelControlClusterStopParams : MCAbstractPayload
-@property (nonatomic, copy) NSNumber * _Nonnull optionsMask;
-@property (nonatomic, copy) NSNumber * _Nonnull optionsOverride;
+@property (nonatomic, copy) NSNumber * _Nonnull optionsMask ;
+@property (nonatomic, copy) NSNumber * _Nonnull optionsOverride ;
 @end
 
 @interface MCLevelControlClusterMoveToLevelWithOnOffParams : MCAbstractPayload
-@property (nonatomic, copy) NSNumber * _Nonnull level;
-@property (nonatomic, copy) NSNumber * _Nullable transitionTime;
-@property (nonatomic, copy) NSNumber * _Nonnull optionsMask;
-@property (nonatomic, copy) NSNumber * _Nonnull optionsOverride;
+@property (nonatomic, copy) NSNumber * _Nonnull level ;
+@property (nonatomic, copy) NSNumber * _Nullable transitionTime ;
+@property (nonatomic, copy) NSNumber * _Nonnull optionsMask ;
+@property (nonatomic, copy) NSNumber * _Nonnull optionsOverride ;
 @end
 
 @interface MCLevelControlClusterMoveWithOnOffParams : MCAbstractPayload
-@property (nonatomic, copy) NSNumber * _Nonnull moveMode;
-@property (nonatomic, copy) NSNumber * _Nullable rate;
-@property (nonatomic, copy) NSNumber * _Nonnull optionsMask;
-@property (nonatomic, copy) NSNumber * _Nonnull optionsOverride;
+@property (nonatomic, copy) NSNumber * _Nonnull moveMode ;
+@property (nonatomic, copy) NSNumber * _Nullable rate ;
+@property (nonatomic, copy) NSNumber * _Nonnull optionsMask ;
+@property (nonatomic, copy) NSNumber * _Nonnull optionsOverride ;
 @end
 
 @interface MCLevelControlClusterStepWithOnOffParams : MCAbstractPayload
-@property (nonatomic, copy) NSNumber * _Nonnull stepMode;
-@property (nonatomic, copy) NSNumber * _Nonnull stepSize;
-@property (nonatomic, copy) NSNumber * _Nullable transitionTime;
-@property (nonatomic, copy) NSNumber * _Nonnull optionsMask;
-@property (nonatomic, copy) NSNumber * _Nonnull optionsOverride;
+@property (nonatomic, copy) NSNumber * _Nonnull stepMode ;
+@property (nonatomic, copy) NSNumber * _Nonnull stepSize ;
+@property (nonatomic, copy) NSNumber * _Nullable transitionTime ;
+@property (nonatomic, copy) NSNumber * _Nonnull optionsMask ;
+@property (nonatomic, copy) NSNumber * _Nonnull optionsOverride ;
 @end
 
 @interface MCLevelControlClusterStopWithOnOffParams : MCAbstractPayload
-@property (nonatomic, copy) NSNumber * _Nonnull optionsMask;
-@property (nonatomic, copy) NSNumber * _Nonnull optionsOverride;
+@property (nonatomic, copy) NSNumber * _Nonnull optionsMask ;
+@property (nonatomic, copy) NSNumber * _Nonnull optionsOverride ;
 @end
 
 @interface MCLevelControlClusterMoveToClosestFrequencyParams : MCAbstractPayload
-@property (nonatomic, copy) NSNumber * _Nonnull frequency;
+@property (nonatomic, copy) NSNumber * _Nonnull frequency ;
 @end
 
 // WakeOnLan cluster:
@@ -114,13 +115,13 @@ NS_ASSUME_NONNULL_BEGIN
 // TargetNavigator cluster:
 
 @interface MCTargetNavigatorClusterNavigateTargetParams : MCAbstractPayload
-@property (nonatomic, copy) NSNumber * _Nonnull target;
-@property (nonatomic, copy) NSString * _Nullable data;
+@property (nonatomic, copy) NSNumber * _Nonnull target ;
+@property (nonatomic, copy) NSString * _Nullable data ;
 @end
 
 @interface MCTargetNavigatorClusterNavigateTargetResponseParams : MCAbstractPayload
-@property (nonatomic, copy) NSNumber * _Nonnull status;
-@property (nonatomic, copy) NSString * _Nullable data;
+@property (nonatomic, copy) NSNumber * _Nonnull status ;
+@property (nonatomic, copy) NSString * _Nullable data ;
 @end
 
 // MediaPlayback cluster:
@@ -144,37 +145,37 @@ NS_ASSUME_NONNULL_BEGIN
 @end
 
 @interface MCMediaPlaybackClusterRewindParams : MCAbstractPayload
-@property (nonatomic, copy) NSNumber * _Nullable audioAdvanceUnmuted;
+@property (nonatomic, copy) NSNumber * _Nullable audioAdvanceUnmuted ;
 @end
 
 @interface MCMediaPlaybackClusterFastForwardParams : MCAbstractPayload
-@property (nonatomic, copy) NSNumber * _Nullable audioAdvanceUnmuted;
+@property (nonatomic, copy) NSNumber * _Nullable audioAdvanceUnmuted ;
 @end
 
 @interface MCMediaPlaybackClusterSkipForwardParams : MCAbstractPayload
-@property (nonatomic, copy) NSNumber * _Nonnull deltaPositionMilliseconds;
+@property (nonatomic, copy) NSNumber * _Nonnull deltaPositionMilliseconds ;
 @end
 
 @interface MCMediaPlaybackClusterSkipBackwardParams : MCAbstractPayload
-@property (nonatomic, copy) NSNumber * _Nonnull deltaPositionMilliseconds;
+@property (nonatomic, copy) NSNumber * _Nonnull deltaPositionMilliseconds ;
 @end
 
 @interface MCMediaPlaybackClusterPlaybackResponseParams : MCAbstractPayload
-@property (nonatomic, copy) NSNumber * _Nonnull status;
-@property (nonatomic, copy) NSString * _Nullable data;
+@property (nonatomic, copy) NSNumber * _Nonnull status ;
+@property (nonatomic, copy) NSString * _Nullable data ;
 @end
 
 @interface MCMediaPlaybackClusterSeekParams : MCAbstractPayload
-@property (nonatomic, copy) NSNumber * _Nonnull position;
+@property (nonatomic, copy) NSNumber * _Nonnull position ;
 @end
 
 @interface MCMediaPlaybackClusterActivateAudioTrackParams : MCAbstractPayload
-@property (nonatomic, copy) NSString * _Nonnull trackID;
-@property (nonatomic, copy) NSNumber * _Nonnull audioOutputIndex;
+@property (nonatomic, copy) NSString * _Nonnull trackID ;
+@property (nonatomic, copy) NSNumber * _Nonnull audioOutputIndex ;
 @end
 
 @interface MCMediaPlaybackClusterActivateTextTrackParams : MCAbstractPayload
-@property (nonatomic, copy) NSString * _Nonnull trackID;
+@property (nonatomic, copy) NSString * _Nonnull trackID ;
 @end
 
 @interface MCMediaPlaybackClusterDeactivateTextTrackParams : MCAbstractPayload
@@ -183,52 +184,52 @@ NS_ASSUME_NONNULL_BEGIN
 // KeypadInput cluster:
 
 @interface MCKeypadInputClusterSendKeyParams : MCAbstractPayload
-@property (nonatomic, copy) NSNumber * _Nonnull keyCode;
+@property (nonatomic, copy) NSNumber * _Nonnull keyCode ;
 @end
 
 @interface MCKeypadInputClusterSendKeyResponseParams : MCAbstractPayload
-@property (nonatomic, copy) NSNumber * _Nonnull status;
+@property (nonatomic, copy) NSNumber * _Nonnull status ;
 @end
 
 // ContentLauncher cluster:
 
 @interface MCContentLauncherClusterLaunchContentParams : MCAbstractPayload
-@property (nonatomic, copy) MCContentLauncherClusterContentSearchStruct * _Nonnull search;
-@property (nonatomic, copy) NSNumber * _Nonnull autoPlay;
-@property (nonatomic, copy) NSString * _Nullable data;
-@property (nonatomic, copy) MCContentLauncherClusterPlaybackPreferencesStruct * _Nullable playbackPreferences;
-@property (nonatomic, copy) NSNumber * _Nullable useCurrentContext;
+@property (nonatomic, copy) MCContentLauncherClusterContentSearchStruct * _Nonnull search ;
+@property (nonatomic, copy) NSNumber * _Nonnull autoPlay ;
+@property (nonatomic, copy) NSString * _Nullable data ;
+@property (nonatomic, copy) MCContentLauncherClusterPlaybackPreferencesStruct * _Nullable playbackPreferences ;
+@property (nonatomic, copy) NSNumber * _Nullable useCurrentContext ;
 @end
 
 @interface MCContentLauncherClusterLaunchURLParams : MCAbstractPayload
-@property (nonatomic, copy) NSString * _Nonnull contentURL;
-@property (nonatomic, copy) NSString * _Nullable displayString;
-@property (nonatomic, copy) MCContentLauncherClusterBrandingInformationStruct * _Nullable brandingInformation;
+@property (nonatomic, copy) NSString * _Nonnull contentURL ;
+@property (nonatomic, copy) NSString * _Nullable displayString ;
+@property (nonatomic, copy) MCContentLauncherClusterBrandingInformationStruct * _Nullable brandingInformation ;
 @end
 
 @interface MCContentLauncherClusterLauncherResponseParams : MCAbstractPayload
-@property (nonatomic, copy) NSNumber * _Nonnull status;
-@property (nonatomic, copy) NSString * _Nullable data;
+@property (nonatomic, copy) NSNumber * _Nonnull status ;
+@property (nonatomic, copy) NSString * _Nullable data ;
 @end
 
 // ApplicationLauncher cluster:
 
 @interface MCApplicationLauncherClusterLaunchAppParams : MCAbstractPayload
-@property (nonatomic, copy) MCApplicationLauncherClusterApplicationStruct * _Nullable application;
-@property (nonatomic, copy) NSData * _Nullable data;
+@property (nonatomic, copy) MCApplicationLauncherClusterApplicationStruct * _Nullable application ;
+@property (nonatomic, copy) NSData * _Nullable data ;
 @end
 
 @interface MCApplicationLauncherClusterStopAppParams : MCAbstractPayload
-@property (nonatomic, copy) MCApplicationLauncherClusterApplicationStruct * _Nullable application;
+@property (nonatomic, copy) MCApplicationLauncherClusterApplicationStruct * _Nullable application ;
 @end
 
 @interface MCApplicationLauncherClusterHideAppParams : MCAbstractPayload
-@property (nonatomic, copy) MCApplicationLauncherClusterApplicationStruct * _Nullable application;
+@property (nonatomic, copy) MCApplicationLauncherClusterApplicationStruct * _Nullable application ;
 @end
 
 @interface MCApplicationLauncherClusterLauncherResponseParams : MCAbstractPayload
-@property (nonatomic, copy) NSNumber * _Nonnull status;
-@property (nonatomic, copy) NSData * _Nullable data;
+@property (nonatomic, copy) NSNumber * _Nonnull status ;
+@property (nonatomic, copy) NSData * _Nullable data ;
 @end
 
 // ApplicationBasic cluster:

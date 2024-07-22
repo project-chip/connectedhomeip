@@ -37,6 +37,7 @@
 }
 @end
 
+
 // OnOff cluster:
 
 @implementation MCOnOffClusterOffCommand
@@ -67,9 +68,9 @@
     if (anyCppRequest.has_value()) {
         try {
             // Extract the object from std::any and convert it to a std::shared_ptr
-            auto & cppRequest = std::any_cast<chip::app::Clusters::OnOff::Commands::Off::Type &>(anyCppRequest);
+            auto& cppRequest = std::any_cast<chip::app::Clusters::OnOff::Commands::Off::Type&>(anyCppRequest);
             return std::any(std::make_shared<chip::app::Clusters::OnOff::Commands::Off::Type>(cppRequest));
-        } catch (const std::bad_any_cast & e) {
+        } catch (const std::bad_any_cast& e) {
             return nullptr;
         }
     }
@@ -78,11 +79,12 @@
 
 - (id)getObjCResponseFromCpp:(std::any)cppResponse
 {
-    MCNullObjectType * objCResponse = nil;
+    MCNullObjectType
+ * objCResponse = nil;
     CHIP_ERROR err = CHIP_NO_ERROR;
     if (cppResponse.type() == typeid(std::shared_ptr<const chip::app::Clusters::OnOff::Commands::Off::Type::ResponseType>)) {
         objCResponse = [[MCNullObjectType
-            alloc] init];
+ alloc] init];
         // Set the ObjC response fields using the given cpp Response
         err = [objCResponse setObjCResponseFromCppResponse:cppResponse];
         VerifyOrReturnValue(err == CHIP_NO_ERROR, nil, ChipLogError(AppServer, "MCOnOffClusterOffCommand getObjCResponseFromCpp() failed"));
@@ -119,9 +121,9 @@
     if (anyCppRequest.has_value()) {
         try {
             // Extract the object from std::any and convert it to a std::shared_ptr
-            auto & cppRequest = std::any_cast<chip::app::Clusters::OnOff::Commands::On::Type &>(anyCppRequest);
+            auto& cppRequest = std::any_cast<chip::app::Clusters::OnOff::Commands::On::Type&>(anyCppRequest);
             return std::any(std::make_shared<chip::app::Clusters::OnOff::Commands::On::Type>(cppRequest));
-        } catch (const std::bad_any_cast & e) {
+        } catch (const std::bad_any_cast& e) {
             return nullptr;
         }
     }
@@ -130,11 +132,12 @@
 
 - (id)getObjCResponseFromCpp:(std::any)cppResponse
 {
-    MCNullObjectType * objCResponse = nil;
+    MCNullObjectType
+ * objCResponse = nil;
     CHIP_ERROR err = CHIP_NO_ERROR;
     if (cppResponse.type() == typeid(std::shared_ptr<const chip::app::Clusters::OnOff::Commands::On::Type::ResponseType>)) {
         objCResponse = [[MCNullObjectType
-            alloc] init];
+ alloc] init];
         // Set the ObjC response fields using the given cpp Response
         err = [objCResponse setObjCResponseFromCppResponse:cppResponse];
         VerifyOrReturnValue(err == CHIP_NO_ERROR, nil, ChipLogError(AppServer, "MCOnOffClusterOnCommand getObjCResponseFromCpp() failed"));
@@ -171,9 +174,9 @@
     if (anyCppRequest.has_value()) {
         try {
             // Extract the object from std::any and convert it to a std::shared_ptr
-            auto & cppRequest = std::any_cast<chip::app::Clusters::OnOff::Commands::Toggle::Type &>(anyCppRequest);
+            auto& cppRequest = std::any_cast<chip::app::Clusters::OnOff::Commands::Toggle::Type&>(anyCppRequest);
             return std::any(std::make_shared<chip::app::Clusters::OnOff::Commands::Toggle::Type>(cppRequest));
-        } catch (const std::bad_any_cast & e) {
+        } catch (const std::bad_any_cast& e) {
             return nullptr;
         }
     }
@@ -182,11 +185,12 @@
 
 - (id)getObjCResponseFromCpp:(std::any)cppResponse
 {
-    MCNullObjectType * objCResponse = nil;
+    MCNullObjectType
+ * objCResponse = nil;
     CHIP_ERROR err = CHIP_NO_ERROR;
     if (cppResponse.type() == typeid(std::shared_ptr<const chip::app::Clusters::OnOff::Commands::Toggle::Type::ResponseType>)) {
         objCResponse = [[MCNullObjectType
-            alloc] init];
+ alloc] init];
         // Set the ObjC response fields using the given cpp Response
         err = [objCResponse setObjCResponseFromCppResponse:cppResponse];
         VerifyOrReturnValue(err == CHIP_NO_ERROR, nil, ChipLogError(AppServer, "MCOnOffClusterToggleCommand getObjCResponseFromCpp() failed"));
@@ -223,9 +227,9 @@
     if (anyCppRequest.has_value()) {
         try {
             // Extract the object from std::any and convert it to a std::shared_ptr
-            auto & cppRequest = std::any_cast<chip::app::Clusters::OnOff::Commands::OffWithEffect::Type &>(anyCppRequest);
+            auto& cppRequest = std::any_cast<chip::app::Clusters::OnOff::Commands::OffWithEffect::Type&>(anyCppRequest);
             return std::any(std::make_shared<chip::app::Clusters::OnOff::Commands::OffWithEffect::Type>(cppRequest));
-        } catch (const std::bad_any_cast & e) {
+        } catch (const std::bad_any_cast& e) {
             return nullptr;
         }
     }
@@ -234,11 +238,12 @@
 
 - (id)getObjCResponseFromCpp:(std::any)cppResponse
 {
-    MCNullObjectType * objCResponse = nil;
+    MCNullObjectType
+ * objCResponse = nil;
     CHIP_ERROR err = CHIP_NO_ERROR;
     if (cppResponse.type() == typeid(std::shared_ptr<const chip::app::Clusters::OnOff::Commands::OffWithEffect::Type::ResponseType>)) {
         objCResponse = [[MCNullObjectType
-            alloc] init];
+ alloc] init];
         // Set the ObjC response fields using the given cpp Response
         err = [objCResponse setObjCResponseFromCppResponse:cppResponse];
         VerifyOrReturnValue(err == CHIP_NO_ERROR, nil, ChipLogError(AppServer, "MCOnOffClusterOffWithEffectCommand getObjCResponseFromCpp() failed"));
@@ -275,9 +280,9 @@
     if (anyCppRequest.has_value()) {
         try {
             // Extract the object from std::any and convert it to a std::shared_ptr
-            auto & cppRequest = std::any_cast<chip::app::Clusters::OnOff::Commands::OnWithRecallGlobalScene::Type &>(anyCppRequest);
+            auto& cppRequest = std::any_cast<chip::app::Clusters::OnOff::Commands::OnWithRecallGlobalScene::Type&>(anyCppRequest);
             return std::any(std::make_shared<chip::app::Clusters::OnOff::Commands::OnWithRecallGlobalScene::Type>(cppRequest));
-        } catch (const std::bad_any_cast & e) {
+        } catch (const std::bad_any_cast& e) {
             return nullptr;
         }
     }
@@ -286,11 +291,12 @@
 
 - (id)getObjCResponseFromCpp:(std::any)cppResponse
 {
-    MCNullObjectType * objCResponse = nil;
+    MCNullObjectType
+ * objCResponse = nil;
     CHIP_ERROR err = CHIP_NO_ERROR;
     if (cppResponse.type() == typeid(std::shared_ptr<const chip::app::Clusters::OnOff::Commands::OnWithRecallGlobalScene::Type::ResponseType>)) {
         objCResponse = [[MCNullObjectType
-            alloc] init];
+ alloc] init];
         // Set the ObjC response fields using the given cpp Response
         err = [objCResponse setObjCResponseFromCppResponse:cppResponse];
         VerifyOrReturnValue(err == CHIP_NO_ERROR, nil, ChipLogError(AppServer, "MCOnOffClusterOnWithRecallGlobalSceneCommand getObjCResponseFromCpp() failed"));
@@ -327,9 +333,9 @@
     if (anyCppRequest.has_value()) {
         try {
             // Extract the object from std::any and convert it to a std::shared_ptr
-            auto & cppRequest = std::any_cast<chip::app::Clusters::OnOff::Commands::OnWithTimedOff::Type &>(anyCppRequest);
+            auto& cppRequest = std::any_cast<chip::app::Clusters::OnOff::Commands::OnWithTimedOff::Type&>(anyCppRequest);
             return std::any(std::make_shared<chip::app::Clusters::OnOff::Commands::OnWithTimedOff::Type>(cppRequest));
-        } catch (const std::bad_any_cast & e) {
+        } catch (const std::bad_any_cast& e) {
             return nullptr;
         }
     }
@@ -338,11 +344,12 @@
 
 - (id)getObjCResponseFromCpp:(std::any)cppResponse
 {
-    MCNullObjectType * objCResponse = nil;
+    MCNullObjectType
+ * objCResponse = nil;
     CHIP_ERROR err = CHIP_NO_ERROR;
     if (cppResponse.type() == typeid(std::shared_ptr<const chip::app::Clusters::OnOff::Commands::OnWithTimedOff::Type::ResponseType>)) {
         objCResponse = [[MCNullObjectType
-            alloc] init];
+ alloc] init];
         // Set the ObjC response fields using the given cpp Response
         err = [objCResponse setObjCResponseFromCppResponse:cppResponse];
         VerifyOrReturnValue(err == CHIP_NO_ERROR, nil, ChipLogError(AppServer, "MCOnOffClusterOnWithTimedOffCommand getObjCResponseFromCpp() failed"));
@@ -350,6 +357,7 @@
     return objCResponse;
 }
 @end
+
 
 // LevelControl cluster:
 
@@ -381,9 +389,9 @@
     if (anyCppRequest.has_value()) {
         try {
             // Extract the object from std::any and convert it to a std::shared_ptr
-            auto & cppRequest = std::any_cast<chip::app::Clusters::LevelControl::Commands::MoveToLevel::Type &>(anyCppRequest);
+            auto& cppRequest = std::any_cast<chip::app::Clusters::LevelControl::Commands::MoveToLevel::Type&>(anyCppRequest);
             return std::any(std::make_shared<chip::app::Clusters::LevelControl::Commands::MoveToLevel::Type>(cppRequest));
-        } catch (const std::bad_any_cast & e) {
+        } catch (const std::bad_any_cast& e) {
             return nullptr;
         }
     }
@@ -392,11 +400,12 @@
 
 - (id)getObjCResponseFromCpp:(std::any)cppResponse
 {
-    MCNullObjectType * objCResponse = nil;
+    MCNullObjectType
+ * objCResponse = nil;
     CHIP_ERROR err = CHIP_NO_ERROR;
     if (cppResponse.type() == typeid(std::shared_ptr<const chip::app::Clusters::LevelControl::Commands::MoveToLevel::Type::ResponseType>)) {
         objCResponse = [[MCNullObjectType
-            alloc] init];
+ alloc] init];
         // Set the ObjC response fields using the given cpp Response
         err = [objCResponse setObjCResponseFromCppResponse:cppResponse];
         VerifyOrReturnValue(err == CHIP_NO_ERROR, nil, ChipLogError(AppServer, "MCLevelControlClusterMoveToLevelCommand getObjCResponseFromCpp() failed"));
@@ -433,9 +442,9 @@
     if (anyCppRequest.has_value()) {
         try {
             // Extract the object from std::any and convert it to a std::shared_ptr
-            auto & cppRequest = std::any_cast<chip::app::Clusters::LevelControl::Commands::Move::Type &>(anyCppRequest);
+            auto& cppRequest = std::any_cast<chip::app::Clusters::LevelControl::Commands::Move::Type&>(anyCppRequest);
             return std::any(std::make_shared<chip::app::Clusters::LevelControl::Commands::Move::Type>(cppRequest));
-        } catch (const std::bad_any_cast & e) {
+        } catch (const std::bad_any_cast& e) {
             return nullptr;
         }
     }
@@ -444,11 +453,12 @@
 
 - (id)getObjCResponseFromCpp:(std::any)cppResponse
 {
-    MCNullObjectType * objCResponse = nil;
+    MCNullObjectType
+ * objCResponse = nil;
     CHIP_ERROR err = CHIP_NO_ERROR;
     if (cppResponse.type() == typeid(std::shared_ptr<const chip::app::Clusters::LevelControl::Commands::Move::Type::ResponseType>)) {
         objCResponse = [[MCNullObjectType
-            alloc] init];
+ alloc] init];
         // Set the ObjC response fields using the given cpp Response
         err = [objCResponse setObjCResponseFromCppResponse:cppResponse];
         VerifyOrReturnValue(err == CHIP_NO_ERROR, nil, ChipLogError(AppServer, "MCLevelControlClusterMoveCommand getObjCResponseFromCpp() failed"));
@@ -485,9 +495,9 @@
     if (anyCppRequest.has_value()) {
         try {
             // Extract the object from std::any and convert it to a std::shared_ptr
-            auto & cppRequest = std::any_cast<chip::app::Clusters::LevelControl::Commands::Step::Type &>(anyCppRequest);
+            auto& cppRequest = std::any_cast<chip::app::Clusters::LevelControl::Commands::Step::Type&>(anyCppRequest);
             return std::any(std::make_shared<chip::app::Clusters::LevelControl::Commands::Step::Type>(cppRequest));
-        } catch (const std::bad_any_cast & e) {
+        } catch (const std::bad_any_cast& e) {
             return nullptr;
         }
     }
@@ -496,11 +506,12 @@
 
 - (id)getObjCResponseFromCpp:(std::any)cppResponse
 {
-    MCNullObjectType * objCResponse = nil;
+    MCNullObjectType
+ * objCResponse = nil;
     CHIP_ERROR err = CHIP_NO_ERROR;
     if (cppResponse.type() == typeid(std::shared_ptr<const chip::app::Clusters::LevelControl::Commands::Step::Type::ResponseType>)) {
         objCResponse = [[MCNullObjectType
-            alloc] init];
+ alloc] init];
         // Set the ObjC response fields using the given cpp Response
         err = [objCResponse setObjCResponseFromCppResponse:cppResponse];
         VerifyOrReturnValue(err == CHIP_NO_ERROR, nil, ChipLogError(AppServer, "MCLevelControlClusterStepCommand getObjCResponseFromCpp() failed"));
@@ -537,9 +548,9 @@
     if (anyCppRequest.has_value()) {
         try {
             // Extract the object from std::any and convert it to a std::shared_ptr
-            auto & cppRequest = std::any_cast<chip::app::Clusters::LevelControl::Commands::Stop::Type &>(anyCppRequest);
+            auto& cppRequest = std::any_cast<chip::app::Clusters::LevelControl::Commands::Stop::Type&>(anyCppRequest);
             return std::any(std::make_shared<chip::app::Clusters::LevelControl::Commands::Stop::Type>(cppRequest));
-        } catch (const std::bad_any_cast & e) {
+        } catch (const std::bad_any_cast& e) {
             return nullptr;
         }
     }
@@ -548,11 +559,12 @@
 
 - (id)getObjCResponseFromCpp:(std::any)cppResponse
 {
-    MCNullObjectType * objCResponse = nil;
+    MCNullObjectType
+ * objCResponse = nil;
     CHIP_ERROR err = CHIP_NO_ERROR;
     if (cppResponse.type() == typeid(std::shared_ptr<const chip::app::Clusters::LevelControl::Commands::Stop::Type::ResponseType>)) {
         objCResponse = [[MCNullObjectType
-            alloc] init];
+ alloc] init];
         // Set the ObjC response fields using the given cpp Response
         err = [objCResponse setObjCResponseFromCppResponse:cppResponse];
         VerifyOrReturnValue(err == CHIP_NO_ERROR, nil, ChipLogError(AppServer, "MCLevelControlClusterStopCommand getObjCResponseFromCpp() failed"));
@@ -589,9 +601,9 @@
     if (anyCppRequest.has_value()) {
         try {
             // Extract the object from std::any and convert it to a std::shared_ptr
-            auto & cppRequest = std::any_cast<chip::app::Clusters::LevelControl::Commands::MoveToLevelWithOnOff::Type &>(anyCppRequest);
+            auto& cppRequest = std::any_cast<chip::app::Clusters::LevelControl::Commands::MoveToLevelWithOnOff::Type&>(anyCppRequest);
             return std::any(std::make_shared<chip::app::Clusters::LevelControl::Commands::MoveToLevelWithOnOff::Type>(cppRequest));
-        } catch (const std::bad_any_cast & e) {
+        } catch (const std::bad_any_cast& e) {
             return nullptr;
         }
     }
@@ -600,11 +612,12 @@
 
 - (id)getObjCResponseFromCpp:(std::any)cppResponse
 {
-    MCNullObjectType * objCResponse = nil;
+    MCNullObjectType
+ * objCResponse = nil;
     CHIP_ERROR err = CHIP_NO_ERROR;
     if (cppResponse.type() == typeid(std::shared_ptr<const chip::app::Clusters::LevelControl::Commands::MoveToLevelWithOnOff::Type::ResponseType>)) {
         objCResponse = [[MCNullObjectType
-            alloc] init];
+ alloc] init];
         // Set the ObjC response fields using the given cpp Response
         err = [objCResponse setObjCResponseFromCppResponse:cppResponse];
         VerifyOrReturnValue(err == CHIP_NO_ERROR, nil, ChipLogError(AppServer, "MCLevelControlClusterMoveToLevelWithOnOffCommand getObjCResponseFromCpp() failed"));
@@ -641,9 +654,9 @@
     if (anyCppRequest.has_value()) {
         try {
             // Extract the object from std::any and convert it to a std::shared_ptr
-            auto & cppRequest = std::any_cast<chip::app::Clusters::LevelControl::Commands::MoveWithOnOff::Type &>(anyCppRequest);
+            auto& cppRequest = std::any_cast<chip::app::Clusters::LevelControl::Commands::MoveWithOnOff::Type&>(anyCppRequest);
             return std::any(std::make_shared<chip::app::Clusters::LevelControl::Commands::MoveWithOnOff::Type>(cppRequest));
-        } catch (const std::bad_any_cast & e) {
+        } catch (const std::bad_any_cast& e) {
             return nullptr;
         }
     }
@@ -652,11 +665,12 @@
 
 - (id)getObjCResponseFromCpp:(std::any)cppResponse
 {
-    MCNullObjectType * objCResponse = nil;
+    MCNullObjectType
+ * objCResponse = nil;
     CHIP_ERROR err = CHIP_NO_ERROR;
     if (cppResponse.type() == typeid(std::shared_ptr<const chip::app::Clusters::LevelControl::Commands::MoveWithOnOff::Type::ResponseType>)) {
         objCResponse = [[MCNullObjectType
-            alloc] init];
+ alloc] init];
         // Set the ObjC response fields using the given cpp Response
         err = [objCResponse setObjCResponseFromCppResponse:cppResponse];
         VerifyOrReturnValue(err == CHIP_NO_ERROR, nil, ChipLogError(AppServer, "MCLevelControlClusterMoveWithOnOffCommand getObjCResponseFromCpp() failed"));
@@ -693,9 +707,9 @@
     if (anyCppRequest.has_value()) {
         try {
             // Extract the object from std::any and convert it to a std::shared_ptr
-            auto & cppRequest = std::any_cast<chip::app::Clusters::LevelControl::Commands::StepWithOnOff::Type &>(anyCppRequest);
+            auto& cppRequest = std::any_cast<chip::app::Clusters::LevelControl::Commands::StepWithOnOff::Type&>(anyCppRequest);
             return std::any(std::make_shared<chip::app::Clusters::LevelControl::Commands::StepWithOnOff::Type>(cppRequest));
-        } catch (const std::bad_any_cast & e) {
+        } catch (const std::bad_any_cast& e) {
             return nullptr;
         }
     }
@@ -704,11 +718,12 @@
 
 - (id)getObjCResponseFromCpp:(std::any)cppResponse
 {
-    MCNullObjectType * objCResponse = nil;
+    MCNullObjectType
+ * objCResponse = nil;
     CHIP_ERROR err = CHIP_NO_ERROR;
     if (cppResponse.type() == typeid(std::shared_ptr<const chip::app::Clusters::LevelControl::Commands::StepWithOnOff::Type::ResponseType>)) {
         objCResponse = [[MCNullObjectType
-            alloc] init];
+ alloc] init];
         // Set the ObjC response fields using the given cpp Response
         err = [objCResponse setObjCResponseFromCppResponse:cppResponse];
         VerifyOrReturnValue(err == CHIP_NO_ERROR, nil, ChipLogError(AppServer, "MCLevelControlClusterStepWithOnOffCommand getObjCResponseFromCpp() failed"));
@@ -745,9 +760,9 @@
     if (anyCppRequest.has_value()) {
         try {
             // Extract the object from std::any and convert it to a std::shared_ptr
-            auto & cppRequest = std::any_cast<chip::app::Clusters::LevelControl::Commands::StopWithOnOff::Type &>(anyCppRequest);
+            auto& cppRequest = std::any_cast<chip::app::Clusters::LevelControl::Commands::StopWithOnOff::Type&>(anyCppRequest);
             return std::any(std::make_shared<chip::app::Clusters::LevelControl::Commands::StopWithOnOff::Type>(cppRequest));
-        } catch (const std::bad_any_cast & e) {
+        } catch (const std::bad_any_cast& e) {
             return nullptr;
         }
     }
@@ -756,11 +771,12 @@
 
 - (id)getObjCResponseFromCpp:(std::any)cppResponse
 {
-    MCNullObjectType * objCResponse = nil;
+    MCNullObjectType
+ * objCResponse = nil;
     CHIP_ERROR err = CHIP_NO_ERROR;
     if (cppResponse.type() == typeid(std::shared_ptr<const chip::app::Clusters::LevelControl::Commands::StopWithOnOff::Type::ResponseType>)) {
         objCResponse = [[MCNullObjectType
-            alloc] init];
+ alloc] init];
         // Set the ObjC response fields using the given cpp Response
         err = [objCResponse setObjCResponseFromCppResponse:cppResponse];
         VerifyOrReturnValue(err == CHIP_NO_ERROR, nil, ChipLogError(AppServer, "MCLevelControlClusterStopWithOnOffCommand getObjCResponseFromCpp() failed"));
@@ -797,9 +813,9 @@
     if (anyCppRequest.has_value()) {
         try {
             // Extract the object from std::any and convert it to a std::shared_ptr
-            auto & cppRequest = std::any_cast<chip::app::Clusters::LevelControl::Commands::MoveToClosestFrequency::Type &>(anyCppRequest);
+            auto& cppRequest = std::any_cast<chip::app::Clusters::LevelControl::Commands::MoveToClosestFrequency::Type&>(anyCppRequest);
             return std::any(std::make_shared<chip::app::Clusters::LevelControl::Commands::MoveToClosestFrequency::Type>(cppRequest));
-        } catch (const std::bad_any_cast & e) {
+        } catch (const std::bad_any_cast& e) {
             return nullptr;
         }
     }
@@ -808,11 +824,12 @@
 
 - (id)getObjCResponseFromCpp:(std::any)cppResponse
 {
-    MCNullObjectType * objCResponse = nil;
+    MCNullObjectType
+ * objCResponse = nil;
     CHIP_ERROR err = CHIP_NO_ERROR;
     if (cppResponse.type() == typeid(std::shared_ptr<const chip::app::Clusters::LevelControl::Commands::MoveToClosestFrequency::Type::ResponseType>)) {
         objCResponse = [[MCNullObjectType
-            alloc] init];
+ alloc] init];
         // Set the ObjC response fields using the given cpp Response
         err = [objCResponse setObjCResponseFromCppResponse:cppResponse];
         VerifyOrReturnValue(err == CHIP_NO_ERROR, nil, ChipLogError(AppServer, "MCLevelControlClusterMoveToClosestFrequencyCommand getObjCResponseFromCpp() failed"));
@@ -821,7 +838,9 @@
 }
 @end
 
+
 // WakeOnLan cluster:
+
 
 // TargetNavigator cluster:
 
@@ -853,9 +872,9 @@
     if (anyCppRequest.has_value()) {
         try {
             // Extract the object from std::any and convert it to a std::shared_ptr
-            auto & cppRequest = std::any_cast<chip::app::Clusters::TargetNavigator::Commands::NavigateTarget::Type &>(anyCppRequest);
+            auto& cppRequest = std::any_cast<chip::app::Clusters::TargetNavigator::Commands::NavigateTarget::Type&>(anyCppRequest);
             return std::any(std::make_shared<chip::app::Clusters::TargetNavigator::Commands::NavigateTarget::Type>(cppRequest));
-        } catch (const std::bad_any_cast & e) {
+        } catch (const std::bad_any_cast& e) {
             return nullptr;
         }
     }
@@ -864,11 +883,12 @@
 
 - (id)getObjCResponseFromCpp:(std::any)cppResponse
 {
-    MCTargetNavigatorClusterNavigateTargetResponseParams * objCResponse = nil;
+    MCTargetNavigatorClusterNavigateTargetResponseParams
+ * objCResponse = nil;
     CHIP_ERROR err = CHIP_NO_ERROR;
     if (cppResponse.type() == typeid(std::shared_ptr<const chip::app::Clusters::TargetNavigator::Commands::NavigateTarget::Type::ResponseType>)) {
         objCResponse = [[MCTargetNavigatorClusterNavigateTargetResponseParams
-            alloc] init];
+ alloc] init];
         // Set the ObjC response fields using the given cpp Response
         err = [objCResponse setObjCResponseFromCppResponse:cppResponse];
         VerifyOrReturnValue(err == CHIP_NO_ERROR, nil, ChipLogError(AppServer, "MCTargetNavigatorClusterNavigateTargetCommand getObjCResponseFromCpp() failed"));
@@ -876,6 +896,7 @@
     return objCResponse;
 }
 @end
+
 
 // MediaPlayback cluster:
 
@@ -907,9 +928,9 @@
     if (anyCppRequest.has_value()) {
         try {
             // Extract the object from std::any and convert it to a std::shared_ptr
-            auto & cppRequest = std::any_cast<chip::app::Clusters::MediaPlayback::Commands::Play::Type &>(anyCppRequest);
+            auto& cppRequest = std::any_cast<chip::app::Clusters::MediaPlayback::Commands::Play::Type&>(anyCppRequest);
             return std::any(std::make_shared<chip::app::Clusters::MediaPlayback::Commands::Play::Type>(cppRequest));
-        } catch (const std::bad_any_cast & e) {
+        } catch (const std::bad_any_cast& e) {
             return nullptr;
         }
     }
@@ -918,11 +939,12 @@
 
 - (id)getObjCResponseFromCpp:(std::any)cppResponse
 {
-    MCMediaPlaybackClusterPlaybackResponseParams * objCResponse = nil;
+    MCMediaPlaybackClusterPlaybackResponseParams
+ * objCResponse = nil;
     CHIP_ERROR err = CHIP_NO_ERROR;
     if (cppResponse.type() == typeid(std::shared_ptr<const chip::app::Clusters::MediaPlayback::Commands::Play::Type::ResponseType>)) {
         objCResponse = [[MCMediaPlaybackClusterPlaybackResponseParams
-            alloc] init];
+ alloc] init];
         // Set the ObjC response fields using the given cpp Response
         err = [objCResponse setObjCResponseFromCppResponse:cppResponse];
         VerifyOrReturnValue(err == CHIP_NO_ERROR, nil, ChipLogError(AppServer, "MCMediaPlaybackClusterPlayCommand getObjCResponseFromCpp() failed"));
@@ -959,9 +981,9 @@
     if (anyCppRequest.has_value()) {
         try {
             // Extract the object from std::any and convert it to a std::shared_ptr
-            auto & cppRequest = std::any_cast<chip::app::Clusters::MediaPlayback::Commands::Pause::Type &>(anyCppRequest);
+            auto& cppRequest = std::any_cast<chip::app::Clusters::MediaPlayback::Commands::Pause::Type&>(anyCppRequest);
             return std::any(std::make_shared<chip::app::Clusters::MediaPlayback::Commands::Pause::Type>(cppRequest));
-        } catch (const std::bad_any_cast & e) {
+        } catch (const std::bad_any_cast& e) {
             return nullptr;
         }
     }
@@ -970,11 +992,12 @@
 
 - (id)getObjCResponseFromCpp:(std::any)cppResponse
 {
-    MCMediaPlaybackClusterPlaybackResponseParams * objCResponse = nil;
+    MCMediaPlaybackClusterPlaybackResponseParams
+ * objCResponse = nil;
     CHIP_ERROR err = CHIP_NO_ERROR;
     if (cppResponse.type() == typeid(std::shared_ptr<const chip::app::Clusters::MediaPlayback::Commands::Pause::Type::ResponseType>)) {
         objCResponse = [[MCMediaPlaybackClusterPlaybackResponseParams
-            alloc] init];
+ alloc] init];
         // Set the ObjC response fields using the given cpp Response
         err = [objCResponse setObjCResponseFromCppResponse:cppResponse];
         VerifyOrReturnValue(err == CHIP_NO_ERROR, nil, ChipLogError(AppServer, "MCMediaPlaybackClusterPauseCommand getObjCResponseFromCpp() failed"));
@@ -1011,9 +1034,9 @@
     if (anyCppRequest.has_value()) {
         try {
             // Extract the object from std::any and convert it to a std::shared_ptr
-            auto & cppRequest = std::any_cast<chip::app::Clusters::MediaPlayback::Commands::Stop::Type &>(anyCppRequest);
+            auto& cppRequest = std::any_cast<chip::app::Clusters::MediaPlayback::Commands::Stop::Type&>(anyCppRequest);
             return std::any(std::make_shared<chip::app::Clusters::MediaPlayback::Commands::Stop::Type>(cppRequest));
-        } catch (const std::bad_any_cast & e) {
+        } catch (const std::bad_any_cast& e) {
             return nullptr;
         }
     }
@@ -1022,11 +1045,12 @@
 
 - (id)getObjCResponseFromCpp:(std::any)cppResponse
 {
-    MCMediaPlaybackClusterPlaybackResponseParams * objCResponse = nil;
+    MCMediaPlaybackClusterPlaybackResponseParams
+ * objCResponse = nil;
     CHIP_ERROR err = CHIP_NO_ERROR;
     if (cppResponse.type() == typeid(std::shared_ptr<const chip::app::Clusters::MediaPlayback::Commands::Stop::Type::ResponseType>)) {
         objCResponse = [[MCMediaPlaybackClusterPlaybackResponseParams
-            alloc] init];
+ alloc] init];
         // Set the ObjC response fields using the given cpp Response
         err = [objCResponse setObjCResponseFromCppResponse:cppResponse];
         VerifyOrReturnValue(err == CHIP_NO_ERROR, nil, ChipLogError(AppServer, "MCMediaPlaybackClusterStopCommand getObjCResponseFromCpp() failed"));
@@ -1063,9 +1087,9 @@
     if (anyCppRequest.has_value()) {
         try {
             // Extract the object from std::any and convert it to a std::shared_ptr
-            auto & cppRequest = std::any_cast<chip::app::Clusters::MediaPlayback::Commands::StartOver::Type &>(anyCppRequest);
+            auto& cppRequest = std::any_cast<chip::app::Clusters::MediaPlayback::Commands::StartOver::Type&>(anyCppRequest);
             return std::any(std::make_shared<chip::app::Clusters::MediaPlayback::Commands::StartOver::Type>(cppRequest));
-        } catch (const std::bad_any_cast & e) {
+        } catch (const std::bad_any_cast& e) {
             return nullptr;
         }
     }
@@ -1074,11 +1098,12 @@
 
 - (id)getObjCResponseFromCpp:(std::any)cppResponse
 {
-    MCMediaPlaybackClusterPlaybackResponseParams * objCResponse = nil;
+    MCMediaPlaybackClusterPlaybackResponseParams
+ * objCResponse = nil;
     CHIP_ERROR err = CHIP_NO_ERROR;
     if (cppResponse.type() == typeid(std::shared_ptr<const chip::app::Clusters::MediaPlayback::Commands::StartOver::Type::ResponseType>)) {
         objCResponse = [[MCMediaPlaybackClusterPlaybackResponseParams
-            alloc] init];
+ alloc] init];
         // Set the ObjC response fields using the given cpp Response
         err = [objCResponse setObjCResponseFromCppResponse:cppResponse];
         VerifyOrReturnValue(err == CHIP_NO_ERROR, nil, ChipLogError(AppServer, "MCMediaPlaybackClusterStartOverCommand getObjCResponseFromCpp() failed"));
@@ -1115,9 +1140,9 @@
     if (anyCppRequest.has_value()) {
         try {
             // Extract the object from std::any and convert it to a std::shared_ptr
-            auto & cppRequest = std::any_cast<chip::app::Clusters::MediaPlayback::Commands::Previous::Type &>(anyCppRequest);
+            auto& cppRequest = std::any_cast<chip::app::Clusters::MediaPlayback::Commands::Previous::Type&>(anyCppRequest);
             return std::any(std::make_shared<chip::app::Clusters::MediaPlayback::Commands::Previous::Type>(cppRequest));
-        } catch (const std::bad_any_cast & e) {
+        } catch (const std::bad_any_cast& e) {
             return nullptr;
         }
     }
@@ -1126,11 +1151,12 @@
 
 - (id)getObjCResponseFromCpp:(std::any)cppResponse
 {
-    MCMediaPlaybackClusterPlaybackResponseParams * objCResponse = nil;
+    MCMediaPlaybackClusterPlaybackResponseParams
+ * objCResponse = nil;
     CHIP_ERROR err = CHIP_NO_ERROR;
     if (cppResponse.type() == typeid(std::shared_ptr<const chip::app::Clusters::MediaPlayback::Commands::Previous::Type::ResponseType>)) {
         objCResponse = [[MCMediaPlaybackClusterPlaybackResponseParams
-            alloc] init];
+ alloc] init];
         // Set the ObjC response fields using the given cpp Response
         err = [objCResponse setObjCResponseFromCppResponse:cppResponse];
         VerifyOrReturnValue(err == CHIP_NO_ERROR, nil, ChipLogError(AppServer, "MCMediaPlaybackClusterPreviousCommand getObjCResponseFromCpp() failed"));
@@ -1167,9 +1193,9 @@
     if (anyCppRequest.has_value()) {
         try {
             // Extract the object from std::any and convert it to a std::shared_ptr
-            auto & cppRequest = std::any_cast<chip::app::Clusters::MediaPlayback::Commands::Next::Type &>(anyCppRequest);
+            auto& cppRequest = std::any_cast<chip::app::Clusters::MediaPlayback::Commands::Next::Type&>(anyCppRequest);
             return std::any(std::make_shared<chip::app::Clusters::MediaPlayback::Commands::Next::Type>(cppRequest));
-        } catch (const std::bad_any_cast & e) {
+        } catch (const std::bad_any_cast& e) {
             return nullptr;
         }
     }
@@ -1178,11 +1204,12 @@
 
 - (id)getObjCResponseFromCpp:(std::any)cppResponse
 {
-    MCMediaPlaybackClusterPlaybackResponseParams * objCResponse = nil;
+    MCMediaPlaybackClusterPlaybackResponseParams
+ * objCResponse = nil;
     CHIP_ERROR err = CHIP_NO_ERROR;
     if (cppResponse.type() == typeid(std::shared_ptr<const chip::app::Clusters::MediaPlayback::Commands::Next::Type::ResponseType>)) {
         objCResponse = [[MCMediaPlaybackClusterPlaybackResponseParams
-            alloc] init];
+ alloc] init];
         // Set the ObjC response fields using the given cpp Response
         err = [objCResponse setObjCResponseFromCppResponse:cppResponse];
         VerifyOrReturnValue(err == CHIP_NO_ERROR, nil, ChipLogError(AppServer, "MCMediaPlaybackClusterNextCommand getObjCResponseFromCpp() failed"));
@@ -1219,9 +1246,9 @@
     if (anyCppRequest.has_value()) {
         try {
             // Extract the object from std::any and convert it to a std::shared_ptr
-            auto & cppRequest = std::any_cast<chip::app::Clusters::MediaPlayback::Commands::Rewind::Type &>(anyCppRequest);
+            auto& cppRequest = std::any_cast<chip::app::Clusters::MediaPlayback::Commands::Rewind::Type&>(anyCppRequest);
             return std::any(std::make_shared<chip::app::Clusters::MediaPlayback::Commands::Rewind::Type>(cppRequest));
-        } catch (const std::bad_any_cast & e) {
+        } catch (const std::bad_any_cast& e) {
             return nullptr;
         }
     }
@@ -1230,11 +1257,12 @@
 
 - (id)getObjCResponseFromCpp:(std::any)cppResponse
 {
-    MCMediaPlaybackClusterPlaybackResponseParams * objCResponse = nil;
+    MCMediaPlaybackClusterPlaybackResponseParams
+ * objCResponse = nil;
     CHIP_ERROR err = CHIP_NO_ERROR;
     if (cppResponse.type() == typeid(std::shared_ptr<const chip::app::Clusters::MediaPlayback::Commands::Rewind::Type::ResponseType>)) {
         objCResponse = [[MCMediaPlaybackClusterPlaybackResponseParams
-            alloc] init];
+ alloc] init];
         // Set the ObjC response fields using the given cpp Response
         err = [objCResponse setObjCResponseFromCppResponse:cppResponse];
         VerifyOrReturnValue(err == CHIP_NO_ERROR, nil, ChipLogError(AppServer, "MCMediaPlaybackClusterRewindCommand getObjCResponseFromCpp() failed"));
@@ -1271,9 +1299,9 @@
     if (anyCppRequest.has_value()) {
         try {
             // Extract the object from std::any and convert it to a std::shared_ptr
-            auto & cppRequest = std::any_cast<chip::app::Clusters::MediaPlayback::Commands::FastForward::Type &>(anyCppRequest);
+            auto& cppRequest = std::any_cast<chip::app::Clusters::MediaPlayback::Commands::FastForward::Type&>(anyCppRequest);
             return std::any(std::make_shared<chip::app::Clusters::MediaPlayback::Commands::FastForward::Type>(cppRequest));
-        } catch (const std::bad_any_cast & e) {
+        } catch (const std::bad_any_cast& e) {
             return nullptr;
         }
     }
@@ -1282,11 +1310,12 @@
 
 - (id)getObjCResponseFromCpp:(std::any)cppResponse
 {
-    MCMediaPlaybackClusterPlaybackResponseParams * objCResponse = nil;
+    MCMediaPlaybackClusterPlaybackResponseParams
+ * objCResponse = nil;
     CHIP_ERROR err = CHIP_NO_ERROR;
     if (cppResponse.type() == typeid(std::shared_ptr<const chip::app::Clusters::MediaPlayback::Commands::FastForward::Type::ResponseType>)) {
         objCResponse = [[MCMediaPlaybackClusterPlaybackResponseParams
-            alloc] init];
+ alloc] init];
         // Set the ObjC response fields using the given cpp Response
         err = [objCResponse setObjCResponseFromCppResponse:cppResponse];
         VerifyOrReturnValue(err == CHIP_NO_ERROR, nil, ChipLogError(AppServer, "MCMediaPlaybackClusterFastForwardCommand getObjCResponseFromCpp() failed"));
@@ -1323,9 +1352,9 @@
     if (anyCppRequest.has_value()) {
         try {
             // Extract the object from std::any and convert it to a std::shared_ptr
-            auto & cppRequest = std::any_cast<chip::app::Clusters::MediaPlayback::Commands::SkipForward::Type &>(anyCppRequest);
+            auto& cppRequest = std::any_cast<chip::app::Clusters::MediaPlayback::Commands::SkipForward::Type&>(anyCppRequest);
             return std::any(std::make_shared<chip::app::Clusters::MediaPlayback::Commands::SkipForward::Type>(cppRequest));
-        } catch (const std::bad_any_cast & e) {
+        } catch (const std::bad_any_cast& e) {
             return nullptr;
         }
     }
@@ -1334,11 +1363,12 @@
 
 - (id)getObjCResponseFromCpp:(std::any)cppResponse
 {
-    MCMediaPlaybackClusterPlaybackResponseParams * objCResponse = nil;
+    MCMediaPlaybackClusterPlaybackResponseParams
+ * objCResponse = nil;
     CHIP_ERROR err = CHIP_NO_ERROR;
     if (cppResponse.type() == typeid(std::shared_ptr<const chip::app::Clusters::MediaPlayback::Commands::SkipForward::Type::ResponseType>)) {
         objCResponse = [[MCMediaPlaybackClusterPlaybackResponseParams
-            alloc] init];
+ alloc] init];
         // Set the ObjC response fields using the given cpp Response
         err = [objCResponse setObjCResponseFromCppResponse:cppResponse];
         VerifyOrReturnValue(err == CHIP_NO_ERROR, nil, ChipLogError(AppServer, "MCMediaPlaybackClusterSkipForwardCommand getObjCResponseFromCpp() failed"));
@@ -1375,9 +1405,9 @@
     if (anyCppRequest.has_value()) {
         try {
             // Extract the object from std::any and convert it to a std::shared_ptr
-            auto & cppRequest = std::any_cast<chip::app::Clusters::MediaPlayback::Commands::SkipBackward::Type &>(anyCppRequest);
+            auto& cppRequest = std::any_cast<chip::app::Clusters::MediaPlayback::Commands::SkipBackward::Type&>(anyCppRequest);
             return std::any(std::make_shared<chip::app::Clusters::MediaPlayback::Commands::SkipBackward::Type>(cppRequest));
-        } catch (const std::bad_any_cast & e) {
+        } catch (const std::bad_any_cast& e) {
             return nullptr;
         }
     }
@@ -1386,11 +1416,12 @@
 
 - (id)getObjCResponseFromCpp:(std::any)cppResponse
 {
-    MCMediaPlaybackClusterPlaybackResponseParams * objCResponse = nil;
+    MCMediaPlaybackClusterPlaybackResponseParams
+ * objCResponse = nil;
     CHIP_ERROR err = CHIP_NO_ERROR;
     if (cppResponse.type() == typeid(std::shared_ptr<const chip::app::Clusters::MediaPlayback::Commands::SkipBackward::Type::ResponseType>)) {
         objCResponse = [[MCMediaPlaybackClusterPlaybackResponseParams
-            alloc] init];
+ alloc] init];
         // Set the ObjC response fields using the given cpp Response
         err = [objCResponse setObjCResponseFromCppResponse:cppResponse];
         VerifyOrReturnValue(err == CHIP_NO_ERROR, nil, ChipLogError(AppServer, "MCMediaPlaybackClusterSkipBackwardCommand getObjCResponseFromCpp() failed"));
@@ -1427,9 +1458,9 @@
     if (anyCppRequest.has_value()) {
         try {
             // Extract the object from std::any and convert it to a std::shared_ptr
-            auto & cppRequest = std::any_cast<chip::app::Clusters::MediaPlayback::Commands::Seek::Type &>(anyCppRequest);
+            auto& cppRequest = std::any_cast<chip::app::Clusters::MediaPlayback::Commands::Seek::Type&>(anyCppRequest);
             return std::any(std::make_shared<chip::app::Clusters::MediaPlayback::Commands::Seek::Type>(cppRequest));
-        } catch (const std::bad_any_cast & e) {
+        } catch (const std::bad_any_cast& e) {
             return nullptr;
         }
     }
@@ -1438,11 +1469,12 @@
 
 - (id)getObjCResponseFromCpp:(std::any)cppResponse
 {
-    MCMediaPlaybackClusterPlaybackResponseParams * objCResponse = nil;
+    MCMediaPlaybackClusterPlaybackResponseParams
+ * objCResponse = nil;
     CHIP_ERROR err = CHIP_NO_ERROR;
     if (cppResponse.type() == typeid(std::shared_ptr<const chip::app::Clusters::MediaPlayback::Commands::Seek::Type::ResponseType>)) {
         objCResponse = [[MCMediaPlaybackClusterPlaybackResponseParams
-            alloc] init];
+ alloc] init];
         // Set the ObjC response fields using the given cpp Response
         err = [objCResponse setObjCResponseFromCppResponse:cppResponse];
         VerifyOrReturnValue(err == CHIP_NO_ERROR, nil, ChipLogError(AppServer, "MCMediaPlaybackClusterSeekCommand getObjCResponseFromCpp() failed"));
@@ -1479,9 +1511,9 @@
     if (anyCppRequest.has_value()) {
         try {
             // Extract the object from std::any and convert it to a std::shared_ptr
-            auto & cppRequest = std::any_cast<chip::app::Clusters::MediaPlayback::Commands::ActivateAudioTrack::Type &>(anyCppRequest);
+            auto& cppRequest = std::any_cast<chip::app::Clusters::MediaPlayback::Commands::ActivateAudioTrack::Type&>(anyCppRequest);
             return std::any(std::make_shared<chip::app::Clusters::MediaPlayback::Commands::ActivateAudioTrack::Type>(cppRequest));
-        } catch (const std::bad_any_cast & e) {
+        } catch (const std::bad_any_cast& e) {
             return nullptr;
         }
     }
@@ -1490,11 +1522,12 @@
 
 - (id)getObjCResponseFromCpp:(std::any)cppResponse
 {
-    MCNullObjectType * objCResponse = nil;
+    MCNullObjectType
+ * objCResponse = nil;
     CHIP_ERROR err = CHIP_NO_ERROR;
     if (cppResponse.type() == typeid(std::shared_ptr<const chip::app::Clusters::MediaPlayback::Commands::ActivateAudioTrack::Type::ResponseType>)) {
         objCResponse = [[MCNullObjectType
-            alloc] init];
+ alloc] init];
         // Set the ObjC response fields using the given cpp Response
         err = [objCResponse setObjCResponseFromCppResponse:cppResponse];
         VerifyOrReturnValue(err == CHIP_NO_ERROR, nil, ChipLogError(AppServer, "MCMediaPlaybackClusterActivateAudioTrackCommand getObjCResponseFromCpp() failed"));
@@ -1531,9 +1564,9 @@
     if (anyCppRequest.has_value()) {
         try {
             // Extract the object from std::any and convert it to a std::shared_ptr
-            auto & cppRequest = std::any_cast<chip::app::Clusters::MediaPlayback::Commands::ActivateTextTrack::Type &>(anyCppRequest);
+            auto& cppRequest = std::any_cast<chip::app::Clusters::MediaPlayback::Commands::ActivateTextTrack::Type&>(anyCppRequest);
             return std::any(std::make_shared<chip::app::Clusters::MediaPlayback::Commands::ActivateTextTrack::Type>(cppRequest));
-        } catch (const std::bad_any_cast & e) {
+        } catch (const std::bad_any_cast& e) {
             return nullptr;
         }
     }
@@ -1542,11 +1575,12 @@
 
 - (id)getObjCResponseFromCpp:(std::any)cppResponse
 {
-    MCNullObjectType * objCResponse = nil;
+    MCNullObjectType
+ * objCResponse = nil;
     CHIP_ERROR err = CHIP_NO_ERROR;
     if (cppResponse.type() == typeid(std::shared_ptr<const chip::app::Clusters::MediaPlayback::Commands::ActivateTextTrack::Type::ResponseType>)) {
         objCResponse = [[MCNullObjectType
-            alloc] init];
+ alloc] init];
         // Set the ObjC response fields using the given cpp Response
         err = [objCResponse setObjCResponseFromCppResponse:cppResponse];
         VerifyOrReturnValue(err == CHIP_NO_ERROR, nil, ChipLogError(AppServer, "MCMediaPlaybackClusterActivateTextTrackCommand getObjCResponseFromCpp() failed"));
@@ -1583,9 +1617,9 @@
     if (anyCppRequest.has_value()) {
         try {
             // Extract the object from std::any and convert it to a std::shared_ptr
-            auto & cppRequest = std::any_cast<chip::app::Clusters::MediaPlayback::Commands::DeactivateTextTrack::Type &>(anyCppRequest);
+            auto& cppRequest = std::any_cast<chip::app::Clusters::MediaPlayback::Commands::DeactivateTextTrack::Type&>(anyCppRequest);
             return std::any(std::make_shared<chip::app::Clusters::MediaPlayback::Commands::DeactivateTextTrack::Type>(cppRequest));
-        } catch (const std::bad_any_cast & e) {
+        } catch (const std::bad_any_cast& e) {
             return nullptr;
         }
     }
@@ -1594,11 +1628,12 @@
 
 - (id)getObjCResponseFromCpp:(std::any)cppResponse
 {
-    MCNullObjectType * objCResponse = nil;
+    MCNullObjectType
+ * objCResponse = nil;
     CHIP_ERROR err = CHIP_NO_ERROR;
     if (cppResponse.type() == typeid(std::shared_ptr<const chip::app::Clusters::MediaPlayback::Commands::DeactivateTextTrack::Type::ResponseType>)) {
         objCResponse = [[MCNullObjectType
-            alloc] init];
+ alloc] init];
         // Set the ObjC response fields using the given cpp Response
         err = [objCResponse setObjCResponseFromCppResponse:cppResponse];
         VerifyOrReturnValue(err == CHIP_NO_ERROR, nil, ChipLogError(AppServer, "MCMediaPlaybackClusterDeactivateTextTrackCommand getObjCResponseFromCpp() failed"));
@@ -1606,6 +1641,7 @@
     return objCResponse;
 }
 @end
+
 
 // KeypadInput cluster:
 
@@ -1637,9 +1673,9 @@
     if (anyCppRequest.has_value()) {
         try {
             // Extract the object from std::any and convert it to a std::shared_ptr
-            auto & cppRequest = std::any_cast<chip::app::Clusters::KeypadInput::Commands::SendKey::Type &>(anyCppRequest);
+            auto& cppRequest = std::any_cast<chip::app::Clusters::KeypadInput::Commands::SendKey::Type&>(anyCppRequest);
             return std::any(std::make_shared<chip::app::Clusters::KeypadInput::Commands::SendKey::Type>(cppRequest));
-        } catch (const std::bad_any_cast & e) {
+        } catch (const std::bad_any_cast& e) {
             return nullptr;
         }
     }
@@ -1648,11 +1684,12 @@
 
 - (id)getObjCResponseFromCpp:(std::any)cppResponse
 {
-    MCKeypadInputClusterSendKeyResponseParams * objCResponse = nil;
+    MCKeypadInputClusterSendKeyResponseParams
+ * objCResponse = nil;
     CHIP_ERROR err = CHIP_NO_ERROR;
     if (cppResponse.type() == typeid(std::shared_ptr<const chip::app::Clusters::KeypadInput::Commands::SendKey::Type::ResponseType>)) {
         objCResponse = [[MCKeypadInputClusterSendKeyResponseParams
-            alloc] init];
+ alloc] init];
         // Set the ObjC response fields using the given cpp Response
         err = [objCResponse setObjCResponseFromCppResponse:cppResponse];
         VerifyOrReturnValue(err == CHIP_NO_ERROR, nil, ChipLogError(AppServer, "MCKeypadInputClusterSendKeyCommand getObjCResponseFromCpp() failed"));
@@ -1660,6 +1697,7 @@
     return objCResponse;
 }
 @end
+
 
 // ContentLauncher cluster:
 
@@ -1691,9 +1729,9 @@
     if (anyCppRequest.has_value()) {
         try {
             // Extract the object from std::any and convert it to a std::shared_ptr
-            auto & cppRequest = std::any_cast<chip::app::Clusters::ContentLauncher::Commands::LaunchContent::Type &>(anyCppRequest);
+            auto& cppRequest = std::any_cast<chip::app::Clusters::ContentLauncher::Commands::LaunchContent::Type&>(anyCppRequest);
             return std::any(std::make_shared<chip::app::Clusters::ContentLauncher::Commands::LaunchContent::Type>(cppRequest));
-        } catch (const std::bad_any_cast & e) {
+        } catch (const std::bad_any_cast& e) {
             return nullptr;
         }
     }
@@ -1702,11 +1740,12 @@
 
 - (id)getObjCResponseFromCpp:(std::any)cppResponse
 {
-    MCContentLauncherClusterLauncherResponseParams * objCResponse = nil;
+    MCContentLauncherClusterLauncherResponseParams
+ * objCResponse = nil;
     CHIP_ERROR err = CHIP_NO_ERROR;
     if (cppResponse.type() == typeid(std::shared_ptr<const chip::app::Clusters::ContentLauncher::Commands::LaunchContent::Type::ResponseType>)) {
         objCResponse = [[MCContentLauncherClusterLauncherResponseParams
-            alloc] init];
+ alloc] init];
         // Set the ObjC response fields using the given cpp Response
         err = [objCResponse setObjCResponseFromCppResponse:cppResponse];
         VerifyOrReturnValue(err == CHIP_NO_ERROR, nil, ChipLogError(AppServer, "MCContentLauncherClusterLaunchContentCommand getObjCResponseFromCpp() failed"));
@@ -1743,9 +1782,9 @@
     if (anyCppRequest.has_value()) {
         try {
             // Extract the object from std::any and convert it to a std::shared_ptr
-            auto & cppRequest = std::any_cast<chip::app::Clusters::ContentLauncher::Commands::LaunchURL::Type &>(anyCppRequest);
+            auto& cppRequest = std::any_cast<chip::app::Clusters::ContentLauncher::Commands::LaunchURL::Type&>(anyCppRequest);
             return std::any(std::make_shared<chip::app::Clusters::ContentLauncher::Commands::LaunchURL::Type>(cppRequest));
-        } catch (const std::bad_any_cast & e) {
+        } catch (const std::bad_any_cast& e) {
             return nullptr;
         }
     }
@@ -1754,11 +1793,12 @@
 
 - (id)getObjCResponseFromCpp:(std::any)cppResponse
 {
-    MCContentLauncherClusterLauncherResponseParams * objCResponse = nil;
+    MCContentLauncherClusterLauncherResponseParams
+ * objCResponse = nil;
     CHIP_ERROR err = CHIP_NO_ERROR;
     if (cppResponse.type() == typeid(std::shared_ptr<const chip::app::Clusters::ContentLauncher::Commands::LaunchURL::Type::ResponseType>)) {
         objCResponse = [[MCContentLauncherClusterLauncherResponseParams
-            alloc] init];
+ alloc] init];
         // Set the ObjC response fields using the given cpp Response
         err = [objCResponse setObjCResponseFromCppResponse:cppResponse];
         VerifyOrReturnValue(err == CHIP_NO_ERROR, nil, ChipLogError(AppServer, "MCContentLauncherClusterLaunchURLCommand getObjCResponseFromCpp() failed"));
@@ -1766,6 +1806,7 @@
     return objCResponse;
 }
 @end
+
 
 // ApplicationLauncher cluster:
 
@@ -1797,9 +1838,9 @@
     if (anyCppRequest.has_value()) {
         try {
             // Extract the object from std::any and convert it to a std::shared_ptr
-            auto & cppRequest = std::any_cast<chip::app::Clusters::ApplicationLauncher::Commands::LaunchApp::Type &>(anyCppRequest);
+            auto& cppRequest = std::any_cast<chip::app::Clusters::ApplicationLauncher::Commands::LaunchApp::Type&>(anyCppRequest);
             return std::any(std::make_shared<chip::app::Clusters::ApplicationLauncher::Commands::LaunchApp::Type>(cppRequest));
-        } catch (const std::bad_any_cast & e) {
+        } catch (const std::bad_any_cast& e) {
             return nullptr;
         }
     }
@@ -1808,11 +1849,12 @@
 
 - (id)getObjCResponseFromCpp:(std::any)cppResponse
 {
-    MCApplicationLauncherClusterLauncherResponseParams * objCResponse = nil;
+    MCApplicationLauncherClusterLauncherResponseParams
+ * objCResponse = nil;
     CHIP_ERROR err = CHIP_NO_ERROR;
     if (cppResponse.type() == typeid(std::shared_ptr<const chip::app::Clusters::ApplicationLauncher::Commands::LaunchApp::Type::ResponseType>)) {
         objCResponse = [[MCApplicationLauncherClusterLauncherResponseParams
-            alloc] init];
+ alloc] init];
         // Set the ObjC response fields using the given cpp Response
         err = [objCResponse setObjCResponseFromCppResponse:cppResponse];
         VerifyOrReturnValue(err == CHIP_NO_ERROR, nil, ChipLogError(AppServer, "MCApplicationLauncherClusterLaunchAppCommand getObjCResponseFromCpp() failed"));
@@ -1849,9 +1891,9 @@
     if (anyCppRequest.has_value()) {
         try {
             // Extract the object from std::any and convert it to a std::shared_ptr
-            auto & cppRequest = std::any_cast<chip::app::Clusters::ApplicationLauncher::Commands::StopApp::Type &>(anyCppRequest);
+            auto& cppRequest = std::any_cast<chip::app::Clusters::ApplicationLauncher::Commands::StopApp::Type&>(anyCppRequest);
             return std::any(std::make_shared<chip::app::Clusters::ApplicationLauncher::Commands::StopApp::Type>(cppRequest));
-        } catch (const std::bad_any_cast & e) {
+        } catch (const std::bad_any_cast& e) {
             return nullptr;
         }
     }
@@ -1860,11 +1902,12 @@
 
 - (id)getObjCResponseFromCpp:(std::any)cppResponse
 {
-    MCApplicationLauncherClusterLauncherResponseParams * objCResponse = nil;
+    MCApplicationLauncherClusterLauncherResponseParams
+ * objCResponse = nil;
     CHIP_ERROR err = CHIP_NO_ERROR;
     if (cppResponse.type() == typeid(std::shared_ptr<const chip::app::Clusters::ApplicationLauncher::Commands::StopApp::Type::ResponseType>)) {
         objCResponse = [[MCApplicationLauncherClusterLauncherResponseParams
-            alloc] init];
+ alloc] init];
         // Set the ObjC response fields using the given cpp Response
         err = [objCResponse setObjCResponseFromCppResponse:cppResponse];
         VerifyOrReturnValue(err == CHIP_NO_ERROR, nil, ChipLogError(AppServer, "MCApplicationLauncherClusterStopAppCommand getObjCResponseFromCpp() failed"));
@@ -1901,9 +1944,9 @@
     if (anyCppRequest.has_value()) {
         try {
             // Extract the object from std::any and convert it to a std::shared_ptr
-            auto & cppRequest = std::any_cast<chip::app::Clusters::ApplicationLauncher::Commands::HideApp::Type &>(anyCppRequest);
+            auto& cppRequest = std::any_cast<chip::app::Clusters::ApplicationLauncher::Commands::HideApp::Type&>(anyCppRequest);
             return std::any(std::make_shared<chip::app::Clusters::ApplicationLauncher::Commands::HideApp::Type>(cppRequest));
-        } catch (const std::bad_any_cast & e) {
+        } catch (const std::bad_any_cast& e) {
             return nullptr;
         }
     }
@@ -1912,11 +1955,12 @@
 
 - (id)getObjCResponseFromCpp:(std::any)cppResponse
 {
-    MCApplicationLauncherClusterLauncherResponseParams * objCResponse = nil;
+    MCApplicationLauncherClusterLauncherResponseParams
+ * objCResponse = nil;
     CHIP_ERROR err = CHIP_NO_ERROR;
     if (cppResponse.type() == typeid(std::shared_ptr<const chip::app::Clusters::ApplicationLauncher::Commands::HideApp::Type::ResponseType>)) {
         objCResponse = [[MCApplicationLauncherClusterLauncherResponseParams
-            alloc] init];
+ alloc] init];
         // Set the ObjC response fields using the given cpp Response
         err = [objCResponse setObjCResponseFromCppResponse:cppResponse];
         VerifyOrReturnValue(err == CHIP_NO_ERROR, nil, ChipLogError(AppServer, "MCApplicationLauncherClusterHideAppCommand getObjCResponseFromCpp() failed"));
@@ -1925,4 +1969,6 @@
 }
 @end
 
+
 // ApplicationBasic cluster:
+
