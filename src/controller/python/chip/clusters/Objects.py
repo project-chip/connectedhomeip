@@ -42011,7 +42011,7 @@ class ThreadNetworkDirectory(Cluster):
     def descriptor(cls) -> ClusterObjectDescriptor:
         return ClusterObjectDescriptor(
             Fields=[
-                ClusterObjectFieldDescriptor(Label="preferredExtendedPanID", Tag=0x00000000, Type=typing.Union[Nullable, uint]),
+                ClusterObjectFieldDescriptor(Label="preferredExtendedPanID", Tag=0x00000000, Type=typing.Union[Nullable, bytes]),
                 ClusterObjectFieldDescriptor(Label="threadNetworks", Tag=0x00000001, Type=typing.List[ThreadNetworkDirectory.Structs.ThreadNetworkStruct]),
                 ClusterObjectFieldDescriptor(Label="threadNetworkTableSize", Tag=0x00000002, Type=uint),
                 ClusterObjectFieldDescriptor(Label="generatedCommandList", Tag=0x0000FFF8, Type=typing.List[uint]),
@@ -42022,7 +42022,7 @@ class ThreadNetworkDirectory(Cluster):
                 ClusterObjectFieldDescriptor(Label="clusterRevision", Tag=0x0000FFFD, Type=uint),
             ])
 
-    preferredExtendedPanID: 'typing.Union[Nullable, uint]' = None
+    preferredExtendedPanID: 'typing.Union[Nullable, bytes]' = None
     threadNetworks: 'typing.List[ThreadNetworkDirectory.Structs.ThreadNetworkStruct]' = None
     threadNetworkTableSize: 'uint' = None
     generatedCommandList: 'typing.List[uint]' = None
@@ -42039,14 +42039,16 @@ class ThreadNetworkDirectory(Cluster):
             def descriptor(cls) -> ClusterObjectDescriptor:
                 return ClusterObjectDescriptor(
                     Fields=[
-                        ClusterObjectFieldDescriptor(Label="extendedPanID", Tag=0, Type=uint),
+                        ClusterObjectFieldDescriptor(Label="extendedPanID", Tag=0, Type=bytes),
                         ClusterObjectFieldDescriptor(Label="networkName", Tag=1, Type=str),
                         ClusterObjectFieldDescriptor(Label="channel", Tag=2, Type=uint),
+                        ClusterObjectFieldDescriptor(Label="activeTimestamp", Tag=3, Type=uint),
                     ])
 
-            extendedPanID: 'uint' = 0
+            extendedPanID: 'bytes' = b""
             networkName: 'str' = ""
             channel: 'uint' = 0
+            activeTimestamp: 'uint' = 0
 
     class Commands:
         @dataclass
@@ -42080,14 +42082,14 @@ class ThreadNetworkDirectory(Cluster):
             def descriptor(cls) -> ClusterObjectDescriptor:
                 return ClusterObjectDescriptor(
                     Fields=[
-                        ClusterObjectFieldDescriptor(Label="extendedPanID", Tag=0, Type=uint),
+                        ClusterObjectFieldDescriptor(Label="extendedPanID", Tag=0, Type=bytes),
                     ])
 
             @ChipUtility.classproperty
             def must_use_timed_invoke(cls) -> bool:
                 return True
 
-            extendedPanID: 'uint' = 0
+            extendedPanID: 'bytes' = b""
 
         @dataclass
         class GetOperationalDataset(ClusterCommand):
@@ -42100,14 +42102,14 @@ class ThreadNetworkDirectory(Cluster):
             def descriptor(cls) -> ClusterObjectDescriptor:
                 return ClusterObjectDescriptor(
                     Fields=[
-                        ClusterObjectFieldDescriptor(Label="extendedPanID", Tag=0, Type=uint),
+                        ClusterObjectFieldDescriptor(Label="extendedPanID", Tag=0, Type=bytes),
                     ])
 
             @ChipUtility.classproperty
             def must_use_timed_invoke(cls) -> bool:
                 return True
 
-            extendedPanID: 'uint' = 0
+            extendedPanID: 'bytes' = b""
 
         @dataclass
         class OperationalDatasetResponse(ClusterCommand):
@@ -42138,9 +42140,9 @@ class ThreadNetworkDirectory(Cluster):
 
             @ChipUtility.classproperty
             def attribute_type(cls) -> ClusterObjectFieldDescriptor:
-                return ClusterObjectFieldDescriptor(Type=typing.Union[Nullable, uint])
+                return ClusterObjectFieldDescriptor(Type=typing.Union[Nullable, bytes])
 
-            value: 'typing.Union[Nullable, uint]' = NullValue
+            value: 'typing.Union[Nullable, bytes]' = NullValue
 
         @dataclass
         class ThreadNetworks(ClusterAttributeDescriptor):
@@ -42269,26 +42271,6 @@ class ThreadNetworkDirectory(Cluster):
                 return ClusterObjectFieldDescriptor(Type=uint)
 
             value: 'uint' = 0
-
-    class Events:
-        @dataclass
-        class NetworkChanged(ClusterEvent):
-            @ChipUtility.classproperty
-            def cluster_id(cls) -> int:
-                return 0x00000453
-
-            @ChipUtility.classproperty
-            def event_id(cls) -> int:
-                return 0x00000000
-
-            @ChipUtility.classproperty
-            def descriptor(cls) -> ClusterObjectDescriptor:
-                return ClusterObjectDescriptor(
-                    Fields=[
-                        ClusterObjectFieldDescriptor(Label="extendedPanID", Tag=0, Type=uint),
-                    ])
-
-            extendedPanID: 'uint' = 0
 
 
 @dataclass

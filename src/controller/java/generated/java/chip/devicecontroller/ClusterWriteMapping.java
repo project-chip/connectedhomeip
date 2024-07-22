@@ -3717,8 +3717,8 @@ public class ClusterWriteMapping {
     CommandParameterInfo threadNetworkDirectorypreferredExtendedPanIDCommandParameterInfo =
         new CommandParameterInfo(
             "value", 
-            Long.class, 
-            Long.class 
+            byte[].class, 
+            byte[].class 
         );
     writeThreadNetworkDirectoryPreferredExtendedPanIDCommandParams.put(
         "value",
@@ -3728,7 +3728,7 @@ public class ClusterWriteMapping {
       (cluster, callback, commandArguments) -> {
         ((ChipClusters.ThreadNetworkDirectoryCluster) cluster).writePreferredExtendedPanIDAttribute(
           (DefaultClusterCallback) callback,
-          (Long) commandArguments.get("value")
+          (byte[]) commandArguments.get("value")
         );
       },
       () -> new ClusterInfoMapping.DelegatedDefaultClusterCallback(),
