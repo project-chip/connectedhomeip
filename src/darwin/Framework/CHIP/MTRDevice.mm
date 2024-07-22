@@ -916,6 +916,9 @@ static NSString * const sLastInitialSubscribeLatencyKey = @"lastInitialSubscribe
         // the subscrption after this point.
         std::lock_guard lock(self->_lock);
         self->_currentReadClient = nullptr;
+        if (self->_currentSubscriptionCallback) {
+            delete self->_currentSubscriptionCallback;
+        }
         self->_currentSubscriptionCallback = nullptr;
 
         [self _changeInternalState:MTRInternalDeviceStateUnsubscribed];
@@ -2352,6 +2355,9 @@ static NSString * const sLastInitialSubscribeLatencyKey = @"lastInitialSubscribe
 
         std::lock_guard lock(self->_lock);
         self->_currentReadClient = nullptr;
+        if (self->_currentSubscriptionCallback) {
+            delete self->_currentSubscriptionCallback;
+        }
         self->_currentSubscriptionCallback = nullptr;
 
         [self _doHandleSubscriptionError:nil];
