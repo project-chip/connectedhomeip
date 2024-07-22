@@ -51,7 +51,8 @@ def evaluate_attribute_choice_conformance(endpoint_id: int, cluster_id: int, xml
 
     counts: dict[Choice, int] = {}
     for attribute_id in all_attributes:
-        conformance_decision_with_choice = xml_clusters[cluster_id].attributes[attribute_id].conformance(feature_map, attribute_list, all_command_list)
+        conformance_decision_with_choice = xml_clusters[cluster_id].attributes[attribute_id].conformance(
+            feature_map, attribute_list, all_command_list)
         _add_to_counts_if_required(conformance_decision_with_choice, attribute_id in attribute_list, counts)
 
     location = AttributePathLocation(endpoint_id=endpoint_id, cluster_id=cluster_id,
@@ -64,7 +65,8 @@ def evaluate_command_choice_conformance(endpoint_id: int, cluster_id: int, xml_c
 
     counts: dict[Choice, int] = {}
     for command_id in all_commands:
-        conformance_decision_with_choice = xml_clusters[cluster_id].accepted_commands[command_id].conformance(feature_map, attribute_list, all_command_list)
+        conformance_decision_with_choice = xml_clusters[cluster_id].accepted_commands[command_id].conformance(
+            feature_map, attribute_list, all_command_list)
         _add_to_counts_if_required(conformance_decision_with_choice, command_id in all_command_list, counts)
 
     location = AttributePathLocation(endpoint_id=endpoint_id, cluster_id=cluster_id,

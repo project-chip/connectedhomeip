@@ -190,9 +190,12 @@ class DeviceConformanceTests(BasicCompositionTests):
                 check_spec_conformance_for_commands(CommandType.ACCEPTED)
                 check_spec_conformance_for_commands(CommandType.GENERATED)
 
-                feature_choice_problems = evaluate_feature_choice_conformance(endpoint_id, cluster_id, self.xml_clusters, feature_map, attribute_list, all_command_list)
-                attribute_choice_problems = evaluate_attribute_choice_conformance(endpoint_id, cluster_id, self.xml_clusters, feature_map, attribute_list, all_command_list)
-                command_choice_problem = evaluate_command_choice_conformance(endpoint_id, cluster_id, self.xml_clusters, feature_map, attribute_list, all_command_list)
+                feature_choice_problems = evaluate_feature_choice_conformance(
+                    endpoint_id, cluster_id, self.xml_clusters, feature_map, attribute_list, all_command_list)
+                attribute_choice_problems = evaluate_attribute_choice_conformance(
+                    endpoint_id, cluster_id, self.xml_clusters, feature_map, attribute_list, all_command_list)
+                command_choice_problem = evaluate_command_choice_conformance(
+                    endpoint_id, cluster_id, self.xml_clusters, feature_map, attribute_list, all_command_list)
 
                 if feature_choice_problems or attribute_choice_problems or command_choice_problem:
                     success = False
