@@ -46,17 +46,21 @@ public:
 
     static System::LayerSocketsLoop & SystemLayer() { return static_cast<System::LayerSocketsLoop &>(DeviceLayer::SystemLayer()); }
 
+    // Schedules a call to the provided lambda and returns a cancel function.
     template <class Lambda>
-    static void Schedule(Timeout delay, Lambda lambda)
+    static std::function<void()> Schedule(Timeout delay, Lambda lambda)
     {
-        SystemLayer().StartTimer(
-            delay,
-            [](System::Layer * layer, void * ctx) {
-                auto * function = static_cast<std::function<void()> *>(ctx);
-                (*function)();
-                delete function;
-            },
-            new std::function<void()>(lambda));
+        System::TimerCompleteCallback callback = [](System::Layer * layer, void * ctx) {
+            auto * function = static_cast<std::function<void()> *>(ctx);
+            (*function)();
+            delete function;
+        };
+        auto * function = new std::function<void()>(lambda);
+        SystemLayer().StartTimer(delay, callback, function);
+        return [=] {
+            SystemLayer().CancelTimer(callback, function);
+            delete function;
+        };
     }
 
     template <class Lambda>
@@ -125,10 +129,12 @@ TEST_F(TestEventLoopHandler, EventLoopHandlerWake)
         }
     } loopHandler;
 
+    // Schedule a fallback timer to ensure the test stops
+    auto cancelFallback = Schedule(1000_ms, [] { DeviceLayer::PlatformMgr().StopEventLoopTask(); });
     SystemLayer().AddLoopHandler(loopHandler);
-    Schedule(1000_ms, [] { DeviceLayer::PlatformMgr().StopEventLoopTask(); });
     chip::DeviceLayer::PlatformMgr().RunEventLoop();
     SystemLayer().RemoveLoopHandler(loopHandler);
+    cancelFallback(); // avoid leaking the fallback timer
 
     Timestamp sleepDuration = loopHandler.wakeTimestamp - loopHandler.startTimestamp;
     EXPECT_GE(sleepDuration.count(), 400u); // loopHandler requested wake-up after 400ms
