@@ -90,8 +90,6 @@ CHIP_ERROR RetrieveClusterData(InteractionModel::DataModel * dataModel, const Ac
         // run for a short period until we switch over to either ember or DM completely).
 #if CONFIG_BUILD_FOR_HOST_UNIT_TEST
         chipDie();
-#else
-        return errDM;
 #endif
     }
 
@@ -115,8 +113,6 @@ CHIP_ERROR RetrieveClusterData(InteractionModel::DataModel * dataModel, const Ac
                      reportBuilder.GetWriter()->GetLengthWritten());
 #if CONFIG_BUILD_FOR_HOST_UNIT_TEST
         chipDie();
-#else
-        return errDM;
 #endif
     }
 
@@ -132,11 +128,16 @@ CHIP_ERROR RetrieveClusterData(InteractionModel::DataModel * dataModel, const Ac
             {
                 ChipLogError(Test, "Different partial data");
                 chipDie();
+#if CONFIG_BUILD_FOR_HOST_UNIT_TEST
+        chipDie();
+#endif
             }
             if (encoderState->CurrentEncodingListIndex() != stateDm.CurrentEncodingListIndex())
             {
                 ChipLogError(Test, "Different partial data");
-                chipDie();
+#if CONFIG_BUILD_FOR_HOST_UNIT_TEST
+        chipDie();
+#endif
             }
         }
     }
