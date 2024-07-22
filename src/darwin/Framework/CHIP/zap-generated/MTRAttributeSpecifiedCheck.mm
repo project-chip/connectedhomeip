@@ -1851,6 +1851,9 @@ static BOOL AttributeIsSpecifiedInICDManagementCluster(AttributeId aAttributeId)
     case Attributes::OperatingMode::Id: {
         return YES;
     }
+    case Attributes::MaximumCheckInBackOff::Id: {
+        return YES;
+    }
     case Attributes::GeneratedCommandList::Id: {
         return YES;
     }
