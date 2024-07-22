@@ -6456,24 +6456,6 @@ bool emberAfThreadBorderRouterManagementClusterSetPendingDatasetRequestCallback(
     chip::app::CommandHandler * commandObj, const chip::app::ConcreteCommandPath & commandPath,
     const chip::app::Clusters::ThreadBorderRouterManagement::Commands::SetPendingDatasetRequest::DecodableType & commandData);
 /**
- * @brief Thread Network Directory Cluster AddNetwork Command callback (from client)
- */
-bool emberAfThreadNetworkDirectoryClusterAddNetworkCallback(
-    chip::app::CommandHandler * commandObj, const chip::app::ConcreteCommandPath & commandPath,
-    const chip::app::Clusters::ThreadNetworkDirectory::Commands::AddNetwork::DecodableType & commandData);
-/**
- * @brief Thread Network Directory Cluster RemoveNetwork Command callback (from client)
- */
-bool emberAfThreadNetworkDirectoryClusterRemoveNetworkCallback(
-    chip::app::CommandHandler * commandObj, const chip::app::ConcreteCommandPath & commandPath,
-    const chip::app::Clusters::ThreadNetworkDirectory::Commands::RemoveNetwork::DecodableType & commandData);
-/**
- * @brief Thread Network Directory Cluster GetOperationalDataset Command callback (from client)
- */
-bool emberAfThreadNetworkDirectoryClusterGetOperationalDatasetCallback(
-    chip::app::CommandHandler * commandObj, const chip::app::ConcreteCommandPath & commandPath,
-    const chip::app::Clusters::ThreadNetworkDirectory::Commands::GetOperationalDataset::DecodableType & commandData);
-/**
  * @brief Channel Cluster ChangeChannel Command callback (from client)
  */
 bool emberAfChannelClusterChangeChannelCallback(

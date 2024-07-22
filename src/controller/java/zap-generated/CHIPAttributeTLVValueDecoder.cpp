@@ -38832,11 +38832,10 @@ jobject DecodeAttributeValue(const app::ConcreteAttributePath & aPath, TLV::TLVR
             }
             else
             {
-                std::string valueClassName     = "java/lang/Long";
-                std::string valueCtorSignature = "(J)V";
-                jlong jnivalue                 = static_cast<jlong>(cppValue.Value());
-                chip::JniReferences::GetInstance().CreateBoxedObject<jlong>(valueClassName.c_str(), valueCtorSignature.c_str(),
-                                                                            jnivalue, value);
+                jbyteArray valueByteArray = env->NewByteArray(static_cast<jsize>(cppValue.Value().size()));
+                env->SetByteArrayRegion(valueByteArray, 0, static_cast<jsize>(cppValue.Value().size()),
+                                        reinterpret_cast<const jbyte *>(cppValue.Value().data()));
+                value = valueByteArray;
             }
             return value;
         }
@@ -38857,12 +38856,11 @@ jobject DecodeAttributeValue(const app::ConcreteAttributePath & aPath, TLV::TLVR
                 auto & entry_0 = iter_value_0.GetValue();
                 jobject newElement_0;
                 jobject newElement_0_extendedPanID;
-                std::string newElement_0_extendedPanIDClassName     = "java/lang/Long";
-                std::string newElement_0_extendedPanIDCtorSignature = "(J)V";
-                jlong jninewElement_0_extendedPanID                 = static_cast<jlong>(entry_0.extendedPanID);
-                chip::JniReferences::GetInstance().CreateBoxedObject<jlong>(
-                    newElement_0_extendedPanIDClassName.c_str(), newElement_0_extendedPanIDCtorSignature.c_str(),
-                    jninewElement_0_extendedPanID, newElement_0_extendedPanID);
+                jbyteArray newElement_0_extendedPanIDByteArray =
+                    env->NewByteArray(static_cast<jsize>(entry_0.extendedPanID.size()));
+                env->SetByteArrayRegion(newElement_0_extendedPanIDByteArray, 0, static_cast<jsize>(entry_0.extendedPanID.size()),
+                                        reinterpret_cast<const jbyte *>(entry_0.extendedPanID.data()));
+                newElement_0_extendedPanID = newElement_0_extendedPanIDByteArray;
                 jobject newElement_0_networkName;
                 LogErrorOnFailure(
                     chip::JniReferences::GetInstance().CharToStringUTF(entry_0.networkName, newElement_0_networkName));
@@ -38873,6 +38871,13 @@ jobject DecodeAttributeValue(const app::ConcreteAttributePath & aPath, TLV::TLVR
                 chip::JniReferences::GetInstance().CreateBoxedObject<jint>(newElement_0_channelClassName.c_str(),
                                                                            newElement_0_channelCtorSignature.c_str(),
                                                                            jninewElement_0_channel, newElement_0_channel);
+                jobject newElement_0_activeTimestamp;
+                std::string newElement_0_activeTimestampClassName     = "java/lang/Long";
+                std::string newElement_0_activeTimestampCtorSignature = "(J)V";
+                jlong jninewElement_0_activeTimestamp                 = static_cast<jlong>(entry_0.activeTimestamp);
+                chip::JniReferences::GetInstance().CreateBoxedObject<jlong>(
+                    newElement_0_activeTimestampClassName.c_str(), newElement_0_activeTimestampCtorSignature.c_str(),
+                    jninewElement_0_activeTimestamp, newElement_0_activeTimestamp);
 
                 jclass threadNetworkStructStructClass_1;
                 err = chip::JniReferences::GetInstance().GetLocalClassRef(
@@ -38886,7 +38891,7 @@ jobject DecodeAttributeValue(const app::ConcreteAttributePath & aPath, TLV::TLVR
 
                 jmethodID threadNetworkStructStructCtor_1;
                 err = chip::JniReferences::GetInstance().FindMethod(env, threadNetworkStructStructClass_1, "<init>",
-                                                                    "(Ljava/lang/Long;Ljava/lang/String;Ljava/lang/Integer;)V",
+                                                                    "([BLjava/lang/String;Ljava/lang/Integer;Ljava/lang/Long;)V",
                                                                     &threadNetworkStructStructCtor_1);
                 if (err != CHIP_NO_ERROR || threadNetworkStructStructCtor_1 == nullptr)
                 {
@@ -38894,8 +38899,9 @@ jobject DecodeAttributeValue(const app::ConcreteAttributePath & aPath, TLV::TLVR
                     return nullptr;
                 }
 
-                newElement_0 = env->NewObject(threadNetworkStructStructClass_1, threadNetworkStructStructCtor_1,
-                                              newElement_0_extendedPanID, newElement_0_networkName, newElement_0_channel);
+                newElement_0 =
+                    env->NewObject(threadNetworkStructStructClass_1, threadNetworkStructStructCtor_1, newElement_0_extendedPanID,
+                                   newElement_0_networkName, newElement_0_channel, newElement_0_activeTimestamp);
                 chip::JniReferences::GetInstance().AddToList(value, newElement_0);
             }
             return value;

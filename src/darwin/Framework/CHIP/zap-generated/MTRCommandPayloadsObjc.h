@@ -8950,7 +8950,7 @@ MTR_PROVISIONALLY_AVAILABLE
 MTR_PROVISIONALLY_AVAILABLE
 @interface MTRThreadNetworkDirectoryClusterRemoveNetworkParams : NSObject <NSCopying>
 
-@property (nonatomic, copy) NSNumber * _Nonnull extendedPanID MTR_PROVISIONALLY_AVAILABLE;
+@property (nonatomic, copy) NSData * _Nonnull extendedPanID MTR_PROVISIONALLY_AVAILABLE;
 /**
  * Controls whether the command is a timed command (using Timed Invoke).
  *
@@ -8980,7 +8980,7 @@ MTR_PROVISIONALLY_AVAILABLE
 MTR_PROVISIONALLY_AVAILABLE
 @interface MTRThreadNetworkDirectoryClusterGetOperationalDatasetParams : NSObject <NSCopying>
 
-@property (nonatomic, copy) NSNumber * _Nonnull extendedPanID MTR_PROVISIONALLY_AVAILABLE;
+@property (nonatomic, copy) NSData * _Nonnull extendedPanID MTR_PROVISIONALLY_AVAILABLE;
 /**
  * Controls whether the command is a timed command (using Timed Invoke).
  *

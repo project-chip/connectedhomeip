@@ -4340,6 +4340,8 @@ CHIP_ERROR ComplexArgumentParser::Setup(const char * label,
         ComplexArgumentParser::EnsureMemberExist("ThreadNetworkStruct.networkName", "networkName", value.isMember("networkName")));
     ReturnErrorOnFailure(
         ComplexArgumentParser::EnsureMemberExist("ThreadNetworkStruct.channel", "channel", value.isMember("channel")));
+    ReturnErrorOnFailure(ComplexArgumentParser::EnsureMemberExist("ThreadNetworkStruct.activeTimestamp", "activeTimestamp",
+                                                                  value.isMember("activeTimestamp")));
 
     char labelWithMember[kMaxLabelLength];
     snprintf(labelWithMember, sizeof(labelWithMember), "%s.%s", label, "extendedPanID");
@@ -4354,6 +4356,10 @@ CHIP_ERROR ComplexArgumentParser::Setup(const char * label,
     ReturnErrorOnFailure(ComplexArgumentParser::Setup(labelWithMember, request.channel, value["channel"]));
     valueCopy.removeMember("channel");
 
+    snprintf(labelWithMember, sizeof(labelWithMember), "%s.%s", label, "activeTimestamp");
+    ReturnErrorOnFailure(ComplexArgumentParser::Setup(labelWithMember, request.activeTimestamp, value["activeTimestamp"]));
+    valueCopy.removeMember("activeTimestamp");
+
     return ComplexArgumentParser::EnsureNoMembersRemaining(label, valueCopy);
 }
 
@@ -4362,6 +4368,7 @@ void ComplexArgumentParser::Finalize(chip::app::Clusters::ThreadNetworkDirectory
     ComplexArgumentParser::Finalize(request.extendedPanID);
     ComplexArgumentParser::Finalize(request.networkName);
     ComplexArgumentParser::Finalize(request.channel);
+    ComplexArgumentParser::Finalize(request.activeTimestamp);
 }
 
 CHIP_ERROR ComplexArgumentParser::Setup(const char * label,
