@@ -74,6 +74,7 @@ static_library("controller") {
     "CommandSenderAllocator.h",
     "CommissioneeDeviceProxy.h",
     "CommissioningDelegate.h",
+    "CommissioningWindowParams.h",
     "DeviceDiscoveryDelegate.h",
     "DevicePairingDelegate.h",
     "InvokeInteraction.h",

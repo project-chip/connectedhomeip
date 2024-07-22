@@ -222,12 +222,15 @@ template("efr32_sdk") {
       "${efr32_sdk_root}/util/third_party/freertos/kernel/include",
       "${silabs_gen_folder}/config",
       "${silabs_gen_folder}/autogen",
+      "${sl_ot_platform_abstraction}/rtos",
+      "${efr32_sdk_root}/protocol/openthread/include",
+      "${efr32_sdk_root}/util/third_party/openthread/include",
+      "${efr32_sdk_root}/util/third_party/openthread/src/core",
+      "${efr32_sdk_root}/util/third_party/openthread/examples/platforms/",
+      "${sdk_support_root}/matter/efr32/${silabs_family}/${silabs_board}/config",
 
       # Headers needed for Init no function will be called if OT is not used
       "${sl_ot_efr32_root}",
-
-      # TODO this is for sl_openthread_features_config.h. should use generated one per board when sl_ot_abstraction is integrated
-      "${sl_ot_libs_path}/config",
     ]
 
     if (is_series_2) {
@@ -437,7 +440,6 @@ template("efr32_sdk") {
       "SL_OPENTHREAD_STACK_FEATURES_CONFIG_FILE=\"sl_openthread_features_config.h\"",
       "SL_CSL_TIMEOUT=${sl_ot_csl_timeout_sec}",
       "CIRCULAR_QUEUE_USE_LOCAL_CONFIG_HEADER=1",
-      "MATTER_INTEGRATION=1",
     ]
 
     if (silabs_log_enabled && chip_logging) {
@@ -472,6 +474,25 @@ template("efr32_sdk") {
         "RSI_LITTLE_ENDIAN=1",
         "SLI_SI91X_ENABLE_BLE=1",
         "SL_SI91X_ENABLE_LITTLE_ENDIAN=1",
+      ]
+    }
+
+    if (defined(invoker.chip_enable_openthread) &&
+        invoker.chip_enable_openthread) {
+      defines += [
+        "SL_OT_ENABLE=1",
+
+        #TODO: Remove these defines once sl_openthread_rtos_config is included in sl_ot_rtos_adaptation.c
+        "SL_OPENTHREAD_RTOS_STACK_TASK_PRIORITY=24",
+        "SL_OPENTHREAD_RTOS_APP_TASK_PRIORITY=23",
+        "SL_OPENTHREAD_RTOS_CLI_TASK_PRIORITY=16",
+        "SL_OPENTHREAD_STACK_TASK_MEM_SIZE=4608",
+        "SL_OPENTHREAD_APP_TASK_MEM_SIZE=4608",
+        "SL_OPENTHREAD_CLI_TASK_MEM_SIZE=2048",
+        "SL_OPENTHREAD_RTOS_CLI_TASK_PRIORITY=16",
+        "SL_OPENTHREAD_OS_CLI_TASK_SIZE=2048",
+        "SL_OPENTHREAD_ENABLE_APP_TASK=0",
+        "SL_OPENTHREAD_ENABLE_CLI_TASK=0",
       ]
     }
 
@@ -809,6 +830,15 @@ template("efr32_sdk") {
       ]
     }
 
+    if (defined(invoker.chip_enable_openthread) &&
+        invoker.chip_enable_openthread) {
+      sources += [
+        "${silabs_gen_folder}/autogen/sl_ot_custom_cli.c",
+        "${silabs_gen_folder}/autogen/sl_ot_init.c",
+        "${sl_ot_platform_abstraction}/rtos/sl_ot_rtos_adaptation.c",
+      ]
+    }
+
     if (use_wstk_buttons) {
       sources += [
         "${efr32_sdk_root}/platform/driver/button/src/sl_button.c",
@@ -886,6 +916,8 @@ template("efr32_sdk") {
       sources += [
         "${efr32_sdk_root}/hardware/driver/configuration_over_swo/src/sl_cos.c",
         "${efr32_sdk_root}/platform/driver/debug/src/sl_debug_swo.c",
+        "${efr32_sdk_root}/util/third_party/mbedtls/library/hmac_drbg.c",
+        "${efr32_sdk_root}/util/third_party/mbedtls/library/psa_crypto_ecp.c",
       ]
     }
 
@@ -947,7 +979,6 @@ template("efr32_sdk") {
         "${efr32_sdk_root}/platform/Device/SiliconLabs/MGM24/Source/startup_mgm24.c",
         "${efr32_sdk_root}/platform/Device/SiliconLabs/MGM24/Source/system_mgm24.c",
         "${efr32_sdk_root}/platform/radio/rail_lib/plugin/fem_util/sl_fem_util.c",
-        "${efr32_sdk_root}/platform/radio/rail_lib/plugin/rail_util_rssi/sl_rail_util_rssi.c",
         "${efr32_sdk_root}/platform/service/device_manager/clocks/sl_device_clock_efr32xg24.c",
         "${efr32_sdk_root}/platform/service/device_manager/devices/sl_device_peripheral_hal_efr32xg24.c",
       ]
@@ -963,6 +994,7 @@ template("efr32_sdk") {
     if (is_series_2) {
       sources += [
         "${efr32_sdk_root}/platform/radio/rail_lib/plugin/pa-conversions/pa_curves_efr32.c",
+        "${efr32_sdk_root}/platform/radio/rail_lib/plugin/rail_util_rssi/sl_rail_util_rssi.c",
         "${efr32_sdk_root}/platform/radio/rail_lib/plugin/rail_util_sequencer/sl_rail_util_sequencer.c",
         "${efr32_sdk_root}/platform/security/sl_component/se_manager/src/sl_se_manager.c",
         "${efr32_sdk_root}/platform/security/sl_component/se_manager/src/sl_se_manager_attestation.c",

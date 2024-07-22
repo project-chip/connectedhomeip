@@ -18,17 +18,17 @@
 
 #include <type_traits>
 
-#include "app/tests/test-interaction-model-api.h"
-#include "lib/support/CHIPMem.h"
 #include <access/examples/PermissiveAccessControlDelegate.h>
 #include <app/AttributeValueEncoder.h>
 #include <app/InteractionModelEngine.h>
 #include <app/InteractionModelHelper.h>
 #include <app/MessageDef/AttributeReportIBs.h>
 #include <app/MessageDef/EventDataIB.h>
+#include <app/codegen-data-model/Instance.h>
 #include <app/icd/server/ICDServerConfig.h>
 #include <app/reporting/tests/MockReportScheduler.h>
 #include <app/tests/AppTestContext.h>
+#include <app/tests/test-interaction-model-api.h>
 #include <app/util/basic-types.h>
 #include <app/util/mock/Constants.h>
 #include <app/util/mock/Functions.h>
@@ -39,6 +39,7 @@
 #include <lib/core/TLVDebug.h>
 #include <lib/core/TLVUtilities.h>
 #include <lib/support/CHIPCounter.h>
+#include <lib/support/CHIPMem.h>
 #include <lib/support/tests/ExtraPwTestMacros.h>
 #include <messaging/ExchangeContext.h>
 #include <messaging/Flags.h>
@@ -469,7 +470,8 @@ TEST_F_FROM_FIXTURE(TestReadInteraction, TestReadHandler)
 
     {
         Messaging::ExchangeContext * exchangeCtx = NewExchangeToAlice(nullptr, false);
-        ReadHandler readHandler(nullCallback, exchangeCtx, chip::app::ReadHandler::InteractionType::Read, gReportScheduler);
+        ReadHandler readHandler(nullCallback, exchangeCtx, chip::app::ReadHandler::InteractionType::Read, gReportScheduler,
+                                CodegenDataModelInstance());
 
         GenerateReportData(reportDatabuf, ReportType::kValid, false /* aSuppressResponse*/);
         EXPECT_EQ(readHandler.SendReportData(std::move(reportDatabuf), false), CHIP_ERROR_INCORRECT_STATE);
@@ -624,7 +626,8 @@ TEST_F_FROM_FIXTURE(TestReadInteraction, TestReadHandlerInvalidAttributePath)
 
     {
         Messaging::ExchangeContext * exchangeCtx = NewExchangeToAlice(nullptr, false);
-        ReadHandler readHandler(nullCallback, exchangeCtx, chip::app::ReadHandler::InteractionType::Read, gReportScheduler);
+        ReadHandler readHandler(nullCallback, exchangeCtx, chip::app::ReadHandler::InteractionType::Read, gReportScheduler,
+                                CodegenDataModelInstance());
 
         GenerateReportData(reportDatabuf, ReportType::kValid, false /* aSuppressResponse*/);
         EXPECT_EQ(readHandler.SendReportData(std::move(reportDatabuf), false), CHIP_ERROR_INCORRECT_STATE);
@@ -1349,7 +1352,8 @@ TEST_F_FROM_FIXTURE(TestReadInteraction, TestProcessSubscribeRequest)
     Messaging::ExchangeContext * exchangeCtx = NewExchangeToAlice(nullptr, false);
 
     {
-        ReadHandler readHandler(*engine, exchangeCtx, chip::app::ReadHandler::InteractionType::Read, gReportScheduler);
+        ReadHandler readHandler(*engine, exchangeCtx, chip::app::ReadHandler::InteractionType::Read, gReportScheduler,
+                                CodegenDataModelInstance());
 
         writer.Init(std::move(subscribeRequestbuf));
         EXPECT_EQ(subscribeRequestBuilder.Init(&writer), CHIP_NO_ERROR);
@@ -1408,7 +1412,8 @@ TEST_F_FROM_FIXTURE(TestReadInteraction, TestICDProcessSubscribeRequestSupMaxInt
     Messaging::ExchangeContext * exchangeCtx = NewExchangeToAlice(nullptr, false);
 
     {
-        ReadHandler readHandler(*engine, exchangeCtx, chip::app::ReadHandler::InteractionType::Read, gReportScheduler);
+        ReadHandler readHandler(*engine, exchangeCtx, chip::app::ReadHandler::InteractionType::Read, gReportScheduler,
+                                CodegenDataModelInstance());
 
         writer.Init(std::move(subscribeRequestbuf));
         EXPECT_EQ(subscribeRequestBuilder.Init(&writer), CHIP_NO_ERROR);
@@ -1474,7 +1479,8 @@ TEST_F_FROM_FIXTURE(TestReadInteraction, TestICDProcessSubscribeRequestInfMaxInt
     Messaging::ExchangeContext * exchangeCtx = NewExchangeToAlice(nullptr, false);
 
     {
-        ReadHandler readHandler(*engine, exchangeCtx, chip::app::ReadHandler::InteractionType::Read, gReportScheduler);
+        ReadHandler readHandler(*engine, exchangeCtx, chip::app::ReadHandler::InteractionType::Read, gReportScheduler,
+                                CodegenDataModelInstance());
 
         writer.Init(std::move(subscribeRequestbuf));
         EXPECT_EQ(subscribeRequestBuilder.Init(&writer), CHIP_NO_ERROR);
@@ -1540,7 +1546,8 @@ TEST_F_FROM_FIXTURE(TestReadInteraction, TestICDProcessSubscribeRequestSupMinInt
     Messaging::ExchangeContext * exchangeCtx = NewExchangeToAlice(nullptr, false);
 
     {
-        ReadHandler readHandler(*engine, exchangeCtx, chip::app::ReadHandler::InteractionType::Read, gReportScheduler);
+        ReadHandler readHandler(*engine, exchangeCtx, chip::app::ReadHandler::InteractionType::Read, gReportScheduler,
+                                CodegenDataModelInstance());
 
         writer.Init(std::move(subscribeRequestbuf));
         EXPECT_EQ(subscribeRequestBuilder.Init(&writer), CHIP_NO_ERROR);
@@ -1606,7 +1613,8 @@ TEST_F_FROM_FIXTURE(TestReadInteraction, TestICDProcessSubscribeRequestMaxMinInt
     Messaging::ExchangeContext * exchangeCtx = NewExchangeToAlice(nullptr, false);
 
     {
-        ReadHandler readHandler(*engine, exchangeCtx, chip::app::ReadHandler::InteractionType::Read, gReportScheduler);
+        ReadHandler readHandler(*engine, exchangeCtx, chip::app::ReadHandler::InteractionType::Read, gReportScheduler,
+                                CodegenDataModelInstance());
 
         writer.Init(std::move(subscribeRequestbuf));
         EXPECT_EQ(subscribeRequestBuilder.Init(&writer), CHIP_NO_ERROR);
@@ -1670,7 +1678,8 @@ TEST_F_FROM_FIXTURE(TestReadInteraction, TestICDProcessSubscribeRequestInvalidId
     Messaging::ExchangeContext * exchangeCtx = NewExchangeToAlice(nullptr, false);
 
     {
-        ReadHandler readHandler(*engine, exchangeCtx, chip::app::ReadHandler::InteractionType::Read, gReportScheduler);
+        ReadHandler readHandler(*engine, exchangeCtx, chip::app::ReadHandler::InteractionType::Read, gReportScheduler,
+                                CodegenDataModelInstance());
 
         writer.Init(std::move(subscribeRequestbuf));
         EXPECT_EQ(subscribeRequestBuilder.Init(&writer), CHIP_NO_ERROR);
