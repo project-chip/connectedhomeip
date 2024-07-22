@@ -22,7 +22,7 @@
 
 namespace chip {
 
-using FactoryProvider     = DeviceLayer::Silabs::Provision::Storage;
+using FactoryProvider = DeviceLayer::Silabs::Provision::Storage;
 
 CHIP_ERROR OTAFactoryDataProcessor::Init()
 {
@@ -69,7 +69,7 @@ CHIP_ERROR OTAFactoryDataProcessor::ProcessInternal(ByteSpan & block)
 
 CHIP_ERROR OTAFactoryDataProcessor::ApplyAction()
 {
-    CHIP_ERROR error           = CHIP_NO_ERROR;
+    CHIP_ERROR error = CHIP_NO_ERROR;
 
     SuccessOrExit(error = Update((uint8_t) FactoryTags::kDacKey, mPayload.mCertDacKey));
     SuccessOrExit(error = Update((uint8_t) FactoryTags::kDacCert, mPayload.mCertDac));
@@ -147,23 +147,21 @@ CHIP_ERROR OTAFactoryDataProcessor::Update(uint8_t tag, Optional<ByteSpan> & opt
 CHIP_ERROR OTAFactoryDataProcessor::UpdateValue(uint8_t tag, ByteSpan & newValue)
 {
     FactoryProvider factoryProvider;
-    switch(tag)
+    switch (tag)
     {
-        case (int) FactoryTags::kDacKey:
-            ChipLogProgress(SoftwareUpdate, "Set Device Attestation Key");
-            return factoryProvider.FactoryProvider::SetDeviceAttestationKey(newValue);
-        case (int) FactoryTags::kDacCert:
-            ChipLogProgress(SoftwareUpdate, "Set Device Attestation Cert");
-            return factoryProvider.FactoryProvider::SetDeviceAttestationCert(newValue);
-        case (int) FactoryTags::kPaiCert:
-            ChipLogProgress(SoftwareUpdate, "Set Product Attestionation Intermediate Cert");
-            return factoryProvider.FactoryProvider::SetProductAttestationIntermediateCert(newValue);
-        case (int) FactoryTags::kCdCert:
-            ChipLogProgress(SoftwareUpdate, "Set Certification Declaration");
-            return factoryProvider.FactoryProvider::SetCertificationDeclaration(newValue);
-
+    case (int) FactoryTags::kDacKey:
+        ChipLogProgress(SoftwareUpdate, "Set Device Attestation Key");
+        return factoryProvider.FactoryProvider::SetDeviceAttestationKey(newValue);
+    case (int) FactoryTags::kDacCert:
+        ChipLogProgress(SoftwareUpdate, "Set Device Attestation Cert");
+        return factoryProvider.FactoryProvider::SetDeviceAttestationCert(newValue);
+    case (int) FactoryTags::kPaiCert:
+        ChipLogProgress(SoftwareUpdate, "Set Product Attestionation Intermediate Cert");
+        return factoryProvider.FactoryProvider::SetProductAttestationIntermediateCert(newValue);
+    case (int) FactoryTags::kCdCert:
+        ChipLogProgress(SoftwareUpdate, "Set Certification Declaration");
+        return factoryProvider.FactoryProvider::SetCertificationDeclaration(newValue);
     }
-
 
     ChipLogError(DeviceLayer, "Failed to find tag %d.", tag);
     return CHIP_ERROR_NOT_FOUND;

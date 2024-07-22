@@ -17,8 +17,8 @@
  */
 
 #include <platform/internal/CHIPDeviceLayerInternal.h>
-#include <platform/silabs/multi-ota/OTAMultiImageProcessorImpl.h>
 #include <platform/silabs/multi-ota/OTACustomProcessor.h>
+#include <platform/silabs/multi-ota/OTAMultiImageProcessorImpl.h>
 
 #include <app/clusters/ota-requestor/OTARequestorInterface.h>
 

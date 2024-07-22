@@ -16,7 +16,6 @@
  */
 #include "AttestationKey.h"
 #include "ProvisionStorage.h"
-#include <platform/silabs/multi-ota/OtaTlvEncryptionKey.h>
 #include <credentials/examples/DeviceAttestationCredsExample.h>
 #include <lib/support/BytesToHex.h>
 #include <lib/support/CHIPMemString.h>
@@ -28,6 +27,7 @@
 #include <platform/CHIPDeviceConfig.h>
 #include <platform/silabs/MigrationManager.h>
 #include <platform/silabs/SilabsConfig.h>
+#include <platform/silabs/multi-ota/OtaTlvEncryptionKey.h>
 #include <silabs_creds.h>
 #ifdef SLI_SI91X_MCU_INTERFACE
 #include <sl_si91x_common_flash_intf.h>

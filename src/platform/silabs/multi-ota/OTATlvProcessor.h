@@ -66,7 +66,7 @@ struct OTATlvHeader
 enum class OTAProcessorTag
 {
     kApplicationProcessor = 1,
-    kBootloaderProcessor = 2 ,
+    kBootloaderProcessor  = 2,
     kFactoryDataProcessor = 3
 };
 

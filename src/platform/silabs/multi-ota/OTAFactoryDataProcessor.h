@@ -22,8 +22,8 @@
 #include <lib/support/ScopedBuffer.h>
 #include <lib/support/Span.h>
 #include <platform/silabs/multi-ota/OTATlvProcessor.h>
+#include <provision/ProvisionStorage.h>        // nogncheck
 #include <provision/ProvisionStorageGeneric.h> // nogncheck
-#include <provision/ProvisionStorage.h> // nogncheck
 
 namespace chip {
 
@@ -53,10 +53,10 @@ struct OTAFactoryPayload
 
 enum class FactoryTags
 {
-    kDacKey = 1,
-    kDacCert = 2 ,
+    kDacKey  = 1,
+    kDacCert = 2,
     kPaiCert = 3,
-    kCdCert = 4
+    kCdCert  = 4
 };
 
 class OTAFactoryDataProcessor : public OTATlvProcessor
@@ -66,7 +66,6 @@ public:
     CHIP_ERROR Clear() override;
     CHIP_ERROR ApplyAction() override;
     CHIP_ERROR FinalizeAction() override;
-
 
 private:
     CHIP_ERROR ProcessInternal(ByteSpan & block) override;
