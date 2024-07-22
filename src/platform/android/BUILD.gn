@@ -64,8 +64,6 @@ static_library("android") {
     "BleConnectCallback-JNI.cpp",
     "BlePlatformConfig.h",
     "CHIPDevicePlatformEvent.h",
-    "CHIPP256KeypairBridge.cpp",
-    "CHIPP256KeypairBridge.h",
     "CommissionableDataProviderImpl.cpp",
     "CommissionableDataProviderImpl.h",
     "ConfigurationManagerImpl.cpp",
