@@ -7213,11 +7213,13 @@ NS_ASSUME_NONNULL_BEGIN
 {
     if (self = [super init]) {
 
-        _extendedPanID = @(0);
+        _extendedPanID = [NSData data];
 
         _networkName = @"";
 
         _channel = @(0);
+
+        _activeTimestamp = @(0);
     }
     return self;
 }
@@ -7229,40 +7231,14 @@ NS_ASSUME_NONNULL_BEGIN
     other.extendedPanID = self.extendedPanID;
     other.networkName = self.networkName;
     other.channel = self.channel;
+    other.activeTimestamp = self.activeTimestamp;
 
     return other;
 }
 
 - (NSString *)description
 {
-    NSString * descriptionString = [NSString stringWithFormat:@"<%@: extendedPanID:%@; networkName:%@; channel:%@; >", NSStringFromClass([self class]), _extendedPanID, _networkName, _channel];
-    return descriptionString;
-}
-
-@end
-
-@implementation MTRThreadNetworkDirectoryClusterNetworkChangedEvent
-- (instancetype)init
-{
-    if (self = [super init]) {
-
-        _extendedPanID = @(0);
-    }
-    return self;
-}
-
-- (id)copyWithZone:(NSZone * _Nullable)zone
-{
-    auto other = [[MTRThreadNetworkDirectoryClusterNetworkChangedEvent alloc] init];
-
-    other.extendedPanID = self.extendedPanID;
-
-    return other;
-}
-
-- (NSString *)description
-{
-    NSString * descriptionString = [NSString stringWithFormat:@"<%@: extendedPanID:%@; >", NSStringFromClass([self class]), _extendedPanID];
+    NSString * descriptionString = [NSString stringWithFormat:@"<%@: extendedPanID:%@; networkName:%@; channel:%@; activeTimestamp:%@; >", NSStringFromClass([self class]), [_extendedPanID base64EncodedStringWithOptions:0], _networkName, _channel, _activeTimestamp];
     return descriptionString;
 }
 

@@ -211,6 +211,7 @@ if (wifi_soc != true) {  # CCP board
 
         include_dirs = [ "${sl_ot_platform_abstraction}/include" ]
       }
+      sources += [ "${sl_ot_platform_abstraction}/efr32/sleep.c" ]
 
       # Use silabs openthread library stack with or without coap api enabled
       COAP_API = ""

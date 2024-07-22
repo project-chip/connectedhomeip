@@ -393,6 +393,19 @@ constexpr inline const _T & max(const _T & a, const _T & b)
 #define SuccessOrExit(error) nlEXPECT(::chip::ChipError::IsSuccess((error)), exit)
 
 /**
+ *  @def SuccessOrExitAction(error, anAction)
+ *
+ *  @brief
+ *    This checks for the specified error, which is expected to
+ *    commonly be successful (CHIP_NO_ERROR), and both executes
+ *    @a anAction and branches to the local label 'exit' if the
+ *    status is unsuccessful.
+ *
+ *  @param[in]  error  A ChipError object to be evaluated against success (CHIP_NO_ERROR).
+ */
+#define SuccessOrExitAction(error, action) nlEXPECT_ACTION(::chip::ChipError::IsSuccess((error)), exit, action)
+
+/**
  *  @def VerifyOrExit(aCondition, anAction)
  *
  *  @brief

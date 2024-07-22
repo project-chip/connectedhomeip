@@ -44,10 +44,10 @@ from .Objects import (AccessControl, AccountLogin, Actions, ActivatedCarbonFilte
                       RefrigeratorAndTemperatureControlledCabinetMode, RelativeHumidityMeasurement, RvcCleanMode,
                       RvcOperationalState, RvcRunMode, ScenesManagement, SmokeCoAlarm, SoftwareDiagnostics, Switch, TargetNavigator,
                       TemperatureControl, TemperatureMeasurement, Thermostat, ThermostatUserInterfaceConfiguration,
-                      ThreadBorderRouterManagement, ThreadNetworkDiagnostics, TimeFormatLocalization, TimeSynchronization,
-                      TotalVolatileOrganicCompoundsConcentrationMeasurement, UnitLocalization, UnitTesting, UserLabel,
-                      ValveConfigurationAndControl, WakeOnLan, WaterHeaterManagement, WaterHeaterMode, WiFiNetworkDiagnostics,
-                      WindowCovering)
+                      ThreadBorderRouterManagement, ThreadNetworkDiagnostics, ThreadNetworkDirectory, TimeFormatLocalization,
+                      TimeSynchronization, TotalVolatileOrganicCompoundsConcentrationMeasurement, UnitLocalization, UnitTesting,
+                      UserLabel, ValveConfigurationAndControl, WakeOnLan, WaterHeaterManagement, WaterHeaterMode,
+                      WiFiNetworkDiagnostics, WindowCovering)
 
 __all__ = [Attribute, CHIPClusters, Command, AccessControl, AccountLogin, Actions, ActivatedCarbonFilterMonitoring, AdministratorCommissioning, AirQuality,
            ApplicationBasic, ApplicationLauncher, AudioOutput, BallastConfiguration, BarrierControl, BasicInformation,
@@ -68,6 +68,6 @@ __all__ = [Attribute, CHIPClusters, Command, AccessControl, AccountLogin, Action
            RefrigeratorAlarm, RefrigeratorAndTemperatureControlledCabinetMode, RelativeHumidityMeasurement, RvcCleanMode,
            RvcOperationalState, RvcRunMode, ScenesManagement, SmokeCoAlarm, SoftwareDiagnostics,
            Switch, TargetNavigator, TemperatureControl, TemperatureMeasurement, Thermostat, ThermostatUserInterfaceConfiguration,
-           ThreadBorderRouterManagement, ThreadNetworkDiagnostics, TimeFormatLocalization, TimeSynchronization,
+           ThreadBorderRouterManagement, ThreadNetworkDiagnostics, ThreadNetworkDirectory, TimeFormatLocalization, TimeSynchronization,
            TotalVolatileOrganicCompoundsConcentrationMeasurement, UnitLocalization,
            UnitTesting, UserLabel, ValveConfigurationAndControl, WakeOnLan, WaterHeaterManagement, WaterHeaterMode, WiFiNetworkDiagnostics, WindowCovering]
