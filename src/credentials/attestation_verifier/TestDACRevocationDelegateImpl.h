@@ -42,6 +42,7 @@ public:
 
     // Set the path to the device attestation revocation set JSON file.
     // revocation set can be generated using credentials/generate-revocation-set.py script
+    // This API returns CHIP_ERROR_INVALID_ARGUMENT if the path is null.
     CHIP_ERROR SetDeviceAttestationRevocationSetPath(const char * path);
 
 private:

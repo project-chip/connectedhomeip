@@ -260,8 +260,6 @@ protected:
     const size_t mNumCerts;
 };
 
-class DeviceAttestationRevocationDelegate;
-
 class DeviceAttestationVerifier
 {
 public:

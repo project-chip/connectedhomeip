@@ -59,6 +59,10 @@ CHIP_ERROR TestDACRevocationDelegateImpl::SetDeviceAttestationRevocationSetPath(
 //  }
 // ]
 //
+// "issuer_subject_key_id" -> Subject key identifier of the CRL file's issuer, encoded as a hex string
+// "issuer_name" -> Issuer field of the CRL file, encoded as a base64 string
+// "revoked_serial_numbers" -> Serial numbers of revoked certificates, encoded as hex strings
+//
 bool TestDACRevocationDelegateImpl::IsEntryInRevocationSet(const CharSpan & akidHexStr, const CharSpan & issuerNameBase64Str,
                                                            const CharSpan & serialNumberHexStr)
 {
