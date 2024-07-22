@@ -3073,6 +3073,71 @@ static const uint16_t kSubscriptionPoolBaseTimeoutInSeconds = 30;
     XCTAssertFalse([controller isRunning]);
 }
 
+- (void)testClearingClientDataStorageRemovesAllValuesAndIndexForNode
+{
+    __auto_type * factory = [MTRDeviceControllerFactory sharedInstance];
+    XCTAssertNotNil(factory);
+
+    __auto_type * rootKeys = [[MTRTestKeys alloc] init];
+    XCTAssertNotNil(rootKeys);
+
+    __auto_type * operationalKeys = [[MTRTestKeys alloc] init];
+    XCTAssertNotNil(operationalKeys);
+
+    __auto_type * storageDelegate = [[MTRTestPerControllerStorage alloc] initWithControllerID:[NSUUID UUID]];
+
+    NSNumber * testNodeID = @(0xcafe);
+    NSNumber * fabricID = @(0x1234);
+
+    NSString * testKeyA = @"testKeyAForAddAndRemove";
+    NSString * testValueA = @"testValueAForAddAndRemove";
+
+    NSString * testKeyB = @"testKeyBForAddAndRemove";
+    NSString * testValueB = @"testValueBForAddAndRemove";
+
+    NSError * error;
+    MTRDeviceController * controller = [self startControllerWithRootKeys:rootKeys
+                                                         operationalKeys:operationalKeys
+                                                                fabricID:fabricID
+                                                                  nodeID:testNodeID
+                                                                 storage:storageDelegate
+                                                                   error:&error];
+    XCTAssertNil(error);
+    XCTAssertNotNil(controller);
+    XCTAssertTrue([controller isRunning]);
+
+    XCTAssertEqualObjects(controller.controllerNodeID, testNodeID);
+
+    XCTAssertNotNil(controller.controllerDataStore);
+
+    id verifyEmptyData = [controller.controllerDataStore clientDataForNodeID:testNodeID key:testKeyA];
+    XCTAssertNil(verifyEmptyData);
+
+    // start actual test
+    
+    // store some data
+    [controller.controllerDataStore storeClientDataForKey:testKeyA value:testValueA forNodeID:testNodeID];
+    [controller.controllerDataStore storeClientDataForKey:testKeyB value:testValueB forNodeID:testNodeID];
+
+    // delete all data for test node
+    [controller.controllerDataStore clearStoredClientDataForNodeID:testNodeID];
+
+    // ensure data A and B are no longer present
+    id readbackDataAAfterDeletion = [controller.controllerDataStore clientDataForNodeID:testNodeID key:testKeyA];
+    XCTAssertNil(readbackDataAAfterDeletion);
+    id readbackDataBAfterDeletion = [controller.controllerDataStore clientDataForNodeID:testNodeID key:testKeyB];
+    XCTAssertNil(readbackDataBAfterDeletion);
+    
+    // ensure index is empty
+    NSArray<NSString *> * indexAfterDeletion = [controller.controllerDataStore storedClientDataKeysForNodeID:testNodeID];
+    XCTAssertEqual(0, indexAfterDeletion.count);
+
+    // end actual test
+
+    [controller shutdown];
+    XCTAssertFalse([controller isRunning]);
+}
+
 - (void)testClientDataStorageKeysAccessor
 {
     __auto_type * factory = [MTRDeviceControllerFactory sharedInstance];
@@ -3152,5 +3217,7 @@ static const uint16_t kSubscriptionPoolBaseTimeoutInSeconds = 30;
     [controller shutdown];
     XCTAssertFalse([controller isRunning]);
 }
+
+// TODO:  test clearing node when multiple node IDs have data stored
 
 @end
