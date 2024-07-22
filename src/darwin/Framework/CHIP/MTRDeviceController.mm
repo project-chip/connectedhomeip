@@ -255,7 +255,7 @@ using namespace chip::Tracing::DarwinFramework;
             return nil;
         }
 
-        // Provide a way to test different subscription pool sizes without code/ change
+        // Provide a way to test different subscription pool sizes without code change
         NSUserDefaults * defaults = [NSUserDefaults standardUserDefaults];
         if ([defaults objectForKey:kDefaultSubscriptionPoolSizeOverrideKey]) {
             NSInteger subscriptionPoolSizeOverride = [defaults integerForKey:kDefaultSubscriptionPoolSizeOverrideKey];

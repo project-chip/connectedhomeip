@@ -908,6 +908,8 @@ static NSString * const sLastInitialSubscribeLatencyKey = @"lastInitialSubscribe
     _reattemptingSubscription = NO;
 
     [_deviceController asyncDispatchToMatterQueue:^{
+        MTR_LOG("%@ invalidate disconnecting ReadClient and SubscriptionCallback", self);
+
         // Destroy the read client and callback (has to happen on the Matter
         // queue, to avoid deleting objects that are being referenced), to
         // tear down the subscription.  We will get no more callbacks from
@@ -940,6 +942,7 @@ static NSString * const sLastInitialSubscribeLatencyKey = @"lastInitialSubscribe
 // whether it might be.
 - (void)_triggerResubscribeWithReason:(NSString *)reason nodeLikelyReachable:(BOOL)nodeLikelyReachable
 {
+    MTR_LOG("%@ _triggerResubscribeWithReason called with reason %@", self, reason);
     assertChipStackLockedByCurrentThread();
 
     // We might want to trigger a resubscribe on our existing ReadClient.  Do
@@ -1483,7 +1486,7 @@ static NSString * const sLastInitialSubscribeLatencyKey = @"lastInitialSubscribe
         return;
     }
 
-    MTR_LOG("%@ reattempting subscription", self);
+    MTR_LOG("%@ reattempting subscription with reason %@", self, reason);
     self.reattemptingSubscription = NO;
     [self _setupSubscriptionWithReason:reason];
 }
@@ -2345,6 +2348,8 @@ static NSString * const sLastInitialSubscribeLatencyKey = @"lastInitialSubscribe
     MTR_LOG_ERROR("%@ %@ - resetting subscription", self, reasonString);
 
     [_deviceController asyncDispatchToMatterQueue:^{
+        MTR_LOG("%@ subscription reset disconnecting ReadClient and SubscriptionCallback", self);
+
         std::lock_guard lock(self->_lock);
         self->_currentReadClient = nullptr;
         self->_currentSubscriptionCallback = nullptr;
@@ -2370,7 +2375,7 @@ static NSString * const sLastInitialSubscribeLatencyKey = @"lastInitialSubscribe
     os_unfair_lock_assert_owner(&self->_lock);
 
     if (![self _subscriptionsAllowed]) {
-        MTR_LOG("%@ _setupSubscription: Subscriptions not allowed. Do not set up subscription", self);
+        MTR_LOG("%@ _setupSubscription: Subscriptions not allowed. Do not set up subscription (reason: %@)", self, reason);
         return;
     }
 
@@ -2389,6 +2394,7 @@ static NSString * const sLastInitialSubscribeLatencyKey = @"lastInitialSubscribe
 
     // for now just subscribe once
     if (!NeedToStartSubscriptionSetup(_internalDeviceState)) {
+        MTR_LOG("%@ setupSubscription: no need to subscribe due to internal state %lu (reason: %@)", self, static_cast<unsigned long>(_internalDeviceState), reason);
         return;
     }
 
