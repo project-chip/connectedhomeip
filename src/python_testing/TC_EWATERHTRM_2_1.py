@@ -28,7 +28,6 @@
 # === END CI TEST ARGUMENTS ===
 
 import logging
-from time import sleep
 
 import chip.clusters as Clusters
 from matter_testing_support import MatterBaseTest, TestStep, async_test_body, default_matter_test_main, type_matches
@@ -41,8 +40,6 @@ class TC_EWATERHTRM_2_1(MatterBaseTest):
     def __init__(self, *args):
         super().__init__(*args)
         self.endpoint = 0
-        self.mode_ok = 0
-        self.mode_fail = 0
 
     def steps_TC_EWATERHTRM_2_1(self) -> list[TestStep]:
         steps = [
@@ -79,15 +76,17 @@ class TC_EWATERHTRM_2_1(MatterBaseTest):
     @async_test_body
     async def test_TC_EWATERHTRM_2_1(self):
 
-        ModeOff    = 0
+        # Valid modes. Only ModeManual referred to in this test
+        # ModeOff    = 0
         ModeManual = 1
-        ModeTimed  = 2
+        # ModeTimed  = 2
 
         self.endpoint = self.matter_test_config.endpoint
 
         attributes = Clusters.WaterHeaterMode.Attributes
 
         self.step(1)
+        # Commission DUT - already done
 
         self.step(2)
 
