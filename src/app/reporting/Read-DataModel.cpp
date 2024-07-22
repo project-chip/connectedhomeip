@@ -78,13 +78,15 @@ CHIP_ERROR RetrieveClusterData(InteractionModel::DataModel * dataModel, const Ac
         return CHIP_NO_ERROR;
     }
 
-    if (IsOutOfSpaceError(err) || err == CHIP_IM_GLOBAL_STATUS(InvalidDataType))
+    // Only update state when relevant. This is to match previous ember layer. The logic there
+    // is "when using attribute access interface, which can handle lists, save the state".
+    //
+    // The use of encoderState is to be able to resume/chunk lists, so it is only relevant
+    // when out of space. As such, logic here is to forward encoder state when the data
+    // is useful up the chain (i.e. out of space errors).
+    if ((encoderState != nullptr) && IsOutOfSpaceError(err))
     {
-        // Only update state for retryable errors. This matches logic in legacy ember compatibility layer
-        if (encoderState != nullptr)
-        {
-            *encoderState = attributeValueEncoder.GetState();
-        }
+        *encoderState = attributeValueEncoder.GetState();
     }
 
     // Out of space errors may be chunked data, reporting those cases would be very confusing
