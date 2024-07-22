@@ -1515,8 +1515,7 @@ CHIP_ERROR EnergyEvseDelegate::SetNextChargeRequiredEnergy(DataModel::Nullable<i
     }
     else
     {
-        ChipLogDetail(AppServer, "NextChargeRequiredEnergy updated to %ld",
-                      static_cast<long>(mNextChargeRequiredEnergy.Value()));
+        ChipLogDetail(AppServer, "NextChargeRequiredEnergy updated to %ld", static_cast<long>(mNextChargeRequiredEnergy.Value()));
     }
 
     MatterReportingAttributeChangeCallback(mEndpointId, EnergyEvse::Id, NextChargeRequiredEnergy::Id);

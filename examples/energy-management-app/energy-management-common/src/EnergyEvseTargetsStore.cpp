@@ -164,10 +164,10 @@ CHIP_ERROR EvseTargetsDelegate::LoadTargets()
 
             ReturnErrorOnFailure(reader.ExitContainer(chargingTargetsStructType));
 
-            ChipLogProgress(
-                AppServer, "LoadingTargets: targetTimeMinutesPastMidnight %u targetSoC %u addedEnergy 0x" ChipLogFormatX64,
-                chargingTarget.targetTimeMinutesPastMidnight,
-                chargingTarget.targetSoC.ValueOr(0), ChipLogValueX64(chargingTarget.addedEnergy.ValueOr(0)));
+            ChipLogProgress(AppServer,
+                            "LoadingTargets: targetTimeMinutesPastMidnight %u targetSoC %u addedEnergy 0x" ChipLogFormatX64,
+                            chargingTarget.targetTimeMinutesPastMidnight, chargingTarget.targetSoC.ValueOr(0),
+                            ChipLogValueX64(chargingTarget.addedEnergy.ValueOr(0)));
 
             // Update mChargingTargets which is tracking the chargingTargets
             mChargingTargets.AddChargingTarget(chargingTarget);
@@ -262,7 +262,8 @@ CHIP_ERROR EvseTargetsDelegate::SetTargets(
     {
         auto & newChargingTargetSchedule = newIter.GetValue();
 
-        uint8_t newBitmask = newChargingTargetSchedule.dayOfWeekForSequence.GetField(static_cast<TargetDayOfWeekBitmap>(kAllTargetDaysMask));
+        uint8_t newBitmask =
+            newChargingTargetSchedule.dayOfWeekForSequence.GetField(static_cast<TargetDayOfWeekBitmap>(kAllTargetDaysMask));
 
         ChipLogProgress(AppServer, "SetTargets: DayOfWeekForSequence = 0x%02x", newBitmask);
 
@@ -389,8 +390,9 @@ EvseTargetsDelegate::SaveTargets(DataModel::List<const Structs::ChargingTargetSc
     ReturnErrorOnFailure(writer.StartContainer(TLV::AnonymousTag(), TLV::kTLVType_Array, arrayType));
     for (auto & chargingTargetSchedule : chargingTargetSchedulesList)
     {
-        ChipLogProgress(AppServer, "SaveTargets: DayOfWeekForSequence = 0x%02x",
-                        chargingTargetSchedule.dayOfWeekForSequence.GetField(static_cast<TargetDayOfWeekBitmap>(kAllTargetDaysMask)));
+        ChipLogProgress(
+            AppServer, "SaveTargets: DayOfWeekForSequence = 0x%02x",
+            chargingTargetSchedule.dayOfWeekForSequence.GetField(static_cast<TargetDayOfWeekBitmap>(kAllTargetDaysMask)));
 
         TLV::TLVType evseTargetEntryType;
         ReturnErrorOnFailure(writer.StartContainer(TLV::AnonymousTag(), TLV::kTLVType_Structure, evseTargetEntryType));
