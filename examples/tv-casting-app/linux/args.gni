@@ -37,4 +37,3 @@ enable_rtti = true
 matter_enable_tracing_support = true
 matter_log_json_payload_hex = true
 matter_log_json_payload_decode_full = true
-

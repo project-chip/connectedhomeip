@@ -266,6 +266,7 @@ def run_test_sequence_steps(
 
         current_index += 1
 
+
 def cmd_execute_list(app_path):
     """Returns the list suitable to pass to a ProcessManager for execution."""
     cmd = []
@@ -282,8 +283,6 @@ def cmd_execute_list(app_path):
     cmd.append("json:log")
 
     return cmd
-
-
 
 
 @click.command()
