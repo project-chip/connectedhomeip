@@ -47,10 +47,7 @@ public:
 
     // Clear the path to the device attestation revocation set JSON file.
     // This can be used to skip the revocation check
-    void ClearDeviceAttestationRevocationSetPath()
-    {
-        mDeviceAttestationRevocationSetPath = nullptr;
-    }
+    void ClearDeviceAttestationRevocationSetPath() { mDeviceAttestationRevocationSetPath = nullptr; }
 
 private:
     CHIP_ERROR GetAKIDHexStr(const ByteSpan & certDer, MutableCharSpan & outAKIDHexStr);
