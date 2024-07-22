@@ -65,7 +65,7 @@ struct OTATlvHeader
 // TLV tags synced with ota files generate by scripts/tools/silabs/ota/ota_image_tool.py
 enum class OTAProcessorTag
 {
-    kApplicationProcessor = 1, 
+    kApplicationProcessor = 1,
     kBootloaderProcessor = 2 ,
     kFactoryDataProcessor = 3
 };

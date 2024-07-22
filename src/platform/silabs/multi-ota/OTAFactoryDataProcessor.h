@@ -53,7 +53,7 @@ struct OTAFactoryPayload
 
 enum class FactoryTags
 {
-    kDacKey = 1, 
+    kDacKey = 1,
     kDacCert = 2 ,
     kPaiCert = 3,
     kCdCert = 4

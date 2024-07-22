@@ -42,7 +42,7 @@ CHIP_ERROR OtaTlvEncryptionKey::Import(const uint8_t * key, size_t key_len)
     psa_set_key_algorithm(&attributes, PSA_ALG_CTR);
     psa_set_key_usage_flags(
         &attributes, PSA_KEY_USAGE_DECRYPT);
-    
+
     status = psa_import_key(&attributes, key, key_len, &key_id);
     if (status != PSA_SUCCESS) {
         printf("Failed to import a key error:%ld\n", status);
@@ -74,7 +74,7 @@ CHIP_ERROR OtaTlvEncryptionKey::Decrypt(MutableByteSpan & block, uint32_t &mIVOf
     iv[12] = (uint8_t) ((u32IVCount >> 24) & 0xff);
     iv[13] = (uint8_t) ((u32IVCount >> 16) & 0xff);
     iv[14] = (uint8_t) ((u32IVCount >> 8) & 0xff);
-    iv[15] = (uint8_t) (u32IVCount & 0xff);   
+    iv[15] = (uint8_t) (u32IVCount & 0xff);
 
     while (Offset + 16 <= block.size())
     {
@@ -88,8 +88,8 @@ CHIP_ERROR OtaTlvEncryptionKey::Decrypt(MutableByteSpan & block, uint32_t &mIVOf
         if (status != PSA_SUCCESS) {
             printf("Failed to set IV error:%ld\n", status);
             return CHIP_ERROR_INTERNAL;
-        } 
-    
+        }
+
         status = psa_cipher_update(&operation, static_cast<uint8_t *>(&block[Offset]), 16,
                                    output, sizeof(output), &output_len);
         if (status != PSA_SUCCESS) {
@@ -115,9 +115,9 @@ CHIP_ERROR OtaTlvEncryptionKey::Decrypt(MutableByteSpan & block, uint32_t &mIVOf
         printf("Failed to finish cipher operation\n");
         return CHIP_ERROR_INTERNAL;
         }
-    
+
     }
-    
+
     printf("Decrypted ciphertext\n");
 
     psa_cipher_abort(&operation);

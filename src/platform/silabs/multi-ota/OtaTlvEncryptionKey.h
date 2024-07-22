@@ -26,7 +26,7 @@ public:
 
 protected:
     uint32_t mId = 0;
-    
+
 };
 
 } // namespace Provision

@@ -161,7 +161,7 @@ CHIP_ERROR OTAFactoryDataProcessor::UpdateValue(uint8_t tag, ByteSpan & newValue
         case (int) FactoryTags::kCdCert:
             ChipLogProgress(SoftwareUpdate, "Set Certification Declaration");
             return factoryProvider.FactoryProvider::SetCertificationDeclaration(newValue);
- 
+
     }
 
 
