@@ -42,7 +42,7 @@ CommandHandlerInterfaceOnlyClusters:
     - Electrical Power Measurement
     - Electrical Energy Measurement
     - Wi-Fi Network Management
-    - Water Heater Management
+    - Thread Network Directory
     - Water Heater Mode
 
 # We need a more configurable way of deciding which clusters have which init functions....
@@ -61,7 +61,6 @@ ClustersWithInitFunctions:
     - Mode Select
     - Sample MEI
     - Scenes Management
-    - Wi-Fi Network Management
 
 ClustersWithAttributeChangedFunctions:
     - Bridged Device Basic
