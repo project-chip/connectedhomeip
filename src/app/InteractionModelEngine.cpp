@@ -41,6 +41,10 @@
 #include <lib/support/CodeUtils.h>
 #include <lib/support/FibonacciUtils.h>
 
+#if CHIP_CONFIG_USE_DATA_MODEL_INTERFACE
+#include <app/codegen-data-model/Instance.h>
+#endif
+
 namespace chip {
 namespace app {
 
@@ -482,7 +486,7 @@ CHIP_ERROR InteractionModelEngine::ParseAttributePaths(const Access::SubjectDesc
 
         if (paramsList.mValue.IsWildcardPath())
         {
-            AttributePathExpandIterator pathIterator(&paramsList);
+            AttributePathExpandIterator pathIterator(GetDataModel(), &paramsList);
             ConcreteAttributePath readPath;
 
             // The definition of "valid path" is "path exists and ACL allows access". The "path exists" part is handled by
@@ -845,7 +849,8 @@ Protocols::InteractionModel::Status InteractionModelEngine::OnReadInitialRequest
 
     // We have already reserved enough resources for read requests, and have granted enough resources for current subscriptions, so
     // we should be able to allocate resources requested by this request.
-    ReadHandler * handler = mReadHandlers.CreateObject(*this, apExchangeContext, aInteractionType, mReportScheduler);
+    ReadHandler * handler =
+        mReadHandlers.CreateObject(*this, apExchangeContext, aInteractionType, mReportScheduler, GetDataModel());
     if (handler == nullptr)
     {
         ChipLogProgress(InteractionModel, "no resource for %s interaction",
@@ -1786,6 +1791,15 @@ CommandHandlerInterface * InteractionModelEngine::FindCommandHandler(EndpointId 
     }
 
     return nullptr;
+}
+
+InteractionModel::DataModel * InteractionModelEngine::GetDataModel() const
+{
+#if CHIP_CONFIG_USE_DATA_MODEL_INTERFACE
+    // TODO: this should be temporary, we should fully inject the data model
+    VerifyOrReturnValue(mDataModel != nullptr, CodegenDataModelInstance());
+#endif
+    return mDataModel;
 }
 
 void InteractionModelEngine::OnTimedInteractionFailed(TimedHandler * apTimedHandler)

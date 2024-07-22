@@ -288,7 +288,7 @@ deprecated cluster OnOffSwitchConfiguration = 7 {
 
 /** Attributes and commands for controlling devices that can be set to a level between fully 'On' and fully 'Off.' */
 cluster LevelControl = 8 {
-  revision 5;
+  revision 6;
 
   enum MoveModeEnum : enum8 {
     kUp = 0;
@@ -5491,7 +5491,7 @@ cluster ThermostatUserInterfaceConfiguration = 516 {
 
 /** Attributes and commands for controlling the color properties of a color-capable light. */
 cluster ColorControl = 768 {
-  revision 6;
+  revision 7;
 
   enum ColorLoopAction : enum8 {
     kDeactivate = 0;
@@ -7897,7 +7897,7 @@ endpoint 1 {
     ram      attribute defaultMoveRate default = 50;
     persist  attribute startUpCurrentLevel default = 255;
     ram      attribute featureMap default = 3;
-    ram      attribute clusterRevision default = 5;
+    ram      attribute clusterRevision default = 6;
 
     handle command MoveToLevel;
     handle command Move;
@@ -8526,6 +8526,8 @@ endpoint 1 {
   server cluster EnergyEvseMode {
     callback attribute supportedModes;
     callback attribute currentMode;
+    ram      attribute startUpMode;
+    ram      attribute onMode;
     callback attribute generatedCommandList;
     callback attribute acceptedCommandList;
     callback attribute eventList;
@@ -8556,6 +8558,8 @@ endpoint 1 {
   server cluster DeviceEnergyManagementMode {
     callback attribute supportedModes;
     callback attribute currentMode;
+    ram      attribute startUpMode;
+    ram      attribute onMode;
     callback attribute generatedCommandList;
     callback attribute acceptedCommandList;
     callback attribute eventList;
@@ -8764,7 +8768,7 @@ endpoint 1 {
     ram      attribute coupleColorTempToLevelMinMireds;
     persist  attribute startUpColorTemperatureMireds;
     ram      attribute featureMap default = 0x1F;
-    ram      attribute clusterRevision default = 6;
+    ram      attribute clusterRevision default = 7;
 
     handle command MoveToHue;
     handle command MoveHue;
