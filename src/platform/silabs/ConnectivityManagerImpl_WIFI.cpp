@@ -431,8 +431,12 @@ void ConnectivityManagerImpl::UpdateInternetConnectivityState(void)
         {
             sl_wfx_mac_address_t macaddr;
             wfx_get_wifi_mac_addr(SL_WFX_STA_INTERFACE, &macaddr);
-            mEndpointQueueFilter.SetMacAddr(ByteSpan(macaddr.octet));
-            chip::Inet::UDPEndPointImpl::SetQueueFilter(&mEndpointQueueFilter);
+            if (mEndpointQueueFilter.SetHostName(ByteSpan(macaddr.octet)) == CHIP_NO_ERROR)
+            {
+                chip::Inet::UDPEndPointImpl::SetQueueFilter(&mEndpointQueueFilter);
+            } else {
+                ChipLogError(DeviceLayer, "Failed to set host name filter");
+            } 
         }
 #endif // CHIP_CONFIG_ENABLE_ICD_SERVER
 
