@@ -1241,7 +1241,7 @@ static inline void emitMetricForSetupPayload(MTRSetupPayload * payload)
         return NO;
     }
 
-    MTR_LOG_ERROR("%@ Error(%" CHIP_ERROR_FORMAT "): %@", self, errorCode.Format(), logMsg);
+    MTR_LOG_ERROR("Error(%" CHIP_ERROR_FORMAT "): %@ %@", errorCode.Format(), self, logMsg);
 
     return YES;
 }
@@ -1252,7 +1252,7 @@ static inline void emitMetricForSetupPayload(MTRSetupPayload * payload)
         return NO;
     }
 
-    MTR_LOG_ERROR("%@ Error(%" CHIP_ERROR_FORMAT "): %s", self, errorCode.Format(), [logMsg UTF8String]);
+    MTR_LOG_ERROR("Error(%" CHIP_ERROR_FORMAT "): %@ %s", errorCode.Format(), self, [logMsg UTF8String]);
     if (error) {
         *error = [MTRError errorForCHIPErrorCode:errorCode];
     }
