@@ -2675,7 +2675,6 @@ endpoint 1 {
   device type ma_colordimmerswitch = 261, version 1;
 
   binding cluster Identify;
-  binding cluster Groups;
   binding cluster OnOff;
   binding cluster LevelControl;
   binding cluster ScenesManagement;
@@ -2693,6 +2692,27 @@ endpoint 1 {
 
     handle command Identify;
     handle command TriggerEffect;
+  }
+
+  server cluster Groups {
+    ram attribute nameSupport;
+    callback attribute generatedCommandList;
+    callback attribute acceptedCommandList;
+    callback attribute eventList;
+    callback attribute attributeList;
+    ram attribute featureMap default = 0;
+    ram attribute clusterRevision default = 4;
+
+    handle command AddGroup;
+    handle command AddGroupResponse;
+    handle command ViewGroup;
+    handle command ViewGroupResponse;
+    handle command GetGroupMembership;
+    handle command GetGroupMembershipResponse;
+    handle command RemoveGroup;
+    handle command RemoveGroupResponse;
+    handle command RemoveAllGroups;
+    handle command AddGroupIfIdentifying;
   }
 
   server cluster Descriptor {

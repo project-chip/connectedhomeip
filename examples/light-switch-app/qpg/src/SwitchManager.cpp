@@ -48,6 +48,7 @@ void SwitchManager::ToggleHandler(AppEvent * aEvent)
     data->localEndpointId = SWITCH_ENDPOINT_ID;
     data->clusterId       = chip::app::Clusters::OnOff::Id;
     data->commandId       = chip::app::Clusters::OnOff::Commands::Toggle::Id;
+    data->isGroup         = true;
 
     DeviceLayer::PlatformMgr().ScheduleWork(SwitchWorkerFunction, reinterpret_cast<intptr_t>(data));
 }
