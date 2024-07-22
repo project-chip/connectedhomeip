@@ -273,6 +273,10 @@ CHIP_ERROR EvseTargetsDelegate::SetTargets(
         // the dayOfWeekForSequenceBitmap
         bool found                                 = false;
         uint16_t updatedChargingTargetSchedulesIdx = 0;
+
+        // Let the updatedChargingTargets object of the schedule index
+        updatedChargingTargets.PrepareDaySchedule(updatedChargingTargetSchedulesIdx);
+
         for (auto & currentChargingTargetSchedule : mChargingTargetSchedulesList)
         {
             uint8_t currentBitmask =
@@ -281,9 +285,6 @@ CHIP_ERROR EvseTargetsDelegate::SetTargets(
             ChipLogProgress(AppServer, "SetTargets: Scanning current entry %d of %d: bitmap 0x%02x",
                             updatedChargingTargetSchedulesIdx, static_cast<unsigned int>(mChargingTargetSchedulesList.size()),
                             currentBitmask);
-
-            // Let the updatedChargingTargets object of the schedule index
-            updatedChargingTargets.PrepareDaySchedule(updatedChargingTargetSchedulesIdx);
 
             // Work out if the new schedule dayOfWeekSequence overlaps with any existing schedules
             uint8_t bitmaskA = static_cast<uint8_t>(currentBitmask & newBitmask);
@@ -329,9 +330,12 @@ CHIP_ERROR EvseTargetsDelegate::SetTargets(
 
             // Going to look at the next schedule entry
             updatedChargingTargetSchedulesIdx++;
+
+            // Let the updatedChargingTargets object of the schedule index
+            updatedChargingTargets.PrepareDaySchedule(updatedChargingTargetSchedulesIdx);
         }
 
-        // If found is false, then there were no existing entries for  the dayOfWeekForSequence. Add a new entry
+        // If found is false, then there were no existing entries for the dayOfWeekForSequence. Add a new entry
         if (!found)
         {
             // Copy the new chargingTargets
@@ -352,6 +356,9 @@ CHIP_ERROR EvseTargetsDelegate::SetTargets(
 
             // We've added a new schedule entry
             updatedChargingTargetSchedulesIdx++;
+
+            // Let the updatedChargingTargets object of the schedule index
+            updatedChargingTargets.PrepareDaySchedule(updatedChargingTargetSchedulesIdx);
         }
 
         // Now create the full Target data structure that we are going to save to persistent storage
