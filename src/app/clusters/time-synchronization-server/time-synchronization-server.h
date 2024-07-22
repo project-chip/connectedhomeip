@@ -124,8 +124,9 @@ public:
     void OnAttributeData(const ConcreteDataAttributePath & aPath, TLV::TLVReader * apData, const StatusIB & aStatus) override;
     void OnDone(ReadClient * apReadClient) override;
 
-    CHIP_ERROR AttemptToGetTimeFromTrustedNode();
 #endif
+
+    CHIP_ERROR AttemptToGetTimeFromTrustedNode();
 
     // Platform event handler functions
     void OnPlatformEventFn(const DeviceLayer::ChipDeviceEvent & event);

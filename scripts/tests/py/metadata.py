@@ -14,10 +14,16 @@
 # limitations under the License.
 
 import re
+import sys
 from dataclasses import dataclass
 from typing import Any, Dict, List
 
 import yaml
+
+
+def bool_from_str(value: str) -> bool:
+    """Convert True/true/False/false strings to bool."""
+    return value.strip().lower() == "true"
 
 
 @dataclass
@@ -58,16 +64,59 @@ class Metadata:
             self.py_script_path = attr_dict["py_script_path"]
 
         if "factoryreset" in attr_dict:
-            self.factoryreset = bool(attr_dict["factoryreset"])
+            self.factoryreset = bool_from_str(attr_dict["factoryreset"])
 
         if "factoryreset_app_only" in attr_dict:
-            self.factoryreset_app_only = bool(attr_dict["factoryreset_app_only"])
+            self.factoryreset_app_only = bool_from_str(attr_dict["factoryreset_app_only"])
 
         if "script_gdb" in attr_dict:
-            self.script_gdb = bool(attr_dict["script_gdb"])
+            self.script_gdb = bool_from_str(attr_dict["script_gdb"])
 
         if "quiet" in attr_dict:
-            self.quiet = bool(attr_dict["quiet"])
+            self.quiet = bool_from_str(attr_dict["quiet"])
+
+
+def extract_runs_arg_lines(py_script_path: str) -> Dict[str, Dict[str, str]]:
+    """Extract the run arguments from the CI test arguments blocks."""
+
+    found_ci_args_section = False
+    done_ci_args_section = False
+
+    runs_def_ptrn = re.compile(r'^\s*#\s*test-runner-runs:\s*(?P<run_id>.*)$')
+    arg_def_ptrn = re.compile(
+        r'^\s*#\s*test-runner-run/(?P<run_id>[a-zA-Z0-9_]+)/(?P<arg_name>[a-zA-Z0-9_\-]+):\s*(?P<arg_val>.*)$')
+
+    runs_arg_lines: Dict[str, Dict[str, str]] = {}
+
+    with open(py_script_path, 'r', encoding='utf8') as py_script:
+        for line_idx, line in enumerate(py_script.readlines()):
+            line = line.strip()
+            line_num = line_idx + 1
+
+            # Detect the single CI args section, to skip the lines otherwise.
+            if not done_ci_args_section and line.startswith("# === BEGIN CI TEST ARGUMENTS ==="):
+                found_ci_args_section = True
+            elif found_ci_args_section and line.startswith("# === END CI TEST ARGUMENTS ==="):
+                done_ci_args_section = True
+                found_ci_args_section = False
+
+            runs_match = runs_def_ptrn.match(line)
+            args_match = arg_def_ptrn.match(line)
+
+            if not found_ci_args_section and (runs_match or args_match):
+                print(f"WARNING: {py_script_path}:{line_num}: Found CI args outside of CI TEST ARGUMENTS block!", file=sys.stderr)
+                continue
+
+            if runs_match:
+                for run in runs_match.group("run_id").strip().split():
+                    runs_arg_lines[run] = {}
+                    runs_arg_lines[run]['run'] = run
+                    runs_arg_lines[run]['py_script_path'] = py_script_path
+
+            elif args_match:
+                runs_arg_lines[args_match.group("run_id")][args_match.group("arg_name")] = args_match.group("arg_val")
+
+    return runs_arg_lines
 
 
 class MetadataReader:
@@ -126,33 +175,15 @@ class MetadataReader:
          the run arguments associated with a particular run defined in
          the script file.
         """
-
-        runs_def_ptrn = re.compile(r'^\s*#\s*test-runner-runs:\s*(.*)$')
-        arg_def_ptrn = re.compile(r'^\s*#\s*test-runner-run/([a-zA-Z0-9_]+)/([a-zA-Z0-9_\-]+):\s*(.*)$')
-
-        runs_arg_lines: Dict[str, Dict[str, str]] = {}
         runs_metadata: List[Metadata] = []
-
-        with open(py_script_path, 'r', encoding='utf8') as py_script:
-            for line in py_script.readlines():
-                runs_match = runs_def_ptrn.match(line.strip())
-                args_match = arg_def_ptrn.match(line.strip())
-
-                if runs_match:
-                    for run in runs_match.group(1).strip().split():
-                        runs_arg_lines[run] = {}
-                        runs_arg_lines[run]['run'] = run
-                        runs_arg_lines[run]['py_script_path'] = py_script_path
-
-                elif args_match:
-                    runs_arg_lines[args_match.group(1)][args_match.group(2)] = args_match.group(3)
+        runs_arg_lines = extract_runs_arg_lines(py_script_path)
 
         for run, attr in runs_arg_lines.items():
             self.__resolve_env_vals__(attr)
 
             metadata = Metadata(
                 py_script_path=attr.get("py_script_path", ""),
-                run=attr.get("run", ""),
+                run=run,
                 app=attr.get("app", ""),
                 app_args=attr.get("app_args", ""),
                 script_args=attr.get("script_args", ""),

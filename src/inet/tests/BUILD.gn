@@ -71,6 +71,7 @@ if (chip_build_tests) {
       ":helpers",
       "${chip_root}/src/inet",
       "${chip_root}/src/lib/core",
+      "${chip_root}/src/lib/core:string-builder-adapters",
     ]
     test_sources = [
       "TestBasicPacketFilters.cpp",

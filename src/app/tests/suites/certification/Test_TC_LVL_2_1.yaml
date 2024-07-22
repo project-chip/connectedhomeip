@@ -215,7 +215,7 @@ tests:
       response:
           constraints:
               type: int8u
-              minValue: 0
+              minValue: 1
               maxValue: 255
 
     - label: "Step 13: TH reads the Options attribute from the DUT"

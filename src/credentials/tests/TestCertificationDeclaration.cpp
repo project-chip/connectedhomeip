@@ -25,13 +25,14 @@
 #include <inttypes.h>
 #include <stddef.h>
 
+#include <pw_unit_test/framework.h>
+
 #include <credentials/CHIPCert.h>
 #include <credentials/CertificationDeclaration.h>
 #include <credentials/attestation_verifier/DefaultDeviceAttestationVerifier.h>
 #include <crypto/CHIPCryptoPAL.h>
+#include <lib/core/StringBuilderAdapters.h>
 #include <lib/support/Span.h>
-
-#include <gtest/gtest.h>
 
 using namespace chip;
 using namespace chip::ASN1;

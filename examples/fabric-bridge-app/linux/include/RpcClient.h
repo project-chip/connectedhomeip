@@ -18,6 +18,7 @@
 
 #pragma once
 
+#include <controller/CommissioningWindowParams.h>
 #include <platform/CHIPDeviceLayer.h>
 
 constexpr uint16_t kFabricAdminServerPort = 33001;
@@ -33,12 +34,25 @@ constexpr uint16_t kFabricAdminServerPort = 33001;
 CHIP_ERROR InitRpcClient(uint16_t rpcServerPort);
 
 /**
- * Opens a commissioning window for a specified node.
+ * Opens a commissioning window for a specified node using setup PIN (passcode).
  *
- * @param nodeId The identifier of the node for which the commissioning window should be opened.
+ * @param params    Params for opening the commissioning window using passcode.
+ * @return CHIP_ERROR An error code indicating the success or failure of the operation.
+ * - CHIP_NO_ERROR: The RPC command was successfully processed.
+ * - CHIP_ERROR_BUSY: Another commissioning window is currently in progress.
+ * - CHIP_ERROR_INTERNAL: An internal error occurred.
+ */
+CHIP_ERROR
+OpenCommissioningWindow(chip::Controller::CommissioningWindowPasscodeParams params);
+
+/**
+ * Opens a commissioning window for a specified node using pre-computed PAKE passcode verifier.
+ *
+ * @param params    Params for opening the commissioning window using verifier.
  * @return CHIP_ERROR An error code indicating the success or failure of the operation.
  * - CHIP_NO_ERROR: The RPC command was successfully sent.
  * - CHIP_ERROR_BUSY: Another commissioning window is currently in progress.
  * - CHIP_ERROR_INTERNAL: An internal error occurred.
  */
-CHIP_ERROR OpenCommissioningWindow(chip::NodeId nodeId);
+CHIP_ERROR
+OpenCommissioningWindow(chip::Controller::CommissioningWindowVerifierParams params);

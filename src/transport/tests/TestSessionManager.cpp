@@ -21,6 +21,10 @@
  *      This file implements unit tests for the SessionManager implementation.
  */
 
+#include <errno.h>
+
+#include <pw_unit_test/framework.h>
+
 #define CHIP_ENABLE_TEST_ENCRYPTED_BUFFER_API // Up here in case some other header
                                               // includes SessionManager.h indirectly
 
@@ -29,6 +33,7 @@
 #include <crypto/DefaultSessionKeystore.h>
 #include <crypto/PersistentStorageOperationalKeystore.h>
 #include <lib/core/CHIPCore.h>
+#include <lib/core/StringBuilderAdapters.h>
 #include <lib/support/CodeUtils.h>
 #include <lib/support/TestPersistentStorageDelegate.h>
 #include <protocols/Protocols.h>
@@ -38,10 +43,6 @@
 #include <transport/SessionManager.h>
 #include <transport/TransportMgr.h>
 #include <transport/tests/LoopbackTransportManager.h>
-
-#include <gtest/gtest.h>
-
-#include <errno.h>
 
 #undef CHIP_ENABLE_TEST_ENCRYPTED_BUFFER_API
 

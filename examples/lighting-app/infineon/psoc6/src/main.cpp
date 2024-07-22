@@ -56,7 +56,7 @@ static void main_task(void * pvParameters);
 //=================================================================================
 void appError(int err)
 {
-    P6_LOG("!!!!!!!!!!!! App Critical Error: %d !!!!!!!!!!!", err);
+    PSOC6_LOG("!!!!!!!!!!!! App Critical Error: %d !!!!!!!!!!!", err);
     portDISABLE_INTERRUPTS();
     while (true)
         ;
@@ -89,35 +89,35 @@ static void main_task(void * pvParameters)
     CHIP_ERROR ret = chip::DeviceLayer::PersistedStorage::KeyValueStoreMgrImpl().Init();
     if (ret != CHIP_NO_ERROR)
     {
-        P6_LOG("PersistedStorage::KeyValueStoreMgrImpl().Init() failed");
+        PSOC6_LOG("PersistedStorage::KeyValueStoreMgrImpl().Init() failed");
         appError(ret);
     }
 
     ret = PlatformMgr().InitChipStack();
     if (ret != CHIP_NO_ERROR)
     {
-        P6_LOG("PlatformMgr().InitChipStack() failed");
+        PSOC6_LOG("PlatformMgr().InitChipStack() failed");
         appError(ret);
     }
 
-    ret = chip::DeviceLayer::ConnectivityMgr().SetBLEDeviceName("P6_LIGHT");
+    ret = chip::DeviceLayer::ConnectivityMgr().SetBLEDeviceName("PSOC6_LIGHT");
     if (ret != CHIP_NO_ERROR)
     {
-        P6_LOG("ConnectivityMgr().SetBLEDeviceName() failed");
+        PSOC6_LOG("ConnectivityMgr().SetBLEDeviceName() failed");
         appError(ret);
     }
 
-    P6_LOG("Starting Platform Manager Event Loop");
+    PSOC6_LOG("Starting Platform Manager Event Loop");
     ret = PlatformMgr().StartEventLoopTask();
     if (ret != CHIP_NO_ERROR)
     {
-        P6_LOG("PlatformMgr().StartEventLoopTask() failed");
+        PSOC6_LOG("PlatformMgr().StartEventLoopTask() failed");
         appError(ret);
     }
     ret = GetAppTask().StartAppTask();
     if (ret != CHIP_NO_ERROR)
     {
-        P6_LOG("GetAppTask().Init() failed");
+        PSOC6_LOG("GetAppTask().Init() failed");
         appError(ret);
     }
 
@@ -130,7 +130,7 @@ static void main_task(void * pvParameters)
 // ================================================================================
 int main(void)
 {
-    init_p6Platform();
+    init_psoc6Platform();
 #if CHIP_DEVICE_CONFIG_ENABLE_OTA_REQUESTOR
     // Clear watchdog timer (started by bootloader) so that it doesn't trigger a reset
     cyhal_wdt_t wdt_obj;
@@ -141,9 +141,9 @@ int main(void)
     MemMonitoring::startHeapMonitoring();
 #endif
 
-    P6_LOG("==================================================\r\n");
-    P6_LOG("chip-p6-lighting-example starting Version %d\r\n", CHIP_DEVICE_CONFIG_DEVICE_SOFTWARE_VERSION);
-    P6_LOG("==================================================\r\n");
+    PSOC6_LOG("==================================================\r\n");
+    PSOC6_LOG("chip-psoc6-lighting-example starting Version %d\r\n", CHIP_DEVICE_CONFIG_DEVICE_SOFTWARE_VERSION);
+    PSOC6_LOG("==================================================\r\n");
 
     /* Start the FreeRTOS scheduler */
     vTaskStartScheduler();
@@ -153,5 +153,5 @@ int main(void)
     PlatformMgr().Shutdown();
 
     // Should never get here.
-    P6_LOG("vTaskStartScheduler() failed");
+    PSOC6_LOG("vTaskStartScheduler() failed");
 }
