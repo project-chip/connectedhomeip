@@ -61,7 +61,7 @@ void UnregisterMatchingAttributeAccessInterfaces(F shouldUnregister, AttributeAc
 namespace chip {
 namespace app {
 
-AttributeAccessInterfaceRegistry & Instance()
+AttributeAccessInterfaceRegistry & AttributeAccessInterfaceRegistry::Instance()
 {
     static AttributeAccessInterfaceRegistry instance;
     return instance;
