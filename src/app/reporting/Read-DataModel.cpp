@@ -72,6 +72,11 @@ CHIP_ERROR RetrieveClusterData(InteractionModel::DataModel * dataModel, const Ac
     if (err == CHIP_NO_ERROR)
     {
 #if !CHIP_CONFIG_USE_EMBER_DATA_MODEL
+        // TODO: this callback being only executed on success is awkward. The Write callback is always done
+        //       for both read and write.
+        //
+        //       For now this preserves existing/previous code logic, however we should consider to ALWAYS
+        //       call this.
         DataModelCallbacks::GetInstance()->AttributeOperation(DataModelCallbacks::OperationType::Read,
                                                               DataModelCallbacks::OperationOrder::Post, path);
 #endif // !CHIP_CONFIG_USE_EMBER_DATA_MODEL
