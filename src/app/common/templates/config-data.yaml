@@ -59,7 +59,6 @@ ClustersWithInitFunctions:
     - Mode Select
     - Sample MEI
     - Scenes Management
-    - Wi-Fi Network Management
 
 ClustersWithAttributeChangedFunctions:
     - Bridged Device Basic

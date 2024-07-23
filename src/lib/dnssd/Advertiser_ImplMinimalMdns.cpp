@@ -278,10 +278,10 @@ private:
             }
         }
 
-        if (const auto & tcpSupported = params.GetTcpSupported(); tcpSupported.has_value())
+        if (params.GetTCPSupportModes() != TCPModeAdvertise::kNone)
         {
-            size_t writtenCharactersNumber =
-                static_cast<size_t>(snprintf(storage.tcpSupportedBuf, sizeof(storage.tcpSupportedBuf), "T=%d", *tcpSupported));
+            size_t writtenCharactersNumber = static_cast<size_t>(snprintf(storage.tcpSupportedBuf, sizeof(storage.tcpSupportedBuf),
+                                                                          "T=%d", static_cast<int>(params.GetTCPSupportModes())));
             VerifyOrReturnError((writtenCharactersNumber > 0) && (writtenCharactersNumber < sizeof(storage.tcpSupportedBuf)),
                                 CHIP_ERROR_INVALID_STRING_LENGTH);
             txtFields[numTxtFields++] = storage.tcpSupportedBuf;
