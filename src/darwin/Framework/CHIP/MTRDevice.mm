@@ -64,8 +64,6 @@ NSString * const MTRDataVersionKey = @"dataVersion";
 // Disabling pending crashes
 #define ENABLE_CONNECTIVITY_MONITORING 0
 
-#define USE_DEVICE_CONTROLLER_DATA_STORE 1
-
 // Consider moving utility classes to their own file
 #pragma mark - Utility Classes
 
@@ -4057,26 +4055,15 @@ static BOOL AttributeHasChangesOmittedQuality(MTRAttributePath * attributePath)
 // (currently, just the node - not the endpoints) kmo 22 jul 2024 19h38
 - (NSArray * _Nullable)clientDataKeys
 {
-#if USE_DEVICE_CONTROLLER_DATA_STORE
     return [self.deviceController.controllerDataStore storedClientDataKeysForNodeID:self.nodeID];
-#else
-    return [self.temporaryMetaDataCache allKeys];
-#endif // USE_DEVICE_CONTROLLER_DATA_STORE
 }
 
 // REVIEWERS:  does it make sense to constrain this to non-null key?
 - (id<NSSecureCoding> _Nullable)clientDataForKey:(NSString *)key
 {
-#if USE_DEVICE_CONTROLLER_DATA_STORE
     NSNumber * selfNodeID = self.nodeID;
     id<NSSecureCoding> data = [self.deviceController.controllerDataStore clientDataForKey:key onNodeID:selfNodeID];
     return data;
-#else
-    if (key == nil)
-        return nil;
-
-    return [self.temporaryMetaDataCache objectForKey:[NSString stringWithFormat:@"%@:-1", key]];
-#endif // USE_DEVICE_CONTROLLER_DATA_STORE
 }
 
 // REVIEWERS:  does it make sense to constrain this to non-null key/value?
@@ -4084,31 +4071,13 @@ static BOOL AttributeHasChangesOmittedQuality(MTRAttributePath * attributePath)
 {
     // TODO: Check supported data types, and also if they conform to NSSecureCoding, when we store these
     // TODO: Need to add a delegate method, so when this value changes we call back to the client
-#if USE_DEVICE_CONTROLLER_DATA_STORE
     [self.deviceController.controllerDataStore storeClientDataValue:value forKey:key onNodeID:self.nodeID];
-#else
-    if (key == nil || value == nil)
-        return;
-
-    if (self.temporaryMetaDataCache == nil) {
-        self.temporaryMetaDataCache = [NSMutableDictionary dictionary];
-    }
-
-    [self.temporaryMetaDataCache setObject:value forKey:[NSString stringWithFormat:@"%@:-1", key]];
-#endif // USE_DEVICE_CONTROLLER_DATA_STORE
 }
 
 // REVIEWERS:  does it make sense to constrain this to non-null key?
 - (void)removeClientDataForKey:(NSString *)key
 {
-#if USE_DEVICE_CONTROLLER_DATA_STORE
     [self.deviceController.controllerDataStore removeClientDataForKey:key onNodeID:self.nodeID];
-#else
-    if (key == nil)
-        return;
-
-    [self.temporaryMetaDataCache removeObjectForKey:[NSString stringWithFormat:@"%@:-1", key]];
-#endif // USE_DEVICE_CONTROLLER_DATA_STORE
 }
 
 #pragma mark Client Metadata Storage: By Endpoint ID + Node ID
@@ -4116,55 +4085,23 @@ static BOOL AttributeHasChangesOmittedQuality(MTRAttributePath * attributePath)
 // REVIEWERS:  does it make sense to constrain this to non-null return/key?
 - (NSArray * _Nullable)clientDataKeysForEndpointID:(NSNumber *)endpointID
 {
-#if USE_DEVICE_CONTROLLER_DATA_STORE
+    // TODO: (from stub impl) When hooked up to storage, enumerate this better
     return [self.deviceController.controllerDataStore storedClientDataKeysForEndpointID:endpointID onNodeID:self.nodeID];
-#else
-    if (endpointID == nil)
-        return nil;
-    // TODO: When hooked up to storage, enumerate this better
-
-    return [self.temporaryMetaDataCache allKeys];
-#endif // USE_DEVICE_CONTROLLER_DATA_STORE
 }
 
 - (id<NSSecureCoding> _Nullable)clientDataForKey:(NSString *)key endpointID:(NSNumber *)endpointID
 {
-#if USE_DEVICE_CONTROLLER_DATA_STORE
     return [self.deviceController.controllerDataStore clientDataForKey:key onEndpointID:endpointID onNodeID:self.nodeID];
-#else
-    if (key == nil || endpointID == nil)
-        return nil;
-
-    return [self.temporaryMetaDataCache objectForKey:[NSString stringWithFormat:@"%@:%@", key, endpointID]];
-#endif // USE_DEVICE_CONTROLLER_DATA_STORE
 }
 
 - (void)setClientDataForKey:(NSString *)key endpointID:(NSNumber *)endpointID value:(id<NSSecureCoding>)value
 {
-#if USE_DEVICE_CONTROLLER_DATA_STORE
     [self.deviceController.controllerDataStore storeClientDataValue:value forKey:key onEndpointID:endpointID onNodeID:self.nodeID];
-#else
-    if (key == nil || value == nil || endpointID == nil)
-        return;
-
-    if (self.temporaryMetaDataCache == nil) {
-        self.temporaryMetaDataCache = [NSMutableDictionary dictionary];
-    }
-
-    [self.temporaryMetaDataCache setObject:value forKey:[NSString stringWithFormat:@"%@:%@", key, endpointID]];
-#endif // USE_DEVICE_CONTROLLER_DATA_STORE
 }
 
 - (void)removeClientDataForKey:(NSString *)key endpointID:(NSNumber *)endpointID
 {
-#if USE_DEVICE_CONTROLLER_DATA_STORE
     [self.deviceController.controllerDataStore removeClientDataForKey:key onEndpointID:endpointID onNodeID:self.nodeID];
-#else
-    if (key == nil || endpointID == nil)
-        return;
-
-    [self.temporaryMetaDataCache removeObjectForKey:[NSString stringWithFormat:@"%@:%@", key, endpointID]];
-#endif // USE_DEVICE_CONTROLLER_DATA_STORE
 }
 
 #pragma mark Log Help
