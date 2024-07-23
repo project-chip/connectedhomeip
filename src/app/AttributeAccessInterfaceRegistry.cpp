@@ -18,9 +18,9 @@
 
 #include <app/AttributeAccessInterfaceCache.h>
 
-using namespace chip::app;
-
 namespace {
+
+using chip::app::AttributeAccessInterface;
 
 // shouldUnregister returns true if the given AttributeAccessInterface should be
 // unregistered.
