@@ -3970,8 +3970,11 @@ static BOOL AttributeHasChangesOmittedQuality(MTRAttributePath * attributePath)
     return @[ [NSData class], [NSString class], [NSNumber class], [NSDictionary class], [NSArray class] ];
 }
 
+#pragma mark Client Metadata Storage: By Node ID
 // REVIEWERS:  does it make sense to constrain this to non-null return and return empty array if necessary?
 // REVIEWERS:  does it make sense to constrain this to NSArray<NSString *> * since it's keys? kmo 19 jul 2024 09h28
+// TODO:  should this include all keys for node and endpoints on that node?
+// (currently, just the node - not the endpoints) kmo 22 jul 2024 19h38
 - (NSArray * _Nullable)clientDataKeys
 {
 #if USE_DEVICE_CONTROLLER_DATA_STORE
@@ -3986,7 +3989,7 @@ static BOOL AttributeHasChangesOmittedQuality(MTRAttributePath * attributePath)
 {
 #if USE_DEVICE_CONTROLLER_DATA_STORE
     NSNumber * selfNodeID = self.nodeID;
-    id<NSSecureCoding> data = [self.deviceController.controllerDataStore clientDataForNodeID:selfNodeID key:key];
+    id<NSSecureCoding> data = [self.deviceController.controllerDataStore clientDataForKey:key onNodeID:selfNodeID];
     return data;
 #else
     if (key == nil)
@@ -4002,7 +4005,7 @@ static BOOL AttributeHasChangesOmittedQuality(MTRAttributePath * attributePath)
     // TODO: Check supported data types, and also if they conform to NSSecureCoding, when we store these
     // TODO: Need to add a delegate method, so when this value changes we call back to the client
 #if USE_DEVICE_CONTROLLER_DATA_STORE
-    [self.deviceController.controllerDataStore storeClientDataForKey:key value:value forNodeID:self.nodeID];
+    [self.deviceController.controllerDataStore storeClientDataValue:value forKey:key onNodeID:self.nodeID];
 #else
     if (key == nil || value == nil)
         return;
@@ -4019,7 +4022,7 @@ static BOOL AttributeHasChangesOmittedQuality(MTRAttributePath * attributePath)
 - (void)removeClientDataForKey:(NSString *)key
 {
 #if USE_DEVICE_CONTROLLER_DATA_STORE
-    [self.deviceController.controllerDataStore removeClientDataForNodeID:self.nodeID key:key];
+    [self.deviceController.controllerDataStore removeClientDataForKey:key onNodeID:self.nodeID];
 #else
     if (key == nil)
         return;
@@ -4027,6 +4030,8 @@ static BOOL AttributeHasChangesOmittedQuality(MTRAttributePath * attributePath)
     [self.temporaryMetaDataCache removeObjectForKey:[NSString stringWithFormat:@"%@:-1", key]];
 #endif // USE_DEVICE_CONTROLLER_DATA_STORE
 }
+
+#pragma mark Client Metadata Storage: By Endpoint ID + Node ID
 
 // REVIEWERS:  does it make sense to constrain this to non-null return/key?
 - (NSArray * _Nullable)clientDataKeysForEndpointID:(NSNumber *)endpointID

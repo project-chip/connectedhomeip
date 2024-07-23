@@ -1210,7 +1210,7 @@ static NSString * sDeviceDataKeyPrefix = @"deviceData";
     return index;
 }
 
-- (void)_storeValue:(id<NSSecureCoding>)value atKey:(NSString *)key inPrefix:(NSString *)prefix
+- (void)_storeValue:(id<NSSecureCoding>)value forKey:(NSString *)key inPrefix:(NSString *)prefix
 {
     dispatch_async(_storageDelegateQueue, ^{
         MTRDeviceController * controller = self->_controller;
@@ -1380,19 +1380,19 @@ static NSString * sClientDataKeyPrefix = @"clientData";
     return [sClientDataKeyPrefix stringByAppendingFormat:@":0x%016llX", nodeID.unsignedLongLongValue];
 }
 
-- (id<NSSecureCoding>)clientDataForNodeID:(NSNumber *)nodeID key:(NSString *)key
+- (id<NSSecureCoding>)clientDataForKey:(NSString *)key onNodeID:(NSNumber *)nodeID
 {
     return [self _dataForKey:key inPrefix:[self _clientDataPrefixForNodeID:nodeID]];
 }
 
-- (void)removeClientDataForNodeID:(NSNumber *)nodeID key:(NSString *)key
+- (void)removeClientDataForKey:(NSString *)key onNodeID:(NSNumber *)nodeID
 {
     [self _removeDataForKey:key inPrefix:[self _clientDataPrefixForNodeID:nodeID]];
 }
 
-- (void)storeClientDataForKey:(NSString *)key value:(id<NSSecureCoding>)value forNodeID:(NSNumber *)nodeID
+- (void)storeClientDataValue:(id<NSSecureCoding>)value forKey:(NSString *)key onNodeID:(NSNumber *)nodeID
 {
-    [self _storeValue:value atKey:key inPrefix:[self _clientDataPrefixForNodeID:nodeID]];
+    [self _storeValue:value forKey:key inPrefix:[self _clientDataPrefixForNodeID:nodeID]];
 }
 
 - (void)clearStoredClientDataForNodeID:(NSNumber *)nodeID
