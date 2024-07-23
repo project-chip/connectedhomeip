@@ -593,7 +593,7 @@ public:
     {
         VerifyOrDie(registerAttributeAccessOverride(&mData));
     }
-    ~RegisteredAttributeAccessInterface() { unregisterAttributeAccessOverride(&mData); }
+    ~RegisteredAttributeAccessInterface() { chip::app::AttributeAccessInterfaceRegistry::Instance().UnregisterAttributeAccessOverride(&mData); }
 
     T * operator->() { return &mData; }
     T & operator*() { return mData; }

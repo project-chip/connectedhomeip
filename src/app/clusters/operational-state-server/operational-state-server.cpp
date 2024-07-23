@@ -50,7 +50,7 @@ Instance::Instance(Delegate * aDelegate, EndpointId aEndpointId) : Instance(aDel
 Instance::~Instance()
 {
     CommandHandlerInterfaceRegistry::Instance().UnregisterCommandHandler(this);
-    unregisterAttributeAccessOverride(this);
+    chip::app::AttributeAccessInterfaceRegistry::Instance().UnregisterAttributeAccessOverride(this);
 }
 
 CHIP_ERROR Instance::Init()

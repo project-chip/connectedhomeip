@@ -39,7 +39,7 @@ Instance::Instance(EndpointId aEndpointId, BitMask<Feature> aFeature) :
 
 Instance::~Instance()
 {
-    unregisterAttributeAccessOverride(this);
+    chip::app::AttributeAccessInterfaceRegistry::Instance().UnregisterAttributeAccessOverride(this);
 }
 
 CHIP_ERROR Instance::Init()

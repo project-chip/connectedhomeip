@@ -87,11 +87,11 @@ as `chip::app::AttributeHandlerInterfaceRegistry::Instance()`
 Replacements for methods are:
 
 -   `registerAttributeAccessOverride` replaced by
-    `chip::app::AttributeHandlerInterfaceRegistry::Instance().RegisterAttributeAccessOverride`
+    `chip::app::AttributeAccessInterfaceRegistry::Instance().RegisterAttributeAccessOverride`
 -   `unregisterAttributeAccessOverride` replaced by
-    `chip::app::AttributeHandlerInterfaceRegistry::Instance().UnregisterAttributeAccessOverride`
+    `chip::app::AttributeAccessInterfaceRegistry::Instance().UnregisterAttributeAccessOverride`
 -   `unregisterAllAttributeAccessOverridesForEndpoint` replaced by
-    `chip::app::AttributeHandlerInterfaceRegistry::Instance().UnregisterAllForEndpoint`
+    `chip::app::AttributeAccessInterfaceRegistry::Instance().UnregisterAllForEndpoint`
 -   `chip::app::GetAttributeAccessOverride` replaced by
-    `chip::app::AttributeHandlerInterfaceRegistry::Instance().Get`
+    `chip::app::AttributeAccessInterfaceRegistry::Instance().Get`
 

@@ -47,7 +47,7 @@ CHIP_ERROR Instance::Init()
 void Instance::Shutdown()
 {
     CommandHandlerInterfaceRegistry::Instance().UnregisterCommandHandler(this);
-    unregisterAttributeAccessOverride(this);
+    chip::app::AttributeAccessInterfaceRegistry::Instance().UnregisterAttributeAccessOverride(this);
 }
 
 bool Instance::HasFeature(Feature aFeature) const

@@ -47,7 +47,7 @@ ThreadNetworkDirectoryServer::ThreadNetworkDirectoryServer(EndpointId endpoint, 
 
 ThreadNetworkDirectoryServer::~ThreadNetworkDirectoryServer()
 {
-    unregisterAttributeAccessOverride(this);
+    chip::app::AttributeAccessInterfaceRegistry::Instance().UnregisterAttributeAccessOverride(this);
     CommandHandlerInterfaceRegistry::Instance().UnregisterCommandHandler(this);
 }
 

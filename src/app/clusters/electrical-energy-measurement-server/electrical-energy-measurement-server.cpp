@@ -48,7 +48,7 @@ CHIP_ERROR ElectricalEnergyMeasurementAttrAccess::Init()
 
 void ElectricalEnergyMeasurementAttrAccess::Shutdown()
 {
-    unregisterAttributeAccessOverride(this);
+    chip::app::AttributeAccessInterfaceRegistry::Instance().UnregisterAttributeAccessOverride(this);
 }
 
 CHIP_ERROR ElectricalEnergyMeasurementAttrAccess::Read(const app::ConcreteReadAttributePath & aPath,

@@ -327,7 +327,7 @@ public:
         this->mMeasurementUnit = aMeasurementUnit;
     };
 
-    ~Instance() override { unregisterAttributeAccessOverride(this); };
+    ~Instance() override { chip::app::AttributeAccessInterfaceRegistry::Instance().UnregisterAttributeAccessOverride(this); };
 
     CHIP_ERROR Init()
     {

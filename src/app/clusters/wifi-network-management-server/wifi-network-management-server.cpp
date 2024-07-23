@@ -63,7 +63,7 @@ WiFiNetworkManagementServer::WiFiNetworkManagementServer(EndpointId endpoint) :
 
 WiFiNetworkManagementServer::~WiFiNetworkManagementServer()
 {
-    unregisterAttributeAccessOverride(this);
+    chip::app::AttributeAccessInterfaceRegistry::Instance().UnregisterAttributeAccessOverride(this);
     CommandHandlerInterfaceRegistry::Instance().UnregisterCommandHandler(this);
 }
 

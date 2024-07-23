@@ -394,7 +394,7 @@ static constexpr EmberAfAttributeMetadata sDescriptorAttributesMetadata[] = {
     std::lock_guard lock(_lock);
 
     if (_attributeAccessInterface != nullptr) {
-        unregisterAttributeAccessOverride(_attributeAccessInterface.get());
+        chip::app::AttributeAccessInterfaceRegistry::Instance().UnregisterAttributeAccessOverride(_attributeAccessInterface.get());
     }
 }
 

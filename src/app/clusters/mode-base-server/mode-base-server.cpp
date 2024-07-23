@@ -65,7 +65,7 @@ void Instance::Shutdown()
     }
     UnregisterThisInstance();
     CommandHandlerInterfaceRegistry::Instance().UnregisterCommandHandler(this);
-    unregisterAttributeAccessOverride(this);
+    chip::app::AttributeAccessInterfaceRegistry::Instance().UnregisterAttributeAccessOverride(this);
 }
 
 CHIP_ERROR Instance::Init()
