@@ -110,7 +110,7 @@ class ProcessOutputCapture:
         """Fetch an item from the output queue, potentially wit h a timeout."""
         try:
             return self.output_lines.get(timeout=timeout_sec)
-        except Empty:
+        except queue.Empty:
             return None
 
     def send_to_program(self, what):
