@@ -72,8 +72,9 @@ CHIP_ERROR WhmInit()
     }
 
     /* Manufacturer may optionally not support all features, commands & attributes */
-    gWhmInstance =
-        std::make_unique<WaterHeaterManagementInstance>(EndpointId(WHM_ENDPOINT), *gWhmDelegate, BitMask<Feature>(Feature::kEnergyManagement, Feature::kTankPercent)); //GetFeatureMapFromCmdLine());
+    gWhmInstance = std::make_unique<WaterHeaterManagementInstance>(
+        EndpointId(WHM_ENDPOINT), *gWhmDelegate,
+        BitMask<Feature>(Feature::kEnergyManagement, Feature::kTankPercent)); // GetFeatureMapFromCmdLine());
 
     if (!gWhmInstance)
     {

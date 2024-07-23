@@ -250,7 +250,7 @@ private:
     uint16_t mHotWaterTemperature;
 
     // The % of hot water remaining at mHotWaterTemperature
-//    uint8_t mPercentageHotWater;
+    //    uint8_t mPercentageHotWater;
 
     // The (100 - mPercentageHotWater)% of water at mReplacedWaterTemperature
     uint16_t mReplacedWaterTemperature;

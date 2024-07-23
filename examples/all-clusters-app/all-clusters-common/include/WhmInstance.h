@@ -29,7 +29,6 @@ namespace Clusters {
 namespace WaterHeaterManagement {
 using namespace chip::app::Clusters::WaterHeaterManagement;
 
-
 class WaterHeaterManagementInstance : public Instance
 {
 public:
