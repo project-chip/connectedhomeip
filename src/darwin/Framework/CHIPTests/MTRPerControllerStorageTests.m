@@ -2967,7 +2967,7 @@ static const uint16_t kSubscriptionPoolBaseTimeoutInSeconds = 30;
                                                                  storage:storageDelegate
                                                                    error:&error
                                                        certificateIssuer:&certificateIssuer];
-                                                       
+
     XCTAssertNil(error);
     XCTAssertNotNil(controller);
     XCTAssertTrue([controller isRunning]);
