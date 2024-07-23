@@ -30,7 +30,7 @@ class ProcessOutputCapture:
         the process stdout)
       - provides read timeouts for incoming data
 
-    Use as part of a resource mangement block like:
+    Use as part of a resource management block like:
 
     with ProcessOutputCapture("test.sh", "logs.txt") as p:
        p.send_to_program("input\n")
