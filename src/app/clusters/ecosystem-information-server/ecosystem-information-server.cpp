@@ -180,7 +180,7 @@ CHIP_ERROR EcosystemDeviceStruct::Encode(const AttributeValueEncoder::ListEncode
 
     deviceStruct.uniqueLocationIDsLastEdit = mUniqueLocationIdsLastEditEpochUs;
 
-    // TODO(#33223) this is a hack, use mFabricIndex when it exists. Additionally check fabric
+    // TODO(#33223) this is a hack, use mFabricIndex when it exists. Additionally checking fabric
     // index matches should happen at the top of this method to prevent building the encodable
     // device struct when we know it is not intended for the accessing fabric.
     deviceStruct.SetFabricIndex(aFabricIndex);
@@ -239,7 +239,7 @@ CHIP_ERROR EcosystemLocationStruct::Encode(const AttributeValueEncoder::ListEnco
     locationStruct.homeLocation         = GetEncodableHomeLocationStruct(mHomeLocation);
     locationStruct.homeLocationLastEdit = mHomeLocationLastEditEpochUs;
 
-    // TODO(#33223) this is a hack, use mFabricIndex when it exists. Additionally check fabric
+    // TODO(#33223) this is a hack, use mFabricIndex when it exists. Additionally checking fabric
     // index matches should happen at the top of this method to prevent building the encodable
     // device struct when we know it is not intended for the accessing fabric.
     locationStruct.SetFabricIndex(aFabricIndex);
@@ -253,18 +253,16 @@ EcosystemInformationServer & EcosystemInformationServer::Instance()
     return mInstance;
 }
 
-CHIP_ERROR EcosystemInformationServer::AddDeviceInfo(EndpointId aEndpoint, uint64_t aUniqueId,
+CHIP_ERROR EcosystemInformationServer::AddDeviceInfo(EndpointId aEndpoint,
                                                      std::unique_ptr<EcosystemDeviceStruct> aDevice)
 {
     VerifyOrReturnError(aDevice, CHIP_ERROR_INVALID_ARGUMENT);
     VerifyOrReturnError((aEndpoint != kRootEndpointId && aEndpoint != kInvalidEndpointId), CHIP_ERROR_INVALID_ARGUMENT);
 
     auto & deviceInfo = mDevicesMap[aEndpoint];
-    VerifyOrReturnError((deviceInfo.mDeviceDirectory.find(aUniqueId) == deviceInfo.mDeviceDirectory.end()),
-                        CHIP_ERROR_INVALID_ARGUMENT);
     VerifyOrReturnError((deviceInfo.mDeviceDirectory.size() >= kDeviceDirectoryMaxSize),
                         CHIP_ERROR_NO_MEMORY);
-    deviceInfo.mDeviceDirectory[aUniqueId] = std::move(aDevice);
+    deviceInfo.mDeviceDirectory.push_back(std::move(aDevice));
     return CHIP_NO_ERROR;
 }
 
@@ -324,7 +322,7 @@ CHIP_ERROR EcosystemInformationServer::EncodeDeviceDirectoryAttribute(EndpointId
 
     FabricIndex fabricIndex = aEncoder.AccessingFabricIndex();
     return aEncoder.EncodeList([&](const auto & encoder) -> CHIP_ERROR {
-        for (auto & [_, device] : deviceInfo.mDeviceDirectory)
+        for (auto & device : deviceInfo.mDeviceDirectory)
         {
             ReturnErrorOnFailure(device->Encode(encoder, fabricIndex));
         }

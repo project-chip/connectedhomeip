@@ -17,7 +17,7 @@
  */
 #pragma once
 
-// This cluster is targeted by devices that are not resource constraint for
+// This cluster is targeted by devices that are not resource constrained, for
 // that reason we use std containers to simplify implementation of the cluster.
 #include <map>
 #include <memory>
@@ -158,17 +158,16 @@ public:
 
     /**
      * @brief Adds device as entry to DeviceDirectory list Attribute.
-     * 
+     *
      * @param[in] aEndpoint Which endpoint is the device being added to the device directory.
-     * @param[in] aUniqueId UniqueID associated with the device.
      * @param[in] aDevice Device information.
      * @return #CHIP_NO_ERROR on success.
      * @return Other CHIP_ERROR associated with issue.
      */
-    CHIP_ERROR AddDeviceInfo(EndpointId aEndpoint, uint64_t aUniqueId, std::unique_ptr<EcosystemDeviceStruct> aDevice);
+    CHIP_ERROR AddDeviceInfo(EndpointId aEndpoint, std::unique_ptr<EcosystemDeviceStruct> aDevice);
     /**
      * @brief Adds location as entry to LocationDirectory list Attribute.
-     * 
+     *
      * @param[in] aEndpoint Which endpoint is the location being added to the location directory.
      * @param[in] aLocationId LocationID associated with location.
      * @param[in] aLocation Location information.
@@ -180,7 +179,7 @@ public:
 
     /**
      * @brief Removes device at the provided endpoint.
-     * 
+     *
      * @param aEndpoint Endpoint of the associated device that has been removed.
      * @param aEpochUs Epoch time in micro seconds assoicated with when device was removed.
      * @return #CHIP_NO_ERROR on success.
@@ -197,9 +196,7 @@ private:
     struct DeviceInfo
     {
         Optional<uint64_t> mRemovedOn;
-        // The device we are representing will have a UniqueId. That is the
-        // recommended value to use as the key here.
-        std::map<uint64_t, std::unique_ptr<EcosystemDeviceStruct>> mDeviceDirectory;
+        std::vector<std::unique_ptr<EcosystemDeviceStruct>> mDeviceDirectory;
         // Map key is using the UniqueLocationId
         std::map<std::string, std::unique_ptr<EcosystemLocationStruct>> mLocationDirectory;
     };
