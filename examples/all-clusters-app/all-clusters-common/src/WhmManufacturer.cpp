@@ -267,4 +267,3 @@ bool HandleWaterHeaterManagementTestEventTrigger(uint64_t eventTrigger)
 
     return true;
 }
-
