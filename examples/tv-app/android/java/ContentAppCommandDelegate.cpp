@@ -138,14 +138,16 @@ Status ContentAppCommandDelegate::InvokeCommand(EndpointId epId, ClusterId clust
 
             std::unique_ptr<Json::CharReader> testReader(readerBuilder.newCharReader());
 
-            if (!testReader->parse(respStr.c_str(), respStr.c_str() + std::strlen(respStr.c_str()), &value, &errors)) {
+            if (!testReader->parse(respStr.c_str(), respStr.c_str() + std::strlen(respStr.c_str()), &value, &errors))
+            {
                 ChipLogError(Zcl, "Failed to parse JSON: %s\n", errors.c_str());
                 env->DeleteLocalRef(resp);
                 return chip::Protocols::InteractionModel::Status::Failure;
             }
 
             // Validate and access JSON data safely
-            if (!value.isObject()) {
+            if (!value.isObject())
+            {
                 ChipLogError(Zcl, "Invalid JSON structure: not an object");
                 env->DeleteLocalRef(resp);
                 return chip::Protocols::InteractionModel::Status::Failure;
@@ -191,13 +193,15 @@ void ContentAppCommandDelegate::FormatResponseData(CommandHandlerInterface::Hand
     Json::Value value;
     std::unique_ptr<Json::CharReader> testReader(readerBuilder.newCharReader());
 
-    if (!testReader->parse(response, response + std::strlen(response), &value, &errors)) {
+    if (!testReader->parse(response, response + std::strlen(response), &value, &errors))
+    {
         ChipLogError(Zcl, "Failed to parse JSON: %s\n", errors.c_str());
         return;
     }
 
     // Validate and access JSON data safely
-    if (!value.isObject()) {
+    if (!value.isObject())
+    {
         ChipLogError(Zcl, "Invalid JSON structure: not an object");
         return;
     }
