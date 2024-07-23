@@ -66,15 +66,15 @@ class ProcessOutputCapture:
             while not self.done:
                 changes = out_wait.poll(0.1)
                 if changes:
-                    l = self.process.stdout.readline()
-                    f.write(l)
-                    self.output_lines.put(l)
+                    out_line = self.process.stdout.readline()
+                    f.write(out_line)
+                    self.output_lines.put(out_line)
 
                 changes = err_wait.poll(0)
                 if changes:
-                    l = self.process.stderr.readline()
-                    if l:
-                        f.write(f"!!STDERR!! : {l}")
+                    err_line = self.process.stderr.readline()
+                    if err_line:
+                        f.write(f"!!STDERR!! : {err_line}")
 
     def __enter__(self):
         self.done = False
@@ -102,8 +102,8 @@ class ProcessOutputCapture:
             # When we fail because of an exception, report the entire log content
             logging.error(f"-------- START: LOG DUMP FOR {self.command!r} -----")
             with open(self.output_path, "rt") as f:
-                for l in f.readlines():
-                    logging.error(l.strip())
+                for output_line in f.readlines():
+                    logging.error(output_line.strip())
             logging.error(f"-------- END:   LOG DUMP FOR {self.command!r} -----")
 
     def next_output_line(self, timeout_sec=None):
