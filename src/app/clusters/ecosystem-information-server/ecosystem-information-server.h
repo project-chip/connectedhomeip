@@ -43,7 +43,7 @@ public:
     {
     public:
         Builder(){};
-        Builder(const Builder&) = delete;
+        Builder(const Builder &) = delete;
 
         Builder & SetDeviceName(std::string aDeviceName, uint64_t aDeviceNameLastEditEpochUs);
         Builder & SetBrigedEndpoint(EndpointId aBridgedEndpoint);
@@ -66,7 +66,7 @@ public:
         bool mIsAlreadyBuilt                       = false;
     };
 
-    EcosystemDeviceStruct(const EcosystemDeviceStruct&) = delete;
+    EcosystemDeviceStruct(const EcosystemDeviceStruct &) = delete;
 
     CHIP_ERROR Encode(const AttributeValueEncoder::ListEncodeHelper & aEncoder, const FabricIndex & aFabricIndex);
 
@@ -111,7 +111,7 @@ public:
     {
     public:
         Builder(){};
-        Builder(const Builder&) = delete;
+        Builder(const Builder &) = delete;
 
         Builder & SetLocationName(std::string aLocationName);
         Builder & SetFloorNumber(std::optional<int16_t> aFloorNumber);

@@ -26,12 +26,12 @@ namespace Clusters {
 namespace EcosystemInformation {
 namespace {
 
-constexpr size_t kDeviceNameMaxSize = 64;
-constexpr size_t kUniqueLocationIdMaxSize = 64;
+constexpr size_t kDeviceNameMaxSize            = 64;
+constexpr size_t kUniqueLocationIdMaxSize      = 64;
 constexpr size_t kUniqueLocationIdsListMaxSize = 64;
-constexpr size_t kHomeLocationNameMaxSize = 128;
+constexpr size_t kHomeLocationNameMaxSize      = 128;
 
-constexpr size_t kDeviceDirectoryMaxSize = 256;
+constexpr size_t kDeviceDirectoryMaxSize   = 256;
 constexpr size_t kLocationDirectoryMaxSize = 64;
 
 class AttrAccess : public AttributeAccessInterface
@@ -131,12 +131,12 @@ EcosystemDeviceStruct::Builder & EcosystemDeviceStruct::Builder::AddUniqueLocati
 
 std::unique_ptr<EcosystemDeviceStruct> EcosystemDeviceStruct::Builder::Build()
 {
-    bool deviceNameIsInvalid = mDeviceName.size() > kDeviceNameMaxSize;
-    bool originalEndpointIsInvalid = mOriginalEndpoint == kInvalidEndpointId;
-    bool deviceTypesListIsInvalid = mDeviceTypes.empty();
+    bool deviceNameIsInvalid            = mDeviceName.size() > kDeviceNameMaxSize;
+    bool originalEndpointIsInvalid      = mOriginalEndpoint == kInvalidEndpointId;
+    bool deviceTypesListIsInvalid       = mDeviceTypes.empty();
     bool uniqueLocationIdsListIsInvalid = mUniqueLocationIds.size() > kUniqueLocationIdsListMaxSize;
-    if (mIsAlreadyBuilt || deviceNameIsInvalid || originalEndpointIsInvalid ||
-        deviceTypesListIsInvalid || uniqueLocationIdsListIsInvalid)
+    if (mIsAlreadyBuilt || deviceNameIsInvalid || originalEndpointIsInvalid || deviceTypesListIsInvalid ||
+        uniqueLocationIdsListIsInvalid)
     {
         return nullptr;
     }
@@ -217,7 +217,8 @@ EcosystemLocationStruct::Builder & EcosystemLocationStruct::Builder::SetHomeLoca
 
 std::unique_ptr<EcosystemLocationStruct> EcosystemLocationStruct::Builder::Build()
 {
-    bool HomeLocationNameIsInvalid = mHomeLocation.mLocationName.empty() || mHomeLocation.mLocationName.size() > kHomeLocationNameMaxSize;
+    bool HomeLocationNameIsInvalid =
+        mHomeLocation.mLocationName.empty() || mHomeLocation.mLocationName.size() > kHomeLocationNameMaxSize;
     if (mIsAlreadyBuilt || HomeLocationNameIsInvalid)
     {
         return nullptr;
@@ -253,15 +254,13 @@ EcosystemInformationServer & EcosystemInformationServer::Instance()
     return mInstance;
 }
 
-CHIP_ERROR EcosystemInformationServer::AddDeviceInfo(EndpointId aEndpoint,
-                                                     std::unique_ptr<EcosystemDeviceStruct> aDevice)
+CHIP_ERROR EcosystemInformationServer::AddDeviceInfo(EndpointId aEndpoint, std::unique_ptr<EcosystemDeviceStruct> aDevice)
 {
     VerifyOrReturnError(aDevice, CHIP_ERROR_INVALID_ARGUMENT);
     VerifyOrReturnError((aEndpoint != kRootEndpointId && aEndpoint != kInvalidEndpointId), CHIP_ERROR_INVALID_ARGUMENT);
 
     auto & deviceInfo = mDevicesMap[aEndpoint];
-    VerifyOrReturnError((deviceInfo.mDeviceDirectory.size() >= kDeviceDirectoryMaxSize),
-                        CHIP_ERROR_NO_MEMORY);
+    VerifyOrReturnError((deviceInfo.mDeviceDirectory.size() >= kDeviceDirectoryMaxSize), CHIP_ERROR_NO_MEMORY);
     deviceInfo.mDeviceDirectory.push_back(std::move(aDevice));
     return CHIP_NO_ERROR;
 }
@@ -275,8 +274,7 @@ CHIP_ERROR EcosystemInformationServer::AddLocationInfo(EndpointId aEndpoint, con
     auto & deviceInfo = mDevicesMap[aEndpoint];
     VerifyOrReturnError((deviceInfo.mLocationDirectory.find(aLocationId) == deviceInfo.mLocationDirectory.end()),
                         CHIP_ERROR_INVALID_ARGUMENT);
-    VerifyOrReturnError((deviceInfo.mLocationDirectory.size() >= kLocationDirectoryMaxSize),
-                        CHIP_ERROR_NO_MEMORY);
+    VerifyOrReturnError((deviceInfo.mLocationDirectory.size() >= kLocationDirectoryMaxSize), CHIP_ERROR_NO_MEMORY);
     deviceInfo.mLocationDirectory[aLocationId] = std::move(aLocation);
     return CHIP_NO_ERROR;
 }
