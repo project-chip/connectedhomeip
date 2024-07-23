@@ -403,7 +403,11 @@ CHIP_ERROR ReadClient::BuildDataVersionFilterList(DataVersionFilterIBs::Builder 
                                                   const Span<DataVersionFilter> & aDataVersionFilters,
                                                   bool & aEncodedDataVersionList)
 {
-    ChipLogProgress(DataManagement, "Attempting to encode %lu data version filters", static_cast<unsigned long>(aDataVersionFilters.size()));
+#if CHIP_PROGRESS_LOGGING
+    size_t encodedFilterCount    = 0;
+    size_t irrelevantFilterCount = 0;
+    size_t skippedFilterCount    = 0;
+#endif
     for (auto & filter : aDataVersionFilters)
     {
         VerifyOrReturnError(filter.IsValidDataVersionFilter(), CHIP_ERROR_INVALID_ARGUMENT);
@@ -421,6 +425,9 @@ CHIP_ERROR ReadClient::BuildDataVersionFilterList(DataVersionFilterIBs::Builder 
 
         if (!intersected)
         {
+#if CHIP_PROGRESS_LOGGING
+            ++irrelevantFilterCount;
+#endif
             continue;
         }
 
@@ -429,6 +436,9 @@ CHIP_ERROR ReadClient::BuildDataVersionFilterList(DataVersionFilterIBs::Builder 
         CHIP_ERROR err = EncodeDataVersionFilter(aDataVersionFilterIBsBuilder, filter);
         if (err == CHIP_NO_ERROR)
         {
+#if CHIP_PROGRESS_LOGGING
+            ++encodedFilterCount;
+#endif
             aEncodedDataVersionList = true;
         }
         else if (err == CHIP_ERROR_NO_MEMORY || err == CHIP_ERROR_BUFFER_TOO_SMALL)
@@ -436,18 +446,21 @@ CHIP_ERROR ReadClient::BuildDataVersionFilterList(DataVersionFilterIBs::Builder 
             // Packet is full, ignore the rest of the list
             aDataVersionFilterIBsBuilder.Rollback(backup);
 #if CHIP_PROGRESS_LOGGING
-            ssize_t nonSkippedFilters = &filter - aDataVersionFilters.data();
-            size_t skippedFilters = aDataVersionFilters.size() - static_cast<size_t>(nonSkippedFilters);
-            ChipLogProgress(DataManagement, "Skipped encoding %lu out of %lu data version filters due to lack of space",
-                            static_cast<unsigned long>(skippedFilters), static_cast<unsigned long>(aDataVersionFilters.size()));
+            ssize_t nonSkippedFilterCount = &filter - aDataVersionFilters.data();
+            skippedFilterCount            = aDataVersionFilters.size() - static_cast<size_t>(nonSkippedFilterCount);
 #endif // CHIP_PROGRESS_LOGGING
-            return CHIP_NO_ERROR;
+            break;
         }
         else
         {
             return err;
         }
     }
+
+    ChipLogProgress(DataManagement,
+                    "%lu data version filters provided, %lu not relevant, %lu encoded, %lu skipped due to lack of space",
+                    static_cast<unsigned long>(aDataVersionFilters.size()), static_cast<unsigned long>(irrelevantFilterCount),
+                    static_cast<unsigned long>(encodedFilterCount), static_cast<unsigned long>(skippedFilterCount));
     return CHIP_NO_ERROR;
 }
 
