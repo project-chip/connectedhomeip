@@ -3960,7 +3960,7 @@ static BOOL AttributeHasChangesOmittedQuality(MTRAttributePath * attributePath)
     return [MTRBaseDevice deviceWithNodeID:self.nodeID controller:self.deviceController];
 }
 
-// Client Metadata Storage
+#pragma mark - Client Metadata Storage
 
 // REVIEWERS:  does it make sense to constrain this to non-null return and return empty array if necessary?
 - (NSArray *)supportedClientDataClasses
