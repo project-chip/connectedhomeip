@@ -1408,6 +1408,52 @@ public class ClusterWriteMapping {
     );
     writeEnergyEvseModeInteractionInfo.put("writeOnModeAttribute", writeEnergyEvseModeOnModeAttributeInteractionInfo);
     writeAttributeMap.put("energyEvseMode", writeEnergyEvseModeInteractionInfo);
+    Map<String, InteractionInfo> writeWaterHeaterModeInteractionInfo = new LinkedHashMap<>();
+    Map<String, CommandParameterInfo> writeWaterHeaterModeStartUpModeCommandParams = new LinkedHashMap<String, CommandParameterInfo>();
+    CommandParameterInfo waterHeaterModestartUpModeCommandParameterInfo =
+        new CommandParameterInfo(
+            "value", 
+            Integer.class, 
+            Integer.class 
+        );
+    writeWaterHeaterModeStartUpModeCommandParams.put(
+        "value",
+        waterHeaterModestartUpModeCommandParameterInfo
+    );
+    InteractionInfo writeWaterHeaterModeStartUpModeAttributeInteractionInfo = new InteractionInfo(
+      (cluster, callback, commandArguments) -> {
+        ((ChipClusters.WaterHeaterModeCluster) cluster).writeStartUpModeAttribute(
+          (DefaultClusterCallback) callback,
+          (Integer) commandArguments.get("value")
+        );
+      },
+      () -> new ClusterInfoMapping.DelegatedDefaultClusterCallback(),
+      writeWaterHeaterModeStartUpModeCommandParams
+    );
+    writeWaterHeaterModeInteractionInfo.put("writeStartUpModeAttribute", writeWaterHeaterModeStartUpModeAttributeInteractionInfo);
+    Map<String, CommandParameterInfo> writeWaterHeaterModeOnModeCommandParams = new LinkedHashMap<String, CommandParameterInfo>();
+    CommandParameterInfo waterHeaterModeonModeCommandParameterInfo =
+        new CommandParameterInfo(
+            "value", 
+            Integer.class, 
+            Integer.class 
+        );
+    writeWaterHeaterModeOnModeCommandParams.put(
+        "value",
+        waterHeaterModeonModeCommandParameterInfo
+    );
+    InteractionInfo writeWaterHeaterModeOnModeAttributeInteractionInfo = new InteractionInfo(
+      (cluster, callback, commandArguments) -> {
+        ((ChipClusters.WaterHeaterModeCluster) cluster).writeOnModeAttribute(
+          (DefaultClusterCallback) callback,
+          (Integer) commandArguments.get("value")
+        );
+      },
+      () -> new ClusterInfoMapping.DelegatedDefaultClusterCallback(),
+      writeWaterHeaterModeOnModeCommandParams
+    );
+    writeWaterHeaterModeInteractionInfo.put("writeOnModeAttribute", writeWaterHeaterModeOnModeAttributeInteractionInfo);
+    writeAttributeMap.put("waterHeaterMode", writeWaterHeaterModeInteractionInfo);
     Map<String, InteractionInfo> writeDeviceEnergyManagementModeInteractionInfo = new LinkedHashMap<>();
     Map<String, CommandParameterInfo> writeDeviceEnergyManagementModeStartUpModeCommandParams = new LinkedHashMap<String, CommandParameterInfo>();
     CommandParameterInfo deviceEnergyManagementModestartUpModeCommandParameterInfo =
@@ -3671,8 +3717,8 @@ public class ClusterWriteMapping {
     CommandParameterInfo threadNetworkDirectorypreferredExtendedPanIDCommandParameterInfo =
         new CommandParameterInfo(
             "value", 
-            Long.class, 
-            Long.class 
+            byte[].class, 
+            byte[].class 
         );
     writeThreadNetworkDirectoryPreferredExtendedPanIDCommandParams.put(
         "value",
@@ -3682,7 +3728,7 @@ public class ClusterWriteMapping {
       (cluster, callback, commandArguments) -> {
         ((ChipClusters.ThreadNetworkDirectoryCluster) cluster).writePreferredExtendedPanIDAttribute(
           (DefaultClusterCallback) callback,
-          (Long) commandArguments.get("value")
+          (byte[]) commandArguments.get("value")
         );
       },
       () -> new ClusterInfoMapping.DelegatedDefaultClusterCallback(),

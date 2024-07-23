@@ -6008,6 +6008,69 @@ NS_ASSUME_NONNULL_BEGIN
 
 @end
 
+@implementation MTRWaterHeaterModeClusterModeTagStruct
+- (instancetype)init
+{
+    if (self = [super init]) {
+
+        _mfgCode = nil;
+
+        _value = @(0);
+    }
+    return self;
+}
+
+- (id)copyWithZone:(NSZone * _Nullable)zone
+{
+    auto other = [[MTRWaterHeaterModeClusterModeTagStruct alloc] init];
+
+    other.mfgCode = self.mfgCode;
+    other.value = self.value;
+
+    return other;
+}
+
+- (NSString *)description
+{
+    NSString * descriptionString = [NSString stringWithFormat:@"<%@: mfgCode:%@; value:%@; >", NSStringFromClass([self class]), _mfgCode, _value];
+    return descriptionString;
+}
+
+@end
+
+@implementation MTRWaterHeaterModeClusterModeOptionStruct
+- (instancetype)init
+{
+    if (self = [super init]) {
+
+        _label = @"";
+
+        _mode = @(0);
+
+        _modeTags = [NSArray array];
+    }
+    return self;
+}
+
+- (id)copyWithZone:(NSZone * _Nullable)zone
+{
+    auto other = [[MTRWaterHeaterModeClusterModeOptionStruct alloc] init];
+
+    other.label = self.label;
+    other.mode = self.mode;
+    other.modeTags = self.modeTags;
+
+    return other;
+}
+
+- (NSString *)description
+{
+    NSString * descriptionString = [NSString stringWithFormat:@"<%@: label:%@; mode:%@; modeTags:%@; >", NSStringFromClass([self class]), _label, _mode, _modeTags];
+    return descriptionString;
+}
+
+@end
+
 @implementation MTRDeviceEnergyManagementModeClusterModeTagStruct
 - (instancetype)init
 {
@@ -7150,11 +7213,13 @@ NS_ASSUME_NONNULL_BEGIN
 {
     if (self = [super init]) {
 
-        _extendedPanID = @(0);
+        _extendedPanID = [NSData data];
 
         _networkName = @"";
 
         _channel = @(0);
+
+        _activeTimestamp = @(0);
     }
     return self;
 }
@@ -7166,40 +7231,14 @@ NS_ASSUME_NONNULL_BEGIN
     other.extendedPanID = self.extendedPanID;
     other.networkName = self.networkName;
     other.channel = self.channel;
+    other.activeTimestamp = self.activeTimestamp;
 
     return other;
 }
 
 - (NSString *)description
 {
-    NSString * descriptionString = [NSString stringWithFormat:@"<%@: extendedPanID:%@; networkName:%@; channel:%@; >", NSStringFromClass([self class]), _extendedPanID, _networkName, _channel];
-    return descriptionString;
-}
-
-@end
-
-@implementation MTRThreadNetworkDirectoryClusterNetworkChangedEvent
-- (instancetype)init
-{
-    if (self = [super init]) {
-
-        _extendedPanID = @(0);
-    }
-    return self;
-}
-
-- (id)copyWithZone:(NSZone * _Nullable)zone
-{
-    auto other = [[MTRThreadNetworkDirectoryClusterNetworkChangedEvent alloc] init];
-
-    other.extendedPanID = self.extendedPanID;
-
-    return other;
-}
-
-- (NSString *)description
-{
-    NSString * descriptionString = [NSString stringWithFormat:@"<%@: extendedPanID:%@; >", NSStringFromClass([self class]), _extendedPanID];
+    NSString * descriptionString = [NSString stringWithFormat:@"<%@: extendedPanID:%@; networkName:%@; channel:%@; activeTimestamp:%@; >", NSStringFromClass([self class]), [_extendedPanID base64EncodedStringWithOptions:0], _networkName, _channel, _activeTimestamp];
     return descriptionString;
 }
 

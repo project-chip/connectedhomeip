@@ -454,6 +454,10 @@ class HostBuilder(GnBuilder):
         if self.app == HostApp.SIMULATED_APP2:
             self.extra_gn_options.append('chip_tests_zap_config="app2"')
 
+        if self.app in {HostApp.JAVA_MATTER_CONTROLLER, HostApp.KOTLIN_MATTER_CONTROLLER}:
+            # TODO: controllers depending on a datamodel is odd. For now fix compile dependencies on ember.
+            self.extra_gn_options.append('chip_use_data_model_interface="disabled"')
+
         if self.app == HostApp.TESTS and fuzzing_type != HostFuzzingType.NONE:
             self.build_command = 'fuzz_tests'
 

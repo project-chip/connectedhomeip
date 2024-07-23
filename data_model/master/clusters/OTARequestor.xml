@@ -149,7 +149,7 @@ Davis, CA 95616, USA
     </attribute>
     <attribute id="0x0003" name="UpdateStateProgress" type="uint8" default="null">
       <access read="true" readPrivilege="view"/>
-      <quality changeOmitted="false" nullable="true" scene="false" persistence="volatile" reportable="false"/>
+      <quality changeOmitted="false" nullable="true" scene="false" persistence="volatile" reportable="false" sourceAttribution="false" quieterReporting="false"/>
       <mandatoryConform/>
       <constraint type="between" from="0" to="100"/>
     </attribute>

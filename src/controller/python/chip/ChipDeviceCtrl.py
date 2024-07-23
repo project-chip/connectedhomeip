@@ -249,7 +249,10 @@ class CallbackContext:
 
     async def __aexit__(self, exc_type, exc_value, traceback):
         if not self._future.done():
-            raise RuntimeError("CallbackContext future not completed")
+            # In case the initial call (which sets up for the callback) fails,
+            # the future will never be used actually. So just cancel it here
+            # for completeness, in case somebody is expecting it to be completed.
+            self._future.cancel()
         self._future = None
         self._lock.release()
 
@@ -603,11 +606,10 @@ class ChipDeviceControllerBase():
 
         async with self._commissioning_context as ctx:
             self._enablePairingCompleteCallback(True)
-            res = await self._ChipStack.CallAsync(
+            await self._ChipStack.CallAsync(
                 lambda: self._dmLib.pychip_DeviceController_ConnectBLE(
                     self.devCtrl, discriminator, isShortDiscriminator, setupPinCode, nodeid)
             )
-            res.raise_on_error()
 
             return await asyncio.futures.wrap_future(ctx.future)
 
@@ -615,11 +617,11 @@ class ChipDeviceControllerBase():
         self.CheckIsActive()
 
         async with self._unpair_device_context as ctx:
-            res = await self._ChipStack.CallAsync(
+            await self._ChipStack.CallAsync(
                 lambda: self._dmLib.pychip_DeviceController_UnpairDevice(
                     self.devCtrl, nodeid, self.cbHandleDeviceUnpairCompleteFunct)
             )
-            res.raise_on_error()
+
             return await asyncio.futures.wrap_future(ctx.future)
 
     def CloseBLEConnection(self):
@@ -656,8 +658,7 @@ class ChipDeviceControllerBase():
 
         async with self._pase_establishment_context as ctx:
             self._enablePairingCompleteCallback(True)
-            res = await self._ChipStack.CallAsync(callFunct)
-            res.raise_on_error()
+            await self._ChipStack.CallAsync(callFunct)
             await asyncio.futures.wrap_future(ctx.future)
 
     async def EstablishPASESessionBLE(self, setupPinCode: int, discriminator: int, nodeid: int) -> None:
@@ -756,13 +757,12 @@ class ChipDeviceControllerBase():
         # Discovery is also used during commissioning. Make sure this manual discovery
         # and commissioning attempts do not interfere with each other.
         async with self._commissioning_lock:
-            res = await self._ChipStack.CallAsync(
+            await self._ChipStack.CallAsync(
                 lambda: self._dmLib.pychip_DeviceController_DiscoverCommissionableNodes(
                     self.devCtrl, int(filterType), str(filter).encode("utf-8")))
-            res.raise_on_error()
 
             async def _wait_discovery():
-                while not await self._ChipStack.CallAsync(
+                while not await self._ChipStack.CallAsyncWithResult(
                         lambda: self._dmLib.pychip_DeviceController_HasDiscoveredCommissionableNode(self.devCtrl)):
                     await asyncio.sleep(0.1)
                 return
@@ -776,9 +776,8 @@ class ChipDeviceControllerBase():
                 # Expected timeout, do nothing
                 pass
             finally:
-                res = await self._ChipStack.CallAsync(
+                await self._ChipStack.CallAsync(
                     lambda: self._dmLib.pychip_DeviceController_StopCommissionableDiscovery(self.devCtrl))
-                res.raise_on_error()
 
             return await self.GetDiscoveredDevices()
 
@@ -796,7 +795,7 @@ class ChipDeviceControllerBase():
             self._dmLib.pychip_DeviceController_IterateDiscoveredCommissionableNodes(devCtrl.devCtrl, HandleDevice)
             return devices
 
-        return await self._ChipStack.CallAsync(lambda: GetDevices(self))
+        return await self._ChipStack.CallAsyncWithResult(lambda: GetDevices(self))
 
     def GetIPForDiscoveredDevice(self, idx, addrStr, length):
         self.CheckIsActive()
@@ -828,11 +827,10 @@ class ChipDeviceControllerBase():
         self.CheckIsActive()
 
         async with self._open_window_context as ctx:
-            res = await self._ChipStack.CallAsync(
+            await self._ChipStack.CallAsync(
                 lambda: self._dmLib.pychip_DeviceController_OpenCommissioningWindow(
                     self.devCtrl, self.pairingDelegate, nodeid, timeout, iteration, discriminator, option)
             )
-            res.raise_on_error()
 
             return await asyncio.futures.wrap_future(ctx.future)
 
@@ -896,14 +894,14 @@ class ChipDeviceControllerBase():
         ''' Returns CommissioneeDeviceProxy if we can find or establish a PASE connection to the specified device'''
         self.CheckIsActive()
         returnDevice = c_void_p(None)
-        res = await self._ChipStack.CallAsync(lambda: self._dmLib.pychip_GetDeviceBeingCommissioned(
+        res = await self._ChipStack.CallAsyncWithResult(lambda: self._dmLib.pychip_GetDeviceBeingCommissioned(
             self.devCtrl, nodeid, byref(returnDevice)), timeoutMs)
         if res.is_success:
             return DeviceProxyWrapper(returnDevice, DeviceProxyWrapper.DeviceProxyType.COMMISSIONEE, self._dmLib)
 
         await self.EstablishPASESession(setupCode, nodeid)
 
-        res = await self._ChipStack.CallAsync(lambda: self._dmLib.pychip_GetDeviceBeingCommissioned(
+        res = await self._ChipStack.CallAsyncWithResult(lambda: self._dmLib.pychip_GetDeviceBeingCommissioned(
             self.devCtrl, nodeid, byref(returnDevice)), timeoutMs)
         if res.is_success:
             return DeviceProxyWrapper(returnDevice, DeviceProxyWrapper.DeviceProxyType.COMMISSIONEE, self._dmLib)
@@ -991,7 +989,7 @@ class ChipDeviceControllerBase():
 
         if allowPASE:
             returnDevice = c_void_p(None)
-            res = await self._ChipStack.CallAsync(lambda: self._dmLib.pychip_GetDeviceBeingCommissioned(
+            res = await self._ChipStack.CallAsyncWithResult(lambda: self._dmLib.pychip_GetDeviceBeingCommissioned(
                 self.devCtrl, nodeid, byref(returnDevice)), timeoutMs)
             if res.is_success:
                 LOGGER.info('Using PASE connection')
@@ -1021,10 +1019,9 @@ class ChipDeviceControllerBase():
 
         closure = DeviceAvailableClosure(eventLoop, future)
         ctypes.pythonapi.Py_IncRef(ctypes.py_object(closure))
-        res = await self._ChipStack.CallAsync(lambda: self._dmLib.pychip_GetConnectedDeviceByNodeId(
+        await self._ChipStack.CallAsync(lambda: self._dmLib.pychip_GetConnectedDeviceByNodeId(
             self.devCtrl, nodeid, ctypes.py_object(closure), _DeviceAvailableCallback),
             timeoutMs)
-        res.raise_on_error()
 
         # The callback might have been received synchronously (during self._ChipStack.CallAsync()).
         # In that case the Future has already been set it will return immediately
@@ -1439,6 +1436,13 @@ class ChipDeviceControllerBase():
 
         reportInterval: A tuple of two int-s for (MinIntervalFloor, MaxIntervalCeiling). Used by establishing subscriptions.
             When not provided, a read request will be sent.
+        fabricFiltered: If True (default), the read/subscribe is fabric-filtered and will only see things associated with the fabric
+            of the reader/subscriber. Relevant for attributes with fabric-scoped data.
+        keepSubscriptions: Keep existing subscriptions. If set to False, existing subscriptions with this node will get cancelled
+            and a new one gets setup.
+        autoResubscribe: Automatically resubscribe to the subscription if subscription is lost. The automatic re-subscription only
+            applies if the subscription establishes on first try. If the first subscription establishment attempt fails the function
+            returns right away.
 
         Returns:
             - AsyncReadTransaction.ReadResponse. Please see ReadAttribute and ReadEvent for examples of how to access data.
@@ -1508,6 +1512,13 @@ class ChipDeviceControllerBase():
 
         reportInterval: A tuple of two int-s for (MinIntervalFloor, MaxIntervalCeiling). Used by establishing subscriptions.
             When not provided, a read request will be sent.
+        fabricFiltered: If True (default), the read/subscribe is fabric-filtered and will only see things associated with the fabric
+            of the reader/subscriber. Relevant for attributes with fabric-scoped data.
+        keepSubscriptions: Keep existing subscriptions. If set to False, existing subscriptions with this node will get cancelled
+            and a new one gets setup.
+        autoResubscribe: Automatically resubscribe to the subscription if subscription is lost. The automatic re-subscription only
+            applies if the subscription establishes on first try. If the first subscription establishment attempt fails the function
+            returns right away.
 
         Returns:
             - subscription request: ClusterAttribute.SubscriptionTransaction
@@ -1584,6 +1595,11 @@ class ChipDeviceControllerBase():
         eventNumberFilter: Optional minimum event number filter.
         reportInterval: A tuple of two int-s for (MinIntervalFloor, MaxIntervalCeiling). Used by establishing subscriptions.
             When not provided, a read request will be sent.
+        keepSubscriptions: Keep existing subscriptions. If set to False, existing subscriptions with this node will get cancelled
+            and a new one gets setup.
+        autoResubscribe: Automatically resubscribe to the subscription if subscription is lost. The automatic re-subscription only
+            applies if the subscription establishes on first try. If the first subscription establishment attempt fails the function
+            returns right away.
 
         Returns:
             - subscription request: ClusterAttribute.SubscriptionTransaction
@@ -1917,11 +1933,10 @@ class ChipDeviceController(ChipDeviceControllerBase):
 
         async with self._commissioning_context as ctx:
             self._enablePairingCompleteCallback(False)
-            res = await self._ChipStack.CallAsync(
+            await self._ChipStack.CallAsync(
                 lambda: self._dmLib.pychip_DeviceController_Commission(
                     self.devCtrl, nodeid)
             )
-            res.raise_on_error()
 
             return await asyncio.futures.wrap_future(ctx.future)
 
@@ -2065,11 +2080,10 @@ class ChipDeviceController(ChipDeviceControllerBase):
 
         async with self._commissioning_context as ctx:
             self._enablePairingCompleteCallback(True)
-            res = await self._ChipStack.CallAsync(
+            await self._ChipStack.CallAsync(
                 lambda: self._dmLib.pychip_DeviceController_OnNetworkCommission(
                     self.devCtrl, self.pairingDelegate, nodeId, setupPinCode, int(filterType), str(filter).encode("utf-8") if filter is not None else None, discoveryTimeoutMsec)
             )
-            res.raise_on_error()
 
             return await asyncio.futures.wrap_future(ctx.future)
 
@@ -2086,11 +2100,10 @@ class ChipDeviceController(ChipDeviceControllerBase):
 
         async with self._commissioning_context as ctx:
             self._enablePairingCompleteCallback(True)
-            res = await self._ChipStack.CallAsync(
+            await self._ChipStack.CallAsync(
                 lambda: self._dmLib.pychip_DeviceController_ConnectWithCode(
                     self.devCtrl, setupPayload.encode("utf-8"), nodeid, discoveryType.value)
             )
-            res.raise_on_error()
 
             return await asyncio.futures.wrap_future(ctx.future)
 
@@ -2106,11 +2119,10 @@ class ChipDeviceController(ChipDeviceControllerBase):
 
         async with self._commissioning_context as ctx:
             self._enablePairingCompleteCallback(True)
-            res = await self._ChipStack.CallAsync(
+            await self._ChipStack.CallAsync(
                 lambda: self._dmLib.pychip_DeviceController_ConnectIP(
                     self.devCtrl, ipaddr.encode("utf-8"), setupPinCode, nodeid)
             )
-            res.raise_on_error()
 
             return await asyncio.futures.wrap_future(ctx.future)
 
@@ -2127,11 +2139,11 @@ class ChipDeviceController(ChipDeviceControllerBase):
         self.CheckIsActive()
 
         async with self._issue_node_chain_context as ctx:
-            res = await self._ChipStack.CallAsync(
+            await self._ChipStack.CallAsync(
                 lambda: self._dmLib.pychip_DeviceController_IssueNOCChain(
                     self.devCtrl, py_object(self), csr.NOCSRElements, len(csr.NOCSRElements), nodeId)
             )
-            res.raise_on_error()
+
             return await asyncio.futures.wrap_future(ctx.future)
 
 

@@ -250,6 +250,9 @@ static constexpr ClusterId Id = 0x0000009C;
 namespace EnergyEvseMode {
 static constexpr ClusterId Id = 0x0000009D;
 } // namespace EnergyEvseMode
+namespace WaterHeaterMode {
+static constexpr ClusterId Id = 0x0000009E;
+} // namespace WaterHeaterMode
 namespace DeviceEnergyManagementMode {
 static constexpr ClusterId Id = 0x0000009F;
 } // namespace DeviceEnergyManagementMode
