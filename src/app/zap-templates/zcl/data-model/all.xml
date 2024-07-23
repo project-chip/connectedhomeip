@@ -18,6 +18,7 @@
    <xi:include href="chip/chip-types.xml" />
    <xi:include href="chip/clusters-extensions.xml" />
    <xi:include href="chip/color-control-cluster.xml" />
+   <xi:include href="chip/commissioner-control-cluster.xml" />
    <xi:include href="chip/concentration-measurement-cluster.xml" />
    <xi:include href="chip/content-launch-cluster.xml" />
    <xi:include href="chip/descriptor-cluster.xml" />
@@ -108,7 +109,8 @@
    <xi:include href="chip/valve-configuration-and-control-cluster.xml" />
    <xi:include href="chip/wake-on-lan-cluster.xml" />
    <xi:include href="chip/washer-controls-cluster.xml" />
-   <xi:include href="chip/water-heater-management-cluster.xml" />   
+   <xi:include href="chip/water-heater-management-cluster.xml" />
+   <xi:include href="chip/water-heater-mode-cluster.xml" />
    <xi:include href="chip/wifi-network-diagnostics-cluster.xml" />
    <xi:include href="chip/wifi-network-management-cluster.xml" />
    <xi:include href="chip/window-covering.xml" />

@@ -216,7 +216,7 @@ deprecated cluster OnOffSwitchConfiguration = 7 {
 
 /** Attributes and commands for controlling devices that can be set to a level between fully 'On' and fully 'Off.' */
 cluster LevelControl = 8 {
-  revision 5;
+  revision 6;
 
   enum MoveModeEnum : enum8 {
     kUp = 0;
@@ -2670,7 +2670,7 @@ cluster BooleanState = 69 {
 
 /** Allows servers to ensure that listed clients are notified when a server is available for communication. */
 cluster IcdManagement = 70 {
-  revision 2;
+  revision 3;
 
   enum ClientTypeEnum : enum8 {
     kPermanent = 0;
@@ -2686,6 +2686,7 @@ cluster IcdManagement = 70 {
     kCheckInProtocolSupport = 0x1;
     kUserActiveModeTrigger = 0x2;
     kLongIdleTimeSupport = 0x4;
+    kDynamicSitLitSupport = 0x8;
   }
 
   bitmap UserActiveModeTriggerBitmap : bitmap32 {
@@ -2724,6 +2725,7 @@ cluster IcdManagement = 70 {
   provisional readonly attribute optional UserActiveModeTriggerBitmap userActiveModeTriggerHint = 6;
   provisional readonly attribute optional char_string<128> userActiveModeTriggerInstruction = 7;
   provisional readonly attribute optional OperatingModeEnum operatingMode = 8;
+  provisional readonly attribute optional int32u maximumCheckInBackOff = 9;
   readonly attribute command_id generatedCommandList[] = 65528;
   readonly attribute command_id acceptedCommandList[] = 65529;
   readonly attribute event_id eventList[] = 65530;
@@ -5173,6 +5175,56 @@ cluster EnergyEvseMode = 157 {
 }
 
 /** Attributes and commands for selecting a mode from a list of supported options. */
+cluster WaterHeaterMode = 158 {
+  revision 1;
+
+  enum ModeTag : enum16 {
+    kOff = 16384;
+    kManual = 16385;
+    kTimed = 16386;
+  }
+
+  bitmap Feature : bitmap32 {
+    kOnOff = 0x1;
+  }
+
+  struct ModeTagStruct {
+    optional vendor_id mfgCode = 0;
+    enum16 value = 1;
+  }
+
+  struct ModeOptionStruct {
+    char_string<64> label = 0;
+    int8u mode = 1;
+    ModeTagStruct modeTags[] = 2;
+  }
+
+  readonly attribute ModeOptionStruct supportedModes[] = 0;
+  readonly attribute int8u currentMode = 1;
+  attribute optional nullable int8u startUpMode = 2;
+  attribute optional nullable int8u onMode = 3;
+  readonly attribute command_id generatedCommandList[] = 65528;
+  readonly attribute command_id acceptedCommandList[] = 65529;
+  readonly attribute event_id eventList[] = 65530;
+  readonly attribute attrib_id attributeList[] = 65531;
+  readonly attribute bitmap32 featureMap = 65532;
+  readonly attribute int16u clusterRevision = 65533;
+
+  request struct ChangeToModeRequest {
+    int8u newMode = 0;
+  }
+
+  response struct ChangeToModeResponse = 1 {
+    enum8 status = 0;
+    optional char_string statusText = 1;
+  }
+
+  /** This command is used to change device modes.
+        On receipt of this command the device SHALL respond with a ChangeToModeResponse command. */
+  command ChangeToMode(ChangeToModeRequest): ChangeToModeResponse = 0;
+}
+
+/** Attributes and commands for selecting a mode from a list of supported options. */
 provisional cluster DeviceEnergyManagementMode = 159 {
   revision 1;
 
@@ -6972,7 +7024,7 @@ cluster ThermostatUserInterfaceConfiguration = 516 {
 
 /** Attributes and commands for controlling the color properties of a color-capable light. */
 cluster ColorControl = 768 {
-  revision 6;
+  revision 7;
 
   enum ColorLoopAction : enum8 {
     kDeactivate = 0;
@@ -8118,16 +8170,13 @@ cluster ThreadNetworkDirectory = 1107 {
   revision 1;
 
   struct ThreadNetworkStruct {
-    int64u extendedPanID = 0;
+    octet_string<8> extendedPanID = 0;
     char_string<16> networkName = 1;
     int16u channel = 2;
+    int64u activeTimestamp = 3;
   }
 
-  info event access(read: operate) NetworkChanged = 0 {
-    int64u extendedPanID = 0;
-  }
-
-  attribute access(read: manage, write: manage) nullable int64u preferredExtendedPanID = 0;
+  attribute access(read: manage, write: manage) nullable octet_string<8> preferredExtendedPanID = 0;
   readonly attribute access(read: operate) ThreadNetworkStruct threadNetworks[] = 1;
   readonly attribute int8u threadNetworkTableSize = 2;
   readonly attribute command_id generatedCommandList[] = 65528;
@@ -8142,11 +8191,11 @@ cluster ThreadNetworkDirectory = 1107 {
   }
 
   request struct RemoveNetworkRequest {
-    int64u extendedPanID = 0;
+    octet_string<8> extendedPanID = 0;
   }
 
   request struct GetOperationalDatasetRequest {
-    int64u extendedPanID = 0;
+    octet_string<8> extendedPanID = 0;
   }
 
   response struct OperationalDatasetResponse = 3 {
@@ -9193,6 +9242,57 @@ provisional cluster ContentAppObserver = 1296 {
 
   /** Upon receipt, the data field MAY be parsed and interpreted. Message encoding is specific to the Content App. A Content App MAY when possible read attributes from the Basic Information Cluster on the Observer and use this to determine the Message encoding. */
   command ContentAppMessage(ContentAppMessageRequest): ContentAppMessageResponse = 0;
+}
+
+/** Supports the ability for clients to request the commissioning of themselves or other nodes onto a fabric which the cluster server can commission onto. */
+provisional cluster CommissionerControl = 1873 {
+  revision 1;
+
+  bitmap SupportedDeviceCategoryBitmap : bitmap32 {
+    kFabricSynchronization = 0x1;
+  }
+
+  fabric_sensitive info event access(read: manage) CommissioningRequestResult = 0 {
+    int64u requestId = 0;
+    node_id clientNodeId = 1;
+    enum8 statusCode = 2;
+    fabric_idx fabricIndex = 254;
+  }
+
+  readonly attribute access(read: manage) SupportedDeviceCategoryBitmap supportedDeviceCategories = 0;
+  readonly attribute command_id generatedCommandList[] = 65528;
+  readonly attribute command_id acceptedCommandList[] = 65529;
+  readonly attribute event_id eventList[] = 65530;
+  readonly attribute attrib_id attributeList[] = 65531;
+  readonly attribute bitmap32 featureMap = 65532;
+  readonly attribute int16u clusterRevision = 65533;
+
+  request struct RequestCommissioningApprovalRequest {
+    int64u requestId = 0;
+    vendor_id vendorId = 1;
+    int16u productId = 2;
+    optional char_string<64> label = 3;
+  }
+
+  request struct CommissionNodeRequest {
+    int64u requestId = 0;
+    int16u responseTimeoutSeconds = 1;
+    optional octet_string ipAddress = 2;
+    optional int16u port = 3;
+  }
+
+  response struct ReverseOpenCommissioningWindow = 2 {
+    int16u commissioningTimeout = 0;
+    octet_string PAKEPasscodeVerifier = 1;
+    int16u discriminator = 2;
+    int32u iterations = 3;
+    octet_string<32> salt = 4;
+  }
+
+  /** This command is sent by a client to request approval for a future CommissionNode call. */
+  command access(invoke: manage) RequestCommissioningApproval(RequestCommissioningApprovalRequest): DefaultSuccess = 0;
+  /** This command is sent by a client to request that the server begins commissioning a previously approved request. */
+  command access(invoke: manage) CommissionNode(CommissionNodeRequest): ReverseOpenCommissioningWindow = 1;
 }
 
 /** Attributes related to the electrical properties of a device. This cluster is used by power outlets and other devices that need to provide instantaneous data as opposed to metrology data which should be retrieved from the metering cluster.. */

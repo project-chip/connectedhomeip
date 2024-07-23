@@ -21,5 +21,8 @@ chip_test_suite("tests") {
 
   cflags = [ "-Wconversion" ]
 
-  public_deps = [ "${chip_root}/src/app/data-model-interface" ]
+  public_deps = [
+    "${chip_root}/src/app/data-model-interface",
+    "${chip_root}/src/lib/core:string-builder-adapters",
+  ]
 }

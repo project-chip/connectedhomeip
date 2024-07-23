@@ -1,4 +1,4 @@
-# Copyright (c) 2021 Project CHIP Authors
+# Copyright (c) 2021-2024 Project CHIP Authors
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -12,6 +12,7 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
+import logging
 import os
 from enum import Enum, auto
 
@@ -19,15 +20,31 @@ from .builder import BuilderOutput
 from .gn import GnBuilder
 
 
+class NxpOsUsed(Enum):
+    FREERTOS = auto()
+    ZEPHYR = auto()
+
+    def OsEnv(self):
+        if self == NxpOsUsed.ZEPHYR:
+            return 'zephyr'
+        elif self == NxpOsUsed.FREERTOS:
+            return 'freertos'
+        else:
+            raise Exception('Unknown OS type: %r' % self)
+
+
 class NxpBoard(Enum):
     K32W0 = auto()
     K32W1 = auto()
+    RW61X = auto()
 
     def Name(self):
         if self == NxpBoard.K32W0:
             return 'k32w0x'
         elif self == NxpBoard.K32W1:
             return 'k32w1'
+        elif self == NxpBoard.RW61X:
+            return 'rd_rw612_bga'
         else:
             raise Exception('Unknown board type: %r' % self)
 
@@ -36,6 +53,8 @@ class NxpBoard(Enum):
             return 'k32w/k32w0'
         elif self == NxpBoard.K32W1:
             return 'k32w/k32w1'
+        elif self == NxpBoard.RW61X:
+            return 'zephyr'
         else:
             raise Exception('Unknown board type: %r' % self)
 
@@ -43,12 +62,21 @@ class NxpBoard(Enum):
 class NxpApp(Enum):
     LIGHTING = auto()
     CONTACT = auto()
+    ALLCLUSTERS = auto()
+    LAUNDRYWASHER = auto()
+    THERMOSTAT = auto()
 
     def ExampleName(self):
         if self == NxpApp.LIGHTING:
             return 'lighting-app'
         elif self == NxpApp.CONTACT:
             return "contact-sensor-app"
+        elif self == NxpApp.ALLCLUSTERS:
+            return "all-clusters-app"
+        elif self == NxpApp.LAUNDRYWASHER:
+            return "laundry-washer-app"
+        elif self == NxpApp.THERMOSTAT:
+            return "thermostat"
         else:
             raise Exception('Unknown app type: %r' % self)
 
@@ -57,6 +85,12 @@ class NxpApp(Enum):
             return 'light-example'
         elif self == NxpApp.CONTACT:
             return 'contact-example'
+        elif self == NxpApp.ALLCLUSTERS:
+            return "all-cluster-example"
+        elif self == NxpApp.LAUNDRYWASHER:
+            return "laundry-washer-example"
+        elif self == NxpApp.THERMOSTAT:
+            return "thermostat-example"
         else:
             raise Exception('Unknown app type: %r' % self)
 
@@ -71,6 +105,7 @@ class NxpBuilder(GnBuilder):
                  runner,
                  app: NxpApp = NxpApp.LIGHTING,
                  board: NxpBoard = NxpBoard.K32W0,
+                 os_env: NxpOsUsed = NxpOsUsed.FREERTOS,
                  low_power: bool = False,
                  smu2: bool = False,
                  enable_factory_data: bool = False,
@@ -85,6 +120,7 @@ class NxpBuilder(GnBuilder):
         self.code_root = root
         self.app = app
         self.board = board
+        self.os_env = os_env
         self.low_power = low_power
         self.smu2 = smu2
         self.enable_factory_data = enable_factory_data
@@ -125,15 +161,54 @@ class NxpBuilder(GnBuilder):
 
         return args
 
+    def WestBuildArgs(self):
+        args = []
+        if self.enable_factory_data:
+            args.append('-DFILE_SUFFIX=fdata')
+
+        if self.has_sw_version_2:
+            args.append('-DCONFIG_CHIP_DEVICE_SOFTWARE_VERSION=2')
+
+        build_args = " -- " + " ".join(args) if len(args) > 0 else ""
+        return build_args
+
     def generate(self):
-        super(NxpBuilder, self).generate()
+        if self.os_env == NxpOsUsed.ZEPHYR:
+            if 'ZEPHYR_NXP_SDK_INSTALL_DIR' in os.environ:
+                cmd = 'export ZEPHYR_SDK_INSTALL_DIR="$ZEPHYR_NXP_SDK_INSTALL_DIR"\n'
+            else:
+                raise Exception("ZEPHYR_SDK_INSTALL_DIR need to be set")
+            if 'ZEPHYR_NXP_BASE' in os.environ:
+                cmd += 'export ZEPHYR_BASE="$ZEPHYR_NXP_BASE"\n'
+            else:
+                raise Exception("ZEPHYR_NXP_BASE need to be set")
+            build_args = self.WestBuildArgs()
+            cmd += '''
+            west build -p --cmake-only -b {board_name} -d {out_folder} {example_folder} {build_args}
+            '''.format(
+                board_name=self.board.Name(),
+                out_folder=self.output_dir,
+                example_folder=self.app.BuildRoot(self.code_root, self.board),
+                build_args=build_args).strip()
+            self._Execute(['bash', '-c', cmd], title='Generating ' + self.identifier)
+        else:
+            super(NxpBuilder, self).generate()
 
     def build_outputs(self):
         name = 'chip-%s-%s' % (self.board.Name(), self.app.NameSuffix())
-        yield BuilderOutput(
-            os.path.join(self.output_dir, name),
-            f'{name}.elf')
-        if self.options.enable_link_map_file:
+        if self.os_env == NxpOsUsed.ZEPHYR:
             yield BuilderOutput(
-                os.path.join(self.output_dir, f'{name}.map'),
-                f'{name}.map')
+                os.path.join(self.output_dir, 'zephyr', 'zephyr.elf'),
+                f'{name}.elf')
+            if self.options.enable_link_map_file:
+                yield BuilderOutput(
+                    os.path.join(self.output_dir, 'zephyr', 'zephyr.map'),
+                    f'{name}.map')
+        else:
+            yield BuilderOutput(
+                os.path.join(self.output_dir, name),
+                f'{name}.elf')
+            if self.options.enable_link_map_file:
+                yield BuilderOutput(
+                    os.path.join(self.output_dir, f'{name}.map'),
+                    f'{name}.map')

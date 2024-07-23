@@ -250,6 +250,9 @@ static constexpr ClusterId Id = 0x0000009C;
 namespace EnergyEvseMode {
 static constexpr ClusterId Id = 0x0000009D;
 } // namespace EnergyEvseMode
+namespace WaterHeaterMode {
+static constexpr ClusterId Id = 0x0000009E;
+} // namespace WaterHeaterMode
 namespace DeviceEnergyManagementMode {
 static constexpr ClusterId Id = 0x0000009F;
 } // namespace DeviceEnergyManagementMode
@@ -382,6 +385,9 @@ static constexpr ClusterId Id = 0x0000050F;
 namespace ContentAppObserver {
 static constexpr ClusterId Id = 0x00000510;
 } // namespace ContentAppObserver
+namespace CommissionerControl {
+static constexpr ClusterId Id = 0x00000751;
+} // namespace CommissionerControl
 namespace ElectricalMeasurement {
 static constexpr ClusterId Id = 0x00000B04;
 } // namespace ElectricalMeasurement
