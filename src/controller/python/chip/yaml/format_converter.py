@@ -200,8 +200,9 @@ def convert_to_data_model_type(field_value, field_type):
     # type indicates so.
     elif (field_type == uint):
         # Longer number are stored as strings. Need to make this conversion first.
-        value = int(field_value)
-        return field_type(value)
+        # The value can be represented in binary, octal, decimal or hexadecimal
+        # format.
+        return field_type(int(field_value, 0))
     # YAML treats enums as ints. Convert to the typed enum class.
     elif (issubclass(field_type, MatterIntEnum)):
         return field_type.extend_enum_if_value_doesnt_exist(field_value)
