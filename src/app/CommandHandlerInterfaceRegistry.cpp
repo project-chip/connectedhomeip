@@ -119,7 +119,7 @@ CHIP_ERROR CommandHandlerInterfaceRegistry::UnregisterCommandHandler(CommandHand
     return CHIP_ERROR_KEY_NOT_FOUND;
 }
 
-CommandHandlerInterface * GetCommandHandler(EndpointId endpointId, ClusterId clusterId)
+CommandHandlerInterface * CommandHandlerInterfaceRegistry::GetCommandHandler(EndpointId endpointId, ClusterId clusterId)
 {
     for (auto * cur = mCommandHandlerList; cur; cur = cur->GetNext())
     {
@@ -132,6 +132,5 @@ CommandHandlerInterface * GetCommandHandler(EndpointId endpointId, ClusterId clu
     return nullptr;
 }
 
-} // namespace CommandHandlerInterfaceRegistry
 } // namespace app
 } // namespace chip
