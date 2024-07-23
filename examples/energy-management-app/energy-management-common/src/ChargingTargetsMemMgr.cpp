@@ -46,7 +46,7 @@ ChargingTargetsMemMgr::~ChargingTargetsMemMgr()
 void ChargingTargetsMemMgr::PrepareDaySchedule(uint16_t chargingTargetSchedulesIdx)
 {
     // MUST be called for each entry in DataModel::List<const Structs::ChargingTargetScheduleStruct::Type> chargingTargetSchedules
-    mNumDailyChargingTargets    = 0;
+    mNumDailyChargingTargets = 0;
 
     // Should not occur but just to be safe
     if (chargingTargetSchedulesIdx >= kEvseTargetsMaxNumberOfDays)
@@ -58,7 +58,7 @@ void ChargingTargetsMemMgr::PrepareDaySchedule(uint16_t chargingTargetSchedulesI
     mChargingTargetSchedulesIdx = chargingTargetSchedulesIdx;
 
     // Free up any memory associated with this targetSchedule
-    if (mpListOfDays [mChargingTargetSchedulesIdx] != nullptr)
+    if (mpListOfDays[mChargingTargetSchedulesIdx] != nullptr)
     {
         chip::Platform::MemoryFree(mpListOfDays[mChargingTargetSchedulesIdx]);
         mpListOfDays[mChargingTargetSchedulesIdx] = nullptr;
