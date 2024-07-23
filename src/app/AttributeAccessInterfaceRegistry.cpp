@@ -67,17 +67,17 @@ AttributeAccessInterfaceRegistry & AttributeAccessInterfaceRegistry::Instance()
     return instance;
 }
 
-void AttributeAccessInterfaceRegistry::UnregisterAllForEndpoint(EndpointId endpointId)
-{
-    UnregisterMatchingAttributeAccessInterfaces(
-        [endpointId](AttributeAccessInterface * entry) { return entry->MatchesEndpoint(endpointId); }, mAttributeAccessOverrides);
-}
-
 void AttributeAccessInterfaceRegistry::Unregister(AttributeAccessInterface * attrOverride)
 {
     mAttributeAccessInterfaceCache.Invalidate();
     UnregisterMatchingAttributeAccessInterfaces([attrOverride](AttributeAccessInterface * entry) { return entry == attrOverride; },
                                                 mAttributeAccessOverrides);
+}
+
+void AttributeAccessInterfaceRegistry::UnregisterAllForEndpoint(EndpointId endpointId)
+{
+    UnregisterMatchingAttributeAccessInterfaces(
+        [endpointId](AttributeAccessInterface * entry) { return entry->MatchesEndpoint(endpointId); }, mAttributeAccessOverrides);
 }
 
 bool AttributeAccessInterfaceRegistry::Register(AttributeAccessInterface * attrOverride)
