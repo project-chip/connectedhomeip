@@ -313,7 +313,7 @@ CHIP_ERROR ReadSingleClusterData(const SubjectDescriptor & aSubjectDescriptor, b
         // reader (which can be lightweight constructed even from nullptr).
         GlobalAttributeReader reader(attributeCluster);
         AttributeAccessInterface * attributeOverride =
-            (attributeCluster != nullptr) ? &reader : GetAttributeAccessOverride(aPath.mEndpointId, aPath.mClusterId);
+            (attributeCluster != nullptr) ? &reader : AttributeAccessInterfaceRegistry::Instance().Get(aPath.mEndpointId, aPath.mClusterId);
         if (attributeOverride)
         {
             bool triedEncode = false;
@@ -713,7 +713,7 @@ CHIP_ERROR WriteSingleClusterData(const SubjectDescriptor & aSubjectDescriptor, 
         return apWriteHandler->AddStatus(aPath, Protocols::InteractionModel::Status::DataVersionMismatch);
     }
 
-    if (auto * attrOverride = GetAttributeAccessOverride(aPath.mEndpointId, aPath.mClusterId))
+    if (auto * attrOverride = AttributeAccessInterfaceRegistry::Instance().Get(aPath.mEndpointId, aPath.mClusterId))
     {
         AttributeValueDecoder valueDecoder(aReader, aSubjectDescriptor);
         ReturnErrorOnFailure(attrOverride->Write(aPath, valueDecoder));
