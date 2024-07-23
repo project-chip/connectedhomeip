@@ -99,11 +99,6 @@ CHIP_ERROR InteractionModelEngine::Init(Messaging::ExchangeManager * apExchangeM
 void InteractionModelEngine::Shutdown()
 {
     mpExchangeMgr->GetSessionManager()->SystemLayer()->CancelTimer(ResumeSubscriptionsTimerCallback, this);
-
-    // TODO: individual object clears the entire command handler interface registry.
-    //       This may not be expected.
-    CommandHandlerInterfaceRegistry::Instance().UnregisterAllHandlers();
-
     mCommandResponderObjs.ReleaseAll();
 
     mTimedHandlers.ForEachActiveObject([this](TimedHandler * obj) -> Loop {
