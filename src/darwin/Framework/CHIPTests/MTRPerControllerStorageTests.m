@@ -2947,7 +2947,6 @@ static const uint16_t kSubscriptionPoolBaseTimeoutInSeconds = 30;
 
     __auto_type queue = dispatch_get_main_queue();
 
-
     __auto_type * rootKeys = [[MTRTestKeys alloc] init];
     XCTAssertNotNil(rootKeys);
 
@@ -3062,7 +3061,6 @@ static const uint16_t kSubscriptionPoolBaseTimeoutInSeconds = 30;
     [controller shutdown];
     XCTAssertFalse([controller isRunning]);
 }
-
 
 - (void)testClientDataStorage
 {
