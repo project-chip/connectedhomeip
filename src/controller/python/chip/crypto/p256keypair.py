@@ -17,33 +17,32 @@
 
 import abc
 import hashlib
-from ctypes import (CFUNCTYPE, POINTER, c_bool, c_char, c_size_t, c_uint8, c_uint32, c_void_p, cast, memmove, pointer, py_object,
+from ctypes import (CFUNCTYPE, POINTER, _Pointer, c_bool, c_char, c_size_t, c_uint8, c_uint32, c_void_p, cast, memmove, py_object,
                     string_at)
 from typing import TYPE_CHECKING
 
 from chip import native
 from ecdsa import ECDH, NIST256p, SigningKey  # type: ignore
 
-# Create a subscriptable pointer type (with square brackets) to ensure compliance of type hinting with ctypes
+# WORKAROUND: Create a subscriptable pointer type (with square brackets) to ensure compliance of type hinting with ctypes
 if not TYPE_CHECKING:
     class pointer_fix:
         @classmethod
         def __class_getitem__(cls, item):
             return POINTER(item)
-    pointer = pointer_fix
+    _Pointer = pointer_fix
 
 
 _pychip_P256Keypair_ECDSA_sign_msg_func = CFUNCTYPE(
     c_bool, py_object, POINTER(c_uint8), c_size_t, POINTER(c_uint8), POINTER(c_size_t))
 
-_pychip_P256Keypair_ECDH_derive_secret_func = CFUNCTYPE(
-    c_bool, py_object, POINTER(c_uint8), POINTER(c_uint8), POINTER(c_size_t))
+_pychip_P256Keypair_ECDH_derive_secret_func = CFUNCTYPE(c_bool, py_object, POINTER(c_uint8), POINTER(c_uint8), POINTER(c_size_t))
 
 P256_PUBLIC_KEY_LENGTH = 2 * 32 + 1
 
 
 @ _pychip_P256Keypair_ECDSA_sign_msg_func
-def _pychip_ECDSA_sign_msg(self_: 'P256Keypair', message_buf: pointer[c_uint8], message_size: int, signature_buf: pointer[c_uint8], signature_buf_size: pointer[c_size_t]) -> bool:
+def _pychip_ECDSA_sign_msg(self_: 'P256Keypair', message_buf: _Pointer[c_uint8], message_size: int, signature_buf: _Pointer[c_uint8], signature_buf_size: _Pointer[c_size_t]) -> bool:
     res = self_.ECDSA_sign_msg(string_at(message_buf, message_size)[:])
     memmove(signature_buf, res, len(res))
     signature_buf_size.contents.value = len(res)
@@ -51,9 +50,8 @@ def _pychip_ECDSA_sign_msg(self_: 'P256Keypair', message_buf: pointer[c_uint8], 
 
 
 @ _pychip_P256Keypair_ECDH_derive_secret_func
-def _pychip_ECDH_derive_secret(self_: 'P256Keypair', remote_pubkey: pointer[c_uint8], out_secret_buf: pointer[c_uint8], out_secret_buf_size: pointer[c_uint32]) -> bool:
-    res = self_.ECDH_derive_secret(
-        string_at(remote_pubkey, P256_PUBLIC_KEY_LENGTH)[:])
+def _pychip_ECDH_derive_secret(self_: 'P256Keypair', remote_pubkey: _Pointer[c_uint8], out_secret_buf: _Pointer[c_uint8], out_secret_buf_size: _Pointer[c_uint32]) -> bool:
+    res = self_.ECDH_derive_secret(string_at(remote_pubkey, P256_PUBLIC_KEY_LENGTH)[:])
     memmove(out_secret_buf, res, len(res))
     out_secret_buf_size.contents.value = len(res)
     return True
@@ -81,8 +79,7 @@ class P256Keypair:
             setter = native.NativeLibraryHandleMethodArguments(handle)
             setter.Set("pychip_NewP256Keypair", c_void_p, [py_object,
                        _pychip_P256Keypair_ECDSA_sign_msg_func, _pychip_P256Keypair_ECDH_derive_secret_func])
-            setter.Set("pychip_P256Keypair_UpdatePubkey", native.PyChipError, [
-                       c_void_p, POINTER(c_char), c_size_t])
+            setter.Set("pychip_P256Keypair_UpdatePubkey", native.PyChipError, [c_void_p, POINTER(c_char), c_size_t])
             setter.Set("pychip_DeleteP256Keypair", None, [c_void_p])
         self._native_obj = handle.pychip_NewP256Keypair(
             py_object(self), _pychip_ECDSA_sign_msg, _pychip_ECDH_derive_secret)
@@ -93,7 +90,7 @@ class P256Keypair:
     def __del__(self):
         if self._native_obj is not None:
             handle = native.GetLibraryHandle()
-            handle.pychip_DeleteP256Keypair(cast(self._native_obj, c_void_p))
+            handle.pychip_DeleteP256Keypair(c_void_p(self._native_obj))
             self._native_obj = None
 
     @property
@@ -150,8 +147,7 @@ class TestP256Keypair(P256Keypair):
         else:
             self._key = private_key
 
-        self._pubkey = self._key.verifying_key.to_string(
-            encoding='uncompressed')
+        self._pubkey = self._key.verifying_key.to_string(encoding='uncompressed')
 
     @property
     def public_key(self) -> bytes:

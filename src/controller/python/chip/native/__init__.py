@@ -239,7 +239,7 @@ def _GetLibraryHandle(lib: Library, expectAlreadyInitialized: bool) -> _Handle:
     return handle
 
 
-def Init(bluetoothAdapter: int = None):
+def Init(bluetoothAdapter: typing.Optional[int] = None):
     CommonStackParams = construct.Struct(
         "BluetoothAdapterId" / construct.Int32ul,
     )

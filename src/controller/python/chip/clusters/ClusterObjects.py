@@ -52,7 +52,7 @@ def GetUnionUnderlyingType(typeToCheck, matchingType=None):
 @dataclass
 class ClusterObjectFieldDescriptor:
     Label: str = ''
-    Tag: int = int()
+    Tag: typing.Optional[int] = None
     Type: type = type(None)
 
     def _PutSingleElementToTLV(self, tag, val, elementType, writer: tlv.TLVWriter, debugPath: str = '?'):
@@ -175,14 +175,13 @@ class ClusterObjectDescriptor:
 
     def TLVToDict(self, tlvBuf: bytes) -> Dict[str, Any]:
         tlvData = tlv.TLVReader(tlvBuf).get().get('Any', {})
-        return self.TagDictToLabelDict([], tlvData)
+        return self.TagDictToLabelDict('', tlvData)
 
     def DictToTLVWithWriter(self, debugPath: str, tag, data: Mapping, writer: tlv.TLVWriter):
         writer.startStructure(tag)
         for _field in self.Fields:
             val = data.get(_field.Label, None)
-            _field.PutFieldToTLV(_field.Tag, val, writer,
-                                 debugPath + f'.{_field.Label}')
+            _field.PutFieldToTLV(_field.Tag, val, writer, debugPath + f'.{_field.Label}')
         writer.endContainer()
 
     def DictToTLV(self, data: dict) -> bytes:
@@ -210,11 +209,11 @@ class ClusterObject:
 
 # The below dictionaries will be filled dynamically
 # and are used for quick lookup/mapping from cluster/attribute id to the correct class
-ALL_CLUSTERS = {}
-ALL_ATTRIBUTES = {}
+ALL_CLUSTERS: typing.Dict = {}
+ALL_ATTRIBUTES: typing.Dict = {}
 # These need to be separate because there can be overlap in command ids for commands and responses.
-ALL_ACCEPTED_COMMANDS = {}
-ALL_GENERATED_COMMANDS = {}
+ALL_ACCEPTED_COMMANDS: typing.Dict = {}
+ALL_GENERATED_COMMANDS: typing.Dict = {}
 
 
 class ClusterCommand(ClusterObject):
