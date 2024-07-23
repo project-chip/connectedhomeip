@@ -98,9 +98,9 @@ void BdxTransfer::HandleTransferSessionOutput(TransferSession::OutputEvent & eve
         EndSession(CHIP_ERROR_TIMEOUT);
         break;
     case TransferSession::OutputEventType::kBlockReceived:
-        ByteSpan data(event.blockdata.Data, event.blockdata.Length);
         if (mDelegate)
         {
+            ByteSpan data(event.blockdata.Data, event.blockdata.Length);
             mDelegate->DataReceived(this, data);
         }
         break;
@@ -117,7 +117,8 @@ void BdxTransfer::HandleTransferSessionOutput(TransferSession::OutputEvent & eve
         break;
     case TransferSession::OutputEventType::kQueryWithSkipReceived:
         mDataTransferredCount = std::min<size_t>(mDataTransferredCount + event.bytesToSkip.BytesToSkip, mDataCount);
-        // Fallthrough intentional.
+        SendBlock();
+        break;
     case TransferSession::OutputEventType::kQueryReceived:
         SendBlock();
         break;
@@ -170,7 +171,7 @@ CHIP_ERROR BdxTransfer::SendBlock()
     block.Data = mData + mDataTransferredCount;
     block.Length = std::min<size_t>(mTransfer.GetTransferBlockSize(), dataRemaining);
     block.IsEof = block.Length == dataRemaining;
-    ReturnOnFailure(mTransfer.PrepareBlock(block));
+    ReturnErrorOnFailure(mTransfer.PrepareBlock(block));
     mDataTransferredCount += block.Length;
     ScheduleImmediatePoll();
     return CHIP_NO_ERROR;

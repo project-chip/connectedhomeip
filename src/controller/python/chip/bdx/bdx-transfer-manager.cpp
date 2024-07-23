@@ -20,6 +20,10 @@
 namespace chip {
 namespace bdx {
 
+BdxTransferManager::BdxTransferManager(BdxTransfer::Delegate * bdxTransferDelegate) : mBdxTransferDelegate(bdxTransferDelegate)
+{
+}
+
 BdxTransferManager::~BdxTransferManager()
 {
     mTransferPool.ReleaseAll();
@@ -43,7 +47,7 @@ BdxTransfer * BdxTransferManager::Allocate()
     VerifyOrReturnValue(mExpectedTransfers != 0, nullptr);
 
     BdxTransfer * result = mTransferPool.CreateObject();
-    VerifyOrReturn(result != nullptr);
+    VerifyOrReturnValue(result != nullptr, nullptr);
     result->SetDelegate(this);
 
     --mExpectedTransfers;

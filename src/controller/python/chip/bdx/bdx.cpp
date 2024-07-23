@@ -46,6 +46,10 @@ struct TransferData
     PyObject OnTransferObtainedContext = nullptr;
     PyObject OnDataReceivedContext = nullptr;
     PyObject OnTransferCompletedContext = nullptr;
+
+    bool operator==(const TransferData& other) const {
+        return Transfer == other.Transfer;
+    }
 };
 
 class TransferMap
@@ -54,20 +58,20 @@ public:
     // This returns the transfer data associated with the given transfer.
     TransferData * TransferDataForTransfer(bdx::BdxTransfer * transfer)
     {
-        std::vector<TransferData>::iterator result = std::find(mTransfers.begin(), mTransfers.end(),
-                                                               [transfer](const TransferData& data) {
-                                                                   return data.Transfer == transfer;
-                                                               });
+        std::vector<TransferData>::iterator result = std::find_if(mTransfers.begin(), mTransfers.end(),
+                                                                  [transfer](const TransferData& data) {
+                                                                      return data.Transfer == transfer;
+                                                                  });
         VerifyOrReturnValue(result != mTransfers.end(), nullptr);
         return &*result;
     }
 
     TransferData * TransferDataForTransferObtainedContext(PyObject transferObtainedContext)
     {
-        std::vector<TransferData>::iterator result = std::find(mTransfers.begin(), mTransfers.end(),
-                                                               [transferObtainedContext](const TransferData& data) {
-                                                                   return data.OnTransferObtainedContext == transferObtainedContext;
-                                                               });
+        std::vector<TransferData>::iterator result = std::find_if(mTransfers.begin(), mTransfers.end(),
+                                                                  [transferObtainedContext](const TransferData& data) {
+                                                                      return data.OnTransferObtainedContext == transferObtainedContext;
+                                                                  });
         VerifyOrReturnValue(result != mTransfers.end(), nullptr);
         return &*result;
     }
@@ -75,10 +79,10 @@ public:
     // This returns the next transfer data that has no associated BdxTransfer.
     TransferData * NextUnassociatedTransferData()
     {
-        std::vector<TransferData>::iterator result = std::find(mTransfers.begin(), mTransfers.end(),
-                                                               [](const TransferData& data) {
-                                                                   return data.Transfer == nullptr;
-                                                               });
+        std::vector<TransferData>::iterator result = std::find_if(mTransfers.begin(), mTransfers.end(),
+                                                                  [](const TransferData& data) {
+                                                                      return data.Transfer == nullptr;
+                                                                  });
         VerifyOrReturnValue(result != mTransfers.end(), nullptr);
         return &*result;
     }
@@ -167,9 +171,9 @@ void pychip_Bdx_InitCallbacks(OnTransferObtainedCallback onTransferObtainedCallb
                               OnDataReceivedCallback onDataReceivedCallback,
                               OnTransferCompletedCallback onTransferCompletedCallback)
 {
-    OnTransferObtainedCallback gOnTransferObtainedCallback   = onTransferObtainedCallback;
-    OnDataReceivedCallback gOnDataReceivedCallback           = onDataReceivedCallback;
-    OnTransferCompletedCallback gOnTransferCompletedCallback = onTransferCompletedCallback;
+    gOnTransferObtainedCallback  = onTransferObtainedCallback;
+    gOnDataReceivedCallback      = onDataReceivedCallback;
+    gOnTransferCompletedCallback = onTransferCompletedCallback;
 }
 
 PyChipError pychip_Bdx_ExpectBdxTransfer(PyObject transferObtainedContext)
