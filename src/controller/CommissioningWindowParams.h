@@ -54,11 +54,10 @@ public:
         return static_cast<Derived &>(*this);
     }
 
-    bool HasEndpointId() const { return mEndpointId.HasValue(); }
-    EndpointId GetEndpointId() const { return mEndpointId.Value(); }
+    EndpointId GetEndpointId() const { return mEndpointId; }
     Derived & SetEndpointId(EndpointId endpointId)
     {
-        mEndpointId = MakeOptional(endpointId);
+        mEndpointId = endpointId;
         return static_cast<Derived &>(*this);
     }
 
@@ -91,7 +90,7 @@ public:
 
 private:
     NodeId mNodeId                    = kUndefinedNodeId;
-    Optional<EndpointId> mEndpointId  = NullOptional;
+    EndpointId mEndpointId            = kRootEndpointId;               // Default endpoint for Administrator Commissioning Cluster
     System::Clock::Seconds16 mTimeout = System::Clock::Seconds16(300); // Defaulting
     uint32_t mIteration               = 1000;                          // Defaulting
     Optional<uint16_t> mDiscriminator = NullOptional; // Using optional type to avoid picking a sentinnel in valid range

@@ -126,10 +126,7 @@ CHIP_ERROR CommissioningWindowOpener::OpenCommissioningWindow(const Commissionin
     mCommissioningWindowVerifierCallback = nullptr;
     mNodeId                              = params.GetNodeId();
     mCommissioningWindowTimeout          = params.GetTimeout();
-    if (params.HasEndpointId())
-    {
-        mTargetEndpointId = params.GetEndpointId();
-    }
+    mTargetEndpointId                    = params.GetEndpointId();
 
     if (params.GetReadVIDPIDAttributes())
     {
@@ -166,10 +163,7 @@ CHIP_ERROR CommissioningWindowOpener::OpenCommissioningWindow(const Commissionin
     mPBKDFIterations                     = params.GetIteration();
     mCommissioningWindowOption           = CommissioningWindowOption::kTokenWithProvidedPIN;
     mDiscriminator.SetLongValue(params.GetDiscriminator());
-    if (params.HasEndpointId())
-    {
-        mTargetEndpointId = params.GetEndpointId();
-    }
+    mTargetEndpointId = params.GetEndpointId();
 
     mNextStep = Step::kOpenCommissioningWindow;
 
