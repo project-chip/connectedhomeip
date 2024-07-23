@@ -107,7 +107,7 @@ class ProcessOutputCapture:
             logging.error(f"-------- END:   LOG DUMP FOR {self.command!r} -----")
 
     def next_output_line(self, timeout_sec=None):
-        """Fetch an item from the output queue, potentially wit h a timeout."""
+        """Fetch an item from the output queue, potentially with a timeout."""
         try:
             return self.output_lines.get(timeout=timeout_sec)
         except queue.Empty:
