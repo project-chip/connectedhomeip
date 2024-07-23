@@ -127,6 +127,5 @@ AttributeAccessInterface * AttributeAccessInterfaceRegistry::Get(EndpointId endp
     return nullptr;
 }
 
-
 } // namespace app
 } // namespace chip
