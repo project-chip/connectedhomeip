@@ -62,6 +62,10 @@ CHIP_ERROR RetrieveClusterData(InteractionModel::DataModel * dataModel, const Ac
     CHIP_ERROR errEmber         = CHIP_NO_ERROR;
     uint32_t lengthWrittenEmber = 0;
 
+    // a copy for DM logic only. Ember changes state directly
+    // IMPORTANT: the copy MUST be taken BEFORE ember processes/changes encoderState inline.
+    AttributeEncodeState stateDm(encoderState); 
+
     {
         ScopedAttributeReportIBsBuilderState builderState(reportBuilder); // temporary only
         errEmber =
@@ -69,7 +73,6 @@ CHIP_ERROR RetrieveClusterData(InteractionModel::DataModel * dataModel, const Ac
         lengthWrittenEmber = reportBuilder.GetWriter()->GetLengthWritten();
     }
 
-    AttributeEncodeState stateDm(encoderState); // a copy for DM logic only. Ember changes state directly
     CHIP_ERROR errDM = DataModelImpl::RetrieveClusterData(dataModel, subjectDescriptor, isFabricFiltered, reportBuilder, path,
                                                           encoderState != nullptr ? &stateDm : nullptr);
 
