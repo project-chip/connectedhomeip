@@ -27,9 +27,10 @@
 
 #include <cinttypes>
 
-#include "access/RequestPath.h"
-#include "access/SubjectDescriptor.h"
+#include <access/RequestPath.h>
+#include <access/SubjectDescriptor.h>
 #include <app/AppConfig.h>
+#include <app/CommandHandlerInterfaceRegistry.h>
 #include <app/RequiredPrivilege.h>
 #include <app/util/IMClusterCommandHandler.h>
 #include <app/util/af-types.h>
@@ -99,20 +100,9 @@ void InteractionModelEngine::Shutdown()
 {
     mpExchangeMgr->GetSessionManager()->SystemLayer()->CancelTimer(ResumeSubscriptionsTimerCallback, this);
 
-    CommandHandlerInterface * handlerIter = mCommandHandlerList;
-
-    //
-    // Walk our list of command handlers and de-register them, before finally
-    // nulling out the list entirely.
-    //
-    while (handlerIter)
-    {
-        CommandHandlerInterface * nextHandler = handlerIter->GetNext();
-        handlerIter->SetNext(nullptr);
-        handlerIter = nextHandler;
-    }
-
-    mCommandHandlerList = nullptr;
+    // TODO: individual object clears the entire command handler interface registry.
+    //       This may not be expected.
+    CommandHandlerInterfaceRegistry::UnregisterAllHandlers();
 
     mCommandResponderObjs.ReleaseAll();
 
@@ -1682,7 +1672,8 @@ CHIP_ERROR InteractionModelEngine::PushFront(SingleLinkedListNode<T> *& aObjectL
 void InteractionModelEngine::DispatchCommand(CommandHandlerImpl & apCommandObj, const ConcreteCommandPath & aCommandPath,
                                              TLV::TLVReader & apPayload)
 {
-    CommandHandlerInterface * handler = FindCommandHandler(aCommandPath.mEndpointId, aCommandPath.mClusterId);
+    CommandHandlerInterface * handler =
+        CommandHandlerInterfaceRegistry::GetCommandHandler(aCommandPath.mEndpointId, aCommandPath.mClusterId);
 
     if (handler)
     {
@@ -1706,6 +1697,7 @@ Protocols::InteractionModel::Status InteractionModelEngine::CommandExists(const 
     return ServerClusterCommandExists(aCommandPath);
 }
 
+<<<<<<< HEAD
 CHIP_ERROR InteractionModelEngine::RegisterCommandHandler(CommandHandlerInterface * handler)
 {
     VerifyOrReturnError(handler != nullptr, CHIP_ERROR_INVALID_ARGUMENT);
