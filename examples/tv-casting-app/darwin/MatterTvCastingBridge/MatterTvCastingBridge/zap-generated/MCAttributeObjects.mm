@@ -30,7 +30,6 @@
 
 #import <Foundation/Foundation.h>
 
-
 // OnOff cluster attributes:
 
 @implementation MCOnOffClusterOnOffAttribute
@@ -71,8 +70,8 @@
         chip::app::Clusters::OnOff::Attributes::OnOff::TypeInfo::DecodableType _cppValue = *sharedPtr;
         *aError = CHIP_NO_ERROR;
         NSNumber * _Nonnull value;
-                value = [NSNumber numberWithBool:_cppValue];
-              return value;
+        value = [NSNumber numberWithBool:_cppValue];
+        return value;
     }
     *aError = CHIP_ERROR_INTERNAL;
     return value;
@@ -117,8 +116,8 @@
         chip::app::Clusters::OnOff::Attributes::GlobalSceneControl::TypeInfo::DecodableType _cppValue = *sharedPtr;
         *aError = CHIP_NO_ERROR;
         NSNumber * _Nonnull value;
-                value = [NSNumber numberWithBool:_cppValue];
-              return value;
+        value = [NSNumber numberWithBool:_cppValue];
+        return value;
     }
     *aError = CHIP_ERROR_INTERNAL;
     return value;
@@ -163,8 +162,8 @@
         chip::app::Clusters::OnOff::Attributes::OnTime::TypeInfo::DecodableType _cppValue = *sharedPtr;
         *aError = CHIP_NO_ERROR;
         NSNumber * _Nonnull value;
-                value = [NSNumber numberWithUnsignedShort:_cppValue];
-              return value;
+        value = [NSNumber numberWithUnsignedShort:_cppValue];
+        return value;
     }
     *aError = CHIP_ERROR_INTERNAL;
     return value;
@@ -209,8 +208,8 @@
         chip::app::Clusters::OnOff::Attributes::OffWaitTime::TypeInfo::DecodableType _cppValue = *sharedPtr;
         *aError = CHIP_NO_ERROR;
         NSNumber * _Nonnull value;
-                value = [NSNumber numberWithUnsignedShort:_cppValue];
-              return value;
+        value = [NSNumber numberWithUnsignedShort:_cppValue];
+        return value;
     }
     *aError = CHIP_ERROR_INTERNAL;
     return value;
@@ -255,11 +254,11 @@
         chip::app::Clusters::OnOff::Attributes::StartUpOnOff::TypeInfo::DecodableType _cppValue = *sharedPtr;
         *aError = CHIP_NO_ERROR;
         NSNumber * _Nullable value;
-          if (_cppValue.IsNull()) {
+        if (_cppValue.IsNull()) {
             value = nil;
-          } else {
-                  value = [NSNumber numberWithUnsignedChar:chip::to_underlying(_cppValue.Value())];
-  }
+        } else {
+            value = [NSNumber numberWithUnsignedChar:chip::to_underlying(_cppValue.Value())];
+        }
         return value;
     }
     *aError = CHIP_ERROR_INTERNAL;
@@ -305,21 +304,22 @@
         chip::app::Clusters::OnOff::Attributes::GeneratedCommandList::TypeInfo::DecodableType _cppValue = *sharedPtr;
         *aError = CHIP_NO_ERROR;
         NSArray * _Nonnull value;
-          { // Scope for our temporary variables
+        { // Scope for our temporary variables
             auto * array_0 = [NSMutableArray new];
             auto iter_0 = _cppValue.begin();
             while (iter_0.Next()) {
-              auto & entry_0 = iter_0.GetValue();
-              NSNumber * newElement_0;
-                      newElement_0 = [NSNumber numberWithUnsignedInt:entry_0];
-            [array_0 addObject:newElement_0];
+                auto & entry_0 = iter_0.GetValue();
+                NSNumber * newElement_0;
+                newElement_0 = [NSNumber numberWithUnsignedInt:entry_0];
+                [array_0 addObject:newElement_0];
             }
             CHIP_ERROR err = iter_0.GetStatus();
             if (err != CHIP_NO_ERROR) {
-              *aError = err; return nil;
+                *aError = err;
+                return nil;
             }
             value = array_0;
-          }
+        }
         return value;
     }
     *aError = CHIP_ERROR_INTERNAL;
@@ -365,21 +365,22 @@
         chip::app::Clusters::OnOff::Attributes::AcceptedCommandList::TypeInfo::DecodableType _cppValue = *sharedPtr;
         *aError = CHIP_NO_ERROR;
         NSArray * _Nonnull value;
-          { // Scope for our temporary variables
+        { // Scope for our temporary variables
             auto * array_0 = [NSMutableArray new];
             auto iter_0 = _cppValue.begin();
             while (iter_0.Next()) {
-              auto & entry_0 = iter_0.GetValue();
-              NSNumber * newElement_0;
-                      newElement_0 = [NSNumber numberWithUnsignedInt:entry_0];
-            [array_0 addObject:newElement_0];
+                auto & entry_0 = iter_0.GetValue();
+                NSNumber * newElement_0;
+                newElement_0 = [NSNumber numberWithUnsignedInt:entry_0];
+                [array_0 addObject:newElement_0];
             }
             CHIP_ERROR err = iter_0.GetStatus();
             if (err != CHIP_NO_ERROR) {
-              *aError = err; return nil;
+                *aError = err;
+                return nil;
             }
             value = array_0;
-          }
+        }
         return value;
     }
     *aError = CHIP_ERROR_INTERNAL;
@@ -425,21 +426,22 @@
         chip::app::Clusters::OnOff::Attributes::EventList::TypeInfo::DecodableType _cppValue = *sharedPtr;
         *aError = CHIP_NO_ERROR;
         NSArray * _Nonnull value;
-          { // Scope for our temporary variables
+        { // Scope for our temporary variables
             auto * array_0 = [NSMutableArray new];
             auto iter_0 = _cppValue.begin();
             while (iter_0.Next()) {
-              auto & entry_0 = iter_0.GetValue();
-              NSNumber * newElement_0;
-                      newElement_0 = [NSNumber numberWithUnsignedInt:entry_0];
-            [array_0 addObject:newElement_0];
+                auto & entry_0 = iter_0.GetValue();
+                NSNumber * newElement_0;
+                newElement_0 = [NSNumber numberWithUnsignedInt:entry_0];
+                [array_0 addObject:newElement_0];
             }
             CHIP_ERROR err = iter_0.GetStatus();
             if (err != CHIP_NO_ERROR) {
-              *aError = err; return nil;
+                *aError = err;
+                return nil;
             }
             value = array_0;
-          }
+        }
         return value;
     }
     *aError = CHIP_ERROR_INTERNAL;
@@ -485,21 +487,22 @@
         chip::app::Clusters::OnOff::Attributes::AttributeList::TypeInfo::DecodableType _cppValue = *sharedPtr;
         *aError = CHIP_NO_ERROR;
         NSArray * _Nonnull value;
-          { // Scope for our temporary variables
+        { // Scope for our temporary variables
             auto * array_0 = [NSMutableArray new];
             auto iter_0 = _cppValue.begin();
             while (iter_0.Next()) {
-              auto & entry_0 = iter_0.GetValue();
-              NSNumber * newElement_0;
-                      newElement_0 = [NSNumber numberWithUnsignedInt:entry_0];
-            [array_0 addObject:newElement_0];
+                auto & entry_0 = iter_0.GetValue();
+                NSNumber * newElement_0;
+                newElement_0 = [NSNumber numberWithUnsignedInt:entry_0];
+                [array_0 addObject:newElement_0];
             }
             CHIP_ERROR err = iter_0.GetStatus();
             if (err != CHIP_NO_ERROR) {
-              *aError = err; return nil;
+                *aError = err;
+                return nil;
             }
             value = array_0;
-          }
+        }
         return value;
     }
     *aError = CHIP_ERROR_INTERNAL;
@@ -545,8 +548,8 @@
         chip::app::Clusters::OnOff::Attributes::FeatureMap::TypeInfo::DecodableType _cppValue = *sharedPtr;
         *aError = CHIP_NO_ERROR;
         NSNumber * _Nonnull value;
-                value = [NSNumber numberWithUnsignedInt:_cppValue];
-              return value;
+        value = [NSNumber numberWithUnsignedInt:_cppValue];
+        return value;
     }
     *aError = CHIP_ERROR_INTERNAL;
     return value;
@@ -591,14 +594,13 @@
         chip::app::Clusters::OnOff::Attributes::ClusterRevision::TypeInfo::DecodableType _cppValue = *sharedPtr;
         *aError = CHIP_NO_ERROR;
         NSNumber * _Nonnull value;
-                value = [NSNumber numberWithUnsignedShort:_cppValue];
-              return value;
+        value = [NSNumber numberWithUnsignedShort:_cppValue];
+        return value;
     }
     *aError = CHIP_ERROR_INTERNAL;
     return value;
 }
 @end
-
 
 // LevelControl cluster attributes:
 
@@ -640,10 +642,10 @@
         chip::app::Clusters::LevelControl::Attributes::CurrentLevel::TypeInfo::DecodableType _cppValue = *sharedPtr;
         *aError = CHIP_NO_ERROR;
         NSNumber * _Nullable value;
-          if (_cppValue.IsNull()) {
+        if (_cppValue.IsNull()) {
             value = nil;
-          } else {
-                    value = [NSNumber numberWithUnsignedChar:_cppValue.Value()];
+        } else {
+            value = [NSNumber numberWithUnsignedChar:_cppValue.Value()];
         }
         return value;
     }
@@ -690,8 +692,8 @@
         chip::app::Clusters::LevelControl::Attributes::RemainingTime::TypeInfo::DecodableType _cppValue = *sharedPtr;
         *aError = CHIP_NO_ERROR;
         NSNumber * _Nonnull value;
-                value = [NSNumber numberWithUnsignedShort:_cppValue];
-              return value;
+        value = [NSNumber numberWithUnsignedShort:_cppValue];
+        return value;
     }
     *aError = CHIP_ERROR_INTERNAL;
     return value;
@@ -736,8 +738,8 @@
         chip::app::Clusters::LevelControl::Attributes::MinLevel::TypeInfo::DecodableType _cppValue = *sharedPtr;
         *aError = CHIP_NO_ERROR;
         NSNumber * _Nonnull value;
-                value = [NSNumber numberWithUnsignedChar:_cppValue];
-              return value;
+        value = [NSNumber numberWithUnsignedChar:_cppValue];
+        return value;
     }
     *aError = CHIP_ERROR_INTERNAL;
     return value;
@@ -782,8 +784,8 @@
         chip::app::Clusters::LevelControl::Attributes::MaxLevel::TypeInfo::DecodableType _cppValue = *sharedPtr;
         *aError = CHIP_NO_ERROR;
         NSNumber * _Nonnull value;
-                value = [NSNumber numberWithUnsignedChar:_cppValue];
-              return value;
+        value = [NSNumber numberWithUnsignedChar:_cppValue];
+        return value;
     }
     *aError = CHIP_ERROR_INTERNAL;
     return value;
@@ -828,8 +830,8 @@
         chip::app::Clusters::LevelControl::Attributes::CurrentFrequency::TypeInfo::DecodableType _cppValue = *sharedPtr;
         *aError = CHIP_NO_ERROR;
         NSNumber * _Nonnull value;
-                value = [NSNumber numberWithUnsignedShort:_cppValue];
-              return value;
+        value = [NSNumber numberWithUnsignedShort:_cppValue];
+        return value;
     }
     *aError = CHIP_ERROR_INTERNAL;
     return value;
@@ -874,8 +876,8 @@
         chip::app::Clusters::LevelControl::Attributes::MinFrequency::TypeInfo::DecodableType _cppValue = *sharedPtr;
         *aError = CHIP_NO_ERROR;
         NSNumber * _Nonnull value;
-                value = [NSNumber numberWithUnsignedShort:_cppValue];
-              return value;
+        value = [NSNumber numberWithUnsignedShort:_cppValue];
+        return value;
     }
     *aError = CHIP_ERROR_INTERNAL;
     return value;
@@ -920,8 +922,8 @@
         chip::app::Clusters::LevelControl::Attributes::MaxFrequency::TypeInfo::DecodableType _cppValue = *sharedPtr;
         *aError = CHIP_NO_ERROR;
         NSNumber * _Nonnull value;
-                value = [NSNumber numberWithUnsignedShort:_cppValue];
-              return value;
+        value = [NSNumber numberWithUnsignedShort:_cppValue];
+        return value;
     }
     *aError = CHIP_ERROR_INTERNAL;
     return value;
@@ -966,7 +968,7 @@
         chip::app::Clusters::LevelControl::Attributes::Options::TypeInfo::DecodableType _cppValue = *sharedPtr;
         *aError = CHIP_NO_ERROR;
         NSNumber * _Nonnull value;
-                value = [NSNumber numberWithUnsignedChar:_cppValue.Raw()];
+        value = [NSNumber numberWithUnsignedChar:_cppValue.Raw()];
         return value;
     }
     *aError = CHIP_ERROR_INTERNAL;
@@ -1012,8 +1014,8 @@
         chip::app::Clusters::LevelControl::Attributes::OnOffTransitionTime::TypeInfo::DecodableType _cppValue = *sharedPtr;
         *aError = CHIP_NO_ERROR;
         NSNumber * _Nonnull value;
-                value = [NSNumber numberWithUnsignedShort:_cppValue];
-              return value;
+        value = [NSNumber numberWithUnsignedShort:_cppValue];
+        return value;
     }
     *aError = CHIP_ERROR_INTERNAL;
     return value;
@@ -1058,10 +1060,10 @@
         chip::app::Clusters::LevelControl::Attributes::OnLevel::TypeInfo::DecodableType _cppValue = *sharedPtr;
         *aError = CHIP_NO_ERROR;
         NSNumber * _Nullable value;
-          if (_cppValue.IsNull()) {
+        if (_cppValue.IsNull()) {
             value = nil;
-          } else {
-                    value = [NSNumber numberWithUnsignedChar:_cppValue.Value()];
+        } else {
+            value = [NSNumber numberWithUnsignedChar:_cppValue.Value()];
         }
         return value;
     }
@@ -1108,10 +1110,10 @@
         chip::app::Clusters::LevelControl::Attributes::OnTransitionTime::TypeInfo::DecodableType _cppValue = *sharedPtr;
         *aError = CHIP_NO_ERROR;
         NSNumber * _Nullable value;
-          if (_cppValue.IsNull()) {
+        if (_cppValue.IsNull()) {
             value = nil;
-          } else {
-                    value = [NSNumber numberWithUnsignedShort:_cppValue.Value()];
+        } else {
+            value = [NSNumber numberWithUnsignedShort:_cppValue.Value()];
         }
         return value;
     }
@@ -1158,10 +1160,10 @@
         chip::app::Clusters::LevelControl::Attributes::OffTransitionTime::TypeInfo::DecodableType _cppValue = *sharedPtr;
         *aError = CHIP_NO_ERROR;
         NSNumber * _Nullable value;
-          if (_cppValue.IsNull()) {
+        if (_cppValue.IsNull()) {
             value = nil;
-          } else {
-                    value = [NSNumber numberWithUnsignedShort:_cppValue.Value()];
+        } else {
+            value = [NSNumber numberWithUnsignedShort:_cppValue.Value()];
         }
         return value;
     }
@@ -1208,10 +1210,10 @@
         chip::app::Clusters::LevelControl::Attributes::DefaultMoveRate::TypeInfo::DecodableType _cppValue = *sharedPtr;
         *aError = CHIP_NO_ERROR;
         NSNumber * _Nullable value;
-          if (_cppValue.IsNull()) {
+        if (_cppValue.IsNull()) {
             value = nil;
-          } else {
-                    value = [NSNumber numberWithUnsignedChar:_cppValue.Value()];
+        } else {
+            value = [NSNumber numberWithUnsignedChar:_cppValue.Value()];
         }
         return value;
     }
@@ -1258,10 +1260,10 @@
         chip::app::Clusters::LevelControl::Attributes::StartUpCurrentLevel::TypeInfo::DecodableType _cppValue = *sharedPtr;
         *aError = CHIP_NO_ERROR;
         NSNumber * _Nullable value;
-          if (_cppValue.IsNull()) {
+        if (_cppValue.IsNull()) {
             value = nil;
-          } else {
-                    value = [NSNumber numberWithUnsignedChar:_cppValue.Value()];
+        } else {
+            value = [NSNumber numberWithUnsignedChar:_cppValue.Value()];
         }
         return value;
     }
@@ -1308,21 +1310,22 @@
         chip::app::Clusters::LevelControl::Attributes::GeneratedCommandList::TypeInfo::DecodableType _cppValue = *sharedPtr;
         *aError = CHIP_NO_ERROR;
         NSArray * _Nonnull value;
-          { // Scope for our temporary variables
+        { // Scope for our temporary variables
             auto * array_0 = [NSMutableArray new];
             auto iter_0 = _cppValue.begin();
             while (iter_0.Next()) {
-              auto & entry_0 = iter_0.GetValue();
-              NSNumber * newElement_0;
-                      newElement_0 = [NSNumber numberWithUnsignedInt:entry_0];
-            [array_0 addObject:newElement_0];
+                auto & entry_0 = iter_0.GetValue();
+                NSNumber * newElement_0;
+                newElement_0 = [NSNumber numberWithUnsignedInt:entry_0];
+                [array_0 addObject:newElement_0];
             }
             CHIP_ERROR err = iter_0.GetStatus();
             if (err != CHIP_NO_ERROR) {
-              *aError = err; return nil;
+                *aError = err;
+                return nil;
             }
             value = array_0;
-          }
+        }
         return value;
     }
     *aError = CHIP_ERROR_INTERNAL;
@@ -1368,21 +1371,22 @@
         chip::app::Clusters::LevelControl::Attributes::AcceptedCommandList::TypeInfo::DecodableType _cppValue = *sharedPtr;
         *aError = CHIP_NO_ERROR;
         NSArray * _Nonnull value;
-          { // Scope for our temporary variables
+        { // Scope for our temporary variables
             auto * array_0 = [NSMutableArray new];
             auto iter_0 = _cppValue.begin();
             while (iter_0.Next()) {
-              auto & entry_0 = iter_0.GetValue();
-              NSNumber * newElement_0;
-                      newElement_0 = [NSNumber numberWithUnsignedInt:entry_0];
-            [array_0 addObject:newElement_0];
+                auto & entry_0 = iter_0.GetValue();
+                NSNumber * newElement_0;
+                newElement_0 = [NSNumber numberWithUnsignedInt:entry_0];
+                [array_0 addObject:newElement_0];
             }
             CHIP_ERROR err = iter_0.GetStatus();
             if (err != CHIP_NO_ERROR) {
-              *aError = err; return nil;
+                *aError = err;
+                return nil;
             }
             value = array_0;
-          }
+        }
         return value;
     }
     *aError = CHIP_ERROR_INTERNAL;
@@ -1428,21 +1432,22 @@
         chip::app::Clusters::LevelControl::Attributes::EventList::TypeInfo::DecodableType _cppValue = *sharedPtr;
         *aError = CHIP_NO_ERROR;
         NSArray * _Nonnull value;
-          { // Scope for our temporary variables
+        { // Scope for our temporary variables
             auto * array_0 = [NSMutableArray new];
             auto iter_0 = _cppValue.begin();
             while (iter_0.Next()) {
-              auto & entry_0 = iter_0.GetValue();
-              NSNumber * newElement_0;
-                      newElement_0 = [NSNumber numberWithUnsignedInt:entry_0];
-            [array_0 addObject:newElement_0];
+                auto & entry_0 = iter_0.GetValue();
+                NSNumber * newElement_0;
+                newElement_0 = [NSNumber numberWithUnsignedInt:entry_0];
+                [array_0 addObject:newElement_0];
             }
             CHIP_ERROR err = iter_0.GetStatus();
             if (err != CHIP_NO_ERROR) {
-              *aError = err; return nil;
+                *aError = err;
+                return nil;
             }
             value = array_0;
-          }
+        }
         return value;
     }
     *aError = CHIP_ERROR_INTERNAL;
@@ -1488,21 +1493,22 @@
         chip::app::Clusters::LevelControl::Attributes::AttributeList::TypeInfo::DecodableType _cppValue = *sharedPtr;
         *aError = CHIP_NO_ERROR;
         NSArray * _Nonnull value;
-          { // Scope for our temporary variables
+        { // Scope for our temporary variables
             auto * array_0 = [NSMutableArray new];
             auto iter_0 = _cppValue.begin();
             while (iter_0.Next()) {
-              auto & entry_0 = iter_0.GetValue();
-              NSNumber * newElement_0;
-                      newElement_0 = [NSNumber numberWithUnsignedInt:entry_0];
-            [array_0 addObject:newElement_0];
+                auto & entry_0 = iter_0.GetValue();
+                NSNumber * newElement_0;
+                newElement_0 = [NSNumber numberWithUnsignedInt:entry_0];
+                [array_0 addObject:newElement_0];
             }
             CHIP_ERROR err = iter_0.GetStatus();
             if (err != CHIP_NO_ERROR) {
-              *aError = err; return nil;
+                *aError = err;
+                return nil;
             }
             value = array_0;
-          }
+        }
         return value;
     }
     *aError = CHIP_ERROR_INTERNAL;
@@ -1548,8 +1554,8 @@
         chip::app::Clusters::LevelControl::Attributes::FeatureMap::TypeInfo::DecodableType _cppValue = *sharedPtr;
         *aError = CHIP_NO_ERROR;
         NSNumber * _Nonnull value;
-                value = [NSNumber numberWithUnsignedInt:_cppValue];
-              return value;
+        value = [NSNumber numberWithUnsignedInt:_cppValue];
+        return value;
     }
     *aError = CHIP_ERROR_INTERNAL;
     return value;
@@ -1594,14 +1600,13 @@
         chip::app::Clusters::LevelControl::Attributes::ClusterRevision::TypeInfo::DecodableType _cppValue = *sharedPtr;
         *aError = CHIP_NO_ERROR;
         NSNumber * _Nonnull value;
-                value = [NSNumber numberWithUnsignedShort:_cppValue];
-              return value;
+        value = [NSNumber numberWithUnsignedShort:_cppValue];
+        return value;
     }
     *aError = CHIP_ERROR_INTERNAL;
     return value;
 }
 @end
-
 
 // WakeOnLan cluster attributes:
 
@@ -1643,10 +1648,11 @@
         chip::app::Clusters::WakeOnLan::Attributes::MACAddress::TypeInfo::DecodableType _cppValue = *sharedPtr;
         *aError = CHIP_NO_ERROR;
         NSString * _Nonnull value;
-                value = AsString(_cppValue);
+        value = AsString(_cppValue);
         if (value == nil) {
-          CHIP_ERROR err = CHIP_ERROR_INVALID_ARGUMENT;
-          *aError = err; return nil;
+            CHIP_ERROR err = CHIP_ERROR_INVALID_ARGUMENT;
+            *aError = err;
+            return nil;
         }
         return value;
     }
@@ -1693,7 +1699,7 @@
         chip::app::Clusters::WakeOnLan::Attributes::LinkLocalAddress::TypeInfo::DecodableType _cppValue = *sharedPtr;
         *aError = CHIP_NO_ERROR;
         NSData * _Nonnull value;
-                value = AsData(_cppValue);
+        value = AsData(_cppValue);
         return value;
     }
     *aError = CHIP_ERROR_INTERNAL;
@@ -1739,21 +1745,22 @@
         chip::app::Clusters::WakeOnLan::Attributes::GeneratedCommandList::TypeInfo::DecodableType _cppValue = *sharedPtr;
         *aError = CHIP_NO_ERROR;
         NSArray * _Nonnull value;
-          { // Scope for our temporary variables
+        { // Scope for our temporary variables
             auto * array_0 = [NSMutableArray new];
             auto iter_0 = _cppValue.begin();
             while (iter_0.Next()) {
-              auto & entry_0 = iter_0.GetValue();
-              NSNumber * newElement_0;
-                      newElement_0 = [NSNumber numberWithUnsignedInt:entry_0];
-            [array_0 addObject:newElement_0];
+                auto & entry_0 = iter_0.GetValue();
+                NSNumber * newElement_0;
+                newElement_0 = [NSNumber numberWithUnsignedInt:entry_0];
+                [array_0 addObject:newElement_0];
             }
             CHIP_ERROR err = iter_0.GetStatus();
             if (err != CHIP_NO_ERROR) {
-              *aError = err; return nil;
+                *aError = err;
+                return nil;
             }
             value = array_0;
-          }
+        }
         return value;
     }
     *aError = CHIP_ERROR_INTERNAL;
@@ -1799,21 +1806,22 @@
         chip::app::Clusters::WakeOnLan::Attributes::AcceptedCommandList::TypeInfo::DecodableType _cppValue = *sharedPtr;
         *aError = CHIP_NO_ERROR;
         NSArray * _Nonnull value;
-          { // Scope for our temporary variables
+        { // Scope for our temporary variables
             auto * array_0 = [NSMutableArray new];
             auto iter_0 = _cppValue.begin();
             while (iter_0.Next()) {
-              auto & entry_0 = iter_0.GetValue();
-              NSNumber * newElement_0;
-                      newElement_0 = [NSNumber numberWithUnsignedInt:entry_0];
-            [array_0 addObject:newElement_0];
+                auto & entry_0 = iter_0.GetValue();
+                NSNumber * newElement_0;
+                newElement_0 = [NSNumber numberWithUnsignedInt:entry_0];
+                [array_0 addObject:newElement_0];
             }
             CHIP_ERROR err = iter_0.GetStatus();
             if (err != CHIP_NO_ERROR) {
-              *aError = err; return nil;
+                *aError = err;
+                return nil;
             }
             value = array_0;
-          }
+        }
         return value;
     }
     *aError = CHIP_ERROR_INTERNAL;
@@ -1859,21 +1867,22 @@
         chip::app::Clusters::WakeOnLan::Attributes::EventList::TypeInfo::DecodableType _cppValue = *sharedPtr;
         *aError = CHIP_NO_ERROR;
         NSArray * _Nonnull value;
-          { // Scope for our temporary variables
+        { // Scope for our temporary variables
             auto * array_0 = [NSMutableArray new];
             auto iter_0 = _cppValue.begin();
             while (iter_0.Next()) {
-              auto & entry_0 = iter_0.GetValue();
-              NSNumber * newElement_0;
-                      newElement_0 = [NSNumber numberWithUnsignedInt:entry_0];
-            [array_0 addObject:newElement_0];
+                auto & entry_0 = iter_0.GetValue();
+                NSNumber * newElement_0;
+                newElement_0 = [NSNumber numberWithUnsignedInt:entry_0];
+                [array_0 addObject:newElement_0];
             }
             CHIP_ERROR err = iter_0.GetStatus();
             if (err != CHIP_NO_ERROR) {
-              *aError = err; return nil;
+                *aError = err;
+                return nil;
             }
             value = array_0;
-          }
+        }
         return value;
     }
     *aError = CHIP_ERROR_INTERNAL;
@@ -1919,21 +1928,22 @@
         chip::app::Clusters::WakeOnLan::Attributes::AttributeList::TypeInfo::DecodableType _cppValue = *sharedPtr;
         *aError = CHIP_NO_ERROR;
         NSArray * _Nonnull value;
-          { // Scope for our temporary variables
+        { // Scope for our temporary variables
             auto * array_0 = [NSMutableArray new];
             auto iter_0 = _cppValue.begin();
             while (iter_0.Next()) {
-              auto & entry_0 = iter_0.GetValue();
-              NSNumber * newElement_0;
-                      newElement_0 = [NSNumber numberWithUnsignedInt:entry_0];
-            [array_0 addObject:newElement_0];
+                auto & entry_0 = iter_0.GetValue();
+                NSNumber * newElement_0;
+                newElement_0 = [NSNumber numberWithUnsignedInt:entry_0];
+                [array_0 addObject:newElement_0];
             }
             CHIP_ERROR err = iter_0.GetStatus();
             if (err != CHIP_NO_ERROR) {
-              *aError = err; return nil;
+                *aError = err;
+                return nil;
             }
             value = array_0;
-          }
+        }
         return value;
     }
     *aError = CHIP_ERROR_INTERNAL;
@@ -1979,8 +1989,8 @@
         chip::app::Clusters::WakeOnLan::Attributes::FeatureMap::TypeInfo::DecodableType _cppValue = *sharedPtr;
         *aError = CHIP_NO_ERROR;
         NSNumber * _Nonnull value;
-                value = [NSNumber numberWithUnsignedInt:_cppValue];
-              return value;
+        value = [NSNumber numberWithUnsignedInt:_cppValue];
+        return value;
     }
     *aError = CHIP_ERROR_INTERNAL;
     return value;
@@ -2025,14 +2035,13 @@
         chip::app::Clusters::WakeOnLan::Attributes::ClusterRevision::TypeInfo::DecodableType _cppValue = *sharedPtr;
         *aError = CHIP_NO_ERROR;
         NSNumber * _Nonnull value;
-                value = [NSNumber numberWithUnsignedShort:_cppValue];
-              return value;
+        value = [NSNumber numberWithUnsignedShort:_cppValue];
+        return value;
     }
     *aError = CHIP_ERROR_INTERNAL;
     return value;
 }
 @end
-
 
 // TargetNavigator cluster attributes:
 
@@ -2074,27 +2083,29 @@
         chip::app::Clusters::TargetNavigator::Attributes::TargetList::TypeInfo::DecodableType _cppValue = *sharedPtr;
         *aError = CHIP_NO_ERROR;
         NSArray * _Nonnull value;
-          { // Scope for our temporary variables
+        { // Scope for our temporary variables
             auto * array_0 = [NSMutableArray new];
             auto iter_0 = _cppValue.begin();
             while (iter_0.Next()) {
-              auto & entry_0 = iter_0.GetValue();
-              MCTargetNavigatorClusterTargetInfoStruct * newElement_0;
-                  newElement_0 = [MCTargetNavigatorClusterTargetInfoStruct new];
-              newElement_0.identifier = [NSNumber numberWithUnsignedChar:entry_0.identifier];
-                    newElement_0.name = AsString(entry_0.name);
-        if (newElement_0.name == nil) {
-          CHIP_ERROR err = CHIP_ERROR_INVALID_ARGUMENT;
-          *aError = err; return nil;
-        }
-      [array_0 addObject:newElement_0];
+                auto & entry_0 = iter_0.GetValue();
+                MCTargetNavigatorClusterTargetInfoStruct * newElement_0;
+                newElement_0 = [MCTargetNavigatorClusterTargetInfoStruct new];
+                newElement_0.identifier = [NSNumber numberWithUnsignedChar:entry_0.identifier];
+                newElement_0.name = AsString(entry_0.name);
+                if (newElement_0.name == nil) {
+                    CHIP_ERROR err = CHIP_ERROR_INVALID_ARGUMENT;
+                    *aError = err;
+                    return nil;
+                }
+                [array_0 addObject:newElement_0];
             }
             CHIP_ERROR err = iter_0.GetStatus();
             if (err != CHIP_NO_ERROR) {
-              *aError = err; return nil;
+                *aError = err;
+                return nil;
             }
             value = array_0;
-          }
+        }
         return value;
     }
     *aError = CHIP_ERROR_INTERNAL;
@@ -2140,8 +2151,8 @@
         chip::app::Clusters::TargetNavigator::Attributes::CurrentTarget::TypeInfo::DecodableType _cppValue = *sharedPtr;
         *aError = CHIP_NO_ERROR;
         NSNumber * _Nonnull value;
-                value = [NSNumber numberWithUnsignedChar:_cppValue];
-              return value;
+        value = [NSNumber numberWithUnsignedChar:_cppValue];
+        return value;
     }
     *aError = CHIP_ERROR_INTERNAL;
     return value;
@@ -2186,21 +2197,22 @@
         chip::app::Clusters::TargetNavigator::Attributes::GeneratedCommandList::TypeInfo::DecodableType _cppValue = *sharedPtr;
         *aError = CHIP_NO_ERROR;
         NSArray * _Nonnull value;
-          { // Scope for our temporary variables
+        { // Scope for our temporary variables
             auto * array_0 = [NSMutableArray new];
             auto iter_0 = _cppValue.begin();
             while (iter_0.Next()) {
-              auto & entry_0 = iter_0.GetValue();
-              NSNumber * newElement_0;
-                      newElement_0 = [NSNumber numberWithUnsignedInt:entry_0];
-            [array_0 addObject:newElement_0];
+                auto & entry_0 = iter_0.GetValue();
+                NSNumber * newElement_0;
+                newElement_0 = [NSNumber numberWithUnsignedInt:entry_0];
+                [array_0 addObject:newElement_0];
             }
             CHIP_ERROR err = iter_0.GetStatus();
             if (err != CHIP_NO_ERROR) {
-              *aError = err; return nil;
+                *aError = err;
+                return nil;
             }
             value = array_0;
-          }
+        }
         return value;
     }
     *aError = CHIP_ERROR_INTERNAL;
@@ -2246,21 +2258,22 @@
         chip::app::Clusters::TargetNavigator::Attributes::AcceptedCommandList::TypeInfo::DecodableType _cppValue = *sharedPtr;
         *aError = CHIP_NO_ERROR;
         NSArray * _Nonnull value;
-          { // Scope for our temporary variables
+        { // Scope for our temporary variables
             auto * array_0 = [NSMutableArray new];
             auto iter_0 = _cppValue.begin();
             while (iter_0.Next()) {
-              auto & entry_0 = iter_0.GetValue();
-              NSNumber * newElement_0;
-                      newElement_0 = [NSNumber numberWithUnsignedInt:entry_0];
-            [array_0 addObject:newElement_0];
+                auto & entry_0 = iter_0.GetValue();
+                NSNumber * newElement_0;
+                newElement_0 = [NSNumber numberWithUnsignedInt:entry_0];
+                [array_0 addObject:newElement_0];
             }
             CHIP_ERROR err = iter_0.GetStatus();
             if (err != CHIP_NO_ERROR) {
-              *aError = err; return nil;
+                *aError = err;
+                return nil;
             }
             value = array_0;
-          }
+        }
         return value;
     }
     *aError = CHIP_ERROR_INTERNAL;
@@ -2306,21 +2319,22 @@
         chip::app::Clusters::TargetNavigator::Attributes::EventList::TypeInfo::DecodableType _cppValue = *sharedPtr;
         *aError = CHIP_NO_ERROR;
         NSArray * _Nonnull value;
-          { // Scope for our temporary variables
+        { // Scope for our temporary variables
             auto * array_0 = [NSMutableArray new];
             auto iter_0 = _cppValue.begin();
             while (iter_0.Next()) {
-              auto & entry_0 = iter_0.GetValue();
-              NSNumber * newElement_0;
-                      newElement_0 = [NSNumber numberWithUnsignedInt:entry_0];
-            [array_0 addObject:newElement_0];
+                auto & entry_0 = iter_0.GetValue();
+                NSNumber * newElement_0;
+                newElement_0 = [NSNumber numberWithUnsignedInt:entry_0];
+                [array_0 addObject:newElement_0];
             }
             CHIP_ERROR err = iter_0.GetStatus();
             if (err != CHIP_NO_ERROR) {
-              *aError = err; return nil;
+                *aError = err;
+                return nil;
             }
             value = array_0;
-          }
+        }
         return value;
     }
     *aError = CHIP_ERROR_INTERNAL;
@@ -2366,21 +2380,22 @@
         chip::app::Clusters::TargetNavigator::Attributes::AttributeList::TypeInfo::DecodableType _cppValue = *sharedPtr;
         *aError = CHIP_NO_ERROR;
         NSArray * _Nonnull value;
-          { // Scope for our temporary variables
+        { // Scope for our temporary variables
             auto * array_0 = [NSMutableArray new];
             auto iter_0 = _cppValue.begin();
             while (iter_0.Next()) {
-              auto & entry_0 = iter_0.GetValue();
-              NSNumber * newElement_0;
-                      newElement_0 = [NSNumber numberWithUnsignedInt:entry_0];
-            [array_0 addObject:newElement_0];
+                auto & entry_0 = iter_0.GetValue();
+                NSNumber * newElement_0;
+                newElement_0 = [NSNumber numberWithUnsignedInt:entry_0];
+                [array_0 addObject:newElement_0];
             }
             CHIP_ERROR err = iter_0.GetStatus();
             if (err != CHIP_NO_ERROR) {
-              *aError = err; return nil;
+                *aError = err;
+                return nil;
             }
             value = array_0;
-          }
+        }
         return value;
     }
     *aError = CHIP_ERROR_INTERNAL;
@@ -2426,8 +2441,8 @@
         chip::app::Clusters::TargetNavigator::Attributes::FeatureMap::TypeInfo::DecodableType _cppValue = *sharedPtr;
         *aError = CHIP_NO_ERROR;
         NSNumber * _Nonnull value;
-                value = [NSNumber numberWithUnsignedInt:_cppValue];
-              return value;
+        value = [NSNumber numberWithUnsignedInt:_cppValue];
+        return value;
     }
     *aError = CHIP_ERROR_INTERNAL;
     return value;
@@ -2472,14 +2487,13 @@
         chip::app::Clusters::TargetNavigator::Attributes::ClusterRevision::TypeInfo::DecodableType _cppValue = *sharedPtr;
         *aError = CHIP_NO_ERROR;
         NSNumber * _Nonnull value;
-                value = [NSNumber numberWithUnsignedShort:_cppValue];
-              return value;
+        value = [NSNumber numberWithUnsignedShort:_cppValue];
+        return value;
     }
     *aError = CHIP_ERROR_INTERNAL;
     return value;
 }
 @end
-
 
 // MediaPlayback cluster attributes:
 
@@ -2521,7 +2535,7 @@
         chip::app::Clusters::MediaPlayback::Attributes::CurrentState::TypeInfo::DecodableType _cppValue = *sharedPtr;
         *aError = CHIP_NO_ERROR;
         NSNumber * _Nonnull value;
-              value = [NSNumber numberWithUnsignedChar:chip::to_underlying(_cppValue)];
+        value = [NSNumber numberWithUnsignedChar:chip::to_underlying(_cppValue)];
         return value;
     }
     *aError = CHIP_ERROR_INTERNAL;
@@ -2567,10 +2581,10 @@
         chip::app::Clusters::MediaPlayback::Attributes::StartTime::TypeInfo::DecodableType _cppValue = *sharedPtr;
         *aError = CHIP_NO_ERROR;
         NSNumber * _Nullable value;
-          if (_cppValue.IsNull()) {
+        if (_cppValue.IsNull()) {
             value = nil;
-          } else {
-                    value = [NSNumber numberWithUnsignedLongLong:_cppValue.Value()];
+        } else {
+            value = [NSNumber numberWithUnsignedLongLong:_cppValue.Value()];
         }
         return value;
     }
@@ -2617,10 +2631,10 @@
         chip::app::Clusters::MediaPlayback::Attributes::Duration::TypeInfo::DecodableType _cppValue = *sharedPtr;
         *aError = CHIP_NO_ERROR;
         NSNumber * _Nullable value;
-          if (_cppValue.IsNull()) {
+        if (_cppValue.IsNull()) {
             value = nil;
-          } else {
-                    value = [NSNumber numberWithUnsignedLongLong:_cppValue.Value()];
+        } else {
+            value = [NSNumber numberWithUnsignedLongLong:_cppValue.Value()];
         }
         return value;
     }
@@ -2667,17 +2681,17 @@
         chip::app::Clusters::MediaPlayback::Attributes::SampledPosition::TypeInfo::DecodableType _cppValue = *sharedPtr;
         *aError = CHIP_NO_ERROR;
         MCMediaPlaybackClusterPlaybackPositionStruct * _Nullable value;
-          if (_cppValue.IsNull()) {
+        if (_cppValue.IsNull()) {
             value = nil;
-          } else {
-                value = [MCMediaPlaybackClusterPlaybackPositionStruct new];
-              value.updatedAt = [NSNumber numberWithUnsignedLongLong:_cppValue.Value().updatedAt];
-              if (_cppValue.Value().position.IsNull()) {
-          value.position = nil;
         } else {
-                  value.position = [NSNumber numberWithUnsignedLongLong:_cppValue.Value().position.Value()];
+            value = [MCMediaPlaybackClusterPlaybackPositionStruct new];
+            value.updatedAt = [NSNumber numberWithUnsignedLongLong:_cppValue.Value().updatedAt];
+            if (_cppValue.Value().position.IsNull()) {
+                value.position = nil;
+            } else {
+                value.position = [NSNumber numberWithUnsignedLongLong:_cppValue.Value().position.Value()];
+            }
         }
-  }
         return value;
     }
     *aError = CHIP_ERROR_INTERNAL;
@@ -2723,8 +2737,8 @@
         chip::app::Clusters::MediaPlayback::Attributes::PlaybackSpeed::TypeInfo::DecodableType _cppValue = *sharedPtr;
         *aError = CHIP_NO_ERROR;
         NSNumber * _Nonnull value;
-                value = [NSNumber numberWithFloat:_cppValue];
-              return value;
+        value = [NSNumber numberWithFloat:_cppValue];
+        return value;
     }
     *aError = CHIP_ERROR_INTERNAL;
     return value;
@@ -2769,10 +2783,10 @@
         chip::app::Clusters::MediaPlayback::Attributes::SeekRangeEnd::TypeInfo::DecodableType _cppValue = *sharedPtr;
         *aError = CHIP_NO_ERROR;
         NSNumber * _Nullable value;
-          if (_cppValue.IsNull()) {
+        if (_cppValue.IsNull()) {
             value = nil;
-          } else {
-                    value = [NSNumber numberWithUnsignedLongLong:_cppValue.Value()];
+        } else {
+            value = [NSNumber numberWithUnsignedLongLong:_cppValue.Value()];
         }
         return value;
     }
@@ -2819,10 +2833,10 @@
         chip::app::Clusters::MediaPlayback::Attributes::SeekRangeStart::TypeInfo::DecodableType _cppValue = *sharedPtr;
         *aError = CHIP_NO_ERROR;
         NSNumber * _Nullable value;
-          if (_cppValue.IsNull()) {
+        if (_cppValue.IsNull()) {
             value = nil;
-          } else {
-                    value = [NSNumber numberWithUnsignedLongLong:_cppValue.Value()];
+        } else {
+            value = [NSNumber numberWithUnsignedLongLong:_cppValue.Value()];
         }
         return value;
     }
@@ -2869,39 +2883,42 @@
         chip::app::Clusters::MediaPlayback::Attributes::ActiveAudioTrack::TypeInfo::DecodableType _cppValue = *sharedPtr;
         *aError = CHIP_NO_ERROR;
         MCMediaPlaybackClusterTrackStruct * _Nullable value;
-          if (_cppValue.IsNull()) {
+        if (_cppValue.IsNull()) {
             value = nil;
-          } else {
-                value = [MCMediaPlaybackClusterTrackStruct new];
-              value.id = AsString(_cppValue.Value().id);
-        if (value.id == nil) {
-          CHIP_ERROR err = CHIP_ERROR_INVALID_ARGUMENT;
-          *aError = err; return nil;
-        }
-        if (_cppValue.Value().trackAttributes.IsNull()) {
-          value.trackAttributes = nil;
         } else {
-              value.trackAttributes = [MCMediaPlaybackClusterTrackAttributesStruct new];
-              value.trackAttributes.languageCode = AsString(_cppValue.Value().trackAttributes.Value().languageCode);
-        if (value.trackAttributes.languageCode == nil) {
-          CHIP_ERROR err = CHIP_ERROR_INVALID_ARGUMENT;
-          *aError = err; return nil;
-        }
-        if (_cppValue.Value().trackAttributes.Value().displayName.HasValue()) {
-            if (_cppValue.Value().trackAttributes.Value().displayName.Value().IsNull()) {
-              value.trackAttributes.displayName = nil;
+            value = [MCMediaPlaybackClusterTrackStruct new];
+            value.id = AsString(_cppValue.Value().id);
+            if (value.id == nil) {
+                CHIP_ERROR err = CHIP_ERROR_INVALID_ARGUMENT;
+                *aError = err;
+                return nil;
+            }
+            if (_cppValue.Value().trackAttributes.IsNull()) {
+                value.trackAttributes = nil;
             } else {
-                      value.trackAttributes.displayName = AsString(_cppValue.Value().trackAttributes.Value().displayName.Value().Value());
-        if (value.trackAttributes.displayName == nil) {
-          CHIP_ERROR err = CHIP_ERROR_INVALID_ARGUMENT;
-          *aError = err; return nil;
+                value.trackAttributes = [MCMediaPlaybackClusterTrackAttributesStruct new];
+                value.trackAttributes.languageCode = AsString(_cppValue.Value().trackAttributes.Value().languageCode);
+                if (value.trackAttributes.languageCode == nil) {
+                    CHIP_ERROR err = CHIP_ERROR_INVALID_ARGUMENT;
+                    *aError = err;
+                    return nil;
+                }
+                if (_cppValue.Value().trackAttributes.Value().displayName.HasValue()) {
+                    if (_cppValue.Value().trackAttributes.Value().displayName.Value().IsNull()) {
+                        value.trackAttributes.displayName = nil;
+                    } else {
+                        value.trackAttributes.displayName = AsString(_cppValue.Value().trackAttributes.Value().displayName.Value().Value());
+                        if (value.trackAttributes.displayName == nil) {
+                            CHIP_ERROR err = CHIP_ERROR_INVALID_ARGUMENT;
+                            *aError = err;
+                            return nil;
+                        }
+                    }
+                } else {
+                    value.trackAttributes.displayName = nil;
+                }
+            }
         }
-  }
-        } else {
-          value.trackAttributes.displayName = nil;
-        }
-  }
-  }
         return value;
     }
     *aError = CHIP_ERROR_INTERNAL;
@@ -2947,53 +2964,57 @@
         chip::app::Clusters::MediaPlayback::Attributes::AvailableAudioTracks::TypeInfo::DecodableType _cppValue = *sharedPtr;
         *aError = CHIP_NO_ERROR;
         NSArray * _Nullable value;
-          if (_cppValue.IsNull()) {
+        if (_cppValue.IsNull()) {
             value = nil;
-          } else {
-              { // Scope for our temporary variables
+        } else {
+            { // Scope for our temporary variables
                 auto * array_1 = [NSMutableArray new];
                 auto iter_1 = _cppValue.Value().begin();
                 while (iter_1.Next()) {
-                  auto & entry_1 = iter_1.GetValue();
-                  MCMediaPlaybackClusterTrackStruct * newElement_1;
-                      newElement_1 = [MCMediaPlaybackClusterTrackStruct new];
-              newElement_1.id = AsString(entry_1.id);
-        if (newElement_1.id == nil) {
-          CHIP_ERROR err = CHIP_ERROR_INVALID_ARGUMENT;
-          *aError = err; return nil;
-        }
-        if (entry_1.trackAttributes.IsNull()) {
-          newElement_1.trackAttributes = nil;
-        } else {
-              newElement_1.trackAttributes = [MCMediaPlaybackClusterTrackAttributesStruct new];
-              newElement_1.trackAttributes.languageCode = AsString(entry_1.trackAttributes.Value().languageCode);
-        if (newElement_1.trackAttributes.languageCode == nil) {
-          CHIP_ERROR err = CHIP_ERROR_INVALID_ARGUMENT;
-          *aError = err; return nil;
-        }
-        if (entry_1.trackAttributes.Value().displayName.HasValue()) {
-            if (entry_1.trackAttributes.Value().displayName.Value().IsNull()) {
-              newElement_1.trackAttributes.displayName = nil;
-            } else {
-                      newElement_1.trackAttributes.displayName = AsString(entry_1.trackAttributes.Value().displayName.Value().Value());
-        if (newElement_1.trackAttributes.displayName == nil) {
-          CHIP_ERROR err = CHIP_ERROR_INVALID_ARGUMENT;
-          *aError = err; return nil;
-        }
-  }
-        } else {
-          newElement_1.trackAttributes.displayName = nil;
-        }
-  }
-      [array_1 addObject:newElement_1];
+                    auto & entry_1 = iter_1.GetValue();
+                    MCMediaPlaybackClusterTrackStruct * newElement_1;
+                    newElement_1 = [MCMediaPlaybackClusterTrackStruct new];
+                    newElement_1.id = AsString(entry_1.id);
+                    if (newElement_1.id == nil) {
+                        CHIP_ERROR err = CHIP_ERROR_INVALID_ARGUMENT;
+                        *aError = err;
+                        return nil;
+                    }
+                    if (entry_1.trackAttributes.IsNull()) {
+                        newElement_1.trackAttributes = nil;
+                    } else {
+                        newElement_1.trackAttributes = [MCMediaPlaybackClusterTrackAttributesStruct new];
+                        newElement_1.trackAttributes.languageCode = AsString(entry_1.trackAttributes.Value().languageCode);
+                        if (newElement_1.trackAttributes.languageCode == nil) {
+                            CHIP_ERROR err = CHIP_ERROR_INVALID_ARGUMENT;
+                            *aError = err;
+                            return nil;
+                        }
+                        if (entry_1.trackAttributes.Value().displayName.HasValue()) {
+                            if (entry_1.trackAttributes.Value().displayName.Value().IsNull()) {
+                                newElement_1.trackAttributes.displayName = nil;
+                            } else {
+                                newElement_1.trackAttributes.displayName = AsString(entry_1.trackAttributes.Value().displayName.Value().Value());
+                                if (newElement_1.trackAttributes.displayName == nil) {
+                                    CHIP_ERROR err = CHIP_ERROR_INVALID_ARGUMENT;
+                                    *aError = err;
+                                    return nil;
+                                }
+                            }
+                        } else {
+                            newElement_1.trackAttributes.displayName = nil;
+                        }
+                    }
+                    [array_1 addObject:newElement_1];
                 }
                 CHIP_ERROR err = iter_1.GetStatus();
                 if (err != CHIP_NO_ERROR) {
-                  *aError = err; return nil;
+                    *aError = err;
+                    return nil;
                 }
                 value = array_1;
-              }
-          }
+            }
+        }
         return value;
     }
     *aError = CHIP_ERROR_INTERNAL;
@@ -3039,39 +3060,42 @@
         chip::app::Clusters::MediaPlayback::Attributes::ActiveTextTrack::TypeInfo::DecodableType _cppValue = *sharedPtr;
         *aError = CHIP_NO_ERROR;
         MCMediaPlaybackClusterTrackStruct * _Nullable value;
-          if (_cppValue.IsNull()) {
+        if (_cppValue.IsNull()) {
             value = nil;
-          } else {
-                value = [MCMediaPlaybackClusterTrackStruct new];
-              value.id = AsString(_cppValue.Value().id);
-        if (value.id == nil) {
-          CHIP_ERROR err = CHIP_ERROR_INVALID_ARGUMENT;
-          *aError = err; return nil;
-        }
-        if (_cppValue.Value().trackAttributes.IsNull()) {
-          value.trackAttributes = nil;
         } else {
-              value.trackAttributes = [MCMediaPlaybackClusterTrackAttributesStruct new];
-              value.trackAttributes.languageCode = AsString(_cppValue.Value().trackAttributes.Value().languageCode);
-        if (value.trackAttributes.languageCode == nil) {
-          CHIP_ERROR err = CHIP_ERROR_INVALID_ARGUMENT;
-          *aError = err; return nil;
-        }
-        if (_cppValue.Value().trackAttributes.Value().displayName.HasValue()) {
-            if (_cppValue.Value().trackAttributes.Value().displayName.Value().IsNull()) {
-              value.trackAttributes.displayName = nil;
+            value = [MCMediaPlaybackClusterTrackStruct new];
+            value.id = AsString(_cppValue.Value().id);
+            if (value.id == nil) {
+                CHIP_ERROR err = CHIP_ERROR_INVALID_ARGUMENT;
+                *aError = err;
+                return nil;
+            }
+            if (_cppValue.Value().trackAttributes.IsNull()) {
+                value.trackAttributes = nil;
             } else {
-                      value.trackAttributes.displayName = AsString(_cppValue.Value().trackAttributes.Value().displayName.Value().Value());
-        if (value.trackAttributes.displayName == nil) {
-          CHIP_ERROR err = CHIP_ERROR_INVALID_ARGUMENT;
-          *aError = err; return nil;
+                value.trackAttributes = [MCMediaPlaybackClusterTrackAttributesStruct new];
+                value.trackAttributes.languageCode = AsString(_cppValue.Value().trackAttributes.Value().languageCode);
+                if (value.trackAttributes.languageCode == nil) {
+                    CHIP_ERROR err = CHIP_ERROR_INVALID_ARGUMENT;
+                    *aError = err;
+                    return nil;
+                }
+                if (_cppValue.Value().trackAttributes.Value().displayName.HasValue()) {
+                    if (_cppValue.Value().trackAttributes.Value().displayName.Value().IsNull()) {
+                        value.trackAttributes.displayName = nil;
+                    } else {
+                        value.trackAttributes.displayName = AsString(_cppValue.Value().trackAttributes.Value().displayName.Value().Value());
+                        if (value.trackAttributes.displayName == nil) {
+                            CHIP_ERROR err = CHIP_ERROR_INVALID_ARGUMENT;
+                            *aError = err;
+                            return nil;
+                        }
+                    }
+                } else {
+                    value.trackAttributes.displayName = nil;
+                }
+            }
         }
-  }
-        } else {
-          value.trackAttributes.displayName = nil;
-        }
-  }
-  }
         return value;
     }
     *aError = CHIP_ERROR_INTERNAL;
@@ -3117,53 +3141,57 @@
         chip::app::Clusters::MediaPlayback::Attributes::AvailableTextTracks::TypeInfo::DecodableType _cppValue = *sharedPtr;
         *aError = CHIP_NO_ERROR;
         NSArray * _Nullable value;
-          if (_cppValue.IsNull()) {
+        if (_cppValue.IsNull()) {
             value = nil;
-          } else {
-              { // Scope for our temporary variables
+        } else {
+            { // Scope for our temporary variables
                 auto * array_1 = [NSMutableArray new];
                 auto iter_1 = _cppValue.Value().begin();
                 while (iter_1.Next()) {
-                  auto & entry_1 = iter_1.GetValue();
-                  MCMediaPlaybackClusterTrackStruct * newElement_1;
-                      newElement_1 = [MCMediaPlaybackClusterTrackStruct new];
-              newElement_1.id = AsString(entry_1.id);
-        if (newElement_1.id == nil) {
-          CHIP_ERROR err = CHIP_ERROR_INVALID_ARGUMENT;
-          *aError = err; return nil;
-        }
-        if (entry_1.trackAttributes.IsNull()) {
-          newElement_1.trackAttributes = nil;
-        } else {
-              newElement_1.trackAttributes = [MCMediaPlaybackClusterTrackAttributesStruct new];
-              newElement_1.trackAttributes.languageCode = AsString(entry_1.trackAttributes.Value().languageCode);
-        if (newElement_1.trackAttributes.languageCode == nil) {
-          CHIP_ERROR err = CHIP_ERROR_INVALID_ARGUMENT;
-          *aError = err; return nil;
-        }
-        if (entry_1.trackAttributes.Value().displayName.HasValue()) {
-            if (entry_1.trackAttributes.Value().displayName.Value().IsNull()) {
-              newElement_1.trackAttributes.displayName = nil;
-            } else {
-                      newElement_1.trackAttributes.displayName = AsString(entry_1.trackAttributes.Value().displayName.Value().Value());
-        if (newElement_1.trackAttributes.displayName == nil) {
-          CHIP_ERROR err = CHIP_ERROR_INVALID_ARGUMENT;
-          *aError = err; return nil;
-        }
-  }
-        } else {
-          newElement_1.trackAttributes.displayName = nil;
-        }
-  }
-      [array_1 addObject:newElement_1];
+                    auto & entry_1 = iter_1.GetValue();
+                    MCMediaPlaybackClusterTrackStruct * newElement_1;
+                    newElement_1 = [MCMediaPlaybackClusterTrackStruct new];
+                    newElement_1.id = AsString(entry_1.id);
+                    if (newElement_1.id == nil) {
+                        CHIP_ERROR err = CHIP_ERROR_INVALID_ARGUMENT;
+                        *aError = err;
+                        return nil;
+                    }
+                    if (entry_1.trackAttributes.IsNull()) {
+                        newElement_1.trackAttributes = nil;
+                    } else {
+                        newElement_1.trackAttributes = [MCMediaPlaybackClusterTrackAttributesStruct new];
+                        newElement_1.trackAttributes.languageCode = AsString(entry_1.trackAttributes.Value().languageCode);
+                        if (newElement_1.trackAttributes.languageCode == nil) {
+                            CHIP_ERROR err = CHIP_ERROR_INVALID_ARGUMENT;
+                            *aError = err;
+                            return nil;
+                        }
+                        if (entry_1.trackAttributes.Value().displayName.HasValue()) {
+                            if (entry_1.trackAttributes.Value().displayName.Value().IsNull()) {
+                                newElement_1.trackAttributes.displayName = nil;
+                            } else {
+                                newElement_1.trackAttributes.displayName = AsString(entry_1.trackAttributes.Value().displayName.Value().Value());
+                                if (newElement_1.trackAttributes.displayName == nil) {
+                                    CHIP_ERROR err = CHIP_ERROR_INVALID_ARGUMENT;
+                                    *aError = err;
+                                    return nil;
+                                }
+                            }
+                        } else {
+                            newElement_1.trackAttributes.displayName = nil;
+                        }
+                    }
+                    [array_1 addObject:newElement_1];
                 }
                 CHIP_ERROR err = iter_1.GetStatus();
                 if (err != CHIP_NO_ERROR) {
-                  *aError = err; return nil;
+                    *aError = err;
+                    return nil;
                 }
                 value = array_1;
-              }
-          }
+            }
+        }
         return value;
     }
     *aError = CHIP_ERROR_INTERNAL;
@@ -3209,21 +3237,22 @@
         chip::app::Clusters::MediaPlayback::Attributes::GeneratedCommandList::TypeInfo::DecodableType _cppValue = *sharedPtr;
         *aError = CHIP_NO_ERROR;
         NSArray * _Nonnull value;
-          { // Scope for our temporary variables
+        { // Scope for our temporary variables
             auto * array_0 = [NSMutableArray new];
             auto iter_0 = _cppValue.begin();
             while (iter_0.Next()) {
-              auto & entry_0 = iter_0.GetValue();
-              NSNumber * newElement_0;
-                      newElement_0 = [NSNumber numberWithUnsignedInt:entry_0];
-            [array_0 addObject:newElement_0];
+                auto & entry_0 = iter_0.GetValue();
+                NSNumber * newElement_0;
+                newElement_0 = [NSNumber numberWithUnsignedInt:entry_0];
+                [array_0 addObject:newElement_0];
             }
             CHIP_ERROR err = iter_0.GetStatus();
             if (err != CHIP_NO_ERROR) {
-              *aError = err; return nil;
+                *aError = err;
+                return nil;
             }
             value = array_0;
-          }
+        }
         return value;
     }
     *aError = CHIP_ERROR_INTERNAL;
@@ -3269,21 +3298,22 @@
         chip::app::Clusters::MediaPlayback::Attributes::AcceptedCommandList::TypeInfo::DecodableType _cppValue = *sharedPtr;
         *aError = CHIP_NO_ERROR;
         NSArray * _Nonnull value;
-          { // Scope for our temporary variables
+        { // Scope for our temporary variables
             auto * array_0 = [NSMutableArray new];
             auto iter_0 = _cppValue.begin();
             while (iter_0.Next()) {
-              auto & entry_0 = iter_0.GetValue();
-              NSNumber * newElement_0;
-                      newElement_0 = [NSNumber numberWithUnsignedInt:entry_0];
-            [array_0 addObject:newElement_0];
+                auto & entry_0 = iter_0.GetValue();
+                NSNumber * newElement_0;
+                newElement_0 = [NSNumber numberWithUnsignedInt:entry_0];
+                [array_0 addObject:newElement_0];
             }
             CHIP_ERROR err = iter_0.GetStatus();
             if (err != CHIP_NO_ERROR) {
-              *aError = err; return nil;
+                *aError = err;
+                return nil;
             }
             value = array_0;
-          }
+        }
         return value;
     }
     *aError = CHIP_ERROR_INTERNAL;
@@ -3329,21 +3359,22 @@
         chip::app::Clusters::MediaPlayback::Attributes::EventList::TypeInfo::DecodableType _cppValue = *sharedPtr;
         *aError = CHIP_NO_ERROR;
         NSArray * _Nonnull value;
-          { // Scope for our temporary variables
+        { // Scope for our temporary variables
             auto * array_0 = [NSMutableArray new];
             auto iter_0 = _cppValue.begin();
             while (iter_0.Next()) {
-              auto & entry_0 = iter_0.GetValue();
-              NSNumber * newElement_0;
-                      newElement_0 = [NSNumber numberWithUnsignedInt:entry_0];
-            [array_0 addObject:newElement_0];
+                auto & entry_0 = iter_0.GetValue();
+                NSNumber * newElement_0;
+                newElement_0 = [NSNumber numberWithUnsignedInt:entry_0];
+                [array_0 addObject:newElement_0];
             }
             CHIP_ERROR err = iter_0.GetStatus();
             if (err != CHIP_NO_ERROR) {
-              *aError = err; return nil;
+                *aError = err;
+                return nil;
             }
             value = array_0;
-          }
+        }
         return value;
     }
     *aError = CHIP_ERROR_INTERNAL;
@@ -3389,21 +3420,22 @@
         chip::app::Clusters::MediaPlayback::Attributes::AttributeList::TypeInfo::DecodableType _cppValue = *sharedPtr;
         *aError = CHIP_NO_ERROR;
         NSArray * _Nonnull value;
-          { // Scope for our temporary variables
+        { // Scope for our temporary variables
             auto * array_0 = [NSMutableArray new];
             auto iter_0 = _cppValue.begin();
             while (iter_0.Next()) {
-              auto & entry_0 = iter_0.GetValue();
-              NSNumber * newElement_0;
-                      newElement_0 = [NSNumber numberWithUnsignedInt:entry_0];
-            [array_0 addObject:newElement_0];
+                auto & entry_0 = iter_0.GetValue();
+                NSNumber * newElement_0;
+                newElement_0 = [NSNumber numberWithUnsignedInt:entry_0];
+                [array_0 addObject:newElement_0];
             }
             CHIP_ERROR err = iter_0.GetStatus();
             if (err != CHIP_NO_ERROR) {
-              *aError = err; return nil;
+                *aError = err;
+                return nil;
             }
             value = array_0;
-          }
+        }
         return value;
     }
     *aError = CHIP_ERROR_INTERNAL;
@@ -3449,8 +3481,8 @@
         chip::app::Clusters::MediaPlayback::Attributes::FeatureMap::TypeInfo::DecodableType _cppValue = *sharedPtr;
         *aError = CHIP_NO_ERROR;
         NSNumber * _Nonnull value;
-                value = [NSNumber numberWithUnsignedInt:_cppValue];
-              return value;
+        value = [NSNumber numberWithUnsignedInt:_cppValue];
+        return value;
     }
     *aError = CHIP_ERROR_INTERNAL;
     return value;
@@ -3495,14 +3527,13 @@
         chip::app::Clusters::MediaPlayback::Attributes::ClusterRevision::TypeInfo::DecodableType _cppValue = *sharedPtr;
         *aError = CHIP_NO_ERROR;
         NSNumber * _Nonnull value;
-                value = [NSNumber numberWithUnsignedShort:_cppValue];
-              return value;
+        value = [NSNumber numberWithUnsignedShort:_cppValue];
+        return value;
     }
     *aError = CHIP_ERROR_INTERNAL;
     return value;
 }
 @end
-
 
 // KeypadInput cluster attributes:
 
@@ -3544,21 +3575,22 @@
         chip::app::Clusters::KeypadInput::Attributes::GeneratedCommandList::TypeInfo::DecodableType _cppValue = *sharedPtr;
         *aError = CHIP_NO_ERROR;
         NSArray * _Nonnull value;
-          { // Scope for our temporary variables
+        { // Scope for our temporary variables
             auto * array_0 = [NSMutableArray new];
             auto iter_0 = _cppValue.begin();
             while (iter_0.Next()) {
-              auto & entry_0 = iter_0.GetValue();
-              NSNumber * newElement_0;
-                      newElement_0 = [NSNumber numberWithUnsignedInt:entry_0];
-            [array_0 addObject:newElement_0];
+                auto & entry_0 = iter_0.GetValue();
+                NSNumber * newElement_0;
+                newElement_0 = [NSNumber numberWithUnsignedInt:entry_0];
+                [array_0 addObject:newElement_0];
             }
             CHIP_ERROR err = iter_0.GetStatus();
             if (err != CHIP_NO_ERROR) {
-              *aError = err; return nil;
+                *aError = err;
+                return nil;
             }
             value = array_0;
-          }
+        }
         return value;
     }
     *aError = CHIP_ERROR_INTERNAL;
@@ -3604,21 +3636,22 @@
         chip::app::Clusters::KeypadInput::Attributes::AcceptedCommandList::TypeInfo::DecodableType _cppValue = *sharedPtr;
         *aError = CHIP_NO_ERROR;
         NSArray * _Nonnull value;
-          { // Scope for our temporary variables
+        { // Scope for our temporary variables
             auto * array_0 = [NSMutableArray new];
             auto iter_0 = _cppValue.begin();
             while (iter_0.Next()) {
-              auto & entry_0 = iter_0.GetValue();
-              NSNumber * newElement_0;
-                      newElement_0 = [NSNumber numberWithUnsignedInt:entry_0];
-            [array_0 addObject:newElement_0];
+                auto & entry_0 = iter_0.GetValue();
+                NSNumber * newElement_0;
+                newElement_0 = [NSNumber numberWithUnsignedInt:entry_0];
+                [array_0 addObject:newElement_0];
             }
             CHIP_ERROR err = iter_0.GetStatus();
             if (err != CHIP_NO_ERROR) {
-              *aError = err; return nil;
+                *aError = err;
+                return nil;
             }
             value = array_0;
-          }
+        }
         return value;
     }
     *aError = CHIP_ERROR_INTERNAL;
@@ -3664,21 +3697,22 @@
         chip::app::Clusters::KeypadInput::Attributes::EventList::TypeInfo::DecodableType _cppValue = *sharedPtr;
         *aError = CHIP_NO_ERROR;
         NSArray * _Nonnull value;
-          { // Scope for our temporary variables
+        { // Scope for our temporary variables
             auto * array_0 = [NSMutableArray new];
             auto iter_0 = _cppValue.begin();
             while (iter_0.Next()) {
-              auto & entry_0 = iter_0.GetValue();
-              NSNumber * newElement_0;
-                      newElement_0 = [NSNumber numberWithUnsignedInt:entry_0];
-            [array_0 addObject:newElement_0];
+                auto & entry_0 = iter_0.GetValue();
+                NSNumber * newElement_0;
+                newElement_0 = [NSNumber numberWithUnsignedInt:entry_0];
+                [array_0 addObject:newElement_0];
             }
             CHIP_ERROR err = iter_0.GetStatus();
             if (err != CHIP_NO_ERROR) {
-              *aError = err; return nil;
+                *aError = err;
+                return nil;
             }
             value = array_0;
-          }
+        }
         return value;
     }
     *aError = CHIP_ERROR_INTERNAL;
@@ -3724,21 +3758,22 @@
         chip::app::Clusters::KeypadInput::Attributes::AttributeList::TypeInfo::DecodableType _cppValue = *sharedPtr;
         *aError = CHIP_NO_ERROR;
         NSArray * _Nonnull value;
-          { // Scope for our temporary variables
+        { // Scope for our temporary variables
             auto * array_0 = [NSMutableArray new];
             auto iter_0 = _cppValue.begin();
             while (iter_0.Next()) {
-              auto & entry_0 = iter_0.GetValue();
-              NSNumber * newElement_0;
-                      newElement_0 = [NSNumber numberWithUnsignedInt:entry_0];
-            [array_0 addObject:newElement_0];
+                auto & entry_0 = iter_0.GetValue();
+                NSNumber * newElement_0;
+                newElement_0 = [NSNumber numberWithUnsignedInt:entry_0];
+                [array_0 addObject:newElement_0];
             }
             CHIP_ERROR err = iter_0.GetStatus();
             if (err != CHIP_NO_ERROR) {
-              *aError = err; return nil;
+                *aError = err;
+                return nil;
             }
             value = array_0;
-          }
+        }
         return value;
     }
     *aError = CHIP_ERROR_INTERNAL;
@@ -3784,8 +3819,8 @@
         chip::app::Clusters::KeypadInput::Attributes::FeatureMap::TypeInfo::DecodableType _cppValue = *sharedPtr;
         *aError = CHIP_NO_ERROR;
         NSNumber * _Nonnull value;
-                value = [NSNumber numberWithUnsignedInt:_cppValue];
-              return value;
+        value = [NSNumber numberWithUnsignedInt:_cppValue];
+        return value;
     }
     *aError = CHIP_ERROR_INTERNAL;
     return value;
@@ -3830,14 +3865,13 @@
         chip::app::Clusters::KeypadInput::Attributes::ClusterRevision::TypeInfo::DecodableType _cppValue = *sharedPtr;
         *aError = CHIP_NO_ERROR;
         NSNumber * _Nonnull value;
-                value = [NSNumber numberWithUnsignedShort:_cppValue];
-              return value;
+        value = [NSNumber numberWithUnsignedShort:_cppValue];
+        return value;
     }
     *aError = CHIP_ERROR_INTERNAL;
     return value;
 }
 @end
-
 
 // ContentLauncher cluster attributes:
 
@@ -3879,25 +3913,27 @@
         chip::app::Clusters::ContentLauncher::Attributes::AcceptHeader::TypeInfo::DecodableType _cppValue = *sharedPtr;
         *aError = CHIP_NO_ERROR;
         NSArray * _Nonnull value;
-          { // Scope for our temporary variables
+        { // Scope for our temporary variables
             auto * array_0 = [NSMutableArray new];
             auto iter_0 = _cppValue.begin();
             while (iter_0.Next()) {
-              auto & entry_0 = iter_0.GetValue();
-              NSString * newElement_0;
-                      newElement_0 = AsString(entry_0);
-        if (newElement_0 == nil) {
-          CHIP_ERROR err = CHIP_ERROR_INVALID_ARGUMENT;
-          *aError = err; return nil;
-        }
-      [array_0 addObject:newElement_0];
+                auto & entry_0 = iter_0.GetValue();
+                NSString * newElement_0;
+                newElement_0 = AsString(entry_0);
+                if (newElement_0 == nil) {
+                    CHIP_ERROR err = CHIP_ERROR_INVALID_ARGUMENT;
+                    *aError = err;
+                    return nil;
+                }
+                [array_0 addObject:newElement_0];
             }
             CHIP_ERROR err = iter_0.GetStatus();
             if (err != CHIP_NO_ERROR) {
-              *aError = err; return nil;
+                *aError = err;
+                return nil;
             }
             value = array_0;
-          }
+        }
         return value;
     }
     *aError = CHIP_ERROR_INTERNAL;
@@ -3943,7 +3979,7 @@
         chip::app::Clusters::ContentLauncher::Attributes::SupportedStreamingProtocols::TypeInfo::DecodableType _cppValue = *sharedPtr;
         *aError = CHIP_NO_ERROR;
         NSNumber * _Nonnull value;
-                value = [NSNumber numberWithUnsignedInt:_cppValue.Raw()];
+        value = [NSNumber numberWithUnsignedInt:_cppValue.Raw()];
         return value;
     }
     *aError = CHIP_ERROR_INTERNAL;
@@ -3989,21 +4025,22 @@
         chip::app::Clusters::ContentLauncher::Attributes::GeneratedCommandList::TypeInfo::DecodableType _cppValue = *sharedPtr;
         *aError = CHIP_NO_ERROR;
         NSArray * _Nonnull value;
-          { // Scope for our temporary variables
+        { // Scope for our temporary variables
             auto * array_0 = [NSMutableArray new];
             auto iter_0 = _cppValue.begin();
             while (iter_0.Next()) {
-              auto & entry_0 = iter_0.GetValue();
-              NSNumber * newElement_0;
-                      newElement_0 = [NSNumber numberWithUnsignedInt:entry_0];
-            [array_0 addObject:newElement_0];
+                auto & entry_0 = iter_0.GetValue();
+                NSNumber * newElement_0;
+                newElement_0 = [NSNumber numberWithUnsignedInt:entry_0];
+                [array_0 addObject:newElement_0];
             }
             CHIP_ERROR err = iter_0.GetStatus();
             if (err != CHIP_NO_ERROR) {
-              *aError = err; return nil;
+                *aError = err;
+                return nil;
             }
             value = array_0;
-          }
+        }
         return value;
     }
     *aError = CHIP_ERROR_INTERNAL;
@@ -4049,21 +4086,22 @@
         chip::app::Clusters::ContentLauncher::Attributes::AcceptedCommandList::TypeInfo::DecodableType _cppValue = *sharedPtr;
         *aError = CHIP_NO_ERROR;
         NSArray * _Nonnull value;
-          { // Scope for our temporary variables
+        { // Scope for our temporary variables
             auto * array_0 = [NSMutableArray new];
             auto iter_0 = _cppValue.begin();
             while (iter_0.Next()) {
-              auto & entry_0 = iter_0.GetValue();
-              NSNumber * newElement_0;
-                      newElement_0 = [NSNumber numberWithUnsignedInt:entry_0];
-            [array_0 addObject:newElement_0];
+                auto & entry_0 = iter_0.GetValue();
+                NSNumber * newElement_0;
+                newElement_0 = [NSNumber numberWithUnsignedInt:entry_0];
+                [array_0 addObject:newElement_0];
             }
             CHIP_ERROR err = iter_0.GetStatus();
             if (err != CHIP_NO_ERROR) {
-              *aError = err; return nil;
+                *aError = err;
+                return nil;
             }
             value = array_0;
-          }
+        }
         return value;
     }
     *aError = CHIP_ERROR_INTERNAL;
@@ -4109,21 +4147,22 @@
         chip::app::Clusters::ContentLauncher::Attributes::EventList::TypeInfo::DecodableType _cppValue = *sharedPtr;
         *aError = CHIP_NO_ERROR;
         NSArray * _Nonnull value;
-          { // Scope for our temporary variables
+        { // Scope for our temporary variables
             auto * array_0 = [NSMutableArray new];
             auto iter_0 = _cppValue.begin();
             while (iter_0.Next()) {
-              auto & entry_0 = iter_0.GetValue();
-              NSNumber * newElement_0;
-                      newElement_0 = [NSNumber numberWithUnsignedInt:entry_0];
-            [array_0 addObject:newElement_0];
+                auto & entry_0 = iter_0.GetValue();
+                NSNumber * newElement_0;
+                newElement_0 = [NSNumber numberWithUnsignedInt:entry_0];
+                [array_0 addObject:newElement_0];
             }
             CHIP_ERROR err = iter_0.GetStatus();
             if (err != CHIP_NO_ERROR) {
-              *aError = err; return nil;
+                *aError = err;
+                return nil;
             }
             value = array_0;
-          }
+        }
         return value;
     }
     *aError = CHIP_ERROR_INTERNAL;
@@ -4169,21 +4208,22 @@
         chip::app::Clusters::ContentLauncher::Attributes::AttributeList::TypeInfo::DecodableType _cppValue = *sharedPtr;
         *aError = CHIP_NO_ERROR;
         NSArray * _Nonnull value;
-          { // Scope for our temporary variables
+        { // Scope for our temporary variables
             auto * array_0 = [NSMutableArray new];
             auto iter_0 = _cppValue.begin();
             while (iter_0.Next()) {
-              auto & entry_0 = iter_0.GetValue();
-              NSNumber * newElement_0;
-                      newElement_0 = [NSNumber numberWithUnsignedInt:entry_0];
-            [array_0 addObject:newElement_0];
+                auto & entry_0 = iter_0.GetValue();
+                NSNumber * newElement_0;
+                newElement_0 = [NSNumber numberWithUnsignedInt:entry_0];
+                [array_0 addObject:newElement_0];
             }
             CHIP_ERROR err = iter_0.GetStatus();
             if (err != CHIP_NO_ERROR) {
-              *aError = err; return nil;
+                *aError = err;
+                return nil;
             }
             value = array_0;
-          }
+        }
         return value;
     }
     *aError = CHIP_ERROR_INTERNAL;
@@ -4229,8 +4269,8 @@
         chip::app::Clusters::ContentLauncher::Attributes::FeatureMap::TypeInfo::DecodableType _cppValue = *sharedPtr;
         *aError = CHIP_NO_ERROR;
         NSNumber * _Nonnull value;
-                value = [NSNumber numberWithUnsignedInt:_cppValue];
-              return value;
+        value = [NSNumber numberWithUnsignedInt:_cppValue];
+        return value;
     }
     *aError = CHIP_ERROR_INTERNAL;
     return value;
@@ -4275,14 +4315,13 @@
         chip::app::Clusters::ContentLauncher::Attributes::ClusterRevision::TypeInfo::DecodableType _cppValue = *sharedPtr;
         *aError = CHIP_NO_ERROR;
         NSNumber * _Nonnull value;
-                value = [NSNumber numberWithUnsignedShort:_cppValue];
-              return value;
+        value = [NSNumber numberWithUnsignedShort:_cppValue];
+        return value;
     }
     *aError = CHIP_ERROR_INTERNAL;
     return value;
 }
 @end
-
 
 // ApplicationLauncher cluster attributes:
 
@@ -4324,21 +4363,22 @@
         chip::app::Clusters::ApplicationLauncher::Attributes::CatalogList::TypeInfo::DecodableType _cppValue = *sharedPtr;
         *aError = CHIP_NO_ERROR;
         NSArray * _Nonnull value;
-          { // Scope for our temporary variables
+        { // Scope for our temporary variables
             auto * array_0 = [NSMutableArray new];
             auto iter_0 = _cppValue.begin();
             while (iter_0.Next()) {
-              auto & entry_0 = iter_0.GetValue();
-              NSNumber * newElement_0;
-                      newElement_0 = [NSNumber numberWithUnsignedShort:entry_0];
-            [array_0 addObject:newElement_0];
+                auto & entry_0 = iter_0.GetValue();
+                NSNumber * newElement_0;
+                newElement_0 = [NSNumber numberWithUnsignedShort:entry_0];
+                [array_0 addObject:newElement_0];
             }
             CHIP_ERROR err = iter_0.GetStatus();
             if (err != CHIP_NO_ERROR) {
-              *aError = err; return nil;
+                *aError = err;
+                return nil;
             }
             value = array_0;
-          }
+        }
         return value;
     }
     *aError = CHIP_ERROR_INTERNAL;
@@ -4384,23 +4424,24 @@
         chip::app::Clusters::ApplicationLauncher::Attributes::CurrentApp::TypeInfo::DecodableType _cppValue = *sharedPtr;
         *aError = CHIP_NO_ERROR;
         MCApplicationLauncherClusterApplicationEPStruct * _Nullable value;
-          if (_cppValue.IsNull()) {
+        if (_cppValue.IsNull()) {
             value = nil;
-          } else {
-                value = [MCApplicationLauncherClusterApplicationEPStruct new];
-          value.application = [MCApplicationLauncherClusterApplicationStruct new];
-              value.application.catalogVendorID = [NSNumber numberWithUnsignedShort:_cppValue.Value().application.catalogVendorID];
-                    value.application.applicationID = AsString(_cppValue.Value().application.applicationID);
-        if (value.application.applicationID == nil) {
-          CHIP_ERROR err = CHIP_ERROR_INVALID_ARGUMENT;
-          *aError = err; return nil;
-        }
-        if (_cppValue.Value().endpoint.HasValue()) {
-                  value.endpoint = [NSNumber numberWithUnsignedShort:_cppValue.Value().endpoint.Value()];
         } else {
-          value.endpoint = nil;
+            value = [MCApplicationLauncherClusterApplicationEPStruct new];
+            value.application = [MCApplicationLauncherClusterApplicationStruct new];
+            value.application.catalogVendorID = [NSNumber numberWithUnsignedShort:_cppValue.Value().application.catalogVendorID];
+            value.application.applicationID = AsString(_cppValue.Value().application.applicationID);
+            if (value.application.applicationID == nil) {
+                CHIP_ERROR err = CHIP_ERROR_INVALID_ARGUMENT;
+                *aError = err;
+                return nil;
+            }
+            if (_cppValue.Value().endpoint.HasValue()) {
+                value.endpoint = [NSNumber numberWithUnsignedShort:_cppValue.Value().endpoint.Value()];
+            } else {
+                value.endpoint = nil;
+            }
         }
-  }
         return value;
     }
     *aError = CHIP_ERROR_INTERNAL;
@@ -4446,21 +4487,22 @@
         chip::app::Clusters::ApplicationLauncher::Attributes::GeneratedCommandList::TypeInfo::DecodableType _cppValue = *sharedPtr;
         *aError = CHIP_NO_ERROR;
         NSArray * _Nonnull value;
-          { // Scope for our temporary variables
+        { // Scope for our temporary variables
             auto * array_0 = [NSMutableArray new];
             auto iter_0 = _cppValue.begin();
             while (iter_0.Next()) {
-              auto & entry_0 = iter_0.GetValue();
-              NSNumber * newElement_0;
-                      newElement_0 = [NSNumber numberWithUnsignedInt:entry_0];
-            [array_0 addObject:newElement_0];
+                auto & entry_0 = iter_0.GetValue();
+                NSNumber * newElement_0;
+                newElement_0 = [NSNumber numberWithUnsignedInt:entry_0];
+                [array_0 addObject:newElement_0];
             }
             CHIP_ERROR err = iter_0.GetStatus();
             if (err != CHIP_NO_ERROR) {
-              *aError = err; return nil;
+                *aError = err;
+                return nil;
             }
             value = array_0;
-          }
+        }
         return value;
     }
     *aError = CHIP_ERROR_INTERNAL;
@@ -4506,21 +4548,22 @@
         chip::app::Clusters::ApplicationLauncher::Attributes::AcceptedCommandList::TypeInfo::DecodableType _cppValue = *sharedPtr;
         *aError = CHIP_NO_ERROR;
         NSArray * _Nonnull value;
-          { // Scope for our temporary variables
+        { // Scope for our temporary variables
             auto * array_0 = [NSMutableArray new];
             auto iter_0 = _cppValue.begin();
             while (iter_0.Next()) {
-              auto & entry_0 = iter_0.GetValue();
-              NSNumber * newElement_0;
-                      newElement_0 = [NSNumber numberWithUnsignedInt:entry_0];
-            [array_0 addObject:newElement_0];
+                auto & entry_0 = iter_0.GetValue();
+                NSNumber * newElement_0;
+                newElement_0 = [NSNumber numberWithUnsignedInt:entry_0];
+                [array_0 addObject:newElement_0];
             }
             CHIP_ERROR err = iter_0.GetStatus();
             if (err != CHIP_NO_ERROR) {
-              *aError = err; return nil;
+                *aError = err;
+                return nil;
             }
             value = array_0;
-          }
+        }
         return value;
     }
     *aError = CHIP_ERROR_INTERNAL;
@@ -4566,21 +4609,22 @@
         chip::app::Clusters::ApplicationLauncher::Attributes::EventList::TypeInfo::DecodableType _cppValue = *sharedPtr;
         *aError = CHIP_NO_ERROR;
         NSArray * _Nonnull value;
-          { // Scope for our temporary variables
+        { // Scope for our temporary variables
             auto * array_0 = [NSMutableArray new];
             auto iter_0 = _cppValue.begin();
             while (iter_0.Next()) {
-              auto & entry_0 = iter_0.GetValue();
-              NSNumber * newElement_0;
-                      newElement_0 = [NSNumber numberWithUnsignedInt:entry_0];
-            [array_0 addObject:newElement_0];
+                auto & entry_0 = iter_0.GetValue();
+                NSNumber * newElement_0;
+                newElement_0 = [NSNumber numberWithUnsignedInt:entry_0];
+                [array_0 addObject:newElement_0];
             }
             CHIP_ERROR err = iter_0.GetStatus();
             if (err != CHIP_NO_ERROR) {
-              *aError = err; return nil;
+                *aError = err;
+                return nil;
             }
             value = array_0;
-          }
+        }
         return value;
     }
     *aError = CHIP_ERROR_INTERNAL;
@@ -4626,21 +4670,22 @@
         chip::app::Clusters::ApplicationLauncher::Attributes::AttributeList::TypeInfo::DecodableType _cppValue = *sharedPtr;
         *aError = CHIP_NO_ERROR;
         NSArray * _Nonnull value;
-          { // Scope for our temporary variables
+        { // Scope for our temporary variables
             auto * array_0 = [NSMutableArray new];
             auto iter_0 = _cppValue.begin();
             while (iter_0.Next()) {
-              auto & entry_0 = iter_0.GetValue();
-              NSNumber * newElement_0;
-                      newElement_0 = [NSNumber numberWithUnsignedInt:entry_0];
-            [array_0 addObject:newElement_0];
+                auto & entry_0 = iter_0.GetValue();
+                NSNumber * newElement_0;
+                newElement_0 = [NSNumber numberWithUnsignedInt:entry_0];
+                [array_0 addObject:newElement_0];
             }
             CHIP_ERROR err = iter_0.GetStatus();
             if (err != CHIP_NO_ERROR) {
-              *aError = err; return nil;
+                *aError = err;
+                return nil;
             }
             value = array_0;
-          }
+        }
         return value;
     }
     *aError = CHIP_ERROR_INTERNAL;
@@ -4686,8 +4731,8 @@
         chip::app::Clusters::ApplicationLauncher::Attributes::FeatureMap::TypeInfo::DecodableType _cppValue = *sharedPtr;
         *aError = CHIP_NO_ERROR;
         NSNumber * _Nonnull value;
-                value = [NSNumber numberWithUnsignedInt:_cppValue];
-              return value;
+        value = [NSNumber numberWithUnsignedInt:_cppValue];
+        return value;
     }
     *aError = CHIP_ERROR_INTERNAL;
     return value;
@@ -4732,14 +4777,13 @@
         chip::app::Clusters::ApplicationLauncher::Attributes::ClusterRevision::TypeInfo::DecodableType _cppValue = *sharedPtr;
         *aError = CHIP_NO_ERROR;
         NSNumber * _Nonnull value;
-                value = [NSNumber numberWithUnsignedShort:_cppValue];
-              return value;
+        value = [NSNumber numberWithUnsignedShort:_cppValue];
+        return value;
     }
     *aError = CHIP_ERROR_INTERNAL;
     return value;
 }
 @end
-
 
 // ApplicationBasic cluster attributes:
 
@@ -4781,10 +4825,11 @@
         chip::app::Clusters::ApplicationBasic::Attributes::VendorName::TypeInfo::DecodableType _cppValue = *sharedPtr;
         *aError = CHIP_NO_ERROR;
         NSString * _Nonnull value;
-                value = AsString(_cppValue);
+        value = AsString(_cppValue);
         if (value == nil) {
-          CHIP_ERROR err = CHIP_ERROR_INVALID_ARGUMENT;
-          *aError = err; return nil;
+            CHIP_ERROR err = CHIP_ERROR_INVALID_ARGUMENT;
+            *aError = err;
+            return nil;
         }
         return value;
     }
@@ -4831,7 +4876,7 @@
         chip::app::Clusters::ApplicationBasic::Attributes::VendorID::TypeInfo::DecodableType _cppValue = *sharedPtr;
         *aError = CHIP_NO_ERROR;
         NSNumber * _Nonnull value;
-              value = [NSNumber numberWithUnsignedShort:chip::to_underlying(_cppValue)];
+        value = [NSNumber numberWithUnsignedShort:chip::to_underlying(_cppValue)];
         return value;
     }
     *aError = CHIP_ERROR_INTERNAL;
@@ -4877,10 +4922,11 @@
         chip::app::Clusters::ApplicationBasic::Attributes::ApplicationName::TypeInfo::DecodableType _cppValue = *sharedPtr;
         *aError = CHIP_NO_ERROR;
         NSString * _Nonnull value;
-                value = AsString(_cppValue);
+        value = AsString(_cppValue);
         if (value == nil) {
-          CHIP_ERROR err = CHIP_ERROR_INVALID_ARGUMENT;
-          *aError = err; return nil;
+            CHIP_ERROR err = CHIP_ERROR_INVALID_ARGUMENT;
+            *aError = err;
+            return nil;
         }
         return value;
     }
@@ -4927,8 +4973,8 @@
         chip::app::Clusters::ApplicationBasic::Attributes::ProductID::TypeInfo::DecodableType _cppValue = *sharedPtr;
         *aError = CHIP_NO_ERROR;
         NSNumber * _Nonnull value;
-                value = [NSNumber numberWithUnsignedShort:_cppValue];
-              return value;
+        value = [NSNumber numberWithUnsignedShort:_cppValue];
+        return value;
     }
     *aError = CHIP_ERROR_INTERNAL;
     return value;
@@ -4973,12 +5019,13 @@
         chip::app::Clusters::ApplicationBasic::Attributes::Application::TypeInfo::DecodableType _cppValue = *sharedPtr;
         *aError = CHIP_NO_ERROR;
         MCApplicationBasicClusterApplicationStruct * _Nonnull value;
-            value = [MCApplicationBasicClusterApplicationStruct new];
-              value.catalogVendorID = [NSNumber numberWithUnsignedShort:_cppValue.catalogVendorID];
-                    value.applicationID = AsString(_cppValue.applicationID);
+        value = [MCApplicationBasicClusterApplicationStruct new];
+        value.catalogVendorID = [NSNumber numberWithUnsignedShort:_cppValue.catalogVendorID];
+        value.applicationID = AsString(_cppValue.applicationID);
         if (value.applicationID == nil) {
-          CHIP_ERROR err = CHIP_ERROR_INVALID_ARGUMENT;
-          *aError = err; return nil;
+            CHIP_ERROR err = CHIP_ERROR_INVALID_ARGUMENT;
+            *aError = err;
+            return nil;
         }
         return value;
     }
@@ -5025,7 +5072,7 @@
         chip::app::Clusters::ApplicationBasic::Attributes::Status::TypeInfo::DecodableType _cppValue = *sharedPtr;
         *aError = CHIP_NO_ERROR;
         NSNumber * _Nonnull value;
-              value = [NSNumber numberWithUnsignedChar:chip::to_underlying(_cppValue)];
+        value = [NSNumber numberWithUnsignedChar:chip::to_underlying(_cppValue)];
         return value;
     }
     *aError = CHIP_ERROR_INTERNAL;
@@ -5071,10 +5118,11 @@
         chip::app::Clusters::ApplicationBasic::Attributes::ApplicationVersion::TypeInfo::DecodableType _cppValue = *sharedPtr;
         *aError = CHIP_NO_ERROR;
         NSString * _Nonnull value;
-                value = AsString(_cppValue);
+        value = AsString(_cppValue);
         if (value == nil) {
-          CHIP_ERROR err = CHIP_ERROR_INVALID_ARGUMENT;
-          *aError = err; return nil;
+            CHIP_ERROR err = CHIP_ERROR_INVALID_ARGUMENT;
+            *aError = err;
+            return nil;
         }
         return value;
     }
@@ -5121,21 +5169,22 @@
         chip::app::Clusters::ApplicationBasic::Attributes::AllowedVendorList::TypeInfo::DecodableType _cppValue = *sharedPtr;
         *aError = CHIP_NO_ERROR;
         NSArray * _Nonnull value;
-          { // Scope for our temporary variables
+        { // Scope for our temporary variables
             auto * array_0 = [NSMutableArray new];
             auto iter_0 = _cppValue.begin();
             while (iter_0.Next()) {
-              auto & entry_0 = iter_0.GetValue();
-              NSNumber * newElement_0;
-                    newElement_0 = [NSNumber numberWithUnsignedShort:chip::to_underlying(entry_0)];
-      [array_0 addObject:newElement_0];
+                auto & entry_0 = iter_0.GetValue();
+                NSNumber * newElement_0;
+                newElement_0 = [NSNumber numberWithUnsignedShort:chip::to_underlying(entry_0)];
+                [array_0 addObject:newElement_0];
             }
             CHIP_ERROR err = iter_0.GetStatus();
             if (err != CHIP_NO_ERROR) {
-              *aError = err; return nil;
+                *aError = err;
+                return nil;
             }
             value = array_0;
-          }
+        }
         return value;
     }
     *aError = CHIP_ERROR_INTERNAL;
@@ -5181,21 +5230,22 @@
         chip::app::Clusters::ApplicationBasic::Attributes::GeneratedCommandList::TypeInfo::DecodableType _cppValue = *sharedPtr;
         *aError = CHIP_NO_ERROR;
         NSArray * _Nonnull value;
-          { // Scope for our temporary variables
+        { // Scope for our temporary variables
             auto * array_0 = [NSMutableArray new];
             auto iter_0 = _cppValue.begin();
             while (iter_0.Next()) {
-              auto & entry_0 = iter_0.GetValue();
-              NSNumber * newElement_0;
-                      newElement_0 = [NSNumber numberWithUnsignedInt:entry_0];
-            [array_0 addObject:newElement_0];
+                auto & entry_0 = iter_0.GetValue();
+                NSNumber * newElement_0;
+                newElement_0 = [NSNumber numberWithUnsignedInt:entry_0];
+                [array_0 addObject:newElement_0];
             }
             CHIP_ERROR err = iter_0.GetStatus();
             if (err != CHIP_NO_ERROR) {
-              *aError = err; return nil;
+                *aError = err;
+                return nil;
             }
             value = array_0;
-          }
+        }
         return value;
     }
     *aError = CHIP_ERROR_INTERNAL;
@@ -5241,21 +5291,22 @@
         chip::app::Clusters::ApplicationBasic::Attributes::AcceptedCommandList::TypeInfo::DecodableType _cppValue = *sharedPtr;
         *aError = CHIP_NO_ERROR;
         NSArray * _Nonnull value;
-          { // Scope for our temporary variables
+        { // Scope for our temporary variables
             auto * array_0 = [NSMutableArray new];
             auto iter_0 = _cppValue.begin();
             while (iter_0.Next()) {
-              auto & entry_0 = iter_0.GetValue();
-              NSNumber * newElement_0;
-                      newElement_0 = [NSNumber numberWithUnsignedInt:entry_0];
-            [array_0 addObject:newElement_0];
+                auto & entry_0 = iter_0.GetValue();
+                NSNumber * newElement_0;
+                newElement_0 = [NSNumber numberWithUnsignedInt:entry_0];
+                [array_0 addObject:newElement_0];
             }
             CHIP_ERROR err = iter_0.GetStatus();
             if (err != CHIP_NO_ERROR) {
-              *aError = err; return nil;
+                *aError = err;
+                return nil;
             }
             value = array_0;
-          }
+        }
         return value;
     }
     *aError = CHIP_ERROR_INTERNAL;
@@ -5301,21 +5352,22 @@
         chip::app::Clusters::ApplicationBasic::Attributes::EventList::TypeInfo::DecodableType _cppValue = *sharedPtr;
         *aError = CHIP_NO_ERROR;
         NSArray * _Nonnull value;
-          { // Scope for our temporary variables
+        { // Scope for our temporary variables
             auto * array_0 = [NSMutableArray new];
             auto iter_0 = _cppValue.begin();
             while (iter_0.Next()) {
-              auto & entry_0 = iter_0.GetValue();
-              NSNumber * newElement_0;
-                      newElement_0 = [NSNumber numberWithUnsignedInt:entry_0];
-            [array_0 addObject:newElement_0];
+                auto & entry_0 = iter_0.GetValue();
+                NSNumber * newElement_0;
+                newElement_0 = [NSNumber numberWithUnsignedInt:entry_0];
+                [array_0 addObject:newElement_0];
             }
             CHIP_ERROR err = iter_0.GetStatus();
             if (err != CHIP_NO_ERROR) {
-              *aError = err; return nil;
+                *aError = err;
+                return nil;
             }
             value = array_0;
-          }
+        }
         return value;
     }
     *aError = CHIP_ERROR_INTERNAL;
@@ -5361,21 +5413,22 @@
         chip::app::Clusters::ApplicationBasic::Attributes::AttributeList::TypeInfo::DecodableType _cppValue = *sharedPtr;
         *aError = CHIP_NO_ERROR;
         NSArray * _Nonnull value;
-          { // Scope for our temporary variables
+        { // Scope for our temporary variables
             auto * array_0 = [NSMutableArray new];
             auto iter_0 = _cppValue.begin();
             while (iter_0.Next()) {
-              auto & entry_0 = iter_0.GetValue();
-              NSNumber * newElement_0;
-                      newElement_0 = [NSNumber numberWithUnsignedInt:entry_0];
-            [array_0 addObject:newElement_0];
+                auto & entry_0 = iter_0.GetValue();
+                NSNumber * newElement_0;
+                newElement_0 = [NSNumber numberWithUnsignedInt:entry_0];
+                [array_0 addObject:newElement_0];
             }
             CHIP_ERROR err = iter_0.GetStatus();
             if (err != CHIP_NO_ERROR) {
-              *aError = err; return nil;
+                *aError = err;
+                return nil;
             }
             value = array_0;
-          }
+        }
         return value;
     }
     *aError = CHIP_ERROR_INTERNAL;
@@ -5421,8 +5474,8 @@
         chip::app::Clusters::ApplicationBasic::Attributes::FeatureMap::TypeInfo::DecodableType _cppValue = *sharedPtr;
         *aError = CHIP_NO_ERROR;
         NSNumber * _Nonnull value;
-                value = [NSNumber numberWithUnsignedInt:_cppValue];
-              return value;
+        value = [NSNumber numberWithUnsignedInt:_cppValue];
+        return value;
     }
     *aError = CHIP_ERROR_INTERNAL;
     return value;
@@ -5467,11 +5520,10 @@
         chip::app::Clusters::ApplicationBasic::Attributes::ClusterRevision::TypeInfo::DecodableType _cppValue = *sharedPtr;
         *aError = CHIP_NO_ERROR;
         NSNumber * _Nonnull value;
-                value = [NSNumber numberWithUnsignedShort:_cppValue];
-              return value;
+        value = [NSNumber numberWithUnsignedShort:_cppValue];
+        return value;
     }
     *aError = CHIP_ERROR_INTERNAL;
     return value;
 }
 @end
-

@@ -27,174 +27,129 @@
 @interface MCNullObjectType : NSObject
 @end
 
-
 // OnOff cluster:
 
-@interface MCOnOffClusterOffCommand : MCCommand <MCOnOffClusterOffParams *, MCNullObjectType
- *>
+@interface MCOnOffClusterOffCommand : MCCommand <MCOnOffClusterOffParams *, MCNullObjectType *>
 @end
 
-@interface MCOnOffClusterOnCommand : MCCommand <MCOnOffClusterOnParams *, MCNullObjectType
- *>
+@interface MCOnOffClusterOnCommand : MCCommand <MCOnOffClusterOnParams *, MCNullObjectType *>
 @end
 
-@interface MCOnOffClusterToggleCommand : MCCommand <MCOnOffClusterToggleParams *, MCNullObjectType
- *>
+@interface MCOnOffClusterToggleCommand : MCCommand <MCOnOffClusterToggleParams *, MCNullObjectType *>
 @end
 
-@interface MCOnOffClusterOffWithEffectCommand : MCCommand <MCOnOffClusterOffWithEffectParams *, MCNullObjectType
- *>
+@interface MCOnOffClusterOffWithEffectCommand : MCCommand <MCOnOffClusterOffWithEffectParams *, MCNullObjectType *>
 @end
 
-@interface MCOnOffClusterOnWithRecallGlobalSceneCommand : MCCommand <MCOnOffClusterOnWithRecallGlobalSceneParams *, MCNullObjectType
- *>
+@interface MCOnOffClusterOnWithRecallGlobalSceneCommand : MCCommand <MCOnOffClusterOnWithRecallGlobalSceneParams *, MCNullObjectType *>
 @end
 
-@interface MCOnOffClusterOnWithTimedOffCommand : MCCommand <MCOnOffClusterOnWithTimedOffParams *, MCNullObjectType
- *>
+@interface MCOnOffClusterOnWithTimedOffCommand : MCCommand <MCOnOffClusterOnWithTimedOffParams *, MCNullObjectType *>
 @end
-
 
 // LevelControl cluster:
 
-@interface MCLevelControlClusterMoveToLevelCommand : MCCommand <MCLevelControlClusterMoveToLevelParams *, MCNullObjectType
- *>
+@interface MCLevelControlClusterMoveToLevelCommand : MCCommand <MCLevelControlClusterMoveToLevelParams *, MCNullObjectType *>
 @end
 
-@interface MCLevelControlClusterMoveCommand : MCCommand <MCLevelControlClusterMoveParams *, MCNullObjectType
- *>
+@interface MCLevelControlClusterMoveCommand : MCCommand <MCLevelControlClusterMoveParams *, MCNullObjectType *>
 @end
 
-@interface MCLevelControlClusterStepCommand : MCCommand <MCLevelControlClusterStepParams *, MCNullObjectType
- *>
+@interface MCLevelControlClusterStepCommand : MCCommand <MCLevelControlClusterStepParams *, MCNullObjectType *>
 @end
 
-@interface MCLevelControlClusterStopCommand : MCCommand <MCLevelControlClusterStopParams *, MCNullObjectType
- *>
+@interface MCLevelControlClusterStopCommand : MCCommand <MCLevelControlClusterStopParams *, MCNullObjectType *>
 @end
 
-@interface MCLevelControlClusterMoveToLevelWithOnOffCommand : MCCommand <MCLevelControlClusterMoveToLevelWithOnOffParams *, MCNullObjectType
- *>
+@interface MCLevelControlClusterMoveToLevelWithOnOffCommand : MCCommand <MCLevelControlClusterMoveToLevelWithOnOffParams *, MCNullObjectType *>
 @end
 
-@interface MCLevelControlClusterMoveWithOnOffCommand : MCCommand <MCLevelControlClusterMoveWithOnOffParams *, MCNullObjectType
- *>
+@interface MCLevelControlClusterMoveWithOnOffCommand : MCCommand <MCLevelControlClusterMoveWithOnOffParams *, MCNullObjectType *>
 @end
 
-@interface MCLevelControlClusterStepWithOnOffCommand : MCCommand <MCLevelControlClusterStepWithOnOffParams *, MCNullObjectType
- *>
+@interface MCLevelControlClusterStepWithOnOffCommand : MCCommand <MCLevelControlClusterStepWithOnOffParams *, MCNullObjectType *>
 @end
 
-@interface MCLevelControlClusterStopWithOnOffCommand : MCCommand <MCLevelControlClusterStopWithOnOffParams *, MCNullObjectType
- *>
+@interface MCLevelControlClusterStopWithOnOffCommand : MCCommand <MCLevelControlClusterStopWithOnOffParams *, MCNullObjectType *>
 @end
 
-@interface MCLevelControlClusterMoveToClosestFrequencyCommand : MCCommand <MCLevelControlClusterMoveToClosestFrequencyParams *, MCNullObjectType
- *>
+@interface MCLevelControlClusterMoveToClosestFrequencyCommand : MCCommand <MCLevelControlClusterMoveToClosestFrequencyParams *, MCNullObjectType *>
 @end
-
 
 // WakeOnLan cluster:
 
-
 // TargetNavigator cluster:
 
-@interface MCTargetNavigatorClusterNavigateTargetCommand : MCCommand <MCTargetNavigatorClusterNavigateTargetParams *, MCTargetNavigatorClusterNavigateTargetResponseParams
- *>
+@interface MCTargetNavigatorClusterNavigateTargetCommand : MCCommand <MCTargetNavigatorClusterNavigateTargetParams *, MCTargetNavigatorClusterNavigateTargetResponseParams *>
 @end
-
 
 // MediaPlayback cluster:
 
-@interface MCMediaPlaybackClusterPlayCommand : MCCommand <MCMediaPlaybackClusterPlayParams *, MCMediaPlaybackClusterPlaybackResponseParams
- *>
+@interface MCMediaPlaybackClusterPlayCommand : MCCommand <MCMediaPlaybackClusterPlayParams *, MCMediaPlaybackClusterPlaybackResponseParams *>
 @end
 
-@interface MCMediaPlaybackClusterPauseCommand : MCCommand <MCMediaPlaybackClusterPauseParams *, MCMediaPlaybackClusterPlaybackResponseParams
- *>
+@interface MCMediaPlaybackClusterPauseCommand : MCCommand <MCMediaPlaybackClusterPauseParams *, MCMediaPlaybackClusterPlaybackResponseParams *>
 @end
 
-@interface MCMediaPlaybackClusterStopCommand : MCCommand <MCMediaPlaybackClusterStopParams *, MCMediaPlaybackClusterPlaybackResponseParams
- *>
+@interface MCMediaPlaybackClusterStopCommand : MCCommand <MCMediaPlaybackClusterStopParams *, MCMediaPlaybackClusterPlaybackResponseParams *>
 @end
 
-@interface MCMediaPlaybackClusterStartOverCommand : MCCommand <MCMediaPlaybackClusterStartOverParams *, MCMediaPlaybackClusterPlaybackResponseParams
- *>
+@interface MCMediaPlaybackClusterStartOverCommand : MCCommand <MCMediaPlaybackClusterStartOverParams *, MCMediaPlaybackClusterPlaybackResponseParams *>
 @end
 
-@interface MCMediaPlaybackClusterPreviousCommand : MCCommand <MCMediaPlaybackClusterPreviousParams *, MCMediaPlaybackClusterPlaybackResponseParams
- *>
+@interface MCMediaPlaybackClusterPreviousCommand : MCCommand <MCMediaPlaybackClusterPreviousParams *, MCMediaPlaybackClusterPlaybackResponseParams *>
 @end
 
-@interface MCMediaPlaybackClusterNextCommand : MCCommand <MCMediaPlaybackClusterNextParams *, MCMediaPlaybackClusterPlaybackResponseParams
- *>
+@interface MCMediaPlaybackClusterNextCommand : MCCommand <MCMediaPlaybackClusterNextParams *, MCMediaPlaybackClusterPlaybackResponseParams *>
 @end
 
-@interface MCMediaPlaybackClusterRewindCommand : MCCommand <MCMediaPlaybackClusterRewindParams *, MCMediaPlaybackClusterPlaybackResponseParams
- *>
+@interface MCMediaPlaybackClusterRewindCommand : MCCommand <MCMediaPlaybackClusterRewindParams *, MCMediaPlaybackClusterPlaybackResponseParams *>
 @end
 
-@interface MCMediaPlaybackClusterFastForwardCommand : MCCommand <MCMediaPlaybackClusterFastForwardParams *, MCMediaPlaybackClusterPlaybackResponseParams
- *>
+@interface MCMediaPlaybackClusterFastForwardCommand : MCCommand <MCMediaPlaybackClusterFastForwardParams *, MCMediaPlaybackClusterPlaybackResponseParams *>
 @end
 
-@interface MCMediaPlaybackClusterSkipForwardCommand : MCCommand <MCMediaPlaybackClusterSkipForwardParams *, MCMediaPlaybackClusterPlaybackResponseParams
- *>
+@interface MCMediaPlaybackClusterSkipForwardCommand : MCCommand <MCMediaPlaybackClusterSkipForwardParams *, MCMediaPlaybackClusterPlaybackResponseParams *>
 @end
 
-@interface MCMediaPlaybackClusterSkipBackwardCommand : MCCommand <MCMediaPlaybackClusterSkipBackwardParams *, MCMediaPlaybackClusterPlaybackResponseParams
- *>
+@interface MCMediaPlaybackClusterSkipBackwardCommand : MCCommand <MCMediaPlaybackClusterSkipBackwardParams *, MCMediaPlaybackClusterPlaybackResponseParams *>
 @end
 
-@interface MCMediaPlaybackClusterSeekCommand : MCCommand <MCMediaPlaybackClusterSeekParams *, MCMediaPlaybackClusterPlaybackResponseParams
- *>
+@interface MCMediaPlaybackClusterSeekCommand : MCCommand <MCMediaPlaybackClusterSeekParams *, MCMediaPlaybackClusterPlaybackResponseParams *>
 @end
 
-@interface MCMediaPlaybackClusterActivateAudioTrackCommand : MCCommand <MCMediaPlaybackClusterActivateAudioTrackParams *, MCNullObjectType
- *>
+@interface MCMediaPlaybackClusterActivateAudioTrackCommand : MCCommand <MCMediaPlaybackClusterActivateAudioTrackParams *, MCNullObjectType *>
 @end
 
-@interface MCMediaPlaybackClusterActivateTextTrackCommand : MCCommand <MCMediaPlaybackClusterActivateTextTrackParams *, MCNullObjectType
- *>
+@interface MCMediaPlaybackClusterActivateTextTrackCommand : MCCommand <MCMediaPlaybackClusterActivateTextTrackParams *, MCNullObjectType *>
 @end
 
-@interface MCMediaPlaybackClusterDeactivateTextTrackCommand : MCCommand <MCMediaPlaybackClusterDeactivateTextTrackParams *, MCNullObjectType
- *>
+@interface MCMediaPlaybackClusterDeactivateTextTrackCommand : MCCommand <MCMediaPlaybackClusterDeactivateTextTrackParams *, MCNullObjectType *>
 @end
-
 
 // KeypadInput cluster:
 
-@interface MCKeypadInputClusterSendKeyCommand : MCCommand <MCKeypadInputClusterSendKeyParams *, MCKeypadInputClusterSendKeyResponseParams
- *>
+@interface MCKeypadInputClusterSendKeyCommand : MCCommand <MCKeypadInputClusterSendKeyParams *, MCKeypadInputClusterSendKeyResponseParams *>
 @end
-
 
 // ContentLauncher cluster:
 
-@interface MCContentLauncherClusterLaunchContentCommand : MCCommand <MCContentLauncherClusterLaunchContentParams *, MCContentLauncherClusterLauncherResponseParams
- *>
+@interface MCContentLauncherClusterLaunchContentCommand : MCCommand <MCContentLauncherClusterLaunchContentParams *, MCContentLauncherClusterLauncherResponseParams *>
 @end
 
-@interface MCContentLauncherClusterLaunchURLCommand : MCCommand <MCContentLauncherClusterLaunchURLParams *, MCContentLauncherClusterLauncherResponseParams
- *>
+@interface MCContentLauncherClusterLaunchURLCommand : MCCommand <MCContentLauncherClusterLaunchURLParams *, MCContentLauncherClusterLauncherResponseParams *>
 @end
-
 
 // ApplicationLauncher cluster:
 
-@interface MCApplicationLauncherClusterLaunchAppCommand : MCCommand <MCApplicationLauncherClusterLaunchAppParams *, MCApplicationLauncherClusterLauncherResponseParams
- *>
+@interface MCApplicationLauncherClusterLaunchAppCommand : MCCommand <MCApplicationLauncherClusterLaunchAppParams *, MCApplicationLauncherClusterLauncherResponseParams *>
 @end
 
-@interface MCApplicationLauncherClusterStopAppCommand : MCCommand <MCApplicationLauncherClusterStopAppParams *, MCApplicationLauncherClusterLauncherResponseParams
- *>
+@interface MCApplicationLauncherClusterStopAppCommand : MCCommand <MCApplicationLauncherClusterStopAppParams *, MCApplicationLauncherClusterLauncherResponseParams *>
 @end
 
-@interface MCApplicationLauncherClusterHideAppCommand : MCCommand <MCApplicationLauncherClusterHideAppParams *, MCApplicationLauncherClusterLauncherResponseParams
- *>
+@interface MCApplicationLauncherClusterHideAppCommand : MCCommand <MCApplicationLauncherClusterHideAppParams *, MCApplicationLauncherClusterLauncherResponseParams *>
 @end
-
 
 // ApplicationBasic cluster:
 
