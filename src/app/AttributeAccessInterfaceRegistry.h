@@ -17,7 +17,6 @@
 
 #include <app/AttributeAccessInterface.h>
 #include <app/AttributeAccessInterfaceCache.h>
-#include <app/util/af-types.h>
 
 namespace chip {
 namespace app {
@@ -47,7 +46,7 @@ public:
     /**
      * Unregister all attribute access interfaces that match this given endpoint.
      */
-    void UnregisterAllForEndpoint(EmberAfDefinedEndpoint * definedEndpoint);
+    void UnregisterAllForEndpoint(EndpointId endpointId);
 
     /**
      *  Get the registered attribute access override. nullptr when attribute access override is not found.

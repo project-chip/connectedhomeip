@@ -67,10 +67,10 @@ AttributeAccessInterfaceRegistry & AttributeAccessInterfaceRegistry::Instance()
     return instance;
 }
 
-void AttributeAccessInterfaceRegistry::UnregisterAllForEndpoint(EmberAfDefinedEndpoint * definedEndpoint)
+void AttributeAccessInterfaceRegistry::UnregisterAllForEndpoint(EndpointId endpointId)
 {
     UnregisterMatchingAttributeAccessInterfaces(
-        [endpoint = definedEndpoint->endpoint](AttributeAccessInterface * entry) { return entry->MatchesEndpoint(endpoint); },
+        [endpointId](AttributeAccessInterface * entry) { return entry->MatchesEndpoint(endpointId); },
         mAttributeAccessOverrides);
 }
 
