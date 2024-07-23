@@ -1119,5 +1119,5 @@ bool emberAfUnitTestingClusterTestSecondBatchHelperRequestCallback(
 
 void MatterUnitTestingPluginServerInitCallback()
 {
-    registerAttributeAccessOverride(&gAttrAccess);
+    chip::app::AttributeAccessInterfaceRegistry::Instance().RegisterAttributeAccessOverride(&gAttrAccess);
 }

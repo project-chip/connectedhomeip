@@ -476,6 +476,6 @@ bool IsLocalConfigDisabled()
 
 void MatterBasicInformationPluginServerInitCallback()
 {
-    registerAttributeAccessOverride(&gAttrAccess);
+    chip::app::AttributeAccessInterfaceRegistry::Instance().RegisterAttributeAccessOverride(&gAttrAccess);
     PlatformMgr().SetDelegate(&gPlatformMgrDelegate);
 }

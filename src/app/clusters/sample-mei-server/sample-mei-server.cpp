@@ -31,7 +31,9 @@ void MatterSampleMeiPluginServerInitCallback()
     ChipLogProgress(Zcl, "Sample MEI Init. Ep %d, Total Ep %u", MATTER_DM_SAMPLE_MEI_CLUSTER_SERVER_ENDPOINT_COUNT,
                     static_cast<uint16_t>(kNumSupportedEndpoints));
     ReturnOnFailure(CommandHandlerInterfaceRegistry::Instance().RegisterCommandHandler(&SampleMeiServer::Instance()));
-    VerifyOrReturn(registerAttributeAccessOverride(&SampleMeiServer::Instance()), CHIP_ERROR_INCORRECT_STATE);
+    VerifyOrReturn(
+        chip::app::AttributeAccessInterfaceRegistry::Instance().RegisterAttributeAccessOverride(&SampleMeiServer::Instance()),
+        CHIP_ERROR_INCORRECT_STATE);
 }
 
 void emberAfSampleMeiClusterServerInitCallback(chip::EndpointId endpoint)

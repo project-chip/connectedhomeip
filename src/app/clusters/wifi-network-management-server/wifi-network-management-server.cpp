@@ -69,7 +69,8 @@ WiFiNetworkManagementServer::~WiFiNetworkManagementServer()
 
 CHIP_ERROR WiFiNetworkManagementServer::Init()
 {
-    VerifyOrReturnError(registerAttributeAccessOverride(this), CHIP_ERROR_INTERNAL);
+    VerifyOrReturnError(chip::app::AttributeAccessInterfaceRegistry::Instance().RegisterAttributeAccessOverride(this),
+                        CHIP_ERROR_INTERNAL);
     ReturnErrorOnFailure(CommandHandlerInterfaceRegistry::Instance().RegisterCommandHandler(this));
     return CHIP_NO_ERROR;
 }

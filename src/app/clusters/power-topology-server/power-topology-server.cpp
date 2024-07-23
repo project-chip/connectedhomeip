@@ -41,7 +41,8 @@ namespace PowerTopology {
 
 CHIP_ERROR Instance::Init()
 {
-    VerifyOrReturnError(registerAttributeAccessOverride(this), CHIP_ERROR_INCORRECT_STATE);
+    VerifyOrReturnError(chip::app::AttributeAccessInterfaceRegistry::Instance().RegisterAttributeAccessOverride(this),
+                        CHIP_ERROR_INCORRECT_STATE);
     return CHIP_NO_ERROR;
 }
 

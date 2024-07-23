@@ -100,5 +100,5 @@ CHIP_ERROR PowerSourceConfigurationAttrAccess::Read(const ConcreteReadAttributeP
 
 void MatterPowerSourceConfigurationPluginServerInitCallback()
 {
-    registerAttributeAccessOverride(&gAttrAccess);
+    chip::app::AttributeAccessInterfaceRegistry::Instance().RegisterAttributeAccessOverride(&gAttrAccess);
 }

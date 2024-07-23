@@ -514,5 +514,5 @@ bool emberAfValveConfigurationAndControlClusterCloseCallback(
 
 void MatterValveConfigurationAndControlPluginServerInitCallback()
 {
-    registerAttributeAccessOverride(&gAttrAccess);
+    chip::app::AttributeAccessInterfaceRegistry::Instance().RegisterAttributeAccessOverride(&gAttrAccess);
 }

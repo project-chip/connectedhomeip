@@ -458,7 +458,7 @@ void MatterIcdManagementPluginServerInitCallback()
 
     // Configure and register Attribute Access Override
     gAttribute.Init(storage, symmetricKeystore, fabricTable, icdConfigurationData);
-    registerAttributeAccessOverride(&gAttribute);
+    chip::app::AttributeAccessInterfaceRegistry::Instance().RegisterAttributeAccessOverride(&gAttribute);
 
     // Configure ICD Management
     ICDManagementServer::Init(storage, symmetricKeystore, icdConfigurationData);

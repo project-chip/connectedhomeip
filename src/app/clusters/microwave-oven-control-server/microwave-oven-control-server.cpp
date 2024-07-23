@@ -90,7 +90,8 @@ CHIP_ERROR Instance::Init()
             "Microwave Oven Control: feature bits error, if feature supports PowerNumberLimits it must support PowerAsNumber"));
 
     ReturnErrorOnFailure(CommandHandlerInterfaceRegistry::Instance().RegisterCommandHandler(this));
-    VerifyOrReturnError(registerAttributeAccessOverride(this), CHIP_ERROR_INCORRECT_STATE);
+    VerifyOrReturnError(chip::app::AttributeAccessInterfaceRegistry::Instance().RegisterAttributeAccessOverride(this),
+                        CHIP_ERROR_INCORRECT_STATE);
     // If the PowerInWatts feature is supported, get the count of supported watt levels so we can later
     // ensure incoming watt level values are valid.
     if (HasFeature(MicrowaveOvenControl::Feature::kPowerInWatts))

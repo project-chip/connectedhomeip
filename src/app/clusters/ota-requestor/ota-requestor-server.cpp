@@ -295,5 +295,5 @@ bool emberAfOtaSoftwareUpdateRequestorClusterAnnounceOTAProviderCallback(
 
 void MatterOtaSoftwareUpdateRequestorPluginServerInitCallback()
 {
-    registerAttributeAccessOverride(&gAttrAccess);
+    chip::app::AttributeAccessInterfaceRegistry::Instance().RegisterAttributeAccessOverride(&gAttrAccess);
 }

@@ -196,5 +196,5 @@ exit:
 
 void MatterKeypadInputPluginServerInitCallback()
 {
-    registerAttributeAccessOverride(&gKeypadInputAttrAccess);
+    chip::app::AttributeAccessInterfaceRegistry::Instance().RegisterAttributeAccessOverride(&gKeypadInputAttrAccess);
 }

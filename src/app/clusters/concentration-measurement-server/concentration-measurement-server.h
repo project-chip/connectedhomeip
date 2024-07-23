@@ -353,7 +353,8 @@ public:
         VerifyOrReturnError(emberAfContainsServer(mEndpointId, mClusterId), CHIP_ERROR_INCORRECT_STATE);
 
         // Register the object as attribute provider
-        VerifyOrReturnError(registerAttributeAccessOverride(this), CHIP_ERROR_INCORRECT_STATE);
+        VerifyOrReturnError(chip::app::AttributeAccessInterfaceRegistry::Instance().RegisterAttributeAccessOverride(this),
+                            CHIP_ERROR_INCORRECT_STATE);
 
         mFeatureMap = GenerateFeatureMap();
 

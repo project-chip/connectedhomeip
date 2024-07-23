@@ -286,5 +286,5 @@ exit:
 
 void MatterContentLauncherPluginServerInitCallback()
 {
-    registerAttributeAccessOverride(&gContentLauncherAttrAccess);
+    chip::app::AttributeAccessInterfaceRegistry::Instance().RegisterAttributeAccessOverride(&gContentLauncherAttrAccess);
 }

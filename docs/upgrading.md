@@ -79,10 +79,8 @@ The following replacements exist:
 
 ### AttributeAccessInterface register/unregister
 
-
-A new object exists for the attribute access interface registry, accessible
-as `chip::app::AttributeHandlerInterfaceRegistry::Instance()`
-
+A new object exists for the attribute access interface registry, accessible as
+`chip::app::AttributeHandlerInterfaceRegistry::Instance()`
 
 Replacements for methods are:
 
@@ -94,4 +92,3 @@ Replacements for methods are:
     `chip::app::AttributeAccessInterfaceRegistry::Instance().UnregisterAllForEndpoint`
 -   `chip::app::GetAttributeAccessOverride` replaced by
     `chip::app::AttributeAccessInterfaceRegistry::Instance().Get`
-

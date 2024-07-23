@@ -47,7 +47,8 @@ CHIP_ERROR Instance::Init()
     // Check if the cluster has been selected in zap
     VerifyOrDie(emberAfContainsServer(mEndpointId, Id) == true);
 
-    VerifyOrReturnError(registerAttributeAccessOverride(this), CHIP_ERROR_INCORRECT_STATE);
+    VerifyOrReturnError(chip::app::AttributeAccessInterfaceRegistry::Instance().RegisterAttributeAccessOverride(this),
+                        CHIP_ERROR_INCORRECT_STATE);
 
     return CHIP_NO_ERROR;
 }

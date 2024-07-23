@@ -73,7 +73,8 @@ CHIP_ERROR Instance::Init()
     LoadPersistentAttributes();
 
     ReturnErrorOnFailure(CommandHandlerInterfaceRegistry::Instance().RegisterCommandHandler(this));
-    VerifyOrReturnError(registerAttributeAccessOverride(this), CHIP_ERROR_INCORRECT_STATE);
+    VerifyOrReturnError(chip::app::AttributeAccessInterfaceRegistry::Instance().RegisterAttributeAccessOverride(this),
+                        CHIP_ERROR_INCORRECT_STATE);
     ChipLogDetail(Zcl, "ResourceMonitoring: calling mDelegate->Init()");
     ReturnErrorOnFailure(mDelegate->Init());
 

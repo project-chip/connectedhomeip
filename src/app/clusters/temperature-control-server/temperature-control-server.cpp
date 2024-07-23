@@ -228,5 +228,5 @@ void emberAfTemperatureControlClusterServerInitCallback(EndpointId endpoint) {}
 
 void MatterTemperatureControlPluginServerInitCallback()
 {
-    registerAttributeAccessOverride(&gAttrAccess);
+    chip::app::AttributeAccessInterfaceRegistry::Instance().RegisterAttributeAccessOverride(&gAttrAccess);
 }

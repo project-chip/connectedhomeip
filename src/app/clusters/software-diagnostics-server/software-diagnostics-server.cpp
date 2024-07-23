@@ -230,6 +230,6 @@ bool emberAfSoftwareDiagnosticsClusterResetWatermarksCallback(app::CommandHandle
 
 void MatterSoftwareDiagnosticsPluginServerInitCallback()
 {
-    registerAttributeAccessOverride(&gAttrAccess);
+    chip::app::AttributeAccessInterfaceRegistry::Instance().RegisterAttributeAccessOverride(&gAttrAccess);
     CommandHandlerInterfaceRegistry::Instance().RegisterCommandHandler(&gCommandHandler);
 }

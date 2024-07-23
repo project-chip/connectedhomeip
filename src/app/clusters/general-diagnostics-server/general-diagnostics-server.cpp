@@ -491,7 +491,7 @@ void MatterGeneralDiagnosticsPluginServerInitCallback()
 {
     BootReasonEnum bootReason;
 
-    registerAttributeAccessOverride(&gAttrAccess);
+    chip::app::AttributeAccessInterfaceRegistry::Instance().RegisterAttributeAccessOverride(&gAttrAccess);
     ConnectivityMgr().SetDelegate(&gDiagnosticDelegate);
 
     if (GetDiagnosticDataProvider().GetBootReason(bootReason) == CHIP_NO_ERROR)

@@ -928,5 +928,5 @@ bool emberAfThermostatClusterSetpointRaiseLowerCallback(app::CommandHandler * co
 
 void MatterThermostatPluginServerInitCallback()
 {
-    registerAttributeAccessOverride(&gThermostatAttrAccess);
+    chip::app::AttributeAccessInterfaceRegistry::Instance().RegisterAttributeAccessOverride(&gThermostatAttrAccess);
 }

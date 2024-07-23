@@ -110,5 +110,5 @@ CHIP_ERROR FixedLabelAttrAccess::Read(const ConcreteReadAttributePath & aPath, A
 
 void MatterFixedLabelPluginServerInitCallback()
 {
-    registerAttributeAccessOverride(&gAttrAccess);
+    chip::app::AttributeAccessInterfaceRegistry::Instance().RegisterAttributeAccessOverride(&gAttrAccess);
 }

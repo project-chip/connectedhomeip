@@ -591,9 +591,12 @@ public:
     template <typename... Args>
     RegisteredAttributeAccessInterface(Args &&... args) : mData(std::forward<Args>(args)...)
     {
-        VerifyOrDie(registerAttributeAccessOverride(&mData));
+        VerifyOrDie(chip::app::AttributeAccessInterfaceRegistry::Instance().RegisterAttributeAccessOverride(&mData));
     }
-    ~RegisteredAttributeAccessInterface() { chip::app::AttributeAccessInterfaceRegistry::Instance().UnregisterAttributeAccessOverride(&mData); }
+    ~RegisteredAttributeAccessInterface()
+    {
+        chip::app::AttributeAccessInterfaceRegistry::Instance().UnregisterAttributeAccessOverride(&mData);
+    }
 
     T * operator->() { return &mData; }
     T & operator*() { return mData; }

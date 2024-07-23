@@ -261,5 +261,5 @@ void MatterTargetNavigatorClusterServerAttributeChangedCallback(const chip::app:
 
 void MatterTargetNavigatorPluginServerInitCallback()
 {
-    registerAttributeAccessOverride(&gTargetNavigatorAttrAccess);
+    chip::app::AttributeAccessInterfaceRegistry::Instance().RegisterAttributeAccessOverride(&gTargetNavigatorAttrAccess);
 }

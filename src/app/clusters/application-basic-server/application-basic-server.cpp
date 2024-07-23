@@ -246,5 +246,5 @@ CHIP_ERROR ApplicationBasicAttrAccess::ReadAllowedVendorListAttribute(app::Attri
 
 void MatterApplicationBasicPluginServerInitCallback()
 {
-    registerAttributeAccessOverride(&gApplicationBasicAttrAccess);
+    chip::app::AttributeAccessInterfaceRegistry::Instance().RegisterAttributeAccessOverride(&gApplicationBasicAttrAccess);
 }

@@ -268,7 +268,7 @@ CHIP_ERROR BindingTableAccess::NotifyBindingsChanged()
 
 void MatterBindingPluginServerInitCallback()
 {
-    registerAttributeAccessOverride(&gAttrAccess);
+    chip::app::AttributeAccessInterfaceRegistry::Instance().RegisterAttributeAccessOverride(&gAttrAccess);
 }
 
 CHIP_ERROR AddBindingEntry(const EmberBindingTableEntry & entry)

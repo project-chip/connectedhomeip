@@ -42,7 +42,8 @@ MeasurementData gMeasurements[MATTER_DM_ELECTRICAL_ENERGY_MEASUREMENT_CLUSTER_SE
 
 CHIP_ERROR ElectricalEnergyMeasurementAttrAccess::Init()
 {
-    VerifyOrReturnError(registerAttributeAccessOverride(this), CHIP_ERROR_INCORRECT_STATE);
+    VerifyOrReturnError(chip::app::AttributeAccessInterfaceRegistry::Instance().RegisterAttributeAccessOverride(this),
+                        CHIP_ERROR_INCORRECT_STATE);
     return CHIP_NO_ERROR;
 }
 

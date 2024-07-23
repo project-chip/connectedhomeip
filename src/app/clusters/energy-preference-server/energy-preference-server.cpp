@@ -18,7 +18,7 @@
 #include "energy-preference-server.h"
 
 #include <app/AttributeAccessInterfaceRegistry.h>
-#include <app/util/attribute-storage.h> // Needed for registerAttributeAccessOverride
+#include <app/util/attribute-storage.h> // Needed for chip::app::AttributeAccessInterfaceRegistry::Instance().RegisterAttributeAccessOverride
 
 #include <app-common/zap-generated/attributes/Accessors.h>
 #include <app-common/zap-generated/callback.h>
@@ -228,5 +228,5 @@ Status MatterEnergyPreferenceClusterServerPreAttributeChangedCallback(const Conc
 
 void MatterEnergyPreferencePluginServerInitCallback()
 {
-    registerAttributeAccessOverride(&gEnergyPrefAttrAccess);
+    chip::app::AttributeAccessInterfaceRegistry::Instance().RegisterAttributeAccessOverride(&gEnergyPrefAttrAccess);
 }

@@ -219,7 +219,7 @@ inline bool areStartUpModeAndCurrentModeNonVolatile(EndpointId endpointId)
 
 void MatterModeSelectPluginServerInitCallback()
 {
-    registerAttributeAccessOverride(&gModeSelectAttrAccess);
+    chip::app::AttributeAccessInterfaceRegistry::Instance().RegisterAttributeAccessOverride(&gModeSelectAttrAccess);
 }
 
 /**
