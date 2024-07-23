@@ -141,6 +141,6 @@ void emberAfFanControlClusterInitCallback(EndpointId endpoint)
 {
     VerifyOrDie(!mFanControlManager);
     mFanControlManager = std::make_unique<ChefFanControlManager>(endpoint);
-    chip::app::AttributeAccessInterfaceRegistry::Instance().RegisterAttributeAccessOverride(mFanControlManager.get());
+    AttributeAccessInterfaceRegistry::Instance().RegisterAttributeAccessOverride(mFanControlManager.get());
     FanControl::SetDefaultDelegate(endpoint, mFanControlManager.get());
 }

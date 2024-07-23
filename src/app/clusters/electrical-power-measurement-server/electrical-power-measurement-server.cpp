@@ -42,14 +42,14 @@ namespace ElectricalPowerMeasurement {
 
 CHIP_ERROR Instance::Init()
 {
-    VerifyOrReturnError(chip::app::AttributeAccessInterfaceRegistry::Instance().RegisterAttributeAccessOverride(this),
+    VerifyOrReturnError(AttributeAccessInterfaceRegistry::Instance().RegisterAttributeAccessOverride(this),
                         CHIP_ERROR_INCORRECT_STATE);
     return CHIP_NO_ERROR;
 }
 
 void Instance::Shutdown()
 {
-    chip::app::AttributeAccessInterfaceRegistry::Instance().UnregisterAttributeAccessOverride(this);
+    AttributeAccessInterfaceRegistry::Instance().UnregisterAttributeAccessOverride(this);
 }
 
 bool Instance::HasFeature(Feature aFeature) const

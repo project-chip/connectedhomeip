@@ -42,14 +42,14 @@ MeasurementData gMeasurements[MATTER_DM_ELECTRICAL_ENERGY_MEASUREMENT_CLUSTER_SE
 
 CHIP_ERROR ElectricalEnergyMeasurementAttrAccess::Init()
 {
-    VerifyOrReturnError(chip::app::AttributeAccessInterfaceRegistry::Instance().RegisterAttributeAccessOverride(this),
+    VerifyOrReturnError(AttributeAccessInterfaceRegistry::Instance().RegisterAttributeAccessOverride(this),
                         CHIP_ERROR_INCORRECT_STATE);
     return CHIP_NO_ERROR;
 }
 
 void ElectricalEnergyMeasurementAttrAccess::Shutdown()
 {
-    chip::app::AttributeAccessInterfaceRegistry::Instance().UnregisterAttributeAccessOverride(this);
+    AttributeAccessInterfaceRegistry::Instance().UnregisterAttributeAccessOverride(this);
 }
 
 CHIP_ERROR ElectricalEnergyMeasurementAttrAccess::Read(const app::ConcreteReadAttributePath & aPath,

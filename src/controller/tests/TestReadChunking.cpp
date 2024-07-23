@@ -360,7 +360,7 @@ public:
     // Register for the Test Cluster cluster on all endpoints.
     TestAttrAccess() : AttributeAccessInterface(Optional<EndpointId>::Missing(), Clusters::UnitTesting::Id)
     {
-        chip::app::AttributeAccessInterfaceRegistry::Instance().RegisterAttributeAccessOverride(this);
+        AttributeAccessInterfaceRegistry::Instance().RegisterAttributeAccessOverride(this);
     }
 
     CHIP_ERROR Read(const app::ConcreteReadAttributePath & aPath, app::AttributeValueEncoder & aEncoder) override;

@@ -436,7 +436,7 @@ GroupKeyManagementAttributeAccess gAttribute;
 
 void MatterGroupKeyManagementPluginServerInitCallback()
 {
-    chip::app::AttributeAccessInterfaceRegistry::Instance().RegisterAttributeAccessOverride(&gAttribute);
+    AttributeAccessInterfaceRegistry::Instance().RegisterAttributeAccessOverride(&gAttribute);
 }
 
 //

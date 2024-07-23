@@ -50,7 +50,7 @@ Instance::Instance(Delegate * aDelegate, EndpointId aEndpointId) : Instance(aDel
 Instance::~Instance()
 {
     CommandHandlerInterfaceRegistry::Instance().UnregisterCommandHandler(this);
-    chip::app::AttributeAccessInterfaceRegistry::Instance().UnregisterAttributeAccessOverride(this);
+    AttributeAccessInterfaceRegistry::Instance().UnregisterAttributeAccessOverride(this);
 }
 
 CHIP_ERROR Instance::Init()
@@ -64,7 +64,7 @@ CHIP_ERROR Instance::Init()
 
     ReturnErrorOnFailure(CommandHandlerInterfaceRegistry::Instance().RegisterCommandHandler(this));
 
-    VerifyOrReturnError(chip::app::AttributeAccessInterfaceRegistry::Instance().RegisterAttributeAccessOverride(this),
+    VerifyOrReturnError(AttributeAccessInterfaceRegistry::Instance().RegisterAttributeAccessOverride(this),
                         CHIP_ERROR_INCORRECT_STATE);
 
     return CHIP_NO_ERROR;

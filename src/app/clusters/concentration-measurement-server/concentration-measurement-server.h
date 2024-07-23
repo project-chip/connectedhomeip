@@ -327,7 +327,7 @@ public:
         this->mMeasurementUnit = aMeasurementUnit;
     };
 
-    ~Instance() override { chip::app::AttributeAccessInterfaceRegistry::Instance().UnregisterAttributeAccessOverride(this); };
+    ~Instance() override { AttributeAccessInterfaceRegistry::Instance().UnregisterAttributeAccessOverride(this); };
 
     CHIP_ERROR Init()
     {
@@ -353,7 +353,7 @@ public:
         VerifyOrReturnError(emberAfContainsServer(mEndpointId, mClusterId), CHIP_ERROR_INCORRECT_STATE);
 
         // Register the object as attribute provider
-        VerifyOrReturnError(chip::app::AttributeAccessInterfaceRegistry::Instance().RegisterAttributeAccessOverride(this),
+        VerifyOrReturnError(AttributeAccessInterfaceRegistry::Instance().RegisterAttributeAccessOverride(this),
                             CHIP_ERROR_INCORRECT_STATE);
 
         mFeatureMap = GenerateFeatureMap();

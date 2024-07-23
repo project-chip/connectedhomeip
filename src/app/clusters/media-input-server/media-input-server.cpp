@@ -294,5 +294,5 @@ exit:
 
 void MatterMediaInputPluginServerInitCallback()
 {
-    chip::app::AttributeAccessInterfaceRegistry::Instance().RegisterAttributeAccessOverride(&gMediaInputAttrAccess);
+    AttributeAccessInterfaceRegistry::Instance().RegisterAttributeAccessOverride(&gMediaInputAttrAccess);
 }

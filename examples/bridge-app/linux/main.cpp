@@ -999,7 +999,7 @@ void ApplicationInit()
         }
     }
 
-    chip::app::AttributeAccessInterfaceRegistry::Instance().RegisterAttributeAccessOverride(&gPowerAttrAccess);
+    AttributeAccessInterfaceRegistry::Instance().RegisterAttributeAccessOverride(&gPowerAttrAccess);
 }
 
 void ApplicationShutdown() {}

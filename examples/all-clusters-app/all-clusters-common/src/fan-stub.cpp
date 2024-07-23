@@ -173,6 +173,6 @@ void emberAfFanControlClusterInitCallback(EndpointId endpoint)
 {
     VerifyOrDie(mFanControlManager == nullptr);
     mFanControlManager = new FanControlManager(endpoint);
-    chip::app::AttributeAccessInterfaceRegistry::Instance().RegisterAttributeAccessOverride(mFanControlManager);
+    AttributeAccessInterfaceRegistry::Instance().RegisterAttributeAccessOverride(mFanControlManager);
     FanControl::SetDefaultDelegate(endpoint, mFanControlManager);
 }

@@ -39,7 +39,7 @@ Instance::Instance(EndpointId aEndpointId, BitMask<Feature> aFeature) :
 
 Instance::~Instance()
 {
-    chip::app::AttributeAccessInterfaceRegistry::Instance().UnregisterAttributeAccessOverride(this);
+    AttributeAccessInterfaceRegistry::Instance().UnregisterAttributeAccessOverride(this);
 }
 
 CHIP_ERROR Instance::Init()
@@ -47,7 +47,7 @@ CHIP_ERROR Instance::Init()
     // Check if the cluster has been selected in zap
     VerifyOrDie(emberAfContainsServer(mEndpointId, Id) == true);
 
-    VerifyOrReturnError(chip::app::AttributeAccessInterfaceRegistry::Instance().RegisterAttributeAccessOverride(this),
+    VerifyOrReturnError(AttributeAccessInterfaceRegistry::Instance().RegisterAttributeAccessOverride(this),
                         CHIP_ERROR_INCORRECT_STATE);
 
     return CHIP_NO_ERROR;

@@ -232,5 +232,5 @@ void emberAfTimeFormatLocalizationClusterServerInitCallback(EndpointId endpoint)
 
 void MatterTimeFormatLocalizationPluginServerInitCallback()
 {
-    chip::app::AttributeAccessInterfaceRegistry::Instance().RegisterAttributeAccessOverride(&gAttrAccess);
+    AttributeAccessInterfaceRegistry::Instance().RegisterAttributeAccessOverride(&gAttrAccess);
 }

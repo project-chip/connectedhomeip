@@ -261,5 +261,5 @@ exit:
 
 void MatterAccountLoginPluginServerInitCallback()
 {
-    chip::app::AttributeAccessInterfaceRegistry::Instance().RegisterAttributeAccessOverride(&gAccountLoginAttrAccess);
+    AttributeAccessInterfaceRegistry::Instance().RegisterAttributeAccessOverride(&gAccountLoginAttrAccess);
 }

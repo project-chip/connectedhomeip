@@ -32,7 +32,7 @@ void MatterSampleMeiPluginServerInitCallback()
                     static_cast<uint16_t>(kNumSupportedEndpoints));
     ReturnOnFailure(CommandHandlerInterfaceRegistry::Instance().RegisterCommandHandler(&SampleMeiServer::Instance()));
     VerifyOrReturn(
-        chip::app::AttributeAccessInterfaceRegistry::Instance().RegisterAttributeAccessOverride(&SampleMeiServer::Instance()),
+        AttributeAccessInterfaceRegistry::Instance().RegisterAttributeAccessOverride(&SampleMeiServer::Instance()),
         CHIP_ERROR_INCORRECT_STATE);
 }
 

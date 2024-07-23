@@ -479,6 +479,6 @@ void MatterAccessControlPluginServerInitCallback()
 {
     ChipLogProgress(DataManagement, "AccessControlCluster: initializing");
 
-    chip::app::AttributeAccessInterfaceRegistry::Instance().RegisterAttributeAccessOverride(&sAttribute);
+    AttributeAccessInterfaceRegistry::Instance().RegisterAttributeAccessOverride(&sAttribute);
     GetAccessControl().AddEntryListener(sAttribute);
 }

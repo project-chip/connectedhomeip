@@ -379,7 +379,7 @@ static constexpr EmberAfAttributeMetadata sDescriptorAttributesMetadata[] = {
 
     std::lock_guard lock(_lock);
 
-    if (!chip::app::AttributeAccessInterfaceRegistry::Instance().RegisterAttributeAccessOverride(_attributeAccessInterface.get())) {
+    if (!AttributeAccessInterfaceRegistry::Instance().RegisterAttributeAccessOverride(_attributeAccessInterface.get())) {
         // This should only happen if we somehow managed to register an
         // AttributeAccessInterface for the same (endpoint, cluster) pair.
         MTR_LOG_ERROR("Could not register AttributeAccessInterface for endpoint %u, cluster 0x%llx",
@@ -394,7 +394,7 @@ static constexpr EmberAfAttributeMetadata sDescriptorAttributesMetadata[] = {
     std::lock_guard lock(_lock);
 
     if (_attributeAccessInterface != nullptr) {
-        chip::app::AttributeAccessInterfaceRegistry::Instance().UnregisterAttributeAccessOverride(_attributeAccessInterface.get());
+        AttributeAccessInterfaceRegistry::Instance().UnregisterAttributeAccessOverride(_attributeAccessInterface.get());
     }
 }
 

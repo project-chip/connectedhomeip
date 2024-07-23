@@ -244,5 +244,5 @@ exit:
 
 void MatterAudioOutputPluginServerInitCallback()
 {
-    chip::app::AttributeAccessInterfaceRegistry::Instance().RegisterAttributeAccessOverride(&gAudioOutputAttrAccess);
+    AttributeAccessInterfaceRegistry::Instance().RegisterAttributeAccessOverride(&gAudioOutputAttrAccess);
 }
