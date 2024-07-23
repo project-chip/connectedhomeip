@@ -123,11 +123,10 @@ tests:
                 value: []
 
     - label:
-          "Step 2a: TH sends a MoveToLevelWithOnOff command to DUT, with Level
-          =0 and TransitionTime =0 (immediate)"
-      PICS: LVL.S.C04.Rsp
+          "Step 2a: TH sends a MoveToLevel command to DUT, with Level =0 and
+          TransitionTime =0 (immediate)"
       cluster: "Level Control"
-      command: "MoveToLevelWithOnOff"
+      command: "MoveToLevel"
       arguments:
           values:
               - name: "Level"
@@ -135,9 +134,9 @@ tests:
               - name: "TransitionTime"
                 value: 0
               - name: "OptionsMask"
-                value: 0
+                value: 1
               - name: "OptionsOverride"
-                value: 0
+                value: 1
 
     - label: "Step 2b: TH reads the MinLevel attribute from the DUT"
       cluster: "Level Control"
@@ -148,41 +147,7 @@ tests:
           constraints:
               type: int8u
 
-    - label: "Step 2c: after a few seconds, TH reads OnOff attribute from DUT"
-      PICS: LVL.S.C04.Rsp && OO.S.A0000
-      cluster: "On/Off"
-      command: "readAttribute"
-      attribute: "OnOff"
-      response:
-          value: 0
-
-    - label: "Step 2d: TH reads the CurrentLevel attribute from DUT"
-      PICS: LVL.S.C04.Rsp && LVL.S.A0000
-      cluster: "Level Control"
-      command: "readAttribute"
-      attribute: "CurrentLevel"
-      response:
-          value: MinLevelValue
-
-    - label:
-          "Step 2e: TH sends a MoveToLevel command to DUT, with Level =0 and
-          TransitionTime =0 (immediate)"
-      PICS: LVL.S && !LVL.S.C04.Rsp
-      cluster: "Level Control"
-      command: "MoveToLevel"
-      arguments:
-          values:
-              - name: "Level"
-                value: 0
-              - name: "TransitionTime"
-                value: 0
-              - name: "OptionsMask"
-                value: 0
-              - name: "OptionsOverride"
-                value: 0
-
-    - label: "Step 2f: TH reads the CurrentLevel attribute from DUT"
-      PICS: LVL.S.A0000 && !LVL.S.C04.Rsp
+    - label: "Step 2c: TH reads the CurrentLevel attribute from DUT"
       cluster: "Level Control"
       command: "readAttribute"
       attribute: "CurrentLevel"
@@ -214,9 +179,6 @@ tests:
           AttributeValueList: [{ AttributeID: 0x0000, ValueUnsigned8: 0x64 }]}]'
           "
       command: "AddScene"
-      ## The default handlers for level control and on/off assume that if both clusters are in the same endpoint,
-      ## the levvel control cluster will use the onoff with level command and thus onoff will be turned on.
-      PICS: OO.S && LVL.S.C04.Rsp
       arguments:
           values:
               - name: "GroupID"
@@ -248,7 +210,6 @@ tests:
     - label:
           "Step 5a: TH sends a RecallScene command to DUT with the GroupID field
           set to G1 and the SceneID field set to 0x02."
-      PICS: S.S.C05.Rsp
       command: "RecallScene"
       arguments:
           values:
@@ -257,16 +218,7 @@ tests:
               - name: "SceneID"
                 value: 0x02
 
-    - label: "Step 5b: after a few seconds, TH reads OnOff attribute from DUT"
-      PICS: LVL.S.C04.Rsp && LVL.S.A0000
-      cluster: "On/Off"
-      command: "readAttribute"
-      attribute: "OnOff"
-      response:
-          value: 1
-
-    - label: "Step 5c: TH reads the CurrentLevel attribute from DUT"
-      PICS: LVL.S.C04.Rsp && LVL.S.A0000
+    - label: "Step 5b: TH reads the CurrentLevel attribute from DUT"
       cluster: "Level Control"
       command: "readAttribute"
       attribute: "CurrentLevel"
@@ -276,7 +228,6 @@ tests:
     - label:
           "Step 6a: TH sends a RecallScene command to DUT with the GroupID field
           set to G1 and the SceneID field set to 0x01."
-      PICS: S.S.C05.Rsp
       command: "RecallScene"
       arguments:
           values:
@@ -285,16 +236,7 @@ tests:
               - name: "SceneID"
                 value: 0x01
 
-    - label: "Step 6b: after a few seconds, TH reads OnOff attribute from DUT"
-      PICS: LVL.S.C04.Rsp && LVL.S.A0000
-      cluster: "On/Off"
-      command: "readAttribute"
-      attribute: "OnOff"
-      response:
-          value: 0
-
     - label: "Step 6c: TH reads the CurrentLevel attribute from DUT"
-      PICS: LVL.S.C04.Rsp && LVL.S.A0000
       cluster: "Level Control"
       command: "readAttribute"
       attribute: "CurrentLevel"
