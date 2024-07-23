@@ -9600,7 +9600,6 @@
               - StartPresetsSchedulesEditRequest
               - CancelPresetsSchedulesEditRequest
               - CommitPresetsSchedulesRequest
-              - CancelSetActivePresetRequest
               - SetTemperatureSetpointHoldPolicy
           RVCOperationalState:
               # Targeting Spring 2024 Matter release
