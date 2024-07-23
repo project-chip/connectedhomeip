@@ -15,6 +15,7 @@
 import queue
 import select
 import subprocess
+import logging
 import threading
 
 from typing import List
@@ -66,26 +67,29 @@ class ProcessOutputCapture:
             while not self.done:
                 changes = out_wait.poll(0.1)
                 if changes:
-                   l = self.process.stdout.readline()
-                   f.write(l)
-                   self.output_lines.put(l)
+                    l = self.process.stdout.readline()
+                    f.write(l)
+                    self.output_lines.put(l)
 
                 changes = err_wait.poll(0)
                 if changes:
-                   l = self.process.stderr.readline()
-                   if l:
-                      f.write(f"!!STDERR!! : {l}")
-
-
+                    l = self.process.stderr.readline()
+                    if l:
+                        f.write(f"!!STDERR!! : {l}")
 
     def __enter__(self):
         self.done = False
-        self.process = subprocess.Popen(self.command, stdin=subprocess.PIPE, stdout=subprocess.PIPE, stderr=subprocess.PIPE, text=True)
+        self.process = subprocess.Popen(
+            self.command,
+            stdin=subprocess.PIPE,
+            stdout=subprocess.PIPE,
+            stderr=subprocess.PIPE,
+            text=True,
+        )
         self.io_thread = threading.Thread(target=self._io_thread)
         self.io_thread.start()
         return self
 
-        
     def __exit__(self, exception_type, exception_value, traceback):
         self.done = True
         if self.process:
@@ -95,11 +99,17 @@ class ProcessOutputCapture:
         if self.io_thread:
             self.io_thread.join()
 
+        if exception_value:
+            # When we fail because of an exception, report the entire log content
+            logging.error(f"-------- START: LOG DUMP FOR {self.command!r} -----")
+            with open(self.output_path, "rt") as f:
+                for l in f.readlines():
+                    logging.error(l.strip())
+            logging.error(f"-------- END:   LOG DUMP FOR {self.command!r} -----")
 
     def next_output_line(self, timeout_sec=None):
         """Fetch an item from the output queue, potentially wit h a timeout."""
         return self.output_lines.get(timeout=timeout_sec)
-
 
     def send_to_program(self, what):
         """Sends the given string to the program.
@@ -108,5 +118,3 @@ class ProcessOutputCapture:
         """
         self.process.stdin.write(what)
         self.process.stdin.flush()
-
-
