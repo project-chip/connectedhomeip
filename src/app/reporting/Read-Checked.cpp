@@ -85,7 +85,7 @@ CHIP_ERROR RetrieveClusterData(InteractionModel::DataModel * dataModel, const Ac
         // For time-dependent data, we may have size differences here: one data fitting in buffer
         // while another not, resulting in different errors (success vs out of space).
         //
-        // Make unit tests strict, however untime allow it with potentially odd mismatch errors
+        // Make unit tests strict; otherwise allow it with potentially odd mismatch errors
         // (in which case logs will be odd, however we also expect Checked versions to only
         // run for a short period until we switch over to either ember or DM completely).
 #if CONFIG_BUILD_FOR_HOST_UNIT_TEST
