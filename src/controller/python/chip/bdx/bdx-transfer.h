@@ -45,6 +45,8 @@ public:
         virtual void TransferCompleted(BdxTransfer * transfer, CHIP_ERROR result) = 0;
     };
 
+    ~BdxTransfer() override;
+
     // Accepts the transfer. When a block of data arrives the delegate is invoked with the block. This must only be called if the
     // transfer sends data to this controller.
     CHIP_ERROR AcceptSend();
