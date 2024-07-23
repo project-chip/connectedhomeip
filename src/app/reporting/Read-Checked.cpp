@@ -64,7 +64,7 @@ CHIP_ERROR RetrieveClusterData(InteractionModel::DataModel * dataModel, const Ac
 
     // a copy for DM logic only. Ember changes state directly
     // IMPORTANT: the copy MUST be taken BEFORE ember processes/changes encoderState inline.
-    AttributeEncodeState stateDm(encoderState); 
+    AttributeEncodeState stateDm(encoderState);
 
     {
         ScopedAttributeReportIBsBuilderState builderState(reportBuilder); // temporary only
