@@ -822,7 +822,8 @@ public:
                                          /* fireAndForget = */ true);
     }
 #if CHIP_DEVICE_CONFIG_ENABLE_WIFIPAF
-    enum ObjChkAction{
+    enum ObjChkAction
+    {
         Set,
         Check,
         Clear
