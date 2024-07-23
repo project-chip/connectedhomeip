@@ -4547,6 +4547,12 @@ MTR_PROVISIONALLY_AVAILABLE
                                     reportHandler:(void (^)(NSNumber * _Nullable value, NSError * _Nullable error))reportHandler MTR_PROVISIONALLY_AVAILABLE;
 + (void)readAttributeOperatingModeWithClusterStateCache:(MTRClusterStateCacheContainer *)clusterStateCacheContainer endpoint:(NSNumber *)endpoint queue:(dispatch_queue_t)queue completion:(void (^)(NSNumber * _Nullable value, NSError * _Nullable error))completion MTR_PROVISIONALLY_AVAILABLE;
 
+- (void)readAttributeMaximumCheckInBackOffWithCompletion:(void (^)(NSNumber * _Nullable value, NSError * _Nullable error))completion MTR_PROVISIONALLY_AVAILABLE;
+- (void)subscribeAttributeMaximumCheckInBackOffWithParams:(MTRSubscribeParams *)params
+                                  subscriptionEstablished:(MTRSubscriptionEstablishedHandler _Nullable)subscriptionEstablished
+                                            reportHandler:(void (^)(NSNumber * _Nullable value, NSError * _Nullable error))reportHandler MTR_PROVISIONALLY_AVAILABLE;
++ (void)readAttributeMaximumCheckInBackOffWithClusterStateCache:(MTRClusterStateCacheContainer *)clusterStateCacheContainer endpoint:(NSNumber *)endpoint queue:(dispatch_queue_t)queue completion:(void (^)(NSNumber * _Nullable value, NSError * _Nullable error))completion MTR_PROVISIONALLY_AVAILABLE;
+
 - (void)readAttributeGeneratedCommandListWithCompletion:(void (^)(NSArray * _Nullable value, NSError * _Nullable error))completion MTR_PROVISIONALLY_AVAILABLE;
 - (void)subscribeAttributeGeneratedCommandListWithParams:(MTRSubscribeParams *)params
                                  subscriptionEstablished:(MTRSubscriptionEstablishedHandler _Nullable)subscriptionEstablished
@@ -18067,6 +18073,7 @@ typedef NS_OPTIONS(uint32_t, MTRICDManagementFeature) {
     MTRICDManagementFeatureCheckInProtocolSupport MTR_PROVISIONALLY_AVAILABLE = 0x1,
     MTRICDManagementFeatureUserActiveModeTrigger MTR_PROVISIONALLY_AVAILABLE = 0x2,
     MTRICDManagementFeatureLongIdleTimeSupport MTR_PROVISIONALLY_AVAILABLE = 0x4,
+    MTRICDManagementFeatureDynamicSitLitSupport MTR_PROVISIONALLY_AVAILABLE = 0x8,
 } MTR_PROVISIONALLY_AVAILABLE;
 
 typedef NS_OPTIONS(uint32_t, MTRICDManagementUserActiveModeTriggerBitmap) {

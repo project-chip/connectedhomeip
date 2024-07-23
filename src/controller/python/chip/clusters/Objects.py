@@ -14162,6 +14162,7 @@ class IcdManagement(Cluster):
                 ClusterObjectFieldDescriptor(Label="userActiveModeTriggerHint", Tag=0x00000006, Type=typing.Optional[uint]),
                 ClusterObjectFieldDescriptor(Label="userActiveModeTriggerInstruction", Tag=0x00000007, Type=typing.Optional[str]),
                 ClusterObjectFieldDescriptor(Label="operatingMode", Tag=0x00000008, Type=typing.Optional[IcdManagement.Enums.OperatingModeEnum]),
+                ClusterObjectFieldDescriptor(Label="maximumCheckInBackOff", Tag=0x00000009, Type=typing.Optional[uint]),
                 ClusterObjectFieldDescriptor(Label="generatedCommandList", Tag=0x0000FFF8, Type=typing.List[uint]),
                 ClusterObjectFieldDescriptor(Label="acceptedCommandList", Tag=0x0000FFF9, Type=typing.List[uint]),
                 ClusterObjectFieldDescriptor(Label="eventList", Tag=0x0000FFFA, Type=typing.List[uint]),
@@ -14179,6 +14180,7 @@ class IcdManagement(Cluster):
     userActiveModeTriggerHint: 'typing.Optional[uint]' = None
     userActiveModeTriggerInstruction: 'typing.Optional[str]' = None
     operatingMode: 'typing.Optional[IcdManagement.Enums.OperatingModeEnum]' = None
+    maximumCheckInBackOff: 'typing.Optional[uint]' = None
     generatedCommandList: 'typing.List[uint]' = None
     acceptedCommandList: 'typing.List[uint]' = None
     eventList: 'typing.List[uint]' = None
@@ -14210,6 +14212,7 @@ class IcdManagement(Cluster):
             kCheckInProtocolSupport = 0x1
             kUserActiveModeTrigger = 0x2
             kLongIdleTimeSupport = 0x4
+            kDynamicSitLitSupport = 0x8
 
         class UserActiveModeTriggerBitmap(IntFlag):
             kPowerCycle = 0x1
@@ -14483,6 +14486,22 @@ class IcdManagement(Cluster):
                 return ClusterObjectFieldDescriptor(Type=typing.Optional[IcdManagement.Enums.OperatingModeEnum])
 
             value: 'typing.Optional[IcdManagement.Enums.OperatingModeEnum]' = None
+
+        @dataclass
+        class MaximumCheckInBackOff(ClusterAttributeDescriptor):
+            @ChipUtility.classproperty
+            def cluster_id(cls) -> int:
+                return 0x00000046
+
+            @ChipUtility.classproperty
+            def attribute_id(cls) -> int:
+                return 0x00000009
+
+            @ChipUtility.classproperty
+            def attribute_type(cls) -> ClusterObjectFieldDescriptor:
+                return ClusterObjectFieldDescriptor(Type=typing.Optional[uint])
+
+            value: 'typing.Optional[uint]' = None
 
         @dataclass
         class GeneratedCommandList(ClusterAttributeDescriptor):

@@ -1631,6 +1631,7 @@ enum class Feature : uint32_t
     kCheckInProtocolSupport = 0x1,
     kUserActiveModeTrigger  = 0x2,
     kLongIdleTimeSupport    = 0x4,
+    kDynamicSitLitSupport   = 0x8,
 };
 
 // Bitmap for UserActiveModeTriggerBitmap

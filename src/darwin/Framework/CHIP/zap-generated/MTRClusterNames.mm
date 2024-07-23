@@ -2772,6 +2772,10 @@ NSString * MTRAttributeNameForID(MTRClusterIDType clusterID, MTRAttributeIDType 
             result = @"OperatingMode";
             break;
 
+        case MTRAttributeIDTypeClusterICDManagementAttributeMaximumCheckInBackOffID:
+            result = @"MaximumCheckInBackOff";
+            break;
+
         case MTRAttributeIDTypeClusterICDManagementAttributeGeneratedCommandListID:
             result = @"GeneratedCommandList";
             break;

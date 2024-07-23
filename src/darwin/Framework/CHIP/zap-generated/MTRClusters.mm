@@ -6152,6 +6152,11 @@ using chip::System::Clock::Timeout;
     return [self.device readAttributeWithEndpointID:self.endpointID clusterID:@(MTRClusterIDTypeICDManagementID) attributeID:@(MTRAttributeIDTypeClusterICDManagementAttributeOperatingModeID) params:params];
 }
 
+- (NSDictionary<NSString *, id> * _Nullable)readAttributeMaximumCheckInBackOffWithParams:(MTRReadParams * _Nullable)params
+{
+    return [self.device readAttributeWithEndpointID:self.endpointID clusterID:@(MTRClusterIDTypeICDManagementID) attributeID:@(MTRAttributeIDTypeClusterICDManagementAttributeMaximumCheckInBackOffID) params:params];
+}
+
 - (NSDictionary<NSString *, id> * _Nullable)readAttributeGeneratedCommandListWithParams:(MTRReadParams * _Nullable)params
 {
     return [self.device readAttributeWithEndpointID:self.endpointID clusterID:@(MTRClusterIDTypeICDManagementID) attributeID:@(MTRAttributeIDTypeClusterICDManagementAttributeGeneratedCommandListID) params:params];

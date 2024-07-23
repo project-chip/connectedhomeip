@@ -5802,6 +5802,7 @@ public class ClusterIDMapping {
             UserActiveModeTriggerHint(6L),
             UserActiveModeTriggerInstruction(7L),
             OperatingMode(8L),
+            MaximumCheckInBackOff(9L),
             GeneratedCommandList(65528L),
             AcceptedCommandList(65529L),
             EventList(65530L),
