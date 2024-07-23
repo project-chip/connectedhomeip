@@ -73,6 +73,29 @@ void AttributeAccessInterfaceRegistry::UnregisterAllForEndpoint(EndpointId endpo
         [endpointId](AttributeAccessInterface * entry) { return entry->MatchesEndpoint(endpointId); }, mAttributeAccessOverrides);
 }
 
+void AttributeAccessInterfaceRegistry::Unregister(AttributeAccessInterface * attrOverride)
+{
+    mAttributeAccessInterfaceCache.Invalidate();
+    UnregisterMatchingAttributeAccessInterfaces([attrOverride](AttributeAccessInterface * entry) { return entry == attrOverride; },
+                                                mAttributeAccessOverrides);
+}
+
+bool AttributeAccessInterfaceRegistry::Register(AttributeAccessInterface * attrOverride)
+{
+    mAttributeAccessInterfaceCache.Invalidate();
+    for (auto * cur = mAttributeAccessOverrides; cur; cur = cur->GetNext())
+    {
+        if (cur->Matches(*attrOverride))
+        {
+            ChipLogError(InteractionModel, "Duplicate attribute override registration failed");
+            return false;
+        }
+    }
+    attrOverride->SetNext(mAttributeAccessOverrides);
+    mAttributeAccessOverrides = attrOverride;
+    return true;
+}
+
 AttributeAccessInterface * AttributeAccessInterfaceRegistry::Get(EndpointId endpointId, ClusterId clusterId)
 {
     using CacheResult = AttributeAccessInterfaceCache::CacheResult;
@@ -104,28 +127,6 @@ AttributeAccessInterface * AttributeAccessInterfaceRegistry::Get(EndpointId endp
     return nullptr;
 }
 
-void AttributeAccessInterfaceRegistry::Unregister(AttributeAccessInterface * attrOverride)
-{
-    mAttributeAccessInterfaceCache.Invalidate();
-    UnregisterMatchingAttributeAccessInterfaces([attrOverride](AttributeAccessInterface * entry) { return entry == attrOverride; },
-                                                mAttributeAccessOverrides);
-}
-
-bool AttributeAccessInterfaceRegistry::Register(AttributeAccessInterface * attrOverride)
-{
-    mAttributeAccessInterfaceCache.Invalidate();
-    for (auto * cur = mAttributeAccessOverrides; cur; cur = cur->GetNext())
-    {
-        if (cur->Matches(*attrOverride))
-        {
-            ChipLogError(InteractionModel, "Duplicate attribute override registration failed");
-            return false;
-        }
-    }
-    attrOverride->SetNext(mAttributeAccessOverrides);
-    mAttributeAccessOverrides = attrOverride;
-    return true;
-}
 
 } // namespace app
 } // namespace chip
