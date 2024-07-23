@@ -495,5 +495,5 @@ exit:
 
 void MatterApplicationLauncherPluginServerInitCallback()
 {
-    AttributeAccessInterfaceRegistry::Instance().RegisterAttributeAccessOverride(&gApplicationLauncherAttrAccess);
+    app::AttributeAccessInterfaceRegistry::Instance().RegisterAttributeAccessOverride(&gApplicationLauncherAttrAccess);
 }
