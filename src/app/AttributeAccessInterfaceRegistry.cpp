@@ -61,20 +61,20 @@ void UnregisterMatchingAttributeAccessInterfaces(F shouldUnregister, AttributeAc
 namespace chip {
 namespace app {
 
-AttributeHandlerInterfaceRegistry & Instance()
+AttributeAccessInterfaceRegistry & Instance()
 {
-    static AttributeHandlerInterfaceRegistry instance;
+    static AttributeAccessInterfaceRegistry instance;
     return instance;
 }
 
-void AttributeHandlerInterfaceRegistry::UnregisterAllForEndpoint(EmberAfDefinedEndpoint * definedEndpoint)
+void AttributeAccessInterfaceRegistry::UnregisterAllForEndpoint(EmberAfDefinedEndpoint * definedEndpoint)
 {
     UnregisterMatchingAttributeAccessInterfaces(
         [endpoint = definedEndpoint->endpoint](AttributeAccessInterface * entry) { return entry->MatchesEndpoint(endpoint); },
         mAttributeAccessOverrides);
 }
 
-AttributeAccessInterface * AttributeHandlerInterfaceRegistry::Get(EndpointId endpointId, ClusterId clusterId)
+AttributeAccessInterface * AttributeAccessInterfaceRegistry::Get(EndpointId endpointId, ClusterId clusterId)
 {
     using CacheResult = AttributeAccessInterfaceCache::CacheResult;
 
@@ -105,14 +105,14 @@ AttributeAccessInterface * AttributeHandlerInterfaceRegistry::Get(EndpointId end
     return nullptr;
 }
 
-void AttributeHandlerInterfaceRegistry::UnregisterAttributeAccessOverride(AttributeAccessInterface * attrOverride)
+void AttributeAccessInterfaceRegistry::UnregisterAttributeAccessOverride(AttributeAccessInterface * attrOverride)
 {
     mAttributeAccessInterfaceCache.Invalidate();
     UnregisterMatchingAttributeAccessInterfaces([attrOverride](AttributeAccessInterface * entry) { return entry == attrOverride; },
                                                 mAttributeAccessOverrides);
 }
 
-bool AttributeHandlerInterfaceRegistry::RegisterAttributeAccessOverride(AttributeAccessInterface * attrOverride)
+bool AttributeAccessInterfaceRegistry::RegisterAttributeAccessOverride(AttributeAccessInterface * attrOverride)
 {
     mAttributeAccessInterfaceCache.Invalidate();
     for (auto * cur = mAttributeAccessOverrides; cur; cur = cur->GetNext())

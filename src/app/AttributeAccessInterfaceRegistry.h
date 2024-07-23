@@ -22,7 +22,7 @@
 namespace chip {
 namespace app {
 
-class AttributeHandlerInterfaceRegistry
+class AttributeAccessInterfaceRegistry
 {
 public:
     /**
@@ -54,7 +54,7 @@ public:
      */
     AttributeAccessInterface * Get(EndpointId aEndpointId, ClusterId aClusterId);
 
-    static AttributeHandlerInterfaceRegistry & Instance();
+    static AttributeAccessInterfaceRegistry & Instance();
 
 private:
     AttributeAccessInterface * mAttributeAccessOverrides = nullptr;
