@@ -17,20 +17,19 @@
 
 using namespace chip::app;
 
-namespace {
-
-CommandHandlerInterface * gCommandHandlerList = nullptr;
-
-}
-
 namespace chip {
 namespace app {
-namespace CommandHandlerInterfaceRegistry {
 
-void UnregisterAllHandlers()
+CommandHandlerInterfaceRegistry & CommandHandlerInterfaceRegistry::Instance()
+{
+    static CommandHandlerInterfaceRegistry registry;
+    return registry;
+}
+
+void CommandHandlerInterfaceRegistry::UnregisterAllHandlers()
 {
 
-    CommandHandlerInterface * handlerIter = gCommandHandlerList;
+    CommandHandlerInterface * handlerIter = mCommandHandlerList;
 
     //
     // Walk our list of command handlers and de-register them, before finally
@@ -43,14 +42,14 @@ void UnregisterAllHandlers()
         handlerIter = nextHandler;
     }
 
-    gCommandHandlerList = nullptr;
+    mCommandHandlerList = nullptr;
 }
 
-CHIP_ERROR RegisterCommandHandler(CommandHandlerInterface * handler)
+CHIP_ERROR CommandHandlerInterfaceRegistry::RegisterCommandHandler(CommandHandlerInterface * handler)
 {
     VerifyOrReturnError(handler != nullptr, CHIP_ERROR_INVALID_ARGUMENT);
 
-    for (auto * cur = gCommandHandlerList; cur; cur = cur->GetNext())
+    for (auto * cur = mCommandHandlerList; cur; cur = cur->GetNext())
     {
         if (cur->Matches(*handler))
         {
@@ -59,24 +58,23 @@ CHIP_ERROR RegisterCommandHandler(CommandHandlerInterface * handler)
         }
     }
 
-    handler->SetNext(gCommandHandlerList);
-    gCommandHandlerList = handler;
+    handler->SetNext(mCommandHandlerList);
+    mCommandHandlerList = handler;
 
     return CHIP_NO_ERROR;
 }
 
-void UnregisterAllCommandHandlersForEndpoint(EndpointId endpointId)
+void CommandHandlerInterfaceRegistry::UnregisterAllCommandHandlersForEndpoint(EndpointId endpointId)
 {
-
     CommandHandlerInterface * prev = nullptr;
 
-    for (auto * cur = gCommandHandlerList; cur; cur = cur->GetNext())
+    for (auto * cur = mCommandHandlerList; cur; cur = cur->GetNext())
     {
         if (cur->MatchesEndpoint(endpointId))
         {
             if (prev == nullptr)
             {
-                gCommandHandlerList = cur->GetNext();
+                mCommandHandlerList = cur->GetNext();
             }
             else
             {
@@ -92,18 +90,18 @@ void UnregisterAllCommandHandlersForEndpoint(EndpointId endpointId)
     }
 }
 
-CHIP_ERROR UnregisterCommandHandler(CommandHandlerInterface * handler)
+CHIP_ERROR CommandHandlerInterfaceRegistry::UnregisterCommandHandler(CommandHandlerInterface * handler)
 {
     VerifyOrReturnError(handler != nullptr, CHIP_ERROR_INVALID_ARGUMENT);
     CommandHandlerInterface * prev = nullptr;
 
-    for (auto * cur = gCommandHandlerList; cur; cur = cur->GetNext())
+    for (auto * cur = mCommandHandlerList; cur; cur = cur->GetNext())
     {
         if (cur->Matches(*handler))
         {
             if (prev == nullptr)
             {
-                gCommandHandlerList = cur->GetNext();
+                mCommandHandlerList = cur->GetNext();
             }
             else
             {
@@ -123,7 +121,7 @@ CHIP_ERROR UnregisterCommandHandler(CommandHandlerInterface * handler)
 
 CommandHandlerInterface * GetCommandHandler(EndpointId endpointId, ClusterId clusterId)
 {
-    for (auto * cur = gCommandHandlerList; cur; cur = cur->GetNext())
+    for (auto * cur = mCommandHandlerList; cur; cur = cur->GetNext())
     {
         if (cur->Matches(endpointId, clusterId))
         {

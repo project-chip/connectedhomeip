@@ -38,7 +38,7 @@ namespace DeviceEnergyManagement {
 
 CHIP_ERROR Instance::Init()
 {
-    ReturnErrorOnFailure(CommandHandlerInterfaceRegistry::RegisterCommandHandler(this));
+    ReturnErrorOnFailure(CommandHandlerInterfaceRegistry::Instance().RegisterCommandHandler(this));
     VerifyOrReturnError(registerAttributeAccessOverride(this), CHIP_ERROR_INCORRECT_STATE);
 
     return CHIP_NO_ERROR;
@@ -46,7 +46,7 @@ CHIP_ERROR Instance::Init()
 
 void Instance::Shutdown()
 {
-    CommandHandlerInterfaceRegistry::UnregisterCommandHandler(this);
+    CommandHandlerInterfaceRegistry::Instance().UnregisterCommandHandler(this);
     unregisterAttributeAccessOverride(this);
 }
 

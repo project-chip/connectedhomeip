@@ -422,7 +422,7 @@ static void shutdownEndpoint(EmberAfDefinedEndpoint * definedEndpoint)
         }
     }
 
-    CommandHandlerInterfaceRegistry::UnregisterAllCommandHandlersForEndpoint(definedEndpoint->endpoint);
+    CommandHandlerInterfaceRegistry::Instance().UnregisterAllCommandHandlersForEndpoint(definedEndpoint->endpoint);
     unregisterAllAttributeAccessOverridesForEndpoint(definedEndpoint);
 }
 

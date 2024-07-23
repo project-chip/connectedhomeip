@@ -102,7 +102,7 @@ void InteractionModelEngine::Shutdown()
 
     // TODO: individual object clears the entire command handler interface registry.
     //       This may not be expected.
-    CommandHandlerInterfaceRegistry::UnregisterAllHandlers();
+    CommandHandlerInterfaceRegistry::Instance().UnregisterAllHandlers();
 
     mCommandResponderObjs.ReleaseAll();
 
@@ -1673,7 +1673,7 @@ void InteractionModelEngine::DispatchCommand(CommandHandlerImpl & apCommandObj, 
                                              TLV::TLVReader & apPayload)
 {
     CommandHandlerInterface * handler =
-        CommandHandlerInterfaceRegistry::GetCommandHandler(aCommandPath.mEndpointId, aCommandPath.mClusterId);
+        CommandHandlerInterfaceRegistry::Instance().GetCommandHandler(aCommandPath.mEndpointId, aCommandPath.mClusterId);
 
     if (handler)
     {

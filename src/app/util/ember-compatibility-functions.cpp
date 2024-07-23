@@ -101,7 +101,8 @@ Protocols::InteractionModel::Status ServerClusterCommandExists(const ConcreteCom
         return Status::UnsupportedCluster;
     }
 
-    auto * commandHandler = CommandHandlerInterfaceRegistry::GetCommandHandler(aCommandPath.mEndpointId, aCommandPath.mClusterId);
+    auto * commandHandler =
+        CommandHandlerInterfaceRegistry::Instance().GetCommandHandler(aCommandPath.mEndpointId, aCommandPath.mClusterId);
     if (commandHandler)
     {
         struct Context

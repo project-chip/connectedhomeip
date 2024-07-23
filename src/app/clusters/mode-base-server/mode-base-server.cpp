@@ -64,7 +64,7 @@ void Instance::Shutdown()
         return;
     }
     UnregisterThisInstance();
-    CommandHandlerInterfaceRegistry::UnregisterCommandHandler(this);
+    CommandHandlerInterfaceRegistry::Instance().UnregisterCommandHandler(this);
     unregisterAttributeAccessOverride(this);
 }
 
@@ -78,7 +78,7 @@ CHIP_ERROR Instance::Init()
 
     LoadPersistentAttributes();
 
-    ReturnErrorOnFailure(CommandHandlerInterfaceRegistry::RegisterCommandHandler(this));
+    ReturnErrorOnFailure(CommandHandlerInterfaceRegistry::Instance().RegisterCommandHandler(this));
     VerifyOrReturnError(registerAttributeAccessOverride(this), CHIP_ERROR_INCORRECT_STATE);
     RegisterThisInstance();
     ReturnErrorOnFailure(mDelegate->Init());

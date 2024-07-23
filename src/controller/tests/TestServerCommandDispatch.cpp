@@ -62,10 +62,10 @@ class TestClusterCommandHandler : public chip::app::CommandHandlerInterface
 public:
     TestClusterCommandHandler() : chip::app::CommandHandlerInterface(Optional<EndpointId>::Missing(), Clusters::UnitTesting::Id)
     {
-        CommandHandlerInterfaceRegistry::RegisterCommandHandler(this);
+        CommandHandlerInterfaceRegistry::Instance().RegisterCommandHandler(this);
     }
 
-    ~TestClusterCommandHandler() { CommandHandlerInterfaceRegistry::UnregisterCommandHandler(this); }
+    ~TestClusterCommandHandler() { CommandHandlerInterfaceRegistry::Instance().UnregisterCommandHandler(this); }
 
     void OverrideAcceptedCommands() { mOverrideAcceptedCommands = true; }
     void ClaimNoCommands() { mClaimNoCommands = true; }

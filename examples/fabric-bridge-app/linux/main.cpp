@@ -174,7 +174,7 @@ void ApplicationInit()
 {
     ChipLogDetail(NotSpecified, "Fabric-Bridge: ApplicationInit()");
 
-    CommandHandlerInterfaceRegistry::RegisterCommandHandler(&gAdministratorCommissioningCommandHandler);
+    CommandHandlerInterfaceRegistry::Instance().RegisterCommandHandler(&gAdministratorCommissioningCommandHandler);
 
 #if defined(PW_RPC_FABRIC_BRIDGE_SERVICE) && PW_RPC_FABRIC_BRIDGE_SERVICE
     InitRpcServer(kFabricBridgeServerPort);

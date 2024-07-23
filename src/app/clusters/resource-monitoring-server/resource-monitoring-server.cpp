@@ -59,7 +59,7 @@ Instance::Instance(Delegate * aDelegate, EndpointId aEndpointId, ClusterId aClus
 
 Instance::~Instance()
 {
-    CommandHandlerInterfaceRegistry::UnregisterCommandHandler(this);
+    CommandHandlerInterfaceRegistry::Instance().UnregisterCommandHandler(this);
     unregisterAttributeAccessOverride(this);
 }
 
@@ -72,7 +72,7 @@ CHIP_ERROR Instance::Init()
 
     LoadPersistentAttributes();
 
-    ReturnErrorOnFailure(CommandHandlerInterfaceRegistry::RegisterCommandHandler(this));
+    ReturnErrorOnFailure(CommandHandlerInterfaceRegistry::Instance().RegisterCommandHandler(this));
     VerifyOrReturnError(registerAttributeAccessOverride(this), CHIP_ERROR_INCORRECT_STATE);
     ChipLogDetail(Zcl, "ResourceMonitoring: calling mDelegate->Init()");
     ReturnErrorOnFailure(mDelegate->Init());
