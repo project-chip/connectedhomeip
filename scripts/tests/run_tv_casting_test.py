@@ -18,7 +18,6 @@ import glob
 import logging
 import os
 import signal
-import subprocess
 import sys
 import tempfile
 import time
@@ -387,8 +386,6 @@ def test_casting_fn(
             with ProcessOutputCapture(
                 cmd_execute_list(tv_casting_app_abs_path), linux_tv_casting_app_log_path
             ) as tv_casting_app_process:
-                log_paths = [linux_tv_app_log_path, linux_tv_casting_app_log_path]
-
                 processes = RunningProcesses(
                     tv_casting=tv_casting_app_process, tv_app=tv_app_process
                 )
