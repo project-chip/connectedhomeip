@@ -62,6 +62,8 @@
 
 #include <string>
 
+#include <WhmMain.h>
+
 using namespace chip;
 using namespace chip::app;
 using namespace chip::DeviceLayer;
@@ -234,6 +236,8 @@ void ApplicationInit()
     Clusters::ValveConfigurationAndControl::SetDefaultDelegate(chip::EndpointId(1), &sValveDelegate);
     Clusters::TimeSynchronization::SetDefaultDelegate(&sTimeSyncDelegate);
 
+    Clusters::WaterHeaterManagement::WhmApplicationInit();
+
     SetTagList(/* endpoint= */ 0, Span<const Clusters::Descriptor::Structs::SemanticTagStruct::Type>(gEp0TagList));
     SetTagList(/* endpoint= */ 1, Span<const Clusters::Descriptor::Structs::SemanticTagStruct::Type>(gEp1TagList));
     SetTagList(/* endpoint= */ 2, Span<const Clusters::Descriptor::Structs::SemanticTagStruct::Type>(gEp2TagList));
@@ -259,6 +263,8 @@ void ApplicationShutdown()
 
     Clusters::DeviceEnergyManagementMode::Shutdown();
     Clusters::EnergyEvseMode::Shutdown();
+
+    Clusters::WaterHeaterManagement::WhmApplicationShutdown();
 
     if (sChipNamedPipeCommands.Stop() != CHIP_NO_ERROR)
     {

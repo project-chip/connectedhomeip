@@ -65,6 +65,12 @@ source_set("chip-all-clusters-common") {
     "${chip_root}/examples/energy-management-app/energy-management-common/src/EnergyEvseManager.cpp",
     "${chip_root}/examples/energy-management-app/energy-management-common/src/device-energy-management-mode.cpp",
     "${chip_root}/examples/energy-management-app/energy-management-common/src/energy-evse-mode.cpp",
+
+    "${chip_root}/examples/all-clusters-app/all-clusters-common/src/WhmDelegateImpl.cpp",
+    "${chip_root}/examples/all-clusters-app/all-clusters-common/src/WhmInstance.cpp",
+    "${chip_root}/examples/all-clusters-app/all-clusters-common/src/WhmMain.cpp",
+    "${chip_root}/examples/all-clusters-app/all-clusters-common/src/WhmManufacturer.cpp",
+
     "AllClustersCommandDelegate.cpp",
     "AppOptions.cpp",
     "ValveControlDelegate.cpp",
