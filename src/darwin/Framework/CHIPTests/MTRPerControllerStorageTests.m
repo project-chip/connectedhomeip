@@ -3114,7 +3114,7 @@ static const uint16_t kSubscriptionPoolBaseTimeoutInSeconds = 30;
     XCTAssertNil(verifyEmptyData);
 
     // start actual test
-    
+
     // store some data
     [controller.controllerDataStore storeClientDataValue:testValueA forKey:testKeyA onNodeID:testNodeID];
     [controller.controllerDataStore storeClientDataValue:testValueB forKey:testKeyB onNodeID:testNodeID];
@@ -3127,7 +3127,7 @@ static const uint16_t kSubscriptionPoolBaseTimeoutInSeconds = 30;
     XCTAssertNil(readbackDataAAfterDeletion);
     id readbackDataBAfterDeletion = [controller.controllerDataStore clientDataForKey:testKeyB onNodeID:testNodeID];
     XCTAssertNil(readbackDataBAfterDeletion);
-    
+
     // ensure index is empty
     NSArray<NSString *> * indexAfterDeletion = [controller.controllerDataStore storedClientDataKeysForNodeID:testNodeID];
     XCTAssertEqual(0, indexAfterDeletion.count);

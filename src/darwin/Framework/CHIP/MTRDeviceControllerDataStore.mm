@@ -1308,7 +1308,7 @@ static NSString * sDeviceDataKeyPrefix = @"deviceData";
     dispatch_sync(_storageDelegateQueue, ^{
         MTRDeviceController * controller = self->_controller;
         VerifyOrReturn(controller != nil); // No way to call delegate without controller.
-        
+
         // remove the data itself
         NSString * storageKey = [self _dataKeyForPrefix:prefix key:key];
         [self->_storageDelegate controller:controller
