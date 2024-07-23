@@ -4062,7 +4062,7 @@ static BOOL AttributeHasChangesOmittedQuality(MTRAttributePath * attributePath)
 - (void)setClientDataForKey:(NSString *)key endpointID:(NSNumber *)endpointID value:(id<NSSecureCoding>)value
 {
 #if USE_DEVICE_CONTROLLER_DATA_STORE
-    [self.deviceController.controllerDataStore storeClientDataForKey:key value:value forEndpointID:endpointID onNodeID:self.nodeID];
+    [self.deviceController.controllerDataStore storeClientDataValue:value forKey:key onEndpointID:endpointID onNodeID:self.nodeID];
 #else
     if (key == nil || value == nil || endpointID == nil)
         return;

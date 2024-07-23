@@ -105,7 +105,7 @@ typedef void (^MTRDeviceControllerDataStoreClusterDataHandler)(NSDictionary<NSNu
 // endpoint ID + node ID indexed
 - (id<NSSecureCoding>)clientDataForKey:(NSString *)key onEndpointID:(NSNumber *)endpointID onNodeID:(NSNumber *)nodeID;
 - (void)removeClientDataForKey:(NSString *)key onEndpointID:(NSNumber *)endpointID onNodeID:(NSNumber *)nodeID;
-- (void)storeClientDataValue:(id<NSSecureCoding>)value forKey:(NSString *)key forEndpointID:(NSNumber *)endpointID onNodeID:(NSNumber *)nodeID;
+- (void)storeClientDataValue:(id<NSSecureCoding>)value forKey:(NSString *)key onEndpointID:(NSNumber *)endpointID onNodeID:(NSNumber *)nodeID;
 - (void)clearStoredClientDataForEndpointID:(NSNumber *)endpointID onNodeID:(NSNumber *)nodeID;
 - (NSArray<NSString *> *)storedClientDataKeysForEndpointID:(NSNumber *)endpointID onNodeID:(NSNumber *)nodeID;
 

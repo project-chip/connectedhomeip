@@ -1435,7 +1435,7 @@ static NSString * sClientDataByEndpointKeyPrefix = @"clientDataByEndpoint";
     [self _removeDataForKey:key inPrefix:[self _clientDataPrefixForEndpointID:endpointID onNodeID:nodeID]];
 }
 
-- (void)storeClientDataValue:(id<NSSecureCoding>)value forKey:(NSString *)key forEndpointID:(NSNumber *)endpointID onNodeID:(NSNumber *)nodeID
+- (void)storeClientDataValue:(id<NSSecureCoding>)value forKey:(NSString *)key onEndpointID:(NSNumber *)endpointID onNodeID:(NSNumber *)nodeID
 {
     [self _storeValue:value forKey:key inPrefix:[self _clientDataPrefixForEndpointID:endpointID onNodeID:nodeID]];
 }
