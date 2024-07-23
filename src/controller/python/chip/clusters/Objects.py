@@ -46525,14 +46525,14 @@ class EcosystemInformation(Cluster):
                 return ClusterObjectDescriptor(
                     Fields=[
                         ClusterObjectFieldDescriptor(Label="uniqueLocationID", Tag=0, Type=str),
-                        ClusterObjectFieldDescriptor(Label="homeLocation", Tag=1, Type=typing.Optional[EcosystemInformation.Structs.HomeLocationStruct]),
-                        ClusterObjectFieldDescriptor(Label="homeLocationLastEdit", Tag=2, Type=typing.Optional[uint]),
+                        ClusterObjectFieldDescriptor(Label="homeLocation", Tag=1, Type=EcosystemInformation.Structs.HomeLocationStruct),
+                        ClusterObjectFieldDescriptor(Label="homeLocationLastEdit", Tag=2, Type=uint),
                         ClusterObjectFieldDescriptor(Label="fabricIndex", Tag=254, Type=uint),
                     ])
 
             uniqueLocationID: 'str' = ""
-            homeLocation: 'typing.Optional[EcosystemInformation.Structs.HomeLocationStruct]' = None
-            homeLocationLastEdit: 'typing.Optional[uint]' = None
+            homeLocation: 'EcosystemInformation.Structs.HomeLocationStruct' = field(default_factory=lambda: EcosystemInformation.Structs.HomeLocationStruct())
+            homeLocationLastEdit: 'uint' = 0
             fabricIndex: 'uint' = 0
 
         @dataclass
@@ -46556,8 +46556,8 @@ class EcosystemInformation(Cluster):
                     Fields=[
                         ClusterObjectFieldDescriptor(Label="deviceName", Tag=0, Type=typing.Optional[str]),
                         ClusterObjectFieldDescriptor(Label="deviceNameLastEdit", Tag=1, Type=typing.Optional[uint]),
-                        ClusterObjectFieldDescriptor(Label="bridgedEndpoint", Tag=2, Type=typing.Optional[uint]),
-                        ClusterObjectFieldDescriptor(Label="originalEndpoint", Tag=3, Type=typing.Optional[uint]),
+                        ClusterObjectFieldDescriptor(Label="bridgedEndpoint", Tag=2, Type=uint),
+                        ClusterObjectFieldDescriptor(Label="originalEndpoint", Tag=3, Type=uint),
                         ClusterObjectFieldDescriptor(Label="deviceTypes", Tag=4, Type=typing.List[EcosystemInformation.Structs.DeviceTypeStruct]),
                         ClusterObjectFieldDescriptor(Label="uniqueLocationIDs", Tag=5, Type=typing.List[str]),
                         ClusterObjectFieldDescriptor(Label="uniqueLocationIDsLastEdit", Tag=6, Type=uint),
@@ -46566,8 +46566,8 @@ class EcosystemInformation(Cluster):
 
             deviceName: 'typing.Optional[str]' = None
             deviceNameLastEdit: 'typing.Optional[uint]' = None
-            bridgedEndpoint: 'typing.Optional[uint]' = None
-            originalEndpoint: 'typing.Optional[uint]' = None
+            bridgedEndpoint: 'uint' = 0
+            originalEndpoint: 'uint' = 0
             deviceTypes: 'typing.List[EcosystemInformation.Structs.DeviceTypeStruct]' = field(default_factory=lambda: [])
             uniqueLocationIDs: 'typing.List[str]' = field(default_factory=lambda: [])
             uniqueLocationIDsLastEdit: 'uint' = 0

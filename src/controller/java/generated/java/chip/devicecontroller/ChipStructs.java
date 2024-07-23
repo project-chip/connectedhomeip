@@ -12270,8 +12270,8 @@ public static class EcosystemInformationClusterHomeLocationStruct {
 }
 public static class EcosystemInformationClusterEcosystemLocationStruct {
   public String uniqueLocationID;
-  public Optional<ChipStructs.EcosystemInformationClusterHomeLocationStruct> homeLocation;
-  public Optional<Long> homeLocationLastEdit;
+  public ChipStructs.EcosystemInformationClusterHomeLocationStruct homeLocation;
+  public Long homeLocationLastEdit;
   public Integer fabricIndex;
   private static final long UNIQUE_LOCATION_I_D_ID = 0L;
   private static final long HOME_LOCATION_ID = 1L;
@@ -12280,8 +12280,8 @@ public static class EcosystemInformationClusterEcosystemLocationStruct {
 
   public EcosystemInformationClusterEcosystemLocationStruct(
     String uniqueLocationID,
-    Optional<ChipStructs.EcosystemInformationClusterHomeLocationStruct> homeLocation,
-    Optional<Long> homeLocationLastEdit,
+    ChipStructs.EcosystemInformationClusterHomeLocationStruct homeLocation,
+    Long homeLocationLastEdit,
     Integer fabricIndex
   ) {
     this.uniqueLocationID = uniqueLocationID;
@@ -12293,8 +12293,8 @@ public static class EcosystemInformationClusterEcosystemLocationStruct {
   public StructType encodeTlv() {
     ArrayList<StructElement> values = new ArrayList<>();
     values.add(new StructElement(UNIQUE_LOCATION_I_D_ID, new StringType(uniqueLocationID)));
-    values.add(new StructElement(HOME_LOCATION_ID, homeLocation.<BaseTLVType>map((nonOptionalhomeLocation) -> nonOptionalhomeLocation.encodeTlv()).orElse(new EmptyType())));
-    values.add(new StructElement(HOME_LOCATION_LAST_EDIT_ID, homeLocationLastEdit.<BaseTLVType>map((nonOptionalhomeLocationLastEdit) -> new UIntType(nonOptionalhomeLocationLastEdit)).orElse(new EmptyType())));
+    values.add(new StructElement(HOME_LOCATION_ID, homeLocation.encodeTlv()));
+    values.add(new StructElement(HOME_LOCATION_LAST_EDIT_ID, new UIntType(homeLocationLastEdit)));
     values.add(new StructElement(FABRIC_INDEX_ID, new UIntType(fabricIndex)));
 
     return new StructType(values);
@@ -12305,8 +12305,8 @@ public static class EcosystemInformationClusterEcosystemLocationStruct {
       return null;
     }
     String uniqueLocationID = null;
-    Optional<ChipStructs.EcosystemInformationClusterHomeLocationStruct> homeLocation = Optional.empty();
-    Optional<Long> homeLocationLastEdit = Optional.empty();
+    ChipStructs.EcosystemInformationClusterHomeLocationStruct homeLocation = null;
+    Long homeLocationLastEdit = null;
     Integer fabricIndex = null;
     for (StructElement element: ((StructType)tlvValue).value()) {
       if (element.contextTagNum() == UNIQUE_LOCATION_I_D_ID) {
@@ -12317,12 +12317,12 @@ public static class EcosystemInformationClusterEcosystemLocationStruct {
       } else if (element.contextTagNum() == HOME_LOCATION_ID) {
         if (element.value(BaseTLVType.class).type() == TLVType.Struct) {
           StructType castingValue = element.value(StructType.class);
-          homeLocation = Optional.of(ChipStructs.EcosystemInformationClusterHomeLocationStruct.decodeTlv(castingValue));
+          homeLocation = ChipStructs.EcosystemInformationClusterHomeLocationStruct.decodeTlv(castingValue);
         }
       } else if (element.contextTagNum() == HOME_LOCATION_LAST_EDIT_ID) {
         if (element.value(BaseTLVType.class).type() == TLVType.UInt) {
           UIntType castingValue = element.value(UIntType.class);
-          homeLocationLastEdit = Optional.of(castingValue.value(Long.class));
+          homeLocationLastEdit = castingValue.value(Long.class);
         }
       } else if (element.contextTagNum() == FABRIC_INDEX_ID) {
         if (element.value(BaseTLVType.class).type() == TLVType.UInt) {
@@ -12423,8 +12423,8 @@ public static class EcosystemInformationClusterDeviceTypeStruct {
 public static class EcosystemInformationClusterEcosystemDeviceStruct {
   public Optional<String> deviceName;
   public Optional<Long> deviceNameLastEdit;
-  public Optional<Integer> bridgedEndpoint;
-  public Optional<Integer> originalEndpoint;
+  public Integer bridgedEndpoint;
+  public Integer originalEndpoint;
   public ArrayList<ChipStructs.EcosystemInformationClusterDeviceTypeStruct> deviceTypes;
   public ArrayList<String> uniqueLocationIDs;
   public Long uniqueLocationIDsLastEdit;
@@ -12441,8 +12441,8 @@ public static class EcosystemInformationClusterEcosystemDeviceStruct {
   public EcosystemInformationClusterEcosystemDeviceStruct(
     Optional<String> deviceName,
     Optional<Long> deviceNameLastEdit,
-    Optional<Integer> bridgedEndpoint,
-    Optional<Integer> originalEndpoint,
+    Integer bridgedEndpoint,
+    Integer originalEndpoint,
     ArrayList<ChipStructs.EcosystemInformationClusterDeviceTypeStruct> deviceTypes,
     ArrayList<String> uniqueLocationIDs,
     Long uniqueLocationIDsLastEdit,
@@ -12462,8 +12462,8 @@ public static class EcosystemInformationClusterEcosystemDeviceStruct {
     ArrayList<StructElement> values = new ArrayList<>();
     values.add(new StructElement(DEVICE_NAME_ID, deviceName.<BaseTLVType>map((nonOptionaldeviceName) -> new StringType(nonOptionaldeviceName)).orElse(new EmptyType())));
     values.add(new StructElement(DEVICE_NAME_LAST_EDIT_ID, deviceNameLastEdit.<BaseTLVType>map((nonOptionaldeviceNameLastEdit) -> new UIntType(nonOptionaldeviceNameLastEdit)).orElse(new EmptyType())));
-    values.add(new StructElement(BRIDGED_ENDPOINT_ID, bridgedEndpoint.<BaseTLVType>map((nonOptionalbridgedEndpoint) -> new UIntType(nonOptionalbridgedEndpoint)).orElse(new EmptyType())));
-    values.add(new StructElement(ORIGINAL_ENDPOINT_ID, originalEndpoint.<BaseTLVType>map((nonOptionaloriginalEndpoint) -> new UIntType(nonOptionaloriginalEndpoint)).orElse(new EmptyType())));
+    values.add(new StructElement(BRIDGED_ENDPOINT_ID, new UIntType(bridgedEndpoint)));
+    values.add(new StructElement(ORIGINAL_ENDPOINT_ID, new UIntType(originalEndpoint)));
     values.add(new StructElement(DEVICE_TYPES_ID, ArrayType.generateArrayType(deviceTypes, (elementdeviceTypes) -> elementdeviceTypes.encodeTlv())));
     values.add(new StructElement(UNIQUE_LOCATION_I_DS_ID, ArrayType.generateArrayType(uniqueLocationIDs, (elementuniqueLocationIDs) -> new StringType(elementuniqueLocationIDs))));
     values.add(new StructElement(UNIQUE_LOCATION_I_DS_LAST_EDIT_ID, new UIntType(uniqueLocationIDsLastEdit)));
@@ -12478,8 +12478,8 @@ public static class EcosystemInformationClusterEcosystemDeviceStruct {
     }
     Optional<String> deviceName = Optional.empty();
     Optional<Long> deviceNameLastEdit = Optional.empty();
-    Optional<Integer> bridgedEndpoint = Optional.empty();
-    Optional<Integer> originalEndpoint = Optional.empty();
+    Integer bridgedEndpoint = null;
+    Integer originalEndpoint = null;
     ArrayList<ChipStructs.EcosystemInformationClusterDeviceTypeStruct> deviceTypes = null;
     ArrayList<String> uniqueLocationIDs = null;
     Long uniqueLocationIDsLastEdit = null;
@@ -12498,12 +12498,12 @@ public static class EcosystemInformationClusterEcosystemDeviceStruct {
       } else if (element.contextTagNum() == BRIDGED_ENDPOINT_ID) {
         if (element.value(BaseTLVType.class).type() == TLVType.UInt) {
           UIntType castingValue = element.value(UIntType.class);
-          bridgedEndpoint = Optional.of(castingValue.value(Integer.class));
+          bridgedEndpoint = castingValue.value(Integer.class);
         }
       } else if (element.contextTagNum() == ORIGINAL_ENDPOINT_ID) {
         if (element.value(BaseTLVType.class).type() == TLVType.UInt) {
           UIntType castingValue = element.value(UIntType.class);
-          originalEndpoint = Optional.of(castingValue.value(Integer.class));
+          originalEndpoint = castingValue.value(Integer.class);
         }
       } else if (element.contextTagNum() == DEVICE_TYPES_ID) {
         if (element.value(BaseTLVType.class).type() == TLVType.Array) {

@@ -20,8 +20,8 @@ limitations under the License.
     <cluster code="0x0750"/>
     <item fieldId="0" name="DeviceName" type="char_string" optional="true" isFabricSensitive="true" length="64"/>
     <item fieldId="1" name="DeviceNameLastEdit" type="epoch_us" optional="true" isFabricSensitive="true" default="0"/>
-    <item fieldId="2" name="BridgedEndpoint" type="endpoint_no" optional="true" isFabricSensitive="true"/>
-    <item fieldId="3" name="OriginalEndpoint" type="endpoint_no" optional="true" isFabricSensitive="true"/>
+    <item fieldId="2" name="BridgedEndpoint" type="endpoint_no" isFabricSensitive="true"/>
+    <item fieldId="3" name="OriginalEndpoint" type="endpoint_no" isFabricSensitive="true"/>
     <item fieldId="4" name="DeviceTypes" array="true" type="DeviceTypeStruct" isFabricSensitive="true" minLength="1"/>
     <item fieldId="5" name="UniqueLocationIDs" array="true" type="char_string" length="64" isFabricSensitive="true"/>
     <item fieldId="6" name="UniqueLocationIDsLastEdit" type="epoch_us" isFabricSensitive="true" default="0"/>
@@ -30,8 +30,8 @@ limitations under the License.
   <struct name="EcosystemLocationStruct" isFabricScoped="true" apiMaturity="provisional">
     <cluster code="0x0750"/>
     <item fieldId="0" name="UniqueLocationID" type="char_string" isFabricSensitive="true" length="64"/>
-    <item fieldId="1" name="HomeLocation" type="HomeLocationStruct" optional="true" isFabricSensitive="true"/>
-    <item fieldId="2" name="HomeLocationLastEdit" type="epoch_us" optional="true" isFabricSensitive="true" default="0"/>
+    <item fieldId="1" name="HomeLocation" type="HomeLocationStruct" isFabricSensitive="true"/>
+    <item fieldId="2" name="HomeLocationLastEdit" type="epoch_us" isFabricSensitive="true" default="0"/>
   </struct>
 
   <cluster apiMaturity="provisional">

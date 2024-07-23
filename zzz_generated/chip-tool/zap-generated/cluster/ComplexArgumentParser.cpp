@@ -5440,25 +5440,23 @@ CHIP_ERROR ComplexArgumentParser::Setup(const char * label,
 
     ReturnErrorOnFailure(ComplexArgumentParser::EnsureMemberExist("EcosystemLocationStruct.uniqueLocationID", "uniqueLocationID",
                                                                   value.isMember("uniqueLocationID")));
+    ReturnErrorOnFailure(ComplexArgumentParser::EnsureMemberExist("EcosystemLocationStruct.homeLocation", "homeLocation",
+                                                                  value.isMember("homeLocation")));
+    ReturnErrorOnFailure(ComplexArgumentParser::EnsureMemberExist("EcosystemLocationStruct.homeLocationLastEdit",
+                                                                  "homeLocationLastEdit", value.isMember("homeLocationLastEdit")));
 
     char labelWithMember[kMaxLabelLength];
     snprintf(labelWithMember, sizeof(labelWithMember), "%s.%s", label, "uniqueLocationID");
     ReturnErrorOnFailure(ComplexArgumentParser::Setup(labelWithMember, request.uniqueLocationID, value["uniqueLocationID"]));
     valueCopy.removeMember("uniqueLocationID");
 
-    if (value.isMember("homeLocation"))
-    {
-        snprintf(labelWithMember, sizeof(labelWithMember), "%s.%s", label, "homeLocation");
-        ReturnErrorOnFailure(ComplexArgumentParser::Setup(labelWithMember, request.homeLocation, value["homeLocation"]));
-    }
+    snprintf(labelWithMember, sizeof(labelWithMember), "%s.%s", label, "homeLocation");
+    ReturnErrorOnFailure(ComplexArgumentParser::Setup(labelWithMember, request.homeLocation, value["homeLocation"]));
     valueCopy.removeMember("homeLocation");
 
-    if (value.isMember("homeLocationLastEdit"))
-    {
-        snprintf(labelWithMember, sizeof(labelWithMember), "%s.%s", label, "homeLocationLastEdit");
-        ReturnErrorOnFailure(
-            ComplexArgumentParser::Setup(labelWithMember, request.homeLocationLastEdit, value["homeLocationLastEdit"]));
-    }
+    snprintf(labelWithMember, sizeof(labelWithMember), "%s.%s", label, "homeLocationLastEdit");
+    ReturnErrorOnFailure(
+        ComplexArgumentParser::Setup(labelWithMember, request.homeLocationLastEdit, value["homeLocationLastEdit"]));
     valueCopy.removeMember("homeLocationLastEdit");
 
     if (value.isMember("fabricIndex"))
@@ -5488,6 +5486,10 @@ CHIP_ERROR ComplexArgumentParser::Setup(const char * label,
     // Copy to track which members we already processed.
     Json::Value valueCopy(value);
 
+    ReturnErrorOnFailure(ComplexArgumentParser::EnsureMemberExist("EcosystemDeviceStruct.bridgedEndpoint", "bridgedEndpoint",
+                                                                  value.isMember("bridgedEndpoint")));
+    ReturnErrorOnFailure(ComplexArgumentParser::EnsureMemberExist("EcosystemDeviceStruct.originalEndpoint", "originalEndpoint",
+                                                                  value.isMember("originalEndpoint")));
     ReturnErrorOnFailure(ComplexArgumentParser::EnsureMemberExist("EcosystemDeviceStruct.deviceTypes", "deviceTypes",
                                                                   value.isMember("deviceTypes")));
     ReturnErrorOnFailure(ComplexArgumentParser::EnsureMemberExist("EcosystemDeviceStruct.uniqueLocationIDs", "uniqueLocationIDs",
@@ -5512,18 +5514,12 @@ CHIP_ERROR ComplexArgumentParser::Setup(const char * label,
     }
     valueCopy.removeMember("deviceNameLastEdit");
 
-    if (value.isMember("bridgedEndpoint"))
-    {
-        snprintf(labelWithMember, sizeof(labelWithMember), "%s.%s", label, "bridgedEndpoint");
-        ReturnErrorOnFailure(ComplexArgumentParser::Setup(labelWithMember, request.bridgedEndpoint, value["bridgedEndpoint"]));
-    }
+    snprintf(labelWithMember, sizeof(labelWithMember), "%s.%s", label, "bridgedEndpoint");
+    ReturnErrorOnFailure(ComplexArgumentParser::Setup(labelWithMember, request.bridgedEndpoint, value["bridgedEndpoint"]));
     valueCopy.removeMember("bridgedEndpoint");
 
-    if (value.isMember("originalEndpoint"))
-    {
-        snprintf(labelWithMember, sizeof(labelWithMember), "%s.%s", label, "originalEndpoint");
-        ReturnErrorOnFailure(ComplexArgumentParser::Setup(labelWithMember, request.originalEndpoint, value["originalEndpoint"]));
-    }
+    snprintf(labelWithMember, sizeof(labelWithMember), "%s.%s", label, "originalEndpoint");
+    ReturnErrorOnFailure(ComplexArgumentParser::Setup(labelWithMember, request.originalEndpoint, value["originalEndpoint"]));
     valueCopy.removeMember("originalEndpoint");
 
     snprintf(labelWithMember, sizeof(labelWithMember), "%s.%s", label, "deviceTypes");

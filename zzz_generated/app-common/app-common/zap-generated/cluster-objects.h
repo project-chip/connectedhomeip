@@ -41007,8 +41007,8 @@ struct Type
 {
 public:
     chip::CharSpan uniqueLocationID;
-    Optional<Structs::HomeLocationStruct::Type> homeLocation;
-    Optional<uint64_t> homeLocationLastEdit;
+    Structs::HomeLocationStruct::Type homeLocation;
+    uint64_t homeLocationLastEdit = static_cast<uint64_t>(0);
     chip::FabricIndex fabricIndex = static_cast<chip::FabricIndex>(0);
 
     CHIP_ERROR Decode(TLV::TLVReader & reader);
@@ -41048,8 +41048,8 @@ struct Type
 public:
     Optional<chip::CharSpan> deviceName;
     Optional<uint64_t> deviceNameLastEdit;
-    Optional<chip::EndpointId> bridgedEndpoint;
-    Optional<chip::EndpointId> originalEndpoint;
+    chip::EndpointId bridgedEndpoint  = static_cast<chip::EndpointId>(0);
+    chip::EndpointId originalEndpoint = static_cast<chip::EndpointId>(0);
     DataModel::List<const Structs::DeviceTypeStruct::Type> deviceTypes;
     DataModel::List<const chip::CharSpan> uniqueLocationIDs;
     uint64_t uniqueLocationIDsLastEdit = static_cast<uint64_t>(0);
@@ -41073,8 +41073,8 @@ struct DecodableType
 public:
     Optional<chip::CharSpan> deviceName;
     Optional<uint64_t> deviceNameLastEdit;
-    Optional<chip::EndpointId> bridgedEndpoint;
-    Optional<chip::EndpointId> originalEndpoint;
+    chip::EndpointId bridgedEndpoint  = static_cast<chip::EndpointId>(0);
+    chip::EndpointId originalEndpoint = static_cast<chip::EndpointId>(0);
     DataModel::DecodableList<Structs::DeviceTypeStruct::DecodableType> deviceTypes;
     DataModel::DecodableList<chip::CharSpan> uniqueLocationIDs;
     uint64_t uniqueLocationIDsLastEdit = static_cast<uint64_t>(0);

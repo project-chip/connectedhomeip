@@ -27,8 +27,8 @@ import matter.tlv.TlvWriter
 class EcosystemInformationClusterEcosystemDeviceStruct(
   val deviceName: Optional<String>,
   val deviceNameLastEdit: Optional<ULong>,
-  val bridgedEndpoint: Optional<UInt>,
-  val originalEndpoint: Optional<UInt>,
+  val bridgedEndpoint: UInt,
+  val originalEndpoint: UInt,
   val deviceTypes: List<EcosystemInformationClusterDeviceTypeStruct>,
   val uniqueLocationIDs: List<String>,
   val uniqueLocationIDsLastEdit: ULong,
@@ -58,14 +58,8 @@ class EcosystemInformationClusterEcosystemDeviceStruct(
         val optdeviceNameLastEdit = deviceNameLastEdit.get()
         put(ContextSpecificTag(TAG_DEVICE_NAME_LAST_EDIT), optdeviceNameLastEdit)
       }
-      if (bridgedEndpoint.isPresent) {
-        val optbridgedEndpoint = bridgedEndpoint.get()
-        put(ContextSpecificTag(TAG_BRIDGED_ENDPOINT), optbridgedEndpoint)
-      }
-      if (originalEndpoint.isPresent) {
-        val optoriginalEndpoint = originalEndpoint.get()
-        put(ContextSpecificTag(TAG_ORIGINAL_ENDPOINT), optoriginalEndpoint)
-      }
+      put(ContextSpecificTag(TAG_BRIDGED_ENDPOINT), bridgedEndpoint)
+      put(ContextSpecificTag(TAG_ORIGINAL_ENDPOINT), originalEndpoint)
       startArray(ContextSpecificTag(TAG_DEVICE_TYPES))
       for (item in deviceTypes.iterator()) {
         item.toTlv(AnonymousTag, this)
@@ -109,18 +103,8 @@ class EcosystemInformationClusterEcosystemDeviceStruct(
         } else {
           Optional.empty()
         }
-      val bridgedEndpoint =
-        if (tlvReader.isNextTag(ContextSpecificTag(TAG_BRIDGED_ENDPOINT))) {
-          Optional.of(tlvReader.getUInt(ContextSpecificTag(TAG_BRIDGED_ENDPOINT)))
-        } else {
-          Optional.empty()
-        }
-      val originalEndpoint =
-        if (tlvReader.isNextTag(ContextSpecificTag(TAG_ORIGINAL_ENDPOINT))) {
-          Optional.of(tlvReader.getUInt(ContextSpecificTag(TAG_ORIGINAL_ENDPOINT)))
-        } else {
-          Optional.empty()
-        }
+      val bridgedEndpoint = tlvReader.getUInt(ContextSpecificTag(TAG_BRIDGED_ENDPOINT))
+      val originalEndpoint = tlvReader.getUInt(ContextSpecificTag(TAG_ORIGINAL_ENDPOINT))
       val deviceTypes =
         buildList<EcosystemInformationClusterDeviceTypeStruct> {
           tlvReader.enterArray(ContextSpecificTag(TAG_DEVICE_TYPES))

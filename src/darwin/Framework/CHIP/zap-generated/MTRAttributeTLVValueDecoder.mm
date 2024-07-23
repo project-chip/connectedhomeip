@@ -16991,16 +16991,8 @@ static id _Nullable DecodeAttributeValueForEcosystemInformationCluster(Attribute
                 } else {
                     newElement_0.deviceNameLastEdit = nil;
                 }
-                if (entry_0.bridgedEndpoint.HasValue()) {
-                    newElement_0.bridgedEndpoint = [NSNumber numberWithUnsignedShort:entry_0.bridgedEndpoint.Value()];
-                } else {
-                    newElement_0.bridgedEndpoint = nil;
-                }
-                if (entry_0.originalEndpoint.HasValue()) {
-                    newElement_0.originalEndpoint = [NSNumber numberWithUnsignedShort:entry_0.originalEndpoint.Value()];
-                } else {
-                    newElement_0.originalEndpoint = nil;
-                }
+                newElement_0.bridgedEndpoint = [NSNumber numberWithUnsignedShort:entry_0.bridgedEndpoint];
+                newElement_0.originalEndpoint = [NSNumber numberWithUnsignedShort:entry_0.originalEndpoint];
                 { // Scope for our temporary variables
                     auto * array_2 = [NSMutableArray new];
                     auto iter_2 = entry_0.deviceTypes.begin();
@@ -17074,32 +17066,24 @@ static id _Nullable DecodeAttributeValueForEcosystemInformationCluster(Attribute
                     *aError = err;
                     return nil;
                 }
-                if (entry_0.homeLocation.HasValue()) {
-                    newElement_0.homeLocation = [MTREcosystemInformationClusterHomeLocationStruct new];
-                    newElement_0.homeLocation.locationName = AsString(entry_0.homeLocation.Value().locationName);
-                    if (newElement_0.homeLocation.locationName == nil) {
-                        CHIP_ERROR err = CHIP_ERROR_INVALID_ARGUMENT;
-                        *aError = err;
-                        return nil;
-                    }
-                    if (entry_0.homeLocation.Value().floorNumber.IsNull()) {
-                        newElement_0.homeLocation.floorNumber = nil;
-                    } else {
-                        newElement_0.homeLocation.floorNumber = [NSNumber numberWithShort:entry_0.homeLocation.Value().floorNumber.Value()];
-                    }
-                    if (entry_0.homeLocation.Value().areaType.IsNull()) {
-                        newElement_0.homeLocation.areaType = nil;
-                    } else {
-                        newElement_0.homeLocation.areaType = [NSNumber numberWithUnsignedChar:chip::to_underlying(entry_0.homeLocation.Value().areaType.Value())];
-                    }
-                } else {
-                    newElement_0.homeLocation = nil;
+                newElement_0.homeLocation = [MTREcosystemInformationClusterHomeLocationStruct new];
+                newElement_0.homeLocation.locationName = AsString(entry_0.homeLocation.locationName);
+                if (newElement_0.homeLocation.locationName == nil) {
+                    CHIP_ERROR err = CHIP_ERROR_INVALID_ARGUMENT;
+                    *aError = err;
+                    return nil;
                 }
-                if (entry_0.homeLocationLastEdit.HasValue()) {
-                    newElement_0.homeLocationLastEdit = [NSNumber numberWithUnsignedLongLong:entry_0.homeLocationLastEdit.Value()];
+                if (entry_0.homeLocation.floorNumber.IsNull()) {
+                    newElement_0.homeLocation.floorNumber = nil;
                 } else {
-                    newElement_0.homeLocationLastEdit = nil;
+                    newElement_0.homeLocation.floorNumber = [NSNumber numberWithShort:entry_0.homeLocation.floorNumber.Value()];
                 }
+                if (entry_0.homeLocation.areaType.IsNull()) {
+                    newElement_0.homeLocation.areaType = nil;
+                } else {
+                    newElement_0.homeLocation.areaType = [NSNumber numberWithUnsignedChar:chip::to_underlying(entry_0.homeLocation.areaType.Value())];
+                }
+                newElement_0.homeLocationLastEdit = [NSNumber numberWithUnsignedLongLong:entry_0.homeLocationLastEdit];
                 newElement_0.fabricIndex = [NSNumber numberWithUnsignedChar:entry_0.fabricIndex];
                 [array_0 addObject:newElement_0];
             }
