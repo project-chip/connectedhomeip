@@ -59,8 +59,6 @@ CHIP_ERROR RetrieveClusterData(InteractionModel::DataModel * dataModel, const Ac
     DataModelCallbacks::GetInstance()->AttributeOperation(DataModelCallbacks::OperationType::Read,
                                                           DataModelCallbacks::OperationOrder::Pre, path);
 
-    AttributeEncodeState stateDm(encoderState); // a copy for DM logic only. Ember changes state directly
-
     CHIP_ERROR errEmber         = CHIP_NO_ERROR;
     uint32_t lengthWrittenEmber = 0;
 
@@ -71,8 +69,9 @@ CHIP_ERROR RetrieveClusterData(InteractionModel::DataModel * dataModel, const Ac
         lengthWrittenEmber = reportBuilder.GetWriter()->GetLengthWritten();
     }
 
-    CHIP_ERROR errDM =
-        DataModelImpl::RetrieveClusterData(dataModel, subjectDescriptor, isFabricFiltered, reportBuilder, path, &stateDm);
+    AttributeEncodeState stateDm(encoderState); // a copy for DM logic only. Ember changes state directly
+    CHIP_ERROR errDM = DataModelImpl::RetrieveClusterData(dataModel, subjectDescriptor, isFabricFiltered, reportBuilder, path,
+                                                          encoderState != nullptr ? &stateDm : nullptr);
 
     if (errEmber != errDM)
     {
@@ -116,7 +115,8 @@ CHIP_ERROR RetrieveClusterData(InteractionModel::DataModel * dataModel, const Ac
 #endif
     }
 
-    // For write resumes, the encoder state MUST be idential
+    // For chunked reads, the encoder state MUST be identical (since this is what controls
+    // where chunking resumes).
     if ((errEmber == CHIP_ERROR_NO_MEMORY) || (errEmber == CHIP_ERROR_BUFFER_TOO_SMALL))
     {
         // Encoder state MUST match on partial reads (used by chunking)
