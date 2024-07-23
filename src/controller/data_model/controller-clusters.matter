@@ -216,7 +216,7 @@ deprecated cluster OnOffSwitchConfiguration = 7 {
 
 /** Attributes and commands for controlling devices that can be set to a level between fully 'On' and fully 'Off.' */
 cluster LevelControl = 8 {
-  revision 5;
+  revision 6;
 
   enum MoveModeEnum : enum8 {
     kUp = 0;
@@ -7022,7 +7022,7 @@ cluster ThermostatUserInterfaceConfiguration = 516 {
 
 /** Attributes and commands for controlling the color properties of a color-capable light. */
 cluster ColorControl = 768 {
-  revision 6;
+  revision 7;
 
   enum ColorLoopAction : enum8 {
     kDeactivate = 0;
@@ -8168,16 +8168,13 @@ cluster ThreadNetworkDirectory = 1107 {
   revision 1;
 
   struct ThreadNetworkStruct {
-    int64u extendedPanID = 0;
+    octet_string<8> extendedPanID = 0;
     char_string<16> networkName = 1;
     int16u channel = 2;
+    int64u activeTimestamp = 3;
   }
 
-  info event access(read: operate) NetworkChanged = 0 {
-    int64u extendedPanID = 0;
-  }
-
-  attribute access(read: manage, write: manage) nullable int64u preferredExtendedPanID = 0;
+  attribute access(read: manage, write: manage) nullable octet_string<8> preferredExtendedPanID = 0;
   readonly attribute access(read: operate) ThreadNetworkStruct threadNetworks[] = 1;
   readonly attribute int8u threadNetworkTableSize = 2;
   readonly attribute command_id generatedCommandList[] = 65528;
@@ -8192,11 +8189,11 @@ cluster ThreadNetworkDirectory = 1107 {
   }
 
   request struct RemoveNetworkRequest {
-    int64u extendedPanID = 0;
+    octet_string<8> extendedPanID = 0;
   }
 
   request struct GetOperationalDatasetRequest {
-    int64u extendedPanID = 0;
+    octet_string<8> extendedPanID = 0;
   }
 
   response struct OperationalDatasetResponse = 3 {

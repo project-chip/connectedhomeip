@@ -1703,6 +1703,24 @@ extern const char CHIP_NON_PRODUCTION_MARKER[];
 #endif
 
 /**
+ * @def CHIP_CONFIG_MAX_THREAD_NETWORK_DIRECTORY_STORAGE_CAPACITY
+ *
+ * Defines the number of networks the default ThreadNetworkDirectoryStorage implementation will store.
+ */
+#ifndef CHIP_CONFIG_MAX_THREAD_NETWORK_DIRECTORY_STORAGE_CAPACITY
+#define CHIP_CONFIG_MAX_THREAD_NETWORK_DIRECTORY_STORAGE_CAPACITY (CHIP_CONFIG_MAX_FABRICS * 2)
+#endif
+
+/**
+ * @def CHIP_CONFIG_MAX_THREAD_NETWORK_DIRECTORY_STORAGE_CONCURRENT_ITERATORS
+ *
+ * Defines the number of ThreadNetworkDirectoryStorage iterators that can be allocated at any one time.
+ */
+#ifndef CHIP_CONFIG_MAX_THREAD_NETWORK_DIRECTORY_STORAGE_CONCURRENT_ITERATORS
+#define CHIP_CONFIG_MAX_THREAD_NETWORK_DIRECTORY_STORAGE_CONCURRENT_ITERATORS 1
+#endif
+
+/**
  * @def CHIP_CONFIG_COMMAND_SENDER_BUILTIN_SUPPORT_FOR_BATCHED_COMMANDS
  *
  * @brief CommandSender will use built-in support to enable sending batch commands in a single Invoke Request Message.
