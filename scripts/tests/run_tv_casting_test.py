@@ -22,11 +22,10 @@ import subprocess
 import sys
 import tempfile
 import time
-from typing import List, Optional
 from dataclasses import dataclass
+from typing import List, Optional
 
 import click
-
 from linux.log_line_processing import ProcessOutputCapture
 from linux.tv_casting_test_sequence_utils import App, Sequence, Step
 from linux.tv_casting_test_sequences import START_APP, STOP_APP
