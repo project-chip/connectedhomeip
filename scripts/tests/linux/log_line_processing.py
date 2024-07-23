@@ -118,5 +118,5 @@ class ProcessOutputCapture:
 
         NOTE: remember to append a `\n` for terminal applications
         """
-        self.process.stdin.write(what)
+        self.process.stdin.write(input_cmd)
         self.process.stdin.flush()
