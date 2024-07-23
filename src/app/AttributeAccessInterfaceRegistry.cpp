@@ -13,6 +13,7 @@
  *    See the License for the specific language governing permissions and
  *    limitations under the License.
  */
+#include "app/AttributeAccessInterface.h"
 #include <app/AttributeAccessInterfaceRegistry.h>
 
 #include <app/AttributeAccessInterfaceCache.h>
@@ -21,16 +22,13 @@ using namespace chip::app;
 
 namespace {
 
-AttributeAccessInterface * gAttributeAccessOverrides = nullptr;
-AttributeAccessInterfaceCache gAttributeAccessInterfaceCache;
-
 // shouldUnregister returns true if the given AttributeAccessInterface should be
 // unregistered.
 template <typename F>
-void UnregisterMatchingAttributeAccessInterfaces(F shouldUnregister)
+void UnregisterMatchingAttributeAccessInterfaces(F shouldUnregister, AttributeAccessInterface *& list_head)
 {
     AttributeAccessInterface * prev = nullptr;
-    AttributeAccessInterface * cur  = gAttributeAccessOverrides;
+    AttributeAccessInterface * cur  = list_head;
     while (cur)
     {
         AttributeAccessInterface * next = cur->GetNext();
@@ -43,7 +41,7 @@ void UnregisterMatchingAttributeAccessInterfaces(F shouldUnregister)
             }
             else
             {
-                gAttributeAccessOverrides = next;
+                list_head = next;
             }
 
             cur->SetNext(nullptr);
@@ -60,43 +58,28 @@ void UnregisterMatchingAttributeAccessInterfaces(F shouldUnregister)
 
 } // namespace
 
-void unregisterAttributeAccessOverride(AttributeAccessInterface * attrOverride)
-{
-    gAttributeAccessInterfaceCache.Invalidate();
-    UnregisterMatchingAttributeAccessInterfaces([attrOverride](AttributeAccessInterface * entry) { return entry == attrOverride; });
-}
-
-void unregisterAllAttributeAccessOverridesForEndpoint(EmberAfDefinedEndpoint * definedEndpoint)
-{
-    UnregisterMatchingAttributeAccessInterfaces(
-        [endpoint = definedEndpoint->endpoint](AttributeAccessInterface * entry) { return entry->MatchesEndpoint(endpoint); });
-}
-
-bool registerAttributeAccessOverride(AttributeAccessInterface * attrOverride)
-{
-    gAttributeAccessInterfaceCache.Invalidate();
-    for (auto * cur = gAttributeAccessOverrides; cur; cur = cur->GetNext())
-    {
-        if (cur->Matches(*attrOverride))
-        {
-            ChipLogError(InteractionModel, "Duplicate attribute override registration failed");
-            return false;
-        }
-    }
-    attrOverride->SetNext(gAttributeAccessOverrides);
-    gAttributeAccessOverrides = attrOverride;
-    return true;
-}
-
 namespace chip {
 namespace app {
 
-app::AttributeAccessInterface * GetAttributeAccessOverride(EndpointId endpointId, ClusterId clusterId)
+AttributeHandlerInterfaceRegistry & Instance()
+{
+    static AttributeHandlerInterfaceRegistry instance;
+    return instance;
+}
+
+void AttributeHandlerInterfaceRegistry::UnregisterAllForEndpoint(EmberAfDefinedEndpoint * definedEndpoint)
+{
+    UnregisterMatchingAttributeAccessInterfaces(
+        [endpoint = definedEndpoint->endpoint](AttributeAccessInterface * entry) { return entry->MatchesEndpoint(endpoint); },
+        mAttributeAccessOverrides);
+}
+
+AttributeAccessInterface * AttributeHandlerInterfaceRegistry::Get(EndpointId endpointId, ClusterId clusterId)
 {
     using CacheResult = AttributeAccessInterfaceCache::CacheResult;
 
     AttributeAccessInterface * cached = nullptr;
-    CacheResult result                = gAttributeAccessInterfaceCache.Get(endpointId, clusterId, &cached);
+    CacheResult result                = mAttributeAccessInterfaceCache.Get(endpointId, clusterId, &cached);
     switch (result)
     {
     case CacheResult::kDefinitelyUnused:
@@ -106,20 +89,43 @@ app::AttributeAccessInterface * GetAttributeAccessOverride(EndpointId endpointId
     case CacheResult::kCacheMiss:
     default:
         // Did not cache yet, search set of AAI registered, and cache if found.
-        for (app::AttributeAccessInterface * cur = gAttributeAccessOverrides; cur; cur = cur->GetNext())
+        for (app::AttributeAccessInterface * cur = mAttributeAccessOverrides; cur; cur = cur->GetNext())
         {
             if (cur->Matches(endpointId, clusterId))
             {
-                gAttributeAccessInterfaceCache.MarkUsed(endpointId, clusterId, cur);
+                mAttributeAccessInterfaceCache.MarkUsed(endpointId, clusterId, cur);
                 return cur;
             }
         }
 
         // Did not find AAI registered: mark as definitely not using.
-        gAttributeAccessInterfaceCache.MarkUnused(endpointId, clusterId);
+        mAttributeAccessInterfaceCache.MarkUnused(endpointId, clusterId);
     }
 
     return nullptr;
+}
+
+void AttributeHandlerInterfaceRegistry::UnregisterAttributeAccessOverride(AttributeAccessInterface * attrOverride)
+{
+    mAttributeAccessInterfaceCache.Invalidate();
+    UnregisterMatchingAttributeAccessInterfaces([attrOverride](AttributeAccessInterface * entry) { return entry == attrOverride; },
+                                                mAttributeAccessOverrides);
+}
+
+bool AttributeHandlerInterfaceRegistry::RegisterAttributeAccessOverride(AttributeAccessInterface * attrOverride)
+{
+    mAttributeAccessInterfaceCache.Invalidate();
+    for (auto * cur = mAttributeAccessOverrides; cur; cur = cur->GetNext())
+    {
+        if (cur->Matches(*attrOverride))
+        {
+            ChipLogError(InteractionModel, "Duplicate attribute override registration failed");
+            return false;
+        }
+    }
+    attrOverride->SetNext(mAttributeAccessOverrides);
+    mAttributeAccessOverrides = attrOverride;
+    return true;
 }
 
 } // namespace app

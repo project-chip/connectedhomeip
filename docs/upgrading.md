@@ -76,3 +76,22 @@ The following replacements exist:
     `chip::app::CommandHandlerInterfaceRegistry::Instance().Instance().GetCommandHandler`
 -   `chip::app::InteractionModelEngine::UnregisterCommandHandlers` replaced by
     `chip::app::CommandHandlerInterfaceRegistry::Instance().Instance().UnregisterAllCommandHandlersForEndpoint`
+
+### AttributeAccessInterface register/unregister
+
+
+A new object exists for the attribute access interface registry, accessible
+as `chip::app::AttributeHandlerInterfaceRegistry::Instance()`
+
+
+Replacements for methods are:
+
+-   `registerAttributeAccessOverride` replaced by
+    `chip::app::AttributeHandlerInterfaceRegistry::Instance().RegisterAttributeAccessOverride`
+-   `unregisterAttributeAccessOverride` replaced by
+    `chip::app::AttributeHandlerInterfaceRegistry::Instance().UnregisterAttributeAccessOverride`
+-   `unregisterAllAttributeAccessOverridesForEndpoint` replaced by
+    `chip::app::AttributeHandlerInterfaceRegistry::Instance().UnregisterAllForEndpoint`
+-   `chip::app::GetAttributeAccessOverride` replaced by
+    `chip::app::AttributeHandlerInterfaceRegistry::Instance().Get`
+
