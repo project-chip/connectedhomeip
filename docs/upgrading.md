@@ -69,13 +69,13 @@ independent of the InteractionModelEngine class.
 The following replacements exist:
 
 -   `chip::app::InteractionModelEngine::RegisterCommandHandler` replaced by
-    `chip::app::CommandHandlerInterfaceRegistry::Instance().Instance().RegisterCommandHandler`
+    `chip::app::CommandHandlerInterfaceRegistry::Instance().RegisterCommandHandler`
 -   `chip::app::InteractionModelEngine::UnregisterCommandHandler` replaced by
-    `chip::app::CommandHandlerInterfaceRegistry::Instance().Instance().UnregisterCommandHandler`
+    `chip::app::CommandHandlerInterfaceRegistry::Instance().UnregisterCommandHandler`
 -   `chip::app::InteractionModelEngine::FindCommandHandler` replaced by
-    `chip::app::CommandHandlerInterfaceRegistry::Instance().Instance().GetCommandHandler`
+    `chip::app::CommandHandlerInterfaceRegistry::Instance().GetCommandHandler`
 -   `chip::app::InteractionModelEngine::UnregisterCommandHandlers` replaced by
-    `chip::app::CommandHandlerInterfaceRegistry::Instance().Instance().UnregisterAllCommandHandlersForEndpoint`
+    `chip::app::CommandHandlerInterfaceRegistry::Instance().UnregisterAllCommandHandlersForEndpoint`
 
 ### AttributeAccessInterface register/unregister
 
