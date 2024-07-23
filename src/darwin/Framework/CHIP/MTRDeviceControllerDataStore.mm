@@ -1339,7 +1339,8 @@ static NSString * sDeviceDataKeyPrefix = @"deviceData";
                            sharingType:MTRStorageSharingTypeNotShared];
 }
 
-- (void)_removeAllDataInPrefix:(NSString *)prefix {
+- (void)_removeAllDataInPrefix:(NSString *)prefix
+{
     dispatch_sync(_storageDelegateQueue, ^{
         MTRDeviceController * controller = self->_controller;
         VerifyOrReturn(controller != nil); // No way to call delegate without controller.
@@ -1410,7 +1411,6 @@ static NSString * sClientDataKeyPrefix = @"clientDataByNode";
 
 #pragma mark - Client Data by Endpoint + Node
 
-
 static NSString * sClientDataByEndpointKeyPrefix = @"clientDataByEndpoint";
 
 // REVIEWERS:  is there a constraint smaller than NSNumber on endpoint IDs?
@@ -1422,7 +1422,7 @@ static NSString * sClientDataByEndpointKeyPrefix = @"clientDataByEndpoint";
 - (NSString *)_clientDataPrefixForEndpointID:(NSNumber *)endpointID onNodeID:(NSNumber *)nodeID
 {
     return [sClientDataByEndpointKeyPrefix stringByAppendingFormat:@":0x%016llX:0x%016llX",
-            nodeID.unsignedLongLongValue, endpointID.unsignedLongLongValue];
+                                           nodeID.unsignedLongLongValue, endpointID.unsignedLongLongValue];
 }
 
 - (id<NSSecureCoding>)clientDataForKey:(NSString *)key onEndpointID:(NSNumber *)endpointID onNodeID:(NSNumber *)nodeID
