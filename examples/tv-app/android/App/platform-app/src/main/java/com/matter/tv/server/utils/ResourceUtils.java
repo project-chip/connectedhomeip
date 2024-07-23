@@ -90,8 +90,8 @@ public class ResourceUtils {
                 }
                 cluster.optionalAttributesIdentifiers = attributeIds;
               } else {
-              reader.skipValue();
-            }
+                reader.skipValue();
+              }
             } catch (NumberFormatException | IllegalStateException e) {
               Log.e(TAG, "Invalid number format in JSON for key: " + name, e);
               reader.skipValue(); // Skip the invalid entry
