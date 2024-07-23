@@ -113,8 +113,8 @@ class ProcessOutputCapture:
         except queue.Empty:
             return None
 
-    def send_to_program(self, what):
-        """Sends the given string to the program.
+    def send_to_program(self, input_cmd):
+        """Sends the given input command string to the program.
 
         NOTE: remember to append a `\n` for terminal applications
         """
