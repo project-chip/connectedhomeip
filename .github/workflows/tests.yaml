@@ -337,6 +337,7 @@ jobs:
 
         if: github.actor != 'restyled-io[bot]'
         runs-on: macos-13
+        python-version: '3.11'
 
         steps:
             - name: Checkout
@@ -617,6 +618,7 @@ jobs:
 
         if: github.actor != 'restyled-io[bot]' && false
         runs-on: macos-13
+        python-version: '3.11'
 
         steps:
             - name: Checkout
