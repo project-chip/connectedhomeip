@@ -75,6 +75,7 @@ public:
     static const Key kConfigKey_ProductId;
     static const Key kConfigKey_ProductName;
     static const Key kConfigKey_ProductLabel;
+    static const Key kConfigKey_PartNumber;
     static const Key kConfigKey_ProductURL;
     static const Key kConfigKey_SupportedCalTypes;
     static const Key kConfigKey_SupportedLocaleSize;

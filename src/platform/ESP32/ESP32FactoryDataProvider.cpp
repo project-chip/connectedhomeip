@@ -278,7 +278,12 @@ CHIP_ERROR ESP32FactoryDataProvider::GetHardwareVersion(uint16_t & hardwareVersi
 
 CHIP_ERROR ESP32FactoryDataProvider::GetPartNumber(char * buf, size_t bufSize)
 {
-    return GenericDeviceInstanceInfoProvider<ESP32Config>::GetPartNumber(buf, bufSize);
+    CHIP_ERROR err = ESP32Config::ReadConfigValueStr(ESP32Config::kConfigKey_PartNumber, buf, bufSize, bufSize);
+    if (err == CHIP_ERROR_PERSISTED_STORAGE_VALUE_NOT_FOUND)
+    {
+        return CHIP_DEVICE_ERROR_CONFIG_NOT_FOUND;
+    }
+    return err;
 }
 #endif // CHIP_DEVICE_CONFIG_ENABLE_DEVICE_INSTANCE_INFO_PROVIDER
 

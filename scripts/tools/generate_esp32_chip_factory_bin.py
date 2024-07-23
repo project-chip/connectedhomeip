@@ -194,6 +194,21 @@ FACTORY_DATA = {
         'encoding': 'u32',
         'value': None,
     },
+    'part-number': {
+        'type': 'data',
+        'encoding': 'string',
+        'value': None,
+    },
+    'product-label': {
+        'type': 'data',
+        'encoding': 'string',
+        'value': None,
+    },
+    'product-url': {
+        'type': 'data',
+        'encoding': 'string',
+        'value': None,
+    },
 }
 
 
@@ -350,6 +365,12 @@ def populate_factory_data(args, spake2p_params):
         FACTORY_DATA['product-finish']['value'] = Product_Finish_Enum[args.product_finish].value
     if args.product_color:
         FACTORY_DATA['product-color']['value'] = Product_Color_Enum[args.product_color].value
+    if args.part_number:
+        FACTORY_DATA['part-number']['value'] = args.part_number
+    if args.product_url:
+        FACTORY_DATA['product-url']['value'] = args.product_url
+    if args.product_label:
+        FACTORY_DATA['product-label']['value'] = args.product_label
 
     # SupportedModes are stored as multiple entries
     #  - sm-sz/<ep>                 : number of supported modes for the endpoint
@@ -527,6 +548,10 @@ def get_args():
     product_color_choices = [color.name for color in Product_Color_Enum]
     parser.add_argument("--product-color", type=str, choices=product_color_choices,
                         help='Product colors choices for product appearance')
+
+    parser.add_argument("--part-number", type=str, help='human readable product number')
+    parser.add_argument("--product-label", type=str, help='human readable product label')
+    parser.add_argument("--product-url", type=str, help='link to product specific web page')
 
     parser.add_argument('-s', '--size', type=any_base_int, default=0x6000,
                         help='The size of the partition.bin, default: 0x6000')
