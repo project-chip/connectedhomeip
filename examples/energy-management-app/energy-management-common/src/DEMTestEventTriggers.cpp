@@ -62,8 +62,9 @@ CHIP_ERROR ConfigureForecast(uint16_t numSlots)
         return err;
     }
 
-    // planned start time, in UTC, for the entire Forecast.
-    sForecastStruct.startTime = chipEpoch;
+    // planned start time, in UTC, for the entire Forecast. Allow to be a little
+    // time in the future as forecastStruct.startTime is used in some tests.
+    sForecastStruct.startTime = chipEpoch + 60;
 
     // earliest start time, in UTC, that the entire Forecast can be shifted to. null value indicates that it can be started
     // immediately.
