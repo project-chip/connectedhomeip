@@ -572,7 +572,7 @@ CHIP_ERROR InitVideoPlayerPlatform(jobject contentAppEndpointManager)
     {
         ContentAppCommandDelegate * delegate =
             new ContentAppCommandDelegate(contentAppEndpointManager, contentAppClusters[i].clusterId);
-        chip::app::CommandHandlerInterfaceRegistry::Instance().RegisterCommandHandler(delegate);
+        app::CommandHandlerInterfaceRegistry::Instance().RegisterCommandHandler(delegate);
         ChipLogProgress(AppServer, "Registered command handler delegate for cluster %d", contentAppClusters[i].clusterId);
     }
 
