@@ -173,7 +173,7 @@ def parse_output_msg_in_subprocess(
                 # successful completion
                 return
 
-    raise TestStepException("Unespected exit", test_sequence_name, test_sequence_step)
+    raise TestStepException("Unexpected exit", test_sequence_name, test_sequence_step)
 
 
 def send_input_cmd_to_subprocess(
