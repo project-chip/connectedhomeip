@@ -708,5 +708,5 @@ void MatterMediaPlaybackClusterServerAttributeChangedCallback(const chip::app::C
 
 void MatterMediaPlaybackPluginServerInitCallback()
 {
-    app::AttributeAccessInterfaceRegistry::Instance().RegisterAttributeAccessOverride(&gMediaPlaybackAttrAccess);
+    app::AttributeAccessInterfaceRegistry::Instance().Register(&gMediaPlaybackAttrAccess);
 }

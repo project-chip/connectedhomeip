@@ -186,5 +186,5 @@ bool emberAfEthernetNetworkDiagnosticsClusterResetCountsCallback(app::CommandHan
 
 void MatterEthernetNetworkDiagnosticsPluginServerInitCallback()
 {
-    AttributeAccessInterfaceRegistry::Instance().RegisterAttributeAccessOverride(&gAttrAccess);
+    AttributeAccessInterfaceRegistry::Instance().Register(&gAttrAccess);
 }

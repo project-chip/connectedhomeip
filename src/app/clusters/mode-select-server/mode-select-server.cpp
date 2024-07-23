@@ -219,7 +219,7 @@ inline bool areStartUpModeAndCurrentModeNonVolatile(EndpointId endpointId)
 
 void MatterModeSelectPluginServerInitCallback()
 {
-    AttributeAccessInterfaceRegistry::Instance().RegisterAttributeAccessOverride(&gModeSelectAttrAccess);
+    AttributeAccessInterfaceRegistry::Instance().Register(&gModeSelectAttrAccess);
 }
 
 /**

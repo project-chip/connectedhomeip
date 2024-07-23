@@ -453,5 +453,5 @@ exit:
 
 void MatterBooleanStateConfigurationPluginServerInitCallback()
 {
-    AttributeAccessInterfaceRegistry::Instance().RegisterAttributeAccessOverride(&gAttrAccess);
+    AttributeAccessInterfaceRegistry::Instance().Register(&gAttrAccess);
 }

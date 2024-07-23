@@ -1119,5 +1119,5 @@ bool emberAfUnitTestingClusterTestSecondBatchHelperRequestCallback(
 
 void MatterUnitTestingPluginServerInitCallback()
 {
-    AttributeAccessInterfaceRegistry::Instance().RegisterAttributeAccessOverride(&gAttrAccess);
+    AttributeAccessInterfaceRegistry::Instance().Register(&gAttrAccess);
 }

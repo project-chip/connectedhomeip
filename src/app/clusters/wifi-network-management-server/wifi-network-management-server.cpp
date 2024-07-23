@@ -63,13 +63,13 @@ WiFiNetworkManagementServer::WiFiNetworkManagementServer(EndpointId endpoint) :
 
 WiFiNetworkManagementServer::~WiFiNetworkManagementServer()
 {
-    AttributeAccessInterfaceRegistry::Instance().UnregisterAttributeAccessOverride(this);
+    AttributeAccessInterfaceRegistry::Instance().Unregister(this);
     CommandHandlerInterfaceRegistry::Instance().UnregisterCommandHandler(this);
 }
 
 CHIP_ERROR WiFiNetworkManagementServer::Init()
 {
-    VerifyOrReturnError(AttributeAccessInterfaceRegistry::Instance().RegisterAttributeAccessOverride(this), CHIP_ERROR_INTERNAL);
+    VerifyOrReturnError(AttributeAccessInterfaceRegistry::Instance().Register(this), CHIP_ERROR_INTERNAL);
     ReturnErrorOnFailure(CommandHandlerInterfaceRegistry::Instance().RegisterCommandHandler(this));
     return CHIP_NO_ERROR;
 }

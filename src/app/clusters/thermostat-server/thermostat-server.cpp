@@ -928,5 +928,5 @@ bool emberAfThermostatClusterSetpointRaiseLowerCallback(app::CommandHandler * co
 
 void MatterThermostatPluginServerInitCallback()
 {
-    AttributeAccessInterfaceRegistry::Instance().RegisterAttributeAccessOverride(&gThermostatAttrAccess);
+    AttributeAccessInterfaceRegistry::Instance().Register(&gThermostatAttrAccess);
 }

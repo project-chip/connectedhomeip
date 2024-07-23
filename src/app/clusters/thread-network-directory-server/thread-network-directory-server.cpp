@@ -47,13 +47,13 @@ ThreadNetworkDirectoryServer::ThreadNetworkDirectoryServer(EndpointId endpoint, 
 
 ThreadNetworkDirectoryServer::~ThreadNetworkDirectoryServer()
 {
-    AttributeAccessInterfaceRegistry::Instance().UnregisterAttributeAccessOverride(this);
+    AttributeAccessInterfaceRegistry::Instance().Unregister(this);
     CommandHandlerInterfaceRegistry::Instance().UnregisterCommandHandler(this);
 }
 
 CHIP_ERROR ThreadNetworkDirectoryServer::Init()
 {
-    VerifyOrReturnError(AttributeAccessInterfaceRegistry::Instance().RegisterAttributeAccessOverride(this), CHIP_ERROR_INTERNAL);
+    VerifyOrReturnError(AttributeAccessInterfaceRegistry::Instance().Register(this), CHIP_ERROR_INTERNAL);
     ReturnErrorOnFailure(CommandHandlerInterfaceRegistry::Instance().RegisterCommandHandler(this));
     return CHIP_NO_ERROR;
 }

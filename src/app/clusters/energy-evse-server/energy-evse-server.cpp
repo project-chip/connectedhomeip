@@ -39,8 +39,7 @@ namespace EnergyEvse {
 CHIP_ERROR Instance::Init()
 {
     ReturnErrorOnFailure(CommandHandlerInterfaceRegistry::Instance().RegisterCommandHandler(this));
-    VerifyOrReturnError(AttributeAccessInterfaceRegistry::Instance().RegisterAttributeAccessOverride(this),
-                        CHIP_ERROR_INCORRECT_STATE);
+    VerifyOrReturnError(AttributeAccessInterfaceRegistry::Instance().Register(this), CHIP_ERROR_INCORRECT_STATE);
 
     return CHIP_NO_ERROR;
 }
@@ -48,7 +47,7 @@ CHIP_ERROR Instance::Init()
 void Instance::Shutdown()
 {
     CommandHandlerInterfaceRegistry::Instance().UnregisterCommandHandler(this);
-    AttributeAccessInterfaceRegistry::Instance().UnregisterAttributeAccessOverride(this);
+    AttributeAccessInterfaceRegistry::Instance().Unregister(this);
 }
 
 bool Instance::HasFeature(Feature aFeature) const

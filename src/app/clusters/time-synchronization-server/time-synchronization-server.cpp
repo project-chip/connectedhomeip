@@ -1290,5 +1290,5 @@ bool emberAfTimeSynchronizationClusterSetDefaultNTPCallback(
 void MatterTimeSynchronizationPluginServerInitCallback()
 {
     TimeSynchronizationServer::Instance().Init();
-    AttributeAccessInterfaceRegistry::Instance().RegisterAttributeAccessOverride(&gAttrAccess);
+    AttributeAccessInterfaceRegistry::Instance().Register(&gAttrAccess);
 }

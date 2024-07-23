@@ -999,7 +999,7 @@ void ApplicationInit()
         }
     }
 
-    AttributeAccessInterfaceRegistry::Instance().RegisterAttributeAccessOverride(&gPowerAttrAccess);
+    AttributeAccessInterfaceRegistry::Instance().Register(&gPowerAttrAccess);
 }
 
 void ApplicationShutdown() {}

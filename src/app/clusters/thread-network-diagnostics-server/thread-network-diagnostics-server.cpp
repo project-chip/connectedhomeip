@@ -204,6 +204,6 @@ bool emberAfThreadNetworkDiagnosticsClusterResetCountsCallback(app::CommandHandl
 
 void MatterThreadNetworkDiagnosticsPluginServerInitCallback()
 {
-    AttributeAccessInterfaceRegistry::Instance().RegisterAttributeAccessOverride(&gAttrAccess);
+    AttributeAccessInterfaceRegistry::Instance().Register(&gAttrAccess);
     GetDiagnosticDataProvider().SetThreadDiagnosticsDelegate(&gDiagnosticDelegate);
 }

@@ -244,5 +244,5 @@ CHIP_ERROR DescriptorAttrAccess::Read(const ConcreteReadAttributePath & aPath, A
 
 void MatterDescriptorPluginServerInitCallback()
 {
-    AttributeAccessInterfaceRegistry::Instance().RegisterAttributeAccessOverride(&gAttrAccess);
+    AttributeAccessInterfaceRegistry::Instance().Register(&gAttrAccess);
 }

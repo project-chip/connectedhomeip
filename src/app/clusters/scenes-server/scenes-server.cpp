@@ -340,8 +340,7 @@ CHIP_ERROR ScenesServer::Init()
     VerifyOrReturnError(!mIsInitialized, CHIP_ERROR_INCORRECT_STATE);
 
     ReturnErrorOnFailure(chip::app::CommandHandlerInterfaceRegistry::Instance().RegisterCommandHandler(this));
-    VerifyOrReturnError(AttributeAccessInterfaceRegistry::Instance().RegisterAttributeAccessOverride(this),
-                        CHIP_ERROR_INCORRECT_STATE);
+    VerifyOrReturnError(AttributeAccessInterfaceRegistry::Instance().Register(this), CHIP_ERROR_INCORRECT_STATE);
     mGroupProvider = Credentials::GetGroupDataProvider();
 
     SceneTable * sceneTable = scenes::GetSceneTableImpl();

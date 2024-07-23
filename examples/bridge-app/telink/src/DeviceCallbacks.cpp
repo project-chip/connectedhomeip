@@ -101,5 +101,5 @@ CHIP_ERROR ActionsAttrAccess::Read(const ConcreteReadAttributePath & aPath, Attr
 
 void MatterActionsPluginServerInitCallback(void)
 {
-    AttributeAccessInterfaceRegistry::Instance().RegisterAttributeAccessOverride(&gAttrAccess);
+    AttributeAccessInterfaceRegistry::Instance().Register(&gAttrAccess);
 }

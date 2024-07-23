@@ -221,5 +221,5 @@ void emberAfLocalizationConfigurationClusterServerInitCallback(EndpointId endpoi
 
 void MatterLocalizationConfigurationPluginServerInitCallback()
 {
-    AttributeAccessInterfaceRegistry::Instance().RegisterAttributeAccessOverride(&gAttrAccess);
+    AttributeAccessInterfaceRegistry::Instance().Register(&gAttrAccess);
 }

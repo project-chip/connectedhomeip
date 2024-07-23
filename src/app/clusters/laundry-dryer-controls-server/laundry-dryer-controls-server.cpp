@@ -149,7 +149,7 @@ CHIP_ERROR LaundryDryerControlsServer::ReadSupportedDrynessLevels(const Concrete
 void MatterLaundryDryerControlsPluginServerInitCallback()
 {
     LaundryDryerControlsServer & laundryDryerControlsServer = LaundryDryerControlsServer::Instance();
-    AttributeAccessInterfaceRegistry::Instance().RegisterAttributeAccessOverride(&laundryDryerControlsServer);
+    AttributeAccessInterfaceRegistry::Instance().Register(&laundryDryerControlsServer);
 }
 
 Status MatterLaundryDryerControlsClusterServerPreAttributeChangedCallback(const chip::app::ConcreteAttributePath & attributePath,

@@ -30,7 +30,7 @@
  * endpoint or for all endpoints.
  *
  * Instances of AttributeAccessInterface that are registered via
- * AttributeAccessInterfaceRegistry::Instance().RegisterAttributeAccessOverride will be consulted before taking the
+ * AttributeAccessInterfaceRegistry::Instance().Register will be consulted before taking the
  * normal attribute access codepath and can use that codepath as a fallback if desired.
  */
 namespace chip {

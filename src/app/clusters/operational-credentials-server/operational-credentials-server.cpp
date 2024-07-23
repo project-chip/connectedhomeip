@@ -396,7 +396,7 @@ OpCredsFabricTableDelegate gFabricDelegate;
 
 void MatterOperationalCredentialsPluginServerInitCallback()
 {
-    AttributeAccessInterfaceRegistry::Instance().RegisterAttributeAccessOverride(&gAttrAccess);
+    AttributeAccessInterfaceRegistry::Instance().Register(&gAttrAccess);
 
     Server::GetInstance().GetFabricTable().AddFabricDelegate(&gFabricDelegate);
 

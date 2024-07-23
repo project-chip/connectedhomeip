@@ -317,6 +317,6 @@ bool emberAfWiFiNetworkDiagnosticsClusterResetCountsCallback(app::CommandHandler
 
 void MatterWiFiNetworkDiagnosticsPluginServerInitCallback()
 {
-    AttributeAccessInterfaceRegistry::Instance().RegisterAttributeAccessOverride(&gAttrAccess);
+    AttributeAccessInterfaceRegistry::Instance().Register(&gAttrAccess);
     GetDiagnosticDataProvider().SetWiFiDiagnosticsDelegate(&gDiagnosticDelegate);
 }

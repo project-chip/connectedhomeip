@@ -105,14 +105,14 @@ AttributeAccessInterface * AttributeAccessInterfaceRegistry::Get(EndpointId endp
     return nullptr;
 }
 
-void AttributeAccessInterfaceRegistry::UnregisterAttributeAccessOverride(AttributeAccessInterface * attrOverride)
+void AttributeAccessInterfaceRegistry::Unregister(AttributeAccessInterface * attrOverride)
 {
     mAttributeAccessInterfaceCache.Invalidate();
     UnregisterMatchingAttributeAccessInterfaces([attrOverride](AttributeAccessInterface * entry) { return entry == attrOverride; },
                                                 mAttributeAccessOverrides);
 }
 
-bool AttributeAccessInterfaceRegistry::RegisterAttributeAccessOverride(AttributeAccessInterface * attrOverride)
+bool AttributeAccessInterfaceRegistry::Register(AttributeAccessInterface * attrOverride)
 {
     mAttributeAccessInterfaceCache.Invalidate();
     for (auto * cur = mAttributeAccessOverrides; cur; cur = cur->GetNext())

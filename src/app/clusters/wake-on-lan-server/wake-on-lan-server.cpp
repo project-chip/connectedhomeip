@@ -142,5 +142,5 @@ CHIP_ERROR WakeOnLanAttrAccess::ReadMacAddressAttribute(app::AttributeValueEncod
 
 void MatterWakeOnLanPluginServerInitCallback()
 {
-    app::AttributeAccessInterfaceRegistry::Instance().RegisterAttributeAccessOverride(&gWakeOnLanAttrAccess);
+    app::AttributeAccessInterfaceRegistry::Instance().Register(&gWakeOnLanAttrAccess);
 }

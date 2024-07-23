@@ -36,13 +36,13 @@ public:
      *               conflict with.  In this case the override is not registered.
      * @return true if registration was successful.
      */
-    bool RegisterAttributeAccessOverride(chip::app::AttributeAccessInterface * attrOverride);
+    bool Register(chip::app::AttributeAccessInterface * attrOverride);
 
     /**
      * Unregister an attribute access override (for example if the object
      * implementing AttributeAccessInterface is being destroyed).
      */
-    void UnregisterAttributeAccessOverride(chip::app::AttributeAccessInterface * attrOverride);
+    void Unregister(chip::app::AttributeAccessInterface * attrOverride);
 
     /**
      * Unregister all attribute access interfaces that match this given endpoint.
