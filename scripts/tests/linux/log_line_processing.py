@@ -30,7 +30,7 @@ class ProcessOutputCapture:
         the process stdout)
       - provides read timeouts for incoming data
 
-    Use as part of a resource mangement block like:
+    Use as part of a resource management block like:
 
     with ProcessOutputCapture("test.sh", "logs.txt") as p:
        p.send_to_program("input\n")
@@ -73,8 +73,7 @@ class ProcessOutputCapture:
                 changes = err_wait.poll(0)
                 if changes:
                     err_line = self.process.stderr.readline()
-                    if err_line:
-                        f.write(f"!!STDERR!! : {err_line}")
+                    f.write(f"!!STDERR!! : {err_line}")
 
     def __enter__(self):
         self.done = False
@@ -107,13 +106,16 @@ class ProcessOutputCapture:
             logging.error(f"-------- END:   LOG DUMP FOR {self.command!r} -----")
 
     def next_output_line(self, timeout_sec=None):
-        """Fetch an item from the output queue, potentially wit h a timeout."""
-        return self.output_lines.get(timeout=timeout_sec)
+        """Fetch an item from the output queue, potentially with a timeout."""
+        try:
+            return self.output_lines.get(timeout=timeout_sec)
+        except queue.Empty:
+            return None
 
-    def send_to_program(self, what):
-        """Sends the given string to the program.
+    def send_to_program(self, input_cmd):
+        """Sends the given input command string to the program.
 
         NOTE: remember to append a `\n` for terminal applications
         """
-        self.process.stdin.write(what)
+        self.process.stdin.write(input_cmd)
         self.process.stdin.flush()
