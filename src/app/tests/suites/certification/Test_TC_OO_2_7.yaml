@@ -123,26 +123,23 @@ tests:
                 value: []
 
     - label: "Step 2a: TH sends Off command to DUT"
-      PICS: "!LVL.S.C04.Rsp"
       cluster: "On/Off"
       command: "Off"
 
-    - label:
-          "Step 2a: TH sends a MoveToLevelWithOnOff command to DUT, with Level
-          =0 and TransitionTime =0 (immediate)"
-      PICS: LVL.S.C04.Rsp
-      cluster: "Level Control"
-      command: "MoveToLevelWithOnOff"
+    - label: "Wait 1000ms"
+      cluster: "DelayCommands"
+      command: "WaitForMs"
       arguments:
           values:
-              - name: "Level"
-                value: 0
-              - name: "TransitionTime"
-                value: 0
-              - name: "OptionsMask"
-                value: 0
-              - name: "OptionsOverride"
-                value: 0
+              - name: "ms"
+                value: 1000
+
+    - label: "Step 2b: after a few seconds, TH reads OnOff attribute from DUT"
+      cluster: "On/Off"
+      command: "readAttribute"
+      attribute: "OnOff"
+      response:
+          value: 0
 
     - label:
           "Step 2b: TH sends a StoreScene command to DUT with the GroupID field
@@ -169,49 +166,6 @@ tests:
           AttributeValueList: [{ AttributeID: 0x0000, ValueUnsigned8: 0x01 }]}]'
           "
       command: "AddScene"
-      ## The default handlers for level control and on/off assume that if both clusters are in the same endpoint,
-      ## the level control cluster will use the onoff with level command and thus onoff will be turned on.
-      PICS: LVL.S.C04.Rsp
-      arguments:
-          values:
-              - name: "GroupID"
-                value: G1
-              - name: "SceneID"
-                value: 0x02
-              - name: "TransitionTime"
-                value: 1000
-              - name: "SceneName"
-                value: "Scene1"
-              - name: "ExtensionFieldSets"
-                value:
-                    [
-                        {
-                            ClusterID: 0x0006,
-                            AttributeValueList:
-                                [{ AttributeID: 0x0000, ValueUnsigned8: 0x01 }],
-                        },
-                        {
-                            ClusterID: 0x0008,
-                            AttributeValueList:
-                                [{ AttributeID: 0x0000, ValueUnsigned8: 0xFE }],
-                        },
-                    ]
-      response:
-          values:
-              - name: "Status"
-                value: 0x00
-              - name: "GroupID"
-                value: G1
-              - name: "SceneID"
-                value: 0x02
-
-    - label: "Step 3: TH sends a AddScene command to DUT with the GroupID field
-          set to G1, the SceneID field set to 0x02, the TransitionTime field set
-          to 1000 (1s) and the ExtensionFieldSets set to: '[{ ClusterID: 0x0006,
-          AttributeValueList: [{ AttributeID: 0x0000, ValueUnsigned8: 0x01 }]}]'
-          "
-      command: "AddScene"
-      PICS: "!LVL.S.C04.Rsp"
       arguments:
           values:
               - name: "GroupID"
@@ -239,28 +193,9 @@ tests:
                 value: G1
               - name: "SceneID"
                 value: 0x02
-
-    - label: "Step 4a: TH sends Off command to DUT"
-      cluster: "On/Off"
-      command: "Off"
-
-    - label: "Wait 1000ms"
-      cluster: "DelayCommands"
-      command: "WaitForMs"
-      arguments:
-          values:
-              - name: "ms"
-                value: 1000
-
-    - label: "Step 4b: after a few seconds, TH reads OnOff attribute from DUT"
-      cluster: "On/Off"
-      command: "readAttribute"
-      attribute: "OnOff"
-      response:
-          value: 0
 
     - label:
-          "Step 5a: TH sends a RecallScene command to DUT with the GroupID field
+          "Step 4a: TH sends a RecallScene command to DUT with the GroupID field
           set to G1 and the SceneID field set to 0x02."
       PICS: S.S.C05.Rsp
       command: "RecallScene"
@@ -279,7 +214,7 @@ tests:
               - name: "ms"
                 value: 2000
 
-    - label: "Step 5b: after a few seconds, TH reads OnOff attribute from DUT"
+    - label: "Step 4b: after a few seconds, TH reads OnOff attribute from DUT"
       cluster: "On/Off"
       command: "readAttribute"
       attribute: "OnOff"
@@ -287,7 +222,7 @@ tests:
           value: 1
 
     - label:
-          "Step 6a: TH sends a RecallScene command to DUT with the GroupID field
+          "Step 5a: TH sends a RecallScene command to DUT with the GroupID field
           set to G1 and the SceneID field set to 0x01."
       PICS: S.S.C05.Rsp
       command: "RecallScene"
@@ -306,7 +241,7 @@ tests:
               - name: "ms"
                 value: 1000
 
-    - label: "Step 6b: after a few seconds, TH reads OnOff attribute from DUT"
+    - label: "Step 5b: after a few seconds, TH reads OnOff attribute from DUT"
       cluster: "On/Off"
       command: "readAttribute"
       attribute: "OnOff"

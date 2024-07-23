@@ -256,12 +256,9 @@ public:
 
         if (!NumericAttributeTraits<uint8_t>::IsNullValue(level))
         {
-            CommandId command = LevelControlHasFeature(endpoint, LevelControl::Feature::kOnOff) ? Commands::MoveToLevelWithOnOff::Id
-                                                                                                : Commands::MoveToLevel::Id;
-
-            moveToLevelHandler(endpoint, command, level, DataModel::MakeNullable(static_cast<uint16_t>(timeMs / 100)),
-                               chip::Optional<BitMask<OptionsBitmap>>(), chip::Optional<BitMask<OptionsBitmap>>(),
-                               INVALID_STORED_LEVEL);
+            moveToLevelHandler(
+                endpoint, Commands::MoveToLevel::Id, level, DataModel::MakeNullable(static_cast<uint16_t>(timeMs / 100)),
+                chip::Optional<BitMask<OptionsBitmap>>(), chip::Optional<BitMask<OptionsBitmap>>(), INVALID_STORED_LEVEL);
         }
 
         return CHIP_NO_ERROR;
