@@ -22,7 +22,7 @@ import subprocess
 import sys
 import tempfile
 import time
-from typing import List, TextIO, Tuple, Optional
+from typing import List, Optional
 from dataclasses import dataclass
 
 import click
@@ -41,8 +41,8 @@ a deterministic order. If these lines are not found, it indicates an issue with 
 
 @dataclass
 class RunningProcesses:
-    tv_casting: ProcessOutputCapture
-    tv_app: ProcessOutputCapture
+    tv_casting: ProcessOutputCapture = None
+    tv_app: ProcessOutputCapture = None
 
 
 # Configure logging format.
@@ -81,20 +81,19 @@ def remove_cached_files(cached_file_pattern: str):
             raise  # Re-raise the OSError to propagate it up.
 
 
-def stop_app(
-    test_sequence_name: str, app_name: str, app: subprocess.ProcessOutputCapture
-):
+def stop_app(test_sequence_name: str, app_name: str, app: ProcessOutputCapture):
     """Stop the given `app` subprocess."""
 
-    app.terminate()
-    app_exit_code = app.wait()
+    app.process.terminate()
+    app_exit_code = app.process.wait()
 
-    if app.poll() is None:
+    if app.process.poll() is None:
         raise TestStepException(
             f"{test_sequence_name}: Failed to stop running {app_name}. Process is still running.",
             test_sequence_name,
             None,
         )
+
     if app_exit_code >= 0:
         raise TestStepException(
             f"{test_sequence_name}: {app_name} exited with unexpected exit code {app_exit_code}.",
@@ -139,19 +138,16 @@ def parse_output_msg_in_subprocess(
     current_index = 0
     while current_index < len(test_sequence_step.output_msg):
         # Check if we exceeded the maximum wait time to parse for the output string(s).
-        if time.time() - start_wait_time > test_sequence_step.timeout_sec:
+        max_wait_time = start_wait_time + test_sequence_step.timeout_sec - time.time()
+        if max_wait_time < 0:
             raise TestStepException(
                 f"{test_sequence_name} - Did not find the expected output string(s) in the {test_sequence_step.app.value} subprocess within the timeout: {test_sequence_step.output_msg}",
                 test_sequence_name,
                 test_sequence_step,
             )
-
-        output_line = app_subprocess.stdout.readline()
+        output_line = app_subprocess.next_output_line(max_wait_time)
 
         if output_line:
-            app_log_file.write(output_line)
-            app_log_file.flush()
-
             if test_sequence_step.output_msg[current_index] in output_line:
                 msg_block.append(output_line.rstrip("\n"))
                 current_index += 1
@@ -183,8 +179,7 @@ def parse_output_msg_in_subprocess(
 
 
 def send_input_cmd_to_subprocess(
-    tv_casting_app_info: Tuple[subprocess.Popen, TextIO],
-    tv_app_info: Tuple[subprocess.Popen, TextIO],
+    processes: RunningProcesses,
     test_sequence_name: str,
     test_sequence_step: Step,
 ):
@@ -197,16 +192,16 @@ def send_input_cmd_to_subprocess(
             test_sequence_step,
         )
 
-    app_subprocess, app_log_file = (
-        tv_casting_app_info
+    app_subprocess = (
+        processes.tv_casting
         if test_sequence_step.app == App.TV_CASTING_APP
-        else tv_app_info
+        else processes.tv_app
     )
     app_name = test_sequence_step.app.value
 
     input_cmd = test_sequence_step.input_cmd
-    app_subprocess.stdin.write(input_cmd)
-    app_subprocess.stdin.flush()
+    app_subprocess.process.stdin.write(input_cmd)
+    app_subprocess.process.stdin.flush()
 
     input_cmd = input_cmd.rstrip("\n")
     logging.info(
@@ -214,54 +209,31 @@ def send_input_cmd_to_subprocess(
     )
 
 
-def handle_output_msg(
-    processes: RunningProcesses, test_sequence_name: str, test_sequence_step: Step
-):
-    """Handle the output message (`output_msg`) from a test sequence step."""
-
-    if not parse_output_msg_in_subprocess(
-        processes, test_sequence_name, test_sequence_step
-    ):
-        raise TestStepException(
-            "Failed to parse output message", test_sequence_name, test_sequence_step
-        )
-
-
 def handle_input_cmd(
     processes: RunningProcesses, test_sequence_name: str, test_sequence_step: Step
 ):
     """Handle the input command (`input_cmd`) from a test sequence step."""
-
-    tv_casting_app_process, tv_casting_app_log_file = tv_casting_app_info
-
     if test_sequence_step.input_cmd == STOP_APP:
         if test_sequence_step.app == App.TV_CASTING_APP:
-            # Stop the tv-casting-app subprocess.
             stop_app(
-                test_sequence_name, test_sequence_step.app.value, tv_casting_app_process
+                test_sequence_name, test_sequence_step.app.value, processes.tv_casting
             )
         elif test_sequence_step.app == App.TV_APP:
-            # Stop the tv-app subprocess.
-            stop_app(test_sequence_name, test_sequence_step.app.value, tv_app_process)
+            stop_app(test_sequence_name, test_sequence_step.app.value, processes.tv_app)
         else:
             raise TestStepException(
                 "Unknown stop app", test_sequence_name, test_sequence_step
             )
-
         return
 
-    send_input_cmd_to_subprocess(
-        tv_casting_app_info, tv_app_info, test_sequence_name, test_sequence_step
-    )
+    send_input_cmd_to_subprocess(processes, test_sequence_name, test_sequence_step)
 
 
 def run_test_sequence_steps(
     current_index: int,
     test_sequence_name: str,
     test_sequence_steps: List[Step],
-    tv_casting_app_info: Tuple[subprocess.Popen, TextIO],
-    tv_app_info: Tuple[subprocess.Popen, TextIO],
-    log_paths: List[str],
+    processes: RunningProcesses,
 ):
     """Run through the test steps from a test sequence starting from the current index and perform actions based on the presence of `output_msg` or `input_cmd`."""
 
@@ -274,18 +246,14 @@ def run_test_sequence_steps(
 
         # A test sequence step contains either an output_msg or input_cmd entry.
         if test_sequence_step.output_msg:
-            handle_output_msg(
-                tv_casting_app_info,
-                tv_app_info,
-                log_paths,
+            parse_output_msg_in_subprocess(
+                processes,
                 test_sequence_name,
                 test_sequence_step,
             )
         elif test_sequence_step.input_cmd:
             handle_input_cmd(
-                tv_casting_app_info,
-                tv_app_info,
-                log_paths,
+                processes,
                 test_sequence_name,
                 test_sequence_step,
             )
@@ -397,12 +365,9 @@ def test_casting_fn(
         with ProcessOutputCapture(
             cmd_execute_list(tv_app_abs_path), linux_tv_app_log_path
         ) as tv_app_process:
-
             # Verify that the tv-app is up and running.
-            handle_output_msg(
-                None,
-                tv_app_process,
-                [linux_tv_app_log_path],
+            parse_output_msg_in_subprocess(
+                RunningProcesses(tv_app=tv_app_process),
                 test_sequence_name,
                 test_sequence_steps[current_index],
             )
@@ -425,11 +390,13 @@ def test_casting_fn(
             ) as tv_casting_app_process:
                 log_paths = [linux_tv_app_log_path, linux_tv_casting_app_log_path]
 
+                processes = RunningProcesses(
+                    tv_casting=tv_casting_app_process, tv_app=tv_app_process
+                )
+
                 # Verify that the server initialization is completed in the tv-casting-app output.
-                handle_output_msg(
-                    tv_casting_app_process,
-                    tv_app_info,
-                    log_paths,
+                parse_output_msg_in_subprocess(
+                    processes,
                     test_sequence_name,
                     test_sequence_steps[current_index],
                 )
@@ -439,9 +406,7 @@ def test_casting_fn(
                     current_index,
                     test_sequence_name,
                     test_sequence_steps,
-                    tv_casting_app_info,
-                    tv_app_info,
-                    log_paths,
+                    processes,
                 )
 
 
