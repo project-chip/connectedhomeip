@@ -26,15 +26,21 @@ namespace Clusters {
 namespace EcosystemInformation {
 namespace {
 
+constexpr size_t kDeviceNameMaxSize = 64;
+constexpr size_t kUniqueLocationIdMaxSize = 64;
+constexpr size_t kUniqueLocationIdsListMaxSize = 64;
+constexpr size_t kHomeLocationNameMaxSize = 128;
+
+constexpr size_t kDeviceDirectoryMaxSize = 256;
+constexpr size_t kLocationDirectoryMaxSize = 64;
+
 class AttrAccess : public AttributeAccessInterface
 {
 public:
-    // Register for the Test Cluster cluster on all endpoints.
+    // Register for the EcosystemInformationCluster on all endpoints.
     AttrAccess() : AttributeAccessInterface(Optional<EndpointId>::Missing(), Clusters::EcosystemInformation::Id) {}
 
     CHIP_ERROR Read(const ConcreteReadAttributePath & aPath, AttributeValueEncoder & aEncoder) override;
-
-private:
 };
 
 CHIP_ERROR AttrAccess::Read(const ConcreteReadAttributePath & aPath, AttributeValueEncoder & aEncoder)
@@ -59,7 +65,6 @@ Structs::HomeLocationStruct::Type GetEncodableHomeLocationStruct(const HomeLocat
     Structs::HomeLocationStruct::Type homeLocationStruct;
     // This would imply data is either not properly validated before being
     // stored here or corruption has occurred.
-    // If VerifyOrDie is too harse we can return optional
     VerifyOrDie(!aHomeLocation.mLocationName.empty());
     homeLocationStruct.locationName = CharSpan(aHomeLocation.mLocationName.c_str(), aHomeLocation.mLocationName.size());
 
@@ -88,7 +93,7 @@ Structs::HomeLocationStruct::Type GetEncodableHomeLocationStruct(const HomeLocat
 EcosystemDeviceStruct::Builder & EcosystemDeviceStruct::Builder::SetDeviceName(std::string aDeviceName,
                                                                                uint64_t aDeviceNameLastEditEpochUs)
 {
-    VerifyOrDie(!mIsBuilt);
+    VerifyOrDie(!mIsAlreadyBuilt);
     mDeviceName                = std::move(aDeviceName);
     mDeviceNameLastEditEpochUs = aDeviceNameLastEditEpochUs;
     return *this;
@@ -96,21 +101,21 @@ EcosystemDeviceStruct::Builder & EcosystemDeviceStruct::Builder::SetDeviceName(s
 
 EcosystemDeviceStruct::Builder & EcosystemDeviceStruct::Builder::SetBrigedEndpoint(EndpointId aBridgedEndpoint)
 {
-    VerifyOrDie(!mIsBuilt);
+    VerifyOrDie(!mIsAlreadyBuilt);
     mBridgedEndpoint = aBridgedEndpoint;
     return *this;
 }
 
 EcosystemDeviceStruct::Builder & EcosystemDeviceStruct::Builder::SetOriginalEndpoint(EndpointId aOriginalEndpoint)
 {
-    VerifyOrDie(!mIsBuilt);
+    VerifyOrDie(!mIsAlreadyBuilt);
     mOriginalEndpoint = aOriginalEndpoint;
     return *this;
 }
 
 EcosystemDeviceStruct::Builder & EcosystemDeviceStruct::Builder::AddDeviceType(Structs::DeviceTypeStruct::Type aDeviceType)
 {
-    VerifyOrDie(!mIsBuilt);
+    VerifyOrDie(!mIsAlreadyBuilt);
     mDeviceTypes.push_back(std::move(aDeviceType));
     return *this;
 }
@@ -118,7 +123,7 @@ EcosystemDeviceStruct::Builder & EcosystemDeviceStruct::Builder::AddDeviceType(S
 EcosystemDeviceStruct::Builder & EcosystemDeviceStruct::Builder::AddUniqueLocationId(std::string aUniqueLocationId,
                                                                                      uint64_t aUniqueLocationIdsLastEditEpochUs)
 {
-    VerifyOrDie(!mIsBuilt);
+    VerifyOrDie(!mIsAlreadyBuilt);
     mUniqueLocationIds.push_back(std::move(aUniqueLocationId));
     mUniqueLocationIdsLastEditEpochUs = aUniqueLocationIdsLastEditEpochUs;
     return *this;
@@ -126,23 +131,29 @@ EcosystemDeviceStruct::Builder & EcosystemDeviceStruct::Builder::AddUniqueLocati
 
 std::unique_ptr<EcosystemDeviceStruct> EcosystemDeviceStruct::Builder::Build()
 {
-    if (mIsBuilt || mDeviceName.empty() || mOriginalEndpoint == kInvalidEndpointId || mDeviceTypes.empty() ||
-        mUniqueLocationIds.size() >= 64)
+    bool deviceNameIsInvalid = mDeviceName.size() > kDeviceNameMaxSize;
+    bool originalEndpointIsInvalid = mOriginalEndpoint == kInvalidEndpointId;
+    bool deviceTypesListIsInvalid = mDeviceTypes.empty();
+    bool uniqueLocationIdsListIsInvalid = mUniqueLocationIds.size() > kUniqueLocationIdsListMaxSize;
+    if (mIsAlreadyBuilt || deviceNameIsInvalid || originalEndpointIsInvalid ||
+        deviceTypesListIsInvalid || uniqueLocationIdsListIsInvalid)
     {
         return nullptr;
     }
+
     for (auto & locationId : mUniqueLocationIds)
     {
-        if (locationId.size() >= 64)
+        if (locationId.size() > kUniqueLocationIdMaxSize)
         {
             return nullptr;
         }
     }
+
     // std::make_unique does not have access to private constructor we workaround with using new
     std::unique_ptr<EcosystemDeviceStruct> ret{ new EcosystemDeviceStruct(
         std::move(mDeviceName), mDeviceNameLastEditEpochUs, mBridgedEndpoint, mOriginalEndpoint, std::move(mDeviceTypes),
         std::move(mUniqueLocationIds), mUniqueLocationIdsLastEditEpochUs) };
-    mIsBuilt = true;
+    mIsAlreadyBuilt = true;
     return ret;
 }
 
@@ -169,44 +180,45 @@ CHIP_ERROR EcosystemDeviceStruct::Encode(const AttributeValueEncoder::ListEncode
 
     deviceStruct.uniqueLocationIDsLastEdit = mUniqueLocationIdsLastEditEpochUs;
 
-    // TODO(#33223) this is a hack, use mFabricIndex when it exists.
-    // Additionally check at top should prevent doing all this work if we know
-    // it won't be encoded due to fabric scoping.
+    // TODO(#33223) this is a hack, use mFabricIndex when it exists. Additionally check fabric
+    // index matches should happen at the top of this method to prevent building the encodable
+    // device struct when we know it is not intended for the accessing fabric.
     deviceStruct.SetFabricIndex(aFabricIndex);
     return aEncoder.Encode(deviceStruct);
 }
 
 EcosystemLocationStruct::Builder & EcosystemLocationStruct::Builder::SetLocationName(std::string aLocationName)
 {
-    VerifyOrDie(!mIsBuilt);
+    VerifyOrDie(!mIsAlreadyBuilt);
     mHomeLocation.mLocationName = std::move(aLocationName);
     return *this;
 }
 
 EcosystemLocationStruct::Builder & EcosystemLocationStruct::Builder::SetFloorNumber(std::optional<int16_t> aFloorNumber)
 {
-    VerifyOrDie(!mIsBuilt);
+    VerifyOrDie(!mIsAlreadyBuilt);
     mHomeLocation.mFloorNumber = aFloorNumber;
     return *this;
 }
 
 EcosystemLocationStruct::Builder & EcosystemLocationStruct::Builder::SetAreaTypeTag(std::optional<AreaTypeTag> aAreaTypeTag)
 {
-    VerifyOrDie(!mIsBuilt);
+    VerifyOrDie(!mIsAlreadyBuilt);
     mHomeLocation.mAreaType = aAreaTypeTag;
     return *this;
 }
 
 EcosystemLocationStruct::Builder & EcosystemLocationStruct::Builder::SetHomeLocationLastEdit(uint64_t aHomeLocationLastEditEpochUs)
 {
-    VerifyOrDie(!mIsBuilt);
+    VerifyOrDie(!mIsAlreadyBuilt);
     mHomeLocationLastEditEpochUs = aHomeLocationLastEditEpochUs;
     return *this;
 }
 
 std::unique_ptr<EcosystemLocationStruct> EcosystemLocationStruct::Builder::Build()
 {
-    if (mIsBuilt || mHomeLocation.mLocationName.empty() || mHomeLocation.mLocationName.size() >= 128)
+    bool HomeLocationNameIsInvalid = mHomeLocation.mLocationName.empty() || mHomeLocation.mLocationName.size() > kHomeLocationNameMaxSize;
+    if (mIsAlreadyBuilt || HomeLocationNameIsInvalid)
     {
         return nullptr;
     }
@@ -214,7 +226,7 @@ std::unique_ptr<EcosystemLocationStruct> EcosystemLocationStruct::Builder::Build
     // std::make_unique does not have access to private constructor we workaround with using new
     std::unique_ptr<EcosystemLocationStruct> ret{ new EcosystemLocationStruct(std::move(mHomeLocation),
                                                                               mHomeLocationLastEditEpochUs) };
-    mIsBuilt = true;
+    mIsAlreadyBuilt = true;
     return ret;
 }
 
@@ -227,9 +239,9 @@ CHIP_ERROR EcosystemLocationStruct::Encode(const AttributeValueEncoder::ListEnco
     locationStruct.homeLocation         = GetEncodableHomeLocationStruct(mHomeLocation);
     locationStruct.homeLocationLastEdit = mHomeLocationLastEditEpochUs;
 
-    // TODO(#33223) this is a hack, use mFabricIndex when it exists.
-    // Additionally check at top should prevent doing all this work if we know
-    // it won't be encoded due to fabric scoping.
+    // TODO(#33223) this is a hack, use mFabricIndex when it exists. Additionally check fabric
+    // index matches should happen at the top of this method to prevent building the encodable
+    // device struct when we know it is not intended for the accessing fabric.
     locationStruct.SetFabricIndex(aFabricIndex);
     return aEncoder.Encode(locationStruct);
 }
@@ -250,6 +262,8 @@ CHIP_ERROR EcosystemInformationServer::AddDeviceInfo(EndpointId aEndpoint, uint6
     auto & deviceInfo = mDevicesMap[aEndpoint];
     VerifyOrReturnError((deviceInfo.mDeviceDirectory.find(aUniqueId) == deviceInfo.mDeviceDirectory.end()),
                         CHIP_ERROR_INVALID_ARGUMENT);
+    VerifyOrReturnError((deviceInfo.mDeviceDirectory.size() >= kDeviceDirectoryMaxSize),
+                        CHIP_ERROR_NO_MEMORY);
     deviceInfo.mDeviceDirectory[aUniqueId] = std::move(aDevice);
     return CHIP_NO_ERROR;
 }
@@ -263,6 +277,8 @@ CHIP_ERROR EcosystemInformationServer::AddLocationInfo(EndpointId aEndpoint, con
     auto & deviceInfo = mDevicesMap[aEndpoint];
     VerifyOrReturnError((deviceInfo.mLocationDirectory.find(aLocationId) == deviceInfo.mLocationDirectory.end()),
                         CHIP_ERROR_INVALID_ARGUMENT);
+    VerifyOrReturnError((deviceInfo.mLocationDirectory.size() >= kLocationDirectoryMaxSize),
+                        CHIP_ERROR_NO_MEMORY);
     deviceInfo.mLocationDirectory[aLocationId] = std::move(aLocation);
     return CHIP_NO_ERROR;
 }
