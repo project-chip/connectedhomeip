@@ -93,10 +93,6 @@ using namespace chip::Encoding;
 #if CHIP_DEVICE_CONFIG_ENABLE_COMMISSIONER_DISCOVERY
 using namespace chip::Protocols::UserDirectedCommissioning;
 #endif // CHIP_DEVICE_CONFIG_ENABLE_COMMISSIONER_DISCOVERY
-#if CHIP_DEVICE_CONFIG_ENABLE_WIFIPAF
-static std::shared_ptr<DeviceCommissioner> DevCommPtr;
-void custom_del(DeviceCommissioner * p){};
-#endif
 
 DeviceController::DeviceController()
 {
@@ -473,6 +469,13 @@ DeviceCommissioner::DeviceCommissioner() :
     mDeviceNOCChainCallback(OnDeviceNOCChainGeneration, this), mSetUpCodePairer(this)
 {}
 
+DeviceCommissioner::~DeviceCommissioner()
+{
+#if CHIP_DEVICE_CONFIG_ENABLE_WIFIPAF
+    SetChkObjValid((void *)this, ObjChkAction::Clear, nullptr);
+#endif
+}
+
 CHIP_ERROR DeviceCommissioner::Init(CommissionerInitParams params)
 {
     VerifyOrReturnError(params.operationalCredentialsDelegate != nullptr, CHIP_ERROR_INVALID_ARGUMENT);
@@ -829,9 +832,9 @@ CHIP_ERROR DeviceCommissioner::EstablishPASEConnection(NodeId remoteDeviceId, Re
                 ChipLogError(Controller, "Wi-Fi Management should have be started now.");
                 ExitNow(CHIP_ERROR_INTERNAL);
             }
-            DevCommPtr.reset(this, custom_del);
             mRendezvousParametersForDeviceDiscoveredOverWiFiPAF = params;
-            DeviceLayer::ConnectivityMgr().WiFiPAFConnect(params.GetSetupDiscriminator().value(), (void *) (&(DevCommPtr)),
+            SetChkObjValid((void*)this, ObjChkAction::Set, nullptr);
+            DeviceLayer::ConnectivityMgr().WiFiPAFConnect(params.GetSetupDiscriminator().value(), (void *) this,
                                                           OnWiFiPAFSubscribeComplete, OnWiFiPAFSubscribeError);
             ExitNow(CHIP_NO_ERROR);
         }
@@ -905,19 +908,66 @@ void DeviceCommissioner::OnDiscoveredDeviceOverBleError(void * appState, CHIP_ER
 #endif // CONFIG_NETWORK_LAYER_BLE
 
 #if CHIP_DEVICE_CONFIG_ENABLE_WIFIPAF
+void DeviceCommissioner::SetChkObjValid(void * appObj, ObjChkAction action, bool* pIsObjValid)
+{
+    static std::vector<void*> ObjVector;
+    bool IsObjValid = false;
+
+    switch (action) {
+        case ObjChkAction::Set: {
+            for (auto lt=ObjVector.begin(); lt!=ObjVector.end(); lt++)
+            {
+                if (*lt == appObj) {
+                    IsObjValid = true;
+                    break;
+                }
+            }
+            if (IsObjValid == false) {
+                ObjVector.push_back(appObj);
+                IsObjValid = true;
+            }
+        }
+            break;
+        case ObjChkAction::Check: {
+            for (auto lt=ObjVector.begin(); lt!=ObjVector.end(); lt++)
+            {
+                if (*lt == appObj) {
+                    IsObjValid = true;
+                    break;
+                }
+            }
+        }
+            break;
+        case ObjChkAction::Clear: {
+            for (auto lt=ObjVector.begin(); lt!=ObjVector.end(); lt++)
+            {
+                if (*lt == appObj) {
+                    // Already existed in the list => Remove it
+                    ObjVector.erase(lt);
+                    break;
+                }
+            }
+        }
+            break;
+    }
+    if (pIsObjValid != nullptr) {
+        *pIsObjValid = IsObjValid;
+    }
+    return;
+}
+
 void DeviceCommissioner::OnWiFiPAFSubscribeComplete(void * appState)
 {
-    std::weak_ptr<DeviceCommissioner> * caller     = (std::weak_ptr<DeviceCommissioner> *) (appState);
-    std::shared_ptr<DeviceCommissioner> selfShrPtr = caller->lock();
-    if (!selfShrPtr)
-    {
-        ChipLogError(Controller, "DeviceCommissioner was destroyed unexpectedly!");
+    bool isObjValid;
+    SetChkObjValid(appState, ObjChkAction::Check, &isObjValid);
+    if (isObjValid == false) {
+        // The caller has been released.
+        ChipLogError(Controller, "DeviceCommissioner has been destroyed!");
         return;
     }
-    auto self   = selfShrPtr.get();
+    auto self   = (DeviceCommissioner*) appState;
     auto device = self->mDeviceInPASEEstablishment;
 
-    selfShrPtr.reset();
     if (nullptr != device && device->GetDeviceTransportType() == Transport::Type::kWiFiPAF)
     {
         ChipLogProgress(Controller, "WiFi-PAF: Subscription Completed, dev_id = %lu", device->GetDeviceId());
@@ -932,17 +982,16 @@ void DeviceCommissioner::OnWiFiPAFSubscribeComplete(void * appState)
 
 void DeviceCommissioner::OnWiFiPAFSubscribeError(void * appState, CHIP_ERROR err)
 {
-    std::weak_ptr<DeviceCommissioner> * caller     = (std::weak_ptr<DeviceCommissioner> *) (appState);
-    std::shared_ptr<DeviceCommissioner> selfShrPtr = caller->lock();
-    if (!selfShrPtr)
-    {
-        ChipLogError(Controller, "Err: DeviceCommissioner was destroyed unexpectedly!");
+    bool isObjValid;
+    SetChkObjValid(appState, ObjChkAction::Check, &isObjValid);
+    if (isObjValid == false) {
+        // The caller has been released.
+        ChipLogError(Controller, "DeviceCommissioner has been destroyed!");
         return;
     }
-    auto self   = static_cast<DeviceCommissioner *>(appState);
+    auto self   = (DeviceCommissioner*) appState;
     auto device = self->mDeviceInPASEEstablishment;
 
-    selfShrPtr.reset();
     if (nullptr != device && device->GetDeviceTransportType() == Transport::Type::kWiFiPAF)
     {
         ChipLogError(Controller, "WiFi-PAF: Subscription Error, id = %lu, err = %" CHIP_ERROR_FORMAT, device->GetDeviceId(),

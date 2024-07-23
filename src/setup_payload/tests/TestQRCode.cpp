@@ -74,14 +74,15 @@ TEST(TestQRCode, TestRendezvousFlags)
 
     inPayload.rendezvousInformation.SetValue(RendezvousInformationFlags(
         RendezvousInformationFlag::kWiFiPAF, RendezvousInformationFlag::kSoftAP, RendezvousInformationFlag::kOnNetwork));
+    EXPECT_TRUE(CheckWriteRead(inPayload));
 
     inPayload.rendezvousInformation.SetValue(RendezvousInformationFlags(
         RendezvousInformationFlag::kWiFiPAF, RendezvousInformationFlag::kBLE, RendezvousInformationFlag::kOnNetwork));
+    EXPECT_TRUE(CheckWriteRead(inPayload));
 
     inPayload.rendezvousInformation.SetValue(
         RendezvousInformationFlags(RendezvousInformationFlag::kWiFiPAF, RendezvousInformationFlag::kBLE,
                                    RendezvousInformationFlag::kSoftAP, RendezvousInformationFlag::kOnNetwork));
-
     EXPECT_TRUE(CheckWriteRead(inPayload));
 }
 

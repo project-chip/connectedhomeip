@@ -77,7 +77,7 @@ class DLL_EXPORT SetUpCodePairer : public DevicePairingDelegate
 {
 public:
     SetUpCodePairer(DeviceCommissioner * commissioner) : mCommissioner(commissioner) {}
-    virtual ~SetUpCodePairer() {}
+    ~SetUpCodePairer();
 
     CHIP_ERROR PairDevice(chip::NodeId remoteId, const char * setUpCode,
                           SetupCodePairerBehaviour connectionType              = SetupCodePairerBehaviour::kCommission,

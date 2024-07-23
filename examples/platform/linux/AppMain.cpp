@@ -483,7 +483,7 @@ int ChipLinuxAppInit(int argc, char * const argv[], OptionSet * customOptions,
             ChipLogProgress(NotSpecified, "Wi-Fi Management started");
             DeviceLayer::ConnectivityManager::WiFiPAFAdvertiseParam args;
             args.enable  = LinuxDeviceOptions::GetInstance().mWiFiPAF;
-            args.ExtCmds = LinuxDeviceOptions::GetInstance().mWiFiPafExtCmds;
+            args.ExtCmds = LinuxDeviceOptions::GetInstance().mWiFiPAFExtCmds;
             DeviceLayer::ConnectivityMgr().SetWiFiPAFAdvertisingEnabled(args);
         }
     }

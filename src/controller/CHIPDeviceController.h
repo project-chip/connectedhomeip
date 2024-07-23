@@ -468,7 +468,7 @@ class DLL_EXPORT DeviceCommissioner : public DeviceController,
 {
 public:
     DeviceCommissioner();
-    ~DeviceCommissioner() override {}
+    ~DeviceCommissioner() override;
 
 #if CHIP_DEVICE_CONFIG_ENABLE_COMMISSIONER_DISCOVERY // make this commissioner discoverable
     /**
@@ -821,6 +821,14 @@ public:
         return ExtendArmFailSafeInternal(proxy, step, armFailSafeTimeout, commandTimeout, onSuccess, onFailure,
                                          /* fireAndForget = */ true);
     }
+#if CHIP_DEVICE_CONFIG_ENABLE_WIFIPAF
+    enum ObjChkAction{
+        Set,
+        Check,
+        Clear
+    };
+    static void SetChkObjValid(void * appState, ObjChkAction action, bool * pIsObjValid);
+#endif
 
 private:
     DevicePairingDelegate * mPairingDelegate = nullptr;
