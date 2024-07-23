@@ -70,8 +70,7 @@ AttributeAccessInterfaceRegistry & AttributeAccessInterfaceRegistry::Instance()
 void AttributeAccessInterfaceRegistry::UnregisterAllForEndpoint(EndpointId endpointId)
 {
     UnregisterMatchingAttributeAccessInterfaces(
-        [endpointId](AttributeAccessInterface * entry) { return entry->MatchesEndpoint(endpointId); },
-        mAttributeAccessOverrides);
+        [endpointId](AttributeAccessInterface * entry) { return entry->MatchesEndpoint(endpointId); }, mAttributeAccessOverrides);
 }
 
 AttributeAccessInterface * AttributeAccessInterfaceRegistry::Get(EndpointId endpointId, ClusterId clusterId)
