@@ -1367,8 +1367,7 @@ static NSString * sDeviceDataKeyPrefix = @"deviceData";
 
 #pragma mark - Client Data
 
-static NSString * sClientDataKeyPrefix = @"clientData";
-
+static NSString * sClientDataKeyPrefix = @"clientDataByNode";
 
 - (nullable NSArray<NSString *> *)_clientDataIndexForNodeID:(NSNumber *)nodeID
 {
@@ -1410,6 +1409,46 @@ static NSString * sClientDataKeyPrefix = @"clientData";
 }
 
 #pragma mark - Client Endpoint Data
+
+
+static NSString * sClientDataByEndpointKeyPrefix = @"clientDataByEndpoint";
+
+// REVIEWERS:  is there a constraint smaller than NSNumber on endpoint IDs?
+- (nullable NSArray<NSString *> *)_clientDataIndexForEndpointID:(NSNumber *)endpointID onNodeID:(NSNumber *)nodeID
+{
+    return [self _dataIndexForPrefix:[self _clientDataPrefixForEndpointID:endpointID onNodeID:nodeID]];
+}
+
+- (NSString *)_clientDataPrefixForEndpointID:(NSNumber *)endpointID onNodeID:(NSNumber *)nodeID
+{
+    return [sClientDataByEndpointKeyPrefix stringByAppendingFormat:@":0x%016llX:0x%016llX",
+            nodeID.unsignedLongLongValue, endpointID.unsignedLongLongValue];
+}
+
+- (id<NSSecureCoding>)clientDataForKey:(NSString *)key onEndpointID:(NSNumber *)endpointID onNodeID:(NSNumber *)nodeID
+{
+    return [self _dataForKey:key inPrefix:[self _clientDataPrefixForEndpointID:endpointID onNodeID:nodeID]];
+}
+
+- (void)removeClientDataForKey:(NSString *)key onEndpointID:(NSNumber *)endpointID onNodeID:(NSNumber *)nodeID
+{
+    [self _removeDataForKey:key inPrefix:[self _clientDataPrefixForEndpointID:endpointID onNodeID:nodeID]];
+}
+
+- (void)storeClientDataValue:(id<NSSecureCoding>)value forKey:(NSString *)key forEndpointID:(NSNumber *)endpointID onNodeID:(NSNumber *)nodeID
+{
+    [self _storeValue:value forKey:key inPrefix:[self _clientDataPrefixForEndpointID:endpointID onNodeID:nodeID]];
+}
+
+- (void)clearStoredClientDataForEndpointID:(NSNumber *)endpointID onNodeID:(NSNumber *)nodeID
+{
+    __block NSArray<NSString *> * keys = nil;
+    dispatch_sync(_storageDelegateQueue, ^{
+        keys = [self _clientDataIndexForEndpointID:endpointID onNodeID:nodeID];
+    });
+    return keys;
+}
+
 
 @end
 
