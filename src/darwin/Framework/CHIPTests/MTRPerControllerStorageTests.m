@@ -3219,5 +3219,6 @@ static const uint16_t kSubscriptionPoolBaseTimeoutInSeconds = 30;
 }
 
 // TODO:  test clearing node when multiple node IDs have data stored
+// TODO:  a basic test for the endpoint+node methods (largely same code path as node methods)
 
 @end

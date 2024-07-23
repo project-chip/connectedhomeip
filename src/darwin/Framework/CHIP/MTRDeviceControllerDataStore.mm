@@ -1365,7 +1365,7 @@ static NSString * sDeviceDataKeyPrefix = @"deviceData";
     });
 }
 
-#pragma mark - Client Data
+#pragma mark - Client Data by Node
 
 static NSString * sClientDataKeyPrefix = @"clientDataByNode";
 
@@ -1408,7 +1408,7 @@ static NSString * sClientDataKeyPrefix = @"clientDataByNode";
     return keys;
 }
 
-#pragma mark - Client Endpoint Data
+#pragma mark - Client Data by Endpoint + Node
 
 
 static NSString * sClientDataByEndpointKeyPrefix = @"clientDataByEndpoint";
@@ -1442,13 +1442,17 @@ static NSString * sClientDataByEndpointKeyPrefix = @"clientDataByEndpoint";
 
 - (void)clearStoredClientDataForEndpointID:(NSNumber *)endpointID onNodeID:(NSNumber *)nodeID
 {
+    [self _removeAllDataInPrefix:[self _clientDataPrefixForEndpointID:endpointID onNodeID:nodeID]];
+}
+
+- (NSArray<NSString *> *)storedClientDataKeysForEndpointID:(NSNumber *)endpointID onNodeID:(NSNumber *)nodeID;
+{
     __block NSArray<NSString *> * keys = nil;
     dispatch_sync(_storageDelegateQueue, ^{
         keys = [self _clientDataIndexForEndpointID:endpointID onNodeID:nodeID];
     });
     return keys;
 }
-
 
 @end
 

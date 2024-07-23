@@ -56,6 +56,7 @@ NS_ASSUME_NONNULL_BEGIN
 - (MTRDeviceClusterData *)_getClusterDataForPath:(MTRClusterPath *)path;
 - (BOOL)_clusterHasBeenPersisted:(MTRClusterPath *)path;
 - (NSMutableArray<NSNumber *> *)arrayOfNumbersFromAttributeValue:(MTRDeviceDataValueDictionary)dataDictionary;
+
 @end
 
 #pragma mark - Declarations for items compiled only for DEBUG configuration
