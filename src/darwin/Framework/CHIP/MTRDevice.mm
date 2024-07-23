@@ -4040,7 +4040,6 @@ static BOOL AttributeHasChangesOmittedQuality(MTRAttributePath * attributePath)
 
 #pragma mark - Client Metadata Storage
 
-// REVIEWERS:  does it make sense to constrain this to non-null return and return empty array if necessary?
 - (NSArray *)supportedClientDataClasses
 {
     // TODO: KMO: check this list, maybe use list from controller DS
@@ -4049,7 +4048,7 @@ static BOOL AttributeHasChangesOmittedQuality(MTRAttributePath * attributePath)
 }
 
 #pragma mark Client Metadata Storage: By Node ID
-// REVIEWERS:  does it make sense to constrain this to non-null return and return empty array if necessary?
+
 // REVIEWERS:  does it make sense to constrain this to NSArray<NSString *> * since it's keys? kmo 19 jul 2024 09h28
 // TODO:  should this include all keys for node and endpoints on that node?
 // (currently, just the node - not the endpoints) kmo 22 jul 2024 19h38
@@ -4058,7 +4057,6 @@ static BOOL AttributeHasChangesOmittedQuality(MTRAttributePath * attributePath)
     return [self.deviceController.controllerDataStore storedClientDataKeysForNodeID:self.nodeID];
 }
 
-// REVIEWERS:  does it make sense to constrain this to non-null key?
 - (id<NSSecureCoding> _Nullable)clientDataForKey:(NSString *)key
 {
     NSNumber * selfNodeID = self.nodeID;
@@ -4066,7 +4064,6 @@ static BOOL AttributeHasChangesOmittedQuality(MTRAttributePath * attributePath)
     return data;
 }
 
-// REVIEWERS:  does it make sense to constrain this to non-null key/value?
 - (void)setClientDataForKey:(NSString *)key value:(id<NSSecureCoding>)value
 {
     // TODO: Check supported data types, and also if they conform to NSSecureCoding, when we store these
@@ -4074,7 +4071,6 @@ static BOOL AttributeHasChangesOmittedQuality(MTRAttributePath * attributePath)
     [self.deviceController.controllerDataStore storeClientDataValue:value forKey:key onNodeID:self.nodeID];
 }
 
-// REVIEWERS:  does it make sense to constrain this to non-null key?
 - (void)removeClientDataForKey:(NSString *)key
 {
     [self.deviceController.controllerDataStore removeClientDataForKey:key onNodeID:self.nodeID];
@@ -4082,7 +4078,6 @@ static BOOL AttributeHasChangesOmittedQuality(MTRAttributePath * attributePath)
 
 #pragma mark Client Metadata Storage: By Endpoint ID + Node ID
 
-// REVIEWERS:  does it make sense to constrain this to non-null return/key?
 - (NSArray * _Nullable)clientDataKeysForEndpointID:(NSNumber *)endpointID
 {
     // TODO: (from stub impl) When hooked up to storage, enumerate this better
