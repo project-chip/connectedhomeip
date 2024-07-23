@@ -4037,7 +4037,7 @@ static BOOL AttributeHasChangesOmittedQuality(MTRAttributePath * attributePath)
 - (NSArray * _Nullable)clientDataKeysForEndpointID:(NSNumber *)endpointID
 {
 #if USE_DEVICE_CONTROLLER_DATA_STORE
-    return [self.deviceController.controllerDataSource storedClientDataKeysForEndpointID:endpointID onNodeID:self.nodeID];
+    return [self.deviceController.controllerDataStore storedClientDataKeysForEndpointID:endpointID onNodeID:self.nodeID];
 #else
     if (endpointID == nil)
         return nil;
@@ -4050,7 +4050,7 @@ static BOOL AttributeHasChangesOmittedQuality(MTRAttributePath * attributePath)
 - (id<NSSecureCoding> _Nullable)clientDataForKey:(NSString *)key endpointID:(NSNumber *)endpointID
 {
 #if USE_DEVICE_CONTROLLER_DATA_STORE
-    return [self.deviceController.controllerDataSource clientDataForKey:key onEndpointID:endpointID onNodeID:self.nodeID];
+    return [self.deviceController.controllerDataStore clientDataForKey:key onEndpointID:endpointID onNodeID:self.nodeID];
 #else
     if (key == nil || endpointID == nil)
         return nil;
