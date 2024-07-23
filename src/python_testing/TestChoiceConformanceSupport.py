@@ -25,15 +25,15 @@ from matter_testing_support import MatterBaseTest, ProblemNotice, default_matter
 from mobly import asserts
 from spec_parsing_support import XmlCluster, add_cluster_data_from_xml
 
-FEATURE_TEMPLATE = (
-    '    <feature bit="{{ id }}" code="{{ name }}" name="{{ name }}" summary="summary">\n'
-    '      <optionalConform choice="{{ choice }}" more="{{ more }}">\n'
-    '    {% if XXX %}'
-    '        <feature name="XXX" />\n'
-    '    {% endif %}'
-    '    </optionalConform>\n'
-    '    </feature>\n'
-)
+FEATURE_TEMPLATE = '''\
+    <feature bit="{{ id }}" code="{{ name }}" name="{{ name }}" summary="summary">
+      <optionalConform choice="{{ choice }}" more="{{ more }}">
+      {%- if XXX %}'
+       <feature name="XXX" />
+      {% endif %}
+      </optionalConform>
+    </feature>
+'''
 
 ATTRIBUTE_TEMPLATE = (
     '    <attribute id="{{ id }}" name="{{ name }}" type="uint16">\n'
@@ -80,7 +80,7 @@ def _create_elements(template_str: str, base_name: str) -> list[str]:
     xml_str = []
 
     def add_elements(curr_choice: str, starting_id: int, more: str, XXX: bool):
-        for i in range(0, 3):
+        for i in range(3):
             element_name = f'{base_name}{curr_choice.upper()*(i+1)}'
             environment = jinja2.Environment()
             template = environment.from_string(template_str)
