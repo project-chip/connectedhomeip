@@ -53,8 +53,7 @@ ThreadNetworkDirectoryServer::~ThreadNetworkDirectoryServer()
 
 CHIP_ERROR ThreadNetworkDirectoryServer::Init()
 {
-    VerifyOrReturnError(AttributeAccessInterfaceRegistry::Instance().RegisterAttributeAccessOverride(this),
-                        CHIP_ERROR_INTERNAL);
+    VerifyOrReturnError(AttributeAccessInterfaceRegistry::Instance().RegisterAttributeAccessOverride(this), CHIP_ERROR_INTERNAL);
     ReturnErrorOnFailure(CommandHandlerInterfaceRegistry::Instance().RegisterCommandHandler(this));
     return CHIP_NO_ERROR;
 }
