@@ -308,7 +308,8 @@ CHIP_ERROR CodegenDataModel::ReadAttribute(const InteractionModel::ReadAttribute
     else
     {
         aai_result = TryReadViaAccessInterface(
-            request.path, AttributeAccessInterfaceRegistry::Instance().Get(request.path.mEndpointId, request.path.mClusterId), encoder);
+            request.path, AttributeAccessInterfaceRegistry::Instance().Get(request.path.mEndpointId, request.path.mClusterId),
+            encoder);
     }
     ReturnErrorCodeIf(aai_result.has_value(), *aai_result);
 

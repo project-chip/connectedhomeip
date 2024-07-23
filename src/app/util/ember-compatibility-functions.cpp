@@ -312,8 +312,9 @@ CHIP_ERROR ReadSingleClusterData(const SubjectDescriptor & aSubjectDescriptor, b
         // Special handling for mandatory global attributes: these are always for attribute list, using a special
         // reader (which can be lightweight constructed even from nullptr).
         GlobalAttributeReader reader(attributeCluster);
-        AttributeAccessInterface * attributeOverride =
-            (attributeCluster != nullptr) ? &reader : AttributeAccessInterfaceRegistry::Instance().Get(aPath.mEndpointId, aPath.mClusterId);
+        AttributeAccessInterface * attributeOverride = (attributeCluster != nullptr)
+            ? &reader
+            : AttributeAccessInterfaceRegistry::Instance().Get(aPath.mEndpointId, aPath.mClusterId);
         if (attributeOverride)
         {
             bool triedEncode = false;
