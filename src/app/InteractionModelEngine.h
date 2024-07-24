@@ -32,7 +32,6 @@
 #include <app/AppConfig.h>
 #include <app/AttributePathParams.h>
 #include <app/CommandHandlerImpl.h>
-#include <app/CommandHandlerInterface.h>
 #include <app/CommandResponseSender.h>
 #include <app/CommandSender.h>
 #include <app/ConcreteAttributePath.h>
@@ -215,11 +214,6 @@ public:
 
     CHIP_ERROR PushFrontDataVersionFilterList(SingleLinkedListNode<DataVersionFilter> *& aDataVersionFilterList,
                                               DataVersionFilter & aDataVersionFilter);
-
-    CHIP_ERROR RegisterCommandHandler(CommandHandlerInterface * handler);
-    CHIP_ERROR UnregisterCommandHandler(CommandHandlerInterface * handler);
-    CommandHandlerInterface * FindCommandHandler(EndpointId endpointId, ClusterId clusterId);
-    void UnregisterCommandHandlers(EndpointId endpointId);
 
     /*
      * Register an application callback to be notified of notable events when handling reads/subscribes.
@@ -616,8 +610,6 @@ private:
     CHIP_ERROR PushFront(SingleLinkedListNode<T> *& aObjectList, T & aData, ObjectPool<SingleLinkedListNode<T>, N> & aObjectPool);
 
     Messaging::ExchangeManager * mpExchangeMgr = nullptr;
-
-    CommandHandlerInterface * mCommandHandlerList = nullptr;
 
 #if CHIP_CONFIG_ENABLE_ICD_SERVER
     ICDManager * mICDManager = nullptr;
