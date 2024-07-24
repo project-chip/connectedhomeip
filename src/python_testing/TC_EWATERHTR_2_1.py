@@ -49,12 +49,18 @@ class TC_EWATERHTR_2_1(MatterBaseTest, EWATERHTRBase):
     def steps_TC_EWATERHTR_2_1(self) -> list[TestStep]:
         steps = [
             TestStep("1", "Commissioning, already done", is_commissioning=True),
-            TestStep("2a", "TH reads HeaterTypes attribute. DUT as Server replies with a WaterHeaterTypeBitmap (enum8) value to match the DUT type."),
-            TestStep("2b", "TH reads HeatDemand attribute. DUT as Server replies with a WaterHeaterDemandBitmap (enum8)."),
-            TestStep("2c", "TH reads TankVolume attribute. DUT as Server replies with a uint16 value."),
-            TestStep("2d", "TH reads EstimatedHeatRequired attribute. DUT as Server replies with an energy-mWh value."),
-            TestStep("2e", "TH reads TankPercentage attribute. DUT as Server replies with a percent value."),
-            TestStep("2f", "TH reads BoostState attribute. DUT as Server replies with a BoostStateEnum (enum8) value."),
+            TestStep("2", "TH reads HeaterTypes attribute.", 
+            "DUT as Server replies with a WaterHeaterTypeBitmap (enum8)greater than 0x00 (at least one type supported), and less than 0x20 (no undefined types supported)."),
+            TestStep("3", "TH reads HeatDemand attribute.", 
+            "DUT as Server replies with a WaterHeaterDemandBitmap (enum8)."),
+            TestStep("4", "TH reads TankVolume attribute.", 
+            "DUT as Server replies with a uint16 value."),
+            TestStep("5", "TH reads EstimatedHeatRequired attribute.",
+            "DUT as Server replies with an energy-mWh value."),
+            TestStep("6", "TH reads TankPercentage attribute.",
+            "DUT as Server replies with a percent value."),
+            TestStep("7", "TH reads BoostState attribute.",
+            "DUT as Server replies with a BoostStateEnum (enum8) value."),
         ]
 
         return steps
@@ -66,22 +72,22 @@ class TC_EWATERHTR_2_1(MatterBaseTest, EWATERHTRBase):
         # Commission DUT - already done
 
         # Note the values used here are configured in WhmManufacturer::Init()
-        self.step("2a")
+        self.step("2")
         await self.check_whm_attribute("HeaterTypes", 0)
 
-        self.step("2b")
+        self.step("3")
         await self.check_whm_attribute("HeatDemand", 0)
 
-        self.step("2c")
+        self.step("4")
         await self.check_whm_attribute("TankVolume", 0)
 
-        self.step("2d")
+        self.step("5")
         await self.check_whm_attribute("EstimatedHeatRequired", 0)
 
-        self.step("2e")
+        self.step("6")
         await self.check_whm_attribute("TankPercentage", 0)
 
-        self.step("2f")
+        self.step("7")
         await self.check_whm_attribute("BoostState", Clusters.WaterHeaterManagement.Enums.BoostStateEnum.kInactive)
 
 
