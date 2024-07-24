@@ -128,8 +128,8 @@ CHIP_ERROR GetLocalDayOfWeekNow(BitMask<EnergyEvse::TargetDayOfWeekBitmap> & day
  */
 CHIP_ERROR GetMinutesPastMidnight(uint16_t & minutesPastMidnight)
 {
-    chip::System::Clock::Milliseconds64 cTMs;
-    CHIP_ERROR err = chip::System::SystemClock().GetClock_RealTimeMS(cTMs);
+    System::Clock::Milliseconds64 cTMs;
+    CHIP_ERROR err = System::SystemClock().GetClock_RealTimeMS(cTMs);
     if (err != CHIP_NO_ERROR)
     {
         ChipLogError(Zcl, "EVSE: unable to get current time to check user schedules error=%" CHIP_ERROR_FORMAT, err.Format());
