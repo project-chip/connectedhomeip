@@ -30,8 +30,13 @@ env:
     CHIP_NO_LOG_TIMESTAMPS: true
 
 jobs:
+    await-fast-ci:
+        name: Await Fast CI
+        uses: ./.github/workflows/await-fast-ci.yaml
+
     openiotsdk:
         name: Open IoT SDK examples building
+        needs: await-fast-ci
 
         env:
             TEST_NETWORK_NAME: OIStest

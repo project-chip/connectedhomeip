@@ -32,8 +32,13 @@ env:
     CHIP_NO_LOG_TIMESTAMPS: true
 
 jobs:
+    await-fast-ci:
+        name: Await Fast CI
+        uses: ./.github/workflows/await-fast-ci.yaml
+
     test_suites_linux:
         name: Test Suites - Linux
+        needs: await-fast-ci
 
         strategy:
             matrix:
@@ -324,6 +329,7 @@ jobs:
 
     test_suites_darwin:
         name: Test Suites - Darwin
+        needs: await-fast-ci
 
         strategy:
             matrix:
@@ -437,6 +443,7 @@ jobs:
 
     repl_tests_linux:
         name: REPL Tests - Linux
+        needs: await-fast-ci
 
         env:
             TSAN_OPTIONS: "halt_on_error=1 suppressions=scripts/tests/chiptest/tsan-linux-suppressions.txt"
@@ -607,6 +614,7 @@ jobs:
 
     repl_tests_darwin:
         name: REPL Tests - Darwin
+        needs: await-fast-ci
 
         strategy:
             matrix:

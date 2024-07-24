@@ -29,8 +29,13 @@ env:
     CHIP_NO_LOG_TIMESTAMPS: true
     
 jobs:
+    await-fast-ci:
+        name: Await Fast CI
+        uses: ./.github/workflows/await-fast-ci.yaml
+        
     ameba:
         name: Ameba
+        needs: await-fast-ci
         env:
             BUILD_TYPE: ameba
 

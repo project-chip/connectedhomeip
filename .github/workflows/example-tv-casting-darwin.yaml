@@ -33,8 +33,13 @@ env:
     CHIP_NO_LOG_TIMESTAMPS: true
 
 jobs:
+    await-fast-ci:
+        name: Await Fast CI
+        uses: ./.github/workflows/await-fast-ci.yaml
+
     tv-casting-bridge:
         name: Build TV Casting Bridge example
+        needs: await-fast-ci
         if: github.actor != 'restyled-io[bot]'
         runs-on: macos-13
         steps:
