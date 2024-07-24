@@ -8819,7 +8819,6 @@ class ChipClusters:
                 "commandName": "SetActivePresetRequest",
                 "args": {
                     "presetHandle": "bytes",
-                    "delayMinutes": "int",
                 },
             },
             0x00000007: {
@@ -8838,12 +8837,6 @@ class ChipClusters:
             0x00000009: {
                 "commandId": 0x00000009,
                 "commandName": "CommitPresetsSchedulesRequest",
-                "args": {
-                },
-            },
-            0x0000000A: {
-                "commandId": 0x0000000A,
-                "commandName": "CancelSetActivePresetRequest",
                 "args": {
                 },
             },
@@ -9255,12 +9248,6 @@ class ChipClusters:
                 "attributeName": "SetpointHoldExpiryTimestamp",
                 "attributeId": 0x00000054,
                 "type": "int",
-                "reportable": True,
-            },
-            0x00000055: {
-                "attributeName": "QueuedPreset",
-                "attributeId": 0x00000055,
-                "type": "",
                 "reportable": True,
             },
             0x0000FFF8: {
