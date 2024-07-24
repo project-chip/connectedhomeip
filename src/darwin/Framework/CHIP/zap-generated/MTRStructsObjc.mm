@@ -7073,36 +7073,6 @@ NS_ASSUME_NONNULL_BEGIN
 
 @end
 
-@implementation MTRThermostatClusterQueuedPresetStruct
-- (instancetype)init
-{
-    if (self = [super init]) {
-
-        _presetHandle = nil;
-
-        _transitionTimestamp = nil;
-    }
-    return self;
-}
-
-- (id)copyWithZone:(NSZone * _Nullable)zone
-{
-    auto other = [[MTRThermostatClusterQueuedPresetStruct alloc] init];
-
-    other.presetHandle = self.presetHandle;
-    other.transitionTimestamp = self.transitionTimestamp;
-
-    return other;
-}
-
-- (NSString *)description
-{
-    NSString * descriptionString = [NSString stringWithFormat:@"<%@: presetHandle:%@; transitionTimestamp:%@; >", NSStringFromClass([self class]), [_presetHandle base64EncodedStringWithOptions:0], _transitionTimestamp];
-    return descriptionString;
-}
-
-@end
-
 @implementation MTRThermostatClusterScheduleTypeStruct
 - (instancetype)init
 {
@@ -7213,11 +7183,13 @@ NS_ASSUME_NONNULL_BEGIN
 {
     if (self = [super init]) {
 
-        _extendedPanID = @(0);
+        _extendedPanID = [NSData data];
 
         _networkName = @"";
 
         _channel = @(0);
+
+        _activeTimestamp = @(0);
     }
     return self;
 }
@@ -7229,40 +7201,14 @@ NS_ASSUME_NONNULL_BEGIN
     other.extendedPanID = self.extendedPanID;
     other.networkName = self.networkName;
     other.channel = self.channel;
+    other.activeTimestamp = self.activeTimestamp;
 
     return other;
 }
 
 - (NSString *)description
 {
-    NSString * descriptionString = [NSString stringWithFormat:@"<%@: extendedPanID:%@; networkName:%@; channel:%@; >", NSStringFromClass([self class]), _extendedPanID, _networkName, _channel];
-    return descriptionString;
-}
-
-@end
-
-@implementation MTRThreadNetworkDirectoryClusterNetworkChangedEvent
-- (instancetype)init
-{
-    if (self = [super init]) {
-
-        _extendedPanID = @(0);
-    }
-    return self;
-}
-
-- (id)copyWithZone:(NSZone * _Nullable)zone
-{
-    auto other = [[MTRThreadNetworkDirectoryClusterNetworkChangedEvent alloc] init];
-
-    other.extendedPanID = self.extendedPanID;
-
-    return other;
-}
-
-- (NSString *)description
-{
-    NSString * descriptionString = [NSString stringWithFormat:@"<%@: extendedPanID:%@; >", NSStringFromClass([self class]), _extendedPanID];
+    NSString * descriptionString = [NSString stringWithFormat:@"<%@: extendedPanID:%@; networkName:%@; channel:%@; activeTimestamp:%@; >", NSStringFromClass([self class]), [_extendedPanID base64EncodedStringWithOptions:0], _networkName, _channel, _activeTimestamp];
     return descriptionString;
 }
 

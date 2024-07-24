@@ -3700,31 +3700,6 @@ CHIP_ERROR DataModelLogger::LogValue(const char * label, size_t indent,
 }
 
 CHIP_ERROR DataModelLogger::LogValue(const char * label, size_t indent,
-                                     const chip::app::Clusters::Thermostat::Structs::QueuedPresetStruct::DecodableType & value)
-{
-    DataModelLogger::LogString(label, indent, "{");
-    {
-        CHIP_ERROR err = LogValue("PresetHandle", indent + 1, value.presetHandle);
-        if (err != CHIP_NO_ERROR)
-        {
-            DataModelLogger::LogString(indent + 1, "Struct truncated due to invalid value for 'PresetHandle'");
-            return err;
-        }
-    }
-    {
-        CHIP_ERROR err = LogValue("TransitionTimestamp", indent + 1, value.transitionTimestamp);
-        if (err != CHIP_NO_ERROR)
-        {
-            DataModelLogger::LogString(indent + 1, "Struct truncated due to invalid value for 'TransitionTimestamp'");
-            return err;
-        }
-    }
-    DataModelLogger::LogString(indent, "}");
-
-    return CHIP_NO_ERROR;
-}
-
-CHIP_ERROR DataModelLogger::LogValue(const char * label, size_t indent,
                                      const chip::app::Clusters::Thermostat::Structs::ScheduleTypeStruct::DecodableType & value)
 {
     DataModelLogger::LogString(label, indent, "{");
@@ -3851,6 +3826,14 @@ DataModelLogger::LogValue(const char * label, size_t indent,
         if (err != CHIP_NO_ERROR)
         {
             DataModelLogger::LogString(indent + 1, "Struct truncated due to invalid value for 'Channel'");
+            return err;
+        }
+    }
+    {
+        CHIP_ERROR err = LogValue("ActiveTimestamp", indent + 1, value.activeTimestamp);
+        if (err != CHIP_NO_ERROR)
+        {
+            DataModelLogger::LogString(indent + 1, "Struct truncated due to invalid value for 'ActiveTimestamp'");
             return err;
         }
     }
@@ -7312,22 +7295,6 @@ CHIP_ERROR DataModelLogger::LogValue(const char * label, size_t indent,
                                      const PumpConfigurationAndControl::Events::TurbineOperation::DecodableType & value)
 {
     DataModelLogger::LogString(label, indent, "{");
-    DataModelLogger::LogString(indent, "}");
-
-    return CHIP_NO_ERROR;
-}
-CHIP_ERROR DataModelLogger::LogValue(const char * label, size_t indent,
-                                     const ThreadNetworkDirectory::Events::NetworkChanged::DecodableType & value)
-{
-    DataModelLogger::LogString(label, indent, "{");
-    {
-        CHIP_ERROR err = DataModelLogger::LogValue("ExtendedPanID", indent + 1, value.extendedPanID);
-        if (err != CHIP_NO_ERROR)
-        {
-            DataModelLogger::LogString(indent + 1, "Event truncated due to invalid value for 'ExtendedPanID'");
-            return err;
-        }
-    }
     DataModelLogger::LogString(indent, "}");
 
     return CHIP_NO_ERROR;
@@ -11334,6 +11301,11 @@ CHIP_ERROR DataModelLogger::LogAttribute(const chip::app::ConcreteDataAttributeP
             ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
             return DataModelLogger::LogValue("OperatingMode", 1, value);
         }
+        case IcdManagement::Attributes::MaximumCheckInBackOff::Id: {
+            uint32_t value;
+            ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
+            return DataModelLogger::LogValue("MaximumCheckInBackOff", 1, value);
+        }
         case IcdManagement::Attributes::GeneratedCommandList::Id: {
             chip::app::DataModel::DecodableList<chip::CommandId> value;
             ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
@@ -14853,11 +14825,6 @@ CHIP_ERROR DataModelLogger::LogAttribute(const chip::app::ConcreteDataAttributeP
             ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
             return DataModelLogger::LogValue("SetpointHoldExpiryTimestamp", 1, value);
         }
-        case Thermostat::Attributes::QueuedPreset::Id: {
-            chip::app::DataModel::Nullable<chip::app::Clusters::Thermostat::Structs::QueuedPresetStruct::DecodableType> value;
-            ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
-            return DataModelLogger::LogValue("QueuedPreset", 1, value);
-        }
         case Thermostat::Attributes::GeneratedCommandList::Id: {
             chip::app::DataModel::DecodableList<chip::CommandId> value;
             ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
@@ -16872,7 +16839,7 @@ CHIP_ERROR DataModelLogger::LogAttribute(const chip::app::ConcreteDataAttributeP
         switch (path.mAttributeId)
         {
         case ThreadNetworkDirectory::Attributes::PreferredExtendedPanID::Id: {
-            chip::app::DataModel::Nullable<uint64_t> value;
+            chip::app::DataModel::Nullable<chip::ByteSpan> value;
             ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
             return DataModelLogger::LogValue("PreferredExtendedPanID", 1, value);
         }
@@ -20314,17 +20281,6 @@ CHIP_ERROR DataModelLogger::LogEvent(const chip::app::EventHeader & header, chip
             chip::app::Clusters::PumpConfigurationAndControl::Events::TurbineOperation::DecodableType value;
             ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
             return DataModelLogger::LogValue("TurbineOperation", 1, value);
-        }
-        }
-        break;
-    }
-    case ThreadNetworkDirectory::Id: {
-        switch (header.mPath.mEventId)
-        {
-        case ThreadNetworkDirectory::Events::NetworkChanged::Id: {
-            chip::app::Clusters::ThreadNetworkDirectory::Events::NetworkChanged::DecodableType value;
-            ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
-            return DataModelLogger::LogValue("NetworkChanged", 1, value);
         }
         }
         break;

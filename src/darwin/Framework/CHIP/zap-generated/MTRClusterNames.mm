@@ -2772,6 +2772,10 @@ NSString * MTRAttributeNameForID(MTRClusterIDType clusterID, MTRAttributeIDType 
             result = @"OperatingMode";
             break;
 
+        case MTRAttributeIDTypeClusterICDManagementAttributeMaximumCheckInBackOffID:
+            result = @"MaximumCheckInBackOff";
+            break;
+
         case MTRAttributeIDTypeClusterICDManagementAttributeGeneratedCommandListID:
             result = @"GeneratedCommandList";
             break;
@@ -5768,10 +5772,6 @@ NSString * MTRAttributeNameForID(MTRClusterIDType clusterID, MTRAttributeIDType 
 
         case MTRAttributeIDTypeClusterThermostatAttributeSetpointHoldExpiryTimestampID:
             result = @"SetpointHoldExpiryTimestamp";
-            break;
-
-        case MTRAttributeIDTypeClusterThermostatAttributeQueuedPresetID:
-            result = @"QueuedPreset";
             break;
 
         case MTRAttributeIDTypeClusterThermostatAttributeGeneratedCommandListID:

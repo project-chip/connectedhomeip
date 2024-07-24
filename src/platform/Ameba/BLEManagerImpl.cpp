@@ -511,19 +511,21 @@ void BLEManagerImpl::_OnPlatformEvent(const ChipDeviceEvent * event)
     }
 }
 
-bool BLEManagerImpl::SubscribeCharacteristic(BLE_CONNECTION_OBJECT conId, const ChipBleUUID * svcId, const ChipBleUUID * charId)
+CHIP_ERROR BLEManagerImpl::SubscribeCharacteristic(BLE_CONNECTION_OBJECT conId, const ChipBleUUID * svcId,
+                                                   const ChipBleUUID * charId)
 {
     ChipLogProgress(DeviceLayer, "BLEManagerImpl::SubscribeCharacteristic() not supported");
-    return false;
+    return CHIP_ERROR_NOT_IMPLEMENTED;
 }
 
-bool BLEManagerImpl::UnsubscribeCharacteristic(BLE_CONNECTION_OBJECT conId, const ChipBleUUID * svcId, const ChipBleUUID * charId)
+CHIP_ERROR BLEManagerImpl::UnsubscribeCharacteristic(BLE_CONNECTION_OBJECT conId, const ChipBleUUID * svcId,
+                                                     const ChipBleUUID * charId)
 {
     ChipLogProgress(DeviceLayer, "BLEManagerImpl::UnsubscribeCharacteristic() not supported");
-    return false;
+    return CHIP_ERROR_NOT_IMPLEMENTED;
 }
 
-bool BLEManagerImpl::CloseConnection(BLE_CONNECTION_OBJECT conId)
+CHIP_ERROR BLEManagerImpl::CloseConnection(BLE_CONNECTION_OBJECT conId)
 {
     CHIP_ERROR err;
     ChipLogProgress(DeviceLayer, "Closing BLE GATT connection (con %u)", conId);
@@ -543,7 +545,7 @@ bool BLEManagerImpl::CloseConnection(BLE_CONNECTION_OBJECT conId)
     mFlags.Clear(Flags::kAdvertisingConfigured);
     PlatformMgr().ScheduleWork(DriveBLEState, 0);
 
-    return (err == CHIP_NO_ERROR);
+    return err;
 }
 
 uint16_t BLEManagerImpl::GetMTU(BLE_CONNECTION_OBJECT conId) const
@@ -557,11 +559,11 @@ uint16_t BLEManagerImpl::GetMTU(BLE_CONNECTION_OBJECT conId) const
     return mtu;
 }
 
-bool BLEManagerImpl::SendWriteRequest(BLE_CONNECTION_OBJECT conId, const ChipBleUUID * svcId, const ChipBleUUID * charId,
-                                      PacketBufferHandle pBuf)
+CHIP_ERROR BLEManagerImpl::SendWriteRequest(BLE_CONNECTION_OBJECT conId, const ChipBleUUID * svcId, const ChipBleUUID * charId,
+                                            PacketBufferHandle pBuf)
 {
     ChipLogError(DeviceLayer, "BLEManagerImpl::SendWriteRequest() not supported");
-    return false;
+    return CHIP_ERROR_NOT_IMPLEMENTED;
 }
 
 void BLEManagerImpl::NotifyChipConnectionClosed(BLE_CONNECTION_OBJECT conId)
@@ -569,8 +571,8 @@ void BLEManagerImpl::NotifyChipConnectionClosed(BLE_CONNECTION_OBJECT conId)
     // Nothing to do
 }
 
-bool BLEManagerImpl::SendIndication(BLE_CONNECTION_OBJECT conId, const ChipBleUUID * svcId, const ChipBleUUID * charId,
-                                    PacketBufferHandle data)
+CHIP_ERROR BLEManagerImpl::SendIndication(BLE_CONNECTION_OBJECT conId, const ChipBleUUID * svcId, const ChipBleUUID * charId,
+                                          PacketBufferHandle data)
 {
     CHIP_ERROR err = CHIP_NO_ERROR;
 
@@ -583,12 +585,7 @@ bool BLEManagerImpl::SendIndication(BLE_CONNECTION_OBJECT conId, const ChipBleUU
 #endif
 
 exit:
-    if (err != CHIP_NO_ERROR)
-    {
-        ChipLogError(DeviceLayer, "BLEManagerImpl::SendIndication() failed: %s", ErrorStr(err));
-        return false;
-    }
-    return true;
+    return err;
 }
 
 /*******************************************************************************

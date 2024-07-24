@@ -14162,6 +14162,7 @@ class IcdManagement(Cluster):
                 ClusterObjectFieldDescriptor(Label="userActiveModeTriggerHint", Tag=0x00000006, Type=typing.Optional[uint]),
                 ClusterObjectFieldDescriptor(Label="userActiveModeTriggerInstruction", Tag=0x00000007, Type=typing.Optional[str]),
                 ClusterObjectFieldDescriptor(Label="operatingMode", Tag=0x00000008, Type=typing.Optional[IcdManagement.Enums.OperatingModeEnum]),
+                ClusterObjectFieldDescriptor(Label="maximumCheckInBackOff", Tag=0x00000009, Type=typing.Optional[uint]),
                 ClusterObjectFieldDescriptor(Label="generatedCommandList", Tag=0x0000FFF8, Type=typing.List[uint]),
                 ClusterObjectFieldDescriptor(Label="acceptedCommandList", Tag=0x0000FFF9, Type=typing.List[uint]),
                 ClusterObjectFieldDescriptor(Label="eventList", Tag=0x0000FFFA, Type=typing.List[uint]),
@@ -14179,6 +14180,7 @@ class IcdManagement(Cluster):
     userActiveModeTriggerHint: 'typing.Optional[uint]' = None
     userActiveModeTriggerInstruction: 'typing.Optional[str]' = None
     operatingMode: 'typing.Optional[IcdManagement.Enums.OperatingModeEnum]' = None
+    maximumCheckInBackOff: 'typing.Optional[uint]' = None
     generatedCommandList: 'typing.List[uint]' = None
     acceptedCommandList: 'typing.List[uint]' = None
     eventList: 'typing.List[uint]' = None
@@ -14210,6 +14212,7 @@ class IcdManagement(Cluster):
             kCheckInProtocolSupport = 0x1
             kUserActiveModeTrigger = 0x2
             kLongIdleTimeSupport = 0x4
+            kDynamicSitLitSupport = 0x8
 
         class UserActiveModeTriggerBitmap(IntFlag):
             kPowerCycle = 0x1
@@ -14483,6 +14486,22 @@ class IcdManagement(Cluster):
                 return ClusterObjectFieldDescriptor(Type=typing.Optional[IcdManagement.Enums.OperatingModeEnum])
 
             value: 'typing.Optional[IcdManagement.Enums.OperatingModeEnum]' = None
+
+        @dataclass
+        class MaximumCheckInBackOff(ClusterAttributeDescriptor):
+            @ChipUtility.classproperty
+            def cluster_id(cls) -> int:
+                return 0x00000046
+
+            @ChipUtility.classproperty
+            def attribute_id(cls) -> int:
+                return 0x00000009
+
+            @ChipUtility.classproperty
+            def attribute_type(cls) -> ClusterObjectFieldDescriptor:
+                return ClusterObjectFieldDescriptor(Type=typing.Optional[uint])
+
+            value: 'typing.Optional[uint]' = None
 
         @dataclass
         class GeneratedCommandList(ClusterAttributeDescriptor):
@@ -32028,7 +32047,6 @@ class Thermostat(Cluster):
                 ClusterObjectFieldDescriptor(Label="presetsSchedulesEditable", Tag=0x00000052, Type=typing.Optional[bool]),
                 ClusterObjectFieldDescriptor(Label="temperatureSetpointHoldPolicy", Tag=0x00000053, Type=typing.Optional[uint]),
                 ClusterObjectFieldDescriptor(Label="setpointHoldExpiryTimestamp", Tag=0x00000054, Type=typing.Union[None, Nullable, uint]),
-                ClusterObjectFieldDescriptor(Label="queuedPreset", Tag=0x00000055, Type=typing.Union[None, Nullable, Thermostat.Structs.QueuedPresetStruct]),
                 ClusterObjectFieldDescriptor(Label="generatedCommandList", Tag=0x0000FFF8, Type=typing.List[uint]),
                 ClusterObjectFieldDescriptor(Label="acceptedCommandList", Tag=0x0000FFF9, Type=typing.List[uint]),
                 ClusterObjectFieldDescriptor(Label="eventList", Tag=0x0000FFFA, Type=typing.List[uint]),
@@ -32099,7 +32117,6 @@ class Thermostat(Cluster):
     presetsSchedulesEditable: 'typing.Optional[bool]' = None
     temperatureSetpointHoldPolicy: 'typing.Optional[uint]' = None
     setpointHoldExpiryTimestamp: 'typing.Union[None, Nullable, uint]' = None
-    queuedPreset: 'typing.Union[None, Nullable, Thermostat.Structs.QueuedPresetStruct]' = None
     generatedCommandList: 'typing.List[uint]' = None
     acceptedCommandList: 'typing.List[uint]' = None
     eventList: 'typing.List[uint]' = None
@@ -32277,7 +32294,6 @@ class Thermostat(Cluster):
             kMatterScheduleConfiguration = 0x80
             kPresets = 0x100
             kSetpoints = 0x200
-            kQueuedPresetsSupported = 0x400
 
         class HVACSystemTypeBitmap(IntFlag):
             kCoolingStage = 0x3
@@ -32410,19 +32426,6 @@ class Thermostat(Cluster):
             presetScenario: 'Thermostat.Enums.PresetScenarioEnum' = 0
             numberOfPresets: 'uint' = 0
             presetTypeFeatures: 'uint' = 0
-
-        @dataclass
-        class QueuedPresetStruct(ClusterObject):
-            @ChipUtility.classproperty
-            def descriptor(cls) -> ClusterObjectDescriptor:
-                return ClusterObjectDescriptor(
-                    Fields=[
-                        ClusterObjectFieldDescriptor(Label="presetHandle", Tag=0, Type=typing.Union[Nullable, bytes]),
-                        ClusterObjectFieldDescriptor(Label="transitionTimestamp", Tag=1, Type=typing.Union[Nullable, uint]),
-                    ])
-
-            presetHandle: 'typing.Union[Nullable, bytes]' = NullValue
-            transitionTimestamp: 'typing.Union[Nullable, uint]' = NullValue
 
         @dataclass
         class ScheduleTypeStruct(ClusterObject):
@@ -32576,11 +32579,9 @@ class Thermostat(Cluster):
                 return ClusterObjectDescriptor(
                     Fields=[
                         ClusterObjectFieldDescriptor(Label="presetHandle", Tag=0, Type=bytes),
-                        ClusterObjectFieldDescriptor(Label="delayMinutes", Tag=1, Type=typing.Optional[uint]),
                     ])
 
             presetHandle: 'bytes' = b""
-            delayMinutes: 'typing.Optional[uint]' = None
 
         @dataclass
         class StartPresetsSchedulesEditRequest(ClusterCommand):
@@ -32615,19 +32616,6 @@ class Thermostat(Cluster):
         class CommitPresetsSchedulesRequest(ClusterCommand):
             cluster_id: typing.ClassVar[int] = 0x00000201
             command_id: typing.ClassVar[int] = 0x00000009
-            is_client: typing.ClassVar[bool] = True
-            response_type: typing.ClassVar[str] = None
-
-            @ChipUtility.classproperty
-            def descriptor(cls) -> ClusterObjectDescriptor:
-                return ClusterObjectDescriptor(
-                    Fields=[
-                    ])
-
-        @dataclass
-        class CancelSetActivePresetRequest(ClusterCommand):
-            cluster_id: typing.ClassVar[int] = 0x00000201
-            command_id: typing.ClassVar[int] = 0x0000000A
             is_client: typing.ClassVar[bool] = True
             response_type: typing.ClassVar[str] = None
 
@@ -33645,22 +33633,6 @@ class Thermostat(Cluster):
                 return ClusterObjectFieldDescriptor(Type=typing.Union[None, Nullable, uint])
 
             value: 'typing.Union[None, Nullable, uint]' = None
-
-        @dataclass
-        class QueuedPreset(ClusterAttributeDescriptor):
-            @ChipUtility.classproperty
-            def cluster_id(cls) -> int:
-                return 0x00000201
-
-            @ChipUtility.classproperty
-            def attribute_id(cls) -> int:
-                return 0x00000055
-
-            @ChipUtility.classproperty
-            def attribute_type(cls) -> ClusterObjectFieldDescriptor:
-                return ClusterObjectFieldDescriptor(Type=typing.Union[None, Nullable, Thermostat.Structs.QueuedPresetStruct])
-
-            value: 'typing.Union[None, Nullable, Thermostat.Structs.QueuedPresetStruct]' = None
 
         @dataclass
         class GeneratedCommandList(ClusterAttributeDescriptor):
@@ -42011,7 +41983,7 @@ class ThreadNetworkDirectory(Cluster):
     def descriptor(cls) -> ClusterObjectDescriptor:
         return ClusterObjectDescriptor(
             Fields=[
-                ClusterObjectFieldDescriptor(Label="preferredExtendedPanID", Tag=0x00000000, Type=typing.Union[Nullable, uint]),
+                ClusterObjectFieldDescriptor(Label="preferredExtendedPanID", Tag=0x00000000, Type=typing.Union[Nullable, bytes]),
                 ClusterObjectFieldDescriptor(Label="threadNetworks", Tag=0x00000001, Type=typing.List[ThreadNetworkDirectory.Structs.ThreadNetworkStruct]),
                 ClusterObjectFieldDescriptor(Label="threadNetworkTableSize", Tag=0x00000002, Type=uint),
                 ClusterObjectFieldDescriptor(Label="generatedCommandList", Tag=0x0000FFF8, Type=typing.List[uint]),
@@ -42022,7 +41994,7 @@ class ThreadNetworkDirectory(Cluster):
                 ClusterObjectFieldDescriptor(Label="clusterRevision", Tag=0x0000FFFD, Type=uint),
             ])
 
-    preferredExtendedPanID: 'typing.Union[Nullable, uint]' = None
+    preferredExtendedPanID: 'typing.Union[Nullable, bytes]' = None
     threadNetworks: 'typing.List[ThreadNetworkDirectory.Structs.ThreadNetworkStruct]' = None
     threadNetworkTableSize: 'uint' = None
     generatedCommandList: 'typing.List[uint]' = None
@@ -42039,14 +42011,16 @@ class ThreadNetworkDirectory(Cluster):
             def descriptor(cls) -> ClusterObjectDescriptor:
                 return ClusterObjectDescriptor(
                     Fields=[
-                        ClusterObjectFieldDescriptor(Label="extendedPanID", Tag=0, Type=uint),
+                        ClusterObjectFieldDescriptor(Label="extendedPanID", Tag=0, Type=bytes),
                         ClusterObjectFieldDescriptor(Label="networkName", Tag=1, Type=str),
                         ClusterObjectFieldDescriptor(Label="channel", Tag=2, Type=uint),
+                        ClusterObjectFieldDescriptor(Label="activeTimestamp", Tag=3, Type=uint),
                     ])
 
-            extendedPanID: 'uint' = 0
+            extendedPanID: 'bytes' = b""
             networkName: 'str' = ""
             channel: 'uint' = 0
+            activeTimestamp: 'uint' = 0
 
     class Commands:
         @dataclass
@@ -42080,14 +42054,14 @@ class ThreadNetworkDirectory(Cluster):
             def descriptor(cls) -> ClusterObjectDescriptor:
                 return ClusterObjectDescriptor(
                     Fields=[
-                        ClusterObjectFieldDescriptor(Label="extendedPanID", Tag=0, Type=uint),
+                        ClusterObjectFieldDescriptor(Label="extendedPanID", Tag=0, Type=bytes),
                     ])
 
             @ChipUtility.classproperty
             def must_use_timed_invoke(cls) -> bool:
                 return True
 
-            extendedPanID: 'uint' = 0
+            extendedPanID: 'bytes' = b""
 
         @dataclass
         class GetOperationalDataset(ClusterCommand):
@@ -42100,14 +42074,14 @@ class ThreadNetworkDirectory(Cluster):
             def descriptor(cls) -> ClusterObjectDescriptor:
                 return ClusterObjectDescriptor(
                     Fields=[
-                        ClusterObjectFieldDescriptor(Label="extendedPanID", Tag=0, Type=uint),
+                        ClusterObjectFieldDescriptor(Label="extendedPanID", Tag=0, Type=bytes),
                     ])
 
             @ChipUtility.classproperty
             def must_use_timed_invoke(cls) -> bool:
                 return True
 
-            extendedPanID: 'uint' = 0
+            extendedPanID: 'bytes' = b""
 
         @dataclass
         class OperationalDatasetResponse(ClusterCommand):
@@ -42138,9 +42112,9 @@ class ThreadNetworkDirectory(Cluster):
 
             @ChipUtility.classproperty
             def attribute_type(cls) -> ClusterObjectFieldDescriptor:
-                return ClusterObjectFieldDescriptor(Type=typing.Union[Nullable, uint])
+                return ClusterObjectFieldDescriptor(Type=typing.Union[Nullable, bytes])
 
-            value: 'typing.Union[Nullable, uint]' = NullValue
+            value: 'typing.Union[Nullable, bytes]' = NullValue
 
         @dataclass
         class ThreadNetworks(ClusterAttributeDescriptor):
@@ -42269,26 +42243,6 @@ class ThreadNetworkDirectory(Cluster):
                 return ClusterObjectFieldDescriptor(Type=uint)
 
             value: 'uint' = 0
-
-    class Events:
-        @dataclass
-        class NetworkChanged(ClusterEvent):
-            @ChipUtility.classproperty
-            def cluster_id(cls) -> int:
-                return 0x00000453
-
-            @ChipUtility.classproperty
-            def event_id(cls) -> int:
-                return 0x00000000
-
-            @ChipUtility.classproperty
-            def descriptor(cls) -> ClusterObjectDescriptor:
-                return ClusterObjectDescriptor(
-                    Fields=[
-                        ClusterObjectFieldDescriptor(Label="extendedPanID", Tag=0, Type=uint),
-                    ])
-
-            extendedPanID: 'uint' = 0
 
 
 @dataclass
