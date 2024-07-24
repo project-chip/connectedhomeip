@@ -1036,7 +1036,7 @@ bool Instance::SetProgressTotalOperationalTime(uint32_t aLocationId, const DataM
     }
 
     // set the time in the local copy
-    progressElement.totalOperationalTime.Value() = aTotalOperationalTime;
+    progressElement.totalOperationalTime.Emplace() = aTotalOperationalTime;
 
     // add the updated element to the progress attribute
     if (!mDelegate->ModifyProgressElement(listIndex, progressElement))
@@ -1067,7 +1067,7 @@ bool Instance::SetProgressEstimatedTime(uint32_t aLocationId, const DataModel::N
     };
 
     // set the time in the local copy
-    progressElement.estimatedTime.Value() = aEstimatedTime;
+    progressElement.estimatedTime.Emplace() = aEstimatedTime;
 
     // add the updated element to the progress attribute
     if (!mDelegate->ModifyProgressElement(listIndex, progressElement))
