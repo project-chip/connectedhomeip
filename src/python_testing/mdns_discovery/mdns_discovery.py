@@ -88,7 +88,6 @@ class MdnsServiceListener(ServiceListener):
         self.updated_event = asyncio.Event()
 
     def add_service(self, zeroconf: Zeroconf, service_type: str, name: str) -> None:
-        sleep(0.5)
         self.updated_event.set()
 
     def remove_service(self, zeroconf: Zeroconf, service_type: str, name: str) -> None:
