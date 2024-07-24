@@ -50,7 +50,7 @@ class MockTestRunner():
             catTags=self.config.controller_cat_tags
         )
 
-    def set_test(self, filename: str, classname: str, test: str, endpoint: int = 0, pics: dict[str, bool] = {}):
+    def set_test(self, filename: str, classname: str, test: str):
         self.test = test
         self.set_test_config()
         module = importlib.import_module(Path(os.path.basename(filename)).stem)
