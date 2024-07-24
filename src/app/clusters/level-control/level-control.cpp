@@ -406,10 +406,10 @@ static Status SetCurrentLevelQuietReport(EndpointId endpoint, EmberAfLevelContro
         System::Clock::Milliseconds64 reportInterval =
             std::max(System::Clock::Milliseconds64(1000), System::Clock::Milliseconds64(state->transitionTimeMs / 4));
         auto predicate = state->quietCurrentLevel.GetPredicateForSufficientTimeSinceLastDirty(reportInterval);
-        dirtyState = state->quietCurrentLevel.SetValue(newValue, now, predicate);
+        dirtyState     = state->quietCurrentLevel.SetValue(newValue, now, predicate);
     }
 
-    if ( dirtyState == AttributeDirtyState::kMustReport)
+    if (dirtyState == AttributeDirtyState::kMustReport)
     {
         markDirty = MarkAttributeDirty::kIfChanged;
     }
