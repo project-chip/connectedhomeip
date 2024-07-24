@@ -2364,6 +2364,10 @@ namespace OperatingMode {
 static constexpr AttributeId Id = 0x00000008;
 } // namespace OperatingMode
 
+namespace MaximumCheckInBackOff {
+static constexpr AttributeId Id = 0x00000009;
+} // namespace MaximumCheckInBackOff
+
 namespace GeneratedCommandList {
 static constexpr AttributeId Id = Globals::Attributes::GeneratedCommandList::Id;
 } // namespace GeneratedCommandList
@@ -4272,6 +4276,52 @@ static constexpr AttributeId Id = Globals::Attributes::ClusterRevision::Id;
 
 } // namespace Attributes
 } // namespace EnergyEvseMode
+
+namespace WaterHeaterMode {
+namespace Attributes {
+
+namespace SupportedModes {
+static constexpr AttributeId Id = 0x00000000;
+} // namespace SupportedModes
+
+namespace CurrentMode {
+static constexpr AttributeId Id = 0x00000001;
+} // namespace CurrentMode
+
+namespace StartUpMode {
+static constexpr AttributeId Id = 0x00000002;
+} // namespace StartUpMode
+
+namespace OnMode {
+static constexpr AttributeId Id = 0x00000003;
+} // namespace OnMode
+
+namespace GeneratedCommandList {
+static constexpr AttributeId Id = Globals::Attributes::GeneratedCommandList::Id;
+} // namespace GeneratedCommandList
+
+namespace AcceptedCommandList {
+static constexpr AttributeId Id = Globals::Attributes::AcceptedCommandList::Id;
+} // namespace AcceptedCommandList
+
+namespace EventList {
+static constexpr AttributeId Id = Globals::Attributes::EventList::Id;
+} // namespace EventList
+
+namespace AttributeList {
+static constexpr AttributeId Id = Globals::Attributes::AttributeList::Id;
+} // namespace AttributeList
+
+namespace FeatureMap {
+static constexpr AttributeId Id = Globals::Attributes::FeatureMap::Id;
+} // namespace FeatureMap
+
+namespace ClusterRevision {
+static constexpr AttributeId Id = Globals::Attributes::ClusterRevision::Id;
+} // namespace ClusterRevision
+
+} // namespace Attributes
+} // namespace WaterHeaterMode
 
 namespace DeviceEnergyManagementMode {
 namespace Attributes {

@@ -19,18 +19,18 @@
   "package": [
     {
       "pathRelativity": "relativeToZap",
-      "path": "../../../src/app/zap-templates/app-templates.json",
-      "type": "gen-templates-json",
-      "category": "matter",
-      "version": "chip-v1"
-    },
-    {
-      "pathRelativity": "relativeToZap",
       "path": "../../../src/app/zap-templates/zcl/zcl.json",
       "type": "zcl-properties",
       "category": "matter",
       "version": 1,
       "description": "Matter SDK ZCL data"
+    },
+    {
+      "pathRelativity": "relativeToZap",
+      "path": "../../../src/app/zap-templates/app-templates.json",
+      "type": "gen-templates-json",
+      "category": "matter",
+      "version": "chip-v1"
     }
   ],
   "endpointTypes": [
@@ -910,7 +910,7 @@
               "storageOption": "External",
               "singleton": 1,
               "bounded": 0,
-              "defaultValue": "",
+              "defaultValue": null,
               "reportable": 1,
               "minInterval": 1,
               "maxInterval": 65534,
@@ -5047,7 +5047,7 @@
               "storageOption": "RAM",
               "singleton": 0,
               "bounded": 0,
-              "defaultValue": "5",
+              "defaultValue": "6",
               "reportable": 1,
               "minInterval": 0,
               "maxInterval": 65344,
@@ -7303,7 +7303,7 @@
               "storageOption": "RAM",
               "singleton": 0,
               "bounded": 0,
-              "defaultValue": "6",
+              "defaultValue": "7",
               "reportable": 1,
               "minInterval": 0,
               "maxInterval": 65344,

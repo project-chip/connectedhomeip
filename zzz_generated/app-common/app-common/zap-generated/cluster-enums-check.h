@@ -1895,6 +1895,20 @@ static auto __attribute__((unused)) EnsureKnownEnumValue(EnergyPreference::Energ
     }
 }
 
+static auto __attribute__((unused)) EnsureKnownEnumValue(WaterHeaterMode::ModeTag val)
+{
+    using EnumType = WaterHeaterMode::ModeTag;
+    switch (val)
+    {
+    case EnumType::kOff:
+    case EnumType::kManual:
+    case EnumType::kTimed:
+        return val;
+    default:
+        return EnumType::kUnknownEnumValue;
+    }
+}
+
 static auto __attribute__((unused)) EnsureKnownEnumValue(DoorLock::AlarmCodeEnum val)
 {
     using EnumType = DoorLock::AlarmCodeEnum;

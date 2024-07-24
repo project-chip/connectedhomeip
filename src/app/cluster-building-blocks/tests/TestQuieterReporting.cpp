@@ -22,9 +22,10 @@
 
 #include <app/data-model/Nullable.h>
 #include <lib/core/CHIPError.h>
+#include <lib/core/StringBuilderAdapters.h>
 #include <system/SystemClock.h>
 
-#include <gtest/gtest.h>
+#include <pw_unit_test/framework.h>
 
 using namespace chip;
 using namespace chip::app;
@@ -73,6 +74,10 @@ TEST(TestQuieterReporting, ChangeToFromZeroPolicyWorks)
     EXPECT_EQ(attribute.SetValue(0, now), AttributeDirtyState::kMustReport);
     EXPECT_EQ(attribute.value().ValueOr(INT_MAX), 0);
 
+    // 0 --> 0, expect NOT marked dirty.
+    EXPECT_EQ(attribute.SetValue(0, now), AttributeDirtyState::kNoReportNeeded);
+    EXPECT_EQ(attribute.value().ValueOr(INT_MAX), 0);
+
     // 0 --> 11, expect marked dirty.
     EXPECT_EQ(attribute.SetValue(11, now), AttributeDirtyState::kMustReport);
     EXPECT_EQ(attribute.value().ValueOr(INT_MAX), 11);
@@ -97,7 +102,7 @@ TEST(TestQuieterReporting, ChangeOnIncrementPolicyWorks)
     QuieterReportingAttribute<int> attribute{ MakeNullable<int>(10) };
 
     // Always start not dirty (because first sub priming always just read value anyway).
-    ASSERT_EQ(*attribute.value(), 10);
+    ASSERT_EQ(attribute.value().Value(), 10);
 
     auto now = fakeClock.now();
 
@@ -148,7 +153,7 @@ TEST(TestQuieterReporting, ChangeOnDecrementPolicyWorks)
     QuieterReportingAttribute<int> attribute{ MakeNullable<int>(9) };
 
     // Always start not dirty (because first sub priming always just read value anyway).
-    ASSERT_EQ(*attribute.value(), 9);
+    ASSERT_EQ(attribute.value().Value(), 9);
 
     auto now = fakeClock.now();
 
@@ -201,15 +206,12 @@ TEST(TestQuieterReporting, SufficientChangePredicateWorks)
     QuieterReportingAttribute<int> attribute{ MakeNullable<int>(9) };
 
     // Always start not dirty (because first sub priming always just read value anyway).
-    ASSERT_EQ(*attribute.value(), 9);
+    ASSERT_EQ(attribute.value().Value(), 9);
 
     auto now = fakeClock.now();
 
     EXPECT_EQ(attribute.SetValue(10, now), AttributeDirtyState::kNoReportNeeded);
     EXPECT_EQ(attribute.value().ValueOr(INT_MAX), 10);
-
-    // Forcing dirty can be done with a force-true predicate
-    EXPECT_EQ(attribute.SetValue(10, now, attribute.GetForceReportablePredicate()), AttributeDirtyState::kMustReport);
 
     auto predicate = attribute.GetPredicateForSufficientTimeSinceLastDirty(1000_ms);
 
@@ -248,6 +250,14 @@ TEST(TestQuieterReporting, SufficientChangePredicateWorks)
     now = fakeClock.Advance(1_ms);
     EXPECT_EQ(attribute.SetValue(14, now, predicate), AttributeDirtyState::kNoReportNeeded);
     EXPECT_EQ(attribute.value().ValueOr(INT_MAX), 14);
+
+    // Forcing dirty can NOT done with a force-true predicate.
+    decltype(attribute)::SufficientChangePredicate forceTruePredicate{
+        [](const decltype(attribute)::SufficientChangePredicateCandidate &) -> bool { return true; }
+    };
+    now = fakeClock.Advance(1_ms);
+    EXPECT_EQ(attribute.SetValue(12, now, forceTruePredicate), AttributeDirtyState::kNoReportNeeded);
+    EXPECT_EQ(attribute.value().ValueOr(INT_MAX), 12);
 
     // Change to a value that marks dirty no matter what (e.g. null). Should be dirty even
     // before delay.

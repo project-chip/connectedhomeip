@@ -43,13 +43,14 @@ constexpr uint32_t kDefaultChannelId = 1;
 
 // Fabric Admin Client
 rpc::pw_rpc::nanopb::FabricAdmin::Client fabricAdminClient(rpc::client::GetDefaultRpcClient(), kDefaultChannelId);
-pw::rpc::NanopbUnaryReceiver<::chip_rpc_OperationStatus> openCommissioningWindowCall;
 
 std::mutex responseMutex;
 std::condition_variable responseCv;
 bool responseReceived    = false;
 CHIP_ERROR responseError = CHIP_NO_ERROR;
 
+// By passing the `call` parameter into WaitForResponse we are explicitly trying to insure the caller takes into consideration that
+// the lifetime of the `call` object when calling WaitForResponse
 template <typename CallType>
 CHIP_ERROR WaitForResponse(CallType & call)
 {
@@ -94,27 +95,51 @@ CHIP_ERROR InitRpcClient(uint16_t rpcServerPort)
     return rpc::client::StartPacketProcessing();
 }
 
-CHIP_ERROR OpenCommissioningWindow(NodeId nodeId)
+CHIP_ERROR OpenCommissioningWindow(chip_rpc_DeviceCommissioningWindowInfo device)
 {
-    ChipLogProgress(NotSpecified, "OpenCommissioningWindow with Node Id 0x:" ChipLogFormatX64, ChipLogValueX64(nodeId));
+    ChipLogProgress(NotSpecified, "OpenCommissioningWindow with Node Id 0x" ChipLogFormatX64, ChipLogValueX64(device.node_id));
 
-    if (openCommissioningWindowCall.active())
-    {
-        ChipLogError(NotSpecified, "OpenCommissioningWindow is in progress\n");
-        return CHIP_ERROR_BUSY;
-    }
+    // The RPC call is kept alive until it completes. When a response is received, it will be logged by the handler
+    // function and the call will complete.
+    auto call = fabricAdminClient.OpenCommissioningWindow(device, OnOpenCommissioningWindowCompleted);
 
-    chip_rpc_DeviceInfo device;
-    device.node_id = nodeId;
-
-    // The RPC will remain active as long as `openCommissioningWindowCall` is alive.
-    openCommissioningWindowCall = fabricAdminClient.OpenCommissioningWindow(device, OnOpenCommissioningWindowCompleted);
-
-    if (!openCommissioningWindowCall.active())
+    if (!call.active())
     {
         // The RPC call was not sent. This could occur due to, for example, an invalid channel ID. Handle if necessary.
         return CHIP_ERROR_INTERNAL;
     }
 
-    return WaitForResponse(openCommissioningWindowCall);
+    return WaitForResponse(call);
+}
+
+CHIP_ERROR
+OpenCommissioningWindow(chip::Controller::CommissioningWindowPasscodeParams params)
+{
+    chip_rpc_DeviceCommissioningWindowInfo device;
+    device.node_id               = params.GetNodeId();
+    device.commissioning_timeout = params.GetTimeout().count();
+    device.discriminator         = params.GetDiscriminator();
+    device.iterations            = params.GetIteration();
+
+    return OpenCommissioningWindow(device);
+}
+
+CHIP_ERROR
+OpenCommissioningWindow(chip::Controller::CommissioningWindowVerifierParams params)
+{
+    chip_rpc_DeviceCommissioningWindowInfo device;
+    device.node_id               = params.GetNodeId();
+    device.commissioning_timeout = params.GetTimeout().count();
+    device.discriminator         = params.GetDiscriminator();
+    device.iterations            = params.GetIteration();
+
+    VerifyOrReturnError(params.GetSalt().size() <= sizeof(device.salt.bytes), CHIP_ERROR_BUFFER_TOO_SMALL);
+    memcpy(device.salt.bytes, params.GetSalt().data(), params.GetSalt().size());
+    device.salt.size = static_cast<size_t>(params.GetSalt().size());
+
+    VerifyOrReturnError(params.GetVerifier().size() <= sizeof(device.verifier.bytes), CHIP_ERROR_BUFFER_TOO_SMALL);
+    memcpy(device.verifier.bytes, params.GetVerifier().data(), params.GetVerifier().size());
+    device.verifier.size = static_cast<size_t>(params.GetVerifier().size());
+
+    return OpenCommissioningWindow(device);
 }

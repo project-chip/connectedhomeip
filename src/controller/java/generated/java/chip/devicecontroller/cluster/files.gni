@@ -147,6 +147,8 @@ structs_sources = [
   "${chip_root}/src/controller/java/generated/java/chip/devicecontroller/cluster/structs/UnitTestingClusterTestFabricScoped.kt",
   "${chip_root}/src/controller/java/generated/java/chip/devicecontroller/cluster/structs/UnitTestingClusterTestListStructOctet.kt",
   "${chip_root}/src/controller/java/generated/java/chip/devicecontroller/cluster/structs/UserLabelClusterLabelStruct.kt",
+  "${chip_root}/src/controller/java/generated/java/chip/devicecontroller/cluster/structs/WaterHeaterModeClusterModeOptionStruct.kt",
+  "${chip_root}/src/controller/java/generated/java/chip/devicecontroller/cluster/structs/WaterHeaterModeClusterModeTagStruct.kt",
 ]
 
 eventstructs_sources = [
@@ -220,7 +222,6 @@ eventstructs_sources = [
   "${chip_root}/src/controller/java/generated/java/chip/devicecontroller/cluster/eventstructs/TargetNavigatorClusterTargetUpdatedEvent.kt",
   "${chip_root}/src/controller/java/generated/java/chip/devicecontroller/cluster/eventstructs/ThreadNetworkDiagnosticsClusterConnectionStatusEvent.kt",
   "${chip_root}/src/controller/java/generated/java/chip/devicecontroller/cluster/eventstructs/ThreadNetworkDiagnosticsClusterNetworkFaultChangeEvent.kt",
-  "${chip_root}/src/controller/java/generated/java/chip/devicecontroller/cluster/eventstructs/ThreadNetworkDirectoryClusterNetworkChangedEvent.kt",
   "${chip_root}/src/controller/java/generated/java/chip/devicecontroller/cluster/eventstructs/TimeSynchronizationClusterDSTStatusEvent.kt",
   "${chip_root}/src/controller/java/generated/java/chip/devicecontroller/cluster/eventstructs/TimeSynchronizationClusterTimeZoneStatusEvent.kt",
   "${chip_root}/src/controller/java/generated/java/chip/devicecontroller/cluster/eventstructs/UnitTestingClusterTestDifferentVendorMeiEventEvent.kt",

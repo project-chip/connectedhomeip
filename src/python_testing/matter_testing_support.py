@@ -369,8 +369,8 @@ class MatterTestConfig:
     # This allows cert tests to be run without re-commissioning for RR-1.1.
     maximize_cert_chains: bool = True
 
-    qr_code_content: Optional[str] = None
-    manual_code: Optional[str] = None
+    qr_code_content: List[str] = field(default_factory=list)
+    manual_code: List[str] = field(default_factory=list)
 
     wifi_ssid: Optional[str] = None
     wifi_passphrase: Optional[str] = None
@@ -453,14 +453,17 @@ class CustomCommissioningParameters:
 
 
 @dataclass
-class ProblemLocation:
+class ClusterPathLocation:
+    endpoint_id: int
+    cluster_id: int
+
     def __str__(self):
-        return "UNKNOWN"
+        return (f'\n       Endpoint: {self.endpoint_id},'
+                f'\n       Cluster:  {cluster_id_str(self.cluster_id)}')
 
 
 @dataclass
-class AttributePathLocation(ProblemLocation):
-    endpoint_id: int
+class AttributePathLocation(ClusterPathLocation):
     cluster_id: Optional[int] = None
     attribute_id: Optional[int] = None
 
@@ -478,55 +481,50 @@ class AttributePathLocation(ProblemLocation):
         return desc
 
     def __str__(self):
-        return (f'\n        Endpoint: {self.endpoint_id},'
-                f'\n        Cluster:  {cluster_id_str(self.cluster_id)},'
-                f'\n        Attribute:{id_str(self.attribute_id)}')
+        return (f'{super().__str__()}'
+                f'\n      Attribute:{id_str(self.attribute_id)}')
 
 
 @dataclass
-class EventPathLocation(ProblemLocation):
-    endpoint_id: int
-    cluster_id: int
+class EventPathLocation(ClusterPathLocation):
     event_id: int
 
     def __str__(self):
-        return (f'\n        Endpoint: {self.endpoint_id},'
-                f'\n        Cluster:  {cluster_id_str(self.cluster_id)},'
-                f'\n        Event:    {id_str(self.event_id)}')
+        return (f'{super().__str__()}'
+                f'\n       Event:    {id_str(self.event_id)}')
 
 
 @dataclass
-class CommandPathLocation(ProblemLocation):
-    endpoint_id: int
-    cluster_id: int
+class CommandPathLocation(ClusterPathLocation):
     command_id: int
 
     def __str__(self):
-        return (f'\n        Endpoint: {self.endpoint_id},'
-                f'\n        Cluster:  {cluster_id_str(self.cluster_id)},'
-                f'\n        Command:  {id_str(self.command_id)}')
+        return (f'{super().__str__()}'
+                f'\n       Command:  {id_str(self.command_id)}')
 
 
 @dataclass
-class ClusterPathLocation(ProblemLocation):
-    endpoint_id: int
-    cluster_id: int
-
-    def __str__(self):
-        return (f'\n       Endpoint: {self.endpoint_id},'
-                f'\n       Cluster:  {cluster_id_str(self.cluster_id)}')
-
-
-@dataclass
-class FeaturePathLocation(ProblemLocation):
-    endpoint_id: int
-    cluster_id: int
+class FeaturePathLocation(ClusterPathLocation):
     feature_code: str
 
     def __str__(self):
-        return (f'\n        Endpoint: {self.endpoint_id},'
-                f'\n        Cluster:  {cluster_id_str(self.cluster_id)},'
-                f'\n        Feature:  {self.feature_code}')
+        return (f'{super().__str__()}'
+                f'\n       Feature:  {self.feature_code}')
+
+
+@dataclass
+class DeviceTypePathLocation:
+    device_type_id: int
+    cluster_id: Optional[int] = None
+
+    def __str__(self):
+        msg = f'\n       DeviceType: {self.device_type_id}'
+        if self.cluster_id:
+            msg += f'\n       ClusterID: {self.cluster_id}'
+        return msg
+
+
+ProblemLocation = typing.Union[ClusterPathLocation, DeviceTypePathLocation]
 
 # ProblemSeverity is not using StrEnum, but rather Enum, since StrEnum only
 # appeared in 3.11. To make it JSON serializable easily, multiple inheritance
@@ -1085,34 +1083,45 @@ class MatterBaseTest(base_test.BaseTestClass):
         self.current_step_index = self.current_step_index + 1
         self.step_skipped = False
 
-    def get_setup_payload_info(self) -> SetupPayloadInfo:
-        if self.matter_test_config.qr_code_content is not None:
-            qr_code = self.matter_test_config.qr_code_content
+    def get_setup_payload_info(self) -> List[SetupPayloadInfo]:
+        setup_payloads = []
+        for qr_code in self.matter_test_config.qr_code_content:
             try:
-                setup_payload = SetupPayload().ParseQrCode(qr_code)
+                setup_payloads.append(SetupPayload().ParseQrCode(qr_code))
             except ChipStackError:
                 asserts.fail(f"QR code '{qr_code} failed to parse properly as a Matter setup code.")
 
-        elif self.matter_test_config.manual_code is not None:
-            manual_code = self.matter_test_config.manual_code
+        for manual_code in self.matter_test_config.manual_code:
             try:
-                setup_payload = SetupPayload().ParseManualPairingCode(manual_code)
+                setup_payloads.append(SetupPayload().ParseManualPairingCode(manual_code))
             except ChipStackError:
                 asserts.fail(
                     f"Manual code code '{manual_code}' failed to parse properly as a Matter setup code. Check that all digits are correct and length is 11 or 21 characters.")
-        else:
-            asserts.fail("Require either --qr-code or --manual-code.")
 
-        info = SetupPayloadInfo()
-        info.passcode = setup_payload.setup_passcode
-        if setup_payload.short_discriminator is not None:
-            info.filter_type = discovery.FilterType.SHORT_DISCRIMINATOR
-            info.filter_value = setup_payload.short_discriminator
-        else:
-            info.filter_type = discovery.FilterType.LONG_DISCRIMINATOR
-            info.filter_value = setup_payload.long_discriminator
+        infos = []
+        for setup_payload in setup_payloads:
+            info = SetupPayloadInfo()
+            info.passcode = setup_payload.setup_passcode
+            if setup_payload.short_discriminator is not None:
+                info.filter_type = discovery.FilterType.SHORT_DISCRIMINATOR
+                info.filter_value = setup_payload.short_discriminator
+            else:
+                info.filter_type = discovery.FilterType.LONG_DISCRIMINATOR
+                info.filter_value = setup_payload.long_discriminator
+            infos.append(info)
 
-        return info
+        num_passcodes = 0 if self.matter_test_config.setup_passcodes is None else len(self.matter_test_config.setup_passcodes)
+        num_discriminators = 0 if self.matter_test_config.discriminators is None else len(self.matter_test_config.discriminators)
+        asserts.assert_equal(num_passcodes, num_discriminators, "Must have same number of discriminators as passcodes")
+        if self.matter_test_config.discriminators:
+            for idx, discriminator in enumerate(self.matter_test_config.discriminators):
+                info = SetupPayloadInfo()
+                info.passcode = self.matter_test_config.setup_passcodes[idx]
+                info.filter_type = DiscoveryFilterType.LONG_DISCRIMINATOR
+                info.filter_value = discriminator
+                infos.append(info)
+
+        return infos
 
     def wait_for_user_input(self,
                             prompt_msg: str,
@@ -1311,27 +1320,23 @@ def populate_commissioning_args(args: argparse.Namespace, config: MatterTestConf
     config.commissioning_method = args.commissioning_method
     config.commission_only = args.commission_only
 
-    # TODO: this should also allow multiple once QR and manual codes are supported.
-    config.qr_code_content = args.qr_code
-    if args.manual_code:
-        config.manual_code = args.manual_code
-    else:
-        config.manual_code = None
+    config.qr_code_content.extend(args.qr_code)
+    config.manual_code.extend(args.manual_code)
 
     if args.commissioning_method is None:
         return True
 
-    if args.discriminators is None and (args.qr_code is None and args.manual_code is None):
+    if args.discriminators == [] and (args.qr_code == [] and args.manual_code == []):
         print("error: Missing --discriminator when no --qr-code/--manual-code present!")
         return False
     config.discriminators = args.discriminators
 
-    if args.passcodes is None and (args.qr_code is None and args.manual_code is None):
+    if args.passcodes == [] and (args.qr_code == [] and args.manual_code == []):
         print("error: Missing --passcode when no --qr-code/--manual-code present!")
         return False
     config.setup_passcodes = args.passcodes
 
-    if args.qr_code is not None and args.manual_code is not None:
+    if args.qr_code != [] and args.manual_code != []:
         print("error: Cannot have both --qr-code and --manual-code present!")
         return False
 
@@ -1339,8 +1344,7 @@ def populate_commissioning_args(args: argparse.Namespace, config: MatterTestConf
         print("error: supplied number of discriminators does not match number of passcodes")
         return False
 
-    device_descriptors = [config.qr_code_content] if config.qr_code_content is not None else [
-        config.manual_code] if config.manual_code is not None else config.discriminators
+    device_descriptors = config.qr_code_content + config.manual_code + config.discriminators
 
     if len(config.dut_node_ids) > len(device_descriptors):
         print("error: More node IDs provided than discriminators")
@@ -1509,9 +1513,9 @@ def parse_matter_test_args(argv: Optional[List[str]] = None) -> MatterTestConfig
     code_group = parser.add_mutually_exclusive_group(required=False)
 
     code_group.add_argument('-q', '--qr-code', type=str,
-                            metavar="QR_CODE", help="QR setup code content (overrides passcode and discriminator)")
+                            metavar="QR_CODE", default=[], help="QR setup code content (overrides passcode and discriminator)", nargs="+")
     code_group.add_argument('--manual-code', type=str_from_manual_code,
-                            metavar="MANUAL_CODE", help="Manual setup code content (overrides passcode and discriminator)")
+                            metavar="MANUAL_CODE", default=[], help="Manual setup code content (overrides passcode and discriminator)", nargs="+")
 
     fabric_group = parser.add_argument_group(
         title="Fabric selection", description="Fabric selection for single-fabric basic usage, and commissioning")
@@ -1729,15 +1733,7 @@ class CommissionDeviceTest(MatterBaseTest):
         dev_ctrl = self.default_controller
         conf = self.matter_test_config
 
-        # TODO: qr code and manual code aren't lists
-
-        if conf.qr_code_content or conf.manual_code:
-            info = self.get_setup_payload_info()
-        else:
-            info = SetupPayloadInfo()
-            info.passcode = conf.setup_passcodes[i]
-            info.filter_type = DiscoveryFilterType.LONG_DISCRIMINATOR
-            info.filter_value = conf.discriminators[i]
+        info = self.get_setup_payload_info()[i]
 
         if conf.commissioning_method == "on-network":
             try:
