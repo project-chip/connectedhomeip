@@ -219,18 +219,18 @@ def main():
     read_resp = get_clusters([0, 1])
     ok = test_runner.run_test_with_mock_read(read_resp, hooks)
     if not ok:
-        failures.append(f"Test case failure: test_checkers")
+        failures.append("Test case failure: test_checkers")
 
     test_runner.set_test('TestDecorators.py', 'TestDecorators', 'test_endpoints')
     read_resp = get_clusters([0, 1])
     ok = test_runner.run_test_with_mock_read(read_resp, hooks)
     if not ok:
-        failures.append(f"Test case failure: test_endpoints")
+        failures.append("Test case failure: test_endpoints")
 
     read_resp = get_clusters([0])
     ok = test_runner.run_test_with_mock_read(read_resp, hooks)
     if not ok:
-        failures.append(f"Test case failure: test_endpoints")
+        failures.append("Test case failure: test_endpoints")
 
     test_name = 'test_whole_node_with_pics'
     test_runner.set_test('TestDecorators.py', 'TestDecorators', test_name)
