@@ -1204,7 +1204,7 @@ static NSString * sDeviceDataKeyPrefix = @"deviceData";
     }
 
     if (![data isKindOfClass:[NSArray<NSString *> class]]) {
-        // TODO: log this, it probably indicates an error inside this part of MTRDeviceControllerDataStore
+        MTR_LOG_ERROR("data index for prefix %@ was of unexpected type", prefix);
         return nil;
     }
 
@@ -1265,7 +1265,6 @@ static NSString * sDeviceDataKeyPrefix = @"deviceData";
         return;
     }
 
-    // REVIEWERS:  does it matter if I pass a mutable vs nonmutable array to this method?
     [self->_storageDelegate controller:controller
                             storeValue:modifiedIndex
                                 forKey:[self _indexKeyForPrefix:prefix]
@@ -1334,7 +1333,6 @@ static NSString * sDeviceDataKeyPrefix = @"deviceData";
     NSMutableArray<NSString *> * modifiedIndex = [[self _dataIndexForPrefix:prefix] mutableCopy];
     [modifiedIndex removeObject:key];
 
-    // REVIEWERS:  does it matter if I pass a mutable vs nonmutable array to this method?
     [self->_storageDelegate controller:controller
                             storeValue:modifiedIndex
                                 forKey:[self _indexKeyForPrefix:prefix]
@@ -1416,7 +1414,6 @@ static NSString * sClientDataKeyPrefix = @"clientDataByNode";
 
 static NSString * sClientDataByEndpointKeyPrefix = @"clientDataByEndpoint";
 
-// REVIEWERS:  is there a constraint smaller than NSNumber on endpoint IDs?
 - (nullable NSArray<NSString *> *)_clientDataIndexForEndpointID:(NSNumber *)endpointID onNodeID:(NSNumber *)nodeID
 {
     return [self _dataIndexForPrefix:[self _clientDataPrefixForEndpointID:endpointID onNodeID:nodeID]];
