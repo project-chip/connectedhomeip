@@ -1631,6 +1631,7 @@ enum class Feature : uint32_t
     kCheckInProtocolSupport = 0x1,
     kUserActiveModeTrigger  = 0x2,
     kLongIdleTimeSupport    = 0x4,
+    kDynamicSitLitSupport   = 0x8,
 };
 
 // Bitmap for UserActiveModeTriggerBitmap
@@ -2807,6 +2808,28 @@ enum class Feature : uint32_t
     kOnOff = 0x1,
 };
 } // namespace EnergyEvseMode
+
+namespace WaterHeaterMode {
+
+// Enum for ModeTag
+enum class ModeTag : uint16_t
+{
+    kOff    = 0x4000,
+    kManual = 0x4001,
+    kTimed  = 0x4002,
+    // All received enum values that are not listed above will be mapped
+    // to kUnknownEnumValue. This is a helper enum value that should only
+    // be used by code to process how it handles receiving and unknown
+    // enum value. This specific should never be transmitted.
+    kUnknownEnumValue = 0,
+};
+
+// Bitmap for Feature
+enum class Feature : uint32_t
+{
+    kOnOff = 0x1,
+};
+} // namespace WaterHeaterMode
 
 namespace DeviceEnergyManagementMode {
 

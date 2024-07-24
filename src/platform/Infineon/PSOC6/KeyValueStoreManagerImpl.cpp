@@ -18,7 +18,7 @@
 
 /**
  *    @file
- *          Platform-specific key value storage implementation for P6
+ *          Platform-specific key value storage implementation for PSOC6
  */
 
 #include "cy_result.h"

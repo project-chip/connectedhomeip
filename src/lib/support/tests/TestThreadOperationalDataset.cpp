@@ -15,8 +15,9 @@
  *    limitations under the License.
  */
 
-#include <gtest/gtest.h>
+#include <pw_unit_test/framework.h>
 
+#include <lib/core/StringBuilderAdapters.h>
 #include <lib/support/CHIPMem.h>
 #include <lib/support/ThreadOperationalDataset.h>
 
@@ -275,6 +276,15 @@ TEST_F(TestThreadOperationalDataset, TestExampleDataset)
         0x3c, 0xa6, 0x7c, 0x96, 0x9e, 0xfb, 0x0d, 0x0c, 0x74, 0xa4, 0xd8, 0xee, 0x92, 0x3b, 0x57, 0x6c
     };
     EXPECT_TRUE(ByteSpan(pksc).data_equal(ByteSpan(expectedPksc)));
+
+    ByteSpan channelMask;
+    EXPECT_EQ(dataset.GetChannelMask(channelMask), CHIP_NO_ERROR);
+    const uint8_t expectedChannelMask[] = { 0x07, 0xff, 0xf8, 0x00 };
+    EXPECT_TRUE(channelMask.data_equal(ByteSpan(expectedChannelMask)));
+
+    uint32_t securityPolicy;
+    EXPECT_EQ(dataset.GetSecurityPolicy(securityPolicy), CHIP_NO_ERROR);
+    EXPECT_EQ(securityPolicy, 0x02a0f7f8u);
 }
 
 TEST_F(TestThreadOperationalDataset, TestInvalidExampleDataset)
@@ -318,6 +328,12 @@ TEST_F(TestThreadOperationalDataset, TestInvalidExampleDataset)
 
     uint8_t pksc[Thread::kSizePSKc];
     EXPECT_EQ(dataset.GetPSKc(pksc), CHIP_ERROR_INVALID_TLV_ELEMENT);
+
+    ByteSpan channelMask;
+    EXPECT_EQ(dataset.GetChannelMask(channelMask), CHIP_ERROR_INVALID_TLV_ELEMENT);
+
+    uint32_t securityPolicy;
+    EXPECT_EQ(dataset.GetSecurityPolicy(securityPolicy), CHIP_ERROR_INVALID_TLV_ELEMENT);
 }
 
 } // namespace

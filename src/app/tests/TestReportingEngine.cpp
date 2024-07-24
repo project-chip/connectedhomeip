@@ -24,20 +24,23 @@
 
 #include <cinttypes>
 
+#include <pw_unit_test/framework.h>
+
 #include <app/ConcreteAttributePath.h>
 #include <app/InteractionModelEngine.h>
+#include <app/codegen-data-model/Instance.h>
 #include <app/reporting/Engine.h>
 #include <app/reporting/tests/MockReportScheduler.h>
 #include <app/tests/AppTestContext.h>
 #include <lib/core/CHIPCore.h>
 #include <lib/core/ErrorStr.h>
+#include <lib/core/StringBuilderAdapters.h>
 #include <lib/core/TLV.h>
 #include <lib/core/TLVDebug.h>
 #include <lib/core/TLVUtilities.h>
 #include <lib/support/tests/ExtraPwTestMacros.h>
 #include <messaging/ExchangeContext.h>
 #include <messaging/Flags.h>
-#include <pw_unit_test/framework.h>
 
 namespace chip {
 
@@ -168,7 +171,7 @@ TEST_F_FROM_FIXTURE(TestReportingEngine, TestBuildAndSendSingleReportData)
     EXPECT_EQ(readRequestBuilder.GetError(), CHIP_NO_ERROR);
     EXPECT_EQ(writer.Finalize(&readRequestbuf), CHIP_NO_ERROR);
     app::ReadHandler readHandler(dummy, exchangeCtx, chip::app::ReadHandler::InteractionType::Read,
-                                 app::reporting::GetDefaultReportScheduler());
+                                 app::reporting::GetDefaultReportScheduler(), CodegenDataModelInstance());
     readHandler.OnInitialRequest(std::move(readRequestbuf));
 
     EXPECT_EQ(InteractionModelEngine::GetInstance()->GetReportingEngine().BuildAndSendSingleReportData(&readHandler),

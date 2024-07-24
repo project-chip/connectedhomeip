@@ -16,11 +16,14 @@
  *    limitations under the License.
  */
 
-#include <gtest/gtest.h>
+#include <stdint.h>
+
+#include <pw_unit_test/framework.h>
+
 #include <lib/core/CHIPCore.h>
+#include <lib/core/StringBuilderAdapters.h>
 #include <lib/support/TestPersistentStorageDelegate.h>
 #include <protocols/secure_channel/CheckInCounter.h>
-#include <stdint.h>
 
 using namespace chip;
 using namespace chip::Protocols::SecureChannel;
