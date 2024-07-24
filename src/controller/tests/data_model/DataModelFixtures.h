@@ -100,6 +100,14 @@ extern CommandHandler::Handle gAsyncCommandHandle;
 
 /// A customized class for read/write/invoke that matches functionality
 /// with the ember-compatibility-functions functionality here.
+///
+/// TODO: these functions currently redirect to ember functions, so could
+///       be merged with test-interaction-model-api.h/cpp as well. This is not done since
+///       if we remove the direct ember dependency from IM, we can implement
+///       distinct functional classes.
+/// TODO items for above:
+///      - once IM only supports DataModel
+///      - break ember-overrides in this h/cpp file
 class CustomDataModel : public InteractionModel::DataModel
 {
 public:
