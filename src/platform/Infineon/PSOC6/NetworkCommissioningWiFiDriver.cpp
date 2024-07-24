@@ -19,8 +19,8 @@
 #include <lib/support/SafeInt.h>
 #include <platform/CHIPDeviceLayer.h>
 #include <platform/Infineon/PSOC6/NetworkCommissioningDriver.h>
-#include <platform/Infineon/PSOC6/P6Config.h>
-#include <platform/Infineon/PSOC6/P6Utils.h>
+#include <platform/Infineon/PSOC6/PSOC6Config.h>
+#include <platform/Infineon/PSOC6/PSOC6Utils.h>
 
 #include <limits>
 #include <string>
@@ -140,11 +140,11 @@ CHIP_ERROR P6WiFiDriver::ConnectWiFiNetwork(const char * ssid, uint8_t ssidLen, 
     ReturnErrorOnFailure(ConnectivityMgr().SetWiFiStationMode(ConnectivityManager::kWiFiStationMode_Disabled));
     // Set the wifi configuration
     wifi_config_t wifi_config;
-    chip::DeviceLayer::Internal::P6Utils::populate_wifi_config_t(
+    chip::DeviceLayer::Internal::PSOC6Utils::populate_wifi_config_t(
         &wifi_config, WIFI_IF_STA, (const cy_wcm_ssid_t *) ssid, (const cy_wcm_passphrase_t *) key,
         (keyLen) ? CHIP_DEVICE_CONFIG_DEFAULT_STA_SECURITY : CY_WCM_SECURITY_OPEN);
 
-    err = chip::DeviceLayer::Internal::P6Utils::p6_wifi_set_config(WIFI_IF_STA, &wifi_config);
+    err = chip::DeviceLayer::Internal::PSOC6Utils::p6_wifi_set_config(WIFI_IF_STA, &wifi_config);
     SuccessOrExit(err);
 
     ReturnErrorOnFailure(ConnectivityMgr().SetWiFiStationMode(ConnectivityManager::kWiFiStationMode_Disabled));
@@ -173,7 +173,7 @@ void P6WiFiDriver::ConnectNetwork(ByteSpan networkId, ConnectCallback * callback
 
     VerifyOrExit(NetworkMatch(mStagingNetwork, networkId), networkingStatus = Status::kNetworkIDNotFound);
     VerifyOrExit(mpConnectCallback == nullptr, networkingStatus = Status::kUnknownError);
-    ChipLogProgress(NetworkProvisioning, "P6 NetworkCommissioningDelegate: SSID: %s", mStagingNetwork.ssid);
+    ChipLogProgress(NetworkProvisioning, "PSOC6 NetworkCommissioningDelegate: SSID: %s", mStagingNetwork.ssid);
     err               = ConnectWiFiNetwork(reinterpret_cast<const char *>(mStagingNetwork.ssid), mStagingNetwork.ssidLen,
                                            reinterpret_cast<const char *>(mStagingNetwork.credentials), mStagingNetwork.credentialsLen);
     mpConnectCallback = callback;
@@ -353,7 +353,7 @@ void P6WiFiDriver::OnNetworkStatusChange()
 {
     Network configuredNetwork;
     bool staEnabled = false, staConnected = false;
-    VerifyOrReturn(P6Utils::IsStationEnabled(staEnabled) == CHIP_NO_ERROR);
+    VerifyOrReturn(PSOC6Utils::IsStationEnabled(staEnabled) == CHIP_NO_ERROR);
     VerifyOrReturn(staEnabled && mpStatusChangeCallback != nullptr);
     CHIP_ERROR err = GetConnectedNetwork(configuredNetwork);
     if (err != CHIP_NO_ERROR)
@@ -361,7 +361,7 @@ void P6WiFiDriver::OnNetworkStatusChange()
         ChipLogError(DeviceLayer, "Failed to get configured network when updating network status: %s", err.AsString());
         return;
     }
-    VerifyOrReturn(P6Utils::IsStationConnected(staConnected) == CHIP_NO_ERROR);
+    VerifyOrReturn(PSOC6Utils::IsStationConnected(staConnected) == CHIP_NO_ERROR);
     if (staConnected)
     {
         mpStatusChangeCallback->OnNetworkingStatusChange(

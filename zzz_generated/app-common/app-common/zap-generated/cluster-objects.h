@@ -13483,6 +13483,18 @@ struct TypeInfo
     static constexpr bool MustUseTimedWrite() { return false; }
 };
 } // namespace OperatingMode
+namespace MaximumCheckInBackOff {
+struct TypeInfo
+{
+    using Type             = uint32_t;
+    using DecodableType    = uint32_t;
+    using DecodableArgType = uint32_t;
+
+    static constexpr ClusterId GetClusterId() { return Clusters::IcdManagement::Id; }
+    static constexpr AttributeId GetAttributeId() { return Attributes::MaximumCheckInBackOff::Id; }
+    static constexpr bool MustUseTimedWrite() { return false; }
+};
+} // namespace MaximumCheckInBackOff
 namespace GeneratedCommandList {
 struct TypeInfo : public Clusters::Globals::Attributes::GeneratedCommandList::TypeInfo
 {
@@ -13539,6 +13551,7 @@ struct TypeInfo
         Attributes::UserActiveModeTriggerInstruction::TypeInfo::DecodableType userActiveModeTriggerInstruction;
         Attributes::OperatingMode::TypeInfo::DecodableType operatingMode =
             static_cast<chip::app::Clusters::IcdManagement::OperatingModeEnum>(0);
+        Attributes::MaximumCheckInBackOff::TypeInfo::DecodableType maximumCheckInBackOff = static_cast<uint32_t>(0);
         Attributes::GeneratedCommandList::TypeInfo::DecodableType generatedCommandList;
         Attributes::AcceptedCommandList::TypeInfo::DecodableType acceptedCommandList;
         Attributes::EventList::TypeInfo::DecodableType eventList;
@@ -29134,29 +29147,6 @@ public:
 using DecodableType = Type;
 
 } // namespace PresetTypeStruct
-namespace QueuedPresetStruct {
-enum class Fields : uint8_t
-{
-    kPresetHandle        = 0,
-    kTransitionTimestamp = 1,
-};
-
-struct Type
-{
-public:
-    DataModel::Nullable<chip::ByteSpan> presetHandle;
-    DataModel::Nullable<uint32_t> transitionTimestamp;
-
-    CHIP_ERROR Decode(TLV::TLVReader & reader);
-
-    static constexpr bool kIsFabricScoped = false;
-
-    CHIP_ERROR Encode(TLV::TLVWriter & aWriter, TLV::Tag aTag) const;
-};
-
-using DecodableType = Type;
-
-} // namespace QueuedPresetStruct
 namespace ScheduleTypeStruct {
 enum class Fields : uint8_t
 {
@@ -29261,11 +29251,6 @@ namespace CommitPresetsSchedulesRequest {
 struct Type;
 struct DecodableType;
 } // namespace CommitPresetsSchedulesRequest
-
-namespace CancelSetActivePresetRequest {
-struct Type;
-struct DecodableType;
-} // namespace CancelSetActivePresetRequest
 
 namespace SetTemperatureSetpointHoldPolicy {
 struct Type;
@@ -29491,7 +29476,6 @@ namespace SetActivePresetRequest {
 enum class Fields : uint8_t
 {
     kPresetHandle = 0,
-    kDelayMinutes = 1,
 };
 
 struct Type
@@ -29502,7 +29486,6 @@ public:
     static constexpr ClusterId GetClusterId() { return Clusters::Thermostat::Id; }
 
     chip::ByteSpan presetHandle;
-    Optional<uint16_t> delayMinutes;
 
     CHIP_ERROR Encode(TLV::TLVWriter & aWriter, TLV::Tag aTag) const;
 
@@ -29518,7 +29501,6 @@ public:
     static constexpr ClusterId GetClusterId() { return Clusters::Thermostat::Id; }
 
     chip::ByteSpan presetHandle;
-    Optional<uint16_t> delayMinutes;
     CHIP_ERROR Decode(TLV::TLVReader & reader);
 };
 }; // namespace SetActivePresetRequest
@@ -29610,34 +29592,6 @@ public:
     CHIP_ERROR Decode(TLV::TLVReader & reader);
 };
 }; // namespace CommitPresetsSchedulesRequest
-namespace CancelSetActivePresetRequest {
-enum class Fields : uint8_t
-{
-};
-
-struct Type
-{
-public:
-    // Use GetCommandId instead of commandId directly to avoid naming conflict with CommandIdentification in ExecutionOfACommand
-    static constexpr CommandId GetCommandId() { return Commands::CancelSetActivePresetRequest::Id; }
-    static constexpr ClusterId GetClusterId() { return Clusters::Thermostat::Id; }
-
-    CHIP_ERROR Encode(TLV::TLVWriter & aWriter, TLV::Tag aTag) const;
-
-    using ResponseType = DataModel::NullObjectType;
-
-    static constexpr bool MustUseTimedInvoke() { return false; }
-};
-
-struct DecodableType
-{
-public:
-    static constexpr CommandId GetCommandId() { return Commands::CancelSetActivePresetRequest::Id; }
-    static constexpr ClusterId GetClusterId() { return Clusters::Thermostat::Id; }
-
-    CHIP_ERROR Decode(TLV::TLVReader & reader);
-};
-}; // namespace CancelSetActivePresetRequest
 namespace SetTemperatureSetpointHoldPolicy {
 enum class Fields : uint8_t
 {
@@ -30430,20 +30384,6 @@ struct TypeInfo
     static constexpr bool MustUseTimedWrite() { return false; }
 };
 } // namespace SetpointHoldExpiryTimestamp
-namespace QueuedPreset {
-struct TypeInfo
-{
-    using Type = chip::app::DataModel::Nullable<chip::app::Clusters::Thermostat::Structs::QueuedPresetStruct::Type>;
-    using DecodableType =
-        chip::app::DataModel::Nullable<chip::app::Clusters::Thermostat::Structs::QueuedPresetStruct::DecodableType>;
-    using DecodableArgType =
-        const chip::app::DataModel::Nullable<chip::app::Clusters::Thermostat::Structs::QueuedPresetStruct::DecodableType> &;
-
-    static constexpr ClusterId GetClusterId() { return Clusters::Thermostat::Id; }
-    static constexpr AttributeId GetAttributeId() { return Attributes::QueuedPreset::Id; }
-    static constexpr bool MustUseTimedWrite() { return false; }
-};
-} // namespace QueuedPreset
 namespace GeneratedCommandList {
 struct TypeInfo : public Clusters::Globals::Attributes::GeneratedCommandList::TypeInfo
 {
@@ -30566,7 +30506,6 @@ struct TypeInfo
         Attributes::TemperatureSetpointHoldPolicy::TypeInfo::DecodableType temperatureSetpointHoldPolicy =
             static_cast<chip::BitMask<chip::app::Clusters::Thermostat::TemperatureSetpointHoldPolicyBitmap>>(0);
         Attributes::SetpointHoldExpiryTimestamp::TypeInfo::DecodableType setpointHoldExpiryTimestamp;
-        Attributes::QueuedPreset::TypeInfo::DecodableType queuedPreset;
         Attributes::GeneratedCommandList::TypeInfo::DecodableType generatedCommandList;
         Attributes::AcceptedCommandList::TypeInfo::DecodableType acceptedCommandList;
         Attributes::EventList::TypeInfo::DecodableType eventList;
@@ -36291,17 +36230,19 @@ namespace Structs {
 namespace ThreadNetworkStruct {
 enum class Fields : uint8_t
 {
-    kExtendedPanID = 0,
-    kNetworkName   = 1,
-    kChannel       = 2,
+    kExtendedPanID   = 0,
+    kNetworkName     = 1,
+    kChannel         = 2,
+    kActiveTimestamp = 3,
 };
 
 struct Type
 {
 public:
-    uint64_t extendedPanID = static_cast<uint64_t>(0);
+    chip::ByteSpan extendedPanID;
     chip::CharSpan networkName;
-    uint16_t channel = static_cast<uint16_t>(0);
+    uint16_t channel         = static_cast<uint16_t>(0);
+    uint64_t activeTimestamp = static_cast<uint64_t>(0);
 
     CHIP_ERROR Decode(TLV::TLVReader & reader);
 
@@ -36386,7 +36327,7 @@ public:
     static constexpr CommandId GetCommandId() { return Commands::RemoveNetwork::Id; }
     static constexpr ClusterId GetClusterId() { return Clusters::ThreadNetworkDirectory::Id; }
 
-    uint64_t extendedPanID = static_cast<uint64_t>(0);
+    chip::ByteSpan extendedPanID;
 
     CHIP_ERROR Encode(TLV::TLVWriter & aWriter, TLV::Tag aTag) const;
 
@@ -36401,7 +36342,7 @@ public:
     static constexpr CommandId GetCommandId() { return Commands::RemoveNetwork::Id; }
     static constexpr ClusterId GetClusterId() { return Clusters::ThreadNetworkDirectory::Id; }
 
-    uint64_t extendedPanID = static_cast<uint64_t>(0);
+    chip::ByteSpan extendedPanID;
     CHIP_ERROR Decode(TLV::TLVReader & reader);
 };
 }; // namespace RemoveNetwork
@@ -36418,7 +36359,7 @@ public:
     static constexpr CommandId GetCommandId() { return Commands::GetOperationalDataset::Id; }
     static constexpr ClusterId GetClusterId() { return Clusters::ThreadNetworkDirectory::Id; }
 
-    uint64_t extendedPanID = static_cast<uint64_t>(0);
+    chip::ByteSpan extendedPanID;
 
     CHIP_ERROR Encode(TLV::TLVWriter & aWriter, TLV::Tag aTag) const;
 
@@ -36433,7 +36374,7 @@ public:
     static constexpr CommandId GetCommandId() { return Commands::GetOperationalDataset::Id; }
     static constexpr ClusterId GetClusterId() { return Clusters::ThreadNetworkDirectory::Id; }
 
-    uint64_t extendedPanID = static_cast<uint64_t>(0);
+    chip::ByteSpan extendedPanID;
     CHIP_ERROR Decode(TLV::TLVReader & reader);
 };
 }; // namespace GetOperationalDataset
@@ -36476,13 +36417,14 @@ namespace Attributes {
 namespace PreferredExtendedPanID {
 struct TypeInfo
 {
-    using Type             = chip::app::DataModel::Nullable<uint64_t>;
-    using DecodableType    = chip::app::DataModel::Nullable<uint64_t>;
-    using DecodableArgType = const chip::app::DataModel::Nullable<uint64_t> &;
+    using Type             = chip::app::DataModel::Nullable<chip::ByteSpan>;
+    using DecodableType    = chip::app::DataModel::Nullable<chip::ByteSpan>;
+    using DecodableArgType = const chip::app::DataModel::Nullable<chip::ByteSpan> &;
 
     static constexpr ClusterId GetClusterId() { return Clusters::ThreadNetworkDirectory::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::PreferredExtendedPanID::Id; }
     static constexpr bool MustUseTimedWrite() { return false; }
+    static constexpr size_t MaxLength() { return 8; }
 };
 } // namespace PreferredExtendedPanID
 namespace ThreadNetworks {
@@ -36568,41 +36510,6 @@ struct TypeInfo
     };
 };
 } // namespace Attributes
-namespace Events {
-namespace NetworkChanged {
-static constexpr PriorityLevel kPriorityLevel = PriorityLevel::Info;
-
-enum class Fields : uint8_t
-{
-    kExtendedPanID = 0,
-};
-
-struct Type
-{
-public:
-    static constexpr PriorityLevel GetPriorityLevel() { return kPriorityLevel; }
-    static constexpr EventId GetEventId() { return Events::NetworkChanged::Id; }
-    static constexpr ClusterId GetClusterId() { return Clusters::ThreadNetworkDirectory::Id; }
-    static constexpr bool kIsFabricScoped = false;
-
-    uint64_t extendedPanID = static_cast<uint64_t>(0);
-
-    CHIP_ERROR Encode(TLV::TLVWriter & aWriter, TLV::Tag aTag) const;
-};
-
-struct DecodableType
-{
-public:
-    static constexpr PriorityLevel GetPriorityLevel() { return kPriorityLevel; }
-    static constexpr EventId GetEventId() { return Events::NetworkChanged::Id; }
-    static constexpr ClusterId GetClusterId() { return Clusters::ThreadNetworkDirectory::Id; }
-
-    uint64_t extendedPanID = static_cast<uint64_t>(0);
-
-    CHIP_ERROR Decode(TLV::TLVReader & reader);
-};
-} // namespace NetworkChanged
-} // namespace Events
 } // namespace ThreadNetworkDirectory
 namespace WakeOnLan {
 

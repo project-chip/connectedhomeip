@@ -616,6 +616,10 @@ private:
 
     void OnReceiveError(CHIP_ERROR error, const Transport::PeerAddress & source);
 
+#if INET_CONFIG_ENABLE_TCP_ENDPOINT
+    void MarkSecureSessionOverTCPForEviction(Transport::ActiveTCPConnectionState * conn, CHIP_ERROR conErr);
+#endif // INET_CONFIG_ENABLE_TCP_ENDPOINT
+
     static bool IsControlMessage(PayloadHeader & payloadHeader)
     {
         return payloadHeader.HasMessageType(Protocols::SecureChannel::MsgType::MsgCounterSyncReq) ||
