@@ -90,7 +90,7 @@ void UpdateModeBaseCurrentModeToOnMode(EndpointId endpoint)
 #endif // MATTER_DM_PLUGIN_MODE_BASE
 
 template <typename EnumType>
-bool isKnownEnumValue(EnumType value)
+bool IsKnownEnumValue(EnumType value)
 {
     return (EnsureKnownEnumValue(value) != EnumType::kUnknownEnumValue);
 }
