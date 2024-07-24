@@ -1237,7 +1237,7 @@ cluster ThreadNetworkDirectory = 1107 {
   /** Removes an entry from the ThreadNetworks list. */
   timed command access(invoke: manage) RemoveNetwork(RemoveNetworkRequest): DefaultSuccess = 1;
   /** Retrieves a Thread Operational Dataset from the ThreadNetworks list. */
-  timed command GetOperationalDataset(GetOperationalDatasetRequest): OperationalDatasetResponse = 2;
+  command GetOperationalDataset(GetOperationalDatasetRequest): OperationalDatasetResponse = 2;
 }
 
 endpoint 0 {

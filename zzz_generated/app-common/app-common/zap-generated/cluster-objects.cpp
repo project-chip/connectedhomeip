@@ -31499,7 +31499,6 @@ bool CommandNeedsTimedInvoke(ClusterId aCluster, CommandId aCommand)
         {
         case Clusters::ThreadNetworkDirectory::Commands::AddNetwork::Id:
         case Clusters::ThreadNetworkDirectory::Commands::RemoveNetwork::Id:
-        case Clusters::ThreadNetworkDirectory::Commands::GetOperationalDataset::Id:
             return true;
         default:
             return false;

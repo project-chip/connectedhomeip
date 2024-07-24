@@ -1011,9 +1011,6 @@ static BOOL CommandNeedsTimedInvokeInThreadNetworkDirectoryCluster(AttributeId a
     case Commands::RemoveNetwork::Id: {
         return YES;
     }
-    case Commands::GetOperationalDataset::Id: {
-        return YES;
-    }
     default: {
         return NO;
     }

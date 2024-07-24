@@ -42124,10 +42124,6 @@ class ThreadNetworkDirectory(Cluster):
                         ClusterObjectFieldDescriptor(Label="extendedPanID", Tag=0, Type=bytes),
                     ])
 
-            @ChipUtility.classproperty
-            def must_use_timed_invoke(cls) -> bool:
-                return True
-
             extendedPanID: 'bytes' = b""
 
         @dataclass

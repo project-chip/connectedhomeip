@@ -54910,6 +54910,9 @@ public class ChipClusters {
         }}, commandId, commandArgs, timedInvokeTimeoutMs);
     }
 
+    public void getOperationalDataset(OperationalDatasetResponseCallback callback, byte[] extendedPanID) {
+      getOperationalDataset(callback, extendedPanID, 0);
+    }
 
     public void getOperationalDataset(OperationalDatasetResponseCallback callback, byte[] extendedPanID, int timedInvokeTimeoutMs) {
       final long commandId = 2L;

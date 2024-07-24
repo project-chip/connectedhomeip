@@ -27716,7 +27716,7 @@ public class ClusterInfoMapping {
            , (byte[])
              commandArguments.get("extendedPanID")
 
-            , 10000);
+            );
         },
         () -> new DelegatedThreadNetworkDirectoryClusterOperationalDatasetResponseCallback(),
         threadNetworkDirectorygetOperationalDatasetCommandParams

@@ -36439,7 +36439,7 @@ public:
 
     using ResponseType = Clusters::ThreadNetworkDirectory::Commands::OperationalDatasetResponse::DecodableType;
 
-    static constexpr bool MustUseTimedInvoke() { return true; }
+    static constexpr bool MustUseTimedInvoke() { return false; }
 };
 
 struct DecodableType

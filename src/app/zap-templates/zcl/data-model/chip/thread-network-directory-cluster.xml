@@ -59,7 +59,7 @@ limitations under the License.
             <access op="invoke" privilege="manage"/>
             <arg name="ExtendedPanID" type="octet_string" length="8"/>
         </command>
-        <command source="client" code="0x02" name="GetOperationalDataset" mustUseTimedInvoke="true" optional="false" response="OperationalDatasetResponse">
+        <command source="client" code="0x02" name="GetOperationalDataset" optional="false" response="OperationalDatasetResponse">
             <description>Retrieves a Thread Operational Dataset from the ThreadNetworks list.</description>
             <access op="invoke" privilege="operate"/>
             <arg name="ExtendedPanID" type="octet_string" length="8"/>
