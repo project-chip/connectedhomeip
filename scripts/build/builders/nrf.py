@@ -224,16 +224,16 @@ west build --cmake-only -d {outdir} -b {board} --sysbuild {sourcedir}{build_flag
     def _bundle(self):
         logging.info(f'Generating flashbundle at {self.output_dir}')
 
-        self._Execute(['ninja', '-C', self.output_dir, 'flashing_script'],
+        self._Execute(['ninja', '-C', os.path.join(self.output_dir, 'nrfconnect'), 'flashing_script'],
                       title='Generating flashable files of ' + self.identifier)
 
     def build_outputs(self):
         yield BuilderOutput(
-            os.path.join(self.output_dir, 'zephyr', 'zephyr.elf'),
+            os.path.join(self.output_dir, 'nrfconnect', 'zephyr', 'zephyr.elf'),
             '%s.elf' % self.app.AppNamePrefix())
         if self.options.enable_link_map_file:
             yield BuilderOutput(
-                os.path.join(self.output_dir, 'zephyr', 'zephyr.map'),
+                os.path.join(self.output_dir, 'nrfconnect', 'zephyr', 'zephyr.map'),
                 '%s.map' % self.app.AppNamePrefix())
 
     def bundle_outputs(self):
