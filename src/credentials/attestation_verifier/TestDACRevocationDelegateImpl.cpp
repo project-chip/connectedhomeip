@@ -49,19 +49,16 @@ CHIP_ERROR TestDACRevocationDelegateImpl::SetDeviceAttestationRevocationSetPath(
 
 // This method parses the below JSON Scheme
 // [
-//  {
-//    "type": "revocation_set",
-//    "issuer_subject_key_id": "63540E47F64B1C38D13884A462D16C195D8FFB3C",
-//    "issuer_name": "MD0xJTAjBgNVBAMMHE1hdHRlciBEZXYgUEFJIDB4RkZGMSBubyBQSUQxFDASBgorBgEEAYKifAIBDARGRkYx",
-//    "revoked_serial_numbers": [
-//      "69CDF10DE9E54ED1"
-//    ]
-//  }
+//   { 
+//     "type": "revocation_set",
+//     "issuer_subject_key_id": "<issuer subject key ID as uppercase hex, 20 bytes>",
+//     "issuer_name": "<ASN.1 SEQUENCE of Issuer of the CRL as base64>",
+//     "revoked_serial_numbers: [
+//       "serial1 bytes as base64",
+//       "serial2 bytes as base64"
+//     ]
+//   }
 // ]
-//
-// "issuer_subject_key_id" -> Subject key identifier of the CRL file's issuer, encoded as a hex string
-// "issuer_name" -> Issuer field of the CRL file, encoded as a base64 string
-// "revoked_serial_numbers" -> Serial numbers of revoked certificates, encoded as hex strings
 //
 bool TestDACRevocationDelegateImpl::IsEntryInRevocationSet(const CharSpan & akidHexStr, const CharSpan & issuerNameBase64Str,
                                                            const CharSpan & serialNumberHexStr)
