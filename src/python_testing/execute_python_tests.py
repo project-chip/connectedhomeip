@@ -67,6 +67,7 @@ def main(search_directory, env_file):
         "TestCommissioningTimeSync.py",
         "TestConformanceSupport.py",
         "TestIdChecks.py",
+        "TestSpecParsingDeviceType",
         "TestMatterTestingSupport.py",
         "TestSpecParsingSupport.py",
         "TestTimeSyncTrustedTimeSource.py",
