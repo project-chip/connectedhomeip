@@ -12496,31 +12496,6 @@ static id _Nullable DecodeAttributeValueForThermostatCluster(AttributeId aAttrib
         }
         return value;
     }
-    case Attributes::QueuedPreset::Id: {
-        using TypeInfo = Attributes::QueuedPreset::TypeInfo;
-        TypeInfo::DecodableType cppValue;
-        *aError = DataModel::Decode(aReader, cppValue);
-        if (*aError != CHIP_NO_ERROR) {
-            return nil;
-        }
-        MTRThermostatClusterQueuedPresetStruct * _Nullable value;
-        if (cppValue.IsNull()) {
-            value = nil;
-        } else {
-            value = [MTRThermostatClusterQueuedPresetStruct new];
-            if (cppValue.Value().presetHandle.IsNull()) {
-                value.presetHandle = nil;
-            } else {
-                value.presetHandle = AsData(cppValue.Value().presetHandle.Value());
-            }
-            if (cppValue.Value().transitionTimestamp.IsNull()) {
-                value.transitionTimestamp = nil;
-            } else {
-                value.transitionTimestamp = [NSNumber numberWithUnsignedInt:cppValue.Value().transitionTimestamp.Value()];
-            }
-        }
-        return value;
-    }
     default: {
         break;
     }
