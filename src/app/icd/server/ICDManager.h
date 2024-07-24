@@ -33,9 +33,10 @@
 #include <system/SystemClock.h>
 
 #if CHIP_CONFIG_ENABLE_ICD_CIP
-#include <app/icd/server/ICDCheckInSender.h>   // nogncheck
-#include <app/icd/server/ICDMonitoringTable.h> // nogncheck
-#endif                                         // CHIP_CONFIG_ENABLE_ICD_CIP
+#include <app/icd/server/ICDCheckInBackOffStrategy.h> // nogncheck
+#include <app/icd/server/ICDCheckInSender.h>          // nogncheck
+#include <app/icd/server/ICDMonitoringTable.h>        // nogncheck
+#endif                                                // CHIP_CONFIG_ENABLE_ICD_CIP
 
 namespace chip {
 namespace Crypto {
@@ -115,7 +116,8 @@ public:
     ~ICDManager() = default;
 
     void Init(PersistentStorageDelegate * storage, FabricTable * fabricTable, Crypto::SymmetricKeystore * symmetricKeyStore,
-              Messaging::ExchangeManager * exchangeManager, SubscriptionsInfoProvider * subInfoProvider);
+              Messaging::ExchangeManager * exchangeManager, SubscriptionsInfoProvider * subInfoProvider,
+              ICDCheckInBackOffStrategy * strategy);
     void Shutdown();
 
     /**
@@ -318,11 +320,12 @@ private:
     bool mIsBootUpResumeSubscriptionExecuted = false;
 #endif // !CHIP_CONFIG_SUBSCRIPTION_TIMEOUT_RESUMPTION && CHIP_CONFIG_PERSIST_SUBSCRIPTIONS
 
-    PersistentStorageDelegate * mStorage           = nullptr;
-    FabricTable * mFabricTable                     = nullptr;
-    Messaging::ExchangeManager * mExchangeManager  = nullptr;
-    Crypto::SymmetricKeystore * mSymmetricKeystore = nullptr;
-    SubscriptionsInfoProvider * mSubInfoProvider   = nullptr;
+    PersistentStorageDelegate * mStorage                   = nullptr;
+    FabricTable * mFabricTable                             = nullptr;
+    Messaging::ExchangeManager * mExchangeManager          = nullptr;
+    Crypto::SymmetricKeystore * mSymmetricKeystore         = nullptr;
+    SubscriptionsInfoProvider * mSubInfoProvider           = nullptr;
+    ICDCheckInBackOffStrategy * mICDCheckInBackOffStrategy = nullptr;
     ObjectPool<ICDCheckInSender, (CHIP_CONFIG_ICD_CLIENTS_SUPPORTED_PER_FABRIC * CHIP_CONFIG_MAX_FABRICS)> mICDSenderPool;
 #endif // CHIP_CONFIG_ENABLE_ICD_CIP
 

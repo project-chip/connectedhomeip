@@ -66,6 +66,22 @@ source_set("notifier") {
   ]
 }
 
+source_set("check-in-back-off") {
+  sources = [ "ICDCheckInBackOffStrategy.h" ]
+
+  public_deps = [
+    ":monitoring-table",
+    "${chip_root}/src/lib/core",
+    "${chip_root}/src/lib/support",
+  ]
+}
+
+source_set("default-check-in-back-off") {
+  sources = [ "DefaultICDCheckInBackOffStrategy.h" ]
+
+  public_deps = [ ":check-in-back-off" ]
+}
+
 # ICD Manager source-set is broken out of the main source-set to enable unit tests
 # All sources and configurations used by the ICDManager need to go in this source-set
 source_set("manager") {
@@ -89,6 +105,7 @@ source_set("manager") {
 
   if (chip_enable_icd_checkin) {
     public_deps += [
+      ":check-in-back-off",
       ":monitoring-table",
       ":sender",
       "${chip_root}/src/app:app_config",

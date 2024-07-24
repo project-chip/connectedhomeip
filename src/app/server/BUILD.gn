@@ -72,5 +72,12 @@ static_library("server") {
 
   if (chip_enable_icd_server) {
     public_deps += [ "${chip_root}/src/app/icd/server:notifier" ]
+
+    if (chip_enable_icd_checkin) {
+      public_deps += [
+        "${chip_root}/src/app/icd/server:check-in-back-off",
+        "${chip_root}/src/app/icd/server:default-check-in-back-off",
+      ]
+    }
   }
 }
