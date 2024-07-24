@@ -295,7 +295,7 @@ class TC_DEM_2_4(MatterBaseTest, DEMTestBase):
         asserts.assert_equal(forecast.slots[1].slotIsPausable, False)
         asserts.assert_equal(forecast.activeSlotNumber, 0)
         asserts.assert_equal(forecast.forecastUpdateReason,
-                             Clusters.DeviceEnergyManagement.Enums.ForecastUpdateReasonEnum.kLocalOptimization)
+                             Clusters.DeviceEnergyManagement.Enums.ForecastUpdateReasonEnum.kInternalOptimization)
 
         self.step("13")
         await self.send_pause_request_command(forecast.slots[0].minPauseDuration,
