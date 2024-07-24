@@ -1631,6 +1631,7 @@ enum class Feature : uint32_t
     kCheckInProtocolSupport = 0x1,
     kUserActiveModeTrigger  = 0x2,
     kLongIdleTimeSupport    = 0x4,
+    kDynamicSitLitSupport   = 0x8,
 };
 
 // Bitmap for UserActiveModeTriggerBitmap
@@ -4052,7 +4053,6 @@ enum class Feature : uint32_t
     kMatterScheduleConfiguration = 0x80,
     kPresets                     = 0x100,
     kSetpoints                   = 0x200,
-    kQueuedPresetsSupported      = 0x400,
 };
 
 // Bitmap for HVACSystemTypeBitmap

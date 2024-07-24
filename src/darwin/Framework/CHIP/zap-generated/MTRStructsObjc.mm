@@ -7073,36 +7073,6 @@ NS_ASSUME_NONNULL_BEGIN
 
 @end
 
-@implementation MTRThermostatClusterQueuedPresetStruct
-- (instancetype)init
-{
-    if (self = [super init]) {
-
-        _presetHandle = nil;
-
-        _transitionTimestamp = nil;
-    }
-    return self;
-}
-
-- (id)copyWithZone:(NSZone * _Nullable)zone
-{
-    auto other = [[MTRThermostatClusterQueuedPresetStruct alloc] init];
-
-    other.presetHandle = self.presetHandle;
-    other.transitionTimestamp = self.transitionTimestamp;
-
-    return other;
-}
-
-- (NSString *)description
-{
-    NSString * descriptionString = [NSString stringWithFormat:@"<%@: presetHandle:%@; transitionTimestamp:%@; >", NSStringFromClass([self class]), [_presetHandle base64EncodedStringWithOptions:0], _transitionTimestamp];
-    return descriptionString;
-}
-
-@end
-
 @implementation MTRThermostatClusterScheduleTypeStruct
 - (instancetype)init
 {
