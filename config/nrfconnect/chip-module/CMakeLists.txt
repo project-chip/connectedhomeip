@@ -78,6 +78,11 @@ if (CONFIG_NRF_802154_RADIO_DRIVER)
     zephyr_include_directories($<TARGET_PROPERTY:nrf-802154-driver-interface,INTERFACE_INCLUDE_DIRECTORIES>)
 endif()
 
+if (CONFIG_CHIP_LOG_FILE_NAME)
+    zephyr_compile_definitions(__FILE__=__FILE_NAME__)
+    zephyr_compile_options(-Wno-builtin-macro-redefined)
+endif()
+
 zephyr_get_compile_flags(ZEPHYR_CFLAGS_C C)
 matter_add_cflags("${ZEPHYR_CFLAGS_C}")
 zephyr_get_compile_flags(ZEPHYR_CFLAGS_CC CXX)
@@ -181,6 +186,10 @@ endif()
 
 if (NOT CONFIG_CHIP_DEBUG_SYMBOLS)
     matter_add_gn_arg_string("symbol_level" "0")
+endif()
+
+if (CONFIG_CHIP_LOG_FILE_NAME)
+    matter_add_gn_arg_bool("warn_builtin_macro_redefined" FALSE)
 endif()
 
 if (CHIP_COMPILER_LAUNCHER)
