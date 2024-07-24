@@ -38,6 +38,11 @@
 
 #define TAG "OTAImageProcessor"
 
+#ifdef CONFIG_ENABLE_DELTA_OTA
+#define PATCH_HEADER_SIZE 64
+#define DIGEST_SIZE 32
+#endif // CONFIG_ENABLE_DELTA_OTA
+
 using namespace chip::System;
 using namespace ::chip::DeviceLayer::Internal;
 
@@ -130,6 +135,70 @@ CHIP_ERROR OTAImageProcessorImpl::ProcessBlock(ByteSpan & block)
 }
 
 #ifdef CONFIG_ENABLE_DELTA_OTA
+static bool verify_chip_id(void * bin_header_data)
+{
+    esp_image_header_t * header = (esp_image_header_t *) bin_header_data;
+    if (header->chip_id != CONFIG_IDF_FIRMWARE_CHIP_ID)
+    {
+        ESP_LOGE(TAG, "Mismatch chip id, expected %d, found %d", CONFIG_IDF_FIRMWARE_CHIP_ID, header->chip_id);
+        return false;
+    }
+    return true;
+}
+
+static bool verify_patch_header(void * img_hdr_data)
+{
+    const uint32_t esp_delta_ota_magic = 0xfccdde10;
+    if (!img_hdr_data)
+    {
+        return false;
+    }
+    uint32_t recv_magic = *(uint32_t *) img_hdr_data;
+    uint8_t * digest    = (uint8_t *) ((uint8_t *) img_hdr_data + 4);
+    if (recv_magic != esp_delta_ota_magic)
+    {
+        ESP_LOGE(TAG, "Invalid magic word in patch");
+        return false;
+    }
+    uint8_t sha_256[DIGEST_SIZE] = { 0 };
+    esp_partition_get_sha256(esp_ota_get_running_partition(), sha_256);
+    if (memcmp(sha_256, digest, DIGEST_SIZE) != 0)
+    {
+        ESP_LOGE(TAG, "SHA256 of current firmware differs from than in patch header. Invalid patch for current firmware");
+        return false;
+    }
+    return true;
+}
+
+esp_err_t verify_header_data(const uint8_t * buf_p, size_t size, int * index)
+{
+    static bool patch_header_verified = false;
+    static char patch_header[PATCH_HEADER_SIZE];
+    static int header_data_read = 0;
+    if (!patch_header_verified)
+    {
+        if (header_data_read + size < PATCH_HEADER_SIZE)
+        {
+            memcpy(patch_header + header_data_read, buf_p, size);
+            header_data_read += size;
+            return ESP_OK;
+        }
+        else
+        {
+            *index = PATCH_HEADER_SIZE - header_data_read;
+            memcpy(patch_header + header_data_read, buf_p, *index);
+            if (!verify_patch_header(patch_header))
+            {
+                return ESP_ERR_INVALID_VERSION;
+            }
+            header_data_read      = 0;
+            *index                = PATCH_HEADER_SIZE;
+            patch_header_verified = true;
+        }
+    }
+    return ESP_OK;
+}
+
 esp_err_t OTAImageProcessorImpl::DeltaOTAReadCallback(uint8_t * buf_p, size_t size, int src_offset)
 {
     if (size <= 0 || buf_p == NULL)
@@ -153,24 +222,25 @@ esp_err_t OTAImageProcessorImpl::DeltaOTAReadCallback(uint8_t * buf_p, size_t si
     return err;
 }
 
-esp_err_t OTAImageProcessorImpl::DeltaOTAWriteHeader(OTAImageProcessorImpl * imageProcessor, const uint8_t * buf_p, size_t size,
-                                                     int index)
+esp_err_t OTAImageProcessorImpl::DeltaOTAWriteCallback(const uint8_t * buf_p, size_t size, void * arg)
 {
+    auto * imageProcessor = reinterpret_cast<OTAImageProcessorImpl *>(arg);
     if (size <= 0 || buf_p == NULL)
     {
         return ESP_ERR_INVALID_ARG;
     }
 
+    int index                   = 0;
+    static int header_data_read = 0;
     static char header_data[IMG_HEADER_LEN];
     static bool chip_id_verified = false;
-    static int header_data_read  = 0;
 
     if (!chip_id_verified)
     {
-        if (header_data_read + size <= IMG_HEADER_LEN)
+        if (header_data_read + size - index <= IMG_HEADER_LEN)
         {
-            memcpy(header_data + header_data_read, buf_p, size);
-            header_data_read += size;
+            memcpy(header_data + header_data_read, buf_p, size - index);
+            header_data_read += size - index;
             return ESP_OK;
         }
         else
@@ -178,38 +248,22 @@ esp_err_t OTAImageProcessorImpl::DeltaOTAWriteHeader(OTAImageProcessorImpl * ima
             index = IMG_HEADER_LEN - header_data_read;
             memcpy(header_data + header_data_read, buf_p, index);
 
+            if (!verify_chip_id(header_data))
+            {
+                return ESP_ERR_INVALID_VERSION;
+            }
             chip_id_verified = true;
 
             // Write data in header_data buffer.
             esp_err_t err = esp_ota_write(imageProcessor->mOTAUpdateHandle, header_data, IMG_HEADER_LEN);
             if (err != ESP_OK)
             {
-                ESP_LOGE(TAG, "esp_ota_write failed (%s)!", esp_err_to_name(err));
                 return err;
             }
         }
     }
-    return ESP_OK;
-}
 
-esp_err_t OTAImageProcessorImpl::DeltaOTAWriteCallback(const uint8_t * buf_p, size_t size, void * arg)
-{
-    static int index      = 0;
-    auto * imageProcessor = reinterpret_cast<OTAImageProcessorImpl *>(arg);
-    if (size <= 0 || buf_p == NULL)
-    {
-        return ESP_ERR_INVALID_ARG;
-    }
-
-    esp_err_t err = imageProcessor->DeltaOTAWriteHeader(imageProcessor, buf_p, size, index);
-
-    if (err != ESP_OK)
-    {
-        ESP_LOGE(TAG, "DeltaOTAWriteHeader failed (%s)!", esp_err_to_name(err));
-        return err;
-    }
-
-    err = esp_ota_write(imageProcessor->mOTAUpdateHandle, buf_p + index, size - index);
+    esp_err_t err = esp_ota_write(imageProcessor->mOTAUpdateHandle, buf_p + index, size - index);
     if (err != ESP_OK)
     {
         ESP_LOGE(TAG, "esp_ota_write failed (%s)!", esp_err_to_name(err));
@@ -260,7 +314,7 @@ void OTAImageProcessorImpl::HandlePrepareDownload(intptr_t context)
     if (imageProcessor->mDeltaOTAUpdateHandle == NULL)
     {
         ChipLogError(SoftwareUpdate, "esp_delta_ota_init failed");
-	return;
+        return;
     }
 #endif // CONFIG_ENABLE_DELTA_OTA
 
@@ -401,7 +455,19 @@ void OTAImageProcessorImpl::HandleProcessBlock(intptr_t context)
 #endif // CONFIG_ENABLE_ENCRYPTED_OTA
 
 #ifdef CONFIG_ENABLE_DELTA_OTA
-    err = esp_delta_ota_feed_patch(imageProcessor->mDeltaOTAUpdateHandle, blockToWrite.data(), blockToWrite.size());
+
+    int index = 0;
+    err       = verify_header_data(blockToWrite.data(), blockToWrite.size(), &index);
+
+    if (err != ESP_OK)
+    {
+        ESP_LOGE(TAG, "Header data verification failed (%s)", esp_err_to_name(err));
+        imageProcessor->mDownloader->EndDownload(CHIP_ERROR_INVALID_SIGNATURE);
+        PostOTAStateChangeEvent(DeviceLayer::kOtaDownloadFailed);
+        return;
+    }
+
+    err = esp_delta_ota_feed_patch(imageProcessor->mDeltaOTAUpdateHandle, blockToWrite.data() + index, blockToWrite.size() - index);
 #else
     err           = esp_ota_write(imageProcessor->mOTAUpdateHandle, blockToWrite.data(), blockToWrite.size());
 #endif // CONFIG_ENABLE_DELTA_OTA

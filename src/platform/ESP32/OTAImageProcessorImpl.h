@@ -55,7 +55,6 @@ public:
     CHIP_ERROR InitEncryptedOTA(const CharSpan & key);
 #endif // CONFIG_ENABLE_ENCRYPTED_OTA
 #ifdef CONFIG_ENABLE_DELTA_OTA
-    esp_err_t DeltaOTAWriteHeader(OTAImageProcessorImpl * imageProcessor, const uint8_t * buf_p, size_t size, int index);
     static esp_err_t DeltaOTAReadCallback(uint8_t * buf_p, size_t size, int src_offset);
     static esp_err_t DeltaOTAWriteCallback(const uint8_t * buf_p, size_t size, void * arg);
 #endif // CONFIG_ENABLE_DELTA_OTA

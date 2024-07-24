@@ -124,7 +124,11 @@ Please follow the steps below to generate an application image for OTA upgrades:
 
 ## Delta OTA
 
-Delta OTA Updates is a feature that enables Over-the-Air (OTA) firmware update with compressed delta binaries. Patch files have smaller size than the original firmware file, which reduces the time and network usage to download the file from the server. Also, no additional storage partition is required for the "patch".
+Delta OTA Updates is a feature that enables Over-the-Air (OTA) firmware update
+with compressed delta binaries. Patch files have smaller size than the original
+firmware file, which reduces the time and network usage to download the file
+from the server. Also, no additional storage partition is required for the
+"patch".
 
 ### Firmware Changes
 
@@ -135,20 +139,20 @@ Delta OTA Updates is a feature that enables Over-the-Air (OTA) firmware update w
     CONFIG_ENABLE_DELTA_OTA=y
     ```
 
--   Delta binary needs to be generated using binary delta encoding in Python 3.6+. You can install detools using the following command.
+-   Delta binary needs to be generated using binary delta encoding in Python
+    3.6+. You can install detools using the following command.
 
     ```
     pip install detools>=0.49.0
     ```
 
--   Generate delta binary and compress it using Heatshrink algorithm.
+-   Generate delta binary.
+
     ```
-    detools create_patch -c heatshrink <base-binary> <new-binary> delta-ota.bin
+    python managed_components/espressif__esp_delta_ota/examples/https_delta_ota/tools/esp_delta_ota_patch_gen.py --chip <chip> --base_binary <base-binary> --new_binary <new-binary> --patch_file_name <patch-file-name.bin>
     ```
 
-- Append the Matter OTA header:
-        ```
-        src/app/ota_image_tool.py create --vendor-id 0xFFF1 --product-id 0x8000 --version 2 --version-str "v2.0" -da sha256 delta-ota.bin lighting-app-delta-ota.bin
-        ```
+-   Append the Matter OTA header:
+    `src/app/ota_image_tool.py create --vendor-id 0xFFF1 --product-id 0x8000 --version 2 --version-str "v2.0" -da sha256 delta-ota.bin lighting-app-delta-ota.bin`
 
-- Use the `lighting-app-delta-ota.bin` file with the OTA Provider app.
+-   Use the `lighting-app-delta-ota.bin` file with the OTA Provider app.
