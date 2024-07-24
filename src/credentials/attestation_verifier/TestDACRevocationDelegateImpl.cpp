@@ -49,7 +49,7 @@ CHIP_ERROR TestDACRevocationDelegateImpl::SetDeviceAttestationRevocationSetPath(
 
 // This method parses the below JSON Scheme
 // [
-//   { 
+//   {
 //     "type": "revocation_set",
 //     "issuer_subject_key_id": "<issuer subject key ID as uppercase hex, 20 bytes>",
 //     "issuer_name": "<ASN.1 SEQUENCE of Issuer of the CRL as base64>",
