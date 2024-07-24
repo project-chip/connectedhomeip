@@ -913,7 +913,7 @@ static NSString * const sLastInitialSubscribeLatencyKey = @"lastInitialSubscribe
         // Destroy the read client and callback (has to happen on the Matter
         // queue, to avoid deleting objects that are being referenced), to
         // tear down the subscription.  We will get no more callbacks from
-        // the subscrption after this point.
+        // the subscription after this point.
         std::lock_guard lock(self->_lock);
         self->_currentReadClient = nullptr;
         if (self->_currentSubscriptionCallback) {
