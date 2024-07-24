@@ -157,7 +157,7 @@ class TC_SC_4_3(MatterBaseTest):
                 return True, "At least one IPv6 address is present."
             except ipaddress.AddressValueError:
                 # If an AddressValueError is raised, the current address is not a valid IPv6 address.
-                return False, f"Invalid address encountered: {address}"
+                return False, f"Invalid IPv6 address encountered: {address}, provided addresses: {addresses}"
         return False, "No IPv6 addresses found."
 
     @staticmethod
@@ -364,7 +364,7 @@ class TC_SC_4_3(MatterBaseTest):
 
         # AAAA
         logging.info("Verify the AAAA record contains at least one IPv6 address")
-        result, message = self.contains_ipv6_address(operational_record.addresses)
+        result, message = self.contains_ipv6_address(quada_record.addresses)
         asserts.assert_true(result, message)
 
         # # *** STEP 10 ***
