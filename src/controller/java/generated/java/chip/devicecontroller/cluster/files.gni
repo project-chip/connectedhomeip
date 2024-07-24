@@ -125,7 +125,6 @@ structs_sources = [
   "${chip_root}/src/controller/java/generated/java/chip/devicecontroller/cluster/structs/TargetNavigatorClusterTargetInfoStruct.kt",
   "${chip_root}/src/controller/java/generated/java/chip/devicecontroller/cluster/structs/ThermostatClusterPresetStruct.kt",
   "${chip_root}/src/controller/java/generated/java/chip/devicecontroller/cluster/structs/ThermostatClusterPresetTypeStruct.kt",
-  "${chip_root}/src/controller/java/generated/java/chip/devicecontroller/cluster/structs/ThermostatClusterQueuedPresetStruct.kt",
   "${chip_root}/src/controller/java/generated/java/chip/devicecontroller/cluster/structs/ThermostatClusterScheduleStruct.kt",
   "${chip_root}/src/controller/java/generated/java/chip/devicecontroller/cluster/structs/ThermostatClusterScheduleTransitionStruct.kt",
   "${chip_root}/src/controller/java/generated/java/chip/devicecontroller/cluster/structs/ThermostatClusterScheduleTypeStruct.kt",
