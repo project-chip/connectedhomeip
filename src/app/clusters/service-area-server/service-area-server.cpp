@@ -346,10 +346,10 @@ void Instance::HandleSelectLocationsCmd(HandlerContext & ctx, const Commands::Se
         if (!req.newLocations.IsNull())
         {
             auto locationIter = req.newLocations.Value().begin();
-            uint32_t dummyIter;
+            uint32_t ignored;
             while (locationIter.Next())
             {
-                mDelegate->AddSelectedLocation(locationIter.GetValue(), dummyIter);
+                mDelegate->AddSelectedLocation(locationIter.GetValue(), ignored);
             }
         }
 
@@ -442,10 +442,10 @@ void Instance::NotifyProgressChanged()
 
 bool Instance::IsSupportedLocation(uint32_t aLocationId)
 {
-    uint32_t dummyIndex;
-    LocationStructureWrapper dummyLocation;
+    uint32_t ignoredIndex;
+    LocationStructureWrapper ignoredLocation;
 
-    return mDelegate->GetSupportedLocationById(aLocationId, dummyIndex, dummyLocation);
+    return mDelegate->GetSupportedLocationById(aLocationId, ignoredIndex, ignoredLocation);
 }
 
 bool Instance::IsValidSupportedLocation(const LocationStructureWrapper & aLocation)
@@ -576,8 +576,8 @@ bool Instance::AddSupportedLocation(uint32_t aLocationId, const DataModel::Nulla
     }
 
     // Add the SupportedLocation to the SupportedLocations attribute.
-    uint32_t dummyIndex;
-    if (!mDelegate->AddSupportedLocation(aNewLocation, dummyIndex))
+    uint32_t ignoredIndex;
+    if (!mDelegate->AddSupportedLocation(aNewLocation, ignoredIndex))
     {
         return false;
     }
@@ -675,10 +675,10 @@ bool Instance::ClearSupportedLocations()
 
 bool Instance::IsSupportedMap(uint8_t aMapId)
 {
-    uint32_t dummyIndex;
-    MapStructureWrapper dummyMap;
+    uint32_t ignoredIndex;
+    MapStructureWrapper ignoredMap;
 
-    return mDelegate->GetSupportedMapById(aMapId, dummyIndex, dummyMap);
+    return mDelegate->GetSupportedMapById(aMapId, ignoredIndex, ignoredMap);
 }
 
 bool Instance::AddSupportedMap(uint8_t aMapId, const CharSpan & aMapName)
@@ -721,8 +721,8 @@ bool Instance::AddSupportedMap(uint8_t aMapId, const CharSpan & aMapName)
     {
         // add to supported maps attribute
         MapStructureWrapper newMap(aMapId, aMapName);
-        uint32_t dummyIndex;
-        if (!mDelegate->AddSupportedMap(newMap, dummyIndex))
+        uint32_t ignoredIndex;
+        if (!mDelegate->AddSupportedMap(newMap, ignoredIndex))
         {
             return false;
         }
@@ -807,7 +807,7 @@ bool Instance::ClearSupportedMaps()
 
 bool Instance::AddSelectedLocation(uint32_t & aSelectedLocation)
 {
-    uint32_t dummyIndex;
+    uint32_t ignoredIndex;
 
     char locationStatusBuffer[kMaxSizeStatusText];
     MutableCharSpan locationStatusText(locationStatusBuffer);
@@ -840,7 +840,7 @@ bool Instance::AddSelectedLocation(uint32_t & aSelectedLocation)
         return false;
     }
 
-    return mDelegate->AddSelectedLocation(aSelectedLocation, dummyIndex);
+    return mDelegate->AddSelectedLocation(aSelectedLocation, ignoredIndex);
 }
 
 bool Instance::ClearSelectedLocations()
@@ -933,7 +933,7 @@ bool Instance::SetEstimatedEndTime(const DataModel::Nullable<uint32_t> & aEstima
 
 bool Instance::AddPendingProgressElement(uint32_t aLocationId)
 {
-    uint32_t dummyIndex;
+    uint32_t ignoredIndex;
 
     // create progress element
     Structs::ProgressStruct::Type inactiveProgress = { aLocationId, OperationalStatusEnum::kPending };
@@ -959,7 +959,7 @@ bool Instance::AddPendingProgressElement(uint32_t aLocationId)
         return false;
     }
 
-    if (!mDelegate->AddProgressElement(inactiveProgress, dummyIndex))
+    if (!mDelegate->AddProgressElement(inactiveProgress, ignoredIndex))
     {
         return false;
     }
