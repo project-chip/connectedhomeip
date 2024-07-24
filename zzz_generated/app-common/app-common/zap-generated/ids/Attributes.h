@@ -2364,6 +2364,10 @@ namespace OperatingMode {
 static constexpr AttributeId Id = 0x00000008;
 } // namespace OperatingMode
 
+namespace MaximumCheckInBackOff {
+static constexpr AttributeId Id = 0x00000009;
+} // namespace MaximumCheckInBackOff
+
 namespace GeneratedCommandList {
 static constexpr AttributeId Id = Globals::Attributes::GeneratedCommandList::Id;
 } // namespace GeneratedCommandList

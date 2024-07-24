@@ -1506,6 +1506,12 @@ Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, chip::app::Cl
                                         MarkAttributeDirty markDirty);
 } // namespace OperatingMode
 
+namespace MaximumCheckInBackOff {
+Protocols::InteractionModel::Status Get(chip::EndpointId endpoint, uint32_t * value); // int32u
+Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint32_t value);
+Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint32_t value, MarkAttributeDirty markDirty);
+} // namespace MaximumCheckInBackOff
+
 namespace FeatureMap {
 Protocols::InteractionModel::Status Get(chip::EndpointId endpoint, uint32_t * value); // bitmap32
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint32_t value);
