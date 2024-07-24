@@ -836,7 +836,7 @@ bool Instance::AddSelectedLocation(uint32_t & aSelectedLocation)
     // Does device mode allow modification of selected locations?
     if (!mDelegate->IsSetSelectedLocationsAllowed(locationStatusText))
     {
-        //        ChipLogError(Zcl, "AddSelectedLocation %u - %s", aSelectedLocation, locationStatusText);
+        ChipLogError(Zcl, "AddSelectedLocation %u - %.*s", aSelectedLocation, static_cast<int>(locationStatusText.size()), locationStatusText.data());
         return false;
     }
 
