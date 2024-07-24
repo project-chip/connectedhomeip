@@ -43,7 +43,6 @@ public:
     {
     public:
         Builder(){};
-        Builder(const Builder &) = delete;
 
         Builder & SetDeviceName(std::string aDeviceName, uint64_t aDeviceNameLastEditEpochUs);
         Builder & SetBrigedEndpoint(EndpointId aBridgedEndpoint);
@@ -66,16 +65,14 @@ public:
         bool mIsAlreadyBuilt                       = false;
     };
 
-    EcosystemDeviceStruct(const EcosystemDeviceStruct &) = delete;
-
     CHIP_ERROR Encode(const AttributeValueEncoder::ListEncodeHelper & aEncoder, const FabricIndex & aFabricIndex);
 
 private:
     // Constructor is intentionally private. This is to ensure that it is only constructed with
     // values that conform to the spec.
-    explicit EcosystemDeviceStruct(std::string aDeviceName, uint64_t aDeviceNameLastEditEpochUs, EndpointId aBridgedEndpoint,
-                                   EndpointId aOriginalEndpoint, std::vector<Structs::DeviceTypeStruct::Type> aDeviceTypes,
-                                   std::vector<std::string> aUniqueLocationIds, uint64_t aUniqueLocationIdsLastEditEpochUs) :
+    explicit EcosystemDeviceStruct(std::string && aDeviceName, uint64_t aDeviceNameLastEditEpochUs, EndpointId aBridgedEndpoint,
+                                   EndpointId aOriginalEndpoint, std::vector<Structs::DeviceTypeStruct::Type> && aDeviceTypes,
+                                   std::vector<std::string> && aUniqueLocationIds, uint64_t aUniqueLocationIdsLastEditEpochUs) :
         mDeviceName(std::move(aDeviceName)),
         mDeviceNameLastEditEpochUs(aDeviceNameLastEditEpochUs), mBridgedEndpoint(aBridgedEndpoint),
         mOriginalEndpoint(aOriginalEndpoint), mDeviceTypes(std::move(aDeviceTypes)),
@@ -111,7 +108,6 @@ public:
     {
     public:
         Builder(){};
-        Builder(const Builder &) = delete;
 
         Builder & SetLocationName(std::string aLocationName);
         Builder & SetFloorNumber(std::optional<int16_t> aFloorNumber);
@@ -128,15 +124,13 @@ public:
         bool mIsAlreadyBuilt                  = false;
     };
 
-    EcosystemLocationStruct(const EcosystemLocationStruct &) = delete;
-
     CHIP_ERROR Encode(const AttributeValueEncoder::ListEncodeHelper & aEncoder, const std::string & aUniqueLocationId,
                       const FabricIndex & aFabricIndex);
 
 private:
     // Constructor is intentionally private. This is to ensure that it is only constructed with
     // values that conform to the spec.
-    explicit EcosystemLocationStruct(HomeLocationStruct aHomeLocation, uint64_t aHomeLocationLastEditEpochUs) :
+    explicit EcosystemLocationStruct(HomeLocationStruct && aHomeLocation, uint64_t aHomeLocationLastEditEpochUs) :
         mHomeLocation(aHomeLocation), mHomeLocationLastEditEpochUs(aHomeLocationLastEditEpochUs)
     {}
     // EcosystemLocationStruct is used as a value in a key-value map.

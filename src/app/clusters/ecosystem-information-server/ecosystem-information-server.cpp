@@ -131,22 +131,14 @@ EcosystemDeviceStruct::Builder & EcosystemDeviceStruct::Builder::AddUniqueLocati
 
 std::unique_ptr<EcosystemDeviceStruct> EcosystemDeviceStruct::Builder::Build()
 {
-    bool deviceNameIsInvalid            = mDeviceName.size() > kDeviceNameMaxSize;
-    bool originalEndpointIsInvalid      = mOriginalEndpoint == kInvalidEndpointId;
-    bool deviceTypesListIsInvalid       = mDeviceTypes.empty();
-    bool uniqueLocationIdsListIsInvalid = mUniqueLocationIds.size() > kUniqueLocationIdsListMaxSize;
-    if (mIsAlreadyBuilt || deviceNameIsInvalid || originalEndpointIsInvalid || deviceTypesListIsInvalid ||
-        uniqueLocationIdsListIsInvalid)
-    {
-        return nullptr;
-    }
+    VerifyOrReturnValue(mDeviceName.size() <= kDeviceNameMaxSize, nullptr, ChipLogError(Zcl, "Device name too large"));
+    VerifyOrReturnValue(mOriginalEndpoint != kInvalidEndpointId, nullptr, ChipLogError(Zcl, "Invalid original endpoint"));
+    VerifyOrReturnValue(!mDeviceTypes.empty(), nullptr, ChipLogError(Zcl, "No device types added"));
+    VerifyOrReturnValue(mUniqueLocationIds.size() <= kUniqueLocationIdsListMaxSize, nullptr, ChipLogError(Zcl, "Too many location ids"));
 
     for (auto & locationId : mUniqueLocationIds)
     {
-        if (locationId.size() > kUniqueLocationIdMaxSize)
-        {
-            return nullptr;
-        }
+        VerifyOrReturnValue(locationId.size() <= kUniqueLocationIdMaxSize, nullptr, ChipLogError(Zcl, "Location id too long"));
     }
 
     // std::make_unique does not have access to private constructor we workaround with using new
@@ -260,7 +252,7 @@ CHIP_ERROR EcosystemInformationServer::AddDeviceInfo(EndpointId aEndpoint, std::
     VerifyOrReturnError((aEndpoint != kRootEndpointId && aEndpoint != kInvalidEndpointId), CHIP_ERROR_INVALID_ARGUMENT);
 
     auto & deviceInfo = mDevicesMap[aEndpoint];
-    VerifyOrReturnError((deviceInfo.mDeviceDirectory.size() >= kDeviceDirectoryMaxSize), CHIP_ERROR_NO_MEMORY);
+    VerifyOrReturnError((deviceInfo.mDeviceDirectory.size() < kDeviceDirectoryMaxSize), CHIP_ERROR_NO_MEMORY);
     deviceInfo.mDeviceDirectory.push_back(std::move(aDevice));
     return CHIP_NO_ERROR;
 }
@@ -274,27 +266,32 @@ CHIP_ERROR EcosystemInformationServer::AddLocationInfo(EndpointId aEndpoint, con
     auto & deviceInfo = mDevicesMap[aEndpoint];
     VerifyOrReturnError((deviceInfo.mLocationDirectory.find(aLocationId) == deviceInfo.mLocationDirectory.end()),
                         CHIP_ERROR_INVALID_ARGUMENT);
-    VerifyOrReturnError((deviceInfo.mLocationDirectory.size() >= kLocationDirectoryMaxSize), CHIP_ERROR_NO_MEMORY);
+    VerifyOrReturnError((deviceInfo.mLocationDirectory.size() < kLocationDirectoryMaxSize), CHIP_ERROR_NO_MEMORY);
     deviceInfo.mLocationDirectory[aLocationId] = std::move(aLocation);
     return CHIP_NO_ERROR;
 }
 
 CHIP_ERROR EcosystemInformationServer::RemoveDevice(EndpointId aEndpoint, uint64_t aEpochUs)
 {
-    VerifyOrReturnError((mDevicesMap.find(aEndpoint) != mDevicesMap.end()), CHIP_ERROR_INVALID_ARGUMENT);
-    auto & deviceInfo = mDevicesMap[aEndpoint];
+    auto it = mDevicesMap.find(aEndpoint);
+    VerifyOrReturnError((it != mDevicesMap.end()), CHIP_ERROR_INVALID_ARGUMENT);
+    auto & deviceInfo = it->second;
     deviceInfo.mRemovedOn.SetValue(aEpochUs);
     return CHIP_NO_ERROR;
 }
 
 CHIP_ERROR EcosystemInformationServer::EncodeRemovedOnAttribute(EndpointId aEndpoint, AttributeValueEncoder & aEncoder)
 {
-    if (mDevicesMap.find(aEndpoint) == mDevicesMap.end())
+    auto it = mDevicesMap.find(aEndpoint);
+    if (it == mDevicesMap.end())
     {
+        // We are always going to be given a valid endpoint. If the endpoint
+        // doesn't exist in our map that indicate that the cluster was not
+        // added on this endpoint, hence UnsupportedCluster.
         return CHIP_IM_GLOBAL_STATUS(UnsupportedCluster);
     }
 
-    auto & deviceInfo = mDevicesMap[aEndpoint];
+    auto& deviceInfo = it->second;
     if (!deviceInfo.mRemovedOn.HasValue())
     {
         aEncoder.EncodeNull();
@@ -307,12 +304,17 @@ CHIP_ERROR EcosystemInformationServer::EncodeRemovedOnAttribute(EndpointId aEndp
 
 CHIP_ERROR EcosystemInformationServer::EncodeDeviceDirectoryAttribute(EndpointId aEndpoint, AttributeValueEncoder & aEncoder)
 {
-    if (mDevicesMap.find(aEndpoint) == mDevicesMap.end())
+
+    auto it = mDevicesMap.find(aEndpoint);
+    if (it == mDevicesMap.end())
     {
+        // We are always going to be given a valid endpoint. If the endpoint
+        // doesn't exist in our map that indicate that the cluster was not
+        // added on this endpoint, hence UnsupportedCluster.
         return CHIP_IM_GLOBAL_STATUS(UnsupportedCluster);
     }
 
-    auto & deviceInfo = mDevicesMap[aEndpoint];
+    auto & deviceInfo = it->second;
     if (deviceInfo.mDeviceDirectory.empty() || deviceInfo.mRemovedOn.HasValue())
     {
         return aEncoder.EncodeEmptyList();
@@ -330,12 +332,16 @@ CHIP_ERROR EcosystemInformationServer::EncodeDeviceDirectoryAttribute(EndpointId
 
 CHIP_ERROR EcosystemInformationServer::EncodeLocationStructAttribute(EndpointId aEndpoint, AttributeValueEncoder & aEncoder)
 {
-    if (mDevicesMap.find(aEndpoint) == mDevicesMap.end())
+    auto it = mDevicesMap.find(aEndpoint);
+    if (it == mDevicesMap.end())
     {
+        // We are always going to be given a valid endpoint. If the endpoint
+        // doesn't exist in our map that indicate that the cluster was not
+        // added on this endpoint, hence UnsupportedCluster.
         return CHIP_IM_GLOBAL_STATUS(UnsupportedCluster);
     }
 
-    auto & deviceInfo = mDevicesMap[aEndpoint];
+    auto & deviceInfo = it->second;
     if (deviceInfo.mLocationDirectory.empty() || deviceInfo.mRemovedOn.HasValue())
     {
         return aEncoder.EncodeEmptyList();
