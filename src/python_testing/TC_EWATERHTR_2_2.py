@@ -31,9 +31,9 @@ import logging
 import time
 
 import chip.clusters as Clusters
-from TC_EWATERHTRBase import EWATERHTRBase
 from matter_testing_support import MatterBaseTest, TestStep, async_test_body, default_matter_test_main
 from mobly import asserts
+from TC_EWATERHTRBase import EWATERHTRBase
 
 logger = logging.getLogger(__name__)
 
