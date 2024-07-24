@@ -19,7 +19,6 @@ import asyncio
 import json
 from dataclasses import asdict, dataclass
 from enum import Enum
-from time import sleep
 from typing import Dict, List, Optional, Union, cast
 
 from mdns_discovery.mdns_async_service_info import DNSRecordType, MdnsAsyncServiceInfo
