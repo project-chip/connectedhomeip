@@ -13483,6 +13483,18 @@ struct TypeInfo
     static constexpr bool MustUseTimedWrite() { return false; }
 };
 } // namespace OperatingMode
+namespace MaximumCheckInBackOff {
+struct TypeInfo
+{
+    using Type             = uint32_t;
+    using DecodableType    = uint32_t;
+    using DecodableArgType = uint32_t;
+
+    static constexpr ClusterId GetClusterId() { return Clusters::IcdManagement::Id; }
+    static constexpr AttributeId GetAttributeId() { return Attributes::MaximumCheckInBackOff::Id; }
+    static constexpr bool MustUseTimedWrite() { return false; }
+};
+} // namespace MaximumCheckInBackOff
 namespace GeneratedCommandList {
 struct TypeInfo : public Clusters::Globals::Attributes::GeneratedCommandList::TypeInfo
 {
@@ -13539,6 +13551,7 @@ struct TypeInfo
         Attributes::UserActiveModeTriggerInstruction::TypeInfo::DecodableType userActiveModeTriggerInstruction;
         Attributes::OperatingMode::TypeInfo::DecodableType operatingMode =
             static_cast<chip::app::Clusters::IcdManagement::OperatingModeEnum>(0);
+        Attributes::MaximumCheckInBackOff::TypeInfo::DecodableType maximumCheckInBackOff = static_cast<uint32_t>(0);
         Attributes::GeneratedCommandList::TypeInfo::DecodableType generatedCommandList;
         Attributes::AcceptedCommandList::TypeInfo::DecodableType acceptedCommandList;
         Attributes::EventList::TypeInfo::DecodableType eventList;
