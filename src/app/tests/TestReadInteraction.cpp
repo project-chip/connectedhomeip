@@ -272,9 +272,11 @@ public:
         ASSERT_EQ(mEventCounter.Init(0), CHIP_NO_ERROR);
         chip::app::EventManagement::CreateEventManagement(&GetExchangeManager(), ArraySize(logStorageResources),
                                                           gCircularEventBuffer, logStorageResources, &mEventCounter);
+        mOldModel = InteractionModelEngine::GetInstance()->SetDataModel(&TestImCustomDataModel::Instance());
     }
     void TearDown()
     {
+        InteractionModelEngine::GetInstance()->SetDataModel(mOldModel);
         chip::app::EventManagement::DestroyEventManagement();
         AppContext::TearDown();
     }
@@ -329,6 +331,7 @@ public:
 protected:
     chip::MonotonicallyIncreasingCounter<chip::EventNumber> mEventCounter;
     static bool sSyncScheduler;
+    chip::app::InteractionModel::DataModel * mOldModel = nullptr;
 };
 
 bool TestReadInteraction::sSyncScheduler = false;

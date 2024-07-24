@@ -93,6 +93,15 @@ CHIP_ERROR InteractionModelEngine::Init(Messaging::ExchangeManager * apExchangeM
 
     StatusIB::RegisterErrorFormatter();
 
+#if CHIP_CONFIG_USE_EMBER_DATA_MODEL && CHIP_CONFIG_USE_DATA_MODEL_INTERFACE
+    ChipLogError(InteractionModel, "WARNING ┌────────────────────────────────────────────────────");
+    ChipLogError(InteractionModel, "WARNING │ Interaction Model Engine running in 'Checked' mode.");
+    ChipLogError(InteractionModel, "WARNING │ This executes BOTH ember and data-model code paths.");
+    ChipLogError(InteractionModel, "WARNING │ which is inefficient and consumes more flash space.");
+    ChipLogError(InteractionModel, "WARNING │ This should be done for testing only.");
+    ChipLogError(InteractionModel, "WARNING └────────────────────────────────────────────────────");
+#endif
+
     return CHIP_NO_ERROR;
 }
 
@@ -1695,6 +1704,16 @@ void InteractionModelEngine::DispatchCommand(CommandHandlerImpl & apCommandObj, 
 Protocols::InteractionModel::Status InteractionModelEngine::CommandExists(const ConcreteCommandPath & aCommandPath)
 {
     return ServerClusterCommandExists(aCommandPath);
+}
+
+InteractionModel::DataModel * InteractionModelEngine::SetDataModel(InteractionModel::DataModel * model)
+{
+    // Alternting data model should not be done while IM is actively handling requests.
+    VerifyOrDie(mReadHandlers.begin() == mReadHandlers.end());
+
+    InteractionModel::DataModel * oldModel = GetDataModel();
+    mDataModel                             = model;
+    return oldModel;
 }
 
 InteractionModel::DataModel * InteractionModelEngine::GetDataModel() const
