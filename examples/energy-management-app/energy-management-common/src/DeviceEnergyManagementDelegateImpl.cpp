@@ -798,7 +798,7 @@ const DataModel::Nullable<Structs::ForecastStruct::Type> & DeviceEnergyManagemen
 
 OptOutStateEnum DeviceEnergyManagementDelegate::GetOptOutState()
 {
-    ChipLogDetail(AppServer, "mOptOutState %d", static_cast<int>(mOptOutState));
+    ChipLogDetail(AppServer, "mOptOutState %d", to_underlying(mOptOutState));
     return mOptOutState;
 }
 
