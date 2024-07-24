@@ -17,6 +17,7 @@ import queue
 import select
 import subprocess
 import threading
+import time
 from typing import List
 
 
@@ -57,12 +58,13 @@ class ProcessOutputCapture:
         reading
         """
         out_wait = select.poll()
-        out_wait.register(self.process.stdout, select.POLLIN)
+        out_wait.register(self.process.stdout, select.POLLIN | select.POLLHUP)
 
         err_wait = select.poll()
-        err_wait.register(self.process.stderr, select.POLLIN)
+        err_wait.register(self.process.stderr, select.POLLIN | select.POLLHUP)
 
         with open(self.output_path, "wt") as f:
+            f.write("PROCESS START: %s\n" % time.ctime())
             while not self.done:
                 changes = out_wait.poll(0.1)
                 if changes:
@@ -80,6 +82,7 @@ class ProcessOutputCapture:
                         # stderr closed (otherwise readline should have at least \n)
                         continue
                     f.write(f"!!STDERR!! : {err_line}")
+            f.write("PROCESS END: %s\n" % time.ctime())
 
     def __enter__(self):
         self.done = False
