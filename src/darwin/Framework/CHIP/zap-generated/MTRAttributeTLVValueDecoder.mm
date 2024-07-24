@@ -5113,6 +5113,17 @@ static id _Nullable DecodeAttributeValueForICDManagementCluster(AttributeId aAtt
         value = [NSNumber numberWithUnsignedChar:chip::to_underlying(cppValue)];
         return value;
     }
+    case Attributes::MaximumCheckInBackOff::Id: {
+        using TypeInfo = Attributes::MaximumCheckInBackOff::TypeInfo;
+        TypeInfo::DecodableType cppValue;
+        *aError = DataModel::Decode(aReader, cppValue);
+        if (*aError != CHIP_NO_ERROR) {
+            return nil;
+        }
+        NSNumber * _Nonnull value;
+        value = [NSNumber numberWithUnsignedInt:cppValue];
+        return value;
+    }
     default: {
         break;
     }
@@ -12485,31 +12496,6 @@ static id _Nullable DecodeAttributeValueForThermostatCluster(AttributeId aAttrib
         }
         return value;
     }
-    case Attributes::QueuedPreset::Id: {
-        using TypeInfo = Attributes::QueuedPreset::TypeInfo;
-        TypeInfo::DecodableType cppValue;
-        *aError = DataModel::Decode(aReader, cppValue);
-        if (*aError != CHIP_NO_ERROR) {
-            return nil;
-        }
-        MTRThermostatClusterQueuedPresetStruct * _Nullable value;
-        if (cppValue.IsNull()) {
-            value = nil;
-        } else {
-            value = [MTRThermostatClusterQueuedPresetStruct new];
-            if (cppValue.Value().presetHandle.IsNull()) {
-                value.presetHandle = nil;
-            } else {
-                value.presetHandle = AsData(cppValue.Value().presetHandle.Value());
-            }
-            if (cppValue.Value().transitionTimestamp.IsNull()) {
-                value.transitionTimestamp = nil;
-            } else {
-                value.transitionTimestamp = [NSNumber numberWithUnsignedInt:cppValue.Value().transitionTimestamp.Value()];
-            }
-        }
-        return value;
-    }
     default: {
         break;
     }
@@ -15779,11 +15765,11 @@ static id _Nullable DecodeAttributeValueForThreadNetworkDirectoryCluster(Attribu
         if (*aError != CHIP_NO_ERROR) {
             return nil;
         }
-        NSNumber * _Nullable value;
+        NSData * _Nullable value;
         if (cppValue.IsNull()) {
             value = nil;
         } else {
-            value = [NSNumber numberWithUnsignedLongLong:cppValue.Value()];
+            value = AsData(cppValue.Value());
         }
         return value;
     }
@@ -15802,7 +15788,7 @@ static id _Nullable DecodeAttributeValueForThreadNetworkDirectoryCluster(Attribu
                 auto & entry_0 = iter_0.GetValue();
                 MTRThreadNetworkDirectoryClusterThreadNetworkStruct * newElement_0;
                 newElement_0 = [MTRThreadNetworkDirectoryClusterThreadNetworkStruct new];
-                newElement_0.extendedPanID = [NSNumber numberWithUnsignedLongLong:entry_0.extendedPanID];
+                newElement_0.extendedPanID = AsData(entry_0.extendedPanID);
                 newElement_0.networkName = AsString(entry_0.networkName);
                 if (newElement_0.networkName == nil) {
                     CHIP_ERROR err = CHIP_ERROR_INVALID_ARGUMENT;
@@ -15810,6 +15796,7 @@ static id _Nullable DecodeAttributeValueForThreadNetworkDirectoryCluster(Attribu
                     return nil;
                 }
                 newElement_0.channel = [NSNumber numberWithUnsignedShort:entry_0.channel];
+                newElement_0.activeTimestamp = [NSNumber numberWithUnsignedLongLong:entry_0.activeTimestamp];
                 [array_0 addObject:newElement_0];
             }
             CHIP_ERROR err = iter_0.GetStatus();

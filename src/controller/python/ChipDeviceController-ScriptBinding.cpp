@@ -584,6 +584,7 @@ struct IcdRegistrationParameters
     uint64_t checkInNodeId;
     uint64_t monitoredSubject;
     uint32_t stayActiveMsec;
+    uint8_t clientType;
 };
 
 PyChipError pychip_DeviceController_SetIcdRegistrationParameters(bool enabled, const IcdRegistrationParameters * params)
@@ -622,6 +623,7 @@ PyChipError pychip_DeviceController_SetIcdRegistrationParameters(bool enabled, c
     sCommissioningParameters.SetICDCheckInNodeId(params->checkInNodeId);
     sCommissioningParameters.SetICDMonitoredSubject(params->monitoredSubject);
     sCommissioningParameters.SetICDRegistrationStrategy(ICDRegistrationStrategy::kBeforeComplete);
+    sCommissioningParameters.SetICDClientType(static_cast<app::Clusters::IcdManagement::ClientTypeEnum>(params->clientType));
 
     return ToPyChipError(CHIP_NO_ERROR);
 }
@@ -714,9 +716,14 @@ PyChipError pychip_DeviceController_OpenCommissioningWindow(chip::Controller::De
         SetupPayload payload;
         auto opener =
             Platform::New<Controller::CommissioningWindowOpener>(static_cast<chip::Controller::DeviceController *>(devCtrl));
-        PyChipError err = ToPyChipError(opener->OpenCommissioningWindow(nodeid, System::Clock::Seconds16(timeout), iteration,
-                                                                        discriminator, NullOptional, NullOptional,
-                                                                        pairingDelegate->GetOpenWindowCallback(opener), payload));
+        PyChipError err =
+            ToPyChipError(opener->OpenCommissioningWindow(Controller::CommissioningWindowPasscodeParams()
+                                                              .SetNodeId(nodeid)
+                                                              .SetTimeout(timeout)
+                                                              .SetIteration(iteration)
+                                                              .SetDiscriminator(discriminator)
+                                                              .SetCallback(pairingDelegate->GetOpenWindowCallback(opener)),
+                                                          payload));
         return err;
     }
 

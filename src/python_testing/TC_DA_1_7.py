@@ -158,15 +158,13 @@ class TC_DA_1_7(MatterBaseTest):
 
     @async_test_body
     async def test_TC_DA_1_7(self):
-        # post_cert_tests (or sdk) can use the qr or manual code
-        # We don't currently support this in cert because the base doesn't support multiple QR/manual
         num = 0
         if self.matter_test_config.discriminators:
             num += len(self.matter_test_config.discriminators)
         if self.matter_test_config.qr_code_content:
-            num += 1
+            num += len(self.matter_test_config.qr_code_content)
         if self.matter_test_config.manual_code:
-            num += 1
+            num += len(self.matter_test_config.manual_code)
 
         if num != self.expected_number_of_DUTs():
             if self.allow_sdk_dac:

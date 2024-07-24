@@ -9896,6 +9896,8 @@ CHIP_ERROR TypeInfo::DecodableType::Decode(TLV::TLVReader & reader, const Concre
         return DataModel::Decode(reader, userActiveModeTriggerInstruction);
     case Attributes::OperatingMode::TypeInfo::GetAttributeId():
         return DataModel::Decode(reader, operatingMode);
+    case Attributes::MaximumCheckInBackOff::TypeInfo::GetAttributeId():
+        return DataModel::Decode(reader, maximumCheckInBackOff);
     case Attributes::GeneratedCommandList::TypeInfo::GetAttributeId():
         return DataModel::Decode(reader, generatedCommandList);
     case Attributes::AcceptedCommandList::TypeInfo::GetAttributeId():
@@ -20815,47 +20817,6 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
 
 } // namespace PresetTypeStruct
 
-namespace QueuedPresetStruct {
-CHIP_ERROR Type::Encode(TLV::TLVWriter & aWriter, TLV::Tag aTag) const
-{
-    DataModel::WrappedStructEncoder encoder{ aWriter, aTag };
-    encoder.Encode(to_underlying(Fields::kPresetHandle), presetHandle);
-    encoder.Encode(to_underlying(Fields::kTransitionTimestamp), transitionTimestamp);
-    return encoder.Finalize();
-}
-
-CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
-{
-    detail::StructDecodeIterator __iterator(reader);
-    while (true)
-    {
-        auto __element = __iterator.Next();
-        if (std::holds_alternative<CHIP_ERROR>(__element))
-        {
-            return std::get<CHIP_ERROR>(__element);
-        }
-
-        CHIP_ERROR err              = CHIP_NO_ERROR;
-        const uint8_t __context_tag = std::get<uint8_t>(__element);
-
-        if (__context_tag == to_underlying(Fields::kPresetHandle))
-        {
-            err = DataModel::Decode(reader, presetHandle);
-        }
-        else if (__context_tag == to_underlying(Fields::kTransitionTimestamp))
-        {
-            err = DataModel::Decode(reader, transitionTimestamp);
-        }
-        else
-        {
-        }
-
-        ReturnErrorOnFailure(err);
-    }
-}
-
-} // namespace QueuedPresetStruct
-
 namespace ScheduleTypeStruct {
 CHIP_ERROR Type::Encode(TLV::TLVWriter & aWriter, TLV::Tag aTag) const
 {
@@ -21185,7 +21146,6 @@ CHIP_ERROR Type::Encode(TLV::TLVWriter & aWriter, TLV::Tag aTag) const
 {
     DataModel::WrappedStructEncoder encoder{ aWriter, aTag };
     encoder.Encode(to_underlying(Fields::kPresetHandle), presetHandle);
-    encoder.Encode(to_underlying(Fields::kDelayMinutes), delayMinutes);
     return encoder.Finalize();
 }
 
@@ -21206,10 +21166,6 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
         if (__context_tag == to_underlying(Fields::kPresetHandle))
         {
             err = DataModel::Decode(reader, presetHandle);
-        }
-        else if (__context_tag == to_underlying(Fields::kDelayMinutes))
-        {
-            err = DataModel::Decode(reader, delayMinutes);
         }
         else
         {
@@ -21293,26 +21249,6 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
     }
 }
 } // namespace CommitPresetsSchedulesRequest.
-namespace CancelSetActivePresetRequest {
-CHIP_ERROR Type::Encode(TLV::TLVWriter & aWriter, TLV::Tag aTag) const
-{
-    DataModel::WrappedStructEncoder encoder{ aWriter, aTag };
-    return encoder.Finalize();
-}
-
-CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
-{
-    detail::StructDecodeIterator __iterator(reader);
-    while (true)
-    {
-        auto __element = __iterator.Next();
-        if (std::holds_alternative<CHIP_ERROR>(__element))
-        {
-            return std::get<CHIP_ERROR>(__element);
-        }
-    }
-}
-} // namespace CancelSetActivePresetRequest.
 namespace SetTemperatureSetpointHoldPolicy {
 CHIP_ERROR Type::Encode(TLV::TLVWriter & aWriter, TLV::Tag aTag) const
 {
@@ -21478,8 +21414,6 @@ CHIP_ERROR TypeInfo::DecodableType::Decode(TLV::TLVReader & reader, const Concre
         return DataModel::Decode(reader, temperatureSetpointHoldPolicy);
     case Attributes::SetpointHoldExpiryTimestamp::TypeInfo::GetAttributeId():
         return DataModel::Decode(reader, setpointHoldExpiryTimestamp);
-    case Attributes::QueuedPreset::TypeInfo::GetAttributeId():
-        return DataModel::Decode(reader, queuedPreset);
     case Attributes::GeneratedCommandList::TypeInfo::GetAttributeId():
         return DataModel::Decode(reader, generatedCommandList);
     case Attributes::AcceptedCommandList::TypeInfo::GetAttributeId():
@@ -23948,6 +23882,7 @@ CHIP_ERROR Type::Encode(TLV::TLVWriter & aWriter, TLV::Tag aTag) const
     encoder.Encode(to_underlying(Fields::kExtendedPanID), extendedPanID);
     encoder.Encode(to_underlying(Fields::kNetworkName), networkName);
     encoder.Encode(to_underlying(Fields::kChannel), channel);
+    encoder.Encode(to_underlying(Fields::kActiveTimestamp), activeTimestamp);
     return encoder.Finalize();
 }
 
@@ -23976,6 +23911,10 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
         else if (__context_tag == to_underlying(Fields::kChannel))
         {
             err = DataModel::Decode(reader, channel);
+        }
+        else if (__context_tag == to_underlying(Fields::kActiveTimestamp))
+        {
+            err = DataModel::Decode(reader, activeTimestamp);
         }
         else
         {
@@ -24156,43 +24095,7 @@ CHIP_ERROR TypeInfo::DecodableType::Decode(TLV::TLVReader & reader, const Concre
 }
 } // namespace Attributes
 
-namespace Events {
-namespace NetworkChanged {
-CHIP_ERROR Type::Encode(TLV::TLVWriter & aWriter, TLV::Tag aTag) const
-{
-    TLV::TLVType outer;
-    ReturnErrorOnFailure(aWriter.StartContainer(aTag, TLV::kTLVType_Structure, outer));
-    ReturnErrorOnFailure(DataModel::Encode(aWriter, TLV::ContextTag(Fields::kExtendedPanID), extendedPanID));
-    return aWriter.EndContainer(outer);
-}
-
-CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
-{
-    detail::StructDecodeIterator __iterator(reader);
-    while (true)
-    {
-        auto __element = __iterator.Next();
-        if (std::holds_alternative<CHIP_ERROR>(__element))
-        {
-            return std::get<CHIP_ERROR>(__element);
-        }
-
-        CHIP_ERROR err              = CHIP_NO_ERROR;
-        const uint8_t __context_tag = std::get<uint8_t>(__element);
-
-        if (__context_tag == to_underlying(Fields::kExtendedPanID))
-        {
-            err = DataModel::Decode(reader, extendedPanID);
-        }
-        else
-        {
-        }
-
-        ReturnErrorOnFailure(err);
-    }
-}
-} // namespace NetworkChanged.
-} // namespace Events
+namespace Events {} // namespace Events
 
 } // namespace ThreadNetworkDirectory
 namespace WakeOnLan {

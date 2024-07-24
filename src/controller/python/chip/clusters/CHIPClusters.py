@@ -4138,6 +4138,12 @@ class ChipClusters:
                 "type": "int",
                 "reportable": True,
             },
+            0x00000009: {
+                "attributeName": "MaximumCheckInBackOff",
+                "attributeId": 0x00000009,
+                "type": "int",
+                "reportable": True,
+            },
             0x0000FFF8: {
                 "attributeName": "GeneratedCommandList",
                 "attributeId": 0x0000FFF8,
@@ -8813,7 +8819,6 @@ class ChipClusters:
                 "commandName": "SetActivePresetRequest",
                 "args": {
                     "presetHandle": "bytes",
-                    "delayMinutes": "int",
                 },
             },
             0x00000007: {
@@ -8832,12 +8837,6 @@ class ChipClusters:
             0x00000009: {
                 "commandId": 0x00000009,
                 "commandName": "CommitPresetsSchedulesRequest",
-                "args": {
-                },
-            },
-            0x0000000A: {
-                "commandId": 0x0000000A,
-                "commandName": "CancelSetActivePresetRequest",
                 "args": {
                 },
             },
@@ -9249,12 +9248,6 @@ class ChipClusters:
                 "attributeName": "SetpointHoldExpiryTimestamp",
                 "attributeId": 0x00000054,
                 "type": "int",
-                "reportable": True,
-            },
-            0x00000055: {
-                "attributeName": "QueuedPreset",
-                "attributeId": 0x00000055,
-                "type": "",
                 "reportable": True,
             },
             0x0000FFF8: {
@@ -11989,14 +11982,14 @@ class ChipClusters:
                 "commandId": 0x00000001,
                 "commandName": "RemoveNetwork",
                 "args": {
-                    "extendedPanID": "int",
+                    "extendedPanID": "bytes",
                 },
             },
             0x00000002: {
                 "commandId": 0x00000002,
                 "commandName": "GetOperationalDataset",
                 "args": {
-                    "extendedPanID": "int",
+                    "extendedPanID": "bytes",
                 },
             },
         },
@@ -12004,7 +11997,7 @@ class ChipClusters:
             0x00000000: {
                 "attributeName": "PreferredExtendedPanID",
                 "attributeId": 0x00000000,
-                "type": "int",
+                "type": "bytes",
                 "reportable": True,
                 "writable": True,
             },
