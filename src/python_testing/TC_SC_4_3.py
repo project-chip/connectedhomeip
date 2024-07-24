@@ -222,6 +222,7 @@ class TC_SC_4_3(MatterBaseTest):
         )
 
         # Will be used in Step 8 and 11
+        # This is the hostname
         server = operational_record.server
 
         # Verify SRV record is returned
