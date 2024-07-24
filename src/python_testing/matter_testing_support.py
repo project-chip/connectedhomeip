@@ -1566,7 +1566,6 @@ def async_test_body(body):
     return async_runner
 
 def per_node_test(body):
-
     """ Decorator to be used for PICS-free tests that apply to the entire node.
 
     Use this decorator when your script needs to be run once to validate the whole node.
@@ -1587,6 +1586,26 @@ def _has_cluster(wildcard, endpoint, cluster: ClusterObjects.Cluster) -> bool:
         return False
 
 def has_cluster(cluster: ClusterObjects.ClusterObjectDescriptor) -> EndpointCheckFunction:
+    """ EndpointCheckFunction that can be passed as a parameter to the per_endpoint_test decorator.
+
+        Use this function with the per_endpoint_test decorator to run this test on all endpoints with
+        the specified cluster. For example, given a device with the following conformance
+
+        EP0: cluster A, B, C
+        EP1: cluster D, E
+        EP2, cluster D
+        EP3, cluster E
+
+        And the following test specification:
+        @per_endpoint_test(has_cluster(Clusters.D))
+        test_mytest(self):
+            ...
+
+        The test would be run on endpoint 1 and on endpoint 2.
+
+        If the cluster is not found on any endpoint the decorator will call the on_skip function to
+        notify the test harness that the test is not applicable to this node and the test will not be run.
+    """
     return partial(_has_cluster, cluster=cluster)
 
 def _has_attribute(wildcard, endpoint, attribute: ClusterObjects.ClusterAttributeDescriptor) -> bool:
@@ -1598,13 +1617,67 @@ def _has_attribute(wildcard, endpoint, attribute: ClusterObjects.ClusterAttribut
         return False
 
 def has_attribute(attribute: ClusterObjects.ClusterAttributeDescriptor) -> EndpointCheckFunction:
+    """ EndpointCheckFunction that can be passed as a parameter to the per_endpoint_test decorator.
+
+        Use this function with the per_endpoint_test decorator to run this test on all endpoints with
+        the specified attribute. For example, given a device with the following conformance
+
+        EP0: cluster A, B, C
+        EP1: cluster D with attribute d, E
+        EP2, cluster D with attribute d
+        EP3, cluster D without attribute d
+
+        And the following test specification:
+        @per_endpoint_test(has_attribute(Clusters.D.Attributes.d))
+        test_mytest(self):
+            ...
+
+        The test would be run on endpoint 1 and on endpoint 2.
+
+        If the cluster is not found on any endpoint the decorator will call the on_skip function to
+        notify the test harness that the test is not applicable to this node and the test will not be run.
+    """
     return partial(_has_attribute, attribute=attribute)
 
-async def get_accepted_endpoints_for_test(self:MatterBaseTest, accept_function: EndpointCheckFunction):
+async def get_accepted_endpoints_for_test(self:MatterBaseTest, accept_function: EndpointCheckFunction) -> list[uint]:
+    """ Helper function for the per_endpoint_test decorator.
+
+        Returns a list of endpoints on which the test should be run given the accept_function for the test.
+    """
     wildcard = await self.default_controller.Read(self.dut_node_id, [()])
     return [e for e in wildcard.attributes.keys() if accept_function(wildcard, e)]
 
-def per_endpoint_test(accept_function):
+def per_endpoint_test(accept_function: EndpointCheckFunction):
+    """ Test decorator for a test that needs to be run once per endpoint that meets the accept_function criteria.
+
+        Place this decorator above the test_ method to have the test framework run this test once per endpoint.
+        This decorator takes an EndpointCheckFunction to assess whether a test needs to be run on a particular
+        endpoint.
+
+        For example, given the following device conformance:
+
+        EP0: cluster A, B, C
+        EP1: cluster D, E
+        EP2, cluster D
+        EP3, cluster E
+
+        And the following test specification:
+        @per_endpoint_test(has_cluster(Clusters.D))
+        test_mytest(self):
+            ...
+
+        The test would be run on endpoint 1 and on endpoint 2.
+
+        If the cluster is not found on any endpoint the decorator will call the on_skip function to
+        notify the test harness that the test is not applicable to this node and the test will not be run.
+
+        The decorator works by setting the self.matter_test_config.endpoint value and running the test function.
+        Therefore, tests that make use of this decorator should call controller functions against that endpoint.
+        Support functions in this file default to this endpoint.
+
+        Tests that use this decorator cannot use a pics_ method for test selection and should not reference any
+        PICS values internally.
+    """
     def per_endpoint_test_internal(body):
         def per_endpoint_runner(self: MatterBaseTest, *args, **kwargs):
             asserts.assert_false(self.get_test_pics(self.current_test_info.name), "pics_ method supplied for per_endpoint_test.")
