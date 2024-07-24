@@ -160,6 +160,11 @@ void ConnectivityManagerImpl::_OnPlatformEvent(const ChipDeviceEvent * event)
         NetworkCommissioning::NXPWiFiDriver::GetInstance().ScanWiFINetworkDoneFromMatterTaskContext(
             event->Platform.ScanWiFiNetworkCount);
     }
+    else if (event->Type == kPlatformNxpStartWlanInitWaitTimerEvent)
+    {
+        DeviceLayer::SystemLayer().StartTimer(System::Clock::Milliseconds32(kWlanInitWaitMs), ConnectNetworkTimerHandler,
+                                              (void *) event->Platform.pNetworkDataEvent);
+    }
 #endif
 }
 
@@ -591,10 +596,10 @@ void ConnectivityManagerImpl::ConnectNetworkTimerHandler(::chip::System::Layer *
     }
     else
     {
-        PlatformMgr().LockChipStack();
-        DeviceLayer::SystemLayer().StartTimer(System::Clock::Milliseconds32(CHIP_DEVICE_CONFIG_WIFI_STATION_RECONNECT_INTERVAL),
-                                              ConnectNetworkTimerHandler, context);
-        PlatformMgr().UnlockChipStack();
+        /* Post an event to start a delay timer asynchronously in the Matter task context */
+        event.Type                       = DeviceEventType::kPlatformNxpStartWlanInitWaitTimerEvent;
+        event.Platform.pNetworkDataEvent = (struct wlan_network *) context;
+        (void) PlatformMgr().PostEvent(&event);
     }
 }
 
