@@ -1176,6 +1176,7 @@ class MatterBaseTest(base_test.BaseTestClass):
         try:
             return input()
         except EOFError:
+            logging.info("========= EOF on STDIN =========")
             return None
 
 
