@@ -46524,15 +46524,15 @@ class EcosystemInformation(Cluster):
             def descriptor(cls) -> ClusterObjectDescriptor:
                 return ClusterObjectDescriptor(
                     Fields=[
-                        ClusterObjectFieldDescriptor(Label="uniqueLocationID", Tag=0, Type=typing.Union[Nullable, str]),
-                        ClusterObjectFieldDescriptor(Label="homeLocation", Tag=1, Type=typing.Union[Nullable, EcosystemInformation.Structs.HomeLocationStruct]),
-                        ClusterObjectFieldDescriptor(Label="homeLocationLastEdit", Tag=2, Type=typing.Union[Nullable, uint]),
+                        ClusterObjectFieldDescriptor(Label="uniqueLocationID", Tag=0, Type=str),
+                        ClusterObjectFieldDescriptor(Label="homeLocation", Tag=1, Type=EcosystemInformation.Structs.HomeLocationStruct),
+                        ClusterObjectFieldDescriptor(Label="homeLocationLastEdit", Tag=2, Type=uint),
                         ClusterObjectFieldDescriptor(Label="fabricIndex", Tag=254, Type=uint),
                     ])
 
-            uniqueLocationID: 'typing.Union[Nullable, str]' = NullValue
-            homeLocation: 'typing.Union[Nullable, EcosystemInformation.Structs.HomeLocationStruct]' = NullValue
-            homeLocationLastEdit: 'typing.Union[Nullable, uint]' = NullValue
+            uniqueLocationID: 'str' = ""
+            homeLocation: 'EcosystemInformation.Structs.HomeLocationStruct' = field(default_factory=lambda: EcosystemInformation.Structs.HomeLocationStruct())
+            homeLocationLastEdit: 'uint' = 0
             fabricIndex: 'uint' = 0
 
         @dataclass
@@ -46554,23 +46554,23 @@ class EcosystemInformation(Cluster):
             def descriptor(cls) -> ClusterObjectDescriptor:
                 return ClusterObjectDescriptor(
                     Fields=[
-                        ClusterObjectFieldDescriptor(Label="deviceName", Tag=0, Type=typing.Union[None, Nullable, str]),
-                        ClusterObjectFieldDescriptor(Label="deviceNameLastEdit", Tag=1, Type=typing.Union[None, Nullable, uint]),
-                        ClusterObjectFieldDescriptor(Label="bridgedEndpoint", Tag=2, Type=typing.Union[Nullable, uint]),
-                        ClusterObjectFieldDescriptor(Label="originalEndpoint", Tag=3, Type=typing.Union[Nullable, uint]),
-                        ClusterObjectFieldDescriptor(Label="deviceTypes", Tag=4, Type=typing.Union[Nullable, typing.List[EcosystemInformation.Structs.DeviceTypeStruct]]),
-                        ClusterObjectFieldDescriptor(Label="uniqueLocationIDs", Tag=5, Type=typing.Union[Nullable, typing.List[str]]),
-                        ClusterObjectFieldDescriptor(Label="uniqueLocationIDsLastEdit", Tag=6, Type=typing.Union[Nullable, uint]),
+                        ClusterObjectFieldDescriptor(Label="deviceName", Tag=0, Type=typing.Optional[str]),
+                        ClusterObjectFieldDescriptor(Label="deviceNameLastEdit", Tag=1, Type=typing.Optional[uint]),
+                        ClusterObjectFieldDescriptor(Label="bridgedEndpoint", Tag=2, Type=uint),
+                        ClusterObjectFieldDescriptor(Label="originalEndpoint", Tag=3, Type=uint),
+                        ClusterObjectFieldDescriptor(Label="deviceTypes", Tag=4, Type=typing.List[EcosystemInformation.Structs.DeviceTypeStruct]),
+                        ClusterObjectFieldDescriptor(Label="uniqueLocationIDs", Tag=5, Type=typing.List[str]),
+                        ClusterObjectFieldDescriptor(Label="uniqueLocationIDsLastEdit", Tag=6, Type=uint),
                         ClusterObjectFieldDescriptor(Label="fabricIndex", Tag=254, Type=uint),
                     ])
 
-            deviceName: 'typing.Union[None, Nullable, str]' = None
-            deviceNameLastEdit: 'typing.Union[None, Nullable, uint]' = None
-            bridgedEndpoint: 'typing.Union[Nullable, uint]' = NullValue
-            originalEndpoint: 'typing.Union[Nullable, uint]' = NullValue
-            deviceTypes: 'typing.Union[Nullable, typing.List[EcosystemInformation.Structs.DeviceTypeStruct]]' = NullValue
-            uniqueLocationIDs: 'typing.Union[Nullable, typing.List[str]]' = NullValue
-            uniqueLocationIDsLastEdit: 'typing.Union[Nullable, uint]' = NullValue
+            deviceName: 'typing.Optional[str]' = None
+            deviceNameLastEdit: 'typing.Optional[uint]' = None
+            bridgedEndpoint: 'uint' = 0
+            originalEndpoint: 'uint' = 0
+            deviceTypes: 'typing.List[EcosystemInformation.Structs.DeviceTypeStruct]' = field(default_factory=lambda: [])
+            uniqueLocationIDs: 'typing.List[str]' = field(default_factory=lambda: [])
+            uniqueLocationIDsLastEdit: 'uint' = 0
             fabricIndex: 'uint' = 0
 
     class Attributes:
