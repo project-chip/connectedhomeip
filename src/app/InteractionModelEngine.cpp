@@ -1699,6 +1699,9 @@ Protocols::InteractionModel::Status InteractionModelEngine::CommandExists(const 
 
 InteractionModel::DataModel * InteractionModelEngine::SetDataModel(InteractionModel::DataModel * model)
 {
+    // Alternting data model should not be done while IM is actively handling requests.
+    VerifyOrDie(mReadHandlers.begin() == mReadHandlers.end());
+
     InteractionModel::DataModel * oldModel = GetDataModel();
     mDataModel                             = model;
     return oldModel;

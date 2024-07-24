@@ -37,6 +37,7 @@ CHIP_ERROR RetrieveClusterData(InteractionModel::DataModel * dataModel, const Ac
                                bool isFabricFiltered, AttributeReportIBs::Builder & reportBuilder,
                                const ConcreteReadAttributePath & path, AttributeEncodeState * encoderState)
 {
+    // Odd ifdef is to only do this if the `Read-Check` does not do it already.
 #if !CHIP_CONFIG_USE_EMBER_DATA_MODEL
     ChipLogDetail(DataManagement, "<RE:Run> Cluster %" PRIx32 ", Attribute %" PRIx32 " is dirty", path.mClusterId,
                   path.mAttributeId);
@@ -71,6 +72,7 @@ CHIP_ERROR RetrieveClusterData(InteractionModel::DataModel * dataModel, const Ac
 
     if (err == CHIP_NO_ERROR)
     {
+        // Odd ifdef is to only do this if the `Read-Check` does not do it already.
 #if !CHIP_CONFIG_USE_EMBER_DATA_MODEL
         // TODO: this callback being only executed on success is awkward. The Write callback is always done
         //       for both read and write.

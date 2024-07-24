@@ -29,6 +29,7 @@ CHIP_ERROR RetrieveClusterData(InteractionModel::DataModel * dataModel, const Ac
                                bool isFabricFiltered, AttributeReportIBs::Builder & reportBuilder,
                                const ConcreteReadAttributePath & path, AttributeEncodeState * encoderState)
 {
+    // Odd ifdef is to only do this if the `Read-Check` does not do it already.
 #if !CHIP_CONFIG_USE_DATA_MODEL_INTERFACE
     ChipLogDetail(DataManagement, "<RE:Run> Cluster %" PRIx32 ", Attribute %" PRIx32 " is dirty", path.mClusterId,
                   path.mAttributeId);
@@ -39,6 +40,7 @@ CHIP_ERROR RetrieveClusterData(InteractionModel::DataModel * dataModel, const Ac
 
     ReturnErrorOnFailure(ReadSingleClusterData(subjectDescriptor, isFabricFiltered, path, reportBuilder, encoderState));
 
+    // Odd ifdef is to only do this if the `Read-Check` does not do it already.
 #if !CHIP_CONFIG_USE_DATA_MODEL_INTERFACE
     DataModelCallbacks::GetInstance()->AttributeOperation(DataModelCallbacks::OperationType::Read,
                                                           DataModelCallbacks::OperationOrder::Post, path);
