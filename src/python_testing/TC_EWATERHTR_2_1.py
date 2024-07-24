@@ -29,7 +29,7 @@
 import logging
 
 import chip.clusters as Clusters
-from EWATERHTRBase import EWATERHTRBase
+from TC_EWATERHTRBase import EWATERHTRBase
 from matter_testing_support import MatterBaseTest, TestStep, async_test_body, default_matter_test_main
 
 logger = logging.getLogger(__name__)
@@ -48,19 +48,20 @@ class TC_EWATERHTR_2_1(MatterBaseTest, EWATERHTRBase):
 
     def steps_TC_EWATERHTR_2_1(self) -> list[TestStep]:
         steps = [
-            TestStep("1", "Commissioning, already done", is_commissioning=True),
-            TestStep("2", "TH reads HeaterTypes attribute.", 
-            "DUT as Server replies with a WaterHeaterTypeBitmap (enum8)greater than 0x00 (at least one type supported), and less than 0x20 (no undefined types supported)."),
-            TestStep("3", "TH reads HeatDemand attribute.", 
-            "DUT as Server replies with a WaterHeaterDemandBitmap (enum8)."),
-            TestStep("4", "TH reads TankVolume attribute.", 
-            "DUT as Server replies with a uint16 value."),
+            TestStep("1", "Commissioning, already done",
+                     is_commissioning=True),
+            TestStep("2", "TH reads HeaterTypes attribute.",
+                     "DUT as Server replies with a WaterHeaterTypeBitmap (enum8)greater than 0x00 (at least one type supported), and less than 0x20 (no undefined types supported)."),
+            TestStep("3", "TH reads HeatDemand attribute.",
+                     "DUT as Server replies with a WaterHeaterDemandBitmap (enum8)."),
+            TestStep("4", "TH reads TankVolume attribute.",
+                     "DUT as Server replies with a uint16 value."),
             TestStep("5", "TH reads EstimatedHeatRequired attribute.",
-            "DUT as Server replies with an energy-mWh value."),
+                     "DUT as Server replies with an energy-mWh value."),
             TestStep("6", "TH reads TankPercentage attribute.",
-            "DUT as Server replies with a percent value."),
+                     "DUT as Server replies with a percent value."),
             TestStep("7", "TH reads BoostState attribute.",
-            "DUT as Server replies with a BoostStateEnum (enum8) value."),
+                     "DUT as Server replies with a BoostStateEnum (enum8) value."),
         ]
 
         return steps
