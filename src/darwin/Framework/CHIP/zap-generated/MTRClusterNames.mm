@@ -5774,10 +5774,6 @@ NSString * MTRAttributeNameForID(MTRClusterIDType clusterID, MTRAttributeIDType 
             result = @"SetpointHoldExpiryTimestamp";
             break;
 
-        case MTRAttributeIDTypeClusterThermostatAttributeQueuedPresetID:
-            result = @"QueuedPreset";
-            break;
-
         case MTRAttributeIDTypeClusterThermostatAttributeGeneratedCommandListID:
             result = @"GeneratedCommandList";
             break;
