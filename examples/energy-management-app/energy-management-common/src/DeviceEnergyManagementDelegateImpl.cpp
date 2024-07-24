@@ -864,7 +864,7 @@ CHIP_ERROR DeviceEnergyManagementDelegate::SetAbsMinPower(int64_t newValueMw)
     mAbsMinPowerMw = newValueMw;
     if (oldValueMw != newValueMw)
     {
-        ChipLogDetail(AppServer, "mAbsMinPower updated to %d", static_cast<int>(mAbsMinPowerMw));
+        ChipLogDetail(AppServer, "mAbsMinPower updated to " ChipLogFormatX64, ChipLogValueX64(mAbsMinPowerMw));
         MatterReportingAttributeChangeCallback(mEndpointId, DeviceEnergyManagement::Id, AbsMinPower::Id);
     }
 
@@ -878,7 +878,7 @@ CHIP_ERROR DeviceEnergyManagementDelegate::SetAbsMaxPower(int64_t newValueMw)
     mAbsMaxPowerMw = newValueMw;
     if (oldValueMw != newValueMw)
     {
-        ChipLogDetail(AppServer, "mAbsMaxPower updated to %d", static_cast<int>(mAbsMaxPowerMw));
+        ChipLogDetail(AppServer, "mAbsMaxPower updated to " ChipLogFormatX64, ChipLogValueX64(mAbsMaxPowerMw));
         MatterReportingAttributeChangeCallback(mEndpointId, DeviceEnergyManagement::Id, AbsMaxPower::Id);
     }
 

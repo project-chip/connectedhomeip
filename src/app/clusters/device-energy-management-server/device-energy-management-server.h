@@ -45,6 +45,9 @@ public:
      * @brief Delegate should implement a handler to begin to adjust client power
      *        consumption/generation to the level requested.
      *
+     *        Note callers must call GetPowerAdjustmentCapability and ensure the return value is not null
+     *        before calling PowerAdjustRequest.
+     *
      * @param power Milli-Watts the ESA SHALL use during the adjustment period.
      * @param duration The duration that the ESA SHALL maintain the requested power for.
      * @return  Success if the adjustment is accepted; otherwise the command SHALL be rejected with appropriate error.
