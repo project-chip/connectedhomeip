@@ -134,7 +134,8 @@ std::unique_ptr<EcosystemDeviceStruct> EcosystemDeviceStruct::Builder::Build()
     VerifyOrReturnValue(mDeviceName.size() <= kDeviceNameMaxSize, nullptr, ChipLogError(Zcl, "Device name too large"));
     VerifyOrReturnValue(mOriginalEndpoint != kInvalidEndpointId, nullptr, ChipLogError(Zcl, "Invalid original endpoint"));
     VerifyOrReturnValue(!mDeviceTypes.empty(), nullptr, ChipLogError(Zcl, "No device types added"));
-    VerifyOrReturnValue(mUniqueLocationIds.size() <= kUniqueLocationIdsListMaxSize, nullptr, ChipLogError(Zcl, "Too many location ids"));
+    VerifyOrReturnValue(mUniqueLocationIds.size() <= kUniqueLocationIdsListMaxSize, nullptr,
+                        ChipLogError(Zcl, "Too many location ids"));
 
     for (auto & locationId : mUniqueLocationIds)
     {
@@ -291,7 +292,7 @@ CHIP_ERROR EcosystemInformationServer::EncodeRemovedOnAttribute(EndpointId aEndp
         return CHIP_IM_GLOBAL_STATUS(UnsupportedCluster);
     }
 
-    auto& deviceInfo = it->second;
+    auto & deviceInfo = it->second;
     if (!deviceInfo.mRemovedOn.HasValue())
     {
         aEncoder.EncodeNull();
