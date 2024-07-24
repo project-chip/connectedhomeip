@@ -878,7 +878,7 @@ bool Instance::SetCurrentLocation(const DataModel::Nullable<uint32_t> & aCurrent
     // EstimatedEndTime SHALL be null if the CurrentLocation attribute is null.
     if (mCurrentLocation.IsNull())
     {
-        SetEstimatedEndTime(DataModel::Nullable<uint32_t>());
+        SetEstimatedEndTime(DataModel::NullNullable);
     }
 
     return true;

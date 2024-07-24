@@ -24,7 +24,7 @@ bool Delegate::GetSupportedLocationById(uint32_t aLocationId, uint32_t & listInd
 void Delegate::HandleSupportedLocationsUpdated()
 {
     mInstance->ClearSelectedLocations();
-    mInstance->SetCurrentLocation(DataModel::Nullable<uint32_t>());
+    mInstance->SetCurrentLocation(DataModel::NullNullable);
     mInstance->ClearProgress();
 }
 
