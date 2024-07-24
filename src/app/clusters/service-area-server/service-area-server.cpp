@@ -506,8 +506,6 @@ bool Instance::IsValidSupportedLocation(const LocationStructureWrapper & aLocati
 
 bool Instance::IsUniqueSupportedLocation(const LocationStructureWrapper & aLocation, bool ignoreLocationId)
 {
-    uint8_t locationIndex = 0;
-    LocationStructureWrapper entry;
     BitMask<LocationStructureWrapper::IsEqualConfig> config;
 
     if (ignoreLocationId)
@@ -523,6 +521,8 @@ bool Instance::IsUniqueSupportedLocation(const LocationStructureWrapper & aLocat
         config.Set(LocationStructureWrapper::IsEqualConfig::kIgnoreMapId);
     }
 
+    uint8_t locationIndex = 0;
+    LocationStructureWrapper entry;
     while (mDelegate->GetSupportedLocationByIndex(locationIndex++, entry))
     {
         if (aLocation.IsEqual(entry, config))
@@ -706,7 +706,7 @@ bool Instance::AddSupportedMap(uint8_t aMapId, const CharSpan & aMapName)
         // the name cannot be the same as an existing map
         if (entry.IsNameEqual(aMapName))
         {
-            ChipLogError(Zcl, "AddSupportedMap %u - A map already exists with same name '%s'", aMapId, entry.GetName().data());
+            ChipLogError(Zcl, "AddSupportedMap %u - A map already exists with same name '%.*s'", aMapId, static_cast<int>(entry.GetName().size()), entry.GetName().data());
             return false;
         }
 
@@ -767,7 +767,7 @@ bool Instance::RenameSupportedMap(uint8_t aMapId, const CharSpan & newMapName)
 
         if (entry.IsNameEqual(newMapName))
         {
-            ChipLogError(Zcl, "AddSupportedMap %u - map already exists with same name '%s'", aMapId, entry.GetName().data());
+            ChipLogError(Zcl, "AddSupportedMap %u - map already exists with same name '%.*s'", aMapId, static_cast<int>(entry.GetName().size()), entry.GetName().data());
             return false;
         }
 
