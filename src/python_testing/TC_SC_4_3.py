@@ -145,7 +145,7 @@ class TC_SC_4_3(MatterBaseTest):
             else:
                 return False, f"Bit 0 is not clear. T value ({t_value})"
         except ValueError:
-            return False, f"T value ({t_value}) is not a valid decimal number."
+            return False, f"T value ({t_value}) is not a valid integer"
 
     @staticmethod
     def contains_ipv6_address(addresses):
