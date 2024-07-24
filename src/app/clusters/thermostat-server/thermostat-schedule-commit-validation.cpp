@@ -11,7 +11,6 @@
 #include <app/CommandHandler.h>
 #include <app/ConcreteAttributePath.h>
 #include <app/ConcreteCommandPath.h>
-#include <app/util/error-mapping.h>
 #include <lib/core/CHIPEncoding.h>
 
 using namespace chip;
@@ -21,7 +20,9 @@ using namespace chip::app::Clusters::Thermostat;
 using namespace chip::app::Clusters::Thermostat::Attributes;
 using namespace chip::app::Clusters::Thermostat::Structs;
 
-static EmberAfStatus FindScheduleByHandle(const chip::ByteSpan & handle, const Span<ScheduleStruct::Type> & list,
+using imcode = Protocols::InteractionModel::Status;
+
+static imcode FindScheduleByHandle(const chip::ByteSpan & handle, const Span<ScheduleStruct::Type> & list,
                                           ScheduleStruct::Type & outSchedule)
 {
     for (auto & schedule : list)
@@ -36,7 +37,7 @@ static EmberAfStatus FindScheduleByHandle(const chip::ByteSpan & handle, const S
     return EMBER_ZCL_STATUS_NOT_FOUND;
 }
 
-static EmberAfStatus CheckScheduleHandleUnique(const chip::ByteSpan & handle, Span<ScheduleStruct::Type> & list)
+static imcode CheckScheduleHandleUnique(const chip::ByteSpan & handle, Span<ScheduleStruct::Type> & list)
 {
     int count = 0;
     for (auto & schedule : list)
@@ -59,7 +60,7 @@ static EmberAfStatus CheckScheduleHandleUnique(const chip::ByteSpan & handle, Sp
 
 static bool IsScheduleHandleReferenced(ThermostatMatterScheduleManager & mgr, const chip::ByteSpan & handle)
 {
-    EmberAfStatus status = EMBER_ZCL_STATUS_SUCCESS;
+    imcode status = EMBER_ZCL_STATUS_SUCCESS;
 
     // Check Active Preset Handle
     DataModel::Nullable<chip::MutableByteSpan> activeScheduleHandle;
@@ -142,9 +143,9 @@ using DecodableType = Type;
 } // namespace ScheduleTypeStruct
 #endif
 
-static EmberAfStatus CheckScheduleTypes(ThermostatMatterScheduleManager & mgr, ScheduleStruct::Type & schedule, Span<PresetStruct::Type> & presetList)
+static imcode CheckScheduleTypes(ThermostatMatterScheduleManager & mgr, ScheduleStruct::Type & schedule, Span<PresetStruct::Type> & presetList)
 {
-    EmberAfStatus status = EMBER_ZCL_STATUS_CONSTRAINT_ERROR;
+    imcode status = EMBER_ZCL_STATUS_CONSTRAINT_ERROR;
     size_t index         = 0;
     ScheduleTypeStruct::Type scheduleType;
 
@@ -201,9 +202,9 @@ static EmberAfStatus CheckScheduleTypes(ThermostatMatterScheduleManager & mgr, S
     return status;
 }
 
-static EmberAfStatus CheckNumberOfTransitions(ThermostatMatterScheduleManager & mgr, ScheduleStruct::Type & schedule)
+static imcode CheckNumberOfTransitions(ThermostatMatterScheduleManager & mgr, ScheduleStruct::Type & schedule)
 {
-    EmberAfStatus status = EMBER_ZCL_STATUS_CONSTRAINT_ERROR;
+    imcode status = EMBER_ZCL_STATUS_CONSTRAINT_ERROR;
 
     // Check 4
     uint8_t numberOfScheduleTransitions;
@@ -242,11 +243,11 @@ exit:
     return status;
 }
 
-EmberAfStatus ThermostatMatterScheduleManager::ValidateSchedulesForCommitting(Span<ScheduleStruct::Type> & oldlist,
+imcode ThermostatMatterScheduleManager::ValidateSchedulesForCommitting(Span<ScheduleStruct::Type> & oldlist,
                                                                               Span<ScheduleStruct::Type> & newlist,
                                                                               Span<PresetStruct::Type> & presetlist)
 {
-    EmberAfStatus status = EMBER_ZCL_STATUS_SUCCESS;
+    imcode status = EMBER_ZCL_STATUS_SUCCESS;
     ScheduleStruct::Type querySchedule; // manager storage used for queries.
 
     // Check that new_list can fit.

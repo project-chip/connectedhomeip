@@ -18,10 +18,10 @@
 #pragma once
 
 #include <app-common/zap-generated/cluster-objects.h>
-#include <app/util/af-enums.h>
 #include <app/util/basic-types.h>
-
 #include <transport/Session.h>
+
+#include <protocols/interaction_model/StatusCode.h>
 
 struct ThermostatMatterScheduleManager
 {
@@ -31,7 +31,7 @@ struct ThermostatMatterScheduleManager
      */
     using onEditStartCb  = void (*)(ThermostatMatterScheduleManager *);
     using onEditCancelCb = onEditStartCb;
-    using onEditCommitCb = EmberAfStatus (*)(ThermostatMatterScheduleManager *);
+    using onEditCommitCb = chip::Protocols::InteractionModel::Status (*)(ThermostatMatterScheduleManager *);
 
     using getPresetTypeAtIndexCB = CHIP_ERROR (*)(ThermostatMatterScheduleManager *, size_t index,
                                                   chip::app::Clusters::Thermostat::Structs::PresetTypeStruct::Type & presetType);
@@ -81,20 +81,6 @@ struct ThermostatMatterScheduleManager
                                     getScheduleTypeAtIndexCB getScheduleTypeAtIndexCB, getScheduleAtIndexCB getScheduleAtIndex,
                                     appendScheduleCB appendSchedule, clearSchedulesCB clearSchedules);
 
-    // If the endpoint supports editable schedules
-    ThermostatMatterScheduleManager(chip::EndpointId endpoint, onEditStartCb onEditStart, onEditCancelCb onEditCancel,
-                                    onEditCommitCb onEditCommit,
-
-                                    getScheduleTypeAtIndexCB getScheduleTypeAtIndexCB, getScheduleAtIndexCB getScheduleAtIndex,
-                                    appendScheduleCB appendSchedule, clearSchedulesCB clearSchedules);
-
-    // If the endpoint supports editable presets
-    ThermostatMatterScheduleManager(chip::EndpointId endpoint, onEditStartCb onEditStart, onEditCancelCb onEditCancel,
-                                    onEditCommitCb onEditCommit,
-
-                                    getPresetTypeAtIndexCB getPresetTypeAtIndex, getPresetAtIndexCB getPresetAtIndex,
-                                    appendPresetCB appendPreset, clearPresetsCB clearPresets);
-
     ~ThermostatMatterScheduleManager();
 
     chip::EndpointId mEndpoint;
@@ -122,9 +108,9 @@ struct ThermostatMatterScheduleManager
     ThermostatMatterScheduleManager * next() { return this->nextEditor; }
     void setNext(ThermostatMatterScheduleManager * inst) { this->nextEditor = inst; }
 
-    EmberAfStatus ValidatePresetsForCommitting(chip::Span<chip::app::Clusters::Thermostat::Structs::PresetStruct::Type> & oldList,
+    chip::Protocols::InteractionModel::Status ValidatePresetsForCommitting(chip::Span<chip::app::Clusters::Thermostat::Structs::PresetStruct::Type> & oldList,
                                                chip::Span<chip::app::Clusters::Thermostat::Structs::PresetStruct::Type> & newList);
-    EmberAfStatus
+    chip::Protocols::InteractionModel::Status
     ValidateSchedulesForCommitting(chip::Span<chip::app::Clusters::Thermostat::Structs::ScheduleStruct::Type> & oldList,
                                    chip::Span<chip::app::Clusters::Thermostat::Structs::ScheduleStruct::Type> & newList,
                                    chip::Span<chip::app::Clusters::Thermostat::Structs::PresetStruct::Type> & presetList);

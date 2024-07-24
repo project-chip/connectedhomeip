@@ -11,7 +11,6 @@
 #include <app/CommandHandler.h>
 #include <app/ConcreteAttributePath.h>
 #include <app/ConcreteCommandPath.h>
-#include <app/util/error-mapping.h>
 #include <lib/core/CHIPEncoding.h>
 
 using namespace chip;
@@ -21,7 +20,9 @@ using namespace chip::app::Clusters::Thermostat;
 using namespace chip::app::Clusters::Thermostat::Attributes;
 using namespace chip::app::Clusters::Thermostat::Structs;
 
-static EmberAfStatus FindPresetByHandle(const chip::ByteSpan & handle, const Span<PresetStruct::Type> & list,
+using imcode = Protocols::InteractionModel::Status;
+
+static imcode FindPresetByHandle(const chip::ByteSpan & handle, const Span<PresetStruct::Type> & list,
                                         PresetStruct::Type & outPreset)
 {
     for (auto & preset : list)
@@ -29,14 +30,14 @@ static EmberAfStatus FindPresetByHandle(const chip::ByteSpan & handle, const Spa
         if ((preset.presetHandle.IsNull() == false) && handle.data_equal(preset.presetHandle.Value()))
         {
             outPreset = preset;
-            return EMBER_ZCL_STATUS_SUCCESS;
+            return imcode::Success;
         }
     }
 
-    return EMBER_ZCL_STATUS_NOT_FOUND;
+    return imcode::NotFound;
 }
 
-static EmberAfStatus CheckPresetHandleUnique(const chip::ByteSpan & handle, Span<PresetStruct::Type> & list)
+static imcode CheckPresetHandleUnique(const chip::ByteSpan & handle, Span<PresetStruct::Type> & list)
 {
     int count = 0;
     for (auto & preset : list)
@@ -49,12 +50,12 @@ static EmberAfStatus CheckPresetHandleUnique(const chip::ByteSpan & handle, Span
             }
             else
             {
-                return EMBER_ZCL_STATUS_CONSTRAINT_ERROR;
+                return imcode::ConstraintError;
             }
         }
     }
 
-    return EMBER_ZCL_STATUS_SUCCESS;
+    return imcode::Success;
 }
 
 #if 0
@@ -76,7 +77,7 @@ public:
 
 static bool IsPresetHandleReferenced(ThermostatMatterScheduleManager & mgr, const chip::ByteSpan & handle)
 {
-    EmberAfStatus status = EMBER_ZCL_STATUS_SUCCESS;
+    imcode status = EMBER_ZCL_STATUS_SUCCESS;
     uint32_t ourFeatureMap;
     FeatureMap::Get(mgr.mEndpoint, &ourFeatureMap);
     const bool enhancedSchedulesSupported = ourFeatureMap & to_underlying(Feature::kMatterScheduleConfiguration);
@@ -164,9 +165,9 @@ enum class PresetTypeFeaturesBitmap : uint8_t
 
 #endif
 
-static EmberAfStatus CheckPresetType(ThermostatMatterScheduleManager & mgr, PresetStruct::Type & preset)
+static imcode CheckPresetType(ThermostatMatterScheduleManager & mgr, PresetStruct::Type & preset)
 {
-    EmberAfStatus status = EMBER_ZCL_STATUS_CONSTRAINT_ERROR;
+    imcode status = EMBER_ZCL_STATUS_CONSTRAINT_ERROR;
     size_t index         = 0;
     PresetTypeStruct::Type presetType;
 
@@ -192,10 +193,10 @@ static EmberAfStatus CheckPresetType(ThermostatMatterScheduleManager & mgr, Pres
     return status;
 }
 
-EmberAfStatus ThermostatMatterScheduleManager::ValidatePresetsForCommitting(Span<PresetStruct::Type> & oldlist,
+imcode ThermostatMatterScheduleManager::ValidatePresetsForCommitting(Span<PresetStruct::Type> & oldlist,
                                                                             Span<PresetStruct::Type> & newlist)
 {
-    EmberAfStatus status = EMBER_ZCL_STATUS_SUCCESS;
+    imcode status = EMBER_ZCL_STATUS_SUCCESS;
     PresetStruct::Type queryPreset; // preset storage used for queries.
 
     // Check that new_list can fit.

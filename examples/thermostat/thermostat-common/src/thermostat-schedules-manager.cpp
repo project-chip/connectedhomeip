@@ -1,11 +1,13 @@
 #include <app/clusters/thermostat-server/thermostat-server.h>
-
+#include <app/MessageDef/StatusIB.h>
 #include <vector>
 
 using namespace chip;
 using namespace chip::app;
 using namespace chip::app::Clusters::Thermostat;
 using namespace chip::app::Clusters::Thermostat::Structs;
+
+using Protocols::InteractionModel::Status;
 
 // built in presets will be prefixed with B
 constexpr const char * kBuiltInPOneHandle = "BP1";
@@ -85,9 +87,9 @@ static void onEditCancel(ThermostatMatterScheduleManager * mgr)
     gsEditingSchedulesEmptyIndex = 0;
 }
 
-static EmberAfStatus onEditCommit(ThermostatMatterScheduleManager * mgr)
+static Status onEditCommit(ThermostatMatterScheduleManager * mgr)
 {
-    EmberAfStatus status = EMBER_ZCL_STATUS_SUCCESS;
+    Status status = Status::Success;
 
     ChipLogProgress(Zcl, "ThermstatScheduleManager - onEditCommit");
 
@@ -97,8 +99,10 @@ static EmberAfStatus onEditCommit(ThermostatMatterScheduleManager * mgr)
         Span<PresetStruct::Type> newPresets = Span<PresetStruct::Type>(gsEditingPresets).SubSpan(0, gsEditingPresetsEmptyIndex);
 
         status = mgr->ThermostatMatterScheduleManager::ValidatePresetsForCommitting(oldPresets, newPresets);
-        SuccessOrExit(status);
-
+        {
+            StatusIB statusIB(status);
+            SuccessOrExit(statusIB.ToChipError());    
+        }
         // New presets look good, lets generate some new ID's for the new presets.
         for (unsigned int index = 0; index < gsEditingPresetsEmptyIndex; ++index)
         {
@@ -119,7 +123,10 @@ static EmberAfStatus onEditCommit(ThermostatMatterScheduleManager * mgr)
                                                                             Span<PresetStruct::Type>(gsActivePresets).SubSpan(0, gsActivePresetsEmptyIndex);
 
         status = mgr->ThermostatMatterScheduleManager::ValidateSchedulesForCommitting(oldSchedules, newSchedules, presets);
-        SuccessOrExit(status);
+        {
+            StatusIB statusIB(status);
+            SuccessOrExit(statusIB.ToChipError());
+        }
 
         // New schedules look good, lets generate some new ID's for the new schedules.
         for (unsigned int index = 0; index < gsEditingSchedulesEmptyIndex; ++index)
@@ -209,11 +216,90 @@ static CHIP_ERROR appendPreset(ThermostatMatterScheduleManager * mgr, const Pres
     return CHIP_NO_ERROR;
 }
 
-struct ExampleThermostatPresetManager : public ThermostatMatterScheduleManager
+static CHIP_ERROR getScheduleTypeAtIndex(ThermostatMatterScheduleManager * mgr, size_t index, ScheduleTypeStruct::Type & scheduleType)
 {
-    ExampleThermostatPresetManager(chip::EndpointId endpoint) :
-        ThermostatMatterScheduleManager(endpoint, onEditStart, onEditCancel, onEditCommit, getPresetTypeAtIndex, getPresetAtIndex,
-                                        appendPreset, clearPresets)
+#if 0
+    static ScheduleTypeStruct::Type presetTypes[] = {
+        { .presetScenario  = PresetScenarioEnum::kOccupied,
+          .numberOfPresets = 4,
+          .presetTypeFeatures =
+              (to_underlying(PresetTypeFeaturesBitmap::kAutomatic) | to_underlying(PresetTypeFeaturesBitmap::kSupportsNames)) },
+        { .presetScenario  = PresetScenarioEnum::kUnoccupied,
+          .numberOfPresets = 2,
+          .presetTypeFeatures =
+              (to_underlying(PresetTypeFeaturesBitmap::kAutomatic) | to_underlying(PresetTypeFeaturesBitmap::kSupportsNames)) },
+        { .presetScenario  = PresetScenarioEnum::kSleep,
+          .numberOfPresets = 5,
+          .presetTypeFeatures =
+              (to_underlying(PresetTypeFeaturesBitmap::kAutomatic) | to_underlying(PresetTypeFeaturesBitmap::kSupportsNames)) },
+        { .presetScenario  = PresetScenarioEnum::kWake,
+          .numberOfPresets = 3,
+          .presetTypeFeatures =
+              (to_underlying(PresetTypeFeaturesBitmap::kAutomatic) | to_underlying(PresetTypeFeaturesBitmap::kSupportsNames)) },
+        { .presetScenario  = PresetScenarioEnum::kVacation,
+          .numberOfPresets = 1,
+          .presetTypeFeatures =
+              (to_underlying(PresetTypeFeaturesBitmap::kAutomatic) | to_underlying(PresetTypeFeaturesBitmap::kSupportsNames)) },
+    };
+
+    if (index < 1)
+    {
+        presetType = presetTypes[index];
+        return CHIP_NO_ERROR;
+    }
+#endif
+    return CHIP_ERROR_NOT_FOUND;
+}
+
+static CHIP_ERROR getScheduleAtIndex(ThermostatMatterScheduleManager * mgr, size_t index, ScheduleStruct::Type & schedule)
+{
+    if (index < gsActiveSchedules.size())
+    {
+        schedule = gsActiveSchedules[index];
+        return CHIP_NO_ERROR;
+    }
+    return CHIP_ERROR_NOT_FOUND;
+}
+
+static CHIP_ERROR clearSchedules(ThermostatMatterScheduleManager * mgr)
+{
+    gsEditingSchedulesEmptyIndex = 0;
+    return CHIP_NO_ERROR;
+}
+
+static CHIP_ERROR appendSchedule(ThermostatMatterScheduleManager * mgr, const ScheduleStruct::DecodableType & schedule)
+{
+    if (gsEditingSchedulesEmptyIndex >= gsEditingSchedules.size())
+        return CHIP_ERROR_INVALID_ARGUMENT;
+
+    // DecodableType and Type are defined seperately
+    gsEditingSchedules[gsEditingSchedulesEmptyIndex].scheduleHandle = schedule.scheduleHandle;
+    gsEditingSchedules[gsEditingSchedulesEmptyIndex].systemMode = schedule.systemMode;
+    gsEditingSchedules[gsEditingSchedulesEmptyIndex].name = schedule.name;
+    gsEditingSchedules[gsEditingSchedulesEmptyIndex].presetHandle = schedule.presetHandle;
+//    gsEditingSchedules[gsEditingSchedulesEmptyIndex].transitions = schedule.transitions;
+    gsEditingSchedules[gsEditingSchedulesEmptyIndex].builtIn = schedule.builtIn;
+
+    gsEditingSchedulesEmptyIndex++;
+
+    return CHIP_NO_ERROR;
+}
+
+struct ExampleThermostatScheduleManager : public ThermostatMatterScheduleManager
+{
+    ExampleThermostatScheduleManager(chip::EndpointId endpoint) :
+        ThermostatMatterScheduleManager(endpoint, 
+            onEditStart, 
+            onEditCancel, 
+            onEditCommit, 
+            getPresetTypeAtIndex, 
+            getPresetAtIndex,
+            appendPreset, 
+            clearPresets,
+            getScheduleTypeAtIndex, 
+            getScheduleAtIndex,
+            appendSchedule, 
+            clearSchedules)
     {
         for (gsActivePresetsEmptyIndex = 0; gsActivePresetsEmptyIndex < sizeof(BuiltInPresets) / sizeof(BuiltInPresets[0]);
              ++gsActivePresetsEmptyIndex)
@@ -224,4 +310,4 @@ struct ExampleThermostatPresetManager : public ThermostatMatterScheduleManager
 };
 
 // Instantiate the manager for endpoint 1
-static ExampleThermostatPresetManager gThermostatPresetManager(1);
+static ExampleThermostatScheduleManager gThermostatPresetManager(1);
