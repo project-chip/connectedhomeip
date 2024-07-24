@@ -26,6 +26,7 @@
 
 import ipaddress
 import logging
+import re
 
 import chip.clusters as Clusters
 from matter_testing_support import MatterBaseTest, TestStep, async_test_body, default_matter_test_main
@@ -160,6 +161,18 @@ class TC_SC_4_3(MatterBaseTest):
                 continue
         return False, "No IPv6 addresses found."
 
+    @staticmethod
+    def verify_hostname(hostname: str, char_length: int) -> bool:
+        # Remove '.local' or '.local.' suffix if present
+        if hostname.endswith('.local'):
+            hostname = hostname[:-6]
+        elif hostname.endswith('.local.'):
+            hostname = hostname[:-7]
+
+        # Regular expression to match an uppercase hexadecimal string of the specified length
+        pattern = re.compile(rf'^[0-9A-F]{{{char_length}}}$')
+        return bool(pattern.match(hostname))
+
     @async_test_body
     async def test_TC_SC_4_3(self):
         supports_icd = None
@@ -273,6 +286,17 @@ class TC_SC_4_3(MatterBaseTest):
         # to 3600000 (1h in ms) SAI TXT key: • if supports_icd is true, verify that the SAI key is present in the TXT record • If the SAI key
         # is present, verify it is a decimal value with no leading zeros and is less than or equal to 3600000 (1h in ms)
         self.step(9)
+
+        # Check MCORE.COM PCIS
+        is_eth_or_wifi = self.check_pics('MCORE.COM.WIFI') or self.check_pics('MCORE.COM.ETH')
+        if is_eth_or_wifi:
+            asserts.assert_true(self.verify_hostname(hostname=server, char_length=12),
+                                f"Hostname for '{server}' is not a 12-character uppercase hexadecimal string")
+        else:
+            is_thr = self.check_pics('MCORE.COM.THR')
+            if is_thr:
+             asserts.assert_true(self.verify_hostname(hostname=server, char_length=16),
+                                f"Hostname for '{server}' is not a 16-character uppercase hexadecimal string")
 
         # ICD TXT KEY
         if supports_lit:
