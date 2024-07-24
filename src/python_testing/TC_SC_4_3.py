@@ -157,8 +157,7 @@ class TC_SC_4_3(MatterBaseTest):
                 return True, "At least one IPv6 address is present."
             except ipaddress.AddressValueError:
                 # If an AddressValueError is raised, the current address is not a valid IPv6 address.
-                # The loop will continue to the next address.
-                continue
+                return False, f"Invalid address encountered: {address}"
         return False, "No IPv6 addresses found."
 
     @staticmethod
@@ -287,7 +286,7 @@ class TC_SC_4_3(MatterBaseTest):
         # is present, verify it is a decimal value with no leading zeros and is less than or equal to 3600000 (1h in ms)
         self.step(9)
 
-        # Check MCORE.COM PCIS
+        # Check MCORE.COM PICS
         is_eth_or_wifi = self.check_pics('MCORE.COM.WIFI') or self.check_pics('MCORE.COM.ETH')
         if is_eth_or_wifi:
             asserts.assert_true(self.verify_hostname(hostname=server, char_length=12),
