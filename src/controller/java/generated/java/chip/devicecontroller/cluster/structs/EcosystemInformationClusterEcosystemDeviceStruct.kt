@@ -25,13 +25,13 @@ import matter.tlv.TlvReader
 import matter.tlv.TlvWriter
 
 class EcosystemInformationClusterEcosystemDeviceStruct(
-  val deviceName: Optional<String>,
-  val deviceNameLastEdit: Optional<ULong>,
-  val bridgedEndpoint: UInt,
-  val originalEndpoint: UInt,
-  val deviceTypes: List<EcosystemInformationClusterDeviceTypeStruct>,
-  val uniqueLocationIDs: List<String>,
-  val uniqueLocationIDsLastEdit: ULong,
+  val deviceName: Optional<String>?,
+  val deviceNameLastEdit: Optional<ULong>?,
+  val bridgedEndpoint: UInt?,
+  val originalEndpoint: UInt?,
+  val deviceTypes: List<EcosystemInformationClusterDeviceTypeStruct>?,
+  val uniqueLocationIDs: List<String>?,
+  val uniqueLocationIDsLastEdit: ULong?,
   val fabricIndex: UInt,
 ) {
   override fun toString(): String = buildString {
@@ -50,27 +50,55 @@ class EcosystemInformationClusterEcosystemDeviceStruct(
   fun toTlv(tlvTag: Tag, tlvWriter: TlvWriter) {
     tlvWriter.apply {
       startStructure(tlvTag)
-      if (deviceName.isPresent) {
-        val optdeviceName = deviceName.get()
-        put(ContextSpecificTag(TAG_DEVICE_NAME), optdeviceName)
+      if (deviceName != null) {
+        if (deviceName.isPresent) {
+          val optdeviceName = deviceName.get()
+          put(ContextSpecificTag(TAG_DEVICE_NAME), optdeviceName)
+        }
+      } else {
+        putNull(ContextSpecificTag(TAG_DEVICE_NAME))
       }
-      if (deviceNameLastEdit.isPresent) {
-        val optdeviceNameLastEdit = deviceNameLastEdit.get()
-        put(ContextSpecificTag(TAG_DEVICE_NAME_LAST_EDIT), optdeviceNameLastEdit)
+      if (deviceNameLastEdit != null) {
+        if (deviceNameLastEdit.isPresent) {
+          val optdeviceNameLastEdit = deviceNameLastEdit.get()
+          put(ContextSpecificTag(TAG_DEVICE_NAME_LAST_EDIT), optdeviceNameLastEdit)
+        }
+      } else {
+        putNull(ContextSpecificTag(TAG_DEVICE_NAME_LAST_EDIT))
       }
-      put(ContextSpecificTag(TAG_BRIDGED_ENDPOINT), bridgedEndpoint)
-      put(ContextSpecificTag(TAG_ORIGINAL_ENDPOINT), originalEndpoint)
-      startArray(ContextSpecificTag(TAG_DEVICE_TYPES))
-      for (item in deviceTypes.iterator()) {
-        item.toTlv(AnonymousTag, this)
+      if (bridgedEndpoint != null) {
+        put(ContextSpecificTag(TAG_BRIDGED_ENDPOINT), bridgedEndpoint)
+      } else {
+        putNull(ContextSpecificTag(TAG_BRIDGED_ENDPOINT))
       }
-      endArray()
-      startArray(ContextSpecificTag(TAG_UNIQUE_LOCATION_I_DS))
-      for (item in uniqueLocationIDs.iterator()) {
-        put(AnonymousTag, item)
+      if (originalEndpoint != null) {
+        put(ContextSpecificTag(TAG_ORIGINAL_ENDPOINT), originalEndpoint)
+      } else {
+        putNull(ContextSpecificTag(TAG_ORIGINAL_ENDPOINT))
       }
-      endArray()
-      put(ContextSpecificTag(TAG_UNIQUE_LOCATION_I_DS_LAST_EDIT), uniqueLocationIDsLastEdit)
+      if (deviceTypes != null) {
+        startArray(ContextSpecificTag(TAG_DEVICE_TYPES))
+        for (item in deviceTypes.iterator()) {
+          item.toTlv(AnonymousTag, this)
+        }
+        endArray()
+      } else {
+        putNull(ContextSpecificTag(TAG_DEVICE_TYPES))
+      }
+      if (uniqueLocationIDs != null) {
+        startArray(ContextSpecificTag(TAG_UNIQUE_LOCATION_I_DS))
+        for (item in uniqueLocationIDs.iterator()) {
+          put(AnonymousTag, item)
+        }
+        endArray()
+      } else {
+        putNull(ContextSpecificTag(TAG_UNIQUE_LOCATION_I_DS))
+      }
+      if (uniqueLocationIDsLastEdit != null) {
+        put(ContextSpecificTag(TAG_UNIQUE_LOCATION_I_DS_LAST_EDIT), uniqueLocationIDsLastEdit)
+      } else {
+        putNull(ContextSpecificTag(TAG_UNIQUE_LOCATION_I_DS_LAST_EDIT))
+      }
       put(ContextSpecificTag(TAG_FABRIC_INDEX), fabricIndex)
       endStructure()
     }
@@ -92,37 +120,74 @@ class EcosystemInformationClusterEcosystemDeviceStruct(
     ): EcosystemInformationClusterEcosystemDeviceStruct {
       tlvReader.enterStructure(tlvTag)
       val deviceName =
-        if (tlvReader.isNextTag(ContextSpecificTag(TAG_DEVICE_NAME))) {
-          Optional.of(tlvReader.getString(ContextSpecificTag(TAG_DEVICE_NAME)))
+        if (!tlvReader.isNull()) {
+          if (tlvReader.isNextTag(ContextSpecificTag(TAG_DEVICE_NAME))) {
+            Optional.of(tlvReader.getString(ContextSpecificTag(TAG_DEVICE_NAME)))
+          } else {
+            Optional.empty()
+          }
         } else {
-          Optional.empty()
+          tlvReader.getNull(ContextSpecificTag(TAG_DEVICE_NAME))
+          null
         }
       val deviceNameLastEdit =
-        if (tlvReader.isNextTag(ContextSpecificTag(TAG_DEVICE_NAME_LAST_EDIT))) {
-          Optional.of(tlvReader.getULong(ContextSpecificTag(TAG_DEVICE_NAME_LAST_EDIT)))
-        } else {
-          Optional.empty()
-        }
-      val bridgedEndpoint = tlvReader.getUInt(ContextSpecificTag(TAG_BRIDGED_ENDPOINT))
-      val originalEndpoint = tlvReader.getUInt(ContextSpecificTag(TAG_ORIGINAL_ENDPOINT))
-      val deviceTypes =
-        buildList<EcosystemInformationClusterDeviceTypeStruct> {
-          tlvReader.enterArray(ContextSpecificTag(TAG_DEVICE_TYPES))
-          while (!tlvReader.isEndOfContainer()) {
-            add(EcosystemInformationClusterDeviceTypeStruct.fromTlv(AnonymousTag, tlvReader))
+        if (!tlvReader.isNull()) {
+          if (tlvReader.isNextTag(ContextSpecificTag(TAG_DEVICE_NAME_LAST_EDIT))) {
+            Optional.of(tlvReader.getULong(ContextSpecificTag(TAG_DEVICE_NAME_LAST_EDIT)))
+          } else {
+            Optional.empty()
           }
-          tlvReader.exitContainer()
+        } else {
+          tlvReader.getNull(ContextSpecificTag(TAG_DEVICE_NAME_LAST_EDIT))
+          null
+        }
+      val bridgedEndpoint =
+        if (!tlvReader.isNull()) {
+          tlvReader.getUInt(ContextSpecificTag(TAG_BRIDGED_ENDPOINT))
+        } else {
+          tlvReader.getNull(ContextSpecificTag(TAG_BRIDGED_ENDPOINT))
+          null
+        }
+      val originalEndpoint =
+        if (!tlvReader.isNull()) {
+          tlvReader.getUInt(ContextSpecificTag(TAG_ORIGINAL_ENDPOINT))
+        } else {
+          tlvReader.getNull(ContextSpecificTag(TAG_ORIGINAL_ENDPOINT))
+          null
+        }
+      val deviceTypes =
+        if (!tlvReader.isNull()) {
+          buildList<EcosystemInformationClusterDeviceTypeStruct> {
+            tlvReader.enterArray(ContextSpecificTag(TAG_DEVICE_TYPES))
+            while (!tlvReader.isEndOfContainer()) {
+              add(EcosystemInformationClusterDeviceTypeStruct.fromTlv(AnonymousTag, tlvReader))
+            }
+            tlvReader.exitContainer()
+          }
+        } else {
+          tlvReader.getNull(ContextSpecificTag(TAG_DEVICE_TYPES))
+          null
         }
       val uniqueLocationIDs =
-        buildList<String> {
-          tlvReader.enterArray(ContextSpecificTag(TAG_UNIQUE_LOCATION_I_DS))
-          while (!tlvReader.isEndOfContainer()) {
-            add(tlvReader.getString(AnonymousTag))
+        if (!tlvReader.isNull()) {
+          buildList<String> {
+            tlvReader.enterArray(ContextSpecificTag(TAG_UNIQUE_LOCATION_I_DS))
+            while (!tlvReader.isEndOfContainer()) {
+              add(tlvReader.getString(AnonymousTag))
+            }
+            tlvReader.exitContainer()
           }
-          tlvReader.exitContainer()
+        } else {
+          tlvReader.getNull(ContextSpecificTag(TAG_UNIQUE_LOCATION_I_DS))
+          null
         }
       val uniqueLocationIDsLastEdit =
-        tlvReader.getULong(ContextSpecificTag(TAG_UNIQUE_LOCATION_I_DS_LAST_EDIT))
+        if (!tlvReader.isNull()) {
+          tlvReader.getULong(ContextSpecificTag(TAG_UNIQUE_LOCATION_I_DS_LAST_EDIT))
+        } else {
+          tlvReader.getNull(ContextSpecificTag(TAG_UNIQUE_LOCATION_I_DS_LAST_EDIT))
+          null
+        }
       val fabricIndex = tlvReader.getUInt(ContextSpecificTag(TAG_FABRIC_INDEX))
 
       tlvReader.exitContainer()

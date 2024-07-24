@@ -16977,62 +16977,90 @@ static id _Nullable DecodeAttributeValueForEcosystemInformationCluster(Attribute
                 MTREcosystemInformationClusterEcosystemDeviceStruct * newElement_0;
                 newElement_0 = [MTREcosystemInformationClusterEcosystemDeviceStruct new];
                 if (entry_0.deviceName.HasValue()) {
-                    newElement_0.deviceName = AsString(entry_0.deviceName.Value());
-                    if (newElement_0.deviceName == nil) {
-                        CHIP_ERROR err = CHIP_ERROR_INVALID_ARGUMENT;
-                        *aError = err;
-                        return nil;
+                    if (entry_0.deviceName.Value().IsNull()) {
+                        newElement_0.deviceName = nil;
+                    } else {
+                        newElement_0.deviceName = AsString(entry_0.deviceName.Value().Value());
+                        if (newElement_0.deviceName == nil) {
+                            CHIP_ERROR err = CHIP_ERROR_INVALID_ARGUMENT;
+                            *aError = err;
+                            return nil;
+                        }
                     }
                 } else {
                     newElement_0.deviceName = nil;
                 }
                 if (entry_0.deviceNameLastEdit.HasValue()) {
-                    newElement_0.deviceNameLastEdit = [NSNumber numberWithUnsignedLongLong:entry_0.deviceNameLastEdit.Value()];
+                    if (entry_0.deviceNameLastEdit.Value().IsNull()) {
+                        newElement_0.deviceNameLastEdit = nil;
+                    } else {
+                        newElement_0.deviceNameLastEdit = [NSNumber numberWithUnsignedLongLong:entry_0.deviceNameLastEdit.Value().Value()];
+                    }
                 } else {
                     newElement_0.deviceNameLastEdit = nil;
                 }
-                newElement_0.bridgedEndpoint = [NSNumber numberWithUnsignedShort:entry_0.bridgedEndpoint];
-                newElement_0.originalEndpoint = [NSNumber numberWithUnsignedShort:entry_0.originalEndpoint];
-                { // Scope for our temporary variables
-                    auto * array_2 = [NSMutableArray new];
-                    auto iter_2 = entry_0.deviceTypes.begin();
-                    while (iter_2.Next()) {
-                        auto & entry_2 = iter_2.GetValue();
-                        MTREcosystemInformationClusterDeviceTypeStruct * newElement_2;
-                        newElement_2 = [MTREcosystemInformationClusterDeviceTypeStruct new];
-                        newElement_2.deviceType = [NSNumber numberWithUnsignedInt:entry_2.deviceType];
-                        newElement_2.revision = [NSNumber numberWithUnsignedShort:entry_2.revision];
-                        [array_2 addObject:newElement_2];
-                    }
-                    CHIP_ERROR err = iter_2.GetStatus();
-                    if (err != CHIP_NO_ERROR) {
-                        *aError = err;
-                        return nil;
-                    }
-                    newElement_0.deviceTypes = array_2;
+                if (entry_0.bridgedEndpoint.IsNull()) {
+                    newElement_0.bridgedEndpoint = nil;
+                } else {
+                    newElement_0.bridgedEndpoint = [NSNumber numberWithUnsignedShort:entry_0.bridgedEndpoint.Value()];
                 }
-                { // Scope for our temporary variables
-                    auto * array_2 = [NSMutableArray new];
-                    auto iter_2 = entry_0.uniqueLocationIDs.begin();
-                    while (iter_2.Next()) {
-                        auto & entry_2 = iter_2.GetValue();
-                        NSString * newElement_2;
-                        newElement_2 = AsString(entry_2);
-                        if (newElement_2 == nil) {
-                            CHIP_ERROR err = CHIP_ERROR_INVALID_ARGUMENT;
+                if (entry_0.originalEndpoint.IsNull()) {
+                    newElement_0.originalEndpoint = nil;
+                } else {
+                    newElement_0.originalEndpoint = [NSNumber numberWithUnsignedShort:entry_0.originalEndpoint.Value()];
+                }
+                if (entry_0.deviceTypes.IsNull()) {
+                    newElement_0.deviceTypes = nil;
+                } else {
+                    { // Scope for our temporary variables
+                        auto * array_3 = [NSMutableArray new];
+                        auto iter_3 = entry_0.deviceTypes.Value().begin();
+                        while (iter_3.Next()) {
+                            auto & entry_3 = iter_3.GetValue();
+                            MTREcosystemInformationClusterDeviceTypeStruct * newElement_3;
+                            newElement_3 = [MTREcosystemInformationClusterDeviceTypeStruct new];
+                            newElement_3.deviceType = [NSNumber numberWithUnsignedInt:entry_3.deviceType];
+                            newElement_3.revision = [NSNumber numberWithUnsignedShort:entry_3.revision];
+                            [array_3 addObject:newElement_3];
+                        }
+                        CHIP_ERROR err = iter_3.GetStatus();
+                        if (err != CHIP_NO_ERROR) {
                             *aError = err;
                             return nil;
                         }
-                        [array_2 addObject:newElement_2];
+                        newElement_0.deviceTypes = array_3;
                     }
-                    CHIP_ERROR err = iter_2.GetStatus();
-                    if (err != CHIP_NO_ERROR) {
-                        *aError = err;
-                        return nil;
-                    }
-                    newElement_0.uniqueLocationIDs = array_2;
                 }
-                newElement_0.uniqueLocationIDsLastEdit = [NSNumber numberWithUnsignedLongLong:entry_0.uniqueLocationIDsLastEdit];
+                if (entry_0.uniqueLocationIDs.IsNull()) {
+                    newElement_0.uniqueLocationIDs = nil;
+                } else {
+                    { // Scope for our temporary variables
+                        auto * array_3 = [NSMutableArray new];
+                        auto iter_3 = entry_0.uniqueLocationIDs.Value().begin();
+                        while (iter_3.Next()) {
+                            auto & entry_3 = iter_3.GetValue();
+                            NSString * newElement_3;
+                            newElement_3 = AsString(entry_3);
+                            if (newElement_3 == nil) {
+                                CHIP_ERROR err = CHIP_ERROR_INVALID_ARGUMENT;
+                                *aError = err;
+                                return nil;
+                            }
+                            [array_3 addObject:newElement_3];
+                        }
+                        CHIP_ERROR err = iter_3.GetStatus();
+                        if (err != CHIP_NO_ERROR) {
+                            *aError = err;
+                            return nil;
+                        }
+                        newElement_0.uniqueLocationIDs = array_3;
+                    }
+                }
+                if (entry_0.uniqueLocationIDsLastEdit.IsNull()) {
+                    newElement_0.uniqueLocationIDsLastEdit = nil;
+                } else {
+                    newElement_0.uniqueLocationIDsLastEdit = [NSNumber numberWithUnsignedLongLong:entry_0.uniqueLocationIDsLastEdit.Value()];
+                }
                 newElement_0.fabricIndex = [NSNumber numberWithUnsignedChar:entry_0.fabricIndex];
                 [array_0 addObject:newElement_0];
             }
@@ -17060,30 +17088,42 @@ static id _Nullable DecodeAttributeValueForEcosystemInformationCluster(Attribute
                 auto & entry_0 = iter_0.GetValue();
                 MTREcosystemInformationClusterEcosystemLocationStruct * newElement_0;
                 newElement_0 = [MTREcosystemInformationClusterEcosystemLocationStruct new];
-                newElement_0.uniqueLocationID = AsString(entry_0.uniqueLocationID);
-                if (newElement_0.uniqueLocationID == nil) {
-                    CHIP_ERROR err = CHIP_ERROR_INVALID_ARGUMENT;
-                    *aError = err;
-                    return nil;
-                }
-                newElement_0.homeLocation = [MTREcosystemInformationClusterHomeLocationStruct new];
-                newElement_0.homeLocation.locationName = AsString(entry_0.homeLocation.locationName);
-                if (newElement_0.homeLocation.locationName == nil) {
-                    CHIP_ERROR err = CHIP_ERROR_INVALID_ARGUMENT;
-                    *aError = err;
-                    return nil;
-                }
-                if (entry_0.homeLocation.floorNumber.IsNull()) {
-                    newElement_0.homeLocation.floorNumber = nil;
+                if (entry_0.uniqueLocationID.IsNull()) {
+                    newElement_0.uniqueLocationID = nil;
                 } else {
-                    newElement_0.homeLocation.floorNumber = [NSNumber numberWithShort:entry_0.homeLocation.floorNumber.Value()];
+                    newElement_0.uniqueLocationID = AsString(entry_0.uniqueLocationID.Value());
+                    if (newElement_0.uniqueLocationID == nil) {
+                        CHIP_ERROR err = CHIP_ERROR_INVALID_ARGUMENT;
+                        *aError = err;
+                        return nil;
+                    }
                 }
-                if (entry_0.homeLocation.areaType.IsNull()) {
-                    newElement_0.homeLocation.areaType = nil;
+                if (entry_0.homeLocation.IsNull()) {
+                    newElement_0.homeLocation = nil;
                 } else {
-                    newElement_0.homeLocation.areaType = [NSNumber numberWithUnsignedChar:chip::to_underlying(entry_0.homeLocation.areaType.Value())];
+                    newElement_0.homeLocation = [MTREcosystemInformationClusterHomeLocationStruct new];
+                    newElement_0.homeLocation.locationName = AsString(entry_0.homeLocation.Value().locationName);
+                    if (newElement_0.homeLocation.locationName == nil) {
+                        CHIP_ERROR err = CHIP_ERROR_INVALID_ARGUMENT;
+                        *aError = err;
+                        return nil;
+                    }
+                    if (entry_0.homeLocation.Value().floorNumber.IsNull()) {
+                        newElement_0.homeLocation.floorNumber = nil;
+                    } else {
+                        newElement_0.homeLocation.floorNumber = [NSNumber numberWithShort:entry_0.homeLocation.Value().floorNumber.Value()];
+                    }
+                    if (entry_0.homeLocation.Value().areaType.IsNull()) {
+                        newElement_0.homeLocation.areaType = nil;
+                    } else {
+                        newElement_0.homeLocation.areaType = [NSNumber numberWithUnsignedChar:chip::to_underlying(entry_0.homeLocation.Value().areaType.Value())];
+                    }
                 }
-                newElement_0.homeLocationLastEdit = [NSNumber numberWithUnsignedLongLong:entry_0.homeLocationLastEdit];
+                if (entry_0.homeLocationLastEdit.IsNull()) {
+                    newElement_0.homeLocationLastEdit = nil;
+                } else {
+                    newElement_0.homeLocationLastEdit = [NSNumber numberWithUnsignedLongLong:entry_0.homeLocationLastEdit.Value()];
+                }
                 newElement_0.fabricIndex = [NSNumber numberWithUnsignedChar:entry_0.fabricIndex];
                 [array_0 addObject:newElement_0];
             }

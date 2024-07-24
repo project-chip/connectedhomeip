@@ -8429,11 +8429,11 @@ NS_ASSUME_NONNULL_BEGIN
 {
     if (self = [super init]) {
 
-        _uniqueLocationID = @"";
+        _uniqueLocationID = nil;
 
-        _homeLocation = [MTREcosystemInformationClusterHomeLocationStruct new];
+        _homeLocation = nil;
 
-        _homeLocationLastEdit = @(0);
+        _homeLocationLastEdit = nil;
 
         _fabricIndex = @(0);
     }
@@ -8499,15 +8499,15 @@ NS_ASSUME_NONNULL_BEGIN
 
         _deviceNameLastEdit = nil;
 
-        _bridgedEndpoint = @(0);
+        _bridgedEndpoint = nil;
 
-        _originalEndpoint = @(0);
+        _originalEndpoint = nil;
 
-        _deviceTypes = [NSArray array];
+        _deviceTypes = nil;
 
-        _uniqueLocationIDs = [NSArray array];
+        _uniqueLocationIDs = nil;
 
-        _uniqueLocationIDsLastEdit = @(0);
+        _uniqueLocationIDsLastEdit = nil;
 
         _fabricIndex = @(0);
     }

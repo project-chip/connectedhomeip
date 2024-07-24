@@ -41006,9 +41006,9 @@ enum class Fields : uint8_t
 struct Type
 {
 public:
-    chip::CharSpan uniqueLocationID;
-    Structs::HomeLocationStruct::Type homeLocation;
-    uint64_t homeLocationLastEdit = static_cast<uint64_t>(0);
+    DataModel::Nullable<chip::CharSpan> uniqueLocationID;
+    DataModel::Nullable<Structs::HomeLocationStruct::Type> homeLocation;
+    DataModel::Nullable<uint64_t> homeLocationLastEdit;
     chip::FabricIndex fabricIndex = static_cast<chip::FabricIndex>(0);
 
     CHIP_ERROR Decode(TLV::TLVReader & reader);
@@ -41046,14 +41046,14 @@ enum class Fields : uint8_t
 struct Type
 {
 public:
-    Optional<chip::CharSpan> deviceName;
-    Optional<uint64_t> deviceNameLastEdit;
-    chip::EndpointId bridgedEndpoint  = static_cast<chip::EndpointId>(0);
-    chip::EndpointId originalEndpoint = static_cast<chip::EndpointId>(0);
-    DataModel::List<const Structs::DeviceTypeStruct::Type> deviceTypes;
-    DataModel::List<const chip::CharSpan> uniqueLocationIDs;
-    uint64_t uniqueLocationIDsLastEdit = static_cast<uint64_t>(0);
-    chip::FabricIndex fabricIndex      = static_cast<chip::FabricIndex>(0);
+    Optional<DataModel::Nullable<chip::CharSpan>> deviceName;
+    Optional<DataModel::Nullable<uint64_t>> deviceNameLastEdit;
+    DataModel::Nullable<chip::EndpointId> bridgedEndpoint;
+    DataModel::Nullable<chip::EndpointId> originalEndpoint;
+    DataModel::Nullable<DataModel::List<const Structs::DeviceTypeStruct::Type>> deviceTypes;
+    DataModel::Nullable<DataModel::List<const chip::CharSpan>> uniqueLocationIDs;
+    DataModel::Nullable<uint64_t> uniqueLocationIDsLastEdit;
+    chip::FabricIndex fabricIndex = static_cast<chip::FabricIndex>(0);
 
     static constexpr bool kIsFabricScoped = true;
 
@@ -41071,14 +41071,14 @@ private:
 struct DecodableType
 {
 public:
-    Optional<chip::CharSpan> deviceName;
-    Optional<uint64_t> deviceNameLastEdit;
-    chip::EndpointId bridgedEndpoint  = static_cast<chip::EndpointId>(0);
-    chip::EndpointId originalEndpoint = static_cast<chip::EndpointId>(0);
-    DataModel::DecodableList<Structs::DeviceTypeStruct::DecodableType> deviceTypes;
-    DataModel::DecodableList<chip::CharSpan> uniqueLocationIDs;
-    uint64_t uniqueLocationIDsLastEdit = static_cast<uint64_t>(0);
-    chip::FabricIndex fabricIndex      = static_cast<chip::FabricIndex>(0);
+    Optional<DataModel::Nullable<chip::CharSpan>> deviceName;
+    Optional<DataModel::Nullable<uint64_t>> deviceNameLastEdit;
+    DataModel::Nullable<chip::EndpointId> bridgedEndpoint;
+    DataModel::Nullable<chip::EndpointId> originalEndpoint;
+    DataModel::Nullable<DataModel::DecodableList<Structs::DeviceTypeStruct::DecodableType>> deviceTypes;
+    DataModel::Nullable<DataModel::DecodableList<chip::CharSpan>> uniqueLocationIDs;
+    DataModel::Nullable<uint64_t> uniqueLocationIDsLastEdit;
+    chip::FabricIndex fabricIndex = static_cast<chip::FabricIndex>(0);
 
     CHIP_ERROR Decode(TLV::TLVReader & reader);
 

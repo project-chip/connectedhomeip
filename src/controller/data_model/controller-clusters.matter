@@ -9304,9 +9304,9 @@ provisional cluster EcosystemInformation = 1872 {
   }
 
   fabric_scoped struct EcosystemLocationStruct {
-    fabric_sensitive char_string<64> uniqueLocationID = 0;
-    fabric_sensitive HomeLocationStruct homeLocation = 1;
-    fabric_sensitive epoch_us homeLocationLastEdit = 2;
+    nullable fabric_sensitive char_string<64> uniqueLocationID = 0;
+    nullable fabric_sensitive HomeLocationStruct homeLocation = 1;
+    nullable fabric_sensitive epoch_us homeLocationLastEdit = 2;
     fabric_idx fabricIndex = 254;
   }
 
@@ -9316,13 +9316,13 @@ provisional cluster EcosystemInformation = 1872 {
   }
 
   fabric_scoped struct EcosystemDeviceStruct {
-    optional fabric_sensitive char_string<64> deviceName = 0;
-    optional fabric_sensitive epoch_us deviceNameLastEdit = 1;
-    fabric_sensitive endpoint_no bridgedEndpoint = 2;
-    fabric_sensitive endpoint_no originalEndpoint = 3;
-    fabric_sensitive DeviceTypeStruct deviceTypes[] = 4;
-    fabric_sensitive char_string uniqueLocationIDs[] = 5;
-    fabric_sensitive epoch_us uniqueLocationIDsLastEdit = 6;
+    optional nullable fabric_sensitive char_string<64> deviceName = 0;
+    optional nullable fabric_sensitive epoch_us deviceNameLastEdit = 1;
+    nullable fabric_sensitive endpoint_no bridgedEndpoint = 2;
+    nullable fabric_sensitive endpoint_no originalEndpoint = 3;
+    nullable fabric_sensitive DeviceTypeStruct deviceTypes[] = 4;
+    nullable fabric_sensitive char_string uniqueLocationIDs[] = 5;
+    nullable fabric_sensitive epoch_us uniqueLocationIDsLastEdit = 6;
     fabric_idx fabricIndex = 254;
   }
 
