@@ -157,15 +157,14 @@ class TC_DEM_2_3(MatterBaseTest, DEMTestBase):
         forecast = await self.read_dem_attribute_expect_success(attribute="Forecast")
 
         asserts.assert_not_equal(forecast, NullValue)
-        if forecast is not NullValue:
-            asserts.assert_less_equal(forecast.earliestStartTime, forecast.startTime,
-                                      f"Expected forecast earliestStartTime {forecast.earliestStartTime} to be <= startTime {forecast.startTime}")
-            asserts.assert_greater_equal(forecast.latestEndTime, forecast.endTime,
-                                         f"Expected forecast latestEndTime {forecast.latestEndTime} to be >= endTime {forecast.endTime}")
-            asserts.assert_equal(forecast.forecastUpdateReason, Clusters.DeviceEnergyManagement.Enums.ForecastUpdateReasonEnum.kInternalOptimization,
-                                 f"Expected forecast forecastUpdateReason {forecast.forecastUpdateReason} to be == Clusters.DeviceEnergyManagement.Enums.ForecastUpdateReasonEnum.kInternalOptimization")
+        asserts.assert_less_equal(forecast.earliestStartTime, forecast.startTime,
+                                  f"Expected forecast earliestStartTime {forecast.earliestStartTime} to be <= startTime {forecast.startTime}")
+        asserts.assert_greater_equal(forecast.latestEndTime, forecast.endTime,
+                                     f"Expected forecast latestEndTime {forecast.latestEndTime} to be >= endTime {forecast.endTime}")
+        asserts.assert_equal(forecast.forecastUpdateReason, Clusters.DeviceEnergyManagement.Enums.ForecastUpdateReasonEnum.kInternalOptimization,
+                             f"Expected forecast forecastUpdateReason {forecast.forecastUpdateReason} to be == Clusters.DeviceEnergyManagement.Enums.ForecastUpdateReasonEnum.kInternalOptimization")
 
-            self.print_forecast(forecast)
+        self.print_forecast(forecast)
 
         self.step("3c")
         await self.check_dem_attribute("OptOutState", Clusters.DeviceEnergyManagement.Enums.OptOutStateEnum.kNoOptOut)

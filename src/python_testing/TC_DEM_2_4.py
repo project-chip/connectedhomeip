@@ -185,14 +185,13 @@ class TC_DEM_2_4(MatterBaseTest, DEMTestBase):
         asserts.assert_equal(forecast.slots[1].slotIsPausable, False)
         asserts.assert_equal(forecast.activeSlotNumber, 0)
 
-        if forecast is not NullValue:
-            asserts.assert_less_equal(forecast.earliestStartTime, forecast.startTime,
-                                      f"Expected forecast earliestStartTime {forecast.earliestStartTime} to be <= startTime {forecast.startTime}")
-            asserts.assert_greater_equal(forecast.latestEndTime, forecast.endTime,
-                                         f"Expected forecast latestEndTime {forecast.latestEndTime} to be >= endTime {forecast.endTime}")
-            asserts.assert_equal(forecast.forecastUpdateReason, Clusters.DeviceEnergyManagement.Enums.ForecastUpdateReasonEnum.kInternalOptimization,
-                                 f"Expected forecast forecastUpdateReason {forecast.forecastUpdateReason} to be == Clusters.DeviceEnergyManagement.Enums.ForecastUpdateReasonEnum.kInternalOptimization")
-            self.print_forecast(forecast)
+        asserts.assert_less_equal(forecast.earliestStartTime, forecast.startTime,
+                                  f"Expected forecast earliestStartTime {forecast.earliestStartTime} to be <= startTime {forecast.startTime}")
+        asserts.assert_greater_equal(forecast.latestEndTime, forecast.endTime,
+                                     f"Expected forecast latestEndTime {forecast.latestEndTime} to be >= endTime {forecast.endTime}")
+        asserts.assert_equal(forecast.forecastUpdateReason, Clusters.DeviceEnergyManagement.Enums.ForecastUpdateReasonEnum.kInternalOptimization,
+                             f"Expected forecast forecastUpdateReason {forecast.forecastUpdateReason} to be == Clusters.DeviceEnergyManagement.Enums.ForecastUpdateReasonEnum.kInternalOptimization")
+        self.print_forecast(forecast)
 
         self.step("3c")
         await self.check_dem_attribute("OptOutState", Clusters.DeviceEnergyManagement.Enums.OptOutStateEnum.kNoOptOut)
@@ -331,6 +330,7 @@ class TC_DEM_2_4(MatterBaseTest, DEMTestBase):
         logging.info(f"Sleeping for forecast.slots[0].minPauseDuration {forecast.slots[0].minPauseDuration}s")
         time.sleep(forecast.slots[0].minPauseDuration)
         event_data = events_callback.wait_for_event_report(Clusters.DeviceEnergyManagement.Events.Resumed)
+        asserts.assert_equal(event_data.cause, Clusters.DeviceEnergyManagement.Enums.CauseEnum.kNormalCompletion)
 
         self.step("16a")
         await self.check_dem_attribute("ESAState", Clusters.DeviceEnergyManagement.Enums.ESAStateEnum.kOnline)

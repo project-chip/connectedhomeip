@@ -20,6 +20,7 @@ import logging
 import chip.clusters as Clusters
 from chip.interaction_model import InteractionModelError, Status
 from mobly import asserts
+from matter_testing_support import utc_time_in_matter_epoch
 
 logger = logging.getLogger(__name__)
 
@@ -184,6 +185,10 @@ class DEMTestBase:
                 for cost_index, cost in enumerate(slot):
                     logging.info(
                         f"   Cost: [{cost_index}]  CostType:{cost.costType} Value: {cost.value} DecimalPoints: {cost.decimalPoints} Currency: {cost.currency}")
+
+    def get_current_utc_time_in_seconds(self):
+        microseconds_in_second = 1000000
+        return int(utc_time_in_matter_epoch()/microseconds_in_second)
 
     async def send_test_event_trigger_power_adjustment(self):
         await self.send_test_event_triggers(eventTrigger=0x0098000000000000)

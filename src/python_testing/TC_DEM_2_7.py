@@ -34,8 +34,7 @@ import logging
 
 import chip.clusters as Clusters
 from chip.interaction_model import Status
-from matter_testing_support import (EventChangeCallback, MatterBaseTest, TestStep, async_test_body, default_matter_test_main,
-                                    utc_time_in_matter_epoch)
+from matter_testing_support import (EventChangeCallback, MatterBaseTest, TestStep, async_test_body, default_matter_test_main)
 from mobly import asserts
 from TC_DEMTestBase import DEMTestBase
 
@@ -177,14 +176,14 @@ class TC_DEM_2_7(MatterBaseTest, DEMTestBase):
 
         self.step("4")
         # Matter UTC is time since 00:00:00 1/1/2000
-        now = int(utc_time_in_matter_epoch()/1000000)
+        now = self.get_current_utc_time_in_seconds()
 
         constraintList = [Clusters.DeviceEnergyManagement.Structs.ConstraintsStruct(startTime=now - 10, duration=20,
                                                                                     nominalPower=forecast.slots[0].nominalPower, maximumEnergy=forecast.slots[0].nominalEnergy)]
         await self.send_request_constraint_based_forecast(constraintList, cause=Clusters.DeviceEnergyManagement.Enums.AdjustmentCauseEnum.kLocalOptimization, expected_status=Status.ConstraintError)
 
         self.step("5")
-        now = int(utc_time_in_matter_epoch()/1000000)
+        now = self.get_current_utc_time_in_seconds()
 
         constraintList = [Clusters.DeviceEnergyManagement.Structs.ConstraintsStruct(startTime=now + 10, duration=20,
                                                                                     nominalPower=forecast.slots[0].nominalPower, maximumEnergy=forecast.slots[0].nominalEnergy),
@@ -195,7 +194,7 @@ class TC_DEM_2_7(MatterBaseTest, DEMTestBase):
         await self.send_request_constraint_based_forecast(constraintList, cause=Clusters.DeviceEnergyManagement.Enums.AdjustmentCauseEnum.kLocalOptimization, expected_status=Status.ConstraintError)
 
         self.step("6")
-        now = int(utc_time_in_matter_epoch()/1000000)
+        now = self.get_current_utc_time_in_seconds()
 
         constraintList = [Clusters.DeviceEnergyManagement.Structs.ConstraintsStruct(startTime=now + 10, duration=20,
                                                                                     nominalPower=forecast.slots[0].nominalPower, maximumEnergy=forecast.slots[0].nominalEnergy),
@@ -206,7 +205,7 @@ class TC_DEM_2_7(MatterBaseTest, DEMTestBase):
         await self.send_request_constraint_based_forecast(constraintList, cause=Clusters.DeviceEnergyManagement.Enums.AdjustmentCauseEnum.kLocalOptimization, expected_status=Status.ConstraintError)
 
         self.step("7")
-        now = int(utc_time_in_matter_epoch()/1000000)
+        now = self.get_current_utc_time_in_seconds()
 
         constraintList = [Clusters.DeviceEnergyManagement.Structs.ConstraintsStruct(startTime=now + 30, duration=20,
                                                                                     nominalPower=forecast.slots[0].nominalPower, maximumEnergy=forecast.slots[0].nominalEnergy),
@@ -217,7 +216,7 @@ class TC_DEM_2_7(MatterBaseTest, DEMTestBase):
         await self.send_request_constraint_based_forecast(constraintList, cause=Clusters.DeviceEnergyManagement.Enums.AdjustmentCauseEnum.kLocalOptimization, expected_status=Status.ConstraintError)
 
         self.step("8")
-        now = int(utc_time_in_matter_epoch()/1000000)
+        now = self.get_current_utc_time_in_seconds()
 
         constraintList = [Clusters.DeviceEnergyManagement.Structs.ConstraintsStruct(startTime=now + 10, duration=20,
                                                                                     nominalPower=forecast.slots[0].nominalPower, maximumEnergy=forecast.slots[0].nominalEnergy),

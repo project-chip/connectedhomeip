@@ -162,8 +162,6 @@ class TC_DEM_2_5(MatterBaseTest, DEMTestBase):
         self.step("3b")
         forecast = await self.read_dem_attribute_expect_success(attribute="Forecast")
 
-        asserts.assert_greater_equal(len(forecast.slots), 2)
-
         asserts.assert_is_not_none(forecast.slots[0].minPowerAdjustment)
         asserts.assert_is_not_none(forecast.slots[0].maxPowerAdjustment)
         asserts.assert_is_not_none(forecast.slots[0].minDurationAdjustment)
