@@ -621,13 +621,13 @@ bool OnOffServer::offWithEffectCommand(app::CommandHandler * commandObj, const a
         // The following check validates that effectVariant value is valid in relation to the applicable enum type.
         // DelayedAllOffEffectVariantEnum or DyingLightEffectVariantEnum
         if (effectId == EffectIdentifierEnum::kDelayedAllOff &&
-            !isKnownEnumValue(static_cast<DelayedAllOffEffectVariantEnum>(effectVariant)))
+            !IsKnownEnumValue(static_cast<DelayedAllOffEffectVariantEnum>(effectVariant)))
         {
             // The server does not support the given variant, it SHALL use the default variant.
             effectVariant = to_underlying(DelayedAllOffEffectVariantEnum::kDelayedOffFastFade);
         }
         else if (effectId == EffectIdentifierEnum::kDyingLight &&
-                 !isKnownEnumValue(static_cast<DyingLightEffectVariantEnum>(effectVariant)))
+                 !IsKnownEnumValue(static_cast<DyingLightEffectVariantEnum>(effectVariant)))
         {
             // The server does not support the given variant, it SHALL use the default variant.
             effectVariant = to_underlying(DyingLightEffectVariantEnum::kDyingLightFadeOff);
