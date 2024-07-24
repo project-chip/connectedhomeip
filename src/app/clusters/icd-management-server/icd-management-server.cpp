@@ -106,7 +106,6 @@ CHIP_ERROR IcdManagementAttributeAccess::Read(const ConcreteReadAttributePath & 
 
     case IcdManagement::Attributes::MaximumCheckInBackOff::Id:
         return ReadMaximumCheckInBackOff(aPath.mEndpointId, aEncoder);
-
 #endif // CHIP_CONFIG_ENABLE_ICD_CIP
     }
 
@@ -126,11 +125,6 @@ CHIP_ERROR IcdManagementAttributeAccess::ReadActiveModeDuration(EndpointId endpo
 CHIP_ERROR IcdManagementAttributeAccess::ReadActiveModeThreshold(EndpointId endpoint, AttributeValueEncoder & encoder)
 {
     return encoder.Encode(mICDConfigurationData->GetActiveModeThreshold().count());
-}
-
-CHIP_ERROR IcdManagementAttributeAccess::ReadMaximumCheckInBackOff(EndpointId endpoint, AttributeValueEncoder & encoder)
-{
-    return encoder.Encode(mICDConfigurationData->GetMaximumCheckInBackoff().count());
 }
 
 #if CHIP_CONFIG_ENABLE_ICD_CIP
@@ -229,6 +223,11 @@ CHIP_ERROR IcdManagementAttributeAccess::ReadICDCounter(EndpointId endpoint, Att
 CHIP_ERROR IcdManagementAttributeAccess::ReadClientsSupportedPerFabric(EndpointId endpoint, AttributeValueEncoder & encoder)
 {
     return encoder.Encode(mICDConfigurationData->GetClientsSupportedPerFabric());
+}
+
+CHIP_ERROR IcdManagementAttributeAccess::ReadMaximumCheckInBackOff(EndpointId endpoint, AttributeValueEncoder & encoder)
+{
+    return encoder.Encode(mICDConfigurationData->GetMaximumCheckInBackoff().count());
 }
 
 /**

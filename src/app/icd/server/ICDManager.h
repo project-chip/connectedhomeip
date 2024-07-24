@@ -21,6 +21,7 @@
 #include <app/AppConfig.h>
 #include <app/SubscriptionsInfoProvider.h>
 #include <app/TestEventTriggerDelegate.h>
+#include <app/icd/server/ICDCheckInBackOffStrategy.h>
 #include <app/icd/server/ICDConfigurationData.h>
 #include <app/icd/server/ICDNotifier.h>
 #include <app/icd/server/ICDStateObserver.h>
@@ -33,10 +34,9 @@
 #include <system/SystemClock.h>
 
 #if CHIP_CONFIG_ENABLE_ICD_CIP
-#include <app/icd/server/ICDCheckInBackOffStrategy.h> // nogncheck
-#include <app/icd/server/ICDCheckInSender.h>          // nogncheck
-#include <app/icd/server/ICDMonitoringTable.h>        // nogncheck
-#endif                                                // CHIP_CONFIG_ENABLE_ICD_CIP
+#include <app/icd/server/ICDCheckInSender.h>   // nogncheck
+#include <app/icd/server/ICDMonitoringTable.h> // nogncheck
+#endif                                         // CHIP_CONFIG_ENABLE_ICD_CIP
 
 namespace chip {
 namespace Crypto {
