@@ -600,6 +600,10 @@ Status DeviceEnergyManagementDelegate::ResumeRequest()
 
     if (mPauseRequestInProgress)
     {
+        // The PauseRequest has effectively been cancelled so as a result the device should
+        // go back to InternalOptimisation
+        mForecast.Value().forecastUpdateReason = ForecastUpdateReasonEnum::kInternalOptimization;
+
         CHIP_ERROR err = CancelPauseRequestAndGenerateEvent(CauseEnum::kCancelled);
         if (err == CHIP_NO_ERROR)
         {
