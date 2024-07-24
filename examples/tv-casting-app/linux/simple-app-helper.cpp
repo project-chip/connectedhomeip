@@ -482,7 +482,8 @@ CHIP_ERROR CommandHandler(int argc, char ** argv)
             }
             // Update the CommissionableDataProvider stored in this CastingApp's AppParameters and the CommissionableDataProvider to
             // be used for the commissioning session.
-            err = matter::casting::core::CastingApp::GetInstance()->UpdateCommissionableDataProvider(&gSimpleAppCommissionableDataProvider);
+            err = matter::casting::core::CastingApp::GetInstance()->UpdateCommissionableDataProvider(
+                &gSimpleAppCommissionableDataProvider);
             if (err != CHIP_NO_ERROR)
             {
                 ChipLogError(AppServer,
