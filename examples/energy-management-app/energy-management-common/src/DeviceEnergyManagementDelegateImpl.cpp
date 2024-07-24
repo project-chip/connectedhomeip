@@ -986,7 +986,7 @@ CHIP_ERROR DeviceEnergyManagementDelegate::SetOptOutState(OptOutStateEnum newVal
             break;
         default:
             ChipLogDetail(AppServer, "Bad ForecastUpdateReasonEnum value of %d",
-                          static_cast<int>(mForecast.Value().forecastUpdateReason));
+                          to_underlying(mForecast.Value().forecastUpdateReason));
             return CHIP_ERROR_BAD_REQUEST;
             break;
         }
