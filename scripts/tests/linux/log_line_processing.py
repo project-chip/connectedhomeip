@@ -67,12 +67,18 @@ class ProcessOutputCapture:
                 changes = out_wait.poll(0.1)
                 if changes:
                     out_line = self.process.stdout.readline()
+                    if not out_line:
+                        # stdout closed (otherwise readline should have at least \n)
+                        continue
                     f.write(out_line)
                     self.output_lines.put(out_line)
 
                 changes = err_wait.poll(0)
                 if changes:
                     err_line = self.process.stderr.readline()
+                    if not err_line:
+                        # stderr closed (otherwise readline should have at least \n)
+                        continue
                     f.write(f"!!STDERR!! : {err_line}")
 
     def __enter__(self):
