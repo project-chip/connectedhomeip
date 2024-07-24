@@ -1156,7 +1156,7 @@ class MatterBaseTest(base_test.BaseTestClass):
     def wait_for_user_input(self,
                             prompt_msg: str,
                             prompt_msg_placeholder: str = "Submit anything to continue",
-                            default_value: str = "y") -> str:
+                            default_value: str = "y") -> Optional[str]:
         """Ask for user input and wait for it.
 
         Args:
@@ -1165,7 +1165,7 @@ class MatterBaseTest(base_test.BaseTestClass):
             default_value (str, optional): TH UI prompt default value. Defaults to "y".
 
         Returns:
-            str: User input
+            str: User input or none if input is closed.
         """
         if self.runner_hook:
             self.runner_hook.show_prompt(msg=prompt_msg,
@@ -1173,7 +1173,10 @@ class MatterBaseTest(base_test.BaseTestClass):
                                          default_value=default_value)
         logging.info("========= USER PROMPT =========")
         logging.info(f">>> {prompt_msg.rstrip()} (press enter to confirm)")
-        return input()
+        try:
+            return input()
+        except EOFError:
+            return None
 
 
 def generate_mobly_test_config(matter_test_config: MatterTestConfig):
