@@ -1,4 +1,4 @@
-# Copyright (c) 2024 Project CHIP Authors
+# Copyright (c) 2021 Project CHIP Authors
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -165,15 +165,6 @@ tests:
               - name: "OptionsOverride"
                 value: 1
 
-    - label: "Wait 100ms"
-      PICS: CC.S.F01
-      cluster: "DelayCommands"
-      command: "WaitForMs"
-      arguments:
-          values:
-              - name: "ms"
-                value: 100
-
     - label: "Step 2b: TH reads CurrentHue attribute from DUT"
       PICS: CC.S.A0000
       cluster: "Color Control"
@@ -212,15 +203,6 @@ tests:
                 value: 1
               - name: "OptionsOverride"
                 value: 1
-
-    - label: "Wait 100ms"
-      PICS: CC.S.F01
-      cluster: "DelayCommands"
-      command: "WaitForMs"
-      arguments:
-          values:
-              - name: "ms"
-                value: 100
 
     - label: "Step 2d: TH reads CurrentX attribute from DUT"
       PICS: CC.S.A0003
@@ -333,15 +315,6 @@ tests:
               - name: "OptionsOverride"
                 value: 1
 
-    - label: "Wait 100ms"
-      PICS: CC.S.F01
-      cluster: "DelayCommands"
-      command: "WaitForMs"
-      arguments:
-          values:
-              - name: "ms"
-                value: 100
-
     - label: "Step 2b: TH reads EnhancedCurrentHue attribute from DUT"
       PICS: CC.S.F01 && CC.S.A4000
       cluster: "Color Control"
@@ -440,10 +413,7 @@ tests:
                                             AttributeID: 0x4004,
                                             ValueUnsigned16: 25,
                                         },
-                                        {
-                                            AttributeID: 0x0007,
-                                            ValueUnsigned16: 48633,
-                                        },
+                                        { AttributeID: 0x0007 },
                                         {
                                             AttributeID: 0x4001,
                                             ValueUnsigned8: 0x03,
@@ -681,15 +651,6 @@ tests:
               - name: "SceneID"
                 value: 0x03
 
-    - label: "Wait 100ms"
-      PICS: CC.S.F01
-      cluster: "DelayCommands"
-      command: "WaitForMs"
-      arguments:
-          values:
-              - name: "ms"
-                value: 100
-
     - label: "Step 6c: TH reads CurrentX attribute from DUT"
       PICS: CC.S.A0003 && CC.S.C07.Rsp
       cluster: "Color Control"
@@ -797,15 +758,6 @@ tests:
               - name: "SceneID"
                 value: 0x04
 
-    - label: "Wait 100ms"
-      PICS: CC.S.F01
-      cluster: "DelayCommands"
-      command: "WaitForMs"
-      arguments:
-          values:
-              - name: "ms"
-                value: 100
-
     - label: "Step 7c: TH reads ColorTemperatureMireds attribute from DUT."
       PICS: CC.S.F04 && CC.S.A0007 && CC.S.C4b.Rsp
       cluster: "Color Control"
@@ -899,15 +851,6 @@ tests:
                 value: G1
               - name: "SceneID"
                 value: 0x05
-
-    - label: "Wait 100ms"
-      PICS: CC.S.F01
-      cluster: "DelayCommands"
-      command: "WaitForMs"
-      arguments:
-          values:
-              - name: "ms"
-                value: 100
 
     - label: "Step 8c: TH reads EnhancedCurrentHue attribute from DUT"
       PICS: CC.S.F01 && CC.S.A4000
@@ -1006,15 +949,6 @@ tests:
                 value: G1
               - name: "SceneID"
                 value: 0x06
-
-    - label: "Wait 100ms"
-      PICS: CC.S.F01
-      cluster: "DelayCommands"
-      command: "WaitForMs"
-      arguments:
-          values:
-              - name: "ms"
-                value: 100
 
     - label: "Step 9c: Read ColorLoopActive attribute from DUT"
       command: "readAttribute"
