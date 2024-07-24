@@ -381,7 +381,7 @@ void EVSEManufacturer::StartFakeReadings(EndpointId aEndpointId, int64_t aPower_
     {
         // Use a fixed random seed to try to avoid random CI test failures
         // which are caused when the test is checking for 2 different numbers
-        // statistically more likely when the test runs for a long time or 
+        // statistically more likely when the test runs for a long time or
         // if the seed is randomly set.
         srand(1);
 
