@@ -340,6 +340,7 @@ class InternalTestRunnerHooks(TestRunnerHooks):
                     placeholder: Optional[str] = None,
                     default_value: Optional[str] = None) -> None:
         pass
+
     def test_skipped(self, filename: str, name: str):
         logging.info(f"Skipping test from {filename}: {name}")
 
@@ -1551,10 +1552,12 @@ def parse_matter_test_args(argv: Optional[List[str]] = None) -> MatterTestConfig
 
     return convert_args_to_matter_config(parser.parse_known_args(argv)[0])
 
+
 def _async_runner(body, self: MatterBaseTest, *args, **kwargs):
     timeout = self.matter_test_config.timeout if self.matter_test_config.timeout is not None else self.default_timeout
     runner_with_timeout = asyncio.wait_for(body(self, *args, **kwargs), timeout=timeout)
     return asyncio.run(runner_with_timeout)
+
 
 def async_test_body(body):
     """Decorator required to be applied whenever a `test_*` method is `async def`.
@@ -1569,25 +1572,30 @@ def async_test_body(body):
 
     return async_runner
 
+
 def per_node_test(body):
     """ Decorator to be used for PICS-free tests that apply to the entire node.
 
     Use this decorator when your script needs to be run once to validate the whole node.
     To use this decorator, the test must NOT have an associated pics_ method.
     """
+
     def whole_node_runner(self: MatterBaseTest, *args, **kwargs):
         asserts.assert_false(self.get_test_pics(self.current_test_info.name), "pics_ method supplied for per_node_test.")
         return _async_runner(body, self, *args, **kwargs)
 
     return whole_node_runner
 
+
 EndpointCheckFunction = typing.Callable[[Clusters.Attribute.AsyncReadTransaction.ReadResponse, int], bool]
+
 
 def _has_cluster(wildcard, endpoint, cluster: ClusterObjects.Cluster) -> bool:
     try:
         return cluster in wildcard.attributes[endpoint]
     except KeyError:
         return False
+
 
 def has_cluster(cluster: ClusterObjects.ClusterObjectDescriptor) -> EndpointCheckFunction:
     """ EndpointCheckFunction that can be passed as a parameter to the per_endpoint_test decorator.
@@ -1612,6 +1620,7 @@ def has_cluster(cluster: ClusterObjects.ClusterObjectDescriptor) -> EndpointChec
     """
     return partial(_has_cluster, cluster=cluster)
 
+
 def _has_attribute(wildcard, endpoint, attribute: ClusterObjects.ClusterAttributeDescriptor) -> bool:
     cluster = getattr(Clusters, attribute.__qualname__.split('.')[-3])
     try:
@@ -1619,6 +1628,7 @@ def _has_attribute(wildcard, endpoint, attribute: ClusterObjects.ClusterAttribut
         return attribute.attribute_id in attr_list
     except KeyError:
         return False
+
 
 def has_attribute(attribute: ClusterObjects.ClusterAttributeDescriptor) -> EndpointCheckFunction:
     """ EndpointCheckFunction that can be passed as a parameter to the per_endpoint_test decorator.
@@ -1643,13 +1653,15 @@ def has_attribute(attribute: ClusterObjects.ClusterAttributeDescriptor) -> Endpo
     """
     return partial(_has_attribute, attribute=attribute)
 
-async def get_accepted_endpoints_for_test(self:MatterBaseTest, accept_function: EndpointCheckFunction) -> list[uint]:
+
+async def get_accepted_endpoints_for_test(self: MatterBaseTest, accept_function: EndpointCheckFunction) -> list[uint]:
     """ Helper function for the per_endpoint_test decorator.
 
         Returns a list of endpoints on which the test should be run given the accept_function for the test.
     """
     wildcard = await self.default_controller.Read(self.dut_node_id, [()])
     return [e for e in wildcard.attributes.keys() if accept_function(wildcard, e)]
+
 
 def per_endpoint_test(accept_function: EndpointCheckFunction):
     """ Test decorator for a test that needs to be run once per endpoint that meets the accept_function criteria.
@@ -1711,6 +1723,7 @@ def per_endpoint_test(accept_function: EndpointCheckFunction):
 
         return per_endpoint_runner
     return per_endpoint_test_internal
+
 
 class CommissionDeviceTest(MatterBaseTest):
     """Test class auto-injected at the start of test list to commission a device when requested"""

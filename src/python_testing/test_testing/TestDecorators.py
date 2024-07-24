@@ -48,11 +48,13 @@ def get_clusters(endpoints: list[int]) -> Attribute.AsyncReadTransaction.ReadRes
     # We're JUST populating the globals here because that's all that matters for this particular test
     feature_map = c.Bitmaps.Feature.kLighting
     # Only supported attributes - globals and OnOff. This isn't a compliant device. Doesn't matter for this test.
-    attribute_list = [attr.FeatureMap.attribute_id, attr.AttributeList.attribute_id, attr.AcceptedCommandList.attribute_id, attr.GeneratedCommandList.attribute_id, attr.OnOff.attribute_id]
+    attribute_list = [attr.FeatureMap.attribute_id, attr.AttributeList.attribute_id,
+                      attr.AcceptedCommandList.attribute_id, attr.GeneratedCommandList.attribute_id, attr.OnOff.attribute_id]
     accepted_commands = [c.Commands.Off, c.Commands.On]
     resp = Attribute.AsyncReadTransaction.ReadResponse({}, [], {})
     for e in endpoints:
-        resp.attributes[e] = {c:{attr.FeatureMap: feature_map, attr.AttributeList: attribute_list, attr.AcceptedCommandList: accepted_commands}}
+        resp.attributes[e] = {c: {attr.FeatureMap: feature_map,
+                                  attr.AttributeList: attribute_list, attr.AcceptedCommandList: accepted_commands}}
     return resp
 
 
@@ -98,6 +100,7 @@ class DecoratorTestRunnerHooks:
                     default_value: Optional[str] = None) -> None:
         pass
 
+
 class TestDecorators(MatterBaseTest):
     def test_checkers(self):
         has_onoff = has_cluster(Clusters.OnOff)
@@ -107,7 +110,8 @@ class TestDecorators(MatterBaseTest):
         has_timesync_utc = has_attribute(Clusters.TimeSynchronization.Attributes.UTCTime)
 
         wildcard = get_clusters([0, 1])
-        def check_endpoints(f, expect_true, expectation:str):
+
+        def check_endpoints(f, expect_true, expectation: str):
             asserts.assert_equal(f(wildcard, 0), expect_true, f"Expected {expectation} == {expect_true} on EP0")
             asserts.assert_equal(f(wildcard, 1), expect_true, f"Expected {expectation} == {expect_true} on EP1")
             asserts.assert_false(f(wildcard, 2), f"Expected {expectation} == False on EP2")
@@ -150,6 +154,7 @@ class TestDecorators(MatterBaseTest):
     @per_node_test
     async def test_whole_node_with_pics(self):
         pass
+
     def pics_whole_node_with_pics(self):
         return ['EXAMPLE.S']
 
@@ -157,6 +162,7 @@ class TestDecorators(MatterBaseTest):
     @per_endpoint_test(has_cluster(Clusters.OnOff))
     async def test_per_endpoint_with_pics(self):
         pass
+
     def pics_per_endpoint_with_pics(self):
         return ['EXAMPLE.S']
 
@@ -202,6 +208,7 @@ class TestDecorators(MatterBaseTest):
 
     # TODO: add test for assertions on whole node, and on each endpoint of an endpoint test
 
+
 def main():
     failures = []
     hooks = DecoratorTestRunnerHooks()
@@ -244,9 +251,10 @@ def main():
         skipped_ok = (hooks.skipped != []) == expect_skip
         stopped_ok = hooks.stopped == expected_runs
         if not ok or not started_ok or not skipped_ok or not stopped_ok:
-            failures.append(f'Expected {expected_runs} run of {test_name}, skips expected: {expect_skip}. Runs: {hooks.started}, skips: {hooks.skipped} stops: {hooks.stopped}')
+            failures.append(
+                f'Expected {expected_runs} run of {test_name}, skips expected: {expect_skip}. Runs: {hooks.started}, skips: {hooks.skipped} stops: {hooks.stopped}')
 
-    def check_once_per_node(test_name:str):
+    def check_once_per_node(test_name: str):
         run_check(test_name, get_clusters([0]), 1, False)
         run_check(test_name, get_clusters([0, 1]), 1, False)
 
