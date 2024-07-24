@@ -295,7 +295,7 @@ class TC_SC_4_3(MatterBaseTest):
             is_thr = self.check_pics('MCORE.COM.THR')
             if is_thr:
                 asserts.assert_true(self.verify_hostname(hostname=server, char_length=16),
-                                f"Hostname for '{server}' is not a 16-character uppercase hexadecimal string")
+                                    f"Hostname for '{server}' is not a 16-character uppercase hexadecimal string")
 
         # ICD TXT KEY
         if supports_lit:
