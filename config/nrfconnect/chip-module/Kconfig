@@ -95,6 +95,22 @@ config CHIP_DEBUG_SYMBOLS
 	help
 	  Enables building the application with debug symbols.
 
+config CHIP_LOG_VERIFY_OR_DIE
+	bool "Log source code location on VerifyOrDie failure"
+	help
+	  Enables the feature to log the file name and line number where the Matter
+	  stack calls the VerifyOrDie macro with the condition evaluating to false.
+
+config CHIP_LOG_FILE_NAME
+	bool "Log file name instead of entire file path"
+	default y
+	help
+	  Enables using a file name instead of an entire file path whenever the
+	  source code location needs to be logged. This is achieved by overriding
+	  the __FILE__ macro with __FILE_NAME__.
+	  This reduces the code size in debug configurations that enable verbose
+	  assertion macros.
+
 config CHIP_MALLOC_SYS_HEAP
 	default y if !ARCH_POSIX
 
