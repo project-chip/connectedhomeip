@@ -550,7 +550,7 @@ def _referenced_type_names(cluster: Cluster) -> Set[str]:
             types.add(f.data_type.name)
 
     for a in cluster.attributes:
-        types.add(a.definition.name)
+        types.add(a.definition.data_type.name)
 
     return types
 
@@ -565,6 +565,8 @@ class GlobalMapping:
         self.enum_map = {e.name: e for e in idl.global_enums}
         self.struct_map = {s.name: s for s in idl.global_structs}
 
+        self.global_types = set(self.bitmap_map.keys()).union(set(self.enum_map.keys())).union(set(self.struct_map.keys()))
+
     def merge_global_types_into_cluster(self, cluster: Cluster) -> Cluster:
         """
         Merges all referenced global types (bitmaps/enums/structs) into the cluster types.
@@ -576,6 +578,9 @@ class GlobalMapping:
         while changed:
             changed = False
             for type_name in _referenced_type_names(cluster):
+                if type_name not in self.global_types:
+                    continue  # not a global type name
+
                 if type_name in global_types_added:
                     continue  # already added
 
@@ -583,15 +588,15 @@ class GlobalMapping:
                 if type_name in self.bitmap_map:
                     global_types_added.add(type_name)
                     changed = True
-                    cluster.bitmaps.append(bitmap_map[type_name])
+                    cluster.bitmaps.append(self.bitmap_map[type_name])
                 elif type_name in self.enum_map:
                     global_types_added.add(type_name)
                     changed = True
-                    cluster.enums.append(enum_map[type_name])
+                    cluster.enums.append(self.enum_map[type_name])
                 elif type_name in self.struct_map:
                     global_types_added.add(type_name)
                     changed = True
-                    cluster.structs.append(struct_map[type_name])
+                    cluster.structs.append(self.struct_map[type_name])
 
         return cluster
 
