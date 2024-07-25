@@ -227,7 +227,6 @@ public:
         {
             ChipLogDetail(AppServer, "\tpairing hint: %d", mPairingHint);
         }
-
         if (mNoPasscode)
         {
             ChipLogDetail(AppServer, "\tno passcode: true");
@@ -395,7 +394,7 @@ public:
         }
         if (mCancelPasscode)
         {
-            ChipLogDetail(AppServer, "\tQR code displayed: true");
+            ChipLogDetail(AppServer, "\tPasscode cancelled: true");
         }
         ChipLogDetail(AppServer, "---- Commissioner Declaration End ----");
     }
