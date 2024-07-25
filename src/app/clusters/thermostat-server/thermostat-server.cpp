@@ -409,7 +409,7 @@ MatterThermostatClusterServerPreAttributeChangedCallback(const app::ConcreteAttr
         requested = *value;
         if (!AutoSupported)
             return imcode::UnsupportedAttribute;
-        if (requested < 0 || requested > 127)
+        if (requested < 0 || requested > 25)
             return imcode::InvalidValue;
         return imcode::Success;
     }
