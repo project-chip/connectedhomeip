@@ -53,8 +53,7 @@ namespace app {
 class AttributePathExpandIteratorDataModel
 {
 public:
-    AttributePathExpandIteratorDataModel(DataModel::Provider * provider,
-                                         SingleLinkedListNode<AttributePathParams> * attributePath);
+    AttributePathExpandIteratorDataModel(DataModel::Provider * provider, SingleLinkedListNode<AttributePathParams> * attributePath);
 
     /**
      * Proceed the iterator to the next attribute path in the given cluster info.

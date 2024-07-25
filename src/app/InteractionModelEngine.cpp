@@ -1712,7 +1712,7 @@ DataModel::Provider * InteractionModelEngine::SetDataModelProvider(DataModel::Pr
     VerifyOrDie(mReadHandlers.begin() == mReadHandlers.end());
 
     DataModel::Provider * oldModel = GetDataModelProvider();
-    mDataModelProvider                     = model;
+    mDataModelProvider             = model;
     return oldModel;
 }
 
