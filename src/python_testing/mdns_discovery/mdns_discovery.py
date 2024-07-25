@@ -19,6 +19,7 @@ import asyncio
 import json
 from dataclasses import asdict, dataclass
 from enum import Enum
+from time import sleep
 from typing import Dict, List, Optional, Union, cast
 
 from mdns_discovery.mdns_async_service_info import DNSRecordType, MdnsAsyncServiceInfo
@@ -87,6 +88,7 @@ class MdnsServiceListener(ServiceListener):
         self.updated_event = asyncio.Event()
 
     def add_service(self, zeroconf: Zeroconf, service_type: str, name: str) -> None:
+        sleep(0.25)
         self.updated_event.set()
 
     def remove_service(self, zeroconf: Zeroconf, service_type: str, name: str) -> None:
