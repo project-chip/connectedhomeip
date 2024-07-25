@@ -2277,32 +2277,26 @@ static NSString * const sLastInitialSubscribeLatencyKey = @"lastInitialSubscribe
     [clusterData removeValueForAttribute:attributeID];
 }
 
-- (void)_createDataVersionFilterListFromDictionary:(NSDictionary<MTRClusterPath *, NSNumber *> *)dataVersions dataVersionFilterList:(DataVersionFilter **)dataVersionFilterList count:(size_t *)count sizeReduction:(size_t)sizeReduction
+- (void)_createDataVersionFilterListFromDictionary:(NSDictionary<MTRClusterPath *, NSNumber *> *)dataVersions dataVersionFilterList:(DataVersionFilter **)dataVersionFilterList count:(size_t *)count
 {
-    size_t maxDataVersionFilterSize = dataVersions.count;
+    size_t dataVersionFilterSize = dataVersions.count;
 
     // Check if any filter list should be generated
-    if (!dataVersions.count || (maxDataVersionFilterSize <= sizeReduction)) {
+    if (dataVersionFilterSize == 0) {
         *count = 0;
         *dataVersionFilterList = nullptr;
         return;
     }
-    maxDataVersionFilterSize -= sizeReduction;
 
-    DataVersionFilter * dataVersionFilterArray = new DataVersionFilter[maxDataVersionFilterSize];
+    DataVersionFilter * dataVersionFilterArray = new DataVersionFilter[dataVersionFilterSize];
     size_t i = 0;
     for (MTRClusterPath * path in dataVersions) {
         NSNumber * dataVersionNumber = dataVersions[path];
-        if (dataVersionNumber) {
-            dataVersionFilterArray[i++] = DataVersionFilter(static_cast<chip::EndpointId>(path.endpoint.unsignedShortValue), static_cast<chip::ClusterId>(path.cluster.unsignedLongValue), static_cast<chip::DataVersion>(dataVersionNumber.unsignedLongValue));
-        }
-        if (i == maxDataVersionFilterSize) {
-            break;
-        }
+        dataVersionFilterArray[i++] = DataVersionFilter(static_cast<chip::EndpointId>(path.endpoint.unsignedShortValue), static_cast<chip::ClusterId>(path.cluster.unsignedLongValue), static_cast<chip::DataVersion>(dataVersionNumber.unsignedLongValue));
     }
 
     *dataVersionFilterList = dataVersionFilterArray;
-    *count = maxDataVersionFilterSize;
+    *count = dataVersionFilterSize;
 }
 
 - (void)_setupConnectivityMonitoring
@@ -2530,75 +2524,55 @@ static NSString * const sLastInitialSubscribeLatencyKey = @"lastInitialSubscribe
                            auto readClient = std::make_unique<ReadClient>(InteractionModelEngine::GetInstance(), exchangeManager,
                                clusterStateCache->GetBufferedCallback(), ReadClient::InteractionType::Subscribe);
 
-                           // Subscribe with data version filter list and retry with smaller list if out of packet space
-                           CHIP_ERROR err;
-                           NSDictionary<MTRClusterPath *, NSNumber *> * dataVersions = [self _getCachedDataVersions];
-                           size_t dataVersionFilterListSizeReduction = 0;
-                           for (;;) {
-                               // Wildcard endpoint, cluster, attribute, event.
-                               auto attributePath = std::make_unique<AttributePathParams>();
-                               auto eventPath = std::make_unique<EventPathParams>();
-                               // We want to get event reports at the minInterval, not the maxInterval.
-                               eventPath->mIsUrgentEvent = true;
-                               ReadPrepareParams readParams(session.Value());
+                           // Wildcard endpoint, cluster, attribute, event.
+                           auto attributePath = std::make_unique<AttributePathParams>();
+                           auto eventPath = std::make_unique<EventPathParams>();
+                           // We want to get event reports at the minInterval, not the maxInterval.
+                           eventPath->mIsUrgentEvent = true;
+                           ReadPrepareParams readParams(session.Value());
 
-                               readParams.mMinIntervalFloorSeconds = 0;
-                               // Select a max interval based on the device's claimed idle sleep interval.
-                               auto idleSleepInterval = std::chrono::duration_cast<System::Clock::Seconds32>(
-                                   session.Value()->GetRemoteMRPConfig().mIdleRetransTimeout);
+                           readParams.mMinIntervalFloorSeconds = 0;
+                           // Select a max interval based on the device's claimed idle sleep interval.
+                           auto idleSleepInterval = std::chrono::duration_cast<System::Clock::Seconds32>(
+                               session.Value()->GetRemoteMRPConfig().mIdleRetransTimeout);
 
-                               auto maxIntervalCeilingMin = System::Clock::Seconds32(MTR_DEVICE_SUBSCRIPTION_MAX_INTERVAL_MIN);
-                               if (idleSleepInterval < maxIntervalCeilingMin) {
-                                   idleSleepInterval = maxIntervalCeilingMin;
-                               }
-
-                               auto maxIntervalCeilingMax = System::Clock::Seconds32(MTR_DEVICE_SUBSCRIPTION_MAX_INTERVAL_MAX);
-                               if (idleSleepInterval > maxIntervalCeilingMax) {
-                                   idleSleepInterval = maxIntervalCeilingMax;
-                               }
-#ifdef DEBUG
-                               if (maxIntervalOverride.HasValue()) {
-                                   idleSleepInterval = maxIntervalOverride.Value();
-                               }
-#endif
-                               readParams.mMaxIntervalCeilingSeconds = static_cast<uint16_t>(idleSleepInterval.count());
-
-                               readParams.mpAttributePathParamsList = attributePath.get();
-                               readParams.mAttributePathParamsListSize = 1;
-                               readParams.mpEventPathParamsList = eventPath.get();
-                               readParams.mEventPathParamsListSize = 1;
-                               readParams.mKeepSubscriptions = true;
-                               readParams.mIsFabricFiltered = false;
-                               size_t dataVersionFilterListSize = 0;
-                               DataVersionFilter * dataVersionFilterList;
-                               [self _createDataVersionFilterListFromDictionary:dataVersions dataVersionFilterList:&dataVersionFilterList count:&dataVersionFilterListSize sizeReduction:dataVersionFilterListSizeReduction];
-                               readParams.mDataVersionFilterListSize = dataVersionFilterListSize;
-                               readParams.mpDataVersionFilterList = dataVersionFilterList;
-                               attributePath.release();
-                               eventPath.release();
-
-                               // TODO: Change from local filter list generation to rehydrating ClusterStateCache ot take advantage of existing filter list sorting algorithm
-
-                               // SendAutoResubscribeRequest cleans up the params, even on failure.
-                               err = readClient->SendAutoResubscribeRequest(std::move(readParams));
-                               if (err == CHIP_NO_ERROR) {
-                                   break;
-                               }
-
-                               // If error is not a "no memory" issue, then break and go through regular resubscribe logic
-                               if (err != CHIP_ERROR_NO_MEMORY) {
-                                   break;
-                               }
-
-                               // If "no memory" error is not caused by data version filter list, break as well
-                               if (!dataVersionFilterListSize) {
-                                   break;
-                               }
-
-                               // Now "no memory" could mean subscribe request packet space ran out. Reduce size and try again immediately
-                               dataVersionFilterListSizeReduction++;
+                           auto maxIntervalCeilingMin = System::Clock::Seconds32(MTR_DEVICE_SUBSCRIPTION_MAX_INTERVAL_MIN);
+                           if (idleSleepInterval < maxIntervalCeilingMin) {
+                               idleSleepInterval = maxIntervalCeilingMin;
                            }
 
+                           auto maxIntervalCeilingMax = System::Clock::Seconds32(MTR_DEVICE_SUBSCRIPTION_MAX_INTERVAL_MAX);
+                           if (idleSleepInterval > maxIntervalCeilingMax) {
+                               idleSleepInterval = maxIntervalCeilingMax;
+                           }
+#ifdef DEBUG
+                           if (maxIntervalOverride.HasValue()) {
+                               idleSleepInterval = maxIntervalOverride.Value();
+                           }
+#endif
+                           readParams.mMaxIntervalCeilingSeconds = static_cast<uint16_t>(idleSleepInterval.count());
+
+                           readParams.mpAttributePathParamsList = attributePath.get();
+                           readParams.mAttributePathParamsListSize = 1;
+                           readParams.mpEventPathParamsList = eventPath.get();
+                           readParams.mEventPathParamsListSize = 1;
+                           readParams.mKeepSubscriptions = true;
+                           readParams.mIsFabricFiltered = false;
+
+                           // Subscribe with data version filter list from our cache.
+                           size_t dataVersionFilterListSize = 0;
+                           DataVersionFilter * dataVersionFilterList;
+                           [self _createDataVersionFilterListFromDictionary:[self _getCachedDataVersions] dataVersionFilterList:&dataVersionFilterList count:&dataVersionFilterListSize];
+
+                           readParams.mDataVersionFilterListSize = dataVersionFilterListSize;
+                           readParams.mpDataVersionFilterList = dataVersionFilterList;
+                           attributePath.release();
+                           eventPath.release();
+
+                           // TODO: Change from local filter list generation to rehydrating ClusterStateCache to take advantage of existing filter list sorting algorithm
+
+                           // SendAutoResubscribeRequest cleans up the params, even on failure.
+                           CHIP_ERROR err = readClient->SendAutoResubscribeRequest(std::move(readParams));
                            if (err != CHIP_NO_ERROR) {
                                NSError * error = [MTRError errorForCHIPErrorCode:err logContext:self];
                                MTR_LOG_ERROR("%@ SendAutoResubscribeRequest error %@", self, error);
@@ -2610,7 +2584,7 @@ static NSString * const sLastInitialSubscribeLatencyKey = @"lastInitialSubscribe
                                return;
                            }
 
-                           MTR_LOG("%@ Subscribe with data version list size %lu, reduced by %lu", self, static_cast<unsigned long>(dataVersions.count), static_cast<unsigned long>(dataVersionFilterListSizeReduction));
+                           MTR_LOG("%@ Subscribe with data version list size %lu", self, static_cast<unsigned long>(dataVersionFilterListSize));
 
                            // Callback and ClusterStateCache and ReadClient will be deleted
                            // when OnDone is called.
