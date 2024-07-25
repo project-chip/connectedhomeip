@@ -85,16 +85,6 @@ public:
     /// NOT thread-safe, external synchronization is required.
     T & get() { return _get(); }
     T * operator->() { return &_get(); }
-    template <class U = std::remove_extent_t<T>>
-    U & operator[](std::size_t i)
-    {
-        return _get()[i];
-    }
-    template <std::size_t N = std::extent_v<T>>
-    constexpr std::size_t size() const
-    {
-        return N;
-    }
 
     // Globals are not copyable or movable
     Global(const Global &)             = delete;
@@ -107,59 +97,70 @@ public:
     ~Global()          = default;
 
 private:
-    // Zero-initialize everything. We should technically leave mStorage uninitialized,
-    // but that can sometimes cause clang to be unable to constant-initialize the object.
-#if CHIP_CONFIG_DYNAMIC_GLOBALS
-    unsigned char * mStorage = nullptr;
-#else
-    alignas(T) unsigned char mStorage[sizeof(T)] = {};
-#endif // CHIP_CONFIG_DYNAMIC_GLOBALS
-    OnceStrategy mOnce;
+#if CHIP_CONFIG_DYNAMICALLY_ALLOCATED_GLOBALS
+    std::remove_extent_t<T> * mStorage = nullptr;
 
     T & _get()
     {
-#if CHIP_CONFIG_DYNAMIC_GLOBALS
-        mOnce.call(&create, &mStorage);
-#else
-        mOnce.call(&create, mStorage);
-#endif // CHIP_CONFIG_DYNAMIC_GLOBALS
+        mOnce.call(&create, this);
         return *reinterpret_cast<T *>(mStorage);
     }
+
     static void create(void * value)
     {
-#if CHIP_CONFIG_DYNAMIC_GLOBALS
-        unsigned char ** storage = static_cast<unsigned char **>(value);
-        value = *storage = new unsigned char[sizeof(T)];
-#endif // CHIP_CONFIG_DYNAMIC_GLOBALS
+        auto self      = static_cast<Global<T, OnceStrategy> *>(value);
+        self->mStorage = new T();
+#if !CHIP_CONFIG_GLOBALS_NO_DESTRUCT
+        CHIP_CXA_ATEXIT(&destroy, self->mStorage);
+#endif // CHIP_CONFIG_GLOBALS_NO_DESTRUCT
+    }
+
+    template <typename U = T, std::enable_if_t<std::is_array_v<U>, bool> = true>
+    static void destroy(void * value)
+    {
+        delete[] static_cast<std::remove_extent_t<T> *>(value);
+    }
+
+    template <typename U = T, std::enable_if_t<!std::is_array_v<U>, bool> = true>
+    static void destroy(void * value)
+    {
+        delete static_cast<T *>(value);
+    }
+#else // CHIP_CONFIG_DYNAMICALLY_ALLOCATED_GLOBALS
+    // Zero-initialize everything. We should technically leave mStorage uninitialized,
+    // but that can sometimes cause clang to be unable to constant-initialize the object.
+    alignas(T) unsigned char mStorage[sizeof(T)] = {};
+
+    T & _get()
+    {
+        mOnce.call(&create, mStorage);
+        return *reinterpret_cast<T *>(mStorage);
+    }
+
+    static void create(void * value)
+    {
         new (value) T();
 #if !CHIP_CONFIG_GLOBALS_NO_DESTRUCT
         CHIP_CXA_ATEXIT(&destroy, value);
 #endif // CHIP_CONFIG_GLOBALS_NO_DESTRUCT
     }
 
-    template <class U, std::size_t N>
-    static void _destroy(U (*value)[N])
-    {
-        _destroy_array(*value, N);
-    }
-    template <class U>
-    static void _destroy_array(U * array, std::size_t N)
-    {
-        for (std::size_t i = 0; i < N; ++i)
-            array[i].~U();
-    }
-    template <class U>
-    static void _destroy(U * value)
-    {
-        value->~U();
-    }
+    template <typename U = T, std::enable_if_t<std::is_array_v<U>, bool> = true>
     static void destroy(void * value)
     {
-        _destroy(static_cast<T *>(value));
-#if CHIP_CONFIG_DYNAMIC_GLOBALS
-        delete[] static_cast<unsigned char *>(value);
-#endif // CHIP_CONFIG_DYNAMIC_GLOBALS
+        using V = std::remove_extent_t<T>;
+        for (std::size_t i = 0; i != std::extent_v<T>; ++i)
+            (static_cast<V *>(value) + i)->~V();
     }
+
+    template <typename U = T, std::enable_if_t<!std::is_array_v<U>, bool> = true>
+    static void destroy(void * value)
+    {
+        static_cast<T *>(value)->~T();
+    }
+#endif // CHIP_CONFIG_DYNAMICALLY_ALLOCATED_GLOBALS
+
+    OnceStrategy mOnce;
 
 #else // CHIP_CONFIG_GLOBALS_LAZY_INIT
 public:

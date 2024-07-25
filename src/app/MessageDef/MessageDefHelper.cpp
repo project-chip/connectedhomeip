@@ -55,9 +55,9 @@ void PrettyPrintIMBlankLine()
 
     for (uint32_t i = 0; i < gPrettyPrintingDepthLevel; i++)
     {
-        if (gLineBuffer.size() > gCurLineBufferSize)
+        if (CHIP_CONFIG_LOG_MESSAGE_MAX_SIZE > gCurLineBufferSize)
         {
-            size_t sizeLeft = gLineBuffer.size() - gCurLineBufferSize;
+            size_t sizeLeft = CHIP_CONFIG_LOG_MESSAGE_MAX_SIZE - gCurLineBufferSize;
             size_t ret      = (size_t) (snprintf(lineBuffer + gCurLineBufferSize, sizeLeft, "\t"));
             if (ret > 0)
             {
@@ -77,9 +77,9 @@ void PrettyPrintIM(bool aIsNewLine, const char * aFmt, ...)
         PrettyPrintIMBlankLine();
     }
 
-    if (gLineBuffer.size() > gCurLineBufferSize)
+    if (CHIP_CONFIG_LOG_MESSAGE_MAX_SIZE > gCurLineBufferSize)
     {
-        size_t sizeLeft = gLineBuffer.size() - gCurLineBufferSize;
+        size_t sizeLeft = CHIP_CONFIG_LOG_MESSAGE_MAX_SIZE - gCurLineBufferSize;
         size_t ret      = (size_t) (vsnprintf(gLineBuffer.get() + gCurLineBufferSize, sizeLeft, aFmt, args));
         if (ret > 0)
         {

@@ -260,12 +260,12 @@ CHIP_ERROR Server::Init(const ServerInitParams & initParams)
 
     {
         ::chip::app::LogStorageResources logStorageResources[] = {
-            { sDebugEventBuffer.get(), sDebugEventBuffer.size(), ::chip::app::PriorityLevel::Debug },
-            { sInfoEventBuffer.get(), sInfoEventBuffer.size(), ::chip::app::PriorityLevel::Info },
-            { sCritEventBuffer.get(), sCritEventBuffer.size(), ::chip::app::PriorityLevel::Critical }
+            { sDebugEventBuffer.get(), CHIP_DEVICE_CONFIG_EVENT_LOGGING_DEBUG_BUFFER_SIZE, ::chip::app::PriorityLevel::Debug },
+            { sInfoEventBuffer.get(), CHIP_DEVICE_CONFIG_EVENT_LOGGING_INFO_BUFFER_SIZE, ::chip::app::PriorityLevel::Info },
+            { sCritEventBuffer.get(), CHIP_DEVICE_CONFIG_EVENT_LOGGING_CRIT_BUFFER_SIZE, ::chip::app::PriorityLevel::Critical }
         };
 
-        chip::app::EventManagement::GetInstance().Init(&mExchangeMgr, CHIP_NUM_EVENT_LOGGING_BUFFERS, &sLoggingBuffer[0],
+        chip::app::EventManagement::GetInstance().Init(&mExchangeMgr, CHIP_NUM_EVENT_LOGGING_BUFFERS, sLoggingBuffer.get(),
                                                        &logStorageResources[0], &sGlobalEventIdCounter.get(),
                                                        std::chrono::duration_cast<System::Clock::Milliseconds64>(mInitTimestamp));
     }
