@@ -179,28 +179,28 @@ class NxpBuilder(GnBuilder):
 
         if self.has_sw_version_2:
             args.append('nxp_software_version=2')
-        
+
         if self.enable_ota:
             # OTA is enabled by default on kw32
             if self.board == NxpBoard.RW61X:
                 args.append('chip_enable_ota_requestor=true no_mcuboot=false')
-        
+
         if self.enable_wifi:
             args.append('chip_enable_wifi=true')
-        
+
         if self.disable_ble:
             args.append('chip_enable_ble=false')
-        
+
         if self.enable_shell:
             args.append('chip_enable_matter_cli=true')
-        
+
         if self.enable_thread:
             # thread is enabled by default on kw32
             if self.board == NxpBoard.RW61X:
                 args.append('chip_enable_openthread=true chip_inet_config_enable_ipv4=false')
                 if self.enable_wifi:
                     args.append('openthread_root=\\"//third_party/connectedhomeip/third_party/openthread/ot-nxp/openthread-br\\"')
-        
+
         if self.is_sdk_package:
             args.append('is_sdk_package=true')
 
@@ -237,18 +237,18 @@ class NxpBuilder(GnBuilder):
                 build_args=build_args).strip()
             self._Execute(['bash', '-c', cmd], title='Generating ' + self.identifier)
         else:
-            cmd=''
+            cmd = ''
             # will be used with next sdk version to get sdk path
             if 'NXP_UPDATE_SDK_SCRIPT_DOCKER' in os.environ:
                 # Dynamic import of a python file to get platforms sdk path
                 spec = importlib.util.spec_from_file_location("None", os.environ['NXP_UPDATE_SDK_SCRIPT_DOCKER'])
                 module = importlib.util.module_from_spec(spec)
                 spec.loader.exec_module(module)
-                
+
                 for p in module.ALL_PLATFORM_SDK:
-                    if p.sdk_name == 'k32w0' :
+                    if p.sdk_name == 'k32w0':
                         cmd += 'export NXP_K32W0_SDK_ROOT="' + str(p.sdk_storage_location_abspath) + '" \n '
-                    elif p.sdk_name == 'common' :
+                    elif p.sdk_name == 'common':
                         cmd += 'export NXP_SDK_ROOT="' + str(p.sdk_storage_location_abspath) + '" \n '
             cmd += 'gn gen --check --fail-on-unused-args --export-compile-commands --root=%s' % self.root
 
@@ -265,12 +265,12 @@ class NxpBuilder(GnBuilder):
 
             extra_args.extend(self.GnBuildArgs() or [])
             if extra_args:
-                cmd += ' --args="%s' % ' '.join(extra_args) +'" '
+                cmd += ' --args="%s' % ' '.join(extra_args) + '" '
 
             cmd += self.output_dir
 
             title = 'Generating ' + self.identifier
-            
+
             self._Execute(['bash', '-c', cmd], title=title)
 
     def build_outputs(self):
