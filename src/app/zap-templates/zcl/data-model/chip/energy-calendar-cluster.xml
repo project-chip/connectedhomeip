@@ -1,10 +1,13 @@
 <?xml version="1.0"?>
 <!--
 Copyright (c) 2024 Project CHIP Authors
+
 Licensed under the Apache License, Version 2.0 (the "License");
 you may not use this file except in compliance with the License.
 You may obtain a copy of the License at
+
     http://www.apache.org/licenses/LICENSE-2.0
+
 Unless required by applicable law or agreed to in writing, software
 distributed under the License is distributed on an "AS IS" BASIS,
 WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -44,6 +47,20 @@ limitations under the License.
     <item name="High" value="0x03"/>
   </enum>
 
+  <struct name="CalendarPeriodStruct" apiMaturity="provisional">
+    <cluster code="0x009A"/>
+    <item fieldId="0" name="StartDate" type="epoch_s" isNullable="true"/>
+    <item fieldId="1" name="Days" array="true" type="DayStruct" length="7" minLength="1"/>
+  </struct>
+
+  <struct name="DayStruct" apiMaturity="provisional">
+    <cluster code="0x009A"/>
+    <item fieldId="0" name="Date" type="DateStruct" optional="true"/>
+    <item fieldId="1" name="DaysOfWeek" type="TransitionDayOfWeekBitmap" optional="true" min="0x00" max="0x7F"/>
+    <item fieldId="2" name="Transitions" array="true" type="TransitionStruct" length="48" minLength="1"/>
+    <item fieldId="3" name="CalendarID" type="int32u" optional="true"/>
+  </struct>
+
   <struct name="PeakPeriodStruct" apiMaturity="provisional">
     <cluster code="0x009A"/>
     <item fieldId="0" name="Severity" type="PeakPeriodSeverityEnum" min="0x00" max="0x03"/>
@@ -60,55 +77,40 @@ limitations under the License.
     <item fieldId="3" name="AuxiliaryLoad" type="AuxiliaryLoadBitmap" optional="true" min="0x00" max="0xFF"/>
   </struct>
 
-  <struct name="DayStruct" apiMaturity="provisional">
-    <cluster code="0x009A"/>
-    <item fieldId="0" name="Date" type="DateStruct" optional="true"/>
-    <item fieldId="1" name="DaysOfWeek" type="TransitionDayOfWeekBitmap" optional="true" min="0x00" max="0x7F"/>
-    <item fieldId="2" name="Transitions" type="TransitionStruct" array="true" length="48" minLength="1"/>
-    <item fieldId="3" name="CalendarID" type="int32u" optional="true"/>
-  </struct>
-
-  <struct name="CalendarPeriodStruct" apiMaturity="provisional">
-    <cluster code="0x009A"/>
-    <item fieldId="0" name="StartDate" type="epoch_s" isNullable="true"/>
-    <item fieldId="1" name="Days" type="DayStruct" array="true" length="7" minLength="1"/>
-  </struct>
-
   <cluster>
-    <name>Energy Calendar</name>
     <domain>Energy Management</domain>
+    <name>Energy Calendar</name>
     <code>0x009A</code>
     <define>ENERGY_CALENDAR_CLUSTER</define>
+    <description/>
     <client init="false" tick="false">true</client>
-    <server init="false" tick="false">true</server>
-    <description>The Energy Calendar Cluster provides a mechanism for communicating schedules associated with various forms of energy consumption.</description>
-    <globalAttribute side="either" code="0xFFFD" value="3"/>
     <features>
-      <feature apiMaturity="provisional" bit="0" code="PTIER" name="PricingTier" summary="Supports information about pricing tiers">
+      <feature bit="0" code="PTIER" name="PricingTier" summary="Supports information about pricing tiers">
         <optionalConform choice="a" more="true" min="1"/>
       </feature>
-      <feature apiMaturity="provisional" bit="1" code="FCRED" name="FriendlyCredit" summary="Supports information about when friendly credit periods begin and end">
+      <feature bit="1" code="FCRED" name="FriendlyCredit" summary="Supports information about when friendly credit periods begin and end">
         <optionalConform choice="a" more="true" min="1"/>
       </feature>
-      <feature apiMaturity="provisional" bit="2" code="AUXLD" name="AuxiliaryLoad" summary="Supports information about when auxiliary loads should be enabled or disabled">
+      <feature bit="2" code="AUXLD" name="AuxiliaryLoad" summary="Supports information about when auxiliary loads should be enabled or disabled">
         <optionalConform choice="a" more="true" min="1"/>
       </feature>
-      <feature apiMaturity="provisional" bit="3" code="PEAKP" name="PeakPeriod" summary="Supports information about peak periods">
+      <feature bit="3" code="PEAKP" name="PeakPeriod" summary="Supports information about peak periods">
         <optionalConform/>
       </feature>
     </features>
-    <!--Attributes-->
-    <attribute code="0x0000" side="server" type="int32u" define="CALENDARID" isNullable="true">CalendarID</attribute>
-    <attribute code="0x0001" side="server" type="char_string" define="NAME" isNullable="true" length="12">Name</attribute>
-    <attribute code="0x0002" side="server" type="int32u" define="PROVIDERID" isNullable="true">ProviderID</attribute>
-    <attribute code="0x0003" side="server" type="int32u" define="EVENTID" isNullable="true">EventID</attribute>
-    <attribute code="0x0004" side="server" type="epoch_s" define="START_DATE" isNullable="true">StartDate</attribute>
-    <attribute code="0x0005" side="server" type="array" define="CALENDAR_PERIODS" entryType="CalendarPeriodStruct" length="4" isNullable="true" minLength="1">CalendarPeriods</attribute>
-    <attribute code="0x0006" side="server" type="array" define="SPECIASL_DAYS" entryType="DayStruct" length="50" isNullable="true">SpecialDays</attribute>
-    <attribute code="0x0007" side="server" type="DayStruct" define="CURRENT_DAY" isNullable="true">CurrentDay</attribute>
-    <attribute code="0x0008" side="server" type="DayStruct" define="NEXT_DAY" isNullable="true">NextDay</attribute>
-    <attribute code="0x0009" side="server" type="TransitionStruct" define="CURRENT_TRANSITION" isNullable="true">CurrentTransition</attribute>
-    <attribute code="0x000A" side="server" type="PeakPeriodStruct" define="CURRENT_PEAK_PERIOD" isNullable="true" optional="true">CurrentPeakPeriod</attribute>
-    <attribute code="0x000B" side="server" type="PeakPeriodStruct" define="NEXT_PEAK_PERIOD" isNullable="true" optional="true">NextPeakPeriod</attribute>
+    <server init="false" tick="false">true</server>
+    <globalAttribute code="0xFFFD" side="either" value="3"/>
+    <attribute code="0x0000" side="server" define="CALENDAR_ID" type="int32u" isNullable="true">CalendarID</attribute>
+    <attribute code="0x0001" side="server" define="NAME" type="char_string" isNullable="true" length="12">Name</attribute>
+    <attribute code="0x0002" side="server" define="PROVIDER_ID" type="int32u" isNullable="true">ProviderID</attribute>
+    <attribute code="0x0003" side="server" define="EVENT_ID" type="int32u" isNullable="true">EventID</attribute>
+    <attribute code="0x0004" side="server" define="START_DATE" type="epoch_s" isNullable="true">StartDate</attribute>
+    <attribute code="0x0005" side="server" define="CALENDAR_PERIODS" type="array" entryType="CalendarPeriodStruct" isNullable="true" length="4" minLength="1">CalendarPeriods</attribute>
+    <attribute code="0x0006" side="server" define="SPECIAL_DAYS" type="array" entryType="DayStruct" isNullable="true" length="50">SpecialDays</attribute>
+    <attribute code="0x0007" side="server" define="CURRENT_DAY" type="DayStruct" isNullable="true">CurrentDay</attribute>
+    <attribute code="0x0008" side="server" define="NEXT_DAY" type="DayStruct" isNullable="true">NextDay</attribute>
+    <attribute code="0x0009" side="server" define="CURRENT_TRANSITION" type="TransitionStruct" isNullable="true">CurrentTransition</attribute>
+    <attribute code="0x000A" side="server" define="CURRENT_PEAK_PERIOD" type="PeakPeriodStruct" isNullable="true" optional="true">CurrentPeakPeriod</attribute>
+    <attribute code="0x000B" side="server" define="NEXT_PEAK_PERIOD" type="PeakPeriodStruct" isNullable="true" optional="true">NextPeakPeriod</attribute>
   </cluster>
 </configurator>

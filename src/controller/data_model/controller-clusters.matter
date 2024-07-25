@@ -5437,7 +5437,7 @@ cluster EnergyEvse = 153 {
   timed command ClearTargets(): DefaultSuccess = 7;
 }
 
-/** The Energy Calendar Cluster provides a mechanism for communicating schedules associated with various forms of energy consumption. */
+/**  */
 cluster EnergyCalendar = 154 {
   revision 3;
 
