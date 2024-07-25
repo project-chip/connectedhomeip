@@ -19,14 +19,13 @@
 #pragma once
 
 #include <app/clusters/device-energy-management-server/device-energy-management-server.h>
+#include <DEMManufacturerDelegate.h>
 #include <app/util/config.h>
 
 namespace chip {
 namespace app {
 namespace Clusters {
 namespace DeviceEnergyManagement {
-
-class DEMManufacturerDelegate;
 
 /**
  * The application delegate.
