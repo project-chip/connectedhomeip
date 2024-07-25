@@ -28,8 +28,6 @@ namespace app {
 namespace Clusters {
 namespace WaterHeaterManagement {
 
-using ModeTagStructType = detail::Structs::ModeTagStruct::Type;
-
 class WhmManufacturer;
 
 // This is an application level delegate to handle operational state commands according to the specific business logic.
@@ -82,8 +80,8 @@ public:
 
     /**
      * @brief Delegate should implement a handler to cancel a boost command.
-     *        Upon receipt, the Water Heater SHALL transition back from the BOOST state to the previous mode (e.g. OFF, MANUAL or
-     * TIMED).
+     *        Upon receipt, the Water Heater SHALL transition back from the BOOST state to the previous mode
+     *        (e.g. OFF, MANUAL or TIMED).
      *
      * @return It should report SUCCESS if successful and FAILURE otherwise.
      */
@@ -164,24 +162,6 @@ public:
      */
     void DrawOffHotWater(uint8_t percentageReplaced, uint16_t replacedWaterTemperature);
 
-    /*********************************************************************************
-     *
-     * Public constants
-     *
-     *********************************************************************************/
-
-    // The Water Header Modes
-
-    // The device will not attempt to keep the water warm.
-    static constexpr uint8_t ModeOff = 0;
-
-    // The device will attempt to keep the water warm based on the OccupiedHeatingSetpoint attribute of the associated Thermostat
-    // cluster.
-    static constexpr uint8_t ModeManual = 1;
-
-    // The device will attempt to keep the water warm based on the Schedules attribute of the associated Thermostat cluster.
-    static constexpr uint8_t ModeTimed = 2;
-
 private:
     /*********************************************************************************
      *
@@ -201,10 +181,7 @@ private:
     // Actual water temperature in 100ths of a C
     uint16_t mHotWaterTemperature;
 
-    // The % of hot water remaining at mHotWaterTemperature
-    //    uint8_t mPercentageHotWater;
-
-    // The (100 - mPercentageHotWater)% of water at mReplacedWaterTemperature
+    // The % of water at temperature mReplacedWaterTemperature
     uint16_t mReplacedWaterTemperature;
 
     // Boost command parameters

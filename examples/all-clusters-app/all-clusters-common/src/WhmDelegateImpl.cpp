@@ -44,7 +44,7 @@ void WaterHeaterManagementDelegate::SetWaterHeaterManagementInstance(WaterHeater
     {
         // If the feature kTankPercent is not supported then set mTankPercentage to 100% so calculations below need
         // less code for the feature kTankPercent case.
-        mTankPercentage = 100;
+        //        mTankPercentage = 100;
     }
 }
 
@@ -295,7 +295,6 @@ Status WaterHeaterManagementDelegate::HandleCancelBoost()
 
 void WaterHeaterManagementDelegate::SetWaterTemperature(uint16_t waterTemperature)
 {
-    // This method assumed 100% of the water in the tank has reached the waterTemperature specified
     mHotWaterTemperature = waterTemperature;
 
     // Do not change mTankPercentage if the kTankPercent feature is not supported
@@ -394,7 +393,7 @@ Status WaterHeaterManagementDelegate::CheckIfHeatNeedsToBeTurnedOnOrOff()
             }
 
             // If a boost command is in progress or in manual mode, find a heating source and "turn it on".
-            if (mBoostState == BoostStateEnum::kActive || mode == ModeManual)
+            if (mBoostState == BoostStateEnum::kActive || mode == WaterHeaterMode::ModeManual)
             {
                 if (mpWhmManufacturer != nullptr)
                 {
@@ -413,7 +412,7 @@ Status WaterHeaterManagementDelegate::CheckIfHeatNeedsToBeTurnedOnOrOff()
                 }
             }
         }
-        else if (mBoostState == BoostStateEnum::kInactive && mode == ModeOff)
+        else if (mBoostState == BoostStateEnum::kInactive && mode == WaterHeaterMode::ModeOff)
         {
             // The water temperature is not at the target temperature but there is no boost command in progress and the mode is Off
             // so need to ensure the heating is turned off.

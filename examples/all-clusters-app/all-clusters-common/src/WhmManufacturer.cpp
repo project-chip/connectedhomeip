@@ -18,10 +18,10 @@
 
 #include <WhmInstance.h>
 #include <WhmManufacturer.h>
+#include <water-heater-mode.h>
 
 #include <app/clusters/water-heater-management-server/WaterHeaterManagementTestEventTriggerHandler.h>
 #include <app/clusters/water-heater-management-server/water-heater-management-server.h>
-
 #include <app-common/zap-generated/attributes/Accessors.h>
 
 using namespace chip;
@@ -198,7 +198,7 @@ void SetTestEventTrigger_ManualModeTestEvent()
     WaterHeaterManagementDelegate * dg = GetWhmDelegate();
 
     // Simulate the Water Heater Mode being set to MANUAL
-    dg->SetWaterHeaterMode(WaterHeaterManagementDelegate::ModeManual);
+    dg->SetWaterHeaterMode(WaterHeaterMode::ModeManual);
 }
 
 void SetTestEventTrigger_OffModeTestEvent()
@@ -206,7 +206,7 @@ void SetTestEventTrigger_OffModeTestEvent()
     WaterHeaterManagementDelegate * dg = GetWhmDelegate();
 
     // Simulate the Water Heater Mode being set to OFF
-    dg->SetWaterHeaterMode(WaterHeaterManagementDelegate::ModeOff);
+    dg->SetWaterHeaterMode(WaterHeaterMode::ModeOff);
 }
 
 void SetTestEventTrigger_DrawOffHotWaterTestEvent()
