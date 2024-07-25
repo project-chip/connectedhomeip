@@ -17,6 +17,7 @@
 #pragma once
 
 #include <lib/dnssd/Resolver.h>
+#include <lib/dnssd/Types.h>
 #include <lib/dnssd/minimal_mdns/Parser.h>
 #include <lib/dnssd/minimal_mdns/RecordData.h>
 #include <lib/dnssd/minimal_mdns/core/QName.h>
@@ -104,11 +105,18 @@ public:
 
     ServiceNameType GetCurrentType() const { return mServiceNameType; }
 
+    PeerId OperationalParsePeerId() const
+    {
+        VerifyOrReturnValue(IsActiveOperationalParse(), PeerId());
+        return mSpecificResolutionData.Get<OperationalNodeData>().peerId;
+    }
+
     /// Start parsing a new record. SRV records are the records we are mainly
     /// interested on, after which TXT and A/AAAA are looked for.
     ///
     /// If this function returns with error, the object will be in an inactive state.
-    CHIP_ERROR InitializeParsing(mdns::Minimal::SerializedQNameIterator name, const mdns::Minimal::SrvRecord & srv);
+    CHIP_ERROR InitializeParsing(mdns::Minimal::SerializedQNameIterator name, const uint64_t ttl,
+                                 const mdns::Minimal::SrvRecord & srv);
 
     /// Notify that a new record is being processed.
     /// Will handle filtering and processing of data to determine if the entry is relevant for
@@ -143,7 +151,7 @@ public:
 
     /// Take the current value of the object and clear it once returned.
     ///
-    /// Object must be in `IsActiveCommissionParse()` for this to succeed.
+    /// Object must be in `IsActive()` for this to succeed.
     /// Data will be returned (and cleared) even if not yet complete based
     /// on `GetMissingRequiredInformation()`. This method takes as much data as
     /// it was parsed so far.
@@ -170,7 +178,7 @@ private:
     /// Input data MUST have GetType() == QType::TXT
     CHIP_ERROR OnTxtRecord(const mdns::Minimal::ResourceData & data, mdns::Minimal::BytesRange packetRange);
 
-    /// Notify that a new IP addres has been found.
+    /// Notify that a new IP address has been found.
     ///
     /// This is to be called on both A (if IPv4 support is enabled) and AAAA
     /// addresses.

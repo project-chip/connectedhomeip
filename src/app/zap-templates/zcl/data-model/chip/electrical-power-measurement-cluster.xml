@@ -16,15 +16,7 @@ limitations under the License.
 -->
 <configurator>
   <domain name="CHIP"/>
-  <bitmap name="Feature" type="bitmap32">
-    <cluster code="0x0090"/>
-    <field name="DirectCurrent" mask="0x01"/>
-    <field name="AlternatingCurrent" mask="0x02"/>
-    <field name="PolyphasePower" mask="0x04"/>
-    <field name="Harmonics" mask="0x08"/>
-    <field name="PowerQuality" mask="0x10"/>
-  </bitmap>
-  <cluster apiMaturity="provisional">
+  <cluster>
     <name>Electrical Power Measurement</name>
     <domain>Measurement &amp; Sensing</domain>
     <code>0x0090</code>
@@ -33,6 +25,31 @@ limitations under the License.
     <server init="false" tick="false">true</server>
     <globalAttribute side="either" code="0xFFFD" value="1"/>
     <description>This cluster provides a mechanism for querying data about electrical power as measured by the server.</description>
+
+    <features>
+      <feature bit="0" code="DIRC" name="DirectCurrent" summary="Supports measurement of direct current">
+        <optionalConform choice="a" more="true"/>
+      </feature>
+      <feature bit="1" code="ALTC" name="AlternatingCurrent" summary="Supports measurement of alternating current">
+        <optionalConform choice="a" more="true"/>
+      </feature>
+      <feature bit="2" code="POLY" name="PolyphasePower" summary="Supports polyphase measurements">
+        <optionalConform>
+          <feature name="ALTC"/>
+        </optionalConform>
+      </feature>
+      <feature bit="3" code="HARM" name="Harmonics" summary="Supports measurement of AC harmonics">
+        <optionalConform>
+          <feature name="ALTC"/>
+        </optionalConform>
+      </feature>
+      <feature bit="4" code="PWRQ" name="PowerQuality" summary="Supports measurement of AC harmonic phases">
+        <optionalConform>
+          <feature name="ALTC"/>
+        </optionalConform>
+      </feature>
+    </features>
+
     <!--Attributes-->
     <attribute code="0x0000" side="server" define="POWER_MODE" type="PowerModeEnum" min="0x00" max="0x02">PowerMode</attribute>
     <attribute code="0x0001" side="server" define="NUMBER_OF_MEASUREMENT_TYPES" type="int8u" min="1">NumberOfMeasurementTypes</attribute>
@@ -65,18 +82,18 @@ limitations under the License.
     <!--Conformance feature [POLY] - for now optional-->
     <attribute code="0x0011" side="server" define="POWER_FACTOR" type="int64s" isNullable="true" min="-10000" max="10000" optional="true">PowerFactor</attribute>
     <attribute code="0x0012" side="server" type="amperage_ma" define="NEUTRAL_CURRENT" isNullable="true" min="-4611686018427387904" max="4611686018427387904" optional="true">NeutralCurrent</attribute>
-    <event code="0x00" side="server" name="MeasurementPeriodRanges" priority="info" apiMaturity="provisional" optional="true">
+    <event code="0x00" side="server" name="MeasurementPeriodRanges" priority="info" optional="true">
       <description>MeasurementPeriodRanges</description>
       <field id="0" name="Ranges" array="true" type="MeasurementRangeStruct"/>
     </event>
   </cluster>
-  <enum name="PowerModeEnum" type="enum8" apiMaturity="provisional">
+  <enum name="PowerModeEnum" type="enum8">
     <cluster code="0x0090"/>
     <item name="Unknown" value="0x00"/>
     <item name="DC" value="0x01"/>
     <item name="AC" value="0x02"/>
   </enum>
-  <struct name="MeasurementRangeStruct" apiMaturity="provisional">
+  <struct name="MeasurementRangeStruct">
     <cluster code="0x0090"/>
     <item fieldId="0" name="MeasurementType" type="MeasurementTypeEnum" min="0x0000" max="0x000E"/>
     <item fieldId="1" name="Min" type="int64s" min="-4611686018427387904" max="4611686018427387904"/>
@@ -90,7 +107,7 @@ limitations under the License.
     <item fieldId="9" name="MinSystime" type="systime_ms" optional="true"/>
     <item fieldId="10" name="MaxSystime" type="systime_ms" optional="true"/>
   </struct>
-  <struct name="HarmonicMeasurementStruct" apiMaturity="provisional">
+  <struct name="HarmonicMeasurementStruct">
     <cluster code="0x0090"/>
     <item fieldId="0" name="Order" type="int8u" min="1" default="1"/>
     <item fieldId="1" name="Measurement" type="int64s" min="-4611686018427387904" max="4611686018427387904" isNullable="true"/>

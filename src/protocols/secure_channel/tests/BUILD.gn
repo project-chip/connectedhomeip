@@ -1,14 +1,14 @@
 import("//build_overrides/build.gni")
 import("//build_overrides/chip.gni")
-import("//build_overrides/nlunit_test.gni")
 import("${chip_root}/build/chip/chip_test_suite.gni")
 import("${chip_root}/src/app/icd/icd.gni")
 
-chip_test_suite_using_nltest("tests") {
+chip_test_suite("tests") {
   output_name = "libSecureChannelTests"
 
   test_sources = [
     "TestCASESession.cpp",
+    "TestCheckInCounter.cpp",
     "TestCheckinMsg.cpp",
     "TestDefaultSessionResumptionStorage.cpp",
     "TestPASESession.cpp",
@@ -22,23 +22,24 @@ chip_test_suite_using_nltest("tests") {
 
   sources = [ "CheckIn_Message_test_vectors.h" ]
 
+  cflags = [ "-Wconversion" ]
   public_deps = [
     "${chip_root}/src/app/icd/server:icd-server-config",
     "${chip_root}/src/credentials/tests:cert_test_vectors",
     "${chip_root}/src/crypto/tests:tests.lib",
     "${chip_root}/src/lib/core",
+    "${chip_root}/src/lib/core:string-builder-adapters",
     "${chip_root}/src/lib/support",
     "${chip_root}/src/lib/support:test_utils",
     "${chip_root}/src/lib/support:testing",
-    "${chip_root}/src/lib/support:testing_nlunit",
+    "${chip_root}/src/lib/support/tests:pw-test-macros",
     "${chip_root}/src/messaging/tests:helpers",
     "${chip_root}/src/protocols",
     "${chip_root}/src/protocols/secure_channel",
+    "${chip_root}/src/protocols/secure_channel:check-in-counter",
     "${chip_root}/src/transport/raw/tests:helpers",
-    "${nlunit_test_root}:nlunit-test",
+    "${dir_pw_unit_test}",
   ]
-
-  cflags = [ "-Wconversion" ]
 
   if (chip_enable_icd_server) {
     public_deps += [ "${chip_root}/src/app/icd/server:configuration-data" ]

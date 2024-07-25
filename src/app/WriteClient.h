@@ -178,7 +178,7 @@ public:
         ReturnErrorOnFailure(EncodeSingleAttributeDataIB(path, DataModel::List<uint8_t>()));
 
         path.mListOp = ConcreteDataAttributePath::ListOperation::AppendItem;
-        for (ListIndex i = 0; i < value.size(); i++)
+        for (size_t i = 0; i < value.size(); i++)
         {
             ReturnErrorOnFailure(EncodeSingleAttributeDataIB(path, value.data()[i]));
         }
@@ -227,12 +227,6 @@ public:
      *  consumer is responsible for calling Shutdown on the WriteClient.
      */
     CHIP_ERROR SendWriteRequest(const SessionHandle & session, System::Clock::Timeout timeout = System::Clock::kZero);
-
-    /**
-     *  Shutdown the WriteClient. This terminates this instance
-     *  of the object and releases all held resources.
-     */
-    void Shutdown();
 
 private:
     friend class TestWriteInteraction;

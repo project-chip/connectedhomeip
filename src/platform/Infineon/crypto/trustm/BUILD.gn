@@ -1,0 +1,64 @@
+# Copyright (c) 2024 Project CHIP Authors
+#
+# Licensed under the Apache License, Version 2.0 (the "License");
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
+#
+# http://www.apache.org/licenses/LICENSE-2.0
+#
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
+
+import("//build_overrides/chip.gni")
+import("//build_overrides/nlassert.gni")
+import("${chip_root}/build/chip/buildconfig_header.gni")
+import("${chip_root}/src/crypto/crypto.gni")
+import("${chip_root}/src/platform/Infineon/crypto/trustm/args.gni")
+
+if (chip_crypto == "platform") {
+  import("//build_overrides/mbedtls.gni")
+}
+
+source_set("public_headers") {
+  sources = []
+
+  public_deps = [
+    "${chip_root}/src/crypto",
+    "${chip_root}/src/lib/asn1",
+    "${chip_root}/src/lib/core",
+    "${chip_root}/src/lib/support",
+    "${nlassert_root}:nlassert",
+  ]
+}
+
+static_library("infineon_crypto_lib") {
+  sources = [
+    "CHIPCryptoPALHost.cpp",
+    "CHIPCryptoPALHsm_HKDF_trustm.cpp",
+    "CHIPCryptoPALHsm_HMAC_trustm.cpp",
+    "CHIPCryptoPALHsm_P256_trustm.cpp",
+    "CHIPCryptoPALHsm_rng_trustm.cpp",
+    "CHIPCryptoPALHsm_utils_trustm.cpp",
+    "CHIPCryptoPAL_HostFallBack.cpp",
+    "DeviceAttestationCredsExampleTrustM.cpp",
+  ]
+
+  public_deps = [ ":public_headers" ]
+  public_configs = []
+  public_deps += [ "${chip_root}/third_party/infineon/trustm:optiga-trust-m" ]
+  public_configs += [ "${chip_root}/third_party/infineon/trustm:trustm_config" ]
+  deps = [ "${chip_root}/${infineon_crypto_root}:optiga-trust-m" ]
+  external_mbedtls = current_os == "zephyr"
+
+  if (!external_mbedtls) {
+    public_deps += [ "${mbedtls_root}:mbedtls" ]
+  }
+  include_dirs = [
+    ".",
+    "${chip_root}/src/crypto",
+    "${chip_root}/src/platform/Infineon/crypto/trustm",
+  ]
+}

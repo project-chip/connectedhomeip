@@ -48,7 +48,7 @@ struct ErrorFormatter
     ErrorFormatter * Next;
 };
 
-extern const char * ErrorStr(CHIP_ERROR err);
+extern const char * ErrorStr(CHIP_ERROR err, bool withSourceLocation = true);
 extern void RegisterErrorFormatter(ErrorFormatter * errFormatter);
 extern void DeregisterErrorFormatter(ErrorFormatter * errFormatter);
 extern void FormatError(char * buf, uint16_t bufSize, const char * subsys, CHIP_ERROR err, const char * desc);

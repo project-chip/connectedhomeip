@@ -19,6 +19,7 @@
 
 #import <Matter/MTRCluster.h>
 #import <Matter/MTRDefines.h>
+#import <Matter/MTRDiagnosticLogsType.h>
 
 @class MTRSetupPayload;
 @class MTRDeviceController;
@@ -542,6 +543,29 @@ MTR_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
                           reportHandler:(MTRDeviceResponseHandler)reportHandler
                 subscriptionEstablished:(MTRSubscriptionEstablishedHandler _Nullable)subscriptionEstablished
     MTR_AVAILABLE(ios(16.4), macos(13.3), watchos(9.4), tvos(16.4));
+
+/**
+ * Download log of the desired type from the device.
+ *
+ * Note: The consumer of this API should move the file that the url points to or open it for reading before the
+ * completion handler returns. Otherwise, the file will be deleted, and the data will be lost.
+ *
+ * @param type       The type of log being requested. This should correspond to a value in the enum MTRDiagnosticLogType.
+ * @param timeout    The timeout for getting the log. If the timeout expires, completion will be called with whatever
+ *                   has been retrieved by that point (which might be none or a partial log).
+ *                   If the timeout is set to 0, the request will not expire and completion will not be called until
+ *                   the log is fully retrieved or an error occurs.
+ * @param queue      The queue on which completion will be called.
+ * @param completion The completion handler that is called after attempting to retrieve the requested log.
+ *                     - In case of success, the completion handler is called with a non-nil URL and a nil error.
+ *                     - If there is an error, a non-nil error is used and the url can be non-nil too if some logs have already been downloaded.
+ */
+- (void)downloadLogOfType:(MTRDiagnosticLogType)type
+                  timeout:(NSTimeInterval)timeout
+                    queue:(dispatch_queue_t)queue
+               completion:(void (^)(NSURL * _Nullable url, NSError * _Nullable error))completion
+    MTR_AVAILABLE(ios(17.6), macos(14.6), watchos(10.6), tvos(17.6));
+
 @end
 
 /**

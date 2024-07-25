@@ -32,7 +32,7 @@
 
 #if CHIP_DEVICE_CONFIG_ENABLE_CHIPOBLE
 
-#include <ble/CHIPBleServiceData.h>
+#include <ble/Ble.h>
 
 #include "board.h"
 #include "gatt_db_app_interface.h"
@@ -125,17 +125,13 @@ EventGroupHandle_t sEventGroup;
 
 TimerHandle_t connectionTimeout;
 
-const uint8_t ShortUUID_CHIPoBLEService[]  = { 0xF6, 0xFF };
-const ChipBleUUID ChipUUID_CHIPoBLEChar_RX = { { 0x18, 0xEE, 0x2E, 0xF5, 0x26, 0x3D, 0x45, 0x59, 0x95, 0x9F, 0x4F, 0x9C, 0x42, 0x9F,
-                                                 0x9D, 0x11 } };
-const ChipBleUUID ChipUUID_CHIPoBLEChar_TX = { { 0x18, 0xEE, 0x2E, 0xF5, 0x26, 0x3D, 0x45, 0x59, 0x95, 0x9F, 0x4F, 0x9C, 0x42, 0x9F,
-                                                 0x9D, 0x12 } };
+const uint8_t ShortUUID_CHIPoBLEService[] = { 0xF6, 0xFF };
 
 #if defined(chip_with_low_power) && (chip_with_low_power == 1)
 static bool bleAppStopInProgress;
 #endif
 
-BLEManagerCommon * sImplInstance;
+BLEManagerCommon * sImplInstance = nullptr;
 
 } // namespace
 
@@ -319,17 +315,17 @@ void BLEManagerCommon::_OnPlatformEvent(const ChipDeviceEvent * event)
     case DeviceEventType::kCHIPoBLESubscribe:
         ChipDeviceEvent connEstEvent;
 
-        HandleSubscribeReceived(event->CHIPoBLESubscribe.ConId, &CHIP_BLE_SVC_ID, &ChipUUID_CHIPoBLEChar_TX);
+        HandleSubscribeReceived(event->CHIPoBLESubscribe.ConId, &CHIP_BLE_SVC_ID, &Ble::CHIP_BLE_CHAR_2_UUID);
         connEstEvent.Type = DeviceEventType::kCHIPoBLEConnectionEstablished;
         PlatformMgr().PostEventOrDie(&connEstEvent);
         break;
 
     case DeviceEventType::kCHIPoBLEUnsubscribe:
-        HandleUnsubscribeReceived(event->CHIPoBLEUnsubscribe.ConId, &CHIP_BLE_SVC_ID, &ChipUUID_CHIPoBLEChar_TX);
+        HandleUnsubscribeReceived(event->CHIPoBLEUnsubscribe.ConId, &CHIP_BLE_SVC_ID, &Ble::CHIP_BLE_CHAR_2_UUID);
         break;
 
     case DeviceEventType::kCHIPoBLEWriteReceived:
-        HandleWriteReceived(event->CHIPoBLEWriteReceived.ConId, &CHIP_BLE_SVC_ID, &ChipUUID_CHIPoBLEChar_RX,
+        HandleWriteReceived(event->CHIPoBLEWriteReceived.ConId, &CHIP_BLE_SVC_ID, &Ble::CHIP_BLE_CHAR_1_UUID,
                             PacketBufferHandle::Adopt(event->CHIPoBLEWriteReceived.Data));
         break;
 
@@ -338,7 +334,7 @@ void BLEManagerCommon::_OnPlatformEvent(const ChipDeviceEvent * event)
         break;
 
     case DeviceEventType::kCHIPoBLEIndicateConfirm:
-        HandleIndicationConfirmation(event->CHIPoBLEIndicateConfirm.ConId, &CHIP_BLE_SVC_ID, &ChipUUID_CHIPoBLEChar_TX);
+        HandleIndicationConfirmation(event->CHIPoBLEIndicateConfirm.ConId, &CHIP_BLE_SVC_ID, &Ble::CHIP_BLE_CHAR_2_UUID);
         break;
 
     default:
@@ -346,19 +342,21 @@ void BLEManagerCommon::_OnPlatformEvent(const ChipDeviceEvent * event)
     }
 }
 
-bool BLEManagerCommon::SubscribeCharacteristic(BLE_CONNECTION_OBJECT conId, const ChipBleUUID * svcId, const ChipBleUUID * charId)
+CHIP_ERROR BLEManagerCommon::SubscribeCharacteristic(BLE_CONNECTION_OBJECT conId, const ChipBleUUID * svcId,
+                                                     const ChipBleUUID * charId)
 {
     ChipLogProgress(DeviceLayer, "BLEManagerCommon::SubscribeCharacteristic() not supported");
-    return false;
+    return CHIP_ERROR_NOT_IMPLEMENTED;
 }
 
-bool BLEManagerCommon::UnsubscribeCharacteristic(BLE_CONNECTION_OBJECT conId, const ChipBleUUID * svcId, const ChipBleUUID * charId)
+CHIP_ERROR BLEManagerCommon::UnsubscribeCharacteristic(BLE_CONNECTION_OBJECT conId, const ChipBleUUID * svcId,
+                                                       const ChipBleUUID * charId)
 {
     ChipLogProgress(DeviceLayer, "BLEManagerCommon::UnsubscribeCharacteristic() not supported");
-    return false;
+    return CHIP_ERROR_NOT_IMPLEMENTED;
 }
 
-bool BLEManagerCommon::CloseConnection(BLE_CONNECTION_OBJECT conId)
+CHIP_ERROR BLEManagerCommon::CloseConnection(BLE_CONNECTION_OBJECT conId)
 {
     return blekw_stop_connection_internal(conId);
 }
@@ -371,25 +369,11 @@ uint16_t BLEManagerCommon::GetMTU(BLE_CONNECTION_OBJECT conId) const
     return tempMtu;
 }
 
-bool BLEManagerCommon::SendWriteRequest(BLE_CONNECTION_OBJECT conId, const ChipBleUUID * svcId, const ChipBleUUID * charId,
-                                        PacketBufferHandle pBuf)
+CHIP_ERROR BLEManagerCommon::SendWriteRequest(BLE_CONNECTION_OBJECT conId, const ChipBleUUID * svcId, const ChipBleUUID * charId,
+                                              PacketBufferHandle pBuf)
 {
     ChipLogProgress(DeviceLayer, "BLEManagerCommon::SendWriteRequest() not supported");
-    return false;
-}
-
-bool BLEManagerCommon::SendReadRequest(BLE_CONNECTION_OBJECT conId, const ChipBleUUID * svcId, const ChipBleUUID * charId,
-                                       PacketBufferHandle pBuf)
-{
-    ChipLogProgress(DeviceLayer, "BLEManagerCommon::SendReadRequest() not supported");
-    return false;
-}
-
-bool BLEManagerCommon::SendReadResponse(BLE_CONNECTION_OBJECT conId, BLE_READ_REQUEST_CONTEXT requestContext,
-                                        const ChipBleUUID * svcId, const ChipBleUUID * charId)
-{
-    ChipLogProgress(DeviceLayer, "BLEManagerCommon::SendReadResponse() not supported");
-    return false;
+    return CHIP_ERROR_NOT_IMPLEMENTED;
 }
 
 void BLEManagerCommon::NotifyChipConnectionClosed(BLE_CONNECTION_OBJECT conId)
@@ -397,34 +381,26 @@ void BLEManagerCommon::NotifyChipConnectionClosed(BLE_CONNECTION_OBJECT conId)
     BLEMgrImpl().CloseConnection(conId);
 }
 
-bool BLEManagerCommon::SendIndication(BLE_CONNECTION_OBJECT conId, const ChipBleUUID * svcId, const ChipBleUUID * charId,
-                                      PacketBufferHandle data)
+CHIP_ERROR BLEManagerCommon::SendIndication(BLE_CONNECTION_OBJECT conId, const ChipBleUUID * svcId, const ChipBleUUID * charId,
+                                            PacketBufferHandle data)
 {
+    VerifyOrReturnError(UUIDsMatch(&Ble::CHIP_BLE_CHAR_2_UUID, charId), BLE_ERROR_GATT_WRITE_FAILED);
+
     CHIP_ERROR err = CHIP_NO_ERROR;
-    uint16_t cId   = (UUIDsMatch(&ChipUUID_CHIPoBLEChar_TX, charId) ? value_chipoble_tx : 0);
-    ChipDeviceEvent event;
 
-    if (cId != 0)
+    if (blekw_send_event(conId, value_chipoble_tx, data->Start(), data->DataLength()) != BLE_OK)
     {
-        if (blekw_send_event(conId, cId, data->Start(), data->DataLength()) != BLE_OK)
-        {
-            err = CHIP_ERROR_SENDING_BLOCKED;
-        }
-        else
-        {
-            event.Type                          = DeviceEventType::kCHIPoBLEIndicateConfirm;
-            event.CHIPoBLEIndicateConfirm.ConId = conId;
-            err                                 = PlatformMgr().PostEvent(&event);
-        }
-
-        if (err != CHIP_NO_ERROR)
-        {
-            ChipLogError(DeviceLayer, "BLEManagerCommon::SendIndication() failed: %s", ErrorStr(err));
-            return false;
-        }
-        return true;
+        err = CHIP_ERROR_SENDING_BLOCKED;
     }
-    return false;
+    else
+    {
+        ChipDeviceEvent event;
+        event.Type                          = DeviceEventType::kCHIPoBLEIndicateConfirm;
+        event.CHIPoBLEIndicateConfirm.ConId = conId;
+        err                                 = PlatformMgr().PostEvent(&event);
+    }
+
+    return err;
 }
 
 BLEManagerCommon::ble_err_t BLEManagerCommon::blekw_send_event(int8_t connection_handle, uint16_t handle, uint8_t * data,
@@ -1075,6 +1051,10 @@ void BLEManagerCommon::HandleForceDisconnect()
     {
         ChipLogProgress(DeviceLayer, "Gap_Disconnect() failed.");
     }
+
+#if defined(chip_with_low_power) && (chip_with_low_power == 1)
+    PWR_AllowDeviceToSleep();
+#endif
 }
 
 /*******************************************************************************
@@ -1085,7 +1065,7 @@ void BLEManagerCommon::blekw_generic_cb(gapGenericEvent_t * pGenericEvent)
     /* Call BLE Conn Manager */
     BleConnManager_GenericEvent(pGenericEvent);
 
-    if (sImplInstance->callbackDelegate.gapCallback)
+    if (sImplInstance && sImplInstance->callbackDelegate.gapCallback)
     {
         sImplInstance->callbackDelegate.gapCallback(pGenericEvent);
     }
@@ -1240,7 +1220,7 @@ void BLEManagerCommon::blekw_stop_connection_timeout(void)
 
 void BLEManagerCommon::blekw_gatt_server_cb(deviceId_t deviceId, gattServerEvent_t * pServerEvent)
 {
-    if (sImplInstance->callbackDelegate.gattCallback)
+    if (sImplInstance && sImplInstance->callbackDelegate.gattCallback)
     {
         sImplInstance->callbackDelegate.gattCallback(deviceId, pServerEvent);
     }
@@ -1429,14 +1409,14 @@ void BLEManagerCommon::StartBleAdvTimeoutTimer(uint32_t aTimeoutInMs)
     }
 }
 
-bool BLEManagerCommon::blekw_stop_connection_internal(BLE_CONNECTION_OBJECT conId)
+CHIP_ERROR BLEManagerCommon::blekw_stop_connection_internal(BLE_CONNECTION_OBJECT conId)
 {
     ChipLogProgress(DeviceLayer, "Closing BLE GATT connection (con %u)", conId);
 
     if (Gap_Disconnect(conId) != gBleSuccess_c)
     {
         ChipLogProgress(DeviceLayer, "Gap_Disconnect() failed.");
-        return false;
+        return CHIP_ERROR_INTERNAL;
     }
 #if defined(chip_with_low_power) && (chip_with_low_power == 1)
     else
@@ -1446,7 +1426,7 @@ bool BLEManagerCommon::blekw_stop_connection_internal(BLE_CONNECTION_OBJECT conI
     }
 #endif
 
-    return true;
+    return CHIP_NO_ERROR;
 }
 
 } // namespace Internal

@@ -266,7 +266,8 @@ public:
         // Sanitize after use
         ClearSecretData(mBytes);
     }
-
+    SensitiveDataBuffer() {}
+    SensitiveDataBuffer(const SensitiveDataBuffer & other) { *this = other; }
     SensitiveDataBuffer & operator=(const SensitiveDataBuffer & other)
     {
         // Guard self assignment
@@ -1215,7 +1216,7 @@ public:
      *
      * @return Returns a CHIP_ERROR on error, CHIP_NO_ERROR otherwise
      **/
-    CHIP_ERROR GetKeys(SessionKeystore & keystore, HkdfKeyHandle & key) const;
+    CHIP_ERROR GetKeys(SessionKeystore & keystore, HkdfKeyHandle & key);
 
     CHIP_ERROR InternalHash(const uint8_t * in, size_t in_len);
     CHIP_ERROR WriteMN();

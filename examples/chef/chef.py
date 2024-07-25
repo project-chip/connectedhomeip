@@ -199,6 +199,7 @@ def bundle_nrfconnect(device_name: str) -> None:
     nrf_root = os.path.join(_CHEF_SCRIPT_PATH,
                             "nrfconnect",
                             "build",
+                            "nrfconnect",
                             "zephyr")
     scripts_root = os.path.join(_REPO_BASE_PATH,
                                 "scripts",
@@ -696,11 +697,24 @@ def main() -> int:
         if options.build_target == "esp32":
             shell.run_cmd(f"cd {_CHEF_SCRIPT_PATH}/esp32")
             if options.enable_ipv4:
-                shell.run_cmd(
-                    "sed -i 's/CONFIG_DISABLE_IPV4=y/#\\ CONFIG_DISABLE_IPV4\\ is\\ not\\ set/g' sdkconfig ")
+                if sys.platform == "darwin":
+                    shell.run_cmd(
+                        "sed -i '' 's/CONFIG_DISABLE_IPV4=y/#\\ CONFIG_DISABLE_IPV4\\ is\\ not\\ set/g' sdkconfig ")
+                else:
+                    shell.run_cmd(
+                        "sed -i 's/CONFIG_DISABLE_IPV4=y/#\\ CONFIG_DISABLE_IPV4\\ is\\ not\\ set/g' sdkconfig ")
             else:
-                shell.run_cmd(
-                    "sed -i 's/#\\ CONFIG_DISABLE_IPV4\\ is\\ not\\ set/CONFIG_DISABLE_IPV4=y/g' sdkconfig ")
+                if sys.platform == "darwin":
+                    shell.run_cmd(
+                        "sed -i '' 's/#\\ CONFIG_DISABLE_IPV4\\ is\\ not\\ set/CONFIG_DISABLE_IPV4=y/g' sdkconfig ")
+                    shell.run_cmd(
+                        "sed -i '' 's/CONFIG_LWIP_IPV4=y/#\\ CONFIG_LWIP_IPV4\\ is\\ not\\ set/g' sdkconfig ")
+                else:
+                    shell.run_cmd(
+                        "sed -i 's/#\\ CONFIG_DISABLE_IPV4\\ is\\ not\\ set/CONFIG_DISABLE_IPV4=y/g' sdkconfig ")
+                    shell.run_cmd(
+                        "sed -i 's/CONFIG_LWIP_IPV4=y/#\\ CONFIG_LWIP_IPV4\\ is\\ not\\ set/g' sdkconfig ")
+
             shell.run_cmd("idf.py build")
             shell.run_cmd("idf.py build flashing_script")
             shell.run_cmd(
@@ -710,9 +724,10 @@ def main() -> int:
                 f"cp build/$(git rev-parse HEAD)-{options.sample_device_type_name}.tar.xz {_CHEF_SCRIPT_PATH}")
         elif options.build_target == "nrfconnect":
             shell.run_cmd(f"cd {_CHEF_SCRIPT_PATH}/nrfconnect")
-            nrf_build_cmds = ["west build -b nrf52840dk_nrf52840"]
+            nrf_build_cmds = ["west build -b nrf52840dk/nrf52840"]
             if options.do_clean:
                 nrf_build_cmds.append("-p always")
+            nrf_build_cmds.append("--sysbuild")
             nrf_build_cmds.append("--")
             if options.do_rpc:
                 nrf_build_cmds.append("-DOVERLAY_CONFIG=rpc.overlay")
@@ -723,7 +738,7 @@ def main() -> int:
             nrf_build_cmds.append(
                 f"-DCONFIG_CHIP_DEVICE_PRODUCT_NAME='\"{options.pname}\"'")
             nrf_build_cmds.append(
-                f"-DSAMPLE_NAME={options.sample_device_type_name}")
+                f"-DCONFIG_CHEF_DEVICE_TYPE='\"{options.sample_device_type_name}\"'")
             nrf_build_cmds.append(
                 f"-DCONFIG_CHIP_DEVICE_SOFTWARE_VERSION_STRING='\"{sw_ver_string}\"'")
 
@@ -802,6 +817,7 @@ def main() -> int:
                 'chip_shell_cmd_server = false',
                 'chip_build_libshell = true',
                 'chip_enable_openthread = false',
+                'chip_generate_link_map_file = true',
                 'chip_config_network_layer_ble = false',
                 'chip_device_project_config_include = "<CHIPProjectAppConfig.h>"',
                 'chip_project_config_include = "<CHIPProjectAppConfig.h>"',
@@ -868,7 +884,7 @@ def main() -> int:
                         """))
             if options.do_clean:
                 shell.run_cmd("rm -rf out")
-            shell.run_cmd("gn gen out")
+            shell.run_cmd("gn gen --export-compile-commands out")
             shell.run_cmd("ninja -C out")
 
     #

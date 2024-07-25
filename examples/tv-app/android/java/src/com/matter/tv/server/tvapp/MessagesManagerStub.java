@@ -31,13 +31,6 @@ public class MessagesManagerStub implements MessagesManager {
   public MessagesManagerStub(int endpoint) {
     this.endpoint = endpoint;
     Log.d(TAG, "MessagesManagerStub: at " + this.endpoint);
-
-    HashMap<Long, String> responseOptions = new HashMap<Long, String>();
-    responseOptions.put(new Long(1), "Yes");
-    responseOptions.put(new Long(2), "No");
-    presentMessages(
-        "31323334353637383930313233343536", 1, 1, 30, 60, "TestMessage", responseOptions);
-    Log.d(TAG, "MessagesManagerStub: added dummy message");
   }
 
   @Override
@@ -52,7 +45,7 @@ public class MessagesManagerStub implements MessagesManager {
       int priority,
       int messageControl,
       long startTime,
-      int duration,
+      long duration,
       String messageText,
       HashMap<Long, String> responseOptions) {
     Log.d(
@@ -61,15 +54,24 @@ public class MessagesManagerStub implements MessagesManager {
     int i = 0;
 
     for (Map.Entry<Long, String> set : responseOptions.entrySet()) {
-      Log.d(TAG, "presentMessages option: key:" + set.getKey() + " value:" + set.getValue());
+      Log.d(
+          TAG,
+          "presentMessages option: key:" + set.getKey().longValue() + " value:" + set.getValue());
       options[i] = new MessageResponseOption(set.getKey().longValue(), set.getValue());
       i++;
     }
 
-    messages.put(
-        messageId,
-        new Message(
-            messageId, priority, messageControl, startTime, duration, messageText, options));
+    Message message =
+        new Message(messageId, priority, messageControl, startTime, duration, messageText, options);
+    messages.put(messageId, message);
+
+    UserPrompter prompter = UserPrompterResolver.getUserPrompter();
+    if (prompter != null) {
+      prompter.promptWithMessage(message);
+    } else {
+      Log.d(TAG, "presentMessages no global user prompter");
+    }
+
     return true;
   }
 

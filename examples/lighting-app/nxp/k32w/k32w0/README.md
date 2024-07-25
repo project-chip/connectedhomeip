@@ -17,30 +17,37 @@ network.
 <hr>
 
 -   [CHIP K32W061 Lighting Example Application](#chip-k32w061-lighting-example-application)
--   [Introduction](#introduction)
-    -   [Bluetooth LE Advertising](#bluetooth-le-advertising)
-    -   [Bluetooth LE Rendezvous](#bluetooth-le-rendezvous)
--   [Device UI](#device-ui)
--   [Building](#building)
-    -   [Overwrite board config files](#overwrite-board-config-files)
+    -   [Introduction](#introduction)
+        -   [SE051H Secure Element](#se051h-secure-element)
+        -   [Bluetooth LE Advertising](#bluetooth-le-advertising)
+        -   [Bluetooth LE Rendezvous](#bluetooth-le-rendezvous)
+        -   [Thread Provisioning](#thread-provisioning)
+    -   [Device UI](#device-ui)
+        -   [No expansion board](#no-expansion-board)
+        -   [Identify cluster LED state](#identify-cluster-led-state)
+    -   [Building](#building)
+        -   [Overwrite board config files](#overwrite-board-config-files)
     -   [Known issues building](#known-issues-building)
--   [Manufacturing data](#manufacturing-data)
--   [Flashing and debugging](#flashing-and-debugging)
--   [Pigweed Tokenizer](#pigweed-tokenizer)
-    -   [Detokenizer script](#detokenizer-script)
-    -   [Notes](#notes)
-    -   [Known issues tokenizer](#known-issues-tokenizer)
--   [NXP Ultrafast P256 ECC Library](#nxp-ultrafast-p256-ecc-library)
-    -   [Building steps](#building-steps)
--   [Tinycrypt ECC library](#tinycrypt-ecc-library)
-    -   [Building steps](#building-steps-1)
--   [OTA](#ota)
-    -   [Writing the SSBL](#writing-the-ssbl)
-    -   [Writing the PSECT](#writing-the-psect)
-    -   [Writing the application](#writing-the-application)
-    -   [OTA Testing](#ota-testing)
-    -   [Known issues OTA](#known-issues-ota)
-        </hr>
+    -   [Rotating device id](#rotating-device-id)
+    -   [Manufacturing data](#manufacturing-data)
+    -   [Flashing and debugging](#flashing-and-debugging)
+    -   [Pigweed tokenizer](#pigweed-tokenizer)
+        -   [Detokenizer script](#detokenizer-script)
+        -   [Notes](#notes)
+        -   [Known issues tokenizer](#known-issues-tokenizer)
+    -   [NXP Ultrafast P256 ECC Library](#nxp-ultrafast-p256-ecc-library)
+        -   [Building steps](#building-steps)
+    -   [Tinycrypt ECC library](#tinycrypt-ecc-library)
+        -   [Building steps](#building-steps-1)
+    -   [OTA](#ota)
+        -   [Writing the SSBL](#writing-the-ssbl)
+        -   [Features](#features)
+            -   [Multi image](#multi-image)
+            -   [Simple hash verification](#simple-hash-verification)
+        -   [Writing the PSECT](#writing-the-psect)
+        -   [Writing the application](#writing-the-application)
+        -   [OTA Testing](#ota-testing)
+    -   [Known issues ota](#known-issues-ota)
 
 ## Introduction
 
@@ -190,48 +197,51 @@ effects:
 ## Building
 
 In order to build the Project CHIP example, we recommend using a Linux
-distribution (the demo-application was compiled on Ubuntu 20.04).
+distribution (supported Operating Systems are listed in
+[BUILDING.md](../../../../../docs/guides/BUILDING.md#tested-operating systems)).
 
-Activate the Matter environment:
+-   Make sure that below prerequisites are correctly installed (as described in
+    [BUILDING.md](../../../../../docs/guides/BUILDING.md#prerequisites)))
 
-```bash
-user@ubuntu:~/Desktop/git/connectedhomeip$ source ./scripts/activate.sh
+```
+sudo apt-get install git gcc g++ pkg-config libssl-dev libdbus-1-dev \
+     libglib2.0-dev libavahi-client-dev ninja-build python3-venv python3-dev \
+     python3-pip unzip libgirepository1.0-dev libcairo2-dev libreadline-dev
 ```
 
-To bring the SDK in the environment, the user can:
+-   Step 1: checkout NXP specific submodules only
 
--   download it with west tool, in which case it will be handled automatically
-    by gn:
+```
+user@ubuntu:~/Desktop/git/connectedhomeip$ scripts/checkout_submodules.py --shallow --platform nxp --recursive
+```
 
-    ```bash
-    user@ubuntu:~/Desktop/git/connectedhomeip$ cd third_party/nxp/k32w0_sdk/repo
-    user@ubuntu:~/Desktop/git/connectedhomeip/third_party/nxp/k32w0_sdk/repo$ west init -l manifest --mf west.yml
-    user@ubuntu:~/Desktop/git/connectedhomeip/third_party/nxp/k32w0_sdk/repo$ west update
-    ```
+-   Step 2: activate local environment
 
-    In case there are local modification to the already installed github NXP
-    SDK, use the below `west forall` command instead of the `west init` command
-    to reset the west workspace. Warning: all local changes will be lost after
-    running this command.
+```
+user@ubuntu:~/Desktop/git/connectedhomeip$ source scripts/activate.sh
+```
 
-    ```bash
-    user@ubuntu:~/Desktop/git/connectedhomeip$ cd third_party/nxp/k32w0_sdk/repo
-    user@ubuntu:~/Desktop/git/connectedhomeip/third_party/nxp/k32w0_sdk/repo$ west forall -c "git reset --hard && git clean -xdf" -a
-    ```
+If the script says the environment is out of date, you can update it by running
+the following command:
 
--   set up a custom path to the SDK, in which case
-    `k32w0_sdk_root=\"${NXP_K32W0_SDK_ROOT}\"` must be added to the `gn gen`
-    command:
+```
+user@ubuntu:~/Desktop/git/connectedhomeip$ source scripts/bootstrap.sh
+```
 
-    ```
-    user@ubuntu:~/Desktop/git/connectedhomeip$ export NXP_K32W0_SDK_ROOT=/custom/path/to/SDK
-    ```
+-   Step 3: Init NXP SDK(s)
 
-Start building the application:
+```
+user@ubuntu:~/Desktop/git/connectedhomeip$ scripts/setup/nxp/update_nxp_sdk.py --platform k32w0
+```
+
+Note: By default setup/nxp/update_nxp_sdk.py will try to initialize all NXP
+SDKs. Arg "-- help" could be used to view all available options.
+
+-   Start building the application:
 
 ```bash
 user@ubuntu:~/Desktop/git/connectedhomeip$ cd examples/lighting-app/nxp/k32w/k32w0
-user@ubuntu:~/Desktop/git/connectedhomeip/examples/lighting-app/nxp/k32w/k32w0$ gn gen out/debug --args="chip_with_OM15082=1 chip_with_ot_cli=0 is_debug=false chip_crypto=\"platform\" chip_with_se05x=0 chip_pw_tokenizer_logging=true"
+user@ubuntu:~/Desktop/git/connectedhomeip/examples/lighting-app/nxp/k32w/k32w0$ gn gen out/debug
 user@ubuntu:~/Desktop/git/connectedhomeip/examples/lighting-app/nxp/k32w/k32w0$ ninja -C out/debug
 ```
 
@@ -256,6 +266,16 @@ set to 1.
 In case the board doesn't have 32KHz crystal fitted, one can use the 32KHz free
 running oscillator as a clock source. In this case one must set the use_fro_32k
 argument to 1.
+
+K32W0x1 supports antenna diversity feature, which is a technique that maximizes
+the performance of an antenna system, allowing the radio signal to be switched
+between two antennas that have very low correlation between their received
+signals. Typically, this is achieved by spacing two antennas around 0.25
+wavelengths apart or by using 2 orthogonal types of polarization. This is
+controlled by software. K32W0x1 provides an output (`ADO`) on one of `DIO7`,
+`DIO9` or `DIO19` and optionally its complement (`ADE`) on `DIO6` that can be
+used to control an antenna switch. In order to use this feature, user must set
+`use_antenna_diversity` to 1.
 
 In case signing errors are encountered when running the "sign_images.sh" script
 (run automatically) install the recommanded packages (python version > 3, pip3,
@@ -313,7 +333,7 @@ Please use the following build args:
 ## Manufacturing data
 
 See
-[Guide for writing manufacturing data on NXP devices](../../../../../docs/guides/nxp_manufacturing_flow.md).
+[Guide for writing manufacturing data on NXP devices](../../../../../docs/guides/nxp/nxp_manufacturing_flow.md).
 
 There are factory data generated binaries available in
 examples/platform/nxp/k32w/k32w0/scripts/demo_generated_factory_data folder.
@@ -524,10 +544,10 @@ This is the list of all supported partitions:
     00 -----------------> 0x00 Bootable flag
     00 -----------------> 0x00 Image type (0x00 = SSBL)
 
-004000000f020101: Application partition
+00400000c9040101: Application partition
 
     00400000 -----------> 0x00004000 Start Address
-    0f02 ---------------> 0x020f Number of 512-bytes pages
+    c904 ---------------> 0x04c9 Number of 512-bytes pages
     01 -----------------> 0x01 Bootable flag
     01 -----------------> 0x01 Image type (0x01 = Application)
 
@@ -624,14 +644,14 @@ The concept for OTA is the next one:
     informed of the node id of the OTA Provider Application.
 
 _Computer #1_ can be any system running an Ubuntu distribution. We recommand
-using TE 7.5 instructions from
-[here](https://groups.csa-iot.org/wg/matter-csg/document/24839), where RPi 4 are
-proposed. Also, TE 7.5 instructions document point to the OS/Docker images that
-should be used on the RPis. For compatibility reasons, we recommand compiling
-chip-tool and OTA Provider applications with the same commit id that was used
-for compiling the Lighting Application. Also, please note that there is a single
-controller (chip-tool) running on Computer #1 which is used for commissioning
-both the device and the OTA Provider Application. If needed,
+using CSA official instructions from
+[here](https://groups.csa-iot.org/wg/matter-csg/document/28566), where RPi 4 are
+proposed. Also, CSA official instructions document point to the OS/Docker images
+that should be used on the RPis. For compatibility reasons, we recommand
+compiling chip-tool and OTA Provider applications with the same commit id that
+was used for compiling the Lighting Application. Also, please note that there is
+a single controller (chip-tool) running on Computer #1 which is used for
+commissioning both the device and the OTA Provider Application. If needed,
 [these instructions](https://itsfoss.com/connect-wifi-terminal-ubuntu/) could be
 used for connecting the RPis to WiFi.
 

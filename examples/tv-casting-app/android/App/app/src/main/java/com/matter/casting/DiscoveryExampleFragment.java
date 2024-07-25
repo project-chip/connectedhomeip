@@ -38,9 +38,6 @@ import com.matter.casting.support.MatterError;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
-import java.util.concurrent.Executors;
-import java.util.concurrent.ScheduledExecutorService;
-import java.util.concurrent.ScheduledFuture;
 
 public class DiscoveryExampleFragment extends Fragment {
   private static final String TAG = DiscoveryExampleFragment.class.getSimpleName();
@@ -48,9 +45,7 @@ public class DiscoveryExampleFragment extends Fragment {
   private static final Long DISCOVERY_TARGET_DEVICE_TYPE = 35L;
   private static final int DISCOVERY_RUNTIME_SEC = 15;
   private TextView matterDiscoveryMessageTextView;
-  private static final ScheduledExecutorService executorService =
-      Executors.newSingleThreadScheduledExecutor();
-  private ScheduledFuture scheduledFutureTask;
+  public static TextView matterDiscoveryErrorMessageTextView;
   private static final List<CastingPlayer> castingPlayerList = new ArrayList<>();
   private static ArrayAdapter<CastingPlayer> arrayAdapter;
 
@@ -164,15 +159,17 @@ public class DiscoveryExampleFragment extends Fragment {
     matterDiscoveryMessageTextView.setText(
         getString(R.string.matter_discovery_message_initializing_text));
 
+    matterDiscoveryErrorMessageTextView =
+        getActivity().findViewById(R.id.matterDiscoveryErrorTextView);
+    matterDiscoveryErrorMessageTextView.setText(
+        getString(R.string.matter_discovery_error_message_initial));
+
     arrayAdapter = new CastingPlayerArrayAdapter(getActivity(), castingPlayerList);
     final ListView list = getActivity().findViewById(R.id.castingPlayerList);
     list.setAdapter(arrayAdapter);
 
     Log.d(TAG, "onViewCreated() creating callbacks");
 
-    // TODO: In following PRs. Enable startDiscoveryButton and stopDiscoveryButton when
-    //  stopDiscovery is implemented in the core Matter SDK DNS-SD API. Enable in
-    //  fragment_matter_discovery_example.xml
     Button startDiscoveryButton = getView().findViewById(R.id.startDiscoveryButton);
     startDiscoveryButton.setOnClickListener(
         v -> {
@@ -188,8 +185,6 @@ public class DiscoveryExampleFragment extends Fragment {
         v -> {
           Log.i(TAG, "onViewCreated() stopDiscoveryButton button clicked. Calling stopDiscovery()");
           stopDiscovery();
-          Log.i(TAG, "onViewCreated() stopDiscoveryButton button clicked. Canceling future task");
-          scheduledFutureTask.cancel(true);
         });
 
     Button clearDiscoveryResultsButton = getView().findViewById(R.id.clearDiscoveryResultsButton);
@@ -198,13 +193,20 @@ public class DiscoveryExampleFragment extends Fragment {
           Log.i(
               TAG, "onViewCreated() clearDiscoveryResultsButton button clicked. Clearing results");
           arrayAdapter.clear();
+          matterDiscoveryErrorMessageTextView.setText(
+              getString(R.string.matter_discovery_error_message_initial));
         });
   }
 
   @Override
   public void onResume() {
+    Log.i(TAG, "onResume() called");
     super.onResume();
-    Log.i(TAG, "onResume() called. Calling startDiscovery()");
+    MatterError err =
+        matterCastingPlayerDiscovery.removeCastingPlayerChangeListener(castingPlayerChangeListener);
+    if (err.hasError()) {
+      Log.e(TAG, "onResume() removeCastingPlayerChangeListener() err: " + err);
+    }
     if (!startDiscovery()) {
       Log.e(TAG, "onResume() Warning: startDiscovery() call Failed");
     }
@@ -214,22 +216,19 @@ public class DiscoveryExampleFragment extends Fragment {
   public void onPause() {
     super.onPause();
     Log.i(TAG, "onPause() called");
-    // stopDiscovery();
-    // Don't crash the app
-    if (scheduledFutureTask != null) {
-      scheduledFutureTask.cancel(true);
-    }
   }
 
   /** Interface for notifying the host. */
   public interface Callback {
     /** Notifies listener of Connection Button click. */
-    // TODO: In following PRs. Implement CastingPlayer connection
-    void handleConnectionButtonClicked(CastingPlayer castingPlayer);
+    void handleConnectionButtonClicked(
+        CastingPlayer castingPlayer, boolean useCommissionerGeneratedPasscode);
   }
 
   private boolean startDiscovery() {
     Log.i(TAG, "startDiscovery() called");
+    matterDiscoveryErrorMessageTextView.setText(
+        getString(R.string.matter_discovery_error_message_initial));
 
     arrayAdapter.clear();
 
@@ -239,6 +238,8 @@ public class DiscoveryExampleFragment extends Fragment {
         matterCastingPlayerDiscovery.addCastingPlayerChangeListener(castingPlayerChangeListener);
     if (err.hasError()) {
       Log.e(TAG, "startDiscovery() addCastingPlayerChangeListener() called, err Add: " + err);
+      matterDiscoveryErrorMessageTextView.setText(
+          getString(R.string.matter_discovery_error_message_stop_before_starting) + err);
       return false;
     }
     // Start discovery
@@ -246,6 +247,8 @@ public class DiscoveryExampleFragment extends Fragment {
     err = matterCastingPlayerDiscovery.startDiscovery(DISCOVERY_TARGET_DEVICE_TYPE);
     if (err.hasError()) {
       Log.e(TAG, "startDiscovery() startDiscovery() called, err Start: " + err);
+      matterDiscoveryErrorMessageTextView.setText(
+          getString(R.string.matter_discovery_error_message_start_error) + err);
       return false;
     }
 
@@ -253,33 +256,14 @@ public class DiscoveryExampleFragment extends Fragment {
 
     matterDiscoveryMessageTextView.setText(
         getString(R.string.matter_discovery_message_discovering_text));
-    Log.d(
-        TAG,
-        "startDiscovery() text set to: "
-            + getString(R.string.matter_discovery_message_discovering_text));
-
-    // TODO: In following PRs. Enable this to auto-stop discovery after stopDiscovery is
-    //  implemented in the core Matter SKD DNS-SD API.
-    // Schedule a service to stop discovery and remove the CastingPlayerChangeListener
-    // Safe to call if discovery is not running
-    //    scheduledFutureTask =
-    //        executorService.schedule(
-    //            () -> {
-    //              Log.i(
-    //                  TAG,
-    //                  "startDiscovery() executorService "
-    //                      + DISCOVERY_RUNTIME_SEC
-    //                      + " seconds timer expired. Auto-calling stopDiscovery()");
-    //              stopDiscovery();
-    //            },
-    //            DISCOVERY_RUNTIME_SEC,
-    //            TimeUnit.SECONDS);
 
     return true;
   }
 
   private void stopDiscovery() {
     Log.i(TAG, "stopDiscovery() called");
+    matterDiscoveryErrorMessageTextView.setText(
+        getString(R.string.matter_discovery_error_message_initial));
 
     // Stop discovery
     MatterError err = matterCastingPlayerDiscovery.stopDiscovery();
@@ -287,8 +271,9 @@ public class DiscoveryExampleFragment extends Fragment {
       Log.e(
           TAG,
           "stopDiscovery() MatterCastingPlayerDiscovery.stopDiscovery() called, err Stop: " + err);
+      matterDiscoveryErrorMessageTextView.setText(
+          getString(R.string.matter_discovery_error_message_stop_error) + err);
     } else {
-      // TODO: In following PRs. Implement stop discovery in the Android core API.
       Log.d(TAG, "stopDiscovery() MatterCastingPlayerDiscovery.stopDiscovery() success");
     }
 
@@ -308,6 +293,8 @@ public class DiscoveryExampleFragment extends Fragment {
           TAG,
           "stopDiscovery() matterCastingPlayerDiscovery.removeCastingPlayerChangeListener() called, err Remove: "
               + err);
+      matterDiscoveryErrorMessageTextView.setText(
+          getString(R.string.matter_discovery_error_message_stop_error) + err);
     }
   }
 }
@@ -333,6 +320,8 @@ class CastingPlayerArrayAdapter extends ArrayAdapter<CastingPlayer> {
     Button playerDescription = view.findViewById(R.id.commissionable_player_description);
     playerDescription.setText(buttonText);
 
+    // OnClickListener for the CastingPLayer button, to be used for the Commissionee-Generated
+    // passcode commissioning flow.
     View.OnClickListener clickListener =
         v -> {
           CastingPlayer castingPlayer = playerList.get(i);
@@ -340,10 +329,39 @@ class CastingPlayerArrayAdapter extends ArrayAdapter<CastingPlayer> {
               TAG,
               "OnClickListener.onClick() called for CastingPlayer with deviceId: "
                   + castingPlayer.getDeviceId());
-          DiscoveryExampleFragment.Callback callback1 = (DiscoveryExampleFragment.Callback) context;
-          callback1.handleConnectionButtonClicked(castingPlayer);
+          DiscoveryExampleFragment.Callback onClickCallback =
+              (DiscoveryExampleFragment.Callback) context;
+          onClickCallback.handleConnectionButtonClicked(castingPlayer, false);
         };
     playerDescription.setOnClickListener(clickListener);
+
+    // OnLongClickListener for the CastingPLayer button, to be used for the Commissioner-Generated
+    // passcode commissioning flow.
+    View.OnLongClickListener longClickListener =
+        v -> {
+          CastingPlayer castingPlayer = playerList.get(i);
+          if (!castingPlayer.getSupportsCommissionerGeneratedPasscode()) {
+            Log.e(
+                TAG,
+                "OnLongClickListener.onLongClick() called for CastingPlayer with deviceId "
+                    + castingPlayer.getDeviceId()
+                    + ". This CastingPlayer does not support Commissioner-Generated passcode commissioning.");
+
+            DiscoveryExampleFragment.matterDiscoveryErrorMessageTextView.setText(
+                "The selected Casting Player does not support Commissioner-Generated passcode commissioning");
+            return true;
+          }
+          Log.d(
+              TAG,
+              "OnLongClickListener.onLongClick() called for CastingPlayer with deviceId "
+                  + castingPlayer.getDeviceId()
+                  + ", attempting the Commissioner-Generated passcode commissioning flow.");
+          DiscoveryExampleFragment.Callback onClickCallback =
+              (DiscoveryExampleFragment.Callback) context;
+          onClickCallback.handleConnectionButtonClicked(castingPlayer, true);
+          return true;
+        };
+    playerDescription.setOnLongClickListener(longClickListener);
     return view;
   }
 
@@ -363,6 +381,10 @@ class CastingPlayerArrayAdapter extends ArrayAdapter<CastingPlayer> {
             ? (aux.isEmpty() ? "" : ", ") + "Device Type: " + player.getDeviceType()
             : "";
     aux += (aux.isEmpty() ? "" : ", ") + "Resolved IP?: " + (player.getIpAddresses().size() > 0);
+    aux +=
+        (aux.isEmpty() ? "" : ", ")
+            + "Supports Commissioner-Generated Passcode: "
+            + (player.getSupportsCommissionerGeneratedPasscode());
 
     aux = aux.isEmpty() ? aux : "\n" + aux;
     return main + aux;

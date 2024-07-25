@@ -44,6 +44,7 @@ public:
     void LogNodeLookup(NodeLookupInfo &) override;
     void LogNodeDiscovered(NodeDiscoveredInfo &) override;
     void LogNodeDiscoveryFailed(NodeDiscoveryFailedInfo &) override;
+    void LogMetricEvent(const MetricEvent &) override;
 };
 
 } // namespace Perfetto

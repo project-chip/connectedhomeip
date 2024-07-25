@@ -23,7 +23,7 @@
 
 #pragma once
 
-#include <ble/BleLayer.h>
+#include <ble/Ble.h>
 #include <platform/internal/BLEManager.h>
 
 #if CHIP_DEVICE_CONFIG_ENABLE_CHIPOBLE
@@ -31,11 +31,11 @@
 #include "ChipDeviceScanner.h"
 #include <luna-service2/lunaservice.h>
 
+#include <string>
+
 namespace chip {
 namespace DeviceLayer {
 namespace Internal {
-
-void HandleIncomingBleConnection(Ble::BLEEndPoint * bleEP);
 
 enum class BleScanState : uint8_t
 {
@@ -110,20 +110,16 @@ private:
 
     // ===== Members that implement virtual methods on BlePlatformDelegate.
 
-    bool SubscribeCharacteristic(BLE_CONNECTION_OBJECT conId, const Ble::ChipBleUUID * svcId,
-                                 const Ble::ChipBleUUID * charId) override;
-    bool UnsubscribeCharacteristic(BLE_CONNECTION_OBJECT conId, const Ble::ChipBleUUID * svcId,
-                                   const Ble::ChipBleUUID * charId) override;
-    bool CloseConnection(BLE_CONNECTION_OBJECT conId) override;
+    CHIP_ERROR SubscribeCharacteristic(BLE_CONNECTION_OBJECT conId, const Ble::ChipBleUUID * svcId,
+                                       const Ble::ChipBleUUID * charId) override;
+    CHIP_ERROR UnsubscribeCharacteristic(BLE_CONNECTION_OBJECT conId, const Ble::ChipBleUUID * svcId,
+                                         const Ble::ChipBleUUID * charId) override;
+    CHIP_ERROR CloseConnection(BLE_CONNECTION_OBJECT conId) override;
     uint16_t GetMTU(BLE_CONNECTION_OBJECT conId) const override;
-    bool SendIndication(BLE_CONNECTION_OBJECT conId, const Ble::ChipBleUUID * svcId, const Ble::ChipBleUUID * charId,
-                        System::PacketBufferHandle pBuf) override;
-    bool SendWriteRequest(BLE_CONNECTION_OBJECT conId, const Ble::ChipBleUUID * svcId, const Ble::ChipBleUUID * charId,
-                          System::PacketBufferHandle pBuf) override;
-    bool SendReadRequest(BLE_CONNECTION_OBJECT conId, const Ble::ChipBleUUID * svcId, const Ble::ChipBleUUID * charId,
-                         System::PacketBufferHandle pBuf) override;
-    bool SendReadResponse(BLE_CONNECTION_OBJECT conId, BLE_READ_REQUEST_CONTEXT requestContext, const Ble::ChipBleUUID * svcId,
-                          const Ble::ChipBleUUID * charId) override;
+    CHIP_ERROR SendIndication(BLE_CONNECTION_OBJECT conId, const Ble::ChipBleUUID * svcId, const Ble::ChipBleUUID * charId,
+                              System::PacketBufferHandle pBuf) override;
+    CHIP_ERROR SendWriteRequest(BLE_CONNECTION_OBJECT conId, const Ble::ChipBleUUID * svcId, const Ble::ChipBleUUID * charId,
+                                System::PacketBufferHandle pBuf) override;
 
     // ===== Members that implement virtual methods on BleApplicationDelegate.
 
@@ -178,9 +174,9 @@ private:
         bool isChipDevice;
     };
 
-    bool SendWriteRequestToWebOS(void * bleConnObj, const uint8_t * svcId, const uint8_t * charId, const uint8_t * pBuf,
-                                 uint32_t pBufDataLen);
-    bool SubscribeCharacteristicToWebOS(void * bleConnObj, const uint8_t * svcId, const uint8_t * charId);
+    CHIP_ERROR SendWriteRequestToWebOS(void * bleConnObj, const uint8_t * svcId, const uint8_t * charId, const uint8_t * pBuf,
+                                       uint32_t pBufDataLen);
+    CHIP_ERROR SubscribeCharacteristicToWebOS(void * bleConnObj, const uint8_t * svcId, const uint8_t * charId);
 
     void InitConnectionData(void);
     void AddConnectionData(const char * remoteAddr);

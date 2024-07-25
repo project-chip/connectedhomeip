@@ -40,7 +40,8 @@ public:
     CHIP_ERROR ConfirmCurrentImage() override;
 
     void SetOTADownloader(OTADownloader * downloader) { mDownloader = downloader; }
-    void SetOTAImageFile(const char * imageFile) { mImageFile = imageFile; }
+    CHIP_ERROR Init(OTADownloader * downloader);
+    static OTAImageProcessorImpl & GetDefaultInstance();
 
 private:
     //////////// Actual handlers for the OTAImageProcessorInterface ///////////////
@@ -68,7 +69,6 @@ private:
     MutableByteSpan mBlock;
     OTADownloader * mDownloader;
     OTAImageHeaderParser mHeaderParser;
-    const char * mImageFile                 = nullptr;
     static constexpr size_t kAlignmentBytes = 64;
     // Intermediate, word-aligned buffer for writing to the bootloader storage.
     // Bootloader storage API requires the buffer size to be a multiple of 4.

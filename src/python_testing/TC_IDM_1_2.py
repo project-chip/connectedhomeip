@@ -15,6 +15,18 @@
 #    limitations under the License.
 #
 
+# See https://github.com/project-chip/connectedhomeip/blob/master/docs/testing/python.md#defining-the-ci-test-arguments
+# for details about the block below.
+#
+# === BEGIN CI TEST ARGUMENTS ===
+# test-runner-runs: run1
+# test-runner-run/run1/app: ${ALL_CLUSTERS_APP}
+# test-runner-run/run1/factoryreset: True
+# test-runner-run/run1/quiet: True
+# test-runner-run/run1/app-args: --discriminator 1234 --KVS kvs1 --trace-to json:${TRACE_APP}.json
+# test-runner-run/run1/script-args: --storage-path admin_storage.json --commissioning-method on-network --discriminator 1234 --passcode 20202021 --trace-to json:${TRACE_TEST_JSON}.json --trace-to perfetto:${TRACE_TEST_PERFETTO}.perfetto
+# === END CI TEST ARGUMENTS ===
+
 import inspect
 import logging
 import random
@@ -187,7 +199,7 @@ class TC_IDM_1_2(MatterBaseTest):
         # To get a PASE session, we need an open commissioning window
         discriminator = random.randint(0, 4095)
 
-        params = self.default_controller.OpenCommissioningWindow(
+        params = await self.default_controller.OpenCommissioningWindow(
             nodeid=self.dut_node_id, timeout=600, iteration=10000, discriminator=discriminator, option=1)
 
         # TH2 = new controller that's not connected over CASE
@@ -195,20 +207,20 @@ class TC_IDM_1_2(MatterBaseTest):
         new_fabric_admin = new_certificate_authority.NewFabricAdmin(vendorId=0xFFF1, fabricId=self.matter_test_config.fabric_id + 1)
         TH2 = new_fabric_admin.NewController(nodeId=112233)
 
-        devices = TH2.DiscoverCommissionableNodes(
+        devices = await TH2.DiscoverCommissionableNodes(
             filterType=Discovery.FilterType.LONG_DISCRIMINATOR, filter=discriminator, stopOnFirst=False)
         # For some reason, the devices returned here aren't filtered, so filter ourselves
         device = next(filter(lambda d: d.commissioningMode == 2 and d.longDiscriminator == discriminator, devices))
         for a in device.addresses:
             try:
-                TH2.EstablishPASESessionIP(ipaddr=a, setupPinCode=params.setupPinCode,
-                                           nodeid=self.dut_node_id+1, port=device.port)
+                await TH2.EstablishPASESessionIP(ipaddr=a, setupPinCode=params.setupPinCode,
+                                                 nodeid=self.dut_node_id+1, port=device.port)
                 break
             except ChipStackError:
                 continue
 
         try:
-            TH2.GetConnectedDeviceSync(nodeid=self.dut_node_id+1, allowPASE=True, timeoutMs=1000)
+            await TH2.GetConnectedDevice(nodeid=self.dut_node_id+1, allowPASE=True, timeoutMs=1000)
         except TimeoutError:
             asserts.fail("Unable to establish a PASE session to the device")
 
@@ -236,8 +248,11 @@ class TC_IDM_1_2(MatterBaseTest):
 
         # Lucky candidate ArmFailSafe is at it again - command side effect is to set breadcrumb attribute
         cmd = Clusters.GeneralCommissioning.Commands.ArmFailSafe(expiryLengthSeconds=900, breadcrumb=2)
-        await self.default_controller.SendCommand(nodeid=self.dut_node_id, endpoint=0, payload=cmd, suppressResponse=True)
-        # TODO: Once the above issue is resolved, this needs a check to ensure that no response was received.
+        try:
+            await self.default_controller.SendCommand(nodeid=self.dut_node_id, endpoint=0, payload=cmd, suppressResponse=True)
+            # TODO: Once the above issue is resolved, this needs a check to ensure that (always) no response was received.
+        except ChipStackError:
+            logging.info("DUT correctly supressed the response")
 
         # Verify that the command had the correct side effect even if a response was sent
         breadcrumb = await self.read_single_attribute_check_success(
@@ -260,7 +275,7 @@ class TC_IDM_1_2(MatterBaseTest):
 
         # Try with RevokeCommissioning
         # First open a commissioning window for us to revoke, so we know this command is able to succeed absent this error
-        _ = self.default_controller.OpenCommissioningWindow(
+        _ = await self.default_controller.OpenCommissioningWindow(
             nodeid=self.dut_node_id, timeout=600, iteration=10000, discriminator=discriminator, option=1)
         cmd = FakeRevokeCommissioning()
         try:

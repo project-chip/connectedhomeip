@@ -22,6 +22,8 @@
 
 #pragma once
 
+#include <stddef.h>
+
 namespace chip {
 
 /**
@@ -44,7 +46,7 @@ public:
     virtual bool Next(T & item) = 0;
     /**
      * Release the memory allocated by this iterator.
-     * Must be called before the iterator goes out of scope in the iterator was dynamically allocated.
+     * Must be called before the iterator goes out of scope if the iterator was dynamically allocated.
      */
     virtual void Release() = 0;
 

@@ -13,8 +13,7 @@ limitations under the License.
 -->
 <configurator>
   <domain name="Energy Management"/>
-
-  <enum name="StateEnum" type="enum8" apiMaturity="provisional">
+  <enum name="StateEnum" type="enum8">
     <cluster code="0x0099"/>
     <item name="NotPluggedIn" value="0x00"/>
     <item name="PluggedInNoDemand" value="0x01"/>
@@ -25,16 +24,17 @@ limitations under the License.
     <item name="Fault" value="0x06"/>
   </enum>
 
-  <enum name="SupplyStateEnum" type="enum8" apiMaturity="provisional">
+  <enum name="SupplyStateEnum" type="enum8">
     <cluster code="0x0099"/>
     <item name="Disabled" value="0x00"/>
     <item name="ChargingEnabled" value="0x01"/>
     <item name="DischargingEnabled" value="0x02"/>
     <item name="DisabledError" value="0x03"/>
     <item name="DisabledDiagnostics" value="0x04"/>
+    <item name="Enabled" value="0x05"/>
   </enum>
 
-  <enum name="FaultStateEnum" type="enum8" apiMaturity="provisional">
+  <enum name="FaultStateEnum" type="enum8">
     <cluster code="0x0099"/>
     <item name="NoError" value="0x00"/>
     <item name="MeterFailure" value="0x01"/>
@@ -55,7 +55,7 @@ limitations under the License.
     <item name="Other" value="0xFF"/>
   </enum>
 
-  <enum name="EnergyTransferStoppedReasonEnum" type="enum8" apiMaturity="provisional">
+  <enum name="EnergyTransferStoppedReasonEnum" type="enum8">
     <cluster code="0x0099"/>
     <item name="EVStopped" value="0x00"/>
     <item name="EVSEStopped" value="0x01"/>
@@ -75,7 +75,7 @@ limitations under the License.
 
   <struct name="ChargingTargetStruct" apiMaturity="provisional">
     <cluster code="0x0099"/>
-    <item fieldId="0" name="TargetTimeMinutesPastMidnight" type="int16u" min="0" max="1439" default="0"/>
+    <item fieldId="0" name="TargetTimeMinutesPastMidnight" type="int16u" max="1439" default="0"/>
     <item fieldId="1" name="TargetSoC" type="percent" optional="true" default="0"/>
     <item fieldId="2" name="AddedEnergy" type="energy_mwh" min="0" optional="true" default="0"/>
   </struct>
@@ -86,7 +86,7 @@ limitations under the License.
     <item fieldId="1" name="ChargingTargets" array="true" type="ChargingTargetStruct" length="10"/>
   </struct>
 
-  <cluster apiMaturity="provisional">
+  <cluster>
     <name>Energy EVSE</name>
     <domain>Energy Management</domain>
     <code>0x0099</code>
@@ -94,23 +94,39 @@ limitations under the License.
     <client init="false" tick="false">true</client>
     <server init="false" tick="false">true</server>
     <description>Electric Vehicle Supply Equipment (EVSE) is equipment used to charge an Electric Vehicle (EV) or Plug-In Hybrid Electric Vehicle. This cluster provides an interface to the functionality of Electric Vehicle Supply Equipment (EVSE) management.</description>
-    <globalAttribute side="either" code="0xFFFD" value="2"/>
-
+    <globalAttribute side="either" code="0xFFFD" value="4"/>
+    <features>
+      <feature bit="0" code="PREF" name="ChargingPreferences" summary="EVSE supports storing user charging preferences">
+        <otherwiseConform>
+          <provisionalConform/>
+          <mandatoryConform/>
+        </otherwiseConform>
+      </feature>
+      <feature bit="1" code="SOC" name="SoCReporting" summary="EVSE supports reporting of vehicle State of Charge (SoC)">
+        <provisionalConform/>
+      </feature>
+      <feature bit="2" code="PNC" name="PlugAndCharge" summary="EVSE supports PLC to support Plug and Charge">
+        <provisionalConform/>
+      </feature>
+      <feature bit="3" code="RFID" name="RFID" summary="EVSE is fitted with an RFID reader">
+        <optionalConform/>
+      </feature>
+      <feature bit="4" code="V2X" name="V2X" summary="EVSE supports bi-directional charging / discharging">
+        <provisionalConform/>
+      </feature>
+    </features>
     <!--Attributes-->
-    
-    <attribute code="0x0000" side="server" type="StateEnum" define="STATE" isNullable="true" writable="false" optional="false" min="0x00" max="0x06">State</attribute>
-    <attribute code="0x0001" side="server" type="SupplyStateEnum" define="SUPPLY_STATE" writable="false" optional="false" min="0x00" max="0x04">SupplyState</attribute>
-    <attribute code="0x0002" side="server" type="FaultStateEnum" define="FAULT_STATE" writable="false" optional="false" min="0x00" max="0xFF">FaultState</attribute>
-    <attribute code="0x0003" side="server" type="epoch_s" define="CHARGING_ENABLED_UNTIL" isNullable="true" default="0" writable="false" optional="false">ChargingEnabledUntil</attribute>
+    <attribute code="0x0000" side="server" type="StateEnum" define="STATE" isNullable="true" min="0x00" max="0x06">State</attribute>
+    <attribute code="0x0001" side="server" type="SupplyStateEnum" define="SUPPLY_STATE" min="0x00" max="0x05">SupplyState</attribute>
+    <attribute code="0x0002" side="server" type="FaultStateEnum" define="FAULT_STATE" min="0x00" max="0xFF">FaultState</attribute>
+    <attribute code="0x0003" side="server" type="epoch_s" define="CHARGING_ENABLED_UNTIL" isNullable="true" default="0">ChargingEnabledUntil</attribute>
     <!--Conformance feature V2X - for now optional-->
-    
-    <attribute code="0x0004" side="server" type="epoch_s" define="DISCHARGING_ENABLED_UNTIL" isNullable="true" default="0" writable="false" optional="true">DischargingEnabledUntil</attribute>
-    <attribute code="0x0005" side="server" type="amperage_ma" define="CIRCUIT_CAPACITY" default="0" min="0" max="80000" writable="false" optional="false">CircuitCapacity</attribute>
-    <attribute code="0x0006" side="server" type="amperage_ma" define="MINIMUM_CHARGE_CURRENT" default="6000" min="0" max="80000" writable="false" optional="false">MinimumChargeCurrent</attribute>
-    <attribute code="0x0007" side="server" type="amperage_ma" define="MAXIMUM_CHARGE_CURRENT" default="0" min="0" max="80000" writable="false" optional="false">MaximumChargeCurrent</attribute>
+    <attribute code="0x0004" side="server" type="epoch_s" define="DISCHARGING_ENABLED_UNTIL" isNullable="true" default="0" optional="true">DischargingEnabledUntil</attribute>
+    <attribute code="0x0005" side="server" type="amperage_ma" define="CIRCUIT_CAPACITY" default="0" min="0">CircuitCapacity</attribute>
+    <attribute code="0x0006" side="server" type="amperage_ma" define="MINIMUM_CHARGE_CURRENT" default="6000" min="0">MinimumChargeCurrent</attribute>
+    <attribute code="0x0007" side="server" type="amperage_ma" define="MAXIMUM_CHARGE_CURRENT" default="0" min="0">MaximumChargeCurrent</attribute>
     <!--Conformance feature V2X - for now optional-->
-    
-    <attribute code="0x0008" side="server" type="amperage_ma" define="MAXIMUM_DISCHARGE_CURRENT" default="0" min="0" max="80000" writable="false" optional="true">MaximumDischargeCurrent</attribute>
+    <attribute code="0x0008" side="server" type="amperage_ma" define="MAXIMUM_DISCHARGE_CURRENT" default="0" min="0" optional="true">MaximumDischargeCurrent</attribute>
     <attribute code="0x0009" side="server" type="amperage_ma" define="USER_MAXIMUM_CHARGE_CURRENT" default="0" writable="true" optional="true">
       <access op="write" privilege="manage"/>
       <description>UserMaximumChargeCurrent</description>
@@ -120,117 +136,113 @@ limitations under the License.
       <description>RandomizationDelayWindow</description>
     </attribute>
     <!--Conformance feature PREF - for now optional-->
-    
     <!--Conformance feature PREF - for now optional-->
-    
     <!--Conformance feature PREF - for now optional-->
-    
-    <attribute code="0x0023" side="server" type="epoch_s" define="NEXT_CHARGE_START_TIME" isNullable="true" writable="false" optional="true">NextChargeStartTime</attribute>
+    <attribute code="0x0023" side="server" type="epoch_s" define="NEXT_CHARGE_START_TIME" isNullable="true" optional="true">NextChargeStartTime</attribute>
     <!--Conformance feature PREF - for now optional-->
-    
-    <attribute code="0x0024" side="server" type="epoch_s" define="NEXT_CHARGE_TARGET_TIME" isNullable="true" writable="false" optional="true">NextChargeTargetTime</attribute>
+    <attribute code="0x0024" side="server" type="epoch_s" define="NEXT_CHARGE_TARGET_TIME" isNullable="true" optional="true">NextChargeTargetTime</attribute>
     <!--Conformance feature PREF - for now optional-->
-    
-    <attribute code="0x0025" side="server" type="energy_mwh" define="NEXT_CHARGE_REQUIRED_ENERGY" isNullable="true" min="0" writable="false" optional="true">NextChargeRequiredEnergy</attribute>
+    <attribute code="0x0025" side="server" type="energy_mwh" define="NEXT_CHARGE_REQUIRED_ENERGY" isNullable="true" min="0" optional="true">NextChargeRequiredEnergy</attribute>
     <!--Conformance feature PREF - for now optional-->
-    
-    <attribute code="0x0026" side="server" type="percent" define="NEXT_CHARGE_TARGET_SOC" isNullable="true" writable="false" optional="true">NextChargeTargetSoC</attribute>
+    <attribute code="0x0026" side="server" type="percent" define="NEXT_CHARGE_TARGET_SOC" isNullable="true" optional="true">NextChargeTargetSoC</attribute>
     <!--Conformance feature [PREF] - for now optional-->
-    
-    <attribute code="0x0027" side="server" type="int16u" define="APPROXIMATE_EV_EFFICIENCY" isNullable="true" writable="true" optional="true">
+    <attribute code="0x0027" side="server" type="int16u" define="APPROXIMATE_EV_EFFICIENCY" isNullable="true" writable="true" optional="true" max="0xFFFE">
       <access op="write" privilege="manage"/>
       <description>ApproximateEVEfficiency</description>
     </attribute>
     <!--Conformance feature SOC - for now optional-->
-    
-    <attribute code="0x0030" side="server" type="percent" define="STATE_OF_CHARGE" isNullable="true" writable="false" optional="true">StateOfCharge</attribute>
+    <attribute code="0x0030" side="server" type="percent" define="STATE_OF_CHARGE" isNullable="true" optional="true">StateOfCharge</attribute>
     <!--Conformance feature SOC - for now optional-->
-    
-    <attribute code="0x0031" side="server" type="energy_mwh" define="BATTERY_CAPACITY" isNullable="true" min="0" writable="false" optional="true">BatteryCapacity</attribute>
+    <attribute code="0x0031" side="server" type="energy_mwh" define="BATTERY_CAPACITY" isNullable="true" min="0" optional="true">BatteryCapacity</attribute>
     <!--Conformance feature PNC - for now optional-->
-    
-    <attribute code="0x0032" side="server" type="char_string" define="VEHICLE_ID" isNullable="true" length="32" writable="false" optional="true">VehicleID</attribute>
-    <attribute code="0x0040" side="server" type="int32u" define="SESSION_ID" isNullable="true" writable="false" optional="false">SessionID</attribute>
-    <attribute code="0x0041" side="server" type="elapsed_s" define="SESSION_DURATION" isNullable="true" writable="false" optional="false">SessionDuration</attribute>
-    <attribute code="0x0042" side="server" type="energy_mwh" define="SESSION_ENERGY_CHARGED" isNullable="true" min="0" writable="false" optional="false">SessionEnergyCharged</attribute>
+    <attribute code="0x0032" side="server" type="char_string" define="VEHICLE_ID" isNullable="true" length="32" optional="true">VehicleID</attribute>
+    <attribute code="0x0040" side="server" type="int32u" define="SESSION_ID" isNullable="true">SessionID</attribute>
+    <attribute code="0x0041" side="server" type="elapsed_s" define="SESSION_DURATION" isNullable="true">SessionDuration</attribute>
+    <attribute code="0x0042" side="server" type="energy_mwh" define="SESSION_ENERGY_CHARGED" isNullable="true" min="0">SessionEnergyCharged</attribute>
     <!--Conformance feature V2X - for now optional-->
-    
-    <attribute code="0x0043" side="server" type="energy_mwh" define="SESSION_ENERGY_DISCHARGED" isNullable="true" min="0" writable="false" optional="true">SessionEnergyDischarged</attribute>
+    <attribute code="0x0043" side="server" type="energy_mwh" define="SESSION_ENERGY_DISCHARGED" isNullable="true" min="0" optional="true">SessionEnergyDischarged</attribute>
     <command source="client" code="0x01" name="Disable" optional="false" mustUseTimedInvoke="true" apiMaturity="provisional">
       <description>Allows a client to disable the EVSE from charging and discharging.</description>
     </command>
-    <command source="client" code="0x02" name="EnableCharging" optional="false" mustUseTimedInvoke="true" apiMaturity="provisional">
-      <arg name="ChargingEnabledUntil" type="epoch_s" isNullable="true"/>
-      <arg name="MinimumChargeCurrent" type="amperage_ma" min="0" max="80000"/>
-      <arg name="MaximumChargeCurrent" type="amperage_ma" min="0" max="80000"/>
-      <description>Allows a client to enable the EVSE to charge an EV.</description>
+
+    <command source="client" code="0x02" name="EnableCharging" optional="false" mustUseTimedInvoke="true">
+      <arg id="0" name="ChargingEnabledUntil" type="epoch_s" isNullable="true"/>
+      <arg id="1" name="MinimumChargeCurrent" type="amperage_ma" min="0"/>
+      <arg id="2" name="MaximumChargeCurrent" type="amperage_ma" min="0"/>
+      <description>This command allows a client to enable the EVSE to charge an EV,</description>
     </command>
+
     <command source="client" code="0x03" name="EnableDischarging" optional="true" mustUseTimedInvoke="true" apiMaturity="provisional">
-      <arg name="DischargingEnabledUntil" type="epoch_s" isNullable="true"/>
-      <arg name="MaximumDischargeCurrent" type="amperage_ma" min="0" max="80000"/>
-      <description>Allows a client to enable the EVSE to discharge an EV.</description>
+      <arg id="0" name="DischargingEnabledUntil" type="epoch_s" isNullable="true"/>
+      <arg id="1" name="MaximumDischargeCurrent" type="amperage_ma" min="0"/>
+      <description>Upon receipt, this SHALL allow a client to enable the discharge of an EV,</description>
     </command>
-    <command source="client" code="0x04" name="StartDiagnostics" optional="true" mustUseTimedInvoke="true" apiMaturity="provisional">
+
+    <command source="client" code="0x04" name="StartDiagnostics" optional="true" mustUseTimedInvoke="true">
       <description>Allows a client to put the EVSE into a self-diagnostics mode.</description>
     </command>
+
     <command source="client" code="0x05" name="SetTargets" optional="true" mustUseTimedInvoke="true" apiMaturity="provisional">
-      <arg name="ChargingTargetSchedules" type="ChargingTargetScheduleStruct" array="true" length="7"/>
+      <arg id="0" name="ChargingTargetSchedules" type="ChargingTargetScheduleStruct" array="true" length="7"/>
       <description>Allows a client to set the user specified charging targets.</description>
     </command>
+
     <command source="client" code="0x06" name="GetTargets" optional="true" response="GetTargetsResponse" mustUseTimedInvoke="true" apiMaturity="provisional">
-      <description>Allows a client to retrieve the user specified charging targets.</description>
+      <description>Allows a client to retrieve the current set of charging targets.</description>
     </command>
+
     <command source="client" code="0x07" name="ClearTargets" optional="true" mustUseTimedInvoke="true" apiMaturity="provisional">
       <description>Allows a client to clear all stored charging targets.</description>
     </command>
-    <command source="server" code="0x00" name="GetTargetsResponse" optional="true" apiMaturity="provisional">
-      <arg name="ChargingTargetSchedules" type="ChargingTargetScheduleStruct" array="true" length="7"/>
+
+    <command source="server" code="0x00" name="GetTargetsResponse" optional="true" apiMaturity="provisional" disableDefaultResponse="true">
+      <arg id="0" name="ChargingTargetSchedules" type="ChargingTargetScheduleStruct" array="true" length="7"/>
       <description>The GetTargetsResponse is sent in response to the GetTargets Command.</description>
     </command>
-    <event side="server" code="0x00" name="EVConnected" priority="info" apiMaturity="provisional">
+
+    <event side="server" code="0x00" name="EVConnected" priority="info">
       <description>EVConnected</description>
-      <field id="0" name="SessionID" type="int32u" apiMaturity="provisional"/>
+      <field id="0" name="SessionID" type="int32u"/>
     </event>
-    <event side="server" code="0x01" name="EVNotDetected" priority="info" apiMaturity="provisional">
+
+    <event side="server" code="0x01" name="EVNotDetected" priority="info">
       <description>EVNotDetected</description>
-      <field id="0" name="SessionID" type="int32u" apiMaturity="provisional"/>
-      <field id="1" name="State" type="StateEnum" apiMaturity="provisional" min="0x00" max="0x06"/>
-      <field id="2" name="SessionDuration" type="elapsed_s" apiMaturity="provisional"/>
-      <field id="3" name="SessionEnergyCharged" type="energy_mwh" min="0" apiMaturity="provisional"/>
+      <field id="0" name="SessionID" type="int32u"/>
+      <field id="1" name="State" type="StateEnum" min="0x00" max="0x06"/>
+      <field id="2" name="SessionDuration" type="elapsed_s"/>
+      <field id="3" name="SessionEnergyCharged" type="energy_mwh" min="0"/>
       <field id="4" name="SessionEnergyDischarged" type="energy_mwh" min="0" optional="true" apiMaturity="provisional"/>
     </event>
-    <event side="server" code="0x02" name="EnergyTransferStarted" priority="info" apiMaturity="provisional">
-      <description>EnergyTransferStarted</description>
-      <field id="0" name="SessionID" type="int32u" apiMaturity="provisional"/>
-      <field id="1" name="State" type="StateEnum" apiMaturity="provisional" min="0x00" max="0x06"/>
-      <field id="2" name="MaximumCurrent" type="amperage_ma" min="0" max="80000" apiMaturity="provisional"/>
-    </event>
-    <event side="server" code="0x03" name="EnergyTransferStopped" priority="info" apiMaturity="provisional">
-      <description>EnergyTransferStopped</description>
-      <field id="0" name="SessionID" type="int32u" apiMaturity="provisional"/>
-      <field id="1" name="State" type="StateEnum" apiMaturity="provisional" min="0x00" max="0x06"/>
-      <field id="2" name="Reason" type="EnergyTransferStoppedReasonEnum" apiMaturity="provisional" min="0x00" max="0x02"/>
-      <field id="4" name="EnergyTransferred" type="energy_mwh" min="0" apiMaturity="provisional"/>
-    </event>
-    <event side="server" code="0x04" name="Fault" priority="critical" apiMaturity="provisional">
-      <description>Fault</description>
-      <field id="0" name="SessionID" type="int32u" isNullable="true" apiMaturity="provisional"/>
-      <field id="1" name="State" type="StateEnum" apiMaturity="provisional" min="0x00" max="0x06"/>
-      <field id="2" name="FaultStatePreviousState" type="FaultStateEnum" apiMaturity="provisional" min="0x00" max="0xFF"/>
-      <field id="4" name="FaultStateCurrentState" type="FaultStateEnum" apiMaturity="provisional" min="0x00" max="0xFF"/>
-    </event>
-    <event side="server" code="0x05" name="RFID" priority="info" apiMaturity="provisional" optional="true">
-      <description>RFID</description>
-      <field id="0" name="UID" type="octet_string" length="10" apiMaturity="provisional"/>
-    </event>
-  </cluster>
-  <bitmap name="Feature" type="bitmap32">
-    <cluster code="0x0099"/>
-    <field name="ChargingPreferences" mask="0x01"/>
-    <field name="SoCReporting" mask="0x02"/>
-    <field name="PlugAndCharge" mask="0x04"/>
-    <field name="RFID" mask="0x08"/>
-    <field name="V2X" mask="0x10"/>
-  </bitmap>
 
+    <event side="server" code="0x02" name="EnergyTransferStarted" priority="info">
+      <description>EnergyTransferStarted</description>
+      <field id="0" name="SessionID" type="int32u"/>
+      <field id="1" name="State" type="StateEnum" min="0x00" max="0x06"/>
+      <field id="2" name="MaximumCurrent" type="amperage_ma" min="0"/>
+      <field id="3" name="MaximumDischargeCurrent" type="amperage_ma" optional="true" min="0"/>
+    </event>
+
+    <event side="server" code="0x03" name="EnergyTransferStopped" priority="info">
+      <description>EnergyTransferStopped</description>
+      <field id="0" name="SessionID" type="int32u"/>
+      <field id="1" name="State" type="StateEnum" min="0x00" max="0x06"/>
+      <field id="2" name="Reason" type="EnergyTransferStoppedReasonEnum" min="0x00" max="0x02"/>
+      <field id="4" name="EnergyTransferred" type="energy_mwh" min="0"/>
+      <field id="5" name="EnergyDischarged" type="energy_mwh" optional="true" min="0"/>
+    </event>
+
+    <event side="server" code="0x04" name="Fault" priority="critical">
+      <description>Fault</description>
+      <field id="0" name="SessionID" type="int32u" isNullable="true"/>
+      <field id="1" name="State" type="StateEnum" min="0x00" max="0x06"/>
+      <field id="2" name="FaultStatePreviousState" type="FaultStateEnum" min="0x00" max="0xFF"/>
+      <field id="4" name="FaultStateCurrentState" type="FaultStateEnum" min="0x00" max="0xFF"/>
+    </event>
+
+    <event side="server" code="0x05" name="RFID" priority="info" optional="true">
+      <description>RFID</description>
+      <field id="0" name="UID" type="octet_string" length="10"/>
+    </event>
+
+  </cluster>
 </configurator>

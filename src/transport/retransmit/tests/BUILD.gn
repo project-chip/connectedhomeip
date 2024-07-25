@@ -14,11 +14,11 @@
 
 import("//build_overrides/build.gni")
 import("//build_overrides/chip.gni")
-import("//build_overrides/nlunit_test.gni")
+import("//build_overrides/pigweed.gni")
 
 import("${chip_root}/build/chip/chip_test_suite.gni")
 
-chip_test_suite_using_nltest("tests") {
+chip_test_suite("tests") {
   output_name = "libRetransmitTests"
 
   cflags = [ "-Wconversion" ]
@@ -26,8 +26,7 @@ chip_test_suite_using_nltest("tests") {
   test_sources = [ "TestCache.cpp" ]
 
   public_deps = [
-    "${chip_root}/src/lib/support:testing_nlunit",
+    "${chip_root}/src/lib/core:string-builder-adapters",
     "${chip_root}/src/transport/retransmit",
-    "${nlunit_test_root}:nlunit-test",
   ]
 }

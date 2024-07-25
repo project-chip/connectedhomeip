@@ -1,0 +1,84 @@
+{{> header excludeZapComment=false}}
+
+#import "MCCommandObjects.h"
+#import "MCCommandPayloads.h"
+#import "MCCommandPayloads_internal.h"
+
+#import "../MCCastingApp.h"
+#import "../MCCommand_Internal.h"
+#import "../MCErrorUtils.h"
+
+#include "core/Command.h"
+#include <app-common/zap-generated/cluster-objects.h>
+
+#import <Foundation/Foundation.h>
+
+@implementation MCNullObjectType
+- (CHIP_ERROR)setObjCResponseFromCppResponse:(std::any)cppDecodableStruct
+{
+    return CHIP_NO_ERROR;
+}
+@end
+
+{{#zcl_clusters}}
+{{#if (isInConfigList name "MatterCastingClusters")}}
+
+// {{asUpperCamelCase name}} cluster:
+
+{{#zcl_commands}}
+{{#if (is_str_equal source 'client')}}
+@implementation MC{{asUpperCamelCase ../name}}Cluster{{asUpperCamelCase name}}Command
+- (void)invoke:(id)request
+                 context:(void * _Nullable)context
+              completion:(void (^_Nonnull __strong)(void *, NSError *, id))completion
+    timedInvokeTimeoutMs:(NSNumber * _Nullable)timedInvokeTimeoutMs
+{
+    MCCommandTemplate<chip::app::Clusters::{{asUpperCamelCase ../name}}::Commands::{{asUpperCamelCase name}}::Type> * mcCommand = new MCCommandTemplate<chip::app::Clusters::{{asUpperCamelCase ../name}}::Commands::{{asUpperCamelCase name}}::Type>(
+        self.cppCommand,
+        [self](id objCRequest) {
+            return [self getCppRequestFromObjC:objCRequest];
+        },
+        [self](std::any cppResponse) {
+            return [self getObjCResponseFromCpp:cppResponse];
+        });
+    mcCommand->invoke(
+        request, context, [mcCommand, completion](void * context, NSError * err, id response) {
+            completion(context, err, response);
+            delete mcCommand;
+        }, timedInvokeTimeoutMs);
+}
+
+- (std::any)getCppRequestFromObjC:(MC{{asUpperCamelCase ../name}}Cluster{{asUpperCamelCase name}}Params *)objcRequest
+{
+    VerifyOrReturnValue(objcRequest != nil, nullptr);
+    std::any anyCppRequest = [objcRequest getCppRequestFromObjCRequest];
+    if (anyCppRequest.has_value()) {
+        try {
+            // Extract the object from std::any and convert it to a std::shared_ptr
+            auto& cppRequest = std::any_cast<chip::app::Clusters::{{asUpperCamelCase ../name}}::Commands::{{asUpperCamelCase name}}::Type&>(anyCppRequest);
+            return std::any(std::make_shared<chip::app::Clusters::{{asUpperCamelCase ../name}}::Commands::{{asUpperCamelCase name}}::Type>(cppRequest));
+        } catch (const std::bad_any_cast& e) {
+            return nullptr;
+        }
+    }
+    return nullptr;
+}
+
+- (id)getObjCResponseFromCpp:(std::any)cppResponse
+{
+    {{>command_response_type command=.}} * objCResponse = nil;
+    CHIP_ERROR err = CHIP_NO_ERROR;
+    if (cppResponse.type() == typeid(std::shared_ptr<const chip::app::Clusters::{{asUpperCamelCase ../name}}::Commands::{{asUpperCamelCase name}}::Type::ResponseType>)) {
+        objCResponse = [[{{>command_response_type command=.}} alloc] init];
+        // Set the ObjC response fields using the given cpp Response
+        err = [objCResponse setObjCResponseFromCppResponse:cppResponse];
+        VerifyOrReturnValue(err == CHIP_NO_ERROR, nil, ChipLogError(AppServer, "MC{{asUpperCamelCase ../name}}Cluster{{asUpperCamelCase name}}Command getObjCResponseFromCpp() failed"));
+    }
+    return objCResponse;
+}
+@end
+
+{{/if}}
+{{/zcl_commands}}
+{{/if}}
+{{/zcl_clusters}}

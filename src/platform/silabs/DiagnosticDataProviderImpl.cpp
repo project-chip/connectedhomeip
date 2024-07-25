@@ -28,9 +28,9 @@
 #if CHIP_DEVICE_CONFIG_ENABLE_THREAD
 #include <platform/OpenThread/GenericThreadStackManagerImpl_OpenThread.h>
 #endif
-#include "AppConfig.h"
 #include "FreeRTOS.h"
-#include "heap_4_silabs.h"
+#include "sl_memory_manager.h"
+#include <inet/InetInterface.h>
 #include <lib/support/CHIPMemString.h>
 
 using namespace ::chip::app::Clusters::GeneralDiagnostics;
@@ -46,38 +46,28 @@ DiagnosticDataProviderImpl & DiagnosticDataProviderImpl::GetDefaultInstance()
 
 // Software Diagnostics Getters
 /*
- * The following Heap stats are compiled values done by the FreeRTOS Heap4 implementation.
- * See /examples/platform/silabs/heap_4_silabs.c
+ * The following Heap stats are compiled values done by the sl_memory_manager.
  * It keeps track of the number of calls to allocate and free memory as well as the
  * number of free bytes remaining, but says nothing about fragmentation.
  */
 CHIP_ERROR DiagnosticDataProviderImpl::GetCurrentHeapFree(uint64_t & currentHeapFree)
 {
-    size_t freeHeapSize = xPortGetFreeHeapSize();
+    size_t freeHeapSize = sl_memory_get_free_heap_size();
     currentHeapFree     = static_cast<uint64_t>(freeHeapSize);
     return CHIP_NO_ERROR;
 }
 
 CHIP_ERROR DiagnosticDataProviderImpl::GetCurrentHeapUsed(uint64_t & currentHeapUsed)
 {
-    // Calculate the Heap used based on Total heap - Free heap
-    int64_t heapUsed = (configTOTAL_HEAP_SIZE - xPortGetFreeHeapSize());
-
-    // Something went wrong, this should not happen
-    VerifyOrReturnError(heapUsed >= 0, CHIP_ERROR_INVALID_INTEGER_VALUE);
+    size_t heapUsed = sl_memory_get_used_heap_size();
     currentHeapUsed = static_cast<uint64_t>(heapUsed);
     return CHIP_NO_ERROR;
 }
 
 CHIP_ERROR DiagnosticDataProviderImpl::GetCurrentHeapHighWatermark(uint64_t & currentHeapHighWatermark)
 {
-    // FreeRTOS records the lowest amount of available heap during runtime
-    // currentHeapHighWatermark wants the highest heap usage point so we calculate it here
-    int64_t HighestHeapUsageRecorded = (configTOTAL_HEAP_SIZE - xPortGetMinimumEverFreeHeapSize());
-
-    // Something went wrong, this should not happen
-    VerifyOrReturnError(HighestHeapUsageRecorded >= 0, CHIP_ERROR_INVALID_INTEGER_VALUE);
-    currentHeapHighWatermark = static_cast<uint64_t>(HighestHeapUsageRecorded);
+    size_t HighestHeapUsageRecorded = sl_memory_get_heap_high_watermark();
+    currentHeapHighWatermark        = static_cast<uint64_t>(HighestHeapUsageRecorded);
 
     return CHIP_NO_ERROR;
 }
@@ -86,9 +76,7 @@ CHIP_ERROR DiagnosticDataProviderImpl::ResetWatermarks()
 {
     // If implemented, the server SHALL set the value of the CurrentHeapHighWatermark attribute to the
     // value of the CurrentHeapUsed.
-
-    xPortResetHeapMinimumEverFreeHeapSize();
-
+    sl_memory_reset_heap_high_watermark();
     return CHIP_NO_ERROR;
 }
 
@@ -193,20 +181,7 @@ CHIP_ERROR DiagnosticDataProviderImpl::GetUpTime(uint64_t & upTime)
 
 CHIP_ERROR DiagnosticDataProviderImpl::GetTotalOperationalHours(uint32_t & totalOperationalHours)
 {
-    uint64_t upTime = 0;
-
-    if (GetUpTime(upTime) == CHIP_NO_ERROR)
-    {
-        uint32_t totalHours = 0;
-        if (ConfigurationMgr().GetTotalOperationalHours(totalHours) == CHIP_NO_ERROR)
-        {
-            VerifyOrReturnError(upTime / 3600 <= UINT32_MAX, CHIP_ERROR_INVALID_INTEGER_VALUE);
-            totalOperationalHours = totalHours + static_cast<uint32_t>(upTime / 3600);
-            return CHIP_NO_ERROR;
-        }
-    }
-
-    return CHIP_ERROR_INVALID_TIME;
+    return ConfigurationMgr().GetTotalOperationalHours(totalOperationalHours);
 }
 
 CHIP_ERROR DiagnosticDataProviderImpl::GetActiveHardwareFaults(GeneralFaults<kMaxHardwareFaults> & hardwareFaults)
@@ -249,13 +224,32 @@ CHIP_ERROR DiagnosticDataProviderImpl::GetNetworkInterfaces(NetworkInterface ** 
 #if CHIP_DEVICE_CONFIG_ENABLE_THREAD
     const char * threadNetworkName = otThreadGetNetworkName(ThreadStackMgrImpl().OTInstance());
     ifp->name                      = Span<const char>(threadNetworkName, strlen(threadNetworkName));
-    ifp->isOperational             = true;
+    ifp->type                      = InterfaceTypeEnum::kThread;
+    ifp->isOperational             = ThreadStackMgrImpl().IsThreadAttached();
     ifp->offPremiseServicesReachableIPv4.SetNull();
     ifp->offPremiseServicesReachableIPv6.SetNull();
-    ifp->type = InterfaceTypeEnum::kThread;
-    uint8_t macBuffer[ConfigurationManager::kPrimaryMACAddressLength];
-    ConfigurationMgr().GetPrimary802154MACAddress(macBuffer);
-    ifp->hardwareAddress = ByteSpan(macBuffer, ConfigurationManager::kPrimaryMACAddressLength);
+
+    ThreadStackMgrImpl().GetPrimary802154MACAddress(ifp->MacAddress);
+    ifp->hardwareAddress = ByteSpan(ifp->MacAddress, kMaxHardwareAddrSize);
+
+    // The Thread implementation has only 1 interface and is IPv6-only
+    Inet::InterfaceAddressIterator interfaceAddressIterator;
+    uint8_t ipv6AddressesCount = 0;
+    while (interfaceAddressIterator.HasCurrent() && ipv6AddressesCount < kMaxIPv6AddrCount)
+    {
+        Inet::IPAddress ipv6Address;
+        if (interfaceAddressIterator.GetAddress(ipv6Address) == CHIP_NO_ERROR)
+        {
+            memcpy(ifp->Ipv6AddressesBuffer[ipv6AddressesCount], ipv6Address.Addr, kMaxIPv6AddrSize);
+            ifp->Ipv6AddressSpans[ipv6AddressesCount] = ByteSpan(ifp->Ipv6AddressesBuffer[ipv6AddressesCount]);
+            ipv6AddressesCount++;
+        }
+        interfaceAddressIterator.Next();
+    }
+
+    ifp->IPv6Addresses = app::DataModel::List<ByteSpan>(ifp->Ipv6AddressSpans, ipv6AddressesCount);
+
+    *netifpp = ifp;
 #else
     NetworkInterface * head = NULL;
     for (Inet::InterfaceIterator interfaceIterator; interfaceIterator.HasCurrent(); interfaceIterator.Next())
@@ -331,7 +325,6 @@ CHIP_ERROR DiagnosticDataProviderImpl::GetNetworkInterfaces(NetworkInterface ** 
     *netifpp = head;
 #endif
 
-    *netifpp = ifp;
     return CHIP_NO_ERROR;
 }
 

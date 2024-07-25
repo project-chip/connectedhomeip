@@ -11,7 +11,7 @@ inputs:
 runs:
   using: "composite"
   steps:
-    - uses: Wandalen/wretry.action@v1.3.0
+    - uses: Wandalen/wretry.action@v1.4.10
       name: Checkout submodules
       with:
         command: scripts/checkout_submodules.py --allow-changing-global-git-config --shallow --platform ${{ inputs.platform }} ${{ inputs.extra-parameters }}

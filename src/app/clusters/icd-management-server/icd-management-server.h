@@ -34,8 +34,6 @@
 #include <lib/core/CHIPPersistentStorageDelegate.h>
 #endif // CHIP_CONFIG_ENABLE_ICD_CIP
 
-using chip::Protocols::InteractionModel::Status;
-
 namespace chip {
 namespace Crypto {
 using SymmetricKeystore = SessionKeystore;
@@ -67,8 +65,6 @@ public:
     UnregisterClient(chip::app::CommandHandler * commandObj, const chip::app::ConcreteCommandPath & commandPath,
                      const chip::app::Clusters::IcdManagement::Commands::UnregisterClient::DecodableType & commandData);
 #endif // CHIP_CONFIG_ENABLE_ICD_CIP
-
-    chip::Protocols::InteractionModel::Status StayActiveRequest(chip::FabricIndex fabricIndex);
 
 private:
 #if CHIP_CONFIG_ENABLE_ICD_CIP

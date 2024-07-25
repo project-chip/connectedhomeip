@@ -41,6 +41,13 @@
 #include "OTAUtil.h"
 #endif
 
+#ifdef CONFIG_CHIP_CRYPTO_PSA
+#include <crypto/PSAOperationalKeystore.h>
+#ifdef CONFIG_CHIP_MIGRATE_OPERATIONAL_KEYS_TO_ITS
+#include "MigrationManager.h"
+#endif
+#endif
+
 #include <dk_buttons_and_leds.h>
 #include <zephyr/kernel.h>
 #include <zephyr/logging/log.h>
@@ -77,6 +84,9 @@ bool sHaveBLEConnections   = false;
 
 chip::DeviceLayer::DeviceInfoProviderImpl gExampleDeviceInfoProvider;
 
+#ifdef CONFIG_CHIP_CRYPTO_PSA
+chip::Crypto::PSAOperationalKeystore sPSAOperationalKeystore{};
+#endif
 } // namespace
 
 namespace LedConsts {
@@ -191,10 +201,23 @@ CHIP_ERROR AppTask::Init()
     static OTATestEventTriggerHandler sOtaTestEventTriggerHandler{};
     VerifyOrDie(sTestEventTriggerDelegate.Init(ByteSpan(sTestEventTriggerEnableKey)) == CHIP_NO_ERROR);
     VerifyOrDie(sTestEventTriggerDelegate.AddHandler(&sOtaTestEventTriggerHandler) == CHIP_NO_ERROR);
+#ifdef CONFIG_CHIP_CRYPTO_PSA
+    initParams.operationalKeystore = &sPSAOperationalKeystore;
+#endif
     (void) initParams.InitializeStaticResourcesBeforeServerInit();
     initParams.testEventTriggerDelegate = &sTestEventTriggerDelegate;
     ReturnErrorOnFailure(chip::Server::GetInstance().Init(initParams));
     AppFabricTableDelegate::Init();
+
+#ifdef CONFIG_CHIP_MIGRATE_OPERATIONAL_KEYS_TO_ITS
+    err = MoveOperationalKeysFromKvsToIts(sLocalInitData.mServerInitParams->persistentStorageDelegate,
+                                          sLocalInitData.mServerInitParams->operationalKeystore);
+    if (err != CHIP_NO_ERROR)
+    {
+        LOG_ERR("MoveOperationalKeysFromKvsToIts() failed");
+        return err;
+    }
+#endif
 
     gExampleDeviceInfoProvider.SetStorageDelegate(&Server::GetInstance().GetPersistentStorage());
     chip::DeviceLayer::SetDeviceInfoProvider(&gExampleDeviceInfoProvider);

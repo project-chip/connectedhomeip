@@ -44,12 +44,12 @@ constexpr char kWiFiCredentialsKeyName[] = "wifi-pass";
 constexpr char kWifiNetworkIdentityKeyName[]       = "wifi-ni";
 constexpr char kWifiClientIdentityKeyName[]        = "wifi-ci";
 constexpr char kWifiClientIdentityKeypairKeyName[] = "wifi-cik";
+#endif // CHIP_DEVICE_CONFIG_ENABLE_WIFI_PDC
 
 inline CHIP_ERROR IgnoreNotFound(CHIP_ERROR err)
 {
     return (err == CHIP_ERROR_PERSISTED_STORAGE_VALUE_NOT_FOUND) ? CHIP_NO_ERROR : err;
 }
-#endif // CHIP_DEVICE_CONFIG_ENABLE_WIFI_PDC
 } // namespace
 
 // NOTE: For WiFiDriver, we uses two network configs, one is mSavedNetwork, and another is mStagingNetwork, during init, it will

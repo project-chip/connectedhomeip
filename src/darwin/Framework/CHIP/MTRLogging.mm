@@ -19,6 +19,7 @@
 #import "MTRLogging_Internal.h"
 
 #import "MTRFramework.h"
+#import "MTRUnfairLock.h"
 
 #import <algorithm>
 #import <atomic>
@@ -56,7 +57,7 @@ void MTRSetLogCallback(MTRLogType logTypeThreshold, MTRLogCallback _Nullable cal
 {
     MTRFrameworkInit();
 
-    os_unfair_lock_lock(&logCallbackLock);
+    std::lock_guard lock(logCallbackLock);
     if (callback) {
         SetLogRedirectCallback(&MTRLogCallbackTrampoline);
         SetLogFilter(static_cast<LogCategory>(std::min(std::max(logTypeThreshold, MTRLogTypeError), MTRLogTypeDetail)));
@@ -66,5 +67,4 @@ void MTRSetLogCallback(MTRLogType logTypeThreshold, MTRLogCallback _Nullable cal
         SetLogFilter(kLogCategory_None);
         SetLogRedirectCallback(nullptr);
     }
-    os_unfair_lock_unlock(&logCallbackLock);
 }

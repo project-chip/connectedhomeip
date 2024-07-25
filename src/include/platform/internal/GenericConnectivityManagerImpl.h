@@ -46,6 +46,7 @@ public:
     void _SetUserSelectedMode(bool val);
     uint16_t _GetUserSelectedModeTimeout();
     void _SetUserSelectedModeTimeout(uint16_t val);
+    CHIP_ERROR _DisconnectNetwork();
 
 private:
     ImplClass * Impl() { return static_cast<ImplClass *>(this); }
@@ -70,6 +71,12 @@ inline uint16_t GenericConnectivityManagerImpl<ImplClass>::_GetUserSelectedModeT
 template <class ImplClass>
 inline void GenericConnectivityManagerImpl<ImplClass>::_SetUserSelectedModeTimeout(uint16_t val)
 {}
+
+template <class ImplClass>
+inline CHIP_ERROR GenericConnectivityManagerImpl<ImplClass>::_DisconnectNetwork()
+{
+    return CHIP_ERROR_UNSUPPORTED_CHIP_FEATURE;
+}
 
 } // namespace Internal
 } // namespace DeviceLayer

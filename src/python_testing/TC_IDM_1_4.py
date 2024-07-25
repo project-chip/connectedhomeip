@@ -15,6 +15,18 @@
 #    limitations under the License.
 #
 
+# See https://github.com/project-chip/connectedhomeip/blob/master/docs/testing/python.md#defining-the-ci-test-arguments
+# for details about the block below.
+#
+# === BEGIN CI TEST ARGUMENTS ===
+# test-runner-runs: run1
+# test-runner-run/run1/app: ${ALL_CLUSTERS_APP}
+# test-runner-run/run1/factoryreset: True
+# test-runner-run/run1/quiet: True
+# test-runner-run/run1/app-args: --discriminator 1234 --KVS kvs1 --trace-to json:${TRACE_APP}.json --enable-key 000102030405060708090a0b0c0d0e0f
+# test-runner-run/run1/script-args: --hex-arg PIXIT.DGGEN.TEST_EVENT_TRIGGER_KEY:000102030405060708090a0b0c0d0e0f --storage-path admin_storage.json --commissioning-method on-network --discriminator 1234 --passcode 20202021 --trace-to json:${TRACE_TEST_JSON}.json --trace-to perfetto:${TRACE_TEST_PERFETTO}.perfetto
+# === END CI TEST ARGUMENTS ===
+
 import logging
 
 import chip.clusters as Clusters
@@ -74,7 +86,11 @@ class TC_IDM_1_4(MatterBaseTest):
         cap_for_batch_commands = 100
         number_of_commands_to_send = min(max_paths_per_invoke + 1, cap_for_batch_commands)
 
-        invalid_command_id = 0xffff_ffff
+        # Use a valid (according to MEI definition) command-id (in this case belonging to Test Vendor MC with prefix 0xfff4)
+        # which should never be existing on a prodiction device. We use this decodable id to prevent hitting issues with the
+        # specification being not clearly defined in respect to decoding vs processing the invoke requests.
+        invalid_command_id = 0xfff4_00ff
+
         list_of_commands_to_send = []
         for endpoint_index in range(number_of_commands_to_send):
             # Using Toggle command to form the base as it is a command that doesn't take

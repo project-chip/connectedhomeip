@@ -21,10 +21,6 @@
 
 #if defined(CONFIG_ESP_COREDUMP_ENABLE_TO_FLASH) && defined(CONFIG_ESP_COREDUMP_DATA_FORMAT_ELF)
 #include <esp_core_dump.h>
-#include <esp_flash_encrypt.h>
-// Its a bit hackish but we need this in order to pull in the sizeof(core_dump_header_t)
-// we can even use the static 20 but, what if that gets chagned?
-#include "../include_core_dump/esp_core_dump_types.h"
 #endif // defined(CONFIG_ESP_COREDUMP_ENABLE_TO_FLASH) && defined(CONFIG_ESP_COREDUMP_DATA_FORMAT_ELF)
 
 using namespace chip;
@@ -95,32 +91,14 @@ size_t LogProvider::GetCrashSize()
     size_t outSize = 0;
 
 #if defined(CONFIG_ESP_COREDUMP_ENABLE_TO_FLASH) && defined(CONFIG_ESP_COREDUMP_DATA_FORMAT_ELF)
-    size_t unusedOutAddr;
-    esp_err_t esp_err = esp_core_dump_image_get(&unusedOutAddr, &outSize);
-    VerifyOrReturnValue(esp_err == ESP_OK, 0, ChipLogError(DeviceLayer, "Failed to get core dump image, esp_err:%d", esp_err));
+    // Verify that the crash is present and sane
+    esp_err_t esp_err = esp_core_dump_image_check();
+    VerifyOrReturnValue(esp_err == ESP_OK, 0, ChipLogError(DeviceLayer, "Core dump image check failed, esp_err:%d", esp_err));
+
+    outSize = sizeof(esp_core_dump_summary_t);
 #endif // defined(CONFIG_ESP_COREDUMP_ENABLE_TO_FLASH) && defined(CONFIG_ESP_COREDUMP_DATA_FORMAT_ELF)
 
     return outSize;
-}
-
-CHIP_ERROR LogProvider::MapCrashPartition(CrashLogContext * context)
-{
-#if defined(CONFIG_ESP_COREDUMP_ENABLE_TO_FLASH) && defined(CONFIG_ESP_COREDUMP_DATA_FORMAT_ELF)
-    size_t outAddr, outSize;
-    esp_err_t esp_err = esp_core_dump_image_get(&outAddr, &outSize);
-    VerifyOrReturnError(esp_err == ESP_OK, CHIP_ERROR(ChipError::Range::kPlatform, esp_err),
-                        ChipLogError(DeviceLayer, "Failed to get core dump image, esp_err:%d", esp_err));
-
-    /* map the full core dump parition, including the checksum. */
-    esp_err = spi_flash_mmap(outAddr, outSize, SPI_FLASH_MMAP_DATA, &context->mappedAddress, &context->mappedHandle);
-    VerifyOrReturnError(esp_err == ESP_OK, CHIP_ERROR(ChipError::Range::kPlatform, esp_err),
-                        ChipLogError(DeviceLayer, "Failed to mmap the crash partition, esp_err:%d", esp_err));
-
-    context->crashSize = static_cast<uint32_t>(outSize);
-    return CHIP_NO_ERROR;
-#else
-    return CHIP_ERROR_NOT_FOUND;
-#endif // defined(CONFIG_ESP_COREDUMP_ENABLE_TO_FLASH) && defined(CONFIG_ESP_COREDUMP_DATA_FORMAT_ELF)
 }
 
 CHIP_ERROR LogProvider::PrepareLogContextForIntent(LogContext * context, IntentEnum intent)
@@ -146,11 +124,24 @@ CHIP_ERROR LogProvider::PrepareLogContextForIntent(LogContext * context, IntentE
         sCrashLogContext.Reset();
         context->Crash.logContext = &sCrashLogContext;
 
-        CHIP_ERROR err = MapCrashPartition(context->Crash.logContext);
-        VerifyOrReturnError(err == CHIP_NO_ERROR, err, context->Crash.logContext = nullptr);
+        size_t crashSize = GetCrashSize();
+        VerifyOrReturnError(crashSize > 0, CHIP_ERROR_NOT_FOUND);
 
-        context->Crash.logContext->readOffset = sizeof(core_dump_header_t);
-        context->Crash.logContext->isMapped   = true;
+        esp_core_dump_summary_t * summary =
+            reinterpret_cast<esp_core_dump_summary_t *>(Platform::MemoryCalloc(1, sizeof(esp_core_dump_summary_t)));
+        VerifyOrReturnError(summary != nullptr, CHIP_ERROR_NO_MEMORY);
+
+        esp_err_t esp_err = esp_core_dump_get_summary(summary);
+        if (esp_err != ESP_OK)
+        {
+            ChipLogError(DeviceLayer, "Failed to get core dump image, esp_err:%d", esp_err);
+            Platform::MemoryFree(summary);
+            return CHIP_ERROR_NOT_FOUND;
+        }
+
+        context->Crash.logContext->crashSize  = crashSize;
+        context->Crash.logContext->readOffset = 0;
+        context->Crash.logContext->summary    = summary;
 #else
         return CHIP_ERROR_NOT_FOUND;
 #endif // defined(CONFIG_ESP_COREDUMP_ENABLE_TO_FLASH) && defined(CONFIG_ESP_COREDUMP_DATA_FORMAT_ELF)
@@ -177,7 +168,7 @@ void LogProvider::CleanupLogContextForIntent(LogContext * context)
     case IntentEnum::kCrashLogs: {
 #if defined(CONFIG_ESP_COREDUMP_ENABLE_TO_FLASH) && defined(CONFIG_ESP_COREDUMP_DATA_FORMAT_ELF)
         CrashLogContext * logContext = context->Crash.logContext;
-        spi_flash_munmap(logContext->mappedHandle);
+        // Reset() frees the summary if allocated
         logContext->Reset();
 #endif // defined(CONFIG_ESP_COREDUMP_ENABLE_TO_FLASH) && defined(CONFIG_ESP_COREDUMP_DATA_FORMAT_ELF)
     }
@@ -227,12 +218,15 @@ CHIP_ERROR LogProvider::GetDataForIntent(LogContext * context, MutableByteSpan &
     case IntentEnum::kCrashLogs: {
 #if defined(CONFIG_ESP_COREDUMP_ENABLE_TO_FLASH) && defined(CONFIG_ESP_COREDUMP_DATA_FORMAT_ELF)
         CrashLogContext * logContext = context->Crash.logContext;
-        size_t dataSize              = logContext->crashSize - logContext->readOffset;
-        auto count                   = std::min(dataSize, outBuffer.size());
+
+        VerifyOrReturnError(logContext->readOffset < logContext->crashSize, CHIP_ERROR_INCORRECT_STATE, outBuffer.reduce_size(0));
+
+        size_t dataSize = logContext->crashSize - logContext->readOffset;
+        auto count      = std::min(dataSize, outBuffer.size());
 
         VerifyOrReturnError(CanCastTo<off_t>(count), CHIP_ERROR_INVALID_ARGUMENT, outBuffer.reduce_size(0));
 
-        const uint8_t * readAddr = reinterpret_cast<const uint8_t *>(logContext->mappedAddress) + logContext->readOffset;
+        const uint8_t * readAddr = reinterpret_cast<const uint8_t *>(logContext->summary) + logContext->readOffset;
         memcpy(outBuffer.data(), readAddr, count);
         outBuffer.reduce_size(count);
 
@@ -257,12 +251,14 @@ CHIP_ERROR LogProvider::StartLogCollection(IntentEnum intent, LogSessionHandle &
 {
     VerifyOrReturnValue(IsValidIntent(intent), CHIP_ERROR_INVALID_ARGUMENT);
 
+#if defined(CONFIG_ESP_COREDUMP_ENABLE_TO_FLASH) && defined(CONFIG_ESP_COREDUMP_DATA_FORMAT_ELF)
     // In case of crash logs we can only mmap at max once, so check before doing anything
     if (intent == IntentEnum::kCrashLogs)
     {
-        VerifyOrReturnError(sCrashLogContext.isMapped == false, CHIP_ERROR_INCORRECT_STATE,
-                            ChipLogError(DeviceLayer, "Crash partition already mapped"));
+        VerifyOrReturnError(sCrashLogContext.summary == nullptr, CHIP_ERROR_INCORRECT_STATE,
+                            ChipLogError(DeviceLayer, "Crash summary already allocated"));
     }
+#endif // defined(CONFIG_ESP_COREDUMP_ENABLE_TO_FLASH) && defined(CONFIG_ESP_COREDUMP_DATA_FORMAT_ELF)
 
     LogContext * context = reinterpret_cast<LogContext *>(Platform::MemoryCalloc(1, sizeof(LogContext)));
     VerifyOrReturnValue(context != nullptr, CHIP_ERROR_NO_MEMORY);

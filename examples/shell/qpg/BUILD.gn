@@ -49,6 +49,7 @@ qpg_executable("shell_app") {
     ":sdk",
     "${chip_root}/examples/shell/shell_common:shell_common",
     "${chip_root}/src/lib",
+    "${chip_root}/src/platform/logging:default",
     "${chip_root}/src/setup_payload",
     "${chip_root}/third_party/openthread/platforms:libopenthread-platform",
     "${chip_root}/third_party/openthread/platforms:libopenthread-platform-utils",
@@ -66,7 +67,7 @@ qpg_executable("shell_app") {
 
   defines = []
 
-  ldscript = "${qpg_sdk_root}/Libraries/Qorvo/QorvoStack/gen/QorvoStack_${qpg_target_ic}/QorvoStack_${qpg_target_ic}.ld"
+  ldscript = "${qpg_sdk_root}/Libraries/Qorvo/QorvoStack/gen/QorvoStack_${qpg_target_ic}${qpg_flavour}/QorvoStack_${qpg_target_ic}${qpg_flavour}.ld"
 
   inputs = [ ldscript ]
 

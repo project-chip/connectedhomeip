@@ -125,57 +125,29 @@ void MTRBaseSubscriptionCallback::OnDeallocatePaths(ReadPrepareParams && aReadPr
 
 void MTRBaseSubscriptionCallback::OnSubscriptionEstablished(SubscriptionId aSubscriptionId)
 {
-    // ReadClient resets it at ProcessSubscribeResponse after calling OnSubscriptionEstablished, so this is equivalent
-    mResubscriptionNumRetries = 0;
     if (mSubscriptionEstablishedHandler) {
         auto subscriptionEstablishedHandler = mSubscriptionEstablishedHandler;
         subscriptionEstablishedHandler();
     }
 }
 
-uint32_t MTRBaseSubscriptionCallback::ComputeTimeTillNextSubscription()
-{
-    uint32_t maxWaitTimeInMsec = 0;
-    uint32_t waitTimeInMsec = 0;
-    uint32_t minWaitTimeInMsec = 0;
-
-    if (mResubscriptionNumRetries <= CHIP_RESUBSCRIBE_MAX_FIBONACCI_STEP_INDEX) {
-        maxWaitTimeInMsec = GetFibonacciForIndex(mResubscriptionNumRetries) * CHIP_RESUBSCRIBE_WAIT_TIME_MULTIPLIER_MS;
-    } else {
-        maxWaitTimeInMsec = CHIP_RESUBSCRIBE_MAX_RETRY_WAIT_INTERVAL_MS;
-    }
-
-    if (maxWaitTimeInMsec != 0) {
-        minWaitTimeInMsec = (CHIP_RESUBSCRIBE_MIN_WAIT_TIME_INTERVAL_PERCENT_PER_STEP * maxWaitTimeInMsec) / 100;
-        waitTimeInMsec = minWaitTimeInMsec + (Crypto::GetRandU32() % (maxWaitTimeInMsec - minWaitTimeInMsec));
-    }
-
-    return waitTimeInMsec;
-}
-
 CHIP_ERROR MTRBaseSubscriptionCallback::OnResubscriptionNeeded(ReadClient * apReadClient, CHIP_ERROR aTerminationCause)
 {
-    // No need to check ReadClient internal state is Idle because ReadClient only calls OnResubscriptionNeeded after calling ClearActiveSubscriptionState(), which sets the state to Idle.
+    CHIP_ERROR err = ClusterStateCache::Callback::OnResubscriptionNeeded(apReadClient, aTerminationCause);
+    ReturnErrorOnFailure(err);
 
-    // This part is copied from ReadClient's DefaultResubscribePolicy:
-    auto timeTillNextResubscription = ComputeTimeTillNextSubscription();
-    ChipLogProgress(DataManagement,
-        "Will try to resubscribe to %02x:" ChipLogFormatX64 " at retry index %" PRIu32 " after %" PRIu32
-        "ms due to error %" CHIP_ERROR_FORMAT,
-        apReadClient->GetFabricIndex(), ChipLogValueX64(apReadClient->GetPeerNodeId()), mResubscriptionNumRetries, timeTillNextResubscription,
-        aTerminationCause.Format());
-    ReturnErrorOnFailure(apReadClient->ScheduleResubscription(timeTillNextResubscription, NullOptional, aTerminationCause == CHIP_ERROR_TIMEOUT));
+    auto error = [MTRError errorForCHIPErrorCode:aTerminationCause];
+    auto delayMs = @(apReadClient->ComputeTimeTillNextSubscription());
+    CallResubscriptionScheduledHandler(error, delayMs);
+    return CHIP_NO_ERROR;
+}
 
-    // Not as good a place to increment as when resubscription timer fires, but as is, this should be as good, because OnResubscriptionNeeded is only called from ReadClient's Close() while Idle, and nothing should cause this to happen
-    mResubscriptionNumRetries++;
-
+void MTRBaseSubscriptionCallback::CallResubscriptionScheduledHandler(NSError * error, NSNumber * resubscriptionDelay)
+{
     if (mResubscriptionCallback != nil) {
         auto callback = mResubscriptionCallback;
-        auto error = [MTRError errorForCHIPErrorCode:aTerminationCause];
-        auto delayMs = @(apReadClient->ComputeTimeTillNextSubscription());
-        callback(error, delayMs);
+        callback(error, resubscriptionDelay);
     }
-    return CHIP_NO_ERROR;
 }
 
 void MTRBaseSubscriptionCallback::OnUnsolicitedMessageFromPublisher(ReadClient *)
@@ -227,5 +199,29 @@ void MTRBaseSubscriptionCallback::ReportError(CHIP_ERROR aError, bool aCancelSub
         dispatch_async(DeviceLayer::PlatformMgrImpl().GetWorkQueue(), ^{
             delete myself;
         });
+    }
+}
+
+void MTRBaseSubscriptionCallback::ClearCachedAttributeState(EndpointId aEndpoint)
+{
+    assertChipStackLockedByCurrentThread();
+    if (mClusterStateCache) {
+        mClusterStateCache->ClearAttributes(aEndpoint);
+    }
+}
+
+void MTRBaseSubscriptionCallback::ClearCachedAttributeState(const ConcreteClusterPath & aCluster)
+{
+    assertChipStackLockedByCurrentThread();
+    if (mClusterStateCache) {
+        mClusterStateCache->ClearAttributes(aCluster);
+    }
+}
+
+void MTRBaseSubscriptionCallback::ClearCachedAttributeState(const ConcreteAttributePath & aAttribute)
+{
+    assertChipStackLockedByCurrentThread();
+    if (mClusterStateCache) {
+        mClusterStateCache->ClearAttribute(aAttribute);
     }
 }

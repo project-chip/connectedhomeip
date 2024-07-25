@@ -1,0 +1,55 @@
+@startuml
+class AttributeAccessInterface {
+  mEndpointId : Optional<EndpointId>
+  mClusterId : ClusterId
+  Read(...)
+  Write(...)
+}
+
+class CommandHandlerInterface {
+  InvokeCommand(...)
+}
+
+class ClusterServer {
+  Read(...)
+  Write(...)
+  InvokeCommand(...)
+  RegisterEndpoint(...)
+  mEndpoints: ClusterLogic[]
+}
+
+class MatterContext {
+  LogEvent()
+  MarkAttributeDirty()
+  mPersistentStorageDelegate
+  mOtherFakeableThings
+}
+
+class ClusterLogic {
+  Init(...)
+  GetXAttribute(...)
+  SetXAttribute(...)
+  HandleXCommand(...)
+  mStateVariables
+}
+
+class ClusterDriver {
+  OnClusterStateChange(...)
+  RegisterListener(...)
+  mListener
+}
+
+AttributeAccessInterface  <|-- ClusterServer
+CommandHandlerInterface <|-- ClusterServer
+ClusterServer "1" *-- "Many" ClusterLogic
+ClusterLogic "1" *-- "1" ClusterDriver
+ClusterLogic "1" *-- "1" MatterContext
+
+hide ClusterServer members
+hide AttributeAccessInterface members
+hide CommandHandlerInterface members
+hide ClusterLogic members
+hide ClusterDriver members
+hide MatterContext members
+
+@enduml

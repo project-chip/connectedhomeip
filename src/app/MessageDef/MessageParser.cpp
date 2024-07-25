@@ -16,7 +16,7 @@
 
 #include "MessageParser.h"
 #include "MessageDefHelper.h"
-#include <app/InteractionModelRevision.h>
+#include <app/SpecificationDefinedRevisions.h>
 
 namespace chip {
 namespace app {
@@ -52,7 +52,7 @@ CHIP_ERROR MessageParser::CheckInteractionModelRevision(TLV::TLVReader & aReader
 
 CHIP_ERROR MessageParser::GetInteractionModelRevision(InteractionModelRevision * const apInteractionModelRevision) const
 {
-    return GetUnsignedInteger(kInteractionModelRevisionTag, apInteractionModelRevision);
+    return GetUnsignedInteger(Revision::kInteractionModelRevisionTag, apInteractionModelRevision);
 }
 
 } // namespace app

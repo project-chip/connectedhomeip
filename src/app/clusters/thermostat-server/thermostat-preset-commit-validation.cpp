@@ -1,9 +1,5 @@
 #include "thermostat-server.h"
-
-#include <app/util/af.h>
-
 #include <app/util/attribute-storage.h>
-
 #include <app-common/zap-generated/attributes/Accessors.h>
 #include <app-common/zap-generated/callback.h>
 #include <app-common/zap-generated/cluster-objects.h>
@@ -77,30 +73,17 @@ public:
 
 static bool IsPresetHandleReferenced(ThermostatMatterScheduleManager & mgr, const chip::ByteSpan & handle)
 {
-    imcode status = EMBER_ZCL_STATUS_SUCCESS;
+    imcode status = imcode::Success;
     uint32_t ourFeatureMap;
     FeatureMap::Get(mgr.mEndpoint, &ourFeatureMap);
     const bool enhancedSchedulesSupported = ourFeatureMap & to_underlying(Feature::kMatterScheduleConfiguration);
-    const bool queuedPresetsSupported     = ourFeatureMap & to_underlying(Feature::kQueuedPresetsSupported);
 
     // Check Active Preset Handle
     DataModel::Nullable<chip::MutableByteSpan> activePresetHandle;
     status = ActivePresetHandle::Get(mgr.mEndpoint, activePresetHandle);
-    VerifyOrDie(status == EMBER_ZCL_STATUS_SUCCESS);
+    VerifyOrDie(status == imcode::Success);
     if ((activePresetHandle.IsNull() == false) && activePresetHandle.Value().data_equal(handle))
         return true;
-
-    // Check Queued Preset Handle
-    if (queuedPresetsSupported)
-    {
-/* TODO: Queued Preset */
-#if 0
-		status = QueuedPresetHandle::Get(mgr.mEndpoint, activePresetHandle);
-		VerifyOrDie(status == EMBER_ZCL_STATUS_SUCCESS);
-		if (activePresetHandle.data_equal(handle))
-			return true;
-#endif
-    }
 
     // Check for the preset on the Schedules
     if (enhancedSchedulesSupported && mgr.mGetScheduleAtIndexCb)
@@ -167,7 +150,7 @@ enum class PresetTypeFeaturesBitmap : uint8_t
 
 static imcode CheckPresetType(ThermostatMatterScheduleManager & mgr, PresetStruct::Type & preset)
 {
-    imcode status = EMBER_ZCL_STATUS_CONSTRAINT_ERROR;
+    imcode status = imcode::ConstraintError;
     size_t index         = 0;
     PresetTypeStruct::Type presetType;
 
@@ -182,10 +165,10 @@ static imcode CheckPresetType(ThermostatMatterScheduleManager & mgr, PresetStruc
                 (preset.name.Value().Value().empty() == false))
             {
                 const bool nameSupported = presetType.presetTypeFeatures.Has(PresetTypeFeaturesBitmap::kSupportsNames);
-                VerifyOrReturnError(nameSupported == true, EMBER_ZCL_STATUS_CONSTRAINT_ERROR);
+                VerifyOrReturnError(nameSupported == true, imcode::ConstraintError);
             }
 
-            return EMBER_ZCL_STATUS_SUCCESS;
+            return imcode::Success;
         }
         index++;
     }
@@ -196,14 +179,14 @@ static imcode CheckPresetType(ThermostatMatterScheduleManager & mgr, PresetStruc
 imcode ThermostatMatterScheduleManager::ValidatePresetsForCommitting(Span<PresetStruct::Type> & oldlist,
                                                                             Span<PresetStruct::Type> & newlist)
 {
-    imcode status = EMBER_ZCL_STATUS_SUCCESS;
+    imcode status = imcode::Success;
     PresetStruct::Type queryPreset; // preset storage used for queries.
 
     // Check that new_list can fit.
     uint8_t numPresets;
     status = NumberOfPresets::Get(mEndpoint, &numPresets);
-    SuccessOrExit(status);
-    VerifyOrExit(newlist.size() <= numPresets, status = EMBER_ZCL_STATUS_RESOURCE_EXHAUSTED);
+    SuccessOrExit(StatusIB(status).ToChipError());
+    VerifyOrExit(newlist.size() <= numPresets, status = imcode::ResourceExhausted);
 
     // For all exisiting presets -- Walk the old list
     for (auto & old_preset : oldlist)
@@ -214,9 +197,9 @@ imcode ThermostatMatterScheduleManager::ValidatePresetsForCommitting(Span<Preset
         if (old_preset.builtIn.IsNull() == false && old_preset.builtIn.Value())
         {
             status = FindPresetByHandle(old_preset.presetHandle.Value(), newlist, queryPreset);
-            VerifyOrExit(status == EMBER_ZCL_STATUS_SUCCESS, status = EMBER_ZCL_STATUS_CONSTRAINT_ERROR);
-            VerifyOrExit(queryPreset.builtIn.IsNull() == false, status = EMBER_ZCL_STATUS_UNSUPPORTED_ACCESS);
-            VerifyOrExit(queryPreset.builtIn.Value() == true, status = EMBER_ZCL_STATUS_UNSUPPORTED_ACCESS);
+            VerifyOrExit(status == imcode::Success, status = imcode::ConstraintError);
+            VerifyOrExit(queryPreset.builtIn.IsNull() == false, status = imcode::UnsupportedAccess);
+            VerifyOrExit(queryPreset.builtIn.Value() == true, status = imcode::UnsupportedAccess);
         }
 
         // Check 2 and 3 and 4. -- If the preset is currently being referenced but would be deleted.
@@ -225,7 +208,7 @@ imcode ThermostatMatterScheduleManager::ValidatePresetsForCommitting(Span<Preset
             IsPresetHandleReferenced(*this, old_preset.presetHandle.Value()))
         {
             status = FindPresetByHandle(old_preset.presetHandle.Value(), newlist, queryPreset);
-            VerifyOrExit(status == EMBER_ZCL_STATUS_SUCCESS, status = EMBER_ZCL_STATUS_INVALID_IN_STATE);
+            VerifyOrExit(status == imcode::Success, status = imcode::InvalidInState);
         }
     }
 
@@ -238,25 +221,25 @@ imcode ThermostatMatterScheduleManager::ValidatePresetsForCommitting(Span<Preset
 
             // Make sure it's unique to the list
             status = CheckPresetHandleUnique(new_preset.presetHandle.Value(), newlist);
-            SuccessOrExit(status);
+            SuccessOrExit(StatusIB(status).ToChipError());
 
             // Look for it in the old list
             PresetStruct::Type existingPreset;
             status = FindPresetByHandle(new_preset.presetHandle.Value(), oldlist, existingPreset);
-            SuccessOrExit(status);
+            SuccessOrExit(StatusIB(status).ToChipError());
 
             // Check BuiltIn
-            VerifyOrExit(new_preset.builtIn == existingPreset.builtIn, status = EMBER_ZCL_STATUS_UNSUPPORTED_ACCESS);
+            VerifyOrExit(new_preset.builtIn == existingPreset.builtIn, status = imcode::UnsupportedAccess);
         }
         else
         {
             // new preset checks
-            VerifyOrExit(new_preset.builtIn == false, status = EMBER_ZCL_STATUS_CONSTRAINT_ERROR);
+            VerifyOrExit(new_preset.builtIn == false, status = imcode::ConstraintError);
         }
 
         // Check for Preset Scenario in Preset Types and that the Name support is valid (3 and 4)
         status = CheckPresetType(*this, new_preset);
-        SuccessOrExit(status);
+        SuccessOrExit(StatusIB(status).ToChipError());
     }
 
 exit:

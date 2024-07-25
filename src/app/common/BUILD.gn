@@ -18,6 +18,25 @@ config("includes") {
   include_dirs = [ "${chip_root}/zzz_generated/app-common" ]
 }
 
+source_set("attribute-type") {
+  sources = [ "${chip_root}/zzz_generated/app-common/app-common/zap-generated/attribute-type.h" ]
+
+  public_configs = [ ":includes" ]
+}
+
+source_set("ids") {
+  sources = [
+    "${chip_root}/zzz_generated/app-common/app-common/zap-generated/ids/Attributes.h",
+    "${chip_root}/zzz_generated/app-common/app-common/zap-generated/ids/Clusters.h",
+    "${chip_root}/zzz_generated/app-common/app-common/zap-generated/ids/Commands.h",
+    "${chip_root}/zzz_generated/app-common/app-common/zap-generated/ids/Events.h",
+  ]
+
+  public_deps = [ "${chip_root}/src/app/util:types" ]
+
+  public_configs = [ ":includes" ]
+}
+
 static_library("cluster-objects") {
   output_name = "libClusterObjects"
 
@@ -27,6 +46,8 @@ static_library("cluster-objects") {
   ]
 
   public_deps = [
+    ":ids",
+    "${chip_root}/src/app:events",
     "${chip_root}/src/app:paths",
     "${chip_root}/src/app/data-model",
     "${chip_root}/src/app/util:types",
@@ -42,6 +63,7 @@ source_set("enums") {
   sources = [
     "${chip_root}/zzz_generated/app-common/app-common/zap-generated/cluster-enums-check.h",
     "${chip_root}/zzz_generated/app-common/app-common/zap-generated/cluster-enums.h",
+    "CompatEnumNames.h",
   ]
 
   public_configs = [ ":includes" ]

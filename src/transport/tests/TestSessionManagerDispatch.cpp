@@ -21,6 +21,10 @@
  *      This file implements unit tests for the SessionManager implementation.
  */
 
+#include <errno.h>
+
+#include <pw_unit_test/framework.h>
+
 #define CHIP_ENABLE_TEST_ENCRYPTED_BUFFER_API // Up here in case some other header
                                               // includes SessionManager.h indirectly
 
@@ -29,19 +33,13 @@
 #include <crypto/DefaultSessionKeystore.h>
 #include <crypto/PersistentStorageOperationalKeystore.h>
 #include <lib/core/CHIPCore.h>
+#include <lib/core/StringBuilderAdapters.h>
 #include <lib/support/CodeUtils.h>
 #include <lib/support/TestPersistentStorageDelegate.h>
-#include <lib/support/UnitTestContext.h>
-#include <lib/support/UnitTestRegistration.h>
 #include <protocols/secure_channel/MessageCounterManager.h>
 #include <transport/SessionManager.h>
 #include <transport/TransportMgr.h>
 #include <transport/tests/LoopbackTransportManager.h>
-
-#include <nlbyteorder.h>
-#include <nlunit-test.h>
-
-#include <errno.h>
 
 #undef CHIP_ENABLE_TEST_ENCRYPTED_BUFFER_API
 
@@ -472,13 +470,13 @@ public:
         MessageTestEntry & testEntry = theMessageTestVector[mTestVectorIndex];
 
         ChipLogProgress(Test, "OnMessageReceived: sessionId=0x%04x", testEntry.sessionId);
-        NL_TEST_ASSERT(mSuite, header.GetSessionId() == testEntry.sessionId);
+        EXPECT_EQ(header.GetSessionId(), testEntry.sessionId);
 
         size_t dataLength   = msgBuf->DataLength();
         size_t expectLength = testEntry.payloadLength;
 
-        NL_TEST_ASSERT(mSuite, dataLength == expectLength);
-        NL_TEST_ASSERT(mSuite, memcmp(msgBuf->Start(), testEntry.payload, dataLength) == 0);
+        EXPECT_EQ(dataLength, expectLength);
+        EXPECT_EQ(memcmp(msgBuf->Start(), testEntry.payload, dataLength), 0);
 
         ChipLogProgress(Test, "::: TestSessionManagerDispatch[%d] PASS", mTestVectorIndex);
     }
@@ -491,7 +489,6 @@ public:
 
     unsigned NumMessagesReceived() { return mReceivedCount; }
 
-    nlTestSuite * mSuite      = nullptr;
     unsigned mTestVectorIndex = 0;
     unsigned mReceivedCount   = 0;
 };
@@ -505,18 +502,17 @@ PeerAddress AddressFromString(const char * str)
     return PeerAddress::UDP(addr);
 }
 
-void TestSessionManagerInit(nlTestSuite * inSuite, TestContext & ctx, SessionManager & sessionManager)
+void TestSessionManagerInit(TestContext & ctx, SessionManager & sessionManager)
 {
     static FabricTableHolder fabricTableHolder;
     static secure_channel::MessageCounterManager gMessageCounterManager;
     static chip::TestPersistentStorageDelegate deviceStorage;
     static chip::Crypto::DefaultSessionKeystore sessionKeystore;
 
-    NL_TEST_ASSERT(inSuite, CHIP_NO_ERROR == fabricTableHolder.Init());
-    NL_TEST_ASSERT(inSuite,
-                   CHIP_NO_ERROR ==
-                       sessionManager.Init(&ctx.GetSystemLayer(), &ctx.GetTransportMgr(), &gMessageCounterManager, &deviceStorage,
-                                           &fabricTableHolder.GetFabricTable(), sessionKeystore));
+    EXPECT_EQ(CHIP_NO_ERROR, fabricTableHolder.Init());
+    EXPECT_EQ(CHIP_NO_ERROR,
+              sessionManager.Init(&ctx.GetSystemLayer(), &ctx.GetTransportMgr(), &gMessageCounterManager, &deviceStorage,
+                                  &fabricTableHolder.GetFabricTable(), sessionKeystore));
 }
 
 // constexpr chip::FabricId kFabricId1               = 0x2906C908D115D362;
@@ -552,15 +548,23 @@ CHIP_ERROR InjectGroupSessionWithTestKey(SessionHolder & sessionHolder, MessageT
     return CHIP_NO_ERROR;
 }
 
-void TestSessionManagerDispatch(nlTestSuite * inSuite, void * inContext)
+class TestSessionManagerDispatch : public ::testing::Test
+{
+protected:
+    void SetUp() { ASSERT_EQ(mContext.Init(), CHIP_NO_ERROR); }
+    void TearDown() { mContext.Shutdown(); }
+
+    TestContext mContext;
+};
+
+TEST_F(TestSessionManagerDispatch, TestSessionManagerDispatch)
 {
     CHIP_ERROR err = CHIP_NO_ERROR;
 
-    TestContext & ctx = *reinterpret_cast<TestContext *>(inContext);
     SessionManager sessionManager;
     TestSessionManagerCallback callback;
 
-    TestSessionManagerInit(inSuite, ctx, sessionManager);
+    TestSessionManagerInit(mContext, sessionManager);
     sessionManager.SetMessageDelegate(&callback);
 
     IPAddress addr;
@@ -570,7 +574,6 @@ void TestSessionManagerDispatch(nlTestSuite * inSuite, void * inContext)
     SessionHolder aliceToBobSession;
     SessionHolder testGroupSession;
 
-    callback.mSuite = inSuite;
     for (unsigned i = 0; i < theMessageTestVectorLength; i++)
     {
         MessageTestEntry & testEntry = theMessageTestVector[i];
@@ -585,10 +588,10 @@ void TestSessionManagerDispatch(nlTestSuite * inSuite, void * inContext)
         err = sessionManager.InjectPaseSessionWithTestKey(aliceToBobSession, testEntry.sessionId, testEntry.peerNodeId,
                                                           testEntry.sessionId, kFabricIndex, peer,
                                                           CryptoContext::SessionRole::kResponder);
-        NL_TEST_ASSERT(inSuite, err == CHIP_NO_ERROR);
+        EXPECT_EQ(err, CHIP_NO_ERROR);
 
         err = InjectGroupSessionWithTestKey(testGroupSession, testEntry);
-        NL_TEST_ASSERT(inSuite, CHIP_NO_ERROR == err);
+        EXPECT_EQ(CHIP_NO_ERROR, err);
 
         const char * plain = testEntry.plain;
         const ByteSpan expectedPlain(reinterpret_cast<const uint8_t *>(plain), testEntry.plainLength);
@@ -598,7 +601,7 @@ void TestSessionManagerDispatch(nlTestSuite * inSuite, void * inContext)
 
         const PeerAddress peerAddress = AddressFromString(testEntry.peerAddr);
         sessionManager.OnMessageReceived(peerAddress, std::move(msg));
-        NL_TEST_ASSERT(inSuite, callback.NumMessagesReceived() == testEntry.expectedMessageCount);
+        EXPECT_EQ(callback.NumMessagesReceived(), testEntry.expectedMessageCount);
 
         if ((testEntry.expectedMessageCount == 0) && (callback.NumMessagesReceived() == 0))
         {
@@ -609,56 +612,4 @@ void TestSessionManagerDispatch(nlTestSuite * inSuite, void * inContext)
     sessionManager.Shutdown();
 }
 
-// ============================================================================
-//              Test Suite Instrumenation
-// ============================================================================
-
-/**
- *  Initialize the test suite.
- */
-int Initialize(void * aContext)
-{
-    CHIP_ERROR err = reinterpret_cast<TestContext *>(aContext)->Init();
-    return (err == CHIP_NO_ERROR) ? SUCCESS : FAILURE;
-}
-
-/**
- *  Finalize the test suite.
- */
-int Finalize(void * aContext)
-{
-    reinterpret_cast<TestContext *>(aContext)->Shutdown();
-    return SUCCESS;
-}
-
-/**
- *  Test Suite that lists all the test functions.
- */
-// clang-format off
-const nlTest sTests[] =
-{
-    NL_TEST_DEF("Test Session Manager Dispatch",  TestSessionManagerDispatch),
-
-    NL_TEST_SENTINEL()
-};
-
-nlTestSuite sSuite =
-{
-    "TestSessionManagerDispatch",
-    &sTests[0],
-    Initialize,
-    Finalize
-};
-// clang-format on
-
 } // namespace
-
-/**
- *  Main
- */
-int TestSessionManagerDispatchSuite()
-{
-    return chip::ExecuteTestsWithContext<TestContext>(&sSuite);
-}
-
-CHIP_REGISTER_TEST_SUITE(TestSessionManagerDispatchSuite);

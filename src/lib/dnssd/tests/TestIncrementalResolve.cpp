@@ -20,6 +20,10 @@
 
 #include <string.h>
 
+#include <pw_unit_test/framework.h>
+
+#include <lib/core/StringBuilderAdapters.h>
+#include <lib/dnssd/ServiceNaming.h>
 #include <lib/dnssd/minimal_mdns/core/tests/QNameStrings.h>
 #include <lib/dnssd/minimal_mdns/records/IP.h>
 #include <lib/dnssd/minimal_mdns/records/Ptr.h>
@@ -27,9 +31,6 @@
 #include <lib/dnssd/minimal_mdns/records/Srv.h>
 #include <lib/dnssd/minimal_mdns/records/Txt.h>
 #include <lib/support/ScopedBuffer.h>
-#include <lib/support/UnitTestRegistration.h>
-
-#include <nlunit-test.h>
 
 using namespace chip;
 using namespace chip::Dnssd;
@@ -51,7 +52,7 @@ const auto kTestHostName = testing::TestQName<2>({ "abcd", "local" });
 
 const auto kIrrelevantHostName = testing::TestQName<2>({ "different", "local" });
 
-void PreloadSrvRecord(nlTestSuite * inSuite, SrvRecord & record)
+void PreloadSrvRecord(SrvRecord & record)
 {
     uint8_t headerBuffer[HeaderRef::kSizeBytes] = {};
     HeaderRef dummyHeader(headerBuffer);
@@ -62,16 +63,15 @@ void PreloadSrvRecord(nlTestSuite * inSuite, SrvRecord & record)
     chip::Encoding::BigEndian::BufferWriter output(dataBuffer, sizeof(dataBuffer));
     RecordWriter writer(&output);
 
-    NL_TEST_ASSERT(inSuite,
-                   SrvResourceRecord(kTestOperationalName.Full(), kTestHostName.Full(), 0x1234 /* port */)
-                       .Append(dummyHeader, ResourceType::kAnswer, writer));
+    EXPECT_TRUE(SrvResourceRecord(kTestOperationalName.Full(), kTestHostName.Full(), 0x1234 /* port */)
+                    .Append(dummyHeader, ResourceType::kAnswer, writer));
 
     ResourceData resource;
     BytesRange packet(dataBuffer, dataBuffer + sizeof(dataBuffer));
     const uint8_t * _ptr = dataBuffer;
 
-    NL_TEST_ASSERT(inSuite, resource.Parse(packet, &_ptr));
-    NL_TEST_ASSERT(inSuite, record.Parse(resource.GetData(), packet));
+    EXPECT_TRUE(resource.Parse(packet, &_ptr));
+    EXPECT_TRUE(record.Parse(resource.GetData(), packet));
 }
 
 /// Convenience method to have a  serialized QName.
@@ -84,7 +84,7 @@ static SerializedQNameIterator AsSerializedQName(const uint8_t (&v)[N])
     return SerializedQNameIterator(BytesRange(v, v + N - 1), v);
 }
 
-void CallOnRecord(nlTestSuite * inSuite, IncrementalResolver & resolver, const ResourceRecord & record)
+void CallOnRecord(IncrementalResolver & resolver, const ResourceRecord & record)
 {
     uint8_t headerBuffer[HeaderRef::kSizeBytes] = {};
     HeaderRef dummyHeader(headerBuffer);
@@ -93,39 +93,39 @@ void CallOnRecord(nlTestSuite * inSuite, IncrementalResolver & resolver, const R
     chip::Encoding::BigEndian::BufferWriter output(dataBuffer, sizeof(dataBuffer));
     RecordWriter writer(&output);
 
-    NL_TEST_ASSERT(inSuite, record.Append(dummyHeader, ResourceType::kAnswer, writer));
-    NL_TEST_ASSERT(inSuite, writer.Fit());
+    EXPECT_TRUE(record.Append(dummyHeader, ResourceType::kAnswer, writer));
+    EXPECT_TRUE(writer.Fit());
 
     ResourceData resource;
     BytesRange packet(dataBuffer, dataBuffer + sizeof(dataBuffer));
     const uint8_t * _ptr = dataBuffer;
-    NL_TEST_ASSERT(inSuite, resource.Parse(packet, &_ptr));
-    NL_TEST_ASSERT(inSuite, resolver.OnRecord(chip::Inet::InterfaceId::Null(), resource, packet) == CHIP_NO_ERROR);
+    EXPECT_TRUE(resource.Parse(packet, &_ptr));
+    EXPECT_EQ(resolver.OnRecord(chip::Inet::InterfaceId::Null(), resource, packet), CHIP_NO_ERROR);
 }
 
-void TestStoredServerName(nlTestSuite * inSuite, void * inContext)
+TEST(TestIncrementalResolve, TestStoredServerName)
 {
 
     StoredServerName name;
 
     // name should start of as cleared
-    NL_TEST_ASSERT(inSuite, !name.Get().Next());
+    EXPECT_FALSE(name.Get().Next());
 
     // Data should be storable in server name
-    NL_TEST_ASSERT(inSuite, name.Set(kTestOperationalName.Serialized()) == CHIP_NO_ERROR);
-    NL_TEST_ASSERT(inSuite, name.Get() == kTestOperationalName.Serialized());
-    NL_TEST_ASSERT(inSuite, name.Get() != kTestCommissionerNode.Serialized());
-    NL_TEST_ASSERT(inSuite, name.Get() != kTestCommissionableNode.Serialized());
+    EXPECT_EQ(name.Set(kTestOperationalName.Serialized()), CHIP_NO_ERROR);
+    EXPECT_EQ(name.Get(), kTestOperationalName.Serialized());
+    EXPECT_NE(name.Get(), kTestCommissionerNode.Serialized());
+    EXPECT_NE(name.Get(), kTestCommissionableNode.Serialized());
 
-    NL_TEST_ASSERT(inSuite, name.Set(kTestCommissionerNode.Serialized()) == CHIP_NO_ERROR);
-    NL_TEST_ASSERT(inSuite, name.Get() != kTestOperationalName.Serialized());
-    NL_TEST_ASSERT(inSuite, name.Get() == kTestCommissionerNode.Serialized());
-    NL_TEST_ASSERT(inSuite, name.Get() != kTestCommissionableNode.Serialized());
+    EXPECT_EQ(name.Set(kTestCommissionerNode.Serialized()), CHIP_NO_ERROR);
+    EXPECT_NE(name.Get(), kTestOperationalName.Serialized());
+    EXPECT_EQ(name.Get(), kTestCommissionerNode.Serialized());
+    EXPECT_NE(name.Get(), kTestCommissionableNode.Serialized());
 
-    NL_TEST_ASSERT(inSuite, name.Set(kTestCommissionableNode.Serialized()) == CHIP_NO_ERROR);
-    NL_TEST_ASSERT(inSuite, name.Get() != kTestOperationalName.Serialized());
-    NL_TEST_ASSERT(inSuite, name.Get() != kTestCommissionerNode.Serialized());
-    NL_TEST_ASSERT(inSuite, name.Get() == kTestCommissionableNode.Serialized());
+    EXPECT_EQ(name.Set(kTestCommissionableNode.Serialized()), CHIP_NO_ERROR);
+    EXPECT_NE(name.Get(), kTestOperationalName.Serialized());
+    EXPECT_NE(name.Get(), kTestCommissionerNode.Serialized());
+    EXPECT_EQ(name.Get(), kTestCommissionableNode.Serialized());
 
     {
         // setting to a too long value should reset it
@@ -145,135 +145,130 @@ void TestStoredServerName(nlTestSuite * inSuite, void * inContext)
             if (writer.WritePos() < 64)
             {
                 // this is how much data can be fit by the copy
-                NL_TEST_ASSERT_LOOP(inSuite, idx, name.Set(AsSerializedQName(largeBuffer)) == CHIP_NO_ERROR);
-                NL_TEST_ASSERT_LOOP(inSuite, idx, name.Get() == AsSerializedQName(largeBuffer));
-                NL_TEST_ASSERT_LOOP(inSuite, idx, name.Get() != kTestOperationalName.Serialized());
+                EXPECT_EQ(name.Set(AsSerializedQName(largeBuffer)), CHIP_NO_ERROR) << "idx = " << idx;
+                EXPECT_EQ(name.Get(), AsSerializedQName(largeBuffer)) << "idx = " << idx;
+                EXPECT_NE(name.Get(), kTestOperationalName.Serialized()) << "idx = " << idx;
             }
             else
             {
-                NL_TEST_ASSERT_LOOP(inSuite, idx, name.Set(AsSerializedQName(largeBuffer)) == CHIP_ERROR_NO_MEMORY);
-                NL_TEST_ASSERT_LOOP(inSuite, idx, !name.Get().Next());
+                EXPECT_EQ(name.Set(AsSerializedQName(largeBuffer)), CHIP_ERROR_NO_MEMORY) << "idx = " << idx;
+                EXPECT_FALSE(name.Get().Next()) << "idx = " << idx;
             }
         }
     }
 }
 
-void TestCreation(nlTestSuite * inSuite, void * inContext)
+TEST(TestIncrementalResolve, TestCreation)
 {
     IncrementalResolver resolver;
 
-    NL_TEST_ASSERT(inSuite, !resolver.IsActive());
-    NL_TEST_ASSERT(inSuite, !resolver.IsActiveCommissionParse());
-    NL_TEST_ASSERT(inSuite, !resolver.IsActiveOperationalParse());
-    NL_TEST_ASSERT(
-        inSuite,
+    EXPECT_FALSE(resolver.IsActive());
+    EXPECT_FALSE(resolver.IsActiveCommissionParse());
+    EXPECT_FALSE(resolver.IsActiveOperationalParse());
+    EXPECT_TRUE(
         resolver.GetMissingRequiredInformation().HasOnly(IncrementalResolver::RequiredInformationBitFlags::kSrvInitialization));
 }
 
-void TestInactiveResetOnInitError(nlTestSuite * inSuite, void * inContext)
+TEST(TestIncrementalResolve, TestInactiveResetOnInitError)
 {
     IncrementalResolver resolver;
 
-    NL_TEST_ASSERT(inSuite, !resolver.IsActive());
+    EXPECT_FALSE(resolver.IsActive());
 
     SrvRecord srvRecord;
-    PreloadSrvRecord(inSuite, srvRecord);
+    PreloadSrvRecord(srvRecord);
 
     // test host name is not a 'matter' name
-    NL_TEST_ASSERT(inSuite, resolver.InitializeParsing(kTestHostName.Serialized(), srvRecord) != CHIP_NO_ERROR);
+    EXPECT_NE(resolver.InitializeParsing(kTestHostName.Serialized(), 0, srvRecord), CHIP_NO_ERROR);
 
-    NL_TEST_ASSERT(inSuite, !resolver.IsActive());
-    NL_TEST_ASSERT(inSuite, !resolver.IsActiveCommissionParse());
-    NL_TEST_ASSERT(inSuite, !resolver.IsActiveOperationalParse());
+    EXPECT_FALSE(resolver.IsActive());
+    EXPECT_FALSE(resolver.IsActiveCommissionParse());
+    EXPECT_FALSE(resolver.IsActiveOperationalParse());
 }
 
-void TestStartOperational(nlTestSuite * inSuite, void * inContext)
+TEST(TestIncrementalResolve, TestStartOperational)
 {
     IncrementalResolver resolver;
 
-    NL_TEST_ASSERT(inSuite, !resolver.IsActive());
+    EXPECT_FALSE(resolver.IsActive());
 
     SrvRecord srvRecord;
-    PreloadSrvRecord(inSuite, srvRecord);
+    PreloadSrvRecord(srvRecord);
 
-    NL_TEST_ASSERT(inSuite, resolver.InitializeParsing(kTestOperationalName.Serialized(), srvRecord) == CHIP_NO_ERROR);
+    EXPECT_EQ(resolver.InitializeParsing(kTestOperationalName.Serialized(), 1, srvRecord), CHIP_NO_ERROR);
 
-    NL_TEST_ASSERT(inSuite, resolver.IsActive());
-    NL_TEST_ASSERT(inSuite, !resolver.IsActiveCommissionParse());
-    NL_TEST_ASSERT(inSuite, resolver.IsActiveOperationalParse());
-    NL_TEST_ASSERT(inSuite,
-                   resolver.GetMissingRequiredInformation().HasOnly(IncrementalResolver::RequiredInformationBitFlags::kIpAddress));
-    NL_TEST_ASSERT(inSuite, resolver.GetTargetHostName() == kTestHostName.Serialized());
+    EXPECT_TRUE(resolver.IsActive());
+    EXPECT_FALSE(resolver.IsActiveCommissionParse());
+    EXPECT_TRUE(resolver.IsActiveOperationalParse());
+    EXPECT_TRUE(resolver.GetMissingRequiredInformation().HasOnly(IncrementalResolver::RequiredInformationBitFlags::kIpAddress));
+    EXPECT_EQ(resolver.GetTargetHostName(), kTestHostName.Serialized());
 }
 
-void TestStartCommissionable(nlTestSuite * inSuite, void * inContext)
+TEST(TestIncrementalResolve, TestStartCommissionable)
 {
     IncrementalResolver resolver;
 
-    NL_TEST_ASSERT(inSuite, !resolver.IsActive());
+    EXPECT_FALSE(resolver.IsActive());
 
     SrvRecord srvRecord;
-    PreloadSrvRecord(inSuite, srvRecord);
+    PreloadSrvRecord(srvRecord);
 
-    NL_TEST_ASSERT(inSuite, resolver.InitializeParsing(kTestCommissionableNode.Serialized(), srvRecord) == CHIP_NO_ERROR);
+    EXPECT_EQ(resolver.InitializeParsing(kTestCommissionableNode.Serialized(), 0, srvRecord), CHIP_NO_ERROR);
 
-    NL_TEST_ASSERT(inSuite, resolver.IsActive());
-    NL_TEST_ASSERT(inSuite, resolver.IsActiveCommissionParse());
-    NL_TEST_ASSERT(inSuite, !resolver.IsActiveOperationalParse());
-    NL_TEST_ASSERT(inSuite,
-                   resolver.GetMissingRequiredInformation().HasOnly(IncrementalResolver::RequiredInformationBitFlags::kIpAddress));
-    NL_TEST_ASSERT(inSuite, resolver.GetTargetHostName() == kTestHostName.Serialized());
+    EXPECT_TRUE(resolver.IsActive());
+    EXPECT_TRUE(resolver.IsActiveCommissionParse());
+    EXPECT_FALSE(resolver.IsActiveOperationalParse());
+    EXPECT_TRUE(resolver.GetMissingRequiredInformation().HasOnly(IncrementalResolver::RequiredInformationBitFlags::kIpAddress));
+    EXPECT_EQ(resolver.GetTargetHostName(), kTestHostName.Serialized());
 }
 
-void TestStartCommissioner(nlTestSuite * inSuite, void * inContext)
+TEST(TestIncrementalResolve, TestStartCommissioner)
 {
     IncrementalResolver resolver;
 
-    NL_TEST_ASSERT(inSuite, !resolver.IsActive());
+    EXPECT_FALSE(resolver.IsActive());
 
     SrvRecord srvRecord;
-    PreloadSrvRecord(inSuite, srvRecord);
+    PreloadSrvRecord(srvRecord);
 
-    NL_TEST_ASSERT(inSuite, resolver.InitializeParsing(kTestCommissionerNode.Serialized(), srvRecord) == CHIP_NO_ERROR);
+    EXPECT_EQ(resolver.InitializeParsing(kTestCommissionerNode.Serialized(), 0, srvRecord), CHIP_NO_ERROR);
 
-    NL_TEST_ASSERT(inSuite, resolver.IsActive());
-    NL_TEST_ASSERT(inSuite, resolver.IsActiveCommissionParse());
-    NL_TEST_ASSERT(inSuite, !resolver.IsActiveOperationalParse());
-    NL_TEST_ASSERT(inSuite,
-                   resolver.GetMissingRequiredInformation().HasOnly(IncrementalResolver::RequiredInformationBitFlags::kIpAddress));
-    NL_TEST_ASSERT(inSuite, resolver.GetTargetHostName() == kTestHostName.Serialized());
+    EXPECT_TRUE(resolver.IsActive());
+    EXPECT_TRUE(resolver.IsActiveCommissionParse());
+    EXPECT_FALSE(resolver.IsActiveOperationalParse());
+    EXPECT_TRUE(resolver.GetMissingRequiredInformation().HasOnly(IncrementalResolver::RequiredInformationBitFlags::kIpAddress));
+    EXPECT_EQ(resolver.GetTargetHostName(), kTestHostName.Serialized());
 }
 
-void TestParseOperational(nlTestSuite * inSuite, void * inContext)
+TEST(TestIncrementalResolve, TestParseOperational)
 {
     IncrementalResolver resolver;
 
-    NL_TEST_ASSERT(inSuite, !resolver.IsActive());
+    EXPECT_FALSE(resolver.IsActive());
 
     SrvRecord srvRecord;
-    PreloadSrvRecord(inSuite, srvRecord);
+    PreloadSrvRecord(srvRecord);
 
-    NL_TEST_ASSERT(inSuite, resolver.InitializeParsing(kTestOperationalName.Serialized(), srvRecord) == CHIP_NO_ERROR);
+    EXPECT_EQ(resolver.InitializeParsing(kTestOperationalName.Serialized(), 1, srvRecord), CHIP_NO_ERROR);
 
     // once initialized, parsing should be ready however no IP address is available
-    NL_TEST_ASSERT(inSuite, resolver.IsActiveOperationalParse());
-    NL_TEST_ASSERT(inSuite,
-                   resolver.GetMissingRequiredInformation().HasOnly(IncrementalResolver::RequiredInformationBitFlags::kIpAddress));
-    NL_TEST_ASSERT(inSuite, resolver.GetTargetHostName() == kTestHostName.Serialized());
+    EXPECT_TRUE(resolver.IsActiveOperationalParse());
+    EXPECT_TRUE(resolver.GetMissingRequiredInformation().HasOnly(IncrementalResolver::RequiredInformationBitFlags::kIpAddress));
+    EXPECT_EQ(resolver.GetTargetHostName(), kTestHostName.Serialized());
 
     // Send an IP for an irrelevant host name
     {
         Inet::IPAddress addr;
-        NL_TEST_ASSERT(inSuite, Inet::IPAddress::FromString("fe80::aabb:ccdd:2233:4455", addr));
+        EXPECT_TRUE(Inet::IPAddress::FromString("fe80::aabb:ccdd:2233:4455", addr));
 
-        CallOnRecord(inSuite, resolver, IPResourceRecord(kIrrelevantHostName.Full(), addr));
+        CallOnRecord(resolver, IPResourceRecord(kIrrelevantHostName.Full(), addr));
     }
 
     // Send a useful IP address here
     {
         Inet::IPAddress addr;
-        NL_TEST_ASSERT(inSuite, Inet::IPAddress::FromString("fe80::abcd:ef11:2233:4455", addr));
-        CallOnRecord(inSuite, resolver, IPResourceRecord(kTestHostName.Full(), addr));
+        EXPECT_TRUE(Inet::IPAddress::FromString("fe80::abcd:ef11:2233:4455", addr));
+        CallOnRecord(resolver, IPResourceRecord(kTestHostName.Full(), addr));
     }
 
     // Send a TXT record for an irrelevant host name
@@ -285,7 +280,7 @@ void TestParseOperational(nlTestSuite * inSuite, void * inContext)
             "T=1"                             // TCP supported
         };
 
-        CallOnRecord(inSuite, resolver, TxtResourceRecord(kTestHostName.Full(), entries));
+        CallOnRecord(resolver, TxtResourceRecord(kTestHostName.Full(), entries));
     }
 
     // Adding actual text entries that are useful
@@ -297,70 +292,69 @@ void TestParseOperational(nlTestSuite * inSuite, void * inContext)
             "SII=23"   // session idle interval
         };
 
-        CallOnRecord(inSuite, resolver, TxtResourceRecord(kTestOperationalName.Full(), entries));
+        CallOnRecord(resolver, TxtResourceRecord(kTestOperationalName.Full(), entries));
     }
 
     // Resolver should have all data
-    NL_TEST_ASSERT(inSuite, !resolver.GetMissingRequiredInformation().HasAny());
+    EXPECT_FALSE(resolver.GetMissingRequiredInformation().HasAny());
 
     // At this point taking value should work. Once taken, the resolver is reset.
     ResolvedNodeData nodeData;
-    NL_TEST_ASSERT(inSuite, resolver.Take(nodeData) == CHIP_NO_ERROR);
-    NL_TEST_ASSERT(inSuite, !resolver.IsActive());
+    EXPECT_EQ(resolver.Take(nodeData), CHIP_NO_ERROR);
+    EXPECT_FALSE(resolver.IsActive());
 
     // validate data as it was passed in
-    NL_TEST_ASSERT(inSuite,
-                   nodeData.operationalData.peerId ==
-                       PeerId().SetCompressedFabricId(0x1234567898765432LL).SetNodeId(0xABCDEFEDCBAABCDELL));
-    NL_TEST_ASSERT(inSuite, nodeData.resolutionData.numIPs == 1);
-    NL_TEST_ASSERT(inSuite, nodeData.resolutionData.port == 0x1234);
-    NL_TEST_ASSERT(inSuite, !nodeData.resolutionData.supportsTcp);
-    NL_TEST_ASSERT(inSuite, !nodeData.resolutionData.GetMrpRetryIntervalActive().HasValue());
-    NL_TEST_ASSERT(inSuite, nodeData.resolutionData.GetMrpRetryIntervalIdle().HasValue());
-    NL_TEST_ASSERT(inSuite, nodeData.resolutionData.GetMrpRetryIntervalIdle().Value() == chip::System::Clock::Milliseconds32(23));
+    EXPECT_EQ(nodeData.operationalData.peerId,
+              PeerId().SetCompressedFabricId(0x1234567898765432LL).SetNodeId(0xABCDEFEDCBAABCDELL));
+    EXPECT_FALSE(nodeData.operationalData.hasZeroTTL);
+    EXPECT_EQ(nodeData.resolutionData.numIPs, 1u);
+    EXPECT_EQ(nodeData.resolutionData.port, 0x1234);
+    EXPECT_FALSE(nodeData.resolutionData.supportsTcpServer);
+    EXPECT_FALSE(nodeData.resolutionData.supportsTcpClient);
+    EXPECT_FALSE(nodeData.resolutionData.GetMrpRetryIntervalActive().has_value());
+    EXPECT_EQ(nodeData.resolutionData.GetMrpRetryIntervalIdle(), std::make_optional(chip::System::Clock::Milliseconds32(23)));
 
     Inet::IPAddress addr;
-    NL_TEST_ASSERT(inSuite, Inet::IPAddress::FromString("fe80::abcd:ef11:2233:4455", addr));
-    NL_TEST_ASSERT(inSuite, nodeData.resolutionData.ipAddress[0] == addr);
+    EXPECT_TRUE(Inet::IPAddress::FromString("fe80::abcd:ef11:2233:4455", addr));
+    EXPECT_EQ(nodeData.resolutionData.ipAddress[0], addr);
 }
 
-void TestParseCommissionable(nlTestSuite * inSuite, void * inContext)
+TEST(TestIncrementalResolve, TestParseCommissionable)
 {
     IncrementalResolver resolver;
 
-    NL_TEST_ASSERT(inSuite, !resolver.IsActive());
+    EXPECT_FALSE(resolver.IsActive());
 
     SrvRecord srvRecord;
-    PreloadSrvRecord(inSuite, srvRecord);
+    PreloadSrvRecord(srvRecord);
 
-    NL_TEST_ASSERT(inSuite, resolver.InitializeParsing(kTestCommissionableNode.Serialized(), srvRecord) == CHIP_NO_ERROR);
+    EXPECT_EQ(resolver.InitializeParsing(kTestCommissionableNode.Serialized(), 0, srvRecord), CHIP_NO_ERROR);
 
     // once initialized, parsing should be ready however no IP address is available
-    NL_TEST_ASSERT(inSuite, resolver.IsActiveCommissionParse());
-    NL_TEST_ASSERT(inSuite,
-                   resolver.GetMissingRequiredInformation().HasOnly(IncrementalResolver::RequiredInformationBitFlags::kIpAddress));
-    NL_TEST_ASSERT(inSuite, resolver.GetTargetHostName() == kTestHostName.Serialized());
+    EXPECT_TRUE(resolver.IsActiveCommissionParse());
+    EXPECT_TRUE(resolver.GetMissingRequiredInformation().HasOnly(IncrementalResolver::RequiredInformationBitFlags::kIpAddress));
+    EXPECT_EQ(resolver.GetTargetHostName(), kTestHostName.Serialized());
 
     // Send an IP for an irrelevant host name
     {
         Inet::IPAddress addr;
 
-        NL_TEST_ASSERT(inSuite, Inet::IPAddress::FromString("fe80::aabb:ccdd:2233:4455", addr));
-        CallOnRecord(inSuite, resolver, IPResourceRecord(kIrrelevantHostName.Full(), addr));
+        EXPECT_TRUE(Inet::IPAddress::FromString("fe80::aabb:ccdd:2233:4455", addr));
+        CallOnRecord(resolver, IPResourceRecord(kIrrelevantHostName.Full(), addr));
     }
 
     // Send a useful IP address here
     {
         Inet::IPAddress addr;
-        NL_TEST_ASSERT(inSuite, Inet::IPAddress::FromString("fe80::abcd:ef11:2233:4455", addr));
-        CallOnRecord(inSuite, resolver, IPResourceRecord(kTestHostName.Full(), addr));
+        EXPECT_TRUE(Inet::IPAddress::FromString("fe80::abcd:ef11:2233:4455", addr));
+        CallOnRecord(resolver, IPResourceRecord(kTestHostName.Full(), addr));
     }
 
     // Send another IP address
     {
         Inet::IPAddress addr;
-        NL_TEST_ASSERT(inSuite, Inet::IPAddress::FromString("fe80::f0f1:f2f3:f4f5:1234", addr));
-        CallOnRecord(inSuite, resolver, IPResourceRecord(kTestHostName.Full(), addr));
+        EXPECT_TRUE(Inet::IPAddress::FromString("fe80::f0f1:f2f3:f4f5:1234", addr));
+        CallOnRecord(resolver, IPResourceRecord(kTestHostName.Full(), addr));
     }
 
     // Send a TXT record for an irrelevant host name
@@ -372,7 +366,7 @@ void TestParseCommissionable(nlTestSuite * inSuite, void * inContext)
             "SII=123"                         // session idle interval
         };
 
-        CallOnRecord(inSuite, resolver, TxtResourceRecord(kTestHostName.Full(), entries));
+        CallOnRecord(resolver, TxtResourceRecord(kTestHostName.Full(), entries));
     }
 
     // Adding actual text entries that are useful
@@ -387,61 +381,38 @@ void TestParseCommissionable(nlTestSuite * inSuite, void * inContext)
             "DN=mytest"   // Device name
         };
 
-        CallOnRecord(inSuite, resolver, TxtResourceRecord(kTestCommissionableNode.Full(), entries));
+        CallOnRecord(resolver, TxtResourceRecord(kTestCommissionableNode.Full(), entries));
     }
 
     // Resolver should have all data
-    NL_TEST_ASSERT(inSuite, !resolver.GetMissingRequiredInformation().HasAny());
+    EXPECT_FALSE(resolver.GetMissingRequiredInformation().HasAny());
 
     // At this point taking value should work. Once taken, the resolver is reset.
-    DiscoveredNodeData nodeData;
-    NL_TEST_ASSERT(inSuite, resolver.Take(nodeData) == CHIP_NO_ERROR);
-    NL_TEST_ASSERT(inSuite, !resolver.IsActive());
+    DiscoveredNodeData discoveredNodeData;
+    EXPECT_TRUE(resolver.Take(discoveredNodeData) == CHIP_NO_ERROR);
+    EXPECT_FALSE(resolver.IsActive());
+
+    EXPECT_TRUE(discoveredNodeData.Is<CommissionNodeData>());
+    CommissionNodeData nodeData = discoveredNodeData.Get<CommissionNodeData>();
 
     // validate data as it was passed in
-    NL_TEST_ASSERT(inSuite, nodeData.resolutionData.numIPs == 2);
-    NL_TEST_ASSERT(inSuite, nodeData.resolutionData.port == 0x1234);
-    NL_TEST_ASSERT(inSuite, !nodeData.resolutionData.supportsTcp);
-    NL_TEST_ASSERT(inSuite, nodeData.resolutionData.GetMrpRetryIntervalActive().HasValue());
-    NL_TEST_ASSERT(inSuite,
-                   nodeData.resolutionData.GetMrpRetryIntervalActive().Value() == chip::System::Clock::Milliseconds32(321));
-    NL_TEST_ASSERT(inSuite, !nodeData.resolutionData.GetMrpRetryIntervalIdle().HasValue());
+    EXPECT_EQ(nodeData.numIPs, 2u);
+    EXPECT_EQ(nodeData.port, 0x1234);
+    EXPECT_FALSE(nodeData.supportsTcpClient);
+    EXPECT_FALSE(nodeData.supportsTcpServer);
+    EXPECT_EQ(nodeData.GetMrpRetryIntervalActive(), std::make_optional(chip::System::Clock::Milliseconds32(321)));
+    EXPECT_FALSE(nodeData.GetMrpRetryIntervalIdle().has_value());
 
     Inet::IPAddress addr;
-    NL_TEST_ASSERT(inSuite, Inet::IPAddress::FromString("fe80::abcd:ef11:2233:4455", addr));
-    NL_TEST_ASSERT(inSuite, nodeData.resolutionData.ipAddress[0] == addr);
-    NL_TEST_ASSERT(inSuite, Inet::IPAddress::FromString("fe80::f0f1:f2f3:f4f5:1234", addr));
-    NL_TEST_ASSERT(inSuite, nodeData.resolutionData.ipAddress[1] == addr);
+    EXPECT_TRUE(Inet::IPAddress::FromString("fe80::abcd:ef11:2233:4455", addr));
+    EXPECT_EQ(nodeData.ipAddress[0], addr);
+    EXPECT_TRUE(Inet::IPAddress::FromString("fe80::f0f1:f2f3:f4f5:1234", addr));
+    EXPECT_EQ(nodeData.ipAddress[1], addr);
 
     // parsed txt data for discovered nodes
-    NL_TEST_ASSERT(inSuite, nodeData.commissionData.longDiscriminator == 22345);
-    NL_TEST_ASSERT(inSuite, nodeData.commissionData.vendorId == 321);
-    NL_TEST_ASSERT(inSuite, nodeData.commissionData.productId == 654);
-    NL_TEST_ASSERT(inSuite, strcmp(nodeData.commissionData.deviceName, "mytest") == 0);
+    EXPECT_EQ(nodeData.longDiscriminator, 22345);
+    EXPECT_EQ(nodeData.vendorId, 321);
+    EXPECT_EQ(nodeData.productId, 654);
+    EXPECT_STREQ(nodeData.deviceName, "mytest");
 }
-
-const nlTest sTests[] = {
-    // Tests for helper class
-    NL_TEST_DEF("StoredServerName", TestStoredServerName), //
-
-    // Actual resolver tests
-    NL_TEST_DEF("Creation", TestCreation),                                 //
-    NL_TEST_DEF("InactiveResetOnInitError", TestInactiveResetOnInitError), //
-    NL_TEST_DEF("StartOperational", TestStartOperational),                 //
-    NL_TEST_DEF("StartCommissionable", TestStartCommissionable),           //
-    NL_TEST_DEF("StartCommissioner", TestStartCommissioner),               //
-    NL_TEST_DEF("ParseOperational", TestParseOperational),                 //
-    NL_TEST_DEF("ParseCommissionable", TestParseCommissionable),           //
-    NL_TEST_SENTINEL()                                                     //
-};
-
 } // namespace
-
-int TestChipDnsSdIncrementalResolve()
-{
-    nlTestSuite theSuite = { "IncrementalResolve", &sTests[0], nullptr, nullptr };
-    nlTestRunner(&theSuite, nullptr);
-    return nlTestRunnerStats(&theSuite);
-}
-
-CHIP_REGISTER_TEST_SUITE(TestChipDnsSdIncrementalResolve)

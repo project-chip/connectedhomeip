@@ -25,6 +25,22 @@ limitations under the License.
     <server init="false" tick="false">true</server>
     <globalAttribute side="either" code="0xFFFD" value="2"/> <!-- Revision   -->
     <description>This cluster provides an interface for controlling the current Channel on a device.</description>
+
+    <features>
+      <feature bit="0" code="CL" name="ChannelList" summary="Provides list of available channels.">
+        <optionalConform/>
+      </feature>
+      <feature bit="1" code="LI" name="LineupInfo" summary="Provides lineup info, which is a reference to an external source of lineup information.">
+        <optionalConform/>
+      </feature>
+      <feature bit="2" code="EG" name="ElectronicGuide" summary="Provides electronic program guide information.">
+        <optionalConform/>
+      </feature>
+      <feature bit="3" code="RP" name="RecordProgram" summary="Provides ability to record program.">
+        <optionalConform/>
+      </feature>
+    </features>
+
     <attribute side="server" code="0x0000" define="CHANNEL_LIST"            type="array" entryType="ChannelInfoStruct" length="254"                    writable="false" optional="true">ChannelList</attribute>
     <attribute side="server" code="0x0001" define="CHANNEL_LINEUP"          type="LineupInfoStruct"                    default="0x0" isNullable="true" writable="false" optional="true">Lineup</attribute>
     <attribute side="server" code="0x0002" define="CHANNEL_CURRENT_CHANNEL" type="ChannelInfoStruct"                   default="0x0" isNullable="true" writable="false" optional="true">CurrentChannel</attribute>
@@ -190,14 +206,6 @@ limitations under the License.
     <field name="Scheduled" mask="0x1"/>
     <field name="RecordSeries"  mask="0x2"/>
     <field name="Recorded" mask="0x4"/>
-  </bitmap>
-
-  <bitmap name="Feature" type="bitmap32">
-    <cluster code="0x0504"/>
-    <field name="ChannelList" mask="0x1"/>
-    <field name="LineupInfo"  mask="0x2"/>
-    <field name="ElectronicGuide" mask="0x4"/>
-    <field name="RecordProgram"  mask="0x8"/>
   </bitmap>
 
 </configurator>

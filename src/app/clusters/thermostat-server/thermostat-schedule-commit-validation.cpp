@@ -1,9 +1,5 @@
 #include "thermostat-server.h"
-
-#include <app/util/af.h>
-
 #include <app/util/attribute-storage.h>
-
 #include <app-common/zap-generated/attributes/Accessors.h>
 #include <app-common/zap-generated/callback.h>
 #include <app-common/zap-generated/cluster-objects.h>
@@ -30,11 +26,11 @@ static imcode FindScheduleByHandle(const chip::ByteSpan & handle, const Span<Sch
         if ((schedule.scheduleHandle.IsNull() == false) && handle.data_equal(schedule.scheduleHandle.Value()))
         {
             outSchedule = schedule;
-            return EMBER_ZCL_STATUS_SUCCESS;
+            return imcode::Success;
         }
     }
 
-    return EMBER_ZCL_STATUS_NOT_FOUND;
+    return imcode::NotFound;
 }
 
 static imcode CheckScheduleHandleUnique(const chip::ByteSpan & handle, Span<ScheduleStruct::Type> & list)
@@ -50,22 +46,22 @@ static imcode CheckScheduleHandleUnique(const chip::ByteSpan & handle, Span<Sche
             }
             else
             {
-                return EMBER_ZCL_STATUS_CONSTRAINT_ERROR;
+                return imcode::ConstraintError;
             }
         }
     }
 
-    return EMBER_ZCL_STATUS_SUCCESS;
+    return imcode::Success;
 }
 
 static bool IsScheduleHandleReferenced(ThermostatMatterScheduleManager & mgr, const chip::ByteSpan & handle)
 {
-    imcode status = EMBER_ZCL_STATUS_SUCCESS;
+    imcode status = imcode::Success;
 
     // Check Active Preset Handle
     DataModel::Nullable<chip::MutableByteSpan> activeScheduleHandle;
     status = ActiveScheduleHandle::Get(mgr.mEndpoint, activeScheduleHandle);
-    VerifyOrDie(status == EMBER_ZCL_STATUS_SUCCESS);
+    VerifyOrDie(status == imcode::Success);
     if ((activeScheduleHandle.IsNull() == false) && activeScheduleHandle.Value().data_equal(handle))
         return true;
 
@@ -145,7 +141,7 @@ using DecodableType = Type;
 
 static imcode CheckScheduleTypes(ThermostatMatterScheduleManager & mgr, ScheduleStruct::Type & schedule, Span<PresetStruct::Type> & presetList)
 {
-    imcode status = EMBER_ZCL_STATUS_CONSTRAINT_ERROR;
+    imcode status = imcode::ConstraintError;
     size_t index         = 0;
     ScheduleTypeStruct::Type scheduleType;
 
@@ -159,7 +155,7 @@ static imcode CheckScheduleTypes(ThermostatMatterScheduleManager & mgr, Schedule
             if (schedule.presetHandle.HasValue() && schedule.presetHandle.Value().empty() == false)
             {
                 const bool presetsSupported = scheduleType.scheduleTypeFeatures.Has(ScheduleTypeFeaturesBitmap::kSupportsPresets);
-                VerifyOrReturnError(presetsSupported == true, EMBER_ZCL_STATUS_CONSTRAINT_ERROR);
+                VerifyOrReturnError(presetsSupported == true, imcode::ConstraintError);
 
                 // make sure the preset exists (check 7)
                 {
@@ -176,7 +172,7 @@ static imcode CheckScheduleTypes(ThermostatMatterScheduleManager & mgr, Schedule
                         }
                         preset_index++;
                     }
-                    VerifyOrReturnError(presetFound == true, EMBER_ZCL_STATUS_CONSTRAINT_ERROR);
+                    VerifyOrReturnError(presetFound == true, imcode::ConstraintError);
                 }
             }
 
@@ -184,17 +180,17 @@ static imcode CheckScheduleTypes(ThermostatMatterScheduleManager & mgr, Schedule
             if (schedule.name.HasValue() == false && schedule.name.Value().empty() == false)
             {
                 const bool nameSupported = scheduleType.scheduleTypeFeatures.Has(ScheduleTypeFeaturesBitmap::kSupportsNames);
-                VerifyOrReturnError(nameSupported == true, EMBER_ZCL_STATUS_CONSTRAINT_ERROR);
+                VerifyOrReturnError(nameSupported == true, imcode::ConstraintError);
             }
 
             // Check the off requirements (check 9)
             if (schedule.systemMode == SystemModeEnum::kOff)
             {
                 const bool offSupported = scheduleType.scheduleTypeFeatures.Has(ScheduleTypeFeaturesBitmap::kSupportsOff);
-                VerifyOrReturnError(offSupported == true, EMBER_ZCL_STATUS_CONSTRAINT_ERROR);
+                VerifyOrReturnError(offSupported == true, imcode::ConstraintError);
             }
 
-            return EMBER_ZCL_STATUS_SUCCESS;
+            return imcode::Success;
         }
         index++;
     }
@@ -204,18 +200,18 @@ static imcode CheckScheduleTypes(ThermostatMatterScheduleManager & mgr, Schedule
 
 static imcode CheckNumberOfTransitions(ThermostatMatterScheduleManager & mgr, ScheduleStruct::Type & schedule)
 {
-    imcode status = EMBER_ZCL_STATUS_CONSTRAINT_ERROR;
+    imcode status = imcode::ConstraintError;
 
     // Check 4
     uint8_t numberOfScheduleTransitions;
     DataModel::Nullable<uint8_t> numberOfScheduleTransitionsPerDay;
 
     status = NumberOfScheduleTransitions::Get(mgr.mEndpoint, &numberOfScheduleTransitions);
-    VerifyOrDie(status == EMBER_ZCL_STATUS_SUCCESS);
-    VerifyOrExit(schedule.transitions.size() <= numberOfScheduleTransitions, status = EMBER_ZCL_STATUS_RESOURCE_EXHAUSTED);
+    VerifyOrDie(status == imcode::Success);
+    VerifyOrExit(schedule.transitions.size() <= numberOfScheduleTransitions, status = imcode::ResourceExhausted);
 
     status = NumberOfScheduleTransitionPerDay::Get(mgr.mEndpoint, numberOfScheduleTransitionsPerDay);
-    VerifyOrDie(status == EMBER_ZCL_STATUS_SUCCESS);
+    VerifyOrDie(status == imcode::Success);
 
     if (numberOfScheduleTransitionsPerDay.IsNull() == false)
     {
@@ -235,7 +231,7 @@ static imcode CheckNumberOfTransitions(ThermostatMatterScheduleManager & mgr, Sc
         for (int weekDayIndex = 0; weekDayIndex < 7; weekDayIndex++)
         {
             VerifyOrExit(weekDayTransitionCounts[weekDayIndex] <= numberOfScheduleTransitionsPerDay.Value(),
-                         status = EMBER_ZCL_STATUS_RESOURCE_EXHAUSTED);
+                         status = imcode::ResourceExhausted);
         }
     }
 
@@ -247,14 +243,14 @@ imcode ThermostatMatterScheduleManager::ValidateSchedulesForCommitting(Span<Sche
                                                                               Span<ScheduleStruct::Type> & newlist,
                                                                               Span<PresetStruct::Type> & presetlist)
 {
-    imcode status = EMBER_ZCL_STATUS_SUCCESS;
+    imcode status = imcode::Success;
     ScheduleStruct::Type querySchedule; // manager storage used for queries.
 
     // Check that new_list can fit.
     uint8_t numSchedules;
     status = NumberOfSchedules::Get(mEndpoint, &numSchedules);
-    SuccessOrExit(status);
-    VerifyOrExit(newlist.size() <= numSchedules, status = EMBER_ZCL_STATUS_RESOURCE_EXHAUSTED);
+    SuccessOrExit(StatusIB(status).ToChipError());
+    VerifyOrExit(newlist.size() <= numSchedules, status = imcode::ResourceExhausted);
 
     // For all exisiting schedules -- Walk the old list
     for (auto & old_schedule : oldlist)
@@ -265,9 +261,9 @@ imcode ThermostatMatterScheduleManager::ValidateSchedulesForCommitting(Span<Sche
         if ((old_schedule.builtIn.IsNull() == false) && (old_schedule.builtIn.Value() == true))
         {
             status = FindScheduleByHandle(old_schedule.scheduleHandle.Value(), newlist, querySchedule);
-            VerifyOrExit(status == EMBER_ZCL_STATUS_SUCCESS, status = EMBER_ZCL_STATUS_CONSTRAINT_ERROR);
-            VerifyOrExit(querySchedule.builtIn.IsNull() == false, status = EMBER_ZCL_STATUS_UNSUPPORTED_ACCESS);
-            VerifyOrExit(querySchedule.builtIn.Value() == true, status = EMBER_ZCL_STATUS_UNSUPPORTED_ACCESS);
+            VerifyOrExit(status == imcode::Success, status = imcode::ConstraintError);
+            VerifyOrExit(querySchedule.builtIn.IsNull() == false, status = imcode::UnsupportedAccess);
+            VerifyOrExit(querySchedule.builtIn.Value() == true, status = imcode::UnsupportedAccess);
         }
 
         // Check 2 -- If the schedule is currently being referenced but would be deleted.
@@ -276,7 +272,7 @@ imcode ThermostatMatterScheduleManager::ValidateSchedulesForCommitting(Span<Sche
         {
             VerifyOrDie(old_schedule.scheduleHandle.IsNull() == false);
             status = FindScheduleByHandle(old_schedule.scheduleHandle.Value(), newlist, querySchedule);
-            VerifyOrExit(status == EMBER_ZCL_STATUS_SUCCESS, status = EMBER_ZCL_STATUS_INVALID_IN_STATE);
+            VerifyOrExit(status == imcode::Success, status = imcode::InvalidInState);
         }
     }
 
@@ -289,33 +285,33 @@ imcode ThermostatMatterScheduleManager::ValidateSchedulesForCommitting(Span<Sche
 
             // Make sure it's unique to the list
             status = CheckScheduleHandleUnique(new_schedule.scheduleHandle.Value(), newlist);
-            SuccessOrExit(status);
+            SuccessOrExit(StatusIB(status).ToChipError());
 
             // Look for it in the old list
             ScheduleStruct::Type existingSchedule;
             status = FindScheduleByHandle(new_schedule.scheduleHandle.Value(), oldlist, existingSchedule);
-            SuccessOrExit(status);
+            SuccessOrExit(StatusIB(status).ToChipError());
 
             // Check BuiltIn
-            VerifyOrExit(new_schedule.builtIn.IsNull() == existingSchedule.builtIn.IsNull(), status = EMBER_ZCL_STATUS_UNSUPPORTED_ACCESS);
+            VerifyOrExit(new_schedule.builtIn.IsNull() == existingSchedule.builtIn.IsNull(), status = imcode::UnsupportedAccess);
             if (new_schedule.builtIn.IsNull() == false)
             {
-                VerifyOrExit(new_schedule.builtIn.Value() == existingSchedule.builtIn.Value(), status = EMBER_ZCL_STATUS_UNSUPPORTED_ACCESS);
+                VerifyOrExit(new_schedule.builtIn.Value() == existingSchedule.builtIn.Value(), status = imcode::UnsupportedAccess);
             }
         }
         else
         {
             // new schedule checks
-            VerifyOrExit((new_schedule.builtIn.IsNull() == true) || (new_schedule.builtIn.Value() == false), status = EMBER_ZCL_STATUS_CONSTRAINT_ERROR);
+            VerifyOrExit((new_schedule.builtIn.IsNull() == true) || (new_schedule.builtIn.Value() == false), status = imcode::ConstraintError);
         }
 
         // Check for system mode in Schedule Types
         status = CheckScheduleTypes(*this, new_schedule, presetlist);
-        SuccessOrExit(status);
+        SuccessOrExit(StatusIB(status).ToChipError());
 
         // Make sure the number of transitions does not exceed out limits
         status = CheckNumberOfTransitions(*this, new_schedule);
-        SuccessOrExit(status);
+        SuccessOrExit(StatusIB(status).ToChipError());
     }
 
 exit:

@@ -24,13 +24,6 @@
 
 #pragma once
 #if CHIP_DEVICE_CONFIG_ENABLE_CHIPOBLE
-
-#if (SLI_SI91X_ENABLE_BLE || RSI_BLE_ENABLE)
-#define BLE_MIN_CONNECTION_INTERVAL_MS 45 // 45 msec
-#define BLE_MAX_CONNECTION_INTERVAL_MS 45 // 45 msec
-#define BLE_SLAVE_LATENCY_MS 0
-#define BLE_TIMEOUT_MS 400
-#endif // (SLI_SI91X_ENABLE_BLE || RSI_BLE_ENABLE)
 #include "FreeRTOS.h"
 #include "timers.h"
 #if (SLI_SI91X_ENABLE_BLE || RSI_BLE_ENABLE)
@@ -87,7 +80,7 @@ public:
 
 #if CHIP_ENABLE_ADDITIONAL_DATA_ADVERTISING
 #if (SLI_SI91X_ENABLE_BLE || RSI_BLE_ENABLE)
-    static void HandleC3ReadRequest(void);
+    static void HandleC3ReadRequest(rsi_ble_read_req_t * rsi_ble_read_req);
 #else
 #if CHIP_ENABLE_ADDITIONAL_DATA_ADVERTISING
     static void HandleC3ReadRequest(volatile sl_bt_msg_t * evt);
@@ -116,20 +109,16 @@ private:
 
     // ===== Members that implement virtual methods on BlePlatformDelegate.
 
-    bool SubscribeCharacteristic(BLE_CONNECTION_OBJECT conId, const Ble::ChipBleUUID * svcId,
-                                 const Ble::ChipBleUUID * charId) override;
-    bool UnsubscribeCharacteristic(BLE_CONNECTION_OBJECT conId, const Ble::ChipBleUUID * svcId,
-                                   const Ble::ChipBleUUID * charId) override;
-    bool CloseConnection(BLE_CONNECTION_OBJECT conId) override;
+    CHIP_ERROR SubscribeCharacteristic(BLE_CONNECTION_OBJECT conId, const Ble::ChipBleUUID * svcId,
+                                       const Ble::ChipBleUUID * charId) override;
+    CHIP_ERROR UnsubscribeCharacteristic(BLE_CONNECTION_OBJECT conId, const Ble::ChipBleUUID * svcId,
+                                         const Ble::ChipBleUUID * charId) override;
+    CHIP_ERROR CloseConnection(BLE_CONNECTION_OBJECT conId) override;
     uint16_t GetMTU(BLE_CONNECTION_OBJECT conId) const override;
-    bool SendIndication(BLE_CONNECTION_OBJECT conId, const Ble::ChipBleUUID * svcId, const Ble::ChipBleUUID * charId,
-                        System::PacketBufferHandle pBuf) override;
-    bool SendWriteRequest(BLE_CONNECTION_OBJECT conId, const Ble::ChipBleUUID * svcId, const Ble::ChipBleUUID * charId,
-                          System::PacketBufferHandle pBuf) override;
-    bool SendReadRequest(BLE_CONNECTION_OBJECT conId, const Ble::ChipBleUUID * svcId, const Ble::ChipBleUUID * charId,
-                         System::PacketBufferHandle pBuf) override;
-    bool SendReadResponse(BLE_CONNECTION_OBJECT conId, BLE_READ_REQUEST_CONTEXT requestContext, const Ble::ChipBleUUID * svcId,
-                          const Ble::ChipBleUUID * charId) override;
+    CHIP_ERROR SendIndication(BLE_CONNECTION_OBJECT conId, const Ble::ChipBleUUID * svcId, const Ble::ChipBleUUID * charId,
+                              System::PacketBufferHandle pBuf) override;
+    CHIP_ERROR SendWriteRequest(BLE_CONNECTION_OBJECT conId, const Ble::ChipBleUUID * svcId, const Ble::ChipBleUUID * charId,
+                                System::PacketBufferHandle pBuf) override;
 
     // ===== Members that implement virtual methods on BleApplicationDelegate.
 
@@ -209,6 +198,11 @@ private:
     static void DriveBLEState(intptr_t arg);
     static void BleAdvTimeoutHandler(TimerHandle_t xTimer);
     uint8_t GetTimerHandle(uint8_t connectionHandle, bool allocate);
+
+#if (SLI_SI91X_ENABLE_BLE || RSI_BLE_ENABLE)
+protected:
+    static void OnSendIndicationTimeout(System::Layer * aLayer, void * appState);
+#endif
 };
 
 /**

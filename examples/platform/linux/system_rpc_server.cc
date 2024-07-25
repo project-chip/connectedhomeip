@@ -32,6 +32,8 @@
 #include "pw_rpc_system_server/rpc_server.h"
 #include "pw_stream/socket_stream.h"
 
+#include <string>
+
 namespace pw::rpc::system_server {
 namespace {
 

@@ -29,16 +29,39 @@ limitations under the License.
     <item name="RemainingCapacity" type="int8u" optional="false"/>
   </struct>
 
-  <struct name="AttributeValuePair">
+  <struct name="AttributeValuePairStruct">
     <cluster code="0x0062"/>
     <item name="AttributeID" type="attrib_id" optional="false"/>
-    <item name="AttributeValue" type="int32u" optional="false"/>
+    <item name="ValueUnsigned8" type="int8u" optional="true">
+      <optionalConform choice="a"/>
+    </item>
+    <item name="ValueSigned8" type="int8s" optional="true">
+      <optionalConform choice="a"/>
+    </item>
+    <item name="ValueUnsigned16" type="int16u" optional="true">
+      <optionalConform choice="a"/>
+    </item>
+    <item name="ValueSigned16" type="int16s" optional="true">
+      <optionalConform choice="a"/>
+    </item>
+    <item name="ValueUnsigned32" type="int32u" optional="true">
+      <optionalConform choice="a"/>
+    </item>
+    <item name="ValueSigned32" type="int32s" optional="true">
+      <optionalConform choice="a"/>
+    </item>
+    <item name="ValueUnsigned64" type="int64u" optional="true">
+      <optionalConform choice="a"/>
+    </item>
+    <item name="ValueSigned64" type="int64s" optional="true">
+      <optionalConform choice="a"/>
+    </item>
   </struct>
 
   <struct name="ExtensionFieldSet">
     <cluster code="0x0062"/>
     <item name="ClusterID" type="cluster_id"/>
-    <item name="AttributeValueList" type="AttributeValuePair" array="true"/>
+    <item name="AttributeValueList" type="AttributeValuePairStruct" array="true"/>
   </struct>
 
   <domain name="CHIP"/>
@@ -51,13 +74,19 @@ limitations under the License.
     <client tick="false" init="false">true</client>
     <server tick="false" init="false">true</server>
     <globalAttribute side="either" code="0xFFFD" value="1"/>
+
+    <features>
+      <feature bit="0" code="SN" name="SceneNames" summary="The ability to store a name for a scene.">
+        <optionalConform/>
+      </feature>
+    </features>
    
     <attribute side="server" code="0x0000" define="LAST_CONFIGURED_BY" type="node_id" writable="false" isNullable="true" optional="true">LastConfiguredBy</attribute>
     <attribute side="server" code="0x0001" define="SCENE_TABLE_SIZE" type="int16u" min="16" default="16" writable="false" optional="false">SceneTableSize</attribute>
     <attribute side="server" code="0x0002" define="FABRIC_SCENE_INFO" type="array" entryType="SceneInfoStruct" writable="false" optional="false">FabricSceneInfo</attribute>
     <command source="client" code="0x00" name="AddScene" response="AddSceneResponse" isFabricScoped="true" optional="false" cli="chip scenes add">
       <description>
-        Add a scene to the scene table. Extension field sets are supported, and are inputed as '{"ClusterID": VALUE, "AttributeValueList":[{"AttributeId": VALUE, "AttributeValue": VALUE}]}'
+        Add a scene to the scene table. Extension field sets are supported, and are inputed as '{"ClusterID": VALUE, "AttributeValueList":[{"AttributeID": VALUE, "Value*": VALUE}]}'
       </description>
       <arg name="GroupID" type="group_id"/>
       <arg name="SceneID" type="int8u"/>
@@ -195,8 +224,4 @@ limitations under the License.
     </command>
   </cluster>
 
-  <bitmap name="Feature" type="bitmap32">
-    <cluster code="0x0062" />
-    <field name="SceneNames" mask="0x01" />
-  </bitmap>
 </configurator>

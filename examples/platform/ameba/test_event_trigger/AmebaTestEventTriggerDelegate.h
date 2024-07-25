@@ -34,12 +34,10 @@
  *
  * @warning *** DO NOT USE FOR STANDARD CLUSTER EVENT TRIGGERS ***
  *
- * TODO(#31723): Rename `emberAfHandleEventTrigger` to `AmebaHandleGlobalTestEventTrigger`
- *
  * @retval true on success
  * @retval false if error happened
  */
-bool emberAfHandleEventTrigger(uint64_t eventTrigger);
+bool AmebaHandleGlobalTestEventTrigger(uint64_t eventTrigger);
 
 namespace chip {
 
@@ -61,7 +59,7 @@ public:
     CHIP_ERROR HandleEventTrigger(uint64_t eventTrigger) override
     {
         // WARNING: LEGACY SUPPORT ONLY, DO NOT EXTEND FOR STANDARD CLUSTERS
-        return (emberAfHandleEventTrigger(eventTrigger)) ? CHIP_NO_ERROR : CHIP_ERROR_INVALID_ARGUMENT;
+        return (AmebaHandleGlobalTestEventTrigger(eventTrigger)) ? CHIP_NO_ERROR : CHIP_ERROR_INVALID_ARGUMENT;
     }
 
 private:

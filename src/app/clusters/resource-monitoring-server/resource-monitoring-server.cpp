@@ -17,7 +17,9 @@
  */
 
 #include <app/AttributeAccessInterface.h>
+#include <app/AttributeAccessInterfaceRegistry.h>
 #include <app/CommandHandlerInterface.h>
+#include <app/CommandHandlerInterfaceRegistry.h>
 #include <app/ConcreteAttributePath.h>
 #include <app/ConcreteClusterPath.h>
 #include <app/InteractionModelEngine.h>
@@ -26,7 +28,6 @@
 #include <app/clusters/resource-monitoring-server/resource-monitoring-server.h>
 #include <app/data-model/Nullable.h>
 #include <app/reporting/reporting.h>
-#include <app/util/af.h>
 #include <app/util/attribute-storage.h>
 #include <lib/core/CHIPError.h>
 #include <lib/support/CodeUtils.h>
@@ -58,7 +59,7 @@ Instance::Instance(Delegate * aDelegate, EndpointId aEndpointId, ClusterId aClus
 
 Instance::~Instance()
 {
-    InteractionModelEngine::GetInstance()->UnregisterCommandHandler(this);
+    CommandHandlerInterfaceRegistry::UnregisterCommandHandler(this);
     unregisterAttributeAccessOverride(this);
 }
 
@@ -71,7 +72,7 @@ CHIP_ERROR Instance::Init()
 
     LoadPersistentAttributes();
 
-    ReturnErrorOnFailure(chip::app::InteractionModelEngine::GetInstance()->RegisterCommandHandler(this));
+    ReturnErrorOnFailure(CommandHandlerInterfaceRegistry::RegisterCommandHandler(this));
     VerifyOrReturnError(registerAttributeAccessOverride(this), CHIP_ERROR_INCORRECT_STATE);
     ChipLogDetail(Zcl, "ResourceMonitoring: calling mDelegate->Init()");
     ReturnErrorOnFailure(mDelegate->Init());

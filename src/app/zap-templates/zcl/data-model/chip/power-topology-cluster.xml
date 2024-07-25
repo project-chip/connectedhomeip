@@ -16,14 +16,8 @@ limitations under the License.
 -->
 <configurator>
   <domain name="Measurement &amp; Sensing"/>
-  <bitmap name="Feature" type="bitmap32">
-    <cluster code="0x009C"/>
-    <field name="NodeTopology" mask="0x01"/>
-    <field name="TreeTopology" mask="0x02"/>
-    <field name="SetTopology" mask="0x04"/>
-    <field name="DynamicPowerFlow" mask="0x08"/>
-  </bitmap>
-  <cluster code="0x009C" apiMaturity="provisional">
+
+  <cluster code="0x009C">
     <domain>Measurement &amp; Sensing</domain>
     <name>Power Topology</name>
     <code>0x009C</code>
@@ -32,6 +26,24 @@ limitations under the License.
     <client init="false" tick="false">true</client>
     <server init="false" tick="false">true</server>
     <globalAttribute code="0xFFFD" side="either" value="1"/>
+
+    <features>
+      <feature bit="0" code="NODE" name="NodeTopology" summary="This endpoint provides or consumes power to/from the entire node">
+        <optionalConform choice="a"/>
+      </feature>
+      <feature bit="1" code="TREE" name="TreeTopology" summary="This endpoint provides or consumes power to/from itself and its child endpoints">
+        <optionalConform choice="a"/>
+      </feature>
+      <feature bit="2" code="SET" name="SetTopology" summary="This endpoint provides or consumes power to/from a specified set of endpoints">
+        <optionalConform choice="a"/>
+      </feature>
+      <feature bit="3" code="DYPF" name="DynamicPowerFlow" summary="The specified set of endpoints may change">
+        <optionalConform>
+          <feature name="SET"/>
+        </optionalConform>
+      </feature>
+    </features>
+    
     <attribute code="0x0000" side="server" define="AVAILABLE_ENDPOINTS" type="array" entryType="endpoint_no" length="20" optional="true">AvailableEndpoints</attribute>
     <attribute code="0x0001" side="server" define="ACTIVE_ENDPOINTS" type="array" entryType="endpoint_no" length="20" optional="true">ActiveEndpoints</attribute>
   </cluster>

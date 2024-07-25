@@ -99,8 +99,6 @@ bl_iot_sdk("sdk") {
 
 chip_data_model("bouffalolab-lighting") {
   zap_file = "${example_dir}/data_model/lighting-app-thread.zap"
-
-  zap_pregenerated_dir = "${chip_root}/zzz_generated/lighting-app/zap-generated"
   is_server = true
 }
 
@@ -150,6 +148,7 @@ bouffalolab_executable("lighting_app") {
     ":sdk",
     "${chip_root}/examples/providers:device_info_provider",
     "${chip_root}/src/lib",
+    "${chip_root}/src/platform/logging:default",
     "${chip_root}/src/setup_payload",
   ]
 

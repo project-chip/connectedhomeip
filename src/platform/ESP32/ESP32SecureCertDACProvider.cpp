@@ -23,13 +23,13 @@
 #include <platform/ESP32/ESP32Config.h>
 #include <platform/ESP32/ESP32SecureCertDACProvider.h>
 
-#if CONFIG_USE_ESP32_ECDSA_PERIPHERAL
+#ifdef CONFIG_USE_ESP32_ECDSA_PERIPHERAL
 #include <platform/ESP32/ESP32CHIPCryptoPAL.h>
 #endif // CONFIG_USE_ESP32_ECDSA_PERIPHERAL
 
 #define TAG "dac_provider"
 
-#if CONFIG_SEC_CERT_DAC_PROVIDER
+#ifdef CONFIG_SEC_CERT_DAC_PROVIDER
 
 namespace chip {
 namespace DeviceLayer {
@@ -139,7 +139,7 @@ CHIP_ERROR ESP32SecureCertDACProvider ::SignWithDeviceAttestationKey(const ByteS
     // This flow is for devices supporting ECDSA peripheral
     if (keyType == ESP_SECURE_CERT_ECDSA_PERIPHERAL_KEY)
     {
-#if CONFIG_USE_ESP32_ECDSA_PERIPHERAL
+#ifdef CONFIG_USE_ESP32_ECDSA_PERIPHERAL
         Crypto::ESP32P256Keypair keypair;
         uint8_t efuseBlockId;
 
@@ -163,7 +163,7 @@ CHIP_ERROR ESP32SecureCertDACProvider ::SignWithDeviceAttestationKey(const ByteS
     }
     else // This flow is for devices which do not support ECDSA peripheral
     {
-#if !CONFIG_USE_ESP32_ECDSA_PERIPHERAL
+#ifndef CONFIG_USE_ESP32_ECDSA_PERIPHERAL
         Crypto::P256Keypair keypair;
         char * sc_keypair       = NULL;
         uint32_t sc_keypair_len = 0;

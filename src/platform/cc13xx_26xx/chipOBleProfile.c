@@ -169,7 +169,8 @@ bStatus_t CHIPoBLEProfile_AddService(uint32 services)
     uint8 status;
 
     // Allocate Client Characteristic Configuration tables
-    chipOBleProfileTxStateDataConfig = (gattCharCfg_t *) ICall_malloc((uint_least16_t) (sizeof(gattCharCfg_t) * MAX_NUM_BLE_CONNS));
+    chipOBleProfileTxStateDataConfig =
+        (gattCharCfg_t *) ICall_malloc((uint_least16_t) (sizeof(gattCharCfg_t) * LL_MAX_NUM_BLE_CONNS));
     if (chipOBleProfileTxStateDataConfig == NULL)
     {
         return bleMemAllocError;

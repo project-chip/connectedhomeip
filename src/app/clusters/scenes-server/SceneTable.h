@@ -149,7 +149,7 @@ public:
 
         bool IsValid() { return (mSceneId != kUndefinedSceneId); }
 
-        bool operator==(const SceneStorageId & other) { return (mGroupId == other.mGroupId && mSceneId == other.mSceneId); }
+        bool operator==(const SceneStorageId & other) const { return (mGroupId == other.mGroupId && mSceneId == other.mSceneId); }
     };
 
     /// @brief struct used to store data held in a scene
@@ -235,7 +235,7 @@ public:
         SceneTableEntry(SceneStorageId id) : mStorageId(id) {}
         SceneTableEntry(const SceneStorageId id, const SceneData data) : mStorageId(id), mStorageData(data) {}
 
-        bool operator==(const SceneTableEntry & other)
+        bool operator==(const SceneTableEntry & other) const
         {
             return (mStorageId == other.mStorageId && mStorageData == other.mStorageData);
         }

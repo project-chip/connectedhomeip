@@ -27,17 +27,24 @@
 
 #include <cinttypes>
 
-#include "access/RequestPath.h"
-#include "access/SubjectDescriptor.h"
+#include <access/RequestPath.h>
+#include <access/SubjectDescriptor.h>
 #include <app/AppConfig.h>
+#include <app/CommandHandlerInterfaceRegistry.h>
 #include <app/RequiredPrivilege.h>
+#include <app/util/IMClusterCommandHandler.h>
 #include <app/util/af-types.h>
+#include <app/util/ember-compatibility-functions.h>
 #include <app/util/endpoint-config-api.h>
 #include <lib/core/Global.h>
 #include <lib/core/TLVUtilities.h>
 #include <lib/support/CHIPFaultInjection.h>
 #include <lib/support/CodeUtils.h>
 #include <lib/support/FibonacciUtils.h>
+
+#if CHIP_CONFIG_USE_DATA_MODEL_INTERFACE
+#include <app/codegen-data-model/Instance.h>
+#endif
 
 namespace chip {
 namespace app {
@@ -83,7 +90,6 @@ CHIP_ERROR InteractionModelEngine::Init(Messaging::ExchangeManager * apExchangeM
     ReturnErrorOnFailure(mpExchangeMgr->RegisterUnsolicitedMessageHandlerForProtocol(Protocols::InteractionModel::Id, this));
 
     mReportingEngine.Init();
-    mMagic++;
 
     StatusIB::RegisterErrorFormatter();
 
@@ -94,25 +100,11 @@ void InteractionModelEngine::Shutdown()
 {
     mpExchangeMgr->GetSessionManager()->SystemLayer()->CancelTimer(ResumeSubscriptionsTimerCallback, this);
 
-    CommandHandlerInterface * handlerIter = mCommandHandlerList;
+    // TODO: individual object clears the entire command handler interface registry.
+    //       This may not be expected.
+    CommandHandlerInterfaceRegistry::UnregisterAllHandlers();
 
-    //
-    // Walk our list of command handlers and de-register them, before finally
-    // nulling out the list entirely.
-    //
-    while (handlerIter)
-    {
-        CommandHandlerInterface * nextHandler = handlerIter->GetNext();
-        handlerIter->SetNext(nullptr);
-        handlerIter = nextHandler;
-    }
-
-    mCommandHandlerList = nullptr;
-
-    // Increase magic number to invalidate all Handle-s.
-    mMagic++;
-
-    mCommandHandlerObjs.ReleaseAll();
+    mCommandResponderObjs.ReleaseAll();
 
     mTimedHandlers.ForEachActiveObject([this](TimedHandler * obj) -> Loop {
         mpExchangeMgr->CloseAllContextsForDelegate(obj);
@@ -335,16 +327,10 @@ bool InteractionModelEngine::SubjectHasActiveSubscription(FabricIndex aFabricInd
 {
     bool isActive = false;
     mReadHandlers.ForEachActiveObject([aFabricIndex, subjectID, &isActive](ReadHandler * handler) {
-        if (!handler->IsType(ReadHandler::InteractionType::Subscribe))
-        {
-            return Loop::Continue;
-        }
+        VerifyOrReturnValue(handler->IsType(ReadHandler::InteractionType::Subscribe), Loop::Continue);
 
         Access::SubjectDescriptor subject = handler->GetSubjectDescriptor();
-        if (subject.fabricIndex != aFabricIndex)
-        {
-            return Loop::Continue;
-        }
+        VerifyOrReturnValue(subject.fabricIndex == aFabricIndex, Loop::Continue);
 
         if (subject.authMode == Access::AuthMode::kCase)
         {
@@ -352,13 +338,9 @@ bool InteractionModelEngine::SubjectHasActiveSubscription(FabricIndex aFabricInd
             {
                 isActive = handler->IsActiveSubscription();
 
-                // Exit loop only if isActive is set to true
-                // Otherwise keep looking for another subscription that could
-                // match the subject
-                if (isActive)
-                {
-                    return Loop::Break;
-                }
+                // Exit loop only if isActive is set to true.
+                // Otherwise keep looking for another subscription that could match the subject.
+                VerifyOrReturnValue(!isActive, Loop::Break);
             }
         }
 
@@ -370,13 +352,43 @@ bool InteractionModelEngine::SubjectHasActiveSubscription(FabricIndex aFabricInd
 
 bool InteractionModelEngine::SubjectHasPersistedSubscription(FabricIndex aFabricIndex, NodeId subjectID)
 {
-    // TODO(#30281) : Implement persisted sub check and verify how persistent subscriptions affects this at ICDManager::Init
-    return false;
+    bool persistedSubMatches = false;
+
+#if CHIP_CONFIG_PERSIST_SUBSCRIPTIONS
+    auto * iterator = mpSubscriptionResumptionStorage->IterateSubscriptions();
+    // Verify that we were able to allocate an iterator. If not, we are probably currently trying to resubscribe to our persisted
+    // subscriptions. As such, we assume we have a persisted subscription and return true.
+    // If we don't have a persisted subscription for the given fabric index and subjectID, we will send a Check-In message next time
+    // we transition to ActiveMode.
+    VerifyOrReturnValue(iterator, true);
+
+    SubscriptionResumptionStorage::SubscriptionInfo subscriptionInfo;
+    while (iterator->Next(subscriptionInfo))
+    {
+        // TODO(#31873): Persistent subscription only stores the NodeID for now. We cannot check if the CAT matches
+        if (subscriptionInfo.mFabricIndex == aFabricIndex && subscriptionInfo.mNodeId == subjectID)
+        {
+            persistedSubMatches = true;
+            break;
+        }
+    }
+    iterator->Release();
+#endif // CHIP_CONFIG_PERSIST_SUBSCRIPTIONS
+
+    return persistedSubMatches;
 }
 
-void InteractionModelEngine::OnDone(CommandHandler & apCommandObj)
+void InteractionModelEngine::OnDone(CommandResponseSender & apResponderObj)
 {
-    mCommandHandlerObjs.ReleaseObject(&apCommandObj);
+    mCommandResponderObjs.ReleaseObject(&apResponderObj);
+}
+
+// TODO(#30453): Follow up refactor. Remove need for InteractionModelEngine::OnDone(CommandHandlerImpl).
+void InteractionModelEngine::OnDone(CommandHandlerImpl & apCommandObj)
+{
+    // We are no longer expecting to receive this callback. With the introduction of CommandResponseSender, it is now
+    // responsible for receiving this callback.
+    VerifyOrDie(false);
 }
 
 void InteractionModelEngine::OnDone(ReadHandler & apReadObj)
@@ -389,7 +401,11 @@ void InteractionModelEngine::OnDone(ReadHandler & apReadObj)
     mReportingEngine.ResetReadHandlerTracker(&apReadObj);
 
     mReadHandlers.ReleaseObject(&apReadObj);
+    TryToResumeSubscriptions();
+}
 
+void InteractionModelEngine::TryToResumeSubscriptions()
+{
 #if CHIP_CONFIG_PERSIST_SUBSCRIPTIONS && CHIP_CONFIG_SUBSCRIPTION_TIMEOUT_RESUMPTION
     if (!mSubscriptionResumptionScheduled && HasSubscriptionsToResume())
     {
@@ -398,36 +414,39 @@ void InteractionModelEngine::OnDone(ReadHandler & apReadObj)
         mpExchangeMgr->GetSessionManager()->SystemLayer()->StartTimer(
             System::Clock::Seconds32(timeTillNextSubscriptionResumptionSecs), ResumeSubscriptionsTimerCallback, this);
         mNumSubscriptionResumptionRetries++;
+        ChipLogProgress(InteractionModel, "Schedule subscription resumption when failing to establish session, Retries: %" PRIu32,
+                        mNumSubscriptionResumptionRetries);
     }
-#endif // CHIP_CONFIG_PERSIST_SUBSCRIPTIONS
+#endif // CHIP_CONFIG_PERSIST_SUBSCRIPTIONS && CHIP_CONFIG_SUBSCRIPTION_TIMEOUT_RESUMPTION
 }
 
 Status InteractionModelEngine::OnInvokeCommandRequest(Messaging::ExchangeContext * apExchangeContext,
                                                       const PayloadHeader & aPayloadHeader, System::PacketBufferHandle && aPayload,
                                                       bool aIsTimedInvoke)
 {
-    CommandHandler * commandHandler = mCommandHandlerObjs.CreateObject(this);
-    if (commandHandler == nullptr)
+    // TODO(#30453): Refactor CommandResponseSender's constructor to accept an exchange context parameter.
+    CommandResponseSender * commandResponder = mCommandResponderObjs.CreateObject(this, this);
+    if (commandResponder == nullptr)
     {
         ChipLogProgress(InteractionModel, "no resource for Invoke interaction");
         return Status::Busy;
     }
-    CHIP_FAULT_INJECT(
-        FaultInjection::kFault_IMInvoke_SeparateResponses,
-        commandHandler->TestOnlyInvokeCommandRequestWithFaultsInjected(
-            apExchangeContext, std::move(aPayload), aIsTimedInvoke, CommandHandler::NlFaultInjectionType::SeparateResponseMessages);
-        return Status::Success;);
-    CHIP_FAULT_INJECT(FaultInjection::kFault_IMInvoke_SeparateResponsesInvertResponseOrder,
-                      commandHandler->TestOnlyInvokeCommandRequestWithFaultsInjected(
+    CHIP_FAULT_INJECT(FaultInjection::kFault_IMInvoke_SeparateResponses,
+                      commandResponder->TestOnlyInvokeCommandRequestWithFaultsInjected(
                           apExchangeContext, std::move(aPayload), aIsTimedInvoke,
-                          CommandHandler::NlFaultInjectionType::SeparateResponseMessagesAndInvertedResponseOrder);
+                          CommandHandlerImpl::NlFaultInjectionType::SeparateResponseMessages);
+                      return Status::Success;);
+    CHIP_FAULT_INJECT(FaultInjection::kFault_IMInvoke_SeparateResponsesInvertResponseOrder,
+                      commandResponder->TestOnlyInvokeCommandRequestWithFaultsInjected(
+                          apExchangeContext, std::move(aPayload), aIsTimedInvoke,
+                          CommandHandlerImpl::NlFaultInjectionType::SeparateResponseMessagesAndInvertedResponseOrder);
                       return Status::Success;);
     CHIP_FAULT_INJECT(
         FaultInjection::kFault_IMInvoke_SkipSecondResponse,
-        commandHandler->TestOnlyInvokeCommandRequestWithFaultsInjected(apExchangeContext, std::move(aPayload), aIsTimedInvoke,
-                                                                       CommandHandler::NlFaultInjectionType::SkipSecondResponse);
+        commandResponder->TestOnlyInvokeCommandRequestWithFaultsInjected(
+            apExchangeContext, std::move(aPayload), aIsTimedInvoke, CommandHandlerImpl::NlFaultInjectionType::SkipSecondResponse);
         return Status::Success;);
-    commandHandler->OnInvokeCommandRequest(apExchangeContext, aPayloadHeader, std::move(aPayload), aIsTimedInvoke);
+    commandResponder->OnInvokeCommandRequest(apExchangeContext, std::move(aPayload), aIsTimedInvoke);
     return Status::Success;
 }
 
@@ -457,7 +476,7 @@ CHIP_ERROR InteractionModelEngine::ParseAttributePaths(const Access::SubjectDesc
 
         if (paramsList.mValue.IsWildcardPath())
         {
-            AttributePathExpandIterator pathIterator(&paramsList);
+            AttributePathExpandIterator pathIterator(GetDataModel(), &paramsList);
             ConcreteAttributePath readPath;
 
             // The definition of "valid path" is "path exists and ACL allows access". The "path exists" part is handled by
@@ -820,7 +839,8 @@ Protocols::InteractionModel::Status InteractionModelEngine::OnReadInitialRequest
 
     // We have already reserved enough resources for read requests, and have granted enough resources for current subscriptions, so
     // we should be able to allocate resources requested by this request.
-    ReadHandler * handler = mReadHandlers.CreateObject(*this, apExchangeContext, aInteractionType, mReportScheduler);
+    ReadHandler * handler =
+        mReadHandlers.CreateObject(*this, apExchangeContext, aInteractionType, mReportScheduler, GetDataModel());
     if (handler == nullptr)
     {
         ChipLogProgress(InteractionModel, "no resource for %s interaction",
@@ -844,7 +864,7 @@ Protocols::InteractionModel::Status InteractionModelEngine::OnWriteRequest(Messa
     {
         if (writeHandler.IsFree())
         {
-            VerifyOrReturnError(writeHandler.Init() == CHIP_NO_ERROR, Status::Busy);
+            VerifyOrReturnError(writeHandler.Init(this) == CHIP_NO_ERROR, Status::Busy);
             return writeHandler.OnWriteRequest(apExchangeContext, std::move(aPayload), aIsTimedWrite);
         }
     }
@@ -1649,10 +1669,11 @@ CHIP_ERROR InteractionModelEngine::PushFront(SingleLinkedListNode<T> *& aObjectL
     return CHIP_NO_ERROR;
 }
 
-void InteractionModelEngine::DispatchCommand(CommandHandler & apCommandObj, const ConcreteCommandPath & aCommandPath,
+void InteractionModelEngine::DispatchCommand(CommandHandlerImpl & apCommandObj, const ConcreteCommandPath & aCommandPath,
                                              TLV::TLVReader & apPayload)
 {
-    CommandHandlerInterface * handler = FindCommandHandler(aCommandPath.mEndpointId, aCommandPath.mClusterId);
+    CommandHandlerInterface * handler =
+        CommandHandlerInterfaceRegistry::GetCommandHandler(aCommandPath.mEndpointId, aCommandPath.mClusterId);
 
     if (handler)
     {
@@ -1676,91 +1697,13 @@ Protocols::InteractionModel::Status InteractionModelEngine::CommandExists(const 
     return ServerClusterCommandExists(aCommandPath);
 }
 
-CHIP_ERROR InteractionModelEngine::RegisterCommandHandler(CommandHandlerInterface * handler)
+InteractionModel::DataModel * InteractionModelEngine::GetDataModel() const
 {
-    VerifyOrReturnError(handler != nullptr, CHIP_ERROR_INVALID_ARGUMENT);
-
-    for (auto * cur = mCommandHandlerList; cur; cur = cur->GetNext())
-    {
-        if (cur->Matches(*handler))
-        {
-            ChipLogError(InteractionModel, "Duplicate command handler registration failed");
-            return CHIP_ERROR_INCORRECT_STATE;
-        }
-    }
-
-    handler->SetNext(mCommandHandlerList);
-    mCommandHandlerList = handler;
-
-    return CHIP_NO_ERROR;
-}
-
-void InteractionModelEngine::UnregisterCommandHandlers(EndpointId endpointId)
-{
-    CommandHandlerInterface * prev = nullptr;
-
-    for (auto * cur = mCommandHandlerList; cur; cur = cur->GetNext())
-    {
-        if (cur->MatchesEndpoint(endpointId))
-        {
-            if (prev == nullptr)
-            {
-                mCommandHandlerList = cur->GetNext();
-            }
-            else
-            {
-                prev->SetNext(cur->GetNext());
-            }
-
-            cur->SetNext(nullptr);
-        }
-        else
-        {
-            prev = cur;
-        }
-    }
-}
-
-CHIP_ERROR InteractionModelEngine::UnregisterCommandHandler(CommandHandlerInterface * handler)
-{
-    VerifyOrReturnError(handler != nullptr, CHIP_ERROR_INVALID_ARGUMENT);
-    CommandHandlerInterface * prev = nullptr;
-
-    for (auto * cur = mCommandHandlerList; cur; cur = cur->GetNext())
-    {
-        if (cur->Matches(*handler))
-        {
-            if (prev == nullptr)
-            {
-                mCommandHandlerList = cur->GetNext();
-            }
-            else
-            {
-                prev->SetNext(cur->GetNext());
-            }
-
-            cur->SetNext(nullptr);
-
-            return CHIP_NO_ERROR;
-        }
-
-        prev = cur;
-    }
-
-    return CHIP_ERROR_KEY_NOT_FOUND;
-}
-
-CommandHandlerInterface * InteractionModelEngine::FindCommandHandler(EndpointId endpointId, ClusterId clusterId)
-{
-    for (auto * cur = mCommandHandlerList; cur; cur = cur->GetNext())
-    {
-        if (cur->Matches(endpointId, clusterId))
-        {
-            return cur;
-        }
-    }
-
-    return nullptr;
+#if CHIP_CONFIG_USE_DATA_MODEL_INTERFACE
+    // TODO: this should be temporary, we should fully inject the data model
+    VerifyOrReturnValue(mDataModel != nullptr, CodegenDataModelInstance());
+#endif
+    return mDataModel;
 }
 
 void InteractionModelEngine::OnTimedInteractionFailed(TimedHandler * apTimedHandler)
@@ -1876,7 +1819,7 @@ void InteractionModelEngine::OnFabricRemoved(const FabricTable & fabricTable, Fa
         }
     }
 
-    // Applications may hold references to CommandHandler instances for async command processing.
+    // Applications may hold references to CommandHandlerImpl instances for async command processing.
     // Therefore we can't forcible destroy CommandHandlers here.  Their exchanges will get closed by
     // the fabric removal, though, so they will fail when they try to actually send their command response
     // and will close at that point.
@@ -1901,22 +1844,22 @@ CHIP_ERROR InteractionModelEngine::ResumeSubscriptions()
     // future improvements: https://github.com/project-chip/connectedhomeip/issues/25439
 
     SubscriptionResumptionStorage::SubscriptionInfo subscriptionInfo;
-    auto * iterator           = mpSubscriptionResumptionStorage->IterateSubscriptions();
-    int subscriptionsToResume = 0;
-    uint16_t minInterval      = 0;
+    auto * iterator             = mpSubscriptionResumptionStorage->IterateSubscriptions();
+    mNumOfSubscriptionsToResume = 0;
+    uint16_t minInterval        = 0;
     while (iterator->Next(subscriptionInfo))
     {
-        subscriptionsToResume++;
+        mNumOfSubscriptionsToResume++;
         minInterval = std::max(minInterval, subscriptionInfo.mMinInterval);
     }
     iterator->Release();
 
-    if (subscriptionsToResume)
+    if (mNumOfSubscriptionsToResume)
     {
 #if CHIP_CONFIG_SUBSCRIPTION_TIMEOUT_RESUMPTION
         mSubscriptionResumptionScheduled = true;
 #endif
-        ChipLogProgress(InteractionModel, "Resuming %d subscriptions in %u seconds", subscriptionsToResume, minInterval);
+        ChipLogProgress(InteractionModel, "Resuming %d subscriptions in %u seconds", mNumOfSubscriptionsToResume, minInterval);
         ReturnErrorOnFailure(mpExchangeMgr->GetSessionManager()->SystemLayer()->StartTimer(System::Clock::Seconds16(minInterval),
                                                                                            ResumeSubscriptionsTimerCallback, this));
     }
@@ -1990,6 +1933,12 @@ void InteractionModelEngine::ResumeSubscriptionsTimerCallback(System::Layer * ap
 #if CHIP_CONFIG_PERSIST_SUBSCRIPTIONS && CHIP_CONFIG_SUBSCRIPTION_TIMEOUT_RESUMPTION
 uint32_t InteractionModelEngine::ComputeTimeSecondsTillNextSubscriptionResumption()
 {
+#if CONFIG_BUILD_FOR_HOST_UNIT_TEST
+    if (mSubscriptionResumptionRetrySecondsOverride > 0)
+    {
+        return static_cast<uint32_t>(mSubscriptionResumptionRetrySecondsOverride);
+    }
+#endif
     if (mNumSubscriptionResumptionRetries > CHIP_CONFIG_SUBSCRIPTION_TIMEOUT_RESUMPTION_MAX_FIBONACCI_STEP_INDEX)
     {
         return CHIP_CONFIG_SUBSCRIPTION_TIMEOUT_RESUMPTION_MAX_RETRY_INTERVAL_SECS;
@@ -2031,6 +1980,25 @@ bool InteractionModelEngine::HasSubscriptionsToResume()
     return foundSubscriptionToResume;
 }
 #endif // CHIP_CONFIG_PERSIST_SUBSCRIPTIONS && CHIP_CONFIG_SUBSCRIPTION_TIMEOUT_RESUMPTION
+
+#if CHIP_CONFIG_PERSIST_SUBSCRIPTIONS
+void InteractionModelEngine::DecrementNumSubscriptionsToResume()
+{
+    VerifyOrReturn(mNumOfSubscriptionsToResume > 0);
+#if CHIP_CONFIG_ENABLE_ICD_CIP && !CHIP_CONFIG_SUBSCRIPTION_TIMEOUT_RESUMPTION
+    VerifyOrDie(mICDManager);
+#endif // CHIP_CONFIG_ENABLE_ICD_CIP && !CHIP_CONFIG_SUBSCRIPTION_TIMEOUT_RESUMPTION
+
+    mNumOfSubscriptionsToResume--;
+
+#if CHIP_CONFIG_ENABLE_ICD_CIP && !CHIP_CONFIG_SUBSCRIPTION_TIMEOUT_RESUMPTION
+    if (!mNumOfSubscriptionsToResume)
+    {
+        mICDManager->SetBootUpResumeSubscriptionExecuted();
+    }
+#endif // CHIP_CONFIG_ENABLE_ICD_CIP && !CHIP_CONFIG_SUBSCRIPTION_TIMEOUT_RESUMPTION
+}
+#endif // CHIP_CONFIG_PERSIST_SUBSCRIPTIONS
 
 } // namespace app
 } // namespace chip

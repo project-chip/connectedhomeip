@@ -24,6 +24,8 @@
 #include <lib/support/CHIPMemString.h>
 #include <lib/support/SafeInt.h>
 
+#include <string>
+
 #include "JsonParser.h"
 
 namespace {
@@ -228,13 +230,7 @@ private:
 class CustomArgument
 {
 public:
-    ~CustomArgument()
-    {
-        if (mData != nullptr)
-        {
-            chip::Platform::MemoryFree(mData);
-        }
-    }
+    ~CustomArgument() { Reset(); }
 
     CHIP_ERROR Parse(const char * label, const char * json)
     {
@@ -282,6 +278,15 @@ public:
         ReturnErrorOnFailure(reader.Next());
 
         return writer.CopyElement(tag, reader);
+    }
+
+    void Reset()
+    {
+        if (mData != nullptr)
+        {
+            chip::Platform::MemoryFree(mData);
+            mData = nullptr;
+        }
     }
 
     // We trust our consumers to do the encoding of our data correctly, so don't

@@ -23,8 +23,8 @@
  * @{
  */
 
+#include "att-storage.h"
 #include <stdbool.h> // For bool
-#include <stddef.h>  // For NULL.
 #include <stdint.h>  // For various uint*_t types
 
 #include <app/util/basic-types.h>
@@ -64,7 +64,7 @@ typedef void (*EmberAfGenericClusterFunction)(void);
 /**
  * @brief Struct describing cluster
  */
-typedef struct
+struct EmberAfCluster
 {
     /**
      *  ID of cluster according to ZCL spec
@@ -117,7 +117,9 @@ typedef struct
      * Total number of events supported by the cluster instance (in eventList array).
      */
     uint16_t eventCount;
-} EmberAfCluster;
+
+    bool IsServer() const { return (mask & CLUSTER_MASK_SERVER) != 0; }
+};
 
 /**
  * @brief Struct that represents a logical device type consisting
@@ -297,3 +299,15 @@ typedef chip::Protocols::InteractionModel::Status (*EmberAfClusterPreAttributeCh
 #define MAX_INT16U_VALUE (0xFFFF)
 
 /** @} END addtogroup */
+
+namespace chip {
+namespace app {
+
+enum class MarkAttributeDirty
+{
+    kIfChanged,
+    kNo,
+};
+
+} // namespace app
+} // namespace chip

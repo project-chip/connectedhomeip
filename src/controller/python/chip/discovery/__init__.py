@@ -92,7 +92,8 @@ class CommissionableNode():
     mrpRetryIntervalIdle: int = None
     mrpRetryIntervalActive: int = None
     mrpRetryActiveThreshold: int = None
-    supportsTcp: bool = None
+    supportsTcpClient: bool = None
+    supportsTcpServer: bool = None
     isICDOperatingAsLIT: bool = None
     addresses: List[str] = None
     rotatingId: Optional[str] = None
@@ -236,8 +237,7 @@ def FindAddressAsync(fabricid: int, nodeid: int, callback, timeout_ms=1000):
     )
 
     res = _GetDiscoveryLibraryHandle().pychip_discovery_resolve(fabricid, nodeid)
-    if res != 0:
-        raise Exception("Failed to start node resolution")
+    res.raise_on_error()
 
 
 class _SyncAddressFinder:

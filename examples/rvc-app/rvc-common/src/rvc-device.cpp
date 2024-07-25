@@ -1,5 +1,7 @@
 #include "rvc-device.h"
 
+#include <string>
+
 using namespace chip::app::Clusters;
 
 void RvcDevice::Init()

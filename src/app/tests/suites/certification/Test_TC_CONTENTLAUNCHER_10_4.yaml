@@ -36,10 +36,10 @@ tests:
       verification: |
           Product maker needs to provide instructions for how to trigger the command on the DUT. For comparison, the DUT behavior for this test step can be simulated using chip-tool (when DUT is a commissioner) or tv-casting-app (when DUT is a commissionee):
 
-          ./chip-tool contentlauncher launch-content '{"parameterList": [ { "type": 0, "value": "exampleString", "externalIDList": [ { "name": "exampleName", "value": "exampleValue"} ] } ] }' 0 '{"playbackPosition": 0, "textTrack": {"languageCode": "", "audioOutputIndex": 0}}' 1 1
+          ./chip-tool contentlauncher launch-content '{"parameterList": [ { "type": 0, "value": "exampleString", "externalIDList": [ { "name": "exampleName", "value": "exampleValue"} ] } ] }' 0 1 1 --Data '{"playbackPosition": 0, "textTrack": {"languageCode": "", "audioOutputIndex": 0}}'
 
 
-          ./chip-tv-casting-app contentlauncher launch-content '{"parameterList": [ { "type": 0, "value": "exampleString", "externalIDList": [ { "name": "exampleName", "value": "exampleValue"} ] } ] }' 0 '{"playbackPosition": 0, "textTrack": {"languageCode": "", "audioOutputIndex": 0}}' 1 1
+          ./chip-tv-casting-app contentlauncher launch-content '{"parameterList": [ { "type": 0, "value": "exampleString", "externalIDList": [ { "name": "exampleName", "value": "exampleValue"} ] } ] }' 0 1 1 --Data '{"playbackPosition": 0, "textTrack": {"languageCode": "", "audioOutputIndex": 0}}'
 
 
           On TH (tv-app), Verify the launch content command is received successfully.

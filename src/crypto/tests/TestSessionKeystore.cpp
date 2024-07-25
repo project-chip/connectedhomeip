@@ -18,16 +18,15 @@
 
 #include "AES_CCM_128_test_vectors.h"
 
+#include <pw_unit_test/framework.h>
+
 #include <crypto/CHIPCryptoPAL.h>
 #include <crypto/DefaultSessionKeystore.h>
+#include <lib/core/StringBuilderAdapters.h>
 #include <lib/support/CHIPMem.h>
 #include <lib/support/CodeUtils.h>
 #include <lib/support/ScopedBuffer.h>
 #include <lib/support/Span.h>
-#include <lib/support/UnitTestExtendedAssertions.h>
-#include <lib/support/UnitTestRegistration.h>
-
-#include <nlunit-test.h>
 
 #if CHIP_CRYPTO_PSA
 #include <psa/crypto.h>
@@ -101,7 +100,21 @@ ByteSpan ToSpan(const char * str)
     return ByteSpan(reinterpret_cast<const uint8_t *>(str), strlen(str));
 }
 
-void TestBasicImport(nlTestSuite * inSuite, void * inContext)
+struct TestSessionKeystore : public ::testing::Test
+{
+    static void SetUpTestSuite()
+    {
+        ASSERT_EQ(Platform::MemoryInit(), CHIP_NO_ERROR);
+
+#if CHIP_CRYPTO_PSA
+        psa_crypto_init();
+#endif
+    }
+
+    static void TearDownTestSuite() { Platform::MemoryShutdown(); }
+};
+
+TEST_F(TestSessionKeystore, TestBasicImport)
 {
     TestSessionKeystoreImpl keystore;
 
@@ -114,23 +127,23 @@ void TestBasicImport(nlTestSuite * inSuite, void * inContext)
         memcpy(keyMaterial, test.key, test.key_len);
 
         Aes128KeyHandle keyHandle;
-        NL_TEST_ASSERT_SUCCESS(inSuite, keystore.CreateKey(keyMaterial, keyHandle));
+        EXPECT_EQ(keystore.CreateKey(keyMaterial, keyHandle), CHIP_NO_ERROR);
 
         Platform::ScopedMemoryBuffer<uint8_t> ciphertext;
         Platform::ScopedMemoryBuffer<uint8_t> tag;
-        NL_TEST_ASSERT(inSuite, ciphertext.Alloc(test.ct_len));
-        NL_TEST_ASSERT(inSuite, tag.Alloc(test.tag_len));
-        NL_TEST_ASSERT(inSuite,
-                       AES_CCM_encrypt(test.pt, test.pt_len, test.aad, test.aad_len, keyHandle, test.nonce, test.nonce_len,
-                                       ciphertext.Get(), tag.Get(), test.tag_len) == test.result);
-        NL_TEST_ASSERT(inSuite, memcmp(ciphertext.Get(), test.ct, test.ct_len) == 0);
-        NL_TEST_ASSERT(inSuite, memcmp(tag.Get(), test.tag, test.tag_len) == 0);
+        EXPECT_TRUE(ciphertext.Alloc(test.ct_len));
+        EXPECT_TRUE(tag.Alloc(test.tag_len));
+        EXPECT_EQ(AES_CCM_encrypt(test.pt, test.pt_len, test.aad, test.aad_len, keyHandle, test.nonce, test.nonce_len,
+                                  ciphertext.Get(), tag.Get(), test.tag_len),
+                  test.result);
+        EXPECT_EQ(memcmp(ciphertext.Get(), test.ct, test.ct_len), 0);
+        EXPECT_EQ(memcmp(tag.Get(), test.tag, test.tag_len), 0);
 
         keystore.DestroyKey(keyHandle);
     }
 }
 
-void TestDeriveKey(nlTestSuite * inSuite, void * inContext)
+TEST_F(TestSessionKeystore, TestDeriveKey)
 {
     TestSessionKeystoreImpl keystore;
 
@@ -141,18 +154,18 @@ void TestDeriveKey(nlTestSuite * inSuite, void * inContext)
         secret.SetLength(strlen(test.secret));
 
         Aes128KeyHandle keyHandle;
-        NL_TEST_ASSERT_SUCCESS(inSuite, keystore.DeriveKey(secret, ToSpan(test.salt), ToSpan(test.info), keyHandle));
+        EXPECT_EQ(keystore.DeriveKey(secret, ToSpan(test.salt), ToSpan(test.info), keyHandle), CHIP_NO_ERROR);
 
         uint8_t ciphertext[sizeof(test.ciphertext)];
-        NL_TEST_ASSERT_SUCCESS(
-            inSuite, AES_CTR_crypt(test.plaintext, sizeof(test.plaintext), keyHandle, test.nonce, sizeof(test.nonce), ciphertext));
-        NL_TEST_ASSERT(inSuite, memcmp(ciphertext, test.ciphertext, sizeof(test.ciphertext)) == 0);
+        EXPECT_EQ(AES_CTR_crypt(test.plaintext, sizeof(test.plaintext), keyHandle, test.nonce, sizeof(test.nonce), ciphertext),
+                  CHIP_NO_ERROR);
+        EXPECT_EQ(memcmp(ciphertext, test.ciphertext, sizeof(test.ciphertext)), 0);
 
         keystore.DestroyKey(keyHandle);
     }
 }
 
-void TestDeriveSessionKeys(nlTestSuite * inSuite, void * inContext)
+TEST_F(TestSessionKeystore, TestDeriveSessionKeys)
 {
     TestSessionKeystoreImpl keystore;
 
@@ -165,63 +178,27 @@ void TestDeriveSessionKeys(nlTestSuite * inSuite, void * inContext)
         Aes128KeyHandle i2r;
         Aes128KeyHandle r2i;
         AttestationChallenge challenge;
-        NL_TEST_ASSERT_SUCCESS(
-            inSuite, keystore.DeriveSessionKeys(ToSpan(test.secret), ToSpan(test.salt), ToSpan(test.info), i2r, r2i, challenge));
+        EXPECT_EQ(keystore.DeriveSessionKeys(ToSpan(test.secret), ToSpan(test.salt), ToSpan(test.info), i2r, r2i, challenge),
+                  CHIP_NO_ERROR);
 
         uint8_t ciphertext[sizeof(test.i2rCiphertext)];
 
         // Test I2R key
-        NL_TEST_ASSERT_SUCCESS(
-            inSuite, AES_CTR_crypt(test.plaintext, sizeof(test.plaintext), i2r, test.nonce, sizeof(test.nonce), ciphertext));
-        NL_TEST_ASSERT(inSuite, memcmp(ciphertext, test.i2rCiphertext, sizeof(test.i2rCiphertext)) == 0);
+        EXPECT_EQ(AES_CTR_crypt(test.plaintext, sizeof(test.plaintext), i2r, test.nonce, sizeof(test.nonce), ciphertext),
+                  CHIP_NO_ERROR);
+        EXPECT_EQ(memcmp(ciphertext, test.i2rCiphertext, sizeof(test.i2rCiphertext)), 0);
 
         // Test R2I key
-        NL_TEST_ASSERT_SUCCESS(
-            inSuite, AES_CTR_crypt(test.plaintext, sizeof(test.plaintext), r2i, test.nonce, sizeof(test.nonce), ciphertext));
-        NL_TEST_ASSERT(inSuite, memcmp(ciphertext, test.r2iCiphertext, sizeof(test.r2iCiphertext)) == 0);
+        EXPECT_EQ(AES_CTR_crypt(test.plaintext, sizeof(test.plaintext), r2i, test.nonce, sizeof(test.nonce), ciphertext),
+                  CHIP_NO_ERROR);
+        EXPECT_EQ(memcmp(ciphertext, test.r2iCiphertext, sizeof(test.r2iCiphertext)), 0);
 
         // Check attestation challenge
-        NL_TEST_ASSERT(inSuite, memcmp(challenge.Bytes(), test.attestationChallenge, sizeof(test.attestationChallenge)) == 0);
+        EXPECT_EQ(memcmp(challenge.Bytes(), test.attestationChallenge, sizeof(test.attestationChallenge)), 0);
 
         keystore.DestroyKey(i2r);
         keystore.DestroyKey(r2i);
     }
 }
 
-const nlTest sTests[] = { NL_TEST_DEF("Test basic import", TestBasicImport), NL_TEST_DEF("Test derive key", TestDeriveKey),
-                          NL_TEST_DEF("Test derive session keys", TestDeriveSessionKeys), NL_TEST_SENTINEL() };
-
-int Test_Setup(void * inContext)
-{
-    CHIP_ERROR error = Platform::MemoryInit();
-    VerifyOrReturnError(error == CHIP_NO_ERROR, FAILURE);
-
-#if CHIP_CRYPTO_PSA
-    psa_crypto_init();
-#endif
-
-    return SUCCESS;
-}
-
-int Test_Teardown(void * inContext)
-{
-    Platform::MemoryShutdown();
-
-    return SUCCESS;
-}
-
 } // namespace
-
-/**
- *  Main
- */
-int TestSessionKeystore()
-{
-    nlTestSuite theSuite = { "SessionKeystore tests", &sTests[0], Test_Setup, Test_Teardown };
-
-    // Run test suite againt one context.
-    nlTestRunner(&theSuite, nullptr);
-    return nlTestRunnerStats(&theSuite);
-}
-
-CHIP_REGISTER_TEST_SUITE(TestSessionKeystore)

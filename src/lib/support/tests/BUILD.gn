@@ -14,11 +14,20 @@
 
 import("//build_overrides/build.gni")
 import("//build_overrides/chip.gni")
-import("//build_overrides/nlunit_test.gni")
+import("//build_overrides/pigweed.gni")
 
 import("${chip_root}/build/chip/chip_test_suite.gni")
 
-chip_test_suite_using_nltest("tests") {
+pw_source_set("pw-test-macros") {
+  output_dir = "${root_out_dir}/lib"
+  public_deps = [
+    "$dir_pw_log:impl",
+    "$dir_pw_unit_test",
+  ]
+  sources = [ "ExtraPwTestMacros.h" ]
+}
+
+chip_test_suite("tests") {
   output_name = "libSupportTests"
 
   test_sources = [
@@ -38,7 +47,6 @@ chip_test_suite_using_nltest("tests") {
     "TestIntrusiveList.cpp",
     "TestJsonToTlv.cpp",
     "TestJsonToTlvToJson.cpp",
-    "TestOwnerOf.cpp",
     "TestPersistedCounter.cpp",
     "TestPool.cpp",
     "TestPrivateHeap.cpp",
@@ -46,7 +54,7 @@ chip_test_suite_using_nltest("tests") {
     "TestSafeString.cpp",
     "TestScoped.cpp",
     "TestScopedBuffer.cpp",
-    "TestSerializableIntegerSet.cpp",
+    "TestSorting.cpp",
     "TestSpan.cpp",
     "TestStateMachine.cpp",
     "TestStaticSupportSmartPtr.cpp",
@@ -61,11 +69,11 @@ chip_test_suite_using_nltest("tests") {
     "TestVariant.cpp",
     "TestZclString.cpp",
   ]
-  sources = []
-
   if (current_os != "mbed") {
     test_sources += [ "TestCHIPArgParser.cpp" ]
   }
+
+  sources = []
 
   cflags = [
     "-Wconversion",
@@ -80,11 +88,10 @@ chip_test_suite_using_nltest("tests") {
   public_deps = [
     "${chip_root}/src/credentials",
     "${chip_root}/src/lib/core",
+    "${chip_root}/src/lib/core:string-builder-adapters",
     "${chip_root}/src/lib/support:static-support",
     "${chip_root}/src/lib/support:testing",
-    "${chip_root}/src/lib/support:testing_nlunit",
     "${chip_root}/src/lib/support/jsontlv",
     "${chip_root}/src/platform",
-    "${nlunit_test_root}:nlunit-test",
   ]
 }

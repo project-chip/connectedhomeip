@@ -39,7 +39,6 @@
 #include <thread.h>
 #include <tizen_error.h>
 
-#include <app/AttributeAccessInterface.h>
 #include <inet/IPAddress.h>
 #include <lib/core/CHIPError.h>
 #include <lib/core/DataModelTypes.h>
@@ -521,12 +520,6 @@ CHIP_ERROR ThreadStackManagerImpl::_GetPollPeriod(uint32_t & buf)
     return CHIP_ERROR_NOT_IMPLEMENTED;
 }
 
-CHIP_ERROR ThreadStackManagerImpl::_JoinerStart()
-{
-    ChipLogError(DeviceLayer, "Not implemented");
-    return CHIP_ERROR_NOT_IMPLEMENTED;
-}
-
 CHIP_ERROR ThreadStackManagerImpl::_StartThreadScan(NetworkCommissioning::ThreadDriver::ScanCallback * callback)
 {
     ChipLogError(DeviceLayer, "Not implemented");
@@ -643,6 +636,16 @@ CHIP_ERROR ThreadStackManagerImpl::_RemoveInvalidSrpServices()
         }
     }
 
+    return CHIP_NO_ERROR;
+}
+
+CHIP_ERROR ThreadStackManagerImpl::_ClearAllSrpHostAndServices()
+{
+    for (auto it = mSrpClientServices.begin(); it != mSrpClientServices.end();)
+    {
+        ReturnErrorOnFailure(_RemoveSrpService(it->mInstanceName, it->mName));
+        it = mSrpClientServices.erase(it);
+    }
     return CHIP_NO_ERROR;
 }
 

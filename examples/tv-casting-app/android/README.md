@@ -70,6 +70,18 @@ Complete the following steps to prepare the Matter build:
     source scripts/bootstrap.sh
     ```
 
+3. The build will produce libraries: AndroidPlatform.jar, CHIPAppServer.jar,
+   CHIPInteractionModel.jar and TVCastingApp.jar in [App/app/libs](App/app/libs)
+   and libTvCastingApp.so and libc++\_shared.so in
+   [App/app/libs/jniLibs/](App/app/libs/jniLibs/) consumed by any casting app to
+   leverage the [casting APIs](../APIs.md), like the sample android
+   tv-casting-app. If building for your own casting app, make sure your client's
+   specific values are set for `CHIP_DEVICE_CONFIG_DEVICE_VENDOR_ID` and
+   `CHIP_DEVICE_CONFIG_DEVICE_PRODUCT_ID` in the
+   [CHIPProjectAppConfig.h](tv-casting-common/include/CHIPProjectAppConfig.h)
+   file, before the build. Other values like the
+   `CHIP_DEVICE_CONFIG_DEVICE_NAME` may be optionally updated as well.
+
 ## Building & Installing the app
 
 This is the simplest option. In the command line, run the following command from

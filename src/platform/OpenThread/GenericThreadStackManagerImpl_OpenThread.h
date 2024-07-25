@@ -37,8 +37,10 @@
 #include <openthread/dns_client.h>
 #endif
 
+#include <app/icd/server/ICDServerConfig.h>
 #include <lib/dnssd/Advertiser.h>
 #include <lib/dnssd/platform/Dnssd.h>
+#include <platform/GeneralFaults.h>
 #include <platform/NetworkCommissioning.h>
 
 namespace chip {
@@ -121,6 +123,7 @@ protected:
     CHIP_ERROR _RemoveSrpService(const char * aInstanceName, const char * aName);
     CHIP_ERROR _InvalidateAllSrpServices();
     CHIP_ERROR _RemoveInvalidSrpServices();
+    CHIP_ERROR _ClearAllSrpHostAndServices();
 
     CHIP_ERROR _SetupSrpHost(const char * aHostName);
     CHIP_ERROR _ClearSrpHost(const char * aHostName);
@@ -139,11 +142,10 @@ protected:
 
     // ===== Members available to the implementation subclass.
 
+    CHIP_ERROR ConfigureThreadStack(otInstance * otInst);
     CHIP_ERROR DoInit(otInstance * otInst);
     bool IsThreadAttachedNoLock(void);
     bool IsThreadInterfaceUpNoLock(void);
-
-    CHIP_ERROR _JoinerStart(void);
 
 private:
     // ===== Private members for use by this class only.
@@ -203,6 +205,8 @@ private:
 
     SrpClient mSrpClient;
 
+    bool mIsSrpClearAllRequested = false;
+
     static void OnSrpClientNotification(otError aError, const otSrpClientHostInfo * aHostInfo, const otSrpClientService * aServices,
                                         const otSrpClientService * aRemovedServices, void * aContext);
     static void OnSrpClientStateChange(const otSockAddr * aServerSockAddr, void * aContext);
@@ -260,8 +264,7 @@ private:
 #endif // CHIP_DEVICE_CONFIG_ENABLE_THREAD_DNS_CLIENT
 #endif // CHIP_DEVICE_CONFIG_ENABLE_THREAD_SRP_CLIENT
 
-    static void OnJoinerComplete(otError aError, void * aContext);
-    void OnJoinerComplete(otError aError);
+    GeneralFaults<kMaxNetworkFaults> mNetworkFaults;
 
     inline ImplClass * Impl() { return static_cast<ImplClass *>(this); }
 };

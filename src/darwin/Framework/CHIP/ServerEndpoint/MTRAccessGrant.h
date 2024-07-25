@@ -24,7 +24,8 @@ NS_ASSUME_NONNULL_BEGIN
  * An access grant, which can be represented as an entry in the Matter Access
  * Control cluster.
  */
-MTR_NEWLY_AVAILABLE
+NS_SWIFT_SENDABLE
+MTR_AVAILABLE(ios(17.6), macos(14.6), watchos(10.6), tvos(17.6))
 @interface MTRAccessGrant : NSObject <NSCopying>
 
 - (instancetype)init NS_UNAVAILABLE;

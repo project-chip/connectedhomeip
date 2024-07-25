@@ -27,15 +27,23 @@
 
 #pragma once
 
-#include <system/SystemLayer.h>
-
-#include <ble/BleRole.h>
-#include <ble/BtpEngine.h>
-
-#if CHIP_ENABLE_CHIPOBLE_TEST
-#include <ble/BtpEngineTest.h>
-#include <system/SystemMutex.h>
+#ifndef _CHIP_BLE_BLE_H
+#error "Please include <ble/Ble.h> instead!"
 #endif
+
+#include <cstdint>
+
+#include <lib/core/CHIPError.h>
+#include <lib/support/BitFlags.h>
+#include <lib/support/DLLUtil.h>
+#include <system/SystemLayer.h>
+#include <system/SystemPacketBuffer.h>
+
+#include "BleConnectionDelegate.h"
+#include "BleLayerDelegate.h"
+#include "BlePlatformDelegate.h"
+#include "BleRole.h"
+#include "BtpEngine.h"
 
 namespace chip {
 namespace Ble {
@@ -51,19 +59,11 @@ enum
 // Forward declarations
 class BleLayer;
 class BleEndPointPool;
-// BLEEndPoint holds a pointer to BleLayerDelegate for messages, while BleLayerDelegate functions also accepts BLEEndPoint.
-class BleLayerDelegate;
-#if CHIP_ENABLE_CHIPOBLE_TEST
-class BtpEngineTest;
-#endif
 
 class DLL_EXPORT BLEEndPoint
 {
     friend class BleLayer;
     friend class BleEndPointPool;
-#if CHIP_ENABLE_CHIPOBLE_TEST
-    friend class BtpEngineTest;
-#endif
 
 public:
     typedef uint64_t AlignT;
@@ -89,15 +89,6 @@ public:
 
     typedef void (*OnConnectionClosedFunct)(BLEEndPoint * endPoint, CHIP_ERROR err);
     OnConnectionClosedFunct OnConnectionClosed;
-
-#if CHIP_ENABLE_CHIPOBLE_TEST
-    typedef void (*OnCommandReceivedFunct)(BLEEndPoint * endPoint, PacketBufferHandle && msg);
-    OnCommandReceivedFunct OnCommandReceived;
-    inline void SetOnCommandReceivedCB(OnCommandReceivedFunct cb) { OnCommandReceived = cb; };
-    BtpEngineTest mBtpEngineTest;
-    inline void SetTxWindowSize(uint8_t size) { mRemoteReceiveWindowSize = size; };
-    inline void SetRxWindowSize(uint8_t size) { mReceiveWindowMaxSize = size; };
-#endif
 
     // Public functions:
     CHIP_ERROR Send(PacketBufferHandle && data);
@@ -137,9 +128,6 @@ private:
         kAckReceivedTimerRunning       = 0x04, // Ack received timer running due to unacked sent fragment.
         kSendAckTimerRunning           = 0x08, // Send ack timer running; indicates pending ack to send.
         kUnsubscribeTimerRunning       = 0x10, // Unsubscribe completion timer running.
-#if CHIP_ENABLE_CHIPOBLE_TEST
-        kUnderTestTimerRunnung = 0x80 // running throughput Tx test
-#endif
     };
 
     // BLE connection to which an end point is uniquely bound. Type BLE_CONNECTION_OBJECT is defined by the platform or
@@ -164,9 +152,6 @@ private:
     SequenceNumber_t mLocalReceiveWindowSize;
     SequenceNumber_t mRemoteReceiveWindowSize;
     SequenceNumber_t mReceiveWindowMaxSize;
-#if CHIP_ENABLE_CHIPOBLE_TEST
-    chip::System::Mutex mTxQueueMutex; // For MT-safe Tx queuing
-#endif
 
     // Private functions:
     BLEEndPoint()  = delete;
@@ -184,8 +169,8 @@ private:
     CHIP_ERROR ContinueMessageSend();
     CHIP_ERROR DoSendStandAloneAck();
     CHIP_ERROR SendCharacteristic(PacketBufferHandle && buf);
-    bool SendIndication(PacketBufferHandle && buf);
-    bool SendWrite(PacketBufferHandle && buf);
+    CHIP_ERROR SendIndication(PacketBufferHandle && buf);
+    CHIP_ERROR SendWrite(PacketBufferHandle && buf);
 
     // Receive path:
     CHIP_ERROR HandleConnectComplete();
@@ -228,14 +213,6 @@ private:
     void Free();
     void FreeBtpEngine();
 
-    // Mutex lock on Tx queue. Used only in BtpEngine test build for now.
-#if CHIP_ENABLE_CHIPOBLE_TEST
-    inline void QueueTxLock() { mTxQueueMutex.Lock(); }
-    inline void QueueTxUnlock() { mTxQueueMutex.Unlock(); }
-#else
-    inline void QueueTxLock() {}
-    inline void QueueTxUnlock() {}
-#endif
     void QueueTx(PacketBufferHandle && data, PacketType_t type);
 };
 

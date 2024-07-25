@@ -19,8 +19,8 @@ import("//build_overrides/openthread.gni")
 declare_args() {
   chip_with_ot_cli = 0
   chip_with_low_power = 0
-  chip_convert_dac_private_key = 0
   sdk_release = 1
+  chip_use_plain_dac_key = false
 }
 
 nxp_platform = "k32w/k32w1"

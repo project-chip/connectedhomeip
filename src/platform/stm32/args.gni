@@ -25,6 +25,7 @@ chip_device_platform = "stm32"
 chip_with_lwip = false
 mbedtls_target = "${stm32_sdk_build_root}:mbedtls"
 openthread_external_mbedtls = mbedtls_target
+openthread_root = "${chip_root}/third_party/openthread/ot-stm32"
 
 # GLOBAL CONFIG
 chip_monolithic_tests = false

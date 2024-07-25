@@ -18,6 +18,7 @@
 #pragma once
 
 #include <fstream>
+#include <string>
 #include <tracing/backend.h>
 #include <unordered_map>
 
@@ -52,12 +53,12 @@ public:
     void TraceEnd(const char * label, const char * group) override;
     void TraceInstant(const char * label, const char * group) override;
     void TraceCounter(const char * label) override;
-    void TraceMetric(const char * label, int32_t val) override;
     void LogMessageSend(MessageSendInfo &) override;
     void LogMessageReceived(MessageReceivedInfo &) override;
     void LogNodeLookup(NodeLookupInfo &) override;
     void LogNodeDiscovered(NodeDiscoveredInfo &) override;
     void LogNodeDiscoveryFailed(NodeDiscoveryFailedInfo &) override;
+    void LogMetricEvent(const MetricEvent &) override;
     void Close() override { CloseFile(); }
 
 private:

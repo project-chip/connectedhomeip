@@ -37,7 +37,9 @@ typedef struct
 
 #define COUNT_OF(A) (sizeof(A) / sizeof((A)[0]))
 static migrationData_t migrationTable[] = {
-    { .migrationGroup = 1, .migrationFunc = MigrateKvsMap }, { .migrationGroup = 2, .migrationFunc = MigrateDacProvider },
+    { .migrationGroup = 1, .migrationFunc = MigrateKvsMap },
+    { .migrationGroup = 2, .migrationFunc = MigrateDacProvider },
+    { .migrationGroup = 3, .migrationFunc = MigrateCounterConfigs },
     // add any additional migration neccesary. migrationGroup should stay equal if done in the same commit or increment by 1 for
     // each new entry.
 };
@@ -59,6 +61,27 @@ void MigrationManager::applyMigrations()
         }
     }
     SilabsConfig::WriteConfigValue(SilabsConfig::kConfigKey_MigrationCounter, completedMigrationGroup);
+}
+void MigrationManager::MigrateUint32(uint32_t old_key, uint32_t new_key)
+{
+    uint32_t value = 0;
+    if (SilabsConfig::ConfigValueExists(old_key) && (CHIP_NO_ERROR == SilabsConfig::ReadConfigValue(old_key, value)))
+    {
+        if (CHIP_NO_ERROR == SilabsConfig::WriteConfigValue(new_key, value))
+        {
+            // Free memory of old key location
+            SilabsConfig::ClearConfigValue(old_key);
+        }
+    }
+}
+
+void MigrateCounterConfigs(void)
+{
+    constexpr uint32_t kOldConfigKey_BootCount             = SilabsConfigKey(SilabsConfig::kMatterCounter_KeyBase, 0x00);
+    constexpr uint32_t kOldConfigKey_TotalOperationalHours = SilabsConfigKey(SilabsConfig::kMatterCounter_KeyBase, 0x01);
+
+    MigrationManager::MigrateUint32(kOldConfigKey_BootCount, SilabsConfig::kConfigKey_BootCount);
+    MigrationManager::MigrateUint32(kOldConfigKey_TotalOperationalHours, SilabsConfig::kConfigKey_TotalOperationalHours);
 }
 
 MigrationManager & MigrationManager::GetMigrationInstance()

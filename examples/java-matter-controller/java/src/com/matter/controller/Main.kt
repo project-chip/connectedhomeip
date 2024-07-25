@@ -67,6 +67,7 @@ private fun getImCommands(
     PairOnNetworkLongImSubscribeCommand(controller, credentialsIssuer),
     PairOnNetworkLongImWriteCommand(controller, credentialsIssuer),
     PairOnNetworkLongImInvokeCommand(controller, credentialsIssuer),
+    PairOnNetworkLongImExtendableInvokeCommand(controller, credentialsIssuer),
   )
 }
 

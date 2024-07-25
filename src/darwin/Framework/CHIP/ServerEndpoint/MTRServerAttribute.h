@@ -24,8 +24,11 @@ NS_ASSUME_NONNULL_BEGIN
  * A representation of an attribute implemented on a server cluster by an
  * MTRDeviceController.  An attribute has an identifier and a value, and may or
  * may not be writable.
+ *
+ * MTRServerAttribute's API can be accessed from any thread.
  */
-MTR_NEWLY_AVAILABLE
+NS_SWIFT_SENDABLE
+MTR_AVAILABLE(ios(17.6), macos(14.6), watchos(10.6), tvos(17.6))
 @interface MTRServerAttribute : NSObject
 
 - (instancetype)init NS_UNAVAILABLE;
@@ -38,7 +41,9 @@ MTR_NEWLY_AVAILABLE
  * Will fail if the attribute ID is not valid per the Matter specification or
  * the attribute value is not a valid data-value.
  *
- * requiredPrivilege is the privilege required to read the attribute.
+ * requiredPrivilege is the privilege required to read the attribute. This
+ * initializer may fail if the provided attributeID is a global attribute and
+ * the provided requiredPrivilege value is not correct for that attribute ID.
  */
 - (nullable instancetype)initReadonlyAttributeWithID:(NSNumber *)attributeID initialValue:(NSDictionary<NSString *, id> *)value requiredPrivilege:(MTRAccessControlEntryPrivilege)requiredPrivilege;
 
@@ -50,13 +55,21 @@ MTR_NEWLY_AVAILABLE
  */
 - (BOOL)setValue:(NSDictionary<NSString *, id> *)value;
 
-@property (nonatomic, copy, readonly) NSNumber * attributeID;
-@property (nonatomic, copy, readonly) NSDictionary<NSString *, id> * value;
+/**
+ * Create an attribute description for a FeatureMap attribute with the provided
+ * value (expected to be an unsigned integer representing the value of the
+ * bitmap). This will automatically set requiredPrivilege to the right value
+ * for FeatureMap.
+ */
++ (MTRServerAttribute *)newFeatureMapAttributeWithInitialValue:(NSNumber *)value;
+
+@property (atomic, copy, readonly) NSNumber * attributeID;
+@property (atomic, copy, readonly) NSDictionary<NSString *, id> * value;
 /**
  * The privilege level necessary to read this attribute.
  */
-@property (nonatomic, assign, readonly) MTRAccessControlEntryPrivilege requiredReadPrivilege;
-@property (nonatomic, assign, readonly, getter=isWritable) BOOL writable;
+@property (atomic, assign, readonly) MTRAccessControlEntryPrivilege requiredReadPrivilege;
+@property (atomic, assign, readonly, getter=isWritable) BOOL writable;
 
 @end
 

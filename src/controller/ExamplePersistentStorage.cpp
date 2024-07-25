@@ -21,7 +21,9 @@
 #include <lib/support/IniEscaping.h>
 
 #include <fstream>
+#include <map>
 #include <memory>
+#include <string>
 
 using String   = std::basic_string<char>;
 using Section  = std::map<String, String>;
@@ -83,6 +85,7 @@ CHIP_ERROR PersistentStorage::Init(const char * name, const char * directory)
 
     mName      = name;
     mDirectory = directory;
+    mConfig.clear();
     mConfig.parse(ifs);
     ifs.close();
 

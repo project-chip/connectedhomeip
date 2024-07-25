@@ -20,12 +20,15 @@
  *    @file
  *      This file implements unit tests for the ExchangeManager implementation.
  */
+#include <errno.h>
+#include <utility>
+
+#include <pw_unit_test/framework.h>
 
 #include <lib/core/CHIPCore.h>
+#include <lib/core/StringBuilderAdapters.h>
 #include <lib/support/CHIPMem.h>
 #include <lib/support/CodeUtils.h>
-#include <lib/support/UnitTestContext.h>
-#include <lib/support/UnitTestRegistration.h>
 #include <messaging/ExchangeContext.h>
 #include <messaging/ExchangeMgr.h>
 #include <messaging/Flags.h>
@@ -34,11 +37,9 @@
 #include <transport/SessionManager.h>
 #include <transport/TransportMgr.h>
 
-#include <nlbyteorder.h>
-#include <nlunit-test.h>
-
-#include <errno.h>
-#include <utility>
+#if CHIP_CRYPTO_PSA
+#include "psa/crypto.h"
+#endif
 
 namespace {
 
@@ -47,7 +48,16 @@ using namespace chip::Inet;
 using namespace chip::Transport;
 using namespace chip::Messaging;
 
-using TestContext = Test::LoopbackMessagingContext;
+struct TestExchangeMgr : public chip::Test::LoopbackMessagingContext
+{
+    void SetUp() override
+    {
+#if CHIP_CRYPTO_PSA
+        ASSERT_EQ(psa_crypto_init(), PSA_SUCCESS);
+#endif
+        chip::Test::LoopbackMessagingContext::SetUp();
+    }
+};
 
 enum : uint8_t
 {
@@ -99,207 +109,155 @@ class ExpireSessionFromTimeoutDelegate : public WaitForTimeoutDelegate
     }
 };
 
-void CheckNewContextTest(nlTestSuite * inSuite, void * inContext)
+TEST_F(TestExchangeMgr, CheckNewContextTest)
 {
-    TestContext & ctx = *reinterpret_cast<TestContext *>(inContext);
-
     MockAppDelegate mockAppDelegate;
-    ExchangeContext * ec1 = ctx.NewExchangeToBob(&mockAppDelegate);
-    NL_TEST_EXIT_ON_FAILED_ASSERT(inSuite, ec1 != nullptr);
-    NL_TEST_ASSERT(inSuite, ec1->IsInitiator() == true);
-    NL_TEST_ASSERT(inSuite, ec1->GetSessionHandle() == ctx.GetSessionAliceToBob());
-    NL_TEST_ASSERT(inSuite, ec1->GetDelegate() == &mockAppDelegate);
+    ExchangeContext * ec1 = NewExchangeToBob(&mockAppDelegate);
+    ASSERT_NE(ec1, nullptr);
+    EXPECT_EQ(ec1->IsInitiator(), true);
+    EXPECT_EQ(ec1->GetSessionHandle(), GetSessionAliceToBob());
+    EXPECT_EQ(ec1->GetDelegate(), &mockAppDelegate);
 
-    ExchangeContext * ec2 = ctx.NewExchangeToAlice(&mockAppDelegate);
-    NL_TEST_EXIT_ON_FAILED_ASSERT(inSuite, ec2 != nullptr);
-    NL_TEST_ASSERT(inSuite, ec2->GetExchangeId() > ec1->GetExchangeId());
-    NL_TEST_ASSERT(inSuite, ec2->GetSessionHandle() == ctx.GetSessionBobToAlice());
+    ExchangeContext * ec2 = NewExchangeToAlice(&mockAppDelegate);
+    ASSERT_NE(ec2, nullptr);
+    EXPECT_GT(ec2->GetExchangeId(), ec1->GetExchangeId());
+    EXPECT_EQ(ec2->GetSessionHandle(), GetSessionBobToAlice());
 
     ec1->Close();
     ec2->Close();
 }
 
-void CheckSessionExpirationBasics(nlTestSuite * inSuite, void * inContext)
+TEST_F(TestExchangeMgr, CheckSessionExpirationBasics)
 {
-    TestContext & ctx = *reinterpret_cast<TestContext *>(inContext);
-
     MockAppDelegate sendDelegate;
-    ExchangeContext * ec1 = ctx.NewExchangeToBob(&sendDelegate);
+    ExchangeContext * ec1 = NewExchangeToBob(&sendDelegate);
+    ASSERT_NE(ec1, nullptr);
 
     // Expire the session this exchange is supposedly on.
     ec1->GetSessionHandle()->AsSecureSession()->MarkForEviction();
 
     MockAppDelegate receiveDelegate;
     CHIP_ERROR err =
-        ctx.GetExchangeManager().RegisterUnsolicitedMessageHandlerForType(Protocols::BDX::Id, kMsgType_TEST1, &receiveDelegate);
-    NL_TEST_ASSERT(inSuite, err == CHIP_NO_ERROR);
+        GetExchangeManager().RegisterUnsolicitedMessageHandlerForType(Protocols::BDX::Id, kMsgType_TEST1, &receiveDelegate);
+    EXPECT_EQ(err, CHIP_NO_ERROR);
 
     err = ec1->SendMessage(Protocols::BDX::Id, kMsgType_TEST1, System::PacketBufferHandle::New(System::PacketBuffer::kMaxSize),
                            SendFlags(Messaging::SendMessageFlags::kNoAutoRequestAck));
-    NL_TEST_ASSERT(inSuite, err != CHIP_NO_ERROR);
-    ctx.DrainAndServiceIO();
+    EXPECT_NE(err, CHIP_NO_ERROR);
+    DrainAndServiceIO();
 
-    NL_TEST_ASSERT(inSuite, !receiveDelegate.IsOnMessageReceivedCalled);
+    EXPECT_FALSE(receiveDelegate.IsOnMessageReceivedCalled);
     ec1->Close();
 
-    err = ctx.GetExchangeManager().UnregisterUnsolicitedMessageHandlerForType(Protocols::BDX::Id, kMsgType_TEST1);
-    NL_TEST_ASSERT(inSuite, err == CHIP_NO_ERROR);
+    err = GetExchangeManager().UnregisterUnsolicitedMessageHandlerForType(Protocols::BDX::Id, kMsgType_TEST1);
+    EXPECT_EQ(err, CHIP_NO_ERROR);
 
     // recreate closed session.
-    NL_TEST_ASSERT(inSuite, ctx.CreateSessionAliceToBob() == CHIP_NO_ERROR);
+    EXPECT_EQ(CreateSessionAliceToBob(), CHIP_NO_ERROR);
 }
 
-void CheckSessionExpirationTimeout(nlTestSuite * inSuite, void * inContext)
+TEST_F(TestExchangeMgr, CheckSessionExpirationTimeout)
 {
-    TestContext & ctx = *reinterpret_cast<TestContext *>(inContext);
-
     WaitForTimeoutDelegate sendDelegate;
-    ExchangeContext * ec1 = ctx.NewExchangeToBob(&sendDelegate);
+    ExchangeContext * ec1 = NewExchangeToBob(&sendDelegate);
 
     ec1->SendMessage(Protocols::BDX::Id, kMsgType_TEST1, System::PacketBufferHandle::New(System::PacketBuffer::kMaxSize),
                      SendFlags(Messaging::SendMessageFlags::kExpectResponse).Set(Messaging::SendMessageFlags::kNoAutoRequestAck));
 
-    ctx.DrainAndServiceIO();
-    NL_TEST_ASSERT(inSuite, !sendDelegate.IsOnResponseTimeoutCalled);
+    DrainAndServiceIO();
+    EXPECT_FALSE(sendDelegate.IsOnResponseTimeoutCalled);
 
     // Expire the session this exchange is supposedly on.  This should close the exchange.
     ec1->GetSessionHandle()->AsSecureSession()->MarkForEviction();
-    NL_TEST_ASSERT(inSuite, sendDelegate.IsOnResponseTimeoutCalled);
+    EXPECT_TRUE(sendDelegate.IsOnResponseTimeoutCalled);
 
     // recreate closed session.
-    NL_TEST_ASSERT(inSuite, ctx.CreateSessionAliceToBob() == CHIP_NO_ERROR);
+    EXPECT_EQ(CreateSessionAliceToBob(), CHIP_NO_ERROR);
 }
 
-void CheckSessionExpirationDuringTimeout(nlTestSuite * inSuite, void * inContext)
+TEST_F(TestExchangeMgr, CheckSessionExpirationDuringTimeout)
 {
     using namespace chip::System::Clock::Literals;
 
-    TestContext & ctx = *reinterpret_cast<TestContext *>(inContext);
-
     ExpireSessionFromTimeoutDelegate sendDelegate;
-    ExchangeContext * ec1 = ctx.NewExchangeToBob(&sendDelegate);
+    ExchangeContext * ec1 = NewExchangeToBob(&sendDelegate);
 
     auto timeout = System::Clock::Timeout(100);
     ec1->SetResponseTimeout(timeout);
 
-    NL_TEST_ASSERT(inSuite, !sendDelegate.IsOnResponseTimeoutCalled);
+    EXPECT_FALSE(sendDelegate.IsOnResponseTimeoutCalled);
 
     ec1->SendMessage(Protocols::BDX::Id, kMsgType_TEST1, System::PacketBufferHandle::New(System::PacketBuffer::kMaxSize),
                      SendFlags(Messaging::SendMessageFlags::kExpectResponse).Set(Messaging::SendMessageFlags::kNoAutoRequestAck));
-    ctx.DrainAndServiceIO();
+    DrainAndServiceIO();
 
     // Wait for our timeout to elapse. Give it an extra 1000ms of slack,
     // because if we lose the timeslice for longer than the slack we could end
     // up breaking out of the loop before the timeout timer has actually fired.
-    ctx.GetIOContext().DriveIOUntil(timeout + 1000_ms32, [&sendDelegate] { return sendDelegate.IsOnResponseTimeoutCalled; });
+    GetIOContext().DriveIOUntil(timeout + 1000_ms32, [&sendDelegate] { return sendDelegate.IsOnResponseTimeoutCalled; });
 
-    NL_TEST_ASSERT(inSuite, sendDelegate.IsOnResponseTimeoutCalled);
+    EXPECT_TRUE(sendDelegate.IsOnResponseTimeoutCalled);
 
     // recreate closed session.
-    NL_TEST_ASSERT(inSuite, ctx.CreateSessionAliceToBob() == CHIP_NO_ERROR);
+    EXPECT_EQ(CreateSessionAliceToBob(), CHIP_NO_ERROR);
 }
 
-void CheckUmhRegistrationTest(nlTestSuite * inSuite, void * inContext)
+TEST_F(TestExchangeMgr, CheckUmhRegistrationTest)
 {
-    TestContext & ctx = *reinterpret_cast<TestContext *>(inContext);
-
     CHIP_ERROR err;
     MockAppDelegate mockAppDelegate;
 
-    err = ctx.GetExchangeManager().RegisterUnsolicitedMessageHandlerForProtocol(Protocols::BDX::Id, &mockAppDelegate);
-    NL_TEST_ASSERT(inSuite, err == CHIP_NO_ERROR);
+    err = GetExchangeManager().RegisterUnsolicitedMessageHandlerForProtocol(Protocols::BDX::Id, &mockAppDelegate);
+    EXPECT_EQ(err, CHIP_NO_ERROR);
 
-    err = ctx.GetExchangeManager().RegisterUnsolicitedMessageHandlerForType(Protocols::Echo::Id, kMsgType_TEST1, &mockAppDelegate);
-    NL_TEST_ASSERT(inSuite, err == CHIP_NO_ERROR);
+    err = GetExchangeManager().RegisterUnsolicitedMessageHandlerForType(Protocols::Echo::Id, kMsgType_TEST1, &mockAppDelegate);
+    EXPECT_EQ(err, CHIP_NO_ERROR);
 
-    err = ctx.GetExchangeManager().UnregisterUnsolicitedMessageHandlerForProtocol(Protocols::BDX::Id);
-    NL_TEST_ASSERT(inSuite, err == CHIP_NO_ERROR);
+    err = GetExchangeManager().UnregisterUnsolicitedMessageHandlerForProtocol(Protocols::BDX::Id);
+    EXPECT_EQ(err, CHIP_NO_ERROR);
 
-    err = ctx.GetExchangeManager().UnregisterUnsolicitedMessageHandlerForProtocol(Protocols::Echo::Id);
-    NL_TEST_ASSERT(inSuite, err != CHIP_NO_ERROR);
+    err = GetExchangeManager().UnregisterUnsolicitedMessageHandlerForProtocol(Protocols::Echo::Id);
+    EXPECT_NE(err, CHIP_NO_ERROR);
 
-    err = ctx.GetExchangeManager().UnregisterUnsolicitedMessageHandlerForType(Protocols::Echo::Id, kMsgType_TEST1);
-    NL_TEST_ASSERT(inSuite, err == CHIP_NO_ERROR);
+    err = GetExchangeManager().UnregisterUnsolicitedMessageHandlerForType(Protocols::Echo::Id, kMsgType_TEST1);
+    EXPECT_EQ(err, CHIP_NO_ERROR);
 
-    err = ctx.GetExchangeManager().UnregisterUnsolicitedMessageHandlerForType(Protocols::Echo::Id, kMsgType_TEST2);
-    NL_TEST_ASSERT(inSuite, err != CHIP_NO_ERROR);
+    err = GetExchangeManager().UnregisterUnsolicitedMessageHandlerForType(Protocols::Echo::Id, kMsgType_TEST2);
+    EXPECT_NE(err, CHIP_NO_ERROR);
 }
 
-void CheckExchangeMessages(nlTestSuite * inSuite, void * inContext)
+TEST_F(TestExchangeMgr, CheckExchangeMessages)
 {
-    TestContext & ctx = *reinterpret_cast<TestContext *>(inContext);
-
     CHIP_ERROR err;
 
     // create solicited exchange
     MockAppDelegate mockSolicitedAppDelegate;
-    ExchangeContext * ec1 = ctx.NewExchangeToAlice(&mockSolicitedAppDelegate);
+    ExchangeContext * ec1 = NewExchangeToAlice(&mockSolicitedAppDelegate);
 
     // create unsolicited exchange
     MockAppDelegate mockUnsolicitedAppDelegate;
-    err = ctx.GetExchangeManager().RegisterUnsolicitedMessageHandlerForType(Protocols::BDX::Id, kMsgType_TEST1,
-                                                                            &mockUnsolicitedAppDelegate);
-    NL_TEST_ASSERT(inSuite, err == CHIP_NO_ERROR);
+    err = GetExchangeManager().RegisterUnsolicitedMessageHandlerForType(Protocols::BDX::Id, kMsgType_TEST1,
+                                                                        &mockUnsolicitedAppDelegate);
+    EXPECT_EQ(err, CHIP_NO_ERROR);
 
     // send a malicious packet
     ec1->SendMessage(Protocols::BDX::Id, kMsgType_TEST2, System::PacketBufferHandle::New(System::PacketBuffer::kMaxSize),
                      SendFlags(Messaging::SendMessageFlags::kNoAutoRequestAck));
 
-    ctx.DrainAndServiceIO();
-    NL_TEST_ASSERT(inSuite, !mockUnsolicitedAppDelegate.IsOnMessageReceivedCalled);
+    DrainAndServiceIO();
+    EXPECT_FALSE(mockUnsolicitedAppDelegate.IsOnMessageReceivedCalled);
 
-    ec1 = ctx.NewExchangeToAlice(&mockSolicitedAppDelegate);
+    ec1 = NewExchangeToAlice(&mockSolicitedAppDelegate);
 
     // send a good packet
     ec1->SendMessage(Protocols::BDX::Id, kMsgType_TEST1, System::PacketBufferHandle::New(System::PacketBuffer::kMaxSize),
                      SendFlags(Messaging::SendMessageFlags::kNoAutoRequestAck));
 
-    ctx.DrainAndServiceIO();
-    NL_TEST_ASSERT(inSuite, mockUnsolicitedAppDelegate.IsOnMessageReceivedCalled);
+    DrainAndServiceIO();
+    EXPECT_TRUE(mockUnsolicitedAppDelegate.IsOnMessageReceivedCalled);
 
-    err = ctx.GetExchangeManager().UnregisterUnsolicitedMessageHandlerForType(Protocols::BDX::Id, kMsgType_TEST1);
-    NL_TEST_ASSERT(inSuite, err == CHIP_NO_ERROR);
+    err = GetExchangeManager().UnregisterUnsolicitedMessageHandlerForType(Protocols::BDX::Id, kMsgType_TEST1);
+    EXPECT_EQ(err, CHIP_NO_ERROR);
 }
-
-// Test Suite
-
-/**
- *  Test Suite that lists all the test functions.
- */
-// clang-format off
-const nlTest sTests[] =
-{
-    NL_TEST_DEF("Test ExchangeMgr::NewContext",               CheckNewContextTest),
-    NL_TEST_DEF("Test ExchangeMgr::CheckUmhRegistrationTest", CheckUmhRegistrationTest),
-    NL_TEST_DEF("Test ExchangeMgr::CheckExchangeMessages",    CheckExchangeMessages),
-    NL_TEST_DEF("Test OnConnectionExpired basics",            CheckSessionExpirationBasics),
-    NL_TEST_DEF("Test OnConnectionExpired timeout handling",  CheckSessionExpirationTimeout),
-    NL_TEST_DEF("Test session eviction in timeout handling",  CheckSessionExpirationDuringTimeout),
-
-    NL_TEST_SENTINEL()
-};
-// clang-format on
-
-// clang-format off
-nlTestSuite sSuite =
-{
-    "Test-CHIP-ExchangeManager",
-    &sTests[0],
-    TestContext::nlTestSetUpTestSuite,
-    TestContext::nlTestTearDownTestSuite,
-    TestContext::nlTestSetUp,
-    TestContext::nlTestTearDown,
-};
-// clang-format on
 
 } // namespace
-
-/**
- *  Main
- */
-int TestExchangeMgr()
-{
-    return chip::ExecuteTestsWithContext<TestContext>(&sSuite);
-}
-
-CHIP_REGISTER_TEST_SUITE(TestExchangeMgr);

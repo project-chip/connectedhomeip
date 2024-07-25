@@ -1,6 +1,6 @@
 {
   "fileFormat": 2,
-  "featureLevel": 99,
+  "featureLevel": 103,
   "creator": "zap",
   "keyValuePairs": [
     {
@@ -29,6 +29,7 @@
       "pathRelativity": "relativeToZap",
       "path": "../../app/zap-templates/app-templates.json",
       "type": "gen-templates-json",
+      "category": "matter",
       "version": "chip-v1"
     }
   ],
@@ -415,7 +416,7 @@
               "storageOption": "RAM",
               "singleton": 0,
               "bounded": 0,
-              "defaultValue": "5",
+              "defaultValue": "6",
               "reportable": 1,
               "minInterval": 0,
               "maxInterval": 65344,
@@ -1117,10 +1118,10 @@
               "side": "client",
               "type": "int16u",
               "included": 1,
-              "storageOption": "RAM",
+              "storageOption": "External",
               "singleton": 0,
               "bounded": 0,
-              "defaultValue": "1",
+              "defaultValue": null,
               "reportable": 1,
               "minInterval": 0,
               "maxInterval": 65344,
@@ -1224,7 +1225,7 @@
               "storageOption": "RAM",
               "singleton": 0,
               "bounded": 0,
-              "defaultValue": "1",
+              "defaultValue": "2",
               "reportable": 1,
               "minInterval": 0,
               "maxInterval": 65344,
@@ -1233,7 +1234,7 @@
           ]
         },
         {
-          "name": "WiFi Network Diagnostics",
+          "name": "Wi-Fi Network Diagnostics",
           "code": 54,
           "mfgCode": null,
           "define": "WIFI_NETWORK_DIAGNOSTICS_CLUSTER",
@@ -1928,7 +1929,6 @@
           "define": "OPERATIONAL_STATE_OVEN_CLUSTER",
           "side": "client",
           "enabled": 1,
-          "apiMaturity": "provisional",
           "attributes": [
             {
               "name": "FeatureMap",
@@ -1971,7 +1971,6 @@
           "define": "OVEN_MODE_CLUSTER",
           "side": "client",
           "enabled": 1,
-          "apiMaturity": "provisional",
           "commands": [
             {
               "name": "ChangeToMode",
@@ -2692,7 +2691,6 @@
           "define": "MICROWAVE_OVEN_MODE_CLUSTER",
           "side": "client",
           "enabled": 1,
-          "apiMaturity": "provisional",
           "attributes": [
             {
               "name": "FeatureMap",
@@ -2735,7 +2733,6 @@
           "define": "MICROWAVE_OVEN_CONTROL_CLUSTER",
           "side": "client",
           "enabled": 1,
-          "apiMaturity": "provisional",
           "commands": [
             {
               "name": "SetCookingParameters",
@@ -2834,22 +2831,6 @@
             {
               "name": "Pause",
               "code": 0,
-              "mfgCode": null,
-              "source": "client",
-              "isIncoming": 0,
-              "isEnabled": 1
-            },
-            {
-              "name": "Stop",
-              "code": 1,
-              "mfgCode": null,
-              "source": "client",
-              "isIncoming": 0,
-              "isEnabled": 1
-            },
-            {
-              "name": "Start",
-              "code": 2,
               "mfgCode": null,
               "source": "client",
               "isIncoming": 0,
@@ -3131,7 +3112,6 @@
           "define": "ELECTRICAL_POWER_MEASUREMENT_CLUSTER",
           "side": "client",
           "enabled": 1,
-          "apiMaturity": "provisional",
           "attributes": [
             {
               "name": "FeatureMap",
@@ -3140,10 +3120,10 @@
               "side": "client",
               "type": "bitmap32",
               "included": 1,
-              "storageOption": "RAM",
+              "storageOption": "External",
               "singleton": 0,
               "bounded": 0,
-              "defaultValue": "0",
+              "defaultValue": null,
               "reportable": 1,
               "minInterval": 1,
               "maxInterval": 65534,
@@ -3174,7 +3154,6 @@
           "define": "ELECTRICAL_ENERGY_MEASUREMENT_CLUSTER",
           "side": "client",
           "enabled": 1,
-          "apiMaturity": "provisional",
           "attributes": [
             {
               "name": "FeatureMap",
@@ -3183,10 +3162,10 @@
               "side": "client",
               "type": "bitmap32",
               "included": 1,
-              "storageOption": "RAM",
+              "storageOption": "External",
               "singleton": 0,
               "bounded": 0,
-              "defaultValue": "0",
+              "defaultValue": null,
               "reportable": 1,
               "minInterval": 1,
               "maxInterval": 65534,
@@ -3260,7 +3239,6 @@
           "define": "ENERGY_EVSE_CLUSTER",
           "side": "client",
           "enabled": 1,
-          "apiMaturity": "provisional",
           "commands": [
             {
               "name": "Disable",
@@ -3332,7 +3310,7 @@
               "storageOption": "External",
               "singleton": 0,
               "bounded": 0,
-              "defaultValue": "0",
+              "defaultValue": null,
               "reportable": 1,
               "minInterval": 1,
               "maxInterval": 65534,
@@ -3363,7 +3341,6 @@
           "define": "ENERGY_EVSE_MODE_CLUSTER",
           "side": "client",
           "enabled": 1,
-          "apiMaturity": "provisional",
           "commands": [
             {
               "name": "ChangeToMode",
@@ -3943,8 +3920,7 @@
           "mfgCode": null,
           "define": "FAN_CONTROL_CLUSTER",
           "side": "client",
-          "enabled": 1,
-          "apiMaturity": "provisional"
+          "enabled": 1
         },
         {
           "name": "Thermostat User Interface Configuration",
@@ -4144,7 +4120,7 @@
               "storageOption": "RAM",
               "singleton": 0,
               "bounded": 0,
-              "defaultValue": "6",
+              "defaultValue": "7",
               "reportable": 1,
               "minInterval": 0,
               "maxInterval": 65344,
@@ -4343,7 +4319,7 @@
               "storageOption": "RAM",
               "singleton": 0,
               "bounded": 0,
-              "defaultValue": "3",
+              "defaultValue": "4",
               "reportable": 1,
               "minInterval": 0,
               "maxInterval": 65344,
@@ -4748,6 +4724,151 @@
               "singleton": 0,
               "bounded": 0,
               "defaultValue": null,
+              "reportable": 1,
+              "minInterval": 1,
+              "maxInterval": 65534,
+              "reportableChange": 0
+            },
+            {
+              "name": "ClusterRevision",
+              "code": 65533,
+              "mfgCode": null,
+              "side": "client",
+              "type": "int16u",
+              "included": 1,
+              "storageOption": "RAM",
+              "singleton": 0,
+              "bounded": 0,
+              "defaultValue": "1",
+              "reportable": 1,
+              "minInterval": 1,
+              "maxInterval": 65534,
+              "reportableChange": 0
+            }
+          ]
+        },
+        {
+          "name": "Thread Border Router Management",
+          "code": 1106,
+          "mfgCode": null,
+          "define": "THREAD_BORDER_ROUTER_MANAGEMENT_CLUSTER",
+          "side": "client",
+          "enabled": 1,
+          "apiMaturity": "provisional",
+          "commands": [
+            {
+              "name": "GetActiveDatasetRequest",
+              "code": 0,
+              "mfgCode": null,
+              "source": "client",
+              "isIncoming": 0,
+              "isEnabled": 1
+            },
+            {
+              "name": "GetPendingDatasetRequest",
+              "code": 1,
+              "mfgCode": null,
+              "source": "client",
+              "isIncoming": 0,
+              "isEnabled": 1
+            },
+            {
+              "name": "SetPendingDatasetRequest",
+              "code": 4,
+              "mfgCode": null,
+              "source": "client",
+              "isIncoming": 0,
+              "isEnabled": 1
+            }
+          ],
+          "attributes": [
+            {
+              "name": "FeatureMap",
+              "code": 65532,
+              "mfgCode": null,
+              "side": "client",
+              "type": "bitmap32",
+              "included": 1,
+              "storageOption": "RAM",
+              "singleton": 0,
+              "bounded": 0,
+              "defaultValue": "0",
+              "reportable": 1,
+              "minInterval": 1,
+              "maxInterval": 65534,
+              "reportableChange": 0
+            },
+            {
+              "name": "ClusterRevision",
+              "code": 65533,
+              "mfgCode": null,
+              "side": "client",
+              "type": "int16u",
+              "included": 1,
+              "storageOption": "RAM",
+              "singleton": 0,
+              "bounded": 0,
+              "defaultValue": "2",
+              "reportable": 1,
+              "minInterval": 0,
+              "maxInterval": 65344,
+              "reportableChange": 0
+            }
+          ]
+        },
+        {
+          "name": "Thread Network Directory",
+          "code": 1107,
+          "mfgCode": null,
+          "define": "THREAD_NETWORK_DIRECTORY_CLUSTER",
+          "side": "client",
+          "enabled": 1,
+          "commands": [
+            {
+              "name": "AddNetwork",
+              "code": 0,
+              "mfgCode": null,
+              "source": "client",
+              "isIncoming": 0,
+              "isEnabled": 1
+            },
+            {
+              "name": "RemoveNetwork",
+              "code": 1,
+              "mfgCode": null,
+              "source": "client",
+              "isIncoming": 0,
+              "isEnabled": 1
+            },
+            {
+              "name": "GetOperationalDataset",
+              "code": 2,
+              "mfgCode": null,
+              "source": "client",
+              "isIncoming": 0,
+              "isEnabled": 1
+            },
+            {
+              "name": "OperationalDatasetResponse",
+              "code": 3,
+              "mfgCode": null,
+              "source": "server",
+              "isIncoming": 1,
+              "isEnabled": 1
+            }
+          ],
+          "attributes": [
+            {
+              "name": "FeatureMap",
+              "code": 65532,
+              "mfgCode": null,
+              "side": "client",
+              "type": "bitmap32",
+              "included": 1,
+              "storageOption": "RAM",
+              "singleton": 0,
+              "bounded": 0,
+              "defaultValue": "0",
               "reportable": 1,
               "minInterval": 1,
               "maxInterval": 65534,
@@ -5748,7 +5869,8 @@
       "endpointTypeIndex": 0,
       "profileId": 259,
       "endpointId": 1,
-      "networkId": 0
+      "networkId": 0,
+      "parentEndpointIdentifier": null
     }
   ]
 }

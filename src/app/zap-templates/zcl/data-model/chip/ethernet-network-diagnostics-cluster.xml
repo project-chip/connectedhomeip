@@ -29,17 +29,22 @@ limitations under the License.
     <item name="Rate200G" value="0x08"/>
     <item name="Rate400G" value="0x09"/>
   </enum>
-  <bitmap name="Feature" type="bitmap32">
-    <cluster code="0x0037"/>
-    <field name="PacketCounts" mask="0x1"/>
-    <field name="ErrorCounts" mask="0x2"/>
-  </bitmap>
   <cluster>
     <domain>General</domain>
     <name>Ethernet Network Diagnostics</name>
     <code>0x0037</code>
     <define>ETHERNET_NETWORK_DIAGNOSTICS_CLUSTER</define>
     <description>The Ethernet Network Diagnostics Cluster provides a means to acquire standardized diagnostics metrics that MAY be used by a Node to assist a user or Administrative Node in diagnosing potential problems.</description>
+
+    <features>
+    <feature bit="0" code="PKTCNT" name="PacketCounts" summary="Node makes available the counts for the number of received and transmitted packets on the ethernet interface.">
+      <optionalConform/>
+    </feature>
+    <feature bit="1" code="ERRCNT" name="ErrorCounts" summary="Node makes available the counts for the number of errors that have occurred during the reception and transmission of packets on the ethernet interface.">
+      <optionalConform/>
+    </feature>
+  </features>
+  
     <attribute side="server" code="0x00" define="PHY_RATE" type="PHYRateEnum" writable="false" isNullable="true" optional="true">PHYRate</attribute>
     <attribute side="server" code="0x01" define="FULL_DUPLEX" type="boolean" min="0x00" max="0x01" writable="false" isNullable="true" optional="true">FullDuplex</attribute>
     <attribute side="server" code="0x02" define="PACKET_RX_COUNT" type="int64u" min="0x0000000000000000" max="0xFFFFFFFFFFFFFFFF" writable="false" default="0x0000000000000000" optional="true">PacketRxCount</attribute>

@@ -2,9 +2,16 @@ ARG VERSION=1
 FROM ghcr.io/project-chip/chip-build:${VERSION}
 LABEL org.opencontainers.image.source https://github.com/project-chip/connectedhomeip
 
+RUN set -x \
+    && apt-get update \
+    && DEBIAN_FRONTEND=noninteractive apt-get install -fy --no-install-recommends \
+    bzip2 \
+    && rm -rf /var/lib/apt/lists/ \
+    && : # last line
+
 # Setup Ameba
 ARG AMEBA_DIR=/opt/ameba
-ARG TAG_NAME=ameba_update_2023_12_15
+ARG TAG_NAME=ameba_update_2024_03_22
 RUN set -x \
     && apt-get update \
     && mkdir ${AMEBA_DIR} \

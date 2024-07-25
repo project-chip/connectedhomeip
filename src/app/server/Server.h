@@ -77,6 +77,12 @@ namespace chip {
 
 inline constexpr size_t kMaxBlePendingPackets = 1;
 
+#if INET_CONFIG_ENABLE_TCP_ENDPOINT
+inline constexpr size_t kMaxTcpActiveConnectionCount = CHIP_CONFIG_MAX_ACTIVE_TCP_CONNECTIONS;
+
+inline constexpr size_t kMaxTcpPendingPackets = CHIP_CONFIG_MAX_TCP_PENDING_PACKETS;
+#endif // INET_CONFIG_ENABLE_TCP_ENDPOINT
+
 //
 // NOTE: Please do not alter the order of template specialization here as the logic
 //       in the Server impl depends on this.
@@ -89,6 +95,10 @@ using ServerTransportMgr = chip::TransportMgr<chip::Transport::UDP
 #if CONFIG_NETWORK_LAYER_BLE
                                               ,
                                               chip::Transport::BLE<kMaxBlePendingPackets>
+#endif
+#if INET_CONFIG_ENABLE_TCP_ENDPOINT
+                                              ,
+                                              chip::Transport::TCP<kMaxTcpActiveConnectionCount, kMaxTcpPendingPackets>
 #endif
                                               >;
 
@@ -369,6 +379,18 @@ public:
 
 #if CHIP_CONFIG_ENABLE_ICD_SERVER
     app::ICDManager & GetICDManager() { return mICDManager; }
+
+#if CHIP_CONFIG_ENABLE_ICD_CIP
+    /**
+     * @brief Function to determine if a Check-In message would be sent at Boot up
+     *
+     * @param aFabricIndex client fabric index
+     * @param subjectID client subject ID
+     * @return true Check-In message would be sent on boot up.
+     * @return false Device has a persisted subscription with the client. See CHIP_CONFIG_PERSIST_SUBSCRIPTIONS.
+     */
+    bool ShouldCheckInMsgsBeSentAtBootFunction(FabricIndex aFabricIndex, NodeId subjectID);
+#endif // CHIP_CONFIG_ENABLE_ICD_CIP
 #endif // CHIP_CONFIG_ENABLE_ICD_SERVER
 
     /**

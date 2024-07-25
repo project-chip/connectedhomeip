@@ -23,7 +23,7 @@
  */
 #include <platform/internal/CHIPDeviceLayerInternal.h>
 
-#include <ble/CHIPBleServiceData.h>
+#include <ble/Ble.h>
 #include <lib/support/CHIPJNIError.h>
 #include <lib/support/CodeUtils.h>
 #include <lib/support/JniReferences.h>
@@ -218,7 +218,8 @@ BleLayer * BLEManagerImpl::_GetBleLayer()
 
 // ===== start implement virtual methods on BlePlatformDelegate.
 
-bool BLEManagerImpl::SubscribeCharacteristic(BLE_CONNECTION_OBJECT conId, const ChipBleUUID * svcId, const ChipBleUUID * charId)
+CHIP_ERROR BLEManagerImpl::SubscribeCharacteristic(BLE_CONNECTION_OBJECT conId, const ChipBleUUID * svcId,
+                                                   const ChipBleUUID * charId)
 {
     chip::DeviceLayer::StackUnlock unlock;
     CHIP_ERROR err = CHIP_NO_ERROR;
@@ -226,7 +227,6 @@ bool BLEManagerImpl::SubscribeCharacteristic(BLE_CONNECTION_OBJECT conId, const 
     jbyteArray svcIdObj;
     jbyteArray charIdObj;
     intptr_t tmpConnObj;
-    bool rc = false;
 
     ChipLogProgress(DeviceLayer, "Received SubscribeCharacteristic");
 
@@ -242,22 +242,23 @@ bool BLEManagerImpl::SubscribeCharacteristic(BLE_CONNECTION_OBJECT conId, const 
 
     env->ExceptionClear();
     tmpConnObj = reinterpret_cast<intptr_t>(conId);
-    rc         = (bool) env->CallBooleanMethod(mBLEManagerObject.ObjectRef(), mOnSubscribeCharacteristicMethod,
-                                               static_cast<jint>(tmpConnObj), svcIdObj, charIdObj);
+    VerifyOrExit(env->CallBooleanMethod(mBLEManagerObject.ObjectRef(), mOnSubscribeCharacteristicMethod,
+                                        static_cast<jint>(tmpConnObj), svcIdObj, charIdObj),
+                 err = BLE_ERROR_GATT_SUBSCRIBE_FAILED);
     VerifyOrExit(!env->ExceptionCheck(), err = CHIP_JNI_ERROR_EXCEPTION_THROWN);
 
 exit:
     if (err != CHIP_NO_ERROR)
     {
         JniReferences::GetInstance().ReportError(env, err, __FUNCTION__);
-        rc = false;
     }
     env->ExceptionClear();
 
-    return rc;
+    return err;
 }
 
-bool BLEManagerImpl::UnsubscribeCharacteristic(BLE_CONNECTION_OBJECT conId, const ChipBleUUID * svcId, const ChipBleUUID * charId)
+CHIP_ERROR BLEManagerImpl::UnsubscribeCharacteristic(BLE_CONNECTION_OBJECT conId, const ChipBleUUID * svcId,
+                                                     const ChipBleUUID * charId)
 {
     chip::DeviceLayer::StackUnlock unlock;
     CHIP_ERROR err = CHIP_NO_ERROR;
@@ -265,7 +266,6 @@ bool BLEManagerImpl::UnsubscribeCharacteristic(BLE_CONNECTION_OBJECT conId, cons
     jbyteArray svcIdObj;
     jbyteArray charIdObj;
     intptr_t tmpConnObj;
-    bool rc = false;
 
     ChipLogProgress(DeviceLayer, "Received UnsubscribeCharacteristic");
 
@@ -281,28 +281,27 @@ bool BLEManagerImpl::UnsubscribeCharacteristic(BLE_CONNECTION_OBJECT conId, cons
 
     env->ExceptionClear();
     tmpConnObj = reinterpret_cast<intptr_t>(conId);
-    rc         = (bool) env->CallBooleanMethod(mBLEManagerObject.ObjectRef(), mOnUnsubscribeCharacteristicMethod,
-                                               static_cast<jint>(tmpConnObj), svcIdObj, charIdObj);
+    VerifyOrExit(env->CallBooleanMethod(mBLEManagerObject.ObjectRef(), mOnUnsubscribeCharacteristicMethod,
+                                        static_cast<jint>(tmpConnObj), svcIdObj, charIdObj),
+                 err = BLE_ERROR_GATT_UNSUBSCRIBE_FAILED);
     VerifyOrExit(!env->ExceptionCheck(), err = CHIP_JNI_ERROR_EXCEPTION_THROWN);
 
 exit:
     if (err != CHIP_NO_ERROR)
     {
         JniReferences::GetInstance().ReportError(env, err, __FUNCTION__);
-        rc = false;
     }
     env->ExceptionClear();
 
-    return rc;
+    return err;
 }
 
-bool BLEManagerImpl::CloseConnection(BLE_CONNECTION_OBJECT conId)
+CHIP_ERROR BLEManagerImpl::CloseConnection(BLE_CONNECTION_OBJECT conId)
 {
     chip::DeviceLayer::StackUnlock unlock;
     CHIP_ERROR err = CHIP_NO_ERROR;
     JNIEnv * env   = JniReferences::GetInstance().GetEnvForCurrentThread();
     intptr_t tmpConnObj;
-    bool rc = false;
 
     ChipLogProgress(DeviceLayer, "Received CloseConnection");
 
@@ -312,17 +311,17 @@ bool BLEManagerImpl::CloseConnection(BLE_CONNECTION_OBJECT conId)
 
     env->ExceptionClear();
     tmpConnObj = reinterpret_cast<intptr_t>(conId);
-    rc = (bool) env->CallBooleanMethod(mBLEManagerObject.ObjectRef(), mOnCloseConnectionMethod, static_cast<jint>(tmpConnObj));
+    VerifyOrExit(env->CallBooleanMethod(mBLEManagerObject.ObjectRef(), mOnCloseConnectionMethod, static_cast<jint>(tmpConnObj)),
+                 err = CHIP_ERROR_INTERNAL);
     VerifyOrExit(!env->ExceptionCheck(), err = CHIP_JNI_ERROR_EXCEPTION_THROWN);
 
 exit:
     if (err != CHIP_NO_ERROR)
     {
         JniReferences::GetInstance().ReportError(env, err, __FUNCTION__);
-        rc = false;
     }
     env->ExceptionClear();
-    return rc;
+    return err;
 }
 
 uint16_t BLEManagerImpl::GetMTU(BLE_CONNECTION_OBJECT conId) const
@@ -355,14 +354,14 @@ exit:
     return mtu;
 }
 
-bool BLEManagerImpl::SendIndication(BLE_CONNECTION_OBJECT conId, const ChipBleUUID * svcId, const Ble::ChipBleUUID * charId,
-                                    chip::System::PacketBufferHandle pBuf)
+CHIP_ERROR BLEManagerImpl::SendIndication(BLE_CONNECTION_OBJECT conId, const ChipBleUUID * svcId, const Ble::ChipBleUUID * charId,
+                                          chip::System::PacketBufferHandle pBuf)
 {
-    return false;
+    return CHIP_ERROR_NOT_IMPLEMENTED;
 }
 
-bool BLEManagerImpl::SendWriteRequest(BLE_CONNECTION_OBJECT conId, const Ble::ChipBleUUID * svcId, const Ble::ChipBleUUID * charId,
-                                      chip::System::PacketBufferHandle pBuf)
+CHIP_ERROR BLEManagerImpl::SendWriteRequest(BLE_CONNECTION_OBJECT conId, const Ble::ChipBleUUID * svcId,
+                                            const Ble::ChipBleUUID * charId, chip::System::PacketBufferHandle pBuf)
 {
     chip::DeviceLayer::StackUnlock unlock;
     CHIP_ERROR err = CHIP_NO_ERROR;
@@ -371,7 +370,6 @@ bool BLEManagerImpl::SendWriteRequest(BLE_CONNECTION_OBJECT conId, const Ble::Ch
     jbyteArray charIdObj;
     jbyteArray characteristicDataObj;
     intptr_t tmpConnObj;
-    bool rc = false;
 
     ChipLogProgress(DeviceLayer, "Received SendWriteRequest");
     VerifyOrExit(mBLEManagerObject.HasValidObjectRef(), err = CHIP_ERROR_INCORRECT_STATE);
@@ -384,38 +382,26 @@ bool BLEManagerImpl::SendWriteRequest(BLE_CONNECTION_OBJECT conId, const Ble::Ch
     err = JniReferences::GetInstance().N2J_ByteArray(env, static_cast<const uint8_t *>(charId->bytes), 16, charIdObj);
     SuccessOrExit(err);
 
-    err = JniReferences::GetInstance().N2J_ByteArray(env, pBuf->Start(), pBuf->DataLength(), characteristicDataObj);
+    VerifyOrExit(CanCastTo<uint16_t>(pBuf->DataLength()), err = CHIP_ERROR_MESSAGE_TOO_LONG);
+    err = JniReferences::GetInstance().N2J_ByteArray(env, pBuf->Start(), static_cast<uint16_t>(pBuf->DataLength()),
+                                                     characteristicDataObj);
     SuccessOrExit(err);
 
     env->ExceptionClear();
     tmpConnObj = reinterpret_cast<intptr_t>(conId);
-    rc = (bool) env->CallBooleanMethod(mBLEManagerObject.ObjectRef(), mOnSendWriteRequestMethod, static_cast<jint>(tmpConnObj),
-                                       svcIdObj, charIdObj, characteristicDataObj);
+    VerifyOrExit(env->CallBooleanMethod(mBLEManagerObject.ObjectRef(), mOnSendWriteRequestMethod, static_cast<jint>(tmpConnObj),
+                                        svcIdObj, charIdObj, characteristicDataObj),
+                 err = BLE_ERROR_GATT_WRITE_FAILED);
     VerifyOrExit(!env->ExceptionCheck(), err = CHIP_JNI_ERROR_EXCEPTION_THROWN);
 
 exit:
     if (err != CHIP_NO_ERROR)
     {
         JniReferences::GetInstance().ReportError(env, err, __FUNCTION__);
-        rc = false;
     }
     env->ExceptionClear();
 
-    return rc;
-}
-
-bool BLEManagerImpl::SendReadRequest(BLE_CONNECTION_OBJECT conId, const Ble::ChipBleUUID * svcId, const Ble::ChipBleUUID * charId,
-                                     chip::System::PacketBufferHandle pBuf)
-{
-    ChipLogError(DeviceLayer, "SendReadRequest: Not implemented");
-    return true;
-}
-
-bool BLEManagerImpl::SendReadResponse(BLE_CONNECTION_OBJECT conId, BLE_READ_REQUEST_CONTEXT requestContext,
-                                      const Ble::ChipBleUUID * svcId, const Ble::ChipBleUUID * charId)
-{
-    ChipLogError(DeviceLayer, "SendReadRBluezonse: Not implemented");
-    return true;
+    return err;
 }
 
 // ===== end implement virtual methods on BlePlatformDelegate.

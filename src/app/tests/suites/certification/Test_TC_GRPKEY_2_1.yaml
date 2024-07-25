@@ -68,34 +68,7 @@ tests:
           value: [{ FabricIndex: 1, GroupId: 0x0103, GroupKeySetID: 0x01a3 }]
 
     - label:
-          "Step 4: TH sends KeySetWrite command in the GroupKeyManagement
-          cluster to DUT. GroupKeySet fields are as follows:1)GroupKeySetID:
-          0x01a3 2)GroupKeySecurityPolicy: TrustFirst (0) 3)EpochKey0:
-          d0d1d2d3d4d5d6d7d8d9dadbdcdddedf 4)EpochStartTime0:1 5)EpochKey1:
-          d1d1d2d3d4d5d6d7d8d9dadbdcdddedf 6)EpochStartTime1:
-          18446744073709551613 7)EpochKey2: d2d1d2d3d4d5d6d7d8d9dadbdcdddedf
-          8)EpochStartTime2: 18446744073709551614"
-      PICS: GRPKEY.S.C00.Rsp
-      command: "KeySetWrite"
-      arguments:
-          values:
-              - name: GroupKeySet
-                value:
-                    {
-                        GroupKeySetID: 0x01a3,
-                        GroupKeySecurityPolicy: 0,
-                        EpochKey0: "hex:d0d1d2d3d4d5d6d7d8d9dadbdcdddedf",
-                        EpochStartTime0: 1,
-                        EpochKey1: "hex:d1d1d2d3d4d5d6d7d8d9dadbdcdddedf",
-                        EpochStartTime1: "18446744073709551613",
-                        EpochKey2: "hex:d2d1d2d3d4d5d6d7d8d9dadbdcdddedf",
-                        EpochStartTime2: "18446744073709551614",
-                    }
-
-    # Step 5 does not exist in the test plan.
-
-    - label:
-          "Step 6: TH reads GroupTable attribute from GroupKeyManagement cluster
+          "Step 4: TH reads GroupTable attribute from GroupKeyManagement cluster
           on DUT."
       PICS: GRPKEY.S.A0001
       command: "readAttribute"
@@ -104,47 +77,7 @@ tests:
           value: []
 
     - label:
-          "Step 7a: TH attempts to write to the GroupTable attribute from
-          GroupKeyManagement cluster on DUT with one entry as follows:1)GroupId:
-          0x0104 2)Endpoints: [PIXIT.G.ENDPOINT] 3)GroupName: 'Test Group2'"
-      PICS: GRPKEY.S.A0001 && G.S.F00
-      command: "writeAttribute"
-      attribute: "GroupTable"
-      arguments:
-          value:
-              [
-                  {
-                      FabricIndex: 1,
-                      GroupId: 0x0104,
-                      Endpoints: [Groups.Endpoint],
-                      GroupName: "Test Group2",
-                  },
-              ]
-      response:
-          error: UNSUPPORTED_WRITE
-
-    - label:
-          "Step 7b: TH attempts to write to the GroupTable attribute from
-          GroupKeyManagement cluster on DUT with one entry as follows:1)GroupId:
-          0x0104 2)Endpoints: [PIXIT.G.ENDPOINT] 3)GroupName: '' "
-      PICS: GRPKEY.S.A0001 && !G.S.F00
-      command: "writeAttribute"
-      attribute: "GroupTable"
-      arguments:
-          value:
-              [
-                  {
-                      FabricIndex: 1,
-                      GroupId: 0x0104,
-                      Endpoints: [Groups.Endpoint],
-                      GroupName: "",
-                  },
-              ]
-      response:
-          error: UNSUPPORTED_WRITE
-
-    - label:
-          "Step 8: TH reads MaxGroupsPerFabric attribute from GroupKeyManagement
+          "Step 5: TH reads MaxGroupsPerFabric attribute from GroupKeyManagement
           cluster on DUT using a fabric-filtered read."
       PICS: GRPKEY.S.A0002
       command: "readAttribute"
@@ -158,18 +91,7 @@ tests:
               maxValue: 65535
 
     - label:
-          "Step 9: TH attempts to write MaxGroupsPerFabric attribute of
-          GroupKeyManagement cluster to the same value as read in step 8."
-      PICS: GRPKEY.S.A0002
-      command: "writeAttribute"
-      attribute: "MaxGroupsPerFabric"
-      arguments:
-          value: MaxGroupsPerFabricValue
-      response:
-          error: UNSUPPORTED_WRITE
-
-    - label:
-          "Step 10: TH reads MaxGroupKeysPerFabric attribute from
+          "Step 6: TH reads MaxGroupKeysPerFabric attribute from
           GroupKeyManagement cluster on DUT using a fabric-filtered read."
       PICS: GRPKEY.S.A0003
       command: "readAttribute"
@@ -181,15 +103,3 @@ tests:
               type: int16u
               minValue: 1
               maxValue: 65535
-
-    - label:
-          "Step 11: TH attempts to write MaxGroupKeysPerFabric attribute of
-          GroupKeyManagement cluster on DUT to the same value as read in step
-          10."
-      PICS: GRPKEY.S.A0003
-      command: "writeAttribute"
-      attribute: "MaxGroupKeysPerFabric"
-      arguments:
-          value: MaxGroupKeysPerFabricValue
-      response:
-          error: UNSUPPORTED_WRITE

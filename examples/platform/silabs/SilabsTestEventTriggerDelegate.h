@@ -25,31 +25,12 @@
 #include <lib/support/CodeUtils.h>
 #include <lib/support/Span.h>
 
-/**
- * @brief User handler for handling the test event trigger
- *
- * @note If TestEventTrigger is enabled, it needs to be implemented in the app
- *
- * @param eventTrigger Event trigger to handle
- *
- * @warning *** DO NOT USE FOR STANDARD CLUSTER EVENT TRIGGERS ***
- *
- * TODO(#31723): Rename `emberAfHandleEventTrigger` to `SilabsHandleGlobalTestEventTrigger`
- *
- * @retval true on success
- * @retval false if error happened
- */
-bool emberAfHandleEventTrigger(uint64_t eventTrigger);
-
 namespace chip {
 
-class SilabsTestEventTriggerDelegate : public TestEventTriggerDelegate, TestEventTriggerHandler
+class SilabsTestEventTriggerDelegate : public TestEventTriggerDelegate
 {
 public:
-    explicit SilabsTestEventTriggerDelegate(const ByteSpan & enableKey) : mEnableKey(enableKey)
-    {
-        VerifyOrDie(AddHandler(this) == CHIP_NO_ERROR);
-    }
+    explicit SilabsTestEventTriggerDelegate() = default;
 
     /**
      * @brief Checks to see if `enableKey` provided matches value chosen by the manufacturer.
@@ -57,21 +38,6 @@ public:
      * @return True or False.
      */
     bool DoesEnableKeyMatch(const ByteSpan & enableKey) const override;
-
-    /**
-     * @brief Delegates handling to global `emberAfHandleEventTrigger` function. DO NOT EXTEND.
-     *
-     * @param eventTrigger - trigger to process.
-     * @return CHIP_NO_ERROR if properly handled, else another CHIP_ERROR.
-     */
-    CHIP_ERROR HandleEventTrigger(uint64_t eventTrigger) override
-    {
-        // WARNING: LEGACY SUPPORT ONLY, DO NOT EXTEND FOR STANDARD CLUSTERS
-        return (emberAfHandleEventTrigger(eventTrigger)) ? CHIP_NO_ERROR : CHIP_ERROR_INVALID_ARGUMENT;
-    }
-
-private:
-    ByteSpan mEnableKey;
 };
 
 } // namespace chip

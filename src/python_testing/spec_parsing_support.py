@@ -29,10 +29,10 @@ import chip.clusters as Clusters
 from chip.tlv import uint
 from conformance_support import (OPTIONAL_CONFORM, TOP_LEVEL_CONFORMANCE_TAGS, ConformanceDecision, ConformanceException,
                                  ConformanceParseParameters, feature, is_disallowed, mandatory, optional, or_operation,
-                                 parse_callable_from_xml)
+                                 parse_callable_from_xml, parse_device_type_callable_from_xml)
 from global_attribute_ids import GlobalAttributeIds
-from matter_testing_support import (AttributePathLocation, ClusterPathLocation, CommandPathLocation, EventPathLocation,
-                                    FeaturePathLocation, ProblemNotice, ProblemSeverity)
+from matter_testing_support import (AttributePathLocation, ClusterPathLocation, CommandPathLocation, DeviceTypePathLocation,
+                                    EventPathLocation, FeaturePathLocation, ProblemNotice, ProblemSeverity)
 
 _PRIVILEGE_STR = {
     None: "N/A",
@@ -45,6 +45,10 @@ _PRIVILEGE_STR = {
 
 def to_access_code(privilege: Clusters.AccessControl.Enums.AccessControlEntryPrivilegeEnum) -> str:
     return _PRIVILEGE_STR.get(privilege, "")
+
+
+class SpecParsingException(Exception):
+    pass
 
 
 @dataclass
@@ -106,6 +110,43 @@ class XmlCluster:
     pics: str
 
 
+class ClusterSide(Enum):
+    SERVER = auto()
+    CLIENT = auto()
+
+
+@dataclass
+class XmlDeviceTypeClusterRequirements:
+    name: str
+    side: ClusterSide
+    conformance: Callable[[uint, list[uint], list[uint]], ConformanceDecision]
+    # TODO: add element requirements
+
+    def __str__(self):
+        return f'{self.name}: {str(self.conformance)}'
+
+
+@dataclass
+class XmlDeviceType:
+    name: str
+    revision: int
+    server_clusters: dict[uint, XmlDeviceTypeClusterRequirements]
+    client_clusters: dict[uint, XmlDeviceTypeClusterRequirements]
+    # Keeping these as strings for now because the exact definitions are being discussed in DMTT
+    classification_class: str
+    classification_scope: str
+
+    def __str__(self):
+        msg = f'{self.name} - Revision {self.revision}, Class {self.classification_class}, Scope {self.classification_scope}\n'
+        msg += '    Server clusters\n'
+        for id, c in self.server_clusters.items():
+            msg = msg + f'      {id}: {str(c)}\n'
+        msg += '    Client clusters\n'
+        for id, c in self.client_clusters.items():
+            msg = msg + f'      {id}: {str(c)}\n'
+        return msg
+
+
 class CommandType(Enum):
     ACCEPTED = auto()
     GENERATED = auto()
@@ -113,40 +154,56 @@ class CommandType(Enum):
     UNKNOWN = auto()
 
 
-# workaround for aliased clusters not appearing in the xml. Remove this once https://github.com/csa-data-model/projects/issues/373 is addressed
-CONC_CLUSTERS = {0x040C: ('Carbon Monoxide Concentration Measurement', 'CMOCONC'),
-                 0x040D: ('Carbon Dioxide Concentration Measurement', 'CDOCONC'),
-                 0x0413: ('Nitrogen Dioxide Concentration Measurement', 'NDOCONC'),
-                 0x0415: ('Ozone Concentration Measurement', 'OZCONC'),
-                 0x042A: ('PM2.5 Concentration Measurement', 'PMICONC'),
-                 0x042B: ('Formaldehyde Concentration Measurement', 'FLDCONC'),
-                 0x042C: ('PM1 Concentration Measurement', 'PMHCONC'),
-                 0x042D: ('PM10 Concentration Measurement', 'PMKCONC'),
-                 0x042E: ('Total Volatile Organic Compounds Concentration Measurement', 'TVOCCONC'),
-                 0x042F: ('Radon Concentration Measurement', 'RNCONC')}
-CONC_BASE_NAME = 'Concentration Measurement Clusters'
-RESOURCE_CLUSTERS = {0x0071: ('HEPA Filter Monitoring', 'HEPAFREMON'),
-                     0x0072: ('Activated Carbon Filter Monitoring', 'ACFREMON')}
-RESOURCE_BASE_NAME = 'Resource Monitoring Clusters'
-WATER_CLUSTER = {0x0405: ('Relative Humidity Measurement', 'RH')}
-WATER_BASE_NAME = 'Water Content Measurement Clusters'
-CLUSTER_ALIASES = {CONC_BASE_NAME: CONC_CLUSTERS, RESOURCE_BASE_NAME: RESOURCE_CLUSTERS, WATER_BASE_NAME: WATER_CLUSTER}
+# workaround for aliased clusters PICS not appearing in the xml. Remove this once https://github.com/csa-data-model/projects/issues/461 is addressed
+ALIAS_PICS = {0x040C: 'CMOCONC',
+              0x040D: 'CDOCONC',
+              0x0413: 'NDOCONC',
+              0x0415: 'OZCONC',
+              0x042A: 'PMICONC',
+              0x042B: 'FLDCONC',
+              0x042C: 'PMHCONC',
+              0x042D: 'PMKCONC',
+              0x042E: 'TVOCCONC',
+              0x042F: 'RNCONC',
+              0x0071: 'HEPAFREMON',
+              0x0072: 'ACFREMON',
+              0x0405: 'RH',
+              0x001C: 'PWM'}
+
+CLUSTER_NAME_FIXES = {0x0036: 'WiFi Network Diagnostics', 0x042a: 'PM25 Concentration Measurement', 0x0006: 'On/Off'}
+DEVICE_TYPE_NAME_FIXES = {0x010b: 'Dimmable Plug-In Unit', 0x010a: 'On/Off Plug-in Unit'}
 
 
-def is_alias(id: uint):
-    for base, alias in CLUSTER_ALIASES.items():
-        if id in alias:
-            return True
-    return False
+def get_location_from_element(element: ElementTree.Element, cluster_id: int):
+    if element.tag == 'feature':
+        location = FeaturePathLocation(endpoint_id=0, cluster_id=cluster_id, feature_code=element.attrib['code'])
+    elif element.tag == 'command':
+        location = CommandPathLocation(endpoint_id=0, cluster_id=cluster_id, command_id=int(element.attrib['id'], 0))
+    elif element.tag == 'attribute':
+        location = AttributePathLocation(endpoint_id=0, cluster_id=cluster_id, attribute_id=int(element.attrib['id'], 0))
+    elif element.tag == 'event':
+        location = EventPathLocation(endpoint_id=0, cluster_id=cluster_id, event_id=int(element.attrib['id'], 0))
+    else:
+        location = ClusterPathLocation(endpoint_id=0, cluster_id=cluster_id)
+    return location
+
+
+def get_conformance(element: ElementTree.Element, cluster_id: int) -> tuple[ElementTree.Element, typing.Optional[ProblemNotice]]:
+    for sub in element:
+        if sub.tag in TOP_LEVEL_CONFORMANCE_TAGS:
+            return sub, None
+    location = get_location_from_element(element, cluster_id)
+    problem = ProblemNotice(test_name='Spec XML parsing', location=location,
+                            severity=ProblemSeverity.WARNING, problem='Unable to find conformance element')
+    return ElementTree.Element(OPTIONAL_CONFORM), problem
 
 
 class ClusterParser:
-    def __init__(self, cluster, cluster_id, name, is_alias):
+    def __init__(self, cluster, cluster_id, name):
         self._problems: list[ProblemNotice] = []
         self._cluster = cluster
         self._cluster_id = cluster_id
         self._name = name
-        self._is_alias = is_alias
 
         self._derived = None
         try:
@@ -163,6 +220,9 @@ class ClusterParser:
         except (KeyError, StopIteration):
             self._pics = None
 
+        if self._cluster_id in ALIAS_PICS.keys():
+            self._pics = ALIAS_PICS[cluster_id]
+
         self.feature_elements = self.get_all_feature_elements()
         self.attribute_elements = self.get_all_attribute_elements()
         self.command_elements = self.get_all_command_elements()
@@ -170,29 +230,11 @@ class ClusterParser:
         self.params = ConformanceParseParameters(feature_map=self.create_feature_map(), attribute_map=self.create_attribute_map(),
                                                  command_map=self.create_command_map())
 
-    def get_location_from_element(self, element: ElementTree.Element):
-        # Conformance is missing, so let's record the problem and treat it as optional for lack of a better choice
-        if element.tag == 'feature':
-            location = FeaturePathLocation(endpoint_id=0, cluster_id=self._cluster_id, feature_code=element.attrib['code'])
-        elif element.tag == 'command':
-            location = CommandPathLocation(endpoint_id=0, cluster_id=self._cluster_id, command_id=int(element.attrib['id'], 0))
-        elif element.tag == 'attribute':
-            location = AttributePathLocation(endpoint_id=0, cluster_id=self._cluster_id, attribute_id=int(element.attrib['id'], 0))
-        elif element.tag == 'event':
-            location = EventPathLocation(endpoint_id=0, cluster_id=self._cluster_id, event_id=int(element.attrib['id'], 0))
-        else:
-            location = ClusterPathLocation(endpoint_id=0, cluster_id=self._cluster_id)
-        return location
-
     def get_conformance(self, element: ElementTree.Element) -> ElementTree.Element:
-        for sub in element:
-            if sub.tag in TOP_LEVEL_CONFORMANCE_TAGS:
-                return sub
-        location = self.get_location_from_element(element)
-        self._problems.append(ProblemNotice(test_name='Spec XML parsing', location=location,
-                                            severity=ProblemSeverity.WARNING, problem='Unable to find conformance element'))
-
-        return ElementTree.Element(OPTIONAL_CONFORM)
+        element, problem = get_conformance(element, self._cluster_id)
+        if problem:
+            self._problems.append(problem)
+        return element
 
     def get_access(self, element: ElementTree.Element) -> Optional[ElementTree.Element]:
         for sub in element:
@@ -276,21 +318,21 @@ class ClusterParser:
                 return Clusters.AccessControl.Enums.AccessControlEntryPrivilegeEnum.kAdminister
 
             # We don't know what this means, for now, assume no access and mark a warning
-            location = self.get_location_from_element(element_xml)
+            location = get_location_from_element(element_xml, self._cluster_id)
             self._problems.append(ProblemNotice(test_name='Spec XML parsing', location=location,
                                                 severity=ProblemSeverity.WARNING, problem=f'Unknown access type {privilege_str}'))
             return Clusters.AccessControl.Enums.AccessControlEntryPrivilegeEnum.kUnknownEnumValue
 
         if access_xml is None:
-            # Derived and alias clusters can inherit their access from the base and that's fine, so don't add an error
+            # Derived clusters can inherit their access from the base and that's fine, so don't add an error
             # Similarly, pure base clusters can have the access defined in the derived clusters. If neither has it defined,
             # we will determine this at the end when we put these together.
             # Things with deprecated conformance don't get an access element, and that is also fine.
             # If a device properly passes the conformance test, such elements are guaranteed not to appear on the device.
-            if self._is_alias or self._derived is not None or is_disallowed(conformance):
+            if self._derived is not None or is_disallowed(conformance):
                 return (None, None, None)
 
-            location = self.get_location_from_element(element_xml)
+            location = get_location_from_element(element_xml, self._cluster_id)
             self._problems.append(ProblemNotice(test_name='Spec XML parsing', location=location,
                                                 severity=ProblemSeverity.WARNING, problem='Unable to find access element'))
             return (None, None, None)
@@ -358,7 +400,7 @@ class ClusterParser:
                 return CommandType.ACCEPTED
             raise Exception(f"Unknown direction: {element.attrib['direction']}")
         except KeyError:
-            return CommandType.ACCEPTED
+            return CommandType.UNKNOWN
 
     def parse_unknown_commands(self) -> list[XmlCommand]:
         commands = []
@@ -421,31 +463,32 @@ def add_cluster_data_from_xml(xml: ElementTree.Element, clusters: dict[int, XmlC
         xml: XML element read from from the XML cluster file
         clusters: dict of id -> XmlCluster. This function will append new clusters as appropriate to this dict.
         pure_base_clusters: dict of base name -> XmlCluster. This data structure is used to hold pure base clusters that don't have
-                            an ID. This function will append new pure base clusters as approrpriate to this dict.
+                            an ID. This function will append new pure base clusters as appropriate to this dict.
         ids_by_name: dict of cluster name -> ID. This function will append new IDs as appropriate to this dict.
         problems: list of any problems encountered during spec parsing. This function will append problems as appropriate to this list.
     '''
     cluster = xml.iter('cluster')
     for c in cluster:
-        name = c.attrib['name']
-        if not c.attrib['id']:
-            # Fully derived clusters have no id, but also shouldn't appear on a device.
-            # We do need to keep them, though, because we need to update the derived
-            # clusters. We keep them in a special dict by name, so they can be thrown
-            # away later.
-            cluster_id = None
-        else:
-            cluster_id = int(c.attrib['id'], 0)
-            ids_by_name[name] = cluster_id
+        ids = c.iter('clusterId')
+        for id in ids:
+            name = id.get('name')
+            cluster_id = id.get('id')
+            if cluster_id:
+                cluster_id = int(id.get('id'), 0)
+                ids_by_name[name] = cluster_id
 
-        parser = ClusterParser(c, cluster_id, name, is_alias(cluster_id))
-        new = parser.create_cluster()
-        problems = problems + parser.get_problems()
+            parser = ClusterParser(c, cluster_id, name)
+            new = parser.create_cluster()
+            problems = problems + parser.get_problems()
 
-        if cluster_id:
-            clusters[cluster_id] = new
-        else:
-            pure_base_clusters[name] = new
+            if cluster_id:
+                clusters[cluster_id] = new
+            else:
+                # Fully derived clusters have no id, but also shouldn't appear on a device.
+                # We do need to keep them, though, because we need to update the derived
+                # clusters. We keep them in a special dict by name, so they can be thrown
+                # away later.
+                pure_base_clusters[name] = new
 
 
 def check_clusters_for_unknown_commands(clusters: dict[int, XmlCluster], problems: list[ProblemNotice]):
@@ -455,13 +498,37 @@ def check_clusters_for_unknown_commands(clusters: dict[int, XmlCluster], problem
                 endpoint_id=0, cluster_id=id, command_id=cmd.id), severity=ProblemSeverity.WARNING, problem="Command with unknown direction"))
 
 
-def build_xml_clusters() -> tuple[list[XmlCluster], list[ProblemNotice]]:
-    dir = os.path.join(os.path.dirname(os.path.realpath(__file__)), '..', '..', 'data_model', 'clusters')
+class PrebuiltDataModelDirectory(Enum):
+    k1_3 = auto()
+    kMaster = auto()
+
+
+class DataModelLevel(str, Enum):
+    kCluster = 'clusters'
+    kDeviceType = 'device_types'
+
+
+def _get_data_model_directory(data_model_directory: typing.Union[PrebuiltDataModelDirectory, str], data_model_level: DataModelLevel) -> str:
+    if data_model_directory == PrebuiltDataModelDirectory.k1_3:
+        return os.path.join(os.path.dirname(os.path.realpath(__file__)), '..', '..', 'data_model', '1.3', data_model_level)
+    elif data_model_directory == PrebuiltDataModelDirectory.kMaster:
+        return os.path.join(os.path.dirname(os.path.realpath(__file__)), '..', '..', 'data_model', 'master', data_model_level)
+    else:
+        return data_model_directory
+
+
+def build_xml_clusters(data_model_directory: typing.Union[PrebuiltDataModelDirectory, str] = PrebuiltDataModelDirectory.k1_3) -> tuple[dict[uint, XmlCluster], list[ProblemNotice]]:
+    dir = _get_data_model_directory(data_model_directory, DataModelLevel.kCluster)
+
     clusters: dict[int, XmlCluster] = {}
     pure_base_clusters: dict[str, XmlCluster] = {}
     ids_by_name: dict[str, int] = {}
     problems: list[ProblemNotice] = []
-    for xml in glob.glob(f"{dir}/*.xml"):
+    files = glob.glob(f'{dir}/*.xml')
+    if not files:
+        raise SpecParsingException(f'No data model files found in specified directory {dir}')
+
+    for xml in files:
         logging.info(f'Parsing file {xml}')
         tree = ElementTree.parse(f'{xml}')
         root = tree.getroot()
@@ -487,16 +554,7 @@ def build_xml_clusters() -> tuple[list[XmlCluster], list[ProblemNotice]]:
         clusters[action_id].accepted_commands[c].conformance = optional()
         remove_problem(CommandPathLocation(endpoint_id=0, cluster_id=action_id, command_id=c))
 
-    combine_derived_clusters_with_base(clusters, pure_base_clusters, ids_by_name)
-
-    for alias_base_name, aliased_clusters in CLUSTER_ALIASES.items():
-        for id, (alias_name, pics) in aliased_clusters.items():
-            base = pure_base_clusters[alias_base_name]
-            new = deepcopy(base)
-            new.derived = alias_base_name
-            new.name = alias_name
-            new.pics = pics
-            clusters[id] = new
+    combine_derived_clusters_with_base(clusters, pure_base_clusters, ids_by_name, problems)
 
     # TODO: All these fixups should be removed BEFORE SVE if at all possible
     # Workaround for Color Control cluster - the spec uses a non-standard conformance. Set all to optional now, will need
@@ -547,10 +605,10 @@ def build_xml_clusters() -> tuple[list[XmlCluster], list[ProblemNotice]]:
     return clusters, problems
 
 
-def combine_derived_clusters_with_base(xml_clusters: dict[int, XmlCluster], pure_base_clusters: dict[str, XmlCluster], ids_by_name: dict[str, int]) -> None:
+def combine_derived_clusters_with_base(xml_clusters: dict[int, XmlCluster], pure_base_clusters: dict[str, XmlCluster], ids_by_name: dict[str, int], problems: list[ProblemNotice]) -> None:
     ''' Overrides base elements with the derived cluster values for derived clusters. '''
 
-    def combine_attributes(base: dict[uint, XmlAttribute], derived: dict[uint, XmlAttribute], cluster_id: uint) -> dict[uint, XmlAttribute]:
+    def combine_attributes(base: dict[uint, XmlAttribute], derived: dict[uint, XmlAttribute], cluster_id: uint, problems: list[ProblemNotice]) -> dict[uint, XmlAttribute]:
         ret = deepcopy(base)
         extras = {k: v for k, v in derived.items() if k not in base.keys()}
         overrides = {k: v for k, v in derived.items() if k in base.keys()}
@@ -590,7 +648,7 @@ def combine_derived_clusters_with_base(xml_clusters: dict[int, XmlCluster], pure
             command_map.update(c.command_map)
             features = deepcopy(base.features)
             features.update(c.features)
-            attributes = combine_attributes(base.attributes, c.attributes, id)
+            attributes = combine_attributes(base.attributes, c.attributes, id, problems)
             accepted_commands = deepcopy(base.accepted_commands)
             accepted_commands.update(c.accepted_commands)
             generated_commands = deepcopy(base.generated_commands)
@@ -611,3 +669,98 @@ def combine_derived_clusters_with_base(xml_clusters: dict[int, XmlCluster], pure
                              features=features, attributes=attributes, accepted_commands=accepted_commands,
                              generated_commands=generated_commands, unknown_commands=unknown_commands, events=events, pics=c.pics)
             xml_clusters[id] = new
+
+
+def parse_single_device_type(root: ElementTree.Element) -> tuple[list[ProblemNotice], dict[int, XmlDeviceType]]:
+    problems: list[ProblemNotice] = []
+    device_types: dict[int, XmlDeviceType] = {}
+    device = root.iter('deviceType')
+    for d in device:
+        name = d.attrib['name']
+        location = DeviceTypePathLocation(device_type_id=0)
+
+        str_id = d.attrib['id']
+        if not str_id:
+            if name == "Base Device Type":
+                # Base is special device type, we're going to call it -1 so we can combine and remove it later.
+                str_id = '-1'
+            else:
+                problems.append(ProblemNotice("Parse Device Type XML", location=location,
+                                severity=ProblemSeverity.WARNING, problem=f"Device type {name} does not have an ID listed"))
+                break
+        try:
+            id = int(str_id, 0)
+            revision = int(d.attrib['revision'], 0)
+        except ValueError:
+            problems.append(ProblemNotice("Parse Device Type XML", location=location,
+                            severity=ProblemSeverity.WARNING,
+                            problem=f"Device type {name} does not a valid ID or revision. ID: {str_id} revision: {d.get('revision', 'UNKNOWN')}"))
+            break
+        if id in DEVICE_TYPE_NAME_FIXES:
+            name = DEVICE_TYPE_NAME_FIXES[id]
+        try:
+            classification = next(d.iter('classification'))
+            scope = classification.attrib['scope']
+            device_class = classification.attrib['class']
+        except (KeyError, StopIteration):
+            # this is fine for base device type
+            if id == -1:
+                classification = 'BASE'
+                scope = 'BASE'
+                device_class = 'BASE'
+            else:
+                location = DeviceTypePathLocation(device_type_id=id)
+                problems.append(ProblemNotice("Parse Device Type XML", location=location,
+                                severity=ProblemSeverity.WARNING, problem="Unable to find classification data for device type"))
+                break
+        device_types[id] = XmlDeviceType(name=name, revision=revision, server_clusters={}, client_clusters={},
+                                         classification_class=device_class, classification_scope=scope)
+        clusters = d.iter('cluster')
+        for c in clusters:
+            try:
+                cid = int(c.attrib['id'], 0)
+                conformance_xml, tmp_problem = get_conformance(c, cid)
+                if tmp_problem:
+                    problems.append(tmp_problem)
+                conformance = parse_device_type_callable_from_xml(conformance_xml)
+                side_dict = {'server': ClusterSide.SERVER, 'client': ClusterSide.CLIENT}
+                side = side_dict[c.attrib['side']]
+                name = c.attrib['name']
+                if cid in CLUSTER_NAME_FIXES:
+                    name = CLUSTER_NAME_FIXES[cid]
+                cluster = XmlDeviceTypeClusterRequirements(name=name, side=side, conformance=conformance)
+                if side == ClusterSide.SERVER:
+                    device_types[id].server_clusters[cid] = cluster
+                else:
+                    device_types[id].client_clusters[cid] = cluster
+            except ConformanceException:
+                location = DeviceTypePathLocation(device_type_id=id, cluster_id=cid)
+                problems.append(ProblemNotice("Parse Device Type XML", location=location,
+                                severity=ProblemSeverity.WARNING, problem="Unable to parse conformance for cluster"))
+            # TODO: Check for features, attributes and commands as element requirements
+            # NOTE: Spec currently does a bad job of matching these exactly to the names and codes
+            # so this will need a bit of fancy handling here to get this right.
+    return device_types, problems
+
+
+def build_xml_device_types(data_model_directory: typing.Union[PrebuiltDataModelDirectory, str] = PrebuiltDataModelDirectory.k1_3) -> tuple[dict[int, XmlDeviceType], list[ProblemNotice]]:
+    dir = _get_data_model_directory(data_model_directory, DataModelLevel.kDeviceType)
+    device_types: dict[int, XmlDeviceType] = {}
+    problems = []
+    for xml in glob.glob(f"{dir}/*.xml"):
+        logging.info(f'Parsing file {xml}')
+        tree = ElementTree.parse(f'{xml}')
+        root = tree.getroot()
+        tmp_device_types, tmp_problems = parse_single_device_type(root)
+        problems = problems + tmp_problems
+        device_types.update(tmp_device_types)
+
+    if -1 not in device_types.keys():
+        raise ConformanceException("Base device type not found in device type xml data")
+
+    # Add in the base device type information and remove the base device type from the device_types
+    for d in device_types.values():
+        d.server_clusters.update(device_types[-1].server_clusters)
+    device_types.pop(-1)
+
+    return device_types, problems

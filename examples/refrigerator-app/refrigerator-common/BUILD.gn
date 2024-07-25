@@ -21,8 +21,5 @@ config("config") {
 
 chip_data_model("refrigerator-common") {
   zap_file = "refrigerator-app.zap"
-
-  zap_pregenerated_dir =
-      "${chip_root}/zzz_generated/refrigerator-app/zap-generated"
   is_server = true
 }

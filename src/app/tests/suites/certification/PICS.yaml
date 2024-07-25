@@ -5294,6 +5294,9 @@ PICS:
     - label: "Device has Deadfront behaviour"
       id: OO.S.F01
 
+    - label: "Device has OffOnly feature"
+      id: OO.S.F02
+
     #
     # server / manually
     #
@@ -8689,10 +8692,13 @@ PICS:
           "Does the device implement the UserActiveModeTriggerHint attribute?"
       id: ICDM.S.A0006
 
+    - label: "Does the device implement the OperatingMode? attribute?"
+      id: ICDM.S.A0007
+
     - label:
           "Does the device implement the UserActiveModeTriggerInstruction
           attribute?"
-      id: ICDM.S.A0007
+      id: ICDM.S.A0008
 
     #
     # Client Attribute

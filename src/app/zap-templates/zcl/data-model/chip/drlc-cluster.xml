@@ -17,16 +17,6 @@ limitations under the License.
 <configurator>
   <domain name="Energy Management"/>
 
-  <bitmap name="Feature" type="bitmap32">
-    <cluster code="0x0096"/>
-    <field name="EnrollmentGroups" mask="0x1"/>
-    <field name="TemperatureOffset" mask="0x2"/>
-    <field name="TemperatureSetpoint" mask="0x4"/>
-    <field name="LoadAdjustment" mask="0x8"/>
-    <field name="DutyCycle" mask="0x10"/>
-    <field name="PowerSavings" mask="0x20"/>
-    <field name="HeatingSource" mask="0x40"/>
-  </bitmap>
 
   <bitmap name="DeviceClassBitmap" type="bitmap32">
     <cluster code="0x0096"/>
@@ -184,6 +174,30 @@ limitations under the License.
     <client tick="false" init="false">true</client>
     <server tick="false" init="false">true</server>
     <globalAttribute side="either" code="0xFFFD" value="4"/>
+
+    <features>
+      <feature bit="0" code="ENRLG" name="Enrollment Groups" summary="Supports enrollment groups">
+        <optionalConform/>
+      </feature>
+      <feature bit="1" code="TEMPO" name="TemperatureOffset" summary="Supports temperature offsets">
+        <optionalConform choice="a" more="true"/>
+      </feature>
+      <feature bit="2" code="TEMPS" name="TemperatureSetpoint" summary="Supports temperature setpoints">
+        <optionalConform choice="a" more="true"/>
+      </feature>
+      <feature bit="3" code="LOADA" name="LoadAdjustment" summary="Supports average load adjustment percentage">
+        <optionalConform choice="a" more="true"/>
+      </feature>
+      <feature bit="4" code="DUTYC" name="DutyCycle" summary="Supports duty cycle adjustment">
+        <optionalConform choice="a" more="true"/>
+      </feature>
+      <feature bit="5" code="PWRSV" name="PowerSavings" summary="Supports power savings">
+        <optionalConform choice="a" more="true"/>
+      </feature>
+      <feature bit="6" code="HEATS" name="HeatingSource" summary="Supports selecting heating source">
+        <optionalConform choice="a" more="true"/>
+      </feature>
+    </features>
 
     <attribute side="server" code="0x0000" define="LOAD_CONTROL_PROGRAMS" type="array" entryType="LoadControlProgramStruct" writable="false">LoadControlPrograms</attribute>
     <attribute side="server" code="0x0001" define="NUMBER_OF_LOAD_CONTROL_PROGRAMS" type="int8u" min="5" writable="false" default="5">NumberOfLoadControlPrograms</attribute>

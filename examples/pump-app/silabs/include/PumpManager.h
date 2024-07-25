@@ -23,10 +23,8 @@
 
 #include "AppEvent.h"
 
+#include <cmsis_os2.h>
 #include <lib/core/CHIPError.h>
-
-#include <FreeRTOS.h>
-#include <timers.h>
 
 #define PCC_CLUSTER_ENDPOINT 1
 
@@ -66,13 +64,13 @@ private:
     Callback_fn_initiated mActionInitiated_CB;
     Callback_fn_completed mActionCompleted_CB;
 
-    TimerHandle_t mTimerHandle;
+    osTimerId_t mTimerHandle;
     int32_t mCurrentActor;
 
     void CancelTimer(void);
     void PumpTimer(uint32_t aTimeoutMs);
 
-    static void TimerEventHandler(TimerHandle_t aTimer);
+    static void TimerEventHandler(void * timerCbArg);
     static void ActuatorMovementTimerEventHandler(AppEvent * aEvent);
 
     static PumpManager sPump;

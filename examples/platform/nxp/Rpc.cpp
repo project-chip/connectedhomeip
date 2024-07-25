@@ -66,7 +66,7 @@ public:
 class NxpDevice final : public Device
 {
 public:
-    pw::Status Reboot(const pw_protobuf_Empty & request, pw_protobuf_Empty & response) override
+    pw::Status Reboot(const chip_rpc_RebootRequest & request, pw_protobuf_Empty & response) override
     {
         mRebootTimer = xTimerCreate("Reboot", kRebootTimerPeriodTicks, false, nullptr, RebootHandler);
         xTimerStart(mRebootTimer, pdMS_TO_TICKS(0));

@@ -14,6 +14,17 @@
 #    See the License for the specific language governing permissions and
 #    limitations under the License.
 
+# See https://github.com/project-chip/connectedhomeip/blob/master/docs/testing/python.md#defining-the-ci-test-arguments
+# for details about the block below.
+#
+# === BEGIN CI TEST ARGUMENTS ===
+# test-runner-runs: run1
+# test-runner-run/run1/app: ${ENERGY_MANAGEMENT_APP}
+# test-runner-run/run1/factoryreset: True
+# test-runner-run/run1/quiet: True
+# test-runner-run/run1/app-args: --discriminator 1234 --KVS kvs1 --trace-to json:${TRACE_APP}.json --enable-key 000102030405060708090a0b0c0d0e0f
+# test-runner-run/run1/script-args: --storage-path admin_storage.json --commissioning-method on-network --discriminator 1234 --passcode 20202021 --hex-arg enableKey:000102030405060708090a0b0c0d0e0f --endpoint 1 --trace-to json:${TRACE_TEST_JSON}.json --trace-to perfetto:${TRACE_TEST_PERFETTO}.perfetto
+# === END CI TEST ARGUMENTS ===
 
 import logging
 
@@ -30,33 +41,47 @@ class TC_EEVSE_2_5(MatterBaseTest, EEVSEBaseTestHelper):
 
     def desc_TC_EEVSE_2_5(self) -> str:
         """Returns a description of this test"""
-        return "5.1.XXX. [TC-EEVSE-2.4] Fault test functionality with DUT as Server"
+        return "5.1.6. [TC-EEVSE-2.5] Optional diagnostics functionality with DUT as Server"
 
     def pics_TC_EEVSE_2_5(self):
         """ This function returns a list of PICS for this test case that must be True for the test to be run"""
-        # In this case - there is no feature flags needed to run this test case
-        return ["EEVSE.S"]
+        # In this case - we need the EVSE to support the StartDiagnostics command
+        return ["EEVSE.S", "EEVSE.S.C04.Rsp"]
 
     def steps_TC_EEVSE_2_5(self) -> list[TestStep]:
         steps = [
-            TestStep("1", "Commissioning, already done", is_commissioning=True),
-            TestStep("2", "TH reads TestEventTriggersEnabled attribute from General Diagnostics Cluster. Verify that TestEventTriggersEnabled attribute has a value of 1 (True)"),
+            TestStep("1", "Commissioning, already done",
+                     is_commissioning=True),
+            TestStep("2", "TH reads TestEventTriggersEnabled attribute from General Diagnostics Cluster",
+                     "Verify that TestEventTriggersEnabled attribute has a value of 1 (True)"),
             TestStep("3", "TH sends TestEventTrigger command to General Diagnostics Cluster on Endpoint 0 with EnableKey field set to PIXIT.EEVSE.TEST_EVENT_TRIGGER_KEY and EventTrigger field set to PIXIT.EEVSE.TEST_EVENT_TRIGGER for Basic Functionality Test Event"),
-            TestStep("3a", "TH reads from the DUT the State attribute. Verify value is 0x00 (NotPluggedIn)"),
-            TestStep("3b", "TH reads from the DUT the SupplyState attribute. Verify value is 0x00 (Disabled)"),
-            TestStep("3c", "TH reads from the DUT the FaultState attribute. Verify value is 0x00 (NoError)"),
+            TestStep("3a", "TH reads from the DUT the State attribute",
+                     "Verify value is 0x00 (NotPluggedIn)"),
+            TestStep("3b", "TH reads from the DUT the SupplyState attribute",
+                     "Verify value is 0x00 (Disabled)"),
+            TestStep("3c", "TH reads from the DUT the FaultState attribute",
+                     "Verify value is 0x00 (NoError)"),
             TestStep("4", "TH sends command EnableCharging with ChargingEnabledUntil=Null, minimumChargeCurrent=6000, maximumChargeCurrent=60000"),
-            TestStep("4a", "TH reads from the DUT the State attribute. Verify value is 0x00 (NotPluggedIn)"),
-            TestStep("4b", "TH reads from the DUT the SupplyState attribute. Verify value is 0x01 (ChargingEnabled)"),
-            TestStep("5", "TH sends command StartDiagnostics. Verify that command is rejected with Failure"),
+            TestStep("4a", "TH reads from the DUT the State attribute",
+                     "Verify value is 0x00 (NotPluggedIn)"),
+            TestStep("4b", "TH reads from the DUT the SupplyState attribute",
+                     "Verify value is 0x01 (ChargingEnabled)"),
+            TestStep("5", "TH sends command StartDiagnostics",
+                     "Verify that command is rejected with Failure"),
             TestStep("6", "TH sends command Disable."),
-            TestStep("6a", "TH reads from the DUT the State attribute. Verify value is 0x00 (NotPluggedIn)"),
-            TestStep("6b", "TH reads from the DUT the SupplyState attribute. Verify value is 0x00 (Disabled)"),
-            TestStep("7", "TH sends command StartDiagnostics. Verify that command is accepted with Success"),
-            TestStep("7a", "TH reads from the DUT the SupplyState attribute. Verify value is 0x04 (DisabledDiagnostics)"),
+            TestStep("6a", "TH reads from the DUT the State attribute",
+                     "Verify value is 0x00 (NotPluggedIn)"),
+            TestStep("6b", "TH reads from the DUT the SupplyState attribute",
+                     "Verify value is 0x00 (Disabled)"),
+            TestStep("7", "TH sends command StartDiagnostics",
+                     "Verify that command is accepted with Success"),
+            TestStep("7a", "TH reads from the DUT the SupplyState attribute",
+                     "Verify value is 0x04 (DisabledDiagnostics)"),
             TestStep("8", "A few seconds later TH sends TestEventTrigger command to General Diagnostics Cluster on Endpoint 0 with EnableKey field set to PIXIT.EEVSE.TEST_EVENT_TRIGGER_KEY and EventTrigger field set to PIXIT.EEVSE.TEST_EVENT_TRIGGER for EVSE Diagnostics Complete Event"),
-            TestStep("8a", "TH reads from the DUT the State attribute. Verify value is 0x00 (NotPluggedIn)"),
-            TestStep("8b", "TH reads from the DUT the SupplyState attribute. Verify value is 0x00 (Disabled)"),
+            TestStep("8a", "TH reads from the DUT the State attribute",
+                     "Verify value is 0x00 (NotPluggedIn)"),
+            TestStep("8b", "TH reads from the DUT the SupplyState attribute",
+                     "Verify value is 0x00 (Disabled)"),
             TestStep("9", "TH sends TestEventTrigger command to General Diagnostics Cluster on Endpoint 0 with EnableKey field set to PIXIT.EEVSE.TEST_EVENT_TRIGGER_KEY and EventTrigger field set to PIXIT.EEVSE.TEST_EVENT_TRIGGER for Basic Functionality Test Event Clear."),
         ]
 

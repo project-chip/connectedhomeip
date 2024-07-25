@@ -14,11 +14,13 @@
 
 import("//build_overrides/build.gni")
 import("//build_overrides/chip.gni")
-import("//build_overrides/k32w0_sdk.gni")
+import("//build_overrides/nxp_sdk.gni")
 import("//build_overrides/openthread.gni")
 
 import("${build_root}/config/compiler/compiler.gni")
-import("${chip_root}/third_party/nxp/k32w0_sdk/k32w0_sdk.gni")
+import("${nxp_sdk_build_root}/nxp_sdk.gni")
+
+import("${nxp_sdk_build_root}/${nxp_sdk_name}/${nxp_sdk_name}.gni")
 
 openthread_nxp_root = "${chip_root}/third_party/openthread/ot-nxp"
 
@@ -90,8 +92,8 @@ source_set("libopenthread-k32w0") {
 
   public_deps = [
     ":openthread_core_config_k32w0",
-    "${k32w0_sdk_build_root}:k32w0_sdk",
-    "${k32w0_sdk_build_root}:mbedtls",
+    "${nxp_sdk_build_root}:nxp_sdk",
+    "${nxp_sdk_build_root}/${nxp_sdk_name}:mbedtls",
     "${openthread_root}/src/core:libopenthread_core_headers",
     "../../..:libopenthread-platform",
     "../../..:libopenthread-platform-utils",

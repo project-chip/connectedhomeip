@@ -48,12 +48,12 @@ ClockImpl gClockImpl;
 
 Microseconds64 ClockImpl::GetMonotonicMicroseconds64(void)
 {
-    return (Clock::Microseconds64(xTaskGetTickCount()) * configTICK_RATE_HZ);
+    return Clock::Microseconds64(ameba_get_clock_time());
 }
 
 Milliseconds64 ClockImpl::GetMonotonicMilliseconds64(void)
 {
-    return (Clock::Milliseconds64(xTaskGetTickCount()));
+    return std::chrono::duration_cast<Milliseconds64>(GetMonotonicMicroseconds64());
 }
 
 CHIP_ERROR ClockImpl::GetClock_RealTime(Clock::Microseconds64 & curTime)

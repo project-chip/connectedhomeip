@@ -6,10 +6,6 @@
 	path = third_party/nlio/repo
 	url = https://github.com/nestlabs/nlio.git
 	branch  = master
-[submodule "nlunit-test"]
-	path = third_party/nlunit-test/repo
-	url = https://github.com/nestlabs/nlunit-test.git
-	branch  = master
 [submodule "mbedtls"]
 	path = third_party/mbedtls/repo
 	url = https://github.com/ARMmbed/mbedtls.git
@@ -54,16 +50,16 @@
 	path = third_party/freertos/repo
 	url = https://github.com/FreeRTOS/FreeRTOS-Kernel.git
 	branch  = V10.3.1-kernel-only
-	platforms = ameba,cc13xx_26xx,bouffalolab,esp32,k32w,infineon,qpg,cc32xx
+	platforms = ameba,cc13xx_26xx,bouffalolab,esp32,infineon,qpg,cc32xx
 [submodule "simw-top-mini"]
 	path = third_party/simw-top-mini/repo
 	url = https://github.com/NXP/plug-and-trust.git
 	branch  = int/CHIPSE_Release
-	platforms = k32w
+	platforms = nxp
 [submodule "third_party/openthread/ot-nxp"]
 	path = third_party/openthread/ot-nxp
 	url = https://github.com/NXP/ot-nxp.git
-	platforms = k32w
+	platforms = nxp
 [submodule "third_party/openthread/ot-qorvo"]
 	path = third_party/openthread/ot-qorvo
 	url = https://github.com/openthread/ot-qorvo.git
@@ -73,6 +69,11 @@
 	url = https://github.com/SiliconLabs/ot-efr32.git
 	branch  = matter_sve
 	platforms = silabs,silabs_docker
+[submodule "ot-stm32"]
+	path = third_party/openthread/ot-stm32
+	url = https://github.com/openthread/openthread
+	branch = eb6377f
+	platforms = stm32
 [submodule "third_party/openthread/ot-ifx"]
 	path = third_party/openthread/ot-ifx
 	url = https://github.com/Infineon/ot-ifx-release.git
@@ -95,11 +96,6 @@
 [submodule "p6/abstraction-rtos"]
 	path = third_party/infineon/psoc6/psoc6_sdk/libs/abstraction-rtos
 	url = https://github.com/Infineon/abstraction-rtos
-	platforms = infineon
-[submodule "p6/bluetooth-freertos"]
-	path = third_party/infineon/psoc6/psoc6_sdk/libs/bluetooth-freertos
-	url = https://github.com/Infineon/bluetooth-freertos
-	branch  = v2.X
 	platforms = infineon
 [submodule "p6/btstack"]
 	path = third_party/infineon/psoc6/psoc6_sdk/libs/btstack
@@ -132,10 +128,6 @@
 [submodule "p6/mtb-pdl-cat1"]
 	path = third_party/infineon/psoc6/psoc6_sdk/libs/mtb-pdl-cat1
 	url = https://github.com/Infineon/mtb-pdl-cat1
-	platforms = infineon
-[submodule "p6/psoc6cm0p"]
-	path = third_party/infineon/psoc6/psoc6_sdk/libs/psoc6cm0p
-	url = https://github.com/Infineon/psoc6cm0p
 	platforms = infineon
 [submodule "p6/whd-bsp-integration"]
 	path = third_party/infineon/psoc6/psoc6_sdk/libs/whd-bsp-integration
@@ -184,26 +176,6 @@
 [submodule "third_party/jsoncpp/repo"]
 	path = third_party/jsoncpp/repo
 	url = https://github.com/open-source-parsers/jsoncpp.git
-[submodule "cyw30739_sdk/30739A0"]
-	path = third_party/infineon/cyw30739_sdk/repos/30739A0
-	url = https://github.com/Infineon/OT-Matter-30739A0.git
-	platforms = infineon
-[submodule "cyw30739_sdk/include"]
-	path = third_party/infineon/cyw30739_sdk/repos/btsdk-include
-	url = https://github.com/Infineon/btsdk-include.git
-	platforms = infineon
-[submodule "cyw30739_sdk/target"]
-	path = third_party/infineon/cyw30739_sdk/repos/CYW930739M2EVB-01
-	url = https://github.com/Infineon/OT-Matter-TARGET_CYW930739M2EVB-01.git
-	platforms = infineon
-[submodule "cyw30739_sdk/tools"]
-	path = third_party/infineon/cyw30739_sdk/repos/btsdk-tools
-	url = https://github.com/Infineon/btsdk-tools.git
-	platforms = infineon
-[submodule "third_party/p6/p6_sdk/libs/anycloud-ota"]
-	path = third_party/infineon/psoc6/psoc6_sdk/libs/anycloud-ota
-	url = https://github.com/Infineon/anycloud-ota
-	platforms = infineon
 [submodule "third_party/mbed-mcu-boot/repo"]
 	path = third_party/mbed-mcu-boot/repo
 	url = https://github.com/ATmobica/mcuboot.git
@@ -212,6 +184,12 @@
 	path = third_party/infineon/psoc6/psoc6_sdk/libs/serial-flash
 	url = https://github.com/Infineon/serial-flash
 	platforms = infineon
+[submodule "infineon/matter-wpan-sdk"]
+	path = third_party/infineon/repos/matter-wpan-sdk
+	url = https://github.com/Infineon/matter-wpan-sdk.git
+	branch = main
+	platforms = infineon
+	recursive = true
 [submodule "ti_simplelink_sdk"]
 	path = third_party/ti_simplelink_sdk/repo_cc13xx_cc26xx
 	url = https://github.com/TexasInstruments/cc13xx_cc26xx_sdk.git
@@ -236,10 +214,10 @@
 	url = https://github.com/SiliconLabs/sdk_support.git
 	branch = main
 	platforms = silabs,silabs_docker
-[submodule "third_party/silabs/gecko_sdk"]
-	path = third_party/silabs/gecko_sdk
-	url = https://github.com/SiliconLabs/gecko_sdk.git
-	branch = v4.4.1
+[submodule "third_party/silabs/simplicity_sdk"]
+	path = third_party/silabs/simplicity_sdk
+	url = https://github.com/SiliconLabs/simplicity_sdk.git
+	branch = v2024.6.0
 	platforms = silabs
 [submodule "third_party/silabs/wiseconnect-wifi-bt-sdk"]
 	path = third_party/silabs/wiseconnect-wifi-bt-sdk
@@ -249,7 +227,7 @@
 [submodule "third_party/silabs/wifi_sdk"]
 	path = third_party/silabs/wifi_sdk
 	url = https://github.com/SiliconLabs/wiseconnect.git
-	branch = v3.1.3
+	branch = v3.3.0
 	platforms = silabs
 [submodule "editline"]
 	path = third_party/editline/repo
@@ -257,6 +235,7 @@
 [submodule "third_party/boringssl/repo/src"]
 	path = third_party/boringssl/repo/src
 	url = https://github.com/google/boringssl.git
+	branch = master
 [submodule "third_party/mt793x_sdk/filogic"]
 	path = third_party/mt793x_sdk/filogic
 	url = https://github.com/MediaTek-Labs/genio-matter-bsp.git
@@ -318,9 +297,39 @@
 [submodule "third_party/st/STM32CubeWB"]
 	path = third_party/st/STM32CubeWB
 	url = https://github.com/STMicroelectronics/STM32CubeWB.git
-	branch = v1.17.0
+	branch = v1.18.0
 	platforms = stm32
-[submodule "p6/lwip-network-interface-integration"]
+[submodule "third_party/infineon/trustm/optiga-trust-m"]
+	path = third_party/infineon/trustm/optiga-trust-m
+	url = https://github.com/Infineon/optiga-trust-m.git
+	branch = matter_support
+	platforms = infineon
+[submodule "third_party/nxp/nxp_matter_support"]
+	path = third_party/nxp/nxp_matter_support
+	url = https://github.com/NXP/nxp_matter_support.git
+	branch = master
+	platforms = nxp
+[submodule "third_party/infineon/psoc6/psoc6_sdk/libs/btstack-integration"]
+	path = third_party/infineon/psoc6/psoc6_sdk/libs/btstack-integration
+	url = https://github.com/Infineon/btstack-integration.git
+	platforms = infineon
+[submodule "third_party/infineon/psoc6/psoc6_sdk/libs/cat1cm0p"]
+	path = third_party/infineon/psoc6/psoc6_sdk/libs/cat1cm0p
+	url = https://github.com/Infineon/cat1cm0p.git
+	platforms = infineon
+[submodule "third_party/infineon/psoc6/psoc6_sdk/libs/cmsis"]
+	path = third_party/infineon/psoc6/psoc6_sdk/libs/cmsis
+	url = https://github.com/Infineon/cmsis.git
+	platforms = infineon
+[submodule "third_party/infineon/psoc6/psoc6_sdk/libs/ota-bootloader-abstraction"]
+	path = third_party/infineon/psoc6/psoc6_sdk/libs/ota-bootloader-abstraction
+	url = https://github.com/Infineon/ota-bootloader-abstraction.git
+	platforms = infineon
+[submodule "third_party/infineon/psoc6/psoc6_sdk/libs/ota-update"]
+	path = third_party/infineon/psoc6/psoc6_sdk/libs/ota-update
+	url = https://github.com/Infineon/ota-update.git
+	platforms = infineon
+[submodule "third_party/infineon/psoc6/psoc6_sdk/libs/lwip-network-interface-integration"]
 	path = third_party/infineon/psoc6/psoc6_sdk/libs/lwip-network-interface-integration
 	url = https://github.com/Infineon/lwip-network-interface-integration.git
 	platforms = infineon

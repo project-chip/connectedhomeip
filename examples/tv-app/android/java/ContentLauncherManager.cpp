@@ -20,6 +20,7 @@
 #include "TvApp-JNI.h"
 #include <app-common/zap-generated/attributes/Accessors.h>
 #include <app-common/zap-generated/ids/Clusters.h>
+#include <app/util/config.h>
 #include <jni.h>
 #include <lib/core/CHIPSafeCasts.h>
 #include <lib/support/CHIPJNIError.h>

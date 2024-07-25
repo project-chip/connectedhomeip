@@ -19,8 +19,6 @@ import("${chip_root}/src/lib/lib.gni")
 
 chip_data_model("tv-common") {
   zap_file = "tv-app.zap"
-
-  zap_pregenerated_dir = "${chip_root}/zzz_generated/tv-app/zap-generated"
   is_server = true
 }
 

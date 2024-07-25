@@ -62,6 +62,10 @@ static void CheckStoredOpcertCats(id<MTRStorage> storage, uint8_t fabricIndex, N
     XCTAssertTrue([factory startControllerFactory:factoryParams error:nil]);
     XCTAssertTrue([factory isRunning]);
 
+    // Starting again with identical params is a no-op
+    __auto_type * factoryParams2 = [[MTRDeviceControllerFactoryParams alloc] initWithStorage:storage];
+    XCTAssertTrue([factory startControllerFactory:factoryParams2 error:nil]);
+
     [factory stopControllerFactory];
     XCTAssertFalse([factory isRunning]);
 
@@ -1546,6 +1550,17 @@ static void CheckStoredOpcertCats(id<MTRStorage> storage, uint8_t fabricIndex, N
 
     [factory stopControllerFactory];
     XCTAssertFalse([factory isRunning]);
+}
+
+- (void)testSetMRPParameters
+{
+    // Can be called before starting the factory
+    XCTAssertFalse(MTRDeviceControllerFactory.sharedInstance.running);
+    MTRSetMessageReliabilityParameters(@2000, @2000, @2000, @2000);
+
+    // Now reset back to the default state, so timings in other tests are not
+    // affected.
+    MTRSetMessageReliabilityParameters(nil, nil, nil, nil);
 }
 
 @end

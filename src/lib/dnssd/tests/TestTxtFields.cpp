@@ -22,10 +22,10 @@
 #include <stdio.h>
 #include <string.h>
 
-#include <lib/dnssd/Resolver.h>
-#include <lib/support/UnitTestRegistration.h>
+#include <pw_unit_test/framework.h>
 
-#include <nlunit-test.h>
+#include <lib/core/StringBuilderAdapters.h>
+#include <lib/dnssd/Resolver.h>
 
 using namespace chip;
 using namespace chip::Dnssd;
@@ -41,161 +41,161 @@ ByteSpan GetSpan(char * key)
     return ByteSpan(reinterpret_cast<uint8_t *>(key), len);
 }
 
-void TestGetTxtFieldKey(nlTestSuite * inSuite, void * inContext)
+TEST(TestTxtFields, TestGetTxtFieldKey)
 {
     char key[4];
     strcpy(key, "D");
-    NL_TEST_ASSERT(inSuite, GetTxtFieldKey(GetSpan(key)) == TxtFieldKey::kLongDiscriminator);
+    EXPECT_EQ(GetTxtFieldKey(GetSpan(key)), TxtFieldKey::kLongDiscriminator);
 
     strcpy(key, "VP");
-    NL_TEST_ASSERT(inSuite, GetTxtFieldKey(GetSpan(key)) == TxtFieldKey::kVendorProduct);
+    EXPECT_EQ(GetTxtFieldKey(GetSpan(key)), TxtFieldKey::kVendorProduct);
 
     strcpy(key, "CM");
-    NL_TEST_ASSERT(inSuite, GetTxtFieldKey(GetSpan(key)) == TxtFieldKey::kCommissioningMode);
+    EXPECT_EQ(GetTxtFieldKey(GetSpan(key)), TxtFieldKey::kCommissioningMode);
 
     strcpy(key, "DT");
-    NL_TEST_ASSERT(inSuite, GetTxtFieldKey(GetSpan(key)) == TxtFieldKey::kDeviceType);
+    EXPECT_EQ(GetTxtFieldKey(GetSpan(key)), TxtFieldKey::kDeviceType);
 
     strcpy(key, "DN");
-    NL_TEST_ASSERT(inSuite, GetTxtFieldKey(GetSpan(key)) == TxtFieldKey::kDeviceName);
+    EXPECT_EQ(GetTxtFieldKey(GetSpan(key)), TxtFieldKey::kDeviceName);
 
     strcpy(key, "RI");
-    NL_TEST_ASSERT(inSuite, GetTxtFieldKey(GetSpan(key)) == TxtFieldKey::kRotatingDeviceId);
+    EXPECT_EQ(GetTxtFieldKey(GetSpan(key)), TxtFieldKey::kRotatingDeviceId);
 
     strcpy(key, "PI");
-    NL_TEST_ASSERT(inSuite, GetTxtFieldKey(GetSpan(key)) == TxtFieldKey::kPairingInstruction);
+    EXPECT_EQ(GetTxtFieldKey(GetSpan(key)), TxtFieldKey::kPairingInstruction);
 
     strcpy(key, "PH");
-    NL_TEST_ASSERT(inSuite, GetTxtFieldKey(GetSpan(key)) == TxtFieldKey::kPairingHint);
+    EXPECT_EQ(GetTxtFieldKey(GetSpan(key)), TxtFieldKey::kPairingHint);
 
     strcpy(key, "SII");
-    NL_TEST_ASSERT(inSuite, GetTxtFieldKey(GetSpan(key)) == TxtFieldKey::kSessionIdleInterval);
+    EXPECT_EQ(GetTxtFieldKey(GetSpan(key)), TxtFieldKey::kSessionIdleInterval);
 
     strcpy(key, "SAI");
-    NL_TEST_ASSERT(inSuite, GetTxtFieldKey(GetSpan(key)) == TxtFieldKey::kSessionActiveInterval);
+    EXPECT_EQ(GetTxtFieldKey(GetSpan(key)), TxtFieldKey::kSessionActiveInterval);
 
     strcpy(key, "SAT");
-    NL_TEST_ASSERT(inSuite, GetTxtFieldKey(GetSpan(key)) == TxtFieldKey::kSessionActiveThreshold);
+    EXPECT_EQ(GetTxtFieldKey(GetSpan(key)), TxtFieldKey::kSessionActiveThreshold);
 
     strcpy(key, "T");
-    NL_TEST_ASSERT(inSuite, GetTxtFieldKey(GetSpan(key)) == TxtFieldKey::kTcpSupported);
+    EXPECT_EQ(GetTxtFieldKey(GetSpan(key)), TxtFieldKey::kTcpSupported);
 
     strcpy(key, "ICD");
-    NL_TEST_ASSERT(inSuite, GetTxtFieldKey(GetSpan(key)) == TxtFieldKey::kLongIdleTimeICD);
+    EXPECT_EQ(GetTxtFieldKey(GetSpan(key)), TxtFieldKey::kLongIdleTimeICD);
 
     strcpy(key, "XX");
-    NL_TEST_ASSERT(inSuite, GetTxtFieldKey(GetSpan(key)) == TxtFieldKey::kUnknown);
+    EXPECT_EQ(GetTxtFieldKey(GetSpan(key)), TxtFieldKey::kUnknown);
 
     strcpy(key, "CP");
-    NL_TEST_ASSERT(inSuite, GetTxtFieldKey(GetSpan(key)) == TxtFieldKey::kCommissionerPasscode);
+    EXPECT_EQ(GetTxtFieldKey(GetSpan(key)), TxtFieldKey::kCommissionerPasscode);
 }
 
-void TestGetTxtFieldKeyCaseInsensitive(nlTestSuite * inSuite, void * inContext)
+TEST(TestTxtFields, TestGetTxtFieldKeyCaseInsensitive)
 {
     char key[3];
     strcpy(key, "d");
-    NL_TEST_ASSERT(inSuite, GetTxtFieldKey(GetSpan(key)) == TxtFieldKey::kLongDiscriminator);
+    EXPECT_EQ(GetTxtFieldKey(GetSpan(key)), TxtFieldKey::kLongDiscriminator);
 
     strcpy(key, "vp");
-    NL_TEST_ASSERT(inSuite, GetTxtFieldKey(GetSpan(key)) == TxtFieldKey::kVendorProduct);
+    EXPECT_EQ(GetTxtFieldKey(GetSpan(key)), TxtFieldKey::kVendorProduct);
     strcpy(key, "Vp");
-    NL_TEST_ASSERT(inSuite, GetTxtFieldKey(GetSpan(key)) == TxtFieldKey::kVendorProduct);
+    EXPECT_EQ(GetTxtFieldKey(GetSpan(key)), TxtFieldKey::kVendorProduct);
     strcpy(key, "vP");
-    NL_TEST_ASSERT(inSuite, GetTxtFieldKey(GetSpan(key)) == TxtFieldKey::kVendorProduct);
+    EXPECT_EQ(GetTxtFieldKey(GetSpan(key)), TxtFieldKey::kVendorProduct);
 
     strcpy(key, "Xx");
-    NL_TEST_ASSERT(inSuite, GetTxtFieldKey(GetSpan(key)) == TxtFieldKey::kUnknown);
+    EXPECT_EQ(GetTxtFieldKey(GetSpan(key)), TxtFieldKey::kUnknown);
 }
 
-void TestGetProduct(nlTestSuite * inSuite, void * inContext)
+TEST(TestTxtFields, TestGetProduct)
 {
     // Product and vendor are given as part of the same key, on either side of a + sign. Product is after the +
     char vp[64];
     strcpy(vp, "123+456");
-    NL_TEST_ASSERT(inSuite, GetProduct(GetSpan(vp)) == 456);
+    EXPECT_EQ(GetProduct(GetSpan(vp)), 456);
 
     strcpy(vp, "123+");
-    NL_TEST_ASSERT(inSuite, GetProduct(GetSpan(vp)) == 0);
+    EXPECT_EQ(GetProduct(GetSpan(vp)), 0);
 
     strcpy(vp, "+456");
-    NL_TEST_ASSERT(inSuite, GetProduct(GetSpan(vp)) == 456);
+    EXPECT_EQ(GetProduct(GetSpan(vp)), 456);
 
     strcpy(vp, "123");
-    NL_TEST_ASSERT(inSuite, GetProduct(GetSpan(vp)) == 0);
+    EXPECT_EQ(GetProduct(GetSpan(vp)), 0);
 
     // overflow a uint16
     sprintf(vp, "123+%" PRIu32, static_cast<uint32_t>(std::numeric_limits<uint16_t>::max()) + 1);
-    NL_TEST_ASSERT(inSuite, GetProduct(GetSpan(vp)) == 0);
+    EXPECT_EQ(GetProduct(GetSpan(vp)), 0);
 }
-void TestGetVendor(nlTestSuite * inSuite, void * inContext)
+TEST(TestTxtFields, TestGetVendor)
 {
     // Product and vendor are given as part of the same key, on either side of a + sign. Vendor is first
     char vp[64];
     strcpy(vp, "123+456");
-    NL_TEST_ASSERT(inSuite, GetVendor(GetSpan(vp)) == 123);
+    EXPECT_EQ(GetVendor(GetSpan(vp)), 123);
 
     strcpy(vp, "123+");
-    NL_TEST_ASSERT(inSuite, GetVendor(GetSpan(vp)) == 123);
+    EXPECT_EQ(GetVendor(GetSpan(vp)), 123);
 
     strcpy(vp, "+456");
-    NL_TEST_ASSERT(inSuite, GetVendor(GetSpan(vp)) == 0);
+    EXPECT_EQ(GetVendor(GetSpan(vp)), 0);
 
     strcpy(vp, "123");
-    NL_TEST_ASSERT(inSuite, GetVendor(GetSpan(vp)) == 123);
+    EXPECT_EQ(GetVendor(GetSpan(vp)), 123);
 
     // overflow a uint16
     sprintf(vp, "%" PRIu32 "+456", static_cast<uint32_t>(std::numeric_limits<uint16_t>::max()) + 1);
-    NL_TEST_ASSERT(inSuite, GetVendor(GetSpan(vp)) == 0);
+    EXPECT_EQ(GetVendor(GetSpan(vp)), 0);
 }
 
-void TestGetLongDiscriminator(nlTestSuite * inSuite, void * inContext)
+TEST(TestTxtFields, TestGetLongDiscriminator)
 {
     char ld[64];
     strcpy(ld, "1234");
-    NL_TEST_ASSERT(inSuite, GetLongDiscriminator(GetSpan(ld)) == 1234);
+    EXPECT_EQ(GetLongDiscriminator(GetSpan(ld)), 1234);
 
     // overflow a uint16
     sprintf(ld, "%" PRIu32, static_cast<uint32_t>(std::numeric_limits<uint16_t>::max()) + 1);
     printf("ld = %s\n", ld);
-    NL_TEST_ASSERT(inSuite, GetLongDiscriminator(GetSpan(ld)) == 0);
+    EXPECT_EQ(GetLongDiscriminator(GetSpan(ld)), 0);
 }
 
-void TestGetCommissioningMode(nlTestSuite * inSuite, void * inContext)
+TEST(TestTxtFields, TestGetCommissioningMode)
 {
     char cm[64];
     strcpy(cm, "0");
-    NL_TEST_ASSERT(inSuite, GetCommissioningMode(GetSpan(cm)) == 0);
+    EXPECT_EQ(GetCommissioningMode(GetSpan(cm)), 0);
 
     strcpy(cm, "1");
-    NL_TEST_ASSERT(inSuite, GetCommissioningMode(GetSpan(cm)) == 1);
+    EXPECT_EQ(GetCommissioningMode(GetSpan(cm)), 1);
 
     strcpy(cm, "2");
-    NL_TEST_ASSERT(inSuite, GetCommissioningMode(GetSpan(cm)) == 2);
+    EXPECT_EQ(GetCommissioningMode(GetSpan(cm)), 2);
 
     // overflow a uint8
     sprintf(cm, "%u", static_cast<uint16_t>(std::numeric_limits<uint8_t>::max()) + 1);
-    NL_TEST_ASSERT(inSuite, GetCommissioningMode(GetSpan(cm)) == 0);
+    EXPECT_EQ(GetCommissioningMode(GetSpan(cm)), 0);
 }
 
-void TestGetDeviceType(nlTestSuite * inSuite, void * inContext)
+TEST(TestTxtFields, TestGetDeviceType)
 {
     char dt[64];
     strcpy(dt, "1234");
-    NL_TEST_ASSERT(inSuite, GetDeviceType(GetSpan(dt)) == 1234);
+    EXPECT_EQ(GetDeviceType(GetSpan(dt)), 1234u);
 
     // overflow a uint32
     sprintf(dt, "%" PRIu64, static_cast<uint64_t>(std::numeric_limits<uint32_t>::max()) + 1);
-    NL_TEST_ASSERT(inSuite, GetDeviceType(GetSpan(dt)) == 0);
+    EXPECT_EQ(GetDeviceType(GetSpan(dt)), 0u);
 }
 
-void TestGetDeviceName(nlTestSuite * inSuite, void * inContext)
+TEST(TestTxtFields, TestGetDeviceName)
 {
     char name[kMaxDeviceNameLen + 1] = "";
     char val[kMaxDeviceNameLen + 2];
 
     strcpy(val, "testname");
     GetDeviceName(GetSpan(val), name);
-    NL_TEST_ASSERT(inSuite, strcmp(name, "testname") == 0);
+    EXPECT_STREQ(name, "testname");
 
     // If the data passed in is too long, it should truncate the end.
     memset(val, 'a', kMaxDeviceNameLen);
@@ -204,10 +204,10 @@ void TestGetDeviceName(nlTestSuite * inSuite, void * inContext)
     GetDeviceName(GetSpan(val), name);
 
     val[kMaxDeviceNameLen] = '\0';
-    NL_TEST_ASSERT(inSuite, strcmp(name, val) == 0);
+    EXPECT_STREQ(name, val);
 }
 
-void TestGetRotatingDeviceId(nlTestSuite * inSuite, void * inContext)
+TEST(TestTxtFields, TestGetRotatingDeviceId)
 {
     // Rotating device ID is given as up to 50 hex bytes
     char ri[kMaxRotatingIdLen * 2 + 1];
@@ -217,58 +217,58 @@ void TestGetRotatingDeviceId(nlTestSuite * inSuite, void * inContext)
     strcpy(ri, "0A1B");
     GetRotatingDeviceId(GetSpan(ri), id, &len);
     printf("id[0] = %x\n", id[0]);
-    NL_TEST_ASSERT(inSuite, id[0] == 0x0A);
-    NL_TEST_ASSERT(inSuite, id[1] == 0x1B);
-    NL_TEST_ASSERT(inSuite, len == 2);
+    EXPECT_EQ(id[0], 0x0A);
+    EXPECT_EQ(id[1], 0x1B);
+    EXPECT_EQ(len, 2u);
 
     // odd number of characters can't be parsed.
     strcpy(ri, "0A1BC");
     GetRotatingDeviceId(GetSpan(ri), id, &len);
-    NL_TEST_ASSERT(inSuite, len == 0);
+    EXPECT_EQ(len, 0u);
 
     // non-hex characters can't be parsed
     strcpy(ri, "0ATT");
     GetRotatingDeviceId(GetSpan(ri), id, &len);
-    NL_TEST_ASSERT(inSuite, len == 0);
+    EXPECT_EQ(len, 0u);
 
     // Lower case should work on SDK even though devices shouldn't be sending that.
     strcpy(ri, "0a1b");
     GetRotatingDeviceId(GetSpan(ri), id, &len);
-    NL_TEST_ASSERT(inSuite, id[0] == 0x0A);
-    NL_TEST_ASSERT(inSuite, id[1] == 0x1B);
-    NL_TEST_ASSERT(inSuite, len == 2);
+    EXPECT_EQ(id[0], 0x0A);
+    EXPECT_EQ(id[1], 0x1B);
+    EXPECT_EQ(len, 2u);
 
     strcpy(ri, "000102030405060708090A0B0C0D0E0F101112131415161718191A1B1C1D1E1F202122232425262728292A2B2C2D2E2F3031");
     GetRotatingDeviceId(GetSpan(ri), id, &len);
-    NL_TEST_ASSERT(inSuite, len == sizeof(id));
+    EXPECT_EQ(len, sizeof(id));
     for (size_t i = 0; i < sizeof(id); ++i)
     {
-        NL_TEST_ASSERT(inSuite, id[i] == i);
+        EXPECT_EQ(id[i], i);
     }
 }
 
-void TestGetPairingHint(nlTestSuite * inSuite, void * inContext)
+TEST(TestTxtFields, TestGetPairingHint)
 {
     char ph[64];
     strcpy(ph, "0");
-    NL_TEST_ASSERT(inSuite, GetPairingHint(GetSpan(ph)) == 0);
+    EXPECT_EQ(GetPairingHint(GetSpan(ph)), 0);
 
     strcpy(ph, "9");
-    NL_TEST_ASSERT(inSuite, GetPairingHint(GetSpan(ph)) == 9);
+    EXPECT_EQ(GetPairingHint(GetSpan(ph)), 9);
 
     // overflow a uint16
     sprintf(ph, "%" PRIu32, static_cast<uint32_t>(std::numeric_limits<uint16_t>::max()) + 1);
-    NL_TEST_ASSERT(inSuite, GetPairingHint(GetSpan(ph)) == 0);
+    EXPECT_EQ(GetPairingHint(GetSpan(ph)), 0);
 }
 
-void TestGetPairingInstruction(nlTestSuite * inSuite, void * inContext)
+TEST(TestTxtFields, TestGetPairingInstruction)
 {
     char data[kMaxPairingInstructionLen + 2];
     char ret[kMaxPairingInstructionLen + 1] = "";
 
     strcpy(data, "something");
     GetPairingInstruction(GetSpan(data), ret);
-    NL_TEST_ASSERT(inSuite, strcmp(ret, "something") == 0);
+    EXPECT_STREQ(ret, "something");
 
     // Exactly the max len.
     memset(data, 'a', kMaxPairingInstructionLen);
@@ -276,7 +276,7 @@ void TestGetPairingInstruction(nlTestSuite * inSuite, void * inContext)
     GetPairingInstruction(GetSpan(data), ret);
     // Add back the null terminator removed by GetSpan.
     data[kMaxPairingInstructionLen] = '\0';
-    NL_TEST_ASSERT(inSuite, strcmp(data, ret) == 0);
+    EXPECT_STREQ(data, ret);
 
     // Too long - should truncate end.
     memset(data, 'a', kMaxPairingInstructionLen);
@@ -284,40 +284,39 @@ void TestGetPairingInstruction(nlTestSuite * inSuite, void * inContext)
     data[kMaxPairingInstructionLen + 1] = '\0';
     GetPairingInstruction(GetSpan(data), ret);
     data[kMaxPairingInstructionLen] = '\0';
-    NL_TEST_ASSERT(inSuite, strcmp(ret, data) == 0);
+    EXPECT_STREQ(ret, data);
 }
 
-void TestGetCommissionerPasscode(nlTestSuite * inSuite, void * inContext)
+TEST(TestTxtFields, TestGetCommissionerPasscode)
 {
     char cm[64];
     strcpy(cm, "0");
-    NL_TEST_ASSERT(inSuite, GetCommissionerPasscode(GetSpan(cm)) == 0);
+    EXPECT_EQ(GetCommissionerPasscode(GetSpan(cm)), 0);
 
     strcpy(cm, "1");
-    NL_TEST_ASSERT(inSuite, GetCommissionerPasscode(GetSpan(cm)) == 1);
+    EXPECT_EQ(GetCommissionerPasscode(GetSpan(cm)), 1);
 
     // overflow a uint8
     sprintf(cm, "%u", static_cast<uint16_t>(std::numeric_limits<uint8_t>::max()) + 1);
-    NL_TEST_ASSERT(inSuite, GetCommissionerPasscode(GetSpan(cm)) == 0);
+    EXPECT_EQ(GetCommissionerPasscode(GetSpan(cm)), 0);
 }
 
-bool NodeDataIsEmpty(const DiscoveredNodeData & node)
+bool NodeDataIsEmpty(const CommissionNodeData & node)
 {
 
-    if (node.commissionData.longDiscriminator != 0 || node.commissionData.vendorId != 0 || node.commissionData.productId != 0 ||
-        node.commissionData.commissioningMode != 0 || node.commissionData.deviceType != 0 ||
-        node.commissionData.rotatingIdLen != 0 || node.commissionData.pairingHint != 0 ||
-        node.resolutionData.mrpRetryIntervalIdle.HasValue() || node.resolutionData.mrpRetryIntervalActive.HasValue() ||
-        node.resolutionData.mrpRetryActiveThreshold.HasValue() || node.resolutionData.isICDOperatingAsLIT.HasValue() ||
-        node.resolutionData.supportsTcp || node.commissionData.commissionerPasscode != 0)
+    if (node.longDiscriminator != 0 || node.vendorId != 0 || node.productId != 0 || node.commissioningMode != 0 ||
+        node.deviceType != 0 || node.rotatingIdLen != 0 || node.pairingHint != 0 || node.mrpRetryIntervalIdle.has_value() ||
+        node.mrpRetryIntervalActive.has_value() || node.mrpRetryActiveThreshold.has_value() ||
+        node.isICDOperatingAsLIT.has_value() || node.supportsTcpServer || node.supportsTcpClient ||
+        node.supportsCommissionerGeneratedPasscode != 0)
     {
         return false;
     }
-    if (strcmp(node.commissionData.deviceName, "") != 0 || strcmp(node.commissionData.pairingInstruction, "") != 0)
+    if (strcmp(node.deviceName, "") != 0 || strcmp(node.pairingInstruction, "") != 0)
     {
         return false;
     }
-    for (uint8_t id : node.commissionData.rotatingId)
+    for (uint8_t id : node.rotatingId)
     {
         if (id != 0)
         {
@@ -328,131 +327,495 @@ bool NodeDataIsEmpty(const DiscoveredNodeData & node)
 }
 
 // The individual fill tests test the error cases for each key type, this test is used to ensure the proper record is filled.
-void TestFillDiscoveredNodeDataFromTxt(nlTestSuite * inSuite, void * inContext)
+TEST(TestTxtFields, TestFillDiscoveredNodeDataFromTxt)
 {
     char key[3];
     char val[16];
-    DiscoveredNodeData filled;
+    CommissionNodeData filled;
 
     // Long discriminator
     strcpy(key, "D");
     strcpy(val, "840");
-    FillNodeDataFromTxt(GetSpan(key), GetSpan(val), filled.commissionData);
-    NL_TEST_ASSERT(inSuite, filled.commissionData.longDiscriminator == 840);
-    filled.commissionData.longDiscriminator = 0;
-    NL_TEST_ASSERT(inSuite, NodeDataIsEmpty(filled));
+    FillNodeDataFromTxt(GetSpan(key), GetSpan(val), filled);
+    EXPECT_EQ(filled.longDiscriminator, 840);
+    filled.longDiscriminator = 0;
+    EXPECT_TRUE(NodeDataIsEmpty(filled));
 
     // vendor and product
     strcpy(key, "VP");
     strcpy(val, "123+456");
-    FillNodeDataFromTxt(GetSpan(key), GetSpan(val), filled.commissionData);
-    NL_TEST_ASSERT(inSuite, filled.commissionData.vendorId == 123);
-    NL_TEST_ASSERT(inSuite, filled.commissionData.productId == 456);
-    filled.commissionData.vendorId  = 0;
-    filled.commissionData.productId = 0;
-    NL_TEST_ASSERT(inSuite, NodeDataIsEmpty(filled));
+    FillNodeDataFromTxt(GetSpan(key), GetSpan(val), filled);
+    EXPECT_EQ(filled.vendorId, 123);
+    EXPECT_EQ(filled.productId, 456);
+    filled.vendorId  = 0;
+    filled.productId = 0;
+    EXPECT_TRUE(NodeDataIsEmpty(filled));
 
     // Commissioning mode
     strcpy(key, "CM");
     strcpy(val, "1");
-    FillNodeDataFromTxt(GetSpan(key), GetSpan(val), filled.commissionData);
-    NL_TEST_ASSERT(inSuite, filled.commissionData.commissioningMode == 1);
-    filled.commissionData.commissioningMode = 0;
-    NL_TEST_ASSERT(inSuite, NodeDataIsEmpty(filled));
-
-    // Commissioning mode
+    FillNodeDataFromTxt(GetSpan(key), GetSpan(val), filled);
+    EXPECT_EQ(filled.commissioningMode, 1);
+    filled.commissioningMode = 0;
+    EXPECT_TRUE(NodeDataIsEmpty(filled));
+    // Supports Commissioner Generated Passcode
     strcpy(key, "CP");
     strcpy(val, "1");
-    FillNodeDataFromTxt(GetSpan(key), GetSpan(val), filled.commissionData);
-    NL_TEST_ASSERT(inSuite, filled.commissionData.commissionerPasscode == 1);
-    filled.commissionData.commissionerPasscode = 0;
-    NL_TEST_ASSERT(inSuite, NodeDataIsEmpty(filled));
+    FillNodeDataFromTxt(GetSpan(key), GetSpan(val), filled);
+    EXPECT_TRUE(filled.supportsCommissionerGeneratedPasscode);
+    filled.supportsCommissionerGeneratedPasscode = false;
+    EXPECT_TRUE(NodeDataIsEmpty(filled));
 
     // Device type
     strcpy(key, "DT");
     strcpy(val, "1");
-    FillNodeDataFromTxt(GetSpan(key), GetSpan(val), filled.commissionData);
-    NL_TEST_ASSERT(inSuite, filled.commissionData.deviceType == 1);
-    filled.commissionData.deviceType = 0;
-    NL_TEST_ASSERT(inSuite, NodeDataIsEmpty(filled));
+    FillNodeDataFromTxt(GetSpan(key), GetSpan(val), filled);
+    EXPECT_EQ(filled.deviceType, 1u);
+    filled.deviceType = 0;
+    EXPECT_TRUE(NodeDataIsEmpty(filled));
 
     // Device name
     strcpy(key, "DN");
     strcpy(val, "abc");
-    FillNodeDataFromTxt(GetSpan(key), GetSpan(val), filled.commissionData);
-    NL_TEST_ASSERT(inSuite, strcmp(filled.commissionData.deviceName, "abc") == 0);
-    memset(filled.commissionData.deviceName, 0, sizeof(filled.commissionData.deviceName));
-    NL_TEST_ASSERT(inSuite, NodeDataIsEmpty(filled));
+    FillNodeDataFromTxt(GetSpan(key), GetSpan(val), filled);
+    EXPECT_STREQ(filled.deviceName, "abc");
+    memset(filled.deviceName, 0, sizeof(filled.deviceName));
+    EXPECT_TRUE(NodeDataIsEmpty(filled));
 
     // Rotating device id
     strcpy(key, "RI");
     strcpy(val, "1A2B");
-    FillNodeDataFromTxt(GetSpan(key), GetSpan(val), filled.commissionData);
-    NL_TEST_ASSERT(inSuite, filled.commissionData.rotatingId[0] == 0x1A);
-    NL_TEST_ASSERT(inSuite, filled.commissionData.rotatingId[1] == 0x2B);
-    NL_TEST_ASSERT(inSuite, filled.commissionData.rotatingIdLen == 2);
-    filled.commissionData.rotatingIdLen = 0;
-    memset(filled.commissionData.rotatingId, 0, sizeof(filled.commissionData.rotatingId));
-    NL_TEST_ASSERT(inSuite, NodeDataIsEmpty(filled));
+    FillNodeDataFromTxt(GetSpan(key), GetSpan(val), filled);
+    EXPECT_EQ(filled.rotatingId[0], 0x1A);
+    EXPECT_EQ(filled.rotatingId[1], 0x2B);
+    EXPECT_EQ(filled.rotatingIdLen, 2u);
+    filled.rotatingIdLen = 0;
+    memset(filled.rotatingId, 0, sizeof(filled.rotatingId));
+    EXPECT_TRUE(NodeDataIsEmpty(filled));
 
     // Pairing instruction
     strcpy(key, "PI");
     strcpy(val, "hint");
-    FillNodeDataFromTxt(GetSpan(key), GetSpan(val), filled.commissionData);
-    NL_TEST_ASSERT(inSuite, strcmp(filled.commissionData.pairingInstruction, "hint") == 0);
-    memset(filled.commissionData.pairingInstruction, 0, sizeof(filled.commissionData.pairingInstruction));
-    NL_TEST_ASSERT(inSuite, NodeDataIsEmpty(filled));
+    FillNodeDataFromTxt(GetSpan(key), GetSpan(val), filled);
+    EXPECT_STREQ(filled.pairingInstruction, "hint");
+    memset(filled.pairingInstruction, 0, sizeof(filled.pairingInstruction));
+    EXPECT_TRUE(NodeDataIsEmpty(filled));
 
     // Pairing hint
     strcpy(key, "PH");
     strcpy(val, "1");
-    FillNodeDataFromTxt(GetSpan(key), GetSpan(val), filled.commissionData);
-    NL_TEST_ASSERT(inSuite, filled.commissionData.pairingHint == 1);
-    filled.commissionData.pairingHint = 0;
-    NL_TEST_ASSERT(inSuite, NodeDataIsEmpty(filled));
+    FillNodeDataFromTxt(GetSpan(key), GetSpan(val), filled);
+    EXPECT_EQ(filled.pairingHint, 1);
+    filled.pairingHint = 0;
+    EXPECT_TRUE(NodeDataIsEmpty(filled));
 }
 
 bool NodeDataIsEmpty(const ResolvedNodeData & nodeData)
 {
     return nodeData.operationalData.peerId == PeerId{} && nodeData.resolutionData.numIPs == 0 &&
-        nodeData.resolutionData.port == 0 && !nodeData.resolutionData.mrpRetryIntervalIdle.HasValue() &&
-        !nodeData.resolutionData.mrpRetryIntervalActive.HasValue() && !nodeData.resolutionData.supportsTcp &&
-        !nodeData.resolutionData.isICDOperatingAsLIT.HasValue();
+        nodeData.resolutionData.port == 0 && !nodeData.resolutionData.mrpRetryIntervalIdle.has_value() &&
+        !nodeData.resolutionData.mrpRetryIntervalActive.has_value() && !nodeData.resolutionData.supportsTcpClient &&
+        !nodeData.resolutionData.supportsTcpServer && !nodeData.resolutionData.isICDOperatingAsLIT.has_value();
 }
 
 void ResetRetryIntervalIdle(DiscoveredNodeData & nodeData)
 {
-    nodeData.resolutionData.mrpRetryIntervalIdle.ClearValue();
+    nodeData.Get<CommissionNodeData>().mrpRetryIntervalIdle.reset();
 }
 
 void ResetRetryIntervalIdle(ResolvedNodeData & nodeData)
 {
-    nodeData.resolutionData.mrpRetryIntervalIdle.ClearValue();
+    nodeData.resolutionData.mrpRetryIntervalIdle.reset();
 }
 
 void ResetRetryIntervalActive(DiscoveredNodeData & nodeData)
 {
-    nodeData.resolutionData.mrpRetryIntervalActive.ClearValue();
+    nodeData.Get<CommissionNodeData>().mrpRetryIntervalActive.reset();
 }
 
 void ResetRetryIntervalActive(ResolvedNodeData & nodeData)
 {
-    nodeData.resolutionData.mrpRetryIntervalActive.ClearValue();
+    nodeData.resolutionData.mrpRetryIntervalActive.reset();
 }
 
 void ResetRetryActiveThreshold(DiscoveredNodeData & nodeData)
 {
-    nodeData.resolutionData.mrpRetryActiveThreshold.ClearValue();
+    nodeData.Get<CommissionNodeData>().mrpRetryActiveThreshold.reset();
 }
 
 void ResetRetryActiveThreshold(ResolvedNodeData & nodeData)
 {
-    nodeData.resolutionData.mrpRetryActiveThreshold.ClearValue();
+    nodeData.resolutionData.mrpRetryActiveThreshold.reset();
+}
+
+template <class NodeData>
+void DiscoveredTxtFieldSessionIdleInterval()
+{
+    char key[4];
+    char val[16];
+    DiscoveredNodeData nodeData;
+    nodeData.Set<NodeData>();
+    CommonResolutionData & resolutionData = nodeData.Get<NodeData>();
+
+    // Minimum
+    strcpy(key, "SII");
+    strcpy(val, "1");
+    FillNodeDataFromTxt(GetSpan(key), GetSpan(val), resolutionData);
+    EXPECT_EQ(nodeData.Get<NodeData>().GetMrpRetryIntervalIdle(), std::make_optional(1_ms32));
+
+    // Maximum
+    strcpy(key, "SII");
+    strcpy(val, "3600000");
+    FillNodeDataFromTxt(GetSpan(key), GetSpan(val), resolutionData);
+    EXPECT_EQ(nodeData.Get<NodeData>().GetMrpRetryIntervalIdle(), std::make_optional(3600000_ms32));
+
+    // Test no other fields were populated
+    ResetRetryIntervalIdle(nodeData);
+    EXPECT_TRUE(NodeDataIsEmpty(nodeData.Get<NodeData>()));
+
+    // Invalid SII - negative value
+    strcpy(key, "SII");
+    strcpy(val, "-1");
+    FillNodeDataFromTxt(GetSpan(key), GetSpan(val), resolutionData);
+    EXPECT_FALSE(nodeData.Get<NodeData>().GetMrpRetryIntervalIdle().has_value());
+
+    // Invalid SII - greater than maximum
+    strcpy(key, "SII");
+    strcpy(val, "3600001");
+    FillNodeDataFromTxt(GetSpan(key), GetSpan(val), resolutionData);
+    EXPECT_FALSE(nodeData.Get<NodeData>().GetMrpRetryIntervalIdle().has_value());
+
+    // Invalid SII - much greater than maximum
+    strcpy(key, "SII");
+    strcpy(val, "1095216660481"); // 0xFF00000001 == 1 (mod 2^32)
+    FillNodeDataFromTxt(GetSpan(key), GetSpan(val), resolutionData);
+    EXPECT_FALSE(nodeData.Get<NodeData>().GetMrpRetryIntervalIdle().has_value());
+
+    // Invalid SII - hexadecimal value
+    strcpy(key, "SII");
+    strcpy(val, "0x20");
+    FillNodeDataFromTxt(GetSpan(key), GetSpan(val), resolutionData);
+    EXPECT_FALSE(nodeData.Get<NodeData>().GetMrpRetryIntervalIdle().has_value());
+
+    // Invalid SII - leading zeros
+    strcpy(key, "SII");
+    strcpy(val, "0700");
+    FillNodeDataFromTxt(GetSpan(key), GetSpan(val), resolutionData);
+    EXPECT_FALSE(nodeData.Get<NodeData>().GetMrpRetryIntervalIdle().has_value());
+
+    // Invalid SII - text at the end
+    strcpy(key, "SII");
+    strcpy(val, "123abc");
+    FillNodeDataFromTxt(GetSpan(key), GetSpan(val), resolutionData);
+    EXPECT_FALSE(nodeData.Get<NodeData>().GetMrpRetryIntervalIdle().has_value());
+}
+
+// Test SAI (formerly CRA)
+template <class NodeData>
+void DiscoveredTxtFieldSessionActiveInterval()
+{
+    char key[4];
+    char val[16];
+    DiscoveredNodeData nodeData;
+    nodeData.Set<NodeData>();
+    CommonResolutionData & resolutionData = nodeData.Get<NodeData>();
+
+    // Minimum
+    strcpy(key, "SAI");
+    strcpy(val, "1");
+    FillNodeDataFromTxt(GetSpan(key), GetSpan(val), resolutionData);
+    EXPECT_EQ(nodeData.Get<NodeData>().GetMrpRetryIntervalActive(), std::make_optional(1_ms32));
+
+    // Maximum
+    strcpy(key, "SAI");
+    strcpy(val, "3600000");
+    FillNodeDataFromTxt(GetSpan(key), GetSpan(val), resolutionData);
+    EXPECT_EQ(nodeData.Get<NodeData>().GetMrpRetryIntervalActive(), std::make_optional(3600000_ms32));
+
+    // Test no other fields were populated
+    ResetRetryIntervalActive(nodeData);
+    EXPECT_TRUE(NodeDataIsEmpty(nodeData.Get<NodeData>()));
+
+    // Invalid SAI - negative value
+    strcpy(key, "SAI");
+    strcpy(val, "-1");
+    FillNodeDataFromTxt(GetSpan(key), GetSpan(val), resolutionData);
+    EXPECT_FALSE(nodeData.Get<NodeData>().GetMrpRetryIntervalActive().has_value());
+
+    // Invalid SAI - greater than maximum
+    strcpy(key, "SAI");
+    strcpy(val, "3600001");
+    FillNodeDataFromTxt(GetSpan(key), GetSpan(val), resolutionData);
+    EXPECT_FALSE(nodeData.Get<NodeData>().GetMrpRetryIntervalActive().has_value());
+
+    // Invalid SAI - much greater than maximum
+    strcpy(key, "SAI");
+    strcpy(val, "1095216660481"); // 0xFF00000001 == 1 (mod 2^32)
+    FillNodeDataFromTxt(GetSpan(key), GetSpan(val), resolutionData);
+    EXPECT_FALSE(nodeData.Get<NodeData>().GetMrpRetryIntervalActive().has_value());
+
+    // Invalid SAI - hexadecimal value
+    strcpy(key, "SAI");
+    strcpy(val, "0x20");
+    FillNodeDataFromTxt(GetSpan(key), GetSpan(val), resolutionData);
+    EXPECT_FALSE(nodeData.Get<NodeData>().GetMrpRetryIntervalActive().has_value());
+
+    // Invalid SAI - leading zeros
+    strcpy(key, "SAI");
+    strcpy(val, "0700");
+    FillNodeDataFromTxt(GetSpan(key), GetSpan(val), resolutionData);
+    EXPECT_FALSE(nodeData.Get<NodeData>().GetMrpRetryIntervalActive().has_value());
+
+    // Invalid SAI - text at the end
+    strcpy(key, "SAI");
+    strcpy(val, "123abc");
+    FillNodeDataFromTxt(GetSpan(key), GetSpan(val), resolutionData);
+    EXPECT_FALSE(nodeData.Get<NodeData>().GetMrpRetryIntervalActive().has_value());
+}
+
+// Test SAT (Session Active Threshold)
+template <class NodeData>
+void DiscoveredTxtFieldSessionActiveThreshold()
+{
+    char key[4];
+    char val[16];
+    DiscoveredNodeData nodeData;
+    nodeData.Set<NodeData>();
+    CommonResolutionData & resolutionData = nodeData.Get<NodeData>();
+
+    // Minimum
+    strcpy(key, "SAT");
+    strcpy(val, "1");
+    FillNodeDataFromTxt(GetSpan(key), GetSpan(val), resolutionData);
+    EXPECT_EQ(nodeData.Get<NodeData>().GetMrpRetryActiveThreshold(), std::make_optional(1_ms16));
+
+    // Maximum
+    strcpy(key, "SAT");
+    strcpy(val, "65535");
+    FillNodeDataFromTxt(GetSpan(key), GetSpan(val), resolutionData);
+    EXPECT_EQ(nodeData.Get<NodeData>().GetMrpRetryActiveThreshold(), std::make_optional(65535_ms16));
+
+    // Test no other fields were populated
+    ResetRetryActiveThreshold(nodeData);
+    EXPECT_TRUE(NodeDataIsEmpty(nodeData.Get<NodeData>()));
+
+    // Invalid SAI - negative value
+    strcpy(key, "SAT");
+    strcpy(val, "-1");
+    FillNodeDataFromTxt(GetSpan(key), GetSpan(val), resolutionData);
+    EXPECT_FALSE(nodeData.Get<NodeData>().GetMrpRetryActiveThreshold().has_value());
+
+    // Invalid SAI - greater than maximum
+    strcpy(key, "SAT");
+    strcpy(val, "65536");
+    FillNodeDataFromTxt(GetSpan(key), GetSpan(val), resolutionData);
+    EXPECT_FALSE(nodeData.Get<NodeData>().GetMrpRetryActiveThreshold().has_value());
+
+    // Invalid SAT - much greater than maximum
+    strcpy(key, "SAT");
+    strcpy(val, "1095216660481"); // 0xFF00000001 == 1 (mod 2^32)
+    FillNodeDataFromTxt(GetSpan(key), GetSpan(val), resolutionData);
+    EXPECT_FALSE(nodeData.Get<NodeData>().GetMrpRetryActiveThreshold().has_value());
+
+    // Invalid SAT - hexadecimal value
+    strcpy(key, "SAT");
+    strcpy(val, "0x20");
+    FillNodeDataFromTxt(GetSpan(key), GetSpan(val), resolutionData);
+    EXPECT_FALSE(nodeData.Get<NodeData>().GetMrpRetryActiveThreshold().has_value());
+
+    // Invalid SAT - leading zeros
+    strcpy(key, "SAT");
+    strcpy(val, "0700");
+    FillNodeDataFromTxt(GetSpan(key), GetSpan(val), resolutionData);
+    EXPECT_FALSE(nodeData.Get<NodeData>().GetMrpRetryActiveThreshold().has_value());
+
+    // Invalid SAT - text at the end
+    strcpy(key, "SAT");
+    strcpy(val, "123abc");
+    FillNodeDataFromTxt(GetSpan(key), GetSpan(val), resolutionData);
+    EXPECT_FALSE(nodeData.Get<NodeData>().GetMrpRetryActiveThreshold().has_value());
+}
+
+// Test T (TCP support)
+template <class NodeData>
+void DiscoveredTxtFieldTcpSupport()
+{
+    char key[4];
+    char val[8];
+    DiscoveredNodeData nodeData;
+    nodeData.Set<NodeData>();
+    CommonResolutionData & resolutionData = nodeData.Get<NodeData>();
+
+    // Neither TCP Client nor TCP Server are enabled
+    strcpy(key, "T");
+    strcpy(val, "0");
+    FillNodeDataFromTxt(GetSpan(key), GetSpan(val), resolutionData);
+    EXPECT_FALSE(nodeData.Get<NodeData>().supportsTcpServer);
+    EXPECT_FALSE(nodeData.Get<NodeData>().supportsTcpClient);
+
+    // Neither TCP Client nor TCP Server are enabled - ignoring first bit
+    strcpy(key, "T");
+    strcpy(val, "1");
+    FillNodeDataFromTxt(GetSpan(key), GetSpan(val), resolutionData);
+    EXPECT_FALSE(nodeData.Get<NodeData>().supportsTcpServer);
+    EXPECT_FALSE(nodeData.Get<NodeData>().supportsTcpClient);
+
+    // Supporting TCP Client only
+    strcpy(key, "T");
+    strcpy(val, "2");
+    FillNodeDataFromTxt(GetSpan(key), GetSpan(val), resolutionData);
+    EXPECT_TRUE(nodeData.Get<NodeData>().supportsTcpClient);
+    EXPECT_FALSE(nodeData.Get<NodeData>().supportsTcpServer);
+
+    // Supporting TCP Client only - ignoring first bit
+    strcpy(key, "T");
+    strcpy(val, "3");
+    FillNodeDataFromTxt(GetSpan(key), GetSpan(val), resolutionData);
+    EXPECT_TRUE(nodeData.Get<NodeData>().supportsTcpClient);
+    EXPECT_FALSE(nodeData.Get<NodeData>().supportsTcpServer);
+
+    // Supporting TCP Server only
+    strcpy(key, "T");
+    strcpy(val, "4");
+    FillNodeDataFromTxt(GetSpan(key), GetSpan(val), resolutionData);
+    EXPECT_FALSE(nodeData.Get<NodeData>().supportsTcpClient);
+    EXPECT_TRUE(nodeData.Get<NodeData>().supportsTcpServer);
+
+    // Supporting TCP Server only - ignoring first bit
+    strcpy(key, "T");
+    strcpy(val, "5");
+    FillNodeDataFromTxt(GetSpan(key), GetSpan(val), resolutionData);
+    EXPECT_FALSE(nodeData.Get<NodeData>().supportsTcpClient);
+    EXPECT_TRUE(nodeData.Get<NodeData>().supportsTcpServer);
+
+    // Supporting TCP Server and Client
+    strcpy(key, "T");
+    strcpy(val, "6");
+    FillNodeDataFromTxt(GetSpan(key), GetSpan(val), resolutionData);
+    EXPECT_TRUE(nodeData.Get<NodeData>().supportsTcpClient);
+    EXPECT_TRUE(nodeData.Get<NodeData>().supportsTcpServer);
+
+    // Supporting TCP Server and Client - ignoring first bit
+    strcpy(key, "T");
+    strcpy(val, "7");
+    FillNodeDataFromTxt(GetSpan(key), GetSpan(val), resolutionData);
+    EXPECT_TRUE(nodeData.Get<NodeData>().supportsTcpClient);
+    EXPECT_TRUE(nodeData.Get<NodeData>().supportsTcpServer);
+
+    // Invalid value, means neither TCP Client or Server are enabled
+    strcpy(key, "T");
+    strcpy(val, "8");
+    FillNodeDataFromTxt(GetSpan(key), GetSpan(val), resolutionData);
+    EXPECT_FALSE(nodeData.Get<NodeData>().supportsTcpClient);
+    EXPECT_FALSE(nodeData.Get<NodeData>().supportsTcpServer);
+
+    // Invalid value, means neither TCP Client or Server are enabled
+    strcpy(key, "T");
+    strcpy(val, "asdf");
+    FillNodeDataFromTxt(GetSpan(key), GetSpan(val), resolutionData);
+    EXPECT_FALSE(nodeData.Get<NodeData>().supportsTcpClient);
+    EXPECT_FALSE(nodeData.Get<NodeData>().supportsTcpServer);
+
+    // Test no other fields were populated
+    nodeData.Get<NodeData>().supportsTcpClient = false;
+    nodeData.Get<NodeData>().supportsTcpServer = false;
+    EXPECT_TRUE(NodeDataIsEmpty(nodeData.Get<NodeData>()));
+}
+
+// Test ICD (ICD operation Mode)
+template <class NodeData>
+void DiscoveredTxtFieldICDoperatesAsLIT()
+{
+    char key[4];
+    char val[16];
+    DiscoveredNodeData nodeData;
+    nodeData.Set<NodeData>();
+    CommonResolutionData & resolutionData = nodeData.Get<NodeData>();
+
+    // ICD is operating as a LIT device
+    strcpy(key, "ICD");
+    strcpy(val, "1");
+    FillNodeDataFromTxt(GetSpan(key), GetSpan(val), resolutionData);
+    EXPECT_EQ(nodeData.Get<NodeData>().isICDOperatingAsLIT, std::make_optional(true));
+
+    // Test no other fields were populated
+    nodeData.Get<NodeData>().isICDOperatingAsLIT.reset();
+    EXPECT_TRUE(NodeDataIsEmpty(nodeData.Get<NodeData>()));
+
+    // ICD is operating as a SIT device
+    strcpy(key, "ICD");
+    strcpy(val, "0");
+    FillNodeDataFromTxt(GetSpan(key), GetSpan(val), resolutionData);
+    EXPECT_EQ(nodeData.Get<NodeData>().isICDOperatingAsLIT, std::make_optional(false));
+
+    nodeData.Get<NodeData>().isICDOperatingAsLIT.reset();
+    EXPECT_TRUE(NodeDataIsEmpty(nodeData.Get<NodeData>()));
+    // Invalid value, No key set
+    strcpy(key, "ICD");
+    strcpy(val, "asdf");
+    FillNodeDataFromTxt(GetSpan(key), GetSpan(val), resolutionData);
+    EXPECT_FALSE(nodeData.Get<NodeData>().isICDOperatingAsLIT.has_value());
+}
+
+// Test IsDeviceTreatedAsSleepy() with CRI
+template <class NodeData>
+void DiscoveredTestIsDeviceSessionIdle()
+{
+    char key[4];
+    char val[32];
+    DiscoveredNodeData nodeData;
+    nodeData.Set<NodeData>();
+    const ReliableMessageProtocolConfig defaultMRPConfig(CHIP_CONFIG_MRP_LOCAL_IDLE_RETRY_INTERVAL,
+                                                         CHIP_CONFIG_MRP_LOCAL_ACTIVE_RETRY_INTERVAL);
+    CommonResolutionData & resolutionData = nodeData.Get<NodeData>();
+
+    // No key/val set, so the device can't be sleepy
+    EXPECT_FALSE(nodeData.Get<NodeData>().IsDeviceTreatedAsSleepy(&defaultMRPConfig));
+
+    // If the interval is the default value, the device is not sleepy
+    strcpy(key, "SII");
+    sprintf(val, "%d", static_cast<int>(CHIP_CONFIG_MRP_LOCAL_IDLE_RETRY_INTERVAL.count()));
+    FillNodeDataFromTxt(GetSpan(key), GetSpan(val), resolutionData);
+    EXPECT_FALSE(nodeData.Get<NodeData>().IsDeviceTreatedAsSleepy(&defaultMRPConfig));
+
+    // If the interval is greater than the default value, the device is sleepy
+    sprintf(key, "SII");
+    sprintf(val, "%d", static_cast<int>(CHIP_CONFIG_MRP_LOCAL_IDLE_RETRY_INTERVAL.count() + 1));
+    FillNodeDataFromTxt(GetSpan(key), GetSpan(val), resolutionData);
+    EXPECT_TRUE(nodeData.Get<NodeData>().IsDeviceTreatedAsSleepy(&defaultMRPConfig));
+}
+
+// Test IsDeviceTreatedAsSleepy() with CRA
+template <class NodeData>
+void DiscoveredTestIsDeviceSessionActive()
+{
+    char key[4];
+    char val[32];
+    DiscoveredNodeData nodeData;
+    nodeData.Set<NodeData>();
+    const ReliableMessageProtocolConfig defaultMRPConfig(CHIP_CONFIG_MRP_LOCAL_IDLE_RETRY_INTERVAL,
+                                                         CHIP_CONFIG_MRP_LOCAL_ACTIVE_RETRY_INTERVAL);
+    CommonResolutionData & resolutionData = nodeData.Get<NodeData>();
+
+    // No key/val set, so the device can't be sleepy
+    EXPECT_FALSE(nodeData.Get<NodeData>().IsDeviceTreatedAsSleepy(&defaultMRPConfig));
+
+    // If the interval is the default value, the device is not sleepy
+    sprintf(key, "SAI");
+    sprintf(val, "%d", static_cast<int>(CHIP_CONFIG_MRP_LOCAL_ACTIVE_RETRY_INTERVAL.count()));
+    FillNodeDataFromTxt(GetSpan(key), GetSpan(val), resolutionData);
+    EXPECT_FALSE(nodeData.Get<NodeData>().IsDeviceTreatedAsSleepy(&defaultMRPConfig));
+
+    // If the interval is greater than the default value, the device is sleepy
+    strcpy(key, "SAI");
+    sprintf(val, "%d", static_cast<int>(CHIP_CONFIG_MRP_LOCAL_ACTIVE_RETRY_INTERVAL.count() + 1));
+    FillNodeDataFromTxt(GetSpan(key), GetSpan(val), resolutionData);
+    EXPECT_TRUE(nodeData.Get<NodeData>().IsDeviceTreatedAsSleepy(&defaultMRPConfig));
 }
 
 // Test SAI (formally CRI)
 template <class NodeData>
-void TxtFieldSessionIdleInterval(nlTestSuite * inSuite, void * inContext)
+void TxtFieldSessionIdleInterval()
 {
     char key[4];
     char val[16];
@@ -462,60 +825,68 @@ void TxtFieldSessionIdleInterval(nlTestSuite * inSuite, void * inContext)
     strcpy(key, "SII");
     strcpy(val, "1");
     FillNodeDataFromTxt(GetSpan(key), GetSpan(val), nodeData.resolutionData);
-    NL_TEST_ASSERT(inSuite, nodeData.resolutionData.GetMrpRetryIntervalIdle().HasValue());
-    NL_TEST_ASSERT(inSuite, nodeData.resolutionData.GetMrpRetryIntervalIdle().Value() == 1_ms32);
+    EXPECT_EQ(nodeData.resolutionData.GetMrpRetryIntervalIdle(), std::make_optional(1_ms32));
 
     // Maximum
     strcpy(key, "SII");
     strcpy(val, "3600000");
     FillNodeDataFromTxt(GetSpan(key), GetSpan(val), nodeData.resolutionData);
-    NL_TEST_ASSERT(inSuite, nodeData.resolutionData.GetMrpRetryIntervalIdle().HasValue());
-    NL_TEST_ASSERT(inSuite, nodeData.resolutionData.GetMrpRetryIntervalIdle().Value() == 3600000_ms32);
+    EXPECT_EQ(nodeData.resolutionData.GetMrpRetryIntervalIdle(), std::make_optional(3600000_ms32));
 
     // Test no other fields were populated
     ResetRetryIntervalIdle(nodeData);
-    NL_TEST_ASSERT(inSuite, NodeDataIsEmpty(nodeData));
+    EXPECT_TRUE(NodeDataIsEmpty(nodeData));
 
     // Invalid SII - negative value
     strcpy(key, "SII");
     strcpy(val, "-1");
     FillNodeDataFromTxt(GetSpan(key), GetSpan(val), nodeData.resolutionData);
-    NL_TEST_ASSERT(inSuite, !nodeData.resolutionData.GetMrpRetryIntervalIdle().HasValue());
+    EXPECT_FALSE(nodeData.resolutionData.GetMrpRetryIntervalIdle().has_value());
 
     // Invalid SII - greater than maximum
     strcpy(key, "SII");
     strcpy(val, "3600001");
     FillNodeDataFromTxt(GetSpan(key), GetSpan(val), nodeData.resolutionData);
-    NL_TEST_ASSERT(inSuite, !nodeData.resolutionData.GetMrpRetryIntervalIdle().HasValue());
+    EXPECT_FALSE(nodeData.resolutionData.GetMrpRetryIntervalIdle().has_value());
 
     // Invalid SII - much greater than maximum
     strcpy(key, "SII");
     strcpy(val, "1095216660481"); // 0xFF00000001 == 1 (mod 2^32)
     FillNodeDataFromTxt(GetSpan(key), GetSpan(val), nodeData.resolutionData);
-    NL_TEST_ASSERT(inSuite, !nodeData.resolutionData.GetMrpRetryIntervalIdle().HasValue());
+    EXPECT_FALSE(nodeData.resolutionData.GetMrpRetryIntervalIdle().has_value());
 
     // Invalid SII - hexadecimal value
     strcpy(key, "SII");
     strcpy(val, "0x20");
     FillNodeDataFromTxt(GetSpan(key), GetSpan(val), nodeData.resolutionData);
-    NL_TEST_ASSERT(inSuite, !nodeData.resolutionData.GetMrpRetryIntervalIdle().HasValue());
+    EXPECT_FALSE(nodeData.resolutionData.GetMrpRetryIntervalIdle().has_value());
 
     // Invalid SII - leading zeros
     strcpy(key, "SII");
     strcpy(val, "0700");
     FillNodeDataFromTxt(GetSpan(key), GetSpan(val), nodeData.resolutionData);
-    NL_TEST_ASSERT(inSuite, !nodeData.resolutionData.GetMrpRetryIntervalIdle().HasValue());
+    EXPECT_FALSE(nodeData.resolutionData.GetMrpRetryIntervalIdle().has_value());
 
     // Invalid SII - text at the end
     strcpy(key, "SII");
     strcpy(val, "123abc");
     FillNodeDataFromTxt(GetSpan(key), GetSpan(val), nodeData.resolutionData);
-    NL_TEST_ASSERT(inSuite, !nodeData.resolutionData.GetMrpRetryIntervalIdle().HasValue());
+    EXPECT_FALSE(nodeData.resolutionData.GetMrpRetryIntervalIdle().has_value());
+}
+
+TEST(TestTxtFields, TxtDiscoveredFieldMrpRetryIntervalIdle)
+{
+    DiscoveredTxtFieldSessionIdleInterval<CommissionNodeData>();
+}
+
+TEST(TestTxtFields, TxtResolvedFieldMrpRetryIntervalIdle)
+{
+    TxtFieldSessionIdleInterval<ResolvedNodeData>();
 }
 
 // Test SAI (formerly CRA)
 template <class NodeData>
-void TxtFieldSessionActiveInterval(nlTestSuite * inSuite, void * inContext)
+void TxtFieldSessionActiveInterval()
 {
     char key[4];
     char val[16];
@@ -525,60 +896,68 @@ void TxtFieldSessionActiveInterval(nlTestSuite * inSuite, void * inContext)
     strcpy(key, "SAI");
     strcpy(val, "1");
     FillNodeDataFromTxt(GetSpan(key), GetSpan(val), nodeData.resolutionData);
-    NL_TEST_ASSERT(inSuite, nodeData.resolutionData.GetMrpRetryIntervalActive().HasValue());
-    NL_TEST_ASSERT(inSuite, nodeData.resolutionData.GetMrpRetryIntervalActive().Value() == 1_ms32);
+    EXPECT_EQ(nodeData.resolutionData.GetMrpRetryIntervalActive(), std::make_optional(1_ms32));
 
     // Maximum
     strcpy(key, "SAI");
     strcpy(val, "3600000");
     FillNodeDataFromTxt(GetSpan(key), GetSpan(val), nodeData.resolutionData);
-    NL_TEST_ASSERT(inSuite, nodeData.resolutionData.GetMrpRetryIntervalActive().HasValue());
-    NL_TEST_ASSERT(inSuite, nodeData.resolutionData.GetMrpRetryIntervalActive().Value() == 3600000_ms32);
+    EXPECT_EQ(nodeData.resolutionData.GetMrpRetryIntervalActive(), std::make_optional(3600000_ms32));
 
     // Test no other fields were populated
     ResetRetryIntervalActive(nodeData);
-    NL_TEST_ASSERT(inSuite, NodeDataIsEmpty(nodeData));
+    EXPECT_TRUE(NodeDataIsEmpty(nodeData));
 
     // Invalid SAI - negative value
     strcpy(key, "SAI");
     strcpy(val, "-1");
     FillNodeDataFromTxt(GetSpan(key), GetSpan(val), nodeData.resolutionData);
-    NL_TEST_ASSERT(inSuite, !nodeData.resolutionData.GetMrpRetryIntervalActive().HasValue());
+    EXPECT_FALSE(nodeData.resolutionData.GetMrpRetryIntervalActive().has_value());
 
     // Invalid SAI - greater than maximum
     strcpy(key, "SAI");
     strcpy(val, "3600001");
     FillNodeDataFromTxt(GetSpan(key), GetSpan(val), nodeData.resolutionData);
-    NL_TEST_ASSERT(inSuite, !nodeData.resolutionData.GetMrpRetryIntervalActive().HasValue());
+    EXPECT_FALSE(nodeData.resolutionData.GetMrpRetryIntervalActive().has_value());
 
     // Invalid SAI - much greater than maximum
     strcpy(key, "SAI");
     strcpy(val, "1095216660481"); // 0xFF00000001 == 1 (mod 2^32)
     FillNodeDataFromTxt(GetSpan(key), GetSpan(val), nodeData.resolutionData);
-    NL_TEST_ASSERT(inSuite, !nodeData.resolutionData.GetMrpRetryIntervalActive().HasValue());
+    EXPECT_FALSE(nodeData.resolutionData.GetMrpRetryIntervalActive().has_value());
 
     // Invalid SAI - hexadecimal value
     strcpy(key, "SAI");
     strcpy(val, "0x20");
     FillNodeDataFromTxt(GetSpan(key), GetSpan(val), nodeData.resolutionData);
-    NL_TEST_ASSERT(inSuite, !nodeData.resolutionData.GetMrpRetryIntervalActive().HasValue());
+    EXPECT_FALSE(nodeData.resolutionData.GetMrpRetryIntervalActive().has_value());
 
     // Invalid SAI - leading zeros
     strcpy(key, "SAI");
     strcpy(val, "0700");
     FillNodeDataFromTxt(GetSpan(key), GetSpan(val), nodeData.resolutionData);
-    NL_TEST_ASSERT(inSuite, !nodeData.resolutionData.GetMrpRetryIntervalActive().HasValue());
+    EXPECT_FALSE(nodeData.resolutionData.GetMrpRetryIntervalActive().has_value());
 
     // Invalid SAI - text at the end
     strcpy(key, "SAI");
     strcpy(val, "123abc");
     FillNodeDataFromTxt(GetSpan(key), GetSpan(val), nodeData.resolutionData);
-    NL_TEST_ASSERT(inSuite, !nodeData.resolutionData.GetMrpRetryIntervalActive().HasValue());
+    EXPECT_FALSE(nodeData.resolutionData.GetMrpRetryIntervalActive().has_value());
+}
+
+TEST(TestTxtFields, TxtDiscoveredFieldMrpRetryIntervalActive)
+{
+    DiscoveredTxtFieldSessionActiveInterval<CommissionNodeData>();
+}
+
+TEST(TestTxtFields, TxtResolvedFieldMrpRetryIntervalActive)
+{
+    TxtFieldSessionActiveInterval<ResolvedNodeData>();
 }
 
 // Test SAT (Session Active Threshold)
 template <class NodeData>
-void TxtFieldSessionActiveThreshold(nlTestSuite * inSuite, void * inContext)
+void TxtFieldSessionActiveThreshold()
 {
     char key[4];
     char val[16];
@@ -588,91 +967,162 @@ void TxtFieldSessionActiveThreshold(nlTestSuite * inSuite, void * inContext)
     strcpy(key, "SAT");
     strcpy(val, "1");
     FillNodeDataFromTxt(GetSpan(key), GetSpan(val), nodeData.resolutionData);
-    NL_TEST_ASSERT(inSuite, nodeData.resolutionData.GetMrpRetryActiveThreshold().HasValue());
-    NL_TEST_ASSERT(inSuite, nodeData.resolutionData.GetMrpRetryActiveThreshold().Value() == 1_ms16);
+    EXPECT_EQ(nodeData.resolutionData.GetMrpRetryActiveThreshold(), std::make_optional(1_ms16));
 
     // Maximum
     strcpy(key, "SAT");
     strcpy(val, "65535");
     FillNodeDataFromTxt(GetSpan(key), GetSpan(val), nodeData.resolutionData);
-    NL_TEST_ASSERT(inSuite, nodeData.resolutionData.GetMrpRetryActiveThreshold().HasValue());
-    NL_TEST_ASSERT(inSuite, nodeData.resolutionData.GetMrpRetryActiveThreshold().Value() == 65535_ms16);
+    EXPECT_EQ(nodeData.resolutionData.GetMrpRetryActiveThreshold(), std::make_optional(65535_ms16));
 
     // Test no other fields were populated
     ResetRetryActiveThreshold(nodeData);
-    NL_TEST_ASSERT(inSuite, NodeDataIsEmpty(nodeData));
+    EXPECT_TRUE(NodeDataIsEmpty(nodeData));
 
     // Invalid SAI - negative value
     strcpy(key, "SAT");
     strcpy(val, "-1");
     FillNodeDataFromTxt(GetSpan(key), GetSpan(val), nodeData.resolutionData);
-    NL_TEST_ASSERT(inSuite, !nodeData.resolutionData.GetMrpRetryActiveThreshold().HasValue());
+    EXPECT_FALSE(nodeData.resolutionData.GetMrpRetryActiveThreshold().has_value());
 
     // Invalid SAI - greater than maximum
     strcpy(key, "SAT");
     strcpy(val, "65536");
     FillNodeDataFromTxt(GetSpan(key), GetSpan(val), nodeData.resolutionData);
-    NL_TEST_ASSERT(inSuite, !nodeData.resolutionData.GetMrpRetryActiveThreshold().HasValue());
+    EXPECT_FALSE(nodeData.resolutionData.GetMrpRetryActiveThreshold().has_value());
 
     // Invalid SAT - much greater than maximum
     strcpy(key, "SAT");
     strcpy(val, "1095216660481"); // 0xFF00000001 == 1 (mod 2^32)
     FillNodeDataFromTxt(GetSpan(key), GetSpan(val), nodeData.resolutionData);
-    NL_TEST_ASSERT(inSuite, !nodeData.resolutionData.GetMrpRetryActiveThreshold().HasValue());
+    EXPECT_FALSE(nodeData.resolutionData.GetMrpRetryActiveThreshold().has_value());
 
     // Invalid SAT - hexadecimal value
     strcpy(key, "SAT");
     strcpy(val, "0x20");
     FillNodeDataFromTxt(GetSpan(key), GetSpan(val), nodeData.resolutionData);
-    NL_TEST_ASSERT(inSuite, !nodeData.resolutionData.GetMrpRetryActiveThreshold().HasValue());
+    EXPECT_FALSE(nodeData.resolutionData.GetMrpRetryActiveThreshold().has_value());
 
     // Invalid SAT - leading zeros
     strcpy(key, "SAT");
     strcpy(val, "0700");
     FillNodeDataFromTxt(GetSpan(key), GetSpan(val), nodeData.resolutionData);
-    NL_TEST_ASSERT(inSuite, !nodeData.resolutionData.GetMrpRetryActiveThreshold().HasValue());
+    EXPECT_FALSE(nodeData.resolutionData.GetMrpRetryActiveThreshold().has_value());
 
     // Invalid SAT - text at the end
     strcpy(key, "SAT");
     strcpy(val, "123abc");
     FillNodeDataFromTxt(GetSpan(key), GetSpan(val), nodeData.resolutionData);
-    NL_TEST_ASSERT(inSuite, !nodeData.resolutionData.GetMrpRetryActiveThreshold().HasValue());
+    EXPECT_FALSE(nodeData.resolutionData.GetMrpRetryActiveThreshold().has_value());
+}
+
+TEST(TestTxtFields, TxtDiscoveredFieldMrpRetryActiveThreshold)
+{
+    DiscoveredTxtFieldSessionActiveThreshold<CommissionNodeData>();
+}
+
+TEST(TestTxtFields, TxtResolvedFieldMrpRetryActiveThreshold)
+{
+    TxtFieldSessionActiveThreshold<ResolvedNodeData>();
 }
 
 // Test T (TCP support)
 template <class NodeData>
-void TxtFieldTcpSupport(nlTestSuite * inSuite, void * inContext)
+void TxtFieldTcpSupport()
 {
     char key[4];
     char val[8];
     NodeData nodeData;
 
-    // True
-    strcpy(key, "T");
-    strcpy(val, "1");
-    FillNodeDataFromTxt(GetSpan(key), GetSpan(val), nodeData.resolutionData);
-    NL_TEST_ASSERT(inSuite, nodeData.resolutionData.supportsTcp);
-
-    // Test no other fields were populated
-    nodeData.resolutionData.supportsTcp = false;
-    NL_TEST_ASSERT(inSuite, NodeDataIsEmpty(nodeData));
-
-    // False
+    // Neither TCP Client nor TCP Server are enabled
     strcpy(key, "T");
     strcpy(val, "0");
     FillNodeDataFromTxt(GetSpan(key), GetSpan(val), nodeData.resolutionData);
-    NL_TEST_ASSERT(inSuite, nodeData.resolutionData.supportsTcp == false);
+    EXPECT_FALSE(nodeData.resolutionData.supportsTcpServer);
+    EXPECT_FALSE(nodeData.resolutionData.supportsTcpClient);
 
-    // Invalid value, stil false
+    // Neither TCP Client nor TCP Server are enabled - ignoring first bit
+    strcpy(key, "T");
+    strcpy(val, "1");
+    FillNodeDataFromTxt(GetSpan(key), GetSpan(val), nodeData.resolutionData);
+    EXPECT_FALSE(nodeData.resolutionData.supportsTcpServer);
+    EXPECT_FALSE(nodeData.resolutionData.supportsTcpClient);
+
+    // Supporting TCP Client only
+    strcpy(key, "T");
+    strcpy(val, "2");
+    FillNodeDataFromTxt(GetSpan(key), GetSpan(val), nodeData.resolutionData);
+    EXPECT_FALSE(nodeData.resolutionData.supportsTcpServer);
+    EXPECT_TRUE(nodeData.resolutionData.supportsTcpClient);
+
+    // Supporting TCP Client only - ignoring first bit
+    strcpy(key, "T");
+    strcpy(val, "3");
+    FillNodeDataFromTxt(GetSpan(key), GetSpan(val), nodeData.resolutionData);
+    EXPECT_FALSE(nodeData.resolutionData.supportsTcpServer);
+    EXPECT_TRUE(nodeData.resolutionData.supportsTcpClient);
+
+    // Supporting TCP Server only
+    strcpy(key, "T");
+    strcpy(val, "4");
+    FillNodeDataFromTxt(GetSpan(key), GetSpan(val), nodeData.resolutionData);
+    EXPECT_TRUE(nodeData.resolutionData.supportsTcpServer);
+    EXPECT_FALSE(nodeData.resolutionData.supportsTcpClient);
+
+    // Supporting TCP Server only - ignoring first bit
+    strcpy(key, "T");
+    strcpy(val, "5");
+    FillNodeDataFromTxt(GetSpan(key), GetSpan(val), nodeData.resolutionData);
+    EXPECT_TRUE(nodeData.resolutionData.supportsTcpServer);
+    EXPECT_FALSE(nodeData.resolutionData.supportsTcpClient);
+
+    // Supporting TCP Server and Client
+    strcpy(key, "T");
+    strcpy(val, "6");
+    FillNodeDataFromTxt(GetSpan(key), GetSpan(val), nodeData.resolutionData);
+    EXPECT_TRUE(nodeData.resolutionData.supportsTcpServer);
+    EXPECT_TRUE(nodeData.resolutionData.supportsTcpClient);
+
+    // Supporting TCP Server and Client - ignoring first bit
+    strcpy(key, "T");
+    strcpy(val, "7");
+    FillNodeDataFromTxt(GetSpan(key), GetSpan(val), nodeData.resolutionData);
+    EXPECT_TRUE(nodeData.resolutionData.supportsTcpServer);
+    EXPECT_TRUE(nodeData.resolutionData.supportsTcpClient);
+
+    // Invalid value, means neither TCP Client or Server are enabled
+    strcpy(key, "T");
+    strcpy(val, "8");
+    FillNodeDataFromTxt(GetSpan(key), GetSpan(val), nodeData.resolutionData);
+    EXPECT_FALSE(nodeData.resolutionData.supportsTcpClient);
+    EXPECT_FALSE(nodeData.resolutionData.supportsTcpServer);
+
+    // Invalid value, means neither TCP Client or Server are enabled
     strcpy(key, "T");
     strcpy(val, "asdf");
     FillNodeDataFromTxt(GetSpan(key), GetSpan(val), nodeData.resolutionData);
-    NL_TEST_ASSERT(inSuite, nodeData.resolutionData.supportsTcp == false);
+    EXPECT_FALSE(nodeData.resolutionData.supportsTcpClient);
+    EXPECT_FALSE(nodeData.resolutionData.supportsTcpServer);
+
+    // Test no other fields were populated
+    nodeData.resolutionData.supportsTcpServer = false;
+    nodeData.resolutionData.supportsTcpClient = false;
+    EXPECT_TRUE(NodeDataIsEmpty(nodeData));
+}
+
+TEST(TestTxtFields, TxtDiscoveredFieldTcpSupport)
+{
+    DiscoveredTxtFieldTcpSupport<CommissionNodeData>();
+}
+
+TEST(TestTxtFields, TxtResolvedFieldTcpSupport)
+{
+    TxtFieldTcpSupport<ResolvedNodeData>();
 }
 
 // Test ICD (ICD operation Mode)
 template <class NodeData>
-void TxtFieldICDoperatesAsLIT(nlTestSuite * inSuite, void * inContext)
+void TxtFieldICDoperatesAsLIT()
 {
     char key[4];
     char val[16];
@@ -682,32 +1132,42 @@ void TxtFieldICDoperatesAsLIT(nlTestSuite * inSuite, void * inContext)
     strcpy(key, "ICD");
     strcpy(val, "1");
     FillNodeDataFromTxt(GetSpan(key), GetSpan(val), nodeData.resolutionData);
-    NL_TEST_ASSERT(inSuite, nodeData.resolutionData.isICDOperatingAsLIT.HasValue());
-    NL_TEST_ASSERT(inSuite, nodeData.resolutionData.isICDOperatingAsLIT.Value());
+    EXPECT_TRUE(nodeData.resolutionData.isICDOperatingAsLIT.has_value());
+    EXPECT_TRUE(nodeData.resolutionData.isICDOperatingAsLIT.value_or(false));
 
     // Test no other fields were populated
-    nodeData.resolutionData.isICDOperatingAsLIT.ClearValue();
-    NL_TEST_ASSERT(inSuite, NodeDataIsEmpty(nodeData));
+    nodeData.resolutionData.isICDOperatingAsLIT.reset();
+    EXPECT_TRUE(NodeDataIsEmpty(nodeData));
 
     // ICD is operating as a SIT device
     strcpy(key, "ICD");
     strcpy(val, "0");
     FillNodeDataFromTxt(GetSpan(key), GetSpan(val), nodeData.resolutionData);
-    NL_TEST_ASSERT(inSuite, nodeData.resolutionData.isICDOperatingAsLIT.HasValue());
-    NL_TEST_ASSERT(inSuite, nodeData.resolutionData.isICDOperatingAsLIT.Value() == false);
+    EXPECT_TRUE(nodeData.resolutionData.isICDOperatingAsLIT.has_value());
+    EXPECT_EQ(nodeData.resolutionData.isICDOperatingAsLIT.value_or(true), false);
 
-    nodeData.resolutionData.isICDOperatingAsLIT.ClearValue();
-    NL_TEST_ASSERT(inSuite, NodeDataIsEmpty(nodeData));
+    nodeData.resolutionData.isICDOperatingAsLIT.reset();
+    EXPECT_TRUE(NodeDataIsEmpty(nodeData));
     // Invalid value, No key set
     strcpy(key, "ICD");
     strcpy(val, "asdf");
     FillNodeDataFromTxt(GetSpan(key), GetSpan(val), nodeData.resolutionData);
-    NL_TEST_ASSERT(inSuite, nodeData.resolutionData.isICDOperatingAsLIT.HasValue() == false);
+    EXPECT_EQ(nodeData.resolutionData.isICDOperatingAsLIT.has_value(), false);
+}
+
+TEST(TestTxtFields, TxtDiscoveredIsICDoperatingAsLIT)
+{
+    DiscoveredTxtFieldICDoperatesAsLIT<CommissionNodeData>();
+}
+
+TEST(TestTxtFields, TxtResolvedFieldICDoperatingAsLIT)
+{
+    TxtFieldICDoperatesAsLIT<ResolvedNodeData>();
 }
 
 // Test IsDeviceTreatedAsSleepy() with CRI
 template <class NodeData>
-void TestIsDeviceSessionIdle(nlTestSuite * inSuite, void * inContext)
+void TestIsDeviceSessionIdle()
 {
     char key[4];
     char val[32];
@@ -716,24 +1176,34 @@ void TestIsDeviceSessionIdle(nlTestSuite * inSuite, void * inContext)
                                                          CHIP_CONFIG_MRP_LOCAL_ACTIVE_RETRY_INTERVAL);
 
     // No key/val set, so the device can't be sleepy
-    NL_TEST_ASSERT(inSuite, !nodeData.resolutionData.IsDeviceTreatedAsSleepy(&defaultMRPConfig));
+    EXPECT_FALSE(nodeData.resolutionData.IsDeviceTreatedAsSleepy(&defaultMRPConfig));
 
     // If the interval is the default value, the device is not sleepy
     strcpy(key, "SII");
     sprintf(val, "%d", static_cast<int>(CHIP_CONFIG_MRP_LOCAL_IDLE_RETRY_INTERVAL.count()));
     FillNodeDataFromTxt(GetSpan(key), GetSpan(val), nodeData.resolutionData);
-    NL_TEST_ASSERT(inSuite, !nodeData.resolutionData.IsDeviceTreatedAsSleepy(&defaultMRPConfig));
+    EXPECT_FALSE(nodeData.resolutionData.IsDeviceTreatedAsSleepy(&defaultMRPConfig));
 
     // If the interval is greater than the default value, the device is sleepy
     sprintf(key, "SII");
     sprintf(val, "%d", static_cast<int>(CHIP_CONFIG_MRP_LOCAL_IDLE_RETRY_INTERVAL.count() + 1));
     FillNodeDataFromTxt(GetSpan(key), GetSpan(val), nodeData.resolutionData);
-    NL_TEST_ASSERT(inSuite, nodeData.resolutionData.IsDeviceTreatedAsSleepy(&defaultMRPConfig));
+    EXPECT_TRUE(nodeData.resolutionData.IsDeviceTreatedAsSleepy(&defaultMRPConfig));
+}
+
+TEST(TestTxtFields, TxtDiscoveredIsDeviceSessionIdle)
+{
+    DiscoveredTestIsDeviceSessionIdle<CommissionNodeData>();
+}
+
+TEST(TestTxtFields, TxtResolvedIsDeviceSessionIdle)
+{
+    TestIsDeviceSessionIdle<ResolvedNodeData>();
 }
 
 // Test IsDeviceTreatedAsSleepy() with CRA
 template <class NodeData>
-void TestIsDeviceSessionActive(nlTestSuite * inSuite, void * inContext)
+void TestIsDeviceSessionActive()
 {
     char key[4];
     char val[32];
@@ -742,59 +1212,29 @@ void TestIsDeviceSessionActive(nlTestSuite * inSuite, void * inContext)
                                                          CHIP_CONFIG_MRP_LOCAL_ACTIVE_RETRY_INTERVAL);
 
     // No key/val set, so the device can't be sleepy
-    NL_TEST_ASSERT(inSuite, !nodeData.resolutionData.IsDeviceTreatedAsSleepy(&defaultMRPConfig));
+    EXPECT_FALSE(nodeData.resolutionData.IsDeviceTreatedAsSleepy(&defaultMRPConfig));
 
     // If the interval is the default value, the device is not sleepy
     sprintf(key, "SAI");
     sprintf(val, "%d", static_cast<int>(CHIP_CONFIG_MRP_LOCAL_ACTIVE_RETRY_INTERVAL.count()));
     FillNodeDataFromTxt(GetSpan(key), GetSpan(val), nodeData.resolutionData);
-    NL_TEST_ASSERT(inSuite, !nodeData.resolutionData.IsDeviceTreatedAsSleepy(&defaultMRPConfig));
+    EXPECT_FALSE(nodeData.resolutionData.IsDeviceTreatedAsSleepy(&defaultMRPConfig));
 
     // If the interval is greater than the default value, the device is sleepy
     strcpy(key, "SAI");
     sprintf(val, "%d", static_cast<int>(CHIP_CONFIG_MRP_LOCAL_ACTIVE_RETRY_INTERVAL.count() + 1));
     FillNodeDataFromTxt(GetSpan(key), GetSpan(val), nodeData.resolutionData);
-    NL_TEST_ASSERT(inSuite, nodeData.resolutionData.IsDeviceTreatedAsSleepy(&defaultMRPConfig));
+    EXPECT_TRUE(nodeData.resolutionData.IsDeviceTreatedAsSleepy(&defaultMRPConfig));
 }
 
-const nlTest sTests[] = {
-    NL_TEST_DEF("TxtFieldKey", TestGetTxtFieldKey),                                          //
-    NL_TEST_DEF("TxtFieldKeyCaseInsensitive", TestGetTxtFieldKeyCaseInsensitive),            //
-    NL_TEST_DEF("TxtFieldProduct", TestGetProduct),                                          //
-    NL_TEST_DEF("TxtFieldVendor", TestGetVendor),                                            //
-    NL_TEST_DEF("TxtFieldLongDiscriminator", TestGetLongDiscriminator),                      //
-    NL_TEST_DEF("TxtFieldCommissioningMode", TestGetCommissioningMode),                      //
-    NL_TEST_DEF("TxtFieldDeviceType", TestGetDeviceType),                                    //
-    NL_TEST_DEF("TxtFieldDeviceName", TestGetDeviceName),                                    //
-    NL_TEST_DEF("TxtFieldRotatingDeviceId", TestGetRotatingDeviceId),                        //
-    NL_TEST_DEF("TxtFieldPairingHint", TestGetPairingHint),                                  //
-    NL_TEST_DEF("TxtFieldPairingInstruction", TestGetPairingInstruction),                    //
-    NL_TEST_DEF("TxtFieldCommissionerPasscode", TestGetCommissionerPasscode),                //
-    NL_TEST_DEF("TxtFieldFillDiscoveredNodeDataFromTxt", TestFillDiscoveredNodeDataFromTxt), //
-    NL_TEST_DEF("TxtDiscoveredFieldMrpRetryIntervalIdle", TxtFieldSessionIdleInterval<DiscoveredNodeData>),
-    NL_TEST_DEF("TxtDiscoveredFieldMrpRetryIntervalActive", TxtFieldSessionActiveInterval<DiscoveredNodeData>),
-    NL_TEST_DEF("TxtDiscoveredFieldMrpRetryActiveThreshold", TxtFieldSessionActiveThreshold<DiscoveredNodeData>),
-    NL_TEST_DEF("TxtDiscoveredFieldTcpSupport", (TxtFieldTcpSupport<DiscoveredNodeData>) ),
-    NL_TEST_DEF("TxtDiscoveredIsICDoperatingAsLIT", (TxtFieldICDoperatesAsLIT<DiscoveredNodeData>) ),
-    NL_TEST_DEF("TxtDiscoveredIsDeviceSessionIdle", TestIsDeviceSessionIdle<DiscoveredNodeData>),
-    NL_TEST_DEF("TxtDiscoveredIsDeviceSessionActive", TestIsDeviceSessionActive<DiscoveredNodeData>),
-    NL_TEST_DEF("TxtResolvedFieldMrpRetryIntervalIdle", TxtFieldSessionIdleInterval<ResolvedNodeData>),
-    NL_TEST_DEF("TxtResolvedFieldMrpRetryIntervalActive", TxtFieldSessionActiveInterval<ResolvedNodeData>),
-    NL_TEST_DEF("TxtResolvedFieldMrpRetryActiveThreshold", TxtFieldSessionActiveThreshold<ResolvedNodeData>),
-    NL_TEST_DEF("TxtResolvedFieldTcpSupport", (TxtFieldTcpSupport<ResolvedNodeData>) ),
-    NL_TEST_DEF("TxtResolvedFieldICDoperatingAsLIT", (TxtFieldICDoperatesAsLIT<ResolvedNodeData>) ),
-    NL_TEST_DEF("TxtResolvedIsDeviceSessionIdle", TestIsDeviceSessionIdle<ResolvedNodeData>),
-    NL_TEST_DEF("TxtResolvedIsDeviceSessionActive", TestIsDeviceSessionActive<ResolvedNodeData>),
-    NL_TEST_SENTINEL()
-};
+TEST(TestTxtFields, TxtDiscoveredIsDeviceSessionActive)
+{
+    DiscoveredTestIsDeviceSessionActive<CommissionNodeData>();
+}
+
+TEST(TestTxtFields, TxtResolvedIsDeviceSessionActive)
+{
+    TestIsDeviceSessionActive<ResolvedNodeData>();
+}
 
 } // namespace
-
-int TestCHIPTxtFields()
-{
-    nlTestSuite theSuite = { "TxtFields", &sTests[0], nullptr, nullptr };
-    nlTestRunner(&theSuite, nullptr);
-    return nlTestRunnerStats(&theSuite);
-}
-
-CHIP_REGISTER_TEST_SUITE(TestCHIPTxtFields);

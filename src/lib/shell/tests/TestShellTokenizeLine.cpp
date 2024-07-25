@@ -15,10 +15,10 @@
  *    limitations under the License.
  */
 
-#include <nlunit-test.h>
+#include <pw_unit_test/framework.h>
 
+#include <lib/core/StringBuilderAdapters.h>
 #include <lib/support/CodeUtils.h>
-#include <lib/support/UnitTestRegistration.h>
 
 // Include entire C++ file to have access to functions-under-test
 // such as TokenizeLine despite them being declared within an anonymous namespace.
@@ -99,7 +99,7 @@ static const struct test_shell_vector test_vector_shell_tokenizer[] = {
 //      Unit tests
 // =================================
 
-static void TestShell_Tokenizer(nlTestSuite * inSuite, void * inContext)
+TEST(TestShellTokenizeLine, TestShell_Tokenizer)
 {
     int numOfTestVectors = ArraySize(test_vector_shell_tokenizer);
     int numOfTestsRan    = 0;
@@ -115,34 +115,13 @@ static void TestShell_Tokenizer(nlTestSuite * inSuite, void * inContext)
         char * argv[TEST_SHELL_MAX_TOKENS];
         int argc = TokenizeLine(line, argv, TEST_SHELL_MAX_TOKENS);
 
-        NL_TEST_ASSERT(inSuite, argc == test_params->argc);
+        EXPECT_EQ(argc, test_params->argc);
 
         for (int i = 0; i < argc; i++)
         {
-            NL_TEST_ASSERT(inSuite, strcmp(argv[i], test_params->argv[i]) == 0);
+            EXPECT_EQ(strcmp(argv[i], test_params->argv[i]), 0);
         }
         numOfTestsRan++;
     }
-    NL_TEST_ASSERT(inSuite, numOfTestsRan > 0);
+    EXPECT_GT(numOfTestsRan, 0);
 }
-
-/**
- *   Test Suite. It lists all the test functions.
- */
-static const nlTest sTests[] = {
-
-    NL_TEST_DEF("Test Shell: TestShell_Tokenizer", TestShell_Tokenizer),
-
-    NL_TEST_SENTINEL()
-};
-
-int TestShellTokenizeLine()
-{
-    nlTestSuite theSuite = { "Test Shell: MainLoop", &sTests[0], nullptr, nullptr };
-
-    // Run test suite against one context.
-    nlTestRunner(&theSuite, nullptr);
-    return nlTestRunnerStats(&theSuite);
-}
-
-CHIP_REGISTER_TEST_SUITE(TestShellTokenizeLine)

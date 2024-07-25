@@ -25,17 +25,29 @@
 namespace chip {
 namespace Credentials {
 
+enum class CertificateValidationMode
+{
+    // Validate that the certificate is a valid PAA certificate.
+    kPAA,
+    // Validate just that the certificate has a public key we can extract
+    // (e.g. it's a CD signing certificate).
+    kPublicKeyOnly,
+};
+
 /**
  * @brief Load all X.509 DER certificates in a given path.
  *
- * Silently ignores non-X.509 files and X.509 files without a subject key identifier.
+ * Silently ignores non-X.509 files and X.509 files that fail validation as
+ * determined by the provided validation mode.
  *
  * Returns an empty vector if no files are found or unrecoverable errors arise.
  *
  * @param trustStorePath - path from where to search for certificates.
+ * @param validationMode - how the certificate files should be validated.
  * @return a vector of certificate DER data
  */
-std::vector<std::vector<uint8_t>> LoadAllX509DerCerts(const char * trustStorePath);
+std::vector<std::vector<uint8_t>> LoadAllX509DerCerts(const char * trustStorePath,
+                                                      CertificateValidationMode validationMode = CertificateValidationMode::kPAA);
 
 class FileAttestationTrustStore : public AttestationTrustStore
 {

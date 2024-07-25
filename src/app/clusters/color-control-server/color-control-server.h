@@ -20,13 +20,16 @@
 #include <app-common/zap-generated/cluster-objects.h>
 #include <app/CommandHandler.h>
 #include <app/ConcreteCommandPath.h>
-#include <app/clusters/scenes-server/SceneTable.h>
 #include <app/util/af-types.h>
-#include <app/util/af.h>
+#include <app/util/attribute-storage.h>
 #include <app/util/basic-types.h>
 #include <app/util/config.h>
 #include <platform/CHIPDeviceConfig.h>
 #include <protocols/interaction_model/StatusCode.h>
+
+#ifdef MATTER_DM_PLUGIN_SCENES_MANAGEMENT
+#include <app/clusters/scenes-server/SceneTable.h>
+#endif
 
 /**********************************************************
  * Defines and Macros
@@ -134,7 +137,9 @@ public:
      *********************************************************/
     static ColorControlServer & Instance();
 
+#ifdef MATTER_DM_PLUGIN_SCENES_MANAGEMENT
     chip::scenes::SceneHandler * GetSceneHandler();
+#endif
 
     bool HasFeature(chip::EndpointId endpoint, Feature feature);
     chip::Protocols::InteractionModel::Status stopAllColorTransitions(chip::EndpointId endpoint);
@@ -272,7 +277,9 @@ private:
 
     EmberEventControl eventControls[kColorControlClusterServerMaxEndpointCount];
 
+#ifdef MATTER_DM_PLUGIN_SCENES_MANAGEMENT
     friend class DefaultColorControlSceneHandler;
+#endif
 };
 
 /**********************************************************

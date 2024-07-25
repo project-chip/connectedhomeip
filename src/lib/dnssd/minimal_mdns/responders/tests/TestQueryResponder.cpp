@@ -18,11 +18,10 @@
 
 #include <vector>
 
+#include <pw_unit_test/framework.h>
+
+#include <lib/core/StringBuilderAdapters.h>
 #include <lib/dnssd/minimal_mdns/records/Ptr.h>
-
-#include <lib/support/UnitTestRegistration.h>
-
-#include <nlunit-test.h>
 
 namespace {
 
@@ -44,13 +43,12 @@ public:
 class DnssdReplyAccumulator : public ResponderDelegate
 {
 public:
-    DnssdReplyAccumulator(nlTestSuite * suite) : mSuite(suite) {}
     void AddResponse(const ResourceRecord & record) override
     {
 
-        NL_TEST_ASSERT(mSuite, record.GetType() == QType::PTR);
-        NL_TEST_ASSERT(mSuite, record.GetClass() == QClass::IN);
-        NL_TEST_ASSERT(mSuite, record.GetName() == kDnsSdname);
+        EXPECT_EQ(record.GetType(), QType::PTR);
+        EXPECT_EQ(record.GetClass(), QClass::IN);
+        EXPECT_EQ(record.GetName(), kDnsSdname);
 
         mCaptures.push_back(reinterpret_cast<const PtrResourceRecord &>(record).GetPtr());
     }
@@ -58,11 +56,10 @@ public:
     std::vector<FullQName> & Captures() { return mCaptures; }
 
 private:
-    nlTestSuite * mSuite;
     std::vector<FullQName> mCaptures;
 };
 
-void CanIterateOverResponders(nlTestSuite * inSuite, void * inContext)
+TEST(TestQueryResponder, CanIterateOverResponders)
 {
     QueryResponder<10> responder;
 
@@ -70,24 +67,24 @@ void CanIterateOverResponders(nlTestSuite * inSuite, void * inContext)
     EmptyResponder empty2(kName2);
     EmptyResponder empty3(kName2);
 
-    NL_TEST_ASSERT(inSuite, responder.AddResponder(&empty1).SetReportInServiceListing(true).IsValid());
-    NL_TEST_ASSERT(inSuite, responder.AddResponder(&empty2).SetReportInServiceListing(true).IsValid());
-    NL_TEST_ASSERT(inSuite, responder.AddResponder(&empty3).SetReportInServiceListing(true).IsValid());
+    EXPECT_TRUE(responder.AddResponder(&empty1).SetReportInServiceListing(true).IsValid());
+    EXPECT_TRUE(responder.AddResponder(&empty2).SetReportInServiceListing(true).IsValid());
+    EXPECT_TRUE(responder.AddResponder(&empty3).SetReportInServiceListing(true).IsValid());
 
     int idx = 0;
     QueryResponderRecordFilter noFilter;
     for (auto it = responder.begin(&noFilter); it != responder.end(); it++, idx++)
     {
         FullQName qName = it->responder->GetQName();
-        NL_TEST_ASSERT(inSuite, (idx != 0) || (qName == kDnsSdname));
-        NL_TEST_ASSERT(inSuite, (idx != 1) || (qName == kName1));
-        NL_TEST_ASSERT(inSuite, (idx != 2) || (qName == kName2));
-        NL_TEST_ASSERT(inSuite, (idx != 3) || (qName == kName2));
+        EXPECT_TRUE((idx != 0) || (qName == kDnsSdname));
+        EXPECT_TRUE((idx != 1) || (qName == kName1));
+        EXPECT_TRUE((idx != 2) || (qName == kName2));
+        EXPECT_TRUE((idx != 3) || (qName == kName2));
     }
-    NL_TEST_ASSERT(inSuite, idx == 4);
+    EXPECT_EQ(idx, 4);
 }
 
-void RespondsToDnsSdQueries(nlTestSuite * inSuite, void * inContext)
+TEST(TestQueryResponder, RespondsToDnsSdQueries)
 {
     QueryResponder<10> responder;
     QueryResponderRecordFilter noFilter;
@@ -97,44 +94,44 @@ void RespondsToDnsSdQueries(nlTestSuite * inSuite, void * inContext)
     EmptyResponder empty3(kName1);
     EmptyResponder empty4(kName1);
 
-    NL_TEST_ASSERT(inSuite, responder.AddResponder(&empty1).IsValid());
-    NL_TEST_ASSERT(inSuite, responder.AddResponder(&empty2).SetReportInServiceListing(true).IsValid());
-    NL_TEST_ASSERT(inSuite, responder.AddResponder(&empty3).SetReportInServiceListing(true).IsValid());
-    NL_TEST_ASSERT(inSuite, responder.AddResponder(&empty4).IsValid());
+    EXPECT_TRUE(responder.AddResponder(&empty1).IsValid());
+    EXPECT_TRUE(responder.AddResponder(&empty2).SetReportInServiceListing(true).IsValid());
+    EXPECT_TRUE(responder.AddResponder(&empty3).SetReportInServiceListing(true).IsValid());
+    EXPECT_TRUE(responder.AddResponder(&empty4).IsValid());
 
     // It reports itself inside the iterator
-    NL_TEST_ASSERT(inSuite, &(*responder.begin(&noFilter)->responder) == &responder);
+    EXPECT_EQ(&(*responder.begin(&noFilter)->responder), &responder);
 
     // It reponds dnssd PTR answers
-    NL_TEST_ASSERT(inSuite, responder.GetQClass() == QClass::IN);
-    NL_TEST_ASSERT(inSuite, responder.GetQType() == QType::PTR);
-    NL_TEST_ASSERT(inSuite, responder.GetQName() == kDnsSdname);
+    EXPECT_EQ(responder.GetQClass(), QClass::IN);
+    EXPECT_EQ(responder.GetQType(), QType::PTR);
+    EXPECT_EQ(responder.GetQName(), kDnsSdname);
 
-    DnssdReplyAccumulator accumulator(inSuite);
+    DnssdReplyAccumulator accumulator;
     responder.AddAllResponses(nullptr, &accumulator, ResponseConfiguration());
 
-    NL_TEST_ASSERT(inSuite, accumulator.Captures().size() == 2);
+    EXPECT_EQ(accumulator.Captures().size(), 2u);
     if (accumulator.Captures().size() == 2)
     {
-        NL_TEST_ASSERT(inSuite, accumulator.Captures()[0] == kName2);
-        NL_TEST_ASSERT(inSuite, accumulator.Captures()[1] == kName1);
+        EXPECT_EQ(accumulator.Captures()[0], kName2);
+        EXPECT_EQ(accumulator.Captures()[1], kName1);
     }
 }
 
-void LimitedStorage(nlTestSuite * inSuite, void * inContext)
+TEST(TestQueryResponder, LimitedStorage)
 {
     QueryResponder<3> responder;
 
     EmptyResponder empty1(kName1);
     EmptyResponder empty2(kName2);
 
-    NL_TEST_ASSERT(inSuite, responder.AddResponder(&empty1).SetReportInServiceListing(true).IsValid());
-    NL_TEST_ASSERT(inSuite, responder.AddResponder(&empty2).SetReportInServiceListing(true).IsValid());
+    EXPECT_TRUE(responder.AddResponder(&empty1).SetReportInServiceListing(true).IsValid());
+    EXPECT_TRUE(responder.AddResponder(&empty2).SetReportInServiceListing(true).IsValid());
 
     for (int i = 0; i < 100; i++)
     {
         EmptyResponder emptyX(kName1);
-        NL_TEST_ASSERT(inSuite, !responder.AddResponder(&emptyX).SetReportInServiceListing(true).IsValid());
+        EXPECT_FALSE(responder.AddResponder(&emptyX).SetReportInServiceListing(true).IsValid());
     }
 
     int idx = 0;
@@ -142,48 +139,30 @@ void LimitedStorage(nlTestSuite * inSuite, void * inContext)
     for (auto it = responder.begin(&noFilter); it != responder.end(); it++, idx++)
     {
         FullQName qName = it->responder->GetQName();
-        NL_TEST_ASSERT(inSuite, (idx != 0) || (qName == kDnsSdname));
-        NL_TEST_ASSERT(inSuite, (idx != 1) || (qName == kName1));
-        NL_TEST_ASSERT(inSuite, (idx != 2) || (qName == kName2));
+        EXPECT_TRUE((idx != 0) || (qName == kDnsSdname));
+        EXPECT_TRUE((idx != 1) || (qName == kName1));
+        EXPECT_TRUE((idx != 2) || (qName == kName2));
     }
-    NL_TEST_ASSERT(inSuite, idx == 3);
+    EXPECT_EQ(idx, 3);
 }
 
-void NonDiscoverableService(nlTestSuite * inSuite, void * inContext)
+TEST(TestQueryResponder, NonDiscoverableService)
 {
     QueryResponder<3> responder;
 
     EmptyResponder empty1(kName1);
     EmptyResponder empty2(kName2);
 
-    NL_TEST_ASSERT(inSuite, responder.AddResponder(&empty1).IsValid());
-    NL_TEST_ASSERT(inSuite, responder.AddResponder(&empty2).SetReportInServiceListing(true).IsValid());
+    EXPECT_TRUE(responder.AddResponder(&empty1).IsValid());
+    EXPECT_TRUE(responder.AddResponder(&empty2).SetReportInServiceListing(true).IsValid());
 
-    DnssdReplyAccumulator accumulator(inSuite);
+    DnssdReplyAccumulator accumulator;
     responder.AddAllResponses(nullptr, &accumulator, ResponseConfiguration());
 
-    NL_TEST_ASSERT(inSuite, accumulator.Captures().size() == 1);
+    EXPECT_EQ(accumulator.Captures().size(), 1u);
     if (accumulator.Captures().size() == 1)
     {
-        NL_TEST_ASSERT(inSuite, accumulator.Captures()[0] == kName2);
+        EXPECT_EQ(accumulator.Captures()[0], kName2);
     }
 }
-
-const nlTest sTests[] = {
-    NL_TEST_DEF("CanIterateOverResponders", CanIterateOverResponders), //
-    NL_TEST_DEF("RespondsToDnsSdQueries", RespondsToDnsSdQueries),     //
-    NL_TEST_DEF("LimitedStorage", LimitedStorage),                     //
-    NL_TEST_DEF("NonDiscoverableService", NonDiscoverableService),     //
-    NL_TEST_SENTINEL()                                                 //
-};
-
 } // namespace
-
-int TestQueryResponder()
-{
-    nlTestSuite theSuite = { "QueryResponder", sTests, nullptr, nullptr };
-    nlTestRunner(&theSuite, nullptr);
-    return nlTestRunnerStats(&theSuite);
-}
-
-CHIP_REGISTER_TEST_SUITE(TestQueryResponder)

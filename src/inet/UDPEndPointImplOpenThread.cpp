@@ -225,7 +225,7 @@ CHIP_ERROR UDPEndPointImplOT::SendMsgImpl(const IPPacketInfo * aPktInfo, System:
     otMessageInfo messageInfo;
 
     // For now the entire message must fit within a single buffer.
-    VerifyOrReturnError(!msg->HasChainedBuffer(), CHIP_ERROR_MESSAGE_TOO_LONG);
+    VerifyOrReturnError(!msg->HasChainedBuffer() && msg->DataLength() <= UINT16_MAX, CHIP_ERROR_MESSAGE_TOO_LONG);
 
     memset(&messageInfo, 0, sizeof(messageInfo));
 
@@ -237,7 +237,7 @@ CHIP_ERROR UDPEndPointImplOT::SendMsgImpl(const IPPacketInfo * aPktInfo, System:
     message = otUdpNewMessage(mOTInstance, NULL);
     VerifyOrExit(message != NULL, error = OT_ERROR_NO_BUFS);
 
-    error = otMessageAppend(message, msg->Start(), msg->DataLength());
+    error = otMessageAppend(message, msg->Start(), static_cast<uint16_t>(msg->DataLength()));
 
     if (error == OT_ERROR_NONE)
     {

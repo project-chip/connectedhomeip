@@ -15,196 +15,172 @@
  *    limitations under the License.
  */
 
+#include <lib/core/StringBuilderAdapters.h>
+#include <pw_unit_test/framework.h>
+
 #include <app/util/binding-table.h>
 #include <app/util/config.h>
 #include <lib/support/DefaultStorageKeyAllocator.h>
 #include <lib/support/TestPersistentStorageDelegate.h>
-#include <lib/support/UnitTestRegistration.h>
-#include <nlunit-test.h>
 
 using chip::BindingTable;
-using chip::NullOptional;
 
 namespace {
 
-void TestEmptyBindingTable(nlTestSuite * aSuite, void * aContext)
+void VerifyTableSame(BindingTable & table, const std::vector<EmberBindingTableEntry> & expected)
+{
+    ASSERT_EQ(table.Size(), expected.size());
+    auto iter1 = table.begin();
+    auto iter2 = expected.begin();
+    while (iter2 != expected.end())
+    {
+        EXPECT_EQ(*iter1, *iter2);
+        ++iter1;
+        ++iter2;
+    }
+    EXPECT_EQ(iter1, table.end());
+}
+
+void VerifyRestored(chip::TestPersistentStorageDelegate & storage, const std::vector<EmberBindingTableEntry> & expected)
+{
+    BindingTable restoredTable;
+    restoredTable.SetPersistentStorage(&storage);
+    EXPECT_EQ(restoredTable.LoadFromStorage(), CHIP_NO_ERROR);
+    VerifyTableSame(restoredTable, expected);
+}
+
+TEST(TestBindingTable, TestEmptyBindingTable)
 {
     BindingTable table;
     chip::TestPersistentStorageDelegate testStorage;
     table.SetPersistentStorage(&testStorage);
-    NL_TEST_ASSERT(aSuite, table.Size() == 0);
-    NL_TEST_ASSERT(aSuite, table.begin() == table.end());
+    EXPECT_EQ(table.Size(), 0u);
+    EXPECT_EQ(table.begin(), table.end());
 }
 
-void TestAdd(nlTestSuite * aSuite, void * aContext)
+TEST(TestBindingTable, TestAdd)
 {
     BindingTable table;
     chip::TestPersistentStorageDelegate testStorage;
     table.SetPersistentStorage(&testStorage);
     EmberBindingTableEntry unusedEntry;
     unusedEntry.type = MATTER_UNUSED_BINDING;
-    NL_TEST_ASSERT(aSuite, table.Add(unusedEntry) == CHIP_ERROR_INVALID_ARGUMENT);
+    EXPECT_EQ(table.Add(unusedEntry), CHIP_ERROR_INVALID_ARGUMENT);
     for (uint8_t i = 0; i < MATTER_BINDING_TABLE_SIZE; i++)
     {
-        NL_TEST_ASSERT(aSuite, table.Add(EmberBindingTableEntry::ForNode(0, i, 0, 0, NullOptional)) == CHIP_NO_ERROR);
+        EXPECT_EQ(table.Add(EmberBindingTableEntry::ForNode(0, i, 0, 0, std::nullopt)), CHIP_NO_ERROR);
     }
-    NL_TEST_ASSERT(aSuite, table.Add(EmberBindingTableEntry::ForNode(0, 0, 0, 0, NullOptional)) == CHIP_ERROR_NO_MEMORY);
-    NL_TEST_ASSERT(aSuite, table.Size() == MATTER_BINDING_TABLE_SIZE);
+    EXPECT_EQ(table.Add(EmberBindingTableEntry::ForNode(0, 0, 0, 0, std::nullopt)), CHIP_ERROR_NO_MEMORY);
+    EXPECT_EQ(table.Size(), MATTER_BINDING_TABLE_SIZE);
 
     auto iter = table.begin();
     for (uint8_t i = 0; i < MATTER_BINDING_TABLE_SIZE; i++)
     {
-        NL_TEST_ASSERT(aSuite, iter != table.end());
-        NL_TEST_ASSERT(aSuite, iter->nodeId == i);
-        NL_TEST_ASSERT(aSuite, iter.GetIndex() == i);
+        EXPECT_NE(iter, table.end());
+        EXPECT_EQ(iter->nodeId, i);
+        EXPECT_EQ(iter.GetIndex(), i);
         ++iter;
     }
-    NL_TEST_ASSERT(aSuite, iter == table.end());
+    EXPECT_EQ(iter, table.end());
 }
 
-void TestRemoveThenAdd(nlTestSuite * aSuite, void * aContext)
+TEST(TestBindingTable, TestRemoveThenAdd)
 {
     BindingTable table;
     chip::TestPersistentStorageDelegate testStorage;
     table.SetPersistentStorage(&testStorage);
-    NL_TEST_ASSERT(aSuite, table.Add(EmberBindingTableEntry::ForNode(0, 0, 0, 0, NullOptional)) == CHIP_NO_ERROR);
+    EXPECT_EQ(table.Add(EmberBindingTableEntry::ForNode(0, 0, 0, 0, std::nullopt)), CHIP_NO_ERROR);
     auto iter = table.begin();
-    NL_TEST_ASSERT(aSuite, table.RemoveAt(iter) == CHIP_NO_ERROR);
-    NL_TEST_ASSERT(aSuite, iter == table.end());
-    NL_TEST_ASSERT(aSuite, table.Size() == 0);
-    NL_TEST_ASSERT(aSuite, table.begin() == table.end());
+    EXPECT_EQ(table.RemoveAt(iter), CHIP_NO_ERROR);
+    EXPECT_EQ(iter, table.end());
+    EXPECT_EQ(table.Size(), 0u);
+    EXPECT_EQ(table.begin(), table.end());
     for (uint8_t i = 0; i < MATTER_BINDING_TABLE_SIZE; i++)
     {
-        NL_TEST_ASSERT(aSuite, table.Add(EmberBindingTableEntry::ForNode(0, i, 0, 0, NullOptional)) == CHIP_NO_ERROR);
+        EXPECT_EQ(table.Add(EmberBindingTableEntry::ForNode(0, i, 0, 0, std::nullopt)), CHIP_NO_ERROR);
     }
     iter = table.begin();
     ++iter;
-    NL_TEST_ASSERT(aSuite, table.RemoveAt(iter) == CHIP_NO_ERROR);
-    NL_TEST_ASSERT(aSuite, table.Size() == MATTER_BINDING_TABLE_SIZE - 1);
-    NL_TEST_ASSERT(aSuite, iter->nodeId == 2);
-    NL_TEST_ASSERT(aSuite, iter.GetIndex() == 2);
+    EXPECT_EQ(table.RemoveAt(iter), CHIP_NO_ERROR);
+    EXPECT_EQ(table.Size(), MATTER_BINDING_TABLE_SIZE - 1);
+    EXPECT_EQ(iter->nodeId, 2u);
+    EXPECT_EQ(iter.GetIndex(), 2u);
     auto iterCheck = table.begin();
     ++iterCheck;
-    NL_TEST_ASSERT(aSuite, iter == iterCheck);
+    EXPECT_EQ(iter, iterCheck);
 
-    NL_TEST_ASSERT(aSuite, table.Add(EmberBindingTableEntry::ForNode(0, 1, 0, 0, NullOptional)) == CHIP_NO_ERROR);
-    NL_TEST_ASSERT(aSuite, table.Size() == MATTER_BINDING_TABLE_SIZE);
+    EXPECT_EQ(table.Add(EmberBindingTableEntry::ForNode(0, 1, 0, 0, std::nullopt)), CHIP_NO_ERROR);
+    EXPECT_EQ(table.Size(), MATTER_BINDING_TABLE_SIZE);
     iter = table.begin();
     for (uint8_t i = 0; i < MATTER_BINDING_TABLE_SIZE - 1; i++)
     {
         ++iter;
     }
-    NL_TEST_ASSERT(aSuite, iter->nodeId == 1);
-    NL_TEST_ASSERT(aSuite, iter.GetIndex() == 1);
+    EXPECT_EQ(iter->nodeId, 1u);
+    EXPECT_EQ(iter.GetIndex(), 1u);
     ++iter;
-    NL_TEST_ASSERT(aSuite, iter == table.end());
+    EXPECT_EQ(iter, table.end());
     iter = table.begin();
-    NL_TEST_ASSERT(aSuite, table.RemoveAt(iter) == CHIP_NO_ERROR);
-    NL_TEST_ASSERT(aSuite, table.Size() == MATTER_BINDING_TABLE_SIZE - 1);
-    NL_TEST_ASSERT(aSuite, iter == table.begin());
-    NL_TEST_ASSERT(aSuite, iter.GetIndex() == 2);
-    NL_TEST_ASSERT(aSuite, iter->nodeId == 2);
-    NL_TEST_ASSERT(aSuite, table.GetAt(0).type == MATTER_UNUSED_BINDING);
+    EXPECT_EQ(table.RemoveAt(iter), CHIP_NO_ERROR);
+    EXPECT_EQ(table.Size(), MATTER_BINDING_TABLE_SIZE - 1);
+    EXPECT_EQ(iter, table.begin());
+    EXPECT_EQ(iter.GetIndex(), 2u);
+    EXPECT_EQ(iter->nodeId, 2u);
+    EXPECT_EQ(table.GetAt(0).type, MATTER_UNUSED_BINDING);
 }
 
-void VerifyTableSame(nlTestSuite * aSuite, BindingTable & table, const std::vector<EmberBindingTableEntry> & expected)
-{
-    NL_TEST_ASSERT(aSuite, table.Size() == expected.size());
-    auto iter1 = table.begin();
-    auto iter2 = expected.begin();
-    while (iter2 != expected.end())
-    {
-        NL_TEST_ASSERT(aSuite, iter1 != table.end());
-        NL_TEST_ASSERT(aSuite, *iter1 == *iter2);
-        ++iter1;
-        ++iter2;
-    }
-    NL_TEST_ASSERT(aSuite, iter1 == table.end());
-}
-
-void VerifyRestored(nlTestSuite * aSuite, chip::TestPersistentStorageDelegate & storage,
-                    const std::vector<EmberBindingTableEntry> & expected)
-{
-    BindingTable restoredTable;
-    restoredTable.SetPersistentStorage(&storage);
-    NL_TEST_ASSERT(aSuite, restoredTable.LoadFromStorage() == CHIP_NO_ERROR);
-    VerifyTableSame(aSuite, restoredTable, expected);
-}
-
-void TestPersistentStorage(nlTestSuite * aSuite, void * aContext)
+TEST(TestBindingTable, TestPersistentStorage)
 {
     chip::TestPersistentStorageDelegate testStorage;
     BindingTable table;
     chip::Optional<chip::ClusterId> cluster = chip::MakeOptional<chip::ClusterId>(static_cast<chip::ClusterId>(UINT16_MAX + 6));
     std::vector<EmberBindingTableEntry> expected = {
-        EmberBindingTableEntry::ForNode(0, 0, 0, 0, NullOptional),
-        EmberBindingTableEntry::ForNode(1, 1, 0, 0, cluster),
-        EmberBindingTableEntry::ForGroup(2, 2, 0, NullOptional),
-        EmberBindingTableEntry::ForGroup(3, 3, 0, cluster),
+        EmberBindingTableEntry::ForNode(0, 0, 0, 0, std::nullopt),
+        EmberBindingTableEntry::ForNode(1, 1, 0, 0, cluster.std_optional()),
+        EmberBindingTableEntry::ForGroup(2, 2, 0, std::nullopt),
+        EmberBindingTableEntry::ForGroup(3, 3, 0, cluster.std_optional()),
     };
     table.SetPersistentStorage(&testStorage);
-    NL_TEST_ASSERT(aSuite, table.Add(expected[0]) == CHIP_NO_ERROR);
-    NL_TEST_ASSERT(aSuite, table.Add(expected[1]) == CHIP_NO_ERROR);
-    NL_TEST_ASSERT(aSuite, table.Add(expected[2]) == CHIP_NO_ERROR);
-    NL_TEST_ASSERT(aSuite, table.Add(expected[3]) == CHIP_NO_ERROR);
-    VerifyRestored(aSuite, testStorage, expected);
+    EXPECT_EQ(table.Add(expected[0]), CHIP_NO_ERROR);
+    EXPECT_EQ(table.Add(expected[1]), CHIP_NO_ERROR);
+    EXPECT_EQ(table.Add(expected[2]), CHIP_NO_ERROR);
+    EXPECT_EQ(table.Add(expected[3]), CHIP_NO_ERROR);
+    VerifyRestored(testStorage, expected);
 
     // Verify storage untouched if add fails
     testStorage.AddPoisonKey(chip::DefaultStorageKeyAllocator::BindingTableEntry(4).KeyName());
-    NL_TEST_ASSERT(aSuite, table.Add(EmberBindingTableEntry::ForNode(4, 4, 0, 0, NullOptional)) != CHIP_NO_ERROR);
-    VerifyRestored(aSuite, testStorage, expected);
+    EXPECT_NE(table.Add(EmberBindingTableEntry::ForNode(4, 4, 0, 0, std::nullopt)), CHIP_NO_ERROR);
+    VerifyRestored(testStorage, expected);
     testStorage.ClearPoisonKeys();
 
     // Verify storage untouched if removing head fails
     testStorage.AddPoisonKey(chip::DefaultStorageKeyAllocator::BindingTable().KeyName());
     auto iter = table.begin();
-    NL_TEST_ASSERT(aSuite, table.RemoveAt(iter) != CHIP_NO_ERROR);
-    VerifyTableSame(aSuite, table, expected);
+    EXPECT_NE(table.RemoveAt(iter), CHIP_NO_ERROR);
+    VerifyTableSame(table, expected);
     testStorage.ClearPoisonKeys();
-    VerifyRestored(aSuite, testStorage, expected);
+    VerifyRestored(testStorage, expected);
 
     // Verify storage untouched if removing other nodes fails
     testStorage.AddPoisonKey(chip::DefaultStorageKeyAllocator::BindingTableEntry(0).KeyName());
     iter = table.begin();
     ++iter;
-    NL_TEST_ASSERT(aSuite, table.RemoveAt(iter) != CHIP_NO_ERROR);
-    VerifyTableSame(aSuite, table, expected);
+    EXPECT_NE(table.RemoveAt(iter), CHIP_NO_ERROR);
+    VerifyTableSame(table, expected);
     testStorage.ClearPoisonKeys();
-    VerifyRestored(aSuite, testStorage, expected);
+    VerifyRestored(testStorage, expected);
 
     // Verify removing head
     iter = table.begin();
-    NL_TEST_ASSERT(aSuite, table.RemoveAt(iter) == CHIP_NO_ERROR);
-    VerifyTableSame(aSuite, table, { expected[1], expected[2], expected[3] });
-    VerifyRestored(aSuite, testStorage, { expected[1], expected[2], expected[3] });
+    EXPECT_EQ(table.RemoveAt(iter), CHIP_NO_ERROR);
+    VerifyTableSame(table, { expected[1], expected[2], expected[3] });
+    VerifyRestored(testStorage, { expected[1], expected[2], expected[3] });
 
     // Verify removing other nodes
     ++iter;
-    NL_TEST_ASSERT(aSuite, table.RemoveAt(iter) == CHIP_NO_ERROR);
-    VerifyTableSame(aSuite, table, { expected[1], expected[3] });
-    VerifyRestored(aSuite, testStorage, { expected[1], expected[3] });
+    EXPECT_EQ(table.RemoveAt(iter), CHIP_NO_ERROR);
+    VerifyTableSame(table, { expected[1], expected[3] });
+    VerifyRestored(testStorage, { expected[1], expected[3] });
 }
 
 } // namespace
-
-int TestBindingTable()
-{
-    static nlTest sTests[] = {
-        NL_TEST_DEF("TestEmptyBindingTable", TestEmptyBindingTable),
-        NL_TEST_DEF("TestAdd", TestAdd),
-        NL_TEST_DEF("TestRemoveThenAdd", TestRemoveThenAdd),
-        NL_TEST_DEF("TestPersistentStorage", TestPersistentStorage),
-        NL_TEST_SENTINEL(),
-    };
-
-    nlTestSuite theSuite = {
-        "BindingTable",
-        &sTests[0],
-        nullptr,
-        nullptr,
-    };
-    nlTestRunner(&theSuite, nullptr);
-    return (nlTestRunnerStats(&theSuite));
-}
-
-CHIP_REGISTER_TEST_SUITE(TestBindingTable)

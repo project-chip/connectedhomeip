@@ -318,7 +318,7 @@ cluster BasicInformation = 40 {
   readonly attribute optional char_string<32> serialNumber = 15;
   attribute access(write: manage) optional boolean localConfigDisabled = 16;
   readonly attribute optional boolean reachable = 17;
-  readonly attribute optional char_string<32> uniqueID = 18;
+  readonly attribute char_string<32> uniqueID = 18;
   readonly attribute CapabilityMinimaStruct capabilityMinima = 19;
   readonly attribute optional ProductAppearanceStruct productAppearance = 20;
   readonly attribute int32u specificationVersion = 21;
@@ -490,9 +490,9 @@ cluster NetworkCommissioning = 49 {
   readonly attribute access(read: administer) nullable NetworkCommissioningStatusEnum lastNetworkingStatus = 5;
   readonly attribute access(read: administer) nullable octet_string<32> lastNetworkID = 6;
   readonly attribute access(read: administer) nullable int32s lastConnectErrorValue = 7;
-  readonly attribute optional WiFiBandEnum supportedWiFiBands[] = 8;
-  readonly attribute optional ThreadCapabilitiesBitmap supportedThreadFeatures = 9;
-  readonly attribute optional int16u threadVersion = 10;
+  provisional readonly attribute optional WiFiBandEnum supportedWiFiBands[] = 8;
+  provisional readonly attribute optional ThreadCapabilitiesBitmap supportedThreadFeatures = 9;
+  provisional readonly attribute optional int16u threadVersion = 10;
   readonly attribute command_id generatedCommandList[] = 65528;
   readonly attribute command_id acceptedCommandList[] = 65529;
   readonly attribute event_id eventList[] = 65530;
@@ -1266,7 +1266,7 @@ cluster Thermostat = 513 {
     kLocalTemperatureNotExposed = 0x40;
     kMatterScheduleConfiguration = 0x80;
     kPresets = 0x100;
-    kQueuedPresetsSupported = 0x200;
+    kSetpoints = 0x200;
   }
 
   bitmap HVACSystemTypeBitmap : bitmap8 {
@@ -1364,11 +1364,6 @@ cluster Thermostat = 513 {
     PresetTypeFeaturesBitmap presetTypeFeatures = 2;
   }
 
-  struct QueuedPresetStruct {
-    nullable octet_string<16> presetHandle = 0;
-    nullable epoch_s transitionTimestamp = 1;
-  }
-
   struct ScheduleTypeStruct {
     SystemModeEnum systemMode = 0;
     int8u numberOfSchedules = 1;
@@ -1443,7 +1438,6 @@ cluster Thermostat = 513 {
   readonly attribute optional boolean presetsSchedulesEditable = 82;
   readonly attribute optional TemperatureSetpointHoldPolicyBitmap temperatureSetpointHoldPolicy = 83;
   readonly attribute optional nullable epoch_s setpointHoldExpiryTimestamp = 84;
-  readonly attribute optional nullable QueuedPresetStruct queuedPreset = 85;
   readonly attribute command_id generatedCommandList[] = 65528;
   readonly attribute command_id acceptedCommandList[] = 65529;
   readonly attribute event_id eventList[] = 65530;
@@ -1481,7 +1475,6 @@ cluster Thermostat = 513 {
 
   request struct SetActivePresetRequestRequest {
     octet_string<16> presetHandle = 0;
-    optional int16u delayMinutes = 1;
   }
 
   request struct StartPresetsSchedulesEditRequestRequest {
@@ -1510,8 +1503,6 @@ cluster Thermostat = 513 {
   command access(invoke: manage) CancelPresetsSchedulesEditRequest(): DefaultSuccess = 8;
   /** This command is used to notify the server that all edits are done and should be committed. */
   command access(invoke: manage) CommitPresetsSchedulesRequest(): DefaultSuccess = 9;
-  /** This command is sent to cancel a queued preset. */
-  command access(invoke: manage) CancelSetActivePresetRequest(): DefaultSuccess = 10;
   /** This command sets the set point hold policy. */
   command SetTemperatureSetpointHoldPolicy(SetTemperatureSetpointHoldPolicyRequest): DefaultSuccess = 11;
 }
@@ -2325,7 +2316,7 @@ endpoint 0 {
     callback attribute windowStatus;
     callback attribute adminFabricIndex;
     callback attribute adminVendorId;
-    ram      attribute featureMap default = 0;
+    ram      attribute featureMap default = 0x0001;
     ram      attribute clusterRevision default = 0x0001;
 
     handle command OpenCommissioningWindow;
@@ -2385,7 +2376,7 @@ endpoint 1 {
     callback attribute eventList;
     callback attribute attributeList;
     ram      attribute featureMap default = 0;
-    ram      attribute clusterRevision default = 2;
+    ram      attribute clusterRevision default = 4;
 
     handle command Identify;
     handle command TriggerEffect;
@@ -2398,7 +2389,7 @@ endpoint 1 {
     callback attribute eventList;
     callback attribute attributeList;
     ram      attribute featureMap default = 0;
-    ram      attribute clusterRevision default = 3;
+    ram      attribute clusterRevision default = 4;
 
     handle command AddGroup;
     handle command AddGroupResponse;
@@ -2430,12 +2421,16 @@ endpoint 1 {
     callback attribute degradationDirection;
     callback attribute changeIndication;
     callback attribute inPlaceIndicator;
+    callback attribute lastChangedTime;
+    callback attribute replacementProductList;
     callback attribute generatedCommandList;
     callback attribute acceptedCommandList;
     callback attribute eventList;
     callback attribute attributeList;
     callback attribute featureMap;
     ram      attribute clusterRevision default = 1;
+
+    handle command ResetCondition;
   }
 
   server cluster ActivatedCarbonFilterMonitoring {
@@ -2443,12 +2438,16 @@ endpoint 1 {
     callback attribute degradationDirection;
     callback attribute changeIndication;
     callback attribute inPlaceIndicator;
+    callback attribute lastChangedTime;
+    callback attribute replacementProductList;
     callback attribute generatedCommandList;
     callback attribute acceptedCommandList;
     callback attribute eventList;
     callback attribute attributeList;
     callback attribute featureMap;
     ram      attribute clusterRevision default = 1;
+
+    handle command ResetCondition;
   }
 
   server cluster FanControl {
@@ -2459,7 +2458,7 @@ endpoint 1 {
     ram      attribute speedMax default = 10;
     ram      attribute speedSetting default = 0;
     ram      attribute speedCurrent default = 0;
-    ram      attribute rockSupport default = 0x01;
+    ram      attribute rockSupport default = 0x07;
     ram      attribute rockSetting default = 0x00;
     ram      attribute windSupport default = 0x03;
     ram      attribute windSetting default = 0x00;
@@ -2468,8 +2467,10 @@ endpoint 1 {
     callback attribute acceptedCommandList;
     callback attribute eventList;
     callback attribute attributeList;
-    ram      attribute featureMap default = 0;
+    ram      attribute featureMap default = 0x3F;
     ram      attribute clusterRevision default = 4;
+
+    handle command Step;
   }
 }
 endpoint 2 {
@@ -2520,6 +2521,7 @@ endpoint 2 {
     callback attribute peakMeasuredValueWindow;
     callback attribute averageMeasuredValue;
     callback attribute averageMeasuredValueWindow;
+    callback attribute uncertainty;
     callback attribute measurementUnit;
     callback attribute measurementMedium;
     callback attribute levelValue;
@@ -2539,6 +2541,7 @@ endpoint 2 {
     callback attribute peakMeasuredValueWindow;
     callback attribute averageMeasuredValue;
     callback attribute averageMeasuredValueWindow;
+    callback attribute uncertainty;
     callback attribute measurementUnit;
     callback attribute measurementMedium;
     callback attribute levelValue;
@@ -2547,7 +2550,7 @@ endpoint 2 {
     callback attribute eventList;
     callback attribute attributeList;
     callback attribute featureMap;
-    ram      attribute clusterRevision default = 1;
+    ram      attribute clusterRevision default = 3;
   }
 
   server cluster NitrogenDioxideConcentrationMeasurement {
@@ -2558,6 +2561,7 @@ endpoint 2 {
     callback attribute peakMeasuredValueWindow;
     callback attribute averageMeasuredValue;
     callback attribute averageMeasuredValueWindow;
+    callback attribute uncertainty;
     callback attribute measurementUnit;
     callback attribute measurementMedium;
     callback attribute levelValue;
@@ -2577,6 +2581,7 @@ endpoint 2 {
     callback attribute peakMeasuredValueWindow;
     callback attribute averageMeasuredValue;
     callback attribute averageMeasuredValueWindow;
+    callback attribute uncertainty;
     callback attribute measurementUnit;
     callback attribute measurementMedium;
     callback attribute levelValue;
@@ -2596,6 +2601,7 @@ endpoint 2 {
     callback attribute peakMeasuredValueWindow;
     callback attribute averageMeasuredValue;
     callback attribute averageMeasuredValueWindow;
+    callback attribute uncertainty;
     callback attribute measurementUnit;
     callback attribute measurementMedium;
     callback attribute levelValue;
@@ -2615,6 +2621,7 @@ endpoint 2 {
     callback attribute peakMeasuredValueWindow;
     callback attribute averageMeasuredValue;
     callback attribute averageMeasuredValueWindow;
+    callback attribute uncertainty;
     callback attribute measurementUnit;
     callback attribute measurementMedium;
     callback attribute levelValue;
@@ -2634,6 +2641,7 @@ endpoint 2 {
     callback attribute peakMeasuredValueWindow;
     callback attribute averageMeasuredValue;
     callback attribute averageMeasuredValueWindow;
+    callback attribute uncertainty;
     callback attribute measurementUnit;
     callback attribute measurementMedium;
     callback attribute levelValue;
@@ -2653,6 +2661,7 @@ endpoint 2 {
     callback attribute peakMeasuredValueWindow;
     callback attribute averageMeasuredValue;
     callback attribute averageMeasuredValueWindow;
+    callback attribute uncertainty;
     callback attribute measurementUnit;
     callback attribute measurementMedium;
     callback attribute levelValue;
@@ -2672,6 +2681,7 @@ endpoint 2 {
     callback attribute peakMeasuredValueWindow;
     callback attribute averageMeasuredValue;
     callback attribute averageMeasuredValueWindow;
+    callback attribute uncertainty;
     callback attribute measurementUnit;
     callback attribute measurementMedium;
     callback attribute levelValue;
@@ -2691,6 +2701,7 @@ endpoint 2 {
     callback attribute peakMeasuredValueWindow;
     callback attribute averageMeasuredValue;
     callback attribute averageMeasuredValueWindow;
+    callback attribute uncertainty;
     callback attribute measurementUnit;
     callback attribute measurementMedium;
     callback attribute levelValue;
@@ -2734,15 +2745,16 @@ endpoint 3 {
   }
 
   server cluster TemperatureMeasurement {
-    ram      attribute measuredValue;
-    ram      attribute minMeasuredValue default = 0x8000;
-    ram      attribute maxMeasuredValue default = 0x8000;
+    persist  attribute measuredValue default = 0;
+    persist  attribute minMeasuredValue default = -5000;
+    persist  attribute maxMeasuredValue default = 7500;
+    persist  attribute tolerance default = 10;
     callback attribute generatedCommandList;
     callback attribute acceptedCommandList;
     callback attribute eventList;
     callback attribute attributeList;
     ram      attribute featureMap default = 0;
-    ram      attribute clusterRevision default = 1;
+    ram      attribute clusterRevision default = 4;
   }
 }
 endpoint 4 {
@@ -2777,9 +2789,10 @@ endpoint 4 {
   }
 
   server cluster RelativeHumidityMeasurement {
-    ram      attribute measuredValue;
-    ram      attribute minMeasuredValue;
-    ram      attribute maxMeasuredValue;
+    ram      attribute measuredValue default = 4600;
+    ram      attribute minMeasuredValue default = 0;
+    ram      attribute maxMeasuredValue default = 10000;
+    ram      attribute tolerance default = 1;
     callback attribute generatedCommandList;
     callback attribute acceptedCommandList;
     callback attribute eventList;
@@ -2820,12 +2833,15 @@ endpoint 5 {
   }
 
   server cluster Thermostat {
-    ram      attribute localTemperature;
+    ram      attribute localTemperature default = 2000;
+    ram      attribute absMinHeatSetpointLimit default = 700;
+    ram      attribute absMaxHeatSetpointLimit default = 3000;
+    persist  attribute PIHeatingDemand default = 0;
     ram      attribute occupiedHeatingSetpoint default = 2000;
-    ram      attribute minHeatSetpointLimit default = 1700;
+    ram      attribute minHeatSetpointLimit default = 700;
     ram      attribute maxHeatSetpointLimit default = 3000;
-    ram      attribute controlSequenceOfOperation default = 0x02;
-    ram      attribute systemMode default = 0x00;
+    ram      attribute controlSequenceOfOperation default = 2;
+    ram      attribute systemMode default = 4;
     callback attribute generatedCommandList;
     callback attribute acceptedCommandList;
     callback attribute eventList;

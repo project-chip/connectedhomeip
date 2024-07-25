@@ -20,9 +20,8 @@
 
 #include <app-common/zap-generated/cluster-objects.h>
 
-#include <app/AttributeAccessInterface.h>
+#include <app/AttributeValueEncoder.h>
 #include <app/CommandResponseHelper.h>
-#include <app/util/af.h>
 
 namespace chip {
 namespace app {
@@ -42,7 +41,7 @@ public:
     virtual CHIP_ERROR HandlePresentMessagesRequest(
         const ByteSpan & messageId, const MessagePriorityEnum & priority,
         const chip::BitMask<MessageControlBitmap> & messageControl, const DataModel::Nullable<uint32_t> & startTime,
-        const DataModel::Nullable<uint16_t> & duration, const CharSpan & messageText,
+        const DataModel::Nullable<uint64_t> & duration, const CharSpan & messageText,
         const chip::Optional<DataModel::DecodableList<chip::app::Clusters::Messages::Structs::MessageResponseOptionStruct::Type>> &
             responses)                                                                                          = 0;
     virtual CHIP_ERROR HandleCancelMessagesRequest(const DataModel::DecodableList<chip::ByteSpan> & messageIds) = 0;

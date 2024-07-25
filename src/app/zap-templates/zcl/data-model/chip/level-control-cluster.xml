@@ -17,12 +17,6 @@ limitations under the License.
 <configurator>
   <domain name="General"/>
 
-  <bitmap name="Feature" type="bitmap32">
-      <cluster code="0x0008"/>
-      <field name="OnOff" mask="0x1"/>
-      <field name="Lighting" mask="0x2"/>
-      <field name="Frequency" mask="0x4"/>
-  </bitmap>
 
   <enum name="MoveModeEnum" type="enum8">
     <cluster code="0x0008"/>
@@ -52,7 +46,21 @@ limitations under the License.
     <client tick="false" init="false">true</client>
     <server tick="false" init="false">true</server>
 
-    <globalAttribute side="either" code="0xFFFD" value="5"/>
+    <globalAttribute side="either" code="0xFFFD" value="6"/>
+
+    <features>
+      <feature bit="0" code="OO" name="OnOff" default="1" summary="Dependency with the On/Off cluster">
+        <optionalConform/>
+      </feature>
+      <feature bit="1" code="LT" name="Lighting" default="0" summary="Behavior that supports lighting applications">
+        <optionalConform/>
+      </feature>
+      <feature bit="2" code="FQ" name="Frequency" default="0" summary="Supports frequency attributes and behavior.
+                                        The Pulse Width Modulation cluster was created
+                                        for frequency control.">
+        <provisionalConform/>
+      </feature>
+    </features>
 
     <attribute side="server" code="0x0000" define="CURRENT_LEVEL"                 type="int8u"                isNullable="true"           writable="false" default="0x00"   optional="false">CurrentLevel</attribute>
     <attribute side="server" code="0x0001" define="LEVEL_CONTROL_REMAINING_TIME"  type="int16u"               min="0x0000"  max="0xFFFF"  writable="false" default="0x0000" optional="true">RemainingTime</attribute>
@@ -66,8 +74,8 @@ limitations under the License.
     <attribute side="server" code="0x0011" define="ON_LEVEL"                      type="int8u"                isNullable="true"         writable="true"                     optional="false">OnLevel</attribute>
     <attribute side="server" code="0x0012" define="ON_TRANSITION_TIME"            type="int16u"               isNullable="true"         writable="true"                     optional="true">OnTransitionTime</attribute>
     <attribute side="server" code="0x0013" define="OFF_TRANSITION_TIME"           type="int16u"               isNullable="true"         writable="true"                     optional="true">OffTransitionTime</attribute>
-    <attribute side="server" code="0x0014" define="DEFAULT_MOVE_RATE"             type="int8u"                isNullable="true"         writable="true"                     optional="true">DefaultMoveRate</attribute>
-    <attribute side="server" code="0x000F" define="OPTIONS"                       type="OptionsBitmap"  min="0x00" max="0x03"     writable="true"  default="0x00"     optional="false">Options</attribute>
+    <attribute side="server" code="0x0014" define="DEFAULT_MOVE_RATE"             type="int8u"                isNullable="true"   min="0x01" max="0xFF"  writable="true"    optional="true">DefaultMoveRate</attribute>
+    <attribute side="server" code="0x000F" define="OPTIONS"                       type="OptionsBitmap"        min="0x00" max="0x03"     writable="true"  default="0x00"     optional="false">Options</attribute>
     <attribute side="server" code="0x4000" define="START_UP_CURRENT_LEVEL"        type="int8u"                isNullable="true"         writable="true"                     optional="true">
       <description>StartUpCurrentLevel</description>
       <access op="read" role="view"/>

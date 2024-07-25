@@ -36,7 +36,7 @@
 #endif
 
 #if CHIP_DEVICE_CONFIG_ENABLE_WIFI
-#include "wifi/ConnectivityManagerImplWiFi.h"
+#include <platform/Zephyr/wifi/ConnectivityManagerImplWiFi.h>
 #else
 #include <platform/internal/GenericConnectivityManagerImpl_NoWiFi.h>
 #endif

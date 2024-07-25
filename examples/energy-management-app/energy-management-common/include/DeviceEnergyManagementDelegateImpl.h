@@ -20,7 +20,6 @@
 
 #include "app/clusters/device-energy-management-server/device-energy-management-server.h"
 
-#include <app/util/af.h>
 #include <app/util/config.h>
 #include <cstring>
 
@@ -70,6 +69,7 @@ public:
     virtual CHIP_ERROR SetAbsMaxPower(int64_t) override;
     virtual CHIP_ERROR SetPowerAdjustmentCapability(Attributes::PowerAdjustmentCapability::TypeInfo::Type) override;
     virtual CHIP_ERROR SetForecast(DataModel::Nullable<Structs::ForecastStruct::Type>) override;
+    virtual CHIP_ERROR SetOptOutState(OptOutStateEnum) override;
 
 private:
     ESATypeEnum mEsaType;

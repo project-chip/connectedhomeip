@@ -464,6 +464,16 @@ limitations under the License.
       <arg name="fillCharacter" type="int8u"/>
     </command>
 
+    <command source="client" code="0x18" name="StringEchoRequest"
+             response="StringEchoResponse" optional="true">
+      <description>
+        Command that takes an argument which is an octet string.  The response echoes
+        the string back. If the string is large then it would require a session that
+        supports large payloads.
+      </description>
+      <arg name="payload" type="octet_string"/>
+    </command>
+
     <command source="client" code="0xFFF200AA" name="TestDifferentVendorMeiRequest"
              optional="true" response="TestDifferentVendorMeiResponse">
       <description>
@@ -603,6 +613,13 @@ limitations under the License.
         Response to TestBatchHelperRequest or TestSecondBatchHelperRequest. Buffer in response is filled as directed in the Request.
       </description>
       <arg name="buffer" type="octet_string" length="800"/>
+    </command>
+
+    <command source="server" code="0xD" name="StringEchoResponse"  optional="true" disableDefaultResponse="true">
+      <description>
+        Response to StringEchoRequest. Buffer in response is filled by the payload in the Request.
+      </description>
+      <arg name="payload" type="octet_string"/>
     </command>
 
     <command source="server" code="0xFFF200BB" name="TestDifferentVendorMeiResponse" optional="true" disableDefaultResponse="true">

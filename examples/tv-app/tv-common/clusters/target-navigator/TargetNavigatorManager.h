@@ -19,6 +19,9 @@
 
 #include <app/clusters/target-navigator-server/target-navigator-server.h>
 
+#include <list>
+#include <string>
+
 using chip::CharSpan;
 using chip::app::AttributeValueEncoder;
 using chip::app::CommandResponseHelper;

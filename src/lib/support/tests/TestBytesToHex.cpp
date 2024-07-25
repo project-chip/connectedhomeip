@@ -20,14 +20,14 @@
 #include <string>
 #include <vector>
 
+#include <pw_unit_test/framework.h>
+
+#include <lib/core/StringBuilderAdapters.h>
 #include <lib/support/BytesToHex.h>
 #include <lib/support/CodeUtils.h>
 #include <lib/support/EnforceFormat.h>
 #include <lib/support/Span.h>
-#include <lib/support/UnitTestRegistration.h>
 #include <lib/support/logging/CHIPLogging.h>
-
-#include <nlunit-test.h>
 
 namespace {
 
@@ -37,7 +37,7 @@ using namespace chip::Encoding;
 // To accumulate redirected logs for some tests
 std::vector<std::string> gRedirectedLogLines;
 
-void TestBytesToHexNotNullTerminated(nlTestSuite * inSuite, void * inContext)
+TEST(TestBytesToHex, TestBytesToHexNotNullTerminated)
 {
     // Uppercase
     {
@@ -45,12 +45,11 @@ void TestBytesToHexNotNullTerminated(nlTestSuite * inSuite, void * inContext)
         char dest[18]     = { '?', '?', '?', '?', '?', '?', '?', '?', '?', '?', '?', '?', '?', '?', '?', '?', '!', '@' };
         char dest2[18]    = { '?', '?', '?', '?', '?', '?', '?', '?', '?', '?', '?', '?', '?', '?', '?', '?', '!', '@' };
         char expected[18] = { 'F', 'E', 'D', 'C', 'B', 'A', '9', '8', '7', '6', '5', '4', '3', '2', '1', '0', '!', '@' };
-        NL_TEST_ASSERT(inSuite,
-                       BytesToHex(&src[0], sizeof(src), &dest[0], sizeof(src) * 2u, HexFlags::kUppercase) == CHIP_NO_ERROR);
-        NL_TEST_ASSERT(inSuite, memcmp(&dest[0], &expected[0], sizeof(expected)) == 0);
+        EXPECT_EQ(BytesToHex(&src[0], sizeof(src), &dest[0], sizeof(src) * 2u, HexFlags::kUppercase), CHIP_NO_ERROR);
+        EXPECT_EQ(memcmp(&dest[0], &expected[0], sizeof(expected)), 0);
 
-        NL_TEST_ASSERT(inSuite, BytesToUppercaseHexBuffer(&src[0], sizeof(src), &dest2[0], sizeof(src) * 2u) == CHIP_NO_ERROR);
-        NL_TEST_ASSERT(inSuite, memcmp(&dest2[0], &expected[0], sizeof(expected)) == 0);
+        EXPECT_EQ(BytesToUppercaseHexBuffer(&src[0], sizeof(src), &dest2[0], sizeof(src) * 2u), CHIP_NO_ERROR);
+        EXPECT_EQ(memcmp(&dest2[0], &expected[0], sizeof(expected)), 0);
     }
 
     // Lowercase
@@ -59,12 +58,12 @@ void TestBytesToHexNotNullTerminated(nlTestSuite * inSuite, void * inContext)
         char dest[18]     = { '?', '?', '?', '?', '?', '?', '?', '?', '?', '?', '?', '?', '?', '?', '?', '?', '!', '@' };
         char dest2[18]    = { '?', '?', '?', '?', '?', '?', '?', '?', '?', '?', '?', '?', '?', '?', '?', '?', '!', '@' };
         char expected[18] = { 'f', 'e', 'd', 'c', 'b', 'a', '9', '8', '7', '6', '5', '4', '3', '2', '1', '0', '!', '@' };
-        NL_TEST_ASSERT(inSuite, BytesToHex(&src[0], sizeof(src), &dest[0], sizeof(src) * 2u, HexFlags::kNone) == CHIP_NO_ERROR);
-        NL_TEST_ASSERT(inSuite, memcmp(&dest[0], &expected[0], sizeof(expected)) == 0);
+        EXPECT_EQ(BytesToHex(&src[0], sizeof(src), &dest[0], sizeof(src) * 2u, HexFlags::kNone), CHIP_NO_ERROR);
+        EXPECT_EQ(memcmp(&dest[0], &expected[0], sizeof(expected)), 0);
 
         // Test Alias
-        NL_TEST_ASSERT(inSuite, BytesToLowercaseHexBuffer(&src[0], sizeof(src), &dest2[0], sizeof(src) * 2u) == CHIP_NO_ERROR);
-        NL_TEST_ASSERT(inSuite, memcmp(&dest2[0], &expected[0], sizeof(expected)) == 0);
+        EXPECT_EQ(BytesToLowercaseHexBuffer(&src[0], sizeof(src), &dest2[0], sizeof(src) * 2u), CHIP_NO_ERROR);
+        EXPECT_EQ(memcmp(&dest2[0], &expected[0], sizeof(expected)), 0);
     }
 
     // Trivial: Zero size input
@@ -72,28 +71,28 @@ void TestBytesToHexNotNullTerminated(nlTestSuite * inSuite, void * inContext)
         uint8_t src[]    = { 0x00 };
         char dest[2]     = { '!', '@' };
         char expected[2] = { '!', '@' };
-        NL_TEST_ASSERT(inSuite, BytesToHex(&src[0], 0, &dest[0], sizeof(src) * 2u, HexFlags::kNone) == CHIP_NO_ERROR);
+        EXPECT_EQ(BytesToHex(&src[0], 0, &dest[0], sizeof(src) * 2u, HexFlags::kNone), CHIP_NO_ERROR);
         // Nothing should have been touched.
-        NL_TEST_ASSERT(inSuite, memcmp(&dest[0], &expected[0], sizeof(expected)) == 0);
+        EXPECT_EQ(memcmp(&dest[0], &expected[0], sizeof(expected)), 0);
     }
 
     // Trivial: Zero size input with null buffer
     {
         char dest[2]     = { '!', '@' };
         char expected[2] = { '!', '@' };
-        NL_TEST_ASSERT(inSuite, BytesToHex(nullptr, 0, &dest[0], sizeof(dest), HexFlags::kNone) == CHIP_NO_ERROR);
+        EXPECT_EQ(BytesToHex(nullptr, 0, &dest[0], sizeof(dest), HexFlags::kNone), CHIP_NO_ERROR);
         // Nothing should have been touched.
-        NL_TEST_ASSERT(inSuite, memcmp(&dest[0], &expected[0], sizeof(expected)) == 0);
+        EXPECT_EQ(memcmp(&dest[0], &expected[0], sizeof(expected)), 0);
 
-        NL_TEST_ASSERT(inSuite, BytesToHex(nullptr, 0, nullptr, 0, HexFlags::kNone) == CHIP_NO_ERROR);
+        EXPECT_EQ(BytesToHex(nullptr, 0, nullptr, 0, HexFlags::kNone), CHIP_NO_ERROR);
         // Nothing should have been touched.
-        NL_TEST_ASSERT(inSuite, memcmp(&dest[0], &expected[0], sizeof(expected)) == 0);
+        EXPECT_EQ(memcmp(&dest[0], &expected[0], sizeof(expected)), 0);
 
-        NL_TEST_ASSERT(inSuite, BytesToHex(nullptr, 0, nullptr, 1, HexFlags::kNone) == CHIP_ERROR_INVALID_ARGUMENT);
+        EXPECT_EQ(BytesToHex(nullptr, 0, nullptr, 1, HexFlags::kNone), CHIP_ERROR_INVALID_ARGUMENT);
     }
 }
 
-void TestBytesToHexNullTerminated(nlTestSuite * inSuite, void * inContext)
+TEST(TestBytesToHex, TestBytesToHexNullTerminated)
 {
     // Uppercase
     {
@@ -101,17 +100,16 @@ void TestBytesToHexNullTerminated(nlTestSuite * inSuite, void * inContext)
         char dest[18]     = { '?', '?', '?', '?', '?', '?', '?', '?', '?', '?', '?', '?', '?', '?', '?', '?', '!', '@' };
         char dest2[18]    = { '?', '?', '?', '?', '?', '?', '?', '?', '?', '?', '?', '?', '?', '?', '?', '?', '!', '@' };
         char expected[18] = { '0', '1', '2', '3', '4', '5', '6', '7', '8', '9', 'A', 'B', 'C', 'D', 'E', 'F', '\0', '@' };
-        NL_TEST_ASSERT(inSuite, ((sizeof(src) * 2u) + 1u) <= sizeof(dest));
-        NL_TEST_ASSERT(inSuite,
-                       BytesToHex(&src[0], sizeof(src), &dest[0], (sizeof(src) * 2u) + 1, HexFlags::kUppercaseAndNullTerminate) ==
-                           CHIP_NO_ERROR);
-        NL_TEST_ASSERT(inSuite, memcmp(&dest[0], &expected[0], sizeof(expected)) == 0);
+        EXPECT_LE(((sizeof(src) * 2u) + 1u), sizeof(dest));
+        EXPECT_EQ(BytesToHex(&src[0], sizeof(src), &dest[0], (sizeof(src) * 2u) + 1, HexFlags::kUppercaseAndNullTerminate),
+                  CHIP_NO_ERROR);
+        EXPECT_EQ(memcmp(&dest[0], &expected[0], sizeof(expected)), 0);
 
         // Test Alias
         CHIP_ERROR retval = BytesToUppercaseHexString(&src[0], sizeof(src), &dest2[0], sizeof(dest2));
         printf("retval=%" CHIP_ERROR_FORMAT "\n", retval.Format());
-        NL_TEST_ASSERT(inSuite, retval == CHIP_NO_ERROR);
-        NL_TEST_ASSERT(inSuite, memcmp(&dest2[0], &expected[0], sizeof(expected)) == 0);
+        EXPECT_EQ(retval, CHIP_NO_ERROR);
+        EXPECT_EQ(memcmp(&dest2[0], &expected[0], sizeof(expected)), 0);
     }
 
     // Lowercase
@@ -120,15 +118,14 @@ void TestBytesToHexNullTerminated(nlTestSuite * inSuite, void * inContext)
         char dest[18]     = { '?', '?', '?', '?', '?', '?', '?', '?', '?', '?', '?', '?', '?', '?', '?', '?', '!', '@' };
         char dest2[18]    = { '?', '?', '?', '?', '?', '?', '?', '?', '?', '?', '?', '?', '?', '?', '?', '?', '!', '@' };
         char expected[18] = { '0', '1', '2', '3', '4', '5', '6', '7', '8', '9', 'a', 'b', 'c', 'd', 'e', 'f', '\0', '@' };
-        NL_TEST_ASSERT(inSuite, ((sizeof(src) * 2u) + 1u) <= sizeof(dest));
-        NL_TEST_ASSERT(
-            inSuite, BytesToHex(&src[0], sizeof(src), &dest[0], (sizeof(src) * 2u) + 1, HexFlags::kNullTerminate) == CHIP_NO_ERROR);
-        NL_TEST_ASSERT(inSuite, memcmp(&dest[0], &expected[0], sizeof(expected)) == 0);
+        EXPECT_LE(((sizeof(src) * 2u) + 1u), sizeof(dest));
+        EXPECT_EQ(BytesToHex(&src[0], sizeof(src), &dest[0], (sizeof(src) * 2u) + 1, HexFlags::kNullTerminate), CHIP_NO_ERROR);
+        EXPECT_EQ(memcmp(&dest[0], &expected[0], sizeof(expected)), 0);
 
         // Test Alias
-        NL_TEST_ASSERT(inSuite, BytesToLowercaseHexString(&src[0], sizeof(src), &dest2[0], sizeof(dest2)) == CHIP_NO_ERROR);
+        EXPECT_EQ(BytesToLowercaseHexString(&src[0], sizeof(src), &dest2[0], sizeof(dest2)), CHIP_NO_ERROR);
         printf("->%s\n", dest2);
-        NL_TEST_ASSERT(inSuite, memcmp(&dest2[0], &expected[0], sizeof(expected)) == 0);
+        EXPECT_EQ(memcmp(&dest2[0], &expected[0], sizeof(expected)), 0);
     }
 
     // Trivial: Zero size input
@@ -136,36 +133,36 @@ void TestBytesToHexNullTerminated(nlTestSuite * inSuite, void * inContext)
         uint8_t src[]    = { 0x00 };
         char dest[2]     = { '!', '@' };
         char expected[2] = { '\0', '@' };
-        NL_TEST_ASSERT(inSuite, BytesToHex(&src[0], 0, &dest[0], sizeof(dest), HexFlags::kNullTerminate) == CHIP_NO_ERROR);
+        EXPECT_EQ(BytesToHex(&src[0], 0, &dest[0], sizeof(dest), HexFlags::kNullTerminate), CHIP_NO_ERROR);
         // Expect nul termination
-        NL_TEST_ASSERT(inSuite, memcmp(&dest[0], &expected[0], sizeof(expected)) == 0);
+        EXPECT_EQ(memcmp(&dest[0], &expected[0], sizeof(expected)), 0);
     }
 
     // Trivial: Zero size input with null buffer
     {
         char dest[2]     = { '!', '@' };
         char expected[2] = { '\0', '@' };
-        NL_TEST_ASSERT(inSuite, BytesToHex(nullptr, 0, &dest[0], sizeof(dest), HexFlags::kNullTerminate) == CHIP_NO_ERROR);
+        EXPECT_EQ(BytesToHex(nullptr, 0, &dest[0], sizeof(dest), HexFlags::kNullTerminate), CHIP_NO_ERROR);
         // Nothing should have been touched.
-        NL_TEST_ASSERT(inSuite, memcmp(&dest[0], &expected[0], sizeof(expected)) == 0);
+        EXPECT_EQ(memcmp(&dest[0], &expected[0], sizeof(expected)), 0);
 
-        NL_TEST_ASSERT(inSuite, BytesToHex(nullptr, 0, nullptr, 0, HexFlags::kNullTerminate) == CHIP_ERROR_BUFFER_TOO_SMALL);
+        EXPECT_EQ(BytesToHex(nullptr, 0, nullptr, 0, HexFlags::kNullTerminate), CHIP_ERROR_BUFFER_TOO_SMALL);
 
-        NL_TEST_ASSERT(inSuite, BytesToHex(nullptr, 0, &dest[0], 1, HexFlags::kNullTerminate) == CHIP_NO_ERROR);
+        EXPECT_EQ(BytesToHex(nullptr, 0, &dest[0], 1, HexFlags::kNullTerminate), CHIP_NO_ERROR);
         // Nothing should have been touched.
-        NL_TEST_ASSERT(inSuite, memcmp(&dest[0], &expected[0], sizeof(expected)) == 0);
+        EXPECT_EQ(memcmp(&dest[0], &expected[0], sizeof(expected)), 0);
 
-        NL_TEST_ASSERT(inSuite, BytesToHex(nullptr, 0, nullptr, 1, HexFlags::kNullTerminate) == CHIP_ERROR_INVALID_ARGUMENT);
+        EXPECT_EQ(BytesToHex(nullptr, 0, nullptr, 1, HexFlags::kNullTerminate), CHIP_ERROR_INVALID_ARGUMENT);
     }
 }
 
-void TestBytesToHexErrors(nlTestSuite * inSuite, void * inContext)
+TEST(TestBytesToHex, TestBytesToHexErrors)
 {
     // NULL destination
     {
         uint8_t src[] = { 0x01, 0x23, 0x45, 0x67, 0x89, 0xAB, 0xCD, 0xEF };
         char * dest   = nullptr;
-        NL_TEST_ASSERT(inSuite, BytesToHex(&src[0], 0, dest, sizeof(src) * 2u, HexFlags::kNone) == CHIP_ERROR_INVALID_ARGUMENT);
+        EXPECT_EQ(BytesToHex(&src[0], 0, dest, sizeof(src) * 2u, HexFlags::kNone), CHIP_ERROR_INVALID_ARGUMENT);
     }
 
     // Destination buffer too small for non-null-terminated
@@ -173,12 +170,10 @@ void TestBytesToHexErrors(nlTestSuite * inSuite, void * inContext)
         uint8_t src[]     = { 0x01, 0x23, 0x45, 0x67, 0x89, 0xAB, 0xCD, 0xEF };
         char dest[18]     = { '?', '?', '?', '?', '?', '?', '?', '?', '?', '?', '?', '?', '?', '?', '?', '?', '!', '@' };
         char expected[18] = { '?', '?', '?', '?', '?', '?', '?', '?', '?', '?', '?', '?', '?', '?', '?', '?', '!', '@' };
-        NL_TEST_ASSERT(inSuite, ((sizeof(src) * 2u) + 1u) <= sizeof(dest));
-        NL_TEST_ASSERT(inSuite,
-                       BytesToHex(&src[0], sizeof(src), &dest[0], (sizeof(src) * 2u) - 1, HexFlags::kNone) ==
-                           CHIP_ERROR_BUFFER_TOO_SMALL);
+        EXPECT_LE(((sizeof(src) * 2u) + 1u), sizeof(dest));
+        EXPECT_EQ(BytesToHex(&src[0], sizeof(src), &dest[0], (sizeof(src) * 2u) - 1, HexFlags::kNone), CHIP_ERROR_BUFFER_TOO_SMALL);
         // Ensure output not touched
-        NL_TEST_ASSERT(inSuite, memcmp(&dest[0], &expected[0], sizeof(expected)) == 0);
+        EXPECT_EQ(memcmp(&dest[0], &expected[0], sizeof(expected)), 0);
     }
 
     // Destination buffer too small for null-terminated
@@ -186,12 +181,11 @@ void TestBytesToHexErrors(nlTestSuite * inSuite, void * inContext)
         uint8_t src[]     = { 0x01, 0x23, 0x45, 0x67, 0x89, 0xAB, 0xCD, 0xEF };
         char dest[18]     = { '?', '?', '?', '?', '?', '?', '?', '?', '?', '?', '?', '?', '?', '?', '?', '?', '!', '@' };
         char expected[18] = { '?', '?', '?', '?', '?', '?', '?', '?', '?', '?', '?', '?', '?', '?', '?', '?', '!', '@' };
-        NL_TEST_ASSERT(inSuite, ((sizeof(src) * 2u) + 1u) <= sizeof(dest));
-        NL_TEST_ASSERT(inSuite,
-                       BytesToHex(&src[0], sizeof(src), &dest[0], (sizeof(src) * 2u), HexFlags::kNullTerminate) ==
-                           CHIP_ERROR_BUFFER_TOO_SMALL);
+        EXPECT_LE(((sizeof(src) * 2u) + 1u), sizeof(dest));
+        EXPECT_EQ(BytesToHex(&src[0], sizeof(src), &dest[0], (sizeof(src) * 2u), HexFlags::kNullTerminate),
+                  CHIP_ERROR_BUFFER_TOO_SMALL);
         // Ensure output not touched
-        NL_TEST_ASSERT(inSuite, memcmp(&dest[0], &expected[0], sizeof(expected)) == 0);
+        EXPECT_EQ(memcmp(&dest[0], &expected[0], sizeof(expected)), 0);
     }
 
     // Writing in a larger buffer is fine, bytes past the nul terminator (when requested) are untouched.
@@ -199,10 +193,9 @@ void TestBytesToHexErrors(nlTestSuite * inSuite, void * inContext)
         uint8_t src[]     = { 0x01, 0x23, 0x45, 0x67, 0x89, 0xAB, 0xCD, 0xEF };
         char dest[18]     = { '?', '?', '?', '?', '?', '?', '?', '?', '?', '?', '?', '?', '?', '?', '?', '?', '!', '@' };
         char expected[18] = { '0', '1', '2', '3', '4', '5', '6', '7', '8', '9', 'a', 'b', 'c', 'd', 'e', 'f', '\0', '@' };
-        NL_TEST_ASSERT(inSuite, ((sizeof(src) * 2u) + 1u) < sizeof(dest));
-        NL_TEST_ASSERT(inSuite,
-                       BytesToHex(&src[0], sizeof(src), &dest[0], sizeof(dest), HexFlags::kNullTerminate) == CHIP_NO_ERROR);
-        NL_TEST_ASSERT(inSuite, memcmp(&dest[0], &expected[0], sizeof(expected)) == 0);
+        EXPECT_LT(((sizeof(src) * 2u) + 1u), sizeof(dest));
+        EXPECT_EQ(BytesToHex(&src[0], sizeof(src), &dest[0], sizeof(dest), HexFlags::kNullTerminate), CHIP_NO_ERROR);
+        EXPECT_EQ(memcmp(&dest[0], &expected[0], sizeof(expected)), 0);
     }
 
     // Source size that would not fit in any output using size_t
@@ -210,18 +203,16 @@ void TestBytesToHexErrors(nlTestSuite * inSuite, void * inContext)
         uint8_t src[]     = { 0x01, 0x23, 0x45, 0x67, 0x89, 0xAB, 0xCD, 0xEF };
         char dest[18]     = { '?', '?', '?', '?', '?', '?', '?', '?', '?', '?', '?', '?', '?', '?', '?', '?', '!', '@' };
         char expected[18] = { '?', '?', '?', '?', '?', '?', '?', '?', '?', '?', '?', '?', '?', '?', '?', '?', '!', '@' };
-        NL_TEST_ASSERT(inSuite,
-                       BytesToHex(&src[0], SIZE_MAX / 2u, &dest[0], sizeof(dest), HexFlags::kNullTerminate) ==
-                           CHIP_ERROR_BUFFER_TOO_SMALL);
-        NL_TEST_ASSERT(inSuite, memcmp(&dest[0], &expected[0], sizeof(expected)) == 0);
+        EXPECT_EQ(BytesToHex(&src[0], SIZE_MAX / 2u, &dest[0], sizeof(dest), HexFlags::kNullTerminate),
+                  CHIP_ERROR_BUFFER_TOO_SMALL);
+        EXPECT_EQ(memcmp(&dest[0], &expected[0], sizeof(expected)), 0);
 
-        NL_TEST_ASSERT(inSuite,
-                       BytesToHex(&src[0], SIZE_MAX / 2u, &dest[0], sizeof(dest), HexFlags::kNone) == CHIP_ERROR_BUFFER_TOO_SMALL);
-        NL_TEST_ASSERT(inSuite, memcmp(&dest[0], &expected[0], sizeof(expected)) == 0);
+        EXPECT_EQ(BytesToHex(&src[0], SIZE_MAX / 2u, &dest[0], sizeof(dest), HexFlags::kNone), CHIP_ERROR_BUFFER_TOO_SMALL);
+        EXPECT_EQ(memcmp(&dest[0], &expected[0], sizeof(expected)), 0);
     }
 }
 
-void TestBytesToHexUint64(nlTestSuite * inSuite, void * inContext)
+TEST(TestBytesToHex, TestBytesToHexUint64)
 {
     // Different values in each byte and each nibble should let us know if the conversion is correct.
     uint64_t test     = 0x0123456789ABCDEF;
@@ -237,62 +228,54 @@ void TestBytesToHexUint64(nlTestSuite * inSuite, void * inContext)
 
     // Lower case - uint64_t.
     memset(buf, 1, sizeof(buf));
-    NL_TEST_ASSERT(inSuite, Uint64ToHex(test, buf, sizeof(buf), HexFlags::kNone) == CHIP_NO_ERROR);
-    NL_TEST_ASSERT(inSuite, memcmp(buf, lowerExpected, strlen(lowerExpected)) == 0);
+    EXPECT_EQ(Uint64ToHex(test, buf, sizeof(buf), HexFlags::kNone), CHIP_NO_ERROR);
+    EXPECT_EQ(memcmp(buf, lowerExpected, strlen(lowerExpected)), 0);
     // No null termination.
-    NL_TEST_ASSERT(inSuite, buf[16] == 1);
+    EXPECT_EQ(buf[16], 1);
 
     // Lower case - uint32_t.
     memset(buf, 1, sizeof(buf));
-    NL_TEST_ASSERT(inSuite, Uint32ToHex(test32_0, buf, sizeof(uint32_t) * 2, HexFlags::kNone) == CHIP_NO_ERROR);
-    NL_TEST_ASSERT(inSuite,
-                   Uint32ToHex(test32_1, &buf[sizeof(uint32_t) * 2], sizeof(uint32_t) * 2, HexFlags::kNone) == CHIP_NO_ERROR);
-    NL_TEST_ASSERT(inSuite, memcmp(buf, lowerExpected, strlen(lowerExpected)) == 0);
+    EXPECT_EQ(Uint32ToHex(test32_0, buf, sizeof(uint32_t) * 2, HexFlags::kNone), CHIP_NO_ERROR);
+    EXPECT_EQ(Uint32ToHex(test32_1, &buf[sizeof(uint32_t) * 2], sizeof(uint32_t) * 2, HexFlags::kNone), CHIP_NO_ERROR);
+    EXPECT_EQ(memcmp(buf, lowerExpected, strlen(lowerExpected)), 0);
     // No null termination.
-    NL_TEST_ASSERT(inSuite, buf[16] == 1);
+    EXPECT_EQ(buf[16], 1);
 
     // Upper case - uint64_t.
     memset(buf, 1, sizeof(buf));
-    NL_TEST_ASSERT(inSuite, Uint64ToHex(test, buf, sizeof(buf), HexFlags::kUppercase) == CHIP_NO_ERROR);
-    NL_TEST_ASSERT(inSuite, memcmp(buf, upperExpected, strlen(upperExpected)) == 0);
+    EXPECT_EQ(Uint64ToHex(test, buf, sizeof(buf), HexFlags::kUppercase), CHIP_NO_ERROR);
+    EXPECT_EQ(memcmp(buf, upperExpected, strlen(upperExpected)), 0);
     // No null termination.
-    NL_TEST_ASSERT(inSuite, buf[16] == 1);
+    EXPECT_EQ(buf[16], 1);
 
     // Upper case - uint16_t.
     memset(buf, 1, sizeof(buf));
-    NL_TEST_ASSERT(inSuite, Uint16ToHex(test16_0, buf, sizeof(uint16_t) * 2, HexFlags::kUppercase) == CHIP_NO_ERROR);
-    NL_TEST_ASSERT(inSuite,
-                   Uint16ToHex(test16_1, &buf[sizeof(uint16_t) * 2 * 1], sizeof(uint16_t) * 2, HexFlags::kUppercase) ==
-                       CHIP_NO_ERROR);
-    NL_TEST_ASSERT(inSuite,
-                   Uint16ToHex(test16_2, &buf[sizeof(uint16_t) * 2 * 2], sizeof(uint16_t) * 2, HexFlags::kUppercase) ==
-                       CHIP_NO_ERROR);
-    NL_TEST_ASSERT(inSuite,
-                   Uint16ToHex(test16_3, &buf[sizeof(uint16_t) * 2 * 3], sizeof(uint16_t) * 2, HexFlags::kUppercase) ==
-                       CHIP_NO_ERROR);
-    NL_TEST_ASSERT(inSuite, memcmp(buf, upperExpected, strlen(upperExpected)) == 0);
+    EXPECT_EQ(Uint16ToHex(test16_0, buf, sizeof(uint16_t) * 2, HexFlags::kUppercase), CHIP_NO_ERROR);
+    EXPECT_EQ(Uint16ToHex(test16_1, &buf[sizeof(uint16_t) * 2 * 1], sizeof(uint16_t) * 2, HexFlags::kUppercase), CHIP_NO_ERROR);
+    EXPECT_EQ(Uint16ToHex(test16_2, &buf[sizeof(uint16_t) * 2 * 2], sizeof(uint16_t) * 2, HexFlags::kUppercase), CHIP_NO_ERROR);
+    EXPECT_EQ(Uint16ToHex(test16_3, &buf[sizeof(uint16_t) * 2 * 3], sizeof(uint16_t) * 2, HexFlags::kUppercase), CHIP_NO_ERROR);
+    EXPECT_EQ(memcmp(buf, upperExpected, strlen(upperExpected)), 0);
     // No null termination.
-    NL_TEST_ASSERT(inSuite, buf[16] == 1);
+    EXPECT_EQ(buf[16], 1);
 
     // Lower case with null termination.
     memset(buf, 1, sizeof(buf));
-    NL_TEST_ASSERT(inSuite, Uint64ToHex(test, buf, sizeof(buf), HexFlags::kNullTerminate) == CHIP_NO_ERROR);
-    NL_TEST_ASSERT(inSuite, memcmp(buf, lowerExpected, sizeof(lowerExpected)) == 0);
+    EXPECT_EQ(Uint64ToHex(test, buf, sizeof(buf), HexFlags::kNullTerminate), CHIP_NO_ERROR);
+    EXPECT_EQ(memcmp(buf, lowerExpected, sizeof(lowerExpected)), 0);
 
     // Upper case with null termination.
     memset(buf, 1, sizeof(buf));
-    NL_TEST_ASSERT(inSuite, Uint64ToHex(test, buf, sizeof(buf), HexFlags::kUppercaseAndNullTerminate) == CHIP_NO_ERROR);
-    NL_TEST_ASSERT(inSuite, memcmp(buf, upperExpected, sizeof(upperExpected)) == 0);
+    EXPECT_EQ(Uint64ToHex(test, buf, sizeof(buf), HexFlags::kUppercaseAndNullTerminate), CHIP_NO_ERROR);
+    EXPECT_EQ(memcmp(buf, upperExpected, sizeof(upperExpected)), 0);
 
     // Too small buffer
-    NL_TEST_ASSERT(inSuite, Uint64ToHex(test, buf, sizeof(buf) - 2, HexFlags::kNone) == CHIP_ERROR_BUFFER_TOO_SMALL);
-    NL_TEST_ASSERT(inSuite, Uint64ToHex(test, buf, sizeof(buf) - 2, HexFlags::kUppercase) == CHIP_ERROR_BUFFER_TOO_SMALL);
-    NL_TEST_ASSERT(inSuite, Uint64ToHex(test, buf, sizeof(buf) - 1, HexFlags::kNullTerminate) == CHIP_ERROR_BUFFER_TOO_SMALL);
-    NL_TEST_ASSERT(inSuite,
-                   Uint64ToHex(test, buf, sizeof(buf) - 1, HexFlags::kUppercaseAndNullTerminate) == CHIP_ERROR_BUFFER_TOO_SMALL);
+    EXPECT_EQ(Uint64ToHex(test, buf, sizeof(buf) - 2, HexFlags::kNone), CHIP_ERROR_BUFFER_TOO_SMALL);
+    EXPECT_EQ(Uint64ToHex(test, buf, sizeof(buf) - 2, HexFlags::kUppercase), CHIP_ERROR_BUFFER_TOO_SMALL);
+    EXPECT_EQ(Uint64ToHex(test, buf, sizeof(buf) - 1, HexFlags::kNullTerminate), CHIP_ERROR_BUFFER_TOO_SMALL);
+    EXPECT_EQ(Uint64ToHex(test, buf, sizeof(buf) - 1, HexFlags::kUppercaseAndNullTerminate), CHIP_ERROR_BUFFER_TOO_SMALL);
 }
 
-void TestHexToBytesAndUint(nlTestSuite * inSuite, void * inContext)
+TEST(TestBytesToHex, TestHexToBytesAndUint)
 {
     // Different values in each byte and each nibble should let us know if the conversion is correct.
     char hexInLowercase[]      = "0123456789abcdef";
@@ -310,32 +293,32 @@ void TestHexToBytesAndUint(nlTestSuite * inSuite, void * inContext)
 
     // Lower case - bytes.
     memset(buf, 0, sizeof(buf));
-    NL_TEST_ASSERT(inSuite, HexToBytes(hexInLowercase, strlen(hexInLowercase), buf, sizeof(buf)) == sizeof(buf));
-    NL_TEST_ASSERT(inSuite, memcmp(buf, bytesOutExpected, sizeof(buf)) == 0);
+    EXPECT_EQ(HexToBytes(hexInLowercase, strlen(hexInLowercase), buf, sizeof(buf)), sizeof(buf));
+    EXPECT_EQ(memcmp(buf, bytesOutExpected, sizeof(buf)), 0);
 
     // Upper case - bytes.
     memset(buf, 0, sizeof(buf));
-    NL_TEST_ASSERT(inSuite, HexToBytes(hexInUppercase, strlen(hexInUppercase), buf, sizeof(buf)) == sizeof(buf));
-    NL_TEST_ASSERT(inSuite, memcmp(buf, bytesOutExpected, sizeof(buf)) == 0);
+    EXPECT_EQ(HexToBytes(hexInUppercase, strlen(hexInUppercase), buf, sizeof(buf)), sizeof(buf));
+    EXPECT_EQ(memcmp(buf, bytesOutExpected, sizeof(buf)), 0);
 
     // Lower case - uint64_t.
     test64Out = 0;
-    NL_TEST_ASSERT(inSuite, UppercaseHexToUint64(hexInLowercase, strlen(hexInLowercase), test64Out) == 0);
+    EXPECT_EQ(UppercaseHexToUint64(hexInLowercase, strlen(hexInLowercase), test64Out), 0u);
 
     // Upper case - uint64_t.
     test64Out = 0;
-    NL_TEST_ASSERT(inSuite, UppercaseHexToUint64(hexInUppercase, strlen(hexInUppercase), test64Out) == sizeof(uint64_t));
-    NL_TEST_ASSERT(inSuite, test64Out == test64OutExpected);
+    EXPECT_EQ(UppercaseHexToUint64(hexInUppercase, strlen(hexInUppercase), test64Out), sizeof(uint64_t));
+    EXPECT_EQ(test64Out, test64OutExpected);
 
     // Upper case - uint32_t.
     test32Out = 0;
-    NL_TEST_ASSERT(inSuite, UppercaseHexToUint32(hexInUppercase32, strlen(hexInUppercase32), test32Out) == sizeof(uint32_t));
-    NL_TEST_ASSERT(inSuite, test32Out == test32OutExpected);
+    EXPECT_EQ(UppercaseHexToUint32(hexInUppercase32, strlen(hexInUppercase32), test32Out), sizeof(uint32_t));
+    EXPECT_EQ(test32Out, test32OutExpected);
 
     // Upper case - uint16_t.
     test16Out = 0;
-    NL_TEST_ASSERT(inSuite, UppercaseHexToUint16(hexInUppercase16, strlen(hexInUppercase16), test16Out) == sizeof(uint16_t));
-    NL_TEST_ASSERT(inSuite, test16Out == test16OutExpected);
+    EXPECT_EQ(UppercaseHexToUint16(hexInUppercase16, strlen(hexInUppercase16), test16Out), sizeof(uint16_t));
+    EXPECT_EQ(test16Out, test16OutExpected);
 }
 
 #if CHIP_PROGRESS_LOGGING
@@ -351,9 +334,9 @@ ENFORCE_FORMAT(3, 0) void AccumulateLogLineCallback(const char * module, uint8_t
     gRedirectedLogLines.push_back(std::string(line));
 }
 
-void ValidateTextMatches(nlTestSuite * inSuite, const char ** expected, size_t numLines, const std::vector<std::string> & candidate)
+void ValidateTextMatches(const char ** expected, size_t numLines, const std::vector<std::string> & candidate)
 {
-    NL_TEST_ASSERT(inSuite, candidate.size() == numLines);
+    EXPECT_EQ(candidate.size(), numLines);
     if (candidate.size() != numLines)
     {
         return;
@@ -361,7 +344,7 @@ void ValidateTextMatches(nlTestSuite * inSuite, const char ** expected, size_t n
     for (size_t idx = 0; idx < numLines; idx++)
     {
         printf("Checking '%s' against '%s'\n", candidate.at(idx).c_str(), expected[idx]);
-        NL_TEST_ASSERT(inSuite, candidate.at(idx) == expected[idx]);
+        EXPECT_EQ(candidate.at(idx), expected[idx]);
         if (candidate.at(idx) != expected[idx])
         {
             return;
@@ -369,7 +352,7 @@ void ValidateTextMatches(nlTestSuite * inSuite, const char ** expected, size_t n
     }
 }
 
-void TestLogBufferAsHex(nlTestSuite * inSuite, void * inContext)
+TEST(TestBytesToHex, TestLogBufferAsHex)
 {
     const char * kExpectedText1[] = {
         ">>>A54A39294B28886E8BFC15B44105A3FD22745225983A753E6BB82DA7C62493BF",
@@ -425,31 +408,9 @@ void TestLogBufferAsHex(nlTestSuite * inSuite, void * inContext)
             LogBufferAsHex(testCase.label, testCase.buffer);
         }
         chip::Logging::SetLogRedirectCallback(nullptr);
-        ValidateTextMatches(inSuite, testCase.expectedText, testCase.numLines, gRedirectedLogLines);
+        ValidateTextMatches(testCase.expectedText, testCase.numLines, gRedirectedLogLines);
     }
 }
 
 #endif
-
-const nlTest sTests[] = {
-    NL_TEST_DEF("TestBytesToHexNotNullTerminated", TestBytesToHexNotNullTerminated), //
-    NL_TEST_DEF("TestBytesToHexNullTerminated", TestBytesToHexNullTerminated),       //
-    NL_TEST_DEF("TestBytesToHexErrors", TestBytesToHexErrors),                       //
-    NL_TEST_DEF("TestBytesToHexUint64", TestBytesToHexUint64),                       //
-    NL_TEST_DEF("TestHexToBytesAndUint", TestHexToBytesAndUint),                     //
-#if CHIP_PROGRESS_LOGGING
-    NL_TEST_DEF("TestLogBufferAsHex", TestLogBufferAsHex), //
-#endif
-    NL_TEST_SENTINEL() //
-};
-
 } // namespace
-
-int TestBytesToHex()
-{
-    nlTestSuite theSuite = { "BytesToHex", sTests, nullptr, nullptr };
-    nlTestRunner(&theSuite, nullptr);
-    return nlTestRunnerStats(&theSuite);
-}
-
-CHIP_REGISTER_TEST_SUITE(TestBytesToHex)

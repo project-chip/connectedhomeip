@@ -65,16 +65,18 @@ static_library("Darwin") {
     "DnssdImpl.h",
     "DnssdType.cpp",
     "InetPlatformConfig.h",
-    "LoggingImpl.cpp",
     "MdnsError.cpp",
     "MdnsError.h",
     "NetworkCommissioningDriver.h",
     "PlatformManagerImpl.cpp",
     "PlatformManagerImpl.h",
+    "PlatformMetricKeys.h",
     "PosixConfig.cpp",
     "PosixConfig.h",
     "SystemPlatformConfig.h",
     "SystemTimeSupport.cpp",
+    "UserDefaults.h",
+    "UserDefaults.mm",
   ]
 
   if (chip_enable_wifi) {
@@ -97,9 +99,11 @@ static_library("Darwin") {
 
   deps = [
     ":logging",
+    ":tracing",
     "${chip_root}/src/lib/dnssd:platform_header",
     "${chip_root}/src/platform/logging:headers",
     "${chip_root}/src/setup_payload",
+    "${chip_root}/src/tracing",
   ]
 
   public_deps = [
@@ -125,22 +129,36 @@ static_library("Darwin") {
       "BleConnectionDelegateImpl.mm",
       "BlePlatformDelegate.h",
       "BlePlatformDelegateImpl.mm",
-      "UUIDHelper.h",
-      "UUIDHelperImpl.mm",
+      "MTRUUIDHelper.h",
+      "MTRUUIDHelperImpl.mm",
     ]
   }
+}
+
+source_set("tracing") {
+  sources = [
+    "Tracing.h",
+    "Tracing.mm",
+  ]
+
+  deps = [
+    ":logging",
+    "${chip_root}/src/tracing",
+  ]
 }
 
 static_library("logging") {
   sources = [
     "Logging.h",
     "Logging.mm",
+    "LoggingImpl.cpp",
   ]
 
   deps = [
     "${chip_root}/src/lib/support:attributes",
     "${chip_root}/src/lib/support:logging_constants",
     "${chip_root}/src/lib/support:span",
+    "${chip_root}/src/platform/logging:headers",
   ]
 
   configs += [ "${chip_root}/src:includes" ]

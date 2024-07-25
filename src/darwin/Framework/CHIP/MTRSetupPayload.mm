@@ -1,6 +1,6 @@
 /**
  *
- *    Copyright (c) 2020 Project CHIP Authors
+ *    Copyright (c) 2020-2024 Project CHIP Authors
  *
  *    Licensed under the Apache License, Version 2.0 (the "License");
  *    you may not use this file except in compliance with the License.
@@ -15,232 +15,524 @@
  *    limitations under the License.
  */
 
-#import "MTRError.h"
+#import "MTRSetupPayload_Internal.h"
+
 #import "MTRError_Internal.h"
 #import "MTRFramework.h"
-#import "MTROnboardingPayloadParser.h"
-#import "MTRSetupPayload_Internal.h"
-#import "setup_payload/ManualSetupPayloadGenerator.h"
-#import "setup_payload/QRCodeSetupPayloadGenerator.h"
-#import <setup_payload/SetupPayload.h>
+#import "MTRLogging_Internal.h"
+#import "MTRUtilities.h"
 
-@implementation MTROptionalQRCodeInfo
+#include <lib/support/SafeInt.h>
+#include <setup_payload/ManualSetupPayloadGenerator.h>
+#include <setup_payload/ManualSetupPayloadParser.h>
+#include <setup_payload/QRCodeSetupPayloadGenerator.h>
+#include <setup_payload/QRCodeSetupPayloadParser.h>
+#include <setup_payload/SetupPayload.h>
+#include <string>
+
+MTR_DIRECT_MEMBERS
+@implementation MTROptionalQRCodeInfo {
+    chip::OptionalQRCodeInfo _info;
+}
+
+static uint8_t ValidateVendorTag(NSNumber * tag)
+{
+    auto integerValue = tag.integerValue;
+    auto tagValue = static_cast<uint8_t>(integerValue);
+    MTRVerifyArgumentOrDie(tag != nil && chip::CanCastTo<uint8_t>(integerValue) && chip::SetupPayload::IsVendorTag(tagValue), @"tag must be a vendor tag (0x80 - 0xFF)");
+    return tagValue;
+}
+
+- (instancetype)initWithTag:(NSNumber *)tag int32Value:(int32_t)value
+{
+    self = [super init];
+    _info.type = chip::optionalQRCodeInfoTypeInt32;
+    _info.tag = ValidateVendorTag(tag);
+    _info.int32 = value;
+    return self;
+}
+
+- (instancetype)initWithTag:(NSNumber *)tag stringValue:(NSString *)value
+{
+    self = [super init];
+    _info.type = chip::optionalQRCodeInfoTypeString;
+    _info.tag = ValidateVendorTag(tag);
+    MTRVerifyArgumentOrDie(value != nil, @"value");
+    _info.data = value.UTF8String;
+    return self;
+}
+
+- (nullable instancetype)initWithQRCodeInfo:(chip::OptionalQRCodeInfo const &)info
+{
+    self = [super init];
+    _info = info;
+    // Don't expose objects with an out-of-range tag or invalid type
+    VerifyOrReturnValue(chip::SetupPayload::IsVendorTag(_info.tag), nil);
+    VerifyOrReturnValue(self.type != MTROptionalQRCodeInfoTypeUnknown, nil);
+    return self;
+}
+
+- (CHIP_ERROR)addAsVendorElementTo:(chip::SetupPayload &)payload
+{
+    switch (_info.type) {
+    case chip::optionalQRCodeInfoTypeString:
+        return payload.addOptionalVendorData(_info.tag, _info.data);
+    case chip::optionalQRCodeInfoTypeInt32:
+        return payload.addOptionalVendorData(_info.tag, _info.int32);
+    default:
+        return CHIP_ERROR_INCORRECT_STATE;
+    }
+}
+
+- (MTROptionalQRCodeInfoType)type
+{
+    // The way OptionalQRCodeInfo uses what are effectively C type identifiers (uint32 etc)
+    // rather than TLV types is not ideal. If we add support for additional integer types
+    // we should consider replacing MTROptionalQRCodeInfoTypeInt32 with
+    // MTROptionalQRCodeInfoTypeInteger and hiding the low-level C representation.
+    switch (_info.type) {
+    case chip::optionalQRCodeInfoTypeString:
+        return MTROptionalQRCodeInfoTypeString;
+    case chip::optionalQRCodeInfoTypeInt32:
+        return MTROptionalQRCodeInfoTypeInt32;
+    // No 'default:' so we get a warning if new types are added.
+    // Note: isEqual: also switches over these types.
+    // OptionalQRCodeInfo does not support these types
+    case chip::optionalQRCodeInfoTypeInt64:
+    case chip::optionalQRCodeInfoTypeUInt32:
+    case chip::optionalQRCodeInfoTypeUInt64:
+    // We should never see the unknown type
+    case chip::optionalQRCodeInfoTypeUnknown:
+        /* fall through */;
+    }
+    return MTROptionalQRCodeInfoTypeUnknown;
+}
+
+- (NSNumber *)tag
+{
+    return @(_info.tag);
+}
+
+- (NSNumber *)integerValue
+{
+    VerifyOrReturnValue(_info.type == chip::optionalQRCodeInfoTypeInt32, nil);
+    return @(_info.int32);
+}
+
+- (NSString *)stringValue
+{
+    VerifyOrReturnValue(_info.type == chip::optionalQRCodeInfoTypeString, nil);
+    return [NSString stringWithUTF8String:_info.data.c_str()];
+}
+
+- (id)copyWithZone:(NSZone *)zone
+{
+    return self; // immutable
+}
+
+- (NSUInteger)hash
+{
+    return _info.type << 8 | _info.tag;
+}
+
+- (BOOL)isEqual:(id)object
+{
+    VerifyOrReturnValue([object class] == [self class], NO);
+    MTROptionalQRCodeInfo * other = object;
+    VerifyOrReturnValue(_info.tag == other->_info.tag, NO);
+    VerifyOrReturnValue(_info.type == other->_info.type, NO);
+    switch (_info.type) {
+    case chip::optionalQRCodeInfoTypeString:
+        return _info.data == other->_info.data;
+    case chip::optionalQRCodeInfoTypeInt32:
+        return _info.int32 == other->_info.int32;
+    default:
+        return NO; // unreachable, type is checked in init
+    }
+}
+
+- (NSString *)description
+{
+    return [NSString stringWithFormat:@"0x%02x=%@", self.tag.unsignedCharValue, self.integerValue ?: self.stringValue];
+}
+
 @end
 
+static constexpr uint8_t kShortDiscriminatorMask = (1 << chip::SetupDiscriminator::kShortBits) - 1;
+static constexpr uint16_t kLongDiscriminatorMask = (1 << chip::SetupDiscriminator::kLongBits) - 1;
+
+static MTRDiscoveryCapabilities KnownDiscoveryCapabilities(NSUInteger value)
+{
+    // A known but 0 value cannot be represented by MTRDiscoveryCapabilities
+    // since MTRDiscoveryCapabilitiesUnknown represents an absent value.
+    // However such a 0 value is not logically valid, because OnNetwork must
+    // always be supported. So just return that if we get a value of 0.
+    return (value != MTRDiscoveryCapabilitiesUnknown ? value : MTRDiscoveryCapabilitiesOnNetwork);
+}
+
+static NSString * MTRDiscoveryCapabilitiesAsString(MTRDiscoveryCapabilities value)
+{
+    VerifyOrReturnValue(value != MTRDiscoveryCapabilitiesUnknown, @"Unknown");
+    NSMutableString * capabilities = [NSMutableString string];
+    if (value & MTRDiscoveryCapabilitiesSoftAP) {
+        [capabilities appendString:@"|SoftAP"];
+        value &= ~MTRDiscoveryCapabilitiesSoftAP;
+    }
+    if (value & MTRDiscoveryCapabilitiesBLE) {
+        [capabilities appendString:@"|BLE"];
+        value &= ~MTRDiscoveryCapabilitiesBLE;
+    }
+    if (value & MTRDiscoveryCapabilitiesOnNetwork) {
+        [capabilities appendString:@"|OnNetwork"];
+        value &= ~MTRDiscoveryCapabilitiesOnNetwork;
+    }
+    if (value != 0) {
+        [capabilities appendFormat:@"|0x%llx", (unsigned long long) value];
+    }
+    return [capabilities substringFromIndex:1];
+}
+
+MTR_DIRECT_MEMBERS
 @implementation MTRSetupPayload {
-    chip::SetupPayload _chipSetupPayload;
+    // Apart from the additional logic to handle discriminators detailed below,
+    // this class is simply a wrapper around this underlying SetupPayload.
+    chip::SetupPayload _payload;
+
+    // SetupPayload deals with the discriminator value and its shortness as a composite
+    // SetupDiscriminator value, which is arguably a tidier API than letting clients
+    // set a value first and only later tell us whether it's long or short. But that is
+    // what our API does, so we need to continue to support it. To make this work, we
+    // keep track of the potentially-long value that was set by the client.
+    NSNumber * _Nullable _shadowDiscriminator;
 }
 
 + (void)initialize
 {
-    // Need to make sure we set up Platform memory stuff before we start
-    // serializing payloads.
+    // Some aspects of working with chip::SetupPayload use Platform memory primitives.
     MTRFrameworkInit();
 }
 
-- (MTRDiscoveryCapabilities)convertRendezvousFlags:(const chip::Optional<chip::RendezvousInformationFlags> &)value
+- (nullable instancetype)initWithPayload:(NSString *)payload
 {
-    if (!value.HasValue()) {
-        return MTRDiscoveryCapabilitiesUnknown;
-    }
-
-    NSUInteger flags = 0;
-    if (value.Value().Has(chip::RendezvousInformationFlag::kBLE)) {
-        flags |= MTRDiscoveryCapabilitiesBLE;
-    }
-    if (value.Value().Has(chip::RendezvousInformationFlag::kSoftAP)) {
-        flags |= MTRDiscoveryCapabilitiesSoftAP;
-    }
-    if (value.Value().Has(chip::RendezvousInformationFlag::kOnNetwork)) {
-        flags |= MTRDiscoveryCapabilitiesOnNetwork;
-    }
-    if (flags == MTRDiscoveryCapabilitiesUnknown) {
-        // OnNetwork has to be supported!
-        flags = MTRDiscoveryCapabilitiesOnNetwork;
-    }
-    return flags;
+    return ([payload hasPrefix:@"MT:"]) ? [self initWithQRCode:payload] : [self initWithManualPairingCode:payload];
 }
 
-+ (chip::Optional<chip::RendezvousInformationFlags>)convertDiscoveryCapabilities:(MTRDiscoveryCapabilities)value
+- (CHIP_ERROR)initializeFromQRCode:(NSString *)qrCode
 {
-    if (value == MTRDiscoveryCapabilitiesUnknown) {
-        return chip::NullOptional;
-    }
-
-    chip::RendezvousInformationFlags flags;
-    if (value & MTRDiscoveryCapabilitiesBLE) {
-        flags.Set(chip::RendezvousInformationFlag::kBLE);
-    }
-    if (value & MTRDiscoveryCapabilitiesSoftAP) {
-        flags.Set(chip::RendezvousInformationFlag::kSoftAP);
-    }
-    if (value & MTRDiscoveryCapabilitiesOnNetwork) {
-        flags.Set(chip::RendezvousInformationFlag::kOnNetwork);
-    }
-    return chip::MakeOptional(flags);
+    std::string string([(qrCode ?: @"") UTF8String]); // handle nil gracefully
+    chip::QRCodeSetupPayloadParser parser(string);
+    return parser.populatePayload(_payload);
 }
 
-- (MTRCommissioningFlow)convertCommissioningFlow:(chip::CommissioningFlow)value
+- (nullable instancetype)initWithQRCode:(NSString *)qrCodePayload
 {
-    if (value == chip::CommissioningFlow::kStandard) {
-        return MTRCommissioningFlowStandard;
+    self = [super init];
+    CHIP_ERROR err = [self initializeFromQRCode:qrCodePayload];
+    if (err != CHIP_NO_ERROR) {
+        MTR_LOG_ERROR("Failed to parse QR Code payload: %" CHIP_ERROR_FORMAT, err.Format());
+        return nil;
     }
-    if (value == chip::CommissioningFlow::kUserActionRequired) {
-        return MTRCommissioningFlowUserActionRequired;
+    if (!_payload.isValidQRCodePayload(chip::PayloadContents::ValidationMode::kConsume)) {
+        MTR_LOG_ERROR("Invalid QR Code payload");
+        return nil;
     }
-    if (value == chip::CommissioningFlow::kCustom) {
-        return MTRCommissioningFlowCustom;
-    }
-    return MTRCommissioningFlowInvalid;
+
+    return self;
 }
 
-+ (chip::CommissioningFlow)unconvertCommissioningFlow:(MTRCommissioningFlow)value
+- (nullable instancetype)initWithManualPairingCode:(NSString *)manualCode
 {
-    if (value == MTRCommissioningFlowStandard) {
-        return chip::CommissioningFlow::kStandard;
-    }
-    if (value == MTRCommissioningFlowUserActionRequired) {
-        return chip::CommissioningFlow::kUserActionRequired;
-    }
-    if (value == MTRCommissioningFlowCustom) {
-        return chip::CommissioningFlow::kCustom;
-    }
-    // It's MTRCommissioningFlowInvalid ... now what?  But in practice
-    // this is not called when we have MTRCommissioningFlowInvalid.
-    return chip::CommissioningFlow::kStandard;
-}
+    self = [super init];
 
-- (instancetype)initWithSetupPayload:(chip::SetupPayload)setupPayload
-{
-    if (self = [super init]) {
-        _chipSetupPayload = setupPayload;
-        _version = [NSNumber numberWithUnsignedChar:setupPayload.version];
-        _vendorID = [NSNumber numberWithUnsignedShort:setupPayload.vendorID];
-        _productID = [NSNumber numberWithUnsignedShort:setupPayload.productID];
-        _commissioningFlow = [self convertCommissioningFlow:setupPayload.commissioningFlow];
-        _discoveryCapabilities = [self convertRendezvousFlags:setupPayload.rendezvousInformation];
-        _hasShortDiscriminator = setupPayload.discriminator.IsShortDiscriminator();
-        if (_hasShortDiscriminator) {
-            _discriminator = [NSNumber numberWithUnsignedShort:setupPayload.discriminator.GetShortValue()];
-        } else {
-            _discriminator = [NSNumber numberWithUnsignedShort:setupPayload.discriminator.GetLongValue()];
-        }
-        _setupPasscode = [NSNumber numberWithUnsignedInt:setupPayload.setUpPINCode];
-
-        [self getSerialNumber:setupPayload];
+    std::string string([(manualCode ?: @"") UTF8String]); // handle nil gracefully
+    chip::ManualSetupPayloadParser parser(string);
+    CHIP_ERROR err = parser.populatePayload(_payload);
+    if (err != CHIP_NO_ERROR) {
+        MTR_LOG_ERROR("Failed to parse Manual Pairing Code: %" CHIP_ERROR_FORMAT, err.Format());
+        return nil;
     }
+    if (!_payload.isValidManualCode(chip::PayloadContents::ValidationMode::kConsume)) {
+        MTR_LOG_ERROR("Invalid Manual Pairing Code");
+        return nil;
+    }
+
     return self;
 }
 
 - (instancetype)initWithSetupPasscode:(NSNumber *)setupPasscode discriminator:(NSNumber *)discriminator
 {
-    if (self = [super init]) {
-        _version = @(0); // Only supported Matter version so far.
-        _vendorID = @(0); // Not available.
-        _productID = @(0); // Not available.
-        _commissioningFlow = MTRCommissioningFlowStandard;
-        // We are using a long discriminator, so have to have a known
-        // discoveryCapabilities to be a valid payload.  Just default to "try
-        // all discovery methods".
-        _discoveryCapabilities = MTRDiscoveryCapabilitiesAllMask;
-        _hasShortDiscriminator = NO;
-        _discriminator = discriminator;
-        _setupPasscode = setupPasscode;
-        _serialNumber = nil;
-    }
+    self = [super init];
+
+    // A default-constructed SetupPayload already has most of the expected
+    // default values. Set discoveryCapabilities to "all known methods" so
+    // we're representing a valid QR Code payload.
+    self.setupPasscode = setupPasscode;
+    self.discriminator = discriminator;
+    self.discoveryCapabilities = MTRDiscoveryCapabilitiesAllMask;
+
     return self;
 }
 
-- (void)getSerialNumber:(chip::SetupPayload)setupPayload
+- (instancetype)initWithSetupPayload:(chip::SetupPayload)setupPayload
 {
-    std::string serialNumberC;
-    CHIP_ERROR err = setupPayload.getSerialNumber(serialNumberC);
-    if (err == CHIP_NO_ERROR) {
-        _serialNumber = [NSString stringWithUTF8String:serialNumberC.c_str()];
-    }
+    self = [super init];
+    _payload = setupPayload;
+    return self;
 }
 
-- (NSArray<MTROptionalQRCodeInfo *> *)getAllOptionalVendorData:(NSError * __autoreleasing *)error
+#pragma mark - Mutable properties
+
+- (NSNumber *)version
 {
-    NSMutableArray<MTROptionalQRCodeInfo *> * allOptionalData = [NSMutableArray new];
-    std::vector<chip::OptionalQRCodeInfo> chipOptionalData = _chipSetupPayload.getAllOptionalVendorData();
-    for (chip::OptionalQRCodeInfo chipInfo : chipOptionalData) {
-        MTROptionalQRCodeInfo * info = [MTROptionalQRCodeInfo new];
-        info.tag = [NSNumber numberWithUnsignedChar:chipInfo.tag];
-        switch (chipInfo.type) {
-        case chip::optionalQRCodeInfoTypeString:
-            info.type = MTROptionalQRCodeInfoTypeString;
-            info.stringValue = [NSString stringWithUTF8String:chipInfo.data.c_str()];
-            break;
-        case chip::optionalQRCodeInfoTypeInt32:
-            info.type = MTROptionalQRCodeInfoTypeInt32;
-            info.integerValue = [NSNumber numberWithInt:chipInfo.int32];
-            break;
-        default:
-            if (error) {
-                *error = [NSError errorWithDomain:MTRErrorDomain code:MTRErrorCodeInvalidArgument userInfo:nil];
-            }
-            return @[];
-        }
-        [allOptionalData addObject:info];
-    }
-    return allOptionalData;
+    return @(_payload.version);
 }
 
-+ (NSUInteger)generateRandomPIN
+- (void)setVersion:(NSNumber *)version
 {
-    return [[MTRSetupPayload generateRandomSetupPasscode] unsignedIntValue];
+    _payload.version = static_cast<decltype(_payload.version)>(version.unsignedIntegerValue);
 }
 
-+ (NSNumber *)generateRandomSetupPasscode
+- (NSNumber *)vendorID
 {
-    do {
-        // Make sure the thing we generate is in the right range.
-        uint32_t setupPIN = arc4random_uniform(chip::kSetupPINCodeMaximumValue) + 1;
-        if (chip::SetupPayload::IsValidSetupPIN(setupPIN)) {
-            return @(setupPIN);
-        }
-
-        // We got pretty unlikely with our random number generation.  Just try
-        // again.  The chance that this loop does not terminate in a reasonable
-        // amount of time is astronomically low, assuming arc4random_uniform is not
-        // broken.
-    } while (true);
-
-    // Not reached.
-    return @(chip::kSetupPINCodeUndefinedValue);
+    return @(_payload.vendorID);
 }
 
-+ (bool)isQRCode:(NSString *)onboardingPayload
+- (void)setVendorID:(NSNumber *)vendorID
 {
-    return [onboardingPayload hasPrefix:@"MT:"];
+    _payload.vendorID = static_cast<decltype(_payload.vendorID)>(vendorID.unsignedIntegerValue);
 }
 
-+ (MTRSetupPayload * _Nullable)setupPayloadWithOnboardingPayload:(NSString *)onboardingPayload
-                                                           error:(NSError * __autoreleasing *)error
+- (NSNumber *)productID
 {
-    // TODO: Do we actually need the MTROnboardingPayloadParser abstraction?
-    MTRSetupPayload * payload = [MTROnboardingPayloadParser setupPayloadForOnboardingPayload:onboardingPayload error:error];
-    if (payload == nil) {
-        return nil;
-    }
+    return @(_payload.productID);
+}
 
-    bool isQRCode = [MTRSetupPayload isQRCode:onboardingPayload];
-    bool validPayload;
-    if (isQRCode) {
-        validPayload = payload->_chipSetupPayload.isValidQRCodePayload();
+- (void)setProductID:(NSNumber *)productID
+{
+    _payload.productID = static_cast<decltype(_payload.productID)>(productID.unsignedIntegerValue);
+}
+
+- (MTRCommissioningFlow)commissioningFlow
+{
+    // To avoid ending up with special logic to handle MTRCommissioningFlowInvalid,
+    // we simply cast between MTRCommissioningFlow and chip::CommissioningFlow.
+    // Both types represent the same set of values defined in the Matter spec.
+    using chip::CommissioningFlow;
+    static_assert(static_cast<CommissioningFlow>(MTRCommissioningFlowStandard) == CommissioningFlow::kStandard);
+    static_assert(static_cast<CommissioningFlow>(MTRCommissioningFlowUserActionRequired) == CommissioningFlow::kUserActionRequired);
+    static_assert(static_cast<CommissioningFlow>(MTRCommissioningFlowCustom) == CommissioningFlow::kCustom);
+    return static_cast<MTRCommissioningFlow>(_payload.commissioningFlow);
+}
+
+- (void)setCommissioningFlow:(MTRCommissioningFlow)commissioningFlow
+{
+    _payload.commissioningFlow = static_cast<chip::CommissioningFlow>(commissioningFlow);
+}
+
+- (MTRDiscoveryCapabilities)discoveryCapabilities
+{
+    VerifyOrReturnValue(_payload.rendezvousInformation.HasValue(), MTRDiscoveryCapabilitiesUnknown);
+
+    // MTRDiscoveryCapabilities and chip::RendezvousInformationFlag represent
+    // the same set of bit flags from the Matter spec, so we can simply cast.
+    using RendezvousFlag = chip::RendezvousInformationFlag;
+    static_assert(static_cast<RendezvousFlag>(MTRDiscoveryCapabilitiesSoftAP) == RendezvousFlag::kSoftAP);
+    static_assert(static_cast<RendezvousFlag>(MTRDiscoveryCapabilitiesBLE) == RendezvousFlag::kBLE);
+    static_assert(static_cast<RendezvousFlag>(MTRDiscoveryCapabilitiesOnNetwork) == RendezvousFlag::kOnNetwork);
+    auto value = static_cast<MTRDiscoveryCapabilities>(_payload.rendezvousInformation.Value().Raw());
+
+    // Ensure a known (HasValue()) but 0 value does not map to MTRDiscoveryCapabilitiesUnknown.
+    return KnownDiscoveryCapabilities(value);
+}
+
+- (void)setDiscoveryCapabilities:(MTRDiscoveryCapabilities)discoveryCapabilities
+{
+    if (discoveryCapabilities == MTRDiscoveryCapabilitiesUnknown) {
+        _payload.rendezvousInformation.ClearValue();
     } else {
-        validPayload = payload->_chipSetupPayload.isValidManualCode();
+        auto flags = static_cast<chip::RendezvousInformationFlags::IntegerType>(discoveryCapabilities);
+        _payload.rendezvousInformation.SetValue(chip::RendezvousInformationFlags(flags));
     }
+}
 
-    if (!validPayload) {
-        if (error) {
-            *error = [MTRError errorForCHIPErrorCode:CHIP_ERROR_INVALID_ARGUMENT logContext:onboardingPayload];
+- (NSNumber *)discriminator
+{
+    VerifyOrReturnValue(_shadowDiscriminator == nil, _shadowDiscriminator);
+    auto & pd = _payload.discriminator;
+    return @(pd.IsShortDiscriminator() ? pd.GetShortValue() : pd.GetLongValue());
+}
+
+- (void)setDiscriminator:(uint16_t)discriminator isShort:(BOOL)isShort
+{
+    if (isShort) {
+        _payload.discriminator.SetShortValue(discriminator & kShortDiscriminatorMask);
+        _shadowDiscriminator = @(discriminator); // keep as a shadow value
+    } else {
+        _payload.discriminator.SetLongValue(discriminator);
+        _shadowDiscriminator = nil; // no need to keep a shadow copy
+    }
+}
+
+- (void)setDiscriminator:(NSNumber *)discriminator
+{
+    // Truncate down to the range of a long discriminator. Then update
+    // our SetupPayload with the value, but keep the current shortness.
+    uint16_t value = discriminator.unsignedIntegerValue & kLongDiscriminatorMask;
+    [self setDiscriminator:value isShort:self.hasShortDiscriminator];
+}
+
+- (BOOL)hasShortDiscriminator
+{
+    return _payload.discriminator.IsShortDiscriminator();
+}
+
+- (void)setHasShortDiscriminator:(BOOL)hasShortDiscriminator
+{
+    VerifyOrReturn(hasShortDiscriminator != self.hasShortDiscriminator);
+    [self setDiscriminator:self.discriminator.unsignedShortValue isShort:hasShortDiscriminator];
+}
+
+- (NSNumber *)setupPasscode
+{
+    return @(_payload.setUpPINCode);
+}
+
+- (void)setSetupPasscode:(NSNumber *)setupPasscode
+{
+    _payload.setUpPINCode = static_cast<decltype(_payload.setUpPINCode)>(setupPasscode.unsignedIntegerValue);
+}
+
+- (nullable NSString *)serialNumber
+{
+    std::string value;
+    VerifyOrReturnValue(_payload.getSerialNumber(value) == CHIP_NO_ERROR, nil);
+    return [NSString stringWithUTF8String:value.c_str()];
+}
+
+- (void)setSerialNumber:(nullable NSString *)serialNumber
+{
+    if (serialNumber) {
+        NSString * existing = self.serialNumber;
+        if (existing) {
+            // The underlying TLV tag can be encoded as either a string or an integer,
+            // avoid changing it if the represented serial number is not changing.
+            VerifyOrReturn(![existing isEqualToString:serialNumber]);
+            _payload.removeSerialNumber();
         }
-        return nil;
+        CHIP_ERROR err = _payload.addSerialNumber(serialNumber.UTF8String);
+        if (err != CHIP_NO_ERROR) {
+            MTR_LOG_ERROR("Ignoring unexpected error in SetupPayload::addSerialNumber: %" CHIP_ERROR_FORMAT, err.Format());
+        }
+    } else {
+        _payload.removeSerialNumber();
+    }
+}
+
+- (NSArray<MTROptionalQRCodeInfo *> *)vendorElements
+{
+    std::vector<chip::OptionalQRCodeInfo> elements = _payload.getAllOptionalVendorData();
+    VerifyOrReturnValue(!elements.empty(), @[]);
+    NSMutableArray<MTROptionalQRCodeInfo *> * infos = [[NSMutableArray alloc] initWithCapacity:elements.size()];
+    for (auto const & element : elements) {
+        MTROptionalQRCodeInfo * info = [[MTROptionalQRCodeInfo alloc] initWithQRCodeInfo:element];
+        if (info != nil) { // ignore invalid elements (there shouldn't be any)
+            [infos addObject:info];
+        }
+    }
+    return infos;
+}
+
+- (MTROptionalQRCodeInfo *)vendorElementWithTag:(NSNumber *)tag
+{
+    chip::OptionalQRCodeInfo element;
+    VerifyOrReturnValue(_payload.getOptionalVendorData(ValidateVendorTag(tag), element) == CHIP_NO_ERROR, nil);
+    return [[MTROptionalQRCodeInfo alloc] initWithQRCodeInfo:element];
+}
+
+- (void)removeVendorElementWithTag:(NSNumber *)tag
+{
+    _payload.removeOptionalVendorData(ValidateVendorTag(tag));
+}
+
+- (void)addOrReplaceVendorElement:(MTROptionalQRCodeInfo *)element
+{
+    MTRVerifyArgumentOrDie(element != nil, @"element");
+    CHIP_ERROR err = [element addAsVendorElementTo:_payload];
+    VerifyOrDieWithMsg(err == CHIP_NO_ERROR, NotSpecified, "Internal error: %" CHIP_ERROR_FORMAT, err.Format());
+}
+
+#pragma mark - Export methods
+
+- (nullable NSString *)manualEntryCode
+{
+    chip::ManualSetupPayloadGenerator generator(_payload);
+    std::string result;
+    VerifyOrReturnValue(generator.payloadDecimalStringRepresentation(result) == CHIP_NO_ERROR, nil);
+    return [NSString stringWithUTF8String:result.c_str()];
+}
+
+- (nullable NSString *)qrCodeString
+{
+    return [self qrCodeStringSkippingValidation:NO];
+}
+
+- (nullable NSString *)qrCodeStringSkippingValidation:(BOOL)allowInvalid
+{
+    chip::QRCodeSetupPayloadGenerator generator(_payload);
+    generator.SetAllowInvalidPayload(allowInvalid);
+    std::string result;
+    CHIP_ERROR err = generator.payloadBase38RepresentationWithAutoTLVBuffer(result);
+    if (allowInvalid) {
+        // Encoding should always work if invalid payloads are allowed
+        VerifyOrDieWithMsg(err == CHIP_NO_ERROR, NotSpecified, "Internal error: %" CHIP_ERROR_FORMAT, err.Format());
+    } else {
+        VerifyOrReturnValue(err == CHIP_NO_ERROR, nil);
+    }
+    return [NSString stringWithUTF8String:result.c_str()];
+}
+
+#pragma mark - Miscellaneous
+
+- (id)copyWithZone:(NSZone *)zone
+{
+    MTRSetupPayload * copy = [[MTRSetupPayload alloc] initWithSetupPayload:_payload];
+    copy->_shadowDiscriminator = _shadowDiscriminator;
+    return copy;
+}
+
+- (NSUInteger)hash
+{
+    return self.discriminator.unsignedIntegerValue;
+}
+
+- (BOOL)isEqual:(id)object
+{
+    VerifyOrReturnValue([object class] == [self class], NO);
+    MTRSetupPayload * other = object;
+    VerifyOrReturnValue(_payload == other->_payload, NO);
+    VerifyOrReturnValue(MTREqualObjects(_shadowDiscriminator, other->_shadowDiscriminator), NO);
+    return YES;
+}
+
+- (NSString *)description
+{
+    // Note: The description does not include the passcode for security reasons!
+
+    NSMutableString * result = [NSMutableString stringWithFormat:@"<MTRSetupPayload: discriminator=0x%0*x",
+                                                (self.hasShortDiscriminator ? 1 : 3), self.discriminator.unsignedIntValue];
+
+    auto capabilities = self.discoveryCapabilities;
+    if (capabilities != MTRDiscoveryCapabilitiesUnknown) {
+        [result appendFormat:@" discoveryCapabilities=%@", MTRDiscoveryCapabilitiesAsString(capabilities)];
     }
 
-    return payload;
+    auto flow = self.commissioningFlow;
+    if (flow != MTRCommissioningFlowStandard) {
+        [result appendFormat:@" commissioningFlow=0x%llx", (unsigned long long) flow];
+    }
+
+    [result appendString:@">"];
+    return result;
 }
 
 #pragma mark - NSSecureCoding
@@ -249,11 +541,12 @@ static NSString * const MTRSetupPayloadCodingKeyVersion = @"MTRSP.ck.version";
 static NSString * const MTRSetupPayloadCodingKeyVendorID = @"MTRSP.ck.vendorID";
 static NSString * const MTRSetupPayloadCodingKeyProductID = @"MTRSP.ck.productID";
 static NSString * const MTRSetupPayloadCodingKeyCommissioningFlow = @"MTRSP.ck.commissioningFlow";
-static NSString * const MTRSetupPayloadCodingKeyDiscoveryCapabilities = @"MTRSP.ck.rendezvousFlags";
+static NSString * const MTRSetupPayloadCodingKeyRendevouzInformation = @"MTRSP.ck.rendezvousFlags";
 static NSString * const MTRSetupPayloadCodingKeyHasShortDiscriminator = @"MTRSP.ck.hasShortDiscriminator";
 static NSString * const MTRSetupPayloadCodingKeyDiscriminator = @"MTRSP.ck.discriminator";
 static NSString * const MTRSetupPayloadCodingKeySetupPasscode = @"MTRSP.ck.setupPINCode";
 static NSString * const MTRSetupPayloadCodingKeySerialNumber = @"MTRSP.ck.serialNumber";
+static NSString * const MTRSetupPayloadCodingKeyQRCode = @"qr";
 
 + (BOOL)supportsSecureCoding
 {
@@ -262,161 +555,89 @@ static NSString * const MTRSetupPayloadCodingKeySerialNumber = @"MTRSP.ck.serial
 
 - (void)encodeWithCoder:(NSCoder *)coder
 {
+    [coder encodeObject:[self qrCodeStringSkippingValidation:YES] forKey:MTRSetupPayloadCodingKeyQRCode];
     [coder encodeObject:self.version forKey:MTRSetupPayloadCodingKeyVersion];
     [coder encodeObject:self.vendorID forKey:MTRSetupPayloadCodingKeyVendorID];
     [coder encodeObject:self.productID forKey:MTRSetupPayloadCodingKeyProductID];
-    // Casts are safe because commissioning flow, discoveryCapabilities, and
-    // hasShortDiscriminator values are all pretty small and non-negative.
-    [coder encodeInteger:static_cast<NSInteger>(self.commissioningFlow) forKey:MTRSetupPayloadCodingKeyCommissioningFlow];
-    // We used to encode the discovery capabilities as an NSNumber object, with
-    // nil representing "unknown".  Keep doing that, for backwards compat.
-    [coder encodeObject:[MTRSetupPayload _boxDiscoveryCapabilities:self.discoveryCapabilities]
-                 forKey:MTRSetupPayloadCodingKeyDiscoveryCapabilities];
-    [coder encodeInteger:static_cast<NSInteger>(self.hasShortDiscriminator) forKey:MTRSetupPayloadCodingKeyHasShortDiscriminator];
+    [coder encodeInteger:self.commissioningFlow forKey:MTRSetupPayloadCodingKeyCommissioningFlow];
+    // For compatibility reasons, keep encoding rendevouzInformation instead of discoveryCapabilities
+    [coder encodeObject:self.rendezvousInformation forKey:MTRSetupPayloadCodingKeyRendevouzInformation];
+    [coder encodeInteger:(self.hasShortDiscriminator ? 1 : 0) forKey:MTRSetupPayloadCodingKeyHasShortDiscriminator];
     [coder encodeObject:self.discriminator forKey:MTRSetupPayloadCodingKeyDiscriminator];
     [coder encodeObject:self.setupPasscode forKey:MTRSetupPayloadCodingKeySetupPasscode];
     [coder encodeObject:self.serialNumber forKey:MTRSetupPayloadCodingKeySerialNumber];
 }
 
-- (instancetype _Nullable)initWithCoder:(NSCoder *)decoder
+- (instancetype)initWithCoder:(NSCoder *)coder
 {
-    NSNumber * version = [decoder decodeObjectOfClass:[NSNumber class] forKey:MTRSetupPayloadCodingKeyVersion];
-    NSNumber * vendorID = [decoder decodeObjectOfClass:[NSNumber class] forKey:MTRSetupPayloadCodingKeyVendorID];
-    NSNumber * productID = [decoder decodeObjectOfClass:[NSNumber class] forKey:MTRSetupPayloadCodingKeyProductID];
-    NSInteger commissioningFlow = [decoder decodeIntegerForKey:MTRSetupPayloadCodingKeyCommissioningFlow];
-    MTRDiscoveryCapabilities discoveryCapabilities =
-        [MTRSetupPayload _unboxDiscoveryCapabilities:[decoder decodeObjectOfClass:[NSNumber class]
-                                                                           forKey:MTRSetupPayloadCodingKeyDiscoveryCapabilities]];
-    NSInteger hasShortDiscriminator = [decoder decodeIntegerForKey:MTRSetupPayloadCodingKeyHasShortDiscriminator];
-    NSNumber * discriminator = [decoder decodeObjectOfClass:[NSNumber class] forKey:MTRSetupPayloadCodingKeyDiscriminator];
-    NSNumber * setupPasscode = [decoder decodeObjectOfClass:[NSNumber class] forKey:MTRSetupPayloadCodingKeySetupPasscode];
-    NSString * serialNumber = [decoder decodeObjectOfClass:[NSString class] forKey:MTRSetupPayloadCodingKeySerialNumber];
+    self = [super init];
 
-    MTRSetupPayload * payload = [[MTRSetupPayload alloc] init];
-    payload.version = version;
-    payload.vendorID = vendorID;
-    payload.productID = productID;
-    payload.commissioningFlow = static_cast<MTRCommissioningFlow>(commissioningFlow);
-    payload.discoveryCapabilities = discoveryCapabilities;
-    payload.hasShortDiscriminator = static_cast<BOOL>(hasShortDiscriminator);
-    payload.discriminator = discriminator;
-    payload.setupPasscode = setupPasscode;
-    payload.serialNumber = serialNumber;
-
-    return payload;
-}
-
-- (NSString * _Nullable)manualEntryCode
-{
-    CHIP_ERROR err = CHIP_NO_ERROR;
-    std::string outDecimalString;
-    chip::SetupPayload payload;
-
-    /// The 11 digit manual pairing code only requires the version, VID_PID present flag,
-    /// discriminator, and the setup pincode.
-    payload.version = [self.version unsignedCharValue];
-    if (self.hasShortDiscriminator) {
-        payload.discriminator.SetShortValue([self.discriminator unsignedCharValue]);
+    // We can't rely on the QR code to be present because older versions of this class
+    // did not encode it. When present, it carries almost the entire state of the object.
+    NSString * qrCode = [coder decodeObjectOfClass:NSString.class forKey:MTRSetupPayloadCodingKeyQRCode];
+    if (qrCode != nil) {
+        [self initializeFromQRCode:qrCode];
     } else {
-        payload.discriminator.SetLongValue([self.discriminator unsignedShortValue]);
-    }
-    payload.setUpPINCode = [self.setupPasscode unsignedIntValue];
-
-    err = chip::ManualSetupPayloadGenerator(payload).payloadDecimalStringRepresentation(outDecimalString);
-
-    if (err != CHIP_NO_ERROR) {
-        return nil;
+        self.version = [coder decodeObjectOfClass:NSNumber.class forKey:MTRSetupPayloadCodingKeyVersion];
+        self.vendorID = [coder decodeObjectOfClass:NSNumber.class forKey:MTRSetupPayloadCodingKeyVendorID];
+        self.productID = [coder decodeObjectOfClass:NSNumber.class forKey:MTRSetupPayloadCodingKeyProductID];
+        self.commissioningFlow = static_cast<MTRCommissioningFlow>([coder decodeIntegerForKey:MTRSetupPayloadCodingKeyCommissioningFlow]);
+        self.setupPasscode = [coder decodeObjectOfClass:NSNumber.class forKey:MTRSetupPayloadCodingKeySetupPasscode];
+        self.serialNumber = [coder decodeObjectOfClass:NSString.class forKey:MTRSetupPayloadCodingKeySerialNumber];
     }
 
-    return [NSString stringWithUTF8String:outDecimalString.c_str()];
+    // The QR code cannot represent short discriminators or the absence of rendevouz
+    //  information, so always decode the state of those properties separately.
+    self.hasShortDiscriminator = ([coder decodeIntegerForKey:MTRSetupPayloadCodingKeyHasShortDiscriminator] != 0);
+    self.discriminator = [coder decodeObjectOfClass:NSNumber.class forKey:MTRSetupPayloadCodingKeyDiscriminator];
+    // For compatibility reasons, keep decoding rendevouzInformation instead of discoveryCapabilities
+    self.rendezvousInformation = [coder decodeObjectOfClass:NSNumber.class forKey:MTRSetupPayloadCodingKeyRendevouzInformation];
+
+    return self;
 }
 
-- (NSString * _Nullable)qrCodeString:(NSError * __autoreleasing *)error
+#pragma mark - Utility class methods
+
++ (NSUInteger)generateRandomPIN
 {
-    if (self.commissioningFlow == MTRCommissioningFlowInvalid) {
-        // No idea how to map this to the standard codes.
-        if (error != nil) {
-            *error = [MTRError errorForCHIPErrorCode:CHIP_ERROR_INCORRECT_STATE logContext:@"invalid flow"];
+    do {
+        // Make sure the thing we generate is in the right range.
+        uint32_t setupPIN = arc4random_uniform(chip::kSetupPINCodeMaximumValue) + 1;
+        if (chip::SetupPayload::IsValidSetupPIN(setupPIN)) {
+            return setupPIN;
         }
-        return nil;
-    }
 
-    if (self.hasShortDiscriminator) {
-        // Can't create a QR code with a short discriminator.
-        if (error != nil) {
-            *error = [MTRError errorForCHIPErrorCode:CHIP_ERROR_INCORRECT_STATE logContext:@"cannot create a QR code with a short descrimintor"];
-        }
-        return nil;
-    }
-
-    if (self.discoveryCapabilities == MTRDiscoveryCapabilitiesUnknown) {
-        // Can't create a QR code if we don't know the discovery capabilities.
-        if (error != nil) {
-            *error = [MTRError errorForCHIPErrorCode:CHIP_ERROR_INCORRECT_STATE logContext:@"cannot create a QR code with unknown discovery capabilities"];
-        }
-        return nil;
-    }
-
-    chip::SetupPayload payload;
-
-    payload.version = [self.version unsignedCharValue];
-    payload.vendorID = [self.vendorID unsignedShortValue];
-    payload.productID = [self.productID unsignedShortValue];
-    payload.commissioningFlow = [MTRSetupPayload unconvertCommissioningFlow:self.commissioningFlow];
-    payload.rendezvousInformation = [MTRSetupPayload convertDiscoveryCapabilities:self.discoveryCapabilities];
-    payload.discriminator.SetLongValue([self.discriminator unsignedShortValue]);
-    payload.setUpPINCode = [self.setupPasscode unsignedIntValue];
-    if (self.serialNumber != nil) {
-        CHIP_ERROR err = payload.addSerialNumber(self.serialNumber.UTF8String);
-        if (err != CHIP_NO_ERROR) {
-            if (error != nil) {
-                *error = [MTRError errorForCHIPErrorCode:err];
-            }
-            return nil;
-        }
-    }
-
-    std::string outQRCodeString;
-    CHIP_ERROR err = chip::QRCodeSetupPayloadGenerator(payload).payloadBase38RepresentationWithAutoTLVBuffer(outQRCodeString);
-
-    if (err != CHIP_NO_ERROR) {
-        if (error != nil) {
-            *error = [MTRError errorForCHIPErrorCode:err];
-        }
-        return nil;
-    }
-
-    return [NSString stringWithUTF8String:outQRCodeString.c_str()];
+        // We got pretty unlikely with our random number generation.  Just try
+        // again.  The chance that this loop does not terminate in a reasonable
+        // amount of time is astronomically low, assuming arc4random_uniform is not
+        // broken.
+    } while (true);
 }
 
-+ (nullable NSNumber *)_boxDiscoveryCapabilities:(MTRDiscoveryCapabilities)discoveryCapabilities
++ (NSNumber *)generateRandomSetupPasscode
 {
-    if (discoveryCapabilities == MTRDiscoveryCapabilitiesUnknown) {
-        return nil;
-    }
-
-    return @(discoveryCapabilities);
-}
-
-+ (MTRDiscoveryCapabilities)_unboxDiscoveryCapabilities:(nullable NSNumber *)boxedDiscoveryCapabilities
-{
-    if (boxedDiscoveryCapabilities == nil) {
-        return MTRDiscoveryCapabilitiesUnknown;
-    }
-
-    NSUInteger value = [boxedDiscoveryCapabilities unsignedIntegerValue];
-    if (value == MTRDiscoveryCapabilitiesUnknown) {
-        // The discovery capabilities were actually known
-        // (rendezvousInformation is not nil), and must support on-network.
-        return MTRDiscoveryCapabilitiesOnNetwork;
-    }
-
-    return static_cast<MTRDiscoveryCapabilities>(value);
+    return @([self generateRandomPIN]);
 }
 
 @end
 
+MTR_DIRECT_MEMBERS
 @implementation MTROptionalQRCodeInfo (Deprecated)
+
+- (instancetype)init
+{
+    return [self initWithTag:@0xff stringValue:@""];
+}
+
+- (void)setType:(MTROptionalQRCodeInfoType)type
+{
+    /* ignored */
+}
+
+- (void)setTag:(NSNumber *)tag
+{
+    /* ignored */
+}
 
 - (NSNumber *)infoType
 {
@@ -425,21 +646,57 @@ static NSString * const MTRSetupPayloadCodingKeySerialNumber = @"MTRSP.ck.serial
 
 - (void)setInfoType:(NSNumber *)infoType
 {
-    self.type = static_cast<MTROptionalQRCodeInfoType>([infoType unsignedIntegerValue]);
+    /* ignored */
+}
+
+- (void)setIntegerValue:(NSNumber *)integerValue
+{
+    /* ignored */
+}
+
+- (void)setStringValue:(NSString *)stringValue
+{
+    /* ignored */
 }
 
 @end
 
+MTR_DIRECT_MEMBERS
 @implementation MTRSetupPayload (Deprecated)
+
+- (instancetype)init
+{
+    return [super init]; // a default-constructed SetupPayload is fine here
+}
+
++ (instancetype)new
+{
+    return [super new];
+}
+
++ (MTRSetupPayload * _Nullable)setupPayloadWithOnboardingPayload:(NSString *)onboardingPayload
+                                                           error:(NSError * __autoreleasing *)error
+{
+    MTRSetupPayload * payload = [[MTRSetupPayload alloc] initWithPayload:onboardingPayload];
+    if (!payload && error) {
+        *error = [MTRError errorWithCode:MTRErrorCodeInvalidArgument];
+    }
+    return payload;
+}
 
 - (nullable NSNumber *)rendezvousInformation
 {
-    return [MTRSetupPayload _boxDiscoveryCapabilities:self.discoveryCapabilities];
+    auto value = self.discoveryCapabilities;
+    return (value != MTRDiscoveryCapabilitiesUnknown) ? @(value) : nil;
 }
 
 - (void)setRendezvousInformation:(nullable NSNumber *)rendezvousInformation
 {
-    self.discoveryCapabilities = [MTRSetupPayload _unboxDiscoveryCapabilities:rendezvousInformation];
+    if (rendezvousInformation != nil) {
+        self.discoveryCapabilities = KnownDiscoveryCapabilities(rendezvousInformation.unsignedIntegerValue);
+    } else {
+        self.discoveryCapabilities = MTRDiscoveryCapabilitiesUnknown;
+    }
 }
 
 - (NSNumber *)setUpPINCode
@@ -452,26 +709,18 @@ static NSString * const MTRSetupPayloadCodingKeySerialNumber = @"MTRSP.ck.serial
     self.setupPasscode = setUpPINCode;
 }
 
-- (instancetype)init
+- (nullable NSString *)qrCodeString:(NSError * __autoreleasing _Nullable *)error
 {
-    if (self = [super init]) {
-        _version = @(0); // Only supported Matter version so far.
-        _vendorID = @(0); // Not available.
-        _productID = @(0); // Not available.
-        _commissioningFlow = MTRCommissioningFlowStandard;
-        _discoveryCapabilities = MTRDiscoveryCapabilitiesUnknown;
-        _hasShortDiscriminator = NO;
-        _discriminator = @(0);
-        _setupPasscode = @(11111111); // Invalid passcode
-        _serialNumber = nil;
+    NSString * result = [self qrCodeString];
+    if (!result && error) {
+        *error = [MTRError errorForCHIPErrorCode:CHIP_ERROR_INCORRECT_STATE];
     }
-
-    return self;
+    return result;
 }
 
-+ (instancetype)new
+- (NSArray<MTROptionalQRCodeInfo *> *)getAllOptionalVendorData:(NSError * __autoreleasing *)error
 {
-    return [[self alloc] init];
+    return self.vendorElements; // never actually fails
 }
 
 @end

@@ -74,14 +74,10 @@ static_library("Linux") {
   ]
 
   deps = [
+    "${chip_root}/src/app/icd/server:icd-server-config",
     "${chip_root}/src/credentials:credentials_header",
     "${chip_root}/src/setup_payload",
   ]
-
-  if (!chip_use_external_logging) {
-    sources += [ "Logging.cpp" ]
-    deps += [ "${chip_root}/src/platform/logging:headers" ]
-  }
 
   if (chip_enable_openthread) {
     sources += [ "NetworkCommissioningThreadDriver.cpp" ]
@@ -102,6 +98,8 @@ static_library("Linux") {
       "bluez/BluezEndpoint.h",
       "bluez/BluezObjectIterator.h",
       "bluez/BluezObjectList.h",
+      "bluez/BluezObjectManager.cpp",
+      "bluez/BluezObjectManager.h",
       "bluez/ChipDeviceScanner.cpp",
       "bluez/ChipDeviceScanner.h",
       "bluez/Types.h",
@@ -156,4 +154,17 @@ static_library("Linux") {
   if (chip_enable_ble) {
     public_deps += [ "dbus/bluez" ]
   }
+}
+
+source_set("logging") {
+  deps = [
+    "${chip_root}/src/platform:platform_base",
+    "${chip_root}/src/platform/logging:headers",
+  ]
+
+  if (chip_use_pw_logging) {
+    deps += [ "$dir_pw_log" ]
+  }
+
+  sources = [ "Logging.cpp" ]
 }

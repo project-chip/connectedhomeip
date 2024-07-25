@@ -22,346 +22,327 @@
  *
  */
 
-#include <lib/support/SafeInt.h>
-#include <lib/support/UnitTestRegistration.h>
+#include <pw_unit_test/framework.h>
 
-#include <nlunit-test.h>
+#include <lib/core/StringBuilderAdapters.h>
+#include <lib/support/SafeInt.h>
 
 using namespace chip;
 
-static void TestCanCastTo_Int8(nlTestSuite * inSuite, void * inContext)
+TEST(TestSafeInt, TestCanCastTo_Int8)
 {
-    NL_TEST_ASSERT(inSuite, CanCastTo<uint8_t>(0));
-    NL_TEST_ASSERT(inSuite, CanCastTo<uint8_t>(127));
-    NL_TEST_ASSERT(inSuite, CanCastTo<uint8_t>(128));
-    NL_TEST_ASSERT(inSuite, CanCastTo<uint8_t>(129));
-    NL_TEST_ASSERT(inSuite, CanCastTo<uint8_t>(255));
-    NL_TEST_ASSERT(inSuite, !CanCastTo<uint8_t>(256));
-    NL_TEST_ASSERT(inSuite, !CanCastTo<uint8_t>(32767));
-    NL_TEST_ASSERT(inSuite, !CanCastTo<uint8_t>(32768));
-    NL_TEST_ASSERT(inSuite, !CanCastTo<uint8_t>(32769));
-    NL_TEST_ASSERT(inSuite, !CanCastTo<uint8_t>(65535));
-    NL_TEST_ASSERT(inSuite, !CanCastTo<uint8_t>(65536));
-    NL_TEST_ASSERT(inSuite, !CanCastTo<uint8_t>(2147483647ll));
-    NL_TEST_ASSERT(inSuite, !CanCastTo<uint8_t>(2147483648ll));
-    NL_TEST_ASSERT(inSuite, !CanCastTo<uint8_t>(2147483649ll));
-    NL_TEST_ASSERT(inSuite, !CanCastTo<uint8_t>(4294967295ll));
-    NL_TEST_ASSERT(inSuite, !CanCastTo<uint8_t>(4294967296ll));
-    NL_TEST_ASSERT(inSuite, !CanCastTo<uint8_t>(9223372036854775807ull));
-    NL_TEST_ASSERT(inSuite, !CanCastTo<uint8_t>(9223372036854775808ull));
+    EXPECT_TRUE(CanCastTo<uint8_t>(0));
+    EXPECT_TRUE(CanCastTo<uint8_t>(127));
+    EXPECT_TRUE(CanCastTo<uint8_t>(128));
+    EXPECT_TRUE(CanCastTo<uint8_t>(129));
+    EXPECT_TRUE(CanCastTo<uint8_t>(255));
+    EXPECT_FALSE(CanCastTo<uint8_t>(256));
+    EXPECT_FALSE(CanCastTo<uint8_t>(32767));
+    EXPECT_FALSE(CanCastTo<uint8_t>(32768));
+    EXPECT_FALSE(CanCastTo<uint8_t>(32769));
+    EXPECT_FALSE(CanCastTo<uint8_t>(65535));
+    EXPECT_FALSE(CanCastTo<uint8_t>(65536));
+    EXPECT_FALSE(CanCastTo<uint8_t>(2147483647ll));
+    EXPECT_FALSE(CanCastTo<uint8_t>(2147483648ll));
+    EXPECT_FALSE(CanCastTo<uint8_t>(2147483649ll));
+    EXPECT_FALSE(CanCastTo<uint8_t>(4294967295ll));
+    EXPECT_FALSE(CanCastTo<uint8_t>(4294967296ll));
+    EXPECT_FALSE(CanCastTo<uint8_t>(9223372036854775807ull));
+    EXPECT_FALSE(CanCastTo<uint8_t>(9223372036854775808ull));
 
-    NL_TEST_ASSERT(inSuite, !CanCastTo<uint8_t>(-1));
-    NL_TEST_ASSERT(inSuite, !CanCastTo<uint8_t>(-127));
-    NL_TEST_ASSERT(inSuite, !CanCastTo<uint8_t>(-128));
-    NL_TEST_ASSERT(inSuite, !CanCastTo<uint8_t>(-129));
-    NL_TEST_ASSERT(inSuite, !CanCastTo<uint8_t>(-255));
-    NL_TEST_ASSERT(inSuite, !CanCastTo<uint8_t>(-256));
-    NL_TEST_ASSERT(inSuite, !CanCastTo<uint8_t>(-32767));
-    NL_TEST_ASSERT(inSuite, !CanCastTo<uint8_t>(-32768));
-    NL_TEST_ASSERT(inSuite, !CanCastTo<uint8_t>(-32769));
-    NL_TEST_ASSERT(inSuite, !CanCastTo<uint8_t>(-65535));
-    NL_TEST_ASSERT(inSuite, !CanCastTo<uint8_t>(-65536));
-    NL_TEST_ASSERT(inSuite, !CanCastTo<uint8_t>(-2147483647ll));
-    NL_TEST_ASSERT(inSuite, !CanCastTo<uint8_t>(-2147483648ll));
-    NL_TEST_ASSERT(inSuite, !CanCastTo<uint8_t>(-2147483649ll));
-    NL_TEST_ASSERT(inSuite, !CanCastTo<uint8_t>(-4294967295ll));
-    NL_TEST_ASSERT(inSuite, !CanCastTo<uint8_t>(-4294967296ll));
-    NL_TEST_ASSERT(inSuite, !CanCastTo<uint8_t>(-9223372036854775807ll));
+    EXPECT_FALSE(CanCastTo<uint8_t>(-1));
+    EXPECT_FALSE(CanCastTo<uint8_t>(-127));
+    EXPECT_FALSE(CanCastTo<uint8_t>(-128));
+    EXPECT_FALSE(CanCastTo<uint8_t>(-129));
+    EXPECT_FALSE(CanCastTo<uint8_t>(-255));
+    EXPECT_FALSE(CanCastTo<uint8_t>(-256));
+    EXPECT_FALSE(CanCastTo<uint8_t>(-32767));
+    EXPECT_FALSE(CanCastTo<uint8_t>(-32768));
+    EXPECT_FALSE(CanCastTo<uint8_t>(-32769));
+    EXPECT_FALSE(CanCastTo<uint8_t>(-65535));
+    EXPECT_FALSE(CanCastTo<uint8_t>(-65536));
+    EXPECT_FALSE(CanCastTo<uint8_t>(-2147483647ll));
+    EXPECT_FALSE(CanCastTo<uint8_t>(-2147483648ll));
+    EXPECT_FALSE(CanCastTo<uint8_t>(-2147483649ll));
+    EXPECT_FALSE(CanCastTo<uint8_t>(-4294967295ll));
+    EXPECT_FALSE(CanCastTo<uint8_t>(-4294967296ll));
+    EXPECT_FALSE(CanCastTo<uint8_t>(-9223372036854775807ll));
 
-    NL_TEST_ASSERT(inSuite, CanCastTo<int8_t>(0));
-    NL_TEST_ASSERT(inSuite, CanCastTo<int8_t>(127));
-    NL_TEST_ASSERT(inSuite, !CanCastTo<int8_t>(128));
-    NL_TEST_ASSERT(inSuite, !CanCastTo<int8_t>(129));
-    NL_TEST_ASSERT(inSuite, !CanCastTo<int8_t>(255));
-    NL_TEST_ASSERT(inSuite, !CanCastTo<int8_t>(256));
-    NL_TEST_ASSERT(inSuite, !CanCastTo<int8_t>(32767));
-    NL_TEST_ASSERT(inSuite, !CanCastTo<int8_t>(32768));
-    NL_TEST_ASSERT(inSuite, !CanCastTo<int8_t>(32769));
-    NL_TEST_ASSERT(inSuite, !CanCastTo<int8_t>(65535));
-    NL_TEST_ASSERT(inSuite, !CanCastTo<int8_t>(65536));
-    NL_TEST_ASSERT(inSuite, !CanCastTo<int8_t>(2147483647ll));
-    NL_TEST_ASSERT(inSuite, !CanCastTo<int8_t>(2147483648ll));
-    NL_TEST_ASSERT(inSuite, !CanCastTo<int8_t>(2147483649ll));
-    NL_TEST_ASSERT(inSuite, !CanCastTo<int8_t>(4294967295ll));
-    NL_TEST_ASSERT(inSuite, !CanCastTo<int8_t>(4294967296ll));
-    NL_TEST_ASSERT(inSuite, !CanCastTo<int8_t>(9223372036854775807ull));
-    NL_TEST_ASSERT(inSuite, !CanCastTo<int8_t>(9223372036854775808ull));
+    EXPECT_TRUE(CanCastTo<int8_t>(0));
+    EXPECT_TRUE(CanCastTo<int8_t>(127));
+    EXPECT_FALSE(CanCastTo<int8_t>(128));
+    EXPECT_FALSE(CanCastTo<int8_t>(129));
+    EXPECT_FALSE(CanCastTo<int8_t>(255));
+    EXPECT_FALSE(CanCastTo<int8_t>(256));
+    EXPECT_FALSE(CanCastTo<int8_t>(32767));
+    EXPECT_FALSE(CanCastTo<int8_t>(32768));
+    EXPECT_FALSE(CanCastTo<int8_t>(32769));
+    EXPECT_FALSE(CanCastTo<int8_t>(65535));
+    EXPECT_FALSE(CanCastTo<int8_t>(65536));
+    EXPECT_FALSE(CanCastTo<int8_t>(2147483647ll));
+    EXPECT_FALSE(CanCastTo<int8_t>(2147483648ll));
+    EXPECT_FALSE(CanCastTo<int8_t>(2147483649ll));
+    EXPECT_FALSE(CanCastTo<int8_t>(4294967295ll));
+    EXPECT_FALSE(CanCastTo<int8_t>(4294967296ll));
+    EXPECT_FALSE(CanCastTo<int8_t>(9223372036854775807ull));
+    EXPECT_FALSE(CanCastTo<int8_t>(9223372036854775808ull));
 
-    NL_TEST_ASSERT(inSuite, CanCastTo<int8_t>(-1));
-    NL_TEST_ASSERT(inSuite, CanCastTo<int8_t>(-127));
-    NL_TEST_ASSERT(inSuite, CanCastTo<int8_t>(-128));
-    NL_TEST_ASSERT(inSuite, !CanCastTo<int8_t>(-129));
-    NL_TEST_ASSERT(inSuite, !CanCastTo<int8_t>(-255));
-    NL_TEST_ASSERT(inSuite, !CanCastTo<int8_t>(-256));
-    NL_TEST_ASSERT(inSuite, !CanCastTo<int8_t>(-32767));
-    NL_TEST_ASSERT(inSuite, !CanCastTo<int8_t>(-32768));
-    NL_TEST_ASSERT(inSuite, !CanCastTo<int8_t>(-32769));
-    NL_TEST_ASSERT(inSuite, !CanCastTo<int8_t>(-65535));
-    NL_TEST_ASSERT(inSuite, !CanCastTo<int8_t>(-65536));
-    NL_TEST_ASSERT(inSuite, !CanCastTo<int8_t>(-2147483647ll));
-    NL_TEST_ASSERT(inSuite, !CanCastTo<int8_t>(-2147483648ll));
-    NL_TEST_ASSERT(inSuite, !CanCastTo<int8_t>(-2147483649ll));
-    NL_TEST_ASSERT(inSuite, !CanCastTo<int8_t>(-4294967295ll));
-    NL_TEST_ASSERT(inSuite, !CanCastTo<int8_t>(-4294967296ll));
-    NL_TEST_ASSERT(inSuite, !CanCastTo<int8_t>(-9223372036854775807ll));
+    EXPECT_TRUE(CanCastTo<int8_t>(-1));
+    EXPECT_TRUE(CanCastTo<int8_t>(-127));
+    EXPECT_TRUE(CanCastTo<int8_t>(-128));
+    EXPECT_FALSE(CanCastTo<int8_t>(-129));
+    EXPECT_FALSE(CanCastTo<int8_t>(-255));
+    EXPECT_FALSE(CanCastTo<int8_t>(-256));
+    EXPECT_FALSE(CanCastTo<int8_t>(-32767));
+    EXPECT_FALSE(CanCastTo<int8_t>(-32768));
+    EXPECT_FALSE(CanCastTo<int8_t>(-32769));
+    EXPECT_FALSE(CanCastTo<int8_t>(-65535));
+    EXPECT_FALSE(CanCastTo<int8_t>(-65536));
+    EXPECT_FALSE(CanCastTo<int8_t>(-2147483647ll));
+    EXPECT_FALSE(CanCastTo<int8_t>(-2147483648ll));
+    EXPECT_FALSE(CanCastTo<int8_t>(-2147483649ll));
+    EXPECT_FALSE(CanCastTo<int8_t>(-4294967295ll));
+    EXPECT_FALSE(CanCastTo<int8_t>(-4294967296ll));
+    EXPECT_FALSE(CanCastTo<int8_t>(-9223372036854775807ll));
 }
 
-static void TestCanCastTo_Int16(nlTestSuite * inSuite, void * inContext)
+TEST(TestSafeInt, TestCanCastTo_Int16)
 {
-    NL_TEST_ASSERT(inSuite, CanCastTo<uint16_t>(0));
-    NL_TEST_ASSERT(inSuite, CanCastTo<uint16_t>(127));
-    NL_TEST_ASSERT(inSuite, CanCastTo<uint16_t>(128));
-    NL_TEST_ASSERT(inSuite, CanCastTo<uint16_t>(129));
-    NL_TEST_ASSERT(inSuite, CanCastTo<uint16_t>(255));
-    NL_TEST_ASSERT(inSuite, CanCastTo<uint16_t>(256));
-    NL_TEST_ASSERT(inSuite, CanCastTo<uint16_t>(32767));
-    NL_TEST_ASSERT(inSuite, CanCastTo<uint16_t>(32768));
-    NL_TEST_ASSERT(inSuite, CanCastTo<uint16_t>(32769));
-    NL_TEST_ASSERT(inSuite, CanCastTo<uint16_t>(65535));
-    NL_TEST_ASSERT(inSuite, !CanCastTo<uint16_t>(65536));
-    NL_TEST_ASSERT(inSuite, !CanCastTo<uint16_t>(2147483647ll));
-    NL_TEST_ASSERT(inSuite, !CanCastTo<uint16_t>(2147483648ll));
-    NL_TEST_ASSERT(inSuite, !CanCastTo<uint16_t>(2147483649ll));
-    NL_TEST_ASSERT(inSuite, !CanCastTo<uint16_t>(4294967295ll));
-    NL_TEST_ASSERT(inSuite, !CanCastTo<uint16_t>(4294967296ll));
-    NL_TEST_ASSERT(inSuite, !CanCastTo<uint16_t>(9223372036854775807ull));
-    NL_TEST_ASSERT(inSuite, !CanCastTo<uint16_t>(9223372036854775808ull));
+    EXPECT_TRUE(CanCastTo<uint16_t>(0));
+    EXPECT_TRUE(CanCastTo<uint16_t>(127));
+    EXPECT_TRUE(CanCastTo<uint16_t>(128));
+    EXPECT_TRUE(CanCastTo<uint16_t>(129));
+    EXPECT_TRUE(CanCastTo<uint16_t>(255));
+    EXPECT_TRUE(CanCastTo<uint16_t>(256));
+    EXPECT_TRUE(CanCastTo<uint16_t>(32767));
+    EXPECT_TRUE(CanCastTo<uint16_t>(32768));
+    EXPECT_TRUE(CanCastTo<uint16_t>(32769));
+    EXPECT_TRUE(CanCastTo<uint16_t>(65535));
+    EXPECT_FALSE(CanCastTo<uint16_t>(65536));
+    EXPECT_FALSE(CanCastTo<uint16_t>(2147483647ll));
+    EXPECT_FALSE(CanCastTo<uint16_t>(2147483648ll));
+    EXPECT_FALSE(CanCastTo<uint16_t>(2147483649ll));
+    EXPECT_FALSE(CanCastTo<uint16_t>(4294967295ll));
+    EXPECT_FALSE(CanCastTo<uint16_t>(4294967296ll));
+    EXPECT_FALSE(CanCastTo<uint16_t>(9223372036854775807ull));
+    EXPECT_FALSE(CanCastTo<uint16_t>(9223372036854775808ull));
 
-    NL_TEST_ASSERT(inSuite, !CanCastTo<uint16_t>(-1));
-    NL_TEST_ASSERT(inSuite, !CanCastTo<uint16_t>(-127));
-    NL_TEST_ASSERT(inSuite, !CanCastTo<uint16_t>(-128));
-    NL_TEST_ASSERT(inSuite, !CanCastTo<uint16_t>(-129));
-    NL_TEST_ASSERT(inSuite, !CanCastTo<uint16_t>(-255));
-    NL_TEST_ASSERT(inSuite, !CanCastTo<uint16_t>(-256));
-    NL_TEST_ASSERT(inSuite, !CanCastTo<uint16_t>(-32767));
-    NL_TEST_ASSERT(inSuite, !CanCastTo<uint16_t>(-32768));
-    NL_TEST_ASSERT(inSuite, !CanCastTo<uint16_t>(-32769));
-    NL_TEST_ASSERT(inSuite, !CanCastTo<uint16_t>(-65535));
-    NL_TEST_ASSERT(inSuite, !CanCastTo<uint16_t>(-65536));
-    NL_TEST_ASSERT(inSuite, !CanCastTo<uint16_t>(-2147483647ll));
-    NL_TEST_ASSERT(inSuite, !CanCastTo<uint16_t>(-2147483648ll));
-    NL_TEST_ASSERT(inSuite, !CanCastTo<uint16_t>(-2147483649ll));
-    NL_TEST_ASSERT(inSuite, !CanCastTo<uint16_t>(-4294967295ll));
-    NL_TEST_ASSERT(inSuite, !CanCastTo<uint16_t>(-4294967296ll));
-    NL_TEST_ASSERT(inSuite, !CanCastTo<uint16_t>(-9223372036854775807ll));
+    EXPECT_FALSE(CanCastTo<uint16_t>(-1));
+    EXPECT_FALSE(CanCastTo<uint16_t>(-127));
+    EXPECT_FALSE(CanCastTo<uint16_t>(-128));
+    EXPECT_FALSE(CanCastTo<uint16_t>(-129));
+    EXPECT_FALSE(CanCastTo<uint16_t>(-255));
+    EXPECT_FALSE(CanCastTo<uint16_t>(-256));
+    EXPECT_FALSE(CanCastTo<uint16_t>(-32767));
+    EXPECT_FALSE(CanCastTo<uint16_t>(-32768));
+    EXPECT_FALSE(CanCastTo<uint16_t>(-32769));
+    EXPECT_FALSE(CanCastTo<uint16_t>(-65535));
+    EXPECT_FALSE(CanCastTo<uint16_t>(-65536));
+    EXPECT_FALSE(CanCastTo<uint16_t>(-2147483647ll));
+    EXPECT_FALSE(CanCastTo<uint16_t>(-2147483648ll));
+    EXPECT_FALSE(CanCastTo<uint16_t>(-2147483649ll));
+    EXPECT_FALSE(CanCastTo<uint16_t>(-4294967295ll));
+    EXPECT_FALSE(CanCastTo<uint16_t>(-4294967296ll));
+    EXPECT_FALSE(CanCastTo<uint16_t>(-9223372036854775807ll));
 
-    NL_TEST_ASSERT(inSuite, CanCastTo<int16_t>(0));
-    NL_TEST_ASSERT(inSuite, CanCastTo<int16_t>(127));
-    NL_TEST_ASSERT(inSuite, CanCastTo<int16_t>(128));
-    NL_TEST_ASSERT(inSuite, CanCastTo<int16_t>(129));
-    NL_TEST_ASSERT(inSuite, CanCastTo<int16_t>(255));
-    NL_TEST_ASSERT(inSuite, CanCastTo<int16_t>(256));
-    NL_TEST_ASSERT(inSuite, CanCastTo<int16_t>(32767));
-    NL_TEST_ASSERT(inSuite, !CanCastTo<int16_t>(32768));
-    NL_TEST_ASSERT(inSuite, !CanCastTo<int16_t>(32769));
-    NL_TEST_ASSERT(inSuite, !CanCastTo<int16_t>(65535));
-    NL_TEST_ASSERT(inSuite, !CanCastTo<int16_t>(65536));
-    NL_TEST_ASSERT(inSuite, !CanCastTo<int16_t>(2147483647ll));
-    NL_TEST_ASSERT(inSuite, !CanCastTo<int16_t>(2147483648ll));
-    NL_TEST_ASSERT(inSuite, !CanCastTo<int16_t>(2147483649ll));
-    NL_TEST_ASSERT(inSuite, !CanCastTo<int16_t>(4294967295ll));
-    NL_TEST_ASSERT(inSuite, !CanCastTo<int16_t>(4294967296ll));
-    NL_TEST_ASSERT(inSuite, !CanCastTo<int16_t>(9223372036854775807ull));
-    NL_TEST_ASSERT(inSuite, !CanCastTo<int16_t>(9223372036854775808ull));
+    EXPECT_TRUE(CanCastTo<int16_t>(0));
+    EXPECT_TRUE(CanCastTo<int16_t>(127));
+    EXPECT_TRUE(CanCastTo<int16_t>(128));
+    EXPECT_TRUE(CanCastTo<int16_t>(129));
+    EXPECT_TRUE(CanCastTo<int16_t>(255));
+    EXPECT_TRUE(CanCastTo<int16_t>(256));
+    EXPECT_TRUE(CanCastTo<int16_t>(32767));
+    EXPECT_FALSE(CanCastTo<int16_t>(32768));
+    EXPECT_FALSE(CanCastTo<int16_t>(32769));
+    EXPECT_FALSE(CanCastTo<int16_t>(65535));
+    EXPECT_FALSE(CanCastTo<int16_t>(65536));
+    EXPECT_FALSE(CanCastTo<int16_t>(2147483647ll));
+    EXPECT_FALSE(CanCastTo<int16_t>(2147483648ll));
+    EXPECT_FALSE(CanCastTo<int16_t>(2147483649ll));
+    EXPECT_FALSE(CanCastTo<int16_t>(4294967295ll));
+    EXPECT_FALSE(CanCastTo<int16_t>(4294967296ll));
+    EXPECT_FALSE(CanCastTo<int16_t>(9223372036854775807ull));
+    EXPECT_FALSE(CanCastTo<int16_t>(9223372036854775808ull));
 
-    NL_TEST_ASSERT(inSuite, CanCastTo<int16_t>(-1));
-    NL_TEST_ASSERT(inSuite, CanCastTo<int16_t>(-127));
-    NL_TEST_ASSERT(inSuite, CanCastTo<int16_t>(-128));
-    NL_TEST_ASSERT(inSuite, CanCastTo<int16_t>(-129));
-    NL_TEST_ASSERT(inSuite, CanCastTo<int16_t>(-255));
-    NL_TEST_ASSERT(inSuite, CanCastTo<int16_t>(-256));
-    NL_TEST_ASSERT(inSuite, CanCastTo<int16_t>(-32767));
-    NL_TEST_ASSERT(inSuite, CanCastTo<int16_t>(-32768));
-    NL_TEST_ASSERT(inSuite, !CanCastTo<int16_t>(-32769));
-    NL_TEST_ASSERT(inSuite, !CanCastTo<int16_t>(-65535));
-    NL_TEST_ASSERT(inSuite, !CanCastTo<int16_t>(-65536));
-    NL_TEST_ASSERT(inSuite, !CanCastTo<int16_t>(-2147483647ll));
-    NL_TEST_ASSERT(inSuite, !CanCastTo<int16_t>(-2147483648ll));
-    NL_TEST_ASSERT(inSuite, !CanCastTo<int16_t>(-2147483649ll));
-    NL_TEST_ASSERT(inSuite, !CanCastTo<int16_t>(-4294967295ll));
-    NL_TEST_ASSERT(inSuite, !CanCastTo<int16_t>(-4294967296ll));
-    NL_TEST_ASSERT(inSuite, !CanCastTo<int16_t>(-9223372036854775807ll));
+    EXPECT_TRUE(CanCastTo<int16_t>(-1));
+    EXPECT_TRUE(CanCastTo<int16_t>(-127));
+    EXPECT_TRUE(CanCastTo<int16_t>(-128));
+    EXPECT_TRUE(CanCastTo<int16_t>(-129));
+    EXPECT_TRUE(CanCastTo<int16_t>(-255));
+    EXPECT_TRUE(CanCastTo<int16_t>(-256));
+    EXPECT_TRUE(CanCastTo<int16_t>(-32767));
+    EXPECT_TRUE(CanCastTo<int16_t>(-32768));
+    EXPECT_FALSE(CanCastTo<int16_t>(-32769));
+    EXPECT_FALSE(CanCastTo<int16_t>(-65535));
+    EXPECT_FALSE(CanCastTo<int16_t>(-65536));
+    EXPECT_FALSE(CanCastTo<int16_t>(-2147483647ll));
+    EXPECT_FALSE(CanCastTo<int16_t>(-2147483648ll));
+    EXPECT_FALSE(CanCastTo<int16_t>(-2147483649ll));
+    EXPECT_FALSE(CanCastTo<int16_t>(-4294967295ll));
+    EXPECT_FALSE(CanCastTo<int16_t>(-4294967296ll));
+    EXPECT_FALSE(CanCastTo<int16_t>(-9223372036854775807ll));
 }
 
-static void TestCanCastTo_Int32(nlTestSuite * inSuite, void * inContext)
+TEST(TestSafeInt, TestCanCastTo_Int32)
 {
-    NL_TEST_ASSERT(inSuite, CanCastTo<uint32_t>(0));
-    NL_TEST_ASSERT(inSuite, CanCastTo<uint32_t>(127));
-    NL_TEST_ASSERT(inSuite, CanCastTo<uint32_t>(128));
-    NL_TEST_ASSERT(inSuite, CanCastTo<uint32_t>(129));
-    NL_TEST_ASSERT(inSuite, CanCastTo<uint32_t>(255));
-    NL_TEST_ASSERT(inSuite, CanCastTo<uint32_t>(256));
-    NL_TEST_ASSERT(inSuite, CanCastTo<uint32_t>(32767));
-    NL_TEST_ASSERT(inSuite, CanCastTo<uint32_t>(32768));
-    NL_TEST_ASSERT(inSuite, CanCastTo<uint32_t>(32769));
-    NL_TEST_ASSERT(inSuite, CanCastTo<uint32_t>(65535));
-    NL_TEST_ASSERT(inSuite, CanCastTo<uint32_t>(65536));
-    NL_TEST_ASSERT(inSuite, CanCastTo<uint32_t>(2147483647ll));
-    NL_TEST_ASSERT(inSuite, CanCastTo<uint32_t>(2147483648ll));
-    NL_TEST_ASSERT(inSuite, CanCastTo<uint32_t>(2147483649ll));
-    NL_TEST_ASSERT(inSuite, CanCastTo<uint32_t>(4294967295ll));
-    NL_TEST_ASSERT(inSuite, !CanCastTo<uint32_t>(4294967296ll));
-    NL_TEST_ASSERT(inSuite, !CanCastTo<uint32_t>(9223372036854775807ull));
-    NL_TEST_ASSERT(inSuite, !CanCastTo<uint32_t>(9223372036854775808ull));
+    EXPECT_TRUE(CanCastTo<uint32_t>(0));
+    EXPECT_TRUE(CanCastTo<uint32_t>(127));
+    EXPECT_TRUE(CanCastTo<uint32_t>(128));
+    EXPECT_TRUE(CanCastTo<uint32_t>(129));
+    EXPECT_TRUE(CanCastTo<uint32_t>(255));
+    EXPECT_TRUE(CanCastTo<uint32_t>(256));
+    EXPECT_TRUE(CanCastTo<uint32_t>(32767));
+    EXPECT_TRUE(CanCastTo<uint32_t>(32768));
+    EXPECT_TRUE(CanCastTo<uint32_t>(32769));
+    EXPECT_TRUE(CanCastTo<uint32_t>(65535));
+    EXPECT_TRUE(CanCastTo<uint32_t>(65536));
+    EXPECT_TRUE(CanCastTo<uint32_t>(2147483647ll));
+    EXPECT_TRUE(CanCastTo<uint32_t>(2147483648ll));
+    EXPECT_TRUE(CanCastTo<uint32_t>(2147483649ll));
+    EXPECT_TRUE(CanCastTo<uint32_t>(4294967295ll));
+    EXPECT_FALSE(CanCastTo<uint32_t>(4294967296ll));
+    EXPECT_FALSE(CanCastTo<uint32_t>(9223372036854775807ull));
+    EXPECT_FALSE(CanCastTo<uint32_t>(9223372036854775808ull));
 
-    NL_TEST_ASSERT(inSuite, !CanCastTo<uint32_t>(-1));
-    NL_TEST_ASSERT(inSuite, !CanCastTo<uint32_t>(-127));
-    NL_TEST_ASSERT(inSuite, !CanCastTo<uint32_t>(-128));
-    NL_TEST_ASSERT(inSuite, !CanCastTo<uint32_t>(-129));
-    NL_TEST_ASSERT(inSuite, !CanCastTo<uint32_t>(-255));
-    NL_TEST_ASSERT(inSuite, !CanCastTo<uint32_t>(-256));
-    NL_TEST_ASSERT(inSuite, !CanCastTo<uint32_t>(-32767));
-    NL_TEST_ASSERT(inSuite, !CanCastTo<uint32_t>(-32768));
-    NL_TEST_ASSERT(inSuite, !CanCastTo<uint32_t>(-32769));
-    NL_TEST_ASSERT(inSuite, !CanCastTo<uint32_t>(-65535));
-    NL_TEST_ASSERT(inSuite, !CanCastTo<uint32_t>(-65536));
-    NL_TEST_ASSERT(inSuite, !CanCastTo<uint32_t>(-2147483647ll));
-    NL_TEST_ASSERT(inSuite, !CanCastTo<uint32_t>(-2147483648ll));
-    NL_TEST_ASSERT(inSuite, !CanCastTo<uint32_t>(-2147483649ll));
-    NL_TEST_ASSERT(inSuite, !CanCastTo<uint32_t>(-4294967295ll));
-    NL_TEST_ASSERT(inSuite, !CanCastTo<uint32_t>(-4294967296ll));
-    NL_TEST_ASSERT(inSuite, !CanCastTo<uint32_t>(-9223372036854775807ll));
+    EXPECT_FALSE(CanCastTo<uint32_t>(-1));
+    EXPECT_FALSE(CanCastTo<uint32_t>(-127));
+    EXPECT_FALSE(CanCastTo<uint32_t>(-128));
+    EXPECT_FALSE(CanCastTo<uint32_t>(-129));
+    EXPECT_FALSE(CanCastTo<uint32_t>(-255));
+    EXPECT_FALSE(CanCastTo<uint32_t>(-256));
+    EXPECT_FALSE(CanCastTo<uint32_t>(-32767));
+    EXPECT_FALSE(CanCastTo<uint32_t>(-32768));
+    EXPECT_FALSE(CanCastTo<uint32_t>(-32769));
+    EXPECT_FALSE(CanCastTo<uint32_t>(-65535));
+    EXPECT_FALSE(CanCastTo<uint32_t>(-65536));
+    EXPECT_FALSE(CanCastTo<uint32_t>(-2147483647ll));
+    EXPECT_FALSE(CanCastTo<uint32_t>(-2147483648ll));
+    EXPECT_FALSE(CanCastTo<uint32_t>(-2147483649ll));
+    EXPECT_FALSE(CanCastTo<uint32_t>(-4294967295ll));
+    EXPECT_FALSE(CanCastTo<uint32_t>(-4294967296ll));
+    EXPECT_FALSE(CanCastTo<uint32_t>(-9223372036854775807ll));
 
-    NL_TEST_ASSERT(inSuite, CanCastTo<int32_t>(0));
-    NL_TEST_ASSERT(inSuite, CanCastTo<int32_t>(127));
-    NL_TEST_ASSERT(inSuite, CanCastTo<int32_t>(128));
-    NL_TEST_ASSERT(inSuite, CanCastTo<int32_t>(129));
-    NL_TEST_ASSERT(inSuite, CanCastTo<int32_t>(255));
-    NL_TEST_ASSERT(inSuite, CanCastTo<int32_t>(256));
-    NL_TEST_ASSERT(inSuite, CanCastTo<int32_t>(32767));
-    NL_TEST_ASSERT(inSuite, CanCastTo<int32_t>(32768));
-    NL_TEST_ASSERT(inSuite, CanCastTo<int32_t>(32769));
-    NL_TEST_ASSERT(inSuite, CanCastTo<int32_t>(65535));
-    NL_TEST_ASSERT(inSuite, CanCastTo<int32_t>(65536));
-    NL_TEST_ASSERT(inSuite, CanCastTo<int32_t>(2147483647ll));
-    NL_TEST_ASSERT(inSuite, !CanCastTo<int32_t>(2147483648ll));
-    NL_TEST_ASSERT(inSuite, !CanCastTo<int32_t>(2147483649ll));
-    NL_TEST_ASSERT(inSuite, !CanCastTo<int32_t>(4294967295ll));
-    NL_TEST_ASSERT(inSuite, !CanCastTo<int32_t>(4294967296ll));
-    NL_TEST_ASSERT(inSuite, !CanCastTo<int32_t>(9223372036854775807ull));
-    NL_TEST_ASSERT(inSuite, !CanCastTo<int32_t>(9223372036854775808ull));
+    EXPECT_TRUE(CanCastTo<int32_t>(0));
+    EXPECT_TRUE(CanCastTo<int32_t>(127));
+    EXPECT_TRUE(CanCastTo<int32_t>(128));
+    EXPECT_TRUE(CanCastTo<int32_t>(129));
+    EXPECT_TRUE(CanCastTo<int32_t>(255));
+    EXPECT_TRUE(CanCastTo<int32_t>(256));
+    EXPECT_TRUE(CanCastTo<int32_t>(32767));
+    EXPECT_TRUE(CanCastTo<int32_t>(32768));
+    EXPECT_TRUE(CanCastTo<int32_t>(32769));
+    EXPECT_TRUE(CanCastTo<int32_t>(65535));
+    EXPECT_TRUE(CanCastTo<int32_t>(65536));
+    EXPECT_TRUE(CanCastTo<int32_t>(2147483647ll));
+    EXPECT_FALSE(CanCastTo<int32_t>(2147483648ll));
+    EXPECT_FALSE(CanCastTo<int32_t>(2147483649ll));
+    EXPECT_FALSE(CanCastTo<int32_t>(4294967295ll));
+    EXPECT_FALSE(CanCastTo<int32_t>(4294967296ll));
+    EXPECT_FALSE(CanCastTo<int32_t>(9223372036854775807ull));
+    EXPECT_FALSE(CanCastTo<int32_t>(9223372036854775808ull));
 
-    NL_TEST_ASSERT(inSuite, CanCastTo<int32_t>(-1));
-    NL_TEST_ASSERT(inSuite, CanCastTo<int32_t>(-127));
-    NL_TEST_ASSERT(inSuite, CanCastTo<int32_t>(-128));
-    NL_TEST_ASSERT(inSuite, CanCastTo<int32_t>(-129));
-    NL_TEST_ASSERT(inSuite, CanCastTo<int32_t>(-255));
-    NL_TEST_ASSERT(inSuite, CanCastTo<int32_t>(-256));
-    NL_TEST_ASSERT(inSuite, CanCastTo<int32_t>(-32767));
-    NL_TEST_ASSERT(inSuite, CanCastTo<int32_t>(-32768));
-    NL_TEST_ASSERT(inSuite, CanCastTo<int32_t>(-32769));
-    NL_TEST_ASSERT(inSuite, CanCastTo<int32_t>(-65535));
-    NL_TEST_ASSERT(inSuite, CanCastTo<int32_t>(-65536));
-    NL_TEST_ASSERT(inSuite, CanCastTo<int32_t>(-2147483647ll));
-    NL_TEST_ASSERT(inSuite, CanCastTo<int32_t>(-2147483648ll));
-    NL_TEST_ASSERT(inSuite, !CanCastTo<int32_t>(-2147483649ll));
-    NL_TEST_ASSERT(inSuite, !CanCastTo<int32_t>(-4294967295ll));
-    NL_TEST_ASSERT(inSuite, !CanCastTo<int32_t>(-4294967296ll));
-    NL_TEST_ASSERT(inSuite, !CanCastTo<int32_t>(-9223372036854775807ll));
+    EXPECT_TRUE(CanCastTo<int32_t>(-1));
+    EXPECT_TRUE(CanCastTo<int32_t>(-127));
+    EXPECT_TRUE(CanCastTo<int32_t>(-128));
+    EXPECT_TRUE(CanCastTo<int32_t>(-129));
+    EXPECT_TRUE(CanCastTo<int32_t>(-255));
+    EXPECT_TRUE(CanCastTo<int32_t>(-256));
+    EXPECT_TRUE(CanCastTo<int32_t>(-32767));
+    EXPECT_TRUE(CanCastTo<int32_t>(-32768));
+    EXPECT_TRUE(CanCastTo<int32_t>(-32769));
+    EXPECT_TRUE(CanCastTo<int32_t>(-65535));
+    EXPECT_TRUE(CanCastTo<int32_t>(-65536));
+    EXPECT_TRUE(CanCastTo<int32_t>(-2147483647ll));
+    EXPECT_TRUE(CanCastTo<int32_t>(-2147483648ll));
+    EXPECT_FALSE(CanCastTo<int32_t>(-2147483649ll));
+    EXPECT_FALSE(CanCastTo<int32_t>(-4294967295ll));
+    EXPECT_FALSE(CanCastTo<int32_t>(-4294967296ll));
+    EXPECT_FALSE(CanCastTo<int32_t>(-9223372036854775807ll));
 }
 
-static void TestCanCastTo_Int64(nlTestSuite * inSuite, void * inContext)
+TEST(TestSafeInt, TestCanCastTo_Int64)
 {
-    NL_TEST_ASSERT(inSuite, CanCastTo<uint64_t>(0));
-    NL_TEST_ASSERT(inSuite, CanCastTo<uint64_t>(127));
-    NL_TEST_ASSERT(inSuite, CanCastTo<uint64_t>(128));
-    NL_TEST_ASSERT(inSuite, CanCastTo<uint64_t>(129));
-    NL_TEST_ASSERT(inSuite, CanCastTo<uint64_t>(255));
-    NL_TEST_ASSERT(inSuite, CanCastTo<uint64_t>(256));
-    NL_TEST_ASSERT(inSuite, CanCastTo<uint64_t>(32767));
-    NL_TEST_ASSERT(inSuite, CanCastTo<uint64_t>(32768));
-    NL_TEST_ASSERT(inSuite, CanCastTo<uint64_t>(32769));
-    NL_TEST_ASSERT(inSuite, CanCastTo<uint64_t>(65535));
-    NL_TEST_ASSERT(inSuite, CanCastTo<uint64_t>(65536));
-    NL_TEST_ASSERT(inSuite, CanCastTo<uint64_t>(2147483647ll));
-    NL_TEST_ASSERT(inSuite, CanCastTo<uint64_t>(2147483648ll));
-    NL_TEST_ASSERT(inSuite, CanCastTo<uint64_t>(2147483649ll));
-    NL_TEST_ASSERT(inSuite, CanCastTo<uint64_t>(4294967295ll));
-    NL_TEST_ASSERT(inSuite, CanCastTo<uint64_t>(4294967296ll));
-    NL_TEST_ASSERT(inSuite, CanCastTo<uint64_t>(9223372036854775807ull));
-    NL_TEST_ASSERT(inSuite, CanCastTo<uint64_t>(9223372036854775808ull));
+    EXPECT_TRUE(CanCastTo<uint64_t>(0));
+    EXPECT_TRUE(CanCastTo<uint64_t>(127));
+    EXPECT_TRUE(CanCastTo<uint64_t>(128));
+    EXPECT_TRUE(CanCastTo<uint64_t>(129));
+    EXPECT_TRUE(CanCastTo<uint64_t>(255));
+    EXPECT_TRUE(CanCastTo<uint64_t>(256));
+    EXPECT_TRUE(CanCastTo<uint64_t>(32767));
+    EXPECT_TRUE(CanCastTo<uint64_t>(32768));
+    EXPECT_TRUE(CanCastTo<uint64_t>(32769));
+    EXPECT_TRUE(CanCastTo<uint64_t>(65535));
+    EXPECT_TRUE(CanCastTo<uint64_t>(65536));
+    EXPECT_TRUE(CanCastTo<uint64_t>(2147483647ll));
+    EXPECT_TRUE(CanCastTo<uint64_t>(2147483648ll));
+    EXPECT_TRUE(CanCastTo<uint64_t>(2147483649ll));
+    EXPECT_TRUE(CanCastTo<uint64_t>(4294967295ll));
+    EXPECT_TRUE(CanCastTo<uint64_t>(4294967296ll));
+    EXPECT_TRUE(CanCastTo<uint64_t>(9223372036854775807ull));
+    EXPECT_TRUE(CanCastTo<uint64_t>(9223372036854775808ull));
 
-    NL_TEST_ASSERT(inSuite, !CanCastTo<uint64_t>(-1));
-    NL_TEST_ASSERT(inSuite, !CanCastTo<uint64_t>(-127));
-    NL_TEST_ASSERT(inSuite, !CanCastTo<uint64_t>(-128));
-    NL_TEST_ASSERT(inSuite, !CanCastTo<uint64_t>(-129));
-    NL_TEST_ASSERT(inSuite, !CanCastTo<uint64_t>(-255));
-    NL_TEST_ASSERT(inSuite, !CanCastTo<uint64_t>(-256));
-    NL_TEST_ASSERT(inSuite, !CanCastTo<uint64_t>(-32767));
-    NL_TEST_ASSERT(inSuite, !CanCastTo<uint64_t>(-32768));
-    NL_TEST_ASSERT(inSuite, !CanCastTo<uint64_t>(-32769));
-    NL_TEST_ASSERT(inSuite, !CanCastTo<uint64_t>(-65535));
-    NL_TEST_ASSERT(inSuite, !CanCastTo<uint64_t>(-65536));
-    NL_TEST_ASSERT(inSuite, !CanCastTo<uint64_t>(-2147483647ll));
-    NL_TEST_ASSERT(inSuite, !CanCastTo<uint64_t>(-2147483648ll));
-    NL_TEST_ASSERT(inSuite, !CanCastTo<uint64_t>(-2147483649ll));
-    NL_TEST_ASSERT(inSuite, !CanCastTo<uint64_t>(-4294967295ll));
-    NL_TEST_ASSERT(inSuite, !CanCastTo<uint64_t>(-4294967296ll));
-    NL_TEST_ASSERT(inSuite, !CanCastTo<uint64_t>(-9223372036854775807ll));
+    EXPECT_FALSE(CanCastTo<uint64_t>(-1));
+    EXPECT_FALSE(CanCastTo<uint64_t>(-127));
+    EXPECT_FALSE(CanCastTo<uint64_t>(-128));
+    EXPECT_FALSE(CanCastTo<uint64_t>(-129));
+    EXPECT_FALSE(CanCastTo<uint64_t>(-255));
+    EXPECT_FALSE(CanCastTo<uint64_t>(-256));
+    EXPECT_FALSE(CanCastTo<uint64_t>(-32767));
+    EXPECT_FALSE(CanCastTo<uint64_t>(-32768));
+    EXPECT_FALSE(CanCastTo<uint64_t>(-32769));
+    EXPECT_FALSE(CanCastTo<uint64_t>(-65535));
+    EXPECT_FALSE(CanCastTo<uint64_t>(-65536));
+    EXPECT_FALSE(CanCastTo<uint64_t>(-2147483647ll));
+    EXPECT_FALSE(CanCastTo<uint64_t>(-2147483648ll));
+    EXPECT_FALSE(CanCastTo<uint64_t>(-2147483649ll));
+    EXPECT_FALSE(CanCastTo<uint64_t>(-4294967295ll));
+    EXPECT_FALSE(CanCastTo<uint64_t>(-4294967296ll));
+    EXPECT_FALSE(CanCastTo<uint64_t>(-9223372036854775807ll));
 
-    NL_TEST_ASSERT(inSuite, CanCastTo<int64_t>(0));
-    NL_TEST_ASSERT(inSuite, CanCastTo<int64_t>(127));
-    NL_TEST_ASSERT(inSuite, CanCastTo<int64_t>(128));
-    NL_TEST_ASSERT(inSuite, CanCastTo<int64_t>(129));
-    NL_TEST_ASSERT(inSuite, CanCastTo<int64_t>(255));
-    NL_TEST_ASSERT(inSuite, CanCastTo<int64_t>(256));
-    NL_TEST_ASSERT(inSuite, CanCastTo<int64_t>(32767));
-    NL_TEST_ASSERT(inSuite, CanCastTo<int64_t>(32768));
-    NL_TEST_ASSERT(inSuite, CanCastTo<int64_t>(32769));
-    NL_TEST_ASSERT(inSuite, CanCastTo<int64_t>(65535));
-    NL_TEST_ASSERT(inSuite, CanCastTo<int64_t>(65536));
-    NL_TEST_ASSERT(inSuite, CanCastTo<int64_t>(2147483647ll));
-    NL_TEST_ASSERT(inSuite, CanCastTo<int64_t>(2147483648ll));
-    NL_TEST_ASSERT(inSuite, CanCastTo<int64_t>(2147483649ll));
-    NL_TEST_ASSERT(inSuite, CanCastTo<int64_t>(4294967295ll));
-    NL_TEST_ASSERT(inSuite, CanCastTo<int64_t>(4294967296ll));
-    NL_TEST_ASSERT(inSuite, CanCastTo<int64_t>(9223372036854775807ull));
-    NL_TEST_ASSERT(inSuite, !CanCastTo<int64_t>(9223372036854775808ull));
+    EXPECT_TRUE(CanCastTo<int64_t>(0));
+    EXPECT_TRUE(CanCastTo<int64_t>(127));
+    EXPECT_TRUE(CanCastTo<int64_t>(128));
+    EXPECT_TRUE(CanCastTo<int64_t>(129));
+    EXPECT_TRUE(CanCastTo<int64_t>(255));
+    EXPECT_TRUE(CanCastTo<int64_t>(256));
+    EXPECT_TRUE(CanCastTo<int64_t>(32767));
+    EXPECT_TRUE(CanCastTo<int64_t>(32768));
+    EXPECT_TRUE(CanCastTo<int64_t>(32769));
+    EXPECT_TRUE(CanCastTo<int64_t>(65535));
+    EXPECT_TRUE(CanCastTo<int64_t>(65536));
+    EXPECT_TRUE(CanCastTo<int64_t>(2147483647ll));
+    EXPECT_TRUE(CanCastTo<int64_t>(2147483648ll));
+    EXPECT_TRUE(CanCastTo<int64_t>(2147483649ll));
+    EXPECT_TRUE(CanCastTo<int64_t>(4294967295ll));
+    EXPECT_TRUE(CanCastTo<int64_t>(4294967296ll));
+    EXPECT_TRUE(CanCastTo<int64_t>(9223372036854775807ull));
+    EXPECT_FALSE(CanCastTo<int64_t>(9223372036854775808ull));
 
-    NL_TEST_ASSERT(inSuite, CanCastTo<int64_t>(-1));
-    NL_TEST_ASSERT(inSuite, CanCastTo<int64_t>(-127));
-    NL_TEST_ASSERT(inSuite, CanCastTo<int64_t>(-128));
-    NL_TEST_ASSERT(inSuite, CanCastTo<int64_t>(-129));
-    NL_TEST_ASSERT(inSuite, CanCastTo<int64_t>(-255));
-    NL_TEST_ASSERT(inSuite, CanCastTo<int64_t>(-256));
-    NL_TEST_ASSERT(inSuite, CanCastTo<int64_t>(-32767));
-    NL_TEST_ASSERT(inSuite, CanCastTo<int64_t>(-32768));
-    NL_TEST_ASSERT(inSuite, CanCastTo<int64_t>(-32769));
-    NL_TEST_ASSERT(inSuite, CanCastTo<int64_t>(-65535));
-    NL_TEST_ASSERT(inSuite, CanCastTo<int64_t>(-65536));
-    NL_TEST_ASSERT(inSuite, CanCastTo<int64_t>(-2147483647ll));
-    NL_TEST_ASSERT(inSuite, CanCastTo<int64_t>(-2147483648ll));
-    NL_TEST_ASSERT(inSuite, CanCastTo<int64_t>(-2147483649ll));
-    NL_TEST_ASSERT(inSuite, CanCastTo<int64_t>(-4294967295ll));
-    NL_TEST_ASSERT(inSuite, CanCastTo<int64_t>(-4294967296ll));
-    NL_TEST_ASSERT(inSuite, CanCastTo<int64_t>(-9223372036854775807ll));
+    EXPECT_TRUE(CanCastTo<int64_t>(-1));
+    EXPECT_TRUE(CanCastTo<int64_t>(-127));
+    EXPECT_TRUE(CanCastTo<int64_t>(-128));
+    EXPECT_TRUE(CanCastTo<int64_t>(-129));
+    EXPECT_TRUE(CanCastTo<int64_t>(-255));
+    EXPECT_TRUE(CanCastTo<int64_t>(-256));
+    EXPECT_TRUE(CanCastTo<int64_t>(-32767));
+    EXPECT_TRUE(CanCastTo<int64_t>(-32768));
+    EXPECT_TRUE(CanCastTo<int64_t>(-32769));
+    EXPECT_TRUE(CanCastTo<int64_t>(-65535));
+    EXPECT_TRUE(CanCastTo<int64_t>(-65536));
+    EXPECT_TRUE(CanCastTo<int64_t>(-2147483647ll));
+    EXPECT_TRUE(CanCastTo<int64_t>(-2147483648ll));
+    EXPECT_TRUE(CanCastTo<int64_t>(-2147483649ll));
+    EXPECT_TRUE(CanCastTo<int64_t>(-4294967295ll));
+    EXPECT_TRUE(CanCastTo<int64_t>(-4294967296ll));
+    EXPECT_TRUE(CanCastTo<int64_t>(-9223372036854775807ll));
 }
 
-static void TestCastToSigned(nlTestSuite * inSuite, void * inContext)
+TEST(TestSafeInt, TestCastToSigned)
 {
-    NL_TEST_ASSERT(inSuite, CastToSigned(static_cast<uint8_t>(5)) == 5);
-    NL_TEST_ASSERT(inSuite, CastToSigned(static_cast<uint8_t>(-5)) == -5);
-    NL_TEST_ASSERT(inSuite, CastToSigned(static_cast<uint8_t>(254)) == -2);
-    NL_TEST_ASSERT(inSuite, CastToSigned(static_cast<uint8_t>(65533)) == -3);
-    NL_TEST_ASSERT(inSuite, CastToSigned(static_cast<uint16_t>(254)) == 254);
-    NL_TEST_ASSERT(inSuite, CastToSigned(static_cast<uint16_t>(65533)) == -3);
+    EXPECT_EQ(CastToSigned(static_cast<uint8_t>(5)), 5);
+    EXPECT_EQ(CastToSigned(static_cast<uint8_t>(-5)), -5);
+    EXPECT_EQ(CastToSigned(static_cast<uint8_t>(254)), -2);
+    EXPECT_EQ(CastToSigned(static_cast<uint8_t>(65533)), -3);
+    EXPECT_EQ(CastToSigned(static_cast<uint16_t>(254)), 254);
+    EXPECT_EQ(CastToSigned(static_cast<uint16_t>(65533)), -3);
 }
-
-#define NL_TEST_DEF_FN(fn) NL_TEST_DEF("Test " #fn, fn)
-/**
- *   Test Suite. It lists all the test functions.
- */
-static const nlTest sTests[] = { NL_TEST_DEF_FN(TestCanCastTo_Int8),  NL_TEST_DEF_FN(TestCanCastTo_Int16),
-                                 NL_TEST_DEF_FN(TestCanCastTo_Int32), NL_TEST_DEF_FN(TestCanCastTo_Int64),
-                                 NL_TEST_DEF_FN(TestCastToSigned),    NL_TEST_SENTINEL() };
-
-int TestSafeInt()
-{
-    nlTestSuite theSuite = { "CHIP SafeInt tests", &sTests[0], nullptr, nullptr };
-
-    // Run test suite against one context.
-    nlTestRunner(&theSuite, nullptr);
-    return nlTestRunnerStats(&theSuite);
-}
-
-CHIP_REGISTER_TEST_SUITE(TestSafeInt)

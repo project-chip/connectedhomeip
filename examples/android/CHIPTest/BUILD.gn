@@ -1,0 +1,82 @@
+# Copyright (c) 2024 Project CHIP Authors
+#
+# Licensed under the Apache License, Version 2.0 (the "License");
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
+#
+# http://www.apache.org/licenses/LICENSE-2.0
+#
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
+
+import("//build_overrides/build.gni")
+import("//build_overrides/chip.gni")
+
+import("${build_root}/config/android_abi.gni")
+import("${chip_root}/build/chip/chip_build.gni")
+import("${chip_root}/build/chip/java/rules.gni")
+import("${chip_root}/build/chip/tools.gni")
+
+shared_library("jni") {
+  output_name = "libCHIPTest"
+
+  sources = [ "app/src/main/cpp/CHIPTest-JNI.cpp" ]
+
+  deps = [
+    "${chip_root}/src:tests",
+    "${chip_root}/src/controller/java",
+    "${chip_root}/src/controller/java:onboarding_payload",
+    "${chip_root}/src/lib",
+    "${chip_root}/src/lib/support",
+    "${chip_root}/src/lib/support:pw_tests_wrapper",
+    "${chip_root}/src/lib/support:test_utils",
+    "${chip_root}/src/lib/support/jsontlv",
+    "${chip_root}/src/platform",
+    "${chip_root}/src/platform/android",
+    "${chip_root}/src/platform/android:java",
+    "${chip_root}/src/platform/android:logging",
+    "${chip_root}/src/platform/tests:tests",
+    "${chip_root}/third_party/inipp",
+    "${chip_root}/third_party/nlfaultinjection:nlfaultinjection",
+  ]
+
+  cflags = [ "-Wconversion" ]
+
+  output_dir = "${root_out_dir}/lib/jni/${android_abi}"
+
+  ldflags = [ "-Wl,--gc-sections" ]
+
+  libs = [ "log" ]
+}
+
+android_library("java") {
+  output_name = "CHIPTest.jar"
+
+  deps = [
+    ":android",
+    "${chip_root}/third_party/android_deps:annotation",
+  ]
+
+  data_deps = [
+    ":jni",
+    "${chip_root}/build/chip/java:shared_cpplib",
+  ]
+
+  sources = [ "app/src/main/java/com/tcl/chip/chiptest/TestEngine.java" ]
+
+  javac_flags = [ "-Xlint:deprecation" ]
+}
+
+java_prebuilt("android") {
+  jar_path = "${android_sdk_root}/platforms/android-26/android.jar"
+}
+
+group("default") {
+  deps = [
+    ":java",
+    ":jni",
+  ]
+}

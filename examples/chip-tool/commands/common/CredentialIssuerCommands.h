@@ -20,6 +20,7 @@
 
 #include <app/util/basic-types.h>
 #include <credentials/attestation_verifier/DeviceAttestationVerifier.h>
+#include <lib/core/CASEAuthTag.h>
 #include <lib/core/CHIPCore.h>
 #include <lib/core/CHIPPersistentStorageDelegate.h>
 #include <vector>

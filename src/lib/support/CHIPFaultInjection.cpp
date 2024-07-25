@@ -53,6 +53,7 @@ static const nl::FaultInjection::Name sFaultNames[] = {
 #if CONFIG_NETWORK_LAYER_BLE
     "CHIPOBLESend",
 #endif // CONFIG_NETWORK_LAYER_BLE
+    "CASEServerBusy",
 };
 
 /**

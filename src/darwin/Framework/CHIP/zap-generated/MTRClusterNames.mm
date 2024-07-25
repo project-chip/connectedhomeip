@@ -219,6 +219,9 @@ NSString * MTRClusterNameForID(MTRClusterIDType clusterID)
     case MTRClusterIDTypeElectricalEnergyMeasurementID:
         result = @"ElectricalEnergyMeasurement";
         break;
+    case MTRClusterIDTypeWaterHeaterManagementID:
+        result = @"WaterHeaterManagement";
+        break;
     case MTRClusterIDTypeDemandResponseLoadControlID:
         result = @"DemandResponseLoadControl";
         break;
@@ -240,6 +243,9 @@ NSString * MTRClusterNameForID(MTRClusterIDType clusterID)
     case MTRClusterIDTypeEnergyEVSEModeID:
         result = @"EnergyEVSEMode";
         break;
+    case MTRClusterIDTypeWaterHeaterModeID:
+        result = @"WaterHeaterMode";
+        break;
     case MTRClusterIDTypeDeviceEnergyManagementModeID:
         result = @"DeviceEnergyManagementMode";
         break;
@@ -251,6 +257,9 @@ NSString * MTRClusterNameForID(MTRClusterIDType clusterID)
         break;
     case MTRClusterIDTypeBarrierControlID:
         result = @"BarrierControl";
+        break;
+    case MTRClusterIDTypeServiceAreaID:
+        result = @"ServiceArea";
         break;
     case MTRClusterIDTypePumpConfigurationAndControlID:
         result = @"PumpConfigurationAndControl";
@@ -318,6 +327,15 @@ NSString * MTRClusterNameForID(MTRClusterIDType clusterID)
     case MTRClusterIDTypeRadonConcentrationMeasurementID:
         result = @"RadonConcentrationMeasurement";
         break;
+    case MTRClusterIDTypeWiFiNetworkManagementID:
+        result = @"WiFiNetworkManagement";
+        break;
+    case MTRClusterIDTypeThreadBorderRouterManagementID:
+        result = @"ThreadBorderRouterManagement";
+        break;
+    case MTRClusterIDTypeThreadNetworkDirectoryID:
+        result = @"ThreadNetworkDirectory";
+        break;
     case MTRClusterIDTypeWakeOnLANID:
         result = @"WakeOnLAN";
         break;
@@ -359,6 +377,9 @@ NSString * MTRClusterNameForID(MTRClusterIDType clusterID)
         break;
     case MTRClusterIDTypeContentAppObserverID:
         result = @"ContentAppObserver";
+        break;
+    case MTRClusterIDTypeCommissionerControlID:
+        result = @"CommissionerControl";
         break;
     case MTRClusterIDTypeElectricalMeasurementID:
         result = @"ElectricalMeasurement";
@@ -2751,6 +2772,10 @@ NSString * MTRAttributeNameForID(MTRClusterIDType clusterID, MTRAttributeIDType 
             result = @"OperatingMode";
             break;
 
+        case MTRAttributeIDTypeClusterICDManagementAttributeMaximumCheckInBackOffID:
+            result = @"MaximumCheckInBackOff";
+            break;
+
         case MTRAttributeIDTypeClusterICDManagementAttributeGeneratedCommandListID:
             result = @"GeneratedCommandList";
             break;
@@ -4298,6 +4323,64 @@ NSString * MTRAttributeNameForID(MTRClusterIDType clusterID, MTRAttributeIDType 
             break;
         }
 
+    case MTRClusterIDTypeWaterHeaterManagementID:
+
+        switch (attributeID) {
+
+            // Cluster WaterHeaterManagement attributes
+        case MTRAttributeIDTypeClusterWaterHeaterManagementAttributeHeaterTypesID:
+            result = @"HeaterTypes";
+            break;
+
+        case MTRAttributeIDTypeClusterWaterHeaterManagementAttributeHeatDemandID:
+            result = @"HeatDemand";
+            break;
+
+        case MTRAttributeIDTypeClusterWaterHeaterManagementAttributeTankVolumeID:
+            result = @"TankVolume";
+            break;
+
+        case MTRAttributeIDTypeClusterWaterHeaterManagementAttributeEstimatedHeatRequiredID:
+            result = @"EstimatedHeatRequired";
+            break;
+
+        case MTRAttributeIDTypeClusterWaterHeaterManagementAttributeTankPercentageID:
+            result = @"TankPercentage";
+            break;
+
+        case MTRAttributeIDTypeClusterWaterHeaterManagementAttributeBoostStateID:
+            result = @"BoostState";
+            break;
+
+        case MTRAttributeIDTypeClusterWaterHeaterManagementAttributeGeneratedCommandListID:
+            result = @"GeneratedCommandList";
+            break;
+
+        case MTRAttributeIDTypeClusterWaterHeaterManagementAttributeAcceptedCommandListID:
+            result = @"AcceptedCommandList";
+            break;
+
+        case MTRAttributeIDTypeClusterWaterHeaterManagementAttributeEventListID:
+            result = @"EventList";
+            break;
+
+        case MTRAttributeIDTypeClusterWaterHeaterManagementAttributeAttributeListID:
+            result = @"AttributeList";
+            break;
+
+        case MTRAttributeIDTypeClusterWaterHeaterManagementAttributeFeatureMapID:
+            result = @"FeatureMap";
+            break;
+
+        case MTRAttributeIDTypeClusterWaterHeaterManagementAttributeClusterRevisionID:
+            result = @"ClusterRevision";
+            break;
+
+        default:
+            result = [NSString stringWithFormat:@"<Unknown attributeID %d>", attributeID];
+            break;
+        }
+
     case MTRClusterIDTypeDemandResponseLoadControlID:
 
         switch (attributeID) {
@@ -4736,6 +4819,56 @@ NSString * MTRAttributeNameForID(MTRClusterIDType clusterID, MTRAttributeIDType 
             break;
 
         case MTRAttributeIDTypeClusterEnergyEVSEModeAttributeClusterRevisionID:
+            result = @"ClusterRevision";
+            break;
+
+        default:
+            result = [NSString stringWithFormat:@"<Unknown attributeID %d>", attributeID];
+            break;
+        }
+
+    case MTRClusterIDTypeWaterHeaterModeID:
+
+        switch (attributeID) {
+
+            // Cluster WaterHeaterMode attributes
+        case MTRAttributeIDTypeClusterWaterHeaterModeAttributeSupportedModesID:
+            result = @"SupportedModes";
+            break;
+
+        case MTRAttributeIDTypeClusterWaterHeaterModeAttributeCurrentModeID:
+            result = @"CurrentMode";
+            break;
+
+        case MTRAttributeIDTypeClusterWaterHeaterModeAttributeStartUpModeID:
+            result = @"StartUpMode";
+            break;
+
+        case MTRAttributeIDTypeClusterWaterHeaterModeAttributeOnModeID:
+            result = @"OnMode";
+            break;
+
+        case MTRAttributeIDTypeClusterWaterHeaterModeAttributeGeneratedCommandListID:
+            result = @"GeneratedCommandList";
+            break;
+
+        case MTRAttributeIDTypeClusterWaterHeaterModeAttributeAcceptedCommandListID:
+            result = @"AcceptedCommandList";
+            break;
+
+        case MTRAttributeIDTypeClusterWaterHeaterModeAttributeEventListID:
+            result = @"EventList";
+            break;
+
+        case MTRAttributeIDTypeClusterWaterHeaterModeAttributeAttributeListID:
+            result = @"AttributeList";
+            break;
+
+        case MTRAttributeIDTypeClusterWaterHeaterModeAttributeFeatureMapID:
+            result = @"FeatureMap";
+            break;
+
+        case MTRAttributeIDTypeClusterWaterHeaterModeAttributeClusterRevisionID:
             result = @"ClusterRevision";
             break;
 
@@ -5204,6 +5337,64 @@ NSString * MTRAttributeNameForID(MTRClusterIDType clusterID, MTRAttributeIDType 
             break;
         }
 
+    case MTRClusterIDTypeServiceAreaID:
+
+        switch (attributeID) {
+
+            // Cluster ServiceArea attributes
+        case MTRAttributeIDTypeClusterServiceAreaAttributeSupportedLocationsID:
+            result = @"SupportedLocations";
+            break;
+
+        case MTRAttributeIDTypeClusterServiceAreaAttributeSupportedMapsID:
+            result = @"SupportedMaps";
+            break;
+
+        case MTRAttributeIDTypeClusterServiceAreaAttributeSelectedLocationsID:
+            result = @"SelectedLocations";
+            break;
+
+        case MTRAttributeIDTypeClusterServiceAreaAttributeCurrentLocationID:
+            result = @"CurrentLocation";
+            break;
+
+        case MTRAttributeIDTypeClusterServiceAreaAttributeEstimatedEndTimeID:
+            result = @"EstimatedEndTime";
+            break;
+
+        case MTRAttributeIDTypeClusterServiceAreaAttributeProgressID:
+            result = @"Progress";
+            break;
+
+        case MTRAttributeIDTypeClusterServiceAreaAttributeGeneratedCommandListID:
+            result = @"GeneratedCommandList";
+            break;
+
+        case MTRAttributeIDTypeClusterServiceAreaAttributeAcceptedCommandListID:
+            result = @"AcceptedCommandList";
+            break;
+
+        case MTRAttributeIDTypeClusterServiceAreaAttributeEventListID:
+            result = @"EventList";
+            break;
+
+        case MTRAttributeIDTypeClusterServiceAreaAttributeAttributeListID:
+            result = @"AttributeList";
+            break;
+
+        case MTRAttributeIDTypeClusterServiceAreaAttributeFeatureMapID:
+            result = @"FeatureMap";
+            break;
+
+        case MTRAttributeIDTypeClusterServiceAreaAttributeClusterRevisionID:
+            result = @"ClusterRevision";
+            break;
+
+        default:
+            result = [NSString stringWithFormat:@"<Unknown attributeID %d>", attributeID];
+            break;
+        }
+
     case MTRClusterIDTypePumpConfigurationAndControlID:
 
         switch (attributeID) {
@@ -5581,10 +5772,6 @@ NSString * MTRAttributeNameForID(MTRClusterIDType clusterID, MTRAttributeIDType 
 
         case MTRAttributeIDTypeClusterThermostatAttributeSetpointHoldExpiryTimestampID:
             result = @"SetpointHoldExpiryTimestamp";
-            break;
-
-        case MTRAttributeIDTypeClusterThermostatAttributeQueuedPresetID:
-            result = @"QueuedPreset";
             break;
 
         case MTRAttributeIDTypeClusterThermostatAttributeGeneratedCommandListID:
@@ -6365,6 +6552,14 @@ NSString * MTRAttributeNameForID(MTRClusterIDType clusterID, MTRAttributeIDType 
 
         case MTRAttributeIDTypeClusterOccupancySensingAttributeOccupancySensorTypeBitmapID:
             result = @"OccupancySensorTypeBitmap";
+            break;
+
+        case MTRAttributeIDTypeClusterOccupancySensingAttributeHoldTimeID:
+            result = @"HoldTime";
+            break;
+
+        case MTRAttributeIDTypeClusterOccupancySensingAttributeHoldTimeLimitsID:
+            result = @"HoldTimeLimits";
             break;
 
         case MTRAttributeIDTypeClusterOccupancySensingAttributePIROccupiedToUnoccupiedDelayID:
@@ -7212,6 +7407,144 @@ NSString * MTRAttributeNameForID(MTRClusterIDType clusterID, MTRAttributeIDType 
             break;
         }
 
+    case MTRClusterIDTypeWiFiNetworkManagementID:
+
+        switch (attributeID) {
+
+            // Cluster WiFiNetworkManagement attributes
+        case MTRAttributeIDTypeClusterWiFiNetworkManagementAttributeSSIDID:
+            result = @"SSID";
+            break;
+
+        case MTRAttributeIDTypeClusterWiFiNetworkManagementAttributeGeneratedCommandListID:
+            result = @"GeneratedCommandList";
+            break;
+
+        case MTRAttributeIDTypeClusterWiFiNetworkManagementAttributeAcceptedCommandListID:
+            result = @"AcceptedCommandList";
+            break;
+
+        case MTRAttributeIDTypeClusterWiFiNetworkManagementAttributeEventListID:
+            result = @"EventList";
+            break;
+
+        case MTRAttributeIDTypeClusterWiFiNetworkManagementAttributeAttributeListID:
+            result = @"AttributeList";
+            break;
+
+        case MTRAttributeIDTypeClusterWiFiNetworkManagementAttributeFeatureMapID:
+            result = @"FeatureMap";
+            break;
+
+        case MTRAttributeIDTypeClusterWiFiNetworkManagementAttributeClusterRevisionID:
+            result = @"ClusterRevision";
+            break;
+
+        default:
+            result = [NSString stringWithFormat:@"<Unknown attributeID %d>", attributeID];
+            break;
+        }
+
+    case MTRClusterIDTypeThreadBorderRouterManagementID:
+
+        switch (attributeID) {
+
+            // Cluster ThreadBorderRouterManagement attributes
+        case MTRAttributeIDTypeClusterThreadBorderRouterManagementAttributeBorderRouterNameID:
+            result = @"BorderRouterName";
+            break;
+
+        case MTRAttributeIDTypeClusterThreadBorderRouterManagementAttributeBorderAgentIDID:
+            result = @"BorderAgentID";
+            break;
+
+        case MTRAttributeIDTypeClusterThreadBorderRouterManagementAttributeThreadVersionID:
+            result = @"ThreadVersion";
+            break;
+
+        case MTRAttributeIDTypeClusterThreadBorderRouterManagementAttributeInterfaceEnabledID:
+            result = @"InterfaceEnabled";
+            break;
+
+        case MTRAttributeIDTypeClusterThreadBorderRouterManagementAttributeActiveDatasetTimestampID:
+            result = @"ActiveDatasetTimestamp";
+            break;
+
+        case MTRAttributeIDTypeClusterThreadBorderRouterManagementAttributeGeneratedCommandListID:
+            result = @"GeneratedCommandList";
+            break;
+
+        case MTRAttributeIDTypeClusterThreadBorderRouterManagementAttributeAcceptedCommandListID:
+            result = @"AcceptedCommandList";
+            break;
+
+        case MTRAttributeIDTypeClusterThreadBorderRouterManagementAttributeEventListID:
+            result = @"EventList";
+            break;
+
+        case MTRAttributeIDTypeClusterThreadBorderRouterManagementAttributeAttributeListID:
+            result = @"AttributeList";
+            break;
+
+        case MTRAttributeIDTypeClusterThreadBorderRouterManagementAttributeFeatureMapID:
+            result = @"FeatureMap";
+            break;
+
+        case MTRAttributeIDTypeClusterThreadBorderRouterManagementAttributeClusterRevisionID:
+            result = @"ClusterRevision";
+            break;
+
+        default:
+            result = [NSString stringWithFormat:@"<Unknown attributeID %d>", attributeID];
+            break;
+        }
+
+    case MTRClusterIDTypeThreadNetworkDirectoryID:
+
+        switch (attributeID) {
+
+            // Cluster ThreadNetworkDirectory attributes
+        case MTRAttributeIDTypeClusterThreadNetworkDirectoryAttributePreferredExtendedPanIDID:
+            result = @"PreferredExtendedPanID";
+            break;
+
+        case MTRAttributeIDTypeClusterThreadNetworkDirectoryAttributeThreadNetworksID:
+            result = @"ThreadNetworks";
+            break;
+
+        case MTRAttributeIDTypeClusterThreadNetworkDirectoryAttributeThreadNetworkTableSizeID:
+            result = @"ThreadNetworkTableSize";
+            break;
+
+        case MTRAttributeIDTypeClusterThreadNetworkDirectoryAttributeGeneratedCommandListID:
+            result = @"GeneratedCommandList";
+            break;
+
+        case MTRAttributeIDTypeClusterThreadNetworkDirectoryAttributeAcceptedCommandListID:
+            result = @"AcceptedCommandList";
+            break;
+
+        case MTRAttributeIDTypeClusterThreadNetworkDirectoryAttributeEventListID:
+            result = @"EventList";
+            break;
+
+        case MTRAttributeIDTypeClusterThreadNetworkDirectoryAttributeAttributeListID:
+            result = @"AttributeList";
+            break;
+
+        case MTRAttributeIDTypeClusterThreadNetworkDirectoryAttributeFeatureMapID:
+            result = @"FeatureMap";
+            break;
+
+        case MTRAttributeIDTypeClusterThreadNetworkDirectoryAttributeClusterRevisionID:
+            result = @"ClusterRevision";
+            break;
+
+        default:
+            result = [NSString stringWithFormat:@"<Unknown attributeID %d>", attributeID];
+            break;
+        }
+
     case MTRClusterIDTypeWakeOnLANID:
 
         switch (attributeID) {
@@ -7848,6 +8181,44 @@ NSString * MTRAttributeNameForID(MTRClusterIDType clusterID, MTRAttributeIDType 
             break;
 
         case MTRAttributeIDTypeClusterContentAppObserverAttributeClusterRevisionID:
+            result = @"ClusterRevision";
+            break;
+
+        default:
+            result = [NSString stringWithFormat:@"<Unknown attributeID %d>", attributeID];
+            break;
+        }
+
+    case MTRClusterIDTypeCommissionerControlID:
+
+        switch (attributeID) {
+
+            // Cluster CommissionerControl attributes
+        case MTRAttributeIDTypeClusterCommissionerControlAttributeSupportedDeviceCategoriesID:
+            result = @"SupportedDeviceCategories";
+            break;
+
+        case MTRAttributeIDTypeClusterCommissionerControlAttributeGeneratedCommandListID:
+            result = @"GeneratedCommandList";
+            break;
+
+        case MTRAttributeIDTypeClusterCommissionerControlAttributeAcceptedCommandListID:
+            result = @"AcceptedCommandList";
+            break;
+
+        case MTRAttributeIDTypeClusterCommissionerControlAttributeEventListID:
+            result = @"EventList";
+            break;
+
+        case MTRAttributeIDTypeClusterCommissionerControlAttributeAttributeListID:
+            result = @"AttributeList";
+            break;
+
+        case MTRAttributeIDTypeClusterCommissionerControlAttributeFeatureMapID:
+            result = @"FeatureMap";
+            break;
+
+        case MTRAttributeIDTypeClusterCommissionerControlAttributeClusterRevisionID:
             result = @"ClusterRevision";
             break;
 

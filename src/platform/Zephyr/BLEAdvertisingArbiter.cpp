@@ -29,6 +29,9 @@ namespace {
 // List of advertising requests ordered by priority
 sys_slist_t sRequests;
 
+bool sIsInitialized = false;
+uint8_t sBtId       = 0;
+
 // Cast an intrusive list node to the containing request object
 const BLEAdvertisingArbiter::Request & ToRequest(const sys_snode_t * node)
 {
@@ -55,8 +58,9 @@ CHIP_ERROR RestartAdvertising()
     ReturnErrorOnFailure(System::MapErrorZephyr(bt_le_adv_stop()));
     ReturnErrorCodeIf(sys_slist_is_empty(&sRequests), CHIP_NO_ERROR);
 
-    const Request & top          = ToRequest(sys_slist_peek_head(&sRequests));
-    const bt_le_adv_param params = BT_LE_ADV_PARAM_INIT(top.options, top.minInterval, top.maxInterval, nullptr);
+    const Request & top    = ToRequest(sys_slist_peek_head(&sRequests));
+    bt_le_adv_param params = BT_LE_ADV_PARAM_INIT(top.options, top.minInterval, top.maxInterval, nullptr);
+    params.id              = sBtId;
     const int result = bt_le_adv_start(&params, top.advertisingData.data(), top.advertisingData.size(), top.scanResponseData.data(),
                                        top.scanResponseData.size());
 
@@ -70,8 +74,26 @@ CHIP_ERROR RestartAdvertising()
 
 } // namespace
 
+CHIP_ERROR Init(uint8_t btId)
+{
+    if (sIsInitialized)
+    {
+        return CHIP_ERROR_INCORRECT_STATE;
+    }
+
+    sBtId          = btId;
+    sIsInitialized = true;
+
+    return CHIP_NO_ERROR;
+}
+
 CHIP_ERROR InsertRequest(Request & request)
 {
+    if (!sIsInitialized)
+    {
+        return CHIP_ERROR_INCORRECT_STATE;
+    }
+
     CancelRequest(request);
 
     sys_snode_t * prev = nullptr;
@@ -109,6 +131,11 @@ CHIP_ERROR InsertRequest(Request & request)
 
 void CancelRequest(Request & request)
 {
+    if (!sIsInitialized)
+    {
+        return;
+    }
+
     const bool isTopPriority = (sys_slist_peek_head(&sRequests) == &request);
     VerifyOrReturn(sys_slist_find_and_remove(&sRequests, &request));
 

@@ -18,7 +18,6 @@
 import argparse
 import asyncio
 import builtins
-import glob
 import inspect
 import json
 import logging
@@ -30,13 +29,12 @@ import re
 import sys
 import typing
 import uuid
-import xml.etree.ElementTree as ET
 from binascii import hexlify, unhexlify
 from dataclasses import asdict as dataclass_asdict
 from dataclasses import dataclass, field
 from datetime import datetime, timedelta, timezone
 from enum import Enum
-from typing import List, Optional, Tuple, Union
+from typing import List, Optional, Tuple
 
 from chip.tlv import float32, uint
 
@@ -54,7 +52,7 @@ import chip.native
 from chip import discovery
 from chip.ChipStack import ChipStack
 from chip.clusters import ClusterObjects as ClusterObjects
-from chip.clusters.Attribute import EventReadResult, SubscriptionTransaction
+from chip.clusters.Attribute import EventReadResult, SubscriptionTransaction, TypedAttributePath
 from chip.exceptions import ChipStackError
 from chip.interaction_model import InteractionModelError, Status
 from chip.setup_payload import SetupPayload
@@ -64,6 +62,7 @@ from global_attribute_ids import GlobalAttributeIds
 from mobly import asserts, base_test, signals, utils
 from mobly.config_parser import ENV_MOBLY_LOGPATH, TestRunConfig
 from mobly.test_runner import TestRunner
+from pics_support import read_pics_from_file
 
 try:
     from matter_yamltests.hooks import TestRunnerHooks
@@ -140,50 +139,6 @@ def get_default_paa_trust_store(root_path: pathlib.Path) -> pathlib.Path:
     else:
         # On not having found a PAA dir, just return current dir to avoid blow-ups
         return pathlib.Path.cwd()
-
-
-def parse_pics(lines: typing.List[str]) -> dict[str, bool]:
-    pics = {}
-    for raw in lines:
-        line, _, _ = raw.partition("#")
-        line = line.strip()
-
-        if not line:
-            continue
-
-        key, _, val = line.partition("=")
-        val = val.strip()
-        if val not in ["1", "0"]:
-            raise ValueError('PICS {} must have a value of 0 or 1'.format(key))
-
-        pics[key.strip()] = (val == "1")
-    return pics
-
-
-def parse_pics_xml(contents: str) -> dict[str, bool]:
-    pics = {}
-    mytree = ET.fromstring(contents)
-    for pi in mytree.iter('picsItem'):
-        name = pi.find('itemNumber').text
-        support = pi.find('support').text
-        pics[name] = int(json.loads(support.lower())) == 1
-    return pics
-
-
-def read_pics_from_file(path: str) -> dict[str, bool]:
-    """ Reads a dictionary of PICS from a file (ci format) or directory (xml format). """
-    if os.path.isdir(os.path.abspath(path)):
-        pics_dict = {}
-        for filename in glob.glob(f'{path}/*.xml'):
-            with open(filename, 'r') as f:
-                contents = f.read()
-                pics_dict.update(parse_pics_xml(contents))
-        return pics_dict
-
-    else:
-        with open(path, 'r') as f:
-            lines = f.readlines()
-            return parse_pics(lines)
 
 
 def type_matches(received_value, desired_type):
@@ -311,6 +266,39 @@ class EventChangeCallback:
         return res.Data
 
 
+class AttributeChangeCallback:
+    def __init__(self, expected_attribute: ClusterObjects.ClusterAttributeDescriptor):
+        self._output = queue.Queue()
+        self._expected_attribute = expected_attribute
+
+    def __call__(self, path: TypedAttributePath, transaction: SubscriptionTransaction):
+        """This is the subscription callback when an attribute is updated.
+           It checks the passed in attribute is the same as the subscribed to attribute and
+           then posts it into the queue for later processing."""
+
+        asserts.assert_equal(path.AttributeType, self._expected_attribute,
+                             f"[AttributeChangeCallback] Attribute mismatch. Expected: {self._expected_attribute}, received: {path.AttributeType}")
+        logging.debug(f"[AttributeChangeCallback] Attribute update callback for {path.AttributeType}")
+        q = (path, transaction)
+        self._output.put(q)
+
+    def wait_for_report(self):
+        try:
+            path, transaction = self._output.get(block=True, timeout=10)
+        except queue.Empty:
+            asserts.fail(
+                f"[AttributeChangeCallback] Failed to receive a report for the {self._expected_attribute} attribute change")
+
+        asserts.assert_equal(path.AttributeType, self._expected_attribute,
+                             f"[AttributeChangeCallback] Received incorrect report. Expected: {self._expected_attribute}, received: {path.AttributeType}")
+        try:
+            attribute_value = transaction.GetAttribute(path)
+            logging.info(
+                f"[AttributeChangeCallback] Got attribute subscription report. Attribute {path.AttributeType}. Updated value: {attribute_value}. SubscriptionId: {transaction.subscriptionId}")
+        except KeyError:
+            asserts.fail("[AttributeChangeCallback] Attribute {expected_attribute} not found in returned report")
+
+
 class InternalTestRunnerHooks(TestRunnerHooks):
 
     def start(self, count: int):
@@ -319,7 +307,7 @@ class InternalTestRunnerHooks(TestRunnerHooks):
     def stop(self, duration: int):
         logging.info(f'Finished test set, ran for {duration}ms')
 
-    def test_start(self, filename: str, name: str, count: int):
+    def test_start(self, filename: str, name: str, count: int, steps: list[str] = []):
         logging.info(f'Starting test from {filename}: {name} - {count} steps')
 
     def test_stop(self, exception: Exception, duration: int):
@@ -346,6 +334,12 @@ class InternalTestRunnerHooks(TestRunnerHooks):
         """
         pass
 
+    def show_prompt(self,
+                    msg: str,
+                    placeholder: Optional[str] = None,
+                    default_value: Optional[str] = None) -> None:
+        pass
+
 
 @dataclass
 class MatterTestConfig:
@@ -368,10 +362,12 @@ class MatterTestConfig:
     discriminators: Optional[List[int]] = None
     setup_passcodes: Optional[List[int]] = None
     commissionee_ip_address_just_for_testing: Optional[str] = None
-    maximize_cert_chains: bool = False
+    # By default, we start with maximized cert chains, as required for RR-1.1.
+    # This allows cert tests to be run without re-commissioning for RR-1.1.
+    maximize_cert_chains: bool = True
 
-    qr_code_content: Optional[str] = None
-    manual_code: Optional[str] = None
+    qr_code_content: List[str] = field(default_factory=list)
+    manual_code: List[str] = field(default_factory=list)
 
     wifi_ssid: Optional[str] = None
     wifi_passphrase: Optional[str] = None
@@ -384,7 +380,10 @@ class MatterTestConfig:
     # Node ID to use for controller/commissioner
     controller_node_id: int = _DEFAULT_CONTROLLER_NODE_ID
     # CAT Tags for default controller/commissioner
-    controller_cat_tags: List[int] = field(default_factory=list)
+    # By default, we commission with CAT tags specified for RR-1.1
+    # so the cert tests can be run without re-commissioning the device
+    # for this one test. This can be overwritten from the command line
+    controller_cat_tags: List[int] = field(default_factory=lambda: [0x0001_0001])
 
     # Fabric ID which to use
     fabric_id: int = 1
@@ -451,8 +450,17 @@ class CustomCommissioningParameters:
 
 
 @dataclass
-class AttributePathLocation:
+class ClusterPathLocation:
     endpoint_id: int
+    cluster_id: int
+
+    def __str__(self):
+        return (f'\n       Endpoint: {self.endpoint_id},'
+                f'\n       Cluster:  {cluster_id_str(self.cluster_id)}')
+
+
+@dataclass
+class AttributePathLocation(ClusterPathLocation):
     cluster_id: Optional[int] = None
     attribute_id: Optional[int] = None
 
@@ -470,55 +478,50 @@ class AttributePathLocation:
         return desc
 
     def __str__(self):
-        return (f'\n        Endpoint: {self.endpoint_id},'
-                f'\n        Cluster:  {cluster_id_str(self.cluster_id)},'
-                f'\n        Attribute:{id_str(self.attribute_id)}')
+        return (f'{super().__str__()}'
+                f'\n      Attribute:{id_str(self.attribute_id)}')
 
 
 @dataclass
-class EventPathLocation:
-    endpoint_id: int
-    cluster_id: int
+class EventPathLocation(ClusterPathLocation):
     event_id: int
 
     def __str__(self):
-        return (f'\n        Endpoint: {self.endpoint_id},'
-                f'\n        Cluster:  {cluster_id_str(self.cluster_id)},'
-                f'\n        Event:    {id_str(self.event_id)}')
+        return (f'{super().__str__()}'
+                f'\n       Event:    {id_str(self.event_id)}')
 
 
 @dataclass
-class CommandPathLocation:
-    endpoint_id: int
-    cluster_id: int
+class CommandPathLocation(ClusterPathLocation):
     command_id: int
 
     def __str__(self):
-        return (f'\n        Endpoint: {self.endpoint_id},'
-                f'\n        Cluster:  {cluster_id_str(self.cluster_id)},'
-                f'\n        Command:  {id_str(self.command_id)}')
+        return (f'{super().__str__()}'
+                f'\n       Command:  {id_str(self.command_id)}')
 
 
 @dataclass
-class ClusterPathLocation:
-    endpoint_id: int
-    cluster_id: int
-
-    def __str__(self):
-        return (f'\n       Endpoint: {self.endpoint_id},'
-                f'\n       Cluster:  {cluster_id_str(self.cluster_id)}')
-
-
-@dataclass
-class FeaturePathLocation:
-    endpoint_id: int
-    cluster_id: int
+class FeaturePathLocation(ClusterPathLocation):
     feature_code: str
 
     def __str__(self):
-        return (f'\n        Endpoint: {self.endpoint_id},'
-                f'\n        Cluster:  {cluster_id_str(self.cluster_id)},'
-                f'\n        Feature:  {self.feature_code}')
+        return (f'{super().__str__()}'
+                f'\n       Feature:  {self.feature_code}')
+
+
+@dataclass
+class DeviceTypePathLocation:
+    device_type_id: int
+    cluster_id: Optional[int] = None
+
+    def __str__(self):
+        msg = f'\n       DeviceType: {self.device_type_id}'
+        if self.cluster_id:
+            msg += f'\n       ClusterID: {self.cluster_id}'
+        return msg
+
+
+ProblemLocation = typing.Union[ClusterPathLocation, DeviceTypePathLocation]
 
 # ProblemSeverity is not using StrEnum, but rather Enum, since StrEnum only
 # appeared in 3.11. To make it JSON serializable easily, multiple inheritance
@@ -534,7 +537,7 @@ class ProblemSeverity(str, Enum):
 @dataclass
 class ProblemNotice:
     test_name: str
-    location: Union[AttributePathLocation, EventPathLocation, CommandPathLocation, ClusterPathLocation, FeaturePathLocation]
+    location: ProblemLocation
     severity: ProblemSeverity
     problem: str
     spec_location: str = ""
@@ -642,6 +645,7 @@ def hex_from_bytes(b: bytes) -> str:
 class TestStep:
     test_plan_number: typing.Union[int, str]
     description: str
+    expectation: str = ""
     is_commissioning: bool = False
 
 
@@ -672,10 +676,10 @@ class MatterBaseTest(base_test.BaseTestClass):
             in order using self.step(number), where number is the test_plan_number
             from each TestStep.
         '''
-        steps = self._get_defined_test_steps(test)
+        steps = self.get_defined_test_steps(test)
         return [TestStep(1, "Run entire test")] if steps is None else steps
 
-    def _get_defined_test_steps(self, test: str) -> list[TestStep]:
+    def get_defined_test_steps(self, test: str) -> list[TestStep]:
         steps_name = 'steps_' + test[5:]
         try:
             fn = getattr(self, steps_name)
@@ -769,11 +773,12 @@ class MatterBaseTest(base_test.BaseTestClass):
         self.step_skipped = False
         if self.runner_hook and not self.is_commissioning:
             test_name = self.current_test_info.name
-            steps = self._get_defined_test_steps(test_name)
+            steps = self.get_defined_test_steps(test_name)
             num_steps = 1 if steps is None else len(steps)
             filename = inspect.getfile(self.__class__)
             desc = self.get_test_desc(test_name)
-            self.runner_hook.test_start(filename=filename, name=desc, count=num_steps)
+            steps_descriptions = [] if steps is None else [step.description for step in steps]
+            self.runner_hook.test_start(filename=filename, name=desc, count=num_steps, steps=steps_descriptions)
             # If we don't have defined steps, we're going to start the one and only step now
             # if there are steps defined by the test, rely on the test calling the step() function
             # to indicates how it is proceeding
@@ -799,11 +804,11 @@ class MatterBaseTest(base_test.BaseTestClass):
         pics_key = pics_key.strip()
         return pics_key in picsd and picsd[pics_key]
 
-    def openCommissioningWindow(self, dev_ctrl: ChipDeviceCtrl, node_id: int) -> CustomCommissioningParameters:
+    async def openCommissioningWindow(self, dev_ctrl: ChipDeviceCtrl, node_id: int) -> CustomCommissioningParameters:
         rnd_discriminator = random.randint(0, 4095)
         try:
-            commissioning_params = dev_ctrl.OpenCommissioningWindow(nodeid=node_id, timeout=900, iteration=1000,
-                                                                    discriminator=rnd_discriminator, option=1)
+            commissioning_params = await dev_ctrl.OpenCommissioningWindow(nodeid=node_id, timeout=900, iteration=1000,
+                                                                          discriminator=rnd_discriminator, option=1)
             params = CustomCommissioningParameters(commissioning_params, rnd_discriminator)
             return params
 
@@ -928,13 +933,13 @@ class MatterBaseTest(base_test.BaseTestClass):
     def print_step(self, stepnum: typing.Union[int, str], title: str) -> None:
         logging.info(f'***** Test Step {stepnum} : {title}')
 
-    def record_error(self, test_name: str, location: Union[AttributePathLocation, EventPathLocation, CommandPathLocation, ClusterPathLocation, FeaturePathLocation], problem: str, spec_location: str = ""):
+    def record_error(self, test_name: str, location: ProblemLocation, problem: str, spec_location: str = ""):
         self.problems.append(ProblemNotice(test_name, location, ProblemSeverity.ERROR, problem, spec_location))
 
-    def record_warning(self, test_name: str, location: Union[AttributePathLocation, EventPathLocation, CommandPathLocation, ClusterPathLocation, FeaturePathLocation], problem: str, spec_location: str = ""):
+    def record_warning(self, test_name: str, location: ProblemLocation, problem: str, spec_location: str = ""):
         self.problems.append(ProblemNotice(test_name, location, ProblemSeverity.WARNING, problem, spec_location))
 
-    def record_note(self, test_name: str, location: Union[AttributePathLocation, EventPathLocation, CommandPathLocation, ClusterPathLocation, FeaturePathLocation], problem: str, spec_location: str = ""):
+    def record_note(self, test_name: str, location: ProblemLocation, problem: str, spec_location: str = ""):
         self.problems.append(ProblemNotice(test_name, location, ProblemSeverity.NOTE, problem, spec_location))
 
     def on_fail(self, record):
@@ -965,7 +970,7 @@ class MatterBaseTest(base_test.BaseTestClass):
             self.runner_hook.step_success(logger=None, logs=None, duration=step_duration, request=None)
 
         # TODO: this check could easily be annoying when doing dev. flag it somehow? Ditto with the in-order check
-        steps = self._get_defined_test_steps(record.test_name)
+        steps = self.get_defined_test_steps(record.test_name)
         if steps is None:
             # if we don't have a list of steps, assume they were all run
             all_steps_run = True
@@ -1062,34 +1067,65 @@ class MatterBaseTest(base_test.BaseTestClass):
         self.current_step_index = self.current_step_index + 1
         self.step_skipped = False
 
-    def get_setup_payload_info(self) -> SetupPayloadInfo:
-        if self.matter_test_config.qr_code_content is not None:
-            qr_code = self.matter_test_config.qr_code_content
+    def get_setup_payload_info(self) -> List[SetupPayloadInfo]:
+        setup_payloads = []
+        for qr_code in self.matter_test_config.qr_code_content:
             try:
-                setup_payload = SetupPayload().ParseQrCode(qr_code)
+                setup_payloads.append(SetupPayload().ParseQrCode(qr_code))
             except ChipStackError:
                 asserts.fail(f"QR code '{qr_code} failed to parse properly as a Matter setup code.")
 
-        elif self.matter_test_config.manual_code is not None:
-            manual_code = self.matter_test_config.manual_code
+        for manual_code in self.matter_test_config.manual_code:
             try:
-                setup_payload = SetupPayload().ParseManualPairingCode(manual_code)
+                setup_payloads.append(SetupPayload().ParseManualPairingCode(manual_code))
             except ChipStackError:
                 asserts.fail(
                     f"Manual code code '{manual_code}' failed to parse properly as a Matter setup code. Check that all digits are correct and length is 11 or 21 characters.")
-        else:
-            asserts.fail("Require either --qr-code or --manual-code.")
 
-        info = SetupPayloadInfo()
-        info.passcode = setup_payload.setup_passcode
-        if setup_payload.short_discriminator is not None:
-            info.filter_type = discovery.FilterType.SHORT_DISCRIMINATOR
-            info.filter_value = setup_payload.short_discriminator
-        else:
-            info.filter_type = discovery.FilterType.LONG_DISCRIMINATOR
-            info.filter_value = setup_payload.long_discriminator
+        infos = []
+        for setup_payload in setup_payloads:
+            info = SetupPayloadInfo()
+            info.passcode = setup_payload.setup_passcode
+            if setup_payload.short_discriminator is not None:
+                info.filter_type = discovery.FilterType.SHORT_DISCRIMINATOR
+                info.filter_value = setup_payload.short_discriminator
+            else:
+                info.filter_type = discovery.FilterType.LONG_DISCRIMINATOR
+                info.filter_value = setup_payload.long_discriminator
+            infos.append(info)
 
-        return info
+        num_passcodes = 0 if self.matter_test_config.setup_passcodes is None else len(self.matter_test_config.setup_passcodes)
+        num_discriminators = 0 if self.matter_test_config.discriminators is None else len(self.matter_test_config.discriminators)
+        asserts.assert_equal(num_passcodes, num_discriminators, "Must have same number of discriminators as passcodes")
+        if self.matter_test_config.discriminators:
+            for idx, discriminator in enumerate(self.matter_test_config.discriminators):
+                info = SetupPayloadInfo()
+                info.passcode = self.matter_test_config.setup_passcodes[idx]
+                info.filter_type = DiscoveryFilterType.LONG_DISCRIMINATOR
+                info.filter_value = discriminator
+                infos.append(info)
+
+        return infos
+
+    def wait_for_user_input(self,
+                            prompt_msg: str,
+                            prompt_msg_placeholder: str = "Submit anything to continue",
+                            default_value: str = "y") -> str:
+        """Ask for user input and wait for it.
+
+        Args:
+            prompt_msg (str): Message for TH UI prompt and input function. Indicates what is expected from the user.
+            prompt_msg_placeholder (str, optional): TH UI prompt input placeholder (where the user types). Defaults to "Submit anything to continue".
+            default_value (str, optional): TH UI prompt default value. Defaults to "y".
+
+        Returns:
+            str: User input
+        """
+        if self.runner_hook:
+            self.runner_hook.show_prompt(msg=prompt_msg,
+                                         placeholder=prompt_msg_placeholder,
+                                         default_value=default_value)
+        return input(f'{prompt_msg.removesuffix(chr(10))}\n')
 
 
 def generate_mobly_test_config(matter_test_config: MatterTestConfig):
@@ -1268,27 +1304,23 @@ def populate_commissioning_args(args: argparse.Namespace, config: MatterTestConf
     config.commissioning_method = args.commissioning_method
     config.commission_only = args.commission_only
 
-    # TODO: this should also allow multiple once QR and manual codes are supported.
-    config.qr_code_content = args.qr_code
-    if args.manual_code:
-        config.manual_code = args.manual_code
-    else:
-        config.manual_code = None
+    config.qr_code_content.extend(args.qr_code)
+    config.manual_code.extend(args.manual_code)
 
     if args.commissioning_method is None:
         return True
 
-    if args.discriminators is None and (args.qr_code is None and args.manual_code is None):
+    if args.discriminators == [] and (args.qr_code == [] and args.manual_code == []):
         print("error: Missing --discriminator when no --qr-code/--manual-code present!")
         return False
     config.discriminators = args.discriminators
 
-    if args.passcodes is None and (args.qr_code is None and args.manual_code is None):
+    if args.passcodes == [] and (args.qr_code == [] and args.manual_code == []):
         print("error: Missing --passcode when no --qr-code/--manual-code present!")
         return False
     config.setup_passcodes = args.passcodes
 
-    if args.qr_code is not None and args.manual_code is not None:
+    if args.qr_code != [] and args.manual_code != []:
         print("error: Cannot have both --qr-code and --manual-code present!")
         return False
 
@@ -1296,8 +1328,7 @@ def populate_commissioning_args(args: argparse.Namespace, config: MatterTestConf
         print("error: supplied number of discriminators does not match number of passcodes")
         return False
 
-    device_descriptors = [config.qr_code_content] if config.qr_code_content is not None else [
-        config.manual_code] if config.manual_code is not None else config.discriminators
+    device_descriptors = config.qr_code_content + config.manual_code + config.discriminators
 
     if len(config.dut_node_ids) > len(device_descriptors):
         print("error: More node IDs provided than discriminators")
@@ -1387,7 +1418,7 @@ def convert_args_to_matter_config(args: argparse.Namespace) -> MatterTestConfig:
     return config
 
 
-def parse_matter_test_args(argv: List[str]) -> MatterTestConfig:
+def parse_matter_test_args(argv: Optional[List[str]] = None) -> MatterTestConfig:
     parser = argparse.ArgumentParser(description='Matter standalone Python test')
 
     basic_group = parser.add_argument_group(title="Basic arguments", description="Overall test execution arguments")
@@ -1466,9 +1497,9 @@ def parse_matter_test_args(argv: List[str]) -> MatterTestConfig:
     code_group = parser.add_mutually_exclusive_group(required=False)
 
     code_group.add_argument('-q', '--qr-code', type=str,
-                            metavar="QR_CODE", help="QR setup code content (overrides passcode and discriminator)")
+                            metavar="QR_CODE", default=[], help="QR setup code content (overrides passcode and discriminator)", nargs="+")
     code_group.add_argument('--manual-code', type=str_from_manual_code,
-                            metavar="MANUAL_CODE", help="Manual setup code content (overrides passcode and discriminator)")
+                            metavar="MANUAL_CODE", default=[], help="Manual setup code content (overrides passcode and discriminator)", nargs="+")
 
     fabric_group = parser.add_argument_group(
         title="Fabric selection", description="Fabric selection for single-fabric basic usage, and commissioning")
@@ -1535,56 +1566,70 @@ class CommissionDeviceTest(MatterBaseTest):
                          (conf.root_of_trust_index, conf.fabric_id, node_id))
             logging.info("Commissioning method: %s" % conf.commissioning_method)
 
-            if not self._commission_device(commission_idx):
+            if not asyncio.run(self._commission_device(commission_idx)):
                 raise signals.TestAbortAll("Failed to commission node")
 
-    def _commission_device(self, i) -> bool:
+    async def _commission_device(self, i) -> bool:
         dev_ctrl = self.default_controller
         conf = self.matter_test_config
 
-        # TODO: qr code and manual code aren't lists
-
-        if conf.qr_code_content or conf.manual_code:
-            info = self.get_setup_payload_info()
-        else:
-            info = SetupPayloadInfo()
-            info.passcode = conf.setup_passcodes[i]
-            info.filter_type = DiscoveryFilterType.LONG_DISCRIMINATOR
-            info.filter_value = conf.discriminators[i]
+        info = self.get_setup_payload_info()[i]
 
         if conf.commissioning_method == "on-network":
-            return dev_ctrl.CommissionOnNetwork(
-                nodeId=conf.dut_node_ids[i],
-                setupPinCode=info.passcode,
-                filterType=info.filter_type,
-                filter=info.filter_value
-            )
+            try:
+                await dev_ctrl.CommissionOnNetwork(
+                    nodeId=conf.dut_node_ids[i],
+                    setupPinCode=info.passcode,
+                    filterType=info.filter_type,
+                    filter=info.filter_value
+                )
+                return True
+            except ChipStackError as e:
+                logging.error("Commissioning failed: %s" % e)
+                return False
         elif conf.commissioning_method == "ble-wifi":
-            return dev_ctrl.CommissionWiFi(
-                info.filter_value,
-                info.passcode,
-                conf.dut_node_ids[i],
-                conf.wifi_ssid,
-                conf.wifi_passphrase
-            )
+            try:
+                await dev_ctrl.CommissionWiFi(
+                    info.filter_value,
+                    info.passcode,
+                    conf.dut_node_ids[i],
+                    conf.wifi_ssid,
+                    conf.wifi_passphrase,
+                    isShortDiscriminator=(info.filter_type == DiscoveryFilterType.SHORT_DISCRIMINATOR)
+                )
+                return True
+            except ChipStackError as e:
+                logging.error("Commissioning failed: %s" % e)
+                return False
         elif conf.commissioning_method == "ble-thread":
-            return dev_ctrl.CommissionThread(
-                info.filter_value,
-                info.passcode,
-                conf.dut_node_ids[i],
-                conf.thread_operational_dataset
-            )
+            try:
+                await dev_ctrl.CommissionThread(
+                    info.filter_value,
+                    info.passcode,
+                    conf.dut_node_ids[i],
+                    conf.thread_operational_dataset,
+                    isShortDiscriminator=(info.filter_type == DiscoveryFilterType.SHORT_DISCRIMINATOR)
+                )
+                return True
+            except ChipStackError as e:
+                logging.error("Commissioning failed: %s" % e)
+                return False
         elif conf.commissioning_method == "on-network-ip":
-            logging.warning("==== USING A DIRECT IP COMMISSIONING METHOD NOT SUPPORTED IN THE LONG TERM ====")
-            return dev_ctrl.CommissionIP(
-                ipaddr=conf.commissionee_ip_address_just_for_testing,
-                setupPinCode=info.passcode, nodeid=conf.dut_node_ids[i]
-            )
+            try:
+                logging.warning("==== USING A DIRECT IP COMMISSIONING METHOD NOT SUPPORTED IN THE LONG TERM ====")
+                await dev_ctrl.CommissionIP(
+                    ipaddr=conf.commissionee_ip_address_just_for_testing,
+                    setupPinCode=info.passcode, nodeid=conf.dut_node_ids[i]
+                )
+                return True
+            except ChipStackError as e:
+                logging.error("Commissioning failed: %s" % e)
+                return False
         else:
             raise ValueError("Invalid commissioning method %s!" % conf.commissioning_method)
 
 
-def default_matter_test_main(argv=None, **kwargs):
+def default_matter_test_main():
     """Execute the test class in a test module.
     This is the default entry point for running a test script file directly.
     In this case, only one test class in a test script is allowed.
@@ -1594,25 +1639,12 @@ def default_matter_test_main(argv=None, **kwargs):
       ...
       if __name__ == '__main__':
         default_matter_test_main.main()
-    Args:
-      argv: A list that is then parsed as command line args. If None, defaults to sys.argv
     """
 
-    matter_test_config = parse_matter_test_args(argv)
-
-    # Allow override of command line from optional arguments
-    if not matter_test_config.controller_cat_tags and "controller_cat_tags" in kwargs:
-        matter_test_config.controller_cat_tags = kwargs["controller_cat_tags"]
+    matter_test_config = parse_matter_test_args()
 
     # Find the test class in the test script.
     test_class = _find_test_class()
-
-    # This is required in case we need any testing with maximized certificate chains.
-    # We need *all* issuers from the start, even for default controller, to use
-    # maximized chains, before MatterStackState init, others some stale certs
-    # may not chain properly.
-    if "maximize_cert_chains" in kwargs:
-        matter_test_config.maximize_cert_chains = kwargs["maximize_cert_chains"]
 
     hooks = InternalTestRunnerHooks()
 
@@ -1635,7 +1667,7 @@ def get_test_info(test_class: MatterBaseTest, matter_test_config: MatterTestConf
     return info
 
 
-def run_tests(test_class: MatterBaseTest, matter_test_config: MatterTestConfig, hooks: TestRunnerHooks) -> None:
+def run_tests_no_exit(test_class: MatterBaseTest, matter_test_config: MatterTestConfig, hooks: TestRunnerHooks, default_controller=None, external_stack=None) -> bool:
 
     get_test_info(test_class, matter_test_config)
 
@@ -1647,7 +1679,10 @@ def run_tests(test_class: MatterBaseTest, matter_test_config: MatterTestConfig, 
     if len(matter_test_config.tests) > 0:
         tests = matter_test_config.tests
 
-    stack = MatterStackState(matter_test_config)
+    if external_stack:
+        stack = external_stack
+    else:
+        stack = MatterStackState(matter_test_config)
 
     with TracingContext() as tracing_ctx:
         for destination in matter_test_config.trace_to:
@@ -1657,12 +1692,12 @@ def run_tests(test_class: MatterBaseTest, matter_test_config: MatterTestConfig, 
 
         # TODO: Steer to right FabricAdmin!
         # TODO: If CASE Admin Subject is a CAT tag range, then make sure to issue NOC with that CAT tag
-
-        default_controller = stack.certificate_authorities[0].adminList[0].NewController(
-            nodeId=matter_test_config.controller_node_id,
-            paaTrustStorePath=str(matter_test_config.paa_trust_store_path),
-            catTags=matter_test_config.controller_cat_tags
-        )
+        if not default_controller:
+            default_controller = stack.certificate_authorities[0].adminList[0].NewController(
+                nodeId=matter_test_config.controller_node_id,
+                paaTrustStorePath=str(matter_test_config.paa_trust_store_path),
+                catTags=matter_test_config.controller_cat_tags
+            )
         test_config.user_params["default_controller"] = stash_globally(default_controller)
 
         test_config.user_params["matter_test_config"] = stash_globally(matter_test_config)
@@ -1689,7 +1724,7 @@ def run_tests(test_class: MatterBaseTest, matter_test_config: MatterTestConfig, 
 
             if hooks:
                 # Right now, we only support running a single test class at once,
-                # but it's relatively easy to exapand that to make the test process faster
+                # but it's relatively easy to expand that to make the test process faster
                 # TODO: support a list of tests
                 hooks.start(count=1)
                 # Mobly gives the test run time in seconds, lets be a bit more precise
@@ -1711,10 +1746,16 @@ def run_tests(test_class: MatterBaseTest, matter_test_config: MatterTestConfig, 
         hooks.stop(duration=duration)
 
     # Shutdown the stack when all done
-    stack.Shutdown()
+    if not external_stack:
+        stack.Shutdown()
 
     if ok:
         logging.info("Final result: PASS !")
     else:
         logging.error("Final result: FAIL !")
+    return ok
+
+
+def run_tests(test_class: MatterBaseTest, matter_test_config: MatterTestConfig, hooks: TestRunnerHooks, default_controller=None, external_stack=None) -> None:
+    if not run_tests_no_exit(test_class, matter_test_config, hooks, default_controller, external_stack):
         sys.exit(1)

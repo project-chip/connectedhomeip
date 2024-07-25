@@ -25,7 +25,7 @@ using namespace chip::app::Clusters::Messages;
 void MessagesManager::HandlePresentMessagesRequest(
     const chip::ByteSpan & messageId, const MessagePriorityEnum & priority,
     const chip::BitMask<MessageControlBitmap> & messageControl, const chip::app::DataModel::Nullable<uint32_t> & startTime,
-    const chip::app::DataModel::Nullable<uint16_t> & duration, const chip::CharSpan & messageText,
+    const chip::app::DataModel::Nullable<uint64_t> & duration, const chip::CharSpan & messageText,
     const chip::Optional<chip::app::DataModel::DecodableList<MessageResponseOption>> & responses)
 {
     // TODO: Present Message

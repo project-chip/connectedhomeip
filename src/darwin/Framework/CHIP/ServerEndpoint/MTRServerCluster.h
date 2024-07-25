@@ -23,8 +23,11 @@ NS_ASSUME_NONNULL_BEGIN
 
 /**
  * A representation of a server cluster implemented by an MTRDeviceController.
+ *
+ * MTRServerCluster's API can be accessed from any thread.
  */
-MTR_NEWLY_AVAILABLE
+NS_SWIFT_SENDABLE
+MTR_AVAILABLE(ios(17.6), macos(14.6), watchos(10.6), tvos(17.6))
 @interface MTRServerCluster : NSObject
 
 - (instancetype)init NS_UNAVAILABLE;
@@ -89,9 +92,9 @@ MTR_NEWLY_AVAILABLE
  */
 + (MTRServerCluster *)newDescriptorCluster;
 
-@property (nonatomic, copy, readonly) NSNumber * clusterID;
+@property (atomic, copy, readonly) NSNumber * clusterID;
 
-@property (nonatomic, copy, readonly) NSNumber * clusterRevision;
+@property (atomic, copy, readonly) NSNumber * clusterRevision;
 
 /**
  * The list of entities that are allowed to access this cluster instance.  This
@@ -99,12 +102,12 @@ MTR_NEWLY_AVAILABLE
  *
  * Defaults to empty list, which means no additional access grants.
  */
-@property (nonatomic, copy, readonly) NSArray<MTRAccessGrant *> * accessGrants;
+@property (atomic, copy, readonly) NSArray<MTRAccessGrant *> * accessGrants;
 
 /**
  * The list of attributes supported by the cluster.
  */
-@property (nonatomic, copy, readonly) NSArray<MTRServerAttribute *> * attributes;
+@property (atomic, copy, readonly) NSArray<MTRServerAttribute *> * attributes;
 
 @end
 

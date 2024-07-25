@@ -15,6 +15,7 @@
 import os
 from enum import Enum, auto
 
+from .builder import BuilderOutput
 from .gn import GnBuilder
 
 
@@ -80,7 +81,8 @@ class InfineonBuilder(GnBuilder):
                  app: InfineonApp = InfineonApp.LOCK,
                  board: InfineonBoard = InfineonBoard.PSOC6BOARD,
                  enable_ota_requestor: bool = False,
-                 update_image: bool = False):
+                 update_image: bool = False,
+                 enable_trustm: bool = False):
         super(InfineonBuilder, self).__init__(
             root=app.BuildRoot(root),
             runner=runner)
@@ -92,24 +94,23 @@ class InfineonBuilder(GnBuilder):
             self.extra_gn_options.append('chip_enable_ota_requestor=true')
         if update_image:
             self.extra_gn_options.append('build_update_image=true')
+        if enable_trustm:
+            self.extra_gn_options.append('chip_crypto=\"platform\"')
+        if enable_trustm is False:
+            self.extra_gn_options.append('chip_crypto=\"mbedtls\"')
 
     def GnBuildArgs(self):
         return self.extra_gn_options
 
     def build_outputs(self):
-        items = {
-            '%s.out' % self.app.AppNamePrefix():
-                os.path.join(self.output_dir, '%s.out' %
-                             self.app.AppNamePrefix()),
-            '%s.out.map' % self.app.AppNamePrefix():
-                os.path.join(self.output_dir,
-                             '%s.out.map' % self.app.AppNamePrefix()),
-        }
+        extensions = ['out']
+        if self.options.enable_link_map_file:
+            extensions.append('out.map')
+        for ext in extensions:
+            name = f"{self.app.AppNamePrefix()}.{ext}"
+            yield BuilderOutput(os.path.join(self.output_dir, name), name)
 
-        return items
-
-    def flashbundle(self):
-        with open(os.path.join(self.output_dir, self.app.FlashBundleName()), 'r') as fp:
-            return {
-                line.strip(): os.path.join(self.output_dir, line.strip()) for line in fp.readlines() if line.strip()
-            }
+    def bundle_outputs(self):
+        with open(os.path.join(self.output_dir, self.app.FlashBundleName())) as f:
+            for line in filter(None, [x.strip() for x in f.readlines()]):
+                yield BuilderOutput(os.path.join(self.output_dir, line), line)

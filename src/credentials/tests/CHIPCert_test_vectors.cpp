@@ -28,6 +28,8 @@
 
 #include "CHIPCert_test_vectors.h"
 
+using namespace chip::Credentials;
+
 namespace chip {
 namespace TestCerts {
 

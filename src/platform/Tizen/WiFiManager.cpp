@@ -400,14 +400,14 @@ bool WiFiManager::_FoundAPOnScanCb(wifi_manager_ap_h ap, void * userData)
     wifi_manager_security_type_e type;
     WiFiScanResponse scannedAP;
 
-    wifiErr = wifi_manager_ap_get_essid(ap, &MakeUniquePointerReceiver(essid).Get());
+    wifiErr = wifi_manager_ap_get_essid(ap, &essid.GetReceiver());
     VerifyOrExit(wifiErr == WIFI_MANAGER_ERROR_NONE,
                  ChipLogError(DeviceLayer, "FAIL: get AP essid [%s]", get_error_message(wifiErr)));
     ChipLogProgress(DeviceLayer, "Essid Found: %s\n", essid.get());
     scannedAP.ssidLen = static_cast<uint8_t>(std::min(strlen(essid.get()), sizeof(scannedAP.ssid)));
     memcpy(scannedAP.ssid, essid.get(), scannedAP.ssidLen);
 
-    wifiErr = wifi_manager_ap_get_bssid(ap, &MakeUniquePointerReceiver(bssid).Get());
+    wifiErr = wifi_manager_ap_get_bssid(ap, &bssid.GetReceiver());
     VerifyOrExit(wifiErr == WIFI_MANAGER_ERROR_NONE,
                  ChipLogError(DeviceLayer, "Fail: get AP bssid [%s]", get_error_message(wifiErr)));
     memcpy(scannedAP.bssid, bssid.get(), std::min(strlen(bssid.get()), sizeof(scannedAP.bssid)));
@@ -443,7 +443,7 @@ bool WiFiManager::_FoundAPCb(wifi_manager_ap_h ap, void * userData)
     bool isPassphraseRequired = false;
     auto clonedAp             = reinterpret_cast<wifi_manager_ap_h *>(userData);
 
-    wifiErr = wifi_manager_ap_get_essid(ap, &MakeUniquePointerReceiver(essid).Get());
+    wifiErr = wifi_manager_ap_get_essid(ap, &essid.GetReceiver());
     VerifyOrExit(wifiErr == WIFI_MANAGER_ERROR_NONE,
                  ChipLogError(DeviceLayer, "FAIL: get AP essid [%s]", get_error_message(wifiErr)));
 
@@ -503,7 +503,7 @@ bool WiFiManager::_ConfigListCb(const wifi_manager_config_h config, void * userD
     GAutoPtr<char> name;
     wifi_manager_security_type_e securityType = WIFI_MANAGER_SECURITY_TYPE_NONE;
 
-    wifi_manager_config_get_name(config, &MakeUniquePointerReceiver(name).Get());
+    wifi_manager_config_get_name(config, &name.GetReceiver());
     wifi_manager_config_get_security_type(config, &securityType);
 
     wifiErr = wifi_manager_config_remove(sInstance.mWiFiManagerHandle, config);
@@ -1155,7 +1155,7 @@ CHIP_ERROR WiFiManager::GetConfiguredNetwork(NetworkCommissioning::Network & net
         return CHIP_ERROR_INCORRECT_STATE;
     }
     GAutoPtr<char> essid;
-    int wifiErr = wifi_manager_ap_get_essid(connectedAp, &MakeUniquePointerReceiver(essid).Get());
+    int wifiErr = wifi_manager_ap_get_essid(connectedAp, &essid.GetReceiver());
     VerifyOrReturnError(wifiErr == WIFI_MANAGER_ERROR_NONE, CHIP_ERROR_INTERNAL,
                         ChipLogError(DeviceLayer, "FAIL: get essid [%s]", get_error_message(wifiErr)));
     network.networkIDLen = static_cast<uint8_t>(std::min(strlen(essid.get()), sizeof(network.networkID)));

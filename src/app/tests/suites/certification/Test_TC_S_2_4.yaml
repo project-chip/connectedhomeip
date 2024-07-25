@@ -440,7 +440,7 @@ tests:
       response:
           value: 100
 
-    - label: "DUT transitions to AC2 over 20."
+    - label: "DUT transitions to AC1 over 20s."
       verification: |
           Is the transition done over 20s?
       cluster: "LogCommands"
@@ -449,7 +449,7 @@ tests:
       arguments:
           values:
               - name: "message"
-                value: "Please confirm that transition to AC2 was made over 5s"
+                value: "Please confirm that transition to AC1 was made over 20s"
               - name: "expectedValue"
                 value: "y"
 

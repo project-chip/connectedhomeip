@@ -18,5 +18,7 @@
 
 #include "Globals.h"
 
+#if (LED_ENABLE == 1)
 LED_Handle sAppRedHandle;
 LED_Handle sAppGreenHandle;
+#endif

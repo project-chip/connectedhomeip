@@ -18,6 +18,7 @@
 #include "DnssdType.h"
 
 #include <sstream>
+#include <string>
 
 constexpr char kProtocolTcp[] = "._tcp";
 constexpr char kProtocolUdp[] = "._udp";

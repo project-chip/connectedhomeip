@@ -17,7 +17,7 @@
 
 #include <app/clusters/diagnostic-logs-server/diagnostic-logs-server.h>
 
-#include <app/util/af.h>
+#include <app/util/attribute-storage.h>
 #include <app/util/config.h>
 #include <lib/support/ScopedBuffer.h>
 #include <protocols/bdx/DiagnosticLogs.h>
@@ -131,8 +131,6 @@ void DiagnosticLogsServer::HandleLogRequestForBdx(CommandHandler * commandObj, c
     // If the RequestedProtocol is set to BDX and there is no TransferFileDesignator the command SHALL fail with a Status Code of
     // INVALID_COMMAND.
     VerifyOrReturn(transferFileDesignator.HasValue(), commandObj->AddStatus(path, Status::InvalidCommand));
-
-    VerifyOrReturn(transferFileDesignator.Value().size() > 0, commandObj->AddStatus(path, Status::ConstraintError));
 
     VerifyOrReturn(transferFileDesignator.Value().size() <= kMaxFileDesignatorLen,
                    commandObj->AddStatus(path, Status::ConstraintError));

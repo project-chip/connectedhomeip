@@ -29,9 +29,9 @@ class MessagesClusterMessageStruct(
   val priority: UByte,
   val messageControl: UByte,
   val startTime: UInt?,
-  val duration: UShort?,
+  val duration: ULong?,
   val messageText: String,
-  val responses: Optional<List<MessagesClusterMessageResponseOptionStruct>>
+  val responses: Optional<List<MessagesClusterMessageResponseOptionStruct>>,
 ) {
   override fun toString(): String = buildString {
     append("MessagesClusterMessageStruct {\n")
@@ -97,7 +97,7 @@ class MessagesClusterMessageStruct(
         }
       val duration =
         if (!tlvReader.isNull()) {
-          tlvReader.getUShort(ContextSpecificTag(TAG_DURATION))
+          tlvReader.getULong(ContextSpecificTag(TAG_DURATION))
         } else {
           tlvReader.getNull(ContextSpecificTag(TAG_DURATION))
           null
@@ -127,7 +127,7 @@ class MessagesClusterMessageStruct(
         startTime,
         duration,
         messageText,
-        responses
+        responses,
       )
     }
   }

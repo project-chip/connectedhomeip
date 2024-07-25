@@ -38,8 +38,8 @@ using namespace ::chip::app::Clusters;
 void MatterPostAttributeChangeCallback(const chip::app::ConcreteAttributePath & attributePath, uint8_t type, uint16_t size,
                                        uint8_t * value)
 {
-    ClusterId clusterId     = attributePath.mClusterId;
-    AttributeId attributeId = attributePath.mAttributeId;
+    [[maybe_unused]] ClusterId clusterId     = attributePath.mClusterId;
+    [[maybe_unused]] AttributeId attributeId = attributePath.mAttributeId;
     ChipLogProgress(Zcl, "AttributeChangeCallback cluster: " ChipLogFormatMEI " attribute:" ChipLogFormatMEI,
                     ChipLogValueMEI(clusterId), ChipLogValueMEI(attributeId));
 }

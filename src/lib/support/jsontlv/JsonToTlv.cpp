@@ -15,7 +15,14 @@
  *    limitations under the License.
  */
 
+#include <stdint.h>
+
 #include <algorithm>
+#include <charconv>
+#include <sstream>
+#include <string>
+#include <vector>
+
 #include <json/json.h>
 #include <lib/support/Base64.h>
 #include <lib/support/SafeInt.h>
@@ -97,69 +104,6 @@ CHIP_ERROR JsonTypeStrToTlvType(const char * elementType, ElementTypeContext & t
     return CHIP_NO_ERROR;
 }
 
-bool IsUnsignedInteger(const std::string & s)
-{
-    size_t len = s.length();
-    if (len == 0)
-    {
-        return false;
-    }
-    for (size_t i = 0; i < len; i++)
-    {
-        if (!isdigit(s[i]))
-        {
-            return false;
-        }
-    }
-    return true;
-}
-
-bool IsSignedInteger(const std::string & s)
-{
-    if (s.length() == 0)
-    {
-        return false;
-    }
-    if (s[0] == '-')
-    {
-        return IsUnsignedInteger(s.substr(1));
-    }
-    return IsUnsignedInteger(s);
-}
-
-bool IsValidBase64String(const std::string & s)
-{
-    const std::string base64Chars = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789+/";
-    size_t len                    = s.length();
-
-    // Check if the length is a multiple of 4
-    if (len % 4 != 0)
-    {
-        return false;
-    }
-
-    size_t paddingLen = 0;
-    if (s[len - 1] == '=')
-    {
-        paddingLen++;
-        if (s[len - 2] == '=')
-        {
-            paddingLen++;
-        }
-    }
-
-    // Check for invalid characters
-    for (char c : s.substr(0, len - paddingLen))
-    {
-        if (base64Chars.find(c) == std::string::npos)
-        {
-            return false;
-        }
-    }
-
-    return true;
-}
-
 struct ElementContext
 {
     std::string jsonName;
@@ -179,26 +123,44 @@ bool CompareByTag(const ElementContext & a, const ElementContext & b)
     return IsContextTag(a.tag);
 }
 
-CHIP_ERROR InternalConvertTlvTag(const uint64_t tagNumber, TLV::Tag & tag, const uint32_t profileId = kTemporaryImplicitProfileId)
+// The profileId parameter is used when encoding a tag for a TLV element to specify the profile that the tag belongs to.
+// If the vendor ID is zero but the tag ID does not fit within an 8-bit value, the function uses Implicit Profile Tag.
+// Here, the kTemporaryImplicitProfileId serves as a default value for cases where no explicit profile ID is provided by
+// the caller. This allows for the encoding of tags that are not vendor-specific or context-specific but are instead
+// associated with a temporary implicit profile ID (0xFF01).
+CHIP_ERROR InternalConvertTlvTag(uint32_t tagNumber, TLV::Tag & tag, const uint32_t profileId = kTemporaryImplicitProfileId)
 {
-    if (tagNumber <= UINT8_MAX)
+    uint16_t vendor_id = static_cast<uint16_t>(tagNumber >> 16);
+    uint16_t tag_id    = static_cast<uint16_t>(tagNumber & 0xFFFF);
+
+    if (vendor_id != 0)
+    {
+        tag = TLV::ProfileTag(vendor_id, /*profileNum=*/0, tag_id);
+    }
+    else if (tag_id <= UINT8_MAX)
     {
         tag = TLV::ContextTag(static_cast<uint8_t>(tagNumber));
     }
-    else if (tagNumber <= UINT32_MAX)
-    {
-        tag = TLV::ProfileTag(profileId, static_cast<uint32_t>(tagNumber));
-    }
     else
     {
-        return CHIP_ERROR_INVALID_ARGUMENT;
+        tag = TLV::ProfileTag(profileId, tagNumber);
     }
     return CHIP_NO_ERROR;
 }
 
-CHIP_ERROR ParseJsonName(const std::string name, ElementContext & elementCtx, uint32_t implicitProfileId)
+template <typename T>
+CHIP_ERROR ParseNumericalField(const std::string & decimalString, T & outValue)
 {
-    uint64_t tagNumber                  = 0;
+    const char * start_ptr       = decimalString.data();
+    const char * end_ptr         = decimalString.data() + decimalString.size();
+    auto [last_converted_ptr, _] = std::from_chars(start_ptr, end_ptr, outValue, 10);
+    VerifyOrReturnError(last_converted_ptr == end_ptr, CHIP_ERROR_INVALID_ARGUMENT);
+    return CHIP_NO_ERROR;
+}
+
+CHIP_ERROR ParseJsonName(const std::string & name, ElementContext & elementCtx, uint32_t implicitProfileId)
+{
+    uint32_t tagNumber                  = 0;
     const char * elementType            = nullptr;
     std::vector<std::string> nameFields = SplitIntoFieldsBySeparator(name, ':');
     TLV::Tag tag                        = TLV::AnonymousTag();
@@ -207,14 +169,12 @@ CHIP_ERROR ParseJsonName(const std::string name, ElementContext & elementCtx, ui
 
     if (nameFields.size() == 2)
     {
-        VerifyOrReturnError(IsUnsignedInteger(nameFields[0]), CHIP_ERROR_INVALID_ARGUMENT);
-        tagNumber   = std::strtoull(nameFields[0].c_str(), nullptr, 10);
+        ReturnErrorOnFailure(ParseNumericalField(nameFields[0], tagNumber));
         elementType = nameFields[1].c_str();
     }
     else if (nameFields.size() == 3)
     {
-        VerifyOrReturnError(IsUnsignedInteger(nameFields[1]), CHIP_ERROR_INVALID_ARGUMENT);
-        tagNumber   = std::strtoull(nameFields[1].c_str(), nullptr, 10);
+        ReturnErrorOnFailure(ParseNumericalField(nameFields[1], tagNumber));
         elementType = nameFields[2].c_str();
     }
     else
@@ -255,16 +215,14 @@ CHIP_ERROR EncodeTlvElement(const Json::Value & val, TLV::TLVWriter & writer, co
     switch (elementCtx.type.tlvType)
     {
     case TLV::kTLVType_UnsignedInteger: {
-        uint64_t v;
+        uint64_t v = 0;
         if (val.isUInt64())
         {
             v = val.asUInt64();
         }
         else if (val.isString())
         {
-            const std::string valAsString = val.asString();
-            VerifyOrReturnError(IsUnsignedInteger(valAsString), CHIP_ERROR_INVALID_ARGUMENT);
-            v = std::strtoull(valAsString.c_str(), nullptr, 10);
+            ReturnErrorOnFailure(ParseNumericalField(val.asString(), v));
         }
         else
         {
@@ -275,16 +233,14 @@ CHIP_ERROR EncodeTlvElement(const Json::Value & val, TLV::TLVWriter & writer, co
     }
 
     case TLV::kTLVType_SignedInteger: {
-        int64_t v;
+        int64_t v = 0;
         if (val.isInt64())
         {
             v = val.asInt64();
         }
         else if (val.isString())
         {
-            const std::string valAsString = val.asString();
-            VerifyOrReturnError(IsSignedInteger(valAsString), CHIP_ERROR_INVALID_ARGUMENT);
-            v = std::strtoll(valAsString.c_str(), nullptr, 10);
+            ReturnErrorOnFailure(ParseNumericalField(val.asString(), v));
         }
         else
         {
@@ -354,20 +310,23 @@ CHIP_ERROR EncodeTlvElement(const Json::Value & val, TLV::TLVWriter & writer, co
         size_t encodedLen             = valAsString.length();
         VerifyOrReturnError(CanCastTo<uint16_t>(encodedLen), CHIP_ERROR_INVALID_ARGUMENT);
 
-        VerifyOrReturnError(IsValidBase64String(valAsString), CHIP_ERROR_INVALID_ARGUMENT);
+        // Check if the length is a multiple of 4 as strict padding is required.
+        VerifyOrReturnError(encodedLen % 4 == 0, CHIP_ERROR_INVALID_ARGUMENT);
 
         Platform::ScopedMemoryBuffer<uint8_t> byteString;
         byteString.Alloc(BASE64_MAX_DECODED_LEN(static_cast<uint16_t>(encodedLen)));
         VerifyOrReturnError(byteString.Get() != nullptr, CHIP_ERROR_NO_MEMORY);
 
         auto decodedLen = Base64Decode(valAsString.c_str(), static_cast<uint16_t>(encodedLen), byteString.Get());
+        VerifyOrReturnError(decodedLen < UINT16_MAX, CHIP_ERROR_INVALID_ARGUMENT);
         ReturnErrorOnFailure(writer.PutBytes(tag, byteString.Get(), decodedLen));
         break;
     }
 
     case TLV::kTLVType_UTF8String: {
         VerifyOrReturnError(val.isString(), CHIP_ERROR_INVALID_ARGUMENT);
-        ReturnErrorOnFailure(writer.PutString(tag, val.asCString()));
+        const std::string valAsString = val.asString();
+        ReturnErrorOnFailure(writer.PutString(tag, valAsString.data(), static_cast<uint32_t>(valAsString.size())));
         break;
     }
 
@@ -459,10 +418,19 @@ CHIP_ERROR JsonToTlv(const std::string & jsonString, TLV::TLVWriter & writer)
 
     ElementContext elementCtx;
     elementCtx.type = { TLV::kTLVType_Structure, false };
+
+    // Use kTemporaryImplicitProfileId as the default value for cases where no explicit implicit profile ID is provided by
+    // the caller. This allows for the encoding of tags that are not vendor-specific or context-specific but are instead
+    // associated with a temporary implicit profile ID (0xFF01).
+    if (writer.ImplicitProfileId == TLV::kProfileIdNotSpecified)
+    {
+        writer.ImplicitProfileId = kTemporaryImplicitProfileId;
+    }
+
     return EncodeTlvElement(json, writer, elementCtx);
 }
 
-CHIP_ERROR ConvertTlvTag(const uint64_t tagNumber, TLV::Tag & tag)
+CHIP_ERROR ConvertTlvTag(uint32_t tagNumber, TLV::Tag & tag)
 {
     return InternalConvertTlvTag(tagNumber, tag);
 }

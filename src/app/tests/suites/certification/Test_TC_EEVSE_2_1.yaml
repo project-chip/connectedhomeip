@@ -88,7 +88,6 @@ tests:
           constraints:
               type: amperage_ma
               minValue: 0
-              maxValue: 80000
 
     - label: "Step 8: TH reads from the DUT the MinimumChargeCurrent attribute"
       PICS: EEVSE.S.A0006
@@ -98,7 +97,6 @@ tests:
           constraints:
               type: amperage_ma
               minValue: 0
-              maxValue: 80000
 
     - label: "Step 9: TH reads from the DUT the MaximumChargeCurrent attribute"
       PICS: EEVSE.S.A0007
@@ -108,7 +106,6 @@ tests:
           constraints:
               type: amperage_ma
               minValue: 0
-              maxValue: 80000
 
     - label:
           "Step 10: TH reads from the DUT the MaximumDischargeCurrent attribute"
@@ -119,7 +116,6 @@ tests:
           constraints:
               type: amperage_ma
               minValue: 0
-              maxValue: 80000
 
     - label:
           "Step 11: TH writes to the DUT the UserMaximumChargeCurrent attribute

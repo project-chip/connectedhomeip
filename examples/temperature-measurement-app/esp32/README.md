@@ -34,7 +34,6 @@ contains three files:
 
 ```
 main/diagnostic_logs
-├── crash.log
 ├── end_user_support.log
 └── network_diag.log
 ```
@@ -53,8 +52,8 @@ chip-tool diagnosticlogs retrieve-logs-request 0 0 1 0
 # Read network diagnostic using BDX protocol
 chip-tool interactive start
 > diagnosticlogs retrieve-logs-request 1 1 1 0 --TransferFileDesignator network-diag.log
-# Retrieve crash over BDX
-> diagnosticlogs retrieve-logs-request 1 1 1 0 --TransferFileDesignator crash.bin
+# Retrieve crash summary over BDX
+> diagnosticlogs retrieve-logs-request 2 1 1 0 --TransferFileDesignator crash-summary.bin
 ```
 
 esp-idf supports storing and retrieving
@@ -73,15 +72,9 @@ This example's partition table and sdkconfig.default are already modified
 -   Retrieve the core dump using diagnostic logs cluster
 
     ```
-    # Read crash logs over BDX
+    # Read crash summary over BDX
     chip-tool interactive start
-    > diagnosticlogs retrieve-logs-request 1 1 1 0 --TransferFileDesignator crash.bin
-    ```
-
--   Decode the crash logs, using espcoredump.py
-    ```
-    espcoredump.py --chip (CHIP) info_corefile --core /tmp/crash.bin \
-                   --core-format elf build/chip-temperature-measurement-app.elf
+    > diagnosticlogs retrieve-logs-request 2 1 1 0 --TransferFileDesignator crash-summary.bin
     ```
 
 ## Optimization

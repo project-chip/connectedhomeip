@@ -106,6 +106,7 @@ CHIP_ERROR ProcessClusterCommand(int argc, char ** argv)
 
 int main(int argc, char * argv[])
 {
+    ChipLogProgress(AppServer, "chip_casting_simplified = 0"); // this file is built/run only if chip_casting_simplified = 0
     VerifyOrDie(CHIP_NO_ERROR == chip::Platform::MemoryInit());
     VerifyOrDie(CHIP_NO_ERROR == chip::DeviceLayer::PlatformMgr().InitChipStack());
 

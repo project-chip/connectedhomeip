@@ -16,7 +16,6 @@ import("//build_overrides/build.gni")
 import("//build_overrides/chip.gni")
 import("//build_overrides/mbedtls.gni")
 import("//build_overrides/nlassert.gni")
-import("//build_overrides/nlunit_test.gni")
 import("//build_overrides/pigweed.gni")
 
 import("//src/lwip/lwip.gni")
@@ -135,7 +134,6 @@ if (current_toolchain != "${dir_pw_toolchain}/default:default") {
       "${chip_root}/src/system",
       "${chip_root}/src/transport",
       "${nlassert_root}:nlassert",
-      "${nlunit_test_root}:nlunit-test",
     ]
 
     if (enable_fuzz_test_targets) {
@@ -163,6 +161,7 @@ if (current_toolchain != "${dir_pw_toolchain}/default:default") {
         "${chip_root}/examples/shell/standalone:chip-shell",
         "${chip_root}/src/app/tests/integration:chip-im-initiator",
         "${chip_root}/src/app/tests/integration:chip-im-responder",
+        "${chip_root}/src/inet/tests:inet-layer-test-tool",
         "${chip_root}/src/lib/address_resolve:address-resolve-tool",
         "${chip_root}/src/messaging/tests/echo:chip-echo-requester",
         "${chip_root}/src/messaging/tests/echo:chip-echo-responder",
@@ -182,7 +181,9 @@ if (current_toolchain != "${dir_pw_toolchain}/default:default") {
       deps += [
         "${chip_root}/src/app/server/java",
         "${chip_root}/src/controller/java",
+        "${chip_root}/src/controller/java:jsontlv",
         "${chip_root}/src/controller/java:onboarding_payload",
+        "${chip_root}/src/controller/java:tlv",
         "${chip_root}/src/platform/android:java",
       ]
     }
@@ -231,6 +232,7 @@ if (current_toolchain != "${dir_pw_toolchain}/default:default") {
         "//scripts/build:build_examples.tests",
         "//scripts/py_matter_idl:matter_idl.tests",
         "//scripts/py_matter_yamltests:matter_yamltests.tests",
+        "//scripts/tests/py:metadata_parser.tests",
         "//src:tests_run",
       ]
 

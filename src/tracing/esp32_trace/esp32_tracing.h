@@ -1,5 +1,7 @@
 #include <lib/core/CHIPError.h>
 #include <tracing/backend.h>
+#include <tracing/metric_event.h>
+#include <unordered_map>
 
 #include <memory>
 namespace chip {
@@ -29,7 +31,6 @@ public:
     void TraceInstant(const char * label, const char * group) override;
 
     void TraceCounter(const char * label) override;
-    void TraceMetric(const char * label, int32_t value) override;
 
     void LogMessageSend(MessageSendInfo &) override;
     void LogMessageReceived(MessageReceivedInfo &) override;
@@ -37,9 +38,12 @@ public:
     void LogNodeLookup(NodeLookupInfo &) override;
     void LogNodeDiscovered(NodeDiscoveredInfo &) override;
     void LogNodeDiscoveryFailed(NodeDiscoveryFailedInfo &) override;
+    void LogMetricEvent(const MetricEvent &) override;
 
 private:
-    bool mRegistered = false;
+    using ValueType = MetricEvent::Value::Type;
+    std::unordered_map<const char *, ValueType> mRegisteredMetrics;
+    void RegisterMetric(const char * key, ValueType type);
 };
 
 } // namespace Insights

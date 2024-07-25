@@ -18,7 +18,7 @@
 #include "TvApp-JNI.h"
 #include <app-common/zap-generated/attributes/Accessors.h>
 #include <app-common/zap-generated/ids/Clusters.h>
-#include <app/util/af.h>
+#include <app/util/attribute-storage.h>
 #include <app/util/config.h>
 #include <jni.h>
 #include <lib/support/CHIPJNIError.h>
@@ -83,6 +83,7 @@ void LevelManager::PostLevelChanged(chip::EndpointId endpoint, uint8_t value)
 
 jboolean LevelManager::SetLevel(jint endpoint, jint value)
 {
+    chip::DeviceLayer::StackLock stack;
     chip::Protocols::InteractionModel::Status status = app::Clusters::LevelControl::Attributes::CurrentLevel::Set(
         static_cast<chip::EndpointId>(endpoint), static_cast<uint8_t>(value));
     return status == chip::Protocols::InteractionModel::Status::Success;

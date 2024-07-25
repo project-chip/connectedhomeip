@@ -18,7 +18,7 @@
 /**
  *    @file
  *          Platform-specific configuration overrides for CHIP on
- *          the Texas Instruments CC1352 platform.
+ *          the Texas Instruments CC1354 platform.
  *
  * NOTE: currently a bare-bones implementation to allow for building.
  */
@@ -67,3 +67,12 @@
 #ifndef CHIP_CONFIG_MAX_FABRICS
 #define CHIP_CONFIG_MAX_FABRICS 5
 #endif
+
+#ifdef TI_ICD_ENABLE_SERVER
+// If ICD server is enabled the device is configured as a sleepy device
+#define CHIP_CONFIG_ICD_ACTIVE_MODE_DURATION_MS 3000
+#define CHIP_CONFIG_ICD_ACTIVE_MODE_THRESHOLD_MS 500
+#define CHIP_CONFIG_ICD_IDLE_MODE_DURATION_SEC 360
+#define CHIP_DEVICE_CONFIG_ICD_SLOW_POLL_INTERVAL chip::System::Clock::Milliseconds32(5000)
+#define CHIP_DEVICE_CONFIG_ICD_FAST_POLL_INTERVAL chip::System::Clock::Milliseconds32(500)
+#endif // TI_ICD_ENABLE_SERVER

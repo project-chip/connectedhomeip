@@ -19,10 +19,10 @@
 
 #include <functional>
 
-#include <lib/support/UnitTestRegistration.h>
-#include <lib/support/utf8.h>
+#include <pw_unit_test/framework.h>
 
-#include <nlunit-test.h>
+#include <lib/core/StringBuilderAdapters.h>
+#include <lib/support/utf8.h>
 
 namespace {
 
@@ -33,7 +33,7 @@ using namespace chip;
     {                                                                                                                              \
         uint8_t _buff[] = { __VA_ARGS__ };                                                                                         \
         CharSpan _span(reinterpret_cast<const char *>(_buff), sizeof(_buff));                                                      \
-        NL_TEST_ASSERT(inSuite, Utf8::IsValid(_span));                                                                             \
+        EXPECT_TRUE(Utf8::IsValid(_span));                                                                                         \
     } while (0)
 
 #define TEST_INVALID_BYTES(...)                                                                                                    \
@@ -41,42 +41,42 @@ using namespace chip;
     {                                                                                                                              \
         uint8_t _buff[] = { __VA_ARGS__ };                                                                                         \
         CharSpan _span(reinterpret_cast<const char *>(_buff), sizeof(_buff));                                                      \
-        NL_TEST_ASSERT(inSuite, !Utf8::IsValid(_span));                                                                            \
+        EXPECT_FALSE(Utf8::IsValid(_span));                                                                                        \
     } while (0)
 
-void TestValidStrings(nlTestSuite * inSuite, void * inContext)
+TEST(TestUtf8, TestValidStrings)
 {
-    NL_TEST_ASSERT(inSuite, Utf8::IsValid(CharSpan())); // empty span ok
+    EXPECT_TRUE(Utf8::IsValid(CharSpan())); // empty span ok
 
-    NL_TEST_ASSERT(inSuite, Utf8::IsValid(CharSpan::fromCharString("")));
-    NL_TEST_ASSERT(inSuite, Utf8::IsValid(CharSpan::fromCharString("abc")));
+    EXPECT_TRUE(Utf8::IsValid(CharSpan::fromCharString("")));
+    EXPECT_TRUE(Utf8::IsValid(CharSpan::fromCharString("abc")));
 
     // Various tests from https://www.w3.org/2001/06/utf-8-wrong/UTF-8-test.html
 
     // Generic UTF8
-    NL_TEST_ASSERT(inSuite, Utf8::IsValid(CharSpan::fromCharString("κόσμε")));
+    EXPECT_TRUE(Utf8::IsValid(CharSpan::fromCharString("κόσμε")));
 
     // First possible sequence of a certain length
-    NL_TEST_ASSERT(inSuite, Utf8::IsValid(CharSpan::fromCharString("")));
-    NL_TEST_ASSERT(inSuite, Utf8::IsValid(CharSpan::fromCharString("ࠀ")));
-    NL_TEST_ASSERT(inSuite, Utf8::IsValid(CharSpan::fromCharString("𐀀")));
-    NL_TEST_ASSERT(inSuite, Utf8::IsValid(CharSpan::fromCharString("�����")));
-    NL_TEST_ASSERT(inSuite, Utf8::IsValid(CharSpan::fromCharString("������")));
+    EXPECT_TRUE(Utf8::IsValid(CharSpan::fromCharString("")));
+    EXPECT_TRUE(Utf8::IsValid(CharSpan::fromCharString("ࠀ")));
+    EXPECT_TRUE(Utf8::IsValid(CharSpan::fromCharString("𐀀")));
+    EXPECT_TRUE(Utf8::IsValid(CharSpan::fromCharString("�����")));
+    EXPECT_TRUE(Utf8::IsValid(CharSpan::fromCharString("������")));
 
     // Last possible sequence of a certain length
-    NL_TEST_ASSERT(inSuite, Utf8::IsValid(CharSpan::fromCharString("")));
-    NL_TEST_ASSERT(inSuite, Utf8::IsValid(CharSpan::fromCharString("߿")));
-    NL_TEST_ASSERT(inSuite, Utf8::IsValid(CharSpan::fromCharString("￿")));
-    NL_TEST_ASSERT(inSuite, Utf8::IsValid(CharSpan::fromCharString("����")));
-    NL_TEST_ASSERT(inSuite, Utf8::IsValid(CharSpan::fromCharString("�����")));
-    NL_TEST_ASSERT(inSuite, Utf8::IsValid(CharSpan::fromCharString("������")));
+    EXPECT_TRUE(Utf8::IsValid(CharSpan::fromCharString("")));
+    EXPECT_TRUE(Utf8::IsValid(CharSpan::fromCharString("߿")));
+    EXPECT_TRUE(Utf8::IsValid(CharSpan::fromCharString("￿")));
+    EXPECT_TRUE(Utf8::IsValid(CharSpan::fromCharString("����")));
+    EXPECT_TRUE(Utf8::IsValid(CharSpan::fromCharString("�����")));
+    EXPECT_TRUE(Utf8::IsValid(CharSpan::fromCharString("������")));
 
     // Other boundary conditions
-    NL_TEST_ASSERT(inSuite, Utf8::IsValid(CharSpan::fromCharString("퟿")));
-    NL_TEST_ASSERT(inSuite, Utf8::IsValid(CharSpan::fromCharString("")));
-    NL_TEST_ASSERT(inSuite, Utf8::IsValid(CharSpan::fromCharString("�")));
-    NL_TEST_ASSERT(inSuite, Utf8::IsValid(CharSpan::fromCharString("􏿿")));
-    NL_TEST_ASSERT(inSuite, Utf8::IsValid(CharSpan::fromCharString("����")));
+    EXPECT_TRUE(Utf8::IsValid(CharSpan::fromCharString("퟿")));
+    EXPECT_TRUE(Utf8::IsValid(CharSpan::fromCharString("")));
+    EXPECT_TRUE(Utf8::IsValid(CharSpan::fromCharString("�")));
+    EXPECT_TRUE(Utf8::IsValid(CharSpan::fromCharString("􏿿")));
+    EXPECT_TRUE(Utf8::IsValid(CharSpan::fromCharString("����")));
 
     // NOTE: UTF8 allows embeded NULLs
     //       even though strings like that are probably not ideal for handling
@@ -84,17 +84,17 @@ void TestValidStrings(nlTestSuite * inSuite, void * inContext)
     //       completely if the spec is updated as such
     {
         char zero[16] = { 0 };
-        NL_TEST_ASSERT(inSuite, Utf8::IsValid(CharSpan(zero, 0)));
-        NL_TEST_ASSERT(inSuite, Utf8::IsValid(CharSpan(zero, 1)));
-        NL_TEST_ASSERT(inSuite, Utf8::IsValid(CharSpan(zero, 2)));
-        NL_TEST_ASSERT(inSuite, Utf8::IsValid(CharSpan(zero, 3)));
-        NL_TEST_ASSERT(inSuite, Utf8::IsValid(CharSpan(zero, 4)));
-        NL_TEST_ASSERT(inSuite, Utf8::IsValid(CharSpan(zero, 16)));
+        EXPECT_TRUE(Utf8::IsValid(CharSpan(zero, 0)));
+        EXPECT_TRUE(Utf8::IsValid(CharSpan(zero, 1)));
+        EXPECT_TRUE(Utf8::IsValid(CharSpan(zero, 2)));
+        EXPECT_TRUE(Utf8::IsValid(CharSpan(zero, 3)));
+        EXPECT_TRUE(Utf8::IsValid(CharSpan(zero, 4)));
+        EXPECT_TRUE(Utf8::IsValid(CharSpan(zero, 16)));
     }
 
     {
         char insideZero[] = "test\0zero";
-        NL_TEST_ASSERT(inSuite, Utf8::IsValid(CharSpan(insideZero)));
+        EXPECT_TRUE(Utf8::IsValid(CharSpan(insideZero)));
     }
 
     // Test around forbidden 0xD800..0xDFFF UTF-16 surrogate pairs.
@@ -102,7 +102,7 @@ void TestValidStrings(nlTestSuite * inSuite, void * inContext)
     TEST_VALID_BYTES(0b1110'1110, 0b10'000000, 0b10'000000);
 }
 
-void TestInvalidStrings(nlTestSuite * inSuite, void * inContext)
+TEST(TestUtf8, TestInvalidStrings)
 {
     // Overly long sequences
     TEST_INVALID_BYTES(0xc0, 0b10'111111);
@@ -169,22 +169,3 @@ void TestInvalidStrings(nlTestSuite * inSuite, void * inContext)
 }
 
 } // namespace
-
-// clang-format off
-const nlTest sTests[] =
-{
-    NL_TEST_DEF("TestValidStrings", TestValidStrings),
-    NL_TEST_DEF("TestInvalidStrings", TestInvalidStrings),
-    NL_TEST_SENTINEL()
-};
-// clang-format on
-
-int TestUtf8()
-{
-    nlTestSuite theSuite = { "UTF8 validator tests", &sTests[0], nullptr, nullptr };
-
-    nlTestRunner(&theSuite, nullptr);
-    return nlTestRunnerStats(&theSuite);
-}
-
-CHIP_REGISTER_TEST_SUITE(TestUtf8);

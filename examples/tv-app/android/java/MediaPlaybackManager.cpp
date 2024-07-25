@@ -28,6 +28,8 @@
 
 #include "MediaPlaybackManager.h"
 
+#include <string>
+
 using namespace chip;
 using namespace chip::app;
 using namespace chip::app::DataModel;
@@ -152,7 +154,7 @@ CHIP_ERROR MediaPlaybackManager::HandleGetActiveTrack(bool audio, AttributeValue
     }
     else
     {
-        err = aEncoder.EncodeNull();
+        return aEncoder.EncodeNull();
     }
 
 exit:

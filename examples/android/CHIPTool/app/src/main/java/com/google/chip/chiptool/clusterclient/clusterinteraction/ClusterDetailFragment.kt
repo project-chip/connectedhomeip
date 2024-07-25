@@ -67,7 +67,15 @@ class ClusterDetailFragment : Fragment() {
     _binding = ClusterDetailFragmentBinding.inflate(inflater, container, false)
     scope = viewLifecycleOwner.lifecycleScope
     deviceId = checkNotNull(requireArguments().getLong(DEVICE_ID))
-    scope.launch { devicePtr = getConnectedDevicePointer(requireContext(), deviceId) }
+    scope.launch {
+      try {
+        devicePtr = getConnectedDevicePointer(requireContext(), deviceId)
+      } catch (e: IllegalStateException) {
+        Log.d(TAG, "getConnectedDevicePointer exception", e)
+        showMessage("Get DevicePointer fail!")
+        return@launch
+      }
+    }
     endpointId = checkNotNull(requireArguments().getInt(ENDPOINT_ID_KEY))
     historyCommand = requireArguments().getSerializable(HISTORY_COMMAND) as HistoryCommand?
     deviceController.setCompletionListener(GenericChipDeviceListener())

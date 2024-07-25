@@ -19,7 +19,6 @@ name:
 
 PICS:
     - S.S
-    - S.S.F03
 
 config:
     nodeId: 0x12344321
@@ -30,7 +29,7 @@ tests:
     - label: "Precondition: Commission DUT to TH1"
       verification: |
           Once DUT reach the  commissionable state send the following command on TH1:
-          ./chip-tool pairing onnetwork 1 20202021
+          pairing onnetwork 1 20202021
           Verify the commissioning completed with success on TH(chip-tool) from DUT
           [1650455358.501816][4366:4371] CHIP:TOO: Device commissioning completed with success
       disabled: true
@@ -39,7 +38,7 @@ tests:
       verification: |
           Open a commissioning window On TH1(Chiptool)using below command
 
-          ./chip-tool  pairing open-commissioning-window 1 1 400 2000 3841
+           pairing open-commissioning-window 1 1 400 2000 3841
 
           Verify the Successfully opened pairing window On TH1(Chiptool)e device
 
@@ -53,7 +52,7 @@ tests:
       verification: |
           Now send the below command for commissionin DUT to TH2 with Manual pairing code generated in TH1 using open commission window
 
-          ./chip-tool pairing code 2 36253605617 --commissioner-name beta
+          pairing code 2 36253605617 --commissioner-name beta
 
           Verify the commissioning completed with success on TH2(chip-tool) from DUT
 
@@ -65,7 +64,7 @@ tests:
       verification: |
           Open a commissioning window On TH1(Chiptool)using below command
 
-          ./chip-tool  pairing open-commissioning-window 1 1 400 2000 3842
+           pairing open-commissioning-window 1 1 400 2000 3842
 
           Verify the Successfully opened pairing window On TH1(Chiptool)e device
 
@@ -79,7 +78,7 @@ tests:
       verification: |
           send the below command for commissionin DUT to TH3 with Manual pairing code generated in TH1 using open commission window
 
-          ./chip-tool pairing code 3 36545248276 --commissioner-name gamma
+          pairing code 3 36545248276 --commissioner-name gamma
 
           Verify the commissioning completed with success on TH3(chip-tool) from DUT
 
@@ -92,7 +91,7 @@ tests:
           field set to 0x0000."
       PICS: S.S.C03.Rsp
       verification: |
-          ./chip-tool scenesmanagement remove-all-scenes 0x0000 1 1
+          scenesmanagement remove-all-scenes 0x0000 1 1
 
           Verify the RemoveAllScenesResponse with following fields:
           Status is SUCCESS
@@ -108,7 +107,7 @@ tests:
     - label: "Step 1b: Repeat Step 1a with TH2."
       PICS: S.S.C03.Rsp
       verification: |
-          ./chip-tool scenesmanagement remove-all-scenes 0x0000 2 1 --commissioner-name beta
+          scenesmanagement remove-all-scenes 0x0000 2 1 --commissioner-name beta
 
           Verify the RemoveAllScenesResponse with following fields:
           Status is SUCCESS
@@ -125,7 +124,7 @@ tests:
     - label: "Step 1C: Repeat Step 1a with TH3."
       PICS: S.S.C03.Rsp
       verification: |
-          ./chip-tool scenesmanagement remove-all-scenes 0x0000 3 1 --commissioner-name gamma
+          scenesmanagement remove-all-scenes 0x0000 3 1 --commissioner-name gamma
 
           Verify the RemoveAllScenesResponse with following fields:
           Status is SUCCESS
@@ -141,7 +140,7 @@ tests:
 
     - label: "Step 2a: TH1 reads from the DUT the SceneTableSize attribute"
       verification: |
-          ./chip-tool scenesmanagement read scene-table-size 1 1
+          scenesmanagement read scene-table-size 1 1
 
           Verify the "SceneTableSize" attribute value is SceneTableSize(minimum=16) which is recorded into SceneTableSize on the TH (Chip-tool) and below is the sample log provided for the raspi platform:
 
@@ -156,7 +155,7 @@ tests:
       verification: |
           Please use Interactive mode to Verify the subscription
           Here the command to enter interactive mode:--
-          ./chip-tool interactive start
+          interactive start
 
           Set up the subscription between DUT and TH by sending the command mentioned below, and verify that the subscription is activated successfully
 
@@ -236,7 +235,7 @@ tests:
 
           Please use Interactive mode to Verify the subscription of an event
           Here the command to enter interactive mode:--
-          ./chip-tool interactive start
+          interactive start
 
           Set up the subscription between DUT and TH by sending the command mentioned below, and verify that the subscription is activated successfully
 
@@ -296,7 +295,7 @@ tests:
       verification: |
           Please use Interactive mode to Verify the subscription of an event
           Here the command to enter interactive mode:--
-          ./chip-tool interactive start
+          interactive start
 
           Set up the subscription between DUT and TH by sending the command mentioned below, and verify that the subscription is activated successfully
 
@@ -358,7 +357,7 @@ tests:
           set to 20000 (20s) and no extension field sets."
       PICS: S.S.C00.Rsp
       verification: |
-          ./chip-tool scenesmanagement add-scene 0x0000 0x01 20000 scene1 [] 1 1
+          scenesmanagement add-scene 0x0000 0x01 20000 scene1 [] 1 1
 
           Verify the AddSceneResponse with following fields:
           Status is SUCCESS
@@ -381,7 +380,7 @@ tests:
           FabricSceneInfo into Remaining1stCapacity; verify Remaining1stCapacity
           equals (MaxRemainingCapacity-1)."
       verification: |
-          ./chipt-tool scenesmanagement subscribe fabric-scene-info 100 200 1 1
+          scenesmanagement subscribe fabric-scene-info 100 200 1 1
 
           Verify  the DUT sends a report data to TH1 for FabricSceneInfo after the MinIntervalFloor time; store the RemainingCapacity field from this fabric’s entry reported in FabricSceneInfo into Remaining1stCapacity and is equals to (MaxRemainingCapacity-1) on the TH (Chip-tool) and below is the sample log provided for the raspi platform:
 
@@ -441,7 +440,7 @@ tests:
           becomes 0."
       PICS: S.S.C00.Rsp
       verification: |
-          ./chip-tool scenesmanagement add-scene 0x0000 0x02 20000 scene2 [] 1 1
+          scenesmanagement add-scene 0x0000 0x02 20000 scene2 [] 1 1
 
           Verify the AddSceneResponse with following fields:
           Status is SUCCESS
@@ -457,7 +456,7 @@ tests:
           [1700827508.579697][16026:16028] CHIP:TOO:    }
 
 
-          ./chip-tool scenesmanagement subscribe fabric-scene-info 100 200 1 1
+          scenesmanagement subscribe fabric-scene-info 100 200 1 1
           Verify  the DUT sends a report data messages after the MinIntervalFloor time to TH1 for RemainingCapacity field in FabricSceneInfo for that fabric with updated valueon the TH1 (Chip-tool) and below is the sample log provided for the raspi platform:
           [1701243677.717829][7642:7644] CHIP:DMG: ReportDataMessage =
           [1701243677.717834][7642:7644] CHIP:DMG: {
@@ -508,7 +507,7 @@ tests:
           .
           .
           .
-          ./chip-tool scenesmanagement add-scene 0x0000 0x07 20000 scene8 [] 1 1
+          scenesmanagement add-scene 0x0000 0x07 20000 scene8 [] 1 1
 
           Verify the AddSceneResponse with following fields:
           Status is SUCCESS
@@ -524,7 +523,7 @@ tests:
           [1700827941.415498][16068:16070] CHIP:TOO:     sceneID: 7
           [1700827941.415508][16068:16070] CHIP:TOO:    }
 
-          ./chip-tool scenesmanagement subscribe fabric-scene-info 100 200 1 1
+          scenesmanagement subscribe fabric-scene-info 100 200 1 1
 
           Verify  the DUT sends a report data messages after the MinIntervalFloor time to TH1 for RemainingCapacity field in FabricSceneInfo for that fabric with updated valueon the TH1 (Chip-tool) and below is the sample log provided for the raspi platform:
 
@@ -583,7 +582,7 @@ tests:
           field sets."
       PICS: S.S.C00.Rsp
       verification: |
-          ./chip-tool scenesmanagement add-scene 0x0000 0x08 20000 scene9 [] 1 1
+          scenesmanagement add-scene 0x0000 0x08 20000 scene9 [] 1 1
 
           Verify the AddSceneResponse with following fields:
           Status is RESOURCE_EXHAUSTED(0x89) on the TH1(Chip-tool) log and below is the sample log provided for the raspi platform:
@@ -601,7 +600,7 @@ tests:
     - label: "Step 5a: Repeat Step 4a with TH2"
       PICS: S.S.C00.Rsp
       verification: |
-          ./chip-tool scenesmanagement add-scene 0x0000 0x02 0x0014 scene1 [] 2 1 --commissioner-name beta
+          scenesmanagement add-scene 0x0000 0x02 0x0014 scene1 [] 2 1 --commissioner-name beta
 
           Verify the AddSceneResponse with following fields:
           Status is SUCCESS
@@ -617,7 +616,7 @@ tests:
           [1700828173.261638][16115:16117] CHIP:TOO:     sceneID: 2
           [1700828173.261640][16115:16117] CHIP:TOO:    }
 
-          ./chip-tool scenesmanagement subscribe fabric-scene-info 100 200 2 1 --commissioner-name beta
+          scenesmanagement subscribe fabric-scene-info 100 200 2 1 --commissioner-name beta
 
           Verify  the DUT sends a report data messages after the MinIntervalFloor time to TH2 for RemainingCapacity field in FabricSceneInfo for that fabric with updated value on the TH2 (Chip-tool) and below is the sample log provided for the raspi platform:
 
@@ -670,7 +669,7 @@ tests:
           .
           .
           .
-          ./chip-tool scenesmanagement add-scene 0x0000 0x08 0x0014 scene7 [] 2 1 --commissioner-name beta
+          scenesmanagement add-scene 0x0000 0x08 0x0014 scene7 [] 2 1 --commissioner-name beta
 
           Verify the AddSceneResponse with following fields:
           Status is SUCCESS
@@ -685,7 +684,7 @@ tests:
           [1700829509.052521][16198:16200] CHIP:TOO:     sceneID: 8
           [1700829509.052532][16198:16200] CHIP:TOO:    }
 
-          ./chip-tool scenesmanagement subscribe fabric-scene-info 100 200 2 1 --commissioner-name beta
+          scenesmanagement subscribe fabric-scene-info 100 200 2 1 --commissioner-name beta
 
           Verify  the DUT sends a report data messages after the MinIntervalFloor time to TH2 for RemainingCapacity field in FabricSceneInfo for that fabric with updated value(decreasing to 0) on the TH2 (Chip-tool) and below is the sample log provided for the raspi platform:
 
@@ -736,7 +735,7 @@ tests:
           [1701245132.870584][7824:7826] CHIP:TOO:       FabricIndex: 2
           [1701245132.870594][7824:7826] CHIP:TOO:      }
 
-          ./chip-tool scenesmanagement subscribe fabric-scene-info 100 200 3 1 --commissioner-name gamma
+          scenesmanagement subscribe fabric-scene-info 100 200 3 1 --commissioner-name gamma
 
           Verify that the DUT sends report data messages after the MinIntervalFloor time to TH3 for RemainingCapacity field in FabricSceneInfo for that fabric with updated value (decreasing to SceneTableSize - (2 * MaxRemainingCapacity)) on the TH2 (Chip-tool) and below is the sample log provided for the raspi platform:
 
@@ -791,7 +790,7 @@ tests:
     - label: "Step 5b: Repeat Step 4b with TH2"
       PICS: S.S.C00.Rsp
       verification: |
-          ./chip-tool scenesmanagement add-scene 0x0000 0x09 0x0014 scene8 [] 2 1 --commissioner-name beta
+          scenesmanagement add-scene 0x0000 0x09 0x0014 scene8 [] 2 1 --commissioner-name beta
 
           Verify the AddSceneResponse with following fields:
           Status is RESOURCE_EXHAUSTED(0x89) on the TH2(Chip-tool) log and below is the sample log provided for the raspi platform:
@@ -808,7 +807,7 @@ tests:
     - label: "Step 6a: Repeat Step 4a with TH3"
       PICS: S.S.C00.Rsp
       verification: |
-          ./chip-tool scenesmanagement add-scene 0x0000 0x02 0x0014 scene1 [] 3 1 --commissioner-name gamma
+          scenesmanagement add-scene 0x0000 0x02 0x0014 scene1 [] 3 1 --commissioner-name gamma
 
           Verify the AddSceneResponse with following fields:
           Status is SUCCESS
@@ -951,7 +950,7 @@ tests:
           set to 20000 20s and no extension field sets."
       PICS: S.S.C00.Rsp
       verification: |
-          ./chipt-tool scenesmanagement add-scene 0x0000 0x01 20000 scene [] 3 1 --commissioner-name gamma
+          scenesmanagement add-scene 0x0000 0x01 20000 scene [] 3 1 --commissioner-name gamma
 
           Verify the AddSceneResponse with following fields:
           Status is RESOURCE_EXHAUSTED(0x89) on the TH3(Chip-tool) log and below is the sample log provided for the raspi platform:
@@ -971,7 +970,7 @@ tests:
           set to 0x0000, the SceneID field set to 0x01."
       PICS: S.S.C04.Rsp
       verification: |
-          ./chipt-tool scenesmanagement store-scene 0x0000 0x01 3 1 --commissioner-name gamma
+          scenesmanagement store-scene 0x0000 0x01 3 1 --commissioner-name gamma
 
           Verify the StoreSceneResponse with following fields:
           Status is RESOURCE_EXHAUSTED(0x89) on the TH3(Chip-tool) log and below is the sample log provided for the raspi platform:
@@ -993,7 +992,7 @@ tests:
           to 0x0000 and the scene identifier to field set to 0xFE."
       PICS: S.S.C40.Rsp
       verification: |
-          ./chipt-tool scenesmanagement copy-scene 0x00 0x0000 0x02 0x0000 0x00 3 1 --commissioner-name gamma
+          scenesmanagement copy-scene 0x00 0x0000 0x02 0x0000 0x00 3 1 --commissioner-name gamma
 
           Verify the CopySceneResponse with following fields:
           Status is RESOURCE_EXHAUSTED(0x89) on the TH(Chip-tool) log and below is the sample log provided for the raspi platform:
@@ -1013,7 +1012,7 @@ tests:
           field set to 0x0000."
       PICS: S.S.C03.Rsp
       verification: |
-          ./chipt-tool scenesmanagement remove-all-scenes 0x0000 1 1
+          scenesmanagement remove-all-scenes 0x0000 1 1
 
           Verify the RemoveAllScenesResponse with following fields:
           Status is SUCCESS
@@ -1038,7 +1037,7 @@ tests:
           should send 'empty' report data since there is no update for this
           attribute for TH2)."
       verification: |
-          ./chipt-tool scenesmanagement subscribe fabric-scene-info 100 200 1 1
+          scenesmanagement subscribe fabric-scene-info 100 200 1 1
 
           Verify that the DUT sends a report data to TH1 for FabricSceneInfo after the MinIntervalFloor time; store the RemainingCapacity field from this fabric’s entry the reported in FabricSceneInfo into Remaining1stCapacity; verify Remaining1stCapacity equals (MaxRemainingCapacity) on TH1(Chip-tool) log and below is the sample log provided for the raspi platform:
 
@@ -1097,7 +1096,7 @@ tests:
           field set to 0x0000."
       PICS: S.S.C03.Rsp
       verification: |
-          ./chipt-tool scenesmanagement remove-all-scenes 0x0000 2 1 --commissioner-name beta
+          scenesmanagement remove-all-scenes 0x0000 2 1 --commissioner-name beta
 
           Verify the RemoveAllScenesResponse with following fields:
           Status is SUCCESS
@@ -1119,7 +1118,7 @@ tests:
           FabricSceneInfo into Remaining2ndCapacity; verify Remaining2ndCapacity
           equals (MaxRemainingCapacity)."
       verification: |
-          ./chip-tool scenesmanagement subscribe fabric-scene-info 100 200 2 1 --commissioner-name beta
+          scenesmanagement subscribe fabric-scene-info 100 200 2 1 --commissioner-name beta
 
           Verify that the DUT sends a report data to TH2 for FabricSceneInfo after the MinIntervalFloor time; store the RemainingCapacity field from this fabric’s entry reported in FabricSceneInfo into Remaining2ndCapacity; verify Remaining2ndCapacity equals (MaxRemainingCapacity) on TH2(Chip-tool) log and below is the sample log provided for the raspi platform:
 
@@ -1141,7 +1140,7 @@ tests:
           "Step 11a: TH1 removes the TH2 fabric by sending the RemoveFabric
           command to the DUT with the FabricIndex set to th2FabricIndex"
       verification: |
-          ./chip-tool operationalcredentials remove-fabric th2FabricIndex 1 0
+          operationalcredentials remove-fabric th2FabricIndex 1 0
 
           On TH1(chip-tool) verify the success with the nocresponse with statuscode is success(0)
 
@@ -1158,7 +1157,7 @@ tests:
           "Step 11b: TH1 removes the TH3 fabric by sending the RemoveFabric
           command to the DUT with the FabricIndex set to th3FabricIndex"
       verification: |
-          ./chip-tool operationalcredentials remove-fabric th3FabricIndex 1 0
+          operationalcredentials remove-fabric th3FabricIndex 1 0
 
           On TH1(chip-tool) verify the success with the nocresponse with statuscode is success(0)
 
