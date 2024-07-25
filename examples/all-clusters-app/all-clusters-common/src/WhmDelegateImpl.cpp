@@ -39,13 +39,6 @@ WaterHeaterManagementDelegate::WaterHeaterManagementDelegate(EndpointId clusters
 void WaterHeaterManagementDelegate::SetWaterHeaterManagementInstance(WaterHeaterManagement::Instance & instance)
 {
     mpWhmInstance = &instance;
-
-    if (!mpWhmInstance->HasFeature(Feature::kTankPercent))
-    {
-        // If the feature kTankPercent is not supported then set mTankPercentage to 100% so calculations below need
-        // less code for the feature kTankPercent case.
-        //        mTankPercentage = 100;
-    }
 }
 
 void WaterHeaterManagementDelegate::SetWhmManufacturer(WhmManufacturer & whmManufacturer)
@@ -340,7 +333,10 @@ void WaterHeaterManagementDelegate::DrawOffHotWater(uint8_t percentageReplaced, 
 bool WaterHeaterManagementDelegate::HasWaterTemperatureReachedTarget() const
 {
     // Determine the target temperature. If a boost command is in progress and has a mBoostTemporarySetpoint value use that as the
-    // target temperature
+    // target temperature.
+    // Note, in practise the actual heating is likely to be controlled by the thermostat's occupiedHeatingSetpoint most of the
+    // time, and the TemporarySetpoint (if not null) would be overiding the thermostat's occupiedHeatingSetpoint.
+    // However, this code doesn't rely upon the thermostat cluster.
     uint16_t targetTemperature = (mBoostState == BoostStateEnum::kActive && mBoostTemporarySetpoint.HasValue())
         ? static_cast<uint16_t>(mBoostTemporarySetpoint.Value())
         : mTargetWaterTemperature;
