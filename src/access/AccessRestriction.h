@@ -161,16 +161,8 @@ public:
      */
     CHIP_ERROR RequestFabricRestrictionReview(FabricIndex fabricIndex, const std::vector<Entry> * arl, uint64_t & token)
     {
-        token = mNextToken++;
-
-        CHIP_ERROR err = DoRequestFabricRestrictionReview(fabricIndex, token, arl);
-
-        if (err == CHIP_NO_ERROR)
-        {
-            token = mNextToken++;
-        }
-
-        return err;
+        token = ++mNextToken;
+        return DoRequestFabricRestrictionReview(fabricIndex, token, arl);
     }
 
     using EntryIterator = std::vector<SharedPtr<Entry>>::iterator;
@@ -206,19 +198,6 @@ public:
      */
     CHIP_ERROR CreateEntry(size_t * index, const Entry & entry, const FabricIndex fabricIndex);
 
-protected:
-    /**
-     * Initiate a review of the access restrictions for a fabric. This method should be implemented by the platform and be
-     * non-blocking.
-     *
-     * @param [in] fabricIndex  The index of the fabric requesting a review.
-     * @param [in] token        The unique token for the review, which can be matched to a review update event.
-     * @param [in] arl          An optinal list of access restriction entries to review.  If null, all entries will be reviewed.
-     * @return                  CHIP_NO_ERROR if the review was successfully requested, or an error code if the request failed.
-     */
-    virtual CHIP_ERROR DoRequestFabricRestrictionReview(const FabricIndex fabricIndex, uint64_t token,
-                                                        const std::vector<Entry> * arl) = 0;
-
     /**
      * Delete a restriction entry from the access restriction list and notify any listeners.
      *
@@ -237,6 +216,19 @@ protected:
      * @return                  CHIP_NO_ERROR if the entry was successfully updated, or an error code.
      */
     CHIP_ERROR UpdateEntry(size_t index, const Entry & entry, const FabricIndex fabricIndex);
+
+protected:
+    /**
+     * Initiate a review of the access restrictions for a fabric. This method should be implemented by the platform and be
+     * non-blocking.
+     *
+     * @param [in] fabricIndex  The index of the fabric requesting a review.
+     * @param [in] token        The unique token for the review, which can be matched to a review update event.
+     * @param [in] arl          An optinal list of access restriction entries to review.  If null, all entries will be reviewed.
+     * @return                  CHIP_NO_ERROR if the review was successfully requested, or an error code if the request failed.
+     */
+    virtual CHIP_ERROR DoRequestFabricRestrictionReview(const FabricIndex fabricIndex, uint64_t token,
+                                                        const std::vector<Entry> * arl) = 0;
 
 private:
     SharedPtr<Entry> GetEntry(FabricIndex fabricIndex, size_t index);

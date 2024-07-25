@@ -566,7 +566,12 @@ void MatterAccessControlPluginServerInitCallback()
 
     registerAttributeAccessOverride(&sAttribute);
     GetAccessControl().AddEntryListener(sAttribute);
-    GetAccessControl().GetAccessRestriction()->AddListener(sAttribute);
+
+    auto accessRestriction = GetAccessControl().GetAccessRestriction();
+    if (accessRestriction != nullptr)
+    {
+        accessRestriction->AddListener(sAttribute);
+    }
 }
 
 bool emberAfAccessControlClusterReviewFabricRestrictionsCallback(

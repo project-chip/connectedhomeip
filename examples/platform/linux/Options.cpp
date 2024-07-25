@@ -82,6 +82,7 @@ enum
     kDeviceOption_TraceFile,
     kDeviceOption_TraceLog,
     kDeviceOption_TraceDecode,
+    kDeviceOption_UseAccessRestrictions,
     kOptionCSRResponseCSRIncorrectType,
     kOptionCSRResponseCSRNonceIncorrectType,
     kOptionCSRResponseCSRNonceTooLong,
@@ -148,6 +149,7 @@ OptionDef sDeviceOptionDefs[] = {
     { "trace_log", kArgumentRequired, kDeviceOption_TraceLog },
     { "trace_decode", kArgumentRequired, kDeviceOption_TraceDecode },
 #endif // CHIP_CONFIG_TRANSPORT_TRACE_ENABLED
+    { "enable-access-restrictions", kNoArgument, kDeviceOption_UseAccessRestrictions },
     { "cert_error_csr_incorrect_type", kNoArgument, kOptionCSRResponseCSRIncorrectType },
     { "cert_error_csr_existing_keypair", kNoArgument, kOptionCSRResponseCSRExistingKeyPair },
     { "cert_error_csr_nonce_incorrect_type", kNoArgument, kOptionCSRResponseCSRNonceIncorrectType },
@@ -268,6 +270,8 @@ const char * sDeviceOptionHelp =
     "  --trace_decode <1/0>\n"
     "       A value of 1 enables traces decoding, 0 disables this (default 0).\n"
 #endif // CHIP_CONFIG_TRANSPORT_TRACE_ENABLED
+    "  --enable-access-restrictions\n"
+    "       Enable ACL cluster access restrictions.\n"
     "  --cert_error_csr_incorrect_type\n"
     "       Configure the CSRResponse to be built with an invalid CSR type.\n"
     "  --cert_error_csr_existing_keypair\n"
@@ -516,7 +520,9 @@ bool HandleOption(const char * aProgram, OptionSet * aOptions, int aIdentifier, 
         }
         break;
 #endif // CHIP_CONFIG_TRANSPORT_TRACE_ENABLED
-
+    case kDeviceOption_UseAccessRestrictions:
+        LinuxDeviceOptions::GetInstance().mUseAccessRestrictions = true;
+        break;
     case kOptionCSRResponseCSRIncorrectType:
         LinuxDeviceOptions::GetInstance().mCSRResponseOptions.csrIncorrectType = true;
         break;

@@ -2193,37 +2193,5 @@ TEST_F(TestAccessControl, TestUpdateEntry)
     }
 }
 
-class TestAccessRestriction : public AccessRestriction
-{
-public:
-    TestAccessRestriction() : AccessRestriction() {}
-    ~TestAccessRestriction() {}
-
-protected:
-    CHIP_ERROR DoRequestFabricRestrictionReview(FabricIndex fabricIndex, uint64_t token, const std::vector<Entry> * arl)
-    {
-        return CHIP_NO_ERROR;
-    }
-};
-
-class TestAccessRestrictionListener : public AccessRestriction::EntryListener
-{
-public:
-    TestAccessRestrictionListener() : AccessRestriction::EntryListener() {}
-    ~TestAccessRestrictionListener() {}
-
-    void OnEntryChanged(FabricIndex fabricIndex, size_t index, SharedPtr<AccessRestriction::Entry> entry, ChangeType changeType) override {}
-
-    void OnFabricRestrictionReviewUpdate(FabricIndex fabricIndex, uint64_t token, const char * instruction, const char * redirectUrl) override {}
-};
-
-TEST_F(TestAccessControl, TestRestrictions)
-{
-    TestAccessRestriction accessRestriction;
-    TestAccessRestrictionListener listener;
-    accessRestriction.AddListener(listener);
-    accessControl.SetAccessRestriction(&accessRestriction);
-}
-
 } // namespace Access
 } // namespace chip

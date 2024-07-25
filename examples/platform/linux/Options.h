@@ -78,6 +78,7 @@ struct LinuxDeviceOptions
     int32_t subscriptionCapacity                   = CHIP_IM_MAX_NUM_SUBSCRIPTIONS;
     int32_t subscriptionResumptionRetryIntervalSec = -1;
 #endif
+    bool mUseAccessRestrictions = false;
     static LinuxDeviceOptions & GetInstance();
 };
 

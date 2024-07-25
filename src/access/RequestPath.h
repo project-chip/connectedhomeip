@@ -28,7 +28,8 @@ struct RequestPath
     // NOTE: eventually this will likely also contain node, for proxying
     ClusterId cluster     = 0;
     EndpointId endpoint   = 0;
-    uint32_t entityId     = 0; // attribute, command, or event id
+    uint32_t entityId     = 0; // attribute, command, or event id.  Ignored if entityWildcarded is true
+    bool entityWildcarded = false;
 };
 
 } // namespace Access

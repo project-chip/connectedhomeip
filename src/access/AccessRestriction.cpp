@@ -82,6 +82,7 @@ SharedPtr<AccessRestriction::Entry> AccessRestriction::GetEntry(FabricIndex fabr
 CHIP_ERROR AccessRestriction::CreateEntry(size_t * index, const Entry & entry, FabricIndex fabricIndex)
 {
     auto localEntry = MakeShared<Entry>(entry);
+    size_t newIndex;
 
     if (mFabricEntries.find(fabricIndex) == mFabricEntries.end())
     {
@@ -93,14 +94,16 @@ CHIP_ERROR AccessRestriction::CreateEntry(size_t * index, const Entry & entry, F
         mFabricEntries[fabricIndex].push_back(localEntry);
     }
 
-    if (index != nullptr)
-    {
-        *index = mFabricEntries[fabricIndex].size() - 1;
-    }
+    newIndex = mFabricEntries[fabricIndex].size() - 1;
 
     for (EntryListener * listener = mListeners; listener != nullptr; listener = listener->mNext)
     {
-        listener->OnEntryChanged(fabricIndex, *index, localEntry, EntryListener::ChangeType::kAdded);
+        listener->OnEntryChanged(fabricIndex, newIndex, localEntry, EntryListener::ChangeType::kAdded);
+    }
+
+    if (index != nullptr)
+    {
+        *index = newIndex;
     }
 
     return CHIP_NO_ERROR;
@@ -160,30 +163,33 @@ CHIP_ERROR AccessRestriction::Check(const SubjectDescriptor & subjectDescriptor,
         {
             // a missing id is a wildcard
             bool idMatch = !restriction.id.HasValue() || restriction.id.Value() == requestPath.entityId;
+            if (!idMatch)
+            {
+                continue;
+            }
 
             switch (restriction.restrictionType)
             {
             case Type::kAttributeAccessForbidden:
-                if (idMatch &&
-                    (action == MsgType::ReadRequest || action == MsgType::WriteRequest || action == MsgType::SubscribeRequest))
+                if (action == MsgType::ReadRequest || action == MsgType::WriteRequest || action == MsgType::SubscribeRequest)
                 {
                     return CHIP_ERROR_ACCESS_DENIED;
                 }
                 break;
             case Type::kAttributeWriteForbidden:
-                if (idMatch && action == MsgType::WriteRequest)
+                if (action == MsgType::WriteRequest)
                 {
                     return CHIP_ERROR_ACCESS_DENIED;
                 }
                 break;
             case Type::kCommandForbidden:
-                if (idMatch && action == MsgType::InvokeCommandRequest)
+                if (action == MsgType::InvokeCommandRequest)
                 {
                     return CHIP_ERROR_ACCESS_DENIED;
                 }
                 break;
             case Type::kEventForbidden:
-                if (idMatch && action == MsgType::SubscribeRequest)
+                if (action == MsgType::SubscribeRequest)
                 {
                     return CHIP_ERROR_ACCESS_DENIED;
                 }

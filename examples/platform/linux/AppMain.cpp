@@ -24,6 +24,7 @@
 #include <app/server/Dnssd.h>
 #include <app/server/OnboardingCodesUtil.h>
 #include <app/server/Server.h>
+#include <app/server/DefaultArlStorage.h>
 #include <app/util/endpoint-config-api.h>
 #include <crypto/CHIPCryptoPAL.h>
 #include <lib/core/CHIPError.h>
@@ -96,6 +97,7 @@
 
 #include "AppMain.h"
 #include "CommissionableInit.h"
+#include "ExampleAccessRestriction.h"
 
 #if CHIP_DEVICE_LAYER_TARGET_DARWIN
 #include <platform/Darwin/NetworkCommissioningDriver.h>
@@ -115,6 +117,7 @@ using namespace chip::DeviceLayer;
 using namespace chip::Inet;
 using namespace chip::Transport;
 using namespace chip::app::Clusters;
+using namespace chip::Access;
 
 // Network comissioning implementation
 namespace {
@@ -561,6 +564,12 @@ void ChipLinuxAppMainLoop(AppMainLoopImplementation * impl)
 
     chip::app::RuntimeOptionsProvider::Instance().SetSimulateNoInternalTime(
         LinuxDeviceOptions::GetInstance().mSimulateNoInternalTime);
+
+    if (LinuxDeviceOptions::GetInstance().mUseAccessRestrictions)
+    {
+        initParams.accessRestriction = new ExampleAccessRestriction();
+        initParams.arlStorage = new app::DefaultArlStorage();
+    }
 
     // Init ZCL Data Model and CHIP App Server
     Server::GetInstance().Init(initParams);
