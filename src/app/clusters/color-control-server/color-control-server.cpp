@@ -204,22 +204,24 @@ public:
         // The color control cluster should have a maximum of 9 scenable attributes
         ReturnErrorOnFailure(attributeValueList.ComputeSize(&attributeCount));
         VerifyOrReturnError(attributeCount <= kColorControlScenableAttributesCount, CHIP_ERROR_BUFFER_TOO_SMALL);
+
+        uint16_t epIndex = ColorControlServer::Instance().getEndpointIndex(endpoint);
         // Retrieve the buffers for different modes
 #ifdef MATTER_DM_PLUGIN_COLOR_CONTROL_SERVER_HSV
         ColorControlServer::ColorHueTransitionState * colorHueTransitionState =
-            ColorControlServer::Instance().getColorHueTransitionState(endpoint);
+            ColorControlServer::Instance().getColorHueTransitionStateByIndex(epIndex);
         ColorControlServer::Color16uTransitionState * colorSaturationTransitionState =
-            ColorControlServer::Instance().getSaturationTransitionState(endpoint);
+            ColorControlServer::Instance().getSaturationTransitionStateByIndex(epIndex);
 #endif
 #ifdef MATTER_DM_PLUGIN_COLOR_CONTROL_SERVER_XY
         ColorControlServer::Color16uTransitionState * colorXTransitionState =
-            ColorControlServer::Instance().getXTransitionState(endpoint);
+            ColorControlServer::Instance().getXTransitionStateByIndex(epIndex);
         ColorControlServer::Color16uTransitionState * colorYTransitionState =
-            ColorControlServer::Instance().getYTransitionState(endpoint);
+            ColorControlServer::Instance().getYTransitionStateByIndex(epIndex);
 #endif
 #ifdef MATTER_DM_PLUGIN_COLOR_CONTROL_SERVER_TEMP
         ColorControlServer::Color16uTransitionState * colorTempTransitionState =
-            ColorControlServer::Instance().getTempTransitionState(endpoint);
+            ColorControlServer::Instance().getTempTransitionStateByIndex(epIndex);
 #endif
 
         // Initialize action attributes to default values in case they are not in the scene
@@ -456,6 +458,11 @@ ColorControlServer & ColorControlServer::Instance()
     return instance;
 }
 
+uint16_t ColorControlServer::getEndpointIndex(EndpointId endpoint)
+{
+    return emberAfGetClusterServerEndpointIndex(endpoint, ColorControl::Id, MATTER_DM_COLOR_CONTROL_CLUSTER_SERVER_ENDPOINT_COUNT);
+}
+
 #ifdef MATTER_DM_PLUGIN_SCENES_MANAGEMENT
 chip::scenes::SceneHandler * ColorControlServer::GetSceneHandler()
 {
@@ -513,8 +520,9 @@ bool ColorControlServer::stopMoveStepCommand(app::CommandHandler * commandObj, c
         // Init both transition states on stop command to prevent that.
         if (status == Status::Success)
         {
-            ColorHueTransitionState * hueState        = getColorHueTransitionState(endpoint);
-            Color16uTransitionState * saturationState = getSaturationTransitionState(endpoint);
+            uint16_t epIndex                          = getEndpointIndex(endpoint);
+            ColorHueTransitionState * hueState        = getColorHueTransitionStateByIndex(epIndex);
+            Color16uTransitionState * saturationState = getSaturationTransitionStateByIndex(epIndex);
             initHueTransitionState(endpoint, hueState, false /*isEnhancedHue don't care*/);
             initSaturationTransitionState(endpoint, saturationState);
         }
@@ -702,8 +710,7 @@ uint16_t ColorControlServer::computeTransitionTimeFromStateAndRate(ColorControlS
  */
 EmberEventControl * ColorControlServer::getEventControl(EndpointId endpoint)
 {
-    uint16_t index =
-        emberAfGetClusterServerEndpointIndex(endpoint, ColorControl::Id, MATTER_DM_COLOR_CONTROL_CLUSTER_SERVER_ENDPOINT_COUNT);
+    uint16_t index            = getEndpointIndex(endpoint);
     EmberEventControl * event = nullptr;
 
     if (index < ArraySize(eventControls))
@@ -825,15 +832,13 @@ bool ColorControlServer::computeNewColor16uValue(ColorControlServer::Color16uTra
 #ifdef MATTER_DM_PLUGIN_COLOR_CONTROL_SERVER_HSV
 
 /**
- * @brief Returns ColorHueTransititionState associated to an endpoint
+ * @brief Returns ColorHueTransititionState associated to an endpoint index
  *
  * @param[in] endpoint
  * @return ColorControlServer::ColorHueTransitionState*
  */
-ColorControlServer::ColorHueTransitionState * ColorControlServer::getColorHueTransitionState(EndpointId endpoint)
+ColorControlServer::ColorHueTransitionState * ColorControlServer::getColorHueTransitionStateByIndex(uint16_t index)
 {
-    uint16_t index =
-        emberAfGetClusterServerEndpointIndex(endpoint, ColorControl::Id, MATTER_DM_COLOR_CONTROL_CLUSTER_SERVER_ENDPOINT_COUNT);
     ColorHueTransitionState * state = nullptr;
 
     if (index < ArraySize(colorHueTransitionStates))
@@ -844,15 +849,24 @@ ColorControlServer::ColorHueTransitionState * ColorControlServer::getColorHueTra
 }
 
 /**
- * @brief Returns Color16uTransitionState for saturation associated to an endpoint
+ * @brief Returns ColorHueTransititionState associated to an endpoint
+ *
+ * @param[in] endpoint
+ * @return ColorControlServer::ColorHueTransitionState*
+ */
+ColorControlServer::ColorHueTransitionState * ColorControlServer::getColorHueTransitionState(EndpointId endpoint)
+{
+    return getColorHueTransitionStateByIndex(getEndpointIndex(endpoint));
+}
+
+/**
+ * @brief Returns the saturation Color16uTransitionState associated to an endpoint index
  *
  * @param[in] endpoint
  * @return ColorControlServer::Color16uTransitionState*
  */
-ColorControlServer::Color16uTransitionState * ColorControlServer::getSaturationTransitionState(EndpointId endpoint)
+ColorControlServer::Color16uTransitionState * ColorControlServer::getSaturationTransitionStateByIndex(uint16_t index)
 {
-    uint16_t index =
-        emberAfGetClusterServerEndpointIndex(endpoint, ColorControl::Id, MATTER_DM_COLOR_CONTROL_CLUSTER_SERVER_ENDPOINT_COUNT);
     Color16uTransitionState * state = nullptr;
 
     if (index < ArraySize(colorSatTransitionStates))
@@ -860,6 +874,17 @@ ColorControlServer::Color16uTransitionState * ColorControlServer::getSaturationT
         state = &colorSatTransitionStates[index];
     }
     return state;
+}
+
+/**
+ * @brief Returns the saturation Color16uTransitionState associated to an endpoint
+ *
+ * @param[in] endpoint
+ * @return ColorControlServer::Color16uTransitionState*
+ */
+ColorControlServer::Color16uTransitionState * ColorControlServer::getSaturationTransitionState(EndpointId endpoint)
+{
+    return getSaturationTransitionStateByIndex(getEndpointIndex(endpoint));
 }
 
 /**
@@ -1079,8 +1104,9 @@ void ColorControlServer::initSaturationTransitionState(chip::EndpointId endpoint
 
 void ColorControlServer::SetHSVRemainingTime(chip::EndpointId endpoint)
 {
-    ColorHueTransitionState * hueTransitionState        = getColorHueTransitionState(endpoint);
-    Color16uTransitionState * saturationTransitionState = getSaturationTransitionState(endpoint);
+    uint16_t epIndex                                    = getEndpointIndex(endpoint);
+    ColorHueTransitionState * hueTransitionState        = getColorHueTransitionStateByIndex(epIndex);
+    Color16uTransitionState * saturationTransitionState = getSaturationTransitionStateByIndex(epIndex);
 
     // When the hue transition is loop, RemainingTime stays at MAX_INT16
     if (hueTransitionState->repeat == false)
@@ -1308,8 +1334,9 @@ Status ColorControlServer::moveToHueAndSaturation(uint16_t hue, uint8_t saturati
     uint16_t halfWay    = isEnhanced ? HALF_MAX_UINT16T : HALF_MAX_UINT8T;
     bool moveUp;
 
-    Color16uTransitionState * colorSaturationTransitionState = getSaturationTransitionState(endpoint);
-    ColorHueTransitionState * colorHueTransitionState        = getColorHueTransitionState(endpoint);
+    uint16_t epIndex = getEndpointIndex(endpoint);
+    Color16uTransitionState * colorSaturationTransitionState = getSaturationTransitionStateByIndex(epIndex);
+    ColorHueTransitionState * colorHueTransitionState        = getColorHueTransitionStateByIndex(epIndex);
 
     VerifyOrReturnError(nullptr != colorSaturationTransitionState, Status::UnsupportedEndpoint);
     VerifyOrReturnError(nullptr != colorHueTransitionState, Status::UnsupportedEndpoint);
@@ -1395,7 +1422,9 @@ bool ColorControlServer::moveHueCommand(app::CommandHandler * commandObj, const 
     MATTER_TRACE_SCOPE("moveHue", "ColorControl");
     EndpointId endpoint                               = commandPath.mEndpointId;
     Status status                                     = Status::Success;
-    ColorHueTransitionState * colorHueTransitionState = getColorHueTransitionState(endpoint);
+
+    uint16_t epIndex = getEndpointIndex(endpoint);
+    ColorHueTransitionState * colorHueTransitionState = getColorHueTransitionStateByIndex(epIndex);
 
     VerifyOrExit(colorHueTransitionState != nullptr, status = Status::UnsupportedEndpoint);
 
@@ -1421,7 +1450,7 @@ bool ColorControlServer::moveHueCommand(app::CommandHandler * commandObj, const 
     if (moveMode == HueMoveMode::kStop)
     {
         // Per spec any saturation transition must also be cancelled.
-        Color16uTransitionState * saturationState = getSaturationTransitionState(endpoint);
+        Color16uTransitionState * saturationState = getSaturationTransitionStateByIndex(epIndex);
         initSaturationTransitionState(endpoint, saturationState);
         commandObj->AddStatus(commandPath, Status::Success);
         return true;
@@ -1766,7 +1795,8 @@ bool ColorControlServer::moveSaturationCommand(app::CommandHandler * commandObj,
     EndpointId endpoint    = commandPath.mEndpointId;
     Status status          = Status::Success;
 
-    Color16uTransitionState * colorSaturationTransitionState = getSaturationTransitionState(endpoint);
+    uint16_t epIndex = getEndpointIndex(endpoint);
+    Color16uTransitionState * colorSaturationTransitionState = getSaturationTransitionStateByIndex(epIndex);
     VerifyOrExit(colorSaturationTransitionState != nullptr, status = Status::UnsupportedEndpoint);
 
     // check moveMode and rate before any operation is done on the transition states
@@ -1794,7 +1824,7 @@ bool ColorControlServer::moveSaturationCommand(app::CommandHandler * commandObj,
     if (moveMode == SaturationMoveMode::kStop)
     {
         // Per spec any hue transition must also be cancelled.
-        ColorHueTransitionState * hueState = getColorHueTransitionState(endpoint);
+        ColorHueTransitionState * hueState = getColorHueTransitionStateByIndex(epIndex);
         initHueTransitionState(endpoint, hueState, false /*isEnhancedHue don't care*/);
         commandObj->AddStatus(commandPath, Status::Success);
         return true;
@@ -2063,8 +2093,9 @@ exit:
 void ColorControlServer::updateHueSatCommand(EndpointId endpoint)
 {
     MATTER_TRACE_SCOPE("updateHueSat", "ColorControl");
-    ColorHueTransitionState * colorHueTransitionState        = getColorHueTransitionState(endpoint);
-    Color16uTransitionState * colorSaturationTransitionState = getSaturationTransitionState(endpoint);
+    uint16_t epIndex = getEndpointIndex(endpoint);
+    ColorHueTransitionState * colorHueTransitionState        = getColorHueTransitionStateByIndex(epIndex);
+    Color16uTransitionState * colorSaturationTransitionState = getSaturationTransitionStateByIndex(epIndex);
 
     uint8_t previousHue          = colorHueTransitionState->currentHue;
     uint16_t previousSaturation  = colorSaturationTransitionState->currentValue;
@@ -2118,6 +2149,23 @@ void ColorControlServer::updateHueSatCommand(EndpointId endpoint)
 #ifdef MATTER_DM_PLUGIN_COLOR_CONTROL_SERVER_XY
 
 /**
+ * @brief Returns Color16uTransitionState for X color associated to an endpoint index
+ *
+ * @param endpoint
+ * @return ColorControlServer::Color16uTransitionState*
+ */
+ColorControlServer::Color16uTransitionState * ColorControlServer::getXTransitionStateByIndex(uint16_t index)
+{
+    Color16uTransitionState * state = nullptr;
+    if (index < ArraySize(colorXtransitionStates))
+    {
+        state = &colorXtransitionStates[index];
+    }
+
+    return state;
+}
+
+/**
  * @brief Returns Color16uTransitionState for X color associated to an endpoint
  *
  * @param endpoint
@@ -2125,13 +2173,21 @@ void ColorControlServer::updateHueSatCommand(EndpointId endpoint)
  */
 ColorControlServer::Color16uTransitionState * ColorControlServer::getXTransitionState(EndpointId endpoint)
 {
-    uint16_t index =
-        emberAfGetClusterServerEndpointIndex(endpoint, ColorControl::Id, MATTER_DM_COLOR_CONTROL_CLUSTER_SERVER_ENDPOINT_COUNT);
+    return getXTransitionStateByIndex(getEndpointIndex(endpoint));
+}
 
+/**
+ * @brief Returns Color16uTransitionState for Y color associated to an endpoint index
+ *
+ * @param endpoint
+ * @return ColorControlServer::Color16uTransitionState*
+ */
+ColorControlServer::Color16uTransitionState * ColorControlServer::getYTransitionStateByIndex(uint16_t index)
+{
     Color16uTransitionState * state = nullptr;
-    if (index < ArraySize(colorXtransitionStates))
+    if (index < ArraySize(colorYtransitionStates))
     {
-        state = &colorXtransitionStates[index];
+        state = &colorYtransitionStates[index];
     }
 
     return state;
@@ -2145,16 +2201,7 @@ ColorControlServer::Color16uTransitionState * ColorControlServer::getXTransition
  */
 ColorControlServer::Color16uTransitionState * ColorControlServer::getYTransitionState(EndpointId endpoint)
 {
-    uint16_t index =
-        emberAfGetClusterServerEndpointIndex(endpoint, ColorControl::Id, MATTER_DM_COLOR_CONTROL_CLUSTER_SERVER_ENDPOINT_COUNT);
-
-    Color16uTransitionState * state = nullptr;
-    if (index < ArraySize(colorYtransitionStates))
-    {
-        state = &colorYtransitionStates[index];
-    }
-
-    return state;
+    return getYTransitionStateByIndex(getEndpointIndex(endpoint));
 }
 
 uint16_t ColorControlServer::findNewColorValueFromStep(uint16_t oldValue, int16_t step)
@@ -2207,8 +2254,9 @@ EmberEventControl * ColorControlServer::configureXYEventControl(EndpointId endpo
  */
 Status ColorControlServer::moveToColor(uint16_t colorX, uint16_t colorY, uint16_t transitionTime, EndpointId endpoint)
 {
-    Color16uTransitionState * colorXTransitionState = getXTransitionState(endpoint);
-    Color16uTransitionState * colorYTransitionState = getYTransitionState(endpoint);
+    uint16_t epIndex = getEndpointIndex(endpoint);
+    Color16uTransitionState * colorXTransitionState = getXTransitionStateByIndex(epIndex);
+    Color16uTransitionState * colorYTransitionState = getYTransitionStateByIndex(epIndex);
 
     VerifyOrReturnError(nullptr != colorXTransitionState, Status::UnsupportedEndpoint);
     VerifyOrReturnError(nullptr != colorYTransitionState, Status::UnsupportedEndpoint);
@@ -2275,8 +2323,9 @@ bool ColorControlServer::moveColorCommand(app::CommandHandler * commandObj, cons
     EndpointId endpoint     = commandPath.mEndpointId;
     Status status           = Status::Success;
 
-    Color16uTransitionState * colorXTransitionState = getXTransitionState(endpoint);
-    Color16uTransitionState * colorYTransitionState = getYTransitionState(endpoint);
+    uint16_t epIndex = getEndpointIndex(endpoint);
+    Color16uTransitionState * colorXTransitionState = getXTransitionStateByIndex(epIndex);
+    Color16uTransitionState * colorYTransitionState = getYTransitionStateByIndex(epIndex);
 
     VerifyOrExit(colorXTransitionState != nullptr, status = Status::UnsupportedEndpoint);
     VerifyOrExit(colorYTransitionState != nullptr, status = Status::UnsupportedEndpoint);
@@ -2377,8 +2426,9 @@ bool ColorControlServer::stepColorCommand(app::CommandHandler * commandObj, cons
 
     Status status = Status::Success;
 
-    Color16uTransitionState * colorXTransitionState = getXTransitionState(endpoint);
-    Color16uTransitionState * colorYTransitionState = getYTransitionState(endpoint);
+    uint16_t epIndex = getEndpointIndex(endpoint);
+    Color16uTransitionState * colorXTransitionState = getXTransitionStateByIndex(epIndex);
+    Color16uTransitionState * colorYTransitionState = getYTransitionStateByIndex(epIndex);
 
     VerifyOrExit(colorXTransitionState != nullptr, status = Status::UnsupportedEndpoint);
     VerifyOrExit(colorYTransitionState != nullptr, status = Status::UnsupportedEndpoint);
@@ -2445,8 +2495,9 @@ exit:
  */
 void ColorControlServer::updateXYCommand(EndpointId endpoint)
 {
-    Color16uTransitionState * colorXTransitionState = getXTransitionState(endpoint);
-    Color16uTransitionState * colorYTransitionState = getYTransitionState(endpoint);
+    uint16_t epIndex = getEndpointIndex(endpoint);
+    Color16uTransitionState * colorXTransitionState = getXTransitionStateByIndex(epIndex);
+    Color16uTransitionState * colorYTransitionState = getYTransitionStateByIndex(epIndex);
     bool isXTransitionDone, isYTransitionDone;
 
     // compute new values for X and Y.
@@ -2477,16 +2528,13 @@ void ColorControlServer::updateXYCommand(EndpointId endpoint)
 
 #ifdef MATTER_DM_PLUGIN_COLOR_CONTROL_SERVER_TEMP
 /**
- * @brief Get the Temp Transition State object associated to the endpoint
+ * @brief Get the Temp Transition State object associated to the endpoint index
  *
  * @param endpoint
  * @return Color16uTransitionState*
  */
-ColorControlServer::Color16uTransitionState * ColorControlServer::getTempTransitionState(EndpointId endpoint)
+ColorControlServer::Color16uTransitionState * ColorControlServer::getTempTransitionStateByIndex(uint16_t index)
 {
-    uint16_t index =
-        emberAfGetClusterServerEndpointIndex(endpoint, ColorControl::Id, MATTER_DM_COLOR_CONTROL_CLUSTER_SERVER_ENDPOINT_COUNT);
-
     Color16uTransitionState * state = nullptr;
     if (index < ArraySize(colorTempTransitionStates))
     {
@@ -2494,6 +2542,17 @@ ColorControlServer::Color16uTransitionState * ColorControlServer::getTempTransit
     }
 
     return state;
+}
+
+/**
+ * @brief Get the Temp Transition State object associated to the endpoint
+ *
+ * @param endpoint
+ * @return Color16uTransitionState*
+ */
+ColorControlServer::Color16uTransitionState * ColorControlServer::getTempTransitionState(EndpointId endpoint)
+{
+    return getTempTransitionStateByIndex(getEndpointIndex(endpoint));
 }
 
 /**

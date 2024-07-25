@@ -20,6 +20,8 @@
 #include <app-common/zap-generated/cluster-objects.h>
 #include <app/CommandHandler.h>
 #include <app/ConcreteCommandPath.h>
+#include <app/cluster-building-blocks/QuieterReporting.h>
+#include <app/data-model/Nullable.h>
 #include <app/util/af-types.h>
 #include <app/util/attribute-storage.h>
 #include <app/util/basic-types.h>
@@ -199,7 +201,37 @@ private:
      * Functions Definitions
      *********************************************************/
 
-    ColorControlServer() {}
+    ColorControlServer()
+    {
+        // #ifdef MATTER_DM_PLUGIN_COLOR_CONTROL_SERVER_HSV
+        //         quietHue = new chip::app::QuieterReportingAttribute<uint8_t>[kColorControlClusterServerMaxEndpointCount]
+        //         {
+        //             chip::app::QuieterReportingAttribute<uint8_t>(0)
+        //         };
+        //         quietSaturation = new
+        //         chip::app::QuieterReportingAttribute<uint8_t>[kColorControlClusterServerMaxEndpointCount] {
+        //             chip::app::QuieterReportingAttribute<uint8_t>(0)
+        //         };
+        //         quietEnhancedHue = new
+        //         chip::app::QuieterReportingAttribute<uint16_t>[kColorControlClusterServerMaxEndpointCount] {
+        //             chip::app::QuieterReportingAttribute<uint16_t>(0)
+        //         };
+        // #endif
+        // #ifdef MATTER_DM_PLUGIN_COLOR_CONTROL_SERVER_XY
+        //         quietColorX = new
+        //         chip::app::QuieterReportingAttribute<uint16_t>[kColorControlClusterServerMaxEndpointCount] {
+        //             chip::app::QuieterReportingAttribute<uint16_t>(0)
+        //         };
+        //         quietColorY = new
+        //         chip::app::QuieterReportingAttribute<uint16_t>[kColorControlClusterServerMaxEndpointCount] {
+        //             chip::app::QuieterReportingAttribute<uint16_t>(0)
+        //         };
+        // #endif
+        //         quietRemainingTime =
+        //             new chip::app::QuieterReportingAttribute<uint16_t>[kColorControlClusterServerMaxEndpointCount] {
+        //                 chip::app::QuieterReportingAttribute<uint16_t>(0)
+        //             };
+    }
     bool shouldExecuteIfOff(chip::EndpointId endpoint, uint8_t optionMask, uint8_t optionOverride);
     void handleModeSwitch(chip::EndpointId endpoint, uint8_t newColorMode);
     uint16_t computeTransitionTimeFromStateAndRate(Color16uTransitionState * p, uint16_t rate);
@@ -213,6 +245,7 @@ private:
     static void timerCallback(chip::System::Layer *, void * callbackContext);
     void scheduleTimerCallbackMs(EmberEventControl * control, uint32_t delayMs);
     void cancelEndpointTimerCallback(EmberEventControl * control);
+    uint16_t getEndpointIndex(chip::EndpointId);
 
 #ifdef MATTER_DM_PLUGIN_COLOR_CONTROL_SERVER_HSV
     chip::Protocols::InteractionModel::Status moveToSaturation(uint8_t saturation, uint16_t transitionTime,
@@ -221,6 +254,8 @@ private:
                                                                      bool isEnhanced, chip::EndpointId endpoint);
     ColorHueTransitionState * getColorHueTransitionState(chip::EndpointId endpoint);
     Color16uTransitionState * getSaturationTransitionState(chip::EndpointId endpoint);
+    ColorHueTransitionState * getColorHueTransitionStateByIndex(uint16_t index);
+    Color16uTransitionState * getSaturationTransitionStateByIndex(uint16_t index);
     uint8_t getSaturation(chip::EndpointId endpoint);
     uint8_t addHue(uint8_t hue1, uint8_t hue2);
     uint8_t subtractHue(uint8_t hue1, uint8_t hue2);
@@ -241,12 +276,15 @@ private:
                                                           chip::EndpointId endpoint);
     Color16uTransitionState * getXTransitionState(chip::EndpointId endpoint);
     Color16uTransitionState * getYTransitionState(chip::EndpointId endpoint);
+    Color16uTransitionState * getXTransitionStateByIndex(uint16_t index);
+    Color16uTransitionState * getYTransitionStateByIndex(uint16_t index);
     uint16_t findNewColorValueFromStep(uint16_t oldValue, int16_t step);
     EmberEventControl * configureXYEventControl(chip::EndpointId);
 #endif // #ifdef MATTER_DM_PLUGIN_COLOR_CONTROL_SERVER_XY
 
 #ifdef MATTER_DM_PLUGIN_COLOR_CONTROL_SERVER_TEMP
     Color16uTransitionState * getTempTransitionState(chip::EndpointId endpoint);
+    Color16uTransitionState * getTempTransitionStateByIndex(uint16_t index);
     chip::Protocols::InteractionModel::Status moveToColorTemp(chip::EndpointId aEndpoint, uint16_t colorTemperature,
                                                               uint16_t transitionTime);
     uint16_t getTemperatureCoupleToLevelMin(chip::EndpointId endpoint);
@@ -264,11 +302,26 @@ private:
 #ifdef MATTER_DM_PLUGIN_COLOR_CONTROL_SERVER_HSV
     ColorHueTransitionState colorHueTransitionStates[kColorControlClusterServerMaxEndpointCount];
     Color16uTransitionState colorSatTransitionStates[kColorControlClusterServerMaxEndpointCount];
+
+    chip::app::QuieterReportingAttribute<uint8_t> quietHue[kColorControlClusterServerMaxEndpointCount]{
+        chip::app::QuieterReportingAttribute<uint8_t>(0)
+    };
+    chip::app::QuieterReportingAttribute<uint8_t> quietSaturation[kColorControlClusterServerMaxEndpointCount]{
+        chip::app::QuieterReportingAttribute<uint8_t>(0)
+    };
+    chip::app::QuieterReportingAttribute<uint16_t> quietEnhancedHue[kColorControlClusterServerMaxEndpointCount]{
+        chip::app::QuieterReportingAttribute<uint16_t>(0)
+    };
 #endif
 
 #ifdef MATTER_DM_PLUGIN_COLOR_CONTROL_SERVER_XY
     Color16uTransitionState colorXtransitionStates[kColorControlClusterServerMaxEndpointCount];
     Color16uTransitionState colorYtransitionStates[kColorControlClusterServerMaxEndpointCount];
+
+    chip::app::QuieterReportingAttribute<uint16_t> quietColorX[kColorControlClusterServerMaxEndpointCount]{
+        chip::app::QuieterReportingAttribute<uint16_t>(0)};
+    chip::app::QuieterReportingAttribute<uint16_t> quietColorY[kColorControlClusterServerMaxEndpointCount]{
+        chip::app::QuieterReportingAttribute<uint16_t>(0)};
 #endif // MATTER_DM_PLUGIN_COLOR_CONTROL_SERVER_XY
 
 #ifdef MATTER_DM_PLUGIN_COLOR_CONTROL_SERVER_TEMP
@@ -276,6 +329,8 @@ private:
 #endif // MATTER_DM_PLUGIN_COLOR_CONTROL_SERVER_TEMP
 
     EmberEventControl eventControls[kColorControlClusterServerMaxEndpointCount];
+    chip::app::QuieterReportingAttribute<uint16_t> quietRemainingTime[kColorControlClusterServerMaxEndpointCount]{
+        chip::app::QuieterReportingAttribute<uint16_t>(0)};
 
 #ifdef MATTER_DM_PLUGIN_SCENES_MANAGEMENT
     friend class DefaultColorControlSceneHandler;
