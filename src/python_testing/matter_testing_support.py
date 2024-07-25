@@ -34,7 +34,7 @@ from dataclasses import asdict as dataclass_asdict
 from dataclasses import dataclass, field
 from datetime import datetime, timedelta, timezone
 from enum import Enum
-from typing import List, Optional, Tuple
+from typing import Any, List, Optional, Tuple
 
 from chip.tlv import float32, uint
 
@@ -231,19 +231,22 @@ class SimpleEventCallback:
 
 
 class EventChangeCallback:
-    def __init__(self, expected_cluster: ClusterObjects):
+    def __init__(self, expected_cluster: ClusterObjects.Cluster):
         """This class creates a queue to store received event callbacks, that can be checked by the test script
            expected_cluster: is the cluster from which the events are expected
         """
         self._q = queue.Queue()
         self._expected_cluster = expected_cluster
 
-    async def start(self, dev_ctrl, node_id: int, endpoint: int):
+    async def start(self, dev_ctrl, node_id: int, endpoint: int, fabric_filtered: bool = False, min_interval_sec: int = 0, max_interval_sec: int = 30) -> Any:
         """This starts a subscription for events on the specified node_id and endpoint. The cluster is specified when the class instance is created."""
+        urgent = True
         self._subscription = await dev_ctrl.ReadEvent(node_id,
-                                                      events=[(endpoint, self._expected_cluster, True)], reportInterval=(1, 5),
-                                                      fabricFiltered=False, keepSubscriptions=True, autoResubscribe=False)
+                                                      events=[(endpoint, self._expected_cluster, urgent)], reportInterval=(
+                                                          min_interval_sec, max_interval_sec),
+                                                      fabricFiltered=fabric_filtered, keepSubscriptions=True, autoResubscribe=False)
         self._subscription.SetEventUpdateCallback(self.__call__)
+        return self._subscription
 
     def __call__(self, res: EventReadResult, transaction: SubscriptionTransaction):
         """This is the subscription callback when an event is received.
@@ -264,6 +267,10 @@ class EventChangeCallback:
         asserts.assert_equal(res.Header.ClusterId, expected_event.cluster_id, "Expected cluster ID not found in event report")
         asserts.assert_equal(res.Header.EventId, expected_event.event_id, "Expected event ID not found in event report")
         return res.Data
+
+    @property
+    def event_queue(self) -> queue.Queue:
+        return self._q
 
 
 class AttributeChangeCallback:
@@ -297,6 +304,45 @@ class AttributeChangeCallback:
                 f"[AttributeChangeCallback] Got attribute subscription report. Attribute {path.AttributeType}. Updated value: {attribute_value}. SubscriptionId: {transaction.subscriptionId}")
         except KeyError:
             asserts.fail("[AttributeChangeCallback] Attribute {expected_attribute} not found in returned report")
+
+
+@dataclass
+class AttributeValue:
+    endpoint_id: int
+    attribute: ClusterObjects.ClusterAttributeDescriptor
+    value: Any
+
+
+class ClusterAttributeChangeAccumulator:
+    def __init__(self, expected_cluster: ClusterObjects.Cluster):
+        self._q = queue.Queue()
+        self._expected_cluster = expected_cluster
+        self._subscription = None
+
+    async def start(self, dev_ctrl, node_id: int, endpoint: int, fabric_filtered: bool = False, min_interval_sec: int = 0, max_interval_sec: int = 30) -> Any:
+        """This starts a subscription for attributes on the specified node_id and endpoint. The cluster is specified when the class instance is created."""
+        self._subscription = await dev_ctrl.ReadAttribute(
+            nodeid=node_id,
+            attributes=[(endpoint, self._expected_cluster)],
+            reportInterval=(min_interval_sec, max_interval_sec),
+            fabricFiltered=fabric_filtered,
+            keepSubscriptions=True
+        )
+        self._subscription.SetAttributeUpdateCallback(self.__call__)
+        return self._subscription
+
+    def __call__(self, path: TypedAttributePath, transaction: SubscriptionTransaction):
+        """This is the subscription callback when an attribute report is received.
+           It checks the report is from the expected_cluster and then posts it into the queue for later processing."""
+        if path.ClusterType == self._expected_cluster:
+            data = transaction.GetAttribute(path)
+            value = AttributeValue(endpoint_id=path.Path.EndpointId, attribute=path.AttributeType, value=data)
+            logging.info(f"Got subscription report for {path.AttributeType}: {data}")
+            self._q.put(value)
+
+    @property
+    def attribute_queue(self) -> queue.Queue:
+        return self._q
 
 
 class InternalTestRunnerHooks(TestRunnerHooks):
@@ -680,7 +726,7 @@ class MatterBaseTest(base_test.BaseTestClass):
         return [TestStep(1, "Run entire test")] if steps is None else steps
 
     def get_defined_test_steps(self, test: str) -> list[TestStep]:
-        steps_name = 'steps_' + test[5:]
+        steps_name = f'steps_{test.removeprefix("test_")}'
         try:
             fn = getattr(self, steps_name)
             return fn()
@@ -700,7 +746,7 @@ class MatterBaseTest(base_test.BaseTestClass):
         return [] if pics is None else pics
 
     def _get_defined_pics(self, test: str) -> list[TestStep]:
-        steps_name = 'pics_' + test[5:]
+        steps_name = f'pics_{test.removeprefix("test_")}'
         try:
             fn = getattr(self, steps_name)
             return fn()
@@ -720,7 +766,7 @@ class MatterBaseTest(base_test.BaseTestClass):
             ex:
             133.1.1. [TC-ACL-1.1] Global attributes
         '''
-        desc_name = 'desc_' + test[5:]
+        desc_name = f'desc_{test.removeprefix("test_")}'
         try:
             fn = getattr(self, desc_name)
             return fn()
@@ -1110,7 +1156,7 @@ class MatterBaseTest(base_test.BaseTestClass):
     def wait_for_user_input(self,
                             prompt_msg: str,
                             prompt_msg_placeholder: str = "Submit anything to continue",
-                            default_value: str = "y") -> str:
+                            default_value: str = "y") -> Optional[str]:
         """Ask for user input and wait for it.
 
         Args:
@@ -1119,13 +1165,19 @@ class MatterBaseTest(base_test.BaseTestClass):
             default_value (str, optional): TH UI prompt default value. Defaults to "y".
 
         Returns:
-            str: User input
+            str: User input or none if input is closed.
         """
         if self.runner_hook:
             self.runner_hook.show_prompt(msg=prompt_msg,
                                          placeholder=prompt_msg_placeholder,
                                          default_value=default_value)
-        return input(f'{prompt_msg.removesuffix(chr(10))}\n')
+        logging.info("========= USER PROMPT =========")
+        logging.info(f">>> {prompt_msg.rstrip()} (press enter to confirm)")
+        try:
+            return input()
+        except EOFError:
+            logging.info("========= EOF on STDIN =========")
+            return None
 
 
 def generate_mobly_test_config(matter_test_config: MatterTestConfig):
