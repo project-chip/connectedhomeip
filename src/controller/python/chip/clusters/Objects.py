@@ -32381,7 +32381,7 @@ class Thermostat(Cluster):
                         ClusterObjectFieldDescriptor(Label="name", Tag=2, Type=typing.Optional[str]),
                         ClusterObjectFieldDescriptor(Label="presetHandle", Tag=3, Type=typing.Optional[bytes]),
                         ClusterObjectFieldDescriptor(Label="transitions", Tag=4, Type=typing.List[Thermostat.Structs.ScheduleTransitionStruct]),
-                        ClusterObjectFieldDescriptor(Label="builtIn", Tag=5, Type=typing.Union[None, Nullable, bool]),
+                        ClusterObjectFieldDescriptor(Label="builtIn", Tag=5, Type=typing.Union[Nullable, bool]),
                     ])
 
             scheduleHandle: 'typing.Union[Nullable, bytes]' = NullValue
@@ -32389,7 +32389,7 @@ class Thermostat(Cluster):
             name: 'typing.Optional[str]' = None
             presetHandle: 'typing.Optional[bytes]' = None
             transitions: 'typing.List[Thermostat.Structs.ScheduleTransitionStruct]' = field(default_factory=lambda: [])
-            builtIn: 'typing.Union[None, Nullable, bool]' = None
+            builtIn: 'typing.Union[Nullable, bool]' = NullValue
 
         @dataclass
         class PresetStruct(ClusterObject):

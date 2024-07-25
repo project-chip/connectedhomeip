@@ -1346,7 +1346,7 @@ cluster Thermostat = 513 {
     optional char_string<64> name = 2;
     optional octet_string<16> presetHandle = 3;
     ScheduleTransitionStruct transitions[] = 4;
-    optional nullable boolean builtIn = 5;
+    nullable boolean builtIn = 5;
   }
 
   struct PresetStruct {

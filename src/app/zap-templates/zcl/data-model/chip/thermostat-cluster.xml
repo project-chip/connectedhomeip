@@ -17,7 +17,6 @@ limitations under the License.
 <configurator>
   <domain name="HVAC"/>
 
-
   <bitmap name="ACErrorCodeBitmap" type="bitmap32">
     <cluster code="0x0201"/>
     <field name="CompressorFail" mask="0x01"/>
@@ -249,7 +248,7 @@ limitations under the License.
     <item fieldId="2" name="Name" type="char_string" length="64" optional="true"/>
     <item fieldId="3" name="PresetHandle" type="octet_string" length="16" optional="true"/>
     <item fieldId="4" name="Transitions" array="true" type="ScheduleTransitionStruct" minLength="1"/>
-    <item fieldId="5" name="BuiltIn" type="boolean" isNullable="true" optional="true"/>
+    <item fieldId="5" name="BuiltIn" type="boolean" isNullable="true"/>
   </struct>
 
   <struct name="ScheduleTransitionStruct" apiMaturity="provisional">

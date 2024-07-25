@@ -66,10 +66,7 @@ class ThermostatClusterScheduleStruct(
       }
       endArray()
       if (builtIn != null) {
-        if (builtIn.isPresent) {
-          val optbuiltIn = builtIn.get()
-          put(ContextSpecificTag(TAG_BUILT_IN), optbuiltIn)
-        }
+        put(ContextSpecificTag(TAG_BUILT_IN), builtIn)
       } else {
         putNull(ContextSpecificTag(TAG_BUILT_IN))
       }
@@ -117,11 +114,7 @@ class ThermostatClusterScheduleStruct(
         }
       val builtIn =
         if (!tlvReader.isNull()) {
-          if (tlvReader.isNextTag(ContextSpecificTag(TAG_BUILT_IN))) {
-            Optional.of(tlvReader.getBoolean(ContextSpecificTag(TAG_BUILT_IN)))
-          } else {
-            Optional.empty()
-          }
+          tlvReader.getBoolean(ContextSpecificTag(TAG_BUILT_IN))
         } else {
           tlvReader.getNull(ContextSpecificTag(TAG_BUILT_IN))
           null

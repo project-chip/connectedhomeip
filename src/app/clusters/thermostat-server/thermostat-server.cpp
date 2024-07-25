@@ -15,6 +15,7 @@
  *    limitations under the License.
  */
 
+#include "thermostat-server.h"
 #include <app/AttributeAccessInterfaceRegistry.h>
 #include <app/util/attribute-storage.h>
 
@@ -27,11 +28,14 @@
 #include <app/ConcreteCommandPath.h>
 #include <lib/core/CHIPEncoding.h>
 
+#include <platform/CHIPDeviceLayer.h>
+
 using namespace chip;
 using namespace chip::app;
 using namespace chip::app::Clusters;
 using namespace chip::app::Clusters::Thermostat;
 using namespace chip::app::Clusters::Thermostat::Attributes;
+using namespace chip::app::Clusters::Thermostat::Structs;
 
 using imcode = Protocols::InteractionModel::Status;
 
@@ -63,6 +67,79 @@ constexpr int8_t kDefaultDeadBand                 = 25; // 2.5C is the default
 
 #define FEATURE_MAP_DEFAULT FEATURE_MAP_HEAT | FEATURE_MAP_COOL | FEATURE_MAP_AUTO
 
+// ----------------------------------------------
+// - Schedules and Presets Manager object       -
+// ----------------------------------------------
+
+// Object Tracking
+static ThermostatMatterScheduleManager * firstMatterScheduleEditor = nullptr;
+
+static ThermostatMatterScheduleManager * inst(EndpointId endpoint)
+{
+    ThermostatMatterScheduleManager * current = firstMatterScheduleEditor;
+    while (current != nullptr && current->mEndpoint != endpoint)
+    {
+        current = current->next();
+    }
+
+    return current;
+}
+
+static inline void reg(ThermostatMatterScheduleManager * inst)
+{
+    inst->setNext(firstMatterScheduleEditor);
+    firstMatterScheduleEditor = inst;
+}
+
+static inline void unreg(ThermostatMatterScheduleManager * inst)
+{
+    if (firstMatterScheduleEditor == inst)
+    {
+        firstMatterScheduleEditor = firstMatterScheduleEditor->next();
+    }
+    else
+    {
+        ThermostatMatterScheduleManager * previous = firstMatterScheduleEditor;
+        ThermostatMatterScheduleManager * current  = firstMatterScheduleEditor->next();
+
+        while (current != nullptr && current != inst)
+        {
+            previous = current;
+            current  = current->next();
+        }
+
+        if (current != nullptr)
+        {
+            previous->setNext(current->next());
+        }
+    }
+}
+
+// Object LifeCycle
+ThermostatMatterScheduleManager::ThermostatMatterScheduleManager(chip::EndpointId endpoint, onEditStartCb onEditStart,
+                                                                 onEditCancelCb onEditCancel, onEditCommitCb onEditCommit,
+
+                                                                 getPresetTypeAtIndexCB getPresetTypeAtIndex,
+                                                                 getPresetAtIndexCB getPresetAtIndex, appendPresetCB appendPreset,
+                                                                 clearPresetsCB clearPresets,
+
+                                                                 getScheduleTypeAtIndexCB getScheduleTypeAtIndex,
+                                                                 getScheduleAtIndexCB getScheduleAtIndex,
+                                                                 appendScheduleCB appendSchedule, clearSchedulesCB clearSchedules) :
+    mEndpoint(endpoint),
+    mOnEditStartCb(onEditStart), mOnEditCancelCb(onEditCancel), mOnEditCommitCb(onEditCommit),
+    mGetPresetTypeAtIndexCb(getPresetTypeAtIndex), mGetPresetAtIndexCb(getPresetAtIndex), mAppendPresetCb(appendPreset),
+    mClearPresetsCb(clearPresets), mGetScheduleTypeAtIndexCb(getScheduleTypeAtIndex), mGetScheduleAtIndexCb(getScheduleAtIndex),
+    mAppendScheduleCb(appendSchedule), mClearSchedulesCb(clearSchedules)
+{
+    reg(this);
+};
+
+ThermostatMatterScheduleManager::~ThermostatMatterScheduleManager()
+{
+    unreg(this);
+}
+
 namespace {
 
 class ThermostatAttrAccess : public AttributeAccessInterface
@@ -83,6 +160,8 @@ CHIP_ERROR ThermostatAttrAccess::Read(const ConcreteReadAttributePath & aPath, A
     uint32_t ourFeatureMap;
     bool localTemperatureNotExposedSupported = (FeatureMap::Get(aPath.mEndpointId, &ourFeatureMap) == imcode::Success) &&
         ((ourFeatureMap & to_underlying(Feature::kLocalTemperatureNotExposed)) != 0);
+    const bool presetsSupported           = ourFeatureMap & to_underlying(Feature::kPresets);
+    const bool enhancedSchedulesSupported = ourFeatureMap & to_underlying(Feature::kMatterScheduleConfiguration);
 
     switch (aPath.mAttributeId)
     {
@@ -102,26 +181,106 @@ CHIP_ERROR ThermostatAttrAccess::Read(const ConcreteReadAttributePath & aPath, A
                 StatusIB statusIB(status);
                 return statusIB.ToChipError();
             }
-            valueRemoteSensing.Clear(RemoteSensingBitmap::kLocalTemperature);
+            valueRemoteSensing.Clear(RemoteSensingBitmap::kLocalTemperature); // clear bit 1 (LocalTemperature RemoteSensing bit)
             return aEncoder.Encode(valueRemoteSensing);
         }
         break;
-    case PresetTypes::Id: {
-        return aEncoder.EncodeList([](const auto & encoder) -> CHIP_ERROR { return CHIP_NO_ERROR; });
-    }
-    break;
-    case Presets::Id: {
-        return aEncoder.EncodeList([](const auto & encoder) -> CHIP_ERROR { return CHIP_NO_ERROR; });
-    }
-    break;
-    case ScheduleTypes::Id: {
-        return aEncoder.EncodeList([](const auto & encoder) -> CHIP_ERROR { return CHIP_NO_ERROR; });
-    }
-    break;
-    case Schedules::Id: {
-        return aEncoder.EncodeList([](const auto & encoder) -> CHIP_ERROR { return CHIP_NO_ERROR; });
-    }
-    break;
+    case PresetTypes::Id:
+        if (presetsSupported)
+        {
+            ThermostatMatterScheduleManager * manager = inst(aPath.mEndpointId);
+            if (manager == nullptr)
+                return CHIP_ERROR_NOT_IMPLEMENTED;
+
+            return aEncoder.EncodeList([manager](const auto & encoder) -> CHIP_ERROR {
+                PresetTypeStruct::Type presetType;
+                size_t index   = 0;
+                CHIP_ERROR err = CHIP_NO_ERROR;
+                while ((err = manager->mGetPresetTypeAtIndexCb(manager, index, presetType)) == CHIP_NO_ERROR)
+                {
+                    ReturnErrorOnFailure(encoder.Encode(presetType));
+                    index++;
+                }
+                if (err == CHIP_ERROR_NOT_FOUND)
+                {
+                    return CHIP_NO_ERROR;
+                }
+                return err;
+            });
+        }
+        break;
+    case Presets::Id:
+        if (presetsSupported)
+        {
+            ThermostatMatterScheduleManager * manager = inst(aPath.mEndpointId);
+            if (manager == nullptr)
+                return CHIP_ERROR_NOT_IMPLEMENTED;
+
+            return aEncoder.EncodeList([manager](const auto & encoder) -> CHIP_ERROR {
+                PresetStruct::Type preset;
+                size_t index   = 0;
+                CHIP_ERROR err = CHIP_NO_ERROR;
+                while ((err = manager->mGetPresetAtIndexCb(manager, index, preset)) == CHIP_NO_ERROR)
+                {
+                    ReturnErrorOnFailure(encoder.Encode(preset));
+                    index++;
+                }
+                if (err == CHIP_ERROR_NOT_FOUND)
+                {
+                    return CHIP_NO_ERROR;
+                }
+                return err;
+            });
+        }
+        break;
+    case ScheduleTypes::Id:
+        if (enhancedSchedulesSupported)
+        {
+            ThermostatMatterScheduleManager * manager = inst(aPath.mEndpointId);
+            if (manager == nullptr)
+                return CHIP_ERROR_NOT_IMPLEMENTED;
+
+            return aEncoder.EncodeList([manager](const auto & encoder) -> CHIP_ERROR {
+                ScheduleTypeStruct::Type scheduleType;
+                size_t index   = 0;
+                CHIP_ERROR err = CHIP_NO_ERROR;
+                while ((err = manager->mGetScheduleTypeAtIndexCb(manager, index, scheduleType)) == CHIP_NO_ERROR)
+                {
+                    ReturnErrorOnFailure(encoder.Encode(scheduleType));
+                    index++;
+                }
+                if (err == CHIP_ERROR_NOT_FOUND)
+                {
+                    return CHIP_NO_ERROR;
+                }
+                return err;
+            });
+        }
+        break;
+    case Schedules::Id:
+        if (enhancedSchedulesSupported)
+        {
+            ThermostatMatterScheduleManager * manager = inst(aPath.mEndpointId);
+            if (manager == nullptr)
+                return CHIP_ERROR_NOT_IMPLEMENTED;
+
+            return aEncoder.EncodeList([manager](const auto & encoder) -> CHIP_ERROR {
+                ScheduleStruct::Type schedule;
+                size_t index   = 0;
+                CHIP_ERROR err = CHIP_NO_ERROR;
+                while ((err = manager->mGetScheduleAtIndexCb(manager, index, schedule)) == CHIP_NO_ERROR)
+                {
+                    ReturnErrorOnFailure(encoder.Encode(schedule));
+                    index++;
+                }
+                if (err == CHIP_ERROR_NOT_FOUND)
+                {
+                    return CHIP_NO_ERROR;
+                }
+                return err;
+            });
+        }
+        break;
     default: // return CHIP_NO_ERROR and just read from the attribute store in default
         break;
     }
@@ -136,6 +295,8 @@ CHIP_ERROR ThermostatAttrAccess::Write(const ConcreteDataAttributePath & aPath, 
     uint32_t ourFeatureMap;
     bool localTemperatureNotExposedSupported = (FeatureMap::Get(aPath.mEndpointId, &ourFeatureMap) == imcode::Success) &&
         ((ourFeatureMap & to_underlying(Feature::kLocalTemperatureNotExposed)) != 0);
+    const bool presetsSupported           = ourFeatureMap & to_underlying(Feature::kPresets);
+    const bool enhancedSchedulesSupported = ourFeatureMap & to_underlying(Feature::kMatterScheduleConfiguration);
 
     switch (aPath.mAttributeId)
     {
@@ -154,12 +315,114 @@ CHIP_ERROR ThermostatAttrAccess::Write(const ConcreteDataAttributePath & aPath, 
         }
         break;
     case Presets::Id: {
-        return CHIP_ERROR_NOT_IMPLEMENTED;
+        if (presetsSupported == false)
+        {
+            StatusIB statusIB(imcode::UnsupportedAttribute);
+            return statusIB.ToChipError();
+        }
+
+        bool currentlyEditing = false;
+        imcode status  = PresetsSchedulesEditable::Get(aPath.mEndpointId, &currentlyEditing);
+        if (status != imcode::Success)
+        {
+            StatusIB statusIB(status);
+            return statusIB.ToChipError();
+        }
+        if (currentlyEditing == false)
+        {
+            StatusIB statusIB(imcode::InvalidInState);
+            return statusIB.ToChipError();
+        }
+
+        // TODO: make sure it's the right session for editing???
+
+        ThermostatMatterScheduleManager * manager = inst(aPath.mEndpointId);
+        if (manager == nullptr)
+            return CHIP_ERROR_NOT_IMPLEMENTED;
+
+        if (manager->mClearPresetsCb == nullptr || manager->mAppendPresetCb == nullptr)
+            return CHIP_ERROR_NOT_IMPLEMENTED;
+
+        if (!aPath.IsListItemOperation())
+        {
+            // Replacing the entire list
+            DataModel::DecodableList<PresetStruct::DecodableType> list;
+            ReturnErrorOnFailure(aDecoder.Decode(list));
+
+            manager->mClearPresetsCb(manager);
+            auto iterator = list.begin();
+            while (iterator.Next())
+            {
+                ReturnErrorOnFailure(manager->mAppendPresetCb(manager, iterator.GetValue()));
+            }
+        }
+        else if (aPath.mListOp == ConcreteDataAttributePath::ListOperation::AppendItem)
+        {
+            PresetStruct::DecodableType decodableType;
+            ReturnErrorOnFailure(aDecoder.Decode(decodableType));
+
+            ReturnErrorOnFailure(manager->mAppendPresetCb(manager, decodableType));
+        }
+        else
+        {
+            return CHIP_ERROR_UNSUPPORTED_CHIP_FEATURE;
+        }
     }
     break;
 
     case Schedules::Id: {
-        return CHIP_ERROR_NOT_IMPLEMENTED;
+        if (enhancedSchedulesSupported == false)
+        {
+            StatusIB statusIB(imcode::UnsupportedAttribute);
+            return statusIB.ToChipError();
+        }
+
+        bool currentlyEditing = false;
+        imcode status  = PresetsSchedulesEditable::Get(aPath.mEndpointId, &currentlyEditing);
+        if (status != imcode::Success)
+        {
+            StatusIB statusIB(status);
+            return statusIB.ToChipError();
+        }
+        if (currentlyEditing == false)
+        {
+            StatusIB statusIB(imcode::InvalidInState);
+            return statusIB.ToChipError();
+        }
+
+        // TODO: make sure it's the right session for editing
+
+        ThermostatMatterScheduleManager * manager = inst(aPath.mEndpointId);
+        if (manager == nullptr)
+            return CHIP_ERROR_NOT_IMPLEMENTED;
+
+        if (manager->mClearSchedulesCb == nullptr || manager->mAppendScheduleCb == nullptr)
+            return CHIP_ERROR_NOT_IMPLEMENTED;
+
+        if (!aPath.IsListItemOperation())
+        {
+            // Replacing the entire list
+            DataModel::DecodableList<ScheduleStruct::DecodableType> list;
+            ReturnErrorOnFailure(aDecoder.Decode(list));
+
+            manager->mClearSchedulesCb(manager);
+            auto iterator = list.begin();
+            while (iterator.Next())
+            {
+                ReturnErrorOnFailure(manager->mAppendScheduleCb(manager, iterator.GetValue()));
+            }
+        }
+        else if (aPath.mListOp == ConcreteDataAttributePath::ListOperation::AppendItem)
+        {
+            ScheduleStruct::DecodableType decodableType;
+            ReturnErrorOnFailure(aDecoder.Decode(decodableType));
+
+            ReturnErrorOnFailure(manager->mAppendScheduleCb(manager, decodableType));
+        }
+        else
+        {
+            return CHIP_ERROR_UNSUPPORTED_CHIP_FEATURE;
+        }
     }
     break;
     default: // return CHIP_NO_ERROR and just write to the attribute store in default
@@ -479,54 +742,6 @@ bool emberAfThermostatClusterGetWeeklyScheduleCallback(app::CommandHandler * com
 bool emberAfThermostatClusterSetWeeklyScheduleCallback(app::CommandHandler * commandObj,
                                                        const app::ConcreteCommandPath & commandPath,
                                                        const Commands::SetWeeklySchedule::DecodableType & commandData)
-{
-    // TODO
-    return false;
-}
-
-bool emberAfThermostatClusterSetActiveScheduleRequestCallback(
-    chip::app::CommandHandler * commandObj, const chip::app::ConcreteCommandPath & commandPath,
-    const chip::app::Clusters::Thermostat::Commands::SetActiveScheduleRequest::DecodableType & commandData)
-{
-    // TODO
-    return false;
-}
-
-bool emberAfThermostatClusterSetActivePresetRequestCallback(
-    chip::app::CommandHandler * commandObj, const chip::app::ConcreteCommandPath & commandPath,
-    const chip::app::Clusters::Thermostat::Commands::SetActivePresetRequest::DecodableType & commandData)
-{
-    // TODO
-    return false;
-}
-
-bool emberAfThermostatClusterStartPresetsSchedulesEditRequestCallback(
-    chip::app::CommandHandler * commandObj, const chip::app::ConcreteCommandPath & commandPath,
-    const chip::app::Clusters::Thermostat::Commands::StartPresetsSchedulesEditRequest::DecodableType & commandData)
-{
-    // TODO
-    return false;
-}
-
-bool emberAfThermostatClusterCancelPresetsSchedulesEditRequestCallback(
-    chip::app::CommandHandler * commandObj, const chip::app::ConcreteCommandPath & commandPath,
-    const chip::app::Clusters::Thermostat::Commands::CancelPresetsSchedulesEditRequest::DecodableType & commandData)
-{
-    // TODO
-    return false;
-}
-
-bool emberAfThermostatClusterCommitPresetsSchedulesRequestCallback(
-    chip::app::CommandHandler * commandObj, const chip::app::ConcreteCommandPath & commandPath,
-    const chip::app::Clusters::Thermostat::Commands::CommitPresetsSchedulesRequest::DecodableType & commandData)
-{
-    // TODO
-    return false;
-}
-
-bool emberAfThermostatClusterSetTemperatureSetpointHoldPolicyCallback(
-    chip::app::CommandHandler * commandObj, const chip::app::ConcreteCommandPath & commandPath,
-    const chip::app::Clusters::Thermostat::Commands::SetTemperatureSetpointHoldPolicy::DecodableType & commandData)
 {
     // TODO
     return false;
@@ -906,6 +1121,272 @@ bool emberAfThermostatClusterSetpointRaiseLowerCallback(app::CommandHandler * co
         break;
     }
 
+    commandObj->AddStatus(commandPath, status);
+    return true;
+}
+
+static void onThermostatEditorTick(chip::System::Layer * systemLayer, void * appState)
+{
+    bool currentlyEditing                       = false;
+    ThermostatMatterScheduleManager * manager = reinterpret_cast<ThermostatMatterScheduleManager *>(appState);
+
+    if (nullptr != manager)
+    {
+        EndpointId endpoint = manager->mEndpoint;
+        if ((imcode::Success == PresetsSchedulesEditable::Get(endpoint, &currentlyEditing)) && currentlyEditing)
+        {
+            manager->mSession.Release(); // this should clear the handle
+            PresetsSchedulesEditable::Set(endpoint, false);
+            manager->mOnEditCancelCb(manager);
+        }
+    }
+}
+
+// Edit/Cancel/Commit logic
+
+static bool StartEditRequest(chip::app::CommandHandler * commandObj, const chip::app::ConcreteCommandPath & commandPath,
+                             uint16_t timeoutSeconds)
+{
+    imcode status                               = imcode::InvalidCommand;
+    bool currentlyEditing                       = false;
+
+    ThermostatMatterScheduleManager * manager = inst(commandPath.mEndpointId);
+    VerifyOrExit(manager != nullptr, status = imcode::InvalidCommand);
+
+    status  = PresetsSchedulesEditable::Get(commandPath.mEndpointId, &currentlyEditing);
+    SuccessOrExit(StatusIB(status).ToChipError());
+
+    if (currentlyEditing && manager->mSession.Contains(commandObj->GetExchangeContext()->GetSessionHandle()))
+    {
+        DeviceLayer::SystemLayer().ExtendTimerTo(System::Clock::Seconds16(timeoutSeconds), onThermostatEditorTick, manager);
+    }
+    else
+    {
+        VerifyOrExit(currentlyEditing == false, status = imcode::Busy);
+
+        status = PresetsSchedulesEditable::Set(commandPath.mEndpointId, true);
+        SuccessOrExit(StatusIB(status).ToChipError());
+
+        manager->mSession = commandObj->GetExchangeContext()->GetSessionHandle();
+        manager->mOnEditStartCb(manager);
+        DeviceLayer::SystemLayer().StartTimer(System::Clock::Seconds16(timeoutSeconds), onThermostatEditorTick, manager);
+    }
+
+exit:
+    commandObj->AddStatus(commandPath, status);
+    return true;
+}
+
+static bool CancelEditRequest(chip::app::CommandHandler * commandObj, const chip::app::ConcreteCommandPath & commandPath)
+{
+    imcode status                        = imcode::InvalidCommand;
+    bool currentlyEditing                       = false;
+
+    ThermostatMatterScheduleManager * manager = inst(commandPath.mEndpointId);
+    VerifyOrExit(manager != nullptr, status = imcode::InvalidCommand);
+
+    status  = PresetsSchedulesEditable::Get(commandPath.mEndpointId, &currentlyEditing);
+    SuccessOrExit(StatusIB(status).ToChipError());
+
+    if (currentlyEditing && !(manager->mSession.Contains(commandObj->GetExchangeContext()->GetSessionHandle())))
+    {
+        status = imcode::UnsupportedAccess;
+    }
+    else
+    {
+        VerifyOrExit(currentlyEditing == true, status = imcode::InvalidInState);
+
+        (void) chip::DeviceLayer::SystemLayer().CancelTimer(onThermostatEditorTick, manager);
+    }
+
+exit:
+    commandObj->AddStatus(commandPath, status);
+    return true;
+}
+
+static bool CommitEditRequest(chip::app::CommandHandler * commandObj, const chip::app::ConcreteCommandPath & commandPath)
+{
+    imcode status                        = imcode::InvalidCommand;
+    bool currentlyEditing                       = false;
+
+    ThermostatMatterScheduleManager * manager = inst(commandPath.mEndpointId);
+    VerifyOrExit(manager != nullptr, status = imcode::InvalidCommand);
+
+    status  = PresetsSchedulesEditable::Get(commandPath.mEndpointId, &currentlyEditing);
+    SuccessOrExit(StatusIB(status).ToChipError());
+
+    if (currentlyEditing && !(manager->mSession.Contains(commandObj->GetExchangeContext()->GetSessionHandle())))
+    {
+        status = imcode::UnsupportedAccess;
+    }
+    else
+    {
+        VerifyOrExit(currentlyEditing == true, status = imcode::InvalidInState);
+
+        status = manager->mOnEditCommitCb(manager);
+        SuccessOrExit(StatusIB(status).ToChipError());
+
+        status = PresetsSchedulesEditable::Set(commandPath.mEndpointId, false);
+        manager->mSession.Release(); // this should clear the handle
+
+        SuccessOrExit(StatusIB(status).ToChipError());
+
+        (void) chip::DeviceLayer::SystemLayer().CancelTimer(onThermostatEditorTick, manager);
+    }
+
+exit:
+    commandObj->AddStatus(commandPath, status);
+    return true;
+}
+
+// Matter Commands
+
+bool emberAfThermostatClusterSetActiveScheduleRequestCallback(
+    chip::app::CommandHandler * commandObj, const chip::app::ConcreteCommandPath & commandPath,
+    const chip::app::Clusters::Thermostat::Commands::SetActiveScheduleRequest::DecodableType & commandData)
+{
+    imcode status = imcode::InvalidCommand;
+    uint32_t ourFeatureMap;
+    bool enhancedSchedulesSupported = (FeatureMap::Get(commandPath.mEndpointId, &ourFeatureMap) == imcode::Success) &&
+        ((ourFeatureMap & to_underlying(Feature::kMatterScheduleConfiguration)) != 0);
+
+    if (enhancedSchedulesSupported)
+    {
+        ThermostatMatterScheduleManager * manager = inst(commandPath.mEndpointId);
+        VerifyOrExit(manager != nullptr, status = imcode::InvalidCommand);
+        VerifyOrExit(manager->mGetScheduleAtIndexCb != nullptr, status = imcode::InvalidCommand);
+
+        const chip::ByteSpan & scheduleHandle = commandData.scheduleHandle;
+        ScheduleStruct::Type schedule;
+        bool found   = false;
+        size_t index = 0;
+
+        while (manager->mGetScheduleAtIndexCb(manager, index, schedule) != CHIP_ERROR_NOT_FOUND)
+        {
+            if ((schedule.scheduleHandle.IsNull() == false) && scheduleHandle.data_equal(schedule.scheduleHandle.Value()))
+            {
+                status = ActiveScheduleHandle::Set(commandPath.mEndpointId, scheduleHandle);
+                SuccessOrExit(StatusIB(status).ToChipError());
+                found = true;
+                break;
+            }
+            index++;
+        }
+
+        VerifyOrExit(found == true, status = imcode::InvalidCommand);
+    }
+
+exit:
+    commandObj->AddStatus(commandPath, status);
+    return true;
+}
+
+bool emberAfThermostatClusterSetActivePresetRequestCallback(
+    chip::app::CommandHandler * commandObj, const chip::app::ConcreteCommandPath & commandPath,
+    const chip::app::Clusters::Thermostat::Commands::SetActivePresetRequest::DecodableType & commandData)
+{
+    imcode status = imcode::InvalidCommand;
+    uint32_t ourFeatureMap;
+    bool presetsSupported = (FeatureMap::Get(commandPath.mEndpointId, &ourFeatureMap) == imcode::Success) &&
+        ((ourFeatureMap & to_underlying(Feature::kPresets)) != 0);
+
+    if (presetsSupported)
+    {
+        ThermostatMatterScheduleManager * manager = inst(commandPath.mEndpointId);
+        VerifyOrExit(manager != nullptr, status = imcode::InvalidCommand);
+        VerifyOrExit(manager->mGetPresetAtIndexCb != nullptr, status = imcode::InvalidCommand);
+
+        const chip::ByteSpan & presetHandle = commandData.presetHandle;
+        // TODO: Delay argument
+
+        PresetStruct::Type preset;
+        bool found   = false;
+        size_t index = 0;
+
+        while (manager->mGetPresetAtIndexCb(manager, index, preset) != CHIP_ERROR_NOT_FOUND)
+        {
+            VerifyOrDie(preset.presetHandle.IsNull() == false);
+            if (presetHandle.data_equal(preset.presetHandle.Value()))
+            {
+                status = ActivePresetHandle::Set(commandPath.mEndpointId, presetHandle);
+                SuccessOrExit(StatusIB(status).ToChipError());
+                found = true;
+                break;
+            }
+            index++;
+        }
+
+        VerifyOrExit(found == true, status = imcode::InvalidCommand);
+    }
+
+exit:
+    commandObj->AddStatus(commandPath, status);
+    return true;
+}
+
+bool emberAfThermostatClusterStartPresetsSchedulesEditRequestCallback(
+    chip::app::CommandHandler * commandObj, const chip::app::ConcreteCommandPath & commandPath,
+    const chip::app::Clusters::Thermostat::Commands::StartPresetsSchedulesEditRequest::DecodableType & commandData)
+{
+    uint32_t ourFeatureMap;
+    bool enhancedSchedulesSupported = (FeatureMap::Get(commandPath.mEndpointId, &ourFeatureMap) == imcode::Success) &&
+        ((ourFeatureMap & to_underlying(Feature::kMatterScheduleConfiguration)) != 0);
+    bool presetsSupported = ((ourFeatureMap & to_underlying(Feature::kPresets)) != 0);
+
+    if (enhancedSchedulesSupported || presetsSupported)
+        return StartEditRequest(commandObj, commandPath, commandData.timeoutSeconds);
+
+    commandObj->AddStatus(commandPath, imcode::InvalidCommand);
+    return true;
+}
+
+bool emberAfThermostatClusterCancelPresetsSchedulesEditRequestCallback(
+    chip::app::CommandHandler * commandObj, const chip::app::ConcreteCommandPath & commandPath,
+    const chip::app::Clusters::Thermostat::Commands::CancelPresetsSchedulesEditRequest::DecodableType & commandData)
+{
+    uint32_t ourFeatureMap;
+    bool enhancedSchedulesSupported = (FeatureMap::Get(commandPath.mEndpointId, &ourFeatureMap) == imcode::Success) &&
+        ((ourFeatureMap & to_underlying(Feature::kMatterScheduleConfiguration)) != 0);
+
+    if (enhancedSchedulesSupported)
+        return CancelEditRequest(commandObj, commandPath);
+
+    commandObj->AddStatus(commandPath, imcode::InvalidCommand);
+    return true;
+}
+
+bool emberAfThermostatClusterCommitPresetsSchedulesRequestCallback(
+    chip::app::CommandHandler * commandObj, const chip::app::ConcreteCommandPath & commandPath,
+    const chip::app::Clusters::Thermostat::Commands::CommitPresetsSchedulesRequest::DecodableType & commandData)
+{
+    uint32_t ourFeatureMap;
+    bool enhancedSchedulesSupported = (FeatureMap::Get(commandPath.mEndpointId, &ourFeatureMap) == imcode::Success) &&
+        ((ourFeatureMap & to_underlying(Feature::kMatterScheduleConfiguration)) != 0);
+
+    if (enhancedSchedulesSupported)
+        return CommitEditRequest(commandObj, commandPath);
+
+    commandObj->AddStatus(commandPath, imcode::InvalidCommand);
+    return true;
+}
+
+bool emberAfThermostatClusterSetTemperatureSetpointHoldPolicyCallback(
+    chip::app::CommandHandler * commandObj, const chip::app::ConcreteCommandPath & commandPath,
+    const chip::app::Clusters::Thermostat::Commands::SetTemperatureSetpointHoldPolicy::DecodableType & commandData)
+{
+    imcode status = imcode::InvalidCommand;
+    uint32_t ourFeatureMap;
+    bool presetsSupported = (FeatureMap::Get(commandPath.mEndpointId, &ourFeatureMap) == imcode::Success) &&
+        ((ourFeatureMap & to_underlying(Feature::kPresets)) != 0);
+
+    if (presetsSupported)
+    {
+        auto holdPolicy = commandData.temperatureSetpointHoldPolicy;
+        status          = TemperatureSetpointHoldPolicy::Set(commandPath.mEndpointId, holdPolicy);
+        SuccessOrExit(StatusIB(status).ToChipError());
+    }
+
+exit:
     commandObj->AddStatus(commandPath, status);
     return true;
 }
