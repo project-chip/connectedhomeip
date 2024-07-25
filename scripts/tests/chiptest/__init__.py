@@ -286,7 +286,7 @@ def target_for_name(name: str):
         return TestTarget.MWO
     if name.startswith("Test_TC_RVCRUNM_") or name.startswith("Test_TC_RVCCLEANM_") or name.startswith("Test_TC_RVCOPSTATE_"):
         return TestTarget.RVC
-    if name.startswith("Test_TC_THNETDIR_"):
+    if name.startswith("Test_TC_THNETDIR_") or name.startswith("Test_TC_WIFINM_"):
         return TestTarget.NETWORK_MANAGER
     return TestTarget.ALL_CLUSTERS
 
