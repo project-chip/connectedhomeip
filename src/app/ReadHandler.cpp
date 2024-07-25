@@ -28,8 +28,8 @@
 #include <app/MessageDef/StatusResponseMessage.h>
 #include <app/MessageDef/SubscribeRequestMessage.h>
 #include <app/MessageDef/SubscribeResponseMessage.h>
-#include <app/icd/server/ICDServerConfig.h>
 #include <app/data-model-provider/Provider.h>
+#include <app/icd/server/ICDServerConfig.h>
 #include <lib/core/TLVUtilities.h>
 #include <messaging/ExchangeContext.h>
 

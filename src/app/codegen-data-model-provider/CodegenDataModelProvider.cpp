@@ -233,7 +233,7 @@ bool CodegenDataModelProvider::EmberCommandListIterator::Exists(const CommandId 
 }
 
 CHIP_ERROR CodegenDataModelProvider::Invoke(const InteractionModel::InvokeRequest & request, TLV::TLVReader & input_arguments,
-                                    CommandHandler * handler)
+                                            CommandHandler * handler)
 {
     // TODO: CommandHandlerInterface support is currently
     //       residing in InteractionModelEngine itself. We may want to separate this out
@@ -319,7 +319,8 @@ InteractionModel::ClusterEntry CodegenDataModelProvider::FirstCluster(EndpointId
     return FirstServerClusterEntry(endpointId, endpoint, 0, mClusterIterationHint);
 }
 
-std::optional<unsigned> CodegenDataModelProvider::TryFindServerClusterIndex(const EmberAfEndpointType * endpoint, ClusterId id) const
+std::optional<unsigned> CodegenDataModelProvider::TryFindServerClusterIndex(const EmberAfEndpointType * endpoint,
+                                                                            ClusterId id) const
 {
     const unsigned clusterCount = endpoint->clusterCount;
 
