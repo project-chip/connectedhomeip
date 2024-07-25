@@ -121,7 +121,7 @@ public:
     private:
         LocationDescriptorStruct mLocationDescriptor;
         uint64_t mLocationDescriptorLastEditEpochUs = 0;
-        bool mIsAlreadyBuilt                  = false;
+        bool mIsAlreadyBuilt                        = false;
     };
 
     CHIP_ERROR Encode(const AttributeValueEncoder::ListEncodeHelper & aEncoder, const std::string & aUniqueLocationId,
