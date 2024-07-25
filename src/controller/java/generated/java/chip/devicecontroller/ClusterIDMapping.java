@@ -4455,7 +4455,8 @@ public class ClusterIDMapping {
             StartUp(0L),
             ShutDown(1L),
             Leave(2L),
-            ReachableChanged(3L),;
+            ReachableChanged(3L),
+            ActiveChanged(128L),;
             private final long id;
             Event(long id) {
                 this.id = id;
@@ -4475,7 +4476,8 @@ public class ClusterIDMapping {
             }
         }
 
-        public enum Command {;
+        public enum Command {
+            KeepActive(128L),;
             private final long id;
             Command(long id) {
                 this.id = id;

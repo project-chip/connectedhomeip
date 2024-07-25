@@ -2246,6 +2246,33 @@ NS_ASSUME_NONNULL_BEGIN
 @dynamic reachableNewValue;
 @end
 
+@implementation MTRBridgedDeviceBasicInformationClusterActiveChangedEvent
+- (instancetype)init
+{
+    if (self = [super init]) {
+
+        _promisedActiveDuration = @(0);
+    }
+    return self;
+}
+
+- (id)copyWithZone:(NSZone * _Nullable)zone
+{
+    auto other = [[MTRBridgedDeviceBasicInformationClusterActiveChangedEvent alloc] init];
+
+    other.promisedActiveDuration = self.promisedActiveDuration;
+
+    return other;
+}
+
+- (NSString *)description
+{
+    NSString * descriptionString = [NSString stringWithFormat:@"<%@: promisedActiveDuration:%@; >", NSStringFromClass([self class]), _promisedActiveDuration];
+    return descriptionString;
+}
+
+@end
+
 @implementation MTRSwitchClusterSwitchLatchedEvent
 - (instancetype)init
 {
