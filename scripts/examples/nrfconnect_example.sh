@@ -51,4 +51,4 @@ fi
 export CCACHE_BASEDIR="$PWD/$APP/nrfconnect"
 
 env
-west build -p auto -b "$BOARD" -d "$APP/nrfconnect/build" "$APP/nrfconnect" -- "${COMMON_CI_FLAGS[@]}" "$@"
+west build -p auto -b "$BOARD" -d "$APP/nrfconnect/build" "$APP/nrfconnect" --sysbuild -- "${COMMON_CI_FLAGS[@]}" "$@"

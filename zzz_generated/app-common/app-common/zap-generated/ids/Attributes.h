@@ -2364,6 +2364,10 @@ namespace OperatingMode {
 static constexpr AttributeId Id = 0x00000008;
 } // namespace OperatingMode
 
+namespace MaximumCheckInBackOff {
+static constexpr AttributeId Id = 0x00000009;
+} // namespace MaximumCheckInBackOff
+
 namespace GeneratedCommandList {
 static constexpr AttributeId Id = Globals::Attributes::GeneratedCommandList::Id;
 } // namespace GeneratedCommandList
@@ -5189,10 +5193,6 @@ static constexpr AttributeId Id = 0x00000053;
 namespace SetpointHoldExpiryTimestamp {
 static constexpr AttributeId Id = 0x00000054;
 } // namespace SetpointHoldExpiryTimestamp
-
-namespace QueuedPreset {
-static constexpr AttributeId Id = 0x00000055;
-} // namespace QueuedPreset
 
 namespace GeneratedCommandList {
 static constexpr AttributeId Id = Globals::Attributes::GeneratedCommandList::Id;

@@ -18,6 +18,7 @@
 
 #include <app-common/zap-generated/attributes/Accessors.h>
 #include <app/AttributeAccessInterfaceRegistry.h>
+#include <app/CommandHandlerInterfaceRegistry.h>
 #include <app/InteractionModelEngine.h>
 #include <app/SafeAttributePersistenceProvider.h>
 #include <app/clusters/mode-base-server/mode-base-server.h>
@@ -63,7 +64,7 @@ void Instance::Shutdown()
         return;
     }
     UnregisterThisInstance();
-    chip::app::InteractionModelEngine::GetInstance()->UnregisterCommandHandler(this);
+    CommandHandlerInterfaceRegistry::UnregisterCommandHandler(this);
     unregisterAttributeAccessOverride(this);
 }
 
@@ -77,7 +78,7 @@ CHIP_ERROR Instance::Init()
 
     LoadPersistentAttributes();
 
-    ReturnErrorOnFailure(chip::app::InteractionModelEngine::GetInstance()->RegisterCommandHandler(this));
+    ReturnErrorOnFailure(CommandHandlerInterfaceRegistry::RegisterCommandHandler(this));
     VerifyOrReturnError(registerAttributeAccessOverride(this), CHIP_ERROR_INCORRECT_STATE);
     RegisterThisInstance();
     ReturnErrorOnFailure(mDelegate->Init());
