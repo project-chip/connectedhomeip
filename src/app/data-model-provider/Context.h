@@ -22,7 +22,7 @@
 
 namespace chip {
 namespace app {
-namespace InteractionModel {
+namespace DataModel {
 
 /// Data provided to data models in order to interface with the interaction model environment.
 ///
@@ -36,6 +36,6 @@ struct InteractionModelContext
     ActionContext * actionContext;
 };
 
-} // namespace InteractionModel
+} // namespace DataModel
 } // namespace app
 } // namespace chip

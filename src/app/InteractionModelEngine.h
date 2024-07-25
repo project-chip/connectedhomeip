@@ -402,14 +402,14 @@ public:
     }
 #endif
 
-    InteractionModel::DataModel * GetDataModel() const;
+    DataModel::Provider * GetDataModel() const;
 
     // MUST NOT be used while the interaction model engine is running as interaction
     // model functionality (e.g. active reads/writes/subscriptions) rely on data model
     // state
     //
     // Returns the old data model value.
-    InteractionModel::DataModel * SetDataModel(InteractionModel::DataModel * model);
+    DataModel::Provider * SetDataModel(DataModel::Provider * model);
 
 private:
     friend class reporting::Engine;
@@ -698,7 +698,7 @@ private:
 
     SubscriptionResumptionStorage * mpSubscriptionResumptionStorage = nullptr;
 
-    InteractionModel::DataModel * mDataModel = nullptr;
+    DataModel::Provider * mDataModel = nullptr;
 };
 
 } // namespace app

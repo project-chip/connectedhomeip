@@ -108,15 +108,15 @@ extern CommandHandler::Handle gAsyncCommandHandle;
 /// TODO items for above:
 ///      - once IM only supports DataModel
 ///      - break ember-overrides in this h/cpp file
-class CustomDataModel : public InteractionModel::DataModel
+class CustomDataModel : public DataModel::Provider
 {
 public:
     static CustomDataModel & Instance();
 
     CHIP_ERROR Shutdown() override { return CHIP_NO_ERROR; }
 
-    CHIP_ERROR ReadAttribute(const InteractionModel::ReadAttributeRequest & request, AttributeValueEncoder & encoder) override;
-    CHIP_ERROR WriteAttribute(const InteractionModel::WriteAttributeRequest & request, AttributeValueDecoder & decoder) override;
+    CHIP_ERROR ReadAttribute(const DataModel::ReadAttributeRequest & request, AttributeValueEncoder & encoder) override;
+    CHIP_ERROR WriteAttribute(const DataModel::WriteAttributeRequest & request, AttributeValueDecoder & decoder) override;
     CHIP_ERROR Invoke(const InteractionModel::InvokeRequest & request, chip::TLV::TLVReader & input_arguments,
                       CommandHandler * handler) override;
 
@@ -127,7 +127,7 @@ public:
     std::optional<InteractionModel::ClusterInfo> GetClusterInfo(const ConcreteClusterPath & path) override;
     InteractionModel::AttributeEntry FirstAttribute(const ConcreteClusterPath & cluster) override;
     InteractionModel::AttributeEntry NextAttribute(const ConcreteAttributePath & before) override;
-    std::optional<InteractionModel::AttributeInfo> GetAttributeInfo(const ConcreteAttributePath & path) override;
+    std::optional<DataModel::AttributeInfo> GetAttributeInfo(const ConcreteAttributePath & path) override;
     InteractionModel::CommandEntry FirstAcceptedCommand(const ConcreteClusterPath & cluster) override;
     InteractionModel::CommandEntry NextAcceptedCommand(const ConcreteCommandPath & before) override;
     std::optional<InteractionModel::CommandInfo> GetAcceptedCommandInfo(const ConcreteCommandPath & path) override;

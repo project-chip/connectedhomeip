@@ -53,7 +53,7 @@ namespace app {
 class AttributePathExpandIteratorDataModel
 {
 public:
-    AttributePathExpandIteratorDataModel(InteractionModel::DataModel * dataModel,
+    AttributePathExpandIteratorDataModel(DataModel::Provider * dataModel,
                                          SingleLinkedListNode<AttributePathParams> * attributePath);
 
     /**
@@ -89,7 +89,7 @@ public:
     }
 
 private:
-    InteractionModel::DataModel * mDataModel;
+    DataModel::Provider * mDataModel;
     SingleLinkedListNode<AttributePathParams> * mpAttributePath;
     ConcreteAttributePath mOutputPath;
 

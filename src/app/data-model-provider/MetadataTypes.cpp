@@ -18,7 +18,7 @@
 
 namespace chip {
 namespace app {
-namespace InteractionModel {
+namespace DataModel {
 
 const AttributeEntry AttributeEntry::kInvalid{ .path = ConcreteAttributePath(kInvalidEndpointId, kInvalidClusterId,
                                                                              kInvalidAttributeId) };
@@ -30,6 +30,6 @@ const ClusterEntry ClusterEntry::kInvalid{
     .info = ClusterInfo(0 /* version */), // version of invalid cluster entry does not matter
 };
 
-} // namespace InteractionModel
+} // namespace DataModel
 } // namespace app
 } // namespace chip

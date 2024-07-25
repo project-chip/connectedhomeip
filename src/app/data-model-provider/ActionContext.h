@@ -20,7 +20,7 @@
 
 namespace chip {
 namespace app {
-namespace InteractionModel {
+namespace DataModel {
 
 // Context for a currently executing action
 class ActionContext
@@ -38,6 +38,6 @@ public:
     virtual Messaging::ExchangeContext * CurrentExchange() = 0;
 };
 
-} // namespace InteractionModel
+} // namespace DataModel
 } // namespace app
 } // namespace chip

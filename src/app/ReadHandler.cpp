@@ -54,7 +54,7 @@ uint16_t ReadHandler::GetPublisherSelectedIntervalLimit()
 }
 
 ReadHandler::ReadHandler(ManagementCallback & apCallback, Messaging::ExchangeContext * apExchangeContext,
-                         InteractionType aInteractionType, Observer * observer, InteractionModel::DataModel * apDataModel) :
+                         InteractionType aInteractionType, Observer * observer, DataModel::Provider * apDataModel) :
     mAttributePathExpandIterator(apDataModel, nullptr),
     mExchangeCtx(*this), mManagementCallback(apCallback)
 {
@@ -80,7 +80,7 @@ ReadHandler::ReadHandler(ManagementCallback & apCallback, Messaging::ExchangeCon
 }
 
 #if CHIP_CONFIG_PERSIST_SUBSCRIPTIONS
-ReadHandler::ReadHandler(ManagementCallback & apCallback, Observer * observer, InteractionModel::DataModel * apDataModel) :
+ReadHandler::ReadHandler(ManagementCallback & apCallback, Observer * observer, DataModel::Provider * apDataModel) :
     mAttributePathExpandIterator(apDataModel, nullptr), mExchangeCtx(*this), mManagementCallback(apCallback)
 {
     mInteractionType = InteractionType::Subscribe;

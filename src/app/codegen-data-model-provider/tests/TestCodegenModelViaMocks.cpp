@@ -62,7 +62,7 @@
 using namespace chip;
 using namespace chip::Test;
 using namespace chip::app;
-using namespace chip::app::InteractionModel;
+using namespace chip::app::DataModel;
 using namespace chip::app::Clusters::Globals::Attributes;
 
 namespace {
@@ -625,7 +625,7 @@ struct TestReadRequest
         request.path              = path;
     }
 
-    std::unique_ptr<AttributeValueEncoder> StartEncoding(InteractionModel::DataModel * model,
+    std::unique_ptr<AttributeValueEncoder> StartEncoding(DataModel::Provider * model,
                                                          AttributeEncodeState state = AttributeEncodeState())
     {
         std::optional<ClusterInfo> info = model->GetClusterInfo(request.path);
@@ -658,7 +658,7 @@ struct TestReadRequest
 // Sets up data for writing
 struct TestWriteRequest
 {
-    InteractionModel::WriteAttributeRequest request;
+    DataModel::WriteAttributeRequest request;
     uint8_t tlvBuffer[128] = { 0 };
     TLV::TLVReader
         tlvReader; /// tlv reader used for the returned AttributeValueDecoder (since attributeValueDecoder uses references)

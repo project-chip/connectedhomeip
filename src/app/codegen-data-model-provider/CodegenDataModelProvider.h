@@ -35,7 +35,7 @@ namespace app {
 /// Given that this relies on global data at link time, there generally can be
 /// only one CodegenDataModelProvider per application (you can create more instances,
 /// however they would share the exact same underlying data and storage).
-class CodegenDataModelProvider : public chip::app::InteractionModel::DataModel
+class CodegenDataModelProvider : public chip::app::DataModel::Provider
 {
 private:
     /// Ember commands are stored as a `CommandId *` pointer that is either null (i.e. no commands)
@@ -68,26 +68,26 @@ public:
     /// Generic model implementations
     CHIP_ERROR Shutdown() override { return CHIP_NO_ERROR; }
 
-    CHIP_ERROR ReadAttribute(const InteractionModel::ReadAttributeRequest & request, AttributeValueEncoder & encoder) override;
-    CHIP_ERROR WriteAttribute(const InteractionModel::WriteAttributeRequest & request, AttributeValueDecoder & decoder) override;
-    CHIP_ERROR Invoke(const InteractionModel::InvokeRequest & request, chip::TLV::TLVReader & input_arguments,
+    CHIP_ERROR ReadAttribute(const DataModel::ReadAttributeRequest & request, AttributeValueEncoder & encoder) override;
+    CHIP_ERROR WriteAttribute(const DataModel::WriteAttributeRequest & request, AttributeValueDecoder & decoder) override;
+    CHIP_ERROR Invoke(const DataModel::InvokeRequest & request, chip::TLV::TLVReader & input_arguments,
                       CommandHandler * handler) override;
 
     /// attribute tree iteration
     EndpointId FirstEndpoint() override;
     EndpointId NextEndpoint(EndpointId before) override;
 
-    InteractionModel::ClusterEntry FirstCluster(EndpointId endpoint) override;
-    InteractionModel::ClusterEntry NextCluster(const ConcreteClusterPath & before) override;
-    std::optional<InteractionModel::ClusterInfo> GetClusterInfo(const ConcreteClusterPath & path) override;
+    DataModel::ClusterEntry FirstCluster(EndpointId endpoint) override;
+    DataModel::ClusterEntry NextCluster(const ConcreteClusterPath & before) override;
+    std::optional<DataModel::ClusterInfo> GetClusterInfo(const ConcreteClusterPath & path) override;
 
-    InteractionModel::AttributeEntry FirstAttribute(const ConcreteClusterPath & cluster) override;
-    InteractionModel::AttributeEntry NextAttribute(const ConcreteAttributePath & before) override;
-    std::optional<InteractionModel::AttributeInfo> GetAttributeInfo(const ConcreteAttributePath & path) override;
+    DataModel::AttributeEntry FirstAttribute(const ConcreteClusterPath & cluster) override;
+    DataModel::AttributeEntry NextAttribute(const ConcreteAttributePath & before) override;
+    std::optional<DataModel::AttributeInfo> GetAttributeInfo(const ConcreteAttributePath & path) override;
 
-    InteractionModel::CommandEntry FirstAcceptedCommand(const ConcreteClusterPath & cluster) override;
-    InteractionModel::CommandEntry NextAcceptedCommand(const ConcreteCommandPath & before) override;
-    std::optional<InteractionModel::CommandInfo> GetAcceptedCommandInfo(const ConcreteCommandPath & path) override;
+    DataModel::CommandEntry FirstAcceptedCommand(const ConcreteClusterPath & cluster) override;
+    DataModel::CommandEntry NextAcceptedCommand(const ConcreteCommandPath & before) override;
+    std::optional<DataModel::CommandInfo> GetAcceptedCommandInfo(const ConcreteCommandPath & path) override;
 
     ConcreteCommandPath FirstGeneratedCommand(const ConcreteClusterPath & cluster) override;
     ConcreteCommandPath NextGeneratedCommand(const ConcreteCommandPath & before) override;

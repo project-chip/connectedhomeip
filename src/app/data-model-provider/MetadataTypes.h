@@ -28,7 +28,7 @@
 
 namespace chip {
 namespace app {
-namespace InteractionModel {
+namespace DataModel {
 
 enum class ClusterQualityFlags : uint32_t
 {
@@ -150,6 +150,6 @@ public:
     virtual ConcreteCommandPath NextGeneratedCommand(const ConcreteCommandPath & before)   = 0;
 };
 
-} // namespace InteractionModel
+} // namespace DataModel
 } // namespace app
 } // namespace chip

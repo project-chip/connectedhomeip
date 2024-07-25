@@ -59,12 +59,12 @@ public:
     void SetUp() override
     {
         chip::Test::AppContext::SetUp();
-        mOldModel = InteractionModelEngine::GetInstance()->SetDataModel(&TestImCustomDataModel::Instance());
+        mOldProvider = InteractionModelEngine::GetInstance()->SetDataModel(&TestImCustomDataModel::Instance());
     }
 
     void TearDown() override
     {
-        InteractionModelEngine::GetInstance()->SetDataModel(mOldModel);
+        InteractionModelEngine::GetInstance()->SetDataModel(mOldProvider);
         chip::Test::AppContext::TearDown();
     }
 
@@ -77,7 +77,7 @@ public:
     void TestMergeAttributePathWhenDirtySetPoolExhausted();
 
 private:
-    chip::app::InteractionModel::DataModel * mOldModel = nullptr;
+    chip::app::DataModel::Provider * mOldProvider = nullptr;
 
     struct ExpectedDirtySetContent : public AttributePathParams
     {

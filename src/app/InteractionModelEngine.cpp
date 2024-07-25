@@ -1706,17 +1706,17 @@ Protocols::InteractionModel::Status InteractionModelEngine::CommandExists(const 
     return ServerClusterCommandExists(aCommandPath);
 }
 
-InteractionModel::DataModel * InteractionModelEngine::SetDataModel(InteractionModel::DataModel * model)
+DataModel::Provider * InteractionModelEngine::SetDataModel(DataModel::Provider * model)
 {
     // Alternting data model should not be done while IM is actively handling requests.
     VerifyOrDie(mReadHandlers.begin() == mReadHandlers.end());
 
-    InteractionModel::DataModel * oldModel = GetDataModel();
-    mDataModel                             = model;
+    DataModel::Provider * oldModel = GetDataModel();
+    mDataModel                     = model;
     return oldModel;
 }
 
-InteractionModel::DataModel * InteractionModelEngine::GetDataModel() const
+DataModel::Provider * InteractionModelEngine::GetDataModel() const
 {
 #if CHIP_CONFIG_USE_DATA_MODEL_INTERFACE
     // TODO: this should be temporary, we should fully inject the data model

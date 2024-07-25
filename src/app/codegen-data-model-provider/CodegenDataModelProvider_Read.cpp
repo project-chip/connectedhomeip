@@ -258,8 +258,7 @@ CHIP_ERROR EncodeEmberValue(ByteSpan data, const EmberAfAttributeMetadata * meta
 ///    - validate ACL (only for non-internal requests)
 ///    - Try to read attribute via the AttributeAccessInterface
 ///    - Try to read the value from ember RAM storage
-CHIP_ERROR CodegenDataModelProvider::ReadAttribute(const InteractionModel::ReadAttributeRequest & request,
-                                                   AttributeValueEncoder & encoder)
+CHIP_ERROR CodegenDataModelProvider::ReadAttribute(const DataModel::ReadAttributeRequest & request, AttributeValueEncoder & encoder)
 {
     ChipLogDetail(DataManagement,
                   "Reading attribute: Cluster=" ChipLogFormatMEI " Endpoint=0x%x AttributeId=" ChipLogFormatMEI " (expanded=%d)",
@@ -267,7 +266,7 @@ CHIP_ERROR CodegenDataModelProvider::ReadAttribute(const InteractionModel::ReadA
                   request.path.mExpanded);
 
     // ACL check for non-internal requests
-    if (!request.operationFlags.Has(InteractionModel::OperationFlags::kInternal))
+    if (!request.operationFlags.Has(DataModel::OperationFlags::kInternal))
     {
         ReturnErrorCodeIf(!request.subjectDescriptor.has_value(), CHIP_ERROR_INVALID_ARGUMENT);
 

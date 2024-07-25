@@ -20,7 +20,7 @@
 
 namespace chip {
 namespace app {
-namespace InteractionModel {
+namespace DataModel {
 
 /// Notification listener for changes of the underlying data in a
 /// data model.
@@ -42,6 +42,6 @@ public:
     virtual void MarkDirty(const ConcreteAttributePath & path) = 0;
 };
 
-} // namespace InteractionModel
+} // namespace DataModel
 } // namespace app
 } // namespace chip

@@ -28,7 +28,7 @@
 using namespace chip;
 using namespace chip::app;
 using namespace chip::app::DataModelTests;
-using namespace chip::app::InteractionModel;
+using namespace chip::app::DataModel;
 using namespace chip::app::Clusters;
 using namespace chip::app::Clusters::UnitTesting;
 using namespace chip::Protocols;

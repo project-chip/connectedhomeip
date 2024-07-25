@@ -18,13 +18,13 @@
 #include <app/AttributePathExpandIterator-DataModel.h>
 #include <app/GlobalAttributes.h>
 
-using namespace chip::app::InteractionModel;
+using namespace chip::app::DataModel;
 
 namespace chip {
 namespace app {
 
 AttributePathExpandIteratorDataModel::AttributePathExpandIteratorDataModel(
-    InteractionModel::DataModel * dataModel, SingleLinkedListNode<AttributePathParams> * attributePath) :
+    DataModel::Provider * dataModel, SingleLinkedListNode<AttributePathParams> * attributePath) :
     mDataModel(dataModel),
     mpAttributePath(attributePath), mOutputPath(kInvalidEndpointId, kInvalidClusterId, kInvalidAttributeId)
 

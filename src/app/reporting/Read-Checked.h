@@ -27,7 +27,7 @@ namespace app {
 namespace reporting {
 namespace CheckedImpl {
 
-CHIP_ERROR RetrieveClusterData(InteractionModel::DataModel * dataModel, const Access::SubjectDescriptor & subjectDescriptor,
+CHIP_ERROR RetrieveClusterData(DataModel::Provider * dataModel, const Access::SubjectDescriptor & subjectDescriptor,
                                bool isFabricFiltered, AttributeReportIBs::Builder & reportBuilder,
                                const ConcreteReadAttributePath & path, AttributeEncodeState * encoderState);
 

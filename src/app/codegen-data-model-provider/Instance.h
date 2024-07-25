@@ -21,7 +21,7 @@
 namespace chip {
 namespace app {
 
-InteractionModel::DataModel * CodegenDataModelProviderInstance();
+DataModel::Provider * CodegenDataModelProviderInstance();
 
 } // namespace app
 } // namespace chip

@@ -70,7 +70,7 @@ namespace app {
 class AttributePathExpandIteratorEmber
 {
 public:
-    AttributePathExpandIteratorEmber(InteractionModel::DataModel *, // datamodel is NOT used by this class
+    AttributePathExpandIteratorEmber(DataModel::Provider *, // datamodel is NOT used by this class
                                      SingleLinkedListNode<AttributePathParams> * aAttributePath);
 
     /**

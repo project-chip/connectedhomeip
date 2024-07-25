@@ -20,7 +20,7 @@
 namespace chip {
 namespace app {
 
-InteractionModel::DataModel * CodegenDataModelProviderInstance()
+DataModel::Provider * CodegenDataModelProviderInstance()
 {
     static CodegenDataModelProvider gCodegenModel;
     return &gCodegenModel;

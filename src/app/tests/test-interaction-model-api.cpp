@@ -24,7 +24,7 @@
 #include <lib/core/CHIPCore.h>
 #include <messaging/ReliableMessageContext.h>
 
-using namespace chip::app::InteractionModel;
+using namespace chip::app::DataModel;
 
 namespace chip {
 uint8_t Test::attributeDataTLV[CHIP_CONFIG_DEFAULT_UDP_MTU_SIZE];

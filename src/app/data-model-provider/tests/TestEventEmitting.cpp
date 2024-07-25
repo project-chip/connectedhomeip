@@ -28,7 +28,7 @@ namespace {
 
 using namespace chip;
 using namespace chip::app;
-using namespace chip::app::InteractionModel;
+using namespace chip::app::DataModel;
 
 using StartUpEventType              = chip::app::Clusters::BasicInformation::Events::StartUp::Type;
 using AccessControlEntryChangedType = chip::app::Clusters::AccessControl::Events::AccessControlEntryChanged::Type;
