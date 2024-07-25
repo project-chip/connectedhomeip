@@ -73,8 +73,7 @@ CHIP_ERROR WhmInit()
 
     /* Manufacturer may optionally not support all features, commands & attributes */
     gWhmInstance = std::make_unique<WaterHeaterManagementInstance>(
-        EndpointId(WHM_ENDPOINT), *gWhmDelegate,
-        BitMask<Feature>(Feature::kEnergyManagement, Feature::kTankPercent));
+        EndpointId(WHM_ENDPOINT), *gWhmDelegate, BitMask<Feature>(Feature::kEnergyManagement, Feature::kTankPercent));
     if (!gWhmInstance)
     {
         ChipLogError(AppServer, "Failed to allocate memory for WaterHeaterManagementInstance");

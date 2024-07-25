@@ -17,7 +17,6 @@
  */
 #include <app/clusters/water-heater-management-server/water-heater-management-server.h>
 
-
 #include <WhmDelegate.h>
 #include <WhmManufacturer.h>
 #include <water-heater-mode.h>
@@ -30,11 +29,9 @@ using namespace chip::app::Clusters::WaterHeaterManagement;
 using Protocols::InteractionModel::Status;
 
 WaterHeaterManagementDelegate::WaterHeaterManagementDelegate(EndpointId clustersEndpoint) :
-    mpWhmInstance(nullptr), mpWhmManufacturer(nullptr), mBoostTargetTemperatureReached(false),
-    mTankVolume(0), mEstimatedHeatRequired(0),
-    mTankPercentage(0), mBoostState(BoostStateEnum::kInactive)
-{
-}
+    mpWhmInstance(nullptr), mpWhmManufacturer(nullptr), mBoostTargetTemperatureReached(false), mTankVolume(0),
+    mEstimatedHeatRequired(0), mTankPercentage(0), mBoostState(BoostStateEnum::kInactive)
+{}
 
 void WaterHeaterManagementDelegate::SetWaterHeaterManagementInstance(WaterHeaterManagement::Instance & instance)
 {
