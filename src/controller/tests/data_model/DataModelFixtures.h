@@ -117,20 +117,20 @@ public:
 
     CHIP_ERROR ReadAttribute(const DataModel::ReadAttributeRequest & request, AttributeValueEncoder & encoder) override;
     CHIP_ERROR WriteAttribute(const DataModel::WriteAttributeRequest & request, AttributeValueDecoder & decoder) override;
-    CHIP_ERROR Invoke(const InteractionModel::InvokeRequest & request, chip::TLV::TLVReader & input_arguments,
+    CHIP_ERROR Invoke(const DataModel::InvokeRequest & request, chip::TLV::TLVReader & input_arguments,
                       CommandHandler * handler) override;
 
     EndpointId FirstEndpoint() override;
     EndpointId NextEndpoint(EndpointId before) override;
-    InteractionModel::ClusterEntry FirstCluster(EndpointId endpoint) override;
-    InteractionModel::ClusterEntry NextCluster(const ConcreteClusterPath & before) override;
-    std::optional<InteractionModel::ClusterInfo> GetClusterInfo(const ConcreteClusterPath & path) override;
-    InteractionModel::AttributeEntry FirstAttribute(const ConcreteClusterPath & cluster) override;
-    InteractionModel::AttributeEntry NextAttribute(const ConcreteAttributePath & before) override;
+    DataModel::ClusterEntry FirstCluster(EndpointId endpoint) override;
+    DataModel::ClusterEntry NextCluster(const ConcreteClusterPath & before) override;
+    std::optional<DataModel::ClusterInfo> GetClusterInfo(const ConcreteClusterPath & path) override;
+    DataModel::AttributeEntry FirstAttribute(const ConcreteClusterPath & cluster) override;
+    DataModel::AttributeEntry NextAttribute(const ConcreteAttributePath & before) override;
     std::optional<DataModel::AttributeInfo> GetAttributeInfo(const ConcreteAttributePath & path) override;
-    InteractionModel::CommandEntry FirstAcceptedCommand(const ConcreteClusterPath & cluster) override;
-    InteractionModel::CommandEntry NextAcceptedCommand(const ConcreteCommandPath & before) override;
-    std::optional<InteractionModel::CommandInfo> GetAcceptedCommandInfo(const ConcreteCommandPath & path) override;
+    DataModel::CommandEntry FirstAcceptedCommand(const ConcreteClusterPath & cluster) override;
+    DataModel::CommandEntry NextAcceptedCommand(const ConcreteCommandPath & before) override;
+    std::optional<DataModel::CommandInfo> GetAcceptedCommandInfo(const ConcreteCommandPath & path) override;
     ConcreteCommandPath FirstGeneratedCommand(const ConcreteClusterPath & cluster) override;
     ConcreteCommandPath NextGeneratedCommand(const ConcreteCommandPath & before) override;
 };
