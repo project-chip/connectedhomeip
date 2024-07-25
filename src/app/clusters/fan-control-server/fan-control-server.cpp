@@ -298,6 +298,17 @@ MatterFanControlClusterServerPreAttributeChangedCallback(const ConcreteAttribute
         }
         break;
     }
+    case PercentCurrent::Id: {
+        res = Status::Success;
+        // ReportRequiredByWhatever - Something that get's triggered on edges to force reporting
+        if (ReportRequiredByWhatever) {
+            res = Status::ForceReport;
+        // SuppressReportByWhatever - Something that limits reporting based on time or some other requirement
+        } else if (SuppressReportByWhatever) {
+            res = Status::SuppressReport;
+        }
+        break;
+    }
     default:
         res = Status::Success;
         break;

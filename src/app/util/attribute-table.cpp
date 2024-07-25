@@ -416,9 +416,21 @@ Status emAfWriteAttribute(EndpointId endpoint, ClusterId cluster, AttributeId at
     // Pre write attribute callback for all attribute changes,
     // regardless of cluster.
     imStatus = MatterPreAttributeChangeCallback(attributePath, dataType, emberAfAttributeSize(metadata), data);
-    if (imStatus != Protocols::InteractionModel::Status::Success)
+    switch(imStatus)
     {
-        return imStatus;
+        case Protocols::InteractionModel::Status::ForceReport: {
+            markDirty = MarkAttributeDirty::kYes;
+            break;
+        }
+        case Protocols::InteractionModel::Status::SuppressReport: {
+            markDirty = MarkAttributeDirty::kNo;
+            break;
+        }
+        case Protocols::InteractionModel::Status::imStatus: {
+            break;
+        }
+        default:
+            return imStatus;
     }
 
     // Pre-write attribute callback specific
