@@ -498,6 +498,9 @@ config HWINFO_SHELL
 config OPENTHREAD_SHELL
     default n if !CHIP_MEMORY_PROFILING
 
+config SHELL_CMD_BUFF_SIZE
+    default 512 if CHIP_MEMORY_PROFILING
+
 endif # SHELL
 
 endif # CHIP
