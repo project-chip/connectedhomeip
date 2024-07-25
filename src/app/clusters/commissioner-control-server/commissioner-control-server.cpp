@@ -183,10 +183,10 @@ bool emberAfCommissionerControlClusterRequestCommissioningApprovalCallback(
         return true;
     }
 
-    auto fabricIndex  = commandObj->GetAccessingFabricIndex();
-    auto requestId    = commandData.requestId;
-    auto vendorId     = commandData.vendorId;
-    auto productId    = commandData.productId;
+    auto fabricIndex = commandObj->GetAccessingFabricIndex();
+    auto requestId   = commandData.requestId;
+    auto vendorId    = commandData.vendorId;
+    auto productId   = commandData.productId;
 
     // The label assigned from commandData need to be stored in CommissionerControl::Delegate which ensure that the backing buffer
     // of it has a valid lifespan during fabric sync setup process.
@@ -237,7 +237,7 @@ bool emberAfCommissionerControlClusterCommissionNodeCallback(
         return true;
     }
 
-    auto requestId    = commandData.requestId;
+    auto requestId = commandData.requestId;
 
     auto commissionNodeInfo = std::make_unique<Clusters::CommissionerControl::CommissionNodeInfo>();
 
