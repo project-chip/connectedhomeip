@@ -24,6 +24,7 @@ chip_with_ota_key = "1234567890ABCDEFA1B2C3D4E5F6F1B4"
 
 chip_stack_lock_tracking = "fatal"
 chip_enable_ble = true
+chip_generate_link_map_file = true
 
 chip_enable_icd_server = true
 chip_enable_icd_lit = false
