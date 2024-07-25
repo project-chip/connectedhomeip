@@ -40,6 +40,10 @@ CHIP_ERROR WhmManufacturer::Init()
 
     mBoostActive = false;
 
+    dg->SetHeaterTypes(BitMask<WaterHeaterTypeBitmap>(WaterHeaterTypeBitmap::kImmersionElement1));
+    dg->SetHeatDemand(BitMask<WaterHeaterDemandBitmap>(WaterHeaterDemandBitmap::kImmersionElement1));
+    dg->SetEstimatedHeatRequired(10000);
+
     return CHIP_NO_ERROR;
 }
 
@@ -68,11 +72,11 @@ BitMask<WaterHeaterDemandBitmap> WhmManufacturer::DetermineHeatingSources()
 
     // The corresponding list of valid headerDemands
     uint8_t waterHeaterDemandValues[] = {
-        static_cast<uint8_t>(WaterHeaterTypeBitmap::kImmersionElement1),
-        static_cast<uint8_t>(WaterHeaterTypeBitmap::kImmersionElement2),
-        static_cast<uint8_t>(WaterHeaterTypeBitmap::kHeatPump),
-        static_cast<uint8_t>(WaterHeaterTypeBitmap::kBoiler),
-        static_cast<uint8_t>(WaterHeaterTypeBitmap::kOther),
+        static_cast<uint8_t>(WaterHeaterDemandBitmap::kImmersionElement1),
+        static_cast<uint8_t>(WaterHeaterDemandBitmap::kImmersionElement2),
+        static_cast<uint8_t>(WaterHeaterDemandBitmap::kHeatPump),
+        static_cast<uint8_t>(WaterHeaterDemandBitmap::kBoiler),
+        static_cast<uint8_t>(WaterHeaterDemandBitmap::kOther),
     };
 
     // Iterate across the valid waterHeaterTypes seeing which heating sources are available based on heaterTypes.

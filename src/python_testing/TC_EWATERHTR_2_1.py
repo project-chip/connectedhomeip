@@ -19,18 +19,19 @@
 # for details about the block below.
 #
 # === BEGIN CI TEST ARGUMENTS ===# test-runner-runs: run1
-# test-runner-run/run1/app: ${WATER_HEATER_MANAGEMENT_APP}
+# test-runner-run/run1/app: ${ALL_CLUSTERS_APP}
 # test-runner-run/run1/factoryreset: True
 # test-runner-run/run1/quiet: True
 # test-runner-run/run1/app-args: --discriminator 1234 --KVS kvs1 --trace-to json:${TRACE_APP}.json --enable-key 000102030405060708090a0b0c0d0e0f --featureSet 0x03
-# test-runner-run/run1/script-args: --storage-path admin_storage.json --commissioning-method on-network --discriminator 1234 --passcode 20202021 --hex-arg enableKey:000102030405060708090a0b0c0d0e0f --endpoint 1 --trace-to json:${TRACE_TEST_JSON}.json --trace-to perfetto:${TRACE_TEST_PERFETTO}.perfetto
+# test-runner-run/run1/script-args: --storage-path admin_storage.json --commissioning-method on-network --discriminator 1234 --passcode 20202021 --hex-arg enableKey:000102030405060708090a0b0c0d0e0f --endpoint 1 --trace-to json:${TRACE_TEST_JSON}.json --trace-to perfetto:${TRACE_TEST_PERFETTO}.perfetto --int-arg PIXIT.EWATERHTR.EM:1 PIXIT.EWATERHTR.TP:2
 # === END CI TEST ARGUMENTS ===
 
 import logging
 
 import chip.clusters as Clusters
-from EWATERHTRBase import EWATERHTRBase
 from matter_testing_support import MatterBaseTest, TestStep, async_test_body, default_matter_test_main
+from mobly import asserts
+from TC_EWATERHTRBase import EWATERHTRBase
 
 logger = logging.getLogger(__name__)
 
@@ -44,17 +45,24 @@ class TC_EWATERHTR_2_1(MatterBaseTest, EWATERHTRBase):
 
     def pics_TC_EWATERHTR_2_1(self):
         """ This function returns a list of PICS for this test case that must be True for the test to be run"""
-        return ["EWATERHTR.S", "EWATERHTR.S.F00", "EWATERHTR.S.F01"]
+        return ["EWATERHTR.S"]
 
     def steps_TC_EWATERHTR_2_1(self) -> list[TestStep]:
         steps = [
-            TestStep("1", "Commissioning, already done", is_commissioning=True),
-            TestStep("2a", "TH reads HeaterTypes attribute. DUT as Server replies with a WaterHeaterTypeBitmap (enum8) value to match the DUT type."),
-            TestStep("2b", "TH reads HeatDemand attribute. DUT as Server replies with a WaterHeaterDemandBitmap (enum8)."),
-            TestStep("2c", "TH reads TankVolume attribute. DUT as Server replies with a uint16 value."),
-            TestStep("2d", "TH reads EstimatedHeatRequired attribute. DUT as Server replies with an energy-mWh value."),
-            TestStep("2e", "TH reads TankPercentage attribute. DUT as Server replies with a percent value."),
-            TestStep("2f", "TH reads BoostState attribute. DUT as Server replies with a BoostStateEnum (enum8) value."),
+            TestStep("1", "Commissioning, already done",
+                     is_commissioning=True),
+            TestStep("2", "TH reads HeaterTypes attribute.",
+                     "DUT as Server replies with a WaterHeaterTypeBitmap (enum8) greater than 0x00 (at least one type supported), and less than 0x20 (no undefined types supported)."),
+            TestStep("3", "TH reads HeatDemand attribute.",
+                     "DUT as Server replies with a WaterHeaterDemandBitmap (enum8)."),
+            TestStep("4", "TH reads TankVolume attribute.",
+                     "DUT as Server replies with a uint16 value."),
+            TestStep("5", "TH reads EstimatedHeatRequired attribute.",
+                     "DUT as Server replies with an energy-mWh value."),
+            TestStep("6", "TH reads TankPercentage attribute.",
+                     "DUT as Server replies with a percent value."),
+            TestStep("7", "TH reads BoostState attribute.",
+                     "DUT as Server replies with a BoostStateEnum (enum8) value."),
         ]
 
         return steps
@@ -62,26 +70,49 @@ class TC_EWATERHTR_2_1(MatterBaseTest, EWATERHTRBase):
     @async_test_body
     async def test_TC_EWATERHTR_2_1(self):
 
+        em_supported = self.matter_test_config.global_test_params['PIXIT.EWATERHTR.EM']
+        tp_supported = self.matter_test_config.global_test_params['PIXIT.EWATERHTR.TP']
+
         self.step("1")
         # Commission DUT - already done
 
-        # Note the values used here are configured in WhmManufacturer::Init()
-        self.step("2a")
-        await self.check_whm_attribute("HeaterTypes", 0)
+        self.step("2")
+        heaterTypes = await self.read_whm_attribute_expect_success(attribute="HeaterTypes")
+        asserts.assert_greater(heaterTypes, 0,
+                               f"Unexpected HeaterTypes value - expected {heaterTypes} > 0")
+        asserts.assert_less_equal(heaterTypes, Clusters.WaterHeaterManagement.Bitmaps.WaterHeaterTypeBitmap.kOther,
+                                  f"Unexpected HeaterTypes value - expected {heaterTypes} <= WaterHeaterTypeBitmap.kOther")
 
-        self.step("2b")
-        await self.check_whm_attribute("HeatDemand", 0)
+        self.step("3")
+        heatDemand = await self.read_whm_attribute_expect_success(attribute="HeatDemand")
+        asserts.assert_greater(heatDemand, 0,
+                               f"Unexpected HeatDemand value - expected {heatDemand} > 0")
+        asserts.assert_less_equal(heatDemand, Clusters.WaterHeaterManagement.Bitmaps.WaterHeaterDemandBitmap.kOther,
+                                  f"Unexpected HeatDemand value - expected {heatDemand} <= WaterHeaterDemandBitmap.kOther")
 
-        self.step("2c")
-        await self.check_whm_attribute("TankVolume", 0)
+        self.step("4")
+        if em_supported:
+            value = await self.read_whm_attribute_expect_success(attribute="TankVolume")
+            asserts.assert_greater_equal(value, 0, f"Unexpected TankVolume value - expected {value} >= 0")
+        else:
+            logging.info("Skipping step 4 as PIXIT.EWATERHTR.EM not supported")
 
-        self.step("2d")
-        await self.check_whm_attribute("EstimatedHeatRequired", 0)
+        self.step("5")
+        if em_supported:
+            value = await self.read_whm_attribute_expect_success(attribute="EstimatedHeatRequired")
+            asserts.assert_greater(value, 0, f"Unexpected EstimatedHeatRequired value - expected {value} > 0")
+        else:
+            logging.info("Skipping step 5 as PIXIT.EWATERHTR.EM not supported")
 
-        self.step("2e")
-        await self.check_whm_attribute("TankPercentage", 0)
+        self.step("6")
+        if tp_supported:
+            value = await self.read_whm_attribute_expect_success(attribute="TankPercentage")
+            asserts.assert_greater_equal(value, 0, f"Unexpected TankPercentage value - expected {value} >= 0")
+            asserts.assert_less_equal(value, 100, f"Unexpected TankPercentage value - expected {value} <= 100")
+        else:
+            logging.info("Skipping step 6 as PIXIT.EWATERHTR.TP not supported")
 
-        self.step("2f")
+        self.step("7")
         await self.check_whm_attribute("BoostState", Clusters.WaterHeaterManagement.Enums.BoostStateEnum.kInactive)
 
 

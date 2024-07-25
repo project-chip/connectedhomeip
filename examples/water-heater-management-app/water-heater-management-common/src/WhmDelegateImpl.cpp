@@ -433,7 +433,7 @@ Status WaterHeaterManagementDelegate::CheckIfHeatNeedsToBeTurnedOnOrOff()
     {
         uint8_t mode = mInstance->GetCurrentMode();
 
-        // The water in the tank is not at the target temperature. See if we heating is currently off
+        // The water in the tank is not at the target temperature. See if heating is currently off
         if (mHeatDemand.Raw() == 0)
         {
             // Need to track whether the water temperature has reached the target temperature for the boost
