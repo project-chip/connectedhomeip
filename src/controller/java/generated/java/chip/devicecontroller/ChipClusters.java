@@ -18601,6 +18601,7 @@ public class ChipClusters {
     private static final long USER_ACTIVE_MODE_TRIGGER_HINT_ATTRIBUTE_ID = 6L;
     private static final long USER_ACTIVE_MODE_TRIGGER_INSTRUCTION_ATTRIBUTE_ID = 7L;
     private static final long OPERATING_MODE_ATTRIBUTE_ID = 8L;
+    private static final long MAXIMUM_CHECK_IN_BACK_OFF_ATTRIBUTE_ID = 9L;
     private static final long GENERATED_COMMAND_LIST_ATTRIBUTE_ID = 65528L;
     private static final long ACCEPTED_COMMAND_LIST_ATTRIBUTE_ID = 65529L;
     private static final long EVENT_LIST_ATTRIBUTE_ID = 65530L;
@@ -18983,6 +18984,32 @@ public class ChipClusters {
             callback.onSuccess(value);
           }
         }, OPERATING_MODE_ATTRIBUTE_ID, minInterval, maxInterval);
+    }
+
+    public void readMaximumCheckInBackOffAttribute(
+        LongAttributeCallback callback) {
+      ChipAttributePath path = ChipAttributePath.newInstance(endpointId, clusterId, MAXIMUM_CHECK_IN_BACK_OFF_ATTRIBUTE_ID);
+
+      readAttribute(new ReportCallbackImpl(callback, path) {
+          @Override
+          public void onSuccess(byte[] tlv) {
+            Long value = ChipTLVValueDecoder.decodeAttributeValue(path, tlv);
+            callback.onSuccess(value);
+          }
+        }, MAXIMUM_CHECK_IN_BACK_OFF_ATTRIBUTE_ID, true);
+    }
+
+    public void subscribeMaximumCheckInBackOffAttribute(
+        LongAttributeCallback callback, int minInterval, int maxInterval) {
+      ChipAttributePath path = ChipAttributePath.newInstance(endpointId, clusterId, MAXIMUM_CHECK_IN_BACK_OFF_ATTRIBUTE_ID);
+
+      subscribeAttribute(new ReportCallbackImpl(callback, path) {
+          @Override
+          public void onSuccess(byte[] tlv) {
+            Long value = ChipTLVValueDecoder.decodeAttributeValue(path, tlv);
+            callback.onSuccess(value);
+          }
+        }, MAXIMUM_CHECK_IN_BACK_OFF_ATTRIBUTE_ID, minInterval, maxInterval);
     }
 
     public void readGeneratedCommandListAttribute(
@@ -40184,7 +40211,6 @@ public class ChipClusters {
     private static final long PRESETS_SCHEDULES_EDITABLE_ATTRIBUTE_ID = 82L;
     private static final long TEMPERATURE_SETPOINT_HOLD_POLICY_ATTRIBUTE_ID = 83L;
     private static final long SETPOINT_HOLD_EXPIRY_TIMESTAMP_ATTRIBUTE_ID = 84L;
-    private static final long QUEUED_PRESET_ATTRIBUTE_ID = 85L;
     private static final long GENERATED_COMMAND_LIST_ATTRIBUTE_ID = 65528L;
     private static final long ACCEPTED_COMMAND_LIST_ATTRIBUTE_ID = 65529L;
     private static final long EVENT_LIST_ATTRIBUTE_ID = 65530L;
@@ -40349,21 +40375,17 @@ public class ChipClusters {
         }}, commandId, commandArgs, timedInvokeTimeoutMs);
     }
 
-    public void setActivePresetRequest(DefaultClusterCallback callback, byte[] presetHandle, Optional<Integer> delayMinutes) {
-      setActivePresetRequest(callback, presetHandle, delayMinutes, 0);
+    public void setActivePresetRequest(DefaultClusterCallback callback, byte[] presetHandle) {
+      setActivePresetRequest(callback, presetHandle, 0);
     }
 
-    public void setActivePresetRequest(DefaultClusterCallback callback, byte[] presetHandle, Optional<Integer> delayMinutes, int timedInvokeTimeoutMs) {
+    public void setActivePresetRequest(DefaultClusterCallback callback, byte[] presetHandle, int timedInvokeTimeoutMs) {
       final long commandId = 6L;
 
       ArrayList<StructElement> elements = new ArrayList<>();
       final long presetHandleFieldID = 0L;
       BaseTLVType presetHandletlvValue = new ByteArrayType(presetHandle);
       elements.add(new StructElement(presetHandleFieldID, presetHandletlvValue));
-
-      final long delayMinutesFieldID = 1L;
-      BaseTLVType delayMinutestlvValue = delayMinutes.<BaseTLVType>map((nonOptionaldelayMinutes) -> new UIntType(nonOptionaldelayMinutes)).orElse(new EmptyType());
-      elements.add(new StructElement(delayMinutesFieldID, delayMinutestlvValue));
 
       StructType commandArgs = new StructType(elements);
       invoke(new InvokeCallbackImpl(callback) {
@@ -40415,22 +40437,6 @@ public class ChipClusters {
 
     public void commitPresetsSchedulesRequest(DefaultClusterCallback callback, int timedInvokeTimeoutMs) {
       final long commandId = 9L;
-
-      ArrayList<StructElement> elements = new ArrayList<>();
-      StructType commandArgs = new StructType(elements);
-      invoke(new InvokeCallbackImpl(callback) {
-          @Override
-          public void onResponse(StructType invokeStructValue) {
-          callback.onSuccess();
-        }}, commandId, commandArgs, timedInvokeTimeoutMs);
-    }
-
-    public void cancelSetActivePresetRequest(DefaultClusterCallback callback) {
-      cancelSetActivePresetRequest(callback, 0);
-    }
-
-    public void cancelSetActivePresetRequest(DefaultClusterCallback callback, int timedInvokeTimeoutMs) {
-      final long commandId = 10L;
 
       ArrayList<StructElement> elements = new ArrayList<>();
       StructType commandArgs = new StructType(elements);
@@ -40539,10 +40545,6 @@ public class ChipClusters {
 
     public interface SetpointHoldExpiryTimestampAttributeCallback extends BaseAttributeCallback {
       void onSuccess(@Nullable Long value);
-    }
-
-    public interface QueuedPresetAttributeCallback extends BaseAttributeCallback {
-      void onSuccess(@Nullable ChipStructs.ThermostatClusterQueuedPresetStruct value);
     }
 
     public interface GeneratedCommandListAttributeCallback extends BaseAttributeCallback {
@@ -42432,32 +42434,6 @@ public class ChipClusters {
             callback.onSuccess(value);
           }
         }, SETPOINT_HOLD_EXPIRY_TIMESTAMP_ATTRIBUTE_ID, minInterval, maxInterval);
-    }
-
-    public void readQueuedPresetAttribute(
-        QueuedPresetAttributeCallback callback) {
-      ChipAttributePath path = ChipAttributePath.newInstance(endpointId, clusterId, QUEUED_PRESET_ATTRIBUTE_ID);
-
-      readAttribute(new ReportCallbackImpl(callback, path) {
-          @Override
-          public void onSuccess(byte[] tlv) {
-            @Nullable ChipStructs.ThermostatClusterQueuedPresetStruct value = ChipTLVValueDecoder.decodeAttributeValue(path, tlv);
-            callback.onSuccess(value);
-          }
-        }, QUEUED_PRESET_ATTRIBUTE_ID, true);
-    }
-
-    public void subscribeQueuedPresetAttribute(
-        QueuedPresetAttributeCallback callback, int minInterval, int maxInterval) {
-      ChipAttributePath path = ChipAttributePath.newInstance(endpointId, clusterId, QUEUED_PRESET_ATTRIBUTE_ID);
-
-      subscribeAttribute(new ReportCallbackImpl(callback, path) {
-          @Override
-          public void onSuccess(byte[] tlv) {
-            @Nullable ChipStructs.ThermostatClusterQueuedPresetStruct value = ChipTLVValueDecoder.decodeAttributeValue(path, tlv);
-            callback.onSuccess(value);
-          }
-        }, QUEUED_PRESET_ATTRIBUTE_ID, minInterval, maxInterval);
     }
 
     public void readGeneratedCommandListAttribute(
@@ -54867,12 +54843,12 @@ public class ChipClusters {
     }
 
 
-    public void removeNetwork(DefaultClusterCallback callback, Long extendedPanID, int timedInvokeTimeoutMs) {
+    public void removeNetwork(DefaultClusterCallback callback, byte[] extendedPanID, int timedInvokeTimeoutMs) {
       final long commandId = 1L;
 
       ArrayList<StructElement> elements = new ArrayList<>();
       final long extendedPanIDFieldID = 0L;
-      BaseTLVType extendedPanIDtlvValue = new UIntType(extendedPanID);
+      BaseTLVType extendedPanIDtlvValue = new ByteArrayType(extendedPanID);
       elements.add(new StructElement(extendedPanIDFieldID, extendedPanIDtlvValue));
 
       StructType commandArgs = new StructType(elements);
@@ -54884,12 +54860,12 @@ public class ChipClusters {
     }
 
 
-    public void getOperationalDataset(OperationalDatasetResponseCallback callback, Long extendedPanID, int timedInvokeTimeoutMs) {
+    public void getOperationalDataset(OperationalDatasetResponseCallback callback, byte[] extendedPanID, int timedInvokeTimeoutMs) {
       final long commandId = 2L;
 
       ArrayList<StructElement> elements = new ArrayList<>();
       final long extendedPanIDFieldID = 0L;
-      BaseTLVType extendedPanIDtlvValue = new UIntType(extendedPanID);
+      BaseTLVType extendedPanIDtlvValue = new ByteArrayType(extendedPanID);
       elements.add(new StructElement(extendedPanIDFieldID, extendedPanIDtlvValue));
 
       StructType commandArgs = new StructType(elements);
@@ -54915,7 +54891,7 @@ public class ChipClusters {
     }
 
     public interface PreferredExtendedPanIDAttributeCallback extends BaseAttributeCallback {
-      void onSuccess(@Nullable Long value);
+      void onSuccess(@Nullable byte[] value);
     }
 
     public interface ThreadNetworksAttributeCallback extends BaseAttributeCallback {
@@ -54945,18 +54921,18 @@ public class ChipClusters {
       readAttribute(new ReportCallbackImpl(callback, path) {
           @Override
           public void onSuccess(byte[] tlv) {
-            @Nullable Long value = ChipTLVValueDecoder.decodeAttributeValue(path, tlv);
+            @Nullable byte[] value = ChipTLVValueDecoder.decodeAttributeValue(path, tlv);
             callback.onSuccess(value);
           }
         }, PREFERRED_EXTENDED_PAN_I_D_ATTRIBUTE_ID, true);
     }
 
-    public void writePreferredExtendedPanIDAttribute(DefaultClusterCallback callback, Long value) {
+    public void writePreferredExtendedPanIDAttribute(DefaultClusterCallback callback, byte[] value) {
       writePreferredExtendedPanIDAttribute(callback, value, 0);
     }
 
-    public void writePreferredExtendedPanIDAttribute(DefaultClusterCallback callback, Long value, int timedWriteTimeoutMs) {
-      BaseTLVType tlvValue = value != null ? new UIntType(value) : new NullType();
+    public void writePreferredExtendedPanIDAttribute(DefaultClusterCallback callback, byte[] value, int timedWriteTimeoutMs) {
+      BaseTLVType tlvValue = value != null ? new ByteArrayType(value) : new NullType();
       writeAttribute(new WriteAttributesCallbackImpl(callback), PREFERRED_EXTENDED_PAN_I_D_ATTRIBUTE_ID, tlvValue, timedWriteTimeoutMs);
     }
 
@@ -54967,7 +54943,7 @@ public class ChipClusters {
       subscribeAttribute(new ReportCallbackImpl(callback, path) {
           @Override
           public void onSuccess(byte[] tlv) {
-            @Nullable Long value = ChipTLVValueDecoder.decodeAttributeValue(path, tlv);
+            @Nullable byte[] value = ChipTLVValueDecoder.decodeAttributeValue(path, tlv);
             callback.onSuccess(value);
           }
         }, PREFERRED_EXTENDED_PAN_I_D_ATTRIBUTE_ID, minInterval, maxInterval);

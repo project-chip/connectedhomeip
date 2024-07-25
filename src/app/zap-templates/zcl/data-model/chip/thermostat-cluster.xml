@@ -224,11 +224,6 @@ limitations under the License.
     <item fieldId="2" name="ScheduleTypeFeatures" type="ScheduleTypeFeaturesBitmap" min="0x0" max="0xF" default="0"/>
   </struct>
 
-  <struct name="QueuedPresetStruct" apiMaturity="provisional">
-    <cluster code="0x0201"/>
-    <item fieldId="0" name="PresetHandle" type="octet_string" length="16" isNullable="true"/>
-    <item fieldId="1" name="TransitionTimestamp" type="epoch_s" isNullable="true"/>
-  </struct>
 
   <struct name="PresetStruct" apiMaturity="provisional">
     <cluster code="0x0201"/>
@@ -323,9 +318,6 @@ limitations under the License.
       <feature bit="9" code="S" name="Setpoints" summary="Setpoints">
         <optionalConform/>
       </feature>
-      <feature bit="10" code="QPS" name="QueuedPresetsSupported" summary="QueuedPresetsSupported">
-        <optionalConform/>
-      </feature>
     </features>
 
     <!-- Attributes -->
@@ -345,7 +337,7 @@ limitations under the License.
       <access op="read" privilege="view"/>
       <access op="write" privilege="manage"/>
     </attribute>
-    <attribute side="server" code="0x0010" define="LOCAL_TEMPERATURE_CALIBRATION" type="int8s" min="0xE7" max="0x19" writable="true" default="0x00" optional="true">
+    <attribute side="server" code="0x0010" define="LOCAL_TEMPERATURE_CALIBRATION" type="int8s" min="-127" max="127" writable="true" default="0x00" optional="true">
       <description>LocalTemperatureCalibration</description>
       <access op="write" privilege="manage"/>
     </attribute>
@@ -369,7 +361,7 @@ limitations under the License.
       <description>MaxCoolSetpointLimit</description>
       <access op="write" privilege="manage"/>
     </attribute>
-    <attribute side="server" code="0x0019" define="MIN_SETPOINT_DEAD_BAND" type="int8s" min="0" max="25" writable="true" default="25" optional="true">
+    <attribute side="server" code="0x0019" define="MIN_SETPOINT_DEAD_BAND" type="int8s" min="0" max="127" writable="true" default="25" optional="true">
       <description>MinSetpointDeadBand</description>
       <access op="write" privilege="manage"/>
     </attribute>
@@ -469,7 +461,6 @@ limitations under the License.
     <attribute code="0x0052" side="server" type="boolean" define="PRESETS_SCHEDULES_EDITABLE" writable="false" optional="true">PresetsSchedulesEditable</attribute>
     <attribute code="0x0053" side="server" type="TemperatureSetpointHoldPolicyBitmap" define="TEMPERATURE_SETPOINT_HOLD_POLICY" default="0" writable="false" optional="true" min="0x0" max="0x3">TemperatureSetpointHoldPolicy</attribute>
     <attribute code="0x0054" side="server" type="epoch_s" define="SETPOINT_HOLD_EXPIRY_TIMESTAMP" isNullable="true" writable="false" optional="true">SetpointHoldExpiryTimestamp</attribute>
-    <attribute code="0x0055" side="server" type="QueuedPresetStruct" define="QUEUED_PRESET" isNullable="true" writable="false" optional="true">QueuedPreset</attribute>
 
     <!-- Client Commands -->
 
@@ -508,7 +499,6 @@ limitations under the License.
     <command source="client" code="0x06" name="SetActivePresetRequest" optional="true">
       <description>This command is used to set the active preset.</description>
       <arg name="PresetHandle" type="octet_string" length="16"/>
-      <arg name="DelayMinutes" type="int16u" optional="true" default="0"/>
     </command>
     <command source="client" code="0x07" name="StartPresetsSchedulesEditRequest" optional="true">
       <description>This command is used to start editing the presets and schedules.</description>
@@ -521,10 +511,6 @@ limitations under the License.
     </command>
     <command source="client" code="0x09" name="CommitPresetsSchedulesRequest" optional="true">
       <description>This command is used to notify the server that all edits are done and should be committed.</description>
-      <access op="invoke" privilege="manage"/>
-    </command>
-    <command source="client" code="0x0A" name="CancelSetActivePresetRequest" optional="true">
-      <description>This command is sent to cancel a queued preset.</description>
       <access op="invoke" privilege="manage"/>
     </command>
     <command source="client" code="0x0B" name="SetTemperatureSetpointHoldPolicy" optional="true">

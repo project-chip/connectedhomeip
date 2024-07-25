@@ -361,6 +361,12 @@ int16_t uartConsoleWrite(const char * Buf, uint16_t BufLength)
         return UART_CONSOLE_ERR;
     }
 
+    if (NULL == sUartTxQueue)
+    {
+        // This is to prevent the first prompt from OTCLI to be rejected and to break the OTCli output
+        uartConsoleInit();
+    }
+
 #ifdef PW_RPC_ENABLED
     // Pigweed Logger is already thread safe.
     UARTDRV_ForceTransmit(vcom_handle, (uint8_t *) Buf, BufLength);

@@ -9777,67 +9777,6 @@ public static class ThermostatClusterPresetTypeStruct {
     return output.toString();
   }
 }
-public static class ThermostatClusterQueuedPresetStruct {
-  public @Nullable byte[] presetHandle;
-  public @Nullable Long transitionTimestamp;
-  private static final long PRESET_HANDLE_ID = 0L;
-  private static final long TRANSITION_TIMESTAMP_ID = 1L;
-
-  public ThermostatClusterQueuedPresetStruct(
-    @Nullable byte[] presetHandle,
-    @Nullable Long transitionTimestamp
-  ) {
-    this.presetHandle = presetHandle;
-    this.transitionTimestamp = transitionTimestamp;
-  }
-
-  public StructType encodeTlv() {
-    ArrayList<StructElement> values = new ArrayList<>();
-    values.add(new StructElement(PRESET_HANDLE_ID, presetHandle != null ? new ByteArrayType(presetHandle) : new NullType()));
-    values.add(new StructElement(TRANSITION_TIMESTAMP_ID, transitionTimestamp != null ? new UIntType(transitionTimestamp) : new NullType()));
-
-    return new StructType(values);
-  }
-
-  public static ThermostatClusterQueuedPresetStruct decodeTlv(BaseTLVType tlvValue) {
-    if (tlvValue == null || tlvValue.type() != TLVType.Struct) {
-      return null;
-    }
-    @Nullable byte[] presetHandle = null;
-    @Nullable Long transitionTimestamp = null;
-    for (StructElement element: ((StructType)tlvValue).value()) {
-      if (element.contextTagNum() == PRESET_HANDLE_ID) {
-        if (element.value(BaseTLVType.class).type() == TLVType.ByteArray) {
-          ByteArrayType castingValue = element.value(ByteArrayType.class);
-          presetHandle = castingValue.value(byte[].class);
-        }
-      } else if (element.contextTagNum() == TRANSITION_TIMESTAMP_ID) {
-        if (element.value(BaseTLVType.class).type() == TLVType.UInt) {
-          UIntType castingValue = element.value(UIntType.class);
-          transitionTimestamp = castingValue.value(Long.class);
-        }
-      }
-    }
-    return new ThermostatClusterQueuedPresetStruct(
-      presetHandle,
-      transitionTimestamp
-    );
-  }
-
-  @Override
-  public String toString() {
-    StringBuilder output = new StringBuilder();
-    output.append("ThermostatClusterQueuedPresetStruct {\n");
-    output.append("\tpresetHandle: ");
-    output.append(Arrays.toString(presetHandle));
-    output.append("\n");
-    output.append("\ttransitionTimestamp: ");
-    output.append(transitionTimestamp);
-    output.append("\n");
-    output.append("}\n");
-    return output.toString();
-  }
-}
 public static class ThermostatClusterScheduleTypeStruct {
   public Integer systemMode;
   public Integer numberOfSchedules;
@@ -10067,28 +10006,33 @@ public static class OccupancySensingClusterHoldTimeLimitsStruct {
   }
 }
 public static class ThreadNetworkDirectoryClusterThreadNetworkStruct {
-  public Long extendedPanID;
+  public byte[] extendedPanID;
   public String networkName;
   public Integer channel;
+  public Long activeTimestamp;
   private static final long EXTENDED_PAN_I_D_ID = 0L;
   private static final long NETWORK_NAME_ID = 1L;
   private static final long CHANNEL_ID = 2L;
+  private static final long ACTIVE_TIMESTAMP_ID = 3L;
 
   public ThreadNetworkDirectoryClusterThreadNetworkStruct(
-    Long extendedPanID,
+    byte[] extendedPanID,
     String networkName,
-    Integer channel
+    Integer channel,
+    Long activeTimestamp
   ) {
     this.extendedPanID = extendedPanID;
     this.networkName = networkName;
     this.channel = channel;
+    this.activeTimestamp = activeTimestamp;
   }
 
   public StructType encodeTlv() {
     ArrayList<StructElement> values = new ArrayList<>();
-    values.add(new StructElement(EXTENDED_PAN_I_D_ID, new UIntType(extendedPanID)));
+    values.add(new StructElement(EXTENDED_PAN_I_D_ID, new ByteArrayType(extendedPanID)));
     values.add(new StructElement(NETWORK_NAME_ID, new StringType(networkName)));
     values.add(new StructElement(CHANNEL_ID, new UIntType(channel)));
+    values.add(new StructElement(ACTIVE_TIMESTAMP_ID, new UIntType(activeTimestamp)));
 
     return new StructType(values);
   }
@@ -10097,14 +10041,15 @@ public static class ThreadNetworkDirectoryClusterThreadNetworkStruct {
     if (tlvValue == null || tlvValue.type() != TLVType.Struct) {
       return null;
     }
-    Long extendedPanID = null;
+    byte[] extendedPanID = null;
     String networkName = null;
     Integer channel = null;
+    Long activeTimestamp = null;
     for (StructElement element: ((StructType)tlvValue).value()) {
       if (element.contextTagNum() == EXTENDED_PAN_I_D_ID) {
-        if (element.value(BaseTLVType.class).type() == TLVType.UInt) {
-          UIntType castingValue = element.value(UIntType.class);
-          extendedPanID = castingValue.value(Long.class);
+        if (element.value(BaseTLVType.class).type() == TLVType.ByteArray) {
+          ByteArrayType castingValue = element.value(ByteArrayType.class);
+          extendedPanID = castingValue.value(byte[].class);
         }
       } else if (element.contextTagNum() == NETWORK_NAME_ID) {
         if (element.value(BaseTLVType.class).type() == TLVType.String) {
@@ -10116,12 +10061,18 @@ public static class ThreadNetworkDirectoryClusterThreadNetworkStruct {
           UIntType castingValue = element.value(UIntType.class);
           channel = castingValue.value(Integer.class);
         }
+      } else if (element.contextTagNum() == ACTIVE_TIMESTAMP_ID) {
+        if (element.value(BaseTLVType.class).type() == TLVType.UInt) {
+          UIntType castingValue = element.value(UIntType.class);
+          activeTimestamp = castingValue.value(Long.class);
+        }
       }
     }
     return new ThreadNetworkDirectoryClusterThreadNetworkStruct(
       extendedPanID,
       networkName,
-      channel
+      channel,
+      activeTimestamp
     );
   }
 
@@ -10130,13 +10081,16 @@ public static class ThreadNetworkDirectoryClusterThreadNetworkStruct {
     StringBuilder output = new StringBuilder();
     output.append("ThreadNetworkDirectoryClusterThreadNetworkStruct {\n");
     output.append("\textendedPanID: ");
-    output.append(extendedPanID);
+    output.append(Arrays.toString(extendedPanID));
     output.append("\n");
     output.append("\tnetworkName: ");
     output.append(networkName);
     output.append("\n");
     output.append("\tchannel: ");
     output.append(channel);
+    output.append("\n");
+    output.append("\tactiveTimestamp: ");
+    output.append(activeTimestamp);
     output.append("\n");
     output.append("}\n");
     return output.toString();

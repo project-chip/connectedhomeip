@@ -1506,6 +1506,12 @@ Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, chip::app::Cl
                                         MarkAttributeDirty markDirty);
 } // namespace OperatingMode
 
+namespace MaximumCheckInBackOff {
+Protocols::InteractionModel::Status Get(chip::EndpointId endpoint, uint32_t * value); // int32u
+Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint32_t value);
+Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint32_t value, MarkAttributeDirty markDirty);
+} // namespace MaximumCheckInBackOff
+
 namespace FeatureMap {
 Protocols::InteractionModel::Status Get(chip::EndpointId endpoint, uint32_t * value); // bitmap32
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint32_t value);
@@ -5536,23 +5542,6 @@ Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint16_t valu
 
 namespace ThreadNetworkDirectory {
 namespace Attributes {
-
-namespace PreferredExtendedPanID {
-Protocols::InteractionModel::Status Get(chip::EndpointId endpoint, DataModel::Nullable<uint64_t> & value); // int64u
-Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint64_t value);
-Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint64_t value, MarkAttributeDirty markDirty);
-Protocols::InteractionModel::Status SetNull(chip::EndpointId endpoint);
-Protocols::InteractionModel::Status SetNull(chip::EndpointId endpoint, MarkAttributeDirty markDirty);
-Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, const chip::app::DataModel::Nullable<uint64_t> & value);
-Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, const chip::app::DataModel::Nullable<uint64_t> & value,
-                                        MarkAttributeDirty markDirty);
-} // namespace PreferredExtendedPanID
-
-namespace ThreadNetworkTableSize {
-Protocols::InteractionModel::Status Get(chip::EndpointId endpoint, uint8_t * value); // int8u
-Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint8_t value);
-Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint8_t value, MarkAttributeDirty markDirty);
-} // namespace ThreadNetworkTableSize
 
 namespace FeatureMap {
 Protocols::InteractionModel::Status Get(chip::EndpointId endpoint, uint32_t * value); // bitmap32
