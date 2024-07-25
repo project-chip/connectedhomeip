@@ -61,7 +61,7 @@ class TC_EWATERHTR_2_3(MatterBaseTest, EWATERHTRBase):
             TestStep("3c", "TH reads TankPercentage attribute.",
                      "Verify value is 0%"),
             TestStep("3d", "TH reads HeaterTypes attribute.",
-                     "Verify value is greater than 0x00 (at least one type supported) and {storeValueAs} HeaterTypes"),
+                     "Verify value is greater than 0x00 (at least one type supported) and store the value as HeaterTypes"),
             TestStep("4", "TH sends Boost with Duration=600s,TargetPercentage=100%.",
                      "Verify Command response is Success"),
             TestStep("4a", "TH reads HeatDemand attribute.",
