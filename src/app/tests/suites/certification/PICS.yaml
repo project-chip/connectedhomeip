@@ -10199,3 +10199,11 @@ PICS:
 
     - label: "Does the device implement the ActiveEndpoints attribute?"
       id: PWRTL.S.A0001
+
+    #
+    # Wi-Fi Network Management Cluster
+    #
+    - label:
+          "Does the device implement the Wi-Fi Network Management cluster as a
+          server"
+      id: WIFINM.S
