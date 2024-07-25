@@ -175,6 +175,7 @@ class TestTarget(Enum):
     OTA = auto()
     BRIDGE = auto()
     LIT_ICD = auto()
+    FABRIC_SYNC = auto()
     MWO = auto()
     RVC = auto()
 
@@ -184,6 +185,7 @@ class ApplicationPaths:
     chip_tool: typing.List[str]
     all_clusters_app: typing.List[str]
     lock_app: typing.List[str]
+    fabric_bridge_app: typing.List[str]
     ota_provider_app: typing.List[str]
     ota_requestor_app: typing.List[str]
     tv_app: typing.List[str]
@@ -195,8 +197,11 @@ class ApplicationPaths:
     rvc_app: typing.List[str]
 
     def items(self):
-        return [self.chip_tool, self.all_clusters_app, self.lock_app, self.ota_provider_app, self.ota_requestor_app,
-                self.tv_app, self.bridge_app, self.lit_icd_app, self.microwave_oven_app, self.chip_repl_yaml_tester_cmd, self.chip_tool_with_python_cmd, self.rvc_app]
+        return [self.chip_tool, self.all_clusters_app, self.lock_app,
+                self.fabric_bridge_app, self.ota_provider_app, self.ota_requestor_app,
+                self.tv_app, self.bridge_app, self.lit_icd_app,
+                self.microwave_oven_app, self.chip_repl_yaml_tester_cmd,
+                self.chip_tool_with_python_cmd, self.rvc_app]
 
 
 @dataclass
@@ -299,6 +304,8 @@ class TestDefinition:
                 target_app = paths.tv_app
             elif self.target == TestTarget.LOCK:
                 target_app = paths.lock_app
+            elif self.target == TestTarget.FABRIC_SYNC:
+                target_app = paths.fabric_bridge_app
             elif self.target == TestTarget.OTA:
                 target_app = paths.ota_requestor_app
             elif self.target == TestTarget.BRIDGE:
