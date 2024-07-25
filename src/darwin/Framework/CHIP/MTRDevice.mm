@@ -908,12 +908,17 @@ static NSString * const sLastInitialSubscribeLatencyKey = @"lastInitialSubscribe
     _reattemptingSubscription = NO;
 
     [_deviceController asyncDispatchToMatterQueue:^{
+        MTR_LOG("%@ invalidate disconnecting ReadClient and SubscriptionCallback", self);
+
         // Destroy the read client and callback (has to happen on the Matter
         // queue, to avoid deleting objects that are being referenced), to
         // tear down the subscription.  We will get no more callbacks from
-        // the subscrption after this point.
+        // the subscription after this point.
         std::lock_guard lock(self->_lock);
         self->_currentReadClient = nullptr;
+        if (self->_currentSubscriptionCallback) {
+            delete self->_currentSubscriptionCallback;
+        }
         self->_currentSubscriptionCallback = nullptr;
 
         [self _changeInternalState:MTRInternalDeviceStateUnsubscribed];
@@ -940,6 +945,7 @@ static NSString * const sLastInitialSubscribeLatencyKey = @"lastInitialSubscribe
 // whether it might be.
 - (void)_triggerResubscribeWithReason:(NSString *)reason nodeLikelyReachable:(BOOL)nodeLikelyReachable
 {
+    MTR_LOG("%@ _triggerResubscribeWithReason called with reason %@", self, reason);
     assertChipStackLockedByCurrentThread();
 
     // We might want to trigger a resubscribe on our existing ReadClient.  Do
@@ -1235,6 +1241,12 @@ static NSString * const sLastInitialSubscribeLatencyKey = @"lastInitialSubscribe
 - (void)_handleSubscriptionError:(NSError *)error
 {
     std::lock_guard lock(_lock);
+    [self _doHandleSubscriptionError:error];
+}
+
+- (void)_doHandleSubscriptionError:(NSError *)error
+{
+    os_unfair_lock_assert_owner(&_lock);
 
     [self _changeInternalState:MTRInternalDeviceStateUnsubscribed];
     _unreportedEvents = nil;
@@ -1400,6 +1412,12 @@ static NSString * const sLastInitialSubscribeLatencyKey = @"lastInitialSubscribe
 - (void)_handleSubscriptionReset:(NSNumber * _Nullable)retryDelay
 {
     std::lock_guard lock(_lock);
+    [self _doHandleSubscriptionReset:retryDelay];
+}
+
+- (void)_doHandleSubscriptionReset:(NSNumber * _Nullable)retryDelay
+{
+    os_unfair_lock_assert_owner(&_lock);
 
     // If we are here, then either we failed to establish initial CASE, or we
     // failed to send the initial SubscribeRequest message, or our ReadClient
@@ -1471,7 +1489,7 @@ static NSString * const sLastInitialSubscribeLatencyKey = @"lastInitialSubscribe
         return;
     }
 
-    MTR_LOG("%@ reattempting subscription", self);
+    MTR_LOG("%@ reattempting subscription with reason %@", self, reason);
     self.reattemptingSubscription = NO;
     [self _setupSubscriptionWithReason:reason];
 }
@@ -2100,6 +2118,22 @@ static NSString * const sLastInitialSubscribeLatencyKey = @"lastInitialSubscribe
 }
 #endif
 
+- (void)_reconcilePersistedClustersWithStorage
+{
+    os_unfair_lock_assert_owner(&self->_lock);
+
+    NSMutableSet * clusterPathsToRemove = [NSMutableSet set];
+    for (MTRClusterPath * clusterPath in _persistedClusters) {
+        MTRDeviceClusterData * data = [_deviceController.controllerDataStore getStoredClusterDataForNodeID:_nodeID endpointID:clusterPath.endpoint clusterID:clusterPath.cluster];
+        if (!data) {
+            [clusterPathsToRemove addObject:clusterPath];
+        }
+    }
+
+    MTR_LOG_ERROR("%@ Storage missing %lu / %lu clusters - reconciling in-memory records", self, static_cast<unsigned long>(clusterPathsToRemove.count), static_cast<unsigned long>(_persistedClusters.count));
+    [_persistedClusters minusSet:clusterPathsToRemove];
+}
+
 - (nullable MTRDeviceClusterData *)_clusterDataForPath:(MTRClusterPath *)clusterPath
 {
     os_unfair_lock_assert_owner(&self->_lock);
@@ -2132,8 +2166,16 @@ static NSString * const sLastInitialSubscribeLatencyKey = @"lastInitialSubscribe
 
     // Page in the stored value for the data.
     MTRDeviceClusterData * data = [_deviceController.controllerDataStore getStoredClusterDataForNodeID:_nodeID endpointID:clusterPath.endpoint clusterID:clusterPath.cluster];
+    MTR_LOG("%@ cluster path %@ cache miss - load from storage success %@", self, clusterPath, YES_NO(data));
     if (data != nil) {
         [_persistedClusterData setObject:data forKey:clusterPath];
+    } else {
+        // If clusterPath is in _persistedClusters and the data store returns nil for it, then the in-memory cache is now not dependable, and subscription should be reset and reestablished to reload cache from device
+
+        // First make sure _persistedClusters is consistent with storage, so repeated calls don't immediately re-trigger this
+        [self _reconcilePersistedClustersWithStorage];
+
+        [self _resetSubscriptionWithReasonString:[NSString stringWithFormat:@"Data store has no data for cluster %@", clusterPath]];
     }
 
     return data;
@@ -2303,13 +2345,43 @@ static NSString * const sLastInitialSubscribeLatencyKey = @"lastInitialSubscribe
     }
 }
 
+- (void)_resetSubscriptionWithReasonString:(NSString *)reasonString
+{
+    os_unfair_lock_assert_owner(&self->_lock);
+    MTR_LOG_ERROR("%@ %@ - resetting subscription", self, reasonString);
+
+    [_deviceController asyncDispatchToMatterQueue:^{
+        MTR_LOG("%@ subscription reset disconnecting ReadClient and SubscriptionCallback", self);
+
+        std::lock_guard lock(self->_lock);
+        self->_currentReadClient = nullptr;
+        if (self->_currentSubscriptionCallback) {
+            delete self->_currentSubscriptionCallback;
+        }
+        self->_currentSubscriptionCallback = nullptr;
+
+        [self _doHandleSubscriptionError:nil];
+        // Use nil reset delay so that this keeps existing backoff timing
+        [self _doHandleSubscriptionReset:nil];
+    }
+                                     errorHandler:nil];
+}
+
+#ifdef DEBUG
+- (void)unitTestResetSubscription
+{
+    std::lock_guard lock(self->_lock);
+    [self _resetSubscriptionWithReasonString:@"Unit test reset subscription"];
+}
+#endif
+
 // assume lock is held
 - (void)_setupSubscriptionWithReason:(NSString *)reason
 {
     os_unfair_lock_assert_owner(&self->_lock);
 
     if (![self _subscriptionsAllowed]) {
-        MTR_LOG("%@ _setupSubscription: Subscriptions not allowed. Do not set up subscription", self);
+        MTR_LOG("%@ _setupSubscription: Subscriptions not allowed. Do not set up subscription (reason: %@)", self, reason);
         return;
     }
 
@@ -2328,6 +2400,7 @@ static NSString * const sLastInitialSubscribeLatencyKey = @"lastInitialSubscribe
 
     // for now just subscribe once
     if (!NeedToStartSubscriptionSetup(_internalDeviceState)) {
+        MTR_LOG("%@ setupSubscription: no need to subscribe due to internal state %lu (reason: %@)", self, static_cast<unsigned long>(_internalDeviceState), reason);
         return;
     }
 
@@ -3758,14 +3831,21 @@ static BOOL AttributeHasChangesOmittedQuality(MTRAttributePath * attributePath)
 }
 
 #ifdef DEBUG
-- (MTRDeviceClusterData *)_getClusterDataForPath:(MTRClusterPath *)path
+- (MTRDeviceClusterData *)unitTestGetClusterDataForPath:(MTRClusterPath *)path
 {
     std::lock_guard lock(_lock);
 
     return [[self _clusterDataForPath:path] copy];
 }
 
-- (BOOL)_clusterHasBeenPersisted:(MTRClusterPath *)path
+- (NSSet<MTRClusterPath *> *)unitTestGetPersistedClusters
+{
+    std::lock_guard lock(_lock);
+
+    return [_persistedClusters copy];
+}
+
+- (BOOL)unitTestClusterHasBeenPersisted:(MTRClusterPath *)path
 {
     std::lock_guard lock(_lock);
 
