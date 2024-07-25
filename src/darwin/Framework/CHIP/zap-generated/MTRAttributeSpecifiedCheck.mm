@@ -4125,7 +4125,7 @@ static BOOL AttributeIsSpecifiedInThermostatCluster(AttributeId aAttributeId)
     case Attributes::ACCoilTemperature::Id: {
         return YES;
     }
-    case Attributes::ACCapacityformat::Id: {
+    case Attributes::ACCapacityFormat::Id: {
         return YES;
     }
     case Attributes::PresetTypes::Id: {
@@ -4156,12 +4156,6 @@ static BOOL AttributeIsSpecifiedInThermostatCluster(AttributeId aAttributeId)
         return YES;
     }
     case Attributes::Schedules::Id: {
-        return YES;
-    }
-    case Attributes::PresetsSchedulesEditable::Id: {
-        return YES;
-    }
-    case Attributes::TemperatureSetpointHoldPolicy::Id: {
         return YES;
     }
     case Attributes::SetpointHoldExpiryTimestamp::Id: {

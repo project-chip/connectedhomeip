@@ -5138,9 +5138,9 @@ namespace ACCoilTemperature {
 static constexpr AttributeId Id = 0x00000046;
 } // namespace ACCoilTemperature
 
-namespace ACCapacityformat {
+namespace ACCapacityFormat {
 static constexpr AttributeId Id = 0x00000047;
-} // namespace ACCapacityformat
+} // namespace ACCapacityFormat
 
 namespace PresetTypes {
 static constexpr AttributeId Id = 0x00000048;
@@ -5182,16 +5182,8 @@ namespace Schedules {
 static constexpr AttributeId Id = 0x00000051;
 } // namespace Schedules
 
-namespace PresetsSchedulesEditable {
-static constexpr AttributeId Id = 0x00000052;
-} // namespace PresetsSchedulesEditable
-
-namespace TemperatureSetpointHoldPolicy {
-static constexpr AttributeId Id = 0x00000053;
-} // namespace TemperatureSetpointHoldPolicy
-
 namespace SetpointHoldExpiryTimestamp {
-static constexpr AttributeId Id = 0x00000054;
+static constexpr AttributeId Id = 0x00000052;
 } // namespace SetpointHoldExpiryTimestamp
 
 namespace GeneratedCommandList {

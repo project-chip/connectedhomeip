@@ -5718,8 +5718,8 @@ NSString * MTRAttributeNameForID(MTRClusterIDType clusterID, MTRAttributeIDType 
             result = @"ACCoilTemperature";
             break;
 
-        case MTRAttributeIDTypeClusterThermostatAttributeACCapacityformatID:
-            result = @"ACCapacityformat";
+        case MTRAttributeIDTypeClusterThermostatAttributeACCapacityFormatID:
+            result = @"ACCapacityFormat";
             break;
 
         case MTRAttributeIDTypeClusterThermostatAttributePresetTypesID:
@@ -5760,14 +5760,6 @@ NSString * MTRAttributeNameForID(MTRClusterIDType clusterID, MTRAttributeIDType 
 
         case MTRAttributeIDTypeClusterThermostatAttributeSchedulesID:
             result = @"Schedules";
-            break;
-
-        case MTRAttributeIDTypeClusterThermostatAttributePresetsSchedulesEditableID:
-            result = @"PresetsSchedulesEditable";
-            break;
-
-        case MTRAttributeIDTypeClusterThermostatAttributeTemperatureSetpointHoldPolicyID:
-            result = @"TemperatureSetpointHoldPolicy";
             break;
 
         case MTRAttributeIDTypeClusterThermostatAttributeSetpointHoldExpiryTimestampID:

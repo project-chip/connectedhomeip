@@ -8821,30 +8821,13 @@ class ChipClusters:
                     "presetHandle": "bytes",
                 },
             },
-            0x00000007: {
-                "commandId": 0x00000007,
-                "commandName": "StartPresetsSchedulesEditRequest",
+            0x000000FE: {
+                "commandId": 0x000000FE,
+                "commandName": "AtomicRequest",
                 "args": {
-                    "timeoutSeconds": "int",
-                },
-            },
-            0x00000008: {
-                "commandId": 0x00000008,
-                "commandName": "CancelPresetsSchedulesEditRequest",
-                "args": {
-                },
-            },
-            0x00000009: {
-                "commandId": 0x00000009,
-                "commandName": "CommitPresetsSchedulesRequest",
-                "args": {
-                },
-            },
-            0x0000000B: {
-                "commandId": 0x0000000B,
-                "commandName": "SetTemperatureSetpointHoldPolicy",
-                "args": {
-                    "temperatureSetpointHoldPolicy": "int",
+                    "requestType": "int",
+                    "attributeRequests": "int",
+                    "timeout": "int",
                 },
             },
         },
@@ -9164,7 +9147,7 @@ class ChipClusters:
                 "reportable": True,
             },
             0x00000047: {
-                "attributeName": "ACCapacityformat",
+                "attributeName": "ACCapacityFormat",
                 "attributeId": 0x00000047,
                 "type": "int",
                 "reportable": True,
@@ -9233,20 +9216,8 @@ class ChipClusters:
                 "writable": True,
             },
             0x00000052: {
-                "attributeName": "PresetsSchedulesEditable",
-                "attributeId": 0x00000052,
-                "type": "bool",
-                "reportable": True,
-            },
-            0x00000053: {
-                "attributeName": "TemperatureSetpointHoldPolicy",
-                "attributeId": 0x00000053,
-                "type": "int",
-                "reportable": True,
-            },
-            0x00000054: {
                 "attributeName": "SetpointHoldExpiryTimestamp",
-                "attributeId": 0x00000054,
+                "attributeId": 0x00000052,
                 "type": "int",
                 "reportable": True,
             },
