@@ -48,6 +48,7 @@ import dacite  # type: ignore
 from . import FabricAdmin
 from . import clusters as Clusters
 from . import discovery
+from .bdx import Bdx
 from .clusters import Attribute as ClusterAttribute
 from .clusters import ClusterObjects as ClusterObjects
 from .clusters import Command as ClusterCommand
