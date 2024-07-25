@@ -37,10 +37,12 @@ pw_log_BACKEND = "$dir_pw_log_basic"
 
 pw_unit_test_BACKEND = "$dir_pw_unit_test:light"
 
+# Override the executable type and the target for the test main.
 pw_unit_test_EXECUTABLE_TARGET_TYPE = "silabs_executable"
 pw_unit_test_EXECUTABLE_TARGET_TYPE_FILE = "${efr32_sdk_build_root}/silabs_executable.gni"
 pw_unit_test_MAIN = "//:efr32_test_main"
 
+# Additional variables needed by silabs_executable that must be passed in to pw_test.
 test_executable_output_name = "matter-silabs-device_tests_"
 test_executable_output_name_suffix = ".out"
 _ldscript = "${chip_root}/examples/platform/silabs/ldscripts/${silabs_family}.ld"
