@@ -504,15 +504,26 @@ class MatterIdlTransformer(Transformer):
         clusters = []
         endpoints = []
 
+        global_bitmaps = []
+        global_enums = []
+        global_structs = []
+
+
         for item in items:
             if isinstance(item, Cluster):
                 clusters.append(item)
             elif isinstance(item, Endpoint):
                 endpoints.append(item)
+            elif isinstance(item, Enum):
+                global_enums.append(item.replace(is_global=True))
+            elif isinstance(item, Bitmap):
+                global_bitmaps.append(item.replace(is_global=True))
+            elif isinstance(item, Struct):
+                global_structs.append(item.replace(is_global=True))
             else:
                 raise Exception("UNKNOWN idl content item: %r" % item)
 
-        return Idl(clusters=clusters, endpoints=endpoints)
+        return Idl(clusters=clusters, endpoints=endpoints, global_bitmaps=global_bitmaps, global_enums=global_enums, global_structs=global_structs)
 
     def prefix_doc_comment(self):
         print("TODO: prefix")
