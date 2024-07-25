@@ -24028,6 +24028,18 @@ public class ClusterInfoMapping {
 
     Map<String, InteractionInfo> bridgedDeviceBasicInformationClusterInteractionInfoMap = new LinkedHashMap<>();
 
+    Map<String, CommandParameterInfo> bridgedDeviceBasicInformationkeepActiveCommandParams = new LinkedHashMap<String, CommandParameterInfo>();
+    InteractionInfo bridgedDeviceBasicInformationkeepActiveInteractionInfo = new InteractionInfo(
+      (cluster, callback, commandArguments) -> {
+        ((ChipClusters.BridgedDeviceBasicInformationCluster) cluster)
+        .keepActive((DefaultClusterCallback) callback
+        );
+      },
+      () -> new DelegatedDefaultClusterCallback(),
+        bridgedDeviceBasicInformationkeepActiveCommandParams
+    );
+    bridgedDeviceBasicInformationClusterInteractionInfoMap.put("keepActive", bridgedDeviceBasicInformationkeepActiveInteractionInfo);
+
     commandMap.put("bridgedDeviceBasicInformation", bridgedDeviceBasicInformationClusterInteractionInfoMap);
 
     Map<String, InteractionInfo> switchClusterInteractionInfoMap = new LinkedHashMap<>();
