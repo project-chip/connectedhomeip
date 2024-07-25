@@ -87,7 +87,7 @@ struct CallbackScheduleState
                                              // when called consecutively
 };
 
-typedef struct
+struct EmberAfLevelControlState
 {
     CommandId commandId;
     uint8_t moveToLevel;
@@ -102,7 +102,7 @@ typedef struct
     CallbackScheduleState callbackSchedule;
     QuieterReportingAttribute<uint8_t> quietCurrentLevel{ DataModel::NullNullable };
     QuieterReportingAttribute<uint16_t> quietRemainingTime{ DataModel::MakeNullable<uint16_t>(0) };
-} EmberAfLevelControlState;
+};
 
 static EmberAfLevelControlState stateTable[kLevelControlStateTableSize];
 
