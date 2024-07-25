@@ -402,14 +402,14 @@ public:
     }
 #endif
 
-    DataModel::Provider * GetDataModel() const;
+    DataModel::Provider * GetDataModelProvider() const;
 
     // MUST NOT be used while the interaction model engine is running as interaction
     // model functionality (e.g. active reads/writes/subscriptions) rely on data model
     // state
     //
-    // Returns the old data model value.
-    DataModel::Provider * SetDataModel(DataModel::Provider * model);
+    // Returns the old data model provider value.
+    DataModel::Provider * SetDataModelProvider(DataModel::Provider * model);
 
 private:
     friend class reporting::Engine;

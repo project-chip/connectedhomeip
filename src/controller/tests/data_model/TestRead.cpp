@@ -56,13 +56,13 @@ protected:
     void SetUp() override
     {
         chip::Test::AppContext::SetUp();
-        mOldProvider = InteractionModelEngine::GetInstance()->SetDataModel(&CustomDataModel::Instance());
+        mOldProvider = InteractionModelEngine::GetInstance()->SetDataModelProvider(&CustomDataModel::Instance());
     }
 
     // Performs teardown for each individual test in the test suite
     void TearDown() override
     {
-        InteractionModelEngine::GetInstance()->SetDataModel(mOldProvider);
+        InteractionModelEngine::GetInstance()->SetDataModelProvider(mOldProvider);
         chip::Test::AppContext::TearDown();
     }
 

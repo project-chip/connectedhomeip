@@ -272,11 +272,11 @@ public:
         ASSERT_EQ(mEventCounter.Init(0), CHIP_NO_ERROR);
         chip::app::EventManagement::CreateEventManagement(&GetExchangeManager(), ArraySize(logStorageResources),
                                                           gCircularEventBuffer, logStorageResources, &mEventCounter);
-        mOldProvider = InteractionModelEngine::GetInstance()->SetDataModel(&TestImCustomDataModel::Instance());
+        mOldProvider = InteractionModelEngine::GetInstance()->SetDataModelProvider(&TestImCustomDataModel::Instance());
     }
     void TearDown()
     {
-        InteractionModelEngine::GetInstance()->SetDataModel(mOldProvider);
+        InteractionModelEngine::GetInstance()->SetDataModelProvider(mOldProvider);
         chip::app::EventManagement::DestroyEventManagement();
         AppContext::TearDown();
     }

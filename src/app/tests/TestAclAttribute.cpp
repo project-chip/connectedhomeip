@@ -118,13 +118,13 @@ public:
 
         Access::GetAccessControl().Finish();
         Access::GetAccessControl().Init(GetTestAccessControlDelegate(), gDeviceTypeResolver);
-        mOldProvider = InteractionModelEngine::GetInstance()->SetDataModel(&TestImCustomDataModel::Instance());
+        mOldProvider = InteractionModelEngine::GetInstance()->SetDataModelProvider(&TestImCustomDataModel::Instance());
     }
 
     void TearDown() override
     {
         AppContext::TearDown();
-        InteractionModelEngine::GetInstance()->SetDataModel(mOldProvider);
+        InteractionModelEngine::GetInstance()->SetDataModelProvider(mOldProvider);
     }
 
 private:

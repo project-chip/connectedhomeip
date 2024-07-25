@@ -59,12 +59,12 @@ public:
     void SetUp() override
     {
         chip::Test::AppContext::SetUp();
-        mOldProvider = InteractionModelEngine::GetInstance()->SetDataModel(&TestImCustomDataModel::Instance());
+        mOldProvider = InteractionModelEngine::GetInstance()->SetDataModelProvider(&TestImCustomDataModel::Instance());
     }
 
     void TearDown() override
     {
-        InteractionModelEngine::GetInstance()->SetDataModel(mOldProvider);
+        InteractionModelEngine::GetInstance()->SetDataModelProvider(mOldProvider);
         chip::Test::AppContext::TearDown();
     }
 
