@@ -38,7 +38,6 @@ class TestMetadataReader(unittest.TestCase):
     ALL_CLUSTERS_APP: out/linux-x64-all-clusters-ipv6only-no-ble-no-wifi-tsan-clang-test/chip-all-clusters-app
     CHIP_LOCK_APP: out/linux-x64-lock-ipv6only-no-ble-no-wifi-tsan-clang-test/chip-lock-app
     ENERGY_MANAGEMENT_APP: out/linux-x64-energy-management-ipv6only-no-ble-no-wifi-tsan-clang-test/chip-energy-management-app
-    WATER_HEATER_MANAGEMENT_APP: out/linux-x64-water-heater-management-ipv6only-no-ble-no-wifi-tsan-clang-test/chip-water-heater-management-app
     TRACE_APP: out/trace_data/app-{SCRIPT_BASE_NAME}
     TRACE_TEST_JSON: out/trace_data/test-{SCRIPT_BASE_NAME}
     TRACE_TEST_PERFETTO: out/trace_data/test-{SCRIPT_BASE_NAME}
