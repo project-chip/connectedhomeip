@@ -53,7 +53,7 @@ namespace app {
 class AttributePathExpandIteratorDataModel
 {
 public:
-    AttributePathExpandIteratorDataModel(DataModel::Provider * dataModel,
+    AttributePathExpandIteratorDataModel(DataModel::Provider * provider,
                                          SingleLinkedListNode<AttributePathParams> * attributePath);
 
     /**

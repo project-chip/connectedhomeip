@@ -24,8 +24,8 @@ namespace chip {
 namespace app {
 
 AttributePathExpandIteratorDataModel::AttributePathExpandIteratorDataModel(
-    DataModel::Provider * dataModel, SingleLinkedListNode<AttributePathParams> * attributePath) :
-    mDataModelProvider(dataModel),
+    DataModel::Provider * provider, SingleLinkedListNode<AttributePathParams> * attributePath) :
+    mDataModelProvider(provider),
     mpAttributePath(attributePath), mOutputPath(kInvalidEndpointId, kInvalidClusterId, kInvalidAttributeId)
 
 {
