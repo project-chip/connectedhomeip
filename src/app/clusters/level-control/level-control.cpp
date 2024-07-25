@@ -258,7 +258,7 @@ public:
         {
             moveToLevelHandler(
                 endpoint, Commands::MoveToLevel::Id, level, DataModel::MakeNullable(static_cast<uint16_t>(timeMs / 100)),
-                chip::Optional<BitMask<OptionsBitmap>>(), chip::Optional<BitMask<OptionsBitmap>>(), INVALID_STORED_LEVEL);
+                chip::Optional<BitMask<OptionsBitmap>>(1), chip::Optional<BitMask<OptionsBitmap>>(1), INVALID_STORED_LEVEL);
         }
 
         return CHIP_NO_ERROR;
