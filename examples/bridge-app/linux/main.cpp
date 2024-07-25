@@ -159,9 +159,6 @@ DeviceOnOff Light2("Light 2", "Office");
 DeviceTempSensor TempSensor1("TempSensor 1", "Office", minMeasuredValue, maxMeasuredValue, initialMeasuredValue);
 DeviceTempSensor TempSensor2("TempSensor 2", "Office", minMeasuredValue, maxMeasuredValue, initialMeasuredValue);
 
-DeviceTempSensor ComposedTempSensor1("Composed TempSensor 1", "Bedroom", minMeasuredValue, maxMeasuredValue, initialMeasuredValue);
-DeviceTempSensor ComposedTempSensor2("Composed TempSensor 2", "Bedroom", minMeasuredValue, maxMeasuredValue, initialMeasuredValue);
-
 // Declare Bridged endpoints used for Action clusters
 DataVersion gActionLight1DataVersions[ArraySize(bridgedLightClusters)];
 DataVersion gActionLight2DataVersions[ArraySize(bridgedLightClusters)];
@@ -172,6 +169,12 @@ DeviceOnOff ActionLight1("Action Light 1", "Room 1");
 DeviceOnOff ActionLight2("Action Light 2", "Room 1");
 DeviceOnOff ActionLight3("Action Light 3", "Room 2");
 DeviceOnOff ActionLight4("Action Light 4", "Room 2");
+
+// Setup composed device with two temperature sensors and a power source
+ComposedDevice ComposedDevice("Composed Device", "Bedroom");
+DeviceTempSensor ComposedTempSensor1("Composed TempSensor 1", "Bedroom", minMeasuredValue, maxMeasuredValue, initialMeasuredValue);
+DeviceTempSensor ComposedTempSensor2("Composed TempSensor 2", "Bedroom", minMeasuredValue, maxMeasuredValue, initialMeasuredValue);
+DevicePowerSource ComposedPowerSource("Composed Power Source", "Bedroom", PowerSource::Feature::kBattery);
 
 Room room1("Room 1", 0xE001, Actions::EndpointListTypeEnum::kRoom, true);
 Room room2("Room 2", 0xE002, Actions::EndpointListTypeEnum::kRoom, true);
@@ -917,10 +920,6 @@ void ApplicationInit()
     ActionLight2.SetChangeCallback(&HandleDeviceOnOffStatusChanged);
     ActionLight3.SetChangeCallback(&HandleDeviceOnOffStatusChanged);
     ActionLight4.SetChangeCallback(&HandleDeviceOnOffStatusChanged);
-
-    // Setup composed device with two temperature sensors and a power source
-    ComposedDevice ComposedDevice("Composed Device", "Bedroom");
-    DevicePowerSource ComposedPowerSource("Composed Power Source", "Bedroom", PowerSource::Feature::kBattery);
 
     ComposedDevice.SetReachable(true);
     ComposedTempSensor1.SetReachable(true);
