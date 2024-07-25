@@ -40997,19 +40997,19 @@ namespace HomeLocationStruct = Clusters::detail::Structs::HomeLocationStruct;
 namespace EcosystemLocationStruct {
 enum class Fields : uint8_t
 {
-    kUniqueLocationID     = 0,
-    kHomeLocation         = 1,
-    kHomeLocationLastEdit = 2,
-    kFabricIndex          = 254,
+    kUniqueLocationID           = 0,
+    kLocationDescriptor         = 1,
+    kLocationDescriptorLastEdit = 2,
+    kFabricIndex                = 254,
 };
 
 struct Type
 {
 public:
     chip::CharSpan uniqueLocationID;
-    Structs::HomeLocationStruct::Type homeLocation;
-    uint64_t homeLocationLastEdit = static_cast<uint64_t>(0);
-    chip::FabricIndex fabricIndex = static_cast<chip::FabricIndex>(0);
+    Structs::HomeLocationStruct::Type locationDescriptor;
+    uint64_t locationDescriptorLastEdit = static_cast<uint64_t>(0);
+    chip::FabricIndex fabricIndex       = static_cast<chip::FabricIndex>(0);
 
     CHIP_ERROR Decode(TLV::TLVReader & reader);
 

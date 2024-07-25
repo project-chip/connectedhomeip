@@ -27973,11 +27973,11 @@ CHIP_ERROR Type::DoEncode(TLV::TLVWriter & aWriter, TLV::Tag aTag, const Optiona
     }
     if (includeSensitive)
     {
-        encoder.Encode(to_underlying(Fields::kHomeLocation), homeLocation);
+        encoder.Encode(to_underlying(Fields::kLocationDescriptor), locationDescriptor);
     }
     if (includeSensitive)
     {
-        encoder.Encode(to_underlying(Fields::kHomeLocationLastEdit), homeLocationLastEdit);
+        encoder.Encode(to_underlying(Fields::kLocationDescriptorLastEdit), locationDescriptorLastEdit);
     }
     if (aAccessingFabricIndex.HasValue())
     {
@@ -28005,13 +28005,13 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
         {
             err = DataModel::Decode(reader, uniqueLocationID);
         }
-        else if (__context_tag == to_underlying(Fields::kHomeLocation))
+        else if (__context_tag == to_underlying(Fields::kLocationDescriptor))
         {
-            err = DataModel::Decode(reader, homeLocation);
+            err = DataModel::Decode(reader, locationDescriptor);
         }
-        else if (__context_tag == to_underlying(Fields::kHomeLocationLastEdit))
+        else if (__context_tag == to_underlying(Fields::kLocationDescriptorLastEdit))
         {
-            err = DataModel::Decode(reader, homeLocationLastEdit);
+            err = DataModel::Decode(reader, locationDescriptorLastEdit);
         }
         else if (__context_tag == to_underlying(Fields::kFabricIndex))
         {

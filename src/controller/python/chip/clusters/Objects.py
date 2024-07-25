@@ -46525,14 +46525,14 @@ class EcosystemInformation(Cluster):
                 return ClusterObjectDescriptor(
                     Fields=[
                         ClusterObjectFieldDescriptor(Label="uniqueLocationID", Tag=0, Type=str),
-                        ClusterObjectFieldDescriptor(Label="homeLocation", Tag=1, Type=EcosystemInformation.Structs.HomeLocationStruct),
-                        ClusterObjectFieldDescriptor(Label="homeLocationLastEdit", Tag=2, Type=uint),
+                        ClusterObjectFieldDescriptor(Label="locationDescriptor", Tag=1, Type=EcosystemInformation.Structs.HomeLocationStruct),
+                        ClusterObjectFieldDescriptor(Label="locationDescriptorLastEdit", Tag=2, Type=uint),
                         ClusterObjectFieldDescriptor(Label="fabricIndex", Tag=254, Type=uint),
                     ])
 
             uniqueLocationID: 'str' = ""
-            homeLocation: 'EcosystemInformation.Structs.HomeLocationStruct' = field(default_factory=lambda: EcosystemInformation.Structs.HomeLocationStruct())
-            homeLocationLastEdit: 'uint' = 0
+            locationDescriptor: 'EcosystemInformation.Structs.HomeLocationStruct' = field(default_factory=lambda: EcosystemInformation.Structs.HomeLocationStruct())
+            locationDescriptorLastEdit: 'uint' = 0
             fabricIndex: 'uint' = 0
 
         @dataclass

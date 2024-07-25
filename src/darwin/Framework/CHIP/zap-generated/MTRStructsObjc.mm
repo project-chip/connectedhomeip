@@ -8431,9 +8431,9 @@ NS_ASSUME_NONNULL_BEGIN
 
         _uniqueLocationID = @"";
 
-        _homeLocation = [MTREcosystemInformationClusterHomeLocationStruct new];
+        _locationDescriptor = [MTREcosystemInformationClusterHomeLocationStruct new];
 
-        _homeLocationLastEdit = @(0);
+        _locationDescriptorLastEdit = @(0);
 
         _fabricIndex = @(0);
     }
@@ -8445,8 +8445,8 @@ NS_ASSUME_NONNULL_BEGIN
     auto other = [[MTREcosystemInformationClusterEcosystemLocationStruct alloc] init];
 
     other.uniqueLocationID = self.uniqueLocationID;
-    other.homeLocation = self.homeLocation;
-    other.homeLocationLastEdit = self.homeLocationLastEdit;
+    other.locationDescriptor = self.locationDescriptor;
+    other.locationDescriptorLastEdit = self.locationDescriptorLastEdit;
     other.fabricIndex = self.fabricIndex;
 
     return other;
@@ -8454,7 +8454,7 @@ NS_ASSUME_NONNULL_BEGIN
 
 - (NSString *)description
 {
-    NSString * descriptionString = [NSString stringWithFormat:@"<%@: uniqueLocationID:%@; homeLocation:%@; homeLocationLastEdit:%@; fabricIndex:%@; >", NSStringFromClass([self class]), _uniqueLocationID, _homeLocation, _homeLocationLastEdit, _fabricIndex];
+    NSString * descriptionString = [NSString stringWithFormat:@"<%@: uniqueLocationID:%@; locationDescriptor:%@; locationDescriptorLastEdit:%@; fabricIndex:%@; >", NSStringFromClass([self class]), _uniqueLocationID, _locationDescriptor, _locationDescriptorLastEdit, _fabricIndex];
     return descriptionString;
 }
 

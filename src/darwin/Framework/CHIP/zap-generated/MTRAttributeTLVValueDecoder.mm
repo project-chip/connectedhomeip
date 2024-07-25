@@ -17066,24 +17066,24 @@ static id _Nullable DecodeAttributeValueForEcosystemInformationCluster(Attribute
                     *aError = err;
                     return nil;
                 }
-                newElement_0.homeLocation = [MTREcosystemInformationClusterHomeLocationStruct new];
-                newElement_0.homeLocation.locationName = AsString(entry_0.homeLocation.locationName);
-                if (newElement_0.homeLocation.locationName == nil) {
+                newElement_0.locationDescriptor = [MTREcosystemInformationClusterHomeLocationStruct new];
+                newElement_0.locationDescriptor.locationName = AsString(entry_0.locationDescriptor.locationName);
+                if (newElement_0.locationDescriptor.locationName == nil) {
                     CHIP_ERROR err = CHIP_ERROR_INVALID_ARGUMENT;
                     *aError = err;
                     return nil;
                 }
-                if (entry_0.homeLocation.floorNumber.IsNull()) {
-                    newElement_0.homeLocation.floorNumber = nil;
+                if (entry_0.locationDescriptor.floorNumber.IsNull()) {
+                    newElement_0.locationDescriptor.floorNumber = nil;
                 } else {
-                    newElement_0.homeLocation.floorNumber = [NSNumber numberWithShort:entry_0.homeLocation.floorNumber.Value()];
+                    newElement_0.locationDescriptor.floorNumber = [NSNumber numberWithShort:entry_0.locationDescriptor.floorNumber.Value()];
                 }
-                if (entry_0.homeLocation.areaType.IsNull()) {
-                    newElement_0.homeLocation.areaType = nil;
+                if (entry_0.locationDescriptor.areaType.IsNull()) {
+                    newElement_0.locationDescriptor.areaType = nil;
                 } else {
-                    newElement_0.homeLocation.areaType = [NSNumber numberWithUnsignedChar:chip::to_underlying(entry_0.homeLocation.areaType.Value())];
+                    newElement_0.locationDescriptor.areaType = [NSNumber numberWithUnsignedChar:chip::to_underlying(entry_0.locationDescriptor.areaType.Value())];
                 }
-                newElement_0.homeLocationLastEdit = [NSNumber numberWithUnsignedLongLong:entry_0.homeLocationLastEdit];
+                newElement_0.locationDescriptorLastEdit = [NSNumber numberWithUnsignedLongLong:entry_0.locationDescriptorLastEdit];
                 newElement_0.fabricIndex = [NSNumber numberWithUnsignedChar:entry_0.fabricIndex];
                 [array_0 addObject:newElement_0];
             }

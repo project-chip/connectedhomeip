@@ -5440,24 +5440,25 @@ CHIP_ERROR ComplexArgumentParser::Setup(const char * label,
 
     ReturnErrorOnFailure(ComplexArgumentParser::EnsureMemberExist("EcosystemLocationStruct.uniqueLocationID", "uniqueLocationID",
                                                                   value.isMember("uniqueLocationID")));
-    ReturnErrorOnFailure(ComplexArgumentParser::EnsureMemberExist("EcosystemLocationStruct.homeLocation", "homeLocation",
-                                                                  value.isMember("homeLocation")));
-    ReturnErrorOnFailure(ComplexArgumentParser::EnsureMemberExist("EcosystemLocationStruct.homeLocationLastEdit",
-                                                                  "homeLocationLastEdit", value.isMember("homeLocationLastEdit")));
+    ReturnErrorOnFailure(ComplexArgumentParser::EnsureMemberExist("EcosystemLocationStruct.locationDescriptor",
+                                                                  "locationDescriptor", value.isMember("locationDescriptor")));
+    ReturnErrorOnFailure(ComplexArgumentParser::EnsureMemberExist("EcosystemLocationStruct.locationDescriptorLastEdit",
+                                                                  "locationDescriptorLastEdit",
+                                                                  value.isMember("locationDescriptorLastEdit")));
 
     char labelWithMember[kMaxLabelLength];
     snprintf(labelWithMember, sizeof(labelWithMember), "%s.%s", label, "uniqueLocationID");
     ReturnErrorOnFailure(ComplexArgumentParser::Setup(labelWithMember, request.uniqueLocationID, value["uniqueLocationID"]));
     valueCopy.removeMember("uniqueLocationID");
 
-    snprintf(labelWithMember, sizeof(labelWithMember), "%s.%s", label, "homeLocation");
-    ReturnErrorOnFailure(ComplexArgumentParser::Setup(labelWithMember, request.homeLocation, value["homeLocation"]));
-    valueCopy.removeMember("homeLocation");
+    snprintf(labelWithMember, sizeof(labelWithMember), "%s.%s", label, "locationDescriptor");
+    ReturnErrorOnFailure(ComplexArgumentParser::Setup(labelWithMember, request.locationDescriptor, value["locationDescriptor"]));
+    valueCopy.removeMember("locationDescriptor");
 
-    snprintf(labelWithMember, sizeof(labelWithMember), "%s.%s", label, "homeLocationLastEdit");
+    snprintf(labelWithMember, sizeof(labelWithMember), "%s.%s", label, "locationDescriptorLastEdit");
     ReturnErrorOnFailure(
-        ComplexArgumentParser::Setup(labelWithMember, request.homeLocationLastEdit, value["homeLocationLastEdit"]));
-    valueCopy.removeMember("homeLocationLastEdit");
+        ComplexArgumentParser::Setup(labelWithMember, request.locationDescriptorLastEdit, value["locationDescriptorLastEdit"]));
+    valueCopy.removeMember("locationDescriptorLastEdit");
 
     if (value.isMember("fabricIndex"))
     {
@@ -5472,8 +5473,8 @@ CHIP_ERROR ComplexArgumentParser::Setup(const char * label,
 void ComplexArgumentParser::Finalize(chip::app::Clusters::EcosystemInformation::Structs::EcosystemLocationStruct::Type & request)
 {
     ComplexArgumentParser::Finalize(request.uniqueLocationID);
-    ComplexArgumentParser::Finalize(request.homeLocation);
-    ComplexArgumentParser::Finalize(request.homeLocationLastEdit);
+    ComplexArgumentParser::Finalize(request.locationDescriptor);
+    ComplexArgumentParser::Finalize(request.locationDescriptorLastEdit);
     ComplexArgumentParser::Finalize(request.fabricIndex);
 }
 

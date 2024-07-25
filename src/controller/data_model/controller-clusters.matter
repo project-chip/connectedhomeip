@@ -9305,8 +9305,8 @@ provisional cluster EcosystemInformation = 1872 {
 
   fabric_scoped struct EcosystemLocationStruct {
     fabric_sensitive char_string<64> uniqueLocationID = 0;
-    fabric_sensitive HomeLocationStruct homeLocation = 1;
-    fabric_sensitive epoch_us homeLocationLastEdit = 2;
+    fabric_sensitive HomeLocationStruct locationDescriptor = 1;
+    fabric_sensitive epoch_us locationDescriptorLastEdit = 2;
     fabric_idx fabricIndex = 254;
   }
 

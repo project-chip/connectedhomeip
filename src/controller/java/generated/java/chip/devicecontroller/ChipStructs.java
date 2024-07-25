@@ -12270,31 +12270,31 @@ public static class EcosystemInformationClusterHomeLocationStruct {
 }
 public static class EcosystemInformationClusterEcosystemLocationStruct {
   public String uniqueLocationID;
-  public ChipStructs.EcosystemInformationClusterHomeLocationStruct homeLocation;
-  public Long homeLocationLastEdit;
+  public ChipStructs.EcosystemInformationClusterHomeLocationStruct locationDescriptor;
+  public Long locationDescriptorLastEdit;
   public Integer fabricIndex;
   private static final long UNIQUE_LOCATION_I_D_ID = 0L;
-  private static final long HOME_LOCATION_ID = 1L;
-  private static final long HOME_LOCATION_LAST_EDIT_ID = 2L;
+  private static final long LOCATION_DESCRIPTOR_ID = 1L;
+  private static final long LOCATION_DESCRIPTOR_LAST_EDIT_ID = 2L;
   private static final long FABRIC_INDEX_ID = 254L;
 
   public EcosystemInformationClusterEcosystemLocationStruct(
     String uniqueLocationID,
-    ChipStructs.EcosystemInformationClusterHomeLocationStruct homeLocation,
-    Long homeLocationLastEdit,
+    ChipStructs.EcosystemInformationClusterHomeLocationStruct locationDescriptor,
+    Long locationDescriptorLastEdit,
     Integer fabricIndex
   ) {
     this.uniqueLocationID = uniqueLocationID;
-    this.homeLocation = homeLocation;
-    this.homeLocationLastEdit = homeLocationLastEdit;
+    this.locationDescriptor = locationDescriptor;
+    this.locationDescriptorLastEdit = locationDescriptorLastEdit;
     this.fabricIndex = fabricIndex;
   }
 
   public StructType encodeTlv() {
     ArrayList<StructElement> values = new ArrayList<>();
     values.add(new StructElement(UNIQUE_LOCATION_I_D_ID, new StringType(uniqueLocationID)));
-    values.add(new StructElement(HOME_LOCATION_ID, homeLocation.encodeTlv()));
-    values.add(new StructElement(HOME_LOCATION_LAST_EDIT_ID, new UIntType(homeLocationLastEdit)));
+    values.add(new StructElement(LOCATION_DESCRIPTOR_ID, locationDescriptor.encodeTlv()));
+    values.add(new StructElement(LOCATION_DESCRIPTOR_LAST_EDIT_ID, new UIntType(locationDescriptorLastEdit)));
     values.add(new StructElement(FABRIC_INDEX_ID, new UIntType(fabricIndex)));
 
     return new StructType(values);
@@ -12305,8 +12305,8 @@ public static class EcosystemInformationClusterEcosystemLocationStruct {
       return null;
     }
     String uniqueLocationID = null;
-    ChipStructs.EcosystemInformationClusterHomeLocationStruct homeLocation = null;
-    Long homeLocationLastEdit = null;
+    ChipStructs.EcosystemInformationClusterHomeLocationStruct locationDescriptor = null;
+    Long locationDescriptorLastEdit = null;
     Integer fabricIndex = null;
     for (StructElement element: ((StructType)tlvValue).value()) {
       if (element.contextTagNum() == UNIQUE_LOCATION_I_D_ID) {
@@ -12314,15 +12314,15 @@ public static class EcosystemInformationClusterEcosystemLocationStruct {
           StringType castingValue = element.value(StringType.class);
           uniqueLocationID = castingValue.value(String.class);
         }
-      } else if (element.contextTagNum() == HOME_LOCATION_ID) {
+      } else if (element.contextTagNum() == LOCATION_DESCRIPTOR_ID) {
         if (element.value(BaseTLVType.class).type() == TLVType.Struct) {
           StructType castingValue = element.value(StructType.class);
-          homeLocation = ChipStructs.EcosystemInformationClusterHomeLocationStruct.decodeTlv(castingValue);
+          locationDescriptor = ChipStructs.EcosystemInformationClusterHomeLocationStruct.decodeTlv(castingValue);
         }
-      } else if (element.contextTagNum() == HOME_LOCATION_LAST_EDIT_ID) {
+      } else if (element.contextTagNum() == LOCATION_DESCRIPTOR_LAST_EDIT_ID) {
         if (element.value(BaseTLVType.class).type() == TLVType.UInt) {
           UIntType castingValue = element.value(UIntType.class);
-          homeLocationLastEdit = castingValue.value(Long.class);
+          locationDescriptorLastEdit = castingValue.value(Long.class);
         }
       } else if (element.contextTagNum() == FABRIC_INDEX_ID) {
         if (element.value(BaseTLVType.class).type() == TLVType.UInt) {
@@ -12333,8 +12333,8 @@ public static class EcosystemInformationClusterEcosystemLocationStruct {
     }
     return new EcosystemInformationClusterEcosystemLocationStruct(
       uniqueLocationID,
-      homeLocation,
-      homeLocationLastEdit,
+      locationDescriptor,
+      locationDescriptorLastEdit,
       fabricIndex
     );
   }
@@ -12346,11 +12346,11 @@ public static class EcosystemInformationClusterEcosystemLocationStruct {
     output.append("\tuniqueLocationID: ");
     output.append(uniqueLocationID);
     output.append("\n");
-    output.append("\thomeLocation: ");
-    output.append(homeLocation);
+    output.append("\tlocationDescriptor: ");
+    output.append(locationDescriptor);
     output.append("\n");
-    output.append("\thomeLocationLastEdit: ");
-    output.append(homeLocationLastEdit);
+    output.append("\tlocationDescriptorLastEdit: ");
+    output.append(locationDescriptorLastEdit);
     output.append("\n");
     output.append("\tfabricIndex: ");
     output.append(fabricIndex);
