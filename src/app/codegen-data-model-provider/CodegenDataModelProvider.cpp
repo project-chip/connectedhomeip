@@ -31,8 +31,7 @@ namespace app {
 namespace {
 
 /// Load the cluster information into the specified destination
-std::variant<CHIP_ERROR, DataModel::ClusterInfo> LoadClusterInfo(const ConcreteClusterPath & path,
-                                                                        const EmberAfCluster & cluster)
+std::variant<CHIP_ERROR, DataModel::ClusterInfo> LoadClusterInfo(const ConcreteClusterPath & path, const EmberAfCluster & cluster)
 {
     DataVersion * versionPtr = emberAfDataVersionStorage(path);
     if (versionPtr == nullptr)
@@ -74,8 +73,8 @@ std::variant<CHIP_ERROR, DataModel::ClusterEntry> ClusterEntryFrom(EndpointId en
 /// Finds the first server cluster entry for the given endpoint data starting at [start_index]
 ///
 /// Returns an invalid entry if no more server clusters are found
-DataModel::ClusterEntry FirstServerClusterEntry(EndpointId endpointId, const EmberAfEndpointType * endpoint,
-                                                       unsigned start_index, unsigned & found_index)
+DataModel::ClusterEntry FirstServerClusterEntry(EndpointId endpointId, const EmberAfEndpointType * endpoint, unsigned start_index,
+                                                unsigned & found_index)
 {
     for (unsigned cluster_idx = start_index; cluster_idx < endpoint->clusterCount; cluster_idx++)
     {
@@ -136,8 +135,7 @@ void LoadAttributeInfo(const ConcreteAttributePath & path, const EmberAfAttribut
     // info->flags.Set(DataModel::AttributeQualityFlags::kChangesOmitted)
 }
 
-DataModel::AttributeEntry AttributeEntryFrom(const ConcreteClusterPath & clusterPath,
-                                                    const EmberAfAttributeMetadata & attribute)
+DataModel::AttributeEntry AttributeEntryFrom(const ConcreteClusterPath & clusterPath, const EmberAfAttributeMetadata & attribute)
 {
     DataModel::AttributeEntry entry;
 
@@ -153,8 +151,7 @@ DataModel::CommandEntry CommandEntryFrom(const ConcreteClusterPath & clusterPath
     entry.path                 = ConcreteCommandPath(clusterPath.mEndpointId, clusterPath.mClusterId, clusterCommandId);
     entry.info.invokePrivilege = RequiredPrivilege::ForInvokeCommand(entry.path);
 
-    entry.info.flags.Set(DataModel::CommandQualityFlags::kTimed,
-                         CommandNeedsTimedInvoke(clusterPath.mClusterId, clusterCommandId));
+    entry.info.flags.Set(DataModel::CommandQualityFlags::kTimed, CommandNeedsTimedInvoke(clusterPath.mClusterId, clusterCommandId));
 
     entry.info.flags.Set(DataModel::CommandQualityFlags::kFabricScoped,
                          CommandIsFabricScoped(clusterPath.mClusterId, clusterCommandId));

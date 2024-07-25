@@ -318,8 +318,7 @@ CHIP_ERROR CodegenDataModelProvider::WriteAttribute(const DataModel::WriteAttrib
     {
         VerifyOrReturnError(!isReadOnly, CHIP_IM_GLOBAL_STATUS(UnsupportedWrite));
 
-        VerifyOrReturnError(!(*attributeMetadata)->MustUseTimedWrite() ||
-                                request.writeFlags.Has(DataModel::WriteFlags::kTimed),
+        VerifyOrReturnError(!(*attributeMetadata)->MustUseTimedWrite() || request.writeFlags.Has(DataModel::WriteFlags::kTimed),
                             CHIP_IM_GLOBAL_STATUS(NeedsTimedInteraction));
     }
 
