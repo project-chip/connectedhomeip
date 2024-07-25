@@ -559,10 +559,11 @@ class GlobalMapping:
     """
     Maintains global type mapping from an IDL
     """
+
     def __init__(self, idl: Idl):
-       self.bitmap_map = { b.name: b for b in idl.global_bitmaps }
-       self.enum_map = { e.name: e for e in idl.global_enums }
-       self.struct_map = { s.name: s for s in idl.global_structs }
+        self.bitmap_map = {b.name: b for b in idl.global_bitmaps}
+        self.enum_map = {e.name: e for e in idl.global_enums}
+        self.struct_map = {s.name: s for s in idl.global_structs}
 
     def merge_global_types_into_cluster(self, cluster: Cluster) -> Cluster:
         """
@@ -576,7 +577,7 @@ class GlobalMapping:
             changed = False
             for type_name in _referenced_type_names(cluster):
                 if type_name in global_types_added:
-                    continue # already added
+                    continue  # already added
 
                 # check if this is a global type
                 if type_name in self.bitmap_map:

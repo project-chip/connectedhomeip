@@ -725,6 +725,56 @@ server cluster A = 1 { /* Test comment */ }
         ])
         self.assertEqual(actual, expected)
 
+    def test_just_globals(self):
+        actual = parseText("""
+            enum TestEnum : ENUM16 { A = 0x123; B = 0x234; }
+            bitmap TestBitmap : BITMAP32 {
+                kStable = 0x1;
+                internal kInternal = 0x2;
+                provisional kProvisional = 0x4;
+            }
+            struct TestStruct {
+               nullable int16u someStableMember = 0;
+               provisional nullable int16u someProvisionalMember = 1;
+               internal nullable int16u someInternalMember = 2;
+            }
+        """)
+
+        expected = Idl(
+            global_enums=[
+                Enum(name="TestEnum", base_type="ENUM16",
+                     entries=[
+                         ConstantEntry(name="A", code=0x123),
+                         ConstantEntry(name="B", code=0x234),
+                     ],
+                     is_global=True,
+                     )],
+            global_bitmaps=[
+                Bitmap(name="TestBitmap", base_type="BITMAP32",
+                       entries=[
+                           ConstantEntry(name="kStable", code=0x1),
+                           ConstantEntry(
+                               name="kInternal", code=0x2, api_maturity=ApiMaturity.INTERNAL),
+                           ConstantEntry(
+                               name="kProvisional", code=0x4, api_maturity=ApiMaturity.PROVISIONAL),
+                       ],
+                       is_global=True,
+                       )],
+            global_structs=[
+                Struct(name="TestStruct", fields=[
+                            Field(name="someStableMember", code=0, data_type=DataType(
+                                name="int16u"), qualities=FieldQuality.NULLABLE),
+                            Field(name="someProvisionalMember", code=1, data_type=DataType(
+                                name="int16u"), qualities=FieldQuality.NULLABLE, api_maturity=ApiMaturity.PROVISIONAL),
+                            Field(name="someInternalMember", code=2, data_type=DataType(
+                                name="int16u"), qualities=FieldQuality.NULLABLE, api_maturity=ApiMaturity.INTERNAL),
+
+                ],
+                    is_global=True,
+                )],
+        )
+        self.assertEqual(actual, expected)
+
     def test_emits_events(self):
         actual = parseText("""
             endpoint 1 {
