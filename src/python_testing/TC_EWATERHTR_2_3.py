@@ -73,7 +73,7 @@ class TC_EWATERHTR_2_3(MatterBaseTest, EWATERHTRBase):
             TestStep("5a", "TH reads HeatDemand attribute.",
                      "Verify value is 0x00 (no demand on any source)"),
             TestStep("5b", "TH reads BoostState attribute.",
-                     "Verify value is 0 (Active)"),
+                     "Verify value is 1 (Active)"),
             TestStep("5c", "TH reads TankPercentage attribute.",
                      "Verify value is 100%"),
             TestStep("6", "TH sends TestEventTrigger command to General Diagnostics Cluster on Endpoint 0 with EnableKey field set to PIXIT.EWATERHTR.TEST_EVENT_TRIGGER_KEY and EventTrigger field set to PIXIT.EWATERHTR.TEST_EVENT_TRIGGER for Draw off hot water Test Event.",
