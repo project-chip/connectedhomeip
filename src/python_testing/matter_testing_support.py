@@ -320,7 +320,8 @@ class ClusterAttributeChangeAccumulator:
         self._expected_cluster = expected_cluster
         self._subscription = None
         self._attribute_report_counts = {}
-        attrs = [cls for name, cls in inspect.getmembers(expected_cluster.Attributes) if inspect.isclass(cls) and issubclass(cls, ClusterObjects.ClusterAttributeDescriptor)]
+        attrs = [cls for name, cls in inspect.getmembers(expected_cluster.Attributes) if inspect.isclass(
+            cls) and issubclass(cls, ClusterObjects.ClusterAttributeDescriptor)]
         for a in attrs:
             self._attribute_report_counts[a] = 0
 
@@ -341,7 +342,8 @@ class ClusterAttributeChangeAccumulator:
            It checks the report is from the expected_cluster and then posts it into the queue for later processing."""
         if path.ClusterType == self._expected_cluster:
             data = transaction.GetAttribute(path)
-            value = AttributeValue(endpoint_id=path.Path.EndpointId, attribute=path.AttributeType, value=data, timestamp_utc=datetime.now(timezone.utc))
+            value = AttributeValue(endpoint_id=path.Path.EndpointId, attribute=path.AttributeType,
+                                   value=data, timestamp_utc=datetime.now(timezone.utc))
             logging.info(f"Got subscription report for {path.AttributeType}: {data}")
             self._q.put(value)
             self._attribute_report_counts[path.AttributeType] += 1

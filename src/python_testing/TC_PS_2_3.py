@@ -67,6 +67,5 @@ class TC_PS_2_3(MatterBaseTest):
         asserts.assert_less_equal(counts[ps.Attributes.BatTimeRemaining], 4, "Too many reports for BatTimeRemaining")
 
 
-
 if __name__ == "__main__":
     default_matter_test_main()
