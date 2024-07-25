@@ -1701,7 +1701,7 @@ tests:
       attribute: "MinSetpointDeadBand"
       PICS: TSTAT.S.F05 && TSTAT.S.M.MinSetpointDeadBandWritable
       arguments:
-          value: 30
+          value: 128
       response:
           error: CONSTRAINT_ERROR
 
