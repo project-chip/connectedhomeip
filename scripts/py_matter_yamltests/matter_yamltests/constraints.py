@@ -865,7 +865,7 @@ class _ConstraintPython(BaseConstraint):
         except Exception as ex:
             self._raise_error(f'Python constraint {type(ex).__name__}: {ex}')
         if type(valid) is not bool:
-            self._raise_error(f'Python constraint validation did not return a bool')
+            self._raise_error("Python constraint TypeError: must return a bool")
         if not valid:
             self._raise_error(f'The response value "{value}" is not valid')
 
