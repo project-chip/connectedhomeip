@@ -287,7 +287,6 @@ void WaterHeaterManagementDelegate::SetWaterTemperature(uint16_t waterTemperatur
 {
     mHotWaterTemperature = waterTemperature;
 
-    // Do not change mTankPercentage if the kTankPercent feature is not supported
     if (mpWhmInstance != nullptr && mpWhmInstance->HasFeature(Feature::kTankPercent))
     {
         mTankPercentage = 100;
@@ -362,8 +361,24 @@ bool WaterHeaterManagementDelegate::HasWaterTemperatureReachedTarget() const
             (mBoostState == BoostStateEnum::kActive && mBoostTargetPercentage.HasValue()) ? mBoostTargetPercentage.Value() : 100;
     }
 
-    // Return whether the water is at the target temperature
-    return (mTankPercentage >= targetPercentage) && (mHotWaterTemperature >= targetTemperature);
+
+    // Determine whether the water is at the target temperature
+    bool tempReached = true;
+    if (mpWhmInstance != nullptr && mpWhmInstance->HasFeature(Feature::kTankPercent))
+    {
+        if (mTankPercentage < targetPercentage)
+        {
+            tempReached = false;
+        }
+    }
+
+    if (mHotWaterTemperature < targetTemperature)
+    {
+        tempReached = false;
+    }
+
+
+    return tempReached;
 }
 
 Status WaterHeaterManagementDelegate::CheckIfHeatNeedsToBeTurnedOnOrOff()
