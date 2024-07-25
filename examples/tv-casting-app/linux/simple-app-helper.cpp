@@ -41,6 +41,7 @@ bool gCommissionerGeneratedPasscodeFlowRunning = false;
 
 DiscoveryDelegateImpl * DiscoveryDelegateImpl::_discoveryDelegateImpl = nullptr;
 bool gAwaitingCommissionerPasscodeInput                               = false;
+LinuxCommissionableDataProvider gSimpleAppCommissionableDataProvider;
 std::shared_ptr<matter::casting::core::CastingPlayer> targetCastingPlayer;
 
 DiscoveryDelegateImpl * DiscoveryDelegateImpl::GetInstance()
@@ -470,9 +471,8 @@ CHIP_ERROR CommandHandler(int argc, char ** argv)
             // Commissioner-generated passcode, and then update the CastigApp's AppParameters to update the commissioning session's
             // passcode.
             LinuxDeviceOptions::GetInstance().payload.setUpPINCode = userEnteredPasscode;
-            LinuxCommissionableDataProvider gCommissionableDataProvider;
-            CHIP_ERROR err = CHIP_NO_ERROR;
-            err            = InitCommissionableDataProvider(gCommissionableDataProvider, LinuxDeviceOptions::GetInstance());
+            CHIP_ERROR err                                         = CHIP_NO_ERROR;
+            err = InitCommissionableDataProvider(gSimpleAppCommissionableDataProvider, LinuxDeviceOptions::GetInstance());
             if (err != CHIP_NO_ERROR)
             {
                 ChipLogError(AppServer,
@@ -482,7 +482,8 @@ CHIP_ERROR CommandHandler(int argc, char ** argv)
             }
             // Update the CommissionableDataProvider stored in this CastingApp's AppParameters and the CommissionableDataProvider to
             // be used for the commissioning session.
-            err = matter::casting::core::CastingApp::GetInstance()->UpdateCommissionableDataProvider(&gCommissionableDataProvider);
+            err = matter::casting::core::CastingApp::GetInstance()->UpdateCommissionableDataProvider(
+                &gSimpleAppCommissionableDataProvider);
             if (err != CHIP_NO_ERROR)
             {
                 ChipLogError(AppServer,

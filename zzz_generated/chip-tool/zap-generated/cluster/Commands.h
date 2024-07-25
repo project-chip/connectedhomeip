@@ -4223,6 +4223,7 @@ private:
 | * UserActiveModeTriggerHint                                         | 0x0006 |
 | * UserActiveModeTriggerInstruction                                  | 0x0007 |
 | * OperatingMode                                                     | 0x0008 |
+| * MaximumCheckInBackOff                                             | 0x0009 |
 | * GeneratedCommandList                                              | 0xFFF8 |
 | * AcceptedCommandList                                               | 0xFFF9 |
 | * EventList                                                         | 0xFFFA |
@@ -9394,7 +9395,6 @@ private:
 | * StartPresetsSchedulesEditRequest                                  |   0x07 |
 | * CancelPresetsSchedulesEditRequest                                 |   0x08 |
 | * CommitPresetsSchedulesRequest                                     |   0x09 |
-| * CancelSetActivePresetRequest                                      |   0x0A |
 | * SetTemperatureSetpointHoldPolicy                                  |   0x0B |
 |------------------------------------------------------------------------------|
 | Attributes:                                                         |        |
@@ -9460,7 +9460,6 @@ private:
 | * PresetsSchedulesEditable                                          | 0x0052 |
 | * TemperatureSetpointHoldPolicy                                     | 0x0053 |
 | * SetpointHoldExpiryTimestamp                                       | 0x0054 |
-| * QueuedPreset                                                      | 0x0055 |
 | * GeneratedCommandList                                              | 0xFFF8 |
 | * AcceptedCommandList                                               | 0xFFF9 |
 | * EventList                                                         | 0xFFFA |
@@ -9678,7 +9677,6 @@ public:
         ClusterCommand("set-active-preset-request", credsIssuerConfig)
     {
         AddArgument("PresetHandle", &mRequest.presetHandle);
-        AddArgument("DelayMinutes", 0, UINT16_MAX, &mRequest.delayMinutes);
         ClusterCommand::AddArguments();
     }
 
@@ -9817,43 +9815,6 @@ public:
 
 private:
     chip::app::Clusters::Thermostat::Commands::CommitPresetsSchedulesRequest::Type mRequest;
-};
-
-/*
- * Command CancelSetActivePresetRequest
- */
-class ThermostatCancelSetActivePresetRequest : public ClusterCommand
-{
-public:
-    ThermostatCancelSetActivePresetRequest(CredentialIssuerCommands * credsIssuerConfig) :
-        ClusterCommand("cancel-set-active-preset-request", credsIssuerConfig)
-    {
-        ClusterCommand::AddArguments();
-    }
-
-    CHIP_ERROR SendCommand(chip::DeviceProxy * device, std::vector<chip::EndpointId> endpointIds) override
-    {
-        constexpr chip::ClusterId clusterId = chip::app::Clusters::Thermostat::Id;
-        constexpr chip::CommandId commandId = chip::app::Clusters::Thermostat::Commands::CancelSetActivePresetRequest::Id;
-
-        ChipLogProgress(chipTool, "Sending cluster (0x%08" PRIX32 ") command (0x%08" PRIX32 ") on endpoint %u", clusterId,
-                        commandId, endpointIds.at(0));
-        return ClusterCommand::SendCommand(device, endpointIds.at(0), clusterId, commandId, mRequest);
-    }
-
-    CHIP_ERROR SendGroupCommand(chip::GroupId groupId, chip::FabricIndex fabricIndex) override
-    {
-        constexpr chip::ClusterId clusterId = chip::app::Clusters::Thermostat::Id;
-        constexpr chip::CommandId commandId = chip::app::Clusters::Thermostat::Commands::CancelSetActivePresetRequest::Id;
-
-        ChipLogProgress(chipTool, "Sending cluster (0x%08" PRIX32 ") command (0x%08" PRIX32 ") on Group %u", clusterId, commandId,
-                        groupId);
-
-        return ClusterCommand::SendGroupCommand(groupId, fabricIndex, clusterId, commandId, mRequest);
-    }
-
-private:
-    chip::app::Clusters::Thermostat::Commands::CancelSetActivePresetRequest::Type mRequest;
 };
 
 /*
@@ -18925,15 +18886,16 @@ void registerClusterIcdManagement(Commands & commands, CredentialIssuerCommands 
         make_unique<ReadAttribute>(Id, "user-active-mode-trigger-hint", Attributes::UserActiveModeTriggerHint::Id,
                                    credsIssuerConfig), //
         make_unique<ReadAttribute>(Id, "user-active-mode-trigger-instruction", Attributes::UserActiveModeTriggerInstruction::Id,
-                                   credsIssuerConfig),                                                                     //
-        make_unique<ReadAttribute>(Id, "operating-mode", Attributes::OperatingMode::Id, credsIssuerConfig),                //
-        make_unique<ReadAttribute>(Id, "generated-command-list", Attributes::GeneratedCommandList::Id, credsIssuerConfig), //
-        make_unique<ReadAttribute>(Id, "accepted-command-list", Attributes::AcceptedCommandList::Id, credsIssuerConfig),   //
-        make_unique<ReadAttribute>(Id, "event-list", Attributes::EventList::Id, credsIssuerConfig),                        //
-        make_unique<ReadAttribute>(Id, "attribute-list", Attributes::AttributeList::Id, credsIssuerConfig),                //
-        make_unique<ReadAttribute>(Id, "feature-map", Attributes::FeatureMap::Id, credsIssuerConfig),                      //
-        make_unique<ReadAttribute>(Id, "cluster-revision", Attributes::ClusterRevision::Id, credsIssuerConfig),            //
-        make_unique<WriteAttribute<>>(Id, credsIssuerConfig),                                                              //
+                                   credsIssuerConfig),                                                                         //
+        make_unique<ReadAttribute>(Id, "operating-mode", Attributes::OperatingMode::Id, credsIssuerConfig),                    //
+        make_unique<ReadAttribute>(Id, "maximum-check-in-back-off", Attributes::MaximumCheckInBackOff::Id, credsIssuerConfig), //
+        make_unique<ReadAttribute>(Id, "generated-command-list", Attributes::GeneratedCommandList::Id, credsIssuerConfig),     //
+        make_unique<ReadAttribute>(Id, "accepted-command-list", Attributes::AcceptedCommandList::Id, credsIssuerConfig),       //
+        make_unique<ReadAttribute>(Id, "event-list", Attributes::EventList::Id, credsIssuerConfig),                            //
+        make_unique<ReadAttribute>(Id, "attribute-list", Attributes::AttributeList::Id, credsIssuerConfig),                    //
+        make_unique<ReadAttribute>(Id, "feature-map", Attributes::FeatureMap::Id, credsIssuerConfig),                          //
+        make_unique<ReadAttribute>(Id, "cluster-revision", Attributes::ClusterRevision::Id, credsIssuerConfig),                //
+        make_unique<WriteAttribute<>>(Id, credsIssuerConfig),                                                                  //
         make_unique<WriteAttribute<uint32_t>>(Id, "idle-mode-duration", 0, UINT32_MAX, Attributes::IdleModeDuration::Id,
                                               WriteCommandType::kForceWrite, credsIssuerConfig), //
         make_unique<WriteAttribute<uint32_t>>(Id, "active-mode-duration", 0, UINT32_MAX, Attributes::ActiveModeDuration::Id,
@@ -18956,6 +18918,8 @@ void registerClusterIcdManagement(Commands & commands, CredentialIssuerCommands 
                                                     credsIssuerConfig), //
         make_unique<WriteAttribute<chip::app::Clusters::IcdManagement::OperatingModeEnum>>(
             Id, "operating-mode", 0, UINT8_MAX, Attributes::OperatingMode::Id, WriteCommandType::kForceWrite, credsIssuerConfig), //
+        make_unique<WriteAttribute<uint32_t>>(Id, "maximum-check-in-back-off", 0, UINT32_MAX, Attributes::MaximumCheckInBackOff::Id,
+                                              WriteCommandType::kForceWrite, credsIssuerConfig), //
         make_unique<WriteAttributeAsComplex<chip::app::DataModel::List<const chip::CommandId>>>(
             Id, "generated-command-list", Attributes::GeneratedCommandList::Id, WriteCommandType::kForceWrite,
             credsIssuerConfig), //
@@ -18980,8 +18944,10 @@ void registerClusterIcdManagement(Commands & commands, CredentialIssuerCommands 
         make_unique<SubscribeAttribute>(Id, "user-active-mode-trigger-hint", Attributes::UserActiveModeTriggerHint::Id,
                                         credsIssuerConfig), //
         make_unique<SubscribeAttribute>(Id, "user-active-mode-trigger-instruction",
-                                        Attributes::UserActiveModeTriggerInstruction::Id, credsIssuerConfig),                   //
-        make_unique<SubscribeAttribute>(Id, "operating-mode", Attributes::OperatingMode::Id, credsIssuerConfig),                //
+                                        Attributes::UserActiveModeTriggerInstruction::Id, credsIssuerConfig),    //
+        make_unique<SubscribeAttribute>(Id, "operating-mode", Attributes::OperatingMode::Id, credsIssuerConfig), //
+        make_unique<SubscribeAttribute>(Id, "maximum-check-in-back-off", Attributes::MaximumCheckInBackOff::Id,
+                                        credsIssuerConfig),                                                                     //
         make_unique<SubscribeAttribute>(Id, "generated-command-list", Attributes::GeneratedCommandList::Id, credsIssuerConfig), //
         make_unique<SubscribeAttribute>(Id, "accepted-command-list", Attributes::AcceptedCommandList::Id, credsIssuerConfig),   //
         make_unique<SubscribeAttribute>(Id, "event-list", Attributes::EventList::Id, credsIssuerConfig),                        //
@@ -22963,7 +22929,6 @@ void registerClusterThermostat(Commands & commands, CredentialIssuerCommands * c
         make_unique<ThermostatStartPresetsSchedulesEditRequest>(credsIssuerConfig),  //
         make_unique<ThermostatCancelPresetsSchedulesEditRequest>(credsIssuerConfig), //
         make_unique<ThermostatCommitPresetsSchedulesRequest>(credsIssuerConfig),     //
-        make_unique<ThermostatCancelSetActivePresetRequest>(credsIssuerConfig),      //
         make_unique<ThermostatSetTemperatureSetpointHoldPolicy>(credsIssuerConfig),  //
         //
         // Attributes
@@ -23050,7 +23015,6 @@ void registerClusterThermostat(Commands & commands, CredentialIssuerCommands * c
                                    credsIssuerConfig), //
         make_unique<ReadAttribute>(Id, "setpoint-hold-expiry-timestamp", Attributes::SetpointHoldExpiryTimestamp::Id,
                                    credsIssuerConfig),                                                                     //
-        make_unique<ReadAttribute>(Id, "queued-preset", Attributes::QueuedPreset::Id, credsIssuerConfig),                  //
         make_unique<ReadAttribute>(Id, "generated-command-list", Attributes::GeneratedCommandList::Id, credsIssuerConfig), //
         make_unique<ReadAttribute>(Id, "accepted-command-list", Attributes::AcceptedCommandList::Id, credsIssuerConfig),   //
         make_unique<ReadAttribute>(Id, "event-list", Attributes::EventList::Id, credsIssuerConfig),                        //
@@ -23223,9 +23187,6 @@ void registerClusterThermostat(Commands & commands, CredentialIssuerCommands * c
         make_unique<WriteAttribute<chip::app::DataModel::Nullable<uint32_t>>>(Id, "setpoint-hold-expiry-timestamp", 0, UINT32_MAX,
                                                                               Attributes::SetpointHoldExpiryTimestamp::Id,
                                                                               WriteCommandType::kForceWrite, credsIssuerConfig), //
-        make_unique<WriteAttributeAsComplex<
-            chip::app::DataModel::Nullable<chip::app::Clusters::Thermostat::Structs::QueuedPresetStruct::Type>>>(
-            Id, "queued-preset", Attributes::QueuedPreset::Id, WriteCommandType::kForceWrite, credsIssuerConfig), //
         make_unique<WriteAttributeAsComplex<chip::app::DataModel::List<const chip::CommandId>>>(
             Id, "generated-command-list", Attributes::GeneratedCommandList::Id, WriteCommandType::kForceWrite,
             credsIssuerConfig), //
@@ -23325,7 +23286,6 @@ void registerClusterThermostat(Commands & commands, CredentialIssuerCommands * c
                                         credsIssuerConfig), //
         make_unique<SubscribeAttribute>(Id, "setpoint-hold-expiry-timestamp", Attributes::SetpointHoldExpiryTimestamp::Id,
                                         credsIssuerConfig),                                                                     //
-        make_unique<SubscribeAttribute>(Id, "queued-preset", Attributes::QueuedPreset::Id, credsIssuerConfig),                  //
         make_unique<SubscribeAttribute>(Id, "generated-command-list", Attributes::GeneratedCommandList::Id, credsIssuerConfig), //
         make_unique<SubscribeAttribute>(Id, "accepted-command-list", Attributes::AcceptedCommandList::Id, credsIssuerConfig),   //
         make_unique<SubscribeAttribute>(Id, "event-list", Attributes::EventList::Id, credsIssuerConfig),                        //
