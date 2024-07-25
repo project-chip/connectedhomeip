@@ -81,7 +81,7 @@ class TC_EWATERHTR_2_3(MatterBaseTest, EWATERHTRBase):
             TestStep("6a", "TH reads HeatDemand attribute.",
                      "Verify value is greater than 0x00 (demand on at least one source) and (HeaterDemand & (!HeaterTypes)) is zero (demand is only from declared supported types)"),
             TestStep("6b", "TH reads BoostState attribute.",
-                     "Verify value is 0 (Active)"),
+                     "Verify value is 1 (Active)"),
             TestStep("6c", "TH reads TankPercentage attribute.",
                      "Verify value is 75%"),
             TestStep("7", "TH sends CancelBoost.",
