@@ -15,17 +15,24 @@
 #    limitations under the License.
 #
 
+import asyncio
+import ctypes
+from ctypes import c_void_p
+from dataclasses import dataclass
+
+from . import Bdx
+
 @dataclass
 class InitMessage:
     TransferControlFlags: int
     MaxBlockSize: int
     StartOffset: int
     Length: int
-    FileDesignator
-    Metadata
+    FileDesignator: bytes
+    Metadata: bytes
 
 class BdxTransfer:
-    __init__(self, bdx_transfer: c_void_p, init_message: InitMessage, data = None):
+    def __init__(self, bdx_transfer: c_void_p, init_message: InitMessage, data = None):
         self.init_message = init_message
         self._bdx_transfer = bdx_transfer
         self._data = data

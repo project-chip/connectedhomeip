@@ -15,8 +15,18 @@
 #    limitations under the License.
 #
 
+import builtins
 import ctypes
-from ctypes import CFUNCTYPE, POINTER, c_bool, c_char_p, c_size_t, c_uint8, c_uint16, c_uint32, c_void_p, cast, py_object
+from asyncio.futures import Future
+from ctypes import CFUNCTYPE, POINTER, c_char_p, c_size_t, c_uint8, c_uint16, c_uint64, c_void_p, py_object
+
+import chip
+from chip.native import PyChipError
+
+from . import BdxTransfer
+
+
+c_uint8_p = POINTER(c_uint8)
 
 
 _OnTransferObtainedCallbackFunct = CFUNCTYPE(
@@ -35,7 +45,7 @@ def _OnTransferObtainedCallback(future: Future, result: PyChipError, bdxTransfer
         fileDesignatorData = ctypes.string_at(fileDesignator, fileDesignatorLength)
         metadataData = ctypes.string_at(metadata, metadataLength)
 
-        initMessage = InitMessage()
+        initMessage = BdxTransfer.InitMessage()
         initMessage.TransferControlFlags = transferControlFlags
         initMessage.MaxBlockSize = maxBlockSize
         initMessage.StartOffset = startOffset
@@ -67,7 +77,7 @@ class AsyncTransferObtainedTransaction:
         self._future = future
         self._data = data
 
-    def handleTransfer(self, bdxTransfer, initMessage: InitMessage):
+    def handleTransfer(self, bdxTransfer, initMessage: BdxTransfer.InitMessage):
         transfer = BdxTransfer(bdx_transfer=bdxTransfer, init_message=initMessage, data=self._data)
         self._future.set_result(transfer)
 
