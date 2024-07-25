@@ -174,6 +174,15 @@ bool emberAfCommissionerControlClusterRequestCommissioningApprovalCallback(
     ChipLogProgress(Zcl, "Received command to request commissioning approval");
 
     auto sourceNodeId = getNodeId(commandObj);
+
+    // Check if the command is executed via a CASE session
+    if (sourceNodeId == kUndefinedNodeId)
+    {
+        ChipLogError(Zcl, "Command not executed via CASE session, failing with UNSUPPORTED_ACCESS");
+        commandObj->AddStatus(commandPath, Status::UnsupportedAccess);
+        return true;
+    }
+
     auto fabricIndex  = commandObj->GetAccessingFabricIndex();
     auto requestId    = commandData.requestId;
     auto vendorId     = commandData.vendorId;
@@ -194,7 +203,6 @@ bool emberAfCommissionerControlClusterRequestCommissioningApprovalCallback(
     Clusters::CommissionerControl::Delegate * delegate =
         Clusters::CommissionerControl::CommissionerControlServer::Instance().GetDelegate();
 
-    VerifyOrExit(sourceNodeId != kUndefinedNodeId, err = CHIP_ERROR_WRONG_NODE_ID);
     VerifyOrExit(delegate != nullptr, err = CHIP_ERROR_INCORRECT_STATE);
 
     // Handle commissioning approval request
@@ -220,6 +228,15 @@ bool emberAfCommissionerControlClusterCommissionNodeCallback(
     ChipLogProgress(Zcl, "Received command to commission node");
 
     auto sourceNodeId = getNodeId(commandObj);
+
+    // Check if the command is executed via a CASE session
+    if (sourceNodeId == kUndefinedNodeId)
+    {
+        ChipLogError(Zcl, "Command not executed via CASE session, failing with UNSUPPORTED_ACCESS");
+        commandObj->AddStatus(commandPath, Status::UnsupportedAccess);
+        return true;
+    }
+
     auto requestId    = commandData.requestId;
 
     auto commissionNodeInfo = std::make_unique<Clusters::CommissionerControl::CommissionNodeInfo>();
@@ -227,7 +244,6 @@ bool emberAfCommissionerControlClusterCommissionNodeCallback(
     Clusters::CommissionerControl::Delegate * delegate =
         Clusters::CommissionerControl::CommissionerControlServer::Instance().GetDelegate();
 
-    VerifyOrExit(sourceNodeId != kUndefinedNodeId, err = CHIP_ERROR_WRONG_NODE_ID);
     VerifyOrExit(delegate != nullptr, err = CHIP_ERROR_INCORRECT_STATE);
 
     // Set IP address and port in the CommissionNodeInfo struct
