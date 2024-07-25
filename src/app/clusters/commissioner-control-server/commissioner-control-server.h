@@ -46,8 +46,8 @@ struct CommissioningWindowParams
     ByteSpan salt;
 };
 
-struct CommissionNodeInfo
-{
+class ProtectedIPAddress {
+public:
     const Optional<ByteSpan> GetIPAddress()
     {
         return ipAddress;
@@ -73,12 +73,16 @@ struct CommissionNodeInfo
         return CHIP_NO_ERROR;
     }
 
-    CommissioningWindowParams params;
-    Optional<uint16_t> port;
-
-protected:
+private:
     Optional<ByteSpan> ipAddress;
     uint8_t ipAddressBuffer[kIpAddressBufferSize];
+};
+
+struct CommissionNodeInfo
+{
+    CommissioningWindowParams params;
+    ProtectedIPAddress ipAddress;
+    Optional<uint16_t> port;
 };
 
 class Delegate

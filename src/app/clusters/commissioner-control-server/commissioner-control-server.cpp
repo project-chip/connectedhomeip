@@ -71,7 +71,7 @@ void RunDeferredCommissionNode(intptr_t commandArg)
 
     if (delegate != nullptr)
     {
-        CHIP_ERROR err = delegate->ReverseCommissionNode(info->params, info->GetIPAddress(), info->port);
+        CHIP_ERROR err = delegate->ReverseCommissionNode(info->params, info->ipAddress.GetIPAddress(), info->port);
         if (err != CHIP_NO_ERROR)
         {
             ChipLogError(Zcl, "ReverseCommissionNode error: %" CHIP_ERROR_FORMAT, err.Format());
@@ -138,7 +138,7 @@ CommissionerControlServer::GenerateCommissioningRequestResultEvent(const Events:
     CHIP_ERROR error = LogEvent(result, kRootEndpointId, eventNumber);
     if (CHIP_NO_ERROR != error)
     {
-        ChipLogError(Zcl, "CommissionerControl: Unable to emit CommissioningRequestResult event: %s", error.AsString());
+        ChipLogError(Zcl, "CommissionerControl: Unable to emit CommissioningRequestResult event: %" CHIP_ERROR_FORMAT, error.Format());
     }
 
     return error;
@@ -233,7 +233,7 @@ bool emberAfCommissionerControlClusterCommissionNodeCallback(
 
     // Set IP address and port in the CommissionNodeInfo struct
     commissionNodeInfo->port = commandData.port;
-    err                      = commissionNodeInfo->SetIPAddress(commandData.ipAddress);
+    err                      = commissionNodeInfo->ipAddress.SetIPAddress(commandData.ipAddress);
     SuccessOrExit(err == CHIP_NO_ERROR);
 
     // Validate the commission node command.
