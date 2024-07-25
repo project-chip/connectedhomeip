@@ -3,7 +3,8 @@
 import dataclasses
 import functools
 import logging
-from typing import Dict, Optional
+from collections.abc import Iterator
+from typing import Dict, Optional, Set
 
 from lark import Lark
 from lark.lexer import Token
@@ -535,9 +536,78 @@ class MatterIdlTransformer(Transformer):
             self.doc_comments.append(PrefixCppDocComment(token))
 
 
+def _referenced_type_names(cluster: Cluster) -> Set[str]:
+    """
+    Return the names of all data types referenced by the given cluster.
+    """
+    types = set()
+    for s in cluster.structs:
+        for f in s.fields:
+            types.add(f.data_type.name)
+
+    for e in cluster.events:
+        for f in e.fields:
+            types.add(f.data_type.name)
+
+    for a in cluster.attributes:
+        types.add(a.definition.name)
+
+    return types
+
+
+class GlobalMapping:
+    """
+    Maintains global type mapping from an IDL
+    """
+    def __init__(self, idl: Idl):
+       self.bitmap_map = { b.name: b for b in idl.global_bitmaps }
+       self.enum_map = { e.name: e for e in idl.global_enums }
+       self.struct_map = { s.name: s for s in idl.global_structs }
+
+    def merge_global_types_into_cluster(self, cluster: Cluster) -> Cluster:
+        """
+        Merges all referenced global types (bitmaps/enums/structs) into the cluster types.
+        This happens recursively.
+        """
+        global_types_added = set()
+
+        changed = True
+        while changed:
+            changed = False
+            for type_name in _referenced_type_names(cluster):
+                if type_name in global_types_added:
+                    continue # already added
+
+                # check if this is a global type
+                if type_name in self.bitmap_map:
+                    global_types_added.add(type_name)
+                    changed = True
+                    cluster.bitmaps.append(bitmap_map[type_name])
+                elif type_name in self.enum_map:
+                    global_types_added.add(type_name)
+                    changed = True
+                    cluster.enums.append(enum_map[type_name])
+                elif type_name in self.struct_map:
+                    global_types_added.add(type_name)
+                    changed = True
+                    cluster.structs.append(struct_map[type_name])
+
+        return cluster
+
+
+def _merge_global_types_into_clusters(idl: Idl) -> Idl:
+    """
+    Adds bitmaps/enums/structs from idl.global_* into clusters as long as
+    clusters reference those type names
+    """
+    mapping = GlobalMapping(idl)
+    return dataclasses.replace(idl, clusters=[mapping.merge_global_types_into_cluster(cluster) for cluster in idl.clusters])
+
+
 class ParserWithLines:
-    def __init__(self, skip_meta: bool):
+    def __init__(self, skip_meta: bool, merge_globals: bool):
         self.transformer = MatterIdlTransformer(skip_meta)
+        self.merge_globals = merge_globals
 
         # NOTE: LALR parser is fast. While Earley could parse more ambigous grammars,
         #       earley is much slower:
@@ -583,14 +653,28 @@ class ParserWithLines:
         for comment in self.transformer.doc_comments:
             comment.appply_to_idl(idl, file)
 
+        if self.merge_globals:
+            idl = _merge_global_types_into_clusters(idl)
+
         return idl
 
 
-def CreateParser(skip_meta: bool = False):
+def CreateParser(skip_meta: bool = False, merge_globals=True):
     """
     Generates a parser that will process a ".matter" file into a IDL
+
+    Arguments:
+       skip_meta - do not add metadata (line position) for items. Metadata is
+                   useful for error reporting, however it does not work well
+                   for unit test comparisons
+
+       merge_globals - places global items (enums/bitmaps/structs) into any
+                       clusters that reference them, so that cluster types
+                       are self-sufficient. Useful as a backwards-compatible
+                       code generation if global definitions are not supported.
+
     """
-    return ParserWithLines(skip_meta)
+    return ParserWithLines(skip_meta, merge_globals)
 
 
 if __name__ == '__main__':
