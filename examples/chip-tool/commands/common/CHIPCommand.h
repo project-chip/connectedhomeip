@@ -87,7 +87,9 @@ public:
                     "Only allow trusted CD verifying keys (disallow test keys). If not provided or 0 (\"false\"), untrusted CD "
                     "verifying keys are allowed. If 1 (\"true\"), test keys are disallowed.");
         AddArgument("dac-revocation-set-path", &mDacRevocationSetPath,
-                    "Path to json file containing the device attestation revocation set.");
+                    "Path to JSON file containing the device attestation revocation set. "
+                    "This argument caches the path to the revocation set. Once set, this will be used by all commands in "
+                    "interactive mode.");
 #if CHIP_CONFIG_TRANSPORT_TRACE_ENABLED
         AddArgument("trace_file", &mTraceFile);
         AddArgument("trace_log", 0, 1, &mTraceLog);
