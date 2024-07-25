@@ -1486,12 +1486,6 @@ NS_ASSUME_NONNULL_BEGIN
 
 @end
 
-@interface MTRThermostatClusterCancelSetActivePresetRequestParams (InternalMethods)
-
-- (NSDictionary<NSString *, id> * _Nullable)_encodeAsDataValue:(NSError * __autoreleasing *)error;
-
-@end
-
 @interface MTRThermostatClusterSetTemperatureSetpointHoldPolicyParams (InternalMethods)
 
 - (NSDictionary<NSString *, id> * _Nullable)_encodeAsDataValue:(NSError * __autoreleasing *)error;

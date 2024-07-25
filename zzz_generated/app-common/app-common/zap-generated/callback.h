@@ -6300,12 +6300,6 @@ bool emberAfThermostatClusterCommitPresetsSchedulesRequestCallback(
     chip::app::CommandHandler * commandObj, const chip::app::ConcreteCommandPath & commandPath,
     const chip::app::Clusters::Thermostat::Commands::CommitPresetsSchedulesRequest::DecodableType & commandData);
 /**
- * @brief Thermostat Cluster CancelSetActivePresetRequest Command callback (from client)
- */
-bool emberAfThermostatClusterCancelSetActivePresetRequestCallback(
-    chip::app::CommandHandler * commandObj, const chip::app::ConcreteCommandPath & commandPath,
-    const chip::app::Clusters::Thermostat::Commands::CancelSetActivePresetRequest::DecodableType & commandData);
-/**
  * @brief Thermostat Cluster SetTemperatureSetpointHoldPolicy Command callback (from client)
  */
 bool emberAfThermostatClusterSetTemperatureSetpointHoldPolicyCallback(
