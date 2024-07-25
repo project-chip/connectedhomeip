@@ -598,7 +598,7 @@ void CommissionerDiscoveryController::Cancel()
 
     auto state = client->GetUDCClientProcessingState();
 
-    bool isCancelableState = (state == UDCClientProcessingState::kPromptingUser || 
+    bool isCancelableState = (state == UDCClientProcessingState::kPromptingUser ||
                           state == UDCClientProcessingState::kObtainingOnboardingPayload ||
                           state == UDCClientProcessingState::kWaitingForCommissionerPasscodeReady);
 
@@ -610,7 +610,7 @@ void CommissionerDiscoveryController::Cancel()
 
     client->SetUDCClientProcessingState(UDCClientProcessingState::kUserDeclined);
 
-    if (state == UDCClientProcessingState::kObtainingOnboardingPayload || 
+    if (state == UDCClientProcessingState::kObtainingOnboardingPayload ||
         state == UDCClientProcessingState::kWaitingForCommissionerPasscodeReady)
     {
         ChipLogDetail(AppServer, "UX Cancel: user cancelled entering PIN code, sending CDC");
