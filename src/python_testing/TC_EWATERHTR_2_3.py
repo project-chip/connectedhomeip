@@ -41,7 +41,6 @@ class TC_EWATERHTR_2_3(MatterBaseTest, EWATERHTRBase):
     def desc_TC_EWATERHTR_2_3(self) -> str:
         """Returns a description of this test"""
         return "[TC-EWATERHTR-2.3] This test case verifies the functionality of the Water Heater Management cluster server with the TankPercentage feature."```
-            "This test case verifies the functionality of the Water Heater Management cluster server with the TankPercentage feature."
 
     def pics_TC_EWATERHTR_2_3(self):
         """ This function returns a list of PICS for this test case that must be True for the test to be run"""
