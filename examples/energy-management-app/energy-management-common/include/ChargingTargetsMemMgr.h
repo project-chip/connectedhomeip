@@ -113,6 +113,9 @@ public:
     /**
      * @brief Called to allocate and copy the chargingTargets into the current day schedule as set
      *        set by PrepareDaySchedule().
+     *        If an attempt is made to add more than kEvseTargetsMaxTargetsPerDay chargingTargets
+     *        for the current day schedule, then the chargingTarget is not added and an error message
+     *        is printed.
      *
      * @param chargingTargets  - The chargingTargets to add into the current day schedule
      */

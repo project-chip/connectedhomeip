@@ -71,6 +71,10 @@ void ChargingTargetsMemMgr::AddChargingTarget(const EnergyEvse::Structs::Chargin
     {
         mDailyChargingTargets[mNumDailyChargingTargets++] = chargingTarget;
     }
+    else
+    {
+        ChipLogError(AppServer, "AddChargingTarget: trying to add too many chargingTargets");
+    }
 }
 
 EnergyEvse::Structs::ChargingTargetStruct::Type * ChargingTargetsMemMgr::GetChargingTargets() const
