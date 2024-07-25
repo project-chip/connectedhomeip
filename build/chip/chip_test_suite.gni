@@ -19,11 +19,14 @@ import("//build_overrides/pigweed.gni")
 import("${chip_root}/build/chip/tests.gni")
 import("${dir_pw_unit_test}/test.gni")
 
-if (chip_device_platform == "efr32") {
-  import("//test_executable_args.gni")
-}
-
 assert(chip_build_tests)
+
+declare_args() {
+  # These may be overridden in args.gni to build platform-specific test binaries.
+  test_executable_output_name = ""
+  test_executable_output_name_suffix = ""
+  test_executable_ldflags = []
+}
 
 # Define CHIP unit tests
 #
@@ -179,7 +182,7 @@ template("chip_test_suite") {
   } else {
 
     # Specified a platform executable type.
-    if (defined(test_executable_output_name) && defined(invoker.test_sources)) {
+    if (test_executable_output_name != "" && defined(invoker.test_sources)) {
       tests = []
 
       foreach(_test, invoker.test_sources) {
@@ -191,7 +194,7 @@ template("chip_test_suite") {
         }
 
         pw_test(_test_name) {
-          # Forward certain varibles from the invoker
+          # Forward certain varibles from the invoker.
           forward_variables_from(invoker,
                                  [
                                    "deps",
@@ -200,16 +203,11 @@ template("chip_test_suite") {
                                    "configs",
                                  ])
 
-          # Set `output_name` if the platform executable needs it.
-          if (!defined(test_executable_output_name_suffix)) {
-            test_executable_output_name_suffix = ""
-          }
+          # Set variables that the platform executable may need.
           output_name = test_executable_output_name + _test_name + test_executable_output_name_suffix
+          ldflags = test_executable_ldflags
 
-          # Set `ldflags` if the platform executable needs it.
-          if (defined(test_executable_ldflags)) { ldflags = test_executable_ldflags }
-
-          # Add the individual test source file (e.g. "TestSomething.cpp")
+          # Add the individual test source file (e.g. "TestSomething.cpp").
           sources = [ _test ]
 
           output_dir = _test_output_dir
