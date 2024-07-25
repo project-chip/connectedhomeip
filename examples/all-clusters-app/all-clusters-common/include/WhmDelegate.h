@@ -19,7 +19,6 @@
 #pragma once
 
 #include <app-common/zap-generated/cluster-objects.h>
-#include <app/clusters/mode-base-server/mode-base-server.h>
 #include <app/clusters/water-heater-management-server/water-heater-management-server.h>
 
 #include <protocols/interaction_model/StatusCode.h>
@@ -34,7 +33,7 @@ using ModeTagStructType = detail::Structs::ModeTagStruct::Type;
 class WhmManufacturer;
 
 // This is an application level delegate to handle operational state commands according to the specific business logic.
-class WaterHeaterManagementDelegate : public WaterHeaterManagement::Delegate, public ModeBase::Delegate
+class WaterHeaterManagementDelegate : public WaterHeaterManagement::Delegate
 {
 public:
     WaterHeaterManagementDelegate(EndpointId clustersEndpoint);
@@ -47,29 +46,33 @@ public:
 
     /*********************************************************************************
      *
-     * Methods implementing the WaterHeaterManagement::Delegate interace
+     * Methods implementing the WaterHeaterManagement::Delegate interface
      *
      *********************************************************************************/
 
     /**
      * @brief Delegate should implement a handler to start boosting the water temperature as required.
-     *        Upon receipt, the Water Heater SHALL transition into the BOOST state, which SHALL cause the water in the tank (or the
-     * TargetPercentage of the water, if included) to be heated towards the set point (or the TemporarySetpoint, if included), which
-     * in turn may cause a call for heat, even if the mode is OFF, or is TIMED and it is during one of the Off periods.
+     *        Upon receipt, the Water Heater SHALL transition into the BOOST state, which SHALL cause the
+     *        water in the tank (or the TargetPercentage of the water, if included) to be heated towards
+     *        the set point (or the TemporarySetpoint, if included), which in turn may cause a call for heat,
+     *        even if the mode is OFF, or is TIMED and it is during one of the Off periods.
      *
-     * @param duration  Indicates the time period in seconds for which the BOOST state is activated before it automatically reverts
-     * to the previous mode (e.g. OFF, MANUAL or TIMED).
-     * @param oneShot  Indicates whether the BOOST state should be automatically canceled once the hot water has first reached the
-     * set point temperature (or the TemporarySetpoint temperature, if specified) for the TargetPercentage (if specified).
-     * @param emergencyBoost  Indicates that the consumer wants the water to be heated as quickly as practicable. This MAY cause
-     * multiple heat sources to be activated (e.g. a heat pump and direct electric heating element).
-     * @param temporarySetpoint  Indicates the target temperature to which to heat the hot water for this Boost command. It SHALL be
-     * used instead of the normal set point temperature whilst the BOOST state is active.
-     * @param targetPercentage  If the tank supports the TankPercent feature, this field indicates the amount of water that SHALL be
-     * heated by this Boost command before the heater is switched off.
-     * @param targetReheat  If the tank supports the TankPercent feature, and the heating by this Boost command has ceased because
-     * the TargetPercentage of the water in the tank has been heated to the set point (or TemporarySetpoint if included), this field
-     * indicates the percentage to which the hot water in the tank SHALL be allowed to fall before again beginning to reheat it.
+     * @param duration  Indicates the time period in seconds for which the BOOST state is activated before it
+     *                  automatically reverts to the previous mode (e.g. OFF, MANUAL or TIMED).
+     * @param oneShot  Indicates whether the BOOST state should be automatically canceled once the hot water has
+     *                 first reached the set point temperature (or the TemporarySetpoint temperature, if specified)
+     *                 for the TargetPercentage (if specified).
+     * @param emergencyBoost  Indicates that the consumer wants the water to be heated as quickly as practicable.
+     *                        This MAY cause multiple heat sources to be activated (e.g. a heat pump and direct
+     *                        electric heating element).
+     * @param temporarySetpoint  Indicates the target temperature to which to heat the hot water for this Boost command.
+     *                           It SHALL be used instead of the normal set point temperature whilst the BOOST state is active.
+     * @param targetPercentage  If the tank supports the TankPercent feature, this field indicates the amount of water
+     *                          that SHALL be heated by this Boost command before the heater is switched off.
+     * @param targetReheat  If the tank supports the TankPercent feature, and the heating by this Boost command has ceased
+     *                      because the TargetPercentage of the water in the tank has been heated to the set point (or
+     *                      TemporarySetpoint if included), this field indicates the percentage to which the hot water in
+     *                      the tank SHALL be allowed to fall before again beginning to reheat it.
      *
      * @return  Success if the boost command is accepted; otherwise the command SHALL be rejected with appropriate error.
      */
@@ -103,57 +106,6 @@ public:
     void SetEstimatedHeatRequired(int64_t estimatedHeatRequired);
     void SetTankPercentage(Percent tankPercentage);
     void SetBoostState(BoostStateEnum boostState);
-
-    /*********************************************************************************
-     *
-     * Methods implementing the ModeBase::Delegate interface
-     *
-     *********************************************************************************/
-
-    CHIP_ERROR Init() override;
-
-    /**
-     * Handle application logic when the mode is changing.
-     *
-     * @param mode The new mode that the device is requested to transition to.
-     * @param response A reference to a response that will be sent to the client. The contents of which con be modified by the
-     * application.
-     */
-    void HandleChangeToMode(uint8_t mode, ModeBase::Commands::ChangeToModeResponse::Type & response) override;
-
-    /**
-     * Get the mode label of the Nth mode in the list of modes.
-     *
-     * @param modeIndex The index of the mode to be returned. It is assumed that modes are indexable from 0 and with no gaps.
-     * @param label A reference to the mutable char span which will be mutated to receive the label on success. Use
-     * CopyCharSpanToMutableCharSpan to copy into the MutableCharSpan.
-     *
-     * @return Returns a CHIP_NO_ERROR if there was no error and the label was returned successfully.
-     * CHIP_ERROR_PROVIDER_LIST_EXHAUSTED if the modeIndex in beyond the list of available labels.
-     */
-    CHIP_ERROR GetModeLabelByIndex(uint8_t modeIndex, MutableCharSpan & label) override;
-
-    /**
-     * Get the mode value of the Nth mode in the list of modes.
-     *
-     * @param modeIndex The index of the mode to be returned. It is assumed that modes are indexable from 0 and with no gaps.
-     * @param value a reference to the uint8_t variable that is to contain the mode value.
-     *
-     * @return Returns a CHIP_NO_ERROR if there was no error and the value was returned successfully.
-     * CHIP_ERROR_PROVIDER_LIST_EXHAUSTED if the modeIndex in beyond the list of available values.
-     */
-    CHIP_ERROR GetModeValueByIndex(uint8_t modeIndex, uint8_t & value) override;
-
-    /**
-     * Get the mode tags of the Nth mode in the list of modes.
-     * @param modeIndex The index of the mode to be returned. It is assumed that modes are indexable from 0 and with no gaps.
-     * @param tags a reference to an existing and initialised buffer that is to contain the mode tags. std::copy can be used
-     * to copy into the buffer.
-     *
-     * @return Returns a CHIP_NO_ERROR if there was no error and the mode tags were returned successfully.
-     * CHIP_ERROR_PROVIDER_LIST_EXHAUSTED if the modeIndex in beyond the list of available mode tags.
-     */
-    CHIP_ERROR GetModeTagsByIndex(uint8_t modeIndex, DataModel::List<ModeTagStructType> & tags) override;
 
     /*********************************************************************************
      *
@@ -293,9 +245,6 @@ private:
      *
      *********************************************************************************/
 
-    // Access to the Water Heater Mode instance
-    ModeBase::Instance mWaterHeaterModeInstance;
-
     // This attribute SHALL indicate the methods to call for heat that the controller supports. If a bit is set then the controller
     // supports the corresponding method.
     BitMask<WaterHeaterTypeBitmap> mHeaterTypes;
@@ -319,28 +268,6 @@ private:
 
     // This attribute SHALL indicate if the BOOST state, as triggered by a Boost command, is currently active.
     BoostStateEnum mBoostState;
-
-    /*********************************************************************************
-     *
-     * Member variables implementing the ModeBase::Delegate interface
-     *
-     *********************************************************************************/
-
-    ModeTagStructType modeTagsOff[1]    = { { .value = to_underlying(WaterHeaterMode::ModeTag::kOff) } };
-    ModeTagStructType modeTagsManual[1] = { { .value = to_underlying(WaterHeaterMode::ModeTag::kManual) } };
-    ModeTagStructType modeTagsTimed[1]  = { { .value = to_underlying(WaterHeaterMode::ModeTag::kTimed) } };
-
-    const detail::Structs::ModeOptionStruct::Type kModeOptions[3] = {
-        detail::Structs::ModeOptionStruct::Type{ .label    = CharSpan::fromCharString("Off"),
-                                                 .mode     = ModeOff,
-                                                 .modeTags = DataModel::List<const ModeTagStructType>(modeTagsOff) },
-        detail::Structs::ModeOptionStruct::Type{ .label    = CharSpan::fromCharString("Manual"),
-                                                 .mode     = ModeManual,
-                                                 .modeTags = DataModel::List<const ModeTagStructType>(modeTagsManual) },
-        detail::Structs::ModeOptionStruct::Type{ .label    = CharSpan::fromCharString("Timed"),
-                                                 .mode     = ModeTimed,
-                                                 .modeTags = DataModel::List<const ModeTagStructType>(modeTagsTimed) }
-    };
 };
 
 } // namespace WaterHeaterManagement

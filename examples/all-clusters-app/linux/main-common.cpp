@@ -37,6 +37,7 @@
 #include "rvc-modes.h"
 #include "rvc-operational-state-delegate-impl.h"
 #include "tcc-mode.h"
+#include "water-heater-mode.h"
 #include <Options.h>
 #include <app-common/zap-generated/attributes/Accessors.h>
 #include <app/CommandHandler.h>
@@ -265,6 +266,7 @@ void ApplicationShutdown()
     Clusters::EnergyEvseMode::Shutdown();
 
     Clusters::WaterHeaterManagement::WhmApplicationShutdown();
+    Clusters::WaterHeaterMode::Shutdown();
 
     if (sChipNamedPipeCommands.Stop() != CHIP_NO_ERROR)
     {

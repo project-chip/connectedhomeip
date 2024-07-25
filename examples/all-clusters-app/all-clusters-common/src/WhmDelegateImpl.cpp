@@ -17,8 +17,10 @@
  */
 #include <app/clusters/water-heater-management-server/water-heater-management-server.h>
 
+
 #include <WhmDelegate.h>
 #include <WhmManufacturer.h>
+#include <water-heater-mode.h>
 
 using namespace chip;
 using namespace chip::app;
@@ -29,11 +31,9 @@ using Protocols::InteractionModel::Status;
 
 WaterHeaterManagementDelegate::WaterHeaterManagementDelegate(EndpointId clustersEndpoint) :
     mpWhmInstance(nullptr), mpWhmManufacturer(nullptr), mBoostTargetTemperatureReached(false),
-    mWaterHeaterModeInstance(this, clustersEndpoint, WaterHeaterMode::Id, 0), mTankVolume(0), mEstimatedHeatRequired(0),
+    mTankVolume(0), mEstimatedHeatRequired(0),
     mTankPercentage(0), mBoostState(BoostStateEnum::kInactive)
 {
-    // Initialise the WaterHeaterMode instance
-    mWaterHeaterModeInstance.Init();
 }
 
 void WaterHeaterManagementDelegate::SetWaterHeaterManagementInstance(WaterHeaterManagement::Instance & instance)
@@ -287,56 +287,6 @@ Status WaterHeaterManagementDelegate::HandleCancelBoost()
  *
  *********************************************************************************/
 
-CHIP_ERROR WaterHeaterManagementDelegate::Init()
-{
-    return CHIP_NO_ERROR;
-}
-
-void WaterHeaterManagementDelegate::HandleChangeToMode(uint8_t NewMode, ModeBase::Commands::ChangeToModeResponse::Type & response)
-{
-    response.status = to_underlying(ModeBase::StatusCode::kSuccess);
-}
-
-CHIP_ERROR WaterHeaterManagementDelegate::GetModeLabelByIndex(uint8_t modeIndex, chip::MutableCharSpan & label)
-{
-    if (modeIndex >= ArraySize(kModeOptions))
-    {
-        return CHIP_ERROR_PROVIDER_LIST_EXHAUSTED;
-    }
-
-    return chip::CopyCharSpanToMutableCharSpan(kModeOptions[modeIndex].label, label);
-}
-
-CHIP_ERROR WaterHeaterManagementDelegate::GetModeValueByIndex(uint8_t modeIndex, uint8_t & value)
-{
-    if (modeIndex >= ArraySize(kModeOptions))
-    {
-        return CHIP_ERROR_PROVIDER_LIST_EXHAUSTED;
-    }
-
-    value = kModeOptions[modeIndex].mode;
-
-    return CHIP_NO_ERROR;
-}
-
-CHIP_ERROR WaterHeaterManagementDelegate::GetModeTagsByIndex(uint8_t modeIndex, DataModel::List<ModeTagStructType> & tags)
-{
-    if (modeIndex >= ArraySize(kModeOptions))
-    {
-        return CHIP_ERROR_PROVIDER_LIST_EXHAUSTED;
-    }
-
-    if (tags.size() < kModeOptions[modeIndex].modeTags.size())
-    {
-        return CHIP_ERROR_INVALID_ARGUMENT;
-    }
-
-    std::copy(kModeOptions[modeIndex].modeTags.begin(), kModeOptions[modeIndex].modeTags.end(), tags.begin());
-    tags.reduce_size(kModeOptions[modeIndex].modeTags.size());
-
-    return CHIP_NO_ERROR;
-}
-
 /*********************************************************************************
  *
  * WaterHeaterManagementDelegate specific methods
@@ -431,9 +381,9 @@ Status WaterHeaterManagementDelegate::CheckIfHeatNeedsToBeTurnedOnOrOff()
 
     if (!HasWaterTemperatureReachedTarget())
     {
-        uint8_t mode = mInstance->GetCurrentMode();
+        uint8_t mode = WaterHeaterMode::Instance()->GetCurrentMode();
 
-        // The water in the tank is not at the target temperature. See if we heating is currently off
+        // The water in the tank is not at the target temperature. See if heating is currently off
         if (mHeatDemand.Raw() == 0)
         {
             // Need to track whether the water temperature has reached the target temperature for the boost
@@ -524,13 +474,13 @@ Status WaterHeaterManagementDelegate::CheckIfHeatNeedsToBeTurnedOnOrOff()
 
 void WaterHeaterManagementDelegate::SetWaterHeaterMode(uint8_t modeValue)
 {
-    if (!mInstance->IsSupportedMode(modeValue))
+    if (!WaterHeaterMode::Instance()->IsSupportedMode(modeValue))
     {
         ChipLogError(AppServer, "SetWaterHeaterMode bad mode");
         return;
     }
 
-    Status status = mInstance->UpdateCurrentMode(modeValue);
+    Status status = WaterHeaterMode::Instance()->UpdateCurrentMode(modeValue);
     if (status != Status::Success)
     {
         ChipLogError(AppServer, "SetWaterHeaterMode updateMode failed");
