@@ -138,7 +138,8 @@ CommissionerControlServer::GenerateCommissioningRequestResultEvent(const Events:
     CHIP_ERROR error = LogEvent(result, kRootEndpointId, eventNumber);
     if (CHIP_NO_ERROR != error)
     {
-        ChipLogError(Zcl, "CommissionerControl: Unable to emit CommissioningRequestResult event: %" CHIP_ERROR_FORMAT, error.Format());
+        ChipLogError(Zcl, "CommissionerControl: Unable to emit CommissioningRequestResult event: %" CHIP_ERROR_FORMAT,
+                     error.Format());
     }
 
     return error;
@@ -196,7 +197,8 @@ bool emberAfCommissionerControlClusterRequestCommissioningApprovalCallback(
 exit:
     if (err != CHIP_NO_ERROR)
     {
-        ChipLogError(Zcl, "emberAfCommissionerControlClusterRequestCommissioningApprovalCallback error: %" CHIP_ERROR_FORMAT, err.Format());
+        ChipLogError(Zcl, "emberAfCommissionerControlClusterRequestCommissioningApprovalCallback error: %" CHIP_ERROR_FORMAT,
+                     err.Format());
         status = StatusIB(err).mStatus;
     }
 

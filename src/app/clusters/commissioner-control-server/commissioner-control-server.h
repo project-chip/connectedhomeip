@@ -46,12 +46,10 @@ struct CommissioningWindowParams
     ByteSpan salt;
 };
 
-class ProtectedIPAddress {
+class ProtectedIPAddress
+{
 public:
-    const Optional<ByteSpan> GetIPAddress()
-    {
-        return ipAddress;
-    }
+    const Optional<ByteSpan> GetIPAddress() { return ipAddress; }
 
     CHIP_ERROR SetIPAddress(const Optional<ByteSpan> & address)
     {
