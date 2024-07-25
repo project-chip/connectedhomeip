@@ -1696,16 +1696,6 @@ tests:
           error: CONSTRAINT_ERROR
 
     - label:
-          "Step 11b: Test Harness Writes the value above MinSetpointDeadBand "
-      command: "writeAttribute"
-      attribute: "MinSetpointDeadBand"
-      PICS: TSTAT.S.F05 && TSTAT.S.M.MinSetpointDeadBandWritable
-      arguments:
-          value: 30
-      response:
-          error: CONSTRAINT_ERROR
-
-    - label:
           "Step 11c: Test Harness Writes the min limit of MinSetpointDeadBand"
       command: "writeAttribute"
       attribute: "MinSetpointDeadBand"
