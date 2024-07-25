@@ -52,7 +52,7 @@ class TC_DEM_2_7(MatterBaseTest, DEMTestBase):
         """Return the PICS definitions associated with this test."""
         pics = [
             # Depends on Feature 06 (ConstraintBasedAdjustment) & Feature 01 (PowerForecastReporting)
-            "DEM.S.F06 & DEM.S.F01"
+            "DEM.S.F06", "DEM.S.F01"
         ]
         return pics
 
