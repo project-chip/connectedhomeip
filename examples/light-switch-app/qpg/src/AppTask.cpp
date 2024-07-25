@@ -247,8 +247,8 @@ CHIP_ERROR AppTask::Init()
     CHIP_ERROR err = CHIP_NO_ERROR;
 
 #if defined(QORVO_QPINCFG_ENABLE)
-    qResult_t res  = Q_OK;
-    res = qPinCfg_Init(NULL);
+    qResult_t res = Q_OK;
+    res           = qPinCfg_Init(NULL);
     if (res != Q_OK)
     {
         ChipLogError(NotSpecified, "qPinCfg_Init failed: %d", res);
