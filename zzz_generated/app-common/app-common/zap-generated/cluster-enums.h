@@ -1480,6 +1480,12 @@ enum class ProductFinishEnum : uint8_t
     // enum value. This specific should never be transmitted.
     kUnknownEnumValue = 6,
 };
+
+// Bitmap for Feature
+enum class Feature : uint32_t
+{
+    kBridgedICDSupport = 0x100000,
+};
 } // namespace BridgedDeviceBasicInformation
 
 namespace Switch {

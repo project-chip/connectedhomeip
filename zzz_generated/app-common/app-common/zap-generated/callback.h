@@ -5827,6 +5827,12 @@ bool emberAfTimeSynchronizationClusterSetDefaultNTPCallback(
     chip::app::CommandHandler * commandObj, const chip::app::ConcreteCommandPath & commandPath,
     const chip::app::Clusters::TimeSynchronization::Commands::SetDefaultNTP::DecodableType & commandData);
 /**
+ * @brief Bridged Device Basic Information Cluster KeepActive Command callback (from client)
+ */
+bool emberAfBridgedDeviceBasicInformationClusterKeepActiveCallback(
+    chip::app::CommandHandler * commandObj, const chip::app::ConcreteCommandPath & commandPath,
+    const chip::app::Clusters::BridgedDeviceBasicInformation::Commands::KeepActive::DecodableType & commandData);
+/**
  * @brief Administrator Commissioning Cluster OpenCommissioningWindow Command callback (from client)
  */
 bool emberAfAdministratorCommissioningClusterOpenCommissioningWindowCallback(

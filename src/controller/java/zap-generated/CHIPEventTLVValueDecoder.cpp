@@ -2159,6 +2159,45 @@ jobject DecodeEventValue(const app::ConcreteEventPath & aPath, TLV::TLVReader & 
 
             return value;
         }
+        case Events::ActiveChanged::Id: {
+            Events::ActiveChanged::DecodableType cppValue;
+            *aError = app::DataModel::Decode(aReader, cppValue);
+            if (*aError != CHIP_NO_ERROR)
+            {
+                return nullptr;
+            }
+            jobject value_promisedActiveDuration;
+            std::string value_promisedActiveDurationClassName     = "java/lang/Long";
+            std::string value_promisedActiveDurationCtorSignature = "(J)V";
+            jlong jnivalue_promisedActiveDuration                 = static_cast<jlong>(cppValue.promisedActiveDuration);
+            chip::JniReferences::GetInstance().CreateBoxedObject<jlong>(
+                value_promisedActiveDurationClassName.c_str(), value_promisedActiveDurationCtorSignature.c_str(),
+                jnivalue_promisedActiveDuration, value_promisedActiveDuration);
+
+            jclass activeChangedStructClass;
+            err = chip::JniReferences::GetInstance().GetLocalClassRef(
+                env, "chip/devicecontroller/ChipEventStructs$BridgedDeviceBasicInformationClusterActiveChangedEvent",
+                activeChangedStructClass);
+            if (err != CHIP_NO_ERROR)
+            {
+                ChipLogError(Zcl, "Could not find class ChipEventStructs$BridgedDeviceBasicInformationClusterActiveChangedEvent");
+                return nullptr;
+            }
+
+            jmethodID activeChangedStructCtor;
+            err = chip::JniReferences::GetInstance().FindMethod(env, activeChangedStructClass, "<init>", "(Ljava/lang/Long;)V",
+                                                                &activeChangedStructCtor);
+            if (err != CHIP_NO_ERROR || activeChangedStructCtor == nullptr)
+            {
+                ChipLogError(Zcl,
+                             "Could not find ChipEventStructs$BridgedDeviceBasicInformationClusterActiveChangedEvent constructor");
+                return nullptr;
+            }
+
+            jobject value = env->NewObject(activeChangedStructClass, activeChangedStructCtor, value_promisedActiveDuration);
+
+            return value;
+        }
         default:
             *aError = CHIP_ERROR_IM_MALFORMED_EVENT_PATH_IB;
             break;

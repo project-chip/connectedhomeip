@@ -3670,6 +3670,15 @@ MTR_PROVISIONALLY_AVAILABLE
 MTR_AVAILABLE(ios(16.4), macos(13.3), watchos(9.4), tvos(16.4))
 @interface MTRBaseClusterBridgedDeviceBasicInformation : MTRGenericBaseCluster
 
+/**
+ * Command KeepActive
+ *
+ * The server SHALL attempt to keep the devices specified active for StayActiveDuration milliseconds when they are next active.
+ */
+- (void)keepActiveWithParams:(MTRBridgedDeviceBasicInformationClusterKeepActiveParams * _Nullable)params completion:(MTRStatusCompletion)completion MTR_PROVISIONALLY_AVAILABLE;
+- (void)keepActiveWithCompletion:(MTRStatusCompletion)completion
+    MTR_PROVISIONALLY_AVAILABLE;
+
 - (void)readAttributeVendorNameWithCompletion:(void (^)(NSString * _Nullable value, NSError * _Nullable error))completion MTR_AVAILABLE(ios(16.4), macos(13.3), watchos(9.4), tvos(16.4));
 - (void)subscribeAttributeVendorNameWithParams:(MTRSubscribeParams *)params
                        subscriptionEstablished:(MTRSubscriptionEstablishedHandler _Nullable)subscriptionEstablished
@@ -17993,6 +18002,10 @@ typedef NS_ENUM(uint8_t, MTRBridgedDeviceBasicInformationProductFinish) {
     MTRBridgedDeviceBasicInformationProductFinishRugged MTR_AVAILABLE(ios(17.0), macos(14.0), watchos(10.0), tvos(17.0)) = 0x04,
     MTRBridgedDeviceBasicInformationProductFinishFabric MTR_AVAILABLE(ios(17.0), macos(14.0), watchos(10.0), tvos(17.0)) = 0x05,
 } MTR_AVAILABLE(ios(17.0), macos(14.0), watchos(10.0), tvos(17.0));
+
+typedef NS_OPTIONS(uint32_t, MTRBridgedDeviceBasicInformationFeature) {
+    MTRBridgedDeviceBasicInformationFeatureBridgedICDSupport MTR_PROVISIONALLY_AVAILABLE = 0x100000,
+} MTR_PROVISIONALLY_AVAILABLE;
 
 typedef NS_OPTIONS(uint32_t, MTRSwitchFeature) {
     MTRSwitchFeatureLatchingSwitch MTR_AVAILABLE(ios(16.2), macos(13.1), watchos(9.2), tvos(16.2)) = 0x1,
