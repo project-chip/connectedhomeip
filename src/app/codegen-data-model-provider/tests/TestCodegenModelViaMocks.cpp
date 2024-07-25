@@ -126,7 +126,7 @@ bool operator==(const Access::SubjectDescriptor & a, const Access::SubjectDescri
     return true;
 }
 
-class TestDataModelChangeListener : public DataModelChangeListener
+class TestProviderChangeListener : public ProviderChangeListener
 {
 public:
     void MarkDirty(const ConcreteAttributePath & path) override { mDirtyList.push_back(path); }
@@ -168,12 +168,12 @@ public:
     }
     ~CodegenDataModelProviderWithContext() { Shutdown(); }
 
-    TestDataModelChangeListener & ChangeListener() { return mChangeListener; }
-    const TestDataModelChangeListener & ChangeListener() const { return mChangeListener; }
+    TestProviderChangeListener & ChangeListener() { return mChangeListener; }
+    const TestProviderChangeListener & ChangeListener() const { return mChangeListener; }
 
 private:
     TestEventGenerator mEventGenerator;
-    TestDataModelChangeListener mChangeListener;
+    TestProviderChangeListener mChangeListener;
     TestActionContext mActionContext;
 };
 

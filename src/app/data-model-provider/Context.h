@@ -32,7 +32,7 @@ namespace InteractionModel {
 struct InteractionModelContext
 {
     EventsGenerator * eventsGenerator;
-    DataModelChangeListener * dataModelChangeListener;
+    ProviderChangeListener * dataModelChangeListener;
     ActionContext * actionContext;
 };
 

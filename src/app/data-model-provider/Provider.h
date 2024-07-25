@@ -38,7 +38,7 @@ namespace InteractionModel {
 ///     thread or equivalent
 ///   - class is allowed to attempt to cache indexes/locations for faster
 ///     lookups of things (e.g during iterations)
-class DataModel : public DataModelMetadataTree
+class DataModel : public ProviderMetadataTree
 {
 public:
     virtual ~DataModel() = default;
