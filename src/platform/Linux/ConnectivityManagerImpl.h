@@ -143,9 +143,10 @@ public:
 #if CHIP_DEVICE_CONFIG_ENABLE_WIFIPAF
     CHIP_ERROR _WiFiPAFConnect(const SetupDiscriminator & connDiscriminator, void * appState, OnConnectionCompleteFunct onSuccess,
                                OnConnectionErrorFunct onError);
+    CHIP_ERROR _WiFiPAFCancelConnect();
     void OnDiscoveryResult(gboolean success, GVariant * obj);
     void OnNanReceive(GVariant * obj);
-
+    void OnNanSubscribeTerminated(gint term_subscribe_id, gint reason);
     CHIP_ERROR _WiFiPAFSend(chip::System::PacketBufferHandle && msgBuf);
     Transport::WiFiPAFBase * _GetWiFiPAF();
     void _SetWiFiPAF(Transport::WiFiPAFBase * pWiFiPAF);
@@ -236,6 +237,7 @@ private:
         uint8_t peer_addr[6];
         uint32_t ssi_len;
     };
+    uint32_t mpresubscribe_id;
     struct wpa_dbus_discov_info mpaf_info;
     struct wpa_dbus_nanrx_info
     {

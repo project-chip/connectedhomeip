@@ -63,7 +63,7 @@ CHIP_ERROR GetPayload(const char * setUpCode, SetupPayload & payload)
 SetUpCodePairer::~SetUpCodePairer()
 {
 #if CHIP_DEVICE_CONFIG_ENABLE_WIFIPAF
-    DeviceCommissioner::SetChkObjValid((void *) this, DeviceCommissioner::ObjChkAction::Clear, nullptr);
+    DeviceLayer::ConnectivityMgr().WiFiPAFCancelConnect();
 #endif
 }
 
@@ -266,8 +266,6 @@ CHIP_ERROR SetUpCodePairer::StartDiscoverOverWiFiPAF(SetupPayload & payload)
     ChipLogProgress(Controller, "Starting commissioning discovery over WiFiPAF");
     VerifyOrReturnError(mCommissioner != nullptr, CHIP_ERROR_INCORRECT_STATE);
     mWaitingForDiscovery[kWiFiPAFTransport] = true;
-
-    DeviceCommissioner::SetChkObjValid((void *) this, DeviceCommissioner::ObjChkAction::Set, nullptr);
     CHIP_ERROR err = DeviceLayer::ConnectivityMgr().WiFiPAFConnect(payload.discriminator, (void *) this, OnWiFiPAFSubscribeComplete,
                                                                    OnWiFiPAFSubscribeError);
     if (err != CHIP_NO_ERROR)
@@ -399,28 +397,12 @@ void SetUpCodePairer::OnWifiPAFDiscoveryError(CHIP_ERROR err)
 
 void SetUpCodePairer::OnWiFiPAFSubscribeComplete(void * appState)
 {
-    bool isObjValid;
-    DeviceCommissioner::SetChkObjValid(appState, DeviceCommissioner::ObjChkAction::Check, &isObjValid);
-    if (isObjValid == false)
-    {
-        // The caller has been released.
-        ChipLogError(Controller, "SetUpCodePairer has been destroyed!");
-        return;
-    }
     auto self = (SetUpCodePairer *) appState;
     self->OnDiscoveredDeviceOverWifiPAF();
 }
 
 void SetUpCodePairer::OnWiFiPAFSubscribeError(void * appState, CHIP_ERROR err)
 {
-    bool isObjValid;
-    DeviceCommissioner::SetChkObjValid(appState, DeviceCommissioner::ObjChkAction::Check, &isObjValid);
-    if (isObjValid == false)
-    {
-        // The caller has been released.
-        ChipLogError(Controller, "SetUpCodePairer has been destroyed!");
-        return;
-    }
     auto self = (SetUpCodePairer *) appState;
     self->OnWifiPAFDiscoveryError(err);
 }

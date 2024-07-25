@@ -472,7 +472,7 @@ DeviceCommissioner::DeviceCommissioner() :
 DeviceCommissioner::~DeviceCommissioner()
 {
 #if CHIP_DEVICE_CONFIG_ENABLE_WIFIPAF
-    SetChkObjValid((void *) this, ObjChkAction::Clear, nullptr);
+    DeviceLayer::ConnectivityMgr().WiFiPAFCancelConnect();
 #endif
 }
 
@@ -833,7 +833,6 @@ CHIP_ERROR DeviceCommissioner::EstablishPASEConnection(NodeId remoteDeviceId, Re
                 ExitNow(CHIP_ERROR_INTERNAL);
             }
             mRendezvousParametersForDeviceDiscoveredOverWiFiPAF = params;
-            SetChkObjValid((void *) this, ObjChkAction::Set, nullptr);
             DeviceLayer::ConnectivityMgr().WiFiPAFConnect(params.GetSetupDiscriminator().value(), (void *) this,
                                                           OnWiFiPAFSubscribeComplete, OnWiFiPAFSubscribeError);
             ExitNow(CHIP_NO_ERROR);
@@ -908,70 +907,8 @@ void DeviceCommissioner::OnDiscoveredDeviceOverBleError(void * appState, CHIP_ER
 #endif // CONFIG_NETWORK_LAYER_BLE
 
 #if CHIP_DEVICE_CONFIG_ENABLE_WIFIPAF
-void DeviceCommissioner::SetChkObjValid(void * appObj, ObjChkAction action, bool * pIsObjValid)
-{
-    static std::vector<void *> ObjVector;
-    bool IsObjValid = false;
-
-    switch (action)
-    {
-    case ObjChkAction::Set: {
-        for (auto lt = ObjVector.begin(); lt != ObjVector.end(); lt++)
-        {
-            if (*lt == appObj)
-            {
-                IsObjValid = true;
-                break;
-            }
-        }
-        if (IsObjValid == false)
-        {
-            ObjVector.push_back(appObj);
-            IsObjValid = true;
-        }
-    }
-    break;
-    case ObjChkAction::Check: {
-        for (auto lt = ObjVector.begin(); lt != ObjVector.end(); lt++)
-        {
-            if (*lt == appObj)
-            {
-                IsObjValid = true;
-                break;
-            }
-        }
-    }
-    break;
-    case ObjChkAction::Clear: {
-        for (auto lt = ObjVector.begin(); lt != ObjVector.end(); lt++)
-        {
-            if (*lt == appObj)
-            {
-                // Already existed in the list => Remove it
-                ObjVector.erase(lt);
-                break;
-            }
-        }
-    }
-    break;
-    }
-    if (pIsObjValid != nullptr)
-    {
-        *pIsObjValid = IsObjValid;
-    }
-    return;
-}
-
 void DeviceCommissioner::OnWiFiPAFSubscribeComplete(void * appState)
 {
-    bool isObjValid;
-    SetChkObjValid(appState, ObjChkAction::Check, &isObjValid);
-    if (isObjValid == false)
-    {
-        // The caller has been released.
-        ChipLogError(Controller, "DeviceCommissioner has been destroyed!");
-        return;
-    }
     auto self   = (DeviceCommissioner *) appState;
     auto device = self->mDeviceInPASEEstablishment;
 
@@ -989,14 +926,6 @@ void DeviceCommissioner::OnWiFiPAFSubscribeComplete(void * appState)
 
 void DeviceCommissioner::OnWiFiPAFSubscribeError(void * appState, CHIP_ERROR err)
 {
-    bool isObjValid;
-    SetChkObjValid(appState, ObjChkAction::Check, &isObjValid);
-    if (isObjValid == false)
-    {
-        // The caller has been released.
-        ChipLogError(Controller, "DeviceCommissioner has been destroyed!");
-        return;
-    }
     auto self   = (DeviceCommissioner *) appState;
     auto device = self->mDeviceInPASEEstablishment;
 

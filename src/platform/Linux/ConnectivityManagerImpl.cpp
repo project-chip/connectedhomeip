@@ -1444,6 +1444,20 @@ void ConnectivityManagerImpl::OnNanReceive(GVariant * obj)
     return;
 }
 
+void ConnectivityManagerImpl::OnNanSubscribeTerminated(gint term_subscribe_id, gint reason)
+{
+    ChipLogProgress(Controller, "WiFi-PAF: Subscription terminated (%d, %d)", term_subscribe_id, reason);
+    if (mpresubscribe_id == (uint32_t) term_subscribe_id)
+    {
+        mpresubscribe_id = 0;
+    }
+    if (mpaf_info.subscribe_id == (uint32_t) term_subscribe_id)
+    {
+        mpaf_info.subscribe_id = 0;
+    }
+    return;
+}
+
 CHIP_ERROR ConnectivityManagerImpl::_WiFiPAFConnect(const SetupDiscriminator & connDiscriminator, void * appState,
                                                     OnConnectionCompleteFunct onSuccess, OnConnectionErrorFunct onError)
 {
@@ -1478,6 +1492,7 @@ CHIP_ERROR ConnectivityManagerImpl::_WiFiPAFConnect(const SetupDiscriminator & c
     wpa_fi_w1_wpa_supplicant1_interface_call_nansubscribe_sync(mWpaSupplicant.iface, args, &subscribe_id, nullptr,
                                                                &err.GetReceiver());
     ChipLogProgress(DeviceLayer, "WiFi-PAF: subscribe_id: [%d]", subscribe_id);
+    mpresubscribe_id        = subscribe_id;
     mOnPafSubscribeComplete = onSuccess;
     mOnPafSubscribeError    = onError;
     g_signal_connect(mWpaSupplicant.iface, "nan-discoveryresult",
@@ -1491,6 +1506,27 @@ CHIP_ERROR ConnectivityManagerImpl::_WiFiPAFConnect(const SetupDiscriminator & c
                      }),
                      this);
 
+    g_signal_connect(mWpaSupplicant.iface, "nan-subscribeterminated",
+                     G_CALLBACK(+[](WpaFiW1Wpa_supplicant1Interface * proxy, gint term_subscribe_id, gint reason,
+                                    ConnectivityManagerImpl * self) {
+                         return self->OnNanSubscribeTerminated(term_subscribe_id, reason);
+                     }),
+                     this);
+
+    return CHIP_NO_ERROR;
+}
+
+CHIP_ERROR ConnectivityManagerImpl::_WiFiPAFCancelConnect()
+{
+    if (mpresubscribe_id == 0)
+    {
+        return CHIP_NO_ERROR;
+    }
+    GAutoPtr<GError> err;
+    gchar args[MAX_PAF_PUBLISH_SSI_BUFLEN];
+
+    snprintf(args, sizeof(args), "subscribe_id=%d", mpresubscribe_id);
+    wpa_fi_w1_wpa_supplicant1_interface_call_nancancel_subscribe_sync(mWpaSupplicant.iface, args, nullptr, &err.GetReceiver());
     return CHIP_NO_ERROR;
 }
 
