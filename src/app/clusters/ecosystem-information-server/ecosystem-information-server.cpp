@@ -29,7 +29,7 @@ namespace {
 constexpr size_t kDeviceNameMaxSize            = 64;
 constexpr size_t kUniqueLocationIdMaxSize      = 64;
 constexpr size_t kUniqueLocationIdsListMaxSize = 64;
-constexpr size_t kHomeLocationNameMaxSize      = 128;
+constexpr size_t kLocationDescriptorNameMaxSize      = 128;
 
 constexpr size_t kDeviceDirectoryMaxSize   = 256;
 constexpr size_t kLocationDirectoryMaxSize = 64;
@@ -60,32 +60,32 @@ CHIP_ERROR AttrAccess::Read(const ConcreteReadAttributePath & aPath, AttributeVa
     return CHIP_NO_ERROR;
 }
 
-Structs::HomeLocationStruct::Type GetEncodableHomeLocationStruct(const HomeLocationStruct & aHomeLocation)
+Structs::HomeLocationStruct::Type GetEncodableLocationDescriptorStruct(const LocationDescriptorStruct & aLocationDescriptor)
 {
-    Structs::HomeLocationStruct::Type homeLocationStruct;
+    Structs::HomeLocationStruct::Type locationDescriptor;
     // This would imply data is either not properly validated before being
     // stored here or corruption has occurred.
-    VerifyOrDie(!aHomeLocation.mLocationName.empty());
-    homeLocationStruct.locationName = CharSpan(aHomeLocation.mLocationName.c_str(), aHomeLocation.mLocationName.size());
+    VerifyOrDie(!aLocationDescriptor.mLocationName.empty());
+    locationDescriptor.locationName = CharSpan(aLocationDescriptor.mLocationName.c_str(), aLocationDescriptor.mLocationName.size());
 
-    if (aHomeLocation.mFloorNumber.has_value())
+    if (aLocationDescriptor.mFloorNumber.has_value())
     {
-        homeLocationStruct.floorNumber.SetNonNull(aHomeLocation.mFloorNumber.value());
+        locationDescriptor.floorNumber.SetNonNull(aLocationDescriptor.mFloorNumber.value());
     }
     else
     {
-        homeLocationStruct.floorNumber.SetNull();
+        locationDescriptor.floorNumber.SetNull();
     }
 
-    if (aHomeLocation.mAreaType.has_value())
+    if (aLocationDescriptor.mAreaType.has_value())
     {
-        homeLocationStruct.areaType.SetNonNull(aHomeLocation.mAreaType.value());
+        locationDescriptor.areaType.SetNonNull(aLocationDescriptor.mAreaType.value());
     }
     else
     {
-        homeLocationStruct.areaType.SetNull();
+        locationDescriptor.areaType.SetNull();
     }
-    return homeLocationStruct;
+    return locationDescriptor;
 }
 
 } // namespace
@@ -131,11 +131,11 @@ EcosystemDeviceStruct::Builder & EcosystemDeviceStruct::Builder::AddUniqueLocati
 
 std::unique_ptr<EcosystemDeviceStruct> EcosystemDeviceStruct::Builder::Build()
 {
+    VerifyOrReturnValue(!mIsAlreadyBuilt, nullptr, ChipLogError(Zcl, "Build() already called"));
     VerifyOrReturnValue(mDeviceName.size() <= kDeviceNameMaxSize, nullptr, ChipLogError(Zcl, "Device name too large"));
     VerifyOrReturnValue(mOriginalEndpoint != kInvalidEndpointId, nullptr, ChipLogError(Zcl, "Invalid original endpoint"));
     VerifyOrReturnValue(!mDeviceTypes.empty(), nullptr, ChipLogError(Zcl, "No device types added"));
-    VerifyOrReturnValue(mUniqueLocationIds.size() <= kUniqueLocationIdsListMaxSize, nullptr,
-                        ChipLogError(Zcl, "Too many location ids"));
+    VerifyOrReturnValue(mUniqueLocationIds.size() <= kUniqueLocationIdsListMaxSize, nullptr, ChipLogError(Zcl, "Too many location ids"));
 
     for (auto & locationId : mUniqueLocationIds)
     {
@@ -183,43 +183,40 @@ CHIP_ERROR EcosystemDeviceStruct::Encode(const AttributeValueEncoder::ListEncode
 EcosystemLocationStruct::Builder & EcosystemLocationStruct::Builder::SetLocationName(std::string aLocationName)
 {
     VerifyOrDie(!mIsAlreadyBuilt);
-    mHomeLocation.mLocationName = std::move(aLocationName);
+    mLocationDescriptor.mLocationName = std::move(aLocationName);
     return *this;
 }
 
 EcosystemLocationStruct::Builder & EcosystemLocationStruct::Builder::SetFloorNumber(std::optional<int16_t> aFloorNumber)
 {
     VerifyOrDie(!mIsAlreadyBuilt);
-    mHomeLocation.mFloorNumber = aFloorNumber;
+    mLocationDescriptor.mFloorNumber = aFloorNumber;
     return *this;
 }
 
 EcosystemLocationStruct::Builder & EcosystemLocationStruct::Builder::SetAreaTypeTag(std::optional<AreaTypeTag> aAreaTypeTag)
 {
     VerifyOrDie(!mIsAlreadyBuilt);
-    mHomeLocation.mAreaType = aAreaTypeTag;
+    mLocationDescriptor.mAreaType = aAreaTypeTag;
     return *this;
 }
 
-EcosystemLocationStruct::Builder & EcosystemLocationStruct::Builder::SetHomeLocationLastEdit(uint64_t aHomeLocationLastEditEpochUs)
+EcosystemLocationStruct::Builder & EcosystemLocationStruct::Builder::SetLocationDescriptorLastEdit(uint64_t aLocationDescriptorLastEditEpochUs)
 {
     VerifyOrDie(!mIsAlreadyBuilt);
-    mHomeLocationLastEditEpochUs = aHomeLocationLastEditEpochUs;
+    mLocationDescriptorLastEditEpochUs = aLocationDescriptorLastEditEpochUs;
     return *this;
 }
 
 std::unique_ptr<EcosystemLocationStruct> EcosystemLocationStruct::Builder::Build()
 {
-    bool HomeLocationNameIsInvalid =
-        mHomeLocation.mLocationName.empty() || mHomeLocation.mLocationName.size() > kHomeLocationNameMaxSize;
-    if (mIsAlreadyBuilt || HomeLocationNameIsInvalid)
-    {
-        return nullptr;
-    }
+    VerifyOrReturnValue(!mIsAlreadyBuilt, nullptr, ChipLogError(Zcl, "Build() already called"));
+    VerifyOrReturnValue(!mLocationDescriptor.mLocationName.empty(), nullptr, ChipLogError(Zcl, "Must Provided Location Name"));
+    VerifyOrReturnValue(mLocationDescriptor.mLocationName.size() <= kLocationDescriptorNameMaxSize, nullptr, ChipLogError(Zcl, "Must Location Name must be less than 64 bytes"));
 
     // std::make_unique does not have access to private constructor we workaround with using new
-    std::unique_ptr<EcosystemLocationStruct> ret{ new EcosystemLocationStruct(std::move(mHomeLocation),
-                                                                              mHomeLocationLastEditEpochUs) };
+    std::unique_ptr<EcosystemLocationStruct> ret{ new EcosystemLocationStruct(std::move(mLocationDescriptor),
+                                                                              mLocationDescriptorLastEditEpochUs) };
     mIsAlreadyBuilt = true;
     return ret;
 }
@@ -229,9 +226,9 @@ CHIP_ERROR EcosystemLocationStruct::Encode(const AttributeValueEncoder::ListEnco
 {
     Structs::EcosystemLocationStruct::Type locationStruct;
     VerifyOrDie(!aUniqueLocationId.empty());
-    locationStruct.uniqueLocationID     = CharSpan(aUniqueLocationId.c_str(), aUniqueLocationId.size());
-    locationStruct.homeLocation         = GetEncodableHomeLocationStruct(mHomeLocation);
-    locationStruct.homeLocationLastEdit = mHomeLocationLastEditEpochUs;
+    locationStruct.uniqueLocationID           = CharSpan(aUniqueLocationId.c_str(), aUniqueLocationId.size());
+    locationStruct.locationDescriptor         = GetEncodableLocationDescriptorStruct(mLocationDescriptor);
+    locationStruct.locationDescriptorLastEdit = mLocationDescriptorLastEditEpochUs;
 
     // TODO(#33223) this is a hack, use mFabricIndex when it exists. Additionally checking fabric
     // index matches should happen at the top of this method to prevent building the encodable
@@ -292,7 +289,7 @@ CHIP_ERROR EcosystemInformationServer::EncodeRemovedOnAttribute(EndpointId aEndp
         return CHIP_IM_GLOBAL_STATUS(UnsupportedCluster);
     }
 
-    auto & deviceInfo = it->second;
+    auto& deviceInfo = it->second;
     if (!deviceInfo.mRemovedOn.HasValue())
     {
         aEncoder.EncodeNull();

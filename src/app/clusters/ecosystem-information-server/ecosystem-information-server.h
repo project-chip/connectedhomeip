@@ -92,7 +92,7 @@ private:
     // fabric scoped to be more throughly reviewed with focus on fabric scoping.
 };
 
-struct HomeLocationStruct
+struct LocationDescriptorStruct
 {
     std::string mLocationName;
     std::optional<int16_t> mFloorNumber;
@@ -112,15 +112,15 @@ public:
         Builder & SetLocationName(std::string aLocationName);
         Builder & SetFloorNumber(std::optional<int16_t> aFloorNumber);
         Builder & SetAreaTypeTag(std::optional<AreaTypeTag> aAreaTypeTag);
-        Builder & SetHomeLocationLastEdit(uint64_t aHomeLocationLastEditEpochUs);
+        Builder & SetLocationDescriptorLastEdit(uint64_t aLocationDescriptorLastEditEpochUs);
 
         // Upon success this object will have moved all ownership of underlying
         // types to EcosystemDeviceStruct and should not be used afterwards.
         std::unique_ptr<EcosystemLocationStruct> Build();
 
     private:
-        HomeLocationStruct mHomeLocation;
-        uint64_t mHomeLocationLastEditEpochUs = 0;
+        LocationDescriptorStruct mLocationDescriptor;
+        uint64_t mLocationDescriptorLastEditEpochUs = 0;
         bool mIsAlreadyBuilt                  = false;
     };
 
@@ -130,15 +130,15 @@ public:
 private:
     // Constructor is intentionally private. This is to ensure that it is only constructed with
     // values that conform to the spec.
-    explicit EcosystemLocationStruct(HomeLocationStruct && aHomeLocation, uint64_t aHomeLocationLastEditEpochUs) :
-        mHomeLocation(aHomeLocation), mHomeLocationLastEditEpochUs(aHomeLocationLastEditEpochUs)
+    explicit EcosystemLocationStruct(LocationDescriptorStruct && aLocationDescriptor, uint64_t aLocationDescriptorLastEditEpochUs) :
+        mLocationDescriptor(aLocationDescriptor), mLocationDescriptorLastEditEpochUs(aLocationDescriptorLastEditEpochUs)
     {}
     // EcosystemLocationStruct is used as a value in a key-value map.
     // Because UniqueLocationId is manditory when an entry exist, and
     // it is unique, we use it as a key to the key-value pair and is why it is
     // not explicitly in this struct.
-    HomeLocationStruct mHomeLocation;
-    uint64_t mHomeLocationLastEditEpochUs;
+    LocationDescriptorStruct mLocationDescriptor;
+    uint64_t mLocationDescriptorLastEditEpochUs;
     // TODO(#33223) This structure needs to contain fabric index to be spec compliant.
     // To keep initial PR smaller, we are going to assume that all entries
     // here are for any fabric. This will allow follow up PR introducing
