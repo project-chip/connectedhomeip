@@ -149,7 +149,10 @@ class TC_SC_4_3(MatterBaseTest):
             return False, f"T value ({t_value}) is not a valid integer"
 
     @staticmethod
-    def contains_ipv6_address(addresses):
+    def is_ipv6_address(addresses):
+        if isinstance(addresses, str):
+            addresses = [addresses]
+
         for address in addresses:
             try:
                 # Attempt to create an IPv6 address object. If successful, this is an IPv6 address.
@@ -159,6 +162,11 @@ class TC_SC_4_3(MatterBaseTest):
                 # If an AddressValueError is raised, the current address is not a valid IPv6 address.
                 return False, f"Invalid IPv6 address encountered: {address}, provided addresses: {addresses}"
         return False, "No IPv6 addresses found."
+
+    @staticmethod
+    def extract_ipv6_address(text):
+        items = text.split(',')
+        return items[-1]
 
     @staticmethod
     def verify_hostname(hostname: str, char_length: int) -> bool:
@@ -364,7 +372,8 @@ class TC_SC_4_3(MatterBaseTest):
 
         # AAAA
         logging.info("Verify the AAAA record contains at least one IPv6 address")
-        result, message = self.contains_ipv6_address(quada_record.addresses)
+        ipv6_address = self.extract_ipv6_address(str(quada_record))
+        result, message = self.is_ipv6_address(ipv6_address)
         asserts.assert_true(result, message)
 
         # # *** STEP 10 ***
