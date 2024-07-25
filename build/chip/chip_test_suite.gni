@@ -19,6 +19,10 @@ import("${chip_root}/build/chip/chip_test.gni")
 import("${chip_root}/build/chip/tests.gni")
 import("${dir_pw_unit_test}/test.gni")
 
+if (chip_device_platform == "efr32") {
+  import("//test_executable_args.gni")
+}
+
 assert(chip_build_tests)
 
 # Define CHIP unit tests
@@ -173,8 +177,58 @@ template("chip_test_suite") {
       }
     }
   } else {
-    group(_suite_name) {
-      deps = [ ":${_suite_name}.lib" ]
+
+    # Specified a platform executable type.
+    if (defined(test_executable_output_name) && defined(invoker.test_sources)) {
+      tests = []
+
+      foreach(_test, invoker.test_sources) {
+        _test_name = string_replace(_test, ".cpp", "")
+
+        _test_output_dir = "${root_out_dir}/tests"
+        if (defined(invoker.output_dir)) {
+          _test_output_dir = invoker.output_dir
+        }
+
+        pw_test(_test_name) {
+          # Forward certain varibles from the invoker
+          forward_variables_from(invoker,
+                                 [
+                                   "deps",
+                                   "public_deps",
+                                   "cflags",
+                                   "configs",
+                                 ])
+
+          # Set `output_name` if the platform executable needs it.
+          if (!defined(test_executable_output_name_suffix)) {
+            test_executable_output_name_suffix = ""
+          }
+          output_name = test_executable_output_name + _test_name + test_executable_output_name_suffix
+
+          # Set `ldflags` if the platform executable needs it.
+          if (defined(test_executable_ldflags)) { ldflags = test_executable_ldflags }
+
+          # Add the individual test source file (e.g. "TestSomething.cpp")
+          sources = [ _test ]
+
+          output_dir = _test_output_dir
+        }
+        tests += [ _test_name ]
+      }
+
+      group(_suite_name) {
+        deps = []
+        foreach(_test, tests) {
+          deps += [ ":${_test}" ]
+        }
+      }
+
+    } else {
+
+      group(_suite_name) {
+        deps = [ ":${_suite_name}.lib" ]
+      }
     }
   }
 }

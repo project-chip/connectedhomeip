@@ -1,0 +1,27 @@
+# Copyright (c) 2024 Project CHIP Authors
+#
+# Licensed under the Apache License, Version 2.0 (the "License");
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
+#
+# http://www.apache.org/licenses/LICENSE-2.0
+#
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
+
+import("//build_overrides/chip.gni")  # Defines chip_root
+import("//build_overrides/efr32_sdk.gni")  # Defines efr32_sdk_build_root
+import("${efr32_sdk_build_root}/efr32_sdk.gni")  # Defines silabs_family
+
+test_executable_output_name = "matter-silabs-device_tests_"
+test_executable_output_name_suffix = ".out"
+
+_ldscript = "${chip_root}/examples/platform/silabs/ldscripts/${silabs_family}.ld"
+test_executable_ldflags = [
+    "-T" + rebase_path(_ldscript, root_build_dir),
+    "-Wl,--no-warn-rwx-segment",
+]
+#test_executable_inputs = [ _ldscript ]  #++++ Is this needed?

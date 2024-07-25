@@ -103,15 +103,6 @@ source_set("efr32_test_main") {
   ]
 
   include_dirs = [ "${chip_root}/examples/common/pigweed/efr32" ]
-
-  ldscript = "${examples_common_plat_dir}/ldscripts/${silabs_family}.ld"
-
-  inputs = [ ldscript ]
-
-  ldflags = [
-    "-T" + rebase_path(ldscript, root_build_dir),
-    "-Wl,--no-warn-rwx-segment",
-  ]
 }
 
 group("efr32") {
