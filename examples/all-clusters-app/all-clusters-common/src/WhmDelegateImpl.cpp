@@ -361,7 +361,6 @@ bool WaterHeaterManagementDelegate::HasWaterTemperatureReachedTarget() const
             (mBoostState == BoostStateEnum::kActive && mBoostTargetPercentage.HasValue()) ? mBoostTargetPercentage.Value() : 100;
     }
 
-
     // Determine whether the water is at the target temperature
     bool tempReached = true;
     if (mpWhmInstance != nullptr && mpWhmInstance->HasFeature(Feature::kTankPercent))
@@ -376,7 +375,6 @@ bool WaterHeaterManagementDelegate::HasWaterTemperatureReachedTarget() const
     {
         tempReached = false;
     }
-
 
     return tempReached;
 }
