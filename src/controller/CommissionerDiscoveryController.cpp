@@ -598,9 +598,9 @@ void CommissionerDiscoveryController::Cancel()
 
     auto state = client->GetUDCClientProcessingState();
 
-    bool isCancelableState = (state == UDCClientProcessingState::kPromptingUser ||
-                          state == UDCClientProcessingState::kObtainingOnboardingPayload ||
-                          state == UDCClientProcessingState::kWaitingForCommissionerPasscodeReady);
+    bool isCancelableState =
+        (state == UDCClientProcessingState::kPromptingUser || state == UDCClientProcessingState::kObtainingOnboardingPayload ||
+         state == UDCClientProcessingState::kWaitingForCommissionerPasscodeReady);
 
     if (!isCancelableState)
     {
