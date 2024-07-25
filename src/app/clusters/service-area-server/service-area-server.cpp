@@ -534,6 +534,44 @@ bool Instance::IsUniqueSupportedLocation(const LocationStructureWrapper & aLocat
     return true;
 }
 
+bool Instance::ReportEstimatedEndTimeChange(const DataModel::Nullable<uint32_t> & aEstimatedEndTime) {
+    if (mEstimatedEndTime == aEstimatedEndTime)
+    {
+        return false;
+    }
+
+    // The value of this attribute SHALL only be reported in the following cases:
+    // - when it changes from null to any non-zero value
+    if (mEstimatedEndTime.IsNull())
+    {
+        if (aEstimatedEndTime.Value() != 0)
+        {
+            return true;
+        }
+        return false;
+    }
+
+    if (aEstimatedEndTime.IsNull()) {
+        return false;
+    }
+
+    // From this point we know that mEstimatedEndTime and aEstimatedEndTime are not null and not the same.
+
+    // - when it changes from 0 to any other value and vice versa
+    if (mEstimatedEndTime.Value() == 0 || aEstimatedEndTime.Value() == 0)
+    {
+        return true;
+    }
+
+    // - when it decreases
+    if (aEstimatedEndTime.Value() < mEstimatedEndTime.Value())
+    {
+        return true;
+    }
+
+    return false;
+}
+
 bool Instance::AddSupportedLocation(uint32_t aLocationId, const DataModel::Nullable<uint8_t> & aMapId,
                                     const CharSpan & aLocationName, const DataModel::Nullable<int16_t> & aFloorNumber,
                                     const DataModel::Nullable<AreaTypeTag> & aAreaType,
@@ -894,8 +932,6 @@ DataModel::Nullable<uint32_t> Instance::GetEstimatedEndTime()
 
 bool Instance::SetEstimatedEndTime(const DataModel::Nullable<uint32_t> & aEstimatedEndTime)
 {
-    bool doChangeNotify = false;
-
     // EstimatedEndTime SHALL be null if the CurrentLocation attribute is null.
     if (mCurrentLocation.IsNull() && !aEstimatedEndTime.IsNull())
     {
@@ -903,23 +939,11 @@ bool Instance::SetEstimatedEndTime(const DataModel::Nullable<uint32_t> & aEstima
         return false;
     }
 
-    // The value of this attribute SHALL only be reported in the following cases:
-    // - when it changes from 0 to any other value and vice versa
-    // - when it decreases
-    // - when it changes from null to any non-zero value
-    if ((!mEstimatedEndTime.IsNull() && !aEstimatedEndTime.IsNull() && (aEstimatedEndTime.Value() == 0) &&
-         mEstimatedEndTime.Value() != 0) ||
-        (!mEstimatedEndTime.IsNull() && !aEstimatedEndTime.IsNull() && (aEstimatedEndTime.Value() != 0) &&
-         mEstimatedEndTime.Value() == 0) ||
-        (!mEstimatedEndTime.IsNull() && !aEstimatedEndTime.IsNull() && (aEstimatedEndTime.Value() < mEstimatedEndTime.Value())) ||
-        (mEstimatedEndTime.IsNull() && !aEstimatedEndTime.IsNull() && (aEstimatedEndTime.Value() != 0)))
-    {
-        doChangeNotify = true;
-    }
+    bool NotifyChange = ReportEstimatedEndTimeChange(aEstimatedEndTime);
 
     mEstimatedEndTime = aEstimatedEndTime;
 
-    if (doChangeNotify)
+    if (NotifyChange)
     {
         NotifyEstimatedEndTimeChanged();
     }

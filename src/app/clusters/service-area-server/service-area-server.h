@@ -159,6 +159,13 @@ private:
      */
     bool IsUniqueSupportedLocation(const LocationStructureWrapper & aLocation, bool ignoreLocationId);
 
+    /**
+     * @brief Check if changing the estimated end time attribute to aEstimatedEndTime requires the change to be reported.
+     * @param aEstimatedEndTime The new estimated end time.
+     * @return true if the change requires a report.
+     */
+    bool ReportEstimatedEndTimeChange(const DataModel::Nullable<uint32_t> & aEstimatedEndTime);
+
 public:
     /**
      * @brief Add new location to the supported locations list.
