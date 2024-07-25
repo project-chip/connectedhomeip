@@ -938,7 +938,8 @@ class MatterBaseTest(base_test.BaseTestClass):
     async def send_single_cmd(
             self, cmd: Clusters.ClusterObjects.ClusterCommand,
             dev_ctrl: ChipDeviceCtrl = None, node_id: int = None, endpoint: int = None,
-            timedRequestTimeoutMs: typing.Union[None, int] = None) -> object:
+            timedRequestTimeoutMs: typing.Union[None, int] = None,
+            payloadCapability: int = ChipDeviceCtrl.TransportPayloadCapability.MRP_PAYLOAD) -> object:
         if dev_ctrl is None:
             dev_ctrl = self.default_controller
         if node_id is None:
@@ -946,7 +947,8 @@ class MatterBaseTest(base_test.BaseTestClass):
         if endpoint is None:
             endpoint = self.matter_test_config.endpoint
 
-        result = await dev_ctrl.SendCommand(nodeid=node_id, endpoint=endpoint, payload=cmd, timedRequestTimeoutMs=timedRequestTimeoutMs)
+        result = await dev_ctrl.SendCommand(nodeid=node_id, endpoint=endpoint, payload=cmd, timedRequestTimeoutMs=timedRequestTimeoutMs,
+                                            payloadCapability=payloadCapability)
         return result
 
     async def send_test_event_triggers(self, eventTrigger: int, enableKey: bytes = None):
