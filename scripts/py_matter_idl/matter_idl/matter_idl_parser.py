@@ -1,5 +1,6 @@
 #!/usr/bin/env python
 
+import dataclasses
 import functools
 import logging
 from typing import Dict, Optional
@@ -514,11 +515,11 @@ class MatterIdlTransformer(Transformer):
             elif isinstance(item, Endpoint):
                 endpoints.append(item)
             elif isinstance(item, Enum):
-                global_enums.append(item.replace(is_global=True))
+                global_enums.append(dataclasses.replace(item, is_global=True))
             elif isinstance(item, Bitmap):
-                global_bitmaps.append(item.replace(is_global=True))
+                global_bitmaps.append(dataclasses.replace(item, is_global=True))
             elif isinstance(item, Struct):
-                global_structs.append(item.replace(is_global=True))
+                global_structs.append(dataclasses.replace(item, is_global=True))
             else:
                 raise Exception("UNKNOWN idl content item: %r" % item)
 
