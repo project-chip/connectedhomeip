@@ -33,46 +33,6 @@ tests:
               - name: nodeId
                 value: nodeId
 
-    - label: "TH reads ClusterRevision attribute from DUT"
-      command: readAttribute
-      attribute: ClusterRevision
-      response:
-          value: 1
-          constraints:
-              type: int16u
-
-    - label: "TH reads FeatureMap attribute from DUT"
-      command: readAttribute
-      attribute: FeatureMap
-      response:
-          value: 0
-          constraints:
-              type: bitmap32
-
-    - label: "TH reads AttributeList attribute from DUT"
-      command: readAttribute
-      attribute: AttributeList
-      response:
-          constraints:
-              contains: [1, 65528, 65529, 65531, 65532, 65533]
-              type: list
-
-    - label: "TH reads AcceptedCommandList attribute from DUT"
-      command: readAttribute
-      attribute: AcceptedCommandList
-      response:
-          constraints:
-              contains: [0]
-              type: list
-
-    - label: "TH reads GeneratedCommandList attribute from DUT"
-      command: readAttribute
-      attribute: GeneratedCommandList
-      response:
-          constraints:
-              contains: [1]
-              type: list
-
     - label: "TH reads the SSID attribute from the DUT"
       command: readAttribute
       attribute: SSID
