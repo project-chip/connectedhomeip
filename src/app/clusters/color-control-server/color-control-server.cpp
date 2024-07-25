@@ -267,7 +267,7 @@ public:
             case Attributes::EnhancedColorMode::Id:
                 VerifyOrReturnError(decodePair.valueUnsigned8.HasValue(), CHIP_ERROR_INVALID_ARGUMENT);
                 if (decodePair.valueUnsigned8.Value() <=
-                    static_cast<uint8_t>(EnhancedColorMode::kEnhancedCurrentHueAndCurrentSaturation))
+                    to_underlying(EnhancedColorMode::kEnhancedCurrentHueAndCurrentSaturation))
                 {
                     targetColorMode =static_cast<EnhancedColorMode>(decodePair.valueUnsigned8.Value());
                 }
