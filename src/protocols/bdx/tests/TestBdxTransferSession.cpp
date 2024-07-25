@@ -252,7 +252,7 @@ void SendAndVerifyRejectMsg(TransferSession::OutputEvent & outEvent, TransferSes
     rejectSender.PollOutput(outEvent, kNoAdvanceTime);
     VerifyNoMoreOutput(rejectSender);
     EXPECT_EQ(outEvent.EventType, TransferSession::OutputEventType::kMsgToSend);
-    System::PacketBufferHandle statusReportMsg               = outEvent.MsgData.Retain();
+    System::PacketBufferHandle statusReportMsg = outEvent.MsgData.Retain();
     VerifyStatusReport(std::move(outEvent.MsgData), reason);
 
     // Pass status message to rejectReceiver
