@@ -1,0 +1,816 @@
+# Copyright (c) 2021 Project CHIP Authors
+#
+# Licensed under the Apache License, Version 2.0 (the "License");
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
+#
+# http://www.apache.org/licenses/LICENSE-2.0
+#
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
+
+
+name: X.2.1. [TC-MTRID-3.1] Subscription Report Verification with DUT as Server
+
+PICS:
+    - MTRID.S
+
+config:
+    nodeId: 0x12344321
+    cluster: "Meter Identification"
+    endpoint: 1
+
+tests:
+    - label: "Step 1: Commission DUT to TH if not already done"
+      cluster: "DelayCommands"
+      command: "WaitForCommissionee"
+      arguments:
+          values:
+              - name: "nodeId"
+                value: nodeId
+
+    - label: "Step 2: TH establishes subscription to all attributes on Meter Identification on the endpoint under test"
+      command: "subscribeAttribute"
+      attribute: "list_int8u"
+      minInterval: 0
+      maxInterval: 30
+      response:
+          value: [0, 1, 2, 3, 4]
+
+# 0x0000 MeterType
+
+    - label: "Step 3: DUT internally sets the attribute value on the cluster: MeterType: 0"
+      verification: |
+          Set the attribute value by the DUT specific procedure.
+      disabled: true
+
+    - label: "Step 3b: TH awaits a ReportDataMessage containing an attribute report for MeterType attribute."
+      verification: |
+          Verify the report is received and the value matches the value set in the previous step.
+          Verify ReportDataMessage on the TH (all-cluster-minimal-app) log:
+
+          ReportDataMessage =
+          {
+                  AttributeReportIBs =
+                  [
+                          AttributeReportIB =
+                          {
+                                  AttributeDataIB =
+                                  {
+                                          DataVersion = 0xd32877aa,
+                                          AttributePathIB =
+                                          {
+                                                  Endpoint = 0x1,
+                                                  Cluster = 0x0B06,
+                                                  Attribute = 0x0000,
+                                          }
+
+                                          Data = 0,
+                                  },
+
+                          },
+
+                  ],
+
+                  SuppressResponse = true,
+                  InteractionModelRevision = 1
+          }
+      disabled: true
+
+    - label: "Step 4a: DUT internally sets the attribute value on the cluster: MeterType: null"
+      verification: |
+          Set the attribute value by the DUT specific procedure.
+      disabled: true     
+
+    - label: "Step 4b: TH awaits a ReportDataMessage containing an attribute report for MeterType attribute."
+      verification: |
+          Verify the report is received and the value matches the value set in the previous step.
+          Verify ReportDataMessage on the TH (all-cluster-minimal-app) log:
+
+          ReportDataMessage =
+          {
+                  AttributeReportIBs =
+                  [
+                          AttributeReportIB =
+                          {
+                                  AttributeDataIB =
+                                  {
+                                          DataVersion = 0xd32877aa,
+                                          AttributePathIB =
+                                          {
+                                                  Endpoint = 0x1,
+                                                  Cluster = 0x0B06,
+                                                  Attribute = 0x0000,
+                                          }
+
+                                          Data = NULL,
+                                  },
+
+                          },
+
+                  ],
+
+                  SuppressResponse = true,
+                  InteractionModelRevision = 1
+          }
+      disabled: true
+
+    - label: "Step 5a: DUT internally sets the attribute value on the cluster: MeterType: 1"
+      verification: |
+          Set the attribute value by the DUT specific procedure.
+      disabled: true
+
+    - label: "Step 5b: TH awaits a ReportDataMessage containing an attribute report for MeterType attribute."
+      verification: |
+          Verify the report is received and the value matches the value set in the previous step.
+          Verify ReportDataMessage on the TH (all-cluster-minimal-app) log:
+
+          ReportDataMessage =
+          {
+                  AttributeReportIBs =
+                  [
+                          AttributeReportIB =
+                          {
+                                  AttributeDataIB =
+                                  {
+                                          DataVersion = 0xd32877aa,
+                                          AttributePathIB =
+                                          {
+                                                  Endpoint = 0x1,
+                                                  Cluster = 0x0B06,
+                                                  Attribute = 0x0000,
+                                          }
+
+                                          Data = 1,
+                                  },
+
+                          },
+
+                  ],
+
+                  SuppressResponse = true,
+                  InteractionModelRevision = 1
+          }    
+      disabled: true
+
+    - label: "Step 5c: DUT internally sets the attribute value on the cluster to re-trigger the application to try to set the same attribute to the same value: MeterType: 1"
+      verification: |
+          Set the attribute value by the DUT specific procedure.
+      disabled: true
+
+    - label: "Step 5d: TH awaits for an appropriate time, and checks that a ReportDataMessage attribute report for MeterType attribute is NOT sent."
+      verification: |
+          Verify the report is received and the value matches the value set in the previous step.
+          Verify ReportDataMessage on the TH (all-cluster-minimal-app) log. A ReportDataMessage attribute report for MeterType attribute is NOT sent:
+
+          ReportDataMessage =
+          {
+                  AttributeReportIBs =
+                  [
+                          AttributeReportIB =
+                          { 
+                                  AttributeDataIB =
+                                  {
+                                          DataVersion = 0xd32877aa,
+                                          AttributePathIB =
+                                          {
+                                                  Endpoint = 0x1,
+                                                  Cluster = 0x0B06,
+                                                  Attribute = 0x0000,
+                                          }
+
+                                          Data = 1,
+                                  },
+
+                          },
+
+                  ],
+
+                  SuppressResponse = true,
+                  InteractionModelRevision = 1
+          }    
+      disabled: true
+
+# 0x0001 UtilityName
+
+    - label: "Step 6a: DUT internally sets the attribute value on the cluster: UtilityName: UN"
+      verification: |
+          Set the attribute value by the DUT specific procedure.
+      disabled: true
+
+    - label: "Step 6b: TH awaits a ReportDataMessage containing an attribute report for UtilityName attribute."
+      verification: |
+          Verify the report is received and the value matches the value set in the previous step.
+          Verify ReportDataMessage on the TH (all-cluster-minimal-app) log:
+
+          ReportDataMessage =
+          {
+                  AttributeReportIBs =
+                  [
+                          AttributeReportIB =
+                          {
+                                  AttributeDataIB =
+                                  {
+                                          DataVersion = 0xd32877aa,
+                                          AttributePathIB =
+                                          {
+                                                  Endpoint = 0x1,
+                                                  Cluster = 0x0B06,
+                                                  Attribute = 0x0001,
+                                          }
+
+                                          Data = UN,
+                                  },
+
+                          },
+
+                  ],
+
+                  SuppressResponse = true,
+                  InteractionModelRevision = 1
+          }
+      disabled: true
+
+    - label: "Step 7a: DUT internally sets the attribute value on the cluster: UtilityName: null"
+      verification: |
+          Set the attribute value by the DUT specific procedure.
+      disabled: true     
+
+    - label: "Step 7b: TH awaits a ReportDataMessage containing an attribute report for UtilityName attribute."
+      verification: |
+          Verify the report is received and the value matches the value set in the previous step.
+          Verify ReportDataMessage on the TH (all-cluster-minimal-app) log:
+
+          ReportDataMessage =
+          {
+                  AttributeReportIBs =
+                  [
+                          AttributeReportIB =
+                          {
+                                  AttributeDataIB =
+                                  {
+                                          DataVersion = 0xd32877aa,
+                                          AttributePathIB =
+                                          {
+                                                  Endpoint = 0x1,
+                                                  Cluster = 0x0B06,
+                                                  Attribute = 0x0001,
+                                          }
+
+                                          Data = NULL,
+                                  },
+
+                          },
+
+                  ],
+
+                  SuppressResponse = true,
+                  InteractionModelRevision = 1
+          }
+      disabled: true
+
+    - label: "Step 8a: DUT internally sets the attribute value on the cluster: UtilityName: TestUtility"
+      verification: |
+          Set the attribute value by the DUT specific procedure.
+      disabled: true
+
+    - label: "Step 8b: TH awaits a ReportDataMessage containing an attribute report for UtilityName attribute."
+      verification: |
+          Verify the report is received and the value matches the value set in the previous step.
+          Verify ReportDataMessage on the TH (all-cluster-minimal-app) log:
+
+          ReportDataMessage =
+          {
+                  AttributeReportIBs =
+                  [
+                          AttributeReportIB =
+                          {
+                                  AttributeDataIB =
+                                  {
+                                          DataVersion = 0xd32877aa,
+                                          AttributePathIB =
+                                          {
+                                                  Endpoint = 0x1,
+                                                  Cluster = 0x0B06,
+                                                  Attribute = 0x0001,
+                                          }
+
+                                          Data = TestUtility,
+                                  },
+
+                          },
+
+                  ],
+
+                  SuppressResponse = true,
+                  InteractionModelRevision = 1
+          }    
+      disabled: true
+
+    - label: "Step 8c: DUT internally sets the attribute value on the cluster to re-trigger the application to try to set the same attribute to the same value: UtilityName: TestUtility"
+      verification: |
+          Set the attribute value by the DUT specific procedure.
+      disabled: true
+
+    - label: "Step 8d: TH awaits for an appropriate time, and checks that a ReportDataMessage attribute report for UtilityName attribute is NOT sent."
+      verification: |
+          Verify the report is received and the value matches the value set in the previous step.
+          Verify ReportDataMessage on the TH (all-cluster-minimal-app) log. A ReportDataMessage attribute report for UtilityName attribute is NOT sent:
+
+          ReportDataMessage =
+          {
+                  AttributeReportIBs =
+                  [
+                          AttributeReportIB =
+                          { 
+                                  AttributeDataIB =
+                                  {
+                                          DataVersion = 0xd32877aa,
+                                          AttributePathIB =
+                                          {
+                                                  Endpoint = 0x1,
+                                                  Cluster = 0x0B06,
+                                                  Attribute = 0x0001,
+                                          }
+
+                                          Data = TestUtility,
+                                  },
+
+                          },
+
+                  ],
+
+                  SuppressResponse = true,
+                  InteractionModelRevision = 1
+          }    
+      disabled: true
+
+# 0x0002 PointOfDelivery
+    - label: "Step 9a: DUT internally sets the attribute value on the cluster: PointOfDelivery: PoD"
+      verification: |
+          Set the attribute value by the DUT specific procedure.
+      disabled: true
+
+    - label: "Step 9b: TH awaits a ReportDataMessage containing an attribute report for PointOfDelivery attribute."
+      verification: |
+          Verify the report is received and the value matches the value set in the previous step.
+          Verify ReportDataMessage on the TH (all-cluster-minimal-app) log:
+
+          ReportDataMessage =
+          {
+                  AttributeReportIBs =
+                  [
+                          AttributeReportIB =
+                          {
+                                  AttributeDataIB =
+                                  {
+                                          DataVersion = 0xd32877aa,
+                                          AttributePathIB =
+                                          {
+                                                  Endpoint = 0x1,
+                                                  Cluster = 0x0B06,
+                                                  Attribute = 0x0002,
+                                          }
+
+                                          Data = PoD,
+                                  },
+
+                          },
+
+                  ],
+
+                  SuppressResponse = true,
+                  InteractionModelRevision = 1
+          }
+      disabled: true
+
+    - label: "Step 10a: DUT internally sets the attribute value on the cluster: PointOfDelivery: null"
+      verification: |
+          Set the attribute value by the DUT specific procedure.
+      disabled: true     
+
+    - label: "Step 10b: TH awaits a ReportDataMessage containing an attribute report for PointOfDelivery attribute."
+      verification: |
+          Verify the report is received and the value matches the value set in the previous step.
+          Verify ReportDataMessage on the TH (all-cluster-minimal-app) log:
+
+          ReportDataMessage =
+          {
+                  AttributeReportIBs =
+                  [
+                          AttributeReportIB =
+                          {
+                                  AttributeDataIB =
+                                  {
+                                          DataVersion = 0xd32877aa,
+                                          AttributePathIB =
+                                          {
+                                                  Endpoint = 0x1,
+                                                  Cluster = 0x0B06,
+                                                  Attribute = 0x0002,
+                                          }
+
+                                          Data = NULL,
+                                  },
+
+                          },
+
+                  ],
+
+                  SuppressResponse = true,
+                  InteractionModelRevision = 1
+          }
+      disabled: true
+
+    - label: "Step 11a: DUT internally sets the attribute value on the cluster: PointOfDelivery: TestPoD"
+      verification: |
+          Set the attribute value by the DUT specific procedure.
+      disabled: true
+
+    - label: "Step 11b: TH awaits a ReportDataMessage containing an attribute report for PointOfDelivery attribute."
+      verification: |
+          Verify the report is received and the value matches the value set in the previous step.
+          Verify ReportDataMessage on the TH (all-cluster-minimal-app) log:
+
+          ReportDataMessage =
+          {
+                  AttributeReportIBs =
+                  [
+                          AttributeReportIB =
+                          {
+                                  AttributeDataIB =
+                                  {
+                                          DataVersion = 0xd32877aa,
+                                          AttributePathIB =
+                                          {
+                                                  Endpoint = 0x1,
+                                                  Cluster = 0x0B06,
+                                                  Attribute = 0x0002,
+                                          }
+
+                                          Data = TestPoD,
+                                  },
+
+                          },
+
+                  ],
+
+                  SuppressResponse = true,
+                  InteractionModelRevision = 1
+          }    
+      disabled: true
+
+    - label: "Step 11c: DUT internally sets the attribute value on the cluster to re-trigger the application to try to set the same attribute to the same value: PointOfDelivery: TestPoD"
+      verification: |
+          Set the attribute value by the DUT specific procedure.
+      disabled: true
+
+    - label: "Step 11d: TH awaits for an appropriate time, and checks that a ReportDataMessage attribute report for PointOfDelivery attribute is NOT sent."
+      verification: |
+          Verify the report is received and the value matches the value set in the previous step.
+          Verify ReportDataMessage on the TH (all-cluster-minimal-app) log. A ReportDataMessage attribute report for PointOfDelivery attribute is NOT sent:
+
+          ReportDataMessage =
+          {
+                  AttributeReportIBs =
+                  [
+                          AttributeReportIB =
+                          { 
+                                  AttributeDataIB =
+                                  {
+                                          DataVersion = 0xd32877aa,
+                                          AttributePathIB =
+                                          {
+                                                  Endpoint = 0x1,
+                                                  Cluster = 0x0B06,
+                                                  Attribute = 0x0002,
+                                          }
+
+                                          Data = TestPoD,
+                                  },
+
+                          },
+
+                  ],
+
+                  SuppressResponse = true,
+                  InteractionModelRevision = 1
+          }    
+      disabled: true
+
+# 0x0003 PowerThreshold
+    - label: "Step 9a: DUT internally sets the attribute value on the cluster: PowerThreshold: 0"
+      verification: |
+          Set the attribute value by the DUT specific procedure.
+      disabled: true
+
+    - label: "Step 9b: TH awaits a ReportDataMessage containing an attribute report for PowerThreshold attribute."
+      verification: |
+          Verify the report is received and the value matches the value set in the previous step.
+          Verify ReportDataMessage on the TH (all-cluster-minimal-app) log:
+
+          ReportDataMessage =
+          {
+                  AttributeReportIBs =
+                  [
+                          AttributeReportIB =
+                          {
+                                  AttributeDataIB =
+                                  {
+                                          DataVersion = 0xd32877aa,
+                                          AttributePathIB =
+                                          {
+                                                  Endpoint = 0x1,
+                                                  Cluster = 0x0B06,
+                                                  Attribute = 0x0003,
+                                          }
+
+                                          Data = 0,
+                                  },
+
+                          },
+
+                  ],
+
+                  SuppressResponse = true,
+                  InteractionModelRevision = 1
+          }
+      disabled: true
+
+    - label: "Step 10a: DUT internally sets the attribute value on the cluster: PowerThreshold: null"
+      verification: |
+          Set the attribute value by the DUT specific procedure.
+      disabled: true     
+
+    - label: "Step 10b: TH awaits a ReportDataMessage containing an attribute report for PowerThreshold attribute."
+      verification: |
+          Verify the report is received and the value matches the value set in the previous step.
+          Verify ReportDataMessage on the TH (all-cluster-minimal-app) log:
+
+          ReportDataMessage =
+          {
+                  AttributeReportIBs =
+                  [
+                          AttributeReportIB =
+                          {
+                                  AttributeDataIB =
+                                  {
+                                          DataVersion = 0xd32877aa,
+                                          AttributePathIB =
+                                          {
+                                                  Endpoint = 0x1,
+                                                  Cluster = 0x0B06,
+                                                  Attribute = 0x0003,
+                                          }
+
+                                          Data = NULL,
+                                  },
+
+                          },
+
+                  ],
+
+                  SuppressResponse = true,
+                  InteractionModelRevision = 1
+          }
+      disabled: true
+
+    - label: "Step 11a: DUT internally sets the attribute value on the cluster: PowerThreshold: 1"
+      verification: |
+          Set the attribute value by the DUT specific procedure.
+      disabled: true
+
+    - label: "Step 11b: TH awaits a ReportDataMessage containing an attribute report for PowerThreshold attribute."
+      verification: |
+          Verify the report is received and the value matches the value set in the previous step.
+          Verify ReportDataMessage on the TH (all-cluster-minimal-app) log:
+
+          ReportDataMessage =
+          {
+                  AttributeReportIBs =
+                  [
+                          AttributeReportIB =
+                          {
+                                  AttributeDataIB =
+                                  {
+                                          DataVersion = 0xd32877aa,
+                                          AttributePathIB =
+                                          {
+                                                  Endpoint = 0x1,
+                                                  Cluster = 0x0B06,
+                                                  Attribute = 0x0003,
+                                          }
+
+                                          Data = 1,
+                                  },
+
+                          },
+
+                  ],
+
+                  SuppressResponse = true,
+                  InteractionModelRevision = 1
+          }    
+      disabled: true
+
+    - label: "Step 11c: DUT internally sets the attribute value on the cluster to re-trigger the application to try to set the same attribute to the same value: PowerThreshold: 1"
+      verification: |
+          Set the attribute value by the DUT specific procedure.
+      disabled: true
+
+    - label: "Step 11d: TH awaits for an appropriate time, and checks that a ReportDataMessage attribute report for PowerThreshold attribute is NOT sent."
+      verification: |
+          Verify the report is received and the value matches the value set in the previous step.
+          Verify ReportDataMessage on the TH (all-cluster-minimal-app) log. A ReportDataMessage attribute report for PowerThreshold attribute is NOT sent:
+
+          ReportDataMessage =
+          {
+                  AttributeReportIBs =
+                  [
+                          AttributeReportIB =
+                          { 
+                                  AttributeDataIB =
+                                  {
+                                          DataVersion = 0xd32877aa,
+                                          AttributePathIB =
+                                          {
+                                                  Endpoint = 0x1,
+                                                  Cluster = 0x0B06,
+                                                  Attribute = 0x0002,
+                                          }
+
+                                          Data = 1  ,
+                                  },
+
+                          },
+
+                  ],
+
+                  SuppressResponse = true,
+                  InteractionModelRevision = 1
+          }    
+      disabled: true
+
+# 0x0004 PowerThresholdSource
+    - label: "Step 12a: DUT internally sets the attribute value on the cluster: PowerThresholdSource: 0"
+      verification: |
+          Set the attribute value by the DUT specific procedure.
+      disabled: true
+
+    - label: "Step 12b: TH awaits a ReportDataMessage containing an attribute report for PowerThresholdSource attribute."
+      verification: |
+          Verify the report is received and the value matches the value set in the previous step.
+          Verify ReportDataMessage on the TH (all-cluster-minimal-app) log:
+
+          ReportDataMessage =
+          {
+                  AttributeReportIBs =
+                  [
+                          AttributeReportIB =
+                          {
+                                  AttributeDataIB =
+                                  {
+                                          DataVersion = 0xd32877aa,
+                                          AttributePathIB =
+                                          {
+                                                  Endpoint = 0x1,
+                                                  Cluster = 0x0B06,
+                                                  Attribute = 0x0004,
+                                          }
+
+                                          Data = 0,
+                                  },
+
+                          },
+
+                  ],
+
+                  SuppressResponse = true,
+                  InteractionModelRevision = 1
+          }
+      disabled: true
+
+    - label: "Step 13a: DUT internally sets the attribute value on the cluster: PowerThresholdSource: null"
+      verification: |
+          Set the attribute value by the DUT specific procedure.
+      disabled: true     
+
+    - label: "Step 13b: TH awaits a ReportDataMessage containing an attribute report for PowerThresholdSource attribute."
+      verification: |
+          Verify the report is received and the value matches the value set in the previous step.
+          Verify ReportDataMessage on the TH (all-cluster-minimal-app) log:
+
+          ReportDataMessage =
+          {
+                  AttributeReportIBs =
+                  [
+                          AttributeReportIB =
+                          {
+                                  AttributeDataIB =
+                                  {
+                                          DataVersion = 0xd32877aa,
+                                          AttributePathIB =
+                                          {
+                                                  Endpoint = 0x1,
+                                                  Cluster = 0x0B06,
+                                                  Attribute = 0x0004,
+                                          }
+
+                                          Data = NULL,
+                                  },
+
+                          },
+
+                  ],
+
+                  SuppressResponse = true,
+                  InteractionModelRevision = 1
+          }
+      disabled: true
+
+    - label: "Step 14a: DUT internally sets the attribute value on the cluster: PowerThresholdSource: 1"
+      verification: |
+          Set the attribute value by the DUT specific procedure.
+      disabled: true
+
+    - label: "Step 14b: TH awaits a ReportDataMessage containing an attribute report for PowerThresholdSource attribute."
+      verification: |
+          Verify the report is received and the value matches the value set in the previous step.
+          Verify ReportDataMessage on the TH (all-cluster-minimal-app) log:
+
+          ReportDataMessage =
+          {
+                  AttributeReportIBs =
+                  [
+                          AttributeReportIB =
+                          {
+                                  AttributeDataIB =
+                                  {
+                                          DataVersion = 0xd32877aa,
+                                          AttributePathIB =
+                                          {
+                                                  Endpoint = 0x1,
+                                                  Cluster = 0x0B06,
+                                                  Attribute = 0x0004,
+                                          }
+
+                                          Data = 1,
+                                  },
+
+                          },
+
+                  ],
+
+                  SuppressResponse = true,
+                  InteractionModelRevision = 1
+          }    
+      disabled: true
+
+    - label: "Step 14c: DUT internally sets the attribute value on the cluster to re-trigger the application to try to set the same attribute to the same value: PowerThresholdSource: 1"
+      verification: |
+          Set the attribute value by the DUT specific procedure.
+      disabled: true
+
+    - label: "Step 14d: TH awaits for an appropriate time, and checks that a ReportDataMessage attribute report for PowerThresholdSource attribute is NOT sent."
+      verification: |
+          Verify the report is received and the value matches the value set in the previous step.
+          Verify ReportDataMessage on the TH (all-cluster-minimal-app) log. A ReportDataMessage attribute report for PowerThresholdSource attribute is NOT sent:
+
+          ReportDataMessage =
+          {
+                  AttributeReportIBs =
+                  [
+                          AttributeReportIB =
+                          { 
+                                  AttributeDataIB =
+                                  {
+                                          DataVersion = 0xd32877aa,
+                                          AttributePathIB =
+                                          {
+                                                  Endpoint = 0x1,
+                                                  Cluster = 0x0B06,
+                                                  Attribute = 0x0002,
+                                          }
+
+                                          Data = 1  ,
+                                  },
+
+                          },
+
+                  ],
+
+                  SuppressResponse = true,
+                  InteractionModelRevision = 1
+          }    
+      disabled: true
+    
+    - label: "Step 12: TH establishes subscription to all attributes on Meter Identification on the endpoint under test"
+      command: "subscribeAttribute"
+      attribute: "list_int8u"
+      minInterval: 0
+      maxInterval: 30
+      response:
+          value: []
