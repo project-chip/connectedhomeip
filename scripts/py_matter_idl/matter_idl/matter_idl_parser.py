@@ -508,7 +508,6 @@ class MatterIdlTransformer(Transformer):
         global_enums = []
         global_structs = []
 
-
         for item in items:
             if isinstance(item, Cluster):
                 clusters.append(item)
