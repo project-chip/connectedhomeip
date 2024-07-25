@@ -695,6 +695,7 @@ CHIP_ERROR ICDManager::HandleEventTrigger(uint64_t eventTrigger)
         break;
     case ICDTestEventTriggerEvent::kForceMaximumCheckInBackOffState:
         err = mICDCheckInBackOffStrategy->ForceMaximumCheckInBackoff();
+        break;
 #endif // CHIP_CONFIG_ENABLE_ICD_CIP
     default:
         err = CHIP_ERROR_INVALID_ARGUMENT;
