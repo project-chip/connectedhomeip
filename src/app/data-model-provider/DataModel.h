@@ -23,9 +23,9 @@
 #include <app/AttributeValueEncoder.h>
 #include <app/CommandHandler.h>
 
-#include <app/data-model-interface/Context.h>
-#include <app/data-model-interface/MetadataTypes.h>
-#include <app/data-model-interface/OperationTypes.h>
+#include <app/data-model-provider/Context.h>
+#include <app/data-model-provider/MetadataTypes.h>
+#include <app/data-model-provider/OperationTypes.h>
 
 namespace chip {
 namespace app {

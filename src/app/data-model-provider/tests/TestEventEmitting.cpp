@@ -17,7 +17,7 @@
  */
 
 #include <app-common/zap-generated/cluster-objects.h>
-#include <app/data-model-interface/EventsGenerator.h>
+#include <app/data-model-provider/EventsGenerator.h>
 #include <app/data-model/Decode.h>
 #include <lib/core/StringBuilderAdapters.h>
 #include <lib/support/CodeUtils.h>

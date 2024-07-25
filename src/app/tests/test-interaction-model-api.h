@@ -22,7 +22,7 @@
 #include <app/CommandHandler.h>
 #include <app/ConcreteCommandPath.h>
 #include <app/WriteHandler.h>
-#include <app/data-model-interface/DataModel.h>
+#include <app/data-model-provider/Provider.h>
 #include <app/util/attribute-storage.h>
 #include <app/util/mock/Constants.h>
 #include <app/util/mock/Functions.h>

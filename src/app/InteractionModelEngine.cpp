@@ -43,7 +43,7 @@
 #include <lib/support/FibonacciUtils.h>
 
 #if CHIP_CONFIG_USE_DATA_MODEL_INTERFACE
-#include <app/codegen-data-model/Instance.h>
+#include <app/codegen-data-model-provider/Instance.h>
 #endif
 
 namespace chip {
@@ -1720,7 +1720,7 @@ InteractionModel::DataModel * InteractionModelEngine::GetDataModel() const
 {
 #if CHIP_CONFIG_USE_DATA_MODEL_INTERFACE
     // TODO: this should be temporary, we should fully inject the data model
-    VerifyOrReturnValue(mDataModel != nullptr, CodegenDataModelInstance());
+    VerifyOrReturnValue(mDataModel != nullptr, CodegenDataModelProviderInstance());
 #endif
     return mDataModel;
 }

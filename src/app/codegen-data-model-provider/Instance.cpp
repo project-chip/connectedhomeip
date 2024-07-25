@@ -14,15 +14,15 @@
  *    See the License for the specific language governing permissions and
  *    limitations under the License.
  */
-#include <app/codegen-data-model/CodegenDataModel.h>
-#include <app/codegen-data-model/Instance.h>
+#include <app/codegen-data-model-provider/CodegenDataModelProvider.h>
+#include <app/codegen-data-model-provider/Instance.h>
 
 namespace chip {
 namespace app {
 
-InteractionModel::DataModel * CodegenDataModelInstance()
+InteractionModel::DataModel * CodegenDataModelProviderInstance()
 {
-    static CodegenDataModel gCodegenModel;
+    static CodegenDataModelProvider gCodegenModel;
     return &gCodegenModel;
 }
 

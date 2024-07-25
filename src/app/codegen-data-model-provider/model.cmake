@@ -11,18 +11,16 @@
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and
 # limitations under the License.
-import("//build_overrides/chip.gni")
-import("${chip_root}/build/chip/chip_test_suite.gni")
+set(BASE_DIR ${CMAKE_CURRENT_LIST_DIR})
 
-chip_test_suite("tests") {
-  output_name = "libIMInterfaceTests"
+# If you change this list, please ALSO CHANGE model.gni
+SET(CODEGEN_DATA_MODEL_SOURCES
+  "${BASE_DIR}/CodegenDataModelProvider.cpp"
+  "${BASE_DIR}/CodegenDataModelProvider.h"
+  "${BASE_DIR}/CodegenDataModelProvider_Read.cpp"
+  "${BASE_DIR}/CodegenDataModelProvider_Write.cpp"
+  "${BASE_DIR}/EmberMetadata.cpp"
+  "${BASE_DIR}/EmberMetadata.h"
+  "${BASE_DIR}/Instance.cpp"
+)
 
-  test_sources = [ "TestEventEmitting.cpp" ]
-
-  cflags = [ "-Wconversion" ]
-
-  public_deps = [
-    "${chip_root}/src/app/data-model-interface",
-    "${chip_root}/src/lib/core:string-builder-adapters",
-  ]
-}

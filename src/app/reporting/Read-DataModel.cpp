@@ -17,7 +17,7 @@
 #include <app/reporting/Read-DataModel.h>
 
 #include <app/AppConfig.h>
-#include <app/data-model-interface/DataModel.h>
+#include <app/data-model-provider/Provider.h>
 #include <app/util/MatterCallbacks.h>
 
 namespace chip {

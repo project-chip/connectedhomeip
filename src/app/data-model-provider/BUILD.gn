@@ -13,12 +13,12 @@
 # limitations under the License.
 import("//build_overrides/chip.gni")
 
-source_set("data-model-interface") {
+source_set("data-model-provider") {
   sources = [
     "ActionContext.h",
     "Context.h",
-    "DataModel.h",
-    "DataModelChangeListener.h",
+    "Provider.h",
+    "ProviderChangeListener.h",
     "EventsGenerator.h",
     "MetadataTypes.cpp",
     "MetadataTypes.h",

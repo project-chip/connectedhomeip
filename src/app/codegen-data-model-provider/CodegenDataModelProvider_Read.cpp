@@ -14,7 +14,7 @@
  *    See the License for the specific language governing permissions and
  *    limitations under the License.
  */
-#include <app/codegen-data-model/CodegenDataModel.h>
+#include <app/codegen-data-model-provider/CodegenDataModelProvider.h>
 
 #include <optional>
 #include <variant>
@@ -28,7 +28,7 @@
 #include <app/AttributeValueEncoder.h>
 #include <app/GlobalAttributes.h>
 #include <app/RequiredPrivilege.h>
-#include <app/codegen-data-model/EmberMetadata.h>
+#include <app/codegen-data-model-provider/EmberMetadata.h>
 #include <app/data-model/FabricScoped.h>
 #include <app/util/af-types.h>
 #include <app/util/attribute-metadata.h>
@@ -258,7 +258,7 @@ CHIP_ERROR EncodeEmberValue(ByteSpan data, const EmberAfAttributeMetadata * meta
 ///    - validate ACL (only for non-internal requests)
 ///    - Try to read attribute via the AttributeAccessInterface
 ///    - Try to read the value from ember RAM storage
-CHIP_ERROR CodegenDataModel::ReadAttribute(const InteractionModel::ReadAttributeRequest & request, AttributeValueEncoder & encoder)
+CHIP_ERROR CodegenDataModelProvider::ReadAttribute(const InteractionModel::ReadAttributeRequest & request, AttributeValueEncoder & encoder)
 {
     ChipLogDetail(DataManagement,
                   "Reading attribute: Cluster=" ChipLogFormatMEI " Endpoint=0x%x AttributeId=" ChipLogFormatMEI " (expanded=%d)",

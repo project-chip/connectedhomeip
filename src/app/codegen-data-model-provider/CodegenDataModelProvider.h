@@ -16,7 +16,7 @@
  */
 #pragma once
 
-#include <app/data-model-interface/DataModel.h>
+#include <app/data-model-provider/Provider.h>
 
 #include <app/util/af-types.h>
 
@@ -33,9 +33,9 @@ namespace app {
 /// as well as application-specific overrides to provide data model functionality.
 ///
 /// Given that this relies on global data at link time, there generally can be
-/// only one CodegenDataModel per application (you can create more instances,
+/// only one CodegenDataModelProvider per application (you can create more instances,
 /// however they would share the exact same underlying data and storage).
-class CodegenDataModel : public chip::app::InteractionModel::DataModel
+class CodegenDataModelProvider : public chip::app::InteractionModel::DataModel
 {
 private:
     /// Ember commands are stored as a `CommandId *` pointer that is either null (i.e. no commands)

@@ -16,9 +16,9 @@
  */
 #pragma once
 
-#include <app/data-model-interface/ActionContext.h>
-#include <app/data-model-interface/DataModelChangeListener.h>
-#include <app/data-model-interface/EventsGenerator.h>
+#include <app/data-model-provider/ActionContext.h>
+#include <app/data-model-provider/ProviderChangeListener.h>
+#include <app/data-model-provider/EventsGenerator.h>
 
 namespace chip {
 namespace app {

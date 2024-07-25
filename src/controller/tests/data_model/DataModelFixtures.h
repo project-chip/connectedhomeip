@@ -22,7 +22,7 @@
 #pragma once
 
 #include <app/CommandHandler.h>
-#include <app/data-model-interface/DataModel.h>
+#include <app/data-model-provider/Provider.h>
 #include <app/util/mock/Constants.h>
 #include <app/util/mock/Functions.h>
 #include <lib/core/DataModelTypes.h>

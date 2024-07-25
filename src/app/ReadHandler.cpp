@@ -22,7 +22,6 @@
  *
  */
 
-#include "data-model-interface/DataModel.h"
 #include <app/AppConfig.h>
 #include <app/InteractionModelEngine.h>
 #include <app/MessageDef/EventPathIB.h>
@@ -30,6 +29,7 @@
 #include <app/MessageDef/SubscribeRequestMessage.h>
 #include <app/MessageDef/SubscribeResponseMessage.h>
 #include <app/icd/server/ICDServerConfig.h>
+#include <app/data-model-provider/Provider.h>
 #include <lib/core/TLVUtilities.h>
 #include <messaging/ExchangeContext.h>
 
