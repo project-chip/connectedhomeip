@@ -213,7 +213,8 @@ PyChipError pychip_DeviceCommissioner_CloseBleConnection(chip::Controller::Devic
 const char * pychip_Stack_StatusReportToString(uint32_t profileId, uint16_t statusCode);
 
 PyChipError pychip_GetConnectedDeviceByNodeId(chip::Controller::DeviceCommissioner * devCtrl, chip::NodeId nodeId,
-                                              chip::Controller::Python::PyObject * context, DeviceAvailableFunc callback);
+                                              chip::Controller::Python::PyObject * context, DeviceAvailableFunc callback,
+                                              int transportPayloadCapability);
 PyChipError pychip_FreeOperationalDeviceProxy(chip::OperationalDeviceProxy * deviceProxy);
 PyChipError pychip_GetLocalSessionId(chip::OperationalDeviceProxy * deviceProxy, uint16_t * localSessionId);
 PyChipError pychip_GetNumSessionsToPeer(chip::OperationalDeviceProxy * deviceProxy, uint32_t * numSessions);
@@ -239,6 +240,13 @@ void pychip_Storage_ShutdownAdapter(chip::Controller::Python::StorageAdapter * s
 // ICD
 //
 void pychip_CheckInDelegate_SetOnCheckInCompleteCallback(PyChipCheckInDelegate::OnCheckInCompleteCallback * callback);
+
+//
+// LargePayload and TCP
+PyChipError pychip_SessionAllowsLargePayload(chip::OperationalDeviceProxy * deviceProxy, bool * allowsLargePayload);
+PyChipError pychip_IsSessionOverTCPConnection(chip::OperationalDeviceProxy * deviceProxy, bool * isSessionOverTCP);
+PyChipError pychip_IsActiveSession(chip::OperationalDeviceProxy * deviceProxy, bool * isActiveSession);
+PyChipError pychip_CloseTCPConnectionWithPeer(chip::OperationalDeviceProxy * deviceProxy);
 }
 
 void * pychip_Storage_InitializeStorageAdapter(chip::Controller::Python::PyObject * context,
@@ -807,11 +815,58 @@ struct GetDeviceCallbacks
 } // anonymous namespace
 
 PyChipError pychip_GetConnectedDeviceByNodeId(chip::Controller::DeviceCommissioner * devCtrl, chip::NodeId nodeId,
-                                              chip::Controller::Python::PyObject * context, DeviceAvailableFunc callback)
+                                              chip::Controller::Python::PyObject * context, DeviceAvailableFunc callback,
+                                              int transportPayloadCapability)
 {
     VerifyOrReturnError(devCtrl != nullptr, ToPyChipError(CHIP_ERROR_INVALID_ARGUMENT));
     auto * callbacks = new GetDeviceCallbacks(context, callback);
-    return ToPyChipError(devCtrl->GetConnectedDevice(nodeId, &callbacks->mOnSuccess, &callbacks->mOnFailure));
+    return ToPyChipError(devCtrl->GetConnectedDevice(nodeId, &callbacks->mOnSuccess, &callbacks->mOnFailure,
+                                                     static_cast<chip::TransportPayloadCapability>(transportPayloadCapability)));
+}
+
+PyChipError pychip_SessionAllowsLargePayload(chip::OperationalDeviceProxy * deviceProxy, bool * allowsLargePayload)
+{
+    VerifyOrReturnError(deviceProxy->GetSecureSession().HasValue(), ToPyChipError(CHIP_ERROR_MISSING_SECURE_SESSION));
+    VerifyOrReturnError(allowsLargePayload != nullptr, ToPyChipError(CHIP_ERROR_INVALID_ARGUMENT));
+
+    *allowsLargePayload = deviceProxy->GetSecureSession().Value()->AsSecureSession()->AllowsLargePayload();
+
+    return ToPyChipError(CHIP_NO_ERROR);
+}
+
+PyChipError pychip_IsSessionOverTCPConnection(chip::OperationalDeviceProxy * deviceProxy, bool * isSessionOverTCP)
+{
+    VerifyOrReturnError(deviceProxy->GetSecureSession().HasValue(), ToPyChipError(CHIP_ERROR_MISSING_SECURE_SESSION));
+    VerifyOrReturnError(isSessionOverTCP != nullptr, ToPyChipError(CHIP_ERROR_INVALID_ARGUMENT));
+
+    *isSessionOverTCP = deviceProxy->GetSecureSession().Value()->AsSecureSession()->GetTCPConnection() != nullptr;
+
+    return ToPyChipError(CHIP_NO_ERROR);
+}
+
+PyChipError pychip_IsActiveSession(chip::OperationalDeviceProxy * deviceProxy, bool * isActiveSession)
+{
+    VerifyOrReturnError(isActiveSession != nullptr, ToPyChipError(CHIP_ERROR_INVALID_ARGUMENT));
+
+    *isActiveSession = false;
+    if (deviceProxy->GetSecureSession().HasValue())
+    {
+        *isActiveSession = deviceProxy->GetSecureSession().Value()->AsSecureSession()->IsActiveSession();
+    }
+
+    return ToPyChipError(CHIP_NO_ERROR);
+}
+
+PyChipError pychip_CloseTCPConnectionWithPeer(chip::OperationalDeviceProxy * deviceProxy)
+{
+    VerifyOrReturnError(deviceProxy->GetSecureSession().HasValue(), ToPyChipError(CHIP_ERROR_MISSING_SECURE_SESSION));
+    VerifyOrReturnError(deviceProxy->GetSecureSession().Value()->AsSecureSession()->AllowsLargePayload(),
+                        ToPyChipError(CHIP_ERROR_INVALID_ARGUMENT));
+
+    deviceProxy->GetExchangeManager()->GetSessionManager()->TCPDisconnect(
+        deviceProxy->GetSecureSession().Value()->AsSecureSession()->GetTCPConnection(), /* shouldAbort = */ false);
+
+    return ToPyChipError(CHIP_NO_ERROR);
 }
 
 PyChipError pychip_FreeOperationalDeviceProxy(chip::OperationalDeviceProxy * deviceProxy)
