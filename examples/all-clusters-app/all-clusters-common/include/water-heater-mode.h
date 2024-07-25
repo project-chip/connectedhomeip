@@ -29,9 +29,9 @@ namespace Clusters {
 
 namespace WaterHeaterMode {
 
-constexpr uint8_t ModeOff    = 0;
-constexpr uint8_t ModeManual = 1;
-constexpr uint8_t ModeTimed  = 2;
+constexpr uint8_t kModeOff    = 0;
+constexpr uint8_t kModeManual = 1;
+constexpr uint8_t kModeTimed  = 2;
 
 /// This is an application level delegate to handle WaterHeaterMode commands according to the specific business logic.
 class ExampleWaterHeaterModeDelegate : public ModeBase::Delegate
