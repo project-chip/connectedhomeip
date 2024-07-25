@@ -3,7 +3,6 @@
 import dataclasses
 import functools
 import logging
-from collections.abc import Iterator
 from typing import Dict, Optional, Set
 
 from lark import Lark
