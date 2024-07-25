@@ -44,7 +44,7 @@ class TC_EWATERHTR_2_1(MatterBaseTest, EWATERHTRBase):
 
     def pics_TC_EWATERHTR_2_1(self):
         """ This function returns a list of PICS for this test case that must be True for the test to be run"""
-        return ["EWATERHTR.S", "EWATERHTR.S.F00", "EWATERHTR.S.F01"]
+        return ["EWATERHTR.S"]
 
     def steps_TC_EWATERHTR_2_1(self) -> list[TestStep]:
         steps = [
