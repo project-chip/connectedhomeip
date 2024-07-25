@@ -1208,7 +1208,6 @@ static NSString * sDeviceDataKeyPrefix = @"deviceData";
         return nil;
     }
 
-    // TODO:  what other checks are possible here? kmo 12 fri 2024 17h29
     index = data;
     return index;
 }
@@ -1219,7 +1218,6 @@ static NSString * sDeviceDataKeyPrefix = @"deviceData";
         MTRDeviceController * controller = self->_controller;
         VerifyOrReturn(controller != nil); // No way to call delegate without controller.
 
-        // REVIEWERS:  should we log failures? kmo 12 jul 2024 13h10
         NSString * storageKey = [self _dataKeyForPrefix:prefix key:key];
         BOOL storedSuccessfully = [self->_storageDelegate controller:controller
                                                           storeValue:value
@@ -1228,6 +1226,7 @@ static NSString * sDeviceDataKeyPrefix = @"deviceData";
                                                          sharingType:MTRStorageSharingTypeNotShared]; // REVIEWERS:  should be fabric shared? kmo 12 jul 2024 13h10
 
         if (!storedSuccessfully) {
+            MTR_LOG_ERROR("unable to store client data with device controller");
             return;
         }
 
