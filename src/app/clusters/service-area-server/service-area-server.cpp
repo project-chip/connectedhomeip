@@ -910,8 +910,12 @@ bool Instance::SetCurrentLocation(const DataModel::Nullable<uint32_t> & aCurrent
         return false;
     }
 
+    bool notifyChange = mCurrentLocation != aCurrentLocation;
+
     mCurrentLocation = aCurrentLocation;
-    NotifyCurrentLocationChanged();
+    if (notifyChange) {
+        NotifyCurrentLocationChanged();
+    }
 
     // EstimatedEndTime SHALL be null if the CurrentLocation attribute is null.
     if (mCurrentLocation.IsNull())
