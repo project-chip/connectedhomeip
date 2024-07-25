@@ -12,10 +12,10 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
+import importlib.util
 import logging
 import os
 from enum import Enum, auto
-import importlib.util
 
 from .builder import BuilderOutput
 from .gn import GnBuilder
