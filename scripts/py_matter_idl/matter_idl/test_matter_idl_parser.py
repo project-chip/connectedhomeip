@@ -27,6 +27,7 @@ except ModuleNotFoundError:
     from matter_idl.matter_idl_parser import CreateParser
 
 import unittest
+from typing import Optional
 
 from matter_idl.generators import GeneratorStorage
 from matter_idl.generators.idl import IdlGenerator
