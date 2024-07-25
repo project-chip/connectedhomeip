@@ -77,32 +77,32 @@ class TC_EWATERHTR_2_1(MatterBaseTest, EWATERHTRBase):
         # Commission DUT - already done
 
         self.step("2")
-        heater_types = await self.read_whm_attribute_expect_success(attribute="HeaterTypes")
-        asserts.assert_greater(heater_types, 0,
-                               f"Unexpected HeaterTypes value - expected {heater_types} > 0")
-        asserts.assert_less_equal(heater_types, Clusters.WaterHeaterManagement.Bitmaps.WaterHeaterTypeBitmap.kOther,
-                                  f"Unexpected HeaterTypes value - expected {heater_types} <= WaterHeaterTypeBitmap.kOther")
+        heaterTypes = await self.read_whm_attribute_expect_success(attribute="HeaterTypes")
+        asserts.assert_greater(heaterTypes, 0,
+                               f"Unexpected HeaterTypes value - expected {heaterTypes} > 0")
+        asserts.assert_less_equal(heaterTypes, Clusters.WaterHeaterManagement.Bitmaps.WaterHeaterTypeBitmap.kOther,
+                                  f"Unexpected HeaterTypes value - expected {heaterTypes} <= WaterHeaterTypeBitmap.kOther")
 
         self.step("3")
-        heat_demand = await self.read_whm_attribute_expect_success(attribute="HeatDemand")
-        asserts.assert_greater(heat_demand, 0,
-                                     f"Unexpected HeatDemand value - expected {heat_demand} > 0")
-        asserts.assert_less_equal(heat_demand, Clusters.WaterHeaterManagement.Bitmaps.WaterHeaterDemandBitmap.kOther,
-                                  f"Unexpected HeatDemand value - expected {heat_demand} <= WaterHeaterDemandBitmap.kOther")
+        heatDemand = await self.read_whm_attribute_expect_success(attribute="HeatDemand")
+        asserts.assert_greater(heatDemand, 0,
+                                     f"Unexpected HeatDemand value - expected {heatDemand} > 0")
+        asserts.assert_less_equal(heatDemand, Clusters.WaterHeaterManagement.Bitmaps.WaterHeaterDemandBitmap.kOther,
+                                  f"Unexpected HeatDemand value - expected {heatDemand} <= WaterHeaterDemandBitmap.kOther")
 
         self.step("4")
         if em_supported:
             value = await self.read_whm_attribute_expect_success(attribute="TankVolume")
             asserts.assert_greater_equal(value, 0, f"Unexpected TankVolume value - expected {value} >= 0")
         else:
-            logging.info("Skipping step 2c as PIXIT.EWATERHTR.EM not supported")
+            logging.info("Skipping step 4 as PIXIT.EWATERHTR.EM not supported")
 
         self.step("5")
         if em_supported:
             value = await self.read_whm_attribute_expect_success(attribute="EstimatedHeatRequired")
-            asserts.assert_greater_equal(value, 0, f"Unexpected EstimatedHeatRequired value - expected {value} >= 0")
+            asserts.assert_greater(value, 0, f"Unexpected EstimatedHeatRequired value - expected {value} > 0")
         else:
-            logging.info("Skipping step 2d as PIXIT.EWATERHTR.EM not supported")
+            logging.info("Skipping step 5 as PIXIT.EWATERHTR.EM not supported")
 
         self.step("6")
         if tp_supported:
@@ -110,7 +110,7 @@ class TC_EWATERHTR_2_1(MatterBaseTest, EWATERHTRBase):
             asserts.assert_greater_equal(value, 0, f"Unexpected TankPercentage value - expected {value} >= 0")
             asserts.assert_less_equal(value, 100, f"Unexpected TankPercentage value - expected {value} <= 100")
         else:
-            logging.info("Skipping step 2e as PIXIT.EWATERHTR.TP not supported")
+            logging.info("Skipping step 6 as PIXIT.EWATERHTR.TP not supported")
 
         self.step("7")
         await self.check_whm_attribute("BoostState", Clusters.WaterHeaterManagement.Enums.BoostStateEnum.kInactive)
