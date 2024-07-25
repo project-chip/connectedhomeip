@@ -698,7 +698,7 @@ private:
 
     SubscriptionResumptionStorage * mpSubscriptionResumptionStorage = nullptr;
 
-    DataModel::Provider * mDataModel = nullptr;
+    DataModel::Provider * mDataModelProvider = nullptr;
 };
 
 } // namespace app

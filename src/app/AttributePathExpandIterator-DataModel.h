@@ -85,11 +85,11 @@ public:
     /** Start iterating over the given `paths` */
     inline void ResetTo(SingleLinkedListNode<AttributePathParams> * paths)
     {
-        *this = AttributePathExpandIteratorDataModel(mDataModel, paths);
+        *this = AttributePathExpandIteratorDataModel(mDataModelProvider, paths);
     }
 
 private:
-    DataModel::Provider * mDataModel;
+    DataModel::Provider * mDataModelProvider;
     SingleLinkedListNode<AttributePathParams> * mpAttributePath;
     ConcreteAttributePath mOutputPath;
 

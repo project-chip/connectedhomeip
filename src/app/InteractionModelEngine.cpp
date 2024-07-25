@@ -1712,7 +1712,7 @@ DataModel::Provider * InteractionModelEngine::SetDataModelProvider(DataModel::Pr
     VerifyOrDie(mReadHandlers.begin() == mReadHandlers.end());
 
     DataModel::Provider * oldModel = GetDataModelProvider();
-    mDataModel                     = model;
+    mDataModelProvider                     = model;
     return oldModel;
 }
 
@@ -1720,9 +1720,9 @@ DataModel::Provider * InteractionModelEngine::GetDataModelProvider() const
 {
 #if CHIP_CONFIG_USE_DATA_MODEL_INTERFACE
     // TODO: this should be temporary, we should fully inject the data model
-    VerifyOrReturnValue(mDataModel != nullptr, CodegenDataModelProviderInstance());
+    VerifyOrReturnValue(mDataModelProvider != nullptr, CodegenDataModelProviderInstance());
 #endif
-    return mDataModel;
+    return mDataModelProvider;
 }
 
 void InteractionModelEngine::OnTimedInteractionFailed(TimedHandler * apTimedHandler)
