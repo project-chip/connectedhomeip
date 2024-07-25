@@ -106,9 +106,7 @@ source_set("efr32_test_main") {
 }
 
 group("efr32") {
-  deps = [
-    "${chip_root}/src:tests",
-  ]
+  deps = [ "${chip_root}/src:tests" ]
 }
 
 group("runner") {
