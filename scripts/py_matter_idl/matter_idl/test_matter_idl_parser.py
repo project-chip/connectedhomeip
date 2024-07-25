@@ -870,7 +870,68 @@ server cluster A = 1 { /* Test comment */ }
             ],
         )
         self.assertIdlEqual(actual, expected)
-        self.assertEqual(actual, expected)
+
+    def test_cluster_reference_globals_recursive(self):
+        actual = parseText("""
+            enum TestEnum : ENUM16 {}
+            bitmap TestBitmap : BITMAP32 {}
+
+            struct TestStruct1 {
+                TestEnum enumField = 0;
+            }
+
+            struct TestStruct2 {
+                TestStruct1 substruct = 0;
+            }
+
+            struct TestStruct3 {
+                TestStruct2 substruct = 0;
+                TestBitmap bmp = 1;
+            }
+
+            server cluster Foo = 1 {
+                attribute TestStruct3 structAttr = 1;
+            }
+        """)
+
+        global_enum = Enum(name="TestEnum", base_type="ENUM16", entries=[], is_global=True)
+        global_bitmap = Bitmap(name="TestBitmap", base_type="BITMAP32", entries=[], is_global=True)
+        global_struct1 = Struct(name="TestStruct1", fields=[
+            Field(name="enumField", code=0, data_type=DataType(name="TestEnum")),
+
+        ], is_global=True)
+        global_struct2 = Struct(name="TestStruct2", fields=[
+            Field(name="substruct", code=0, data_type=DataType(name="TestStruct1")),
+
+        ], is_global=True)
+        global_struct3 = Struct(name="TestStruct3", fields=[
+            Field(name="substruct", code=0, data_type=DataType(name="TestStruct2")),
+            Field(name="bmp", code=1, data_type=DataType(name="TestBitmap")),
+        ], is_global=True)
+        expected = Idl(
+            global_enums=[global_enum],
+            global_bitmaps=[global_bitmap],
+            global_structs=[global_struct1, global_struct2, global_struct3],
+            clusters=[
+                Cluster(
+                    name="Foo",
+                    code=1,
+                    enums=[global_enum],
+                    bitmaps=[global_bitmap],
+                    structs=[
+                        global_struct3,
+                        global_struct2,
+                        global_struct1,
+                    ],
+                    attributes=[
+                        Attribute(
+                            qualities=AttributeQuality.READABLE | AttributeQuality.WRITABLE,
+                            definition=Field(data_type=DataType(name="TestStruct3"), code=1, name="structAttr")),
+                    ],
+                )
+            ],
+        )
+        self.assertIdlEqual(actual, expected)
 
     def test_emits_events(self):
         actual = parseText("""

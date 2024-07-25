@@ -85,7 +85,6 @@ bitmap {{bitmap.name}} : {{ bitmap.base_type}} {
 
   {%- for s in cluster.structs | selectattr("is_global") %}
   /* GLOBAL:
-
   {{render_struct(s)}}
    */
 
