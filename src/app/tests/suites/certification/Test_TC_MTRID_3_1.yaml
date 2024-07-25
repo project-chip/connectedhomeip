@@ -42,7 +42,7 @@ tests:
 
 # 0x0000 MeterType
 
-    - label: "Step 3: DUT internally sets the attribute value on the cluster: MeterType: 0"
+    - label: "Step 3a: DUT internally sets the attribute value on the cluster: MeterType: 0"
       verification: |
           Set the attribute value by the DUT specific procedure.
       disabled: true
@@ -502,12 +502,14 @@ tests:
       disabled: true
 
 # 0x0003 PowerThreshold
-    - label: "Step 9a: DUT internally sets the attribute value on the cluster: PowerThreshold: 0"
+    - label: "Step 12a: DUT internally sets the attribute value on the cluster: PowerThreshold: 0"
+      PICS: MTRID.S.A0003
       verification: |
           Set the attribute value by the DUT specific procedure.
       disabled: true
 
-    - label: "Step 9b: TH awaits a ReportDataMessage containing an attribute report for PowerThreshold attribute."
+    - label: "Step 12b: TH awaits a ReportDataMessage containing an attribute report for PowerThreshold attribute."
+      PICS: MTRID.S.A0003
       verification: |
           Verify the report is received and the value matches the value set in the previous step.
           Verify ReportDataMessage on the TH (all-cluster-minimal-app) log:
@@ -540,12 +542,14 @@ tests:
           }
       disabled: true
 
-    - label: "Step 10a: DUT internally sets the attribute value on the cluster: PowerThreshold: null"
+    - label: "Step 13a: DUT internally sets the attribute value on the cluster: PowerThreshold: null"
+      PICS: MTRID.S.A0003
       verification: |
           Set the attribute value by the DUT specific procedure.
       disabled: true     
 
-    - label: "Step 10b: TH awaits a ReportDataMessage containing an attribute report for PowerThreshold attribute."
+    - label: "Step 13b: TH awaits a ReportDataMessage containing an attribute report for PowerThreshold attribute."
+      PICS: MTRID.S.A0003
       verification: |
           Verify the report is received and the value matches the value set in the previous step.
           Verify ReportDataMessage on the TH (all-cluster-minimal-app) log:
@@ -578,12 +582,14 @@ tests:
           }
       disabled: true
 
-    - label: "Step 11a: DUT internally sets the attribute value on the cluster: PowerThreshold: 1"
+    - label: "Step 14a: DUT internally sets the attribute value on the cluster: PowerThreshold: 1"
+      PICS: MTRID.S.A0003
       verification: |
           Set the attribute value by the DUT specific procedure.
       disabled: true
 
-    - label: "Step 11b: TH awaits a ReportDataMessage containing an attribute report for PowerThreshold attribute."
+    - label: "Step 14b: TH awaits a ReportDataMessage containing an attribute report for PowerThreshold attribute."
+      PICS: MTRID.S.A0003
       verification: |
           Verify the report is received and the value matches the value set in the previous step.
           Verify ReportDataMessage on the TH (all-cluster-minimal-app) log:
@@ -616,12 +622,14 @@ tests:
           }    
       disabled: true
 
-    - label: "Step 11c: DUT internally sets the attribute value on the cluster to re-trigger the application to try to set the same attribute to the same value: PowerThreshold: 1"
+    - label: "Step 14c: DUT internally sets the attribute value on the cluster to re-trigger the application to try to set the same attribute to the same value: PowerThreshold: 1"
+      PICS: MTRID.S.A0003
       verification: |
           Set the attribute value by the DUT specific procedure.
       disabled: true
 
-    - label: "Step 11d: TH awaits for an appropriate time, and checks that a ReportDataMessage attribute report for PowerThreshold attribute is NOT sent."
+    - label: "Step 14d: TH awaits for an appropriate time, and checks that a ReportDataMessage attribute report for PowerThreshold attribute is NOT sent."
+      PICS: MTRID.S.A0003
       verification: |
           Verify the report is received and the value matches the value set in the previous step.
           Verify ReportDataMessage on the TH (all-cluster-minimal-app) log. A ReportDataMessage attribute report for PowerThreshold attribute is NOT sent:
@@ -655,12 +663,14 @@ tests:
       disabled: true
 
 # 0x0004 PowerThresholdSource
-    - label: "Step 12a: DUT internally sets the attribute value on the cluster: PowerThresholdSource: 0"
+    - label: "Step 15a: DUT internally sets the attribute value on the cluster: PowerThresholdSource: 0"
+      PICS: MTRID.S.A0004
       verification: |
           Set the attribute value by the DUT specific procedure.
       disabled: true
 
-    - label: "Step 12b: TH awaits a ReportDataMessage containing an attribute report for PowerThresholdSource attribute."
+    - label: "Step 15b: TH awaits a ReportDataMessage containing an attribute report for PowerThresholdSource attribute."
+      PICS: MTRID.S.A0004
       verification: |
           Verify the report is received and the value matches the value set in the previous step.
           Verify ReportDataMessage on the TH (all-cluster-minimal-app) log:
@@ -693,12 +703,14 @@ tests:
           }
       disabled: true
 
-    - label: "Step 13a: DUT internally sets the attribute value on the cluster: PowerThresholdSource: null"
+    - label: "Step 16a: DUT internally sets the attribute value on the cluster: PowerThresholdSource: null"
+      PICS: MTRID.S.A0004
       verification: |
           Set the attribute value by the DUT specific procedure.
       disabled: true     
 
-    - label: "Step 13b: TH awaits a ReportDataMessage containing an attribute report for PowerThresholdSource attribute."
+    - label: "Step 16b: TH awaits a ReportDataMessage containing an attribute report for PowerThresholdSource attribute."
+      PICS: MTRID.S.A0004
       verification: |
           Verify the report is received and the value matches the value set in the previous step.
           Verify ReportDataMessage on the TH (all-cluster-minimal-app) log:
@@ -731,12 +743,14 @@ tests:
           }
       disabled: true
 
-    - label: "Step 14a: DUT internally sets the attribute value on the cluster: PowerThresholdSource: 1"
+    - label: "Step 17a: DUT internally sets the attribute value on the cluster: PowerThresholdSource: 1"
+      PICS: MTRID.S.A0004
       verification: |
           Set the attribute value by the DUT specific procedure.
       disabled: true
 
-    - label: "Step 14b: TH awaits a ReportDataMessage containing an attribute report for PowerThresholdSource attribute."
+    - label: "Step 17b: TH awaits a ReportDataMessage containing an attribute report for PowerThresholdSource attribute."
+      PICS: MTRID.S.A0004
       verification: |
           Verify the report is received and the value matches the value set in the previous step.
           Verify ReportDataMessage on the TH (all-cluster-minimal-app) log:
@@ -769,12 +783,14 @@ tests:
           }    
       disabled: true
 
-    - label: "Step 14c: DUT internally sets the attribute value on the cluster to re-trigger the application to try to set the same attribute to the same value: PowerThresholdSource: 1"
+    - label: "Step 17c: DUT internally sets the attribute value on the cluster to re-trigger the application to try to set the same attribute to the same value: PowerThresholdSource: 1"
+      PICS: MTRID.S.A0004
       verification: |
           Set the attribute value by the DUT specific procedure.
       disabled: true
 
-    - label: "Step 14d: TH awaits for an appropriate time, and checks that a ReportDataMessage attribute report for PowerThresholdSource attribute is NOT sent."
+    - label: "Step 17d: TH awaits for an appropriate time, and checks that a ReportDataMessage attribute report for PowerThresholdSource attribute is NOT sent."
+      PICS: MTRID.S.A0004
       verification: |
           Verify the report is received and the value matches the value set in the previous step.
           Verify ReportDataMessage on the TH (all-cluster-minimal-app) log. A ReportDataMessage attribute report for PowerThresholdSource attribute is NOT sent:
@@ -807,7 +823,7 @@ tests:
           }    
       disabled: true
     
-    - label: "Step 12: TH establishes subscription to all attributes on Meter Identification on the endpoint under test"
+    - label: "Step 18: TH establishes subscription to all attributes on Meter Identification on the endpoint under test"
       command: "subscribeAttribute"
       attribute: "list_int8u"
       minInterval: 0
