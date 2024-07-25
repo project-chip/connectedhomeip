@@ -11425,6 +11425,10 @@ class BridgedDeviceBasicInformation(Cluster):
             # enum value. This specific should never be transmitted.
             kUnknownEnumValue = 6,
 
+    class Bitmaps:
+        class Feature(IntFlag):
+            kBridgedICDSupport = 0x100000
+
     class Structs:
         @dataclass
         class ProductAppearanceStruct(ClusterObject):
@@ -11438,6 +11442,20 @@ class BridgedDeviceBasicInformation(Cluster):
 
             finish: 'BridgedDeviceBasicInformation.Enums.ProductFinishEnum' = 0
             primaryColor: 'typing.Union[Nullable, BridgedDeviceBasicInformation.Enums.ColorEnum]' = NullValue
+
+    class Commands:
+        @dataclass
+        class KeepActive(ClusterCommand):
+            cluster_id: typing.ClassVar[int] = 0x00000039
+            command_id: typing.ClassVar[int] = 0x00000080
+            is_client: typing.ClassVar[bool] = True
+            response_type: typing.ClassVar[str] = None
+
+            @ChipUtility.classproperty
+            def descriptor(cls) -> ClusterObjectDescriptor:
+                return ClusterObjectDescriptor(
+                    Fields=[
+                    ])
 
     class Attributes:
         @dataclass
@@ -11862,6 +11880,25 @@ class BridgedDeviceBasicInformation(Cluster):
                     ])
 
             reachableNewValue: 'bool' = False
+
+        @dataclass
+        class ActiveChanged(ClusterEvent):
+            @ChipUtility.classproperty
+            def cluster_id(cls) -> int:
+                return 0x00000039
+
+            @ChipUtility.classproperty
+            def event_id(cls) -> int:
+                return 0x00000080
+
+            @ChipUtility.classproperty
+            def descriptor(cls) -> ClusterObjectDescriptor:
+                return ClusterObjectDescriptor(
+                    Fields=[
+                        ClusterObjectFieldDescriptor(Label="promisedActiveDuration", Tag=0, Type=uint),
+                    ])
+
+            promisedActiveDuration: 'uint' = 0
 
 
 @dataclass
