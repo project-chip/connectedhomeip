@@ -77,18 +77,18 @@ class TC_EWATERHTR_2_1(MatterBaseTest, EWATERHTRBase):
         # Commission DUT - already done
 
         self.step("2")
-        value = await self.read_whm_attribute_expect_success(attribute="HeaterTypes")
-        asserts.assert_greater_equal(value, Clusters.WaterHeaterManagement.Bitmaps.WaterHeaterTypeBitmap.kImmersionElement1,
-                                     f"Unexpected HeaterTypes value - expected {value} >= WaterHeaterTypeBitmap..kImmersionElement1")
-        asserts.assert_less_equal(value, Clusters.WaterHeaterManagement.Bitmaps.WaterHeaterTypeBitmap.kOther,
-                                  f"Unexpected HeaterTypes value - expected {value} <= WaterHeaterTypeBitmap.kOther")
+        heater_types = await self.read_whm_attribute_expect_success(attribute="HeaterTypes")
+        asserts.assert_greater(heater_types, 0,
+                               f"Unexpected HeaterTypes value - expected {heater_types} > 0")
+        asserts.assert_less_equal(heater_types, Clusters.WaterHeaterManagement.Bitmaps.WaterHeaterTypeBitmap.kOther,
+                                  f"Unexpected HeaterTypes value - expected {heater_types} <= WaterHeaterTypeBitmap.kOther")
 
         self.step("3")
-        value = await self.read_whm_attribute_expect_success(attribute="HeatDemand")
-        asserts.assert_greater_equal(value, Clusters.WaterHeaterManagement.Bitmaps.WaterHeaterDemandBitmap.kImmersionElement1,
-                                     f"Unexpected HeatDemand value - expected {value} >= WaterHeaterDemandBitmap.kImmersionElement1")
-        asserts.assert_less_equal(value, Clusters.WaterHeaterManagement.Bitmaps.WaterHeaterDemandBitmap.kOther,
-                                  f"Unexpected HeatDemand value - expected {value} <= WaterHeaterDemandBitmap.kOther")
+        heat_demand = await self.read_whm_attribute_expect_success(attribute="HeatDemand")
+        asserts.assert_greater(heat_demand, 0,
+                                     f"Unexpected HeatDemand value - expected {heat_demand} > 0")
+        asserts.assert_less_equal(heat_demand, Clusters.WaterHeaterManagement.Bitmaps.WaterHeaterDemandBitmap.kOther,
+                                  f"Unexpected HeatDemand value - expected {heat_demand} <= WaterHeaterDemandBitmap.kOther")
 
         self.step("4")
         if em_supported:

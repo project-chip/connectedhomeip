@@ -188,17 +188,18 @@ class TC_EWATERHTR_2_2(MatterBaseTest, EWATERHTRBase):
         await self.check_whm_attribute("BoostState", Clusters.WaterHeaterManagement.Enums.BoostStateEnum.kInactive)
 
         self.step("3c")
-        heaterTypes = await self.read_whm_attribute_expect_success(attribute="HeaterTypes")
-        asserts.assert_equal(
-            heaterTypes, Clusters.WaterHeaterManagement.Bitmaps.WaterHeaterTypeBitmap.kImmersionElement1)
+        heater_types = await self.read_whm_attribute_expect_success(attribute="HeaterTypes")
+        asserts.assert_greater(heater_types, 0,
+                               f"Unexpected HeaterTypes value - expected {heater_types} > 0")
+        asserts.assert_less_equal(heater_types, Clusters.WaterHeaterManagement.Bitmaps.WaterHeaterTypeBitmap.kOther,
+                                  f"Unexpected HeaterTypes value - expected {heater_types} <= WaterHeaterTypeBitmap.kOther")
 
         self.step("4")
         await self.send_test_event_trigger_manual_mode_test_event()
 
         self.step("4a")
         heatDemand = await self.read_whm_attribute_expect_success(attribute="HeatDemand")
-        asserts.assert_not_equal(
-            heatDemand & Clusters.WaterHeaterManagement.Bitmaps.WaterHeaterDemandBitmap.kImmersionElement1, 0)
+        asserts.assert_greater(heatDemand, 0)
 
         self.step("5")
         await self.send_test_event_trigger_water_temperature61C_test_event()
@@ -212,8 +213,7 @@ class TC_EWATERHTR_2_2(MatterBaseTest, EWATERHTRBase):
 
         self.step("6a")
         heatDemand = await self.read_whm_attribute_expect_success(attribute="HeatDemand")
-        asserts.assert_not_equal(
-            heatDemand & Clusters.WaterHeaterManagement.Bitmaps.WaterHeaterDemandBitmap.kImmersionElement1, 0)
+        asserts.assert_greater(heatDemand, 0)
 
         self.step("7")
         await self.send_test_event_trigger_off_mode_test_event()
@@ -226,9 +226,9 @@ class TC_EWATERHTR_2_2(MatterBaseTest, EWATERHTRBase):
         await self.send_boost_command(duration=5, one_shot=True)
 
         self.step("8a")
-        heatDemand = await self.read_whm_attribute_expect_success(attribute="HeatDemand")
-        asserts.assert_not_equal(
-            heatDemand & Clusters.WaterHeaterManagement.Bitmaps.WaterHeaterDemandBitmap.kImmersionElement1, 0)
+        heat_demand = await self.read_whm_attribute_expect_success(attribute="HeatDemand")
+        asserts.assert_greater(heat_demand, 0)
+        asserts.assert_equal(heat_demand & (~heater_types), 0, "heat_demand should only be from declared supported types"),
 
         self.step("8b")
         await self.check_whm_attribute("BoostState", Clusters.WaterHeaterManagement.Enums.BoostStateEnum.kActive)
@@ -248,8 +248,8 @@ class TC_EWATERHTR_2_2(MatterBaseTest, EWATERHTRBase):
 
         self.step("10a")
         heatDemand = await self.read_whm_attribute_expect_success(attribute="HeatDemand")
-        asserts.assert_not_equal(
-            heatDemand & Clusters.WaterHeaterManagement.Bitmaps.WaterHeaterDemandBitmap.kImmersionElement1, 0)
+        asserts.assert_greater(heat_demand, 0)
+        asserts.assert_equal(heat_demand & (~heater_types), 0, "heat_demand should only be from declared supported types"),
 
         self.step("10b")
         await self.check_whm_attribute("BoostState", Clusters.WaterHeaterManagement.Enums.BoostStateEnum.kActive)
@@ -276,8 +276,8 @@ class TC_EWATERHTR_2_2(MatterBaseTest, EWATERHTRBase):
 
         self.step("13a")
         heatDemand = await self.read_whm_attribute_expect_success(attribute="HeatDemand")
-        asserts.assert_not_equal(
-            heatDemand & Clusters.WaterHeaterManagement.Bitmaps.WaterHeaterDemandBitmap.kImmersionElement1, 0)
+        asserts.assert_greater(heat_demand, 0)
+        asserts.assert_equal(heat_demand & (~heater_types), 0, "heat_demand should only be from declared supported types"),
 
         self.step("13b")
         await self.check_whm_attribute("BoostState", Clusters.WaterHeaterManagement.Enums.BoostStateEnum.kActive)
@@ -297,8 +297,8 @@ class TC_EWATERHTR_2_2(MatterBaseTest, EWATERHTRBase):
 
         self.step("15a")
         heatDemand = await self.read_whm_attribute_expect_success(attribute="HeatDemand")
-        asserts.assert_not_equal(
-            heatDemand & Clusters.WaterHeaterManagement.Bitmaps.WaterHeaterDemandBitmap.kImmersionElement1, 0)
+        asserts.assert_greater(heat_demand, 0)
+        asserts.assert_equal(heat_demand & (~heater_types), 0, "heat_demand should only be from declared supported types"),
 
         self.step("15b")
         await self.check_whm_attribute("BoostState", Clusters.WaterHeaterManagement.Enums.BoostStateEnum.kActive)
@@ -318,8 +318,8 @@ class TC_EWATERHTR_2_2(MatterBaseTest, EWATERHTRBase):
 
         self.step("17a")
         heatDemand = await self.read_whm_attribute_expect_success(attribute="HeatDemand")
-        asserts.assert_not_equal(
-            heatDemand & Clusters.WaterHeaterManagement.Bitmaps.WaterHeaterDemandBitmap.kImmersionElement1, 0)
+        asserts.assert_greater(heat_demand, 0)
+        asserts.assert_equal(heat_demand & (~heater_types), 0, "heat_demand should only be from declared supported types"),
 
         self.step("17b")
         await self.check_whm_attribute("BoostState", Clusters.WaterHeaterManagement.Enums.BoostStateEnum.kActive)
@@ -350,8 +350,8 @@ class TC_EWATERHTR_2_2(MatterBaseTest, EWATERHTRBase):
 
         self.step("20a")
         heatDemand = await self.read_whm_attribute_expect_success(attribute="HeatDemand")
-        asserts.assert_not_equal(
-            heatDemand & Clusters.WaterHeaterManagement.Bitmaps.WaterHeaterDemandBitmap.kImmersionElement1, 0)
+        asserts.assert_greater(heat_demand, 0)
+        asserts.assert_equal(heat_demand & (~heater_types), 0, "heat_demand should only be from declared supported types"),
 
         self.step("20b")
         await self.check_whm_attribute("BoostState", Clusters.WaterHeaterManagement.Enums.BoostStateEnum.kActive)
