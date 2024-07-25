@@ -32,8 +32,8 @@ from matter_idl.matter_idl_types import (AccessPrivilege, ApiMaturity, Attribute
                                          Field, FieldQuality, Idl, ParseMetaData, ServerClusterInstantiation, Struct, StructTag)
 
 
-def parseText(txt, skip_meta=True):
-    return CreateParser(skip_meta=skip_meta).parse(txt)
+def parseText(txt, skip_meta=True, merge_globals=True):
+    return CreateParser(skip_meta=skip_meta, merge_globals=merge_globals).parse(txt)
 
 
 class TestParser(unittest.TestCase):
