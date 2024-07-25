@@ -215,6 +215,7 @@ class TC_EWATERHTR_2_2(MatterBaseTest, EWATERHTRBase):
         self.step("6a")
         heatDemand = await self.read_whm_attribute_expect_success(attribute="HeatDemand")
         asserts.assert_greater(heatDemand, 0)
+        asserts.assert_equal(heatDemand & (~heaterTypes), 0, "heatDemand should only be from declared supported types"),
 
         self.step("7")
         await self.send_test_event_trigger_off_mode_test_event()
@@ -330,8 +331,8 @@ class TC_EWATERHTR_2_2(MatterBaseTest, EWATERHTRBase):
 
         self.step("18a")
         heatDemand = await self.read_whm_attribute_expect_success(attribute="HeatDemand")
-        asserts.assert_not_equal(
-            heatDemand & Clusters.WaterHeaterManagement.Bitmaps.WaterHeaterDemandBitmap.kImmersionElement1, 0)
+        asserts.assert_greater(heatDemand, 0)
+        asserts.assert_equal(heatDemand & (~heaterTypes), 0, "heatDemand should only be from declared supported types"),
 
         self.step("18b")
         await self.check_whm_attribute("BoostState", Clusters.WaterHeaterManagement.Enums.BoostStateEnum.kActive)
