@@ -42,7 +42,7 @@ class MockTestRunner():
         self.test = test
         self.endpoint = endpoint
         self.pics = pics
-        self.set_test(filename, classname, test, endpoint, pics)
+        self.set_test(filename, classname, test)
         self.stack = MatterStackState(self.config)
         self.default_controller = self.stack.certificate_authorities[0].adminList[0].NewController(
             nodeId=self.config.controller_node_id,
