@@ -63,10 +63,10 @@ tests:
           constraints:
               type: power-mW
 
-    - label: "Step 6: TH reads PowerThresholdSourse attribute from DUT"
+    - label: "Step 6: TH reads PowerThresholdSource attribute from DUT"
       PICS: MTRID.S.A0004
       command: "readAttribute"
-      attribute: "PowerThresholdSourse"
+      attribute: "PowerThresholdSource"
       response:
           constraints:
               type: PowerThresholdSourceEnum
