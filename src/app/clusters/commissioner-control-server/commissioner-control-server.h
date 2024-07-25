@@ -24,8 +24,8 @@ namespace app {
 namespace Clusters {
 namespace CommissionerControl {
 
-// Set to 64 bytes, which is more than enough for storing an IPv6 address in either binary or text form.
-static constexpr size_t kIpAddressBufferSize = 64;
+// Spec indicates that IP Address is either 4 or 16 bytes.
+static constexpr size_t kIpAddressBufferSize = 16;
 
 struct CommissioningApprovalRequest
 {
@@ -48,10 +48,10 @@ struct CommissioningWindowParams
 
 struct CommissionNodeInfo
 {
-    CommissioningWindowParams params;
-    Optional<ByteSpan> ipAddress;
-    Optional<uint16_t> port;
-    uint8_t ipAddressBuffer[kIpAddressBufferSize];
+    const Optional<ByteSpan> GetIPAddress()
+    {
+        return ipAddress;
+    }
 
     CHIP_ERROR SetIPAddress(const Optional<ByteSpan> & address)
     {
@@ -63,22 +63,22 @@ struct CommissionNodeInfo
 
         const ByteSpan & addressSpan = address.Value();
         size_t addressLength         = addressSpan.size();
-
-        if (addressLength > kIpAddressBufferSize)
+        if (addressLength != 4 && addressLength != 16)
         {
-            return CHIP_ERROR_BUFFER_TOO_SMALL;
-        }
-
-        if (addressLength == 0)
-        {
-            ipAddress.ClearValue();
-            return CHIP_NO_ERROR;
+            return CHIP_ERROR_INVALID_ARGUMENT;
         }
 
         memcpy(ipAddressBuffer, addressSpan.data(), addressLength);
         ipAddress.SetValue(ByteSpan(ipAddressBuffer, addressLength));
         return CHIP_NO_ERROR;
     }
+
+    CommissioningWindowParams params;
+    Optional<uint16_t> port;
+
+protected:
+    Optional<ByteSpan> ipAddress;
+    uint8_t ipAddressBuffer[kIpAddressBufferSize];
 };
 
 class Delegate
@@ -114,16 +114,6 @@ public:
      * @return CHIP_ERROR indicating the success or failure of the operation.
      */
     virtual CHIP_ERROR ValidateCommissionNodeCommand(NodeId clientNodeId, uint64_t requestId) = 0;
-
-    /**
-     * @brief Get the parameters for the commissioning window.
-     *
-     * This method is called to retrieve the parameters needed for the commissioning window.
-     *
-     * @param[out] outParams The parameters for the commissioning window.
-     * @return CHIP_ERROR indicating the success or failure of the operation.
-     */
-    virtual CHIP_ERROR GetCommissioningWindowParams(CommissioningWindowParams & outParams) = 0;
 
     /**
      * @brief Reverse the commission node process.
@@ -169,7 +159,7 @@ private:
     CommissionerControlServer()  = default;
     ~CommissionerControlServer() = default;
 
-    static CommissionerControlServer mInstance;
+    static CommissionerControlServer sInstance;
 
     Delegate * mDelegate = nullptr;
 };

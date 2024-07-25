@@ -38,29 +38,14 @@ using chip::Protocols::InteractionModel::Status;
 
 namespace {
 
-NodeId getNodeId(const app::CommandHandler * commandObj)
+NodeId GetNodeId(const CommandHandler * commandObj)
 {
-    if (nullptr == commandObj || nullptr == commandObj->GetExchangeContext())
-    {
-        ChipLogError(Zcl, "Cannot access ExchangeContext of Command Object for Node ID");
-        return kUndefinedNodeId;
-    }
+    auto descriptor = commandObj->GetSubjectDescriptor();
 
-    if (!commandObj->GetExchangeContext()->HasSessionHandle())
-    {
-        ChipLogError(Zcl, "Cannot access session of Command Object for Node ID");
-        return kUndefinedNodeId;
-    }
-
-    auto descriptor = commandObj->GetExchangeContext()->GetSessionHandle()->GetSubjectDescriptor();
-
-    // Return kUndefinedNodeId if get the NodeID from a group or PASE session.
     if (descriptor.authMode != Access::AuthMode::kCase)
     {
-        ChipLogError(Zcl, "Cannot get Node ID from non-CASE session of Command Object");
         return kUndefinedNodeId;
     }
-
     return descriptor.subject;
 }
 
@@ -86,10 +71,10 @@ void RunDeferredCommissionNode(intptr_t commandArg)
 
     if (delegate != nullptr)
     {
-        CHIP_ERROR err = delegate->ReverseCommissionNode(info->params, info->ipAddress, info->port);
+        CHIP_ERROR err = delegate->ReverseCommissionNode(info->params, info->GetIPAddress(), info->port);
         if (err != CHIP_NO_ERROR)
         {
-            ChipLogError(Zcl, "ReverseCommissionNode error: %s", err.AsString());
+            ChipLogError(Zcl, "ReverseCommissionNode error: %" CHIP_ERROR_FORMAT, err.Format());
         }
     }
     else
@@ -107,11 +92,11 @@ namespace app {
 namespace Clusters {
 namespace CommissionerControl {
 
-CommissionerControlServer CommissionerControlServer::mInstance;
+CommissionerControlServer CommissionerControlServer::sInstance;
 
 CommissionerControlServer & CommissionerControlServer::Instance()
 {
-    return mInstance;
+    return sInstance;
 }
 
 CHIP_ERROR CommissionerControlServer::Init(Delegate & delegate)
@@ -120,7 +105,7 @@ CHIP_ERROR CommissionerControlServer::Init(Delegate & delegate)
     return CHIP_NO_ERROR;
 }
 
-Protocols::InteractionModel::Status CommissionerControlServer::GetSupportedDeviceCategoriesValue(
+Status CommissionerControlServer::GetSupportedDeviceCategoriesValue(
     EndpointId endpoint, BitMask<SupportedDeviceCategoryBitmap> * supportedDeviceCategories) const
 {
     Status status = Attributes::SupportedDeviceCategories::Get(endpoint, supportedDeviceCategories);
@@ -131,7 +116,7 @@ Protocols::InteractionModel::Status CommissionerControlServer::GetSupportedDevic
     return status;
 }
 
-Protocols::InteractionModel::Status
+Status
 CommissionerControlServer::SetSupportedDeviceCategoriesValue(EndpointId endpoint,
                                                              const BitMask<SupportedDeviceCategoryBitmap> supportedDeviceCategories)
 {
@@ -173,12 +158,12 @@ bool emberAfCommissionerControlClusterRequestCommissioningApprovalCallback(
 
     ChipLogProgress(Zcl, "Received command to request commissioning approval");
 
-    auto sourceNodeId = getNodeId(commandObj);
+    auto sourceNodeId = GetNodeId(commandObj);
 
     // Check if the command is executed via a CASE session
     if (sourceNodeId == kUndefinedNodeId)
     {
-        ChipLogError(Zcl, "Command not executed via CASE session, failing with UNSUPPORTED_ACCESS");
+        ChipLogError(Zcl, "Commissioning approval request not executed via CASE session, failing with UNSUPPORTED_ACCESS");
         commandObj->AddStatus(commandPath, Status::UnsupportedAccess);
         return true;
     }
@@ -211,8 +196,8 @@ bool emberAfCommissionerControlClusterRequestCommissioningApprovalCallback(
 exit:
     if (err != CHIP_NO_ERROR)
     {
-        ChipLogError(Zcl, "emberAfCommissionerControlClusterRequestCommissioningApprovalCallback error: %s", err.AsString());
-        status = Status::Failure;
+        ChipLogError(Zcl, "emberAfCommissionerControlClusterRequestCommissioningApprovalCallback error: %" CHIP_ERROR_FORMAT, err.Format());
+        status = StatusIB(err).mStatus;
     }
 
     commandObj->AddStatus(commandPath, status);
@@ -227,12 +212,12 @@ bool emberAfCommissionerControlClusterCommissionNodeCallback(
 
     ChipLogProgress(Zcl, "Received command to commission node");
 
-    auto sourceNodeId = getNodeId(commandObj);
+    auto sourceNodeId = GetNodeId(commandObj);
 
     // Check if the command is executed via a CASE session
     if (sourceNodeId == kUndefinedNodeId)
     {
-        ChipLogError(Zcl, "Command not executed via CASE session, failing with UNSUPPORTED_ACCESS");
+        ChipLogError(Zcl, "Commission node request not executed via CASE session, failing with UNSUPPORTED_ACCESS");
         commandObj->AddStatus(commandPath, Status::UnsupportedAccess);
         return true;
     }
@@ -264,8 +249,8 @@ bool emberAfCommissionerControlClusterCommissionNodeCallback(
 exit:
     if (err != CHIP_NO_ERROR)
     {
-        ChipLogError(Zcl, "emberAfCommissionerControlClusterCommissionNodeCallback error: %s", err.AsString());
-        commandObj->AddStatus(commandPath, Status::Failure);
+        ChipLogError(Zcl, "emberAfCommissionerControlClusterCommissionNodeCallback error: %" CHIP_ERROR_FORMAT, err.Format());
+        commandObj->AddStatus(commandPath, StatusIB(err).mStatus);
     }
 
     return true;
@@ -273,5 +258,5 @@ exit:
 
 void MatterCommissionerControlPluginServerInitCallback()
 {
-    ChipLogProgress(Zcl, "Initiating Commissioner Control cluster.");
+    ChipLogProgress(Zcl, "Initializing Commissioner Control cluster.");
 }
