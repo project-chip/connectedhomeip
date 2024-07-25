@@ -245,7 +245,7 @@ void AppTask::OpenCommissioning(intptr_t arg)
 CHIP_ERROR AppTask::Init()
 {
     CHIP_ERROR err = CHIP_NO_ERROR;
-    
+
 #if defined(QORVO_QPINCFG_ENABLE)
     qResult_t res  = Q_OK;
     res = qPinCfg_Init(NULL);
