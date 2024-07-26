@@ -118,6 +118,16 @@ public:
     virtual CHIP_ERROR ValidateCommissionNodeCommand(NodeId clientNodeId, uint64_t requestId) = 0;
 
     /**
+     * @brief Get the parameters for the commissioning window.
+     *
+     * This method is called to retrieve the parameters needed for the commissioning window.
+     *
+     * @param[out] outParams The parameters for the commissioning window.
+     * @return CHIP_ERROR indicating the success or failure of the operation.
+     */
+    virtual CHIP_ERROR GetCommissioningWindowParams(CommissioningWindowParams & outParams) = 0;
+
+    /**
      * @brief Reverse the commission node process.
      *
      * When received within the timeout specified by CommissionNode, the client SHALL open a
