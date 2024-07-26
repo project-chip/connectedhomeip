@@ -169,12 +169,6 @@ enum class ProductIdentifierTypeEnum : uint8_t
 
 // Bitmaps shared across multiple clusters.
 
-// Bitmap for OccupancyBitmap
-enum class OccupancyBitmap : uint8_t
-{
-    kOccupied = 0x1,
-};
-
 } // namespace detail
 
 namespace Identify {
@@ -4082,7 +4076,11 @@ enum class HVACSystemTypeBitmap : uint8_t
     kHeatingUsesFuel   = 0x20,
 };
 
-using OccupancyBitmap = Clusters::detail::OccupancyBitmap;
+// Bitmap for OccupancyBitmap
+enum class OccupancyBitmap : uint8_t
+{
+    kOccupied = 0x1,
+};
 
 // Bitmap for PresetTypeFeaturesBitmap
 enum class PresetTypeFeaturesBitmap : uint16_t
@@ -4487,7 +4485,11 @@ enum class Feature : uint32_t
     kVision          = 0x80,
 };
 
-using OccupancyBitmap = Clusters::detail::OccupancyBitmap;
+// Bitmap for OccupancyBitmap
+enum class OccupancyBitmap : uint8_t
+{
+    kOccupied = 0x1,
+};
 
 // Bitmap for OccupancySensorTypeBitmap
 enum class OccupancySensorTypeBitmap : uint8_t

@@ -19,7 +19,6 @@ limitations under the License.
 
   <bitmap name="OccupancyBitmap" type="bitmap8">
     <cluster code="0x0406"/>
-    <cluster code="0x0201"/>
     <field name="Occupied" mask="0x1"/>
   </bitmap>
 
