@@ -129,7 +129,7 @@ bitmap {{bitmap.name}} : {{ bitmap.base_type}} {
 
   {%- for s in cluster.structs | selectattr("tag") %}
 
-  {{render_struct(s)|indent(2)}}
+  {{render_struct(s) | indent(2)}}
   {% endfor %}
 
   {%- for c in cluster.commands %}
