@@ -44,7 +44,7 @@ executable("chip-energy-management-app") {
     "${chip_root}/examples/energy-management-app/energy-management-common/src/EnergyEvseEventTriggers.cpp",
     "${chip_root}/examples/energy-management-app/energy-management-common/src/EnergyEvseMain.cpp",
     "${chip_root}/examples/energy-management-app/energy-management-common/src/EnergyEvseManager.cpp",
-    "${chip_root}/examples/energy-management-app/energy-management-common/src/EnergyEvseTargetsStore.cpp",    
+    "${chip_root}/examples/energy-management-app/energy-management-common/src/EnergyEvseTargetsStore.cpp",
     "${chip_root}/examples/energy-management-app/energy-management-common/src/EnergyReportingEventTriggers.cpp",
     "${chip_root}/examples/energy-management-app/energy-management-common/src/EnergyTimeUtils.cpp",
     "${chip_root}/examples/energy-management-app/energy-management-common/src/FakeReadings.cpp",
