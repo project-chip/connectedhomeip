@@ -1506,12 +1506,11 @@ CHIP_ERROR ConnectivityManagerImpl::_WiFiPAFConnect(const SetupDiscriminator & c
                      }),
                      this);
 
-    g_signal_connect(mWpaSupplicant.iface, "nan-subscribeterminated",
-                     G_CALLBACK(+[](WpaFiW1Wpa_supplicant1Interface * proxy, gint term_subscribe_id, gint reason,
-                                    ConnectivityManagerImpl * self) {
-                         return self->OnNanSubscribeTerminated(term_subscribe_id, reason);
-                     }),
-                     this);
+    g_signal_connect(
+        mWpaSupplicant.iface, "nan-subscribeterminated",
+        G_CALLBACK(+[](WpaFiW1Wpa_supplicant1Interface * proxy, gint term_subscribe_id, gint reason,
+                       ConnectivityManagerImpl * self) { return self->OnNanSubscribeTerminated(term_subscribe_id, reason); }),
+        this);
 
     return CHIP_NO_ERROR;
 }
