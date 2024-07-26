@@ -78,6 +78,7 @@ enum
     ZCL_VOLTAGE_MV_ATTRIBUTE_TYPE        = 0xDB, // Voltage millivolts
     ZCL_ENERGY_MWH_ATTRIBUTE_TYPE        = 0xDC, // Energy milliwatt-hours
     ZCL_TOD_ATTRIBUTE_TYPE               = 0xE0, // Time of day
+    ZCL_DATE_ATTRIBUTE_TYPE              = 0xE1, // Date
     ZCL_EPOCH_US_ATTRIBUTE_TYPE          = 0xE3, // Epoch Microseconds
     ZCL_EPOCH_S_ATTRIBUTE_TYPE           = 0xE4, // Epoch Seconds
     ZCL_POSIX_MS_ATTRIBUTE_TYPE          = 0xE5, // Posix Time Milliseconds
