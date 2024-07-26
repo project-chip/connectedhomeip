@@ -17,12 +17,12 @@ import("//build_overrides/chip.gni")
 
 executable("thermostat-app") {
   sources = [
+    "${chip_root}/src/app/clusters/thermostat-server/PresetStructWithOwnedMembers.cpp",
     "include/low-power/LowPowerManager.cpp",
     "include/low-power/LowPowerManager.h",
-    "${chip_root}/src/app/clusters/thermostat-server/PresetStructWithOwnedMembers.cpp",
     "main.cpp",
-    "thermostat-manager.cpp",
     "thermostat-delegate-impl.cpp",
+    "thermostat-manager.cpp",
   ]
 
   deps = [
@@ -31,9 +31,7 @@ executable("thermostat-app") {
     "${chip_root}/src/lib",
   ]
 
-  include_dirs = [
-    "include"
-  ]
+  include_dirs = [ "include" ]
 
   cflags = [ "-Wconversion" ]
 
