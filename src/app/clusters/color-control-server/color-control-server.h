@@ -295,27 +295,17 @@ private:
     ColorHueTransitionState colorHueTransitionStates[kColorControlClusterServerMaxEndpointCount];
     Color16uTransitionState colorSatTransitionStates[kColorControlClusterServerMaxEndpointCount];
 
-    chip::app::QuieterReportingAttribute<uint8_t> quietHue[kColorControlClusterServerMaxEndpointCount]{
-        chip::app::QuieterReportingAttribute<uint8_t>(0)
-    };
-    chip::app::QuieterReportingAttribute<uint8_t> quietSaturation[kColorControlClusterServerMaxEndpointCount]{
-        chip::app::QuieterReportingAttribute<uint8_t>(0)
-    };
-    chip::app::QuieterReportingAttribute<uint16_t> quietEnhancedHue[kColorControlClusterServerMaxEndpointCount]{
-        chip::app::QuieterReportingAttribute<uint16_t>(0)
-    };
+    chip::app::QuieterReportingAttribute<uint8_t> quietHue[kColorControlClusterServerMaxEndpointCount];
+    chip::app::QuieterReportingAttribute<uint8_t> quietSaturation[kColorControlClusterServerMaxEndpointCount];
+    chip::app::QuieterReportingAttribute<uint16_t> quietEnhancedHue[kColorControlClusterServerMaxEndpointCount];
 #endif
 
 #ifdef MATTER_DM_PLUGIN_COLOR_CONTROL_SERVER_XY
     Color16uTransitionState colorXtransitionStates[kColorControlClusterServerMaxEndpointCount];
     Color16uTransitionState colorYtransitionStates[kColorControlClusterServerMaxEndpointCount];
 
-    chip::app::QuieterReportingAttribute<uint16_t> quietColorX[kColorControlClusterServerMaxEndpointCount]{
-        chip::app::QuieterReportingAttribute<uint16_t>(0)
-    };
-    chip::app::QuieterReportingAttribute<uint16_t> quietColorY[kColorControlClusterServerMaxEndpointCount]{
-        chip::app::QuieterReportingAttribute<uint16_t>(0)
-    };
+    chip::app::QuieterReportingAttribute<uint16_t> quietColorX[kColorControlClusterServerMaxEndpointCount];
+    chip::app::QuieterReportingAttribute<uint16_t> quietColorY[kColorControlClusterServerMaxEndpointCount];
 #endif // MATTER_DM_PLUGIN_COLOR_CONTROL_SERVER_XY
 
 #ifdef MATTER_DM_PLUGIN_COLOR_CONTROL_SERVER_TEMP
@@ -323,9 +313,7 @@ private:
 #endif // MATTER_DM_PLUGIN_COLOR_CONTROL_SERVER_TEMP
 
     EmberEventControl eventControls[kColorControlClusterServerMaxEndpointCount];
-    chip::app::QuieterReportingAttribute<uint16_t> quietRemainingTime[kColorControlClusterServerMaxEndpointCount]{
-        chip::app::QuieterReportingAttribute<uint16_t>(0)
-    };
+    chip::app::QuieterReportingAttribute<uint16_t> quietRemainingTime[kColorControlClusterServerMaxEndpointCount];
 
 #ifdef MATTER_DM_PLUGIN_SCENES_MANAGEMENT
     friend class DefaultColorControlSceneHandler;
