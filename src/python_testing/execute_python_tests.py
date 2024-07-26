@@ -56,16 +56,16 @@ def main(search_directory, env_file):
     # Define the files and patterns to exclude
     excluded_patterns = {
         "MinimalRepresentation.py",
-        "TC_ACL_2_2.py",
         "TC_CNET_4_4.py",
         "TC_DGGEN_3_2.py",
         "TC_EEVSE_Utils.py",
         "TC_EnergyReporting_Utils.py",
         "TC_OpstateCommon.py",
-        "TC_TMP_2_1.py",
         "TC_pics_checker.py",
         "TestCommissioningTimeSync.py",
         "TestConformanceSupport.py",
+        "TestChoiceConformanceSupport.py",
+        "choice_conformance_support.py",
         "TestIdChecks.py",
         "TestSpecParsingDeviceType.py",
         "TestMatterTestingSupport.py",
