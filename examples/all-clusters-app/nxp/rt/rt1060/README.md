@@ -34,7 +34,7 @@ commissioning and different cluster control.
       - [Matter over wifi with openthread border router configuration :](#matter-over-wifi-with-openthread-border-router-configuration-)
     - [Testing the all-clusters application without Matter CLI:](#testing-the-all-clusters-application-without-matter-cli)
     - [Testing the all-clusters application with Matter CLI enabled:](#testing-the-all-clusters-application-with-matter-cli-enabled)
-
+  - [Thread Border Router overwiew](#thread-border-router-overwiew)
 <hr>
 
 <a name="intro"></a>
@@ -374,8 +374,10 @@ user@ubuntu:~/Desktop/git/connectedhomeip/examples/all-clusters-app/nxp/rt/rt106
 
 ### Build with Matter over Wi-Fi + OpenThread Border Router configuration on RT1060 + 88W8801 + K32W0x1DK6
 
-This configuration requires enabling the Matter CLI in order to control the
-Thread network on the Border Router.
+This configuration supports the Thread Border Router management cluster to provision the Thread credentials. Enabling the Matter CLI in order to control the
+Thread network on the Border Router is optional but recommended for other features like the Thread credential sharing.
+
+Note that the Thread Border Router management cluster is only supported on the thermostat application for now.
 
 -   Build Matter with Border Router configuration with ble-wifi commissioning:
 
@@ -398,6 +400,9 @@ out/debug/chip-rt1060-all-cluster-example.
 
 Optional GN options that can be added when building an application:
 
+-   To enable the
+    [secondary network commissioning interface](../../../../../docs/guides/nxp/nxp_otbr_guide.md#using-the-secondary-network-commissioning-interface),
+    the arguments `chip_enable_secondary_nwk_if=true` and `chip_device_config_thread_network_endpoint_id=3` must be added to the _gn gen_ command. Note that this is only supported when building the Matter over Wifi + OpenThread Border Router configuration. Note that is only supported on the on the thermostat application for now.
 -   To enable the [matter CLI](README.md#matter-shell), the argument
     `chip_enable_matter_cli=true` must be added to the _gn gen_ command.
 -   To build the application in debug mode, the argument
@@ -575,9 +580,9 @@ The "ble-thread" pairing method can be used in order to commission the device.
 
 #### Matter over wifi with openthread border router configuration :
 
-In order to create or join a Thread network on the Matter Border Router, the
-`otcli` commands from the matter CLI can be used. For more information about
-using the matter shell, follow instructions from
+In order to create or join a Thread network on the Matter Border Router, the TBR management cluster or the 
+`otcli` commands from the matter CLI can be used. For more information about using the TBR management cluster follow instructions from ['Using the TBR management cluster'](../../../../../docs/guides/nxp/nxp_otbr_guide.md#using-the-thread-border-router-management-cluster).
+For more information about using the matter shell, follow instructions from
 ['Testing the all-clusters application with Matter CLI'](#testing-the-all-clusters-application-with-matter-cli-enabled).
 
 In this configuration, the device can be commissioned over Wi-Fi with the
@@ -687,3 +692,10 @@ Done
 leader
 Done
 ```
+<a name="thread-border-router-overwiew"></a>
+
+## Thread Border Router overwiew
+
+To enable Thread Border Router support see the [build](README.md#building) section.
+
+The complete Border Router guide is located [here](../../../../../docs/guides/nxp/nxp_otbr_guide.md).

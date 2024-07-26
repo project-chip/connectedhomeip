@@ -37,6 +37,10 @@ enable_eventlist_attribute = true
 
 mbedtls_target = "${nxp_sdk_build_root}:nxp_mbedtls"
 
+declare_args() {
+  chip_enable_secondary_nwk_if = false
+}
+
 openthread_external_mbedtls = mbedtls_target
 openthread_project_core_config_file = "OpenThreadConfig.h"
 openthread_core_config_deps = [ "${chip_root}/third_party/openthread/platforms/nxp/${nxp_platform}:openthread_core_config_rt1060" ]
