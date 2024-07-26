@@ -2867,7 +2867,7 @@ public:
     static constexpr CommandId GetCommandId() { return Commands::ReviewFabricRestrictions::Id; }
     static constexpr ClusterId GetClusterId() { return Clusters::AccessControl::Id; }
 
-    Optional<DataModel::List<const Structs::CommissioningAccessRestrictionEntryStruct::Type>> arl;
+    DataModel::List<const Structs::CommissioningAccessRestrictionEntryStruct::Type> arl;
 
     CHIP_ERROR Encode(TLV::TLVWriter & aWriter, TLV::Tag aTag) const;
 
@@ -2882,7 +2882,7 @@ public:
     static constexpr CommandId GetCommandId() { return Commands::ReviewFabricRestrictions::Id; }
     static constexpr ClusterId GetClusterId() { return Clusters::AccessControl::Id; }
 
-    Optional<DataModel::DecodableList<Structs::CommissioningAccessRestrictionEntryStruct::DecodableType>> arl;
+    DataModel::DecodableList<Structs::CommissioningAccessRestrictionEntryStruct::DecodableType> arl;
     CHIP_ERROR Decode(TLV::TLVReader & reader);
 };
 }; // namespace ReviewFabricRestrictions

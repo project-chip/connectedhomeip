@@ -2516,7 +2516,7 @@ NS_ASSUME_NONNULL_BEGIN
 {
     if (self = [super init]) {
 
-        _arl = nil;
+        _arl = [NSArray array];
         _timedInvokeTimeoutMs = nil;
         _serverSideProcessingTimeout = nil;
     }
@@ -2549,58 +2549,55 @@ NS_ASSUME_NONNULL_BEGIN
     chip::app::Clusters::AccessControl::Commands::ReviewFabricRestrictions::Type encodableStruct;
     ListFreer listFreer;
     {
-        if (self.arl != nil) {
-            auto & definedValue_0 = encodableStruct.arl.Emplace();
-            {
-                using ListType_1 = std::remove_reference_t<decltype(definedValue_0)>;
-                using ListMemberType_1 = ListMemberTypeGetter<ListType_1>::Type;
-                if (self.arl.count != 0) {
-                    auto * listHolder_1 = new ListHolder<ListMemberType_1>(self.arl.count);
-                    if (listHolder_1 == nullptr || listHolder_1->mList == nullptr) {
+        {
+            using ListType_0 = std::remove_reference_t<decltype(encodableStruct.arl)>;
+            using ListMemberType_0 = ListMemberTypeGetter<ListType_0>::Type;
+            if (self.arl.count != 0) {
+                auto * listHolder_0 = new ListHolder<ListMemberType_0>(self.arl.count);
+                if (listHolder_0 == nullptr || listHolder_0->mList == nullptr) {
+                    return CHIP_ERROR_INVALID_ARGUMENT;
+                }
+                listFreer.add(listHolder_0);
+                for (size_t i_0 = 0; i_0 < self.arl.count; ++i_0) {
+                    if (![self.arl[i_0] isKindOfClass:[MTRAccessControlClusterCommissioningAccessRestrictionEntryStruct class]]) {
+                        // Wrong kind of value.
                         return CHIP_ERROR_INVALID_ARGUMENT;
                     }
-                    listFreer.add(listHolder_1);
-                    for (size_t i_1 = 0; i_1 < self.arl.count; ++i_1) {
-                        if (![self.arl[i_1] isKindOfClass:[MTRAccessControlClusterCommissioningAccessRestrictionEntryStruct class]]) {
-                            // Wrong kind of value.
-                            return CHIP_ERROR_INVALID_ARGUMENT;
-                        }
-                        auto element_1 = (MTRAccessControlClusterCommissioningAccessRestrictionEntryStruct *) self.arl[i_1];
-                        listHolder_1->mList[i_1].endpoint = element_1.endpoint.unsignedShortValue;
-                        listHolder_1->mList[i_1].cluster = element_1.cluster.unsignedIntValue;
-                        {
-                            using ListType_3 = std::remove_reference_t<decltype(listHolder_1->mList[i_1].restrictions)>;
-                            using ListMemberType_3 = ListMemberTypeGetter<ListType_3>::Type;
-                            if (element_1.restrictions.count != 0) {
-                                auto * listHolder_3 = new ListHolder<ListMemberType_3>(element_1.restrictions.count);
-                                if (listHolder_3 == nullptr || listHolder_3->mList == nullptr) {
+                    auto element_0 = (MTRAccessControlClusterCommissioningAccessRestrictionEntryStruct *) self.arl[i_0];
+                    listHolder_0->mList[i_0].endpoint = element_0.endpoint.unsignedShortValue;
+                    listHolder_0->mList[i_0].cluster = element_0.cluster.unsignedIntValue;
+                    {
+                        using ListType_2 = std::remove_reference_t<decltype(listHolder_0->mList[i_0].restrictions)>;
+                        using ListMemberType_2 = ListMemberTypeGetter<ListType_2>::Type;
+                        if (element_0.restrictions.count != 0) {
+                            auto * listHolder_2 = new ListHolder<ListMemberType_2>(element_0.restrictions.count);
+                            if (listHolder_2 == nullptr || listHolder_2->mList == nullptr) {
+                                return CHIP_ERROR_INVALID_ARGUMENT;
+                            }
+                            listFreer.add(listHolder_2);
+                            for (size_t i_2 = 0; i_2 < element_0.restrictions.count; ++i_2) {
+                                if (![element_0.restrictions[i_2] isKindOfClass:[MTRAccessControlClusterAccessRestrictionStruct class]]) {
+                                    // Wrong kind of value.
                                     return CHIP_ERROR_INVALID_ARGUMENT;
                                 }
-                                listFreer.add(listHolder_3);
-                                for (size_t i_3 = 0; i_3 < element_1.restrictions.count; ++i_3) {
-                                    if (![element_1.restrictions[i_3] isKindOfClass:[MTRAccessControlClusterAccessRestrictionStruct class]]) {
-                                        // Wrong kind of value.
-                                        return CHIP_ERROR_INVALID_ARGUMENT;
-                                    }
-                                    auto element_3 = (MTRAccessControlClusterAccessRestrictionStruct *) element_1.restrictions[i_3];
-                                    listHolder_3->mList[i_3].type = static_cast<std::remove_reference_t<decltype(listHolder_3->mList[i_3].type)>>(element_3.type.unsignedCharValue);
-                                    if (element_3.id == nil) {
-                                        listHolder_3->mList[i_3].id.SetNull();
-                                    } else {
-                                        auto & nonNullValue_5 = listHolder_3->mList[i_3].id.SetNonNull();
-                                        nonNullValue_5 = element_3.id.unsignedIntValue;
-                                    }
+                                auto element_2 = (MTRAccessControlClusterAccessRestrictionStruct *) element_0.restrictions[i_2];
+                                listHolder_2->mList[i_2].type = static_cast<std::remove_reference_t<decltype(listHolder_2->mList[i_2].type)>>(element_2.type.unsignedCharValue);
+                                if (element_2.id == nil) {
+                                    listHolder_2->mList[i_2].id.SetNull();
+                                } else {
+                                    auto & nonNullValue_4 = listHolder_2->mList[i_2].id.SetNonNull();
+                                    nonNullValue_4 = element_2.id.unsignedIntValue;
                                 }
-                                listHolder_1->mList[i_1].restrictions = ListType_3(listHolder_3->mList, element_1.restrictions.count);
-                            } else {
-                                listHolder_1->mList[i_1].restrictions = ListType_3();
                             }
+                            listHolder_0->mList[i_0].restrictions = ListType_2(listHolder_2->mList, element_0.restrictions.count);
+                        } else {
+                            listHolder_0->mList[i_0].restrictions = ListType_2();
                         }
                     }
-                    definedValue_0 = ListType_1(listHolder_1->mList, self.arl.count);
-                } else {
-                    definedValue_0 = ListType_1();
                 }
+                encodableStruct.arl = ListType_0(listHolder_0->mList, self.arl.count);
+            } else {
+                encodableStruct.arl = ListType_0();
             }
         }
     }

@@ -71,14 +71,7 @@ limitations under the License.
   <struct name="AccessRestrictionStruct">
     <cluster code="0x001F"/>
     <item fieldId="0" name="Type" type="AccessRestrictionTypeEnum" min="0x00" max="0x03"/>
-    <item fieldId="1" name="Id" type="int32u" isNullable="true"/>
-  </struct>
-
-  <struct name="CommissioningAccessRestrictionEntryStruct">
-    <cluster code="0x001F"/>
-    <item fieldId="0" name="Endpoint" type="endpoint_no"/>
-    <item fieldId="1" name="Cluster" type="cluster_id"/>
-    <item fieldId="2" name="Restrictions" array="true" type="AccessRestrictionStruct" minLength="1"/>
+    <item fieldId="1" name="ID" type="int32u" isNullable="true"/>
   </struct>
 
   <struct name="AccessRestrictionEntryStruct" isFabricScoped="true">
@@ -86,6 +79,13 @@ limitations under the License.
     <item fieldId="0" name="Endpoint" type="endpoint_no" isFabricSensitive="true"/>
     <item fieldId="1" name="Cluster" type="cluster_id" isFabricSensitive="true"/>
     <item fieldId="2" name="Restrictions" array="true" type="AccessRestrictionStruct" minLength="1" isFabricSensitive="true"/>
+  </struct>
+
+  <struct name="CommissioningAccessRestrictionEntryStruct">
+    <cluster code="0x001F"/>
+    <item fieldId="0" name="Endpoint" type="endpoint_no"/>
+    <item fieldId="1" name="Cluster" type="cluster_id"/>
+    <item fieldId="2" name="Restrictions" array="true" type="AccessRestrictionStruct" minLength="1"/>
   </struct>
 
   <cluster>
@@ -146,7 +146,7 @@ limitations under the License.
     <command code="0x00" source="client" name="ReviewFabricRestrictions" optional="true" response="ReviewFabricRestrictionsResponse">
       <description>This command signals to the service associated with the device maker that the fabric administrator would like a review of the current fabric restrictions.</description>
       <access op="invoke" privilege="administer"/>
-      <arg id="0" name="ARL" array="true" type="CommissioningAccessRestrictionEntryStruct" optional="true"/>
+      <arg id="0" name="ARL" array="true" type="CommissioningAccessRestrictionEntryStruct" optional="false"/>
     </command>
 
     <command code="0x01" source="server" name="ReviewFabricRestrictionsResponse" optional="true" disableDefaultResponse="true">

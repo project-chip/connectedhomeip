@@ -3982,16 +3982,16 @@ public class ChipClusters {
       return 0L;
     }
 
-    public void reviewFabricRestrictions(ReviewFabricRestrictionsResponseCallback callback, Optional<ArrayList<ChipStructs.AccessControlClusterCommissioningAccessRestrictionEntryStruct>> arl) {
+    public void reviewFabricRestrictions(ReviewFabricRestrictionsResponseCallback callback, ArrayList<ChipStructs.AccessControlClusterCommissioningAccessRestrictionEntryStruct> arl) {
       reviewFabricRestrictions(callback, arl, 0);
     }
 
-    public void reviewFabricRestrictions(ReviewFabricRestrictionsResponseCallback callback, Optional<ArrayList<ChipStructs.AccessControlClusterCommissioningAccessRestrictionEntryStruct>> arl, int timedInvokeTimeoutMs) {
+    public void reviewFabricRestrictions(ReviewFabricRestrictionsResponseCallback callback, ArrayList<ChipStructs.AccessControlClusterCommissioningAccessRestrictionEntryStruct> arl, int timedInvokeTimeoutMs) {
       final long commandId = 0L;
 
       ArrayList<StructElement> elements = new ArrayList<>();
       final long arlFieldID = 0L;
-      BaseTLVType arltlvValue = arl.<BaseTLVType>map((nonOptionalarl) -> ArrayType.generateArrayType(nonOptionalarl, (elementnonOptionalarl) -> elementnonOptionalarl.encodeTlv())).orElse(new EmptyType());
+      BaseTLVType arltlvValue = ArrayType.generateArrayType(arl, (elementarl) -> elementarl.encodeTlv());
       elements.add(new StructElement(arlFieldID, arltlvValue));
 
       StructType commandArgs = new StructType(elements);

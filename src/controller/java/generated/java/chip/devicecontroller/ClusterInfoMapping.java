@@ -23234,7 +23234,7 @@ public class ClusterInfoMapping {
       (cluster, callback, commandArguments) -> {
         ((ChipClusters.AccessControlCluster) cluster)
           .reviewFabricRestrictions((ChipClusters.AccessControlCluster.ReviewFabricRestrictionsResponseCallback) callback
-           , (Optional<ArrayList<ChipStructs.AccessControlClusterCommissioningAccessRestrictionEntryStruct>>)
+           , (ArrayList<ChipStructs.AccessControlClusterCommissioningAccessRestrictionEntryStruct>)
              commandArguments.get("arl")
 
             );

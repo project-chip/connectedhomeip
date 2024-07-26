@@ -1286,7 +1286,7 @@ public:
     AccessControlReviewFabricRestrictions(CredentialIssuerCommands * credsIssuerConfig) :
         ClusterCommand("review-fabric-restrictions", credsIssuerConfig), mComplex_Arl(&mRequest.arl)
     {
-        AddArgument("Arl", &mComplex_Arl, "", Argument::kOptional);
+        AddArgument("Arl", &mComplex_Arl);
         ClusterCommand::AddArguments();
     }
 
@@ -1313,8 +1313,8 @@ public:
 
 private:
     chip::app::Clusters::AccessControl::Commands::ReviewFabricRestrictions::Type mRequest;
-    TypedComplexArgument<chip::Optional<chip::app::DataModel::List<
-        const chip::app::Clusters::AccessControl::Structs::CommissioningAccessRestrictionEntryStruct::Type>>>
+    TypedComplexArgument<chip::app::DataModel::List<
+        const chip::app::Clusters::AccessControl::Structs::CommissioningAccessRestrictionEntryStruct::Type>>
         mComplex_Arl;
 };
 

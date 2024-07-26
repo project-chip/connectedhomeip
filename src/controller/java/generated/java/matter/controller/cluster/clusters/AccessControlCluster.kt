@@ -136,7 +136,7 @@ class AccessControlCluster(
   }
 
   suspend fun reviewFabricRestrictions(
-    arl: List<AccessControlClusterCommissioningAccessRestrictionEntryStruct>?,
+    arl: List<AccessControlClusterCommissioningAccessRestrictionEntryStruct>,
     timedInvokeTimeout: Duration? = null,
   ): ReviewFabricRestrictionsResponse {
     val commandId: UInt = 0u
@@ -145,13 +145,11 @@ class AccessControlCluster(
     tlvWriter.startStructure(AnonymousTag)
 
     val TAG_ARL_REQ: Int = 0
-    arl?.let {
-      tlvWriter.startArray(ContextSpecificTag(TAG_ARL_REQ))
-      for (item in arl.iterator()) {
-        item.toTlv(AnonymousTag, tlvWriter)
-      }
-      tlvWriter.endArray()
+    tlvWriter.startArray(ContextSpecificTag(TAG_ARL_REQ))
+    for (item in arl.iterator()) {
+      item.toTlv(AnonymousTag, tlvWriter)
     }
+    tlvWriter.endArray()
     tlvWriter.endStructure()
 
     val request: InvokeRequest =
