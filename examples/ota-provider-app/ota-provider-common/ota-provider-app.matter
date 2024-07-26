@@ -13,9 +13,9 @@ bitmap TestGlobalBitmap : bitmap32 {
 }
 
 struct TestGlobalStruct {
-    char_string<128> name = 0;
-    nullable TestGlobalBitmap myBitmap = 1;
-    optional nullable TestGlobalEnum myEnum = 2;
+  char_string<128> name = 0;
+  nullable TestGlobalBitmap myBitmap = 1;
+  optional nullable TestGlobalEnum myEnum = 2;
 }
 
 /** The Descriptor Cluster is meant to replace the support from the Zigbee Device Object (ZDO) for describing a node, its endpoints and clusters. */

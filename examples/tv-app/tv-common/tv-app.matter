@@ -13,9 +13,9 @@ bitmap TestGlobalBitmap : bitmap32 {
 }
 
 struct TestGlobalStruct {
-    char_string<128> name = 0;
-    nullable TestGlobalBitmap myBitmap = 1;
-    optional nullable TestGlobalEnum myEnum = 2;
+  char_string<128> name = 0;
+  nullable TestGlobalBitmap myBitmap = 1;
+  optional nullable TestGlobalEnum myEnum = 2;
 }
 
 /** Attributes and commands for switching devices between 'On' and 'Off' states. */
