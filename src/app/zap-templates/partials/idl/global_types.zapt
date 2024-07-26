@@ -20,7 +20,7 @@ bitmap {{asUpperCamelCase name preserveAcronyms=true}} : bitmap{{multiply size 8
 {{/zcl_bitmaps}}
 {{#zcl_structs}}
 {{#if has_no_clusters}}
-{{~>idl_structure_definition extraIndent=1}}
+{{~>idl_structure_definition extraIndent=0}}
 
 {{/if}}
 {{/zcl_structs}}
