@@ -426,7 +426,7 @@ Status emAfWriteAttribute(EndpointId endpoint, ClusterId cluster, AttributeId at
             markDirty = MarkAttributeDirty::kNo;
             break;
         }
-        case Protocols::InteractionModel::Status:: Success: {
+        case Protocols::InteractionModel::Status::Success: {
             break;
         }
         default:
