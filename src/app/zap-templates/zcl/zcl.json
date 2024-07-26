@@ -46,6 +46,7 @@
         "microwave-oven-mode-cluster.xml",
         "door-lock-cluster.xml",
         "drlc-cluster.xml",
+        "ecosystem-information-cluster.xml",
         "electrical-energy-measurement-cluster.xml",
         "electrical-measurement-cluster.xml",
         "electrical-power-measurement-cluster.xml",
@@ -129,6 +130,7 @@
         "wake-on-lan-cluster.xml",
         "washer-controls-cluster.xml",
         "water-heater-management-cluster.xml",
+        "water-heater-mode-cluster.xml",
         "wifi-network-diagnostics-cluster.xml",
         "wifi-network-management-cluster.xml",
         "window-covering.xml",
@@ -606,7 +608,6 @@
             "FeatureMap"
         ],
         "Air Quality": ["AirQuality", "FeatureMap"],
-        "Thermostat": ["QueuedPreset"],
         "Electrical Energy Measurement": [
             "Accuracy",
             "CumulativeEnergyImported",
@@ -641,7 +642,13 @@
         "Power Topology": ["FeatureMap"],
         "Valve Configuration and Control": ["RemainingDuration"],
         "Boolean State Configuration": ["CurrentSensitivityLevel"],
+        "Water Heater Mode": ["SupportedModes", "CurrentMode", "FeatureMap"],
         "Wi-Fi Network Management": ["SSID"],
+        "Thread Network Directory": [
+            "PreferredExtendedPanID",
+            "ThreadNetworks",
+            "ThreadNetworkTableSize"
+        ],
         "Service Area": [
             "CurrentLocation",
             "EstimatedEndTime"

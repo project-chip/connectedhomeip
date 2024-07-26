@@ -11,7 +11,7 @@ runs:
         attempt_limit: 3
         attempt_delay: 2000
         with: |
-          key: ${{ runner.os }}-env-${{ hashFiles('scripts/setup/*', 'third_party/pigweed/**') }}
+          key: ${{ runner.os }}-env-${{ hashFiles('scripts/setup/*', 'third_party/pigweed/**', '/etc/lsb-release') }}
           path: |
               .environment
               build_overrides/pigweed_environment.gni

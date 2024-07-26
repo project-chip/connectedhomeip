@@ -8608,6 +8608,143 @@ public static class EnergyEvseModeClusterModeOptionStruct {
     return output.toString();
   }
 }
+public static class WaterHeaterModeClusterModeTagStruct {
+  public Optional<Integer> mfgCode;
+  public Integer value;
+  private static final long MFG_CODE_ID = 0L;
+  private static final long VALUE_ID = 1L;
+
+  public WaterHeaterModeClusterModeTagStruct(
+    Optional<Integer> mfgCode,
+    Integer value
+  ) {
+    this.mfgCode = mfgCode;
+    this.value = value;
+  }
+
+  public StructType encodeTlv() {
+    ArrayList<StructElement> values = new ArrayList<>();
+    values.add(new StructElement(MFG_CODE_ID, mfgCode.<BaseTLVType>map((nonOptionalmfgCode) -> new UIntType(nonOptionalmfgCode)).orElse(new EmptyType())));
+    values.add(new StructElement(VALUE_ID, new UIntType(value)));
+
+    return new StructType(values);
+  }
+
+  public static WaterHeaterModeClusterModeTagStruct decodeTlv(BaseTLVType tlvValue) {
+    if (tlvValue == null || tlvValue.type() != TLVType.Struct) {
+      return null;
+    }
+    Optional<Integer> mfgCode = Optional.empty();
+    Integer value = null;
+    for (StructElement element: ((StructType)tlvValue).value()) {
+      if (element.contextTagNum() == MFG_CODE_ID) {
+        if (element.value(BaseTLVType.class).type() == TLVType.UInt) {
+          UIntType castingValue = element.value(UIntType.class);
+          mfgCode = Optional.of(castingValue.value(Integer.class));
+        }
+      } else if (element.contextTagNum() == VALUE_ID) {
+        if (element.value(BaseTLVType.class).type() == TLVType.UInt) {
+          UIntType castingValue = element.value(UIntType.class);
+          value = castingValue.value(Integer.class);
+        }
+      }
+    }
+    return new WaterHeaterModeClusterModeTagStruct(
+      mfgCode,
+      value
+    );
+  }
+
+  @Override
+  public String toString() {
+    StringBuilder output = new StringBuilder();
+    output.append("WaterHeaterModeClusterModeTagStruct {\n");
+    output.append("\tmfgCode: ");
+    output.append(mfgCode);
+    output.append("\n");
+    output.append("\tvalue: ");
+    output.append(value);
+    output.append("\n");
+    output.append("}\n");
+    return output.toString();
+  }
+}
+public static class WaterHeaterModeClusterModeOptionStruct {
+  public String label;
+  public Integer mode;
+  public ArrayList<ChipStructs.WaterHeaterModeClusterModeTagStruct> modeTags;
+  private static final long LABEL_ID = 0L;
+  private static final long MODE_ID = 1L;
+  private static final long MODE_TAGS_ID = 2L;
+
+  public WaterHeaterModeClusterModeOptionStruct(
+    String label,
+    Integer mode,
+    ArrayList<ChipStructs.WaterHeaterModeClusterModeTagStruct> modeTags
+  ) {
+    this.label = label;
+    this.mode = mode;
+    this.modeTags = modeTags;
+  }
+
+  public StructType encodeTlv() {
+    ArrayList<StructElement> values = new ArrayList<>();
+    values.add(new StructElement(LABEL_ID, new StringType(label)));
+    values.add(new StructElement(MODE_ID, new UIntType(mode)));
+    values.add(new StructElement(MODE_TAGS_ID, ArrayType.generateArrayType(modeTags, (elementmodeTags) -> elementmodeTags.encodeTlv())));
+
+    return new StructType(values);
+  }
+
+  public static WaterHeaterModeClusterModeOptionStruct decodeTlv(BaseTLVType tlvValue) {
+    if (tlvValue == null || tlvValue.type() != TLVType.Struct) {
+      return null;
+    }
+    String label = null;
+    Integer mode = null;
+    ArrayList<ChipStructs.WaterHeaterModeClusterModeTagStruct> modeTags = null;
+    for (StructElement element: ((StructType)tlvValue).value()) {
+      if (element.contextTagNum() == LABEL_ID) {
+        if (element.value(BaseTLVType.class).type() == TLVType.String) {
+          StringType castingValue = element.value(StringType.class);
+          label = castingValue.value(String.class);
+        }
+      } else if (element.contextTagNum() == MODE_ID) {
+        if (element.value(BaseTLVType.class).type() == TLVType.UInt) {
+          UIntType castingValue = element.value(UIntType.class);
+          mode = castingValue.value(Integer.class);
+        }
+      } else if (element.contextTagNum() == MODE_TAGS_ID) {
+        if (element.value(BaseTLVType.class).type() == TLVType.Array) {
+          ArrayType castingValue = element.value(ArrayType.class);
+          modeTags = castingValue.map((elementcastingValue) -> ChipStructs.WaterHeaterModeClusterModeTagStruct.decodeTlv(elementcastingValue));
+        }
+      }
+    }
+    return new WaterHeaterModeClusterModeOptionStruct(
+      label,
+      mode,
+      modeTags
+    );
+  }
+
+  @Override
+  public String toString() {
+    StringBuilder output = new StringBuilder();
+    output.append("WaterHeaterModeClusterModeOptionStruct {\n");
+    output.append("\tlabel: ");
+    output.append(label);
+    output.append("\n");
+    output.append("\tmode: ");
+    output.append(mode);
+    output.append("\n");
+    output.append("\tmodeTags: ");
+    output.append(modeTags);
+    output.append("\n");
+    output.append("}\n");
+    return output.toString();
+  }
+}
 public static class DeviceEnergyManagementModeClusterModeTagStruct {
   public Optional<Integer> mfgCode;
   public Integer value;
@@ -9640,67 +9777,6 @@ public static class ThermostatClusterPresetTypeStruct {
     return output.toString();
   }
 }
-public static class ThermostatClusterQueuedPresetStruct {
-  public @Nullable byte[] presetHandle;
-  public @Nullable Long transitionTimestamp;
-  private static final long PRESET_HANDLE_ID = 0L;
-  private static final long TRANSITION_TIMESTAMP_ID = 1L;
-
-  public ThermostatClusterQueuedPresetStruct(
-    @Nullable byte[] presetHandle,
-    @Nullable Long transitionTimestamp
-  ) {
-    this.presetHandle = presetHandle;
-    this.transitionTimestamp = transitionTimestamp;
-  }
-
-  public StructType encodeTlv() {
-    ArrayList<StructElement> values = new ArrayList<>();
-    values.add(new StructElement(PRESET_HANDLE_ID, presetHandle != null ? new ByteArrayType(presetHandle) : new NullType()));
-    values.add(new StructElement(TRANSITION_TIMESTAMP_ID, transitionTimestamp != null ? new UIntType(transitionTimestamp) : new NullType()));
-
-    return new StructType(values);
-  }
-
-  public static ThermostatClusterQueuedPresetStruct decodeTlv(BaseTLVType tlvValue) {
-    if (tlvValue == null || tlvValue.type() != TLVType.Struct) {
-      return null;
-    }
-    @Nullable byte[] presetHandle = null;
-    @Nullable Long transitionTimestamp = null;
-    for (StructElement element: ((StructType)tlvValue).value()) {
-      if (element.contextTagNum() == PRESET_HANDLE_ID) {
-        if (element.value(BaseTLVType.class).type() == TLVType.ByteArray) {
-          ByteArrayType castingValue = element.value(ByteArrayType.class);
-          presetHandle = castingValue.value(byte[].class);
-        }
-      } else if (element.contextTagNum() == TRANSITION_TIMESTAMP_ID) {
-        if (element.value(BaseTLVType.class).type() == TLVType.UInt) {
-          UIntType castingValue = element.value(UIntType.class);
-          transitionTimestamp = castingValue.value(Long.class);
-        }
-      }
-    }
-    return new ThermostatClusterQueuedPresetStruct(
-      presetHandle,
-      transitionTimestamp
-    );
-  }
-
-  @Override
-  public String toString() {
-    StringBuilder output = new StringBuilder();
-    output.append("ThermostatClusterQueuedPresetStruct {\n");
-    output.append("\tpresetHandle: ");
-    output.append(Arrays.toString(presetHandle));
-    output.append("\n");
-    output.append("\ttransitionTimestamp: ");
-    output.append(transitionTimestamp);
-    output.append("\n");
-    output.append("}\n");
-    return output.toString();
-  }
-}
 public static class ThermostatClusterScheduleTypeStruct {
   public Integer systemMode;
   public Integer numberOfSchedules;
@@ -9930,28 +10006,33 @@ public static class OccupancySensingClusterHoldTimeLimitsStruct {
   }
 }
 public static class ThreadNetworkDirectoryClusterThreadNetworkStruct {
-  public Long extendedPanID;
+  public byte[] extendedPanID;
   public String networkName;
   public Integer channel;
+  public Long activeTimestamp;
   private static final long EXTENDED_PAN_I_D_ID = 0L;
   private static final long NETWORK_NAME_ID = 1L;
   private static final long CHANNEL_ID = 2L;
+  private static final long ACTIVE_TIMESTAMP_ID = 3L;
 
   public ThreadNetworkDirectoryClusterThreadNetworkStruct(
-    Long extendedPanID,
+    byte[] extendedPanID,
     String networkName,
-    Integer channel
+    Integer channel,
+    Long activeTimestamp
   ) {
     this.extendedPanID = extendedPanID;
     this.networkName = networkName;
     this.channel = channel;
+    this.activeTimestamp = activeTimestamp;
   }
 
   public StructType encodeTlv() {
     ArrayList<StructElement> values = new ArrayList<>();
-    values.add(new StructElement(EXTENDED_PAN_I_D_ID, new UIntType(extendedPanID)));
+    values.add(new StructElement(EXTENDED_PAN_I_D_ID, new ByteArrayType(extendedPanID)));
     values.add(new StructElement(NETWORK_NAME_ID, new StringType(networkName)));
     values.add(new StructElement(CHANNEL_ID, new UIntType(channel)));
+    values.add(new StructElement(ACTIVE_TIMESTAMP_ID, new UIntType(activeTimestamp)));
 
     return new StructType(values);
   }
@@ -9960,14 +10041,15 @@ public static class ThreadNetworkDirectoryClusterThreadNetworkStruct {
     if (tlvValue == null || tlvValue.type() != TLVType.Struct) {
       return null;
     }
-    Long extendedPanID = null;
+    byte[] extendedPanID = null;
     String networkName = null;
     Integer channel = null;
+    Long activeTimestamp = null;
     for (StructElement element: ((StructType)tlvValue).value()) {
       if (element.contextTagNum() == EXTENDED_PAN_I_D_ID) {
-        if (element.value(BaseTLVType.class).type() == TLVType.UInt) {
-          UIntType castingValue = element.value(UIntType.class);
-          extendedPanID = castingValue.value(Long.class);
+        if (element.value(BaseTLVType.class).type() == TLVType.ByteArray) {
+          ByteArrayType castingValue = element.value(ByteArrayType.class);
+          extendedPanID = castingValue.value(byte[].class);
         }
       } else if (element.contextTagNum() == NETWORK_NAME_ID) {
         if (element.value(BaseTLVType.class).type() == TLVType.String) {
@@ -9979,12 +10061,18 @@ public static class ThreadNetworkDirectoryClusterThreadNetworkStruct {
           UIntType castingValue = element.value(UIntType.class);
           channel = castingValue.value(Integer.class);
         }
+      } else if (element.contextTagNum() == ACTIVE_TIMESTAMP_ID) {
+        if (element.value(BaseTLVType.class).type() == TLVType.UInt) {
+          UIntType castingValue = element.value(UIntType.class);
+          activeTimestamp = castingValue.value(Long.class);
+        }
       }
     }
     return new ThreadNetworkDirectoryClusterThreadNetworkStruct(
       extendedPanID,
       networkName,
-      channel
+      channel,
+      activeTimestamp
     );
   }
 
@@ -9993,13 +10081,16 @@ public static class ThreadNetworkDirectoryClusterThreadNetworkStruct {
     StringBuilder output = new StringBuilder();
     output.append("ThreadNetworkDirectoryClusterThreadNetworkStruct {\n");
     output.append("\textendedPanID: ");
-    output.append(extendedPanID);
+    output.append(Arrays.toString(extendedPanID));
     output.append("\n");
     output.append("\tnetworkName: ");
     output.append(networkName);
     output.append("\n");
     output.append("\tchannel: ");
     output.append(channel);
+    output.append("\n");
+    output.append("\tactiveTimestamp: ");
+    output.append(activeTimestamp);
     output.append("\n");
     output.append("}\n");
     return output.toString();
@@ -12187,6 +12278,385 @@ public static class ContentControlClusterRatingNameStruct {
     output.append("\n");
     output.append("\tratingNameDesc: ");
     output.append(ratingNameDesc);
+    output.append("\n");
+    output.append("}\n");
+    return output.toString();
+  }
+}
+public static class EcosystemInformationClusterHomeLocationStruct {
+  public String locationName;
+  public @Nullable Integer floorNumber;
+  public @Nullable Integer areaType;
+  private static final long LOCATION_NAME_ID = 0L;
+  private static final long FLOOR_NUMBER_ID = 1L;
+  private static final long AREA_TYPE_ID = 2L;
+
+  public EcosystemInformationClusterHomeLocationStruct(
+    String locationName,
+    @Nullable Integer floorNumber,
+    @Nullable Integer areaType
+  ) {
+    this.locationName = locationName;
+    this.floorNumber = floorNumber;
+    this.areaType = areaType;
+  }
+
+  public StructType encodeTlv() {
+    ArrayList<StructElement> values = new ArrayList<>();
+    values.add(new StructElement(LOCATION_NAME_ID, new StringType(locationName)));
+    values.add(new StructElement(FLOOR_NUMBER_ID, floorNumber != null ? new IntType(floorNumber) : new NullType()));
+    values.add(new StructElement(AREA_TYPE_ID, areaType != null ? new UIntType(areaType) : new NullType()));
+
+    return new StructType(values);
+  }
+
+  public static EcosystemInformationClusterHomeLocationStruct decodeTlv(BaseTLVType tlvValue) {
+    if (tlvValue == null || tlvValue.type() != TLVType.Struct) {
+      return null;
+    }
+    String locationName = null;
+    @Nullable Integer floorNumber = null;
+    @Nullable Integer areaType = null;
+    for (StructElement element: ((StructType)tlvValue).value()) {
+      if (element.contextTagNum() == LOCATION_NAME_ID) {
+        if (element.value(BaseTLVType.class).type() == TLVType.String) {
+          StringType castingValue = element.value(StringType.class);
+          locationName = castingValue.value(String.class);
+        }
+      } else if (element.contextTagNum() == FLOOR_NUMBER_ID) {
+        if (element.value(BaseTLVType.class).type() == TLVType.Int) {
+          IntType castingValue = element.value(IntType.class);
+          floorNumber = castingValue.value(Integer.class);
+        }
+      } else if (element.contextTagNum() == AREA_TYPE_ID) {
+        if (element.value(BaseTLVType.class).type() == TLVType.UInt) {
+          UIntType castingValue = element.value(UIntType.class);
+          areaType = castingValue.value(Integer.class);
+        }
+      }
+    }
+    return new EcosystemInformationClusterHomeLocationStruct(
+      locationName,
+      floorNumber,
+      areaType
+    );
+  }
+
+  @Override
+  public String toString() {
+    StringBuilder output = new StringBuilder();
+    output.append("EcosystemInformationClusterHomeLocationStruct {\n");
+    output.append("\tlocationName: ");
+    output.append(locationName);
+    output.append("\n");
+    output.append("\tfloorNumber: ");
+    output.append(floorNumber);
+    output.append("\n");
+    output.append("\tareaType: ");
+    output.append(areaType);
+    output.append("\n");
+    output.append("}\n");
+    return output.toString();
+  }
+}
+public static class EcosystemInformationClusterEcosystemLocationStruct {
+  public String uniqueLocationID;
+  public ChipStructs.EcosystemInformationClusterHomeLocationStruct locationDescriptor;
+  public Long locationDescriptorLastEdit;
+  public Integer fabricIndex;
+  private static final long UNIQUE_LOCATION_I_D_ID = 0L;
+  private static final long LOCATION_DESCRIPTOR_ID = 1L;
+  private static final long LOCATION_DESCRIPTOR_LAST_EDIT_ID = 2L;
+  private static final long FABRIC_INDEX_ID = 254L;
+
+  public EcosystemInformationClusterEcosystemLocationStruct(
+    String uniqueLocationID,
+    ChipStructs.EcosystemInformationClusterHomeLocationStruct locationDescriptor,
+    Long locationDescriptorLastEdit,
+    Integer fabricIndex
+  ) {
+    this.uniqueLocationID = uniqueLocationID;
+    this.locationDescriptor = locationDescriptor;
+    this.locationDescriptorLastEdit = locationDescriptorLastEdit;
+    this.fabricIndex = fabricIndex;
+  }
+
+  public StructType encodeTlv() {
+    ArrayList<StructElement> values = new ArrayList<>();
+    values.add(new StructElement(UNIQUE_LOCATION_I_D_ID, new StringType(uniqueLocationID)));
+    values.add(new StructElement(LOCATION_DESCRIPTOR_ID, locationDescriptor.encodeTlv()));
+    values.add(new StructElement(LOCATION_DESCRIPTOR_LAST_EDIT_ID, new UIntType(locationDescriptorLastEdit)));
+    values.add(new StructElement(FABRIC_INDEX_ID, new UIntType(fabricIndex)));
+
+    return new StructType(values);
+  }
+
+  public static EcosystemInformationClusterEcosystemLocationStruct decodeTlv(BaseTLVType tlvValue) {
+    if (tlvValue == null || tlvValue.type() != TLVType.Struct) {
+      return null;
+    }
+    String uniqueLocationID = null;
+    ChipStructs.EcosystemInformationClusterHomeLocationStruct locationDescriptor = null;
+    Long locationDescriptorLastEdit = null;
+    Integer fabricIndex = null;
+    for (StructElement element: ((StructType)tlvValue).value()) {
+      if (element.contextTagNum() == UNIQUE_LOCATION_I_D_ID) {
+        if (element.value(BaseTLVType.class).type() == TLVType.String) {
+          StringType castingValue = element.value(StringType.class);
+          uniqueLocationID = castingValue.value(String.class);
+        }
+      } else if (element.contextTagNum() == LOCATION_DESCRIPTOR_ID) {
+        if (element.value(BaseTLVType.class).type() == TLVType.Struct) {
+          StructType castingValue = element.value(StructType.class);
+          locationDescriptor = ChipStructs.EcosystemInformationClusterHomeLocationStruct.decodeTlv(castingValue);
+        }
+      } else if (element.contextTagNum() == LOCATION_DESCRIPTOR_LAST_EDIT_ID) {
+        if (element.value(BaseTLVType.class).type() == TLVType.UInt) {
+          UIntType castingValue = element.value(UIntType.class);
+          locationDescriptorLastEdit = castingValue.value(Long.class);
+        }
+      } else if (element.contextTagNum() == FABRIC_INDEX_ID) {
+        if (element.value(BaseTLVType.class).type() == TLVType.UInt) {
+          UIntType castingValue = element.value(UIntType.class);
+          fabricIndex = castingValue.value(Integer.class);
+        }
+      }
+    }
+    return new EcosystemInformationClusterEcosystemLocationStruct(
+      uniqueLocationID,
+      locationDescriptor,
+      locationDescriptorLastEdit,
+      fabricIndex
+    );
+  }
+
+  @Override
+  public String toString() {
+    StringBuilder output = new StringBuilder();
+    output.append("EcosystemInformationClusterEcosystemLocationStruct {\n");
+    output.append("\tuniqueLocationID: ");
+    output.append(uniqueLocationID);
+    output.append("\n");
+    output.append("\tlocationDescriptor: ");
+    output.append(locationDescriptor);
+    output.append("\n");
+    output.append("\tlocationDescriptorLastEdit: ");
+    output.append(locationDescriptorLastEdit);
+    output.append("\n");
+    output.append("\tfabricIndex: ");
+    output.append(fabricIndex);
+    output.append("\n");
+    output.append("}\n");
+    return output.toString();
+  }
+}
+public static class EcosystemInformationClusterDeviceTypeStruct {
+  public Long deviceType;
+  public Integer revision;
+  private static final long DEVICE_TYPE_ID = 0L;
+  private static final long REVISION_ID = 1L;
+
+  public EcosystemInformationClusterDeviceTypeStruct(
+    Long deviceType,
+    Integer revision
+  ) {
+    this.deviceType = deviceType;
+    this.revision = revision;
+  }
+
+  public StructType encodeTlv() {
+    ArrayList<StructElement> values = new ArrayList<>();
+    values.add(new StructElement(DEVICE_TYPE_ID, new UIntType(deviceType)));
+    values.add(new StructElement(REVISION_ID, new UIntType(revision)));
+
+    return new StructType(values);
+  }
+
+  public static EcosystemInformationClusterDeviceTypeStruct decodeTlv(BaseTLVType tlvValue) {
+    if (tlvValue == null || tlvValue.type() != TLVType.Struct) {
+      return null;
+    }
+    Long deviceType = null;
+    Integer revision = null;
+    for (StructElement element: ((StructType)tlvValue).value()) {
+      if (element.contextTagNum() == DEVICE_TYPE_ID) {
+        if (element.value(BaseTLVType.class).type() == TLVType.UInt) {
+          UIntType castingValue = element.value(UIntType.class);
+          deviceType = castingValue.value(Long.class);
+        }
+      } else if (element.contextTagNum() == REVISION_ID) {
+        if (element.value(BaseTLVType.class).type() == TLVType.UInt) {
+          UIntType castingValue = element.value(UIntType.class);
+          revision = castingValue.value(Integer.class);
+        }
+      }
+    }
+    return new EcosystemInformationClusterDeviceTypeStruct(
+      deviceType,
+      revision
+    );
+  }
+
+  @Override
+  public String toString() {
+    StringBuilder output = new StringBuilder();
+    output.append("EcosystemInformationClusterDeviceTypeStruct {\n");
+    output.append("\tdeviceType: ");
+    output.append(deviceType);
+    output.append("\n");
+    output.append("\trevision: ");
+    output.append(revision);
+    output.append("\n");
+    output.append("}\n");
+    return output.toString();
+  }
+}
+public static class EcosystemInformationClusterEcosystemDeviceStruct {
+  public Optional<String> deviceName;
+  public Optional<Long> deviceNameLastEdit;
+  public Integer bridgedEndpoint;
+  public Integer originalEndpoint;
+  public ArrayList<ChipStructs.EcosystemInformationClusterDeviceTypeStruct> deviceTypes;
+  public ArrayList<String> uniqueLocationIDs;
+  public Long uniqueLocationIDsLastEdit;
+  public Integer fabricIndex;
+  private static final long DEVICE_NAME_ID = 0L;
+  private static final long DEVICE_NAME_LAST_EDIT_ID = 1L;
+  private static final long BRIDGED_ENDPOINT_ID = 2L;
+  private static final long ORIGINAL_ENDPOINT_ID = 3L;
+  private static final long DEVICE_TYPES_ID = 4L;
+  private static final long UNIQUE_LOCATION_I_DS_ID = 5L;
+  private static final long UNIQUE_LOCATION_I_DS_LAST_EDIT_ID = 6L;
+  private static final long FABRIC_INDEX_ID = 254L;
+
+  public EcosystemInformationClusterEcosystemDeviceStruct(
+    Optional<String> deviceName,
+    Optional<Long> deviceNameLastEdit,
+    Integer bridgedEndpoint,
+    Integer originalEndpoint,
+    ArrayList<ChipStructs.EcosystemInformationClusterDeviceTypeStruct> deviceTypes,
+    ArrayList<String> uniqueLocationIDs,
+    Long uniqueLocationIDsLastEdit,
+    Integer fabricIndex
+  ) {
+    this.deviceName = deviceName;
+    this.deviceNameLastEdit = deviceNameLastEdit;
+    this.bridgedEndpoint = bridgedEndpoint;
+    this.originalEndpoint = originalEndpoint;
+    this.deviceTypes = deviceTypes;
+    this.uniqueLocationIDs = uniqueLocationIDs;
+    this.uniqueLocationIDsLastEdit = uniqueLocationIDsLastEdit;
+    this.fabricIndex = fabricIndex;
+  }
+
+  public StructType encodeTlv() {
+    ArrayList<StructElement> values = new ArrayList<>();
+    values.add(new StructElement(DEVICE_NAME_ID, deviceName.<BaseTLVType>map((nonOptionaldeviceName) -> new StringType(nonOptionaldeviceName)).orElse(new EmptyType())));
+    values.add(new StructElement(DEVICE_NAME_LAST_EDIT_ID, deviceNameLastEdit.<BaseTLVType>map((nonOptionaldeviceNameLastEdit) -> new UIntType(nonOptionaldeviceNameLastEdit)).orElse(new EmptyType())));
+    values.add(new StructElement(BRIDGED_ENDPOINT_ID, new UIntType(bridgedEndpoint)));
+    values.add(new StructElement(ORIGINAL_ENDPOINT_ID, new UIntType(originalEndpoint)));
+    values.add(new StructElement(DEVICE_TYPES_ID, ArrayType.generateArrayType(deviceTypes, (elementdeviceTypes) -> elementdeviceTypes.encodeTlv())));
+    values.add(new StructElement(UNIQUE_LOCATION_I_DS_ID, ArrayType.generateArrayType(uniqueLocationIDs, (elementuniqueLocationIDs) -> new StringType(elementuniqueLocationIDs))));
+    values.add(new StructElement(UNIQUE_LOCATION_I_DS_LAST_EDIT_ID, new UIntType(uniqueLocationIDsLastEdit)));
+    values.add(new StructElement(FABRIC_INDEX_ID, new UIntType(fabricIndex)));
+
+    return new StructType(values);
+  }
+
+  public static EcosystemInformationClusterEcosystemDeviceStruct decodeTlv(BaseTLVType tlvValue) {
+    if (tlvValue == null || tlvValue.type() != TLVType.Struct) {
+      return null;
+    }
+    Optional<String> deviceName = Optional.empty();
+    Optional<Long> deviceNameLastEdit = Optional.empty();
+    Integer bridgedEndpoint = null;
+    Integer originalEndpoint = null;
+    ArrayList<ChipStructs.EcosystemInformationClusterDeviceTypeStruct> deviceTypes = null;
+    ArrayList<String> uniqueLocationIDs = null;
+    Long uniqueLocationIDsLastEdit = null;
+    Integer fabricIndex = null;
+    for (StructElement element: ((StructType)tlvValue).value()) {
+      if (element.contextTagNum() == DEVICE_NAME_ID) {
+        if (element.value(BaseTLVType.class).type() == TLVType.String) {
+          StringType castingValue = element.value(StringType.class);
+          deviceName = Optional.of(castingValue.value(String.class));
+        }
+      } else if (element.contextTagNum() == DEVICE_NAME_LAST_EDIT_ID) {
+        if (element.value(BaseTLVType.class).type() == TLVType.UInt) {
+          UIntType castingValue = element.value(UIntType.class);
+          deviceNameLastEdit = Optional.of(castingValue.value(Long.class));
+        }
+      } else if (element.contextTagNum() == BRIDGED_ENDPOINT_ID) {
+        if (element.value(BaseTLVType.class).type() == TLVType.UInt) {
+          UIntType castingValue = element.value(UIntType.class);
+          bridgedEndpoint = castingValue.value(Integer.class);
+        }
+      } else if (element.contextTagNum() == ORIGINAL_ENDPOINT_ID) {
+        if (element.value(BaseTLVType.class).type() == TLVType.UInt) {
+          UIntType castingValue = element.value(UIntType.class);
+          originalEndpoint = castingValue.value(Integer.class);
+        }
+      } else if (element.contextTagNum() == DEVICE_TYPES_ID) {
+        if (element.value(BaseTLVType.class).type() == TLVType.Array) {
+          ArrayType castingValue = element.value(ArrayType.class);
+          deviceTypes = castingValue.map((elementcastingValue) -> ChipStructs.EcosystemInformationClusterDeviceTypeStruct.decodeTlv(elementcastingValue));
+        }
+      } else if (element.contextTagNum() == UNIQUE_LOCATION_I_DS_ID) {
+        if (element.value(BaseTLVType.class).type() == TLVType.Array) {
+          ArrayType castingValue = element.value(ArrayType.class);
+          uniqueLocationIDs = castingValue.map((elementcastingValue) -> elementcastingValue.value(String.class));
+        }
+      } else if (element.contextTagNum() == UNIQUE_LOCATION_I_DS_LAST_EDIT_ID) {
+        if (element.value(BaseTLVType.class).type() == TLVType.UInt) {
+          UIntType castingValue = element.value(UIntType.class);
+          uniqueLocationIDsLastEdit = castingValue.value(Long.class);
+        }
+      } else if (element.contextTagNum() == FABRIC_INDEX_ID) {
+        if (element.value(BaseTLVType.class).type() == TLVType.UInt) {
+          UIntType castingValue = element.value(UIntType.class);
+          fabricIndex = castingValue.value(Integer.class);
+        }
+      }
+    }
+    return new EcosystemInformationClusterEcosystemDeviceStruct(
+      deviceName,
+      deviceNameLastEdit,
+      bridgedEndpoint,
+      originalEndpoint,
+      deviceTypes,
+      uniqueLocationIDs,
+      uniqueLocationIDsLastEdit,
+      fabricIndex
+    );
+  }
+
+  @Override
+  public String toString() {
+    StringBuilder output = new StringBuilder();
+    output.append("EcosystemInformationClusterEcosystemDeviceStruct {\n");
+    output.append("\tdeviceName: ");
+    output.append(deviceName);
+    output.append("\n");
+    output.append("\tdeviceNameLastEdit: ");
+    output.append(deviceNameLastEdit);
+    output.append("\n");
+    output.append("\tbridgedEndpoint: ");
+    output.append(bridgedEndpoint);
+    output.append("\n");
+    output.append("\toriginalEndpoint: ");
+    output.append(originalEndpoint);
+    output.append("\n");
+    output.append("\tdeviceTypes: ");
+    output.append(deviceTypes);
+    output.append("\n");
+    output.append("\tuniqueLocationIDs: ");
+    output.append(uniqueLocationIDs);
+    output.append("\n");
+    output.append("\tuniqueLocationIDsLastEdit: ");
+    output.append(uniqueLocationIDsLastEdit);
+    output.append("\n");
+    output.append("\tfabricIndex: ");
+    output.append(fabricIndex);
     output.append("\n");
     output.append("}\n");
     return output.toString();

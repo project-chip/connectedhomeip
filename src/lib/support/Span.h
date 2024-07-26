@@ -364,6 +364,8 @@ using ByteSpan        = Span<const uint8_t>;
 using MutableByteSpan = Span<uint8_t>;
 template <size_t N>
 using FixedByteSpan = FixedSpan<const uint8_t, N>;
+template <size_t N>
+using MutableFixedByteSpan = FixedSpan<uint8_t, N>;
 
 using CharSpan        = Span<const char>;
 using MutableCharSpan = Span<char>;
