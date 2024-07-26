@@ -564,7 +564,16 @@ class GlobalMapping:
         self.enum_map = {e.name: e for e in idl.global_enums}
         self.struct_map = {s.name: s for s in idl.global_structs}
 
+
         self.global_types = set(self.bitmap_map.keys()).union(set(self.enum_map.keys())).union(set(self.struct_map.keys()))
+
+        # Spec does not enforce unique naming in bitmap/enum/struct, however in practice
+        # if we have both enum Foo and bitmap Foo for example, it would be impossible
+        # to disambiguate `attribute Foo foo = 1` for the actual type we want.
+        #
+        # As a result, we do not try to namespace this and just error out
+        if len(self.global_types) != len(self.bitmap_map) + len(self.enum_map) + len(self.struct_map):
+            raise ValueError("Global type names are not unique.")
 
     def merge_global_types_into_cluster(self, cluster: Cluster) -> Cluster:
         """
