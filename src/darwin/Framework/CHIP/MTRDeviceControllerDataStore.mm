@@ -1196,7 +1196,7 @@ static NSString * sDeviceDataKeyPrefix = @"deviceData";
         data = [self->_storageDelegate controller:controller
                                       valueForKey:key
                                     securityLevel:MTRStorageSecurityLevelSecure
-                                      sharingType:MTRStorageSharingTypeNotShared]; // REVIEWERS:  fabric shared? kmo 12 jul 2024 14h58
+                                      sharingType:MTRStorageSharingTypeSameFabric];
     }
 
     if (data == nil) {
@@ -1223,7 +1223,7 @@ static NSString * sDeviceDataKeyPrefix = @"deviceData";
                                                           storeValue:value
                                                               forKey:storageKey
                                                        securityLevel:MTRStorageSecurityLevelSecure
-                                                         sharingType:MTRStorageSharingTypeNotShared]; // REVIEWERS:  should be fabric shared? kmo 12 jul 2024 13h10
+                                                         sharingType:MTRStorageSharingTypeSameFabric];
 
         if (!storedSuccessfully) {
             MTR_LOG_ERROR("unable to store client data with device controller");
@@ -1287,7 +1287,7 @@ static NSString * sDeviceDataKeyPrefix = @"deviceData";
             data = [self->_storageDelegate controller:controller
                                           valueForKey:dataKey
                                         securityLevel:MTRStorageSecurityLevelSecure
-                                          sharingType:MTRStorageSharingTypeNotShared]; // REVIEWERS:  fabric shared? kmo 12 jul 2024 14h58
+                                          sharingType:MTRStorageSharingTypeSameFabric];
         }
         if (data == nil) {
             return;
@@ -1315,7 +1315,7 @@ static NSString * sDeviceDataKeyPrefix = @"deviceData";
         [self->_storageDelegate controller:controller
                          removeValueForKey:storageKey
                              securityLevel:MTRStorageSecurityLevelSecure
-                               sharingType:MTRStorageSharingTypeNotShared]; // REVIEWERS:  fabric shared?
+                               sharingType:MTRStorageSharingTypeSameFabric];
 
         // remove the key from the index
         [self _removeKey:key fromIndexForPrefix:prefix];

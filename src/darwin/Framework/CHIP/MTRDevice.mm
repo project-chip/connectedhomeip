@@ -4049,10 +4049,7 @@ static BOOL AttributeHasChangesOmittedQuality(MTRAttributePath * attributePath)
 
 #pragma mark Client Metadata Storage: By Node ID
 
-// REVIEWERS:  does it make sense to constrain this to NSArray<NSString *> * since it's keys? kmo 19 jul 2024 09h28
-// TODO:  should this include all keys for node and endpoints on that node?
-// (currently, just the node - not the endpoints) kmo 22 jul 2024 19h38
-- (NSArray * _Nullable)clientDataKeys
+- (NSArray<NSString *> * _Nullable)clientDataKeys
 {
     return [self.deviceController.controllerDataStore storedClientDataKeysForNodeID:self.nodeID];
 }
@@ -4078,7 +4075,7 @@ static BOOL AttributeHasChangesOmittedQuality(MTRAttributePath * attributePath)
 
 #pragma mark Client Metadata Storage: By Endpoint ID + Node ID
 
-- (NSArray * _Nullable)clientDataKeysForEndpointID:(NSNumber *)endpointID
+- (NSArray<NSString *> * _Nullable)clientDataKeysForEndpointID:(NSNumber *)endpointID
 {
     // TODO: (from stub impl) When hooked up to storage, enumerate this better
     return [self.deviceController.controllerDataStore storedClientDataKeysForEndpointID:endpointID onNodeID:self.nodeID];

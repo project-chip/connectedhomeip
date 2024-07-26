@@ -312,7 +312,7 @@ MTR_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
  * List of all client data keys stored
  *
  */
-- (NSArray * _Nullable)clientDataKeys MTR_UNSTABLE_API;
+- (NSArray<NSString *> * _Nullable)clientDataKeys MTR_UNSTABLE_API;
 
 /**
  *
@@ -344,7 +344,7 @@ MTR_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
  * List of all client data keys stored
  *
  */
-- (NSArray * _Nullable)clientDataKeysForEndpointID:(NSNumber *)endpointID MTR_UNSTABLE_API;
+- (NSArray<NSString *> * _Nullable)clientDataKeysForEndpointID:(NSNumber *)endpointID MTR_UNSTABLE_API;
 
 /**
  *
