@@ -130,6 +130,12 @@ public:
     static void ApplicationCallbackHandler(const EVSECbInfo * cb, intptr_t arg);
 
     /**
+     * @brief   Simple example to demonstrate how an EVSE can compute the start time
+     *          and duration of a charging schedule
+     */
+    CHIP_ERROR ComputeChargingSchedule();
+
+    /**
      * @brief   Allows a client application to initialise the Accuracy, Measurement types etc
      */
     CHIP_ERROR InitializePowerMeasurementCluster();
