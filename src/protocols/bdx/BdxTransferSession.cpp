@@ -261,6 +261,17 @@ CHIP_ERROR TransferSession::AcceptTransfer(const TransferAcceptData & acceptData
     return CHIP_NO_ERROR;
 }
 
+CHIP_ERROR TransferSession::RejectTransfer(StatusCode reason)
+{
+    VerifyOrReturnError(mState == TransferState::kNegotiateTransferParams, CHIP_ERROR_INCORRECT_STATE);
+    VerifyOrReturnError(mPendingOutput == OutputEventType::kNone, CHIP_ERROR_INCORRECT_STATE);
+
+    PrepareStatusReport(reason);
+    mState = TransferState::kTransferDone;
+
+    return CHIP_NO_ERROR;
+}
+
 CHIP_ERROR TransferSession::PrepareBlockQuery()
 {
     const MessageType msgType = MessageType::BlockQuery;

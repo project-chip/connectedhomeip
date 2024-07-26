@@ -213,19 +213,8 @@ public:
             return err;
         }
 
-        // This handler assumes it is being used with the default handler for the level control. Therefore if the level control
-        // cluster with on off feature is present on the endpoint and the level control handler is registered, it assumes this
-        // handler will take action on the on-off state. This assumes the level control attributes were also saved in the scene.
-        // This is to prevent a behavior where the on off state is set by this handler, and then the level control handler or vice
-        // versa.
-#ifdef MATTER_DM_PLUGIN_LEVEL_CONTROL
-        if (!(LevelControlWithOnOffFeaturePresent(endpoint) &&
-              ScenesManagement::ScenesServer::Instance().IsHandlerRegistered(endpoint, LevelControlServer::GetSceneHandler())))
-#endif
-        {
-            VerifyOrReturnError(mTransitionTimeInterface.sceneEventControl(endpoint) != nullptr, CHIP_ERROR_INVALID_ARGUMENT);
-            OnOffServer::Instance().scheduleTimerCallbackMs(mTransitionTimeInterface.sceneEventControl(endpoint), timeMs);
-        }
+        VerifyOrReturnError(mTransitionTimeInterface.sceneEventControl(endpoint) != nullptr, CHIP_ERROR_INVALID_ARGUMENT);
+        OnOffServer::Instance().scheduleTimerCallbackMs(mTransitionTimeInterface.sceneEventControl(endpoint), timeMs);
 
         return CHIP_NO_ERROR;
     }
