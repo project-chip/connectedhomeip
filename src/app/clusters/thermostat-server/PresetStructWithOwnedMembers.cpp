@@ -62,8 +62,8 @@ CHIP_ERROR PresetStructWithOwnedMembers::SetPresetHandle(const Nullable<ByteSpan
         size_t newPresetHandleSize = newPresetHandle.Value().size();
         if (newPresetHandleSize > kPresetHandleSize)
         {
-            ChipLogError(Zcl, "Failed to set Preset handle. New preset handle size (%ld) > allowed preset handle size (%ld)",
-                         newPresetHandleSize, kPresetNameSize);
+            ChipLogError(Zcl, "Failed to set Preset handle. New preset handle size (%u) > allowed preset handle size (%u)",
+                         static_cast<uint8_t>(newPresetHandleSize), static_cast<uint8_t>(kPresetNameSize));
             return CHIP_ERROR_NO_MEMORY;
         }
         MutableByteSpan targetSpan(presetHandleData);
@@ -85,8 +85,8 @@ CHIP_ERROR PresetStructWithOwnedMembers::SetName(const Optional<DataModel::Nulla
         size_t newNameSize = newName.Value().Value().size();
         if (newNameSize > kPresetNameSize)
         {
-            ChipLogError(Zcl, "Failed to set Preset name. New name size (%ld) > allowed preset name size (%ld)", newNameSize,
-                         kPresetNameSize);
+            ChipLogError(Zcl, "Failed to set Preset name. New name size (%u) > allowed preset name size (%u)", static_cast<uint8_t>(newNameSize),
+                         static_cast<uint8_t>(kPresetNameSize));
             return CHIP_ERROR_NO_MEMORY;
         }
         MutableCharSpan targetSpan(presetNameData);

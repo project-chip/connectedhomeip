@@ -138,8 +138,7 @@ CHIP_ERROR ThermostatDelegate::GetActivePresetHandle(MutableByteSpan & activePre
 {
     if (mActivePresetHandleDataSize > 0)
     {
-        ByteSpan presetHandleSpan(mActivePresetHandleData, mActivePresetHandleDataSize);
-        CopySpanToMutableSpan(presetHandleSpan, activePresetHandle);
+        CopySpanToMutableSpan(ByteSpan(mActivePresetHandleData, mActivePresetHandleDataSize), activePresetHandle);
     }
     else
     {
@@ -156,8 +155,8 @@ CHIP_ERROR ThermostatDelegate::SetActivePresetHandle(const DataModel::Nullable<B
         if (newActivePresetHandleSize > kPresetHandleSize)
         {
             ChipLogError(NotSpecified,
-                         "Failed to set ActivePresetHandle. newActivePresetHandle size %ld is larger than preset handle size %ld",
-                         newActivePresetHandleSize, kPresetHandleSize);
+                         "Failed to set ActivePresetHandle. newActivePresetHandle size %u is larger than preset handle size %u",
+                         static_cast<uint8_t>(newActivePresetHandleSize), static_cast<uint8_t>(kPresetHandleSize));
             return CHIP_ERROR_NO_MEMORY;
         }
         memcpy(mActivePresetHandleData, newActivePresetHandle.Value().data(), newActivePresetHandleSize);
@@ -183,14 +182,7 @@ CHIP_ERROR ThermostatDelegate::AppendToPendingPresetList(const PresetStruct::Typ
         mPendingPresets[mNextFreeIndexInPendingPresetsList].SetName(preset.name);
         mPendingPresets[mNextFreeIndexInPendingPresetsList].SetCoolingSetpoint(preset.coolingSetpoint);
         mPendingPresets[mNextFreeIndexInPendingPresetsList].SetHeatingSetpoint(preset.heatingSetpoint);
-        if (!preset.builtIn.IsNull())
-        {
-            mPendingPresets[mNextFreeIndexInPendingPresetsList].SetBuiltIn(preset.builtIn);
-        }
-        else
-        {
-            mPendingPresets[mNextFreeIndexInPendingPresetsList].SetBuiltIn(NullOptional);
-        }
+        mPendingPresets[mNextFreeIndexInPendingPresetsList].SetBuiltIn(preset.builtIn);
         mNextFreeIndexInPendingPresetsList++;
         return CHIP_NO_ERROR;
     }
