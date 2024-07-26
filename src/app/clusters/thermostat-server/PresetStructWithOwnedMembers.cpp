@@ -85,8 +85,8 @@ CHIP_ERROR PresetStructWithOwnedMembers::SetName(const Optional<DataModel::Nulla
         size_t newNameSize = newName.Value().Value().size();
         if (newNameSize > kPresetNameSize)
         {
-            ChipLogError(Zcl, "Failed to set Preset name. New name size (%u) > allowed preset name size (%u)", static_cast<uint8_t>(newNameSize),
-                         static_cast<uint8_t>(kPresetNameSize));
+            ChipLogError(Zcl, "Failed to set Preset name. New name size (%u) > allowed preset name size (%u)",
+                         static_cast<uint8_t>(newNameSize), static_cast<uint8_t>(kPresetNameSize));
             return CHIP_ERROR_NO_MEMORY;
         }
         MutableCharSpan targetSpan(presetNameData);
