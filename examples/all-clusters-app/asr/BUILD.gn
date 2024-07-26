@@ -85,6 +85,7 @@ asr_executable("clusters_app") {
     "${chip_root}/examples/energy-management-app/energy-management-common/src/ChargingTargetsMemMgr.cpp",
     "${chip_root}/examples/energy-management-app/energy-management-common/src/DeviceEnergyManagementDelegateImpl.cpp",
     "${chip_root}/examples/energy-management-app/energy-management-common/src/DeviceEnergyManagementManager.cpp",
+    "${chip_root}/examples/energy-management-app/energy-management-common/src/EVSEManufacturerImpl.cpp",
     "${chip_root}/examples/energy-management-app/energy-management-common/src/ElectricalPowerMeasurementDelegate.cpp",
     "${chip_root}/examples/energy-management-app/energy-management-common/src/EnergyEvseDelegateImpl.cpp",
     "${chip_root}/examples/energy-management-app/energy-management-common/src/EnergyEvseManager.cpp",

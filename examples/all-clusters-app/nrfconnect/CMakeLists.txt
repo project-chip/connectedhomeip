@@ -65,6 +65,7 @@ target_sources(app PRIVATE
                ${ENERGY_MANAGEMENT_COMMON_DIR}/src/ChargingTargetsMemMgr.cpp
                ${ENERGY_MANAGEMENT_COMMON_DIR}/src/DeviceEnergyManagementDelegateImpl.cpp
                ${ENERGY_MANAGEMENT_COMMON_DIR}/src/DeviceEnergyManagementManager.cpp
+               ${ENERGY_MANAGEMENT_COMMON_DIR}/src/EVSEManufacturerImpl.cpp
                ${ENERGY_MANAGEMENT_COMMON_DIR}/src/ElectricalPowerMeasurementDelegate.cpp
                ${ENERGY_MANAGEMENT_COMMON_DIR}/src/EnergyEvseDelegateImpl.cpp
                ${ENERGY_MANAGEMENT_COMMON_DIR}/src/EnergyEvseManager.cpp

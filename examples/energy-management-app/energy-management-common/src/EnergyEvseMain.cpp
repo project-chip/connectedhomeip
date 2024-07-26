@@ -16,6 +16,8 @@
  *    limitations under the License.
  */
 
+#include "EnergyManagementAppCmdLineOptions.h"
+
 #include <DeviceEnergyManagementManager.h>
 #include <EVSEManufacturerImpl.h>
 #include <ElectricalPowerMeasurementDelegate.h>
@@ -87,13 +89,10 @@ CHIP_ERROR DeviceEnergyManagementInit()
         return CHIP_ERROR_NO_MEMORY;
     }
 
+    BitMask<DeviceEnergyManagement::Feature> featureMap = GetFeatureMapFromCmdLine();
+
     /* Manufacturer may optionally not support all features, commands & attributes */
-    gDEMInstance = std::make_unique<DeviceEnergyManagementManager>(
-        EndpointId(ENERGY_EVSE_ENDPOINT), *gDEMDelegate,
-        BitMask<DeviceEnergyManagement::Feature, uint32_t>(
-            DeviceEnergyManagement::Feature::kPowerAdjustment, DeviceEnergyManagement::Feature::kPowerForecastReporting,
-            DeviceEnergyManagement::Feature::kStateForecastReporting, DeviceEnergyManagement::Feature::kStartTimeAdjustment,
-            DeviceEnergyManagement::Feature::kPausable));
+    gDEMInstance = std::make_unique<DeviceEnergyManagementManager>(EndpointId(ENERGY_EVSE_ENDPOINT), *gDEMDelegate, featureMap);
 
     if (!gDEMInstance)
     {
@@ -101,6 +100,8 @@ CHIP_ERROR DeviceEnergyManagementInit()
         gDEMDelegate.reset();
         return CHIP_ERROR_NO_MEMORY;
     }
+
+    gDEMDelegate->SetDeviceEnergyManagementInstance(*gDEMInstance);
 
     CHIP_ERROR err = gDEMInstance->Init(); /* Register Attribute & Command handlers */
     if (err != CHIP_NO_ERROR)
@@ -396,12 +397,15 @@ CHIP_ERROR EVSEManufacturerInit()
     }
 
     /* Now create EVSEManufacturer */
-    gEvseManufacturer = std::make_unique<EVSEManufacturer>(gEvseInstance.get(), gEPMInstance.get(), gPTInstance.get());
+    gEvseManufacturer =
+        std::make_unique<EVSEManufacturer>(gEvseInstance.get(), gEPMInstance.get(), gPTInstance.get(), gDEMInstance.get());
     if (!gEvseManufacturer)
     {
         ChipLogError(AppServer, "Failed to allocate memory for EvseManufacturer");
         return CHIP_ERROR_NO_MEMORY;
     }
+
+    gDEMDelegate.get()->SetDEMManufacturerDelegate(*gEvseManufacturer.get());
 
     /* Call Manufacturer specific init */
     err = gEvseManufacturer->Init();

@@ -7459,6 +7459,48 @@ static constexpr AttributeId Id = Globals::Attributes::ClusterRevision::Id;
 } // namespace Attributes
 } // namespace ContentAppObserver
 
+namespace EcosystemInformation {
+namespace Attributes {
+
+namespace RemovedOn {
+static constexpr AttributeId Id = 0x00000000;
+} // namespace RemovedOn
+
+namespace DeviceDirectory {
+static constexpr AttributeId Id = 0x00000001;
+} // namespace DeviceDirectory
+
+namespace LocationDirectory {
+static constexpr AttributeId Id = 0x00000002;
+} // namespace LocationDirectory
+
+namespace GeneratedCommandList {
+static constexpr AttributeId Id = Globals::Attributes::GeneratedCommandList::Id;
+} // namespace GeneratedCommandList
+
+namespace AcceptedCommandList {
+static constexpr AttributeId Id = Globals::Attributes::AcceptedCommandList::Id;
+} // namespace AcceptedCommandList
+
+namespace EventList {
+static constexpr AttributeId Id = Globals::Attributes::EventList::Id;
+} // namespace EventList
+
+namespace AttributeList {
+static constexpr AttributeId Id = Globals::Attributes::AttributeList::Id;
+} // namespace AttributeList
+
+namespace FeatureMap {
+static constexpr AttributeId Id = Globals::Attributes::FeatureMap::Id;
+} // namespace FeatureMap
+
+namespace ClusterRevision {
+static constexpr AttributeId Id = Globals::Attributes::ClusterRevision::Id;
+} // namespace ClusterRevision
+
+} // namespace Attributes
+} // namespace EcosystemInformation
+
 namespace CommissionerControl {
 namespace Attributes {
 
