@@ -65,7 +65,6 @@ enum class ReadFlags : uint32_t
 struct ReadAttributeRequest : OperationRequest
 {
     ConcreteAttributePath path;
-    std::optional<DataVersion> dataVersion;
     BitFlags<ReadFlags> readFlags;
 };
 

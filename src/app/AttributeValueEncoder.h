@@ -162,6 +162,7 @@ public:
 private:
     // We made EncodeListItem() private, and ListEncoderHelper will expose it by Encode()
     friend class ListEncodeHelper;
+    friend class TestOnlyAttributeValueEncoderAccessor;
 
     template <typename... Ts>
     CHIP_ERROR EncodeListItem(Ts &&... aArgs)
