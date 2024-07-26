@@ -1,0 +1,36 @@
+# ASN1 constants extracted from src/lib/asn1/ASN1.h
+
+# ASN1TagClasses
+kASN1TagClass_Universal       = "\x00"
+kASN1TagClass_Application     = "\x40"
+kASN1TagClass_ContextSpecific = "\x80"
+kASN1TagClass_Private         = "\xC0"
+
+# ASN1UniversalTags
+kASN1UniversalTag_Boolean         = "\x01"
+kASN1UniversalTag_Integer         = "\x02"
+kASN1UniversalTag_BitString       = "\x03"
+kASN1UniversalTag_OctetString     = "\x04"
+kASN1UniversalTag_Null            = "\x05"
+kASN1UniversalTag_ObjectId        = "\x06"
+kASN1UniversalTag_ObjectDesc      = "\x07"
+kASN1UniversalTag_External        = "\x08"
+kASN1UniversalTag_Real            = "\x09"
+kASN1UniversalTag_Enumerated      = "\x0A"
+kASN1UniversalTag_UTF8String      = "\x0C"
+kASN1UniversalTag_Sequence        = "\x10"
+kASN1UniversalTag_Set             = "\x11"
+kASN1UniversalTag_NumericString   = "\x12"
+kASN1UniversalTag_PrintableString = "\x13"
+kASN1UniversalTag_T61String       = "\x14"
+kASN1UniversalTag_VideotexString  = "\x15"
+kASN1UniversalTag_IA5String       = "\x16"
+kASN1UniversalTag_UTCTime         = "\x17"
+kASN1UniversalTag_GeneralizedTime = "\x18"
+kASN1UniversalTag_GraphicString   = "\x19"
+kASN1UniversalTag_VisibleString   = "\x1A"
+kASN1UniversalTag_GeneralString   = "\x1B"
+kASN1UniversalTag_UniversalString = "\x1C"
+
+kASN1UniversalTag_Sequence_Constructed = "\x30"
+kASN1UniversalTag_Set_Constructed = "\x31"
