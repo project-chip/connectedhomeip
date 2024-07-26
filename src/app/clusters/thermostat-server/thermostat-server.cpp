@@ -854,11 +854,11 @@ CHIP_ERROR ThermostatAttrAccess::Write(const ConcreteDataAttributePath & aPath, 
         Delegate * delegate = GetDelegate(endpoint);
         VerifyOrReturnError(delegate != nullptr, CHIP_ERROR_INCORRECT_STATE, ChipLogError(Zcl, "Delegate is null"));
 
-        // #1 Presets are not editable, return INVALID_IN_STATE.
+        // Presets are not editable, return INVALID_IN_STATE.
         VerifyOrReturnError(gThermostatAttrAccess.GetPresetsEditable(endpoint), CHIP_IM_GLOBAL_STATUS(InvalidInState),
                             ChipLogError(Zcl, "Presets are not editable"));
 
-        // #2 Check if the OriginatorScopedNodeId at the endpoint is the same as the node editing the presets,
+        // Check if the OriginatorScopedNodeId at the endpoint is the same as the node editing the presets,
         // otherwise return BUSY.
         const Access::SubjectDescriptor subjectDescriptor = aDecoder.GetSubjectDescriptor();
         ScopedNodeId scopedNodeId                         = ScopedNodeId(subjectDescriptor.subject, subjectDescriptor.fabricIndex);
@@ -905,10 +905,7 @@ CHIP_ERROR ThermostatAttrAccess::Write(const ConcreteDataAttributePath & aPath, 
             {
                 return delegate->AppendToPendingPresetList(preset);
             }
-            else
-            {
-                return CHIP_IM_GLOBAL_STATUS(ConstraintError);
-            }
+            return CHIP_IM_GLOBAL_STATUS(ConstraintError);
         }
     }
     break;
@@ -1292,7 +1289,7 @@ bool emberAfThermostatClusterStartPresetsSchedulesEditRequestCallback(
 
     EndpointId endpoint = commandPath.mEndpointId;
 
-    // #1 If the presets are editable and the scoped node id of the client sending StartPresetsSchedulesEditRequest command
+    // If the presets are editable and the scoped node id of the client sending StartPresetsSchedulesEditRequest command
     // is not the same as the one that previously originated a StartPresetsSchedulesEditRequest command, return BUSY.
     if (gThermostatAttrAccess.GetPresetsEditable(endpoint) &&
         (gThermostatAttrAccess.GetOriginatorScopedNodeId(endpoint) != sourceNodeId))
@@ -1301,7 +1298,7 @@ bool emberAfThermostatClusterStartPresetsSchedulesEditRequestCallback(
         return true;
     }
 
-    // #2 If presets are editable and the scoped node id of the client sending StartPresetsSchedulesEditRequest command
+    // If presets are editable and the scoped node id of the client sending StartPresetsSchedulesEditRequest command
     // is the same as the one that previously originated a StartPresetsSchedulesEditRequest command, extend the timer.
     if (gThermostatAttrAccess.GetPresetsEditable(endpoint))
     {
@@ -1325,7 +1322,7 @@ bool emberAfThermostatClusterCancelPresetsSchedulesEditRequestCallback(
 {
     EndpointId endpoint = commandPath.mEndpointId;
 
-    // #1 If presets are not editable, return INVALID_IN_STATE.
+    // If presets are not editable, return INVALID_IN_STATE.
     if (!gThermostatAttrAccess.GetPresetsEditable(endpoint))
     {
         commandObj->AddStatus(commandPath, imcode::InvalidInState);
@@ -1334,7 +1331,7 @@ bool emberAfThermostatClusterCancelPresetsSchedulesEditRequestCallback(
 
     ScopedNodeId sourceNodeId = GetSourceScopedNodeId(commandObj);
 
-    // #2 If the node id sending the CancelPresetsSchedulesRequest command is not the same as the one which send the
+    // If the node id sending the CancelPresetsSchedulesRequest command is not the same as the one which send the
     // previous StartPresetsSchedulesEditRequest, return UNSUPPORTED_ACCESS.
     if (gThermostatAttrAccess.GetOriginatorScopedNodeId(endpoint) != sourceNodeId)
     {
@@ -1367,7 +1364,7 @@ bool emberAfThermostatClusterCommitPresetsSchedulesRequestCallback(
         return SendResponseAndCleanUp(delegate, endpoint, commandObj, commandPath, imcode::InvalidInState);
     }
 
-    // #1. If presets are not editable, return INVALID_IN_STATE.
+    // If presets are not editable, return INVALID_IN_STATE.
     if (!gThermostatAttrAccess.GetPresetsEditable(endpoint))
     {
         return SendResponseAndCleanUp(delegate, endpoint, commandObj, commandPath, imcode::InvalidInState);
@@ -1375,7 +1372,7 @@ bool emberAfThermostatClusterCommitPresetsSchedulesRequestCallback(
 
     ScopedNodeId sourceNodeId = GetSourceScopedNodeId(commandObj);
 
-    // #2. If the node id sending the CommitPresetsSchedulesRequest command is not the same as the one which send the
+    // If the node id sending the CommitPresetsSchedulesRequest command is not the same as the one which send the
     // StartPresetsSchedulesEditRequest, return UNSUPPORTED_ACCESS.
     if (gThermostatAttrAccess.GetOriginatorScopedNodeId(endpoint) != sourceNodeId)
     {
@@ -1406,7 +1403,7 @@ bool emberAfThermostatClusterCommitPresetsSchedulesRequestCallback(
 
         bool found = MatchingPendingPresetExists(delegate, preset);
 
-        // #3. If a built in preset in the Presets attribute list is removed and not found in the pending presets list, return
+        // If a built in preset in the Presets attribute list is removed and not found in the pending presets list, return
         // CONSTRAINT_ERROR.
         if (IsBuiltIn(preset) && !found)
         {
@@ -1414,7 +1411,7 @@ bool emberAfThermostatClusterCommitPresetsSchedulesRequestCallback(
         }
     }
 
-    // #4. If there is an ActivePresetHandle set, find the preset in the pending presets list that matches the ActivePresetHandle
+    // If there is an ActivePresetHandle set, find the preset in the pending presets list that matches the ActivePresetHandle
     // attribute. If a preset is not found with the same presetHandle, return INVALID_IN_STATE. If there is no ActivePresetHandle
     // attribute set, continue with other checks.
     uint8_t buffer[kPresetHandleSize];
@@ -1458,12 +1455,12 @@ bool emberAfThermostatClusterCommitPresetsSchedulesRequestCallback(
         bool isPendingPresetWithNullPresetHandle = pendingPreset.GetPresetHandle().IsNull();
         if (isPendingPresetWithNullPresetHandle)
         {
-            // #5. If the presetHandle for a preset is null, the device should set a unique presetHandle.
+            // If the presetHandle for a preset is null, the device should set a unique presetHandle.
             const uint8_t handle[] = { static_cast<uint8_t>(pendingPreset.GetPresetScenario()) };
             pendingPreset.SetPresetHandle(DataModel::MakeNullable(ByteSpan(handle)));
         }
 
-        // #6. If the preset handle is null and the built in field is set to true, return CONSTRAINT_ERROR.
+        // If the preset handle is null and the built in field is set to true, return CONSTRAINT_ERROR.
         if (isPendingPresetWithNullPresetHandle && IsBuiltIn(pendingPreset))
         {
             return SendResponseAndCleanUp(delegate, endpoint, commandObj, commandPath, imcode::ConstraintError);
@@ -1475,14 +1472,14 @@ bool emberAfThermostatClusterCommitPresetsSchedulesRequestCallback(
         {
             foundMatchingPresetInPresets = GetMatchingPresetInPresets(delegate, pendingPreset, matchingPreset);
 
-            // #7. If the presetHandle for the pending preset is not null and a matching preset is not found in the
+            // If the presetHandle for the pending preset is not null and a matching preset is not found in the
             // presets attribute list, return NOT_FOUND.
             if (!foundMatchingPresetInPresets)
             {
                 return SendResponseAndCleanUp(delegate, endpoint, commandObj, commandPath, imcode::NotFound);
             }
 
-            // #8. Find the number of presets in the pending preset list that match the preset handle. If there are duplicate
+            // Find the number of presets in the pending preset list that match the preset handle. If there are duplicate
             // entries, return CONSTRAINT_ERROR.
             uint8_t count = CountPresetsInPendingListWithPresetHandle(delegate, pendingPreset.GetPresetHandle().Value());
             if (count > 1)
@@ -1491,28 +1488,28 @@ bool emberAfThermostatClusterCommitPresetsSchedulesRequestCallback(
             }
         }
 
-        // #9. If the preset is found in the  presets attribute list and the preset is builtIn in the pending presets list
+        // If the preset is found in the  presets attribute list and the preset is builtIn in the pending presets list
         //  but not in the presets attribute list, return UNSUPPORTED_ACCESS.
         if (foundMatchingPresetInPresets && (IsBuiltIn(pendingPreset) && !IsBuiltIn(matchingPreset)))
         {
             return SendResponseAndCleanUp(delegate, endpoint, commandObj, commandPath, imcode::UnsupportedAccess);
         }
 
-        // #10. If the preset is found in the  presets attribute list and the preset is builtIn in the presets attribute
+        // If the preset is found in the  presets attribute list and the preset is builtIn in the presets attribute
         //  but not in the pending presets list, return UNSUPPORTED_ACCESS.
         if (foundMatchingPresetInPresets && (!IsBuiltIn(pendingPreset) && IsBuiltIn(matchingPreset)))
         {
             return SendResponseAndCleanUp(delegate, endpoint, commandObj, commandPath, imcode::UnsupportedAccess);
         }
 
-        // #11. If the presetScenario is not found in the preset types, return CONSTRAINT_ERROR.
+        // If the presetScenario is not found in the preset types, return CONSTRAINT_ERROR.
         PresetScenarioEnum presetScenario = pendingPreset.GetPresetScenario();
         if (!FindPresetScenarioInPresetTypes(delegate, presetScenario))
         {
             return SendResponseAndCleanUp(delegate, endpoint, commandObj, commandPath, imcode::ConstraintError);
         }
 
-        // #12. If the preset type for the preset scenario does not supports names and a name is specified, return CONSTRAINT_ERROR.
+        // If the preset type for the preset scenario does not supports names and a name is specified, return CONSTRAINT_ERROR.
         if (!PresetTypeSupportsNames(delegate, presetScenario) && pendingPreset.GetName().HasValue())
         {
             return SendResponseAndCleanUp(delegate, endpoint, commandObj, commandPath, imcode::ConstraintError);
@@ -1542,14 +1539,14 @@ bool emberAfThermostatClusterCommitPresetsSchedulesRequestCallback(
         return SendResponseAndCleanUp(delegate, endpoint, commandObj, commandPath, imcode::InvalidInState);
     }
 
-    // #12 If the expected length of the presets attribute with the applied changes exceeds the total number of presets supported,
+    // If the expected length of the presets attribute with the applied changes exceeds the total number of presets supported,
     // return RESOURCE_EXHAUSTED. Note that the changes are not yet applied.
     if (numberOfPresetsSupported > 0 && totalCount > numberOfPresetsSupported)
     {
         return SendResponseAndCleanUp(delegate, endpoint, commandObj, commandPath, imcode::ResourceExhausted);
     }
 
-    // #13 TODO: #25 Check if the number of presets for each presetScenario exceeds the max number of presets supported for that
+    // TODO: Check if the number of presets for each presetScenario exceeds the max number of presets supported for that
     // scenario. We plan to support only one preset for each presetScenario for our use cases so defer this for re-evaluation.
 
     // Call the delegate API to apply the pending presets to the presets attribute and update it.

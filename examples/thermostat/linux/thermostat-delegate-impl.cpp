@@ -90,7 +90,6 @@ void ThermostatDelegate::InitializePresets()
     uint8_t index = 0;
     for (PresetScenarioEnum presetScenario : presetScenarioEnumArray)
     {
-        ChipLogDetail(Zcl, "initializing preset for scenario %hhu", presetScenario);
         mPresets[index].SetPresetScenario(presetScenario);
 
         // Set the preset handle to the preset scenario value as a unique id.
@@ -195,10 +194,7 @@ CHIP_ERROR ThermostatDelegate::AppendToPendingPresetList(const PresetStruct::Typ
         mNextFreeIndexInPendingPresetsList++;
         return CHIP_NO_ERROR;
     }
-    else
-    {
-        return CHIP_ERROR_WRITE_FAILED;
-    }
+    return CHIP_ERROR_WRITE_FAILED;
 }
 
 CHIP_ERROR ThermostatDelegate::GetPendingPresetAtIndex(size_t index, PresetStructWithOwnedMembers & preset)

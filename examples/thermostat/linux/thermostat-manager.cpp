@@ -170,7 +170,6 @@ CHIP_ERROR ThermostatManager::Init()
     DeviceLayer::PlatformMgr().AddEventHandler(OnPlatformChipDeviceEvent, reinterpret_cast<intptr_t>(this));
     DeviceLayer::PlatformMgr().ScheduleWork(InitBindingManager);
 
-    PlatformMgr().LockChipStack();
     mLocalTemperature        = GetCurrentTemperature();
     mSystemMode              = GetSystemMode();
     mRunningMode             = GetRunningMode();
@@ -179,14 +178,11 @@ CHIP_ERROR ThermostatManager::Init()
     // TODO: Gotta expose this properly on attribute
     mOccupiedSetback = 5; // 0.5 C
 
-    PlatformMgr().UnlockChipStack();
-
     ChipLogError(AppServer,
                  "Initialized a thermostat with \n "
-                 "mSystemMode: %hhu (%s) \n mRunningMode: %hhu (%s) \n mLocalTemperature: %d \n mOccupiedHeatingSetpoint: %d \n "
-                 "mOccupiedCoolingSetpoint: %d"
-                 "NumberOfPresets: %d",
-                 mSystemMode, SystemModeString(mSystemMode), mRunningMode, RunningModeString(mRunningMode), mLocalTemperature,
+                 "mSystemMode: %u (%s) \n mRunningMode: %u (%s) \n mLocalTemperature: %d \n mOccupiedHeatingSetpoint: %d \n "
+                 "mOccupiedCoolingSetpoint: %d" "NumberOfPresets: %d",
+                 static_cast<uint8_t>(mSystemMode), SystemModeString(mSystemMode), static_cast<uint8_t>(mRunningMode), RunningModeString(mRunningMode), mLocalTemperature,
                  mOccupiedHeatingSetpoint, mOccupiedCoolingSetpoint, GetNumberOfPresets());
 
     // TODO: Should this be called later?
@@ -253,14 +249,14 @@ void ThermostatManager::ThermostatClusterAttributeChangeHandler(AttributeId attr
 
     case SystemMode::Id: {
         mSystemMode = static_cast<SystemModeEnum>(*value);
-        ChipLogError(AppServer, "System mode changed to %hhu (%s)", mSystemMode, SystemModeString(mSystemMode));
+        ChipLogError(AppServer, "System mode changed to %u (%s)", *value, SystemModeString(mSystemMode));
         EvalThermostatState();
     }
     break;
 
     case ThermostatRunningMode::Id: {
         mRunningMode = static_cast<ThermostatRunningModeEnum>(*value);
-        ChipLogError(AppServer, "Running mode changed to %hhu (%s)", mRunningMode, RunningModeString(mRunningMode));
+        ChipLogError(AppServer, "Running mode changed to %u (%s)", *value, RunningModeString(mRunningMode));
     }
     break;
 
@@ -276,14 +272,14 @@ SystemModeEnum ThermostatManager::GetSystemMode()
 {
     SystemModeEnum systemMode;
     SystemMode::Get(kThermostatEndpoint, &systemMode);
-    return static_cast<SystemModeEnum>(systemMode);
+    return systemMode;
 }
 
 ThermostatRunningModeEnum ThermostatManager::GetRunningMode()
 {
     ThermostatRunningModeEnum runningMode;
     ThermostatRunningMode::Get(kThermostatEndpoint, &runningMode);
-    return static_cast<ThermostatRunningModeEnum>(runningMode);
+    return runningMode;
 }
 
 int16_t ThermostatManager::GetCurrentTemperature()
@@ -315,13 +311,14 @@ uint8_t ThermostatManager::GetNumberOfPresets()
 
 CHIP_ERROR ThermostatManager::SetSystemMode(SystemModeEnum systemMode)
 {
+    uint8_t systemModeValue = static_cast<uint8_t>(systemMode);
     if (mSystemMode == systemMode)
     {
-        ChipLogDetail(AppServer, "Already in system mode: %hhu (%s)", systemMode, SystemModeString(systemMode));
+        ChipLogDetail(AppServer, "Already in system mode: %u (%s)", systemModeValue, SystemModeString(systemMode));
         return CHIP_NO_ERROR;
     }
 
-    ChipLogError(AppServer, "Setting system mode: %hhu (%s)", systemMode, SystemModeString(systemMode));
+    ChipLogError(AppServer, "Setting system mode: %u (%s)", systemModeValue, SystemModeString(systemMode));
     Protocols::InteractionModel::Status status = SystemMode::Set(kThermostatEndpoint, systemMode);
 
     // TODO: CHIP_ERROR_WRITE_FAILED might not be the best error code to send
@@ -330,13 +327,14 @@ CHIP_ERROR ThermostatManager::SetSystemMode(SystemModeEnum systemMode)
 
 CHIP_ERROR ThermostatManager::SetRunningMode(ThermostatRunningModeEnum runningMode)
 {
+    uint8_t runningModeValue = static_cast<uint8_t>(runningMode);
     if (mRunningMode == runningMode)
     {
-        ChipLogDetail(AppServer, "Already in running mode: %hhu (%s)", runningMode, RunningModeString(runningMode));
+        ChipLogDetail(AppServer, "Already in running mode: %u (%s)", runningModeValue, RunningModeString(runningMode));
         return CHIP_NO_ERROR;
     }
 
-    ChipLogError(AppServer, "Setting running mode: %hhu (%s)", runningMode, RunningModeString(runningMode));
+    ChipLogError(AppServer, "Setting running mode: %u (%s)", runningModeValue, RunningModeString(runningMode));
     Protocols::InteractionModel::Status status = ThermostatRunningMode::Set(kThermostatEndpoint, runningMode);
 
     // TODO: CHIP_ERROR_WRITE_FAILED might not be the best error code to send
@@ -365,12 +363,12 @@ void ThermostatManager::EvalThermostatState()
 {
     ChipLogError(AppServer,
                  "Eval Thermostat Running Mode \n "
-                 "mSystemMode: %hhu (%s) \n mRunningMode: %hhu (%s) \n mLocalTemperature: %d \n mOccupiedHeatingSetpoint: %d \n "
+                 "mSystemMode: %u (%s) \n mRunningMode: %u (%s) \n mLocalTemperature: %d \n mOccupiedHeatingSetpoint: %d \n "
                  "mOccupiedCoolingSetpoint: %d",
-                 mSystemMode, SystemModeString(mSystemMode), mRunningMode, RunningModeString(mRunningMode), mLocalTemperature,
+                 static_cast<uint8_t>(mSystemMode), SystemModeString(mSystemMode), static_cast<uint8_t>(mRunningMode), RunningModeString(mRunningMode), mLocalTemperature,
                  mOccupiedHeatingSetpoint, mOccupiedCoolingSetpoint);
 
-    switch (static_cast<SystemModeEnum>(mSystemMode))
+    switch (mSystemMode)
     {
     case SystemModeEnum::kOff: {
         SetRunningMode(ThermostatRunningModeEnum::kOff);
