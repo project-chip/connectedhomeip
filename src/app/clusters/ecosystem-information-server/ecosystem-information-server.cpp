@@ -63,6 +63,9 @@ CHIP_ERROR AttrAccess::Read(const ConcreteReadAttributePath & aPath, AttributeVa
 // WARNING: caller is expected to use the returned LocationDescriptorStruct::Type immediately. Caller must
 // be certain that the provided aLocationDescriptor has not been destroyed, prior to using the return
 // struct to encode.
+// TODO(#33223) To improve safety we could make GetEncodableLocationDescriptorStruct a private
+// memeber method where we explicitly delete member method for the parameter that matches
+// (LocationDescriptorStruct && aLocationDescriptor).
 Structs::LocationDescriptorStruct::Type GetEncodableLocationDescriptorStruct(const LocationDescriptorStruct & aLocationDescriptor)
 {
     Structs::LocationDescriptorStruct::Type locationDescriptor;
