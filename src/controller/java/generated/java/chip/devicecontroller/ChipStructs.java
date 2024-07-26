@@ -8943,7 +8943,7 @@ public static class DoorLockClusterCredentialStruct {
     return output.toString();
   }
 }
-public static class ServiceAreaClusterHomeLocationStruct {
+public static class ServiceAreaClusterLocationDescriptorStruct {
   public String locationName;
   public @Nullable Integer floorNumber;
   public @Nullable Integer areaType;
@@ -8951,7 +8951,7 @@ public static class ServiceAreaClusterHomeLocationStruct {
   private static final long FLOOR_NUMBER_ID = 1L;
   private static final long AREA_TYPE_ID = 2L;
 
-  public ServiceAreaClusterHomeLocationStruct(
+  public ServiceAreaClusterLocationDescriptorStruct(
     String locationName,
     @Nullable Integer floorNumber,
     @Nullable Integer areaType
@@ -8970,7 +8970,7 @@ public static class ServiceAreaClusterHomeLocationStruct {
     return new StructType(values);
   }
 
-  public static ServiceAreaClusterHomeLocationStruct decodeTlv(BaseTLVType tlvValue) {
+  public static ServiceAreaClusterLocationDescriptorStruct decodeTlv(BaseTLVType tlvValue) {
     if (tlvValue == null || tlvValue.type() != TLVType.Struct) {
       return null;
     }
@@ -8995,7 +8995,7 @@ public static class ServiceAreaClusterHomeLocationStruct {
         }
       }
     }
-    return new ServiceAreaClusterHomeLocationStruct(
+    return new ServiceAreaClusterLocationDescriptorStruct(
       locationName,
       floorNumber,
       areaType
@@ -9005,7 +9005,7 @@ public static class ServiceAreaClusterHomeLocationStruct {
   @Override
   public String toString() {
     StringBuilder output = new StringBuilder();
-    output.append("ServiceAreaClusterHomeLocationStruct {\n");
+    output.append("ServiceAreaClusterLocationDescriptorStruct {\n");
     output.append("\tlocationName: ");
     output.append(locationName);
     output.append("\n");
@@ -9020,7 +9020,7 @@ public static class ServiceAreaClusterHomeLocationStruct {
   }
 }
 public static class ServiceAreaClusterLocationInfoStruct {
-  public @Nullable ChipStructs.ServiceAreaClusterHomeLocationStruct locationInfo;
+  public @Nullable ChipStructs.ServiceAreaClusterLocationDescriptorStruct locationInfo;
   public @Nullable Integer landmarkTag;
   public @Nullable Integer positionTag;
   public @Nullable Integer surfaceTag;
@@ -9030,7 +9030,7 @@ public static class ServiceAreaClusterLocationInfoStruct {
   private static final long SURFACE_TAG_ID = 3L;
 
   public ServiceAreaClusterLocationInfoStruct(
-    @Nullable ChipStructs.ServiceAreaClusterHomeLocationStruct locationInfo,
+    @Nullable ChipStructs.ServiceAreaClusterLocationDescriptorStruct locationInfo,
     @Nullable Integer landmarkTag,
     @Nullable Integer positionTag,
     @Nullable Integer surfaceTag
@@ -9055,7 +9055,7 @@ public static class ServiceAreaClusterLocationInfoStruct {
     if (tlvValue == null || tlvValue.type() != TLVType.Struct) {
       return null;
     }
-    @Nullable ChipStructs.ServiceAreaClusterHomeLocationStruct locationInfo = null;
+    @Nullable ChipStructs.ServiceAreaClusterLocationDescriptorStruct locationInfo = null;
     @Nullable Integer landmarkTag = null;
     @Nullable Integer positionTag = null;
     @Nullable Integer surfaceTag = null;
@@ -9063,7 +9063,7 @@ public static class ServiceAreaClusterLocationInfoStruct {
       if (element.contextTagNum() == LOCATION_INFO_ID) {
         if (element.value(BaseTLVType.class).type() == TLVType.Struct) {
           StructType castingValue = element.value(StructType.class);
-          locationInfo = ChipStructs.ServiceAreaClusterHomeLocationStruct.decodeTlv(castingValue);
+          locationInfo = ChipStructs.ServiceAreaClusterLocationDescriptorStruct.decodeTlv(castingValue);
         }
       } else if (element.contextTagNum() == LANDMARK_TAG_ID) {
         if (element.value(BaseTLVType.class).type() == TLVType.UInt) {
@@ -12283,7 +12283,7 @@ public static class ContentControlClusterRatingNameStruct {
     return output.toString();
   }
 }
-public static class EcosystemInformationClusterHomeLocationStruct {
+public static class EcosystemInformationClusterLocationDescriptorStruct {
   public String locationName;
   public @Nullable Integer floorNumber;
   public @Nullable Integer areaType;
@@ -12291,7 +12291,7 @@ public static class EcosystemInformationClusterHomeLocationStruct {
   private static final long FLOOR_NUMBER_ID = 1L;
   private static final long AREA_TYPE_ID = 2L;
 
-  public EcosystemInformationClusterHomeLocationStruct(
+  public EcosystemInformationClusterLocationDescriptorStruct(
     String locationName,
     @Nullable Integer floorNumber,
     @Nullable Integer areaType
@@ -12310,7 +12310,7 @@ public static class EcosystemInformationClusterHomeLocationStruct {
     return new StructType(values);
   }
 
-  public static EcosystemInformationClusterHomeLocationStruct decodeTlv(BaseTLVType tlvValue) {
+  public static EcosystemInformationClusterLocationDescriptorStruct decodeTlv(BaseTLVType tlvValue) {
     if (tlvValue == null || tlvValue.type() != TLVType.Struct) {
       return null;
     }
@@ -12335,7 +12335,7 @@ public static class EcosystemInformationClusterHomeLocationStruct {
         }
       }
     }
-    return new EcosystemInformationClusterHomeLocationStruct(
+    return new EcosystemInformationClusterLocationDescriptorStruct(
       locationName,
       floorNumber,
       areaType
@@ -12345,7 +12345,7 @@ public static class EcosystemInformationClusterHomeLocationStruct {
   @Override
   public String toString() {
     StringBuilder output = new StringBuilder();
-    output.append("EcosystemInformationClusterHomeLocationStruct {\n");
+    output.append("EcosystemInformationClusterLocationDescriptorStruct {\n");
     output.append("\tlocationName: ");
     output.append(locationName);
     output.append("\n");
@@ -12361,7 +12361,7 @@ public static class EcosystemInformationClusterHomeLocationStruct {
 }
 public static class EcosystemInformationClusterEcosystemLocationStruct {
   public String uniqueLocationID;
-  public ChipStructs.EcosystemInformationClusterHomeLocationStruct locationDescriptor;
+  public ChipStructs.EcosystemInformationClusterLocationDescriptorStruct locationDescriptor;
   public Long locationDescriptorLastEdit;
   public Integer fabricIndex;
   private static final long UNIQUE_LOCATION_I_D_ID = 0L;
@@ -12371,7 +12371,7 @@ public static class EcosystemInformationClusterEcosystemLocationStruct {
 
   public EcosystemInformationClusterEcosystemLocationStruct(
     String uniqueLocationID,
-    ChipStructs.EcosystemInformationClusterHomeLocationStruct locationDescriptor,
+    ChipStructs.EcosystemInformationClusterLocationDescriptorStruct locationDescriptor,
     Long locationDescriptorLastEdit,
     Integer fabricIndex
   ) {
@@ -12396,7 +12396,7 @@ public static class EcosystemInformationClusterEcosystemLocationStruct {
       return null;
     }
     String uniqueLocationID = null;
-    ChipStructs.EcosystemInformationClusterHomeLocationStruct locationDescriptor = null;
+    ChipStructs.EcosystemInformationClusterLocationDescriptorStruct locationDescriptor = null;
     Long locationDescriptorLastEdit = null;
     Integer fabricIndex = null;
     for (StructElement element: ((StructType)tlvValue).value()) {
@@ -12408,7 +12408,7 @@ public static class EcosystemInformationClusterEcosystemLocationStruct {
       } else if (element.contextTagNum() == LOCATION_DESCRIPTOR_ID) {
         if (element.value(BaseTLVType.class).type() == TLVType.Struct) {
           StructType castingValue = element.value(StructType.class);
-          locationDescriptor = ChipStructs.EcosystemInformationClusterHomeLocationStruct.decodeTlv(castingValue);
+          locationDescriptor = ChipStructs.EcosystemInformationClusterLocationDescriptorStruct.decodeTlv(castingValue);
         }
       } else if (element.contextTagNum() == LOCATION_DESCRIPTOR_LAST_EDIT_ID) {
         if (element.value(BaseTLVType.class).type() == TLVType.UInt) {

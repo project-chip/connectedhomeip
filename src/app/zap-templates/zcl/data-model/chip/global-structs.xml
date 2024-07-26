@@ -23,7 +23,7 @@ TODO: Make these structures global rather than defining them for each cluster.
 
 <configurator>
   <domain name="CHIP"/>
-  <struct name="HomeLocationStruct">
+  <struct name="LocationDescriptorStruct">
     <cluster code="0x0150"/> <!-- Service Area Cluster -->
     <cluster code="0x0750"/> <!-- Ecosystem Information Cluster -->
     <!-- TODO: add Basic Information Cluster code="0x0028" -->
