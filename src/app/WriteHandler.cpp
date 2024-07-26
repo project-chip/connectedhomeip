@@ -24,7 +24,7 @@
 #include <app/MessageDef/StatusIB.h>
 #include <app/StatusResponse.h>
 #include <app/WriteHandler.h>
-#include <app/data-model-interface/OperationTypes.h>
+#include <app/data-model-provider/OperationTypes.h>
 #include <app/reporting/Engine.h>
 #include <app/util/MatterCallbacks.h>
 #include <app/util/ember-compatibility-functions.h>
@@ -42,14 +42,14 @@ using namespace Protocols::InteractionModel;
 using Status                         = Protocols::InteractionModel::Status;
 constexpr uint8_t kListAttributeType = 0x48;
 
-CHIP_ERROR WriteHandler::Init(InteractionModel::DataModel * apModel, WriteHandlerDelegate * apWriteHandlerDelegate)
+CHIP_ERROR WriteHandler::Init(DataModel::Provider * apProvider, WriteHandlerDelegate * apWriteHandlerDelegate)
 {
     VerifyOrReturnError(!mExchangeCtx, CHIP_ERROR_INCORRECT_STATE);
     VerifyOrReturnError(apWriteHandlerDelegate, CHIP_ERROR_INVALID_ARGUMENT);
-    VerifyOrReturnError(apModel, CHIP_ERROR_INVALID_ARGUMENT);
+    VerifyOrReturnError(apProvider, CHIP_ERROR_INVALID_ARGUMENT);
 
-    mDelegate  = apWriteHandlerDelegate;
-    mDataModel = apModel;
+    mDelegate          = apWriteHandlerDelegate;
+    mDataModelProvider = apProvider;
     MoveToState(State::Initialized);
 
     mACLCheckCache.ClearValue();
@@ -68,8 +68,8 @@ void WriteHandler::Close()
     // successful.
     DeliverFinalListWriteEnd(false /* wasSuccessful */);
     mExchangeCtx.Release();
-    mSuppressResponse = false;
-    mDataModel        = nullptr;
+    mSuppressResponse  = false;
+    mDataModelProvider = nullptr;
     MoveToState(State::Uninitialized);
 }
 
@@ -703,16 +703,16 @@ CHIP_ERROR WriteHandler::WriteClusterData(const Access::SubjectDescriptor & subj
     // Writes do not have a checked-path. If data model interface is enabled (both checked and only version)
     // the write is done via the DataModel interface
 #if CHIP_CONFIG_USE_DATA_MODEL_INTERFACE
-    VerifyOrReturnError(mDataModel != nullptr, CHIP_ERROR_INCORRECT_STATE);
+    VerifyOrReturnError(mDataModelProvider != nullptr, CHIP_ERROR_INCORRECT_STATE);
 
-    InteractionModel::WriteAttributeRequest request;
+    DataModel::WriteAttributeRequest request;
 
     request.path = path;
-    request.writeFlags.Set(InteractionModel::WriteFlags::kTimed, IsTimedWrite());
+    request.writeFlags.Set(DataModel::WriteFlags::kTimed, IsTimedWrite());
 
     AttributeValueDecoder decoder(data, subject);
 
-    return mDataModel->WriteAttribute(request, decoder);
+    return mDataModelProvider->WriteAttribute(request, decoder);
 #else
     return WriteSingleClusterData(subject, path, data, this);
 #endif // CHIP_CONFIG_USE_DATA_MODEL_INTERFACE

@@ -22,7 +22,7 @@
 #include <app/AttributePathParams.h>
 #include <app/InteractionModelDelegatePointers.h>
 #include <app/MessageDef/WriteResponseMessage.h>
-#include <app/data-model-interface/DataModel.h>
+#include <app/data-model-provider/Provider.h>
 #include <lib/core/CHIPCore.h>
 #include <lib/core/TLVDebug.h>
 #include <lib/support/CodeUtils.h>
@@ -68,7 +68,7 @@ public:
      *  construction until a call to Close is made to terminate the
      *  instance.
      *
-     *  @param[in] apModel                 A Valid pointer to the model used to forward writes towards
+     *  @param[in] apProvider              A Valid pointer to the model used to forward writes towards
      *  @param[in] apWriteHandlerDelegate  A Valid pointer to the WriteHandlerDelegate.
      *
      *  @retval #CHIP_ERROR_INVALID_ARGUMENT on invalid pointers
@@ -77,7 +77,7 @@ public:
      *  @retval #CHIP_NO_ERROR On success.
      *
      */
-    CHIP_ERROR Init(InteractionModel::DataModel * apModel, WriteHandlerDelegate * apWriteHandlerDelegate);
+    CHIP_ERROR Init(DataModel::Provider * apProvider, WriteHandlerDelegate * apWriteHandlerDelegate);
 
     /**
      *  Process a write request.  Parts of the processing may end up being asynchronous, but the WriteHandler
@@ -206,7 +206,7 @@ private:
     bool mAttributeWriteSuccessful                = false;
     Optional<AttributeAccessToken> mACLCheckCache = NullOptional;
 
-    InteractionModel::DataModel * mDataModel = nullptr;
+    DataModel::Provider * mDataModelProvider = nullptr;
 
     // This may be a "fake" pointer or a real delegate pointer, depending
     // on CHIP_CONFIG_STATIC_GLOBAL_INTERACTION_MODEL_ENGINE setting.

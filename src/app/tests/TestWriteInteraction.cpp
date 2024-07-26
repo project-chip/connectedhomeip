@@ -99,7 +99,7 @@ public:
 
 private:
 
-    chip::app::InteractionModel::DataModel * mOldProvider = nullptr;
+    chip::app::DataModel::Provider * mOldProvider = nullptr;
 };
 
 class TestExchangeDelegate : public Messaging::ExchangeDelegate
