@@ -35,14 +35,14 @@ public:
      * @brief Function is used by the ICDManager to determine if a Check-In message should be sent to the given entry based on the
      *        Check-In BackOff strategy.
      *
-     *        There are no  requirements on how the Check-In BackOff strategy should behave.
+     *        There are no requirements on how the Check-In BackOff strategy should behave.
      *        The only specified requirement is the maximum time between to Check-In message, MaximumCheckInBackOff.
      *        All strategies must respect this requirement.
      *
      * @param entry ICDMonitoringEntry for which we are about to send a Check-In message to.
      *
      * @return true   ICDCheckInBackOffStrategy determines that we SHOULD send a Check-In message to the given entry
-     * @return falseI CDCheckInBackOffStrategy determines that we SHOULD NOT send a Check-In message to the given entry
+     * @return false ICDCheckInBackOffStrategy determines that we SHOULD NOT send a Check-In message to the given entry
      */
     virtual bool ShouldSendCheckInMessage(const ICDMonitoringEntry & entry) = 0;
 

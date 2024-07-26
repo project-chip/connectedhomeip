@@ -169,8 +169,8 @@ struct ServerInitParams
     Credentials::OperationalCertificateStore * opCertStore = nullptr;
     // Required, if not provided, the Server::Init() WILL fail.
     app::reporting::ReportScheduler * reportScheduler = nullptr;
-    // Optionnal. Support for the ICD Check-In BackOff strategy. Must be initialized before being provided.
-    // If the ICD Check-In protocol use-case is supported and no strategy is prprovided, server will use the default strategy.
+    // Optional. Support for the ICD Check-In BackOff strategy. Must be initialized before being provided.
+    // If the ICD Check-In protocol use-case is supported and no strategy is provided, server will use the default strategy.
     app::ICDCheckInBackOffStrategy * icdCheckInBackOffStrategy = nullptr;
 };
 

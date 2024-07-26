@@ -40,13 +40,13 @@ public:
     /**
      * @brief Function checks if the entry is a permanent or ephemeral client.
      *        If the client is permanent, we should send a Check-In message.
-     *        If the cliet is ephemerakl, we should not send a Check-In message.
+     *        If the client is ephemeral, we should not send a Check-In message.
      *
-     * @param entry Entry for which we are deciding if we need to send a Check-In message or not.
+     * @param entry Entry for which we are deciding whether we need to send a Check-In message or not.
      * @return true If the client is permanent, return true.
      * @return false If the client is not permanent, ephemeral or invalid, return false.
      */
-    bool ShouldSendCheckInMessage(const ICDMonitoringEntry & entry)
+    bool ShouldSendCheckInMessage(const ICDMonitoringEntry & entry) override
     {
         return (entry.clientType == Clusters::IcdManagement::ClientTypeEnum::kPermanent);
     }
@@ -56,7 +56,7 @@ public:
      *        As such, we don't need to execute anything to force the maximum Check-In BackOff.
      *
      */
-    CHIP_ERROR ForceMaximumCheckInBackoff() { return CHIP_NO_ERROR; }
+    CHIP_ERROR ForceMaximumCheckInBackoff() override { return CHIP_NO_ERROR; }
 };
 
 } // namespace app
