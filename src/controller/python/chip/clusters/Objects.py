@@ -3416,6 +3416,7 @@ class BasicInformation(Cluster):
                 ClusterObjectFieldDescriptor(Label="productAppearance", Tag=0x00000014, Type=typing.Optional[BasicInformation.Structs.ProductAppearanceStruct]),
                 ClusterObjectFieldDescriptor(Label="specificationVersion", Tag=0x00000015, Type=uint),
                 ClusterObjectFieldDescriptor(Label="maxPathsPerInvoke", Tag=0x00000016, Type=uint),
+                ClusterObjectFieldDescriptor(Label="deviceLocation", Tag=0x00000017, Type=typing.Union[None, Nullable, BasicInformation.Structs.HomeLocationStruct]),
                 ClusterObjectFieldDescriptor(Label="generatedCommandList", Tag=0x0000FFF8, Type=typing.List[uint]),
                 ClusterObjectFieldDescriptor(Label="acceptedCommandList", Tag=0x0000FFF9, Type=typing.List[uint]),
                 ClusterObjectFieldDescriptor(Label="eventList", Tag=0x0000FFFA, Type=typing.List[uint]),
@@ -3447,6 +3448,7 @@ class BasicInformation(Cluster):
     productAppearance: 'typing.Optional[BasicInformation.Structs.ProductAppearanceStruct]' = None
     specificationVersion: 'uint' = None
     maxPathsPerInvoke: 'uint' = None
+    deviceLocation: 'typing.Union[None, Nullable, BasicInformation.Structs.HomeLocationStruct]' = None
     generatedCommandList: 'typing.List[uint]' = None
     acceptedCommandList: 'typing.List[uint]' = None
     eventList: 'typing.List[uint]' = None
@@ -3455,6 +3457,108 @@ class BasicInformation(Cluster):
     clusterRevision: 'uint' = None
 
     class Enums:
+        class AreaTypeTag(MatterIntEnum):
+            kAisle = 0x00
+            kAttic = 0x01
+            kBackDoor = 0x02
+            kBackYard = 0x03
+            kBalcony = 0x04
+            kBallroom = 0x05
+            kBathroom = 0x06
+            kBedroom = 0x07
+            kBorder = 0x08
+            kBoxroom = 0x09
+            kBreakfastRoom = 0x0A
+            kCarport = 0x0B
+            kCellar = 0x0C
+            kCloakroom = 0x0D
+            kCloset = 0x0E
+            kConservatory = 0x0F
+            kCorridor = 0x10
+            kCraftRoom = 0x11
+            kCupboard = 0x12
+            kDeck = 0x13
+            kDen = 0x14
+            kDining = 0x15
+            kDrawingRoom = 0x16
+            kDressingRoom = 0x17
+            kDriveway = 0x18
+            kElevator = 0x19
+            kEnsuite = 0x1A
+            kEntrance = 0x1B
+            kEntryway = 0x1C
+            kFamilyRoom = 0x1D
+            kFoyer = 0x1E
+            kFrontDoor = 0x1F
+            kFrontYard = 0x20
+            kGameRoom = 0x21
+            kGarage = 0x22
+            kGarageDoor = 0x23
+            kGarden = 0x24
+            kGardenDoor = 0x25
+            kGuestBathroom = 0x26
+            kGuestBedroom = 0x27
+            kGuestRestroom = 0x28
+            kGuestRoom = 0x29
+            kGym = 0x2A
+            kHallway = 0x2B
+            kHearthRoom = 0x2C
+            kKidsRoom = 0x2D
+            kKidsBedroom = 0x2E
+            kKitchen = 0x2F
+            kLarder = 0x30
+            kLaundryRoom = 0x31
+            kLawn = 0x32
+            kLibrary = 0x33
+            kLivingRoom = 0x34
+            kLounge = 0x35
+            kMediaTvRoom = 0x36
+            kMudRoom = 0x37
+            kMusicRoom = 0x38
+            kNursery = 0x39
+            kOffice = 0x3A
+            kOutdoorKitchen = 0x3B
+            kOutside = 0x3C
+            kPantry = 0x3D
+            kParkingLot = 0x3E
+            kParlor = 0x3F
+            kPatio = 0x40
+            kPlayRoom = 0x41
+            kPoolRoom = 0x42
+            kPorch = 0x43
+            kPrimaryBathroom = 0x44
+            kPrimaryBedroom = 0x45
+            kRamp = 0x46
+            kReceptionRoom = 0x47
+            kRecreationRoom = 0x48
+            kRestroom = 0x49
+            kRoof = 0x4A
+            kSauna = 0x4B
+            kScullery = 0x4C
+            kSewingRoom = 0x4D
+            kShed = 0x4E
+            kSideDoor = 0x4F
+            kSideYard = 0x50
+            kSittingRoom = 0x51
+            kSnug = 0x52
+            kSpa = 0x53
+            kStaircase = 0x54
+            kSteamRoom = 0x55
+            kStorageRoom = 0x56
+            kStudio = 0x57
+            kStudy = 0x58
+            kSunRoom = 0x59
+            kSwimmingPool = 0x5A
+            kTerrace = 0x5B
+            kUtilityRoom = 0x5C
+            kWard = 0x5D
+            kWorkshop = 0x5E
+            # All received enum values that are not listed above will be mapped
+            # to kUnknownEnumValue. This is a helper enum value that should only
+            # be used by code to process how it handles receiving and unknown
+            # enum value. This specific should never be transmitted.
+            kUnknownEnumValue = 95,
+
         class ColorEnum(MatterIntEnum):
             kBlack = 0x00
             kNavy = 0x01
@@ -3509,6 +3613,21 @@ class BasicInformation(Cluster):
 
             caseSessionsPerFabric: 'uint' = 0
             subscriptionsPerFabric: 'uint' = 0
+
+        @dataclass
+        class HomeLocationStruct(ClusterObject):
+            @ChipUtility.classproperty
+            def descriptor(cls) -> ClusterObjectDescriptor:
+                return ClusterObjectDescriptor(
+                    Fields=[
+                        ClusterObjectFieldDescriptor(Label="locationName", Tag=0, Type=str),
+                        ClusterObjectFieldDescriptor(Label="floorNumber", Tag=1, Type=typing.Union[Nullable, int]),
+                        ClusterObjectFieldDescriptor(Label="areaType", Tag=2, Type=typing.Union[Nullable, BasicInformation.Enums.AreaTypeTag]),
+                    ])
+
+            locationName: 'str' = ""
+            floorNumber: 'typing.Union[Nullable, int]' = NullValue
+            areaType: 'typing.Union[Nullable, BasicInformation.Enums.AreaTypeTag]' = NullValue
 
         @dataclass
         class ProductAppearanceStruct(ClusterObject):
@@ -3905,6 +4024,22 @@ class BasicInformation(Cluster):
                 return ClusterObjectFieldDescriptor(Type=uint)
 
             value: 'uint' = 0
+
+        @dataclass
+        class DeviceLocation(ClusterAttributeDescriptor):
+            @ChipUtility.classproperty
+            def cluster_id(cls) -> int:
+                return 0x00000028
+
+            @ChipUtility.classproperty
+            def attribute_id(cls) -> int:
+                return 0x00000017
+
+            @ChipUtility.classproperty
+            def attribute_type(cls) -> ClusterObjectFieldDescriptor:
+                return ClusterObjectFieldDescriptor(Type=typing.Union[None, Nullable, BasicInformation.Structs.HomeLocationStruct])
+
+            value: 'typing.Union[None, Nullable, BasicInformation.Structs.HomeLocationStruct]' = None
 
         @dataclass
         class GeneratedCommandList(ClusterAttributeDescriptor):

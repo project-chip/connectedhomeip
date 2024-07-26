@@ -155,6 +155,13 @@ MTR_DEPRECATED("Please use MTRBasicInformationClusterCapabilityMinimaStruct", io
 @property (nonatomic, copy) NSNumber * _Nonnull subscriptionsPerFabric MTR_DEPRECATED("Please use MTRBasicInformationClusterCapabilityMinimaStruct", ios(16.1, 16.4), macos(13.0, 13.3), watchos(9.1, 9.4), tvos(16.1, 16.4));
 @end
 
+MTR_PROVISIONALLY_AVAILABLE
+@interface MTRBasicInformationClusterHomeLocationStruct : NSObject <NSCopying>
+@property (nonatomic, copy) NSString * _Nonnull locationName MTR_PROVISIONALLY_AVAILABLE;
+@property (nonatomic, copy) NSNumber * _Nullable floorNumber MTR_PROVISIONALLY_AVAILABLE;
+@property (nonatomic, copy) NSNumber * _Nullable areaType MTR_PROVISIONALLY_AVAILABLE;
+@end
+
 MTR_AVAILABLE(ios(17.0), macos(14.0), watchos(10.0), tvos(17.0))
 @interface MTRBasicInformationClusterProductAppearanceStruct : NSObject <NSCopying>
 @property (nonatomic, copy) NSNumber * _Nonnull finish MTR_AVAILABLE(ios(17.0), macos(14.0), watchos(10.0), tvos(17.0));

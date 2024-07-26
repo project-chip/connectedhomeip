@@ -1635,6 +1635,27 @@ public class ClusterInfoMapping {
     }
   }
 
+  public static class DelegatedBasicInformationClusterDeviceLocationAttributeCallback implements ChipClusters.BasicInformationCluster.DeviceLocationAttributeCallback, DelegatedClusterCallback {
+    private ClusterCommandCallback callback;
+    @Override
+    public void setCallbackDelegate(ClusterCommandCallback callback) {
+      this.callback = callback;
+    }
+
+    @Override
+    public void onSuccess(@Nullable ChipStructs.BasicInformationClusterHomeLocationStruct value) {
+      Map<CommandResponseInfo, Object> responseValues = new LinkedHashMap<>();
+      CommandResponseInfo commandResponseInfo = new CommandResponseInfo("value", "ChipStructs.BasicInformationClusterHomeLocationStruct");
+      responseValues.put(commandResponseInfo, value);
+      callback.onSuccess(responseValues);
+    }
+
+    @Override
+    public void onError(Exception ex) {
+      callback.onFailure(ex);
+    }
+  }
+
   public static class DelegatedBasicInformationClusterGeneratedCommandListAttributeCallback implements ChipClusters.BasicInformationCluster.GeneratedCommandListAttributeCallback, DelegatedClusterCallback {
     private ClusterCommandCallback callback;
     @Override
