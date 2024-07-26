@@ -8645,6 +8645,7 @@ endpoint 1 {
     ram      attribute absMaxHeatSetpointLimit default = 0x0BB8;
     ram      attribute absMinCoolSetpointLimit default = 0x0640;
     ram      attribute absMaxCoolSetpointLimit default = 0x0C80;
+    ram      attribute localTemperatureCalibration default = 0x00;
     ram      attribute occupiedCoolingSetpoint default = 0x0A28;
     ram      attribute occupiedHeatingSetpoint default = 0x07D0;
     ram      attribute minHeatSetpointLimit default = 0x02BC;
