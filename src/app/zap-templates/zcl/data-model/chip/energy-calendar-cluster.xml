@@ -55,7 +55,7 @@ limitations under the License.
 
   <struct name="DayStruct" apiMaturity="provisional">
     <cluster code="0x009A"/>
-    <item fieldId="0" name="Date" type="DateStruct" optional="true"/>
+    <item fieldId="0" name="Date" type="epoch_s" optional="true"/>
     <item fieldId="1" name="DaysOfWeek" type="TransitionDayOfWeekBitmap" optional="true" min="0x00" max="0x7F"/>
     <item fieldId="2" name="Transitions" array="true" type="TransitionStruct" length="48" minLength="1"/>
     <item fieldId="3" name="CalendarID" type="int32u" optional="true"/>

@@ -72,7 +72,6 @@ matter_structs_sources = [
   "${chip_root}/src/controller/java/generated/java/matter/controller/cluster/structs/ElectricalPowerMeasurementClusterMeasurementAccuracyStruct.kt",
   "${chip_root}/src/controller/java/generated/java/matter/controller/cluster/structs/ElectricalPowerMeasurementClusterMeasurementRangeStruct.kt",
   "${chip_root}/src/controller/java/generated/java/matter/controller/cluster/structs/EnergyCalendarClusterCalendarPeriodStruct.kt",
-  "${chip_root}/src/controller/java/generated/java/matter/controller/cluster/structs/EnergyCalendarClusterDateStruct.kt",
   "${chip_root}/src/controller/java/generated/java/matter/controller/cluster/structs/EnergyCalendarClusterDayStruct.kt",
   "${chip_root}/src/controller/java/generated/java/matter/controller/cluster/structs/EnergyCalendarClusterPeakPeriodStruct.kt",
   "${chip_root}/src/controller/java/generated/java/matter/controller/cluster/structs/EnergyCalendarClusterTransitionStruct.kt",
