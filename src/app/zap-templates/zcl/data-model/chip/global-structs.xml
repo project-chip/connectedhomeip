@@ -23,6 +23,20 @@ TODO: Make these structures global rather than defining them for each cluster.
 
 <configurator>
   <domain name="CHIP"/>
+
+  <enum name="AtomicRequestTypeEnum" type="enum8">
+    <cluster code="0x0201"/>
+    <item name="BeginWrite" value="0x00"/>
+    <item name="CommitWrite" value="0x01"/>
+    <item name="RollbackWrite" value="0x02"/>
+  </enum>
+
+  <struct name="AtomicAttributeStatusStruct">
+    <cluster code="0x0201"/>
+    <item fieldId="0" name="AttributeID" type="attrib_id" optional="true"/>
+    <item fieldId="1" name="StatusCode" type="status" optional="true"/>
+  </struct>
+
   <struct name="HomeLocationStruct">
     <cluster code="0x0150"/> <!-- Service Area Cluster -->
     <!-- TODO: add Basic Information Cluster code="0x0028" -->
