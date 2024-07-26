@@ -26,8 +26,8 @@ public:
     CHIP_ERROR Init();
 
     /// @brief Callback called when any attribute changed on the device
-    void AttributeChangeHandler(chip::EndpointId endpointId, chip::ClusterId clusterId, chip::AttributeId attributeId, uint8_t * value,
-                                uint16_t size);
+    void AttributeChangeHandler(chip::EndpointId endpointId, chip::ClusterId clusterId, chip::AttributeId attributeId,
+                                uint8_t * value, uint16_t size);
 
     chip::app::Clusters::Thermostat::SystemModeEnum GetSystemMode();
     chip::app::Clusters::Thermostat::ThermostatRunningModeEnum GetRunningMode();
@@ -54,10 +54,11 @@ private:
     static ThermostatManager sThermostatMgr;
 
     /// @brief attribute handler for the thermostat endpoint
-    void ThermostatEndpointAttributeChangeHandler(chip::ClusterId clusterId, chip::AttributeId attributeId, uint8_t * value, uint16_t size);
+    void ThermostatEndpointAttributeChangeHandler(chip::ClusterId clusterId, chip::AttributeId attributeId, uint8_t * value,
+                                                  uint16_t size);
     void ThermostatClusterAttributeChangeHandler(chip::AttributeId attributeId, uint8_t * value, uint16_t size);
-    void LocalTemperatureMeasurementEndpointAttributeChangeHandler(chip::ClusterId clusterId, chip::AttributeId attributeId, uint8_t * value,
-                                                                   uint16_t size);
+    void LocalTemperatureMeasurementEndpointAttributeChangeHandler(chip::ClusterId clusterId, chip::AttributeId attributeId,
+                                                                   uint8_t * value, uint16_t size);
     void LocalTemperatureMeasurementClusterAttributeChangeHandler(chip::AttributeId attributeId, uint8_t * value, uint16_t size);
 
     /// @brief  Main method that evaluates the current thermostat state and updates attributes

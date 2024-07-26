@@ -26,9 +26,10 @@ namespace Clusters {
 namespace Thermostat {
 
 /**
- * The ThermostatDelegate class serves as the instance delegate for storing Presets related information and providing it to the Thermostat server code.
- * It also manages the presets attribute and provides methods to write to presets, edit presets, maintain a pending presets list and either commit the
- * presets when requested or discard the changes. It also provide API's to get and set the attribute values.
+ * The ThermostatDelegate class serves as the instance delegate for storing Presets related information and providing it to the
+ * Thermostat server code. It also manages the presets attribute and provides methods to write to presets, edit presets, maintain a
+ * pending presets list and either commit the presets when requested or discard the changes. It also provide API's to get and set
+ * the attribute values.
  *
  */
 
@@ -61,7 +62,6 @@ public:
     void ClearPendingPresetList() override;
 
 private:
-
     static ThermostatDelegate sInstance;
 
     ThermostatDelegate();

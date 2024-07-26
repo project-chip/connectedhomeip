@@ -37,7 +37,7 @@ static constexpr size_t kPresetHandleSize = 16;
 
 static constexpr size_t kPresetNameSize = 64;
 
-struct PresetStructWithOwnedMembers :  protected Structs::PresetStruct::Type
+struct PresetStructWithOwnedMembers : protected Structs::PresetStruct::Type
 {
 public:
     PresetStructWithOwnedMembers() = default;

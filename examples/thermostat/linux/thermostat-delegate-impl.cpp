@@ -41,16 +41,16 @@ namespace {
  */
 bool PresetHandlesExistAndMatch(const PresetStructWithOwnedMembers & preset, const PresetStructWithOwnedMembers & presetToMatch)
 {
-    return !preset.GetPresetHandle().IsNull() && !presetToMatch.GetPresetHandle().IsNull()
-                && preset.GetPresetHandle().Value().data_equal(presetToMatch.GetPresetHandle().Value());
+    return !preset.GetPresetHandle().IsNull() && !presetToMatch.GetPresetHandle().IsNull() &&
+        preset.GetPresetHandle().Value().data_equal(presetToMatch.GetPresetHandle().Value());
 }
 
 } // anonymous namespace
 
 ThermostatDelegate::ThermostatDelegate()
 {
-    mNumberOfPresets = kMaxNumberOfPresetTypes * kMaxNumberOfPresetTypesOfEachType;
-    mNextFreeIndexInPresetsList = 0;
+    mNumberOfPresets                   = kMaxNumberOfPresetTypes * kMaxNumberOfPresetTypesOfEachType;
+    mNextFreeIndexInPresetsList        = 0;
     mNextFreeIndexInPendingPresetsList = 0;
 
     InitializePresetTypes();
@@ -62,18 +62,21 @@ ThermostatDelegate::ThermostatDelegate()
 
 void ThermostatDelegate::InitializePresetTypes()
 {
-    PresetScenarioEnum presetScenarioEnumArray[kMaxNumberOfPresetTypes] = { PresetScenarioEnum::kOccupied, PresetScenarioEnum::kUnoccupied,
-        PresetScenarioEnum::kSleep, PresetScenarioEnum::kWake, PresetScenarioEnum::kVacation, PresetScenarioEnum::kGoingToSleep };
+    PresetScenarioEnum presetScenarioEnumArray[kMaxNumberOfPresetTypes] = {
+        PresetScenarioEnum::kOccupied, PresetScenarioEnum::kUnoccupied, PresetScenarioEnum::kSleep,
+        PresetScenarioEnum::kWake,     PresetScenarioEnum::kVacation,   PresetScenarioEnum::kGoingToSleep
+    };
     static_assert(ArraySize(presetScenarioEnumArray) <= ArraySize(mPresetTypes));
 
     uint8_t index = 0;
     for (PresetScenarioEnum presetScenario : presetScenarioEnumArray)
     {
-        mPresetTypes[index].presetScenario = presetScenario;
+        mPresetTypes[index].presetScenario  = presetScenario;
         mPresetTypes[index].numberOfPresets = kMaxNumberOfPresetTypesOfEachType;
         mPresetTypes[index].presetTypeFeatures =
-            (presetScenario == PresetScenarioEnum::kOccupied || presetScenario == PresetScenarioEnum::kUnoccupied) ?
-                PresetTypeFeaturesBitmap::kAutomatic : PresetTypeFeaturesBitmap::kSupportsNames;
+            (presetScenario == PresetScenarioEnum::kOccupied || presetScenario == PresetScenarioEnum::kUnoccupied)
+            ? PresetTypeFeaturesBitmap::kAutomatic
+            : PresetTypeFeaturesBitmap::kSupportsNames;
         index++;
     }
 }
@@ -122,8 +125,7 @@ uint8_t ThermostatDelegate::GetNumberOfPresets()
     return mNumberOfPresets;
 }
 
-CHIP_ERROR ThermostatDelegate::GetPresetAtIndex(size_t index,
-    PresetStructWithOwnedMembers & preset)
+CHIP_ERROR ThermostatDelegate::GetPresetAtIndex(size_t index, PresetStructWithOwnedMembers & preset)
 {
     if (index < mNextFreeIndexInPresetsList)
     {
@@ -155,8 +157,8 @@ CHIP_ERROR ThermostatDelegate::SetActivePresetHandle(const DataModel::Nullable<B
         if (newActivePresetHandleSize > kPresetHandleSize)
         {
             ChipLogError(NotSpecified,
-                "Failed to set ActivePresetHandle. newActivePresetHandle size %ld is larger than preset handle size %ld",
-                    newActivePresetHandleSize, kPresetHandleSize);
+                         "Failed to set ActivePresetHandle. newActivePresetHandle size %ld is larger than preset handle size %ld",
+                         newActivePresetHandleSize, kPresetHandleSize);
             return CHIP_ERROR_NO_MEMORY;
         }
         memcpy(mActivePresetHandleData, newActivePresetHandle.Value().data(), newActivePresetHandleSize);
@@ -192,7 +194,9 @@ CHIP_ERROR ThermostatDelegate::AppendToPendingPresetList(const PresetStruct::Typ
         }
         mNextFreeIndexInPendingPresetsList++;
         return CHIP_NO_ERROR;
-    } else {
+    }
+    else
+    {
         return CHIP_ERROR_WRITE_FAILED;
     }
 }
@@ -208,9 +212,9 @@ CHIP_ERROR ThermostatDelegate::GetPendingPresetAtIndex(size_t index, PresetStruc
 }
 
 CHIP_ERROR ThermostatDelegate::ApplyPendingPresets()
- {
-     for (uint8_t indexInPendingPresets = 0; indexInPendingPresets < mNextFreeIndexInPendingPresetsList; indexInPendingPresets++)
-     {
+{
+    for (uint8_t indexInPendingPresets = 0; indexInPendingPresets < mNextFreeIndexInPendingPresetsList; indexInPendingPresets++)
+    {
         const PresetStructWithOwnedMembers & pendingPreset = mPendingPresets[indexInPendingPresets];
 
         bool found = false;
@@ -235,8 +239,8 @@ CHIP_ERROR ThermostatDelegate::ApplyPendingPresets()
             mPresets[mNextFreeIndexInPresetsList].SetPresetHandle(DataModel::MakeNullable(ByteSpan(handle)));
             mNextFreeIndexInPresetsList++;
         }
-     }
-     return CHIP_NO_ERROR;
+    }
+    return CHIP_NO_ERROR;
 }
 
 void ThermostatDelegate::ClearPendingPresetList()

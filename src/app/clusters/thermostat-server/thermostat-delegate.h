@@ -103,10 +103,10 @@ public:
     virtual CHIP_ERROR GetPendingPresetAtIndex(size_t index, PresetStructWithOwnedMembers & preset) = 0;
 
     /**
-     * @brief Updates the presets attribute with the content of the pending presets list. If the preset in the pending presets list matches i.e. has the
-     *        same presetHandle as an existing entry in the Presets attribute, the thermostat will update the entry with the new preset values, otherwise
-     *        it will add a new preset to the Presets attribute. This will be called when the Thermostat receives a CommitPresetsSchedulesRequest
-     *        command to commit the pending preset changes.
+     * @brief Updates the presets attribute with the content of the pending presets list. If the preset in the pending presets list
+     * matches i.e. has the same presetHandle as an existing entry in the Presets attribute, the thermostat will update the entry
+     * with the new preset values, otherwise it will add a new preset to the Presets attribute. This will be called when the
+     * Thermostat receives a CommitPresetsSchedulesRequest command to commit the pending preset changes.
      *
      * @return CHIP_NO_ERROR if the updates to the presets attribute has been committed successfully.
      * @return CHIP_ERROR if the updates to the presets attribute failed to commit for some reason.

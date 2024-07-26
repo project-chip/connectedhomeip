@@ -84,7 +84,6 @@ public:
     bool GetPresetsEditable(EndpointId endpoint);
 
 private:
-
     ScopedNodeId mPresetEditRequestOriginatorNodeIds[kThermostatEndpointCount];
 
     bool mPresetsEditables[kThermostatEndpointCount];

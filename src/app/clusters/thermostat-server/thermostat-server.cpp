@@ -15,8 +15,8 @@
  *    limitations under the License.
  */
 
-#include "PresetStructWithOwnedMembers.h"
 #include "thermostat-server.h"
+#include "PresetStructWithOwnedMembers.h"
 
 #include <app/util/attribute-storage.h>
 
@@ -77,7 +77,8 @@ Delegate * gDelegateTable[kThermostatEndpointCount] = { nullptr };
 
 Delegate * GetDelegate(EndpointId endpoint)
 {
-    uint16_t ep = emberAfGetClusterServerEndpointIndex(endpoint, Thermostat::Id, MATTER_DM_THERMOSTAT_CLUSTER_SERVER_ENDPOINT_COUNT);
+    uint16_t ep =
+        emberAfGetClusterServerEndpointIndex(endpoint, Thermostat::Id, MATTER_DM_THERMOSTAT_CLUSTER_SERVER_ENDPOINT_COUNT);
     return (ep >= ArraySize(gDelegateTable) ? nullptr : gDelegateTable[ep]);
 }
 
@@ -126,8 +127,8 @@ void TimerExpiredCallback(System::Layer * systemLayer, void * callbackContext)
  */
 void ScheduleTimer(EndpointId endpoint, uint16_t timeoutSeconds)
 {
-    DeviceLayer::SystemLayer().StartTimer(System::Clock::Seconds16(timeoutSeconds),
-        TimerExpiredCallback, reinterpret_cast<void *>(static_cast<uintptr_t>(endpoint)));
+    DeviceLayer::SystemLayer().StartTimer(System::Clock::Seconds16(timeoutSeconds), TimerExpiredCallback,
+                                          reinterpret_cast<void *>(static_cast<uintptr_t>(endpoint)));
 }
 
 /**
@@ -148,8 +149,8 @@ void ClearTimer(EndpointId endpoint)
  */
 void ExtendTimer(EndpointId endpoint, uint16_t timeoutSeconds)
 {
-    DeviceLayer::SystemLayer().ExtendTimerTo(System::Clock::Seconds16(timeoutSeconds),
-        TimerExpiredCallback, reinterpret_cast<void *>(static_cast<uintptr_t>(endpoint)));
+    DeviceLayer::SystemLayer().ExtendTimerTo(System::Clock::Seconds16(timeoutSeconds), TimerExpiredCallback,
+                                             reinterpret_cast<void *>(static_cast<uintptr_t>(endpoint)));
 }
 
 /**
@@ -174,8 +175,8 @@ bool IsBuiltIn(const PresetStructWithOwnedMembers & preset)
  */
 bool PresetHandlesExistAndMatch(const PresetStructWithOwnedMembers & preset, const PresetStructWithOwnedMembers & presetToMatch)
 {
-    return !preset.GetPresetHandle().IsNull() && !presetToMatch.GetPresetHandle().IsNull()
-                && preset.GetPresetHandle().Value().data_equal(presetToMatch.GetPresetHandle().Value());
+    return !preset.GetPresetHandle().IsNull() && !presetToMatch.GetPresetHandle().IsNull() &&
+        preset.GetPresetHandle().Value().data_equal(presetToMatch.GetPresetHandle().Value());
 }
 
 /**
@@ -188,12 +189,13 @@ bool PresetHandlesExistAndMatch(const PresetStructWithOwnedMembers & preset, con
 ScopedNodeId GetSourceScopedNodeId(CommandHandler * commandObj)
 {
     ScopedNodeId sourceNodeId = ScopedNodeId();
-    auto sessionHandle = commandObj->GetExchangeContext()->GetSessionHandle();
+    auto sessionHandle        = commandObj->GetExchangeContext()->GetSessionHandle();
 
     if (sessionHandle->IsSecureSession())
     {
         sourceNodeId = sessionHandle->AsSecureSession()->GetPeer();
-    } else if (sessionHandle->IsGroupSession())
+    }
+    else if (sessionHandle->IsGroupSession())
     {
         sourceNodeId = sessionHandle->AsIncomingGroupSession()->GetPeer();
     }
@@ -229,7 +231,8 @@ void CleanUp(Delegate * delegate, EndpointId endpoint)
  *
  * @return true to indicate the response has been sent and command has been handled.
  */
-bool SendResponseAndCleanUp(Delegate * delegate, EndpointId endpoint, CommandHandler * commandObj, const ConcreteCommandPath & commandPath, imcode status)
+bool SendResponseAndCleanUp(Delegate * delegate, EndpointId endpoint, CommandHandler * commandObj,
+                            const ConcreteCommandPath & commandPath, imcode status)
 {
     commandObj->AddStatus(commandPath, status);
     CleanUp(delegate, endpoint);
@@ -256,12 +259,12 @@ bool MatchingPendingPresetExists(Delegate * delegate, const PresetStructWithOwne
 
         if (err == CHIP_ERROR_PROVIDER_LIST_EXHAUSTED)
         {
-           break;
+            break;
         }
         if (err != CHIP_NO_ERROR)
         {
-            ChipLogError(Zcl,
-                "MatchingPendingPresetExists: GetPendingPresetAtIndex failed with error %" CHIP_ERROR_FORMAT, err.Format());
+            ChipLogError(Zcl, "MatchingPendingPresetExists: GetPendingPresetAtIndex failed with error %" CHIP_ERROR_FORMAT,
+                         err.Format());
             return false;
         }
 
@@ -283,7 +286,8 @@ bool MatchingPendingPresetExists(Delegate * delegate, const PresetStructWithOwne
  *
  * @return true if a matching entry was found in the  presets attribute list, false otherwise.
  */
-bool GetMatchingPresetInPresets(Delegate * delegate, const PresetStructWithOwnedMembers & presetToMatch, PresetStructWithOwnedMembers & matchingPreset)
+bool GetMatchingPresetInPresets(Delegate * delegate, const PresetStructWithOwnedMembers & presetToMatch,
+                                PresetStructWithOwnedMembers & matchingPreset)
 {
     VerifyOrReturnValue(delegate != nullptr, false);
 
@@ -293,7 +297,7 @@ bool GetMatchingPresetInPresets(Delegate * delegate, const PresetStructWithOwned
 
         if (err == CHIP_ERROR_PROVIDER_LIST_EXHAUSTED)
         {
-           break;
+            break;
         }
         if (err != CHIP_NO_ERROR)
         {
@@ -327,12 +331,13 @@ bool IsPresetHandlePresentInPresets(Delegate * delegate, const ByteSpan & preset
 
         if (err == CHIP_ERROR_PROVIDER_LIST_EXHAUSTED)
         {
-           return false;
+            return false;
         }
 
         if (err != CHIP_NO_ERROR)
         {
-            ChipLogError(Zcl, "IsPresetHandlePresentInPresets: GetPresetAtIndex failed with error %" CHIP_ERROR_FORMAT, err.Format());
+            ChipLogError(Zcl, "IsPresetHandlePresentInPresets: GetPresetAtIndex failed with error %" CHIP_ERROR_FORMAT,
+                         err.Format());
             return false;
         }
 
@@ -355,8 +360,8 @@ bool IsPresetHandlePresentInPresets(Delegate * delegate, const ByteSpan & preset
  */
 uint8_t CountUpdatedPresetsAfterApplyingPendingPresets(Delegate * delegate)
 {
-    uint8_t numberOfPresets = 0;
-    uint8_t numberOfMatches = 0;
+    uint8_t numberOfPresets        = 0;
+    uint8_t numberOfMatches        = 0;
     uint8_t numberOfPendingPresets = 0;
 
     VerifyOrReturnValue(delegate != nullptr, 0);
@@ -368,12 +373,11 @@ uint8_t CountUpdatedPresetsAfterApplyingPendingPresets(Delegate * delegate)
 
         if (err == CHIP_ERROR_PROVIDER_LIST_EXHAUSTED)
         {
-           break;
+            break;
         }
         if (err != CHIP_NO_ERROR)
         {
-            ChipLogError(Zcl,
-                "GetUpdatedPresetsCount: GetPresetAtIndex failed with error %" CHIP_ERROR_FORMAT, err.Format());
+            ChipLogError(Zcl, "GetUpdatedPresetsCount: GetPresetAtIndex failed with error %" CHIP_ERROR_FORMAT, err.Format());
             return 0;
         }
         numberOfPresets++;
@@ -393,12 +397,12 @@ uint8_t CountUpdatedPresetsAfterApplyingPendingPresets(Delegate * delegate)
 
         if (err == CHIP_ERROR_PROVIDER_LIST_EXHAUSTED)
         {
-           break;
+            break;
         }
         if (err != CHIP_NO_ERROR)
         {
-            ChipLogError(Zcl,
-                "GetUpdatedPresetsCount: GetPendingPresetAtIndex failed with error %" CHIP_ERROR_FORMAT, err.Format());
+            ChipLogError(Zcl, "GetUpdatedPresetsCount: GetPendingPresetAtIndex failed with error %" CHIP_ERROR_FORMAT,
+                         err.Format());
             return 0;
         }
         numberOfPendingPresets++;
@@ -435,7 +439,6 @@ bool FindPresetScenarioInPresetTypes(Delegate * delegate, PresetScenarioEnum pre
     }
     return false;
 }
-
 
 /**
  * @brief Returns the count of preset entries in the pending presets list that have the matching presetHandle.
@@ -647,7 +650,8 @@ namespace Thermostat {
 
 void SetDefaultDelegate(EndpointId endpoint, Delegate * delegate)
 {
-    uint16_t ep = emberAfGetClusterServerEndpointIndex(endpoint, Thermostat::Id, MATTER_DM_THERMOSTAT_CLUSTER_SERVER_ENDPOINT_COUNT);
+    uint16_t ep =
+        emberAfGetClusterServerEndpointIndex(endpoint, Thermostat::Id, MATTER_DM_THERMOSTAT_CLUSTER_SERVER_ENDPOINT_COUNT);
     // if endpoint is found, add the delegate in the delegate table
     if (ep < ArraySize(gDelegateTable))
     {
@@ -657,7 +661,8 @@ void SetDefaultDelegate(EndpointId endpoint, Delegate * delegate)
 
 void ThermostatAttrAccess::SetPresetsEditable(EndpointId endpoint, bool presetEditable)
 {
-    uint16_t ep = emberAfGetClusterServerEndpointIndex(endpoint, Thermostat::Id, MATTER_DM_THERMOSTAT_CLUSTER_SERVER_ENDPOINT_COUNT);
+    uint16_t ep =
+        emberAfGetClusterServerEndpointIndex(endpoint, Thermostat::Id, MATTER_DM_THERMOSTAT_CLUSTER_SERVER_ENDPOINT_COUNT);
 
     if (ep < ArraySize(mPresetsEditables))
     {
@@ -668,7 +673,8 @@ void ThermostatAttrAccess::SetPresetsEditable(EndpointId endpoint, bool presetEd
 bool ThermostatAttrAccess::GetPresetsEditable(EndpointId endpoint)
 {
     bool presetEditable = false;
-    uint16_t ep = emberAfGetClusterServerEndpointIndex(endpoint, Thermostat::Id, MATTER_DM_THERMOSTAT_CLUSTER_SERVER_ENDPOINT_COUNT);
+    uint16_t ep =
+        emberAfGetClusterServerEndpointIndex(endpoint, Thermostat::Id, MATTER_DM_THERMOSTAT_CLUSTER_SERVER_ENDPOINT_COUNT);
 
     if (ep < ArraySize(mPresetsEditables))
     {
@@ -679,7 +685,8 @@ bool ThermostatAttrAccess::GetPresetsEditable(EndpointId endpoint)
 
 void ThermostatAttrAccess::SetOriginatorScopedNodeId(EndpointId endpoint, ScopedNodeId originatorNodeId)
 {
-    uint16_t ep = emberAfGetClusterServerEndpointIndex(endpoint, Thermostat::Id, MATTER_DM_THERMOSTAT_CLUSTER_SERVER_ENDPOINT_COUNT);
+    uint16_t ep =
+        emberAfGetClusterServerEndpointIndex(endpoint, Thermostat::Id, MATTER_DM_THERMOSTAT_CLUSTER_SERVER_ENDPOINT_COUNT);
 
     if (ep < ArraySize(mPresetEditRequestOriginatorNodeIds))
     {
@@ -690,7 +697,8 @@ void ThermostatAttrAccess::SetOriginatorScopedNodeId(EndpointId endpoint, Scoped
 ScopedNodeId ThermostatAttrAccess::GetOriginatorScopedNodeId(EndpointId endpoint)
 {
     ScopedNodeId originatorNodeId = ScopedNodeId();
-    uint16_t ep = emberAfGetClusterServerEndpointIndex(endpoint, Thermostat::Id, MATTER_DM_THERMOSTAT_CLUSTER_SERVER_ENDPOINT_COUNT);
+    uint16_t ep =
+        emberAfGetClusterServerEndpointIndex(endpoint, Thermostat::Id, MATTER_DM_THERMOSTAT_CLUSTER_SERVER_ENDPOINT_COUNT);
 
     if (ep < ArraySize(mPresetEditRequestOriginatorNodeIds))
     {
@@ -847,13 +855,13 @@ CHIP_ERROR ThermostatAttrAccess::Write(const ConcreteDataAttributePath & aPath, 
         VerifyOrReturnError(delegate != nullptr, CHIP_ERROR_INCORRECT_STATE, ChipLogError(Zcl, "Delegate is null"));
 
         // #1 Presets are not editable, return INVALID_IN_STATE.
-        VerifyOrReturnError(gThermostatAttrAccess.GetPresetsEditable(endpoint),
-            CHIP_IM_GLOBAL_STATUS(InvalidInState), ChipLogError(Zcl, "Presets are not editable"));
+        VerifyOrReturnError(gThermostatAttrAccess.GetPresetsEditable(endpoint), CHIP_IM_GLOBAL_STATUS(InvalidInState),
+                            ChipLogError(Zcl, "Presets are not editable"));
 
         // #2 Check if the OriginatorScopedNodeId at the endpoint is the same as the node editing the presets,
         // otherwise return BUSY.
         const Access::SubjectDescriptor subjectDescriptor = aDecoder.GetSubjectDescriptor();
-        ScopedNodeId scopedNodeId = ScopedNodeId(subjectDescriptor.subject, subjectDescriptor.fabricIndex);
+        ScopedNodeId scopedNodeId                         = ScopedNodeId(subjectDescriptor.subject, subjectDescriptor.fabricIndex);
 
         if (gThermostatAttrAccess.GetOriginatorScopedNodeId(endpoint) != scopedNodeId)
         {
@@ -882,7 +890,7 @@ CHIP_ERROR ThermostatAttrAccess::Write(const ConcreteDataAttributePath & aPath, 
                 }
                 else
                 {
-                   return CHIP_IM_GLOBAL_STATUS(ConstraintError);
+                    return CHIP_IM_GLOBAL_STATUS(ConstraintError);
                 }
             }
             return iter.GetStatus();
@@ -899,7 +907,7 @@ CHIP_ERROR ThermostatAttrAccess::Write(const ConcreteDataAttributePath & aPath, 
             }
             else
             {
-               return CHIP_IM_GLOBAL_STATUS(ConstraintError);
+                return CHIP_IM_GLOBAL_STATUS(ConstraintError);
             }
         }
     }
@@ -936,9 +944,8 @@ void emberAfThermostatClusterServerInitCallback(chip::EndpointId endpoint)
     // or should this just be the responsibility of the thermostat application?
 }
 
-imcode
-MatterThermostatClusterServerPreAttributeChangedCallback(const app::ConcreteAttributePath & attributePath,
-                                                         EmberAfAttributeType attributeType, uint16_t size, uint8_t * value)
+imcode MatterThermostatClusterServerPreAttributeChangedCallback(const app::ConcreteAttributePath & attributePath,
+                                                                EmberAfAttributeType attributeType, uint16_t size, uint8_t * value)
 {
     EndpointId endpoint = attributePath.mEndpointId;
     int16_t requested;
@@ -1260,8 +1267,8 @@ bool emberAfThermostatClusterSetActivePresetRequestCallback(
     // If the preset handle passed in the command is not present in the Presets attribute, return INVALID_COMMAND.
     if (!IsPresetHandlePresentInPresets(delegate, newPresetHandle))
     {
-       commandObj->AddStatus(commandPath, imcode::InvalidCommand);
-       return true;
+        commandObj->AddStatus(commandPath, imcode::InvalidCommand);
+        return true;
     }
 
     CHIP_ERROR err = delegate->SetActivePresetHandle(DataModel::MakeNullable(newPresetHandle));
@@ -1287,11 +1294,11 @@ bool emberAfThermostatClusterStartPresetsSchedulesEditRequestCallback(
 
     // #1 If the presets are editable and the scoped node id of the client sending StartPresetsSchedulesEditRequest command
     // is not the same as the one that previously originated a StartPresetsSchedulesEditRequest command, return BUSY.
-    if (gThermostatAttrAccess.GetPresetsEditable(endpoint)
-        && (gThermostatAttrAccess.GetOriginatorScopedNodeId(endpoint) != sourceNodeId))
+    if (gThermostatAttrAccess.GetPresetsEditable(endpoint) &&
+        (gThermostatAttrAccess.GetOriginatorScopedNodeId(endpoint) != sourceNodeId))
     {
-       commandObj->AddStatus(commandPath, imcode::Busy);
-       return true;
+        commandObj->AddStatus(commandPath, imcode::Busy);
+        return true;
     }
 
     // #2 If presets are editable and the scoped node id of the client sending StartPresetsSchedulesEditRequest command
@@ -1321,8 +1328,8 @@ bool emberAfThermostatClusterCancelPresetsSchedulesEditRequestCallback(
     // #1 If presets are not editable, return INVALID_IN_STATE.
     if (!gThermostatAttrAccess.GetPresetsEditable(endpoint))
     {
-       commandObj->AddStatus(commandPath, imcode::InvalidInState);
-       return true;
+        commandObj->AddStatus(commandPath, imcode::InvalidInState);
+        return true;
     }
 
     ScopedNodeId sourceNodeId = GetSourceScopedNodeId(commandObj);
@@ -1331,8 +1338,8 @@ bool emberAfThermostatClusterCancelPresetsSchedulesEditRequestCallback(
     // previous StartPresetsSchedulesEditRequest, return UNSUPPORTED_ACCESS.
     if (gThermostatAttrAccess.GetOriginatorScopedNodeId(endpoint) != sourceNodeId)
     {
-       commandObj->AddStatus(commandPath, imcode::UnsupportedAccess);
-       return true;
+        commandObj->AddStatus(commandPath, imcode::UnsupportedAccess);
+        return true;
     }
 
     Delegate * delegate = GetDelegate(endpoint);
@@ -1386,27 +1393,30 @@ bool emberAfThermostatClusterCommitPresetsSchedulesRequestCallback(
 
         if (err == CHIP_ERROR_PROVIDER_LIST_EXHAUSTED)
         {
-           break;
+            break;
         }
         if (err != CHIP_NO_ERROR)
         {
             ChipLogError(Zcl,
-                "emberAfThermostatClusterCommitPresetsSchedulesRequestCallback: GetPresetAtIndex failed with error %" CHIP_ERROR_FORMAT, err.Format());
+                         "emberAfThermostatClusterCommitPresetsSchedulesRequestCallback: GetPresetAtIndex failed with error "
+                         "%" CHIP_ERROR_FORMAT,
+                         err.Format());
             return SendResponseAndCleanUp(delegate, endpoint, commandObj, commandPath, imcode::InvalidInState);
         }
 
         bool found = MatchingPendingPresetExists(delegate, preset);
 
-        // #3. If a built in preset in the Presets attribute list is removed and not found in the pending presets list, return CONSTRAINT_ERROR.
+        // #3. If a built in preset in the Presets attribute list is removed and not found in the pending presets list, return
+        // CONSTRAINT_ERROR.
         if (IsBuiltIn(preset) && !found)
         {
             return SendResponseAndCleanUp(delegate, endpoint, commandObj, commandPath, imcode::ConstraintError);
         }
     }
 
-    // #4. If there is an ActivePresetHandle set, find the preset in the pending presets list that matches the ActivePresetHandle attribute.
-    // If a preset is not found with the same presetHandle, return INVALID_IN_STATE. If there is no ActivePresetHandle attribute set, continue with
-    // other checks.
+    // #4. If there is an ActivePresetHandle set, find the preset in the pending presets list that matches the ActivePresetHandle
+    // attribute. If a preset is not found with the same presetHandle, return INVALID_IN_STATE. If there is no ActivePresetHandle
+    // attribute set, continue with other checks.
     uint8_t buffer[kPresetHandleSize];
     MutableByteSpan activePresetHandle(buffer);
 
@@ -1434,12 +1444,14 @@ bool emberAfThermostatClusterCommitPresetsSchedulesRequestCallback(
 
         if (err == CHIP_ERROR_PROVIDER_LIST_EXHAUSTED)
         {
-           break;
+            break;
         }
         if (err != CHIP_NO_ERROR)
         {
             ChipLogError(Zcl,
-                "emberAfThermostatClusterCommitPresetsSchedulesRequestCallback: GetPendingPresetAtIndex failed with error %" CHIP_ERROR_FORMAT, err.Format());
+                         "emberAfThermostatClusterCommitPresetsSchedulesRequestCallback: GetPendingPresetAtIndex failed with error "
+                         "%" CHIP_ERROR_FORMAT,
+                         err.Format());
             return SendResponseAndCleanUp(delegate, endpoint, commandObj, commandPath, imcode::InvalidInState);
         }
 
@@ -1534,11 +1546,11 @@ bool emberAfThermostatClusterCommitPresetsSchedulesRequestCallback(
     // return RESOURCE_EXHAUSTED. Note that the changes are not yet applied.
     if (numberOfPresetsSupported > 0 && totalCount > numberOfPresetsSupported)
     {
-         return SendResponseAndCleanUp(delegate, endpoint, commandObj, commandPath, imcode::ResourceExhausted);
+        return SendResponseAndCleanUp(delegate, endpoint, commandObj, commandPath, imcode::ResourceExhausted);
     }
 
-    // #13 TODO: #25 Check if the number of presets for each presetScenario exceeds the max number of presets supported for that scenario.
-    // We plan to support only one preset for each presetScenario for our use cases so defer this for re-evaluation.
+    // #13 TODO: #25 Check if the number of presets for each presetScenario exceeds the max number of presets supported for that
+    // scenario. We plan to support only one preset for each presetScenario for our use cases so defer this for re-evaluation.
 
     // Call the delegate API to apply the pending presets to the presets attribute and update it.
     err = delegate->ApplyPendingPresets();

@@ -20,8 +20,8 @@
  * Includes
  *********************************************************/
 
-#include "include/thermostat-delegate-impl.h"
 #include "include/thermostat-manager.h"
+#include "include/thermostat-delegate-impl.h"
 
 #include <app/clusters/bindings/BindingManager.h>
 #include <app/clusters/thermostat-server/thermostat-server.h>
@@ -61,34 +61,39 @@ ThermostatManager ThermostatManager::sThermostatMgr;
 namespace {
 
 template <typename DecodableAttributeType>
-    static void OnAttributeChangeReported(const ConcreteDataAttributePath & path, const DecodableAttributeType & value);
+static void OnAttributeChangeReported(const ConcreteDataAttributePath & path, const DecodableAttributeType & value);
 
-
-template<>
+template <>
 void OnAttributeChangeReported<MeasuredValue::TypeInfo::DecodableType>(const ConcreteDataAttributePath & path,
-    const MeasuredValue::TypeInfo::DecodableType & value)
+                                                                       const MeasuredValue::TypeInfo::DecodableType & value)
 {
     ClusterId clusterId = path.mClusterId;
-    if (clusterId != TemperatureMeasurement::Id) {
-        ChipLogError(AppServer, "Attribute change reported for TemperatureMeasurement cluster on incorrect cluster id %u", clusterId);
+    if (clusterId != TemperatureMeasurement::Id)
+    {
+        ChipLogError(AppServer, "Attribute change reported for TemperatureMeasurement cluster on incorrect cluster id %u",
+                     clusterId);
         return;
     }
 
     AttributeId attributeId = path.mAttributeId;
-    if (attributeId != MeasuredValue::Id) {
-        ChipLogError(AppServer, "Attribute change reported for TemperatureMeasurement cluster for incorrect attribute %u", attributeId);
+    if (attributeId != MeasuredValue::Id)
+    {
+        ChipLogError(AppServer, "Attribute change reported for TemperatureMeasurement cluster for incorrect attribute %u",
+                     attributeId);
         return;
     }
 
     if (!value.IsNull())
     {
-        ChipLogDetail(AppServer, "Attribute change reported for TemperatureMeasurement cluster - MeasuredValue is %d", static_cast<short>(value.Value()));
+        ChipLogDetail(AppServer, "Attribute change reported for TemperatureMeasurement cluster - MeasuredValue is %d",
+                      static_cast<short>(value.Value()));
     }
 }
 
-static void OnError(const ConcreteDataAttributePath * path, ChipError err) {
-    ChipLogError(AppServer, "Subscribing to cluster Id %u and attribute Id %u failed with error %" CHIP_ERROR_FORMAT, path->mClusterId,
-        path->mAttributeId, err.Format());
+static void OnError(const ConcreteDataAttributePath * path, ChipError err)
+{
+    ChipLogError(AppServer, "Subscribing to cluster Id %u and attribute Id %u failed with error %" CHIP_ERROR_FORMAT,
+                 path->mClusterId, path->mAttributeId, err.Format());
 }
 
 static void OnSubscriptionEstablished(const ReadClient & client, unsigned int value)
@@ -98,16 +103,19 @@ static void OnSubscriptionEstablished(const ReadClient & client, unsigned int va
 
 template <typename DecodableAttributeType>
 void SubscribeToAttribute(ClusterId clusterId, AttributeId attributeId, const EmberBindingTableEntry & binding,
-    OperationalDeviceProxy * peer_device)
+                          OperationalDeviceProxy * peer_device)
 {
-    VerifyOrReturn(peer_device->GetSecureSession().HasValue(), ChipLogError(AppServer, "SubscribeToAttribute failed. Secure session is null"));
+    VerifyOrReturn(peer_device->GetSecureSession().HasValue(),
+                   ChipLogError(AppServer, "SubscribeToAttribute failed. Secure session is null"));
 
-    SubscribeAttribute<DecodableAttributeType>(peer_device->GetExchangeManager(), peer_device->GetSecureSession().Value(), binding.remote, clusterId,
-        attributeId, &OnAttributeChangeReported<DecodableAttributeType>, &OnError, 0, kMaxIntervalCeilingSeconds, &OnSubscriptionEstablished, nullptr, true /* fabricFiltered */, true /* keepExistingSubscription */);
+    SubscribeAttribute<DecodableAttributeType>(
+        peer_device->GetExchangeManager(), peer_device->GetSecureSession().Value(), binding.remote, clusterId, attributeId,
+        &OnAttributeChangeReported<DecodableAttributeType>, &OnError, 0, kMaxIntervalCeilingSeconds, &OnSubscriptionEstablished,
+        nullptr, true /* fabricFiltered */, true /* keepExistingSubscription */);
 }
 
-static void ThermostatBoundDeviceChangedHandler(const EmberBindingTableEntry & binding,
-    OperationalDeviceProxy * peer_device, void * context)
+static void ThermostatBoundDeviceChangedHandler(const EmberBindingTableEntry & binding, OperationalDeviceProxy * peer_device,
+                                                void * context)
 {
     VerifyOrReturn(binding.clusterId.has_value(), ChipLogError(AppServer, "Cluster Id is null"));
     ClusterId clusterId = binding.clusterId.value();
@@ -140,7 +148,7 @@ static void OnPlatformChipDeviceEvent(const DeviceLayer::ChipDeviceEvent * event
 
 void InitBindingManager(intptr_t context)
 {
-    auto & server = Server::GetInstance();
+    auto & server    = Server::GetInstance();
     CHIP_ERROR error = BindingManager::GetInstance().Init(
         { &server.GetFabricTable(), server.GetCASESessionManager(), &server.GetPersistentStorage() });
 
@@ -176,7 +184,8 @@ CHIP_ERROR ThermostatManager::Init()
     ChipLogError(AppServer,
                  "Initialized a thermostat with \n "
                  "mSystemMode: %hhu (%s) \n mRunningMode: %hhu (%s) \n mLocalTemperature: %d \n mOccupiedHeatingSetpoint: %d \n "
-                 "mOccupiedCoolingSetpoint: %d" "NumberOfPresets: %d",
+                 "mOccupiedCoolingSetpoint: %d"
+                 "NumberOfPresets: %d",
                  mSystemMode, SystemModeString(mSystemMode), mRunningMode, RunningModeString(mRunningMode), mLocalTemperature,
                  mOccupiedHeatingSetpoint, mOccupiedCoolingSetpoint, GetNumberOfPresets());
 
@@ -201,7 +210,6 @@ void ThermostatManager::AttributeChangeHandler(EndpointId endpointId, ClusterId 
     }
 }
 
-
 void ThermostatManager::ThermostatEndpointAttributeChangeHandler(ClusterId clusterId, AttributeId attributeId, uint8_t * value,
                                                                  uint16_t size)
 {
@@ -212,7 +220,8 @@ void ThermostatManager::ThermostatEndpointAttributeChangeHandler(ClusterId clust
         break;
 
     default:
-        ChipLogError(AppServer, "Attribute change reported for Thermostat on incorrect cluster for the thermostat endpoint. Ignoring.");
+        ChipLogError(AppServer,
+                     "Attribute change reported for Thermostat on incorrect cluster for the thermostat endpoint. Ignoring.");
         break;
     }
 }
@@ -479,14 +488,14 @@ static const char * RunningModeString(ThermostatRunningModeEnum runningMode)
     }
 }
 
-void MatterPostAttributeChangeCallback(const ConcreteAttributePath & attributePath, uint8_t type, uint16_t size,
-                                       uint8_t * value)
+void MatterPostAttributeChangeCallback(const ConcreteAttributePath & attributePath, uint8_t type, uint16_t size, uint8_t * value)
 {
     ClusterId clusterId     = attributePath.mClusterId;
     AttributeId attributeId = attributePath.mAttributeId;
     ChipLogProgress(AppServer, "Cluster callback: " ChipLogFormatMEI, ChipLogValueMEI(clusterId));
 
-    ChipLogProgress(AppServer, "Attribute ID changed: " ChipLogFormatMEI " Endpoint: %d ClusterId: %d Type: %u Value: %u, length %u",
+    ChipLogProgress(AppServer,
+                    "Attribute ID changed: " ChipLogFormatMEI " Endpoint: %d ClusterId: %d Type: %u Value: %u, length %u",
                     ChipLogValueMEI(attributeId), attributePath.mEndpointId, clusterId, type, *value, size);
 
     ThermostatMgr().AttributeChangeHandler(attributePath.mEndpointId, clusterId, attributeId, value, size);
