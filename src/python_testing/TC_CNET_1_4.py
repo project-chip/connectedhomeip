@@ -40,7 +40,7 @@ kSecondaryNetworkInterfaceDeviceTypeId = 0x0019
 class TC_CNET_1_4(MatterBaseTest):
     def steps_TC_CNET_1_4(self):
         return [TestStep(1, "TH is commissioned", is_commissioning=True),
-                TestStep(2, 'TH performs a wildcard read of the FeatureMap attribute on Network Commissioning clusters across all endpoints, and save the response as `NetworkCommissioningResponse`'),
+                TestStep(2, 'TH performs a wildcard read of the FeatureMap attribute on Network Commissioning clusters across all endpoints, and saves the response as `NetworkCommissioningResponse`'),
                 TestStep(3, 'If `NetworkCommissioningResponse` does not contain any entries for Network Commissioning cluster, skip remaining steps and end test case'),
                 TestStep(4, 'If `NetworkCommissioningResponse` contains only a single entry for Network Commissioning cluster on Endpoint 0, skip remaining steps and end test case. Verify `NetworkCommissioningResponse` contains an entry for Network Commissioning cluster on Endpoint 0'),
                 TestStep(5, 'TH reads from the DUT the Descriptor Cluster DeviceTypeList attribute on each endpoint from the `NetworkCommissioningResponse` (except for Endpoint 0), verify that the Secondary Network Interface device type id (0x0019) is listed in the DeviceTypeList'),
