@@ -70,7 +70,7 @@ void ThermostatDelegate::InitializePresetTypes()
     for (PresetScenarioEnum presetScenario : presetScenarioEnumArray)
     {
         mPresetTypes[index].presetScenario = presetScenario;
-        mPresetTypes[index].numberOfPresets = kMaxNumberOfPresetTypesOfEachType;     
+        mPresetTypes[index].numberOfPresets = kMaxNumberOfPresetTypesOfEachType;
         mPresetTypes[index].presetTypeFeatures =
             (presetScenario == PresetScenarioEnum::kOccupied || presetScenario == PresetScenarioEnum::kUnoccupied) ?
                 PresetTypeFeaturesBitmap::kAutomatic : PresetTypeFeaturesBitmap::kSupportsNames;
@@ -97,7 +97,7 @@ void ThermostatDelegate::InitializePresets()
         int16_t coolingSetpointValue = 2500 + index * 100;
         mPresets[index].SetCoolingSetpoint(MakeOptional(coolingSetpointValue));
 
-        int16_t heatingSetpointValue = 2100 - index * 100; 
+        int16_t heatingSetpointValue = 2100 - index * 100;
         mPresets[index].SetHeatingSetpoint(MakeOptional(heatingSetpointValue));
         mPresets[index].SetBuiltIn(DataModel::MakeNullable(true));
         index++;
@@ -228,7 +228,7 @@ CHIP_ERROR ThermostatDelegate::ApplyPendingPresets()
         // If pending preset was not found in the Presets list, append to the Presets list.
         if (!found)
         {
-            
+
             mPresets[mNextFreeIndexInPresetsList] = pendingPreset;
 
             const uint8_t handle[] = { static_cast<uint8_t>(pendingPreset.GetPresetScenario()) };

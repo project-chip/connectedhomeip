@@ -73,7 +73,7 @@ CHIP_ERROR PresetStructWithOwnedMembers::SetPresetHandle(const Nullable<ByteSpan
     {
         presetHandle.SetNull();
     }
-    
+
     return CHIP_NO_ERROR;
 }
 
@@ -98,7 +98,7 @@ CHIP_ERROR PresetStructWithOwnedMembers::SetName(const Optional<DataModel::Nulla
     else
     {
         name.ClearValue();
-    }    
+    }
     return CHIP_NO_ERROR;
 }
 

@@ -1463,7 +1463,7 @@ bool emberAfThermostatClusterCommitPresetsSchedulesRequestCallback(
         {
             foundMatchingPresetInPresets = GetMatchingPresetInPresets(delegate, pendingPreset, matchingPreset);
 
-            // #7. If the presetHandle for the pending preset is not null and a matching preset is not found in the 
+            // #7. If the presetHandle for the pending preset is not null and a matching preset is not found in the
             // presets attribute list, return NOT_FOUND.
             if (!foundMatchingPresetInPresets)
             {
@@ -1500,11 +1500,11 @@ bool emberAfThermostatClusterCommitPresetsSchedulesRequestCallback(
             return SendResponseAndCleanUp(delegate, endpoint, commandObj, commandPath, imcode::ConstraintError);
         }
 
-        // #12. If the preset type for the preset scenario does not supports names and a name is specified, return CONSTRAINT_ERROR. 
+        // #12. If the preset type for the preset scenario does not supports names and a name is specified, return CONSTRAINT_ERROR.
         if (!PresetTypeSupportsNames(delegate, presetScenario) && pendingPreset.GetName().HasValue())
         {
             return SendResponseAndCleanUp(delegate, endpoint, commandObj, commandPath, imcode::ConstraintError);
-        } 
+        }
 
         // Enforce the Setpoint Limits for both the cooling and heating
         Optional<int16_t> coolingSetpointValue = preset.GetCoolingSetpoint();
