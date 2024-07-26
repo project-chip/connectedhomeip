@@ -270,7 +270,8 @@ void Instance::HandleSelectLocationsCmd(HandlerContext & ctx, const Commands::Se
                 auto jLocationIter = req.newLocations.Value().begin();
                 while (j < i)
                 {
-                    jLocationIter.Next(); // Since j < i and i is valid, we can safely call Next() without checking the return value.
+                    jLocationIter
+                        .Next(); // Since j < i and i is valid, we can safely call Next() without checking the return value.
                     if (jLocationIter.GetValue() == aSelectedLocation)
                     {
                         exitResponse(SelectLocationsStatus::kDuplicatedLocations, ""_span);
@@ -534,7 +535,8 @@ bool Instance::IsUniqueSupportedLocation(const LocationStructureWrapper & aLocat
     return true;
 }
 
-bool Instance::ReportEstimatedEndTimeChange(const DataModel::Nullable<uint32_t> & aEstimatedEndTime) {
+bool Instance::ReportEstimatedEndTimeChange(const DataModel::Nullable<uint32_t> & aEstimatedEndTime)
+{
     if (mEstimatedEndTime == aEstimatedEndTime)
     {
         return false;
@@ -547,7 +549,8 @@ bool Instance::ReportEstimatedEndTimeChange(const DataModel::Nullable<uint32_t> 
         return (aEstimatedEndTime.Value() != 0);
     }
 
-    if (aEstimatedEndTime.IsNull()) {
+    if (aEstimatedEndTime.IsNull())
+    {
         return false;
     }
 
@@ -735,7 +738,8 @@ bool Instance::AddSupportedMap(uint8_t aMapId, const CharSpan & aMapName)
         // the name cannot be the same as an existing map
         if (entry.IsNameEqual(aMapName))
         {
-            ChipLogError(Zcl, "AddSupportedMap %u - A map already exists with same name '%.*s'", aMapId, static_cast<int>(entry.GetName().size()), entry.GetName().data());
+            ChipLogError(Zcl, "AddSupportedMap %u - A map already exists with same name '%.*s'", aMapId,
+                         static_cast<int>(entry.GetName().size()), entry.GetName().data());
             return false;
         }
 
@@ -796,7 +800,8 @@ bool Instance::RenameSupportedMap(uint8_t aMapId, const CharSpan & newMapName)
 
         if (entry.IsNameEqual(newMapName))
         {
-            ChipLogError(Zcl, "AddSupportedMap %u - map already exists with same name '%.*s'", aMapId, static_cast<int>(entry.GetName().size()), entry.GetName().data());
+            ChipLogError(Zcl, "AddSupportedMap %u - map already exists with same name '%.*s'", aMapId,
+                         static_cast<int>(entry.GetName().size()), entry.GetName().data());
             return false;
         }
 
@@ -865,7 +870,8 @@ bool Instance::AddSelectedLocation(uint32_t & aSelectedLocation)
     // Does device mode allow modification of selected locations?
     if (!mDelegate->IsSetSelectedLocationsAllowed(locationStatusText))
     {
-        ChipLogError(Zcl, "AddSelectedLocation %u - %.*s", aSelectedLocation, static_cast<int>(locationStatusText.size()), locationStatusText.data());
+        ChipLogError(Zcl, "AddSelectedLocation %u - %.*s", aSelectedLocation, static_cast<int>(locationStatusText.size()),
+                     locationStatusText.data());
         return false;
     }
 
@@ -904,7 +910,8 @@ bool Instance::SetCurrentLocation(const DataModel::Nullable<uint32_t> & aCurrent
     bool notifyChange = mCurrentLocation != aCurrentLocation;
 
     mCurrentLocation = aCurrentLocation;
-    if (notifyChange) {
+    if (notifyChange)
+    {
         NotifyCurrentLocationChanged();
     }
 
