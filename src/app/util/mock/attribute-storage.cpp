@@ -37,7 +37,7 @@
 #include <app/util/attribute-storage.h>
 #include <app/util/endpoint-config-api.h>
 #include <app/util/mock/Constants.h>
-#include <app/util/mock/MockNodeConfigImpl.h>
+#include <app/util/mock/MockNodeConfig.h>
 
 #include <app/AttributeValueEncoder.h>
 #include <app/ConcreteAttributePath.h>
@@ -124,31 +124,15 @@ const bool mockAttribute1          = true;
 const int16_t mockAttribute2       = 42;
 const uint64_t mockAttribute3      = 0xdeadbeef0000cafe;
 const uint8_t mockAttribute4[256]  = {
-     0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 0xa, 0xb, 0xc, 0xd, 0xe, 0xf, 0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 0xa, 0xb, 0xc, 0xd, 0xe, 0xf,
-     0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 0xa, 0xb, 0xc, 0xd, 0xe, 0xf, 0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 0xa, 0xb, 0xc, 0xd, 0xe, 0xf,
-     0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 0xa, 0xb, 0xc, 0xd, 0xe, 0xf, 0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 0xa, 0xb, 0xc, 0xd, 0xe, 0xf,
-     0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 0xa, 0xb, 0xc, 0xd, 0xe, 0xf, 0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 0xa, 0xb, 0xc, 0xd, 0xe, 0xf,
-     0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 0xa, 0xb, 0xc, 0xd, 0xe, 0xf, 0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 0xa, 0xb, 0xc, 0xd, 0xe, 0xf,
-     0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 0xa, 0xb, 0xc, 0xd, 0xe, 0xf, 0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 0xa, 0xb, 0xc, 0xd, 0xe, 0xf,
-     0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 0xa, 0xb, 0xc, 0xd, 0xe, 0xf, 0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 0xa, 0xb, 0xc, 0xd, 0xe, 0xf,
-     0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 0xa, 0xb, 0xc, 0xd, 0xe, 0xf, 0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 0xa, 0xb, 0xc, 0xd, 0xe, 0xf,
+    0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 0xa, 0xb, 0xc, 0xd, 0xe, 0xf, 0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 0xa, 0xb, 0xc, 0xd, 0xe, 0xf,
+    0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 0xa, 0xb, 0xc, 0xd, 0xe, 0xf, 0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 0xa, 0xb, 0xc, 0xd, 0xe, 0xf,
+    0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 0xa, 0xb, 0xc, 0xd, 0xe, 0xf, 0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 0xa, 0xb, 0xc, 0xd, 0xe, 0xf,
+    0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 0xa, 0xb, 0xc, 0xd, 0xe, 0xf, 0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 0xa, 0xb, 0xc, 0xd, 0xe, 0xf,
+    0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 0xa, 0xb, 0xc, 0xd, 0xe, 0xf, 0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 0xa, 0xb, 0xc, 0xd, 0xe, 0xf,
+    0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 0xa, 0xb, 0xc, 0xd, 0xe, 0xf, 0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 0xa, 0xb, 0xc, 0xd, 0xe, 0xf,
+    0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 0xa, 0xb, 0xc, 0xd, 0xe, 0xf, 0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 0xa, 0xb, 0xc, 0xd, 0xe, 0xf,
+    0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 0xa, 0xb, 0xc, 0xd, 0xe, 0xf, 0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 0xa, 0xb, 0xc, 0xd, 0xe, 0xf,
 };
-
-const uint8_t defaultValueData[] = { 0x01, 0x02, 0x03, 0x04 };
-const uint8_t minValueData[]     = { 0xFF, 0xFF, 0xFF, 0xFF };
-#if CHIP_CONFIG_BIG_ENDIAN_TARGET
-const uint8_t maxValueData[] = { 0x00, 0x7F, 0xFF, 0xFF };
-#else
-const uint8_t maxValueData[] = { 0xFF, 0xFF, 0x7F, 0x00 }; // Equivalent, in little-endian, to 0x007FFFFF
-#endif
-
-EmberAfAttributeMinMaxValue minMaxValue = { defaultValueData, minValueData, maxValueData };
-
-EmberAfAttributeMetadata mockmetadata = { .defaultValue  = EmberAfDefaultOrMinMaxAttributeValue(&minMaxValue),
-                                          .attributeId   = 0,
-                                          .size          = 3,
-                                          .attributeType = ZCL_INT24S_ATTRIBUTE_TYPE,
-                                          .mask          = ATTRIBUTE_MASK_MIN_MAX }; // namespace
 
 } // namespace Test
 } // namespace chip
@@ -305,7 +289,8 @@ bool emberAfContainsServerFromIndex(uint16_t index, ClusterId clusterId)
 {
     auto config = GetMockNodeConfig();
     VerifyOrReturnValue(index < config.endpoints.size(), false);
-    return config.endpoints[index].clusterById(clusterId) != nullptr;
+    return true; // TODO: TestSceneTable relies on returning true here: https://github.com/project-chip/connectedhomeip/issues/30696
+    // return config.endpoints[index].clusterById(clusterId) != nullptr;
 }
 
 const EmberAfEndpointType * emberAfFindEndpointType(EndpointId endpointId)
@@ -326,11 +311,6 @@ DataVersion * emberAfDataVersionStorage(const chip::app::ConcreteClusterPath & a
 {
     // shared data version storage
     return &dataVersion;
-}
-
-const EmberAfAttributeMetadata * emberAfLocateAttributeMetadata(EndpointId endpoint, ClusterId clusterId, AttributeId attributeId)
-{
-    return &mockmetadata;
 }
 
 namespace chip {
