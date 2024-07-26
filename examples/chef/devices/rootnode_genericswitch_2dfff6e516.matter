@@ -1,6 +1,35 @@
 // This IDL was generated automatically by ZAP.
 // It is for view/code review purposes only.
 
+enum TestGlobalEnum : enum8 {
+  kSomeValue = 0;
+  kSomeOtherValue = 1;
+  kFinalValue = 2;
+}
+
+bitmap TestGlobalBitmap : bitmap32 {
+  kFirstBit = 0x1;
+  kSecondBit = 0x2;
+}
+
+bitmap Bitmap16 : bitmap16 {
+}
+
+bitmap Bitmap32 : bitmap32 {
+}
+
+bitmap Bitmap64 : bitmap64 {
+}
+
+bitmap Bitmap8 : bitmap8 {
+}
+
+struct TestGlobalStruct {
+    char_string<128> name = 0;
+    nullable TestGlobalBitmap myBitmap = 1;
+    optional nullable TestGlobalEnum myEnum = 2;
+}
+
 /** Attributes and commands for putting a device into Identification mode (e.g. flashing a light). */
 cluster Identify = 3 {
   revision 4;
