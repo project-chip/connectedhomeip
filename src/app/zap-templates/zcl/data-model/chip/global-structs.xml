@@ -23,6 +23,13 @@ TODO: Make these structures global rather than defining them for each cluster.
 
 <configurator>
   <domain name="CHIP"/>
+
+  <struct name="AtomicAttributeStatusStruct">
+    <cluster code="0x0201"/>
+    <item fieldId="0" name="AttributeID" type="attrib_id" optional="true"/>
+    <item fieldId="1" name="StatusCode" type="status" optional="true"/>
+  </struct>
+
   <struct name="HomeLocationStruct">
     <cluster code="0x0150"/> <!-- Service Area Cluster -->
     <!-- TODO: add Basic Information Cluster code="0x0028" -->
@@ -30,5 +37,16 @@ TODO: Make these structures global rather than defining them for each cluster.
     <item fieldId="0" name="LocationName"    type="char_string" length="128" isNullable="false" optional="false"/>
     <item fieldId="1" name="FloorNumber"     type="int16s"                   isNullable="true"  optional="false"/>
     <item fieldId="2" name="AreaType"        type="AreaTypeTag"              isNullable="true"  optional="false"/>
+  </struct>
+
+  <!--
+    These are test global items (no cluster attached) for testing only.
+    Their usage is defined for UnitTestCluster only.
+  -->
+  
+  <struct name="TestGlobalStruct">
+    <item fieldId="0" name="Name" type="char_string" length="128" isNullable="false" optional="false"/>
+    <item fieldId="1" name="MyBitmap" type="TestGlobalBitmap" isNullable="true" optional="false"/>
+    <item fieldId="2" name="MyEnum" type="TestGlobalEnum" isNullable="true" optional="true"/>
   </struct>
 </configurator>

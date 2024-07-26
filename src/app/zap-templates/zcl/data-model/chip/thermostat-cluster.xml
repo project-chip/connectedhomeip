@@ -97,13 +97,6 @@ limitations under the License.
     <field name="SupportsNames" mask="0x02"/>
   </bitmap>
 
-  <enum name="AtomicRequestTypeEnum" type="enum8">
-    <cluster code="0x0201"/>
-    <item name="BeginWrite" value="0x00"/>
-    <item name="CommitWrite" value="0x01"/>
-    <item name="RollbackWrite" value="0x02"/>
-  </enum>
-
   <enum name="SystemModeEnum" type="enum8">
     <cluster code="0x0201"/>
     <item name="Off" value="0x00"/>
@@ -214,12 +207,6 @@ limitations under the License.
     <item name="GoingToSleep" value="0x06"/>
     <item name="UserDefined" value="0xFE"/>
   </enum>
-
-  <struct name="AtomicAttributeStatusStruct" apiMaturity="provisional">
-    <cluster code="0x0201"/>
-    <item fieldId="0" name="AttributeID" type="attrib_id" optional="true"/>
-    <item fieldId="1" name="StatusCode" type="status" optional="true"/>
-  </struct>
 
   <struct name="WeeklyScheduleTransitionStruct">
     <cluster code="0x0201"/>
