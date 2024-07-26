@@ -98,7 +98,6 @@ public:
     static void GenerateWriteResponse(System::PacketBufferHandle & aPayload);
 
 private:
-
     chip::app::DataModel::Provider * mOldProvider = nullptr;
 };
 
