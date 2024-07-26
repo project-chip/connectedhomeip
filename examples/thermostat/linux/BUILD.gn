@@ -17,7 +17,6 @@ import("//build_overrides/chip.gni")
 
 executable("thermostat-app") {
   sources = [
-    "${chip_root}/src/app/clusters/thermostat-server/PresetStructWithOwnedMembers.cpp",
     "include/low-power/LowPowerManager.cpp",
     "include/low-power/LowPowerManager.h",
     "main.cpp",

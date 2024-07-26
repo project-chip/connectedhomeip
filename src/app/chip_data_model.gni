@@ -400,6 +400,14 @@ template("chip_data_model") {
           "${_app_root}/clusters/${cluster}/DefaultThreadNetworkDirectoryStorage.h",
           "${_app_root}/clusters/${cluster}/ThreadNetworkDirectoryStorage.h",
         ]
+      } else if (cluster == "thermostat-server") {
+        sources += [
+          "${_app_root}/clusters/${cluster}/${cluster}.cpp",
+          "${_app_root}/clusters/${cluster}/${cluster}.h",
+          "${_app_root}/clusters/${cluster}/PresetStructWithOwnedMembers.cpp",
+          "${_app_root}/clusters/${cluster}/PresetStructWithOwnedMembers.h",
+          "${_app_root}/clusters/${cluster}/thermostat-delegate.h",
+        ]
       } else {
         sources += [ "${_app_root}/clusters/${cluster}/${cluster}.cpp" ]
       }
