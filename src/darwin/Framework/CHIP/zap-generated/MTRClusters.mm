@@ -20009,6 +20009,55 @@ using chip::System::Clock::Timeout;
 
 @end
 
+@implementation MTRClusterEcosystemInformation
+
+- (NSDictionary<NSString *, id> * _Nullable)readAttributeRemovedOnWithParams:(MTRReadParams * _Nullable)params
+{
+    return [self.device readAttributeWithEndpointID:self.endpointID clusterID:@(MTRClusterIDTypeEcosystemInformationID) attributeID:@(MTRAttributeIDTypeClusterEcosystemInformationAttributeRemovedOnID) params:params];
+}
+
+- (NSDictionary<NSString *, id> * _Nullable)readAttributeDeviceDirectoryWithParams:(MTRReadParams * _Nullable)params
+{
+    return [self.device readAttributeWithEndpointID:self.endpointID clusterID:@(MTRClusterIDTypeEcosystemInformationID) attributeID:@(MTRAttributeIDTypeClusterEcosystemInformationAttributeDeviceDirectoryID) params:params];
+}
+
+- (NSDictionary<NSString *, id> * _Nullable)readAttributeLocationDirectoryWithParams:(MTRReadParams * _Nullable)params
+{
+    return [self.device readAttributeWithEndpointID:self.endpointID clusterID:@(MTRClusterIDTypeEcosystemInformationID) attributeID:@(MTRAttributeIDTypeClusterEcosystemInformationAttributeLocationDirectoryID) params:params];
+}
+
+- (NSDictionary<NSString *, id> * _Nullable)readAttributeGeneratedCommandListWithParams:(MTRReadParams * _Nullable)params
+{
+    return [self.device readAttributeWithEndpointID:self.endpointID clusterID:@(MTRClusterIDTypeEcosystemInformationID) attributeID:@(MTRAttributeIDTypeClusterEcosystemInformationAttributeGeneratedCommandListID) params:params];
+}
+
+- (NSDictionary<NSString *, id> * _Nullable)readAttributeAcceptedCommandListWithParams:(MTRReadParams * _Nullable)params
+{
+    return [self.device readAttributeWithEndpointID:self.endpointID clusterID:@(MTRClusterIDTypeEcosystemInformationID) attributeID:@(MTRAttributeIDTypeClusterEcosystemInformationAttributeAcceptedCommandListID) params:params];
+}
+
+- (NSDictionary<NSString *, id> * _Nullable)readAttributeEventListWithParams:(MTRReadParams * _Nullable)params
+{
+    return [self.device readAttributeWithEndpointID:self.endpointID clusterID:@(MTRClusterIDTypeEcosystemInformationID) attributeID:@(MTRAttributeIDTypeClusterEcosystemInformationAttributeEventListID) params:params];
+}
+
+- (NSDictionary<NSString *, id> * _Nullable)readAttributeAttributeListWithParams:(MTRReadParams * _Nullable)params
+{
+    return [self.device readAttributeWithEndpointID:self.endpointID clusterID:@(MTRClusterIDTypeEcosystemInformationID) attributeID:@(MTRAttributeIDTypeClusterEcosystemInformationAttributeAttributeListID) params:params];
+}
+
+- (NSDictionary<NSString *, id> * _Nullable)readAttributeFeatureMapWithParams:(MTRReadParams * _Nullable)params
+{
+    return [self.device readAttributeWithEndpointID:self.endpointID clusterID:@(MTRClusterIDTypeEcosystemInformationID) attributeID:@(MTRAttributeIDTypeClusterEcosystemInformationAttributeFeatureMapID) params:params];
+}
+
+- (NSDictionary<NSString *, id> * _Nullable)readAttributeClusterRevisionWithParams:(MTRReadParams * _Nullable)params
+{
+    return [self.device readAttributeWithEndpointID:self.endpointID clusterID:@(MTRClusterIDTypeEcosystemInformationID) attributeID:@(MTRAttributeIDTypeClusterEcosystemInformationAttributeClusterRevisionID) params:params];
+}
+
+@end
+
 @implementation MTRClusterCommissionerControl
 
 - (void)requestCommissioningApprovalWithParams:(MTRCommissionerControlClusterRequestCommissioningApprovalParams *)params expectedValues:(NSArray<NSDictionary<NSString *, id> *> * _Nullable)expectedValues expectedValueInterval:(NSNumber * _Nullable)expectedValueIntervalMs completion:(MTRStatusCompletion)completion
