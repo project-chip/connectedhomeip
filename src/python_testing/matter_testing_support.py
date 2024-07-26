@@ -256,17 +256,27 @@ class EventChangeCallback:
                 f'Got subscription report for event on cluster {self._expected_cluster}: {res.Data}')
             self._q.put(res)
 
-    def wait_for_event_report(self, expected_event: ClusterObjects.ClusterEvent, timeout: int = 10):
-        """This function allows a test script to block waiting for the specific event to arrive with a timeout.
-           It returns the event data so that the values can be checked."""
+    def wait_for_event_report(self, expected_event: ClusterObjects.ClusterEvent, timeoutS: int = 10):
+        """This function allows a test script to block waiting for the specific event to arrive with a timeout
+           (specified in seconds). It returns the event data so that the values can be checked."""
         try:
-            res = self._q.get(block=True, timeout=timeout)
+            res = self._q.get(block=True, timeout=timeoutS)
         except queue.Empty:
             asserts.fail("Failed to receive a report for the event {}".format(expected_event))
 
         asserts.assert_equal(res.Header.ClusterId, expected_event.cluster_id, "Expected cluster ID not found in event report")
         asserts.assert_equal(res.Header.EventId, expected_event.event_id, "Expected event ID not found in event report")
         return res.Data
+
+    def wait_for_event_expect_no_report(self, timeoutS: int = 10):
+        """This function succceeds/returns if an event does not arrive within the timeout specified in seconds.
+           If an event does arrive, an assert is called."""
+        try:
+            res = self._q.get(block=True, timeout=timeoutS)
+        except queue.Empty:
+            return
+
+        asserts.fail(f"Event reported when not expected {res}")
 
     @property
     def event_queue(self) -> queue.Queue:
@@ -311,6 +321,7 @@ class AttributeValue:
     endpoint_id: int
     attribute: ClusterObjects.ClusterAttributeDescriptor
     value: Any
+    timestamp_utc: datetime
 
 
 class ClusterAttributeChangeAccumulator:
@@ -318,8 +329,13 @@ class ClusterAttributeChangeAccumulator:
         self._q = queue.Queue()
         self._expected_cluster = expected_cluster
         self._subscription = None
+        self._attribute_report_counts = {}
+        attrs = [cls for name, cls in inspect.getmembers(expected_cluster.Attributes) if inspect.isclass(
+            cls) and issubclass(cls, ClusterObjects.ClusterAttributeDescriptor)]
+        for a in attrs:
+            self._attribute_report_counts[a] = 0
 
-    async def start(self, dev_ctrl, node_id: int, endpoint: int, fabric_filtered: bool = False, min_interval_sec: int = 0, max_interval_sec: int = 30) -> Any:
+    async def start(self, dev_ctrl, node_id: int, endpoint: int, fabric_filtered: bool = False, min_interval_sec: int = 0, max_interval_sec: int = 5) -> Any:
         """This starts a subscription for attributes on the specified node_id and endpoint. The cluster is specified when the class instance is created."""
         self._subscription = await dev_ctrl.ReadAttribute(
             nodeid=node_id,
@@ -336,13 +352,19 @@ class ClusterAttributeChangeAccumulator:
            It checks the report is from the expected_cluster and then posts it into the queue for later processing."""
         if path.ClusterType == self._expected_cluster:
             data = transaction.GetAttribute(path)
-            value = AttributeValue(endpoint_id=path.Path.EndpointId, attribute=path.AttributeType, value=data)
+            value = AttributeValue(endpoint_id=path.Path.EndpointId, attribute=path.AttributeType,
+                                   value=data, timestamp_utc=datetime.now(timezone.utc))
             logging.info(f"Got subscription report for {path.AttributeType}: {data}")
             self._q.put(value)
+            self._attribute_report_counts[path.AttributeType] += 1
 
     @property
     def attribute_queue(self) -> queue.Queue:
         return self._q
+
+    @property
+    def attribute_report_counts(self) -> dict[ClusterObjects.ClusterAttributeDescriptor, int]:
+        return self._attribute_report_counts
 
 
 class InternalTestRunnerHooks(TestRunnerHooks):
@@ -928,7 +950,8 @@ class MatterBaseTest(base_test.BaseTestClass):
     async def send_single_cmd(
             self, cmd: Clusters.ClusterObjects.ClusterCommand,
             dev_ctrl: ChipDeviceCtrl = None, node_id: int = None, endpoint: int = None,
-            timedRequestTimeoutMs: typing.Union[None, int] = None) -> object:
+            timedRequestTimeoutMs: typing.Union[None, int] = None,
+            payloadCapability: int = ChipDeviceCtrl.TransportPayloadCapability.MRP_PAYLOAD) -> object:
         if dev_ctrl is None:
             dev_ctrl = self.default_controller
         if node_id is None:
@@ -936,7 +959,8 @@ class MatterBaseTest(base_test.BaseTestClass):
         if endpoint is None:
             endpoint = self.matter_test_config.endpoint
 
-        result = await dev_ctrl.SendCommand(nodeid=node_id, endpoint=endpoint, payload=cmd, timedRequestTimeoutMs=timedRequestTimeoutMs)
+        result = await dev_ctrl.SendCommand(nodeid=node_id, endpoint=endpoint, payload=cmd, timedRequestTimeoutMs=timedRequestTimeoutMs,
+                                            payloadCapability=payloadCapability)
         return result
 
     async def send_test_event_triggers(self, eventTrigger: int, enableKey: bytes = None):
