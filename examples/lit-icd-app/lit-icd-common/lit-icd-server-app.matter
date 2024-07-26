@@ -1813,6 +1813,7 @@ endpoint 0 {
     ram      attribute userActiveModeTriggerHint default = 0x111D;
     ram      attribute userActiveModeTriggerInstruction default = "Restart the application";
     ram      attribute operatingMode default = 0;
+    callback attribute maximumCheckInBackOff;
     callback attribute generatedCommandList;
     callback attribute acceptedCommandList;
     callback attribute eventList;
