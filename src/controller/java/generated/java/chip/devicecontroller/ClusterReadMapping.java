@@ -5803,6 +5803,17 @@ public class ClusterReadMapping {
           readIcdManagementOperatingModeCommandParams
         );
         result.put("readOperatingModeAttribute", readIcdManagementOperatingModeAttributeInteractionInfo);
+     Map<String, CommandParameterInfo> readIcdManagementMaximumCheckInBackOffCommandParams = new LinkedHashMap<String, CommandParameterInfo>();
+        InteractionInfo readIcdManagementMaximumCheckInBackOffAttributeInteractionInfo = new InteractionInfo(
+          (cluster, callback, commandArguments) -> {
+            ((ChipClusters.IcdManagementCluster) cluster).readMaximumCheckInBackOffAttribute(
+              (ChipClusters.LongAttributeCallback) callback
+            );
+          },
+          () -> new ClusterInfoMapping.DelegatedLongAttributeCallback(),
+          readIcdManagementMaximumCheckInBackOffCommandParams
+        );
+        result.put("readMaximumCheckInBackOffAttribute", readIcdManagementMaximumCheckInBackOffAttributeInteractionInfo);
      Map<String, CommandParameterInfo> readIcdManagementGeneratedCommandListCommandParams = new LinkedHashMap<String, CommandParameterInfo>();
         InteractionInfo readIcdManagementGeneratedCommandListAttributeInteractionInfo = new InteractionInfo(
           (cluster, callback, commandArguments) -> {
@@ -18589,6 +18600,109 @@ public class ClusterReadMapping {
      
        return result;
     }
+    private static Map<String, InteractionInfo> readEcosystemInformationInteractionInfo() {
+       Map<String, InteractionInfo> result = new LinkedHashMap<>();Map<String, CommandParameterInfo> readEcosystemInformationRemovedOnCommandParams = new LinkedHashMap<String, CommandParameterInfo>();
+        InteractionInfo readEcosystemInformationRemovedOnAttributeInteractionInfo = new InteractionInfo(
+          (cluster, callback, commandArguments) -> {
+            ((ChipClusters.EcosystemInformationCluster) cluster).readRemovedOnAttribute(
+              (ChipClusters.EcosystemInformationCluster.RemovedOnAttributeCallback) callback
+            );
+          },
+          () -> new ClusterInfoMapping.DelegatedEcosystemInformationClusterRemovedOnAttributeCallback(),
+          readEcosystemInformationRemovedOnCommandParams
+        );
+        result.put("readRemovedOnAttribute", readEcosystemInformationRemovedOnAttributeInteractionInfo);
+     Map<String, CommandParameterInfo> readEcosystemInformationDeviceDirectoryCommandParams = new LinkedHashMap<String, CommandParameterInfo>();
+        InteractionInfo readEcosystemInformationDeviceDirectoryAttributeInteractionInfo = new InteractionInfo(
+          (cluster, callback, commandArguments) -> {
+            ((ChipClusters.EcosystemInformationCluster) cluster).readDeviceDirectoryAttribute(
+              (ChipClusters.EcosystemInformationCluster.DeviceDirectoryAttributeCallback) callback
+            );
+          },
+          () -> new ClusterInfoMapping.DelegatedEcosystemInformationClusterDeviceDirectoryAttributeCallback(),
+          readEcosystemInformationDeviceDirectoryCommandParams
+        );
+        result.put("readDeviceDirectoryAttribute", readEcosystemInformationDeviceDirectoryAttributeInteractionInfo);
+     Map<String, CommandParameterInfo> readEcosystemInformationLocationDirectoryCommandParams = new LinkedHashMap<String, CommandParameterInfo>();
+        InteractionInfo readEcosystemInformationLocationDirectoryAttributeInteractionInfo = new InteractionInfo(
+          (cluster, callback, commandArguments) -> {
+            ((ChipClusters.EcosystemInformationCluster) cluster).readLocationDirectoryAttribute(
+              (ChipClusters.EcosystemInformationCluster.LocationDirectoryAttributeCallback) callback
+            );
+          },
+          () -> new ClusterInfoMapping.DelegatedEcosystemInformationClusterLocationDirectoryAttributeCallback(),
+          readEcosystemInformationLocationDirectoryCommandParams
+        );
+        result.put("readLocationDirectoryAttribute", readEcosystemInformationLocationDirectoryAttributeInteractionInfo);
+     Map<String, CommandParameterInfo> readEcosystemInformationGeneratedCommandListCommandParams = new LinkedHashMap<String, CommandParameterInfo>();
+        InteractionInfo readEcosystemInformationGeneratedCommandListAttributeInteractionInfo = new InteractionInfo(
+          (cluster, callback, commandArguments) -> {
+            ((ChipClusters.EcosystemInformationCluster) cluster).readGeneratedCommandListAttribute(
+              (ChipClusters.EcosystemInformationCluster.GeneratedCommandListAttributeCallback) callback
+            );
+          },
+          () -> new ClusterInfoMapping.DelegatedEcosystemInformationClusterGeneratedCommandListAttributeCallback(),
+          readEcosystemInformationGeneratedCommandListCommandParams
+        );
+        result.put("readGeneratedCommandListAttribute", readEcosystemInformationGeneratedCommandListAttributeInteractionInfo);
+     Map<String, CommandParameterInfo> readEcosystemInformationAcceptedCommandListCommandParams = new LinkedHashMap<String, CommandParameterInfo>();
+        InteractionInfo readEcosystemInformationAcceptedCommandListAttributeInteractionInfo = new InteractionInfo(
+          (cluster, callback, commandArguments) -> {
+            ((ChipClusters.EcosystemInformationCluster) cluster).readAcceptedCommandListAttribute(
+              (ChipClusters.EcosystemInformationCluster.AcceptedCommandListAttributeCallback) callback
+            );
+          },
+          () -> new ClusterInfoMapping.DelegatedEcosystemInformationClusterAcceptedCommandListAttributeCallback(),
+          readEcosystemInformationAcceptedCommandListCommandParams
+        );
+        result.put("readAcceptedCommandListAttribute", readEcosystemInformationAcceptedCommandListAttributeInteractionInfo);
+     Map<String, CommandParameterInfo> readEcosystemInformationEventListCommandParams = new LinkedHashMap<String, CommandParameterInfo>();
+        InteractionInfo readEcosystemInformationEventListAttributeInteractionInfo = new InteractionInfo(
+          (cluster, callback, commandArguments) -> {
+            ((ChipClusters.EcosystemInformationCluster) cluster).readEventListAttribute(
+              (ChipClusters.EcosystemInformationCluster.EventListAttributeCallback) callback
+            );
+          },
+          () -> new ClusterInfoMapping.DelegatedEcosystemInformationClusterEventListAttributeCallback(),
+          readEcosystemInformationEventListCommandParams
+        );
+        result.put("readEventListAttribute", readEcosystemInformationEventListAttributeInteractionInfo);
+     Map<String, CommandParameterInfo> readEcosystemInformationAttributeListCommandParams = new LinkedHashMap<String, CommandParameterInfo>();
+        InteractionInfo readEcosystemInformationAttributeListAttributeInteractionInfo = new InteractionInfo(
+          (cluster, callback, commandArguments) -> {
+            ((ChipClusters.EcosystemInformationCluster) cluster).readAttributeListAttribute(
+              (ChipClusters.EcosystemInformationCluster.AttributeListAttributeCallback) callback
+            );
+          },
+          () -> new ClusterInfoMapping.DelegatedEcosystemInformationClusterAttributeListAttributeCallback(),
+          readEcosystemInformationAttributeListCommandParams
+        );
+        result.put("readAttributeListAttribute", readEcosystemInformationAttributeListAttributeInteractionInfo);
+     Map<String, CommandParameterInfo> readEcosystemInformationFeatureMapCommandParams = new LinkedHashMap<String, CommandParameterInfo>();
+        InteractionInfo readEcosystemInformationFeatureMapAttributeInteractionInfo = new InteractionInfo(
+          (cluster, callback, commandArguments) -> {
+            ((ChipClusters.EcosystemInformationCluster) cluster).readFeatureMapAttribute(
+              (ChipClusters.LongAttributeCallback) callback
+            );
+          },
+          () -> new ClusterInfoMapping.DelegatedLongAttributeCallback(),
+          readEcosystemInformationFeatureMapCommandParams
+        );
+        result.put("readFeatureMapAttribute", readEcosystemInformationFeatureMapAttributeInteractionInfo);
+     Map<String, CommandParameterInfo> readEcosystemInformationClusterRevisionCommandParams = new LinkedHashMap<String, CommandParameterInfo>();
+        InteractionInfo readEcosystemInformationClusterRevisionAttributeInteractionInfo = new InteractionInfo(
+          (cluster, callback, commandArguments) -> {
+            ((ChipClusters.EcosystemInformationCluster) cluster).readClusterRevisionAttribute(
+              (ChipClusters.IntegerAttributeCallback) callback
+            );
+          },
+          () -> new ClusterInfoMapping.DelegatedIntegerAttributeCallback(),
+          readEcosystemInformationClusterRevisionCommandParams
+        );
+        result.put("readClusterRevisionAttribute", readEcosystemInformationClusterRevisionAttributeInteractionInfo);
+     
+       return result;
+    }
     private static Map<String, InteractionInfo> readCommissionerControlInteractionInfo() {
        Map<String, InteractionInfo> result = new LinkedHashMap<>();Map<String, CommandParameterInfo> readCommissionerControlSupportedDeviceCategoriesCommandParams = new LinkedHashMap<String, CommandParameterInfo>();
         InteractionInfo readCommissionerControlSupportedDeviceCategoriesAttributeInteractionInfo = new InteractionInfo(
@@ -21384,6 +21498,7 @@ public class ClusterReadMapping {
             put("accountLogin", readAccountLoginInteractionInfo());
             put("contentControl", readContentControlInteractionInfo());
             put("contentAppObserver", readContentAppObserverInteractionInfo());
+            put("ecosystemInformation", readEcosystemInformationInteractionInfo());
             put("commissionerControl", readCommissionerControlInteractionInfo());
             put("electricalMeasurement", readElectricalMeasurementInteractionInfo());
             put("unitTesting", readUnitTestingInteractionInfo());

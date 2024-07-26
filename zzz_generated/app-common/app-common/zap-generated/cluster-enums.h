@@ -28,6 +28,111 @@ namespace Clusters {
 namespace detail {
 // Enums shared across multiple clusters.
 
+// Enum for AreaTypeTag
+enum class AreaTypeTag : uint8_t
+{
+    kAisle           = 0x00,
+    kAttic           = 0x01,
+    kBackDoor        = 0x02,
+    kBackYard        = 0x03,
+    kBalcony         = 0x04,
+    kBallroom        = 0x05,
+    kBathroom        = 0x06,
+    kBedroom         = 0x07,
+    kBorder          = 0x08,
+    kBoxroom         = 0x09,
+    kBreakfastRoom   = 0x0A,
+    kCarport         = 0x0B,
+    kCellar          = 0x0C,
+    kCloakroom       = 0x0D,
+    kCloset          = 0x0E,
+    kConservatory    = 0x0F,
+    kCorridor        = 0x10,
+    kCraftRoom       = 0x11,
+    kCupboard        = 0x12,
+    kDeck            = 0x13,
+    kDen             = 0x14,
+    kDining          = 0x15,
+    kDrawingRoom     = 0x16,
+    kDressingRoom    = 0x17,
+    kDriveway        = 0x18,
+    kElevator        = 0x19,
+    kEnsuite         = 0x1A,
+    kEntrance        = 0x1B,
+    kEntryway        = 0x1C,
+    kFamilyRoom      = 0x1D,
+    kFoyer           = 0x1E,
+    kFrontDoor       = 0x1F,
+    kFrontYard       = 0x20,
+    kGameRoom        = 0x21,
+    kGarage          = 0x22,
+    kGarageDoor      = 0x23,
+    kGarden          = 0x24,
+    kGardenDoor      = 0x25,
+    kGuestBathroom   = 0x26,
+    kGuestBedroom    = 0x27,
+    kGuestRestroom   = 0x28,
+    kGuestRoom       = 0x29,
+    kGym             = 0x2A,
+    kHallway         = 0x2B,
+    kHearthRoom      = 0x2C,
+    kKidsRoom        = 0x2D,
+    kKidsBedroom     = 0x2E,
+    kKitchen         = 0x2F,
+    kLarder          = 0x30,
+    kLaundryRoom     = 0x31,
+    kLawn            = 0x32,
+    kLibrary         = 0x33,
+    kLivingRoom      = 0x34,
+    kLounge          = 0x35,
+    kMediaTvRoom     = 0x36,
+    kMudRoom         = 0x37,
+    kMusicRoom       = 0x38,
+    kNursery         = 0x39,
+    kOffice          = 0x3A,
+    kOutdoorKitchen  = 0x3B,
+    kOutside         = 0x3C,
+    kPantry          = 0x3D,
+    kParkingLot      = 0x3E,
+    kParlor          = 0x3F,
+    kPatio           = 0x40,
+    kPlayRoom        = 0x41,
+    kPoolRoom        = 0x42,
+    kPorch           = 0x43,
+    kPrimaryBathroom = 0x44,
+    kPrimaryBedroom  = 0x45,
+    kRamp            = 0x46,
+    kReceptionRoom   = 0x47,
+    kRecreationRoom  = 0x48,
+    kRestroom        = 0x49,
+    kRoof            = 0x4A,
+    kSauna           = 0x4B,
+    kScullery        = 0x4C,
+    kSewingRoom      = 0x4D,
+    kShed            = 0x4E,
+    kSideDoor        = 0x4F,
+    kSideYard        = 0x50,
+    kSittingRoom     = 0x51,
+    kSnug            = 0x52,
+    kSpa             = 0x53,
+    kStaircase       = 0x54,
+    kSteamRoom       = 0x55,
+    kStorageRoom     = 0x56,
+    kStudio          = 0x57,
+    kStudy           = 0x58,
+    kSunRoom         = 0x59,
+    kSwimmingPool    = 0x5A,
+    kTerrace         = 0x5B,
+    kUtilityRoom     = 0x5C,
+    kWard            = 0x5D,
+    kWorkshop        = 0x5E,
+    // All received enum values that are not listed above will be mapped
+    // to kUnknownEnumValue. This is a helper enum value that should only
+    // be used by code to process how it handles receiving and unknown
+    // enum value. This specific should never be transmitted.
+    kUnknownEnumValue = 95,
+};
+
 // Enum for ChangeIndicationEnum
 enum class ChangeIndicationEnum : uint8_t
 {
@@ -1480,6 +1585,12 @@ enum class ProductFinishEnum : uint8_t
     // enum value. This specific should never be transmitted.
     kUnknownEnumValue = 6,
 };
+
+// Bitmap for Feature
+enum class Feature : uint32_t
+{
+    kBridgedICDSupport = 0x100000,
+};
 } // namespace BridgedDeviceBasicInformation
 
 namespace Switch {
@@ -1631,6 +1742,7 @@ enum class Feature : uint32_t
     kCheckInProtocolSupport = 0x1,
     kUserActiveModeTrigger  = 0x2,
     kLongIdleTimeSupport    = 0x4,
+    kDynamicSitLitSupport   = 0x8,
 };
 
 // Bitmap for UserActiveModeTriggerBitmap
@@ -2816,11 +2928,11 @@ enum class ModeTag : uint16_t
     kOff    = 0x4000,
     kManual = 0x4001,
     kTimed  = 0x4002,
-    // All received enum values that are not listed above will be mapped
-    // to kUnknownEnumValue. This is a helper enum value that should only
-    // be used by code to process how it handles receiving and unknown
-    // enum value. This specific should never be transmitted.
-    kUnknownEnumValue = 0,
+    // kUnknownEnumValue intentionally not defined. This enum never goes
+    // through DataModel::Decode, likely because it is a part of a derived
+    // cluster. As a result having kUnknownEnumValue in this enum is error
+    // prone, and was removed. See
+    // src/app/common/templates/config-data.yaml.
 };
 
 // Bitmap for Feature
@@ -3505,110 +3617,7 @@ enum class BarrierControlSafetyStatus : uint16_t
 
 namespace ServiceArea {
 
-// Enum for AreaTypeTag
-enum class AreaTypeTag : uint8_t
-{
-    kAisle           = 0x00,
-    kAttic           = 0x01,
-    kBackDoor        = 0x02,
-    kBackYard        = 0x03,
-    kBalcony         = 0x04,
-    kBallroom        = 0x05,
-    kBathroom        = 0x06,
-    kBedroom         = 0x07,
-    kBorder          = 0x08,
-    kBoxroom         = 0x09,
-    kBreakfastRoom   = 0x0A,
-    kCarport         = 0x0B,
-    kCellar          = 0x0C,
-    kCloakroom       = 0x0D,
-    kCloset          = 0x0E,
-    kConservatory    = 0x0F,
-    kCorridor        = 0x10,
-    kCraftRoom       = 0x11,
-    kCupboard        = 0x12,
-    kDeck            = 0x13,
-    kDen             = 0x14,
-    kDining          = 0x15,
-    kDrawingRoom     = 0x16,
-    kDressingRoom    = 0x17,
-    kDriveway        = 0x18,
-    kElevator        = 0x19,
-    kEnsuite         = 0x1A,
-    kEntrance        = 0x1B,
-    kEntryway        = 0x1C,
-    kFamilyRoom      = 0x1D,
-    kFoyer           = 0x1E,
-    kFrontDoor       = 0x1F,
-    kFrontYard       = 0x20,
-    kGameRoom        = 0x21,
-    kGarage          = 0x22,
-    kGarageDoor      = 0x23,
-    kGarden          = 0x24,
-    kGardenDoor      = 0x25,
-    kGuestBathroom   = 0x26,
-    kGuestBedroom    = 0x27,
-    kGuestRestroom   = 0x28,
-    kGuestRoom       = 0x29,
-    kGym             = 0x2A,
-    kHallway         = 0x2B,
-    kHearthRoom      = 0x2C,
-    kKidsRoom        = 0x2D,
-    kKidsBedroom     = 0x2E,
-    kKitchen         = 0x2F,
-    kLarder          = 0x30,
-    kLaundryRoom     = 0x31,
-    kLawn            = 0x32,
-    kLibrary         = 0x33,
-    kLivingRoom      = 0x34,
-    kLounge          = 0x35,
-    kMediaTvRoom     = 0x36,
-    kMudRoom         = 0x37,
-    kMusicRoom       = 0x38,
-    kNursery         = 0x39,
-    kOffice          = 0x3A,
-    kOutdoorKitchen  = 0x3B,
-    kOutside         = 0x3C,
-    kPantry          = 0x3D,
-    kParkingLot      = 0x3E,
-    kParlor          = 0x3F,
-    kPatio           = 0x40,
-    kPlayRoom        = 0x41,
-    kPoolRoom        = 0x42,
-    kPorch           = 0x43,
-    kPrimaryBathroom = 0x44,
-    kPrimaryBedroom  = 0x45,
-    kRamp            = 0x46,
-    kReceptionRoom   = 0x47,
-    kRecreationRoom  = 0x48,
-    kRestroom        = 0x49,
-    kRoof            = 0x4A,
-    kSauna           = 0x4B,
-    kScullery        = 0x4C,
-    kSewingRoom      = 0x4D,
-    kShed            = 0x4E,
-    kSideDoor        = 0x4F,
-    kSideYard        = 0x50,
-    kSittingRoom     = 0x51,
-    kSnug            = 0x52,
-    kSpa             = 0x53,
-    kStaircase       = 0x54,
-    kSteamRoom       = 0x55,
-    kStorageRoom     = 0x56,
-    kStudio          = 0x57,
-    kStudy           = 0x58,
-    kSunRoom         = 0x59,
-    kSwimmingPool    = 0x5A,
-    kTerrace         = 0x5B,
-    kUtilityRoom     = 0x5C,
-    kWard            = 0x5D,
-    kWorkshop        = 0x5E,
-    // All received enum values that are not listed above will be mapped
-    // to kUnknownEnumValue. This is a helper enum value that should only
-    // be used by code to process how it handles receiving and unknown
-    // enum value. This specific should never be transmitted.
-    kUnknownEnumValue = 95,
-};
+using AreaTypeTag = Clusters::detail::AreaTypeTag;
 
 // Enum for FloorSurfaceTag
 enum class FloorSurfaceTag : uint8_t
@@ -4052,7 +4061,6 @@ enum class Feature : uint32_t
     kMatterScheduleConfiguration = 0x80,
     kPresets                     = 0x100,
     kSetpoints                   = 0x200,
-    kQueuedPresetsSupported      = 0x400,
 };
 
 // Bitmap for HVACSystemTypeBitmap
@@ -5197,6 +5205,11 @@ enum class StatusEnum : uint8_t
     kUnknownEnumValue = 2,
 };
 } // namespace ContentAppObserver
+
+namespace EcosystemInformation {
+
+using AreaTypeTag = Clusters::detail::AreaTypeTag;
+} // namespace EcosystemInformation
 
 namespace CommissionerControl {
 
