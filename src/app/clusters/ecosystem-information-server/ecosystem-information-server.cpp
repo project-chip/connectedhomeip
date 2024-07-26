@@ -60,6 +60,9 @@ CHIP_ERROR AttrAccess::Read(const ConcreteReadAttributePath & aPath, AttributeVa
     return CHIP_NO_ERROR;
 }
 
+// WARNING: caller is expected to use the returned HomeLocationStruct::Type immediately. Caller must be
+// certain that the provided aLocationDescriptor has not been destroyed, prior to using the return
+// struct to encode.
 Structs::HomeLocationStruct::Type GetEncodableLocationDescriptorStruct(const LocationDescriptorStruct & aLocationDescriptor)
 {
     Structs::HomeLocationStruct::Type locationDescriptor;
@@ -174,9 +177,7 @@ CHIP_ERROR EcosystemDeviceStruct::Encode(const AttributeValueEncoder::ListEncode
 
     deviceStruct.uniqueLocationIDsLastEdit = mUniqueLocationIdsLastEditEpochUs;
 
-    // TODO(#33223) this is a hack, use mFabricIndex when it exists. Additionally checking fabric
-    // index matches should happen at the top of this method to prevent building the encodable
-    // device struct when we know it is not intended for the accessing fabric.
+    // TODO(#33223) this is a hack, use mFabricIndex when it exists.
     deviceStruct.SetFabricIndex(aFabricIndex);
     return aEncoder.Encode(deviceStruct);
 }
@@ -233,9 +234,7 @@ CHIP_ERROR EcosystemLocationStruct::Encode(const AttributeValueEncoder::ListEnco
     locationStruct.locationDescriptor         = GetEncodableLocationDescriptorStruct(mLocationDescriptor);
     locationStruct.locationDescriptorLastEdit = mLocationDescriptorLastEditEpochUs;
 
-    // TODO(#33223) this is a hack, use mFabricIndex when it exists. Additionally checking fabric
-    // index matches should happen at the top of this method to prevent building the encodable
-    // device struct when we know it is not intended for the accessing fabric.
+    // TODO(#33223) this is a hack, use mFabricIndex when it exists.
     locationStruct.SetFabricIndex(aFabricIndex);
     return aEncoder.Encode(locationStruct);
 }
