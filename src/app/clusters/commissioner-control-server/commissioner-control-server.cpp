@@ -244,7 +244,7 @@ bool emberAfCommissionerControlClusterCommissionNodeCallback(
 
     // Populate the parameters for the commissioning window
     err = delegate->GetCommissioningWindowParams(commissionNodeInfo->params);
-    SuccessOrExit(err == CHIP_NO_ERROR);    
+    SuccessOrExit(err == CHIP_NO_ERROR);
 
     // Add the response for the commissioning window.
     AddReverseOpenCommissioningWindowResponse(commandObj, commandPath, commissionNodeInfo->params);
