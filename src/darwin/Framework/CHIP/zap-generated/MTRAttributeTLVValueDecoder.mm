@@ -12470,17 +12470,6 @@ static id _Nullable DecodeAttributeValueForThermostatCluster(AttributeId aAttrib
         value = [NSNumber numberWithBool:cppValue];
         return value;
     }
-    case Attributes::TemperatureSetpointHoldPolicy::Id: {
-        using TypeInfo = Attributes::TemperatureSetpointHoldPolicy::TypeInfo;
-        TypeInfo::DecodableType cppValue;
-        *aError = DataModel::Decode(aReader, cppValue);
-        if (*aError != CHIP_NO_ERROR) {
-            return nil;
-        }
-        NSNumber * _Nonnull value;
-        value = [NSNumber numberWithUnsignedChar:cppValue.Raw()];
-        return value;
-    }
     case Attributes::SetpointHoldExpiryTimestamp::Id: {
         using TypeInfo = Attributes::SetpointHoldExpiryTimestamp::TypeInfo;
         TypeInfo::DecodableType cppValue;

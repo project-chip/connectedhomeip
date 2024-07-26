@@ -4162,17 +4162,6 @@ Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, bool value);
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, bool value, MarkAttributeDirty markDirty);
 } // namespace PresetsSchedulesEditable
 
-namespace TemperatureSetpointHoldPolicy {
-Protocols::InteractionModel::Status Get(chip::EndpointId endpoint,
-                                        chip::BitMask<chip::app::Clusters::Thermostat::TemperatureSetpointHoldPolicyBitmap> *
-                                            value); // TemperatureSetpointHoldPolicyBitmap
-Protocols::InteractionModel::Status Set(chip::EndpointId endpoint,
-                                        chip::BitMask<chip::app::Clusters::Thermostat::TemperatureSetpointHoldPolicyBitmap> value);
-Protocols::InteractionModel::Status Set(chip::EndpointId endpoint,
-                                        chip::BitMask<chip::app::Clusters::Thermostat::TemperatureSetpointHoldPolicyBitmap> value,
-                                        MarkAttributeDirty markDirty);
-} // namespace TemperatureSetpointHoldPolicy
-
 namespace SetpointHoldExpiryTimestamp {
 Protocols::InteractionModel::Status Get(chip::EndpointId endpoint, DataModel::Nullable<uint32_t> & value); // epoch_s
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint32_t value);

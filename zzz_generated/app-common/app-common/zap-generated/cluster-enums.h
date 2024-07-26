@@ -3929,18 +3929,19 @@ enum class ControlSequenceOfOperationEnum : uint8_t
 // Enum for PresetScenarioEnum
 enum class PresetScenarioEnum : uint8_t
 {
-    kUnspecified = 0x00,
-    kOccupied    = 0x01,
-    kUnoccupied  = 0x02,
-    kSleep       = 0x03,
-    kWake        = 0x04,
-    kVacation    = 0x05,
-    kUserDefined = 0x06,
+    kUnspecified  = 0x00,
+    kOccupied     = 0x01,
+    kUnoccupied   = 0x02,
+    kSleep        = 0x03,
+    kWake         = 0x04,
+    kVacation     = 0x05,
+    kGoingToSleep = 0x06,
+    kUserDefined  = 0x07,
     // All received enum values that are not listed above will be mapped
     // to kUnknownEnumValue. This is a helper enum value that should only
     // be used by code to process how it handles receiving and unknown
     // enum value. This specific should never be transmitted.
-    kUnknownEnumValue = 7,
+    kUnknownEnumValue = 8,
 };
 
 // Enum for SetpointChangeSourceEnum
@@ -4126,13 +4127,6 @@ enum class ScheduleTypeFeaturesBitmap : uint16_t
     kSupportsSetpoints = 0x2,
     kSupportsNames     = 0x4,
     kSupportsOff       = 0x8,
-};
-
-// Bitmap for TemperatureSetpointHoldPolicyBitmap
-enum class TemperatureSetpointHoldPolicyBitmap : uint8_t
-{
-    kHoldDurationElapsed                = 0x1,
-    kHoldDurationElapsedOrPresetChanged = 0x2,
 };
 } // namespace Thermostat
 

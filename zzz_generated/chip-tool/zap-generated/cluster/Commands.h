@@ -9395,7 +9395,6 @@ private:
 | * StartPresetsSchedulesEditRequest                                  |   0x07 |
 | * CancelPresetsSchedulesEditRequest                                 |   0x08 |
 | * CommitPresetsSchedulesRequest                                     |   0x09 |
-| * SetTemperatureSetpointHoldPolicy                                  |   0x0B |
 |------------------------------------------------------------------------------|
 | Attributes:                                                         |        |
 | * LocalTemperature                                                  | 0x0000 |
@@ -9458,8 +9457,7 @@ private:
 | * Presets                                                           | 0x0050 |
 | * Schedules                                                         | 0x0051 |
 | * PresetsSchedulesEditable                                          | 0x0052 |
-| * TemperatureSetpointHoldPolicy                                     | 0x0053 |
-| * SetpointHoldExpiryTimestamp                                       | 0x0054 |
+| * SetpointHoldExpiryTimestamp                                       | 0x0053 |
 | * GeneratedCommandList                                              | 0xFFF8 |
 | * AcceptedCommandList                                               | 0xFFF9 |
 | * EventList                                                         | 0xFFFA |
@@ -9815,44 +9813,6 @@ public:
 
 private:
     chip::app::Clusters::Thermostat::Commands::CommitPresetsSchedulesRequest::Type mRequest;
-};
-
-/*
- * Command SetTemperatureSetpointHoldPolicy
- */
-class ThermostatSetTemperatureSetpointHoldPolicy : public ClusterCommand
-{
-public:
-    ThermostatSetTemperatureSetpointHoldPolicy(CredentialIssuerCommands * credsIssuerConfig) :
-        ClusterCommand("set-temperature-setpoint-hold-policy", credsIssuerConfig)
-    {
-        AddArgument("TemperatureSetpointHoldPolicy", 0, UINT8_MAX, &mRequest.temperatureSetpointHoldPolicy);
-        ClusterCommand::AddArguments();
-    }
-
-    CHIP_ERROR SendCommand(chip::DeviceProxy * device, std::vector<chip::EndpointId> endpointIds) override
-    {
-        constexpr chip::ClusterId clusterId = chip::app::Clusters::Thermostat::Id;
-        constexpr chip::CommandId commandId = chip::app::Clusters::Thermostat::Commands::SetTemperatureSetpointHoldPolicy::Id;
-
-        ChipLogProgress(chipTool, "Sending cluster (0x%08" PRIX32 ") command (0x%08" PRIX32 ") on endpoint %u", clusterId,
-                        commandId, endpointIds.at(0));
-        return ClusterCommand::SendCommand(device, endpointIds.at(0), clusterId, commandId, mRequest);
-    }
-
-    CHIP_ERROR SendGroupCommand(chip::GroupId groupId, chip::FabricIndex fabricIndex) override
-    {
-        constexpr chip::ClusterId clusterId = chip::app::Clusters::Thermostat::Id;
-        constexpr chip::CommandId commandId = chip::app::Clusters::Thermostat::Commands::SetTemperatureSetpointHoldPolicy::Id;
-
-        ChipLogProgress(chipTool, "Sending cluster (0x%08" PRIX32 ") command (0x%08" PRIX32 ") on Group %u", clusterId, commandId,
-                        groupId);
-
-        return ClusterCommand::SendGroupCommand(groupId, fabricIndex, clusterId, commandId, mRequest);
-    }
-
-private:
-    chip::app::Clusters::Thermostat::Commands::SetTemperatureSetpointHoldPolicy::Type mRequest;
 };
 
 /*----------------------------------------------------------------------------*\
@@ -22929,7 +22889,6 @@ void registerClusterThermostat(Commands & commands, CredentialIssuerCommands * c
         make_unique<ThermostatStartPresetsSchedulesEditRequest>(credsIssuerConfig),  //
         make_unique<ThermostatCancelPresetsSchedulesEditRequest>(credsIssuerConfig), //
         make_unique<ThermostatCommitPresetsSchedulesRequest>(credsIssuerConfig),     //
-        make_unique<ThermostatSetTemperatureSetpointHoldPolicy>(credsIssuerConfig),  //
         //
         // Attributes
         //
@@ -23010,8 +22969,6 @@ void registerClusterThermostat(Commands & commands, CredentialIssuerCommands * c
         make_unique<ReadAttribute>(Id, "presets", Attributes::Presets::Id, credsIssuerConfig),                             //
         make_unique<ReadAttribute>(Id, "schedules", Attributes::Schedules::Id, credsIssuerConfig),                         //
         make_unique<ReadAttribute>(Id, "presets-schedules-editable", Attributes::PresetsSchedulesEditable::Id,
-                                   credsIssuerConfig), //
-        make_unique<ReadAttribute>(Id, "temperature-setpoint-hold-policy", Attributes::TemperatureSetpointHoldPolicy::Id,
                                    credsIssuerConfig), //
         make_unique<ReadAttribute>(Id, "setpoint-hold-expiry-timestamp", Attributes::SetpointHoldExpiryTimestamp::Id,
                                    credsIssuerConfig),                                                                     //
@@ -23181,9 +23138,6 @@ void registerClusterThermostat(Commands & commands, CredentialIssuerCommands * c
             Id, "schedules", Attributes::Schedules::Id, WriteCommandType::kWrite, credsIssuerConfig), //
         make_unique<WriteAttribute<bool>>(Id, "presets-schedules-editable", 0, 1, Attributes::PresetsSchedulesEditable::Id,
                                           WriteCommandType::kForceWrite, credsIssuerConfig), //
-        make_unique<WriteAttribute<chip::BitMask<chip::app::Clusters::Thermostat::TemperatureSetpointHoldPolicyBitmap>>>(
-            Id, "temperature-setpoint-hold-policy", 0, UINT8_MAX, Attributes::TemperatureSetpointHoldPolicy::Id,
-            WriteCommandType::kForceWrite, credsIssuerConfig), //
         make_unique<WriteAttribute<chip::app::DataModel::Nullable<uint32_t>>>(Id, "setpoint-hold-expiry-timestamp", 0, UINT32_MAX,
                                                                               Attributes::SetpointHoldExpiryTimestamp::Id,
                                                                               WriteCommandType::kForceWrite, credsIssuerConfig), //
@@ -23281,8 +23235,6 @@ void registerClusterThermostat(Commands & commands, CredentialIssuerCommands * c
         make_unique<SubscribeAttribute>(Id, "presets", Attributes::Presets::Id, credsIssuerConfig),                             //
         make_unique<SubscribeAttribute>(Id, "schedules", Attributes::Schedules::Id, credsIssuerConfig),                         //
         make_unique<SubscribeAttribute>(Id, "presets-schedules-editable", Attributes::PresetsSchedulesEditable::Id,
-                                        credsIssuerConfig), //
-        make_unique<SubscribeAttribute>(Id, "temperature-setpoint-hold-policy", Attributes::TemperatureSetpointHoldPolicy::Id,
                                         credsIssuerConfig), //
         make_unique<SubscribeAttribute>(Id, "setpoint-hold-expiry-timestamp", Attributes::SetpointHoldExpiryTimestamp::Id,
                                         credsIssuerConfig),                                                                     //

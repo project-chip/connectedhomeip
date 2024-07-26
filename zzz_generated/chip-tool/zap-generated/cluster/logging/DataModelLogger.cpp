@@ -14815,11 +14815,6 @@ CHIP_ERROR DataModelLogger::LogAttribute(const chip::app::ConcreteDataAttributeP
             ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
             return DataModelLogger::LogValue("PresetsSchedulesEditable", 1, value);
         }
-        case Thermostat::Attributes::TemperatureSetpointHoldPolicy::Id: {
-            chip::BitMask<chip::app::Clusters::Thermostat::TemperatureSetpointHoldPolicyBitmap> value;
-            ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
-            return DataModelLogger::LogValue("TemperatureSetpointHoldPolicy", 1, value);
-        }
         case Thermostat::Attributes::SetpointHoldExpiryTimestamp::Id: {
             chip::app::DataModel::Nullable<uint32_t> value;
             ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));

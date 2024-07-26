@@ -5186,12 +5186,8 @@ namespace PresetsSchedulesEditable {
 static constexpr AttributeId Id = 0x00000052;
 } // namespace PresetsSchedulesEditable
 
-namespace TemperatureSetpointHoldPolicy {
-static constexpr AttributeId Id = 0x00000053;
-} // namespace TemperatureSetpointHoldPolicy
-
 namespace SetpointHoldExpiryTimestamp {
-static constexpr AttributeId Id = 0x00000054;
+static constexpr AttributeId Id = 0x00000053;
 } // namespace SetpointHoldExpiryTimestamp
 
 namespace GeneratedCommandList {

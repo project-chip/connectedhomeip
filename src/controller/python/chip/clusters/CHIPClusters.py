@@ -8840,13 +8840,6 @@ class ChipClusters:
                 "args": {
                 },
             },
-            0x0000000B: {
-                "commandId": 0x0000000B,
-                "commandName": "SetTemperatureSetpointHoldPolicy",
-                "args": {
-                    "temperatureSetpointHoldPolicy": "int",
-                },
-            },
         },
         "attributes": {
             0x00000000: {
@@ -9239,14 +9232,8 @@ class ChipClusters:
                 "reportable": True,
             },
             0x00000053: {
-                "attributeName": "TemperatureSetpointHoldPolicy",
-                "attributeId": 0x00000053,
-                "type": "int",
-                "reportable": True,
-            },
-            0x00000054: {
                 "attributeName": "SetpointHoldExpiryTimestamp",
-                "attributeId": 0x00000054,
+                "attributeId": 0x00000053,
                 "type": "int",
                 "reportable": True,
             },
