@@ -46,6 +46,7 @@
         "microwave-oven-mode-cluster.xml",
         "door-lock-cluster.xml",
         "drlc-cluster.xml",
+        "ecosystem-information-cluster.xml",
         "electrical-energy-measurement-cluster.xml",
         "electrical-measurement-cluster.xml",
         "electrical-power-measurement-cluster.xml",
@@ -607,7 +608,6 @@
             "FeatureMap"
         ],
         "Air Quality": ["AirQuality", "FeatureMap"],
-        "Thermostat": ["QueuedPreset"],
         "Electrical Energy Measurement": [
             "Accuracy",
             "CumulativeEnergyImported",

@@ -496,6 +496,12 @@ NS_ASSUME_NONNULL_BEGIN
 
 @end
 
+@interface MTRBridgedDeviceBasicInformationClusterKeepActiveParams (InternalMethods)
+
+- (NSDictionary<NSString *, id> * _Nullable)_encodeAsDataValue:(NSError * __autoreleasing *)error;
+
+@end
+
 @interface MTRAdministratorCommissioningClusterOpenCommissioningWindowParams (InternalMethods)
 
 - (NSDictionary<NSString *, id> * _Nullable)_encodeAsDataValue:(NSError * __autoreleasing *)error;
@@ -1481,12 +1487,6 @@ NS_ASSUME_NONNULL_BEGIN
 @end
 
 @interface MTRThermostatClusterCommitPresetsSchedulesRequestParams (InternalMethods)
-
-- (NSDictionary<NSString *, id> * _Nullable)_encodeAsDataValue:(NSError * __autoreleasing *)error;
-
-@end
-
-@interface MTRThermostatClusterCancelSetActivePresetRequestParams (InternalMethods)
 
 - (NSDictionary<NSString *, id> * _Nullable)_encodeAsDataValue:(NSError * __autoreleasing *)error;
 

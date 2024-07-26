@@ -388,6 +388,9 @@ public class ClusterIDMapping {
         if (clusterId == ContentAppObserver.ID) {
             return new ContentAppObserver();
         }
+        if (clusterId == EcosystemInformation.ID) {
+            return new EcosystemInformation();
+        }
         if (clusterId == CommissionerControl.ID) {
             return new CommissionerControl();
         }
@@ -4455,7 +4458,8 @@ public class ClusterIDMapping {
             StartUp(0L),
             ShutDown(1L),
             Leave(2L),
-            ReachableChanged(3L),;
+            ReachableChanged(3L),
+            ActiveChanged(128L),;
             private final long id;
             Event(long id) {
                 this.id = id;
@@ -4475,7 +4479,8 @@ public class ClusterIDMapping {
             }
         }
 
-        public enum Command {;
+        public enum Command {
+            KeepActive(128L),;
             private final long id;
             Command(long id) {
                 this.id = id;
@@ -5802,6 +5807,7 @@ public class ClusterIDMapping {
             UserActiveModeTriggerHint(6L),
             UserActiveModeTriggerInstruction(7L),
             OperatingMode(8L),
+            MaximumCheckInBackOff(9L),
             GeneratedCommandList(65528L),
             AcceptedCommandList(65529L),
             EventList(65530L),
@@ -11893,7 +11899,6 @@ public class ClusterIDMapping {
             PresetsSchedulesEditable(82L),
             TemperatureSetpointHoldPolicy(83L),
             SetpointHoldExpiryTimestamp(84L),
-            QueuedPreset(85L),
             GeneratedCommandList(65528L),
             AcceptedCommandList(65529L),
             EventList(65530L),
@@ -11949,7 +11954,6 @@ public class ClusterIDMapping {
             StartPresetsSchedulesEditRequest(7L),
             CancelPresetsSchedulesEditRequest(8L),
             CommitPresetsSchedulesRequest(9L),
-            CancelSetActivePresetRequest(10L),
             SetTemperatureSetpointHoldPolicy(11L),;
             private final long id;
             Command(long id) {
@@ -12036,7 +12040,7 @@ public class ClusterIDMapping {
                         }
                         throw new NoSuchFieldError();
                     }
-                }public enum SetActivePresetRequestCommandField {PresetHandle(0),DelayMinutes(1),;
+                }public enum SetActivePresetRequestCommandField {PresetHandle(0),;
                     private final int id;
                     SetActivePresetRequestCommandField(int id) {
                         this.id = id;
@@ -17136,6 +17140,109 @@ public class ClusterIDMapping {
                         throw new NoSuchFieldError();
                     }
                 }@Override
+        public String getAttributeName(long id) throws NoSuchFieldError {
+            return Attribute.value(id).toString();
+        }
+
+        @Override
+        public String getEventName(long id) throws NoSuchFieldError {
+            return Event.value(id).toString();
+        }
+
+        @Override
+        public String getCommandName(long id) throws NoSuchFieldError {
+            return Command.value(id).toString();
+        }
+
+        @Override
+        public long getAttributeID(String name) throws IllegalArgumentException {
+            return Attribute.valueOf(name).getID();
+        }
+
+        @Override
+        public long getEventID(String name) throws IllegalArgumentException {
+            return Event.valueOf(name).getID();
+        }
+
+        @Override
+        public long getCommandID(String name) throws IllegalArgumentException {
+            return Command.valueOf(name).getID();
+        }
+    }
+    public static class EcosystemInformation implements BaseCluster {
+        public static final long ID = 1872L;
+        public long getID() {
+            return ID;
+        }
+
+        public enum Attribute {
+            RemovedOn(0L),
+            DeviceDirectory(1L),
+            LocationDirectory(2L),
+            GeneratedCommandList(65528L),
+            AcceptedCommandList(65529L),
+            EventList(65530L),
+            AttributeList(65531L),
+            FeatureMap(65532L),
+            ClusterRevision(65533L),;
+            private final long id;
+            Attribute(long id) {
+                this.id = id;
+            }
+
+            public long getID() {
+                return id;
+            }
+
+            public static Attribute value(long id) throws NoSuchFieldError {
+                for (Attribute attribute : Attribute.values()) {
+                    if (attribute.getID() == id) {
+                        return attribute;
+                    }
+                }
+                throw new NoSuchFieldError();
+            }
+        }
+
+        public enum Event {;
+            private final long id;
+            Event(long id) {
+                this.id = id;
+            }
+
+            public long getID() {
+                return id;
+            }
+
+            public static Event value(long id) throws NoSuchFieldError {
+                for (Event event : Event.values()) {
+                    if (event.getID() == id) {
+                        return event;
+                    }
+                }
+                throw new NoSuchFieldError();
+            }
+        }
+
+        public enum Command {;
+            private final long id;
+            Command(long id) {
+                this.id = id;
+            }
+
+            public long getID() {
+                return id;
+            }
+
+            public static Command value(long id) throws NoSuchFieldError {
+                for (Command command : Command.values()) {
+                    if (command.getID() == id) {
+                        return command;
+                    }
+                }
+                throw new NoSuchFieldError();
+            }
+        }@Override
         public String getAttributeName(long id) throws NoSuchFieldError {
             return Attribute.value(id).toString();
         }

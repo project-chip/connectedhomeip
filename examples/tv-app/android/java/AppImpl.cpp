@@ -26,7 +26,7 @@
 #include <app-common/zap-generated/ids/Attributes.h>
 #include <app-common/zap-generated/ids/Clusters.h>
 #include <app/CommandHandler.h>
-#include <app/InteractionModelEngine.h>
+#include <app/CommandHandlerInterfaceRegistry.h>
 #include <app/reporting/reporting.h>
 #include <app/server/Dnssd.h>
 #include <app/server/Server.h>
@@ -572,7 +572,7 @@ CHIP_ERROR InitVideoPlayerPlatform(jobject contentAppEndpointManager)
     {
         ContentAppCommandDelegate * delegate =
             new ContentAppCommandDelegate(contentAppEndpointManager, contentAppClusters[i].clusterId);
-        chip::app::InteractionModelEngine::GetInstance()->RegisterCommandHandler(delegate);
+        chip::app::CommandHandlerInterfaceRegistry::RegisterCommandHandler(delegate);
         ChipLogProgress(AppServer, "Registered command handler delegate for cluster %d", contentAppClusters[i].clusterId);
     }
 
