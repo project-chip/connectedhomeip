@@ -31,7 +31,10 @@ limitations under the License.
 
     <attribute side="server" code="0x0000" define="MASK" type="AlarmBitmap" default="0" writable="false" optional="false">Mask</attribute>
     <attribute side="server" code="0x0002" define="STATE" type="AlarmBitmap" default="0" writable="false" optional="false">State</attribute>
-    <attribute side="server" code="0x0003" define="SUPPORTED" type="AlarmBitmap" default="0" writable="false" optional="false">Supported</attribute>
+    <attribute side="server" code="0x0003" define="SUPPORTED" type="AlarmBitmap" default="0" writable="false" optional="false">
+        <description>Supported</description>
+        <quality persistence= "fixed" />
+    </attribute>
 
     <event side="server" code="0x00" priority="info" name="Notify" optional="false">
         <description>Notify</description>

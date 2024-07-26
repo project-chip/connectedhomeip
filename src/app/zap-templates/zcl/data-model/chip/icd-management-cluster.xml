@@ -112,10 +112,12 @@ limitations under the License.
         <attribute side="server" code="0x02" define="ACTIVE_MODE_THRESHOLD" type="int16u" default="300" writable="false" optional="false" isNullable="false">ActiveModeThreshold</attribute>
         <attribute side="server" code="0x03" define="REGISTERED_CLIENTS" type="array" entryType="MonitoringRegistrationStruct" writable="false" optional="true" isNullable="false">
             <description>RegisteredClients</description>
+        <quality persistence= "nonVolatile" />
             <access op="read" privilege="administer"/>
         </attribute>
         <attribute side="server" code="0x04" define="ICD_COUNTER" type="int32u" writable="false" default="0" optional="true" isNullable="false">
             <description>ICDCounter</description>
+        <quality changeOmitted= "true" persistence= "nonVolatile" />
             <access op="read" privilege="administer"/>
         </attribute>
         <attribute side="server" code="0x05" define="CLIENTS_SUPPORTED_PER_FABRIC" type="int16u" min="1" default="1" writable="false" optional="true" isNullable="false">ClientsSupportedPerFabric</attribute>

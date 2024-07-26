@@ -88,6 +88,7 @@ limitations under the License.
     <attribute side="server" code="0x4002" define="OFF_WAIT_TIME"        type="int16u"  default="0" writable="true" optional="true">OffWaitTime</attribute>
     <attribute side="server" code="0x4003" define="START_UP_ON_OFF"      type="StartUpOnOffEnum" min="0" max="2" isNullable="true" writable="true" optional="true">
       <description>StartUpOnOff</description>
+        <quality persistence= "nonVolatile" />
       <access op="read" privilege="view"/>
       <access op="write" privilege="manage"/>
     </attribute>

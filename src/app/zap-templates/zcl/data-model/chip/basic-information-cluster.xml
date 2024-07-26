@@ -81,11 +81,13 @@ limitations under the License.
     <attribute side="server" code="4"  define="PRODUCT_ID"                type="int16u"                                                                             >ProductID</attribute>
     <attribute side="server" code="5"  define="NODE_LABEL"                type="char_string"               length="32"  default=""   writable="true"                >
       <description>NodeLabel</description>
+        <quality persistence= "nonVolatile" />
       <access op="read" privilege="view"/>
       <access op="write" privilege="manage"/>
     </attribute>
     <attribute side="server" code="6"  define="LOCATION"                  type="char_string"               length="2"   default="XX" writable="true"                >
       <description>Location</description>
+        <quality persistence= "nonVolatile" />
       <access op="read" privilege="view"/>
       <access op="write" privilege="administer"/>
     </attribute>
@@ -100,6 +102,7 @@ limitations under the License.
     <attribute side="server" code="15" define="SERIAL_NUMBER"             type="char_string"               length="32"                               optional="true">SerialNumber</attribute>
     <attribute side="server" code="16" define="LOCAL_CONFIG_DISABLED"     type="boolean"                                default="0"  writable="true" optional="true">
       <description>LocalConfigDisabled</description>
+        <quality persistence= "nonVolatile" />
       <access op="read" privilege="view"/>
       <access op="write" privilege="manage"/>
     </attribute>

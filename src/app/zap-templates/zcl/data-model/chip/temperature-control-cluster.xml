@@ -41,9 +41,18 @@ limitations under the License.
     </features>
 
     <attribute side="server" code="0x0000" define="TEMP_SETPOINT" type="temperature" writable="false" optional="true">TemperatureSetpoint</attribute>
-    <attribute side="server" code="0x0001" define="MIN_TEMP" type="temperature" writable="false" optional="true">MinTemperature</attribute>
-    <attribute side="server" code="0x0002" define="MAX_TEMP" type="temperature" writable="false" optional="true">MaxTemperature</attribute>
-    <attribute side="server" code="0x0003" define="STEP" type="temperature" writable="false" optional="true">Step</attribute>
+    <attribute side="server" code="0x0001" define="MIN_TEMP" type="temperature" writable="false" optional="true">
+        <description>MinTemperature</description>
+        <quality persistence= "fixed" />
+    </attribute>
+    <attribute side="server" code="0x0002" define="MAX_TEMP" type="temperature" writable="false" optional="true">
+        <description>MaxTemperature</description>
+        <quality persistence= "fixed" />
+    </attribute>
+    <attribute side="server" code="0x0003" define="STEP" type="temperature" writable="false" optional="true">
+        <description>Step</description>
+        <quality persistence= "fixed" />
+    </attribute>
     <attribute side="server" code="0x0004" define="SELECTED_TEMP_LEVEL" type="int8u" writable="false" optional="true">SelectedTemperatureLevel</attribute>
     <attribute side="server" code="0x0005" define="SUPPORTED_TEMP_LEVELS" type="array" entryType="char_string" writable="false" optional="true">SupportedTemperatureLevels</attribute>
 

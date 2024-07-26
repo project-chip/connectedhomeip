@@ -46,14 +46,32 @@ limitations under the License.
     </features>
 
     <!-- Attributes -->
-    <attribute side="server" code="0x0000" define="EXPRESSED_STATE" type="ExpressedStateEnum" writable="false" optional="false">ExpressedState</attribute>
-    <attribute side="server" code="0x0001" define="SMOKE_STATE" type="AlarmStateEnum" writable="false" optional="true">SmokeState</attribute>
-    <attribute side="server" code="0x0002" define="CO_STATE" type="AlarmStateEnum" writable="false" optional="true">COState</attribute>
-    <attribute side="server" code="0x0003" define="BATTERY_ALERT" type="AlarmStateEnum" writable="false" optional="false">BatteryAlert</attribute>
-    <attribute side="server" code="0x0004" define="DEVICE_MUTED" type="MuteStateEnum" writable="false" optional="true">DeviceMuted</attribute>
+    <attribute side="server" code="0x0000" define="EXPRESSED_STATE" type="ExpressedStateEnum" writable="false" optional="false">
+        <description>ExpressedState</description>
+        <quality persistence= "nonVolatile" />
+    </attribute>
+    <attribute side="server" code="0x0001" define="SMOKE_STATE" type="AlarmStateEnum" writable="false" optional="true">
+        <description>SmokeState</description>
+        <quality persistence= "nonVolatile" />
+    </attribute>
+    <attribute side="server" code="0x0002" define="CO_STATE" type="AlarmStateEnum" writable="false" optional="true">
+        <description>COState</description>
+        <quality persistence= "nonVolatile" />
+    </attribute>
+    <attribute side="server" code="0x0003" define="BATTERY_ALERT" type="AlarmStateEnum" writable="false" optional="false">
+        <description>BatteryAlert</description>
+        <quality persistence= "nonVolatile" />
+    </attribute>
+    <attribute side="server" code="0x0004" define="DEVICE_MUTED" type="MuteStateEnum" writable="false" optional="true">
+        <description>DeviceMuted</description>
+        <quality persistence= "nonVolatile" />
+    </attribute>
     <attribute side="server" code="0x0005" define="TEST_IN_PROGRESS" type="boolean" writable="false" optional="false">TestInProgress</attribute>
     <attribute side="server" code="0x0006" define="HARDWARE_FAULTALERT" type="boolean" writable="false" optional="false">HardwareFaultAlert</attribute>
-    <attribute side="server" code="0x0007" define="END_OF_SERVICEALERT" type="EndOfServiceEnum" writable="false" optional="false">EndOfServiceAlert</attribute>
+    <attribute side="server" code="0x0007" define="END_OF_SERVICEALERT" type="EndOfServiceEnum" writable="false" optional="false">
+        <description>EndOfServiceAlert</description>
+        <quality persistence= "nonVolatile" />
+    </attribute>
     <attribute side="server" code="0x0008" define="INTERCONNECT_SMOKE_ALARM" type="AlarmStateEnum" writable="false" optional="true">InterconnectSmokeAlarm</attribute>
     <attribute side="server" code="0x0009" define="INTERCONNECT_CO_ALARM" type="AlarmStateEnum" writable="false" optional="true">InterconnectCOAlarm</attribute>
     <attribute side="server" code="0x000A" define="CONTAMINATION_STATE" type="ContaminationStateEnum" writable="false" optional="true">ContaminationState</attribute>
@@ -61,7 +79,10 @@ limitations under the License.
       <description>SmokeSensitivityLevel</description>
       <access op="write" role="manage"/>
     </attribute>
-    <attribute side="server" code="0x000C" define="EXPIRY_DATE" type="epoch_s" writable="false" optional="true">ExpiryDate</attribute>
+    <attribute side="server" code="0x000C" define="EXPIRY_DATE" type="epoch_s" writable="false" optional="true">
+        <description>ExpiryDate</description>
+        <quality persistence= "fixed" />
+    </attribute>
 
     <!-- Commands -->
     <command source="client" code="0x00" name="SelfTestRequest" optional="true">

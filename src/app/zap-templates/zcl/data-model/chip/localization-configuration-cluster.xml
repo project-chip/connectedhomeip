@@ -30,6 +30,7 @@ limitations under the License.
     <!-- Base data types -->
     <attribute side="server" code="0x00" define="ACTIVE_LOCALE" type="char_string" length="35" writable="true" optional="false">
       <description>ActiveLocale</description>
+        <quality persistence= "nonVolatile" />
       <access op="write" privilege="manage"/>
     </attribute>
     <attribute side="server" code="0x01" define="SUPPORTED_LOCALES" type="array" entryType="char_string" length="254" writable="false" optional="false">SupportedLocales</attribute>

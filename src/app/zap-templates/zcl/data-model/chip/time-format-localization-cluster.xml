@@ -60,10 +60,12 @@ limitations under the License.
     <!-- Base data types -->
     <attribute side="server" code="0x00" define="HOUR_FORMAT" type="HourFormatEnum" writable="true" optional="false">
         <description>HourFormat</description>
+        <quality persistence= "nonVolatile" />
         <access op="write" role="manage" />
     </attribute>
     <attribute side="server" code="0x01" define="ACTIVE_CALENDAR_TYPE" type="CalendarTypeEnum" writable="true" optional="true">
         <description>ActiveCalendarType</description>
+        <quality persistence= "nonVolatile" />
         <access op="write" role="manage" />
     </attribute>
     <attribute side="server" code="0x02" define="SUPPORTED_CALENDAR_TYPES" type="array" entryType="CalendarTypeEnum" writable="false" optional="true">SupportedCalendarTypes</attribute>  

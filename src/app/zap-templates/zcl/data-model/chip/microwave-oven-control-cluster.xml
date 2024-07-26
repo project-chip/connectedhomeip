@@ -42,14 +42,32 @@ limitations under the License.
     </features>
 
     <attribute side="server" code="0x0000" define="COOK_TIME"           type="elapsed_s" default="30"  writable="false" optional="false">CookTime</attribute>
-    <attribute side="server" code="0x0001" define="MAX_COOK_TIME"       type="elapsed_s"               writable="false" optional="false" min="1" max="86400">MaxCookTime</attribute>
+    <attribute side="server" code="0x0001" define="MAX_COOK_TIME"       type="elapsed_s"               writable="false" optional="false" min="1" max="86400">
+        <description>MaxCookTime</description>
+        <quality persistence= "fixed" />
+    </attribute>
     <attribute side="server" code="0x0002" define="POWER_SETTING"       type="int8u"     default="100" writable="false" optional="true">PowerSetting</attribute>
-    <attribute side="server" code="0x0003" define="MIN_POWER"           type="int8u"     default="10"  writable="false" optional="true">MinPower</attribute>
-    <attribute side="server" code="0x0004" define="MAX_POWER"           type="int8u"     default="100" writable="false" optional="true">MaxPower</attribute>
-    <attribute side="server" code="0x0005" define="POWER_STEP"          type="int8u"     default="10"  writable="false" optional="true">PowerStep</attribute>
-    <attribute apiMaturity="provisional" side="server" code="0x0006" define="SUPPORTED_WATTS"     type="array" entryType="int16u" writable="false" optional="true">SupportedWatts</attribute>
+    <attribute side="server" code="0x0003" define="MIN_POWER"           type="int8u"     default="10"  writable="false" optional="true">
+        <description>MinPower</description>
+        <quality persistence= "fixed" />
+    </attribute>
+    <attribute side="server" code="0x0004" define="MAX_POWER"           type="int8u"     default="100" writable="false" optional="true">
+        <description>MaxPower</description>
+        <quality persistence= "fixed" />
+    </attribute>
+    <attribute side="server" code="0x0005" define="POWER_STEP"          type="int8u"     default="10"  writable="false" optional="true">
+        <description>PowerStep</description>
+        <quality persistence= "fixed" />
+    </attribute>
+    <attribute apiMaturity="provisional" side="server" code="0x0006" define="SUPPORTED_WATTS"     type="array" entryType="int16u" writable="false" optional="true">
+        <description>SupportedWatts</description>
+        <quality persistence= "fixed" />
+    </attribute>
     <attribute apiMaturity="provisional" side="server" code="0x0007" define="SELECTED_WATT_INDEX" type="int8u"                   writable="false" optional="true">SelectedWattIndex</attribute>
-    <attribute side="server" code="0x0008" define="WATT_RATING"         type="int16u"                  writable="false" optional="true">WattRating</attribute>
+    <attribute side="server" code="0x0008" define="WATT_RATING"         type="int16u"                  writable="false" optional="true">
+        <description>WattRating</description>
+        <quality persistence= "fixed" />
+    </attribute>
 
     <command source="client" code="0x00" name="SetCookingParameters" optional="false">
         <description>Set Cooking Parameters</description>

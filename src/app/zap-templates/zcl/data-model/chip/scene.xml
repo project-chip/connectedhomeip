@@ -82,7 +82,10 @@ limitations under the License.
     </features>
    
     <attribute side="server" code="0x0000" define="LAST_CONFIGURED_BY" type="node_id" writable="false" isNullable="true" optional="true">LastConfiguredBy</attribute>
-    <attribute side="server" code="0x0001" define="SCENE_TABLE_SIZE" type="int16u" min="16" default="16" writable="false" optional="false">SceneTableSize</attribute>
+    <attribute side="server" code="0x0001" define="SCENE_TABLE_SIZE" type="int16u" min="16" default="16" writable="false" optional="false">
+        <description>SceneTableSize</description>
+        <quality persistence= "fixed" />
+    </attribute>
     <attribute side="server" code="0x0002" define="FABRIC_SCENE_INFO" type="array" entryType="SceneInfoStruct" writable="false" optional="false">FabricSceneInfo</attribute>
     <command source="client" code="0x00" name="AddScene" response="AddSceneResponse" isFabricScoped="true" optional="false" cli="chip scenes add">
       <description>
