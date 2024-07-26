@@ -408,7 +408,7 @@ uint8_t CountUpdatedPresetsAfterApplyingPendingPresets(Delegate * delegate)
         numberOfPendingPresets++;
     }
 
-    return numberOfPresets + numberOfPendingPresets - numberOfMatches;
+    return static_cast<uint8_t>(numberOfPresets + numberOfPendingPresets - numberOfMatches);
 }
 
 /**
