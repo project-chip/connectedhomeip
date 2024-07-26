@@ -306,7 +306,6 @@ class TC_SwitchTests(MatterBaseTest):
             self._await_sequence_of_events(event_queue=event_listener.event_queue, endpoint_id=endpoint_id,
                                            sequence=expected_events, timeout_sec=post_prompt_settle_delay_seconds)
 
-
     def _received_event(self, event_listener: EventChangeCallback, target_event: ClusterObjects.ClusterEvent, timeout_s: int) -> bool:
         """
             Returns true if this event was received, false otherwise
@@ -326,16 +325,19 @@ class TC_SwitchTests(MatterBaseTest):
 
     def pics_TC_SWTCH_2_3(self):
         return ['SWTCH.S.F01']
+
     def steps_TC_SWTCH_2_3(self):
         return [TestStep(1, test_plan_support.commission_if_required(), "", is_commissioning=True),
                 TestStep(2, "Set up subscription to all events of Switch cluster on the endpoint"),
                 TestStep(3, "Operator does not operate switch on the DUT"),
                 TestStep(4, "TH reads the CurrentPosition attribute from the DUT", "Verify that the value is 0"),
-                TestStep(5, "Operator operates switch (keep it pressed)", "Verify that the TH receives InitialPress event with NewPosition set to 1 on the DUT"),
+                TestStep(5, "Operator operates switch (keep it pressed)",
+                         "Verify that the TH receives InitialPress event with NewPosition set to 1 on the DUT"),
                 TestStep(6, "TH reads the CurrentPosition attribute from the DUT", "Verify that the value is 1"),
                 TestStep(7, "Operator releases switch on the DUT"),
                 TestStep("8a", "If the DUT implements the MSR feature, verify that the TH receives ShortRelease event with NewPosition set to 0 on the DUT", "Event received"),
-                TestStep("8b", "If the DUT implements the AS feature, verify that the TH does not receive ShortRelease event on the DUT", "No event received"),
+                TestStep(
+                    "8b", "If the DUT implements the AS feature, verify that the TH does not receive ShortRelease event on the DUT", "No event received"),
                 TestStep(9, "TH reads the CurrentPosition attribute from the DUT", "Verify that the value is 0"),
                 ]
 
@@ -377,10 +379,10 @@ class TC_SwitchTests(MatterBaseTest):
         self.step(7)
         self._ask_for_release()
 
-
         self.step("8a")
         if has_msr_feature:
-            asserts.assert_true(self._received_event(event_listener, cluster.Events.ShortRelease, 10), "Did not receive short release")
+            asserts.assert_true(self._received_event(event_listener, cluster.Events.ShortRelease, 10),
+                                "Did not receive short release")
         else:
             self.mark_current_step_skipped()
 
