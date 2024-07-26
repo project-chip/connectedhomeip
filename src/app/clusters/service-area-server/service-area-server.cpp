@@ -544,11 +544,7 @@ bool Instance::ReportEstimatedEndTimeChange(const DataModel::Nullable<uint32_t> 
     // - when it changes from null to any non-zero value
     if (mEstimatedEndTime.IsNull())
     {
-        if (aEstimatedEndTime.Value() != 0)
-        {
-            return true;
-        }
-        return false;
+        return (aEstimatedEndTime.Value() != 0);
     }
 
     if (aEstimatedEndTime.IsNull()) {
@@ -564,12 +560,7 @@ bool Instance::ReportEstimatedEndTimeChange(const DataModel::Nullable<uint32_t> 
     }
 
     // - when it decreases
-    if (aEstimatedEndTime.Value() < mEstimatedEndTime.Value())
-    {
-        return true;
-    }
-
-    return false;
+    return (aEstimatedEndTime.Value() < mEstimatedEndTime.Value());
 }
 
 bool Instance::AddSupportedLocation(uint32_t aLocationId, const DataModel::Nullable<uint8_t> & aMapId,
