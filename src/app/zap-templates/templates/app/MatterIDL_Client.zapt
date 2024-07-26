@@ -2,7 +2,6 @@
 // It is for view/code review purposes only.
 
 {{>idl_global_types}}
-
 {{#zcl_clusters~}}
 {{>idl_cluster_definition}}
 {{/zcl_clusters}}
