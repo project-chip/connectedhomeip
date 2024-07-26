@@ -1,6 +1,6 @@
 /*
  *
- *    Copyright (c) 2023-2024 Project CHIP Authors
+ *    Copyright (c) 2024 Project CHIP Authors
  *    All rights reserved.
  *
  *    Licensed under the Apache License, Version 2.0 (the "License");
@@ -16,32 +16,19 @@
  *    limitations under the License.
  */
 
-#include <DeviceEnergyManagementManager.h>
+#pragma once
 
-using namespace chip::app;
-using namespace chip::app::Clusters;
-using namespace chip::app::Clusters::DeviceEnergyManagement;
+#include <app-common/zap-generated/cluster-objects.h>
+#include <lib/support/BitMask.h>
 
 namespace chip {
 namespace app {
 namespace Clusters {
+namespace DeviceEnergyManagement {
 
-DeviceEnergyManagementManager::DeviceEnergyManagementManager(EndpointId aEndpointId, DeviceEnergyManagementDelegate & aDelegate,
-                                                             Feature aFeature) :
-    DeviceEnergyManagement::Instance(aEndpointId, aDelegate, aFeature),
-    mDelegate(&aDelegate)
-{}
+chip::BitMask<Feature> GetFeatureMapFromCmdLine();
 
-CHIP_ERROR DeviceEnergyManagementManager::Init()
-{
-    return Instance::Init();
-}
-
-void DeviceEnergyManagementManager::Shutdown()
-{
-    Instance::Shutdown();
-}
-
+} // namespace DeviceEnergyManagement
 } // namespace Clusters
 } // namespace app
 } // namespace chip
