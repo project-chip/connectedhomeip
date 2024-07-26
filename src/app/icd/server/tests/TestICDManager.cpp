@@ -199,13 +199,15 @@ public:
         mICDStateObserver.ResetAll();
         mICDManager.RegisterObserver(&mICDStateObserver);
 
+#if CHIP_CONFIG_ENABLE_ICD_CIP
         mICDManager.SetPersistentStorageDelegate(&testStorage)
             .SetFabricTable(&GetFabricTable())
             .SetSymmetricKeyStore(&mKeystore)
             .SetExchangeManager(&GetExchangeManager())
             .SetSubscriptionsInfoProvider(&mSubInfoProvider)
-            .SetICDCheckInBackOffStrategy(&mStrategy)
-            .Init();
+            .SetICDCheckInBackOffStrategy(&mStrategy);
+#endif // CHIP_CONFIG_ENABLE_ICD_CIP
+        mICDManager.Init();
     }
 
     // Performs teardown for each individual test in the test suite
@@ -577,13 +579,16 @@ TEST_F(TestICDManager, TestICDCounter)
 
     // Shut down and reinit ICDManager to increment counter
     mICDManager.Shutdown();
+#if CHIP_CONFIG_ENABLE_ICD_CIP
     mICDManager.SetPersistentStorageDelegate(&testStorage)
         .SetFabricTable(&GetFabricTable())
         .SetSymmetricKeyStore(&mKeystore)
         .SetExchangeManager(&GetExchangeManager())
         .SetSubscriptionsInfoProvider(&mSubInfoProvider)
-        .SetICDCheckInBackOffStrategy(&mStrategy)
-        .Init();
+        .SetICDCheckInBackOffStrategy(&mStrategy);
+#endif // CHIP_CONFIG_ENABLE_ICD_CIP
+    mICDManager.Init();
+
     mICDManager.RegisterObserver(&(mICDStateObserver));
 
     EXPECT_EQ(counter + ICDConfigurationData::kICDCounterPersistenceIncrement,
@@ -988,13 +993,15 @@ TEST_F(TestICDManager, TestICDStateObserverOnICDModeChangeOnInit)
     // Shut down and reinit ICDManager - We should go to LIT mode since we have a registration
     mICDManager.Shutdown();
     mICDManager.RegisterObserver(&(mICDStateObserver));
+#if CHIP_CONFIG_ENABLE_ICD_CIP
     mICDManager.SetPersistentStorageDelegate(&testStorage)
         .SetFabricTable(&GetFabricTable())
         .SetSymmetricKeyStore(&mKeystore)
         .SetExchangeManager(&GetExchangeManager())
         .SetSubscriptionsInfoProvider(&mSubInfoProvider)
-        .SetICDCheckInBackOffStrategy(&mStrategy)
-        .Init();
+        .SetICDCheckInBackOffStrategy(&mStrategy);
+#endif // CHIP_CONFIG_ENABLE_ICD_CIP
+    mICDManager.Init();
 
     // We have a registration, transition to LIT mode
     EXPECT_TRUE(mICDStateObserver.mOnICDModeChangeCalled);
