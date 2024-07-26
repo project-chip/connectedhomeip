@@ -1,5 +1,5 @@
 #
-#    Copyright (c) 2023 Project CHIP Authors
+#    Copyright (c) 2024 Project CHIP Authors
 #    All rights reserved.
 #
 #    Licensed under the Apache License, Version 2.0 (the "License");
@@ -30,14 +30,16 @@ import json
 import logging
 import queue
 import time
+from datetime import datetime, timedelta
 from typing import Any
 
 import chip.clusters as Clusters
 from chip.clusters import ClusterObjects as ClusterObjects
 from chip.clusters.Attribute import EventReadResult, TypedAttributePath
 from matter_testing_support import (AttributeValue, ClusterAttributeChangeAccumulator, EventChangeCallback, MatterBaseTest,
-                                    async_test_body, default_matter_test_main)
+                                    TestStep, async_test_body, default_matter_test_main)
 from mobly import asserts
+import test_plan_support
 
 logger = logging.getLogger(__name__)
 
@@ -92,6 +94,25 @@ class TC_SwitchTests(MatterBaseTest):
             command_dict = {"Name": "SimulateActionSwitchLongPress", "EndpointId": endpoint_id,
                             "ButtonId": pressed_position, "LongPressDelayMillis": 5000, "LongPressDurationMillis": 5500}
             self._send_named_pipe_command(command_dict)
+
+    def _ask_for_keep_pressed(self, endpoint_id: int, pressed_position: int):
+        if not self._use_button_simulator():
+            self.wait_for_user_input(
+                prompt_msg=f"Press switch position {pressed_position} for a long time (around 5 seconds) on the DUT, then release it.")
+        else:
+            # Using the long press here with a long duration so we can check the intermediate value.
+            command_dict = {"Name": "SimulateActionSwitchLongPress", "EndpointId": endpoint_id,
+                            "ButtonId": pressed_position, "LongPressDelayMillis": 0, "LongPressDurationMillis": self.keep_pressed_delay}
+            self._send_named_pipe_command(command_dict)
+
+    def _ask_for_release(self):
+        # Since we used a long press for this, "ask for release" on the button simulator just means waiting out the delay
+        if not self._use_button_simulator():
+            self.wait_for_user_input(
+                prompt_msg="Release the button."
+            )
+        else:
+            time.sleep(self.keep_pressed_delay/1000)
 
     def _placeholder_for_step(self, step_id: str):
         # TODO: Global search an replace of `self._placeholder_for_step` with `self.step` when done.
@@ -284,6 +305,94 @@ class TC_SwitchTests(MatterBaseTest):
             expected_events = [cluster.Events.ShortRelease(previousPosition=switch_pressed_position)]
             self._await_sequence_of_events(event_queue=event_listener.event_queue, endpoint_id=endpoint_id,
                                            sequence=expected_events, timeout_sec=post_prompt_settle_delay_seconds)
+
+
+    def _received_event(self, event_listener: EventChangeCallback, target_event: ClusterObjects.ClusterEvent, timeout_s: int) -> bool:
+        """
+            Returns true if this event was received, false otherwise
+        """
+        remaining = timedelta(seconds=timeout_s)
+        end_time = datetime.now() + remaining
+        while (remaining.seconds > 0):
+            try:
+                event = event_listener.event_queue.get(timeout=remaining.seconds)
+            except queue.Empty:
+                return False
+
+            if event.Header.EventId == target_event.event_id:
+                return True
+            remaining = end_time - datetime.now()
+        return False
+
+    def pics_TC_SWTCH_2_3(self):
+        return ['SWTCH.S.F01']
+    def steps_TC_SWTCH_2_3(self):
+        return [TestStep(1, test_plan_support.commission_if_required(), "", is_commissioning=True),
+                TestStep(2, "Set up subscription to all events of Switch cluster on the endpoint"),
+                TestStep(3, "Operator does not operate switch on the DUT"),
+                TestStep(4, "TH reads the CurrentPosition attribute from the DUT", "Verify that the value is 0"),
+                TestStep(5, "Operator operates switch (keep it pressed)", "Verify that the TH receives InitialPress event with NewPosition set to 1 on the DUT"),
+                TestStep(6, "TH reads the CurrentPosition attribute from the DUT", "Verify that the value is 1"),
+                TestStep(7, "Operator releases switch on the DUT"),
+                TestStep("8a", "If the DUT implements the MSR feature, verify that the TH receives ShortRelease event with NewPosition set to 0 on the DUT", "Event received"),
+                TestStep("8b", "If the DUT implements the AS feature, verify that the TH does not receive ShortRelease event on the DUT", "No event received"),
+                TestStep(9, "TH reads the CurrentPosition attribute from the DUT", "Verify that the value is 0"),
+                ]
+
+    @async_test_body
+    async def test_TC_SWTCH_2_3(self):
+        # Commissioning - already done
+        self.step(1)
+        cluster = Clusters.Switch
+        feature_map = await self.read_single_attribute_check_success(cluster, attribute=cluster.Attributes.FeatureMap)
+
+        has_msr_feature = (feature_map & cluster.Bitmaps.Feature.kMomentarySwitchRelease) != 0
+        has_as_feature = (feature_map & cluster.Bitmaps.Feature.kActionSwitch) != 0
+
+        endpoint_id = self.matter_test_config.endpoint
+
+        self.step(2)
+        event_listener = EventChangeCallback(cluster)
+        await event_listener.start(self.default_controller, self.dut_node_id, endpoint=endpoint_id)
+
+        self.step(3)
+        self._ask_for_switch_idle()
+
+        self.step(4)
+        button_val = await self.read_single_attribute_check_success(cluster=cluster, attribute=cluster.Attributes.CurrentPosition)
+        asserts.assert_equal(button_val, 0, "Button value is not 0")
+
+        self.step(5)
+        # We're using a long press here with a very long duration (in computer-land). This will let us check the intermediate values.
+        # This is 1s larger than the subscription ceiling
+        self.keep_pressed_delay = 6000
+        self.pressed_position = 1
+        self._ask_for_keep_pressed(endpoint_id, self.pressed_position)
+        event_listener.wait_for_event_report(cluster.Events.InitialPress)
+
+        self.step(6)
+        button_val = await self.read_single_attribute_check_success(cluster=cluster, attribute=cluster.Attributes.CurrentPosition)
+        asserts.assert_equal(button_val, self.pressed_position, f"Button value is not {self.pressed_position}")
+
+        self.step(7)
+        self._ask_for_release()
+
+
+        self.step("8a")
+        if has_msr_feature:
+            asserts.assert_true(self._received_event(event_listener, cluster.Events.ShortRelease, 10), "Did not receive short release")
+        else:
+            self.mark_current_step_skipped()
+
+        self.step("8b")
+        if has_as_feature:
+            asserts.assert_false(self._received_event(event_listener, cluster.Events.ShortRelease, 10), "Received short release")
+        else:
+            self.mark_current_step_skipped()
+
+        self.step(9)
+        button_val = await self.read_single_attribute_check_success(cluster=cluster, attribute=cluster.Attributes.CurrentPosition)
+        asserts.assert_equal(button_val, 0, "Button value is not 0")
 
 
 if __name__ == "__main__":
