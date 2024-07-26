@@ -564,7 +564,6 @@ class GlobalMapping:
         self.enum_map = {e.name: e for e in idl.global_enums}
         self.struct_map = {s.name: s for s in idl.global_structs}
 
-
         self.global_types = set(self.bitmap_map.keys()).union(set(self.enum_map.keys())).union(set(self.struct_map.keys()))
 
         # Spec does not enforce unique naming in bitmap/enum/struct, however in practice
