@@ -27,7 +27,7 @@ namespace {
 template <int ByteSize, bool IsSigned>
 using OddSizedInteger        = app::OddSizedInteger<ByteSize, IsSigned>;
 using ConcreteAttributePath  = app::ConcreteAttributePath;
-using AttributeValuePairType = app::Clusters::ScenesManagement::Structs::AttributeValuePair::Type;
+using AttributeValuePairType = app::Clusters::ScenesManagement::Structs::AttributeValuePairStruct::Type;
 
 /// ConvertDefaultValueToWorkingValue
 /// @brief Helper function to convert a byte array to a value of the given type.
