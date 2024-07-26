@@ -17,10 +17,12 @@
  */
 
 #pragma once
+
 #include <app/AttributeAccessToken.h>
 #include <app/AttributePathParams.h>
 #include <app/InteractionModelDelegatePointers.h>
 #include <app/MessageDef/WriteResponseMessage.h>
+#include <app/data-model-interface/DataModel.h>
 #include <lib/core/CHIPCore.h>
 #include <lib/core/TLVDebug.h>
 #include <lib/support/CodeUtils.h>
@@ -66,13 +68,16 @@ public:
      *  construction until a call to Close is made to terminate the
      *  instance.
      *
+     *  @param[in] apModel                 A Valid pointer to the model used to forward writes towards
      *  @param[in] apWriteHandlerDelegate  A Valid pointer to the WriteHandlerDelegate.
      *
+     *  @retval #CHIP_ERROR_INVALID_ARGUMENT on invalid pointers
      *  @retval #CHIP_ERROR_INCORRECT_STATE If the state is not equal to
      *          kState_NotInitialized.
      *  @retval #CHIP_NO_ERROR On success.
+     *
      */
-    CHIP_ERROR Init(WriteHandlerDelegate * apWriteHandlerDelegate);
+    CHIP_ERROR Init(InteractionModel::DataModel * apModel, WriteHandlerDelegate * apWriteHandlerDelegate);
 
     /**
      *  Process a write request.  Parts of the processing may end up being asynchronous, but the WriteHandler
@@ -172,11 +177,14 @@ private:
 
     CHIP_ERROR AddStatusInternal(const ConcreteDataAttributePath & aPath, const StatusIB & aStatus);
 
-private:
     // ExchangeDelegate
     CHIP_ERROR OnMessageReceived(Messaging::ExchangeContext * apExchangeContext, const PayloadHeader & aPayloadHeader,
                                  System::PacketBufferHandle && aPayload) override;
     void OnResponseTimeout(Messaging::ExchangeContext * apExchangeContext) override;
+
+    // Write the given data to the given path
+    CHIP_ERROR WriteClusterData(const Access::SubjectDescriptor & subject, const ConcreteDataAttributePath & path,
+                                TLV::TLVReader & data);
 
     Messaging::ExchangeHolder mExchangeCtx;
     WriteResponseMessage::Builder mWriteResponseBuilder;
@@ -197,6 +205,8 @@ private:
     //  Where (1)-(3) will be consistent among the whole list write request, while (4) and (5) are not appliable to group writes.
     bool mAttributeWriteSuccessful                = false;
     Optional<AttributeAccessToken> mACLCheckCache = NullOptional;
+
+    InteractionModel::DataModel * mDataModel = nullptr;
 
     // This may be a "fake" pointer or a real delegate pointer, depending
     // on CHIP_CONFIG_STATIC_GLOBAL_INTERACTION_MODEL_ENGINE setting.

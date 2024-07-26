@@ -70,9 +70,12 @@ public:
         chip::MutableByteSpan span(buf);
         ASSERT_EQ(GetBobFabric()->GetCompressedFabricIdBytes(span), CHIP_NO_ERROR);
         ASSERT_EQ(chip::GroupTesting::InitData(&gGroupsProvider, GetBobFabricIndex(), span), CHIP_NO_ERROR);
+
+        mOldModel = InteractionModelEngine::GetInstance()->SetDataModel(&TestImCustomDataModel::Instance());
     }
     void TearDown() override
     {
+        InteractionModelEngine::GetInstance()->SetDataModel(mOldModel);
         chip::Credentials::GroupDataProvider * provider = chip::Credentials::GetGroupDataProvider();
         if (provider != nullptr)
         {
@@ -93,6 +96,10 @@ public:
     static void AddAttributeStatus(WriteHandler & aWriteHandler);
     static void GenerateWriteRequest(bool aIsTimedWrite, System::PacketBufferHandle & aPayload);
     static void GenerateWriteResponse(System::PacketBufferHandle & aPayload);
+
+private:
+
+    chip::app::InteractionModel::DataModel * mOldModel = nullptr;
 };
 
 class TestExchangeDelegate : public Messaging::ExchangeDelegate
@@ -296,7 +303,8 @@ TEST_F(TestWriteInteraction, TestWriteHandler)
 
             System::PacketBufferHandle buf = System::PacketBufferHandle::New(System::PacketBuffer::kMaxSize);
 
-            writeHandler.Init(chip::app::InteractionModelEngine::GetInstance());
+            writeHandler.Init(chip::app::InteractionModelEngine::GetInstance()->GetDataModel(),
+                              chip::app::InteractionModelEngine::GetInstance());
 
             GenerateWriteRequest(messageIsTimed, buf);
 
