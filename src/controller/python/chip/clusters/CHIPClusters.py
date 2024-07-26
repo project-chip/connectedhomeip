@@ -9147,7 +9147,7 @@ class ChipClusters:
                 "reportable": True,
             },
             0x00000047: {
-                "attributeName": "ACCapacityFormat",
+                "attributeName": "ACCapacityformat",
                 "attributeId": 0x00000047,
                 "type": "int",
                 "reportable": True,

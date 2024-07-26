@@ -437,7 +437,7 @@ limitations under the License.
     </attribute>
     <attribute side="server" code="0x0046" define="AC_COIL_TEMPERATURE" type="temperature" optional="true" isNullable="true">ACCoilTemperature</attribute>
     <attribute side="server" code="0x0047" define="AC_CAPACITY_FORMAT" type="ACCapacityFormatEnum" min="0x00" max="0x00" writable="true" default="0" optional="true">
-      <description>ACCapacityFormat</description>
+      <description>ACCapacityformat</description>
       <access op="write" privilege="manage"/>
     </attribute>
     <attribute code="0x0048" side="server" type="array" entryType="PresetTypeStruct" define="PRESET_TYPES" optional="true">PresetTypes</attribute>

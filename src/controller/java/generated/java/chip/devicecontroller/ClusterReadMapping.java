@@ -12773,17 +12773,17 @@ public class ClusterReadMapping {
           readThermostatACCoilTemperatureCommandParams
         );
         result.put("readACCoilTemperatureAttribute", readThermostatACCoilTemperatureAttributeInteractionInfo);
-     Map<String, CommandParameterInfo> readThermostatACCapacityFormatCommandParams = new LinkedHashMap<String, CommandParameterInfo>();
-        InteractionInfo readThermostatACCapacityFormatAttributeInteractionInfo = new InteractionInfo(
+     Map<String, CommandParameterInfo> readThermostatACCapacityformatCommandParams = new LinkedHashMap<String, CommandParameterInfo>();
+        InteractionInfo readThermostatACCapacityformatAttributeInteractionInfo = new InteractionInfo(
           (cluster, callback, commandArguments) -> {
-            ((ChipClusters.ThermostatCluster) cluster).readACCapacityFormatAttribute(
+            ((ChipClusters.ThermostatCluster) cluster).readACCapacityformatAttribute(
               (ChipClusters.IntegerAttributeCallback) callback
             );
           },
           () -> new ClusterInfoMapping.DelegatedIntegerAttributeCallback(),
-          readThermostatACCapacityFormatCommandParams
+          readThermostatACCapacityformatCommandParams
         );
-        result.put("readACCapacityFormatAttribute", readThermostatACCapacityFormatAttributeInteractionInfo);
+        result.put("readACCapacityformatAttribute", readThermostatACCapacityformatAttributeInteractionInfo);
      Map<String, CommandParameterInfo> readThermostatPresetTypesCommandParams = new LinkedHashMap<String, CommandParameterInfo>();
         InteractionInfo readThermostatPresetTypesAttributeInteractionInfo = new InteractionInfo(
           (cluster, callback, commandArguments) -> {

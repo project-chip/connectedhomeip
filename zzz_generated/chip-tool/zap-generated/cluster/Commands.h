@@ -9443,7 +9443,7 @@ private:
 | * ACErrorCode                                                       | 0x0044 |
 | * ACLouverPosition                                                  | 0x0045 |
 | * ACCoilTemperature                                                 | 0x0046 |
-| * ACCapacityFormat                                                  | 0x0047 |
+| * ACCapacityformat                                                  | 0x0047 |
 | * PresetTypes                                                       | 0x0048 |
 | * ScheduleTypes                                                     | 0x0049 |
 | * NumberOfPresets                                                   | 0x004A |
@@ -22879,7 +22879,7 @@ void registerClusterThermostat(Commands & commands, CredentialIssuerCommands * c
         make_unique<ReadAttribute>(Id, "acerror-code", Attributes::ACErrorCode::Id, credsIssuerConfig),                    //
         make_unique<ReadAttribute>(Id, "aclouver-position", Attributes::ACLouverPosition::Id, credsIssuerConfig),          //
         make_unique<ReadAttribute>(Id, "accoil-temperature", Attributes::ACCoilTemperature::Id, credsIssuerConfig),        //
-        make_unique<ReadAttribute>(Id, "accapacity-format", Attributes::ACCapacityFormat::Id, credsIssuerConfig),          //
+        make_unique<ReadAttribute>(Id, "accapacityformat", Attributes::ACCapacityformat::Id, credsIssuerConfig),           //
         make_unique<ReadAttribute>(Id, "preset-types", Attributes::PresetTypes::Id, credsIssuerConfig),                    //
         make_unique<ReadAttribute>(Id, "schedule-types", Attributes::ScheduleTypes::Id, credsIssuerConfig),                //
         make_unique<ReadAttribute>(Id, "number-of-presets", Attributes::NumberOfPresets::Id, credsIssuerConfig),           //
@@ -23030,8 +23030,7 @@ void registerClusterThermostat(Commands & commands, CredentialIssuerCommands * c
                                                                              Attributes::ACCoilTemperature::Id,
                                                                              WriteCommandType::kForceWrite, credsIssuerConfig), //
         make_unique<WriteAttribute<chip::app::Clusters::Thermostat::ACCapacityFormatEnum>>(
-            Id, "accapacity-format", 0, UINT8_MAX, Attributes::ACCapacityFormat::Id, WriteCommandType::kWrite,
-            credsIssuerConfig), //
+            Id, "accapacityformat", 0, UINT8_MAX, Attributes::ACCapacityformat::Id, WriteCommandType::kWrite, credsIssuerConfig), //
         make_unique<WriteAttributeAsComplex<
             chip::app::DataModel::List<const chip::app::Clusters::Thermostat::Structs::PresetTypeStruct::Type>>>(
             Id, "preset-types", Attributes::PresetTypes::Id, WriteCommandType::kForceWrite, credsIssuerConfig), //
@@ -23142,7 +23141,7 @@ void registerClusterThermostat(Commands & commands, CredentialIssuerCommands * c
         make_unique<SubscribeAttribute>(Id, "acerror-code", Attributes::ACErrorCode::Id, credsIssuerConfig),                    //
         make_unique<SubscribeAttribute>(Id, "aclouver-position", Attributes::ACLouverPosition::Id, credsIssuerConfig),          //
         make_unique<SubscribeAttribute>(Id, "accoil-temperature", Attributes::ACCoilTemperature::Id, credsIssuerConfig),        //
-        make_unique<SubscribeAttribute>(Id, "accapacity-format", Attributes::ACCapacityFormat::Id, credsIssuerConfig),          //
+        make_unique<SubscribeAttribute>(Id, "accapacityformat", Attributes::ACCapacityformat::Id, credsIssuerConfig),           //
         make_unique<SubscribeAttribute>(Id, "preset-types", Attributes::PresetTypes::Id, credsIssuerConfig),                    //
         make_unique<SubscribeAttribute>(Id, "schedule-types", Attributes::ScheduleTypes::Id, credsIssuerConfig),                //
         make_unique<SubscribeAttribute>(Id, "number-of-presets", Attributes::NumberOfPresets::Id, credsIssuerConfig),           //

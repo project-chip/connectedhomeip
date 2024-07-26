@@ -3406,6 +3406,9 @@ typedef NS_ENUM(uint32_t, MTRAttributeIDType) {
     MTRClusterThermostatAttributeACCoilTemperatureID
         MTR_DEPRECATED("Please use MTRAttributeIDTypeClusterThermostatAttributeACCoilTemperatureID", ios(16.1, 16.4), macos(13.0, 13.3), watchos(9.1, 9.4), tvos(16.1, 16.4))
     = 0x00000046,
+    MTRClusterThermostatAttributeACCapacityformatID
+        MTR_DEPRECATED("Please use MTRAttributeIDTypeClusterThermostatAttributeACCapacityformatID", ios(16.1, 16.4), macos(13.0, 13.3), watchos(9.1, 9.4), tvos(16.1, 16.4))
+    = 0x00000047,
     MTRClusterThermostatAttributeGeneratedCommandListID
         MTR_DEPRECATED("Please use MTRAttributeIDTypeClusterThermostatAttributeGeneratedCommandListID", ios(16.1, 16.4), macos(13.0, 13.3), watchos(9.1, 9.4), tvos(16.1, 16.4))
     = MTRClusterGlobalAttributeGeneratedCommandListID,
@@ -3471,7 +3474,7 @@ typedef NS_ENUM(uint32_t, MTRAttributeIDType) {
     MTRAttributeIDTypeClusterThermostatAttributeACErrorCodeID MTR_AVAILABLE(ios(16.4), macos(13.3), watchos(9.4), tvos(16.4)) = 0x00000044,
     MTRAttributeIDTypeClusterThermostatAttributeACLouverPositionID MTR_AVAILABLE(ios(16.4), macos(13.3), watchos(9.4), tvos(16.4)) = 0x00000045,
     MTRAttributeIDTypeClusterThermostatAttributeACCoilTemperatureID MTR_AVAILABLE(ios(16.4), macos(13.3), watchos(9.4), tvos(16.4)) = 0x00000046,
-    MTRAttributeIDTypeClusterThermostatAttributeACCapacityFormatID MTR_PROVISIONALLY_AVAILABLE = 0x00000047,
+    MTRAttributeIDTypeClusterThermostatAttributeACCapacityformatID MTR_AVAILABLE(ios(16.4), macos(13.3), watchos(9.4), tvos(16.4)) = 0x00000047,
     MTRAttributeIDTypeClusterThermostatAttributePresetTypesID MTR_PROVISIONALLY_AVAILABLE = 0x00000048,
     MTRAttributeIDTypeClusterThermostatAttributeScheduleTypesID MTR_PROVISIONALLY_AVAILABLE = 0x00000049,
     MTRAttributeIDTypeClusterThermostatAttributeNumberOfPresetsID MTR_PROVISIONALLY_AVAILABLE = 0x0000004A,

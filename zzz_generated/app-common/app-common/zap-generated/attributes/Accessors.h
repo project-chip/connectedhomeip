@@ -4103,13 +4103,13 @@ Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, const chip::a
                                         MarkAttributeDirty markDirty);
 } // namespace ACCoilTemperature
 
-namespace ACCapacityFormat {
+namespace ACCapacityformat {
 Protocols::InteractionModel::Status Get(chip::EndpointId endpoint,
                                         chip::app::Clusters::Thermostat::ACCapacityFormatEnum * value); // ACCapacityFormatEnum
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, chip::app::Clusters::Thermostat::ACCapacityFormatEnum value);
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, chip::app::Clusters::Thermostat::ACCapacityFormatEnum value,
                                         MarkAttributeDirty markDirty);
-} // namespace ACCapacityFormat
+} // namespace ACCapacityformat
 
 namespace NumberOfPresets {
 Protocols::InteractionModel::Status Get(chip::EndpointId endpoint, uint8_t * value); // int8u

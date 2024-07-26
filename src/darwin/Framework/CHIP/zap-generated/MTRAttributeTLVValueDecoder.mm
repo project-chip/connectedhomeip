@@ -12157,8 +12157,8 @@ static id _Nullable DecodeAttributeValueForThermostatCluster(AttributeId aAttrib
         }
         return value;
     }
-    case Attributes::ACCapacityFormat::Id: {
-        using TypeInfo = Attributes::ACCapacityFormat::TypeInfo;
+    case Attributes::ACCapacityformat::Id: {
+        using TypeInfo = Attributes::ACCapacityformat::TypeInfo;
         TypeInfo::DecodableType cppValue;
         *aError = DataModel::Decode(aReader, cppValue);
         if (*aError != CHIP_NO_ERROR) {
