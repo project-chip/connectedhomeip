@@ -1382,6 +1382,23 @@ static id _Nullable DecodeEventPayloadForBridgedDeviceBasicInformationCluster(Ev
 
         return value;
     }
+    case Events::ActiveChanged::Id: {
+        Events::ActiveChanged::DecodableType cppValue;
+        *aError = DataModel::Decode(aReader, cppValue);
+        if (*aError != CHIP_NO_ERROR) {
+            return nil;
+        }
+
+        __auto_type * value = [MTRBridgedDeviceBasicInformationClusterActiveChangedEvent new];
+
+        do {
+            NSNumber * _Nonnull memberValue;
+            memberValue = [NSNumber numberWithUnsignedInt:cppValue.promisedActiveDuration];
+            value.promisedActiveDuration = memberValue;
+        } while (0);
+
+        return value;
+    }
     default: {
         break;
     }
@@ -3306,6 +3323,18 @@ static id _Nullable DecodeEventPayloadForEnergyEVSEModeCluster(EventId aEventId,
     *aError = CHIP_ERROR_IM_MALFORMED_EVENT_PATH_IB;
     return nil;
 }
+static id _Nullable DecodeEventPayloadForWaterHeaterModeCluster(EventId aEventId, TLV::TLVReader & aReader, CHIP_ERROR * aError)
+{
+    using namespace Clusters::WaterHeaterMode;
+    switch (aEventId) {
+    default: {
+        break;
+    }
+    }
+
+    *aError = CHIP_ERROR_IM_MALFORMED_EVENT_PATH_IB;
+    return nil;
+}
 static id _Nullable DecodeEventPayloadForDeviceEnergyManagementModeCluster(EventId aEventId, TLV::TLVReader & aReader, CHIP_ERROR * aError)
 {
     using namespace Clusters::DeviceEnergyManagementMode;
@@ -4105,23 +4134,6 @@ static id _Nullable DecodeEventPayloadForThreadNetworkDirectoryCluster(EventId a
 {
     using namespace Clusters::ThreadNetworkDirectory;
     switch (aEventId) {
-    case Events::NetworkChanged::Id: {
-        Events::NetworkChanged::DecodableType cppValue;
-        *aError = DataModel::Decode(aReader, cppValue);
-        if (*aError != CHIP_NO_ERROR) {
-            return nil;
-        }
-
-        __auto_type * value = [MTRThreadNetworkDirectoryClusterNetworkChangedEvent new];
-
-        do {
-            NSNumber * _Nonnull memberValue;
-            memberValue = [NSNumber numberWithUnsignedLongLong:cppValue.extendedPanID];
-            value.extendedPanID = memberValue;
-        } while (0);
-
-        return value;
-    }
     default: {
         break;
     }
@@ -4437,6 +4449,18 @@ static id _Nullable DecodeEventPayloadForContentControlCluster(EventId aEventId,
 static id _Nullable DecodeEventPayloadForContentAppObserverCluster(EventId aEventId, TLV::TLVReader & aReader, CHIP_ERROR * aError)
 {
     using namespace Clusters::ContentAppObserver;
+    switch (aEventId) {
+    default: {
+        break;
+    }
+    }
+
+    *aError = CHIP_ERROR_IM_MALFORMED_EVENT_PATH_IB;
+    return nil;
+}
+static id _Nullable DecodeEventPayloadForEcosystemInformationCluster(EventId aEventId, TLV::TLVReader & aReader, CHIP_ERROR * aError)
+{
+    using namespace Clusters::EcosystemInformation;
     switch (aEventId) {
     default: {
         break;
@@ -4900,6 +4924,9 @@ id _Nullable MTRDecodeEventPayload(const ConcreteEventPath & aPath, TLV::TLVRead
     case Clusters::EnergyEvseMode::Id: {
         return DecodeEventPayloadForEnergyEVSEModeCluster(aPath.mEventId, aReader, aError);
     }
+    case Clusters::WaterHeaterMode::Id: {
+        return DecodeEventPayloadForWaterHeaterModeCluster(aPath.mEventId, aReader, aError);
+    }
     case Clusters::DeviceEnergyManagementMode::Id: {
         return DecodeEventPayloadForDeviceEnergyManagementModeCluster(aPath.mEventId, aReader, aError);
     }
@@ -5031,6 +5058,9 @@ id _Nullable MTRDecodeEventPayload(const ConcreteEventPath & aPath, TLV::TLVRead
     }
     case Clusters::ContentAppObserver::Id: {
         return DecodeEventPayloadForContentAppObserverCluster(aPath.mEventId, aReader, aError);
+    }
+    case Clusters::EcosystemInformation::Id: {
+        return DecodeEventPayloadForEcosystemInformationCluster(aPath.mEventId, aReader, aError);
     }
     case Clusters::CommissionerControl::Id: {
         return DecodeEventPayloadForCommissionerControlCluster(aPath.mEventId, aReader, aError);

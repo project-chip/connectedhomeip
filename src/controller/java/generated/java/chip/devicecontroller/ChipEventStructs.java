@@ -1899,6 +1899,52 @@ public static class BridgedDeviceBasicInformationClusterReachableChangedEvent {
     return output.toString();
   }
 }
+public static class BridgedDeviceBasicInformationClusterActiveChangedEvent {
+  public Long promisedActiveDuration;
+  private static final long PROMISED_ACTIVE_DURATION_ID = 0L;
+
+  public BridgedDeviceBasicInformationClusterActiveChangedEvent(
+    Long promisedActiveDuration
+  ) {
+    this.promisedActiveDuration = promisedActiveDuration;
+  }
+
+  public StructType encodeTlv() {
+    ArrayList<StructElement> values = new ArrayList<>();
+    values.add(new StructElement(PROMISED_ACTIVE_DURATION_ID, new UIntType(promisedActiveDuration)));
+
+    return new StructType(values);
+  }
+
+  public static BridgedDeviceBasicInformationClusterActiveChangedEvent decodeTlv(BaseTLVType tlvValue) {
+    if (tlvValue == null || tlvValue.type() != TLVType.Struct) {
+      return null;
+    }
+    Long promisedActiveDuration = null;
+    for (StructElement element: ((StructType)tlvValue).value()) {
+      if (element.contextTagNum() == PROMISED_ACTIVE_DURATION_ID) {
+        if (element.value(BaseTLVType.class).type() == TLVType.UInt) {
+          UIntType castingValue = element.value(UIntType.class);
+          promisedActiveDuration = castingValue.value(Long.class);
+        }
+      }
+    }
+    return new BridgedDeviceBasicInformationClusterActiveChangedEvent(
+      promisedActiveDuration
+    );
+  }
+
+  @Override
+  public String toString() {
+    StringBuilder output = new StringBuilder();
+    output.append("BridgedDeviceBasicInformationClusterActiveChangedEvent {\n");
+    output.append("\tpromisedActiveDuration: ");
+    output.append(promisedActiveDuration);
+    output.append("\n");
+    output.append("}\n");
+    return output.toString();
+  }
+}
 public static class SwitchClusterSwitchLatchedEvent {
   public Integer newPosition;
   private static final long NEW_POSITION_ID = 0L;
@@ -5610,52 +5656,6 @@ public static class PumpConfigurationAndControlClusterTurbineOperationEvent {
   public String toString() {
     StringBuilder output = new StringBuilder();
     output.append("PumpConfigurationAndControlClusterTurbineOperationEvent {\n");
-    output.append("}\n");
-    return output.toString();
-  }
-}
-public static class ThreadNetworkDirectoryClusterNetworkChangedEvent {
-  public Long extendedPanID;
-  private static final long EXTENDED_PAN_I_D_ID = 0L;
-
-  public ThreadNetworkDirectoryClusterNetworkChangedEvent(
-    Long extendedPanID
-  ) {
-    this.extendedPanID = extendedPanID;
-  }
-
-  public StructType encodeTlv() {
-    ArrayList<StructElement> values = new ArrayList<>();
-    values.add(new StructElement(EXTENDED_PAN_I_D_ID, new UIntType(extendedPanID)));
-
-    return new StructType(values);
-  }
-
-  public static ThreadNetworkDirectoryClusterNetworkChangedEvent decodeTlv(BaseTLVType tlvValue) {
-    if (tlvValue == null || tlvValue.type() != TLVType.Struct) {
-      return null;
-    }
-    Long extendedPanID = null;
-    for (StructElement element: ((StructType)tlvValue).value()) {
-      if (element.contextTagNum() == EXTENDED_PAN_I_D_ID) {
-        if (element.value(BaseTLVType.class).type() == TLVType.UInt) {
-          UIntType castingValue = element.value(UIntType.class);
-          extendedPanID = castingValue.value(Long.class);
-        }
-      }
-    }
-    return new ThreadNetworkDirectoryClusterNetworkChangedEvent(
-      extendedPanID
-    );
-  }
-
-  @Override
-  public String toString() {
-    StringBuilder output = new StringBuilder();
-    output.append("ThreadNetworkDirectoryClusterNetworkChangedEvent {\n");
-    output.append("\textendedPanID: ");
-    output.append(extendedPanID);
-    output.append("\n");
     output.append("}\n");
     return output.toString();
   }

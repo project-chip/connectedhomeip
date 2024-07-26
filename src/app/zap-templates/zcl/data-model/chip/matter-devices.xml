@@ -2426,6 +2426,7 @@ limitations under the License.
         <scope>Endpoint</scope>
         <clusters lockOthers="true">
             <include cluster="Descriptor" client="false" server="true" clientLocked="true" serverLocked="true"/>
+            <include cluster="Thread Network Directory" client="false" server="true" clientLocked="true" serverLocked="true"/>
             <include cluster="Wi-Fi Network Management" client="false" server="true" clientLocked="true" serverLocked="true"/>
         </clusters>
     </deviceType>

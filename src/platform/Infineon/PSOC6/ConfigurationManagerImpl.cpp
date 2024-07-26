@@ -28,7 +28,7 @@
 #include <platform/internal/GenericConfigurationManagerImpl.ipp>
 
 #include <platform/ConfigurationManager.h>
-#include <platform/Infineon/PSOC6/P6Config.h>
+#include <platform/Infineon/PSOC6/PSOC6Config.h>
 #include <platform/KeyValueStoreManager.h>
 
 namespace chip {
@@ -48,13 +48,13 @@ CHIP_ERROR ConfigurationManagerImpl::Init()
     uint32_t rebootCount;
 
     // Save out software version on first boot
-    if (!P6Config::ConfigValueExists(P6Config::kConfigKey_SoftwareVersion))
+    if (!PSOC6Config::ConfigValueExists(PSOC6Config::kConfigKey_SoftwareVersion))
     {
         err = StoreSoftwareVersion(CHIP_DEVICE_CONFIG_DEVICE_SOFTWARE_VERSION);
         SuccessOrExit(err);
     }
 
-    if (P6Config::ConfigValueExists(P6Config::kCounterKey_RebootCount))
+    if (PSOC6Config::ConfigValueExists(PSOC6Config::kCounterKey_RebootCount))
     {
         err = GetRebootCount(rebootCount);
         SuccessOrExit(err);
@@ -69,14 +69,14 @@ CHIP_ERROR ConfigurationManagerImpl::Init()
         SuccessOrExit(err);
     }
 
-    if (!P6Config::ConfigValueExists(P6Config::kCounterKey_TotalOperationalHours))
+    if (!PSOC6Config::ConfigValueExists(PSOC6Config::kCounterKey_TotalOperationalHours))
     {
         err = StoreTotalOperationalHours(0);
         SuccessOrExit(err);
     }
 
     // Initialize the generic implementation base class.
-    err = Internal::GenericConfigurationManagerImpl<P6Config>::Init();
+    err = Internal::GenericConfigurationManagerImpl<PSOC6Config>::Init();
     VerifyOrReturnError(CHIP_NO_ERROR == err, err);
 
 exit:
@@ -85,32 +85,32 @@ exit:
 
 CHIP_ERROR ConfigurationManagerImpl::GetRebootCount(uint32_t & rebootCount)
 {
-    return ReadConfigValue(P6Config::kCounterKey_RebootCount, rebootCount);
+    return ReadConfigValue(PSOC6Config::kCounterKey_RebootCount, rebootCount);
 }
 
 CHIP_ERROR ConfigurationManagerImpl::StoreRebootCount(uint32_t rebootCount)
 {
-    return WriteConfigValue(P6Config::kCounterKey_RebootCount, rebootCount);
+    return WriteConfigValue(PSOC6Config::kCounterKey_RebootCount, rebootCount);
 }
 
 CHIP_ERROR ConfigurationManagerImpl::GetSoftwareVersion(uint32_t & softwareVer)
 {
-    return ReadConfigValue(P6Config::kConfigKey_SoftwareVersion, softwareVer);
+    return ReadConfigValue(PSOC6Config::kConfigKey_SoftwareVersion, softwareVer);
 }
 
 CHIP_ERROR ConfigurationManagerImpl::StoreSoftwareVersion(uint32_t softwareVer)
 {
-    return WriteConfigValue(P6Config::kConfigKey_SoftwareVersion, softwareVer);
+    return WriteConfigValue(PSOC6Config::kConfigKey_SoftwareVersion, softwareVer);
 }
 
 CHIP_ERROR ConfigurationManagerImpl::GetTotalOperationalHours(uint32_t & totalOperationalHours)
 {
-    return ReadConfigValue(P6Config::kCounterKey_TotalOperationalHours, totalOperationalHours);
+    return ReadConfigValue(PSOC6Config::kCounterKey_TotalOperationalHours, totalOperationalHours);
 }
 
 CHIP_ERROR ConfigurationManagerImpl::StoreTotalOperationalHours(uint32_t totalOperationalHours)
 {
-    return WriteConfigValue(P6Config::kCounterKey_TotalOperationalHours, totalOperationalHours);
+    return WriteConfigValue(PSOC6Config::kCounterKey_TotalOperationalHours, totalOperationalHours);
 }
 
 CHIP_ERROR ConfigurationManagerImpl::GetPrimaryWiFiMACAddress(uint8_t * buf)
@@ -163,62 +163,62 @@ CHIP_ERROR ConfigurationManagerImpl::WritePersistedStorageValue(::chip::Platform
 
 CHIP_ERROR ConfigurationManagerImpl::ReadConfigValue(Key key, bool & val)
 {
-    return P6Config::ReadConfigValue(key, val);
+    return PSOC6Config::ReadConfigValue(key, val);
 }
 
 CHIP_ERROR ConfigurationManagerImpl::ReadConfigValue(Key key, uint32_t & val)
 {
-    return P6Config::ReadConfigValue(key, val);
+    return PSOC6Config::ReadConfigValue(key, val);
 }
 
 CHIP_ERROR ConfigurationManagerImpl::ReadConfigValue(Key key, uint64_t & val)
 {
-    return P6Config::ReadConfigValue(key, val);
+    return PSOC6Config::ReadConfigValue(key, val);
 }
 
 CHIP_ERROR ConfigurationManagerImpl::ReadConfigValueStr(Key key, char * buf, size_t bufSize, size_t & outLen)
 {
-    return P6Config::ReadConfigValueStr(key, buf, bufSize, outLen);
+    return PSOC6Config::ReadConfigValueStr(key, buf, bufSize, outLen);
 }
 
 CHIP_ERROR ConfigurationManagerImpl::ReadConfigValueBin(Key key, uint8_t * buf, size_t bufSize, size_t & outLen)
 {
-    return P6Config::ReadConfigValueBin(key, buf, bufSize, outLen);
+    return PSOC6Config::ReadConfigValueBin(key, buf, bufSize, outLen);
 }
 
 CHIP_ERROR ConfigurationManagerImpl::WriteConfigValue(Key key, bool val)
 {
-    return P6Config::WriteConfigValue(key, val);
+    return PSOC6Config::WriteConfigValue(key, val);
 }
 
 CHIP_ERROR ConfigurationManagerImpl::WriteConfigValue(Key key, uint32_t val)
 {
-    return P6Config::WriteConfigValue(key, val);
+    return PSOC6Config::WriteConfigValue(key, val);
 }
 
 CHIP_ERROR ConfigurationManagerImpl::WriteConfigValue(Key key, uint64_t val)
 {
-    return P6Config::WriteConfigValue(key, val);
+    return PSOC6Config::WriteConfigValue(key, val);
 }
 
 CHIP_ERROR ConfigurationManagerImpl::WriteConfigValueStr(Key key, const char * str)
 {
-    return P6Config::WriteConfigValueStr(key, str);
+    return PSOC6Config::WriteConfigValueStr(key, str);
 }
 
 CHIP_ERROR ConfigurationManagerImpl::WriteConfigValueStr(Key key, const char * str, size_t strLen)
 {
-    return P6Config::WriteConfigValueStr(key, str, strLen);
+    return PSOC6Config::WriteConfigValueStr(key, str, strLen);
 }
 
 CHIP_ERROR ConfigurationManagerImpl::WriteConfigValueBin(Key key, const uint8_t * data, size_t dataLen)
 {
-    return P6Config::WriteConfigValueBin(key, data, dataLen);
+    return PSOC6Config::WriteConfigValueBin(key, data, dataLen);
 }
 
 void ConfigurationManagerImpl::RunConfigUnitTest(void)
 {
-    P6Config::RunConfigUnitTest();
+    PSOC6Config::RunConfigUnitTest();
 }
 
 void ConfigurationManagerImpl::DoFactoryReset(intptr_t arg)
@@ -227,7 +227,7 @@ void ConfigurationManagerImpl::DoFactoryReset(intptr_t arg)
 
     ChipLogProgress(DeviceLayer, "Performing factory reset");
 
-    err = P6Config::FactoryResetConfig();
+    err = PSOC6Config::FactoryResetConfig();
     if (err != CHIP_NO_ERROR)
     {
         ChipLogError(DeviceLayer, "FactoryResetConfig() failed: %s", ErrorStr(err));

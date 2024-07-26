@@ -14,8 +14,7 @@
  *    See the License for the specific language governing permissions and
  *    limitations under the License.
  */
-#import <Matter/MTRClusterConstants.h>
-#import <Matter/MTRDefines.h>
+#import <Matter/Matter.h>
 
 #import "MTRAttributeTLVValueDecoder_Internal.h"
 #import "MTRBaseDevice_Internal.h"
@@ -31,31 +30,32 @@
 #import "MTRLogging_Internal.h"
 #import "MTRMetricKeys.h"
 #import "MTRSetupPayload_Internal.h"
+#import "MTRUtilities.h"
 #import "NSDataSpanConversion.h"
 #import "NSStringSpanConversion.h"
 #import "zap-generated/MTRCommandPayloads_Internal.h"
 
-#include "app/ConcreteAttributePath.h"
-#include "app/ConcreteCommandPath.h"
-#include "app/ConcreteEventPath.h"
-#include "app/StatusResponse.h"
-#include "lib/core/CHIPError.h"
-#include "lib/core/DataModelTypes.h"
+#import "app/ConcreteAttributePath.h"
+#import "app/ConcreteCommandPath.h"
+#import "app/ConcreteEventPath.h"
+#import "app/StatusResponse.h"
+#import "lib/core/CHIPError.h"
+#import "lib/core/DataModelTypes.h"
 
-#include <app/AttributePathParams.h>
-#include <app/BufferedReadCallback.h>
-#include <app/ClusterStateCache.h>
-#include <app/InteractionModelEngine.h>
-#include <app/ReadClient.h>
-#include <app/data-model/List.h>
-#include <controller/CommissioningWindowOpener.h>
-#include <controller/ReadInteraction.h>
-#include <controller/WriteInteraction.h>
-#include <crypto/CHIPCryptoPAL.h>
-#include <setup_payload/SetupPayload.h>
-#include <system/SystemClock.h>
+#import <app/AttributePathParams.h>
+#import <app/BufferedReadCallback.h>
+#import <app/ClusterStateCache.h>
+#import <app/InteractionModelEngine.h>
+#import <app/ReadClient.h>
+#import <app/data-model/List.h>
+#import <controller/CommissioningWindowOpener.h>
+#import <controller/ReadInteraction.h>
+#import <controller/WriteInteraction.h>
+#import <crypto/CHIPCryptoPAL.h>
+#import <setup_payload/SetupPayload.h>
+#import <system/SystemClock.h>
 
-#include <memory>
+#import <memory>
 
 using namespace chip;
 using namespace chip::app;
@@ -2290,12 +2290,9 @@ MTREventPriority MTREventPriorityForValidPriorityLevel(chip::app::PriorityLevel 
 
 - (BOOL)isEqualToAttributeRequestPath:(MTRAttributeRequestPath *)path
 {
-    if (!path)
-        return NO;
-
-    return (path.endpoint && [_endpoint isEqualToNumber:path.endpoint])
-        && (path.cluster && [_cluster isEqualToNumber:path.cluster])
-        && (path.attribute && [_attribute isEqualToNumber:path.attribute]);
+    return MTREqualObjects(_endpoint, path.endpoint)
+        && MTREqualObjects(_cluster, path.cluster)
+        && MTREqualObjects(_attribute, path.attribute);
 }
 
 - (BOOL)isEqual:(id)object
@@ -2366,12 +2363,9 @@ MTREventPriority MTREventPriorityForValidPriorityLevel(chip::app::PriorityLevel 
 
 - (BOOL)isEqualToEventRequestPath:(MTREventRequestPath *)path
 {
-    if (!path)
-        return NO;
-
-    return (path.endpoint && [_endpoint isEqualToNumber:path.endpoint])
-        && (path.cluster && [_cluster isEqualToNumber:path.cluster])
-        && (path.event && [_event isEqualToNumber:path.event]);
+    return MTREqualObjects(_endpoint, path.endpoint)
+        && MTREqualObjects(_cluster, path.cluster)
+        && MTREqualObjects(_event, path.event);
 }
 
 - (BOOL)isEqual:(id)object
@@ -2440,11 +2434,8 @@ MTREventPriority MTREventPriorityForValidPriorityLevel(chip::app::PriorityLevel 
 
 - (BOOL)isEqualToClusterPath:(MTRClusterPath *)clusterPath
 {
-    if (!clusterPath)
-        return NO;
-
-    return (clusterPath.endpoint && [_endpoint isEqualToNumber:clusterPath.endpoint])
-        && (clusterPath.cluster && [_cluster isEqualToNumber:clusterPath.cluster]);
+    return MTREqualObjects(_endpoint, clusterPath.endpoint)
+        && MTREqualObjects(_cluster, clusterPath.cluster);
 }
 
 - (BOOL)isEqual:(id)object
@@ -2532,10 +2523,7 @@ static NSString * const sClusterKey = @"clusterKey";
 
 - (BOOL)isEqualToAttributePath:(MTRAttributePath *)attributePath
 {
-    if (!attributePath)
-        return NO;
-
-    return [self isEqualToClusterPath:attributePath] && attributePath.attribute && [_attribute isEqualToNumber:attributePath.attribute];
+    return [self isEqualToClusterPath:attributePath] && MTREqualObjects(_attribute, attributePath.attribute);
 }
 
 - (BOOL)isEqual:(id)object
@@ -2628,10 +2616,7 @@ static NSString * const sAttributeKey = @"attributeKey";
 
 - (BOOL)isEqualToEventPath:(MTREventPath *)eventPath
 {
-    if (!eventPath)
-        return NO;
-
-    return [self isEqualToClusterPath:eventPath] && eventPath.event && [_event isEqualToNumber:eventPath.event];
+    return [self isEqualToClusterPath:eventPath] && MTREqualObjects(_event, eventPath.event);
 }
 
 - (BOOL)isEqual:(id)object
@@ -2721,10 +2706,7 @@ static NSString * const sEventKey = @"eventKey";
 
 - (BOOL)isEqualToCommandPath:(MTRCommandPath *)commandPath
 {
-    if (!commandPath)
-        return NO;
-
-    return [self isEqualToClusterPath:commandPath] && commandPath.command && [_command isEqualToNumber:commandPath.command];
+    return [self isEqualToClusterPath:commandPath] && MTREqualObjects(_command, commandPath.command);
 }
 
 - (BOOL)isEqual:(id)object
