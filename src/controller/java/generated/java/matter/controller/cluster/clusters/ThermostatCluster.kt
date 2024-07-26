@@ -51,7 +51,7 @@ class ThermostatCluster(private val controller: MatterController, private val en
     val numberOfTransitionsForSequence: UByte,
     val dayOfWeekForSequence: UByte,
     val modeForSequence: UByte,
-    val transitions: List<ThermostatClusterWeeklyScheduleTransitionStruct>
+    val transitions: List<ThermostatClusterWeeklyScheduleTransitionStruct>,
   )
 
   class LocalTemperatureAttribute(val value: Short?)
@@ -253,17 +253,6 @@ class ThermostatCluster(private val controller: MatterController, private val en
     object SubscriptionEstablished : SetpointHoldExpiryTimestampAttributeSubscriptionState()
   }
 
-  class QueuedPresetAttribute(val value: ThermostatClusterQueuedPresetStruct?)
-
-  sealed class QueuedPresetAttributeSubscriptionState {
-    data class Success(val value: ThermostatClusterQueuedPresetStruct?) :
-      QueuedPresetAttributeSubscriptionState()
-
-    data class Error(val exception: Exception) : QueuedPresetAttributeSubscriptionState()
-
-    object SubscriptionEstablished : QueuedPresetAttributeSubscriptionState()
-  }
-
   class GeneratedCommandListAttribute(val value: List<UInt>)
 
   sealed class GeneratedCommandListAttributeSubscriptionState {
@@ -321,7 +310,7 @@ class ThermostatCluster(private val controller: MatterController, private val en
       InvokeRequest(
         CommandPath(endpointId, clusterId = CLUSTER_ID, commandId),
         tlvPayload = tlvWriter.getEncoded(),
-        timedRequest = timedInvokeTimeout
+        timedRequest = timedInvokeTimeout,
       )
 
     val response: InvokeResponse = controller.invoke(request)
@@ -333,7 +322,7 @@ class ThermostatCluster(private val controller: MatterController, private val en
     dayOfWeekForSequence: UByte,
     modeForSequence: UByte,
     transitions: List<ThermostatClusterWeeklyScheduleTransitionStruct>,
-    timedInvokeTimeout: Duration? = null
+    timedInvokeTimeout: Duration? = null,
   ) {
     val commandId: UInt = 1u
 
@@ -343,7 +332,7 @@ class ThermostatCluster(private val controller: MatterController, private val en
     val TAG_NUMBER_OF_TRANSITIONS_FOR_SEQUENCE_REQ: Int = 0
     tlvWriter.put(
       ContextSpecificTag(TAG_NUMBER_OF_TRANSITIONS_FOR_SEQUENCE_REQ),
-      numberOfTransitionsForSequence
+      numberOfTransitionsForSequence,
     )
 
     val TAG_DAY_OF_WEEK_FOR_SEQUENCE_REQ: Int = 1
@@ -364,7 +353,7 @@ class ThermostatCluster(private val controller: MatterController, private val en
       InvokeRequest(
         CommandPath(endpointId, clusterId = CLUSTER_ID, commandId),
         tlvPayload = tlvWriter.getEncoded(),
-        timedRequest = timedInvokeTimeout
+        timedRequest = timedInvokeTimeout,
       )
 
     val response: InvokeResponse = controller.invoke(request)
@@ -374,7 +363,7 @@ class ThermostatCluster(private val controller: MatterController, private val en
   suspend fun getWeeklySchedule(
     daysToReturn: UByte,
     modeToReturn: UByte,
-    timedInvokeTimeout: Duration? = null
+    timedInvokeTimeout: Duration? = null,
   ): GetWeeklyScheduleResponse {
     val commandId: UInt = 2u
 
@@ -392,7 +381,7 @@ class ThermostatCluster(private val controller: MatterController, private val en
       InvokeRequest(
         CommandPath(endpointId, clusterId = CLUSTER_ID, commandId),
         tlvPayload = tlvWriter.getEncoded(),
-        timedRequest = timedInvokeTimeout
+        timedRequest = timedInvokeTimeout,
       )
 
     val response: InvokeResponse = controller.invoke(request)
@@ -463,7 +452,7 @@ class ThermostatCluster(private val controller: MatterController, private val en
       numberOfTransitionsForSequence_decoded,
       dayOfWeekForSequence_decoded,
       modeForSequence_decoded,
-      transitions_decoded
+      transitions_decoded,
     )
   }
 
@@ -478,7 +467,7 @@ class ThermostatCluster(private val controller: MatterController, private val en
       InvokeRequest(
         CommandPath(endpointId, clusterId = CLUSTER_ID, commandId),
         tlvPayload = tlvWriter.getEncoded(),
-        timedRequest = timedInvokeTimeout
+        timedRequest = timedInvokeTimeout,
       )
 
     val response: InvokeResponse = controller.invoke(request)
@@ -487,7 +476,7 @@ class ThermostatCluster(private val controller: MatterController, private val en
 
   suspend fun setActiveScheduleRequest(
     scheduleHandle: ByteArray,
-    timedInvokeTimeout: Duration? = null
+    timedInvokeTimeout: Duration? = null,
   ) {
     val commandId: UInt = 5u
 
@@ -502,7 +491,7 @@ class ThermostatCluster(private val controller: MatterController, private val en
       InvokeRequest(
         CommandPath(endpointId, clusterId = CLUSTER_ID, commandId),
         tlvPayload = tlvWriter.getEncoded(),
-        timedRequest = timedInvokeTimeout
+        timedRequest = timedInvokeTimeout,
       )
 
     val response: InvokeResponse = controller.invoke(request)
@@ -511,8 +500,7 @@ class ThermostatCluster(private val controller: MatterController, private val en
 
   suspend fun setActivePresetRequest(
     presetHandle: ByteArray,
-    delayMinutes: UShort?,
-    timedInvokeTimeout: Duration? = null
+    timedInvokeTimeout: Duration? = null,
   ) {
     val commandId: UInt = 6u
 
@@ -521,16 +509,13 @@ class ThermostatCluster(private val controller: MatterController, private val en
 
     val TAG_PRESET_HANDLE_REQ: Int = 0
     tlvWriter.put(ContextSpecificTag(TAG_PRESET_HANDLE_REQ), presetHandle)
-
-    val TAG_DELAY_MINUTES_REQ: Int = 1
-    delayMinutes?.let { tlvWriter.put(ContextSpecificTag(TAG_DELAY_MINUTES_REQ), delayMinutes) }
     tlvWriter.endStructure()
 
     val request: InvokeRequest =
       InvokeRequest(
         CommandPath(endpointId, clusterId = CLUSTER_ID, commandId),
         tlvPayload = tlvWriter.getEncoded(),
-        timedRequest = timedInvokeTimeout
+        timedRequest = timedInvokeTimeout,
       )
 
     val response: InvokeResponse = controller.invoke(request)
@@ -539,7 +524,7 @@ class ThermostatCluster(private val controller: MatterController, private val en
 
   suspend fun startPresetsSchedulesEditRequest(
     timeoutSeconds: UShort,
-    timedInvokeTimeout: Duration? = null
+    timedInvokeTimeout: Duration? = null,
   ) {
     val commandId: UInt = 7u
 
@@ -554,7 +539,7 @@ class ThermostatCluster(private val controller: MatterController, private val en
       InvokeRequest(
         CommandPath(endpointId, clusterId = CLUSTER_ID, commandId),
         tlvPayload = tlvWriter.getEncoded(),
-        timedRequest = timedInvokeTimeout
+        timedRequest = timedInvokeTimeout,
       )
 
     val response: InvokeResponse = controller.invoke(request)
@@ -572,7 +557,7 @@ class ThermostatCluster(private val controller: MatterController, private val en
       InvokeRequest(
         CommandPath(endpointId, clusterId = CLUSTER_ID, commandId),
         tlvPayload = tlvWriter.getEncoded(),
-        timedRequest = timedInvokeTimeout
+        timedRequest = timedInvokeTimeout,
       )
 
     val response: InvokeResponse = controller.invoke(request)
@@ -590,25 +575,7 @@ class ThermostatCluster(private val controller: MatterController, private val en
       InvokeRequest(
         CommandPath(endpointId, clusterId = CLUSTER_ID, commandId),
         tlvPayload = tlvWriter.getEncoded(),
-        timedRequest = timedInvokeTimeout
-      )
-
-    val response: InvokeResponse = controller.invoke(request)
-    logger.log(Level.FINE, "Invoke command succeeded: ${response}")
-  }
-
-  suspend fun cancelSetActivePresetRequest(timedInvokeTimeout: Duration? = null) {
-    val commandId: UInt = 10u
-
-    val tlvWriter = TlvWriter()
-    tlvWriter.startStructure(AnonymousTag)
-    tlvWriter.endStructure()
-
-    val request: InvokeRequest =
-      InvokeRequest(
-        CommandPath(endpointId, clusterId = CLUSTER_ID, commandId),
-        tlvPayload = tlvWriter.getEncoded(),
-        timedRequest = timedInvokeTimeout
+        timedRequest = timedInvokeTimeout,
       )
 
     val response: InvokeResponse = controller.invoke(request)
@@ -617,7 +584,7 @@ class ThermostatCluster(private val controller: MatterController, private val en
 
   suspend fun setTemperatureSetpointHoldPolicy(
     temperatureSetpointHoldPolicy: UByte,
-    timedInvokeTimeout: Duration? = null
+    timedInvokeTimeout: Duration? = null,
   ) {
     val commandId: UInt = 11u
 
@@ -627,7 +594,7 @@ class ThermostatCluster(private val controller: MatterController, private val en
     val TAG_TEMPERATURE_SETPOINT_HOLD_POLICY_REQ: Int = 0
     tlvWriter.put(
       ContextSpecificTag(TAG_TEMPERATURE_SETPOINT_HOLD_POLICY_REQ),
-      temperatureSetpointHoldPolicy
+      temperatureSetpointHoldPolicy,
     )
     tlvWriter.endStructure()
 
@@ -635,7 +602,7 @@ class ThermostatCluster(private val controller: MatterController, private val en
       InvokeRequest(
         CommandPath(endpointId, clusterId = CLUSTER_ID, commandId),
         tlvPayload = tlvWriter.getEncoded(),
-        timedRequest = timedInvokeTimeout
+        timedRequest = timedInvokeTimeout,
       )
 
     val response: InvokeResponse = controller.invoke(request)
@@ -681,7 +648,7 @@ class ThermostatCluster(private val controller: MatterController, private val en
 
   suspend fun subscribeLocalTemperatureAttribute(
     minInterval: Int,
-    maxInterval: Int
+    maxInterval: Int,
   ): Flow<LocalTemperatureAttributeSubscriptionState> {
     val ATTRIBUTE_ID: UInt = 0u
     val attributePaths =
@@ -694,7 +661,7 @@ class ThermostatCluster(private val controller: MatterController, private val en
         eventPaths = emptyList(),
         attributePaths = attributePaths,
         minInterval = Duration.ofSeconds(minInterval.toLong()),
-        maxInterval = Duration.ofSeconds(maxInterval.toLong())
+        maxInterval = Duration.ofSeconds(maxInterval.toLong()),
       )
 
     return controller.subscribe(subscribeRequest).transform { subscriptionState ->
@@ -780,7 +747,7 @@ class ThermostatCluster(private val controller: MatterController, private val en
 
   suspend fun subscribeOutdoorTemperatureAttribute(
     minInterval: Int,
-    maxInterval: Int
+    maxInterval: Int,
   ): Flow<OutdoorTemperatureAttributeSubscriptionState> {
     val ATTRIBUTE_ID: UInt = 1u
     val attributePaths =
@@ -793,7 +760,7 @@ class ThermostatCluster(private val controller: MatterController, private val en
         eventPaths = emptyList(),
         attributePaths = attributePaths,
         minInterval = Duration.ofSeconds(minInterval.toLong()),
-        maxInterval = Duration.ofSeconds(maxInterval.toLong())
+        maxInterval = Duration.ofSeconds(maxInterval.toLong()),
       )
 
     return controller.subscribe(subscribeRequest).transform { subscriptionState ->
@@ -878,7 +845,7 @@ class ThermostatCluster(private val controller: MatterController, private val en
 
   suspend fun subscribeOccupancyAttribute(
     minInterval: Int,
-    maxInterval: Int
+    maxInterval: Int,
   ): Flow<UByteSubscriptionState> {
     val ATTRIBUTE_ID: UInt = 2u
     val attributePaths =
@@ -891,7 +858,7 @@ class ThermostatCluster(private val controller: MatterController, private val en
         eventPaths = emptyList(),
         attributePaths = attributePaths,
         minInterval = Duration.ofSeconds(minInterval.toLong()),
-        maxInterval = Duration.ofSeconds(maxInterval.toLong())
+        maxInterval = Duration.ofSeconds(maxInterval.toLong()),
       )
 
     return controller.subscribe(subscribeRequest).transform { subscriptionState ->
@@ -969,7 +936,7 @@ class ThermostatCluster(private val controller: MatterController, private val en
 
   suspend fun subscribeAbsMinHeatSetpointLimitAttribute(
     minInterval: Int,
-    maxInterval: Int
+    maxInterval: Int,
   ): Flow<ShortSubscriptionState> {
     val ATTRIBUTE_ID: UInt = 3u
     val attributePaths =
@@ -982,7 +949,7 @@ class ThermostatCluster(private val controller: MatterController, private val en
         eventPaths = emptyList(),
         attributePaths = attributePaths,
         minInterval = Duration.ofSeconds(minInterval.toLong()),
-        maxInterval = Duration.ofSeconds(maxInterval.toLong())
+        maxInterval = Duration.ofSeconds(maxInterval.toLong()),
       )
 
     return controller.subscribe(subscribeRequest).transform { subscriptionState ->
@@ -1062,7 +1029,7 @@ class ThermostatCluster(private val controller: MatterController, private val en
 
   suspend fun subscribeAbsMaxHeatSetpointLimitAttribute(
     minInterval: Int,
-    maxInterval: Int
+    maxInterval: Int,
   ): Flow<ShortSubscriptionState> {
     val ATTRIBUTE_ID: UInt = 4u
     val attributePaths =
@@ -1075,7 +1042,7 @@ class ThermostatCluster(private val controller: MatterController, private val en
         eventPaths = emptyList(),
         attributePaths = attributePaths,
         minInterval = Duration.ofSeconds(minInterval.toLong()),
-        maxInterval = Duration.ofSeconds(maxInterval.toLong())
+        maxInterval = Duration.ofSeconds(maxInterval.toLong()),
       )
 
     return controller.subscribe(subscribeRequest).transform { subscriptionState ->
@@ -1155,7 +1122,7 @@ class ThermostatCluster(private val controller: MatterController, private val en
 
   suspend fun subscribeAbsMinCoolSetpointLimitAttribute(
     minInterval: Int,
-    maxInterval: Int
+    maxInterval: Int,
   ): Flow<ShortSubscriptionState> {
     val ATTRIBUTE_ID: UInt = 5u
     val attributePaths =
@@ -1168,7 +1135,7 @@ class ThermostatCluster(private val controller: MatterController, private val en
         eventPaths = emptyList(),
         attributePaths = attributePaths,
         minInterval = Duration.ofSeconds(minInterval.toLong()),
-        maxInterval = Duration.ofSeconds(maxInterval.toLong())
+        maxInterval = Duration.ofSeconds(maxInterval.toLong()),
       )
 
     return controller.subscribe(subscribeRequest).transform { subscriptionState ->
@@ -1248,7 +1215,7 @@ class ThermostatCluster(private val controller: MatterController, private val en
 
   suspend fun subscribeAbsMaxCoolSetpointLimitAttribute(
     minInterval: Int,
-    maxInterval: Int
+    maxInterval: Int,
   ): Flow<ShortSubscriptionState> {
     val ATTRIBUTE_ID: UInt = 6u
     val attributePaths =
@@ -1261,7 +1228,7 @@ class ThermostatCluster(private val controller: MatterController, private val en
         eventPaths = emptyList(),
         attributePaths = attributePaths,
         minInterval = Duration.ofSeconds(minInterval.toLong()),
-        maxInterval = Duration.ofSeconds(maxInterval.toLong())
+        maxInterval = Duration.ofSeconds(maxInterval.toLong()),
       )
 
     return controller.subscribe(subscribeRequest).transform { subscriptionState ->
@@ -1341,7 +1308,7 @@ class ThermostatCluster(private val controller: MatterController, private val en
 
   suspend fun subscribePICoolingDemandAttribute(
     minInterval: Int,
-    maxInterval: Int
+    maxInterval: Int,
   ): Flow<UByteSubscriptionState> {
     val ATTRIBUTE_ID: UInt = 7u
     val attributePaths =
@@ -1354,7 +1321,7 @@ class ThermostatCluster(private val controller: MatterController, private val en
         eventPaths = emptyList(),
         attributePaths = attributePaths,
         minInterval = Duration.ofSeconds(minInterval.toLong()),
-        maxInterval = Duration.ofSeconds(maxInterval.toLong())
+        maxInterval = Duration.ofSeconds(maxInterval.toLong()),
       )
 
     return controller.subscribe(subscribeRequest).transform { subscriptionState ->
@@ -1434,7 +1401,7 @@ class ThermostatCluster(private val controller: MatterController, private val en
 
   suspend fun subscribePIHeatingDemandAttribute(
     minInterval: Int,
-    maxInterval: Int
+    maxInterval: Int,
   ): Flow<UByteSubscriptionState> {
     val ATTRIBUTE_ID: UInt = 8u
     val attributePaths =
@@ -1447,7 +1414,7 @@ class ThermostatCluster(private val controller: MatterController, private val en
         eventPaths = emptyList(),
         attributePaths = attributePaths,
         minInterval = Duration.ofSeconds(minInterval.toLong()),
-        maxInterval = Duration.ofSeconds(maxInterval.toLong())
+        maxInterval = Duration.ofSeconds(maxInterval.toLong()),
       )
 
     return controller.subscribe(subscribeRequest).transform { subscriptionState ->
@@ -1527,7 +1494,7 @@ class ThermostatCluster(private val controller: MatterController, private val en
 
   suspend fun writeHVACSystemTypeConfigurationAttribute(
     value: UByte,
-    timedWriteTimeout: Duration? = null
+    timedWriteTimeout: Duration? = null,
   ) {
     val ATTRIBUTE_ID: UInt = 9u
 
@@ -1541,10 +1508,10 @@ class ThermostatCluster(private val controller: MatterController, private val en
             WriteRequest(
               attributePath =
                 AttributePath(endpointId, clusterId = CLUSTER_ID, attributeId = ATTRIBUTE_ID),
-              tlvPayload = tlvWriter.getEncoded()
+              tlvPayload = tlvWriter.getEncoded(),
             )
           ),
-        timedRequest = timedWriteTimeout
+        timedRequest = timedWriteTimeout,
       )
 
     val response: WriteResponse = controller.write(writeRequests)
@@ -1570,7 +1537,7 @@ class ThermostatCluster(private val controller: MatterController, private val en
 
   suspend fun subscribeHVACSystemTypeConfigurationAttribute(
     minInterval: Int,
-    maxInterval: Int
+    maxInterval: Int,
   ): Flow<UByteSubscriptionState> {
     val ATTRIBUTE_ID: UInt = 9u
     val attributePaths =
@@ -1583,7 +1550,7 @@ class ThermostatCluster(private val controller: MatterController, private val en
         eventPaths = emptyList(),
         attributePaths = attributePaths,
         minInterval = Duration.ofSeconds(minInterval.toLong()),
-        maxInterval = Duration.ofSeconds(maxInterval.toLong())
+        maxInterval = Duration.ofSeconds(maxInterval.toLong()),
       )
 
     return controller.subscribe(subscribeRequest).transform { subscriptionState ->
@@ -1663,7 +1630,7 @@ class ThermostatCluster(private val controller: MatterController, private val en
 
   suspend fun writeLocalTemperatureCalibrationAttribute(
     value: Byte,
-    timedWriteTimeout: Duration? = null
+    timedWriteTimeout: Duration? = null,
   ) {
     val ATTRIBUTE_ID: UInt = 16u
 
@@ -1677,10 +1644,10 @@ class ThermostatCluster(private val controller: MatterController, private val en
             WriteRequest(
               attributePath =
                 AttributePath(endpointId, clusterId = CLUSTER_ID, attributeId = ATTRIBUTE_ID),
-              tlvPayload = tlvWriter.getEncoded()
+              tlvPayload = tlvWriter.getEncoded(),
             )
           ),
-        timedRequest = timedWriteTimeout
+        timedRequest = timedWriteTimeout,
       )
 
     val response: WriteResponse = controller.write(writeRequests)
@@ -1706,7 +1673,7 @@ class ThermostatCluster(private val controller: MatterController, private val en
 
   suspend fun subscribeLocalTemperatureCalibrationAttribute(
     minInterval: Int,
-    maxInterval: Int
+    maxInterval: Int,
   ): Flow<ByteSubscriptionState> {
     val ATTRIBUTE_ID: UInt = 16u
     val attributePaths =
@@ -1719,7 +1686,7 @@ class ThermostatCluster(private val controller: MatterController, private val en
         eventPaths = emptyList(),
         attributePaths = attributePaths,
         minInterval = Duration.ofSeconds(minInterval.toLong()),
-        maxInterval = Duration.ofSeconds(maxInterval.toLong())
+        maxInterval = Duration.ofSeconds(maxInterval.toLong()),
       )
 
     return controller.subscribe(subscribeRequest).transform { subscriptionState ->
@@ -1799,7 +1766,7 @@ class ThermostatCluster(private val controller: MatterController, private val en
 
   suspend fun writeOccupiedCoolingSetpointAttribute(
     value: Short,
-    timedWriteTimeout: Duration? = null
+    timedWriteTimeout: Duration? = null,
   ) {
     val ATTRIBUTE_ID: UInt = 17u
 
@@ -1813,10 +1780,10 @@ class ThermostatCluster(private val controller: MatterController, private val en
             WriteRequest(
               attributePath =
                 AttributePath(endpointId, clusterId = CLUSTER_ID, attributeId = ATTRIBUTE_ID),
-              tlvPayload = tlvWriter.getEncoded()
+              tlvPayload = tlvWriter.getEncoded(),
             )
           ),
-        timedRequest = timedWriteTimeout
+        timedRequest = timedWriteTimeout,
       )
 
     val response: WriteResponse = controller.write(writeRequests)
@@ -1842,7 +1809,7 @@ class ThermostatCluster(private val controller: MatterController, private val en
 
   suspend fun subscribeOccupiedCoolingSetpointAttribute(
     minInterval: Int,
-    maxInterval: Int
+    maxInterval: Int,
   ): Flow<ShortSubscriptionState> {
     val ATTRIBUTE_ID: UInt = 17u
     val attributePaths =
@@ -1855,7 +1822,7 @@ class ThermostatCluster(private val controller: MatterController, private val en
         eventPaths = emptyList(),
         attributePaths = attributePaths,
         minInterval = Duration.ofSeconds(minInterval.toLong()),
-        maxInterval = Duration.ofSeconds(maxInterval.toLong())
+        maxInterval = Duration.ofSeconds(maxInterval.toLong()),
       )
 
     return controller.subscribe(subscribeRequest).transform { subscriptionState ->
@@ -1935,7 +1902,7 @@ class ThermostatCluster(private val controller: MatterController, private val en
 
   suspend fun writeOccupiedHeatingSetpointAttribute(
     value: Short,
-    timedWriteTimeout: Duration? = null
+    timedWriteTimeout: Duration? = null,
   ) {
     val ATTRIBUTE_ID: UInt = 18u
 
@@ -1949,10 +1916,10 @@ class ThermostatCluster(private val controller: MatterController, private val en
             WriteRequest(
               attributePath =
                 AttributePath(endpointId, clusterId = CLUSTER_ID, attributeId = ATTRIBUTE_ID),
-              tlvPayload = tlvWriter.getEncoded()
+              tlvPayload = tlvWriter.getEncoded(),
             )
           ),
-        timedRequest = timedWriteTimeout
+        timedRequest = timedWriteTimeout,
       )
 
     val response: WriteResponse = controller.write(writeRequests)
@@ -1978,7 +1945,7 @@ class ThermostatCluster(private val controller: MatterController, private val en
 
   suspend fun subscribeOccupiedHeatingSetpointAttribute(
     minInterval: Int,
-    maxInterval: Int
+    maxInterval: Int,
   ): Flow<ShortSubscriptionState> {
     val ATTRIBUTE_ID: UInt = 18u
     val attributePaths =
@@ -1991,7 +1958,7 @@ class ThermostatCluster(private val controller: MatterController, private val en
         eventPaths = emptyList(),
         attributePaths = attributePaths,
         minInterval = Duration.ofSeconds(minInterval.toLong()),
-        maxInterval = Duration.ofSeconds(maxInterval.toLong())
+        maxInterval = Duration.ofSeconds(maxInterval.toLong()),
       )
 
     return controller.subscribe(subscribeRequest).transform { subscriptionState ->
@@ -2071,7 +2038,7 @@ class ThermostatCluster(private val controller: MatterController, private val en
 
   suspend fun writeUnoccupiedCoolingSetpointAttribute(
     value: Short,
-    timedWriteTimeout: Duration? = null
+    timedWriteTimeout: Duration? = null,
   ) {
     val ATTRIBUTE_ID: UInt = 19u
 
@@ -2085,10 +2052,10 @@ class ThermostatCluster(private val controller: MatterController, private val en
             WriteRequest(
               attributePath =
                 AttributePath(endpointId, clusterId = CLUSTER_ID, attributeId = ATTRIBUTE_ID),
-              tlvPayload = tlvWriter.getEncoded()
+              tlvPayload = tlvWriter.getEncoded(),
             )
           ),
-        timedRequest = timedWriteTimeout
+        timedRequest = timedWriteTimeout,
       )
 
     val response: WriteResponse = controller.write(writeRequests)
@@ -2114,7 +2081,7 @@ class ThermostatCluster(private val controller: MatterController, private val en
 
   suspend fun subscribeUnoccupiedCoolingSetpointAttribute(
     minInterval: Int,
-    maxInterval: Int
+    maxInterval: Int,
   ): Flow<ShortSubscriptionState> {
     val ATTRIBUTE_ID: UInt = 19u
     val attributePaths =
@@ -2127,7 +2094,7 @@ class ThermostatCluster(private val controller: MatterController, private val en
         eventPaths = emptyList(),
         attributePaths = attributePaths,
         minInterval = Duration.ofSeconds(minInterval.toLong()),
-        maxInterval = Duration.ofSeconds(maxInterval.toLong())
+        maxInterval = Duration.ofSeconds(maxInterval.toLong()),
       )
 
     return controller.subscribe(subscribeRequest).transform { subscriptionState ->
@@ -2207,7 +2174,7 @@ class ThermostatCluster(private val controller: MatterController, private val en
 
   suspend fun writeUnoccupiedHeatingSetpointAttribute(
     value: Short,
-    timedWriteTimeout: Duration? = null
+    timedWriteTimeout: Duration? = null,
   ) {
     val ATTRIBUTE_ID: UInt = 20u
 
@@ -2221,10 +2188,10 @@ class ThermostatCluster(private val controller: MatterController, private val en
             WriteRequest(
               attributePath =
                 AttributePath(endpointId, clusterId = CLUSTER_ID, attributeId = ATTRIBUTE_ID),
-              tlvPayload = tlvWriter.getEncoded()
+              tlvPayload = tlvWriter.getEncoded(),
             )
           ),
-        timedRequest = timedWriteTimeout
+        timedRequest = timedWriteTimeout,
       )
 
     val response: WriteResponse = controller.write(writeRequests)
@@ -2250,7 +2217,7 @@ class ThermostatCluster(private val controller: MatterController, private val en
 
   suspend fun subscribeUnoccupiedHeatingSetpointAttribute(
     minInterval: Int,
-    maxInterval: Int
+    maxInterval: Int,
   ): Flow<ShortSubscriptionState> {
     val ATTRIBUTE_ID: UInt = 20u
     val attributePaths =
@@ -2263,7 +2230,7 @@ class ThermostatCluster(private val controller: MatterController, private val en
         eventPaths = emptyList(),
         attributePaths = attributePaths,
         minInterval = Duration.ofSeconds(minInterval.toLong()),
-        maxInterval = Duration.ofSeconds(maxInterval.toLong())
+        maxInterval = Duration.ofSeconds(maxInterval.toLong()),
       )
 
     return controller.subscribe(subscribeRequest).transform { subscriptionState ->
@@ -2343,7 +2310,7 @@ class ThermostatCluster(private val controller: MatterController, private val en
 
   suspend fun writeMinHeatSetpointLimitAttribute(
     value: Short,
-    timedWriteTimeout: Duration? = null
+    timedWriteTimeout: Duration? = null,
   ) {
     val ATTRIBUTE_ID: UInt = 21u
 
@@ -2357,10 +2324,10 @@ class ThermostatCluster(private val controller: MatterController, private val en
             WriteRequest(
               attributePath =
                 AttributePath(endpointId, clusterId = CLUSTER_ID, attributeId = ATTRIBUTE_ID),
-              tlvPayload = tlvWriter.getEncoded()
+              tlvPayload = tlvWriter.getEncoded(),
             )
           ),
-        timedRequest = timedWriteTimeout
+        timedRequest = timedWriteTimeout,
       )
 
     val response: WriteResponse = controller.write(writeRequests)
@@ -2386,7 +2353,7 @@ class ThermostatCluster(private val controller: MatterController, private val en
 
   suspend fun subscribeMinHeatSetpointLimitAttribute(
     minInterval: Int,
-    maxInterval: Int
+    maxInterval: Int,
   ): Flow<ShortSubscriptionState> {
     val ATTRIBUTE_ID: UInt = 21u
     val attributePaths =
@@ -2399,7 +2366,7 @@ class ThermostatCluster(private val controller: MatterController, private val en
         eventPaths = emptyList(),
         attributePaths = attributePaths,
         minInterval = Duration.ofSeconds(minInterval.toLong()),
-        maxInterval = Duration.ofSeconds(maxInterval.toLong())
+        maxInterval = Duration.ofSeconds(maxInterval.toLong()),
       )
 
     return controller.subscribe(subscribeRequest).transform { subscriptionState ->
@@ -2479,7 +2446,7 @@ class ThermostatCluster(private val controller: MatterController, private val en
 
   suspend fun writeMaxHeatSetpointLimitAttribute(
     value: Short,
-    timedWriteTimeout: Duration? = null
+    timedWriteTimeout: Duration? = null,
   ) {
     val ATTRIBUTE_ID: UInt = 22u
 
@@ -2493,10 +2460,10 @@ class ThermostatCluster(private val controller: MatterController, private val en
             WriteRequest(
               attributePath =
                 AttributePath(endpointId, clusterId = CLUSTER_ID, attributeId = ATTRIBUTE_ID),
-              tlvPayload = tlvWriter.getEncoded()
+              tlvPayload = tlvWriter.getEncoded(),
             )
           ),
-        timedRequest = timedWriteTimeout
+        timedRequest = timedWriteTimeout,
       )
 
     val response: WriteResponse = controller.write(writeRequests)
@@ -2522,7 +2489,7 @@ class ThermostatCluster(private val controller: MatterController, private val en
 
   suspend fun subscribeMaxHeatSetpointLimitAttribute(
     minInterval: Int,
-    maxInterval: Int
+    maxInterval: Int,
   ): Flow<ShortSubscriptionState> {
     val ATTRIBUTE_ID: UInt = 22u
     val attributePaths =
@@ -2535,7 +2502,7 @@ class ThermostatCluster(private val controller: MatterController, private val en
         eventPaths = emptyList(),
         attributePaths = attributePaths,
         minInterval = Duration.ofSeconds(minInterval.toLong()),
-        maxInterval = Duration.ofSeconds(maxInterval.toLong())
+        maxInterval = Duration.ofSeconds(maxInterval.toLong()),
       )
 
     return controller.subscribe(subscribeRequest).transform { subscriptionState ->
@@ -2615,7 +2582,7 @@ class ThermostatCluster(private val controller: MatterController, private val en
 
   suspend fun writeMinCoolSetpointLimitAttribute(
     value: Short,
-    timedWriteTimeout: Duration? = null
+    timedWriteTimeout: Duration? = null,
   ) {
     val ATTRIBUTE_ID: UInt = 23u
 
@@ -2629,10 +2596,10 @@ class ThermostatCluster(private val controller: MatterController, private val en
             WriteRequest(
               attributePath =
                 AttributePath(endpointId, clusterId = CLUSTER_ID, attributeId = ATTRIBUTE_ID),
-              tlvPayload = tlvWriter.getEncoded()
+              tlvPayload = tlvWriter.getEncoded(),
             )
           ),
-        timedRequest = timedWriteTimeout
+        timedRequest = timedWriteTimeout,
       )
 
     val response: WriteResponse = controller.write(writeRequests)
@@ -2658,7 +2625,7 @@ class ThermostatCluster(private val controller: MatterController, private val en
 
   suspend fun subscribeMinCoolSetpointLimitAttribute(
     minInterval: Int,
-    maxInterval: Int
+    maxInterval: Int,
   ): Flow<ShortSubscriptionState> {
     val ATTRIBUTE_ID: UInt = 23u
     val attributePaths =
@@ -2671,7 +2638,7 @@ class ThermostatCluster(private val controller: MatterController, private val en
         eventPaths = emptyList(),
         attributePaths = attributePaths,
         minInterval = Duration.ofSeconds(minInterval.toLong()),
-        maxInterval = Duration.ofSeconds(maxInterval.toLong())
+        maxInterval = Duration.ofSeconds(maxInterval.toLong()),
       )
 
     return controller.subscribe(subscribeRequest).transform { subscriptionState ->
@@ -2751,7 +2718,7 @@ class ThermostatCluster(private val controller: MatterController, private val en
 
   suspend fun writeMaxCoolSetpointLimitAttribute(
     value: Short,
-    timedWriteTimeout: Duration? = null
+    timedWriteTimeout: Duration? = null,
   ) {
     val ATTRIBUTE_ID: UInt = 24u
 
@@ -2765,10 +2732,10 @@ class ThermostatCluster(private val controller: MatterController, private val en
             WriteRequest(
               attributePath =
                 AttributePath(endpointId, clusterId = CLUSTER_ID, attributeId = ATTRIBUTE_ID),
-              tlvPayload = tlvWriter.getEncoded()
+              tlvPayload = tlvWriter.getEncoded(),
             )
           ),
-        timedRequest = timedWriteTimeout
+        timedRequest = timedWriteTimeout,
       )
 
     val response: WriteResponse = controller.write(writeRequests)
@@ -2794,7 +2761,7 @@ class ThermostatCluster(private val controller: MatterController, private val en
 
   suspend fun subscribeMaxCoolSetpointLimitAttribute(
     minInterval: Int,
-    maxInterval: Int
+    maxInterval: Int,
   ): Flow<ShortSubscriptionState> {
     val ATTRIBUTE_ID: UInt = 24u
     val attributePaths =
@@ -2807,7 +2774,7 @@ class ThermostatCluster(private val controller: MatterController, private val en
         eventPaths = emptyList(),
         attributePaths = attributePaths,
         minInterval = Duration.ofSeconds(minInterval.toLong()),
-        maxInterval = Duration.ofSeconds(maxInterval.toLong())
+        maxInterval = Duration.ofSeconds(maxInterval.toLong()),
       )
 
     return controller.subscribe(subscribeRequest).transform { subscriptionState ->
@@ -2898,10 +2865,10 @@ class ThermostatCluster(private val controller: MatterController, private val en
             WriteRequest(
               attributePath =
                 AttributePath(endpointId, clusterId = CLUSTER_ID, attributeId = ATTRIBUTE_ID),
-              tlvPayload = tlvWriter.getEncoded()
+              tlvPayload = tlvWriter.getEncoded(),
             )
           ),
-        timedRequest = timedWriteTimeout
+        timedRequest = timedWriteTimeout,
       )
 
     val response: WriteResponse = controller.write(writeRequests)
@@ -2927,7 +2894,7 @@ class ThermostatCluster(private val controller: MatterController, private val en
 
   suspend fun subscribeMinSetpointDeadBandAttribute(
     minInterval: Int,
-    maxInterval: Int
+    maxInterval: Int,
   ): Flow<ByteSubscriptionState> {
     val ATTRIBUTE_ID: UInt = 25u
     val attributePaths =
@@ -2940,7 +2907,7 @@ class ThermostatCluster(private val controller: MatterController, private val en
         eventPaths = emptyList(),
         attributePaths = attributePaths,
         minInterval = Duration.ofSeconds(minInterval.toLong()),
-        maxInterval = Duration.ofSeconds(maxInterval.toLong())
+        maxInterval = Duration.ofSeconds(maxInterval.toLong()),
       )
 
     return controller.subscribe(subscribeRequest).transform { subscriptionState ->
@@ -3031,10 +2998,10 @@ class ThermostatCluster(private val controller: MatterController, private val en
             WriteRequest(
               attributePath =
                 AttributePath(endpointId, clusterId = CLUSTER_ID, attributeId = ATTRIBUTE_ID),
-              tlvPayload = tlvWriter.getEncoded()
+              tlvPayload = tlvWriter.getEncoded(),
             )
           ),
-        timedRequest = timedWriteTimeout
+        timedRequest = timedWriteTimeout,
       )
 
     val response: WriteResponse = controller.write(writeRequests)
@@ -3060,7 +3027,7 @@ class ThermostatCluster(private val controller: MatterController, private val en
 
   suspend fun subscribeRemoteSensingAttribute(
     minInterval: Int,
-    maxInterval: Int
+    maxInterval: Int,
   ): Flow<UByteSubscriptionState> {
     val ATTRIBUTE_ID: UInt = 26u
     val attributePaths =
@@ -3073,7 +3040,7 @@ class ThermostatCluster(private val controller: MatterController, private val en
         eventPaths = emptyList(),
         attributePaths = attributePaths,
         minInterval = Duration.ofSeconds(minInterval.toLong()),
-        maxInterval = Duration.ofSeconds(maxInterval.toLong())
+        maxInterval = Duration.ofSeconds(maxInterval.toLong()),
       )
 
     return controller.subscribe(subscribeRequest).transform { subscriptionState ->
@@ -3146,7 +3113,7 @@ class ThermostatCluster(private val controller: MatterController, private val en
 
   suspend fun writeControlSequenceOfOperationAttribute(
     value: UByte,
-    timedWriteTimeout: Duration? = null
+    timedWriteTimeout: Duration? = null,
   ) {
     val ATTRIBUTE_ID: UInt = 27u
 
@@ -3160,10 +3127,10 @@ class ThermostatCluster(private val controller: MatterController, private val en
             WriteRequest(
               attributePath =
                 AttributePath(endpointId, clusterId = CLUSTER_ID, attributeId = ATTRIBUTE_ID),
-              tlvPayload = tlvWriter.getEncoded()
+              tlvPayload = tlvWriter.getEncoded(),
             )
           ),
-        timedRequest = timedWriteTimeout
+        timedRequest = timedWriteTimeout,
       )
 
     val response: WriteResponse = controller.write(writeRequests)
@@ -3189,7 +3156,7 @@ class ThermostatCluster(private val controller: MatterController, private val en
 
   suspend fun subscribeControlSequenceOfOperationAttribute(
     minInterval: Int,
-    maxInterval: Int
+    maxInterval: Int,
   ): Flow<UByteSubscriptionState> {
     val ATTRIBUTE_ID: UInt = 27u
     val attributePaths =
@@ -3202,7 +3169,7 @@ class ThermostatCluster(private val controller: MatterController, private val en
         eventPaths = emptyList(),
         attributePaths = attributePaths,
         minInterval = Duration.ofSeconds(minInterval.toLong()),
-        maxInterval = Duration.ofSeconds(maxInterval.toLong())
+        maxInterval = Duration.ofSeconds(maxInterval.toLong()),
       )
 
     return controller.subscribe(subscribeRequest).transform { subscriptionState ->
@@ -3283,10 +3250,10 @@ class ThermostatCluster(private val controller: MatterController, private val en
             WriteRequest(
               attributePath =
                 AttributePath(endpointId, clusterId = CLUSTER_ID, attributeId = ATTRIBUTE_ID),
-              tlvPayload = tlvWriter.getEncoded()
+              tlvPayload = tlvWriter.getEncoded(),
             )
           ),
-        timedRequest = timedWriteTimeout
+        timedRequest = timedWriteTimeout,
       )
 
     val response: WriteResponse = controller.write(writeRequests)
@@ -3312,7 +3279,7 @@ class ThermostatCluster(private val controller: MatterController, private val en
 
   suspend fun subscribeSystemModeAttribute(
     minInterval: Int,
-    maxInterval: Int
+    maxInterval: Int,
   ): Flow<UByteSubscriptionState> {
     val ATTRIBUTE_ID: UInt = 28u
     val attributePaths =
@@ -3325,7 +3292,7 @@ class ThermostatCluster(private val controller: MatterController, private val en
         eventPaths = emptyList(),
         attributePaths = attributePaths,
         minInterval = Duration.ofSeconds(minInterval.toLong()),
-        maxInterval = Duration.ofSeconds(maxInterval.toLong())
+        maxInterval = Duration.ofSeconds(maxInterval.toLong()),
       )
 
     return controller.subscribe(subscribeRequest).transform { subscriptionState ->
@@ -3398,7 +3365,7 @@ class ThermostatCluster(private val controller: MatterController, private val en
 
   suspend fun subscribeThermostatRunningModeAttribute(
     minInterval: Int,
-    maxInterval: Int
+    maxInterval: Int,
   ): Flow<UByteSubscriptionState> {
     val ATTRIBUTE_ID: UInt = 30u
     val attributePaths =
@@ -3411,7 +3378,7 @@ class ThermostatCluster(private val controller: MatterController, private val en
         eventPaths = emptyList(),
         attributePaths = attributePaths,
         minInterval = Duration.ofSeconds(minInterval.toLong()),
-        maxInterval = Duration.ofSeconds(maxInterval.toLong())
+        maxInterval = Duration.ofSeconds(maxInterval.toLong()),
       )
 
     return controller.subscribe(subscribeRequest).transform { subscriptionState ->
@@ -3491,7 +3458,7 @@ class ThermostatCluster(private val controller: MatterController, private val en
 
   suspend fun subscribeStartOfWeekAttribute(
     minInterval: Int,
-    maxInterval: Int
+    maxInterval: Int,
   ): Flow<UByteSubscriptionState> {
     val ATTRIBUTE_ID: UInt = 32u
     val attributePaths =
@@ -3504,7 +3471,7 @@ class ThermostatCluster(private val controller: MatterController, private val en
         eventPaths = emptyList(),
         attributePaths = attributePaths,
         minInterval = Duration.ofSeconds(minInterval.toLong()),
-        maxInterval = Duration.ofSeconds(maxInterval.toLong())
+        maxInterval = Duration.ofSeconds(maxInterval.toLong()),
       )
 
     return controller.subscribe(subscribeRequest).transform { subscriptionState ->
@@ -3582,7 +3549,7 @@ class ThermostatCluster(private val controller: MatterController, private val en
 
   suspend fun subscribeNumberOfWeeklyTransitionsAttribute(
     minInterval: Int,
-    maxInterval: Int
+    maxInterval: Int,
   ): Flow<UByteSubscriptionState> {
     val ATTRIBUTE_ID: UInt = 33u
     val attributePaths =
@@ -3595,7 +3562,7 @@ class ThermostatCluster(private val controller: MatterController, private val en
         eventPaths = emptyList(),
         attributePaths = attributePaths,
         minInterval = Duration.ofSeconds(minInterval.toLong()),
-        maxInterval = Duration.ofSeconds(maxInterval.toLong())
+        maxInterval = Duration.ofSeconds(maxInterval.toLong()),
       )
 
     return controller.subscribe(subscribeRequest).transform { subscriptionState ->
@@ -3675,7 +3642,7 @@ class ThermostatCluster(private val controller: MatterController, private val en
 
   suspend fun subscribeNumberOfDailyTransitionsAttribute(
     minInterval: Int,
-    maxInterval: Int
+    maxInterval: Int,
   ): Flow<UByteSubscriptionState> {
     val ATTRIBUTE_ID: UInt = 34u
     val attributePaths =
@@ -3688,7 +3655,7 @@ class ThermostatCluster(private val controller: MatterController, private val en
         eventPaths = emptyList(),
         attributePaths = attributePaths,
         minInterval = Duration.ofSeconds(minInterval.toLong()),
-        maxInterval = Duration.ofSeconds(maxInterval.toLong())
+        maxInterval = Duration.ofSeconds(maxInterval.toLong()),
       )
 
     return controller.subscribe(subscribeRequest).transform { subscriptionState ->
@@ -3768,7 +3735,7 @@ class ThermostatCluster(private val controller: MatterController, private val en
 
   suspend fun writeTemperatureSetpointHoldAttribute(
     value: UByte,
-    timedWriteTimeout: Duration? = null
+    timedWriteTimeout: Duration? = null,
   ) {
     val ATTRIBUTE_ID: UInt = 35u
 
@@ -3782,10 +3749,10 @@ class ThermostatCluster(private val controller: MatterController, private val en
             WriteRequest(
               attributePath =
                 AttributePath(endpointId, clusterId = CLUSTER_ID, attributeId = ATTRIBUTE_ID),
-              tlvPayload = tlvWriter.getEncoded()
+              tlvPayload = tlvWriter.getEncoded(),
             )
           ),
-        timedRequest = timedWriteTimeout
+        timedRequest = timedWriteTimeout,
       )
 
     val response: WriteResponse = controller.write(writeRequests)
@@ -3811,7 +3778,7 @@ class ThermostatCluster(private val controller: MatterController, private val en
 
   suspend fun subscribeTemperatureSetpointHoldAttribute(
     minInterval: Int,
-    maxInterval: Int
+    maxInterval: Int,
   ): Flow<UByteSubscriptionState> {
     val ATTRIBUTE_ID: UInt = 35u
     val attributePaths =
@@ -3824,7 +3791,7 @@ class ThermostatCluster(private val controller: MatterController, private val en
         eventPaths = emptyList(),
         attributePaths = attributePaths,
         minInterval = Duration.ofSeconds(minInterval.toLong()),
-        maxInterval = Duration.ofSeconds(maxInterval.toLong())
+        maxInterval = Duration.ofSeconds(maxInterval.toLong()),
       )
 
     return controller.subscribe(subscribeRequest).transform { subscriptionState ->
@@ -3912,7 +3879,7 @@ class ThermostatCluster(private val controller: MatterController, private val en
 
   suspend fun writeTemperatureSetpointHoldDurationAttribute(
     value: UShort,
-    timedWriteTimeout: Duration? = null
+    timedWriteTimeout: Duration? = null,
   ) {
     val ATTRIBUTE_ID: UInt = 36u
 
@@ -3926,10 +3893,10 @@ class ThermostatCluster(private val controller: MatterController, private val en
             WriteRequest(
               attributePath =
                 AttributePath(endpointId, clusterId = CLUSTER_ID, attributeId = ATTRIBUTE_ID),
-              tlvPayload = tlvWriter.getEncoded()
+              tlvPayload = tlvWriter.getEncoded(),
             )
           ),
-        timedRequest = timedWriteTimeout
+        timedRequest = timedWriteTimeout,
       )
 
     val response: WriteResponse = controller.write(writeRequests)
@@ -3955,7 +3922,7 @@ class ThermostatCluster(private val controller: MatterController, private val en
 
   suspend fun subscribeTemperatureSetpointHoldDurationAttribute(
     minInterval: Int,
-    maxInterval: Int
+    maxInterval: Int,
   ): Flow<TemperatureSetpointHoldDurationAttributeSubscriptionState> {
     val ATTRIBUTE_ID: UInt = 36u
     val attributePaths =
@@ -3968,7 +3935,7 @@ class ThermostatCluster(private val controller: MatterController, private val en
         eventPaths = emptyList(),
         attributePaths = attributePaths,
         minInterval = Duration.ofSeconds(minInterval.toLong()),
-        maxInterval = Duration.ofSeconds(maxInterval.toLong())
+        maxInterval = Duration.ofSeconds(maxInterval.toLong()),
       )
 
     return controller.subscribe(subscribeRequest).transform { subscriptionState ->
@@ -4057,7 +4024,7 @@ class ThermostatCluster(private val controller: MatterController, private val en
 
   suspend fun writeThermostatProgrammingOperationModeAttribute(
     value: UByte,
-    timedWriteTimeout: Duration? = null
+    timedWriteTimeout: Duration? = null,
   ) {
     val ATTRIBUTE_ID: UInt = 37u
 
@@ -4071,10 +4038,10 @@ class ThermostatCluster(private val controller: MatterController, private val en
             WriteRequest(
               attributePath =
                 AttributePath(endpointId, clusterId = CLUSTER_ID, attributeId = ATTRIBUTE_ID),
-              tlvPayload = tlvWriter.getEncoded()
+              tlvPayload = tlvWriter.getEncoded(),
             )
           ),
-        timedRequest = timedWriteTimeout
+        timedRequest = timedWriteTimeout,
       )
 
     val response: WriteResponse = controller.write(writeRequests)
@@ -4100,7 +4067,7 @@ class ThermostatCluster(private val controller: MatterController, private val en
 
   suspend fun subscribeThermostatProgrammingOperationModeAttribute(
     minInterval: Int,
-    maxInterval: Int
+    maxInterval: Int,
   ): Flow<UByteSubscriptionState> {
     val ATTRIBUTE_ID: UInt = 37u
     val attributePaths =
@@ -4113,7 +4080,7 @@ class ThermostatCluster(private val controller: MatterController, private val en
         eventPaths = emptyList(),
         attributePaths = attributePaths,
         minInterval = Duration.ofSeconds(minInterval.toLong()),
-        maxInterval = Duration.ofSeconds(maxInterval.toLong())
+        maxInterval = Duration.ofSeconds(maxInterval.toLong()),
       )
 
     return controller.subscribe(subscribeRequest).transform { subscriptionState ->
@@ -4193,7 +4160,7 @@ class ThermostatCluster(private val controller: MatterController, private val en
 
   suspend fun subscribeThermostatRunningStateAttribute(
     minInterval: Int,
-    maxInterval: Int
+    maxInterval: Int,
   ): Flow<UShortSubscriptionState> {
     val ATTRIBUTE_ID: UInt = 41u
     val attributePaths =
@@ -4206,7 +4173,7 @@ class ThermostatCluster(private val controller: MatterController, private val en
         eventPaths = emptyList(),
         attributePaths = attributePaths,
         minInterval = Duration.ofSeconds(minInterval.toLong()),
-        maxInterval = Duration.ofSeconds(maxInterval.toLong())
+        maxInterval = Duration.ofSeconds(maxInterval.toLong()),
       )
 
     return controller.subscribe(subscribeRequest).transform { subscriptionState ->
@@ -4286,7 +4253,7 @@ class ThermostatCluster(private val controller: MatterController, private val en
 
   suspend fun subscribeSetpointChangeSourceAttribute(
     minInterval: Int,
-    maxInterval: Int
+    maxInterval: Int,
   ): Flow<UByteSubscriptionState> {
     val ATTRIBUTE_ID: UInt = 48u
     val attributePaths =
@@ -4299,7 +4266,7 @@ class ThermostatCluster(private val controller: MatterController, private val en
         eventPaths = emptyList(),
         attributePaths = attributePaths,
         minInterval = Duration.ofSeconds(minInterval.toLong()),
-        maxInterval = Duration.ofSeconds(maxInterval.toLong())
+        maxInterval = Duration.ofSeconds(maxInterval.toLong()),
       )
 
     return controller.subscribe(subscribeRequest).transform { subscriptionState ->
@@ -4384,7 +4351,7 @@ class ThermostatCluster(private val controller: MatterController, private val en
 
   suspend fun subscribeSetpointChangeAmountAttribute(
     minInterval: Int,
-    maxInterval: Int
+    maxInterval: Int,
   ): Flow<SetpointChangeAmountAttributeSubscriptionState> {
     val ATTRIBUTE_ID: UInt = 49u
     val attributePaths =
@@ -4397,7 +4364,7 @@ class ThermostatCluster(private val controller: MatterController, private val en
         eventPaths = emptyList(),
         attributePaths = attributePaths,
         minInterval = Duration.ofSeconds(minInterval.toLong()),
-        maxInterval = Duration.ofSeconds(maxInterval.toLong())
+        maxInterval = Duration.ofSeconds(maxInterval.toLong()),
       )
 
     return controller.subscribe(subscribeRequest).transform { subscriptionState ->
@@ -4484,7 +4451,7 @@ class ThermostatCluster(private val controller: MatterController, private val en
 
   suspend fun subscribeSetpointChangeSourceTimestampAttribute(
     minInterval: Int,
-    maxInterval: Int
+    maxInterval: Int,
   ): Flow<UIntSubscriptionState> {
     val ATTRIBUTE_ID: UInt = 50u
     val attributePaths =
@@ -4497,7 +4464,7 @@ class ThermostatCluster(private val controller: MatterController, private val en
         eventPaths = emptyList(),
         attributePaths = attributePaths,
         minInterval = Duration.ofSeconds(minInterval.toLong()),
-        maxInterval = Duration.ofSeconds(maxInterval.toLong())
+        maxInterval = Duration.ofSeconds(maxInterval.toLong()),
       )
 
     return controller.subscribe(subscribeRequest).transform { subscriptionState ->
@@ -4593,10 +4560,10 @@ class ThermostatCluster(private val controller: MatterController, private val en
             WriteRequest(
               attributePath =
                 AttributePath(endpointId, clusterId = CLUSTER_ID, attributeId = ATTRIBUTE_ID),
-              tlvPayload = tlvWriter.getEncoded()
+              tlvPayload = tlvWriter.getEncoded(),
             )
           ),
-        timedRequest = timedWriteTimeout
+        timedRequest = timedWriteTimeout,
       )
 
     val response: WriteResponse = controller.write(writeRequests)
@@ -4622,7 +4589,7 @@ class ThermostatCluster(private val controller: MatterController, private val en
 
   suspend fun subscribeOccupiedSetbackAttribute(
     minInterval: Int,
-    maxInterval: Int
+    maxInterval: Int,
   ): Flow<OccupiedSetbackAttributeSubscriptionState> {
     val ATTRIBUTE_ID: UInt = 52u
     val attributePaths =
@@ -4635,7 +4602,7 @@ class ThermostatCluster(private val controller: MatterController, private val en
         eventPaths = emptyList(),
         attributePaths = attributePaths,
         minInterval = Duration.ofSeconds(minInterval.toLong()),
-        maxInterval = Duration.ofSeconds(maxInterval.toLong())
+        maxInterval = Duration.ofSeconds(maxInterval.toLong()),
       )
 
     return controller.subscribe(subscribeRequest).transform { subscriptionState ->
@@ -4725,7 +4692,7 @@ class ThermostatCluster(private val controller: MatterController, private val en
 
   suspend fun subscribeOccupiedSetbackMinAttribute(
     minInterval: Int,
-    maxInterval: Int
+    maxInterval: Int,
   ): Flow<OccupiedSetbackMinAttributeSubscriptionState> {
     val ATTRIBUTE_ID: UInt = 53u
     val attributePaths =
@@ -4738,7 +4705,7 @@ class ThermostatCluster(private val controller: MatterController, private val en
         eventPaths = emptyList(),
         attributePaths = attributePaths,
         minInterval = Duration.ofSeconds(minInterval.toLong()),
-        maxInterval = Duration.ofSeconds(maxInterval.toLong())
+        maxInterval = Duration.ofSeconds(maxInterval.toLong()),
       )
 
     return controller.subscribe(subscribeRequest).transform { subscriptionState ->
@@ -4828,7 +4795,7 @@ class ThermostatCluster(private val controller: MatterController, private val en
 
   suspend fun subscribeOccupiedSetbackMaxAttribute(
     minInterval: Int,
-    maxInterval: Int
+    maxInterval: Int,
   ): Flow<OccupiedSetbackMaxAttributeSubscriptionState> {
     val ATTRIBUTE_ID: UInt = 54u
     val attributePaths =
@@ -4841,7 +4808,7 @@ class ThermostatCluster(private val controller: MatterController, private val en
         eventPaths = emptyList(),
         attributePaths = attributePaths,
         minInterval = Duration.ofSeconds(minInterval.toLong()),
-        maxInterval = Duration.ofSeconds(maxInterval.toLong())
+        maxInterval = Duration.ofSeconds(maxInterval.toLong()),
       )
 
     return controller.subscribe(subscribeRequest).transform { subscriptionState ->
@@ -4942,10 +4909,10 @@ class ThermostatCluster(private val controller: MatterController, private val en
             WriteRequest(
               attributePath =
                 AttributePath(endpointId, clusterId = CLUSTER_ID, attributeId = ATTRIBUTE_ID),
-              tlvPayload = tlvWriter.getEncoded()
+              tlvPayload = tlvWriter.getEncoded(),
             )
           ),
-        timedRequest = timedWriteTimeout
+        timedRequest = timedWriteTimeout,
       )
 
     val response: WriteResponse = controller.write(writeRequests)
@@ -4971,7 +4938,7 @@ class ThermostatCluster(private val controller: MatterController, private val en
 
   suspend fun subscribeUnoccupiedSetbackAttribute(
     minInterval: Int,
-    maxInterval: Int
+    maxInterval: Int,
   ): Flow<UnoccupiedSetbackAttributeSubscriptionState> {
     val ATTRIBUTE_ID: UInt = 55u
     val attributePaths =
@@ -4984,7 +4951,7 @@ class ThermostatCluster(private val controller: MatterController, private val en
         eventPaths = emptyList(),
         attributePaths = attributePaths,
         minInterval = Duration.ofSeconds(minInterval.toLong()),
-        maxInterval = Duration.ofSeconds(maxInterval.toLong())
+        maxInterval = Duration.ofSeconds(maxInterval.toLong()),
       )
 
     return controller.subscribe(subscribeRequest).transform { subscriptionState ->
@@ -5074,7 +5041,7 @@ class ThermostatCluster(private val controller: MatterController, private val en
 
   suspend fun subscribeUnoccupiedSetbackMinAttribute(
     minInterval: Int,
-    maxInterval: Int
+    maxInterval: Int,
   ): Flow<UnoccupiedSetbackMinAttributeSubscriptionState> {
     val ATTRIBUTE_ID: UInt = 56u
     val attributePaths =
@@ -5087,7 +5054,7 @@ class ThermostatCluster(private val controller: MatterController, private val en
         eventPaths = emptyList(),
         attributePaths = attributePaths,
         minInterval = Duration.ofSeconds(minInterval.toLong()),
-        maxInterval = Duration.ofSeconds(maxInterval.toLong())
+        maxInterval = Duration.ofSeconds(maxInterval.toLong()),
       )
 
     return controller.subscribe(subscribeRequest).transform { subscriptionState ->
@@ -5177,7 +5144,7 @@ class ThermostatCluster(private val controller: MatterController, private val en
 
   suspend fun subscribeUnoccupiedSetbackMaxAttribute(
     minInterval: Int,
-    maxInterval: Int
+    maxInterval: Int,
   ): Flow<UnoccupiedSetbackMaxAttributeSubscriptionState> {
     val ATTRIBUTE_ID: UInt = 57u
     val attributePaths =
@@ -5190,7 +5157,7 @@ class ThermostatCluster(private val controller: MatterController, private val en
         eventPaths = emptyList(),
         attributePaths = attributePaths,
         minInterval = Duration.ofSeconds(minInterval.toLong()),
-        maxInterval = Duration.ofSeconds(maxInterval.toLong())
+        maxInterval = Duration.ofSeconds(maxInterval.toLong()),
       )
 
     return controller.subscribe(subscribeRequest).transform { subscriptionState ->
@@ -5286,10 +5253,10 @@ class ThermostatCluster(private val controller: MatterController, private val en
             WriteRequest(
               attributePath =
                 AttributePath(endpointId, clusterId = CLUSTER_ID, attributeId = ATTRIBUTE_ID),
-              tlvPayload = tlvWriter.getEncoded()
+              tlvPayload = tlvWriter.getEncoded(),
             )
           ),
-        timedRequest = timedWriteTimeout
+        timedRequest = timedWriteTimeout,
       )
 
     val response: WriteResponse = controller.write(writeRequests)
@@ -5315,7 +5282,7 @@ class ThermostatCluster(private val controller: MatterController, private val en
 
   suspend fun subscribeEmergencyHeatDeltaAttribute(
     minInterval: Int,
-    maxInterval: Int
+    maxInterval: Int,
   ): Flow<UByteSubscriptionState> {
     val ATTRIBUTE_ID: UInt = 58u
     val attributePaths =
@@ -5328,7 +5295,7 @@ class ThermostatCluster(private val controller: MatterController, private val en
         eventPaths = emptyList(),
         attributePaths = attributePaths,
         minInterval = Duration.ofSeconds(minInterval.toLong()),
-        maxInterval = Duration.ofSeconds(maxInterval.toLong())
+        maxInterval = Duration.ofSeconds(maxInterval.toLong()),
       )
 
     return controller.subscribe(subscribeRequest).transform { subscriptionState ->
@@ -5419,10 +5386,10 @@ class ThermostatCluster(private val controller: MatterController, private val en
             WriteRequest(
               attributePath =
                 AttributePath(endpointId, clusterId = CLUSTER_ID, attributeId = ATTRIBUTE_ID),
-              tlvPayload = tlvWriter.getEncoded()
+              tlvPayload = tlvWriter.getEncoded(),
             )
           ),
-        timedRequest = timedWriteTimeout
+        timedRequest = timedWriteTimeout,
       )
 
     val response: WriteResponse = controller.write(writeRequests)
@@ -5448,7 +5415,7 @@ class ThermostatCluster(private val controller: MatterController, private val en
 
   suspend fun subscribeACTypeAttribute(
     minInterval: Int,
-    maxInterval: Int
+    maxInterval: Int,
   ): Flow<UByteSubscriptionState> {
     val ATTRIBUTE_ID: UInt = 64u
     val attributePaths =
@@ -5461,7 +5428,7 @@ class ThermostatCluster(private val controller: MatterController, private val en
         eventPaths = emptyList(),
         attributePaths = attributePaths,
         minInterval = Duration.ofSeconds(minInterval.toLong()),
-        maxInterval = Duration.ofSeconds(maxInterval.toLong())
+        maxInterval = Duration.ofSeconds(maxInterval.toLong()),
       )
 
     return controller.subscribe(subscribeRequest).transform { subscriptionState ->
@@ -5550,10 +5517,10 @@ class ThermostatCluster(private val controller: MatterController, private val en
             WriteRequest(
               attributePath =
                 AttributePath(endpointId, clusterId = CLUSTER_ID, attributeId = ATTRIBUTE_ID),
-              tlvPayload = tlvWriter.getEncoded()
+              tlvPayload = tlvWriter.getEncoded(),
             )
           ),
-        timedRequest = timedWriteTimeout
+        timedRequest = timedWriteTimeout,
       )
 
     val response: WriteResponse = controller.write(writeRequests)
@@ -5579,7 +5546,7 @@ class ThermostatCluster(private val controller: MatterController, private val en
 
   suspend fun subscribeACCapacityAttribute(
     minInterval: Int,
-    maxInterval: Int
+    maxInterval: Int,
   ): Flow<UShortSubscriptionState> {
     val ATTRIBUTE_ID: UInt = 65u
     val attributePaths =
@@ -5592,7 +5559,7 @@ class ThermostatCluster(private val controller: MatterController, private val en
         eventPaths = emptyList(),
         attributePaths = attributePaths,
         minInterval = Duration.ofSeconds(minInterval.toLong()),
-        maxInterval = Duration.ofSeconds(maxInterval.toLong())
+        maxInterval = Duration.ofSeconds(maxInterval.toLong()),
       )
 
     return controller.subscribe(subscribeRequest).transform { subscriptionState ->
@@ -5681,10 +5648,10 @@ class ThermostatCluster(private val controller: MatterController, private val en
             WriteRequest(
               attributePath =
                 AttributePath(endpointId, clusterId = CLUSTER_ID, attributeId = ATTRIBUTE_ID),
-              tlvPayload = tlvWriter.getEncoded()
+              tlvPayload = tlvWriter.getEncoded(),
             )
           ),
-        timedRequest = timedWriteTimeout
+        timedRequest = timedWriteTimeout,
       )
 
     val response: WriteResponse = controller.write(writeRequests)
@@ -5710,7 +5677,7 @@ class ThermostatCluster(private val controller: MatterController, private val en
 
   suspend fun subscribeACRefrigerantTypeAttribute(
     minInterval: Int,
-    maxInterval: Int
+    maxInterval: Int,
   ): Flow<UByteSubscriptionState> {
     val ATTRIBUTE_ID: UInt = 66u
     val attributePaths =
@@ -5723,7 +5690,7 @@ class ThermostatCluster(private val controller: MatterController, private val en
         eventPaths = emptyList(),
         attributePaths = attributePaths,
         minInterval = Duration.ofSeconds(minInterval.toLong()),
-        maxInterval = Duration.ofSeconds(maxInterval.toLong())
+        maxInterval = Duration.ofSeconds(maxInterval.toLong()),
       )
 
     return controller.subscribe(subscribeRequest).transform { subscriptionState ->
@@ -5814,10 +5781,10 @@ class ThermostatCluster(private val controller: MatterController, private val en
             WriteRequest(
               attributePath =
                 AttributePath(endpointId, clusterId = CLUSTER_ID, attributeId = ATTRIBUTE_ID),
-              tlvPayload = tlvWriter.getEncoded()
+              tlvPayload = tlvWriter.getEncoded(),
             )
           ),
-        timedRequest = timedWriteTimeout
+        timedRequest = timedWriteTimeout,
       )
 
     val response: WriteResponse = controller.write(writeRequests)
@@ -5843,7 +5810,7 @@ class ThermostatCluster(private val controller: MatterController, private val en
 
   suspend fun subscribeACCompressorTypeAttribute(
     minInterval: Int,
-    maxInterval: Int
+    maxInterval: Int,
   ): Flow<UByteSubscriptionState> {
     val ATTRIBUTE_ID: UInt = 67u
     val attributePaths =
@@ -5856,7 +5823,7 @@ class ThermostatCluster(private val controller: MatterController, private val en
         eventPaths = emptyList(),
         attributePaths = attributePaths,
         minInterval = Duration.ofSeconds(minInterval.toLong()),
-        maxInterval = Duration.ofSeconds(maxInterval.toLong())
+        maxInterval = Duration.ofSeconds(maxInterval.toLong()),
       )
 
     return controller.subscribe(subscribeRequest).transform { subscriptionState ->
@@ -5947,10 +5914,10 @@ class ThermostatCluster(private val controller: MatterController, private val en
             WriteRequest(
               attributePath =
                 AttributePath(endpointId, clusterId = CLUSTER_ID, attributeId = ATTRIBUTE_ID),
-              tlvPayload = tlvWriter.getEncoded()
+              tlvPayload = tlvWriter.getEncoded(),
             )
           ),
-        timedRequest = timedWriteTimeout
+        timedRequest = timedWriteTimeout,
       )
 
     val response: WriteResponse = controller.write(writeRequests)
@@ -5976,7 +5943,7 @@ class ThermostatCluster(private val controller: MatterController, private val en
 
   suspend fun subscribeACErrorCodeAttribute(
     minInterval: Int,
-    maxInterval: Int
+    maxInterval: Int,
   ): Flow<UIntSubscriptionState> {
     val ATTRIBUTE_ID: UInt = 68u
     val attributePaths =
@@ -5989,7 +5956,7 @@ class ThermostatCluster(private val controller: MatterController, private val en
         eventPaths = emptyList(),
         attributePaths = attributePaths,
         minInterval = Duration.ofSeconds(minInterval.toLong()),
-        maxInterval = Duration.ofSeconds(maxInterval.toLong())
+        maxInterval = Duration.ofSeconds(maxInterval.toLong()),
       )
 
     return controller.subscribe(subscribeRequest).transform { subscriptionState ->
@@ -6078,10 +6045,10 @@ class ThermostatCluster(private val controller: MatterController, private val en
             WriteRequest(
               attributePath =
                 AttributePath(endpointId, clusterId = CLUSTER_ID, attributeId = ATTRIBUTE_ID),
-              tlvPayload = tlvWriter.getEncoded()
+              tlvPayload = tlvWriter.getEncoded(),
             )
           ),
-        timedRequest = timedWriteTimeout
+        timedRequest = timedWriteTimeout,
       )
 
     val response: WriteResponse = controller.write(writeRequests)
@@ -6107,7 +6074,7 @@ class ThermostatCluster(private val controller: MatterController, private val en
 
   suspend fun subscribeACLouverPositionAttribute(
     minInterval: Int,
-    maxInterval: Int
+    maxInterval: Int,
   ): Flow<UByteSubscriptionState> {
     val ATTRIBUTE_ID: UInt = 69u
     val attributePaths =
@@ -6120,7 +6087,7 @@ class ThermostatCluster(private val controller: MatterController, private val en
         eventPaths = emptyList(),
         attributePaths = attributePaths,
         minInterval = Duration.ofSeconds(minInterval.toLong()),
-        maxInterval = Duration.ofSeconds(maxInterval.toLong())
+        maxInterval = Duration.ofSeconds(maxInterval.toLong()),
       )
 
     return controller.subscribe(subscribeRequest).transform { subscriptionState ->
@@ -6205,7 +6172,7 @@ class ThermostatCluster(private val controller: MatterController, private val en
 
   suspend fun subscribeACCoilTemperatureAttribute(
     minInterval: Int,
-    maxInterval: Int
+    maxInterval: Int,
   ): Flow<ACCoilTemperatureAttributeSubscriptionState> {
     val ATTRIBUTE_ID: UInt = 70u
     val attributePaths =
@@ -6218,7 +6185,7 @@ class ThermostatCluster(private val controller: MatterController, private val en
         eventPaths = emptyList(),
         attributePaths = attributePaths,
         minInterval = Duration.ofSeconds(minInterval.toLong()),
-        maxInterval = Duration.ofSeconds(maxInterval.toLong())
+        maxInterval = Duration.ofSeconds(maxInterval.toLong()),
       )
 
     return controller.subscribe(subscribeRequest).transform { subscriptionState ->
@@ -6314,10 +6281,10 @@ class ThermostatCluster(private val controller: MatterController, private val en
             WriteRequest(
               attributePath =
                 AttributePath(endpointId, clusterId = CLUSTER_ID, attributeId = ATTRIBUTE_ID),
-              tlvPayload = tlvWriter.getEncoded()
+              tlvPayload = tlvWriter.getEncoded(),
             )
           ),
-        timedRequest = timedWriteTimeout
+        timedRequest = timedWriteTimeout,
       )
 
     val response: WriteResponse = controller.write(writeRequests)
@@ -6343,7 +6310,7 @@ class ThermostatCluster(private val controller: MatterController, private val en
 
   suspend fun subscribeACCapacityformatAttribute(
     minInterval: Int,
-    maxInterval: Int
+    maxInterval: Int,
   ): Flow<UByteSubscriptionState> {
     val ATTRIBUTE_ID: UInt = 71u
     val attributePaths =
@@ -6356,7 +6323,7 @@ class ThermostatCluster(private val controller: MatterController, private val en
         eventPaths = emptyList(),
         attributePaths = attributePaths,
         minInterval = Duration.ofSeconds(minInterval.toLong()),
-        maxInterval = Duration.ofSeconds(maxInterval.toLong())
+        maxInterval = Duration.ofSeconds(maxInterval.toLong()),
       )
 
     return controller.subscribe(subscribeRequest).transform { subscriptionState ->
@@ -6442,7 +6409,7 @@ class ThermostatCluster(private val controller: MatterController, private val en
 
   suspend fun subscribePresetTypesAttribute(
     minInterval: Int,
-    maxInterval: Int
+    maxInterval: Int,
   ): Flow<PresetTypesAttributeSubscriptionState> {
     val ATTRIBUTE_ID: UInt = 72u
     val attributePaths =
@@ -6455,7 +6422,7 @@ class ThermostatCluster(private val controller: MatterController, private val en
         eventPaths = emptyList(),
         attributePaths = attributePaths,
         minInterval = Duration.ofSeconds(minInterval.toLong()),
-        maxInterval = Duration.ofSeconds(maxInterval.toLong())
+        maxInterval = Duration.ofSeconds(maxInterval.toLong()),
       )
 
     return controller.subscribe(subscribeRequest).transform { subscriptionState ->
@@ -6545,7 +6512,7 @@ class ThermostatCluster(private val controller: MatterController, private val en
 
   suspend fun subscribeScheduleTypesAttribute(
     minInterval: Int,
-    maxInterval: Int
+    maxInterval: Int,
   ): Flow<ScheduleTypesAttributeSubscriptionState> {
     val ATTRIBUTE_ID: UInt = 73u
     val attributePaths =
@@ -6558,7 +6525,7 @@ class ThermostatCluster(private val controller: MatterController, private val en
         eventPaths = emptyList(),
         attributePaths = attributePaths,
         minInterval = Duration.ofSeconds(minInterval.toLong()),
-        maxInterval = Duration.ofSeconds(maxInterval.toLong())
+        maxInterval = Duration.ofSeconds(maxInterval.toLong()),
       )
 
     return controller.subscribe(subscribeRequest).transform { subscriptionState ->
@@ -6642,7 +6609,7 @@ class ThermostatCluster(private val controller: MatterController, private val en
 
   suspend fun subscribeNumberOfPresetsAttribute(
     minInterval: Int,
-    maxInterval: Int
+    maxInterval: Int,
   ): Flow<UByteSubscriptionState> {
     val ATTRIBUTE_ID: UInt = 74u
     val attributePaths =
@@ -6655,7 +6622,7 @@ class ThermostatCluster(private val controller: MatterController, private val en
         eventPaths = emptyList(),
         attributePaths = attributePaths,
         minInterval = Duration.ofSeconds(minInterval.toLong()),
-        maxInterval = Duration.ofSeconds(maxInterval.toLong())
+        maxInterval = Duration.ofSeconds(maxInterval.toLong()),
       )
 
     return controller.subscribe(subscribeRequest).transform { subscriptionState ->
@@ -6735,7 +6702,7 @@ class ThermostatCluster(private val controller: MatterController, private val en
 
   suspend fun subscribeNumberOfSchedulesAttribute(
     minInterval: Int,
-    maxInterval: Int
+    maxInterval: Int,
   ): Flow<UByteSubscriptionState> {
     val ATTRIBUTE_ID: UInt = 75u
     val attributePaths =
@@ -6748,7 +6715,7 @@ class ThermostatCluster(private val controller: MatterController, private val en
         eventPaths = emptyList(),
         attributePaths = attributePaths,
         minInterval = Duration.ofSeconds(minInterval.toLong()),
-        maxInterval = Duration.ofSeconds(maxInterval.toLong())
+        maxInterval = Duration.ofSeconds(maxInterval.toLong()),
       )
 
     return controller.subscribe(subscribeRequest).transform { subscriptionState ->
@@ -6828,7 +6795,7 @@ class ThermostatCluster(private val controller: MatterController, private val en
 
   suspend fun subscribeNumberOfScheduleTransitionsAttribute(
     minInterval: Int,
-    maxInterval: Int
+    maxInterval: Int,
   ): Flow<UByteSubscriptionState> {
     val ATTRIBUTE_ID: UInt = 76u
     val attributePaths =
@@ -6841,7 +6808,7 @@ class ThermostatCluster(private val controller: MatterController, private val en
         eventPaths = emptyList(),
         attributePaths = attributePaths,
         minInterval = Duration.ofSeconds(minInterval.toLong()),
-        maxInterval = Duration.ofSeconds(maxInterval.toLong())
+        maxInterval = Duration.ofSeconds(maxInterval.toLong()),
       )
 
     return controller.subscribe(subscribeRequest).transform { subscriptionState ->
@@ -6929,7 +6896,7 @@ class ThermostatCluster(private val controller: MatterController, private val en
 
   suspend fun subscribeNumberOfScheduleTransitionPerDayAttribute(
     minInterval: Int,
-    maxInterval: Int
+    maxInterval: Int,
   ): Flow<NumberOfScheduleTransitionPerDayAttributeSubscriptionState> {
     val ATTRIBUTE_ID: UInt = 77u
     val attributePaths =
@@ -6942,7 +6909,7 @@ class ThermostatCluster(private val controller: MatterController, private val en
         eventPaths = emptyList(),
         attributePaths = attributePaths,
         minInterval = Duration.ofSeconds(minInterval.toLong()),
-        maxInterval = Duration.ofSeconds(maxInterval.toLong())
+        maxInterval = Duration.ofSeconds(maxInterval.toLong()),
       )
 
     return controller.subscribe(subscribeRequest).transform { subscriptionState ->
@@ -7034,7 +7001,7 @@ class ThermostatCluster(private val controller: MatterController, private val en
 
   suspend fun subscribeActivePresetHandleAttribute(
     minInterval: Int,
-    maxInterval: Int
+    maxInterval: Int,
   ): Flow<ActivePresetHandleAttributeSubscriptionState> {
     val ATTRIBUTE_ID: UInt = 78u
     val attributePaths =
@@ -7047,7 +7014,7 @@ class ThermostatCluster(private val controller: MatterController, private val en
         eventPaths = emptyList(),
         attributePaths = attributePaths,
         minInterval = Duration.ofSeconds(minInterval.toLong()),
-        maxInterval = Duration.ofSeconds(maxInterval.toLong())
+        maxInterval = Duration.ofSeconds(maxInterval.toLong()),
       )
 
     return controller.subscribe(subscribeRequest).transform { subscriptionState ->
@@ -7137,7 +7104,7 @@ class ThermostatCluster(private val controller: MatterController, private val en
 
   suspend fun subscribeActiveScheduleHandleAttribute(
     minInterval: Int,
-    maxInterval: Int
+    maxInterval: Int,
   ): Flow<ActiveScheduleHandleAttributeSubscriptionState> {
     val ATTRIBUTE_ID: UInt = 79u
     val attributePaths =
@@ -7150,7 +7117,7 @@ class ThermostatCluster(private val controller: MatterController, private val en
         eventPaths = emptyList(),
         attributePaths = attributePaths,
         minInterval = Duration.ofSeconds(minInterval.toLong()),
-        maxInterval = Duration.ofSeconds(maxInterval.toLong())
+        maxInterval = Duration.ofSeconds(maxInterval.toLong()),
       )
 
     return controller.subscribe(subscribeRequest).transform { subscriptionState ->
@@ -7241,7 +7208,7 @@ class ThermostatCluster(private val controller: MatterController, private val en
 
   suspend fun writePresetsAttribute(
     value: List<ThermostatClusterPresetStruct>,
-    timedWriteTimeout: Duration? = null
+    timedWriteTimeout: Duration? = null,
   ) {
     val ATTRIBUTE_ID: UInt = 80u
 
@@ -7259,10 +7226,10 @@ class ThermostatCluster(private val controller: MatterController, private val en
             WriteRequest(
               attributePath =
                 AttributePath(endpointId, clusterId = CLUSTER_ID, attributeId = ATTRIBUTE_ID),
-              tlvPayload = tlvWriter.getEncoded()
+              tlvPayload = tlvWriter.getEncoded(),
             )
           ),
-        timedRequest = timedWriteTimeout
+        timedRequest = timedWriteTimeout,
       )
 
     val response: WriteResponse = controller.write(writeRequests)
@@ -7288,7 +7255,7 @@ class ThermostatCluster(private val controller: MatterController, private val en
 
   suspend fun subscribePresetsAttribute(
     minInterval: Int,
-    maxInterval: Int
+    maxInterval: Int,
   ): Flow<PresetsAttributeSubscriptionState> {
     val ATTRIBUTE_ID: UInt = 80u
     val attributePaths =
@@ -7301,7 +7268,7 @@ class ThermostatCluster(private val controller: MatterController, private val en
         eventPaths = emptyList(),
         attributePaths = attributePaths,
         minInterval = Duration.ofSeconds(minInterval.toLong()),
-        maxInterval = Duration.ofSeconds(maxInterval.toLong())
+        maxInterval = Duration.ofSeconds(maxInterval.toLong()),
       )
 
     return controller.subscribe(subscribeRequest).transform { subscriptionState ->
@@ -7391,7 +7358,7 @@ class ThermostatCluster(private val controller: MatterController, private val en
 
   suspend fun writeSchedulesAttribute(
     value: List<ThermostatClusterScheduleStruct>,
-    timedWriteTimeout: Duration? = null
+    timedWriteTimeout: Duration? = null,
   ) {
     val ATTRIBUTE_ID: UInt = 81u
 
@@ -7409,10 +7376,10 @@ class ThermostatCluster(private val controller: MatterController, private val en
             WriteRequest(
               attributePath =
                 AttributePath(endpointId, clusterId = CLUSTER_ID, attributeId = ATTRIBUTE_ID),
-              tlvPayload = tlvWriter.getEncoded()
+              tlvPayload = tlvWriter.getEncoded(),
             )
           ),
-        timedRequest = timedWriteTimeout
+        timedRequest = timedWriteTimeout,
       )
 
     val response: WriteResponse = controller.write(writeRequests)
@@ -7438,7 +7405,7 @@ class ThermostatCluster(private val controller: MatterController, private val en
 
   suspend fun subscribeSchedulesAttribute(
     minInterval: Int,
-    maxInterval: Int
+    maxInterval: Int,
   ): Flow<SchedulesAttributeSubscriptionState> {
     val ATTRIBUTE_ID: UInt = 81u
     val attributePaths =
@@ -7451,7 +7418,7 @@ class ThermostatCluster(private val controller: MatterController, private val en
         eventPaths = emptyList(),
         attributePaths = attributePaths,
         minInterval = Duration.ofSeconds(minInterval.toLong()),
-        maxInterval = Duration.ofSeconds(maxInterval.toLong())
+        maxInterval = Duration.ofSeconds(maxInterval.toLong()),
       )
 
     return controller.subscribe(subscribeRequest).transform { subscriptionState ->
@@ -7535,7 +7502,7 @@ class ThermostatCluster(private val controller: MatterController, private val en
 
   suspend fun subscribePresetsSchedulesEditableAttribute(
     minInterval: Int,
-    maxInterval: Int
+    maxInterval: Int,
   ): Flow<BooleanSubscriptionState> {
     val ATTRIBUTE_ID: UInt = 82u
     val attributePaths =
@@ -7548,7 +7515,7 @@ class ThermostatCluster(private val controller: MatterController, private val en
         eventPaths = emptyList(),
         attributePaths = attributePaths,
         minInterval = Duration.ofSeconds(minInterval.toLong()),
-        maxInterval = Duration.ofSeconds(maxInterval.toLong())
+        maxInterval = Duration.ofSeconds(maxInterval.toLong()),
       )
 
     return controller.subscribe(subscribeRequest).transform { subscriptionState ->
@@ -7630,7 +7597,7 @@ class ThermostatCluster(private val controller: MatterController, private val en
 
   suspend fun subscribeTemperatureSetpointHoldPolicyAttribute(
     minInterval: Int,
-    maxInterval: Int
+    maxInterval: Int,
   ): Flow<UByteSubscriptionState> {
     val ATTRIBUTE_ID: UInt = 83u
     val attributePaths =
@@ -7643,7 +7610,7 @@ class ThermostatCluster(private val controller: MatterController, private val en
         eventPaths = emptyList(),
         attributePaths = attributePaths,
         minInterval = Duration.ofSeconds(minInterval.toLong()),
-        maxInterval = Duration.ofSeconds(maxInterval.toLong())
+        maxInterval = Duration.ofSeconds(maxInterval.toLong()),
       )
 
     return controller.subscribe(subscribeRequest).transform { subscriptionState ->
@@ -7728,7 +7695,7 @@ class ThermostatCluster(private val controller: MatterController, private val en
 
   suspend fun subscribeSetpointHoldExpiryTimestampAttribute(
     minInterval: Int,
-    maxInterval: Int
+    maxInterval: Int,
   ): Flow<SetpointHoldExpiryTimestampAttributeSubscriptionState> {
     val ATTRIBUTE_ID: UInt = 84u
     val attributePaths =
@@ -7741,7 +7708,7 @@ class ThermostatCluster(private val controller: MatterController, private val en
         eventPaths = emptyList(),
         attributePaths = attributePaths,
         minInterval = Duration.ofSeconds(minInterval.toLong()),
-        maxInterval = Duration.ofSeconds(maxInterval.toLong())
+        maxInterval = Duration.ofSeconds(maxInterval.toLong()),
       )
 
     return controller.subscribe(subscribeRequest).transform { subscriptionState ->
@@ -7790,107 +7757,6 @@ class ThermostatCluster(private val controller: MatterController, private val en
     }
   }
 
-  suspend fun readQueuedPresetAttribute(): QueuedPresetAttribute {
-    val ATTRIBUTE_ID: UInt = 85u
-
-    val attributePath =
-      AttributePath(endpointId = endpointId, clusterId = CLUSTER_ID, attributeId = ATTRIBUTE_ID)
-
-    val readRequest = ReadRequest(eventPaths = emptyList(), attributePaths = listOf(attributePath))
-
-    val response = controller.read(readRequest)
-
-    if (response.successes.isEmpty()) {
-      logger.log(Level.WARNING, "Read command failed")
-      throw IllegalStateException("Read command failed with failures: ${response.failures}")
-    }
-
-    logger.log(Level.FINE, "Read command succeeded")
-
-    val attributeData =
-      response.successes.filterIsInstance<ReadData.Attribute>().firstOrNull {
-        it.path.attributeId == ATTRIBUTE_ID
-      }
-
-    requireNotNull(attributeData) { "Queuedpreset attribute not found in response" }
-
-    // Decode the TLV data into the appropriate type
-    val tlvReader = TlvReader(attributeData.data)
-    val decodedValue: ThermostatClusterQueuedPresetStruct? =
-      if (!tlvReader.isNull()) {
-        if (tlvReader.isNextTag(AnonymousTag)) {
-          ThermostatClusterQueuedPresetStruct.fromTlv(AnonymousTag, tlvReader)
-        } else {
-          null
-        }
-      } else {
-        tlvReader.getNull(AnonymousTag)
-        null
-      }
-
-    return QueuedPresetAttribute(decodedValue)
-  }
-
-  suspend fun subscribeQueuedPresetAttribute(
-    minInterval: Int,
-    maxInterval: Int
-  ): Flow<QueuedPresetAttributeSubscriptionState> {
-    val ATTRIBUTE_ID: UInt = 85u
-    val attributePaths =
-      listOf(
-        AttributePath(endpointId = endpointId, clusterId = CLUSTER_ID, attributeId = ATTRIBUTE_ID)
-      )
-
-    val subscribeRequest: SubscribeRequest =
-      SubscribeRequest(
-        eventPaths = emptyList(),
-        attributePaths = attributePaths,
-        minInterval = Duration.ofSeconds(minInterval.toLong()),
-        maxInterval = Duration.ofSeconds(maxInterval.toLong())
-      )
-
-    return controller.subscribe(subscribeRequest).transform { subscriptionState ->
-      when (subscriptionState) {
-        is SubscriptionState.SubscriptionErrorNotification -> {
-          emit(
-            QueuedPresetAttributeSubscriptionState.Error(
-              Exception(
-                "Subscription terminated with error code: ${subscriptionState.terminationCause}"
-              )
-            )
-          )
-        }
-        is SubscriptionState.NodeStateUpdate -> {
-          val attributeData =
-            subscriptionState.updateState.successes
-              .filterIsInstance<ReadData.Attribute>()
-              .firstOrNull { it.path.attributeId == ATTRIBUTE_ID }
-
-          requireNotNull(attributeData) { "Queuedpreset attribute not found in Node State update" }
-
-          // Decode the TLV data into the appropriate type
-          val tlvReader = TlvReader(attributeData.data)
-          val decodedValue: ThermostatClusterQueuedPresetStruct? =
-            if (!tlvReader.isNull()) {
-              if (tlvReader.isNextTag(AnonymousTag)) {
-                ThermostatClusterQueuedPresetStruct.fromTlv(AnonymousTag, tlvReader)
-              } else {
-                null
-              }
-            } else {
-              tlvReader.getNull(AnonymousTag)
-              null
-            }
-
-          decodedValue?.let { emit(QueuedPresetAttributeSubscriptionState.Success(it)) }
-        }
-        SubscriptionState.SubscriptionEstablished -> {
-          emit(QueuedPresetAttributeSubscriptionState.SubscriptionEstablished)
-        }
-      }
-    }
-  }
-
   suspend fun readGeneratedCommandListAttribute(): GeneratedCommandListAttribute {
     val ATTRIBUTE_ID: UInt = 65528u
 
@@ -7931,7 +7797,7 @@ class ThermostatCluster(private val controller: MatterController, private val en
 
   suspend fun subscribeGeneratedCommandListAttribute(
     minInterval: Int,
-    maxInterval: Int
+    maxInterval: Int,
   ): Flow<GeneratedCommandListAttributeSubscriptionState> {
     val ATTRIBUTE_ID: UInt = 65528u
     val attributePaths =
@@ -7944,7 +7810,7 @@ class ThermostatCluster(private val controller: MatterController, private val en
         eventPaths = emptyList(),
         attributePaths = attributePaths,
         minInterval = Duration.ofSeconds(minInterval.toLong()),
-        maxInterval = Duration.ofSeconds(maxInterval.toLong())
+        maxInterval = Duration.ofSeconds(maxInterval.toLong()),
       )
 
     return controller.subscribe(subscribeRequest).transform { subscriptionState ->
@@ -8028,7 +7894,7 @@ class ThermostatCluster(private val controller: MatterController, private val en
 
   suspend fun subscribeAcceptedCommandListAttribute(
     minInterval: Int,
-    maxInterval: Int
+    maxInterval: Int,
   ): Flow<AcceptedCommandListAttributeSubscriptionState> {
     val ATTRIBUTE_ID: UInt = 65529u
     val attributePaths =
@@ -8041,7 +7907,7 @@ class ThermostatCluster(private val controller: MatterController, private val en
         eventPaths = emptyList(),
         attributePaths = attributePaths,
         minInterval = Duration.ofSeconds(minInterval.toLong()),
-        maxInterval = Duration.ofSeconds(maxInterval.toLong())
+        maxInterval = Duration.ofSeconds(maxInterval.toLong()),
       )
 
     return controller.subscribe(subscribeRequest).transform { subscriptionState ->
@@ -8125,7 +7991,7 @@ class ThermostatCluster(private val controller: MatterController, private val en
 
   suspend fun subscribeEventListAttribute(
     minInterval: Int,
-    maxInterval: Int
+    maxInterval: Int,
   ): Flow<EventListAttributeSubscriptionState> {
     val ATTRIBUTE_ID: UInt = 65530u
     val attributePaths =
@@ -8138,7 +8004,7 @@ class ThermostatCluster(private val controller: MatterController, private val en
         eventPaths = emptyList(),
         attributePaths = attributePaths,
         minInterval = Duration.ofSeconds(minInterval.toLong()),
-        maxInterval = Duration.ofSeconds(maxInterval.toLong())
+        maxInterval = Duration.ofSeconds(maxInterval.toLong()),
       )
 
     return controller.subscribe(subscribeRequest).transform { subscriptionState ->
@@ -8220,7 +8086,7 @@ class ThermostatCluster(private val controller: MatterController, private val en
 
   suspend fun subscribeAttributeListAttribute(
     minInterval: Int,
-    maxInterval: Int
+    maxInterval: Int,
   ): Flow<AttributeListAttributeSubscriptionState> {
     val ATTRIBUTE_ID: UInt = 65531u
     val attributePaths =
@@ -8233,7 +8099,7 @@ class ThermostatCluster(private val controller: MatterController, private val en
         eventPaths = emptyList(),
         attributePaths = attributePaths,
         minInterval = Duration.ofSeconds(minInterval.toLong()),
-        maxInterval = Duration.ofSeconds(maxInterval.toLong())
+        maxInterval = Duration.ofSeconds(maxInterval.toLong()),
       )
 
     return controller.subscribe(subscribeRequest).transform { subscriptionState ->
@@ -8308,7 +8174,7 @@ class ThermostatCluster(private val controller: MatterController, private val en
 
   suspend fun subscribeFeatureMapAttribute(
     minInterval: Int,
-    maxInterval: Int
+    maxInterval: Int,
   ): Flow<UIntSubscriptionState> {
     val ATTRIBUTE_ID: UInt = 65532u
     val attributePaths =
@@ -8321,7 +8187,7 @@ class ThermostatCluster(private val controller: MatterController, private val en
         eventPaths = emptyList(),
         attributePaths = attributePaths,
         minInterval = Duration.ofSeconds(minInterval.toLong()),
-        maxInterval = Duration.ofSeconds(maxInterval.toLong())
+        maxInterval = Duration.ofSeconds(maxInterval.toLong()),
       )
 
     return controller.subscribe(subscribeRequest).transform { subscriptionState ->
@@ -8389,7 +8255,7 @@ class ThermostatCluster(private val controller: MatterController, private val en
 
   suspend fun subscribeClusterRevisionAttribute(
     minInterval: Int,
-    maxInterval: Int
+    maxInterval: Int,
   ): Flow<UShortSubscriptionState> {
     val ATTRIBUTE_ID: UInt = 65533u
     val attributePaths =
@@ -8402,7 +8268,7 @@ class ThermostatCluster(private val controller: MatterController, private val en
         eventPaths = emptyList(),
         attributePaths = attributePaths,
         minInterval = Duration.ofSeconds(minInterval.toLong()),
-        maxInterval = Duration.ofSeconds(maxInterval.toLong())
+        maxInterval = Duration.ofSeconds(maxInterval.toLong()),
       )
 
     return controller.subscribe(subscribeRequest).transform { subscriptionState ->

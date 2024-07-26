@@ -22,9 +22,12 @@
  */
 
 #include <errno.h>
-#include <gtest/gtest.h>
+#include <stdarg.h>
+
+#include <pw_unit_test/framework.h>
 
 #include <lib/core/CHIPCore.h>
+#include <lib/core/StringBuilderAdapters.h>
 
 #include <credentials/FabricTable.h>
 
@@ -40,8 +43,6 @@
 #include <platform/ConfigurationManager.h>
 
 #include <lib/support/BytesToHex.h>
-
-#include <stdarg.h>
 
 using namespace chip;
 using namespace chip::Credentials;

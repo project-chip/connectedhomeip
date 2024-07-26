@@ -79,6 +79,7 @@ Generally regenerate using one of:
 |        129 |       0x81 | ValveConfigurationAndControl                            |
 |        144 |       0x90 | ElectricalPowerMeasurement                              |
 |        145 |       0x91 | ElectricalEnergyMeasurement                             |
+|        148 |       0x94 | WaterHeaterManagement                                   |
 |        150 |       0x96 | DemandResponseLoadControl                               |
 |        151 |       0x97 | Messages                                                |
 |        152 |       0x98 | DeviceEnergyManagement                                  |
@@ -86,10 +87,12 @@ Generally regenerate using one of:
 |        155 |       0x9B | EnergyPreference                                        |
 |        156 |       0x9C | PowerTopology                                           |
 |        157 |       0x9D | EnergyEvseMode                                          |
+|        158 |       0x9E | WaterHeaterMode                                         |
 |        159 |       0x9F | DeviceEnergyManagementMode                              |
 |        257 |      0x101 | DoorLock                                                |
 |        258 |      0x102 | WindowCovering                                          |
 |        259 |      0x103 | BarrierControl                                          |
+|        336 |      0x150 | ServiceArea                                             |
 |        512 |      0x200 | PumpConfigurationAndControl                             |
 |        513 |      0x201 | Thermostat                                              |
 |        514 |      0x202 | FanControl                                              |
@@ -129,6 +132,8 @@ Generally regenerate using one of:
 |       1294 |      0x50E | AccountLogin                                            |
 |       1295 |      0x50F | ContentControl                                          |
 |       1296 |      0x510 | ContentAppObserver                                      |
+|       1872 |      0x750 | EcosystemInformation                                    |
+|       1873 |      0x751 | CommissionerControl                                     |
 |       2820 |      0xB04 | ElectricalMeasurement                                   |
 | 4294048773 | 0xFFF1FC05 | UnitTesting                                             |
 | 4294048774 | 0xFFF1FC06 | FaultInjection                                          |

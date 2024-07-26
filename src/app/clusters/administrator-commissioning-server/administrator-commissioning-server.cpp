@@ -91,8 +91,8 @@ bool emberAfAdministratorCommissioningClusterOpenCommissioningWindowCallback(
     auto & iterations         = commandData.iterations;
     auto & salt               = commandData.salt;
 
-    Optional<StatusCode> status           = Optional<StatusCode>::Missing();
-    InteractionModel::Status globalStatus = InteractionModel::Status::Success;
+    Optional<StatusCode> status = Optional<StatusCode>::Missing();
+    Status globalStatus         = Status::Success;
     Spake2pVerifier verifier;
 
     ChipLogProgress(Zcl, "Received command to open commissioning window");
@@ -110,11 +110,9 @@ bool emberAfAdministratorCommissioningClusterOpenCommissioningWindowCallback(
     VerifyOrExit(iterations <= kSpake2p_Max_PBKDF_Iterations, status.Emplace(StatusCode::kPAKEParameterError));
     VerifyOrExit(salt.size() >= kSpake2p_Min_PBKDF_Salt_Length, status.Emplace(StatusCode::kPAKEParameterError));
     VerifyOrExit(salt.size() <= kSpake2p_Max_PBKDF_Salt_Length, status.Emplace(StatusCode::kPAKEParameterError));
-    VerifyOrExit(commissioningTimeout <= commissionMgr.MaxCommissioningTimeout(),
-                 globalStatus = InteractionModel::Status::InvalidCommand);
-    VerifyOrExit(commissioningTimeout >= commissionMgr.MinCommissioningTimeout(),
-                 globalStatus = InteractionModel::Status::InvalidCommand);
-    VerifyOrExit(discriminator <= kMaxDiscriminatorValue, globalStatus = InteractionModel::Status::InvalidCommand);
+    VerifyOrExit(commissioningTimeout <= commissionMgr.MaxCommissioningTimeout(), globalStatus = Status::InvalidCommand);
+    VerifyOrExit(commissioningTimeout >= commissionMgr.MinCommissioningTimeout(), globalStatus = Status::InvalidCommand);
+    VerifyOrExit(discriminator <= kMaxDiscriminatorValue, globalStatus = Status::InvalidCommand);
 
     VerifyOrExit(verifier.Deserialize(pakeVerifier) == CHIP_NO_ERROR, status.Emplace(StatusCode::kPAKEParameterError));
     VerifyOrExit(commissionMgr.OpenEnhancedCommissioningWindow(commissioningTimeout, discriminator, verifier, iterations, salt,
@@ -130,7 +128,7 @@ exit:
     }
     else
     {
-        if (globalStatus != InteractionModel::Status::Success)
+        if (globalStatus != Status::Success)
         {
             ChipLogError(Zcl, "Failed to open commissioning window. Global status " ChipLogFormatIMStatus,
                          ChipLogValueIMStatus(globalStatus));
@@ -147,8 +145,8 @@ bool emberAfAdministratorCommissioningClusterOpenBasicCommissioningWindowCallbac
     MATTER_TRACE_SCOPE("OpenBasicCommissioningWindow", "AdministratorCommissioning");
     auto commissioningTimeout = System::Clock::Seconds16(commandData.commissioningTimeout);
 
-    Optional<StatusCode> status           = Optional<StatusCode>::Missing();
-    InteractionModel::Status globalStatus = InteractionModel::Status::Success;
+    Optional<StatusCode> status = Optional<StatusCode>::Missing();
+    Status globalStatus         = Status::Success;
     ChipLogProgress(Zcl, "Received command to open basic commissioning window");
 
     FabricIndex fabricIndex       = commandObj->GetAccessingFabricIndex();
@@ -160,10 +158,8 @@ bool emberAfAdministratorCommissioningClusterOpenBasicCommissioningWindowCallbac
 
     VerifyOrExit(!commissionMgr.IsCommissioningWindowOpen(), status.Emplace(StatusCode::kBusy));
     VerifyOrExit(failSafeContext.IsFailSafeFullyDisarmed(), status.Emplace(StatusCode::kBusy));
-    VerifyOrExit(commissioningTimeout <= commissionMgr.MaxCommissioningTimeout(),
-                 globalStatus = InteractionModel::Status::InvalidCommand);
-    VerifyOrExit(commissioningTimeout >= commissionMgr.MinCommissioningTimeout(),
-                 globalStatus = InteractionModel::Status::InvalidCommand);
+    VerifyOrExit(commissioningTimeout <= commissionMgr.MaxCommissioningTimeout(), globalStatus = Status::InvalidCommand);
+    VerifyOrExit(commissioningTimeout >= commissionMgr.MinCommissioningTimeout(), globalStatus = Status::InvalidCommand);
     VerifyOrExit(commissionMgr.OpenBasicCommissioningWindowForAdministratorCommissioningCluster(
                      commissioningTimeout, fabricIndex, fabricInfo->GetVendorId()) == CHIP_NO_ERROR,
                  status.Emplace(StatusCode::kPAKEParameterError));
@@ -177,7 +173,7 @@ exit:
     }
     else
     {
-        if (globalStatus != InteractionModel::Status::Success)
+        if (globalStatus != Status::Success)
         {
             ChipLogError(Zcl, "Failed to open commissioning window. Global status " ChipLogFormatIMStatus,
                          ChipLogValueIMStatus(globalStatus));

@@ -59,13 +59,8 @@ config("chip_examples_project_config") {
   include_dirs = [ "project_include" ]
 
   # Link options that provide a replacement for dynamic memory operations in standard
-  # library with the FreeRTOS malloc in platform code.
+  # library with the sl_memory_manager in platform code.
   ldflags = [
-    # memory allocation -- these must be re-entrant and do locking
-    "-Wl,--wrap=malloc",
-    "-Wl,--wrap=free",
-    "-Wl,--wrap=realloc",
-    "-Wl,--wrap=calloc",
     "-Wl,--wrap=MemoryAlloc",
 
     # Wrap these in case internal newlib call them (e.g. strdup will)
@@ -91,10 +86,9 @@ source_set("test-event-trigger") {
     "${silabs_common_plat_dir}/SilabsTestEventTriggerDelegate.h",
   ]
 
+  deps = [ "${chip_root}/src/platform/silabs/provision:provision-headers" ]
   public_configs = [ ":test-event-trigger-config" ]
-
   public_deps = [
-    ":silabs-factory-data-provider",
     "${chip_root}/src/app:test-event-trigger",
     "${chip_root}/src/lib/core",
     "${chip_root}/src/lib/support",
@@ -119,46 +113,14 @@ source_set("siwx917-matter-shell") {
   }
 }
 
-config("attestation-credentials-config") {
-  include_dirs = [ "${chip_root}" ]
-}
-
-source_set("siwx917-attestation-credentials") {
-  sources = [
-    "${silabs_common_plat_dir}/SilabsDeviceAttestationCreds.cpp",
-    "${silabs_common_plat_dir}/SilabsDeviceAttestationCreds.h",
-  ]
-
-  public_deps = [
-    "${chip_root}/src/credentials",
-    "${chip_root}/src/platform:platform_base",
-  ]
-
-  public_configs = [ ":attestation-credentials-config" ]
-}
-
-source_set("silabs-factory-data-provider") {
-  sources = [
-    "${silabs_common_plat_dir}/SilabsDeviceDataProvider.cpp",
-    "${silabs_common_plat_dir}/SilabsDeviceDataProvider.h",
-  ]
-
-  public_deps = [
-    "${chip_root}/src/credentials",
-    "${chip_root}/src/lib/support",
-    "${chip_root}/src/platform:platform_base",
-    "${chip_root}/src/setup_payload",
-  ]
-
-  public_configs = [ ":siwx917-common-config" ]
-
-  if (sl_enable_test_event_trigger) {
-    public_configs += [ ":test-event-trigger-config" ]
-  }
-}
-
 config("siwx917-common-config") {
   defines = [ "OTA_PERIODIC_TIMEOUT=${ota_periodic_query_timeout_sec}" ]
+  if (sl_si91x_crypto_flavor == "psa") {
+    libs =
+        [ "${sdk_support_root}/matter/provision/lib/libProvisionPSA_si917.a" ]
+  } else {
+    libs = [ "${sdk_support_root}/matter/provision/lib/libProvision_si917.a" ]
+  }
 
   if (!disable_lcd) {
     include_dirs = [ "${silabs_common_plat_dir}/display" ]
@@ -215,12 +177,13 @@ config("silabs-wifi-config") {
 }
 
 source_set("siwx917-common") {
-  deps = []
+  deps = [ "${chip_root}/src/platform/silabs/provision:provision-headers" ]
   defines = []
   public_deps = []
   public_configs = [
     ":siwx917-common-config",
     "${efr32_sdk_build_root}:silabs_config",
+    ":chip_examples_project_config",
   ]
 
   include_dirs = [
@@ -234,7 +197,8 @@ source_set("siwx917-common") {
     "${silabs_common_plat_dir}/LEDWidget.cpp",
     "${silabs_common_plat_dir}/MatterConfig.cpp",
     "${silabs_common_plat_dir}/SoftwareFaultReports.cpp",
-    "${silabs_common_plat_dir}/heap_4_silabs.c",
+    "${silabs_common_plat_dir}/provision/ProvisionStorageCustom.cpp",
+    "${silabs_common_plat_dir}/provision/ProvisionStorageFlash.cpp",
     "${silabs_common_plat_dir}/silabs_utils.cpp",
     "${silabs_common_plat_dir}/syscalls_stubs.cpp",
     "${silabs_plat_si91x_wifi_dir}/dhcp_client.cpp",
@@ -286,14 +250,6 @@ source_set("siwx917-common") {
     public_deps += [
       "${silabs_common_plat_dir}/DIC/matter_abs_interface:silabs-aws-sdk-ota",
     ]
-  }
-
-  # Attestation Credentials
-  deps += [ ":siwx917-attestation-credentials" ]
-
-  # Factory Data Provider
-  if (use_efr32_factory_data_provider) {
-    public_deps += [ ":silabs-factory-data-provider" ]
   }
 
   public_deps += [

@@ -118,7 +118,11 @@ chip_gn_arg_append("chip_config_network_layer_ble"           "false")
 endif()
 
 if(CONFIG_DISABLE_IPV4)
-    chip_gn_arg_append("chip_inet_config_enable_ipv4"        "false")
+    if(NOT CONFIG_LWIP_IPV4)
+        chip_gn_arg_append("chip_inet_config_enable_ipv4"        "false")
+    else()
+	message(FATAL_ERROR "Please also disable config option CONFIG_LWIP_IPV4")
+    endif()
 endif()
 
 if(CONFIG_DISABLE_READ_CLIENT)
@@ -471,7 +475,15 @@ if (CONFIG_SEC_CERT_DAC_PROVIDER)
 endif()
 
 if (CONFIG_ENABLE_ESP_INSIGHTS_TRACE)
-    idf_component_get_property(esp_insights_lib espressif__esp_insights COMPONENT_LIB)
+    idf_build_get_property(build_components BUILD_COMPONENTS)
+    # esp_insights can be used as an independent component or through component manager so,
+    # We should check and add the right component.
+    if("espressif__esp_insights" IN_LIST build_components)
+        idf_component_get_property(esp_insights_lib espressif__esp_insights COMPONENT_LIB)
+    elseif("esp_insights" IN_LIST build_components)
+        idf_component_get_property(esp_insights_lib esp_insights COMPONENT_LIB)
+    endif()
+
     list(APPEND chip_libraries $<TARGET_FILE:${esp_insights_lib}>)
 endif()
 

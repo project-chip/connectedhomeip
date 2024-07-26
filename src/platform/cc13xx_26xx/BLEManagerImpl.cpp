@@ -260,12 +260,14 @@ void BLEManagerImpl::_OnPlatformEvent(const ChipDeviceEvent * event)
 }
 
 // ===== Members that implement virtual methods on BlePlatformDelegate.
-bool BLEManagerImpl::CloseConnection(BLE_CONNECTION_OBJECT conId)
+CHIP_ERROR BLEManagerImpl::CloseConnection(BLE_CONNECTION_OBJECT conId)
 {
     void * pMsg = (void *) ICall_malloc(sizeof(void *));
     pMsg        = (void *) conId;
 
-    return (EnqueueEvtHdrMsg(BLEManagerIMPL_CHIPOBLE_CLOSE_CONN_EVT, (void *) pMsg) == true);
+    EnqueueEvtHdrMsg(BLEManagerIMPL_CHIPOBLE_CLOSE_CONN_EVT, (void *) pMsg);
+
+    return CHIP_NO_ERROR;
 }
 
 uint16_t BLEManagerImpl::GetMTU(BLE_CONNECTION_OBJECT conId) const
@@ -295,8 +297,8 @@ void BLEManagerImpl::NotifyChipConnectionClosed(BLE_CONNECTION_OBJECT conId)
     // Unused
 }
 
-bool BLEManagerImpl::SendIndication(BLE_CONNECTION_OBJECT conId, const ChipBleUUID * svcId, const ChipBleUUID * charId,
-                                    PacketBufferHandle data)
+CHIP_ERROR BLEManagerImpl::SendIndication(BLE_CONNECTION_OBJECT conId, const ChipBleUUID * svcId, const ChipBleUUID * charId,
+                                          PacketBufferHandle data)
 {
     BLEMGR_LOG("BLEMGR: BLE SendIndication ");
 
@@ -308,14 +310,14 @@ bool BLEManagerImpl::SendIndication(BLE_CONNECTION_OBJECT conId, const ChipBleUU
     pMsg = (CHIPoBLEIndEvt_t *) ICall_malloc(sizeof(CHIPoBLEIndEvt_t));
     if (NULL == pMsg)
     {
-        return false;
+        return CHIP_ERROR_NO_MEMORY;
     }
 
     pBuf = (uint8_t *) ICall_malloc(dataLen);
     if (NULL == pBuf)
     {
         ICall_free((void *) pMsg);
-        return false;
+        return CHIP_ERROR_NO_MEMORY;
     }
 
     memset(pBuf, 0x00, dataLen);
@@ -327,29 +329,28 @@ bool BLEManagerImpl::SendIndication(BLE_CONNECTION_OBJECT conId, const ChipBleUU
     EnqueueEvtHdrMsg(BLEManagerIMPL_CHIPOBLE_TX_IND_EVT, (void *) pMsg);
 
     BLEMGR_LOG("BLEMGR: BLE SendIndication RETURN, Length: %d ", dataLen);
-    return true;
+    return CHIP_NO_ERROR;
 }
 
-bool BLEManagerImpl::SubscribeCharacteristic(BLE_CONNECTION_OBJECT conId, const Ble::ChipBleUUID * svcId,
-                                             const Ble::ChipBleUUID * charId)
+CHIP_ERROR BLEManagerImpl::SubscribeCharacteristic(BLE_CONNECTION_OBJECT conId, const Ble::ChipBleUUID * svcId,
+                                                   const Ble::ChipBleUUID * charId)
 {
     /* Unsupported on TI peripheral device implementation */
-    return false;
+    return CHIP_ERROR_NOT_IMPLEMENTED;
 }
 
-bool BLEManagerImpl::UnsubscribeCharacteristic(BLE_CONNECTION_OBJECT conId, const Ble::ChipBleUUID * svcId,
-                                               const Ble::ChipBleUUID * charId)
+CHIP_ERROR BLEManagerImpl::UnsubscribeCharacteristic(BLE_CONNECTION_OBJECT conId, const Ble::ChipBleUUID * svcId,
+                                                     const Ble::ChipBleUUID * charId)
 {
     /* Unsupported on TI peripheral device implementation */
-    return false;
+    return CHIP_ERROR_NOT_IMPLEMENTED;
 }
 
-bool BLEManagerImpl::SendWriteRequest(BLE_CONNECTION_OBJECT conId, const ChipBleUUID * svcId, const ChipBleUUID * charId,
-                                      PacketBufferHandle pBuf)
+CHIP_ERROR BLEManagerImpl::SendWriteRequest(BLE_CONNECTION_OBJECT conId, const ChipBleUUID * svcId, const ChipBleUUID * charId,
+                                            PacketBufferHandle pBuf)
 {
     /* Unsupported on TI peripheral device implementation */
-    BLEMGR_LOG("BLEMGR: BLE SendWriteRequest");
-    return false;
+    return CHIP_ERROR_NOT_IMPLEMENTED;
 }
 
 // ===== Helper Members that implement the Low level BLE Stack behavior.
@@ -557,7 +558,7 @@ void BLEManagerImpl::EventHandler_init(void)
     CHIPoBLEProfile_AddService(GATT_ALL_SERVICES);
 
     // Start Bond Manager and register callback
-    VOID GAPBondMgr_Register(BLEMgr_BondMgrCBs);
+    VOID GAPBondMgr_Register(&BLEMgr_BondMgrCBs);
 
     // Register with GAP for HCI/Host messages. This is needed to receive HCI
     // events. For more information, see the HCI section in the User's Guide:
@@ -950,9 +951,6 @@ void BLEManagerImpl::ProcessEvtHdrMsg(QueuedEvt_t * pMsg)
 
     case PAIR_STATE_EVT: {
         BLEMGR_LOG("BLEMGR: PAIR_STATE_EVT");
-
-        // Send passcode response
-        GAPBondMgr_PasscodeRsp(((PasscodeData_t *) (pMsg->pData))->connHandle, SUCCESS, B_APP_DEFAULT_PASSCODE);
     }
     break;
 

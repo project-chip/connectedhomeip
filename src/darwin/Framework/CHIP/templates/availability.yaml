@@ -9583,7 +9583,6 @@
               - PresetsSchedulesEditable
               - TemperatureSetpointHoldPolicy
               - SetpointHoldExpiryTimestamp
-              - QueuedPreset
               - ActiveScheduleHandle
           UnitTesting:
               # Ideally none of UnitTesting would be exposed as public API, but
@@ -9601,7 +9600,6 @@
               - StartPresetsSchedulesEditRequest
               - CancelPresetsSchedulesEditRequest
               - CommitPresetsSchedulesRequest
-              - CancelSetActivePresetRequest
               - SetTemperatureSetpointHoldPolicy
           RVCOperationalState:
               # Targeting Spring 2024 Matter release
@@ -9623,7 +9621,6 @@
               - PresetStruct
               - PresetTypeStruct
               - ScheduleTypeStruct
-              - QueuedPresetStruct
       events:
           UnitTesting:
               # Ideally none of UnitTesting would be exposed as public API, but
@@ -9670,7 +9667,6 @@
           Thermostat:
               Feature:
                   # Targeting Spring 2024 Matter release
-                  - QueuedPresetsSupported
                   - Setpoints
                   - Presets
                   - MatterScheduleConfiguration
@@ -9689,12 +9685,35 @@
   versions: "future"
   provisional:
       clusters:
-          # Targeting Fall 2024
+          # Targeting 1.4
+          - CommissionerControl
+          - ServiceArea
           - ThreadBorderRouterManagement
           - ThreadNetworkDirectory
+          - WaterHeaterManagement
+          - WaterHeaterMode
           - WiFiNetworkManagement
+      attributes:
+          OccupancySensing:
+              # Targeting 1.4
+              - HoldTime
+              - HoldTimeLimits
+      commands:
+          UnitTesting:
+              # Ideally none of UnitTesting would be exposed as public API, but
+              # for now just start doing that for new additions to it.
+              - StringEchoRequest
+              - StringEchoResponse
+      structs:
+          OccupancySensing:
+              # Targeting 1.4
+              - HoldTimeLimitsStruct
+      bitmaps:
+          OccupancySensing:
+              # Targeting 1.4
+              - Feature
       bitmap values:
           Switch:
               Feature:
-                  # Targeting Fall 2024
+                  # Targeting 1.4
                   - ActionSwitch

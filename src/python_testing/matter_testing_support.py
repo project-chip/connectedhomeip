@@ -34,7 +34,7 @@ from dataclasses import asdict as dataclass_asdict
 from dataclasses import dataclass, field
 from datetime import datetime, timedelta, timezone
 from enum import Enum
-from typing import List, Optional, Tuple, Union
+from typing import Any, List, Optional, Tuple
 
 from chip.tlv import float32, uint
 
@@ -52,7 +52,7 @@ import chip.native
 from chip import discovery
 from chip.ChipStack import ChipStack
 from chip.clusters import ClusterObjects as ClusterObjects
-from chip.clusters.Attribute import EventReadResult, SubscriptionTransaction
+from chip.clusters.Attribute import EventReadResult, SubscriptionTransaction, TypedAttributePath
 from chip.exceptions import ChipStackError
 from chip.interaction_model import InteractionModelError, Status
 from chip.setup_payload import SetupPayload
@@ -231,19 +231,22 @@ class SimpleEventCallback:
 
 
 class EventChangeCallback:
-    def __init__(self, expected_cluster: ClusterObjects):
+    def __init__(self, expected_cluster: ClusterObjects.Cluster):
         """This class creates a queue to store received event callbacks, that can be checked by the test script
            expected_cluster: is the cluster from which the events are expected
         """
         self._q = queue.Queue()
         self._expected_cluster = expected_cluster
 
-    async def start(self, dev_ctrl, node_id: int, endpoint: int):
+    async def start(self, dev_ctrl, node_id: int, endpoint: int, fabric_filtered: bool = False, min_interval_sec: int = 0, max_interval_sec: int = 30) -> Any:
         """This starts a subscription for events on the specified node_id and endpoint. The cluster is specified when the class instance is created."""
+        urgent = True
         self._subscription = await dev_ctrl.ReadEvent(node_id,
-                                                      events=[(endpoint, self._expected_cluster, True)], reportInterval=(1, 5),
-                                                      fabricFiltered=False, keepSubscriptions=True, autoResubscribe=False)
+                                                      events=[(endpoint, self._expected_cluster, urgent)], reportInterval=(
+                                                          min_interval_sec, max_interval_sec),
+                                                      fabricFiltered=fabric_filtered, keepSubscriptions=True, autoResubscribe=False)
         self._subscription.SetEventUpdateCallback(self.__call__)
+        return self._subscription
 
     def __call__(self, res: EventReadResult, transaction: SubscriptionTransaction):
         """This is the subscription callback when an event is received.
@@ -253,17 +256,103 @@ class EventChangeCallback:
                 f'Got subscription report for event on cluster {self._expected_cluster}: {res.Data}')
             self._q.put(res)
 
-    def wait_for_event_report(self, expected_event: ClusterObjects.ClusterEvent, timeout: int = 10):
-        """This function allows a test script to block waiting for the specific event to arrive with a timeout.
-           It returns the event data so that the values can be checked."""
+    def wait_for_event_report(self, expected_event: ClusterObjects.ClusterEvent, timeoutS: int = 10):
+        """This function allows a test script to block waiting for the specific event to arrive with a timeout
+           (specified in seconds). It returns the event data so that the values can be checked."""
         try:
-            res = self._q.get(block=True, timeout=timeout)
+            res = self._q.get(block=True, timeout=timeoutS)
         except queue.Empty:
             asserts.fail("Failed to receive a report for the event {}".format(expected_event))
 
         asserts.assert_equal(res.Header.ClusterId, expected_event.cluster_id, "Expected cluster ID not found in event report")
         asserts.assert_equal(res.Header.EventId, expected_event.event_id, "Expected event ID not found in event report")
         return res.Data
+
+    def wait_for_event_expect_no_report(self, timeoutS: int = 10):
+        """This function succceeds/returns if an event does not arrive within the timeout specified in seconds.
+           If an event does arrive, an assert is called."""
+        try:
+            res = self._q.get(block=True, timeout=timeoutS)
+        except queue.Empty:
+            return
+
+        asserts.fail(f"Event reported when not expected {res}")
+
+    @property
+    def event_queue(self) -> queue.Queue:
+        return self._q
+
+
+class AttributeChangeCallback:
+    def __init__(self, expected_attribute: ClusterObjects.ClusterAttributeDescriptor):
+        self._output = queue.Queue()
+        self._expected_attribute = expected_attribute
+
+    def __call__(self, path: TypedAttributePath, transaction: SubscriptionTransaction):
+        """This is the subscription callback when an attribute is updated.
+           It checks the passed in attribute is the same as the subscribed to attribute and
+           then posts it into the queue for later processing."""
+
+        asserts.assert_equal(path.AttributeType, self._expected_attribute,
+                             f"[AttributeChangeCallback] Attribute mismatch. Expected: {self._expected_attribute}, received: {path.AttributeType}")
+        logging.debug(f"[AttributeChangeCallback] Attribute update callback for {path.AttributeType}")
+        q = (path, transaction)
+        self._output.put(q)
+
+    def wait_for_report(self):
+        try:
+            path, transaction = self._output.get(block=True, timeout=10)
+        except queue.Empty:
+            asserts.fail(
+                f"[AttributeChangeCallback] Failed to receive a report for the {self._expected_attribute} attribute change")
+
+        asserts.assert_equal(path.AttributeType, self._expected_attribute,
+                             f"[AttributeChangeCallback] Received incorrect report. Expected: {self._expected_attribute}, received: {path.AttributeType}")
+        try:
+            attribute_value = transaction.GetAttribute(path)
+            logging.info(
+                f"[AttributeChangeCallback] Got attribute subscription report. Attribute {path.AttributeType}. Updated value: {attribute_value}. SubscriptionId: {transaction.subscriptionId}")
+        except KeyError:
+            asserts.fail("[AttributeChangeCallback] Attribute {expected_attribute} not found in returned report")
+
+
+@dataclass
+class AttributeValue:
+    endpoint_id: int
+    attribute: ClusterObjects.ClusterAttributeDescriptor
+    value: Any
+
+
+class ClusterAttributeChangeAccumulator:
+    def __init__(self, expected_cluster: ClusterObjects.Cluster):
+        self._q = queue.Queue()
+        self._expected_cluster = expected_cluster
+        self._subscription = None
+
+    async def start(self, dev_ctrl, node_id: int, endpoint: int, fabric_filtered: bool = False, min_interval_sec: int = 0, max_interval_sec: int = 30) -> Any:
+        """This starts a subscription for attributes on the specified node_id and endpoint. The cluster is specified when the class instance is created."""
+        self._subscription = await dev_ctrl.ReadAttribute(
+            nodeid=node_id,
+            attributes=[(endpoint, self._expected_cluster)],
+            reportInterval=(min_interval_sec, max_interval_sec),
+            fabricFiltered=fabric_filtered,
+            keepSubscriptions=True
+        )
+        self._subscription.SetAttributeUpdateCallback(self.__call__)
+        return self._subscription
+
+    def __call__(self, path: TypedAttributePath, transaction: SubscriptionTransaction):
+        """This is the subscription callback when an attribute report is received.
+           It checks the report is from the expected_cluster and then posts it into the queue for later processing."""
+        if path.ClusterType == self._expected_cluster:
+            data = transaction.GetAttribute(path)
+            value = AttributeValue(endpoint_id=path.Path.EndpointId, attribute=path.AttributeType, value=data)
+            logging.info(f"Got subscription report for {path.AttributeType}: {data}")
+            self._q.put(value)
+
+    @property
+    def attribute_queue(self) -> queue.Queue:
+        return self._q
 
 
 class InternalTestRunnerHooks(TestRunnerHooks):
@@ -274,7 +363,7 @@ class InternalTestRunnerHooks(TestRunnerHooks):
     def stop(self, duration: int):
         logging.info(f'Finished test set, ran for {duration}ms')
 
-    def test_start(self, filename: str, name: str, count: int):
+    def test_start(self, filename: str, name: str, count: int, steps: list[str] = []):
         logging.info(f'Starting test from {filename}: {name} - {count} steps')
 
     def test_stop(self, exception: Exception, duration: int):
@@ -333,8 +422,8 @@ class MatterTestConfig:
     # This allows cert tests to be run without re-commissioning for RR-1.1.
     maximize_cert_chains: bool = True
 
-    qr_code_content: Optional[str] = None
-    manual_code: Optional[str] = None
+    qr_code_content: List[str] = field(default_factory=list)
+    manual_code: List[str] = field(default_factory=list)
 
     wifi_ssid: Optional[str] = None
     wifi_passphrase: Optional[str] = None
@@ -417,8 +506,17 @@ class CustomCommissioningParameters:
 
 
 @dataclass
-class AttributePathLocation:
+class ClusterPathLocation:
     endpoint_id: int
+    cluster_id: int
+
+    def __str__(self):
+        return (f'\n       Endpoint: {self.endpoint_id},'
+                f'\n       Cluster:  {cluster_id_str(self.cluster_id)}')
+
+
+@dataclass
+class AttributePathLocation(ClusterPathLocation):
     cluster_id: Optional[int] = None
     attribute_id: Optional[int] = None
 
@@ -436,55 +534,50 @@ class AttributePathLocation:
         return desc
 
     def __str__(self):
-        return (f'\n        Endpoint: {self.endpoint_id},'
-                f'\n        Cluster:  {cluster_id_str(self.cluster_id)},'
-                f'\n        Attribute:{id_str(self.attribute_id)}')
+        return (f'{super().__str__()}'
+                f'\n      Attribute:{id_str(self.attribute_id)}')
 
 
 @dataclass
-class EventPathLocation:
-    endpoint_id: int
-    cluster_id: int
+class EventPathLocation(ClusterPathLocation):
     event_id: int
 
     def __str__(self):
-        return (f'\n        Endpoint: {self.endpoint_id},'
-                f'\n        Cluster:  {cluster_id_str(self.cluster_id)},'
-                f'\n        Event:    {id_str(self.event_id)}')
+        return (f'{super().__str__()}'
+                f'\n       Event:    {id_str(self.event_id)}')
 
 
 @dataclass
-class CommandPathLocation:
-    endpoint_id: int
-    cluster_id: int
+class CommandPathLocation(ClusterPathLocation):
     command_id: int
 
     def __str__(self):
-        return (f'\n        Endpoint: {self.endpoint_id},'
-                f'\n        Cluster:  {cluster_id_str(self.cluster_id)},'
-                f'\n        Command:  {id_str(self.command_id)}')
+        return (f'{super().__str__()}'
+                f'\n       Command:  {id_str(self.command_id)}')
 
 
 @dataclass
-class ClusterPathLocation:
-    endpoint_id: int
-    cluster_id: int
-
-    def __str__(self):
-        return (f'\n       Endpoint: {self.endpoint_id},'
-                f'\n       Cluster:  {cluster_id_str(self.cluster_id)}')
-
-
-@dataclass
-class FeaturePathLocation:
-    endpoint_id: int
-    cluster_id: int
+class FeaturePathLocation(ClusterPathLocation):
     feature_code: str
 
     def __str__(self):
-        return (f'\n        Endpoint: {self.endpoint_id},'
-                f'\n        Cluster:  {cluster_id_str(self.cluster_id)},'
-                f'\n        Feature:  {self.feature_code}')
+        return (f'{super().__str__()}'
+                f'\n       Feature:  {self.feature_code}')
+
+
+@dataclass
+class DeviceTypePathLocation:
+    device_type_id: int
+    cluster_id: Optional[int] = None
+
+    def __str__(self):
+        msg = f'\n       DeviceType: {self.device_type_id}'
+        if self.cluster_id:
+            msg += f'\n       ClusterID: {self.cluster_id}'
+        return msg
+
+
+ProblemLocation = typing.Union[ClusterPathLocation, DeviceTypePathLocation]
 
 # ProblemSeverity is not using StrEnum, but rather Enum, since StrEnum only
 # appeared in 3.11. To make it JSON serializable easily, multiple inheritance
@@ -500,7 +593,7 @@ class ProblemSeverity(str, Enum):
 @dataclass
 class ProblemNotice:
     test_name: str
-    location: Union[AttributePathLocation, EventPathLocation, CommandPathLocation, ClusterPathLocation, FeaturePathLocation]
+    location: ProblemLocation
     severity: ProblemSeverity
     problem: str
     spec_location: str = ""
@@ -643,7 +736,7 @@ class MatterBaseTest(base_test.BaseTestClass):
         return [TestStep(1, "Run entire test")] if steps is None else steps
 
     def get_defined_test_steps(self, test: str) -> list[TestStep]:
-        steps_name = 'steps_' + test[5:]
+        steps_name = f'steps_{test.removeprefix("test_")}'
         try:
             fn = getattr(self, steps_name)
             return fn()
@@ -663,7 +756,7 @@ class MatterBaseTest(base_test.BaseTestClass):
         return [] if pics is None else pics
 
     def _get_defined_pics(self, test: str) -> list[TestStep]:
-        steps_name = 'pics_' + test[5:]
+        steps_name = f'pics_{test.removeprefix("test_")}'
         try:
             fn = getattr(self, steps_name)
             return fn()
@@ -683,7 +776,7 @@ class MatterBaseTest(base_test.BaseTestClass):
             ex:
             133.1.1. [TC-ACL-1.1] Global attributes
         '''
-        desc_name = 'desc_' + test[5:]
+        desc_name = f'desc_{test.removeprefix("test_")}'
         try:
             fn = getattr(self, desc_name)
             return fn()
@@ -740,7 +833,8 @@ class MatterBaseTest(base_test.BaseTestClass):
             num_steps = 1 if steps is None else len(steps)
             filename = inspect.getfile(self.__class__)
             desc = self.get_test_desc(test_name)
-            self.runner_hook.test_start(filename=filename, name=desc, count=num_steps)
+            steps_descriptions = [] if steps is None else [step.description for step in steps]
+            self.runner_hook.test_start(filename=filename, name=desc, count=num_steps, steps=steps_descriptions)
             # If we don't have defined steps, we're going to start the one and only step now
             # if there are steps defined by the test, rely on the test calling the step() function
             # to indicates how it is proceeding
@@ -844,7 +938,8 @@ class MatterBaseTest(base_test.BaseTestClass):
     async def send_single_cmd(
             self, cmd: Clusters.ClusterObjects.ClusterCommand,
             dev_ctrl: ChipDeviceCtrl = None, node_id: int = None, endpoint: int = None,
-            timedRequestTimeoutMs: typing.Union[None, int] = None) -> object:
+            timedRequestTimeoutMs: typing.Union[None, int] = None,
+            payloadCapability: int = ChipDeviceCtrl.TransportPayloadCapability.MRP_PAYLOAD) -> object:
         if dev_ctrl is None:
             dev_ctrl = self.default_controller
         if node_id is None:
@@ -852,7 +947,8 @@ class MatterBaseTest(base_test.BaseTestClass):
         if endpoint is None:
             endpoint = self.matter_test_config.endpoint
 
-        result = await dev_ctrl.SendCommand(nodeid=node_id, endpoint=endpoint, payload=cmd, timedRequestTimeoutMs=timedRequestTimeoutMs)
+        result = await dev_ctrl.SendCommand(nodeid=node_id, endpoint=endpoint, payload=cmd, timedRequestTimeoutMs=timedRequestTimeoutMs,
+                                            payloadCapability=payloadCapability)
         return result
 
     async def send_test_event_triggers(self, eventTrigger: int, enableKey: bytes = None):
@@ -895,13 +991,13 @@ class MatterBaseTest(base_test.BaseTestClass):
     def print_step(self, stepnum: typing.Union[int, str], title: str) -> None:
         logging.info(f'***** Test Step {stepnum} : {title}')
 
-    def record_error(self, test_name: str, location: Union[AttributePathLocation, EventPathLocation, CommandPathLocation, ClusterPathLocation, FeaturePathLocation], problem: str, spec_location: str = ""):
+    def record_error(self, test_name: str, location: ProblemLocation, problem: str, spec_location: str = ""):
         self.problems.append(ProblemNotice(test_name, location, ProblemSeverity.ERROR, problem, spec_location))
 
-    def record_warning(self, test_name: str, location: Union[AttributePathLocation, EventPathLocation, CommandPathLocation, ClusterPathLocation, FeaturePathLocation], problem: str, spec_location: str = ""):
+    def record_warning(self, test_name: str, location: ProblemLocation, problem: str, spec_location: str = ""):
         self.problems.append(ProblemNotice(test_name, location, ProblemSeverity.WARNING, problem, spec_location))
 
-    def record_note(self, test_name: str, location: Union[AttributePathLocation, EventPathLocation, CommandPathLocation, ClusterPathLocation, FeaturePathLocation], problem: str, spec_location: str = ""):
+    def record_note(self, test_name: str, location: ProblemLocation, problem: str, spec_location: str = ""):
         self.problems.append(ProblemNotice(test_name, location, ProblemSeverity.NOTE, problem, spec_location))
 
     def on_fail(self, record):
@@ -1029,56 +1125,71 @@ class MatterBaseTest(base_test.BaseTestClass):
         self.current_step_index = self.current_step_index + 1
         self.step_skipped = False
 
-    def get_setup_payload_info(self) -> SetupPayloadInfo:
-        if self.matter_test_config.qr_code_content is not None:
-            qr_code = self.matter_test_config.qr_code_content
+    def get_setup_payload_info(self) -> List[SetupPayloadInfo]:
+        setup_payloads = []
+        for qr_code in self.matter_test_config.qr_code_content:
             try:
-                setup_payload = SetupPayload().ParseQrCode(qr_code)
+                setup_payloads.append(SetupPayload().ParseQrCode(qr_code))
             except ChipStackError:
                 asserts.fail(f"QR code '{qr_code} failed to parse properly as a Matter setup code.")
 
-        elif self.matter_test_config.manual_code is not None:
-            manual_code = self.matter_test_config.manual_code
+        for manual_code in self.matter_test_config.manual_code:
             try:
-                setup_payload = SetupPayload().ParseManualPairingCode(manual_code)
+                setup_payloads.append(SetupPayload().ParseManualPairingCode(manual_code))
             except ChipStackError:
                 asserts.fail(
                     f"Manual code code '{manual_code}' failed to parse properly as a Matter setup code. Check that all digits are correct and length is 11 or 21 characters.")
-        else:
-            asserts.fail("Require either --qr-code or --manual-code.")
 
-        info = SetupPayloadInfo()
-        info.passcode = setup_payload.setup_passcode
-        if setup_payload.short_discriminator is not None:
-            info.filter_type = discovery.FilterType.SHORT_DISCRIMINATOR
-            info.filter_value = setup_payload.short_discriminator
-        else:
-            info.filter_type = discovery.FilterType.LONG_DISCRIMINATOR
-            info.filter_value = setup_payload.long_discriminator
+        infos = []
+        for setup_payload in setup_payloads:
+            info = SetupPayloadInfo()
+            info.passcode = setup_payload.setup_passcode
+            if setup_payload.short_discriminator is not None:
+                info.filter_type = discovery.FilterType.SHORT_DISCRIMINATOR
+                info.filter_value = setup_payload.short_discriminator
+            else:
+                info.filter_type = discovery.FilterType.LONG_DISCRIMINATOR
+                info.filter_value = setup_payload.long_discriminator
+            infos.append(info)
 
-        return info
+        num_passcodes = 0 if self.matter_test_config.setup_passcodes is None else len(self.matter_test_config.setup_passcodes)
+        num_discriminators = 0 if self.matter_test_config.discriminators is None else len(self.matter_test_config.discriminators)
+        asserts.assert_equal(num_passcodes, num_discriminators, "Must have same number of discriminators as passcodes")
+        if self.matter_test_config.discriminators:
+            for idx, discriminator in enumerate(self.matter_test_config.discriminators):
+                info = SetupPayloadInfo()
+                info.passcode = self.matter_test_config.setup_passcodes[idx]
+                info.filter_type = DiscoveryFilterType.LONG_DISCRIMINATOR
+                info.filter_value = discriminator
+                infos.append(info)
+
+        return infos
 
     def wait_for_user_input(self,
                             prompt_msg: str,
-                            input_msg: str = "Press Enter when done.\n",
                             prompt_msg_placeholder: str = "Submit anything to continue",
-                            default_value: str = "y") -> str:
+                            default_value: str = "y") -> Optional[str]:
         """Ask for user input and wait for it.
 
         Args:
-            prompt_msg (str): Message for TH UI prompt. Indicates what is expected from the user.
-            input_msg (str, optional): Prompt for input function, used when running tests manually. Defaults to "Press Enter when done.\n".
-            prompt_msg_placeholder (str, optional): TH UI prompt input placeholder. Defaults to "Submit anything to continue".
+            prompt_msg (str): Message for TH UI prompt and input function. Indicates what is expected from the user.
+            prompt_msg_placeholder (str, optional): TH UI prompt input placeholder (where the user types). Defaults to "Submit anything to continue".
             default_value (str, optional): TH UI prompt default value. Defaults to "y".
 
         Returns:
-            str: User input
+            str: User input or none if input is closed.
         """
         if self.runner_hook:
             self.runner_hook.show_prompt(msg=prompt_msg,
                                          placeholder=prompt_msg_placeholder,
                                          default_value=default_value)
-        return input(input_msg)
+        logging.info("========= USER PROMPT =========")
+        logging.info(f">>> {prompt_msg.rstrip()} (press enter to confirm)")
+        try:
+            return input()
+        except EOFError:
+            logging.info("========= EOF on STDIN =========")
+            return None
 
 
 def generate_mobly_test_config(matter_test_config: MatterTestConfig):
@@ -1257,27 +1368,23 @@ def populate_commissioning_args(args: argparse.Namespace, config: MatterTestConf
     config.commissioning_method = args.commissioning_method
     config.commission_only = args.commission_only
 
-    # TODO: this should also allow multiple once QR and manual codes are supported.
-    config.qr_code_content = args.qr_code
-    if args.manual_code:
-        config.manual_code = args.manual_code
-    else:
-        config.manual_code = None
+    config.qr_code_content.extend(args.qr_code)
+    config.manual_code.extend(args.manual_code)
 
     if args.commissioning_method is None:
         return True
 
-    if args.discriminators is None and (args.qr_code is None and args.manual_code is None):
+    if args.discriminators == [] and (args.qr_code == [] and args.manual_code == []):
         print("error: Missing --discriminator when no --qr-code/--manual-code present!")
         return False
     config.discriminators = args.discriminators
 
-    if args.passcodes is None and (args.qr_code is None and args.manual_code is None):
+    if args.passcodes == [] and (args.qr_code == [] and args.manual_code == []):
         print("error: Missing --passcode when no --qr-code/--manual-code present!")
         return False
     config.setup_passcodes = args.passcodes
 
-    if args.qr_code is not None and args.manual_code is not None:
+    if args.qr_code != [] and args.manual_code != []:
         print("error: Cannot have both --qr-code and --manual-code present!")
         return False
 
@@ -1285,8 +1392,7 @@ def populate_commissioning_args(args: argparse.Namespace, config: MatterTestConf
         print("error: supplied number of discriminators does not match number of passcodes")
         return False
 
-    device_descriptors = [config.qr_code_content] if config.qr_code_content is not None else [
-        config.manual_code] if config.manual_code is not None else config.discriminators
+    device_descriptors = config.qr_code_content + config.manual_code + config.discriminators
 
     if len(config.dut_node_ids) > len(device_descriptors):
         print("error: More node IDs provided than discriminators")
@@ -1455,9 +1561,9 @@ def parse_matter_test_args(argv: Optional[List[str]] = None) -> MatterTestConfig
     code_group = parser.add_mutually_exclusive_group(required=False)
 
     code_group.add_argument('-q', '--qr-code', type=str,
-                            metavar="QR_CODE", help="QR setup code content (overrides passcode and discriminator)")
+                            metavar="QR_CODE", default=[], help="QR setup code content (overrides passcode and discriminator)", nargs="+")
     code_group.add_argument('--manual-code', type=str_from_manual_code,
-                            metavar="MANUAL_CODE", help="Manual setup code content (overrides passcode and discriminator)")
+                            metavar="MANUAL_CODE", default=[], help="Manual setup code content (overrides passcode and discriminator)", nargs="+")
 
     fabric_group = parser.add_argument_group(
         title="Fabric selection", description="Fabric selection for single-fabric basic usage, and commissioning")
@@ -1531,15 +1637,7 @@ class CommissionDeviceTest(MatterBaseTest):
         dev_ctrl = self.default_controller
         conf = self.matter_test_config
 
-        # TODO: qr code and manual code aren't lists
-
-        if conf.qr_code_content or conf.manual_code:
-            info = self.get_setup_payload_info()
-        else:
-            info = SetupPayloadInfo()
-            info.passcode = conf.setup_passcodes[i]
-            info.filter_type = DiscoveryFilterType.LONG_DISCRIMINATOR
-            info.filter_value = conf.discriminators[i]
+        info = self.get_setup_payload_info()[i]
 
         if conf.commissioning_method == "on-network":
             try:

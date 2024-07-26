@@ -110,6 +110,10 @@ def main(app: str, factoryreset: bool, factoryreset_app_only: bool, app_args: st
             )
         ]
 
+    if not runs:
+        raise Exception(
+            "No valid runs were found. Make sure you add runs to your file, see https://github.com/project-chip/connectedhomeip/blob/master/docs/testing/python.md document for reference/example.")
+
     for run in runs:
         print(f"Executing {run.py_script_path.split('/')[-1]} {run.run}")
         main_impl(run.app, run.factoryreset, run.factoryreset_app_only, run.app_args,
@@ -165,7 +169,8 @@ def main_impl(app: str, factoryreset: bool, factoryreset_app_only: bool, app_arg
         app_args = [app] + shlex.split(app_args)
         logging.info(f"Execute: {app_args}")
         app_process = subprocess.Popen(
-            app_args, stdout=subprocess.PIPE, stderr=subprocess.PIPE, bufsize=0)
+            app_args, stdout=subprocess.PIPE, stderr=subprocess.PIPE, stdin=subprocess.PIPE, bufsize=0)
+        app_process.stdin.close()
         app_pid = app_process.pid
         DumpProgramOutputToQueue(
             log_cooking_threads, Fore.GREEN + "APP " + Style.RESET_ALL, app_process, stream_output, log_queue)
@@ -188,7 +193,8 @@ def main_impl(app: str, factoryreset: bool, factoryreset_app_only: bool, app_arg
 
     logging.info(f"Execute: {final_script_command}")
     test_script_process = subprocess.Popen(
-        final_script_command, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
+        final_script_command, stdout=subprocess.PIPE, stderr=subprocess.PIPE, stdin=subprocess.PIPE)
+    test_script_process.stdin.close()
     DumpProgramOutputToQueue(log_cooking_threads, Fore.GREEN + "TEST" + Style.RESET_ALL,
                              test_script_process, stream_output, log_queue)
 

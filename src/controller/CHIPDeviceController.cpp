@@ -36,6 +36,7 @@
 #include <app/server/Dnssd.h>
 #include <controller/CurrentFabricRemover.h>
 #include <controller/InvokeInteraction.h>
+#include <controller/WriteInteraction.h>
 #include <credentials/CHIPCert.h>
 #include <credentials/DeviceAttestationCredsProvider.h>
 #include <crypto/CHIPCryptoPAL.h>
@@ -1028,6 +1029,12 @@ void DeviceCommissioner::CancelCommissioningInteractions()
         mInvokeCancelFn();
         mInvokeCancelFn = nullptr;
     }
+    if (mWriteCancelFn)
+    {
+        ChipLogDetail(Controller, "Cancelling write request for step '%s'", StageToString(mCommissioningStage));
+        mWriteCancelFn();
+        mWriteCancelFn = nullptr;
+    }
     if (mOnDeviceConnectedCallback.IsRegistered())
     {
         ChipLogDetail(Controller, "Cancelling CASE setup for step '%s'", StageToString(mCommissioningStage));
@@ -1800,6 +1807,12 @@ void DeviceCommissioner::OnBasicSuccess(void * context, const chip::app::DataMod
     commissioner->CommissioningStageComplete(CHIP_NO_ERROR);
 }
 
+void DeviceCommissioner::OnInterfaceEnableWriteSuccessResponse(void * context)
+{
+    DeviceCommissioner * commissioner = static_cast<DeviceCommissioner *>(context);
+    commissioner->CommissioningStageComplete(CHIP_NO_ERROR);
+}
+
 void DeviceCommissioner::OnBasicFailure(void * context, CHIP_ERROR error)
 {
     ChipLogProgress(Controller, "Received failure response %s\n", chip::ErrorStr(error));
@@ -1831,13 +1844,25 @@ void DeviceCommissioner::CleanupCommissioning(DeviceProxy * proxy, NodeId nodeId
 
     if (completionStatus.err == CHIP_NO_ERROR)
     {
+        // CommissioningStageComplete uses mDeviceBeingCommissioned, which can
+        // be commissionee if we are cleaning up before we've gone operational.  Normally
+        // that would not happen in this non-error case, _except_ if we were told to skip sending
+        // CommissioningComplete: in that case we do not have an operational DeviceProxy, so
+        // we're using our CommissioneeDeviceProxy to do a successful cleanup.
+        //
+        // This means we have to call CommissioningStageComplete() before we destroy commissionee.
+        //
+        // This should be safe, because CommissioningStageComplete() does not call CleanupCommissioning
+        // when called in the cleanup stage (which is where we are), and StopPairing does not directly release
+        // mDeviceBeingCommissioned.
+        CommissioningStageComplete(CHIP_NO_ERROR);
+
         CommissioneeDeviceProxy * commissionee = FindCommissioneeDevice(nodeId);
         if (commissionee != nullptr)
         {
             ReleaseCommissioneeDevice(commissionee);
         }
         // Send the callbacks, we're done.
-        CommissioningStageComplete(CHIP_NO_ERROR);
         SendCommissioningCompleteCallbacks(nodeId, mCommissioningCompletionStatus);
     }
     else if (completionStatus.err == CHIP_ERROR_CANCELLED)
@@ -1916,11 +1941,12 @@ void DeviceCommissioner::CleanupDoneAfterError()
     VerifyOrReturn(mDeviceBeingCommissioned != nullptr);
 
     NodeId nodeId = mDeviceBeingCommissioned->GetDeviceId();
-    // At this point, we also want to close off the pase session so we need to re-establish
-    CommissioneeDeviceProxy * commissionee = FindCommissioneeDevice(nodeId);
 
     // Signal completion - this will reset mDeviceBeingCommissioned.
     CommissioningStageComplete(CHIP_NO_ERROR);
+
+    // At this point, we also want to close off the pase session so we need to re-establish
+    CommissioneeDeviceProxy * commissionee = FindCommissioneeDevice(nodeId);
 
     // If we've disarmed the failsafe, it's because we're starting again, so kill the pase connection.
     if (commissionee != nullptr)
@@ -1971,6 +1997,7 @@ void DeviceCommissioner::CommissioningStageComplete(CHIP_ERROR err, Commissionin
     DeviceProxy * proxy      = mDeviceBeingCommissioned;
     mDeviceBeingCommissioned = nullptr;
     mInvokeCancelFn          = nullptr;
+    mWriteCancelFn           = nullptr;
 
     if (mPairingDelegate != nullptr)
     {
@@ -2739,6 +2766,20 @@ DeviceCommissioner::SendCommissioningCommand(DeviceProxy * device, const Request
                                 onFailureCb, NullOptional, timeout, (!fireAndForget) ? &mInvokeCancelFn : nullptr);
 }
 
+template <typename AttrType>
+CHIP_ERROR DeviceCommissioner::SendCommissioningWriteRequest(DeviceProxy * device, EndpointId endpoint, ClusterId cluster,
+                                                             AttributeId attribute, const AttrType & requestData,
+                                                             WriteResponseSuccessCallback successCb,
+                                                             WriteResponseFailureCallback failureCb)
+{
+    VerifyOrDie(!mWriteCancelFn); // we don't make parallel (cancellable) calls
+    auto onSuccessCb = [this, successCb](const app::ConcreteAttributePath & aPath) { successCb(this); };
+    auto onFailureCb = [this, failureCb](const app::ConcreteAttributePath * aPath, CHIP_ERROR aError) { failureCb(this, aError); };
+    return WriteAttribute(device->GetSecureSession().Value(), endpoint, cluster, attribute, requestData, onSuccessCb, onFailureCb,
+                          /* aTimedWriteTimeoutMs = */ NullOptional, /* onDoneCb = */ nullptr, /* aDataVersion = */ NullOptional,
+                          /* outCancelFn = */ &mWriteCancelFn);
+}
+
 void DeviceCommissioner::SendCommissioningReadRequest(DeviceProxy * proxy, Optional<System::Clock::Timeout> timeout,
                                                       app::AttributePathParams * readPaths, size_t readPathsSize)
 {
@@ -3423,6 +3464,25 @@ void DeviceCommissioner::PerformCommissioningStep(DeviceProxy * proxy, Commissio
         );
     }
     break;
+    case CommissioningStage::kPrimaryOperationalNetworkFailed: {
+        // nothing to do. This stage indicates that the primary operational network failed and the network interface should be
+        // disabled later.
+        break;
+    }
+    case CommissioningStage::kDisablePrimaryNetworkInterface: {
+        NetworkCommissioning::Attributes::InterfaceEnabled::TypeInfo::Type request = false;
+        CHIP_ERROR err = SendCommissioningWriteRequest(proxy, endpoint, NetworkCommissioning::Id,
+                                                       NetworkCommissioning::Attributes::InterfaceEnabled::Id, request,
+                                                       OnInterfaceEnableWriteSuccessResponse, OnBasicFailure);
+        if (err != CHIP_NO_ERROR)
+        {
+            // We won't get any async callbacks here, so just complete our stage.
+            ChipLogError(Controller, "Failed to send InterfaceEnabled write request: %" CHIP_ERROR_FORMAT, err.Format());
+            CommissioningStageComplete(err);
+            return;
+        }
+        break;
+    }
     case CommissioningStage::kICDSendStayActive: {
         if (!(params.GetICDStayActiveDurationMsec().HasValue()))
         {

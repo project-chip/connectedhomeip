@@ -220,6 +220,10 @@ namespace ReachableChanged {
 static constexpr EventId Id = 0x00000003;
 } // namespace ReachableChanged
 
+namespace ActiveChanged {
+static constexpr EventId Id = 0x00000080;
+} // namespace ActiveChanged
+
 } // namespace Events
 } // namespace BridgedDeviceBasicInformation
 
@@ -611,16 +615,6 @@ static constexpr EventId Id = 0x00000010;
 } // namespace Events
 } // namespace PumpConfigurationAndControl
 
-namespace ThreadNetworkDirectory {
-namespace Events {
-
-namespace NetworkChanged {
-static constexpr EventId Id = 0x00000000;
-} // namespace NetworkChanged
-
-} // namespace Events
-} // namespace ThreadNetworkDirectory
-
 namespace TargetNavigator {
 namespace Events {
 
@@ -660,6 +654,16 @@ static constexpr EventId Id = 0x00000000;
 
 } // namespace Events
 } // namespace ContentControl
+
+namespace CommissionerControl {
+namespace Events {
+
+namespace CommissioningRequestResult {
+static constexpr EventId Id = 0x00000000;
+} // namespace CommissioningRequestResult
+
+} // namespace Events
+} // namespace CommissionerControl
 
 namespace UnitTesting {
 namespace Events {

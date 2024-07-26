@@ -19,7 +19,55 @@ package com.matter.casting.support;
  */
 public class TargetAppInfo {
   /** Target Target Content Application Vendor ID, null means unspecified */
-  public Integer vendorId;
+  private Integer vendorId;
   /** Target Target Content Application Product ID, null means unspecified */
-  public Integer productId;
+  private Integer productId;
+
+  /**
+   * Constructor to set both vendorId and productId.
+   *
+   * @param vendorId the vendor ID, null means unspecified.
+   * @param productId the product ID, null means unspecified.
+   */
+  public TargetAppInfo(Integer vendorId, Integer productId) {
+    this.vendorId = vendorId;
+    this.productId = productId;
+  }
+
+  /**
+   * Constructor to set only the vendorId.
+   *
+   * @param vendorId the vendor ID, null means unspecified.
+   */
+  public TargetAppInfo(Integer vendorId) {
+    this.vendorId = vendorId;
+  }
+
+  /**
+   * Getter for vendorId.
+   *
+   * @return the vendor ID, null means unspecified.
+   */
+  public Integer getVendorId() {
+    return vendorId;
+  }
+
+  /**
+   * Getter for productId.
+   *
+   * @return the product ID, null means unspecified.
+   */
+  public Integer getProductId() {
+    return productId;
+  }
+
+  /**
+   * Returns a string representation of the object.
+   *
+   * @return a string representation of the object.
+   */
+  @Override
+  public String toString() {
+    return "TargetAppInfo Vendor ID:" + vendorId + ", Product ID:" + productId;
+  }
 }

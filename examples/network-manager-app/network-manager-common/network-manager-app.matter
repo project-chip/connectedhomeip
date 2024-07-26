@@ -241,7 +241,7 @@ cluster BasicInformation = 40 {
   readonly attribute optional char_string<32> serialNumber = 15;
   attribute access(write: manage) optional boolean localConfigDisabled = 16;
   readonly attribute optional boolean reachable = 17;
-  readonly attribute optional char_string<32> uniqueID = 18;
+  readonly attribute char_string<32> uniqueID = 18;
   readonly attribute CapabilityMinimaStruct capabilityMinima = 19;
   readonly attribute optional ProductAppearanceStruct productAppearance = 20;
   readonly attribute int32u specificationVersion = 21;
@@ -1195,6 +1195,51 @@ cluster WiFiNetworkManagement = 1105 {
   command access(invoke: administer) NetworkPassphraseRequest(): NetworkPassphraseResponse = 0;
 }
 
+/** Manages the names and credentials of Thread networks visible to the user. */
+cluster ThreadNetworkDirectory = 1107 {
+  revision 1;
+
+  struct ThreadNetworkStruct {
+    octet_string<8> extendedPanID = 0;
+    char_string<16> networkName = 1;
+    int16u channel = 2;
+    int64u activeTimestamp = 3;
+  }
+
+  attribute access(read: manage, write: manage) nullable octet_string<8> preferredExtendedPanID = 0;
+  readonly attribute access(read: operate) ThreadNetworkStruct threadNetworks[] = 1;
+  readonly attribute int8u threadNetworkTableSize = 2;
+  readonly attribute command_id generatedCommandList[] = 65528;
+  readonly attribute command_id acceptedCommandList[] = 65529;
+  readonly attribute event_id eventList[] = 65530;
+  readonly attribute attrib_id attributeList[] = 65531;
+  readonly attribute bitmap32 featureMap = 65532;
+  readonly attribute int16u clusterRevision = 65533;
+
+  request struct AddNetworkRequest {
+    octet_string<254> operationalDataset = 0;
+  }
+
+  request struct RemoveNetworkRequest {
+    octet_string<8> extendedPanID = 0;
+  }
+
+  request struct GetOperationalDatasetRequest {
+    octet_string<8> extendedPanID = 0;
+  }
+
+  response struct OperationalDatasetResponse = 3 {
+    octet_string<254> operationalDataset = 0;
+  }
+
+  /** Adds an entry to the ThreadNetworks list. */
+  timed command access(invoke: manage) AddNetwork(AddNetworkRequest): DefaultSuccess = 0;
+  /** Removes an entry from the ThreadNetworks list. */
+  timed command access(invoke: manage) RemoveNetwork(RemoveNetworkRequest): DefaultSuccess = 1;
+  /** Retrieves a Thread Operational Dataset from the ThreadNetworks list. */
+  timed command GetOperationalDataset(GetOperationalDatasetRequest): OperationalDatasetResponse = 2;
+}
+
 endpoint 0 {
   device type ma_rootdevice = 22, version 1;
 
@@ -1472,6 +1517,23 @@ endpoint 1 {
 
     handle command NetworkPassphraseRequest;
     handle command NetworkPassphraseResponse;
+  }
+
+  server cluster ThreadNetworkDirectory {
+    callback attribute preferredExtendedPanID;
+    callback attribute threadNetworks;
+    callback attribute threadNetworkTableSize;
+    callback attribute generatedCommandList;
+    callback attribute acceptedCommandList;
+    callback attribute eventList;
+    callback attribute attributeList;
+    ram      attribute featureMap default = 0;
+    ram      attribute clusterRevision default = 1;
+
+    handle command AddNetwork;
+    handle command RemoveNetwork;
+    handle command GetOperationalDataset;
+    handle command OperationalDatasetResponse;
   }
 }
 

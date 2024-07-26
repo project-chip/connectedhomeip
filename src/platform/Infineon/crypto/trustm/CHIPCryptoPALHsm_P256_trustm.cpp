@@ -252,15 +252,16 @@ CHIP_ERROR P256Keypair::ECDH_derive_secret(const P256PublicKey & remote_public_k
 
     return_status = trustm_ecdh_derive_secret(OPTIGA_KEY_ID_E100, (uint8_t *) remote_key, (uint16_t) rem_pubKeyLen + 3,
                                               out_secret.Bytes(), (uint8_t) secret_length);
-
     VerifyOrExit(return_status == OPTIGA_LIB_SUCCESS, error = CHIP_ERROR_INTERNAL);
+    out_secret.SetLength(secret_length);
+    error = CHIP_NO_ERROR;
 
 exit:
     if (error != CHIP_NO_ERROR)
     {
         trustm_close();
     }
-    return out_secret.SetLength(secret_length);
+    return error;
 #endif
 }
 
@@ -276,8 +277,7 @@ CHIP_ERROR P256PublicKey::ECDSA_validate_hash_signature(const uint8_t * hash, si
     size_t signature_trustm_len                               = sizeof(signature_trustm);
     MutableByteSpan out_der_sig_span(signature_trustm, signature_trustm_len);
 
-    uint8_t hash_length_u8            = static_cast<uint8_t>(hash_length);
-    uint16_t signature_trustm_len_u16 = static_cast<uint16_t>(signature_trustm_len);
+    uint8_t hash_length_u8 = static_cast<uint8_t>(hash_length);
 
     VerifyOrReturnError(hash != nullptr, CHIP_ERROR_INVALID_ARGUMENT);
     VerifyOrReturnError(hash_length > 0, CHIP_ERROR_INVALID_ARGUMENT);
@@ -291,11 +291,11 @@ CHIP_ERROR P256PublicKey::ECDSA_validate_hash_signature(const uint8_t * hash, si
 
     signature_trustm_len = out_der_sig_span.size();
     // ECC verify
-    return_status = trustm_ecdsa_verify((uint8_t *) hash, hash_length_u8, (uint8_t *) signature_trustm, signature_trustm_len_u16,
+    return_status = trustm_ecdsa_verify((uint8_t *) hash, hash_length_u8, (uint8_t *) signature_trustm, signature_trustm_len,
                                         (uint8_t *) bytes, (uint8_t) kP256_PublicKey_Length);
 
     VerifyOrExit(return_status == OPTIGA_LIB_SUCCESS, error = CHIP_ERROR_INTERNAL);
-
+    error = CHIP_NO_ERROR;
 exit:
     if (error != CHIP_NO_ERROR)
     {
@@ -407,7 +407,7 @@ CHIP_ERROR P256PublicKey::ECDSA_validate_msg_signature(const uint8_t * msg, size
                                         (uint8_t *) bytes, (uint8_t) kP256_PublicKey_Length);
 
     VerifyOrExit(return_status == OPTIGA_LIB_SUCCESS, error = CHIP_ERROR_INTERNAL);
-
+    error = CHIP_NO_ERROR;
 exit:
     if (error != CHIP_NO_ERROR)
     {

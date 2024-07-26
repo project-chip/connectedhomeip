@@ -318,7 +318,7 @@ cluster BasicInformation = 40 {
   readonly attribute optional char_string<32> serialNumber = 15;
   attribute access(write: manage) optional boolean localConfigDisabled = 16;
   readonly attribute optional boolean reachable = 17;
-  readonly attribute optional char_string<32> uniqueID = 18;
+  readonly attribute char_string<32> uniqueID = 18;
   readonly attribute CapabilityMinimaStruct capabilityMinima = 19;
   readonly attribute optional ProductAppearanceStruct productAppearance = 20;
   readonly attribute int32u specificationVersion = 21;
@@ -1730,7 +1730,12 @@ cluster UserLabel = 65 {
 
 /** Allows servers to ensure that listed clients are notified when a server is available for communication. */
 cluster IcdManagement = 70 {
-  revision 2;
+  revision 3;
+
+  enum ClientTypeEnum : enum8 {
+    kPermanent = 0;
+    kEphemeral = 1;
+  }
 
   enum OperatingModeEnum : enum8 {
     kSIT = 0;
@@ -1741,6 +1746,7 @@ cluster IcdManagement = 70 {
     kCheckInProtocolSupport = 0x1;
     kUserActiveModeTrigger = 0x2;
     kLongIdleTimeSupport = 0x4;
+    kDynamicSitLitSupport = 0x8;
   }
 
   bitmap UserActiveModeTriggerBitmap : bitmap32 {
@@ -1766,6 +1772,7 @@ cluster IcdManagement = 70 {
   fabric_scoped struct MonitoringRegistrationStruct {
     fabric_sensitive node_id checkInNodeID = 1;
     fabric_sensitive int64u monitoredSubject = 2;
+    fabric_sensitive ClientTypeEnum clientType = 4;
     fabric_idx fabricIndex = 254;
   }
 
@@ -1778,6 +1785,7 @@ cluster IcdManagement = 70 {
   provisional readonly attribute optional UserActiveModeTriggerBitmap userActiveModeTriggerHint = 6;
   provisional readonly attribute optional char_string<128> userActiveModeTriggerInstruction = 7;
   provisional readonly attribute optional OperatingModeEnum operatingMode = 8;
+  provisional readonly attribute optional int32u maximumCheckInBackOff = 9;
   readonly attribute command_id generatedCommandList[] = 65528;
   readonly attribute command_id acceptedCommandList[] = 65529;
   readonly attribute event_id eventList[] = 65530;
@@ -1790,6 +1798,7 @@ cluster IcdManagement = 70 {
     int64u monitoredSubject = 1;
     octet_string<16> key = 2;
     optional octet_string<16> verificationKey = 3;
+    ClientTypeEnum clientType = 4;
   }
 
   response struct RegisterClientResponse = 1 {
@@ -2226,7 +2235,7 @@ endpoint 0 {
     callback attribute acceptedCommandList;
     callback attribute attributeList;
     ram      attribute featureMap default = 1;
-    ram      attribute clusterRevision default = 2;
+    ram      attribute clusterRevision default = 3;
 
     handle command RegisterClient;
     handle command RegisterClientResponse;

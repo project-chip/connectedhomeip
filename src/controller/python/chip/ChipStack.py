@@ -216,7 +216,7 @@ class ChipStack(object):
         '''
         return self.PostTaskOnChipThread(callFunct).Wait(timeoutMs)
 
-    async def CallAsync(self, callFunct, timeoutMs: int = None):
+    async def CallAsyncWithResult(self, callFunct, timeoutMs: int = None):
         '''Run a Python function on CHIP stack, and wait for the response.
         This function will post a task on CHIP mainloop and waits for the call response in a asyncio friendly manner.
         '''
@@ -231,6 +231,11 @@ class ChipStack(object):
             raise res.to_exception()
 
         return await asyncio.wait_for(callObj.future, timeoutMs / 1000 if timeoutMs else None)
+
+    async def CallAsync(self, callFunct, timeoutMs: int = None) -> None:
+        '''Run a Python function on CHIP stack, and wait for the response.'''
+        res: PyChipError = await self.CallAsyncWithResult(callFunct, timeoutMs)
+        res.raise_on_error()
 
     def PostTaskOnChipThread(self, callFunct) -> AsyncCallableHandle:
         '''Run a Python function on CHIP stack, and wait for the response.

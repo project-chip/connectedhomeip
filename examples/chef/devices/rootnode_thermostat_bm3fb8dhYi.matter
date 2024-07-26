@@ -339,7 +339,7 @@ cluster BasicInformation = 40 {
   readonly attribute optional char_string<32> serialNumber = 15;
   attribute access(write: manage) optional boolean localConfigDisabled = 16;
   readonly attribute optional boolean reachable = 17;
-  readonly attribute optional char_string<32> uniqueID = 18;
+  readonly attribute char_string<32> uniqueID = 18;
   readonly attribute CapabilityMinimaStruct capabilityMinima = 19;
   readonly attribute optional ProductAppearanceStruct productAppearance = 20;
   readonly attribute int32u specificationVersion = 21;
@@ -1427,7 +1427,6 @@ cluster Thermostat = 513 {
     kMatterScheduleConfiguration = 0x80;
     kPresets = 0x100;
     kSetpoints = 0x200;
-    kQueuedPresetsSupported = 0x400;
   }
 
   bitmap HVACSystemTypeBitmap : bitmap8 {
@@ -1525,11 +1524,6 @@ cluster Thermostat = 513 {
     PresetTypeFeaturesBitmap presetTypeFeatures = 2;
   }
 
-  struct QueuedPresetStruct {
-    nullable octet_string<16> presetHandle = 0;
-    nullable epoch_s transitionTimestamp = 1;
-  }
-
   struct ScheduleTypeStruct {
     SystemModeEnum systemMode = 0;
     int8u numberOfSchedules = 1;
@@ -1604,7 +1598,6 @@ cluster Thermostat = 513 {
   readonly attribute optional boolean presetsSchedulesEditable = 82;
   readonly attribute optional TemperatureSetpointHoldPolicyBitmap temperatureSetpointHoldPolicy = 83;
   readonly attribute optional nullable epoch_s setpointHoldExpiryTimestamp = 84;
-  readonly attribute optional nullable QueuedPresetStruct queuedPreset = 85;
   readonly attribute command_id generatedCommandList[] = 65528;
   readonly attribute command_id acceptedCommandList[] = 65529;
   readonly attribute event_id eventList[] = 65530;
@@ -1642,7 +1635,6 @@ cluster Thermostat = 513 {
 
   request struct SetActivePresetRequestRequest {
     octet_string<16> presetHandle = 0;
-    optional int16u delayMinutes = 1;
   }
 
   request struct StartPresetsSchedulesEditRequestRequest {
@@ -1671,8 +1663,6 @@ cluster Thermostat = 513 {
   command access(invoke: manage) CancelPresetsSchedulesEditRequest(): DefaultSuccess = 8;
   /** This command is used to notify the server that all edits are done and should be committed. */
   command access(invoke: manage) CommitPresetsSchedulesRequest(): DefaultSuccess = 9;
-  /** This command is sent to cancel a queued preset. */
-  command access(invoke: manage) CancelSetActivePresetRequest(): DefaultSuccess = 10;
   /** This command sets the set point hold policy. */
   command SetTemperatureSetpointHoldPolicy(SetTemperatureSetpointHoldPolicyRequest): DefaultSuccess = 11;
 }
@@ -1836,6 +1826,17 @@ cluster OccupancySensing = 1030 {
     kPhysicalContact = 3;
   }
 
+  bitmap Feature : bitmap32 {
+    kOther = 0x1;
+    kPassiveInfrared = 0x2;
+    kUltrasonic = 0x4;
+    kPhysicalContact = 0x8;
+    kActiveInfrared = 0x10;
+    kRadar = 0x20;
+    kRFSensing = 0x40;
+    kVision = 0x80;
+  }
+
   bitmap OccupancyBitmap : bitmap8 {
     kOccupied = 0x1;
   }
@@ -1846,9 +1847,17 @@ cluster OccupancySensing = 1030 {
     kPhysicalContact = 0x4;
   }
 
+  struct HoldTimeLimitsStruct {
+    int16u holdTimeMin = 0;
+    int16u holdTimeMax = 1;
+    int16u holdTimeDefault = 2;
+  }
+
   readonly attribute OccupancyBitmap occupancy = 0;
   readonly attribute OccupancySensorTypeEnum occupancySensorType = 1;
   readonly attribute OccupancySensorTypeBitmap occupancySensorTypeBitmap = 2;
+  attribute access(write: manage) optional int16u holdTime = 3;
+  readonly attribute optional HoldTimeLimitsStruct holdTimeLimits = 4;
   attribute access(write: manage) optional int16u PIROccupiedToUnoccupiedDelay = 16;
   attribute access(write: manage) optional int16u PIRUnoccupiedToOccupiedDelay = 17;
   attribute access(write: manage) optional int8u PIRUnoccupiedToOccupiedThreshold = 18;

@@ -39,8 +39,8 @@ SECTIONS
 	.text :
 	{
 		KEEP(*(.isr_vector))
-        KEEP(*(.reset_handler))
-		*(EXCLUDE_FILE(*sl_si91x_bus.c.o *sl_si91x_driver.c.o *sli_si91x_multithreaded.c.o *rsi_hal_mcu_m4_ram.c.o *rsi_hal_mcu_m4_rom.c.o *rsi_deepsleep_soc.c.o *croutine.c.o *event_groups.c.o *list.c.o *queue.c.o *stream_buffer.c.o *tasks.c.o *timers.c.o *cmsis_os2.c.o *freertos_umm_malloc_host.c.o *malloc_buffers.c.o *sl_rsi_utility.c.o *port.c.o *heap_*.c.o *os_systick.c.o *sl_wifi_if.c.o *sl_si91x_m4_ps.c.o *sl_platform_wireless.c.o) .text*)
+     	KEEP(*(.reset_handler))
+		*(EXCLUDE_FILE(*sl_si91x_bus.c.o *sl_si91x_driver.c.o *sli_si91x_multithreaded.c.o *rsi_hal_mcu_m4_ram.c.o *rsi_hal_mcu_m4_rom.c.o *rsi_deepsleep_soc.c.o *croutine.c.o *event_groups.c.o *list.c.o *queue.c.o *stream_buffer.c.o *tasks.c.o *timers.c.o *cmsis_os2.c.o *freertos_umm_malloc_host.c.o *malloc_buffers.c.o *sl_rsi_utility.c.o *port.c.o *sl_sleeptimer.c.o *sl_sleeptimer_hal_si91x_sysrtc.c.o *rsi_sysrtc.c.o *sl_si91x_low_power_tickless_mode.c.o *heap_*.c.o *sl_core_cortexm.c.o) .text*)
 		
     /* .ctors */
     *crtbegin.o(.ctors)
@@ -132,7 +132,7 @@ SECTIONS
 		*sli_si91x_multithreaded.c.o(.text*)
 		*rsi_hal_mcu_m4_ram.c.o(.text*)
 		*rsi_hal_mcu_m4_rom.c.o(.text*)
-		*rsi_deepsleep_soc.c.o(.text*)
+  	    *rsi_deepsleep_soc.c.o(.text*)
 		*croutine.c.o(.text*)
 		*event_groups.c.o(.text*)
 		*list.c.o(.text*)
@@ -146,10 +146,11 @@ SECTIONS
 		*sl_rsi_utility.c.o(.text*)
 		*port.c.o(.text*)
 		*heap_*.c.o(.text*)
-		*os_systick.c.o(.text*)
-		*sl_wifi_if.c.o(.text*)
-		*sl_si91x_m4_ps.c.o(.text*)
-		*sl_platform_wireless.c.o(.text*)
+    *sl_sleeptimer.c.o(.text*)
+    *sl_sleeptimer_hal_si91x_sysrtc.c.o(.text*)
+    *rsi_sysrtc.c.o(.text*)
+    *sl_si91x_low_power_tickless_mode.c.o(.text*)
+    *sl_core_cortexm.c.o(.text*)
 
     . = ALIGN(4);
     /* preinit data */

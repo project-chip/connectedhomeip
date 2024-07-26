@@ -114,16 +114,16 @@ private:
 
     // ===== Members that implement virtual methods on BlePlatformDelegate.
 
-    bool SubscribeCharacteristic(BLE_CONNECTION_OBJECT conId, const Ble::ChipBleUUID * svcId,
-                                 const Ble::ChipBleUUID * charId) override;
-    bool UnsubscribeCharacteristic(BLE_CONNECTION_OBJECT conId, const Ble::ChipBleUUID * svcId,
-                                   const Ble::ChipBleUUID * charId) override;
-    bool CloseConnection(BLE_CONNECTION_OBJECT conId) override;
+    CHIP_ERROR SubscribeCharacteristic(BLE_CONNECTION_OBJECT conId, const Ble::ChipBleUUID * svcId,
+                                       const Ble::ChipBleUUID * charId) override;
+    CHIP_ERROR UnsubscribeCharacteristic(BLE_CONNECTION_OBJECT conId, const Ble::ChipBleUUID * svcId,
+                                         const Ble::ChipBleUUID * charId) override;
+    CHIP_ERROR CloseConnection(BLE_CONNECTION_OBJECT conId) override;
     uint16_t GetMTU(BLE_CONNECTION_OBJECT conId) const override;
-    bool SendIndication(BLE_CONNECTION_OBJECT conId, const Ble::ChipBleUUID * svcId, const Ble::ChipBleUUID * charId,
-                        System::PacketBufferHandle pBuf) override;
-    bool SendWriteRequest(BLE_CONNECTION_OBJECT conId, const Ble::ChipBleUUID * svcId, const Ble::ChipBleUUID * charId,
-                          System::PacketBufferHandle pBuf) override;
+    CHIP_ERROR SendIndication(BLE_CONNECTION_OBJECT conId, const Ble::ChipBleUUID * svcId, const Ble::ChipBleUUID * charId,
+                              System::PacketBufferHandle pBuf) override;
+    CHIP_ERROR SendWriteRequest(BLE_CONNECTION_OBJECT conId, const Ble::ChipBleUUID * svcId, const Ble::ChipBleUUID * charId,
+                                System::PacketBufferHandle pBuf) override;
 
     // ===== Members that implement virtual methods on BleApplicationDelegate.
 
@@ -173,7 +173,7 @@ private:
 
     void AdapterStateChangedCb(int result, bt_adapter_state_e adapterState);
     void AdvertisingStateChangedCb(int result, bt_advertiser_h advertiser, bt_adapter_le_advertising_state_e advState);
-    void NotificationStateChangedCb(bool notify, bt_gatt_server_h server, bt_gatt_h gattHandle);
+    void IndicationStateChangedCb(bool notify, bt_gatt_server_h server, bt_gatt_h gattHandle);
     void ReadValueRequestedCb(const char * remoteAddress, int requestId, bt_gatt_server_h server, bt_gatt_h gattHandle, int offset);
     void WriteValueRequestedCb(const char * remoteAddress, int requestId, bt_gatt_server_h server, bt_gatt_h gattHandle,
                                bool responseNeeded, int offset, const char * value, int len);
@@ -181,7 +181,7 @@ private:
                                   bool completed);
     void GattConnectionStateChangedCb(int result, bool connected, const char * remoteAddress);
     static void WriteCompletedCb(int result, bt_gatt_h gattHandle, void * userData);
-    static void CharacteristicNotificationCb(bt_gatt_h characteristic, char * value, int len, void * userData);
+    static void CharacteristicIndicationCb(bt_gatt_h characteristic, char * value, int len, void * userData);
 
     // ==== BLE Scan.
     void InitiateScan(BleScanState scanType);
@@ -191,8 +191,8 @@ private:
     void AddConnectionData(const char * remoteAddr);
     void RemoveConnectionData(const char * remoteAddr);
 
-    void HandleC1CharWriteEvent(BLE_CONNECTION_OBJECT conId, const uint8_t * value, size_t len);
-    void HandleRXCharChanged(BLE_CONNECTION_OBJECT conId, const uint8_t * value, size_t len);
+    void HandleC1CharWrite(BLE_CONNECTION_OBJECT conId, const uint8_t * value, size_t len);
+    void HandleC2CharChanged(BLE_CONNECTION_OBJECT conId, const uint8_t * value, size_t len);
     void HandleConnectionEvent(bool connected, const char * remoteAddress);
     static void HandleConnectionTimeout(System::Layer * layer, void * appState);
     bool IsDeviceChipPeripheral(BLE_CONNECTION_OBJECT conId);
@@ -204,7 +204,6 @@ private:
     void NotifyBLEPeripheralAdvStopComplete(CHIP_ERROR error);
     void NotifyBLESubscribed(BLE_CONNECTION_OBJECT conId, bool indicationsEnabled);
     void NotifyBLEIndicationConfirmation(BLE_CONNECTION_OBJECT conId);
-    void NotifyBLEWriteReceived(BLE_CONNECTION_OBJECT conId, System::PacketBufferHandle & buf);
     static void HandleAdvertisingTimeout(chip::System::Layer *, void * appState);
     AdvertisingIntervals GetAdvertisingIntervals() const;
 
@@ -216,7 +215,6 @@ private:
     void NotifyHandleConnectFailed(CHIP_ERROR error);
     void NotifyHandleWriteComplete(BLE_CONNECTION_OBJECT conId);
     void NotifySubscribeOpComplete(BLE_CONNECTION_OBJECT conId, bool isSubscribed);
-    void NotifyBLENotificationReceived(BLE_CONNECTION_OBJECT conId, System::PacketBufferHandle & buf);
 
     CHIP_ERROR RegisterGATTServer();
     CHIP_ERROR StartBLEAdvertising();

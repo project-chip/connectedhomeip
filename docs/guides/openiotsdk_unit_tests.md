@@ -20,13 +20,14 @@ The list of currently supported Matter's component tests:
 
 ```
 accesstest
+AppDataModelTests
 AppTests
 ASN1Tests
 BDXTests
 ChipCryptoTests
+ControllerDataModelTests
 CoreTests
 CredentialsTest
-DataModelTests
 ICDServerTests
 InetLayerTests
 MdnsTests

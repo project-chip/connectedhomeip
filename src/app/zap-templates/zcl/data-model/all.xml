@@ -18,6 +18,7 @@
    <xi:include href="chip/chip-types.xml" />
    <xi:include href="chip/clusters-extensions.xml" />
    <xi:include href="chip/color-control-cluster.xml" />
+   <xi:include href="chip/commissioner-control-cluster.xml" />
    <xi:include href="chip/concentration-measurement-cluster.xml" />
    <xi:include href="chip/content-launch-cluster.xml" />
    <xi:include href="chip/descriptor-cluster.xml" />
@@ -33,6 +34,7 @@
    <xi:include href="chip/microwave-oven-mode-cluster.xml" />
    <xi:include href="chip/microwave-oven-control-cluster.xml" />
    <xi:include href="chip/door-lock-cluster.xml" />
+   <xi:include href="chip/ecosystem-information-cluster.xml" />
    <xi:include href="chip/energy-evse-cluster.xml" />
    <xi:include href="chip/energy-evse-mode-cluster.xml" />   
    <xi:include href="chip/energy-preference-cluster.xml" />
@@ -45,6 +47,7 @@
    <xi:include href="chip/general-commissioning-cluster.xml" />
    <xi:include href="chip/general-diagnostics-cluster.xml" />
    <xi:include href="chip/global-attributes.xml" />
+   <xi:include href="chip/global-structs.xml" />
    <xi:include href="chip/groups-cluster.xml" />
    <xi:include href="chip/group-key-mgmt-cluster.xml" />
    <xi:include href="chip/icd-management-cluster.xml" />
@@ -61,6 +64,7 @@
    <xi:include href="chip/messages-cluster.xml" />   
    <xi:include href="chip/mode-base-cluster.xml" />
    <xi:include href="chip/mode-select-cluster.xml" />
+   <xi:include href="chip/semantic-tag-namespace-enums.xml" />
    <xi:include href="chip/network-commissioning-cluster.xml" />
    <xi:include href="chip/occupancy-sensing-cluster.xml" />
    <xi:include href="chip/onoff-cluster.xml" />
@@ -85,6 +89,7 @@
    <xi:include href="chip/replacable-monitoring-cluster.xml.xml" />
    <xi:include href="chip/resource-monitoring-cluster.xml" />
    <xi:include href="chip/scene.xml" />
+   <xi:include href="chip/service-area-cluster.xml" />
    <xi:include href="chip/smoke-co-alarm-cluster.xml" />
    <xi:include href="chip/software-diagnostics-cluster.xml" />
    <xi:include href="chip/switch-cluster.xml" />
@@ -105,6 +110,8 @@
    <xi:include href="chip/valve-configuration-and-control-cluster.xml" />
    <xi:include href="chip/wake-on-lan-cluster.xml" />
    <xi:include href="chip/washer-controls-cluster.xml" />
+   <xi:include href="chip/water-heater-management-cluster.xml" />
+   <xi:include href="chip/water-heater-mode-cluster.xml" />
    <xi:include href="chip/wifi-network-diagnostics-cluster.xml" />
    <xi:include href="chip/wifi-network-management-cluster.xml" />
    <xi:include href="chip/window-covering.xml" />

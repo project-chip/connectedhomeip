@@ -24,8 +24,9 @@
 #include "AppConfig.h"
 #include "AppEvent.h"
 #include "AppTask.h"
-
 #include <app/server/Server.h>
+
+#define APP_ACTION_BUTTON 1
 
 #ifdef DISPLAY_ENABLED
 #include "lcd.h"
@@ -34,10 +35,10 @@
 #endif // QR_CODE_ENABLED
 #endif // DISPLAY_ENABLED
 
-#include "SilabsDeviceDataProvider.h"
 #if CHIP_CONFIG_ENABLE_ICD_SERVER == 1
 #include <app/icd/server/ICDNotifier.h> // nogncheck
 #endif
+#include <ProvisionManager.h>
 #include <app/server/OnboardingCodesUtil.h>
 #include <app/util/attribute-storage.h>
 #include <assert.h>
@@ -50,6 +51,7 @@
 #if CHIP_ENABLE_OPENTHREAD
 #include <platform/OpenThread/OpenThreadUtils.h>
 #include <platform/ThreadStackManager.h>
+#include <platform/silabs/ConfigurationManagerImpl.h>
 #include <platform/silabs/ThreadStackManagerImpl.h>
 #endif // CHIP_ENABLE_OPENTHREAD
 
@@ -114,9 +116,10 @@ app::Clusters::NetworkCommissioning::Instance
     sWiFiNetworkCommissioningInstance(0 /* Endpoint Id */, &(NetworkCommissioning::SlWiFiDriver::GetInstance()));
 #endif /* SL_WIFI */
 
+bool sIsEnabled  = false;
+bool sIsAttached = false;
+
 #if !(defined(CHIP_CONFIG_ENABLE_ICD_SERVER) && CHIP_CONFIG_ENABLE_ICD_SERVER)
-bool sIsEnabled          = false;
-bool sIsAttached         = false;
 bool sHaveBLEConnections = false;
 #endif // CHIP_CONFIG_ENABLE_ICD_SERVER
 
@@ -155,14 +158,13 @@ Identify gIdentify = {
 };
 
 #endif // MATTER_DM_PLUGIN_IDENTIFY_SERVER
+
 } // namespace
 
-bool BaseApplication::sIsProvisioned           = false;
-bool BaseApplication::sIsFactoryResetTriggered = false;
-LEDWidget * BaseApplication::sAppActionLed     = nullptr;
-#if CHIP_CONFIG_ENABLE_ICD_SERVER && SLI_SI917
+bool BaseApplication::sIsProvisioned                  = false;
+bool BaseApplication::sIsFactoryResetTriggered        = false;
+LEDWidget * BaseApplication::sAppActionLed            = nullptr;
 BaseApplicationDelegate BaseApplication::sAppDelegate = BaseApplicationDelegate();
-#endif // CHIP_CONFIG_ENABLE_ICD_SERVER && SLI_SI917
 
 #ifdef DIC_ENABLE
 namespace {
@@ -180,17 +182,19 @@ void AppSpecificConnectivityEventCallback(const ChipDeviceEvent * event, intptr_
 } // namespace
 #endif // DIC_ENABLE
 
-#if CHIP_CONFIG_ENABLE_ICD_SERVER && SLI_SI917
 void BaseApplicationDelegate::OnCommissioningSessionStarted()
 {
     isComissioningStarted = true;
 }
+
 void BaseApplicationDelegate::OnCommissioningSessionStopped()
 {
     isComissioningStarted = false;
 }
+
 void BaseApplicationDelegate::OnCommissioningWindowClosed()
 {
+#if CHIP_CONFIG_ENABLE_ICD_SERVER && SLI_SI917
     if (!BaseApplication::GetProvisionStatus() && !isComissioningStarted)
     {
         int32_t status = wfx_power_save(RSI_SLEEP_MODE_8, STANDBY_POWER_SAVE_WITH_RAM_RETENTION);
@@ -199,8 +203,27 @@ void BaseApplicationDelegate::OnCommissioningWindowClosed()
             ChipLogError(DeviceLayer, "Failed to enable the TA Deep Sleep");
         }
     }
+#endif // CHIP_CONFIG_ENABLE_ICD_SERVER && SLI_SI917qq
 }
-#endif // CHIP_CONFIG_ENABLE_ICD_SERVER && SLI_SI917
+
+void BaseApplicationDelegate::OnFabricCommitted(const FabricTable & fabricTable, FabricIndex fabricIndex)
+{
+    // If we commissioned our first fabric, Update the commissioned status of the App
+    if (fabricTable.FabricCount() == 1)
+    {
+        BaseApplication::UpdateCommissioningStatus(true);
+    }
+}
+
+void BaseApplicationDelegate::OnFabricRemoved(const FabricTable & fabricTable, FabricIndex fabricIndex)
+{
+    if (fabricTable.FabricCount() == 0)
+    {
+        BaseApplication::UpdateCommissioningStatus(false);
+
+        BaseApplication::DoProvisioningReset();
+    }
+}
 
 /**********************************************************
  * AppTask Definitions
@@ -297,6 +320,8 @@ CHIP_ERROR BaseApplication::Init()
 #if CHIP_ENABLE_OPENTHREAD
     BaseApplication::sIsProvisioned = ConnectivityMgr().IsThreadProvisioned();
 #endif
+
+    err = chip::Server::GetInstance().GetFabricTable().AddFabricDelegate(&sAppDelegate);
     return err;
 }
 
@@ -408,6 +433,23 @@ bool BaseApplication::ActivateStatusLedPatterns()
 #endif // CHIP_CONFIG_ENABLE_ICD_SERVER
 #endif // ENABLE_WSTK_LEDS) && SL_CATALOG_SIMPLE_LED_LED1_PRESENT
     return isPatternSet;
+}
+
+void BaseApplication::UpdateCommissioningStatus(bool newState)
+{
+#ifdef SL_WIFI
+    BaseApplication::sIsProvisioned = ConnectivityMgr().IsWiFiStationProvisioned();
+    sIsEnabled                      = ConnectivityMgr().IsWiFiStationEnabled();
+    sIsAttached                     = ConnectivityMgr().IsWiFiStationConnected();
+#endif /* SL_WIFI */
+#if CHIP_ENABLE_OPENTHREAD
+    // TODO: This is a temporary solution until we can read Thread provisioning status from RAM instead of NVM.
+    BaseApplication::sIsProvisioned = newState;
+    sIsEnabled                      = ConnectivityMgr().IsThreadEnabled();
+    sIsAttached                     = ConnectivityMgr().IsThreadAttached();
+#endif /* CHIP_ENABLE_OPENTHREAD */
+
+    ActivateStatusLedPatterns();
 }
 
 // TODO Move State Monitoring elsewhere
@@ -744,8 +786,37 @@ void BaseApplication::DispatchEvent(AppEvent * aEvent)
 void BaseApplication::ScheduleFactoryReset()
 {
     PlatformMgr().ScheduleWork([](intptr_t) {
-        PlatformMgr().HandleServerShuttingDown();
+        // Press both buttons to request provisioning
+        if (GetPlatform().GetButtonState(APP_ACTION_BUTTON))
+        {
+            Provision::Manager::GetInstance().SetProvisionRequired(true);
+        }
+        PlatformMgr().HandleServerShuttingDown(); // HandleServerShuttingDown calls OnShutdown() which is only implemented for the
+                                                  // basic information cluster it seems. And triggers and Event flush, which is not
+                                                  // relevant when there are no fabrics left
         ConfigurationMgr().InitiateFactoryReset();
+    });
+}
+
+void BaseApplication::DoProvisioningReset()
+{
+    PlatformMgr().ScheduleWork([](intptr_t) {
+#if CHIP_DEVICE_CONFIG_ENABLE_THREAD
+        ConfigurationManagerImpl::GetDefaultInstance().ClearThreadStack();
+        ThreadStackMgrImpl().FactoryResetThreadStack();
+        ThreadStackMgr().InitThreadStack();
+#endif // CHIP_DEVICE_CONFIG_ENABLE_THREAD
+
+#if CHIP_DEVICE_CONFIG_ENABLE_WIFI_STATION
+        ChipLogProgress(DeviceLayer, "Clearing WiFi provision");
+        chip::DeviceLayer::ConnectivityMgr().ClearWiFiStationProvision();
+#endif // CHIP_DEVICE_CONFIG_ENABLE_WIFI_STATION
+
+        CHIP_ERROR err = Server::GetInstance().GetCommissioningWindowManager().OpenBasicCommissioningWindow();
+        if (err != CHIP_NO_ERROR)
+        {
+            SILABS_LOG("Failed to open the Basic Commissioning Window");
+        }
     });
 }
 
@@ -753,6 +824,7 @@ void BaseApplication::OnPlatformEvent(const ChipDeviceEvent * event, intptr_t)
 {
     if (event->Type == DeviceEventType::kServiceProvisioningChange)
     {
+        // Note: This is only called on Attach, we need to add a method to detect Thread Network Detach
         BaseApplication::sIsProvisioned = event->ServiceProvisioningChange.IsServiceProvisioned;
     }
 }
@@ -765,7 +837,8 @@ void BaseApplication::OutputQrCode(bool refreshLCD)
     char setupPayloadBuffer[chip::QRCodeBasicSetupPayloadGenerator::kMaxQRCodeBase38RepresentationLength + 1];
     chip::MutableCharSpan setupPayload(setupPayloadBuffer);
 
-    if (Silabs::SilabsDeviceDataProvider::GetDeviceDataProvider().GetSetupPayload(setupPayload) == CHIP_NO_ERROR)
+    CHIP_ERROR err = Provision::Manager::GetInstance().GetStorage().GetSetupPayload(setupPayload);
+    if (CHIP_NO_ERROR == err)
     {
         // Print setup info on LCD if available
 #ifdef QR_CODE_ENABLED

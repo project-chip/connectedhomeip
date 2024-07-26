@@ -12,6 +12,7 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 import("//build_overrides/chip.gni")
+
 # This source set is TIGHLY coupled with code-generated data models
 # as generally implemented by `src/app/util`
 #
@@ -21,7 +22,24 @@ import("//build_overrides/chip.gni")
 # Use `model.gni` to get access to:
 #   CodegenDataModel.cpp
 #   CodegenDataModel.h
+#   CodegenDataModel_Read.cpp
+#   CodegenDataModel_Write.cpp
+#   EmberMetadata.cpp
+#   EmberMetadata.h
+#   Instance.cpp
 #
 # The above list of files exists to satisfy the "dependency linter"
 # since those files should technically be "visible to gn" even though we
 # are supposed to go through model.gni constants
+
+source_set("instance-header") {
+  # TODO: this is a workaround until we have actual injection in our code. The issue is that
+  #       DataModel is not currently injected and InteractionModelEngine needs a default
+  #
+  #       The default should be code-generated data models, however that depends on code
+  #       generation and is application specific.
+  #
+  # This only declares that the instance method is provided by something (that something
+  # generally being unit tests or data_model.gni/data_model.cmake files)
+  sources = [ "Instance.h" ]
+}

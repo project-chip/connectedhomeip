@@ -41,6 +41,7 @@ bool gCommissionerGeneratedPasscodeFlowRunning = false;
 
 DiscoveryDelegateImpl * DiscoveryDelegateImpl::_discoveryDelegateImpl = nullptr;
 bool gAwaitingCommissionerPasscodeInput                               = false;
+LinuxCommissionableDataProvider gSimpleAppCommissionableDataProvider;
 std::shared_ptr<matter::casting::core::CastingPlayer> targetCastingPlayer;
 
 DiscoveryDelegateImpl * DiscoveryDelegateImpl::GetInstance()
@@ -389,11 +390,15 @@ CHIP_ERROR CommandHandler(int argc, char ** argv)
         unsigned long index = static_cast<unsigned long>(strtol(argv[1], &eptr, 10));
         std::vector<matter::casting::memory::Strong<matter::casting::core::CastingPlayer>> castingPlayers =
             matter::casting::core::CastingPlayerDiscovery::GetInstance()->GetCastingPlayers();
-        VerifyOrReturnValue(0 <= index && index < castingPlayers.size(), CHIP_ERROR_INVALID_ARGUMENT,
+        VerifyOrReturnValue(index < castingPlayers.size(), CHIP_ERROR_INVALID_ARGUMENT,
                             ChipLogError(AppServer, "Invalid casting player index provided: %lu", index));
         targetCastingPlayer = castingPlayers.at(index);
 
         gCommissionerGeneratedPasscodeFlowRunning = false;
+
+        // Specify the TargetApp that the client wants to interact with after commissioning. If this value is passed in,
+        // VerifyOrEstablishConnection() will force UDC, in case the desired TargetApp is not found in the on-device
+        // CastingStore
         matter::casting::core::IdentificationDeclarationOptions idOptions;
         chip::Protocols::UserDirectedCommissioning::TargetAppInfo targetAppInfo;
         targetAppInfo.vendorId = kDesiredEndpointVendorId;
@@ -455,42 +460,56 @@ CHIP_ERROR CommandHandler(int argc, char ** argv)
             return PrintAllCommands();
         }
         char * eptr;
-        uint32_t passcode = (uint32_t) strtol(argv[1], &eptr, 10);
+        uint32_t userEnteredPasscode = (uint32_t) strtol(argv[1], &eptr, 10);
         if (gAwaitingCommissionerPasscodeInput)
         {
-            ChipLogProgress(AppServer, "CommandHandler() setcommissionerpasscode user entered passcode: %d", passcode);
+            ChipLogProgress(AppServer, "CommandHandler() setcommissionerpasscode user-entered passcode: %d", userEnteredPasscode);
             gAwaitingCommissionerPasscodeInput = false;
 
             // Per connectedhomeip/examples/platform/linux/LinuxCommissionableDataProvider.h: We don't support overriding the
-            // passcode post-init (it is deprecated!). Therefore we need to initiate a new provider with the user entered
+            // passcode post-init (it is deprecated!). Therefore we need to initiate a new provider with the user-entered
             // Commissioner-generated passcode, and then update the CastigApp's AppParameters to update the commissioning session's
             // passcode.
-            LinuxDeviceOptions::GetInstance().payload.setUpPINCode = passcode;
-            LinuxCommissionableDataProvider gCommissionableDataProvider;
-            CHIP_ERROR err = CHIP_NO_ERROR;
-            err            = InitCommissionableDataProvider(gCommissionableDataProvider, LinuxDeviceOptions::GetInstance());
+            LinuxDeviceOptions::GetInstance().payload.setUpPINCode = userEnteredPasscode;
+            CHIP_ERROR err                                         = CHIP_NO_ERROR;
+            err = InitCommissionableDataProvider(gSimpleAppCommissionableDataProvider, LinuxDeviceOptions::GetInstance());
             if (err != CHIP_NO_ERROR)
             {
                 ChipLogError(AppServer,
                              "CommandHandler() setcommissionerpasscode InitCommissionableDataProvider() err %" CHIP_ERROR_FORMAT,
                              err.Format());
+                return err;
             }
             // Update the CommissionableDataProvider stored in this CastingApp's AppParameters and the CommissionableDataProvider to
             // be used for the commissioning session.
-            err = matter::casting::core::CastingApp::GetInstance()->UpdateCommissionableDataProvider(&gCommissionableDataProvider);
+            err = matter::casting::core::CastingApp::GetInstance()->UpdateCommissionableDataProvider(
+                &gSimpleAppCommissionableDataProvider);
             if (err != CHIP_NO_ERROR)
             {
                 ChipLogError(AppServer,
                              "CommandHandler() setcommissionerpasscode InitCommissionableDataProvider() err %" CHIP_ERROR_FORMAT,
                              err.Format());
+                return err;
             }
 
             // Continue Connecting to the target CastingPlayer with the user entered Commissioner-generated Passcode.
             err = targetCastingPlayer->ContinueConnecting();
             if (err != CHIP_NO_ERROR)
             {
-                ChipLogError(AppServer, "CommandHandler() setcommissionerpasscode ContinueConnecting() err %" CHIP_ERROR_FORMAT,
+                ChipLogError(AppServer,
+                             "CommandHandler() setcommissionerpasscode ContinueConnecting() failed due to err %" CHIP_ERROR_FORMAT,
                              err.Format());
+                // Since continueConnecting() failed, Attempt to cancel the connection attempt with
+                // the CastingPlayer/Commissioner by calling StopConnecting().
+                err = targetCastingPlayer->StopConnecting();
+                if (err != CHIP_NO_ERROR)
+                {
+                    ChipLogError(AppServer,
+                                 "CommandHandler() setcommissionerpasscode, ContinueConnecting() failed and then StopConnecting "
+                                 "failed due to err %" CHIP_ERROR_FORMAT,
+                                 err.Format());
+                }
+                return err;
             }
         }
         else
@@ -498,6 +517,7 @@ CHIP_ERROR CommandHandler(int argc, char ** argv)
             ChipLogError(
                 AppServer,
                 "CommandHandler() setcommissionerpasscode, no Commissioner-Generated passcode input expected at this time.");
+            return CHIP_ERROR_INVALID_ARGUMENT;
         }
     }
     if (strcmp(argv[0], "stop-connecting") == 0)
@@ -507,6 +527,7 @@ CHIP_ERROR CommandHandler(int argc, char ** argv)
         if (err != CHIP_NO_ERROR)
         {
             ChipLogError(AppServer, "CommandHandler() stop-connecting, err %" CHIP_ERROR_FORMAT, err.Format());
+            return err;
         }
     }
     if (strcmp(argv[0], "print-bindings") == 0)

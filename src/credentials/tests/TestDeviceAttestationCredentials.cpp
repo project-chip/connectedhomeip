@@ -15,6 +15,9 @@
  *    See the License for the specific language governing permissions and
  *    limitations under the License.
  */
+
+#include <pw_unit_test/framework.h>
+
 #include <crypto/CHIPCryptoPAL.h>
 
 #include <credentials/CHIPCert.h>
@@ -28,10 +31,9 @@
 #include <credentials/examples/ExamplePAI.h>
 
 #include <lib/core/CHIPError.h>
+#include <lib/core/StringBuilderAdapters.h>
 #include <lib/support/CHIPMem.h>
 #include <lib/support/Span.h>
-
-#include <gtest/gtest.h>
 
 #include "CHIPAttCert_test_vectors.h"
 

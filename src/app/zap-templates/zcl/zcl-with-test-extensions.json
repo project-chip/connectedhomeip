@@ -33,6 +33,7 @@
         "channel-cluster.xml",
         "clusters-extensions.xml",
         "color-control-cluster.xml",
+        "commissioner-control-cluster.xml",
         "concentration-measurement-cluster.xml",
         "content-launch-cluster.xml",
         "content-app-observer-cluster.xml",
@@ -47,6 +48,7 @@
         "microwave-oven-mode-cluster.xml",
         "microwave-oven-control-cluster.xml",
         "door-lock-cluster.xml",
+        "ecosystem-information-cluster.xml",
         "energy-preference-cluster.xml",
         "electrical-energy-measurement-cluster.xml",
         "electrical-measurement-cluster.xml",
@@ -61,6 +63,7 @@
         "general-commissioning-cluster.xml",
         "general-diagnostics-cluster.xml",
         "global-attributes.xml",
+        "global-structs.xml",
         "groups-cluster.xml",
         "group-key-mgmt-cluster.xml",
         "icd-management-cluster.xml",
@@ -80,6 +83,7 @@
         "mode-base-cluster.xml",
         "mode-select-cluster.xml",
         "mode-select-extensions.xml",
+        "semantic-tag-namespace-enums.xml",
         "network-commissioning-cluster.xml",
         "occupancy-sensing-cluster.xml",
         "onoff-cluster.xml",
@@ -106,6 +110,7 @@
         "rvc-run-mode-cluster.xml",
         "resource-monitoring-cluster.xml",
         "scene.xml",
+        "service-area-cluster.xml",
         "smoke-co-alarm-cluster.xml",
         "software-diagnostics-cluster.xml",
         "switch-cluster.xml",
@@ -126,6 +131,8 @@
         "valve-configuration-and-control-cluster.xml",
         "wake-on-lan-cluster.xml",
         "washer-controls-cluster.xml",
+        "water-heater-management-cluster.xml",
+        "water-heater-mode-cluster.xml",
         "wifi-network-diagnostics-cluster.xml",
         "wifi-network-management-cluster.xml",
         "window-covering.xml",
@@ -274,6 +281,7 @@
             "ICDCounter",
             "ClientsSupportedPerFabric"
         ],
+        "Occupancy Sensing": ["HoldTimeLimits"],
         "Operational Credentials": [
             "SupportedFabrics",
             "CommissionedFabrics",
@@ -602,7 +610,6 @@
             "FeatureMap"
         ],
         "Air Quality": ["AirQuality", "FeatureMap"],
-        "Thermostat": ["QueuedPreset"],
         "Electrical Energy Measurement": [
             "Accuracy",
             "CumulativeEnergyImported",
@@ -637,7 +644,13 @@
         "Power Topology": ["FeatureMap"],
         "Valve Configuration and Control": ["RemainingDuration"],
         "Boolean State Configuration": ["CurrentSensitivityLevel"],
-        "Wi-Fi Network Management": ["SSID"]
+        "Water Heater Mode": ["SupportedModes", "CurrentMode", "FeatureMap"],
+        "Wi-Fi Network Management": ["SSID"],
+        "Thread Network Directory": [
+            "PreferredExtendedPanID",
+            "ThreadNetworks",
+            "ThreadNetworkTableSize"
+        ]
     },
     "defaultReportingPolicy": "mandatory",
     "ZCLDataTypes": ["ARRAY", "BITMAP", "ENUM", "NUMBER", "STRING", "STRUCT"],

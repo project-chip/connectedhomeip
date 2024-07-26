@@ -226,6 +226,9 @@ static constexpr ClusterId Id = 0x00000090;
 namespace ElectricalEnergyMeasurement {
 static constexpr ClusterId Id = 0x00000091;
 } // namespace ElectricalEnergyMeasurement
+namespace WaterHeaterManagement {
+static constexpr ClusterId Id = 0x00000094;
+} // namespace WaterHeaterManagement
 namespace DemandResponseLoadControl {
 static constexpr ClusterId Id = 0x00000096;
 } // namespace DemandResponseLoadControl
@@ -247,6 +250,9 @@ static constexpr ClusterId Id = 0x0000009C;
 namespace EnergyEvseMode {
 static constexpr ClusterId Id = 0x0000009D;
 } // namespace EnergyEvseMode
+namespace WaterHeaterMode {
+static constexpr ClusterId Id = 0x0000009E;
+} // namespace WaterHeaterMode
 namespace DeviceEnergyManagementMode {
 static constexpr ClusterId Id = 0x0000009F;
 } // namespace DeviceEnergyManagementMode
@@ -259,6 +265,9 @@ static constexpr ClusterId Id = 0x00000102;
 namespace BarrierControl {
 static constexpr ClusterId Id = 0x00000103;
 } // namespace BarrierControl
+namespace ServiceArea {
+static constexpr ClusterId Id = 0x00000150;
+} // namespace ServiceArea
 namespace PumpConfigurationAndControl {
 static constexpr ClusterId Id = 0x00000200;
 } // namespace PumpConfigurationAndControl
@@ -376,6 +385,12 @@ static constexpr ClusterId Id = 0x0000050F;
 namespace ContentAppObserver {
 static constexpr ClusterId Id = 0x00000510;
 } // namespace ContentAppObserver
+namespace EcosystemInformation {
+static constexpr ClusterId Id = 0x00000750;
+} // namespace EcosystemInformation
+namespace CommissionerControl {
+static constexpr ClusterId Id = 0x00000751;
+} // namespace CommissionerControl
 namespace ElectricalMeasurement {
 static constexpr ClusterId Id = 0x00000B04;
 } // namespace ElectricalMeasurement
