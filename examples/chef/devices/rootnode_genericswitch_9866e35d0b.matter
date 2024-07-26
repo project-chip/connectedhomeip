@@ -12,18 +12,6 @@ bitmap TestGlobalBitmap : bitmap32 {
   kSecondBit = 0x2;
 }
 
-bitmap Bitmap16 : bitmap16 {
-}
-
-bitmap Bitmap32 : bitmap32 {
-}
-
-bitmap Bitmap64 : bitmap64 {
-}
-
-bitmap Bitmap8 : bitmap8 {
-}
-
 struct TestGlobalStruct {
     char_string<128> name = 0;
     nullable TestGlobalBitmap myBitmap = 1;
