@@ -71,11 +71,11 @@ public:
         ASSERT_EQ(GetBobFabric()->GetCompressedFabricIdBytes(span), CHIP_NO_ERROR);
         ASSERT_EQ(chip::GroupTesting::InitData(&gGroupsProvider, GetBobFabricIndex(), span), CHIP_NO_ERROR);
 
-        mOldModel = InteractionModelEngine::GetInstance()->SetDataModel(&TestImCustomDataModel::Instance());
+        mOldProvider = InteractionModelEngine::GetInstance()->SetDataModelProvider(&TestImCustomDataModel::Instance());
     }
     void TearDown() override
     {
-        InteractionModelEngine::GetInstance()->SetDataModel(mOldModel);
+        InteractionModelEngine::GetInstance()->SetDataModelProvider(mOldProvider);
         chip::Credentials::GroupDataProvider * provider = chip::Credentials::GetGroupDataProvider();
         if (provider != nullptr)
         {
@@ -99,7 +99,7 @@ public:
 
 private:
 
-    chip::app::InteractionModel::DataModel * mOldModel = nullptr;
+    chip::app::InteractionModel::DataModel * mOldProvider = nullptr;
 };
 
 class TestExchangeDelegate : public Messaging::ExchangeDelegate
@@ -303,7 +303,7 @@ TEST_F(TestWriteInteraction, TestWriteHandler)
 
             System::PacketBufferHandle buf = System::PacketBufferHandle::New(System::PacketBuffer::kMaxSize);
 
-            writeHandler.Init(chip::app::InteractionModelEngine::GetInstance()->GetDataModel(),
+            writeHandler.Init(chip::app::InteractionModelEngine::GetInstance()->GetDataModelProvider(),
                               chip::app::InteractionModelEngine::GetInstance());
 
             GenerateWriteRequest(messageIsTimed, buf);
