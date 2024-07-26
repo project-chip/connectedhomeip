@@ -40,7 +40,7 @@ import secrets
 import threading
 import typing
 from ctypes import (CDLL, CFUNCTYPE, POINTER, Structure, byref, c_bool, c_char, c_char_p, c_int, c_int32, c_size_t, c_uint8,
-                    c_uint16, c_uint32, c_uint64, c_void_p, create_string_buffer, pointer, py_object, resize, string_at)
+                    c_uint16, c_uint32, c_uint64, c_void_p, cast, create_string_buffer, pointer, py_object, resize, string_at)
 from dataclasses import dataclass
 
 import dacite  # type: ignore
@@ -1030,7 +1030,6 @@ class ChipDeviceControllerBase():
         await WaitForCheckIn(ScopedNodeId(nodeid, self._fabricIndex), timeoutSeconds=timeoutSeconds)
         return await self.SendCommand(nodeid, 0, Clusters.IcdManagement.Commands.StayActiveRequest(stayActiveDuration=stayActiveDurationMs))
 
-
     async def GetConnectedDevice(self, nodeid, allowPASE: bool = True, timeoutMs: typing.Optional[int] = None,
                                  payloadCapability: int = TransportPayloadCapability.MRP_PAYLOAD):
         ''' Gets an OperationalDeviceProxy or CommissioneeDeviceProxy for the specified Node.
@@ -1181,7 +1180,7 @@ class ChipDeviceControllerBase():
     async def SendCommand(self, nodeid: int, endpoint: int, payload: ClusterObjects.ClusterCommand, responseType=None,
                           timedRequestTimeoutMs: typing.Optional[int] = None,
                           interactionTimeoutMs: typing.Optional[int] = None, busyWaitMs: typing.Optional[int] = None,
-                          suppressResponse: typing.Optional[bool] = None):
+                          suppressResponse: typing.Optional[bool] = None,
                           payloadCapability: int = TransportPayloadCapability.MRP_PAYLOAD):
         '''
         Send a cluster-object encapsulated command to a node and get returned a future that can be awaited upon to receive
@@ -1955,8 +1954,8 @@ class ChipDeviceController(ChipDeviceControllerBase):
         # TODO(erjiaqing@): Figure out how to control enableServerInteractions for a single device controller (node)
         self._externalKeyPair = keypair
         self._ChipStack.Call(
-            lambda: self._dmLib.pychip_OpCreds_AllocateController(c_void_p(
-                opCredsContext), pointer(devCtrl), pointer(pairingDelegate), fabricId, nodeId, adminVendorId, c_char_p(None if len(paaTrustStorePath) == 0 else str.encode(paaTrustStorePath)), useTestCommissioner, self._ChipStack.enableServerInteractions, c_catTags, len(catTags), None if keypair is None else keypair.native_object)
+            lambda: self._dmLib.pychip_OpCreds_AllocateController(cast(
+                opCredsContext, c_void_p), pointer(devCtrl), pointer(pairingDelegate), fabricId, nodeId, adminVendorId, c_char_p(None if len(paaTrustStorePath) == 0 else str.encode(paaTrustStorePath)), useTestCommissioner, self._ChipStack.enableServerInteractions, c_catTags, len(catTags), None if keypair is None else keypair.native_object)
         ).raise_on_error()
 
         self._fabricAdmin = fabricAdmin
@@ -2245,7 +2244,7 @@ class BareChipDeviceController(ChipDeviceControllerBase):
 
         self._ChipStack.Call(
             lambda: self._dmLib.pychip_OpCreds_AllocateControllerForPythonCommissioningFLow(
-                c_void_p(devCtrl), c_void_p(pairingDelegate), nativeKey, noc, len(noc), icac, len(icac) if icac else 0, rcac, len(rcac), ipk, len(ipk) if ipk else 0, adminVendorId, self._ChipStack.enableServerInteractions)
+                cast(devCtrl, c_void_p), cast(pairingDelegate, c_void_p), nativeKey, noc, len(noc), icac, len(icac) if icac else 0, rcac, len(rcac), ipk, len(ipk) if ipk else 0, adminVendorId, self._ChipStack.enableServerInteractions)
         ).raise_on_error()
 
         self._set_dev_ctrl(devCtrl, pairingDelegate)
