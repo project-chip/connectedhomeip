@@ -29,7 +29,8 @@ using namespace chip::app::Clusters::WaterHeaterManagement;
 using Protocols::InteractionModel::Status;
 
 WaterHeaterManagementDelegate::WaterHeaterManagementDelegate(EndpointId clustersEndpoint) :
-    mpWhmInstance(nullptr), mpWhmManufacturer(nullptr), mBoostTargetTemperatureReached(false), mTankVolume(0),
+    mpWhmInstance(nullptr), mpWhmManufacturer(nullptr), mHotWaterTemperature(0), mReplacedWaterTemperature(0),
+    mBoostTargetTemperatureReached(false), mTankVolume(0),
     mEstimatedHeatRequired(0), mTankPercentage(0), mBoostState(BoostStateEnum::kInactive)
 {}
 
@@ -336,7 +337,9 @@ bool WaterHeaterManagementDelegate::HasWaterTemperatureReachedTarget() const
     uint16_t targetTemperature = (mBoostState == BoostStateEnum::kActive && mBoostTemporarySetpoint.HasValue())
         ? static_cast<uint16_t>(mBoostTemporarySetpoint.Value())
         : mTargetWaterTemperature;
-    uint8_t targetPercentage;
+
+    uint8_t targetPercentage = 0;
+    bool useTankPercentage = false;
 
     if (mBoostState == BoostStateEnum::kActive && mBoostTargetTemperatureReached && mBoostTargetReheat.HasValue())
     {
@@ -352,23 +355,27 @@ bool WaterHeaterManagementDelegate::HasWaterTemperatureReachedTarget() const
         // If this field is included then the TargetPercentage field SHALL also be included, and the OneShot excluded.
 
         targetPercentage = mBoostTargetReheat.Value();
+
+        useTankPercentage = true;
+    }
+    else if (mpWhmInstance != nullptr && mpWhmInstance->HasFeature(Feature::kTankPercent) && mBoostTargetPercentage.HasValue())
+    {
+        // If tank percentage is supported AND the targetPercentage.HasValue() then use target percentage to heat up.
+        targetPercentage = mBoostTargetPercentage.Value();
+
+        useTankPercentage = true;
     }
     else
     {
-        // Determine the target %. If a boost command is in progress and has a mBoostTargetPercentage value use that as the target
-        // %, otherwise 100% of the water in the tank must be at the target temperature
-        targetPercentage =
-            (mBoostState == BoostStateEnum::kActive && mBoostTargetPercentage.HasValue()) ? mBoostTargetPercentage.Value() : 100;
+        // Don't support tankPercentage OR the targetPercent wasn't included then just rely on temperature alone
+        useTankPercentage = false;
     }
 
     // Determine whether the water is at the target temperature
     bool tempReached = true;
-    if (mpWhmInstance != nullptr && mpWhmInstance->HasFeature(Feature::kTankPercent))
+    if (useTankPercentage && mTankPercentage < targetPercentage)
     {
-        if (mTankPercentage < targetPercentage)
-        {
-            tempReached = false;
-        }
+        tempReached = false;
     }
 
     if (mHotWaterTemperature < targetTemperature)
