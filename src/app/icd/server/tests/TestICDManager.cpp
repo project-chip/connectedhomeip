@@ -198,7 +198,14 @@ public:
 
         mICDStateObserver.ResetAll();
         mICDManager.RegisterObserver(&mICDStateObserver);
-        mICDManager.Init(&testStorage, &GetFabricTable(), &mKeystore, &GetExchangeManager(), &mSubInfoProvider, &mStrategy);
+
+        mICDManager.SetPersistentStorageDelegate(&testStorage)
+            .SetFabricTable(&GetFabricTable())
+            .SetSymmetricKeyStore(&mKeystore)
+            .SetExchangeManager(&GetExchangeManager())
+            .SetSubscriptionsInfoProvider(&mSubInfoProvider)
+            .SetICDCheckInBackOffStrategy(&mStrategy)
+            .Init();
     }
 
     // Performs teardown for each individual test in the test suite
@@ -570,7 +577,13 @@ TEST_F(TestICDManager, TestICDCounter)
 
     // Shut down and reinit ICDManager to increment counter
     mICDManager.Shutdown();
-    mICDManager.Init(&(testStorage), &GetFabricTable(), &(mKeystore), &GetExchangeManager(), &(mSubInfoProvider), &mStrategy);
+    mICDManager.SetPersistentStorageDelegate(&testStorage)
+        .SetFabricTable(&GetFabricTable())
+        .SetSymmetricKeyStore(&mKeystore)
+        .SetExchangeManager(&GetExchangeManager())
+        .SetSubscriptionsInfoProvider(&mSubInfoProvider)
+        .SetICDCheckInBackOffStrategy(&mStrategy)
+        .Init();
     mICDManager.RegisterObserver(&(mICDStateObserver));
 
     EXPECT_EQ(counter + ICDConfigurationData::kICDCounterPersistenceIncrement,
@@ -975,7 +988,13 @@ TEST_F(TestICDManager, TestICDStateObserverOnICDModeChangeOnInit)
     // Shut down and reinit ICDManager - We should go to LIT mode since we have a registration
     mICDManager.Shutdown();
     mICDManager.RegisterObserver(&(mICDStateObserver));
-    mICDManager.Init(&testStorage, &GetFabricTable(), &mKeystore, &GetExchangeManager(), &mSubInfoProvider, &mStrategy);
+    mICDManager.SetPersistentStorageDelegate(&testStorage)
+        .SetFabricTable(&GetFabricTable())
+        .SetSymmetricKeyStore(&mKeystore)
+        .SetExchangeManager(&GetExchangeManager())
+        .SetSubscriptionsInfoProvider(&mSubInfoProvider)
+        .SetICDCheckInBackOffStrategy(&mStrategy)
+        .Init();
 
     // We have a registration, transition to LIT mode
     EXPECT_TRUE(mICDStateObserver.mOnICDModeChangeCalled);

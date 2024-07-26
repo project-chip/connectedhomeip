@@ -359,8 +359,16 @@ CHIP_ERROR Server::Init(const ServerInitParams & initParams)
     mICDManager.RegisterObserver(mReportScheduler);
     mICDManager.RegisterObserver(&app::DnssdServer::Instance());
 
-    mICDManager.Init(mDeviceStorage, &GetFabricTable(), mSessionKeystore, &mExchangeMgr,
-                     chip::app::InteractionModelEngine::GetInstance(), initParams.icdCheckInBackOffStrategy);
+#if CHIP_CONFIG_ENABLE_ICD_CIP
+    mICDManager.SetPersistentStorageDelegate(mDeviceStorage)
+        .SetFabricTable(&GetFabricTable())
+        .SetSymmetricKeyStore(mSessionKeystore)
+        .SetExchangeManager(&mExchangeMgr)
+        .SetSubscriptionsInfoProvider(chip::app::InteractionModelEngine::GetInstance())
+        .SetICDCheckInBackOffStrategy(initParams.icdCheckInBackOffStrategy);
+
+#endif // CHIP_CONFIG_ENABLE_ICD_CIP
+    mICDManager.Init();
 
     // Register Test Event Trigger Handler
     if (mTestEventTriggerDelegate != nullptr)

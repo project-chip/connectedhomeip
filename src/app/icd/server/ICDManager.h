@@ -115,9 +115,52 @@ public:
     ICDManager()  = default;
     ~ICDManager() = default;
 
-    void Init(PersistentStorageDelegate * storage, FabricTable * fabricTable, Crypto::SymmetricKeystore * symmetricKeyStore,
-              Messaging::ExchangeManager * exchangeManager, SubscriptionsInfoProvider * subInfoProvider,
-              ICDCheckInBackOffStrategy * strategy);
+    /*
+        Builder function to set all necessary members for the ICDManager class
+    */
+
+#if CHIP_CONFIG_ENABLE_ICD_CIP
+    ICDManager & SetPersistentStorageDelegate(PersistentStorageDelegate * storage)
+    {
+        mStorage = storage;
+        return *this;
+    };
+
+    ICDManager & SetFabricTable(FabricTable * fabricTable)
+    {
+        mFabricTable = fabricTable;
+        return *this;
+    };
+
+    ICDManager & SetSymmetricKeyStore(Crypto::SymmetricKeystore * symmetricKeystore)
+    {
+        mSymmetricKeystore = symmetricKeystore;
+        return *this;
+    };
+
+    ICDManager & SetExchangeManager(Messaging::ExchangeManager * exchangeManager)
+    {
+        mExchangeManager = exchangeManager;
+        return *this;
+    };
+
+    ICDManager & SetSubscriptionsInfoProvider(SubscriptionsInfoProvider * subInfoProvider)
+    {
+        mSubInfoProvider = subInfoProvider;
+        return *this;
+    };
+
+    ICDManager & SetICDCheckInBackOffStrategy(ICDCheckInBackOffStrategy * strategy)
+    {
+        mICDCheckInBackOffStrategy = strategy;
+        return *this;
+    };
+#endif // CHIP_CONFIG_ENABLE_ICD_CIP
+
+    /**
+     * @brief Validates that the ICDManager has all the necessary members to function and initializes the class
+     */
+    void Init();
     void Shutdown();
 
     /**

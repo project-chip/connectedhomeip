@@ -52,17 +52,19 @@ using chip::Protocols::InteractionModel::Status;
 static_assert(UINT8_MAX >= CHIP_CONFIG_MAX_EXCHANGE_CONTEXTS,
               "ICDManager::mOpenExchangeContextCount cannot hold count for the max exchange count");
 
-void ICDManager::Init(PersistentStorageDelegate * storage, FabricTable * fabricTable, Crypto::SymmetricKeystore * symmetricKeystore,
-                      Messaging::ExchangeManager * exchangeManager, SubscriptionsInfoProvider * subInfoProvider,
-                      ICDCheckInBackOffStrategy * strategy)
+void ICDManager::Init()
 {
 #if CHIP_CONFIG_ENABLE_ICD_CIP
-    VerifyOrDie(storage != nullptr);
-    VerifyOrDie(fabricTable != nullptr);
-    VerifyOrDie(symmetricKeystore != nullptr);
-    VerifyOrDie(exchangeManager != nullptr);
-    VerifyOrDie(subInfoProvider != nullptr);
-    VerifyOrDie(strategy != nullptr);
+    VerifyOrDie(mStorage != nullptr);
+    VerifyOrDie(mFabricTable != nullptr);
+    VerifyOrDie(mSymmetricKeystore != nullptr);
+    VerifyOrDie(mExchangeManager != nullptr);
+    VerifyOrDie(mSubInfoProvider != nullptr);
+    VerifyOrDie(mICDCheckInBackOffStrategy != nullptr);
+
+    VerifyOrDie(ICDConfigurationData::GetInstance().GetICDCounter().Init(mStorage, DefaultStorageKeyAllocator::ICDCheckInCounter(),
+                                                                         ICDConfigurationData::kICDCounterPersistenceIncrement) ==
+                CHIP_NO_ERROR);
 #endif // CHIP_CONFIG_ENABLE_ICD_CIP
 
 #if CHIP_CONFIG_ENABLE_ICD_LIT
@@ -83,19 +85,6 @@ void ICDManager::Init(PersistentStorageDelegate * storage, FabricTable * fabricT
 #endif // CHIP_CONFIG_ENABLE_ICD_LIT
 
     VerifyOrDie(ICDNotifier::GetInstance().Subscribe(this) == CHIP_NO_ERROR);
-
-#if CHIP_CONFIG_ENABLE_ICD_CIP
-    mStorage                   = storage;
-    mFabricTable               = fabricTable;
-    mSymmetricKeystore         = symmetricKeystore;
-    mExchangeManager           = exchangeManager;
-    mSubInfoProvider           = subInfoProvider;
-    mICDCheckInBackOffStrategy = strategy;
-
-    VerifyOrDie(ICDConfigurationData::GetInstance().GetICDCounter().Init(mStorage, DefaultStorageKeyAllocator::ICDCheckInCounter(),
-                                                                         ICDConfigurationData::kICDCounterPersistenceIncrement) ==
-                CHIP_NO_ERROR);
-#endif // CHIP_CONFIG_ENABLE_ICD_CIP
 
     UpdateICDMode();
     UpdateOperationState(OperationalState::IdleMode);
@@ -197,7 +186,6 @@ void ICDManager::SendCheckInMsgs()
                 continue;
             }
 
-            // Validate Check-In BackOff strategy if we should send a Check-In message.
             if (!mICDCheckInBackOffStrategy->ShouldSendCheckInMessage(entry))
             {
                 // continue to next entry
