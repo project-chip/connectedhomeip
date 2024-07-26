@@ -28,9 +28,9 @@ pw_python_package("metadata_parser") {
   inputs = [ "env_test.yaml" ]
 
   sources = [
-    "__init__.py",
-    "metadata.py",
+    "metadata_parser/__init__.py",
+    "metadata_parser/metadata.py",
   ]
 
-  tests = [ "test_metadata.py" ]
+  tests = [ "metadata_parser/test_metadata.py" ]
 }

@@ -321,6 +321,7 @@ class AttributeValue:
     endpoint_id: int
     attribute: ClusterObjects.ClusterAttributeDescriptor
     value: Any
+    timestamp_utc: datetime
 
 
 class ClusterAttributeChangeAccumulator:
@@ -328,8 +329,13 @@ class ClusterAttributeChangeAccumulator:
         self._q = queue.Queue()
         self._expected_cluster = expected_cluster
         self._subscription = None
+        self._attribute_report_counts = {}
+        attrs = [cls for name, cls in inspect.getmembers(expected_cluster.Attributes) if inspect.isclass(
+            cls) and issubclass(cls, ClusterObjects.ClusterAttributeDescriptor)]
+        for a in attrs:
+            self._attribute_report_counts[a] = 0
 
-    async def start(self, dev_ctrl, node_id: int, endpoint: int, fabric_filtered: bool = False, min_interval_sec: int = 0, max_interval_sec: int = 30) -> Any:
+    async def start(self, dev_ctrl, node_id: int, endpoint: int, fabric_filtered: bool = False, min_interval_sec: int = 0, max_interval_sec: int = 5) -> Any:
         """This starts a subscription for attributes on the specified node_id and endpoint. The cluster is specified when the class instance is created."""
         self._subscription = await dev_ctrl.ReadAttribute(
             nodeid=node_id,
@@ -346,13 +352,19 @@ class ClusterAttributeChangeAccumulator:
            It checks the report is from the expected_cluster and then posts it into the queue for later processing."""
         if path.ClusterType == self._expected_cluster:
             data = transaction.GetAttribute(path)
-            value = AttributeValue(endpoint_id=path.Path.EndpointId, attribute=path.AttributeType, value=data)
+            value = AttributeValue(endpoint_id=path.Path.EndpointId, attribute=path.AttributeType,
+                                   value=data, timestamp_utc=datetime.now(timezone.utc))
             logging.info(f"Got subscription report for {path.AttributeType}: {data}")
             self._q.put(value)
+            self._attribute_report_counts[path.AttributeType] += 1
 
     @property
     def attribute_queue(self) -> queue.Queue:
         return self._q
+
+    @property
+    def attribute_report_counts(self) -> dict[ClusterObjects.ClusterAttributeDescriptor, int]:
+        return self._attribute_report_counts
 
 
 class InternalTestRunnerHooks(TestRunnerHooks):
