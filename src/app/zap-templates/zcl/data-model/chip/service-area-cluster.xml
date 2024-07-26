@@ -20,10 +20,10 @@ limitations under the License.
   Data types
   <struct name="LocationInfoStruct">
     <cluster code="0x0150"/>
-    <item name="LocationInfo"  type="HomeLocationStruct"    optional="false" isNullable="true"/>
-    <item name="LandmarkTag"   type="LandmarkTag"           optional="false" isNullable="true"/>
-    <item name="PositionTag"   type="PositionTag"           optional="false" isNullable="true"/>
-    <item name="SurfaceTag"    type="FloorSurfaceTag"       optional="false" isNullable="true"/>
+    <item name="LocationInfo"  type="LocationDescriptorStruct" optional="false" isNullable="true"/>
+    <item name="LandmarkTag"   type="LandmarkTag"              optional="false" isNullable="true"/>
+    <item name="PositionTag"   type="PositionTag"              optional="false" isNullable="true"/>
+    <item name="SurfaceTag"    type="FloorSurfaceTag"          optional="false" isNullable="true"/>
   </struct>
 
   <struct name="MapStruct">

@@ -23,7 +23,7 @@ import matter.tlv.TlvReader
 import matter.tlv.TlvWriter
 
 class ServiceAreaClusterLocationInfoStruct(
-  val locationInfo: ServiceAreaClusterHomeLocationStruct?,
+  val locationInfo: ServiceAreaClusterLocationDescriptorStruct?,
   val landmarkTag: UInt?,
   val positionTag: UInt?,
   val surfaceTag: UInt?,
@@ -74,7 +74,7 @@ class ServiceAreaClusterLocationInfoStruct(
       tlvReader.enterStructure(tlvTag)
       val locationInfo =
         if (!tlvReader.isNull()) {
-          ServiceAreaClusterHomeLocationStruct.fromTlv(
+          ServiceAreaClusterLocationDescriptorStruct.fromTlv(
             ContextSpecificTag(TAG_LOCATION_INFO),
             tlvReader,
           )
