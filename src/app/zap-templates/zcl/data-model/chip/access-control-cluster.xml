@@ -33,6 +33,14 @@ limitations under the License.
     <item name="Group" value="0x03"/>
   </enum>
 
+  <enum name="AccessRestrictionTypeEnum" type="enum8">
+    <cluster code="0x001F"/>
+    <item name="AttributeAccessForbidden" value="0x00"/>
+    <item name="AttributeWriteForbidden" value="0x01"/>
+    <item name="CommandForbidden" value="0x02"/>
+    <item name="EventForbidden" value="0x03"/>
+  </enum>
+
   <enum name="ChangeTypeEnum" type="enum8">
     <cluster code="0x001F"/>
     <item name="Changed" value="0x00"/>
@@ -60,13 +68,39 @@ limitations under the License.
     <item fieldId="1" name="Data" type="octet_string" length="128" isFabricSensitive="true"/>
   </struct>
 
+  <struct name="AccessRestrictionStruct">
+    <cluster code="0x001F"/>
+    <item fieldId="0" name="Type" type="AccessRestrictionTypeEnum" min="0x00" max="0x03"/>
+    <item fieldId="1" name="Id" type="int32u" isNullable="true"/>
+  </struct>
+
+  <struct name="CommissioningAccessRestrictionEntryStruct">
+    <cluster code="0x001F"/>
+    <item fieldId="0" name="Endpoint" type="endpoint_no"/>
+    <item fieldId="1" name="Cluster" type="cluster_id"/>
+    <item fieldId="2" name="Restrictions" array="true" type="AccessRestrictionStruct" minLength="1"/>
+  </struct>
+
+  <struct name="AccessRestrictionEntryStruct" isFabricScoped="true">
+    <cluster code="0x001F"/>
+    <item fieldId="0" name="Endpoint" type="endpoint_no" isFabricSensitive="true"/>
+    <item fieldId="1" name="Cluster" type="cluster_id" isFabricSensitive="true"/>
+    <item fieldId="2" name="Restrictions" array="true" type="AccessRestrictionStruct" minLength="1" isFabricSensitive="true"/>
+  </struct>
+
   <cluster>
     <domain>General</domain>
     <name>Access Control</name>
     <code>0x001F</code>
     <define>ACCESS_CONTROL_CLUSTER</define>
     <client init="false" tick="false">true</client>
+    <features>
+      <feature bit="0" code="MNGD" name="Managed Device" summary="Device is managed">
+        <optionalConform/>
+      </feature>
+    </features>
     <server init="false" tick="false">true</server>
+    <globalAttribute code="0xFFFD" side="either" value="2"/>
     <description>The Access Control Cluster exposes a data model view of a
       Node's Access Control List (ACL), which codifies the rules used to manage
       and enforce Access Control for the Node's endpoints and their associated
@@ -99,6 +133,27 @@ limitations under the License.
       <access op="read" privilege="view"/>
     </attribute>
 
+    <attribute side="server" code="0x0005" define="COMMISSIONING_ARL" type="array" entryType="CommissioningAccessRestrictionEntryStruct" writable="false" optional="true">
+      <description>CommissioningARL</description>
+      <access op="read" privilege="view"/>
+    </attribute>
+
+    <attribute side="server" code="0x0006" define="ARL" type="array" entryType="AccessRestrictionEntryStruct" writable="false" optional="true">
+      <description>ARL</description>
+      <access op="read" privilege="view"/>
+    </attribute>
+
+    <command code="0x00" source="client" name="ReviewFabricRestrictions" optional="true">
+      <description>This command signals to the service associated with the device maker that the fabric administrator would like a review of the current fabric restrictions.</description>
+      <access op="invoke" privilege="administer"/>
+      <arg id="0" name="ARL" array="true" type="CommissioningAccessRestrictionEntryStruct" optional="true"/>
+    </command>
+
+    <command code="0x01" source="server" name="ReviewFabricRestrictionsResponse" optional="true" disableDefaultResponse="true">
+      <description>Returns the review token for the request, which can be used to correlate with a FabricRestrictionReviewUpdate event.</description>
+      <arg id="0" name="Token" type="int64u"/>
+    </command>
+
     <event side="server" code="0x0000" name="AccessControlEntryChanged" priority="info" isFabricSensitive="true" optional="false">
       <description>The cluster SHALL send AccessControlEntryChanged events whenever its ACL attribute data is changed by an Administrator.</description>
       <field id="1" name="AdminNodeID" type="node_id" isNullable="true"/>
@@ -113,6 +168,17 @@ limitations under the License.
       <field id="2" name="AdminPasscodeID" type="int16u" isNullable="true"/>
       <field id="3" name="ChangeType" type="ChangeTypeEnum"/>
       <field id="4" name="LatestValue" type="AccessControlExtensionStruct" isNullable="true"/>
+      <access op="read" privilege="administer"/>
+    </event>
+    <event side="server" code="0x0002" name="AccessRestrictionEntryChanged" priority="info" isFabricSensitive="true" optional="true">
+      <description>The cluster SHALL send AccessRestrictionEntryChanged events whenever its ARL attribute data is changed by the device maker.</description>
+      <access op="read" privilege="administer"/>
+    </event>
+    <event side="server" code="0x0003" name="FabricRestrictionReviewUpdate" priority="info" isFabricSensitive="true" optional="true">
+      <description>The cluster SHALL send FabricRestrictionReviewUpdate events to indicate completion of a fabric restriction review.</description>
+      <field id="0" name="Token" type="int64u"/>
+      <field id="1" name="Instruction" type="char_string" isNullable="true"/>
+      <field id="2" name="RedirectURL" type="char_string" isNullable="true"/>
       <access op="read" privilege="administer"/>
     </event>
   </cluster>

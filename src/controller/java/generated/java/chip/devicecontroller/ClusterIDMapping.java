@@ -1687,6 +1687,8 @@ public class ClusterIDMapping {
             SubjectsPerAccessControlEntry(2L),
             TargetsPerAccessControlEntry(3L),
             AccessControlEntriesPerFabric(4L),
+            CommissioningARL(5L),
+            Arl(6L),
             GeneratedCommandList(65528L),
             AcceptedCommandList(65529L),
             EventList(65530L),
@@ -1714,7 +1716,9 @@ public class ClusterIDMapping {
 
         public enum Event {
             AccessControlEntryChanged(0L),
-            AccessControlExtensionChanged(1L),;
+            AccessControlExtensionChanged(1L),
+            AccessRestrictionEntryChanged(2L),
+            FabricRestrictionReviewUpdate(3L),;
             private final long id;
             Event(long id) {
                 this.id = id;
@@ -1734,7 +1738,8 @@ public class ClusterIDMapping {
             }
         }
 
-        public enum Command {;
+        public enum Command {
+            ReviewFabricRestrictions(0L),;
             private final long id;
             Command(long id) {
                 this.id = id;
@@ -1752,7 +1757,24 @@ public class ClusterIDMapping {
                 }
                 throw new NoSuchFieldError();
             }
-        }@Override
+        }public enum ReviewFabricRestrictionsCommandField {Arl(0),;
+                    private final int id;
+                    ReviewFabricRestrictionsCommandField(int id) {
+                        this.id = id;
+                    }
+
+                    public int getID() {
+                        return id;
+                    }
+                    public static ReviewFabricRestrictionsCommandField value(int id) throws NoSuchFieldError {
+                        for (ReviewFabricRestrictionsCommandField field : ReviewFabricRestrictionsCommandField.values()) {
+                        if (field.getID() == id) {
+                            return field;
+                        }
+                        }
+                        throw new NoSuchFieldError();
+                    }
+                }@Override
         public String getAttributeName(long id) throws NoSuchFieldError {
             return Attribute.value(id).toString();
         }

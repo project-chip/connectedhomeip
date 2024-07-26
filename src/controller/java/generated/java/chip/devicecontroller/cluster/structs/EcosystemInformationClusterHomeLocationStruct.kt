@@ -17,17 +17,20 @@
 package chip.devicecontroller.cluster.structs
 
 import chip.devicecontroller.cluster.*
+import matter.tlv.AnonymousTag
 import matter.tlv.ContextSpecificTag
 import matter.tlv.Tag
+import matter.tlv.TlvParsingException
 import matter.tlv.TlvReader
 import matter.tlv.TlvWriter
 
-class EcosystemInformationClusterHomeLocationStruct(
-  val locationName: String,
-  val floorNumber: Int?,
-  val areaType: UInt?,
-) {
-  override fun toString(): String = buildString {
+import java.util.Optional
+
+class EcosystemInformationClusterHomeLocationStruct (
+    val locationName: String,
+    val floorNumber: Int?,
+    val areaType: UInt?) {
+  override fun toString(): String  = buildString {
     append("EcosystemInformationClusterHomeLocationStruct {\n")
     append("\tlocationName : $locationName\n")
     append("\tfloorNumber : $floorNumber\n")
@@ -40,15 +43,15 @@ class EcosystemInformationClusterHomeLocationStruct(
       startStructure(tlvTag)
       put(ContextSpecificTag(TAG_LOCATION_NAME), locationName)
       if (floorNumber != null) {
-        put(ContextSpecificTag(TAG_FLOOR_NUMBER), floorNumber)
-      } else {
-        putNull(ContextSpecificTag(TAG_FLOOR_NUMBER))
-      }
+      put(ContextSpecificTag(TAG_FLOOR_NUMBER), floorNumber)
+    } else {
+      putNull(ContextSpecificTag(TAG_FLOOR_NUMBER))
+    }
       if (areaType != null) {
-        put(ContextSpecificTag(TAG_AREA_TYPE), areaType)
-      } else {
-        putNull(ContextSpecificTag(TAG_AREA_TYPE))
-      }
+      put(ContextSpecificTag(TAG_AREA_TYPE), areaType)
+    } else {
+      putNull(ContextSpecificTag(TAG_AREA_TYPE))
+    }
       endStructure()
     }
   }
@@ -58,24 +61,22 @@ class EcosystemInformationClusterHomeLocationStruct(
     private const val TAG_FLOOR_NUMBER = 1
     private const val TAG_AREA_TYPE = 2
 
-    fun fromTlv(tlvTag: Tag, tlvReader: TlvReader): EcosystemInformationClusterHomeLocationStruct {
+    fun fromTlv(tlvTag: Tag, tlvReader: TlvReader) : EcosystemInformationClusterHomeLocationStruct {
       tlvReader.enterStructure(tlvTag)
       val locationName = tlvReader.getString(ContextSpecificTag(TAG_LOCATION_NAME))
-      val floorNumber =
-        if (!tlvReader.isNull()) {
-          tlvReader.getInt(ContextSpecificTag(TAG_FLOOR_NUMBER))
-        } else {
-          tlvReader.getNull(ContextSpecificTag(TAG_FLOOR_NUMBER))
-          null
-        }
-      val areaType =
-        if (!tlvReader.isNull()) {
-          tlvReader.getUInt(ContextSpecificTag(TAG_AREA_TYPE))
-        } else {
-          tlvReader.getNull(ContextSpecificTag(TAG_AREA_TYPE))
-          null
-        }
-
+      val floorNumber = if (!tlvReader.isNull()) {
+      tlvReader.getInt(ContextSpecificTag(TAG_FLOOR_NUMBER))
+    } else {
+      tlvReader.getNull(ContextSpecificTag(TAG_FLOOR_NUMBER))
+      null
+    }
+      val areaType = if (!tlvReader.isNull()) {
+      tlvReader.getUInt(ContextSpecificTag(TAG_AREA_TYPE))
+    } else {
+      tlvReader.getNull(ContextSpecificTag(TAG_AREA_TYPE))
+      null
+    }
+      
       tlvReader.exitContainer()
 
       return EcosystemInformationClusterHomeLocationStruct(locationName, floorNumber, areaType)

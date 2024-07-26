@@ -18,12 +18,16 @@ package matter.controller.cluster.structs
 
 import java.util.Optional
 import matter.controller.cluster.*
+import matter.tlv.AnonymousTag
 import matter.tlv.ContextSpecificTag
 import matter.tlv.Tag
 import matter.tlv.TlvReader
 import matter.tlv.TlvWriter
 
-class WaterHeaterModeClusterModeTagStruct(val mfgCode: Optional<UShort>, val value: UShort) {
+class WaterHeaterModeClusterModeTagStruct(
+  val mfgCode: Optional<UShort>,
+  val value: UShort
+) {
   override fun toString(): String = buildString {
     append("WaterHeaterModeClusterModeTagStruct {\n")
     append("\tmfgCode : $mfgCode\n")
@@ -49,14 +53,13 @@ class WaterHeaterModeClusterModeTagStruct(val mfgCode: Optional<UShort>, val val
 
     fun fromTlv(tlvTag: Tag, tlvReader: TlvReader): WaterHeaterModeClusterModeTagStruct {
       tlvReader.enterStructure(tlvTag)
-      val mfgCode =
-        if (tlvReader.isNextTag(ContextSpecificTag(TAG_MFG_CODE))) {
-          Optional.of(tlvReader.getUShort(ContextSpecificTag(TAG_MFG_CODE)))
-        } else {
-          Optional.empty()
-        }
+      val mfgCode = if (tlvReader.isNextTag(ContextSpecificTag(TAG_MFG_CODE))) {
+      Optional.of(tlvReader.getUShort(ContextSpecificTag(TAG_MFG_CODE)))
+    } else {
+      Optional.empty()
+    }
       val value = tlvReader.getUShort(ContextSpecificTag(TAG_VALUE))
-
+      
       tlvReader.exitContainer()
 
       return WaterHeaterModeClusterModeTagStruct(mfgCode, value)

@@ -16,13 +16,18 @@
  */
 package matter.controller.cluster.structs
 
+import java.util.Optional
 import matter.controller.cluster.*
+import matter.tlv.AnonymousTag
 import matter.tlv.ContextSpecificTag
 import matter.tlv.Tag
 import matter.tlv.TlvReader
 import matter.tlv.TlvWriter
 
-class UnitTestingClusterTestListStructOctet(val member1: ULong, val member2: ByteArray) {
+class UnitTestingClusterTestListStructOctet(
+  val member1: ULong,
+  val member2: ByteArray
+) {
   override fun toString(): String = buildString {
     append("UnitTestingClusterTestListStructOctet {\n")
     append("\tmember1 : $member1\n")
@@ -47,7 +52,7 @@ class UnitTestingClusterTestListStructOctet(val member1: ULong, val member2: Byt
       tlvReader.enterStructure(tlvTag)
       val member1 = tlvReader.getULong(ContextSpecificTag(TAG_MEMBER1))
       val member2 = tlvReader.getByteArray(ContextSpecificTag(TAG_MEMBER2))
-
+      
       tlvReader.exitContainer()
 
       return UnitTestingClusterTestListStructOctet(member1, member2)

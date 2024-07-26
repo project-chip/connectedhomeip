@@ -5,6 +5,9 @@ matter_structs_sources = [
   "${chip_root}/src/controller/java/generated/java/matter/controller/cluster/structs/AccessControlClusterAccessControlEntryStruct.kt",
   "${chip_root}/src/controller/java/generated/java/matter/controller/cluster/structs/AccessControlClusterAccessControlExtensionStruct.kt",
   "${chip_root}/src/controller/java/generated/java/matter/controller/cluster/structs/AccessControlClusterAccessControlTargetStruct.kt",
+  "${chip_root}/src/controller/java/generated/java/matter/controller/cluster/structs/AccessControlClusterAccessRestrictionEntryStruct.kt",
+  "${chip_root}/src/controller/java/generated/java/matter/controller/cluster/structs/AccessControlClusterAccessRestrictionStruct.kt",
+  "${chip_root}/src/controller/java/generated/java/matter/controller/cluster/structs/AccessControlClusterCommissioningAccessRestrictionEntryStruct.kt",
   "${chip_root}/src/controller/java/generated/java/matter/controller/cluster/structs/ActionsClusterActionStruct.kt",
   "${chip_root}/src/controller/java/generated/java/matter/controller/cluster/structs/ActionsClusterEndpointListStruct.kt",
   "${chip_root}/src/controller/java/generated/java/matter/controller/cluster/structs/ActivatedCarbonFilterMonitoringClusterReplacementProductStruct.kt",
@@ -157,6 +160,8 @@ matter_structs_sources = [
 matter_eventstructs_sources = [
   "${chip_root}/src/controller/java/generated/java/matter/controller/cluster/eventstructs/AccessControlClusterAccessControlEntryChangedEvent.kt",
   "${chip_root}/src/controller/java/generated/java/matter/controller/cluster/eventstructs/AccessControlClusterAccessControlExtensionChangedEvent.kt",
+  "${chip_root}/src/controller/java/generated/java/matter/controller/cluster/eventstructs/AccessControlClusterAccessRestrictionEntryChangedEvent.kt",
+  "${chip_root}/src/controller/java/generated/java/matter/controller/cluster/eventstructs/AccessControlClusterFabricRestrictionReviewUpdateEvent.kt",
   "${chip_root}/src/controller/java/generated/java/matter/controller/cluster/eventstructs/AccountLoginClusterLoggedOutEvent.kt",
   "${chip_root}/src/controller/java/generated/java/matter/controller/cluster/eventstructs/ActionsClusterActionFailedEvent.kt",
   "${chip_root}/src/controller/java/generated/java/matter/controller/cluster/eventstructs/ActionsClusterStateChangedEvent.kt",
