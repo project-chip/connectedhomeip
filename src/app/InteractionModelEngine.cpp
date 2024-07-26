@@ -494,7 +494,8 @@ CHIP_ERROR InteractionModelEngine::ParseAttributePaths(const Access::SubjectDesc
             {
                 Access::RequestPath requestPath{ .cluster = readPath.mClusterId, .endpoint = readPath.mEndpointId };
                 err = Access::GetAccessControl().Check(aSubjectDescriptor, requestPath,
-                                                       RequiredPrivilege::ForReadAttribute(readPath));
+                                                       RequiredPrivilege::ForReadAttribute(readPath),
+                                                       Protocols::InteractionModel::MsgType::ReadRequest);
                 if (err == CHIP_NO_ERROR)
                 {
                     aHasValidAttributePath = true;
@@ -511,7 +512,8 @@ CHIP_ERROR InteractionModelEngine::ParseAttributePaths(const Access::SubjectDesc
                 Access::RequestPath requestPath{ .cluster = concretePath.mClusterId, .endpoint = concretePath.mEndpointId };
 
                 err = Access::GetAccessControl().Check(aSubjectDescriptor, requestPath,
-                                                       RequiredPrivilege::ForReadAttribute(concretePath));
+                                                       RequiredPrivilege::ForReadAttribute(concretePath),
+                                                       Protocols::InteractionModel::MsgType::ReadRequest);
                 if (err == CHIP_NO_ERROR)
                 {
                     aHasValidAttributePath = true;
@@ -534,13 +536,17 @@ static bool CanAccess(const Access::SubjectDescriptor & aSubjectDescriptor, cons
                       Access::Privilege aNeededPrivilege)
 {
     Access::RequestPath requestPath{ .cluster = aPath.mClusterId, .endpoint = aPath.mEndpointId };
-    CHIP_ERROR err = Access::GetAccessControl().Check(aSubjectDescriptor, requestPath, aNeededPrivilege);
+    CHIP_ERROR err = Access::GetAccessControl().Check(aSubjectDescriptor, requestPath, aNeededPrivilege,
+                                                      Protocols::InteractionModel::MsgType::SubscribeRequest);
     return (err == CHIP_NO_ERROR);
 }
 
 static bool CanAccess(const Access::SubjectDescriptor & aSubjectDescriptor, const ConcreteEventPath & aPath)
 {
-    return CanAccess(aSubjectDescriptor, aPath, RequiredPrivilege::ForReadEvent(aPath));
+    Access::RequestPath requestPath{ .cluster = aPath.mClusterId, .endpoint = aPath.mEndpointId, .entityId = aPath.mEventId };
+    CHIP_ERROR err = Access::GetAccessControl().Check(aSubjectDescriptor, requestPath, RequiredPrivilege::ForReadEvent(aPath),
+                                                      Protocols::InteractionModel::MsgType::SubscribeRequest);
+    return (err == CHIP_NO_ERROR);   
 }
 
 /**

@@ -25,12 +25,15 @@
 #include <lib/core/CHIPCore.h>
 #include <lib/core/Global.h>
 #include <lib/support/CodeUtils.h>
+#include <protocols/interaction_model/Constants.h>
 
 // Dump function for use during development only (0 for disabled, non-zero for enabled).
 #define CHIP_ACCESS_CONTROL_DUMP_ENABLED 0
 
 namespace chip {
 namespace Access {
+
+using namespace chip::Protocols::InteractionModel;
 
 class AccessControl
 {
@@ -629,13 +632,15 @@ public:
 
     /**
      * Check whether access (by a subject descriptor, to a request path,
-     * requiring a privilege) should be allowed or denied.
+     * requiring a privilege) should be allowed or denied. The IM action
+     * is provided for context.
      *
      * @retval #CHIP_ERROR_ACCESS_DENIED if denied.
      * @retval other errors should also be treated as denied.
      * @retval #CHIP_NO_ERROR if allowed.
      */
-    CHIP_ERROR Check(const SubjectDescriptor & subjectDescriptor, const RequestPath & requestPath, Privilege requestPrivilege);
+    CHIP_ERROR Check(const SubjectDescriptor & subjectDescriptor, const RequestPath & requestPath, Privilege requestPrivilege,
+                     MsgType action);
 
 #if CHIP_ACCESS_CONTROL_DUMP_ENABLED
     CHIP_ERROR Dump(const Entry & entry);

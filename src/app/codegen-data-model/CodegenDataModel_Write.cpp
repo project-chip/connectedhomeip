@@ -279,7 +279,8 @@ CHIP_ERROR CodegenDataModel::WriteAttribute(const InteractionModel::WriteAttribu
 
         Access::RequestPath requestPath{ .cluster = request.path.mClusterId, .endpoint = request.path.mEndpointId };
         CHIP_ERROR err = Access::GetAccessControl().Check(*request.subjectDescriptor, requestPath,
-                                                          RequiredPrivilege::ForWriteAttribute(request.path));
+                                                          RequiredPrivilege::ForWriteAttribute(request.path),
+                                                          Protocols::InteractionModel::MsgType::WriteRequest);
 
         if (err != CHIP_NO_ERROR)
         {
