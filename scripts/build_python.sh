@@ -213,7 +213,7 @@ else
 fi
 
 # Add the matter_testing_infrastructure wheel
-WHEEL+=("$OUTPUT_ROOT"/python/obj/scripts/tests/py/matter_testing_infrastructure._build_wheel/matter_testing_infrastructure-*.whl)
+WHEEL+=("$OUTPUT_ROOT"/python/obj/src/python_testing/matter_testing_infrastructure/metadata_parser._build_wheel/metadata_parser-*.whl)
 
 if [ -n "$extra_packages" ]; then
     WHEEL+=("$extra_packages")

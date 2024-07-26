@@ -13,7 +13,7 @@
 # limitations under the License.
 
 
-"""The matter_testing_infrastructure package."""
+"""The metadata_parser package."""
 
 import setuptools  # type: ignore
 
