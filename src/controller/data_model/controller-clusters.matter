@@ -6133,7 +6133,7 @@ deprecated cluster BarrierControl = 259 {
 }
 
 /** The Service Area cluster provides an interface for controlling the locations where a device should operate, and for querying the current location. */
-cluster ServiceArea = 336 {
+provisional cluster ServiceArea = 336 {
   revision 1; // NOTE: Default/not specifically set
 
   enum AreaTypeTag : enum8 {
