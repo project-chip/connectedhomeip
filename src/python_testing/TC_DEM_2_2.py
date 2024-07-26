@@ -196,7 +196,7 @@ class TC_DEM_2_2(MatterBaseTest, DEMTestBase):
         await self.check_dem_attribute("OptOutState", Clusters.DeviceEnergyManagement.Enums.OptOutStateEnum.kNoOptOut)
 
         self.step("4")
-        await self.send_power_adjustment_command(power=max_power,
+        await self.send_power_adjustment_command(power=powerAdjustCapabilityStruct.powerAdjustCapability[0].maxPower,
                                                  duration=powerAdjustCapabilityStruct.powerAdjustCapability[0].minDuration,
                                                  cause=Clusters.DeviceEnergyManagement.Enums.AdjustmentCauseEnum.kLocalOptimization)
 
@@ -218,7 +218,6 @@ class TC_DEM_2_2(MatterBaseTest, DEMTestBase):
 
         self.step("5a")
         powerAdjustCapabilityStruct = await self.read_dem_attribute_expect_success(attribute="PowerAdjustmentCapability")
-        asserts.assert_greater_equal(len(powerAdjustCapabilityStruct.powerAdjustCapability), 1)
         asserts.assert_equal(powerAdjustCapabilityStruct.cause,
                              Clusters.DeviceEnergyManagement.Enums.PowerAdjustReasonEnum.kNoAdjustment)
 
@@ -254,7 +253,7 @@ class TC_DEM_2_2(MatterBaseTest, DEMTestBase):
 
         self.step("11")
         start = datetime.datetime.now()
-        await self.send_power_adjustment_command(power=powerAdjustCapabilityStruct.powerAdjustCapability[0].maxPower,
+        await self.send_power_adjustment_command(power=powerAdjustCapabilityStruct.powerAdjustCapability[0].minPower,
                                                  duration=min_duration,
                                                  cause=Clusters.DeviceEnergyManagement.Enums.AdjustmentCauseEnum.kLocalOptimization)
 
@@ -262,13 +261,12 @@ class TC_DEM_2_2(MatterBaseTest, DEMTestBase):
 
         self.step("11a")
         powerAdjustCapabilityStruct = await self.read_dem_attribute_expect_success(attribute="PowerAdjustmentCapability")
-        asserts.assert_greater_equal(len(powerAdjustCapabilityStruct.powerAdjustCapability), 1)
         asserts.assert_equal(powerAdjustCapabilityStruct.cause,
                              Clusters.DeviceEnergyManagement.Enums.PowerAdjustReasonEnum.kLocalOptimizationAdjustment)
 
         self.step("12")
         await self.send_power_adjustment_command(power=powerAdjustCapabilityStruct.powerAdjustCapability[0].maxPower,
-                                                 duration=min_duration,
+                                                 duration=powerAdjustCapabilityStruct.powerAdjustCapability[0].minDuration,
                                                  cause=Clusters.DeviceEnergyManagement.Enums.AdjustmentCauseEnum.kGridOptimization)
 
         # Wait 5 seconds for an event not to be reported
@@ -279,7 +277,6 @@ class TC_DEM_2_2(MatterBaseTest, DEMTestBase):
 
         self.step("12b")
         powerAdjustCapabilityStruct = await self.read_dem_attribute_expect_success(attribute="PowerAdjustmentCapability")
-        asserts.assert_greater_equal(len(powerAdjustCapabilityStruct.powerAdjustCapability), 1)
         asserts.assert_equal(powerAdjustCapabilityStruct.cause,
                              Clusters.DeviceEnergyManagement.Enums.PowerAdjustReasonEnum.kGridOptimizationAdjustment)
 
@@ -294,7 +291,7 @@ class TC_DEM_2_2(MatterBaseTest, DEMTestBase):
 
         self.step("14")
         await self.send_power_adjustment_command(power=max_power,
-                                                 duration=max_duration,
+                                                 duration=powerAdjustCapabilityStruct.powerAdjustCapability[0].maxDuration,
                                                  cause=Clusters.DeviceEnergyManagement.Enums.AdjustmentCauseEnum.kLocalOptimization,
                                                  expected_status=Status.ConstraintError)
 
