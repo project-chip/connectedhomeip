@@ -17,20 +17,18 @@
 package chip.devicecontroller.cluster.eventstructs
 
 import chip.devicecontroller.cluster.*
-import matter.tlv.AnonymousTag
+import java.util.Optional
 import matter.tlv.ContextSpecificTag
 import matter.tlv.Tag
-import matter.tlv.TlvParsingException
 import matter.tlv.TlvReader
 import matter.tlv.TlvWriter
 
-import java.util.Optional
-
-class SoftwareDiagnosticsClusterSoftwareFaultEvent (
-    val id: ULong,
-    val name: Optional<String>,
-    val faultRecording: Optional<ByteArray>) {
-  override fun toString(): String  = buildString {
+class SoftwareDiagnosticsClusterSoftwareFaultEvent(
+  val id: ULong,
+  val name: Optional<String>,
+  val faultRecording: Optional<ByteArray>,
+) {
+  override fun toString(): String = buildString {
     append("SoftwareDiagnosticsClusterSoftwareFaultEvent {\n")
     append("\tid : $id\n")
     append("\tname : $name\n")
@@ -43,13 +41,13 @@ class SoftwareDiagnosticsClusterSoftwareFaultEvent (
       startStructure(tlvTag)
       put(ContextSpecificTag(TAG_ID), id)
       if (name.isPresent) {
-      val optname = name.get()
-      put(ContextSpecificTag(TAG_NAME), optname)
-    }
+        val optname = name.get()
+        put(ContextSpecificTag(TAG_NAME), optname)
+      }
       if (faultRecording.isPresent) {
-      val optfaultRecording = faultRecording.get()
-      put(ContextSpecificTag(TAG_FAULT_RECORDING), optfaultRecording)
-    }
+        val optfaultRecording = faultRecording.get()
+        put(ContextSpecificTag(TAG_FAULT_RECORDING), optfaultRecording)
+      }
       endStructure()
     }
   }
@@ -59,20 +57,22 @@ class SoftwareDiagnosticsClusterSoftwareFaultEvent (
     private const val TAG_NAME = 1
     private const val TAG_FAULT_RECORDING = 2
 
-    fun fromTlv(tlvTag: Tag, tlvReader: TlvReader) : SoftwareDiagnosticsClusterSoftwareFaultEvent {
+    fun fromTlv(tlvTag: Tag, tlvReader: TlvReader): SoftwareDiagnosticsClusterSoftwareFaultEvent {
       tlvReader.enterStructure(tlvTag)
       val id = tlvReader.getULong(ContextSpecificTag(TAG_ID))
-      val name = if (tlvReader.isNextTag(ContextSpecificTag(TAG_NAME))) {
-      Optional.of(tlvReader.getString(ContextSpecificTag(TAG_NAME)))
-    } else {
-      Optional.empty()
-    }
-      val faultRecording = if (tlvReader.isNextTag(ContextSpecificTag(TAG_FAULT_RECORDING))) {
-      Optional.of(tlvReader.getByteArray(ContextSpecificTag(TAG_FAULT_RECORDING)))
-    } else {
-      Optional.empty()
-    }
-      
+      val name =
+        if (tlvReader.isNextTag(ContextSpecificTag(TAG_NAME))) {
+          Optional.of(tlvReader.getString(ContextSpecificTag(TAG_NAME)))
+        } else {
+          Optional.empty()
+        }
+      val faultRecording =
+        if (tlvReader.isNextTag(ContextSpecificTag(TAG_FAULT_RECORDING))) {
+          Optional.of(tlvReader.getByteArray(ContextSpecificTag(TAG_FAULT_RECORDING)))
+        } else {
+          Optional.empty()
+        }
+
       tlvReader.exitContainer()
 
       return SoftwareDiagnosticsClusterSoftwareFaultEvent(id, name, faultRecording)

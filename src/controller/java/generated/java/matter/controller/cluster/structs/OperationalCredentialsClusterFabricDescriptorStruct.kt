@@ -16,9 +16,7 @@
  */
 package matter.controller.cluster.structs
 
-import java.util.Optional
 import matter.controller.cluster.*
-import matter.tlv.AnonymousTag
 import matter.tlv.ContextSpecificTag
 import matter.tlv.Tag
 import matter.tlv.TlvReader
@@ -30,7 +28,7 @@ class OperationalCredentialsClusterFabricDescriptorStruct(
   val fabricID: ULong,
   val nodeID: ULong,
   val label: String,
-  val fabricIndex: UByte
+  val fabricIndex: UByte,
 ) {
   override fun toString(): String = buildString {
     append("OperationalCredentialsClusterFabricDescriptorStruct {\n")
@@ -64,7 +62,10 @@ class OperationalCredentialsClusterFabricDescriptorStruct(
     private const val TAG_LABEL = 5
     private const val TAG_FABRIC_INDEX = 254
 
-    fun fromTlv(tlvTag: Tag, tlvReader: TlvReader): OperationalCredentialsClusterFabricDescriptorStruct {
+    fun fromTlv(
+      tlvTag: Tag,
+      tlvReader: TlvReader,
+    ): OperationalCredentialsClusterFabricDescriptorStruct {
       tlvReader.enterStructure(tlvTag)
       val rootPublicKey = tlvReader.getByteArray(ContextSpecificTag(TAG_ROOT_PUBLIC_KEY))
       val vendorID = tlvReader.getUShort(ContextSpecificTag(TAG_VENDOR_I_D))
@@ -72,10 +73,17 @@ class OperationalCredentialsClusterFabricDescriptorStruct(
       val nodeID = tlvReader.getULong(ContextSpecificTag(TAG_NODE_I_D))
       val label = tlvReader.getString(ContextSpecificTag(TAG_LABEL))
       val fabricIndex = tlvReader.getUByte(ContextSpecificTag(TAG_FABRIC_INDEX))
-      
+
       tlvReader.exitContainer()
 
-      return OperationalCredentialsClusterFabricDescriptorStruct(rootPublicKey, vendorID, fabricID, nodeID, label, fabricIndex)
+      return OperationalCredentialsClusterFabricDescriptorStruct(
+        rootPublicKey,
+        vendorID,
+        fabricID,
+        nodeID,
+        label,
+        fabricIndex,
+      )
     }
   }
 }

@@ -17,21 +17,18 @@
 package chip.devicecontroller.cluster.eventstructs
 
 import chip.devicecontroller.cluster.*
-import matter.tlv.AnonymousTag
 import matter.tlv.ContextSpecificTag
 import matter.tlv.Tag
-import matter.tlv.TlvParsingException
 import matter.tlv.TlvReader
 import matter.tlv.TlvWriter
 
-import java.util.Optional
-
-class AccessControlClusterFabricRestrictionReviewUpdateEvent (
-    val token: ULong,
-    val instruction: String?,
-    val redirectURL: String?,
-    val fabricIndex: UInt) {
-  override fun toString(): String  = buildString {
+class AccessControlClusterFabricRestrictionReviewUpdateEvent(
+  val token: ULong,
+  val instruction: String?,
+  val redirectURL: String?,
+  val fabricIndex: UInt,
+) {
+  override fun toString(): String = buildString {
     append("AccessControlClusterFabricRestrictionReviewUpdateEvent {\n")
     append("\ttoken : $token\n")
     append("\tinstruction : $instruction\n")
@@ -45,15 +42,15 @@ class AccessControlClusterFabricRestrictionReviewUpdateEvent (
       startStructure(tlvTag)
       put(ContextSpecificTag(TAG_TOKEN), token)
       if (instruction != null) {
-      put(ContextSpecificTag(TAG_INSTRUCTION), instruction)
-    } else {
-      putNull(ContextSpecificTag(TAG_INSTRUCTION))
-    }
+        put(ContextSpecificTag(TAG_INSTRUCTION), instruction)
+      } else {
+        putNull(ContextSpecificTag(TAG_INSTRUCTION))
+      }
       if (redirectURL != null) {
-      put(ContextSpecificTag(TAG_REDIRECT_U_R_L), redirectURL)
-    } else {
-      putNull(ContextSpecificTag(TAG_REDIRECT_U_R_L))
-    }
+        put(ContextSpecificTag(TAG_REDIRECT_U_R_L), redirectURL)
+      } else {
+        putNull(ContextSpecificTag(TAG_REDIRECT_U_R_L))
+      }
       put(ContextSpecificTag(TAG_FABRIC_INDEX), fabricIndex)
       endStructure()
     }
@@ -65,26 +62,36 @@ class AccessControlClusterFabricRestrictionReviewUpdateEvent (
     private const val TAG_REDIRECT_U_R_L = 2
     private const val TAG_FABRIC_INDEX = 254
 
-    fun fromTlv(tlvTag: Tag, tlvReader: TlvReader) : AccessControlClusterFabricRestrictionReviewUpdateEvent {
+    fun fromTlv(
+      tlvTag: Tag,
+      tlvReader: TlvReader,
+    ): AccessControlClusterFabricRestrictionReviewUpdateEvent {
       tlvReader.enterStructure(tlvTag)
       val token = tlvReader.getULong(ContextSpecificTag(TAG_TOKEN))
-      val instruction = if (!tlvReader.isNull()) {
-      tlvReader.getString(ContextSpecificTag(TAG_INSTRUCTION))
-    } else {
-      tlvReader.getNull(ContextSpecificTag(TAG_INSTRUCTION))
-      null
-    }
-      val redirectURL = if (!tlvReader.isNull()) {
-      tlvReader.getString(ContextSpecificTag(TAG_REDIRECT_U_R_L))
-    } else {
-      tlvReader.getNull(ContextSpecificTag(TAG_REDIRECT_U_R_L))
-      null
-    }
+      val instruction =
+        if (!tlvReader.isNull()) {
+          tlvReader.getString(ContextSpecificTag(TAG_INSTRUCTION))
+        } else {
+          tlvReader.getNull(ContextSpecificTag(TAG_INSTRUCTION))
+          null
+        }
+      val redirectURL =
+        if (!tlvReader.isNull()) {
+          tlvReader.getString(ContextSpecificTag(TAG_REDIRECT_U_R_L))
+        } else {
+          tlvReader.getNull(ContextSpecificTag(TAG_REDIRECT_U_R_L))
+          null
+        }
       val fabricIndex = tlvReader.getUInt(ContextSpecificTag(TAG_FABRIC_INDEX))
-      
+
       tlvReader.exitContainer()
 
-      return AccessControlClusterFabricRestrictionReviewUpdateEvent(token, instruction, redirectURL, fabricIndex)
+      return AccessControlClusterFabricRestrictionReviewUpdateEvent(
+        token,
+        instruction,
+        redirectURL,
+        fabricIndex,
+      )
     }
   }
 }

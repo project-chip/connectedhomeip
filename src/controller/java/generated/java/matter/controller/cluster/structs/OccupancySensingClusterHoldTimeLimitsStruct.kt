@@ -16,9 +16,7 @@
  */
 package matter.controller.cluster.structs
 
-import java.util.Optional
 import matter.controller.cluster.*
-import matter.tlv.AnonymousTag
 import matter.tlv.ContextSpecificTag
 import matter.tlv.Tag
 import matter.tlv.TlvReader
@@ -27,7 +25,7 @@ import matter.tlv.TlvWriter
 class OccupancySensingClusterHoldTimeLimitsStruct(
   val holdTimeMin: UShort,
   val holdTimeMax: UShort,
-  val holdTimeDefault: UShort
+  val holdTimeDefault: UShort,
 ) {
   override fun toString(): String = buildString {
     append("OccupancySensingClusterHoldTimeLimitsStruct {\n")
@@ -57,7 +55,7 @@ class OccupancySensingClusterHoldTimeLimitsStruct(
       val holdTimeMin = tlvReader.getUShort(ContextSpecificTag(TAG_HOLD_TIME_MIN))
       val holdTimeMax = tlvReader.getUShort(ContextSpecificTag(TAG_HOLD_TIME_MAX))
       val holdTimeDefault = tlvReader.getUShort(ContextSpecificTag(TAG_HOLD_TIME_DEFAULT))
-      
+
       tlvReader.exitContainer()
 
       return OccupancySensingClusterHoldTimeLimitsStruct(holdTimeMin, holdTimeMax, holdTimeDefault)

@@ -17,18 +17,13 @@
 package chip.devicecontroller.cluster.eventstructs
 
 import chip.devicecontroller.cluster.*
-import matter.tlv.AnonymousTag
 import matter.tlv.ContextSpecificTag
 import matter.tlv.Tag
-import matter.tlv.TlvParsingException
 import matter.tlv.TlvReader
 import matter.tlv.TlvWriter
 
-import java.util.Optional
-
-class AccessControlClusterAccessRestrictionEntryChangedEvent (
-    val fabricIndex: UInt) {
-  override fun toString(): String  = buildString {
+class AccessControlClusterAccessRestrictionEntryChangedEvent(val fabricIndex: UInt) {
+  override fun toString(): String = buildString {
     append("AccessControlClusterAccessRestrictionEntryChangedEvent {\n")
     append("\tfabricIndex : $fabricIndex\n")
     append("}\n")
@@ -45,10 +40,13 @@ class AccessControlClusterAccessRestrictionEntryChangedEvent (
   companion object {
     private const val TAG_FABRIC_INDEX = 254
 
-    fun fromTlv(tlvTag: Tag, tlvReader: TlvReader) : AccessControlClusterAccessRestrictionEntryChangedEvent {
+    fun fromTlv(
+      tlvTag: Tag,
+      tlvReader: TlvReader,
+    ): AccessControlClusterAccessRestrictionEntryChangedEvent {
       tlvReader.enterStructure(tlvTag)
       val fabricIndex = tlvReader.getUInt(ContextSpecificTag(TAG_FABRIC_INDEX))
-      
+
       tlvReader.exitContainer()
 
       return AccessControlClusterAccessRestrictionEntryChangedEvent(fabricIndex)

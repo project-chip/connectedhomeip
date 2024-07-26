@@ -16,18 +16,13 @@
  */
 package matter.controller.cluster.structs
 
-import java.util.Optional
 import matter.controller.cluster.*
-import matter.tlv.AnonymousTag
 import matter.tlv.ContextSpecificTag
 import matter.tlv.Tag
 import matter.tlv.TlvReader
 import matter.tlv.TlvWriter
 
-class AccessControlClusterAccessRestrictionStruct(
-  val type: UByte,
-  val id: UInt?
-) {
+class AccessControlClusterAccessRestrictionStruct(val type: UByte, val id: UInt?) {
   override fun toString(): String = buildString {
     append("AccessControlClusterAccessRestrictionStruct {\n")
     append("\ttype : $type\n")
@@ -55,13 +50,14 @@ class AccessControlClusterAccessRestrictionStruct(
     fun fromTlv(tlvTag: Tag, tlvReader: TlvReader): AccessControlClusterAccessRestrictionStruct {
       tlvReader.enterStructure(tlvTag)
       val type = tlvReader.getUByte(ContextSpecificTag(TAG_TYPE))
-      val id = if (!tlvReader.isNull()) {
-      tlvReader.getUInt(ContextSpecificTag(TAG_ID))
-    } else {
-      tlvReader.getNull(ContextSpecificTag(TAG_ID))
-      null
-    }
-      
+      val id =
+        if (!tlvReader.isNull()) {
+          tlvReader.getUInt(ContextSpecificTag(TAG_ID))
+        } else {
+          tlvReader.getNull(ContextSpecificTag(TAG_ID))
+          null
+        }
+
       tlvReader.exitContainer()
 
       return AccessControlClusterAccessRestrictionStruct(type, id)

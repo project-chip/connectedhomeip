@@ -16,17 +16,13 @@
  */
 package matter.controller.cluster.eventstructs
 
-import java.util.Optional
 import matter.controller.cluster.*
-import matter.tlv.AnonymousTag
 import matter.tlv.ContextSpecificTag
 import matter.tlv.Tag
 import matter.tlv.TlvReader
 import matter.tlv.TlvWriter
 
-class BooleanStateClusterStateChangeEvent(
-  val stateValue: Boolean
-) {
+class BooleanStateClusterStateChangeEvent(val stateValue: Boolean) {
   override fun toString(): String = buildString {
     append("BooleanStateClusterStateChangeEvent {\n")
     append("\tstateValue : $stateValue\n")
@@ -44,10 +40,10 @@ class BooleanStateClusterStateChangeEvent(
   companion object {
     private const val TAG_STATE_VALUE = 0
 
-    fun fromTlv(tlvTag: Tag, tlvReader: TlvReader) : BooleanStateClusterStateChangeEvent {
+    fun fromTlv(tlvTag: Tag, tlvReader: TlvReader): BooleanStateClusterStateChangeEvent {
       tlvReader.enterStructure(tlvTag)
       val stateValue = tlvReader.getBoolean(ContextSpecificTag(TAG_STATE_VALUE))
-      
+
       tlvReader.exitContainer()
 
       return BooleanStateClusterStateChangeEvent(stateValue)

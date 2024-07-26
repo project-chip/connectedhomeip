@@ -20,17 +20,15 @@ import chip.devicecontroller.cluster.*
 import matter.tlv.AnonymousTag
 import matter.tlv.ContextSpecificTag
 import matter.tlv.Tag
-import matter.tlv.TlvParsingException
 import matter.tlv.TlvReader
 import matter.tlv.TlvWriter
 
-import java.util.Optional
-
-class OvenModeClusterModeOptionStruct (
-    val label: String,
-    val mode: UInt,
-    val modeTags: List<OvenModeClusterModeTagStruct>) {
-  override fun toString(): String  = buildString {
+class OvenModeClusterModeOptionStruct(
+  val label: String,
+  val mode: UInt,
+  val modeTags: List<OvenModeClusterModeTagStruct>,
+) {
+  override fun toString(): String = buildString {
     append("OvenModeClusterModeOptionStruct {\n")
     append("\tlabel : $label\n")
     append("\tmode : $mode\n")
@@ -57,18 +55,19 @@ class OvenModeClusterModeOptionStruct (
     private const val TAG_MODE = 1
     private const val TAG_MODE_TAGS = 2
 
-    fun fromTlv(tlvTag: Tag, tlvReader: TlvReader) : OvenModeClusterModeOptionStruct {
+    fun fromTlv(tlvTag: Tag, tlvReader: TlvReader): OvenModeClusterModeOptionStruct {
       tlvReader.enterStructure(tlvTag)
       val label = tlvReader.getString(ContextSpecificTag(TAG_LABEL))
       val mode = tlvReader.getUInt(ContextSpecificTag(TAG_MODE))
-      val modeTags = buildList<OvenModeClusterModeTagStruct> {
-      tlvReader.enterArray(ContextSpecificTag(TAG_MODE_TAGS))
-      while(!tlvReader.isEndOfContainer()) {
-        add(OvenModeClusterModeTagStruct.fromTlv(AnonymousTag, tlvReader))
-      }
-      tlvReader.exitContainer()
-    }
-      
+      val modeTags =
+        buildList<OvenModeClusterModeTagStruct> {
+          tlvReader.enterArray(ContextSpecificTag(TAG_MODE_TAGS))
+          while (!tlvReader.isEndOfContainer()) {
+            add(OvenModeClusterModeTagStruct.fromTlv(AnonymousTag, tlvReader))
+          }
+          tlvReader.exitContainer()
+        }
+
       tlvReader.exitContainer()
 
       return OvenModeClusterModeOptionStruct(label, mode, modeTags)

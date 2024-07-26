@@ -17,19 +17,13 @@
 package chip.devicecontroller.cluster.eventstructs
 
 import chip.devicecontroller.cluster.*
-import matter.tlv.AnonymousTag
 import matter.tlv.ContextSpecificTag
 import matter.tlv.Tag
-import matter.tlv.TlvParsingException
 import matter.tlv.TlvReader
 import matter.tlv.TlvWriter
 
-import java.util.Optional
-
-class SampleMeiClusterPingCountEventEvent (
-    val count: ULong,
-    val fabricIndex: UInt) {
-  override fun toString(): String  = buildString {
+class SampleMeiClusterPingCountEventEvent(val count: ULong, val fabricIndex: UInt) {
+  override fun toString(): String = buildString {
     append("SampleMeiClusterPingCountEventEvent {\n")
     append("\tcount : $count\n")
     append("\tfabricIndex : $fabricIndex\n")
@@ -49,11 +43,11 @@ class SampleMeiClusterPingCountEventEvent (
     private const val TAG_COUNT = 1
     private const val TAG_FABRIC_INDEX = 254
 
-    fun fromTlv(tlvTag: Tag, tlvReader: TlvReader) : SampleMeiClusterPingCountEventEvent {
+    fun fromTlv(tlvTag: Tag, tlvReader: TlvReader): SampleMeiClusterPingCountEventEvent {
       tlvReader.enterStructure(tlvTag)
       val count = tlvReader.getULong(ContextSpecificTag(TAG_COUNT))
       val fabricIndex = tlvReader.getUInt(ContextSpecificTag(TAG_FABRIC_INDEX))
-      
+
       tlvReader.exitContainer()
 
       return SampleMeiClusterPingCountEventEvent(count, fabricIndex)

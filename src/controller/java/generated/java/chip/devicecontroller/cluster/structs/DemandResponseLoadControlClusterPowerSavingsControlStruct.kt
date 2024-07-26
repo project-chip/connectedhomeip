@@ -17,18 +17,13 @@
 package chip.devicecontroller.cluster.structs
 
 import chip.devicecontroller.cluster.*
-import matter.tlv.AnonymousTag
 import matter.tlv.ContextSpecificTag
 import matter.tlv.Tag
-import matter.tlv.TlvParsingException
 import matter.tlv.TlvReader
 import matter.tlv.TlvWriter
 
-import java.util.Optional
-
-class DemandResponseLoadControlClusterPowerSavingsControlStruct (
-    val powerSavings: UInt) {
-  override fun toString(): String  = buildString {
+class DemandResponseLoadControlClusterPowerSavingsControlStruct(val powerSavings: UInt) {
+  override fun toString(): String = buildString {
     append("DemandResponseLoadControlClusterPowerSavingsControlStruct {\n")
     append("\tpowerSavings : $powerSavings\n")
     append("}\n")
@@ -45,10 +40,13 @@ class DemandResponseLoadControlClusterPowerSavingsControlStruct (
   companion object {
     private const val TAG_POWER_SAVINGS = 0
 
-    fun fromTlv(tlvTag: Tag, tlvReader: TlvReader) : DemandResponseLoadControlClusterPowerSavingsControlStruct {
+    fun fromTlv(
+      tlvTag: Tag,
+      tlvReader: TlvReader,
+    ): DemandResponseLoadControlClusterPowerSavingsControlStruct {
       tlvReader.enterStructure(tlvTag)
       val powerSavings = tlvReader.getUInt(ContextSpecificTag(TAG_POWER_SAVINGS))
-      
+
       tlvReader.exitContainer()
 
       return DemandResponseLoadControlClusterPowerSavingsControlStruct(powerSavings)

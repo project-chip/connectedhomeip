@@ -17,21 +17,18 @@
 package chip.devicecontroller.cluster.eventstructs
 
 import chip.devicecontroller.cluster.*
-import matter.tlv.AnonymousTag
 import matter.tlv.ContextSpecificTag
 import matter.tlv.Tag
-import matter.tlv.TlvParsingException
 import matter.tlv.TlvReader
 import matter.tlv.TlvWriter
 
-import java.util.Optional
-
-class CommissionerControlClusterCommissioningRequestResultEvent (
-    val requestId: ULong,
-    val clientNodeId: ULong,
-    val statusCode: UInt,
-    val fabricIndex: UInt) {
-  override fun toString(): String  = buildString {
+class CommissionerControlClusterCommissioningRequestResultEvent(
+  val requestId: ULong,
+  val clientNodeId: ULong,
+  val statusCode: UInt,
+  val fabricIndex: UInt,
+) {
+  override fun toString(): String = buildString {
     append("CommissionerControlClusterCommissioningRequestResultEvent {\n")
     append("\trequestId : $requestId\n")
     append("\tclientNodeId : $clientNodeId\n")
@@ -57,16 +54,24 @@ class CommissionerControlClusterCommissioningRequestResultEvent (
     private const val TAG_STATUS_CODE = 2
     private const val TAG_FABRIC_INDEX = 254
 
-    fun fromTlv(tlvTag: Tag, tlvReader: TlvReader) : CommissionerControlClusterCommissioningRequestResultEvent {
+    fun fromTlv(
+      tlvTag: Tag,
+      tlvReader: TlvReader,
+    ): CommissionerControlClusterCommissioningRequestResultEvent {
       tlvReader.enterStructure(tlvTag)
       val requestId = tlvReader.getULong(ContextSpecificTag(TAG_REQUEST_ID))
       val clientNodeId = tlvReader.getULong(ContextSpecificTag(TAG_CLIENT_NODE_ID))
       val statusCode = tlvReader.getUInt(ContextSpecificTag(TAG_STATUS_CODE))
       val fabricIndex = tlvReader.getUInt(ContextSpecificTag(TAG_FABRIC_INDEX))
-      
+
       tlvReader.exitContainer()
 
-      return CommissionerControlClusterCommissioningRequestResultEvent(requestId, clientNodeId, statusCode, fabricIndex)
+      return CommissionerControlClusterCommissioningRequestResultEvent(
+        requestId,
+        clientNodeId,
+        statusCode,
+        fabricIndex,
+      )
     }
   }
 }
