@@ -109,7 +109,7 @@ class TC_SEAR_1_3(MatterBaseTest):
             self.write_to_app_pipe('{"Name": "Reset"}')
 
         supported_area_ids = await self.read_supported_areas(2)
-        asserts.assert_true(len(self.supported_areas > 0), f"SupportedAreas is empty")
+        asserts.assert_true(len(self.supported_areas) > 0, f"SupportedAreas is empty")
         valid_area_id = supported_area_ids[0]
         invalid_area_id = 1 + max(supported_area_ids)
 
@@ -121,7 +121,7 @@ class TC_SEAR_1_3(MatterBaseTest):
         await self.send_cmd_select_areas_expect_response(4, [], Clusters.ServiceArea.SelectAreasStatus.kSuccess)
 
         selected_areas = await self.read_selected_areas(5)
-        asserts.assert_true(len(selected_areas == 0), f"SelectedAreas should be empty")
+        asserts.assert_true(len(selected_areas) == 0, f"SelectedAreas should be empty")
 
         await self.send_cmd_select_areas_expect_response(6, [invalid_area_id], Clusters.ServiceArea.SelectAreasStatus.kUnsupportedArea)
 
@@ -142,7 +142,7 @@ class TC_SEAR_1_3(MatterBaseTest):
             await self.send_cmd_select_areas_expect_response(10, supported_area_ids, Clusters.ServiceArea.SelectAreasStatus.kSuccess)
 
             selected_areas = await self.read_selected_areas(11)
-            asserts.assert_true(len(selected_areas == supported_area_ids), f"SelectedAreas({selected_areas}) should match SupportedAreas({supported_area_ids})")
+            asserts.assert_true(len(selected_areas) == len(supported_area_ids), f"SelectedAreas({selected_areas}) should match SupportedAreas({supported_area_ids})")
 
             await self.send_cmd_select_areas_expect_response(12, supported_area_ids, Clusters.ServiceArea.SelectAreasStatus.kSuccess)
 
