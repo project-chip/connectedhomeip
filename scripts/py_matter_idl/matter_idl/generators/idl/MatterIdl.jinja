@@ -18,15 +18,15 @@
 {% macro render_struct(s) -%}{#
  Macro for the output of a complete struct
 #}
-  {%- if s.tag %}{{s.tag | idltxt}} {% endif -%}
-  {% if s.qualities %}{{s.qualities | idltxt}} {% endif -%}
-  struct {{s.name}} {##}
-  {%- if s.code is not none %}= {{s.code}} {% endif -%}
-  {
-    {% for field in s.fields %}
-    {{render_field(field)}}
-    {% endfor %}
-  }
+{%- if s.tag %}{{s.tag | idltxt}} {% endif -%}
+{% if s.qualities %}{{s.qualities | idltxt}} {% endif -%}
+struct {{s.name}} {##}
+{%- if s.code is not none %}= {{s.code}} {% endif -%}
+{
+  {% for field in s.fields %}
+  {{render_field(field)}}
+  {% endfor %}
+}
 {%- endmacro -%}
 
 
@@ -85,7 +85,7 @@ bitmap {{bitmap.name}} : {{ bitmap.base_type}} {
 
   {%- for s in cluster.structs | selectattr("is_global") %}
   /* GLOBAL:
-  {{render_struct(s)}}
+  {{render_struct(s) | indent(2)}}
    */
 
   {% endfor %}
@@ -109,7 +109,7 @@ bitmap {{bitmap.name}} : {{ bitmap.base_type}} {
   {% endfor %}
 
   {%- for s in cluster.structs | rejectattr("tag") | rejectattr("is_global") %}
-  {{render_struct(s)}}
+  {{render_struct(s) | indent(2)}}
 
   {% endfor %}
 
@@ -129,7 +129,7 @@ bitmap {{bitmap.name}} : {{ bitmap.base_type}} {
 
   {%- for s in cluster.structs | selectattr("tag") %}
 
-  {{render_struct(s)}}
+  {{render_struct(s)|indent(2)}}
   {% endfor %}
 
   {%- for c in cluster.commands %}
