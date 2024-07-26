@@ -1762,6 +1762,7 @@ def per_endpoint_test(accept_function: EndpointCheckFunction):
             # Ditto for teardown - we want to tear down after each iteration, and we want to notify the hook that
             # the test iteration is stopped. test_stop is called by on_pass or on_fail during the last iteration or
             # on failure.
+            original_ep = self.matter_test_config.endpoint
             for e in endpoints:
                 logging.info(f'Running test on endpoint {e}')
                 if e != endpoints[0]:
@@ -1772,7 +1773,7 @@ def per_endpoint_test(accept_function: EndpointCheckFunction):
                     self.teardown_test()
                     test_duration = (datetime.now(timezone.utc) - self.test_start_time) / timedelta(microseconds=1)
                     self.runner_hook.test_stop(exception=None, duration=test_duration)
-
+            self.matter_test_config.endpoint = original_ep
         return per_endpoint_runner
     return per_endpoint_test_internal
 

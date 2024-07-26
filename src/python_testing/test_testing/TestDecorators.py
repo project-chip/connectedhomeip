@@ -159,6 +159,8 @@ class TestDecorators(MatterBaseTest):
     async def test_whole_node_with_pics(self):
         pass
 
+    # This method returns the top level pics for test_whole_node_with_pics
+    # It is used to test that test_whole_node_with_pics will fail since you can't have a whole node test gated on a PICS.
     def pics_whole_node_with_pics(self):
         return ['EXAMPLE.S']
 
@@ -167,6 +169,8 @@ class TestDecorators(MatterBaseTest):
     async def test_per_endpoint_with_pics(self):
         pass
 
+    # This method returns the top level pics for test_per_endpoint_with_pics
+    # It is used to test that test_per_endpoint_with_pics will fail since you can't have a per endpoint test gated on a PICS.
     def pics_per_endpoint_with_pics(self):
         return ['EXAMPLE.S']
 
@@ -210,7 +214,19 @@ class TestDecorators(MatterBaseTest):
     async def test_endpoint_boolean_no(self):
         pass
 
-    # TODO: add test for assertions on whole node, and on each endpoint of an endpoint test
+    @per_endpoint_test(has_cluster(Clusters.OnOff))
+    async def test_fail_on_ep0(self):
+        if self.matter_test_config.endpoint == 0:
+            asserts.fail("Expected failure")
+
+    @per_endpoint_test(has_cluster(Clusters.OnOff))
+    async def test_fail_on_ep1(self):
+        if self.matter_test_config.endpoint == 1:
+            asserts.fail("Expected failure")
+
+    @per_node_test
+    async def test_fail_on_whole_node(self):
+        asserts.fail("Expected failure")
 
 
 def main():
@@ -278,6 +294,34 @@ def main():
     check_skipped('test_endpoint_attribute_unsupported_cluster_no')
     check_once_per_endpoint('test_endpoint_boolean_yes')
     check_skipped('test_endpoint_boolean_no')
+
+    test_name = 'test_fail_on_ep0'
+    test_runner.set_test('TestDecorators.py', 'TestDecorators', test_name)
+    read_resp = get_clusters([0, 1])
+    ok = test_runner.run_test_with_mock_read(read_resp, hooks)
+    if ok:
+        failures.append(f"Did not get expected test assertion on {test_name}")
+
+    test_name = 'test_fail_on_ep1'
+    test_runner.set_test('TestDecorators.py', 'TestDecorators', test_name)
+    read_resp = get_clusters([0, 1])
+    ok = test_runner.run_test_with_mock_read(read_resp, hooks)
+    if ok:
+        failures.append(f"Did not get expected test assertion on {test_name}")
+
+    test_name = 'test_fail_on_ep1'
+    test_runner.set_test('TestDecorators.py', 'TestDecorators', test_name)
+    read_resp = get_clusters([0])
+    ok = test_runner.run_test_with_mock_read(read_resp, hooks)
+    if not ok:
+        failures.append(f"Unexpected failure on {test_name}")
+
+    test_name = 'test_fail_on_whole_node'
+    test_runner.set_test('TestDecorators.py', 'TestDecorators', test_name)
+    read_resp = get_clusters([0, 1])
+    ok = test_runner.run_test_with_mock_read(read_resp, hooks)
+    if ok:
+        failures.append(f"Did not get expected test assertion on {test_name}")
 
     test_runner.Shutdown()
     print(
