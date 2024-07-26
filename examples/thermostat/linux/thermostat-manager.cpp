@@ -181,9 +181,11 @@ CHIP_ERROR ThermostatManager::Init()
     ChipLogError(AppServer,
                  "Initialized a thermostat with \n "
                  "mSystemMode: %u (%s) \n mRunningMode: %u (%s) \n mLocalTemperature: %d \n mOccupiedHeatingSetpoint: %d \n "
-                 "mOccupiedCoolingSetpoint: %d" "NumberOfPresets: %d",
-                 static_cast<uint8_t>(mSystemMode), SystemModeString(mSystemMode), static_cast<uint8_t>(mRunningMode), RunningModeString(mRunningMode), mLocalTemperature,
-                 mOccupiedHeatingSetpoint, mOccupiedCoolingSetpoint, GetNumberOfPresets());
+                 "mOccupiedCoolingSetpoint: %d"
+                 "NumberOfPresets: %d",
+                 static_cast<uint8_t>(mSystemMode), SystemModeString(mSystemMode), static_cast<uint8_t>(mRunningMode),
+                 RunningModeString(mRunningMode), mLocalTemperature, mOccupiedHeatingSetpoint, mOccupiedCoolingSetpoint,
+                 GetNumberOfPresets());
 
     // TODO: Should this be called later?
     EvalThermostatState();
@@ -365,8 +367,8 @@ void ThermostatManager::EvalThermostatState()
                  "Eval Thermostat Running Mode \n "
                  "mSystemMode: %u (%s) \n mRunningMode: %u (%s) \n mLocalTemperature: %d \n mOccupiedHeatingSetpoint: %d \n "
                  "mOccupiedCoolingSetpoint: %d",
-                 static_cast<uint8_t>(mSystemMode), SystemModeString(mSystemMode), static_cast<uint8_t>(mRunningMode), RunningModeString(mRunningMode), mLocalTemperature,
-                 mOccupiedHeatingSetpoint, mOccupiedCoolingSetpoint);
+                 static_cast<uint8_t>(mSystemMode), SystemModeString(mSystemMode), static_cast<uint8_t>(mRunningMode),
+                 RunningModeString(mRunningMode), mLocalTemperature, mOccupiedHeatingSetpoint, mOccupiedCoolingSetpoint);
 
     switch (mSystemMode)
     {
