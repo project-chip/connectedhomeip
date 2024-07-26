@@ -3982,11 +3982,11 @@ public class ChipClusters {
       return 0L;
     }
 
-    public void reviewFabricRestrictions(DefaultClusterCallback callback, Optional<ArrayList<ChipStructs.AccessControlClusterCommissioningAccessRestrictionEntryStruct>> arl) {
+    public void reviewFabricRestrictions(ReviewFabricRestrictionsResponseCallback callback, Optional<ArrayList<ChipStructs.AccessControlClusterCommissioningAccessRestrictionEntryStruct>> arl) {
       reviewFabricRestrictions(callback, arl, 0);
     }
 
-    public void reviewFabricRestrictions(DefaultClusterCallback callback, Optional<ArrayList<ChipStructs.AccessControlClusterCommissioningAccessRestrictionEntryStruct>> arl, int timedInvokeTimeoutMs) {
+    public void reviewFabricRestrictions(ReviewFabricRestrictionsResponseCallback callback, Optional<ArrayList<ChipStructs.AccessControlClusterCommissioningAccessRestrictionEntryStruct>> arl, int timedInvokeTimeoutMs) {
       final long commandId = 0L;
 
       ArrayList<StructElement> elements = new ArrayList<>();
@@ -3998,8 +3998,22 @@ public class ChipClusters {
       invoke(new InvokeCallbackImpl(callback) {
           @Override
           public void onResponse(StructType invokeStructValue) {
-          callback.onSuccess();
+          final long tokenFieldID = 0L;
+          Long token = null;
+          for (StructElement element: invokeStructValue.value()) {
+            if (element.contextTagNum() == tokenFieldID) {
+              if (element.value(BaseTLVType.class).type() == TLVType.UInt) {
+                UIntType castingValue = element.value(UIntType.class);
+                token = castingValue.value(Long.class);
+              }
+            }
+          }
+          callback.onSuccess(token);
         }}, commandId, commandArgs, timedInvokeTimeoutMs);
+    }
+
+    public interface ReviewFabricRestrictionsResponseCallback extends BaseClusterCallback {
+      void onSuccess(Long token);
     }
 
     public interface AclAttributeCallback extends BaseAttributeCallback {

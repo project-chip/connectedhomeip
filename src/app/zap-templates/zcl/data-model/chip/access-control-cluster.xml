@@ -143,7 +143,7 @@ limitations under the License.
       <access op="read" privilege="view"/>
     </attribute>
 
-    <command code="0x00" source="client" name="ReviewFabricRestrictions" optional="true">
+    <command code="0x00" source="client" name="ReviewFabricRestrictions" optional="true" response="ReviewFabricRestrictionsResponse">
       <description>This command signals to the service associated with the device maker that the fabric administrator would like a review of the current fabric restrictions.</description>
       <access op="invoke" privilege="administer"/>
       <arg id="0" name="ARL" array="true" type="CommissioningAccessRestrictionEntryStruct" optional="true"/>
