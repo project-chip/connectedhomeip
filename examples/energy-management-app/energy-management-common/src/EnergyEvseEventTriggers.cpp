@@ -101,6 +101,14 @@ void SetTestEventTrigger_EVChargeDemandClear()
 
     dg->HwSetState(sEVSETestEventSaveData.mOldHwStatePluggedInDemand);
 }
+void SetTestEventTrigger_EVTimeOfUseMode()
+{
+    // TODO - See #34249
+}
+void SetTestEventTrigger_EVTimeOfUseModeClear()
+{
+    // TODO - See #34249
+}
 void SetTestEventTrigger_EVSEGroundFault()
 {
     EnergyEvseDelegate * dg = GetEvseDelegate();
@@ -159,6 +167,10 @@ bool HandleEnergyEvseTestEventTrigger(uint64_t eventTrigger)
         ChipLogProgress(Support, "[EnergyEVSE-Test-Event] => EV Charge NoDemand");
         SetTestEventTrigger_EVChargeDemandClear();
         break;
+    case EnergyEvseTrigger::kEVTimeOfUseMode:
+        ChipLogProgress(Support, "[EnergyEVSE-Test-Event] => EV TimeOfUse Mode");
+        SetTestEventTrigger_EVTimeOfUseMode();
+        break;
     case EnergyEvseTrigger::kEVSEGroundFault:
         ChipLogProgress(Support, "[EnergyEVSE-Test-Event] => EVSE has a GroundFault fault");
         SetTestEventTrigger_EVSEGroundFault();
@@ -175,7 +187,10 @@ bool HandleEnergyEvseTestEventTrigger(uint64_t eventTrigger)
         ChipLogProgress(Support, "[EnergyEVSE-Test-Event] => EVSE Diagnostics Completed");
         SetTestEventTrigger_EVSEDiagnosticsComplete();
         break;
-
+    case EnergyEvseTrigger::kEVTimeOfUseModeClear:
+        ChipLogProgress(Support, "[EnergyEVSE-Test-Event] => EV TimeOfUse Mode clear");
+        SetTestEventTrigger_EVTimeOfUseModeClear();
+        break;
     default:
         return false;
     }
