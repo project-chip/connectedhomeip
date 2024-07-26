@@ -321,8 +321,6 @@ void Instance::InvokeCommand(HandlerContext & handlerContext)
         ChipLogDetail(Zcl, "OperationalState: Entering handling derived cluster commands");
 
         InvokeDerivedClusterCommand(handlerContext);
-        // Call here to avoid the subclasses forgetting about it.
-        UpdateCountdownTimeFromClusterLogic();
         break;
     }
 }
@@ -435,8 +433,6 @@ void Instance::HandlePauseState(HandlerContext & ctx, const Commands::Pause::Dec
     response.commandResponseState = err;
 
     ctx.mCommandHandler.AddResponse(ctx.mRequestPath, response);
-
-    UpdateCountdownTimeFromClusterLogic();
 }
 
 void Instance::HandleStopState(HandlerContext & ctx, const Commands::Stop::DecodableType & req)
@@ -475,8 +471,6 @@ void Instance::HandleStartState(HandlerContext & ctx, const Commands::Start::Dec
     response.commandResponseState = err;
 
     ctx.mCommandHandler.AddResponse(ctx.mRequestPath, response);
-
-    UpdateCountdownTimeFromClusterLogic();
 }
 
 void Instance::HandleResumeState(HandlerContext & ctx, const Commands::Resume::DecodableType & req)
@@ -512,8 +506,6 @@ void Instance::HandleResumeState(HandlerContext & ctx, const Commands::Resume::D
     response.commandResponseState = err;
 
     ctx.mCommandHandler.AddResponse(ctx.mRequestPath, response);
-
-    UpdateCountdownTimeFromClusterLogic();
 }
 
 // RvcOperationalState
