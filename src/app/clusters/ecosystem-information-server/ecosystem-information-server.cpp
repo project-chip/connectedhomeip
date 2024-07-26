@@ -60,12 +60,12 @@ CHIP_ERROR AttrAccess::Read(const ConcreteReadAttributePath & aPath, AttributeVa
     return CHIP_NO_ERROR;
 }
 
-// WARNING: caller is expected to use the returned HomeLocationStruct::Type immediately. Caller must be
-// certain that the provided aLocationDescriptor has not been destroyed, prior to using the return
+// WARNING: caller is expected to use the returned LocationDescriptorStruct::Type immediately. Caller must
+// be certain that the provided aLocationDescriptor has not been destroyed, prior to using the return
 // struct to encode.
-Structs::HomeLocationStruct::Type GetEncodableLocationDescriptorStruct(const LocationDescriptorStruct & aLocationDescriptor)
+Structs::LocationDescriptorStruct::Type GetEncodableLocationDescriptorStruct(const LocationDescriptorStruct & aLocationDescriptor)
 {
-    Structs::HomeLocationStruct::Type locationDescriptor;
+    Structs::LocationDescriptorStruct::Type locationDescriptor;
     // This would imply data is either not properly validated before being
     // stored here or corruption has occurred.
     VerifyOrDie(!aLocationDescriptor.mLocationName.empty());
