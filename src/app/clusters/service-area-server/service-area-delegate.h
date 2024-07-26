@@ -54,9 +54,6 @@ public:
     Delegate(const Delegate &)             = delete;
     Delegate & operator=(const Delegate &) = delete;
 
-    friend class Instance;
-
-protected:
     /**
      * @brief This method will be called during the ServiceArea server initialization after the Instance information has been
      * validated and the Instance has been registered. This can be used to initialise app logic.
@@ -375,10 +372,10 @@ protected:
 
     Instance * GetInstance() { return mInstance; }
 
+    void SetInstance(Instance * aInstance) { mInstance = aInstance; }
+
 private:
     Instance * mInstance = nullptr;
-
-    void SetInstance(Instance * aInstance) { mInstance = aInstance; }
 };
 
 } // namespace ServiceArea
