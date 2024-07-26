@@ -29,9 +29,9 @@ namespace Clusters {
 
 namespace WaterHeaterMode {
 
-constexpr uint8_t ModeOff    = 0;
-constexpr uint8_t ModeManual = 1;
-constexpr uint8_t ModeTimed  = 2;
+constexpr uint8_t kModeOff    = 0;
+constexpr uint8_t kModeManual = 1;
+constexpr uint8_t kModeTimed  = 2;
 
 /// This is an application level delegate to handle WaterHeaterMode commands according to the specific business logic.
 class ExampleWaterHeaterModeDelegate : public ModeBase::Delegate
@@ -44,11 +44,11 @@ private:
 
     const detail::Structs::ModeOptionStruct::Type kModeOptions[3] = {
         detail::Structs::ModeOptionStruct::Type{
-            .label = "Off"_span, .mode = ModeOff, .modeTags = DataModel::List<const ModeTagStructType>(modeTagsOff) },
+            .label = "Off"_span, .mode = kModeOff, .modeTags = DataModel::List<const ModeTagStructType>(modeTagsOff) },
         detail::Structs::ModeOptionStruct::Type{
-            .label = "Manual"_span, .mode = ModeManual, .modeTags = DataModel::List<const ModeTagStructType>(modeTagsManual) },
+            .label = "Manual"_span, .mode = kModeManual, .modeTags = DataModel::List<const ModeTagStructType>(modeTagsManual) },
         detail::Structs::ModeOptionStruct::Type{
-            .label = "Timed"_span, .mode = ModeTimed, .modeTags = DataModel::List<const ModeTagStructType>(modeTagsTimed) }
+            .label = "Timed"_span, .mode = kModeTimed, .modeTags = DataModel::List<const ModeTagStructType>(modeTagsTimed) }
     };
 
     CHIP_ERROR Init() override;

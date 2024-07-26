@@ -264,6 +264,7 @@ void ApplicationShutdown()
 
     Clusters::DeviceEnergyManagementMode::Shutdown();
     Clusters::EnergyEvseMode::Shutdown();
+    Clusters::WaterHeaterMode::Shutdown();
 
     Clusters::WaterHeaterManagement::WhmApplicationShutdown();
     Clusters::WaterHeaterMode::Shutdown();

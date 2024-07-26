@@ -16,7 +16,6 @@
  *    limitations under the License.
  */
 
-#include <WhmAppCmdLineOptions.h>
 #include <WhmInstance.h>
 #include <WhmManufacturer.h>
 

@@ -8608,6 +8608,8 @@ endpoint 1 {
   server cluster WaterHeaterMode {
     callback attribute supportedModes;
     callback attribute currentMode;
+    ram      attribute startUpMode;
+    ram      attribute onMode;
     callback attribute generatedCommandList;
     callback attribute acceptedCommandList;
     callback attribute eventList;

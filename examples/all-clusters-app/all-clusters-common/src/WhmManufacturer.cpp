@@ -198,7 +198,7 @@ void SetTestEventTrigger_ManualModeTestEvent()
     WaterHeaterManagementDelegate * dg = GetWhmDelegate();
 
     // Simulate the Water Heater Mode being set to MANUAL
-    dg->SetWaterHeaterMode(WaterHeaterMode::ModeManual);
+    dg->SetWaterHeaterMode(WaterHeaterMode::kModeManual);
 }
 
 void SetTestEventTrigger_OffModeTestEvent()
@@ -206,7 +206,7 @@ void SetTestEventTrigger_OffModeTestEvent()
     WaterHeaterManagementDelegate * dg = GetWhmDelegate();
 
     // Simulate the Water Heater Mode being set to OFF
-    dg->SetWaterHeaterMode(WaterHeaterMode::ModeOff);
+    dg->SetWaterHeaterMode(WaterHeaterMode::kModeOff);
 }
 
 void SetTestEventTrigger_DrawOffHotWaterTestEvent()

@@ -406,7 +406,7 @@ Status WaterHeaterManagementDelegate::CheckIfHeatNeedsToBeTurnedOnOrOff()
             }
 
             // If a boost command is in progress or in manual mode, find a heating source and "turn it on".
-            if (mBoostState == BoostStateEnum::kActive || mode == WaterHeaterMode::ModeManual)
+            if (mBoostState == BoostStateEnum::kActive || mode == WaterHeaterMode::kModeManual)
             {
                 if (mpWhmManufacturer != nullptr)
                 {
@@ -425,7 +425,7 @@ Status WaterHeaterManagementDelegate::CheckIfHeatNeedsToBeTurnedOnOrOff()
                 }
             }
         }
-        else if (mBoostState == BoostStateEnum::kInactive && mode == WaterHeaterMode::ModeOff)
+        else if (mBoostState == BoostStateEnum::kInactive && mode == WaterHeaterMode::kModeOff)
         {
             // The water temperature is not at the target temperature but there is no boost command in progress and the mode is Off
             // so need to ensure the heating is turned off.
