@@ -30824,7 +30824,7 @@ class ServiceArea(Cluster):
 
     class Structs:
         @dataclass
-        class HomeLocationStruct(ClusterObject):
+        class LocationDescriptorStruct(ClusterObject):
             @ChipUtility.classproperty
             def descriptor(cls) -> ClusterObjectDescriptor:
                 return ClusterObjectDescriptor(
@@ -30844,13 +30844,13 @@ class ServiceArea(Cluster):
             def descriptor(cls) -> ClusterObjectDescriptor:
                 return ClusterObjectDescriptor(
                     Fields=[
-                        ClusterObjectFieldDescriptor(Label="locationInfo", Tag=0, Type=typing.Union[Nullable, ServiceArea.Structs.HomeLocationStruct]),
+                        ClusterObjectFieldDescriptor(Label="locationInfo", Tag=0, Type=typing.Union[Nullable, ServiceArea.Structs.LocationDescriptorStruct]),
                         ClusterObjectFieldDescriptor(Label="landmarkTag", Tag=1, Type=typing.Union[Nullable, ServiceArea.Enums.LandmarkTag]),
                         ClusterObjectFieldDescriptor(Label="positionTag", Tag=2, Type=typing.Union[Nullable, ServiceArea.Enums.PositionTag]),
                         ClusterObjectFieldDescriptor(Label="surfaceTag", Tag=3, Type=typing.Union[Nullable, ServiceArea.Enums.FloorSurfaceTag]),
                     ])
 
-            locationInfo: 'typing.Union[Nullable, ServiceArea.Structs.HomeLocationStruct]' = NullValue
+            locationInfo: 'typing.Union[Nullable, ServiceArea.Structs.LocationDescriptorStruct]' = NullValue
             landmarkTag: 'typing.Union[Nullable, ServiceArea.Enums.LandmarkTag]' = NullValue
             positionTag: 'typing.Union[Nullable, ServiceArea.Enums.PositionTag]' = NullValue
             surfaceTag: 'typing.Union[Nullable, ServiceArea.Enums.FloorSurfaceTag]' = NullValue
@@ -46767,7 +46767,7 @@ class EcosystemInformation(Cluster):
 
     class Structs:
         @dataclass
-        class HomeLocationStruct(ClusterObject):
+        class LocationDescriptorStruct(ClusterObject):
             @ChipUtility.classproperty
             def descriptor(cls) -> ClusterObjectDescriptor:
                 return ClusterObjectDescriptor(
@@ -46788,13 +46788,13 @@ class EcosystemInformation(Cluster):
                 return ClusterObjectDescriptor(
                     Fields=[
                         ClusterObjectFieldDescriptor(Label="uniqueLocationID", Tag=0, Type=str),
-                        ClusterObjectFieldDescriptor(Label="locationDescriptor", Tag=1, Type=EcosystemInformation.Structs.HomeLocationStruct),
+                        ClusterObjectFieldDescriptor(Label="locationDescriptor", Tag=1, Type=EcosystemInformation.Structs.LocationDescriptorStruct),
                         ClusterObjectFieldDescriptor(Label="locationDescriptorLastEdit", Tag=2, Type=uint),
                         ClusterObjectFieldDescriptor(Label="fabricIndex", Tag=254, Type=uint),
                     ])
 
             uniqueLocationID: 'str' = ""
-            locationDescriptor: 'EcosystemInformation.Structs.HomeLocationStruct' = field(default_factory=lambda: EcosystemInformation.Structs.HomeLocationStruct())
+            locationDescriptor: 'EcosystemInformation.Structs.LocationDescriptorStruct' = field(default_factory=lambda: EcosystemInformation.Structs.LocationDescriptorStruct())
             locationDescriptorLastEdit: 'uint' = 0
             fabricIndex: 'uint' = 0
 
