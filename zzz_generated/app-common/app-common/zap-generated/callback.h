@@ -6072,12 +6072,6 @@ bool emberAfMessagesClusterCancelMessagesRequestCallback(
     chip::app::CommandHandler * commandObj, const chip::app::ConcreteCommandPath & commandPath,
     const chip::app::Clusters::Messages::Commands::CancelMessagesRequest::DecodableType & commandData);
 /**
- * @brief Water Heater Mode Cluster ChangeToMode Command callback (from client)
- */
-bool emberAfWaterHeaterModeClusterChangeToModeCallback(
-    chip::app::CommandHandler * commandObj, const chip::app::ConcreteCommandPath & commandPath,
-    const chip::app::Clusters::WaterHeaterMode::Commands::ChangeToMode::DecodableType & commandData);
-/**
  * @brief Door Lock Cluster LockDoor Command callback (from client)
  */
 bool emberAfDoorLockClusterLockDoorCallback(chip::app::CommandHandler * commandObj,
