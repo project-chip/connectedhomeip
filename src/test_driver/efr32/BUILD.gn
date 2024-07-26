@@ -111,8 +111,8 @@ group("efr32") {
 
 group("runner") {
   deps = [
-    "${efr32_project_dir}/py:nl_test_runner.install",
-    "${efr32_project_dir}/py:nl_test_runner_wheel",
+    "${efr32_project_dir}/py:pw_test_runner.install",
+    "${efr32_project_dir}/py:pw_test_runner_wheel",
   ]
 }
 
