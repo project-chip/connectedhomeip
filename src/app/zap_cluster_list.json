@@ -37,6 +37,7 @@
         "DISHWASHER_MODE_CLUSTER": [],
         "MICROWAVE_OVEN_MODE_CLUSTER": [],
         "DOOR_LOCK_CLUSTER": [],
+        "ECOSYSTEM_INFORMATION_CLUSTER": [],
         "ELECTRICAL_ENERGY_MEASUREMENT_CLUSTER": [],
         "ELECTRICAL_MEASUREMENT_CLUSTER": [],
         "ELECTRICAL_POWER_MEASUREMENT_CLUSTER": [],
@@ -185,6 +186,7 @@
         "DISHWASHER_MODE_CLUSTER": ["mode-base-server"],
         "MICROWAVE_OVEN_MODE_CLUSTER": ["mode-base-server"],
         "DOOR_LOCK_CLUSTER": ["door-lock-server"],
+        "ECOSYSTEM_INFORMATION_CLUSTER": [],
         "ELECTRICAL_ENERGY_MEASUREMENT_CLUSTER": [
             "electrical-energy-measurement-server"
         ],
