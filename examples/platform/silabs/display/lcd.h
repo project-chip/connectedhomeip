@@ -67,6 +67,7 @@ public:
     void WriteDemoUI(bool state);
     void SetCustomUI(customUICB cb);
 
+    void GetScreen(Screen_e & screen);
     void SetScreen(Screen_e screen);
     void CycleScreens(void);
     void SetStatus(DisplayStatus_t & status);
