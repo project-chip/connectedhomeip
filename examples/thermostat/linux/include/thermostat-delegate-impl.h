@@ -28,7 +28,7 @@ namespace Thermostat {
 /**
  * The ThermostatDelegate class serves as the instance delegate for storing Presets related information and providing it to the
  * Thermostat server code. It also manages the presets attribute and provides methods to write to presets, edit presets, maintain a
- * pending presets list and either commit the presets when requested or discard the changes. It also provide API's to get and set
+ * pending presets list and either commit the presets when requested or discard the changes. It also provides APIs to get and set
  * the attribute values.
  *
  */
@@ -36,7 +36,7 @@ namespace Thermostat {
 static constexpr uint8_t kMaxNumberOfPresetTypes = 6;
 
 // We will support only one preset of each preset type.
-static constexpr uint8_t kMaxNumberOfPresetTypesOfEachType = 1;
+static constexpr uint8_t kMaxNumberOfPresetsOfEachType = 1;
 
 class ThermostatDelegate : public Delegate
 {

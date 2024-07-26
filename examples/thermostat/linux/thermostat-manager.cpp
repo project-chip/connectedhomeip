@@ -289,7 +289,7 @@ int16_t ThermostatManager::GetCurrentTemperature()
     DataModel::Nullable<int16_t> currentTemperature;
     currentTemperature.SetNull();
     LocalTemperature::Get(kThermostatEndpoint, currentTemperature);
-    return (!currentTemperature.IsNull()) ? currentTemperature.Value() : 0;
+    return currentTemperature.ValueOr(0);
 }
 
 int16_t ThermostatManager::GetCurrentHeatingSetPoint()

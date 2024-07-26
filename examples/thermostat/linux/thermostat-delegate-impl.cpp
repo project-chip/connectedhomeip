@@ -56,7 +56,7 @@ ThermostatDelegate::ThermostatDelegate()
     InitializePresetTypes();
     InitializePresets();
 
-    memset(mActivePresetHandleData, 0, kPresetHandleSize);
+    memset(mActivePresetHandleData, 0, sizeof(mActivePresetHandleData));
     mActivePresetHandleDataSize = 0;
 }
 
@@ -83,7 +83,7 @@ void ThermostatDelegate::InitializePresetTypes()
 
 void ThermostatDelegate::InitializePresets()
 {
-    // Initilaize the presets with 2 built in presets - occupied and unoccupied.
+    // Initialize the presets with 2 built in presets - occupied and unoccupied.
     PresetScenarioEnum presetScenarioEnumArray[2] = { PresetScenarioEnum::kOccupied, PresetScenarioEnum::kUnoccupied };
     static_assert(ArraySize(presetScenarioEnumArray) <= ArraySize(mPresets));
 
@@ -136,15 +136,7 @@ CHIP_ERROR ThermostatDelegate::GetPresetAtIndex(size_t index, PresetStructWithOw
 
 CHIP_ERROR ThermostatDelegate::GetActivePresetHandle(MutableByteSpan & activePresetHandle)
 {
-    if (mActivePresetHandleDataSize > 0)
-    {
-        CopySpanToMutableSpan(ByteSpan(mActivePresetHandleData, mActivePresetHandleDataSize), activePresetHandle);
-    }
-    else
-    {
-        activePresetHandle.reduce_size(0);
-    }
-    return CHIP_NO_ERROR;
+    return CopySpanToMutableSpan(ByteSpan(mActivePresetHandleData, mActivePresetHandleDataSize), activePresetHandle);
 }
 
 CHIP_ERROR ThermostatDelegate::SetActivePresetHandle(const DataModel::Nullable<ByteSpan> & newActivePresetHandle)
@@ -152,7 +144,7 @@ CHIP_ERROR ThermostatDelegate::SetActivePresetHandle(const DataModel::Nullable<B
     if (!newActivePresetHandle.IsNull())
     {
         size_t newActivePresetHandleSize = newActivePresetHandle.Value().size();
-        if (newActivePresetHandleSize > kPresetHandleSize)
+        if (newActivePresetHandleSize > sizeof(mActivePresetHandleData))
         {
             ChipLogError(NotSpecified,
                          "Failed to set ActivePresetHandle. newActivePresetHandle size %u is larger than preset handle size %u",
@@ -166,7 +158,7 @@ CHIP_ERROR ThermostatDelegate::SetActivePresetHandle(const DataModel::Nullable<B
     }
     else
     {
-        memset(mActivePresetHandleData, 0, kPresetHandleSize);
+        memset(mActivePresetHandleData, 0, sizeof(mActivePresetHandleData));
         mActivePresetHandleDataSize = 0;
         ChipLogDetail(NotSpecified, "Clear ActivePresetHandle");
     }

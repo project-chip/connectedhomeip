@@ -92,13 +92,13 @@ Delegate * GetDelegate(EndpointId endpoint)
  */
 bool IsValidPresetEntry(const PresetStruct::Type & preset)
 {
-    // If the presetHandle is not null, the size of the handle does not exceed 16 bytes, return true.
+    // Check that the preset handle is not too long.
     if (!preset.presetHandle.IsNull() && preset.presetHandle.Value().size() > kPresetHandleSize)
     {
         return false;
     }
 
-    // Return true if the preset scenario is valid, false otherwise.
+    // Ensure we have a valid PresetScenario.
     return (preset.presetScenario != PresetScenarioEnum::kUnknownEnumValue);
 }
 
@@ -419,7 +419,7 @@ uint8_t CountUpdatedPresetsAfterApplyingPendingPresets(Delegate * delegate)
  *
  * @return true if the presetScenario is found, false otherwise.
  */
-bool FindPresetScenarioInPresetTypes(Delegate * delegate, PresetScenarioEnum presetScenario)
+bool PresetScenarioExistsInPresetTypes(Delegate * delegate, PresetScenarioEnum presetScenario)
 {
     VerifyOrReturnValue(delegate != nullptr, false);
 
@@ -786,7 +786,7 @@ CHIP_ERROR ThermostatAttrAccess::Read(const ConcreteReadAttributePath & aPath, A
         Delegate * delegate = GetDelegate(aPath.mEndpointId);
         VerifyOrReturnError(delegate != nullptr, CHIP_ERROR_INCORRECT_STATE, ChipLogError(Zcl, "Delegate is null"));
 
-        ReturnErrorOnFailure(aEncoder.Encode(gThermostatAttrAccess.GetPresetsEditable(aPath.mEndpointId)));
+        ReturnErrorOnFailure(aEncoder.Encode(GetPresetsEditable(aPath.mEndpointId)));
     }
     break;
     case ActivePresetHandle::Id: {
@@ -855,7 +855,7 @@ CHIP_ERROR ThermostatAttrAccess::Write(const ConcreteDataAttributePath & aPath, 
         VerifyOrReturnError(delegate != nullptr, CHIP_ERROR_INCORRECT_STATE, ChipLogError(Zcl, "Delegate is null"));
 
         // Presets are not editable, return INVALID_IN_STATE.
-        VerifyOrReturnError(gThermostatAttrAccess.GetPresetsEditable(endpoint), CHIP_IM_GLOBAL_STATUS(InvalidInState),
+        VerifyOrReturnError(GetPresetsEditable(endpoint), CHIP_IM_GLOBAL_STATUS(InvalidInState),
                             ChipLogError(Zcl, "Presets are not editable"));
 
         // Check if the OriginatorScopedNodeId at the endpoint is the same as the node editing the presets,
@@ -863,7 +863,7 @@ CHIP_ERROR ThermostatAttrAccess::Write(const ConcreteDataAttributePath & aPath, 
         const Access::SubjectDescriptor subjectDescriptor = aDecoder.GetSubjectDescriptor();
         ScopedNodeId scopedNodeId                         = ScopedNodeId(subjectDescriptor.subject, subjectDescriptor.fabricIndex);
 
-        if (gThermostatAttrAccess.GetOriginatorScopedNodeId(endpoint) != scopedNodeId)
+        if (GetOriginatorScopedNodeId(endpoint) != scopedNodeId)
         {
             ChipLogError(Zcl, "Another node is editing presets. Server is busy. Try again later");
             return CHIP_IM_GLOBAL_STATUS(Busy);
@@ -1273,7 +1273,7 @@ bool emberAfThermostatClusterSetActivePresetRequestCallback(
     if (err != CHIP_NO_ERROR)
     {
         ChipLogError(Zcl, "Failed to set ActivePresetHandle with error %" CHIP_ERROR_FORMAT, err.Format());
-        commandObj->AddStatus(commandPath, imcode::Failure);
+        commandObj->AddStatus(commandPath, StatusIB(err).mStatus);
         return true;
     }
 
@@ -1509,7 +1509,7 @@ bool emberAfThermostatClusterCommitPresetsSchedulesRequestCallback(
             return SendResponseAndCleanUp(delegate, endpoint, commandObj, commandPath, imcode::ConstraintError);
         }
 
-        // If the preset type for the preset scenario does not supports names and a name is specified, return CONSTRAINT_ERROR.
+        // If the preset type for the preset scenario does not supports name and a name is specified, return CONSTRAINT_ERROR.
         if (!PresetTypeSupportsNames(delegate, presetScenario) && pendingPreset.GetName().HasValue())
         {
             return SendResponseAndCleanUp(delegate, endpoint, commandObj, commandPath, imcode::ConstraintError);
@@ -1522,7 +1522,7 @@ bool emberAfThermostatClusterCommitPresetsSchedulesRequestCallback(
             pendingPreset.SetCoolingSetpoint(MakeOptional(EnforceCoolingSetpointLimits(coolingSetpointValue.Value(), endpoint)));
         }
 
-        Optional<int16_t> heatingSetpointValue = preset.GetHeatingSetpoint();
+        Optional<int16_t> heatingSetpointValue = pendingPreset.GetHeatingSetpoint();
         if (heatingSetpointValue.HasValue())
         {
             pendingPreset.SetHeatingSetpoint(MakeOptional(EnforceHeatingSetpointLimits(heatingSetpointValue.Value(), endpoint)));
