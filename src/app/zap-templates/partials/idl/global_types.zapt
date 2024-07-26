@@ -1,1 +1,26 @@
-// FIXME
+{{#zcl_enums}}
+{{#if has_no_clusters}}
+enum {{asUpperCamelCase name preserveAcronyms=true}} : enum{{multiply size 8}} {
+  {{#zcl_enum_items}}
+  k{{asUpperCamelCase label preserveAcronyms=true}} = {{value}};
+  {{/zcl_enum_items}}
+}
+
+{{/if}}
+{{/zcl_enums}}
+{{#zcl_bitmaps}}
+{{#if has_no_clusters}}
+bitmap {{asUpperCamelCase name preserveAcronyms=true}} : bitmap{{multiply size 8}} {
+  {{#zcl_bitmap_items}}
+  k{{asUpperCamelCase label preserveAcronyms=true}} = {{asHex mask}};
+  {{/zcl_bitmap_items}}
+}
+
+{{/if}}
+{{/zcl_bitmaps}}
+{{#zcl_structs}}
+{{#if has_no_clusters}}
+{{~>idl_structure_definition extraIndent=1}}
+
+{{/if}}
+{{/zcl_structs}}
