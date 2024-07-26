@@ -9,6 +9,9 @@
         "templates/app/helper.js",
         "templates/chip/helper.js"
     ],
+    "resources": {
+        "config-data": "../common/templates/config-data.yaml"
+    },
     "override": "common/override.js",
     "partials": [
         {

@@ -10,12 +10,14 @@ enum {{asUpperCamelCase name preserveAcronyms=true}} : enum{{multiply size 8}} {
 {{/zcl_enums}}
 {{#zcl_bitmaps}}
 {{#if has_no_clusters}}
+{{#unless (isInConfigList (asUpperCamelCase name preserveAcronyms=true) "NotReallyGlobalBitmaps")}}
 bitmap {{asUpperCamelCase name preserveAcronyms=true}} : bitmap{{multiply size 8}} {
   {{#zcl_bitmap_items}}
   k{{asUpperCamelCase label preserveAcronyms=true}} = {{asHex mask}};
   {{/zcl_bitmap_items}}
 }
 
+{{/unless}}
 {{/if}}
 {{/zcl_bitmaps}}
 {{#zcl_structs}}

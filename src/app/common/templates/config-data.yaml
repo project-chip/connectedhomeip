@@ -91,3 +91,11 @@ ClustersWithPreAttributeChangeFunctions:
     - Energy Preference
     - Laundry Washer Controls
     - Laundry Dryer Controls
+
+# Workaround for zap reporting these bitmaps as global bitmaps even though no
+# XML seems to define them
+NotReallyGlobalBitmaps:
+    - Bitmap8
+    - Bitmap16
+    - Bitmap32
+    - Bitmap64
