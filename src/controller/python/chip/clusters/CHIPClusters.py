@@ -11835,10 +11835,16 @@ class ChipClusters:
             },
         },
         "attributes": {
-            0x00000001: {
+            0x00000000: {
                 "attributeName": "Ssid",
-                "attributeId": 0x00000001,
+                "attributeId": 0x00000000,
                 "type": "bytes",
+                "reportable": True,
+            },
+            0x00000001: {
+                "attributeName": "PassphraseSurrogate",
+                "attributeId": 0x00000001,
+                "type": "int",
                 "reportable": True,
             },
             0x0000FFF8: {

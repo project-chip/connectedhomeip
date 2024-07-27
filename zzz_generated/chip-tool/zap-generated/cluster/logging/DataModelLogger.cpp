@@ -16771,6 +16771,11 @@ CHIP_ERROR DataModelLogger::LogAttribute(const chip::app::ConcreteDataAttributeP
             ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
             return DataModelLogger::LogValue("SSID", 1, value);
         }
+        case WiFiNetworkManagement::Attributes::PassphraseSurrogate::Id: {
+            chip::app::DataModel::Nullable<uint64_t> value;
+            ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
+            return DataModelLogger::LogValue("PassphraseSurrogate", 1, value);
+        }
         case WiFiNetworkManagement::Attributes::GeneratedCommandList::Id: {
             chip::app::DataModel::DecodableList<chip::CommandId> value;
             ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));

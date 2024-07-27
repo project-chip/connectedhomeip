@@ -5433,6 +5433,9 @@ static BOOL AttributeIsSpecifiedInWiFiNetworkManagementCluster(AttributeId aAttr
     case Attributes::Ssid::Id: {
         return YES;
     }
+    case Attributes::PassphraseSurrogate::Id: {
+        return YES;
+    }
     case Attributes::GeneratedCommandList::Id: {
         return YES;
     }

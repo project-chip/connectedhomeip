@@ -7420,6 +7420,10 @@ NSString * MTRAttributeNameForID(MTRClusterIDType clusterID, MTRAttributeIDType 
             result = @"SSID";
             break;
 
+        case MTRAttributeIDTypeClusterWiFiNetworkManagementAttributePassphraseSurrogateID:
+            result = @"PassphraseSurrogate";
+            break;
+
         case MTRAttributeIDTypeClusterWiFiNetworkManagementAttributeGeneratedCommandListID:
             result = @"GeneratedCommandList";
             break;

@@ -23731,6 +23731,8 @@ CHIP_ERROR TypeInfo::DecodableType::Decode(TLV::TLVReader & reader, const Concre
     {
     case Attributes::Ssid::TypeInfo::GetAttributeId():
         return DataModel::Decode(reader, ssid);
+    case Attributes::PassphraseSurrogate::TypeInfo::GetAttributeId():
+        return DataModel::Decode(reader, passphraseSurrogate);
     case Attributes::GeneratedCommandList::TypeInfo::GetAttributeId():
         return DataModel::Decode(reader, generatedCommandList);
     case Attributes::AcceptedCommandList::TypeInfo::GetAttributeId():

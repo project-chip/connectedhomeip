@@ -15695,6 +15695,21 @@ static id _Nullable DecodeAttributeValueForWiFiNetworkManagementCluster(Attribut
         }
         return value;
     }
+    case Attributes::PassphraseSurrogate::Id: {
+        using TypeInfo = Attributes::PassphraseSurrogate::TypeInfo;
+        TypeInfo::DecodableType cppValue;
+        *aError = DataModel::Decode(aReader, cppValue);
+        if (*aError != CHIP_NO_ERROR) {
+            return nil;
+        }
+        NSNumber * _Nullable value;
+        if (cppValue.IsNull()) {
+            value = nil;
+        } else {
+            value = [NSNumber numberWithUnsignedLongLong:cppValue.Value()];
+        }
+        return value;
+    }
     default: {
         break;
     }

@@ -14716,7 +14716,8 @@ public class ClusterIDMapping {
         }
 
         public enum Attribute {
-            Ssid(1L),
+            Ssid(0L),
+            PassphraseSurrogate(1L),
             GeneratedCommandList(65528L),
             AcceptedCommandList(65529L),
             EventList(65530L),

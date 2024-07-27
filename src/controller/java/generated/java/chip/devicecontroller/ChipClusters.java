@@ -54170,7 +54170,8 @@ public class ChipClusters {
   public static class WiFiNetworkManagementCluster extends BaseChipCluster {
     public static final long CLUSTER_ID = 1105L;
 
-    private static final long SSID_ATTRIBUTE_ID = 1L;
+    private static final long SSID_ATTRIBUTE_ID = 0L;
+    private static final long PASSPHRASE_SURROGATE_ATTRIBUTE_ID = 1L;
     private static final long GENERATED_COMMAND_LIST_ATTRIBUTE_ID = 65528L;
     private static final long ACCEPTED_COMMAND_LIST_ATTRIBUTE_ID = 65529L;
     private static final long EVENT_LIST_ATTRIBUTE_ID = 65530L;
@@ -54222,6 +54223,10 @@ public class ChipClusters {
       void onSuccess(@Nullable byte[] value);
     }
 
+    public interface PassphraseSurrogateAttributeCallback extends BaseAttributeCallback {
+      void onSuccess(@Nullable Long value);
+    }
+
     public interface GeneratedCommandListAttributeCallback extends BaseAttributeCallback {
       void onSuccess(List<Long> value);
     }
@@ -54262,6 +54267,32 @@ public class ChipClusters {
             callback.onSuccess(value);
           }
         }, SSID_ATTRIBUTE_ID, minInterval, maxInterval);
+    }
+
+    public void readPassphraseSurrogateAttribute(
+        PassphraseSurrogateAttributeCallback callback) {
+      ChipAttributePath path = ChipAttributePath.newInstance(endpointId, clusterId, PASSPHRASE_SURROGATE_ATTRIBUTE_ID);
+
+      readAttribute(new ReportCallbackImpl(callback, path) {
+          @Override
+          public void onSuccess(byte[] tlv) {
+            @Nullable Long value = ChipTLVValueDecoder.decodeAttributeValue(path, tlv);
+            callback.onSuccess(value);
+          }
+        }, PASSPHRASE_SURROGATE_ATTRIBUTE_ID, true);
+    }
+
+    public void subscribePassphraseSurrogateAttribute(
+        PassphraseSurrogateAttributeCallback callback, int minInterval, int maxInterval) {
+      ChipAttributePath path = ChipAttributePath.newInstance(endpointId, clusterId, PASSPHRASE_SURROGATE_ATTRIBUTE_ID);
+
+      subscribeAttribute(new ReportCallbackImpl(callback, path) {
+          @Override
+          public void onSuccess(byte[] tlv) {
+            @Nullable Long value = ChipTLVValueDecoder.decodeAttributeValue(path, tlv);
+            callback.onSuccess(value);
+          }
+        }, PASSPHRASE_SURROGATE_ATTRIBUTE_ID, minInterval, maxInterval);
     }
 
     public void readGeneratedCommandListAttribute(

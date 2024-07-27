@@ -17179,6 +17179,11 @@ using chip::System::Clock::Timeout;
     return [self.device readAttributeWithEndpointID:self.endpointID clusterID:@(MTRClusterIDTypeWiFiNetworkManagementID) attributeID:@(MTRAttributeIDTypeClusterWiFiNetworkManagementAttributeSSIDID) params:params];
 }
 
+- (NSDictionary<NSString *, id> * _Nullable)readAttributePassphraseSurrogateWithParams:(MTRReadParams * _Nullable)params
+{
+    return [self.device readAttributeWithEndpointID:self.endpointID clusterID:@(MTRClusterIDTypeWiFiNetworkManagementID) attributeID:@(MTRAttributeIDTypeClusterWiFiNetworkManagementAttributePassphraseSurrogateID) params:params];
+}
+
 - (NSDictionary<NSString *, id> * _Nullable)readAttributeGeneratedCommandListWithParams:(MTRReadParams * _Nullable)params
 {
     return [self.device readAttributeWithEndpointID:self.endpointID clusterID:@(MTRClusterIDTypeWiFiNetworkManagementID) attributeID:@(MTRAttributeIDTypeClusterWiFiNetworkManagementAttributeGeneratedCommandListID) params:params];

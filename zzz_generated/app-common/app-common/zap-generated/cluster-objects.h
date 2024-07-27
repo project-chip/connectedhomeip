@@ -35929,6 +35929,18 @@ struct TypeInfo
     static constexpr size_t MaxLength() { return 32; }
 };
 } // namespace Ssid
+namespace PassphraseSurrogate {
+struct TypeInfo
+{
+    using Type             = chip::app::DataModel::Nullable<uint64_t>;
+    using DecodableType    = chip::app::DataModel::Nullable<uint64_t>;
+    using DecodableArgType = const chip::app::DataModel::Nullable<uint64_t> &;
+
+    static constexpr ClusterId GetClusterId() { return Clusters::WiFiNetworkManagement::Id; }
+    static constexpr AttributeId GetAttributeId() { return Attributes::PassphraseSurrogate::Id; }
+    static constexpr bool MustUseTimedWrite() { return false; }
+};
+} // namespace PassphraseSurrogate
 namespace GeneratedCommandList {
 struct TypeInfo : public Clusters::Globals::Attributes::GeneratedCommandList::TypeInfo
 {
@@ -35975,6 +35987,7 @@ struct TypeInfo
         CHIP_ERROR Decode(TLV::TLVReader & reader, const ConcreteAttributePath & path);
 
         Attributes::Ssid::TypeInfo::DecodableType ssid;
+        Attributes::PassphraseSurrogate::TypeInfo::DecodableType passphraseSurrogate;
         Attributes::GeneratedCommandList::TypeInfo::DecodableType generatedCommandList;
         Attributes::AcceptedCommandList::TypeInfo::DecodableType acceptedCommandList;
         Attributes::EventList::TypeInfo::DecodableType eventList;

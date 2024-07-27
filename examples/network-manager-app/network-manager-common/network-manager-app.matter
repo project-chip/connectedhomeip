@@ -1179,7 +1179,8 @@ cluster GroupKeyManagement = 63 {
 cluster WiFiNetworkManagement = 1105 {
   revision 1;
 
-  readonly attribute nullable octet_string<32> ssid = 1;
+  readonly attribute nullable octet_string<32> ssid = 0;
+  readonly attribute access(read: manage) nullable int64u passphraseSurrogate = 1;
   readonly attribute command_id generatedCommandList[] = 65528;
   readonly attribute command_id acceptedCommandList[] = 65529;
   readonly attribute event_id eventList[] = 65530;
@@ -1192,7 +1193,7 @@ cluster WiFiNetworkManagement = 1105 {
   }
 
   /** Request the current WPA-Personal passphrase or PSK associated with the managed Wi-Fi network. */
-  command access(invoke: administer) NetworkPassphraseRequest(): NetworkPassphraseResponse = 0;
+  command access(invoke: manage) NetworkPassphraseRequest(): NetworkPassphraseResponse = 0;
 }
 
 /** Manages the names and credentials of Thread networks visible to the user. */
@@ -1507,7 +1508,7 @@ endpoint 1 {
   }
 
   server cluster WiFiNetworkManagement {
-    callback attribute ssid;
+    callback attribute passphraseSurrogate;
     callback attribute generatedCommandList;
     callback attribute acceptedCommandList;
     callback attribute eventList;

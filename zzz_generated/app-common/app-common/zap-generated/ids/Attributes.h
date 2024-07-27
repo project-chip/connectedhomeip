@@ -6753,8 +6753,12 @@ namespace WiFiNetworkManagement {
 namespace Attributes {
 
 namespace Ssid {
-static constexpr AttributeId Id = 0x00000001;
+static constexpr AttributeId Id = 0x00000000;
 } // namespace Ssid
+
+namespace PassphraseSurrogate {
+static constexpr AttributeId Id = 0x00000001;
+} // namespace PassphraseSurrogate
 
 namespace GeneratedCommandList {
 static constexpr AttributeId Id = Globals::Attributes::GeneratedCommandList::Id;
