@@ -33,7 +33,7 @@ from binascii import hexlify, unhexlify
 from dataclasses import asdict as dataclass_asdict
 from dataclasses import dataclass, field
 from datetime import datetime, timedelta, timezone
-from enum import Enum
+from enum import Enum, IntFlag
 from functools import partial
 from typing import Any, List, Optional, Tuple
 
@@ -1093,7 +1093,7 @@ class MatterBaseTest(base_test.BaseTestClass):
             steps = self.get_test_steps(self.current_test_info.name)
             if self.current_step_index == 0:
                 asserts.fail("Script error: mark_current_step_skipped cannot be called before step()")
-            num = steps[self.current_step_index-1].test_plan_number
+            num = steps[self.current_step_index - 1].test_plan_number
         except KeyError:
             num = self.current_step_index
 
@@ -1728,6 +1728,38 @@ def has_attribute(attribute: ClusterObjects.ClusterAttributeDescriptor) -> Endpo
         notify the test harness that the test is not applicable to this node and the test will not be run.
     """
     return partial(_has_attribute, attribute=attribute)
+
+
+def _has_feature(wildcard, endpoint, cluster: ClusterObjects.ClusterObjectDescriptor, feature: IntFlag) -> bool:
+    try:
+        feature_map = wildcard.attributes[endpoint][cluster][cluster.Attributes.FeatureMap]
+        return (feature & feature_map) != 0
+    except KeyError:
+        return False
+
+
+def has_feature(cluster: ClusterObjects.ClusterObjectDescriptor, feature: IntFlag) -> EndpointCheckFunction:
+    """ EndpointCheckFunction that can be passed as a parameter to the per_endpoint_test decorator.
+
+        Use this function with the per_endpoint_test decorator to run this test on all endpoints with
+        the specified feature. For example, given a device with the following conformance
+
+        EP0: cluster A, B, C
+        EP1: cluster D with feature F0
+        EP2, cluster D with feature F0
+        EP3, cluster D without feature F0
+
+        And the following test specification:
+        @per_endpoint_test(has_feature(Clusters.D.Bitmaps.Feature.F0))
+        test_mytest(self):
+            ...
+
+        The test would be run on endpoint 1 and on endpoint 2.
+
+        If the cluster is not found on any endpoint the decorator will call the on_skip function to
+        notify the test harness that the test is not applicable to this node and the test will not be run.
+    """
+    return partial(_has_feature, cluster=cluster, feature=feature)
 
 
 async def get_accepted_endpoints_for_test(self: MatterBaseTest, accept_function: EndpointCheckFunction) -> list[uint]:
