@@ -48,7 +48,7 @@ template("generate_rps_file") {
 
 template("silabs_executable") {
   if (!defined(invoker.output_dir)) {invoker.output_dir = root_out_dir}
-  if (!defined(invoker.output_name)) {invoker.output_name = target_name + ".bin"}  #++++ Added to support internal Pigweed tests that don't set output_name.
+  if (!defined(invoker.output_name)) {invoker.output_name = target_name + ".bin"}
   output_base_name = get_path_info(invoker.output_name, "name")
   objcopy_image_name = output_base_name + ".s37"
   objcopy_image_format = "srec"
