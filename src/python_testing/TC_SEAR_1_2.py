@@ -171,7 +171,7 @@ class TC_SEAR_1_2(MatterBaseTest):
 
         if self.current_area is NullValue:
             asserts.assert_true(estimated_end_time is NullValue,
-                             f"EstimatedEndTime should be null if CurrentArea is null.")
+                             "EstimatedEndTime should be null if CurrentArea is null.")
         else:
             #allow for some clock skew
             asserts.assert_true(estimated_end_time >= read_time - 3*60,
@@ -265,7 +265,7 @@ class TC_SEAR_1_2(MatterBaseTest):
 
             await self.read_and_validate_supported_maps(11)
             new_supported_maps = self.mapid_list
-            asserts.assert_true(len(old_supported_maps) > len(new_supported_maps), f"Failed to remove map(s)")
+            asserts.assert_true(len(old_supported_maps) > len(new_supported_maps), "Failed to remove map(s)")
 
             #NOTE the following operations are all part of step 11 - read all these attributes and check the data consistency
             #     after removing map(s)
@@ -298,7 +298,7 @@ class TC_SEAR_1_2(MatterBaseTest):
 
             await self.read_and_validate_supported_maps(15)
             new_supported_maps = self.mapid_list
-            asserts.assert_true(len(old_supported_maps) < len(new_supported_maps), f"Failed to add map(s)")
+            asserts.assert_true(len(old_supported_maps) < len(new_supported_maps), "Failed to add map(s)")
 
             #NOTE the following operations are all part of step 15 - read all these attributes and check the data consistency
             #     after adding map(s)
@@ -331,7 +331,7 @@ class TC_SEAR_1_2(MatterBaseTest):
 
             await self.read_and_validate_supported_areas(19)
             new_supported_areas = self.areaid_list
-            asserts.assert_true(len(old_supported_areas) > len(new_supported_areas), f"Failed to remove area(s)")
+            asserts.assert_true(len(old_supported_areas) > len(new_supported_areas), "Failed to remove area(s)")
 
             #NOTE the following operations are all part of step 19 - read all these attributes and check the data consistency
             #     after removing areas(s)
@@ -363,7 +363,7 @@ class TC_SEAR_1_2(MatterBaseTest):
 
             await self.read_and_validate_supported_areas(23)
             new_supported_areas = self.areaid_list
-            asserts.assert_true(len(old_supported_areas) < len(new_supported_areas), f"Failed to add area(s)")
+            asserts.assert_true(len(old_supported_areas) < len(new_supported_areas), "Failed to add area(s)")
 
             #NOTE the following operations are all part of step 23 - read all these attributes and check the data consistency
             #     after removing areas(s)

@@ -29,10 +29,8 @@
 # === END CI TEST ARGUMENTS ===
 
 import logging
-from time import sleep
 
 import chip.clusters as Clusters
-from chip.clusters.Types import NullValue
 from matter_testing_support import MatterBaseTest, async_test_body, default_matter_test_main
 from mobly import asserts
 
@@ -76,7 +74,7 @@ class TC_SEAR_1_4(MatterBaseTest):
             cmd_list = await self.read_sear_attribute_expect_success(
             endpoint=self.endpoint, attribute=Clusters.ServiceArea.Attributes.AcceptedCommandList)
             logging.info("AcceptedCommandList: %s" % (cmd_list))
-            asserts.assert_true(Clusters.ServiceArea.Commands.SkipArea not in cmd_list, f"SkipArea command should not be implemented if both CurrentArea and Progress are not")
+            asserts.assert_true(Clusters.ServiceArea.Commands.SkipArea not in cmd_list, "SkipArea command should not be implemented if both CurrentArea and Progress are not")
 
 
 if __name__ == "__main__":

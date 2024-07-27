@@ -115,10 +115,10 @@ class TC_SEAR_1_6(MatterBaseTest):
             self.wait_for_user_input(prompt_msg=f"{test_step}, and press Enter when done.\n")
 
         supported_area_ids = await self.read_supported_areas(3)
-        asserts.assert_true(len(supported_area_ids) > 0, f"SupportedAreas is empty")
+        asserts.assert_true(len(supported_area_ids) > 0, "SupportedAreas is empty")
 
         selected_areas = await self.read_selected_areas(4)
-        asserts.assert_true(len(selected_areas) > 0, f"SelectedAreas is empty")
+        asserts.assert_true(len(selected_areas) > 0, "SelectedAreas is empty")
 
         test_step = "Manually intervene to put the device in the operating state"
         self.print_step("5", test_step)
@@ -133,7 +133,7 @@ class TC_SEAR_1_6(MatterBaseTest):
             asserts.assert_true(p.status in (Clusters.ServiceArea.OperationalStatusEnum.kPending,
                                              Clusters.ServiceArea.OperationalStatusEnum.kOperating), 
                                              f"Progress entry with unexpected Status({p.status})")
-            asserts.assert_true(p.TotalOperationalTime is NullValue, f"Progress entry with non-null TotalOperationalTime")
+            asserts.assert_true(p.TotalOperationalTime is NullValue, "Progress entry with non-null TotalOperationalTime")
 
         test_step = "While all entries in Progress show the Pending or Operating status (i.e. \
                     before any area is skipped or completed), manually intervene to put the device \
