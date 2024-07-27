@@ -85,6 +85,8 @@ source_set("app-main") {
     ":energy-evse-test-event-trigger",
     ":energy-reporting-test-event-trigger",
     ":smco-test-event-trigger",
+    "${chip_root}/src/controller:controller",
+    "${chip_root}/src/controller:gen_check_chip_controller_headers",
     "${chip_root}/src/lib",
     "${chip_root}/src/platform/logging:stdio",
   ]
@@ -142,7 +144,11 @@ source_set("commissioner-main") {
     defines += [ "ENABLE_CHIP_SHELL" ]
   }
 
-  public_deps = [ "${chip_root}/src/lib" ]
+  public_deps = [
+    "${chip_root}/src/controller:controller",
+    "${chip_root}/src/controller:gen_check_chip_controller_headers",
+    "${chip_root}/src/lib",
+  ]
   deps = [ "${chip_root}/src/app/server" ]
 
   if (chip_enable_transport_trace) {

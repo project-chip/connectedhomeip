@@ -65,13 +65,15 @@ target_sources(${APP_TARGET}
         ${ALL_CLUSTERS_COMMON}/src/resource-monitoring-delegates.cpp
         ${ALL_CLUSTERS_COMMON}/src/static-supported-modes-manager.cpp
         ${ALL_CLUSTERS_COMMON}/src/binding-handler.cpp
-        ${ENERGY_MANAGEMENT_COMMON}/src/EnergyTimeUtils.cpp
+        ${ENERGY_MANAGEMENT_COMMON}/src/ChargingTargetsMemMgr.cpp
         ${ENERGY_MANAGEMENT_COMMON}/src/DeviceEnergyManagementDelegateImpl.cpp
         ${ENERGY_MANAGEMENT_COMMON}/src/DeviceEnergyManagementManager.cpp
         ${ENERGY_MANAGEMENT_COMMON}/src/EVSEManufacturerImpl.cpp
         ${ENERGY_MANAGEMENT_COMMON}/src/ElectricalPowerMeasurementDelegate.cpp
         ${ENERGY_MANAGEMENT_COMMON}/src/EnergyEvseDelegateImpl.cpp
         ${ENERGY_MANAGEMENT_COMMON}/src/EnergyEvseManager.cpp
+        ${ENERGY_MANAGEMENT_COMMON}/src/EnergyEvseTargetsStore.cpp
+        ${ENERGY_MANAGEMENT_COMMON}/src/EnergyTimeUtils.cpp
 )
 
 target_link_libraries(${APP_TARGET}
