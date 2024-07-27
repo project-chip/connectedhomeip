@@ -860,7 +860,7 @@ CHIP_ERROR ThermostatAttrAccess::Write(const ConcreteDataAttributePath & aPath, 
         // Check if the OriginatorScopedNodeId at the endpoint is the same as the node editing the presets,
         // otherwise return BUSY.
         const Access::SubjectDescriptor subjectDescriptor = aDecoder.GetSubjectDescriptor();
-        ScopedNodeId scopedNodeId = ScopedNodeId();
+        ScopedNodeId scopedNodeId                         = ScopedNodeId();
 
         // Get the node id if the authentication mode is CASE.
         if (subjectDescriptor.authMode == Access::AuthMode::kCase)
@@ -946,8 +946,9 @@ void emberAfThermostatClusterServerInitCallback(chip::EndpointId endpoint)
     // or should this just be the responsibility of the thermostat application?
 }
 
-Protocols::InteractionModel::Status MatterThermostatClusterServerPreAttributeChangedCallback(const app::ConcreteAttributePath & attributePath,
-                                                                EmberAfAttributeType attributeType, uint16_t size, uint8_t * value)
+Protocols::InteractionModel::Status
+MatterThermostatClusterServerPreAttributeChangedCallback(const app::ConcreteAttributePath & attributePath,
+                                                         EmberAfAttributeType attributeType, uint16_t size, uint8_t * value)
 {
     EndpointId endpoint = attributePath.mEndpointId;
     int16_t requested;

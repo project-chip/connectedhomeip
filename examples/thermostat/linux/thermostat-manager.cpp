@@ -77,7 +77,8 @@ void OnAttributeChangeReported<MeasuredValue::TypeInfo::DecodableType>(const Con
     ClusterId clusterId = path.mClusterId;
     if (clusterId != TemperatureMeasurement::Id)
     {
-        ChipLogError(AppServer, "Attribute change reported for TemperatureMeasurement cluster on incorrect cluster id " ChipLogFormatMEI,
+        ChipLogError(AppServer,
+                     "Attribute change reported for TemperatureMeasurement cluster on incorrect cluster id " ChipLogFormatMEI,
                      ChipLogValueMEI(clusterId));
         return;
     }
@@ -85,7 +86,8 @@ void OnAttributeChangeReported<MeasuredValue::TypeInfo::DecodableType>(const Con
     AttributeId attributeId = path.mAttributeId;
     if (attributeId != MeasuredValue::Id)
     {
-        ChipLogError(AppServer, "Attribute change reported for TemperatureMeasurement cluster for incorrect attribute" ChipLogFormatMEI,
+        ChipLogError(AppServer,
+                     "Attribute change reported for TemperatureMeasurement cluster for incorrect attribute" ChipLogFormatMEI,
                      ChipLogValueMEI(attributeId));
         return;
     }
@@ -99,7 +101,9 @@ void OnAttributeChangeReported<MeasuredValue::TypeInfo::DecodableType>(const Con
 
 static void OnError(const ConcreteDataAttributePath * path, ChipError err)
 {
-    ChipLogError(AppServer, "Subscribing to cluster Id " ChipLogFormatMEI " and attribute Id " ChipLogFormatMEI " failed with error %" CHIP_ERROR_FORMAT,
+    ChipLogError(AppServer,
+                 "Subscribing to cluster Id " ChipLogFormatMEI " and attribute Id " ChipLogFormatMEI
+                 " failed with error %" CHIP_ERROR_FORMAT,
                  ChipLogValueMEI(path->mClusterId), ChipLogValueMEI(path->mAttributeId), err.Format());
 }
 
@@ -493,7 +497,8 @@ void MatterPostAttributeChangeCallback(const ConcreteAttributePath & attributePa
     ChipLogProgress(AppServer, "Cluster callback: " ChipLogFormatMEI, ChipLogValueMEI(clusterId));
 
     ChipLogProgress(AppServer,
-                    "Attribute ID changed: " ChipLogFormatMEI " Endpoint: %d ClusterId: " ChipLogFormatMEI " Type: %u Value: %u, length %u",
+                    "Attribute ID changed: " ChipLogFormatMEI " Endpoint: %d ClusterId: " ChipLogFormatMEI
+                    " Type: %u Value: %u, length %u",
                     ChipLogValueMEI(attributeId), attributePath.mEndpointId, ChipLogValueMEI(clusterId), type, *value, size);
 
     ThermostatMgr().AttributeChangeHandler(attributePath.mEndpointId, clusterId, attributeId, value, size);
