@@ -41,7 +41,6 @@ from chip.tlv import uint
 from matter_testing_support import (AttributeValue, ClusterAttributeChangeAccumulator, EventChangeCallback, MatterBaseTest,
                                     TestStep, default_matter_test_main, has_feature, per_endpoint_test)
 from mobly import asserts
-import test_plan_support
 
 logger = logging.getLogger(__name__)
 
