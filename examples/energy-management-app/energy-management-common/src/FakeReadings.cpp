@@ -98,7 +98,7 @@ void FakeReadings::StartFakeReadings(EndpointId aEndpointId, int64_t aPower_mW, 
         // This is statistically more likely when the test runs for a long time
         // or if the seed is not set
         srand(1);
-        
+
         mTotalEnergyImported = 0;
         mTotalEnergyExported = 0;
     }
