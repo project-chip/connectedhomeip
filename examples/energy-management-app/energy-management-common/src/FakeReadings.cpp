@@ -93,6 +93,12 @@ void FakeReadings::StartFakeReadings(EndpointId aEndpointId, int64_t aPower_mW, 
 
     if (bReset)
     {
+        // Use a fixed random seed to try to avoid random CI test failures
+        // which are caused when the test is checking for 2 different numbers.
+        // This is statistically more likely when the test runs for a long time
+        // or if the seed is not set
+        srand(1);
+        
         mTotalEnergyImported = 0;
         mTotalEnergyExported = 0;
     }
