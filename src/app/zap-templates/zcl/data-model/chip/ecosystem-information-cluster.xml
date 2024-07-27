@@ -30,7 +30,7 @@ limitations under the License.
   <struct name="EcosystemLocationStruct" isFabricScoped="true" apiMaturity="provisional">
     <cluster code="0x0750"/>
     <item fieldId="0" name="UniqueLocationID" type="char_string" isFabricSensitive="true" length="64"/>
-    <item fieldId="1" name="LocationDescriptor" type="HomeLocationStruct" isFabricSensitive="true"/>
+    <item fieldId="1" name="LocationDescriptor" type="LocationDescriptorStruct" isFabricSensitive="true"/>
     <item fieldId="2" name="LocationDescriptorLastEdit" type="epoch_us" isFabricSensitive="true" default="0"/>
   </struct>
 
