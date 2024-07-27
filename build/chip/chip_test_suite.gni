@@ -146,33 +146,6 @@ template("chip_test_suite") {
     tests += [ _test_name ]
   }
 
-  if (defined(invoker.tests)) {
-    foreach(_test, invoker.tests) {
-      _test_output_dir = "${root_out_dir}/tests"
-      if (defined(invoker.output_dir)) {
-        _test_output_dir = invoker.output_dir
-      }
-
-      pw_test(_test) {
-        forward_variables_from(invoker,
-                                [
-                                  "deps",
-                                  "public_deps",
-                                  "cflags",
-                                  "configs",
-                                ])
-        public_deps += [ ":${_suite_name}.lib" ]
-        test_main = ""
-        sources = [
-          "${_test}.cpp",
-          "${_test}Driver.cpp",
-        ]
-        output_dir = _test_output_dir
-      }
-      tests += [ _test ]
-    }
-  }
-
   group(_suite_name) {
     deps = []
     foreach(_test, tests) {
