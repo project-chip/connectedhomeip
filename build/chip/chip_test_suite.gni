@@ -146,10 +146,59 @@ template("chip_test_suite") {
     tests += [ _test_name ]
   }
 
+  # Deprecated usage (user-defined driver)
+  if (defined(invoker.tests)) {
+    foreach(_test, invoker.tests) {
+      _test_output_dir = "${root_out_dir}/tests"
+      if (defined(invoker.output_dir)) {
+        _test_output_dir = invoker.output_dir
+      }
+
+      pw_test(_test) {
+        # Forward certain varibles from the invoker.
+        forward_variables_from(invoker,
+                                [
+                                  "deps",
+                                  "public_deps",
+                                  "cflags",
+                                  "configs",
+                                ])
+
+        # Link to the common library for this test suite.
+        if (chip_link_tests) {
+          public_deps += [ ":${_suite_name}.lib" ]
+        }
+
+        # Set variables that the platform executable may need.
+        if (test_executable_output_name != "") {
+          output_name = test_executable_output_name + _test_name + test_executable_output_name_suffix
+        }
+        ldflags = test_executable_ldflags
+
+        # Add the individual test source file (e.g. "TestSomething.cpp") and its driver.
+        sources = [
+          "${_test}.cpp",
+          "${_test}Driver.cpp",
+        ]
+
+        test_main = ""
+        output_dir = _test_output_dir
+      }
+      tests += [ _test ]
+    }
+  }
+
   group(_suite_name) {
     deps = []
+
+    # Add each individual unit test.
     foreach(_test, tests) {
       deps += [ ":${_test}" ]
+    }
+
+    # Add the common library if none of the above tests did.
+    if (!chip_link_tests) {
+      deps += [ ":${_suite_name}.lib" ]
     }
   }
 
