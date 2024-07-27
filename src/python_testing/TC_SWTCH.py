@@ -102,6 +102,7 @@ class TC_SwitchTests(MatterBaseTest):
                 2. Operate switch (keep pressed for long time, e.g. 5 seconds) on the DUT immediately after the previous step
                 3. Release switch from the DUT
                 """
+            self.wait_for_user_input(msg)
         else:
             # This is just a simulator, ignore the long press instruction for now, it doesn't matter for the CI. It does for cert.
             self._send_multi_press_named_pipe_command(endpoint_id, 2, pressed_position, feature_map, multi_press_max)
