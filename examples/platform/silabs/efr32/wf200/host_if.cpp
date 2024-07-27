@@ -42,6 +42,7 @@
 
 #include "dhcp_client.h"
 #include "ethernetif.h"
+#include <lib/support/CHIPMemString.h>
 #include <lib/support/logging/CHIPLogging.h>
 #include <platform/CHIPDeviceLayer.h>
 
@@ -245,7 +246,7 @@ sl_status_t sl_wfx_host_process_event(sl_wfx_generic_message_t * event_payload)
     case SL_WFX_EXCEPTION_IND_ID: {
         sl_wfx_exception_ind_t * firmware_exception = (sl_wfx_exception_ind_t *) event_payload;
         ChipLogError(DeviceLayer, "event: SL_WFX_EXCEPTION_IND_ID");
-        ChipLogError(DeviceLayer, "firmware_exception->header.length: %lu", firmware_exception->header.length);
+        ChipLogError(DeviceLayer, "firmware_exception->header.length: %d", firmware_exception->header.length);
         // create a bytespan header.length with exception payload
         ByteSpan exception_byte_span = ByteSpan((uint8_t *) firmware_exception, firmware_exception->header.length);
         ChipLogByteSpan(DeviceLayer, exception_byte_span);
@@ -255,7 +256,7 @@ sl_status_t sl_wfx_host_process_event(sl_wfx_generic_message_t * event_payload)
         sl_wfx_error_ind_t * firmware_error = (sl_wfx_error_ind_t *) event_payload;
         ChipLogError(DeviceLayer, "event: SL_WFX_ERROR_IND_ID");
         ChipLogError(DeviceLayer, "firmware_error->type: %lu", firmware_error->body.type);
-        ChipLogError(DeviceLayer, "firmware_error->header.length: %lu", firmware_error->header.length);
+        ChipLogError(DeviceLayer, "firmware_error->header.length: %d", firmware_error->header.length);
         // create a bytespan header.length with error payload
         ByteSpan error_byte_span = ByteSpan((uint8_t *) firmware_error, firmware_error->header.length);
         ChipLogByteSpan(DeviceLayer, error_byte_span);
@@ -496,7 +497,7 @@ static void sl_wfx_ap_client_disconnected_callback(uint32_t status, uint8_t * ma
 static void sl_wfx_generic_status_callback(sl_wfx_generic_ind_t * frame)
 {
     (void) (frame);
-    ChipDetailLog(DeviceLayer, "Generic status received");
+    ChipLogDetail(DeviceLayer, "Generic status received");
 }
 
 /***************************************************************************
@@ -530,7 +531,7 @@ static void wfx_events_task(void * p_arg)
             {
                 retryInProgress = true;
                 wfx_retry_interval_handler(is_wifi_disconnection_event, retryJoin);
-                ChipLogProgess(DeviceLayer, "sending the connect command");
+                ChipLogProgress(DeviceLayer, "sending the connect command");
                 wfx_connect_to_ap();
             }
         }
@@ -768,7 +769,7 @@ int32_t wfx_get_ap_info(wfx_wifi_scan_result_t * ap)
 
     if (status == SL_STATUS_OK)
     {
-        ChipLogDetail(DeviceLayer, "status SL_STATUS_OK & signal_strength:: %d", signal_strength);
+        ChipLogDetail(DeviceLayer, "status SL_STATUS_OK & signal_strength: %ld", signal_strength);
         ap->rssi = (signal_strength - 220) / 2;
     }
     return status;
@@ -1197,14 +1198,14 @@ void wfx_enable_sta_mode(void)
 bool wfx_start_scan(char * ssid, void (*callback)(wfx_wifi_scan_result_t *))
 {
     VerifyOrReturnError(scan_cb != NULL, false);
-    uint8_t sz = 0;
-    scan_cb    = callback;
+    size_t sz = 0;
+    scan_cb   = callback;
     if (ssid)
     {
         sz        = strnlen(ssid, WFX_MAX_SSID_LENGTH);
-        scan_ssid = (char *) pvPortMalloc(sz + 1);
+        scan_ssid = dynamic_cast<char *>(pvPortMalloc(sz + 1));
         VerifyOrReturnError(scan_ssid != NULL, false);
-        strncpy(scan_ssid, ssid, sizeof(scan_ssid));
+        strncpy(scan_ssid, ssid, sz);
     }
     xEventGroupSetBits(sl_wfx_event_group, SL_WFX_SCAN_START);
     return true;
