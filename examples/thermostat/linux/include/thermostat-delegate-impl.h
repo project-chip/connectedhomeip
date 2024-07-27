@@ -35,6 +35,7 @@ namespace Thermostat {
 
 static constexpr uint8_t kMaxNumberOfPresetTypes = 6;
 
+// TODO: #34556 Support multiple presets of each type.
 // We will support only one preset of each preset type.
 static constexpr uint8_t kMaxNumberOfPresetsOfEachType = 1;
 
@@ -83,8 +84,8 @@ private:
     uint8_t mNumberOfPresets;
 
     Structs::PresetTypeStruct::Type mPresetTypes[kMaxNumberOfPresetTypes];
-    PresetStructWithOwnedMembers mPresets[kMaxNumberOfPresetTypes * kMaxNumberOfPresetTypesOfEachType];
-    PresetStructWithOwnedMembers mPendingPresets[kMaxNumberOfPresetTypes * kMaxNumberOfPresetTypesOfEachType];
+    PresetStructWithOwnedMembers mPresets[kMaxNumberOfPresetTypes * kMaxNumberOfPresetsOfEachType];
+    PresetStructWithOwnedMembers mPendingPresets[kMaxNumberOfPresetTypes * kMaxNumberOfPresetsOfEachType];
 
     uint8_t mNextFreeIndexInPendingPresetsList;
     uint8_t mNextFreeIndexInPresetsList;

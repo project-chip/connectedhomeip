@@ -42,6 +42,7 @@ using namespace chip::app::Clusters::Thermostat::Structs;
 using namespace chip::app::Clusters::Thermostat::Attributes;
 using namespace chip::app::Clusters::TemperatureMeasurement;
 using namespace chip::app::Clusters::TemperatureMeasurement::Attributes;
+using namespace Protocols::InteractionModel;
 
 using namespace chip::DeviceLayer;
 
@@ -60,6 +61,12 @@ ThermostatManager ThermostatManager::sThermostatMgr;
 
 namespace {
 
+CHIP_ERROR ChipErrorFromStatusCode(Status status)
+{
+    StatusIB statusIB(status);
+    return statusIB.ToChipError();
+}
+
 template <typename DecodableAttributeType>
 static void OnAttributeChangeReported(const ConcreteDataAttributePath & path, const DecodableAttributeType & value);
 
@@ -70,30 +77,30 @@ void OnAttributeChangeReported<MeasuredValue::TypeInfo::DecodableType>(const Con
     ClusterId clusterId = path.mClusterId;
     if (clusterId != TemperatureMeasurement::Id)
     {
-        ChipLogError(AppServer, "Attribute change reported for TemperatureMeasurement cluster on incorrect cluster id %u",
-                     clusterId);
+        ChipLogError(AppServer, "Attribute change reported for TemperatureMeasurement cluster on incorrect cluster id " ChipLogFormatMEI,
+                     ChipLogValueMEI(clusterId));
         return;
     }
 
     AttributeId attributeId = path.mAttributeId;
     if (attributeId != MeasuredValue::Id)
     {
-        ChipLogError(AppServer, "Attribute change reported for TemperatureMeasurement cluster for incorrect attribute %u",
-                     attributeId);
+        ChipLogError(AppServer, "Attribute change reported for TemperatureMeasurement cluster for incorrect attribute" ChipLogFormatMEI,
+                     ChipLogValueMEI(attributeId));
         return;
     }
 
     if (!value.IsNull())
     {
         ChipLogDetail(AppServer, "Attribute change reported for TemperatureMeasurement cluster - MeasuredValue is %d",
-                      static_cast<short>(value.Value()));
+                      value.Value());
     }
 }
 
 static void OnError(const ConcreteDataAttributePath * path, ChipError err)
 {
-    ChipLogError(AppServer, "Subscribing to cluster Id %u and attribute Id %u failed with error %" CHIP_ERROR_FORMAT,
-                 path->mClusterId, path->mAttributeId, err.Format());
+    ChipLogError(AppServer, "Subscribing to cluster Id " ChipLogFormatMEI " and attribute Id " ChipLogFormatMEI " failed with error %" CHIP_ERROR_FORMAT,
+                 ChipLogValueMEI(path->mClusterId), ChipLogValueMEI(path->mAttributeId), err.Format());
 }
 
 static void OnSubscriptionEstablished(const ReadClient & client, unsigned int value)
@@ -111,7 +118,7 @@ void SubscribeToAttribute(ClusterId clusterId, AttributeId attributeId, const Em
     SubscribeAttribute<DecodableAttributeType>(
         peer_device->GetExchangeManager(), peer_device->GetSecureSession().Value(), binding.remote, clusterId, attributeId,
         &OnAttributeChangeReported<DecodableAttributeType>, &OnError, 0, kMaxIntervalCeilingSeconds, &OnSubscriptionEstablished,
-        nullptr, true /* fabricFiltered */, true /* keepExistingSubscription */);
+        nullptr, true /* fabricFiltered */, false /* keepExistingSubscription */);
 }
 
 static void ThermostatBoundDeviceChangedHandler(const EmberBindingTableEntry & binding, OperationalDeviceProxy * peer_device,
@@ -183,7 +190,7 @@ CHIP_ERROR ThermostatManager::Init()
                  "mSystemMode: %u (%s) \n mRunningMode: %u (%s) \n mLocalTemperature: %d \n mOccupiedHeatingSetpoint: %d \n "
                  "mOccupiedCoolingSetpoint: %d"
                  "NumberOfPresets: %d",
-                 static_cast<uint8_t>(mSystemMode), SystemModeString(mSystemMode), static_cast<uint8_t>(mRunningMode),
+                 to_underlying(mSystemMode), SystemModeString(mSystemMode), to_underlying(mRunningMode),
                  RunningModeString(mRunningMode), mLocalTemperature, mOccupiedHeatingSetpoint, mOccupiedCoolingSetpoint,
                  GetNumberOfPresets());
 
@@ -229,21 +236,21 @@ void ThermostatManager::ThermostatClusterAttributeChangeHandler(AttributeId attr
     switch (attributeId)
     {
     case LocalTemperature::Id: {
-        mLocalTemperature = static_cast<int16_t>(Encoding::LittleEndian::Get16(value));
+        memcpy(&mLocalTemperature, value, size);
         ChipLogError(AppServer, "Local temperature changed to %d", mLocalTemperature);
         EvalThermostatState();
     }
     break;
 
     case OccupiedCoolingSetpoint::Id: {
-        mOccupiedCoolingSetpoint = static_cast<int16_t>(Encoding::LittleEndian::Get16(value));
+        memcpy(&mOccupiedCoolingSetpoint, value, size);
         ChipLogError(AppServer, "Cooling temperature changed to %d", mOccupiedCoolingSetpoint);
         EvalThermostatState();
     }
     break;
 
     case OccupiedHeatingSetpoint::Id: {
-        mOccupiedHeatingSetpoint = static_cast<int16_t>(Encoding::LittleEndian::Get16(value));
+        memcpy(&mOccupiedHeatingSetpoint, value, size);
         ChipLogError(AppServer, "Heating temperature changed to %d", mOccupiedHeatingSetpoint);
         EvalThermostatState();
     }
@@ -313,7 +320,7 @@ uint8_t ThermostatManager::GetNumberOfPresets()
 
 CHIP_ERROR ThermostatManager::SetSystemMode(SystemModeEnum systemMode)
 {
-    uint8_t systemModeValue = static_cast<uint8_t>(systemMode);
+    uint8_t systemModeValue = to_underlying(systemMode);
     if (mSystemMode == systemMode)
     {
         ChipLogDetail(AppServer, "Already in system mode: %u (%s)", systemModeValue, SystemModeString(systemMode));
@@ -321,15 +328,12 @@ CHIP_ERROR ThermostatManager::SetSystemMode(SystemModeEnum systemMode)
     }
 
     ChipLogError(AppServer, "Setting system mode: %u (%s)", systemModeValue, SystemModeString(systemMode));
-    Protocols::InteractionModel::Status status = SystemMode::Set(kThermostatEndpoint, systemMode);
-
-    // TODO: CHIP_ERROR_WRITE_FAILED might not be the best error code to send
-    return (status == Protocols::InteractionModel::Status::Success) ? CHIP_NO_ERROR : CHIP_ERROR_WRITE_FAILED;
+    return ChipErrorFromStatusCode(SystemMode::Set(kThermostatEndpoint, systemMode));
 }
 
 CHIP_ERROR ThermostatManager::SetRunningMode(ThermostatRunningModeEnum runningMode)
 {
-    uint8_t runningModeValue = static_cast<uint8_t>(runningMode);
+    uint8_t runningModeValue = to_underlying(runningMode);
     if (mRunningMode == runningMode)
     {
         ChipLogDetail(AppServer, "Already in running mode: %u (%s)", runningModeValue, RunningModeString(runningMode));
@@ -337,28 +341,22 @@ CHIP_ERROR ThermostatManager::SetRunningMode(ThermostatRunningModeEnum runningMo
     }
 
     ChipLogError(AppServer, "Setting running mode: %u (%s)", runningModeValue, RunningModeString(runningMode));
-    Protocols::InteractionModel::Status status = ThermostatRunningMode::Set(kThermostatEndpoint, runningMode);
-
-    // TODO: CHIP_ERROR_WRITE_FAILED might not be the best error code to send
-    return (status == Protocols::InteractionModel::Status::Success) ? CHIP_NO_ERROR : CHIP_ERROR_WRITE_FAILED;
+    return ChipErrorFromStatusCode(ThermostatRunningMode::Set(kThermostatEndpoint, runningMode));
 }
 
 CHIP_ERROR ThermostatManager::SetCurrentTemperature(int16_t temperature)
 {
-    Protocols::InteractionModel::Status status = LocalTemperature::Set(kThermostatEndpoint, temperature);
-    return (status == Protocols::InteractionModel::Status::Success) ? CHIP_NO_ERROR : CHIP_ERROR_WRITE_FAILED;
+    return ChipErrorFromStatusCode(LocalTemperature::Set(kThermostatEndpoint, temperature));
 }
 
 CHIP_ERROR ThermostatManager::SetCurrentHeatingSetPoint(int16_t heatingSetpoint)
 {
-    Protocols::InteractionModel::Status status = OccupiedHeatingSetpoint::Set(kThermostatEndpoint, heatingSetpoint);
-    return (status == Protocols::InteractionModel::Status::Success) ? CHIP_NO_ERROR : CHIP_ERROR_WRITE_FAILED;
+    return ChipErrorFromStatusCode(OccupiedHeatingSetpoint::Set(kThermostatEndpoint, heatingSetpoint));
 }
 
 CHIP_ERROR ThermostatManager::SetCurrentCoolingSetPoint(int16_t coolingSetpoint)
 {
-    Protocols::InteractionModel::Status status = OccupiedCoolingSetpoint::Set(kThermostatEndpoint, coolingSetpoint);
-    return (status == Protocols::InteractionModel::Status::Success) ? CHIP_NO_ERROR : CHIP_ERROR_WRITE_FAILED;
+    return ChipErrorFromStatusCode(OccupiedCoolingSetpoint::Set(kThermostatEndpoint, coolingSetpoint));
 }
 
 void ThermostatManager::EvalThermostatState()
@@ -367,7 +365,7 @@ void ThermostatManager::EvalThermostatState()
                  "Eval Thermostat Running Mode \n "
                  "mSystemMode: %u (%s) \n mRunningMode: %u (%s) \n mLocalTemperature: %d \n mOccupiedHeatingSetpoint: %d \n "
                  "mOccupiedCoolingSetpoint: %d",
-                 static_cast<uint8_t>(mSystemMode), SystemModeString(mSystemMode), static_cast<uint8_t>(mRunningMode),
+                 to_underlying(mSystemMode), SystemModeString(mSystemMode), to_underlying(mRunningMode),
                  RunningModeString(mRunningMode), mLocalTemperature, mOccupiedHeatingSetpoint, mOccupiedCoolingSetpoint);
 
     switch (mSystemMode)
@@ -495,8 +493,8 @@ void MatterPostAttributeChangeCallback(const ConcreteAttributePath & attributePa
     ChipLogProgress(AppServer, "Cluster callback: " ChipLogFormatMEI, ChipLogValueMEI(clusterId));
 
     ChipLogProgress(AppServer,
-                    "Attribute ID changed: " ChipLogFormatMEI " Endpoint: %d ClusterId: %d Type: %u Value: %u, length %u",
-                    ChipLogValueMEI(attributeId), attributePath.mEndpointId, clusterId, type, *value, size);
+                    "Attribute ID changed: " ChipLogFormatMEI " Endpoint: %d ClusterId: " ChipLogFormatMEI " Type: %u Value: %u, length %u",
+                    ChipLogValueMEI(attributeId), attributePath.mEndpointId, ChipLogValueMEI(clusterId), type, *value, size);
 
     ThermostatMgr().AttributeChangeHandler(attributePath.mEndpointId, clusterId, attributeId, value, size);
 }

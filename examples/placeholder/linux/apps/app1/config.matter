@@ -4798,7 +4798,7 @@ cluster Thermostat = 513 {
     kWake = 4;
     kVacation = 5;
     kGoingToSleep = 6;
-    kUserDefined = 7;
+    kUserDefined = 254;
   }
 
   enum SetpointChangeSourceEnum : enum8 {
@@ -5148,7 +5148,7 @@ cluster Thermostat = 513 {
     kWake = 4;
     kVacation = 5;
     kGoingToSleep = 6;
-    kUserDefined = 7;
+    kUserDefined = 254;
   }
 
   enum SetpointChangeSourceEnum : enum8 {

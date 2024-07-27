@@ -3936,12 +3936,12 @@ enum class PresetScenarioEnum : uint8_t
     kWake         = 0x04,
     kVacation     = 0x05,
     kGoingToSleep = 0x06,
-    kUserDefined  = 0x07,
+    kUserDefined  = 0xFE,
     // All received enum values that are not listed above will be mapped
     // to kUnknownEnumValue. This is a helper enum value that should only
     // be used by code to process how it handles receiving and unknown
     // enum value. This specific should never be transmitted.
-    kUnknownEnumValue = 8,
+    kUnknownEnumValue = 7,
 };
 
 // Enum for SetpointChangeSourceEnum

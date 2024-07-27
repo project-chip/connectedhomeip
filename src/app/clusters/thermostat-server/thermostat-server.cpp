@@ -408,6 +408,8 @@ uint8_t CountUpdatedPresetsAfterApplyingPendingPresets(Delegate * delegate)
         numberOfPendingPresets++;
     }
 
+    // TODO: #34546 - Need to support deletion of presets that are removed from Presets.
+    // This API needs to modify its logic for the deletion case.
     return static_cast<uint8_t>(numberOfPresets + numberOfPendingPresets - numberOfMatches);
 }
 
@@ -471,12 +473,12 @@ uint8_t CountPresetsInPendingListWithPresetHandle(Delegate * delegate, const Byt
 }
 
 /**
- * @brief Checks if the presetType for the given preset scenario supports names in the presetTypeFeatures bitmap.
+ * @brief Checks if the presetType for the given preset scenario supports name in the presetTypeFeatures bitmap.
  *
  * @param[in] delegate The delegate to use.
  * @param[in] presetScenario The presetScenario to match with.
  *
- * @return true if the presetType for the given preset scenario supports names, false otherwise.
+ * @return true if the presetType for the given preset scenario supports name, false otherwise.
  */
 bool PresetTypeSupportsNames(Delegate * delegate, PresetScenarioEnum scenario)
 {
@@ -493,7 +495,7 @@ bool PresetTypeSupportsNames(Delegate * delegate, PresetScenarioEnum scenario)
 
         if (presetType.presetScenario == scenario)
         {
-            return (presetType.presetTypeFeatures == PresetTypeFeaturesBitmap::kSupportsNames);
+            return (presetType.presetTypeFeatures.Has(PresetTypeFeaturesBitmap::kSupportsNames));
         }
     }
     return false;
@@ -783,9 +785,6 @@ CHIP_ERROR ThermostatAttrAccess::Read(const ConcreteReadAttributePath & aPath, A
     }
     break;
     case PresetsSchedulesEditable::Id: {
-        Delegate * delegate = GetDelegate(aPath.mEndpointId);
-        VerifyOrReturnError(delegate != nullptr, CHIP_ERROR_INCORRECT_STATE, ChipLogError(Zcl, "Delegate is null"));
-
         ReturnErrorOnFailure(aEncoder.Encode(GetPresetsEditable(aPath.mEndpointId)));
     }
     break;
@@ -861,7 +860,13 @@ CHIP_ERROR ThermostatAttrAccess::Write(const ConcreteDataAttributePath & aPath, 
         // Check if the OriginatorScopedNodeId at the endpoint is the same as the node editing the presets,
         // otherwise return BUSY.
         const Access::SubjectDescriptor subjectDescriptor = aDecoder.GetSubjectDescriptor();
-        ScopedNodeId scopedNodeId                         = ScopedNodeId(subjectDescriptor.subject, subjectDescriptor.fabricIndex);
+        ScopedNodeId scopedNodeId = ScopedNodeId();
+
+        // Get the node id if the authentication mode is CASE.
+        if (subjectDescriptor.authMode == Access::AuthMode::kCase)
+        {
+            scopedNodeId = ScopedNodeId(subjectDescriptor.subject, subjectDescriptor.fabricIndex);
+        }
 
         if (GetOriginatorScopedNodeId(endpoint) != scopedNodeId)
         {
@@ -941,7 +946,7 @@ void emberAfThermostatClusterServerInitCallback(chip::EndpointId endpoint)
     // or should this just be the responsibility of the thermostat application?
 }
 
-imcode MatterThermostatClusterServerPreAttributeChangedCallback(const app::ConcreteAttributePath & attributePath,
+Protocols::InteractionModel::Status MatterThermostatClusterServerPreAttributeChangedCallback(const app::ConcreteAttributePath & attributePath,
                                                                 EmberAfAttributeType attributeType, uint16_t size, uint8_t * value)
 {
     EndpointId endpoint = attributePath.mEndpointId;
@@ -1376,7 +1381,8 @@ bool emberAfThermostatClusterCommitPresetsSchedulesRequestCallback(
     // StartPresetsSchedulesEditRequest, return UNSUPPORTED_ACCESS.
     if (gThermostatAttrAccess.GetOriginatorScopedNodeId(endpoint) != sourceNodeId)
     {
-        return SendResponseAndCleanUp(delegate, endpoint, commandObj, commandPath, imcode::UnsupportedAccess);
+        commandObj->AddStatus(commandPath, imcode::UnsupportedAccess);
+        return true;
     }
 
     PresetStructWithOwnedMembers preset;
@@ -1453,12 +1459,6 @@ bool emberAfThermostatClusterCommitPresetsSchedulesRequestCallback(
         }
 
         bool isPendingPresetWithNullPresetHandle = pendingPreset.GetPresetHandle().IsNull();
-        if (isPendingPresetWithNullPresetHandle)
-        {
-            // If the presetHandle for a preset is null, the device should set a unique presetHandle.
-            const uint8_t handle[] = { static_cast<uint8_t>(pendingPreset.GetPresetScenario()) };
-            pendingPreset.SetPresetHandle(DataModel::MakeNullable(ByteSpan(handle)));
-        }
 
         // If the preset handle is null and the built in field is set to true, return CONSTRAINT_ERROR.
         if (isPendingPresetWithNullPresetHandle && IsBuiltIn(pendingPreset))
@@ -1504,19 +1504,19 @@ bool emberAfThermostatClusterCommitPresetsSchedulesRequestCallback(
 
         // If the presetScenario is not found in the preset types, return CONSTRAINT_ERROR.
         PresetScenarioEnum presetScenario = pendingPreset.GetPresetScenario();
-        if (!FindPresetScenarioInPresetTypes(delegate, presetScenario))
+        if (!PresetScenarioExistsInPresetTypes(delegate, presetScenario))
         {
             return SendResponseAndCleanUp(delegate, endpoint, commandObj, commandPath, imcode::ConstraintError);
         }
 
-        // If the preset type for the preset scenario does not supports name and a name is specified, return CONSTRAINT_ERROR.
+        // If the preset type for the preset scenario does not support name and a name is specified, return CONSTRAINT_ERROR.
         if (!PresetTypeSupportsNames(delegate, presetScenario) && pendingPreset.GetName().HasValue())
         {
             return SendResponseAndCleanUp(delegate, endpoint, commandObj, commandPath, imcode::ConstraintError);
         }
 
-        // Enforce the Setpoint Limits for both the cooling and heating
-        Optional<int16_t> coolingSetpointValue = preset.GetCoolingSetpoint();
+        // Enforce the Setpoint Limits for both the cooling and heating setpoints in the pending preset.
+        Optional<int16_t> coolingSetpointValue = pendingPreset.GetCoolingSetpoint();
         if (coolingSetpointValue.HasValue())
         {
             pendingPreset.SetCoolingSetpoint(MakeOptional(EnforceCoolingSetpointLimits(coolingSetpointValue.Value(), endpoint)));

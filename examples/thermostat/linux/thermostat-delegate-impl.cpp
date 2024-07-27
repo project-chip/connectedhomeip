@@ -49,7 +49,7 @@ bool PresetHandlesExistAndMatch(const PresetStructWithOwnedMembers & preset, con
 
 ThermostatDelegate::ThermostatDelegate()
 {
-    mNumberOfPresets                   = kMaxNumberOfPresetTypes * kMaxNumberOfPresetTypesOfEachType;
+    mNumberOfPresets                   = kMaxNumberOfPresetTypes * kMaxNumberOfPresetsOfEachType;
     mNextFreeIndexInPresetsList        = 0;
     mNextFreeIndexInPendingPresetsList = 0;
 
@@ -72,7 +72,7 @@ void ThermostatDelegate::InitializePresetTypes()
     for (PresetScenarioEnum presetScenario : presetScenarioEnumArray)
     {
         mPresetTypes[index].presetScenario  = presetScenario;
-        mPresetTypes[index].numberOfPresets = kMaxNumberOfPresetTypesOfEachType;
+        mPresetTypes[index].numberOfPresets = kMaxNumberOfPresetsOfEachType;
         mPresetTypes[index].presetTypeFeatures =
             (presetScenario == PresetScenarioEnum::kOccupied || presetScenario == PresetScenarioEnum::kUnoccupied)
             ? PresetTypeFeaturesBitmap::kAutomatic
@@ -193,6 +193,8 @@ CHIP_ERROR ThermostatDelegate::GetPendingPresetAtIndex(size_t index, PresetStruc
 
 CHIP_ERROR ThermostatDelegate::ApplyPendingPresets()
 {
+
+    // TODO: #34546 - Need to support deletion of presets that are removed from Presets.
     for (uint8_t indexInPendingPresets = 0; indexInPendingPresets < mNextFreeIndexInPendingPresetsList; indexInPendingPresets++)
     {
         const PresetStructWithOwnedMembers & pendingPreset = mPendingPresets[indexInPendingPresets];
@@ -215,6 +217,9 @@ CHIP_ERROR ThermostatDelegate::ApplyPendingPresets()
 
             mPresets[mNextFreeIndexInPresetsList] = pendingPreset;
 
+            // TODO: #34556 Since we support only one preset of each type, using the octet string containing the preset scenario
+            // suffices as the unique preset handle. Need to fix this to actually provide unique handles once multiple presets of
+            // each type are supported.
             const uint8_t handle[] = { static_cast<uint8_t>(pendingPreset.GetPresetScenario()) };
             mPresets[mNextFreeIndexInPresetsList].SetPresetHandle(DataModel::MakeNullable(ByteSpan(handle)));
             mNextFreeIndexInPresetsList++;

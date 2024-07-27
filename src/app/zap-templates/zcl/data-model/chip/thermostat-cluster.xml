@@ -201,7 +201,7 @@ limitations under the License.
     <item name="Wake" value="0x04"/>
     <item name="Vacation" value="0x05"/>
     <item name="GoingToSleep" value="0x06"/>
-    <item name="UserDefined" value="0x07"/>
+    <item name="UserDefined" value="0xFE"/>
   </enum>
 
   <struct name="WeeklyScheduleTransitionStruct">
