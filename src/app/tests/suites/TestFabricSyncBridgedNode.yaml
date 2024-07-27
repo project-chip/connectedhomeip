@@ -24,15 +24,17 @@ config:
 
 tests:
     - label:
-          "Read the DeviceTypeList attribute of the Descriptor cluster and
-          check whether the device type is Aggregator."
+          "Read the DeviceTypeList attribute of the Descriptor cluster and check
+          whether the device type is Aggregator."
       cluster: "Descriptor"
       command: "readAttribute"
       attribute: "DeviceTypeList"
       response:
-          value: [{
-              DeviceType: 14, # Aggregator
-          }]
+          value: [
+                  {
+                      DeviceType: 14, # Aggregator
+                  },
+              ]
 
     - label:
           "Read the ServerList attribute of the Descriptor cluster and check
@@ -45,8 +47,8 @@ tests:
           constraints:
               type: list
               contains: [
-                  0x0751, # Commissioner Control Cluster
-              ]
+                      0x0751, # Commissioner Control Cluster
+                  ]
 
     - label:
           "Read the SupportedDeviceCategories attribute of the Commissioner
@@ -59,4 +61,4 @@ tests:
       response:
           constraints:
               type: bitmap32
-              hasMasksSet: [ 0x01 ]
+              hasMasksSet: [0x01]
