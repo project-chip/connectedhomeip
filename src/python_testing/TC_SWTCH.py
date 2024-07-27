@@ -91,9 +91,9 @@ class TC_SwitchTests(MatterBaseTest):
         self._send_named_pipe_command(command_dict)
 
     def _send_long_press_named_pipe_command(self, endpoint_id: int, pressed_position: int, feature_map: int):
-            command_dict = {"Name": "SimulateLongPress", "EndpointId": endpoint_id,
-                            "ButtonId": pressed_position, "LongPressDelayMillis": 5000, "LongPressDurationMillis": 5500, "FeatureMap": feature_map}
-            self._send_named_pipe_command(command_dict)
+        command_dict = {"Name": "SimulateLongPress", "EndpointId": endpoint_id,
+                        "ButtonId": pressed_position, "LongPressDelayMillis": 5000, "LongPressDurationMillis": 5500, "FeatureMap": feature_map}
+        self._send_named_pipe_command(command_dict)
 
     def _ask_for_multi_press_short_long(self, endpoint_id: int, pressed_position: int, feature_map: uint, multi_press_max: uint):
         if not self._use_button_simulator():
@@ -123,9 +123,11 @@ class TC_SwitchTests(MatterBaseTest):
 
     def _ask_for_multi_press(self, endpoint_id: int, number_of_presses: int, pressed_position: int, feature_map: uint, multi_press_max: uint):
         if not self._use_button_simulator():
-            self.wait_for_user_input(f'Operate the switch (press briefly) associated with position {pressed_position} then release {number_of_presses} times')
+            self.wait_for_user_input(
+                f'Operate the switch (press briefly) associated with position {pressed_position} then release {number_of_presses} times')
         else:
-            self._send_multi_press_named_pipe_command(endpoint_id, number_of_presses, pressed_position, feature_map, multi_press_max)
+            self._send_multi_press_named_pipe_command(endpoint_id, number_of_presses,
+                                                      pressed_position, feature_map, multi_press_max)
 
     def _ask_for_long_press(self, endpoint_id: int, pressed_position: int, feature_map):
         if not self._use_button_simulator():
@@ -436,7 +438,6 @@ class TC_SwitchTests(MatterBaseTest):
         button_val = await self.read_single_attribute_check_success(cluster=cluster, attribute=cluster.Attributes.CurrentPosition)
         asserts.assert_equal(button_val, 0, "Button value is not 0")
 
-
     def steps_TC_SWTCH_2_5(self):
         return [TestStep(1, test_plan_support.commission_if_required(), "", is_commissioning=True),
                 TestStep(2, "Set up a subscription to all Switch cluster events"),
@@ -499,7 +500,8 @@ class TC_SwitchTests(MatterBaseTest):
 
                          The events sequence from the subscription SHALL follow the same sequence as expressed above, in the exact order of events specified.
                          """),
-                TestStep("8b", "Operator does not operate switch on the DUT", "TH receives MultiPressComplete event with PreviousPosition set to 1 and TotalNumberOfPressesCounted set to 2 from the DUT"),
+                TestStep("8b", "Operator does not operate switch on the DUT",
+                         "TH receives MultiPressComplete event with PreviousPosition set to 1 and TotalNumberOfPressesCounted set to 2 from the DUT"),
                 TestStep("9a",
                          """
                          Operator operates switch in below sequence:
@@ -518,10 +520,10 @@ class TC_SwitchTests(MatterBaseTest):
 
                          The events sequence from the subscription SHALL follow the same sequence as expressed above, in the exact order of events specified.
                          """),
-                TestStep("9b", "Operator does not operate switch on the DUT", "TH receives MultiPressComplete event with PreviousPosition set to 1 and TotalNumberOfPressesCounted set to 2 from the DUT")
+                TestStep("9b", "Operator does not operate switch on the DUT",
+                         "TH receives MultiPressComplete event with PreviousPosition set to 1 and TotalNumberOfPressesCounted set to 2 from the DUT")
 
                 ]
-
 
     @staticmethod
     def should_run_SWTCH_2_5(wildcard, endpoint):
@@ -549,21 +551,24 @@ class TC_SwitchTests(MatterBaseTest):
         self.step(3)
         self._ask_for_switch_idle()
 
-        def test_multi_press_sequence(starting_step:str, count:int, short_long:bool = False):
+        def test_multi_press_sequence(starting_step: str, count: int, short_long: bool = False):
             step = starting_step
             self.step(step)
 
             if short_long:
-                self._ask_for_multi_press_short_long(endpoint_id, pressed_position, feature_map=feature_map, multi_press_max=multi_press_max)
+                self._ask_for_multi_press_short_long(endpoint_id, pressed_position,
+                                                     feature_map=feature_map, multi_press_max=multi_press_max)
             else:
-                self._ask_for_multi_press(endpoint_id, number_of_presses=count, pressed_position=pressed_position, feature_map=feature_map, multi_press_max=multi_press_max)
+                self._ask_for_multi_press(endpoint_id, number_of_presses=count, pressed_position=pressed_position,
+                                          feature_map=feature_map, multi_press_max=multi_press_max)
             for i in range(count):
                 event = event_listener.wait_for_event_report(cluster.Events.InitialPress)
                 asserts.assert_equal(event.newPosition, pressed_position, "Unexpected NewPosition on InitialEvent")
                 if i > 0:
                     event = event_listener.wait_for_event_report(cluster.Events.MultiPressOngoing)
                     asserts.assert_equal(event.newPosition, pressed_position, "Unexpected NewPosition on MultiPressOngoing")
-                    asserts.assert_equal(event.currentNumberOfPressesCounted, i+1, "Unexpected CurrentNumberOfPressesCounted on MultiPressOngoing")
+                    asserts.assert_equal(event.currentNumberOfPressesCounted, i+1,
+                                         "Unexpected CurrentNumberOfPressesCounted on MultiPressOngoing")
                 event = event_listener.wait_for_event_report(cluster.Events.ShortRelease)
                 asserts.assert_equal(event.previousPosition, pressed_position, "Unexpected PreviousPosition on ShortRelease")
 
@@ -573,7 +578,6 @@ class TC_SwitchTests(MatterBaseTest):
             event = event_listener.wait_for_event_report(cluster.Events.MultiPressComplete)
             asserts.assert_equal(event.previousPosition, pressed_position, "Unexpected PreviousPosition on MultiPressComplete")
             asserts.assert_equal(event.totalNumberOfPressesCounted, count, "Unexpected count on MultiPressComplete")
-
 
         test_multi_press_sequence("4a", 1)
 
@@ -607,7 +611,8 @@ class TC_SwitchTests(MatterBaseTest):
         asserts.assert_equal(event.previousPosition, pressed_position, "Unexpected PreviousPosition on LongRelease")
         if self._use_button_simulator:
             # simulator can't sequence so we need to help it along here
-            self._send_multi_press_named_pipe_command(endpoint_id, number_of_presses=1, pressed_position=1, feature_map=feature_map, multi_press_max=multi_press_max)
+            self._send_multi_press_named_pipe_command(endpoint_id, number_of_presses=1,
+                                                      pressed_position=1, feature_map=feature_map, multi_press_max=multi_press_max)
 
         event = event_listener.wait_for_event_report(cluster.Events.InitialPress)
         asserts.assert_equal(event.newPosition, pressed_position, "Unexpected NewPosition on InitialEvent")
@@ -622,13 +627,12 @@ class TC_SwitchTests(MatterBaseTest):
         asserts.assert_equal(event.previousPosition, pressed_position, "Unexpected PreviousPosition on MultiPressComplete")
         asserts.assert_equal(event.totalNumberOfPressesCounted, 1, "Unexpected count on MultiPressComplete")
 
-
     def steps_TC_SWTCH_2_6(self):
         return [TestStep(1, test_plan_support.commission_if_required(), is_commissioning=True),
                 TestStep(2, "Set up subscription to all Switch cluster events"),
                 TestStep(3, "Operator does not operate switch on the DUT"),
                 TestStep("4a", "Operator operates switch (press briefly) associated with position 1 on the DUT then release switch from DUT",
-                            """
+                         """
 
                             * Verify that the TH receives InitialPress event with NewPosition set to 1 from the DUT
                             * Verify that the TH does not receive ShortRelease event from the DUT
@@ -695,6 +699,7 @@ class TC_SwitchTests(MatterBaseTest):
                 TestStep("9b", "Operator does not operate switch on the DUT"
                          "Verify that the TH receives MultiPressComplete event with PreviousPosition set to 1 and TotalNumberOfPressesCounted set to 1 from the DUT"),
                 ]
+
     @staticmethod
     def should_run_SWTCH_2_6(wildcard, endpoint):
         msm = has_feature(Clusters.Switch, Clusters.Switch.Bitmaps.Feature.kMomentarySwitchMultiPress)
@@ -721,14 +726,16 @@ class TC_SwitchTests(MatterBaseTest):
         self.step(3)
         self._ask_for_switch_idle()
 
-        def test_multi_press_sequence(starting_step:str, count:int, short_long:bool = False):
+        def test_multi_press_sequence(starting_step: str, count: int, short_long: bool = False):
             step = starting_step
             self.step(step)
 
             if short_long:
-                self._ask_for_multi_press_short_long(endpoint_id, pressed_position, feature_map=feature_map, multi_press_max=multi_press_max)
+                self._ask_for_multi_press_short_long(endpoint_id, pressed_position,
+                                                     feature_map=feature_map, multi_press_max=multi_press_max)
             else:
-                self._ask_for_multi_press(endpoint_id, number_of_presses=count, pressed_position=pressed_position, feature_map=feature_map, multi_press_max=multi_press_max)
+                self._ask_for_multi_press(endpoint_id, number_of_presses=count, pressed_position=pressed_position,
+                                          feature_map=feature_map, multi_press_max=multi_press_max)
 
             event = event_listener.wait_for_event_report(cluster.Events.InitialPress)
             asserts.assert_equal(event.newPosition, pressed_position, "Unexpected NewPosition on InitialEvent")
@@ -767,7 +774,8 @@ class TC_SwitchTests(MatterBaseTest):
         asserts.assert_equal(event.previousPosition, pressed_position, "Unexpected PreviousPosition on LongRelease")
         if self._use_button_simulator:
             # simulator can't sequence so we need to help it along here
-            self._send_multi_press_named_pipe_command(endpoint_id, number_of_presses=1, pressed_position=1, feature_map=feature_map, multi_press_max=multi_press_max)
+            self._send_multi_press_named_pipe_command(endpoint_id, number_of_presses=1,
+                                                      pressed_position=1, feature_map=feature_map, multi_press_max=multi_press_max)
 
         event = event_listener.wait_for_event_report(cluster.Events.InitialPress)
         asserts.assert_equal(event.newPosition, pressed_position, "Unexpected NewPosition on InitialEvent")
@@ -778,7 +786,6 @@ class TC_SwitchTests(MatterBaseTest):
         event = event_listener.wait_for_event_report(cluster.Events.MultiPressComplete)
         asserts.assert_equal(event.previousPosition, pressed_position, "Unexpected PreviousPosition on MultiPressComplete")
         asserts.assert_equal(event.totalNumberOfPressesCounted, 1, "Unexpected count on MultiPressComplete")
-
 
 
 if __name__ == "__main__":
