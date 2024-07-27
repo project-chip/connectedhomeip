@@ -43,6 +43,14 @@ tests:
               minLength: 1
               maxLength: 32
 
+    - label: "TH reads the PassphraseSurrogate attribute from the DUT"
+      command: readAttribute
+      attribute: PassphraseSurrogate
+      response:
+          constraints:
+              type: int64u
+              hasValue: true
+
     - label: "TH sends the NetworkPassphraseRequest command to the DUT"
       command: NetworkPassphraseRequest
       response:
