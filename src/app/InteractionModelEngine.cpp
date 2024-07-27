@@ -492,10 +492,10 @@ CHIP_ERROR InteractionModelEngine::ParseAttributePaths(const Access::SubjectDesc
             // AttributePathExpandIterator. So we just need to check the ACL bits.
             for (; pathIterator.Get(readPath); pathIterator.Next())
             {
-                Access::RequestPath requestPath{ .cluster = readPath.mClusterId, .endpoint = readPath.mEndpointId };
+                //leave requestPath.entityId optional value unset to indicate wildcard
+                Access::RequestPath requestPath{ .cluster = readPath.mClusterId, .endpoint = readPath.mEndpointId, .requestType = Access::RequestType::kReadRequest };
                 err = Access::GetAccessControl().Check(aSubjectDescriptor, requestPath,
-                                                       RequiredPrivilege::ForReadAttribute(readPath),
-                                                       Protocols::InteractionModel::MsgType::ReadRequest);
+                                                       RequiredPrivilege::ForReadAttribute(readPath));
                 if (err == CHIP_NO_ERROR)
                 {
                     aHasValidAttributePath = true;
@@ -509,11 +509,11 @@ CHIP_ERROR InteractionModelEngine::ParseAttributePaths(const Access::SubjectDesc
                                                paramsList.mValue.mAttributeId);
             if (ConcreteAttributePathExists(concretePath))
             {
-                Access::RequestPath requestPath{ .cluster = concretePath.mClusterId, .endpoint = concretePath.mEndpointId };
+                Access::RequestPath requestPath{ .cluster = concretePath.mClusterId, .endpoint = concretePath.mEndpointId,
+                                                 .requestType = Access::RequestType::kReadRequest, .entityId = paramsList.mValue.mAttributeId };
 
                 err = Access::GetAccessControl().Check(aSubjectDescriptor, requestPath,
-                                                       RequiredPrivilege::ForReadAttribute(concretePath),
-                                                       Protocols::InteractionModel::MsgType::ReadRequest);
+                                                       RequiredPrivilege::ForReadAttribute(concretePath));
                 if (err == CHIP_NO_ERROR)
                 {
                     aHasValidAttributePath = true;
@@ -535,17 +535,17 @@ CHIP_ERROR InteractionModelEngine::ParseAttributePaths(const Access::SubjectDesc
 static bool CanAccess(const Access::SubjectDescriptor & aSubjectDescriptor, const ConcreteClusterPath & aPath,
                       Access::Privilege aNeededPrivilege)
 {
-    Access::RequestPath requestPath{ .cluster = aPath.mClusterId, .endpoint = aPath.mEndpointId };
-    CHIP_ERROR err = Access::GetAccessControl().Check(aSubjectDescriptor, requestPath, aNeededPrivilege,
-                                                      Protocols::InteractionModel::MsgType::SubscribeRequest);
+    Access::RequestPath requestPath{ .cluster = aPath.mClusterId, .endpoint = aPath.mEndpointId, .requestType = Access::RequestType::kSubscribeEventRequest };
+    //leave requestPath.entityId optional value unset to indicate wildcard
+    CHIP_ERROR err = Access::GetAccessControl().Check(aSubjectDescriptor, requestPath, aNeededPrivilege);
     return (err == CHIP_NO_ERROR);
 }
 
 static bool CanAccess(const Access::SubjectDescriptor & aSubjectDescriptor, const ConcreteEventPath & aPath)
 {
-    Access::RequestPath requestPath{ .cluster = aPath.mClusterId, .endpoint = aPath.mEndpointId, .entityId = aPath.mEventId };
-    CHIP_ERROR err = Access::GetAccessControl().Check(aSubjectDescriptor, requestPath, RequiredPrivilege::ForReadEvent(aPath),
-                                                      Protocols::InteractionModel::MsgType::SubscribeRequest);
+    Access::RequestPath requestPath{ .cluster = aPath.mClusterId, .endpoint = aPath.mEndpointId,
+                                     .requestType = Access::RequestType::kSubscribeEventRequest, .entityId = aPath.mEventId };
+    CHIP_ERROR err = Access::GetAccessControl().Check(aSubjectDescriptor, requestPath, RequiredPrivilege::ForReadEvent(aPath));
     return (err == CHIP_NO_ERROR);   
 }
 

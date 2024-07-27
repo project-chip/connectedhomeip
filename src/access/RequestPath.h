@@ -19,17 +19,29 @@
 #pragma once
 
 #include <lib/core/DataModelTypes.h>
+#include <optional>
 
 namespace chip {
 namespace Access {
 
+enum class RequestType : uint8_t
+{
+    kRequestTypeUnknown,
+    kReadRequest,
+    kWriteRequest,
+    kInvokeRequest,
+    kSubscribeEventRequest
+};
+
 struct RequestPath
 {
     // NOTE: eventually this will likely also contain node, for proxying
-    ClusterId cluster     = 0;
-    EndpointId endpoint   = 0;
-    uint32_t entityId     = 0; // attribute, command, or event id.  Ignored if entityWildcarded is true
-    bool entityWildcarded = false;
+    ClusterId cluster       = 0;
+    EndpointId endpoint     = 0;
+    RequestType requestType = RequestType::kRequestTypeUnknown;
+
+    //entityId represents an attribute, command, or event ID, which is determined by the requestType. Wildcard if omitted.
+    std::optional<uint32_t> entityId;
 };
 
 } // namespace Access

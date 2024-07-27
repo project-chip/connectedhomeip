@@ -171,18 +171,18 @@ char GetPrivilegeStringForLogging(Privilege privilege)
     return 'u';
 }
 
-char GetActionStringForLogging(MsgType action)
+char GetRequestTypeStringForLogging(RequestType requestType)
 {
-    switch (action)
+    switch (requestType)
     {
-    case MsgType::ReadRequest:
+    case RequestType::kReadRequest:
         return 'r';
-    case MsgType::SubscribeRequest:
-        return 's';
-    case MsgType::WriteRequest:
+    case RequestType::kWriteRequest:
         return 'w';
-    case MsgType::InvokeCommandRequest:
+    case RequestType::kInvokeRequest:
         return 'i';
+    case RequestType::kSubscribeEventRequest:
+        return 's';
     default:
         return '?';
     }
@@ -324,7 +324,7 @@ void AccessControl::RemoveEntryListener(EntryListener & listener)
 }
 
 CHIP_ERROR AccessControl::Check(const SubjectDescriptor & subjectDescriptor, const RequestPath & requestPath,
-                                Privilege requestPrivilege, MsgType action)
+                                Privilege requestPrivilege)
 {
     VerifyOrReturnError(IsInitialized(), CHIP_ERROR_INCORRECT_STATE);
 
@@ -333,12 +333,12 @@ CHIP_ERROR AccessControl::Check(const SubjectDescriptor & subjectDescriptor, con
         constexpr size_t kMaxCatsToLog = 6;
         char catLogBuf[kMaxCatsToLog * kCharsPerCatForLogging];
         ChipLogProgress(DataManagement,
-                        "AccessControl: checking f=%u a=%c s=0x" ChipLogFormatX64 " t=%s c=" ChipLogFormatMEI " e=%u p=%c i=%c",
+                        "AccessControl: checking f=%u a=%c s=0x" ChipLogFormatX64 " t=%s c=" ChipLogFormatMEI " e=%u p=%c r=%c",
                         subjectDescriptor.fabricIndex, GetAuthModeStringForLogging(subjectDescriptor.authMode),
                         ChipLogValueX64(subjectDescriptor.subject),
                         GetCatStringForLogging(catLogBuf, sizeof(catLogBuf), subjectDescriptor.cats),
                         ChipLogValueMEI(requestPath.cluster), requestPath.endpoint, GetPrivilegeStringForLogging(requestPrivilege),
-                        GetActionStringForLogging(action));
+                        GetRequestTypeStringForLogging(requestPath.requestType));
     }
 #endif // CHIP_PROGRESS_LOGGING && CHIP_CONFIG_ACCESS_CONTROL_POLICY_LOGGING_VERBOSITY > 1
 

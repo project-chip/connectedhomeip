@@ -33,8 +33,6 @@
 namespace chip {
 namespace Access {
 
-using namespace chip::Protocols::InteractionModel;
-
 class AccessControl
 {
 public:
@@ -632,15 +630,13 @@ public:
 
     /**
      * Check whether access (by a subject descriptor, to a request path,
-     * requiring a privilege) should be allowed or denied. The IM action
-     * is provided for context.
+     * requiring a privilege) should be allowed or denied.
      *
      * @retval #CHIP_ERROR_ACCESS_DENIED if denied.
      * @retval other errors should also be treated as denied.
      * @retval #CHIP_NO_ERROR if allowed.
      */
-    CHIP_ERROR Check(const SubjectDescriptor & subjectDescriptor, const RequestPath & requestPath, Privilege requestPrivilege,
-                     MsgType action);
+    CHIP_ERROR Check(const SubjectDescriptor & subjectDescriptor, const RequestPath & requestPath, Privilege requestPrivilege);
 
 #if CHIP_ACCESS_CONTROL_DUMP_ENABLED
     CHIP_ERROR Dump(const Entry & entry);
