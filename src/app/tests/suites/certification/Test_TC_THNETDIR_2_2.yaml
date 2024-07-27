@@ -81,14 +81,15 @@ tests:
       response:
           error: NOT_FOUND
 
-    - label: "TH sends AddNetwork command to DUT without a timed interaction"
-      command: AddNetwork
-      arguments:
-          values:
-              - name: OperationalDataset
-                value: TestNetworkDataset
-      response:
-          error: NEEDS_TIMED_INTERACTION
+    # TODO: Currently fails with darwin-framework-tool because it automatically performs a timed invoke
+    # - label: "TH sends AddNetwork command to DUT without a timed interaction"
+    #   command: AddNetwork
+    #   arguments:
+    #       values:
+    #           - name: OperationalDataset
+    #             value: TestNetworkDataset
+    #   response:
+    #       error: NEEDS_TIMED_INTERACTION
 
     - label: "TH sends AddNetwork command to DUT with TestNetwork dataset"
       command: AddNetwork
@@ -144,14 +145,15 @@ tests:
       response:
           value: TestNetworkExtendedPanId
 
-    - label: "TH sends RemoveNetwork command to DUT without a timed interaction"
-      command: RemoveNetwork
-      arguments:
-          values:
-              - name: ExtendedPanID
-                value: TestNetworkExtendedPanId
-      response:
-          error: NEEDS_TIMED_INTERACTION
+    # TODO: Currently fails with darwin-framework-tool because it automatically performs a timed invoke
+    # - label: "TH sends RemoveNetwork command to DUT without a timed interaction"
+    #   command: RemoveNetwork
+    #   arguments:
+    #       values:
+    #           - name: ExtendedPanID
+    #             value: TestNetworkExtendedPanId
+    #   response:
+    #       error: NEEDS_TIMED_INTERACTION
 
     - label:
           "TH sends RemoveNetwork command to DUT with ExtendedPanID of
