@@ -14,14 +14,18 @@
 
 name: Test Fabric Synchronization condition on Bridged Node Device Type
 
+PICS:
+    - MCORE.BRIDGE.FS
+
 config:
     nodeId: 0x12344321
+    endpoint: 1
+    endpointCommissionerControl: 0
 
 tests:
     - label:
           "Read the DeviceTypeList attribute of the Descriptor cluster and
           check whether the device type is Aggregator."
-      endpoint: 1
       cluster: "Descriptor"
       command: "readAttribute"
       attribute: "DeviceTypeList"
@@ -33,7 +37,7 @@ tests:
     - label:
           "Read the ServerList attribute of the Descriptor cluster and check
           whether the Commissioner Control is present."
-      endpoint: 0
+      endpoint: endpointCommissionerControl
       cluster: "Descriptor"
       command: "readAttribute"
       attribute: "ServerList"
@@ -48,7 +52,7 @@ tests:
           "Read the SupportedDeviceCategories attribute of the Commissioner
           Control cluster and check whether the FabricSynchronization bit is
           set."
-      endpoint: 0
+      endpoint: endpointCommissionerControl
       cluster: "CommissionerControl"
       command: "readAttribute"
       attribute: "SupportedDeviceCategories"
