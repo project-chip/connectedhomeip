@@ -70,7 +70,7 @@ template("silabs_executable") {
   ]
   copy(flashing_runtime_target) {
     sources = flashing_script_inputs
-    outputs = [ "${invoker.output_dir}/${output_base_name}--{{source_file_part}}" ]  #++++ FIXME: Can we remove the output_base_name-- prefix?.
+    outputs = [ "${invoker.output_dir}/${output_base_name}--{{source_file_part}}" ]  #++++ FIXME: Can we avoid adding the "output_base_name--" prefix?.
   }
 
   flashing_script_generator =
