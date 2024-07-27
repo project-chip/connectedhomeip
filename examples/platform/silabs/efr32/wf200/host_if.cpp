@@ -1005,7 +1005,7 @@ sl_status_t wfx_connect_to_ap(void)
     sl_status_t result;
     sl_wfx_security_mode_t connect_security_mode;
 
-    VerifyOrReturnError(wifi_provision.ssid[0] != NULL, SL_STATUS_NOT_AVAILABLE);
+    VerifyOrReturnError(wifi_provision.ssid[0] != static_cast<char>(NULL), SL_STATUS_NOT_AVAILABLE);
     ChipLogDetail(DeviceLayer, "WIFI:JOIN to %s", &wifi_provision.ssid[0]);
 
     ChipLogDetail(DeviceLayer,
@@ -1203,7 +1203,7 @@ bool wfx_start_scan(char * ssid, void (*callback)(wfx_wifi_scan_result_t *))
     if (ssid)
     {
         sz        = strnlen(ssid, WFX_MAX_SSID_LENGTH);
-        scan_ssid = dynamic_cast<char *>(pvPortMalloc(sz + 1));
+        scan_ssid = reinterpret_cast<char *>(pvPortMalloc(sz + 1));
         VerifyOrReturnError(scan_ssid != NULL, false);
         strncpy(scan_ssid, ssid, sz);
     }
