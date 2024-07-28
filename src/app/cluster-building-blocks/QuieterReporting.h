@@ -113,7 +113,7 @@ class QuieterReportingAttribute
 public:
     explicit QuieterReportingAttribute(const Nullable<T> & initialValue) : mValue(initialValue), mLastDirtyValue(initialValue) {}
     // constructor that works with arrays of QuieterReportingAttribute
-    explicit QuieterReportingAttribute() : mValue(Nullable<T>(0)), mLastDirtyValue(Nullable<T>(0)) {}
+    explicit QuieterReportingAttribute() : mValue(DataModel::NullNullable), mLastDirtyValue(DataModel::NullNullable) {}
 
     struct SufficientChangePredicateCandidate
     {
