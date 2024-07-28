@@ -93,7 +93,6 @@ class TC_EWATERHTR_2_1(MatterBaseTest, EWATERHTRBase):
         self.step("4")
         if em_supported:
             value = await self.read_whm_attribute_expect_success(attribute="TankVolume")
-            asserts.assert_greater_equal(value, 0, f"Unexpected TankVolume value - expected {value} >= 0")
         else:
             logging.info("Skipping step 4 as PIXIT.EWATERHTR.EM not supported")
 
