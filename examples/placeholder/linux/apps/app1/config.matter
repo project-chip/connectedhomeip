@@ -1,6 +1,23 @@
 // This IDL was generated automatically by ZAP.
 // It is for view/code review purposes only.
 
+enum TestGlobalEnum : enum8 {
+  kSomeValue = 0;
+  kSomeOtherValue = 1;
+  kFinalValue = 2;
+}
+
+bitmap TestGlobalBitmap : bitmap32 {
+  kFirstBit = 0x1;
+  kSecondBit = 0x2;
+}
+
+struct TestGlobalStruct {
+  char_string<128> name = 0;
+  nullable TestGlobalBitmap myBitmap = 1;
+  optional nullable TestGlobalEnum myEnum = 2;
+}
+
 /** Attributes and commands for putting a device into Identification mode (e.g. flashing a light). */
 cluster Identify = 3 {
   revision 4;
@@ -2320,6 +2337,10 @@ cluster BridgedDeviceBasicInformation = 57 {
     kFabric = 5;
   }
 
+  bitmap Feature : bitmap32 {
+    kBridgedICDSupport = 0x100000;
+  }
+
   struct ProductAppearanceStruct {
     ProductFinishEnum finish = 0;
     nullable ColorEnum primaryColor = 1;
@@ -2337,6 +2358,10 @@ cluster BridgedDeviceBasicInformation = 57 {
 
   info event ReachableChanged = 3 {
     boolean reachableNewValue = 0;
+  }
+
+  info event ActiveChanged = 128 {
+    int32u promisedActiveDuration = 0;
   }
 
   readonly attribute optional char_string<32> vendorName = 1;
@@ -2361,6 +2386,9 @@ cluster BridgedDeviceBasicInformation = 57 {
   readonly attribute attrib_id attributeList[] = 65531;
   readonly attribute bitmap32 featureMap = 65532;
   readonly attribute int16u clusterRevision = 65533;
+
+  /** The server SHALL attempt to keep the devices specified active for StayActiveDuration milliseconds when they are next active. */
+  command KeepActive(): DefaultSuccess = 128;
 }
 
 /** This cluster exposes interactions with a switch device, for the purpose of using those interactions by other devices.
@@ -4864,7 +4892,6 @@ cluster Thermostat = 513 {
     kMatterScheduleConfiguration = 0x80;
     kPresets = 0x100;
     kSetpoints = 0x200;
-    kQueuedPresetsSupported = 0x400;
   }
 
   bitmap HVACSystemTypeBitmap : bitmap8 {
@@ -4962,11 +4989,6 @@ cluster Thermostat = 513 {
     PresetTypeFeaturesBitmap presetTypeFeatures = 2;
   }
 
-  struct QueuedPresetStruct {
-    nullable octet_string<16> presetHandle = 0;
-    nullable epoch_s transitionTimestamp = 1;
-  }
-
   struct ScheduleTypeStruct {
     SystemModeEnum systemMode = 0;
     int8u numberOfSchedules = 1;
@@ -5041,7 +5063,6 @@ cluster Thermostat = 513 {
   readonly attribute optional boolean presetsSchedulesEditable = 82;
   readonly attribute optional TemperatureSetpointHoldPolicyBitmap temperatureSetpointHoldPolicy = 83;
   readonly attribute optional nullable epoch_s setpointHoldExpiryTimestamp = 84;
-  readonly attribute optional nullable QueuedPresetStruct queuedPreset = 85;
   readonly attribute command_id generatedCommandList[] = 65528;
   readonly attribute command_id acceptedCommandList[] = 65529;
   readonly attribute event_id eventList[] = 65530;
@@ -5079,7 +5100,6 @@ cluster Thermostat = 513 {
 
   request struct SetActivePresetRequestRequest {
     octet_string<16> presetHandle = 0;
-    optional int16u delayMinutes = 1;
   }
 
   request struct StartPresetsSchedulesEditRequestRequest {
@@ -5108,8 +5128,6 @@ cluster Thermostat = 513 {
   command access(invoke: manage) CancelPresetsSchedulesEditRequest(): DefaultSuccess = 8;
   /** This command is used to notify the server that all edits are done and should be committed. */
   command access(invoke: manage) CommitPresetsSchedulesRequest(): DefaultSuccess = 9;
-  /** This command is sent to cancel a queued preset. */
-  command access(invoke: manage) CancelSetActivePresetRequest(): DefaultSuccess = 10;
   /** This command sets the set point hold policy. */
   command SetTemperatureSetpointHoldPolicy(SetTemperatureSetpointHoldPolicyRequest): DefaultSuccess = 11;
 }
@@ -5235,7 +5253,6 @@ cluster Thermostat = 513 {
     kMatterScheduleConfiguration = 0x80;
     kPresets = 0x100;
     kSetpoints = 0x200;
-    kQueuedPresetsSupported = 0x400;
   }
 
   bitmap HVACSystemTypeBitmap : bitmap8 {
@@ -5333,11 +5350,6 @@ cluster Thermostat = 513 {
     PresetTypeFeaturesBitmap presetTypeFeatures = 2;
   }
 
-  struct QueuedPresetStruct {
-    nullable octet_string<16> presetHandle = 0;
-    nullable epoch_s transitionTimestamp = 1;
-  }
-
   struct ScheduleTypeStruct {
     SystemModeEnum systemMode = 0;
     int8u numberOfSchedules = 1;
@@ -5412,7 +5424,6 @@ cluster Thermostat = 513 {
   readonly attribute optional boolean presetsSchedulesEditable = 82;
   readonly attribute optional TemperatureSetpointHoldPolicyBitmap temperatureSetpointHoldPolicy = 83;
   readonly attribute optional nullable epoch_s setpointHoldExpiryTimestamp = 84;
-  readonly attribute optional nullable QueuedPresetStruct queuedPreset = 85;
   readonly attribute command_id generatedCommandList[] = 65528;
   readonly attribute command_id acceptedCommandList[] = 65529;
   readonly attribute event_id eventList[] = 65530;
@@ -5450,7 +5461,6 @@ cluster Thermostat = 513 {
 
   request struct SetActivePresetRequestRequest {
     octet_string<16> presetHandle = 0;
-    optional int16u delayMinutes = 1;
   }
 
   request struct StartPresetsSchedulesEditRequestRequest {
@@ -5479,8 +5489,6 @@ cluster Thermostat = 513 {
   command access(invoke: manage) CancelPresetsSchedulesEditRequest(): DefaultSuccess = 8;
   /** This command is used to notify the server that all edits are done and should be committed. */
   command access(invoke: manage) CommitPresetsSchedulesRequest(): DefaultSuccess = 9;
-  /** This command is sent to cancel a queued preset. */
-  command access(invoke: manage) CancelSetActivePresetRequest(): DefaultSuccess = 10;
   /** This command sets the set point hold policy. */
   command SetTemperatureSetpointHoldPolicy(SetTemperatureSetpointHoldPolicyRequest): DefaultSuccess = 11;
 }

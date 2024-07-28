@@ -22,6 +22,7 @@ chip_test_suite("tests") {
   output_name = "libICDServerTests"
 
   test_sources = [
+    "TestDefaultICDCheckInBackOffStrategy.cpp",
     "TestICDManager.cpp",
     "TestICDMonitoringTable.cpp",
   ]
@@ -29,6 +30,7 @@ chip_test_suite("tests") {
   sources = [ "ICDConfigurationDataTestAccess.h" ]
 
   public_deps = [
+    "${chip_root}/src/app/icd/server:default-check-in-back-off",
     "${chip_root}/src/app/icd/server:manager",
     "${chip_root}/src/app/icd/server:monitoring-table",
     "${chip_root}/src/lib/core:string-builder-adapters",

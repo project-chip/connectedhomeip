@@ -69,6 +69,7 @@ private:
     CHIP_ERROR ReadRegisteredClients(EndpointId endpoint, AttributeValueEncoder & encoder);
     CHIP_ERROR ReadICDCounter(EndpointId endpoint, AttributeValueEncoder & encoder);
     CHIP_ERROR ReadClientsSupportedPerFabric(EndpointId endpoint, AttributeValueEncoder & encoder);
+    CHIP_ERROR ReadMaximumCheckInBackOff(EndpointId endpoint, AttributeValueEncoder & encoder);
 
     PersistentStorageDelegate * mStorage           = nullptr;
     Crypto::SymmetricKeystore * mSymmetricKeystore = nullptr;
@@ -102,6 +103,9 @@ CHIP_ERROR IcdManagementAttributeAccess::Read(const ConcreteReadAttributePath & 
 
     case IcdManagement::Attributes::ClientsSupportedPerFabric::Id:
         return ReadClientsSupportedPerFabric(aPath.mEndpointId, aEncoder);
+
+    case IcdManagement::Attributes::MaximumCheckInBackOff::Id:
+        return ReadMaximumCheckInBackOff(aPath.mEndpointId, aEncoder);
 #endif // CHIP_CONFIG_ENABLE_ICD_CIP
     }
 
@@ -219,6 +223,11 @@ CHIP_ERROR IcdManagementAttributeAccess::ReadICDCounter(EndpointId endpoint, Att
 CHIP_ERROR IcdManagementAttributeAccess::ReadClientsSupportedPerFabric(EndpointId endpoint, AttributeValueEncoder & encoder)
 {
     return encoder.Encode(mICDConfigurationData->GetClientsSupportedPerFabric());
+}
+
+CHIP_ERROR IcdManagementAttributeAccess::ReadMaximumCheckInBackOff(EndpointId endpoint, AttributeValueEncoder & encoder)
+{
+    return encoder.Encode(mICDConfigurationData->GetMaximumCheckInBackoff().count());
 }
 
 /**

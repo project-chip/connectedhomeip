@@ -1,6 +1,6 @@
 /*
  *
- *    Copyright (c) 2023 Project CHIP Authors
+ *    Copyright (c) 2023-2024 Project CHIP Authors
  *    All rights reserved.
  *
  *    Licensed under the Apache License, Version 2.0 (the "License");
@@ -17,6 +17,7 @@
  */
 
 #include <EnergyEvseDelegateImpl.h>
+#include <EnergyTimeUtils.h>
 #include <app-common/zap-generated/attributes/Accessors.h>
 #include <app-common/zap-generated/cluster-objects.h>
 #include <app/EventLogging.h>
@@ -43,13 +44,6 @@ EnergyEvseDelegate::~EnergyEvseDelegate()
 }
 
 /**
- * @brief   Helper function to get current timestamp in Epoch format
- *
- * @param   chipEpoch reference to hold return timestamp
- */
-CHIP_ERROR GetEpochTS(uint32_t & chipEpoch);
-
-/**
  * @brief   Called when EVSE cluster receives Disable command
  */
 Status EnergyEvseDelegate::Disable()
@@ -63,7 +57,9 @@ Status EnergyEvseDelegate::Disable()
 
     /* update MinimumChargeCurrent & MaximumChargeCurrent to 0 */
     SetMinimumChargeCurrent(0);
-    SetMaximumChargeCurrent(0);
+
+    mMaximumChargingCurrentLimitFromCommand = 0;
+    ComputeMaxChargeCurrentLimit();
 
     /* update MaximumDischargeCurrent to 0 */
     SetMaximumDischargeCurrent(0);
@@ -83,13 +79,13 @@ Status EnergyEvseDelegate::EnableCharging(const DataModel::Nullable<uint32_t> & 
 {
     ChipLogProgress(AppServer, "EnergyEvseDelegate::EnableCharging()");
 
-    if (maximumChargeCurrent < kMinimumChargeCurrent || maximumChargeCurrent > kMaximumChargeCurrent)
+    if (maximumChargeCurrent < kMinimumChargeCurrent)
     {
         ChipLogError(AppServer, "Maximum Current outside limits");
         return Status::ConstraintError;
     }
 
-    if (minimumChargeCurrent < kMinimumChargeCurrent || minimumChargeCurrent > kMaximumChargeCurrent)
+    if (minimumChargeCurrent < kMinimumChargeCurrent)
     {
         ChipLogError(AppServer, "Maximum Current outside limits");
         return Status::ConstraintError;
@@ -177,7 +173,7 @@ Status EnergyEvseDelegate::ScheduleCheckOnEnabledTimeout()
         return Status::Success;
     }
 
-    CHIP_ERROR err = GetEpochTS(chipEpoch);
+    CHIP_ERROR err = DeviceEnergyManagement::GetEpochTS(chipEpoch);
     if (err == CHIP_NO_ERROR)
     {
         /* time is sync'd */
@@ -198,7 +194,7 @@ Status EnergyEvseDelegate::ScheduleCheckOnEnabledTimeout()
     else if (err == CHIP_ERROR_REAL_TIME_NOT_SYNCED)
     {
         /* Real time isn't sync'd -lets check again in 30 seconds - otherwise keep the charger enabled */
-        DeviceLayer::SystemLayer().StartTimer(System::Clock::Seconds32(kPeriodicCheckIntervalRealTimeClockNotSynced),
+        DeviceLayer::SystemLayer().StartTimer(System::Clock::Seconds32(kPeriodicCheckIntervalRealTimeClockNotSynced_sec),
                                               EvseCheckTimerExpiry, this);
     }
     return Status::Success;
@@ -230,6 +226,83 @@ Status EnergyEvseDelegate::StartDiagnostics()
 
     // Update the SupplyState - this will automatically callback the Application StateChanged callback
     SetSupplyState(SupplyStateEnum::kDisabledDiagnostics);
+
+    return Status::Success;
+}
+
+/**
+ * @brief    Called when EVSE cluster receives SetTargets command
+ */
+Status EnergyEvseDelegate::SetTargets(
+    const DataModel::DecodableList<Structs::ChargingTargetScheduleStruct::DecodableType> & chargingTargetSchedules)
+{
+    ChipLogProgress(AppServer, "EnergyEvseDelegate::SetTargets()");
+
+    EvseTargetsDelegate * targets = GetEvseTargetsDelegate();
+    VerifyOrReturnError(targets != nullptr, Status::Failure);
+
+    CHIP_ERROR err = targets->SetTargets(chargingTargetSchedules);
+    VerifyOrReturnError(err == CHIP_NO_ERROR, StatusIB(err).mStatus);
+
+    /* The Application needs to be told that the Targets have been updated
+     * so it can potentially re-optimize the charging start time etc
+     */
+    NotifyApplicationChargingPreferencesChange();
+
+    return Status::Success;
+}
+
+Status EnergyEvseDelegate::LoadTargets()
+{
+    ChipLogProgress(AppServer, "EnergyEvseDelegate::LoadTargets()");
+
+    EvseTargetsDelegate * targets = GetEvseTargetsDelegate();
+    VerifyOrReturnError(targets != nullptr, StatusIB(CHIP_ERROR_UNINITIALIZED).mStatus);
+
+    CHIP_ERROR err = targets->LoadTargets();
+    VerifyOrReturnError(err == CHIP_NO_ERROR, StatusIB(err).mStatus);
+
+    return Status::Success;
+}
+
+Status EnergyEvseDelegate::GetTargets(DataModel::List<const Structs::ChargingTargetScheduleStruct::Type> & chargingTargetSchedules)
+{
+    ChipLogProgress(AppServer, "EnergyEvseDelegate::GetTargets()");
+
+    EvseTargetsDelegate * targets = GetEvseTargetsDelegate();
+    VerifyOrReturnError(targets != nullptr, StatusIB(CHIP_ERROR_UNINITIALIZED).mStatus);
+
+    chargingTargetSchedules = targets->GetTargets();
+
+    return Status::Success;
+}
+
+/**
+ * @brief    Called when EVSE cluster receives ClearTargets command
+ */
+Status EnergyEvseDelegate::ClearTargets()
+{
+    ChipLogProgress(AppServer, "EnergyEvseDelegate::ClearTargets()");
+
+    CHIP_ERROR err;
+
+    EvseTargetsDelegate * targets = GetEvseTargetsDelegate();
+    if (targets == nullptr)
+    {
+        return StatusIB(CHIP_ERROR_UNINITIALIZED).mStatus;
+    }
+
+    err = targets->ClearTargets();
+    if (err != CHIP_NO_ERROR)
+    {
+        ChipLogError(AppServer, "Failed to clear Evse targets: %" CHIP_ERROR_FORMAT, err.Format());
+        return Status::Failure;
+    }
+
+    /* The Application needs to be told that the Targets have been deleted
+     * so it can potentially re-optimize the charging start time etc
+     */
+    NotifyApplicationChargingPreferencesChange();
 
     return Status::Success;
 }
@@ -269,7 +342,7 @@ Status EnergyEvseDelegate::HwRegisterEvseCallbackHandler(EVSECallbackFunc handle
  */
 Status EnergyEvseDelegate::HwSetMaxHardwareCurrentLimit(int64_t currentmA)
 {
-    if (currentmA < kMinimumChargeCurrent || currentmA > kMaximumChargeCurrent)
+    if (currentmA < kMinimumChargeCurrent)
     {
         return Status::ConstraintError;
     }
@@ -291,7 +364,7 @@ Status EnergyEvseDelegate::HwSetMaxHardwareCurrentLimit(int64_t currentmA)
  */
 Status EnergyEvseDelegate::HwSetCircuitCapacity(int64_t currentmA)
 {
-    if (currentmA < kMinimumChargeCurrent || currentmA > kMaximumChargeCurrent)
+    if (currentmA < kMinimumChargeCurrent)
     {
         return Status::ConstraintError;
     }
@@ -316,7 +389,7 @@ Status EnergyEvseDelegate::HwSetCircuitCapacity(int64_t currentmA)
  */
 Status EnergyEvseDelegate::HwSetCableAssemblyLimit(int64_t currentmA)
 {
-    if (currentmA < kMinimumChargeCurrent || currentmA > kMaximumChargeCurrent)
+    if (currentmA < kMinimumChargeCurrent)
     {
         return Status::ConstraintError;
     }
@@ -909,6 +982,20 @@ Status EnergyEvseDelegate::NotifyApplicationStateChange()
     return Status::Success;
 }
 
+Status EnergyEvseDelegate::NotifyApplicationChargingPreferencesChange()
+{
+    EVSECbInfo cbInfo;
+
+    cbInfo.type = EVSECallbackType::ChargingPreferencesChanged;
+
+    if (mCallbacks.handler != nullptr)
+    {
+        mCallbacks.handler(&cbInfo, mCallbacks.arg);
+    }
+
+    return Status::Success;
+}
+
 Status EnergyEvseDelegate::GetEVSEEnergyMeterValue(ChargingDischargingType meterType, int64_t & aMeterValue)
 {
     EVSECbInfo cbInfo;
@@ -1227,7 +1314,7 @@ CHIP_ERROR EnergyEvseDelegate::SetCircuitCapacity(int64_t newValue)
 {
     int64_t oldValue = mCircuitCapacity;
 
-    if (newValue >= kMaximumChargeCurrent)
+    if (newValue < 0)
     {
         return CHIP_IM_GLOBAL_STATUS(ConstraintError);
     }
@@ -1251,7 +1338,7 @@ CHIP_ERROR EnergyEvseDelegate::SetMinimumChargeCurrent(int64_t newValue)
 {
     int64_t oldValue = mMinimumChargeCurrent;
 
-    if (newValue >= kMaximumChargeCurrent)
+    if (newValue < 0)
     {
         return CHIP_IM_GLOBAL_STATUS(ConstraintError);
     }
@@ -1271,24 +1358,6 @@ int64_t EnergyEvseDelegate::GetMaximumChargeCurrent()
     return mMaximumChargeCurrent;
 }
 
-CHIP_ERROR EnergyEvseDelegate::SetMaximumChargeCurrent(int64_t newValue)
-{
-    int64_t oldValue = mMaximumChargeCurrent;
-
-    if (newValue >= kMaximumChargeCurrent)
-    {
-        return CHIP_IM_GLOBAL_STATUS(ConstraintError);
-    }
-
-    mMaximumChargeCurrent = newValue;
-    if (oldValue != mMaximumChargeCurrent)
-    {
-        ChipLogDetail(AppServer, "MaximumChargeCurrent updated to %ld", static_cast<long>(mMaximumChargeCurrent));
-        MatterReportingAttributeChangeCallback(mEndpointId, EnergyEvse::Id, MaximumChargeCurrent::Id);
-    }
-    return CHIP_NO_ERROR;
-}
-
 /* MaximumDischargeCurrent */
 int64_t EnergyEvseDelegate::GetMaximumDischargeCurrent()
 {
@@ -1299,7 +1368,7 @@ CHIP_ERROR EnergyEvseDelegate::SetMaximumDischargeCurrent(int64_t newValue)
 {
     int64_t oldValue = mMaximumDischargeCurrent;
 
-    if (newValue >= kMaximumChargeCurrent)
+    if (newValue < 0)
     {
         return CHIP_IM_GLOBAL_STATUS(ConstraintError);
     }
@@ -1321,7 +1390,7 @@ int64_t EnergyEvseDelegate::GetUserMaximumChargeCurrent()
 
 CHIP_ERROR EnergyEvseDelegate::SetUserMaximumChargeCurrent(int64_t newValue)
 {
-    if ((newValue < 0) || (newValue > kMaximumChargeCurrent))
+    if (newValue < 0)
     {
         return CHIP_IM_GLOBAL_STATUS(ConstraintError);
     }
@@ -1378,17 +1447,104 @@ DataModel::Nullable<uint32_t> EnergyEvseDelegate::GetNextChargeStartTime()
 {
     return mNextChargeStartTime;
 }
+CHIP_ERROR EnergyEvseDelegate::SetNextChargeStartTime(DataModel::Nullable<uint32_t> newNextChargeStartTimeUtc)
+{
+    if (newNextChargeStartTimeUtc == mNextChargeStartTime)
+    {
+        return CHIP_NO_ERROR;
+    }
+
+    mNextChargeStartTime = newNextChargeStartTimeUtc;
+    if (mNextChargeStartTime.IsNull())
+    {
+        ChipLogDetail(AppServer, "NextChargeStartTime updated to Null");
+    }
+    else
+    {
+        ChipLogDetail(AppServer, "NextChargeStartTime updated to %lu",
+                      static_cast<unsigned long int>(mNextChargeStartTime.Value()));
+    }
+
+    MatterReportingAttributeChangeCallback(mEndpointId, EnergyEvse::Id, NextChargeStartTime::Id);
+
+    return CHIP_NO_ERROR;
+}
+
 DataModel::Nullable<uint32_t> EnergyEvseDelegate::GetNextChargeTargetTime()
 {
     return mNextChargeTargetTime;
 }
+CHIP_ERROR EnergyEvseDelegate::SetNextChargeTargetTime(DataModel::Nullable<uint32_t> newNextChargeTargetTimeUtc)
+{
+    if (newNextChargeTargetTimeUtc == mNextChargeTargetTime)
+    {
+        return CHIP_NO_ERROR;
+    }
+
+    mNextChargeTargetTime = newNextChargeTargetTimeUtc;
+    if (mNextChargeTargetTime.IsNull())
+    {
+        ChipLogDetail(AppServer, "NextChargeTargetTime updated to Null");
+    }
+    else
+    {
+        ChipLogDetail(AppServer, "NextChargeTargetTime updated to %lu",
+                      static_cast<unsigned long int>(mNextChargeTargetTime.Value()));
+    }
+
+    MatterReportingAttributeChangeCallback(mEndpointId, EnergyEvse::Id, NextChargeTargetTime::Id);
+
+    return CHIP_NO_ERROR;
+}
+
 DataModel::Nullable<int64_t> EnergyEvseDelegate::GetNextChargeRequiredEnergy()
 {
     return mNextChargeRequiredEnergy;
 }
+CHIP_ERROR EnergyEvseDelegate::SetNextChargeRequiredEnergy(DataModel::Nullable<int64_t> newNextChargeRequiredEnergyMilliWattH)
+{
+    if (mNextChargeRequiredEnergy == newNextChargeRequiredEnergyMilliWattH)
+    {
+        return CHIP_NO_ERROR;
+    }
+
+    mNextChargeRequiredEnergy = newNextChargeRequiredEnergyMilliWattH;
+    if (mNextChargeRequiredEnergy.IsNull())
+    {
+        ChipLogDetail(AppServer, "NextChargeRequiredEnergy updated to Null");
+    }
+    else
+    {
+        ChipLogDetail(AppServer, "NextChargeRequiredEnergy updated to %ld", static_cast<long>(mNextChargeRequiredEnergy.Value()));
+    }
+
+    MatterReportingAttributeChangeCallback(mEndpointId, EnergyEvse::Id, NextChargeRequiredEnergy::Id);
+
+    return CHIP_NO_ERROR;
+}
+
 DataModel::Nullable<Percent> EnergyEvseDelegate::GetNextChargeTargetSoC()
 {
     return mNextChargeTargetSoC;
+}
+CHIP_ERROR EnergyEvseDelegate::SetNextChargeTargetSoC(DataModel::Nullable<Percent> newValue)
+{
+    DataModel::Nullable<Percent> oldValue = mNextChargeTargetSoC;
+
+    mNextChargeTargetSoC = newValue;
+    if (oldValue != newValue)
+    {
+        if (newValue.IsNull())
+        {
+            ChipLogDetail(AppServer, "NextChargeTargetSoC updated to Null");
+        }
+        else
+        {
+            ChipLogDetail(AppServer, "NextChargeTargetSoC updated to %d %%", mNextChargeTargetSoC.Value());
+        }
+        MatterReportingAttributeChangeCallback(mEndpointId, EnergyEvse::Id, NextChargeTargetSoC::Id);
+    }
+    return CHIP_NO_ERROR;
 }
 
 /* ApproximateEVEfficiency */
@@ -1402,7 +1558,7 @@ CHIP_ERROR EnergyEvseDelegate::SetApproximateEVEfficiency(DataModel::Nullable<ui
     DataModel::Nullable<uint16_t> oldValue = mApproximateEVEfficiency;
 
     mApproximateEVEfficiency = newValue;
-    if ((oldValue != newValue))
+    if (oldValue != newValue)
     {
         if (newValue.IsNull())
         {
@@ -1458,42 +1614,13 @@ DataModel::Nullable<int64_t> EnergyEvseDelegate::GetSessionEnergyDischarged()
 }
 
 /**
- * @brief   Helper function to get current timestamp in Epoch format
- *
- * @param   chipEpoch reference to hold return timestamp
+ * @brief   Helper function to get know if the EV is plugged in based on state
+ *          (regardless of if it is actually transferring energy)
  */
-CHIP_ERROR GetEpochTS(uint32_t & chipEpoch)
+bool EnergyEvseDelegate::IsEvsePluggedIn()
 {
-    chipEpoch = 0;
-
-    System::Clock::Milliseconds64 cTMs;
-    CHIP_ERROR err = System::SystemClock().GetClock_RealTimeMS(cTMs);
-
-    /* If the GetClock_RealTimeMS returns CHIP_ERROR_UNSUPPORTED_CHIP_FEATURE, then
-     * This platform cannot ever report real time !
-     * This should not be certifiable since getting time is a Mandatory
-     * feature of EVSE Cluster
-     */
-    if (err == CHIP_ERROR_UNSUPPORTED_CHIP_FEATURE)
-    {
-        ChipLogError(Zcl, "Platform does not support GetClock_RealTimeMS. Check EVSE certification requirements!");
-        return err;
-    }
-
-    if (err != CHIP_NO_ERROR)
-    {
-        ChipLogError(Zcl, "EVSE: Unable to get current time - err:%" CHIP_ERROR_FORMAT, err.Format());
-        return err;
-    }
-
-    auto unixEpoch = std::chrono::duration_cast<System::Clock::Seconds32>(cTMs).count();
-    if (!UnixEpochToChipEpochTime(unixEpoch, chipEpoch))
-    {
-        ChipLogError(Zcl, "EVSE: unable to convert Unix Epoch time to Matter Epoch Time");
-        return err;
-    }
-
-    return CHIP_NO_ERROR;
+    return (mState == StateEnum::kPluggedInCharging || mState == StateEnum::kPluggedInDemand ||
+            mState == StateEnum::kPluggedInDischarging || mState == StateEnum::kPluggedInNoDemand);
 }
 
 /**
@@ -1506,7 +1633,7 @@ void EvseSession::StartSession(int64_t chargingMeterValue, int64_t dischargingMe
 {
     /* Get Timestamp */
     uint32_t chipEpoch = 0;
-    CHIP_ERROR err     = GetEpochTS(chipEpoch);
+    CHIP_ERROR err     = DeviceEnergyManagement::GetEpochTS(chipEpoch);
     if (err != CHIP_NO_ERROR)
     {
         /* Note that the error will be also be logged inside GetErrorTS() -
@@ -1548,6 +1675,8 @@ void EvseSession::StartSession(int64_t chargingMeterValue, int64_t dischargingMe
     // TODO persist mSessionEnergyDischargedAtStart
 }
 
+/*---------------------- EvseSession functions --------------------------*/
+
 /**
  * @brief This function updates the session attrs to allow read attributes to return latest values
  */
@@ -1555,7 +1684,7 @@ void EvseSession::RecalculateSessionDuration()
 {
     /* Get Timestamp */
     uint32_t chipEpoch = 0;
-    CHIP_ERROR err     = GetEpochTS(chipEpoch);
+    CHIP_ERROR err     = DeviceEnergyManagement::GetEpochTS(chipEpoch);
     if (err != CHIP_NO_ERROR)
     {
         /* Note that the error will be also be logged inside GetErrorTS() -

@@ -143,9 +143,17 @@ source_set("app-test-stubs") {
   sources = [
     "test-ember-api.cpp",
     "test-ember-api.h",
+
+    # The overrides in these files are overrides from ember-compatibility-functions
+    # and the data model interface is NOT aware of such functionality
+    #
+    # TODO: ideally tests should have been written via mock ember, however mock ember did
+    #       not exist at that time. We should completely re-write how these tests access
+    #       the data via the DataModel interface
     "test-interaction-model-api.cpp",
     "test-interaction-model-api.h",
   ]
+
   public_configs = [ "${chip_root}/src/lib/support/pw_log_chip:config" ]
 
   public_deps = [

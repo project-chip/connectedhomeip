@@ -1,6 +1,6 @@
 /*
  *
- *    Copyright (c) 2023 Project CHIP Authors
+ *    Copyright (c) 2023-2024 Project CHIP Authors
  *    All rights reserved.
  *
  *    Licensed under the Apache License, Version 2.0 (the "License");
@@ -20,23 +20,21 @@
 
 #include "app/clusters/energy-evse-server/energy-evse-server.h"
 #include <EVSECallbacks.h>
+#include <EnergyEvseTargetsStore.h>
 
 #include <app/util/config.h>
 #include <cstring>
 
 using chip::Protocols::InteractionModel::Status;
 
-/**
- * @brief   Helper function to get current timestamp in Epoch format
- *
- * @param   chipEpoch reference to hold return timestamp
- */
-CHIP_ERROR GetEpochTS(uint32_t & chipEpoch);
-
 namespace chip {
 namespace app {
 namespace Clusters {
 namespace EnergyEvse {
+
+// A bitmap of all possible days (the union of the values in
+// chip::app::Clusters::EnergyEvse::TargetDayOfWeekBitmap)
+constexpr uint8_t kAllTargetDaysMask = 0x7f;
 
 /* Local state machine Events to allow simpler handling of state transitions */
 enum EVSEStateMachineEvent
@@ -107,7 +105,10 @@ private:
 class EnergyEvseDelegate : public EnergyEvse::Delegate
 {
 public:
+    EnergyEvseDelegate(EvseTargetsDelegate & aDelegate) : EnergyEvse::Delegate() { mEvseTargetsDelegate = &aDelegate; }
     ~EnergyEvseDelegate();
+
+    EvseTargetsDelegate * GetEvseTargetsDelegate() { return mEvseTargetsDelegate; }
 
     /**
      * @brief   Called when EVSE cluster receives Disable command
@@ -139,6 +140,37 @@ public:
     Status StartDiagnostics() override;
 
     /**
+     * @brief    Called when EVSE cluster receives the SetTargets command
+     */
+    Status SetTargets(
+        const DataModel::DecodableList<Structs::ChargingTargetScheduleStruct::DecodableType> & chargingTargetSchedules) override;
+
+    /**
+     * @brief Delegate should implement a handler for LoadTargets
+     *
+     * This needs to load any stored targets into memory and MUST be called before
+     * GetTargets is called.
+     */
+    Status LoadTargets() override;
+
+    /**
+     * @brief    Called when EVSE cluster receives the GetTargets command
+     *
+     * NOTE: LoadTargets MUST be called GetTargets is called.
+     */
+    Protocols::InteractionModel::Status
+    GetTargets(DataModel::List<const Structs::ChargingTargetScheduleStruct::Type> & chargingTargetSchedules) override;
+
+    /**
+     * @brief    Called when EVSE cluster receives ClearTargets command
+     */
+    Status ClearTargets() override;
+
+    /* Helper functions for managing targets*/
+    Status
+    ValidateTargets(const DataModel::DecodableList<Structs::ChargingTargetScheduleStruct::DecodableType> & chargingTargetSchedules);
+
+    /**
      * @brief    Called by EVSE Hardware to register a single callback handler
      */
     Status HwRegisterEvseCallbackHandler(EVSECallbackFunc handler, intptr_t arg);
@@ -159,6 +191,12 @@ public:
      * on ChargingEnabledUntil / DischargingEnabledUntil expiring.
      */
     Status ScheduleCheckOnEnabledTimeout();
+
+    /**
+     * @brief   Helper function to get know if the EV is plugged in based on state
+     *          (regardless of if it is actually transferring energy)
+     */
+    bool IsEvsePluggedIn();
 
     // -----------------------------------------------------------------
     // Internal API to allow an EVSE to change its internal state etc
@@ -216,9 +254,16 @@ public:
 
     /* PREF attributes */
     DataModel::Nullable<uint32_t> GetNextChargeStartTime() override;
+    CHIP_ERROR SetNextChargeStartTime(DataModel::Nullable<uint32_t> newNextChargeStartTimeUtc);
+
     DataModel::Nullable<uint32_t> GetNextChargeTargetTime() override;
+    CHIP_ERROR SetNextChargeTargetTime(DataModel::Nullable<uint32_t> newNextChargeTargetTimeUtc);
+
     DataModel::Nullable<int64_t> GetNextChargeRequiredEnergy() override;
+    CHIP_ERROR SetNextChargeRequiredEnergy(DataModel::Nullable<int64_t> newNextChargeRequiredEnergyMilliWattH);
+
     DataModel::Nullable<Percent> GetNextChargeTargetSoC() override;
+    CHIP_ERROR SetNextChargeTargetSoC(DataModel::Nullable<Percent> newValue);
 
     DataModel::Nullable<uint16_t> GetApproximateEVEfficiency() override;
     CHIP_ERROR SetApproximateEVEfficiency(DataModel::Nullable<uint16_t>) override;
@@ -236,11 +281,11 @@ public:
 
 private:
     /* Constants */
-    static constexpr int kDefaultMinChargeCurrent                     = 6000;                  /* 6A */
-    static constexpr int kDefaultUserMaximumChargeCurrent             = kMaximumChargeCurrent; /* 80A */
-    static constexpr int kDefaultRandomizationDelayWindow             = 600;                   /* 600s */
-    static constexpr int kMaxVehicleIDBufSize                         = 32;
-    static constexpr int kPeriodicCheckIntervalRealTimeClockNotSynced = 30;
+    static constexpr int kDefaultMinChargeCurrent_mA                      = 6000;  /* 6A */
+    static constexpr int kDefaultUserMaximumChargeCurrent_mA              = 80000; /* 80A */
+    static constexpr int kDefaultRandomizationDelayWindow_sec             = 600;   /* 600s */
+    static constexpr int kMaxVehicleIDBufSize                             = 32;
+    static constexpr int kPeriodicCheckIntervalRealTimeClockNotSynced_sec = 30;
 
     /* private variables for controlling the hardware - these are not attributes */
     int64_t mMaxHardwareCurrentLimit                = 0; /* Hardware current limit in mA */
@@ -257,6 +302,7 @@ private:
     EVSECallbackWrapper mCallbacks = { .handler = nullptr, .arg = 0 }; /* Wrapper to allow callbacks to be registered */
     Status NotifyApplicationCurrentLimitChange(int64_t maximumChargeCurrent);
     Status NotifyApplicationStateChange();
+    Status NotifyApplicationChargingPreferencesChange();
     Status GetEVSEEnergyMeterValue(ChargingDischargingType meterType, int64_t & aMeterValue);
 
     /* Local State machine handling */
@@ -292,11 +338,11 @@ private:
     DataModel::Nullable<uint32_t> mChargingEnabledUntil;    // TODO Default to 0 to indicate disabled
     DataModel::Nullable<uint32_t> mDischargingEnabledUntil; // TODO Default to 0 to indicate disabled
     int64_t mCircuitCapacity           = 0;
-    int64_t mMinimumChargeCurrent      = kDefaultMinChargeCurrent;
+    int64_t mMinimumChargeCurrent      = kDefaultMinChargeCurrent_mA;
     int64_t mMaximumChargeCurrent      = 0;
     int64_t mMaximumDischargeCurrent   = 0;
-    int64_t mUserMaximumChargeCurrent  = kDefaultUserMaximumChargeCurrent; // TODO update spec
-    uint32_t mRandomizationDelayWindow = kDefaultRandomizationDelayWindow;
+    int64_t mUserMaximumChargeCurrent  = kDefaultUserMaximumChargeCurrent_mA; // TODO update spec
+    uint32_t mRandomizationDelayWindow = kDefaultRandomizationDelayWindow_sec;
     /* PREF attributes */
     DataModel::Nullable<uint32_t> mNextChargeStartTime;
     DataModel::Nullable<uint32_t> mNextChargeTargetTime;
@@ -316,6 +362,9 @@ private:
 
     /* Helper variable to hold meter val since last EnergyTransferStarted event */
     int64_t mMeterValueAtEnergyTransferStart;
+
+    /* Targets Delegate */
+    EvseTargetsDelegate * mEvseTargetsDelegate = nullptr;
 };
 
 } // namespace EnergyEvse

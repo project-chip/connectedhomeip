@@ -1,6 +1,6 @@
 /*
  *
- *    Copyright (c) 2023 Project CHIP Authors
+ *    Copyright (c) 2023-2024 Project CHIP Authors
  *    All rights reserved.
  *
  *    Licensed under the Apache License, Version 2.0 (the "License");
@@ -18,6 +18,7 @@
 
 #include <EnergyEvseManager.h>
 #include <app/SafeAttributePersistenceProvider.h>
+#include <app/server/Server.h>
 
 using namespace chip::app;
 using namespace chip::app::Clusters;
@@ -117,6 +118,16 @@ CHIP_ERROR EnergyEvseManager::LoadPersistentAttributes()
 CHIP_ERROR EnergyEvseManager::Init()
 {
     ReturnErrorOnFailure(Instance::Init());
+
+    // Set up the EnergyEvseTargetsStore and persistent storage delegate
+    EnergyEvseDelegate * dg = GetDelegate();
+    VerifyOrReturnLogError(dg != nullptr, CHIP_ERROR_UNINITIALIZED);
+
+    EvseTargetsDelegate * targetsStore = dg->GetEvseTargetsDelegate();
+    VerifyOrReturnLogError(targetsStore != nullptr, CHIP_ERROR_UNINITIALIZED);
+
+    ReturnErrorOnFailure(targetsStore->Init(&Server::GetInstance().GetPersistentStorage()));
+
     return LoadPersistentAttributes();
 }
 

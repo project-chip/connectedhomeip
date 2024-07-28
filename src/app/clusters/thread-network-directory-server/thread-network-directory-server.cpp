@@ -18,6 +18,7 @@
 #include "thread-network-directory-server.h"
 
 #include <app/AttributeAccessInterfaceRegistry.h>
+#include <app/CommandHandlerInterfaceRegistry.h>
 #include <app/InteractionModelEngine.h>
 #include <app/MessageDef/StatusIB.h>
 #include <app/SafeAttributePersistenceProvider.h>
@@ -47,13 +48,13 @@ ThreadNetworkDirectoryServer::ThreadNetworkDirectoryServer(EndpointId endpoint, 
 ThreadNetworkDirectoryServer::~ThreadNetworkDirectoryServer()
 {
     unregisterAttributeAccessOverride(this);
-    InteractionModelEngine::GetInstance()->UnregisterCommandHandler(this);
+    CommandHandlerInterfaceRegistry::UnregisterCommandHandler(this);
 }
 
 CHIP_ERROR ThreadNetworkDirectoryServer::Init()
 {
     VerifyOrReturnError(registerAttributeAccessOverride(this), CHIP_ERROR_INTERNAL);
-    ReturnErrorOnFailure(InteractionModelEngine::GetInstance()->RegisterCommandHandler(this));
+    ReturnErrorOnFailure(CommandHandlerInterfaceRegistry::RegisterCommandHandler(this));
     return CHIP_NO_ERROR;
 }
 

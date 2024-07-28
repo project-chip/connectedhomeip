@@ -19,6 +19,7 @@
 #include <access/AccessControl.h>
 #include <app/AttributeAccessInterfaceRegistry.h>
 #include <app/CommandHandlerInterface.h>
+#include <app/CommandHandlerInterfaceRegistry.h>
 #include <app/ConcreteAttributePath.h>
 #include <app/ConcreteEventPath.h>
 #include <app/GlobalAttributes.h>
@@ -100,8 +101,7 @@ Protocols::InteractionModel::Status ServerClusterCommandExists(const ConcreteCom
         return Status::UnsupportedCluster;
     }
 
-    auto * commandHandler =
-        InteractionModelEngine::GetInstance()->FindCommandHandler(aCommandPath.mEndpointId, aCommandPath.mClusterId);
+    auto * commandHandler = CommandHandlerInterfaceRegistry::GetCommandHandler(aCommandPath.mEndpointId, aCommandPath.mClusterId);
     if (commandHandler)
     {
         struct Context

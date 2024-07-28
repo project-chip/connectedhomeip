@@ -21,6 +21,7 @@
 
 #include <app/AttributeAccessInterfaceRegistry.h>
 #include <app/AttributePersistenceProvider.h>
+#include <app/CommandHandlerInterfaceRegistry.h>
 #include <app/InteractionModelEngine.h>
 #include <app/reporting/reporting.h>
 #include <app/util/config.h>
@@ -421,10 +422,7 @@ static void shutdownEndpoint(EmberAfDefinedEndpoint * definedEndpoint)
         }
     }
 
-    // Clear out any command handler overrides registered for this
-    // endpoint.
-    chip::app::InteractionModelEngine::GetInstance()->UnregisterCommandHandlers(definedEndpoint->endpoint);
-
+    CommandHandlerInterfaceRegistry::UnregisterAllCommandHandlersForEndpoint(definedEndpoint->endpoint);
     unregisterAllAttributeAccessOverridesForEndpoint(definedEndpoint);
 }
 

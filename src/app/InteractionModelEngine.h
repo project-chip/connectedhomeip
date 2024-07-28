@@ -32,7 +32,6 @@
 #include <app/AppConfig.h>
 #include <app/AttributePathParams.h>
 #include <app/CommandHandlerImpl.h>
-#include <app/CommandHandlerInterface.h>
 #include <app/CommandResponseSender.h>
 #include <app/CommandSender.h>
 #include <app/ConcreteAttributePath.h>
@@ -126,10 +125,6 @@ public:
      *  @param[in]    apFabricTable    A pointer to the FabricTable object.
      *  @param[in]    apCASESessionMgr An optional pointer to a CASESessionManager (used for re-subscriptions).
      *
-     *  @retval #CHIP_ERROR_INCORRECT_STATE If the state is not equal to
-     *          kState_NotInitialized.
-     *  @retval #CHIP_NO_ERROR On success.
-     *
      */
     CHIP_ERROR Init(Messaging::ExchangeManager * apExchangeMgr, FabricTable * apFabricTable,
                     reporting::ReportScheduler * reportScheduler, CASESessionManager * apCASESessionMgr = nullptr,
@@ -215,11 +210,6 @@ public:
 
     CHIP_ERROR PushFrontDataVersionFilterList(SingleLinkedListNode<DataVersionFilter> *& aDataVersionFilterList,
                                               DataVersionFilter & aDataVersionFilter);
-
-    CHIP_ERROR RegisterCommandHandler(CommandHandlerInterface * handler);
-    CHIP_ERROR UnregisterCommandHandler(CommandHandlerInterface * handler);
-    CommandHandlerInterface * FindCommandHandler(EndpointId endpointId, ClusterId clusterId);
-    void UnregisterCommandHandlers(EndpointId endpointId);
 
     /*
      * Register an application callback to be notified of notable events when handling reads/subscribes.
@@ -413,6 +403,13 @@ public:
 #endif
 
     InteractionModel::DataModel * GetDataModel() const;
+
+    // MUST NOT be used while the interaction model engine is running as interaction
+    // model functionality (e.g. active reads/writes/subscriptions) rely on data model
+    // state
+    //
+    // Returns the old data model value.
+    InteractionModel::DataModel * SetDataModel(InteractionModel::DataModel * model);
 
 private:
     friend class reporting::Engine;
@@ -616,8 +613,6 @@ private:
     CHIP_ERROR PushFront(SingleLinkedListNode<T> *& aObjectList, T & aData, ObjectPool<SingleLinkedListNode<T>, N> & aObjectPool);
 
     Messaging::ExchangeManager * mpExchangeMgr = nullptr;
-
-    CommandHandlerInterface * mCommandHandlerList = nullptr;
 
 #if CHIP_CONFIG_ENABLE_ICD_SERVER
     ICDManager * mICDManager = nullptr;

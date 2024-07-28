@@ -192,5 +192,5 @@
     "[python]": {
         "editor.defaultFormatter": "ms-python.autopep8"
     },
-    "python.formatting.provider": "none"
+    "autopep8.args": ["--max-line-length", "132"]
 }

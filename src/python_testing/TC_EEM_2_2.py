@@ -53,7 +53,7 @@ class TC_EEM_2_2(MatterBaseTest, EnergyReportingBaseTestHelper):
             TestStep("4", "Wait 3 seconds"),
             TestStep("4a", "TH reads from the DUT the CumulativeEnergyImported attribute",
                      "Verify the read is successful and note the value read."),
-            TestStep("5", "Wait 5 seconds"),
+            TestStep("5", "Wait 3 seconds"),
             TestStep("5a", "TH reads from the DUT the CumulativeEnergyImported attribute",
                      "Verify the read is successful and that the value is greater than the value measured in step 4a."),
             TestStep("6", "TH sends TestEventTrigger command to General Diagnostics Cluster on Endpoint 0 with EnableKey field set to PIXIT.EEM.TEST_EVENT_TRIGGER_KEY and EventTrigger field set to PIXIT.EEM.TEST_EVENT_TRIGGER for Stop Fake Readings Test Event."),
@@ -80,7 +80,7 @@ class TC_EEM_2_2(MatterBaseTest, EnergyReportingBaseTestHelper):
         cumulative_energy_imported = await self.read_eem_attribute_expect_success("CumulativeEnergyImported")
 
         self.step("5")
-        time.sleep(5)
+        time.sleep(3)
 
         self.step("5a")
         cumulative_energy_imported_2 = await self.read_eem_attribute_expect_success("CumulativeEnergyImported")

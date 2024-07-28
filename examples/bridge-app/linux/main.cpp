@@ -159,9 +159,6 @@ DeviceOnOff Light2("Light 2", "Office");
 DeviceTempSensor TempSensor1("TempSensor 1", "Office", minMeasuredValue, maxMeasuredValue, initialMeasuredValue);
 DeviceTempSensor TempSensor2("TempSensor 2", "Office", minMeasuredValue, maxMeasuredValue, initialMeasuredValue);
 
-DeviceTempSensor ComposedTempSensor1("Composed TempSensor 1", "Bedroom", minMeasuredValue, maxMeasuredValue, initialMeasuredValue);
-DeviceTempSensor ComposedTempSensor2("Composed TempSensor 2", "Bedroom", minMeasuredValue, maxMeasuredValue, initialMeasuredValue);
-
 // Declare Bridged endpoints used for Action clusters
 DataVersion gActionLight1DataVersions[ArraySize(bridgedLightClusters)];
 DataVersion gActionLight2DataVersions[ArraySize(bridgedLightClusters)];
@@ -172,6 +169,12 @@ DeviceOnOff ActionLight1("Action Light 1", "Room 1");
 DeviceOnOff ActionLight2("Action Light 2", "Room 1");
 DeviceOnOff ActionLight3("Action Light 3", "Room 2");
 DeviceOnOff ActionLight4("Action Light 4", "Room 2");
+
+// Setup composed device with two temperature sensors and a power source
+ComposedDevice gComposedDevice("Composed Device", "Bedroom");
+DeviceTempSensor ComposedTempSensor1("Composed TempSensor 1", "Bedroom", minMeasuredValue, maxMeasuredValue, initialMeasuredValue);
+DeviceTempSensor ComposedTempSensor2("Composed TempSensor 2", "Bedroom", minMeasuredValue, maxMeasuredValue, initialMeasuredValue);
+DevicePowerSource ComposedPowerSource("Composed Power Source", "Bedroom", PowerSource::Feature::kBattery);
 
 Room room1("Room 1", 0xE001, Actions::EndpointListTypeEnum::kRoom, true);
 Room room2("Room 2", 0xE002, Actions::EndpointListTypeEnum::kRoom, true);
@@ -918,11 +921,7 @@ void ApplicationInit()
     ActionLight3.SetChangeCallback(&HandleDeviceOnOffStatusChanged);
     ActionLight4.SetChangeCallback(&HandleDeviceOnOffStatusChanged);
 
-    // Setup composed device with two temperature sensors and a power source
-    ComposedDevice ComposedDevice("Composed Device", "Bedroom");
-    DevicePowerSource ComposedPowerSource("Composed Power Source", "Bedroom", PowerSource::Feature::kBattery);
-
-    ComposedDevice.SetReachable(true);
+    gComposedDevice.SetReachable(true);
     ComposedTempSensor1.SetReachable(true);
     ComposedTempSensor2.SetReachable(true);
     ComposedPowerSource.SetReachable(true);
@@ -952,14 +951,14 @@ void ApplicationInit()
                       Span<DataVersion>(gTempSensor2DataVersions), 1);
 
     // Add composed Device with two temperature sensors and a power source
-    AddDeviceEndpoint(&ComposedDevice, &bridgedComposedDeviceEndpoint, Span<const EmberAfDeviceType>(gBridgedComposedDeviceTypes),
+    AddDeviceEndpoint(&gComposedDevice, &bridgedComposedDeviceEndpoint, Span<const EmberAfDeviceType>(gBridgedComposedDeviceTypes),
                       Span<DataVersion>(gComposedDeviceDataVersions), 1);
     AddDeviceEndpoint(&ComposedTempSensor1, &bridgedTempSensorEndpoint,
                       Span<const EmberAfDeviceType>(gComposedTempSensorDeviceTypes),
-                      Span<DataVersion>(gComposedTempSensor1DataVersions), ComposedDevice.GetEndpointId());
+                      Span<DataVersion>(gComposedTempSensor1DataVersions), gComposedDevice.GetEndpointId());
     AddDeviceEndpoint(&ComposedTempSensor2, &bridgedTempSensorEndpoint,
                       Span<const EmberAfDeviceType>(gComposedTempSensorDeviceTypes),
-                      Span<DataVersion>(gComposedTempSensor2DataVersions), ComposedDevice.GetEndpointId());
+                      Span<DataVersion>(gComposedTempSensor2DataVersions), gComposedDevice.GetEndpointId());
 
     // Add 4 lights for the Action Clusters tests
     AddDeviceEndpoint(&ActionLight1, &bridgedLightEndpoint, Span<const EmberAfDeviceType>(gBridgedOnOffDeviceTypes),
@@ -975,11 +974,11 @@ void ApplicationInit()
     gDevices[CHIP_DEVICE_CONFIG_DYNAMIC_ENDPOINT_COUNT] = &ComposedPowerSource;
     // This provides power for the composed endpoint
     std::vector<chip::EndpointId> endpointList;
-    endpointList.push_back(ComposedDevice.GetEndpointId());
+    endpointList.push_back(gComposedDevice.GetEndpointId());
     endpointList.push_back(ComposedTempSensor1.GetEndpointId());
     endpointList.push_back(ComposedTempSensor2.GetEndpointId());
     ComposedPowerSource.SetEndpointList(endpointList);
-    ComposedPowerSource.SetEndpointId(ComposedDevice.GetEndpointId());
+    ComposedPowerSource.SetEndpointId(gComposedDevice.GetEndpointId());
 
     gRooms.push_back(&room1);
     gRooms.push_back(&room2);

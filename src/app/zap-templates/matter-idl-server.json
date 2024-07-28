@@ -38,6 +38,10 @@
         {
             "name": "idl_cluster_definition",
             "path": "partials/idl/cluster_definition.zapt"
+        },
+        {
+            "name": "idl_global_types",
+            "path": "partials/idl/global_types.zapt"
         }
     ],
     "templates": [

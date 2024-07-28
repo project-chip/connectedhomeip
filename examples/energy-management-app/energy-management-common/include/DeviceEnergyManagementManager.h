@@ -1,6 +1,6 @@
 /*
  *
- *    Copyright (c) 2023 Project CHIP Authors
+ *    Copyright (c) 2023-2024 Project CHIP Authors
  *    All rights reserved.
  *
  *    Licensed under the Apache License, Version 2.0 (the "License");
@@ -19,7 +19,6 @@
 #pragma once
 
 #include <DeviceEnergyManagementDelegateImpl.h>
-#include <app/clusters/energy-evse-server/energy-evse-server.h>
 #include <app/util/af-types.h>
 #include <lib/core/CHIPError.h>
 
@@ -28,14 +27,11 @@ namespace app {
 namespace Clusters {
 
 using namespace chip::app::Clusters::DeviceEnergyManagement;
+
 class DeviceEnergyManagementManager : public Instance
 {
 public:
-    DeviceEnergyManagementManager(EndpointId aEndpointId, DeviceEnergyManagementDelegate & aDelegate, Feature aFeature) :
-        DeviceEnergyManagement::Instance(aEndpointId, aDelegate, aFeature)
-    {
-        mDelegate = &aDelegate;
-    }
+    DeviceEnergyManagementManager(EndpointId aEndpointId, DeviceEnergyManagementDelegate & aDelegate, Feature aFeature);
 
     // Delete copy constructor and assignment operator.
     DeviceEnergyManagementManager(const DeviceEnergyManagementManager &)             = delete;

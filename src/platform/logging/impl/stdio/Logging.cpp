@@ -59,6 +59,7 @@ void LogV(const char * module, uint8_t category, const char * msg, va_list v)
     printf("[%s] ", module);
     vprintf(msg, v);
     printf("\033[0m\n");
+    fflush(stdout);
 
 #if defined(_POSIX_THREAD_SAFE_FUNCTIONS)
     funlockfile(stdout);

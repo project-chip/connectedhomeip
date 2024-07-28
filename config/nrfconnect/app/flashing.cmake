@@ -40,9 +40,9 @@ add_custom_command(OUTPUT "${FLASHBUNDLE_FLASHER_PLATFORM}"
     VERBATIM)
 
 if (merged_hex_to_flash)
-  set(flashbundle_hex_to_copy "zephyr/${merged_hex_to_flash}")
+  set(flashbundle_hex_to_copy "${merged_hex_to_flash}")
 else()
-  set(flashbundle_hex_to_copy "zephyr/${KERNEL_HEX_NAME}")
+  set(flashbundle_hex_to_copy "../merged.hex")
 endif()
 
 add_custom_command(OUTPUT "${FLASHBUNDLE_FIRMWARE}"

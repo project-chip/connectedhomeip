@@ -17,10 +17,12 @@
  */
 
 #include "scenes-server.h"
+
 #include <app-common/zap-generated/attributes/Accessors.h>
 #include <app-common/zap-generated/cluster-objects.h>
 #include <app/AttributeAccessInterfaceRegistry.h>
 #include <app/CommandHandlerInterface.h>
+#include <app/CommandHandlerInterfaceRegistry.h>
 #include <app/InteractionModelEngine.h>
 #include <app/clusters/scenes-server/SceneTableImpl.h>
 #include <app/reporting/reporting.h>
@@ -337,7 +339,7 @@ CHIP_ERROR ScenesServer::Init()
     // Prevents re-initializing
     VerifyOrReturnError(!mIsInitialized, CHIP_ERROR_INCORRECT_STATE);
 
-    ReturnErrorOnFailure(chip::app::InteractionModelEngine::GetInstance()->RegisterCommandHandler(this));
+    ReturnErrorOnFailure(chip::app::CommandHandlerInterfaceRegistry::RegisterCommandHandler(this));
     VerifyOrReturnError(registerAttributeAccessOverride(this), CHIP_ERROR_INCORRECT_STATE);
     mGroupProvider = Credentials::GetGroupDataProvider();
 
@@ -351,7 +353,7 @@ CHIP_ERROR ScenesServer::Init()
 
 void ScenesServer::Shutdown()
 {
-    chip::app::InteractionModelEngine::GetInstance()->UnregisterCommandHandler(this);
+    chip::app::CommandHandlerInterfaceRegistry::UnregisterCommandHandler(this);
 
     mGroupProvider = nullptr;
     mIsInitialized = false;

@@ -636,6 +636,11 @@ void emberAfContentAppObserverClusterInitCallback(chip::EndpointId endpoint);
 /**
  * @param endpoint    Endpoint that is being initialized
  */
+void emberAfEcosystemInformationClusterInitCallback(chip::EndpointId endpoint);
+
+/**
+ * @param endpoint    Endpoint that is being initialized
+ */
 void emberAfCommissionerControlClusterInitCallback(chip::EndpointId endpoint);
 
 /**
@@ -5299,6 +5304,44 @@ chip::Protocols::InteractionModel::Status MatterContentAppObserverClusterServerP
 void emberAfContentAppObserverClusterServerTickCallback(chip::EndpointId endpoint);
 
 //
+// Ecosystem Information Cluster
+//
+
+/**
+ * @param endpoint    Endpoint that is being initialized
+ */
+void emberAfEcosystemInformationClusterServerInitCallback(chip::EndpointId endpoint);
+
+/**
+ * @param endpoint    Endpoint that is being shutdown
+ */
+void MatterEcosystemInformationClusterServerShutdownCallback(chip::EndpointId endpoint);
+
+/**
+ * @param endpoint    Endpoint that is being initialized
+ */
+void emberAfEcosystemInformationClusterClientInitCallback(chip::EndpointId endpoint);
+
+/**
+ * @param attributePath Concrete attribute path that changed
+ */
+void MatterEcosystemInformationClusterServerAttributeChangedCallback(const chip::app::ConcreteAttributePath & attributePath);
+
+/**
+ * @param attributePath Concrete attribute path to be changed
+ * @param attributeType Attribute type
+ * @param size          Attribute size
+ * @param value         Attribute value
+ */
+chip::Protocols::InteractionModel::Status MatterEcosystemInformationClusterServerPreAttributeChangedCallback(
+    const chip::app::ConcreteAttributePath & attributePath, EmberAfAttributeType attributeType, uint16_t size, uint8_t * value);
+
+/**
+ * @param endpoint  Endpoint that is being served
+ */
+void emberAfEcosystemInformationClusterServerTickCallback(chip::EndpointId endpoint);
+
+//
 // Commissioner Control Cluster
 //
 
@@ -5827,6 +5870,12 @@ bool emberAfTimeSynchronizationClusterSetDefaultNTPCallback(
     chip::app::CommandHandler * commandObj, const chip::app::ConcreteCommandPath & commandPath,
     const chip::app::Clusters::TimeSynchronization::Commands::SetDefaultNTP::DecodableType & commandData);
 /**
+ * @brief Bridged Device Basic Information Cluster KeepActive Command callback (from client)
+ */
+bool emberAfBridgedDeviceBasicInformationClusterKeepActiveCallback(
+    chip::app::CommandHandler * commandObj, const chip::app::ConcreteCommandPath & commandPath,
+    const chip::app::Clusters::BridgedDeviceBasicInformation::Commands::KeepActive::DecodableType & commandData);
+/**
  * @brief Administrator Commissioning Cluster OpenCommissioningWindow Command callback (from client)
  */
 bool emberAfAdministratorCommissioningClusterOpenCommissioningWindowCallback(
@@ -6065,12 +6114,6 @@ bool emberAfMessagesClusterPresentMessagesRequestCallback(
 bool emberAfMessagesClusterCancelMessagesRequestCallback(
     chip::app::CommandHandler * commandObj, const chip::app::ConcreteCommandPath & commandPath,
     const chip::app::Clusters::Messages::Commands::CancelMessagesRequest::DecodableType & commandData);
-/**
- * @brief Water Heater Mode Cluster ChangeToMode Command callback (from client)
- */
-bool emberAfWaterHeaterModeClusterChangeToModeCallback(
-    chip::app::CommandHandler * commandObj, const chip::app::ConcreteCommandPath & commandPath,
-    const chip::app::Clusters::WaterHeaterMode::Commands::ChangeToMode::DecodableType & commandData);
 /**
  * @brief Door Lock Cluster LockDoor Command callback (from client)
  */
@@ -6317,12 +6360,6 @@ bool emberAfThermostatClusterCancelPresetsSchedulesEditRequestCallback(
 bool emberAfThermostatClusterCommitPresetsSchedulesRequestCallback(
     chip::app::CommandHandler * commandObj, const chip::app::ConcreteCommandPath & commandPath,
     const chip::app::Clusters::Thermostat::Commands::CommitPresetsSchedulesRequest::DecodableType & commandData);
-/**
- * @brief Thermostat Cluster CancelSetActivePresetRequest Command callback (from client)
- */
-bool emberAfThermostatClusterCancelSetActivePresetRequestCallback(
-    chip::app::CommandHandler * commandObj, const chip::app::ConcreteCommandPath & commandPath,
-    const chip::app::Clusters::Thermostat::Commands::CancelSetActivePresetRequest::DecodableType & commandData);
 /**
  * @brief Thermostat Cluster SetTemperatureSetpointHoldPolicy Command callback (from client)
  */

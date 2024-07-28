@@ -26,10 +26,12 @@
 SwitchManager SwitchManager::sSwitch;
 using namespace ::chip;
 using namespace chip::DeviceLayer;
+static uint8_t multiPressCount = 1;
 
 void SwitchManager::Init(void)
 {
-    // init - TODO
+    uint8_t multiPressMax = 2;
+    chip::app::Clusters::Switch::Attributes::MultiPressMax::Set(GENERICSWITCH_ENDPOINT_ID, multiPressMax);
 }
 
 void SwitchManager::ToggleHandler(AppEvent * aEvent)
@@ -46,6 +48,7 @@ void SwitchManager::ToggleHandler(AppEvent * aEvent)
     data->localEndpointId = SWITCH_ENDPOINT_ID;
     data->clusterId       = chip::app::Clusters::OnOff::Id;
     data->commandId       = chip::app::Clusters::OnOff::Commands::Toggle::Id;
+    data->isGroup         = true;
 
     DeviceLayer::PlatformMgr().ScheduleWork(SwitchWorkerFunction, reinterpret_cast<intptr_t>(data));
 }
@@ -118,7 +121,7 @@ void SwitchManager::GenericSwitchInitialPressHandler(AppEvent * aEvent)
         return;
     }
 
-    ChipLogProgress(NotSpecified, "GenericSwitchInitialPress new position %d", newPosition);
+    ChipLogDetail(NotSpecified, "GenericSwitchInitialPress new position %d", newPosition);
     SystemLayer().ScheduleLambda([newPosition] {
         chip::app::Clusters::Switch::Attributes::CurrentPosition::Set(GENERICSWITCH_ENDPOINT_ID, newPosition);
         // InitialPress event takes newPosition as event data
@@ -126,10 +129,10 @@ void SwitchManager::GenericSwitchInitialPressHandler(AppEvent * aEvent)
     });
 }
 
-void SwitchManager::GenericSwitchReleasePressHandler(AppEvent * aEvent)
+void SwitchManager::GenericSwitchLongPressHandler(AppEvent * aEvent)
 {
-    // Release moves Position from 1 (press) to 0
-    uint8_t newPosition = 0;
+    // Press moves Position from 0 (idle) to 1 (press)
+    uint8_t newPosition = 1;
 
     if (aEvent->Type != AppEvent::kEventType_Button)
     {
@@ -137,10 +140,76 @@ void SwitchManager::GenericSwitchReleasePressHandler(AppEvent * aEvent)
         return;
     }
 
-    ChipLogProgress(NotSpecified, "GenericSwitchReleasePress new position %d", newPosition);
+    ChipLogDetail(NotSpecified, "GenericSwitchLongPress new position %d", newPosition);
     SystemLayer().ScheduleLambda([newPosition] {
+        // LongPress event takes newPosition as event data
+        chip::app::Clusters::SwitchServer::Instance().OnLongPress(GENERICSWITCH_ENDPOINT_ID, newPosition);
+    });
+}
+
+void SwitchManager::GenericSwitchShortReleaseHandler(AppEvent * aEvent)
+{
+    // Release moves Position from 1 (press) to 0
+    uint8_t newPosition      = 0;
+    uint8_t previousPosition = 1;
+
+    if (aEvent->Type != AppEvent::kEventType_Button)
+    {
+        ChipLogError(NotSpecified, "Event type not supported!");
+        return;
+    }
+
+    ChipLogDetail(NotSpecified, "GenericSwitchShortRelease new position %d", newPosition);
+    SystemLayer().ScheduleLambda([newPosition, previousPosition] {
         chip::app::Clusters::Switch::Attributes::CurrentPosition::Set(GENERICSWITCH_ENDPOINT_ID, newPosition);
         // Short Release event takes newPosition as event data
-        chip::app::Clusters::SwitchServer::Instance().OnShortRelease(GENERICSWITCH_ENDPOINT_ID, newPosition);
+        chip::app::Clusters::SwitchServer::Instance().OnShortRelease(GENERICSWITCH_ENDPOINT_ID, previousPosition);
     });
+}
+
+void SwitchManager::GenericSwitchLongReleaseHandler(AppEvent * aEvent)
+{
+    // Release moves Position from 1 (press) to 0
+    uint8_t newPosition      = 0;
+    uint8_t previousPosition = 1;
+
+    if (aEvent->Type != AppEvent::kEventType_Button)
+    {
+        ChipLogError(NotSpecified, "Event type not supported!");
+        return;
+    }
+
+    ChipLogDetail(NotSpecified, "GenericSwitchLongRelease new position %d", newPosition);
+    SystemLayer().ScheduleLambda([newPosition, previousPosition] {
+        chip::app::Clusters::Switch::Attributes::CurrentPosition::Set(GENERICSWITCH_ENDPOINT_ID, newPosition);
+        // LongRelease event takes newPosition as event data
+        chip::app::Clusters::SwitchServer::Instance().OnLongRelease(GENERICSWITCH_ENDPOINT_ID, previousPosition);
+    });
+}
+
+void SwitchManager::GenericSwitchMultipressOngoingHandler(AppEvent * aEvent)
+{
+    uint8_t newPosition = 1;
+
+    multiPressCount++;
+
+    ChipLogDetail(NotSpecified, "GenericSwitchMultiPressOngoing (%d)", multiPressCount);
+
+    SystemLayer().ScheduleLambda([newPosition] {
+        chip::app::Clusters::SwitchServer::Instance().OnMultiPressOngoing(GENERICSWITCH_ENDPOINT_ID, newPosition, multiPressCount);
+    });
+}
+
+void SwitchManager::GenericSwitchMultipressCompleteHandler(AppEvent * aEvent)
+{
+    uint8_t previousPosition = 0;
+
+    ChipLogProgress(NotSpecified, "GenericSwitchMultiPressComplete (%d)", multiPressCount);
+
+    SystemLayer().ScheduleLambda([previousPosition] {
+        chip::app::Clusters::SwitchServer::Instance().OnMultiPressComplete(GENERICSWITCH_ENDPOINT_ID, previousPosition,
+                                                                           multiPressCount);
+    });
+
+    multiPressCount = 1;
 }

@@ -31,6 +31,7 @@
 #include <app/InteractionModelEngine.h>
 #include <app/RequiredPrivilege.h>
 #include <app/reporting/Engine.h>
+#include <app/reporting/Read.h>
 #include <app/util/MatterCallbacks.h>
 #include <app/util/ember-compatibility-functions.h>
 
@@ -77,25 +78,6 @@ bool Engine::IsClusterDataVersionMatch(const SingleLinkedListNode<DataVersionFil
         }
     }
     return existPathMatch && !existVersionMismatch;
-}
-
-CHIP_ERROR
-Engine::RetrieveClusterData(const SubjectDescriptor & aSubjectDescriptor, bool aIsFabricFiltered,
-                            AttributeReportIBs::Builder & aAttributeReportIBs, const ConcreteReadAttributePath & aPath,
-                            AttributeEncodeState * aEncoderState)
-{
-    ChipLogDetail(DataManagement, "<RE:Run> Cluster %" PRIx32 ", Attribute %" PRIx32 " is dirty", aPath.mClusterId,
-                  aPath.mAttributeId);
-
-    DataModelCallbacks::GetInstance()->AttributeOperation(DataModelCallbacks::OperationType::Read,
-                                                          DataModelCallbacks::OperationOrder::Pre, aPath);
-
-    ReturnErrorOnFailure(ReadSingleClusterData(aSubjectDescriptor, aIsFabricFiltered, aPath, aAttributeReportIBs, aEncoderState));
-
-    DataModelCallbacks::GetInstance()->AttributeOperation(DataModelCallbacks::OperationType::Read,
-                                                          DataModelCallbacks::OperationOrder::Post, aPath);
-
-    return CHIP_NO_ERROR;
 }
 
 static bool IsOutOfWriterSpaceError(CHIP_ERROR err)
@@ -200,8 +182,8 @@ CHIP_ERROR Engine::BuildSingleReportDataAttributeReportIBs(ReportDataMessage::Bu
             ConcreteReadAttributePath pathForRetrieval(readPath);
             // Load the saved state from previous encoding session for chunking of one single attribute (list chunking).
             AttributeEncodeState encodeState = apReadHandler->GetAttributeEncodeState();
-            err = RetrieveClusterData(apReadHandler->GetSubjectDescriptor(), apReadHandler->IsFabricFiltered(), attributeReportIBs,
-                                      pathForRetrieval, &encodeState);
+            err = Impl::RetrieveClusterData(mpImEngine->GetDataModel(), apReadHandler->GetSubjectDescriptor(),
+                                            apReadHandler->IsFabricFiltered(), attributeReportIBs, pathForRetrieval, &encodeState);
             if (err != CHIP_NO_ERROR)
             {
                 // If error is not an "out of writer space" error, rollback and encode status.

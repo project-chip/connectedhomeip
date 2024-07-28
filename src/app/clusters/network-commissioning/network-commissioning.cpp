@@ -24,7 +24,7 @@
 #include <app-common/zap-generated/cluster-objects.h>
 #include <app/AttributeAccessInterfaceRegistry.h>
 #include <app/CommandHandlerInterface.h>
-#include <app/InteractionModelEngine.h>
+#include <app/CommandHandlerInterfaceRegistry.h>
 #include <app/clusters/general-commissioning-server/general-commissioning-server.h>
 #include <app/data-model/Nullable.h>
 #include <app/reporting/reporting.h>
@@ -358,7 +358,7 @@ Instance::Instance(EndpointId aEndpointId, EthernetDriver * apDelegate) :
 
 CHIP_ERROR Instance::Init()
 {
-    ReturnErrorOnFailure(InteractionModelEngine::GetInstance()->RegisterCommandHandler(this));
+    ReturnErrorOnFailure(CommandHandlerInterfaceRegistry::RegisterCommandHandler(this));
     VerifyOrReturnError(registerAttributeAccessOverride(this), CHIP_ERROR_INCORRECT_STATE);
     ReturnErrorOnFailure(DeviceLayer::PlatformMgrImpl().AddEventHandler(OnPlatformEventHandler, reinterpret_cast<intptr_t>(this)));
     ReturnErrorOnFailure(mpBaseDriver->Init(this));

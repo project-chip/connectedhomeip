@@ -18,12 +18,12 @@ limitations under the License.
   <domain name="CHIP"/>
 
   Data types
-  <struct name="LocationInfoStruct">
+  <struct name="LocationInfoStruct" apiMaturity="provisional">
     <cluster code="0x0150"/>
-    <item name="LocationInfo"  type="HomeLocationStruct"    optional="false" isNullable="true"/>
-    <item name="LandmarkTag"   type="LandmarkTag"           optional="false" isNullable="true"/>
-    <item name="PositionTag"   type="PositionTag"           optional="false" isNullable="true"/>
-    <item name="SurfaceTag"    type="FloorSurfaceTag"       optional="false" isNullable="true"/>
+    <item name="LocationInfo"  type="LocationDescriptorStruct" optional="false" isNullable="true"/>
+    <item name="LandmarkTag"   type="LandmarkTag"              optional="false" isNullable="true"/>
+    <item name="PositionTag"   type="PositionTag"              optional="false" isNullable="true"/>
+    <item name="SurfaceTag"    type="FloorSurfaceTag"          optional="false" isNullable="true"/>
   </struct>
 
   <struct name="MapStruct">
@@ -71,7 +71,7 @@ limitations under the License.
     <item value="0x02" name="InvalidInMode"/>
   </enum>
 
-  <cluster>
+  <cluster apiMaturity="provisional">
     <domain>General</domain>
     <name>Service Area</name>
     <description>The Service Area cluster provides an interface for controlling the locations where a device should operate, and for querying the current location.</description>

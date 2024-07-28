@@ -184,7 +184,7 @@ class BaseTestHelper:
                  keypair: p256keypair.P256Keypair = None):
         chip.native.Init()
 
-        self.chipStack = ChipStack('/tmp/repl_storage.json')
+        self.chipStack = ChipStack('/tmp/repl_storage.json', enableServerInteractions=True)
         self.certificateAuthorityManager = chip.CertificateAuthority.CertificateAuthorityManager(chipStack=self.chipStack)
         self.certificateAuthority = self.certificateAuthorityManager.NewCertificateAuthority()
         self.fabricAdmin = self.certificateAuthority.NewFabricAdmin(vendorId=0xFFF1, fabricId=1)
@@ -1156,6 +1156,24 @@ class BaseTestHelper:
             return True
         except Exception as ex:
             self.logger.exception("Failed to resolve. {}".format(ex))
+            return False
+
+    async def TestTriggerTestEventHandler(self, nodeid, enable_key, event_trigger):
+        self.logger.info("Test trigger test event handler for device = %08x", nodeid)
+        try:
+            await self.devCtrl.SendCommand(nodeid, 0, Clusters.GeneralDiagnostics.Commands.TestEventTrigger(enableKey=enable_key, eventTrigger=event_trigger))
+            return True
+        except Exception as ex:
+            self.logger.exception("Failed to trigger test event handler {}".format(ex))
+            return False
+
+    async def TestWaitForActive(self, nodeid):
+        self.logger.info("Test wait for device = %08x", nodeid)
+        try:
+            await self.devCtrl.WaitForActive(nodeid)
+            return True
+        except Exception as ex:
+            self.logger.exception("Failed to wait for active. {}".format(ex))
             return False
 
     async def TestReadBasicAttributes(self, nodeid: int, endpoint: int):
