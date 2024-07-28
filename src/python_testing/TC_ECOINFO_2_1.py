@@ -49,7 +49,7 @@ class TC_ECOINFO_2_1(MatterBaseTest):
         self.step(1)
         endpoint_wild_card_read = await dev_ctrl.ReadAttribute(dut_node_id, [(Clusters.EcosystemInformation.Attributes.ClusterRevision)])
         list_of_endpoints = list(endpoint_wild_card_read.keys())
-    
+
         for cluster_endpoint in list_of_endpoints:
             if first_cluster_validation:
                 self.step(2)
@@ -58,12 +58,12 @@ class TC_ECOINFO_2_1(MatterBaseTest):
                 dut_node_id,
                 endpoint=cluster_endpoint,
                 attribute=Clusters.EcosystemInformation.Attributes.RemovedOn)
-    
+
             removed_on_is_null = removed_on is NullValue
             if not removed_on_is_null:
                 asserts.assert_true(type_matches(removed_on, uint))
                 asserts.assert_greater(removed_on, 0, "RemovedOn must be greater than 0", "RemovedOn should be a uint")
-                
+
             if first_cluster_validation:
                 self.step(3)
             device_directory = await self.read_single_attribute(
@@ -72,7 +72,7 @@ class TC_ECOINFO_2_1(MatterBaseTest):
                 endpoint=cluster_endpoint,
                 attribute=Clusters.EcosystemInformation.Attributes.DeviceDirectory,
                 fabricFiltered=False)
-    
+
             num_of_devices = len(device_directory)
             if removed_on_is_null:
                 asserts.assert_less_equal(num_of_devices, 256, "Too many device entries")
@@ -84,16 +84,19 @@ class TC_ECOINFO_2_1(MatterBaseTest):
                         asserts.assert_true(type_matches(device.deviceNameLastEdit, uint), "DeviceNameLastEdit should be a uint")
                         asserts.assert_greater(device.deviceNameLastEdit, 0, "DeviceNameLastEdit must be greater than 0")
                     else:
-                        asserts.assert_true(device.deviceNameLastEdit is None, "DeviceNameLastEdit should not be provided when there is no DeviceName")
-                    
+                        asserts.assert_true(device.deviceNameLastEdit is None,
+                                            "DeviceNameLastEdit should not be provided when there is no DeviceName")
+
                     asserts.assert_true(type_matches(device.bridgedEndpoint, uint), "BridgedEndpoint should be a uint")
                     asserts.assert_greater_equal(device.bridgedEndpoint, 0, "BridgedEndpoint >= 0")
-                    asserts.assert_less_equal(device.bridgedEndpoint, 0xffff_ffff, "BridgedEndpoint less than or equal to Invalid Endpoint value")
-    
+                    asserts.assert_less_equal(device.bridgedEndpoint, 0xffff_ffff,
+                                              "BridgedEndpoint less than or equal to Invalid Endpoint value")
+
                     asserts.assert_true(type_matches(device.originalEndpoint, uint), "OriginalEndpoint should be a uint")
                     asserts.assert_greater_equal(device.originalEndpoint, 0, "OriginalEndpoint >= 0")
-                    asserts.assert_less(device.originalEndpoint, 0xffff_ffff, "OriginalEndpoint less than or equal to Invalid Endpoint value")
-    
+                    asserts.assert_less(device.originalEndpoint, 0xffff_ffff,
+                                        "OriginalEndpoint less than or equal to Invalid Endpoint value")
+
                     asserts.assert_true(type_matches(device.deviceTypes, list), "DeviceTypes should be a list")
                     asserts.assert_greater_equal(len(device.deviceTypes), 1, "DeviceTypes list must contains at least one entry")
                     for device_type in device.deviceTypes:
@@ -101,25 +104,28 @@ class TC_ECOINFO_2_1(MatterBaseTest):
                         # TODO what other validation can we do here to device_type.deviceType
                         asserts.assert_true(type_matches(device_type.revision, uint), "device type's revision should be a uint")
                         asserts.assert_greater_equal(device_type.revision, 1, "device type's revision must >= 1")
-    
+
                     asserts.assert_true(type_matches(device.uniqueLocationIDs, list), "UniqueLocationIds should be a list")
                     num_of_unique_location_ids = len(device.uniqueLocationIDs)
                     asserts.assert_less_equal(num_of_unique_location_ids, 64, "UniqueLocationIds list should be <= 64")
                     for location_id in device.uniqueLocationIDs:
                         asserts.assert_true(type_matches(location_id, str), "UniqueLocationId should be a string")
                         location_id_string_length = len(location_id)
-                        asserts.assert_greater_equal(location_id_string_length, 1, "UniqueLocationId must contain at least one character")
+                        asserts.assert_greater_equal(location_id_string_length, 1,
+                                                     "UniqueLocationId must contain at least one character")
                         asserts.assert_less_equal(location_id_string_length, 64, "UniqueLocationId should be <= 64")
-    
-                    asserts.assert_true(type_matches(device.uniqueLocationIDsLastEdit, uint), "UniqueLocationIdsLastEdit should be a uint")
+
+                    asserts.assert_true(type_matches(device.uniqueLocationIDsLastEdit, uint),
+                                        "UniqueLocationIdsLastEdit should be a uint")
                     if num_of_unique_location_ids:
                         asserts.assert_greater(device.uniqueLocationIDsLastEdit, 0, "UniqueLocationIdsLastEdit must be non-zero")
                     else:
                         # TODO double check this is actually a true thing to be asserting.
-                        asserts.assert_equal(device.uniqueLocationIDsLastEdit, 0, "UniqueLocationIdsLastEdit must be 0 if there are no UniqueLocationIds")
+                        asserts.assert_equal(device.uniqueLocationIDsLastEdit, 0,
+                                             "UniqueLocationIdsLastEdit must be 0 if there are no UniqueLocationIds")
             else:
                 asserts.assert_equal(num_of_devices, 0, "Device was removed, there should be no devices in DeviceDirectory")
-            
+
             if first_cluster_validation:
                 self.step(4)
             location_directory = await self.read_single_attribute(
@@ -128,53 +134,56 @@ class TC_ECOINFO_2_1(MatterBaseTest):
                 endpoint=cluster_endpoint,
                 attribute=Clusters.EcosystemInformation.Attributes.LocationDirectory,
                 fabricFiltered=False)
-    
+
             num_of_locations = len(location_directory)
             if removed_on_is_null:
                 asserts.assert_less_equal(num_of_locations, 64, "Too many location entries")
                 for location in location_directory:
                     asserts.assert_true(type_matches(location.uniqueLocationID, str), "UniqueLocationId should be a string")
                     location_id_string_length = len(location.uniqueLocationID)
-                    asserts.assert_greater_equal(location_id_string_length, 1, "UniqueLocationId must contain at least one character")
+                    asserts.assert_greater_equal(location_id_string_length, 1,
+                                                 "UniqueLocationId must contain at least one character")
                     asserts.assert_less_equal(location_id_string_length, 64, "UniqueLocationId should be <= 64")
-    
-                    asserts.assert_true(type_matches(location.locationDescriptor.locationName, str), "LocationName should be a string")
+
+                    asserts.assert_true(type_matches(location.locationDescriptor.locationName, str),
+                                        "LocationName should be a string")
                     asserts.assert_less_equal(len(location.locationDescriptor.locationName), 64, "LocationName should be <= 64")
-    
+
                     if location.locationDescriptor.floorNumber is not NullValue:
-                        asserts.assert_true(type_matches(location.locationDescriptor.floorNumber, int), "FloorNumber should be an int")
+                        asserts.assert_true(type_matches(location.locationDescriptor.floorNumber, int),
+                                            "FloorNumber should be an int")
                         # TODO check in range of int16.
-    
+
                     if location.locationDescriptor.areaType is not NullValue:
                         # TODO check areaType is valid.
                         pass
-    
-                    asserts.assert_true(type_matches(location.locationDescriptorLastEdit, uint), "UniqueLocationIdsLastEdit should be a uint")
+
+                    asserts.assert_true(type_matches(location.locationDescriptorLastEdit, uint),
+                                        "UniqueLocationIdsLastEdit should be a uint")
                     asserts.assert_greater(location.locationDescriptorLastEdit, 0, "LocationDescriptorLastEdit must be non-zero")
-                    
-    
+
             else:
                 asserts.assert_equal(num_of_locations, 0, "Device was removed, there should be no location in LocationDirectory")
-    
+
             if first_cluster_validation:
                 self.step(5)
             result = await dev_ctrl.WriteAttribute(dut_node_id, [(cluster_endpoint, Clusters.EcosystemInformation.Attributes.RemovedOn(2))])
             asserts.assert_equal(len(result), 1, "Expecting only one result from trying to write to RemovedOn Attribute")
             asserts.assert_equal(result[0].Status, Status.UnsupportedWrite, "Expecting Status of UnsupportedWrite")
-            
+
             if first_cluster_validation:
                 self.step(6)
             result = await dev_ctrl.WriteAttribute(dut_node_id, [(cluster_endpoint, Clusters.EcosystemInformation.Attributes.DeviceDirectory([]))])
             asserts.assert_equal(len(result), 1, "Expecting only one result from trying to write to DeviceDirectory Attribute")
             asserts.assert_equal(result[0].Status, Status.UnsupportedWrite, "Expecting Status of UnsupportedWrite")
-    
+
             if first_cluster_validation:
                 self.step(7)
             result = await dev_ctrl.WriteAttribute(dut_node_id, [(cluster_endpoint, Clusters.EcosystemInformation.Attributes.DeviceDirectory([]))])
             asserts.assert_equal(len(result), 1, "Expecting only one result from trying to write to LocationDirectory Attribute")
             asserts.assert_equal(result[0].Status, Status.UnsupportedWrite, "Expecting Status of UnsupportedWrite")
-    
+
             if first_cluster_validation:
                 self.step(8)
-            
+
             first_cluster_validation = False
