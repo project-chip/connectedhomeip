@@ -86,6 +86,8 @@ template("gen_flashing_script") {
 template("flashable_executable") {
   executable_target = "$target_name.executable"
 
+  if (!defined(invoker.output_dir)) {invoker.output_dir = root_out_dir}
+
   if (defined(invoker.flashing_script_name)) {
     # Generating the flashing script is the final target.
     final_target = "$target_name.flashing"
