@@ -165,8 +165,8 @@ void wfx_clear_wifi_provision(void)
 sl_status_t wfx_connect_to_ap(void)
 {
     VerifyOrReturnError(wfx_rsi.dev_state & WFX_RSI_ST_STA_PROVISIONED, SL_STATUS_INVALID_CONFIGURATION);
-    // TODO: check for '\0' in SSID before printing
-    ChipLogProgress(DeviceLayer, "Connect to access point: %s", wfx_rsi.sec.ssid);
+    VerifyOrReturnError(strlen(wfx_rsi.sec.ssid) <= WFX_MAX_SSID_LENGTH, SL_STATUS_WOULD_OVERFLOW);
+    ChipLogProgress(DeviceLayer, "connect to access point: %s", wfx_rsi.sec.ssid);
     WfxEvent_t event;
     event.eventType = WFX_EVT_STA_START_JOIN;
     WfxPostEvent(&event);

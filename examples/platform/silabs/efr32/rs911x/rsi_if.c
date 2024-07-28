@@ -813,7 +813,7 @@ void wfx_rsi_task(void * arg)
     wfx_lwip_start();
     wfx_started_notify();
 
-    SILABS_LOG("Starting event loop");
+    SILABS_LOG("wfx_rsi_task: starting event loop");
     for (;;)
     {
         osStatus_t status = osMessageQueueGet(sWifiEventQueue, &wfxEvent, NULL, osWaitForever);
@@ -823,7 +823,7 @@ void wfx_rsi_task(void * arg)
         }
         else
         {
-            SILABS_LOG("Failed to get event with status: %x", status);
+            SILABS_LOG("wfx_rsi_task: get event failed: %x", status);
         }
     }
 }

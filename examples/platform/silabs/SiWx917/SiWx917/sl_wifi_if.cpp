@@ -358,7 +358,7 @@ int32_t wfx_rsi_power_save(rsi_power_save_profile_mode_t sl_si91x_ble_state, sl_
  *****************************************************************************************/
 int32_t wfx_wifi_rsi_init(void)
 {
-    ChipLogDetail(DeviceLayer, "wfx_wifi_rsi_init started");
+    ChipLogDetail(DeviceLayer, "wfx_wifi_rsi_init: started");
     sl_status_t status;
     status = sl_wifi_init(&config, NULL, sl_wifi_default_event_handler);
     VerifyOrReturnError(status == SL_STATUS_OK, status);

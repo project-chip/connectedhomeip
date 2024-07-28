@@ -92,11 +92,9 @@ void wfx_connected_notify(int32_t status, sl_wfx_mac_address_t * ap)
 
     if (status != SUCCESS_STATUS)
     {
-        ChipLogProgress(DeviceLayer, "%s: error: failed status: %ld.", __func__, status);
+        ChipLogProgress(DeviceLayer, "wfx_connected_notify: error: failed status: %ld", status);
         return;
     }
-
-    ChipLogProgress(DeviceLayer, "%s: connected.", __func__);
 
     memset(&evt, 0, sizeof(evt));
     evt.header.id     = SL_WFX_CONNECT_IND_ID;
