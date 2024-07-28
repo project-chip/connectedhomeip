@@ -43,8 +43,6 @@ CHIP_ERROR WhmManufacturer::Init()
         return CHIP_ERROR_UNINITIALIZED;
     }
 
-    mBoostActive = false;
-
     dg->SetHeaterTypes(BitMask<WaterHeaterTypeBitmap>(WaterHeaterTypeBitmap::kImmersionElement1));
     dg->SetHeatDemand(BitMask<WaterHeaterDemandBitmap>(WaterHeaterDemandBitmap::kImmersionElement1));
     dg->SetEstimatedHeatRequired(10000);
@@ -109,13 +107,10 @@ Status WhmManufacturer::TurnHeatingOn(bool emergencyBoost)
 
     WaterHeaterManagementDelegate * dg = GetWhmDelegate();
 
-    if (dg->GetBoostState() == BoostStateEnum::kActive)
-    {
-        mBoostActive = true;
-    }
-
     if (emergencyBoost)
     {
+        // emergencyBoost that the consumer wants the water to be heated as quickly as practicable.
+        // Thus, cause multiple heat sources to be activated
         dg->SetHeatDemand(BitMask<WaterHeaterDemandBitmap>(WaterHeaterDemandBitmap::kImmersionElement1,
                                                            WaterHeaterDemandBitmap::kImmersionElement2));
     }
@@ -132,11 +127,6 @@ Status WhmManufacturer::TurnHeatingOff()
     Status status = Status::Success;
 
     ChipLogProgress(AppServer, "WhmManufacturer::TurnHeatingOff");
-
-    if (mBoostActive)
-    {
-        mBoostActive = false;
-    }
 
     WaterHeaterManagementDelegate * dg = GetWhmDelegate();
 

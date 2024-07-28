@@ -120,7 +120,6 @@ public:
 
 private:
     WaterHeaterManagementInstance * mWhmInstance;
-    bool mBoostActive;
 };
 
 /** @brief Helper function to return the singleton WhmManufacturer instance
