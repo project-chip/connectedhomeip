@@ -29,7 +29,7 @@ using namespace chip::app::Clusters::WaterHeaterManagement;
 using Protocols::InteractionModel::Status;
 
 WaterHeaterManagementDelegate::WaterHeaterManagementDelegate(EndpointId clustersEndpoint) :
-    mpWhmInstance(nullptr), mpWhmManufacturer(nullptr), mHotWaterTemperature(0), mReplacedWaterTemperature(0),
+    mpWhmInstance(nullptr), mpWhmManufacturer(nullptr), mWaterTemperature(0), mReplacedWaterTemperature(0),
     mBoostTargetTemperatureReached(false), mTankVolume(0),
     mEstimatedHeatRequired(0), mTankPercentage(0), mBoostState(BoostStateEnum::kInactive)
 {}
@@ -253,6 +253,7 @@ Status WaterHeaterManagementDelegate::HandleCancelBoost()
     if (mBoostState == BoostStateEnum::kActive)
     {
         SetBoostState(BoostStateEnum::kInactive);
+        mBoostEmergencyBoost.ClearValue();
 
         DeviceLayer::SystemLayer().CancelTimer(BoostTimerExpiry, this);
 
@@ -274,19 +275,13 @@ Status WaterHeaterManagementDelegate::HandleCancelBoost()
 
 /*********************************************************************************
  *
- * Methods implementing the ModeBase::Delegate interface
- *
- *********************************************************************************/
-
-/*********************************************************************************
- *
  * WaterHeaterManagementDelegate specific methods
  *
  *********************************************************************************/
 
 void WaterHeaterManagementDelegate::SetWaterTemperature(uint16_t waterTemperature)
 {
-    mHotWaterTemperature = waterTemperature;
+    mWaterTemperature = waterTemperature;
 
     if (mpWhmInstance != nullptr && mpWhmInstance->HasFeature(Feature::kTankPercent))
     {
@@ -338,52 +333,34 @@ bool WaterHeaterManagementDelegate::HasWaterTemperatureReachedTarget() const
         ? static_cast<uint16_t>(mBoostTemporarySetpoint.Value())
         : mTargetWaterTemperature;
 
-    uint8_t targetPercentage = 0;
-    bool useTankPercentage = false;
+    VerifyOrReturnValue(mWaterTemperature >= targetTemperature, false);
 
-    if (mBoostState == BoostStateEnum::kActive && mBoostTargetTemperatureReached && mBoostTargetReheat.HasValue())
+    if (mBoostState == BoostStateEnum::kActive)
     {
-        // If the tank supports the TankPercent feature, and the heating by this Boost command has ceased because the
-        // TargetPercentage of the water in the tank has been heated to the set point (or TemporarySetpoint if included), this field
-        // indicates the percentage to which the hot water in the tank SHALL be allowed to fall before again beginning to reheat it.
-        //
-        // For example if the TargetPercentage was 80%, and the TargetReheat was 40%, then after initial heating to 80% hot water,
-        // the tank may have hot water drawn off until only 40% hot water remains. At this point the heater will begin to heat back
-        // up to 80% of hot water. If this field and the OneShot field were both omitted, heating would begin again after any water
-        // draw which reduced the TankPercentage below 80%.
+        if (mBoostTargetTemperatureReached && mBoostTargetReheat.HasValue())
+        {
+            // If the tank supports the TankPercent feature, and the heating by this Boost command has ceased because the
+            // TargetPercentage of the water in the tank has been heated to the set point (or TemporarySetpoint if included),
+            // mBoostTargetReheat indicates the percentage to which the hot water in the tank SHALL be allowed to fall before
+            // again beginning to reheat it.
+            //
+            // For example if the TargetPercentage was 80%, and the TargetReheat was 40%, then after initial heating to 80% hot water,
+            // the tank may have hot water drawn off until only 40% hot water remains. At this point the heater will begin to heat back
+            // up to 80% of hot water. If this field and the OneShot field were both omitted, heating would begin again after any water
+            // draw which reduced the TankPercentage below 80%.
 
-        // If this field is included then the TargetPercentage field SHALL also be included, and the OneShot excluded.
-
-        targetPercentage = mBoostTargetReheat.Value();
-
-        useTankPercentage = true;
-    }
-    else if (mpWhmInstance != nullptr && mpWhmInstance->HasFeature(Feature::kTankPercent) && mBoostTargetPercentage.HasValue())
-    {
-        // If tank percentage is supported AND the targetPercentage.HasValue() then use target percentage to heat up.
-        targetPercentage = mBoostTargetPercentage.Value();
-
-        useTankPercentage = true;
-    }
-    else
-    {
-        // Don't support tankPercentage OR the targetPercent wasn't included then just rely on temperature alone
-        useTankPercentage = false;
+            // If this field is included then the TargetPercentage field SHALL also be included, and the OneShot excluded.
+            VerifyOrReturnValue(mTankPercentage >= mBoostTargetReheat.Value(), false);
+        }
+        else if (mBoostTargetPercentage.HasValue())
+        {
+            // If tank percentage is supported AND the targetPercentage.HasValue() then use target percentage to heat up.
+            VerifyOrReturnValue(mTankPercentage >= mBoostTargetPercentage.Value(), false);
+        }
     }
 
-    // Determine whether the water is at the target temperature
-    bool tempReached = true;
-    if (useTankPercentage && mTankPercentage < targetPercentage)
-    {
-        tempReached = false;
-    }
-
-    if (mHotWaterTemperature < targetTemperature)
-    {
-        tempReached = false;
-    }
-
-    return tempReached;
+    // Must have reached teh right temperature
+    return true;
 }
 
 Status WaterHeaterManagementDelegate::CheckIfHeatNeedsToBeTurnedOnOrOff()
@@ -391,8 +368,12 @@ Status WaterHeaterManagementDelegate::CheckIfHeatNeedsToBeTurnedOnOrOff()
     Status status       = Status::Success;
     bool turningHeatOff = false;
 
+    VerifyOrReturnError(mpWhmManufacturer != nullptr, Status::InvalidInState);
+
     if (!HasWaterTemperatureReachedTarget())
     {
+        VerifyOrReturnError(WaterHeaterMode::Instance() != nullptr, Status::InvalidInState);
+
         uint8_t mode = WaterHeaterMode::Instance()->GetCurrentMode();
 
         // The water in the tank is not at the target temperature. See if heating is currently off
@@ -408,28 +389,20 @@ Status WaterHeaterManagementDelegate::CheckIfHeatNeedsToBeTurnedOnOrOff()
             // If a boost command is in progress or in manual mode, find a heating source and "turn it on".
             if (mBoostState == BoostStateEnum::kActive || mode == WaterHeaterMode::kModeManual)
             {
-                if (mpWhmManufacturer != nullptr)
-                {
-                    // Find out from the manufacturer object the heating sources to use.
-                    BitMask<WaterHeaterDemandBitmap> heaterDemand = mpWhmManufacturer->DetermineHeatingSources();
+                // Find out from the manufacturer object the heating sources to use.
+                BitMask<WaterHeaterDemandBitmap> heaterDemand = mpWhmManufacturer->DetermineHeatingSources();
 
-                    SetHeatDemand(heaterDemand);
+                SetHeatDemand(heaterDemand);
 
-                    // And turn the heating of the water tank on.
-                    status = mpWhmManufacturer->TurnHeatingOn();
-                }
-                else
-                {
-                    status = Status::InvalidInState;
-                    ChipLogError(AppServer, "CheckIfHeatNeedsToBeTurnedOnOrOff: Failed as mpWhmManufacturer == nullptr");
-                }
+                // And turn the heating of the water tank on.
+                status = mpWhmManufacturer->TurnHeatingOn(mBoostEmergencyBoost.HasValue() ? mBoostEmergencyBoost.Value() : false);
             }
         }
         else if (mBoostState == BoostStateEnum::kInactive && mode == WaterHeaterMode::kModeOff)
         {
             // The water temperature is not at the target temperature but there is no boost command in progress and the mode is Off
             // so need to ensure the heating is turned off.
-            ChipLogError(AppServer, "CheckIfHeatNeedsToBeTurnedOnOrOff turning heating off due to mode");
+            ChipLogError(AppServer, "CheckIfHeatNeedsToBeTurnedOnOrOff turning heating off due to no boost cmd and kModeOff");
 
             SetHeatDemand(BitMask<WaterHeaterDemandBitmap>(0));
 
@@ -457,47 +430,34 @@ Status WaterHeaterManagementDelegate::CheckIfHeatNeedsToBeTurnedOnOrOff()
 
             DeviceLayer::SystemLayer().CancelTimer(BoostTimerExpiry, this);
 
-            if (mpWhmManufacturer != nullptr)
-            {
-                status = mpWhmManufacturer->BoostCommandCancelled();
-            }
-            else
-            {
-                status = Status::InvalidInState;
-                ChipLogError(AppServer, "CheckIfHeatNeedsToBeTurnedOnOrOff: mpWhmManufacturer == nullptr");
-            }
+            mBoostEmergencyBoost.ClearValue();
+
+            status = mpWhmManufacturer->BoostCommandCancelled();
         }
 
         // Turn the heating off
-        if (mpWhmManufacturer != nullptr)
-        {
-            status = mpWhmManufacturer->TurnHeatingOff();
-        }
-        else
-        {
-            status = Status::InvalidInState;
-            ChipLogError(AppServer,
-                         "CheckIfHeatNeedsToBeTurnedOnOrOff: Failed to turn the heating off as mpWhmManufacturer == nullptr");
-        }
+        status = mpWhmManufacturer->TurnHeatingOff();
     }
 
     return status;
 }
 
-void WaterHeaterManagementDelegate::SetWaterHeaterMode(uint8_t modeValue)
+Status WaterHeaterManagementDelegate::SetWaterHeaterMode(uint8_t modeValue)
 {
+    VerifyOrReturnError(WaterHeaterMode::Instance() != nullptr, Status::InvalidInState);
+
     if (!WaterHeaterMode::Instance()->IsSupportedMode(modeValue))
     {
         ChipLogError(AppServer, "SetWaterHeaterMode bad mode");
-        return;
+        return Status::ConstraintError;
     }
 
     Status status = WaterHeaterMode::Instance()->UpdateCurrentMode(modeValue);
     if (status != Status::Success)
     {
-        ChipLogError(AppServer, "SetWaterHeaterMode updateMode failed");
-        return;
+        ChipLogError(AppServer, "SetWaterHeaterMode updateMode failed 0x%02x", to_underlying(status));
+        return status;
     }
 
-    CheckIfHeatNeedsToBeTurnedOnOrOff();
+    return CheckIfHeatNeedsToBeTurnedOnOrOff();
 }

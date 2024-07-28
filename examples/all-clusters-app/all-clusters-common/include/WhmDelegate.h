@@ -116,7 +116,7 @@ public:
      *
      * @param mode  The Water Heater Mode (e.g. OFF, MANUAL or TIMED).
      */
-    void SetWaterHeaterMode(uint8_t mode);
+    Protocols::InteractionModel::Status SetWaterHeaterMode(uint8_t mode);
 
     /**
      * @brief Set the water temperature of the tank
@@ -179,7 +179,7 @@ private:
     uint16_t mTargetWaterTemperature;
 
     // Actual water temperature in 100ths of a C
-    uint16_t mHotWaterTemperature;
+    uint16_t mWaterTemperature;
 
     // The % of water at temperature mReplacedWaterTemperature
     uint16_t mReplacedWaterTemperature;

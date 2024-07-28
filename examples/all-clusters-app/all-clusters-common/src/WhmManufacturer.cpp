@@ -101,7 +101,7 @@ BitMask<WaterHeaterDemandBitmap> WhmManufacturer::DetermineHeatingSources()
     return BitMask<WaterHeaterDemandBitmap>(heaterDemandMask);
 }
 
-Status WhmManufacturer::TurnHeatingOn()
+Status WhmManufacturer::TurnHeatingOn(bool emergencyBoost)
 {
     Status status = Status::Success;
 
@@ -198,7 +198,11 @@ void SetTestEventTrigger_ManualModeTestEvent()
     WaterHeaterManagementDelegate * dg = GetWhmDelegate();
 
     // Simulate the Water Heater Mode being set to MANUAL
-    dg->SetWaterHeaterMode(WaterHeaterMode::kModeManual);
+    Status status = dg->SetWaterHeaterMode(WaterHeaterMode::kModeManual);
+    if (status != Status::Success)
+    {
+        ChipLogError(Zcl, "SetTestEventTrigger_OffModeTestEvent setting mode -> KModeManual failed 0x%02x", to_underlying(status));
+    }
 }
 
 void SetTestEventTrigger_OffModeTestEvent()
@@ -206,7 +210,11 @@ void SetTestEventTrigger_OffModeTestEvent()
     WaterHeaterManagementDelegate * dg = GetWhmDelegate();
 
     // Simulate the Water Heater Mode being set to OFF
-    dg->SetWaterHeaterMode(WaterHeaterMode::kModeOff);
+    Status status = dg->SetWaterHeaterMode(WaterHeaterMode::kModeOff);
+    if (status != Status::Success)
+    {
+        ChipLogError(Zcl, "SetTestEventTrigger_OffModeTestEvent setting mode -> KModeOff failed 0x%02x", to_underlying(status));
+    }
 }
 
 void SetTestEventTrigger_DrawOffHotWaterTestEvent()
