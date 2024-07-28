@@ -114,6 +114,16 @@ Status WhmManufacturer::TurnHeatingOn(bool emergencyBoost)
         mBoostActive = true;
     }
 
+    if (emergencyBoost)
+    {
+        dg->SetHeatDemand(BitMask<WaterHeaterDemandBitmap>(WaterHeaterDemandBitmap::kImmersionElement1,
+                                                           WaterHeaterDemandBitmap::kImmersionElement2));
+    }
+    else
+    {
+        dg->SetHeatDemand(BitMask<WaterHeaterDemandBitmap>(WaterHeaterDemandBitmap::kImmersionElement1));
+    }
+
     return status;
 }
 
@@ -127,6 +137,10 @@ Status WhmManufacturer::TurnHeatingOff()
     {
         mBoostActive = false;
     }
+
+    WaterHeaterManagementDelegate * dg = GetWhmDelegate();
+
+    dg->SetHeatDemand(BitMask<WaterHeaterDemandBitmap>(0));
 
     return status;
 }

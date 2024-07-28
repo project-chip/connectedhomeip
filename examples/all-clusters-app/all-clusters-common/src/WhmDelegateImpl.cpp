@@ -246,8 +246,6 @@ void WaterHeaterManagementDelegate::HandleBoostTimerExpiry()
  */
 Status WaterHeaterManagementDelegate::HandleCancelBoost()
 {
-    Status status = Status::Success;
-
     ChipLogProgress(AppServer, "HandleCancelBoost");
 
     if (mBoostState == BoostStateEnum::kActive)
@@ -257,20 +255,16 @@ Status WaterHeaterManagementDelegate::HandleCancelBoost()
 
         DeviceLayer::SystemLayer().CancelTimer(BoostTimerExpiry, this);
 
-        if (mpWhmManufacturer != nullptr)
-        {
-            status = mpWhmManufacturer->BoostCommandCancelled();
-        }
-        else
-        {
-            status = Status::InvalidInState;
-            ChipLogError(AppServer, "HandleCancelBoost: mpWhmManufacturer == nullptr");
-        }
+        VerifyOrReturnValue(mpWhmManufacturer != nullptr, Status::InvalidInState);
+
+        Status status = mpWhmManufacturer->BoostCommandCancelled();
+        VerifyOrReturnValue(status == Status::Success, status);
 
         status = CheckIfHeatNeedsToBeTurnedOnOrOff();
+        VerifyOrReturnValue(status == Status::Success, status);
     }
 
-    return status;
+    return Status::Success;
 }
 
 /*********************************************************************************
@@ -365,10 +359,43 @@ bool WaterHeaterManagementDelegate::HasWaterTemperatureReachedTarget() const
 
 Status WaterHeaterManagementDelegate::CheckIfHeatNeedsToBeTurnedOnOrOff()
 {
-    Status status       = Status::Success;
-    bool turningHeatOff = false;
-
     VerifyOrReturnError(mpWhmManufacturer != nullptr, Status::InvalidInState);
+
+    HeatingOp heatingOp = HeatingOp::LeaveHeatingUnchanged;
+
+    Status status = DetermineIfChangingHeatingState(heatingOp);
+
+    VerifyOrReturnError(status == Status::Success, status);
+
+    if (heatingOp == HeatingOp::TurnHeatingOn)
+    {
+        status = mpWhmManufacturer->TurnHeatingOn(mBoostEmergencyBoost.HasValue() ? mBoostEmergencyBoost.Value() : false);
+    }
+    else if (heatingOp == HeatingOp::TurnHeatingOff)
+    {
+        // If running a boost command with the oneShot parameter and turning heat off, then must have
+        // reached the boost command target temperature -> that's the boost command complete.
+        if (mBoostState == BoostStateEnum::kActive && mBoostOneShot.HasValue() && mBoostOneShot.Value())
+        {
+            SetBoostState(BoostStateEnum::kInactive);
+
+            DeviceLayer::SystemLayer().CancelTimer(BoostTimerExpiry, this);
+
+            mBoostEmergencyBoost.ClearValue();
+
+            status = mpWhmManufacturer->BoostCommandCancelled();
+        }
+
+        // Turn the heating off
+        status = mpWhmManufacturer->TurnHeatingOff();
+    }
+
+    return status;
+}
+
+Status WaterHeaterManagementDelegate::DetermineIfChangingHeatingState(HeatingOp & heatingOp)
+{
+    heatingOp = LeaveHeatingUnchanged;
 
     if (!HasWaterTemperatureReachedTarget())
     {
@@ -389,57 +416,28 @@ Status WaterHeaterManagementDelegate::CheckIfHeatNeedsToBeTurnedOnOrOff()
             // If a boost command is in progress or in manual mode, find a heating source and "turn it on".
             if (mBoostState == BoostStateEnum::kActive || mode == WaterHeaterMode::kModeManual)
             {
-                // Find out from the manufacturer object the heating sources to use.
-                BitMask<WaterHeaterDemandBitmap> heaterDemand = mpWhmManufacturer->DetermineHeatingSources();
-
-                SetHeatDemand(heaterDemand);
-
-                // And turn the heating of the water tank on.
-                status = mpWhmManufacturer->TurnHeatingOn(mBoostEmergencyBoost.HasValue() ? mBoostEmergencyBoost.Value() : false);
+                heatingOp = HeatingOp::TurnHeatingOn;
             }
         }
         else if (mBoostState == BoostStateEnum::kInactive && mode == WaterHeaterMode::kModeOff)
         {
             // The water temperature is not at the target temperature but there is no boost command in progress and the mode is Off
             // so need to ensure the heating is turned off.
-            ChipLogError(AppServer, "CheckIfHeatNeedsToBeTurnedOnOrOff turning heating off due to no boost cmd and kModeOff");
+            ChipLogError(AppServer, "DetermineIfChangingHeatingState turning heating off due to no boost cmd and kModeOff");
 
-            SetHeatDemand(BitMask<WaterHeaterDemandBitmap>(0));
-
-            turningHeatOff = true;
+            heatingOp = HeatingOp::TurnHeatingOff;
         }
     }
     else if (mHeatDemand.Raw() != 0)
     {
         // The water in the tank has reached the target temperature - need to turn the heating off
-        SetHeatDemand(BitMask<WaterHeaterDemandBitmap>(0));
-
-        turningHeatOff = true;
+        heatingOp = HeatingOp::TurnHeatingOff;
 
         // If a boost command is in progress, record that the target temperature has been reached.
         mBoostTargetTemperatureReached = (mBoostState == BoostStateEnum::kActive);
     }
 
-    if (turningHeatOff)
-    {
-        // If running a boost command with the oneShot parameter and turning heat off, then must have
-        // reached the boost command target temperature -> that's the boost command complete.
-        if (mBoostState == BoostStateEnum::kActive && mBoostOneShot.HasValue() && mBoostOneShot.Value())
-        {
-            SetBoostState(BoostStateEnum::kInactive);
-
-            DeviceLayer::SystemLayer().CancelTimer(BoostTimerExpiry, this);
-
-            mBoostEmergencyBoost.ClearValue();
-
-            status = mpWhmManufacturer->BoostCommandCancelled();
-        }
-
-        // Turn the heating off
-        status = mpWhmManufacturer->TurnHeatingOff();
-    }
-
-    return status;
+    return Status::Success;
 }
 
 Status WaterHeaterManagementDelegate::SetWaterHeaterMode(uint8_t modeValue)

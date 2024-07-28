@@ -30,6 +30,13 @@ namespace WaterHeaterManagement {
 
 class WhmManufacturer;
 
+enum HeatingOp
+{
+    TurnHeatingOn,
+    TurnHeatingOff,
+    LeaveHeatingUnchanged
+};
+
 // This is an application level delegate to handle operational state commands according to the specific business logic.
 class WaterHeaterManagementDelegate : public WaterHeaterManagement::Delegate
 {
@@ -161,6 +168,16 @@ public:
      * @param replacedWaterTemperature  The temperature of the percentageReplaced water.
      */
     void DrawOffHotWater(uint8_t percentageReplaced, uint16_t replacedWaterTemperature);
+
+private:
+    /**
+     * @brief Determine whether heating needs to be turned on or off or left as is.
+     *
+     * @param heatingOp[out]  Set as determined whether heating needs to be turned on/off or left unchanged.
+     *
+     * @return  Success if the heating operation could be determined otherwise returns with appropriate error.
+     */
+    Protocols::InteractionModel::Status DetermineIfChangingHeatingState(HeatingOp & heatingOp);
 
 private:
     /*********************************************************************************
