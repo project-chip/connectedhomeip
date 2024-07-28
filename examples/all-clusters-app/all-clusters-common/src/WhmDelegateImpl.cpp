@@ -30,8 +30,8 @@ using Protocols::InteractionModel::Status;
 
 WaterHeaterManagementDelegate::WaterHeaterManagementDelegate(EndpointId clustersEndpoint) :
     mpWhmInstance(nullptr), mpWhmManufacturer(nullptr), mWaterTemperature(0), mReplacedWaterTemperature(0),
-    mBoostTargetTemperatureReached(false), mTankVolume(0),
-    mEstimatedHeatRequired(0), mTankPercentage(0), mBoostState(BoostStateEnum::kInactive)
+    mBoostTargetTemperatureReached(false), mTankVolume(0), mEstimatedHeatRequired(0), mTankPercentage(0),
+    mBoostState(BoostStateEnum::kInactive)
 {}
 
 void WaterHeaterManagementDelegate::SetWaterHeaterManagementInstance(WaterHeaterManagement::Instance & instance)
@@ -344,10 +344,10 @@ bool WaterHeaterManagementDelegate::HasWaterTemperatureReachedTarget() const
             // mBoostTargetReheat indicates the percentage to which the hot water in the tank SHALL be allowed to fall before
             // again beginning to reheat it.
             //
-            // For example if the TargetPercentage was 80%, and the TargetReheat was 40%, then after initial heating to 80% hot water,
-            // the tank may have hot water drawn off until only 40% hot water remains. At this point the heater will begin to heat back
-            // up to 80% of hot water. If this field and the OneShot field were both omitted, heating would begin again after any water
-            // draw which reduced the TankPercentage below 80%.
+            // For example if the TargetPercentage was 80%, and the TargetReheat was 40%, then after initial heating to 80% hot
+            // water, the tank may have hot water drawn off until only 40% hot water remains. At this point the heater will begin to
+            // heat back up to 80% of hot water. If this field and the OneShot field were both omitted, heating would begin again
+            // after any water draw which reduced the TankPercentage below 80%.
 
             // If this field is included then the TargetPercentage field SHALL also be included, and the OneShot excluded.
             VerifyOrReturnValue(mTankPercentage >= mBoostTargetReheat.Value(), false);
