@@ -57,7 +57,7 @@ limitations under the License.
       </feature>
     </features>
     <server init="false" tick="false">true</server>
-    <globalAttribute code="0xFFFD" side="either" value="1"/>
+    <globalAttribute code="0xFFFD" side="either" value="2"/>
     <attribute code="0x0000" side="server" define="HEATER_TYPES" type="WaterHeaterHeatSourceBitmap" min="0x00" max="0x1F" default="0x00">HeaterTypes</attribute>
     <attribute code="0x0001" side="server" define="HEAT_DEMAND" type="WaterHeaterHeatSourceBitmap" min="0x00" max="0x1F" default="0x00">HeatDemand</attribute>
     <attribute code="0x0002" side="server" define="TANK_VOLUME" type="int16u" default="0" optional="true">TankVolume</attribute>
