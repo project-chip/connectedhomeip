@@ -18,6 +18,7 @@
 
 #include "include/thermostat-delegate-impl.h"
 
+#include "thermostat-delegate-impl.h"
 #include <app-common/zap-generated/attributes/Accessors.h>
 #include <lib/support/Span.h>
 #include <platform/internal/CHIPDeviceLayerInternal.h>
@@ -134,6 +135,22 @@ CHIP_ERROR ThermostatDelegate::GetPresetAtIndex(size_t index, PresetStructWithOw
     return CHIP_ERROR_PROVIDER_LIST_EXHAUSTED;
 }
 
+void ThermostatDelegate::BeginPendingPresetList()
+{
+    mNextFreeIndexInPendingPresetsList = 0;
+    for (uint8_t indexInPresets = 0; indexInPresets < mNextFreeIndexInPresetsList; indexInPresets++)
+    {
+        auto preset = mPresets[indexInPresets];
+        mPendingPresets[mNextFreeIndexInPendingPresetsList].SetPresetHandle(preset.GetPresetHandle());
+        mPendingPresets[mNextFreeIndexInPendingPresetsList].SetPresetScenario(preset.GetPresetScenario());
+        mPendingPresets[mNextFreeIndexInPendingPresetsList].SetName(preset.GetName());
+        mPendingPresets[mNextFreeIndexInPendingPresetsList].SetCoolingSetpoint(preset.GetCoolingSetpoint());
+        mPendingPresets[mNextFreeIndexInPendingPresetsList].SetHeatingSetpoint(preset.GetHeatingSetpoint());
+        mPendingPresets[mNextFreeIndexInPendingPresetsList].SetBuiltIn(preset.GetBuiltIn());
+        mNextFreeIndexInPendingPresetsList++;
+    }
+}
+
 CHIP_ERROR ThermostatDelegate::GetActivePresetHandle(MutableByteSpan & activePresetHandle)
 {
     return CopySpanToMutableSpan(ByteSpan(mActivePresetHandleData, mActivePresetHandleDataSize), activePresetHandle);
@@ -169,8 +186,19 @@ CHIP_ERROR ThermostatDelegate::AppendToPendingPresetList(const PresetStruct::Typ
 {
     if (mNextFreeIndexInPendingPresetsList < ArraySize(mPendingPresets))
     {
+        if (preset.presetHandle.IsNull())
+        {
+            // TODO: #34556 Since we support only one preset of each type, using the octet string containing the preset scenario
+            // suffices as the unique preset handle. Need to fix this to actually provide unique handles once multiple presets of
+            // each type are supported.
+            const uint8_t handle[] = { static_cast<uint8_t>(preset.presetScenario) };
+            mPendingPresets[mNextFreeIndexInPendingPresetsList].SetPresetHandle(DataModel::MakeNullable(ByteSpan(handle)));
+        }
+        else
+        {
+            mPendingPresets[mNextFreeIndexInPendingPresetsList].SetPresetHandle(preset.presetHandle);
+        }
         mPendingPresets[mNextFreeIndexInPendingPresetsList].SetPresetScenario(preset.presetScenario);
-        mPendingPresets[mNextFreeIndexInPendingPresetsList].SetPresetHandle(preset.presetHandle);
         mPendingPresets[mNextFreeIndexInPendingPresetsList].SetName(preset.name);
         mPendingPresets[mNextFreeIndexInPendingPresetsList].SetCoolingSetpoint(preset.coolingSetpoint);
         mPendingPresets[mNextFreeIndexInPendingPresetsList].SetHeatingSetpoint(preset.heatingSetpoint);
@@ -193,7 +221,6 @@ CHIP_ERROR ThermostatDelegate::GetPendingPresetAtIndex(size_t index, PresetStruc
 
 CHIP_ERROR ThermostatDelegate::ApplyPendingPresets()
 {
-
     // TODO: #34546 - Need to support deletion of presets that are removed from Presets.
     for (uint8_t indexInPendingPresets = 0; indexInPendingPresets < mNextFreeIndexInPendingPresetsList; indexInPendingPresets++)
     {
@@ -214,14 +241,7 @@ CHIP_ERROR ThermostatDelegate::ApplyPendingPresets()
         // If pending preset was not found in the Presets list, append to the Presets list.
         if (!found)
         {
-
             mPresets[mNextFreeIndexInPresetsList] = pendingPreset;
-
-            // TODO: #34556 Since we support only one preset of each type, using the octet string containing the preset scenario
-            // suffices as the unique preset handle. Need to fix this to actually provide unique handles once multiple presets of
-            // each type are supported.
-            const uint8_t handle[] = { static_cast<uint8_t>(pendingPreset.GetPresetScenario()) };
-            mPresets[mNextFreeIndexInPresetsList].SetPresetHandle(DataModel::MakeNullable(ByteSpan(handle)));
             mNextFreeIndexInPresetsList++;
         }
     }

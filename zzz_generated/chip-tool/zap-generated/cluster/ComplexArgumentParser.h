@@ -461,6 +461,11 @@ static CHIP_ERROR Setup(const char * label, chip::app::Clusters::Thermostat::Str
 
 static void Finalize(chip::app::Clusters::Thermostat::Structs::ScheduleStruct::Type & request);
 
+static CHIP_ERROR Setup(const char * label, chip::app::Clusters::Thermostat::Structs::AtomicAttributeStatusStruct::Type & request,
+                        Json::Value & value);
+
+static void Finalize(chip::app::Clusters::Thermostat::Structs::AtomicAttributeStatusStruct::Type & request);
+
 static CHIP_ERROR Setup(const char * label, chip::app::Clusters::Thermostat::Structs::PresetStruct::Type & request,
                         Json::Value & value);
 

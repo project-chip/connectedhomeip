@@ -65,6 +65,12 @@ public:
     virtual CHIP_ERROR GetPresetAtIndex(size_t index, PresetStructWithOwnedMembers & preset) = 0;
 
     /**
+     * @brief Creates a new pending presets list.
+     *
+     */
+    virtual void BeginPendingPresetList() = 0;
+
+    /**
      * @brief Get the ActivePresetHandle attribute value.
      *
      * @param[out] activePresetHandle The MutableByteSpan to copy the active preset handle into. On success,

@@ -2675,6 +2675,19 @@ static auto __attribute__((unused)) EnsureKnownEnumValue(Thermostat::ACTypeEnum 
         return EnumType::kUnknownEnumValue;
     }
 }
+static auto __attribute__((unused)) EnsureKnownEnumValue(Thermostat::AtomicRequestTypeEnum val)
+{
+    using EnumType = Thermostat::AtomicRequestTypeEnum;
+    switch (val)
+    {
+    case EnumType::kBeginWrite:
+    case EnumType::kCommitWrite:
+    case EnumType::kRollbackWrite:
+        return val;
+    default:
+        return EnumType::kUnknownEnumValue;
+    }
+}
 static auto __attribute__((unused)) EnsureKnownEnumValue(Thermostat::ControlSequenceOfOperationEnum val)
 {
     using EnumType = Thermostat::ControlSequenceOfOperationEnum;
@@ -2696,7 +2709,6 @@ static auto __attribute__((unused)) EnsureKnownEnumValue(Thermostat::PresetScena
     using EnumType = Thermostat::PresetScenarioEnum;
     switch (val)
     {
-    case EnumType::kUnspecified:
     case EnumType::kOccupied:
     case EnumType::kUnoccupied:
     case EnumType::kSleep:

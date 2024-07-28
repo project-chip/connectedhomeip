@@ -26,8 +26,8 @@ TODO: Make these structures global rather than defining them for each cluster.
 
   <struct name="AtomicAttributeStatusStruct">
     <cluster code="0x0201"/>
-    <item fieldId="0" name="AttributeID" type="attrib_id" optional="true"/>
-    <item fieldId="1" name="StatusCode" type="status" optional="true"/>
+    <item fieldId="0" name="AttributeID" type="attrib_id" />
+    <item fieldId="1" name="StatusCode" type="status"/>
   </struct>
 
   <struct name="HomeLocationStruct">
