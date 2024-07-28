@@ -64,19 +64,30 @@ class TC_EWATERHTRM_1_2(MatterBaseTest):
         self.step(1)
 
         self.step(2)
-        supported_modes = await self.read_mod_attribute_expect_success(endpoint=endpoint, attribute=attributes.SupportedModes)
-        asserts.assert_greater_equal(len(supported_modes), 2, "SupportedModes must have at least 2 entries!")
-        asserts.assert_less_equal(len(supported_modes), 255, "SupportedModes must have at most 255 entries!")
+        supported_modes = await self.read_mode_attribute_expect_success(endpoint=endpoint, attribute=attributes.SupportedModes)
+        asserts.assert_greater_equal(len(supported_modes), 2,
+                                     "SupportedModes must have at least 2 entries!")
+        asserts.assert_less_equal(len(supported_modes), 255,
+                                  "SupportedModes must have at most 255 entries!")
         modes = set([m.mode for m in supported_modes])
-        asserts.assert_equal(len(modes), len(supported_modes), "SupportedModes must have unique mode values")
+        asserts.assert_equal(len(modes), len(supported_modes),
+                             "SupportedModes must have unique mode values")
 
         labels = set([m.label for m in supported_modes])
-        asserts.assert_equal(len(labels), len(supported_modes), "SupportedModes must have unique mode label values")
+        asserts.assert_equal(len(labels), len(supported_modes),
+                             "SupportedModes must have unique mode label values")
 
         # common mode tags
-        commonTags = {0x0: 'Off',
-                      0x1: 'Manual',
-                      0x2: 'Timed'}
+        commonTags = {0x0: 'Auto',
+                      0x1: 'Quick',
+                      0x2: 'Quiet',
+                      0x3: 'LowNoise',
+                      0x4: 'LowEnergy',
+                      0x5: 'Vacation',
+                      0x6: 'Min',
+                      0x7: 'Max',
+                      0x8: 'Night',
+                      0x9: 'Day'}
 
         # derived cluster defined tags
         # kUnknownEnumValue may not be defined
@@ -88,21 +99,59 @@ class TC_EWATERHTRM_1_2(MatterBaseTest):
 
         logging.info("Derived tags: %s" % derivedTags)
 
+        # According to the Mode spec:
+        # At least one entry in the SupportedModes attribute SHALL include the Manual mode tag in the ModeTags field list.
+        # At least one entry in the SupportedModes attribute SHALL include the Off mode tag in the ModeTags field list.
+        # An entry in the SupportedModes attribute that includes one of an Off, Manual, or Timed tag
+        # SHALL NOT also include an additional instance of any one of these tag types.
+        off_present = 0
+        manual_present = 0
+        timed_present = 0
+
         for m in supported_modes:
+            off_manual_timed_present_in_this_mode = 0
             for t in m.modeTags:
                 is_mfg = (0x8000 <= t.value and t.value <= 0xBFFF)
                 asserts.assert_true(t.value in commonTags.keys() or t.value in derivedTags or is_mfg,
                                     "Found a SupportedModes entry with invalid mode tag value!")
                 if t.value == Clusters.WaterHeaterMode.Enums.ModeTag.kOff:
-                    off_present = True
-                    logging.info("Found normal mode tag %s with tag value %s", m.mode, t.value)
+                    off_present += 1
+                    off_manual_timed_present_in_this_mode += 1
+                    logging.info(
+                        "Found Off mode tag %s with tag value %s", m.mode, t.value)
 
-        asserts.assert_true(off_present, "SupportedModes does not have an entry of Off(0x4000)")
+                if t.value == Clusters.WaterHeaterMode.Enums.ModeTag.kManual:
+                    manual_present += 1
+                    off_manual_timed_present_in_this_mode += 1
+                    logging.info(
+                        "Found Manual mode tag %s with tag value %s", m.mode, t.value)
+
+                if t.value == Clusters.WaterHeaterMode.Enums.ModeTag.kTimed:
+                    timed_present += 1
+                    off_manual_timed_present_in_this_mode += 1
+                    logging.info(
+                        "Found Timed mode tag %s with tag value %s", m.mode, t.value)
+
+            asserts.assert_less_equal(off_manual_timed_present_in_this_mode, 1,
+                                      f"The supported mode ({m.mode}) should only include one of OFF, MANUAL or TIMED, but includes more than one.")
+
+        asserts.assert_greater(off_present, 0,
+                               "SupportedModes does not have an entry of Off(0x4000)")
+        asserts.assert_greater(manual_present, 0,
+                               "SupportedModes does not have an entry of Manual(0x4001)")
+
+        asserts.assert_less_equal(off_present, 1,
+                                  "SupportedModes cannot have more than one instance of Off(0x4000)")
+        asserts.assert_less_equal(manual_present, 1,
+                                  "SupportedModes cannot have more than one instance of Manual(0x4001)")
+        asserts.assert_less_equal(timed_present, 1,
+                                  "SupportedModes cannot have more than one instance of Timed(0x4002)")
 
         self.step(3)
         current_mode = await self.read_mode_attribute_expect_success(endpoint=endpoint, attribute=attributes.CurrentMode)
         logging.info("CurrentMode: %s" % current_mode)
-        asserts.assert_true(current_mode in modes, "CurrentMode is not a supported mode!")
+        asserts.assert_true(current_mode in modes,
+                            "CurrentMode is not a supported mode!")
 
 
 if __name__ == "__main__":
