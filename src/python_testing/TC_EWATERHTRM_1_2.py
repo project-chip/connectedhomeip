@@ -33,7 +33,7 @@ from mobly import asserts
 
 class TC_EWATERHTRM_1_2(MatterBaseTest):
 
-    async def read_mod_attribute_expect_success(self, endpoint, attribute):
+    async def read_mode_attribute_expect_success(self, endpoint, attribute):
         cluster = Clusters.Objects.WaterHeaterMode
         return await self.read_single_attribute_check_success(endpoint=endpoint, cluster=cluster, attribute=attribute)
 
@@ -100,7 +100,7 @@ class TC_EWATERHTRM_1_2(MatterBaseTest):
         asserts.assert_true(off_present, "SupportedModes does not have an entry of Off(0x4000)")
 
         self.step(3)
-        current_mode = await self.read_mod_attribute_expect_success(endpoint=endpoint, attribute=attributes.CurrentMode)
+        current_mode = await self.read_mode_attribute_expect_success(endpoint=endpoint, attribute=attributes.CurrentMode)
         logging.info("CurrentMode: %s" % current_mode)
         asserts.assert_true(current_mode in modes, "CurrentMode is not a supported mode!")
 
