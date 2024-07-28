@@ -154,8 +154,8 @@ void WaterHeaterManagementDelegate::SetBoostState(BoostStateEnum boostState)
  * the Off periods.
  */
 Status WaterHeaterManagementDelegate::HandleBoost(uint32_t durationS, Optional<bool> oneShot, Optional<bool> emergencyBoost,
-                                                  Optional<int16_t> temporarySetpoint, Optional<chip::Percent> targetPercentage,
-                                                  Optional<chip::Percent> targetReheat)
+                                                  Optional<int16_t> temporarySetpoint, Optional<Percent> targetPercentage,
+                                                  Optional<Percent> targetReheat)
 {
     Status status = Status::Success;
 
