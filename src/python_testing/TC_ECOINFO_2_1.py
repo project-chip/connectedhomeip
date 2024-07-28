@@ -39,7 +39,7 @@ class TC_ECOINFO_2_1(MatterBaseTest):
         return steps
 
     @async_test_body
-    async def test_TC_IDM_1_4(self):
+    async def test_TC_ECOINFO_2_1(self):
         dev_ctrl = self.default_controller
         dut_node_id = self.dut_node_id
 
