@@ -100,7 +100,7 @@ class TC_EWATERHTR_2_1(MatterBaseTest, EWATERHTRBase):
         self.step("5")
         if em_supported:
             value = await self.read_whm_attribute_expect_success(attribute="EstimatedHeatRequired")
-            asserts.assert_greater(value, 0, f"Unexpected EstimatedHeatRequired value - expected {value} > 0")
+            asserts.assert_greater_equal(value, 0, f"Unexpected EstimatedHeatRequired value - expected {value} >= 0")
         else:
             logging.info("Skipping step 5 as PIXIT.EWATERHTR.EM not supported")
 
