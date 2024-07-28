@@ -1176,7 +1176,7 @@ cluster GroupKeyManagement = 63 {
 }
 
 /** Functionality to retrieve operational information about a managed Wi-Fi network. */
-cluster WiFiNetworkManagement = 1105 {
+provisional cluster WiFiNetworkManagement = 1105 {
   revision 1;
 
   readonly attribute nullable octet_string<32> ssid = 0;
@@ -1197,7 +1197,7 @@ cluster WiFiNetworkManagement = 1105 {
 }
 
 /** Manages the names and credentials of Thread networks visible to the user. */
-cluster ThreadNetworkDirectory = 1107 {
+provisional cluster ThreadNetworkDirectory = 1107 {
   revision 1;
 
   struct ThreadNetworkStruct {
