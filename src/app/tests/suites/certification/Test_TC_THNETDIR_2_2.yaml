@@ -54,6 +54,7 @@ tests:
       command: readAttribute
       attribute: PreferredExtendedPanID
       response:
+          saveAs: initialPreferredExtendedPanID
           constraints:
               type: octet_string
               minLength: 8
@@ -69,6 +70,14 @@ tests:
           value: TestNetworkExtendedPanId
       response:
           error: CONSTRAINT_ERROR # TestNetwork is not in ThreadNetworks
+
+    - label:
+          "TH reads PreferredExtendedPanID attribute from DUT, verifying that
+          the value did not change"
+      command: readAttribute
+      attribute: PreferredExtendedPanID
+      response:
+          value: initialPreferredExtendedPanID
 
     - label:
           "TH sends GetOperationalDataset command to DUT with ExtendedPanID of
@@ -99,7 +108,9 @@ tests:
               - name: OperationalDataset
                 value: TestNetworkDataset
 
-    - label: "TH reads ThreadNetworks attribute from DUT"
+    - label:
+          "TH reads ThreadNetworks attribute from DUT, verifying that the
+          network has been added"
       command: readAttribute
       attribute: ThreadNetworks
       response:
@@ -139,7 +150,9 @@ tests:
       arguments:
           value: TestNetworkExtendedPanId
 
-    - label: "TH reads PreferredExtendedPanID attribute from DUT"
+    - label:
+          "TH reads PreferredExtendedPanID attribute from DUT, verifying that
+          the value was written"
       command: readAttribute
       attribute: PreferredExtendedPanID
       response:
@@ -173,7 +186,9 @@ tests:
       arguments:
           value: null
 
-    - label: "TH reads PreferredExtendedPanID attribute from DUT"
+    - label:
+          "TH reads PreferredExtendedPanID attribute from DUT, verifying that
+          the value was cleared"
       command: readAttribute
       attribute: PreferredExtendedPanID
       response:
@@ -189,7 +204,9 @@ tests:
               - name: ExtendedPanID
                 value: TestNetworkExtendedPanId
 
-    - label: "TH reads ThreadNetworks attribute from DUT"
+    - label:
+          "TH reads ThreadNetworks attribute from DUT, verifying that the
+          network was removed"
       command: readAttribute
       attribute: ThreadNetworks
       response:
@@ -199,3 +216,10 @@ tests:
               #       # value == initialNetworks (ignoring order)
               #       return (len(value) == len(initialNetworks) and
               #               all(n in initialNetworks for n in value))
+
+    - label:
+          "TH writes PreferredExtendedPanID to DUT, restoring the initial value"
+      command: writeAttribute
+      attribute: PreferredExtendedPanID
+      arguments:
+          value: initialPreferredExtendedPanID
