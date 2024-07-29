@@ -51,6 +51,9 @@ static CHIP_ERROR LogValue(const char * label, size_t indent,
                            const chip::app::Clusters::detail::Structs::OperationalStateStruct::DecodableType & value);
 
 static CHIP_ERROR LogValue(const char * label, size_t indent,
+                           const chip::app::Clusters::Globals::Structs::TestGlobalStruct::DecodableType & value);
+
+static CHIP_ERROR LogValue(const char * label, size_t indent,
                            const chip::app::Clusters::Descriptor::Structs::SemanticTagStruct::DecodableType & value);
 
 static CHIP_ERROR LogValue(const char * label, size_t indent,
