@@ -90,12 +90,7 @@ class TC_EWATERHTRM_1_2(MatterBaseTest):
                       0x9: 'Day'}
 
         # derived cluster defined tags
-        # kUnknownEnumValue may not be defined
-        try:
-            derivedTags = [tag.value for tag in Clusters.WaterHeaterMode.Enums.ModeTag
-                           if tag is not Clusters.WaterHeaterMode.Enums.ModeTag.kUnknownEnumValue]
-        except AttributeError:
-            derivedTags = Clusters.WaterHeaterMode.Enums.ModeTag
+        derivedTags = [tag.value for tag in Clusters.WaterHeaterMode.Enums.ModeTag]
 
         logging.info("Derived tags: %s" % derivedTags)
 

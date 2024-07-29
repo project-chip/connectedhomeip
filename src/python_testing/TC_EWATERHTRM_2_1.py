@@ -97,8 +97,6 @@ class TC_EWATERHTRM_2_1(MatterBaseTest):
         asserts.assert_greater_equal(len(supported_modes), 2,
                                      "SupportedModes must have at least two entries!")
 
-        modes = [m.mode for m in supported_modes]
-
         self.step(3)
 
         old_current_mode = await self.read_mode_attribute_expect_success(endpoint=self.endpoint, attribute=attributes.CurrentMode)
@@ -106,13 +104,14 @@ class TC_EWATERHTRM_2_1(MatterBaseTest):
         logging.info(f"CurrentMode: {old_current_mode}")
 
         # pick a value that's not on the list of supported modes
+        modes = [m.mode for m in supported_modes]
         invalid_mode = max(modes) + 1
 
         self.step(4)
 
         ret = await self.send_change_to_mode_cmd(newMode=old_current_mode)
         logging.info(f"ret.status {ret.status}")
-        asserts.assert_true(ret.status == Status.Success,
+        asserts.assert_equal(ret.status, Status.Success,
                             "Changing the mode to the current mode should be a no-op")
 
         # Steps 5-9 are not performed as EWATERHTRM.S.M.CAN_TEST_MODE_FAILURE is false
