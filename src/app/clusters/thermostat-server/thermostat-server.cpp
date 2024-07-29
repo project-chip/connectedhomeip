@@ -815,29 +815,21 @@ CHIP_ERROR ThermostatAttrAccess::Write(const ConcreteDataAttributePath & aPath, 
 {
     VerifyOrDie(aPath.mClusterId == Thermostat::Id);
 
-    uint32_t ourFeatureMap;
-    bool localTemperatureNotExposedSupported = (FeatureMap::Get(aPath.mEndpointId, &ourFeatureMap) == imcode::Success) &&
-        ((ourFeatureMap & to_underlying(Feature::kLocalTemperatureNotExposed)) != 0);
+    EndpointId endpoint                               = aPath.mEndpointId;
+    const Access::SubjectDescriptor subjectDescriptor = aDecoder.GetSubjectDescriptor();
+    ScopedNodeId scopedNodeId                         = ScopedNodeId();
 
+    // Get the node id if the authentication mode is CASE.
+    if (subjectDescriptor.authMode == Access::AuthMode::kCase)
+    {
+        scopedNodeId = ScopedNodeId(subjectDescriptor.subject, subjectDescriptor.fabricIndex);
+    }
+
+    // Check atomic attributes first
     switch (aPath.mAttributeId)
     {
-    case RemoteSensing::Id:
-        if (localTemperatureNotExposedSupported)
-        {
-            uint8_t valueRemoteSensing;
-            ReturnErrorOnFailure(aDecoder.Decode(valueRemoteSensing));
-            if (valueRemoteSensing & 0x01) // If setting bit 1 (LocalTemperature RemoteSensing bit)
-            {
-                return CHIP_IM_GLOBAL_STATUS(ConstraintError);
-            }
-            imcode status = RemoteSensing::Set(aPath.mEndpointId, valueRemoteSensing);
-            StatusIB statusIB(status);
-            return statusIB.ToChipError();
-        }
-        break;
     case Presets::Id: {
 
-        EndpointId endpoint = aPath.mEndpointId;
         Delegate * delegate = GetDelegate(endpoint);
         VerifyOrReturnError(delegate != nullptr, CHIP_ERROR_INCORRECT_STATE, ChipLogError(Zcl, "Delegate is null"));
 
@@ -847,15 +839,6 @@ CHIP_ERROR ThermostatAttrAccess::Write(const ConcreteDataAttributePath & aPath, 
 
         // Check if the OriginatorScopedNodeId at the endpoint is the same as the node editing the presets,
         // otherwise return BUSY.
-        const Access::SubjectDescriptor subjectDescriptor = aDecoder.GetSubjectDescriptor();
-        ScopedNodeId scopedNodeId                         = ScopedNodeId();
-
-        // Get the node id if the authentication mode is CASE.
-        if (subjectDescriptor.authMode == Access::AuthMode::kCase)
-        {
-            scopedNodeId = ScopedNodeId(subjectDescriptor.subject, subjectDescriptor.fabricIndex);
-        }
-
         if (GetAtomicWriteScopedNodeId(endpoint) != scopedNodeId)
         {
             ChipLogError(Zcl, "Another node is editing presets. Server is busy. Try again later");
@@ -906,6 +889,36 @@ CHIP_ERROR ThermostatAttrAccess::Write(const ConcreteDataAttributePath & aPath, 
         return CHIP_ERROR_NOT_IMPLEMENTED;
     }
     break;
+    }
+
+    // This is not an atomic attribute, so check to make sure we don't have an atomic write going for this client
+    if (InAtomicWrite(endpoint))
+    {
+        VerifyOrReturnError(GetAtomicWriteScopedNodeId(endpoint) != scopedNodeId, CHIP_IM_GLOBAL_STATUS(InvalidInState),
+                            ChipLogError(Zcl, "Can not write to non-atomic attributes during atomic write"));
+    }
+
+    uint32_t ourFeatureMap;
+    bool localTemperatureNotExposedSupported = (FeatureMap::Get(aPath.mEndpointId, &ourFeatureMap) == imcode::Success) &&
+        ((ourFeatureMap & to_underlying(Feature::kLocalTemperatureNotExposed)) != 0);
+
+    switch (aPath.mAttributeId)
+    {
+    case RemoteSensing::Id:
+        if (localTemperatureNotExposedSupported)
+        {
+            uint8_t valueRemoteSensing;
+            ReturnErrorOnFailure(aDecoder.Decode(valueRemoteSensing));
+            if (valueRemoteSensing & 0x01) // If setting bit 1 (LocalTemperature RemoteSensing bit)
+            {
+                return CHIP_IM_GLOBAL_STATUS(ConstraintError);
+            }
+            imcode status = RemoteSensing::Set(aPath.mEndpointId, valueRemoteSensing);
+            StatusIB statusIB(status);
+            return statusIB.ToChipError();
+        }
+        break;
+
     default: // return CHIP_NO_ERROR and just write to the attribute store in default
         break;
     }

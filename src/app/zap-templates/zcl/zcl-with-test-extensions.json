@@ -647,6 +647,16 @@
         "Power Topology": ["FeatureMap"],
         "Valve Configuration and Control": ["RemainingDuration"],
         "Boolean State Configuration": ["CurrentSensitivityLevel"],
+        "Water Heater Management": [
+            "HeaterTypes",
+            "HeatDemand",
+            "TankVolume",
+            "EstimatedHeatRequired",
+            "TankPercentage",
+            "BoostState",
+            "FeatureMap",
+            "ClusterRevision"
+        ],
         "Water Heater Mode": ["SupportedModes", "CurrentMode", "FeatureMap"],
         "Wi-Fi Network Management": ["SSID"],
         "Thread Network Directory": [

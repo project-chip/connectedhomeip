@@ -276,6 +276,33 @@ enum class ProductIdentifierTypeEnum : uint8_t
 
 } // namespace detail
 
+namespace Globals {
+// Global enums.
+
+// Enum for TestGlobalEnum
+enum class TestGlobalEnum : uint8_t
+{
+    kSomeValue      = 0x00,
+    kSomeOtherValue = 0x01,
+    kFinalValue     = 0x02,
+    // All received enum values that are not listed above will be mapped
+    // to kUnknownEnumValue. This is a helper enum value that should only
+    // be used by code to process how it handles receiving and unknown
+    // enum value. This specific should never be transmitted.
+    kUnknownEnumValue = 3,
+};
+
+// Global bitmaps.
+
+// Bitmap for TestGlobalBitmap
+enum class TestGlobalBitmap : uint32_t
+{
+    kFirstBit  = 0x1,
+    kSecondBit = 0x2,
+};
+
+} // namespace Globals
+
 namespace Identify {
 
 // Enum for EffectIdentifierEnum

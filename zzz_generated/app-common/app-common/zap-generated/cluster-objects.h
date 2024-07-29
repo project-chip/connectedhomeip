@@ -319,6 +319,38 @@ using DecodableType = Type;
 } // namespace detail
 
 namespace Globals {
+
+// Global structs.
+namespace Structs {
+
+namespace TestGlobalStruct {
+enum class Fields : uint8_t
+{
+    kName     = 0,
+    kMyBitmap = 1,
+    kMyEnum   = 2,
+};
+
+struct Type
+{
+public:
+    chip::CharSpan name;
+    DataModel::Nullable<chip::BitMask<Globals::TestGlobalBitmap>> myBitmap;
+    Optional<DataModel::Nullable<Globals::TestGlobalEnum>> myEnum;
+
+    CHIP_ERROR Decode(TLV::TLVReader & reader);
+
+    static constexpr bool kIsFabricScoped = false;
+
+    CHIP_ERROR Encode(TLV::TLVWriter & aWriter, TLV::Tag aTag) const;
+};
+
+using DecodableType = Type;
+
+} // namespace TestGlobalStruct
+
+} // namespace Structs
+
 namespace Attributes {
 namespace GeneratedCommandList {
 struct TypeInfo
