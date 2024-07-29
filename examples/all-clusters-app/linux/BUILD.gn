@@ -29,6 +29,10 @@ if (chip_enable_pw_rpc) {
 
 source_set("chip-all-clusters-common") {
   sources = [
+    "${chip_root}/examples/all-clusters-app/all-clusters-common/src/WhmDelegateImpl.cpp",
+    "${chip_root}/examples/all-clusters-app/all-clusters-common/src/WhmInstance.cpp",
+    "${chip_root}/examples/all-clusters-app/all-clusters-common/src/WhmMain.cpp",
+    "${chip_root}/examples/all-clusters-app/all-clusters-common/src/WhmManufacturer.cpp",
     "${chip_root}/examples/all-clusters-app/all-clusters-common/src/air-quality-instance.cpp",
     "${chip_root}/examples/all-clusters-app/all-clusters-common/src/binding-handler.cpp",
     "${chip_root}/examples/all-clusters-app/all-clusters-common/src/boolcfg-stub.cpp",
