@@ -220,7 +220,7 @@ void ComplexArgumentParser::Finalize(chip::app::Clusters::detail::Structs::Measu
 }
 
 CHIP_ERROR ComplexArgumentParser::Setup(const char * label,
-                                        chip::app::Clusters::detail::Structs::HomeLocationStruct::Type & request,
+                                        chip::app::Clusters::detail::Structs::LocationDescriptorStruct::Type & request,
                                         Json::Value & value)
 {
     VerifyOrReturnError(value.isObject(), CHIP_ERROR_INVALID_ARGUMENT);
@@ -228,12 +228,12 @@ CHIP_ERROR ComplexArgumentParser::Setup(const char * label,
     // Copy to track which members we already processed.
     Json::Value valueCopy(value);
 
-    ReturnErrorOnFailure(ComplexArgumentParser::EnsureMemberExist("HomeLocationStruct.locationName", "locationName",
+    ReturnErrorOnFailure(ComplexArgumentParser::EnsureMemberExist("LocationDescriptorStruct.locationName", "locationName",
                                                                   value.isMember("locationName")));
+    ReturnErrorOnFailure(ComplexArgumentParser::EnsureMemberExist("LocationDescriptorStruct.floorNumber", "floorNumber",
+                                                                  value.isMember("floorNumber")));
     ReturnErrorOnFailure(
-        ComplexArgumentParser::EnsureMemberExist("HomeLocationStruct.floorNumber", "floorNumber", value.isMember("floorNumber")));
-    ReturnErrorOnFailure(
-        ComplexArgumentParser::EnsureMemberExist("HomeLocationStruct.areaType", "areaType", value.isMember("areaType")));
+        ComplexArgumentParser::EnsureMemberExist("LocationDescriptorStruct.areaType", "areaType", value.isMember("areaType")));
 
     char labelWithMember[kMaxLabelLength];
     snprintf(labelWithMember, sizeof(labelWithMember), "%s.%s", label, "locationName");
@@ -251,7 +251,7 @@ CHIP_ERROR ComplexArgumentParser::Setup(const char * label,
     return ComplexArgumentParser::EnsureNoMembersRemaining(label, valueCopy);
 }
 
-void ComplexArgumentParser::Finalize(chip::app::Clusters::detail::Structs::HomeLocationStruct::Type & request)
+void ComplexArgumentParser::Finalize(chip::app::Clusters::detail::Structs::LocationDescriptorStruct::Type & request)
 {
     ComplexArgumentParser::Finalize(request.locationName);
     ComplexArgumentParser::Finalize(request.floorNumber);

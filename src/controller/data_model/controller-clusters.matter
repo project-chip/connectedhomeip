@@ -1,6 +1,23 @@
 // This IDL was generated automatically by ZAP.
 // It is for view/code review purposes only.
 
+enum TestGlobalEnum : enum8 {
+  kSomeValue = 0;
+  kSomeOtherValue = 1;
+  kFinalValue = 2;
+}
+
+bitmap TestGlobalBitmap : bitmap32 {
+  kFirstBit = 0x1;
+  kSecondBit = 0x2;
+}
+
+struct TestGlobalStruct {
+  char_string<128> name = 0;
+  nullable TestGlobalBitmap myBitmap = 1;
+  optional nullable TestGlobalEnum myEnum = 2;
+}
+
 /** Attributes and commands for putting a device into Identification mode (e.g. flashing a light). */
 cluster Identify = 3 {
   revision 4;
@@ -6186,7 +6203,7 @@ deprecated cluster BarrierControl = 259 {
 }
 
 /** The Service Area cluster provides an interface for controlling the locations where a device should operate, and for querying the current location. */
-cluster ServiceArea = 336 {
+provisional cluster ServiceArea = 336 {
   revision 1; // NOTE: Default/not specifically set
 
   enum AreaTypeTag : enum8 {
@@ -6411,14 +6428,14 @@ cluster ServiceArea = 336 {
     kSelectWhileRunning = 0x2;
   }
 
-  struct HomeLocationStruct {
+  struct LocationDescriptorStruct {
     char_string<128> locationName = 0;
     nullable int16s floorNumber = 1;
     nullable AreaTypeTag areaType = 2;
   }
 
   struct LocationInfoStruct {
-    nullable HomeLocationStruct locationInfo = 0;
+    nullable LocationDescriptorStruct locationInfo = 0;
     nullable LandmarkTag landmarkTag = 1;
     nullable PositionTag positionTag = 2;
     nullable FloorSurfaceTag surfaceTag = 3;
@@ -9400,7 +9417,7 @@ provisional cluster EcosystemInformation = 1872 {
     kWorkshop = 94;
   }
 
-  struct HomeLocationStruct {
+  struct LocationDescriptorStruct {
     char_string<128> locationName = 0;
     nullable int16s floorNumber = 1;
     nullable AreaTypeTag areaType = 2;
@@ -9408,7 +9425,7 @@ provisional cluster EcosystemInformation = 1872 {
 
   fabric_scoped struct EcosystemLocationStruct {
     fabric_sensitive char_string<64> uniqueLocationID = 0;
-    fabric_sensitive HomeLocationStruct locationDescriptor = 1;
+    fabric_sensitive LocationDescriptorStruct locationDescriptor = 1;
     fabric_sensitive epoch_us locationDescriptorLastEdit = 2;
     fabric_idx fabricIndex = 254;
   }

@@ -42,10 +42,10 @@ static CHIP_ERROR Setup(const char * label, chip::app::Clusters::detail::Structs
 
 static void Finalize(chip::app::Clusters::detail::Structs::MeasurementAccuracyStruct::Type & request);
 
-static CHIP_ERROR Setup(const char * label, chip::app::Clusters::detail::Structs::HomeLocationStruct::Type & request,
+static CHIP_ERROR Setup(const char * label, chip::app::Clusters::detail::Structs::LocationDescriptorStruct::Type & request,
                         Json::Value & value);
 
-static void Finalize(chip::app::Clusters::detail::Structs::HomeLocationStruct::Type & request);
+static void Finalize(chip::app::Clusters::detail::Structs::LocationDescriptorStruct::Type & request);
 
 static CHIP_ERROR Setup(const char * label, chip::app::Clusters::detail::Structs::DeviceTypeStruct::Type & request,
                         Json::Value & value);

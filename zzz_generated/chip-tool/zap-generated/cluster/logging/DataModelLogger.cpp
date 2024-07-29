@@ -203,7 +203,7 @@ CHIP_ERROR DataModelLogger::LogValue(const char * label, size_t indent,
 }
 
 CHIP_ERROR DataModelLogger::LogValue(const char * label, size_t indent,
-                                     const chip::app::Clusters::detail::Structs::HomeLocationStruct::DecodableType & value)
+                                     const chip::app::Clusters::detail::Structs::LocationDescriptorStruct::DecodableType & value)
 {
     DataModelLogger::LogString(label, indent, "{");
     {
