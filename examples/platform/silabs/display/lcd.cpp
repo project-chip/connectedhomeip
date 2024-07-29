@@ -203,6 +203,11 @@ void SilabsLCD::SetCustomUI(customUICB cb)
     customUI = cb;
 }
 
+void SilabsLCD::GetScreen(Screen_e & screen)
+{
+    screen = static_cast<Screen_e>(mCurrentScreen);
+}
+
 void SilabsLCD::SetScreen(Screen_e screen)
 {
     if (screen >= InvalidScreen)
@@ -226,6 +231,7 @@ void SilabsLCD::SetScreen(Screen_e screen)
     default:
         break;
     }
+    mCurrentScreen = screen;
 }
 
 void SilabsLCD::CycleScreens(void)

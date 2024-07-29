@@ -9687,6 +9687,7 @@
       clusters:
           # Targeting 1.4
           - CommissionerControl
+          - EcosystemInformation
           - ServiceArea
           - ThreadBorderRouterManagement
           - ThreadNetworkDirectory
@@ -9699,16 +9700,33 @@
               - HoldTime
               - HoldTimeLimits
       commands:
+          BridgedDeviceBasicInformation:
+              # Targeting 1.4
+              - KeepActive
           UnitTesting:
               # Ideally none of UnitTesting would be exposed as public API, but
               # for now just start doing that for new additions to it.
               - StringEchoRequest
               - StringEchoResponse
       structs:
+          Globals:
+              # Test-only value
+              - TestGlobalStruct
           OccupancySensing:
               # Targeting 1.4
               - HoldTimeLimitsStruct
+      events:
+          BridgedDeviceBasicInformation:
+              # Targeting 1.4
+              - ActiveChanged
+      enums:
+          Globals:
+              # Test-only value
+              - TestGlobalEnum
       bitmaps:
+          BridgedDeviceBasicInformation:
+              # Targeting 1.4
+              - Feature
           OccupancySensing:
               # Targeting 1.4
               - Feature
@@ -9717,12 +9735,3 @@
               Feature:
                   # Targeting 1.4
                   - ActionSwitch
-  removed:
-      structs:
-          Globals:
-              # Don't enable TestGlobalStruct until the ZAP side is fixed to handle it properly
-              - TestGlobalStruct
-      enums:
-          Globals:
-              # Don't enable TestGlobalEnum until the ZAP side is fixed to handle it properly
-              - TestGlobalEnum
