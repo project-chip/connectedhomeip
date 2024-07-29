@@ -549,7 +549,8 @@ enum class ChangeTypeEnum : uint8_t
 // Bitmap for Feature
 enum class Feature : uint32_t
 {
-    kManagedDevice = 0x1,
+    kExtension     = 0x1,
+    kManagedDevice = 0x2,
 };
 } // namespace AccessControl
 

@@ -871,7 +871,7 @@ class ChipClusters:
                 "commandId": 0x00000000,
                 "commandName": "ReviewFabricRestrictions",
                 "args": {
-                    "arl": "CommissioningAccessRestrictionEntryStruct",
+                    "arl": "AccessRestrictionStruct",
                 },
             },
         },

@@ -46,8 +46,6 @@ class AccessControlCluster(
   private val controller: MatterController,
   private val endpointId: UShort,
 ) {
-  class ReviewFabricRestrictionsResponse(val token: ULong)
-
   class AclAttribute(val value: List<AccessControlClusterAccessControlEntryStruct>)
 
   sealed class AclAttributeSubscriptionState {
@@ -136,9 +134,9 @@ class AccessControlCluster(
   }
 
   suspend fun reviewFabricRestrictions(
-    arl: List<AccessControlClusterCommissioningAccessRestrictionEntryStruct>,
+    arl: List<AccessControlClusterAccessRestrictionStruct>,
     timedInvokeTimeout: Duration? = null,
-  ): ReviewFabricRestrictionsResponse {
+  ) {
     val commandId: UInt = 0u
 
     val tlvWriter = TlvWriter()
@@ -161,29 +159,6 @@ class AccessControlCluster(
 
     val response: InvokeResponse = controller.invoke(request)
     logger.log(Level.FINE, "Invoke command succeeded: ${response}")
-
-    val tlvReader = TlvReader(response.payload)
-    tlvReader.enterStructure(AnonymousTag)
-    val TAG_TOKEN: Int = 0
-    var token_decoded: ULong? = null
-
-    while (!tlvReader.isEndOfContainer()) {
-      val tag = tlvReader.peekElement().tag
-
-      if (tag == ContextSpecificTag(TAG_TOKEN)) {
-        token_decoded = tlvReader.getULong(tag)
-      } else {
-        tlvReader.skipElement()
-      }
-    }
-
-    if (token_decoded == null) {
-      throw IllegalStateException("token not found in TLV")
-    }
-
-    tlvReader.exitContainer()
-
-    return ReviewFabricRestrictionsResponse(token_decoded)
   }
 
   suspend fun readAclAttribute(): AclAttribute {

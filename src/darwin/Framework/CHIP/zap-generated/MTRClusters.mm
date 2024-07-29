@@ -1617,7 +1617,7 @@ using chip::System::Clock::Timeout;
 
 @implementation MTRClusterAccessControl
 
-- (void)reviewFabricRestrictionsWithParams:(MTRAccessControlClusterReviewFabricRestrictionsParams *)params expectedValues:(NSArray<NSDictionary<NSString *, id> *> * _Nullable)expectedValues expectedValueInterval:(NSNumber * _Nullable)expectedValueIntervalMs completion:(void (^)(MTRAccessControlClusterReviewFabricRestrictionsResponseParams * _Nullable data, NSError * _Nullable error))completion
+- (void)reviewFabricRestrictionsWithParams:(MTRAccessControlClusterReviewFabricRestrictionsParams *)params expectedValues:(NSArray<NSDictionary<NSString *, id> *> * _Nullable)expectedValues expectedValueInterval:(NSNumber * _Nullable)expectedValueIntervalMs completion:(MTRStatusCompletion)completion
 {
     if (params == nil) {
         params = [[MTRAccessControlClusterReviewFabricRestrictionsParams
@@ -1625,7 +1625,7 @@ using chip::System::Clock::Timeout;
     }
 
     auto responseHandler = ^(id _Nullable response, NSError * _Nullable error) {
-        completion(response, error);
+        completion(error);
     };
 
     auto * timedInvokeTimeoutMs = params.timedInvokeTimeoutMs;
@@ -1639,7 +1639,7 @@ using chip::System::Clock::Timeout;
                              expectedValueInterval:expectedValueIntervalMs
                                 timedInvokeTimeout:timedInvokeTimeoutMs
                        serverSideProcessingTimeout:params.serverSideProcessingTimeout
-                                     responseClass:MTRAccessControlClusterReviewFabricRestrictionsResponseParams.class
+                                     responseClass:nil
                                              queue:self.callbackQueue
                                         completion:responseHandler];
 }

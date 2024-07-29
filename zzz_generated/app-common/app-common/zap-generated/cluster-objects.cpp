@@ -32168,6 +32168,8 @@ bool CommandIsFabricScoped(ClusterId aCluster, CommandId aCommand)
     case Clusters::AccessControl::Id: {
         switch (aCommand)
         {
+        case Clusters::AccessControl::Commands::ReviewFabricRestrictions::Id:
+            return true;
         default:
             return false;
         }

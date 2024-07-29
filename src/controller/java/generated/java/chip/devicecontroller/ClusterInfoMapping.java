@@ -1341,28 +1341,6 @@ public class ClusterInfoMapping {
     }
   }
 
-
-  public static class DelegatedAccessControlClusterReviewFabricRestrictionsResponseCallback implements ChipClusters.AccessControlCluster.ReviewFabricRestrictionsResponseCallback, DelegatedClusterCallback {
-    private ClusterCommandCallback callback;
-    @Override
-    public void setCallbackDelegate(ClusterCommandCallback callback) {
-      this.callback = callback;
-    }
-
-    @Override
-    public void onSuccess(Long token) {
-      Map<CommandResponseInfo, Object> responseValues = new LinkedHashMap<>();
-
-      CommandResponseInfo tokenResponseValue = new CommandResponseInfo("token", "Long");
-      responseValues.put(tokenResponseValue, token);
-      callback.onSuccess(responseValues);
-    }
-
-    @Override
-    public void onError(Exception error) {
-      callback.onFailure(error);
-    }
-  }
   public static class DelegatedAccessControlClusterAclAttributeCallback implements ChipClusters.AccessControlCluster.AclAttributeCallback, DelegatedClusterCallback {
     private ClusterCommandCallback callback;
     @Override
@@ -23233,15 +23211,14 @@ public class ClusterInfoMapping {
     InteractionInfo accessControlreviewFabricRestrictionsInteractionInfo = new InteractionInfo(
       (cluster, callback, commandArguments) -> {
         ((ChipClusters.AccessControlCluster) cluster)
-          .reviewFabricRestrictions((ChipClusters.AccessControlCluster.ReviewFabricRestrictionsResponseCallback) callback
-           , (ArrayList<ChipStructs.AccessControlClusterCommissioningAccessRestrictionEntryStruct>)
-             commandArguments.get("arl")
-
-            );
-        },
-        () -> new DelegatedAccessControlClusterReviewFabricRestrictionsResponseCallback(),
+        .reviewFabricRestrictions((DefaultClusterCallback) callback
+        , (ArrayList<ChipStructs.AccessControlClusterAccessRestrictionStruct>)
+        commandArguments.get("arl")
+        );
+      },
+      () -> new DelegatedDefaultClusterCallback(),
         accessControlreviewFabricRestrictionsCommandParams
-      );
+    );
     accessControlClusterInteractionInfoMap.put("reviewFabricRestrictions", accessControlreviewFabricRestrictionsInteractionInfo);
 
     commandMap.put("accessControl", accessControlClusterInteractionInfoMap);

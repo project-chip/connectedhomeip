@@ -1010,9 +1010,9 @@ MTR_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
 /**
  * Command ReviewFabricRestrictions
  *
- * This command signals to the service associated with the device maker that the fabric administrator would like a review of the current fabric restrictions.
+ * This command signals to the service associated with the device vendor that the fabric administrator would like a review of the current restrictions on the accessing fabric.
  */
-- (void)reviewFabricRestrictionsWithParams:(MTRAccessControlClusterReviewFabricRestrictionsParams *)params completion:(void (^)(MTRAccessControlClusterReviewFabricRestrictionsResponseParams * _Nullable data, NSError * _Nullable error))completion MTR_PROVISIONALLY_AVAILABLE;
+- (void)reviewFabricRestrictionsWithParams:(MTRAccessControlClusterReviewFabricRestrictionsParams *)params completion:(MTRStatusCompletion)completion MTR_PROVISIONALLY_AVAILABLE;
 
 - (void)readAttributeACLWithParams:(MTRReadParams * _Nullable)params completion:(void (^)(NSArray * _Nullable value, NSError * _Nullable error))completion MTR_AVAILABLE(ios(16.4), macos(13.3), watchos(9.4), tvos(16.4));
 - (void)writeAttributeACLWithValue:(NSArray * _Nonnull)value completion:(MTRStatusCompletion)completion MTR_AVAILABLE(ios(16.4), macos(13.3), watchos(9.4), tvos(16.4));
@@ -17291,7 +17291,8 @@ typedef NS_ENUM(uint8_t, MTRAccessControlChangeType) {
 } MTR_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1));
 
 typedef NS_OPTIONS(uint32_t, MTRAccessControlFeature) {
-    MTRAccessControlFeatureManagedDevice MTR_PROVISIONALLY_AVAILABLE = 0x1,
+    MTRAccessControlFeatureExtension MTR_PROVISIONALLY_AVAILABLE = 0x1,
+    MTRAccessControlFeatureManagedDevice MTR_PROVISIONALLY_AVAILABLE = 0x2,
 } MTR_PROVISIONALLY_AVAILABLE;
 
 typedef NS_ENUM(uint8_t, MTRActionsActionError) {

@@ -325,7 +325,8 @@ cluster AccessControl = 31 {
   }
 
   bitmap Feature : bitmap32 {
-    kManagedDevice = 0x1;
+    kExtension = 0x1;
+    kManagedDevice = 0x2;
   }
 
   struct AccessRestrictionStruct {
@@ -387,8 +388,8 @@ cluster AccessControl = 31 {
 
   fabric_sensitive info event access(read: administer) FabricRestrictionReviewUpdate = 3 {
     int64u token = 0;
-    nullable char_string instruction = 1;
-    nullable char_string redirectURL = 2;
+    nullable long_char_string instruction = 1;
+    nullable long_char_string redirectURL = 2;
     fabric_idx fabricIndex = 254;
   }
 
@@ -407,15 +408,15 @@ cluster AccessControl = 31 {
   readonly attribute int16u clusterRevision = 65533;
 
   request struct ReviewFabricRestrictionsRequest {
-    CommissioningAccessRestrictionEntryStruct arl[] = 0;
+    AccessRestrictionStruct arl[] = 0;
   }
 
   response struct ReviewFabricRestrictionsResponse = 1 {
     int64u token = 0;
   }
 
-  /** This command signals to the service associated with the device maker that the fabric administrator would like a review of the current fabric restrictions. */
-  command access(invoke: administer) ReviewFabricRestrictions(ReviewFabricRestrictionsRequest): ReviewFabricRestrictionsResponse = 0;
+  /** This command signals to the service associated with the device vendor that the fabric administrator would like a review of the current restrictions on the accessing fabric. */
+  fabric command access(invoke: administer) ReviewFabricRestrictions(ReviewFabricRestrictionsRequest): DefaultSuccess = 0;
 }
 
 /** This cluster provides attributes and events for determining basic information about Nodes, which supports both

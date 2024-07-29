@@ -2605,7 +2605,8 @@ class AccessControl(Cluster):
 
     class Bitmaps:
         class Feature(IntFlag):
-            kManagedDevice = 0x1
+            kExtension = 0x1
+            kManagedDevice = 0x2
 
     class Structs:
         @dataclass
@@ -2706,16 +2707,16 @@ class AccessControl(Cluster):
             cluster_id: typing.ClassVar[int] = 0x0000001F
             command_id: typing.ClassVar[int] = 0x00000000
             is_client: typing.ClassVar[bool] = True
-            response_type: typing.ClassVar[str] = 'ReviewFabricRestrictionsResponse'
+            response_type: typing.ClassVar[str] = None
 
             @ChipUtility.classproperty
             def descriptor(cls) -> ClusterObjectDescriptor:
                 return ClusterObjectDescriptor(
                     Fields=[
-                        ClusterObjectFieldDescriptor(Label="arl", Tag=0, Type=typing.List[AccessControl.Structs.CommissioningAccessRestrictionEntryStruct]),
+                        ClusterObjectFieldDescriptor(Label="arl", Tag=0, Type=typing.List[AccessControl.Structs.AccessRestrictionStruct]),
                     ])
 
-            arl: 'typing.List[AccessControl.Structs.CommissioningAccessRestrictionEntryStruct]' = field(default_factory=lambda: [])
+            arl: 'typing.List[AccessControl.Structs.AccessRestrictionStruct]' = field(default_factory=lambda: [])
 
         @dataclass
         class ReviewFabricRestrictionsResponse(ClusterCommand):
