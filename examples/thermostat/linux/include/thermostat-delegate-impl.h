@@ -52,10 +52,6 @@ public:
 
     void BeginPendingPresetList() override;
 
-    int GetPendingPresetCount() override;
-
-    CHIP_ERROR GetPendingPresetAtIndex(size_t index, PresetStructWithOwnedMembers & preset) override;
-
     CHIP_ERROR GetActivePresetHandle(MutableByteSpan & activePresetHandle) override;
 
     CHIP_ERROR SetActivePresetHandle(const DataModel::Nullable<ByteSpan> & newActivePresetHandle) override;
