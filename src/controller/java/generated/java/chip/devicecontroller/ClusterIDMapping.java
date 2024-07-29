@@ -11885,7 +11885,7 @@ public class ClusterIDMapping {
             ACErrorCode(68L),
             ACLouverPosition(69L),
             ACCoilTemperature(70L),
-            ACCapacityFormat(71L),
+            ACCapacityformat(71L),
             PresetTypes(72L),
             ScheduleTypes(73L),
             NumberOfPresets(74L),

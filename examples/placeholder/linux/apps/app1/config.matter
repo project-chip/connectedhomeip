@@ -5058,7 +5058,7 @@ cluster Thermostat = 513 {
   attribute access(write: manage) optional ACErrorCodeBitmap ACErrorCode = 68;
   attribute access(write: manage) optional ACLouverPositionEnum ACLouverPosition = 69;
   readonly attribute optional nullable temperature ACCoilTemperature = 70;
-  attribute access(write: manage) optional ACCapacityFormatEnum ACCapacityFormat = 71;
+  attribute access(write: manage) optional ACCapacityFormatEnum ACCapacityformat = 71;
   readonly attribute optional PresetTypeStruct presetTypes[] = 72;
   readonly attribute optional ScheduleTypeStruct scheduleTypes[] = 73;
   readonly attribute optional int8u numberOfPresets = 74;
@@ -5424,7 +5424,7 @@ cluster Thermostat = 513 {
   attribute access(write: manage) optional ACErrorCodeBitmap ACErrorCode = 68;
   attribute access(write: manage) optional ACLouverPositionEnum ACLouverPosition = 69;
   readonly attribute optional nullable temperature ACCoilTemperature = 70;
-  attribute access(write: manage) optional ACCapacityFormatEnum ACCapacityFormat = 71;
+  attribute access(write: manage) optional ACCapacityFormatEnum ACCapacityformat = 71;
   readonly attribute optional PresetTypeStruct presetTypes[] = 72;
   readonly attribute optional ScheduleTypeStruct scheduleTypes[] = 73;
   readonly attribute optional int8u numberOfPresets = 74;
@@ -8830,7 +8830,7 @@ endpoint 0 {
     callback attribute ACCompressorType default = 0x00;
     callback attribute ACLouverPosition default = 0x00;
     callback attribute ACCoilTemperature;
-    callback attribute ACCapacityFormat default = 0x00;
+    callback attribute ACCapacityformat default = 0x00;
     ram      attribute featureMap default = 0x000b;
     ram      attribute clusterRevision default = 6;
   }

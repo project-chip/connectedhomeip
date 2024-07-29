@@ -2721,28 +2721,28 @@ public class ClusterWriteMapping {
       writeThermostatACLouverPositionCommandParams
     );
     writeThermostatInteractionInfo.put("writeACLouverPositionAttribute", writeThermostatACLouverPositionAttributeInteractionInfo);
-    Map<String, CommandParameterInfo> writeThermostatACCapacityFormatCommandParams = new LinkedHashMap<String, CommandParameterInfo>();
-    CommandParameterInfo thermostatACCapacityFormatCommandParameterInfo =
+    Map<String, CommandParameterInfo> writeThermostatACCapacityformatCommandParams = new LinkedHashMap<String, CommandParameterInfo>();
+    CommandParameterInfo thermostatACCapacityformatCommandParameterInfo =
         new CommandParameterInfo(
             "value", 
             Integer.class, 
             Integer.class 
         );
-    writeThermostatACCapacityFormatCommandParams.put(
+    writeThermostatACCapacityformatCommandParams.put(
         "value",
-        thermostatACCapacityFormatCommandParameterInfo
+        thermostatACCapacityformatCommandParameterInfo
     );
-    InteractionInfo writeThermostatACCapacityFormatAttributeInteractionInfo = new InteractionInfo(
+    InteractionInfo writeThermostatACCapacityformatAttributeInteractionInfo = new InteractionInfo(
       (cluster, callback, commandArguments) -> {
-        ((ChipClusters.ThermostatCluster) cluster).writeACCapacityFormatAttribute(
+        ((ChipClusters.ThermostatCluster) cluster).writeACCapacityformatAttribute(
           (DefaultClusterCallback) callback,
           (Integer) commandArguments.get("value")
         );
       },
       () -> new ClusterInfoMapping.DelegatedDefaultClusterCallback(),
-      writeThermostatACCapacityFormatCommandParams
+      writeThermostatACCapacityformatCommandParams
     );
-    writeThermostatInteractionInfo.put("writeACCapacityFormatAttribute", writeThermostatACCapacityFormatAttributeInteractionInfo);
+    writeThermostatInteractionInfo.put("writeACCapacityformatAttribute", writeThermostatACCapacityformatAttributeInteractionInfo);
     writeAttributeMap.put("thermostat", writeThermostatInteractionInfo);
     Map<String, InteractionInfo> writeFanControlInteractionInfo = new LinkedHashMap<>();
     Map<String, CommandParameterInfo> writeFanControlFanModeCommandParams = new LinkedHashMap<String, CommandParameterInfo>();

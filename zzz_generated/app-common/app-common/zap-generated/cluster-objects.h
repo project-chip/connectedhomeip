@@ -30281,7 +30281,7 @@ struct TypeInfo
     static constexpr bool MustUseTimedWrite() { return false; }
 };
 } // namespace ACCoilTemperature
-namespace ACCapacityFormat {
+namespace ACCapacityformat {
 struct TypeInfo
 {
     using Type             = chip::app::Clusters::Thermostat::ACCapacityFormatEnum;
@@ -30289,10 +30289,10 @@ struct TypeInfo
     using DecodableArgType = chip::app::Clusters::Thermostat::ACCapacityFormatEnum;
 
     static constexpr ClusterId GetClusterId() { return Clusters::Thermostat::Id; }
-    static constexpr AttributeId GetAttributeId() { return Attributes::ACCapacityFormat::Id; }
+    static constexpr AttributeId GetAttributeId() { return Attributes::ACCapacityformat::Id; }
     static constexpr bool MustUseTimedWrite() { return false; }
 };
-} // namespace ACCapacityFormat
+} // namespace ACCapacityformat
 namespace PresetTypes {
 struct TypeInfo
 {
@@ -30543,7 +30543,7 @@ struct TypeInfo
         Attributes::ACLouverPosition::TypeInfo::DecodableType ACLouverPosition =
             static_cast<chip::app::Clusters::Thermostat::ACLouverPositionEnum>(0);
         Attributes::ACCoilTemperature::TypeInfo::DecodableType ACCoilTemperature;
-        Attributes::ACCapacityFormat::TypeInfo::DecodableType ACCapacityFormat =
+        Attributes::ACCapacityformat::TypeInfo::DecodableType ACCapacityformat =
             static_cast<chip::app::Clusters::Thermostat::ACCapacityFormatEnum>(0);
         Attributes::PresetTypes::TypeInfo::DecodableType presetTypes;
         Attributes::ScheduleTypes::TypeInfo::DecodableType scheduleTypes;
