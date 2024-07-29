@@ -16,18 +16,17 @@
 #    limitations under the License.
 #
 
-import os
-import sys
 import base64
+import os
 import pathlib
+import sys
 import typing
 
 import chip.clusters as Clusters
 from chip import ChipDeviceCtrl
 from chip.clusters import Attribute
-from MockTestRunner import MockTestRunner, AsyncMock
 from chip.interaction_model import InteractionModelError, Status
-
+from MockTestRunner import AsyncMock, MockTestRunner
 
 try:
     from matter_testing_support import get_default_paa_trust_store, run_tests_no_exit

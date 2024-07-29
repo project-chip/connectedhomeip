@@ -23,18 +23,19 @@
 import ipaddress
 import logging
 import os
+import pathlib
+import random
 import signal
 import subprocess
-import uuid
-import random
-import pathlib
 import time
+import uuid
 
 import chip.clusters as Clusters
 import chip.exceptions
-from matter_testing_support import MatterBaseTest, TestStep, default_matter_test_main, per_endpoint_test, has_cluster, async_test_body
-from mobly import asserts
 from chip.interaction_model import InteractionModelError, Status
+from matter_testing_support import (MatterBaseTest, TestStep, async_test_body, default_matter_test_main, has_cluster,
+                                    per_endpoint_test)
+from mobly import asserts
 
 # isort: off
 
