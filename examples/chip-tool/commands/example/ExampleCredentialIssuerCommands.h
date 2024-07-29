@@ -34,16 +34,18 @@ public:
         return mOpCredsIssuer.Initialize(storage);
     }
     CHIP_ERROR SetupDeviceAttestation(chip::Controller::SetupParams & setupParams,
-                                      const chip::Credentials::AttestationTrustStore * trustStore) override
+                                      const chip::Credentials::AttestationTrustStore * trustStore,
+                                      chip::Credentials::DeviceAttestationRevocationDelegate * revocationDelegate) override
     {
         chip::Credentials::SetDeviceAttestationCredentialsProvider(chip::Credentials::Examples::GetExampleDACProvider());
 
-        mDacVerifier                          = chip::Credentials::GetDefaultDACVerifier(trustStore);
+        mDacVerifier                          = chip::Credentials::GetDefaultDACVerifier(trustStore, revocationDelegate);
         setupParams.deviceAttestationVerifier = mDacVerifier;
         mDacVerifier->EnableCdTestKeySupport(mAllowTestCdSigningKey);
 
         return CHIP_NO_ERROR;
     }
+
     chip::Controller::OperationalCredentialsDelegate * GetCredentialIssuer() override { return &mOpCredsIssuer; }
     void SetCredentialIssuerCATValues(chip::CATValues cats) override { mOpCredsIssuer.SetCATValuesForNextNOCRequest(cats); }
     CHIP_ERROR GenerateControllerNOCChain(chip::NodeId nodeId, chip::FabricId fabricId, const chip::CATValues & cats,
