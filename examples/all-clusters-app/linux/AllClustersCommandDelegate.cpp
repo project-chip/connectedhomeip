@@ -70,21 +70,25 @@ uint8_t GetNumberOfSwitchPositions(EndpointId endpointId)
 
 /**
  * Named pipe handler for simulated long press
+ * Named pipe handler for simulated long press
  *
  * Usage example:
+ *   echo '{"Name": "SimulateLongPress", "EndpointId": 3, "ButtonId": 1, "LongPressDelayMillis": 800,
  *   echo '{"Name": "SimulateLongPress", "EndpointId": 3, "ButtonId": 1, "LongPressDelayMillis": 800,
  * "LongPressDurationMillis": 1000}' > /tmp/chip_all_clusters_fifo_1146610
  *
  * JSON Arguments:
  *   - "Name": Must be "SimulateLongPress"
- *   - "EndpointId": ID of endpoint having a switch cluster
+ *   - "EndpointId": number of endpoint having a switch cluster
  *   - "ButtonId": switch position in the switch cluster for "down" button (not idle)
  *   - "LongPressDelayMillis": Time in milliseconds before the LongPress
  *   - "LongPressDurationMillis": Total duration in milliseconds from start of the press to LongRelease
  *   - "FeatureMap": The feature map to simulate
+ *   - "FeatureMap": The feature map to simulate
  *
  * @param jsonValue - JSON payload from named pipe
  */
+void HandleSimulateLongPress(Json::Value & jsonValue)
 void HandleSimulateLongPress(Json::Value & jsonValue)
 {
     if (sButtonSimulatorInstance != nullptr)
@@ -99,8 +103,14 @@ void HandleSimulateLongPress(Json::Value & jsonValue)
     bool hasLongPressDurationMillis = HasNumericField(jsonValue, "LongPressDurationMillis");
     bool hasFeatureMap              = HasNumericField(jsonValue, "FeatureMap");
     if (!hasEndpointId || !hasButtonId || !hasLongPressDelayMillis || !hasLongPressDurationMillis || !hasFeatureMap)
+    bool hasFeatureMap              = HasNumericField(jsonValue, "FeatureMap");
+    if (!hasEndpointId || !hasButtonId || !hasLongPressDelayMillis || !hasLongPressDurationMillis || !hasFeatureMap)
     {
         std::string inputJson = jsonValue.toStyledString();
+        ChipLogError(NotSpecified,
+                     "Missing or invalid value for one of EndpointId, ButtonId, LongPressDelayMillis, LongPressDurationMillis or "
+                     "FeatureMap in %s",
+                     inputJson.c_str());
         ChipLogError(NotSpecified,
                      "Missing or invalid value for one of EndpointId, ButtonId, LongPressDelayMillis, LongPressDurationMillis or "
                      "FeatureMap in %s",
@@ -122,6 +132,7 @@ void HandleSimulateLongPress(Json::Value & jsonValue)
     System::Clock::Milliseconds32 longPressDelayMillis{ static_cast<unsigned>(jsonValue["LongPressDelayMillis"].asUInt()) };
     System::Clock::Milliseconds32 longPressDurationMillis{ static_cast<unsigned>(jsonValue["LongPressDurationMillis"].asUInt()) };
     uint32_t featureMap  = static_cast<uint32_t>(jsonValue["FeatureMap"].asUInt());
+    uint32_t featureMap  = static_cast<uint32_t>(jsonValue["FeatureMap"].asUInt());
     auto buttonSimulator = std::make_unique<ButtonEventsSimulator>();
 
     bool success = buttonSimulator->SetMode(ButtonEventsSimulator::Mode::kModeLongPress)
@@ -130,6 +141,7 @@ void HandleSimulateLongPress(Json::Value & jsonValue)
                        .SetIdleButtonId(0)
                        .SetPressedButtonId(buttonId)
                        .SetEndpointId(endpointId)
+                       .SetFeatureMap(featureMap)
                        .SetFeatureMap(featureMap)
                        .Execute([]() { sButtonSimulatorInstance.reset(); });
 
@@ -144,8 +156,11 @@ void HandleSimulateLongPress(Json::Value & jsonValue)
 
 /**
  * Named pipe handler for simulated multi-press.
+ * Named pipe handler for simulated multi-press.
  *
  * Usage example:
+ *   echo '{"Name": "SimulateMultiPress", "EndpointId": 3, "ButtonId": 1, "MultiPressPressedTimeMillis": 100,
+ * "MultiPressReleasedTimeMillis": 350, "MultiPressNumPresses": 2, "FeatureMap": 58}' > /tmp/chip_all_clusters_fifo_1146610
  *   echo '{"Name": "SimulateMultiPress", "EndpointId": 3, "ButtonId": 1, "MultiPressPressedTimeMillis": 100,
  * "MultiPressReleasedTimeMillis": 350, "MultiPressNumPresses": 2, "FeatureMap": 58}' > /tmp/chip_all_clusters_fifo_1146610
  *
@@ -158,9 +173,12 @@ void HandleSimulateLongPress(Json::Value & jsonValue)
  *   - "MultiPressNumPresses": Number of presses to simulate
  *   - "FeatureMap": The feature map to simulate
  *   - "MultiPressMax": max number of presses (from attribute).
+ *   - "FeatureMap": The feature map to simulate
+ *   - "MultiPressMax": max number of presses (from attribute).
  *
  * @param jsonValue - JSON payload from named pipe
  */
+void HandleSimulateMultiPress(Json::Value & jsonValue)
 void HandleSimulateMultiPress(Json::Value & jsonValue)
 {
     if (sButtonSimulatorInstance != nullptr)
@@ -176,12 +194,16 @@ void HandleSimulateMultiPress(Json::Value & jsonValue)
     bool hasMultiPressNumPresses         = HasNumericField(jsonValue, "MultiPressNumPresses");
     bool hasFeatureMap                   = HasNumericField(jsonValue, "FeatureMap");
     bool hasMultiPressMax                = HasNumericField(jsonValue, "MultiPressMax");
+    bool hasFeatureMap                   = HasNumericField(jsonValue, "FeatureMap");
+    bool hasMultiPressMax                = HasNumericField(jsonValue, "MultiPressMax");
     if (!hasEndpointId || !hasButtonId || !hasMultiPressPressedTimeMillis || !hasMultiPressReleasedTimeMillis ||
+        !hasMultiPressNumPresses || !hasFeatureMap || !hasMultiPressMax)
         !hasMultiPressNumPresses || !hasFeatureMap || !hasMultiPressMax)
     {
         std::string inputJson = jsonValue.toStyledString();
         ChipLogError(NotSpecified,
                      "Missing or invalid value for one of EndpointId, ButtonId, MultiPressPressedTimeMillis, "
+                     "MultiPressReleasedTimeMillis, MultiPressNumPresses, FeatureMap or MultiPressMax in %s",
                      "MultiPressReleasedTimeMillis, MultiPressNumPresses, FeatureMap or MultiPressMax in %s",
                      inputJson.c_str());
         return;
@@ -205,6 +227,8 @@ void HandleSimulateMultiPress(Json::Value & jsonValue)
     uint8_t multiPressNumPresses = static_cast<uint8_t>(jsonValue["MultiPressNumPresses"].asUInt());
     uint32_t featureMap          = static_cast<uint32_t>(jsonValue["FeatureMap"].asUInt());
     uint8_t multiPressMax        = static_cast<uint8_t>(jsonValue["MultiPressMax"].asUInt());
+    uint32_t featureMap          = static_cast<uint32_t>(jsonValue["FeatureMap"].asUInt());
+    uint8_t multiPressMax        = static_cast<uint8_t>(jsonValue["MultiPressMax"].asUInt());
     auto buttonSimulator         = std::make_unique<ButtonEventsSimulator>();
 
     bool success = buttonSimulator->SetMode(ButtonEventsSimulator::Mode::kModeMultiPress)
@@ -214,6 +238,8 @@ void HandleSimulateMultiPress(Json::Value & jsonValue)
                        .SetIdleButtonId(0)
                        .SetPressedButtonId(buttonId)
                        .SetEndpointId(endpointId)
+                       .SetFeatureMap(featureMap)
+                       .SetMultiPressMax(multiPressMax)
                        .SetFeatureMap(featureMap)
                        .SetMultiPressMax(multiPressMax)
                        .Execute([]() { sButtonSimulatorInstance.reset(); });
@@ -481,34 +507,15 @@ void AllClustersAppCommandHandler::HandleCommand(intptr_t context)
         self->OnOperationalStateChange(device, operation, self->mJsonValue["Param"]);
     }
     else if (name == "SimulateLongPress")
+    else if (name == "SimulateLongPress")
     {
+        HandleSimulateLongPress(self->mJsonValue);
         HandleSimulateLongPress(self->mJsonValue);
     }
     else if (name == "SimulateMultiPress")
+    else if (name == "SimulateMultiPress")
     {
         HandleSimulateMultiPress(self->mJsonValue);
-    }
-    else if (name == "SimulateLatchPosition")
-    {
-        HandleSimulateLatchPosition(self->mJsonValue);
-    }
-    else if (name == "SimulateSwitchIdle")
-    {
-        HandleSimulateSwitchIdle(self->mJsonValue);
-    }
-    else if (name == "SetOccupancy")
-    {
-        uint8_t occupancy     = static_cast<uint8_t>(self->mJsonValue["Occupancy"].asUInt());
-        EndpointId endpointId = static_cast<EndpointId>(self->mJsonValue["EndpointId"].asUInt());
-
-        if (1 == occupancy || 0 == occupancy)
-        {
-            self->HandleSetOccupancyChange(endpointId, occupancy);
-        }
-        else
-        {
-            ChipLogError(NotSpecified, "Invalid Occupancy state to set.");
-        }
     }
     else
     {

@@ -24,26 +24,8 @@
 # test-runner-run/run1/factoryreset: True
 # test-runner-run/run1/quiet: True
 # test-runner-run/run1/app-args: --discriminator 1234 --KVS kvs1 --trace-to json:${TRACE_APP}.json
-# test-runner-run/run1/script-args: --endpoint 1 --storage-path admin_storage.json --commissioning-method on-network --discriminator 1234 --passcode 20202021 --trace-to json:${TRACE_TEST_JSON}.json --trace-to perfetto:${TRACE_TEST_PERFETTO}.perfetto --PICS src/app/tests/suites/certification/ci-pics-values
-#
-# test-runner-run/run2/app: ${ALL_CLUSTERS_APP}
-# test-runner-run/run2/factoryreset: True
-# test-runner-run/run2/quiet: True
-# test-runner-run/run2/app-args: --discriminator 1234 --KVS kvs1 --trace-to json:${TRACE_APP}.json
-# test-runner-run/run2/script-args: --endpoint 2 --storage-path admin_storage.json --commissioning-method on-network --discriminator 1234 --passcode 20202021 --trace-to json:${TRACE_TEST_JSON}.json --trace-to perfetto:${TRACE_TEST_PERFETTO}.perfetto --PICS src/app/tests/suites/certification/ci-pics-values
-#
-# test-runner-run/run3/app: ${ALL_CLUSTERS_APP}
-# test-runner-run/run3/factoryreset: True
-# test-runner-run/run3/quiet: True
-# test-runner-run/run3/app-args: --discriminator 1234 --KVS kvs1 --trace-to json:${TRACE_APP}.json
-# test-runner-run/run3/script-args: --endpoint 3 --storage-path admin_storage.json --commissioning-method on-network --discriminator 1234 --passcode 20202021 --trace-to json:${TRACE_TEST_JSON}.json --trace-to perfetto:${TRACE_TEST_PERFETTO}.perfetto --PICS src/app/tests/suites/certification/ci-pics-values
-#
-# test-runner-run/run4/app: ${ALL_CLUSTERS_APP}
-# test-runner-run/run4/factoryreset: True
-# test-runner-run/run4/quiet: True
-# test-runner-run/run4/app-args: --discriminator 1234 --KVS kvs1 --trace-to json:${TRACE_APP}.json
-# test-runner-run/run4/script-args: --endpoint 4 --storage-path admin_storage.json --commissioning-method on-network --discriminator 1234 --passcode 20202021 --trace-to json:${TRACE_TEST_JSON}.json --trace-to perfetto:${TRACE_TEST_PERFETTO}.perfetto --PICS src/app/tests/suites/certification/ci-pics-values
-#
+# test-runner-run/run1/script-args: --storage-path admin_storage.json --commissioning-method on-network --discriminator 1234 --passcode 20202021 --trace-to json:${TRACE_TEST_JSON}.json --trace-to perfetto:${TRACE_TEST_PERFETTO}.perfetto --PICS src/app/tests/suites/certification/ci-pics-values
+# test-runner-run/run1/script-args: --storage-path admin_storage.json --commissioning-method on-network --discriminator 1234 --passcode 20202021 --trace-to json:${TRACE_TEST_JSON}.json --trace-to perfetto:${TRACE_TEST_PERFETTO}.perfetto --PICS src/app/tests/suites/certification/ci-pics-values
 # === END CI TEST ARGUMENTS ===
 #
 # These tests run on every endpoint regardless of whether a switch is present because they are set up to auto-select.
@@ -58,11 +40,10 @@ from typing import Any
 import chip.clusters as Clusters
 import test_plan_support
 from chip.clusters import ClusterObjects as ClusterObjects
-from chip.clusters.Attribute import EventReadResult
+from chip.clusters.Attribute import EventReadResult, TypedAttributePath
 from chip.tlv import uint
 from matter_testing_support import (AttributeValue, ClusterAttributeChangeAccumulator, EventChangeCallback, MatterBaseTest,
-                                    TestStep, await_sequence_of_reports, default_matter_test_main, has_feature,
-                                    run_if_endpoint_matches)
+                                    TestStep, default_matter_test_main, has_feature, per_endpoint_test)
 from mobly import asserts
 
 logger = logging.getLogger(__name__)
@@ -91,7 +72,18 @@ def bump_substep(step: str) -> str:
 class TC_SwitchTests(MatterBaseTest):
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
-        self._default_pressed_position = self.user_params.get("default_pressed_position", 1)
+
+    def desc_TC_SWTCH_2_4(self) -> str:
+        """Returns a description of this test"""
+        return "[TC-SWTCH-2.4] Momentary Switch Long Press Verification"
+
+    # def steps_TC_SWTCH_2_4(self) -> list[TestStep]:
+    #     steps = [
+    #         TestStep("0", "Commissioning, already done", is_commissioning=True),
+    #         # TODO: fill when test is done
+    #     ]
+
+    #     return steps
 
     def setup_test(self):
         super().setup_test()
@@ -141,11 +133,16 @@ class TC_SwitchTests(MatterBaseTest):
         elif not omit_for_simulator:
             self._send_switch_idle_named_pipe_command(endpoint_id)
 
-    def _ask_for_switch_position(self, endpoint_id: int, new_position: int):
-        if not self._use_button_simulator():
-            self.wait_for_user_input(prompt_msg=f"Move latched switch to position {new_position}, if it is not already there.")
-        else:
-            self._send_latching_switch_named_pipe_command(endpoint_id, new_position)
+    def _send_multi_press_named_pipe_command(self, endpoint_id: int, number_of_presses: int, pressed_position: int, feature_map: uint, multi_press_max: uint):
+        command_dict = {"Name": 'SimulateMultiPress', "EndpointId": endpoint_id,
+                        "ButtonId": pressed_position, "MultiPressPressedTimeMillis": 500, "MultiPressReleasedTimeMillis": 500,
+                        "MultiPressNumPresses": number_of_presses, "FeatureMap": feature_map, "MultiPressMax": multi_press_max}
+        self._send_named_pipe_command(command_dict)
+
+    def _send_long_press_named_pipe_command(self, endpoint_id: int, pressed_position: int, feature_map: int):
+        command_dict = {"Name": "SimulateLongPress", "EndpointId": endpoint_id,
+                        "ButtonId": pressed_position, "LongPressDelayMillis": 5000, "LongPressDurationMillis": 5500, "FeatureMap": feature_map}
+        self._send_named_pipe_command(command_dict)
 
     def _ask_for_multi_press_short_long(self, endpoint_id: int, pressed_position: int, feature_map: uint, multi_press_max: uint):
         if not self._use_button_simulator():
@@ -158,8 +155,7 @@ class TC_SwitchTests(MatterBaseTest):
             self.wait_for_user_input(msg)
         else:
             # This is just a simulator, ignore the long press instruction for now, it doesn't matter for the CI. It does for cert.
-            self._send_multi_press_named_pipe_command(
-                endpoint_id, number_of_presses=2, pressed_position=pressed_position, feature_map=feature_map, multi_press_max=multi_press_max)
+            self._send_multi_press_named_pipe_command(endpoint_id, 2, pressed_position, feature_map, multi_press_max)
 
     def _ask_for_multi_press_long_short(self, endpoint_id, pressed_position, feature_map: int):
         if not self._use_button_simulator():
@@ -189,12 +185,15 @@ class TC_SwitchTests(MatterBaseTest):
                 prompt_msg=f"Press switch position {pressed_position} for a long time (around 5 seconds) on the DUT, then release it.")
         else:
             self._send_long_press_named_pipe_command(endpoint_id, pressed_position, feature_map)
+            self._send_long_press_named_pipe_command(endpoint_id, pressed_position, feature_map)
 
+    def _ask_for_keep_pressed(self, endpoint_id: int, pressed_position: int, feature_map: int):
     def _ask_for_keep_pressed(self, endpoint_id: int, pressed_position: int, feature_map: int):
         if not self._use_button_simulator():
             self.wait_for_user_input(
                 prompt_msg=f"Press switch position {pressed_position} for a long time (around 5 seconds) on the DUT, keep it pressed, do NOT release it.")
         else:
+            self._send_long_press_named_pipe_command(endpoint_id, pressed_position, feature_map)
             self._send_long_press_named_pipe_command(endpoint_id, pressed_position, feature_map)
 
     def _ask_for_release(self):
@@ -267,6 +266,93 @@ class TC_SwitchTests(MatterBaseTest):
 
         logging.info(f"Successfully waited for no further events on {expected_cluster} for {elapsed:.1f} seconds")
 
+    @per_endpoint_test(has_feature(Clusters.Switch, Clusters.Switch.Bitmaps.Feature.kMomentarySwitch))
+    async def test_TC_SWTCH_2_4(self):
+        # TODO: Make this come from PIXIT
+        switch_pressed_position = 1
+        post_prompt_settle_delay_seconds = 10.0
+
+        # Commission DUT - already done
+
+        # Read feature map to set bool markers
+        cluster = Clusters.Objects.Switch
+        feature_map = await self.read_single_attribute_check_success(cluster, attribute=cluster.Attributes.FeatureMap)
+
+        has_ms_feature = (feature_map & cluster.Bitmaps.Feature.kMomentarySwitch) != 0
+        has_msr_feature = (feature_map & cluster.Bitmaps.Feature.kMomentarySwitchRelease) != 0
+        has_msl_feature = (feature_map & cluster.Bitmaps.Feature.kMomentarySwitchLongPress) != 0
+        has_as_feature = (feature_map & cluster.Bitmaps.Feature.kActionSwitch) != 0
+        # has_msm_feature = (feature_map & cluster.Bitmaps.Feature.kMomentarySwitchMultiPress) != 0
+
+        if not has_ms_feature:
+            logging.info("Skipping rest of test: SWTCH.S.F01(MS) feature not present")
+            self.skip_all_remaining_steps("2")
+
+        endpoint_id = self.matter_test_config.endpoint
+
+        # Step 1: Set up subscription to all Switch cluster events
+        self._placeholder_for_step("1")
+        event_listener = EventChangeCallback(cluster)
+        attrib_listener = ClusterAttributeChangeAccumulator(cluster)
+        await event_listener.start(self.default_controller, self.dut_node_id, endpoint=endpoint_id)
+        await attrib_listener.start(self.default_controller, self.dut_node_id, endpoint=endpoint_id)
+
+        # Step 2: Operator does not operate switch on the DUT
+        self._placeholder_for_step("2")
+        self._ask_for_switch_idle()
+
+        # Step 3: TH reads the CurrentPosition attribute from the DUT
+        self._placeholder_for_step("3")
+
+        # Verify that the value is 0
+        current_position = await self.read_single_attribute_check_success(cluster, attribute=cluster.Attributes.CurrentPosition)
+        asserts.assert_equal(current_position, 0)
+
+        # Step 4a: Operator operates switch (keep pressed for long time, e.g. 5 seconds) on the DUT, the release it
+        self._placeholder_for_step("4a")
+        self._ask_for_long_press(endpoint_id, switch_pressed_position, feature_map)
+
+        # Step 4b: TH expects report of CurrentPosition 1, followed by a report of Current Position 0.
+        self._placeholder_for_step("4b")
+        logging.info(
+            f"Starting to wait for {post_prompt_settle_delay_seconds:.1f} seconds for CurrentPosition to go {switch_pressed_position}, then 0.")
+        self._await_sequence_of_reports(report_queue=attrib_listener.attribute_queue, endpoint_id=endpoint_id, attribute=cluster.Attributes.CurrentPosition, sequence=[
+                                        switch_pressed_position, 0], timeout_sec=post_prompt_settle_delay_seconds)
+
+        # Step 4c: TH expects at least InitialPress with NewPosition = 1
+        self._placeholder_for_step("4c")
+        logging.info(f"Starting to wait for {post_prompt_settle_delay_seconds:.1f} seconds for InitialPress event.")
+        expected_events = [cluster.Events.InitialPress(newPosition=switch_pressed_position)]
+        self._await_sequence_of_events(event_queue=event_listener.event_queue, endpoint_id=endpoint_id,
+                                       sequence=expected_events, timeout_sec=post_prompt_settle_delay_seconds)
+
+        # Step 4d: For MSL/AS, expect to see LongPress/LongRelease in that order
+        if not has_msl_feature and not has_as_feature:
+            logging.info("Skipping Step 4d due to missing MSL and AS features")
+            self._placeholder_for_skip("4d")
+        else:
+            # Steb 4d: TH expects report of LongPress, LongRelease in that order.
+            self._placeholder_for_step("4d")
+            logging.info(f"Starting to wait for {post_prompt_settle_delay_seconds:.1f} seconds for LongPress then LongRelease.")
+            expected_events = []
+            expected_events.append(cluster.Events.LongPress(newPosition=switch_pressed_position))
+            expected_events.append(cluster.Events.LongRelease(previousPosition=switch_pressed_position))
+            self._await_sequence_of_events(event_queue=event_listener.event_queue, endpoint_id=endpoint_id,
+                                           sequence=expected_events, timeout_sec=post_prompt_settle_delay_seconds)
+
+        # Step 4e: For MS & (!MSL & !AS & !MSR), expect no further events for 10 seconds.
+        if not has_msl_feature and not has_as_feature and not has_msr_feature:
+            self._placeholder_for_step("4e")
+            self._expect_no_events_for_cluster(event_queue=event_listener.event_queue,
+                                               endpoint_id=endpoint_id, expected_cluster=cluster, timeout_sec=10.0)
+
+        # Step 4f: For MSR & not MSL, expect to see ShortRelease.
+        if not has_msl_feature and has_msr_feature:
+            self._placeholder_for_step("4f")
+            expected_events = [cluster.Events.ShortRelease(previousPosition=switch_pressed_position)]
+            self._await_sequence_of_events(event_queue=event_listener.event_queue, endpoint_id=endpoint_id,
+                                           sequence=expected_events, timeout_sec=post_prompt_settle_delay_seconds)
+
     def _received_event(self, event_listener: EventChangeCallback, target_event: ClusterObjects.ClusterEvent, timeout_s: int) -> bool:
         """
             Returns true if this event was received, false otherwise
@@ -284,116 +370,6 @@ class TC_SwitchTests(MatterBaseTest):
             remaining = end_time - datetime.now()
         return False
 
-    def steps_TC_SWTCH_2_2(self):
-        return [TestStep(1, test_plan_support.commission_if_required(), "", is_commissioning=True),
-                TestStep(2, "Set up subscription to all events and attributes of Switch cluster on the endpoint"),
-                TestStep(3, "Operator sets switch to first position on the DUT"),
-                TestStep(4, "TH reads the CurrentPosition attribute from the DUT.", "Verify that the value is 0."),
-                TestStep(5, "Operator sets switch to second position (one) on the DUT",
-                         "Verify that the TH receives SwitchLatched event with NewPosition set to 1 from the DUT."),
-                TestStep(6, "TH reads the CurrentPosition attribute from the DUT",
-                         "Verify that the value is 1, and that a subscription report was received for that change."),
-                TestStep(7, "If there are more than 2 positions, test subsequent positions of the DUT"),
-                TestStep(8, "Operator sets switch to first position on the DUT."),
-                TestStep(9, "Wait 10 seconds for event reports stable." "Verify that last SwitchLatched event received is for NewPosition 0."),
-                TestStep(10, "TH reads the CurrentPosition attribute from the DUT",
-                         "Verify that the value is 0, and that a subscription report was received for that change."),
-                ]
-
-    @run_if_endpoint_matches(has_feature(Clusters.Switch, Clusters.Switch.Bitmaps.Feature.kLatchingSwitch))
-    async def test_TC_SWTCH_2_2(self):
-        post_prompt_settle_delay_seconds = 10.0
-        cluster = Clusters.Switch
-        endpoint_id = self.matter_test_config.endpoint
-
-        # Step 1: Commissioning - already done
-        self.step(1)
-
-        # Step 2: Set up subscription to all events of Switch cluster on the endpoint.
-        self.step(2)
-        event_listener = EventChangeCallback(cluster)
-        await event_listener.start(self.default_controller, self.dut_node_id, endpoint=endpoint_id)
-        attrib_listener = ClusterAttributeChangeAccumulator(cluster)
-        await attrib_listener.start(self.default_controller, self.dut_node_id, endpoint=endpoint_id)
-
-        # Pre-get number of positions for step 7 later.
-        num_positions = await self.read_single_attribute_check_success(cluster=cluster, attribute=cluster.Attributes.NumberOfPositions)
-        asserts.assert_greater(num_positions, 1, "Latching switch has only 1 position, this is impossible.")
-
-        # Step 3: Operator sets switch to first position on the DUT.
-        self.step(3)
-        self._ask_for_switch_position(endpoint_id, new_position=0)
-
-        # Step 4: TH reads the CurrentPosition attribute from the DUT.
-        # Verify that the value is 0.
-        self.step(4)
-        button_val = await self.read_single_attribute_check_success(cluster=cluster, attribute=cluster.Attributes.CurrentPosition)
-        asserts.assert_equal(button_val, 0, "Switch position value is not 0")
-
-        attrib_listener.reset()
-        event_listener.reset()
-
-        for expected_switch_position in range(1, num_positions):
-            # Step 5: Operator sets switch to second position (one) on the DUT",
-            # Verify that the TH receives SwitchLatched event with NewPosition set to 1 from the DUT
-            if expected_switch_position == 1:
-                self.step(5)
-            self._ask_for_switch_position(endpoint_id, expected_switch_position)
-
-            data = event_listener.wait_for_event_report(cluster.Events.SwitchLatched, timeout_sec=post_prompt_settle_delay_seconds)
-            logging.info(f"-> SwitchLatched event last received: {data}")
-            asserts.assert_equal(data, cluster.Events.SwitchLatched(
-                newPosition=expected_switch_position), "Did not get expected switch position")
-
-            # Step 6: TH reads the CurrentPosition attribute from the DUT", "Verify that the value is 1
-            if expected_switch_position == 1:  # Indicate step 7 only once
-                self.step(6)
-            button_val = await self.read_single_attribute_check_success(cluster=cluster, attribute=cluster.Attributes.CurrentPosition)
-            asserts.assert_equal(button_val, expected_switch_position, f"Switch position is not {expected_switch_position}")
-            logging.info(f"Checking to see if a report for {expected_switch_position} is received")
-            attrib_listener.await_sequence_of_reports(attribute=cluster.Attributes.CurrentPosition, sequence=[
-                                                      expected_switch_position], timeout_sec=post_prompt_settle_delay_seconds)
-
-            # Step 7: If there are more than 2 positions, test subsequent positions of the DUT
-            if expected_switch_position == 1:
-                if num_positions > 2:  # Indicate step 7 only once
-                    self.step(7)
-                else:
-                    self.skip_step(7)
-
-            if num_positions > 2:
-                logging.info("Looping for the other positions")
-
-        # Step 8: Operator sets switch to first position on the DUT.
-        self.step(8)
-        event_listener.flush_events()
-        self._ask_for_switch_position(endpoint_id, new_position=0)
-
-        # Step 9: Wait 10 seconds for event reports stable.
-        # Verify that last SwitchLatched event received is for NewPosition 0.
-        self.step(9)
-        time.sleep(10.0 if not self.is_ci else 1.0)
-
-        expected_switch_position = 0
-        last_event = event_listener.get_last_event()
-        asserts.assert_is_not_none(last_event, "Did not get SwitchLatched events since last operator action.")
-        last_event_data = last_event.Data
-        logging.info(f"-> SwitchLatched event last received: {last_event_data}")
-        asserts.assert_equal(last_event_data, cluster.Events.SwitchLatched(
-            newPosition=expected_switch_position), "Did not get expected switch position")
-
-        # Step 10: TH reads the CurrentPosition attribute from the DUT.
-        # Verify that the value is 0
-        self.step(10)
-
-        button_val = await self.read_single_attribute_check_success(cluster=cluster, attribute=cluster.Attributes.CurrentPosition)
-        asserts.assert_equal(button_val, 0, "Button value is not 0")
-
-        logging.info(f"Checking to see if a report for {expected_switch_position} is received")
-        expected_final_value = [AttributeValue(
-            endpoint_id, attribute=cluster.Attributes.CurrentPosition, value=expected_switch_position)]
-        attrib_listener.await_all_final_values_reported(expected_final_value, timeout_sec=post_prompt_settle_delay_seconds)
-
     def steps_TC_SWTCH_2_3(self):
         return [TestStep(1, test_plan_support.commission_if_required(), "", is_commissioning=True),
                 TestStep(2, "Set up subscription to all events of Switch cluster on the endpoint"),
@@ -405,12 +381,16 @@ class TC_SwitchTests(MatterBaseTest):
                 TestStep(7, "Operator releases switch on the DUT"),
                 TestStep("8a", "If the DUT implements the MSR feature and does not implement the MSL feature, verify that the TH receives ShortRelease event with NewPosition set to 0 on the DUT", "Event received"),
                 TestStep("8b", "If the DUT implements the MSR feature and the MSL feature, verify that the TH receives LongRelease event with NewPosition set to 0 on the DUT", "Event received"),
+                TestStep("8a", "If the DUT implements the MSR feature and does not implement the MSL feature, verify that the TH receives ShortRelease event with NewPosition set to 0 on the DUT", "Event received"),
+                TestStep("8b", "If the DUT implements the MSR feature and the MSL feature, verify that the TH receives LongRelease event with NewPosition set to 0 on the DUT", "Event received"),
                 TestStep(
+                    "8c", "If the DUT implements the AS feature, verify that the TH does not receive ShortRelease event on the DUT", "No event received"),
                     "8c", "If the DUT implements the AS feature, verify that the TH does not receive ShortRelease event on the DUT", "No event received"),
                 TestStep(9, "TH reads the CurrentPosition attribute from the DUT", "Verify that the value is 0"),
                 ]
 
-    @run_if_endpoint_matches(has_feature(Clusters.Switch, Clusters.Switch.Bitmaps.Feature.kMomentarySwitch))
+    @per_endpoint_test(has_feature(Clusters.Switch, Clusters.Switch.Bitmaps.Feature.kMomentarySwitch))
+    @per_endpoint_test(has_feature(Clusters.Switch, Clusters.Switch.Bitmaps.Feature.kMomentarySwitch))
     async def test_TC_SWTCH_2_3(self):
         # Commissioning - already done
         self.step(1)
@@ -418,6 +398,7 @@ class TC_SwitchTests(MatterBaseTest):
         feature_map = await self.read_single_attribute_check_success(cluster, attribute=cluster.Attributes.FeatureMap)
 
         has_msr_feature = (feature_map & cluster.Bitmaps.Feature.kMomentarySwitchRelease) != 0
+        has_msl_feature = (feature_map & cluster.Bitmaps.Feature.kMomentarySwitchLongPress) != 0
         has_msl_feature = (feature_map & cluster.Bitmaps.Feature.kMomentarySwitchLongPress) != 0
         has_as_feature = (feature_map & cluster.Bitmaps.Feature.kActionSwitch) != 0
 
@@ -439,6 +420,7 @@ class TC_SwitchTests(MatterBaseTest):
         # This is 1s larger than the subscription ceiling
         self.pressed_position = 1
         self._ask_for_keep_pressed(endpoint_id, self.pressed_position, feature_map)
+        self._ask_for_keep_pressed(endpoint_id, self.pressed_position, feature_map)
         event_listener.wait_for_event_report(cluster.Events.InitialPress)
 
         self.step(6)
@@ -450,12 +432,18 @@ class TC_SwitchTests(MatterBaseTest):
 
         self.step("8a")
         if has_msr_feature and not has_msl_feature:
+        if has_msr_feature and not has_msl_feature:
             asserts.assert_true(self._received_event(event_listener, cluster.Events.ShortRelease, 10),
                                 "Did not receive short release")
         else:
             self.mark_current_step_skipped()
 
         self.step("8b")
+        if has_msr_feature and has_msl_feature:
+            asserts.assert_true(self._received_event(event_listener, cluster.Events.LongRelease, 10),
+                                "Did not receive long release")
+
+        self.step("8c")
         if has_msr_feature and has_msl_feature:
             asserts.assert_true(self._received_event(event_listener, cluster.Events.LongRelease, 10),
                                 "Did not receive long release")
@@ -469,105 +457,6 @@ class TC_SwitchTests(MatterBaseTest):
         self.step(9)
         button_val = await self.read_single_attribute_check_success(cluster=cluster, attribute=cluster.Attributes.CurrentPosition)
         asserts.assert_equal(button_val, 0, "Button value is not 0")
-
-    def desc_TC_SWTCH_2_4(self) -> str:
-        return "[TC-SWTCH-2.4] Momentary Switch Long Press Verification"
-
-    def steps_TC_SWTCH_2_4(self):
-        return [TestStep(1, test_plan_support.commission_if_required(), "", is_commissioning=True),
-                TestStep(2, "Set up subscription to all events and attributes of Switch cluster on the endpoint"),
-                TestStep(3, "Operator does not operate switch on the DUT"),
-                TestStep(4, "TH reads the CurrentPosition attribute from the DUT", "Verify that the value is 0"),
-                TestStep(5, "Operator operates switch (keep pressed for long time, e.g. 5 seconds) on the DUT, then release it",
-                """
-                * TH expects receiving a subscription report of CurrentPosition 1, followed by a report of Current Position 0.
-                * TH expects receiving at InitialPress event with NewPosition = 1.
-                * if MSL feature is supported, TH expect receiving LongPress/LongRelease in that order.
-                * if MS & (!MSL & !AS & !MSR & !MSM) features present, TH expects receiving no further events for 10 seconds after release.
-                * if (MSR & !MSL) features present, TH expects receiving ShortRelease event.
-                """)
-                ]
-
-    @run_if_endpoint_matches(has_feature(Clusters.Switch, Clusters.Switch.Bitmaps.Feature.kMomentarySwitch))
-    async def test_TC_SWTCH_2_4(self):
-        switch_pressed_position = self._default_pressed_position
-        post_prompt_settle_delay_seconds = 10.0
-
-        endpoint_id = self.matter_test_config.endpoint
-        cluster = Clusters.Objects.Switch
-
-        # Step 1: Commission DUT - already done
-        self.step(1)
-
-        # Read feature map to set bool markers
-        feature_map = await self.read_single_attribute_check_success(cluster, attribute=cluster.Attributes.FeatureMap)
-
-        has_ms_feature = (feature_map & cluster.Bitmaps.Feature.kMomentarySwitch) != 0
-        has_msr_feature = (feature_map & cluster.Bitmaps.Feature.kMomentarySwitchRelease) != 0
-        has_msl_feature = (feature_map & cluster.Bitmaps.Feature.kMomentarySwitchLongPress) != 0
-        has_msm_feature = (feature_map & cluster.Bitmaps.Feature.kMomentarySwitchMultiPress) != 0
-        has_as_feature = (feature_map & cluster.Bitmaps.Feature.kActionSwitch) != 0
-
-        if not has_ms_feature:
-            logging.info("Skipping rest of test: SWTCH.S.F01(MS) feature not present")
-            self.skip_all_remaining_steps("2")
-
-        # Step 2: Set up subscription to all events and attributes of Switch cluster on the endpoint
-        self.step(2)
-        event_listener = EventChangeCallback(cluster)
-        await event_listener.start(self.default_controller, self.dut_node_id, endpoint=endpoint_id)
-        attrib_listener = ClusterAttributeChangeAccumulator(cluster)
-        await attrib_listener.start(self.default_controller, self.dut_node_id, endpoint=endpoint_id)
-
-        # Step 3: Operator does not operate switch on the DUT
-        self.step(3)
-        self._ask_for_switch_idle(endpoint_id)
-
-        # Step 4: TH reads the CurrentPosition attribute from the DUT
-        self.step(4)
-
-        # Verify that the value is 0
-        current_position = await self.read_single_attribute_check_success(cluster, attribute=cluster.Attributes.CurrentPosition)
-        asserts.assert_equal(current_position, 0)
-
-        # Step 5: Operator operates switch (keep pressed for long time, e.g. 5 seconds) on the DUT, the release it
-        self.step(5)
-        self._ask_for_long_press(endpoint_id, switch_pressed_position, feature_map)
-
-        # - TH expects report of CurrentPosition 1, followed by a report of Current Position 0.
-        logging.info(
-            f"Starting to wait for {post_prompt_settle_delay_seconds:.1f} seconds for CurrentPosition to go {switch_pressed_position}, then 0.")
-        await_sequence_of_reports(report_queue=attrib_listener.attribute_queue, endpoint_id=endpoint_id, attribute=cluster.Attributes.CurrentPosition, sequence=[
-                                  switch_pressed_position, 0], timeout_sec=post_prompt_settle_delay_seconds)
-
-        # - TH expects at least InitialPress with NewPosition = 1
-        logging.info(f"Starting to wait for {post_prompt_settle_delay_seconds:.1f} seconds for InitialPress event.")
-        expected_events = [cluster.Events.InitialPress(newPosition=switch_pressed_position)]
-        self._await_sequence_of_events(event_queue=event_listener.event_queue, endpoint_id=endpoint_id,
-                                       sequence=expected_events, timeout_sec=post_prompt_settle_delay_seconds)
-
-        # - if MSL feature is supported, expect to see LongPress/LongRelease in that order.
-        if not has_msl_feature:
-            logging.info("Since MSL feature unsupported, skipping check for LongPress/LongRelease")
-        else:
-            # - TH expects report of LongPress, LongRelease in that order.
-            logging.info(f"Starting to wait for {post_prompt_settle_delay_seconds:.1f} seconds for LongPress then LongRelease.")
-            expected_events = []
-            expected_events.append(cluster.Events.LongPress(newPosition=switch_pressed_position))
-            expected_events.append(cluster.Events.LongRelease(previousPosition=switch_pressed_position))
-            self._await_sequence_of_events(event_queue=event_listener.event_queue, endpoint_id=endpoint_id,
-                                           sequence=expected_events, timeout_sec=post_prompt_settle_delay_seconds)
-
-        # - if MS & (!MSL & !AS & !MSR & !MSM) features present, expect no further events for 10 seconds after release.
-        if not has_msl_feature and not has_as_feature and not has_msr_feature and not has_msm_feature:
-            self._expect_no_events_for_cluster(event_queue=event_listener.event_queue,
-                                               endpoint_id=endpoint_id, expected_cluster=cluster, timeout_sec=10.0)
-
-        # - if (MSR & !MSL) features present, expect to see ShortRelease event.
-        if not has_msl_feature and has_msr_feature:
-            expected_events = [cluster.Events.ShortRelease(previousPosition=switch_pressed_position)]
-            self._await_sequence_of_events(event_queue=event_listener.event_queue, endpoint_id=endpoint_id,
-                                           sequence=expected_events, timeout_sec=post_prompt_settle_delay_seconds)
 
     def steps_TC_SWTCH_2_5(self):
         return [TestStep(1, test_plan_support.commission_if_required(), "", is_commissioning=True),
@@ -674,7 +563,7 @@ class TC_SwitchTests(MatterBaseTest):
         multi_press_max = await self.read_single_attribute_check_success(cluster, attribute=cluster.Attributes.MultiPressMax)
 
         endpoint_id = self.matter_test_config.endpoint
-        pressed_position = self._default_pressed_position
+        pressed_position = 1
 
         self.step(2)
         event_listener = EventChangeCallback(cluster)
@@ -693,28 +582,28 @@ class TC_SwitchTests(MatterBaseTest):
             else:
                 self._ask_for_multi_press(endpoint_id, number_of_presses=count, pressed_position=pressed_position,
                                           feature_map=feature_map, multi_press_max=multi_press_max)
-            for pos_idx in range(count):
+            for i in range(count):
                 event = event_listener.wait_for_event_report(cluster.Events.InitialPress)
                 asserts.assert_equal(event.newPosition, pressed_position, "Unexpected NewPosition on InitialEvent")
-                if pos_idx > 0:
+                if i > 0:
                     event = event_listener.wait_for_event_report(cluster.Events.MultiPressOngoing)
                     asserts.assert_equal(event.newPosition, pressed_position, "Unexpected NewPosition on MultiPressOngoing")
-                    asserts.assert_equal(event.currentNumberOfPressesCounted, pos_idx + 1,
+                    asserts.assert_equal(event.currentNumberOfPressesCounted, i+1,
                                          "Unexpected CurrentNumberOfPressesCounted on MultiPressOngoing")
                 if has_msr_feature:
                     event = event_listener.wait_for_event_report(cluster.Events.ShortRelease)
                     asserts.assert_equal(event.previousPosition, pressed_position, "Unexpected PreviousPosition on ShortRelease")
 
-            step = bump_substep(step)
+            step = step[:-1] + chr(ord(step[-1])+1)
             self.step(step)
             self._ask_for_switch_idle(endpoint_id, omit_for_simulator=True)
             event = event_listener.wait_for_event_report(cluster.Events.MultiPressComplete)
             asserts.assert_equal(event.previousPosition, pressed_position, "Unexpected PreviousPosition on MultiPressComplete")
             asserts.assert_equal(event.totalNumberOfPressesCounted, count, "Unexpected count on MultiPressComplete")
 
-        test_multi_press_sequence("4a", count=1)
+        test_multi_press_sequence("4a", 1)
 
-        test_multi_press_sequence("5a", count=2)
+        test_multi_press_sequence("5a", 2)
 
         self.step("6a")
         multi_press_max = await self.read_single_attribute_check_success(cluster=cluster, attribute=cluster.Attributes.MultiPressMax)
@@ -722,7 +611,7 @@ class TC_SwitchTests(MatterBaseTest):
             self.skip_step("6b")
             self.skip_step("6c")
         else:
-            test_multi_press_sequence("6b", count=3)
+            test_multi_press_sequence("6b", 3)
 
         if not has_msl_feature:
             self.skip_all_remaining_steps(7)
@@ -731,7 +620,7 @@ class TC_SwitchTests(MatterBaseTest):
         self.step(7)
         # subscription is already set up
 
-        test_multi_press_sequence("8a", count=2, short_long=True)
+        test_multi_press_sequence("8a", 2, short_long=True)
 
         self.step("9a")
         self._ask_for_multi_press_long_short(endpoint_id, pressed_position, feature_map)
@@ -852,7 +741,7 @@ class TC_SwitchTests(MatterBaseTest):
         multi_press_max = await self.read_single_attribute_check_success(cluster, attribute=cluster.Attributes.MultiPressMax)
 
         endpoint_id = self.matter_test_config.endpoint
-        pressed_position = self._default_pressed_position
+        pressed_position = 1
 
         self.step(2)
         event_listener = EventChangeCallback(cluster)
@@ -875,7 +764,7 @@ class TC_SwitchTests(MatterBaseTest):
             event = event_listener.wait_for_event_report(cluster.Events.InitialPress)
             asserts.assert_equal(event.newPosition, pressed_position, "Unexpected NewPosition on InitialEvent")
 
-            step = bump_substep(step)
+            step = step[:-1] + chr(ord(step[-1])+1)
             self.step(step)
             self._ask_for_switch_idle(endpoint_id, omit_for_simulator=True)
             event = event_listener.wait_for_event_report(cluster.Events.MultiPressComplete)
@@ -883,11 +772,11 @@ class TC_SwitchTests(MatterBaseTest):
             expected_count = 0 if count > multi_press_max else count
             asserts.assert_equal(event.totalNumberOfPressesCounted, expected_count, "Unexpected count on MultiPressComplete")
 
-        test_multi_press_sequence("4a", count=1)
+        test_multi_press_sequence("4a", 1)
 
-        test_multi_press_sequence("5a", count=2)
+        test_multi_press_sequence("5a", 2)
 
-        test_multi_press_sequence("6a", count=(multi_press_max + 1))
+        test_multi_press_sequence("6a", multi_press_max + 1)
 
         self.step("7a")
         if not has_msl_feature:
@@ -896,7 +785,7 @@ class TC_SwitchTests(MatterBaseTest):
         # subscription is already established
         self.step("7b")
 
-        test_multi_press_sequence("8a", count=2, short_long=True)
+        test_multi_press_sequence("8a", 2, short_long=True)
 
         self.step("9a")
         self._ask_for_multi_press_long_short(endpoint_id, pressed_position, feature_map)

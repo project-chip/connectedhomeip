@@ -38,7 +38,9 @@ from dataclasses import dataclass, field
 from datetime import datetime, timedelta, timezone
 from enum import Enum, IntFlag
 from functools import partial
-from typing import Any, Iterable, List, Optional, Tuple
+from enum import Enum, IntFlag
+from functools import partial
+from typing import Any, List, Optional, Tuple
 
 from chip.tlv import float32, uint
 
@@ -57,7 +59,6 @@ import chip.logging
 import chip.native
 from chip import discovery
 from chip.ChipStack import ChipStack
-from chip.clusters import Attribute
 from chip.clusters import ClusterObjects as ClusterObjects
 from chip.clusters.Attribute import EventReadResult, SubscriptionTransaction, TypedAttributePath
 from chip.exceptions import ChipStackError
@@ -263,12 +264,11 @@ class EventChangeCallback:
                 f'Got subscription report for event on cluster {self._expected_cluster}: {res.Data}')
             self._q.put(res)
 
-    def wait_for_event_report(self, expected_event: ClusterObjects.ClusterEvent, timeout_sec: float = 10.0) -> Any:
-        """This function allows a test script to block waiting for the specific event to be the next event
-           to arrive within a timeout (specified in seconds). It returns the event data so that the values can be checked."""
-        logging.info(f"Waiting for {expected_event} for {timeout_sec:.1f} seconds")
+    def wait_for_event_report(self, expected_event: ClusterObjects.ClusterEvent, timeoutS: int = 10):
+        """This function allows a test script to block waiting for the specific event to arrive with a timeout
+           (specified in seconds). It returns the event data so that the values can be checked."""
         try:
-            res = self._q.get(block=True, timeout=timeout_sec)
+            res = self._q.get(block=True, timeout=timeoutS)
         except queue.Empty:
             asserts.fail("Failed to receive a report for the event {}".format(expected_event))
 
@@ -277,11 +277,11 @@ class EventChangeCallback:
         logging.info(f"Successfully waited for {expected_event}")
         return res.Data
 
-    def wait_for_event_expect_no_report(self, timeout_sec: float = 10.0):
-        """This function returns if an event does not arrive within the timeout specified in seconds.
-           If any event does arrive, an assert failure occurs."""
+    def wait_for_event_expect_no_report(self, timeoutS: int = 10):
+        """This function succceeds/returns if an event does not arrive within the timeout specified in seconds.
+           If an event does arrive, an assert is called."""
         try:
-            res = self._q.get(block=True, timeout=timeout_sec)
+            res = self._q.get(block=True, timeout=timeoutS)
         except queue.Empty:
             return
 
@@ -340,27 +340,8 @@ class AttributeChangeCallback:
             logging.info(
                 f"[AttributeChangeCallback] Got attribute subscription report. Attribute {path.AttributeType}. Updated value: {attribute_value}. SubscriptionId: {transaction.subscriptionId}")
         except KeyError:
-            asserts.fail(f"[AttributeChangeCallback] Attribute {self._expected_attribute} not found in returned report")
-
-
-def clear_queue(report_queue: queue.Queue):
-    """Flush all contents of a report queue. Useful to get back to empty point."""
-    while not report_queue.empty():
-        try:
-            report_queue.get(block=False)
-        except queue.Empty:
-            break
-
-
-@dataclass
-class AttributeValue:
-    endpoint_id: int
-    attribute: ClusterObjects.ClusterAttributeDescriptor
-    value: Any
-    timestamp_utc: Optional[datetime] = None
-
-
-def await_sequence_of_reports(report_queue: queue.Queue, endpoint_id: int, attribute: TypedAttributePath, sequence: list[Any], timeout_sec: float) -> None:
+            asserts.fail("[AttributeChangeCallback] Attribute {expected_attribute} not found in returned report")
+def await_sequence_of_reports(report_queue: queue.Queue, endpoint_id: int, attribute: TypedAttributePath, sequence: list[Any], timeout_sec: float):
     """Given a queue.Queue hooked-up to an attribute change accumulator, await a given expected sequence of attribute reports.
 
     Args:
@@ -442,7 +423,7 @@ class ClusterAttributeChangeAccumulator:
         self._subscription = await dev_ctrl.ReadAttribute(
             nodeid=node_id,
             attributes=[(endpoint, self._expected_cluster)],
-            reportInterval=(int(min_interval_sec), int(max_interval_sec)),
+            reportInterval=(min_interval_sec, max_interval_sec),
             fabricFiltered=fabric_filtered,
             keepSubscriptions=keepSubscriptions
         )
@@ -1300,16 +1281,8 @@ class MatterBaseTest(base_test.BaseTestClass):
         self.failed = True
         if self.runner_hook and not self.is_commissioning:
             exception = record.termination_signal.exception
-
-            try:
-                step_duration = (datetime.now(timezone.utc) - self.step_start_time) / timedelta(microseconds=1)
-            except AttributeError:
-                # If we failed during setup, these may not be populated
-                step_duration = 0
-            try:
-                test_duration = (datetime.now(timezone.utc) - self.test_start_time) / timedelta(microseconds=1)
-            except AttributeError:
-                test_duration = 0
+            step_duration = (datetime.now(timezone.utc) - self.step_start_time) / timedelta(microseconds=1)
+            test_duration = (datetime.now(timezone.utc) - self.test_start_time) / timedelta(microseconds=1)            
             # TODO: I have no idea what logger, logs, request or received are. Hope None works because I have nothing to give
             self.runner_hook.step_failure(logger=None, logs=None, duration=step_duration, request=None, received=None)
             self.runner_hook.test_stop(exception=exception, duration=test_duration)
@@ -1979,7 +1952,9 @@ def async_test_body(body):
     """
 
     def async_runner(self: MatterBaseTest, *args, **kwargs):
-        return _async_runner(body, self, *args, **kwargs)
+        timeout = self.matter_test_config.timeout if self.matter_test_config.timeout is not None else self.default_timeout
+        runner_with_timeout = asyncio.wait_for(body(self, *args, **kwargs), timeout=timeout)
+        return asyncio.run(runner_with_timeout)
 
     return async_runner
 
@@ -2095,11 +2070,14 @@ def has_feature(cluster: ClusterObjects.ClusterObjectDescriptor, feature: IntFla
     return partial(_has_feature, cluster=cluster, feature=feature)
 
 
-async def _get_all_matching_endpoints(self: MatterBaseTest, accept_function: EndpointCheckFunction) -> list[uint]:
-    """ Returns a list of endpoints matching the accept condition. """
-    wildcard = await self.default_controller.Read(self.dut_node_id, [(Clusters.Descriptor), Attribute.AttributePath(None, None, GlobalAttributeIds.ATTRIBUTE_LIST_ID), Attribute.AttributePath(None, None, GlobalAttributeIds.FEATURE_MAP_ID), Attribute.AttributePath(None, None, GlobalAttributeIds.ACCEPTED_COMMAND_LIST_ID)])
-    matching = [e for e in wildcard.attributes.keys() if accept_function(wildcard, e)]
-    return matching
+async def get_accepted_endpoints_for_test(self: MatterBaseTest, accept_function: EndpointCheckFunction) -> list[uint]:
+    """ Helper function for the per_endpoint_test decorator.
+
+        Returns a list of endpoints on which the test should be run given the accept_function for the test.
+    """
+        wildcard = await self.default_controller.Read(self.dut_node_id, [(Clusters.Descriptor), Attribute.AttributePath(None, None, GlobalAttributeIds.ATTRIBUTE_LIST_ID), Attribute.AttributePath(None, None, GlobalAttributeIds.FEATURE_MAP_ID), Attribute.AttributePath(None, None, GlobalAttributeIds.ACCEPTED_COMMAND_LIST_ID)])
+
+    return [e for e in wildcard.attributes.keys() if accept_function(wildcard, e)]
 
 
 async def should_run_test_on_endpoint(self: MatterBaseTest, accept_function: EndpointCheckFunction) -> bool:
