@@ -51,24 +51,26 @@ def dynamic_invoke_return(*args, **argv):
     print(f'invoke call {invoke_call_count}')
     if invoke_call_count == 1: # Commission node with no prior request, return failure - step 5
         raise InteractionModelError(status=Status.Failure)
-    elif invoke_call_count == 2: # Commission node over pase - return unsupported access - step 6
+    elif invoke_call_count == 2: # Commission node over pase - return unsupported access - step 7
         raise InteractionModelError(status=Status.UnsupportedAccess)
-    elif invoke_call_count == 3: # request commissioning approval over pase - return unsupported access - step 7
+    elif invoke_call_count == 3: # request commissioning approval over pase - return unsupported access - step 8
         raise InteractionModelError(status=Status.UnsupportedAccess)
-    elif invoke_call_count == 4: # good RequestCommissioningApproval over CASE with bad vid - step 9
+    elif invoke_call_count == 4: # good RevokeCommissioning over CASE with bad vid - step 9
         return None
-    elif invoke_call_count == 5: # CommissionNode with bad request id - step 12
+    elif invoke_call_count == 5: # good RequestCommissioningApproval over CASE with bad vid - step 10
+        return None
+    elif invoke_call_count == 6: # CommissionNode with bad request id - step 14
         raise InteractionModelError(status=Status.Failure)
-    elif invoke_call_count == 6: # CommissionNode with bad timeout (low) - step 13
+    elif invoke_call_count == 7: # CommissionNode with bad timeout (low) - step 15
         raise InteractionModelError(status=Status.Failure)
-    elif invoke_call_count == 7: # CommissionNode with bad timeout (high) - step 14
+    elif invoke_call_count == 8: # CommissionNode with bad timeout (high) - step 16
         raise InteractionModelError(status=Status.Failure)
-    elif invoke_call_count == 8: # CommissionNode - step 15
+    elif invoke_call_count == 9: # CommissionNode - step 17
         # passcode 20202024
         return reverse_open
-    elif invoke_call_count == 9: # RequestCommissioningApproval with good vid - step 20
+    elif invoke_call_count == 10: # RequestCommissioningApproval with good vid - step 22
         return None
-    elif invoke_call_count == 10: # CommissionNode - step 23
+    elif invoke_call_count == 11: # CommissionNode - step 25
         # passcode 20202024
         return reverse_open
     else:
@@ -87,7 +89,7 @@ def dynamic_event_return(*args, **argv):
         data = Clusters.CommissionerControl.Events.CommissioningRequestResult(requestId=0x1234567887654321, clientNodeId=112233, statusCode=0)
         result = Attribute.EventReadResult(Header=header, Status=Status.Success, Data=data)
         return [result]
-    elif event_call_count == 4: # returmed event with new request
+    elif event_call_count == 4: # returned event with new request
         header = Attribute.EventHeader(EndpointId=0, ClusterId=Clusters.CommissionerControl.id, EventId=Clusters.CommissionerControl.Events.CommissioningRequestResult.event_id, EventNumber=1)
         data = Clusters.CommissionerControl.Events.CommissioningRequestResult(requestId=0x1234567812345678, clientNodeId=112233, statusCode=0)
         result = Attribute.EventReadResult(Header=header, Status=Status.Success, Data=data)
@@ -140,7 +142,7 @@ def main():
     print(f'paa = {paa_path}')
 
     pics = {"PICS_SDK_CI_ONLY": True }
-    test_runner = MyMock('TC_CCTRL', 'TC_CCTRL', 'test_TC_CCTRL_3_1', 1, paa_trust_store_path=paa_path, pics=pics)
+    test_runner = MyMock('TC_CCTRL', 'TC_CCTRL', 'test_TC_CCTRL_2_2', 1, paa_trust_store_path=paa_path, pics=pics)
 
     test_runner.run_test_with_mock(dynamic_invoke_return, dynamic_event_return, wildcard())
     test_runner.Shutdown()
