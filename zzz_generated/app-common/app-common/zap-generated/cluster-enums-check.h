@@ -268,6 +268,19 @@ static auto __attribute__((unused)) EnsureKnownEnumValue(detail::ProductIdentifi
         return EnumType::kUnknownEnumValue;
     }
 }
+static auto __attribute__((unused)) EnsureKnownEnumValue(Globals::TestGlobalEnum val)
+{
+    using EnumType = Globals::TestGlobalEnum;
+    switch (val)
+    {
+    case EnumType::kSomeValue:
+    case EnumType::kSomeOtherValue:
+    case EnumType::kFinalValue:
+        return val;
+    default:
+        return EnumType::kUnknownEnumValue;
+    }
+}
 
 static auto __attribute__((unused)) EnsureKnownEnumValue(Identify::EffectIdentifierEnum val)
 {
