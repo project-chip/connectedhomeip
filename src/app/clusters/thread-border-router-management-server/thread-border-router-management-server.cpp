@@ -26,6 +26,7 @@
 #include "app/CommandHandler.h"
 #include "app/CommandHandlerInterface.h"
 #include "app/InteractionModelEngine.h"
+#include "app/CommandHandlerInterfaceRegistry.h"
 #include "app/MessageDef/StatusIB.h"
 #include "app/clusters/general-commissioning-server/general-commissioning-server.h"
 #include "app/data-model/Nullable.h"
