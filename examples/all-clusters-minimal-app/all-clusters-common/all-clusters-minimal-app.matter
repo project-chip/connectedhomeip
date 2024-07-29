@@ -6445,7 +6445,7 @@ endpoint 1 {
     ram      attribute numberOfPositions default = 2;
     ram      attribute currentPosition;
     ram      attribute featureMap default = 1;
-    ram      attribute clusterRevision default = 1;
+    ram      attribute clusterRevision default = 2;
   }
 
   server cluster FixedLabel {
