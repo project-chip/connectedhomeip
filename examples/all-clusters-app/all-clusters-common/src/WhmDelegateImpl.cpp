@@ -212,7 +212,7 @@ Status WaterHeaterManagementDelegate::HandleBoost(uint32_t durationS, Optional<b
 
 void WaterHeaterManagementDelegate::BoostTimerExpiry(System::Layer * systemLayer, void * delegate)
 {
-    WaterHeaterManagementDelegate * dg = reinterpret_cast<WaterHeaterManagementDelegate *>(delegate);
+    WaterHeaterManagementDelegate * dg = static_cast<WaterHeaterManagementDelegate *>(delegate);
 
     dg->HandleBoostTimerExpiry();
 }
