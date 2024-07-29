@@ -9517,6 +9517,41 @@ endpoint 3 {
     ram      attribute clusterRevision default = 2;
   }
 }
+endpoint 4 {
+  device type ma_genericswitch = 15, version 3;
+
+
+  server cluster Identify {
+    ram      attribute identifyTime default = 0x0000;
+    ram      attribute identifyType default = 0x00;
+    callback attribute generatedCommandList;
+    callback attribute acceptedCommandList;
+    callback attribute attributeList;
+    ram      attribute featureMap default = 0;
+    ram      attribute clusterRevision default = 4;
+  }
+
+  server cluster Descriptor {
+    callback attribute deviceTypeList;
+    callback attribute serverList;
+    callback attribute clientList;
+    callback attribute partsList;
+    callback attribute tagList;
+    callback attribute generatedCommandList;
+    callback attribute acceptedCommandList;
+    callback attribute attributeList;
+    callback attribute featureMap;
+    callback attribute clusterRevision;
+  }
+
+  server cluster Switch {
+    ram      attribute numberOfPositions default = 2;
+    ram      attribute currentPosition default = 0;
+    ram      attribute multiPressMax default = 3;
+    ram      attribute featureMap default = 30;
+    ram      attribute clusterRevision default = 2;
+  }
+}
 endpoint 65534 {
   device type ma_secondary_network_interface = 25, version 1;
 
