@@ -354,7 +354,7 @@ class TC_OPSTATE_BASE():
             if phase_list is not NullValue:
                 phase_list_len = len(phase_list)
                 asserts.assert_less_equal(phase_list_len, 32,
-                                          f"PhaseList length({phase_list_len}) must be less than 32!")
+                                          f"PhaseList length({phase_list_len}) must be at most than 32 entries!")
 
         # STEP 3: TH reads from the DUT the CurrentPhase attribute
         self.step(3)
@@ -364,8 +364,8 @@ class TC_OPSTATE_BASE():
             if (phase_list == NullValue) or (not phase_list):
                 asserts.assert_true(current_phase == NullValue, f"CurrentPhase({current_phase}) should be null")
             else:
-                asserts.assert_true(0 <= current_phase and current_phase < phase_list_len,
-                                    f"CurrentPhase({current_phase}) must be between 0 and {(phase_list_len - 1)}")
+                asserts.assert_greater_equal(current_phase, 0, f"CurrentPhase({current_phase}) must be >= 0")
+                asserts.assert_less(current_phase, phase_list_len, f"CurrentPhase({current_phase}) must be less {phase_list_len}")
 
         # STEP 4: TH reads from the DUT the CountdownTime attribute
         self.step(4)
@@ -652,7 +652,7 @@ class TC_OPSTATE_BASE():
             if phase_list is not NullValue:
                 phase_list_len = len(phase_list)
                 asserts.assert_less_equal(phase_list_len, 32,
-                                          f"PhaseList length({phase_list_len}) must be less than 32!")
+                                          f"PhaseList length({phase_list_len}) must be at most 32 entries!")
 
         # STEP 9: TH reads from the DUT the CurrentPhase attribute
         self.step(9)
@@ -662,10 +662,10 @@ class TC_OPSTATE_BASE():
             if (phase_list == NullValue) or (not phase_list):
                 asserts.assert_equal(current_phase, NullValue, f"CurrentPhase({current_phase}) should be null")
             else:
-                asserts.assert_less_equal(0, current_phase,
+                asserts.assert_greater_equal(current_phase, 0,
                                           f"CurrentPhase({current_phase}) must be greater or equal than 0")
-                asserts.assert_less(current_phase < phase_list_len,
-                                    f"CurrentPhase({current_phase}) must be less then {(phase_list_len - 1)}")
+                asserts.assert_less(current_phase, phase_list_len,
+                                    f"CurrentPhase({current_phase}) must be less then {(phase_list_len)}")
 
         # STEP 10: TH waits for {PIXIT.WAITTIME.COUNTDOWN}
         self.step(10)
@@ -679,6 +679,8 @@ class TC_OPSTATE_BASE():
                                                             attribute=attributes.CountdownTime)
 
             if (countdown_time is not NullValue) and (initial_countdown_time is not NullValue):
+                logging.info(f" -> Initial countdown time: {initial_countdown_time}")
+                logging.info(f" -> New countdown time: {countdown_time}")
                 asserts.assert_less_equal(countdown_time, (initial_countdown_time - wait_time),
                                           f"The countdown time shall have decreased at least {wait_time:.1f} since start command")
 
@@ -821,6 +823,7 @@ class TC_OPSTATE_BASE():
             initial_countdown_time = await self.read_expect_success(endpoint=endpoint,
                                                                     attribute=attributes.CountdownTime)
             if initial_countdown_time is not NullValue:
+                logging.info(f" -> Initial ountdown time: {initial_countdown_time}")
                 asserts.assert_true(0 <= initial_countdown_time <= 259200,
                                     f"CountdownTime({initial_countdown_time}) must be between 0 and 259200")
 
@@ -835,6 +838,8 @@ class TC_OPSTATE_BASE():
                                                             attribute=attributes.CountdownTime)
 
             if (countdown_time is not NullValue) and (initial_countdown_time is not NullValue):
+                logging.info(f" -> Initial countdown time: {initial_countdown_time}")
+                logging.info(f" -> New countdown time: {countdown_time}")
                 asserts.assert_equal(countdown_time, initial_countdown_time,
                                      "The countdown time shall be equal since pause command")
 
