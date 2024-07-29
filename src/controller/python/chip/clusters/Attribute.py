@@ -288,7 +288,7 @@ def _BuildClusterIndex():
     ''' Build internal cluster index for locating the corresponding cluster object by path in the future.
     '''
     for clusterName, obj in inspect.getmembers(sys.modules['chip.clusters.Objects']):
-        if ('chip.clusters.Objects' in str(obj)) and inspect.isclass(obj):
+        if ('chip.clusters.Objects' in str(obj)) and inspect.isclass(obj) and issubclass(obj, Cluster):
             _ClusterIndex[obj.id] = obj
 
 
