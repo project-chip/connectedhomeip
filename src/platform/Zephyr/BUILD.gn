@@ -52,7 +52,10 @@ static_library("Zephyr") {
   ]
 
   public_deps = [ "${chip_root}/src/platform:platform_base" ]
-  deps = [ "${chip_root}/src/platform/logging:headers" ]
+  deps = [ 
+      "${chip_root}/src/platform/logging:headers",
+      "${chip_root}/src/lib/dnssd:platform_header",
+  ]
 
   if (chip_enable_openthread) {
     sources += [
@@ -69,6 +72,13 @@ static_library("Zephyr") {
       ]
       deps += [ "${chip_root}/src/lib/dnssd:platform_header" ]
     }
+  }
+
+  if (chip_mdns == "minimal") {
+      sources += [
+        "DnssdImpl.cpp",
+      ]
+      deps += [ "${chip_root}/src/lib/dnssd:platform_header" ]
   }
 
   if (chip_enable_nfc) {
