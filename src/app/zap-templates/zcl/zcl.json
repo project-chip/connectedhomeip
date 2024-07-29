@@ -136,6 +136,7 @@
         "window-covering.xml",
         "matter-devices.xml",
         "sample-mei-cluster.xml",
+        "energy-calendar-cluster.xml",
         "types/door-lock.xml",
         "types/occupancy-sensing.xml",
         "types/thermostat-user-interface-configuration.xml"
@@ -649,6 +650,16 @@
             "PreferredExtendedPanID",
             "ThreadNetworks",
             "ThreadNetworkTableSize"
+        ],
+        "Energy Calendar": [
+            "CalendarPeriods",
+            "SpecialDays",
+            "CurrentDay",
+            "NextDay",
+            "CurrentTransition",
+            "CurrentPeakPeriod",
+            "NextPeakPeriod",
+            "FeatureMap"
         ]
     },
     "defaultReportingPolicy": "mandatory",

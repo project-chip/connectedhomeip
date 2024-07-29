@@ -241,6 +241,9 @@ static constexpr ClusterId Id = 0x00000098;
 namespace EnergyEvse {
 static constexpr ClusterId Id = 0x00000099;
 } // namespace EnergyEvse
+namespace EnergyCalendar {
+static constexpr ClusterId Id = 0x0000009A;
+} // namespace EnergyCalendar
 namespace EnergyPreference {
 static constexpr ClusterId Id = 0x0000009B;
 } // namespace EnergyPreference

@@ -135,6 +135,7 @@
         "WATER_HEATER_MODE_CLUSTER": [],
         "WIFI_NETWORK_DIAGNOSTICS_CLUSTER": [],
         "WINDOW_COVERING_CLUSTER": [],
+        "ENERGY_CALENDAR_CLUSTER": [],
         "ZLL_COMMISSIONING_CLUSTER": []
     },
     "ServerDirectories": {
@@ -317,6 +318,7 @@
         "WIFI_NETWORK_DIAGNOSTICS_CLUSTER": ["wifi-network-diagnostics-server"],
         "WIFI_NETWORK_MANAGEMENT_CLUSTER": ["wifi-network-management-server"],
         "WINDOW_COVERING_CLUSTER": ["window-covering-server"],
+        "ENERGY_CALENDAR_CLUSTER": ["energy-calendar-server"],
         "WATER_HEATER_MODE_CLUSTER": ["mode-base-server"],
         "ZLL_COMMISSIONING_CLUSTER": []
     }
