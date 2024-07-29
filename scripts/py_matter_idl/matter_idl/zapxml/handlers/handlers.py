@@ -313,7 +313,7 @@ class BitmapHandler(BaseHandler):
             return BaseHandler(self.context)
 
     def FinalizeProcessing(self, idl: Idl):
-        # We have two choices of adding an enum:
+        # We have two choices of adding a bitmap:
         #   - inside a cluster if a code exists
         #   - inside top level if a code does not exist
         if not self._cluster_codes:
