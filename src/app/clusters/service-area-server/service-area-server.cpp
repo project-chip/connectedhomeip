@@ -213,11 +213,6 @@ void Instance::HandleSelectLocationsCmd(HandlerContext & ctx, const Commands::Se
 {
     ChipLogDetail(Zcl, "Service Area: HandleSelectLocationsCmd");
 
-    uint32_t listIndex = 0;
-    uint32_t oldSelectedLocation;
-    size_t numberOfLocations = 0;
-    bool matchesCurrentSelectedLocations;
-
     // On receipt of this command the device SHALL respond with a SelectLocationsResponse command.
     auto exitResponse = [ctx](SelectLocationsStatus status, CharSpan statusText) {
         Commands::SelectLocationsResponse::Type response{
@@ -227,6 +222,7 @@ void Instance::HandleSelectLocationsCmd(HandlerContext & ctx, const Commands::Se
         ctx.mCommandHandler.AddResponse(ctx.mRequestPath, response);
     };
 
+    size_t numberOfLocations = 0;
     // Get the number of Selected Locations in the command parameter and check that it is valid.
     if (!req.newLocations.IsNull())
     {
@@ -246,13 +242,15 @@ void Instance::HandleSelectLocationsCmd(HandlerContext & ctx, const Commands::Se
     }
 
     // if number of selected locations in parameter matches number in attribute - the locations *might* be the same
-    matchesCurrentSelectedLocations = (numberOfLocations == mDelegate->GetNumberOfSelectedLocations());
+    bool matchesCurrentSelectedLocations = (numberOfLocations == mDelegate->GetNumberOfSelectedLocations());
 
     if (!req.newLocations.IsNull())
     {
         // do as much parameter validation as we can
         {
-            uint32_t i         = 0;
+            uint32_t ignoredIndex = 0;
+            uint32_t oldSelectedLocation;
+            uint32_t i = 0;
             auto iLocationIter = req.newLocations.Value().begin();
             while (iLocationIter.Next())
             {
@@ -284,7 +282,7 @@ void Instance::HandleSelectLocationsCmd(HandlerContext & ctx, const Commands::Se
                 // check to see if parameter list and attribute still match
                 if (matchesCurrentSelectedLocations)
                 {
-                    if (!mDelegate->GetSelectedLocationByIndex(listIndex, oldSelectedLocation) ||
+                    if (!mDelegate->GetSelectedLocationByIndex(ignoredIndex, oldSelectedLocation) ||
                         (aSelectedLocation != oldSelectedLocation))
                     {
                         matchesCurrentSelectedLocations = false;
@@ -716,9 +714,6 @@ bool Instance::IsSupportedMap(uint8_t aMapId)
 
 bool Instance::AddSupportedMap(uint8_t aMapId, const CharSpan & aMapName)
 {
-    uint8_t mapIndex = 0;
-    MapStructureWrapper entry;
-
     // check max# of list entries
     if (mDelegate->GetNumberOfSupportedMaps() >= kMaxNumSupportedMaps)
     {
@@ -734,6 +729,9 @@ bool Instance::AddSupportedMap(uint8_t aMapId, const CharSpan & aMapName)
     }
 
     // Each entry in this list SHALL have a unique value for the Name field.
+    uint8_t mapIndex = 0;
+    MapStructureWrapper entry;
+
     while (mDelegate->GetSupportedMapByIndex(mapIndex++, entry))
     {
         // the name cannot be the same as an existing map
@@ -770,9 +768,7 @@ bool Instance::AddSupportedMap(uint8_t aMapId, const CharSpan & aMapName)
 bool Instance::RenameSupportedMap(uint8_t aMapId, const CharSpan & newMapName)
 {
     uint32_t modifiedIndex;
-    uint32_t loopIndex = 0;
     MapStructureWrapper modifiedMap;
-    MapStructureWrapper entry;
 
     // get existing entry
     if (!mDelegate->GetSupportedMapById(aMapId, modifiedIndex, modifiedMap))
@@ -792,6 +788,9 @@ bool Instance::RenameSupportedMap(uint8_t aMapId, const CharSpan & newMapName)
     modifiedMap.Set(modifiedMap.mapID, newMapName);
 
     // Each entry in this list SHALL have a unique value for the Name field.
+    uint32_t loopIndex = 0;
+    MapStructureWrapper entry;
+
     while (mDelegate->GetSupportedMapByIndex(loopIndex, entry))
     {
         if (modifiedIndex == loopIndex)
@@ -842,11 +841,6 @@ bool Instance::ClearSupportedMaps()
 
 bool Instance::AddSelectedLocation(uint32_t & aSelectedLocation)
 {
-    uint32_t ignoredIndex;
-
-    char locationStatusBuffer[kMaxSizeStatusText];
-    MutableCharSpan locationStatusText(locationStatusBuffer);
-
     // check max# of list entries
     if (mDelegate->GetNumberOfSelectedLocations() >= kMaxNumSelectedLocations)
     {
@@ -869,6 +863,9 @@ bool Instance::AddSelectedLocation(uint32_t & aSelectedLocation)
     }
 
     // Does device mode allow modification of selected locations?
+    char locationStatusBuffer[kMaxSizeStatusText];
+    MutableCharSpan locationStatusText(locationStatusBuffer);
+
     if (!mDelegate->IsSetSelectedLocationsAllowed(locationStatusText))
     {
         ChipLogError(Zcl, "AddSelectedLocation %u - %.*s", aSelectedLocation, static_cast<int>(locationStatusText.size()),
@@ -876,6 +873,7 @@ bool Instance::AddSelectedLocation(uint32_t & aSelectedLocation)
         return false;
     }
 
+    uint32_t ignoredIndex;
     return mDelegate->AddSelectedLocation(aSelectedLocation, ignoredIndex);
 }
 
@@ -960,8 +958,6 @@ bool Instance::SetEstimatedEndTime(const DataModel::Nullable<uint32_t> & aEstima
 
 bool Instance::AddPendingProgressElement(uint32_t aLocationId)
 {
-    uint32_t ignoredIndex;
-
     // create progress element
     Structs::ProgressStruct::Type inactiveProgress = { aLocationId, OperationalStatusEnum::kPending };
 
@@ -986,6 +982,8 @@ bool Instance::AddPendingProgressElement(uint32_t aLocationId)
         return false;
     }
 
+    uint32_t ignoredIndex;
+
     if (!mDelegate->AddProgressElement(inactiveProgress, ignoredIndex))
     {
         return false;
@@ -998,7 +996,6 @@ bool Instance::AddPendingProgressElement(uint32_t aLocationId)
 bool Instance::SetProgressStatus(uint32_t aLocationId, OperationalStatusEnum opStatus)
 {
     uint32_t listIndex;
-
     Structs::ProgressStruct::Type progressElement;
 
     if (!mDelegate->GetProgressElementById(aLocationId, listIndex, progressElement))
@@ -1035,7 +1032,6 @@ bool Instance::SetProgressStatus(uint32_t aLocationId, OperationalStatusEnum opS
 bool Instance::SetProgressTotalOperationalTime(uint32_t aLocationId, const DataModel::Nullable<uint32_t> & aTotalOperationalTime)
 {
     uint32_t listIndex;
-
     Structs::ProgressStruct::Type progressElement;
 
     if (!mDelegate->GetProgressElementById(aLocationId, listIndex, progressElement))
@@ -1078,7 +1074,6 @@ bool Instance::SetProgressTotalOperationalTime(uint32_t aLocationId, const DataM
 bool Instance::SetProgressEstimatedTime(uint32_t aLocationId, const DataModel::Nullable<uint32_t> & aEstimatedTime)
 {
     uint32_t listIndex;
-
     Structs::ProgressStruct::Type progressElement;
 
     if (!mDelegate->GetProgressElementById(aLocationId, listIndex, progressElement))
