@@ -58,6 +58,7 @@ static_library("ESP32") {
     "KeyValueStoreManagerImpl.cpp",
     "KeyValueStoreManagerImpl.h",
     "LwIPCoreLock.cpp",
+    "MdnsBasicPacketFilters.h",
     "PlatformManagerImpl.cpp",
     "PlatformManagerImpl.h",
     "SystemTimeSupport.cpp",
