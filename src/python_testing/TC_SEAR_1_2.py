@@ -177,7 +177,7 @@ class TC_SEAR_1_2(MatterBaseTest):
             endpoint=self.endpoint, attribute=Clusters.ServiceArea.Attributes.Progress)
         logging.info(f"Progress {progress}")
 
-        asserts.assert_true(len(self.selected_areas) <= len(self.areaid_list),
+        asserts.assert_true(len(progress) <= len(self.areaid_list),
                              f"Progress(len {len(progress)}) should have at most {len(self.areaid_list)} entries")
 
         progareaid_list = []
