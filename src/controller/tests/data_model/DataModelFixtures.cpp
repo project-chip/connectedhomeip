@@ -539,7 +539,7 @@ CHIP_ERROR CustomDataModel::WriteAttribute(const WriteAttributeRequest & request
 
                 Attributes::ListStructOctetString::TypeInfo::DecodableType value;
 
-                ReturnErrorOnFailure(DataModel::Decode(aReader, value));
+                ReturnErrorOnFailure(decoder.Decode(value));
 
                 auto iter                         = value.begin();
                 listStructOctetStringElementCount = 0;
@@ -556,7 +556,7 @@ CHIP_ERROR CustomDataModel::WriteAttribute(const WriteAttributeRequest & request
             if (request.path.mListOp == ConcreteDataAttributePath::ListOperation::AppendItem)
             {
                 Structs::TestListStructOctet::DecodableType item;
-                ReturnErrorOnFailure(DataModel::Decode(aReader, item));
+                ReturnErrorOnFailure(decoder.Decode(item));
                 VerifyOrReturnError(item.member1 == listStructOctetStringElementCount, CHIP_ERROR_INVALID_ARGUMENT);
                 listStructOctetStringElementCount++;
 
@@ -597,57 +597,46 @@ CHIP_ERROR CustomDataModel::WriteAttribute(const WriteAttributeRequest & request
     }
 
     // Boolean attribute of unit testing cluster triggers "multiple errors" case.
-    if (request.path.mClusterId == Clusters::UnitTesting::Id && request.path.mAttributeId == Attributes::Boolean::TypeInfo::GetAttributeId())
+    if (request.path.mClusterId == Clusters::UnitTesting::Id &&
+        request.path.mAttributeId == Attributes::Boolean::TypeInfo::GetAttributeId())
     {
-        Protocols::InteractionModel::ClusterStatusCode status{ Protocols::InteractionModel::Status::InvalidValue };
-
-        if (gWriteResponseDirective == WriteResponseDirective::kSendMultipleSuccess)
+        // TODO(IMDM): this used to send 4 responses (hence the multiple status)
+        //
+        //    for (size_t i = 0; i < 4; ++i)
+        //    {
+        //        aWriteHandler->AddStatus(request.path, status);
+        //    }
+        //
+        // which are NOT encodable by a simple response. It is unclear how this is
+        // convertible (if at all): we write path by path only. Having multiple
+        // responses for the same path within the write code makes no sense
+        //
+        // This should NOT be possible anymore when one can only return a single
+        // status (nobody has access to multiple path status updates at this level)
+        switch (gWriteResponseDirective)
         {
-            status = Protocols::InteractionModel::Status::Success;
+        case WriteResponseDirective::kSendMultipleSuccess:
+            return CHIP_NO_ERROR;
+        case WriteResponseDirective::kSendMultipleErrors:
+            return CHIP_IM_GLOBAL_STATUS(Failure);
+        default:
+            chipDie();
         }
-        else if (gWriteResponseDirective == WriteResponseDirective::kSendMultipleErrors)
-        {
-            status = Protocols::InteractionModel::Status::Failure;
-        }
-        else
-        {
-            VerifyOrDie(false);
-        }
-
-    /*
-        // TODO: IMDM
-        // FIXME: how do I do this ???? this sets 4 statuses ....
-        //        AND it uses cluster status codes
-        for (size_t i = 0; i < 4; ++i)
-        {
-            aWriteHandler->AddStatus(request.path, status);
-        }
-    */
-
-        return CHIP_NO_ERROR;
     }
 
-    if (request.path.mClusterId == Clusters::UnitTesting::Id && request.path.mAttributeId == Attributes::Int8u::TypeInfo::GetAttributeId())
+    if (request.path.mClusterId == Clusters::UnitTesting::Id &&
+        request.path.mAttributeId == Attributes::Int8u::TypeInfo::GetAttributeId())
     {
-        Protocols::InteractionModel::ClusterStatusCode status{ Protocols::InteractionModel::Status::InvalidValue };
-    /*
-        // TODO: IMDM
-        // FIXME: how do I do this ????
-        aWriteHandler->AddStatus(request.path, status);
-    */
-        if (gWriteResponseDirective == WriteResponseDirective::kSendClusterSpecificSuccess)
+        switch (gWriteResponseDirective)
         {
-            //status = Protocols::InteractionModel::ClusterStatusCode::ClusterSpecificSuccess(kExampleClusterSpecificSuccess);
-            return CHIP_IM_CLUSTER_STATUS(Protocols::InteractionModel::ClusterStatusCode::ClusterSpecificSuccess(kExampleClusterSpecificSuccess));
+        case WriteResponseDirective::kSendClusterSpecificSuccess:
+            return CHIP_IM_CLUSTER_STATUS_SUCCESS(kExampleClusterSpecificSuccess);
+        case WriteResponseDirective::kSendClusterSpecificFailure:
+            return CHIP_IM_CLUSTER_STATUS_FAILURE(kExampleClusterSpecificFailure);
+        default:
+            // this should not be reached, our tests only set up these for this test case
+            chipDie();
         }
-
-        if (gWriteResponseDirective == WriteResponseDirective::kSendClusterSpecificFailure)
-        {
-            //status = Protocols::InteractionModel::ClusterStatusCode::ClusterSpecificFailure(kExampleClusterSpecificFailure);
-            return CHIP_IM_CLUSTER_STATUS(Protocols::InteractionModel::ClusterStatusCode::ClusterSpecificFailure(kExampleClusterSpecificFailure));
-        }
-        VerifyOrDie(false);
-
     }
 
     return CHIP_ERROR_UNSUPPORTED_CHIP_FEATURE;
