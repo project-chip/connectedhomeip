@@ -32,6 +32,13 @@ class testbed(MatterBaseTest, BasicCompositionTests):
 
     @per_node_test
     async def test_testbed(self):
+        supported_endpoints = set(self.endpoints.keys())
+        all_endpoints = set(range(max(supported_endpoints)+2))
+        unsupported = list(all_endpoints - supported_endpoints)
+        # Read descriptor
+        await self.read_single_attribute_expect_error(endpoint=unsupported[0], cluster=Clusters.Descriptor, attribute=Clusters.Descriptor.Attributes.FeatureMap, error=Status.UnsupportedEndpoint)
+
+
         for endpoint_id, endpoint in self.endpoints.items():
             for cluster_type, cluster in endpoint.items():
                 if global_attribute_ids.cluster_id_type(cluster_type.id) != global_attribute_ids.ClusterIdType.kStandard:
