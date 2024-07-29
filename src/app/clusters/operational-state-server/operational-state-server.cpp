@@ -453,8 +453,6 @@ void Instance::HandleStopState(HandlerContext & ctx, const Commands::Stop::Decod
     response.commandResponseState = err;
 
     ctx.mCommandHandler.AddResponse(ctx.mRequestPath, response);
-
-    UpdateCountdownTimeFromClusterLogic();
 }
 
 void Instance::HandleStartState(HandlerContext & ctx, const Commands::Start::DecodableType & req)
