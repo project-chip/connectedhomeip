@@ -51,7 +51,8 @@ class TC_ECOINFO_2_2(MatterBaseTest):
         root_part_list = await dev_ctrl.ReadAttribute(dut_node_id, [(root_node_endpoint, Clusters.Descriptor.Attributes.PartsList)])
 
         self.step("1b")
-        set_of_endpoints_step_1 = set(root_part_list[root_node_endpoint][Clusters.Descriptor][Clusters.Descriptor.Attributes.PartsList])
+        set_of_endpoints_step_1 = set(root_part_list[root_node_endpoint]
+                                      [Clusters.Descriptor][Clusters.Descriptor.Attributes.PartsList])
         list_of_aggregator_endpoints = []
         for endpoint in set_of_endpoints_step_1:
             device_type_list_read = await dev_ctrl.ReadAttribute(dut_node_id, [(endpoint, Clusters.Descriptor.Attributes.DeviceTypeList)])
