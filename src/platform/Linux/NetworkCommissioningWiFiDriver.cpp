@@ -67,6 +67,8 @@ constexpr std::array<char[size], kMaxNetworks> createNetworkStorageKeys(const ch
         {
             arr[i][j] = keyName[j];
         }
+        // We assume that keyName[size - 1] is null terminated. Adding the check to this function
+        // does not make the function a consteval. The check can be added in when compiling the code with c++20
         arr[i][size - 2] = intToChar(i);
     }
     return arr;
@@ -173,31 +175,42 @@ CHIP_ERROR LinuxWiFiDriver::CommitConfiguration()
 
     for (uint8_t networkIndex = 0; networkIndex < kMaxNetworks; networkIndex++)
     {
-        ReturnErrorOnFailure(
-            kvs.Put(kWiFiSSIDKeyName[networkIndex], mStagingNetworks[networkIndex].ssid, mStagingNetworks[networkIndex].ssidLen));
+        // Add entries to persistent storage upto mStagingNetworkCount and delete all other entries if present.
+        if (networkIndex < mStagingNetworkCount) {
+            ReturnErrorOnFailure(
+                kvs.Put(kWiFiSSIDKeyName[networkIndex], mStagingNetworks[networkIndex].ssid, mStagingNetworks[networkIndex].ssidLen));
 #if CHIP_DEVICE_CONFIG_ENABLE_WIFI_PDC
-        if (mStagingNetworks[networkIndex].UsingPDC())
-        {
-            ReturnErrorOnFailure(IgnoreNotFound(kvs.Delete(kWiFiCredentialsKeyName[networkIndex])));
-            ReturnErrorOnFailure(kvs.Put(kWifiNetworkIdentityKeyName[networkIndex], mStagingNetworks[networkIndex].networkIdentity,
-                                         mStagingNetworks[networkIndex].networkIdentityLen));
-            ReturnErrorOnFailure(kvs.Put(kWifiClientIdentityKeyName[networkIndex], mStagingNetworks[networkIndex].clientIdentity,
-                                         mStagingNetworks[networkIndex].clientIdentityLen));
+            if (mStagingNetworks[networkIndex].UsingPDC())
+            {
+                ReturnErrorOnFailure(IgnoreNotFound(kvs.Delete(kWiFiCredentialsKeyName[networkIndex])));
+                ReturnErrorOnFailure(kvs.Put(kWifiNetworkIdentityKeyName[networkIndex], mStagingNetworks[networkIndex].networkIdentity,
+                                            mStagingNetworks[networkIndex].networkIdentityLen));
+                ReturnErrorOnFailure(kvs.Put(kWifiClientIdentityKeyName[networkIndex], mStagingNetworks[networkIndex].clientIdentity,
+                                            mStagingNetworks[networkIndex].clientIdentityLen));
 
-            P256SerializedKeypair serializedKeypair;
-            ReturnErrorOnFailure(mStagingNetworks[networkIndex].clientIdentityKeypair->Serialize(serializedKeypair));
-            ReturnErrorOnFailure(kvs.Put(kWifiClientIdentityKeypairKeyName[networkIndex], serializedKeypair.ConstBytes(),
-                                         serializedKeypair.Length()));
-        }
-        else
-        {
-            ReturnErrorOnFailure(IgnoreNotFound(kvs.Delete(kWifiNetworkIdentityKeyName[networkIndex])));
-            ReturnErrorOnFailure(IgnoreNotFound(kvs.Delete(kWifiClientIdentityKeyName[networkIndex]));
-            ReturnErrorOnFailure(IgnoreNotFound(kvs.Delete(kWifiClientIdentityKeypairKeyName[networkIndex]));
+                P256SerializedKeypair serializedKeypair;
+                ReturnErrorOnFailure(mStagingNetworks[networkIndex].clientIdentityKeypair->Serialize(serializedKeypair));
+                ReturnErrorOnFailure(kvs.Put(kWifiClientIdentityKeypairKeyName[networkIndex], serializedKeypair.ConstBytes(),
+                                            serializedKeypair.Length()));
+            }
+            else
+            {
+                ReturnErrorOnFailure(IgnoreNotFound(kvs.Delete(kWifiNetworkIdentityKeyName[networkIndex])));
+                ReturnErrorOnFailure(IgnoreNotFound(kvs.Delete(kWifiClientIdentityKeyName[networkIndex])));
+                ReturnErrorOnFailure(IgnoreNotFound(kvs.Delete(kWifiClientIdentityKeypairKeyName[networkIndex])));
 #else  // CHIP_DEVICE_CONFIG_ENABLE_WIFI_PDC
-        {
+            {
 #endif // CHIP_DEVICE_CONFIG_ENABLE_WIFI_PDC
-            ReturnErrorOnFailure(kvs.Put(kWiFiCredentialsKeyName[networkIndex], mStagingNetworks[networkIndex].credentials, mStagingNetworks[networkIndex].credentialsLen));
+                ReturnErrorOnFailure(kvs.Put(kWiFiCredentialsKeyName[networkIndex], mStagingNetworks[networkIndex].credentials, mStagingNetworks[networkIndex].credentialsLen));
+            }
+        } else {
+            ReturnErrorOnFailure(IgnoreNotFound(kvs.Delete(kWiFiSSIDKeyName[networkIndex])));
+            ReturnErrorOnFailure(IgnoreNotFound(kvs.Delete(kWiFiCredentialsKeyName[networkIndex])));
+#if CHIP_DEVICE_CONFIG_ENABLE_WIFI_PDC
+            ReturnErrorOnFailure(IgnoreNotFound(kvs.Delete(kWifiNetworkIdentityKeyName[networkIndex])));
+            ReturnErrorOnFailure(IgnoreNotFound(kvs.Delete(kWifiClientIdentityKeyName[networkIndex])));
+            ReturnErrorOnFailure(IgnoreNotFound(kvs.Delete(kWifiClientIdentityKeypairKeyName[networkIndex])));
+#endif
         }
     }
 

@@ -125,6 +125,15 @@ public:
 #endif // CHIP_DEVICE_CONFIG_ENABLE_WIFI_PDC
 
 private:
+    // On receiving ReorderNetwork command, insert the entry requested by the command to the new
+    // index location in mStagingNetworks (0-based index) in a way that they all retain their existing
+    // relative order between each other, with the exception of the newly re-ordered entry.
+    bool StartReorderingEntries(uint8_t index, int8_t foundNetworkAtIndex);
+    // After removing a network from mStagingNetworks the relative order of the entries in the Networks
+    // attribute shall remain unchanged, except for the removal of the requested network configuration.
+    void CompressStagingNetworksList();
+
+private:
     struct WiFiNetwork
     {
         bool Empty() const { return ssidLen == 0; }
@@ -162,13 +171,6 @@ private:
     // networks Sets the value to the index location of the network in mStagingNetworks or mSavedNetworks
     int8_t mStagedConnectedNetworkIndex = -1;
     int8_t mSavedConnectedNetworkIndex  = -1;
-    // On receiving ReorderNetwork command, insert the entry requested by the command to the new
-    // index location in mStagingNetworks (0-based index) in a way that they all retain their existing
-    // relative order between each other, with the exception of the newly re-ordered entry.
-    bool StartReorderingEntries(uint8_t index, int8_t foundNetworkAtIndex);
-    // After removing a network from mStagingNetworks the relative order of the entries in the Networks
-    // attribute shall remain unchanged, except for the removal of the requested network configuration.
-    void CompressStagingNetworksList();
     // Whether 5GHz band is supported, as claimed by callers (`Set5gSupport()`) rather than syscalls.
     bool mIs5gSupported = false;
 };
