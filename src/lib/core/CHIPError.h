@@ -455,6 +455,12 @@ using CHIP_ERROR = ::chip::ChipError;
 //
 // value must be a compile-time constant as mandated by CHIP_SDK_ERROR.
 //
+// NOTE: CLUSTER_STATUS are generally treated as ERRORS for most logging since
+//       they do not equal CHIP_NO_ERROR and return false on IsSuccess.
+//
+//       The existence of IM_CLUSTER_STATUS_SUCCESS is for complete conversion
+//       to a StatusIB.
+//
 // value MUST be uint8_t sized
 //
 #define CHIP_IM_CLUSTER_STATUS_FAILURE(value) CHIP_SDK_ERROR(::chip::ChipError::SdkPart::kIMClusterStatusFailure, value)
