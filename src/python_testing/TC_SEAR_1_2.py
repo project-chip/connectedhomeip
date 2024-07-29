@@ -86,6 +86,7 @@ class TC_SEAR_1_2(MatterBaseTest):
         asserts.assert_less_equal(len(supported_areas), 255,
                              "SupportedAreas should have max 255 entries")
         areaid_list = []
+        areadesc_s = set()
         for a in supported_areas:
             if a.areaID in areaid_list:
                 asserts.fail("SupportedAreas must have unique AreaID values!")
@@ -97,25 +98,17 @@ class TC_SEAR_1_2(MatterBaseTest):
                              f"SupportedAreas entry with AreaID({a.areaID}) should not have null MapID")
                     asserts.assert_is(a.mapID in self.mapid_list,
                              f"SupportedAreas entry with AreaID({a.areaID}) has unknown MapID({a.mapID})")
-                    areadesc_same_map_list = []
-                    areadesc_same_map_list.append(a.areaDesc)
-                    for b in supported_areas:
-                        if a.mapID == b.mapID:
-                            if b.areaDesc in areadesc_same_map_list:
-                                asserts.fail(f"SupportedAreas must have unique MapID({a.mapID}) + AreaDesc({a.areaDesc}) values!")
-                            else:
-                                areadesc_same_map_list.append(b.areaDesc)
+                    k = f"mapID:{a.mapID} areaDesc:{a.areaDesc}"
+                    asserts.true(k not in areadesc_s, f"SupportedAreas must have unique MapID({a.mapID}) + AreaDesc({a.areaDesc}) values!")
+                    areadesc_s.add(k)
                 else:
                     #empty SupportedMaps
                     asserts.assert_is(a.mapID, NullValue,
                              f"SupportedAreas entry with AreaID({a.areaID}) should have null MapID")
-                    areadesc_list = []
-                    areadesc_list.append(a.areaDesc)
-                    for b in supported_areas:
-                        if b.areaDesc in areadesc_list:
-                                asserts.fail(f"SupportedAreas must have unique AreaDesc({a.areaDesc}) values!")
-                        else:
-                            areadesc_list.append(b.areaDesc)
+                    k = f"areaDesc:{a.areaDesc}"
+                    asserts.true(k not in areadesc_s, f"SupportedAreas must have unique AreaDesc({a.areaDesc}) values!")
+                    areadesc_s.add(k)
+
                 if a.locationInfo is NullValue and a.landmarkTag is NullValue:
                     asserts.assert_true(f"SupportedAreas entry with AreaID({a.areaID}) should not have null LocationInfo and null LandmarkTag")
                 if a.landmarkTag is not NullValue:
