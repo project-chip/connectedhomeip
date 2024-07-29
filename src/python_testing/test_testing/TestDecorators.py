@@ -30,15 +30,14 @@ import sys
 
 import chip.clusters as Clusters
 from chip.clusters import Attribute
-from chip.clusters import ClusterObjects as ClusterObjects
 
 try:
     from matter_testing_support import (MatterBaseTest, async_test_body, get_accepted_endpoints_for_test, has_attribute,
-                                        has_cluster, per_endpoint_test, per_node_test)
+                                        has_cluster, has_feature, per_endpoint_test, per_node_test)
 except ImportError:
     sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), '..')))
     from matter_testing_support import (MatterBaseTest, async_test_body, get_accepted_endpoints_for_test, has_attribute,
-                                        has_cluster, per_endpoint_test, per_node_test)
+                                        has_cluster, has_feature, per_endpoint_test, per_node_test)
 
 from typing import Optional
 
@@ -204,6 +203,16 @@ class TestDecorators(MatterBaseTest):
     async def test_endpoint_attribute_unsupported_cluster_no(self):
         pass
 
+    # This test should be run once per endpoint
+    @per_endpoint_test(has_feature(Clusters.OnOff, Clusters.OnOff.Bitmaps.Feature.kLighting))
+    async def test_endpoint_feature_yes(self):
+        pass
+
+    # This test should be skipped since this attribute is part of an unsupported cluster
+    @per_endpoint_test(has_feature(Clusters.TimeSynchronization, Clusters.TimeSynchronization.Bitmaps.Feature.kNTPClient))
+    async def test_endpoint_feature_unsupported_cluster_no(self):
+        pass
+
     # This test should be run since both are present
     @per_endpoint_test(has_attribute(Clusters.OnOff.Attributes.OnOff) and has_cluster(Clusters.OnOff))
     async def test_endpoint_boolean_yes(self):
@@ -292,6 +301,8 @@ def main():
     check_once_per_endpoint('test_endpoint_attribute_yes')
     check_skipped('test_endpoint_attribute_supported_cluster_no')
     check_skipped('test_endpoint_attribute_unsupported_cluster_no')
+    check_once_per_endpoint('test_endpoint_feature_yes')
+    check_skipped('test_endpoint_feature_unsupported_cluster_no')
     check_once_per_endpoint('test_endpoint_boolean_yes')
     check_skipped('test_endpoint_boolean_no')
 
