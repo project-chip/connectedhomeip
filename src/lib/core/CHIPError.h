@@ -341,11 +341,11 @@ private:
      * density on embedded builds. Arm 32, Xtensa, and RISC-V can all handle 11-bit values in a move-immediate instruction.
      * Further, SdkPart::kCore is 0 so that the most common errors fit in 8 bits for additional density on some processors.
      *
-     *  31        28          24      20      16      12                8       4       0    Bit
-     *  |          |           |       |       |       |                |       |       |
-     *  |        range         |                     value                              |
-     *  |       kSdk==0        |       0               |      part      |    code       |   SDK error
-     *  |       01 - FF        |          encapsulated error code                       |   Encapsulated error
+     *  31    28      24      20      16      12       8       4       0    Bit
+     *  |       |       |       |       |       |       |       |       |
+     *  |     range     |                     value                     |
+     *  |    kSdk==0    |       0               |   part|    code       |   SDK error
+     *  |    01 - FF    |          encapsulated error code              |   Encapsulated error
      */
     static constexpr int kRangeStart  = 24;
     static constexpr int kRangeLength = 8;
