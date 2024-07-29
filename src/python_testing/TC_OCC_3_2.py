@@ -75,24 +75,24 @@ class TC_OCC_3_2(MatterBaseTest):
             TestStep(1, "Commission DUT to TH if not already done", is_commissioning=True),
             TestStep(2, "TH establishes a wildcard subscription to all attributes on Occupancy Sensing Cluster on the endpoint under test"),
             TestStep(3a, "Don’t trigger DUT for occupancy state change."),
-            TestStep(3b, "TH reads DUT Occupancy attribute and saves the initial value as initial")
-            TestStep(3c, "Trigger DUT to change the occupancy state.")
-            TestStep(3d, "TH awaits a ReportDataMessage containing an attribute report for DUT Occupancy attribute.")
+            TestStep(3b, "TH reads DUT Occupancy attribute and saves the initial value as initial"),
+            TestStep(3c, "Trigger DUT to change the occupancy state."),
+            TestStep(3d, "TH awaits a ReportDataMessage containing an attribute report for DUT Occupancy attribute."),
             TestStep(4a, "Check if DUT supports HoldTime attribute, If not supported, then stop and skip the rest of test cases."),
-            TestStep(4b, "TH reads DUT HoldTime attribute and saves the initial value as initial")
-            TestStep(4c, "TH writes 10 seconds to DUT HoldTime attribute.")
-            TestStep(4d, "TH awaits a ReportDataMessage containing an attribute report for DUT HoldTime attribute.")
+            TestStep(4b, "TH reads DUT HoldTime attribute and saves the initial value as initial"),
+            TestStep(4c, "TH writes 10 seconds to DUT HoldTime attribute."),
+            TestStep(4d, "TH awaits a ReportDataMessage containing an attribute report for DUT HoldTime attribute."),
             TestStep(5a, "Check if DUT supports DUT feature flag PIR or OTHER, If not supported, then stop and skip to 6a."),
-            TestStep(5b, "TH reads DUT PIROccupiedToUnoccupiedDelay attribute and saves the initial value as initial")
-            TestStep(5c, "TH writes 10 seconds to DUT PIROccupiedToUnoccupiedDelay attribute.")
-            TestStep(5d, "TH awaits a ReportDataMessage containing an attribute report for DUT PIROccupiedToUnoccupiedDelay attribute.")
+            TestStep(5b, "TH reads DUT PIROccupiedToUnoccupiedDelay attribute and saves the initial value as initial"),
+            TestStep(5c, "TH writes 10 seconds to DUT PIROccupiedToUnoccupiedDelay attribute."),
+            TestStep(5d, "TH awaits a ReportDataMessage containing an attribute report for DUT PIROccupiedToUnoccupiedDelay attribute."),
             TestStep(6a, "Check if DUT supports DUT feature flag US, If not supported, then stop and skip to 7a."),
-            TestStep(6b, "TH reads DUT UltrasonicOccupiedToUnoccupiedDelay attribute and saves the initial value as initial")
-            TestStep(6c, "TH writes 10 seconds to DUT UltrasonicOccupiedToUnoccupiedDelay attribute.")
-            TestStep(6d, "TH awaits a ReportDataMessage containing an attribute report for DUT UltrasonicOccupiedToUnoccupiedDelay attribute.")
+            TestStep(6b, "TH reads DUT UltrasonicOccupiedToUnoccupiedDelay attribute and saves the initial value as initial"),
+            TestStep(6c, "TH writes 10 seconds to DUT UltrasonicOccupiedToUnoccupiedDelay attribute."),
+            TestStep(6d, "TH awaits a ReportDataMessage containing an attribute report for DUT UltrasonicOccupiedToUnoccupiedDelay attribute."),
             TestStep(7a, "Check if DUT supports DUT feature flag PHY, If not supported, terminate this test case."),
-            TestStep(7b, "TH reads DUT PhysicalContactOccupiedToUnoccupiedDelay attribute and saves the initial value as initial")
-            TestStep(7c, "TH writes 10 seconds to DUT PhysicalContactOccupiedToUnoccupiedDelay attribute.")
+            TestStep(7b, "TH reads DUT PhysicalContactOccupiedToUnoccupiedDelay attribute and saves the initial value as initial"),
+            TestStep(7c, "TH writes 10 seconds to DUT PhysicalContactOccupiedToUnoccupiedDelay attribute."),
             TestStep(7d, "TH awaits a ReportDataMessage containing an attribute report for DUT PhysicalContactOccupiedToUnoccupiedDelay attribute.")            
         ]
         return steps
