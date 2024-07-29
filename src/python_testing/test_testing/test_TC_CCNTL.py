@@ -35,21 +35,50 @@ except ImportError:
         os.path.join(os.path.dirname(__file__), '..')))
     from matter_testing_support import get_default_paa_trust_store, run_tests_no_exit
 
-call_count = 0
+invoke_call_count = 0
+event_call_count = 0
 
-def dynamic_return(*args, **argv):
-    print("using Mock invoke")
-    global call_count
-    call_count += 1
+def dynamic_invoke_return(*args, **argv):
+    global invoke_call_count
+    invoke_call_count += 1
 
-    if call_count == 1: # Commission node with no prior request, return failure
+    if invoke_call_count == 1: # Commission node with no prior request, return failure
         raise InteractionModelError(status=Status.Failure)
-    elif call_count == 2: # Commission node over pase - return unsupported access
+    elif invoke_call_count == 2: # Commission node over pase - return unsupported access
         raise InteractionModelError(status=Status.UnsupportedAccess)
-    elif call_count == 3: # request commissioning approval over pase - return unsupported access
+    elif invoke_call_count == 3: # request commissioning approval over pase - return unsupported access
         raise InteractionModelError(status=Status.UnsupportedAccess)
-    elif call_count == 4: # good RequestCommissioningApproval over CASE
+    elif invoke_call_count == 4: # good RequestCommissioningApproval over CASE with bad vid
         return None
+    elif invoke_call_count == 5: # CommissionNode with bad request id
+        raise InteractionModelError(status=Status.Failure)
+    elif invoke_call_count == 6: # CommissionNode with bad timeout (low)
+        raise InteractionModelError(status=Status.Failure)
+    elif invoke_call_count == 7: # CommissionNode with bad timeout (high)
+        raise InteractionModelError(status=Status.Failure)
+    elif invoke_call_count == 8: #CommissionNode
+        return Clusters.CommissionerControl.Commands.ReverseOpenCommissioningWindow(commissioningTimeout=30, PAKEPasscodeVerifier=b'', discriminator=2222, iterations=10000, salt=bytes('SaltyMcSaltersons', 'utf-8'))
+    else:
+        raise InteractionModelError(Status.Failure)
+
+def dynamic_event_return(*args, **argv):
+    global event_call_count
+    event_call_count += 1
+
+    if event_call_count == 1: # reading events, start empty - no events
+        return []
+    elif event_call_count == 2: # read event with filter - expect empty
+        return []
+    elif event_call_count == 3: # returned event
+        header = Attribute.EventHeader(EndpointId=0, ClusterId=Clusters.CommissionerControl.id, EventId=Clusters.CommissionerControl.Events.CommissioningRequestResult.event_id, EventNumber=1)
+        data = Clusters.CommissionerControl.Events.CommissioningRequestResult(requestId=0x1234567887654321, clientNodeId=112233, statusCode=0)
+        result = Attribute.EventReadResult(Header=header, Status=Status.Success, Data=data)
+        return [result]
+    elif event_call_count == 4: # returmed event with new request id
+        header = Attribute.EventHeader(EndpointId=0, ClusterId=Clusters.CommissionerControl.id, EventId=Clusters.CommissionerControl.Events.CommissioningRequestResult.event_id, EventNumber=1)
+        data = Clusters.CommissionerControl.Events.CommissioningRequestResult(requestId=0x1234567812345678, clientNodeId=112233, statusCode=0)
+        result = Attribute.EventReadResult(Header=header, Status=Status.Success, Data=data)
+        return [result]
     else:
         raise InteractionModelError(Status.Failure)
 
@@ -79,7 +108,7 @@ def wildcard() -> Attribute.AsyncReadTransaction.ReadResponse:
 
 class MyMock(MockTestRunner):
     # TODO consolidate with above
-    def run_test_with_mock(self, dynamic_invoke_return: typing.Callable, read_cache: Attribute.AsyncReadTransaction.ReadResponse, hooks=None):
+    def run_test_with_mock(self, dynamic_invoke_return: typing.Callable, dynamic_event_return: typing.Callable, read_cache: Attribute.AsyncReadTransaction.ReadResponse, hooks=None):
         ''' Effects is a list of callable functions with *args, **kwargs parameters. It can either throw an InteractionModelException or return the command response.'''
         self.default_controller.Read = AsyncMock(return_value=read_cache)
         self.default_controller.SendCommand = AsyncMock(return_value=None, side_effect=dynamic_invoke_return)
@@ -87,6 +116,7 @@ class MyMock(MockTestRunner):
         params = ChipDeviceCtrl.CommissioningParameters(setupPinCode=0, setupManualCode='', setupQRCode='')
         self.default_controller.OpenCommissioningWindow = AsyncMock(return_value=params)
         self.default_controller.FindOrEstablishPASESession = AsyncMock(return_value=None)
+        self.default_controller.ReadEvent = AsyncMock(return_value=[], side_effect=dynamic_event_return)
 
         return run_tests_no_exit(self.test_class, self.config, hooks, self.default_controller, self.stack)
 
@@ -96,9 +126,10 @@ def main():
     paa_path = get_default_paa_trust_store(root)
     print(f'paa = {paa_path}')
 
-    test_runner = MyMock('TC_CCTRL', 'TC_CCTRL', 'test_TC_CCTRL_3_1', 1, paa_trust_store_path=paa_path)
+    pics = {"PICS_SDK_CI_ONLY": True }
+    test_runner = MyMock('TC_CCTRL', 'TC_CCTRL', 'test_TC_CCTRL_3_1', 1, paa_trust_store_path=paa_path, pics=pics)
 
-    test_runner.run_test_with_mock(dynamic_return, wildcard())
+    test_runner.run_test_with_mock(dynamic_invoke_return, dynamic_event_return, wildcard())
     test_runner.Shutdown()
 
 if __name__ == "__main__":
