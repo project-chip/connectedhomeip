@@ -17,6 +17,7 @@
  */
 
 #include "DataModelFixtures.h"
+#include "lib/core/CHIPError.h"
 
 #include <app-common/zap-generated/cluster-objects.h>
 #include <app-common/zap-generated/ids/Clusters.h>
@@ -521,7 +522,135 @@ CHIP_ERROR CustomDataModel::ReadAttribute(const ReadAttributeRequest & request, 
 
 CHIP_ERROR CustomDataModel::WriteAttribute(const WriteAttributeRequest & request, AttributeValueDecoder & decoder)
 {
-    return CHIP_ERROR_NOT_IMPLEMENTED;
+    static ListIndex listStructOctetStringElementCount = 0;
+
+    if (request.path.mDataVersion.HasValue() && request.path.mDataVersion.Value() == kRejectedDataVersion)
+    {
+        return CHIP_IM_GLOBAL_STATUS(DataVersionMismatch);
+    }
+
+    if (request.path.mClusterId == Clusters::UnitTesting::Id &&
+        request.path.mAttributeId == Attributes::ListStructOctetString::TypeInfo::GetAttributeId())
+    {
+        if (gWriteResponseDirective == WriteResponseDirective::kSendAttributeSuccess)
+        {
+            if (!request.path.IsListOperation() || request.path.mListOp == ConcreteDataAttributePath::ListOperation::ReplaceAll)
+            {
+
+                Attributes::ListStructOctetString::TypeInfo::DecodableType value;
+
+                ReturnErrorOnFailure(DataModel::Decode(aReader, value));
+
+                auto iter                         = value.begin();
+                listStructOctetStringElementCount = 0;
+                while (iter.Next())
+                {
+                    auto & item = iter.GetValue();
+
+                    VerifyOrReturnError(item.member1 == listStructOctetStringElementCount, CHIP_ERROR_INVALID_ARGUMENT);
+                    listStructOctetStringElementCount++;
+                }
+                return CHIP_NO_ERROR;
+            }
+
+            if (request.path.mListOp == ConcreteDataAttributePath::ListOperation::AppendItem)
+            {
+                Structs::TestListStructOctet::DecodableType item;
+                ReturnErrorOnFailure(DataModel::Decode(aReader, item));
+                VerifyOrReturnError(item.member1 == listStructOctetStringElementCount, CHIP_ERROR_INVALID_ARGUMENT);
+                listStructOctetStringElementCount++;
+
+                return CHIP_NO_ERROR;
+            }
+
+            return CHIP_ERROR_UNSUPPORTED_CHIP_FEATURE;
+        }
+
+        return CHIP_IM_GLOBAL_STATUS(Failure);
+    }
+    if (request.path.mClusterId == Clusters::UnitTesting::Id && request.path.mAttributeId == Attributes::ListFabricScoped::Id)
+    {
+        // Mock a invalid SubjectDescriptor
+        if (!request.path.IsListOperation() || request.path.mListOp == ConcreteDataAttributePath::ListOperation::ReplaceAll)
+        {
+            Attributes::ListFabricScoped::TypeInfo::DecodableType value;
+
+            ReturnErrorOnFailure(decoder.Decode(value));
+
+            auto iter = value.begin();
+            while (iter.Next())
+            {
+                auto & item = iter.GetValue();
+                (void) item;
+            }
+        }
+        else if (request.path.mListOp == ConcreteDataAttributePath::ListOperation::AppendItem)
+        {
+            Structs::TestFabricScoped::DecodableType item;
+            ReturnErrorOnFailure(decoder.Decode(item));
+        }
+        else
+        {
+            return CHIP_ERROR_UNSUPPORTED_CHIP_FEATURE;
+        }
+        return CHIP_NO_ERROR;
+    }
+
+    // Boolean attribute of unit testing cluster triggers "multiple errors" case.
+    if (request.path.mClusterId == Clusters::UnitTesting::Id && request.path.mAttributeId == Attributes::Boolean::TypeInfo::GetAttributeId())
+    {
+        Protocols::InteractionModel::ClusterStatusCode status{ Protocols::InteractionModel::Status::InvalidValue };
+
+        if (gWriteResponseDirective == WriteResponseDirective::kSendMultipleSuccess)
+        {
+            status = Protocols::InteractionModel::Status::Success;
+        }
+        else if (gWriteResponseDirective == WriteResponseDirective::kSendMultipleErrors)
+        {
+            status = Protocols::InteractionModel::Status::Failure;
+        }
+        else
+        {
+            VerifyOrDie(false);
+        }
+
+    /*
+        // TODO: IMDM
+        // FIXME: how do I do this ???? this sets 4 statuses ....
+        //        AND it uses cluster status codes
+        for (size_t i = 0; i < 4; ++i)
+        {
+            aWriteHandler->AddStatus(request.path, status);
+        }
+    */
+
+        return CHIP_NO_ERROR;
+    }
+
+    if (request.path.mClusterId == Clusters::UnitTesting::Id && request.path.mAttributeId == Attributes::Int8u::TypeInfo::GetAttributeId())
+    {
+        Protocols::InteractionModel::ClusterStatusCode status{ Protocols::InteractionModel::Status::InvalidValue };
+    /*
+        // TODO: IMDM
+        // FIXME: how do I do this ????
+        aWriteHandler->AddStatus(request.path, status);
+    */
+        if (gWriteResponseDirective == WriteResponseDirective::kSendClusterSpecificSuccess)
+        {
+            //status = Protocols::InteractionModel::ClusterStatusCode::ClusterSpecificSuccess(kExampleClusterSpecificSuccess);
+            return CHIP_IM_CLUSTER_STATUS(Protocols::InteractionModel::ClusterStatusCode::ClusterSpecificSuccess(kExampleClusterSpecificSuccess));
+        }
+
+        if (gWriteResponseDirective == WriteResponseDirective::kSendClusterSpecificFailure)
+        {
+            //status = Protocols::InteractionModel::ClusterStatusCode::ClusterSpecificFailure(kExampleClusterSpecificFailure);
+            return CHIP_IM_CLUSTER_STATUS(Protocols::InteractionModel::ClusterStatusCode::ClusterSpecificFailure(kExampleClusterSpecificFailure));
+        }
+        VerifyOrDie(false);
+
+    }
+
+    return CHIP_ERROR_UNSUPPORTED_CHIP_FEATURE;
 }
 
 CHIP_ERROR CustomDataModel::Invoke(const InvokeRequest & request, chip::TLV::TLVReader & input_arguments, CommandHandler * handler)
