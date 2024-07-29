@@ -8661,17 +8661,6 @@ endpoint 1 {
     ram      attribute minSetpointDeadBand default = 0x19;
     ram      attribute controlSequenceOfOperation default = 0x04;
     ram      attribute systemMode default = 0x01;
-    callback attribute presetTypes;
-    callback attribute scheduleTypes;
-    ram      attribute numberOfPresets default = 0;
-    ram      attribute numberOfSchedules default = 0;
-    ram      attribute numberOfScheduleTransitionPerDay default = 0xFF;
-    ram      attribute activePresetHandle;
-    ram      attribute activeScheduleHandle;
-    callback attribute presets;
-    callback attribute schedules;
-    ram      attribute presetsSchedulesEditable;
-    ram      attribute setpointHoldExpiryTimestamp default = 0;
     callback attribute generatedCommandList;
     callback attribute acceptedCommandList;
     callback attribute eventList;
