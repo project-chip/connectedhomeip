@@ -73,6 +73,6 @@ class TC_OCC_2_2(MatterBaseTest):
 
             if occupancy_sensor_type_bitmap_dut != NullValue:
                 if occupancy_sensor_type_bitmap_dut == 1:
-                asserts.assert_less_equal(occupancy_sensor_type_bitmap_dut, 0b00000111, "OccupancySensorTypeBitmap attribute is not in valid range")
+                    asserts.assert_less_equal(occupancy_sensor_type_bitmap_dut, 0b00000111, "OccupancySensorTypeBitmap attribute is not in valid range")
         else:
             logging.info("Test step skipped")
