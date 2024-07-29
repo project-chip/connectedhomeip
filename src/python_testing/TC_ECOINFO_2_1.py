@@ -106,7 +106,6 @@ class TC_ECOINFO_2_1(MatterBaseTest):
         else:
             asserts.assert_equal(num_of_locations, 0, "Device was removed, there should be no location in LocationDirectory")
 
-
     def steps_TC_ECOINFO_2_1(self) -> list[TestStep]:
         steps = [TestStep(1, "Identify endpoints with Ecosystem Information Cluster", is_commissioning=True),
                  TestStep(2, "Reading RemovedOn Attribute"),
@@ -164,7 +163,6 @@ class TC_ECOINFO_2_1(MatterBaseTest):
                 fabricFiltered=False)
 
             self._validate_location_directory(is_removed_on_null, location_directory)
-
 
             if idx == 0:
                 self.step(5)
