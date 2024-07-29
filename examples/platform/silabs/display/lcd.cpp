@@ -75,7 +75,7 @@ CHIP_ERROR SilabsLCD::Init(uint8_t * name, bool initialState)
         SILABS_LOG("Board Display enable fail %d", status);
         err = CHIP_ERROR_INTERNAL;
     }
-#endif
+#endif // SLI_SI91X_MCU_INTERFACE
 
     /* Initialize the DMD module for the DISPLAY device driver. */
     status = DMD_init(0);
@@ -255,6 +255,30 @@ void SilabsLCD::CycleScreens(void)
 void SilabsLCD::SetStatus(DisplayStatus_t & status)
 {
     mStatus = status;
+}
+
+CHIP_ERROR SilabsLCD::TurnOn(void)
+{
+    CHIP_ERROR err = CHIP_NO_ERROR;
+    EMSTATUS status;
+#if (SLI_SI91X_MCU_INTERFACE)
+    sl_memlcd_display_enable();
+#else
+    status = sl_board_enable_display();
+    if (status != SL_STATUS_OK)
+    {
+        SILABS_LOG("Board Display enable fail %d", status);
+        err = CHIP_ERROR_INTERNAL;
+    }
+#endif // SLI_SI91X_MCU_INTERFACE
+    return err;
+}
+
+CHIP_ERROR SilabsLCD::TurnOff(void)
+{
+    CHIP_ERROR err = CHIP_NO_ERROR;
+    Clear();
+    sl_board_disable_display();
 }
 
 #ifdef QR_CODE_ENABLED
