@@ -663,7 +663,7 @@ class TC_OPSTATE_BASE():
                 asserts.assert_equal(current_phase, NullValue, f"CurrentPhase({current_phase}) should be null")
             else:
                 asserts.assert_greater_equal(current_phase, 0,
-                                          f"CurrentPhase({current_phase}) must be greater or equal than 0")
+                                             f"CurrentPhase({current_phase}) must be greater or equal than 0")
                 asserts.assert_less(current_phase, phase_list_len,
                                     f"CurrentPhase({current_phase}) must be less then {(phase_list_len)}")
 
