@@ -18,6 +18,7 @@
 
 import os
 import sys
+import base64
 import pathlib
 import typing
 
@@ -42,22 +43,34 @@ def dynamic_invoke_return(*args, **argv):
     global invoke_call_count
     invoke_call_count += 1
 
-    if invoke_call_count == 1: # Commission node with no prior request, return failure
+    # passcode 20202024
+    reverse_open = Clusters.CommissionerControl.Commands.ReverseOpenCommissioningWindow(commissioningTimeout=30,
+                                                                                        PAKEPasscodeVerifier=b"+w1qZQR05Zn0bc2LDyNaDAhsrhDS5iRHPTN10+EmNx8E2OpIPC4SjWRDQVOgqcbnXdYMlpiZ168xLBqn1fx9659gGK/7f9Yc6GxpoJH8kwAUYAYyLGsYeEBt1kL6kpXjgA==",
+                                                                                        discriminator=2222, iterations=10000, salt=base64.b64encode(bytes('SaltyMcSalterson', 'utf-8')))
+
+    print(f'invoke call {invoke_call_count}')
+    if invoke_call_count == 1: # Commission node with no prior request, return failure - step 5
         raise InteractionModelError(status=Status.Failure)
-    elif invoke_call_count == 2: # Commission node over pase - return unsupported access
+    elif invoke_call_count == 2: # Commission node over pase - return unsupported access - step 6
         raise InteractionModelError(status=Status.UnsupportedAccess)
-    elif invoke_call_count == 3: # request commissioning approval over pase - return unsupported access
+    elif invoke_call_count == 3: # request commissioning approval over pase - return unsupported access - step 7
         raise InteractionModelError(status=Status.UnsupportedAccess)
-    elif invoke_call_count == 4: # good RequestCommissioningApproval over CASE with bad vid
+    elif invoke_call_count == 4: # good RequestCommissioningApproval over CASE with bad vid - step 9
         return None
-    elif invoke_call_count == 5: # CommissionNode with bad request id
+    elif invoke_call_count == 5: # CommissionNode with bad request id - step 12
         raise InteractionModelError(status=Status.Failure)
-    elif invoke_call_count == 6: # CommissionNode with bad timeout (low)
+    elif invoke_call_count == 6: # CommissionNode with bad timeout (low) - step 13
         raise InteractionModelError(status=Status.Failure)
-    elif invoke_call_count == 7: # CommissionNode with bad timeout (high)
+    elif invoke_call_count == 7: # CommissionNode with bad timeout (high) - step 14
         raise InteractionModelError(status=Status.Failure)
-    elif invoke_call_count == 8: #CommissionNode
-        return Clusters.CommissionerControl.Commands.ReverseOpenCommissioningWindow(commissioningTimeout=30, PAKEPasscodeVerifier=b'', discriminator=2222, iterations=10000, salt=bytes('SaltyMcSaltersons', 'utf-8'))
+    elif invoke_call_count == 8: # CommissionNode - step 15
+        # passcode 20202024
+        return reverse_open
+    elif invoke_call_count == 9: # RequestCommissioningApproval with good vid - step 20
+        return None
+    elif invoke_call_count == 10: # CommissionNode - step 23
+        # passcode 20202024
+        return reverse_open
     else:
         raise InteractionModelError(Status.Failure)
 
@@ -74,7 +87,7 @@ def dynamic_event_return(*args, **argv):
         data = Clusters.CommissionerControl.Events.CommissioningRequestResult(requestId=0x1234567887654321, clientNodeId=112233, statusCode=0)
         result = Attribute.EventReadResult(Header=header, Status=Status.Success, Data=data)
         return [result]
-    elif event_call_count == 4: # returmed event with new request id
+    elif event_call_count == 4: # returmed event with new request
         header = Attribute.EventHeader(EndpointId=0, ClusterId=Clusters.CommissionerControl.id, EventId=Clusters.CommissionerControl.Events.CommissioningRequestResult.event_id, EventNumber=1)
         data = Clusters.CommissionerControl.Events.CommissioningRequestResult(requestId=0x1234567812345678, clientNodeId=112233, statusCode=0)
         result = Attribute.EventReadResult(Header=header, Status=Status.Success, Data=data)

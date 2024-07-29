@@ -188,13 +188,16 @@ class TC_CCTRL(MatterBaseTest):
 
         #self.step(15)
         cmd = Clusters.CommissionerControl.Commands.CommissionNode(requestId=good_request_id, responseTimeoutSeconds=30)
-        resp = await self.send_single_cmd(cmd)
+        resp: Clusters.CommissionerControl.Commands.ReverseOpenCommissioningWindow = await self.send_single_cmd(cmd)
         asserts.assert_equal(type(resp), Clusters.CommissionerControl.Commands.ReverseOpenCommissioningWindow, "Incorrect response type")
 
         #self.step(16)
-        #TODO: we do not have a direct line to OpenEnhancedCommissioningWindow. Need to add plumbing
-        # For now, open with anything so the below command is ok
-        await self.openCommissioningWindow(dev_ctrl=self.TH_server_controller, node_id=self.server_nodeid)
+        # min commissioning timeout is 3*60 seconds, so use that even though the command said 30.
+        cmd = Clusters.AdministratorCommissioning.Commands.OpenCommissioningWindow(commissioningTimeout=3*60,
+                                                                                   PAKEPasscodeVerifier=resp.PAKEPasscodeVerifier,
+                                                                                   discriminator=resp.discriminator,
+                                                                                   iterations=resp.iterations, salt=resp.salt)
+        await self.send_single_cmd(cmd, dev_ctrl=self.TH_server_controller, node_id=self.server_nodeid, endpoint=0, timedRequestTimeoutMs=5000)
 
         #self.step(17)
         logging.info("Test now waits for 30 seconds")
@@ -210,9 +213,10 @@ class TC_CCTRL(MatterBaseTest):
         await self.send_single_cmd(cmd, dev_ctrl=self.TH_server_controller, node_id=self.server_nodeid, timedRequestTimeoutMs=5000, endpoint=0)
 
         #self.step(20)
+        print('step 20')
         good_request_id = 0x1234567812345678
         cmd = Clusters.CommissionerControl.Commands.RequestCommissioningApproval(requestId=good_request_id, vendorId=th_server_vid, productId=th_server_pid, label="Test Ecosystem")
-        self.send_single_cmd(cmd)
+        await self.send_single_cmd(cmd)
 
         #self.step(21)
         if not self.is_ci:
@@ -226,6 +230,28 @@ class TC_CCTRL(MatterBaseTest):
         asserts.assert_equal(new_event[0].Data.statusCode, 0, "Unexpected status code")
         asserts.assert_equal(new_event[0].Data.clientNodeId, self.matter_test_config.controller_node_id, "Unexpected client node id")
         asserts.assert_equal(new_event[0].Data.requestId, good_request_id, "Unexpected request ID")
+
+        #self.step(23)
+        cmd = Clusters.CommissionerControl.Commands.CommissionNode(requestId=good_request_id, responseTimeoutSeconds=30)
+        resp = await self.send_single_cmd(cmd)
+        asserts.assert_equal(type(resp), Clusters.CommissionerControl.Commands.ReverseOpenCommissioningWindow, "Incorrect response type")
+
+        #self.step(24)
+        # min commissioning timeout is 3*60 seconds, so use that even though the command said 30.
+        cmd = Clusters.AdministratorCommissioning.Commands.OpenCommissioningWindow(commissioningTimeout=3*60,
+                                                                                   PAKEPasscodeVerifier=resp.PAKEPasscodeVerifier,
+                                                                                   discriminator=resp.discriminator,
+                                                                                   iterations=resp.iterations, salt=resp.salt)
+        await self.send_single_cmd(cmd, dev_ctrl=self.TH_server_controller, node_id=self.server_nodeid, endpoint=0, timedRequestTimeoutMs=5000)
+
+        #self.step(25)
+        if not self.is_ci:
+            time.sleep(30)
+
+        th_server_fabrics_new = await self.read_single_attribute_check_success(cluster=Clusters.OperationalCredentials, attribute=Clusters.OperationalCredentials.Attributes.Fabrics, dev_ctrl=self.TH_server_controller, node_id=self.server_nodeid, endpoint=0)
+        #TODO: this should be mocked too.
+        if not self.is_ci:
+            asserts.assert_equal(len(th_server_fabrics) + 1, len(th_server_fabrics_new), "Unexpected number of fabrics on TH_SERVER")
 
 
 
