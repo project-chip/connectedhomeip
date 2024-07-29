@@ -32,18 +32,11 @@ import uuid
 
 import chip.clusters as Clusters
 import chip.exceptions
+from chip import ChipDeviceCtrl
 from chip.interaction_model import InteractionModelError, Status
 from matter_testing_support import (MatterBaseTest, TestStep, async_test_body, default_matter_test_main, has_cluster,
                                     per_endpoint_test)
 from mobly import asserts
-
-# isort: off
-
-from chip import ChipDeviceCtrl  # Needed before chip.FabricAdmin
-import chip.CertificateAuthority
-from chip.ChipDeviceCtrl import CommissioningParameters
-
-# isort: on
 
 
 class TC_CCTRL_2_2(MatterBaseTest):
@@ -83,7 +76,7 @@ class TC_CCTRL_2_2(MatterBaseTest):
     def teardown_class(self):
         logging.warning("Stopping app with SIGTERM")
         self.app_process.send_signal(signal.SIGTERM.value)
-        test_app_exit_code = self.app_process.wait()
+        self.app_process.wait()
         # TODO: Use timeout, if term doesn't work, try SIGINT
 
         os.remove(self.kvs)
