@@ -61,7 +61,7 @@ class TC_EPM_2_2(MatterBaseTest, EnergyReportingBaseTestHelper):
                      "Verify the read is successful and that the value is between 3'848 and 4'848 mA. Note the value read."),
             TestStep("4c", "TH reads from the DUT the Voltage attribute",
                      "Verify the read is successful and that the value is between 229'000 and 231'000 mV. Note the value read."),
-            TestStep("5", "Wait 5 seconds"),
+            TestStep("5", "Wait 3 seconds"),
             TestStep("5a", "TH reads from the DUT the ActivePower attribute",
                      "Verify the read is successful, that the value is between '980'000 and 1'020'000 mW, and the value is different from the value read in step 4a."),
             TestStep("5b", "TH reads from the DUT the ActiveCurrent attribute",
@@ -105,8 +105,8 @@ class TC_EPM_2_2(MatterBaseTest, EnergyReportingBaseTestHelper):
             voltage = await self.check_epm_attribute_in_range("Voltage", 229000, 231000)
 
         self.step("5")
-        # After 5 seconds...
-        time.sleep(5)
+        # After 3 seconds...
+        time.sleep(3)
 
         self.step("5a")
         # Active power is Mandatory
