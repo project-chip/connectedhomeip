@@ -327,7 +327,7 @@ limitations under the License.
       <description>HVACSystemTypeConfiguration</description>
       <access op="write" privilege="manage"/>
     </attribute>
-    <attribute side="server" code="0x0010" define="LOCAL_TEMPERATURE_CALIBRATION" type="int8s" min="-128" max="-128" writable="true" default="0x00" optional="true">
+    <attribute side="server" code="0x0010" define="LOCAL_TEMPERATURE_CALIBRATION" type="int8s" min="-127" max="127" writable="true" default="0x00" optional="true">
       <description>LocalTemperatureCalibration</description>
       <access op="write" privilege="manage"/>
     </attribute>

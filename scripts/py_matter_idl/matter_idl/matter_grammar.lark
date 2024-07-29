@@ -116,7 +116,7 @@ POSITIVE_INTEGER: /\d+/
 HEX_INTEGER: /0x[A-Fa-f0-9]+/
 ID: /[a-zA-Z_][a-zA-Z0-9_]*/
 
-idl: (cluster|endpoint)*
+idl: (struct|enum|bitmap|cluster|endpoint)*
 
 %import common.ESCAPED_STRING
 %import common.WS
