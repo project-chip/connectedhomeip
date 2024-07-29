@@ -34,8 +34,10 @@ class TC_CCTRL_2_1(MatterBaseTest):
 
         self.step(2)
         supported_device_categories = await self.read_single_attribute_check_success(cluster=Clusters.CommissionerControl, attribute=Clusters.CommissionerControl.Attributes.SupportedDeviceCategories)
-        is_fabric_sync_bit_set = bool(supported_device_categories & Clusters.CommissionerControl.Bitmaps.SupportedDeviceCategoryBitmap.kFabricSynchronization)
-        asserts.assert_equal(is_fabric_sync_bit_set, is_fabric_sync_pics_enabled, "Mismatch between PICS MCORE.FS value and what attribute indicates")
+        is_fabric_sync_bit_set = bool(supported_device_categories &
+                                      Clusters.CommissionerControl.Bitmaps.SupportedDeviceCategoryBitmap.kFabricSynchronization)
+        asserts.assert_equal(is_fabric_sync_bit_set, is_fabric_sync_pics_enabled,
+                             "Mismatch between PICS MCORE.FS value and what attribute indicates")
 
 
 if __name__ == "__main__":
