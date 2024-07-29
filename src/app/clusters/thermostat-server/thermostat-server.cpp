@@ -1510,7 +1510,7 @@ bool emberAfThermostatClusterCommitPresetsSchedulesRequestCallback(
             return SendResponseAndCleanUp(delegate, endpoint, commandObj, commandPath, imcode::ConstraintError);
         }
 
-        // If the preset type for the preset scenario does not support name and a name is specified, return CONSTRAINT_ERROR.
+        // If the preset type for the preset scenario does not support names and a name is specified, return CONSTRAINT_ERROR.
         if (!PresetTypeSupportsNames(delegate, presetScenario) && pendingPreset.GetName().HasValue())
         {
             return SendResponseAndCleanUp(delegate, endpoint, commandObj, commandPath, imcode::ConstraintError);

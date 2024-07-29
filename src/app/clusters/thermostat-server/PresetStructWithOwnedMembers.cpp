@@ -63,7 +63,7 @@ CHIP_ERROR PresetStructWithOwnedMembers::SetPresetHandle(const Nullable<ByteSpan
         if (newPresetHandleSize > kPresetHandleSize)
         {
             ChipLogError(Zcl, "Failed to set Preset handle. New preset handle size (%u) > allowed preset handle size (%u)",
-                         static_cast<uint8_t>(newPresetHandleSize), static_cast<uint8_t>(kPresetNameSize));
+                         static_cast<unsigned>(newPresetHandleSize), static_cast<unsigned>(kPresetNameSize));
             return CHIP_ERROR_NO_MEMORY;
         }
         MutableByteSpan targetSpan(presetHandleData);
