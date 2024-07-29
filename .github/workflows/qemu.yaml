@@ -40,7 +40,7 @@ jobs:
         if: github.actor != 'restyled-io[bot]'
 
         container:
-            image: ghcr.io/project-chip/chip-build-esp32-qemu:65
+            image: ghcr.io/project-chip/chip-build-esp32-qemu:66
             volumes:
                 - "/tmp/log_output:/tmp/test_logs"
 
