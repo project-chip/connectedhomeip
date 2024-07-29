@@ -1,6 +1,23 @@
 // This IDL was generated automatically by ZAP.
 // It is for view/code review purposes only.
 
+enum TestGlobalEnum : enum8 {
+  kSomeValue = 0;
+  kSomeOtherValue = 1;
+  kFinalValue = 2;
+}
+
+bitmap TestGlobalBitmap : bitmap32 {
+  kFirstBit = 0x1;
+  kSecondBit = 0x2;
+}
+
+struct TestGlobalStruct {
+  char_string<128> name = 0;
+  nullable TestGlobalBitmap myBitmap = 1;
+  optional nullable TestGlobalEnum myEnum = 2;
+}
+
 /** Attributes and commands for putting a device into Identification mode (e.g. flashing a light). */
 cluster Identify = 3 {
   revision 4;
@@ -2225,6 +2242,10 @@ cluster BridgedDeviceBasicInformation = 57 {
     kFabric = 5;
   }
 
+  bitmap Feature : bitmap32 {
+    kBridgedICDSupport = 0x100000;
+  }
+
   struct ProductAppearanceStruct {
     ProductFinishEnum finish = 0;
     nullable ColorEnum primaryColor = 1;
@@ -2242,6 +2263,10 @@ cluster BridgedDeviceBasicInformation = 57 {
 
   info event ReachableChanged = 3 {
     boolean reachableNewValue = 0;
+  }
+
+  info event ActiveChanged = 128 {
+    int32u promisedActiveDuration = 0;
   }
 
   readonly attribute optional char_string<32> vendorName = 1;
@@ -2266,6 +2291,9 @@ cluster BridgedDeviceBasicInformation = 57 {
   readonly attribute attrib_id attributeList[] = 65531;
   readonly attribute bitmap32 featureMap = 65532;
   readonly attribute int16u clusterRevision = 65533;
+
+  /** The server SHALL attempt to keep the devices specified active for StayActiveDuration milliseconds when they are next active. */
+  command KeepActive(): DefaultSuccess = 128;
 }
 
 /** This cluster exposes interactions with a switch device, for the purpose of using those interactions by other devices.
@@ -6122,7 +6150,7 @@ deprecated cluster BarrierControl = 259 {
 }
 
 /** The Service Area cluster provides an interface for controlling the locations where a device should operate, and for querying the current location. */
-cluster ServiceArea = 336 {
+provisional cluster ServiceArea = 336 {
   revision 1; // NOTE: Default/not specifically set
 
   enum AreaTypeTag : enum8 {
@@ -6347,14 +6375,14 @@ cluster ServiceArea = 336 {
     kSelectWhileRunning = 0x2;
   }
 
-  struct HomeLocationStruct {
+  struct LocationDescriptorStruct {
     char_string<128> locationName = 0;
     nullable int16s floorNumber = 1;
     nullable AreaTypeTag areaType = 2;
   }
 
   struct LocationInfoStruct {
-    nullable HomeLocationStruct locationInfo = 0;
+    nullable LocationDescriptorStruct locationInfo = 0;
     nullable LandmarkTag landmarkTag = 1;
     nullable PositionTag positionTag = 2;
     nullable FloorSurfaceTag surfaceTag = 3;
@@ -9237,6 +9265,148 @@ provisional cluster ContentAppObserver = 1296 {
 
   /** Upon receipt, the data field MAY be parsed and interpreted. Message encoding is specific to the Content App. A Content App MAY when possible read attributes from the Basic Information Cluster on the Observer and use this to determine the Message encoding. */
   command ContentAppMessage(ContentAppMessageRequest): ContentAppMessageResponse = 0;
+}
+
+/** Provides extended device information for all the logical devices represented by a Bridged Node. */
+provisional cluster EcosystemInformation = 1872 {
+  revision 1;
+
+  enum AreaTypeTag : enum8 {
+    kAisle = 0;
+    kAttic = 1;
+    kBackDoor = 2;
+    kBackYard = 3;
+    kBalcony = 4;
+    kBallroom = 5;
+    kBathroom = 6;
+    kBedroom = 7;
+    kBorder = 8;
+    kBoxroom = 9;
+    kBreakfastRoom = 10;
+    kCarport = 11;
+    kCellar = 12;
+    kCloakroom = 13;
+    kCloset = 14;
+    kConservatory = 15;
+    kCorridor = 16;
+    kCraftRoom = 17;
+    kCupboard = 18;
+    kDeck = 19;
+    kDen = 20;
+    kDining = 21;
+    kDrawingRoom = 22;
+    kDressingRoom = 23;
+    kDriveway = 24;
+    kElevator = 25;
+    kEnsuite = 26;
+    kEntrance = 27;
+    kEntryway = 28;
+    kFamilyRoom = 29;
+    kFoyer = 30;
+    kFrontDoor = 31;
+    kFrontYard = 32;
+    kGameRoom = 33;
+    kGarage = 34;
+    kGarageDoor = 35;
+    kGarden = 36;
+    kGardenDoor = 37;
+    kGuestBathroom = 38;
+    kGuestBedroom = 39;
+    kGuestRestroom = 40;
+    kGuestRoom = 41;
+    kGym = 42;
+    kHallway = 43;
+    kHearthRoom = 44;
+    kKidsRoom = 45;
+    kKidsBedroom = 46;
+    kKitchen = 47;
+    kLarder = 48;
+    kLaundryRoom = 49;
+    kLawn = 50;
+    kLibrary = 51;
+    kLivingRoom = 52;
+    kLounge = 53;
+    kMediaTVRoom = 54;
+    kMudRoom = 55;
+    kMusicRoom = 56;
+    kNursery = 57;
+    kOffice = 58;
+    kOutdoorKitchen = 59;
+    kOutside = 60;
+    kPantry = 61;
+    kParkingLot = 62;
+    kParlor = 63;
+    kPatio = 64;
+    kPlayRoom = 65;
+    kPoolRoom = 66;
+    kPorch = 67;
+    kPrimaryBathroom = 68;
+    kPrimaryBedroom = 69;
+    kRamp = 70;
+    kReceptionRoom = 71;
+    kRecreationRoom = 72;
+    kRestroom = 73;
+    kRoof = 74;
+    kSauna = 75;
+    kScullery = 76;
+    kSewingRoom = 77;
+    kShed = 78;
+    kSideDoor = 79;
+    kSideYard = 80;
+    kSittingRoom = 81;
+    kSnug = 82;
+    kSpa = 83;
+    kStaircase = 84;
+    kSteamRoom = 85;
+    kStorageRoom = 86;
+    kStudio = 87;
+    kStudy = 88;
+    kSunRoom = 89;
+    kSwimmingPool = 90;
+    kTerrace = 91;
+    kUtilityRoom = 92;
+    kWard = 93;
+    kWorkshop = 94;
+  }
+
+  struct LocationDescriptorStruct {
+    char_string<128> locationName = 0;
+    nullable int16s floorNumber = 1;
+    nullable AreaTypeTag areaType = 2;
+  }
+
+  fabric_scoped struct EcosystemLocationStruct {
+    fabric_sensitive char_string<64> uniqueLocationID = 0;
+    fabric_sensitive LocationDescriptorStruct locationDescriptor = 1;
+    fabric_sensitive epoch_us locationDescriptorLastEdit = 2;
+    fabric_idx fabricIndex = 254;
+  }
+
+  struct DeviceTypeStruct {
+    devtype_id deviceType = 0;
+    int16u revision = 1;
+  }
+
+  fabric_scoped struct EcosystemDeviceStruct {
+    optional fabric_sensitive char_string<64> deviceName = 0;
+    optional fabric_sensitive epoch_us deviceNameLastEdit = 1;
+    fabric_sensitive endpoint_no bridgedEndpoint = 2;
+    fabric_sensitive endpoint_no originalEndpoint = 3;
+    fabric_sensitive DeviceTypeStruct deviceTypes[] = 4;
+    fabric_sensitive char_string uniqueLocationIDs[] = 5;
+    fabric_sensitive epoch_us uniqueLocationIDsLastEdit = 6;
+    fabric_idx fabricIndex = 254;
+  }
+
+  readonly attribute access(read: manage) optional nullable epoch_us removedOn = 0;
+  readonly attribute access(read: manage) EcosystemDeviceStruct deviceDirectory[] = 1;
+  readonly attribute access(read: manage) EcosystemLocationStruct locationDirectory[] = 2;
+  readonly attribute command_id generatedCommandList[] = 65528;
+  readonly attribute command_id acceptedCommandList[] = 65529;
+  readonly attribute event_id eventList[] = 65530;
+  readonly attribute attrib_id attributeList[] = 65531;
+  readonly attribute bitmap32 featureMap = 65532;
+  readonly attribute int16u clusterRevision = 65533;
 }
 
 /** Supports the ability for clients to request the commissioning of themselves or other nodes onto a fabric which the cluster server can commission onto. */
