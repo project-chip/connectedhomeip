@@ -354,11 +354,8 @@ private:
 
     static constexpr int kSdkPartStart  = 8;
     static constexpr int kSdkPartLength = 4;
-    static constexpr int kSdkCodeStart  = 0; // shared with IMClusterStatusCode
-    static constexpr int kSdkCodeLength = 8; // shared with IMClusterStatusCode
-
-    static constexpr int kImStatusSuccess       = 8;
-    static constexpr int kImStatusSuccessLength = 1;
+    static constexpr int kSdkCodeStart  = 0;
+    static constexpr int kSdkCodeLength = 8;
 
     static constexpr StorageType GetField(unsigned int start, unsigned int length, StorageType value)
     {
