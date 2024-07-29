@@ -87,10 +87,10 @@ BitMask<WaterHeaterDemandBitmap> WhmManufacturer::DetermineHeatingSources()
     BitMask<WaterHeaterTypeBitmap> heaterTypes = dg->GetHeaterTypes();
 
     uint8_t heaterDemandMask = 0;
-    for (auto & waterHeaterType : waterHeaterTypeValues) {
+    for (uint16_t idx = 0; idx < static_cast<uint16_t>(sizeof(waterHeaterTypeValues) / sizeof(waterHeaterTypeValues[0])); idx++)
     {
         // Is this heating source being used?
-        if (heaterTypes.Has(waterHeaterTypeValue))
+        if (heaterTypes.Raw() & waterHeaterTypeValues[idx])
         {
             heaterDemandMask |= waterHeaterDemandValues[idx];
         }
