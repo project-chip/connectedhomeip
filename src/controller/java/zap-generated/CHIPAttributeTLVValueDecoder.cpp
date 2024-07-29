@@ -28377,28 +28377,28 @@ jobject DecodeAttributeValue(const app::ConcreteAttributePath & aPath, TLV::TLVR
                             jninewElement_0_locationInfo_locationInfo_areaType, newElement_0_locationInfo_locationInfo_areaType);
                     }
 
-                    jclass homeLocationStructStructClass_4;
+                    jclass locationDescriptorStructStructClass_4;
                     err = chip::JniReferences::GetInstance().GetLocalClassRef(
-                        env, "chip/devicecontroller/ChipStructs$ServiceAreaClusterHomeLocationStruct",
-                        homeLocationStructStructClass_4);
+                        env, "chip/devicecontroller/ChipStructs$ServiceAreaClusterLocationDescriptorStruct",
+                        locationDescriptorStructStructClass_4);
                     if (err != CHIP_NO_ERROR)
                     {
-                        ChipLogError(Zcl, "Could not find class ChipStructs$ServiceAreaClusterHomeLocationStruct");
+                        ChipLogError(Zcl, "Could not find class ChipStructs$ServiceAreaClusterLocationDescriptorStruct");
                         return nullptr;
                     }
 
-                    jmethodID homeLocationStructStructCtor_4;
+                    jmethodID locationDescriptorStructStructCtor_4;
                     err = chip::JniReferences::GetInstance().FindMethod(
-                        env, homeLocationStructStructClass_4, "<init>",
-                        "(Ljava/lang/String;Ljava/lang/Integer;Ljava/lang/Integer;)V", &homeLocationStructStructCtor_4);
-                    if (err != CHIP_NO_ERROR || homeLocationStructStructCtor_4 == nullptr)
+                        env, locationDescriptorStructStructClass_4, "<init>",
+                        "(Ljava/lang/String;Ljava/lang/Integer;Ljava/lang/Integer;)V", &locationDescriptorStructStructCtor_4);
+                    if (err != CHIP_NO_ERROR || locationDescriptorStructStructCtor_4 == nullptr)
                     {
-                        ChipLogError(Zcl, "Could not find ChipStructs$ServiceAreaClusterHomeLocationStruct constructor");
+                        ChipLogError(Zcl, "Could not find ChipStructs$ServiceAreaClusterLocationDescriptorStruct constructor");
                         return nullptr;
                     }
 
                     newElement_0_locationInfo_locationInfo = env->NewObject(
-                        homeLocationStructStructClass_4, homeLocationStructStructCtor_4,
+                        locationDescriptorStructStructClass_4, locationDescriptorStructStructCtor_4,
                         newElement_0_locationInfo_locationInfo_locationName, newElement_0_locationInfo_locationInfo_floorNumber,
                         newElement_0_locationInfo_locationInfo_areaType);
                 }
@@ -28460,7 +28460,7 @@ jobject DecodeAttributeValue(const app::ConcreteAttributePath & aPath, TLV::TLVR
                 jmethodID locationInfoStructStructCtor_2;
                 err = chip::JniReferences::GetInstance().FindMethod(
                     env, locationInfoStructStructClass_2, "<init>",
-                    "(Lchip/devicecontroller/ChipStructs$ServiceAreaClusterHomeLocationStruct;Ljava/lang/Integer;Ljava/lang/"
+                    "(Lchip/devicecontroller/ChipStructs$ServiceAreaClusterLocationDescriptorStruct;Ljava/lang/Integer;Ljava/lang/"
                     "Integer;Ljava/lang/Integer;)V",
                     &locationInfoStructStructCtor_2);
                 if (err != CHIP_NO_ERROR || locationInfoStructStructCtor_2 == nullptr)
@@ -42915,29 +42915,30 @@ jobject DecodeAttributeValue(const app::ConcreteAttributePath & aPath, TLV::TLVR
                         newElement_0_locationDescriptor_areaType);
                 }
 
-                jclass homeLocationStructStructClass_2;
+                jclass locationDescriptorStructStructClass_2;
                 err = chip::JniReferences::GetInstance().GetLocalClassRef(
-                    env, "chip/devicecontroller/ChipStructs$EcosystemInformationClusterHomeLocationStruct",
-                    homeLocationStructStructClass_2);
+                    env, "chip/devicecontroller/ChipStructs$EcosystemInformationClusterLocationDescriptorStruct",
+                    locationDescriptorStructStructClass_2);
                 if (err != CHIP_NO_ERROR)
                 {
-                    ChipLogError(Zcl, "Could not find class ChipStructs$EcosystemInformationClusterHomeLocationStruct");
+                    ChipLogError(Zcl, "Could not find class ChipStructs$EcosystemInformationClusterLocationDescriptorStruct");
                     return nullptr;
                 }
 
-                jmethodID homeLocationStructStructCtor_2;
-                err = chip::JniReferences::GetInstance().FindMethod(env, homeLocationStructStructClass_2, "<init>",
+                jmethodID locationDescriptorStructStructCtor_2;
+                err = chip::JniReferences::GetInstance().FindMethod(env, locationDescriptorStructStructClass_2, "<init>",
                                                                     "(Ljava/lang/String;Ljava/lang/Integer;Ljava/lang/Integer;)V",
-                                                                    &homeLocationStructStructCtor_2);
-                if (err != CHIP_NO_ERROR || homeLocationStructStructCtor_2 == nullptr)
+                                                                    &locationDescriptorStructStructCtor_2);
+                if (err != CHIP_NO_ERROR || locationDescriptorStructStructCtor_2 == nullptr)
                 {
-                    ChipLogError(Zcl, "Could not find ChipStructs$EcosystemInformationClusterHomeLocationStruct constructor");
+                    ChipLogError(Zcl, "Could not find ChipStructs$EcosystemInformationClusterLocationDescriptorStruct constructor");
                     return nullptr;
                 }
 
-                newElement_0_locationDescriptor = env->NewObject(
-                    homeLocationStructStructClass_2, homeLocationStructStructCtor_2, newElement_0_locationDescriptor_locationName,
-                    newElement_0_locationDescriptor_floorNumber, newElement_0_locationDescriptor_areaType);
+                newElement_0_locationDescriptor =
+                    env->NewObject(locationDescriptorStructStructClass_2, locationDescriptorStructStructCtor_2,
+                                   newElement_0_locationDescriptor_locationName, newElement_0_locationDescriptor_floorNumber,
+                                   newElement_0_locationDescriptor_areaType);
                 jobject newElement_0_locationDescriptorLastEdit;
                 std::string newElement_0_locationDescriptorLastEditClassName     = "java/lang/Long";
                 std::string newElement_0_locationDescriptorLastEditCtorSignature = "(J)V";
@@ -42967,8 +42968,8 @@ jobject DecodeAttributeValue(const app::ConcreteAttributePath & aPath, TLV::TLVR
                 jmethodID ecosystemLocationStructStructCtor_1;
                 err = chip::JniReferences::GetInstance().FindMethod(
                     env, ecosystemLocationStructStructClass_1, "<init>",
-                    "(Ljava/lang/String;Lchip/devicecontroller/ChipStructs$EcosystemInformationClusterHomeLocationStruct;Ljava/"
-                    "lang/Long;Ljava/lang/Integer;)V",
+                    "(Ljava/lang/String;Lchip/devicecontroller/"
+                    "ChipStructs$EcosystemInformationClusterLocationDescriptorStruct;Ljava/lang/Long;Ljava/lang/Integer;)V",
                     &ecosystemLocationStructStructCtor_1);
                 if (err != CHIP_NO_ERROR || ecosystemLocationStructStructCtor_1 == nullptr)
                 {

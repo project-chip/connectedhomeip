@@ -22,13 +22,13 @@ import matter.tlv.Tag
 import matter.tlv.TlvReader
 import matter.tlv.TlvWriter
 
-class ServiceAreaClusterHomeLocationStruct(
+class ServiceAreaClusterLocationDescriptorStruct(
   val locationName: String,
   val floorNumber: Int?,
   val areaType: UInt?,
 ) {
   override fun toString(): String = buildString {
-    append("ServiceAreaClusterHomeLocationStruct {\n")
+    append("ServiceAreaClusterLocationDescriptorStruct {\n")
     append("\tlocationName : $locationName\n")
     append("\tfloorNumber : $floorNumber\n")
     append("\tareaType : $areaType\n")
@@ -58,7 +58,7 @@ class ServiceAreaClusterHomeLocationStruct(
     private const val TAG_FLOOR_NUMBER = 1
     private const val TAG_AREA_TYPE = 2
 
-    fun fromTlv(tlvTag: Tag, tlvReader: TlvReader): ServiceAreaClusterHomeLocationStruct {
+    fun fromTlv(tlvTag: Tag, tlvReader: TlvReader): ServiceAreaClusterLocationDescriptorStruct {
       tlvReader.enterStructure(tlvTag)
       val locationName = tlvReader.getString(ContextSpecificTag(TAG_LOCATION_NAME))
       val floorNumber =
@@ -78,7 +78,7 @@ class ServiceAreaClusterHomeLocationStruct(
 
       tlvReader.exitContainer()
 
-      return ServiceAreaClusterHomeLocationStruct(locationName, floorNumber, areaType)
+      return ServiceAreaClusterLocationDescriptorStruct(locationName, floorNumber, areaType)
     }
   }
 }
