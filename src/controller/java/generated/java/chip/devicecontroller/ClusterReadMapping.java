@@ -16938,6 +16938,17 @@ public class ClusterReadMapping {
           readWiFiNetworkManagementSsidCommandParams
         );
         result.put("readSsidAttribute", readWiFiNetworkManagementSsidAttributeInteractionInfo);
+     Map<String, CommandParameterInfo> readWiFiNetworkManagementPassphraseSurrogateCommandParams = new LinkedHashMap<String, CommandParameterInfo>();
+        InteractionInfo readWiFiNetworkManagementPassphraseSurrogateAttributeInteractionInfo = new InteractionInfo(
+          (cluster, callback, commandArguments) -> {
+            ((ChipClusters.WiFiNetworkManagementCluster) cluster).readPassphraseSurrogateAttribute(
+              (ChipClusters.WiFiNetworkManagementCluster.PassphraseSurrogateAttributeCallback) callback
+            );
+          },
+          () -> new ClusterInfoMapping.DelegatedWiFiNetworkManagementClusterPassphraseSurrogateAttributeCallback(),
+          readWiFiNetworkManagementPassphraseSurrogateCommandParams
+        );
+        result.put("readPassphraseSurrogateAttribute", readWiFiNetworkManagementPassphraseSurrogateAttributeInteractionInfo);
      Map<String, CommandParameterInfo> readWiFiNetworkManagementGeneratedCommandListCommandParams = new LinkedHashMap<String, CommandParameterInfo>();
         InteractionInfo readWiFiNetworkManagementGeneratedCommandListAttributeInteractionInfo = new InteractionInfo(
           (cluster, callback, commandArguments) -> {

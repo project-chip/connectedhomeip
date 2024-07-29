@@ -654,7 +654,7 @@
             "ClusterRevision"
         ],
         "Water Heater Mode": ["SupportedModes", "CurrentMode", "FeatureMap"],
-        "Wi-Fi Network Management": ["SSID"],
+        "Wi-Fi Network Management": ["SSID", "PassphraseSurrogate"],
         "Thread Network Directory": [
             "PreferredExtendedPanID",
             "ThreadNetworks",
