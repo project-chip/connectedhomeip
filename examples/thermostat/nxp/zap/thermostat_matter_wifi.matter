@@ -2568,5 +2568,3 @@ endpoint 1 {
     handle command SetpointRaiseLower;
   }
 }
-
-

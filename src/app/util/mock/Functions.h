@@ -47,11 +47,5 @@ void ResetVersion();
 /// be returned by emberAfDataVersionStorage
 DataVersion GetVersion();
 
-/// Configures the singular global mock attribute storage to use the specified configuration.
-void SetMockNodeConfig(const MockNodeConfig & config);
-
-/// Resets the mock attribute storage to the default configuration.
-void ResetMockNodeConfig();
-
 } // namespace Test
 } // namespace chip
