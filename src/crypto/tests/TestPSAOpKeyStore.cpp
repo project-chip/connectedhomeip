@@ -18,15 +18,16 @@
 
 #include <inttypes.h>
 
+#include <pw_unit_test/framework.h>
+
 #include <crypto/PSAOperationalKeystore.h>
 #include <crypto/PersistentStorageOperationalKeystore.h>
+#include <lib/core/StringBuilderAdapters.h>
 #include <lib/support/CHIPMem.h>
 #include <lib/support/CodeUtils.h>
 #include <lib/support/DefaultStorageKeyAllocator.h>
 #include <lib/support/Span.h>
 #include <lib/support/TestPersistentStorageDelegate.h>
-
-#include <gtest/gtest.h>
 
 using namespace chip;
 using namespace chip::Crypto;

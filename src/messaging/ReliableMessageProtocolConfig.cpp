@@ -32,33 +32,28 @@
 #include <app/icd/server/ICDConfigurationData.h> // nogncheck
 #endif
 
-#include <optional>
-
 namespace chip {
 
 using namespace System::Clock::Literals;
 
 #if CONFIG_BUILD_FOR_HOST_UNIT_TEST
-namespace {
-// Use std::optional for globals to avoid static initializers
-std::optional<System::Clock::Timeout> gIdleRetransTimeoutOverride;
-std::optional<System::Clock::Timeout> gActiveRetransTimeoutOverride;
-std::optional<System::Clock::Timeout> gActiveThresholdTimeOverride;
-} // namespace
+static Optional<System::Clock::Timeout> idleRetransTimeoutOverride   = NullOptional;
+static Optional<System::Clock::Timeout> activeRetransTimeoutOverride = NullOptional;
+static Optional<System::Clock::Timeout> activeThresholdTimeOverride  = NullOptional;
 
 void OverrideLocalMRPConfig(System::Clock::Timeout idleRetransTimeout, System::Clock::Timeout activeRetransTimeout,
                             System::Clock::Timeout activeThresholdTime)
 {
-    gIdleRetransTimeoutOverride   = idleRetransTimeout;
-    gActiveRetransTimeoutOverride = activeRetransTimeout;
-    gActiveThresholdTimeOverride  = activeThresholdTime;
+    idleRetransTimeoutOverride.SetValue(idleRetransTimeout);
+    activeRetransTimeoutOverride.SetValue(activeRetransTimeout);
+    activeThresholdTimeOverride.SetValue(activeThresholdTime);
 }
 
 void ClearLocalMRPConfigOverride()
 {
-    gActiveRetransTimeoutOverride = std::nullopt;
-    gIdleRetransTimeoutOverride   = std::nullopt;
-    gActiveThresholdTimeOverride  = std::nullopt;
+    activeRetransTimeoutOverride.ClearValue();
+    idleRetransTimeoutOverride.ClearValue();
+    activeThresholdTimeOverride.ClearValue();
 }
 #endif
 
@@ -67,15 +62,14 @@ namespace {
 
 // This is not a static member of ReliableMessageProtocolConfig because the free
 // function GetLocalMRPConfig() needs access to it.
-// Use std::optional to avoid a static initializer
-std::optional<ReliableMessageProtocolConfig> sDynamicLocalMPRConfig;
+Optional<ReliableMessageProtocolConfig> sDynamicLocalMPRConfig;
 
 } // anonymous namespace
 
 bool ReliableMessageProtocolConfig::SetLocalMRPConfig(const Optional<ReliableMessageProtocolConfig> & localMRPConfig)
 {
     auto oldConfig         = GetLocalMRPConfig();
-    sDynamicLocalMPRConfig = localMRPConfig.std_optional();
+    sDynamicLocalMPRConfig = localMRPConfig;
     return oldConfig != GetLocalMRPConfig();
 }
 #endif // CHIP_DEVICE_CONFIG_ENABLE_DYNAMIC_MRP_CONFIG
@@ -95,9 +89,9 @@ Optional<ReliableMessageProtocolConfig> GetLocalMRPConfig()
     ReliableMessageProtocolConfig config(CHIP_CONFIG_MRP_LOCAL_IDLE_RETRY_INTERVAL, CHIP_CONFIG_MRP_LOCAL_ACTIVE_RETRY_INTERVAL);
 
 #if CHIP_DEVICE_CONFIG_ENABLE_DYNAMIC_MRP_CONFIG
-    if (sDynamicLocalMPRConfig.has_value())
+    if (sDynamicLocalMPRConfig.HasValue())
     {
-        config = sDynamicLocalMPRConfig.value();
+        config = sDynamicLocalMPRConfig.Value();
     }
 #endif // CHIP_DEVICE_CONFIG_ENABLE_DYNAMIC_MRP_CONFIG
 
@@ -111,19 +105,19 @@ Optional<ReliableMessageProtocolConfig> GetLocalMRPConfig()
 #endif
 
 #if CONFIG_BUILD_FOR_HOST_UNIT_TEST
-    if (gIdleRetransTimeoutOverride.has_value())
+    if (idleRetransTimeoutOverride.HasValue())
     {
-        config.mIdleRetransTimeout = gIdleRetransTimeoutOverride.value();
+        config.mIdleRetransTimeout = idleRetransTimeoutOverride.Value();
     }
 
-    if (gActiveRetransTimeoutOverride.has_value())
+    if (activeRetransTimeoutOverride.HasValue())
     {
-        config.mActiveRetransTimeout = gActiveRetransTimeoutOverride.value();
+        config.mActiveRetransTimeout = activeRetransTimeoutOverride.Value();
     }
 
-    if (gActiveThresholdTimeOverride.has_value())
+    if (activeThresholdTimeOverride.HasValue())
     {
-        config.mActiveThresholdTime = gActiveThresholdTimeOverride.value();
+        config.mActiveThresholdTime = activeRetransTimeoutOverride.Value();
     }
 #endif
 

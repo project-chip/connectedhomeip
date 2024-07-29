@@ -21,9 +21,9 @@
 
 #include <app/AttributeValueDecoder.h>
 #include <app/AttributeValueEncoder.h>
+#include <app/CommandHandler.h>
 
 #include <app/data-model-interface/Context.h>
-#include <app/data-model-interface/InvokeResponder.h>
 #include <app/data-model-interface/MetadataTypes.h>
 #include <app/data-model-interface/OperationTypes.h>
 
@@ -99,25 +99,9 @@ public:
     ///         - `NeedsTimedInteraction` for writes that are not timed however are required to be so
     virtual CHIP_ERROR WriteAttribute(const WriteAttributeRequest & request, AttributeValueDecoder & decoder) = 0;
 
-    /// `reply` is used to send back the reply.
-    ///    - calling Reply() or ReplyAsync() will let the application control the reply
-    ///    - returning a CHIP_NO_ERROR without reply/reply_async implies a Status::Success reply without data
+    /// `handler` is used to send back the reply.
     ///    - returning a value other than CHIP_NO_ERROR implies an error reply (error and data are mutually exclusive)
-    ///
-    /// See InvokeReply/AutoCompleteInvokeResponder for details on how to send back replies and expected
-    /// error handling. If you need to know weather a response was successfully sent, use the underlying
-    /// `reply` object instead of returning an error code from Invoke.
-    ///
-    /// Return codes
-    ///   CHIP_IM_GLOBAL_STATUS(code):
-    ///       - error codes that are translatable to specific IM codes
-    ///       - in particular, the following codes are interesting/expected
-    ///         - `UnsupportedEndpoint` for invalid endpoint
-    ///         - `UnsupportedCluster` for no such cluster on the endpoint
-    ///         - `UnsupportedCommand` for no such command in the cluster
-    ///         - `UnsupportedAccess` for permission errors (ACL or fabric scoped with invalid fabric)
-    ///         - `NeedsTimedInteraction` if the invoke requires timed interaction support
-    virtual CHIP_ERROR Invoke(const InvokeRequest & request, chip::TLV::TLVReader & input_arguments, InvokeReply & reply) = 0;
+    virtual CHIP_ERROR Invoke(const InvokeRequest & request, chip::TLV::TLVReader & input_arguments, CommandHandler * handler) = 0;
 
 private:
     InteractionModelContext mContext = { nullptr };

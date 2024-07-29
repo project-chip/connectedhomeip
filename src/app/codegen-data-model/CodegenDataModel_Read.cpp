@@ -121,8 +121,8 @@ static_assert(sizeof(LongPascalString::LengthType) == 2);
 /// Given a ByteSpan containing data from ember, interpret it
 /// as a span of type OUT (i.e. ByteSpan or CharSpan) given a ENCODING
 /// where ENCODING is Short or Long pascal strings.
-template <class OUT, class ENCODING>
-std::optional<OUT> ExtractEmberString(ByteSpan data)
+template <class OUT_TYPE, class ENCODING>
+std::optional<OUT_TYPE> ExtractEmberString(ByteSpan data)
 {
     constexpr size_t kLengthTypeSize = sizeof(typename ENCODING::LengthType);
     VerifyOrDie(kLengthTypeSize <= data.size());
@@ -134,7 +134,7 @@ std::optional<OUT> ExtractEmberString(ByteSpan data)
     }
 
     VerifyOrDie(len + sizeof(len) <= data.size());
-    return std::make_optional<OUT>(reinterpret_cast<typename OUT::pointer>(data.data() + kLengthTypeSize), len);
+    return std::make_optional<OUT_TYPE>(reinterpret_cast<typename OUT_TYPE::pointer>(data.data() + kLengthTypeSize), len);
 }
 
 /// Encode a value inside `encoder`

@@ -149,6 +149,9 @@ public:
             (!mEndpointId.HasValue() || !aOther.mEndpointId.HasValue() || mEndpointId.Value() == aOther.mEndpointId.Value());
     }
 
+protected:
+    Optional<EndpointId> GetEndpointId() { return mEndpointId; }
+
 private:
     Optional<EndpointId> mEndpointId;
     ClusterId mClusterId;

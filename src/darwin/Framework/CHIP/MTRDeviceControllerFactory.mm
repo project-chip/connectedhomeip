@@ -889,11 +889,10 @@ MTR_DIRECT_MEMBERS
     // If we're not advertising, then there's no need to reset anything.
     VerifyOrReturn(_advertiseOperational);
 
-    // If there are no running controllers there will be no advertisements to reset.
-    {
-        std::lock_guard lock(_controllersLock);
-        VerifyOrReturn(_controllers.count > 0);
-    }
+    // Ensure the stack is running. We can't look at _controllers to determine this
+    // reliably because it gets updated early during controller startup from off-queue.
+    auto systemState = _controllerFactory->GetSystemState();
+    VerifyOrReturn(systemState != nullptr && !systemState->IsShutDown());
 
     // StartServer() is the only API we have for resetting DNS-SD advertising.
     // It sure would be nice if there were a "restart" that was a no-op if the

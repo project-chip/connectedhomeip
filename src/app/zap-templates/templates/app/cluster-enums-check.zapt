@@ -9,40 +9,17 @@ namespace app {
 namespace Clusters {
 {{#zcl_enums}}
 {{#if has_more_than_one_cluster}}
-{{#unless (isInConfigList (concat "::" label) "EnumsNotUsedAsTypeInXML")}}
-static auto __attribute__((unused)) EnsureKnownEnumValue(detail::{{asType label}} val)
-{
-    using EnumType = detail::{{asType label}};
-    switch (val) {
-    {{#zcl_enum_items}}
-    case EnumType::k{{asUpperCamelCase label}}:
-    {{/zcl_enum_items}}
-        return val;
-    default:
-        return EnumType::kUnknownEnumValue;
-    }
-}
-{{/unless}}
+{{> cluster_enums_ensure_known_value ns="detail"}}
+{{else if has_no_clusters}}
+{{> cluster_enums_ensure_known_value ns="Globals"}}
+
 {{/if}}
 {{/zcl_enums}}
 
 {{#zcl_clusters}}
 {{#zcl_enums}}
 {{#unless has_more_than_one_cluster}}
-{{#unless (isInConfigList (concat (asUpperCamelCase ../name) "::" label) "EnumsNotUsedAsTypeInXML")}}
-static auto __attribute__((unused)) EnsureKnownEnumValue({{asUpperCamelCase ../name}}::{{asType label}} val)
-{
-    using EnumType = {{asUpperCamelCase ../name}}::{{asType label}};
-    switch (val) {
-    {{#zcl_enum_items}}
-    case EnumType::k{{asUpperCamelCase label}}:
-    {{/zcl_enum_items}}
-        return val;
-    default:
-        return EnumType::kUnknownEnumValue;
-    }
-}
-{{/unless}}
+{{> cluster_enums_ensure_known_value ns=(asUpperCamelCase ../name)}}
 {{/unless}}
 {{/zcl_enums}}
 

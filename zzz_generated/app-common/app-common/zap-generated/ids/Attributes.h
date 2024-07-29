@@ -2364,6 +2364,10 @@ namespace OperatingMode {
 static constexpr AttributeId Id = 0x00000008;
 } // namespace OperatingMode
 
+namespace MaximumCheckInBackOff {
+static constexpr AttributeId Id = 0x00000009;
+} // namespace MaximumCheckInBackOff
+
 namespace GeneratedCommandList {
 static constexpr AttributeId Id = Globals::Attributes::GeneratedCommandList::Id;
 } // namespace GeneratedCommandList
@@ -3801,6 +3805,60 @@ static constexpr AttributeId Id = Globals::Attributes::ClusterRevision::Id;
 } // namespace Attributes
 } // namespace ElectricalEnergyMeasurement
 
+namespace WaterHeaterManagement {
+namespace Attributes {
+
+namespace HeaterTypes {
+static constexpr AttributeId Id = 0x00000000;
+} // namespace HeaterTypes
+
+namespace HeatDemand {
+static constexpr AttributeId Id = 0x00000001;
+} // namespace HeatDemand
+
+namespace TankVolume {
+static constexpr AttributeId Id = 0x00000002;
+} // namespace TankVolume
+
+namespace EstimatedHeatRequired {
+static constexpr AttributeId Id = 0x00000003;
+} // namespace EstimatedHeatRequired
+
+namespace TankPercentage {
+static constexpr AttributeId Id = 0x00000004;
+} // namespace TankPercentage
+
+namespace BoostState {
+static constexpr AttributeId Id = 0x00000005;
+} // namespace BoostState
+
+namespace GeneratedCommandList {
+static constexpr AttributeId Id = Globals::Attributes::GeneratedCommandList::Id;
+} // namespace GeneratedCommandList
+
+namespace AcceptedCommandList {
+static constexpr AttributeId Id = Globals::Attributes::AcceptedCommandList::Id;
+} // namespace AcceptedCommandList
+
+namespace EventList {
+static constexpr AttributeId Id = Globals::Attributes::EventList::Id;
+} // namespace EventList
+
+namespace AttributeList {
+static constexpr AttributeId Id = Globals::Attributes::AttributeList::Id;
+} // namespace AttributeList
+
+namespace FeatureMap {
+static constexpr AttributeId Id = Globals::Attributes::FeatureMap::Id;
+} // namespace FeatureMap
+
+namespace ClusterRevision {
+static constexpr AttributeId Id = Globals::Attributes::ClusterRevision::Id;
+} // namespace ClusterRevision
+
+} // namespace Attributes
+} // namespace WaterHeaterManagement
+
 namespace DemandResponseLoadControl {
 namespace Attributes {
 
@@ -4218,6 +4276,52 @@ static constexpr AttributeId Id = Globals::Attributes::ClusterRevision::Id;
 
 } // namespace Attributes
 } // namespace EnergyEvseMode
+
+namespace WaterHeaterMode {
+namespace Attributes {
+
+namespace SupportedModes {
+static constexpr AttributeId Id = 0x00000000;
+} // namespace SupportedModes
+
+namespace CurrentMode {
+static constexpr AttributeId Id = 0x00000001;
+} // namespace CurrentMode
+
+namespace StartUpMode {
+static constexpr AttributeId Id = 0x00000002;
+} // namespace StartUpMode
+
+namespace OnMode {
+static constexpr AttributeId Id = 0x00000003;
+} // namespace OnMode
+
+namespace GeneratedCommandList {
+static constexpr AttributeId Id = Globals::Attributes::GeneratedCommandList::Id;
+} // namespace GeneratedCommandList
+
+namespace AcceptedCommandList {
+static constexpr AttributeId Id = Globals::Attributes::AcceptedCommandList::Id;
+} // namespace AcceptedCommandList
+
+namespace EventList {
+static constexpr AttributeId Id = Globals::Attributes::EventList::Id;
+} // namespace EventList
+
+namespace AttributeList {
+static constexpr AttributeId Id = Globals::Attributes::AttributeList::Id;
+} // namespace AttributeList
+
+namespace FeatureMap {
+static constexpr AttributeId Id = Globals::Attributes::FeatureMap::Id;
+} // namespace FeatureMap
+
+namespace ClusterRevision {
+static constexpr AttributeId Id = Globals::Attributes::ClusterRevision::Id;
+} // namespace ClusterRevision
+
+} // namespace Attributes
+} // namespace WaterHeaterMode
 
 namespace DeviceEnergyManagementMode {
 namespace Attributes {
@@ -5089,10 +5193,6 @@ static constexpr AttributeId Id = 0x00000053;
 namespace SetpointHoldExpiryTimestamp {
 static constexpr AttributeId Id = 0x00000054;
 } // namespace SetpointHoldExpiryTimestamp
-
-namespace QueuedPreset {
-static constexpr AttributeId Id = 0x00000055;
-} // namespace QueuedPreset
 
 namespace GeneratedCommandList {
 static constexpr AttributeId Id = Globals::Attributes::GeneratedCommandList::Id;
@@ -6699,7 +6799,7 @@ static constexpr AttributeId Id = 0x00000003;
 } // namespace InterfaceEnabled
 
 namespace ActiveDatasetTimestamp {
-static constexpr AttributeId Id = 0x00000005;
+static constexpr AttributeId Id = 0x00000004;
 } // namespace ActiveDatasetTimestamp
 
 namespace GeneratedCommandList {
@@ -7358,6 +7458,82 @@ static constexpr AttributeId Id = Globals::Attributes::ClusterRevision::Id;
 
 } // namespace Attributes
 } // namespace ContentAppObserver
+
+namespace EcosystemInformation {
+namespace Attributes {
+
+namespace RemovedOn {
+static constexpr AttributeId Id = 0x00000000;
+} // namespace RemovedOn
+
+namespace DeviceDirectory {
+static constexpr AttributeId Id = 0x00000001;
+} // namespace DeviceDirectory
+
+namespace LocationDirectory {
+static constexpr AttributeId Id = 0x00000002;
+} // namespace LocationDirectory
+
+namespace GeneratedCommandList {
+static constexpr AttributeId Id = Globals::Attributes::GeneratedCommandList::Id;
+} // namespace GeneratedCommandList
+
+namespace AcceptedCommandList {
+static constexpr AttributeId Id = Globals::Attributes::AcceptedCommandList::Id;
+} // namespace AcceptedCommandList
+
+namespace EventList {
+static constexpr AttributeId Id = Globals::Attributes::EventList::Id;
+} // namespace EventList
+
+namespace AttributeList {
+static constexpr AttributeId Id = Globals::Attributes::AttributeList::Id;
+} // namespace AttributeList
+
+namespace FeatureMap {
+static constexpr AttributeId Id = Globals::Attributes::FeatureMap::Id;
+} // namespace FeatureMap
+
+namespace ClusterRevision {
+static constexpr AttributeId Id = Globals::Attributes::ClusterRevision::Id;
+} // namespace ClusterRevision
+
+} // namespace Attributes
+} // namespace EcosystemInformation
+
+namespace CommissionerControl {
+namespace Attributes {
+
+namespace SupportedDeviceCategories {
+static constexpr AttributeId Id = 0x00000000;
+} // namespace SupportedDeviceCategories
+
+namespace GeneratedCommandList {
+static constexpr AttributeId Id = Globals::Attributes::GeneratedCommandList::Id;
+} // namespace GeneratedCommandList
+
+namespace AcceptedCommandList {
+static constexpr AttributeId Id = Globals::Attributes::AcceptedCommandList::Id;
+} // namespace AcceptedCommandList
+
+namespace EventList {
+static constexpr AttributeId Id = Globals::Attributes::EventList::Id;
+} // namespace EventList
+
+namespace AttributeList {
+static constexpr AttributeId Id = Globals::Attributes::AttributeList::Id;
+} // namespace AttributeList
+
+namespace FeatureMap {
+static constexpr AttributeId Id = Globals::Attributes::FeatureMap::Id;
+} // namespace FeatureMap
+
+namespace ClusterRevision {
+static constexpr AttributeId Id = Globals::Attributes::ClusterRevision::Id;
+} // namespace ClusterRevision
+
+} // namespace Attributes
+} // namespace CommissionerControl
 
 namespace ElectricalMeasurement {
 namespace Attributes {

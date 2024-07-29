@@ -28,6 +28,8 @@ from chip import ChipStack, FabricAdmin
 from chip.native import PyChipError
 from chip.storage import PersistentStorage
 
+LOGGER = logging.getLogger(__name__)
+
 
 class CertificateAuthority:
     '''  This represents an operational Root Certificate Authority (CA) with a root key key pair with associated
@@ -64,7 +66,7 @@ class CertificateAuthority:
                 persistentStorage:  An optional reference to a PersistentStorage object. If one is provided, it will pick that over
                                     the default PersistentStorage object retrieved from the chipStack.
         '''
-        self.logger().warning(f"New CertificateAuthority at index {caIndex}")
+        LOGGER.info(f"New CertificateAuthority at index {caIndex}")
 
         self._chipStack = chipStack
         self._caIndex = caIndex
@@ -105,7 +107,7 @@ class CertificateAuthority:
         if (not (self._isActive)):
             raise RuntimeError("Object isn't active")
 
-        self.logger().warning("Loading fabric admins from storage...")
+        LOGGER.info("Loading fabric admins from storage...")
 
         caList = self._persistentStorage.GetReplKey(key='caList')
         if (str(self._caIndex) not in caList):
@@ -244,7 +246,7 @@ class CertificateAuthorityManager:
         if (not (self._isActive)):
             raise RuntimeError("Object is not active")
 
-        self.logger().warning("Loading certificate authorities from storage...")
+        LOGGER.info("Loading certificate authorities from storage...")
 
         #
         # Persist details to storage (read modify write).

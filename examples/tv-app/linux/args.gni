@@ -31,6 +31,8 @@ chip_enable_additional_data_advertising = true
 chip_enable_rotating_device_id = true
 
 matter_enable_tracing_support = true
+matter_log_json_payload_hex = true
+matter_log_json_payload_decode_full = true
 
 # Thread devices do not support WakeOnLan because their mac address is >48bit
 chip_enable_openthread = false
