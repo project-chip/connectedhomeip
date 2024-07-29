@@ -15,8 +15,6 @@
 #    limitations under the License.
 #
 
-import logging
-
 import chip.clusters as Clusters
 from chip.clusters.Types import NullValue
 from chip.interaction_model import Status
@@ -119,10 +117,6 @@ class TC_ECOINFO_2_1(MatterBaseTest):
                                         "UniqueLocationIdsLastEdit should be a uint")
                     if num_of_unique_location_ids:
                         asserts.assert_greater(device.uniqueLocationIDsLastEdit, 0, "UniqueLocationIdsLastEdit must be non-zero")
-                    else:
-                        # TODO double check this is actually a true thing to be asserting.
-                        asserts.assert_equal(device.uniqueLocationIDsLastEdit, 0,
-                                             "UniqueLocationIdsLastEdit must be 0 if there are no UniqueLocationIds")
             else:
                 asserts.assert_equal(num_of_devices, 0, "Device was removed, there should be no devices in DeviceDirectory")
 
