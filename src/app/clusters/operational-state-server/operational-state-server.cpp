@@ -20,9 +20,11 @@
  * @brief Implementation for the Operational State Server Cluster
  ***************************************************************************/
 #include "operational-state-server.h"
+
 #include <app-common/zap-generated/attributes/Accessors.h>
 #include <app-common/zap-generated/callback.h>
 #include <app/AttributeAccessInterfaceRegistry.h>
+#include <app/CommandHandlerInterfaceRegistry.h>
 #include <app/EventLogging.h>
 #include <app/InteractionModelEngine.h>
 #include <app/reporting/reporting.h>
@@ -47,7 +49,7 @@ Instance::Instance(Delegate * aDelegate, EndpointId aEndpointId) : Instance(aDel
 
 Instance::~Instance()
 {
-    InteractionModelEngine::GetInstance()->UnregisterCommandHandler(this);
+    CommandHandlerInterfaceRegistry::UnregisterCommandHandler(this);
     unregisterAttributeAccessOverride(this);
 }
 
@@ -60,7 +62,7 @@ CHIP_ERROR Instance::Init()
         return CHIP_ERROR_INVALID_ARGUMENT;
     }
 
-    ReturnErrorOnFailure(InteractionModelEngine::GetInstance()->RegisterCommandHandler(this));
+    ReturnErrorOnFailure(CommandHandlerInterfaceRegistry::RegisterCommandHandler(this));
 
     VerifyOrReturnError(registerAttributeAccessOverride(this), CHIP_ERROR_INCORRECT_STATE);
 

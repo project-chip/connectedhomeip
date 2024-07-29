@@ -1069,6 +1069,11 @@ void Command::ResetArguments()
                 auto vectorArgument = static_cast<std::vector<uint32_t> *>(arg.value);
                 vectorArgument->clear();
             }
+            else if (type == ArgumentType::Custom)
+            {
+                auto argument = static_cast<CustomArgument *>(arg.value);
+                argument->Reset();
+            }
             else if (type == ArgumentType::VectorCustom)
             {
                 auto vectorArgument = static_cast<std::vector<CustomArgument *> *>(arg.value);

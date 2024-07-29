@@ -32,6 +32,7 @@
 #include <app/reporting/Engine.h>
 #include <app/reporting/tests/MockReportScheduler.h>
 #include <app/tests/AppTestContext.h>
+#include <app/tests/test-interaction-model-api.h>
 #include <lib/core/CHIPCore.h>
 #include <lib/core/ErrorStr.h>
 #include <lib/core/StringBuilderAdapters.h>
@@ -55,6 +56,18 @@ namespace reporting {
 class TestReportingEngine : public chip::Test::AppContext
 {
 public:
+    void SetUp() override
+    {
+        chip::Test::AppContext::SetUp();
+        mOldModel = InteractionModelEngine::GetInstance()->SetDataModel(&TestImCustomDataModel::Instance());
+    }
+
+    void TearDown() override
+    {
+        InteractionModelEngine::GetInstance()->SetDataModel(mOldModel);
+        chip::Test::AppContext::TearDown();
+    }
+
     template <typename... Args>
     static bool VerifyDirtySetContent(const Args &... args);
     static bool InsertToDirtySet(const AttributePathParams & aPath);
@@ -64,6 +77,8 @@ public:
     void TestMergeAttributePathWhenDirtySetPoolExhausted();
 
 private:
+    chip::app::InteractionModel::DataModel * mOldModel = nullptr;
+
     struct ExpectedDirtySetContent : public AttributePathParams
     {
         ExpectedDirtySetContent(const AttributePathParams & path) : AttributePathParams(path) {}

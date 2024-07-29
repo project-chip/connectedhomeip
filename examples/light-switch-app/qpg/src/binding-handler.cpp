@@ -38,31 +38,120 @@ static void ProcessSwitchUnicastBindingCommand(CommandId commandId, const EmberB
         ChipLogError(NotSpecified, "Switch command failed: %" CHIP_ERROR_FORMAT, error.Format());
     };
 
-    switch (commandId)
+    switch (data->clusterId)
     {
-    case Clusters::OnOff::Commands::Toggle::Id:
-        Clusters::OnOff::Commands::Toggle::Type toggleCommand;
-        Controller::InvokeCommandRequest(exchangeMgr, sessionHandle, binding.remote, toggleCommand, onSuccess, onFailure);
+    case Clusters::OnOff::Id:
+        switch (commandId)
+        {
+        case Clusters::OnOff::Commands::Toggle::Id:
+            Clusters::OnOff::Commands::Toggle::Type toggleCommand;
+            Controller::InvokeCommandRequest(exchangeMgr, sessionHandle, binding.remote, toggleCommand, onSuccess, onFailure);
+            break;
+        case Clusters::OnOff::Commands::On::Id:
+            Clusters::OnOff::Commands::On::Type onCommand;
+            Controller::InvokeCommandRequest(exchangeMgr, sessionHandle, binding.remote, onCommand, onSuccess, onFailure);
+            break;
+
+        case Clusters::OnOff::Commands::Off::Id:
+            Clusters::OnOff::Commands::Off::Type offCommand;
+            Controller::InvokeCommandRequest(exchangeMgr, sessionHandle, binding.remote, offCommand, onSuccess, onFailure);
+            break;
+        default:
+            ChipLogError(NotSpecified, "Unsupported Command Id");
+            break;
+        }
         break;
 
-    case Clusters::LevelControl::Commands::MoveToLevel::Id: {
-        Clusters::LevelControl::Commands::MoveToLevel::Type moveToLevelCommand;
-        moveToLevelCommand.level = data->level;
-        Controller::InvokeCommandRequest(exchangeMgr, sessionHandle, binding.remote, moveToLevelCommand, onSuccess, onFailure);
-    }
-    break;
-    case Clusters::ColorControl::Commands::MoveToColor::Id: {
+    case Clusters::LevelControl::Id:
+        if (commandId == Clusters::LevelControl::Commands::MoveToLevel::Id)
+        {
+            Clusters::LevelControl::Commands::MoveToLevel::Type moveToLevelCommand;
+            moveToLevelCommand.level = data->level;
+            Controller::InvokeCommandRequest(exchangeMgr, sessionHandle, binding.remote, moveToLevelCommand, onSuccess, onFailure);
+        }
+        else
+        {
+            ChipLogError(NotSpecified, "Unsupported Command Id");
+        }
+        break;
 
-        Clusters::ColorControl::Commands::MoveToColor::Type moveToColorCommand;
-
-        moveToColorCommand.colorX = data->colorXY.x;
-        moveToColorCommand.colorY = data->colorXY.y;
-        Controller::InvokeCommandRequest(exchangeMgr, sessionHandle, binding.remote, moveToColorCommand, onSuccess, onFailure);
-    }
-    break;
+    case Clusters::ColorControl::Id:
+        if (commandId == Clusters::ColorControl::Commands::MoveToColor::Id)
+        {
+            Clusters::ColorControl::Commands::MoveToColor::Type moveToColorCommand;
+            moveToColorCommand.colorX = data->colorXY.x;
+            moveToColorCommand.colorY = data->colorXY.y;
+            Controller::InvokeCommandRequest(exchangeMgr, sessionHandle, binding.remote, moveToColorCommand, onSuccess, onFailure);
+        }
+        else
+        {
+            ChipLogError(NotSpecified, "Unsupported Command Id");
+        }
+        break;
 
     default:
-        ChipLogError(NotSpecified, "Unsupported Command Id");
+        ChipLogError(NotSpecified, "Unsupported Cluster Id");
+        break;
+    }
+}
+
+static void ProcessSwitchGroupBindingCommand(CommandId commandId, const EmberBindingTableEntry & binding, BindingCommandData * data)
+{
+    Messaging::ExchangeManager & exchangeMgr = Server::GetInstance().GetExchangeManager();
+
+    switch (data->clusterId)
+    {
+    case Clusters::OnOff::Id:
+        switch (commandId)
+        {
+        case Clusters::OnOff::Commands::Toggle::Id:
+            Clusters::OnOff::Commands::Toggle::Type toggleCommand;
+            Controller::InvokeGroupCommandRequest(&exchangeMgr, binding.fabricIndex, binding.groupId, toggleCommand);
+            break;
+        case Clusters::OnOff::Commands::On::Id:
+            Clusters::OnOff::Commands::On::Type onCommand;
+            Controller::InvokeGroupCommandRequest(&exchangeMgr, binding.fabricIndex, binding.groupId, onCommand);
+
+            break;
+        case Clusters::OnOff::Commands::Off::Id:
+            Clusters::OnOff::Commands::Off::Type offCommand;
+            Controller::InvokeGroupCommandRequest(&exchangeMgr, binding.fabricIndex, binding.groupId, offCommand);
+            break;
+        default:
+            ChipLogError(NotSpecified, "Unsupported Command Id");
+            break;
+        }
+        break;
+
+    case Clusters::LevelControl::Id:
+        if (commandId == Clusters::LevelControl::Commands::MoveToLevel::Id)
+        {
+            Clusters::LevelControl::Commands::MoveToLevel::Type moveToLevelCommand;
+            moveToLevelCommand.level = data->level;
+            Controller::InvokeGroupCommandRequest(&exchangeMgr, binding.fabricIndex, binding.groupId, moveToLevelCommand);
+        }
+        else
+        {
+            ChipLogError(NotSpecified, "Unsupported Command Id");
+        }
+        break;
+
+    case Clusters::ColorControl::Id:
+        if (commandId == Clusters::ColorControl::Commands::MoveToColor::Id)
+        {
+            Clusters::ColorControl::Commands::MoveToColor::Type moveToColorCommand;
+            moveToColorCommand.colorX = data->colorXY.x;
+            moveToColorCommand.colorY = data->colorXY.y;
+            Controller::InvokeGroupCommandRequest(&exchangeMgr, binding.fabricIndex, binding.groupId, moveToColorCommand);
+        }
+        else
+        {
+            ChipLogError(NotSpecified, "Unsupported Command Id");
+        }
+        break;
+
+    default:
+        ChipLogError(NotSpecified, "Unsupported Cluster Id");
         break;
     }
 }
@@ -70,10 +159,20 @@ static void ProcessSwitchUnicastBindingCommand(CommandId commandId, const EmberB
 static void LightSwitchChangedHandler(const EmberBindingTableEntry & binding, OperationalDeviceProxy * peer_device, void * context)
 {
     VerifyOrReturn(context != nullptr, ChipLogError(NotSpecified, "nullptr pointer passed"));
-
     BindingCommandData * data = static_cast<BindingCommandData *>(context);
 
-    if (binding.type == MATTER_UNICAST_BINDING)
+    if (binding.type == MATTER_MULTICAST_BINDING && data->isGroup)
+    {
+        switch (data->clusterId)
+        {
+        case Clusters::OnOff::Id:
+        case Clusters::LevelControl::Id:
+        case Clusters::ColorControl::Id:
+            ProcessSwitchGroupBindingCommand(data->commandId, binding, data);
+            break;
+        }
+    }
+    else if (binding.type == MATTER_UNICAST_BINDING && !data->isGroup)
     {
         switch (data->clusterId)
         {

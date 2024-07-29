@@ -18,6 +18,7 @@
 
 #include <app/AttributeAccessInterface.h>
 #include <app/AttributeAccessInterfaceRegistry.h>
+#include <app/CommandHandlerInterfaceRegistry.h>
 #include <app/ConcreteAttributePath.h>
 #include <app/InteractionModelEngine.h>
 #include <app/util/attribute-storage.h>
@@ -37,7 +38,7 @@ namespace DeviceEnergyManagement {
 
 CHIP_ERROR Instance::Init()
 {
-    ReturnErrorOnFailure(InteractionModelEngine::GetInstance()->RegisterCommandHandler(this));
+    ReturnErrorOnFailure(CommandHandlerInterfaceRegistry::RegisterCommandHandler(this));
     VerifyOrReturnError(registerAttributeAccessOverride(this), CHIP_ERROR_INCORRECT_STATE);
 
     return CHIP_NO_ERROR;
@@ -45,7 +46,7 @@ CHIP_ERROR Instance::Init()
 
 void Instance::Shutdown()
 {
-    InteractionModelEngine::GetInstance()->UnregisterCommandHandler(this);
+    CommandHandlerInterfaceRegistry::UnregisterCommandHandler(this);
     unregisterAttributeAccessOverride(this);
 }
 
@@ -581,7 +582,7 @@ void Instance::HandlePauseRequest(HandlerContext & ctx, const Commands::PauseReq
     if (!forecast.Value().slots[activeSlotNumber].slotIsPausable.Value())
     {
         ChipLogError(Zcl, "DEM: activeSlotNumber %d is NOT pausable.", activeSlotNumber);
-        ctx.mCommandHandler.AddStatus(ctx.mRequestPath, Status::ConstraintError);
+        ctx.mCommandHandler.AddStatus(ctx.mRequestPath, Status::Failure);
         return;
     }
 
@@ -606,6 +607,7 @@ void Instance::HandlePauseRequest(HandlerContext & ctx, const Commands::PauseReq
     if (status != Status::Success)
     {
         ChipLogError(Zcl, "DEM: PauseRequest(%ld) FAILURE", static_cast<long unsigned int>(duration));
+        ctx.mCommandHandler.AddStatus(ctx.mRequestPath, status);
         return;
     }
 }
@@ -622,7 +624,7 @@ void Instance::HandleResumeRequest(HandlerContext & ctx, const Commands::ResumeR
     if (ESAStateEnum::kPaused != mDelegate.GetESAState())
     {
         ChipLogError(Zcl, "DEM: ESAState not Paused.");
-        ctx.mCommandHandler.AddStatus(ctx.mRequestPath, Status::Failure);
+        ctx.mCommandHandler.AddStatus(ctx.mRequestPath, Status::InvalidInState);
         return;
     }
 
@@ -677,7 +679,7 @@ void Instance::HandleModifyForecastRequest(HandlerContext & ctx, const Commands:
         if (slotAdjustment.slotIndex > forecast.Value().slots.size())
         {
             ChipLogError(Zcl, "DEM: Bad slot index %d", slotAdjustment.slotIndex);
-            ctx.mCommandHandler.AddStatus(ctx.mRequestPath, Status::ConstraintError);
+            ctx.mCommandHandler.AddStatus(ctx.mRequestPath, Status::Failure);
             return;
         }
 
@@ -725,6 +727,7 @@ void Instance::HandleModifyForecastRequest(HandlerContext & ctx, const Commands:
     if (status != Status::Success)
     {
         ChipLogError(Zcl, "DEM: ModifyForecastRequest FAILURE");
+        ctx.mCommandHandler.AddStatus(ctx.mRequestPath, Status::Failure);
         return;
     }
 }

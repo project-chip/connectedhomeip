@@ -34,6 +34,7 @@ load "../src/app/zap-templates/zcl/data-model/chip/measurement-and-sensing.xml";
 load "../src/app/zap-templates/zcl/data-model/chip/microwave-oven-mode-cluster.xml";
 load "../src/app/zap-templates/zcl/data-model/chip/microwave-oven-control-cluster.xml";
 load "../src/app/zap-templates/zcl/data-model/chip/door-lock-cluster.xml";
+load "../src/app/zap-templates/zcl/data-model/chip/ecosystem-information-cluster.xml";
 load "../src/app/zap-templates/zcl/data-model/chip/energy-evse-cluster.xml";
 load "../src/app/zap-templates/zcl/data-model/chip/energy-evse-mode-cluster.xml";
 load "../src/app/zap-templates/zcl/data-model/chip/ethernet-network-diagnostics-cluster.xml";

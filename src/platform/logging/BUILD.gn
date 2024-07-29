@@ -79,7 +79,7 @@ source_set("default") {
     } else {
       assert(
           chip_device_platform == "fake" || chip_device_platform == "android" ||
-          chip_device_platform == "external")
+          chip_device_platform == "external" || chip_device_platform == "none")
     }
   }
 }

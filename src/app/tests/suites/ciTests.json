@@ -83,7 +83,8 @@
         "Test_TC_LVL_4_1",
         "Test_TC_LVL_5_1",
         "Test_TC_LVL_6_1",
-        "Test_TC_LVL_7_1"
+        "Test_TC_LVL_7_1",
+        "Test_TC_LVL_9_1"
     ],
     "LocalizationConfiguration": [],
     "TimeFormatLocalization": ["Test_TC_LTIME_1_2", "Test_TC_LTIME_3_1"],
@@ -144,7 +145,12 @@
     "ModeSelect": [],
     "MultipleFabrics": [],
     "OTASoftwareUpdate": ["OTA_SuccessfulTransfer"],
-    "OnOff": ["Test_TC_OO_2_1", "Test_TC_OO_2_2", "Test_TC_OO_2_4"],
+    "OnOff": [
+        "Test_TC_OO_2_1",
+        "Test_TC_OO_2_2",
+        "Test_TC_OO_2_4",
+        "Test_TC_OO_2_7"
+    ],
     "PowerSource": ["Test_TC_PS_2_1"],
     "PowerTopology": ["Test_TC_PWRTL_1_1"],
     "PressureMeasurement": ["Test_TC_PRS_2_1", "Test_TC_PRS_2_2"],

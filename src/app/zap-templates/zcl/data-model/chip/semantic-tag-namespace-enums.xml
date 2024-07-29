@@ -44,6 +44,7 @@ TODO: Make these namespace enums global rather than defining them for each clust
 
   <enum name="AreaTypeTag" type="enum8">
     <cluster code="0x0150"/> <!-- Service Area Cluster -->
+    <cluster code="0x0750"/> <!-- Ecosystem Information Cluster -->
     <!-- TODO: add Basic Information Cluster code="0x0028" -->
 
     <item value="0x00" name="Aisle"/>

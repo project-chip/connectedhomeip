@@ -19,6 +19,7 @@
 
 #include <lib/core/CHIPCallback.h>
 #include <lib/core/CHIPError.h>
+#include <lib/core/DataModelTypes.h>
 #include <lib/core/NodeId.h>
 #include <lib/core/Optional.h>
 #include <lib/support/Span.h>
@@ -53,6 +54,13 @@ public:
         return static_cast<Derived &>(*this);
     }
 
+    EndpointId GetEndpointId() const { return mEndpointId; }
+    Derived & SetEndpointId(EndpointId endpointId)
+    {
+        mEndpointId = endpointId;
+        return static_cast<Derived &>(*this);
+    }
+
     System::Clock::Seconds16 GetTimeout() const { return mTimeout; }
     // The duration for which the commissioning window should remain open.
     Derived & SetTimeout(System::Clock::Seconds16 timeout)
@@ -82,6 +90,7 @@ public:
 
 private:
     NodeId mNodeId                    = kUndefinedNodeId;
+    EndpointId mEndpointId            = kRootEndpointId;               // Default endpoint for Administrator Commissioning Cluster
     System::Clock::Seconds16 mTimeout = System::Clock::Seconds16(300); // Defaulting
     uint32_t mIteration               = 1000;                          // Defaulting
     Optional<uint16_t> mDiscriminator = NullOptional; // Using optional type to avoid picking a sentinnel in valid range

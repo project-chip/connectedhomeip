@@ -21,8 +21,6 @@ get_filename_component(CHEF ${CMAKE_CURRENT_SOURCE_DIR}/../ REALPATH)
 
 include(${CHIP_ROOT}/config/nrfconnect/app/check-nrfconnect-version.cmake)
 
-get_filename_component(GEN_DIR ${CHEF}/out/${SAMPLE_NAME}/zap-generated REALPATH)
-
 set(CONF_FILE prj.conf)
 
 set(CMAKE_EXPORT_COMPILE_COMMANDS ON)
@@ -30,10 +28,6 @@ message(STATUS "Vendor ID " ${CONFIG_CHIP_DEVICE_VENDOR_ID})
 message(STATUS "Product ID " ${CONFIG_CHIP_DEVICE_PRODUCT_ID})
 message(STATUS "Product Name " ${CONFIG_CHIP_DEVICE_PRODUCT_NAME})
 message(STATUS "SW Version String" ${CONFIG_CHIP_DEVICE_SOFTWARE_VERSION_STRING})
-
-# Set Kconfig root files that will be processed as a first Kconfig for used child images.
-set(mcuboot_KCONFIG_ROOT ${CHIP_ROOT}/config/nrfconnect/chip-module/Kconfig.mcuboot.root)
-set(multiprotocol_rpmsg_KCONFIG_ROOT ${CHIP_ROOT}/config/nrfconnect/chip-module/Kconfig.multiprotocol_rpmsg.root)
 
 list(APPEND ZEPHYR_EXTRA_MODULES ${CHIP_ROOT}/config/nrfconnect/chip-module)
 
@@ -43,8 +37,11 @@ endif()
 
 find_package(Zephyr HINTS $ENV{ZEPHYR_BASE})
 
+get_filename_component(GEN_DIR ${CHEF}/out/${CONFIG_CHEF_DEVICE_TYPE}/zap-generated REALPATH)
+
 project(chip-nrfconnect-chef-example)
 
+include(${CHIP_ROOT}/config/nrfconnect/app/check-sysbuild-use.cmake)
 include(${CHIP_ROOT}/config/nrfconnect/app/enable-gnu-std.cmake)
 include(${CHIP_ROOT}/src/app/chip_data_model.cmake)
 
@@ -107,10 +104,10 @@ target_sources(app PRIVATE
     ${CHEF}/nrfconnect/main.cpp
 )
 
-message(STATUS ${CHEF}/devices/${SAMPLE_NAME}.zap)
+message(STATUS ${CHEF}/devices/${CONFIG_CHEF_DEVICE_TYPE}.zap)
 chip_configure_data_model(app
     INCLUDE_SERVER
-    ZAP_FILE ${CHEF}/devices/${SAMPLE_NAME}.zap
+    ZAP_FILE ${CHEF}/devices/${CONFIG_CHEF_DEVICE_TYPE}.zap
 )
 
 include(${CHIP_ROOT}/config/nrfconnect/app/flashing.cmake)

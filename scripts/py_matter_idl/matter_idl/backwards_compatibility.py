@@ -318,6 +318,12 @@ class CompatibilityChecker:
 
         self._check_cluster_list_compatible(
             self._original_idl.clusters, self._updated_idl.clusters)
+        self._check_enum_list_compatible(
+            "", self._original_idl.global_enums, self._updated_idl.global_enums)
+        self._check_bitmap_list_compatible(
+            "", self._original_idl.global_bitmaps, self._updated_idl.global_bitmaps)
+        self._check_struct_list_compatible(
+            "", self._original_idl.global_structs, self._updated_idl.global_structs)
 
         return self.compatible
 

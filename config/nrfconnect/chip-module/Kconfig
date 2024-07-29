@@ -34,15 +34,6 @@ config CHIP_NRF_PLATFORM
 config CHIP_DEVICE_VENDOR_NAME
 	default "Nordic Semiconductor ASA"
 
-config CHIP_APP_LOG_LEVEL
-	int "Logging level in application"
-	default LOG_DEFAULT_LEVEL
-	depends on LOG
-	help
-	  Sets the logging level in the Matter application. Use this configuration
-	  option only within the application. To set the logging level for the
-	  Matter stack, use the MATTER_LOG_LEVEL configuration option.
-
 config CHIP_NFC_COMMISSIONING
 	bool "Share onboarding payload in NFC tag"
 	default n
@@ -305,5 +296,10 @@ config CHIP_PERSISTENT_SUBSCRIPTIONS
 	default n
 	# selecting experimental for this feature since there is an issue with multiple controllers.
 	select EXPERIMENTAL
+
+config CHIP_ENABLE_BDX_LOG_TRANSFER
+	bool "Enable BDX transfer for diagnostic logs"
+	help
+	  Enables the BDX protocol for diagnostics log transfer purposes.
 
 endif # CHIP

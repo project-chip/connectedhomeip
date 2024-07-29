@@ -28,6 +28,7 @@
 #include <app/util/attribute-storage.h>
 #include <platform/PlatformManager.h>
 
+#include "ButtonEventsSimulator.h"
 #include <air-quality-instance.h>
 #include <dishwasher-mode.h>
 #include <laundry-washer-mode.h>
@@ -36,12 +37,154 @@
 #include <oven-operational-state-delegate.h>
 #include <rvc-modes.h>
 
+#include <memory>
 #include <string>
+#include <utility>
 
 using namespace chip;
 using namespace chip::app;
 using namespace chip::app::Clusters;
 using namespace chip::DeviceLayer;
+
+namespace {
+
+std::unique_ptr<ButtonEventsSimulator> sButtonSimulatorInstance{ nullptr };
+
+bool HasNumericField(Json::Value & jsonValue, const std::string & field)
+{
+    return jsonValue.isMember(field) && jsonValue[field].isNumeric();
+}
+
+/**
+ * Named pipe handler for simulated long press on an action switch.
+ *
+ * Usage example:
+ *   echo '{"Name": "SimulateActionSwitchLongPress", "EndpointId": 3, "ButtonId": 1, "LongPressDelayMillis": 800,
+ * "LongPressDurationMillis": 1000}' > /tmp/chip_all_clusters_fifo_1146610
+ *
+ * JSON Arguments:
+ *   - "Name": Must be "SimulateActionSwitchLongPress"
+ *   - "EndpointId": number of endpoint having a switch cluster
+ *   - "ButtonId": switch position in the switch cluster for "down" button (not idle)
+ *   - "LongPressDelayMillis": Time in milliseconds before the LongPress
+ *   - "LongPressDurationMillis": Total duration in milliseconds from start of the press to LongRelease
+ *
+ * @param jsonValue - JSON payload from named pipe
+ */
+void HandleSimulateActionSwitchLongPress(Json::Value & jsonValue)
+{
+    if (sButtonSimulatorInstance != nullptr)
+    {
+        ChipLogError(NotSpecified, "Button simulation already in progress! Ignoring request.");
+        return;
+    }
+
+    bool hasEndpointId              = HasNumericField(jsonValue, "EndpointId");
+    bool hasButtonId                = HasNumericField(jsonValue, "ButtonId");
+    bool hasLongPressDelayMillis    = HasNumericField(jsonValue, "LongPressDelayMillis");
+    bool hasLongPressDurationMillis = HasNumericField(jsonValue, "LongPressDurationMillis");
+    if (!hasEndpointId || !hasButtonId || !hasLongPressDelayMillis || !hasLongPressDurationMillis)
+    {
+        std::string inputJson = jsonValue.toStyledString();
+        ChipLogError(
+            NotSpecified,
+            "Missing or invalid value for one of EndpointId, ButtonId, LongPressDelayMillis or LongPressDurationMillis in %s",
+            inputJson.c_str());
+        return;
+    }
+
+    EndpointId endpointId = static_cast<EndpointId>(jsonValue["EndpointId"].asUInt());
+    uint8_t buttonId      = static_cast<uint8_t>(jsonValue["ButtonId"].asUInt());
+    System::Clock::Milliseconds32 longPressDelayMillis{ static_cast<unsigned>(jsonValue["LongPressDelayMillis"].asUInt()) };
+    System::Clock::Milliseconds32 longPressDurationMillis{ static_cast<unsigned>(jsonValue["LongPressDurationMillis"].asUInt()) };
+    auto buttonSimulator = std::make_unique<ButtonEventsSimulator>();
+
+    bool success = buttonSimulator->SetMode(ButtonEventsSimulator::Mode::kModeLongPress)
+                       .SetLongPressDelayMillis(longPressDelayMillis)
+                       .SetLongPressDurationMillis(longPressDurationMillis)
+                       .SetIdleButtonId(0)
+                       .SetPressedButtonId(buttonId)
+                       .SetEndpointId(endpointId)
+                       .Execute([]() { sButtonSimulatorInstance.reset(); });
+
+    if (!success)
+    {
+        ChipLogError(NotSpecified, "Failed to start execution of button simulator!");
+        return;
+    }
+
+    sButtonSimulatorInstance = std::move(buttonSimulator);
+}
+
+/**
+ * Named pipe handler for simulated multi-press on an action switch.
+ *
+ * Usage example:
+ *   echo '{"Name": "SimulateActionSwitchMultiPress", "EndpointId": 3, "ButtonId": 1, "MultiPressPressedTimeMillis": 100,
+ * "MultiPressReleasedTimeMillis": 350, "MultiPressNumPresses": 2}' > /tmp/chip_all_clusters_fifo_1146610
+ *
+ * JSON Arguments:
+ *   - "Name": Must be "SimulateActionSwitchMultiPress"
+ *   - "EndpointId": number of endpoint having a switch cluster
+ *   - "ButtonId": switch position in the switch cluster for "down" button (not idle)
+ *   - "MultiPressPressedTimeMillis": Pressed time in milliseconds for each press
+ *   - "MultiPressReleasedTimeMillis": Released time in milliseconds after each press
+ *   - "MultiPressNumPresses": Number of presses to simulate
+ *
+ * @param jsonValue - JSON payload from named pipe
+ */
+void HandleSimulateActionSwitchMultiPress(Json::Value & jsonValue)
+{
+    if (sButtonSimulatorInstance != nullptr)
+    {
+        ChipLogError(NotSpecified, "Button simulation already in progress! Ignoring request.");
+        return;
+    }
+
+    bool hasEndpointId                   = HasNumericField(jsonValue, "EndpointId");
+    bool hasButtonId                     = HasNumericField(jsonValue, "ButtonId");
+    bool hasMultiPressPressedTimeMillis  = HasNumericField(jsonValue, "MultiPressPressedTimeMillis");
+    bool hasMultiPressReleasedTimeMillis = HasNumericField(jsonValue, "MultiPressReleasedTimeMillis");
+    bool hasMultiPressNumPresses         = HasNumericField(jsonValue, "MultiPressNumPresses");
+    if (!hasEndpointId || !hasButtonId || !hasMultiPressPressedTimeMillis || !hasMultiPressReleasedTimeMillis ||
+        !hasMultiPressNumPresses)
+    {
+        std::string inputJson = jsonValue.toStyledString();
+        ChipLogError(NotSpecified,
+                     "Missing or invalid value for one of EndpointId, ButtonId, MultiPressPressedTimeMillis, "
+                     "MultiPressReleasedTimeMillis or MultiPressNumPresses in %s",
+                     inputJson.c_str());
+        return;
+    }
+
+    EndpointId endpointId = static_cast<EndpointId>(jsonValue["EndpointId"].asUInt());
+    uint8_t buttonId      = static_cast<uint8_t>(jsonValue["ButtonId"].asUInt());
+    System::Clock::Milliseconds32 multiPressPressedTimeMillis{ static_cast<unsigned>(
+        jsonValue["MultiPressPressedTimeMillis"].asUInt()) };
+    System::Clock::Milliseconds32 multiPressReleasedTimeMillis{ static_cast<unsigned>(
+        jsonValue["MultiPressReleasedTimeMillis"].asUInt()) };
+    uint8_t multiPressNumPresses = static_cast<uint8_t>(jsonValue["MultiPressNumPresses"].asUInt());
+    auto buttonSimulator         = std::make_unique<ButtonEventsSimulator>();
+
+    bool success = buttonSimulator->SetMode(ButtonEventsSimulator::Mode::kModeMultiPress)
+                       .SetMultiPressPressedTimeMillis(multiPressPressedTimeMillis)
+                       .SetMultiPressReleasedTimeMillis(multiPressReleasedTimeMillis)
+                       .SetMultiPressNumPresses(multiPressNumPresses)
+                       .SetIdleButtonId(0)
+                       .SetPressedButtonId(buttonId)
+                       .SetEndpointId(endpointId)
+                       .Execute([]() { sButtonSimulatorInstance.reset(); });
+
+    if (!success)
+    {
+        ChipLogError(NotSpecified, "Failed to start execution of button simulator!");
+        return;
+    }
+
+    sButtonSimulatorInstance = std::move(buttonSimulator);
+}
+
+} // namespace
 
 AllClustersAppCommandHandler * AllClustersAppCommandHandler::FromJSON(const char * json)
 {
@@ -189,6 +332,14 @@ void AllClustersAppCommandHandler::HandleCommand(intptr_t context)
         std::string device    = self->mJsonValue["Device"].asString();
         std::string operation = self->mJsonValue["Operation"].asString();
         self->OnOperationalStateChange(device, operation, self->mJsonValue["Param"]);
+    }
+    else if (name == "SimulateActionSwitchLongPress")
+    {
+        HandleSimulateActionSwitchLongPress(self->mJsonValue);
+    }
+    else if (name == "SimulateActionSwitchMultiPress")
+    {
+        HandleSimulateActionSwitchMultiPress(self->mJsonValue);
     }
     else
     {

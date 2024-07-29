@@ -30,15 +30,6 @@ config CHIP_NXP_PLATFORM
 config CHIP_DEVICE_VENDOR_NAME
 	default "NXP Semiconductors"
 
-config CHIP_APP_LOG_LEVEL
-	int "Logging level in application"
-	default LOG_DEFAULT_LEVEL
-	depends on LOG
-	help
-	  Sets the logging level in the Matter application. Use this configuration
-	  option only within the application. To set the logging level for the
-	  Matter stack, use the MATTER_LOG_LEVEL configuration option.
-
 config CHIP_EXAMPLE_DEVICE_INFO_PROVIDER
 	bool "Include default device information provider build"
 	default y
