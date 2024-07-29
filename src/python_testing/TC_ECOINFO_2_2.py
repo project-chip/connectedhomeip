@@ -17,7 +17,7 @@
 
 import chip.clusters as Clusters
 from chip.clusters.Types import NullValue
-from matter_testing_support import MatterBaseTest, TestStep, async_test_body
+from matter_testing_support import MatterBaseTest, TestStep, async_test_body, default_matter_test_main
 from mobly import asserts
 
 
@@ -65,8 +65,8 @@ class TC_ECOINFO_2_2(MatterBaseTest):
 
         self.step(2)
         self.step("2a")
-        # TODO what is the stop and wait for user prompt so we can add the device
-        breakpoint()
+        self.wait_for_user_input(prompt_msg="Add a bridged device using method indicated by the manufacturer")
+
         self.step("2b")
         root_part_list_step_2 = await dev_ctrl.ReadAttribute(dut_node_id, [(root_node_endpoint, Clusters.Descriptor.Attributes.PartsList)])
         set_of_endpoints_step_2 = set(
@@ -88,8 +88,7 @@ class TC_ECOINFO_2_2(MatterBaseTest):
 
         self.step(3)
         self.step("3a")
-        # TODO what is the stop and wait for user prompt so we can remove the device
-        breakpoint()
+        self.wait_for_user_input(prompt_msg="Removed bridged device added in step 2a using method indicated by the manufacturer")
 
         self.step("3b")
         removed_on = await self.read_single_attribute(
@@ -116,3 +115,7 @@ class TC_ECOINFO_2_2(MatterBaseTest):
             attribute=Clusters.EcosystemInformation.Attributes.LocationDirectory,
             fabricFiltered=False)
         asserts.assert_equal(len(location_directory), 0, "Expected location directory to be empty")
+
+
+if __name__ == "__main__":
+    default_matter_test_main()
