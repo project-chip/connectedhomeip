@@ -90,7 +90,7 @@ BitMask<WaterHeaterDemandBitmap> WhmManufacturer::DetermineHeatingSources()
     for (auto & waterHeaterType : waterHeaterTypeValues) {
     {
         // Is this heating source being used?
-        if (heaterTypes.Raw() & waterHeaterTypeValues[idx])
+        if (heaterTypes.Has(waterHeaterTypeValue))
         {
             heaterDemandMask |= waterHeaterDemandValues[idx];
         }
