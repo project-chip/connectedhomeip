@@ -21,9 +21,7 @@ import("//build_overrides/chip.gni")
 #import("${chip_root}/build/chip/tests.gni")
 
 group("beken") {
-  deps = [
-    "${chip_root}/src/lib",
-  ]
+  deps = [ "${chip_root}/src/lib" ]
 }
 group("default") {
   deps = [ ":beken" ]
