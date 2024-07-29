@@ -649,6 +649,7 @@ href
 HSM
 hsm
 HTTPS
+Humidistat
 HW
 hwadr
 HydrogenConcentrationMeasurement
