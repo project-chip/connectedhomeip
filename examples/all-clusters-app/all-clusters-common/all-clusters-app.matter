@@ -8869,10 +8869,8 @@ endpoint 1 {
     ram      attribute occupancy;
     ram      attribute occupancySensorType;
     ram      attribute occupancySensorTypeBitmap;
-    ram      attribute holdTime default = 10;
-    callback attribute holdTimeLimits;
-    ram      attribute featureMap default = 0x01;
-    ram      attribute clusterRevision default = 5;
+    ram      attribute featureMap default = 0;
+    ram      attribute clusterRevision default = 4;
   }
 
   server cluster CarbonMonoxideConcentrationMeasurement {
@@ -9340,10 +9338,8 @@ endpoint 2 {
     ram      attribute occupancy;
     ram      attribute occupancySensorType;
     ram      attribute occupancySensorTypeBitmap;
-    ram      attribute holdTime default = 20;
-    callback attribute holdTimeLimits;
-    ram      attribute featureMap default = 0x01;
-    ram      attribute clusterRevision default = 5;
+    ram      attribute featureMap default = 0;
+    ram      attribute clusterRevision default = 4;
   }
 }
 endpoint 3 {
