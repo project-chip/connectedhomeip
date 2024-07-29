@@ -600,7 +600,7 @@ tests:
       command: "readAttribute"
       attribute: "GeneratedCommandList"
       response:
-          value: []
+          value: [0xFD] # AtomicResponse
           constraints:
               type: list
 
