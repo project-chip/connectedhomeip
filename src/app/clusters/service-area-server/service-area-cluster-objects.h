@@ -131,7 +131,7 @@ struct LocationStructureWrapper : public chip::app::Clusters::ServiceArea::Struc
         if ((!aLocationName.empty()) || (!aFloorNumber.IsNull()) || (!aAreaType.IsNull()))
         {
             // Create a home location info structure and fill it in except for the location name. This is done below.
-            locationInfo.locationInfo.SetNonNull(Structs::HomeLocationStruct::Type());
+            locationInfo.locationInfo.SetNonNull(Structs::LocationDescriptorStruct::Type());
 
             locationInfo.locationInfo.Value().floorNumber = aFloorNumber;
             locationInfo.locationInfo.Value().areaType    = aAreaType;
