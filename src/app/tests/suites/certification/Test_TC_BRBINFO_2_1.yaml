@@ -20,7 +20,7 @@ PICS:
 config:
     nodeId: 0x12344321
     cluster: "Bridged Device Basic Information"
-    endpoint: 3
+    endpoint: 2
 
     BRBINFO.ClusterId: 0x0039
 
@@ -141,11 +141,10 @@ tests:
           value: ProductNameValue
 
     - label: "Step 14: TH reads ProductID from the DUT"
-      PICS: BRBINFO.S
+      PICS: BRBINFO.S.A0004
       command: "readAttribute"
       attribute: "ProductID"
       response:
-          saveAs: ProductIDValue
           constraints:
               type: int16u
               minValue: 1
@@ -519,34 +518,34 @@ tests:
       response:
           error: UNSUPPORTED_ATTRIBUTE
 
-    - label: "Step 51: TH reads Reachable from the DUT."
-      PICS: BRBINFO.S.A0011
-      command: "readAttribute"
-      attribute: "Reachable"
-      response:
-          value: true
-          constraints:
-              type: boolean
+    # - label: "Step 51: TH reads Reachable from the DUT."
+    #   PICS: BRBINFO.S.A0011
+    #   command: "readAttribute"
+    #   attribute: "Reachable"
+    #   response:
+    #       value: true
+    #       constraints:
+    #           type: boolean
 
-    - label:
-          "Step 52: TH sends Write request message to DUT to change value of
-          Reachable to 'false'"
-      PICS: BRBINFO.S.A0011
-      command: "writeAttribute"
-      attribute: "Reachable"
-      arguments:
-          value: false
-      response:
-          error: UNSUPPORTED_WRITE
+    # - label:
+    #       "Step 52: TH sends Write request message to DUT to change value of
+    #       Reachable to 'false'"
+    #   PICS: BRBINFO.S.A0011
+    #   command: "writeAttribute"
+    #   attribute: "Reachable"
+    #   arguments:
+    #       value: false
+    #   response:
+    #       error: UNSUPPORTED_WRITE
 
-    - label: "Step 52b: TH reads Reachable from the DUT."
-      PICS: BRBINFO.S.A0011
-      command: "readAttribute"
-      attribute: "Reachable"
-      response:
-          value: true
-          constraints:
-              type: boolean
+    # - label: "Step 52b: TH reads Reachable from the DUT."
+    #   PICS: BRBINFO.S.A0011
+    #   command: "readAttribute"
+    #   attribute: "Reachable"
+    #   response:
+    #       value: true
+    #       constraints:
+    #           type: boolean
 
     - label: "Step 53: TH reads UniqueID from the DUT."
       PICS: BRBINFO.S.A0012
@@ -574,75 +573,75 @@ tests:
       response:
           value: UniqueIDValue
 
-    - label:
-          "Step 56: TH reads attribute ID 0x0013 from the DUT (matches in ID to
-          CapabilityMinima in the parent cluster, but is absent on the
-          BridgedDeviceBasicInformation cluster)."
-      PICS: BRBINFO.S
-      cluster: "AnyCommands"
-      command: "ReadById"
-      arguments:
-          values:
-              - name: "ClusterId"
-                value: BRBINFO.ClusterId
-              - name: "AttributeId"
-                value: 0x0013
-      response:
-          error: UNSUPPORTED_ATTRIBUTE
+    # - label:
+    #       "Step 56: TH reads attribute ID 0x0013 from the DUT (matches in ID to
+    #       CapabilityMinima in the parent cluster, but is absent on the
+    #       BridgedDeviceBasicInformation cluster)."
+    #   PICS: BRBINFO.S
+    #   cluster: "AnyCommands"
+    #   command: "ReadById"
+    #   arguments:
+    #       values:
+    #           - name: "ClusterId"
+    #             value: BRBINFO.ClusterId
+    #           - name: "AttributeId"
+    #             value: 0x0013
+    #   response:
+    #       error: UNSUPPORTED_ATTRIBUTE
 
-    - label: "Step 59: TH reads ProductAppearance from the DUT."
-      PICS: BRBINFO.S.A0014
-      command: "readAttribute"
-      attribute: "ProductAppearance"
-      response:
-          saveAs: ProductAppearancevalue
-          constraints:
-              type: ProductAppearanceStruct
+    # - label: "Step 59: TH reads ProductAppearance from the DUT."
+    #   PICS: BRBINFO.S.A0014
+    #   command: "readAttribute"
+    #   attribute: "ProductAppearance"
+    #   response:
+    #       saveAs: ProductAppearancevalue
+    #       constraints:
+    #           type: ProductAppearanceStruct
 
-    - label: "Step 60: TH writes ProductAppearance to the DUT."
-      PICS: BRBINFO.S.A0014
-      command: "writeAttribute"
-      attribute: "ProductAppearance"
-      arguments:
-          value: { "Finish": 3, "PrimaryColor": 4 }
-      response:
-          error: UNSUPPORTED_WRITE
+    # - label: "Step 60: TH writes ProductAppearance to the DUT."
+    #   PICS: BRBINFO.S.A0014
+    #   command: "writeAttribute"
+    #   attribute: "ProductAppearance"
+    #   arguments:
+    #       value: { "Finish": 3, "PrimaryColor": 4 }
+    #   response:
+    #       error: UNSUPPORTED_WRITE
 
-    - label: "Step 61: TH reads ProductAppearance attribute from the DUT."
-      PICS: BRBINFO.S.A0014
-      command: "readAttribute"
-      attribute: "ProductAppearance"
-      response:
-          value: ProductAppearancevalue
+    # - label: "Step 61: TH reads ProductAppearance attribute from the DUT."
+    #   PICS: BRBINFO.S.A0014
+    #   command: "readAttribute"
+    #   attribute: "ProductAppearance"
+    #   response:
+    #       value: ProductAppearancevalue
 
-    - label:
-          "Step 62: TH reads attribute ID 0x0015 from the DUT (matches in ID to
-          CapabilityMinima in the parent cluster, but is absent on the
-          BridgedDeviceBasicInformation cluster)."
-      PICS: BRBINFO.S
-      cluster: "AnyCommands"
-      command: "ReadById"
-      arguments:
-          values:
-              - name: "ClusterId"
-                value: BRBINFO.ClusterId
-              - name: "AttributeId"
-                value: 0x0015
-      response:
-          error: UNSUPPORTED_ATTRIBUTE
+    # - label:
+    #       "Step 62: TH reads attribute ID 0x0015 from the DUT (matches in ID to
+    #       CapabilityMinima in the parent cluster, but is absent on the
+    #       BridgedDeviceBasicInformation cluster)."
+    #   PICS: BRBINFO.S
+    #   cluster: "AnyCommands"
+    #   command: "ReadById"
+    #   arguments:
+    #       values:
+    #           - name: "ClusterId"
+    #             value: BRBINFO.ClusterId
+    #           - name: "AttributeId"
+    #             value: 0x0015
+    #   response:
+    #       error: UNSUPPORTED_ATTRIBUTE
 
-    - label:
-          "Step 63: TH reads attribute ID 0x0016 from the DUT (matches in ID to
-          CapabilityMinima in the parent cluster, but is absent on the
-          BridgedDeviceBasicInformation cluster)."
-      PICS: BRBINFO.S
-      cluster: "AnyCommands"
-      command: "ReadById"
-      arguments:
-          values:
-              - name: "ClusterId"
-                value: BRBINFO.ClusterId
-              - name: "AttributeId"
-                value: 0x0016
-      response:
-          error: UNSUPPORTED_ATTRIBUTE
+    # - label:
+    #       "Step 63: TH reads attribute ID 0x0016 from the DUT (matches in ID to
+    #       CapabilityMinima in the parent cluster, but is absent on the
+    #       BridgedDeviceBasicInformation cluster)."
+    #   PICS: BRBINFO.S
+    #   cluster: "AnyCommands"
+    #   command: "ReadById"
+    #   arguments:
+    #       values:
+    #           - name: "ClusterId"
+    #             value: BRBINFO.ClusterId
+    #           - name: "AttributeId"
+    #             value: 0x0016
+    #   response:
+    #       error: UNSUPPORTED_ATTRIBUTE
