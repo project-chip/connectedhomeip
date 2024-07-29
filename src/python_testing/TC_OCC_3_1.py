@@ -39,7 +39,7 @@ class TC_OCC_3_1(MatterBaseTest):
             TestStep(1, "Commission DUT to TH and obtain DUT attribute list.", is_commissioning=True),
             TestStep(2, "Change DUT HoldTime attribute value to 10 seconds."),
             TestStep(3, "Do not trigger DUT occupancy sensing for the period of HoldTime. TH reads Occupancy attribute from DUT."),
-            TestStep(4, "Trigger DUT occupancy sensing to change the occupancy state and start a timer.")
+            TestStep(4, "Trigger DUT occupancy sensing to change the occupancy state and start a timer."),
             TestStep(5, "After 10 seconds, TH reads Occupancy attribute from DUT.")
         ]
         return steps
