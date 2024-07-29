@@ -74,6 +74,9 @@ public:
     void SetStatus(DisplayStatus_t & status);
     void WriteStatus();
 
+    CHIP_ERROR TurnOn(void);
+    CHIP_ERROR TurnOff(void);
+
 #ifdef QR_CODE_ENABLED
     void SetQRCode(uint8_t * str, uint32_t size);
     void ShowQRCode(bool show);
