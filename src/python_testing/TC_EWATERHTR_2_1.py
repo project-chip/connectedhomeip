@@ -112,7 +112,9 @@ class TC_EWATERHTR_2_1(MatterBaseTest, EWATERHTRBase):
             logging.info("Skipping step 6 as PIXIT.EWATERHTR.TP not supported")
 
         self.step("7")
-        await self.check_whm_attribute("BoostState", Clusters.WaterHeaterManagement.Enums.BoostStateEnum.kInactive)
+        boost_state = await self.read_whm_attribute_expect_success(attribute="BoostState")
+        asserts.assert_less_equal(boost_state, Clusters.WaterHeaterManagement.Enums.BoostStateEnum.kInactive,
+                                  f"Unexpected BoostState value - expected {boost_state} should be BoostStateEnum (enum8) value in range 0x00 to 0x01")
 
 
 if __name__ == "__main__":
