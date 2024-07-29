@@ -61,19 +61,15 @@ class TC_ECOINFO_2_2(MatterBaseTest):
                     list_of_aggregator_endpoints.append(endpoint)
 
         asserts.assert_greater_equal(len(list_of_aggregator_endpoints), 1, "Did not find any Aggregator device types")
-        #aggregator_endpoint = list_of_aggregator_endpoints[0]
-        #aggregator_part_list = await dev_ctrl.ReadAttribute(aggregator_endpoint, [(root_node_endpoint, Clusters.Descriptor.Attributes.PartsList)])
-        #step_1_set_of_aggregator_endpoints = set(
-        #    aggregator_part_list[aggregator_endpoint][Clusters.Descriptor][Clusters.Descriptor.Attributes.PartsList])
 
         self.step(2)
         self.step("2a")
         # TODO what is the stop and wait for user prompt so we can add the device
         breakpoint()
         self.step("2b")
-        aggregator_part_list = await dev_ctrl.ReadAttribute(dut_node_id, [(root_node_endpoint, Clusters.Descriptor.Attributes.PartsList)])
+        root_part_list_step_2 = await dev_ctrl.ReadAttribute(dut_node_id, [(root_node_endpoint, Clusters.Descriptor.Attributes.PartsList)])
         set_of_endpoints_step_2 = set(
-            aggregator_part_list[root_node_endpoint][Clusters.Descriptor][Clusters.Descriptor.Attributes.PartsList])
+            root_part_list_step_2[root_node_endpoint][Clusters.Descriptor][Clusters.Descriptor.Attributes.PartsList])
 
         asserts.assert_true(set_of_endpoints_step_2.issuperset(set_of_endpoints_step_1), "Expected only new endpoints to be added")
         unique_endpoints_set = set_of_endpoints_step_2 - set_of_endpoints_step_1
