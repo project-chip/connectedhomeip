@@ -31,7 +31,7 @@
 #include <lib/core/CHIPConfig.h>
 #include <lib/support/TypeTraits.h>
 
-#include <inttypes.h>
+#include <cinttypes>
 #include <limits>
 #include <type_traits>
 
@@ -102,14 +102,15 @@ public:
      */
     enum class SdkPart : uint8_t
     {
-        kCore            = 0, ///< SDK core errors.
-        kInet            = 1, ///< Inet layer errors; see <inet/InetError.h>.
-        kDevice          = 2, ///< Device layer errors; see <platform/CHIPDeviceError.h>.
-        kASN1            = 3, ///< ASN1 errors; see <asn1/ASN1Error.h>.
-        kBLE             = 4, ///< BLE layer errors; see <ble/BleError.h>.
-        kIMGlobalStatus  = 5, ///< Interaction Model global status code.
-        kIMClusterStatus = 6, ///< Interaction Model cluster-specific status code.
-        kApplication     = 7, ///< Application-defined errors; see CHIP_APPLICATION_ERROR
+        kCore                   = 0, ///< SDK core errors.
+        kInet                   = 1, ///< Inet layer errors; see <inet/InetError.h>.
+        kDevice                 = 2, ///< Device layer errors; see <platform/CHIPDeviceError.h>.
+        kASN1                   = 3, ///< ASN1 errors; see <asn1/ASN1Error.h>.
+        kBLE                    = 4, ///< BLE layer errors; see <ble/BleError.h>.
+        kIMGlobalStatus         = 5, ///< Interaction Model global status code.
+        kIMClusterStatusFailure = 6, ///< Interaction Model cluster-specific status code (failure)
+        kApplication            = 7, ///< Application-defined errors; see CHIP_APPLICATION_ERROR
+        kIMClusterStatusSuccess = 8, ///< Interaction Model cluster-specific status code (success)
     };
 
     ChipError() = default;
@@ -157,8 +158,7 @@ public:
     {}
 #else
     constexpr ChipError(SdkPart part, uint8_t code, const char * file, unsigned int line) :
-        mError(MakeInteger(part, code)) CHIP_INITIALIZE_ERROR_SOURCE(file, line, /*loc=*/nullptr)
-    {}
+        mError(MakeInteger(part, code)) CHIP_INITIALIZE_ERROR_SOURCE(file, line, /*loc=*/nullptr){}
 #endif // CHIP_CONFIG_ERROR_SOURCE && __cplusplus >= 202002L
 
     /**
@@ -305,7 +305,8 @@ public:
     {
         // Open question: should CHIP_NO_ERROR be treated as an IM status for
         // purposes of this test?
-        return IsPart(SdkPart::kIMGlobalStatus) || IsPart(SdkPart::kIMClusterStatus);
+        return IsPart(SdkPart::kIMGlobalStatus) || IsPart(SdkPart::kIMClusterStatusFailure) ||
+            IsPart(SdkPart::kIMClusterStatusSuccess);
     }
 
 #if CHIP_CONFIG_ERROR_SOURCE
@@ -340,11 +341,11 @@ private:
      * density on embedded builds. Arm 32, Xtensa, and RISC-V can all handle 11-bit values in a move-immediate instruction.
      * Further, SdkPart::kCore is 0 so that the most common errors fit in 8 bits for additional density on some processors.
      *
-     *  31    28      24      20      16      12       8       4       0    Bit
-     *  |       |       |       |       |       |       |       |       |
-     *  |     range     |                     value                     |
-     *  |    kSdk==0    |       0               |0| part|    code       |   SDK error
-     *  |    01 - FF    |          encapsulated error code              |   Encapsulated error
+     *  31        28          24      20      16      12                8       4       0    Bit
+     *  |          |           |       |       |       |                |       |       |
+     *  |        range         |                     value                              |
+     *  |       kSdk==0        |       0               |      part      |    code       |   SDK error
+     *  |       01 - FF        |          encapsulated error code                       |   Encapsulated error
      */
     static constexpr int kRangeStart  = 24;
     static constexpr int kRangeLength = 8;
@@ -352,9 +353,12 @@ private:
     static constexpr int kValueLength = 24;
 
     static constexpr int kSdkPartStart  = 8;
-    static constexpr int kSdkPartLength = 3;
-    static constexpr int kSdkCodeStart  = 0;
-    static constexpr int kSdkCodeLength = 8;
+    static constexpr int kSdkPartLength = 4;
+    static constexpr int kSdkCodeStart  = 0; // shared with IMClusterStatusCode
+    static constexpr int kSdkCodeLength = 8; // shared with IMClusterStatusCode
+
+    static constexpr int kImStatusSuccess       = 8;
+    static constexpr int kImStatusSuccessLength = 1;
 
     static constexpr StorageType GetField(unsigned int start, unsigned int length, StorageType value)
     {
@@ -449,9 +453,12 @@ using CHIP_ERROR = ::chip::ChipError;
 #endif // CHIP_CONFIG_ERROR_SOURCE
 
 //
-// type must be a compile-time constant as mandated by CHIP_SDK_ERROR.
+// value must be a compile-time constant as mandated by CHIP_SDK_ERROR.
 //
-#define CHIP_IM_CLUSTER_STATUS(type) CHIP_SDK_ERROR(::chip::ChipError::SdkPart::kIMClusterStatus, type)
+// value MUST be uint8_t sized
+//
+#define CHIP_IM_CLUSTER_STATUS_FAILURE(value) CHIP_SDK_ERROR(::chip::ChipError::SdkPart::kIMClusterStatusFailure, value)
+#define CHIP_IM_CLUSTER_STATUS_SUCCESS(value) CHIP_SDK_ERROR(::chip::ChipError::SdkPart::kIMClusterStatusSuccess, value)
 
 // clang-format off
 

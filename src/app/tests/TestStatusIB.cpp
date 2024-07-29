@@ -101,6 +101,26 @@ TEST_F(TestStatusIB, TestStatusIBToFromChipError)
     }
 }
 
+TEST_F(TestStatusIB, TestChipErrorClusterSpecificErrorCodes)
+{
+    StatusIB status;
+    status.InitFromChipError(CHIP_IM_CLUSTER_STATUS_FAILURE(123));
+
+    EXPECT_TRUE(status.IsFailure());
+    ASSERT_TRUE(status.mClusterStatus.HasValue());
+    EXPECT_EQ(status.mClusterStatus.Value(), 123u);
+    EXPECT_EQ(status.mStatus, Status::Failure);
+
+    status.InitFromChipError(CHIP_IM_CLUSTER_STATUS_SUCCESS(123));
+
+    EXPECT_TRUE(status.IsSuccess());
+    ASSERT_TRUE(status.mClusterStatus.HasValue());
+    EXPECT_EQ(status.mClusterStatus.Value(), 123u);
+    EXPECT_EQ(status.mStatus, Status::Success);
+    // ToChipError explicitly LOSES the IM cluster info on success
+    EXPECT_EQ(status.ToChipError(), CHIP_NO_ERROR);
+}
+
 #if !CHIP_CONFIG_SHORT_ERROR_STR
 TEST_F(TestStatusIB, TestStatusIBErrorToString)
 {
