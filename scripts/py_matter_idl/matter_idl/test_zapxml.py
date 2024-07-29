@@ -308,6 +308,28 @@ class TestXmlParser(unittest.TestCase):
                              Cluster(name='TestFeatures', code=20, bitmaps=[bitmap])
                          ])),
 
+    def testGlobalStruct(self):
+        idl = XmlToIdl('''<?xml version="1.0"?>
+            <configurator>
+              <struct name="SomeStruct" isFabricScoped="true">
+                <item name="FirstMember" type="int16u" />
+                <item name="SecondMember" type="int32u" />
+              </struct>
+
+            </configurator>
+        ''')
+        struct = Struct(
+            name='SomeStruct',
+            qualities=StructQuality.FABRIC_SCOPED,
+            fields=[
+                Field(data_type=DataType(name='int16u'),
+                      code=0, name='FirstMember'),
+                Field(data_type=DataType(name='int32u'),
+                      code=1, name='SecondMember')
+            ]
+        )
+        self.assertEqual(idl, Idl(global_structs=[struct]))
+
     def testStruct(self):
         idl = XmlToIdl('''<?xml version="1.0"?>
             <configurator>
