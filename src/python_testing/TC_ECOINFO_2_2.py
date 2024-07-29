@@ -20,6 +20,7 @@ from chip.clusters.Types import NullValue
 from matter_testing_support import MatterBaseTest, TestStep, async_test_body, default_matter_test_main
 from mobly import asserts
 
+_DEVICE_TYPE_AGGREGGATOR = 0x000E
 
 class TC_ECOINFO_2_2(MatterBaseTest):
 
@@ -58,7 +59,7 @@ class TC_ECOINFO_2_2(MatterBaseTest):
             device_type_list_read = await dev_ctrl.ReadAttribute(dut_node_id, [(endpoint, Clusters.Descriptor.Attributes.DeviceTypeList)])
             device_type_list = device_type_list_read[endpoint][Clusters.Descriptor][Clusters.Descriptor.Attributes.DeviceTypeList]
             for device_type in device_type_list:
-                if device_type.deviceType == 14:
+                if device_type.deviceType == _DEVICE_TYPE_AGGREGGATOR:
                     list_of_aggregator_endpoints.append(endpoint)
 
         asserts.assert_greater_equal(len(list_of_aggregator_endpoints), 1, "Did not find any Aggregator device types")
