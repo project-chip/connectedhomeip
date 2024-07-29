@@ -142,7 +142,7 @@ def main():
     print(f'paa = {paa_path}')
 
     pics = {"PICS_SDK_CI_ONLY": True }
-    test_runner = MyMock('TC_CCTRL', 'TC_CCTRL', 'test_TC_CCTRL_2_2', 1, paa_trust_store_path=paa_path, pics=pics)
+    test_runner = MyMock('TC_CCTRL_2_2', 'TC_CCTRL_2_2', 'test_TC_CCTRL_2_2', 1, paa_trust_store_path=paa_path, pics=pics)
 
     test_runner.run_test_with_mock(dynamic_invoke_return, dynamic_event_return, wildcard())
     test_runner.Shutdown()

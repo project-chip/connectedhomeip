@@ -45,7 +45,7 @@ from chip.ChipDeviceCtrl import CommissioningParameters
 # isort: on
 
 
-class TC_CCTRL(MatterBaseTest):
+class TC_CCTRL_2_2(MatterBaseTest):
 
     @async_test_body
     async def setup_class(self):
