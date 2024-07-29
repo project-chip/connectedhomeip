@@ -365,7 +365,7 @@ class TC_OPSTATE_BASE():
                 asserts.assert_true(current_phase == NullValue, f"CurrentPhase({current_phase}) should be null")
             else:
                 asserts.assert_greater_equal(current_phase, 0, f"CurrentPhase({current_phase}) must be >= 0")
-                asserts.assert_less(current_phase, phase_list_len, f"CurrentPhase({current_phase}) must be less {phase_list_len}")
+                asserts.assert_less(current_phase, phase_list_len, f"CurrentPhase({current_phase}) must be less than {phase_list_len}")
 
         # STEP 4: TH reads from the DUT the CountdownTime attribute
         self.step(4)
@@ -663,9 +663,9 @@ class TC_OPSTATE_BASE():
                 asserts.assert_equal(current_phase, NullValue, f"CurrentPhase({current_phase}) should be null")
             else:
                 asserts.assert_greater_equal(current_phase, 0,
-                                             f"CurrentPhase({current_phase}) must be greater or equal than 0")
+                                             f"CurrentPhase({current_phase}) must be greater or equal to 0")
                 asserts.assert_less(current_phase, phase_list_len,
-                                    f"CurrentPhase({current_phase}) must be less then {(phase_list_len)}")
+                                    f"CurrentPhase({current_phase}) must be less than {(phase_list_len)}")
 
         # STEP 10: TH waits for {PIXIT.WAITTIME.COUNTDOWN}
         self.step(10)
