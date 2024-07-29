@@ -62,6 +62,7 @@ def main(search_directory, env_file):
         "TC_EnergyReporting_Utils.py",
         "TC_OpstateCommon.py",
         "TC_pics_checker.py",
+        "TC_TMP_2_1.py",
         "TestCommissioningTimeSync.py",
         "TestConformanceSupport.py",
         "TestChoiceConformanceSupport.py",
