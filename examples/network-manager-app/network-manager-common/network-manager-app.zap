@@ -3238,10 +3238,26 @@
           "attributes": [
             {
               "name": "SSID",
-              "code": 1,
+              "code": 0,
               "mfgCode": null,
               "side": "server",
               "type": "octet_string",
+              "included": 1,
+              "storageOption": "External",
+              "singleton": 0,
+              "bounded": 0,
+              "defaultValue": null,
+              "reportable": 1,
+              "minInterval": 1,
+              "maxInterval": 65534,
+              "reportableChange": 0
+            },
+            {
+              "name": "PassphraseSurrogate",
+              "code": 1,
+              "mfgCode": null,
+              "side": "server",
+              "type": "int64u",
               "included": 1,
               "storageOption": "External",
               "singleton": 0,
