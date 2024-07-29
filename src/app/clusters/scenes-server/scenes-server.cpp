@@ -364,7 +364,7 @@ void AddSceneParse(CommandHandlerInterface::HandlerContext & ctx, const CommandD
 {
     ResponseType response;
     uint16_t endpointTableSize = 0;
-    
+
     ReturnOnFailure(
         AddResponseOnError(ctx, response, Attributes::SceneTableSize::Get(ctx.mRequestPath.mEndpointId, &endpointTableSize)));
 
@@ -376,7 +376,8 @@ void AddSceneParse(CommandHandlerInterface::HandlerContext & ctx, const CommandD
     response.sceneID = req.sceneID;
 
     // Verify the attributes are respecting constraints
-    if (req.transitionTime > scenes::kScenesMaxTransitionTime || req.sceneName.size() > scenes::kSceneNameMaxLength || req.sceneID == scenes::kUndefinedSceneId)
+    if (req.transitionTime > scenes::kScenesMaxTransitionTime || req.sceneName.size() > scenes::kSceneNameMaxLength ||
+        req.sceneID == scenes::kUndefinedSceneId)
     {
         response.status = to_underlying(Protocols::InteractionModel::Status::ConstraintError);
         ctx.mCommandHandler.AddResponse(ctx.mRequestPath, response);
@@ -555,7 +556,7 @@ CHIP_ERROR StoreSceneParse(const FabricIndex & fabricIdx, const EndpointId & end
 
     // Get Scene Table Instance
     SceneTable * sceneTable = scenes::GetSceneTableImpl(endpointID, endpointTableSize);
-    
+
     // Verify Endpoint in group
     VerifyOrReturnError(nullptr != groupProvider, CHIP_ERROR_INTERNAL);
     if (0 != groupID && !groupProvider->HasEndpoint(fabricIdx, groupID, endpointID))

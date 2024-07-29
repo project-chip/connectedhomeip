@@ -301,10 +301,10 @@ tests:
                 value: GI
               - name: "SceneID"
                 value: 0x01
-  
+
     - label:
           "Step 2d: TH sends a StoreScene command to DUT with the GroupID field
-          set to G1 and the SceneID field set to 0xFF, which is outside of the 
+          set to G1 and the SceneID field set to 0xFF, which is outside of the
           constraints for a SceneID."
       PICS: S.S.C04.Rsp
       command: "StoreScene"
@@ -467,7 +467,7 @@ tests:
 
     - label:
           "Step 4e: TH sends a RecallScene command to DUT with the GroupID field
-          set to G1 and the SceneID field set to 0xFF, which is outside of the 
+          set to G1 and the SceneID field set to 0xFF, which is outside of the
           constraints for a SceneID."
       PICS: S.S.C05.Rsp
       command: "RecallScene"
@@ -593,7 +593,7 @@ tests:
 
     - label:
           "Step 5d: TH sends a ViewScene command to DUT with the GroupID field
-          set to G1 and the SceneID field set to 0xFF, which is outside of the 
+          set to G1 and the SceneID field set to 0xFF, which is outside of the
           constraints for a SceneID."
       PICS: S.S.C01.Rsp
       command: "ViewScene"
@@ -845,10 +845,10 @@ tests:
 
     - label:
           "Step 8f: TH sends a AddScene command to DUT with the GroupID field
-          set to G1, the SceneID field set to 0xFF, which is outside of the 
-          constraints for a SceneID, the TransitionTime field set
-          to 1000 (1s) and no extension field sets. This should
-          fail and return a status of 0x87 (CONSTRAINT_ERROR)."
+          set to G1, the SceneID field set to 0xFF, which is outside of the
+          constraints for a SceneID, the TransitionTime field set to 1000 (1s)
+          and no extension field sets. This should fail and return a status of
+          0x87 (CONSTRAINT_ERROR)."
       PICS: S.S.C00.Rsp
       command: "AddScene"
       arguments:
@@ -935,7 +935,7 @@ tests:
 
     - label:
           "Step 9d: TH sends a RemoveScene command to DUT with the GroupID field
-          set to G1 and the SceneID field set to 0xFF, which is outside of the 
+          set to G1 and the SceneID field set to 0xFF, which is outside of the
           constraints for a SceneID."
       PICS: S.S.C02.Rsp
       command: "RemoveScene"
