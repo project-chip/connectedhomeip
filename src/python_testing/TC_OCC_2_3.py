@@ -37,8 +37,8 @@ class TC_OCC_2_3(MatterBaseTest):
             TestStep(1, "Commission DUT to TH", is_commissioning=True),
             TestStep(2, "DUT supports HoldTime attribute. If DUT doesn’t support it, then stop and exit this test case."),
             TestStep(3, "Based on the feature flag value table, read OccupancySensorType attribute from DUT"),
-            TestStep(4, "If TH reads 0 - PIR, TH reads PIROccupiedToUnoccupiedDelay attribute and its value should be same as HoldTime")
-            TestStep(5, "If TH reads 1 - Ultrasonic, TH reads UltrasonicOccupiedToUnoccupiedDelay attribute and its value should be same as HoldTime")
+            TestStep(4, "If TH reads 0 - PIR, TH reads PIROccupiedToUnoccupiedDelay attribute and its value should be same as HoldTime"),
+            TestStep(5, "If TH reads 1 - Ultrasonic, TH reads UltrasonicOccupiedToUnoccupiedDelay attribute and its value should be same as HoldTime"),
             TestStep(6, "If TH reads 2 - PHY, TH reads PhysicalContactOccupiedToUnoccupiedDelay attribute and its value should be same as HoldTime")
         ]
         return steps
