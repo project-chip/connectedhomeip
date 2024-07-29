@@ -423,6 +423,44 @@ void ComplexArgumentParser::Finalize(chip::app::Clusters::detail::Structs::Opera
     ComplexArgumentParser::Finalize(request.operationalStateLabel);
 }
 
+CHIP_ERROR ComplexArgumentParser::Setup(const char * label, chip::app::Clusters::Globals::Structs::TestGlobalStruct::Type & request,
+                                        Json::Value & value)
+{
+    VerifyOrReturnError(value.isObject(), CHIP_ERROR_INVALID_ARGUMENT);
+
+    // Copy to track which members we already processed.
+    Json::Value valueCopy(value);
+
+    ReturnErrorOnFailure(ComplexArgumentParser::EnsureMemberExist("TestGlobalStruct.name", "name", value.isMember("name")));
+    ReturnErrorOnFailure(
+        ComplexArgumentParser::EnsureMemberExist("TestGlobalStruct.myBitmap", "myBitmap", value.isMember("myBitmap")));
+
+    char labelWithMember[kMaxLabelLength];
+    snprintf(labelWithMember, sizeof(labelWithMember), "%s.%s", label, "name");
+    ReturnErrorOnFailure(ComplexArgumentParser::Setup(labelWithMember, request.name, value["name"]));
+    valueCopy.removeMember("name");
+
+    snprintf(labelWithMember, sizeof(labelWithMember), "%s.%s", label, "myBitmap");
+    ReturnErrorOnFailure(ComplexArgumentParser::Setup(labelWithMember, request.myBitmap, value["myBitmap"]));
+    valueCopy.removeMember("myBitmap");
+
+    if (value.isMember("myEnum"))
+    {
+        snprintf(labelWithMember, sizeof(labelWithMember), "%s.%s", label, "myEnum");
+        ReturnErrorOnFailure(ComplexArgumentParser::Setup(labelWithMember, request.myEnum, value["myEnum"]));
+    }
+    valueCopy.removeMember("myEnum");
+
+    return ComplexArgumentParser::EnsureNoMembersRemaining(label, valueCopy);
+}
+
+void ComplexArgumentParser::Finalize(chip::app::Clusters::Globals::Structs::TestGlobalStruct::Type & request)
+{
+    ComplexArgumentParser::Finalize(request.name);
+    ComplexArgumentParser::Finalize(request.myBitmap);
+    ComplexArgumentParser::Finalize(request.myEnum);
+}
+
 CHIP_ERROR ComplexArgumentParser::Setup(const char * label,
                                         chip::app::Clusters::Descriptor::Structs::SemanticTagStruct::Type & request,
                                         Json::Value & value)
