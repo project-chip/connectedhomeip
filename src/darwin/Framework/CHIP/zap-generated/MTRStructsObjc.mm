@@ -19,6 +19,39 @@
 
 NS_ASSUME_NONNULL_BEGIN
 
+@implementation MTRDataTypeTestGlobalStruct
+- (instancetype)init
+{
+    if (self = [super init]) {
+
+        _name = @"";
+
+        _myBitmap = nil;
+
+        _myEnum = nil;
+    }
+    return self;
+}
+
+- (id)copyWithZone:(NSZone * _Nullable)zone
+{
+    auto other = [[MTRDataTypeTestGlobalStruct alloc] init];
+
+    other.name = self.name;
+    other.myBitmap = self.myBitmap;
+    other.myEnum = self.myEnum;
+
+    return other;
+}
+
+- (NSString *)description
+{
+    NSString * descriptionString = [NSString stringWithFormat:@"<%@: name:%@; myBitmap:%@; myEnum:%@; >", NSStringFromClass([self class]), _name, _myBitmap, _myEnum];
+    return descriptionString;
+}
+
+@end
+
 @implementation MTRDescriptorClusterDeviceTypeStruct
 - (instancetype)init
 {
