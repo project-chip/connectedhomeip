@@ -140,7 +140,7 @@ tests:
       response:
           value: ProductNameValue
 
-    - label: "Step 14: TH reads ProducID from the DUT"
+    - label: "Step 14: TH reads ProductID from the DUT"
       PICS: BRBINFO.S
       command: "readAttribute"
       attribute: "ProductID"
