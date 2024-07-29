@@ -281,7 +281,8 @@
             "ActiveModeThreshold",
             "RegisteredClients",
             "ICDCounter",
-            "ClientsSupportedPerFabric"
+            "ClientsSupportedPerFabric",
+            "MaximumCheckInBackOff"
         ],
         "Occupancy Sensing": ["HoldTimeLimits"],
         "Operational Credentials": [
