@@ -176,22 +176,25 @@ CHIP_ERROR LinuxWiFiDriver::CommitConfiguration()
     for (uint8_t networkIndex = 0; networkIndex < kMaxNetworks; networkIndex++)
     {
         // Add entries to persistent storage upto mStagingNetworkCount and delete all other entries if present.
-        if (networkIndex < mStagingNetworkCount) {
-            ReturnErrorOnFailure(
-                kvs.Put(kWiFiSSIDKeyName[networkIndex], mStagingNetworks[networkIndex].ssid, mStagingNetworks[networkIndex].ssidLen));
+        if (networkIndex < mStagingNetworkCount)
+        {
+            ReturnErrorOnFailure(kvs.Put(kWiFiSSIDKeyName[networkIndex], mStagingNetworks[networkIndex].ssid,
+                                         mStagingNetworks[networkIndex].ssidLen));
 #if CHIP_DEVICE_CONFIG_ENABLE_WIFI_PDC
             if (mStagingNetworks[networkIndex].UsingPDC())
             {
                 ReturnErrorOnFailure(IgnoreNotFound(kvs.Delete(kWiFiCredentialsKeyName[networkIndex])));
-                ReturnErrorOnFailure(kvs.Put(kWifiNetworkIdentityKeyName[networkIndex], mStagingNetworks[networkIndex].networkIdentity,
-                                            mStagingNetworks[networkIndex].networkIdentityLen));
-                ReturnErrorOnFailure(kvs.Put(kWifiClientIdentityKeyName[networkIndex], mStagingNetworks[networkIndex].clientIdentity,
-                                            mStagingNetworks[networkIndex].clientIdentityLen));
+                ReturnErrorOnFailure(kvs.Put(kWifiNetworkIdentityKeyName[networkIndex],
+                                             mStagingNetworks[networkIndex].networkIdentity,
+                                             mStagingNetworks[networkIndex].networkIdentityLen));
+                ReturnErrorOnFailure(kvs.Put(kWifiClientIdentityKeyName[networkIndex],
+                                             mStagingNetworks[networkIndex].clientIdentity,
+                                             mStagingNetworks[networkIndex].clientIdentityLen));
 
                 P256SerializedKeypair serializedKeypair;
                 ReturnErrorOnFailure(mStagingNetworks[networkIndex].clientIdentityKeypair->Serialize(serializedKeypair));
                 ReturnErrorOnFailure(kvs.Put(kWifiClientIdentityKeypairKeyName[networkIndex], serializedKeypair.ConstBytes(),
-                                            serializedKeypair.Length()));
+                                             serializedKeypair.Length()));
             }
             else
             {
@@ -201,9 +204,12 @@ CHIP_ERROR LinuxWiFiDriver::CommitConfiguration()
 #else  // CHIP_DEVICE_CONFIG_ENABLE_WIFI_PDC
             {
 #endif // CHIP_DEVICE_CONFIG_ENABLE_WIFI_PDC
-                ReturnErrorOnFailure(kvs.Put(kWiFiCredentialsKeyName[networkIndex], mStagingNetworks[networkIndex].credentials, mStagingNetworks[networkIndex].credentialsLen));
+                ReturnErrorOnFailure(kvs.Put(kWiFiCredentialsKeyName[networkIndex], mStagingNetworks[networkIndex].credentials,
+                                             mStagingNetworks[networkIndex].credentialsLen));
             }
-        } else {
+        }
+        else
+        {
             ReturnErrorOnFailure(IgnoreNotFound(kvs.Delete(kWiFiSSIDKeyName[networkIndex])));
             ReturnErrorOnFailure(IgnoreNotFound(kvs.Delete(kWiFiCredentialsKeyName[networkIndex])));
 #if CHIP_DEVICE_CONFIG_ENABLE_WIFI_PDC
