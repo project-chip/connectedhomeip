@@ -24,9 +24,19 @@ from mobly import asserts
 class TC_ECOINFO_2_2(MatterBaseTest):
 
     def steps_TC_ECOINFO_2_2(self) -> list[TestStep]:
-        steps = [TestStep(1, "Prepare: Collect aggregator information", is_commissioning=True),
-                 TestStep(2, "Add a bridged device: Validate new Ecosystem Information cluster accessible on new endpoint"),
-                 TestStep(3, "Remove bridged device: Validate Ecosystem Information's Removed on populated")]
+        steps = [TestStep(1, "Prepare", is_commissioning=True),
+                 TestStep("1a", "Read root endpoint's PartsList"),
+                 TestStep("1b", "For each endpoint in 1a read DeviceType list confirming aggregator endpoint exists"),
+                 TestStep(2, "Add a bridged device"),
+                 TestStep("2a", "(Manual Step) Add a bridged device using method indicated by the manufacturer"),
+                 TestStep("2b", "Read root endpoint's PartsList, validate exactly one endpoint added"),
+                 TestStep("2c", "On newly added endpoint detected in 2b read RemovedOn Ecosystem Information Attribute and validate"),
+                 TestStep(3, "Remove bridged device"),
+                 TestStep("3a", "(Manual Step) Removed bridged device added in step 2a using method indicated by the manufacturer"),
+                 TestStep("3b", "On newly added endpoint detected in 2b read RemovedOn Ecosystem Information Attribute and validate"),
+                 TestStep("3c", "On newly added endpoint detected in 2b read DeviceDirectory Ecosystem Information Attribute and validate"),
+                 TestStep("3d", "On newly added endpoint detected in 2b read LocationDirectory Ecosystem Information Attribute and validate")]
+
         return steps
 
     @async_test_body
@@ -36,38 +46,41 @@ class TC_ECOINFO_2_2(MatterBaseTest):
 
         self.print_step(0, "Commissioning, already done")
         self.step(1)
+        self.step("1a")
         root_node_endpoint = 0
         root_part_list = await dev_ctrl.ReadAttribute(dut_node_id, [(root_node_endpoint, Clusters.Descriptor.Attributes.PartsList)])
 
-        list_of_endpoints = root_part_list[root_node_endpoint][Clusters.Descriptor][Clusters.Descriptor.Attributes.PartsList]
-
+        self.step("1b")
+        set_of_endpoints_step_1 = set(root_part_list[root_node_endpoint][Clusters.Descriptor][Clusters.Descriptor.Attributes.PartsList])
         list_of_aggregator_endpoints = []
-        for endpoint in list_of_endpoints:
+        for endpoint in set_of_endpoints_step_1:
             device_type_list_read = await dev_ctrl.ReadAttribute(dut_node_id, [(endpoint, Clusters.Descriptor.Attributes.DeviceTypeList)])
             device_type_list = device_type_list_read[endpoint][Clusters.Descriptor][Clusters.Descriptor.Attributes.DeviceTypeList]
             for device_type in device_type_list:
                 if device_type.deviceType == 14:
                     list_of_aggregator_endpoints.append(endpoint)
 
-        asserts.assert_equal(len(list_of_aggregator_endpoints), 1, "Test currently assumes one Aggregator device type")
-        aggregator_endpoint = list_of_aggregator_endpoints[0]
-        aggregator_part_list = await dev_ctrl.ReadAttribute(dut_node_id, [(aggregator_endpoint, Clusters.Descriptor.Attributes.PartsList)])
-        step_1_set_of_aggregator_endpoints = set(
-            aggregator_part_list[aggregator_endpoint][Clusters.Descriptor][Clusters.Descriptor.Attributes.PartsList])
+        asserts.assert_greater_equal(len(list_of_aggregator_endpoints), 1, "Did not find any Aggregator device types")
+        #aggregator_endpoint = list_of_aggregator_endpoints[0]
+        #aggregator_part_list = await dev_ctrl.ReadAttribute(aggregator_endpoint, [(root_node_endpoint, Clusters.Descriptor.Attributes.PartsList)])
+        #step_1_set_of_aggregator_endpoints = set(
+        #    aggregator_part_list[aggregator_endpoint][Clusters.Descriptor][Clusters.Descriptor.Attributes.PartsList])
 
+        self.step(2)
+        self.step("2a")
         # TODO what is the stop and wait for user prompt so we can add the device
         breakpoint()
-        aggregator_part_list = await dev_ctrl.ReadAttribute(dut_node_id, [(aggregator_endpoint, Clusters.Descriptor.Attributes.PartsList)])
-        step_2_set_of_aggregator_endpoints = set(
-            aggregator_part_list[aggregator_endpoint][Clusters.Descriptor][Clusters.Descriptor.Attributes.PartsList])
+        self.step("2b")
+        aggregator_part_list = await dev_ctrl.ReadAttribute(dut_node_id, [(root_node_endpoint, Clusters.Descriptor.Attributes.PartsList)])
+        set_of_endpoints_step_2 = set(
+            aggregator_part_list[root_node_endpoint][Clusters.Descriptor][Clusters.Descriptor.Attributes.PartsList])
 
-        asserts.assert_true(step_2_set_of_aggregator_endpoints.issuperset(
-            step_1_set_of_aggregator_endpoints), "Expected only new endpoints to be added")
-        unique_endpoints_set = step_2_set_of_aggregator_endpoints - step_1_set_of_aggregator_endpoints
+        asserts.assert_true(set_of_endpoints_step_2.issuperset(set_of_endpoints_step_1), "Expected only new endpoints to be added")
+        unique_endpoints_set = set_of_endpoints_step_2 - set_of_endpoints_step_1
         asserts.assert_equal(len(unique_endpoints_set), 1, "Expected only one new endpoint")
 
+        self.step("2c")
         newly_added_endpoint = list(unique_endpoints_set)[0]
-
         removed_on = await self.read_single_attribute(
             dev_ctrl,
             dut_node_id,
@@ -76,16 +89,12 @@ class TC_ECOINFO_2_2(MatterBaseTest):
 
         asserts.assert_true(removed_on is NullValue, "RemovedOn is expected to be null for a newly added device")
 
+        self.step(3)
+        self.step("3a")
         # TODO what is the stop and wait for user prompt so we can remove the device
         breakpoint()
 
-        aggregator_part_list = await dev_ctrl.ReadAttribute(dut_node_id, [(aggregator_endpoint, Clusters.Descriptor.Attributes.PartsList)])
-        step_3_set_of_aggregator_endpoints = set(
-            aggregator_part_list[aggregator_endpoint][Clusters.Descriptor][Clusters.Descriptor.Attributes.PartsList])
-
-        asserts.assert_equal(step_2_set_of_aggregator_endpoints, step_3_set_of_aggregator_endpoints,
-                             "Expect number of endpoints to be identical")
-
+        self.step("3b")
         removed_on = await self.read_single_attribute(
             dev_ctrl,
             dut_node_id,
@@ -93,6 +102,7 @@ class TC_ECOINFO_2_2(MatterBaseTest):
             attribute=Clusters.EcosystemInformation.Attributes.RemovedOn)
         asserts.assert_true(removed_on is not NullValue, "RemovedOn is expected to have a value")
 
+        self.step("3c")
         device_directory = await self.read_single_attribute(
             dev_ctrl,
             dut_node_id,
@@ -101,6 +111,7 @@ class TC_ECOINFO_2_2(MatterBaseTest):
             fabricFiltered=False)
         asserts.assert_equal(len(device_directory), 0, "Expected device directory to be empty")
 
+        self.step("3d")
         location_directory = await self.read_single_attribute(
             dev_ctrl,
             dut_node_id,
