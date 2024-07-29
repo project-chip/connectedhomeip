@@ -88,34 +88,33 @@ class TC_SEAR_1_2(MatterBaseTest):
         areaid_list = []
         areadesc_s = set()
         for a in supported_areas:
-            if a.areaID in areaid_list:
-                asserts.fail("SupportedAreas must have unique AreaID values!")
-            else:
-                areaid_list.append(a.areaID)
-                
-                if len(self.mapid_list) > 0:
-                    asserts.assert_is_not(a.mapID, NullValue,
-                             f"SupportedAreas entry with AreaID({a.areaID}) should not have null MapID")
-                    asserts.assert_is(a.mapID in self.mapid_list,
-                             f"SupportedAreas entry with AreaID({a.areaID}) has unknown MapID({a.mapID})")
-                    k = f"mapID:{a.mapID} areaDesc:{a.areaDesc}"
-                    asserts.true(k not in areadesc_s, f"SupportedAreas must have unique MapID({a.mapID}) + AreaDesc({a.areaDesc}) values!")
-                    areadesc_s.add(k)
-                else:
-                    #empty SupportedMaps
-                    asserts.assert_is(a.mapID, NullValue,
-                             f"SupportedAreas entry with AreaID({a.areaID}) should have null MapID")
-                    k = f"areaDesc:{a.areaDesc}"
-                    asserts.true(k not in areadesc_s, f"SupportedAreas must have unique AreaDesc({a.areaDesc}) values!")
-                    areadesc_s.add(k)
+            asserts.assert_true(a.areaID not in areaid_list, "SupportedAreas must have unique AreaID values!")
 
-                if a.locationInfo is NullValue and a.landmarkTag is NullValue:
-                    asserts.assert_true(f"SupportedAreas entry with AreaID({a.areaID}) should not have null LocationInfo and null LandmarkTag")
-                if a.landmarkTag is not NullValue:
-                    asserts.assert_true(a.landmarkTag <= self.MAX_LANDMARK_ID,
-                             f"SupportedAreas entry with AreaID({a.areaID}) has invalid LandmarkTag({a.landmarkTag})")
-                    asserts.assert_true(a.positionTag is NullValue or a.positionTag in range(0, self.MAX_RELPOS_ID),
-                             f"SupportedAreas entry with AreaID({a.areaID}) has invalid PositionTag({a.positionTag})")
+            areaid_list.append(a.areaID)
+            
+            if len(self.mapid_list) > 0:
+                asserts.assert_is_not(a.mapID, NullValue,
+                            f"SupportedAreas entry with AreaID({a.areaID}) should not have null MapID")
+                asserts.assert_is(a.mapID in self.mapid_list,
+                            f"SupportedAreas entry with AreaID({a.areaID}) has unknown MapID({a.mapID})")
+                k = f"mapID:{a.mapID} areaDesc:{a.areaDesc}"
+                asserts.assert_true(k not in areadesc_s, f"SupportedAreas must have unique MapID({a.mapID}) + AreaDesc({a.areaDesc}) values!")
+                areadesc_s.add(k)
+            else:
+                #empty SupportedMaps
+                asserts.assert_is(a.mapID, NullValue,
+                            f"SupportedAreas entry with AreaID({a.areaID}) should have null MapID")
+                k = f"areaDesc:{a.areaDesc}"
+                asserts.assert_true(k not in areadesc_s, f"SupportedAreas must have unique AreaDesc({a.areaDesc}) values!")
+                areadesc_s.add(k)
+
+            if a.locationInfo is NullValue and a.landmarkTag is NullValue:
+                asserts.assert_true(f"SupportedAreas entry with AreaID({a.areaID}) should not have null LocationInfo and null LandmarkTag")
+            if a.landmarkTag is not NullValue:
+                asserts.assert_true(a.landmarkTag <= self.MAX_LANDMARK_ID,
+                            f"SupportedAreas entry with AreaID({a.areaID}) has invalid LandmarkTag({a.landmarkTag})")
+                asserts.assert_true(a.positionTag is NullValue or a.positionTag in range(0, self.MAX_RELPOS_ID),
+                            f"SupportedAreas entry with AreaID({a.areaID}) has invalid PositionTag({a.positionTag})")
         #save so other methods can use this if neeeded
         self.areaid_list = areaid_list
 
@@ -130,14 +129,12 @@ class TC_SEAR_1_2(MatterBaseTest):
         asserts.assert_true(len(selected_areas) <= len(self.areaid_list),
                              f"SelectedAreas(len {len(selected_areas)}) should have at most {len(self.areaid_list)} entries")
 
-        selareaid_list = []
+        asserts.assert_true(len(set(selected_areas)) == len(selected_areas), "SelectedAreas must have unique AreaID values!")
+        selareaid_list = []        
         for a in selected_areas:
-            if a.areaID in selareaid_list:
-                asserts.fail("SelectedAreas must have unique AreaID values!")
-            else:
-                selareaid_list.append(a.areaID)
-                asserts.assert_true(a.areaID in self.areaid_list,
-                             f"SelectedAreas entry {a.areaID} has invalid value")
+            selareaid_list.append(a)
+            asserts.assert_true(a in self.areaid_list,
+                            f"SelectedAreas entry {a} has invalid value")
         #save so other methods can use this if neeeded
         self.selareaid_list = selareaid_list
 
@@ -227,20 +224,20 @@ class TC_SEAR_1_2(MatterBaseTest):
             self.write_to_app_pipe('{"Name": "Reset"}')
 
         if self.check_pics("SEAR.S.F02"):
-            await self.read_and_validate_supported_maps(2)
+            await self.read_and_validate_supported_maps(step=2)
 
-        await self.read_and_validate_supported_areas(3)
+        await self.read_and_validate_supported_areas(step=3)
 
-        await self.read_and_validate_selected_areas(4)
+        await self.read_and_validate_selected_areas(step=4)
 
         if self.check_pics("SEAR.S.A0003"):
-            await self.read_and_validate_current_area(5)
+            await self.read_and_validate_current_area(step=5)
 
         if self.check_pics("SEAR.S.A0004"):
-            await self.read_and_validate_estimated_end_time(6)
+            await self.read_and_validate_estimated_end_time(step=6)
 
         if self.check_pics("SEAR.S.A0005"):
-            await self.read_and_validate_progress(7)
+            await self.read_and_validate_progress(step=7)
 
         if self.check_pics("SEAR.S.F02") and self.check_pics("SEAR.S.M.REMOVE_MAP"):
             test_step = "Manually ensure the SupportedMaps attribute is not empty and that the device is not operating"
@@ -248,7 +245,7 @@ class TC_SEAR_1_2(MatterBaseTest):
             if not self.is_ci:
                 self.wait_for_user_input(prompt_msg=f"{test_step}, and press Enter when done.\n")
 
-            await self.read_and_validate_supported_maps(9)
+            await self.read_and_validate_supported_maps(step=9)
             old_supported_maps = self.mapid_list
 
             test_step = "Manually intervene to remove one or more entries in the SupportedMaps list"
@@ -256,24 +253,24 @@ class TC_SEAR_1_2(MatterBaseTest):
             if not self.is_ci:
                 self.wait_for_user_input(prompt_msg=f"{test_step}, and press Enter when done.\n")
 
-            await self.read_and_validate_supported_maps(11)
+            await self.read_and_validate_supported_maps(step=11)
             new_supported_maps = self.mapid_list
             asserts.assert_true(len(old_supported_maps) > len(new_supported_maps), "Failed to remove map(s)")
 
             #NOTE the following operations are all part of step 11 - read all these attributes and check the data consistency
             #     after removing map(s)
-            await self.read_and_validate_supported_areas(11)
+            await self.read_and_validate_supported_areas(step=11)
 
-            await self.read_and_validate_selected_areas(11)
+            await self.read_and_validate_selected_areas(step=11)
 
             if self.check_pics("SEAR.S.A0003"):
-                await self.read_and_validate_current_area(11)
+                await self.read_and_validate_current_area(step=11)
 
             if self.check_pics("SEAR.S.A0004"):
-                await self.read_and_validate_estimated_end_time(11)
+                await self.read_and_validate_estimated_end_time(step=11)
 
             if self.check_pics("SEAR.S.A0005"):
-                await self.read_and_validate_progress(11)
+                await self.read_and_validate_progress(step=11)
 
         if self.check_pics("SEAR.S.F02") and self.check_pics("SEAR.S.M.ADD_MAP"):
             test_step = "Manually ensure the SupportedMaps attribute has less than 255 entries and that the device is not operating"
@@ -281,7 +278,7 @@ class TC_SEAR_1_2(MatterBaseTest):
             if not self.is_ci:
                 self.wait_for_user_input(prompt_msg=f"{test_step}, and press Enter when done.\n")
 
-            await self.read_and_validate_supported_maps(13)
+            await self.read_and_validate_supported_maps(step=13)
             old_supported_maps = self.mapid_list
 
             test_step = "Manually intervene to add one or more entries to the SupportedMaps list"
@@ -289,24 +286,24 @@ class TC_SEAR_1_2(MatterBaseTest):
             if not self.is_ci:
                 self.wait_for_user_input(prompt_msg=f"{test_step}, and press Enter when done.\n")
 
-            await self.read_and_validate_supported_maps(15)
+            await self.read_and_validate_supported_maps(step=15)
             new_supported_maps = self.mapid_list
             asserts.assert_true(len(old_supported_maps) < len(new_supported_maps), "Failed to add map(s)")
 
             #NOTE the following operations are all part of step 15 - read all these attributes and check the data consistency
             #     after adding map(s)
-            await self.read_and_validate_supported_areas(15)
+            await self.read_and_validate_supported_areas(step=15)
 
-            await self.read_and_validate_selected_areas(15)
+            await self.read_and_validate_selected_areas(step=15)
 
             if self.check_pics("SEAR.S.A0003"):
-                await self.read_and_validate_current_area(15)
+                await self.read_and_validate_current_area(step=15)
 
             if self.check_pics("SEAR.S.A0004"):
-                await self.read_and_validate_estimated_end_time(15)
+                await self.read_and_validate_estimated_end_time(step=15)
 
             if self.check_pics("SEAR.S.A0005"):
-                await self.read_and_validate_progress(15)
+                await self.read_and_validate_progress(step=15)
 
         if self.check_pics("SEAR.S.M.REMOVE_AREA"):
             test_step = "Manually ensure the SupportedAreas attribute is not empty and that the device is not operating"
@@ -314,7 +311,7 @@ class TC_SEAR_1_2(MatterBaseTest):
             if not self.is_ci:
                 self.wait_for_user_input(prompt_msg=f"{test_step}, and press Enter when done.\n")
 
-            await self.read_and_validate_supported_areas(17)
+            await self.read_and_validate_supported_areas(step=17)
             old_supported_areas = self.areaid_list
 
             test_step = "Manually intervene to remove one or more entries from the SupportedAreas list"
@@ -322,23 +319,23 @@ class TC_SEAR_1_2(MatterBaseTest):
             if not self.is_ci:
                 self.wait_for_user_input(prompt_msg=f"{test_step}, and press Enter when done.\n")
 
-            await self.read_and_validate_supported_areas(19)
+            await self.read_and_validate_supported_areas(step=19)
             new_supported_areas = self.areaid_list
             asserts.assert_true(len(old_supported_areas) > len(new_supported_areas), "Failed to remove area(s)")
 
             #NOTE the following operations are all part of step 19 - read all these attributes and check the data consistency
             #     after removing areas(s)
             
-            await self.read_and_validate_selected_areas(19)
+            await self.read_and_validate_selected_areas(step=19)
 
             if self.check_pics("SEAR.S.A0003"):
-                await self.read_and_validate_current_area(19)
+                await self.read_and_validate_current_area(step=19)
 
             if self.check_pics("SEAR.S.A0004"):
-                await self.read_and_validate_estimated_end_time(19)
+                await self.read_and_validate_estimated_end_time(step=19)
 
             if self.check_pics("SEAR.S.A0005"):
-                await self.read_and_validate_progress(19)
+                await self.read_and_validate_progress(step=19)
 
         if self.check_pics("SEAR.S.M.ADD_AREA"):
             test_step = "Manually ensure the SupportedAreas attribute has less than 255 entries and that the device is not operating"
@@ -346,7 +343,7 @@ class TC_SEAR_1_2(MatterBaseTest):
             if not self.is_ci:
                 self.wait_for_user_input(prompt_msg=f"{test_step}, and press Enter when done.\n")
 
-            await self.read_and_validate_supported_areas(21)
+            await self.read_and_validate_supported_areas(step=21)
             old_supported_areas = self.areaid_list
 
             test_step = "Manually intervene to add one or more entries to the SupportedAreas list"
@@ -354,23 +351,23 @@ class TC_SEAR_1_2(MatterBaseTest):
             if not self.is_ci:
                 self.wait_for_user_input(prompt_msg=f"{test_step}, and press Enter when done.\n")
 
-            await self.read_and_validate_supported_areas(23)
+            await self.read_and_validate_supported_areas(step=23)
             new_supported_areas = self.areaid_list
             asserts.assert_true(len(old_supported_areas) < len(new_supported_areas), "Failed to add area(s)")
 
             #NOTE the following operations are all part of step 23 - read all these attributes and check the data consistency
             #     after removing areas(s)
             
-            await self.read_and_validate_selected_areas(23)
+            await self.read_and_validate_selected_areas(step=23)
 
             if self.check_pics("SEAR.S.A0003"):
-                await self.read_and_validate_current_area(23)
+                await self.read_and_validate_current_area(step=23)
 
             if self.check_pics("SEAR.S.A0004"):
-                await self.read_and_validate_estimated_end_time(23)
+                await self.read_and_validate_estimated_end_time(step=23)
 
             if self.check_pics("SEAR.S.A0005"):
-                await self.read_and_validate_progress(23)
+                await self.read_and_validate_progress(step=23)
 
 
 if __name__ == "__main__":

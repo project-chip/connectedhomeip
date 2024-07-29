@@ -114,10 +114,10 @@ class TC_SEAR_1_6(MatterBaseTest):
         if not self.is_ci:
             self.wait_for_user_input(prompt_msg=f"{test_step}, and press Enter when done.\n")
 
-        supported_area_ids = await self.read_supported_areas(3)
+        supported_area_ids = await self.read_supported_areas(step=3)
         asserts.assert_true(len(supported_area_ids) > 0, "SupportedAreas is empty")
 
-        selected_areas = await self.read_selected_areas(4)
+        selected_areas = await self.read_selected_areas(step=4)
         asserts.assert_true(len(selected_areas) > 0, "SelectedAreas is empty")
 
         test_step = "Manually intervene to put the device in the operating state"
@@ -125,7 +125,7 @@ class TC_SEAR_1_6(MatterBaseTest):
         if not self.is_ci:
             self.wait_for_user_input(prompt_msg=f"{test_step}, and press Enter when done.\n")
 
-        progress_list_operating = await self.read_progress(6)
+        progress_list_operating = await self.read_progress(step=6)
         asserts.assert_true(len(selected_areas) == len(progress_list_operating), f"len of SelectedAreas({len(selected_areas)}) should be equal to len of Progress({len(progress_list_operating)})")
 
         for p in progress_list_operating:
@@ -142,7 +142,7 @@ class TC_SEAR_1_6(MatterBaseTest):
         if not self.is_ci:
             self.wait_for_user_input(prompt_msg=f"{test_step}, and press Enter when done.\n")
 
-        progress_list_idle = await self.read_progress(8)
+        progress_list_idle = await self.read_progress(step=8)
         asserts.assert_true(len(selected_areas) == len(progress_list_idle), f"len of SelectedAreas({len(selected_areas)}) should be equal to len of Progress({len(progress_list_idle)})")
 
         for p in progress_list_idle:
