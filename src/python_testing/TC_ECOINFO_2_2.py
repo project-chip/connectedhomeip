@@ -15,13 +15,9 @@
 #    limitations under the License.
 #
 
-import logging
-
 import chip.clusters as Clusters
 from chip.clusters.Types import NullValue
-from chip.interaction_model import Status
-from chip.tlv import uint
-from matter_testing_support import MatterBaseTest, TestStep, async_test_body, type_matches
+from matter_testing_support import MatterBaseTest, TestStep, async_test_body
 from mobly import asserts
 
 
