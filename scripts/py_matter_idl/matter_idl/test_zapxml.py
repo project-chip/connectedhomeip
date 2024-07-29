@@ -234,6 +234,37 @@ class TestXmlParser(unittest.TestCase):
                                       qualities=StructQuality.FABRIC_SCOPED)],
                          )]))
 
+    def testGlobalEnum(self):
+        idl = XmlToIdl('''<?xml version="1.0"?>
+            <configurator>
+              <enum name="One" type="ENUM8">
+                <item value="3" name="Three" />
+              </enum>
+
+              <enum name="Two" type="ENUM8">
+                <item value="100" name="Big" />
+                <item value="2000" name="Bigger" />
+              </enum>
+            </configurator>
+        ''')
+        e1 = Enum(
+            name='One',
+            base_type="ENUM8",
+            entries=[
+                ConstantEntry(name="Three", code=3),
+            ]
+        )
+        e2 = Enum(
+            name='Two',
+            base_type="ENUM8",
+            entries=[
+                ConstantEntry(name="Big", code=100),
+                ConstantEntry(name="Bigger", code=2000),
+            ]
+        )
+        self.assertEqual(idl, Idl(global_enums=[e1, e2]))
+
+
     def testEnum(self):
         idl = XmlToIdl('''<?xml version="1.0"?>
             <configurator>
