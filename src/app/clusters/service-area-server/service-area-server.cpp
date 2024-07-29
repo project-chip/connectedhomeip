@@ -250,7 +250,7 @@ void Instance::HandleSelectLocationsCmd(HandlerContext & ctx, const Commands::Se
         {
             uint32_t ignoredIndex = 0;
             uint32_t oldSelectedLocation;
-            uint32_t i = 0;
+            uint32_t i         = 0;
             auto iLocationIter = req.newLocations.Value().begin();
             while (iLocationIter.Next())
             {
