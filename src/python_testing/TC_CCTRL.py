@@ -89,7 +89,7 @@ class TC_CCTRL(MatterBaseTest):
         super().teardown_class()
 
     @per_endpoint_test(has_cluster(Clusters.CommissionerControl))
-    async def test_TC_CCTRL_3_1(self):
+    async def test_TC_CCTRL_2_2(self):
         self.is_ci = self.check_pics('PICS_SDK_CI_ONLY')
 
         #self.step(1)
