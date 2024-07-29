@@ -16,7 +16,7 @@
 #
 
 import chip.clusters as Clusters
-from matter_testing_support import MatterBaseTest, TestStep, async_test_body, default_matter_test_main, has_cluster, per_endpoint_test
+from matter_testing_support import MatterBaseTest, TestStep, default_matter_test_main, has_cluster, per_endpoint_test
 from mobly import asserts
 
 
