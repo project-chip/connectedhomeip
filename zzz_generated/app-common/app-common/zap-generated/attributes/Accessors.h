@@ -2468,70 +2468,7 @@ Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint16_t valu
 } // namespace ElectricalEnergyMeasurement
 
 namespace WaterHeaterManagement {
-namespace Attributes {
-
-namespace HeaterTypes {
-Protocols::InteractionModel::Status
-Get(chip::EndpointId endpoint,
-    chip::BitMask<chip::app::Clusters::WaterHeaterManagement::WaterHeaterTypeBitmap> * value); // WaterHeaterTypeBitmap
-Protocols::InteractionModel::Status Set(chip::EndpointId endpoint,
-                                        chip::BitMask<chip::app::Clusters::WaterHeaterManagement::WaterHeaterTypeBitmap> value);
-Protocols::InteractionModel::Status Set(chip::EndpointId endpoint,
-                                        chip::BitMask<chip::app::Clusters::WaterHeaterManagement::WaterHeaterTypeBitmap> value,
-                                        MarkAttributeDirty markDirty);
-} // namespace HeaterTypes
-
-namespace HeatDemand {
-Protocols::InteractionModel::Status
-Get(chip::EndpointId endpoint,
-    chip::BitMask<chip::app::Clusters::WaterHeaterManagement::WaterHeaterDemandBitmap> * value); // WaterHeaterDemandBitmap
-Protocols::InteractionModel::Status Set(chip::EndpointId endpoint,
-                                        chip::BitMask<chip::app::Clusters::WaterHeaterManagement::WaterHeaterDemandBitmap> value);
-Protocols::InteractionModel::Status Set(chip::EndpointId endpoint,
-                                        chip::BitMask<chip::app::Clusters::WaterHeaterManagement::WaterHeaterDemandBitmap> value,
-                                        MarkAttributeDirty markDirty);
-} // namespace HeatDemand
-
-namespace TankVolume {
-Protocols::InteractionModel::Status Get(chip::EndpointId endpoint, uint16_t * value); // int16u
-Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint16_t value);
-Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint16_t value, MarkAttributeDirty markDirty);
-} // namespace TankVolume
-
-namespace EstimatedHeatRequired {
-Protocols::InteractionModel::Status Get(chip::EndpointId endpoint, int64_t * value); // energy_mwh
-Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, int64_t value);
-Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, int64_t value, MarkAttributeDirty markDirty);
-} // namespace EstimatedHeatRequired
-
-namespace TankPercentage {
-Protocols::InteractionModel::Status Get(chip::EndpointId endpoint, chip::Percent * value); // percent
-Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, chip::Percent value);
-Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, chip::Percent value, MarkAttributeDirty markDirty);
-} // namespace TankPercentage
-
-namespace BoostState {
-Protocols::InteractionModel::Status Get(chip::EndpointId endpoint,
-                                        chip::app::Clusters::WaterHeaterManagement::BoostStateEnum * value); // BoostStateEnum
-Protocols::InteractionModel::Status Set(chip::EndpointId endpoint,
-                                        chip::app::Clusters::WaterHeaterManagement::BoostStateEnum value);
-Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, chip::app::Clusters::WaterHeaterManagement::BoostStateEnum value,
-                                        MarkAttributeDirty markDirty);
-} // namespace BoostState
-
-namespace FeatureMap {
-Protocols::InteractionModel::Status Get(chip::EndpointId endpoint, uint32_t * value); // bitmap32
-Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint32_t value);
-Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint32_t value, MarkAttributeDirty markDirty);
-} // namespace FeatureMap
-
-namespace ClusterRevision {
-Protocols::InteractionModel::Status Get(chip::EndpointId endpoint, uint16_t * value); // int16u
-Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint16_t value);
-Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint16_t value, MarkAttributeDirty markDirty);
-} // namespace ClusterRevision
-
-} // namespace Attributes
+namespace Attributes {} // namespace Attributes
 } // namespace WaterHeaterManagement
 
 namespace DemandResponseLoadControl {
@@ -5936,6 +5873,35 @@ Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint16_t valu
 
 } // namespace Attributes
 } // namespace ContentAppObserver
+
+namespace EcosystemInformation {
+namespace Attributes {
+
+namespace RemovedOn {
+Protocols::InteractionModel::Status Get(chip::EndpointId endpoint, DataModel::Nullable<uint64_t> & value); // epoch_us
+Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint64_t value);
+Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint64_t value, MarkAttributeDirty markDirty);
+Protocols::InteractionModel::Status SetNull(chip::EndpointId endpoint);
+Protocols::InteractionModel::Status SetNull(chip::EndpointId endpoint, MarkAttributeDirty markDirty);
+Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, const chip::app::DataModel::Nullable<uint64_t> & value);
+Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, const chip::app::DataModel::Nullable<uint64_t> & value,
+                                        MarkAttributeDirty markDirty);
+} // namespace RemovedOn
+
+namespace FeatureMap {
+Protocols::InteractionModel::Status Get(chip::EndpointId endpoint, uint32_t * value); // bitmap32
+Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint32_t value);
+Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint32_t value, MarkAttributeDirty markDirty);
+} // namespace FeatureMap
+
+namespace ClusterRevision {
+Protocols::InteractionModel::Status Get(chip::EndpointId endpoint, uint16_t * value); // int16u
+Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint16_t value);
+Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint16_t value, MarkAttributeDirty markDirty);
+} // namespace ClusterRevision
+
+} // namespace Attributes
+} // namespace EcosystemInformation
 
 namespace CommissionerControl {
 namespace Attributes {

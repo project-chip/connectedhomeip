@@ -243,8 +243,8 @@ tests:
       response:
           constraints:
               type: int8s
-              minValue: -25
-              maxValue: 25
+              minValue: -127
+              maxValue: 127
 
     - label: "Step 13a: TH reads attribute OccupiedCoolingSetpoint from the DUT"
       PICS: TSTAT.S.F01 && TSTAT.S.A0017 && TSTAT.S.A0018

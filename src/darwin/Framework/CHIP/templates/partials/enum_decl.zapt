@@ -1,0 +1,46 @@
+{{! Arguments: cluster (might be "Globals", is not case-canonicalized), name, enumLabel }}
+{{#*inline "enumDef"}}
+typedef NS_ENUM({{asUnderlyingZclType name}}, {{objCEnumName clusterName enumName}}) {
+   {{#zcl_enum_items}}
+   {{#if (isSupported ../clusterName enum=../enumName enumValue=(asUpperCamelCase label preserveAcronyms=true))}}
+   {{objCEnumName ../clusterName ../enumName}}{{asUpperCamelCase label preserveAcronyms=true}} {{availability ../clusterName enum=../enumName enumValue=(asUpperCamelCase label preserveAcronyms=true) deprecationMessage=(concat "Please use " (objCEnumName (asUpperCamelCase ../cluster preserveAcronyms=true) ../enumLabel) (asUpperCamelCase label preserveAcronyms=true))}} = {{asHex value 2}},
+   {{/if}}
+   {{#*inline "oldNameItemDecl"}}
+   {{#if oldItemName}}
+   {{#if (isSupported ../clusterName enum=../enumName enumValue=oldItemName)}}
+   {{objCEnumName ../clusterName ../enumName}}{{objCEnumItemLabel oldItemName}} {{availability ../clusterName enum=../enumName enumValue=oldItemName deprecationMessage=(concat "Please use " (objCEnumName (asUpperCamelCase ../cluster preserveAcronyms=true) ../enumLabel) (asUpperCamelCase label preserveAcronyms=true))}} = {{asHex value 2}},
+   {{/if}}
+   {{/if}}
+   {{/inline}}
+   {{> oldNameItemDecl oldItemName=(oldName ../clusterName enum=../enumName enumValue=(asUpperCamelCase label preserveAcronyms=true))}}
+   {{/zcl_enum_items}}
+   {{!We had extra "Not Supported" values for DoorLockUserStatus/DoorLockUserType that we have to wedge in here manually for now.}}
+   {{#if (and (isStrEqual clusterName "DoorLock")
+              (or (isStrEqual enumName "UserTypeEnum") (isStrEqual enumName "UserStatusEnum"))
+              (isSupported clusterName enum=enumName enumValue="NotSupported"))}}
+   {{objCEnumName clusterName enumName}}{{objCEnumItemLabel "NotSupported"}} {{availability clusterName enum=enumName enumValue="NotSupported" deprecationMessage="This value is not part of the specification and will be removed"}} = 0xFF,
+   {{/if}}
+}
+{{/inline}}
+{{#if (isSupported (asUpperCamelCase cluster preserveAcronyms=true) enum=(asUpperCamelCase enumLabel preserveAcronyms=true))}}
+{{> enumDef name=name clusterName=(asUpperCamelCase cluster preserveAcronyms=true) enumName=(asUpperCamelCase enumLabel preserveAcronyms=true)}} {{availability (asUpperCamelCase cluster preserveAcronyms=true) enum=(asUpperCamelCase enumLabel preserveAcronyms=true) deprecationMessage="This enum is unused and will be removed"}};
+{{/if}}
+{{! Takes the name of the enum to use as enumName. }}
+{{#*inline "oldNameDecl"}}
+{{#if (isSupported (compatClusterNameRemapping cluster) enum=enumName)}}
+
+{{> enumDef name=name clusterName=(compatClusterNameRemapping cluster) enumName=enumName}} {{availability (compatClusterNameRemapping cluster) enum=enumName deprecationMessage=(concat "Please use " (objCEnumName (asUpperCamelCase cluster preserveAcronyms=true) enumLabel))}};
+{{/if}}
+{{/inline}}
+{{! Takes the old name of the enum, if any, as oldEnumName. }}
+{{#*inline "oldNameCheck"}}
+{{#if (or oldEnumName
+          (hasOldName (asUpperCamelCase cluster preserveAcronyms=true)))}}
+{{#if oldEnumName}}
+{{> oldNameDecl enumName=oldEnumName}}
+{{else}}
+{{> oldNameDecl enumName=(asUpperCamelCase enumLabel preserveAcronyms=true)}}
+{{/if}}
+{{/if}}
+{{/inline}}
+{{> oldNameCheck oldEnumName=(oldName (asUpperCamelCase cluster preserveAcronyms=true) enum=(asUpperCamelCase enumLabel preserveAcronyms=true))}}

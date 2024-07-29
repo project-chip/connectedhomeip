@@ -52,7 +52,21 @@ class TestRead : public chip::Test::AppContext, public app::ReadHandler::Applica
 protected:
     static uint16_t mMaxInterval;
 
-    CHIP_ERROR OnSubscriptionRequested(app::ReadHandler & aReadHandler, Transport::SecureSession & aSecureSession)
+    // Performs setup for each individual test in the test suite
+    void SetUp() override
+    {
+        chip::Test::AppContext::SetUp();
+        mOldModel = InteractionModelEngine::GetInstance()->SetDataModel(&CustomDataModel::Instance());
+    }
+
+    // Performs teardown for each individual test in the test suite
+    void TearDown() override
+    {
+        InteractionModelEngine::GetInstance()->SetDataModel(mOldModel);
+        chip::Test::AppContext::TearDown();
+    }
+
+    CHIP_ERROR OnSubscriptionRequested(app::ReadHandler & aReadHandler, Transport::SecureSession & aSecureSession) override
     {
         VerifyOrReturnError(!mEmitSubscriptionError, CHIP_ERROR_INVALID_ARGUMENT);
 
@@ -63,9 +77,9 @@ protected:
         return CHIP_NO_ERROR;
     }
 
-    void OnSubscriptionEstablished(app::ReadHandler & aReadHandler) { mNumActiveSubscriptions++; }
+    void OnSubscriptionEstablished(app::ReadHandler & aReadHandler) override { mNumActiveSubscriptions++; }
 
-    void OnSubscriptionTerminated(app::ReadHandler & aReadHandler) { mNumActiveSubscriptions--; }
+    void OnSubscriptionTerminated(app::ReadHandler & aReadHandler) override { mNumActiveSubscriptions--; }
 
     // Issue the given number of reads in parallel and wait for them all to
     // succeed.
@@ -83,9 +97,10 @@ protected:
     // max-interval to time out.
     static System::Clock::Timeout ComputeSubscriptionTimeout(System::Clock::Seconds16 aMaxInterval);
 
-    bool mEmitSubscriptionError      = false;
-    int32_t mNumActiveSubscriptions  = 0;
-    bool mAlterSubscriptionIntervals = false;
+    bool mEmitSubscriptionError                        = false;
+    int32_t mNumActiveSubscriptions                    = 0;
+    bool mAlterSubscriptionIntervals                   = false;
+    chip::app::InteractionModel::DataModel * mOldModel = nullptr;
 };
 
 uint16_t TestRead::mMaxInterval = 66;
