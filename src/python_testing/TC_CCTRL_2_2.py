@@ -52,7 +52,8 @@ class TC_CCTRL_2_2(MatterBaseTest):
         super().setup_class()
         # TODO: This needs to come from an arg and needs to be something available on the TH
         # TODO: confirm whether we can open processes like this on the TH
-        app = os.path.join(pathlib.Path(__file__).resolve().parent, '..','..','out', 'linux-x64-all-clusters-no-ble', 'chip-all-clusters-app')
+        app = os.path.join(pathlib.Path(__file__).resolve().parent, '..', '..', 'out',
+                           'linux-x64-all-clusters-no-ble', 'chip-all-clusters-app')
 
         self.kvs = f'kvs_{str(uuid.uuid4())}'
         self.port = 5543
@@ -68,7 +69,6 @@ class TC_CCTRL_2_2(MatterBaseTest):
         time.sleep(3)
 
         logging.info("Commissioning from separate fabric")
-
 
         # Create a second controller on a new fabric to communicate to the server
         new_certificate_authority = self.certificate_authority_manager.NewCertificateAuthority()
@@ -88,7 +88,6 @@ class TC_CCTRL_2_2(MatterBaseTest):
         os.remove(self.kvs)
         super().teardown_class()
 
-    
     def steps_TC_CCTRL_2_2(self) -> list[TestStep]:
         steps = [TestStep(1, "Get number of fabrics from TH_SERVER", is_commissioning=True),
                  TestStep(2, "Reading Attribute VendorId from TH_SERVER"),
@@ -138,7 +137,8 @@ class TC_CCTRL_2_2(MatterBaseTest):
 
         self.step(5)
         ipaddr = ipaddress.IPv6Address('::1')
-        cmd = Clusters.CommissionerControl.Commands.CommissionNode(requestId=1, responseTimeoutSeconds=30, ipAddress=ipaddr.packed, port=self.port)
+        cmd = Clusters.CommissionerControl.Commands.CommissionNode(
+            requestId=1, responseTimeoutSeconds=30, ipAddress=ipaddr.packed, port=self.port)
         try:
             await self.send_single_cmd(cmd)
             asserts.fail("Unexpected success on CommissionNode")
@@ -158,7 +158,8 @@ class TC_CCTRL_2_2(MatterBaseTest):
 
         self.step(8)
         good_request_id = 0x1234567887654321
-        cmd = Clusters.CommissionerControl.Commands.RequestCommissioningApproval(requestId=good_request_id, vendorId=th_server_vid, productId=th_server_pid)
+        cmd = Clusters.CommissionerControl.Commands.RequestCommissioningApproval(
+            requestId=good_request_id, vendorId=th_server_vid, productId=th_server_pid)
         try:
             await self.send_single_cmd(cmd=cmd, node_id=pase_nodeid)
             asserts.fail("Unexpected success on RequestCommissioningApproval over PASE")
@@ -182,7 +183,8 @@ class TC_CCTRL_2_2(MatterBaseTest):
         # There should be nothing on the TH that uses VID 0x6006 as this is a real vendor ID.
         not_th_server_vid = 0x6006
         asserts.assert_not_equal(not_th_server_vid, th_server_vid, "Test implementation assumption incorrect")
-        cmd = Clusters.CommissionerControl.Commands.RequestCommissioningApproval(requestId=good_request_id, vendorId=not_th_server_vid, productId=th_server_pid)
+        cmd = Clusters.CommissionerControl.Commands.RequestCommissioningApproval(
+            requestId=good_request_id, vendorId=not_th_server_vid, productId=th_server_pid)
         # If no exception is raised, this is success
         await self.send_single_cmd(cmd)
 
@@ -198,7 +200,8 @@ class TC_CCTRL_2_2(MatterBaseTest):
             new_event = await self.default_controller.ReadEvent(nodeid=self.dut_node_id, events=event_path, eventNumberFilter=max(event_nums)+1)
         asserts.assert_equal(len(new_event), 1, "Unexpected event list len")
         asserts.assert_equal(new_event[0].Data.statusCode, 0, "Unexpected status code")
-        asserts.assert_equal(new_event[0].Data.clientNodeId, self.matter_test_config.controller_node_id, "Unexpected client node id")
+        asserts.assert_equal(new_event[0].Data.clientNodeId,
+                             self.matter_test_config.controller_node_id, "Unexpected client node id")
         asserts.assert_equal(new_event[0].Data.requestId, good_request_id, "Unexpected request ID")
 
         self.step(14)
@@ -229,7 +232,8 @@ class TC_CCTRL_2_2(MatterBaseTest):
         self.step(17)
         cmd = Clusters.CommissionerControl.Commands.CommissionNode(requestId=good_request_id, responseTimeoutSeconds=30)
         resp: Clusters.CommissionerControl.Commands.ReverseOpenCommissioningWindow = await self.send_single_cmd(cmd)
-        asserts.assert_equal(type(resp), Clusters.CommissionerControl.Commands.ReverseOpenCommissioningWindow, "Incorrect response type")
+        asserts.assert_equal(type(resp), Clusters.CommissionerControl.Commands.ReverseOpenCommissioningWindow,
+                             "Incorrect response type")
 
         self.step(18)
         # min commissioning timeout is 3*60 seconds, so use that even though the command said 30.
@@ -255,7 +259,8 @@ class TC_CCTRL_2_2(MatterBaseTest):
 
         self.step(22)
         good_request_id = 0x1234567812345678
-        cmd = Clusters.CommissionerControl.Commands.RequestCommissioningApproval(requestId=good_request_id, vendorId=th_server_vid, productId=th_server_pid, label="Test Ecosystem")
+        cmd = Clusters.CommissionerControl.Commands.RequestCommissioningApproval(
+            requestId=good_request_id, vendorId=th_server_vid, productId=th_server_pid, label="Test Ecosystem")
         await self.send_single_cmd(cmd)
 
         self.step(23)
@@ -268,13 +273,15 @@ class TC_CCTRL_2_2(MatterBaseTest):
         new_event = await self.default_controller.ReadEvent(nodeid=self.dut_node_id, events=event_path, eventNumberFilter=max(event_nums)+1)
         asserts.assert_equal(len(new_event), 1, "Unexpected event list len")
         asserts.assert_equal(new_event[0].Data.statusCode, 0, "Unexpected status code")
-        asserts.assert_equal(new_event[0].Data.clientNodeId, self.matter_test_config.controller_node_id, "Unexpected client node id")
+        asserts.assert_equal(new_event[0].Data.clientNodeId,
+                             self.matter_test_config.controller_node_id, "Unexpected client node id")
         asserts.assert_equal(new_event[0].Data.requestId, good_request_id, "Unexpected request ID")
 
         self.step(25)
         cmd = Clusters.CommissionerControl.Commands.CommissionNode(requestId=good_request_id, responseTimeoutSeconds=30)
         resp = await self.send_single_cmd(cmd)
-        asserts.assert_equal(type(resp), Clusters.CommissionerControl.Commands.ReverseOpenCommissioningWindow, "Incorrect response type")
+        asserts.assert_equal(type(resp), Clusters.CommissionerControl.Commands.ReverseOpenCommissioningWindow,
+                             "Incorrect response type")
 
         self.step(26)
         # min commissioning timeout is 3*60 seconds, so use that even though the command said 30.
@@ -290,10 +297,10 @@ class TC_CCTRL_2_2(MatterBaseTest):
 
         self.step(28)
         th_server_fabrics_new = await self.read_single_attribute_check_success(cluster=Clusters.OperationalCredentials, attribute=Clusters.OperationalCredentials.Attributes.Fabrics, dev_ctrl=self.TH_server_controller, node_id=self.server_nodeid, endpoint=0)
-        #TODO: this should be mocked too.
+        # TODO: this should be mocked too.
         if not self.is_ci:
-            asserts.assert_equal(len(th_server_fabrics) + 1, len(th_server_fabrics_new), "Unexpected number of fabrics on TH_SERVER")
-
+            asserts.assert_equal(len(th_server_fabrics) + 1, len(th_server_fabrics_new),
+                                 "Unexpected number of fabrics on TH_SERVER")
 
 
 if __name__ == "__main__":

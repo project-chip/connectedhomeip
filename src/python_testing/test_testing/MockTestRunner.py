@@ -34,9 +34,11 @@ except ImportError:
 class AsyncMock(MagicMock):
     async def __call__(self, *args, **kwargs):
         return super(AsyncMock, self).__call__(*args, **kwargs)
+
+
 class MockTestRunner():
 
-    def __init__(self, filename: str, classname: str, test: str, endpoint: int = 0, pics: dict[str, bool] = None, paa_trust_store_path = None):
+    def __init__(self, filename: str, classname: str, test: str, endpoint: int = 0, pics: dict[str, bool] = None, paa_trust_store_path=None):
         self.test = test
         self.endpoint = endpoint
         self.pics = pics
