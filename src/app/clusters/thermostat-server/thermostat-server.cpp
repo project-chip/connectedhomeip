@@ -732,9 +732,6 @@ CHIP_ERROR ThermostatAttrAccess::Read(const ConcreteReadAttributePath & aPath, A
         Delegate * delegate = GetDelegate(aPath.mEndpointId);
         VerifyOrReturnError(delegate != nullptr, CHIP_ERROR_INCORRECT_STATE, ChipLogError(Zcl, "Delegate is null"));
 
-        if (InAtomicWrite(aPath.mEndpointId))
-        {
-        }
         return aEncoder.EncodeList([delegate](const auto & encoder) -> CHIP_ERROR {
             for (uint8_t i = 0; true; i++)
             {
@@ -761,6 +758,22 @@ CHIP_ERROR ThermostatAttrAccess::Read(const ConcreteReadAttributePath & aPath, A
         Delegate * delegate = GetDelegate(aPath.mEndpointId);
         VerifyOrReturnError(delegate != nullptr, CHIP_ERROR_INCORRECT_STATE, ChipLogError(Zcl, "Delegate is null"));
 
+        if (InAtomicWrite(aPath.mEndpointId))
+        {
+            return aEncoder.EncodeList([delegate](const auto & encoder) -> CHIP_ERROR {
+                for (uint8_t i = 0; true; i++)
+                {
+                    PresetStructWithOwnedMembers preset;
+                    auto err = delegate->GetPendingPresetAtIndex(i, preset);
+                    if (err == CHIP_ERROR_PROVIDER_LIST_EXHAUSTED)
+                    {
+                        return CHIP_NO_ERROR;
+                    }
+                    ReturnErrorOnFailure(err);
+                    ReturnErrorOnFailure(encoder.Encode(preset));
+                }
+            });
+        }
         return aEncoder.EncodeList([delegate](const auto & encoder) -> CHIP_ERROR {
             for (uint8_t i = 0; true; i++)
             {
