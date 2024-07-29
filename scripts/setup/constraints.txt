@@ -124,7 +124,7 @@ markupsafe==2.1.2
     # via jinja2
 matplotlib-inline==0.1.6
     # via ipython
-mobly==1.12.1
+mobly==1.12.3
     # via -r requirements.all.txt
 msgpack==1.0.4
     # via cachecontrol
