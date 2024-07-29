@@ -19,6 +19,7 @@
 
 #include <credentials/attestation_verifier/DeviceAttestationVerifier.h>
 #include <lib/support/Span.h>
+#include <string_view>
 
 namespace chip {
 namespace Credentials {
@@ -43,11 +44,11 @@ public:
     // Set the path to the device attestation revocation set JSON file.
     // revocation set can be generated using credentials/generate-revocation-set.py script
     // This API returns CHIP_ERROR_INVALID_ARGUMENT if the path is null.
-    CHIP_ERROR SetDeviceAttestationRevocationSetPath(const char * path);
+    CHIP_ERROR SetDeviceAttestationRevocationSetPath(std::string_view path);
 
     // Clear the path to the device attestation revocation set JSON file.
     // This can be used to skip the revocation check
-    void ClearDeviceAttestationRevocationSetPath() { mDeviceAttestationRevocationSetPath = nullptr; }
+    void ClearDeviceAttestationRevocationSetPath();
 
 private:
     CHIP_ERROR GetAKIDHexStr(const ByteSpan & certDer, MutableCharSpan & outAKIDHexStr);
@@ -57,7 +58,7 @@ private:
                                 const CharSpan & serialNumberHexStr);
     bool IsCertificateRevoked(const ByteSpan & certDer);
 
-    const char * mDeviceAttestationRevocationSetPath = nullptr;
+    std::string_view mDeviceAttestationRevocationSetPath;
 };
 
 } // namespace Credentials

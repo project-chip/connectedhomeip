@@ -57,10 +57,10 @@ protected:
 class DefaultDACVerifier : public DeviceAttestationVerifier
 {
 public:
-    DefaultDACVerifier(const AttestationTrustStore * paaRootStore,
-                       DeviceAttestationRevocationDelegate * revocationDelegate = nullptr) :
-        mAttestationTrustStore(paaRootStore),
-        mRevocationDelegate(revocationDelegate)
+    DefaultDACVerifier(const AttestationTrustStore * paaRootStore) : mAttestationTrustStore(paaRootStore) {}
+
+    DefaultDACVerifier(const AttestationTrustStore * paaRootStore, DeviceAttestationRevocationDelegate * revocationDelegate) :
+        mAttestationTrustStore(paaRootStore), mRevocationDelegate(revocationDelegate)
     {}
 
     void VerifyAttestationInformation(const DeviceAttestationVerifier::AttestationInfo & info,
@@ -82,6 +82,11 @@ public:
                                  Callback::Callback<OnAttestationInformationVerification> * onCompletion) override;
 
     CsaCdKeysTrustStore * GetCertificationDeclarationTrustStore() override { return &mCdKeysTrustStore; }
+
+    void SetRevocationDelegate(DeviceAttestationRevocationDelegate * revocationDelegate)
+    {
+        mRevocationDelegate = revocationDelegate;
+    }
 
 protected:
     DefaultDACVerifier() {}

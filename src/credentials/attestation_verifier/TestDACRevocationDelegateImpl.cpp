@@ -40,11 +40,17 @@ CHIP_ERROR BytesToHexStr(const ByteSpan & bytes, MutableCharSpan & outHexStr)
 }
 } // anonymous namespace
 
-CHIP_ERROR TestDACRevocationDelegateImpl::SetDeviceAttestationRevocationSetPath(const char * path)
+CHIP_ERROR TestDACRevocationDelegateImpl::SetDeviceAttestationRevocationSetPath(std::string_view path)
 {
-    VerifyOrReturnError(path != nullptr, CHIP_ERROR_INVALID_ARGUMENT);
+    VerifyOrReturnError(path.empty() != true, CHIP_ERROR_INVALID_ARGUMENT);
     mDeviceAttestationRevocationSetPath = path;
     return CHIP_NO_ERROR;
+}
+
+void TestDACRevocationDelegateImpl::ClearDeviceAttestationRevocationSetPath()
+{
+    // clear the string_view
+    mDeviceAttestationRevocationSetPath = mDeviceAttestationRevocationSetPath.substr(0, 0);
 }
 
 // This method parses the below JSON Scheme
@@ -63,10 +69,10 @@ CHIP_ERROR TestDACRevocationDelegateImpl::SetDeviceAttestationRevocationSetPath(
 bool TestDACRevocationDelegateImpl::IsEntryInRevocationSet(const CharSpan & akidHexStr, const CharSpan & issuerNameBase64Str,
                                                            const CharSpan & serialNumberHexStr)
 {
-    std::ifstream file(mDeviceAttestationRevocationSetPath);
+    std::ifstream file(mDeviceAttestationRevocationSetPath.data());
     if (!file.is_open())
     {
-        ChipLogError(NotSpecified, "Failed to open file: %s", mDeviceAttestationRevocationSetPath);
+        ChipLogError(NotSpecified, "Failed to open file: %s", mDeviceAttestationRevocationSetPath.data());
         return false;
     }
 
@@ -139,7 +145,7 @@ CHIP_ERROR TestDACRevocationDelegateImpl::GetIssuerNameBase64Str(const ByteSpan 
     ReturnErrorOnFailure(ExtractIssuerFromX509Cert(certDer, issuer));
     VerifyOrReturnError(outIssuerNameBase64String.size() >= BASE64_ENCODED_LEN(issuer.size()), CHIP_ERROR_BUFFER_TOO_SMALL);
 
-    uint32_t encodedLen = Base64Encode32(issuer.data(), static_cast<uint32_t>(issuer.size()), outIssuerNameBase64String.data());
+    uint16_t encodedLen = Base64Encode(issuer.data(), static_cast<uint16_t>(issuer.size()), outIssuerNameBase64String.data());
     outIssuerNameBase64String.reduce_size(encodedLen);
     return CHIP_NO_ERROR;
 }
@@ -165,6 +171,8 @@ bool TestDACRevocationDelegateImpl::IsCertificateRevoked(const ByteSpan & certDe
     VerifyOrReturnValue(CHIP_NO_ERROR == GetAKIDHexStr(certDer, akid), false);
     ChipLogDetail(NotSpecified, "AKID: %.*s", static_cast<int>(akid.size()), akid.data());
 
+    // TODO: Cross-validate the CRLSignerCertificate and CRLSignerDelegator per spec: #34587
+
     return IsEntryInRevocationSet(akid, issuerName, serialNumber);
 }
 
@@ -174,30 +182,36 @@ void TestDACRevocationDelegateImpl::CheckForRevokedDACChain(
 {
     AttestationVerificationResult attestationError = AttestationVerificationResult::kSuccess;
 
-    if (mDeviceAttestationRevocationSetPath != nullptr)
+    if (mDeviceAttestationRevocationSetPath.empty())
     {
-        ChipLogDetail(NotSpecified, "Checking for revoked DAC in %s", mDeviceAttestationRevocationSetPath);
-        if (IsCertificateRevoked(info.dacDerBuffer))
+
+        onCompletion->mCall(onCompletion->mContext, info, attestationError);
+    }
+
+    ChipLogDetail(NotSpecified, "Checking for revoked DAC in %s", mDeviceAttestationRevocationSetPath.data());
+
+    if (IsCertificateRevoked(info.dacDerBuffer))
+    {
+        ChipLogProgress(NotSpecified, "Found revoked DAC in %s", mDeviceAttestationRevocationSetPath.data());
+        attestationError = AttestationVerificationResult::kDacRevoked;
+    }
+
+    ChipLogDetail(NotSpecified, "Checking for revoked PAI in %s", mDeviceAttestationRevocationSetPath.data());
+
+    if (IsCertificateRevoked(info.paiDerBuffer))
+    {
+        ChipLogProgress(NotSpecified, "Found revoked PAI in %s", mDeviceAttestationRevocationSetPath.data());
+
+        if (attestationError == AttestationVerificationResult::kDacRevoked)
         {
-            ChipLogProgress(NotSpecified, "Found revoked DAC in %s", mDeviceAttestationRevocationSetPath);
-            attestationError = AttestationVerificationResult::kDacRevoked;
+            attestationError = AttestationVerificationResult::kPaiAndDacRevoked;
         }
-
-        ChipLogDetail(NotSpecified, "Checking for revoked PAI in %s", mDeviceAttestationRevocationSetPath);
-        if (IsCertificateRevoked(info.paiDerBuffer))
+        else
         {
-            ChipLogProgress(NotSpecified, "Found revoked PAI in %s", mDeviceAttestationRevocationSetPath);
-
-            if (attestationError == AttestationVerificationResult::kDacRevoked)
-            {
-                attestationError = AttestationVerificationResult::kPaiAndDacRevoked;
-            }
-            else
-            {
-                attestationError = AttestationVerificationResult::kPaiRevoked;
-            }
+            attestationError = AttestationVerificationResult::kPaiRevoked;
         }
     }
+
     onCompletion->mCall(onCompletion->mContext, info, attestationError);
 }
 

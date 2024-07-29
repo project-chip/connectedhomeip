@@ -419,6 +419,8 @@ TEST_F(TestDeviceAttestationCredentials, TestAttestationTrustStore)
 
 static void WriteTestRevokedData(const char * jsonData, const char * fileName)
 {
+    // TODO: Add option to load test data from the test without using file. #34588
+
     // write data to /tmp/sample_revoked_set.json using fstream APIs
     std::ofstream file;
     file.open(fileName, std::ofstream::out | std::ofstream::trunc);
