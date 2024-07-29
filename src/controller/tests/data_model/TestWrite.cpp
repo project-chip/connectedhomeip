@@ -143,7 +143,7 @@ TEST_F(TestWrite, TestDataResponse)
     DrainAndServiceIO();
 
     EXPECT_TRUE(onSuccessCbInvoked);
-    EXPECT_FALSE(!onFailureCbInvoked);
+    EXPECT_FALSE(onFailureCbInvoked);
     EXPECT_EQ(chip::app::InteractionModelEngine::GetInstance()->GetNumActiveWriteHandlers(), 0u);
     EXPECT_EQ(GetExchangeManager().GetNumActiveExchanges(), 0u);
 }
