@@ -181,7 +181,7 @@ class TC_OCC_2_1(MatterBaseTest):
         else:
             logging.info("Test step skipped")
 
-       self.step(14)
+        self.step(14)
         if attributes.PhysicalContactOccupiedToUnoccupiedDelay.attribute_id in attribute_list:
             phycontact_otou_delay_dut = await self.read_occ_attribute_expect_success(endpoint=endpoint, attribute=attributes.PhysicalContactOccupiedToUnoccupiedDelay)
 
