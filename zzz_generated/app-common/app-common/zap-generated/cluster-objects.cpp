@@ -20710,6 +20710,47 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
 
 } // namespace ScheduleStruct
 
+namespace AtomicAttributeStatusStruct {
+CHIP_ERROR Type::Encode(TLV::TLVWriter & aWriter, TLV::Tag aTag) const
+{
+    DataModel::WrappedStructEncoder encoder{ aWriter, aTag };
+    encoder.Encode(to_underlying(Fields::kAttributeID), attributeID);
+    encoder.Encode(to_underlying(Fields::kStatusCode), statusCode);
+    return encoder.Finalize();
+}
+
+CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
+{
+    detail::StructDecodeIterator __iterator(reader);
+    while (true)
+    {
+        auto __element = __iterator.Next();
+        if (std::holds_alternative<CHIP_ERROR>(__element))
+        {
+            return std::get<CHIP_ERROR>(__element);
+        }
+
+        CHIP_ERROR err              = CHIP_NO_ERROR;
+        const uint8_t __context_tag = std::get<uint8_t>(__element);
+
+        if (__context_tag == to_underlying(Fields::kAttributeID))
+        {
+            err = DataModel::Decode(reader, attributeID);
+        }
+        else if (__context_tag == to_underlying(Fields::kStatusCode))
+        {
+            err = DataModel::Decode(reader, statusCode);
+        }
+        else
+        {
+        }
+
+        ReturnErrorOnFailure(err);
+    }
+}
+
+} // namespace AtomicAttributeStatusStruct
+
 namespace PresetStruct {
 CHIP_ERROR Type::Encode(TLV::TLVWriter & aWriter, TLV::Tag aTag) const
 {
@@ -21175,11 +21216,13 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
     }
 }
 } // namespace SetActivePresetRequest.
-namespace StartPresetsSchedulesEditRequest {
+namespace AtomicResponse {
 CHIP_ERROR Type::Encode(TLV::TLVWriter & aWriter, TLV::Tag aTag) const
 {
     DataModel::WrappedStructEncoder encoder{ aWriter, aTag };
-    encoder.Encode(to_underlying(Fields::kTimeoutSeconds), timeoutSeconds);
+    encoder.Encode(to_underlying(Fields::kStatusCode), statusCode);
+    encoder.Encode(to_underlying(Fields::kAttributeStatus), attributeStatus);
+    encoder.Encode(to_underlying(Fields::kTimeout), timeout);
     return encoder.Finalize();
 }
 
@@ -21197,9 +21240,17 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
         CHIP_ERROR err              = CHIP_NO_ERROR;
         const uint8_t __context_tag = std::get<uint8_t>(__element);
 
-        if (__context_tag == to_underlying(Fields::kTimeoutSeconds))
+        if (__context_tag == to_underlying(Fields::kStatusCode))
         {
-            err = DataModel::Decode(reader, timeoutSeconds);
+            err = DataModel::Decode(reader, statusCode);
+        }
+        else if (__context_tag == to_underlying(Fields::kAttributeStatus))
+        {
+            err = DataModel::Decode(reader, attributeStatus);
+        }
+        else if (__context_tag == to_underlying(Fields::kTimeout))
+        {
+            err = DataModel::Decode(reader, timeout);
         }
         else
         {
@@ -21208,52 +21259,14 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
         ReturnErrorOnFailure(err);
     }
 }
-} // namespace StartPresetsSchedulesEditRequest.
-namespace CancelPresetsSchedulesEditRequest {
+} // namespace AtomicResponse.
+namespace AtomicRequest {
 CHIP_ERROR Type::Encode(TLV::TLVWriter & aWriter, TLV::Tag aTag) const
 {
     DataModel::WrappedStructEncoder encoder{ aWriter, aTag };
-    return encoder.Finalize();
-}
-
-CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
-{
-    detail::StructDecodeIterator __iterator(reader);
-    while (true)
-    {
-        auto __element = __iterator.Next();
-        if (std::holds_alternative<CHIP_ERROR>(__element))
-        {
-            return std::get<CHIP_ERROR>(__element);
-        }
-    }
-}
-} // namespace CancelPresetsSchedulesEditRequest.
-namespace CommitPresetsSchedulesRequest {
-CHIP_ERROR Type::Encode(TLV::TLVWriter & aWriter, TLV::Tag aTag) const
-{
-    DataModel::WrappedStructEncoder encoder{ aWriter, aTag };
-    return encoder.Finalize();
-}
-
-CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
-{
-    detail::StructDecodeIterator __iterator(reader);
-    while (true)
-    {
-        auto __element = __iterator.Next();
-        if (std::holds_alternative<CHIP_ERROR>(__element))
-        {
-            return std::get<CHIP_ERROR>(__element);
-        }
-    }
-}
-} // namespace CommitPresetsSchedulesRequest.
-namespace SetTemperatureSetpointHoldPolicy {
-CHIP_ERROR Type::Encode(TLV::TLVWriter & aWriter, TLV::Tag aTag) const
-{
-    DataModel::WrappedStructEncoder encoder{ aWriter, aTag };
-    encoder.Encode(to_underlying(Fields::kTemperatureSetpointHoldPolicy), temperatureSetpointHoldPolicy);
+    encoder.Encode(to_underlying(Fields::kRequestType), requestType);
+    encoder.Encode(to_underlying(Fields::kAttributeRequests), attributeRequests);
+    encoder.Encode(to_underlying(Fields::kTimeout), timeout);
     return encoder.Finalize();
 }
 
@@ -21271,9 +21284,17 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
         CHIP_ERROR err              = CHIP_NO_ERROR;
         const uint8_t __context_tag = std::get<uint8_t>(__element);
 
-        if (__context_tag == to_underlying(Fields::kTemperatureSetpointHoldPolicy))
+        if (__context_tag == to_underlying(Fields::kRequestType))
         {
-            err = DataModel::Decode(reader, temperatureSetpointHoldPolicy);
+            err = DataModel::Decode(reader, requestType);
+        }
+        else if (__context_tag == to_underlying(Fields::kAttributeRequests))
+        {
+            err = DataModel::Decode(reader, attributeRequests);
+        }
+        else if (__context_tag == to_underlying(Fields::kTimeout))
+        {
+            err = DataModel::Decode(reader, timeout);
         }
         else
         {
@@ -21282,7 +21303,7 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
         ReturnErrorOnFailure(err);
     }
 }
-} // namespace SetTemperatureSetpointHoldPolicy.
+} // namespace AtomicRequest.
 } // namespace Commands
 
 namespace Attributes {
@@ -21386,8 +21407,8 @@ CHIP_ERROR TypeInfo::DecodableType::Decode(TLV::TLVReader & reader, const Concre
         return DataModel::Decode(reader, ACLouverPosition);
     case Attributes::ACCoilTemperature::TypeInfo::GetAttributeId():
         return DataModel::Decode(reader, ACCoilTemperature);
-    case Attributes::ACCapacityformat::TypeInfo::GetAttributeId():
-        return DataModel::Decode(reader, ACCapacityformat);
+    case Attributes::ACCapacityFormat::TypeInfo::GetAttributeId():
+        return DataModel::Decode(reader, ACCapacityFormat);
     case Attributes::PresetTypes::TypeInfo::GetAttributeId():
         return DataModel::Decode(reader, presetTypes);
     case Attributes::ScheduleTypes::TypeInfo::GetAttributeId():
@@ -21408,10 +21429,6 @@ CHIP_ERROR TypeInfo::DecodableType::Decode(TLV::TLVReader & reader, const Concre
         return DataModel::Decode(reader, presets);
     case Attributes::Schedules::TypeInfo::GetAttributeId():
         return DataModel::Decode(reader, schedules);
-    case Attributes::PresetsSchedulesEditable::TypeInfo::GetAttributeId():
-        return DataModel::Decode(reader, presetsSchedulesEditable);
-    case Attributes::TemperatureSetpointHoldPolicy::TypeInfo::GetAttributeId():
-        return DataModel::Decode(reader, temperatureSetpointHoldPolicy);
     case Attributes::SetpointHoldExpiryTimestamp::TypeInfo::GetAttributeId():
         return DataModel::Decode(reader, setpointHoldExpiryTimestamp);
     case Attributes::GeneratedCommandList::TypeInfo::GetAttributeId():

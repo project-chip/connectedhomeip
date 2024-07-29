@@ -40197,7 +40197,7 @@ public class ChipClusters {
     private static final long A_C_ERROR_CODE_ATTRIBUTE_ID = 68L;
     private static final long A_C_LOUVER_POSITION_ATTRIBUTE_ID = 69L;
     private static final long A_C_COIL_TEMPERATURE_ATTRIBUTE_ID = 70L;
-    private static final long A_C_CAPACITYFORMAT_ATTRIBUTE_ID = 71L;
+    private static final long A_C_CAPACITY_FORMAT_ATTRIBUTE_ID = 71L;
     private static final long PRESET_TYPES_ATTRIBUTE_ID = 72L;
     private static final long SCHEDULE_TYPES_ATTRIBUTE_ID = 73L;
     private static final long NUMBER_OF_PRESETS_ATTRIBUTE_ID = 74L;
@@ -40208,9 +40208,7 @@ public class ChipClusters {
     private static final long ACTIVE_SCHEDULE_HANDLE_ATTRIBUTE_ID = 79L;
     private static final long PRESETS_ATTRIBUTE_ID = 80L;
     private static final long SCHEDULES_ATTRIBUTE_ID = 81L;
-    private static final long PRESETS_SCHEDULES_EDITABLE_ATTRIBUTE_ID = 82L;
-    private static final long TEMPERATURE_SETPOINT_HOLD_POLICY_ATTRIBUTE_ID = 83L;
-    private static final long SETPOINT_HOLD_EXPIRY_TIMESTAMP_ATTRIBUTE_ID = 84L;
+    private static final long SETPOINT_HOLD_EXPIRY_TIMESTAMP_ATTRIBUTE_ID = 82L;
     private static final long GENERATED_COMMAND_LIST_ATTRIBUTE_ID = 65528L;
     private static final long ACCEPTED_COMMAND_LIST_ATTRIBUTE_ID = 65529L;
     private static final long EVENT_LIST_ATTRIBUTE_ID = 65530L;
@@ -40395,80 +40393,64 @@ public class ChipClusters {
         }}, commandId, commandArgs, timedInvokeTimeoutMs);
     }
 
-    public void startPresetsSchedulesEditRequest(DefaultClusterCallback callback, Integer timeoutSeconds) {
-      startPresetsSchedulesEditRequest(callback, timeoutSeconds, 0);
+    public void atomicRequest(AtomicResponseCallback callback, Integer requestType, ArrayList<Long> attributeRequests, Optional<Integer> timeout) {
+      atomicRequest(callback, requestType, attributeRequests, timeout, 0);
     }
 
-    public void startPresetsSchedulesEditRequest(DefaultClusterCallback callback, Integer timeoutSeconds, int timedInvokeTimeoutMs) {
-      final long commandId = 7L;
+    public void atomicRequest(AtomicResponseCallback callback, Integer requestType, ArrayList<Long> attributeRequests, Optional<Integer> timeout, int timedInvokeTimeoutMs) {
+      final long commandId = 254L;
 
       ArrayList<StructElement> elements = new ArrayList<>();
-      final long timeoutSecondsFieldID = 0L;
-      BaseTLVType timeoutSecondstlvValue = new UIntType(timeoutSeconds);
-      elements.add(new StructElement(timeoutSecondsFieldID, timeoutSecondstlvValue));
+      final long requestTypeFieldID = 0L;
+      BaseTLVType requestTypetlvValue = new UIntType(requestType);
+      elements.add(new StructElement(requestTypeFieldID, requestTypetlvValue));
+
+      final long attributeRequestsFieldID = 1L;
+      BaseTLVType attributeRequeststlvValue = ArrayType.generateArrayType(attributeRequests, (elementattributeRequests) -> new UIntType(elementattributeRequests));
+      elements.add(new StructElement(attributeRequestsFieldID, attributeRequeststlvValue));
+
+      final long timeoutFieldID = 2L;
+      BaseTLVType timeouttlvValue = timeout.<BaseTLVType>map((nonOptionaltimeout) -> new UIntType(nonOptionaltimeout)).orElse(new EmptyType());
+      elements.add(new StructElement(timeoutFieldID, timeouttlvValue));
 
       StructType commandArgs = new StructType(elements);
       invoke(new InvokeCallbackImpl(callback) {
           @Override
           public void onResponse(StructType invokeStructValue) {
-          callback.onSuccess();
-        }}, commandId, commandArgs, timedInvokeTimeoutMs);
-    }
-
-    public void cancelPresetsSchedulesEditRequest(DefaultClusterCallback callback) {
-      cancelPresetsSchedulesEditRequest(callback, 0);
-    }
-
-    public void cancelPresetsSchedulesEditRequest(DefaultClusterCallback callback, int timedInvokeTimeoutMs) {
-      final long commandId = 8L;
-
-      ArrayList<StructElement> elements = new ArrayList<>();
-      StructType commandArgs = new StructType(elements);
-      invoke(new InvokeCallbackImpl(callback) {
-          @Override
-          public void onResponse(StructType invokeStructValue) {
-          callback.onSuccess();
-        }}, commandId, commandArgs, timedInvokeTimeoutMs);
-    }
-
-    public void commitPresetsSchedulesRequest(DefaultClusterCallback callback) {
-      commitPresetsSchedulesRequest(callback, 0);
-    }
-
-    public void commitPresetsSchedulesRequest(DefaultClusterCallback callback, int timedInvokeTimeoutMs) {
-      final long commandId = 9L;
-
-      ArrayList<StructElement> elements = new ArrayList<>();
-      StructType commandArgs = new StructType(elements);
-      invoke(new InvokeCallbackImpl(callback) {
-          @Override
-          public void onResponse(StructType invokeStructValue) {
-          callback.onSuccess();
-        }}, commandId, commandArgs, timedInvokeTimeoutMs);
-    }
-
-    public void setTemperatureSetpointHoldPolicy(DefaultClusterCallback callback, Integer temperatureSetpointHoldPolicy) {
-      setTemperatureSetpointHoldPolicy(callback, temperatureSetpointHoldPolicy, 0);
-    }
-
-    public void setTemperatureSetpointHoldPolicy(DefaultClusterCallback callback, Integer temperatureSetpointHoldPolicy, int timedInvokeTimeoutMs) {
-      final long commandId = 11L;
-
-      ArrayList<StructElement> elements = new ArrayList<>();
-      final long temperatureSetpointHoldPolicyFieldID = 0L;
-      BaseTLVType temperatureSetpointHoldPolicytlvValue = new UIntType(temperatureSetpointHoldPolicy);
-      elements.add(new StructElement(temperatureSetpointHoldPolicyFieldID, temperatureSetpointHoldPolicytlvValue));
-
-      StructType commandArgs = new StructType(elements);
-      invoke(new InvokeCallbackImpl(callback) {
-          @Override
-          public void onResponse(StructType invokeStructValue) {
-          callback.onSuccess();
+          final long statusCodeFieldID = 0L;
+          Integer statusCode = null;
+          final long attributeStatusFieldID = 1L;
+          ArrayList<ChipStructs.ThermostatClusterAtomicAttributeStatusStruct> attributeStatus = null;
+          final long timeoutFieldID = 2L;
+          Optional<Integer> timeout = Optional.empty();
+          for (StructElement element: invokeStructValue.value()) {
+            if (element.contextTagNum() == statusCodeFieldID) {
+              if (element.value(BaseTLVType.class).type() == TLVType.UInt) {
+                UIntType castingValue = element.value(UIntType.class);
+                statusCode = castingValue.value(Integer.class);
+              }
+            } else if (element.contextTagNum() == attributeStatusFieldID) {
+              if (element.value(BaseTLVType.class).type() == TLVType.Array) {
+                ArrayType castingValue = element.value(ArrayType.class);
+                attributeStatus = castingValue.map((elementcastingValue) -> ChipStructs.ThermostatClusterAtomicAttributeStatusStruct.decodeTlv(elementcastingValue));
+              }
+            } else if (element.contextTagNum() == timeoutFieldID) {
+              if (element.value(BaseTLVType.class).type() == TLVType.UInt) {
+                UIntType castingValue = element.value(UIntType.class);
+                timeout = Optional.of(castingValue.value(Integer.class));
+              }
+            }
+          }
+          callback.onSuccess(statusCode, attributeStatus, timeout);
         }}, commandId, commandArgs, timedInvokeTimeoutMs);
     }
 
     public interface GetWeeklyScheduleResponseCallback extends BaseClusterCallback {
       void onSuccess(Integer numberOfTransitionsForSequence, Integer dayOfWeekForSequence, Integer modeForSequence, ArrayList<ChipStructs.ThermostatClusterWeeklyScheduleTransitionStruct> transitions);
+    }
+
+    public interface AtomicResponseCallback extends BaseClusterCallback {
+      void onSuccess(Integer statusCode, ArrayList<ChipStructs.ThermostatClusterAtomicAttributeStatusStruct> attributeStatus, Optional<Integer> timeout);
     }
 
     public interface LocalTemperatureAttributeCallback extends BaseAttributeCallback {
@@ -42045,9 +42027,9 @@ public class ChipClusters {
         }, A_C_COIL_TEMPERATURE_ATTRIBUTE_ID, minInterval, maxInterval);
     }
 
-    public void readACCapacityformatAttribute(
+    public void readACCapacityFormatAttribute(
         IntegerAttributeCallback callback) {
-      ChipAttributePath path = ChipAttributePath.newInstance(endpointId, clusterId, A_C_CAPACITYFORMAT_ATTRIBUTE_ID);
+      ChipAttributePath path = ChipAttributePath.newInstance(endpointId, clusterId, A_C_CAPACITY_FORMAT_ATTRIBUTE_ID);
 
       readAttribute(new ReportCallbackImpl(callback, path) {
           @Override
@@ -42055,21 +42037,21 @@ public class ChipClusters {
             Integer value = ChipTLVValueDecoder.decodeAttributeValue(path, tlv);
             callback.onSuccess(value);
           }
-        }, A_C_CAPACITYFORMAT_ATTRIBUTE_ID, true);
+        }, A_C_CAPACITY_FORMAT_ATTRIBUTE_ID, true);
     }
 
-    public void writeACCapacityformatAttribute(DefaultClusterCallback callback, Integer value) {
-      writeACCapacityformatAttribute(callback, value, 0);
+    public void writeACCapacityFormatAttribute(DefaultClusterCallback callback, Integer value) {
+      writeACCapacityFormatAttribute(callback, value, 0);
     }
 
-    public void writeACCapacityformatAttribute(DefaultClusterCallback callback, Integer value, int timedWriteTimeoutMs) {
+    public void writeACCapacityFormatAttribute(DefaultClusterCallback callback, Integer value, int timedWriteTimeoutMs) {
       BaseTLVType tlvValue = new UIntType(value);
-      writeAttribute(new WriteAttributesCallbackImpl(callback), A_C_CAPACITYFORMAT_ATTRIBUTE_ID, tlvValue, timedWriteTimeoutMs);
+      writeAttribute(new WriteAttributesCallbackImpl(callback), A_C_CAPACITY_FORMAT_ATTRIBUTE_ID, tlvValue, timedWriteTimeoutMs);
     }
 
-    public void subscribeACCapacityformatAttribute(
+    public void subscribeACCapacityFormatAttribute(
         IntegerAttributeCallback callback, int minInterval, int maxInterval) {
-      ChipAttributePath path = ChipAttributePath.newInstance(endpointId, clusterId, A_C_CAPACITYFORMAT_ATTRIBUTE_ID);
+      ChipAttributePath path = ChipAttributePath.newInstance(endpointId, clusterId, A_C_CAPACITY_FORMAT_ATTRIBUTE_ID);
 
       subscribeAttribute(new ReportCallbackImpl(callback, path) {
           @Override
@@ -42077,7 +42059,7 @@ public class ChipClusters {
             Integer value = ChipTLVValueDecoder.decodeAttributeValue(path, tlv);
             callback.onSuccess(value);
           }
-        }, A_C_CAPACITYFORMAT_ATTRIBUTE_ID, minInterval, maxInterval);
+        }, A_C_CAPACITY_FORMAT_ATTRIBUTE_ID, minInterval, maxInterval);
     }
 
     public void readPresetTypesAttribute(
@@ -42356,58 +42338,6 @@ public class ChipClusters {
             callback.onSuccess(value);
           }
         }, SCHEDULES_ATTRIBUTE_ID, minInterval, maxInterval);
-    }
-
-    public void readPresetsSchedulesEditableAttribute(
-        BooleanAttributeCallback callback) {
-      ChipAttributePath path = ChipAttributePath.newInstance(endpointId, clusterId, PRESETS_SCHEDULES_EDITABLE_ATTRIBUTE_ID);
-
-      readAttribute(new ReportCallbackImpl(callback, path) {
-          @Override
-          public void onSuccess(byte[] tlv) {
-            Boolean value = ChipTLVValueDecoder.decodeAttributeValue(path, tlv);
-            callback.onSuccess(value);
-          }
-        }, PRESETS_SCHEDULES_EDITABLE_ATTRIBUTE_ID, true);
-    }
-
-    public void subscribePresetsSchedulesEditableAttribute(
-        BooleanAttributeCallback callback, int minInterval, int maxInterval) {
-      ChipAttributePath path = ChipAttributePath.newInstance(endpointId, clusterId, PRESETS_SCHEDULES_EDITABLE_ATTRIBUTE_ID);
-
-      subscribeAttribute(new ReportCallbackImpl(callback, path) {
-          @Override
-          public void onSuccess(byte[] tlv) {
-            Boolean value = ChipTLVValueDecoder.decodeAttributeValue(path, tlv);
-            callback.onSuccess(value);
-          }
-        }, PRESETS_SCHEDULES_EDITABLE_ATTRIBUTE_ID, minInterval, maxInterval);
-    }
-
-    public void readTemperatureSetpointHoldPolicyAttribute(
-        IntegerAttributeCallback callback) {
-      ChipAttributePath path = ChipAttributePath.newInstance(endpointId, clusterId, TEMPERATURE_SETPOINT_HOLD_POLICY_ATTRIBUTE_ID);
-
-      readAttribute(new ReportCallbackImpl(callback, path) {
-          @Override
-          public void onSuccess(byte[] tlv) {
-            Integer value = ChipTLVValueDecoder.decodeAttributeValue(path, tlv);
-            callback.onSuccess(value);
-          }
-        }, TEMPERATURE_SETPOINT_HOLD_POLICY_ATTRIBUTE_ID, true);
-    }
-
-    public void subscribeTemperatureSetpointHoldPolicyAttribute(
-        IntegerAttributeCallback callback, int minInterval, int maxInterval) {
-      ChipAttributePath path = ChipAttributePath.newInstance(endpointId, clusterId, TEMPERATURE_SETPOINT_HOLD_POLICY_ATTRIBUTE_ID);
-
-      subscribeAttribute(new ReportCallbackImpl(callback, path) {
-          @Override
-          public void onSuccess(byte[] tlv) {
-            Integer value = ChipTLVValueDecoder.decodeAttributeValue(path, tlv);
-            callback.onSuccess(value);
-          }
-        }, TEMPERATURE_SETPOINT_HOLD_POLICY_ATTRIBUTE_ID, minInterval, maxInterval);
     }
 
     public void readSetpointHoldExpiryTimestampAttribute(

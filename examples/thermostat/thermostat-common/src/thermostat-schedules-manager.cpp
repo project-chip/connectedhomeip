@@ -1,3 +1,4 @@
+#if 0
 #include <app/clusters/thermostat-server/thermostat-server.h>
 #include <app/MessageDef/StatusIB.h>
 #include <vector>
@@ -311,3 +312,4 @@ struct ExampleThermostatScheduleManager : public ThermostatMatterScheduleManager
 
 // Instantiate the manager for endpoint 1
 static ExampleThermostatScheduleManager gThermostatPresetManager(1);
+#endif

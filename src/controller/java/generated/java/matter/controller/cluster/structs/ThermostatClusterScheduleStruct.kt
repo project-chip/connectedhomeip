@@ -30,7 +30,7 @@ class ThermostatClusterScheduleStruct(
   val name: Optional<String>,
   val presetHandle: Optional<ByteArray>,
   val transitions: List<ThermostatClusterScheduleTransitionStruct>,
-  val builtIn: Optional<Boolean>?,
+  val builtIn: Boolean?,
 ) {
   override fun toString(): String = buildString {
     append("ThermostatClusterScheduleStruct {\n")

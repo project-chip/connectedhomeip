@@ -1316,21 +1316,13 @@ namespace SetActivePresetRequest {
 static constexpr CommandId Id = 0x00000006;
 } // namespace SetActivePresetRequest
 
-namespace StartPresetsSchedulesEditRequest {
-static constexpr CommandId Id = 0x00000007;
-} // namespace StartPresetsSchedulesEditRequest
+namespace AtomicResponse {
+static constexpr CommandId Id = 0x000000FD;
+} // namespace AtomicResponse
 
-namespace CancelPresetsSchedulesEditRequest {
-static constexpr CommandId Id = 0x00000008;
-} // namespace CancelPresetsSchedulesEditRequest
-
-namespace CommitPresetsSchedulesRequest {
-static constexpr CommandId Id = 0x00000009;
-} // namespace CommitPresetsSchedulesRequest
-
-namespace SetTemperatureSetpointHoldPolicy {
-static constexpr CommandId Id = 0x0000000B;
-} // namespace SetTemperatureSetpointHoldPolicy
+namespace AtomicRequest {
+static constexpr CommandId Id = 0x000000FE;
+} // namespace AtomicRequest
 
 } // namespace Commands
 } // namespace Thermostat

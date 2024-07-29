@@ -4073,6 +4073,39 @@ void ComplexArgumentParser::Finalize(chip::app::Clusters::Thermostat::Structs::S
     ComplexArgumentParser::Finalize(request.builtIn);
 }
 
+CHIP_ERROR ComplexArgumentParser::Setup(const char * label,
+                                        chip::app::Clusters::Thermostat::Structs::AtomicAttributeStatusStruct::Type & request,
+                                        Json::Value & value)
+{
+    VerifyOrReturnError(value.isObject(), CHIP_ERROR_INVALID_ARGUMENT);
+
+    // Copy to track which members we already processed.
+    Json::Value valueCopy(value);
+
+    char labelWithMember[kMaxLabelLength];
+    if (value.isMember("attributeID"))
+    {
+        snprintf(labelWithMember, sizeof(labelWithMember), "%s.%s", label, "attributeID");
+        ReturnErrorOnFailure(ComplexArgumentParser::Setup(labelWithMember, request.attributeID, value["attributeID"]));
+    }
+    valueCopy.removeMember("attributeID");
+
+    if (value.isMember("statusCode"))
+    {
+        snprintf(labelWithMember, sizeof(labelWithMember), "%s.%s", label, "statusCode");
+        ReturnErrorOnFailure(ComplexArgumentParser::Setup(labelWithMember, request.statusCode, value["statusCode"]));
+    }
+    valueCopy.removeMember("statusCode");
+
+    return ComplexArgumentParser::EnsureNoMembersRemaining(label, valueCopy);
+}
+
+void ComplexArgumentParser::Finalize(chip::app::Clusters::Thermostat::Structs::AtomicAttributeStatusStruct::Type & request)
+{
+    ComplexArgumentParser::Finalize(request.attributeID);
+    ComplexArgumentParser::Finalize(request.statusCode);
+}
+
 CHIP_ERROR ComplexArgumentParser::Setup(const char * label, chip::app::Clusters::Thermostat::Structs::PresetStruct::Type & request,
                                         Json::Value & value)
 {

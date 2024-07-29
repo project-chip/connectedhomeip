@@ -3734,9 +3734,12 @@ Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, const chip::a
 } // namespace OutdoorTemperature
 
 namespace Occupancy {
-Protocols::InteractionModel::Status Get(chip::EndpointId endpoint, uint8_t * value); // bitmap8
-Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint8_t value);
-Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint8_t value, MarkAttributeDirty markDirty);
+Protocols::InteractionModel::Status Get(chip::EndpointId endpoint,
+                                        chip::BitMask<chip::app::Clusters::Thermostat::OccupancyBitmap> * value); // OccupancyBitmap
+Protocols::InteractionModel::Status Set(chip::EndpointId endpoint,
+                                        chip::BitMask<chip::app::Clusters::Thermostat::OccupancyBitmap> value);
+Protocols::InteractionModel::Status
+Set(chip::EndpointId endpoint, chip::BitMask<chip::app::Clusters::Thermostat::OccupancyBitmap> value, MarkAttributeDirty markDirty);
 } // namespace Occupancy
 
 namespace AbsMinHeatSetpointLimit {
@@ -3776,9 +3779,14 @@ Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint8_t value
 } // namespace PIHeatingDemand
 
 namespace HVACSystemTypeConfiguration {
-Protocols::InteractionModel::Status Get(chip::EndpointId endpoint, uint8_t * value); // bitmap8
-Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint8_t value);
-Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint8_t value, MarkAttributeDirty markDirty);
+Protocols::InteractionModel::Status
+Get(chip::EndpointId endpoint,
+    chip::BitMask<chip::app::Clusters::Thermostat::HVACSystemTypeBitmap> * value); // HVACSystemTypeBitmap
+Protocols::InteractionModel::Status Set(chip::EndpointId endpoint,
+                                        chip::BitMask<chip::app::Clusters::Thermostat::HVACSystemTypeBitmap> value);
+Protocols::InteractionModel::Status Set(chip::EndpointId endpoint,
+                                        chip::BitMask<chip::app::Clusters::Thermostat::HVACSystemTypeBitmap> value,
+                                        MarkAttributeDirty markDirty);
 } // namespace HVACSystemTypeConfiguration
 
 namespace LocalTemperatureCalibration {
@@ -3788,49 +3796,49 @@ Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, int8_t value,
 } // namespace LocalTemperatureCalibration
 
 namespace OccupiedCoolingSetpoint {
-Protocols::InteractionModel::Status Get(chip::EndpointId endpoint, int16_t * value); // int16s
+Protocols::InteractionModel::Status Get(chip::EndpointId endpoint, int16_t * value); // temperature
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, int16_t value);
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, int16_t value, MarkAttributeDirty markDirty);
 } // namespace OccupiedCoolingSetpoint
 
 namespace OccupiedHeatingSetpoint {
-Protocols::InteractionModel::Status Get(chip::EndpointId endpoint, int16_t * value); // int16s
+Protocols::InteractionModel::Status Get(chip::EndpointId endpoint, int16_t * value); // temperature
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, int16_t value);
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, int16_t value, MarkAttributeDirty markDirty);
 } // namespace OccupiedHeatingSetpoint
 
 namespace UnoccupiedCoolingSetpoint {
-Protocols::InteractionModel::Status Get(chip::EndpointId endpoint, int16_t * value); // int16s
+Protocols::InteractionModel::Status Get(chip::EndpointId endpoint, int16_t * value); // temperature
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, int16_t value);
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, int16_t value, MarkAttributeDirty markDirty);
 } // namespace UnoccupiedCoolingSetpoint
 
 namespace UnoccupiedHeatingSetpoint {
-Protocols::InteractionModel::Status Get(chip::EndpointId endpoint, int16_t * value); // int16s
+Protocols::InteractionModel::Status Get(chip::EndpointId endpoint, int16_t * value); // temperature
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, int16_t value);
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, int16_t value, MarkAttributeDirty markDirty);
 } // namespace UnoccupiedHeatingSetpoint
 
 namespace MinHeatSetpointLimit {
-Protocols::InteractionModel::Status Get(chip::EndpointId endpoint, int16_t * value); // int16s
+Protocols::InteractionModel::Status Get(chip::EndpointId endpoint, int16_t * value); // temperature
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, int16_t value);
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, int16_t value, MarkAttributeDirty markDirty);
 } // namespace MinHeatSetpointLimit
 
 namespace MaxHeatSetpointLimit {
-Protocols::InteractionModel::Status Get(chip::EndpointId endpoint, int16_t * value); // int16s
+Protocols::InteractionModel::Status Get(chip::EndpointId endpoint, int16_t * value); // temperature
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, int16_t value);
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, int16_t value, MarkAttributeDirty markDirty);
 } // namespace MaxHeatSetpointLimit
 
 namespace MinCoolSetpointLimit {
-Protocols::InteractionModel::Status Get(chip::EndpointId endpoint, int16_t * value); // int16s
+Protocols::InteractionModel::Status Get(chip::EndpointId endpoint, int16_t * value); // temperature
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, int16_t value);
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, int16_t value, MarkAttributeDirty markDirty);
 } // namespace MinCoolSetpointLimit
 
 namespace MaxCoolSetpointLimit {
-Protocols::InteractionModel::Status Get(chip::EndpointId endpoint, int16_t * value); // int16s
+Protocols::InteractionModel::Status Get(chip::EndpointId endpoint, int16_t * value); // temperature
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, int16_t value);
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, int16_t value, MarkAttributeDirty markDirty);
 } // namespace MaxCoolSetpointLimit
@@ -4095,13 +4103,13 @@ Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, const chip::a
                                         MarkAttributeDirty markDirty);
 } // namespace ACCoilTemperature
 
-namespace ACCapacityformat {
+namespace ACCapacityFormat {
 Protocols::InteractionModel::Status Get(chip::EndpointId endpoint,
                                         chip::app::Clusters::Thermostat::ACCapacityFormatEnum * value); // ACCapacityFormatEnum
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, chip::app::Clusters::Thermostat::ACCapacityFormatEnum value);
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, chip::app::Clusters::Thermostat::ACCapacityFormatEnum value,
                                         MarkAttributeDirty markDirty);
-} // namespace ACCapacityformat
+} // namespace ACCapacityFormat
 
 namespace NumberOfPresets {
 Protocols::InteractionModel::Status Get(chip::EndpointId endpoint, uint8_t * value); // int8u
@@ -4155,23 +4163,6 @@ Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, const chip::a
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, const chip::app::DataModel::Nullable<chip::ByteSpan> & value,
                                         MarkAttributeDirty markDirty);
 } // namespace ActiveScheduleHandle
-
-namespace PresetsSchedulesEditable {
-Protocols::InteractionModel::Status Get(chip::EndpointId endpoint, bool * value); // boolean
-Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, bool value);
-Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, bool value, MarkAttributeDirty markDirty);
-} // namespace PresetsSchedulesEditable
-
-namespace TemperatureSetpointHoldPolicy {
-Protocols::InteractionModel::Status Get(chip::EndpointId endpoint,
-                                        chip::BitMask<chip::app::Clusters::Thermostat::TemperatureSetpointHoldPolicyBitmap> *
-                                            value); // TemperatureSetpointHoldPolicyBitmap
-Protocols::InteractionModel::Status Set(chip::EndpointId endpoint,
-                                        chip::BitMask<chip::app::Clusters::Thermostat::TemperatureSetpointHoldPolicyBitmap> value);
-Protocols::InteractionModel::Status Set(chip::EndpointId endpoint,
-                                        chip::BitMask<chip::app::Clusters::Thermostat::TemperatureSetpointHoldPolicyBitmap> value,
-                                        MarkAttributeDirty markDirty);
-} // namespace TemperatureSetpointHoldPolicy
 
 namespace SetpointHoldExpiryTimestamp {
 Protocols::InteractionModel::Status Get(chip::EndpointId endpoint, DataModel::Nullable<uint32_t> & value); // epoch_s

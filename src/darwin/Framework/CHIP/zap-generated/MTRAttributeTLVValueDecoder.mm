@@ -11623,7 +11623,7 @@ static id _Nullable DecodeAttributeValueForThermostatCluster(AttributeId aAttrib
             return nil;
         }
         NSNumber * _Nonnull value;
-        value = [NSNumber numberWithUnsignedChar:cppValue];
+        value = [NSNumber numberWithUnsignedChar:cppValue.Raw()];
         return value;
     }
     case Attributes::AbsMinHeatSetpointLimit::Id: {
@@ -11700,7 +11700,7 @@ static id _Nullable DecodeAttributeValueForThermostatCluster(AttributeId aAttrib
             return nil;
         }
         NSNumber * _Nonnull value;
-        value = [NSNumber numberWithUnsignedChar:cppValue];
+        value = [NSNumber numberWithUnsignedChar:cppValue.Raw()];
         return value;
     }
     case Attributes::LocalTemperatureCalibration::Id: {
@@ -12157,8 +12157,8 @@ static id _Nullable DecodeAttributeValueForThermostatCluster(AttributeId aAttrib
         }
         return value;
     }
-    case Attributes::ACCapacityformat::Id: {
-        using TypeInfo = Attributes::ACCapacityformat::TypeInfo;
+    case Attributes::ACCapacityFormat::Id: {
+        using TypeInfo = Attributes::ACCapacityFormat::TypeInfo;
         TypeInfo::DecodableType cppValue;
         *aError = DataModel::Decode(aReader, cppValue);
         if (*aError != CHIP_NO_ERROR) {
@@ -12453,28 +12453,6 @@ static id _Nullable DecodeAttributeValueForThermostatCluster(AttributeId aAttrib
             }
             value = array_0;
         }
-        return value;
-    }
-    case Attributes::PresetsSchedulesEditable::Id: {
-        using TypeInfo = Attributes::PresetsSchedulesEditable::TypeInfo;
-        TypeInfo::DecodableType cppValue;
-        *aError = DataModel::Decode(aReader, cppValue);
-        if (*aError != CHIP_NO_ERROR) {
-            return nil;
-        }
-        NSNumber * _Nonnull value;
-        value = [NSNumber numberWithBool:cppValue];
-        return value;
-    }
-    case Attributes::TemperatureSetpointHoldPolicy::Id: {
-        using TypeInfo = Attributes::TemperatureSetpointHoldPolicy::TypeInfo;
-        TypeInfo::DecodableType cppValue;
-        *aError = DataModel::Decode(aReader, cppValue);
-        if (*aError != CHIP_NO_ERROR) {
-            return nil;
-        }
-        NSNumber * _Nonnull value;
-        value = [NSNumber numberWithUnsignedChar:cppValue.Raw()];
         return value;
     }
     case Attributes::SetpointHoldExpiryTimestamp::Id: {

@@ -1,3 +1,5 @@
+#if 0
+
 #include "thermostat-server.h"
 #include <app/util/attribute-storage.h>
 #include <app-common/zap-generated/attributes/Accessors.h>
@@ -317,3 +319,4 @@ imcode ThermostatMatterScheduleManager::ValidateSchedulesForCommitting(Span<Sche
 exit:
     return status;
 }
+#endif

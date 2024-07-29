@@ -26,92 +26,48 @@
 struct ThermostatMatterScheduleManager
 {
     /**
-     * Callbacks are not thread safe. To access the ThermostatMatterScheduleManager struct please
-     * consider using the LockChipStack / UnlockChipStack functions of the PlatformMgr.
-     */
-    using onEditStartCb  = void (*)(ThermostatMatterScheduleManager *);
-    using onEditCancelCb = onEditStartCb;
-    using onEditCommitCb = chip::Protocols::InteractionModel::Status (*)(ThermostatMatterScheduleManager *);
-
-    using getPresetTypeAtIndexCB = CHIP_ERROR (*)(ThermostatMatterScheduleManager *, size_t index,
-                                                  chip::app::Clusters::Thermostat::Structs::PresetTypeStruct::Type & presetType);
-    using getPresetAtIndexCB     = CHIP_ERROR (*)(ThermostatMatterScheduleManager *, size_t index,
-                                              chip::app::Clusters::Thermostat::Structs::PresetStruct::Type & preset);
-    using clearPresetsCB         = CHIP_ERROR (*)(ThermostatMatterScheduleManager *);
-    using appendPresetCB         = CHIP_ERROR (*)(ThermostatMatterScheduleManager *,
-                                          const chip::app::Clusters::Thermostat::Structs::PresetStruct::DecodableType & preset);
-
-    using getScheduleTypeAtIndexCB =
-        CHIP_ERROR (*)(ThermostatMatterScheduleManager *, size_t index,
-                       chip::app::Clusters::Thermostat::Structs::ScheduleTypeStruct::Type & scheduleType);
-    using getScheduleAtIndexCB = CHIP_ERROR (*)(ThermostatMatterScheduleManager *, size_t index,
-                                                chip::app::Clusters::Thermostat::Structs::ScheduleStruct::Type & schedule);
-    using clearSchedulesCB     = CHIP_ERROR (*)(ThermostatMatterScheduleManager *);
-    using appendScheduleCB =
-        CHIP_ERROR (*)(ThermostatMatterScheduleManager *,
-                       const chip::app::Clusters::Thermostat::Structs::ScheduleStruct::DecodableType & schedule);
-
-    /**
-     * @brief Construct a new ThermostatMatterScheduleManager object
-     *
-     * Please note: The app should create a instance of this object to handle
-     * the schedules for each endpoint a thermostat cluster is instantiated on.
-     *
-     * @param endpoint endpoint of the cluster
-     * @param onEditStart callback to indicate to the app to start editing the schedules/presets
-     * @param onEditCancel callback to indicate to the app to cancel editing the schedules/presets
-     * @param onEditCommit callback to indicate to the app to commit the new schedules/presets
-     *
-     * @param getPresetTypeAtIndex callback requesting from the app a preset type at a given index.
-     * @param getPresetAtIndex callback requesting from the app a preset at a given index.
-     * @param setPresetAtIndex callback requesting the app to set a preset at a given index.
-     *
-     * @param getScheduleTypeAtIndex callback requesting from the app a preset type at a given index.
-     * @param getScheduleAtIndex callback requesting from the app a preset at a given index.
-     * @param setScheduleAtIndex callback requesting the app to set a preset at a given index.
+     * @brief Construct a new ThermostatMatterScheduleManager object *
      */
 
     // If the endpoint supports both editable presets and editable schedules
-    ThermostatMatterScheduleManager(chip::EndpointId endpoint, onEditStartCb onEditStart, onEditCancelCb onEditCancel,
-                                    onEditCommitCb onEditCommit,
-
-                                    getPresetTypeAtIndexCB getPresetTypeAtIndex, getPresetAtIndexCB getPresetAtIndex,
-                                    appendPresetCB appendPreset, clearPresetsCB clearPresets,
-
-                                    getScheduleTypeAtIndexCB getScheduleTypeAtIndexCB, getScheduleAtIndexCB getScheduleAtIndex,
-                                    appendScheduleCB appendSchedule, clearSchedulesCB clearSchedules);
-
-    ~ThermostatMatterScheduleManager();
-
-    chip::EndpointId mEndpoint;
-    onEditStartCb mOnEditStartCb   = nullptr;
-    onEditCancelCb mOnEditCancelCb = nullptr;
-    onEditCommitCb mOnEditCommitCb = nullptr;
-
-    getPresetTypeAtIndexCB mGetPresetTypeAtIndexCb = nullptr;
-    getPresetAtIndexCB mGetPresetAtIndexCb         = nullptr;
-    appendPresetCB mAppendPresetCb                 = nullptr;
-    clearPresetsCB mClearPresetsCb                 = nullptr;
-
-    getScheduleTypeAtIndexCB mGetScheduleTypeAtIndexCb = nullptr;
-    getScheduleAtIndexCB mGetScheduleAtIndexCb         = nullptr;
-    appendScheduleCB mAppendScheduleCb                 = nullptr;
-    clearSchedulesCB mClearSchedulesCb                 = nullptr;
+    ThermostatMatterScheduleManager();
+    virtual ~ThermostatMatterScheduleManager();
 
     // TODO: Verify this is the right object to be tracking to ensure that the client 
     // that started editing is the only one that can edit until it sends a cancel or commit
     chip::SessionHolder mSession;
 
-    ThermostatMatterScheduleManager * nextEditor = nullptr;
-
-    bool hasNext() { return this->nextEditor != nullptr; }
-    ThermostatMatterScheduleManager * next() { return this->nextEditor; }
-    void setNext(ThermostatMatterScheduleManager * inst) { this->nextEditor = inst; }
-
+#if 0
     chip::Protocols::InteractionModel::Status ValidatePresetsForCommitting(chip::Span<chip::app::Clusters::Thermostat::Structs::PresetStruct::Type> & oldList,
                                                chip::Span<chip::app::Clusters::Thermostat::Structs::PresetStruct::Type> & newList);
     chip::Protocols::InteractionModel::Status
     ValidateSchedulesForCommitting(chip::Span<chip::app::Clusters::Thermostat::Structs::ScheduleStruct::Type> & oldList,
                                    chip::Span<chip::app::Clusters::Thermostat::Structs::ScheduleStruct::Type> & newList,
                                    chip::Span<chip::app::Clusters::Thermostat::Structs::PresetStruct::Type> & presetList);
+#endif
+
+    virtual bool IsEditing() = 0;  // is any endpoint currently being edited?
+    virtual bool IsEditing(chip::EndpointId aEndpoint) = 0;
+    virtual CHIP_ERROR StartEditing(chip::EndpointId aEndpoint) = 0;
+
+    virtual CHIP_ERROR RollbackEdits() = 0; // rollback all edits
+    virtual CHIP_ERROR RollbackEdits(chip::EndpointId aEndpoint) = 0;    
+
+    virtual CHIP_ERROR ValidateEdits(chip::EndpointId aEndpoint) = 0;
+    virtual chip::Protocols::InteractionModel::Status CommitEdits(chip::EndpointId aEndpoint) = 0;
+
+    // presets
+    virtual CHIP_ERROR GetPresetTypeAtIndex(chip::EndpointId aEndpoint, size_t aIndex, chip::app::Clusters::Thermostat::Structs::PresetTypeStruct::Type & outPresetType) { return CHIP_ERROR_NOT_IMPLEMENTED; } const
+    virtual CHIP_ERROR GetPresetAtIndex(chip::EndpointId aEndpoint, size_t aIndex, chip::app::Clusters::Thermostat::Structs::PresetStruct::Type & outPreset) { return CHIP_ERROR_NOT_IMPLEMENTED; } const
+    virtual CHIP_ERROR ClearPresets(chip::EndpointId aEndpoint) { return CHIP_ERROR_NOT_IMPLEMENTED; }
+    virtual CHIP_ERROR AppendPreset(chip::EndpointId aEndpoint, const chip::app::Clusters::Thermostat::Structs::PresetStruct::DecodableType & preset) { return CHIP_ERROR_NOT_IMPLEMENTED; }
+
+    // schedules
+    virtual CHIP_ERROR GetScheduleTypeAtIndex(chip::EndpointId aEndpoint, size_t index, chip::app::Clusters::Thermostat::Structs::ScheduleTypeStruct::Type & scheduleType) { return CHIP_ERROR_NOT_IMPLEMENTED; } const
+    virtual CHIP_ERROR GetScheduleAtIndex(chip::EndpointId aEndpoint, size_t index, chip::app::Clusters::Thermostat::Structs::ScheduleStruct::Type & schedule) { return CHIP_ERROR_NOT_IMPLEMENTED; } const
+    virtual CHIP_ERROR ClearSchedules(chip::EndpointId aEndpoint) { return CHIP_ERROR_NOT_IMPLEMENTED; }
+    virtual CHIP_ERROR AppendSchedule(chip::EndpointId aEndpoint, const chip::app::Clusters::Thermostat::Structs::ScheduleStruct::DecodableType & schedule) { return CHIP_ERROR_NOT_IMPLEMENTED; }
+
+    static void SetActiveInstance(ThermostatMatterScheduleManager * inManager);
+    static ThermostatMatterScheduleManager * GetActiveInstance();
 };
