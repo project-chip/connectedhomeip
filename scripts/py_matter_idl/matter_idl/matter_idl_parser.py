@@ -1,8 +1,9 @@
 #!/usr/bin/env python
 
+import dataclasses
 import functools
 import logging
-from typing import Dict, Optional
+from typing import Dict, Optional, Set
 
 from lark import Lark
 from lark.lexer import Token
@@ -504,15 +505,25 @@ class MatterIdlTransformer(Transformer):
         clusters = []
         endpoints = []
 
+        global_bitmaps = []
+        global_enums = []
+        global_structs = []
+
         for item in items:
             if isinstance(item, Cluster):
                 clusters.append(item)
             elif isinstance(item, Endpoint):
                 endpoints.append(item)
+            elif isinstance(item, Enum):
+                global_enums.append(dataclasses.replace(item, is_global=True))
+            elif isinstance(item, Bitmap):
+                global_bitmaps.append(dataclasses.replace(item, is_global=True))
+            elif isinstance(item, Struct):
+                global_structs.append(dataclasses.replace(item, is_global=True))
             else:
                 raise Exception("UNKNOWN idl content item: %r" % item)
 
-        return Idl(clusters=clusters, endpoints=endpoints)
+        return Idl(clusters=clusters, endpoints=endpoints, global_bitmaps=global_bitmaps, global_enums=global_enums, global_structs=global_structs)
 
     def prefix_doc_comment(self):
         print("TODO: prefix")
@@ -524,9 +535,92 @@ class MatterIdlTransformer(Transformer):
             self.doc_comments.append(PrefixCppDocComment(token))
 
 
+def _referenced_type_names(cluster: Cluster) -> Set[str]:
+    """
+    Return the names of all data types referenced by the given cluster.
+    """
+    types = set()
+    for s in cluster.structs:
+        for f in s.fields:
+            types.add(f.data_type.name)
+
+    for e in cluster.events:
+        for f in e.fields:
+            types.add(f.data_type.name)
+
+    for a in cluster.attributes:
+        types.add(a.definition.data_type.name)
+
+    return types
+
+
+class GlobalMapping:
+    """
+    Maintains global type mapping from an IDL
+    """
+
+    def __init__(self, idl: Idl):
+        self.bitmap_map = {b.name: b for b in idl.global_bitmaps}
+        self.enum_map = {e.name: e for e in idl.global_enums}
+        self.struct_map = {s.name: s for s in idl.global_structs}
+
+        self.global_types = set(self.bitmap_map.keys()).union(set(self.enum_map.keys())).union(set(self.struct_map.keys()))
+
+        # Spec does not enforce unique naming in bitmap/enum/struct, however in practice
+        # if we have both enum Foo and bitmap Foo for example, it would be impossible
+        # to disambiguate `attribute Foo foo = 1` for the actual type we want.
+        #
+        # As a result, we do not try to namespace this and just error out
+        if len(self.global_types) != len(self.bitmap_map) + len(self.enum_map) + len(self.struct_map):
+            raise ValueError("Global type names are not unique.")
+
+    def merge_global_types_into_cluster(self, cluster: Cluster) -> Cluster:
+        """
+        Merges all referenced global types (bitmaps/enums/structs) into the cluster types.
+        This happens recursively.
+        """
+        global_types_added = set()
+
+        changed = True
+        while changed:
+            changed = False
+            for type_name in _referenced_type_names(cluster):
+                if type_name not in self.global_types:
+                    continue  # not a global type name
+
+                if type_name in global_types_added:
+                    continue  # already added
+
+                # check if this is a global type
+                if type_name in self.bitmap_map:
+                    global_types_added.add(type_name)
+                    changed = True
+                    cluster.bitmaps.append(self.bitmap_map[type_name])
+                elif type_name in self.enum_map:
+                    global_types_added.add(type_name)
+                    changed = True
+                    cluster.enums.append(self.enum_map[type_name])
+                elif type_name in self.struct_map:
+                    global_types_added.add(type_name)
+                    changed = True
+                    cluster.structs.append(self.struct_map[type_name])
+
+        return cluster
+
+
+def _merge_global_types_into_clusters(idl: Idl) -> Idl:
+    """
+    Adds bitmaps/enums/structs from idl.global_* into clusters as long as
+    clusters reference those type names
+    """
+    mapping = GlobalMapping(idl)
+    return dataclasses.replace(idl, clusters=[mapping.merge_global_types_into_cluster(cluster) for cluster in idl.clusters])
+
+
 class ParserWithLines:
-    def __init__(self, skip_meta: bool):
+    def __init__(self, skip_meta: bool, merge_globals: bool):
         self.transformer = MatterIdlTransformer(skip_meta)
+        self.merge_globals = merge_globals
 
         # NOTE: LALR parser is fast. While Earley could parse more ambigous grammars,
         #       earley is much slower:
@@ -572,14 +666,28 @@ class ParserWithLines:
         for comment in self.transformer.doc_comments:
             comment.appply_to_idl(idl, file)
 
+        if self.merge_globals:
+            idl = _merge_global_types_into_clusters(idl)
+
         return idl
 
 
-def CreateParser(skip_meta: bool = False):
+def CreateParser(skip_meta: bool = False, merge_globals=True):
     """
     Generates a parser that will process a ".matter" file into a IDL
+
+    Arguments:
+       skip_meta - do not add metadata (line position) for items. Metadata is
+                   useful for error reporting, however it does not work well
+                   for unit test comparisons
+
+       merge_globals - places global items (enums/bitmaps/structs) into any
+                       clusters that reference them, so that cluster types
+                       are self-sufficient. Useful as a backwards-compatible
+                       code generation if global definitions are not supported.
+
     """
-    return ParserWithLines(skip_meta)
+    return ParserWithLines(skip_meta, merge_globals)
 
 
 if __name__ == '__main__':

@@ -496,6 +496,12 @@ NS_ASSUME_NONNULL_BEGIN
 
 @end
 
+@interface MTRBridgedDeviceBasicInformationClusterKeepActiveParams (InternalMethods)
+
+- (NSDictionary<NSString *, id> * _Nullable)_encodeAsDataValue:(NSError * __autoreleasing *)error;
+
+@end
+
 @interface MTRAdministratorCommissioningClusterOpenCommissioningWindowParams (InternalMethods)
 
 - (NSDictionary<NSString *, id> * _Nullable)_encodeAsDataValue:(NSError * __autoreleasing *)error;
