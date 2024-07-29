@@ -24,20 +24,24 @@
 
 #include <cinttypes>
 
+#include <pw_unit_test/framework.h>
+
 #include <app/ConcreteAttributePath.h>
 #include <app/InteractionModelEngine.h>
+#include <app/codegen-data-model/Instance.h>
 #include <app/reporting/Engine.h>
 #include <app/reporting/tests/MockReportScheduler.h>
 #include <app/tests/AppTestContext.h>
+#include <app/tests/test-interaction-model-api.h>
 #include <lib/core/CHIPCore.h>
 #include <lib/core/ErrorStr.h>
+#include <lib/core/StringBuilderAdapters.h>
 #include <lib/core/TLV.h>
 #include <lib/core/TLVDebug.h>
 #include <lib/core/TLVUtilities.h>
 #include <lib/support/tests/ExtraPwTestMacros.h>
 #include <messaging/ExchangeContext.h>
 #include <messaging/Flags.h>
-#include <pw_unit_test/framework.h>
 
 namespace chip {
 
@@ -52,6 +56,18 @@ namespace reporting {
 class TestReportingEngine : public chip::Test::AppContext
 {
 public:
+    void SetUp() override
+    {
+        chip::Test::AppContext::SetUp();
+        mOldModel = InteractionModelEngine::GetInstance()->SetDataModel(&TestImCustomDataModel::Instance());
+    }
+
+    void TearDown() override
+    {
+        InteractionModelEngine::GetInstance()->SetDataModel(mOldModel);
+        chip::Test::AppContext::TearDown();
+    }
+
     template <typename... Args>
     static bool VerifyDirtySetContent(const Args &... args);
     static bool InsertToDirtySet(const AttributePathParams & aPath);
@@ -61,6 +77,8 @@ public:
     void TestMergeAttributePathWhenDirtySetPoolExhausted();
 
 private:
+    chip::app::InteractionModel::DataModel * mOldModel = nullptr;
+
     struct ExpectedDirtySetContent : public AttributePathParams
     {
         ExpectedDirtySetContent(const AttributePathParams & path) : AttributePathParams(path) {}
@@ -168,7 +186,7 @@ TEST_F_FROM_FIXTURE(TestReportingEngine, TestBuildAndSendSingleReportData)
     EXPECT_EQ(readRequestBuilder.GetError(), CHIP_NO_ERROR);
     EXPECT_EQ(writer.Finalize(&readRequestbuf), CHIP_NO_ERROR);
     app::ReadHandler readHandler(dummy, exchangeCtx, chip::app::ReadHandler::InteractionType::Read,
-                                 app::reporting::GetDefaultReportScheduler());
+                                 app::reporting::GetDefaultReportScheduler(), CodegenDataModelInstance());
     readHandler.OnInitialRequest(std::move(readRequestbuf));
 
     EXPECT_EQ(InteractionModelEngine::GetInstance()->GetReportingEngine().BuildAndSendSingleReportData(&readHandler),

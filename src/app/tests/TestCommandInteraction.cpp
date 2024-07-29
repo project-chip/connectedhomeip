@@ -165,27 +165,25 @@ struct BadFields
     }
 };
 
-InteractionModel::Status ServerClusterCommandExists(const ConcreteCommandPath & aRequestCommandPath)
+Protocols::InteractionModel::Status ServerClusterCommandExists(const ConcreteCommandPath & aRequestCommandPath)
 {
     // Mock cluster catalog, only support commands on one cluster on one endpoint.
-    using InteractionModel::Status;
-
     if (aRequestCommandPath.mEndpointId != kTestEndpointId)
     {
-        return Status::UnsupportedEndpoint;
+        return Protocols::InteractionModel::Status::UnsupportedEndpoint;
     }
 
     if (aRequestCommandPath.mClusterId != kTestClusterId)
     {
-        return Status::UnsupportedCluster;
+        return Protocols::InteractionModel::Status::UnsupportedCluster;
     }
 
     if (aRequestCommandPath.mCommandId == kTestNonExistCommandId)
     {
-        return Status::UnsupportedCommand;
+        return Protocols::InteractionModel::Status::UnsupportedCommand;
     }
 
-    return Status::Success;
+    return Protocols::InteractionModel::Status::Success;
 }
 
 void DispatchSingleClusterCommand(const ConcreteCommandPath & aRequestCommandPath, chip::TLV::TLVReader & aReader,
@@ -346,7 +344,7 @@ public:
     {
         DispatchSingleClusterCommand(aCommandPath, apPayload, &apCommandObj);
     }
-    InteractionModel::Status CommandExists(const ConcreteCommandPath & aCommandPath)
+    Protocols::InteractionModel::Status CommandExists(const ConcreteCommandPath & aCommandPath)
     {
         return ServerClusterCommandExists(aCommandPath);
     }
@@ -1255,7 +1253,8 @@ TEST_F(TestCommandInteraction, TestCommandHandler_WithOnInvokeReceivedNotExistCo
 
     mockCommandHandlerDelegate.ResetCounter();
     MockCommandResponder mockCommandResponder;
-    InteractionModel::Status status = commandHandler.OnInvokeCommandRequest(mockCommandResponder, std::move(commandDatabuf), false);
+    Protocols::InteractionModel::Status status =
+        commandHandler.OnInvokeCommandRequest(mockCommandResponder, std::move(commandDatabuf), false);
 
     EXPECT_EQ(status, Protocols::InteractionModel::Status::InvalidAction);
     EXPECT_TRUE(mockCommandResponder.mChunks.IsNull());
@@ -1650,8 +1649,8 @@ TEST_F_FROM_FIXTURE(TestCommandInteraction, TestCommandHandler_RejectsMultipleCo
     mockCommandHandlerDelegate.ResetCounter();
     commandDispatchedCount = 0;
 
-    InteractionModel::Status status = commandHandler.ProcessInvokeRequest(std::move(commandDatabuf), false);
-    EXPECT_EQ(status, InteractionModel::Status::InvalidAction);
+    Protocols::InteractionModel::Status status = commandHandler.ProcessInvokeRequest(std::move(commandDatabuf), false);
+    EXPECT_EQ(status, Protocols::InteractionModel::Status::InvalidAction);
 
     EXPECT_EQ(commandDispatchedCount, 0u);
 }
@@ -1703,8 +1702,9 @@ TEST_F_FROM_FIXTURE(TestCommandInteraction, TestCommandHandler_RejectMultipleCom
 
     CommandHandlerImpl commandHandler(&mockCommandHandlerDelegate);
     MockCommandResponder mockCommandResponder;
-    InteractionModel::Status status = commandHandler.OnInvokeCommandRequest(mockCommandResponder, std::move(commandDatabuf), false);
-    EXPECT_EQ(status, InteractionModel::Status::InvalidAction);
+    Protocols::InteractionModel::Status status =
+        commandHandler.OnInvokeCommandRequest(mockCommandResponder, std::move(commandDatabuf), false);
+    EXPECT_EQ(status, Protocols::InteractionModel::Status::InvalidAction);
     EXPECT_TRUE(mockCommandResponder.mChunks.IsNull());
 
     EXPECT_EQ(commandDispatchedCount, 0u);
@@ -1759,8 +1759,8 @@ TEST_F_FROM_FIXTURE(TestCommandInteraction, TestCommandHandler_AcceptMultipleCom
     mockCommandHandlerDelegate.ResetCounter();
     commandDispatchedCount = 0;
 
-    InteractionModel::Status status = commandHandler.ProcessInvokeRequest(std::move(commandDatabuf), false);
-    EXPECT_EQ(status, InteractionModel::Status::Success);
+    Protocols::InteractionModel::Status status = commandHandler.ProcessInvokeRequest(std::move(commandDatabuf), false);
+    EXPECT_EQ(status, Protocols::InteractionModel::Status::Success);
 
     EXPECT_EQ(commandDispatchedCount, 2u);
 }

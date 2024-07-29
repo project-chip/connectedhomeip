@@ -28,7 +28,7 @@ from .Objects import (AccessControl, AccountLogin, Actions, ActivatedCarbonFilte
                       BinaryInputBasic, Binding, BooleanState, BooleanStateConfiguration, BridgedDeviceBasicInformation,
                       CarbonDioxideConcentrationMeasurement, CarbonMonoxideConcentrationMeasurement, Channel, ColorControl,
                       ContentControl, ContentLauncher, DemandResponseLoadControl, Descriptor, DeviceEnergyManagement,
-                      DeviceEnergyManagementMode, DiagnosticLogs, DishwasherAlarm, DishwasherMode, DoorLock,
+                      DeviceEnergyManagementMode, DiagnosticLogs, DishwasherAlarm, DishwasherMode, DoorLock, EcosystemInformation,
                       ElectricalEnergyMeasurement, ElectricalMeasurement, ElectricalPowerMeasurement, EnergyEvse, EnergyEvseMode,
                       EnergyPreference, EthernetNetworkDiagnostics, FanControl, FaultInjection, FixedLabel, FlowMeasurement,
                       FormaldehydeConcentrationMeasurement, GeneralCommissioning, GeneralDiagnostics, GroupKeyManagement, Groups,
@@ -44,16 +44,17 @@ from .Objects import (AccessControl, AccountLogin, Actions, ActivatedCarbonFilte
                       RefrigeratorAndTemperatureControlledCabinetMode, RelativeHumidityMeasurement, RvcCleanMode,
                       RvcOperationalState, RvcRunMode, ScenesManagement, SmokeCoAlarm, SoftwareDiagnostics, Switch, TargetNavigator,
                       TemperatureControl, TemperatureMeasurement, Thermostat, ThermostatUserInterfaceConfiguration,
-                      ThreadBorderRouterManagement, ThreadNetworkDiagnostics, TimeFormatLocalization, TimeSynchronization,
-                      TotalVolatileOrganicCompoundsConcentrationMeasurement, UnitLocalization, UnitTesting, UserLabel,
-                      ValveConfigurationAndControl, WakeOnLan, WiFiNetworkDiagnostics, WindowCovering)
+                      ThreadBorderRouterManagement, ThreadNetworkDiagnostics, ThreadNetworkDirectory, TimeFormatLocalization,
+                      TimeSynchronization, TotalVolatileOrganicCompoundsConcentrationMeasurement, UnitLocalization, UnitTesting,
+                      UserLabel, ValveConfigurationAndControl, WakeOnLan, WaterHeaterManagement, WaterHeaterMode,
+                      WiFiNetworkDiagnostics, WindowCovering)
 
 __all__ = [Attribute, CHIPClusters, Command, AccessControl, AccountLogin, Actions, ActivatedCarbonFilterMonitoring, AdministratorCommissioning, AirQuality,
            ApplicationBasic, ApplicationLauncher, AudioOutput, BallastConfiguration, BarrierControl, BasicInformation,
            BinaryInputBasic, Binding, BooleanState, BooleanStateConfiguration, BridgedDeviceBasicInformation, CarbonDioxideConcentrationMeasurement,
            CarbonMonoxideConcentrationMeasurement, Channel,
            ColorControl, ContentControl, ContentLauncher, DemandResponseLoadControl, Descriptor, DeviceEnergyManagementMode, DeviceEnergyManagement, DeviceEnergyManagementMode, DiagnosticLogs, DishwasherAlarm, DishwasherMode,
-           DoorLock, ElectricalEnergyMeasurement, ElectricalMeasurement, ElectricalPowerMeasurement, EnergyEvse, EnergyEvseMode, EnergyPreference,
+           DoorLock, EcosystemInformation, ElectricalEnergyMeasurement, ElectricalMeasurement, ElectricalPowerMeasurement, EnergyEvse, EnergyEvseMode, EnergyPreference,
            EthernetNetworkDiagnostics, FanControl, FaultInjection, FixedLabel, FlowMeasurement,
            FormaldehydeConcentrationMeasurement, GeneralCommissioning, GeneralDiagnostics, GroupKeyManagement, Groups,
            HepaFilterMonitoring, IcdManagement, Identify, IlluminanceMeasurement, KeypadInput, LaundryDryerControls,
@@ -67,6 +68,6 @@ __all__ = [Attribute, CHIPClusters, Command, AccessControl, AccountLogin, Action
            RefrigeratorAlarm, RefrigeratorAndTemperatureControlledCabinetMode, RelativeHumidityMeasurement, RvcCleanMode,
            RvcOperationalState, RvcRunMode, ScenesManagement, SmokeCoAlarm, SoftwareDiagnostics,
            Switch, TargetNavigator, TemperatureControl, TemperatureMeasurement, Thermostat, ThermostatUserInterfaceConfiguration,
-           ThreadBorderRouterManagement, ThreadNetworkDiagnostics, TimeFormatLocalization, TimeSynchronization,
+           ThreadBorderRouterManagement, ThreadNetworkDiagnostics, ThreadNetworkDirectory, TimeFormatLocalization, TimeSynchronization,
            TotalVolatileOrganicCompoundsConcentrationMeasurement, UnitLocalization,
-           UnitTesting, UserLabel, ValveConfigurationAndControl, WakeOnLan, WiFiNetworkDiagnostics, WindowCovering]
+           UnitTesting, UserLabel, ValveConfigurationAndControl, WakeOnLan, WaterHeaterManagement, WaterHeaterMode, WiFiNetworkDiagnostics, WindowCovering]

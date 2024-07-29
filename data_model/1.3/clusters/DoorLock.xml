@@ -570,7 +570,7 @@ Davis, CA 95616, USA
       <bitfield name="LockFactoryReset" bit="1" summary="Lock Reset to Factory Defaults">
         <optionalConform/>
       </bitfield>
-      <bitfield name="N" bit="2" summary="Reserved">
+      <bitfield name="N/A" bit="2" summary="Reserved">
         <optionalConform/>
       </bitfield>
       <bitfield name="LockRadioPowerCycled" bit="3" summary="RF Module Power Cycled">
@@ -738,7 +738,7 @@ Davis, CA 95616, USA
   <attributes>
     <attribute id="0x0000" name="LockState" type="LockStateEnum">
       <access read="true" readPrivilege="view"/>
-      <quality changeOmitted="false" nullable="true" scene="true" persistence="volatile" reportable="true"/>
+      <quality changeOmitted="false" nullable="true" scene="true" persistence="volatile" reportable="true" sourceAttribution="false" quieterReporting="false"/>
       <mandatoryConform/>
       <constraint type="desc"/>
     </attribute>
@@ -753,7 +753,7 @@ Davis, CA 95616, USA
     </attribute>
     <attribute id="0x0003" name="DoorState" type="DoorStateEnum">
       <access read="true" readPrivilege="view"/>
-      <quality changeOmitted="false" nullable="true" scene="false" persistence="volatile" reportable="true"/>
+      <quality changeOmitted="false" nullable="true" scene="false" persistence="volatile" reportable="true" sourceAttribution="false" quieterReporting="false"/>
       <mandatoryConform>
         <feature name="DPS"/>
       </mandatoryConform>
@@ -779,167 +779,167 @@ Davis, CA 95616, USA
     </attribute>
     <attribute id="0x0010" name="NumberOfLogRecordsSupported" type="uint16" default="0">
       <access read="true" readPrivilege="view"/>
-      <quality changeOmitted="false" nullable="false" scene="false" persistence="fixed" reportable="false"/>
+      <quality changeOmitted="false" nullable="false" scene="false" persistence="fixed" reportable="false" sourceAttribution="false" quieterReporting="false"/>
       <mandatoryConform>
         <feature name="LOG"/>
       </mandatoryConform>
     </attribute>
     <attribute id="0x0011" name="NumberOfTotalUsersSupported" type="uint16" default="0">
       <access read="true" readPrivilege="view"/>
-      <quality changeOmitted="false" nullable="false" scene="false" persistence="fixed" reportable="false"/>
+      <quality changeOmitted="false" nullable="false" scene="false" persistence="fixed" reportable="false" sourceAttribution="false" quieterReporting="false"/>
       <mandatoryConform>
         <feature name="USR"/>
       </mandatoryConform>
     </attribute>
     <attribute id="0x0012" name="NumberOfPINUsersSupported" type="uint16" default="0">
       <access read="true" readPrivilege="view"/>
-      <quality changeOmitted="false" nullable="false" scene="false" persistence="fixed" reportable="false"/>
+      <quality changeOmitted="false" nullable="false" scene="false" persistence="fixed" reportable="false" sourceAttribution="false" quieterReporting="false"/>
       <mandatoryConform>
         <feature name="PIN"/>
       </mandatoryConform>
     </attribute>
     <attribute id="0x0013" name="NumberOfRFIDUsersSupported" type="uint16" default="0">
       <access read="true" readPrivilege="view"/>
-      <quality changeOmitted="false" nullable="false" scene="false" persistence="fixed" reportable="false"/>
+      <quality changeOmitted="false" nullable="false" scene="false" persistence="fixed" reportable="false" sourceAttribution="false" quieterReporting="false"/>
       <mandatoryConform>
         <feature name="RID"/>
       </mandatoryConform>
     </attribute>
     <attribute id="0x0014" name="NumberOfWeekDaySchedulesSupportedPerUser" type="uint8" default="0">
       <access read="true" readPrivilege="view"/>
-      <quality changeOmitted="false" nullable="false" scene="false" persistence="fixed" reportable="false"/>
+      <quality changeOmitted="false" nullable="false" scene="false" persistence="fixed" reportable="false" sourceAttribution="false" quieterReporting="false"/>
       <mandatoryConform>
         <feature name="WDSCH"/>
       </mandatoryConform>
     </attribute>
     <attribute id="0x0015" name="NumberOfYearDaySchedulesSupportedPerUser" type="uint8" default="0">
       <access read="true" readPrivilege="view"/>
-      <quality changeOmitted="false" nullable="false" scene="false" persistence="fixed" reportable="false"/>
+      <quality changeOmitted="false" nullable="false" scene="false" persistence="fixed" reportable="false" sourceAttribution="false" quieterReporting="false"/>
       <mandatoryConform>
         <feature name="YDSCH"/>
       </mandatoryConform>
     </attribute>
     <attribute id="0x0016" name="NumberOfHolidaySchedulesSupported" type="uint8" default="0">
       <access read="true" readPrivilege="view"/>
-      <quality changeOmitted="false" nullable="false" scene="false" persistence="fixed" reportable="false"/>
+      <quality changeOmitted="false" nullable="false" scene="false" persistence="fixed" reportable="false" sourceAttribution="false" quieterReporting="false"/>
       <mandatoryConform>
         <feature name="HDSCH"/>
       </mandatoryConform>
     </attribute>
     <attribute id="0x0017" name="MaxPINCodeLength" type="uint8" default="MS">
       <access read="true" readPrivilege="view"/>
-      <quality changeOmitted="false" nullable="false" scene="false" persistence="fixed" reportable="false"/>
+      <quality changeOmitted="false" nullable="false" scene="false" persistence="fixed" reportable="false" sourceAttribution="false" quieterReporting="false"/>
       <mandatoryConform>
         <feature name="PIN"/>
       </mandatoryConform>
     </attribute>
     <attribute id="0x0018" name="MinPINCodeLength" type="uint8" default="MS">
       <access read="true" readPrivilege="view"/>
-      <quality changeOmitted="false" nullable="false" scene="false" persistence="fixed" reportable="false"/>
+      <quality changeOmitted="false" nullable="false" scene="false" persistence="fixed" reportable="false" sourceAttribution="false" quieterReporting="false"/>
       <mandatoryConform>
         <feature name="PIN"/>
       </mandatoryConform>
     </attribute>
     <attribute id="0x0019" name="MaxRFIDCodeLength" type="uint8" default="MS">
       <access read="true" readPrivilege="view"/>
-      <quality changeOmitted="false" nullable="false" scene="false" persistence="fixed" reportable="false"/>
+      <quality changeOmitted="false" nullable="false" scene="false" persistence="fixed" reportable="false" sourceAttribution="false" quieterReporting="false"/>
       <mandatoryConform>
         <feature name="RID"/>
       </mandatoryConform>
     </attribute>
     <attribute id="0x001A" name="MinRFIDCodeLength" type="uint8" default="MS">
       <access read="true" readPrivilege="view"/>
-      <quality changeOmitted="false" nullable="false" scene="false" persistence="fixed" reportable="false"/>
+      <quality changeOmitted="false" nullable="false" scene="false" persistence="fixed" reportable="false" sourceAttribution="false" quieterReporting="false"/>
       <mandatoryConform>
         <feature name="RID"/>
       </mandatoryConform>
     </attribute>
     <attribute id="0x001B" name="CredentialRulesSupport" type="CredentialRulesBitmap" default="1">
       <access read="true" readPrivilege="view"/>
-      <quality changeOmitted="false" nullable="false" scene="false" persistence="fixed" reportable="false"/>
+      <quality changeOmitted="false" nullable="false" scene="false" persistence="fixed" reportable="false" sourceAttribution="false" quieterReporting="false"/>
       <mandatoryConform>
         <feature name="USR"/>
       </mandatoryConform>
     </attribute>
     <attribute id="0x001C" name="NumberOfCredentialsSupportedPerUser" type="uint8" default="0">
       <access read="true" readPrivilege="view"/>
-      <quality changeOmitted="false" nullable="false" scene="false" persistence="fixed" reportable="false"/>
+      <quality changeOmitted="false" nullable="false" scene="false" persistence="fixed" reportable="false" sourceAttribution="false" quieterReporting="false"/>
       <mandatoryConform>
         <feature name="USR"/>
       </mandatoryConform>
     </attribute>
     <attribute id="0x0020" name="EnableLogging" type="bool" default="0">
       <access read="true" write="optional" readPrivilege="view" writePrivilege="admin"/>
-      <quality changeOmitted="false" nullable="false" scene="false" persistence="volatile" reportable="true"/>
+      <quality changeOmitted="false" nullable="false" scene="false" persistence="volatile" reportable="true" sourceAttribution="false" quieterReporting="false"/>
       <mandatoryConform>
         <feature name="LOG"/>
       </mandatoryConform>
     </attribute>
     <attribute id="0x0021" name="Language" type="string" default="MS">
       <access read="true" write="optional" readPrivilege="view" writePrivilege="manage"/>
-      <quality changeOmitted="false" nullable="false" scene="false" persistence="volatile" reportable="true"/>
+      <quality changeOmitted="false" nullable="false" scene="false" persistence="volatile" reportable="true" sourceAttribution="false" quieterReporting="false"/>
       <optionalConform/>
       <constraint type="maxLength" value="3"/>
     </attribute>
     <attribute id="0x0022" name="LEDSettings" type="LEDSettingEnum" default="0">
       <access read="true" write="optional" readPrivilege="view" writePrivilege="manage"/>
-      <quality changeOmitted="false" nullable="false" scene="false" persistence="volatile" reportable="true"/>
+      <quality changeOmitted="false" nullable="false" scene="false" persistence="volatile" reportable="true" sourceAttribution="false" quieterReporting="false"/>
       <optionalConform/>
     </attribute>
     <attribute id="0x0023" name="AutoRelockTime" type="uint32" default="MS">
       <access read="true" write="optional" readPrivilege="view" writePrivilege="manage"/>
-      <quality changeOmitted="false" nullable="false" scene="false" persistence="volatile" reportable="true"/>
+      <quality changeOmitted="false" nullable="false" scene="false" persistence="volatile" reportable="true" sourceAttribution="false" quieterReporting="false"/>
       <optionalConform/>
     </attribute>
     <attribute id="0x0024" name="SoundVolume" type="SoundVolumeEnum" default="0">
       <access read="true" write="optional" readPrivilege="view" writePrivilege="manage"/>
-      <quality changeOmitted="false" nullable="false" scene="false" persistence="volatile" reportable="true"/>
+      <quality changeOmitted="false" nullable="false" scene="false" persistence="volatile" reportable="true" sourceAttribution="false" quieterReporting="false"/>
       <optionalConform/>
     </attribute>
     <attribute id="0x0025" name="OperatingMode" type="OperatingModeEnum" default="0">
       <access read="true" write="optional" readPrivilege="view" writePrivilege="manage"/>
-      <quality changeOmitted="false" nullable="false" scene="false" persistence="volatile" reportable="true"/>
+      <quality changeOmitted="false" nullable="false" scene="false" persistence="volatile" reportable="true" sourceAttribution="false" quieterReporting="false"/>
       <mandatoryConform/>
       <constraint type="desc"/>
     </attribute>
     <attribute id="0x0026" name="SupportedOperatingModes" type="OperatingModesBitmap" default="0xFFF6">
       <access read="true" readPrivilege="view"/>
-      <quality changeOmitted="false" nullable="false" scene="false" persistence="fixed" reportable="false"/>
+      <quality changeOmitted="false" nullable="false" scene="false" persistence="fixed" reportable="false" sourceAttribution="false" quieterReporting="false"/>
       <mandatoryConform/>
     </attribute>
     <attribute id="0x0027" name="DefaultConfigurationRegister" type="ConfigurationRegisterBitmap" default="0">
       <access read="true" readPrivilege="view"/>
-      <quality changeOmitted="false" nullable="false" scene="false" persistence="volatile" reportable="true"/>
+      <quality changeOmitted="false" nullable="false" scene="false" persistence="volatile" reportable="true" sourceAttribution="false" quieterReporting="false"/>
       <optionalConform/>
     </attribute>
     <attribute id="0x0028" name="EnableLocalProgramming" type="bool" default="1">
       <access read="true" write="optional" readPrivilege="view" writePrivilege="admin"/>
-      <quality changeOmitted="false" nullable="false" scene="false" persistence="volatile" reportable="true"/>
+      <quality changeOmitted="false" nullable="false" scene="false" persistence="volatile" reportable="true" sourceAttribution="false" quieterReporting="false"/>
       <optionalConform/>
     </attribute>
     <attribute id="0x0029" name="EnableOneTouchLocking" type="bool" default="0">
       <access read="true" write="true" readPrivilege="view" writePrivilege="manage"/>
-      <quality changeOmitted="false" nullable="false" scene="false" persistence="volatile" reportable="true"/>
+      <quality changeOmitted="false" nullable="false" scene="false" persistence="volatile" reportable="true" sourceAttribution="false" quieterReporting="false"/>
       <optionalConform/>
     </attribute>
     <attribute id="0x002A" name="EnableInsideStatusLED" type="bool" default="0">
       <access read="true" write="true" readPrivilege="view" writePrivilege="manage"/>
-      <quality changeOmitted="false" nullable="false" scene="false" persistence="volatile" reportable="true"/>
+      <quality changeOmitted="false" nullable="false" scene="false" persistence="volatile" reportable="true" sourceAttribution="false" quieterReporting="false"/>
       <optionalConform/>
     </attribute>
     <attribute id="0x002B" name="EnablePrivacyModeButton" type="bool" default="0">
       <access read="true" write="true" readPrivilege="view" writePrivilege="manage"/>
-      <quality changeOmitted="false" nullable="false" scene="false" persistence="volatile" reportable="true"/>
+      <quality changeOmitted="false" nullable="false" scene="false" persistence="volatile" reportable="true" sourceAttribution="false" quieterReporting="false"/>
       <optionalConform/>
     </attribute>
     <attribute id="0x002C" name="LocalProgrammingFeatures" type="LocalProgrammingFeaturesBitmap" default="0">
       <access read="true" write="optional" readPrivilege="view" writePrivilege="admin"/>
-      <quality changeOmitted="false" nullable="false" scene="false" persistence="volatile" reportable="true"/>
+      <quality changeOmitted="false" nullable="false" scene="false" persistence="volatile" reportable="true" sourceAttribution="false" quieterReporting="false"/>
       <optionalConform/>
     </attribute>
     <attribute id="0x0030" name="WrongCodeEntryLimit" type="uint8" default="MS">
       <access read="true" write="optional" readPrivilege="view" writePrivilege="admin"/>
-      <quality changeOmitted="false" nullable="false" scene="false" persistence="volatile" reportable="true"/>
+      <quality changeOmitted="false" nullable="false" scene="false" persistence="volatile" reportable="true" sourceAttribution="false" quieterReporting="false"/>
       <mandatoryConform>
         <orTerm>
           <feature name="PIN"/>
@@ -950,7 +950,7 @@ Davis, CA 95616, USA
     </attribute>
     <attribute id="0x0031" name="UserCodeTemporaryDisableTime" type="uint8" default="MS">
       <access read="true" write="optional" readPrivilege="view" writePrivilege="admin"/>
-      <quality changeOmitted="false" nullable="false" scene="false" persistence="volatile" reportable="true"/>
+      <quality changeOmitted="false" nullable="false" scene="false" persistence="volatile" reportable="true" sourceAttribution="false" quieterReporting="false"/>
       <mandatoryConform>
         <orTerm>
           <feature name="PIN"/>
@@ -961,7 +961,7 @@ Davis, CA 95616, USA
     </attribute>
     <attribute id="0x0032" name="SendPINOverTheAir" type="bool" default="0">
       <access read="true" write="optional" readPrivilege="view" writePrivilege="admin"/>
-      <quality changeOmitted="false" nullable="false" scene="false" persistence="volatile" reportable="true"/>
+      <quality changeOmitted="false" nullable="false" scene="false" persistence="volatile" reportable="true" sourceAttribution="false" quieterReporting="false"/>
       <optionalConform>
         <andTerm>
           <notTerm>
@@ -973,7 +973,7 @@ Davis, CA 95616, USA
     </attribute>
     <attribute id="0x0033" name="RequirePINforRemoteOperation" type="bool" default="0">
       <access read="true" write="optional" readPrivilege="view" writePrivilege="admin"/>
-      <quality changeOmitted="false" nullable="false" scene="false" persistence="volatile" reportable="true"/>
+      <quality changeOmitted="false" nullable="false" scene="false" persistence="volatile" reportable="true" sourceAttribution="false" quieterReporting="false"/>
       <mandatoryConform>
         <andTerm>
           <feature name="COTA"/>
@@ -986,7 +986,7 @@ Davis, CA 95616, USA
     </attribute>
     <attribute id="0x0035" name="ExpiringUserTimeout" type="uint16" default="MS">
       <access read="true" write="optional" readPrivilege="view" writePrivilege="admin"/>
-      <quality changeOmitted="false" nullable="false" scene="false" persistence="volatile" reportable="true"/>
+      <quality changeOmitted="false" nullable="false" scene="false" persistence="volatile" reportable="true" sourceAttribution="false" quieterReporting="false"/>
       <optionalConform>
         <feature name="USR"/>
       </optionalConform>
@@ -994,12 +994,12 @@ Davis, CA 95616, USA
     </attribute>
     <attribute id="0x0040" name="AlarmMask" type="AlarmMaskBitmap" default="0xFFFF">
       <access read="true" write="true" readPrivilege="view" writePrivilege="admin"/>
-      <quality changeOmitted="false" nullable="false" scene="false" persistence="volatile" reportable="true"/>
+      <quality changeOmitted="false" nullable="false" scene="false" persistence="volatile" reportable="true" sourceAttribution="false" quieterReporting="false"/>
       <optionalConform/>
     </attribute>
     <attribute id="0x0041" name="KeypadOperationEventMask" type="EventMaskBitmap" default="0xFFFF">
       <access read="true" write="true" readPrivilege="view" writePrivilege="admin"/>
-      <quality changeOmitted="false" nullable="false" scene="false" persistence="volatile" reportable="true"/>
+      <quality changeOmitted="false" nullable="false" scene="false" persistence="volatile" reportable="true" sourceAttribution="false" quieterReporting="false"/>
       <optionalConform>
         <andTerm>
           <feature name="NOT"/>
@@ -1009,21 +1009,21 @@ Davis, CA 95616, USA
     </attribute>
     <attribute id="0x0042" name="RemoteOperationEventMask" type="EventMaskBitmap" default="0xFFFF">
       <access read="true" write="true" readPrivilege="view" writePrivilege="admin"/>
-      <quality changeOmitted="false" nullable="false" scene="false" persistence="volatile" reportable="true"/>
+      <quality changeOmitted="false" nullable="false" scene="false" persistence="volatile" reportable="true" sourceAttribution="false" quieterReporting="false"/>
       <optionalConform>
         <feature name="NOT"/>
       </optionalConform>
     </attribute>
     <attribute id="0x0043" name="ManualOperationEventMask" type="EventMaskBitmap" default="0xFFFF">
       <access read="true" write="true" readPrivilege="view" writePrivilege="admin"/>
-      <quality changeOmitted="false" nullable="false" scene="false" persistence="volatile" reportable="true"/>
+      <quality changeOmitted="false" nullable="false" scene="false" persistence="volatile" reportable="true" sourceAttribution="false" quieterReporting="false"/>
       <optionalConform>
         <feature name="NOT"/>
       </optionalConform>
     </attribute>
     <attribute id="0x0044" name="RFIDOperationEventMask" type="EventMaskBitmap" default="0xFFFF">
       <access read="true" write="true" readPrivilege="view" writePrivilege="admin"/>
-      <quality changeOmitted="false" nullable="false" scene="false" persistence="volatile" reportable="true"/>
+      <quality changeOmitted="false" nullable="false" scene="false" persistence="volatile" reportable="true" sourceAttribution="false" quieterReporting="false"/>
       <optionalConform>
         <andTerm>
           <feature name="NOT"/>
@@ -1033,7 +1033,7 @@ Davis, CA 95616, USA
     </attribute>
     <attribute id="0x0045" name="KeypadProgrammingEventMask" type="EventMaskBitmap" default="0xFFFF">
       <access read="true" write="true" readPrivilege="view" writePrivilege="admin"/>
-      <quality changeOmitted="false" nullable="false" scene="false" persistence="volatile" reportable="true"/>
+      <quality changeOmitted="false" nullable="false" scene="false" persistence="volatile" reportable="true" sourceAttribution="false" quieterReporting="false"/>
       <optionalConform>
         <andTerm>
           <feature name="NOT"/>
@@ -1043,14 +1043,14 @@ Davis, CA 95616, USA
     </attribute>
     <attribute id="0x0046" name="RemoteProgrammingEventMask" type="EventMaskBitmap" default="0xFFFF">
       <access read="true" write="true" readPrivilege="view" writePrivilege="admin"/>
-      <quality changeOmitted="false" nullable="false" scene="false" persistence="volatile" reportable="true"/>
+      <quality changeOmitted="false" nullable="false" scene="false" persistence="volatile" reportable="true" sourceAttribution="false" quieterReporting="false"/>
       <optionalConform>
         <feature name="NOT"/>
       </optionalConform>
     </attribute>
     <attribute id="0x0047" name="RFIDProgrammingEventMask" type="EventMaskBitmap" default="0xFFFF">
       <access read="true" write="true" readPrivilege="view" writePrivilege="admin"/>
-      <quality changeOmitted="false" nullable="false" scene="false" persistence="volatile" reportable="true"/>
+      <quality changeOmitted="false" nullable="false" scene="false" persistence="volatile" reportable="true" sourceAttribution="false" quieterReporting="false"/>
       <optionalConform>
         <andTerm>
           <feature name="NOT"/>

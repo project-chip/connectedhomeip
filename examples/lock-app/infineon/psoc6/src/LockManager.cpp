@@ -25,7 +25,7 @@
 #include <app-common/zap-generated/attributes/Accessors.h>
 #include <cstring>
 #include <lib/support/logging/CHIPLogging.h>
-#include <platform/Infineon/PSOC6/P6Config.h>
+#include <platform/Infineon/PSOC6/PSOC6Config.h>
 
 LockManager LockManager::sLock;
 
@@ -90,7 +90,7 @@ CHIP_ERROR LockManager::Init(chip::app::DataModel::Nullable<chip::app::Clusters:
 
     if (sLockTimer == NULL)
     {
-        P6_LOG("sLockTimer timer create failed");
+        PSOC6_LOG("sLockTimer timer create failed");
         return APP_ERROR_CREATE_TIMER_FAILED;
     }
 
@@ -141,33 +141,33 @@ bool LockManager::IsValidHolidayScheduleIndex(uint8_t scheduleIndex)
 bool LockManager::ReadConfigValues()
 {
     size_t outLen;
-    P6Config::ReadConfigValueBin(P6Config::kConfigKey_LockUser, reinterpret_cast<uint8_t *>(&mLockUsers),
-                                 sizeof(EmberAfPluginDoorLockUserInfo) * ArraySize(mLockUsers), outLen);
+    PSOC6Config::ReadConfigValueBin(PSOC6Config::kConfigKey_LockUser, reinterpret_cast<uint8_t *>(&mLockUsers),
+                                    sizeof(EmberAfPluginDoorLockUserInfo) * ArraySize(mLockUsers), outLen);
 
-    P6Config::ReadConfigValueBin(P6Config::kConfigKey_Credential, reinterpret_cast<uint8_t *>(&mLockCredentials),
-                                 sizeof(EmberAfPluginDoorLockCredentialInfo) * kMaxCredentials * kNumCredentialTypes, outLen);
+    PSOC6Config::ReadConfigValueBin(PSOC6Config::kConfigKey_Credential, reinterpret_cast<uint8_t *>(&mLockCredentials),
+                                    sizeof(EmberAfPluginDoorLockCredentialInfo) * kMaxCredentials * kNumCredentialTypes, outLen);
 
-    P6Config::ReadConfigValueBin(P6Config::kConfigKey_LockUserName, reinterpret_cast<uint8_t *>(mUserNames), sizeof(mUserNames),
-                                 outLen);
+    PSOC6Config::ReadConfigValueBin(PSOC6Config::kConfigKey_LockUserName, reinterpret_cast<uint8_t *>(mUserNames),
+                                    sizeof(mUserNames), outLen);
 
-    P6Config::ReadConfigValueBin(P6Config::kConfigKey_CredentialData, reinterpret_cast<uint8_t *>(mCredentialData),
-                                 sizeof(mCredentialData), outLen);
+    PSOC6Config::ReadConfigValueBin(PSOC6Config::kConfigKey_CredentialData, reinterpret_cast<uint8_t *>(mCredentialData),
+                                    sizeof(mCredentialData), outLen);
 
-    P6Config::ReadConfigValueBin(P6Config::kConfigKey_UserCredentials, reinterpret_cast<uint8_t *>(mCredentials),
-                                 sizeof(CredentialStruct) * LockParams.numberOfUsers * kMaxCredentials, outLen);
+    PSOC6Config::ReadConfigValueBin(PSOC6Config::kConfigKey_UserCredentials, reinterpret_cast<uint8_t *>(mCredentials),
+                                    sizeof(CredentialStruct) * LockParams.numberOfUsers * kMaxCredentials, outLen);
 
-    P6Config::ReadConfigValueBin(P6Config::kConfigKey_WeekDaySchedules, reinterpret_cast<uint8_t *>(mWeekdaySchedule),
-                                 sizeof(EmberAfPluginDoorLockWeekDaySchedule) * LockParams.numberOfWeekdaySchedulesPerUser *
-                                     LockParams.numberOfUsers,
-                                 outLen);
+    PSOC6Config::ReadConfigValueBin(PSOC6Config::kConfigKey_WeekDaySchedules, reinterpret_cast<uint8_t *>(mWeekdaySchedule),
+                                    sizeof(EmberAfPluginDoorLockWeekDaySchedule) * LockParams.numberOfWeekdaySchedulesPerUser *
+                                        LockParams.numberOfUsers,
+                                    outLen);
 
-    P6Config::ReadConfigValueBin(P6Config::kConfigKey_YearDaySchedules, reinterpret_cast<uint8_t *>(mYeardaySchedule),
-                                 sizeof(EmberAfPluginDoorLockYearDaySchedule) * LockParams.numberOfYeardaySchedulesPerUser *
-                                     LockParams.numberOfUsers,
-                                 outLen);
+    PSOC6Config::ReadConfigValueBin(PSOC6Config::kConfigKey_YearDaySchedules, reinterpret_cast<uint8_t *>(mYeardaySchedule),
+                                    sizeof(EmberAfPluginDoorLockYearDaySchedule) * LockParams.numberOfYeardaySchedulesPerUser *
+                                        LockParams.numberOfUsers,
+                                    outLen);
 
-    P6Config::ReadConfigValueBin(P6Config::kConfigKey_HolidaySchedules, reinterpret_cast<uint8_t *>(&(mHolidaySchedule)),
-                                 sizeof(EmberAfPluginDoorLockHolidaySchedule) * LockParams.numberOfHolidaySchedules, outLen);
+    PSOC6Config::ReadConfigValueBin(PSOC6Config::kConfigKey_HolidaySchedules, reinterpret_cast<uint8_t *>(&(mHolidaySchedule)),
+                                    sizeof(EmberAfPluginDoorLockHolidaySchedule) * LockParams.numberOfHolidaySchedules, outLen);
 
     return true;
 }
@@ -228,7 +228,7 @@ void LockManager::StartTimer(uint32_t aTimeoutMs)
 {
     if (xTimerIsTimerActive(sLockTimer))
     {
-        P6_LOG("app timer already started!");
+        PSOC6_LOG("app timer already started!");
         CancelTimer();
     }
 
@@ -237,7 +237,7 @@ void LockManager::StartTimer(uint32_t aTimeoutMs)
     // cannot immediately be sent to the timer command queue.
     if (xTimerChangePeriod(sLockTimer, (aTimeoutMs / portTICK_PERIOD_MS), 100) != pdPASS)
     {
-        P6_LOG("sLockTimer timer start() failed");
+        PSOC6_LOG("sLockTimer timer start() failed");
         appError(APP_ERROR_START_TIMER_FAILED);
     }
 }
@@ -246,7 +246,7 @@ void LockManager::CancelTimer(void)
 {
     if (xTimerStop(sLockTimer, 0) == pdFAIL)
     {
-        P6_LOG("sLockTimer stop() failed");
+        PSOC6_LOG("sLockTimer stop() failed");
         appError(APP_ERROR_STOP_TIMER_FAILED);
     }
 }
@@ -393,14 +393,14 @@ bool LockManager::SetUser(chip::EndpointId endpointId, uint16_t userIndex, chip:
     userInStorage.credentials = chip::Span<const CredentialStruct>(mCredentials[userIndex], totalCredentials);
 
     // Save user information in NVM flash
-    P6Config::WriteConfigValueBin(P6Config::kConfigKey_LockUser, reinterpret_cast<const uint8_t *>(&mLockUsers),
-                                  sizeof(EmberAfPluginDoorLockUserInfo) * LockParams.numberOfUsers);
+    PSOC6Config::WriteConfigValueBin(PSOC6Config::kConfigKey_LockUser, reinterpret_cast<const uint8_t *>(&mLockUsers),
+                                     sizeof(EmberAfPluginDoorLockUserInfo) * LockParams.numberOfUsers);
 
-    P6Config::WriteConfigValueBin(P6Config::kConfigKey_UserCredentials, reinterpret_cast<const uint8_t *>(mCredentials),
-                                  sizeof(CredentialStruct) * LockParams.numberOfUsers * kMaxCredentials);
+    PSOC6Config::WriteConfigValueBin(PSOC6Config::kConfigKey_UserCredentials, reinterpret_cast<const uint8_t *>(mCredentials),
+                                     sizeof(CredentialStruct) * LockParams.numberOfUsers * kMaxCredentials);
 
-    P6Config::WriteConfigValueBin(P6Config::kConfigKey_LockUserName, reinterpret_cast<const uint8_t *>(mUserNames),
-                                  sizeof(mUserNames));
+    PSOC6Config::WriteConfigValueBin(PSOC6Config::kConfigKey_LockUserName, reinterpret_cast<const uint8_t *>(mUserNames),
+                                     sizeof(mUserNames));
 
     ChipLogProgress(Zcl, "Successfully set the user [mEndpointId=%d,index=%d]", endpointId, userIndex);
 
@@ -481,11 +481,11 @@ bool LockManager::SetCredential(chip::EndpointId endpointId, uint16_t credential
         chip::ByteSpan{ mCredentialData[to_underlying(credentialType)][credentialIndex], credentialData.size() };
 
     // Save credential information in NVM flash
-    P6Config::WriteConfigValueBin(P6Config::kConfigKey_Credential, reinterpret_cast<const uint8_t *>(&mLockCredentials),
-                                  sizeof(EmberAfPluginDoorLockCredentialInfo) * kMaxCredentials * kNumCredentialTypes);
+    PSOC6Config::WriteConfigValueBin(PSOC6Config::kConfigKey_Credential, reinterpret_cast<const uint8_t *>(&mLockCredentials),
+                                     sizeof(EmberAfPluginDoorLockCredentialInfo) * kMaxCredentials * kNumCredentialTypes);
 
-    P6Config::WriteConfigValueBin(P6Config::kConfigKey_CredentialData, reinterpret_cast<const uint8_t *>(&mCredentialData),
-                                  sizeof(mCredentialData));
+    PSOC6Config::WriteConfigValueBin(PSOC6Config::kConfigKey_CredentialData, reinterpret_cast<const uint8_t *>(&mCredentialData),
+                                     sizeof(mCredentialData));
 
     ChipLogProgress(Zcl, "Successfully set the credential [credentialType=%u]", to_underlying(credentialType));
 
@@ -540,9 +540,9 @@ DlStatus LockManager::SetWeekdaySchedule(chip::EndpointId endpointId, uint8_t we
     scheduleInStorage.status               = status;
 
     // Save schedule information in NVM flash
-    P6Config::WriteConfigValueBin(P6Config::kConfigKey_WeekDaySchedules, reinterpret_cast<const uint8_t *>(mWeekdaySchedule),
-                                  sizeof(EmberAfPluginDoorLockWeekDaySchedule) * LockParams.numberOfWeekdaySchedulesPerUser *
-                                      LockParams.numberOfUsers);
+    PSOC6Config::WriteConfigValueBin(PSOC6Config::kConfigKey_WeekDaySchedules, reinterpret_cast<const uint8_t *>(mWeekdaySchedule),
+                                     sizeof(EmberAfPluginDoorLockWeekDaySchedule) * LockParams.numberOfWeekdaySchedulesPerUser *
+                                         LockParams.numberOfUsers);
 
     return DlStatus::kSuccess;
 }
@@ -589,9 +589,9 @@ DlStatus LockManager::SetYeardaySchedule(chip::EndpointId endpointId, uint8_t ye
     scheduleInStorage.status                  = status;
 
     // Save schedule information in NVM flash
-    P6Config::WriteConfigValueBin(P6Config::kConfigKey_YearDaySchedules, reinterpret_cast<const uint8_t *>(mYeardaySchedule),
-                                  sizeof(EmberAfPluginDoorLockYearDaySchedule) * LockParams.numberOfYeardaySchedulesPerUser *
-                                      LockParams.numberOfUsers);
+    PSOC6Config::WriteConfigValueBin(PSOC6Config::kConfigKey_YearDaySchedules, reinterpret_cast<const uint8_t *>(mYeardaySchedule),
+                                     sizeof(EmberAfPluginDoorLockYearDaySchedule) * LockParams.numberOfYeardaySchedulesPerUser *
+                                         LockParams.numberOfUsers);
 
     return DlStatus::kSuccess;
 }
@@ -633,8 +633,9 @@ DlStatus LockManager::SetHolidaySchedule(chip::EndpointId endpointId, uint8_t ho
     scheduleInStorage.status                  = status;
 
     // Save schedule information in NVM flash
-    P6Config::WriteConfigValueBin(P6Config::kConfigKey_HolidaySchedules, reinterpret_cast<const uint8_t *>(&(mHolidaySchedule)),
-                                  sizeof(EmberAfPluginDoorLockHolidaySchedule) * LockParams.numberOfHolidaySchedules);
+    PSOC6Config::WriteConfigValueBin(PSOC6Config::kConfigKey_HolidaySchedules,
+                                     reinterpret_cast<const uint8_t *>(&(mHolidaySchedule)),
+                                     sizeof(EmberAfPluginDoorLockHolidaySchedule) * LockParams.numberOfHolidaySchedules);
 
     return DlStatus::kSuccess;
 }

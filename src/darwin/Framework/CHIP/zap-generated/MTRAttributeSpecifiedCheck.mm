@@ -1851,6 +1851,9 @@ static BOOL AttributeIsSpecifiedInICDManagementCluster(AttributeId aAttributeId)
     case Attributes::OperatingMode::Id: {
         return YES;
     }
+    case Attributes::MaximumCheckInBackOff::Id: {
+        return YES;
+    }
     case Attributes::GeneratedCommandList::Id: {
         return YES;
     }
@@ -3443,6 +3446,45 @@ static BOOL AttributeIsSpecifiedInEnergyEVSEModeCluster(AttributeId aAttributeId
     }
     }
 }
+static BOOL AttributeIsSpecifiedInWaterHeaterModeCluster(AttributeId aAttributeId)
+{
+    using namespace Clusters::WaterHeaterMode;
+    switch (aAttributeId) {
+    case Attributes::SupportedModes::Id: {
+        return YES;
+    }
+    case Attributes::CurrentMode::Id: {
+        return YES;
+    }
+    case Attributes::StartUpMode::Id: {
+        return YES;
+    }
+    case Attributes::OnMode::Id: {
+        return YES;
+    }
+    case Attributes::GeneratedCommandList::Id: {
+        return YES;
+    }
+    case Attributes::AcceptedCommandList::Id: {
+        return YES;
+    }
+    case Attributes::EventList::Id: {
+        return YES;
+    }
+    case Attributes::AttributeList::Id: {
+        return YES;
+    }
+    case Attributes::FeatureMap::Id: {
+        return YES;
+    }
+    case Attributes::ClusterRevision::Id: {
+        return YES;
+    }
+    default: {
+        return NO;
+    }
+    }
+}
 static BOOL AttributeIsSpecifiedInDeviceEnergyManagementModeCluster(AttributeId aAttributeId)
 {
     using namespace Clusters::DeviceEnergyManagementMode;
@@ -4123,9 +4165,6 @@ static BOOL AttributeIsSpecifiedInThermostatCluster(AttributeId aAttributeId)
         return YES;
     }
     case Attributes::SetpointHoldExpiryTimestamp::Id: {
-        return YES;
-    }
-    case Attributes::QueuedPreset::Id: {
         return YES;
     }
     case Attributes::GeneratedCommandList::Id: {
@@ -5996,6 +6035,42 @@ static BOOL AttributeIsSpecifiedInContentAppObserverCluster(AttributeId aAttribu
     }
     }
 }
+static BOOL AttributeIsSpecifiedInEcosystemInformationCluster(AttributeId aAttributeId)
+{
+    using namespace Clusters::EcosystemInformation;
+    switch (aAttributeId) {
+    case Attributes::RemovedOn::Id: {
+        return YES;
+    }
+    case Attributes::DeviceDirectory::Id: {
+        return YES;
+    }
+    case Attributes::LocationDirectory::Id: {
+        return YES;
+    }
+    case Attributes::GeneratedCommandList::Id: {
+        return YES;
+    }
+    case Attributes::AcceptedCommandList::Id: {
+        return YES;
+    }
+    case Attributes::EventList::Id: {
+        return YES;
+    }
+    case Attributes::AttributeList::Id: {
+        return YES;
+    }
+    case Attributes::FeatureMap::Id: {
+        return YES;
+    }
+    case Attributes::ClusterRevision::Id: {
+        return YES;
+    }
+    default: {
+        return NO;
+    }
+    }
+}
 static BOOL AttributeIsSpecifiedInCommissionerControlCluster(AttributeId aAttributeId)
 {
     using namespace Clusters::CommissionerControl;
@@ -6963,6 +7038,9 @@ BOOL MTRAttributeIsSpecified(ClusterId aClusterId, AttributeId aAttributeId)
     case Clusters::EnergyEvseMode::Id: {
         return AttributeIsSpecifiedInEnergyEVSEModeCluster(aAttributeId);
     }
+    case Clusters::WaterHeaterMode::Id: {
+        return AttributeIsSpecifiedInWaterHeaterModeCluster(aAttributeId);
+    }
     case Clusters::DeviceEnergyManagementMode::Id: {
         return AttributeIsSpecifiedInDeviceEnergyManagementModeCluster(aAttributeId);
     }
@@ -7094,6 +7172,9 @@ BOOL MTRAttributeIsSpecified(ClusterId aClusterId, AttributeId aAttributeId)
     }
     case Clusters::ContentAppObserver::Id: {
         return AttributeIsSpecifiedInContentAppObserverCluster(aAttributeId);
+    }
+    case Clusters::EcosystemInformation::Id: {
+        return AttributeIsSpecifiedInEcosystemInformationCluster(aAttributeId);
     }
     case Clusters::CommissionerControl::Id: {
         return AttributeIsSpecifiedInCommissionerControlCluster(aAttributeId);

@@ -21,17 +21,33 @@
 #include <app-common/zap-generated/cluster-objects.h>
 #include <app-common/zap-generated/ids/Clusters.h>
 #include <app/AttributeValueDecoder.h>
+#include <app/AttributeValueEncoder.h>
 #include <app/InteractionModelEngine.h>
+#include <app/codegen-data-model/Instance.h>
 
 using namespace chip;
 using namespace chip::app;
 using namespace chip::app::DataModelTests;
+using namespace chip::app::InteractionModel;
 using namespace chip::app::Clusters;
 using namespace chip::app::Clusters::UnitTesting;
 using namespace chip::Protocols;
 
 namespace chip {
 namespace app {
+
+class TestOnlyAttributeValueEncoderAccessor
+{
+public:
+    TestOnlyAttributeValueEncoderAccessor(AttributeValueEncoder & encoder) : mEncoder(encoder) {}
+
+    AttributeReportIBs::Builder & Builder() { return mEncoder.mAttributeReportIBsBuilder; }
+
+    void SetState(const AttributeEncodeState & state) { mEncoder.mEncodeState = state; }
+
+private:
+    AttributeValueEncoder & mEncoder;
+};
 
 namespace DataModelTests {
 
@@ -41,6 +57,11 @@ ScopedChangeOnly<CommandResponseDirective> gCommandResponseDirective(CommandResp
 
 ScopedChangeOnly<bool> gIsLitIcd(false);
 
+// TODO: usage of a global value that changes as a READ sideffect is problematic for
+//       dual-read use cases (i.e. during checked ember/datamodel tests)
+//
+//       For now see the hack "change undo" in CustomDataModel::ReadAttribute, however
+//       overall this is problematic.
 uint16_t gInt16uTotalReadCount = 0;
 CommandHandler::Handle gAsyncCommandHandle;
 
@@ -312,15 +333,15 @@ CHIP_ERROR WriteSingleClusterData(const Access::SubjectDescriptor & aSubjectDesc
     // Boolean attribute of unit testing cluster triggers "multiple errors" case.
     if (aPath.mClusterId == Clusters::UnitTesting::Id && aPath.mAttributeId == Attributes::Boolean::TypeInfo::GetAttributeId())
     {
-        InteractionModel::ClusterStatusCode status{ Protocols::InteractionModel::Status::InvalidValue };
+        Protocols::InteractionModel::ClusterStatusCode status{ Protocols::InteractionModel::Status::InvalidValue };
 
         if (gWriteResponseDirective == WriteResponseDirective::kSendMultipleSuccess)
         {
-            status = InteractionModel::Status::Success;
+            status = Protocols::InteractionModel::Status::Success;
         }
         else if (gWriteResponseDirective == WriteResponseDirective::kSendMultipleErrors)
         {
-            status = InteractionModel::Status::Failure;
+            status = Protocols::InteractionModel::Status::Failure;
         }
         else
         {
@@ -337,14 +358,14 @@ CHIP_ERROR WriteSingleClusterData(const Access::SubjectDescriptor & aSubjectDesc
 
     if (aPath.mClusterId == Clusters::UnitTesting::Id && aPath.mAttributeId == Attributes::Int8u::TypeInfo::GetAttributeId())
     {
-        InteractionModel::ClusterStatusCode status{ Protocols::InteractionModel::Status::InvalidValue };
+        Protocols::InteractionModel::ClusterStatusCode status{ Protocols::InteractionModel::Status::InvalidValue };
         if (gWriteResponseDirective == WriteResponseDirective::kSendClusterSpecificSuccess)
         {
-            status = InteractionModel::ClusterStatusCode::ClusterSpecificSuccess(kExampleClusterSpecificSuccess);
+            status = Protocols::InteractionModel::ClusterStatusCode::ClusterSpecificSuccess(kExampleClusterSpecificSuccess);
         }
         else if (gWriteResponseDirective == WriteResponseDirective::kSendClusterSpecificFailure)
         {
-            status = InteractionModel::ClusterStatusCode::ClusterSpecificFailure(kExampleClusterSpecificFailure);
+            status = Protocols::InteractionModel::ClusterStatusCode::ClusterSpecificFailure(kExampleClusterSpecificFailure);
         }
         else
         {
@@ -446,10 +467,10 @@ void DispatchSingleClusterCommand(const ConcreteCommandPath & aCommandPath, chip
     }
 }
 
-InteractionModel::Status ServerClusterCommandExists(const ConcreteCommandPath & aCommandPath)
+Protocols::InteractionModel::Status ServerClusterCommandExists(const ConcreteCommandPath & aCommandPath)
 {
     // Mock cluster catalog, only support commands on one cluster on one endpoint.
-    using InteractionModel::Status;
+    using Protocols::InteractionModel::Status;
 
     if (aCommandPath.mEndpointId != kTestEndpointId)
     {
@@ -462,6 +483,115 @@ InteractionModel::Status ServerClusterCommandExists(const ConcreteCommandPath & 
     }
 
     return Status::Success;
+}
+
+CustomDataModel & CustomDataModel::Instance()
+{
+    static CustomDataModel model;
+    return model;
+}
+
+CHIP_ERROR CustomDataModel::ReadAttribute(const ReadAttributeRequest & request, AttributeValueEncoder & encoder)
+{
+    AttributeEncodeState mutableState(&encoder.GetState()); // provide a state copy to start.
+
+#if CHIP_CONFIG_USE_EMBER_DATA_MODEL && CHIP_CONFIG_USE_DATA_MODEL_INTERFACE
+    if ((request.path.mEndpointId < chip::Test::kMockEndpointMin) &&
+        (gReadResponseDirective == ReadResponseDirective::kSendDataResponse) &&
+        (request.path.mClusterId == app::Clusters::UnitTesting::Id) &&
+        (request.path.mAttributeId == app::Clusters::UnitTesting::Attributes::Int16u::Id))
+    {
+        // gInt16uTotalReadCount is a global that keeps changing. Further more, encoding
+        // size differs when moving from 0xFF to 0x100, so encoding sizes in TLV differ.
+        //
+        // This is a HACKISH workaround as it relies that we ember-read before datamodel-read
+        gInt16uTotalReadCount--;
+    }
+#endif // CHIP_CONFIG_USE_EMBER_DATA_MODEL && CHIP_CONFIG_USE_DATA_MODEL_INTERFACE
+
+    CHIP_ERROR err = ReadSingleClusterData(request.subjectDescriptor.value_or(Access::SubjectDescriptor()),
+                                           request.readFlags.Has(ReadFlags::kFabricFiltered), request.path,
+                                           TestOnlyAttributeValueEncoderAccessor(encoder).Builder(), &mutableState);
+
+    // state must survive CHIP_ERRORs as it is used for chunking
+    TestOnlyAttributeValueEncoderAccessor(encoder).SetState(mutableState);
+
+    return err;
+}
+
+CHIP_ERROR CustomDataModel::WriteAttribute(const WriteAttributeRequest & request, AttributeValueDecoder & decoder)
+{
+    return CHIP_ERROR_NOT_IMPLEMENTED;
+}
+
+CHIP_ERROR CustomDataModel::Invoke(const InvokeRequest & request, chip::TLV::TLVReader & input_arguments, CommandHandler * handler)
+{
+    return CHIP_ERROR_NOT_IMPLEMENTED;
+}
+
+EndpointId CustomDataModel::FirstEndpoint()
+{
+    return CodegenDataModelInstance()->FirstEndpoint();
+}
+
+EndpointId CustomDataModel::NextEndpoint(EndpointId before)
+{
+    return CodegenDataModelInstance()->NextEndpoint(before);
+}
+
+ClusterEntry CustomDataModel::FirstCluster(EndpointId endpoint)
+{
+    return CodegenDataModelInstance()->FirstCluster(endpoint);
+}
+
+ClusterEntry CustomDataModel::NextCluster(const ConcreteClusterPath & before)
+{
+    return CodegenDataModelInstance()->NextCluster(before);
+}
+
+std::optional<ClusterInfo> CustomDataModel::GetClusterInfo(const ConcreteClusterPath & path)
+{
+    return CodegenDataModelInstance()->GetClusterInfo(path);
+}
+
+AttributeEntry CustomDataModel::FirstAttribute(const ConcreteClusterPath & cluster)
+{
+    return CodegenDataModelInstance()->FirstAttribute(cluster);
+}
+
+AttributeEntry CustomDataModel::NextAttribute(const ConcreteAttributePath & before)
+{
+    return CodegenDataModelInstance()->NextAttribute(before);
+}
+
+std::optional<AttributeInfo> CustomDataModel::GetAttributeInfo(const ConcreteAttributePath & path)
+{
+    return CodegenDataModelInstance()->GetAttributeInfo(path);
+}
+
+CommandEntry CustomDataModel::FirstAcceptedCommand(const ConcreteClusterPath & cluster)
+{
+    return CodegenDataModelInstance()->FirstAcceptedCommand(cluster);
+}
+
+CommandEntry CustomDataModel::NextAcceptedCommand(const ConcreteCommandPath & before)
+{
+    return CodegenDataModelInstance()->NextAcceptedCommand(before);
+}
+
+std::optional<CommandInfo> CustomDataModel::GetAcceptedCommandInfo(const ConcreteCommandPath & path)
+{
+    return CodegenDataModelInstance()->GetAcceptedCommandInfo(path);
+}
+
+ConcreteCommandPath CustomDataModel::FirstGeneratedCommand(const ConcreteClusterPath & cluster)
+{
+    return CodegenDataModelInstance()->FirstGeneratedCommand(cluster);
+}
+
+ConcreteCommandPath CustomDataModel::NextGeneratedCommand(const ConcreteCommandPath & before)
+{
+    return CodegenDataModelInstance()->NextGeneratedCommand(before);
 }
 
 } // namespace app

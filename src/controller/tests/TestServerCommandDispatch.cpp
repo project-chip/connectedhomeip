@@ -24,18 +24,20 @@
 
 #include <pw_unit_test/framework.h>
 
-#include "app-common/zap-generated/ids/Attributes.h"
-#include "app-common/zap-generated/ids/Clusters.h"
-#include "protocols/interaction_model/Constants.h"
 #include <app-common/zap-generated/cluster-objects.h>
+#include <app-common/zap-generated/ids/Attributes.h>
+#include <app-common/zap-generated/ids/Clusters.h>
 #include <app/CommandHandlerInterface.h>
+#include <app/CommandHandlerInterfaceRegistry.h>
 #include <app/InteractionModelEngine.h>
 #include <app/tests/AppTestContext.h>
 #include <app/util/attribute-storage.h>
 #include <controller/InvokeInteraction.h>
 #include <controller/ReadInteraction.h>
 #include <lib/core/ErrorStr.h>
+#include <lib/core/StringBuilderAdapters.h>
 #include <lib/support/logging/CHIPLogging.h>
+#include <protocols/interaction_model/Constants.h>
 
 using namespace chip;
 using namespace chip::app;
@@ -60,10 +62,10 @@ class TestClusterCommandHandler : public chip::app::CommandHandlerInterface
 public:
     TestClusterCommandHandler() : chip::app::CommandHandlerInterface(Optional<EndpointId>::Missing(), Clusters::UnitTesting::Id)
     {
-        chip::app::InteractionModelEngine::GetInstance()->RegisterCommandHandler(this);
+        CommandHandlerInterfaceRegistry::RegisterCommandHandler(this);
     }
 
-    ~TestClusterCommandHandler() { chip::app::InteractionModelEngine::GetInstance()->UnregisterCommandHandler(this); }
+    ~TestClusterCommandHandler() { CommandHandlerInterfaceRegistry::UnregisterCommandHandler(this); }
 
     void OverrideAcceptedCommands() { mOverrideAcceptedCommands = true; }
     void ClaimNoCommands() { mClaimNoCommands = true; }

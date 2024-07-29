@@ -133,7 +133,8 @@
         "random": "cpp",
         "thread": "cpp",
         "variant": "cpp",
-        "any": "cpp"
+        "any": "cpp",
+        "future": "cpp"
     },
     // Configure paths or glob patterns to exclude from file watching.
     "files.watcherExclude": {
@@ -191,5 +192,5 @@
     "[python]": {
         "editor.defaultFormatter": "ms-python.autopep8"
     },
-    "python.formatting.provider": "none"
+    "autopep8.args": ["--max-line-length", "132"]
 }

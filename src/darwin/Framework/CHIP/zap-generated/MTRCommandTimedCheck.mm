@@ -701,6 +701,15 @@ static BOOL CommandNeedsTimedInvokeInEnergyEVSEModeCluster(AttributeId aAttribut
     }
     }
 }
+static BOOL CommandNeedsTimedInvokeInWaterHeaterModeCluster(AttributeId aAttributeId)
+{
+    using namespace Clusters::WaterHeaterMode;
+    switch (aAttributeId) {
+    default: {
+        return NO;
+    }
+    }
+}
 static BOOL CommandNeedsTimedInvokeInDeviceEnergyManagementModeCluster(AttributeId aAttributeId)
 {
     using namespace Clusters::DeviceEnergyManagementMode;
@@ -1145,6 +1154,15 @@ static BOOL CommandNeedsTimedInvokeInContentAppObserverCluster(AttributeId aAttr
     }
     }
 }
+static BOOL CommandNeedsTimedInvokeInEcosystemInformationCluster(AttributeId aAttributeId)
+{
+    using namespace Clusters::EcosystemInformation;
+    switch (aAttributeId) {
+    default: {
+        return NO;
+    }
+    }
+}
 static BOOL CommandNeedsTimedInvokeInCommissionerControlCluster(AttributeId aAttributeId)
 {
     using namespace Clusters::CommissionerControl;
@@ -1407,6 +1425,9 @@ BOOL MTRCommandNeedsTimedInvoke(NSNumber * _Nonnull aClusterID, NSNumber * _Nonn
     case Clusters::EnergyEvseMode::Id: {
         return CommandNeedsTimedInvokeInEnergyEVSEModeCluster(commandID);
     }
+    case Clusters::WaterHeaterMode::Id: {
+        return CommandNeedsTimedInvokeInWaterHeaterModeCluster(commandID);
+    }
     case Clusters::DeviceEnergyManagementMode::Id: {
         return CommandNeedsTimedInvokeInDeviceEnergyManagementModeCluster(commandID);
     }
@@ -1538,6 +1559,9 @@ BOOL MTRCommandNeedsTimedInvoke(NSNumber * _Nonnull aClusterID, NSNumber * _Nonn
     }
     case Clusters::ContentAppObserver::Id: {
         return CommandNeedsTimedInvokeInContentAppObserverCluster(commandID);
+    }
+    case Clusters::EcosystemInformation::Id: {
+        return CommandNeedsTimedInvokeInEcosystemInformationCluster(commandID);
     }
     case Clusters::CommissionerControl::Id: {
         return CommandNeedsTimedInvokeInCommissionerControlCluster(commandID);

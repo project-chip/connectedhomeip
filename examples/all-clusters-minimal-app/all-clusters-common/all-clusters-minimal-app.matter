@@ -1,6 +1,23 @@
 // This IDL was generated automatically by ZAP.
 // It is for view/code review purposes only.
 
+enum TestGlobalEnum : enum8 {
+  kSomeValue = 0;
+  kSomeOtherValue = 1;
+  kFinalValue = 2;
+}
+
+bitmap TestGlobalBitmap : bitmap32 {
+  kFirstBit = 0x1;
+  kSecondBit = 0x2;
+}
+
+struct TestGlobalStruct {
+  char_string<128> name = 0;
+  nullable TestGlobalBitmap myBitmap = 1;
+  optional nullable TestGlobalEnum myEnum = 2;
+}
+
 /** Attributes and commands for putting a device into Identification mode (e.g. flashing a light). */
 cluster Identify = 3 {
   revision 4;
@@ -202,7 +219,7 @@ cluster OnOff = 6 {
 
 /** Attributes and commands for controlling devices that can be set to a level between fully 'On' and fully 'Off.' */
 cluster LevelControl = 8 {
-  revision 5;
+  revision 6;
 
   enum MoveModeEnum : enum8 {
     kUp = 0;
@@ -3618,7 +3635,6 @@ cluster Thermostat = 513 {
     kMatterScheduleConfiguration = 0x80;
     kPresets = 0x100;
     kSetpoints = 0x200;
-    kQueuedPresetsSupported = 0x400;
   }
 
   bitmap HVACSystemTypeBitmap : bitmap8 {
@@ -3716,11 +3732,6 @@ cluster Thermostat = 513 {
     PresetTypeFeaturesBitmap presetTypeFeatures = 2;
   }
 
-  struct QueuedPresetStruct {
-    nullable octet_string<16> presetHandle = 0;
-    nullable epoch_s transitionTimestamp = 1;
-  }
-
   struct ScheduleTypeStruct {
     SystemModeEnum systemMode = 0;
     int8u numberOfSchedules = 1;
@@ -3795,7 +3806,6 @@ cluster Thermostat = 513 {
   readonly attribute optional boolean presetsSchedulesEditable = 82;
   readonly attribute optional TemperatureSetpointHoldPolicyBitmap temperatureSetpointHoldPolicy = 83;
   readonly attribute optional nullable epoch_s setpointHoldExpiryTimestamp = 84;
-  readonly attribute optional nullable QueuedPresetStruct queuedPreset = 85;
   readonly attribute command_id generatedCommandList[] = 65528;
   readonly attribute command_id acceptedCommandList[] = 65529;
   readonly attribute event_id eventList[] = 65530;
@@ -3833,7 +3843,6 @@ cluster Thermostat = 513 {
 
   request struct SetActivePresetRequestRequest {
     octet_string<16> presetHandle = 0;
-    optional int16u delayMinutes = 1;
   }
 
   request struct StartPresetsSchedulesEditRequestRequest {
@@ -3862,8 +3871,6 @@ cluster Thermostat = 513 {
   command access(invoke: manage) CancelPresetsSchedulesEditRequest(): DefaultSuccess = 8;
   /** This command is used to notify the server that all edits are done and should be committed. */
   command access(invoke: manage) CommitPresetsSchedulesRequest(): DefaultSuccess = 9;
-  /** This command is sent to cancel a queued preset. */
-  command access(invoke: manage) CancelSetActivePresetRequest(): DefaultSuccess = 10;
   /** This command sets the set point hold policy. */
   command SetTemperatureSetpointHoldPolicy(SetTemperatureSetpointHoldPolicyRequest): DefaultSuccess = 11;
 }
@@ -3986,7 +3993,7 @@ cluster ThermostatUserInterfaceConfiguration = 516 {
 
 /** Attributes and commands for controlling the color properties of a color-capable light. */
 cluster ColorControl = 768 {
-  revision 6;
+  revision 7;
 
   enum ColorLoopAction : enum8 {
     kDeactivate = 0;
@@ -6340,7 +6347,7 @@ endpoint 1 {
     ram      attribute onLevel default = 0xFF;
     persist  attribute startUpCurrentLevel default = 255;
     ram      attribute featureMap default = 0;
-    ram      attribute clusterRevision default = 5;
+    ram      attribute clusterRevision default = 6;
 
     handle command MoveToLevel;
     handle command Move;
@@ -6550,7 +6557,7 @@ endpoint 1 {
     ram      attribute enhancedColorMode default = 0x01;
     ram      attribute colorCapabilities default = 0x1F;
     ram      attribute featureMap default = 0;
-    ram      attribute clusterRevision default = 6;
+    ram      attribute clusterRevision default = 7;
   }
 
   server cluster BallastConfiguration {

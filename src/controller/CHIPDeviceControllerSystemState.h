@@ -208,7 +208,7 @@ public:
             mGroupDataProvider != nullptr && mReportScheduler != nullptr && mTimerDelegate != nullptr &&
             mSessionKeystore != nullptr && mSessionResumptionStorage != nullptr && mBDXTransferServer != nullptr;
     };
-    bool IsShutDown() { return mHaveShutDown; }
+    bool IsShutDown() const { return mHaveShutDown; }
 
     System::Layer * SystemLayer() const { return mSystemLayer; };
     Inet::EndPointManager<Inet::TCPEndPoint> * TCPEndPointManager() const { return mTCPEndPointManager; };
