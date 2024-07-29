@@ -57,9 +57,10 @@ Davis, CA 95616, USA
 
 :xrefstyle: basic
 -->
-<cluster xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="types types.xsd cluster cluster.xsd" id="0x050C" name="Application Launcher Cluster" revision="1">
+<cluster xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="types types.xsd cluster cluster.xsd" id="0x050C" name="Application Launcher Cluster" revision="2">
   <revisionHistory>
-    <revision revision="1" summary="Initial Release"/>
+    <revision revision="1" summary="Initial revision"/>
+    <revision revision="2" summary="Addition of new states to StatusEnum"/>
   </revisionHistory>
   <clusterIds>
     <clusterId id="0x050C" name="Application Launcher"/>
@@ -75,10 +76,19 @@ Davis, CA 95616, USA
       <item value="0" name="Success" summary="Command succeeded">
         <mandatoryConform/>
       </item>
-      <item value="1" name="AppNotAvailable" summary="Requested app is not available.">
+      <item value="1" name="AppNotAvailable" summary="Requested app is not available">
         <mandatoryConform/>
       </item>
-      <item value="2" name="SystemBusy" summary="Video platform unable to honor command.">
+      <item value="2" name="SystemBusy" summary="Video platform unable to honor command">
+        <mandatoryConform/>
+      </item>
+      <item value="3" name="PendingUserApproval" summary="User approval for app download is pending">
+        <mandatoryConform/>
+      </item>
+      <item value="4" name="Downloading" summary="Downloading the requested app">
+        <mandatoryConform/>
+      </item>
+      <item value="5" name="Installing" summary="Installing the requested app">
         <mandatoryConform/>
       </item>
     </enum>

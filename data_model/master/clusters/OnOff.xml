@@ -59,7 +59,7 @@ Davis, CA 95616, USA
 -->
 <cluster xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="types types.xsd cluster cluster.xsd" id="0x0006" name="On/Off Cluster" revision="6">
   <revisionHistory>
-    <revision revision="1" summary="Global mandatory ClusterRevision attribute added; CCB 1555"/>
+    <revision revision="1" summary="Mandatory global ClusterRevision attribute added; CCB 1555"/>
     <revision revision="2" summary="ZLO 1.0: StartUpOnOff"/>
     <revision revision="3" summary="FeatureMap global attribute support with Level Control and Lighting feature"/>
     <revision revision="4" summary="New data model format and notation"/>
