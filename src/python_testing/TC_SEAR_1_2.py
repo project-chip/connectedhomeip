@@ -112,7 +112,7 @@ class TC_SEAR_1_2(MatterBaseTest):
                 if a.locationInfo is NullValue and a.landmarkTag is NullValue:
                     asserts.assert_true(f"SupportedAreas entry with AreaID({a.areaID}) should not have null LocationInfo and null LandmarkTag")
                 if a.landmarkTag is not NullValue:
-                    asserts.assert_true(a.landmarkTag in range(0, self.MAX_LANDMARK_ID),
+                    asserts.assert_true(a.landmarkTag <= self.MAX_LANDMARK_ID,
                              f"SupportedAreas entry with AreaID({a.areaID}) has invalid LandmarkTag({a.landmarkTag})")
                     asserts.assert_true(a.positionTag is NullValue or a.positionTag in range(0, self.MAX_RELPOS_ID),
                              f"SupportedAreas entry with AreaID({a.areaID}) has invalid PositionTag({a.positionTag})")
