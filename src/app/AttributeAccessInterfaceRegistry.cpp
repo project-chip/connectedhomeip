@@ -76,6 +76,7 @@ void AttributeAccessInterfaceRegistry::Unregister(AttributeAccessInterface * att
 
 void AttributeAccessInterfaceRegistry::UnregisterAllForEndpoint(EndpointId endpointId)
 {
+    mAttributeAccessInterfaceCache.Invalidate();
     UnregisterMatchingAttributeAccessInterfaces(
         [endpointId](AttributeAccessInterface * entry) { return entry->MatchesEndpoint(endpointId); }, mAttributeAccessOverrides);
 }
