@@ -39,7 +39,7 @@ constexpr uint16_t kOptionFeatureMap = 'f';
 // Define the chip::ArgParser command line structures for extending the command line to support the
 // -f/--featureMap option
 static chip::ArgParser::OptionDef sFeatureMapOptionDefs[] = {
-    { "featureSet", chip::ArgParser::kArgumentRequired, kOptionFeatureMap }, { NULL }
+    { "featureSet", chip::ArgParser::kArgumentRequired, kOptionFeatureMap }, { nullptr }
 };
 
 static chip::ArgParser::OptionSet sCmdLineOptions = {
@@ -74,11 +74,11 @@ static uint32_t ParseNumber(const char * pString)
     uint32_t num = 0;
     if (strlen(pString) > 2 && pString[0] == '0' && pString[1] == 'x')
     {
-        num = (uint32_t) strtoul(&pString[2], NULL, 16);
+        num = (uint32_t) strtoul(&pString[2], nullptr, 16);
     }
     else
     {
-        num = (uint32_t) strtoul(pString, NULL, 10);
+        num = (uint32_t) strtoul(pString, nullptr, 10);
     }
 
     return num;

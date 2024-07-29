@@ -1,6 +1,23 @@
 // This IDL was generated automatically by ZAP.
 // It is for view/code review purposes only.
 
+enum TestGlobalEnum : enum8 {
+  kSomeValue = 0;
+  kSomeOtherValue = 1;
+  kFinalValue = 2;
+}
+
+bitmap TestGlobalBitmap : bitmap32 {
+  kFirstBit = 0x1;
+  kSecondBit = 0x2;
+}
+
+struct TestGlobalStruct {
+  char_string<128> name = 0;
+  nullable TestGlobalBitmap myBitmap = 1;
+  optional nullable TestGlobalEnum myEnum = 2;
+}
+
 /** Attributes and commands for putting a device into Identification mode (e.g. flashing a light). */
 cluster Identify = 3 {
   revision 4;
@@ -8645,6 +8662,7 @@ endpoint 1 {
     ram      attribute absMaxHeatSetpointLimit default = 0x0BB8;
     ram      attribute absMinCoolSetpointLimit default = 0x0640;
     ram      attribute absMaxCoolSetpointLimit default = 0x0C80;
+    ram      attribute localTemperatureCalibration default = 0x00;
     ram      attribute occupiedCoolingSetpoint default = 0x0A28;
     ram      attribute occupiedHeatingSetpoint default = 0x07D0;
     ram      attribute minHeatSetpointLimit default = 0x02BC;
@@ -9363,6 +9381,41 @@ endpoint 3 {
     ram      attribute currentPosition default = 0;
     ram      attribute multiPressMax default = 3;
     ram      attribute featureMap default = 58;
+    ram      attribute clusterRevision default = 2;
+  }
+}
+endpoint 4 {
+  device type ma_genericswitch = 15, version 3;
+
+
+  server cluster Identify {
+    ram      attribute identifyTime default = 0x0000;
+    ram      attribute identifyType default = 0x00;
+    callback attribute generatedCommandList;
+    callback attribute acceptedCommandList;
+    callback attribute attributeList;
+    ram      attribute featureMap default = 0;
+    ram      attribute clusterRevision default = 4;
+  }
+
+  server cluster Descriptor {
+    callback attribute deviceTypeList;
+    callback attribute serverList;
+    callback attribute clientList;
+    callback attribute partsList;
+    callback attribute tagList;
+    callback attribute generatedCommandList;
+    callback attribute acceptedCommandList;
+    callback attribute attributeList;
+    callback attribute featureMap;
+    callback attribute clusterRevision;
+  }
+
+  server cluster Switch {
+    ram      attribute numberOfPositions default = 2;
+    ram      attribute currentPosition default = 0;
+    ram      attribute multiPressMax default = 3;
+    ram      attribute featureMap default = 30;
     ram      attribute clusterRevision default = 2;
   }
 }
