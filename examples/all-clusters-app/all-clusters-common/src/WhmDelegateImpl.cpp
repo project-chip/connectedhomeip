@@ -353,7 +353,7 @@ bool WaterHeaterManagementDelegate::HasWaterTemperatureReachedTarget() const
         }
     }
 
-    // Must have reached teh right temperature
+    // Must have reached the right temperature
     return true;
 }
 
