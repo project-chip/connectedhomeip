@@ -264,7 +264,6 @@ class TestXmlParser(unittest.TestCase):
         )
         self.assertEqual(idl, Idl(global_enums=[e1, e2]))
 
-
     def testEnum(self):
         idl = XmlToIdl('''<?xml version="1.0"?>
             <configurator>
