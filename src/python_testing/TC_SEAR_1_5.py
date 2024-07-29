@@ -135,7 +135,7 @@ class TC_SEAR_1_5(MatterBaseTest):
             if not self.is_ci:
                 self.wait_for_user_input(prompt_msg=f"{test_step}, and press Enter when done.\n")
             
-                await self.send_cmd_skip_area_expect_response(step=4, valid_area_id, Clusters.ServiceArea.SkipAreaStatus.kInvalidInMode)
+                await self.send_cmd_skip_area_expect_response(step=4, skipped_area=valid_area_id, expected_response=Clusters.ServiceArea.SkipAreaStatus.kInvalidInMode)
 
         if self.check_pics("SEAR.S.M.NO_SELAREA_FOR_SKIP") and self.check_pics("SEAR.S.M.HAS_MANUAL_SKIP_STATE_CONTROL"):
             test_step = "Manually intervene to put the device in a state where the state would allow it to execute the SkipArea command, \
@@ -144,7 +144,7 @@ class TC_SEAR_1_5(MatterBaseTest):
             if not self.is_ci:
                 self.wait_for_user_input(prompt_msg=f"{test_step}, and press Enter when done.\n")
             
-                await self.send_cmd_skip_area_expect_response(step=6, valid_area_id, Clusters.ServiceArea.SkipAreaStatus.kInvalidAreaList)
+                await self.send_cmd_skip_area_expect_response(step=6, skipped_area=valid_area_id, expected_response=Clusters.ServiceArea.SkipAreaStatus.kInvalidAreaList)
 
         if self.check_pics("SEAR.S.M.VALID_STATE_FOR_SKIP") and self.check_pics("SEAR.S.M.HAS_MANUAL_SKIP_STATE_CONTROL"):
             test_step = "Manually intervene to put the device in a state that allows it to execute the SkipArea command"
@@ -152,7 +152,7 @@ class TC_SEAR_1_5(MatterBaseTest):
             if not self.is_ci:
                 self.wait_for_user_input(prompt_msg=f"{test_step}, and press Enter when done.\n")
             
-                await self.send_cmd_skip_area_expect_response(step=8, invalid_area_id, Clusters.ServiceArea.SkipAreaStatus.kInvalidSkippedArea)
+                await self.send_cmd_skip_area_expect_response(step=8, skipped_area=invalid_area_id, expected_response=Clusters.ServiceArea.SkipAreaStatus.kInvalidSkippedArea)
 
             if self.check_pics("SEAR.S.A0005"):
                 old_progress_list = await self.read_progress(step=9)
@@ -167,7 +167,7 @@ class TC_SEAR_1_5(MatterBaseTest):
 
             self.print_step("12", "")
             if old_current_area is not NullValue:
-                await self.send_cmd_skip_area_expect_response(step=13, old_current_area, Clusters.ServiceArea.SkipAreaStatus.kSuccess)
+                await self.send_cmd_skip_area_expect_response(step=13, skipped_area=old_current_area, expected_response=Clusters.ServiceArea.SkipAreaStatus.kSuccess)
 
                 test_step = "(Manual operation) wait for the device to skip the current area, and start operating at\
                       the next one it should process, or stop operating"
@@ -234,7 +234,7 @@ class TC_SEAR_1_5(MatterBaseTest):
                 if area_to_skip is NullValue:
                     return
 
-                await self.send_cmd_skip_area_expect_response(step=21, area_to_skip, Clusters.ServiceArea.SkipAreaStatus.kSuccess)
+                await self.send_cmd_skip_area_expect_response(step=21, skipped_area=area_to_skip, expected_response=Clusters.ServiceArea.SkipAreaStatus.kSuccess)
 
                 test_step = "(Manual operation) wait for the device to update Progress or to stop operating"
                 self.print_step("22", test_step)
