@@ -294,7 +294,9 @@
         "THERMOSTAT_USER_INTERFACE_CONFIGURATION_CLUSTER": [
             "thermostat-user-interface-configuration-server"
         ],
-        "THREAD_BORDER_ROUTER_MANAGEMENT_CLUSTER": [],
+        "THREAD_BORDER_ROUTER_MANAGEMENT_CLUSTER": [
+            "thread-border-router-management-server"
+        ],
         "THREAD_NETWORK_DIAGNOSTICS_CLUSTER": [
             "thread-network-diagnostics-server"
         ],
