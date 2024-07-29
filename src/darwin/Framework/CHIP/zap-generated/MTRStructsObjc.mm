@@ -19,6 +19,39 @@
 
 NS_ASSUME_NONNULL_BEGIN
 
+@implementation MTRDataTypeTestGlobalStruct
+- (instancetype)init
+{
+    if (self = [super init]) {
+
+        _name = @"";
+
+        _myBitmap = nil;
+
+        _myEnum = nil;
+    }
+    return self;
+}
+
+- (id)copyWithZone:(NSZone * _Nullable)zone
+{
+    auto other = [[MTRDataTypeTestGlobalStruct alloc] init];
+
+    other.name = self.name;
+    other.myBitmap = self.myBitmap;
+    other.myEnum = self.myEnum;
+
+    return other;
+}
+
+- (NSString *)description
+{
+    NSString * descriptionString = [NSString stringWithFormat:@"<%@: name:%@; myBitmap:%@; myEnum:%@; >", NSStringFromClass([self class]), _name, _myBitmap, _myEnum];
+    return descriptionString;
+}
+
+@end
+
 @implementation MTRDescriptorClusterDeviceTypeStruct
 - (instancetype)init
 {
@@ -6382,7 +6415,7 @@ NS_ASSUME_NONNULL_BEGIN
 
 @end
 
-@implementation MTRServiceAreaClusterHomeLocationStruct
+@implementation MTRServiceAreaClusterLocationDescriptorStruct
 - (instancetype)init
 {
     if (self = [super init]) {
@@ -6398,7 +6431,7 @@ NS_ASSUME_NONNULL_BEGIN
 
 - (id)copyWithZone:(NSZone * _Nullable)zone
 {
-    auto other = [[MTRServiceAreaClusterHomeLocationStruct alloc] init];
+    auto other = [[MTRServiceAreaClusterLocationDescriptorStruct alloc] init];
 
     other.locationName = self.locationName;
     other.floorNumber = self.floorNumber;
@@ -8427,7 +8460,7 @@ NS_ASSUME_NONNULL_BEGIN
 
 @end
 
-@implementation MTREcosystemInformationClusterHomeLocationStruct
+@implementation MTREcosystemInformationClusterLocationDescriptorStruct
 - (instancetype)init
 {
     if (self = [super init]) {
@@ -8443,7 +8476,7 @@ NS_ASSUME_NONNULL_BEGIN
 
 - (id)copyWithZone:(NSZone * _Nullable)zone
 {
-    auto other = [[MTREcosystemInformationClusterHomeLocationStruct alloc] init];
+    auto other = [[MTREcosystemInformationClusterLocationDescriptorStruct alloc] init];
 
     other.locationName = self.locationName;
     other.floorNumber = self.floorNumber;
@@ -8467,7 +8500,7 @@ NS_ASSUME_NONNULL_BEGIN
 
         _uniqueLocationID = @"";
 
-        _locationDescriptor = [MTREcosystemInformationClusterHomeLocationStruct new];
+        _locationDescriptor = [MTREcosystemInformationClusterLocationDescriptorStruct new];
 
         _locationDescriptorLastEdit = @(0);
 

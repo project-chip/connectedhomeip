@@ -24,7 +24,7 @@ import matter.tlv.TlvWriter
 
 class EcosystemInformationClusterEcosystemLocationStruct(
   val uniqueLocationID: String,
-  val locationDescriptor: EcosystemInformationClusterHomeLocationStruct,
+  val locationDescriptor: EcosystemInformationClusterLocationDescriptorStruct,
   val locationDescriptorLastEdit: ULong,
   val fabricIndex: UInt,
 ) {
@@ -61,7 +61,7 @@ class EcosystemInformationClusterEcosystemLocationStruct(
       tlvReader.enterStructure(tlvTag)
       val uniqueLocationID = tlvReader.getString(ContextSpecificTag(TAG_UNIQUE_LOCATION_I_D))
       val locationDescriptor =
-        EcosystemInformationClusterHomeLocationStruct.fromTlv(
+        EcosystemInformationClusterLocationDescriptorStruct.fromTlv(
           ContextSpecificTag(TAG_LOCATION_DESCRIPTOR),
           tlvReader,
         )

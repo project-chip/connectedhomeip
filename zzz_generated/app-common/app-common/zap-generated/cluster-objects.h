@@ -173,7 +173,7 @@ public:
 };
 
 } // namespace MeasurementAccuracyStruct
-namespace HomeLocationStruct {
+namespace LocationDescriptorStruct {
 enum class Fields : uint8_t
 {
     kLocationName = 0,
@@ -197,7 +197,7 @@ public:
 
 using DecodableType = Type;
 
-} // namespace HomeLocationStruct
+} // namespace LocationDescriptorStruct
 namespace DeviceTypeStruct {
 enum class Fields : uint8_t
 {
@@ -319,6 +319,38 @@ using DecodableType = Type;
 } // namespace detail
 
 namespace Globals {
+
+// Global structs.
+namespace Structs {
+
+namespace TestGlobalStruct {
+enum class Fields : uint8_t
+{
+    kName     = 0,
+    kMyBitmap = 1,
+    kMyEnum   = 2,
+};
+
+struct Type
+{
+public:
+    chip::CharSpan name;
+    DataModel::Nullable<chip::BitMask<Globals::TestGlobalBitmap>> myBitmap;
+    Optional<DataModel::Nullable<Globals::TestGlobalEnum>> myEnum;
+
+    CHIP_ERROR Decode(TLV::TLVReader & reader);
+
+    static constexpr bool kIsFabricScoped = false;
+
+    CHIP_ERROR Encode(TLV::TLVWriter & aWriter, TLV::Tag aTag) const;
+};
+
+using DecodableType = Type;
+
+} // namespace TestGlobalStruct
+
+} // namespace Structs
+
 namespace Attributes {
 namespace GeneratedCommandList {
 struct TypeInfo
@@ -27845,7 +27877,7 @@ struct TypeInfo
 } // namespace BarrierControl
 namespace ServiceArea {
 namespace Structs {
-namespace HomeLocationStruct = Clusters::detail::Structs::HomeLocationStruct;
+namespace LocationDescriptorStruct = Clusters::detail::Structs::LocationDescriptorStruct;
 namespace LocationInfoStruct {
 enum class Fields : uint8_t
 {
@@ -27858,7 +27890,7 @@ enum class Fields : uint8_t
 struct Type
 {
 public:
-    DataModel::Nullable<Structs::HomeLocationStruct::Type> locationInfo;
+    DataModel::Nullable<Structs::LocationDescriptorStruct::Type> locationInfo;
     DataModel::Nullable<LandmarkTag> landmarkTag;
     DataModel::Nullable<PositionTag> positionTag;
     DataModel::Nullable<FloorSurfaceTag> surfaceTag;
@@ -41176,7 +41208,7 @@ struct TypeInfo
 } // namespace ContentAppObserver
 namespace EcosystemInformation {
 namespace Structs {
-namespace HomeLocationStruct = Clusters::detail::Structs::HomeLocationStruct;
+namespace LocationDescriptorStruct = Clusters::detail::Structs::LocationDescriptorStruct;
 namespace EcosystemLocationStruct {
 enum class Fields : uint8_t
 {
@@ -41190,7 +41222,7 @@ struct Type
 {
 public:
     chip::CharSpan uniqueLocationID;
-    Structs::HomeLocationStruct::Type locationDescriptor;
+    Structs::LocationDescriptorStruct::Type locationDescriptor;
     uint64_t locationDescriptorLastEdit = static_cast<uint64_t>(0);
     chip::FabricIndex fabricIndex       = static_cast<chip::FabricIndex>(0);
 
