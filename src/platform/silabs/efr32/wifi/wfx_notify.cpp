@@ -88,11 +88,11 @@ void wfx_connected_notify(int32_t status, sl_wfx_mac_address_t * ap)
 
     if (status != SUCCESS_STATUS)
     {
-        ChipLogProgress(DeviceLayer, "%s: error: failed status: %ld.", __func__, status);
+        ChipLogProgress(DeviceLayer, "wfx_connected_notify: error: failed status: %ld", status);
         return;
     }
 
-    ChipLogProgress(DeviceLayer, "%s: connected.", __func__);
+    ChipLogProgress(DeviceLayer, "wfx_connected_notify: connected");
 
     memset(&evt, 0, sizeof(evt));
     evt.header.id     = SL_WFX_CONNECT_IND_ID;
@@ -194,12 +194,12 @@ void wfx_retry_interval_handler(bool is_wifi_disconnection_event, uint16_t retry
          */
         if (retryJoin < MAX_JOIN_RETRIES_COUNT)
         {
-            ChipLogProgress(DeviceLayer, "%s: Next attempt after %d Seconds", __func__, CONVERT_MS_TO_SEC(WLAN_RETRY_TIMER_MS));
+            ChipLogProgress(DeviceLayer, "next retry attempt after %d seconds", CONVERT_MS_TO_SEC(WLAN_RETRY_TIMER_MS));
             vTaskDelay(pdMS_TO_TICKS(WLAN_RETRY_TIMER_MS));
         }
         else
         {
-            ChipLogProgress(DeviceLayer, "Connect failed after max %d tries", retryJoin);
+            ChipLogProgress(DeviceLayer, "connect failed after max %d tries", retryJoin);
         }
     }
     else
@@ -213,7 +213,7 @@ void wfx_retry_interval_handler(bool is_wifi_disconnection_event, uint16_t retry
         {
             retryInterval = WLAN_MAX_RETRY_TIMER_MS;
         }
-        ChipLogProgress(DeviceLayer, "%s: Next attempt after %ld Seconds", __func__, CONVERT_MS_TO_SEC(retryInterval));
+        ChipLogProgress(DeviceLayer, "next retry attempt after %ld seconds", CONVERT_MS_TO_SEC(retryInterval));
         vTaskDelay(pdMS_TO_TICKS(retryInterval));
         retryInterval += retryInterval;
     }
