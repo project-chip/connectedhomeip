@@ -1533,6 +1533,22 @@ NSString * MTRAttributeNameForID(MTRClusterIDType clusterID, MTRAttributeIDType 
             result = @"SupportsConcurrentConnection";
             break;
 
+        case MTRAttributeIDTypeClusterGeneralCommissioningAttributeTCAcceptedVersionID:
+            result = @"TCAcceptedVersion";
+            break;
+
+        case MTRAttributeIDTypeClusterGeneralCommissioningAttributeTCMinRequiredVersionID:
+            result = @"TCMinRequiredVersion";
+            break;
+
+        case MTRAttributeIDTypeClusterGeneralCommissioningAttributeTCAcknowledgementsID:
+            result = @"TCAcknowledgements";
+            break;
+
+        case MTRAttributeIDTypeClusterGeneralCommissioningAttributeTCAcknowledgementsRequiredID:
+            result = @"TCAcknowledgementsRequired";
+            break;
+
         case MTRAttributeIDTypeClusterGeneralCommissioningAttributeGeneratedCommandListID:
             result = @"GeneratedCommandList";
             break;

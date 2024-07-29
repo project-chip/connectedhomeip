@@ -1100,6 +1100,22 @@ namespace SupportsConcurrentConnection {
 static constexpr AttributeId Id = 0x00000004;
 } // namespace SupportsConcurrentConnection
 
+namespace TCAcceptedVersion {
+static constexpr AttributeId Id = 0x00000005;
+} // namespace TCAcceptedVersion
+
+namespace TCMinRequiredVersion {
+static constexpr AttributeId Id = 0x00000006;
+} // namespace TCMinRequiredVersion
+
+namespace TCAcknowledgements {
+static constexpr AttributeId Id = 0x00000007;
+} // namespace TCAcknowledgements
+
+namespace TCAcknowledgementsRequired {
+static constexpr AttributeId Id = 0x00000008;
+} // namespace TCAcknowledgementsRequired
+
 namespace GeneratedCommandList {
 static constexpr AttributeId Id = Globals::Attributes::GeneratedCommandList::Id;
 } // namespace GeneratedCommandList

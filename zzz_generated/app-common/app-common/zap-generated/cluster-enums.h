@@ -1089,16 +1089,19 @@ namespace GeneralCommissioning {
 // Enum for CommissioningErrorEnum
 enum class CommissioningErrorEnum : uint8_t
 {
-    kOk                    = 0x00,
-    kValueOutsideRange     = 0x01,
-    kInvalidAuthentication = 0x02,
-    kNoFailSafe            = 0x03,
-    kBusyWithOtherAdmin    = 0x04,
+    kOk                            = 0x00,
+    kValueOutsideRange             = 0x01,
+    kInvalidAuthentication         = 0x02,
+    kNoFailSafe                    = 0x03,
+    kBusyWithOtherAdmin            = 0x04,
+    kRequiredTCNotAccepted         = 0x05,
+    kTCAcknowledgementsNotReceived = 0x06,
+    kTCMinVersionNotMet            = 0x07,
     // All received enum values that are not listed above will be mapped
     // to kUnknownEnumValue. This is a helper enum value that should only
     // be used by code to process how it handles receiving and unknown
     // enum value. This specific should never be transmitted.
-    kUnknownEnumValue = 5,
+    kUnknownEnumValue = 8,
 };
 
 // Enum for RegulatoryLocationTypeEnum
@@ -1112,6 +1115,12 @@ enum class RegulatoryLocationTypeEnum : uint8_t
     // be used by code to process how it handles receiving and unknown
     // enum value. This specific should never be transmitted.
     kUnknownEnumValue = 3,
+};
+
+// Bitmap for Feature
+enum class Feature : uint32_t
+{
+    kTermsAndConditions = 0x1,
 };
 } // namespace GeneralCommissioning
 
