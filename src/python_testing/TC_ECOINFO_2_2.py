@@ -22,6 +22,7 @@ from mobly import asserts
 
 _DEVICE_TYPE_AGGREGGATOR = 0x000E
 
+
 class TC_ECOINFO_2_2(MatterBaseTest):
 
     def steps_TC_ECOINFO_2_2(self) -> list[TestStep]:
