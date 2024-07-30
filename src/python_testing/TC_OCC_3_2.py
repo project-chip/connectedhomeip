@@ -18,12 +18,11 @@
 import logging
 import time
 import queue
-from typing import Any, List, Optional, Tuple
+from typing import Any
 from chip import ChipDeviceCtrl
 import chip.clusters as Clusters
-from chip.clusters.Types import NullValue
-from chip.clusters.Attribute import EventReadResult, SubscriptionTransaction, TypedAttributePath
-from matter_testing_support import MatterBaseTest, ClusterAttributeChangeAccumulator, TestStep, async_test_body, default_matter_test_main
+from chip.clusters.Attribute import TypedAttributePath
+from matter_testing_support import MatterBaseTest, ClusterAttributeChangeAccumulator, AttributeValue, TestStep, async_test_body, default_matter_test_main
 from mobly import asserts
 
 
@@ -150,7 +149,7 @@ class TC_OCC_3_2(MatterBaseTest):
         self.step(9)
         # write a different a HoldTime attibute
         diff_val = 12
-        write_res = await ChipDeviceCtrl.WriteAttribute(node_id, [(endpoint, attributes.HoldTime(diff_val))])
+        await ChipDeviceCtrl.WriteAttribute(node_id, [(endpoint, attributes.HoldTime(diff_val))])
         
         self.step(10)
         self._await_sequence_of_reports(report_queue=attrib_listener.attribute_queue, endpoint_id=endpoint_id, attribute=cluster.Attributes.HoldTime, sequence=[
@@ -172,7 +171,7 @@ class TC_OCC_3_2(MatterBaseTest):
         self.step(13)
         # write the new attribute value
         diff_val = 11
-        write_res = await ChipDeviceCtrl.WriteAttribute(node_id, [(endpoint, attributes.PIROccupiedToUnoccupiedDelay(diff_val))])
+        await ChipDeviceCtrl.WriteAttribute(node_id, [(endpoint, attributes.PIROccupiedToUnoccupiedDelay(diff_val))])
         
         self.step(14)
         self._await_sequence_of_reports(report_queue=attrib_listener.attribute_queue, endpoint_id=endpoint_id, attribute=cluster.Attributes.PIROccupiedToUnoccupiedDelay, sequence=[
@@ -194,7 +193,7 @@ class TC_OCC_3_2(MatterBaseTest):
         self.step(17)
         # write the new attribute value
         diff_val = 14
-        write_res = await ChipDeviceCtrl.WriteAttribute(node_id, [(endpoint, attributes.UltrasonicOccupiedToUnoccupiedDelay(diff_val))])
+        await ChipDeviceCtrl.WriteAttribute(node_id, [(endpoint, attributes.UltrasonicOccupiedToUnoccupiedDelay(diff_val))])
         
         self.step(18)
         self._await_sequence_of_reports(report_queue=attrib_listener.attribute_queue, endpoint_id=endpoint_id, attribute=cluster.Attributes.UltrasonicOccupiedToUnoccupiedDelay, sequence=[
@@ -214,8 +213,11 @@ class TC_OCC_3_2(MatterBaseTest):
         self.step(21)
         # write the new attribute value
         diff_val = 9
-        write_res = await ChipDeviceCtrl.WriteAttribute(node_id, [(endpoint, attributes.PhysicalContactOccupiedToUnoccupiedDelay(diff_val))])
+        await ChipDeviceCtrl.WriteAttribute(node_id, [(endpoint, attributes.PhysicalContactOccupiedToUnoccupiedDelay(diff_val))])
         
         self.step(22)
         self._await_sequence_of_reports(report_queue=attrib_listener.attribute_queue, endpoint_id=endpoint_id, attribute=cluster.Attributes.PhysicalContactOccupiedToUnoccupiedDelay, sequence=[
                                         initial_dut, diff_val], timeout_sec=post_prompt_settle_delay_seconds)                                        
+
+if __name__ == "__main__":
+    default_matter_test_main()
