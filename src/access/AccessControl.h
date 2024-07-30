@@ -25,7 +25,6 @@
 #include <lib/core/CHIPCore.h>
 #include <lib/core/Global.h>
 #include <lib/support/CodeUtils.h>
-#include <protocols/interaction_model/Constants.h>
 
 // Dump function for use during development only (0 for disabled, non-zero for enabled).
 #define CHIP_ACCESS_CONTROL_DUMP_ENABLED 0

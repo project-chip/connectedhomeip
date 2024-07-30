@@ -342,6 +342,8 @@ CHIP_ERROR AccessControl::Check(const SubjectDescriptor & subjectDescriptor, con
     }
 #endif // CHIP_PROGRESS_LOGGING && CHIP_CONFIG_ACCESS_CONTROL_POLICY_LOGGING_VERBOSITY > 1
 
+    VerifyOrReturnError(requestPath.requestType != RequestType::kRequestTypeUnknown, CHIP_ERROR_INVALID_ARGUMENT);
+
     {
         CHIP_ERROR result = mDelegate->Check(subjectDescriptor, requestPath, requestPrivilege);
         if (result != CHIP_ERROR_NOT_IMPLEMENTED)
