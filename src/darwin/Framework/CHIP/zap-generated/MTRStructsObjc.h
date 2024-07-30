@@ -55,6 +55,27 @@ MTR_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
 @property (nonatomic, copy) NSNumber * _Nonnull fabricIndex MTR_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1));
 @end
 
+MTR_PROVISIONALLY_AVAILABLE
+@interface MTRAccessControlClusterAccessRestrictionStruct : NSObject <NSCopying>
+@property (nonatomic, copy) NSNumber * _Nonnull type MTR_PROVISIONALLY_AVAILABLE;
+@property (nonatomic, copy) NSNumber * _Nullable id MTR_PROVISIONALLY_AVAILABLE;
+@end
+
+MTR_PROVISIONALLY_AVAILABLE
+@interface MTRAccessControlClusterCommissioningAccessRestrictionEntryStruct : NSObject <NSCopying>
+@property (nonatomic, copy) NSNumber * _Nonnull endpoint MTR_PROVISIONALLY_AVAILABLE;
+@property (nonatomic, copy) NSNumber * _Nonnull cluster MTR_PROVISIONALLY_AVAILABLE;
+@property (nonatomic, copy) NSArray * _Nonnull restrictions MTR_PROVISIONALLY_AVAILABLE;
+@end
+
+MTR_PROVISIONALLY_AVAILABLE
+@interface MTRAccessControlClusterAccessRestrictionEntryStruct : NSObject <NSCopying>
+@property (nonatomic, copy) NSNumber * _Nonnull endpoint MTR_PROVISIONALLY_AVAILABLE;
+@property (nonatomic, copy) NSNumber * _Nonnull cluster MTR_PROVISIONALLY_AVAILABLE;
+@property (nonatomic, copy) NSArray * _Nonnull restrictions MTR_PROVISIONALLY_AVAILABLE;
+@property (nonatomic, copy) NSNumber * _Nonnull fabricIndex MTR_PROVISIONALLY_AVAILABLE;
+@end
+
 MTR_AVAILABLE(ios(17.0), macos(14.0), watchos(10.0), tvos(17.0))
 @interface MTRAccessControlClusterAccessControlTargetStruct : NSObject <NSCopying>
 @property (nonatomic, copy) NSNumber * _Nullable cluster MTR_AVAILABLE(ios(17.0), macos(14.0), watchos(10.0), tvos(17.0));
@@ -115,6 +136,19 @@ MTR_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
 @property (nonatomic, copy) NSNumber * _Nonnull changeType MTR_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1));
 @property (nonatomic, copy) MTRAccessControlClusterAccessControlExtensionStruct * _Nullable latestValue MTR_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1));
 @property (nonatomic, copy) NSNumber * _Nonnull fabricIndex MTR_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1));
+@end
+
+MTR_PROVISIONALLY_AVAILABLE
+@interface MTRAccessControlClusterAccessRestrictionEntryChangedEvent : NSObject <NSCopying>
+@property (nonatomic, copy) NSNumber * _Nonnull fabricIndex MTR_PROVISIONALLY_AVAILABLE;
+@end
+
+MTR_PROVISIONALLY_AVAILABLE
+@interface MTRAccessControlClusterFabricRestrictionReviewUpdateEvent : NSObject <NSCopying>
+@property (nonatomic, copy) NSNumber * _Nonnull token MTR_PROVISIONALLY_AVAILABLE;
+@property (nonatomic, copy) NSString * _Nullable instruction MTR_PROVISIONALLY_AVAILABLE;
+@property (nonatomic, copy) NSString * _Nullable redirectURL MTR_PROVISIONALLY_AVAILABLE;
+@property (nonatomic, copy) NSNumber * _Nonnull fabricIndex MTR_PROVISIONALLY_AVAILABLE;
 @end
 
 MTR_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))

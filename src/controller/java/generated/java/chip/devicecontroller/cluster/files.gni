@@ -5,6 +5,9 @@ structs_sources = [
   "${chip_root}/src/controller/java/generated/java/chip/devicecontroller/cluster/structs/AccessControlClusterAccessControlEntryStruct.kt",
   "${chip_root}/src/controller/java/generated/java/chip/devicecontroller/cluster/structs/AccessControlClusterAccessControlExtensionStruct.kt",
   "${chip_root}/src/controller/java/generated/java/chip/devicecontroller/cluster/structs/AccessControlClusterAccessControlTargetStruct.kt",
+  "${chip_root}/src/controller/java/generated/java/chip/devicecontroller/cluster/structs/AccessControlClusterAccessRestrictionEntryStruct.kt",
+  "${chip_root}/src/controller/java/generated/java/chip/devicecontroller/cluster/structs/AccessControlClusterAccessRestrictionStruct.kt",
+  "${chip_root}/src/controller/java/generated/java/chip/devicecontroller/cluster/structs/AccessControlClusterCommissioningAccessRestrictionEntryStruct.kt",
   "${chip_root}/src/controller/java/generated/java/chip/devicecontroller/cluster/structs/ActionsClusterActionStruct.kt",
   "${chip_root}/src/controller/java/generated/java/chip/devicecontroller/cluster/structs/ActionsClusterEndpointListStruct.kt",
   "${chip_root}/src/controller/java/generated/java/chip/devicecontroller/cluster/structs/ActivatedCarbonFilterMonitoringClusterReplacementProductStruct.kt",
@@ -158,6 +161,8 @@ structs_sources = [
 eventstructs_sources = [
   "${chip_root}/src/controller/java/generated/java/chip/devicecontroller/cluster/eventstructs/AccessControlClusterAccessControlEntryChangedEvent.kt",
   "${chip_root}/src/controller/java/generated/java/chip/devicecontroller/cluster/eventstructs/AccessControlClusterAccessControlExtensionChangedEvent.kt",
+  "${chip_root}/src/controller/java/generated/java/chip/devicecontroller/cluster/eventstructs/AccessControlClusterAccessRestrictionEntryChangedEvent.kt",
+  "${chip_root}/src/controller/java/generated/java/chip/devicecontroller/cluster/eventstructs/AccessControlClusterFabricRestrictionReviewUpdateEvent.kt",
   "${chip_root}/src/controller/java/generated/java/chip/devicecontroller/cluster/eventstructs/AccountLoginClusterLoggedOutEvent.kt",
   "${chip_root}/src/controller/java/generated/java/chip/devicecontroller/cluster/eventstructs/ActionsClusterActionFailedEvent.kt",
   "${chip_root}/src/controller/java/generated/java/chip/devicecontroller/cluster/eventstructs/ActionsClusterStateChangedEvent.kt",

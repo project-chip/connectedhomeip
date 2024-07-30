@@ -867,6 +867,13 @@ class ChipClusters:
         "clusterName": "AccessControl",
         "clusterId": 0x0000001F,
         "commands": {
+            0x00000000: {
+                "commandId": 0x00000000,
+                "commandName": "ReviewFabricRestrictions",
+                "args": {
+                    "arl": "AccessRestrictionStruct",
+                },
+            },
         },
         "attributes": {
             0x00000000: {
@@ -899,6 +906,18 @@ class ChipClusters:
                 "attributeName": "AccessControlEntriesPerFabric",
                 "attributeId": 0x00000004,
                 "type": "int",
+                "reportable": True,
+            },
+            0x00000005: {
+                "attributeName": "CommissioningARL",
+                "attributeId": 0x00000005,
+                "type": "",
+                "reportable": True,
+            },
+            0x00000006: {
+                "attributeName": "Arl",
+                "attributeId": 0x00000006,
+                "type": "",
                 "reportable": True,
             },
             0x0000FFF8: {
