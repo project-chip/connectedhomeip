@@ -18,9 +18,9 @@
 # test-runner-runs: run1
 # test-runner-run/run1/app: ${ALL_CLUSTERS_APP}
 # test-runner-run/run1/factoryreset: True
-# test-runner-run/run1/quiet: True
+# test-runner-run/run1/quiet: False
 # test-runner-run/run1/app-args: --discriminator 1234 --KVS kvs1 --trace-to json:${TRACE_APP}.json
-# test-runner-run/run1/script-args:  --storage-path admin_storage.json --commissioning-method on-network --discriminator 1234 --passcode 20202021 --PICS src/app/tests/suites/certification/ci-pics-values --trace-to json:${TRACE_TEST_JSON}.json --trace-to perfetto:${TRACE_TEST_PERFETTO}.perfetto
+# test-runner-run/run1/script-args:  --storage-path admin_storage.json --commissioning-method on-network --discriminator 1234 --passcode 20202021 --trace-to json:${TRACE_TEST_JSON}.json --trace-to perfetto:${TRACE_TEST_PERFETTO}.perfetto
 # === END CI TEST ARGUMENTS ===
 
 import logging
