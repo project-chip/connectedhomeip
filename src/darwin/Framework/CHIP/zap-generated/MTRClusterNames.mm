@@ -378,6 +378,9 @@ NSString * MTRClusterNameForID(MTRClusterIDType clusterID)
     case MTRClusterIDTypeContentAppObserverID:
         result = @"ContentAppObserver";
         break;
+    case MTRClusterIDTypeEcosystemInformationID:
+        result = @"EcosystemInformation";
+        break;
     case MTRClusterIDTypeCommissionerControlID:
         result = @"CommissionerControl";
         break;
@@ -892,6 +895,14 @@ NSString * MTRAttributeNameForID(MTRClusterIDType clusterID, MTRAttributeIDType 
 
         case MTRAttributeIDTypeClusterAccessControlAttributeAccessControlEntriesPerFabricID:
             result = @"AccessControlEntriesPerFabric";
+            break;
+
+        case MTRAttributeIDTypeClusterAccessControlAttributeCommissioningARLID:
+            result = @"CommissioningARL";
+            break;
+
+        case MTRAttributeIDTypeClusterAccessControlAttributeARLID:
+            result = @"ARL";
             break;
 
         case MTRAttributeIDTypeClusterAccessControlAttributeGeneratedCommandListID:
@@ -5766,10 +5777,6 @@ NSString * MTRAttributeNameForID(MTRClusterIDType clusterID, MTRAttributeIDType 
             result = @"PresetsSchedulesEditable";
             break;
 
-        case MTRAttributeIDTypeClusterThermostatAttributeTemperatureSetpointHoldPolicyID:
-            result = @"TemperatureSetpointHoldPolicy";
-            break;
-
         case MTRAttributeIDTypeClusterThermostatAttributeSetpointHoldExpiryTimestampID:
             result = @"SetpointHoldExpiryTimestamp";
             break;
@@ -7416,6 +7423,10 @@ NSString * MTRAttributeNameForID(MTRClusterIDType clusterID, MTRAttributeIDType 
             result = @"SSID";
             break;
 
+        case MTRAttributeIDTypeClusterWiFiNetworkManagementAttributePassphraseSurrogateID:
+            result = @"PassphraseSurrogate";
+            break;
+
         case MTRAttributeIDTypeClusterWiFiNetworkManagementAttributeGeneratedCommandListID:
             result = @"GeneratedCommandList";
             break;
@@ -8181,6 +8192,52 @@ NSString * MTRAttributeNameForID(MTRClusterIDType clusterID, MTRAttributeIDType 
             break;
 
         case MTRAttributeIDTypeClusterContentAppObserverAttributeClusterRevisionID:
+            result = @"ClusterRevision";
+            break;
+
+        default:
+            result = [NSString stringWithFormat:@"<Unknown attributeID %d>", attributeID];
+            break;
+        }
+
+    case MTRClusterIDTypeEcosystemInformationID:
+
+        switch (attributeID) {
+
+            // Cluster EcosystemInformation attributes
+        case MTRAttributeIDTypeClusterEcosystemInformationAttributeRemovedOnID:
+            result = @"RemovedOn";
+            break;
+
+        case MTRAttributeIDTypeClusterEcosystemInformationAttributeDeviceDirectoryID:
+            result = @"DeviceDirectory";
+            break;
+
+        case MTRAttributeIDTypeClusterEcosystemInformationAttributeLocationDirectoryID:
+            result = @"LocationDirectory";
+            break;
+
+        case MTRAttributeIDTypeClusterEcosystemInformationAttributeGeneratedCommandListID:
+            result = @"GeneratedCommandList";
+            break;
+
+        case MTRAttributeIDTypeClusterEcosystemInformationAttributeAcceptedCommandListID:
+            result = @"AcceptedCommandList";
+            break;
+
+        case MTRAttributeIDTypeClusterEcosystemInformationAttributeEventListID:
+            result = @"EventList";
+            break;
+
+        case MTRAttributeIDTypeClusterEcosystemInformationAttributeAttributeListID:
+            result = @"AttributeList";
+            break;
+
+        case MTRAttributeIDTypeClusterEcosystemInformationAttributeFeatureMapID:
+            result = @"FeatureMap";
+            break;
+
+        case MTRAttributeIDTypeClusterEcosystemInformationAttributeClusterRevisionID:
             result = @"ClusterRevision";
             break;
 

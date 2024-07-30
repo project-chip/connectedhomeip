@@ -184,6 +184,7 @@ def PathsWithNetworkNamespaces(paths: ApplicationPaths) -> ApplicationPaths:
         lit_icd_app='ip netns exec app'.split() + paths.lit_icd_app,
         microwave_oven_app='ip netns exec app'.split() + paths.microwave_oven_app,
         rvc_app='ip netns exec app'.split() + paths.rvc_app,
+        network_manager_app='ip netns exec app'.split() + paths.network_manager_app,
         bridge_app='ip netns exec app'.split() + paths.bridge_app,
         chip_repl_yaml_tester_cmd='ip netns exec tool'.split() + paths.chip_repl_yaml_tester_cmd,
         chip_tool_with_python_cmd='ip netns exec tool'.split() + paths.chip_tool_with_python_cmd,
