@@ -35,11 +35,6 @@ limitations under the License.
     <field name="HeatingUsesFuel" mask="0x20"/>
   </bitmap>
 
-  <bitmap name="OccupancyBitmap" type="bitmap8">
-    <cluster code="0x0201"/>
-    <field name="Occupied" mask="0x1"/>
-  </bitmap>
-
   <bitmap name="ProgrammingOperationModeBitmap" type="bitmap8">
     <cluster code="0x0201"/>
     <field name="ScheduleActive" mask="0x01"/>
@@ -89,6 +84,11 @@ limitations under the License.
     <cluster code="0x0201"/>
     <field name="HeatSetpointPresent" mask="0x01"/>
     <field name="CoolSetpointPresent" mask="0x02"/>
+  </bitmap>
+
+  <bitmap name="OccupancyBitmap" type="bitmap8">
+    <cluster code="0x0201"/>
+    <field name="Occupied" mask="0x1"/>
   </bitmap>
 
   <bitmap name="PresetTypeFeaturesBitmap" type="bitmap16">

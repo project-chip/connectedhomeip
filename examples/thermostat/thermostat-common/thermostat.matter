@@ -2522,7 +2522,10 @@ endpoint 1 {
     ram      attribute clusterRevision default = 6;
 
     handle command SetpointRaiseLower;
+    handle command SetActiveScheduleRequest;
     handle command SetActivePresetRequest;
+    handle command AtomicResponse;
+    handle command AtomicRequest;
   }
 
   server cluster ThermostatUserInterfaceConfiguration {
