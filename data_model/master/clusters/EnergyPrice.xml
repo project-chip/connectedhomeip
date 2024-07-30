@@ -59,10 +59,10 @@ Davis, CA 95616, USA
 -->
 <cluster xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="types types.xsd cluster cluster.xsd" id="0x0095" name="Energy Price Cluster" revision="4">
   <revisionHistory>
-    <revision revision="1" summary="mandatory global ClusterRevision attribute added"/>
+    <revision revision="1" summary="Mandatory global ClusterRevision attribute added"/>
     <revision revision="2" summary="Updated from SE1.4 version; CCB 1447 2964 2965"/>
     <revision revision="3" summary="CCBs 2043 2706 2810 2912 3566"/>
-    <revision revision="4" summary="Initial Matter Release"/>
+    <revision revision="4" summary="Initial Matter revision"/>
   </revisionHistory>
   <clusterIds>
     <clusterId id="0x0095" name="Energy Price"/>

@@ -59,10 +59,21 @@ Davis, CA 95616, USA
 -->
 <cluster xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="types types.xsd cluster cluster.xsd" id="0x0048" name="Oven Cavity Operational State Cluster" revision="1">
   <revisionHistory>
-    <revision revision="1" summary="Initial release"/>
+    <revision revision="1" summary="Initial revision"/>
   </revisionHistory>
   <clusterIds>
     <clusterId id="0x0048" name="Oven Cavity Operational State"/>
   </clusterIds>
   <classification hierarchy="derived" baseCluster="Operational State" role="application" picsCode="OVENOPSTATE" scope="Endpoint"/>
+  <commands>
+    <command id="0x00" name="Pause">
+      <disallowConform/>
+    </command>
+    <command id="0x01" name="Stop"/>
+    <command id="0x02" name="Start"/>
+    <command id="0x03" name="Resume">
+      <disallowConform/>
+    </command>
+    <command id="0x04" name="OperationalCommandResponse"/>
+  </commands>
 </cluster>

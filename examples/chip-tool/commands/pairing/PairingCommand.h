@@ -35,6 +35,9 @@ enum class PairingMode
     CodePaseOnly,
     Ble,
     SoftAP,
+#if CHIP_DEVICE_CONFIG_ENABLE_WIFIPAF
+    WiFiPAF,
+#endif
     AlreadyDiscovered,
     AlreadyDiscoveredByIndex,
     AlreadyDiscoveredByIndexWithCode,
@@ -127,6 +130,13 @@ public:
             AddArgument("device-remote-port", 0, UINT16_MAX, &mRemotePort);
             AddArgument("pase-only", 0, 1, &mPaseOnly);
             break;
+#if CHIP_DEVICE_CONFIG_ENABLE_WIFIPAF
+        case PairingMode::WiFiPAF:
+            AddArgument("skip-commissioning-complete", 0, 1, &mSkipCommissioningComplete);
+            AddArgument("setup-pin-code", 0, 134217727, &mSetupPINCode.emplace());
+            AddArgument("discriminator", 0, 4096, &mDiscriminator.emplace());
+            break;
+#endif
         case PairingMode::AlreadyDiscovered:
             AddArgument("skip-commissioning-complete", 0, 1, &mSkipCommissioningComplete);
             AddArgument("setup-pin-code", 0, 134217727, &mSetupPINCode.emplace());

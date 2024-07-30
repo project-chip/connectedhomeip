@@ -897,6 +897,14 @@ NSString * MTRAttributeNameForID(MTRClusterIDType clusterID, MTRAttributeIDType 
             result = @"AccessControlEntriesPerFabric";
             break;
 
+        case MTRAttributeIDTypeClusterAccessControlAttributeCommissioningARLID:
+            result = @"CommissioningARL";
+            break;
+
+        case MTRAttributeIDTypeClusterAccessControlAttributeARLID:
+            result = @"ARL";
+            break;
+
         case MTRAttributeIDTypeClusterAccessControlAttributeGeneratedCommandListID:
             result = @"GeneratedCommandList";
             break;
@@ -5767,10 +5775,6 @@ NSString * MTRAttributeNameForID(MTRClusterIDType clusterID, MTRAttributeIDType 
 
         case MTRAttributeIDTypeClusterThermostatAttributePresetsSchedulesEditableID:
             result = @"PresetsSchedulesEditable";
-            break;
-
-        case MTRAttributeIDTypeClusterThermostatAttributeTemperatureSetpointHoldPolicyID:
-            result = @"TemperatureSetpointHoldPolicy";
             break;
 
         case MTRAttributeIDTypeClusterThermostatAttributeSetpointHoldExpiryTimestampID:

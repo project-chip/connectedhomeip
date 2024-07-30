@@ -327,14 +327,19 @@ class AttributeValue:
 
 class ClusterAttributeChangeAccumulator:
     def __init__(self, expected_cluster: ClusterObjects.Cluster):
-        self._q = queue.Queue()
         self._expected_cluster = expected_cluster
         self._subscription = None
+        self.reset()
+
+    def reset(self):
         self._attribute_report_counts = {}
-        attrs = [cls for name, cls in inspect.getmembers(expected_cluster.Attributes) if inspect.isclass(
+        attrs = [cls for name, cls in inspect.getmembers(self._expected_cluster.Attributes) if inspect.isclass(
             cls) and issubclass(cls, ClusterObjects.ClusterAttributeDescriptor)]
+        self._attribute_reports = {}
         for a in attrs:
             self._attribute_report_counts[a] = 0
+            self._attribute_reports[a] = []
+        self._q = queue.Queue()
 
     async def start(self, dev_ctrl, node_id: int, endpoint: int, fabric_filtered: bool = False, min_interval_sec: int = 0, max_interval_sec: int = 5) -> Any:
         """This starts a subscription for attributes on the specified node_id and endpoint. The cluster is specified when the class instance is created."""
@@ -358,6 +363,7 @@ class ClusterAttributeChangeAccumulator:
             logging.info(f"Got subscription report for {path.AttributeType}: {data}")
             self._q.put(value)
             self._attribute_report_counts[path.AttributeType] += 1
+            self._attribute_reports[path.AttributeType].append(value)
 
     @property
     def attribute_queue(self) -> queue.Queue:
@@ -366,6 +372,10 @@ class ClusterAttributeChangeAccumulator:
     @property
     def attribute_report_counts(self) -> dict[ClusterObjects.ClusterAttributeDescriptor, int]:
         return self._attribute_report_counts
+
+    @property
+    def attribute_reports(self) -> dict[ClusterObjects.ClusterAttributeDescriptor, AttributeValue]:
+        return self._attribute_reports
 
 
 class InternalTestRunnerHooks(TestRunnerHooks):
@@ -1805,7 +1815,7 @@ def per_endpoint_test(accept_function: EndpointCheckFunction):
     def per_endpoint_test_internal(body):
         def per_endpoint_runner(self: MatterBaseTest, *args, **kwargs):
             asserts.assert_false(self.get_test_pics(self.current_test_info.name), "pics_ method supplied for per_endpoint_test.")
-            runner_with_timeout = asyncio.wait_for(get_accepted_endpoints_for_test(self, accept_function), timeout=5)
+            runner_with_timeout = asyncio.wait_for(get_accepted_endpoints_for_test(self, accept_function), timeout=30)
             endpoints = asyncio.run(runner_with_timeout)
             if not endpoints:
                 logging.info("No matching endpoints found - skipping test")

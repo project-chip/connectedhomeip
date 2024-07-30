@@ -5672,6 +5672,12 @@ bool emberAfLevelControlClusterMoveToClosestFrequencyCallback(
     chip::app::CommandHandler * commandObj, const chip::app::ConcreteCommandPath & commandPath,
     const chip::app::Clusters::LevelControl::Commands::MoveToClosestFrequency::DecodableType & commandData);
 /**
+ * @brief Access Control Cluster ReviewFabricRestrictions Command callback (from client)
+ */
+bool emberAfAccessControlClusterReviewFabricRestrictionsCallback(
+    chip::app::CommandHandler * commandObj, const chip::app::ConcreteCommandPath & commandPath,
+    const chip::app::Clusters::AccessControl::Commands::ReviewFabricRestrictions::DecodableType & commandData);
+/**
  * @brief Actions Cluster InstantAction Command callback (from client)
  */
 bool emberAfActionsClusterInstantActionCallback(
@@ -6348,12 +6354,6 @@ bool emberAfThermostatClusterCancelPresetsSchedulesEditRequestCallback(
 bool emberAfThermostatClusterCommitPresetsSchedulesRequestCallback(
     chip::app::CommandHandler * commandObj, const chip::app::ConcreteCommandPath & commandPath,
     const chip::app::Clusters::Thermostat::Commands::CommitPresetsSchedulesRequest::DecodableType & commandData);
-/**
- * @brief Thermostat Cluster SetTemperatureSetpointHoldPolicy Command callback (from client)
- */
-bool emberAfThermostatClusterSetTemperatureSetpointHoldPolicyCallback(
-    chip::app::CommandHandler * commandObj, const chip::app::ConcreteCommandPath & commandPath,
-    const chip::app::Clusters::Thermostat::Commands::SetTemperatureSetpointHoldPolicy::DecodableType & commandData);
 /**
  * @brief Fan Control Cluster Step Command callback (from client)
  */
