@@ -55,10 +55,14 @@ CHIP_ERROR GenericOperationalStateDelegateImpl::GetOperationalPhaseAtIndex(size_
 
 void GenericOperationalStateDelegateImpl::HandlePauseStateCallback(GenericOperationalError & err)
 {
+    ChipLogDetail(AppServer,
+                "------> Received pause command in OpState delegate HandlePauseStateCallback.");
+
     // placeholder implementation
     auto error = GetInstance()->SetOperationalState(to_underlying(OperationalState::OperationalStateEnum::kPaused));
     if (error == CHIP_NO_ERROR)
     {
+        GetInstance()->UpdateCountdownTimeFromDelegate();
         err.Set(to_underlying(ErrorStateEnum::kNoError));
     }
     else
@@ -69,10 +73,14 @@ void GenericOperationalStateDelegateImpl::HandlePauseStateCallback(GenericOperat
 
 void GenericOperationalStateDelegateImpl::HandleResumeStateCallback(GenericOperationalError & err)
 {
+    ChipLogDetail(AppServer,
+                "------> Received resume command in OpState delegate HandleResumeStateCallback.");
+
     // placeholder implementation
     auto error = GetInstance()->SetOperationalState(to_underlying(OperationalStateEnum::kRunning));
     if (error == CHIP_NO_ERROR)
     {
+        GetInstance()->UpdateCountdownTimeFromDelegate();
         err.Set(to_underlying(ErrorStateEnum::kNoError));
     }
     else
@@ -86,6 +94,9 @@ void GenericOperationalStateDelegateImpl::HandleStartStateCallback(GenericOperat
     OperationalState::GenericOperationalError current_err(to_underlying(OperationalState::ErrorStateEnum::kNoError));
     GetInstance()->GetCurrentOperationalError(current_err);
 
+    ChipLogDetail(AppServer,
+                "------> Received start command in OpState delegate HandleStartStateCallback.");
+
     if (current_err.errorStateID != to_underlying(OperationalState::ErrorStateEnum::kNoError))
     {
         err.Set(to_underlying(OperationalState::ErrorStateEnum::kUnableToStartOrResume));
@@ -96,6 +107,9 @@ void GenericOperationalStateDelegateImpl::HandleStartStateCallback(GenericOperat
     auto error = GetInstance()->SetOperationalState(to_underlying(OperationalStateEnum::kRunning));
     if (error == CHIP_NO_ERROR)
     {
+        GetInstance()->UpdateCountdownTimeFromDelegate();
+        ChipLogDetail(AppServer,
+                    "------> Starting timer tick.");
         (void) DeviceLayer::SystemLayer().StartTimer(System::Clock::Seconds16(1), onOperationalStateTimerTick, this);
         err.Set(to_underlying(ErrorStateEnum::kNoError));
     }
@@ -107,6 +121,9 @@ void GenericOperationalStateDelegateImpl::HandleStartStateCallback(GenericOperat
 
 void GenericOperationalStateDelegateImpl::HandleStopStateCallback(GenericOperationalError & err)
 {
+    ChipLogDetail(AppServer,
+                "------> Received stop command in OpState delegate HandleStopStateCallback.");
+
     // placeholder implementation
     auto error = GetInstance()->SetOperationalState(to_underlying(OperationalStateEnum::kStopped));
     if (error == CHIP_NO_ERROR)
@@ -135,6 +152,9 @@ static void onOperationalStateTimerTick(System::Layer * systemLayer, void * data
 {
     GenericOperationalStateDelegateImpl * delegate = reinterpret_cast<GenericOperationalStateDelegateImpl *>(data);
 
+    ChipLogDetail(AppServer,
+                "------> Received a timer tick in onOperationalStateTimerTick.");
+
     OperationalState::Instance * instance = OperationalState::GetOperationalStateInstance();
     OperationalState::OperationalStateEnum state =
         static_cast<OperationalState::OperationalStateEnum>(instance->GetCurrentOperationalState());
@@ -145,12 +165,21 @@ static void onOperationalStateTimerTick(System::Layer * systemLayer, void * data
     {
         if (state == OperationalState::OperationalStateEnum::kRunning)
         {
+            ChipLogDetail(AppServer,
+                        "------> Inrementing the running timer.");
             delegate->mRunningTime++;
         }
         else if (state == OperationalState::OperationalStateEnum::kPaused)
         {
+            ChipLogDetail(AppServer,
+                        "------> Inrementing the paused timer.");
             delegate->mPausedTime++;
         }
+    }
+    else
+    {
+        instance->SetOperationalState(to_underlying(OperationalState::OperationalStateEnum::kStopped));
+        instance->UpdateCountdownTimeFromDelegate();
     }
 
     if (state == OperationalState::OperationalStateEnum::kRunning || state == OperationalState::OperationalStateEnum::kPaused)
