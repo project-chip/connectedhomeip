@@ -20,8 +20,8 @@
  * Includes
  *********************************************************/
 
-#include "include/thermostat-manager.h"
-#include "include/thermostat-delegate-impl.h"
+#include <thermostat-delegate-impl.h>
+#include <thermostat-manager.h>
 
 #include <app/clusters/bindings/BindingManager.h>
 #include <app/clusters/thermostat-server/thermostat-server.h>
@@ -506,9 +506,11 @@ void MatterPostAttributeChangeCallback(const ConcreteAttributePath & attributePa
 
 void emberAfThermostatClusterInitCallback(EndpointId endpoint)
 {
+    ChipLogProgress(Zcl, "Starting Thermostat Manager");
+    ThermostatManager().Init();
+
     // Register the delegate for the Thermostat
     auto & delegate = ThermostatDelegate::GetInstance();
-
     // Set the default delegate for endpoint kThermostatEndpoint.
     VerifyOrDie(endpoint == kThermostatEndpoint);
     SetDefaultDelegate(endpoint, &delegate);

@@ -16,9 +16,8 @@
  *    limitations under the License.
  */
 
-#include "include/thermostat-delegate-impl.h"
+#include <thermostat-delegate-impl.h>
 
-#include "thermostat-delegate-impl.h"
 #include <app-common/zap-generated/attributes/Accessors.h>
 #include <lib/support/Span.h>
 #include <platform/internal/CHIPDeviceLayerInternal.h>
