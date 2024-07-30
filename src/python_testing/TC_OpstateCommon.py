@@ -1245,7 +1245,6 @@ class TC_OPSTATE_BASE():
     async def TEST_TC_OPSTATE_BASE_2_6(self, endpoint=1):
         cluster = self.test_info.cluster
         attributes = cluster.Attributes
-        events = cluster.Events
 
         self.init_test()
 
