@@ -139,6 +139,17 @@ source_set("operational-state-test-srcs") {
   ]
 }
 
+source_set("thread-border-router-management-test-srcs") {
+  sources = [ "${chip_root}/src/app/clusters/thread-border-router-management-server/thread-border-router-management-server.cpp" ]
+
+  public_deps = [
+    "${chip_root}/src/app",
+    "${chip_root}/src/app/common:cluster-objects",
+    "${chip_root}/src/app/util/mock:mock_ember",
+    "${chip_root}/src/lib/core",
+  ]
+}
+
 source_set("app-test-stubs") {
   sources = [
     "test-ember-api.cpp",
@@ -249,6 +260,9 @@ chip_test_suite("tests") {
       "${chip_root}/src/app/server",
       "${chip_root}/src/messaging/tests/echo:common",
     ]
+  } else if (!chip_fake_platform) {
+    test_sources += [ "TestThreadBorderRouterManagementCluster.cpp" ]
+    public_deps += [ ":thread-border-router-management-test-srcs" ]
   }
 
   if (!chip_fake_platform) {

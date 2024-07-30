@@ -14,21 +14,21 @@
  *    See the License for the specific language governing permissions and
  *    limitations under the License.
  */
-package matter.controller.cluster.structs
+package chip.devicecontroller.cluster.structs
 
-import matter.controller.cluster.*
+import chip.devicecontroller.cluster.*
 import matter.tlv.ContextSpecificTag
 import matter.tlv.Tag
 import matter.tlv.TlvReader
 import matter.tlv.TlvWriter
 
-class ServiceAreaClusterHomeLocationStruct(
+class ServiceAreaClusterLocationDescriptorStruct(
   val locationName: String,
-  val floorNumber: Short?,
-  val areaType: UByte?,
+  val floorNumber: Int?,
+  val areaType: UInt?,
 ) {
   override fun toString(): String = buildString {
-    append("ServiceAreaClusterHomeLocationStruct {\n")
+    append("ServiceAreaClusterLocationDescriptorStruct {\n")
     append("\tlocationName : $locationName\n")
     append("\tfloorNumber : $floorNumber\n")
     append("\tareaType : $areaType\n")
@@ -58,19 +58,19 @@ class ServiceAreaClusterHomeLocationStruct(
     private const val TAG_FLOOR_NUMBER = 1
     private const val TAG_AREA_TYPE = 2
 
-    fun fromTlv(tlvTag: Tag, tlvReader: TlvReader): ServiceAreaClusterHomeLocationStruct {
+    fun fromTlv(tlvTag: Tag, tlvReader: TlvReader): ServiceAreaClusterLocationDescriptorStruct {
       tlvReader.enterStructure(tlvTag)
       val locationName = tlvReader.getString(ContextSpecificTag(TAG_LOCATION_NAME))
       val floorNumber =
         if (!tlvReader.isNull()) {
-          tlvReader.getShort(ContextSpecificTag(TAG_FLOOR_NUMBER))
+          tlvReader.getInt(ContextSpecificTag(TAG_FLOOR_NUMBER))
         } else {
           tlvReader.getNull(ContextSpecificTag(TAG_FLOOR_NUMBER))
           null
         }
       val areaType =
         if (!tlvReader.isNull()) {
-          tlvReader.getUByte(ContextSpecificTag(TAG_AREA_TYPE))
+          tlvReader.getUInt(ContextSpecificTag(TAG_AREA_TYPE))
         } else {
           tlvReader.getNull(ContextSpecificTag(TAG_AREA_TYPE))
           null
@@ -78,7 +78,7 @@ class ServiceAreaClusterHomeLocationStruct(
 
       tlvReader.exitContainer()
 
-      return ServiceAreaClusterHomeLocationStruct(locationName, floorNumber, areaType)
+      return ServiceAreaClusterLocationDescriptorStruct(locationName, floorNumber, areaType)
     }
   }
 }

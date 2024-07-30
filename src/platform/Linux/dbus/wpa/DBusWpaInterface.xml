@@ -56,6 +56,23 @@
         <method name="AutoScan">
             <arg name="arg" type="s" direction="in" />
         </method>
+        <method name="NANPublish">
+            <arg name="nan_args" type="s" direction="in" />
+            <arg name="publish_id" type="i" direction="out" />
+        </method>
+        <method name="NANCancelPublish">
+            <arg name="nan_args" type="s" direction="in" />
+        </method>
+        <method name="NANSubscribe">
+            <arg name="nan_args" type="s" direction="in" />
+            <arg name="subscribe_id" type="i" direction="out" />
+        </method>
+        <method name="NANCancelSubscribe">
+            <arg name="nan_args" type="s" direction="in" />
+        </method>
+        <method name="NANTransmit">
+            <arg name="nan_args" type="s" direction="in" />
+        </method>
         <method name="TDLSDiscover">
             <arg name="peer_address" type="s" direction="in" />
         </method>
@@ -91,6 +108,21 @@
         <method name="AbortScan" />
         <signal name="ScanDone">
             <arg name="success" type="b" />
+        </signal>
+        <signal name="NanDiscoveryresult">
+            <arg name="result" type="b" />
+            <arg name="discov_info" type="a{sv}" />
+        </signal>
+        <signal name="NanReceive">
+            <arg name="nanrx" type="a{sv}" />
+        </signal>
+        <signal name="NanPublishterminated">
+            <arg name="publish_id" type="i" />
+            <arg name="reason" type="i" />
+        </signal>
+        <signal name="NanSubscribeterminated">
+            <arg name="term_subscribe_id" type="i" />
+            <arg name="reason" type="i" />
         </signal>
         <signal name="BSSAdded">
             <arg name="path" type="o" />
