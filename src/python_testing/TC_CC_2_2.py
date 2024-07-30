@@ -49,7 +49,7 @@ class TC_CC_2_3(MatterBaseTest):
             return f'TH verifies that _reportedCurrentHueValuesList_ does not contain more than 10 entries for _{attr}_'
 
         def entry_count_verification() -> str:
-            return f'_reportedCurrentHueValuesList_ has 10 or less entries in the list'
+            return '_reportedCurrentHueValuesList_ has 10 or less entries in the list'
 
         return [TestStep(1, commission_if_required(), is_commissioning=True),
                 TestStep(2, read_attribute('FeatureMap')),
@@ -269,8 +269,8 @@ class TC_CC_2_3(MatterBaseTest):
         time.sleep(20)
 
         self.step(34)
-        count = sub_handler.attribute_report_counts[cc.Attributes.RemainingTime]
         # TODO: Re-enable checks 34, 34, 36 when #34643 is addressed
+        # count = sub_handler.attribute_report_counts[cc.Attributes.RemainingTime]
         # asserts.assert_equal(count, 3, "Unexpected number of reports received")
 
         self.step(35)
