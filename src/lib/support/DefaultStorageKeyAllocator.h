@@ -130,6 +130,16 @@ public:
 
     static StorageKeyName AccessControlExtensionEntry(FabricIndex fabric) { return StorageKeyName::Formatted("f/%x/ac/1", fabric); }
 
+    static StorageKeyName AccessControlCommissioningArlEntry(size_t index)
+    {
+        return StorageKeyName::Formatted("g/car/0/%x", static_cast<unsigned>(index));
+    }
+
+    static StorageKeyName AccessControlArlEntry(FabricIndex fabric, size_t index)
+    {
+        return StorageKeyName::Formatted("f/%x/ar/0/%x", fabric, static_cast<unsigned>(index));
+    }
+
     // Group Message Counters
     static StorageKeyName GroupDataCounter() { return StorageKeyName::FromConst("g/gdc"); }
     static StorageKeyName GroupControlCounter() { return StorageKeyName::FromConst("g/gcc"); }

@@ -26,6 +26,7 @@
 #include <app/server/OnboardingCodesUtil.h>
 
 #include <crypto/CHIPCryptoPAL.h>
+#include <json/json.h>
 #include <lib/core/CHIPError.h>
 #include <lib/support/Base64.h>
 #include <lib/support/BytesToHex.h>
@@ -47,6 +48,11 @@
 
 using namespace chip;
 using namespace chip::ArgParser;
+using namespace chip::Platform;
+
+#if CHIP_CONFIG_USE_ACCESS_RESTRICTIONS
+using namespace chip::Access;
+#endif
 
 namespace {
 LinuxDeviceOptions gDeviceOptions;
@@ -82,6 +88,9 @@ enum
     kDeviceOption_TraceFile,
     kDeviceOption_TraceLog,
     kDeviceOption_TraceDecode,
+#if CHIP_CONFIG_USE_ACCESS_RESTRICTIONS
+    kDeviceOption_UseAccessRestrictions,
+#endif
     kOptionCSRResponseCSRIncorrectType,
     kOptionCSRResponseCSRNonceIncorrectType,
     kOptionCSRResponseCSRNonceTooLong,
@@ -154,6 +163,9 @@ OptionDef sDeviceOptionDefs[] = {
     { "trace_log", kArgumentRequired, kDeviceOption_TraceLog },
     { "trace_decode", kArgumentRequired, kDeviceOption_TraceDecode },
 #endif // CHIP_CONFIG_TRANSPORT_TRACE_ENABLED
+#if CHIP_CONFIG_USE_ACCESS_RESTRICTIONS
+    { "enable-access-restrictions", kArgumentRequired, kDeviceOption_UseAccessRestrictions },
+#endif // CHIP_CONFIG_USE_ACCESS_RESTRICTIONS
     { "cert_error_csr_incorrect_type", kNoArgument, kOptionCSRResponseCSRIncorrectType },
     { "cert_error_csr_existing_keypair", kNoArgument, kOptionCSRResponseCSRExistingKeyPair },
     { "cert_error_csr_nonce_incorrect_type", kNoArgument, kOptionCSRResponseCSRNonceIncorrectType },
@@ -280,6 +292,11 @@ const char * sDeviceOptionHelp =
     "  --trace_decode <1/0>\n"
     "       A value of 1 enables traces decoding, 0 disables this (default 0).\n"
 #endif // CHIP_CONFIG_TRANSPORT_TRACE_ENABLED
+#if CHIP_CONFIG_USE_ACCESS_RESTRICTIONS
+    "  --enable-access-restrictions <CommissioningARL JSON>\n"
+    "       Enable ACL cluster access restrictions with the provided JSON CommissioningARL. Example:\n"
+    "       \"[{\\\"endpoint\\\": 1,\\\"cluster\\\": 2,\\\"restrictions\\\": [{\\\"type\\\": 0,\\\"id\\\": 3}]}]\"\n"
+#endif // CHIP_CONFIG_USE_ACCESS_RESTRICTIONS
     "  --cert_error_csr_incorrect_type\n"
     "       Configure the CSRResponse to be built with an invalid CSR type.\n"
     "  --cert_error_csr_existing_keypair\n"
@@ -319,6 +336,40 @@ const char * sDeviceOptionHelp =
     "       Inject specified fault(s) at runtime.\n"
 #endif
     "\n";
+
+#if CHIP_CONFIG_USE_ACCESS_RESTRICTIONS
+bool ParseAccessRestrictionEntriesFromJson(const char * jsonString,
+                                           std::vector<Platform::SharedPtr<AccessRestriction::Entry>> & entries)
+{
+    Json::Value root;
+    Json::Reader reader;
+    VerifyOrReturnValue(reader.parse(jsonString, root), false);
+
+    for (Json::Value::const_iterator eIt = root.begin(); eIt != root.end(); eIt++)
+    {
+        auto entry = MakeShared<AccessRestriction::Entry>();
+
+        entry->endpointNumber = static_cast<EndpointId>((*eIt)["endpoint"].asUInt());
+        entry->clusterId      = static_cast<ClusterId>((*eIt)["cluster"].asUInt());
+
+        Json::Value restrictions = (*eIt)["restrictions"];
+        for (Json::Value::const_iterator rIt = restrictions.begin(); rIt != restrictions.end(); rIt++)
+        {
+            AccessRestriction::Restriction restriction;
+            restriction.restrictionType = static_cast<AccessRestriction::Type>((*rIt)["type"].asInt());
+            if ((*rIt).isMember("id"))
+            {
+                restriction.id.SetValue((*rIt)["id"].asUInt());
+            }
+            entry->restrictions.push_back(restriction);
+        }
+
+        entries.push_back(entry);
+    }
+
+    return true;
+}
+#endif // CHIP_CONFIG_USE_ACCESS_RESTRICTIONS
 
 bool Base64ArgToVector(const char * arg, size_t maxSize, std::vector<uint8_t> & outVector)
 {
@@ -528,6 +579,18 @@ bool HandleOption(const char * aProgram, OptionSet * aOptions, int aIdentifier, 
         }
         break;
 #endif // CHIP_CONFIG_TRANSPORT_TRACE_ENABLED
+
+#if CHIP_CONFIG_USE_ACCESS_RESTRICTIONS
+    case kDeviceOption_UseAccessRestrictions: {
+        std::vector<Platform::SharedPtr<AccessRestriction::Entry>> accessRestrictionEntries;
+        retval = ParseAccessRestrictionEntriesFromJson(aValue, accessRestrictionEntries);
+        if (retval)
+        {
+            LinuxDeviceOptions::GetInstance().accessRestrictionEntries.SetValue(std::move(accessRestrictionEntries));
+        }
+    }
+    break;
+#endif // CHIP_CONFIG_USE_ACCESS_RESTRICTIONS
 
     case kOptionCSRResponseCSRIncorrectType:
         LinuxDeviceOptions::GetInstance().mCSRResponseOptions.csrIncorrectType = true;

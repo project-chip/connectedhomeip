@@ -18,6 +18,12 @@
 
 #pragma once
 
+#include <access/AccessConfig.h>
+
+#if CHIP_CONFIG_USE_ACCESS_RESTRICTIONS
+#include "AccessRestriction.h"
+#endif
+
 #include "Privilege.h"
 #include "RequestPath.h"
 #include "SubjectDescriptor.h"
@@ -627,6 +633,13 @@ public:
     // Removes a listener from the listener list, if in the list.
     void RemoveEntryListener(EntryListener & listener);
 
+#if CHIP_CONFIG_USE_ACCESS_RESTRICTIONS
+    // Set an optional AcceessRestriction object for MNGD feature.
+    void SetAccessRestriction(AccessRestriction * accessRestriction) { mAccessRestriction = accessRestriction; }
+
+    AccessRestriction * GetAccessRestriction() { return mAccessRestriction; }
+#endif
+
     /**
      * Check whether or not Access Restriction List is supported.
      *
@@ -637,6 +650,8 @@ public:
     /**
      * Check whether access (by a subject descriptor, to a request path,
      * requiring a privilege) should be allowed or denied.
+     *
+     * If an AccessRestriction object is set, it will be checked for additional access restrictions.
      *
      * @retval #CHIP_ERROR_ACCESS_DENIED if denied.
      * @retval other errors should also be treated as denied.
@@ -662,6 +677,10 @@ private:
     DeviceTypeResolver * mDeviceTypeResolver = nullptr;
 
     EntryListener * mEntryListener = nullptr;
+
+#if CHIP_CONFIG_USE_ACCESS_RESTRICTIONS
+    AccessRestriction * mAccessRestriction;
+#endif
 };
 
 /**

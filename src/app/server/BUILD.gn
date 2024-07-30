@@ -13,6 +13,7 @@
 # limitations under the License.
 
 import("//build_overrides/chip.gni")
+import("${chip_root}/src/access/access.gni")
 import("${chip_root}/src/app/common_flags.gni")
 import("${chip_root}/src/app/icd/icd.gni")
 
@@ -78,5 +79,14 @@ static_library("server") {
       public_deps +=
           [ "${chip_root}/src/app/icd/server:default-check-in-back-off" ]
     }
+  }
+
+  if (chip_enable_access_restrictions) {
+    sources += [
+      "ArlStorage.cpp",
+      "ArlStorage.h",
+      "DefaultArlStorage.cpp",
+      "DefaultArlStorage.h",
+    ]
   }
 }

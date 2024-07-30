@@ -13,6 +13,7 @@
 # limitations under the License.
 
 import("//build_overrides/chip.gni")
+import("//build_overrides/jsoncpp.gni")
 import("${chip_root}/examples/common/pigweed/pigweed_rpcs.gni")
 import("${chip_root}/src/app/common_flags.gni")
 import("${chip_root}/src/lib/core/core.gni")
@@ -94,6 +95,7 @@ source_set("app-main") {
     "${chip_root}/src/controller:gen_check_chip_controller_headers",
     "${chip_root}/src/lib",
     "${chip_root}/src/platform/logging:default",
+    jsoncpp_root,
   ]
   deps = [
     ":ota-test-event-trigger",

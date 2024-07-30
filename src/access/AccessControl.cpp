@@ -325,7 +325,11 @@ void AccessControl::RemoveEntryListener(EntryListener & listener)
 
 bool AccessControl::IsAccessRestrictionListSupported() const
 {
-    return false; // not yet supported
+#if CHIP_CONFIG_USE_ACCESS_RESTRICTIONS
+    return mAccessRestriction != nullptr;
+#else
+    return false;
+#endif
 }
 
 CHIP_ERROR AccessControl::Check(const SubjectDescriptor & subjectDescriptor, const RequestPath & requestPath,
@@ -351,6 +355,19 @@ CHIP_ERROR AccessControl::Check(const SubjectDescriptor & subjectDescriptor, con
     {
         VerifyOrReturnError(requestPath.requestType != RequestType::kRequestTypeUnknown, CHIP_ERROR_INVALID_ARGUMENT);
     }
+
+#if CHIP_CONFIG_USE_ACCESS_RESTRICTIONS
+    if (mAccessRestriction != nullptr)
+    {
+        CHIP_ERROR result = mAccessRestriction->Check(subjectDescriptor, requestPath);
+        if (result != CHIP_NO_ERROR)
+        {
+            ChipLogProgress(DataManagement, "AccessControl: %s",
+                            (result == CHIP_ERROR_ACCESS_DENIED) ? "denied (restricted)" : "denied (restriction error)");
+            return result;
+        }
+    }
+#endif
 
     {
         CHIP_ERROR result = mDelegate->Check(subjectDescriptor, requestPath, requestPrivilege);

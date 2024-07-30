@@ -103,6 +103,11 @@
 #include "AppMain.h"
 #include "CommissionableInit.h"
 
+#if CHIP_CONFIG_USE_ACCESS_RESTRICTIONS
+#include "ExampleAccessRestriction.h"
+#include <app/server/DefaultArlStorage.h>
+#endif
+
 #if CHIP_DEVICE_LAYER_TARGET_DARWIN
 #include <platform/Darwin/NetworkCommissioningDriver.h>
 #if CHIP_DEVICE_CONFIG_ENABLE_WIFI
@@ -121,6 +126,7 @@ using namespace chip::DeviceLayer;
 using namespace chip::Inet;
 using namespace chip::Transport;
 using namespace chip::app::Clusters;
+using namespace chip::Access;
 
 // Network comissioning implementation
 namespace {
@@ -592,6 +598,18 @@ void ChipLinuxAppMainLoop(AppMainLoopImplementation * impl)
 
     chip::app::RuntimeOptionsProvider::Instance().SetSimulateNoInternalTime(
         LinuxDeviceOptions::GetInstance().mSimulateNoInternalTime);
+
+#if CHIP_CONFIG_USE_ACCESS_RESTRICTIONS
+    if (LinuxDeviceOptions::GetInstance().accessRestrictionEntries.HasValue())
+    {
+        initParams.accessRestriction = new ExampleAccessRestriction();
+        initParams.arlStorage        = new app::DefaultArlStorage();
+        for (const auto & entry : LinuxDeviceOptions::GetInstance().accessRestrictionEntries.Value())
+        {
+            VerifyOrDie(AccessRestriction::CreateCommissioningEntry(entry) == CHIP_NO_ERROR);
+        }
+    }
+#endif
 
     // Init ZCL Data Model and CHIP App Server
     Server::GetInstance().Init(initParams);
