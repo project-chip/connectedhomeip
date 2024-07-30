@@ -86,6 +86,7 @@ namespace app {
  */
 class InteractionModelEngine : public Messaging::UnsolicitedMessageHandler,
                                public Messaging::ExchangeDelegate,
+                               public DataModel::ActionContext,
                                public CommandResponseSender::Callback,
                                public CommandHandlerImpl::Callback,
                                public ReadHandler::ManagementCallback,
@@ -414,6 +415,9 @@ public:
     // Returns the old data model provider value.
     DataModel::Provider * SetDataModelProvider(DataModel::Provider * model);
 
+    /* DataModel::ActionContext implementation */
+    Messaging::ExchangeContext * CurrentExchange() override { return mCurrentExchange; }
+
 private:
     friend class reporting::Engine;
     friend class TestCommandInteraction;
@@ -701,7 +705,22 @@ private:
 
     SubscriptionResumptionStorage * mpSubscriptionResumptionStorage = nullptr;
 
-    DataModel::Provider * mDataModelProvider = nullptr;
+    DataModel::Provider * mDataModelProvider      = nullptr;
+    Messaging::ExchangeContext * mCurrentExchange = nullptr;
+
+    // Changes the current exchange context of a InteractionModelEngine to a given context
+    class ScopedExchangeContext
+    {
+    public:
+        ScopedExchangeContext(InteractionModelEngine & engine, Messaging::ExchangeContext * context) : mEngine(engine)
+        {
+            mEngine.mCurrentExchange = context;
+        }
+
+        ~ScopedExchangeContext() { mEngine.mCurrentExchange = nullptr; }
+    private:
+        InteractionModelEngine & mEngine;
+    };
 };
 
 } // namespace app

@@ -975,6 +975,10 @@ CHIP_ERROR InteractionModelEngine::OnMessageReceived(Messaging::ExchangeContext 
 
     Protocols::InteractionModel::Status status = Status::Failure;
 
+    // Ensure that DataModel::Provider have access to the currently executing
+    // exchange context.
+    ScopedExchangeContext scopedExchangeContext(*this, apExchangeContext);
+
     // Group Message can only be an InvokeCommandRequest or WriteRequest
     if (apExchangeContext->IsGroupExchangeContext() &&
         !aPayloadHeader.HasMessageType(Protocols::InteractionModel::MsgType::InvokeCommandRequest) &&
@@ -1727,11 +1731,9 @@ DataModel::Provider * InteractionModelEngine::SetDataModelProvider(DataModel::Pr
     {
         DataModel::InteractionModelContext context;
 
-        // TODO: one by one
         context.eventsGenerator = &EventManagement::GetInstance();
         context.dataModelChangeListener = &mReportingEngine;
-        // context.actionContext = this;
-
+        context.actionContext = this;
 
         CHIP_ERROR err = mDataModelProvider->Startup(context);
         if (err != CHIP_NO_ERROR)
