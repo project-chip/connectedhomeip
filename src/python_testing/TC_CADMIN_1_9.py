@@ -30,6 +30,7 @@ from time import sleep
 import chip.clusters as Clusters
 from chip import ChipDeviceCtrl
 from chip.ChipDeviceCtrl import CommissioningParameters
+from chip.exceptions import ChipStackError
 from matter_testing_support import MatterBaseTest, TestStep, async_test_body, default_matter_test_main
 from mobly import asserts
 
@@ -65,6 +66,17 @@ class TC_CADMIN_1_9(MatterBaseTest):
             if random_value != value:
                 return random_value
 
+    async def CommissionOnNetwork(
+        self, setup_code: int
+    ):
+        ctx = asserts.assert_raises(ChipStackError)
+        with ctx:
+            await self.th2.CommissionOnNetwork(
+                nodeId=self.dut_node_id, setupPinCode=setup_code,
+                filterType=ChipDeviceCtrl.DiscoveryFilterType.LONG_DISCRIMINATOR, filter=self.discriminator)
+        errcode = ctx.exception.chip_error
+        return errcode
+
     async def CommissionAttempt(
             self, setupPinCode: int, expectedErrCode: int):
 
@@ -72,9 +84,7 @@ class TC_CADMIN_1_9(MatterBaseTest):
             for cycle in range(20):
                 logging.info("-----------------Current Iteration {}-------------------------".format(cycle+1))
                 setup_code = self.generate_unique_random_value(setupPinCode)
-                errcode = self.th2.CommissionOnNetwork(
-                    nodeId=self.dut_node_id, setupPinCode=setup_code,
-                    filterType=ChipDeviceCtrl.DiscoveryFilterType.LONG_DISCRIMINATOR, filter=self.discriminator)
+                errcode = await self.CommissionOnNetwork(setup_code)
                 logging.info('Commissioning complete done. Successful? {}, errorcode = {}, cycle={}'.format(
                     errcode.is_success, errcode, (cycle+1)))
                 asserts.assert_false(errcode.is_success, 'Commissioning complete did not error as expected')
@@ -83,9 +93,7 @@ class TC_CADMIN_1_9(MatterBaseTest):
 
         elif expectedErrCode == 50:
             logging.info("-----------------Attempting connection expecting timeout-------------------------")
-            errcode = self.th2.CommissionOnNetwork(
-                nodeId=self.dut_node_id, setupPinCode=setupPinCode,
-                filterType=ChipDeviceCtrl.DiscoveryFilterType.LONG_DISCRIMINATOR, filter=self.discriminator)
+            errcode = await self.CommissionOnNetwork(setupPinCode)
             logging.info('Commissioning complete done. Successful? {}, errorcode = {}'.format(errcode.is_success, errcode))
             asserts.assert_false(errcode.is_success, 'Commissioning complete did not error as expected')
             asserts.assert_true(errcode.sdk_code == expectedErrCode, 'Unexpected error code returned from CommissioningComplete')
