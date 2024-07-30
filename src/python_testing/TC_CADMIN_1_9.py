@@ -40,7 +40,7 @@ class TC_CADMIN_1_9(MatterBaseTest):
             cluster = Clusters.GeneralCommissioning
             attribute = cluster.Attributes.BasicCommissioningInfo
             duration = await self.read_single_attribute_check_success(endpoint=0, cluster=cluster, attribute=attribute)
-            params = self.th1.OpenCommissioningWindow(
+            params = await self.th1.OpenCommissioningWindow(
                 nodeid=self.dut_node_id, timeout=duration.maxCumulativeFailsafeSeconds, iteration=10000, discriminator=self.discriminator, option=1)
             return params
 
