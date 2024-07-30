@@ -79,7 +79,7 @@ class TC_OCC_3_1(MatterBaseTest):
         if occupancy_dut == 1:
             # Don't trigger occupancy sensor to render occupancy attribute to 0
             if attributes.HoldTime.attribute_id in attribute_list:
-                time.sleep(hold_time) # wait 10 seconds
+                self.wait_for_user_input(prompt_msg="Type any letter and press ENTER after not triggering the sensor for HoldTime period to ensure occupancy attribute = 0")
                 
             else: # a user wait until a sensor specific time to change occupancy attribute to 0
                 self.wait_for_user_input(prompt_msg="Type any letter and press ENTER after the sensor occupancy is detection ready state (occupancy attribute = 0)")
