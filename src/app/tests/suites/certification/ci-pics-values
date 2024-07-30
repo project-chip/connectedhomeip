@@ -1520,7 +1520,8 @@ DRLK.S.A0035=0
 
 #ReadOnly attributes
 DRLK.S.A0028.ReadOnly=1
-DRLK.S.A002c.ReadOnly=1
+DRLK.S.A002c.ReadOnly=
+DRLK.S.A0080.ReadOnly=0
 
 #write attributes
 DRLK.S.M.SimulateNotFullyLocked=1
