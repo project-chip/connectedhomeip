@@ -10199,3 +10199,19 @@ PICS:
 
     - label: "Does the device implement the ActiveEndpoints attribute?"
       id: PWRTL.S.A0001
+
+    #
+    # Thread Network Directory Cluster
+    #
+    - label:
+          "Does the device implement the Thread Network Directory cluster as a
+          server"
+      id: THNETDIR.S
+
+    #
+    # Wi-Fi Network Management Cluster
+    #
+    - label:
+          "Does the device implement the Wi-Fi Network Management cluster as a
+          server"
+      id: WIFINM.S

@@ -402,6 +402,12 @@ static BOOL AttributeIsSpecifiedInAccessControlCluster(AttributeId aAttributeId)
     case Attributes::AccessControlEntriesPerFabric::Id: {
         return YES;
     }
+    case Attributes::CommissioningARL::Id: {
+        return YES;
+    }
+    case Attributes::Arl::Id: {
+        return YES;
+    }
     case Attributes::GeneratedCommandList::Id: {
         return YES;
     }
@@ -4173,9 +4179,6 @@ static BOOL AttributeIsSpecifiedInThermostatCluster(AttributeId aAttributeId)
     case Attributes::PresetsSchedulesEditable::Id: {
         return YES;
     }
-    case Attributes::TemperatureSetpointHoldPolicy::Id: {
-        return YES;
-    }
     case Attributes::SetpointHoldExpiryTimestamp::Id: {
         return YES;
     }
@@ -5440,6 +5443,9 @@ static BOOL AttributeIsSpecifiedInWiFiNetworkManagementCluster(AttributeId aAttr
     using namespace Clusters::WiFiNetworkManagement;
     switch (aAttributeId) {
     case Attributes::Ssid::Id: {
+        return YES;
+    }
+    case Attributes::PassphraseSurrogate::Id: {
         return YES;
     }
     case Attributes::GeneratedCommandList::Id: {

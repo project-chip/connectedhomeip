@@ -1617,6 +1617,33 @@ using chip::System::Clock::Timeout;
 
 @implementation MTRClusterAccessControl
 
+- (void)reviewFabricRestrictionsWithParams:(MTRAccessControlClusterReviewFabricRestrictionsParams *)params expectedValues:(NSArray<NSDictionary<NSString *, id> *> * _Nullable)expectedValues expectedValueInterval:(NSNumber * _Nullable)expectedValueIntervalMs completion:(MTRStatusCompletion)completion
+{
+    if (params == nil) {
+        params = [[MTRAccessControlClusterReviewFabricRestrictionsParams
+            alloc] init];
+    }
+
+    auto responseHandler = ^(id _Nullable response, NSError * _Nullable error) {
+        completion(error);
+    };
+
+    auto * timedInvokeTimeoutMs = params.timedInvokeTimeoutMs;
+
+    using RequestType = AccessControl::Commands::ReviewFabricRestrictions::Type;
+    [self.device _invokeKnownCommandWithEndpointID:self.endpointID
+                                         clusterID:@(RequestType::GetClusterId())
+                                         commandID:@(RequestType::GetCommandId())
+                                    commandPayload:params
+                                    expectedValues:expectedValues
+                             expectedValueInterval:expectedValueIntervalMs
+                                timedInvokeTimeout:timedInvokeTimeoutMs
+                       serverSideProcessingTimeout:params.serverSideProcessingTimeout
+                                     responseClass:nil
+                                             queue:self.callbackQueue
+                                        completion:responseHandler];
+}
+
 - (NSDictionary<NSString *, id> * _Nullable)readAttributeACLWithParams:(MTRReadParams * _Nullable)params
 {
     return [self.device readAttributeWithEndpointID:self.endpointID clusterID:@(MTRClusterIDTypeAccessControlID) attributeID:@(MTRAttributeIDTypeClusterAccessControlAttributeACLID) params:params];
@@ -1662,6 +1689,16 @@ using chip::System::Clock::Timeout;
 - (NSDictionary<NSString *, id> * _Nullable)readAttributeAccessControlEntriesPerFabricWithParams:(MTRReadParams * _Nullable)params
 {
     return [self.device readAttributeWithEndpointID:self.endpointID clusterID:@(MTRClusterIDTypeAccessControlID) attributeID:@(MTRAttributeIDTypeClusterAccessControlAttributeAccessControlEntriesPerFabricID) params:params];
+}
+
+- (NSDictionary<NSString *, id> * _Nullable)readAttributeCommissioningARLWithParams:(MTRReadParams * _Nullable)params
+{
+    return [self.device readAttributeWithEndpointID:self.endpointID clusterID:@(MTRClusterIDTypeAccessControlID) attributeID:@(MTRAttributeIDTypeClusterAccessControlAttributeCommissioningARLID) params:params];
+}
+
+- (NSDictionary<NSString *, id> * _Nullable)readAttributeARLWithParams:(MTRReadParams * _Nullable)params
+{
+    return [self.device readAttributeWithEndpointID:self.endpointID clusterID:@(MTRClusterIDTypeAccessControlID) attributeID:@(MTRAttributeIDTypeClusterAccessControlAttributeARLID) params:params];
 }
 
 - (NSDictionary<NSString *, id> * _Nullable)readAttributeGeneratedCommandListWithParams:(MTRReadParams * _Nullable)params
@@ -4991,11 +5028,7 @@ using chip::System::Clock::Timeout;
 
 @implementation MTRClusterBridgedDeviceBasicInformation
 
-- (void)keepActiveWithExpectedValues:(NSArray<NSDictionary<NSString *, id> *> *)expectedValues expectedValueInterval:(NSNumber *)expectedValueIntervalMs completion:(MTRStatusCompletion)completion
-{
-    [self keepActiveWithParams:nil expectedValues:expectedValues expectedValueInterval:expectedValueIntervalMs completion:completion];
-}
-- (void)keepActiveWithParams:(MTRBridgedDeviceBasicInformationClusterKeepActiveParams * _Nullable)params expectedValues:(NSArray<NSDictionary<NSString *, id> *> * _Nullable)expectedValues expectedValueInterval:(NSNumber * _Nullable)expectedValueIntervalMs completion:(MTRStatusCompletion)completion
+- (void)keepActiveWithParams:(MTRBridgedDeviceBasicInformationClusterKeepActiveParams *)params expectedValues:(NSArray<NSDictionary<NSString *, id> *> * _Nullable)expectedValues expectedValueInterval:(NSNumber * _Nullable)expectedValueIntervalMs completion:(MTRStatusCompletion)completion
 {
     if (params == nil) {
         params = [[MTRBridgedDeviceBasicInformationClusterKeepActiveParams
@@ -13378,33 +13411,6 @@ using chip::System::Clock::Timeout;
                                         completion:responseHandler];
 }
 
-- (void)setTemperatureSetpointHoldPolicyWithParams:(MTRThermostatClusterSetTemperatureSetpointHoldPolicyParams *)params expectedValues:(NSArray<NSDictionary<NSString *, id> *> * _Nullable)expectedValues expectedValueInterval:(NSNumber * _Nullable)expectedValueIntervalMs completion:(MTRStatusCompletion)completion
-{
-    if (params == nil) {
-        params = [[MTRThermostatClusterSetTemperatureSetpointHoldPolicyParams
-            alloc] init];
-    }
-
-    auto responseHandler = ^(id _Nullable response, NSError * _Nullable error) {
-        completion(error);
-    };
-
-    auto * timedInvokeTimeoutMs = params.timedInvokeTimeoutMs;
-
-    using RequestType = Thermostat::Commands::SetTemperatureSetpointHoldPolicy::Type;
-    [self.device _invokeKnownCommandWithEndpointID:self.endpointID
-                                         clusterID:@(RequestType::GetClusterId())
-                                         commandID:@(RequestType::GetCommandId())
-                                    commandPayload:params
-                                    expectedValues:expectedValues
-                             expectedValueInterval:expectedValueIntervalMs
-                                timedInvokeTimeout:timedInvokeTimeoutMs
-                       serverSideProcessingTimeout:params.serverSideProcessingTimeout
-                                     responseClass:nil
-                                             queue:self.callbackQueue
-                                        completion:responseHandler];
-}
-
 - (NSDictionary<NSString *, id> * _Nullable)readAttributeLocalTemperatureWithParams:(MTRReadParams * _Nullable)params
 {
     return [self.device readAttributeWithEndpointID:self.endpointID clusterID:@(MTRClusterIDTypeThermostatID) attributeID:@(MTRAttributeIDTypeClusterThermostatAttributeLocalTemperatureID) params:params];
@@ -14022,11 +14028,6 @@ using chip::System::Clock::Timeout;
 - (NSDictionary<NSString *, id> * _Nullable)readAttributePresetsSchedulesEditableWithParams:(MTRReadParams * _Nullable)params
 {
     return [self.device readAttributeWithEndpointID:self.endpointID clusterID:@(MTRClusterIDTypeThermostatID) attributeID:@(MTRAttributeIDTypeClusterThermostatAttributePresetsSchedulesEditableID) params:params];
-}
-
-- (NSDictionary<NSString *, id> * _Nullable)readAttributeTemperatureSetpointHoldPolicyWithParams:(MTRReadParams * _Nullable)params
-{
-    return [self.device readAttributeWithEndpointID:self.endpointID clusterID:@(MTRClusterIDTypeThermostatID) attributeID:@(MTRAttributeIDTypeClusterThermostatAttributeTemperatureSetpointHoldPolicyID) params:params];
 }
 
 - (NSDictionary<NSString *, id> * _Nullable)readAttributeSetpointHoldExpiryTimestampWithParams:(MTRReadParams * _Nullable)params
@@ -17221,6 +17222,11 @@ using chip::System::Clock::Timeout;
     return [self.device readAttributeWithEndpointID:self.endpointID clusterID:@(MTRClusterIDTypeWiFiNetworkManagementID) attributeID:@(MTRAttributeIDTypeClusterWiFiNetworkManagementAttributeSSIDID) params:params];
 }
 
+- (NSDictionary<NSString *, id> * _Nullable)readAttributePassphraseSurrogateWithParams:(MTRReadParams * _Nullable)params
+{
+    return [self.device readAttributeWithEndpointID:self.endpointID clusterID:@(MTRClusterIDTypeWiFiNetworkManagementID) attributeID:@(MTRAttributeIDTypeClusterWiFiNetworkManagementAttributePassphraseSurrogateID) params:params];
+}
+
 - (NSDictionary<NSString *, id> * _Nullable)readAttributeGeneratedCommandListWithParams:(MTRReadParams * _Nullable)params
 {
     return [self.device readAttributeWithEndpointID:self.endpointID clusterID:@(MTRClusterIDTypeWiFiNetworkManagementID) attributeID:@(MTRAttributeIDTypeClusterWiFiNetworkManagementAttributeGeneratedCommandListID) params:params];
@@ -17502,9 +17508,6 @@ using chip::System::Clock::Timeout;
     };
 
     auto * timedInvokeTimeoutMs = params.timedInvokeTimeoutMs;
-    if (timedInvokeTimeoutMs == nil) {
-        timedInvokeTimeoutMs = @(MTR_DEFAULT_TIMED_INTERACTION_TIMEOUT_MS);
-    }
 
     using RequestType = ThreadNetworkDirectory::Commands::GetOperationalDataset::Type;
     [self.device _invokeKnownCommandWithEndpointID:self.endpointID

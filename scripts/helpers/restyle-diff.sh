@@ -21,9 +21,10 @@
 #  you've written is kosher to CI
 #
 # Usage:
-#  restyle-diff.sh [ref]
+#  restyle-diff.sh [-d] [ref]
 #
 # if unspecified, ref defaults to upstream/master (or master)
+# -d sets container's log level to DEBUG, if unspecified the default log level will remain (info level)
 #
 
 here=${0%/*}
@@ -33,20 +34,55 @@ set -e
 CHIP_ROOT=$(cd "$here/../.." && pwd)
 cd "$CHIP_ROOT"
 
-restyle-paths() {
-    if hash restyle-path 2>/dev/null; then
-        echo "$@" | xargs restyle-path
+docker_run() {
+    if [ -t 0 ]; then
+        exec docker run --tty "$@"
+
     else
-        url=https://github.com/restyled-io/restyler/raw/main/bin/restyle-path
-        echo "$@" | xargs sh <(curl --location --proto "=https" --tlsv1.2 "$url" -sSf)
+        exec docker run "$@"
+
     fi
 }
 
-ref="$1"
+restyle-paths() {
+
+    image=restyled/restyler:edge
+
+    for path in "$@"; do
+        (
+            docker_run --tty --interactive --rm \
+                --env LOG_LEVEL \
+                --env LOG_DESTINATION \
+                --env LOG_FORMAT \
+                --env LOG_COLOR \
+                --env HOST_DIRECTORY="$PWD" \
+                --env UNRESTRICTED=1 \
+                --volume "$PWD":/code \
+                --volume /tmp:/tmp \
+                --volume /var/run/docker.sock:/var/run/docker.sock \
+                --entrypoint restyle-path \
+                "$image" "$path"
+        )
+    done
+}
+
+while [[ $# -gt 0 ]]; do
+    case "$1" in
+        -d)
+            export LOG_LEVEL="DEBUG"
+            shift
+            ;;
+        *)
+            ref="$1"
+            shift
+            ;;
+    esac
+done
+
 if [[ -z "$ref" ]]; then
     ref="master"
     git remote | grep -qxF upstream && ref="upstream/master"
 fi
 
-declare -a paths=("$(git diff --ignore-submodules --name-only --merge-base "$ref")")
+mapfile -t paths < <(git diff --ignore-submodules --name-only --merge-base "$ref")
 restyle-paths "${paths[@]}"
