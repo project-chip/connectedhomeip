@@ -19,7 +19,7 @@
 
 NS_ASSUME_NONNULL_BEGIN
 
-@implementation MTRDataTypeTestGlobalStruct
+@implementation MTRGlobalsClusterTestGlobalStruct
 - (instancetype)init
 {
     if (self = [super init]) {
@@ -35,7 +35,7 @@ NS_ASSUME_NONNULL_BEGIN
 
 - (id)copyWithZone:(NSZone * _Nullable)zone
 {
-    auto other = [[MTRDataTypeTestGlobalStruct alloc] init];
+    auto other = [[MTRGlobalsClusterTestGlobalStruct alloc] init];
 
     other.name = self.name;
     other.myBitmap = self.myBitmap;

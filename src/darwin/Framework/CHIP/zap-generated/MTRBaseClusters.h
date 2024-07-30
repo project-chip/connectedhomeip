@@ -17137,10 +17137,10 @@ MTR_DEPRECATED("Please use MTRBaseClusterUnitTesting", ios(16.1, 16.4), macos(13
 @interface MTRBaseClusterTestCluster : MTRBaseClusterUnitTesting
 @end
 
-typedef NS_ENUM(uint8_t, MTRDataTypeTestGlobalEnum) {
-    MTRDataTypeTestGlobalEnumSomeValue MTR_PROVISIONALLY_AVAILABLE = 0x00,
-    MTRDataTypeTestGlobalEnumSomeOtherValue MTR_PROVISIONALLY_AVAILABLE = 0x01,
-    MTRDataTypeTestGlobalEnumFinalValue MTR_PROVISIONALLY_AVAILABLE = 0x02,
+typedef NS_ENUM(uint8_t, MTRGlobalsTestGlobal) {
+    MTRGlobalsTestGlobalSomeValue MTR_PROVISIONALLY_AVAILABLE = 0x00,
+    MTRGlobalsTestGlobalSomeOtherValue MTR_PROVISIONALLY_AVAILABLE = 0x01,
+    MTRGlobalsTestGlobalFinalValue MTR_PROVISIONALLY_AVAILABLE = 0x02,
 } MTR_PROVISIONALLY_AVAILABLE;
 
 typedef NS_ENUM(uint8_t, MTRIdentifyEffectIdentifier) {

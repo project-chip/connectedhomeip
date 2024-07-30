@@ -53,8 +53,8 @@ tests:
               - name: "expectedValue"
                 value: "y"
 
-    - label: "Step 3a:  Test Harness writes to the Presets attribute after calling the StartPresetsSchedulesEditRequest command"
-      PICS: TSTAT.S.F08 && TSTAT.C.C07.Tx
+    - label: "Step 3a: Test Harness writes to the Presets attribute after calling the StartPresetsSchedulesEditRequest command"
+      PICS: TSTAT.S.F08 && TSTAT.S.C07.Rsp
       verification: |
           Optional Attribute - If it is supported, then in TH log it will results in displaying the value, else it will display UNSUPPORTED_ATTRIBUTE. Below is the log of RPI the result may be vary on the basis of dut implementation.
 
@@ -75,7 +75,7 @@ tests:
               - name: "expectedValue"
                 value: "y"
 
-    - label: "Step 3b:  Test Harness writes to the Presets attribute adding 3 presets for Sleep, Wake and GoingToSleep"
+    - label: "Step 3b: Test Harness writes to the Presets attribute adding 3 presets for Sleep, Wake and GoingToSleep"
       PICS: TSTAT.S.F08 && TSTAT.S.A0050
       verification: |
           Optional Attribute - If it is supported, then in TH log it will results in displaying the value, else it will display UNSUPPORTED_ATTRIBUTE. Below is the log of RPI the result may be vary on the basis of dut implementation.
@@ -242,7 +242,7 @@ tests:
                 value: "y"
 
     - label: "Step 3d:  Test Harness calls the CommitPresetsSchedulesRequest command"
-      PICS: TSTAT.S.F08 && TSTAT.C.C09.Tx
+      PICS: TSTAT.S.F08 && TSTAT.S.C09.Rsp
       verification: |
           Optional Attribute - If it is supported, then in TH log it will results in displaying the value, else it will display UNSUPPORTED_ATTRIBUTE. Below is the log of RPI the result may be vary on the basis of dut implementation.
 
@@ -323,7 +323,7 @@ tests:
                 value: "y"
 
     - label: "Step 4a:  Test Harness writes to the Presets attribute wherein a built-in preset is removed"
-      PICS: TSTAT.S.F08 && TSTAT.C.C07.Tx
+      PICS: TSTAT.S.F08 && TSTAT.S.C07.Rsp
       verification: |
           Optional Attribute - If it is supported, then in TH log it will results in displaying the value, else it will display UNSUPPORTED_ATTRIBUTE. Below is the log of RPI the result may be vary on the basis of dut implementation.
 
@@ -458,7 +458,7 @@ tests:
                 value: "y"
 
     - label: "Step 4c:  Test Harness calls the CommitPresetsSchedulesRequest command"
-      PICS: TSTAT.S.F08 && TSTAT.C.C09.Tx
+      PICS: TSTAT.S.F08 && TSTAT.S.C09.Rsp
       verification: |
           Optional Attribute - If it is supported, then in TH log it will results in displaying the value, else it will display UNSUPPORTED_ATTRIBUTE. Below is the log of RPI the result may be vary on the basis of dut implementation.
 
@@ -480,7 +480,7 @@ tests:
                 value: "y"
 
     - label: "Step 5a:  Test Harness writes to the Presets attribute wherein a preset is removed such that its handle matches the active preset handle"
-      PICS: TSTAT.S.F08 && TSTAT.C.C06.Tx
+      PICS: TSTAT.S.F08 && TSTAT.S.C06.Rsp
       verification: |
           Optional Attribute - If it is supported, then in TH log it will results in displaying the value, else it will display UNSUPPORTED_ATTRIBUTE. Below is the log of RPI the result may be vary on the basis of dut implementation.
 
@@ -524,7 +524,7 @@ tests:
                 value: "y"
 
     - label: "Step 5c:  Test Harness calls StartPresetsSchedulesEditRequest"
-      PICS: TSTAT.S.F08 && TSTAT.C.C07.Tx
+      PICS: TSTAT.S.F08 && TSTAT.S.C07.Rsp
       verification: |
           Optional Attribute - If it is supported, then in TH log it will results in displaying the value, else it will display UNSUPPORTED_ATTRIBUTE. Below is the log of RPI the result may be vary on the basis of dut implementation.
 
@@ -676,7 +676,7 @@ tests:
                 value: "y"
 
     - label: "Step 5e:  Test Harness calls the CommitPresetsSchedulesRequest command"
-      PICS: TSTAT.S.F08 && TSTAT.C.C09.Tx
+      PICS: TSTAT.S.F08 && TSTAT.S.C09.Rsp
       verification: |
           Optional Attribute - If it is supported, then in TH log it will results in displaying the value, else it will display UNSUPPORTED_ATTRIBUTE. Below is the log of RPI the result may be vary on the basis of dut implementation.
 
@@ -698,7 +698,7 @@ tests:
                 value: "y"
 
     - label: "Step 6a:  Test Harness writes to the Presets attribute wherein a built-in preset is modified to a non built-in preset"
-      PICS: TSTAT.S.F08 && TSTAT.C.C07.Tx
+      PICS: TSTAT.S.F08 && TSTAT.S.C07.Rsp
       verification: |
           Optional Attribute - If it is supported, then in TH log it will results in displaying the value, else it will display UNSUPPORTED_ATTRIBUTE. Below is the log of RPI the result may be vary on the basis of dut implementation.
 
@@ -850,7 +850,7 @@ tests:
                 value: "y"
 
     - label: "Step 6c:  Test Harness calls the CommitPresetsSchedulesRequest command"
-      PICS: TSTAT.S.F08 && TSTAT.C.C09.Tx
+      PICS: TSTAT.S.F08 && TSTAT.S.C09.Rsp
       verification: |
           Optional Attribute - If it is supported, then in TH log it will results in displaying the value, else it will display UNSUPPORTED_ATTRIBUTE. Below is the log of RPI the result may be vary on the basis of dut implementation.
 
@@ -872,7 +872,7 @@ tests:
                 value: "y"
 
     - label: "Step 7a:  Test Harness writes to the Presets attribute wherein a new preset is added with the builtIn flag set to true"
-      PICS: TSTAT.S.F08 && TSTAT.C.C07.Tx
+      PICS: TSTAT.S.F08 && TSTAT.S.C07.Rsp
       verification: |
           Optional Attribute - If it is supported, then in TH log it will results in displaying the value, else it will display UNSUPPORTED_ATTRIBUTE. Below is the log of RPI the result may be vary on the basis of dut implementation.
 
@@ -1024,7 +1024,7 @@ tests:
                 value: "y"
 
     - label: "Step 7c:  Test Harness calls the CommitPresetsSchedulesRequest command"
-      PICS: TSTAT.S.F08 && TSTAT.C.C09.Tx
+      PICS: TSTAT.S.F08 && TSTAT.S.C09.Rsp
       verification: |
           Optional Attribute - If it is supported, then in TH log it will results in displaying the value, else it will display UNSUPPORTED_ATTRIBUTE. Below is the log of RPI the result may be vary on the basis of dut implementation.
 
@@ -1046,7 +1046,7 @@ tests:
                 value: "y"
 
     - label: "Step 8a:  Test Harness writes to the Presets attribute with a preset having a non-null preset handle that doesn't exist in the Presets attribute"
-      PICS: TSTAT.S.F08 && TSTAT.C.C07.Tx
+      PICS: TSTAT.S.F08 && TSTAT.S.C07.Rsp
       verification: |
           Optional Attribute - If it is supported, then in TH log it will results in displaying the value, else it will display UNSUPPORTED_ATTRIBUTE. Below is the log of RPI the result may be vary on the basis of dut implementation.
 
@@ -1198,7 +1198,7 @@ tests:
                 value: "y"
 
     - label: "Step 8c:  Test Harness calls the CommitPresetsSchedulesRequest command"
-      PICS: TSTAT.S.F08 && TSTAT.C.C09.Tx
+      PICS: TSTAT.S.F08 && TSTAT.S.C09.Rsp
       verification: |
           Optional Attribute - If it is supported, then in TH log it will results in displaying the value, else it will display UNSUPPORTED_ATTRIBUTE. Below is the log of RPI the result may be vary on the basis of dut implementation.
 
@@ -1219,7 +1219,7 @@ tests:
                 value: "y"
 
     - label: "Step 9a:  Test Harness writes to the Presets attribute wherein there are 2 presets with the same preset handle"
-      PICS: TSTAT.S.F08 && TSTAT.C.C07.Tx
+      PICS: TSTAT.S.F08 && TSTAT.S.C07.Rsp
       verification: |
           Optional Attribute - If it is supported, then in TH log it will results in displaying the value, else it will display UNSUPPORTED_ATTRIBUTE. Below is the log of RPI the result may be vary on the basis of dut implementation.
 
@@ -1371,7 +1371,7 @@ tests:
                 value: "y"
 
     - label: "Step 9c:  Test Harness calls the CommitPresetsSchedulesRequest command"
-      PICS: TSTAT.S.F08 && TSTAT.C.C09.Tx
+      PICS: TSTAT.S.F08 && TSTAT.S.C09.Rsp
       verification: |
           Optional Attribute - If it is supported, then in TH log it will results in displaying the value, else it will display UNSUPPORTED_ATTRIBUTE. Below is the log of RPI the result may be vary on the basis of dut implementation.
 
@@ -1392,7 +1392,7 @@ tests:
                 value: "y"
 
     - label: "Step 10a:  Test Harness writes to the Presets attribute wherein a built-in preset is modified to be a non built-in preset"
-      PICS: TSTAT.S.F08 && TSTAT.C.C07.Tx
+      PICS: TSTAT.S.F08 && TSTAT.S.C07.Rsp
       verification: |
           Optional Attribute - If it is supported, then in TH log it will results in displaying the value, else it will display UNSUPPORTED_ATTRIBUTE. Below is the log of RPI the result may be vary on the basis of dut implementation.
 
@@ -1544,7 +1544,7 @@ tests:
                 value: "y"
 
     - label: "Step 10c:  Test Harness calls the CommitPresetsSchedulesRequest command"
-      PICS: TSTAT.S.F08 && TSTAT.C.C09.Tx
+      PICS: TSTAT.S.F08 && TSTAT.S.C09.Rsp
       verification: |
           Optional Attribute - If it is supported, then in TH log it will results in displaying the value, else it will display UNSUPPORTED_ATTRIBUTE. Below is the log of RPI the result may be vary on the basis of dut implementation.
 
@@ -1566,7 +1566,7 @@ tests:
                 value: "y"
 
     - label: "Step 11a:  Test Harness writes to the Presets attribute wherein a non built-in preset is modified to a built-in preset"
-      PICS: TSTAT.S.F08 && TSTAT.C.C07.Tx
+      PICS: TSTAT.S.F08 && TSTAT.S.C07.Rsp
       verification: |
           Optional Attribute - If it is supported, then in TH log it will results in displaying the value, else it will display UNSUPPORTED_ATTRIBUTE. Below is the log of RPI the result may be vary on the basis of dut implementation.
 
@@ -1718,7 +1718,7 @@ tests:
                 value: "y"
 
     - label: "Step 11c:  Test Harness calls the CommitPresetsSchedulesRequest command"
-      PICS: TSTAT.S.F08 && TSTAT.C.C09.Tx
+      PICS: TSTAT.S.F08 && TSTAT.S.C09.Rsp
       verification: |
           Optional Attribute - If it is supported, then in TH log it will results in displaying the value, else it will display UNSUPPORTED_ATTRIBUTE. Below is the log of RPI the result may be vary on the basis of dut implementation.
 
@@ -1740,7 +1740,7 @@ tests:
 
 
     - label: "Step 12a:  Test Harness writes to the Presets attribute wherein a preset doesn't support names in the PresetTypeFeatures bitmap but has a name in the write presets command"
-      PICS: TSTAT.S.F08 && TSTAT.C.C07.Tx
+      PICS: TSTAT.S.F08 && TSTAT.S.C07.Rsp
       verification: |
           Optional Attribute - If it is supported, then in TH log it will results in displaying the value, else it will display UNSUPPORTED_ATTRIBUTE. Below is the log of RPI the result may be vary on the basis of dut implementation.
 
@@ -1892,7 +1892,7 @@ tests:
                 value: "y"
 
     - label: "Step 12c:  Test Harness calls the CommitPresetsSchedulesRequest command"
-      PICS: TSTAT.S.F08 && TSTAT.C.C09.Tx
+      PICS: TSTAT.S.F08 && TSTAT.S.C09.Rsp
       verification: |
           Optional Attribute - If it is supported, then in TH log it will results in displaying the value, else it will display UNSUPPORTED_ATTRIBUTE. Below is the log of RPI the result may be vary on the basis of dut implementation.
 
@@ -1915,7 +1915,7 @@ tests:
 #TODO: Add tests for the total number of Presets exceeds the NumberOfPresets supported. Also Add tests for adding presets with preset scenario not present in PresetTypes.
 
     - label: "Step 13a:  Test Harness writes to the Presets attribute but calls CancelPresetsSchedulesEditRequest command to cancel the edit request"
-      PICS: TSTAT.S.F08 && TSTAT.C.C07.Tx
+      PICS: TSTAT.S.F08 && TSTAT.S.C07.Rsp
       verification: |
           Optional Attribute - If it is supported, then in TH log it will results in displaying the value, else it will display UNSUPPORTED_ATTRIBUTE. Below is the log of RPI the result may be vary on the basis of dut implementation.
 
@@ -2068,7 +2068,7 @@ tests:
                 value: "y"
 
     - label: "Step 13c:  Test Harness calls the CancelPresetsSchedulesEditRequest command"
-      PICS: TSTAT.S.F08 && TSTAT.C.C08.Tx
+      PICS: TSTAT.S.F08 && TSTAT.S.C08.Rsp
       verification: |
           Optional Attribute - If it is supported, then in TH log it will results in displaying the value, else it will display UNSUPPORTED_ATTRIBUTE. Below is the log of RPI the result may be vary on the basis of dut implementation.
 

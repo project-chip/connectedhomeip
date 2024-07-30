@@ -335,8 +335,8 @@ struct Type
 {
 public:
     chip::CharSpan name;
-    DataModel::Nullable<chip::BitMask<Globals::TestGlobalBitmap>> myBitmap;
-    Optional<DataModel::Nullable<Globals::TestGlobalEnum>> myEnum;
+    DataModel::Nullable<chip::BitMask<TestGlobalBitmap>> myBitmap;
+    Optional<DataModel::Nullable<TestGlobalEnum>> myEnum;
 
     CHIP_ERROR Decode(TLV::TLVReader & reader);
 
