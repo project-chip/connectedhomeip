@@ -39,6 +39,7 @@ using namespace chip;
 using namespace chip::app;
 using namespace chip::app::Clusters;
 using namespace chip::app::Clusters::AdministratorCommissioning;
+using namespace chip::app::Clusters::BridgedDeviceBasicInformation;
 
 namespace {
 
@@ -122,7 +123,7 @@ void AdministratorCommissioningCommandHandler::InvokeCommand(HandlerContext & ha
     EndpointId endpointId = handlerContext.mRequestPath.mEndpointId;
     ChipLogProgress(NotSpecified, "Received command to open commissioning window on Endpoint: %d", endpointId);
 
-    if (handlerContext.mRequestPath.mCommandId != Commands::OpenCommissioningWindow::Id || endpointId == kRootEndpointId)
+    if (handlerContext.mRequestPath.mCommandId != AdministratorCommissioning::Commands::OpenCommissioningWindow::Id || endpointId == kRootEndpointId)
     {
         // Proceed with default handling in Administrator Commissioning Server
         return;
@@ -130,7 +131,7 @@ void AdministratorCommissioningCommandHandler::InvokeCommand(HandlerContext & ha
 
     handlerContext.SetCommandHandled();
 
-    Commands::OpenCommissioningWindow::DecodableType commandData;
+    AdministratorCommissioning::Commands::OpenCommissioningWindow::DecodableType commandData;
     if (DataModel::Decode(handlerContext.mPayload, commandData) != CHIP_NO_ERROR)
     {
         handlerContext.mCommandHandler.AddStatus(handlerContext.mRequestPath, Status::InvalidCommand);
@@ -166,7 +167,37 @@ void AdministratorCommissioningCommandHandler::InvokeCommand(HandlerContext & ha
     handlerContext.mCommandHandler.AddStatus(handlerContext.mRequestPath, status);
 }
 
+class BridgedDeviceInformationCommandHandler : public CommandHandlerInterface
+{
+public:
+    // Register for the BridgedDeviceBasicInformation cluster on all endpoints.
+    BridgedDeviceInformationCommandHandler() :
+        CommandHandlerInterface(Optional<EndpointId>::Missing(), BridgedDeviceBasicInformation::Id)
+    {}
+
+    void InvokeCommand(HandlerContext & handlerContext) override;
+};
+
+void BridgedDeviceInformationCommandHandler::InvokeCommand(HandlerContext & handlerContext)
+{
+    using Protocols::InteractionModel::Status;
+
+    EndpointId endpointId = handlerContext.mRequestPath.mEndpointId;
+
+    if (handlerContext.mRequestPath.mCommandId != BridgedDeviceBasicInformation::Commands::KeepActive::Id)
+    {
+        // Proceed with default handling in BridgedDeviceBasicInformation Server
+        return;
+    }
+
+    ChipLogProgress(NotSpecified, "Received command to KeepActive on Endpoint: %d", endpointId);
+
+    handlerContext.SetCommandHandled();
+    handlerContext.mCommandHandler.AddStatus(handlerContext.mRequestPath, Status::Success);
+}
+
 AdministratorCommissioningCommandHandler gAdministratorCommissioningCommandHandler;
+BridgedDeviceInformationCommandHandler gBridgedDeviceInformationCommandHandler;
 
 } // namespace
 
@@ -175,6 +206,7 @@ void ApplicationInit()
     ChipLogDetail(NotSpecified, "Fabric-Bridge: ApplicationInit()");
 
     CommandHandlerInterfaceRegistry::RegisterCommandHandler(&gAdministratorCommissioningCommandHandler);
+    CommandHandlerInterfaceRegistry::RegisterCommandHandler(&gBridgedDeviceInformationCommandHandler);
 
 #if defined(PW_RPC_FABRIC_BRIDGE_SERVICE) && PW_RPC_FABRIC_BRIDGE_SERVICE
     InitRpcServer(kFabricBridgeServerPort);
