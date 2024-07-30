@@ -897,6 +897,14 @@ NSString * MTRAttributeNameForID(MTRClusterIDType clusterID, MTRAttributeIDType 
             result = @"AccessControlEntriesPerFabric";
             break;
 
+        case MTRAttributeIDTypeClusterAccessControlAttributeCommissioningARLID:
+            result = @"CommissioningARL";
+            break;
+
+        case MTRAttributeIDTypeClusterAccessControlAttributeARLID:
+            result = @"ARL";
+            break;
+
         case MTRAttributeIDTypeClusterAccessControlAttributeGeneratedCommandListID:
             result = @"GeneratedCommandList";
             break;
@@ -1531,6 +1539,22 @@ NSString * MTRAttributeNameForID(MTRClusterIDType clusterID, MTRAttributeIDType 
 
         case MTRAttributeIDTypeClusterGeneralCommissioningAttributeSupportsConcurrentConnectionID:
             result = @"SupportsConcurrentConnection";
+            break;
+
+        case MTRAttributeIDTypeClusterGeneralCommissioningAttributeTCAcceptedVersionID:
+            result = @"TCAcceptedVersion";
+            break;
+
+        case MTRAttributeIDTypeClusterGeneralCommissioningAttributeTCMinRequiredVersionID:
+            result = @"TCMinRequiredVersion";
+            break;
+
+        case MTRAttributeIDTypeClusterGeneralCommissioningAttributeTCAcknowledgementsID:
+            result = @"TCAcknowledgements";
+            break;
+
+        case MTRAttributeIDTypeClusterGeneralCommissioningAttributeTCAcknowledgementsRequiredID:
+            result = @"TCAcknowledgementsRequired";
             break;
 
         case MTRAttributeIDTypeClusterGeneralCommissioningAttributeGeneratedCommandListID:
@@ -5769,10 +5793,6 @@ NSString * MTRAttributeNameForID(MTRClusterIDType clusterID, MTRAttributeIDType 
             result = @"PresetsSchedulesEditable";
             break;
 
-        case MTRAttributeIDTypeClusterThermostatAttributeTemperatureSetpointHoldPolicyID:
-            result = @"TemperatureSetpointHoldPolicy";
-            break;
-
         case MTRAttributeIDTypeClusterThermostatAttributeSetpointHoldExpiryTimestampID:
             result = @"SetpointHoldExpiryTimestamp";
             break;
@@ -7417,6 +7437,10 @@ NSString * MTRAttributeNameForID(MTRClusterIDType clusterID, MTRAttributeIDType 
             // Cluster WiFiNetworkManagement attributes
         case MTRAttributeIDTypeClusterWiFiNetworkManagementAttributeSSIDID:
             result = @"SSID";
+            break;
+
+        case MTRAttributeIDTypeClusterWiFiNetworkManagementAttributePassphraseSurrogateID:
+            result = @"PassphraseSurrogate";
             break;
 
         case MTRAttributeIDTypeClusterWiFiNetworkManagementAttributeGeneratedCommandListID:
