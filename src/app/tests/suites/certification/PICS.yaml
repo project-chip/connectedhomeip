@@ -6458,19 +6458,23 @@ PICS:
       id: TSTAT.S.C04.Rsp
 
     - label:
-          "Does the device implement receiving the SetActivePresetRequest command?"
+          "Does the device implement receiving the SetActivePresetRequest
+          command?"
       id: TSTAT.S.C06.Rsp
 
     - label:
-          "Does the device implement receiving the StartPresetsSchedulesEditRequest command?"
+          "Does the device implement receiving the
+          StartPresetsSchedulesEditRequest command?"
       id: TSTAT.S.C07.Rsp
 
     - label:
-          "Does the device implement receiving the CancelPresetsSchedulesEditRequest command?"
+          "Does the device implement receiving the
+          CancelPresetsSchedulesEditRequest command?"
       id: TSTAT.S.C08.Rsp
 
     - label:
-          "Does the device implement receiving the CommitPresetsSchedulesRequest command?"
+          "Does the device implement receiving the CommitPresetsSchedulesRequest
+          command?"
       id: TSTAT.S.C09.Rsp
 
     #
@@ -6559,15 +6563,18 @@ PICS:
       id: TSTAT.C.C06.Tx
 
     - label:
-          "Does the device implement sending the StartPresetsSchedulesEditRequest command?"
+          "Does the device implement sending the
+          StartPresetsSchedulesEditRequest command?"
       id: TSTAT.C.C07.Tx
 
     - label:
-          "Does the device implement sending the CancelPresetsSchedulesEditRequest command?"
+          "Does the device implement sending the
+          CancelPresetsSchedulesEditRequest command?"
       id: TSTAT.C.C08.Tx
 
     - label:
-          "Does the device implement sending the CommitPresetsSchedulesRequest command?"
+          "Does the device implement sending the CommitPresetsSchedulesRequest
+          command?"
       id: TSTAT.C.C09.Tx
 
     #
