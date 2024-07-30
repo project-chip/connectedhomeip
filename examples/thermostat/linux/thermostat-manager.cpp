@@ -399,7 +399,7 @@ void ThermostatManager::EvalThermostatState()
 void ThermostatManager::UpdateRunningModeForHeating()
 {
     const int16_t heatingOnThreshold  = mOccupiedHeatingSetpoint - static_cast<int16_t>(mOccupiedSetback * 10);
-    const int16_t heatingOffThreshold = mOccupiedHeatingSetpoint - static_cast<int16_t>(mOccupiedSetback * 10);
+    const int16_t heatingOffThreshold = mOccupiedHeatingSetpoint + static_cast<int16_t>(mOccupiedSetback * 10);
 
     if (mRunningMode == ThermostatRunningModeEnum::kHeat)
     {
