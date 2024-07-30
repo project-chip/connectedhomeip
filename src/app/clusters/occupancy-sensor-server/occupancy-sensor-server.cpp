@@ -1,6 +1,6 @@
 /**
  *
- *    Copyright (c) 2020 Project CHIP Authors
+ *    Copyright (c) 2020-2024 Project CHIP Authors
  *
  *    Licensed under the Apache License, Version 2.0 (the "License");
  *    you may not use this file except in compliance with the License.
@@ -16,12 +16,158 @@
  */
 
 #include "occupancy-sensor-server.h"
-
-#include <app-common/zap-generated/attributes/Accessors.h>
-
 #include "occupancy-hal.h"
 
+#include <app/AttributeAccessInterfaceRegistry.h>
+#include <app/EventLogging.h>
+#include <app/data-model/Encode.h>
+#include <app/reporting/reporting.h>
+#include <app/util/attribute-storage.h>
+#include <lib/core/CHIPError.h>
+
+using chip::Protocols::InteractionModel::Status;
+
+namespace chip {
+namespace app {
+namespace Clusters {
+namespace OccupancySensing {
+
+namespace {
+Structs::HoldTimeLimitsStruct::Type
+    sHoldTimeLimitsStructs[MATTER_DM_OCCUPANCY_SENSING_CLUSTER_SERVER_ENDPOINT_COUNT + CHIP_DEVICE_CONFIG_DYNAMIC_ENDPOINT_COUNT];
+
+uint16_t sHoldTime[MATTER_DM_OCCUPANCY_SENSING_CLUSTER_SERVER_ENDPOINT_COUNT + CHIP_DEVICE_CONFIG_DYNAMIC_ENDPOINT_COUNT];
+} // namespace
+
+CHIP_ERROR OccupancySensingAttrAccess::Init()
+{
+    VerifyOrReturnError(registerAttributeAccessOverride(this), CHIP_ERROR_INCORRECT_STATE);
+    return CHIP_NO_ERROR;
+}
+
+void OccupancySensingAttrAccess::Shutdown()
+{
+    unregisterAttributeAccessOverride(this);
+}
+
+CHIP_ERROR OccupancySensingAttrAccess::Read(const ConcreteReadAttributePath & aPath, AttributeValueEncoder & aEncoder)
+{
+    VerifyOrDie(aPath.mClusterId == app::Clusters::OccupancySensing::Id);
+
+    switch (aPath.mAttributeId)
+    {
+    case Attributes::FeatureMap::Id:
+        ReturnErrorOnFailure(aEncoder.Encode(mFeature));
+        break;
+    case Attributes::HoldTime::Id: {
+
+        uint16_t * holdTime = GetHoldTimeForEndpoint(aPath.mEndpointId);
+
+        if (holdTime == nullptr)
+        {
+            return CHIP_ERROR_NOT_FOUND;
+        }
+
+        return aEncoder.Encode(*holdTime);
+    }
+    case Attributes::HoldTimeLimits::Id: {
+
+        Structs::HoldTimeLimitsStruct::Type * holdTimeLimitsStruct = GetHoldTimeLimitsForEndpoint(aPath.mEndpointId);
+
+        if (holdTimeLimitsStruct == nullptr)
+        {
+            return CHIP_ERROR_NOT_FOUND;
+        }
+
+        return aEncoder.Encode(*holdTimeLimitsStruct);
+    }
+    default:
+        return CHIP_NO_ERROR;
+    }
+
+    return CHIP_NO_ERROR;
+}
+
+bool OccupancySensingAttrAccess::HasFeature(Feature aFeature) const
+{
+    return mFeature.Has(aFeature);
+}
+
+Structs::HoldTimeLimitsStruct::Type * GetHoldTimeLimitsForEndpoint(EndpointId endpoint)
+{
+    auto index = emberAfGetClusterServerEndpointIndex(endpoint, app::Clusters::OccupancySensing::Id,
+                                                      MATTER_DM_OCCUPANCY_SENSING_CLUSTER_SERVER_ENDPOINT_COUNT);
+
+    if (index == kEmberInvalidEndpointIndex)
+    {
+        return nullptr;
+    }
+
+    if (index >= ArraySize(sHoldTimeLimitsStructs))
+    {
+        ChipLogError(NotSpecified, "Internal error: invalid/unexpected hold time limits index.");
+        return nullptr;
+    }
+    return &sHoldTimeLimitsStructs[index];
+}
+
+CHIP_ERROR SetHoldTimeLimits(EndpointId endpointId, const Structs::HoldTimeLimitsStruct::Type & holdTimeLimits)
+{
+
+    VerifyOrReturnError(kInvalidEndpointId != endpointId, CHIP_ERROR_INVALID_ARGUMENT);
+
+    Structs::HoldTimeLimitsStruct::Type * holdTimeLimitsForEndpoint = GetHoldTimeLimitsForEndpoint(endpointId);
+    VerifyOrReturnError(holdTimeLimitsForEndpoint != nullptr, CHIP_ERROR_INVALID_ARGUMENT);
+
+    holdTimeLimitsForEndpoint->holdTimeMin     = holdTimeLimits.holdTimeMin;
+    holdTimeLimitsForEndpoint->holdTimeMax     = holdTimeLimits.holdTimeMax;
+    holdTimeLimitsForEndpoint->holdTimeDefault = holdTimeLimits.holdTimeDefault;
+
+    MatterReportingAttributeChangeCallback(endpointId, OccupancySensing::Id, Attributes::HoldTimeLimits::Id);
+
+    return CHIP_NO_ERROR;
+}
+
+uint16_t * GetHoldTimeForEndpoint(EndpointId endpoint)
+{
+    auto index = emberAfGetClusterServerEndpointIndex(endpoint, app::Clusters::OccupancySensing::Id,
+                                                      MATTER_DM_OCCUPANCY_SENSING_CLUSTER_SERVER_ENDPOINT_COUNT);
+
+    if (index == kEmberInvalidEndpointIndex)
+    {
+        return nullptr;
+    }
+
+    if (index >= ArraySize(sHoldTimeLimitsStructs))
+    {
+        ChipLogError(NotSpecified, "Internal error: invalid/unexpected hold time index.");
+        return nullptr;
+    }
+    return &sHoldTime[index];
+}
+
+CHIP_ERROR SetHoldTime(EndpointId endpointId, const uint16_t & holdTime)
+{
+    VerifyOrReturnError(kInvalidEndpointId != endpointId, CHIP_ERROR_INVALID_ARGUMENT);
+
+    uint16_t * holdTimeForEndpoint = GetHoldTimeForEndpoint(endpointId);
+    VerifyOrReturnError(holdTimeForEndpoint != nullptr, CHIP_ERROR_INVALID_ARGUMENT);
+
+    *holdTimeForEndpoint = holdTime;
+
+    MatterReportingAttributeChangeCallback(endpointId, OccupancySensing::Id, Attributes::HoldTime::Id);
+
+    return CHIP_NO_ERROR;
+}
+
+} // namespace OccupancySensing
+} // namespace Clusters
+} // namespace app
+} // namespace chip
+
 using namespace chip;
+using namespace chip::app;
+using namespace chip::app::Clusters;
 using namespace chip::app::Clusters::OccupancySensing;
 
 //******************************************************************************
@@ -59,8 +205,6 @@ void emberAfOccupancySensingClusterServerInitCallback(EndpointId endpoint)
         break;
     }
     Attributes::OccupancySensorTypeBitmap::Set(endpoint, deviceTypeBitmap);
-
-    emberAfPluginOccupancyClusterServerPostInitCallback(endpoint);
 }
 
 //******************************************************************************
@@ -81,8 +225,6 @@ void halOccupancyStateChangedCallback(EndpointId endpoint, HalOccupancyState occ
 
     Attributes::Occupancy::Set(endpoint, occupancyState);
 }
-
-void emberAfPluginOccupancyClusterServerPostInitCallback(EndpointId endpoint) {}
 
 HalOccupancySensorType __attribute__((weak)) halOccupancyGetSensorType(EndpointId endpoint)
 {
