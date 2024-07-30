@@ -24,6 +24,7 @@
  */
 
 #include "InteractionModelEngine.h"
+#include "lib/core/CHIPError.h"
 
 #include <cinttypes>
 
@@ -1711,16 +1712,45 @@ DataModel::Provider * InteractionModelEngine::SetDataModelProvider(DataModel::Pr
     // Alternting data model should not be done while IM is actively handling requests.
     VerifyOrDie(mReadHandlers.begin() == mReadHandlers.end());
 
-    DataModel::Provider * oldModel = GetDataModelProvider();
-    mDataModelProvider             = model;
+    DataModel::Provider * oldModel = mDataModelProvider;
+    if (oldModel != nullptr)
+    {
+        CHIP_ERROR err = oldModel->Shutdown();
+        if (err != CHIP_NO_ERROR)
+        {
+            ChipLogError(InteractionModel, "Failure on interaction model shutdown: %" CHIP_ERROR_FORMAT, err.Format());
+        }
+    }
+
+    mDataModelProvider = model;
+    if (mDataModelProvider != nullptr)
+    {
+        DataModel::InteractionModelContext context;
+
+        // TODO: one by one
+        context.eventsGenerator = &EventManagement::GetInstance();
+        // context.dataModelChangeListener = this;
+        // context.actionContext = this;
+
+
+        CHIP_ERROR err = mDataModelProvider->Startup(context);
+        if (err != CHIP_NO_ERROR)
+        {
+            ChipLogError(InteractionModel, "Failure on interaction model startup: %" CHIP_ERROR_FORMAT, err.Format());
+        }
+    }
+
     return oldModel;
 }
 
-DataModel::Provider * InteractionModelEngine::GetDataModelProvider() const
+DataModel::Provider * InteractionModelEngine::GetDataModelProvider()
 {
 #if CHIP_CONFIG_USE_DATA_MODEL_INTERFACE
-    // TODO: this should be temporary, we should fully inject the data model
-    VerifyOrReturnValue(mDataModelProvider != nullptr, CodegenDataModelProviderInstance());
+    if (mDataModelProvider == nullptr)
+    {
+        // Generally this is expected to be thread safe as these should be called within the CHIP processing loop.
+        SetDataModelProvider(CodegenDataModelProviderInstance());
+    }
 #endif
     return mDataModelProvider;
 }
