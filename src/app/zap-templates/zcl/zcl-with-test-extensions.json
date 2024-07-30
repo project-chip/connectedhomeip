@@ -662,7 +662,7 @@
             "ThreadNetworks",
             "ThreadNetworkTableSize"
         ],
-        "Service Area": ["CurrentLocation", "EstimatedEndTime"]
+        "Service Area": ["CurrentLocation", "EstimatedEndTime", "FeatureMap"]
     },
     "defaultReportingPolicy": "mandatory",
     "ZCLDataTypes": ["ARRAY", "BITMAP", "ENUM", "NUMBER", "STRING", "STRUCT"],
