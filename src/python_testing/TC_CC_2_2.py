@@ -72,7 +72,7 @@ class TC_CC_2_3(MatterBaseTest):
                 TestStep(15, verify_entry_count('CurrentSaturation'), entry_count_verification()),
                 TestStep(16, 'If XY feature is not supported, skip steps 17-21'),
                 TestStep(
-                    17, f"{THcommand} MoveToColor with _ColorX_ field set to 65279, _ColorY_ set to 65279, _TransitionTime_ field set to 100 and remaining fields set to 0"),
+                    17, f"{THcommand} MoveToColor with _ColorX_ field set to 13107, _ColorY_ set to 13107, _TransitionTime_ field set to 100 and remaining fields set to 0"),
                 TestStep(18, store_values('CurrentX')),
                 TestStep(19, store_values('CurrentY')),
                 TestStep(20, verify_entry_count('CurrentX'), entry_count_verification()),
@@ -86,12 +86,12 @@ class TC_CC_2_3(MatterBaseTest):
                 TestStep(
                     28, f"If HS feature is supported and XY feature is not supported, {THcommand} MoveToHue with _Hue_ field set to 254, _TransitionTime_ field set to 100, _Direction_ field set to Shortest and remaining fields set to 0", verify_success()),
                 TestStep(
-                    29, f"If the XY feature is supported and the HS feature is not supported, {THcommand} MoveToColor with _ColorX_ field set to 65279, _ColorY_ set to 65279, _TransitionTime_ field set to 100 and remaining fields set to 0", verify_success()),
+                    29, f"If the XY feature is supported and the HS feature is not supported, {THcommand} MoveToColor with _ColorX_ field set to 13107, _ColorY_ set to 13107, _TransitionTime_ field set to 100 and remaining fields set to 0", verify_success()),
                 TestStep(30, "Wait for 5 seconds"),
                 TestStep(
                     31, f"If HS feature is supported and XY feature is not supported, {THcommand} MoveToHue with _Hue_ field set to 254, _TransitionTime_ field set to 150, _Direction_ field set to Shortest and remaining fields set to 0", verify_success()),
                 TestStep(
-                    32, f"If the XY feature is supported and the HS feature is not supported, {THcommand} MoveToColor with _ColorX_ field set to 65279, _ColorY_ set to 65279, _TransitionTime_ field set to 150 and remaining fields set to 0", verify_success()),
+                    32, f"If the XY feature is supported and the HS feature is not supported, {THcommand} MoveToColor with _ColorX_ field set to 13107, _ColorY_ set to 13107, _TransitionTime_ field set to 150 and remaining fields set to 0", verify_success()),
                 TestStep(33, "Wait for 20 seconds"),
                 TestStep(34, "TH verifies _reportedRemainingTimeValuesList_ contains three entries",
                          "_reportedRemainingTimeValuesList_ has 3 entries in the list"),
@@ -105,9 +105,7 @@ class TC_CC_2_3(MatterBaseTest):
 
     @per_endpoint_test(has_cluster(Clusters.ColorControl))
     async def test_TC_CC_2_2(self):
-        # TODO: make configurable for ci?
-        is_ci = self.check_pics('PICS_SDK_CI_ONLY')
-        gather_time = 10 if is_ci else 30
+        gather_time = 20
 
         # commissioning - already done
         self.step(1)
@@ -158,8 +156,8 @@ class TC_CC_2_3(MatterBaseTest):
 
         def check_report_counts(attr: ClusterObjects.ClusterAttributeDescriptor):
             count = sub_handler.attribute_report_counts[attr]
-            # TODO: Test plan says 10, but I'm pretty sure this is supposed to be 30 since it's not more than once per second
-            # asserts.assert_less_equal(count, 10, "More than 10 reports received")
+            # TODO: should be 12 - see issue #34646
+            # asserts.assert_less_equal(count, 12, "More than 12 reports received")
             asserts.assert_less_equal(count, gather_time, f"More than {gather_time} reports received")
 
         self.step(9)
@@ -200,7 +198,7 @@ class TC_CC_2_3(MatterBaseTest):
             self.skip_step(21)
         else:
             self.step(17)
-            cmd = cc.Commands.MoveToColor(colorX=65279, colorY=65279, transitionTime=100)
+            cmd = cc.Commands.MoveToColor(colorX=13107, colorY=13107, transitionTime=100)
             await self.send_single_cmd(cmd)
 
             self.step(18)
@@ -247,7 +245,7 @@ class TC_CC_2_3(MatterBaseTest):
 
         self.step(29)
         if supports_xy and not supports_hs:
-            cmd = cc.Commands.MoveToColor(colorX=65279, colorY=65279, transitionTime=100)
+            cmd = cc.Commands.MoveToColor(colorX=13107, colorY=13107, transitionTime=100)
             await self.send_single_cmd(cmd)
 
         self.step(30)
@@ -261,7 +259,7 @@ class TC_CC_2_3(MatterBaseTest):
 
         self.step(32)
         if supports_xy and not supports_hs:
-            cmd = cc.Commands.MoveToColor(colorX=65279, colorY=65279, transitionTime=150)
+            cmd = cc.Commands.MoveToColor(colorX=13107, colorY=13107, transitionTime=150)
             await self.send_single_cmd(cmd)
 
         self.step(33)
