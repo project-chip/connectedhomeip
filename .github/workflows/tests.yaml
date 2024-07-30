@@ -598,6 +598,7 @@ jobs:
                   scripts/run_in_python_env.sh out/venv './scripts/tests/run_python_test.py --load-from-env /tmp/test_env.yaml --script src/python_testing/TC_RVCOPSTATE_2_4.py'
                   scripts/run_in_python_env.sh out/venv './scripts/tests/run_python_test.py --load-from-env /tmp/test_env.yaml --script src/python_testing/TC_SC_7_1.py'
                   scripts/run_in_python_env.sh out/venv './scripts/tests/run_python_test.py --load-from-env /tmp/test_env.yaml --script src/python_testing/TC_SWTCH.py'
+                  scripts/run_in_python_env.sh out/venv './scripts/tests/run_python_test.py --load-from-env /tmp/test_env.yaml --script src/python_testing/TC_LVL_2_3.py'
                   scripts/run_in_python_env.sh out/venv './scripts/tests/run_python_test.py --load-from-env /tmp/test_env.yaml --script src/python_testing/TCP_Tests.py'
                   scripts/run_in_python_env.sh out/venv './scripts/tests/run_python_test.py --script "src/python_testing/TestConformanceSupport.py" --script-args "--trace-to json:out/trace_data/test-{SCRIPT_BASE_NAME}.json --trace-to perfetto:out/trace_data/test-{SCRIPT_BASE_NAME}.perfetto"'
                   scripts/run_in_python_env.sh out/venv './scripts/tests/run_python_test.py --script "src/python_testing/TestMatterTestingSupport.py" --script-args "--trace-to json:out/trace_data/test-{SCRIPT_BASE_NAME}.json --trace-to perfetto:out/trace_data/test-{SCRIPT_BASE_NAME}.perfetto"'
