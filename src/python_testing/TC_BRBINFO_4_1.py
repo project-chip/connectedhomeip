@@ -48,6 +48,7 @@ from chip.ChipDeviceCtrl import CommissioningParameters
 
 logger = logging.getLogger(__name__)
 kRootEndpointId = 0
+kICDMEndpointId = 0
 kICDBridgedEndpointId = 2
 kMaxUserActiveModeBitmap = 0x1FFFF
 kMaxUserActiveModeTriggerInstructionByteLength = 128
@@ -62,17 +63,8 @@ class TC_BRBINFO_4_1(MatterBaseTest):
     # Class Helper functions
     #
 
-    async def _read_icdm_attribute_expect_success(self, attribute):
-        cluster = Clusters.Objects.IcdManagement
-        return await self.read_single_attribute_check_success(endpoint=kRootEndpointId, cluster=cluster, attribute=attribute)
-
-    async def _read_brbinfo_attribute_expect_success(self, attribute):
-        cluster = Clusters.Objects.BridgedDeviceBasicInformation
-        return await self.read_single_attribute_check_success(endpoint=kRootEndpointId, cluster=cluster, attribute=attribute)
-
-    async def _read_basicinfo_attribute_expect_success(self, attribute):
-        cluster = Clusters.Objects.BasicInformation
-        return await self.read_single_attribute_check_success(endpoint=kRootEndpointId, cluster=cluster, attribute=attribute)
+    async def _read_attribute_expect_success(self, endpoint, cluster, attribute, node_id):
+        return await self.read_single_attribute_check_success(endpoint=endpoint, cluster=cluster, attribute=attribute, node_id=node_id)
 
     #
     # Test Harness Helpers
@@ -86,7 +78,7 @@ class TC_BRBINFO_4_1(MatterBaseTest):
         steps = [
             TestStep(1, "Commissioning of the DUT, already done", is_commissioning=True),
             TestStep(2, "Commissioning of the ICD, already done", is_commissioning=True),
-            TestStep(3, "TH reads from the ICD the IDLE_MODE_DURATION, ACTIVE_MODE_DURATION, ACTIVE_MODE_THRESHOLD attributes"),
+            TestStep(3, "TH reads from the ICD the IDLE_MODE_DURATION and ACTIVE_MODE_DURATION attributes"),
             TestStep(4, "Simple KeepActive command w/ subscription. ActiveChanged event received by TH contains PromisedActiveDuration"),
             TestStep(5, "Multiple KeepActive commands. ActiveChanged event received by TH contains a PromisedActiveDuration"),
             TestStep(6, "Simple KeepActive command w/ check-in. ActiveChanged event received by TH contains PromisedActiveDuration"),
@@ -113,8 +105,6 @@ class TC_BRBINFO_4_1(MatterBaseTest):
     @async_test_body
     async def setup_class(self):
         super().setup_class()
-        # TODO: This needs to come from an arg and needs to be something available on the TH
-        # TODO: confirm whether we can open processes like this on the TH
         app = os.path.join(pathlib.Path(__file__).resolve().parent, '..','..','out', 'linux-x64-lit-icd', 'lit-icd-app')
 
         self.kvs = f'kvs_{str(uuid.uuid4())}'
@@ -132,25 +122,14 @@ class TC_BRBINFO_4_1(MatterBaseTest):
         time.sleep(3)
 
         logging.info("Commissioning of ICD to fabric one (TH)")
-        #new_certificate_authority = self.certificate_authority_manager.NewCertificateAuthority()
-        #new_fabric_admin = new_certificate_authority.NewFabricAdmin(vendorId=0xFFF1, fabricId=2)
-        #paa_path = str(self.matter_test_config.paa_trust_store_path)
-        #print(f"paa_path = {paa_path}  ------------------------------------------------")
-        #self.TH_server_controller = new_fabric_admin.NewController(nodeId=112233, paaTrustStorePath=paa_path)
-        self.server_nodeid = 1111
+        self.icd_nodeid = 1111
 
-        await self.default_controller.CommissionOnNetwork(nodeId=self.server_nodeid, setupPinCode=passcode, filterType=ChipDeviceCtrl.DiscoveryFilterType.LONG_DISCRIMINATOR, filter=discriminator)
-        # await self.TH_server_controller.CommissionOnNetwork(nodeId=self.server_nodeid, setupPinCode=passcode, filterType=ChipDeviceCtrl.DiscoveryFilterType.LONG_DISCRIMINATOR, filter=discriminator)
-        logging.info("Commissioning complete (1/2)")
+        await self.default_controller.CommissionOnNetwork(nodeId=self.icd_nodeid, setupPinCode=passcode, filterType=ChipDeviceCtrl.DiscoveryFilterType.LONG_DISCRIMINATOR, filter=discriminator)
 
         logging.info("Commissioning of ICD to fabric two (DUT)")
-        params = await self.openCommissioningWindow(dev_ctrl=self.default_controller, node_id=self.server_nodeid)
-
+        params = await self.openCommissioningWindow(dev_ctrl=self.default_controller, node_id=self.icd_nodeid)
 
         self._ask_for_vendor_commissioniong_ux_operation(params.randomDiscriminator, params.commissioningParameters.setupPinCode)
-
-        # cmd = Clusters.CommissionerControl.Commands.CommissionNode(requestId=1, responseTimeoutSeconds=30, ipAddress=ipaddr.packed, port=self.port)
-
 
     def teardown_class(self):
         logging.warning("Stopping app with SIGTERM")
@@ -166,40 +145,66 @@ class TC_BRBINFO_4_1(MatterBaseTest):
     @async_test_body
     async def test_TC_BRBINFO_4_1(self):
 
+        icdmCluster = Clusters.Objects.IcdManagement
+        icdmAttributes = icdmCluster.Attributes
         brbinfoCluster = Clusters.Objects.BridgedDeviceBasicInformation
-        basicinfoCluster = Clusters.Objects.BasicInformation
-
-
         brbinfoAttributes = brbinfoCluster.Attributes
+        basicinfoCluster = Clusters.Objects.BasicInformation
         basicinfoAttributes = basicinfoCluster.Attributes
 
         self.endpoint = 0
 
-        # Check commisisoned DUT
+        # Check commissioned DUT
         self.step(1)
         # Confirms commissioning of DUT as it reads basic info from bridge device
-        featureMap = await self._read_basicinfo_attribute_expect_success(
-            basicinfoAttributes.FeatureMap)
+        featureMap = await self._read_attribute_expect_success(
+          kRootEndpointId,
+          basicinfoCluster,
+          basicinfoAttributes.FeatureMap,
+          self.dut_node_id
+        )
 
         self.step(2)
-        # Confirms commissioning of DUT as it reads basic info from bridge device
-        featureMap = await self._read_basicinfo_attribute_expect_success(
-            basicinfoAttributes.FeatureMap)
+        # Confirms commissioning of ICD as it reads basic info from bridge device
+        # reachable = await self._read_attribute_expect_success(
+        #   kICDBridgedEndpointId,
+        #   brbinfoCluster,
+        #   brbinfoAttributes.Reachable,
+        #   self.dut_node_id
+        # )
 
         self.step(3)
-        ## ??
+        idle_mode_duration = await self._read_attribute_expect_success(
+          kICDMEndpointId,
+          icdmCluster,
+          icdmAttributes.IdleModeDuration,
+          self.icd_nodeid
+        )
 
-        # dummy values
-        idle_mode_duration = 10000
-        active_mode_duration = 200
+        active_mode_duration = await self._read_attribute_expect_success(
+          kICDMEndpointId,
+          icdmCluster,
+          icdmAttributes.ActiveModeDuration,
+          self.icd_nodeid
+        )
 
         self.step(4)
+
+        # Subscription to ActiveChanged
         event = brbinfoCluster.Events.ActiveChanged
         self.q = queue.Queue()
         urgent = 1
-        cb = SimpleEventCallback("KeepActive", event.cluster_id, event.event_id, self.q)
-        subscription = await self.default_controller.ReadEvent(nodeid=self.dut_node_id, events=[(self.endpoint, event, urgent)], reportInterval=[1, 3])
+        cb = SimpleEventCallback("Activechanged", event.cluster_id, event.event_id, self.q)
+        subscription = await self.default_controller.ReadEvent(nodeid=self.dut_node_id, events=[(kICDBridgedEndpointId, event, urgent)], reportInterval=[1, 3])
         subscription.SetEventUpdateCallback(callback=cb)
+
+        # Sends KeepActive command
+        keepActive = await self.default_controller.SendCommand(nodeid=self.dut_node_id, endpoint=kICDBridgedEndpointId, payload=brbinfoCluster.Commands.KeepActive(2000))
+
+        try:
+            self.q.get(block=True, timeout=10)
+        except queue.Empty:
+            asserts.assert_fail("Timeout on event")
 
         self.step(5)
 
