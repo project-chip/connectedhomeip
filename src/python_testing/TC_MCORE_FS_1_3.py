@@ -43,11 +43,13 @@ class TC_MCORE_FS_1_3(MatterBaseTest):
 
 
     def teardown_class(self):
-        logging.warning("Stopping app with SIGTERM")
-        self.app_process_for_dut_eco.send_signal(signal.SIGTERM.value)
-        self.app_process_for_dut_eco.wait()
+        if self.app_process_for_dut_eco is not None:
+            logging.warning("Stopping app with SIGTERM")
+            self.app_process_for_dut_eco.send_signal(signal.SIGTERM.value)
+            self.app_process_for_dut_eco.wait()
         # TODO: Use timeout, if term doesn't work, try SIGINT
         if self.app_process_for_th_eco is not None:
+            logging.warning("Stopping app with SIGTERM")
             self.app_process_for_th_eco.send_signal(signal.SIGTERM.value)
             self.app_process_for_th_eco.wait()
 
