@@ -64,7 +64,6 @@ class TC_OCC_2_3(MatterBaseTest):
 
         else:
             logging.info("No HoldTime attribute supports. Terminate this test case")
-            return pics
             
         self.step(3)
         if attributes.OccupancySensorType.attribute_id in attribute_list:
