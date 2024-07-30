@@ -82,7 +82,7 @@ tests:
 
           #3b Test Harness Client attempts to write PresetTypes and gets SUCCESS
 
-         ./chip-tool thermostat write presets '[ {"presetHandle": "hex:01", "presetScenario": 1, "coolingSetpoint": 2500, "heatingSetpoint": 2600, "builtIn": true }, {"presetHandle": "hex:02", "presetScenario": 2, "coolingSetpoint": 2600, "heatingSetpoint": 2500, "builtIn": true }, {"presetHandle": null, "name": "Sleep", "presetScenario": 3, "coolingSetpoint": 2500, "heatingSetpoint": 2600, "builtIn": false },  {"presetHandle": null, "name": "Wake", "presetScenario": 4, "coolingSetpoint": 2200, "heatingSetpoint": 2900, "builtIn": false }, {"presetHandle": null, "name": "GoingToSleep", "presetScenario": 6, "coolingSetpoint": 2100, "heatingSetpoint": 2500, "builtIn": false }]' 0x12344321 1
+          ./chip-tool thermostat write presets '[ {"presetHandle": "hex:01", "presetScenario": 1, "coolingSetpoint": 2500, "heatingSetpoint": 2600, "builtIn": true }, {"presetHandle": "hex:02", "presetScenario": 2, "coolingSetpoint": 2600, "heatingSetpoint": 2500, "builtIn": true }, {"presetHandle": null, "name": "Sleep", "presetScenario": 3, "coolingSetpoint": 2500, "heatingSetpoint": 2600, "builtIn": false },  {"presetHandle": null, "name": "Wake", "presetScenario": 4, "coolingSetpoint": 2200, "heatingSetpoint": 2900, "builtIn": false }, {"presetHandle": null, "name": "GoingToSleep", "presetScenario": 6, "coolingSetpoint": 2100, "heatingSetpoint": 2500, "builtIn": false }]' 0x12344321 1
           On TH(chip-tool) verify that  DUT sends a success response
           [1722286250.503] [54321:5397545] [DMG] WriteClient moving to [ResponseRe]
           [1722286250.503] [54321:5397545] [DMG] WriteResponseMessage =
@@ -213,7 +213,7 @@ tests:
 
           #3c Test Harness Client reads Presets attribute but the new additions are not committed since the client didn't call the CommitPresetsSchedulesRequest command
 
-         ./chip-tool thermostat read presets 0x12344321 1
+          ./chip-tool thermostat read presets 0x12344321 1
           On TH(chip-tool) verify that  DUT successfully read Presets (but without the new changes)
           [1722286701.424] [54699:5406692] [TOO] Endpoint: 1 Cluster: 0x0000_0201 Attribute 0x0000_0050 DataVersion: 3807987049
           [1722286701.425] [54699:5406692] [TOO]   Presets: 2 entries
@@ -269,7 +269,7 @@ tests:
 
           #3e Test Harness Client reads Presets attribute and can see the added Presets.
 
-         ./chip-tool thermostat read presets 0x12344321 1
+          ./chip-tool thermostat read presets 0x12344321 1
           On TH(chip-tool) verify that  DUT successfully read Presets (with the new changes)
           [1722288101.757] [55446:5430009] [TOO] Endpoint: 1 Cluster: 0x0000_0201 Attribute 0x0000_0050 DataVersion: 3807987055
           [1722288101.757] [55446:5430009] [TOO]   Presets: 5 entries
@@ -351,7 +351,7 @@ tests:
 
           #4b Test Harness Client attempts to write PresetTypes and gets SUCCESS
 
-         ./chip-tool thermostat write presets '[ {"presetHandle": "hex:02", "presetScenario": 2, "coolingSetpoint": 2600, "heatingSetpoint": 2500, "builtIn": true }, {"presetHandle": "hex:03", "name": "Sleep", "presetScenario": 3, "coolingSetpoint": 2500, "heatingSetpoint": 2600, "builtIn": false },  {"presetHandle": "hex:04", "name": "Wake", "presetScenario": 4, "coolingSetpoint": 2200, "heatingSetpoint": 2900, "builtIn": false }, {"presetHandle": "hex:06", "name": "GoingToSleep", "presetScenario": 6, "coolingSetpoint": 2100, "heatingSetpoint": 2500, "builtIn": false }]' 0x12344321 1
+          ./chip-tool thermostat write presets '[ {"presetHandle": "hex:02", "presetScenario": 2, "coolingSetpoint": 2600, "heatingSetpoint": 2500, "builtIn": true }, {"presetHandle": "hex:03", "name": "Sleep", "presetScenario": 3, "coolingSetpoint": 2500, "heatingSetpoint": 2600, "builtIn": false },  {"presetHandle": "hex:04", "name": "Wake", "presetScenario": 4, "coolingSetpoint": 2200, "heatingSetpoint": 2900, "builtIn": false }, {"presetHandle": "hex:06", "name": "GoingToSleep", "presetScenario": 6, "coolingSetpoint": 2100, "heatingSetpoint": 2500, "builtIn": false }]' 0x12344321 1
           On TH(chip-tool) verify that  DUT sends a success response
           [1722288460.741] [55752:5437815] [DMG] WriteClient moving to [ResponseRe]
           [1722288460.741] [55752:5437815] [DMG] WriteResponseMessage =
@@ -508,7 +508,7 @@ tests:
 
           #5b Test Harness Client reads ActivePresetHandle attribute
 
-         ./chip-tool thermostat read active-preset-handle 0x12344321 1
+          ./chip-tool thermostat read active-preset-handle 0x12344321 1
           On TH(chip-tool) verify that  DUT successfully read ActivePresetHandle
           [1722299898.382] [62999:5632512] [TOO] Endpoint: 1 Cluster: 0x0000_0201 Attribute 0x0000_004E DataVersion: 3098962545
           [1722299898.382] [62999:5632512] [TOO]   ActivePresetHandle: 03
@@ -552,7 +552,7 @@ tests:
 
           #5c Test Harness Client attempts to write PresetTypes and gets SUCCESS
 
-         ./chip-tool thermostat write presets ./out/debug/chip-tool thermostat write presets '[ {"presetHandle": "hex:01", "presetScenario": 1, "coolingSetpoint": 2500, "heatingSetpoint": 2600, "builtIn": true }, {"presetHandle": "hex:02", "presetScenario": 2, "coolingSetpoint": 2600, "heatingSetpoint": 2500, "builtIn": true }, {"presetHandle": "hex:04", "name": "Wake", "presetScenario": 4, "coolingSetpoint": 2200, "heatingSetpoint": 2900, "builtIn": false }, {"presetHandle": "hex:06", "name": "GoingToSleep", "presetScenario": 6, "coolingSetpoint": 2100, "heatingSetpoint": 2500, "builtIn": false }]' 0x12344321 1
+          ./chip-tool thermostat write presets ./out/debug/chip-tool thermostat write presets '[ {"presetHandle": "hex:01", "presetScenario": 1, "coolingSetpoint": 2500, "heatingSetpoint": 2600, "builtIn": true }, {"presetHandle": "hex:02", "presetScenario": 2, "coolingSetpoint": 2600, "heatingSetpoint": 2500, "builtIn": true }, {"presetHandle": "hex:04", "name": "Wake", "presetScenario": 4, "coolingSetpoint": 2200, "heatingSetpoint": 2900, "builtIn": false }, {"presetHandle": "hex:06", "name": "GoingToSleep", "presetScenario": 6, "coolingSetpoint": 2100, "heatingSetpoint": 2500, "builtIn": false }]' 0x12344321 1
           On TH(chip-tool) verify that  DUT sends a success response
           [1722289461.376] [56636:5458560] [DMG] WriteClient moving to [ResponseRe]
           [1722289461.376] [56636:5458560] [DMG] WriteResponseMessage =
@@ -726,7 +726,7 @@ tests:
 
           #6b Test Harness Client attempts to write PresetTypes and gets SUCCESS
 
-         ./chip-tool thermostat write presets '[ {"presetHandle": "hex:01", "presetScenario": 1, "coolingSetpoint": 2500, "heatingSetpoint": 2600, "builtIn": false }, {"presetHandle": "hex:02", "presetScenario": 2, "coolingSetpoint": 2600, "heatingSetpoint": 2500, "builtIn": true }, {"presetHandle": "hex:03", "name": "Sleep", "presetScenario": 3, "coolingSetpoint": 2500, "heatingSetpoint": 2600, "builtIn": false },  {"presetHandle": "hex:04", "name": "Wake", "presetScenario": 4, "coolingSetpoint": 2200, "heatingSetpoint": 2900, "builtIn": false }, {"presetHandle": "hex:06", "name": "GoingToSleep", "presetScenario": 6, "coolingSetpoint": 2100, "heatingSetpoint": 2500, "builtIn": false }]' 0x12344321 1
+          ./chip-tool thermostat write presets '[ {"presetHandle": "hex:01", "presetScenario": 1, "coolingSetpoint": 2500, "heatingSetpoint": 2600, "builtIn": false }, {"presetHandle": "hex:02", "presetScenario": 2, "coolingSetpoint": 2600, "heatingSetpoint": 2500, "builtIn": true }, {"presetHandle": "hex:03", "name": "Sleep", "presetScenario": 3, "coolingSetpoint": 2500, "heatingSetpoint": 2600, "builtIn": false },  {"presetHandle": "hex:04", "name": "Wake", "presetScenario": 4, "coolingSetpoint": 2200, "heatingSetpoint": 2900, "builtIn": false }, {"presetHandle": "hex:06", "name": "GoingToSleep", "presetScenario": 6, "coolingSetpoint": 2100, "heatingSetpoint": 2500, "builtIn": false }]' 0x12344321 1
           On TH(chip-tool) verify that  DUT sends a success response
           [1722289461.376] [56636:5458560] [DMG] WriteClient moving to [ResponseRe]
           [1722289461.376] [56636:5458560] [DMG] WriteResponseMessage =
@@ -900,7 +900,7 @@ tests:
 
           #7b Test Harness Client attempts to write PresetTypes and gets SUCCESS
 
-         ./chip-tool thermostat write presets '[ {"presetHandle": "hex:01", "presetScenario": 1, "coolingSetpoint": 2500, "heatingSetpoint": 2600, "builtIn": true }, {"presetHandle": "hex:02", "presetScenario": 2, "coolingSetpoint": 2600, "heatingSetpoint": 2500, "builtIn": true }, {"presetHandle": "hex:03", "name": "Sleep", "presetScenario": 3, "coolingSetpoint": 2500, "heatingSetpoint": 2600, "builtIn": false },  {"presetHandle": "hex:04", "name": "Wake", "presetScenario": 4, "coolingSetpoint": 2200, "heatingSetpoint": 2900, "builtIn": false }, {"presetHandle": null, "name": "Vacation", "presetScenario": 5, "coolingSetpoint": 2900, "heatingSetpoint": 2000, "builtIn": true }, {"presetHandle": "hex:06", "name": "GoingToSleep", "presetScenario": 6, "coolingSetpoint": 2100, "heatingSetpoint": 2500, "builtIn": false }]' 0x12344321 1
+          ./chip-tool thermostat write presets '[ {"presetHandle": "hex:01", "presetScenario": 1, "coolingSetpoint": 2500, "heatingSetpoint": 2600, "builtIn": true }, {"presetHandle": "hex:02", "presetScenario": 2, "coolingSetpoint": 2600, "heatingSetpoint": 2500, "builtIn": true }, {"presetHandle": "hex:03", "name": "Sleep", "presetScenario": 3, "coolingSetpoint": 2500, "heatingSetpoint": 2600, "builtIn": false },  {"presetHandle": "hex:04", "name": "Wake", "presetScenario": 4, "coolingSetpoint": 2200, "heatingSetpoint": 2900, "builtIn": false }, {"presetHandle": null, "name": "Vacation", "presetScenario": 5, "coolingSetpoint": 2900, "heatingSetpoint": 2000, "builtIn": true }, {"presetHandle": "hex:06", "name": "GoingToSleep", "presetScenario": 6, "coolingSetpoint": 2100, "heatingSetpoint": 2500, "builtIn": false }]' 0x12344321 1
           On TH(chip-tool) verify that  DUT sends a success response
           [1722289461.376] [56636:5458560] [DMG] WriteClient moving to [ResponseRe]
           [1722289461.376] [56636:5458560] [DMG] WriteResponseMessage =
@@ -1074,7 +1074,7 @@ tests:
 
           #8b Test Harness Client attempts to write PresetTypes and gets SUCCESS
 
-         ./chip-tool thermostat write presets '[ {"presetHandle": "hex:01", "presetScenario": 1, "coolingSetpoint": 2500, "heatingSetpoint": 2600, "builtIn": true }, {"presetHandle": "hex:02", "presetScenario": 2, "coolingSetpoint": 2600, "heatingSetpoint": 2500, "builtIn": true }, {"presetHandle": "hex:03", "name": "Sleep", "presetScenario": 3, "coolingSetpoint": 2500, "heatingSetpoint": 2600, "builtIn": false },  {"presetHandle": "hex:04", "name": "Wake", "presetScenario": 4, "coolingSetpoint": 2200, "heatingSetpoint": 2900, "builtIn": false }, {"presetHandle": "hex:08", "name": "GoingToSleep", "presetScenario": 6, "coolingSetpoint": 2100, "heatingSetpoint": 2500, "builtIn": false }]' 0x12344321 1
+          ./chip-tool thermostat write presets '[ {"presetHandle": "hex:01", "presetScenario": 1, "coolingSetpoint": 2500, "heatingSetpoint": 2600, "builtIn": true }, {"presetHandle": "hex:02", "presetScenario": 2, "coolingSetpoint": 2600, "heatingSetpoint": 2500, "builtIn": true }, {"presetHandle": "hex:03", "name": "Sleep", "presetScenario": 3, "coolingSetpoint": 2500, "heatingSetpoint": 2600, "builtIn": false },  {"presetHandle": "hex:04", "name": "Wake", "presetScenario": 4, "coolingSetpoint": 2200, "heatingSetpoint": 2900, "builtIn": false }, {"presetHandle": "hex:08", "name": "GoingToSleep", "presetScenario": 6, "coolingSetpoint": 2100, "heatingSetpoint": 2500, "builtIn": false }]' 0x12344321 1
           On TH(chip-tool) verify that  DUT sends a success response
           [1722289461.376] [56636:5458560] [DMG] WriteClient moving to [ResponseRe]
           [1722289461.376] [56636:5458560] [DMG] WriteResponseMessage =
@@ -1210,6 +1210,7 @@ tests:
           [1722290436.980] [57434:5479429] [TOO] Error: IM Error 0x0000058B: General error: 0x8b (NOT_FOUND)
           [1722290436.980] [57434:5479429] [DMG] ICR moving to [AwaitingDe]
           [1722290436.980] [57434:5479429] [EM] <<< [E:54210i S:10110 M:158287615 (Ack:73923062)] (S) Msg TX to 1:000000000000006E [FEC4] [UDP:[fe80::1%lo0]:5540] --- Type 0000:10 (SecureChannel:StandaloneAck) (B:34)
+      cluster: "LogCommands"
       command: "UserPrompt"
       arguments:
           values:
@@ -1247,7 +1248,7 @@ tests:
 
           #8b Test Harness Client attempts to write PresetTypes and gets SUCCESS
 
-         ./chip-tool thermostat write presets '[ {"presetHandle": "hex:01", "presetScenario": 1, "coolingSetpoint": 2500, "heatingSetpoint": 2600, "builtIn": true }, {"presetHandle": "hex:02", "presetScenario": 2, "coolingSetpoint": 2600, "heatingSetpoint": 2500, "builtIn": true }, {"presetHandle": "hex:03", "name": "Sleep", "presetScenario": 3, "coolingSetpoint": 2500, "heatingSetpoint": 2600, "builtIn": false }, {"presetHandle": "hex:03", "name": "Sleep", "presetScenario": 3, "coolingSetpoint": 2500, "heatingSetpoint": 2600, "builtIn": false }, {"presetHandle": "hex:04", "name": "Wake", "presetScenario": 4, "coolingSetpoint": 2200, "heatingSetpoint": 2900, "builtIn": false }, {"presetHandle": "hex:06", "name": "GoingToSleep", "presetScenario": 6, "coolingSetpoint": 2100, "heatingSetpoint": 2500, "builtIn": false }]' 0x12344321 1
+          ./chip-tool thermostat write presets '[ {"presetHandle": "hex:01", "presetScenario": 1, "coolingSetpoint": 2500, "heatingSetpoint": 2600, "builtIn": true }, {"presetHandle": "hex:02", "presetScenario": 2, "coolingSetpoint": 2600, "heatingSetpoint": 2500, "builtIn": true }, {"presetHandle": "hex:03", "name": "Sleep", "presetScenario": 3, "coolingSetpoint": 2500, "heatingSetpoint": 2600, "builtIn": false }, {"presetHandle": "hex:03", "name": "Sleep", "presetScenario": 3, "coolingSetpoint": 2500, "heatingSetpoint": 2600, "builtIn": false }, {"presetHandle": "hex:04", "name": "Wake", "presetScenario": 4, "coolingSetpoint": 2200, "heatingSetpoint": 2900, "builtIn": false }, {"presetHandle": "hex:06", "name": "GoingToSleep", "presetScenario": 6, "coolingSetpoint": 2100, "heatingSetpoint": 2500, "builtIn": false }]' 0x12344321 1
           On TH(chip-tool) verify that  DUT sends a success response
           [1722289461.376] [56636:5458560] [DMG] WriteClient moving to [ResponseRe]
           [1722289461.376] [56636:5458560] [DMG] WriteResponseMessage =
@@ -1383,6 +1384,7 @@ tests:
           [1722302289.994] [63677:5670818] [TOO] Error: IM Error 0x00000587: General error: 0x87 (CONSTRAINT_ERROR)
           [1722302289.994] [63677:5670818] [DMG] ICR moving to [AwaitingDe]
           [1722302289.994] [63677:5670818] [EM] <<< [E:25209i S:7768 M:264197735 (Ack:106550461)] (S) Msg TX to 1:000000000000006E [FEC4] [UDP:[fe80::1%lo0]:5540] --- Type 0000:10 (SecureChannel:StandaloneAck) (B:34)
+      cluster: "LogCommands"
       command: "UserPrompt"
       arguments:
           values:
@@ -1420,7 +1422,7 @@ tests:
 
           #10b Test Harness Client attempts to write PresetTypes and gets SUCCESS
 
-         ./chip-tool thermostat write presets '[ {"presetHandle": "hex:01", "presetScenario": 1, "coolingSetpoint": 2500, "heatingSetpoint": 2600, "builtIn": false }, {"presetHandle": "hex:02", "presetScenario": 2, "coolingSetpoint": 2600, "heatingSetpoint": 2500, "builtIn": true }, {"presetHandle": "hex:03", "name": "Sleep", "presetScenario": 3, "coolingSetpoint": 2500, "heatingSetpoint": 2600, "builtIn": false },  {"presetHandle": "hex:04", "name": "Wake", "presetScenario": 4, "coolingSetpoint": 2200, "heatingSetpoint": 2900, "builtIn": false }, {"presetHandle": "hex:06", "name": "GoingToSleep", "presetScenario": 6, "coolingSetpoint": 2100, "heatingSetpoint": 2500, "builtIn": false }]' 0x12344321 1
+          ./chip-tool thermostat write presets '[ {"presetHandle": "hex:01", "presetScenario": 1, "coolingSetpoint": 2500, "heatingSetpoint": 2600, "builtIn": false }, {"presetHandle": "hex:02", "presetScenario": 2, "coolingSetpoint": 2600, "heatingSetpoint": 2500, "builtIn": true }, {"presetHandle": "hex:03", "name": "Sleep", "presetScenario": 3, "coolingSetpoint": 2500, "heatingSetpoint": 2600, "builtIn": false },  {"presetHandle": "hex:04", "name": "Wake", "presetScenario": 4, "coolingSetpoint": 2200, "heatingSetpoint": 2900, "builtIn": false }, {"presetHandle": "hex:06", "name": "GoingToSleep", "presetScenario": 6, "coolingSetpoint": 2100, "heatingSetpoint": 2500, "builtIn": false }]' 0x12344321 1
           On TH(chip-tool) verify that  DUT sends a success response
           [1722289461.376] [56636:5458560] [DMG] WriteClient moving to [ResponseRe]
           [1722289461.376] [56636:5458560] [DMG] WriteResponseMessage =
@@ -1594,7 +1596,7 @@ tests:
 
           #11b Test Harness Client attempts to write PresetTypes and gets SUCCESS
 
-         ./chip-tool thermostat write presets '[ {"presetHandle": "hex:01", "presetScenario": 1, "coolingSetpoint": 2500, "heatingSetpoint": 2600, "builtIn": true }, {"presetHandle": "hex:02", "presetScenario": 2, "coolingSetpoint": 2600, "heatingSetpoint": 2500, "builtIn": true }, {"presetHandle": "hex:03", "name": "Sleep", "presetScenario": 3, "coolingSetpoint": 2500, "heatingSetpoint": 2600, "builtIn": true },  {"presetHandle": "hex:04", "name": "Wake", "presetScenario": 4, "coolingSetpoint": 2200, "heatingSetpoint": 2900, "builtIn": false }, {"presetHandle": "hex:06", "name": "GoingToSleep", "presetScenario": 6, "coolingSetpoint": 2100, "heatingSetpoint": 2500, "builtIn": false }, {"presetHandle": "hex:06", "name": "GoingToSleep", "presetScenario": 6, "coolingSetpoint": 2100, "heatingSetpoint": 2500, "builtIn": false }]' 0x12344321 1
+          ./chip-tool thermostat write presets '[ {"presetHandle": "hex:01", "presetScenario": 1, "coolingSetpoint": 2500, "heatingSetpoint": 2600, "builtIn": true }, {"presetHandle": "hex:02", "presetScenario": 2, "coolingSetpoint": 2600, "heatingSetpoint": 2500, "builtIn": true }, {"presetHandle": "hex:03", "name": "Sleep", "presetScenario": 3, "coolingSetpoint": 2500, "heatingSetpoint": 2600, "builtIn": true },  {"presetHandle": "hex:04", "name": "Wake", "presetScenario": 4, "coolingSetpoint": 2200, "heatingSetpoint": 2900, "builtIn": false }, {"presetHandle": "hex:06", "name": "GoingToSleep", "presetScenario": 6, "coolingSetpoint": 2100, "heatingSetpoint": 2500, "builtIn": false }, {"presetHandle": "hex:06", "name": "GoingToSleep", "presetScenario": 6, "coolingSetpoint": 2100, "heatingSetpoint": 2500, "builtIn": false }]' 0x12344321 1
           On TH(chip-tool) verify that  DUT sends a success response
           [1722289461.376] [56636:5458560] [DMG] WriteClient moving to [ResponseRe]
           [1722289461.376] [56636:5458560] [DMG] WriteResponseMessage =
@@ -1730,6 +1732,7 @@ tests:
           [1722297542.066] [60654:5591651] [TOO] Error: IM Error 0x0000057E: General error: 0x7e (UNSUPPORTED_ACCESS)
           [1722297542.066] [60654:5591651] [DMG] ICR moving to [AwaitingDe]
           [1722297542.066] [60654:5591651] [EM] <<< [E:11999i S:35595 M:148057801 (Ack:14642826)] (S) Msg TX to 1:000000000000006E [FEC4] [UDP:[fe80::1%lo0]:5540] --- Type 0000:10 (SecureChannel:StandaloneAck) (B:34)
+      cluster: "LogCommands"
       command: "UserPrompt"
       arguments:
           values:
@@ -1768,7 +1771,7 @@ tests:
 
           #11b Test Harness Client attempts to write PresetTypes and gets SUCCESS
 
-         ./chip-tool thermostat write presets '[ {"presetHandle": "hex:01", "name": "Occupied", "presetScenario": 1, "coolingSetpoint": 2500, "heatingSetpoint": 2600, "builtIn": true }, {"presetHandle": "hex:02", "presetScenario": 2, "coolingSetpoint": 2600, "heatingSetpoint": 2500, "builtIn": true }, {"presetHandle": "hex:03", "name": "Sleep", "presetScenario": 3, "coolingSetpoint": 2500, "heatingSetpoint": 2600, "builtIn": true },  {"presetHandle": "hex:04", "name": "Wake", "presetScenario": 4, "coolingSetpoint": 2200, "heatingSetpoint": 2900, "builtIn": false }, {"presetHandle": "hex:06", "name": "GoingToSleep", "presetScenario": 6, "coolingSetpoint": 2100, "heatingSetpoint": 2500, "builtIn": false }, {"presetHandle": "hex:06", "name": "GoingToSleep", "presetScenario": 6, "coolingSetpoint": 2100, "heatingSetpoint": 2500, "builtIn": false }]' 0x12344321 1
+          ./chip-tool thermostat write presets '[ {"presetHandle": "hex:01", "name": "Occupied", "presetScenario": 1, "coolingSetpoint": 2500, "heatingSetpoint": 2600, "builtIn": true }, {"presetHandle": "hex:02", "presetScenario": 2, "coolingSetpoint": 2600, "heatingSetpoint": 2500, "builtIn": true }, {"presetHandle": "hex:03", "name": "Sleep", "presetScenario": 3, "coolingSetpoint": 2500, "heatingSetpoint": 2600, "builtIn": true },  {"presetHandle": "hex:04", "name": "Wake", "presetScenario": 4, "coolingSetpoint": 2200, "heatingSetpoint": 2900, "builtIn": false }, {"presetHandle": "hex:06", "name": "GoingToSleep", "presetScenario": 6, "coolingSetpoint": 2100, "heatingSetpoint": 2500, "builtIn": false }, {"presetHandle": "hex:06", "name": "GoingToSleep", "presetScenario": 6, "coolingSetpoint": 2100, "heatingSetpoint": 2500, "builtIn": false }]' 0x12344321 1
           On TH(chip-tool) verify that  DUT sends a success response
           [1722289461.376] [56636:5458560] [DMG] WriteClient moving to [ResponseRe]
           [1722289461.376] [56636:5458560] [DMG] WriteResponseMessage =
@@ -1904,6 +1907,7 @@ tests:
           [1722298150.233] [60910:5602100] [TOO] Error: IM Error 0x00000587: General error: 0x87 (CONSTRAINT_ERROR)
           [1722298150.233] [60910:5602100] [DMG] ICR moving to [AwaitingDe]
           [1722298150.233] [60910:5602100] [EM] <<< [E:44287i S:42687 M:5072557 (Ack:66989213)] (S) Msg TX to 1:000000000000006E [FEC4] [UDP:[fe80::1%lo0]:5540] --- Type 0000:10 (SecureChannel:StandaloneAck) (B:34)
+      cluster: "LogCommands"
       command: "UserPrompt"
       arguments:
           values:
@@ -1943,7 +1947,7 @@ tests:
 
           #13b Test Harness Client attempts to write PresetTypes and gets SUCCESS
 
-         ./chip-tool thermostat write presets '[ {"presetHandle": "hex:01", "presetScenario": 1, "coolingSetpoint": 2500, "heatingSetpoint": 2600, "builtIn": true }, {"presetHandle": "hex:02", "presetScenario": 2, "coolingSetpoint": 2600, "heatingSetpoint": 2500, "builtIn": true }, {"presetHandle": "03", "name": "Sleep", "presetScenario": 3, "coolingSetpoint": 2500, "heatingSetpoint": 2600, "builtIn": false }, {"presetHandle": "04", "name": "Wake", "presetScenario": 4, "coolingSetpoint": 2200, "heatingSetpoint": 2900, "builtIn": false }, {"presetHandle": null, "name": "Vacation", "presetScenario": 5, "coolingSetpoint": 2900, "heatingSetpoint": 2000, "builtIn": false }, {"presetHandle": "06", "name": "GoingToSleep", "presetScenario": 6, "coolingSetpoint": 3000, "heatingSetpoint": 1900, "builtIn": false }]' 0x12344321 1
+          ./chip-tool thermostat write presets '[ {"presetHandle": "hex:01", "presetScenario": 1, "coolingSetpoint": 2500, "heatingSetpoint": 2600, "builtIn": true }, {"presetHandle": "hex:02", "presetScenario": 2, "coolingSetpoint": 2600, "heatingSetpoint": 2500, "builtIn": true }, {"presetHandle": "03", "name": "Sleep", "presetScenario": 3, "coolingSetpoint": 2500, "heatingSetpoint": 2600, "builtIn": false }, {"presetHandle": "04", "name": "Wake", "presetScenario": 4, "coolingSetpoint": 2200, "heatingSetpoint": 2900, "builtIn": false }, {"presetHandle": null, "name": "Vacation", "presetScenario": 5, "coolingSetpoint": 2900, "heatingSetpoint": 2000, "builtIn": false }, {"presetHandle": "06", "name": "GoingToSleep", "presetScenario": 6, "coolingSetpoint": 3000, "heatingSetpoint": 1900, "builtIn": false }]' 0x12344321 1
           On TH(chip-tool) verify that  DUT sends a success response
           [1722289461.376] [56636:5458560] [DMG] WriteClient moving to [ResponseRe]
           [1722289461.376] [56636:5458560] [DMG] WriteResponseMessage =
@@ -2095,7 +2099,7 @@ tests:
 
           #3c Test Harness Client reads Presets attribute
 
-         ./chip-tool thermostat read presets 0x12344321 1
+          ./chip-tool thermostat read presets 0x12344321 1
           On TH(chip-tool) verify that  DUT successfully read Presets (but without the Vacation preset added)
           [1722299465.497] [62905:5625656] [TOO] Endpoint: 1 Cluster: 0x0000_0201 Attribute 0x0000_0050 DataVersion: 3098962545
           [1722299465.497] [62905:5625656] [TOO]   Presets: 5 entries
