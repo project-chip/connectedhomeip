@@ -1344,39 +1344,35 @@ class ChipDeviceControllerBase():
         # An empty list is the expected return for sending group write attribute.
         return []
 
-    async def PrepareToReceiveBdxData(self):
+    def PrepareToReceiveBdxData(self) -> asyncio.Future:
         '''
         Sets up the system to expect a node to initiate a BDX transfer. The transfer will send data here.
 
         Returns:
-            - a BdxTransfer with the init message from the transfer.
-        Raises:
-            - ? on error
+            - a future that will yield a BdxTransfer with the init message from the transfer.
         '''
         self.CheckIsActive()
 
         eventLoop = asyncio.get_running_loop()
         future = eventLoop.create_future()
 
-        res = await Bdx.PrepareToReceiveBdxData(future)
-        res.raise_on_error()
-        return await future
+        Bdx.PrepareToReceiveBdxData(future).raise_on_error()
+        return future
 
-    async def PrepareToSendBdxData(self, data: bytes): # TODO: Type of `data`.
+    def PrepareToSendBdxData(self, data: bytes) -> asyncio.Future:
         '''
         Sets up the system to expect a node to initiate a BDX transfer. The transfer will send data to the node.
 
-        Raises:
-            - ? on error
+        Returns:
+            - a future that will yield a BdxTransfer with the init message from the transfer.
         '''
         self.CheckIsActive()
 
         eventLoop = asyncio.get_running_loop()
         future = eventLoop.create_future()
 
-        res = await Bdx.PrepareToSendBdxData(future, data)
-        res.raise_on_error()
-        return await future
+        Bdx.PrepareToSendBdxData(future, data).raise_on_error()
+        return future
 
     def _parseAttributePathTuple(self, pathTuple: typing.Union[
         None,  # Empty tuple, all wildcard
