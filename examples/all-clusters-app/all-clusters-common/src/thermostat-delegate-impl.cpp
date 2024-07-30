@@ -17,6 +17,7 @@
  */
 
 #include <thermostat-delegate-impl.h>
+#include <thermostat-manager.h>
 
 #include <app-common/zap-generated/attributes/Accessors.h>
 #include <lib/support/Span.h>
@@ -251,4 +252,16 @@ CHIP_ERROR ThermostatDelegate::ApplyPendingPresets()
 void ThermostatDelegate::ClearPendingPresetList()
 {
     mNextFreeIndexInPendingPresetsList = 0;
+}
+
+void ThermostatDelegate::AttributeChanged(EndpointId endpointId, ClusterId clusterId, AttributeId attributeId, uint8_t * value,
+                                          uint16_t size)
+{
+    ChipLogProgress(AppServer, "ThermostatDelegate AttributeChanged callback: " ChipLogFormatMEI, ChipLogValueMEI(clusterId));
+
+    ChipLogProgress(AppServer,
+                    "Attribute ID changed: " ChipLogFormatMEI " Endpoint: %d ClusterId: " ChipLogFormatMEI " Value: %u, length %u",
+                    ChipLogValueMEI(attributeId), endpointId, ChipLogValueMEI(clusterId), *value, size);
+
+    ThermostatManager().AttributeChangeHandler(endpointId, clusterId, attributeId, value, size);
 }

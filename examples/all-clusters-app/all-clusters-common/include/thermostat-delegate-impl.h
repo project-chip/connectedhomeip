@@ -64,6 +64,9 @@ public:
 
     void ClearPendingPresetList() override;
 
+    void AttributeChanged(EndpointId endpointId, ClusterId clusterId, AttributeId attributeId, uint8_t * value,
+                          uint16_t size) override;
+
 private:
     static ThermostatDelegate sInstance;
 

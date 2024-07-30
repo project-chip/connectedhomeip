@@ -127,6 +127,19 @@ public:
      *
      */
     virtual void ClearPendingPresetList() = 0;
+
+    /**
+     * @brief Informs of a change in a non-atomic thermostat attribute
+     *
+     * @param[in] endpointId The endpoint for the thermostat cluster.
+     * @param[in] clusterId The ID of the cluster.
+     * @param[in] attributeId The ID of the attribute being updated.
+     * @param[in] value The new value of the attribute.
+     * @param[in] size The size of the new value of the attribute.
+     *
+     */
+    virtual void AttributeChanged(EndpointId endpointId, ClusterId clusterId, AttributeId attributeId, uint8_t * value,
+                                  uint16_t size) = 0;
 };
 
 } // namespace Thermostat

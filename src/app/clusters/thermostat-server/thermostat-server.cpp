@@ -1079,7 +1079,7 @@ MatterThermostatClusterServerPreAttributeChangedCallback(const app::ConcreteAttr
             if (requested > OccupiedCoolingSetpoint - DeadBandTemp)
                 return imcode::InvalidValue;
         }
-        return imcode::Success;
+        break;
     }
 
     case OccupiedCoolingSetpoint::Id: {
@@ -1094,7 +1094,7 @@ MatterThermostatClusterServerPreAttributeChangedCallback(const app::ConcreteAttr
             if (requested < OccupiedHeatingSetpoint + DeadBandTemp)
                 return imcode::InvalidValue;
         }
-        return imcode::Success;
+        break;
     }
 
     case UnoccupiedHeatingSetpoint::Id: {
@@ -1109,7 +1109,7 @@ MatterThermostatClusterServerPreAttributeChangedCallback(const app::ConcreteAttr
             if (requested > UnoccupiedCoolingSetpoint - DeadBandTemp)
                 return imcode::InvalidValue;
         }
-        return imcode::Success;
+        break;
     }
     case UnoccupiedCoolingSetpoint::Id: {
         requested = static_cast<int16_t>(chip::Encoding::LittleEndian::Get16(value));
@@ -1123,7 +1123,7 @@ MatterThermostatClusterServerPreAttributeChangedCallback(const app::ConcreteAttr
             if (requested < UnoccupiedHeatingSetpoint + DeadBandTemp)
                 return imcode::InvalidValue;
         }
-        return imcode::Success;
+        break;
     }
 
     case MinHeatSetpointLimit::Id: {
@@ -1137,7 +1137,7 @@ MatterThermostatClusterServerPreAttributeChangedCallback(const app::ConcreteAttr
             if (requested > MinCoolSetpointLimit - DeadBandTemp)
                 return imcode::InvalidValue;
         }
-        return imcode::Success;
+        break;
     }
     case MaxHeatSetpointLimit::Id: {
         requested = static_cast<int16_t>(chip::Encoding::LittleEndian::Get16(value));
@@ -1150,7 +1150,7 @@ MatterThermostatClusterServerPreAttributeChangedCallback(const app::ConcreteAttr
             if (requested > MaxCoolSetpointLimit - DeadBandTemp)
                 return imcode::InvalidValue;
         }
-        return imcode::Success;
+        break;
     }
     case MinCoolSetpointLimit::Id: {
         requested = static_cast<int16_t>(chip::Encoding::LittleEndian::Get16(value));
@@ -1163,7 +1163,7 @@ MatterThermostatClusterServerPreAttributeChangedCallback(const app::ConcreteAttr
             if (requested < MinHeatSetpointLimit + DeadBandTemp)
                 return imcode::InvalidValue;
         }
-        return imcode::Success;
+        break;
     }
     case MaxCoolSetpointLimit::Id: {
         requested = static_cast<int16_t>(chip::Encoding::LittleEndian::Get16(value));
@@ -1176,7 +1176,7 @@ MatterThermostatClusterServerPreAttributeChangedCallback(const app::ConcreteAttr
             if (requested < MaxHeatSetpointLimit + DeadBandTemp)
                 return imcode::InvalidValue;
         }
-        return imcode::Success;
+        break;
     }
     case MinSetpointDeadBand::Id: {
         requested = *value;
@@ -1184,7 +1184,7 @@ MatterThermostatClusterServerPreAttributeChangedCallback(const app::ConcreteAttr
             return imcode::UnsupportedAttribute;
         if (requested < 0 || requested > 25)
             return imcode::InvalidValue;
-        return imcode::Success;
+        break;
     }
 
     case ControlSequenceOfOperation::Id: {
@@ -1192,7 +1192,7 @@ MatterThermostatClusterServerPreAttributeChangedCallback(const app::ConcreteAttr
         requestedCSO = *value;
         if (requestedCSO > to_underlying(ControlSequenceOfOperationEnum::kCoolingAndHeatingWithReheat))
             return imcode::InvalidValue;
-        return imcode::Success;
+        break;
     }
 
     case SystemMode::Id: {
@@ -1215,22 +1215,27 @@ MatterThermostatClusterServerPreAttributeChangedCallback(const app::ConcreteAttr
         case ControlSequenceOfOperationEnum::kCoolingWithReheat:
             if (RequestedSystemMode == SystemModeEnum::kHeat || RequestedSystemMode == SystemModeEnum::kEmergencyHeat)
                 return imcode::InvalidValue;
-            else
-                return imcode::Success;
+            break;
 
         case ControlSequenceOfOperationEnum::kHeatingOnly:
         case ControlSequenceOfOperationEnum::kHeatingWithReheat:
             if (RequestedSystemMode == SystemModeEnum::kCool || RequestedSystemMode == SystemModeEnum::kPrecooling)
                 return imcode::InvalidValue;
-            else
-                return imcode::Success;
+            break;
         default:
-            return imcode::Success;
+            break;
         }
+        break;
     }
     default:
-        return imcode::Success;
+        break;
     }
+    Delegate * delegate = GetDelegate(endpoint);
+    if (delegate != nullptr)
+    {
+        delegate->AttributeChanged(attributePath.mEndpointId, attributePath.mClusterId, attributePath.mAttributeId, value, size);
+    }
+    return imcode::Success;
 }
 
 bool emberAfThermostatClusterClearWeeklyScheduleCallback(app::CommandHandler * commandObj,

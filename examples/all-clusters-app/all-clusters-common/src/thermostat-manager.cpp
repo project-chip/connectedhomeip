@@ -490,20 +490,6 @@ static const char * RunningModeString(ThermostatRunningModeEnum runningMode)
     }
 }
 
-void MatterPostAttributeChangeCallback(const ConcreteAttributePath & attributePath, uint8_t type, uint16_t size, uint8_t * value)
-{
-    ClusterId clusterId     = attributePath.mClusterId;
-    AttributeId attributeId = attributePath.mAttributeId;
-    ChipLogProgress(AppServer, "Cluster callback: " ChipLogFormatMEI, ChipLogValueMEI(clusterId));
-
-    ChipLogProgress(AppServer,
-                    "Attribute ID changed: " ChipLogFormatMEI " Endpoint: %d ClusterId: " ChipLogFormatMEI
-                    " Type: %u Value: %u, length %u",
-                    ChipLogValueMEI(attributeId), attributePath.mEndpointId, ChipLogValueMEI(clusterId), type, *value, size);
-
-    ThermostatMgr().AttributeChangeHandler(attributePath.mEndpointId, clusterId, attributeId, value, size);
-}
-
 void emberAfThermostatClusterInitCallback(EndpointId endpoint)
 {
     ChipLogProgress(Zcl, "Starting Thermostat Manager");
