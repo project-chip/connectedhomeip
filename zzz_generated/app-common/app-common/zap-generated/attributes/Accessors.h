@@ -3335,12 +3335,6 @@ Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint16_t valu
 namespace ServiceArea {
 namespace Attributes {
 
-namespace FeatureMap {
-Protocols::InteractionModel::Status Get(chip::EndpointId endpoint, uint32_t * value); // bitmap32
-Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint32_t value);
-Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint32_t value, MarkAttributeDirty markDirty);
-} // namespace FeatureMap
-
 namespace ClusterRevision {
 Protocols::InteractionModel::Status Get(chip::EndpointId endpoint, uint16_t * value); // int16u
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint16_t value);
