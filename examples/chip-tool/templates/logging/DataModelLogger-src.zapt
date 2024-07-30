@@ -7,6 +7,8 @@ using namespace chip::app::Clusters;
 {{#zcl_structs}}
 {{#if has_more_than_one_cluster}}
 {{> struct_logger_impl namespace="detail"}}
+{{else if has_no_clusters}}
+{{> struct_logger_impl namespace="Globals"}}
 {{/if}}
 {{/zcl_structs}}
 

@@ -1,0 +1,4 @@
+        class {{asType label}}(IntFlag):
+{{#zcl_bitmap_items}}
+            k{{asUpperCamelCase label}} = {{asHex mask}}
+{{/zcl_bitmap_items}}

@@ -402,6 +402,12 @@ static BOOL AttributeIsSpecifiedInAccessControlCluster(AttributeId aAttributeId)
     case Attributes::AccessControlEntriesPerFabric::Id: {
         return YES;
     }
+    case Attributes::CommissioningARL::Id: {
+        return YES;
+    }
+    case Attributes::Arl::Id: {
+        return YES;
+    }
     case Attributes::GeneratedCommandList::Id: {
         return YES;
     }
@@ -892,6 +898,18 @@ static BOOL AttributeIsSpecifiedInGeneralCommissioningCluster(AttributeId aAttri
         return YES;
     }
     case Attributes::SupportsConcurrentConnection::Id: {
+        return YES;
+    }
+    case Attributes::TCAcceptedVersion::Id: {
+        return YES;
+    }
+    case Attributes::TCMinRequiredVersion::Id: {
+        return YES;
+    }
+    case Attributes::TCAcknowledgements::Id: {
+        return YES;
+    }
+    case Attributes::TCAcknowledgementsRequired::Id: {
         return YES;
     }
     case Attributes::GeneratedCommandList::Id: {
@@ -1510,6 +1528,9 @@ static BOOL AttributeIsSpecifiedInBridgedDeviceBasicInformationCluster(Attribute
         return YES;
     }
     case Attributes::ProductName::Id: {
+        return YES;
+    }
+    case Attributes::ProductID::Id: {
         return YES;
     }
     case Attributes::NodeLabel::Id: {
@@ -4161,9 +4182,6 @@ static BOOL AttributeIsSpecifiedInThermostatCluster(AttributeId aAttributeId)
     case Attributes::PresetsSchedulesEditable::Id: {
         return YES;
     }
-    case Attributes::TemperatureSetpointHoldPolicy::Id: {
-        return YES;
-    }
     case Attributes::SetpointHoldExpiryTimestamp::Id: {
         return YES;
     }
@@ -5430,6 +5448,9 @@ static BOOL AttributeIsSpecifiedInWiFiNetworkManagementCluster(AttributeId aAttr
     case Attributes::Ssid::Id: {
         return YES;
     }
+    case Attributes::PassphraseSurrogate::Id: {
+        return YES;
+    }
     case Attributes::GeneratedCommandList::Id: {
         return YES;
     }
@@ -6657,6 +6678,12 @@ static BOOL AttributeIsSpecifiedInUnitTestingCluster(AttributeId aAttributeId)
     case Attributes::ClusterErrorBoolean::Id: {
         return YES;
     }
+    case Attributes::GlobalEnum::Id: {
+        return YES;
+    }
+    case Attributes::GlobalStruct::Id: {
+        return YES;
+    }
     case Attributes::Unsupported::Id: {
         return YES;
     }
@@ -6760,6 +6787,12 @@ static BOOL AttributeIsSpecifiedInUnitTestingCluster(AttributeId aAttributeId)
         return YES;
     }
     case Attributes::WriteOnlyInt8u::Id: {
+        return YES;
+    }
+    case Attributes::NullableGlobalEnum::Id: {
+        return YES;
+    }
+    case Attributes::NullableGlobalStruct::Id: {
         return YES;
     }
     case Attributes::GeneratedCommandList::Id: {
