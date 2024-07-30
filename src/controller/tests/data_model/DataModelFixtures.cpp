@@ -50,6 +50,17 @@ private:
     AttributeValueEncoder & mEncoder;
 };
 
+class TestOnlyAttributeValueDecoderAccessor
+{
+public:
+    TestOnlyAttributeValueDecoderAccessor(AttributeValueDecoder & decoder) : mDecoder(decoder) {}
+
+    TLV::TLVReader & GetTlvReader() { return mDecoder.mReader; }
+
+private:
+    AttributeValueDecoder & mDecoder;
+};
+
 namespace DataModelTests {
 
 ScopedChangeOnly<ReadResponseDirective> gReadResponseDirective(ReadResponseDirective::kSendDataResponse);
@@ -300,7 +311,8 @@ CHIP_ERROR WriteSingleClusterData(const Access::SubjectDescriptor & aSubjectDesc
     }
     if (aPath.mClusterId == Clusters::UnitTesting::Id && aPath.mAttributeId == Attributes::ListFabricScoped::Id)
     {
-        // Mock a invalid SubjectDescriptor
+        // Mock an invalid SubjectDescriptor.
+        // NOTE: completely ignores the passed-in subjectDescriptor
         AttributeValueDecoder decoder(aReader, Access::SubjectDescriptor());
         if (!aPath.IsListOperation() || aPath.mListOp == ConcreteDataAttributePath::ListOperation::ReplaceAll)
         {
@@ -570,12 +582,20 @@ CHIP_ERROR CustomDataModel::WriteAttribute(const WriteAttributeRequest & request
     }
     if (request.path.mClusterId == Clusters::UnitTesting::Id && request.path.mAttributeId == Attributes::ListFabricScoped::Id)
     {
-        // Mock a invalid SubjectDescriptor
+        // TODO(backwards compatibility): unit tests here undoes the subject descriptor usage
+        //   - original tests were completely bypassing the passed in subject descriptor for this test
+        //     and overriding it with a invalid subject descriptor
+        //   - we do the same here, however this seems somewhat off: decoder.Decode() will fail for list
+        //     items so we could just return the error directly without this extra step
+
+        // Mock an invalid Subject Descriptor
+        AttributeValueDecoder invalidSubjectDescriptorDecoder(TestOnlyAttributeValueDecoderAccessor(decoder).GetTlvReader(),
+                                                              Access::SubjectDescriptor());
         if (!request.path.IsListOperation() || request.path.mListOp == ConcreteDataAttributePath::ListOperation::ReplaceAll)
         {
             Attributes::ListFabricScoped::TypeInfo::DecodableType value;
 
-            ReturnErrorOnFailure(decoder.Decode(value));
+            ReturnErrorOnFailure(invalidSubjectDescriptorDecoder.Decode(value));
 
             auto iter = value.begin();
             while (iter.Next())
@@ -587,7 +607,7 @@ CHIP_ERROR CustomDataModel::WriteAttribute(const WriteAttributeRequest & request
         else if (request.path.mListOp == ConcreteDataAttributePath::ListOperation::AppendItem)
         {
             Structs::TestFabricScoped::DecodableType item;
-            ReturnErrorOnFailure(decoder.Decode(item));
+            ReturnErrorOnFailure(invalidSubjectDescriptorDecoder.Decode(item));
         }
         else
         {
