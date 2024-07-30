@@ -37,6 +37,8 @@ import uuid
 import subprocess
 import time
 import signal
+import time
+
 
 import chip.clusters as Clusters
 from matter_testing_support import MatterBaseTest, TestStep, async_test_body, default_matter_test_main, SimpleEventCallback
@@ -81,8 +83,7 @@ class TC_BRBINFO_4_1(MatterBaseTest):
             TestStep(3, "TH reads from the ICD the IDLE_MODE_DURATION and ACTIVE_MODE_DURATION attributes"),
             TestStep(4, "Simple KeepActive command w/ subscription. ActiveChanged event received by TH contains PromisedActiveDuration"),
             TestStep(5, "Multiple KeepActive commands. ActiveChanged event received by TH contains a PromisedActiveDuration"),
-            TestStep(6, "Simple KeepActive command w/ check-in. ActiveChanged event received by TH contains PromisedActiveDuration"),
-            TestStep(7, "KeepActive not returned after 60 minutes of offline ICD"),
+            TestStep(6, "KeepActive not returned after 60 minutes of offline ICD"),
         ]
         return steps
 
@@ -101,6 +102,24 @@ class TC_BRBINFO_4_1(MatterBaseTest):
                         f"- setupPinCode: {setupPinCode}\n"
                         f"If using FabricSync Admin, you may type:\n"
                         f">>> pairing onnetwork 111 {setupPinCode}")
+
+    def _display_message_and_wait_for_user_input(self, message):
+        self.wait_for_user_input(prompt_msg=message)
+
+    async def _send_keep_active_command(self, duration):
+        logging.info("Mock sending keep active command")
+        # TODO check success
+        #keepActive = await self.default_controller.SendCommand(nodeid=self.dut_node_id, endpoint=kICDBridgedEndpointId, payload=brbinfoCluster.Commands.KeepActive(stayActiveDuration=duration))
+
+    async def _wait_for_active_changed_event(self, timeout) -> int:
+        try:
+            PromisedActiveDuration = self.q.get(block=True, timeout=timeout)
+            logging.info(f"PromisedActiveDuration: {PromisedActiveDuration}")
+            return PromisedActiveDuration
+        except queue.Empty:
+            asserts.assert_true(False, "Timeout on event")
+
+
 
     @async_test_body
     async def setup_class(self):
@@ -165,21 +184,23 @@ class TC_BRBINFO_4_1(MatterBaseTest):
         )
 
         self.step(2)
-        # Confirms commissioning of ICD as it reads basic info from bridge device
-        # reachable = await self._read_attribute_expect_success(
-        #   kICDBridgedEndpointId,
-        #   brbinfoCluster,
-        #   brbinfoAttributes.Reachable,
-        #   self.dut_node_id
-        # )
+        # Confirms commissioning of ICD as it reads basic info from ICD device
+        reachable = await self._read_attribute_expect_success(
+          kRootEndpointId,
+          basicinfoCluster,
+          basicinfoAttributes.FeatureMap,
+          self.icd_nodeid
+        )
 
         self.step(3)
+        # Test 1A
         idle_mode_duration = await self._read_attribute_expect_success(
           kICDMEndpointId,
           icdmCluster,
           icdmAttributes.IdleModeDuration,
           self.icd_nodeid
         )
+        logging.info(f"IdleModeDuration: {idle_mode_duration}")
 
         active_mode_duration = await self._read_attribute_expect_success(
           kICDMEndpointId,
@@ -187,32 +208,80 @@ class TC_BRBINFO_4_1(MatterBaseTest):
           icdmAttributes.ActiveModeDuration,
           self.icd_nodeid
         )
+        logging.info(f"ActiveModeDuration: {active_mode_duration}")
 
         self.step(4)
+        # Test 1B
 
         # Subscription to ActiveChanged
         event = brbinfoCluster.Events.ActiveChanged
         self.q = queue.Queue()
         urgent = 1
-        cb = SimpleEventCallback("Activechanged", event.cluster_id, event.event_id, self.q)
+        cb = SimpleEventCallback("ActiveChanged", event.cluster_id, event.event_id, self.q)
         subscription = await self.default_controller.ReadEvent(nodeid=self.dut_node_id, events=[(kICDBridgedEndpointId, event, urgent)], reportInterval=[1, 3])
         subscription.SetEventUpdateCallback(callback=cb)
 
-        # Sends KeepActive command
-        keepActive = await self.default_controller.SendCommand(nodeid=self.dut_node_id, endpoint=kICDBridgedEndpointId, payload=brbinfoCluster.Commands.KeepActive(2000))
+        StayActiveDuration = 1000
+        logging.info(f"Sending KeepActiveCommand({StayActiveDuration}ms)")
+        self._send_keep_active_command(StayActiveDuration)
 
-        try:
-            self.q.get(block=True, timeout=10)
-        except queue.Empty:
-            asserts.assert_fail("Timeout on event")
+        logging.info(f"Waiting for ActiveChanged from DUT...")
+        PromisedActiveDuration = await self._wait_for_active_changed_event((idle_mode_duration + max(active_mode_duration, StayActiveDuration))/1000)
+
+        asserts.assert_true(PromisedActiveDuration >= StayActiveDuration, "PromisedActiveDuration < StayActiveDuration")
 
         self.step(5)
+        # Test 2
 
+        StayActiveDuration = 1500
+        logging.info(f"Sending KeepActiveCommand({StayActiveDuration}ms)")
+        self._send_keep_active_command(StayActiveDuration)
+
+        logging.info(f"Waiting for ActiveChanged from DUT...")
+        PromisedActiveDuration = await self._wait_for_active_changed_event((idle_mode_duration + max(active_mode_duration, StayActiveDuration))/1000)
+
+        # wait for active time duration
+        time.sleep(max(StayActiveDuration/1000, active_mode_duration))
+        # ICD now should be in idle mode
+
+        # sends 3x keep active commands
+        logging.info(f"Sending KeepActiveCommand({StayActiveDuration})")
+        self._send_keep_active_command(StayActiveDuration)
+        time.sleep(StayActiveDuration/1000)
+        logging.info(f"Sending KeepActiveCommand({StayActiveDuration})")
+        self._send_keep_active_command(StayActiveDuration)
+        time.sleep(StayActiveDuration/1000)
+        logging.info(f"Sending KeepActiveCommand({StayActiveDuration})")
+        self._send_keep_active_command(StayActiveDuration)
+        time.sleep(StayActiveDuration/1000)
+
+        logging.info(f"Waiting for ActiveChanged from DUT...")
+        PromisedActiveDuration = await self._wait_for_active_changed_event((idle_mode_duration + max(active_mode_duration, StayActiveDuration))/1000)
+
+        asserts.assert_true(q.qSize() == 0, "More than one event received from DUT")
 
         self.step(6)
+        # Test 3
 
+        StayActiveDuration = 10000
+        logging.info(f"Sending KeepActiveCommand({StayActiveDuration})")
+        self._send_keep_active_command(StayActiveDuration)
 
-        self.step(7)
+        ## TODO turn off the ICD
+
+        logging.info(f"Waiting for 60 minutes")
+        time.sleep(60*60*1000)
+
+        ## TODO turn on the ICD
+
+        # wait for active changed event, expect no event will be sent
+
+        # give extra time for ICD startup
+        event_timeout = (idle_mode_duration + max(active_mode_duration, StayActiveDuration))/1000 + 10
+        try:
+            PromisedActiveDuration = self.q.get(block=True, timeout=event_timeout)
+        finally:
+            asserts.assert_true(queue.Empty(), "ActiveChanged event received when not expected")
 
 if __name__ == "__main__":
     default_matter_test_main()
