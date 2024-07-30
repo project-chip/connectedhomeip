@@ -128,7 +128,6 @@ class TC_BRBINFO_4_1(MatterBaseTest):
 
         self.kvs = f'kvs_{str(uuid.uuid4())}'
         self.port = 5543
-        discriminator = random.randint(0, 4095)
         discriminator = 3850
         passcode = 20202021
         app_args = f'--secured-device-port {self.port} --discriminator {discriminator} --passcode {passcode} --KVS {self.kvs} ' + \
@@ -267,17 +266,17 @@ class TC_BRBINFO_4_1(MatterBaseTest):
         logging.info(f"Sending KeepActiveCommand({StayActiveDuration})")
         self._send_keep_active_command(StayActiveDuration)
 
-        ## TODO turn off the ICD
+        ## halt the ICD process
+        self.app_process.send_signal(signal.SIGSTOP.value)
 
         logging.info(f"Waiting for 60 minutes")
-        time.sleep(60*60*1000)
+        time.sleep(60*60)
 
-        ## TODO turn on the ICD
+        ## resume the ICD
+        self.app_process.send_signal(signal.SIGCONT.value)
 
         # wait for active changed event, expect no event will be sent
-
-        # give extra time for ICD startup
-        event_timeout = (idle_mode_duration + max(active_mode_duration, StayActiveDuration))/1000 + 10
+        event_timeout = (idle_mode_duration + max(active_mode_duration, StayActiveDuration))/1000
         try:
             PromisedActiveDuration = self.q.get(block=True, timeout=event_timeout)
         finally:
