@@ -1,0 +1,2148 @@
+# Copyright (c) 2024 Project CHIP Authors
+#
+# Licensed under the Apache License, Version 2.0 (the "License");
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
+#
+# http://www.apache.org/licenses/LICENSE-2.0
+#
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
+
+name: 42.4.2. [TC-TSTAT-4.2] Preset Test Cases with server as DUT
+
+PICS:
+    - TSTAT.S
+
+config:
+    nodeId: 0x12344321
+    cluster: "Thermostat"
+    endpoint: 1
+
+tests:
+    - label: "Step 1: Commission DUT to TH"
+      cluster: "DelayCommands"
+      command: "WaitForCommissionee"
+      arguments:
+          values:
+              - name: "nodeId"
+                value: nodeId
+
+    - label: "Step 2: Test Harness writes to the Presets attribute without calling the StartPresetsSchedulesEditRequest"
+      PICS: TSTAT.S.F08 && TSTAT.S.A0050
+      verification: |
+          Optional Attribute - If it is supported, then in TH log it will results in displaying the value, else it will display UNSUPPORTED_ATTRIBUTE. Below is the log of RPI the result may be vary on the basis of dut implementation.
+
+          #2 Test Harness Client attempts to write PresetTypes and gets an INVALID_IN_STATE error since the client didn't send a request to edit the presets by calling StartPresetsSchedulesEditRequest command.
+          ./chip-tool thermostat write presets '[ {"presetHandle": "hex:01", "presetScenario": 1, "coolingSetpoint": 2500, "heatingSetpoint": 2600, "builtIn": true }, {"presetHandle": "hex:02", "presetScenario": 2, "coolingSetpoint": 2600, "heatingSetpoint": 2500, "builtIn": true }, {"presetHandle": null, "name": "Sleep", "presetScenario": 3, "coolingSetpoint": 2500, "heatingSetpoint": 2600, "builtIn": false }]' 0x12344321 1
+          On TH(chip-tool) verify that  DUT sends a INVALID_IN_STATE (0xCB)
+
+          [1722285385.263] [53729:5380292] [DMG] WriteClient moving to [AwaitingDe]
+          [1722285385.263] [53729:5380292] [TOO] Response Failure: IM Error 0x000005CB: General error: 0xcb (INVALID_IN_STATE)
+          [1722285385.263] [53729:5380292] [EM] <<< [E:42658i S:21691 M:14088666 (Ack:20978215)] (S) Msg TX to 1:000000000000006E [FEC4] [UDP:[fe80::1%lo0]:5540] --- Type 0000:10 (SecureChannel:StandaloneAck) (B:34)
+          [1722285385.263] [53729:5380292] [EM] Flushed pending ack for MessageCounter:20978215 on exchange 42658i
+      cluster: "LogCommands"
+      command: "UserPrompt"
+      arguments:
+          values:
+              - name: "message"
+                value: "Please enter 'y' after success"
+              - name: "expectedValue"
+                value: "y"
+
+    - label: "Step 3a:  Test Harness writes to the Presets attribute after calling the StartPresetsSchedulesEditRequest command"
+      PICS: TSTAT.S.F08 && TSTAT.C.C07.Tx
+      verification: |
+          Optional Attribute - If it is supported, then in TH log it will results in displaying the value, else it will display UNSUPPORTED_ATTRIBUTE. Below is the log of RPI the result may be vary on the basis of dut implementation.
+
+          #3a Test Harness Client calls StartPresetsSchedulesEditRequest command
+
+          ./chip-tool thermostat start-presets-schedules-edit-request 180 0x12344321 1
+          On TH(chip-tool) verify that  DUT sends a success response
+          [1722286001.805] [54149:5392862] [DMG] Received Command Response Status for Endpoint=1 Cluster=0x0000_0201 Command=0x0000_0007 Status=0x0
+          [1722286001.805] [54149:5392862] [DMG] ICR moving to [AwaitingDe]
+          [1722286001.805] [54149:5392862] [EM] <<< [E:7545i S:16937 M:144975449 (Ack:93571372)] (S) Msg TX to 1:000000000000006E [FEC4] [UDP:[fe80::1%lo0]:5540] --- Type 0000:10 (SecureChannel:StandaloneAck) (B:34)
+          [1722286001.806] [54149:5392862] [EM] Flushed pending ack for MessageCounter:93571372 on exchange 7545i
+      cluster: "LogCommands"
+      command: "UserPrompt"
+      arguments:
+          values:
+              - name: "message"
+                value: "Please enter 'y' after success"
+              - name: "expectedValue"
+                value: "y"
+
+    - label: "Step 3b:  Test Harness writes to the Presets attribute adding 3 presets for Sleep, Wake and GoingToSleep"
+      PICS: TSTAT.S.F08 && TSTAT.S.A0050
+      verification: |
+          Optional Attribute - If it is supported, then in TH log it will results in displaying the value, else it will display UNSUPPORTED_ATTRIBUTE. Below is the log of RPI the result may be vary on the basis of dut implementation.
+
+          #3b Test Harness Client attempts to write PresetTypes and gets SUCCESS
+
+         ./chip-tool thermostat write presets '[ {"presetHandle": "hex:01", "presetScenario": 1, "coolingSetpoint": 2500, "heatingSetpoint": 2600, "builtIn": true }, {"presetHandle": "hex:02", "presetScenario": 2, "coolingSetpoint": 2600, "heatingSetpoint": 2500, "builtIn": true }, {"presetHandle": null, "name": "Sleep", "presetScenario": 3, "coolingSetpoint": 2500, "heatingSetpoint": 2600, "builtIn": false },  {"presetHandle": null, "name": "Wake", "presetScenario": 4, "coolingSetpoint": 2200, "heatingSetpoint": 2900, "builtIn": false }, {"presetHandle": null, "name": "GoingToSleep", "presetScenario": 6, "coolingSetpoint": 2100, "heatingSetpoint": 2500, "builtIn": false }]' 0x12344321 1
+          On TH(chip-tool) verify that  DUT sends a success response
+          [1722286250.503] [54321:5397545] [DMG] WriteClient moving to [ResponseRe]
+          [1722286250.503] [54321:5397545] [DMG] WriteResponseMessage =
+          [1722286250.503] [54321:5397545] [DMG] {
+          [1722286250.503] [54321:5397545] [DMG] 	AttributeStatusIBs =
+          [1722286250.503] [54321:5397545] [DMG] 	[
+          [1722286250.503] [54321:5397545] [DMG] 		AttributeStatusIB =
+          [1722286250.503] [54321:5397545] [DMG] 		{
+          [1722286250.503] [54321:5397545] [DMG] 			AttributePathIB =
+          [1722286250.503] [54321:5397545] [DMG] 			{
+          [1722286250.503] [54321:5397545] [DMG] 				Endpoint = 0x1,
+          [1722286250.503] [54321:5397545] [DMG] 				Cluster = 0x201,
+          [1722286250.503] [54321:5397545] [DMG] 				Attribute = 0x0000_0050,
+          [1722286250.503] [54321:5397545] [DMG] 			}
+          [1722286250.503] [54321:5397545] [DMG]
+          [1722286250.503] [54321:5397545] [DMG] 			StatusIB =
+          [1722286250.503] [54321:5397545] [DMG] 			{
+          [1722286250.503] [54321:5397545] [DMG] 				status = 0x00 (SUCCESS),
+          [1722286250.503] [54321:5397545] [DMG] 			},
+          [1722286250.503] [54321:5397545] [DMG]
+          [1722286250.503] [54321:5397545] [DMG] 		},
+          [1722286250.503] [54321:5397545] [DMG]
+          [1722286250.503] [54321:5397545] [DMG] 		AttributeStatusIB =
+          [1722286250.503] [54321:5397545] [DMG] 		{
+          [1722286250.503] [54321:5397545] [DMG] 			AttributePathIB =
+          [1722286250.503] [54321:5397545] [DMG] 			{
+          [1722286250.503] [54321:5397545] [DMG] 				Endpoint = 0x1,
+          [1722286250.503] [54321:5397545] [DMG] 				Cluster = 0x201,
+          [1722286250.503] [54321:5397545] [DMG] 				Attribute = 0x0000_0050,
+          [1722286250.503] [54321:5397545] [DMG] 				ListIndex = Null,
+          [1722286250.503] [54321:5397545] [DMG] 			}
+          [1722286250.503] [54321:5397545] [DMG]
+          [1722286250.503] [54321:5397545] [DMG] 			StatusIB =
+          [1722286250.503] [54321:5397545] [DMG] 			{
+          [1722286250.503] [54321:5397545] [DMG] 				status = 0x00 (SUCCESS),
+          [1722286250.503] [54321:5397545] [DMG] 			},
+          [1722286250.503] [54321:5397545] [DMG]
+          [1722286250.503] [54321:5397545] [DMG] 		},
+          [1722286250.503] [54321:5397545] [DMG]
+          [1722286250.503] [54321:5397545] [DMG] 		AttributeStatusIB =
+          [1722286250.503] [54321:5397545] [DMG] 		{
+          [1722286250.503] [54321:5397545] [DMG] 			AttributePathIB =
+          [1722286250.503] [54321:5397545] [DMG] 			{
+          [1722286250.503] [54321:5397545] [DMG] 				Endpoint = 0x1,
+          [1722286250.503] [54321:5397545] [DMG] 				Cluster = 0x201,
+          [1722286250.503] [54321:5397545] [DMG] 				Attribute = 0x0000_0050,
+          [1722286250.503] [54321:5397545] [DMG] 				ListIndex = Null,
+          [1722286250.503] [54321:5397545] [DMG] 			}
+          [1722286250.503] [54321:5397545] [DMG]
+          [1722286250.503] [54321:5397545] [DMG] 			StatusIB =
+          [1722286250.504] [54321:5397545] [DMG] 			{
+          [1722286250.504] [54321:5397545] [DMG] 				status = 0x00 (SUCCESS),
+          [1722286250.504] [54321:5397545] [DMG] 			},
+          [1722286250.504] [54321:5397545] [DMG]
+          [1722286250.504] [54321:5397545] [DMG] 		},
+          [1722286250.504] [54321:5397545] [DMG]
+          [1722286250.504] [54321:5397545] [DMG] 		AttributeStatusIB =
+          [1722286250.504] [54321:5397545] [DMG] 		{
+          [1722286250.504] [54321:5397545] [DMG] 			AttributePathIB =
+          [1722286250.504] [54321:5397545] [DMG] 			{
+          [1722286250.504] [54321:5397545] [DMG] 				Endpoint = 0x1,
+          [1722286250.504] [54321:5397545] [DMG] 				Cluster = 0x201,
+          [1722286250.504] [54321:5397545] [DMG] 				Attribute = 0x0000_0050,
+          [1722286250.504] [54321:5397545] [DMG] 				ListIndex = Null,
+          [1722286250.504] [54321:5397545] [DMG] 			}
+          [1722286250.504] [54321:5397545] [DMG]
+          [1722286250.504] [54321:5397545] [DMG] 			StatusIB =
+          [1722286250.504] [54321:5397545] [DMG] 			{
+          [1722286250.504] [54321:5397545] [DMG] 				status = 0x00 (SUCCESS),
+          [1722286250.504] [54321:5397545] [DMG] 			},
+          [1722286250.504] [54321:5397545] [DMG]
+          [1722286250.504] [54321:5397545] [DMG] 		},
+          [1722286250.504] [54321:5397545] [DMG]
+          [1722286250.504] [54321:5397545] [DMG] 		AttributeStatusIB =
+          [1722286250.504] [54321:5397545] [DMG] 		{
+          [1722286250.504] [54321:5397545] [DMG] 			AttributePathIB =
+          [1722286250.504] [54321:5397545] [DMG] 			{
+          [1722286250.504] [54321:5397545] [DMG] 				Endpoint = 0x1,
+          [1722286250.504] [54321:5397545] [DMG] 				Cluster = 0x201,
+          [1722286250.504] [54321:5397545] [DMG] 				Attribute = 0x0000_0050,
+          [1722286250.504] [54321:5397545] [DMG] 				ListIndex = Null,
+          [1722286250.504] [54321:5397545] [DMG] 			}
+          [1722286250.504] [54321:5397545] [DMG]
+          [1722286250.504] [54321:5397545] [DMG] 			StatusIB =
+          [1722286250.504] [54321:5397545] [DMG] 			{
+          [1722286250.504] [54321:5397545] [DMG] 				status = 0x00 (SUCCESS),
+          [1722286250.504] [54321:5397545] [DMG] 			},
+          [1722286250.504] [54321:5397545] [DMG]
+          [1722286250.504] [54321:5397545] [DMG] 		},
+          [1722286250.504] [54321:5397545] [DMG]
+          [1722286250.504] [54321:5397545] [DMG] 		AttributeStatusIB =
+          [1722286250.504] [54321:5397545] [DMG] 		{
+          [1722286250.504] [54321:5397545] [DMG] 			AttributePathIB =
+          [1722286250.504] [54321:5397545] [DMG] 			{
+          [1722286250.504] [54321:5397545] [DMG] 				Endpoint = 0x1,
+          [1722286250.504] [54321:5397545] [DMG] 				Cluster = 0x201,
+          [1722286250.504] [54321:5397545] [DMG] 				Attribute = 0x0000_0050,
+          [1722286250.504] [54321:5397545] [DMG] 				ListIndex = Null,
+          [1722286250.504] [54321:5397545] [DMG] 			}
+          [1722286250.504] [54321:5397545] [DMG]
+          [1722286250.504] [54321:5397545] [DMG] 			StatusIB =
+          [1722286250.504] [54321:5397545] [DMG] 			{
+          [1722286250.504] [54321:5397545] [DMG] 				status = 0x00 (SUCCESS),
+          [1722286250.504] [54321:5397545] [DMG] 			},
+          [1722286250.504] [54321:5397545] [DMG]
+          [1722286250.504] [54321:5397545] [DMG] 		},
+          [1722286250.504] [54321:5397545] [DMG]
+          [1722286250.504] [54321:5397545] [DMG] 	],
+          [1722286250.504] [54321:5397545] [DMG]
+          [1722286250.504] [54321:5397545] [DMG] 	InteractionModelRevision = 11
+          [1722286250.504] [54321:5397545] [DMG] }
+          [1722286250.504] [54321:5397545] [DMG] WriteClient moving to [AwaitingDe]
+          [1722286250.504] [54321:5397545] [EM] <<< [E:14426i S:42250 M:116961408 (Ack:156984778)] (S) Msg TX to 1:000000000000006E [FEC4] [UDP:[fe80::1%lo0]:5540] --- Type 0000:10 (SecureChannel:StandaloneAck) (B:34)
+          [1722286250.504] [54321:5397545] [EM] Flushed pending ack for MessageCounter:156984778 on exchange 14426i
+      cluster: "LogCommands"
+      command: "UserPrompt"
+      arguments:
+          values:
+              - name: "message"
+                value: "Please enter 'y' after success"
+              - name: "expectedValue"
+                value: "y"
+
+    - label: "Step 3c:  Test Harness reads the Presets attribute without calling the CommitPresetsSchedulesRequest command"
+      PICS: TSTAT.S.F08 && TSTAT.S.A0050
+      verification: |
+          Optional Attribute - If it is supported, then in TH log it will results in displaying the value, else it will display UNSUPPORTED_ATTRIBUTE. Below is the log of RPI the result may be vary on the basis of dut implementation.
+
+          #3c Test Harness Client reads Presets attribute but the new additions are not committed since the client didn't call the CommitPresetsSchedulesRequest command
+
+         ./chip-tool thermostat read presets 0x12344321 1
+          On TH(chip-tool) verify that  DUT successfully read Presets (but without the new changes)
+          [1722286701.424] [54699:5406692] [TOO] Endpoint: 1 Cluster: 0x0000_0201 Attribute 0x0000_0050 DataVersion: 3807987049
+          [1722286701.425] [54699:5406692] [TOO]   Presets: 2 entries
+          [1722286701.425] [54699:5406692] [TOO]     [1]: {
+          [1722286701.425] [54699:5406692] [TOO]       PresetHandle: 01
+          [1722286701.425] [54699:5406692] [TOO]       PresetScenario: 1
+          [1722286701.425] [54699:5406692] [TOO]       CoolingSetpoint: 2500
+          [1722286701.425] [54699:5406692] [TOO]       HeatingSetpoint: 2100
+          [1722286701.426] [54699:5406692] [TOO]       BuiltIn: TRUE
+          [1722286701.426] [54699:5406692] [TOO]      }
+          [1722286701.426] [54699:5406692] [TOO]     [2]: {
+          [1722286701.426] [54699:5406692] [TOO]       PresetHandle: 02
+          [1722286701.426] [54699:5406692] [TOO]       PresetScenario: 2
+          [1722286701.426] [54699:5406692] [TOO]       CoolingSetpoint: 2600
+          [1722286701.426] [54699:5406692] [TOO]       HeatingSetpoint: 2000
+          [1722286701.426] [54699:5406692] [TOO]       BuiltIn: TRUE
+          [1722286701.426] [54699:5406692] [TOO]      }
+          [1722286701.426] [54699:5406692] [EM] <<< [E:49759i S:37002 M:67372150 (Ack:254131025)] (S) Msg TX to 1:000000000000006E [FEC4] [UDP:[fe80::1%lo0]:5540] --- Type 0000:10 (SecureChannel:StandaloneAck) (B:34)
+      cluster: "LogCommands"
+      command: "UserPrompt"
+      arguments:
+          values:
+              - name: "message"
+                value: "Please enter 'y' after success"
+              - name: "expectedValue"
+                value: "y"
+
+    - label: "Step 3d:  Test Harness calls the CommitPresetsSchedulesRequest command"
+      PICS: TSTAT.S.F08 && TSTAT.C.C09.Tx
+      verification: |
+          Optional Attribute - If it is supported, then in TH log it will results in displaying the value, else it will display UNSUPPORTED_ATTRIBUTE. Below is the log of RPI the result may be vary on the basis of dut implementation.
+
+          #3d Test Harness Client calls CommitPresetsSchedulesRequest command
+
+          ./chip-tool thermostat commit-presets-schedules-request 0x12344321 1
+          On TH(chip-tool) verify that  DUT sends a success response
+          [1722287841.505] [55282:5425045] [DMG] Received Command Response Status for Endpoint=1 Cluster=0x0000_0201 Command=0x0000_0009 Status=0x0
+          [1722287841.505] [55282:5425045] [DMG] ICR moving to [AwaitingDe]
+          [1722287841.505] [55282:5425045] [EM] <<< [E:46441i S:57071 M:61366563 (Ack:138534230)] (S) Msg TX to 1:000000000000006E [FEC4] [UDP:[fe80::1%lo0]:5540] --- Type 0000:10 (SecureChannel:StandaloneAck) (B:34)
+      cluster: "LogCommands"
+      command: "UserPrompt"
+      arguments:
+          values:
+              - name: "message"
+                value: "Please enter 'y' after success"
+              - name: "expectedValue"
+                value: "y"
+
+    - label: "Step 3e:  Test Harness reads the Presets attribute after calling the CommitPresetsSchedulesRequest command"
+      PICS: TSTAT.S.F08 && TSTAT.S.A0050
+      verification: |
+          Optional Attribute - If it is supported, then in TH log it will results in displaying the value, else it will display UNSUPPORTED_ATTRIBUTE. Below is the log of RPI the result may be vary on the basis of dut implementation.
+
+          #3e Test Harness Client reads Presets attribute and can see the added Presets.
+
+         ./chip-tool thermostat read presets 0x12344321 1
+          On TH(chip-tool) verify that  DUT successfully read Presets (with the new changes)
+          [1722288101.757] [55446:5430009] [TOO] Endpoint: 1 Cluster: 0x0000_0201 Attribute 0x0000_0050 DataVersion: 3807987055
+          [1722288101.757] [55446:5430009] [TOO]   Presets: 5 entries
+          [1722288101.758] [55446:5430009] [TOO]     [1]: {
+          [1722288101.759] [55446:5430009] [TOO]       PresetHandle: 01
+          [1722288101.759] [55446:5430009] [TOO]       PresetScenario: 1
+          [1722288101.759] [55446:5430009] [TOO]       CoolingSetpoint: 2500
+          [1722288101.759] [55446:5430009] [TOO]       HeatingSetpoint: 2600
+          [1722288101.759] [55446:5430009] [TOO]       BuiltIn: TRUE
+          [1722288101.759] [55446:5430009] [TOO]      }
+          [1722288101.759] [55446:5430009] [TOO]     [2]: {
+          [1722288101.759] [55446:5430009] [TOO]       PresetHandle: 02
+          [1722288101.759] [55446:5430009] [TOO]       PresetScenario: 2
+          [1722288101.759] [55446:5430009] [TOO]       CoolingSetpoint: 2600
+          [1722288101.759] [55446:5430009] [TOO]       HeatingSetpoint: 2500
+          [1722288101.759] [55446:5430009] [TOO]       BuiltIn: TRUE
+          [1722288101.759] [55446:5430009] [TOO]      }
+          [1722288101.759] [55446:5430009] [TOO]     [3]: {
+          [1722288101.759] [55446:5430009] [TOO]       PresetHandle: 03
+          [1722288101.759] [55446:5430009] [TOO]       PresetScenario: 3
+          [1722288101.759] [55446:5430009] [TOO]       Name: Sleep
+          [1722288101.759] [55446:5430009] [TOO]       CoolingSetpoint: 2500
+          [1722288101.759] [55446:5430009] [TOO]       HeatingSetpoint: 2600
+          [1722288101.759] [55446:5430009] [TOO]       BuiltIn: FALSE
+          [1722288101.759] [55446:5430009] [TOO]      }
+          [1722288101.759] [55446:5430009] [TOO]     [4]: {
+          [1722288101.759] [55446:5430009] [TOO]       PresetHandle: 04
+          [1722288101.759] [55446:5430009] [TOO]       PresetScenario: 4
+          [1722288101.759] [55446:5430009] [TOO]       Name: Wake
+          [1722288101.759] [55446:5430009] [TOO]       CoolingSetpoint: 2200
+          [1722288101.759] [55446:5430009] [TOO]       HeatingSetpoint: 2900
+          [1722288101.759] [55446:5430009] [TOO]       BuiltIn: FALSE
+          [1722288101.759] [55446:5430009] [TOO]      }
+          [1722288101.759] [55446:5430009] [TOO]     [5]: {
+          [1722288101.759] [55446:5430009] [TOO]       PresetHandle: 06
+          [1722288101.759] [55446:5430009] [TOO]       PresetScenario: 6
+          [1722288101.759] [55446:5430009] [TOO]       Name: GoingToSleep
+          [1722288101.759] [55446:5430009] [TOO]       CoolingSetpoint: 2100
+          [1722288101.759] [55446:5430009] [TOO]       HeatingSetpoint: 2500
+          [1722288101.759] [55446:5430009] [TOO]       BuiltIn: FALSE
+          [1722288101.759] [55446:5430009] [TOO]      }
+          [1722288101.759] [55446:5430009] [EM] <<< [E:64397i S:21821 M:262922240 (Ack:37271345)] (S) Msg TX to 1:000000000000006E [FEC4] [UDP:[fe80::1%lo0]:5540] --- Type 0000:10 (SecureChannel:StandaloneAck) (B:34)
+          [1722288101.760] [55446:5430009] [EM] Flushed pending ack for MessageCounter:37271345 on exchange 64397i
+      cluster: "LogCommands"
+      command: "UserPrompt"
+      arguments:
+          values:
+              - name: "message"
+                value: "Please enter 'y' after success"
+              - name: "expectedValue"
+                value: "y"
+
+    - label: "Step 4a:  Test Harness writes to the Presets attribute wherein a built-in preset is removed"
+      PICS: TSTAT.S.F08 && TSTAT.C.C07.Tx
+      verification: |
+          Optional Attribute - If it is supported, then in TH log it will results in displaying the value, else it will display UNSUPPORTED_ATTRIBUTE. Below is the log of RPI the result may be vary on the basis of dut implementation.
+
+          #4a Test Harness Client calls StartPresetsSchedulesEditRequest command
+
+          ./chip-tool thermostat start-presets-schedules-edit-request 180 0x12344321 1
+          On TH(chip-tool) verify that  DUT sends a success response
+          [1722286001.805] [54149:5392862] [DMG] Received Command Response Status for Endpoint=1 Cluster=0x0000_0201 Command=0x0000_0007 Status=0x0
+          [1722286001.805] [54149:5392862] [DMG] ICR moving to [AwaitingDe]
+          [1722286001.805] [54149:5392862] [EM] <<< [E:7545i S:16937 M:144975449 (Ack:93571372)] (S) Msg TX to 1:000000000000006E [FEC4] [UDP:[fe80::1%lo0]:5540] --- Type 0000:10 (SecureChannel:StandaloneAck) (B:34)
+          [1722286001.806] [54149:5392862] [EM] Flushed pending ack for MessageCounter:93571372 on exchange 7545i
+      cluster: "LogCommands"
+      command: "UserPrompt"
+      arguments:
+          values:
+              - name: "message"
+                value: "Please enter 'y' after success"
+              - name: "expectedValue"
+                value: "y"
+
+    - label: "Step 4b:  Test Harness writes to the Presets attribute with a built-in preset having preset handle hex:01 removed"
+      PICS: TSTAT.S.F08 && TSTAT.S.A0050
+      verification: |
+          Optional Attribute - If it is supported, then in TH log it will results in displaying the value, else it will display UNSUPPORTED_ATTRIBUTE. Below is the log of RPI the result may be vary on the basis of dut implementation.
+
+          #4b Test Harness Client attempts to write PresetTypes and gets SUCCESS
+
+         ./chip-tool thermostat write presets '[ {"presetHandle": "hex:02", "presetScenario": 2, "coolingSetpoint": 2600, "heatingSetpoint": 2500, "builtIn": true }, {"presetHandle": "hex:03", "name": "Sleep", "presetScenario": 3, "coolingSetpoint": 2500, "heatingSetpoint": 2600, "builtIn": false },  {"presetHandle": "hex:04", "name": "Wake", "presetScenario": 4, "coolingSetpoint": 2200, "heatingSetpoint": 2900, "builtIn": false }, {"presetHandle": "hex:06", "name": "GoingToSleep", "presetScenario": 6, "coolingSetpoint": 2100, "heatingSetpoint": 2500, "builtIn": false }]' 0x12344321 1
+          On TH(chip-tool) verify that  DUT sends a success response
+          [1722288460.741] [55752:5437815] [DMG] WriteClient moving to [ResponseRe]
+          [1722288460.741] [55752:5437815] [DMG] WriteResponseMessage =
+          [1722288460.741] [55752:5437815] [DMG] {
+          [1722288460.741] [55752:5437815] [DMG] 	AttributeStatusIBs =
+          [1722288460.741] [55752:5437815] [DMG] 	[
+          [1722288460.741] [55752:5437815] [DMG] 		AttributeStatusIB =
+          [1722288460.741] [55752:5437815] [DMG] 		{
+          [1722288460.741] [55752:5437815] [DMG] 			AttributePathIB =
+          [1722288460.741] [55752:5437815] [DMG] 			{
+          [1722288460.741] [55752:5437815] [DMG] 				Endpoint = 0x1,
+          [1722288460.741] [55752:5437815] [DMG] 				Cluster = 0x201,
+          [1722288460.741] [55752:5437815] [DMG] 				Attribute = 0x0000_0050,
+          [1722288460.741] [55752:5437815] [DMG] 			}
+          [1722288460.741] [55752:5437815] [DMG]
+          [1722288460.741] [55752:5437815] [DMG] 			StatusIB =
+          [1722288460.741] [55752:5437815] [DMG] 			{
+          [1722288460.741] [55752:5437815] [DMG] 				status = 0x00 (SUCCESS),
+          [1722288460.741] [55752:5437815] [DMG] 			},
+          [1722288460.741] [55752:5437815] [DMG]
+          [1722288460.741] [55752:5437815] [DMG] 		},
+          [1722288460.741] [55752:5437815] [DMG]
+          [1722288460.741] [55752:5437815] [DMG] 		AttributeStatusIB =
+          [1722288460.741] [55752:5437815] [DMG] 		{
+          [1722288460.741] [55752:5437815] [DMG] 			AttributePathIB =
+          [1722288460.741] [55752:5437815] [DMG] 			{
+          [1722288460.741] [55752:5437815] [DMG] 				Endpoint = 0x1,
+          [1722288460.741] [55752:5437815] [DMG] 				Cluster = 0x201,
+          [1722288460.741] [55752:5437815] [DMG] 				Attribute = 0x0000_0050,
+          [1722288460.741] [55752:5437815] [DMG] 				ListIndex = Null,
+          [1722288460.741] [55752:5437815] [DMG] 			}
+          [1722288460.741] [55752:5437815] [DMG]
+          [1722288460.741] [55752:5437815] [DMG] 			StatusIB =
+          [1722288460.741] [55752:5437815] [DMG] 			{
+          [1722288460.741] [55752:5437815] [DMG] 				status = 0x00 (SUCCESS),
+          [1722288460.741] [55752:5437815] [DMG] 			},
+          [1722288460.741] [55752:5437815] [DMG]
+          [1722288460.741] [55752:5437815] [DMG] 		},
+          [1722288460.741] [55752:5437815] [DMG]
+          [1722288460.741] [55752:5437815] [DMG] 		AttributeStatusIB =
+          [1722288460.741] [55752:5437815] [DMG] 		{
+          [1722288460.741] [55752:5437815] [DMG] 			AttributePathIB =
+          [1722288460.741] [55752:5437815] [DMG] 			{
+          [1722288460.741] [55752:5437815] [DMG] 				Endpoint = 0x1,
+          [1722288460.741] [55752:5437815] [DMG] 				Cluster = 0x201,
+          [1722288460.741] [55752:5437815] [DMG] 				Attribute = 0x0000_0050,
+          [1722288460.741] [55752:5437815] [DMG] 				ListIndex = Null,
+          [1722288460.741] [55752:5437815] [DMG] 			}
+          [1722288460.741] [55752:5437815] [DMG]
+          [1722288460.741] [55752:5437815] [DMG] 			StatusIB =
+          [1722288460.741] [55752:5437815] [DMG] 			{
+          [1722288460.741] [55752:5437815] [DMG] 				status = 0x00 (SUCCESS),
+          [1722288460.741] [55752:5437815] [DMG] 			},
+          [1722288460.741] [55752:5437815] [DMG]
+          [1722288460.741] [55752:5437815] [DMG] 		},
+          [1722288460.741] [55752:5437815] [DMG]
+          [1722288460.741] [55752:5437815] [DMG] 		AttributeStatusIB =
+          [1722288460.741] [55752:5437815] [DMG] 		{
+          [1722288460.741] [55752:5437815] [DMG] 			AttributePathIB =
+          [1722288460.741] [55752:5437815] [DMG] 			{
+          [1722288460.742] [55752:5437815] [DMG] 				Endpoint = 0x1,
+          [1722288460.742] [55752:5437815] [DMG] 				Cluster = 0x201,
+          [1722288460.742] [55752:5437815] [DMG] 				Attribute = 0x0000_0050,
+          [1722288460.742] [55752:5437815] [DMG] 				ListIndex = Null,
+          [1722288460.742] [55752:5437815] [DMG] 			}
+          [1722288460.742] [55752:5437815] [DMG]
+          [1722288460.742] [55752:5437815] [DMG] 			StatusIB =
+          [1722288460.742] [55752:5437815] [DMG] 			{
+          [1722288460.742] [55752:5437815] [DMG] 				status = 0x00 (SUCCESS),
+          [1722288460.742] [55752:5437815] [DMG] 			},
+          [1722288460.742] [55752:5437815] [DMG]
+          [1722288460.742] [55752:5437815] [DMG] 		},
+          [1722288460.742] [55752:5437815] [DMG]
+          [1722288460.742] [55752:5437815] [DMG] 		AttributeStatusIB =
+          [1722288460.742] [55752:5437815] [DMG] 		{
+          [1722288460.742] [55752:5437815] [DMG] 			AttributePathIB =
+          [1722288460.742] [55752:5437815] [DMG] 			{
+          [1722288460.742] [55752:5437815] [DMG] 				Endpoint = 0x1,
+          [1722288460.742] [55752:5437815] [DMG] 				Cluster = 0x201,
+          [1722288460.742] [55752:5437815] [DMG] 				Attribute = 0x0000_0050,
+          [1722288460.742] [55752:5437815] [DMG] 				ListIndex = Null,
+          [1722288460.742] [55752:5437815] [DMG] 			}
+          [1722288460.742] [55752:5437815] [DMG]
+          [1722288460.742] [55752:5437815] [DMG] 			StatusIB =
+          [1722288460.742] [55752:5437815] [DMG] 			{
+          [1722288460.742] [55752:5437815] [DMG] 				status = 0x00 (SUCCESS),
+          [1722288460.742] [55752:5437815] [DMG] 			},
+          [1722288460.742] [55752:5437815] [DMG]
+          [1722288460.742] [55752:5437815] [DMG] 		},
+          [1722288460.742] [55752:5437815] [DMG]
+          [1722288460.742] [55752:5437815] [DMG] 	],
+          [1722288460.742] [55752:5437815] [DMG]
+          [1722288460.742] [55752:5437815] [DMG] 	InteractionModelRevision = 11
+          [1722288460.742] [55752:5437815] [DMG] }
+          [1722288460.742] [55752:5437815] [DMG] WriteClient moving to [AwaitingDe]
+          [1722288460.742] [55752:5437815] [EM] <<< [E:10991i S:19292 M:9249657 (Ack:153811994)] (S) Msg TX to 1:000000000000006E [FEC4] [UDP:[fe80::1%lo0]:5540] --- Type 0000:10 (SecureChannel:StandaloneAck) (B:34)
+      cluster: "LogCommands"
+      command: "UserPrompt"
+      arguments:
+          values:
+              - name: "message"
+                value: "Please enter 'y' after success"
+              - name: "expectedValue"
+                value: "y"
+
+    - label: "Step 4c:  Test Harness calls the CommitPresetsSchedulesRequest command"
+      PICS: TSTAT.S.F08 && TSTAT.C.C09.Tx
+      verification: |
+          Optional Attribute - If it is supported, then in TH log it will results in displaying the value, else it will display UNSUPPORTED_ATTRIBUTE. Below is the log of RPI the result may be vary on the basis of dut implementation.
+
+          #4c Test Harness Client calls CommitPresetsSchedulesRequest command and gets UNSUPPORTED_ACCESS since a built-in preset was attempted to be removed.
+
+          ./chip-tool thermostat commit-presets-schedules-request 0x12344321 1
+          On TH(chip-tool) verify that  DUT sends an UNSUPPORTED_ACCESS (0x7E) error
+          [1722288464.392] [55754:5437857] [DMG] Received Command Response Status for Endpoint=1 Cluster=0x0000_0201 Command=0x0000_0009 Status=0x7e
+          [1722288464.392] [55754:5437857] [TOO] Error: IM Error 0x0000057E: General error: 0x7e (UNSUPPORTED_ACCESS)
+          [1722288464.392] [55754:5437857] [DMG] ICR moving to [AwaitingDe]
+          [1722288464.392] [55754:5437857] [EM] <<< [E:45905i S:14600 M:175519796 (Ack:248690311)] (S) Msg TX to 1:000000000000006E [FEC4] [UDP:[fe80::1%lo0]:5540] --- Type 0000:10 (SecureChannel:StandaloneAck) (B:34)
+      cluster: "LogCommands"
+      command: "UserPrompt"
+      arguments:
+          values:
+              - name: "message"
+                value: "Please enter 'y' after success"
+              - name: "expectedValue"
+                value: "y"
+
+    - label: "Step 5a:  Test Harness writes to the Presets attribute wherein a preset is removed such that its handle matches the active preset handle"
+      PICS: TSTAT.S.F08 && TSTAT.C.C06.Tx
+      verification: |
+          Optional Attribute - If it is supported, then in TH log it will results in displaying the value, else it will display UNSUPPORTED_ATTRIBUTE. Below is the log of RPI the result may be vary on the basis of dut implementation.
+
+          #5a Test Harness Client calls SetActivePresetRequest command to set the active preset handle
+
+          ./chip-tool thermostat set-active-preset-request "hex:03" 0x12344321 1
+          On TH(chip-tool) verify that  DUT sends a success response
+          [1722292538.299] [58873:5523668] [TOO] Endpoint: 1 Cluster: 0x0000_0201 Attribute 0x0000_004E DataVersion: 3470253931
+          [1722292538.300] [58873:5523668] [TOO]   ActivePresetHandle: 03
+          [1722292538.300] [58873:5523668] [EM] <<< [E:63772i S:58620 M:79797990 (Ack:248773669)] (S) Msg TX to 1:000000000000006E [FEC4] [UDP:[fe80::1%lo0]:5540] --- Type 0000:10 (SecureChannel:StandaloneAck) (B:34)
+      cluster: "LogCommands"
+      command: "UserPrompt"
+      arguments:
+          values:
+              - name: "message"
+                value: "Please enter 'y' after success"
+              - name: "expectedValue"
+                value: "y"
+
+
+    - label: "Step 5b:  Test Harness reads the ActivePresetHandle attribute"
+      PICS: TSTAT.S.F08 && TSTAT.S.A004e
+      verification: |
+          Optional Attribute - If it is supported, then in TH log it will results in displaying the value, else it will display UNSUPPORTED_ATTRIBUTE. Below is the log of RPI the result may be vary on the basis of dut implementation.
+
+          #5b Test Harness Client reads ActivePresetHandle attribute
+
+         ./chip-tool thermostat read active-preset-handle 0x12344321 1
+          On TH(chip-tool) verify that  DUT successfully read ActivePresetHandle
+          [1722299898.382] [62999:5632512] [TOO] Endpoint: 1 Cluster: 0x0000_0201 Attribute 0x0000_004E DataVersion: 3098962545
+          [1722299898.382] [62999:5632512] [TOO]   ActivePresetHandle: 03
+          [1722299898.382] [62999:5632512] [EM] <<< [E:27648i S:55804 M:2686999 (Ack:191947351)] (S) Msg TX to 1:000000000000006E [FEC4] [UDP:[fe80::1%lo0]:5540] --- Type 0000:10 (SecureChannel:StandaloneAck) (B:34)
+
+      cluster: "LogCommands"
+      command: "UserPrompt"
+      arguments:
+          values:
+              - name: "message"
+                value: "Please enter 'y' after success"
+              - name: "expectedValue"
+                value: "y"
+
+    - label: "Step 5c:  Test Harness calls StartPresetsSchedulesEditRequest"
+      PICS: TSTAT.S.F08 && TSTAT.C.C07.Tx
+      verification: |
+          Optional Attribute - If it is supported, then in TH log it will results in displaying the value, else it will display UNSUPPORTED_ATTRIBUTE. Below is the log of RPI the result may be vary on the basis of dut implementation.
+
+          #5b Test Harness Client calls StartPresetsSchedulesEditRequest command
+
+          ./chip-tool thermostat start-presets-schedules-edit-request 180 0x12344321 1
+          On TH(chip-tool) verify that  DUT sends a success response
+          [1722286001.805] [54149:5392862] [DMG] Received Command Response Status for Endpoint=1 Cluster=0x0000_0201 Command=0x0000_0007 Status=0x0
+          [1722286001.805] [54149:5392862] [DMG] ICR moving to [AwaitingDe]
+          [1722286001.805] [54149:5392862] [EM] <<< [E:7545i S:16937 M:144975449 (Ack:93571372)] (S) Msg TX to 1:000000000000006E [FEC4] [UDP:[fe80::1%lo0]:5540] --- Type 0000:10 (SecureChannel:StandaloneAck) (B:34)
+          [1722286001.806] [54149:5392862] [EM] Flushed pending ack for MessageCounter:93571372 on exchange 7545i
+      cluster: "LogCommands"
+      command: "UserPrompt"
+      arguments:
+          values:
+              - name: "message"
+                value: "Please enter 'y' after success"
+              - name: "expectedValue"
+                value: "y"
+
+    - label: "Step 5d:  Test Harness writes to the Presets attribute without the preset with handle hex:03 matching the ActivePresetHandle attribute removed"
+      PICS: TSTAT.S.F08 && TSTAT.S.A0050
+      verification: |
+          Optional Attribute - If it is supported, then in TH log it will results in displaying the value, else it will display UNSUPPORTED_ATTRIBUTE. Below is the log of RPI the result may be vary on the basis of dut implementation.
+
+          #5c Test Harness Client attempts to write PresetTypes and gets SUCCESS
+
+         ./chip-tool thermostat write presets ./out/debug/chip-tool thermostat write presets '[ {"presetHandle": "hex:01", "presetScenario": 1, "coolingSetpoint": 2500, "heatingSetpoint": 2600, "builtIn": true }, {"presetHandle": "hex:02", "presetScenario": 2, "coolingSetpoint": 2600, "heatingSetpoint": 2500, "builtIn": true }, {"presetHandle": "hex:04", "name": "Wake", "presetScenario": 4, "coolingSetpoint": 2200, "heatingSetpoint": 2900, "builtIn": false }, {"presetHandle": "hex:06", "name": "GoingToSleep", "presetScenario": 6, "coolingSetpoint": 2100, "heatingSetpoint": 2500, "builtIn": false }]' 0x12344321 1
+          On TH(chip-tool) verify that  DUT sends a success response
+          [1722289461.376] [56636:5458560] [DMG] WriteClient moving to [ResponseRe]
+          [1722289461.376] [56636:5458560] [DMG] WriteResponseMessage =
+          [1722289461.376] [56636:5458560] [DMG] {
+          [1722289461.376] [56636:5458560] [DMG] 	AttributeStatusIBs =
+          [1722289461.376] [56636:5458560] [DMG] 	[
+          [1722289461.376] [56636:5458560] [DMG] 		AttributeStatusIB =
+          [1722289461.376] [56636:5458560] [DMG] 		{
+          [1722289461.376] [56636:5458560] [DMG] 			AttributePathIB =
+          [1722289461.376] [56636:5458560] [DMG] 			{
+          [1722289461.376] [56636:5458560] [DMG] 				Endpoint = 0x1,
+          [1722289461.376] [56636:5458560] [DMG] 				Cluster = 0x201,
+          [1722289461.376] [56636:5458560] [DMG] 				Attribute = 0x0000_0050,
+          [1722289461.376] [56636:5458560] [DMG] 			}
+          [1722289461.376] [56636:5458560] [DMG]
+          [1722289461.376] [56636:5458560] [DMG] 			StatusIB =
+          [1722289461.376] [56636:5458560] [DMG] 			{
+          [1722289461.376] [56636:5458560] [DMG] 				status = 0x00 (SUCCESS),
+          [1722289461.376] [56636:5458560] [DMG] 			},
+          [1722289461.376] [56636:5458560] [DMG]
+          [1722289461.376] [56636:5458560] [DMG] 		},
+          [1722289461.376] [56636:5458560] [DMG]
+          [1722289461.376] [56636:5458560] [DMG] 		AttributeStatusIB =
+          [1722289461.376] [56636:5458560] [DMG] 		{
+          [1722289461.376] [56636:5458560] [DMG] 			AttributePathIB =
+          [1722289461.376] [56636:5458560] [DMG] 			{
+          [1722289461.376] [56636:5458560] [DMG] 				Endpoint = 0x1,
+          [1722289461.376] [56636:5458560] [DMG] 				Cluster = 0x201,
+          [1722289461.376] [56636:5458560] [DMG] 				Attribute = 0x0000_0050,
+          [1722289461.376] [56636:5458560] [DMG] 				ListIndex = Null,
+          [1722289461.376] [56636:5458560] [DMG] 			}
+          [1722289461.376] [56636:5458560] [DMG]
+          [1722289461.376] [56636:5458560] [DMG] 			StatusIB =
+          [1722289461.376] [56636:5458560] [DMG] 			{
+          [1722289461.376] [56636:5458560] [DMG] 				status = 0x00 (SUCCESS),
+          [1722289461.376] [56636:5458560] [DMG] 			},
+          [1722289461.376] [56636:5458560] [DMG]
+          [1722289461.376] [56636:5458560] [DMG] 		},
+          [1722289461.376] [56636:5458560] [DMG]
+          [1722289461.376] [56636:5458560] [DMG] 		AttributeStatusIB =
+          [1722289461.376] [56636:5458560] [DMG] 		{
+          [1722289461.376] [56636:5458560] [DMG] 			AttributePathIB =
+          [1722289461.376] [56636:5458560] [DMG] 			{
+          [1722289461.376] [56636:5458560] [DMG] 				Endpoint = 0x1,
+          [1722289461.376] [56636:5458560] [DMG] 				Cluster = 0x201,
+          [1722289461.376] [56636:5458560] [DMG] 				Attribute = 0x0000_0050,
+          [1722289461.376] [56636:5458560] [DMG] 				ListIndex = Null,
+          [1722289461.376] [56636:5458560] [DMG] 			}
+          [1722289461.376] [56636:5458560] [DMG]
+          [1722289461.376] [56636:5458560] [DMG] 			StatusIB =
+          [1722289461.376] [56636:5458560] [DMG] 			{
+          [1722289461.376] [56636:5458560] [DMG] 				status = 0x00 (SUCCESS),
+          [1722289461.376] [56636:5458560] [DMG] 			},
+          [1722289461.376] [56636:5458560] [DMG]
+          [1722289461.376] [56636:5458560] [DMG] 		},
+          [1722289461.376] [56636:5458560] [DMG]
+          [1722289461.376] [56636:5458560] [DMG] 		AttributeStatusIB =
+          [1722289461.376] [56636:5458560] [DMG] 		{
+          [1722289461.376] [56636:5458560] [DMG] 			AttributePathIB =
+          [1722289461.376] [56636:5458560] [DMG] 			{
+          [1722289461.376] [56636:5458560] [DMG] 				Endpoint = 0x1,
+          [1722289461.376] [56636:5458560] [DMG] 				Cluster = 0x201,
+          [1722289461.376] [56636:5458560] [DMG] 				Attribute = 0x0000_0050,
+          [1722289461.376] [56636:5458560] [DMG] 				ListIndex = Null,
+          [1722289461.376] [56636:5458560] [DMG] 			}
+          [1722289461.376] [56636:5458560] [DMG]
+          [1722289461.376] [56636:5458560] [DMG] 			StatusIB =
+          [1722289461.376] [56636:5458560] [DMG] 			{
+          [1722289461.376] [56636:5458560] [DMG] 				status = 0x00 (SUCCESS),
+          [1722289461.376] [56636:5458560] [DMG] 			},
+          [1722289461.376] [56636:5458560] [DMG]
+          [1722289461.376] [56636:5458560] [DMG] 		},
+          [1722289461.376] [56636:5458560] [DMG]
+          [1722289461.376] [56636:5458560] [DMG] 		AttributeStatusIB =
+          [1722289461.376] [56636:5458560] [DMG] 		{
+          [1722289461.376] [56636:5458560] [DMG] 			AttributePathIB =
+          [1722289461.376] [56636:5458560] [DMG] 			{
+          [1722289461.376] [56636:5458560] [DMG] 				Endpoint = 0x1,
+          [1722289461.376] [56636:5458560] [DMG] 				Cluster = 0x201,
+          [1722289461.376] [56636:5458560] [DMG] 				Attribute = 0x0000_0050,
+          [1722289461.376] [56636:5458560] [DMG] 				ListIndex = Null,
+          [1722289461.377] [56636:5458560] [DMG] 			}
+          [1722289461.377] [56636:5458560] [DMG]
+          [1722289461.377] [56636:5458560] [DMG] 			StatusIB =
+          [1722289461.377] [56636:5458560] [DMG] 			{
+          [1722289461.377] [56636:5458560] [DMG] 				status = 0x00 (SUCCESS),
+          [1722289461.377] [56636:5458560] [DMG] 			},
+          [1722289461.377] [56636:5458560] [DMG]
+          [1722289461.377] [56636:5458560] [DMG] 		},
+          [1722289461.377] [56636:5458560] [DMG]
+          [1722289461.377] [56636:5458560] [DMG] 		AttributeStatusIB =
+          [1722289461.377] [56636:5458560] [DMG] 		{
+          [1722289461.377] [56636:5458560] [DMG] 			AttributePathIB =
+          [1722289461.377] [56636:5458560] [DMG] 			{
+          [1722289461.377] [56636:5458560] [DMG] 				Endpoint = 0x1,
+          [1722289461.377] [56636:5458560] [DMG] 				Cluster = 0x201,
+          [1722289461.377] [56636:5458560] [DMG] 				Attribute = 0x0000_0050,
+          [1722289461.377] [56636:5458560] [DMG] 				ListIndex = Null,
+          [1722289461.377] [56636:5458560] [DMG] 			}
+          [1722289461.377] [56636:5458560] [DMG]
+          [1722289461.377] [56636:5458560] [DMG] 			StatusIB =
+          [1722289461.377] [56636:5458560] [DMG] 			{
+          [1722289461.377] [56636:5458560] [DMG] 				status = 0x00 (SUCCESS),
+          [1722289461.377] [56636:5458560] [DMG] 			},
+          [1722289461.377] [56636:5458560] [DMG]
+          [1722289461.377] [56636:5458560] [DMG] 		},
+          [1722289461.377] [56636:5458560] [DMG]
+          [1722289461.377] [56636:5458560] [DMG] 	],
+          [1722289461.377] [56636:5458560] [DMG]
+          [1722289461.377] [56636:5458560] [DMG] 	InteractionModelRevision = 11
+          [1722289461.377] [56636:5458560] [DMG] }
+          [1722289461.377] [56636:5458560] [DMG] WriteClient moving to [AwaitingDe]
+          [1722289461.377] [56636:5458560] [EM] <<< [E:23635i S:58282 M:220756286 (Ack:5366080)] (S) Msg TX to 1:000000000000006E [FEC4] [UDP:[fe80::1%lo0]:5540] --- Type 0000:10 (SecureChannel:StandaloneAck) (B:34)
+      cluster: "LogCommands"
+      command: "UserPrompt"
+      arguments:
+          values:
+              - name: "message"
+                value: "Please enter 'y' after success"
+              - name: "expectedValue"
+                value: "y"
+
+    - label: "Step 5e:  Test Harness calls the CommitPresetsSchedulesRequest command"
+      PICS: TSTAT.S.F08 && TSTAT.C.C09.Tx
+      verification: |
+          Optional Attribute - If it is supported, then in TH log it will results in displaying the value, else it will display UNSUPPORTED_ATTRIBUTE. Below is the log of RPI the result may be vary on the basis of dut implementation.
+
+          #5e Test Harness Client calls CommitPresetsSchedulesRequest command ans gets INVALID_IN_STATE since the preset with its handle matching the active preset handle was attempted to be removed.
+
+          ./chip-tool thermostat commit-presets-schedules-request 0x12344321 1
+          On TH(chip-tool) verify that  DUT sends an INVALID_IN_STATE (0xCB) error
+          [1722293312.795] [59386:5538858] [DMG] Received Command Response Status for Endpoint=1 Cluster=0x0000_0201 Command=0x0000_0009 Status=0xcb
+          [1722293312.795] [59386:5538858] [TOO] Error: IM Error 0x000005CB: General error: 0xcb (INVALID_IN_STATE)
+          [1722293312.795] [59386:5538858] [DMG] ICR moving to [AwaitingDe]
+          [1722293312.795] [59386:5538858] [EM] <<< [E:4647i S:21966 M:58651952 (Ack:80870764)] (S) Msg TX to 1:000000000000006E [FEC4] [UDP:[fe80::1%lo0]:5540] --- Type 0000:10 (SecureChannel:StandaloneAck) (B:34)
+      cluster: "LogCommands"
+      command: "UserPrompt"
+      arguments:
+          values:
+              - name: "message"
+                value: "Please enter 'y' after success"
+              - name: "expectedValue"
+                value: "y"
+
+    - label: "Step 6a:  Test Harness writes to the Presets attribute wherein a built-in preset is modified to a non built-in preset"
+      PICS: TSTAT.S.F08 && TSTAT.C.C07.Tx
+      verification: |
+          Optional Attribute - If it is supported, then in TH log it will results in displaying the value, else it will display UNSUPPORTED_ATTRIBUTE. Below is the log of RPI the result may be vary on the basis of dut implementation.
+
+          #6a Test Harness Client calls StartPresetsSchedulesEditRequest command
+
+          ./chip-tool thermostat start-presets-schedules-edit-request 180 0x12344321 1
+          On TH(chip-tool) verify that  DUT sends a success response
+          [1722286001.805] [54149:5392862] [DMG] Received Command Response Status for Endpoint=1 Cluster=0x0000_0201 Command=0x0000_0007 Status=0x0
+          [1722286001.805] [54149:5392862] [DMG] ICR moving to [AwaitingDe]
+          [1722286001.805] [54149:5392862] [EM] <<< [E:7545i S:16937 M:144975449 (Ack:93571372)] (S) Msg TX to 1:000000000000006E [FEC4] [UDP:[fe80::1%lo0]:5540] --- Type 0000:10 (SecureChannel:StandaloneAck) (B:34)
+          [1722286001.806] [54149:5392862] [EM] Flushed pending ack for MessageCounter:93571372 on exchange 7545i
+      cluster: "LogCommands"
+      command: "UserPrompt"
+      arguments:
+          values:
+              - name: "message"
+                value: "Please enter 'y' after success"
+              - name: "expectedValue"
+                value: "y"
+
+    - label: "Step 6b:  Test Harness writes to the Presets attribute with a built-in preset having preset handle hex:01 modified to be not built-in."
+      PICS: TSTAT.S.F08 && TSTAT.S.A0050
+      verification: |
+          Optional Attribute - If it is supported, then in TH log it will results in displaying the value, else it will display UNSUPPORTED_ATTRIBUTE. Below is the log of RPI the result may be vary on the basis of dut implementation.
+
+          #6b Test Harness Client attempts to write PresetTypes and gets SUCCESS
+
+         ./chip-tool thermostat write presets '[ {"presetHandle": "hex:01", "presetScenario": 1, "coolingSetpoint": 2500, "heatingSetpoint": 2600, "builtIn": false }, {"presetHandle": "hex:02", "presetScenario": 2, "coolingSetpoint": 2600, "heatingSetpoint": 2500, "builtIn": true }, {"presetHandle": "hex:03", "name": "Sleep", "presetScenario": 3, "coolingSetpoint": 2500, "heatingSetpoint": 2600, "builtIn": false },  {"presetHandle": "hex:04", "name": "Wake", "presetScenario": 4, "coolingSetpoint": 2200, "heatingSetpoint": 2900, "builtIn": false }, {"presetHandle": "hex:06", "name": "GoingToSleep", "presetScenario": 6, "coolingSetpoint": 2100, "heatingSetpoint": 2500, "builtIn": false }]' 0x12344321 1
+          On TH(chip-tool) verify that  DUT sends a success response
+          [1722289461.376] [56636:5458560] [DMG] WriteClient moving to [ResponseRe]
+          [1722289461.376] [56636:5458560] [DMG] WriteResponseMessage =
+          [1722289461.376] [56636:5458560] [DMG] {
+          [1722289461.376] [56636:5458560] [DMG] 	AttributeStatusIBs =
+          [1722289461.376] [56636:5458560] [DMG] 	[
+          [1722289461.376] [56636:5458560] [DMG] 		AttributeStatusIB =
+          [1722289461.376] [56636:5458560] [DMG] 		{
+          [1722289461.376] [56636:5458560] [DMG] 			AttributePathIB =
+          [1722289461.376] [56636:5458560] [DMG] 			{
+          [1722289461.376] [56636:5458560] [DMG] 				Endpoint = 0x1,
+          [1722289461.376] [56636:5458560] [DMG] 				Cluster = 0x201,
+          [1722289461.376] [56636:5458560] [DMG] 				Attribute = 0x0000_0050,
+          [1722289461.376] [56636:5458560] [DMG] 			}
+          [1722289461.376] [56636:5458560] [DMG]
+          [1722289461.376] [56636:5458560] [DMG] 			StatusIB =
+          [1722289461.376] [56636:5458560] [DMG] 			{
+          [1722289461.376] [56636:5458560] [DMG] 				status = 0x00 (SUCCESS),
+          [1722289461.376] [56636:5458560] [DMG] 			},
+          [1722289461.376] [56636:5458560] [DMG]
+          [1722289461.376] [56636:5458560] [DMG] 		},
+          [1722289461.376] [56636:5458560] [DMG]
+          [1722289461.376] [56636:5458560] [DMG] 		AttributeStatusIB =
+          [1722289461.376] [56636:5458560] [DMG] 		{
+          [1722289461.376] [56636:5458560] [DMG] 			AttributePathIB =
+          [1722289461.376] [56636:5458560] [DMG] 			{
+          [1722289461.376] [56636:5458560] [DMG] 				Endpoint = 0x1,
+          [1722289461.376] [56636:5458560] [DMG] 				Cluster = 0x201,
+          [1722289461.376] [56636:5458560] [DMG] 				Attribute = 0x0000_0050,
+          [1722289461.376] [56636:5458560] [DMG] 				ListIndex = Null,
+          [1722289461.376] [56636:5458560] [DMG] 			}
+          [1722289461.376] [56636:5458560] [DMG]
+          [1722289461.376] [56636:5458560] [DMG] 			StatusIB =
+          [1722289461.376] [56636:5458560] [DMG] 			{
+          [1722289461.376] [56636:5458560] [DMG] 				status = 0x00 (SUCCESS),
+          [1722289461.376] [56636:5458560] [DMG] 			},
+          [1722289461.376] [56636:5458560] [DMG]
+          [1722289461.376] [56636:5458560] [DMG] 		},
+          [1722289461.376] [56636:5458560] [DMG]
+          [1722289461.376] [56636:5458560] [DMG] 		AttributeStatusIB =
+          [1722289461.376] [56636:5458560] [DMG] 		{
+          [1722289461.376] [56636:5458560] [DMG] 			AttributePathIB =
+          [1722289461.376] [56636:5458560] [DMG] 			{
+          [1722289461.376] [56636:5458560] [DMG] 				Endpoint = 0x1,
+          [1722289461.376] [56636:5458560] [DMG] 				Cluster = 0x201,
+          [1722289461.376] [56636:5458560] [DMG] 				Attribute = 0x0000_0050,
+          [1722289461.376] [56636:5458560] [DMG] 				ListIndex = Null,
+          [1722289461.376] [56636:5458560] [DMG] 			}
+          [1722289461.376] [56636:5458560] [DMG]
+          [1722289461.376] [56636:5458560] [DMG] 			StatusIB =
+          [1722289461.376] [56636:5458560] [DMG] 			{
+          [1722289461.376] [56636:5458560] [DMG] 				status = 0x00 (SUCCESS),
+          [1722289461.376] [56636:5458560] [DMG] 			},
+          [1722289461.376] [56636:5458560] [DMG]
+          [1722289461.376] [56636:5458560] [DMG] 		},
+          [1722289461.376] [56636:5458560] [DMG]
+          [1722289461.376] [56636:5458560] [DMG] 		AttributeStatusIB =
+          [1722289461.376] [56636:5458560] [DMG] 		{
+          [1722289461.376] [56636:5458560] [DMG] 			AttributePathIB =
+          [1722289461.376] [56636:5458560] [DMG] 			{
+          [1722289461.376] [56636:5458560] [DMG] 				Endpoint = 0x1,
+          [1722289461.376] [56636:5458560] [DMG] 				Cluster = 0x201,
+          [1722289461.376] [56636:5458560] [DMG] 				Attribute = 0x0000_0050,
+          [1722289461.376] [56636:5458560] [DMG] 				ListIndex = Null,
+          [1722289461.376] [56636:5458560] [DMG] 			}
+          [1722289461.376] [56636:5458560] [DMG]
+          [1722289461.376] [56636:5458560] [DMG] 			StatusIB =
+          [1722289461.376] [56636:5458560] [DMG] 			{
+          [1722289461.376] [56636:5458560] [DMG] 				status = 0x00 (SUCCESS),
+          [1722289461.376] [56636:5458560] [DMG] 			},
+          [1722289461.376] [56636:5458560] [DMG]
+          [1722289461.376] [56636:5458560] [DMG] 		},
+          [1722289461.376] [56636:5458560] [DMG]
+          [1722289461.376] [56636:5458560] [DMG] 		AttributeStatusIB =
+          [1722289461.376] [56636:5458560] [DMG] 		{
+          [1722289461.376] [56636:5458560] [DMG] 			AttributePathIB =
+          [1722289461.376] [56636:5458560] [DMG] 			{
+          [1722289461.376] [56636:5458560] [DMG] 				Endpoint = 0x1,
+          [1722289461.376] [56636:5458560] [DMG] 				Cluster = 0x201,
+          [1722289461.376] [56636:5458560] [DMG] 				Attribute = 0x0000_0050,
+          [1722289461.376] [56636:5458560] [DMG] 				ListIndex = Null,
+          [1722289461.377] [56636:5458560] [DMG] 			}
+          [1722289461.377] [56636:5458560] [DMG]
+          [1722289461.377] [56636:5458560] [DMG] 			StatusIB =
+          [1722289461.377] [56636:5458560] [DMG] 			{
+          [1722289461.377] [56636:5458560] [DMG] 				status = 0x00 (SUCCESS),
+          [1722289461.377] [56636:5458560] [DMG] 			},
+          [1722289461.377] [56636:5458560] [DMG]
+          [1722289461.377] [56636:5458560] [DMG] 		},
+          [1722289461.377] [56636:5458560] [DMG]
+          [1722289461.377] [56636:5458560] [DMG] 		AttributeStatusIB =
+          [1722289461.377] [56636:5458560] [DMG] 		{
+          [1722289461.377] [56636:5458560] [DMG] 			AttributePathIB =
+          [1722289461.377] [56636:5458560] [DMG] 			{
+          [1722289461.377] [56636:5458560] [DMG] 				Endpoint = 0x1,
+          [1722289461.377] [56636:5458560] [DMG] 				Cluster = 0x201,
+          [1722289461.377] [56636:5458560] [DMG] 				Attribute = 0x0000_0050,
+          [1722289461.377] [56636:5458560] [DMG] 				ListIndex = Null,
+          [1722289461.377] [56636:5458560] [DMG] 			}
+          [1722289461.377] [56636:5458560] [DMG]
+          [1722289461.377] [56636:5458560] [DMG] 			StatusIB =
+          [1722289461.377] [56636:5458560] [DMG] 			{
+          [1722289461.377] [56636:5458560] [DMG] 				status = 0x00 (SUCCESS),
+          [1722289461.377] [56636:5458560] [DMG] 			},
+          [1722289461.377] [56636:5458560] [DMG]
+          [1722289461.377] [56636:5458560] [DMG] 		},
+          [1722289461.377] [56636:5458560] [DMG]
+          [1722289461.377] [56636:5458560] [DMG] 	],
+          [1722289461.377] [56636:5458560] [DMG]
+          [1722289461.377] [56636:5458560] [DMG] 	InteractionModelRevision = 11
+          [1722289461.377] [56636:5458560] [DMG] }
+          [1722289461.377] [56636:5458560] [DMG] WriteClient moving to [AwaitingDe]
+          [1722289461.377] [56636:5458560] [EM] <<< [E:23635i S:58282 M:220756286 (Ack:5366080)] (S) Msg TX to 1:000000000000006E [FEC4] [UDP:[fe80::1%lo0]:5540] --- Type 0000:10 (SecureChannel:StandaloneAck) (B:34)
+      cluster: "LogCommands"
+      command: "UserPrompt"
+      arguments:
+          values:
+              - name: "message"
+                value: "Please enter 'y' after success"
+              - name: "expectedValue"
+                value: "y"
+
+    - label: "Step 6c:  Test Harness calls the CommitPresetsSchedulesRequest command"
+      PICS: TSTAT.S.F08 && TSTAT.C.C09.Tx
+      verification: |
+          Optional Attribute - If it is supported, then in TH log it will results in displaying the value, else it will display UNSUPPORTED_ATTRIBUTE. Below is the log of RPI the result may be vary on the basis of dut implementation.
+
+          #6c Test Harness Client calls CommitPresetsSchedulesRequest command gets UNSUPPORTED_ACCESS since a built-in preset was attempted to be modified to a non built-in preset
+
+          ./chip-tool thermostat commit-presets-schedules-request 0x12344321 1
+          On TH(chip-tool) verify that  DUT sends an UNSUPPORTED_ACCESS (0x7E) error
+          [1722289468.881] [56642:5458641] [DMG] Received Command Response Status for Endpoint=1 Cluster=0x0000_0201 Command=0x0000_0009 Status=0x7e
+          [1722289468.881] [56642:5458641] [TOO] Error: IM Error 0x0000057E: General error: 0x7e (UNSUPPORTED_ACCESS)
+          [1722289468.881] [56642:5458641] [DMG] ICR moving to [AwaitingDe]
+          [1722289468.881] [56642:5458641] [EM] <<< [E:20464i S:35105 M:91065475 (Ack:114933900)] (S) Msg TX to 1:000000000000006E [FEC4] [UDP:[fe80::1%lo0]:5540] --- Type 0000:10 (SecureChannel:StandaloneAck) (B:34)
+      cluster: "LogCommands"
+      command: "UserPrompt"
+      arguments:
+          values:
+              - name: "message"
+                value: "Please enter 'y' after success"
+              - name: "expectedValue"
+                value: "y"
+
+    - label: "Step 7a:  Test Harness writes to the Presets attribute wherein a new preset is added with the builtIn flag set to true"
+      PICS: TSTAT.S.F08 && TSTAT.C.C07.Tx
+      verification: |
+          Optional Attribute - If it is supported, then in TH log it will results in displaying the value, else it will display UNSUPPORTED_ATTRIBUTE. Below is the log of RPI the result may be vary on the basis of dut implementation.
+
+          #6a Test Harness Client calls StartPresetsSchedulesEditRequest command
+
+          ./chip-tool thermostat start-presets-schedules-edit-request 180 0x12344321 1
+          On TH(chip-tool) verify that  DUT sends a success response
+          [1722286001.805] [54149:5392862] [DMG] Received Command Response Status for Endpoint=1 Cluster=0x0000_0201 Command=0x0000_0007 Status=0x0
+          [1722286001.805] [54149:5392862] [DMG] ICR moving to [AwaitingDe]
+          [1722286001.805] [54149:5392862] [EM] <<< [E:7545i S:16937 M:144975449 (Ack:93571372)] (S) Msg TX to 1:000000000000006E [FEC4] [UDP:[fe80::1%lo0]:5540] --- Type 0000:10 (SecureChannel:StandaloneAck) (B:34)
+          [1722286001.806] [54149:5392862] [EM] Flushed pending ack for MessageCounter:93571372 on exchange 7545i
+      cluster: "LogCommands"
+      command: "UserPrompt"
+      arguments:
+          values:
+              - name: "message"
+                value: "Please enter 'y' after success"
+              - name: "expectedValue"
+                value: "y"
+
+    - label: "Step 7b:  Test Harness writes to the Presets attribute with a new preset having builtIn set to true"
+      PICS: TSTAT.S.F08 && TSTAT.S.A0050
+      verification: |
+          Optional Attribute - If it is supported, then in TH log it will results in displaying the value, else it will display UNSUPPORTED_ATTRIBUTE. Below is the log of RPI the result may be vary on the basis of dut implementation.
+
+          #7b Test Harness Client attempts to write PresetTypes and gets SUCCESS
+
+         ./chip-tool thermostat write presets '[ {"presetHandle": "hex:01", "presetScenario": 1, "coolingSetpoint": 2500, "heatingSetpoint": 2600, "builtIn": true }, {"presetHandle": "hex:02", "presetScenario": 2, "coolingSetpoint": 2600, "heatingSetpoint": 2500, "builtIn": true }, {"presetHandle": "hex:03", "name": "Sleep", "presetScenario": 3, "coolingSetpoint": 2500, "heatingSetpoint": 2600, "builtIn": false },  {"presetHandle": "hex:04", "name": "Wake", "presetScenario": 4, "coolingSetpoint": 2200, "heatingSetpoint": 2900, "builtIn": false }, {"presetHandle": null, "name": "Vacation", "presetScenario": 5, "coolingSetpoint": 2900, "heatingSetpoint": 2000, "builtIn": true }, {"presetHandle": "hex:06", "name": "GoingToSleep", "presetScenario": 6, "coolingSetpoint": 2100, "heatingSetpoint": 2500, "builtIn": false }]' 0x12344321 1
+          On TH(chip-tool) verify that  DUT sends a success response
+          [1722289461.376] [56636:5458560] [DMG] WriteClient moving to [ResponseRe]
+          [1722289461.376] [56636:5458560] [DMG] WriteResponseMessage =
+          [1722289461.376] [56636:5458560] [DMG] {
+          [1722289461.376] [56636:5458560] [DMG] 	AttributeStatusIBs =
+          [1722289461.376] [56636:5458560] [DMG] 	[
+          [1722289461.376] [56636:5458560] [DMG] 		AttributeStatusIB =
+          [1722289461.376] [56636:5458560] [DMG] 		{
+          [1722289461.376] [56636:5458560] [DMG] 			AttributePathIB =
+          [1722289461.376] [56636:5458560] [DMG] 			{
+          [1722289461.376] [56636:5458560] [DMG] 				Endpoint = 0x1,
+          [1722289461.376] [56636:5458560] [DMG] 				Cluster = 0x201,
+          [1722289461.376] [56636:5458560] [DMG] 				Attribute = 0x0000_0050,
+          [1722289461.376] [56636:5458560] [DMG] 			}
+          [1722289461.376] [56636:5458560] [DMG]
+          [1722289461.376] [56636:5458560] [DMG] 			StatusIB =
+          [1722289461.376] [56636:5458560] [DMG] 			{
+          [1722289461.376] [56636:5458560] [DMG] 				status = 0x00 (SUCCESS),
+          [1722289461.376] [56636:5458560] [DMG] 			},
+          [1722289461.376] [56636:5458560] [DMG]
+          [1722289461.376] [56636:5458560] [DMG] 		},
+          [1722289461.376] [56636:5458560] [DMG]
+          [1722289461.376] [56636:5458560] [DMG] 		AttributeStatusIB =
+          [1722289461.376] [56636:5458560] [DMG] 		{
+          [1722289461.376] [56636:5458560] [DMG] 			AttributePathIB =
+          [1722289461.376] [56636:5458560] [DMG] 			{
+          [1722289461.376] [56636:5458560] [DMG] 				Endpoint = 0x1,
+          [1722289461.376] [56636:5458560] [DMG] 				Cluster = 0x201,
+          [1722289461.376] [56636:5458560] [DMG] 				Attribute = 0x0000_0050,
+          [1722289461.376] [56636:5458560] [DMG] 				ListIndex = Null,
+          [1722289461.376] [56636:5458560] [DMG] 			}
+          [1722289461.376] [56636:5458560] [DMG]
+          [1722289461.376] [56636:5458560] [DMG] 			StatusIB =
+          [1722289461.376] [56636:5458560] [DMG] 			{
+          [1722289461.376] [56636:5458560] [DMG] 				status = 0x00 (SUCCESS),
+          [1722289461.376] [56636:5458560] [DMG] 			},
+          [1722289461.376] [56636:5458560] [DMG]
+          [1722289461.376] [56636:5458560] [DMG] 		},
+          [1722289461.376] [56636:5458560] [DMG]
+          [1722289461.376] [56636:5458560] [DMG] 		AttributeStatusIB =
+          [1722289461.376] [56636:5458560] [DMG] 		{
+          [1722289461.376] [56636:5458560] [DMG] 			AttributePathIB =
+          [1722289461.376] [56636:5458560] [DMG] 			{
+          [1722289461.376] [56636:5458560] [DMG] 				Endpoint = 0x1,
+          [1722289461.376] [56636:5458560] [DMG] 				Cluster = 0x201,
+          [1722289461.376] [56636:5458560] [DMG] 				Attribute = 0x0000_0050,
+          [1722289461.376] [56636:5458560] [DMG] 				ListIndex = Null,
+          [1722289461.376] [56636:5458560] [DMG] 			}
+          [1722289461.376] [56636:5458560] [DMG]
+          [1722289461.376] [56636:5458560] [DMG] 			StatusIB =
+          [1722289461.376] [56636:5458560] [DMG] 			{
+          [1722289461.376] [56636:5458560] [DMG] 				status = 0x00 (SUCCESS),
+          [1722289461.376] [56636:5458560] [DMG] 			},
+          [1722289461.376] [56636:5458560] [DMG]
+          [1722289461.376] [56636:5458560] [DMG] 		},
+          [1722289461.376] [56636:5458560] [DMG]
+          [1722289461.376] [56636:5458560] [DMG] 		AttributeStatusIB =
+          [1722289461.376] [56636:5458560] [DMG] 		{
+          [1722289461.376] [56636:5458560] [DMG] 			AttributePathIB =
+          [1722289461.376] [56636:5458560] [DMG] 			{
+          [1722289461.376] [56636:5458560] [DMG] 				Endpoint = 0x1,
+          [1722289461.376] [56636:5458560] [DMG] 				Cluster = 0x201,
+          [1722289461.376] [56636:5458560] [DMG] 				Attribute = 0x0000_0050,
+          [1722289461.376] [56636:5458560] [DMG] 				ListIndex = Null,
+          [1722289461.376] [56636:5458560] [DMG] 			}
+          [1722289461.376] [56636:5458560] [DMG]
+          [1722289461.376] [56636:5458560] [DMG] 			StatusIB =
+          [1722289461.376] [56636:5458560] [DMG] 			{
+          [1722289461.376] [56636:5458560] [DMG] 				status = 0x00 (SUCCESS),
+          [1722289461.376] [56636:5458560] [DMG] 			},
+          [1722289461.376] [56636:5458560] [DMG]
+          [1722289461.376] [56636:5458560] [DMG] 		},
+          [1722289461.376] [56636:5458560] [DMG]
+          [1722289461.376] [56636:5458560] [DMG] 		AttributeStatusIB =
+          [1722289461.376] [56636:5458560] [DMG] 		{
+          [1722289461.376] [56636:5458560] [DMG] 			AttributePathIB =
+          [1722289461.376] [56636:5458560] [DMG] 			{
+          [1722289461.376] [56636:5458560] [DMG] 				Endpoint = 0x1,
+          [1722289461.376] [56636:5458560] [DMG] 				Cluster = 0x201,
+          [1722289461.376] [56636:5458560] [DMG] 				Attribute = 0x0000_0050,
+          [1722289461.376] [56636:5458560] [DMG] 				ListIndex = Null,
+          [1722289461.377] [56636:5458560] [DMG] 			}
+          [1722289461.377] [56636:5458560] [DMG]
+          [1722289461.377] [56636:5458560] [DMG] 			StatusIB =
+          [1722289461.377] [56636:5458560] [DMG] 			{
+          [1722289461.377] [56636:5458560] [DMG] 				status = 0x00 (SUCCESS),
+          [1722289461.377] [56636:5458560] [DMG] 			},
+          [1722289461.377] [56636:5458560] [DMG]
+          [1722289461.377] [56636:5458560] [DMG] 		},
+          [1722289461.377] [56636:5458560] [DMG]
+          [1722289461.377] [56636:5458560] [DMG] 		AttributeStatusIB =
+          [1722289461.377] [56636:5458560] [DMG] 		{
+          [1722289461.377] [56636:5458560] [DMG] 			AttributePathIB =
+          [1722289461.377] [56636:5458560] [DMG] 			{
+          [1722289461.377] [56636:5458560] [DMG] 				Endpoint = 0x1,
+          [1722289461.377] [56636:5458560] [DMG] 				Cluster = 0x201,
+          [1722289461.377] [56636:5458560] [DMG] 				Attribute = 0x0000_0050,
+          [1722289461.377] [56636:5458560] [DMG] 				ListIndex = Null,
+          [1722289461.377] [56636:5458560] [DMG] 			}
+          [1722289461.377] [56636:5458560] [DMG]
+          [1722289461.377] [56636:5458560] [DMG] 			StatusIB =
+          [1722289461.377] [56636:5458560] [DMG] 			{
+          [1722289461.377] [56636:5458560] [DMG] 				status = 0x00 (SUCCESS),
+          [1722289461.377] [56636:5458560] [DMG] 			},
+          [1722289461.377] [56636:5458560] [DMG]
+          [1722289461.377] [56636:5458560] [DMG] 		},
+          [1722289461.377] [56636:5458560] [DMG]
+          [1722289461.377] [56636:5458560] [DMG] 	],
+          [1722289461.377] [56636:5458560] [DMG]
+          [1722289461.377] [56636:5458560] [DMG] 	InteractionModelRevision = 11
+          [1722289461.377] [56636:5458560] [DMG] }
+          [1722289461.377] [56636:5458560] [DMG] WriteClient moving to [AwaitingDe]
+          [1722289461.377] [56636:5458560] [EM] <<< [E:23635i S:58282 M:220756286 (Ack:5366080)] (S) Msg TX to 1:000000000000006E [FEC4] [UDP:[fe80::1%lo0]:5540] --- Type 0000:10 (SecureChannel:StandaloneAck) (B:34)
+      cluster: "LogCommands"
+      command: "UserPrompt"
+      arguments:
+          values:
+              - name: "message"
+                value: "Please enter 'y' after success"
+              - name: "expectedValue"
+                value: "y"
+
+    - label: "Step 7c:  Test Harness calls the CommitPresetsSchedulesRequest command"
+      PICS: TSTAT.S.F08 && TSTAT.C.C09.Tx
+      verification: |
+          Optional Attribute - If it is supported, then in TH log it will results in displaying the value, else it will display UNSUPPORTED_ATTRIBUTE. Below is the log of RPI the result may be vary on the basis of dut implementation.
+
+          #6c Test Harness Client calls CommitPresetsSchedulesRequest command and gets CONSTRAINT_ERROR since a new preset was attempted to be added as a built-in preset.
+
+          ./chip-tool thermostat commit-presets-schedules-request 0x12344321 1
+          On TH(chip-tool) verify that  DUT sends an CONSTRAINT_ERROR (0x87) error
+          [1722289998.305] [56996:5468872] [DMG] Received Command Response Status for Endpoint=1 Cluster=0x0000_0201 Command=0x0000_0009 Status=0x87
+          [1722289998.305] [56996:5468872] [TOO] Error: IM Error 0x00000587: General error: 0x87 (CONSTRAINT_ERROR)
+          [1722289998.305] [56996:5468872] [DMG] ICR moving to [AwaitingDe]
+          [1722289998.305] [56996:5468872] [EM] <<< [E:44500i S:62829 M:76436393 (Ack:145233702)] (S) Msg TX to 1:000000000000006E [FEC4] [UDP:[fe80::1%lo0]:5540] --- Type 0000:10 (SecureChannel:StandaloneAck) (B:34)
+      cluster: "LogCommands"
+      command: "UserPrompt"
+      arguments:
+          values:
+              - name: "message"
+                value: "Please enter 'y' after success"
+              - name: "expectedValue"
+                value: "y"
+
+    - label: "Step 8a:  Test Harness writes to the Presets attribute with a preset having a non-null preset handle that doesn't exist in the Presets attribute"
+      PICS: TSTAT.S.F08 && TSTAT.C.C07.Tx
+      verification: |
+          Optional Attribute - If it is supported, then in TH log it will results in displaying the value, else it will display UNSUPPORTED_ATTRIBUTE. Below is the log of RPI the result may be vary on the basis of dut implementation.
+
+          #8a Test Harness Client calls StartPresetsSchedulesEditRequest command
+
+          ./chip-tool thermostat start-presets-schedules-edit-request 180 0x12344321 1
+          On TH(chip-tool) verify that  DUT sends a success response
+          [1722286001.805] [54149:5392862] [DMG] Received Command Response Status for Endpoint=1 Cluster=0x0000_0201 Command=0x0000_0007 Status=0x0
+          [1722286001.805] [54149:5392862] [DMG] ICR moving to [AwaitingDe]
+          [1722286001.805] [54149:5392862] [EM] <<< [E:7545i S:16937 M:144975449 (Ack:93571372)] (S) Msg TX to 1:000000000000006E [FEC4] [UDP:[fe80::1%lo0]:5540] --- Type 0000:10 (SecureChannel:StandaloneAck) (B:34)
+          [1722286001.806] [54149:5392862] [EM] Flushed pending ack for MessageCounter:93571372 on exchange 7545i
+      cluster: "LogCommands"
+      command: "UserPrompt"
+      arguments:
+          values:
+              - name: "message"
+                value: "Please enter 'y' after success"
+              - name: "expectedValue"
+                value: "y"
+
+    - label: "Step 8b:  Test Harness writes to the Presets attribute with a preset having preset handle hex:08 that doesn't exist in the Presets attribute"
+      PICS: TSTAT.S.F08 && TSTAT.S.A0050
+      verification: |
+          Optional Attribute - If it is supported, then in TH log it will results in displaying the value, else it will display UNSUPPORTED_ATTRIBUTE. Below is the log of RPI the result may be vary on the basis of dut implementation.
+
+          #8b Test Harness Client attempts to write PresetTypes and gets SUCCESS
+
+         ./chip-tool thermostat write presets '[ {"presetHandle": "hex:01", "presetScenario": 1, "coolingSetpoint": 2500, "heatingSetpoint": 2600, "builtIn": true }, {"presetHandle": "hex:02", "presetScenario": 2, "coolingSetpoint": 2600, "heatingSetpoint": 2500, "builtIn": true }, {"presetHandle": "hex:03", "name": "Sleep", "presetScenario": 3, "coolingSetpoint": 2500, "heatingSetpoint": 2600, "builtIn": false },  {"presetHandle": "hex:04", "name": "Wake", "presetScenario": 4, "coolingSetpoint": 2200, "heatingSetpoint": 2900, "builtIn": false }, {"presetHandle": "hex:08", "name": "GoingToSleep", "presetScenario": 6, "coolingSetpoint": 2100, "heatingSetpoint": 2500, "builtIn": false }]' 0x12344321 1
+          On TH(chip-tool) verify that  DUT sends a success response
+          [1722289461.376] [56636:5458560] [DMG] WriteClient moving to [ResponseRe]
+          [1722289461.376] [56636:5458560] [DMG] WriteResponseMessage =
+          [1722289461.376] [56636:5458560] [DMG] {
+          [1722289461.376] [56636:5458560] [DMG] 	AttributeStatusIBs =
+          [1722289461.376] [56636:5458560] [DMG] 	[
+          [1722289461.376] [56636:5458560] [DMG] 		AttributeStatusIB =
+          [1722289461.376] [56636:5458560] [DMG] 		{
+          [1722289461.376] [56636:5458560] [DMG] 			AttributePathIB =
+          [1722289461.376] [56636:5458560] [DMG] 			{
+          [1722289461.376] [56636:5458560] [DMG] 				Endpoint = 0x1,
+          [1722289461.376] [56636:5458560] [DMG] 				Cluster = 0x201,
+          [1722289461.376] [56636:5458560] [DMG] 				Attribute = 0x0000_0050,
+          [1722289461.376] [56636:5458560] [DMG] 			}
+          [1722289461.376] [56636:5458560] [DMG]
+          [1722289461.376] [56636:5458560] [DMG] 			StatusIB =
+          [1722289461.376] [56636:5458560] [DMG] 			{
+          [1722289461.376] [56636:5458560] [DMG] 				status = 0x00 (SUCCESS),
+          [1722289461.376] [56636:5458560] [DMG] 			},
+          [1722289461.376] [56636:5458560] [DMG]
+          [1722289461.376] [56636:5458560] [DMG] 		},
+          [1722289461.376] [56636:5458560] [DMG]
+          [1722289461.376] [56636:5458560] [DMG] 		AttributeStatusIB =
+          [1722289461.376] [56636:5458560] [DMG] 		{
+          [1722289461.376] [56636:5458560] [DMG] 			AttributePathIB =
+          [1722289461.376] [56636:5458560] [DMG] 			{
+          [1722289461.376] [56636:5458560] [DMG] 				Endpoint = 0x1,
+          [1722289461.376] [56636:5458560] [DMG] 				Cluster = 0x201,
+          [1722289461.376] [56636:5458560] [DMG] 				Attribute = 0x0000_0050,
+          [1722289461.376] [56636:5458560] [DMG] 				ListIndex = Null,
+          [1722289461.376] [56636:5458560] [DMG] 			}
+          [1722289461.376] [56636:5458560] [DMG]
+          [1722289461.376] [56636:5458560] [DMG] 			StatusIB =
+          [1722289461.376] [56636:5458560] [DMG] 			{
+          [1722289461.376] [56636:5458560] [DMG] 				status = 0x00 (SUCCESS),
+          [1722289461.376] [56636:5458560] [DMG] 			},
+          [1722289461.376] [56636:5458560] [DMG]
+          [1722289461.376] [56636:5458560] [DMG] 		},
+          [1722289461.376] [56636:5458560] [DMG]
+          [1722289461.376] [56636:5458560] [DMG] 		AttributeStatusIB =
+          [1722289461.376] [56636:5458560] [DMG] 		{
+          [1722289461.376] [56636:5458560] [DMG] 			AttributePathIB =
+          [1722289461.376] [56636:5458560] [DMG] 			{
+          [1722289461.376] [56636:5458560] [DMG] 				Endpoint = 0x1,
+          [1722289461.376] [56636:5458560] [DMG] 				Cluster = 0x201,
+          [1722289461.376] [56636:5458560] [DMG] 				Attribute = 0x0000_0050,
+          [1722289461.376] [56636:5458560] [DMG] 				ListIndex = Null,
+          [1722289461.376] [56636:5458560] [DMG] 			}
+          [1722289461.376] [56636:5458560] [DMG]
+          [1722289461.376] [56636:5458560] [DMG] 			StatusIB =
+          [1722289461.376] [56636:5458560] [DMG] 			{
+          [1722289461.376] [56636:5458560] [DMG] 				status = 0x00 (SUCCESS),
+          [1722289461.376] [56636:5458560] [DMG] 			},
+          [1722289461.376] [56636:5458560] [DMG]
+          [1722289461.376] [56636:5458560] [DMG] 		},
+          [1722289461.376] [56636:5458560] [DMG]
+          [1722289461.376] [56636:5458560] [DMG] 		AttributeStatusIB =
+          [1722289461.376] [56636:5458560] [DMG] 		{
+          [1722289461.376] [56636:5458560] [DMG] 			AttributePathIB =
+          [1722289461.376] [56636:5458560] [DMG] 			{
+          [1722289461.376] [56636:5458560] [DMG] 				Endpoint = 0x1,
+          [1722289461.376] [56636:5458560] [DMG] 				Cluster = 0x201,
+          [1722289461.376] [56636:5458560] [DMG] 				Attribute = 0x0000_0050,
+          [1722289461.376] [56636:5458560] [DMG] 				ListIndex = Null,
+          [1722289461.376] [56636:5458560] [DMG] 			}
+          [1722289461.376] [56636:5458560] [DMG]
+          [1722289461.376] [56636:5458560] [DMG] 			StatusIB =
+          [1722289461.376] [56636:5458560] [DMG] 			{
+          [1722289461.376] [56636:5458560] [DMG] 				status = 0x00 (SUCCESS),
+          [1722289461.376] [56636:5458560] [DMG] 			},
+          [1722289461.376] [56636:5458560] [DMG]
+          [1722289461.376] [56636:5458560] [DMG] 		},
+          [1722289461.376] [56636:5458560] [DMG]
+          [1722289461.376] [56636:5458560] [DMG] 		AttributeStatusIB =
+          [1722289461.376] [56636:5458560] [DMG] 		{
+          [1722289461.376] [56636:5458560] [DMG] 			AttributePathIB =
+          [1722289461.376] [56636:5458560] [DMG] 			{
+          [1722289461.376] [56636:5458560] [DMG] 				Endpoint = 0x1,
+          [1722289461.376] [56636:5458560] [DMG] 				Cluster = 0x201,
+          [1722289461.376] [56636:5458560] [DMG] 				Attribute = 0x0000_0050,
+          [1722289461.376] [56636:5458560] [DMG] 				ListIndex = Null,
+          [1722289461.377] [56636:5458560] [DMG] 			}
+          [1722289461.377] [56636:5458560] [DMG]
+          [1722289461.377] [56636:5458560] [DMG] 			StatusIB =
+          [1722289461.377] [56636:5458560] [DMG] 			{
+          [1722289461.377] [56636:5458560] [DMG] 				status = 0x00 (SUCCESS),
+          [1722289461.377] [56636:5458560] [DMG] 			},
+          [1722289461.377] [56636:5458560] [DMG]
+          [1722289461.377] [56636:5458560] [DMG] 		},
+          [1722289461.377] [56636:5458560] [DMG]
+          [1722289461.377] [56636:5458560] [DMG] 		AttributeStatusIB =
+          [1722289461.377] [56636:5458560] [DMG] 		{
+          [1722289461.377] [56636:5458560] [DMG] 			AttributePathIB =
+          [1722289461.377] [56636:5458560] [DMG] 			{
+          [1722289461.377] [56636:5458560] [DMG] 				Endpoint = 0x1,
+          [1722289461.377] [56636:5458560] [DMG] 				Cluster = 0x201,
+          [1722289461.377] [56636:5458560] [DMG] 				Attribute = 0x0000_0050,
+          [1722289461.377] [56636:5458560] [DMG] 				ListIndex = Null,
+          [1722289461.377] [56636:5458560] [DMG] 			}
+          [1722289461.377] [56636:5458560] [DMG]
+          [1722289461.377] [56636:5458560] [DMG] 			StatusIB =
+          [1722289461.377] [56636:5458560] [DMG] 			{
+          [1722289461.377] [56636:5458560] [DMG] 				status = 0x00 (SUCCESS),
+          [1722289461.377] [56636:5458560] [DMG] 			},
+          [1722289461.377] [56636:5458560] [DMG]
+          [1722289461.377] [56636:5458560] [DMG] 		},
+          [1722289461.377] [56636:5458560] [DMG]
+          [1722289461.377] [56636:5458560] [DMG] 	],
+          [1722289461.377] [56636:5458560] [DMG]
+          [1722289461.377] [56636:5458560] [DMG] 	InteractionModelRevision = 11
+          [1722289461.377] [56636:5458560] [DMG] }
+          [1722289461.377] [56636:5458560] [DMG] WriteClient moving to [AwaitingDe]
+          [1722289461.377] [56636:5458560] [EM] <<< [E:23635i S:58282 M:220756286 (Ack:5366080)] (S) Msg TX to 1:000000000000006E [FEC4] [UDP:[fe80::1%lo0]:5540] --- Type 0000:10 (SecureChannel:StandaloneAck) (B:34)
+      cluster: "LogCommands"
+      command: "UserPrompt"
+      arguments:
+          values:
+              - name: "message"
+                value: "Please enter 'y' after success"
+              - name: "expectedValue"
+                value: "y"
+
+    - label: "Step 8c:  Test Harness calls the CommitPresetsSchedulesRequest command"
+      PICS: TSTAT.S.F08 && TSTAT.C.C09.Tx
+      verification: |
+          Optional Attribute - If it is supported, then in TH log it will results in displaying the value, else it will display UNSUPPORTED_ATTRIBUTE. Below is the log of RPI the result may be vary on the basis of dut implementation.
+
+          #8c Test Harness Client calls CommitPresetsSchedulesRequest command gets NOT_FOUND since an existing preset was attempted to be added with a preset handle that doesn't exist in the Presets attribute
+
+          ./chip-tool thermostat commit-presets-schedules-request 0x12344321 1
+          On TH(chip-tool) verify that  DUT sends an NOT_FOUND (0x8B) error
+          [1722290436.980] [57434:5479429] [DMG] Received Command Response Status for Endpoint=1 Cluster=0x0000_0201 Command=0x0000_0009 Status=0x8b
+          [1722290436.980] [57434:5479429] [TOO] Error: IM Error 0x0000058B: General error: 0x8b (NOT_FOUND)
+          [1722290436.980] [57434:5479429] [DMG] ICR moving to [AwaitingDe]
+          [1722290436.980] [57434:5479429] [EM] <<< [E:54210i S:10110 M:158287615 (Ack:73923062)] (S) Msg TX to 1:000000000000006E [FEC4] [UDP:[fe80::1%lo0]:5540] --- Type 0000:10 (SecureChannel:StandaloneAck) (B:34)
+      command: "UserPrompt"
+      arguments:
+          values:
+              - name: "message"
+                value: "Please enter 'y' after success"
+              - name: "expectedValue"
+                value: "y"
+
+    - label: "Step 9a:  Test Harness writes to the Presets attribute wherein there are 2 presets with the same preset handle"
+      PICS: TSTAT.S.F08 && TSTAT.C.C07.Tx
+      verification: |
+          Optional Attribute - If it is supported, then in TH log it will results in displaying the value, else it will display UNSUPPORTED_ATTRIBUTE. Below is the log of RPI the result may be vary on the basis of dut implementation.
+
+          #9a Test Harness Client calls StartPresetsSchedulesEditRequest command
+
+          ./chip-tool thermostat start-presets-schedules-edit-request 180 0x12344321 1
+          On TH(chip-tool) verify that  DUT sends a success response
+          [1722286001.805] [54149:5392862] [DMG] Received Command Response Status for Endpoint=1 Cluster=0x0000_0201 Command=0x0000_0007 Status=0x0
+          [1722286001.805] [54149:5392862] [DMG] ICR moving to [AwaitingDe]
+          [1722286001.805] [54149:5392862] [EM] <<< [E:7545i S:16937 M:144975449 (Ack:93571372)] (S) Msg TX to 1:000000000000006E [FEC4] [UDP:[fe80::1%lo0]:5540] --- Type 0000:10 (SecureChannel:StandaloneAck) (B:34)
+          [1722286001.806] [54149:5392862] [EM] Flushed pending ack for MessageCounter:93571372 on exchange 7545i
+      cluster: "LogCommands"
+      command: "UserPrompt"
+      arguments:
+          values:
+              - name: "message"
+                value: "Please enter 'y' after success"
+              - name: "expectedValue"
+                value: "y"
+
+    - label: "Step 9b:  Test Harness writes to the Presets attribute"
+      PICS: TSTAT.S.F08 && TSTAT.S.A0050
+      verification: |
+          Optional Attribute - If it is supported, then in TH log it will results in displaying the value, else it will display UNSUPPORTED_ATTRIBUTE. Below is the log of RPI the result may be vary on the basis of dut implementation.
+
+          #8b Test Harness Client attempts to write PresetTypes and gets SUCCESS
+
+         ./chip-tool thermostat write presets '[ {"presetHandle": "hex:01", "presetScenario": 1, "coolingSetpoint": 2500, "heatingSetpoint": 2600, "builtIn": true }, {"presetHandle": "hex:02", "presetScenario": 2, "coolingSetpoint": 2600, "heatingSetpoint": 2500, "builtIn": true }, {"presetHandle": "hex:03", "name": "Sleep", "presetScenario": 3, "coolingSetpoint": 2500, "heatingSetpoint": 2600, "builtIn": false }, {"presetHandle": "hex:03", "name": "Sleep", "presetScenario": 3, "coolingSetpoint": 2500, "heatingSetpoint": 2600, "builtIn": false }, {"presetHandle": "hex:04", "name": "Wake", "presetScenario": 4, "coolingSetpoint": 2200, "heatingSetpoint": 2900, "builtIn": false }, {"presetHandle": "hex:06", "name": "GoingToSleep", "presetScenario": 6, "coolingSetpoint": 2100, "heatingSetpoint": 2500, "builtIn": false }]' 0x12344321 1
+          On TH(chip-tool) verify that  DUT sends a success response
+          [1722289461.376] [56636:5458560] [DMG] WriteClient moving to [ResponseRe]
+          [1722289461.376] [56636:5458560] [DMG] WriteResponseMessage =
+          [1722289461.376] [56636:5458560] [DMG] {
+          [1722289461.376] [56636:5458560] [DMG] 	AttributeStatusIBs =
+          [1722289461.376] [56636:5458560] [DMG] 	[
+          [1722289461.376] [56636:5458560] [DMG] 		AttributeStatusIB =
+          [1722289461.376] [56636:5458560] [DMG] 		{
+          [1722289461.376] [56636:5458560] [DMG] 			AttributePathIB =
+          [1722289461.376] [56636:5458560] [DMG] 			{
+          [1722289461.376] [56636:5458560] [DMG] 				Endpoint = 0x1,
+          [1722289461.376] [56636:5458560] [DMG] 				Cluster = 0x201,
+          [1722289461.376] [56636:5458560] [DMG] 				Attribute = 0x0000_0050,
+          [1722289461.376] [56636:5458560] [DMG] 			}
+          [1722289461.376] [56636:5458560] [DMG]
+          [1722289461.376] [56636:5458560] [DMG] 			StatusIB =
+          [1722289461.376] [56636:5458560] [DMG] 			{
+          [1722289461.376] [56636:5458560] [DMG] 				status = 0x00 (SUCCESS),
+          [1722289461.376] [56636:5458560] [DMG] 			},
+          [1722289461.376] [56636:5458560] [DMG]
+          [1722289461.376] [56636:5458560] [DMG] 		},
+          [1722289461.376] [56636:5458560] [DMG]
+          [1722289461.376] [56636:5458560] [DMG] 		AttributeStatusIB =
+          [1722289461.376] [56636:5458560] [DMG] 		{
+          [1722289461.376] [56636:5458560] [DMG] 			AttributePathIB =
+          [1722289461.376] [56636:5458560] [DMG] 			{
+          [1722289461.376] [56636:5458560] [DMG] 				Endpoint = 0x1,
+          [1722289461.376] [56636:5458560] [DMG] 				Cluster = 0x201,
+          [1722289461.376] [56636:5458560] [DMG] 				Attribute = 0x0000_0050,
+          [1722289461.376] [56636:5458560] [DMG] 				ListIndex = Null,
+          [1722289461.376] [56636:5458560] [DMG] 			}
+          [1722289461.376] [56636:5458560] [DMG]
+          [1722289461.376] [56636:5458560] [DMG] 			StatusIB =
+          [1722289461.376] [56636:5458560] [DMG] 			{
+          [1722289461.376] [56636:5458560] [DMG] 				status = 0x00 (SUCCESS),
+          [1722289461.376] [56636:5458560] [DMG] 			},
+          [1722289461.376] [56636:5458560] [DMG]
+          [1722289461.376] [56636:5458560] [DMG] 		},
+          [1722289461.376] [56636:5458560] [DMG]
+          [1722289461.376] [56636:5458560] [DMG] 		AttributeStatusIB =
+          [1722289461.376] [56636:5458560] [DMG] 		{
+          [1722289461.376] [56636:5458560] [DMG] 			AttributePathIB =
+          [1722289461.376] [56636:5458560] [DMG] 			{
+          [1722289461.376] [56636:5458560] [DMG] 				Endpoint = 0x1,
+          [1722289461.376] [56636:5458560] [DMG] 				Cluster = 0x201,
+          [1722289461.376] [56636:5458560] [DMG] 				Attribute = 0x0000_0050,
+          [1722289461.376] [56636:5458560] [DMG] 				ListIndex = Null,
+          [1722289461.376] [56636:5458560] [DMG] 			}
+          [1722289461.376] [56636:5458560] [DMG]
+          [1722289461.376] [56636:5458560] [DMG] 			StatusIB =
+          [1722289461.376] [56636:5458560] [DMG] 			{
+          [1722289461.376] [56636:5458560] [DMG] 				status = 0x00 (SUCCESS),
+          [1722289461.376] [56636:5458560] [DMG] 			},
+          [1722289461.376] [56636:5458560] [DMG]
+          [1722289461.376] [56636:5458560] [DMG] 		},
+          [1722289461.376] [56636:5458560] [DMG]
+          [1722289461.376] [56636:5458560] [DMG] 		AttributeStatusIB =
+          [1722289461.376] [56636:5458560] [DMG] 		{
+          [1722289461.376] [56636:5458560] [DMG] 			AttributePathIB =
+          [1722289461.376] [56636:5458560] [DMG] 			{
+          [1722289461.376] [56636:5458560] [DMG] 				Endpoint = 0x1,
+          [1722289461.376] [56636:5458560] [DMG] 				Cluster = 0x201,
+          [1722289461.376] [56636:5458560] [DMG] 				Attribute = 0x0000_0050,
+          [1722289461.376] [56636:5458560] [DMG] 				ListIndex = Null,
+          [1722289461.376] [56636:5458560] [DMG] 			}
+          [1722289461.376] [56636:5458560] [DMG]
+          [1722289461.376] [56636:5458560] [DMG] 			StatusIB =
+          [1722289461.376] [56636:5458560] [DMG] 			{
+          [1722289461.376] [56636:5458560] [DMG] 				status = 0x00 (SUCCESS),
+          [1722289461.376] [56636:5458560] [DMG] 			},
+          [1722289461.376] [56636:5458560] [DMG]
+          [1722289461.376] [56636:5458560] [DMG] 		},
+          [1722289461.376] [56636:5458560] [DMG]
+          [1722289461.376] [56636:5458560] [DMG] 		AttributeStatusIB =
+          [1722289461.376] [56636:5458560] [DMG] 		{
+          [1722289461.376] [56636:5458560] [DMG] 			AttributePathIB =
+          [1722289461.376] [56636:5458560] [DMG] 			{
+          [1722289461.376] [56636:5458560] [DMG] 				Endpoint = 0x1,
+          [1722289461.376] [56636:5458560] [DMG] 				Cluster = 0x201,
+          [1722289461.376] [56636:5458560] [DMG] 				Attribute = 0x0000_0050,
+          [1722289461.376] [56636:5458560] [DMG] 				ListIndex = Null,
+          [1722289461.377] [56636:5458560] [DMG] 			}
+          [1722289461.377] [56636:5458560] [DMG]
+          [1722289461.377] [56636:5458560] [DMG] 			StatusIB =
+          [1722289461.377] [56636:5458560] [DMG] 			{
+          [1722289461.377] [56636:5458560] [DMG] 				status = 0x00 (SUCCESS),
+          [1722289461.377] [56636:5458560] [DMG] 			},
+          [1722289461.377] [56636:5458560] [DMG]
+          [1722289461.377] [56636:5458560] [DMG] 		},
+          [1722289461.377] [56636:5458560] [DMG]
+          [1722289461.377] [56636:5458560] [DMG] 		AttributeStatusIB =
+          [1722289461.377] [56636:5458560] [DMG] 		{
+          [1722289461.377] [56636:5458560] [DMG] 			AttributePathIB =
+          [1722289461.377] [56636:5458560] [DMG] 			{
+          [1722289461.377] [56636:5458560] [DMG] 				Endpoint = 0x1,
+          [1722289461.377] [56636:5458560] [DMG] 				Cluster = 0x201,
+          [1722289461.377] [56636:5458560] [DMG] 				Attribute = 0x0000_0050,
+          [1722289461.377] [56636:5458560] [DMG] 				ListIndex = Null,
+          [1722289461.377] [56636:5458560] [DMG] 			}
+          [1722289461.377] [56636:5458560] [DMG]
+          [1722289461.377] [56636:5458560] [DMG] 			StatusIB =
+          [1722289461.377] [56636:5458560] [DMG] 			{
+          [1722289461.377] [56636:5458560] [DMG] 				status = 0x00 (SUCCESS),
+          [1722289461.377] [56636:5458560] [DMG] 			},
+          [1722289461.377] [56636:5458560] [DMG]
+          [1722289461.377] [56636:5458560] [DMG] 		},
+          [1722289461.377] [56636:5458560] [DMG]
+          [1722289461.377] [56636:5458560] [DMG] 	],
+          [1722289461.377] [56636:5458560] [DMG]
+          [1722289461.377] [56636:5458560] [DMG] 	InteractionModelRevision = 11
+          [1722289461.377] [56636:5458560] [DMG] }
+          [1722289461.377] [56636:5458560] [DMG] WriteClient moving to [AwaitingDe]
+          [1722289461.377] [56636:5458560] [EM] <<< [E:23635i S:58282 M:220756286 (Ack:5366080)] (S) Msg TX to 1:000000000000006E [FEC4] [UDP:[fe80::1%lo0]:5540] --- Type 0000:10 (SecureChannel:StandaloneAck) (B:34)
+      cluster: "LogCommands"
+      command: "UserPrompt"
+      arguments:
+          values:
+              - name: "message"
+                value: "Please enter 'y' after success"
+              - name: "expectedValue"
+                value: "y"
+
+    - label: "Step 9c:  Test Harness calls the CommitPresetsSchedulesRequest command"
+      PICS: TSTAT.S.F08 && TSTAT.C.C09.Tx
+      verification: |
+          Optional Attribute - If it is supported, then in TH log it will results in displaying the value, else it will display UNSUPPORTED_ATTRIBUTE. Below is the log of RPI the result may be vary on the basis of dut implementation.
+
+          #8c Test Harness Client calls CommitPresetsSchedulesRequest command gets CONSTRAINT_ERROR since preset with preset handle hex:03 is duplicated
+
+          ./chip-tool thermostat commit-presets-schedules-request 0x12344321 1
+          On TH(chip-tool) verify that  DUT sends a CONSTRAINT_ERROR (0x87) error
+          [1722302289.994] [63677:5670818] [DMG] Received Command Response Status for Endpoint=1 Cluster=0x0000_0201 Command=0x0000_0009 Status=0x87
+          [1722302289.994] [63677:5670818] [TOO] Error: IM Error 0x00000587: General error: 0x87 (CONSTRAINT_ERROR)
+          [1722302289.994] [63677:5670818] [DMG] ICR moving to [AwaitingDe]
+          [1722302289.994] [63677:5670818] [EM] <<< [E:25209i S:7768 M:264197735 (Ack:106550461)] (S) Msg TX to 1:000000000000006E [FEC4] [UDP:[fe80::1%lo0]:5540] --- Type 0000:10 (SecureChannel:StandaloneAck) (B:34)
+      command: "UserPrompt"
+      arguments:
+          values:
+              - name: "message"
+                value: "Please enter 'y' after success"
+              - name: "expectedValue"
+                value: "y"
+
+    - label: "Step 10a:  Test Harness writes to the Presets attribute wherein a built-in preset is modified to be a non built-in preset"
+      PICS: TSTAT.S.F08 && TSTAT.C.C07.Tx
+      verification: |
+          Optional Attribute - If it is supported, then in TH log it will results in displaying the value, else it will display UNSUPPORTED_ATTRIBUTE. Below is the log of RPI the result may be vary on the basis of dut implementation.
+
+          #10a Test Harness Client calls StartPresetsSchedulesEditRequest command
+
+          ./chip-tool thermostat start-presets-schedules-edit-request 180 0x12344321 1
+          On TH(chip-tool) verify that  DUT sends a success response
+          [1722286001.805] [54149:5392862] [DMG] Received Command Response Status for Endpoint=1 Cluster=0x0000_0201 Command=0x0000_0007 Status=0x0
+          [1722286001.805] [54149:5392862] [DMG] ICR moving to [AwaitingDe]
+          [1722286001.805] [54149:5392862] [EM] <<< [E:7545i S:16937 M:144975449 (Ack:93571372)] (S) Msg TX to 1:000000000000006E [FEC4] [UDP:[fe80::1%lo0]:5540] --- Type 0000:10 (SecureChannel:StandaloneAck) (B:34)
+          [1722286001.806] [54149:5392862] [EM] Flushed pending ack for MessageCounter:93571372 on exchange 7545i
+      cluster: "LogCommands"
+      command: "UserPrompt"
+      arguments:
+          values:
+              - name: "message"
+                value: "Please enter 'y' after success"
+              - name: "expectedValue"
+                value: "y"
+
+    - label: "Step 10b:  Test Harness writes to the Presets attribute wherein a built-in preset is modified to a non built-in preset"
+      PICS: TSTAT.S.F08 && TSTAT.S.A0050
+      verification: |
+          Optional Attribute - If it is supported, then in TH log it will results in displaying the value, else it will display UNSUPPORTED_ATTRIBUTE. Below is the log of RPI the result may be vary on the basis of dut implementation.
+
+          #10b Test Harness Client attempts to write PresetTypes and gets SUCCESS
+
+         ./chip-tool thermostat write presets '[ {"presetHandle": "hex:01", "presetScenario": 1, "coolingSetpoint": 2500, "heatingSetpoint": 2600, "builtIn": false }, {"presetHandle": "hex:02", "presetScenario": 2, "coolingSetpoint": 2600, "heatingSetpoint": 2500, "builtIn": true }, {"presetHandle": "hex:03", "name": "Sleep", "presetScenario": 3, "coolingSetpoint": 2500, "heatingSetpoint": 2600, "builtIn": false },  {"presetHandle": "hex:04", "name": "Wake", "presetScenario": 4, "coolingSetpoint": 2200, "heatingSetpoint": 2900, "builtIn": false }, {"presetHandle": "hex:06", "name": "GoingToSleep", "presetScenario": 6, "coolingSetpoint": 2100, "heatingSetpoint": 2500, "builtIn": false }]' 0x12344321 1
+          On TH(chip-tool) verify that  DUT sends a success response
+          [1722289461.376] [56636:5458560] [DMG] WriteClient moving to [ResponseRe]
+          [1722289461.376] [56636:5458560] [DMG] WriteResponseMessage =
+          [1722289461.376] [56636:5458560] [DMG] {
+          [1722289461.376] [56636:5458560] [DMG] 	AttributeStatusIBs =
+          [1722289461.376] [56636:5458560] [DMG] 	[
+          [1722289461.376] [56636:5458560] [DMG] 		AttributeStatusIB =
+          [1722289461.376] [56636:5458560] [DMG] 		{
+          [1722289461.376] [56636:5458560] [DMG] 			AttributePathIB =
+          [1722289461.376] [56636:5458560] [DMG] 			{
+          [1722289461.376] [56636:5458560] [DMG] 				Endpoint = 0x1,
+          [1722289461.376] [56636:5458560] [DMG] 				Cluster = 0x201,
+          [1722289461.376] [56636:5458560] [DMG] 				Attribute = 0x0000_0050,
+          [1722289461.376] [56636:5458560] [DMG] 			}
+          [1722289461.376] [56636:5458560] [DMG]
+          [1722289461.376] [56636:5458560] [DMG] 			StatusIB =
+          [1722289461.376] [56636:5458560] [DMG] 			{
+          [1722289461.376] [56636:5458560] [DMG] 				status = 0x00 (SUCCESS),
+          [1722289461.376] [56636:5458560] [DMG] 			},
+          [1722289461.376] [56636:5458560] [DMG]
+          [1722289461.376] [56636:5458560] [DMG] 		},
+          [1722289461.376] [56636:5458560] [DMG]
+          [1722289461.376] [56636:5458560] [DMG] 		AttributeStatusIB =
+          [1722289461.376] [56636:5458560] [DMG] 		{
+          [1722289461.376] [56636:5458560] [DMG] 			AttributePathIB =
+          [1722289461.376] [56636:5458560] [DMG] 			{
+          [1722289461.376] [56636:5458560] [DMG] 				Endpoint = 0x1,
+          [1722289461.376] [56636:5458560] [DMG] 				Cluster = 0x201,
+          [1722289461.376] [56636:5458560] [DMG] 				Attribute = 0x0000_0050,
+          [1722289461.376] [56636:5458560] [DMG] 				ListIndex = Null,
+          [1722289461.376] [56636:5458560] [DMG] 			}
+          [1722289461.376] [56636:5458560] [DMG]
+          [1722289461.376] [56636:5458560] [DMG] 			StatusIB =
+          [1722289461.376] [56636:5458560] [DMG] 			{
+          [1722289461.376] [56636:5458560] [DMG] 				status = 0x00 (SUCCESS),
+          [1722289461.376] [56636:5458560] [DMG] 			},
+          [1722289461.376] [56636:5458560] [DMG]
+          [1722289461.376] [56636:5458560] [DMG] 		},
+          [1722289461.376] [56636:5458560] [DMG]
+          [1722289461.376] [56636:5458560] [DMG] 		AttributeStatusIB =
+          [1722289461.376] [56636:5458560] [DMG] 		{
+          [1722289461.376] [56636:5458560] [DMG] 			AttributePathIB =
+          [1722289461.376] [56636:5458560] [DMG] 			{
+          [1722289461.376] [56636:5458560] [DMG] 				Endpoint = 0x1,
+          [1722289461.376] [56636:5458560] [DMG] 				Cluster = 0x201,
+          [1722289461.376] [56636:5458560] [DMG] 				Attribute = 0x0000_0050,
+          [1722289461.376] [56636:5458560] [DMG] 				ListIndex = Null,
+          [1722289461.376] [56636:5458560] [DMG] 			}
+          [1722289461.376] [56636:5458560] [DMG]
+          [1722289461.376] [56636:5458560] [DMG] 			StatusIB =
+          [1722289461.376] [56636:5458560] [DMG] 			{
+          [1722289461.376] [56636:5458560] [DMG] 				status = 0x00 (SUCCESS),
+          [1722289461.376] [56636:5458560] [DMG] 			},
+          [1722289461.376] [56636:5458560] [DMG]
+          [1722289461.376] [56636:5458560] [DMG] 		},
+          [1722289461.376] [56636:5458560] [DMG]
+          [1722289461.376] [56636:5458560] [DMG] 		AttributeStatusIB =
+          [1722289461.376] [56636:5458560] [DMG] 		{
+          [1722289461.376] [56636:5458560] [DMG] 			AttributePathIB =
+          [1722289461.376] [56636:5458560] [DMG] 			{
+          [1722289461.376] [56636:5458560] [DMG] 				Endpoint = 0x1,
+          [1722289461.376] [56636:5458560] [DMG] 				Cluster = 0x201,
+          [1722289461.376] [56636:5458560] [DMG] 				Attribute = 0x0000_0050,
+          [1722289461.376] [56636:5458560] [DMG] 				ListIndex = Null,
+          [1722289461.376] [56636:5458560] [DMG] 			}
+          [1722289461.376] [56636:5458560] [DMG]
+          [1722289461.376] [56636:5458560] [DMG] 			StatusIB =
+          [1722289461.376] [56636:5458560] [DMG] 			{
+          [1722289461.376] [56636:5458560] [DMG] 				status = 0x00 (SUCCESS),
+          [1722289461.376] [56636:5458560] [DMG] 			},
+          [1722289461.376] [56636:5458560] [DMG]
+          [1722289461.376] [56636:5458560] [DMG] 		},
+          [1722289461.376] [56636:5458560] [DMG]
+          [1722289461.376] [56636:5458560] [DMG] 		AttributeStatusIB =
+          [1722289461.376] [56636:5458560] [DMG] 		{
+          [1722289461.376] [56636:5458560] [DMG] 			AttributePathIB =
+          [1722289461.376] [56636:5458560] [DMG] 			{
+          [1722289461.376] [56636:5458560] [DMG] 				Endpoint = 0x1,
+          [1722289461.376] [56636:5458560] [DMG] 				Cluster = 0x201,
+          [1722289461.376] [56636:5458560] [DMG] 				Attribute = 0x0000_0050,
+          [1722289461.376] [56636:5458560] [DMG] 				ListIndex = Null,
+          [1722289461.377] [56636:5458560] [DMG] 			}
+          [1722289461.377] [56636:5458560] [DMG]
+          [1722289461.377] [56636:5458560] [DMG] 			StatusIB =
+          [1722289461.377] [56636:5458560] [DMG] 			{
+          [1722289461.377] [56636:5458560] [DMG] 				status = 0x00 (SUCCESS),
+          [1722289461.377] [56636:5458560] [DMG] 			},
+          [1722289461.377] [56636:5458560] [DMG]
+          [1722289461.377] [56636:5458560] [DMG] 		},
+          [1722289461.377] [56636:5458560] [DMG]
+          [1722289461.377] [56636:5458560] [DMG] 		AttributeStatusIB =
+          [1722289461.377] [56636:5458560] [DMG] 		{
+          [1722289461.377] [56636:5458560] [DMG] 			AttributePathIB =
+          [1722289461.377] [56636:5458560] [DMG] 			{
+          [1722289461.377] [56636:5458560] [DMG] 				Endpoint = 0x1,
+          [1722289461.377] [56636:5458560] [DMG] 				Cluster = 0x201,
+          [1722289461.377] [56636:5458560] [DMG] 				Attribute = 0x0000_0050,
+          [1722289461.377] [56636:5458560] [DMG] 				ListIndex = Null,
+          [1722289461.377] [56636:5458560] [DMG] 			}
+          [1722289461.377] [56636:5458560] [DMG]
+          [1722289461.377] [56636:5458560] [DMG] 			StatusIB =
+          [1722289461.377] [56636:5458560] [DMG] 			{
+          [1722289461.377] [56636:5458560] [DMG] 				status = 0x00 (SUCCESS),
+          [1722289461.377] [56636:5458560] [DMG] 			},
+          [1722289461.377] [56636:5458560] [DMG]
+          [1722289461.377] [56636:5458560] [DMG] 		},
+          [1722289461.377] [56636:5458560] [DMG]
+          [1722289461.377] [56636:5458560] [DMG] 	],
+          [1722289461.377] [56636:5458560] [DMG]
+          [1722289461.377] [56636:5458560] [DMG] 	InteractionModelRevision = 11
+          [1722289461.377] [56636:5458560] [DMG] }
+          [1722289461.377] [56636:5458560] [DMG] WriteClient moving to [AwaitingDe]
+          [1722289461.377] [56636:5458560] [EM] <<< [E:23635i S:58282 M:220756286 (Ack:5366080)] (S) Msg TX to 1:000000000000006E [FEC4] [UDP:[fe80::1%lo0]:5540] --- Type 0000:10 (SecureChannel:StandaloneAck) (B:34)
+      cluster: "LogCommands"
+      command: "UserPrompt"
+      arguments:
+          values:
+              - name: "message"
+                value: "Please enter 'y' after success"
+              - name: "expectedValue"
+                value: "y"
+
+    - label: "Step 10c:  Test Harness calls the CommitPresetsSchedulesRequest command"
+      PICS: TSTAT.S.F08 && TSTAT.C.C09.Tx
+      verification: |
+          Optional Attribute - If it is supported, then in TH log it will results in displaying the value, else it will display UNSUPPORTED_ATTRIBUTE. Below is the log of RPI the result may be vary on the basis of dut implementation.
+
+          #10c Test Harness Client calls CommitPresetsSchedulesRequest command gets UNSUPPORTED_ACCESS since built-in preset with handle hex:01 was attempted to be modified to a not built-in preset
+
+          ./chip-tool thermostat commit-presets-schedules-request 0x12344321 1
+          On TH(chip-tool) verify that  DUT sends an UNSUPPORTED_ACCESS (0x7E) error
+          [1722289468.881] [56642:5458641] [DMG] Received Command Response Status for Endpoint=1 Cluster=0x0000_0201 Command=0x0000_0009 Status=0x7e
+          [1722289468.881] [56642:5458641] [TOO] Error: IM Error 0x0000057E: General error: 0x7e (UNSUPPORTED_ACCESS)
+          [1722289468.881] [56642:5458641] [DMG] ICR moving to [AwaitingDe]
+          [1722289468.881] [56642:5458641] [EM] <<< [E:20464i S:35105 M:91065475 (Ack:114933900)] (S) Msg TX to 1:000000000000006E [FEC4] [UDP:[fe80::1%lo0]:5540] --- Type 0000:10 (SecureChannel:StandaloneAck) (B:34)
+      cluster: "LogCommands"
+      command: "UserPrompt"
+      arguments:
+          values:
+              - name: "message"
+                value: "Please enter 'y' after success"
+              - name: "expectedValue"
+                value: "y"
+
+    - label: "Step 11a:  Test Harness writes to the Presets attribute wherein a non built-in preset is modified to a built-in preset"
+      PICS: TSTAT.S.F08 && TSTAT.C.C07.Tx
+      verification: |
+          Optional Attribute - If it is supported, then in TH log it will results in displaying the value, else it will display UNSUPPORTED_ATTRIBUTE. Below is the log of RPI the result may be vary on the basis of dut implementation.
+
+          #11a Test Harness Client calls StartPresetsSchedulesEditRequest command
+
+          ./chip-tool thermostat start-presets-schedules-edit-request 180 0x12344321 1
+          On TH(chip-tool) verify that  DUT sends a success response
+          [1722286001.805] [54149:5392862] [DMG] Received Command Response Status for Endpoint=1 Cluster=0x0000_0201 Command=0x0000_0007 Status=0x0
+          [1722286001.805] [54149:5392862] [DMG] ICR moving to [AwaitingDe]
+          [1722286001.805] [54149:5392862] [EM] <<< [E:7545i S:16937 M:144975449 (Ack:93571372)] (S) Msg TX to 1:000000000000006E [FEC4] [UDP:[fe80::1%lo0]:5540] --- Type 0000:10 (SecureChannel:StandaloneAck) (B:34)
+          [1722286001.806] [54149:5392862] [EM] Flushed pending ack for MessageCounter:93571372 on exchange 7545i
+      cluster: "LogCommands"
+      command: "UserPrompt"
+      arguments:
+          values:
+              - name: "message"
+                value: "Please enter 'y' after success"
+              - name: "expectedValue"
+                value: "y"
+
+    - label: "Step 11b:  Test Harness writes to the Presets attribute wherein a non built-in preset is modified to a built-in preset"
+      PICS: TSTAT.S.F08 && TSTAT.S.A0050
+      verification: |
+          Optional Attribute - If it is supported, then in TH log it will results in displaying the value, else it will display UNSUPPORTED_ATTRIBUTE. Below is the log of RPI the result may be vary on the basis of dut implementation.
+
+          #11b Test Harness Client attempts to write PresetTypes and gets SUCCESS
+
+         ./chip-tool thermostat write presets '[ {"presetHandle": "hex:01", "presetScenario": 1, "coolingSetpoint": 2500, "heatingSetpoint": 2600, "builtIn": true }, {"presetHandle": "hex:02", "presetScenario": 2, "coolingSetpoint": 2600, "heatingSetpoint": 2500, "builtIn": true }, {"presetHandle": "hex:03", "name": "Sleep", "presetScenario": 3, "coolingSetpoint": 2500, "heatingSetpoint": 2600, "builtIn": true },  {"presetHandle": "hex:04", "name": "Wake", "presetScenario": 4, "coolingSetpoint": 2200, "heatingSetpoint": 2900, "builtIn": false }, {"presetHandle": "hex:06", "name": "GoingToSleep", "presetScenario": 6, "coolingSetpoint": 2100, "heatingSetpoint": 2500, "builtIn": false }, {"presetHandle": "hex:06", "name": "GoingToSleep", "presetScenario": 6, "coolingSetpoint": 2100, "heatingSetpoint": 2500, "builtIn": false }]' 0x12344321 1
+          On TH(chip-tool) verify that  DUT sends a success response
+          [1722289461.376] [56636:5458560] [DMG] WriteClient moving to [ResponseRe]
+          [1722289461.376] [56636:5458560] [DMG] WriteResponseMessage =
+          [1722289461.376] [56636:5458560] [DMG] {
+          [1722289461.376] [56636:5458560] [DMG] 	AttributeStatusIBs =
+          [1722289461.376] [56636:5458560] [DMG] 	[
+          [1722289461.376] [56636:5458560] [DMG] 		AttributeStatusIB =
+          [1722289461.376] [56636:5458560] [DMG] 		{
+          [1722289461.376] [56636:5458560] [DMG] 			AttributePathIB =
+          [1722289461.376] [56636:5458560] [DMG] 			{
+          [1722289461.376] [56636:5458560] [DMG] 				Endpoint = 0x1,
+          [1722289461.376] [56636:5458560] [DMG] 				Cluster = 0x201,
+          [1722289461.376] [56636:5458560] [DMG] 				Attribute = 0x0000_0050,
+          [1722289461.376] [56636:5458560] [DMG] 			}
+          [1722289461.376] [56636:5458560] [DMG]
+          [1722289461.376] [56636:5458560] [DMG] 			StatusIB =
+          [1722289461.376] [56636:5458560] [DMG] 			{
+          [1722289461.376] [56636:5458560] [DMG] 				status = 0x00 (SUCCESS),
+          [1722289461.376] [56636:5458560] [DMG] 			},
+          [1722289461.376] [56636:5458560] [DMG]
+          [1722289461.376] [56636:5458560] [DMG] 		},
+          [1722289461.376] [56636:5458560] [DMG]
+          [1722289461.376] [56636:5458560] [DMG] 		AttributeStatusIB =
+          [1722289461.376] [56636:5458560] [DMG] 		{
+          [1722289461.376] [56636:5458560] [DMG] 			AttributePathIB =
+          [1722289461.376] [56636:5458560] [DMG] 			{
+          [1722289461.376] [56636:5458560] [DMG] 				Endpoint = 0x1,
+          [1722289461.376] [56636:5458560] [DMG] 				Cluster = 0x201,
+          [1722289461.376] [56636:5458560] [DMG] 				Attribute = 0x0000_0050,
+          [1722289461.376] [56636:5458560] [DMG] 				ListIndex = Null,
+          [1722289461.376] [56636:5458560] [DMG] 			}
+          [1722289461.376] [56636:5458560] [DMG]
+          [1722289461.376] [56636:5458560] [DMG] 			StatusIB =
+          [1722289461.376] [56636:5458560] [DMG] 			{
+          [1722289461.376] [56636:5458560] [DMG] 				status = 0x00 (SUCCESS),
+          [1722289461.376] [56636:5458560] [DMG] 			},
+          [1722289461.376] [56636:5458560] [DMG]
+          [1722289461.376] [56636:5458560] [DMG] 		},
+          [1722289461.376] [56636:5458560] [DMG]
+          [1722289461.376] [56636:5458560] [DMG] 		AttributeStatusIB =
+          [1722289461.376] [56636:5458560] [DMG] 		{
+          [1722289461.376] [56636:5458560] [DMG] 			AttributePathIB =
+          [1722289461.376] [56636:5458560] [DMG] 			{
+          [1722289461.376] [56636:5458560] [DMG] 				Endpoint = 0x1,
+          [1722289461.376] [56636:5458560] [DMG] 				Cluster = 0x201,
+          [1722289461.376] [56636:5458560] [DMG] 				Attribute = 0x0000_0050,
+          [1722289461.376] [56636:5458560] [DMG] 				ListIndex = Null,
+          [1722289461.376] [56636:5458560] [DMG] 			}
+          [1722289461.376] [56636:5458560] [DMG]
+          [1722289461.376] [56636:5458560] [DMG] 			StatusIB =
+          [1722289461.376] [56636:5458560] [DMG] 			{
+          [1722289461.376] [56636:5458560] [DMG] 				status = 0x00 (SUCCESS),
+          [1722289461.376] [56636:5458560] [DMG] 			},
+          [1722289461.376] [56636:5458560] [DMG]
+          [1722289461.376] [56636:5458560] [DMG] 		},
+          [1722289461.376] [56636:5458560] [DMG]
+          [1722289461.376] [56636:5458560] [DMG] 		AttributeStatusIB =
+          [1722289461.376] [56636:5458560] [DMG] 		{
+          [1722289461.376] [56636:5458560] [DMG] 			AttributePathIB =
+          [1722289461.376] [56636:5458560] [DMG] 			{
+          [1722289461.376] [56636:5458560] [DMG] 				Endpoint = 0x1,
+          [1722289461.376] [56636:5458560] [DMG] 				Cluster = 0x201,
+          [1722289461.376] [56636:5458560] [DMG] 				Attribute = 0x0000_0050,
+          [1722289461.376] [56636:5458560] [DMG] 				ListIndex = Null,
+          [1722289461.376] [56636:5458560] [DMG] 			}
+          [1722289461.376] [56636:5458560] [DMG]
+          [1722289461.376] [56636:5458560] [DMG] 			StatusIB =
+          [1722289461.376] [56636:5458560] [DMG] 			{
+          [1722289461.376] [56636:5458560] [DMG] 				status = 0x00 (SUCCESS),
+          [1722289461.376] [56636:5458560] [DMG] 			},
+          [1722289461.376] [56636:5458560] [DMG]
+          [1722289461.376] [56636:5458560] [DMG] 		},
+          [1722289461.376] [56636:5458560] [DMG]
+          [1722289461.376] [56636:5458560] [DMG] 		AttributeStatusIB =
+          [1722289461.376] [56636:5458560] [DMG] 		{
+          [1722289461.376] [56636:5458560] [DMG] 			AttributePathIB =
+          [1722289461.376] [56636:5458560] [DMG] 			{
+          [1722289461.376] [56636:5458560] [DMG] 				Endpoint = 0x1,
+          [1722289461.376] [56636:5458560] [DMG] 				Cluster = 0x201,
+          [1722289461.376] [56636:5458560] [DMG] 				Attribute = 0x0000_0050,
+          [1722289461.376] [56636:5458560] [DMG] 				ListIndex = Null,
+          [1722289461.377] [56636:5458560] [DMG] 			}
+          [1722289461.377] [56636:5458560] [DMG]
+          [1722289461.377] [56636:5458560] [DMG] 			StatusIB =
+          [1722289461.377] [56636:5458560] [DMG] 			{
+          [1722289461.377] [56636:5458560] [DMG] 				status = 0x00 (SUCCESS),
+          [1722289461.377] [56636:5458560] [DMG] 			},
+          [1722289461.377] [56636:5458560] [DMG]
+          [1722289461.377] [56636:5458560] [DMG] 		},
+          [1722289461.377] [56636:5458560] [DMG]
+          [1722289461.377] [56636:5458560] [DMG] 		AttributeStatusIB =
+          [1722289461.377] [56636:5458560] [DMG] 		{
+          [1722289461.377] [56636:5458560] [DMG] 			AttributePathIB =
+          [1722289461.377] [56636:5458560] [DMG] 			{
+          [1722289461.377] [56636:5458560] [DMG] 				Endpoint = 0x1,
+          [1722289461.377] [56636:5458560] [DMG] 				Cluster = 0x201,
+          [1722289461.377] [56636:5458560] [DMG] 				Attribute = 0x0000_0050,
+          [1722289461.377] [56636:5458560] [DMG] 				ListIndex = Null,
+          [1722289461.377] [56636:5458560] [DMG] 			}
+          [1722289461.377] [56636:5458560] [DMG]
+          [1722289461.377] [56636:5458560] [DMG] 			StatusIB =
+          [1722289461.377] [56636:5458560] [DMG] 			{
+          [1722289461.377] [56636:5458560] [DMG] 				status = 0x00 (SUCCESS),
+          [1722289461.377] [56636:5458560] [DMG] 			},
+          [1722289461.377] [56636:5458560] [DMG]
+          [1722289461.377] [56636:5458560] [DMG] 		},
+          [1722289461.377] [56636:5458560] [DMG]
+          [1722289461.377] [56636:5458560] [DMG] 	],
+          [1722289461.377] [56636:5458560] [DMG]
+          [1722289461.377] [56636:5458560] [DMG] 	InteractionModelRevision = 11
+          [1722289461.377] [56636:5458560] [DMG] }
+          [1722289461.377] [56636:5458560] [DMG] WriteClient moving to [AwaitingDe]
+          [1722289461.377] [56636:5458560] [EM] <<< [E:23635i S:58282 M:220756286 (Ack:5366080)] (S) Msg TX to 1:000000000000006E [FEC4] [UDP:[fe80::1%lo0]:5540] --- Type 0000:10 (SecureChannel:StandaloneAck) (B:34)
+      cluster: "LogCommands"
+      command: "UserPrompt"
+      arguments:
+          values:
+              - name: "message"
+                value: "Please enter 'y' after success"
+              - name: "expectedValue"
+                value: "y"
+
+    - label: "Step 11c:  Test Harness calls the CommitPresetsSchedulesRequest command"
+      PICS: TSTAT.S.F08 && TSTAT.C.C09.Tx
+      verification: |
+          Optional Attribute - If it is supported, then in TH log it will results in displaying the value, else it will display UNSUPPORTED_ATTRIBUTE. Below is the log of RPI the result may be vary on the basis of dut implementation.
+
+          #11c Test Harness Client calls CommitPresetsSchedulesRequest command gets UNSUPPORTED_ACCESS since non built-in preset with handle hex:03 was attempted to be modified to be built-in
+
+          ./chip-tool thermostat commit-presets-schedules-request 0x12344321 1
+          On TH(chip-tool) verify that  DUT sends an UNSUPPORTED_ACCESS (0x7E) error
+          [1722297542.066] [60654:5591651] [DMG] Received Command Response Status for Endpoint=1 Cluster=0x0000_0201 Command=0x0000_0009 Status=0x7e
+          [1722297542.066] [60654:5591651] [TOO] Error: IM Error 0x0000057E: General error: 0x7e (UNSUPPORTED_ACCESS)
+          [1722297542.066] [60654:5591651] [DMG] ICR moving to [AwaitingDe]
+          [1722297542.066] [60654:5591651] [EM] <<< [E:11999i S:35595 M:148057801 (Ack:14642826)] (S) Msg TX to 1:000000000000006E [FEC4] [UDP:[fe80::1%lo0]:5540] --- Type 0000:10 (SecureChannel:StandaloneAck) (B:34)
+      command: "UserPrompt"
+      arguments:
+          values:
+              - name: "message"
+                value: "Please enter 'y' after success"
+              - name: "expectedValue"
+                value: "y"
+
+
+    - label: "Step 12a:  Test Harness writes to the Presets attribute wherein a preset doesn't support names in the PresetTypeFeatures bitmap but has a name in the write presets command"
+      PICS: TSTAT.S.F08 && TSTAT.C.C07.Tx
+      verification: |
+          Optional Attribute - If it is supported, then in TH log it will results in displaying the value, else it will display UNSUPPORTED_ATTRIBUTE. Below is the log of RPI the result may be vary on the basis of dut implementation.
+
+          #12a Test Harness Client calls StartPresetsSchedulesEditRequest command
+
+          ./chip-tool thermostat start-presets-schedules-edit-request 180 0x12344321 1
+          On TH(chip-tool) verify that  DUT sends a success response
+          [1722286001.805] [54149:5392862] [DMG] Received Command Response Status for Endpoint=1 Cluster=0x0000_0201 Command=0x0000_0007 Status=0x0
+          [1722286001.805] [54149:5392862] [DMG] ICR moving to [AwaitingDe]
+          [1722286001.805] [54149:5392862] [EM] <<< [E:7545i S:16937 M:144975449 (Ack:93571372)] (S) Msg TX to 1:000000000000006E [FEC4] [UDP:[fe80::1%lo0]:5540] --- Type 0000:10 (SecureChannel:StandaloneAck) (B:34)
+          [1722286001.806] [54149:5392862] [EM] Flushed pending ack for MessageCounter:93571372 on exchange 7545i
+      cluster: "LogCommands"
+      command: "UserPrompt"
+      arguments:
+          values:
+              - name: "message"
+                value: "Please enter 'y' after success"
+              - name: "expectedValue"
+                value: "y"
+
+    - label: "Step 12b:  Test Harness writes to the Presets attribute with a preset that doesn't support names in the PresetTypeFeatures bitmap but has a name"
+      PICS: TSTAT.S.F08 && TSTAT.S.A0050
+      verification: |
+          Optional Attribute - If it is supported, then in TH log it will results in displaying the value, else it will display UNSUPPORTED_ATTRIBUTE. Below is the log of RPI the result may be vary on the basis of dut implementation.
+
+          #11b Test Harness Client attempts to write PresetTypes and gets SUCCESS
+
+         ./chip-tool thermostat write presets '[ {"presetHandle": "hex:01", "name": "Occupied", "presetScenario": 1, "coolingSetpoint": 2500, "heatingSetpoint": 2600, "builtIn": true }, {"presetHandle": "hex:02", "presetScenario": 2, "coolingSetpoint": 2600, "heatingSetpoint": 2500, "builtIn": true }, {"presetHandle": "hex:03", "name": "Sleep", "presetScenario": 3, "coolingSetpoint": 2500, "heatingSetpoint": 2600, "builtIn": true },  {"presetHandle": "hex:04", "name": "Wake", "presetScenario": 4, "coolingSetpoint": 2200, "heatingSetpoint": 2900, "builtIn": false }, {"presetHandle": "hex:06", "name": "GoingToSleep", "presetScenario": 6, "coolingSetpoint": 2100, "heatingSetpoint": 2500, "builtIn": false }, {"presetHandle": "hex:06", "name": "GoingToSleep", "presetScenario": 6, "coolingSetpoint": 2100, "heatingSetpoint": 2500, "builtIn": false }]' 0x12344321 1
+          On TH(chip-tool) verify that  DUT sends a success response
+          [1722289461.376] [56636:5458560] [DMG] WriteClient moving to [ResponseRe]
+          [1722289461.376] [56636:5458560] [DMG] WriteResponseMessage =
+          [1722289461.376] [56636:5458560] [DMG] {
+          [1722289461.376] [56636:5458560] [DMG] 	AttributeStatusIBs =
+          [1722289461.376] [56636:5458560] [DMG] 	[
+          [1722289461.376] [56636:5458560] [DMG] 		AttributeStatusIB =
+          [1722289461.376] [56636:5458560] [DMG] 		{
+          [1722289461.376] [56636:5458560] [DMG] 			AttributePathIB =
+          [1722289461.376] [56636:5458560] [DMG] 			{
+          [1722289461.376] [56636:5458560] [DMG] 				Endpoint = 0x1,
+          [1722289461.376] [56636:5458560] [DMG] 				Cluster = 0x201,
+          [1722289461.376] [56636:5458560] [DMG] 				Attribute = 0x0000_0050,
+          [1722289461.376] [56636:5458560] [DMG] 			}
+          [1722289461.376] [56636:5458560] [DMG]
+          [1722289461.376] [56636:5458560] [DMG] 			StatusIB =
+          [1722289461.376] [56636:5458560] [DMG] 			{
+          [1722289461.376] [56636:5458560] [DMG] 				status = 0x00 (SUCCESS),
+          [1722289461.376] [56636:5458560] [DMG] 			},
+          [1722289461.376] [56636:5458560] [DMG]
+          [1722289461.376] [56636:5458560] [DMG] 		},
+          [1722289461.376] [56636:5458560] [DMG]
+          [1722289461.376] [56636:5458560] [DMG] 		AttributeStatusIB =
+          [1722289461.376] [56636:5458560] [DMG] 		{
+          [1722289461.376] [56636:5458560] [DMG] 			AttributePathIB =
+          [1722289461.376] [56636:5458560] [DMG] 			{
+          [1722289461.376] [56636:5458560] [DMG] 				Endpoint = 0x1,
+          [1722289461.376] [56636:5458560] [DMG] 				Cluster = 0x201,
+          [1722289461.376] [56636:5458560] [DMG] 				Attribute = 0x0000_0050,
+          [1722289461.376] [56636:5458560] [DMG] 				ListIndex = Null,
+          [1722289461.376] [56636:5458560] [DMG] 			}
+          [1722289461.376] [56636:5458560] [DMG]
+          [1722289461.376] [56636:5458560] [DMG] 			StatusIB =
+          [1722289461.376] [56636:5458560] [DMG] 			{
+          [1722289461.376] [56636:5458560] [DMG] 				status = 0x00 (SUCCESS),
+          [1722289461.376] [56636:5458560] [DMG] 			},
+          [1722289461.376] [56636:5458560] [DMG]
+          [1722289461.376] [56636:5458560] [DMG] 		},
+          [1722289461.376] [56636:5458560] [DMG]
+          [1722289461.376] [56636:5458560] [DMG] 		AttributeStatusIB =
+          [1722289461.376] [56636:5458560] [DMG] 		{
+          [1722289461.376] [56636:5458560] [DMG] 			AttributePathIB =
+          [1722289461.376] [56636:5458560] [DMG] 			{
+          [1722289461.376] [56636:5458560] [DMG] 				Endpoint = 0x1,
+          [1722289461.376] [56636:5458560] [DMG] 				Cluster = 0x201,
+          [1722289461.376] [56636:5458560] [DMG] 				Attribute = 0x0000_0050,
+          [1722289461.376] [56636:5458560] [DMG] 				ListIndex = Null,
+          [1722289461.376] [56636:5458560] [DMG] 			}
+          [1722289461.376] [56636:5458560] [DMG]
+          [1722289461.376] [56636:5458560] [DMG] 			StatusIB =
+          [1722289461.376] [56636:5458560] [DMG] 			{
+          [1722289461.376] [56636:5458560] [DMG] 				status = 0x00 (SUCCESS),
+          [1722289461.376] [56636:5458560] [DMG] 			},
+          [1722289461.376] [56636:5458560] [DMG]
+          [1722289461.376] [56636:5458560] [DMG] 		},
+          [1722289461.376] [56636:5458560] [DMG]
+          [1722289461.376] [56636:5458560] [DMG] 		AttributeStatusIB =
+          [1722289461.376] [56636:5458560] [DMG] 		{
+          [1722289461.376] [56636:5458560] [DMG] 			AttributePathIB =
+          [1722289461.376] [56636:5458560] [DMG] 			{
+          [1722289461.376] [56636:5458560] [DMG] 				Endpoint = 0x1,
+          [1722289461.376] [56636:5458560] [DMG] 				Cluster = 0x201,
+          [1722289461.376] [56636:5458560] [DMG] 				Attribute = 0x0000_0050,
+          [1722289461.376] [56636:5458560] [DMG] 				ListIndex = Null,
+          [1722289461.376] [56636:5458560] [DMG] 			}
+          [1722289461.376] [56636:5458560] [DMG]
+          [1722289461.376] [56636:5458560] [DMG] 			StatusIB =
+          [1722289461.376] [56636:5458560] [DMG] 			{
+          [1722289461.376] [56636:5458560] [DMG] 				status = 0x00 (SUCCESS),
+          [1722289461.376] [56636:5458560] [DMG] 			},
+          [1722289461.376] [56636:5458560] [DMG]
+          [1722289461.376] [56636:5458560] [DMG] 		},
+          [1722289461.376] [56636:5458560] [DMG]
+          [1722289461.376] [56636:5458560] [DMG] 		AttributeStatusIB =
+          [1722289461.376] [56636:5458560] [DMG] 		{
+          [1722289461.376] [56636:5458560] [DMG] 			AttributePathIB =
+          [1722289461.376] [56636:5458560] [DMG] 			{
+          [1722289461.376] [56636:5458560] [DMG] 				Endpoint = 0x1,
+          [1722289461.376] [56636:5458560] [DMG] 				Cluster = 0x201,
+          [1722289461.376] [56636:5458560] [DMG] 				Attribute = 0x0000_0050,
+          [1722289461.376] [56636:5458560] [DMG] 				ListIndex = Null,
+          [1722289461.377] [56636:5458560] [DMG] 			}
+          [1722289461.377] [56636:5458560] [DMG]
+          [1722289461.377] [56636:5458560] [DMG] 			StatusIB =
+          [1722289461.377] [56636:5458560] [DMG] 			{
+          [1722289461.377] [56636:5458560] [DMG] 				status = 0x00 (SUCCESS),
+          [1722289461.377] [56636:5458560] [DMG] 			},
+          [1722289461.377] [56636:5458560] [DMG]
+          [1722289461.377] [56636:5458560] [DMG] 		},
+          [1722289461.377] [56636:5458560] [DMG]
+          [1722289461.377] [56636:5458560] [DMG] 		AttributeStatusIB =
+          [1722289461.377] [56636:5458560] [DMG] 		{
+          [1722289461.377] [56636:5458560] [DMG] 			AttributePathIB =
+          [1722289461.377] [56636:5458560] [DMG] 			{
+          [1722289461.377] [56636:5458560] [DMG] 				Endpoint = 0x1,
+          [1722289461.377] [56636:5458560] [DMG] 				Cluster = 0x201,
+          [1722289461.377] [56636:5458560] [DMG] 				Attribute = 0x0000_0050,
+          [1722289461.377] [56636:5458560] [DMG] 				ListIndex = Null,
+          [1722289461.377] [56636:5458560] [DMG] 			}
+          [1722289461.377] [56636:5458560] [DMG]
+          [1722289461.377] [56636:5458560] [DMG] 			StatusIB =
+          [1722289461.377] [56636:5458560] [DMG] 			{
+          [1722289461.377] [56636:5458560] [DMG] 				status = 0x00 (SUCCESS),
+          [1722289461.377] [56636:5458560] [DMG] 			},
+          [1722289461.377] [56636:5458560] [DMG]
+          [1722289461.377] [56636:5458560] [DMG] 		},
+          [1722289461.377] [56636:5458560] [DMG]
+          [1722289461.377] [56636:5458560] [DMG] 	],
+          [1722289461.377] [56636:5458560] [DMG]
+          [1722289461.377] [56636:5458560] [DMG] 	InteractionModelRevision = 11
+          [1722289461.377] [56636:5458560] [DMG] }
+          [1722289461.377] [56636:5458560] [DMG] WriteClient moving to [AwaitingDe]
+          [1722289461.377] [56636:5458560] [EM] <<< [E:23635i S:58282 M:220756286 (Ack:5366080)] (S) Msg TX to 1:000000000000006E [FEC4] [UDP:[fe80::1%lo0]:5540] --- Type 0000:10 (SecureChannel:StandaloneAck) (B:34)
+      cluster: "LogCommands"
+      command: "UserPrompt"
+      arguments:
+          values:
+              - name: "message"
+                value: "Please enter 'y' after success"
+              - name: "expectedValue"
+                value: "y"
+
+    - label: "Step 12c:  Test Harness calls the CommitPresetsSchedulesRequest command"
+      PICS: TSTAT.S.F08 && TSTAT.C.C09.Tx
+      verification: |
+          Optional Attribute - If it is supported, then in TH log it will results in displaying the value, else it will display UNSUPPORTED_ATTRIBUTE. Below is the log of RPI the result may be vary on the basis of dut implementation.
+
+          #11c Test Harness Client calls CommitPresetsSchedulesRequest command gets CONSTRAINT_ERROR since we attempted to add a name to a preset with handle hex:01 that doesn't support names.
+
+          ./chip-tool thermostat commit-presets-schedules-request 0x12344321 1
+          On TH(chip-tool) verify that  DUT sends an CONSTRAINT_ERROR (0x87) error
+          [1722298150.233] [60910:5602100] [DMG] Received Command Response Status for Endpoint=1 Cluster=0x0000_0201 Command=0x0000_0009 Status=0x87
+          [1722298150.233] [60910:5602100] [TOO] Error: IM Error 0x00000587: General error: 0x87 (CONSTRAINT_ERROR)
+          [1722298150.233] [60910:5602100] [DMG] ICR moving to [AwaitingDe]
+          [1722298150.233] [60910:5602100] [EM] <<< [E:44287i S:42687 M:5072557 (Ack:66989213)] (S) Msg TX to 1:000000000000006E [FEC4] [UDP:[fe80::1%lo0]:5540] --- Type 0000:10 (SecureChannel:StandaloneAck) (B:34)
+      command: "UserPrompt"
+      arguments:
+          values:
+              - name: "message"
+                value: "Please enter 'y' after success"
+              - name: "expectedValue"
+                value: "y"
+
+#TODO: Add tests for the total number of Presets exceeds the NumberOfPresets supported. Also Add tests for adding presets with preset scenario not present in PresetTypes.
+
+    - label: "Step 13a:  Test Harness writes to the Presets attribute but calls CancelPresetsSchedulesEditRequest command to cancel the edit request"
+      PICS: TSTAT.S.F08 && TSTAT.C.C07.Tx
+      verification: |
+          Optional Attribute - If it is supported, then in TH log it will results in displaying the value, else it will display UNSUPPORTED_ATTRIBUTE. Below is the log of RPI the result may be vary on the basis of dut implementation.
+
+          #13a Test Harness Client calls StartPresetsSchedulesEditRequest command
+
+          ./chip-tool thermostat start-presets-schedules-edit-request 180 0x12344321 1
+          On TH(chip-tool) verify that  DUT sends a success response
+          [1722286001.805] [54149:5392862] [DMG] Received Command Response Status for Endpoint=1 Cluster=0x0000_0201 Command=0x0000_0007 Status=0x0
+          [1722286001.805] [54149:5392862] [DMG] ICR moving to [AwaitingDe]
+          [1722286001.805] [54149:5392862] [EM] <<< [E:7545i S:16937 M:144975449 (Ack:93571372)] (S) Msg TX to 1:000000000000006E [FEC4] [UDP:[fe80::1%lo0]:5540] --- Type 0000:10 (SecureChannel:StandaloneAck) (B:34)
+          [1722286001.806] [54149:5392862] [EM] Flushed pending ack for MessageCounter:93571372 on exchange 7545i
+      cluster: "LogCommands"
+      command: "UserPrompt"
+      arguments:
+          values:
+              - name: "message"
+                value: "Please enter 'y' after success"
+              - name: "expectedValue"
+                value: "y"
+
+    - label: "Step 13b:  Test Harness writes to the Presets attribute"
+      PICS: TSTAT.S.F08 && TSTAT.S.A0050
+      verification: |
+          Optional Attribute - If it is supported, then in TH log it will results in displaying the value, else it will display UNSUPPORTED_ATTRIBUTE. Below is the log of RPI the result may be vary on the basis of dut implementation.
+
+          #13b Test Harness Client attempts to write PresetTypes and gets SUCCESS
+
+         ./chip-tool thermostat write presets '[ {"presetHandle": "hex:01", "presetScenario": 1, "coolingSetpoint": 2500, "heatingSetpoint": 2600, "builtIn": true }, {"presetHandle": "hex:02", "presetScenario": 2, "coolingSetpoint": 2600, "heatingSetpoint": 2500, "builtIn": true }, {"presetHandle": "03", "name": "Sleep", "presetScenario": 3, "coolingSetpoint": 2500, "heatingSetpoint": 2600, "builtIn": false }, {"presetHandle": "04", "name": "Wake", "presetScenario": 4, "coolingSetpoint": 2200, "heatingSetpoint": 2900, "builtIn": false }, {"presetHandle": null, "name": "Vacation", "presetScenario": 5, "coolingSetpoint": 2900, "heatingSetpoint": 2000, "builtIn": false }, {"presetHandle": "06", "name": "GoingToSleep", "presetScenario": 6, "coolingSetpoint": 3000, "heatingSetpoint": 1900, "builtIn": false }]' 0x12344321 1
+          On TH(chip-tool) verify that  DUT sends a success response
+          [1722289461.376] [56636:5458560] [DMG] WriteClient moving to [ResponseRe]
+          [1722289461.376] [56636:5458560] [DMG] WriteResponseMessage =
+          [1722289461.376] [56636:5458560] [DMG] {
+          [1722289461.376] [56636:5458560] [DMG] 	AttributeStatusIBs =
+          [1722289461.376] [56636:5458560] [DMG] 	[
+          [1722289461.376] [56636:5458560] [DMG] 		AttributeStatusIB =
+          [1722289461.376] [56636:5458560] [DMG] 		{
+          [1722289461.376] [56636:5458560] [DMG] 			AttributePathIB =
+          [1722289461.376] [56636:5458560] [DMG] 			{
+          [1722289461.376] [56636:5458560] [DMG] 				Endpoint = 0x1,
+          [1722289461.376] [56636:5458560] [DMG] 				Cluster = 0x201,
+          [1722289461.376] [56636:5458560] [DMG] 				Attribute = 0x0000_0050,
+          [1722289461.376] [56636:5458560] [DMG] 			}
+          [1722289461.376] [56636:5458560] [DMG]
+          [1722289461.376] [56636:5458560] [DMG] 			StatusIB =
+          [1722289461.376] [56636:5458560] [DMG] 			{
+          [1722289461.376] [56636:5458560] [DMG] 				status = 0x00 (SUCCESS),
+          [1722289461.376] [56636:5458560] [DMG] 			},
+          [1722289461.376] [56636:5458560] [DMG]
+          [1722289461.376] [56636:5458560] [DMG] 		},
+          [1722289461.376] [56636:5458560] [DMG]
+          [1722289461.376] [56636:5458560] [DMG] 		AttributeStatusIB =
+          [1722289461.376] [56636:5458560] [DMG] 		{
+          [1722289461.376] [56636:5458560] [DMG] 			AttributePathIB =
+          [1722289461.376] [56636:5458560] [DMG] 			{
+          [1722289461.376] [56636:5458560] [DMG] 				Endpoint = 0x1,
+          [1722289461.376] [56636:5458560] [DMG] 				Cluster = 0x201,
+          [1722289461.376] [56636:5458560] [DMG] 				Attribute = 0x0000_0050,
+          [1722289461.376] [56636:5458560] [DMG] 				ListIndex = Null,
+          [1722289461.376] [56636:5458560] [DMG] 			}
+          [1722289461.376] [56636:5458560] [DMG]
+          [1722289461.376] [56636:5458560] [DMG] 			StatusIB =
+          [1722289461.376] [56636:5458560] [DMG] 			{
+          [1722289461.376] [56636:5458560] [DMG] 				status = 0x00 (SUCCESS),
+          [1722289461.376] [56636:5458560] [DMG] 			},
+          [1722289461.376] [56636:5458560] [DMG]
+          [1722289461.376] [56636:5458560] [DMG] 		},
+          [1722289461.376] [56636:5458560] [DMG]
+          [1722289461.376] [56636:5458560] [DMG] 		AttributeStatusIB =
+          [1722289461.376] [56636:5458560] [DMG] 		{
+          [1722289461.376] [56636:5458560] [DMG] 			AttributePathIB =
+          [1722289461.376] [56636:5458560] [DMG] 			{
+          [1722289461.376] [56636:5458560] [DMG] 				Endpoint = 0x1,
+          [1722289461.376] [56636:5458560] [DMG] 				Cluster = 0x201,
+          [1722289461.376] [56636:5458560] [DMG] 				Attribute = 0x0000_0050,
+          [1722289461.376] [56636:5458560] [DMG] 				ListIndex = Null,
+          [1722289461.376] [56636:5458560] [DMG] 			}
+          [1722289461.376] [56636:5458560] [DMG]
+          [1722289461.376] [56636:5458560] [DMG] 			StatusIB =
+          [1722289461.376] [56636:5458560] [DMG] 			{
+          [1722289461.376] [56636:5458560] [DMG] 				status = 0x00 (SUCCESS),
+          [1722289461.376] [56636:5458560] [DMG] 			},
+          [1722289461.376] [56636:5458560] [DMG]
+          [1722289461.376] [56636:5458560] [DMG] 		},
+          [1722289461.376] [56636:5458560] [DMG]
+          [1722289461.376] [56636:5458560] [DMG] 		AttributeStatusIB =
+          [1722289461.376] [56636:5458560] [DMG] 		{
+          [1722289461.376] [56636:5458560] [DMG] 			AttributePathIB =
+          [1722289461.376] [56636:5458560] [DMG] 			{
+          [1722289461.376] [56636:5458560] [DMG] 				Endpoint = 0x1,
+          [1722289461.376] [56636:5458560] [DMG] 				Cluster = 0x201,
+          [1722289461.376] [56636:5458560] [DMG] 				Attribute = 0x0000_0050,
+          [1722289461.376] [56636:5458560] [DMG] 				ListIndex = Null,
+          [1722289461.376] [56636:5458560] [DMG] 			}
+          [1722289461.376] [56636:5458560] [DMG]
+          [1722289461.376] [56636:5458560] [DMG] 			StatusIB =
+          [1722289461.376] [56636:5458560] [DMG] 			{
+          [1722289461.376] [56636:5458560] [DMG] 				status = 0x00 (SUCCESS),
+          [1722289461.376] [56636:5458560] [DMG] 			},
+          [1722289461.376] [56636:5458560] [DMG]
+          [1722289461.376] [56636:5458560] [DMG] 		},
+          [1722289461.376] [56636:5458560] [DMG]
+          [1722289461.376] [56636:5458560] [DMG] 		AttributeStatusIB =
+          [1722289461.376] [56636:5458560] [DMG] 		{
+          [1722289461.376] [56636:5458560] [DMG] 			AttributePathIB =
+          [1722289461.376] [56636:5458560] [DMG] 			{
+          [1722289461.376] [56636:5458560] [DMG] 				Endpoint = 0x1,
+          [1722289461.376] [56636:5458560] [DMG] 				Cluster = 0x201,
+          [1722289461.376] [56636:5458560] [DMG] 				Attribute = 0x0000_0050,
+          [1722289461.376] [56636:5458560] [DMG] 				ListIndex = Null,
+          [1722289461.377] [56636:5458560] [DMG] 			}
+          [1722289461.377] [56636:5458560] [DMG]
+          [1722289461.377] [56636:5458560] [DMG] 			StatusIB =
+          [1722289461.377] [56636:5458560] [DMG] 			{
+          [1722289461.377] [56636:5458560] [DMG] 				status = 0x00 (SUCCESS),
+          [1722289461.377] [56636:5458560] [DMG] 			},
+          [1722289461.377] [56636:5458560] [DMG]
+          [1722289461.377] [56636:5458560] [DMG] 		},
+          [1722289461.377] [56636:5458560] [DMG]
+          [1722289461.377] [56636:5458560] [DMG] 		AttributeStatusIB =
+          [1722289461.377] [56636:5458560] [DMG] 		{
+          [1722289461.377] [56636:5458560] [DMG] 			AttributePathIB =
+          [1722289461.377] [56636:5458560] [DMG] 			{
+          [1722289461.377] [56636:5458560] [DMG] 				Endpoint = 0x1,
+          [1722289461.377] [56636:5458560] [DMG] 				Cluster = 0x201,
+          [1722289461.377] [56636:5458560] [DMG] 				Attribute = 0x0000_0050,
+          [1722289461.377] [56636:5458560] [DMG] 				ListIndex = Null,
+          [1722289461.377] [56636:5458560] [DMG] 			}
+          [1722289461.377] [56636:5458560] [DMG]
+          [1722289461.377] [56636:5458560] [DMG] 			StatusIB =
+          [1722289461.377] [56636:5458560] [DMG] 			{
+          [1722289461.377] [56636:5458560] [DMG] 				status = 0x00 (SUCCESS),
+          [1722289461.377] [56636:5458560] [DMG] 			},
+          [1722289461.377] [56636:5458560] [DMG]
+          [1722289461.377] [56636:5458560] [DMG] 		},
+          [1722289461.377] [56636:5458560] [DMG]
+          [1722289461.377] [56636:5458560] [DMG] 	],
+          [1722289461.377] [56636:5458560] [DMG]
+          [1722289461.377] [56636:5458560] [DMG] 	InteractionModelRevision = 11
+          [1722289461.377] [56636:5458560] [DMG] }
+          [1722289461.377] [56636:5458560] [DMG] WriteClient moving to [AwaitingDe]
+          [1722286250.504] [54321:5397545] [EM] <<< [E:14426i S:42250 M:116961408 (Ack:156984778)] (S) Msg TX to 1:000000000000006E [FEC4] [UDP:[fe80::1%lo0]:5540] --- Type 0000:10 (SecureChannel:StandaloneAck) (B:34)
+          [1722286250.504] [54321:5397545] [EM] Flushed pending ack for MessageCounter:156984778 on exchange 14426i
+      cluster: "LogCommands"
+      command: "UserPrompt"
+      arguments:
+          values:
+              - name: "message"
+                value: "Please enter 'y' after success"
+              - name: "expectedValue"
+                value: "y"
+
+    - label: "Step 13c:  Test Harness calls the CancelPresetsSchedulesEditRequest command"
+      PICS: TSTAT.S.F08 && TSTAT.C.C08.Tx
+      verification: |
+          Optional Attribute - If it is supported, then in TH log it will results in displaying the value, else it will display UNSUPPORTED_ATTRIBUTE. Below is the log of RPI the result may be vary on the basis of dut implementation.
+
+          #13c Test Harness Client calls CancelPresetsSchedulesEditRequest command
+
+          ./chip-tool thermostat cancel-presets-schedules-edit-request 0x12344321 1
+          On TH(chip-tool) verify that  DUT sends a success response
+          [1722287841.505] [55282:5425045] [DMG] Received Command Response Status for Endpoint=1 Cluster=0x0000_0201 Command=0x0000_0009 Status=0x0
+          [1722287841.505] [55282:5425045] [DMG] ICR moving to [AwaitingDe]
+          [1722287841.505] [55282:5425045] [EM] <<< [E:46441i S:57071 M:61366563 (Ack:138534230)] (S) Msg TX to 1:000000000000006E [FEC4] [UDP:[fe80::1%lo0]:5540] --- Type 0000:10 (SecureChannel:StandaloneAck) (B:34)
+      cluster: "LogCommands"
+      command: "UserPrompt"
+      arguments:
+          values:
+              - name: "message"
+                value: "Please enter 'y' after success"
+              - name: "expectedValue"
+                value: "y"
+
+    - label: "Step 13d:  Test Harness reads the Presets attribute without calling the CommitPresetsSchedulesRequest command"
+      PICS: TSTAT.S.F08 && TSTAT.S.A0050
+      verification: |
+          Optional Attribute - If it is supported, then in TH log it will results in displaying the value, else it will display UNSUPPORTED_ATTRIBUTE. Below is the log of RPI the result may be vary on the basis of dut implementation.
+
+          #3c Test Harness Client reads Presets attribute
+
+         ./chip-tool thermostat read presets 0x12344321 1
+          On TH(chip-tool) verify that  DUT successfully read Presets (but without the Vacation preset added)
+          [1722299465.497] [62905:5625656] [TOO] Endpoint: 1 Cluster: 0x0000_0201 Attribute 0x0000_0050 DataVersion: 3098962545
+          [1722299465.497] [62905:5625656] [TOO]   Presets: 5 entries
+          [1722299465.498] [62905:5625656] [TOO]     [1]: {
+          [1722299465.498] [62905:5625656] [TOO]       PresetHandle: 01
+          [1722299465.498] [62905:5625656] [TOO]       PresetScenario: 1
+          [1722299465.498] [62905:5625656] [TOO]       CoolingSetpoint: 2500
+          [1722299465.498] [62905:5625656] [TOO]       HeatingSetpoint: 2600
+          [1722299465.498] [62905:5625656] [TOO]       BuiltIn: TRUE
+          [1722299465.498] [62905:5625656] [TOO]      }
+          [1722299465.498] [62905:5625656] [TOO]     [2]: {
+          [1722299465.498] [62905:5625656] [TOO]       PresetHandle: 02
+          [1722299465.498] [62905:5625656] [TOO]       PresetScenario: 2
+          [1722299465.498] [62905:5625656] [TOO]       CoolingSetpoint: 2600
+          [1722299465.498] [62905:5625656] [TOO]       HeatingSetpoint: 2500
+          [1722299465.498] [62905:5625656] [TOO]       BuiltIn: TRUE
+          [1722299465.498] [62905:5625656] [TOO]      }
+          [1722299465.498] [62905:5625656] [TOO]     [3]: {
+          [1722299465.498] [62905:5625656] [TOO]       PresetHandle: 03
+          [1722299465.498] [62905:5625656] [TOO]       PresetScenario: 3
+          [1722299465.498] [62905:5625656] [TOO]       Name: Sleep
+          [1722299465.498] [62905:5625656] [TOO]       CoolingSetpoint: 2500
+          [1722299465.498] [62905:5625656] [TOO]       HeatingSetpoint: 2600
+          [1722299465.498] [62905:5625656] [TOO]       BuiltIn: FALSE
+          [1722299465.498] [62905:5625656] [TOO]      }
+          [1722299465.498] [62905:5625656] [TOO]     [4]: {
+          [1722299465.498] [62905:5625656] [TOO]       PresetHandle: 04
+          [1722299465.498] [62905:5625656] [TOO]       PresetScenario: 4
+          [1722299465.498] [62905:5625656] [TOO]       Name: Wake
+          [1722299465.498] [62905:5625656] [TOO]       CoolingSetpoint: 2200
+          [1722299465.498] [62905:5625656] [TOO]       HeatingSetpoint: 2900
+          [1722299465.498] [62905:5625656] [TOO]       BuiltIn: FALSE
+          [1722299465.498] [62905:5625656] [TOO]      }
+          [1722299465.498] [62905:5625656] [TOO]     [5]: {
+          [1722299465.498] [62905:5625656] [TOO]       PresetHandle: 06
+          [1722299465.498] [62905:5625656] [TOO]       PresetScenario: 6
+          [1722299465.498] [62905:5625656] [TOO]       Name: Vacationleep
+          [1722299465.498] [62905:5625656] [TOO]       CoolingSetpoint: 2100
+          [1722299465.498] [62905:5625656] [TOO]       HeatingSetpoint: 2500
+          [1722299465.498] [62905:5625656] [TOO]       BuiltIn: FALSE
+          [1722299465.498] [62905:5625656] [TOO]      }
+          [1722299465.498] [62905:5625656] [EM] <<< [E:53084i S:11903 M:249395534 (Ack:245071987)] (S) Msg TX to 1:000000000000006E [FEC4] [UDP:[fe80::1%lo0]:5540] --- Type 0000:10 (SecureChannel:StandaloneAck) (B:34)
+      cluster: "LogCommands"
+      command: "UserPrompt"
+      arguments:
+          values:
+              - name: "message"
+                value: "Please enter 'y' after success"
+              - name: "expectedValue"
+                value: "y"
