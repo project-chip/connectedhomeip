@@ -717,7 +717,9 @@ CHIP_ERROR WriteHandler::WriteClusterData(const Access::SubjectDescriptor & subj
 
     AttributeValueDecoder decoder(data, subject);
 
-    return mDataModelProvider->WriteAttribute(request, decoder);
+    StatusIB statusIB;
+    statusIB.InitFromChipError(mDataModelProvider->WriteAttribute(request, decoder));
+    return AddStatusInternal(path, statusIB);
 #else
     return WriteSingleClusterData(subject, path, data, this);
 #endif // CHIP_CONFIG_USE_DATA_MODEL_INTERFACE
