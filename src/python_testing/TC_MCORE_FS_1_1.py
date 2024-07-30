@@ -19,11 +19,9 @@
 # for details about the block below.
 #
 
-import ipaddress
 import logging
 import os
 import pathlib
-import random
 import signal
 import subprocess
 import time
@@ -31,8 +29,7 @@ import uuid
 
 import chip.clusters as Clusters
 from chip import ChipDeviceCtrl
-from chip.interaction_model import InteractionModelError, Status
-from matter_testing_support import MatterBaseTest, TestStep, async_test_body, default_matter_test_main, has_cluster, per_endpoint_test
+from matter_testing_support import MatterBaseTest, TestStep, async_test_body, default_matter_test_main
 from mobly import asserts
 
 
@@ -65,7 +62,7 @@ class TC_MCORE_FS_1_1(MatterBaseTest):
 
         # TODO: This should be setup outside the script and pairing data provided by the user.
         dut_fsa_app = os.path.join(pathlib.Path(__file__).resolve().parent, '..', '..', 'out',
-                           'linux-x64-fabric-bridge-rpc', 'fabric-bridge-app')
+                           'linux-x64-fabric-bridge-rpc-no-ble', 'fabric-bridge-app')
 
         dut_fsa_discriminator = 3840
         dut_fsa_passcode = 20202021
@@ -111,6 +108,11 @@ class TC_MCORE_FS_1_1(MatterBaseTest):
         # TODO: wait_for_user_input
         # if not self.is_ci:
         #     self.wait_for_use_input("Approve Commissioning approval request using manufacturer specified mechanism")
+        if not events:
+            new_event = await self.default_controller.ReadEvent(nodeid=self.dut_node_id, events=event_path)
+        else:
+            event_nums = [e.Header.EventNumber for e in events]
+            new_event = await self.default_controller.ReadEvent(nodeid=self.dut_node_id, events=event_path, eventNumberFilter=max(event_nums)+1)
 
         events = new_event
         event_nums = [e.Header.EventNumber for e in events]
