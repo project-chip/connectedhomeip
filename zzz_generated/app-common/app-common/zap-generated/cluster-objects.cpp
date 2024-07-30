@@ -5136,6 +5136,79 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
     }
 }
 } // namespace CommissioningCompleteResponse.
+namespace SetTCAcknowledgements {
+CHIP_ERROR Type::Encode(TLV::TLVWriter & aWriter, TLV::Tag aTag) const
+{
+    DataModel::WrappedStructEncoder encoder{ aWriter, aTag };
+    encoder.Encode(to_underlying(Fields::kTCVersion), TCVersion);
+    encoder.Encode(to_underlying(Fields::kTCUserResponse), TCUserResponse);
+    return encoder.Finalize();
+}
+
+CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
+{
+    detail::StructDecodeIterator __iterator(reader);
+    while (true)
+    {
+        auto __element = __iterator.Next();
+        if (std::holds_alternative<CHIP_ERROR>(__element))
+        {
+            return std::get<CHIP_ERROR>(__element);
+        }
+
+        CHIP_ERROR err              = CHIP_NO_ERROR;
+        const uint8_t __context_tag = std::get<uint8_t>(__element);
+
+        if (__context_tag == to_underlying(Fields::kTCVersion))
+        {
+            err = DataModel::Decode(reader, TCVersion);
+        }
+        else if (__context_tag == to_underlying(Fields::kTCUserResponse))
+        {
+            err = DataModel::Decode(reader, TCUserResponse);
+        }
+        else
+        {
+        }
+
+        ReturnErrorOnFailure(err);
+    }
+}
+} // namespace SetTCAcknowledgements.
+namespace SetTCAcknowledgementsResponse {
+CHIP_ERROR Type::Encode(TLV::TLVWriter & aWriter, TLV::Tag aTag) const
+{
+    DataModel::WrappedStructEncoder encoder{ aWriter, aTag };
+    encoder.Encode(to_underlying(Fields::kErrorCode), errorCode);
+    return encoder.Finalize();
+}
+
+CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
+{
+    detail::StructDecodeIterator __iterator(reader);
+    while (true)
+    {
+        auto __element = __iterator.Next();
+        if (std::holds_alternative<CHIP_ERROR>(__element))
+        {
+            return std::get<CHIP_ERROR>(__element);
+        }
+
+        CHIP_ERROR err              = CHIP_NO_ERROR;
+        const uint8_t __context_tag = std::get<uint8_t>(__element);
+
+        if (__context_tag == to_underlying(Fields::kErrorCode))
+        {
+            err = DataModel::Decode(reader, errorCode);
+        }
+        else
+        {
+        }
+
+        ReturnErrorOnFailure(err);
+    }
+}
+} // namespace SetTCAcknowledgementsResponse.
 } // namespace Commands
 
 namespace Attributes {
@@ -5153,6 +5226,14 @@ CHIP_ERROR TypeInfo::DecodableType::Decode(TLV::TLVReader & reader, const Concre
         return DataModel::Decode(reader, locationCapability);
     case Attributes::SupportsConcurrentConnection::TypeInfo::GetAttributeId():
         return DataModel::Decode(reader, supportsConcurrentConnection);
+    case Attributes::TCAcceptedVersion::TypeInfo::GetAttributeId():
+        return DataModel::Decode(reader, TCAcceptedVersion);
+    case Attributes::TCMinRequiredVersion::TypeInfo::GetAttributeId():
+        return DataModel::Decode(reader, TCMinRequiredVersion);
+    case Attributes::TCAcknowledgements::TypeInfo::GetAttributeId():
+        return DataModel::Decode(reader, TCAcknowledgements);
+    case Attributes::TCAcknowledgementsRequired::TypeInfo::GetAttributeId():
+        return DataModel::Decode(reader, TCAcknowledgementsRequired);
     case Attributes::GeneratedCommandList::TypeInfo::GetAttributeId():
         return DataModel::Decode(reader, generatedCommandList);
     case Attributes::AcceptedCommandList::TypeInfo::GetAttributeId():
