@@ -60,15 +60,20 @@ Mac OS.
 
 -   Setup build environment for `Bouffalo Lab` SoC
 
-    Enter  **connectedhomeip** repo under terminal and execute `setup.sh` script to install `Bouffalo Lab` SDK as below.
+    Enter  **connectedhomeip** repo under terminal and execute `setup.sh` script
+    to install `Bouffalo Lab` SDK as below.
+
     ```
     bash integrations/docker/images/stage-2/chip-build-bouffalolab/setup.sh
     ```
 
-    Script `setup.sh` requires to input expected installation path, or default path `/opt/bouffalolab_sdk`.
-    If default path `/opt/bouffalolab_sdk` is used, please add `sudo` to execute script for `/opt` access permission.
+    Script `setup.sh` requires to input expected installation path, or default
+    path `/opt/bouffalolab_sdk`. If default path `/opt/bouffalolab_sdk` is used,
+    please add `sudo` to execute script for `/opt` access permission.
 
-    Before building, please export environment variable `BOUFFALOLAB_SDK_ROOT` specifiy toolchain installation path as below.
+    Before building, please export environment variable `BOUFFALOLAB_SDK_ROOT`
+    to specify toolchain installation path as below.
+
     ```
     export BOUFFALOLAB_SDK_ROOT=<toolchain installation path>
     ```

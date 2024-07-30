@@ -19,8 +19,8 @@ import os
 import pathlib
 import re
 import shutil
-import sys
 import subprocess
+import sys
 
 import coloredlogs
 import firmware_utils
