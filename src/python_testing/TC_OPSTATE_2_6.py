@@ -52,7 +52,7 @@ class TC_OPSTATE_2_6(MatterBaseTest, TC_OPSTATE_BASE):
         return ["OPSTATE.S", "OPSTATE.S.A0002"]
 
     @per_endpoint_test(has_cluster(Clusters.OperationalState))
-    @per_endpoint_test(has_attribute(Clusters.OperationalState.CountdownTime))
+    @per_endpoint_test(has_attribute(Clusters.OperationalState.countdownTime))
     @async_test_body
     async def test_TC_OPSTATE_2_6(self):
         endpoint = self.matter_test_config.endpoint
