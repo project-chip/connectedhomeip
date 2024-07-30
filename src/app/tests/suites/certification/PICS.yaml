@@ -6143,20 +6143,23 @@ PICS:
     #
     # server / features
     #
-    - label: "Does the device represent a Latching Switch?"
+    - label: "Does the device represent a Latching Switch (LS)?"
       id: SWTCH.S.F00
 
-    - label: "Does the device represent a Momentary Switch?"
+    - label: "Does the device represent a Momentary Switch (MS)?"
       id: SWTCH.S.F01
 
-    - label: "Does the MS device support Momentary Switch Release?"
+    - label: "Does the MS device support Momentary Switch Release (MSR)?"
       id: SWTCH.S.F02
 
-    - label: "Does the MS device support Momentary Switch LongPress?"
+    - label: "Does the MS device support Momentary Switch LongPress (MSL)?"
       id: SWTCH.S.F03
 
-    - label: "Does the MS device support Momentary Switch MultiPress?"
+    - label: "Does the MS device support Momentary Switch MultiPress (MSM)?"
       id: SWTCH.S.F04
+
+    - label: "Does the device support ActionSwitch feature (AS)?"
+      id: SWTCH.S.F05
 
     #
     # client / features
