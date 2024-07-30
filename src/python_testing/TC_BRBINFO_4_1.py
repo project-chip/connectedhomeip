@@ -117,7 +117,7 @@ class TC_BRBINFO_4_1(MatterBaseTest):
             logging.info(f"PromisedActiveDuration: {PromisedActiveDuration}")
             return PromisedActiveDuration
         except queue.Empty:
-            asserts.assert_true(False, "Timeout on event")
+            asserts.fail("Timeout on event")
 
 
 
