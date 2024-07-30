@@ -221,6 +221,7 @@ CHIP_ERROR ThermostatDelegate::GetPendingPresetAtIndex(size_t index, PresetStruc
 
 CHIP_ERROR ThermostatDelegate::ApplyPendingPresets()
 {
+
     // TODO: #34546 - Need to support deletion of presets that are removed from Presets.
     for (uint8_t indexInPendingPresets = 0; indexInPendingPresets < mNextFreeIndexInPendingPresetsList; indexInPendingPresets++)
     {

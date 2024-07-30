@@ -448,7 +448,8 @@ limitations under the License.
       <description>Schedules</description>
       <access op="write" privilege="manage"/>
     </attribute>
-    <attribute code="0x0052" side="server" type="epoch_s" define="PRESETS_SCHEDULES_EDITABLE" optional="true" isNullable="true">SetpointHoldExpiryTimestamp</attribute>
+    <attribute code="0x0052" side="server" type="epoch_s" define="SETPOINT_HOLD_EXPIRY_TIMESTAMP" optional="true" isNullable="true">SetpointHoldExpiryTimestamp</attribute>
+
     <!-- Client Commands -->
     <command source="client" code="0x00" name="SetpointRaiseLower" optional="false">
       <description>Upon receipt, the attributes for the indicated setpoint(s) SHALL have the amount specified in the Amount field added to them.</description>
