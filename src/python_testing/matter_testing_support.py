@@ -1815,7 +1815,7 @@ def per_endpoint_test(accept_function: EndpointCheckFunction):
     def per_endpoint_test_internal(body):
         def per_endpoint_runner(self: MatterBaseTest, *args, **kwargs):
             asserts.assert_false(self.get_test_pics(self.current_test_info.name), "pics_ method supplied for per_endpoint_test.")
-            runner_with_timeout = asyncio.wait_for(get_accepted_endpoints_for_test(self, accept_function), timeout=5)
+            runner_with_timeout = asyncio.wait_for(get_accepted_endpoints_for_test(self, accept_function), timeout=30)
             endpoints = asyncio.run(runner_with_timeout)
             if not endpoints:
                 logging.info("No matching endpoints found - skipping test")
