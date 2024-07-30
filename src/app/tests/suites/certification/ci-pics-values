@@ -2988,3 +2988,9 @@ PWRTL.S.F00=0
 PWRTL.S.F01=0
 PWRTL.S.F02=1
 PWRTL.S.F03=1
+
+# Thread Network Directory Cluster
+THNETDIR.S=1
+
+# Wi-Fi Network Management Cluster
+WIFINM.S=1

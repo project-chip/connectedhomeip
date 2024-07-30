@@ -11182,7 +11182,8 @@ private:
 | * NetworkPassphraseRequest                                          |   0x00 |
 |------------------------------------------------------------------------------|
 | Attributes:                                                         |        |
-| * Ssid                                                              | 0x0001 |
+| * Ssid                                                              | 0x0000 |
+| * PassphraseSurrogate                                               | 0x0001 |
 | * GeneratedCommandList                                              | 0xFFF8 |
 | * AcceptedCommandList                                               | 0xFFF9 |
 | * EventList                                                         | 0xFFFA |
@@ -25440,6 +25441,7 @@ void registerClusterWiFiNetworkManagement(Commands & commands, CredentialIssuerC
         //
         make_unique<ReadAttribute>(Id, credsIssuerConfig),                                                                 //
         make_unique<ReadAttribute>(Id, "ssid", Attributes::Ssid::Id, credsIssuerConfig),                                   //
+        make_unique<ReadAttribute>(Id, "passphrase-surrogate", Attributes::PassphraseSurrogate::Id, credsIssuerConfig),    //
         make_unique<ReadAttribute>(Id, "generated-command-list", Attributes::GeneratedCommandList::Id, credsIssuerConfig), //
         make_unique<ReadAttribute>(Id, "accepted-command-list", Attributes::AcceptedCommandList::Id, credsIssuerConfig),   //
         make_unique<ReadAttribute>(Id, "event-list", Attributes::EventList::Id, credsIssuerConfig),                        //
@@ -25449,6 +25451,9 @@ void registerClusterWiFiNetworkManagement(Commands & commands, CredentialIssuerC
         make_unique<WriteAttribute<>>(Id, credsIssuerConfig),                                                              //
         make_unique<WriteAttribute<chip::app::DataModel::Nullable<chip::ByteSpan>>>(
             Id, "ssid", Attributes::Ssid::Id, WriteCommandType::kForceWrite, credsIssuerConfig), //
+        make_unique<WriteAttribute<chip::app::DataModel::Nullable<uint64_t>>>(Id, "passphrase-surrogate", 0, UINT64_MAX,
+                                                                              Attributes::PassphraseSurrogate::Id,
+                                                                              WriteCommandType::kForceWrite, credsIssuerConfig), //
         make_unique<WriteAttributeAsComplex<chip::app::DataModel::List<const chip::CommandId>>>(
             Id, "generated-command-list", Attributes::GeneratedCommandList::Id, WriteCommandType::kForceWrite,
             credsIssuerConfig), //
@@ -25464,6 +25469,7 @@ void registerClusterWiFiNetworkManagement(Commands & commands, CredentialIssuerC
                                               WriteCommandType::kForceWrite, credsIssuerConfig),                                //
         make_unique<SubscribeAttribute>(Id, credsIssuerConfig),                                                                 //
         make_unique<SubscribeAttribute>(Id, "ssid", Attributes::Ssid::Id, credsIssuerConfig),                                   //
+        make_unique<SubscribeAttribute>(Id, "passphrase-surrogate", Attributes::PassphraseSurrogate::Id, credsIssuerConfig),    //
         make_unique<SubscribeAttribute>(Id, "generated-command-list", Attributes::GeneratedCommandList::Id, credsIssuerConfig), //
         make_unique<SubscribeAttribute>(Id, "accepted-command-list", Attributes::AcceptedCommandList::Id, credsIssuerConfig),   //
         make_unique<SubscribeAttribute>(Id, "event-list", Attributes::EventList::Id, credsIssuerConfig),                        //
