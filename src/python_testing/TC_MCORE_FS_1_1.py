@@ -145,5 +145,6 @@ class TC_MCORE_FS_1_1(MatterBaseTest):
             asserts.assert_equal(len(th_fsa_server_fabrics) + 1, len(th_fsa_server_fabrics_new),
                                  "Unexpected number of fabrics on TH_SERVER")
 
+
 if __name__ == "__main__":
     default_matter_test_main()
