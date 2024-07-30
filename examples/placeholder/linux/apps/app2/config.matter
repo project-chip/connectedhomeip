@@ -2398,8 +2398,12 @@ cluster BridgedDeviceBasicInformation = 57 {
   readonly attribute bitmap32 featureMap = 65532;
   readonly attribute int16u clusterRevision = 65533;
 
+  request struct KeepActiveRequest {
+    int32u stayActiveDuration = 0;
+  }
+
   /** The server SHALL attempt to keep the devices specified active for StayActiveDuration milliseconds when they are next active. */
-  command KeepActive(): DefaultSuccess = 128;
+  command KeepActive(KeepActiveRequest): DefaultSuccess = 128;
 }
 
 /** This cluster exposes interactions with a switch device, for the purpose of using those interactions by other devices.

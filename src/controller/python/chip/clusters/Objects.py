@@ -11663,7 +11663,10 @@ class BridgedDeviceBasicInformation(Cluster):
             def descriptor(cls) -> ClusterObjectDescriptor:
                 return ClusterObjectDescriptor(
                     Fields=[
+                        ClusterObjectFieldDescriptor(Label="stayActiveDuration", Tag=0, Type=uint),
                     ])
+
+            stayActiveDuration: 'uint' = 0
 
     class Attributes:
         @dataclass
