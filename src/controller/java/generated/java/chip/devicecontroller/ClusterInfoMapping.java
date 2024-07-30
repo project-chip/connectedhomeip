@@ -1383,6 +1383,48 @@ public class ClusterInfoMapping {
     }
   }
 
+  public static class DelegatedAccessControlClusterCommissioningARLAttributeCallback implements ChipClusters.AccessControlCluster.CommissioningARLAttributeCallback, DelegatedClusterCallback {
+    private ClusterCommandCallback callback;
+    @Override
+    public void setCallbackDelegate(ClusterCommandCallback callback) {
+      this.callback = callback;
+    }
+
+    @Override
+    public void onSuccess(List<ChipStructs.AccessControlClusterCommissioningAccessRestrictionEntryStruct> valueList) {
+      Map<CommandResponseInfo, Object> responseValues = new LinkedHashMap<>();
+      CommandResponseInfo commandResponseInfo = new CommandResponseInfo("valueList", "List<ChipStructs.AccessControlClusterCommissioningAccessRestrictionEntryStruct>");
+      responseValues.put(commandResponseInfo, valueList);
+      callback.onSuccess(responseValues);
+    }
+
+    @Override
+    public void onError(Exception ex) {
+      callback.onFailure(ex);
+    }
+  }
+
+  public static class DelegatedAccessControlClusterArlAttributeCallback implements ChipClusters.AccessControlCluster.ArlAttributeCallback, DelegatedClusterCallback {
+    private ClusterCommandCallback callback;
+    @Override
+    public void setCallbackDelegate(ClusterCommandCallback callback) {
+      this.callback = callback;
+    }
+
+    @Override
+    public void onSuccess(List<ChipStructs.AccessControlClusterAccessRestrictionEntryStruct> valueList) {
+      Map<CommandResponseInfo, Object> responseValues = new LinkedHashMap<>();
+      CommandResponseInfo commandResponseInfo = new CommandResponseInfo("valueList", "List<ChipStructs.AccessControlClusterAccessRestrictionEntryStruct>");
+      responseValues.put(commandResponseInfo, valueList);
+      callback.onSuccess(responseValues);
+    }
+
+    @Override
+    public void onError(Exception ex) {
+      callback.onFailure(ex);
+    }
+  }
+
   public static class DelegatedAccessControlClusterGeneratedCommandListAttributeCallback implements ChipClusters.AccessControlCluster.GeneratedCommandListAttributeCallback, DelegatedClusterCallback {
     private ClusterCommandCallback callback;
     @Override
@@ -17855,6 +17897,27 @@ public class ClusterInfoMapping {
     }
   }
 
+  public static class DelegatedWiFiNetworkManagementClusterPassphraseSurrogateAttributeCallback implements ChipClusters.WiFiNetworkManagementCluster.PassphraseSurrogateAttributeCallback, DelegatedClusterCallback {
+    private ClusterCommandCallback callback;
+    @Override
+    public void setCallbackDelegate(ClusterCommandCallback callback) {
+      this.callback = callback;
+    }
+
+    @Override
+    public void onSuccess(@Nullable Long value) {
+      Map<CommandResponseInfo, Object> responseValues = new LinkedHashMap<>();
+      CommandResponseInfo commandResponseInfo = new CommandResponseInfo("value", "Long");
+      responseValues.put(commandResponseInfo, value);
+      callback.onSuccess(responseValues);
+    }
+
+    @Override
+    public void onError(Exception ex) {
+      callback.onFailure(ex);
+    }
+  }
+
   public static class DelegatedWiFiNetworkManagementClusterGeneratedCommandListAttributeCallback implements ChipClusters.WiFiNetworkManagementCluster.GeneratedCommandListAttributeCallback, DelegatedClusterCallback {
     private ClusterCommandCallback callback;
     @Override
@@ -23164,6 +23227,21 @@ public class ClusterInfoMapping {
 
     Map<String, InteractionInfo> accessControlClusterInteractionInfoMap = new LinkedHashMap<>();
 
+    Map<String, CommandParameterInfo> accessControlreviewFabricRestrictionsCommandParams = new LinkedHashMap<String, CommandParameterInfo>();
+
+    InteractionInfo accessControlreviewFabricRestrictionsInteractionInfo = new InteractionInfo(
+      (cluster, callback, commandArguments) -> {
+        ((ChipClusters.AccessControlCluster) cluster)
+        .reviewFabricRestrictions((DefaultClusterCallback) callback
+        , (ArrayList<ChipStructs.AccessControlClusterAccessRestrictionStruct>)
+        commandArguments.get("arl")
+        );
+      },
+      () -> new DelegatedDefaultClusterCallback(),
+        accessControlreviewFabricRestrictionsCommandParams
+    );
+    accessControlClusterInteractionInfoMap.put("reviewFabricRestrictions", accessControlreviewFabricRestrictionsInteractionInfo);
+
     commandMap.put("accessControl", accessControlClusterInteractionInfoMap);
 
     Map<String, InteractionInfo> actionsClusterInteractionInfoMap = new LinkedHashMap<>();
@@ -26903,23 +26981,6 @@ public class ClusterInfoMapping {
     );
     thermostatClusterInteractionInfoMap.put("commitPresetsSchedulesRequest", thermostatcommitPresetsSchedulesRequestInteractionInfo);
 
-    Map<String, CommandParameterInfo> thermostatsetTemperatureSetpointHoldPolicyCommandParams = new LinkedHashMap<String, CommandParameterInfo>();
-
-    CommandParameterInfo thermostatsetTemperatureSetpointHoldPolicytemperatureSetpointHoldPolicyCommandParameterInfo = new CommandParameterInfo("temperatureSetpointHoldPolicy", Integer.class, Integer.class);
-    thermostatsetTemperatureSetpointHoldPolicyCommandParams.put("temperatureSetpointHoldPolicy",thermostatsetTemperatureSetpointHoldPolicytemperatureSetpointHoldPolicyCommandParameterInfo);
-    InteractionInfo thermostatsetTemperatureSetpointHoldPolicyInteractionInfo = new InteractionInfo(
-      (cluster, callback, commandArguments) -> {
-        ((ChipClusters.ThermostatCluster) cluster)
-        .setTemperatureSetpointHoldPolicy((DefaultClusterCallback) callback
-        , (Integer)
-        commandArguments.get("temperatureSetpointHoldPolicy")
-        );
-      },
-      () -> new DelegatedDefaultClusterCallback(),
-        thermostatsetTemperatureSetpointHoldPolicyCommandParams
-    );
-    thermostatClusterInteractionInfoMap.put("setTemperatureSetpointHoldPolicy", thermostatsetTemperatureSetpointHoldPolicyInteractionInfo);
-
     commandMap.put("thermostat", thermostatClusterInteractionInfoMap);
 
     Map<String, InteractionInfo> fanControlClusterInteractionInfoMap = new LinkedHashMap<>();
@@ -27842,7 +27903,7 @@ public class ClusterInfoMapping {
            , (byte[])
              commandArguments.get("extendedPanID")
 
-            , 10000);
+            );
         },
         () -> new DelegatedThreadNetworkDirectoryClusterOperationalDatasetResponseCallback(),
         threadNetworkDirectorygetOperationalDatasetCommandParams
