@@ -301,12 +301,11 @@ using LogRedirectCallback_t = void (*)(const char * module, uint8_t category, co
  * ChipLogError(Foo, "Delegate=" ChipLogFormatRtti, ChipLogValueRtti(mDelegate));
  * @endcode
  */
-#if __has_feature(cxx_rtti)
 #define ChipLogFormatRtti "%s"
-#define ChipLogValueRtti(ptr) ((ptr) != nullptr ? typeid(*(ptr)).name() : "0")
+#if __has_feature(cxx_rtti)
+#define ChipLogValueRtti(ptr) ((ptr) != nullptr ? typeid(*(ptr)).name() : "null")
 #else
-#define ChipLogFormatRtti "%c"
-#define ChipLogValueRtti(ptr) ((ptr) != nullptr ? '?' : '0')
+#define ChipLogValueRtti(ptr) ((ptr) != nullptr ? "?" : "null")
 #endif
 
 /**

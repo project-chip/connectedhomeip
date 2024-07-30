@@ -329,8 +329,8 @@ public:
         ChipLogError(Support, "BitMapObjectPool: %lu allocated", static_cast<unsigned long>(Allocated()));
         if constexpr (IsDumpable<T>::value)
         {
-            ForEachActiveObjectInner(nullptr, [](void * context, const void * object) {
-                static_cast<const T *>(object)->DumpToLog();
+            ForEachActiveObject([](const T * object) {
+                object->DumpToLog();
                 return Loop::Continue;
             });
         }
@@ -588,8 +588,8 @@ public:
         ChipLogError(Support, "HeapObjectPool: %lu allocated", static_cast<unsigned long>(Allocated()));
         if constexpr (IsDumpable<T>::value)
         {
-            mObjects.ForEachNode(nullptr, [](void * context, const void * object) {
-                static_cast<const T *>(object)->DumpToLog();
+            ForEachActiveObject([](const T * object) {
+                object->DumpToLog();
                 return Loop::Continue;
             });
         }

@@ -228,7 +228,7 @@ TEST_F(TestExchange, CheckBasicExchangeMessageDispatch)
 // {
 //     MockExchangeDelegate delegate;
 //     ObjectPool<ExchangeContext, CHIP_CONFIG_MAX_EXCHANGE_CONTEXTS> pool;
-//     pool.CreateObject(&GetExchangeManager(), static_cast<uint16_t>(1234u), GetSessionAliceToBob(), true, &delegate);
+//     pool.CreateObject(&GetExchangeManager(), static_cast<uint16_t>(1234), GetSessionAliceToBob(), true, &delegate);
 // }
 
 } // namespace
