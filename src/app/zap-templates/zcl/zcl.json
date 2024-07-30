@@ -299,6 +299,14 @@
             "general_error_boolean",
             "cluster_error_boolean"
         ],
+        "Thread Border Router Management": [
+            "BorderRouterName",
+            "BorderAgentID",
+            "ThreadVersion",
+            "InterfaceEnabled",
+            "ActiveDatasetTimestamp",
+            "FeatureMap"
+        ],
         "Thread Network Diagnostics": [
             "Channel",
             "RoutingRole",
@@ -654,7 +662,7 @@
             "ClusterRevision"
         ],
         "Water Heater Mode": ["SupportedModes", "CurrentMode", "FeatureMap"],
-        "Wi-Fi Network Management": ["SSID"],
+        "Wi-Fi Network Management": ["SSID", "PassphraseSurrogate"],
         "Thread Network Directory": [
             "PreferredExtendedPanID",
             "ThreadNetworks",
