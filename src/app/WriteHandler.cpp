@@ -708,6 +708,7 @@ CHIP_ERROR WriteHandler::WriteClusterData(const Access::SubjectDescriptor & subj
     DataModel::WriteAttributeRequest request;
 
     request.path = path;
+    request.subjectDescriptor = subject;
     request.writeFlags.Set(DataModel::WriteFlags::kTimed, IsTimedWrite());
 
     AttributeValueDecoder decoder(data, subject);
