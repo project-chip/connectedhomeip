@@ -27,6 +27,7 @@
 #include <access/AccessControl.h>
 #include <app/MessageDef/ReportDataMessage.h>
 #include <app/ReadHandler.h>
+#include <app/data-model-provider/ProviderChangeListener.h>
 #include <app/util/basic-types.h>
 #include <lib/core/CHIPCore.h>
 #include <lib/support/CodeUtils.h>
@@ -54,7 +55,7 @@ namespace reporting {
  *         At its core, it  tries to gather and pack as much relevant attributes changes and/or events as possible into a report
  * message before sending that to the reader. It continues to do so until it has no more work to do.
  */
-class Engine
+class Engine : public DataModel::ProviderChangeListener
 {
 public:
     /**
@@ -139,6 +140,9 @@ public:
 #if CONFIG_BUILD_FOR_HOST_UNIT_TEST
     size_t GetGlobalDirtySetSize() { return mGlobalDirtySet.Allocated(); }
 #endif
+
+    /* ProviderChangeListener implementation */
+    void MarkDirty(const ConcreteAttributePath & path) override;
 
 private:
     /**

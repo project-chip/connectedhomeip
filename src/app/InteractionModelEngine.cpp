@@ -1729,7 +1729,7 @@ DataModel::Provider * InteractionModelEngine::SetDataModelProvider(DataModel::Pr
 
         // TODO: one by one
         context.eventsGenerator = &EventManagement::GetInstance();
-        // context.dataModelChangeListener = this;
+        context.dataModelChangeListener = &mReportingEngine;
         // context.actionContext = this;
 
 
