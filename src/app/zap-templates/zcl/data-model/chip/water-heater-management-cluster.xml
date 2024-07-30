@@ -76,9 +76,13 @@ limitations under the License.
     </command>
 
     <event code="0x0000" name="BoostStarted" priority="info" side="server">
+      <description>BoostStarted</description>
       <field id="0" name="BoostInfo" type="WaterHeaterBoostInfoStruct"/>
     </event>
 
-    <event code="0x0001" name="BoostEnded" priority="info" side="server"/>
+    <event code="0x0001" name="BoostEnded" priority="info" side="server">
+      <description>BoostEnded</description>
+    </event>
+        
   </cluster>
 </configurator>
