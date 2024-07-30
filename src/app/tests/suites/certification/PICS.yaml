@@ -2747,6 +2747,35 @@ PICS:
           "Does the DUT(server) support the LocalProgrammingFeatures attribute
           and is ReadOnly"
       id: DRLK.S.A002c.ReadOnly
+      
+    - label:
+          "Does the DUT(server) support the AliroReaderVerificationKey attribute and is ReadOnly" 
+       id: DRLK.S.A0080.ReadOnly
+  
+    - label:
+          "Does the DUT(server) support the AliroReaderGroupIdentifier attribute and is ReadOnly" 
+		  id: DRLK.S.A0081.ReadOnly
+    - label:
+          "Does the DUT(server) support the AliroReaderGroupSubIdentifier attribute and is ReadOnly" 
+		  id:  DRLK.S.A0082.ReadOnly
+    - label: 
+          "Does the DUT(server) support the AliroExpeditedTransactionSupportedProtocolVersions attribute and is ReadOnly" 
+		  id:  DRLK.S.A0083.ReadOnly
+    - label: 
+          "Does the DUT(server) support the AliroGroupResolvingKey attribute and is ReadOnly" 
+		  id:  DRLK.S.A0084.ReadOnly
+    - label: 
+          "Does the DUT(server) support the AliroSupportedBLEUWBProtocolVersions attribute and is ReadOnly" 
+		  id:  DRLK.S.A0085.ReadOnly
+    - label: 
+          "Does the DUT(server) support the AliroBLEAdvertisingVersion attribute and is ReadOnly" 
+		  id:  DRLK.S.A0086.ReadOnly
+    - label: 
+          "Does the DUT(server) support the NumberOfAliroCredentialIssuerKeysSupported attribute and is ReadOnly" 
+		  id:  DRLK.S.A0087.ReadOnly
+    - label: 
+          "Does the DUT(server) support the NumberOfAliroEndpointKeysSupported attribute and is ReadOnly" 
+		  id:  DRLK.S.A0088.ReadOnly
 
     #
     # Server write attributes
@@ -2865,6 +2894,12 @@ PICS:
 
     - label: "Does the DUT(server) support the Unbolt Door command?"
       id: DRLK.S.C27.Rsp
+      
+    - label: "Does the DUT(server) support the SetAliroReaderConfig command?"
+      id: DRLK.S.C28.Rsp
+ 
+    - label: "Does the DUT(server) support the ClearAliroReaderConfig command?"
+      id: DRLK.S.C29.Rsp
 
     #
     # server / commandsGenerated
@@ -2966,6 +3001,12 @@ PICS:
 
     - label: "Does the DUT(server) support the Lock supports unbolting feature?"
       id: DRLK.S.F0c
+      
+    - label: "Does the DUT(server) support AliroProvisioning feature?"
+      id: DRLK.S.F0d
+
+    - label: "Does the DUT(server) support Bluetooth LE + UWB Access Control Flow feature?"
+      id: DRLK.S.F0e
 
     #
     # server / manually
