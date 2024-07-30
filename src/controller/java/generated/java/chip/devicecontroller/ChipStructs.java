@@ -282,6 +282,234 @@ public static class BindingClusterTargetStruct {
     return output.toString();
   }
 }
+public static class AccessControlClusterAccessRestrictionStruct {
+  public Integer type;
+  public @Nullable Long id;
+  private static final long TYPE_ID = 0L;
+  private static final long ID_ID = 1L;
+
+  public AccessControlClusterAccessRestrictionStruct(
+    Integer type,
+    @Nullable Long id
+  ) {
+    this.type = type;
+    this.id = id;
+  }
+
+  public StructType encodeTlv() {
+    ArrayList<StructElement> values = new ArrayList<>();
+    values.add(new StructElement(TYPE_ID, new UIntType(type)));
+    values.add(new StructElement(ID_ID, id != null ? new UIntType(id) : new NullType()));
+
+    return new StructType(values);
+  }
+
+  public static AccessControlClusterAccessRestrictionStruct decodeTlv(BaseTLVType tlvValue) {
+    if (tlvValue == null || tlvValue.type() != TLVType.Struct) {
+      return null;
+    }
+    Integer type = null;
+    @Nullable Long id = null;
+    for (StructElement element: ((StructType)tlvValue).value()) {
+      if (element.contextTagNum() == TYPE_ID) {
+        if (element.value(BaseTLVType.class).type() == TLVType.UInt) {
+          UIntType castingValue = element.value(UIntType.class);
+          type = castingValue.value(Integer.class);
+        }
+      } else if (element.contextTagNum() == ID_ID) {
+        if (element.value(BaseTLVType.class).type() == TLVType.UInt) {
+          UIntType castingValue = element.value(UIntType.class);
+          id = castingValue.value(Long.class);
+        }
+      }
+    }
+    return new AccessControlClusterAccessRestrictionStruct(
+      type,
+      id
+    );
+  }
+
+  @Override
+  public String toString() {
+    StringBuilder output = new StringBuilder();
+    output.append("AccessControlClusterAccessRestrictionStruct {\n");
+    output.append("\ttype: ");
+    output.append(type);
+    output.append("\n");
+    output.append("\tid: ");
+    output.append(id);
+    output.append("\n");
+    output.append("}\n");
+    return output.toString();
+  }
+}
+public static class AccessControlClusterCommissioningAccessRestrictionEntryStruct {
+  public Integer endpoint;
+  public Long cluster;
+  public ArrayList<ChipStructs.AccessControlClusterAccessRestrictionStruct> restrictions;
+  private static final long ENDPOINT_ID = 0L;
+  private static final long CLUSTER_ID = 1L;
+  private static final long RESTRICTIONS_ID = 2L;
+
+  public AccessControlClusterCommissioningAccessRestrictionEntryStruct(
+    Integer endpoint,
+    Long cluster,
+    ArrayList<ChipStructs.AccessControlClusterAccessRestrictionStruct> restrictions
+  ) {
+    this.endpoint = endpoint;
+    this.cluster = cluster;
+    this.restrictions = restrictions;
+  }
+
+  public StructType encodeTlv() {
+    ArrayList<StructElement> values = new ArrayList<>();
+    values.add(new StructElement(ENDPOINT_ID, new UIntType(endpoint)));
+    values.add(new StructElement(CLUSTER_ID, new UIntType(cluster)));
+    values.add(new StructElement(RESTRICTIONS_ID, ArrayType.generateArrayType(restrictions, (elementrestrictions) -> elementrestrictions.encodeTlv())));
+
+    return new StructType(values);
+  }
+
+  public static AccessControlClusterCommissioningAccessRestrictionEntryStruct decodeTlv(BaseTLVType tlvValue) {
+    if (tlvValue == null || tlvValue.type() != TLVType.Struct) {
+      return null;
+    }
+    Integer endpoint = null;
+    Long cluster = null;
+    ArrayList<ChipStructs.AccessControlClusterAccessRestrictionStruct> restrictions = null;
+    for (StructElement element: ((StructType)tlvValue).value()) {
+      if (element.contextTagNum() == ENDPOINT_ID) {
+        if (element.value(BaseTLVType.class).type() == TLVType.UInt) {
+          UIntType castingValue = element.value(UIntType.class);
+          endpoint = castingValue.value(Integer.class);
+        }
+      } else if (element.contextTagNum() == CLUSTER_ID) {
+        if (element.value(BaseTLVType.class).type() == TLVType.UInt) {
+          UIntType castingValue = element.value(UIntType.class);
+          cluster = castingValue.value(Long.class);
+        }
+      } else if (element.contextTagNum() == RESTRICTIONS_ID) {
+        if (element.value(BaseTLVType.class).type() == TLVType.Array) {
+          ArrayType castingValue = element.value(ArrayType.class);
+          restrictions = castingValue.map((elementcastingValue) -> ChipStructs.AccessControlClusterAccessRestrictionStruct.decodeTlv(elementcastingValue));
+        }
+      }
+    }
+    return new AccessControlClusterCommissioningAccessRestrictionEntryStruct(
+      endpoint,
+      cluster,
+      restrictions
+    );
+  }
+
+  @Override
+  public String toString() {
+    StringBuilder output = new StringBuilder();
+    output.append("AccessControlClusterCommissioningAccessRestrictionEntryStruct {\n");
+    output.append("\tendpoint: ");
+    output.append(endpoint);
+    output.append("\n");
+    output.append("\tcluster: ");
+    output.append(cluster);
+    output.append("\n");
+    output.append("\trestrictions: ");
+    output.append(restrictions);
+    output.append("\n");
+    output.append("}\n");
+    return output.toString();
+  }
+}
+public static class AccessControlClusterAccessRestrictionEntryStruct {
+  public Integer endpoint;
+  public Long cluster;
+  public ArrayList<ChipStructs.AccessControlClusterAccessRestrictionStruct> restrictions;
+  public Integer fabricIndex;
+  private static final long ENDPOINT_ID = 0L;
+  private static final long CLUSTER_ID = 1L;
+  private static final long RESTRICTIONS_ID = 2L;
+  private static final long FABRIC_INDEX_ID = 254L;
+
+  public AccessControlClusterAccessRestrictionEntryStruct(
+    Integer endpoint,
+    Long cluster,
+    ArrayList<ChipStructs.AccessControlClusterAccessRestrictionStruct> restrictions,
+    Integer fabricIndex
+  ) {
+    this.endpoint = endpoint;
+    this.cluster = cluster;
+    this.restrictions = restrictions;
+    this.fabricIndex = fabricIndex;
+  }
+
+  public StructType encodeTlv() {
+    ArrayList<StructElement> values = new ArrayList<>();
+    values.add(new StructElement(ENDPOINT_ID, new UIntType(endpoint)));
+    values.add(new StructElement(CLUSTER_ID, new UIntType(cluster)));
+    values.add(new StructElement(RESTRICTIONS_ID, ArrayType.generateArrayType(restrictions, (elementrestrictions) -> elementrestrictions.encodeTlv())));
+    values.add(new StructElement(FABRIC_INDEX_ID, new UIntType(fabricIndex)));
+
+    return new StructType(values);
+  }
+
+  public static AccessControlClusterAccessRestrictionEntryStruct decodeTlv(BaseTLVType tlvValue) {
+    if (tlvValue == null || tlvValue.type() != TLVType.Struct) {
+      return null;
+    }
+    Integer endpoint = null;
+    Long cluster = null;
+    ArrayList<ChipStructs.AccessControlClusterAccessRestrictionStruct> restrictions = null;
+    Integer fabricIndex = null;
+    for (StructElement element: ((StructType)tlvValue).value()) {
+      if (element.contextTagNum() == ENDPOINT_ID) {
+        if (element.value(BaseTLVType.class).type() == TLVType.UInt) {
+          UIntType castingValue = element.value(UIntType.class);
+          endpoint = castingValue.value(Integer.class);
+        }
+      } else if (element.contextTagNum() == CLUSTER_ID) {
+        if (element.value(BaseTLVType.class).type() == TLVType.UInt) {
+          UIntType castingValue = element.value(UIntType.class);
+          cluster = castingValue.value(Long.class);
+        }
+      } else if (element.contextTagNum() == RESTRICTIONS_ID) {
+        if (element.value(BaseTLVType.class).type() == TLVType.Array) {
+          ArrayType castingValue = element.value(ArrayType.class);
+          restrictions = castingValue.map((elementcastingValue) -> ChipStructs.AccessControlClusterAccessRestrictionStruct.decodeTlv(elementcastingValue));
+        }
+      } else if (element.contextTagNum() == FABRIC_INDEX_ID) {
+        if (element.value(BaseTLVType.class).type() == TLVType.UInt) {
+          UIntType castingValue = element.value(UIntType.class);
+          fabricIndex = castingValue.value(Integer.class);
+        }
+      }
+    }
+    return new AccessControlClusterAccessRestrictionEntryStruct(
+      endpoint,
+      cluster,
+      restrictions,
+      fabricIndex
+    );
+  }
+
+  @Override
+  public String toString() {
+    StringBuilder output = new StringBuilder();
+    output.append("AccessControlClusterAccessRestrictionEntryStruct {\n");
+    output.append("\tendpoint: ");
+    output.append(endpoint);
+    output.append("\n");
+    output.append("\tcluster: ");
+    output.append(cluster);
+    output.append("\n");
+    output.append("\trestrictions: ");
+    output.append(restrictions);
+    output.append("\n");
+    output.append("\tfabricIndex: ");
+    output.append(fabricIndex);
+    output.append("\n");
+    output.append("}\n");
+    return output.toString();
+  }
+}
 public static class AccessControlClusterAccessControlTargetStruct {
   public @Nullable Long cluster;
   public @Nullable Integer endpoint;

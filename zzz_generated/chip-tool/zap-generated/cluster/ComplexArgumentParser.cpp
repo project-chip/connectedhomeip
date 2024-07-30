@@ -564,6 +564,124 @@ void ComplexArgumentParser::Finalize(chip::app::Clusters::Binding::Structs::Targ
 }
 
 CHIP_ERROR ComplexArgumentParser::Setup(const char * label,
+                                        chip::app::Clusters::AccessControl::Structs::AccessRestrictionStruct::Type & request,
+                                        Json::Value & value)
+{
+    VerifyOrReturnError(value.isObject(), CHIP_ERROR_INVALID_ARGUMENT);
+
+    // Copy to track which members we already processed.
+    Json::Value valueCopy(value);
+
+    ReturnErrorOnFailure(ComplexArgumentParser::EnsureMemberExist("AccessRestrictionStruct.type", "type", value.isMember("type")));
+    ReturnErrorOnFailure(ComplexArgumentParser::EnsureMemberExist("AccessRestrictionStruct.id", "id", value.isMember("id")));
+
+    char labelWithMember[kMaxLabelLength];
+    snprintf(labelWithMember, sizeof(labelWithMember), "%s.%s", label, "type");
+    ReturnErrorOnFailure(ComplexArgumentParser::Setup(labelWithMember, request.type, value["type"]));
+    valueCopy.removeMember("type");
+
+    snprintf(labelWithMember, sizeof(labelWithMember), "%s.%s", label, "id");
+    ReturnErrorOnFailure(ComplexArgumentParser::Setup(labelWithMember, request.id, value["id"]));
+    valueCopy.removeMember("id");
+
+    return ComplexArgumentParser::EnsureNoMembersRemaining(label, valueCopy);
+}
+
+void ComplexArgumentParser::Finalize(chip::app::Clusters::AccessControl::Structs::AccessRestrictionStruct::Type & request)
+{
+    ComplexArgumentParser::Finalize(request.type);
+    ComplexArgumentParser::Finalize(request.id);
+}
+
+CHIP_ERROR
+ComplexArgumentParser::Setup(const char * label,
+                             chip::app::Clusters::AccessControl::Structs::CommissioningAccessRestrictionEntryStruct::Type & request,
+                             Json::Value & value)
+{
+    VerifyOrReturnError(value.isObject(), CHIP_ERROR_INVALID_ARGUMENT);
+
+    // Copy to track which members we already processed.
+    Json::Value valueCopy(value);
+
+    ReturnErrorOnFailure(ComplexArgumentParser::EnsureMemberExist("CommissioningAccessRestrictionEntryStruct.endpoint", "endpoint",
+                                                                  value.isMember("endpoint")));
+    ReturnErrorOnFailure(ComplexArgumentParser::EnsureMemberExist("CommissioningAccessRestrictionEntryStruct.cluster", "cluster",
+                                                                  value.isMember("cluster")));
+    ReturnErrorOnFailure(ComplexArgumentParser::EnsureMemberExist("CommissioningAccessRestrictionEntryStruct.restrictions",
+                                                                  "restrictions", value.isMember("restrictions")));
+
+    char labelWithMember[kMaxLabelLength];
+    snprintf(labelWithMember, sizeof(labelWithMember), "%s.%s", label, "endpoint");
+    ReturnErrorOnFailure(ComplexArgumentParser::Setup(labelWithMember, request.endpoint, value["endpoint"]));
+    valueCopy.removeMember("endpoint");
+
+    snprintf(labelWithMember, sizeof(labelWithMember), "%s.%s", label, "cluster");
+    ReturnErrorOnFailure(ComplexArgumentParser::Setup(labelWithMember, request.cluster, value["cluster"]));
+    valueCopy.removeMember("cluster");
+
+    snprintf(labelWithMember, sizeof(labelWithMember), "%s.%s", label, "restrictions");
+    ReturnErrorOnFailure(ComplexArgumentParser::Setup(labelWithMember, request.restrictions, value["restrictions"]));
+    valueCopy.removeMember("restrictions");
+
+    return ComplexArgumentParser::EnsureNoMembersRemaining(label, valueCopy);
+}
+
+void ComplexArgumentParser::Finalize(
+    chip::app::Clusters::AccessControl::Structs::CommissioningAccessRestrictionEntryStruct::Type & request)
+{
+    ComplexArgumentParser::Finalize(request.endpoint);
+    ComplexArgumentParser::Finalize(request.cluster);
+    ComplexArgumentParser::Finalize(request.restrictions);
+}
+
+CHIP_ERROR ComplexArgumentParser::Setup(const char * label,
+                                        chip::app::Clusters::AccessControl::Structs::AccessRestrictionEntryStruct::Type & request,
+                                        Json::Value & value)
+{
+    VerifyOrReturnError(value.isObject(), CHIP_ERROR_INVALID_ARGUMENT);
+
+    // Copy to track which members we already processed.
+    Json::Value valueCopy(value);
+
+    ReturnErrorOnFailure(
+        ComplexArgumentParser::EnsureMemberExist("AccessRestrictionEntryStruct.endpoint", "endpoint", value.isMember("endpoint")));
+    ReturnErrorOnFailure(
+        ComplexArgumentParser::EnsureMemberExist("AccessRestrictionEntryStruct.cluster", "cluster", value.isMember("cluster")));
+    ReturnErrorOnFailure(ComplexArgumentParser::EnsureMemberExist("AccessRestrictionEntryStruct.restrictions", "restrictions",
+                                                                  value.isMember("restrictions")));
+
+    char labelWithMember[kMaxLabelLength];
+    snprintf(labelWithMember, sizeof(labelWithMember), "%s.%s", label, "endpoint");
+    ReturnErrorOnFailure(ComplexArgumentParser::Setup(labelWithMember, request.endpoint, value["endpoint"]));
+    valueCopy.removeMember("endpoint");
+
+    snprintf(labelWithMember, sizeof(labelWithMember), "%s.%s", label, "cluster");
+    ReturnErrorOnFailure(ComplexArgumentParser::Setup(labelWithMember, request.cluster, value["cluster"]));
+    valueCopy.removeMember("cluster");
+
+    snprintf(labelWithMember, sizeof(labelWithMember), "%s.%s", label, "restrictions");
+    ReturnErrorOnFailure(ComplexArgumentParser::Setup(labelWithMember, request.restrictions, value["restrictions"]));
+    valueCopy.removeMember("restrictions");
+
+    if (value.isMember("fabricIndex"))
+    {
+        snprintf(labelWithMember, sizeof(labelWithMember), "%s.%s", label, "fabricIndex");
+        ReturnErrorOnFailure(ComplexArgumentParser::Setup(labelWithMember, request.fabricIndex, value["fabricIndex"]));
+    }
+    valueCopy.removeMember("fabricIndex");
+
+    return ComplexArgumentParser::EnsureNoMembersRemaining(label, valueCopy);
+}
+
+void ComplexArgumentParser::Finalize(chip::app::Clusters::AccessControl::Structs::AccessRestrictionEntryStruct::Type & request)
+{
+    ComplexArgumentParser::Finalize(request.endpoint);
+    ComplexArgumentParser::Finalize(request.cluster);
+    ComplexArgumentParser::Finalize(request.restrictions);
+    ComplexArgumentParser::Finalize(request.fabricIndex);
+}
+
+CHIP_ERROR ComplexArgumentParser::Setup(const char * label,
                                         chip::app::Clusters::AccessControl::Structs::AccessControlTargetStruct::Type & request,
                                         Json::Value & value)
 {

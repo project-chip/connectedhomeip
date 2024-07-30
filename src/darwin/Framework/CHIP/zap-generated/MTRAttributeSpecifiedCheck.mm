@@ -402,6 +402,12 @@ static BOOL AttributeIsSpecifiedInAccessControlCluster(AttributeId aAttributeId)
     case Attributes::AccessControlEntriesPerFabric::Id: {
         return YES;
     }
+    case Attributes::CommissioningARL::Id: {
+        return YES;
+    }
+    case Attributes::Arl::Id: {
+        return YES;
+    }
     case Attributes::GeneratedCommandList::Id: {
         return YES;
     }

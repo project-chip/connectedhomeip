@@ -29,6 +29,7 @@
 #include <controller/CHIPDeviceController.h>
 #include <lib/dnssd/Resolver.h>
 #include <lib/support/CodeUtils.h>
+#include <memory>
 #include <system/SystemClock.h>
 #include <tracing/metric_event.h>
 
@@ -58,6 +59,13 @@ CHIP_ERROR GetPayload(const char * setUpCode, SetupPayload & payload)
     return CHIP_NO_ERROR;
 }
 } // namespace
+
+SetUpCodePairer::~SetUpCodePairer()
+{
+#if CHIP_DEVICE_CONFIG_ENABLE_WIFIPAF
+    DeviceLayer::ConnectivityMgr().WiFiPAFCancelConnect();
+#endif
+}
 
 CHIP_ERROR SetUpCodePairer::PairDevice(NodeId remoteId, const char * setUpCode, SetupCodePairerBehaviour commission,
                                        DiscoveryType discoveryType, Optional<Dnssd::CommonResolutionData> resolutionData)
@@ -124,6 +132,15 @@ CHIP_ERROR SetUpCodePairer::Connect(SetupPayload & payload)
         if (searchOverAll || payload.rendezvousInformation.Value().Has(RendezvousInformationFlag::kSoftAP))
         {
             if (CHIP_NO_ERROR == (err = StartDiscoverOverSoftAP(payload)))
+            {
+                isRunning = true;
+            }
+            VerifyOrReturnError(searchOverAll || CHIP_NO_ERROR == err || CHIP_ERROR_UNSUPPORTED_CHIP_FEATURE == err, err);
+        }
+        if (searchOverAll || payload.rendezvousInformation.Value().Has(RendezvousInformationFlag::kWiFiPAF))
+        {
+            ChipLogProgress(Controller, "WiFi-PAF: has RendezvousInformationFlag::kWiFiPAF");
+            if (CHIP_NO_ERROR == (err = StartDiscoverOverWiFiPAF(payload)))
             {
                 isRunning = true;
             }
@@ -243,6 +260,31 @@ CHIP_ERROR SetUpCodePairer::StopConnectOverSoftAP()
     return CHIP_NO_ERROR;
 }
 
+CHIP_ERROR SetUpCodePairer::StartDiscoverOverWiFiPAF(SetupPayload & payload)
+{
+#if CHIP_DEVICE_CONFIG_ENABLE_WIFIPAF
+    ChipLogProgress(Controller, "Starting commissioning discovery over WiFiPAF");
+    VerifyOrReturnError(mCommissioner != nullptr, CHIP_ERROR_INCORRECT_STATE);
+    mWaitingForDiscovery[kWiFiPAFTransport] = true;
+    CHIP_ERROR err = DeviceLayer::ConnectivityMgr().WiFiPAFConnect(payload.discriminator, (void *) this, OnWiFiPAFSubscribeComplete,
+                                                                   OnWiFiPAFSubscribeError);
+    if (err != CHIP_NO_ERROR)
+    {
+        ChipLogError(Controller, "Commissioning discovery over WiFiPAF failed, err = %" CHIP_ERROR_FORMAT, err.Format());
+        mWaitingForDiscovery[kWiFiPAFTransport] = false;
+    }
+    return err;
+#else
+    return CHIP_ERROR_UNSUPPORTED_CHIP_FEATURE;
+#endif // CONFIG_NETWORK_LAYER_BLE
+}
+
+CHIP_ERROR SetUpCodePairer::StopConnectOverWiFiPAF()
+{
+    mWaitingForDiscovery[kWiFiPAFTransport] = false;
+    return CHIP_NO_ERROR;
+}
+
 bool SetUpCodePairer::ConnectToDiscoveredDevice()
 {
     if (mWaitingForPASE)
@@ -334,6 +376,37 @@ void SetUpCodePairer::OnBLEDiscoveryError(CHIP_ERROR err)
     LogErrorOnFailure(err);
 }
 #endif // CONFIG_NETWORK_LAYER_BLE
+
+#if CHIP_DEVICE_CONFIG_ENABLE_WIFIPAF
+void SetUpCodePairer::OnDiscoveredDeviceOverWifiPAF()
+{
+    ChipLogProgress(Controller, "Discovered device to be commissioned over WiFiPAF, RemoteId: %lu", mRemoteId);
+
+    mWaitingForDiscovery[kWiFiPAFTransport] = false;
+    auto param                              = SetUpCodePairerParameters();
+    param.SetPeerAddress(Transport::PeerAddress(Transport::Type::kWiFiPAF, mRemoteId));
+    mDiscoveredParameters.emplace_back(param);
+    ConnectToDiscoveredDevice();
+}
+
+void SetUpCodePairer::OnWifiPAFDiscoveryError(CHIP_ERROR err)
+{
+    ChipLogError(Controller, "Commissioning discovery over WiFiPAF failed: %" CHIP_ERROR_FORMAT, err.Format());
+    mWaitingForDiscovery[kWiFiPAFTransport] = false;
+}
+
+void SetUpCodePairer::OnWiFiPAFSubscribeComplete(void * appState)
+{
+    auto self = (SetUpCodePairer *) appState;
+    self->OnDiscoveredDeviceOverWifiPAF();
+}
+
+void SetUpCodePairer::OnWiFiPAFSubscribeError(void * appState, CHIP_ERROR err)
+{
+    auto self = (SetUpCodePairer *) appState;
+    self->OnWifiPAFDiscoveryError(err);
+}
+#endif
 
 bool SetUpCodePairer::IdIsPresent(uint16_t vendorOrProductID)
 {
@@ -473,6 +546,7 @@ void SetUpCodePairer::ResetDiscoveryState()
     StopConnectOverBle();
     StopConnectOverIP();
     StopConnectOverSoftAP();
+    StopConnectOverWiFiPAF();
 
     // Just in case any of those failed to reset the waiting state properly.
     for (auto & waiting : mWaitingForDiscovery)
