@@ -22,8 +22,6 @@
 #include <app/CommandHandler.h>
 #include <app/clusters/identify-server/identify-server.h>
 
-#include "thermostat-manager.h"
-
 using namespace chip;
 using namespace chip::app;
 // using namespace chip::app::Clusters;
