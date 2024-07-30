@@ -38,7 +38,7 @@ tests:
       verification: |
           Optional Attribute - If it is supported, then in TH log it will results in displaying the value, else it will display UNSUPPORTED_ATTRIBUTE. Below is the log of RPI the result may be vary on the basis of dut implementation.
 
-          #2 Test Harness Client attempts to write PresetTypes and gets an INVALID_IN_STATE error since the client didn't send a request to edit the presets by calling StartPresetsSchedulesEditRequest command.
+          #2 Test Harness Client attempts to write Presets and gets an INVALID_IN_STATE error since the client didn't send a request to edit the presets by calling StartPresetsSchedulesEditRequest command.
           ./chip-tool thermostat write presets '[ {"presetHandle": "hex:01", "presetScenario": 1, "coolingSetpoint": 2500, "heatingSetpoint": 2600, "builtIn": true }, {"presetHandle": "hex:02", "presetScenario": 2, "coolingSetpoint": 2600, "heatingSetpoint": 2500, "builtIn": true }, {"presetHandle": null, "name": "Sleep", "presetScenario": 3, "coolingSetpoint": 2500, "heatingSetpoint": 2600, "builtIn": false }]' 0x12344321 1
           On TH(chip-tool) verify that  DUT sends a INVALID_IN_STATE (0xCB)
 
@@ -86,7 +86,7 @@ tests:
       verification: |
           Optional Attribute - If it is supported, then in TH log it will results in displaying the value, else it will display UNSUPPORTED_ATTRIBUTE. Below is the log of RPI the result may be vary on the basis of dut implementation.
 
-          #3b Test Harness Client attempts to write PresetTypes and gets SUCCESS
+          #3b Test Harness Client attempts to write Presets and gets SUCCESS
 
           ./chip-tool thermostat write presets '[ {"presetHandle": "hex:01", "presetScenario": 1, "coolingSetpoint": 2500, "heatingSetpoint": 2600, "builtIn": true }, {"presetHandle": "hex:02", "presetScenario": 2, "coolingSetpoint": 2600, "heatingSetpoint": 2500, "builtIn": true }, {"presetHandle": null, "name": "Sleep", "presetScenario": 3, "coolingSetpoint": 2500, "heatingSetpoint": 2600, "builtIn": false },  {"presetHandle": null, "name": "Wake", "presetScenario": 4, "coolingSetpoint": 2200, "heatingSetpoint": 2900, "builtIn": false }, {"presetHandle": null, "name": "GoingToSleep", "presetScenario": 6, "coolingSetpoint": 2100, "heatingSetpoint": 2500, "builtIn": false }]' 0x12344321 1
           On TH(chip-tool) verify that  DUT sends a success response
@@ -335,8 +335,8 @@ tests:
                 value: "y"
 
     - label:
-          "Step 4a:  Test Harness writes to the Presets attribute wherein a
-          built-in preset is removed"
+          "Step 4a: Test Harness calls the StartPresetsSchedulesEditRequest
+          command to edit presets"
       PICS: TSTAT.S.F08 && TSTAT.S.C07.Rsp
       verification: |
           Optional Attribute - If it is supported, then in TH log it will results in displaying the value, else it will display UNSUPPORTED_ATTRIBUTE. Below is the log of RPI the result may be vary on the basis of dut implementation.
@@ -365,7 +365,7 @@ tests:
       verification: |
           Optional Attribute - If it is supported, then in TH log it will results in displaying the value, else it will display UNSUPPORTED_ATTRIBUTE. Below is the log of RPI the result may be vary on the basis of dut implementation.
 
-          #4b Test Harness Client attempts to write PresetTypes and gets SUCCESS
+          #4b Test Harness Client attempts to write Presets and gets SUCCESS
 
           ./chip-tool thermostat write presets '[ {"presetHandle": "hex:02", "presetScenario": 2, "coolingSetpoint": 2600, "heatingSetpoint": 2500, "builtIn": true }, {"presetHandle": "hex:03", "name": "Sleep", "presetScenario": 3, "coolingSetpoint": 2500, "heatingSetpoint": 2600, "builtIn": false },  {"presetHandle": "hex:04", "name": "Wake", "presetScenario": 4, "coolingSetpoint": 2200, "heatingSetpoint": 2900, "builtIn": false }, {"presetHandle": "hex:06", "name": "GoingToSleep", "presetScenario": 6, "coolingSetpoint": 2100, "heatingSetpoint": 2500, "builtIn": false }]' 0x12344321 1
           On TH(chip-tool) verify that  DUT sends a success response
@@ -498,9 +498,8 @@ tests:
                 value: "y"
 
     - label:
-          "Step 5a:  Test Harness writes to the Presets attribute wherein a
-          preset is removed such that its handle matches the active preset
-          handle"
+          "Step 5a:  Test Harness calls the SetActivePresetRequest
+          command to set the active preset handle"
       PICS: TSTAT.S.F08 && TSTAT.S.C06.Rsp
       verification: |
           Optional Attribute - If it is supported, then in TH log it will results in displaying the value, else it will display UNSUPPORTED_ATTRIBUTE. Below is the log of RPI the result may be vary on the basis of dut implementation.
@@ -543,7 +542,8 @@ tests:
               - name: "expectedValue"
                 value: "y"
 
-    - label: "Step 5c:  Test Harness calls StartPresetsSchedulesEditRequest"
+    - label: "Step 5c:  Test Harness calls the StartPresetsSchedulesEditRequest
+          command to edit presets"
       PICS: TSTAT.S.F08 && TSTAT.S.C07.Rsp
       verification: |
           Optional Attribute - If it is supported, then in TH log it will results in displaying the value, else it will display UNSUPPORTED_ATTRIBUTE. Below is the log of RPI the result may be vary on the basis of dut implementation.
@@ -573,7 +573,7 @@ tests:
       verification: |
           Optional Attribute - If it is supported, then in TH log it will results in displaying the value, else it will display UNSUPPORTED_ATTRIBUTE. Below is the log of RPI the result may be vary on the basis of dut implementation.
 
-          #5c Test Harness Client attempts to write PresetTypes and gets SUCCESS
+          #5c Test Harness Client attempts to write Presets and gets SUCCESS
 
           ./chip-tool thermostat write presets ./out/debug/chip-tool thermostat write presets '[ {"presetHandle": "hex:01", "presetScenario": 1, "coolingSetpoint": 2500, "heatingSetpoint": 2600, "builtIn": true }, {"presetHandle": "hex:02", "presetScenario": 2, "coolingSetpoint": 2600, "heatingSetpoint": 2500, "builtIn": true }, {"presetHandle": "hex:04", "name": "Wake", "presetScenario": 4, "coolingSetpoint": 2200, "heatingSetpoint": 2900, "builtIn": false }, {"presetHandle": "hex:06", "name": "GoingToSleep", "presetScenario": 6, "coolingSetpoint": 2100, "heatingSetpoint": 2500, "builtIn": false }]' 0x12344321 1
           On TH(chip-tool) verify that  DUT sends a success response
@@ -723,8 +723,8 @@ tests:
                 value: "y"
 
     - label:
-          "Step 6a:  Test Harness writes to the Presets attribute wherein a
-          built-in preset is modified to a non built-in preset"
+          "Step 6a:  Test Harness calls the StartPresetsSchedulesEditRequest
+          command to edit presets"
       PICS: TSTAT.S.F08 && TSTAT.S.C07.Rsp
       verification: |
           Optional Attribute - If it is supported, then in TH log it will results in displaying the value, else it will display UNSUPPORTED_ATTRIBUTE. Below is the log of RPI the result may be vary on the basis of dut implementation.
@@ -754,7 +754,7 @@ tests:
       verification: |
           Optional Attribute - If it is supported, then in TH log it will results in displaying the value, else it will display UNSUPPORTED_ATTRIBUTE. Below is the log of RPI the result may be vary on the basis of dut implementation.
 
-          #6b Test Harness Client attempts to write PresetTypes and gets SUCCESS
+          #6b Test Harness Client attempts to write Presets and gets SUCCESS
 
           ./chip-tool thermostat write presets '[ {"presetHandle": "hex:01", "presetScenario": 1, "coolingSetpoint": 2500, "heatingSetpoint": 2600, "builtIn": false }, {"presetHandle": "hex:02", "presetScenario": 2, "coolingSetpoint": 2600, "heatingSetpoint": 2500, "builtIn": true }, {"presetHandle": "hex:03", "name": "Sleep", "presetScenario": 3, "coolingSetpoint": 2500, "heatingSetpoint": 2600, "builtIn": false },  {"presetHandle": "hex:04", "name": "Wake", "presetScenario": 4, "coolingSetpoint": 2200, "heatingSetpoint": 2900, "builtIn": false }, {"presetHandle": "hex:06", "name": "GoingToSleep", "presetScenario": 6, "coolingSetpoint": 2100, "heatingSetpoint": 2500, "builtIn": false }]' 0x12344321 1
           On TH(chip-tool) verify that  DUT sends a success response
@@ -904,8 +904,8 @@ tests:
                 value: "y"
 
     - label:
-          "Step 7a:  Test Harness writes to the Presets attribute wherein a new
-          preset is added with the builtIn flag set to true"
+          "Step 7a:  Test Harness calls the StartPresetsSchedulesEditRequest
+          command to edit presets"
       PICS: TSTAT.S.F08 && TSTAT.S.C07.Rsp
       verification: |
           Optional Attribute - If it is supported, then in TH log it will results in displaying the value, else it will display UNSUPPORTED_ATTRIBUTE. Below is the log of RPI the result may be vary on the basis of dut implementation.
@@ -934,7 +934,7 @@ tests:
       verification: |
           Optional Attribute - If it is supported, then in TH log it will results in displaying the value, else it will display UNSUPPORTED_ATTRIBUTE. Below is the log of RPI the result may be vary on the basis of dut implementation.
 
-          #7b Test Harness Client attempts to write PresetTypes and gets SUCCESS
+          #7b Test Harness Client attempts to write Presets and gets SUCCESS
 
           ./chip-tool thermostat write presets '[ {"presetHandle": "hex:01", "presetScenario": 1, "coolingSetpoint": 2500, "heatingSetpoint": 2600, "builtIn": true }, {"presetHandle": "hex:02", "presetScenario": 2, "coolingSetpoint": 2600, "heatingSetpoint": 2500, "builtIn": true }, {"presetHandle": "hex:03", "name": "Sleep", "presetScenario": 3, "coolingSetpoint": 2500, "heatingSetpoint": 2600, "builtIn": false },  {"presetHandle": "hex:04", "name": "Wake", "presetScenario": 4, "coolingSetpoint": 2200, "heatingSetpoint": 2900, "builtIn": false }, {"presetHandle": null, "name": "Vacation", "presetScenario": 5, "coolingSetpoint": 2900, "heatingSetpoint": 2000, "builtIn": true }, {"presetHandle": "hex:06", "name": "GoingToSleep", "presetScenario": 6, "coolingSetpoint": 2100, "heatingSetpoint": 2500, "builtIn": false }]' 0x12344321 1
           On TH(chip-tool) verify that  DUT sends a success response
@@ -1084,9 +1084,8 @@ tests:
                 value: "y"
 
     - label:
-          "Step 8a:  Test Harness writes to the Presets attribute with a preset
-          having a non-null preset handle that doesn't exist in the Presets
-          attribute"
+          "Step 8a:  Test Harness calls the StartPresetsSchedulesEditRequest
+          command to edit presets"
       PICS: TSTAT.S.F08 && TSTAT.S.C07.Rsp
       verification: |
           Optional Attribute - If it is supported, then in TH log it will results in displaying the value, else it will display UNSUPPORTED_ATTRIBUTE. Below is the log of RPI the result may be vary on the basis of dut implementation.
@@ -1116,7 +1115,7 @@ tests:
       verification: |
           Optional Attribute - If it is supported, then in TH log it will results in displaying the value, else it will display UNSUPPORTED_ATTRIBUTE. Below is the log of RPI the result may be vary on the basis of dut implementation.
 
-          #8b Test Harness Client attempts to write PresetTypes and gets SUCCESS
+          #8b Test Harness Client attempts to write Presets and gets SUCCESS
 
           ./chip-tool thermostat write presets '[ {"presetHandle": "hex:01", "presetScenario": 1, "coolingSetpoint": 2500, "heatingSetpoint": 2600, "builtIn": true }, {"presetHandle": "hex:02", "presetScenario": 2, "coolingSetpoint": 2600, "heatingSetpoint": 2500, "builtIn": true }, {"presetHandle": "hex:03", "name": "Sleep", "presetScenario": 3, "coolingSetpoint": 2500, "heatingSetpoint": 2600, "builtIn": false },  {"presetHandle": "hex:04", "name": "Wake", "presetScenario": 4, "coolingSetpoint": 2200, "heatingSetpoint": 2900, "builtIn": false }, {"presetHandle": "hex:08", "name": "GoingToSleep", "presetScenario": 6, "coolingSetpoint": 2100, "heatingSetpoint": 2500, "builtIn": false }]' 0x12344321 1
           On TH(chip-tool) verify that  DUT sends a success response
@@ -1266,8 +1265,8 @@ tests:
                 value: "y"
 
     - label:
-          "Step 9a:  Test Harness writes to the Presets attribute wherein there
-          are 2 presets with the same preset handle"
+          "Step 9a:  Test Harness calls the StartPresetsSchedulesEditRequest
+          command to edit presets"
       PICS: TSTAT.S.F08 && TSTAT.S.C07.Rsp
       verification: |
           Optional Attribute - If it is supported, then in TH log it will results in displaying the value, else it will display UNSUPPORTED_ATTRIBUTE. Below is the log of RPI the result may be vary on the basis of dut implementation.
@@ -1294,7 +1293,7 @@ tests:
       verification: |
           Optional Attribute - If it is supported, then in TH log it will results in displaying the value, else it will display UNSUPPORTED_ATTRIBUTE. Below is the log of RPI the result may be vary on the basis of dut implementation.
 
-          #8b Test Harness Client attempts to write PresetTypes and gets SUCCESS
+          #8b Test Harness Client attempts to write Presets and gets SUCCESS
 
           ./chip-tool thermostat write presets '[ {"presetHandle": "hex:01", "presetScenario": 1, "coolingSetpoint": 2500, "heatingSetpoint": 2600, "builtIn": true }, {"presetHandle": "hex:02", "presetScenario": 2, "coolingSetpoint": 2600, "heatingSetpoint": 2500, "builtIn": true }, {"presetHandle": "hex:03", "name": "Sleep", "presetScenario": 3, "coolingSetpoint": 2500, "heatingSetpoint": 2600, "builtIn": false }, {"presetHandle": "hex:03", "name": "Sleep", "presetScenario": 3, "coolingSetpoint": 2500, "heatingSetpoint": 2600, "builtIn": false }, {"presetHandle": "hex:04", "name": "Wake", "presetScenario": 4, "coolingSetpoint": 2200, "heatingSetpoint": 2900, "builtIn": false }, {"presetHandle": "hex:06", "name": "GoingToSleep", "presetScenario": 6, "coolingSetpoint": 2100, "heatingSetpoint": 2500, "builtIn": false }]' 0x12344321 1
           On TH(chip-tool) verify that  DUT sends a success response
@@ -1444,8 +1443,8 @@ tests:
                 value: "y"
 
     - label:
-          "Step 10a:  Test Harness writes to the Presets attribute wherein a
-          built-in preset is modified to be a non built-in preset"
+          "Step 10a:  Test Harness calls the StartPresetsSchedulesEditRequest
+          command to edit presets"
       PICS: TSTAT.S.F08 && TSTAT.S.C07.Rsp
       verification: |
           Optional Attribute - If it is supported, then in TH log it will results in displaying the value, else it will display UNSUPPORTED_ATTRIBUTE. Below is the log of RPI the result may be vary on the basis of dut implementation.
@@ -1474,7 +1473,7 @@ tests:
       verification: |
           Optional Attribute - If it is supported, then in TH log it will results in displaying the value, else it will display UNSUPPORTED_ATTRIBUTE. Below is the log of RPI the result may be vary on the basis of dut implementation.
 
-          #10b Test Harness Client attempts to write PresetTypes and gets SUCCESS
+          #10b Test Harness Client attempts to write Presets and gets SUCCESS
 
           ./chip-tool thermostat write presets '[ {"presetHandle": "hex:01", "presetScenario": 1, "coolingSetpoint": 2500, "heatingSetpoint": 2600, "builtIn": false }, {"presetHandle": "hex:02", "presetScenario": 2, "coolingSetpoint": 2600, "heatingSetpoint": 2500, "builtIn": true }, {"presetHandle": "hex:03", "name": "Sleep", "presetScenario": 3, "coolingSetpoint": 2500, "heatingSetpoint": 2600, "builtIn": false },  {"presetHandle": "hex:04", "name": "Wake", "presetScenario": 4, "coolingSetpoint": 2200, "heatingSetpoint": 2900, "builtIn": false }, {"presetHandle": "hex:06", "name": "GoingToSleep", "presetScenario": 6, "coolingSetpoint": 2100, "heatingSetpoint": 2500, "builtIn": false }]' 0x12344321 1
           On TH(chip-tool) verify that  DUT sends a success response
@@ -1624,8 +1623,8 @@ tests:
                 value: "y"
 
     - label:
-          "Step 11a:  Test Harness writes to the Presets attribute wherein a non
-          built-in preset is modified to a built-in preset"
+          "Step 11a:  Test Harness calls the StartPresetsSchedulesEditRequest
+          command to edit presets"
       PICS: TSTAT.S.F08 && TSTAT.S.C07.Rsp
       verification: |
           Optional Attribute - If it is supported, then in TH log it will results in displaying the value, else it will display UNSUPPORTED_ATTRIBUTE. Below is the log of RPI the result may be vary on the basis of dut implementation.
@@ -1654,7 +1653,7 @@ tests:
       verification: |
           Optional Attribute - If it is supported, then in TH log it will results in displaying the value, else it will display UNSUPPORTED_ATTRIBUTE. Below is the log of RPI the result may be vary on the basis of dut implementation.
 
-          #11b Test Harness Client attempts to write PresetTypes and gets SUCCESS
+          #11b Test Harness Client attempts to write Presets and gets SUCCESS
 
           ./chip-tool thermostat write presets '[ {"presetHandle": "hex:01", "presetScenario": 1, "coolingSetpoint": 2500, "heatingSetpoint": 2600, "builtIn": true }, {"presetHandle": "hex:02", "presetScenario": 2, "coolingSetpoint": 2600, "heatingSetpoint": 2500, "builtIn": true }, {"presetHandle": "hex:03", "name": "Sleep", "presetScenario": 3, "coolingSetpoint": 2500, "heatingSetpoint": 2600, "builtIn": true },  {"presetHandle": "hex:04", "name": "Wake", "presetScenario": 4, "coolingSetpoint": 2200, "heatingSetpoint": 2900, "builtIn": false }, {"presetHandle": "hex:06", "name": "GoingToSleep", "presetScenario": 6, "coolingSetpoint": 2100, "heatingSetpoint": 2500, "builtIn": false }, {"presetHandle": "hex:06", "name": "GoingToSleep", "presetScenario": 6, "coolingSetpoint": 2100, "heatingSetpoint": 2500, "builtIn": false }]' 0x12344321 1
           On TH(chip-tool) verify that  DUT sends a success response
@@ -1804,9 +1803,8 @@ tests:
                 value: "y"
 
     - label:
-          "Step 12a:  Test Harness writes to the Presets attribute wherein a
-          preset doesn't support names in the PresetTypeFeatures bitmap but has
-          a name in the write presets command"
+          "Step 12a:  Test Harness calls the StartPresetsSchedulesEditRequest
+          command to edit presets"
       PICS: TSTAT.S.F08 && TSTAT.S.C07.Rsp
       verification: |
           Optional Attribute - If it is supported, then in TH log it will results in displaying the value, else it will display UNSUPPORTED_ATTRIBUTE. Below is the log of RPI the result may be vary on the basis of dut implementation.
@@ -1836,7 +1834,7 @@ tests:
       verification: |
           Optional Attribute - If it is supported, then in TH log it will results in displaying the value, else it will display UNSUPPORTED_ATTRIBUTE. Below is the log of RPI the result may be vary on the basis of dut implementation.
 
-          #11b Test Harness Client attempts to write PresetTypes and gets SUCCESS
+          #11b Test Harness Client attempts to write Presets and gets SUCCESS
 
           ./chip-tool thermostat write presets '[ {"presetHandle": "hex:01", "name": "Occupied", "presetScenario": 1, "coolingSetpoint": 2500, "heatingSetpoint": 2600, "builtIn": true }, {"presetHandle": "hex:02", "presetScenario": 2, "coolingSetpoint": 2600, "heatingSetpoint": 2500, "builtIn": true }, {"presetHandle": "hex:03", "name": "Sleep", "presetScenario": 3, "coolingSetpoint": 2500, "heatingSetpoint": 2600, "builtIn": true },  {"presetHandle": "hex:04", "name": "Wake", "presetScenario": 4, "coolingSetpoint": 2200, "heatingSetpoint": 2900, "builtIn": false }, {"presetHandle": "hex:06", "name": "GoingToSleep", "presetScenario": 6, "coolingSetpoint": 2100, "heatingSetpoint": 2500, "builtIn": false }, {"presetHandle": "hex:06", "name": "GoingToSleep", "presetScenario": 6, "coolingSetpoint": 2100, "heatingSetpoint": 2500, "builtIn": false }]' 0x12344321 1
           On TH(chip-tool) verify that  DUT sends a success response
@@ -1988,8 +1986,8 @@ tests:
     #TODO: Add tests for the total number of Presets exceeds the NumberOfPresets supported. Also Add tests for adding presets with preset scenario not present in PresetTypes.
 
     - label:
-          "Step 13a:  Test Harness writes to the Presets attribute but calls
-          CancelPresetsSchedulesEditRequest command to cancel the edit request"
+          "Step 13a:  Test Harness calls the StartPresetsSchedulesEditRequest
+          command to edit presets"
       PICS: TSTAT.S.F08 && TSTAT.S.C07.Rsp
       verification: |
           Optional Attribute - If it is supported, then in TH log it will results in displaying the value, else it will display UNSUPPORTED_ATTRIBUTE. Below is the log of RPI the result may be vary on the basis of dut implementation.
@@ -2011,12 +2009,13 @@ tests:
               - name: "expectedValue"
                 value: "y"
 
-    - label: "Step 13b:  Test Harness writes to the Presets attribute"
+    - label: "Step 13b:  Test Harness writes to the Presets attribute but calls
+          CancelPresetsSchedulesEditRequest command to cancel the edit request"
       PICS: TSTAT.S.F08 && TSTAT.S.A0050
       verification: |
           Optional Attribute - If it is supported, then in TH log it will results in displaying the value, else it will display UNSUPPORTED_ATTRIBUTE. Below is the log of RPI the result may be vary on the basis of dut implementation.
 
-          #13b Test Harness Client attempts to write PresetTypes and gets SUCCESS
+          #13b Test Harness Client attempts to write Presets and gets SUCCESS
 
           ./chip-tool thermostat write presets '[ {"presetHandle": "hex:01", "presetScenario": 1, "coolingSetpoint": 2500, "heatingSetpoint": 2600, "builtIn": true }, {"presetHandle": "hex:02", "presetScenario": 2, "coolingSetpoint": 2600, "heatingSetpoint": 2500, "builtIn": true }, {"presetHandle": "03", "name": "Sleep", "presetScenario": 3, "coolingSetpoint": 2500, "heatingSetpoint": 2600, "builtIn": false }, {"presetHandle": "04", "name": "Wake", "presetScenario": 4, "coolingSetpoint": 2200, "heatingSetpoint": 2900, "builtIn": false }, {"presetHandle": null, "name": "Vacation", "presetScenario": 5, "coolingSetpoint": 2900, "heatingSetpoint": 2000, "builtIn": false }, {"presetHandle": "06", "name": "GoingToSleep", "presetScenario": 6, "coolingSetpoint": 3000, "heatingSetpoint": 1900, "builtIn": false }]' 0x12344321 1
           On TH(chip-tool) verify that  DUT sends a success response
@@ -2166,8 +2165,8 @@ tests:
                 value: "y"
 
     - label:
-          "Step 13d:  Test Harness reads the Presets attribute without calling
-          the CommitPresetsSchedulesRequest command"
+          "Step 13d:  Test Harness reads the Presets attribute after calling
+          the CancelPresetsSchedulesEditRequest command"
       PICS: TSTAT.S.F08 && TSTAT.S.A0050
       verification: |
           Optional Attribute - If it is supported, then in TH log it will results in displaying the value, else it will display UNSUPPORTED_ATTRIBUTE. Below is the log of RPI the result may be vary on the basis of dut implementation.
