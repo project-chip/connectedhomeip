@@ -304,6 +304,73 @@ static id _Nullable DecodeEventPayloadForAccessControlCluster(EventId aEventId, 
 
         return value;
     }
+    case Events::AccessRestrictionEntryChanged::Id: {
+        Events::AccessRestrictionEntryChanged::DecodableType cppValue;
+        *aError = DataModel::Decode(aReader, cppValue);
+        if (*aError != CHIP_NO_ERROR) {
+            return nil;
+        }
+
+        __auto_type * value = [MTRAccessControlClusterAccessRestrictionEntryChangedEvent new];
+
+        do {
+            NSNumber * _Nonnull memberValue;
+            memberValue = [NSNumber numberWithUnsignedChar:cppValue.fabricIndex];
+            value.fabricIndex = memberValue;
+        } while (0);
+
+        return value;
+    }
+    case Events::FabricRestrictionReviewUpdate::Id: {
+        Events::FabricRestrictionReviewUpdate::DecodableType cppValue;
+        *aError = DataModel::Decode(aReader, cppValue);
+        if (*aError != CHIP_NO_ERROR) {
+            return nil;
+        }
+
+        __auto_type * value = [MTRAccessControlClusterFabricRestrictionReviewUpdateEvent new];
+
+        do {
+            NSNumber * _Nonnull memberValue;
+            memberValue = [NSNumber numberWithUnsignedLongLong:cppValue.token];
+            value.token = memberValue;
+        } while (0);
+        do {
+            NSString * _Nullable memberValue;
+            if (cppValue.instruction.IsNull()) {
+                memberValue = nil;
+            } else {
+                memberValue = AsString(cppValue.instruction.Value());
+                if (memberValue == nil) {
+                    CHIP_ERROR err = CHIP_ERROR_INVALID_ARGUMENT;
+                    *aError = err;
+                    return nil;
+                }
+            }
+            value.instruction = memberValue;
+        } while (0);
+        do {
+            NSString * _Nullable memberValue;
+            if (cppValue.redirectURL.IsNull()) {
+                memberValue = nil;
+            } else {
+                memberValue = AsString(cppValue.redirectURL.Value());
+                if (memberValue == nil) {
+                    CHIP_ERROR err = CHIP_ERROR_INVALID_ARGUMENT;
+                    *aError = err;
+                    return nil;
+                }
+            }
+            value.redirectURL = memberValue;
+        } while (0);
+        do {
+            NSNumber * _Nonnull memberValue;
+            memberValue = [NSNumber numberWithUnsignedChar:cppValue.fabricIndex];
+            value.fabricIndex = memberValue;
+        } while (0);
+
+        return value;
+    }
     default: {
         break;
     }
@@ -1378,6 +1445,23 @@ static id _Nullable DecodeEventPayloadForBridgedDeviceBasicInformationCluster(Ev
             NSNumber * _Nonnull memberValue;
             memberValue = [NSNumber numberWithBool:cppValue.reachableNewValue];
             value.reachableNewValue = memberValue;
+        } while (0);
+
+        return value;
+    }
+    case Events::ActiveChanged::Id: {
+        Events::ActiveChanged::DecodableType cppValue;
+        *aError = DataModel::Decode(aReader, cppValue);
+        if (*aError != CHIP_NO_ERROR) {
+            return nil;
+        }
+
+        __auto_type * value = [MTRBridgedDeviceBasicInformationClusterActiveChangedEvent new];
+
+        do {
+            NSNumber * _Nonnull memberValue;
+            memberValue = [NSNumber numberWithUnsignedInt:cppValue.promisedActiveDuration];
+            value.promisedActiveDuration = memberValue;
         } while (0);
 
         return value;
@@ -4117,23 +4201,6 @@ static id _Nullable DecodeEventPayloadForThreadNetworkDirectoryCluster(EventId a
 {
     using namespace Clusters::ThreadNetworkDirectory;
     switch (aEventId) {
-    case Events::NetworkChanged::Id: {
-        Events::NetworkChanged::DecodableType cppValue;
-        *aError = DataModel::Decode(aReader, cppValue);
-        if (*aError != CHIP_NO_ERROR) {
-            return nil;
-        }
-
-        __auto_type * value = [MTRThreadNetworkDirectoryClusterNetworkChangedEvent new];
-
-        do {
-            NSNumber * _Nonnull memberValue;
-            memberValue = [NSNumber numberWithUnsignedLongLong:cppValue.extendedPanID];
-            value.extendedPanID = memberValue;
-        } while (0);
-
-        return value;
-    }
     default: {
         break;
     }
@@ -4449,6 +4516,18 @@ static id _Nullable DecodeEventPayloadForContentControlCluster(EventId aEventId,
 static id _Nullable DecodeEventPayloadForContentAppObserverCluster(EventId aEventId, TLV::TLVReader & aReader, CHIP_ERROR * aError)
 {
     using namespace Clusters::ContentAppObserver;
+    switch (aEventId) {
+    default: {
+        break;
+    }
+    }
+
+    *aError = CHIP_ERROR_IM_MALFORMED_EVENT_PATH_IB;
+    return nil;
+}
+static id _Nullable DecodeEventPayloadForEcosystemInformationCluster(EventId aEventId, TLV::TLVReader & aReader, CHIP_ERROR * aError)
+{
+    using namespace Clusters::EcosystemInformation;
     switch (aEventId) {
     default: {
         break;
@@ -5046,6 +5125,9 @@ id _Nullable MTRDecodeEventPayload(const ConcreteEventPath & aPath, TLV::TLVRead
     }
     case Clusters::ContentAppObserver::Id: {
         return DecodeEventPayloadForContentAppObserverCluster(aPath.mEventId, aReader, aError);
+    }
+    case Clusters::EcosystemInformation::Id: {
+        return DecodeEventPayloadForEcosystemInformationCluster(aPath.mEventId, aReader, aError);
     }
     case Clusters::CommissionerControl::Id: {
         return DecodeEventPayloadForCommissionerControlCluster(aPath.mEventId, aReader, aError);

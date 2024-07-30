@@ -48,6 +48,7 @@
         "microwave-oven-mode-cluster.xml",
         "microwave-oven-control-cluster.xml",
         "door-lock-cluster.xml",
+        "ecosystem-information-cluster.xml",
         "energy-preference-cluster.xml",
         "electrical-energy-measurement-cluster.xml",
         "electrical-measurement-cluster.xml",
@@ -278,7 +279,8 @@
             "ActiveModeThreshold",
             "RegisteredClients",
             "ICDCounter",
-            "ClientsSupportedPerFabric"
+            "ClientsSupportedPerFabric",
+            "MaximumCheckInBackOff"
         ],
         "Occupancy Sensing": ["HoldTimeLimits"],
         "Operational Credentials": [
@@ -298,6 +300,14 @@
             "nullable_struct",
             "general_error_boolean",
             "cluster_error_boolean"
+        ],
+        "Thread Border Router Management": [
+            "BorderRouterName",
+            "BorderAgentID",
+            "ThreadVersion",
+            "InterfaceEnabled",
+            "ActiveDatasetTimestamp",
+            "FeatureMap"
         ],
         "Thread Network Diagnostics": [
             "Channel",
@@ -609,7 +619,6 @@
             "FeatureMap"
         ],
         "Air Quality": ["AirQuality", "FeatureMap"],
-        "Thermostat": ["QueuedPreset"],
         "Electrical Energy Measurement": [
             "Accuracy",
             "CumulativeEnergyImported",
@@ -644,8 +653,23 @@
         "Power Topology": ["FeatureMap"],
         "Valve Configuration and Control": ["RemainingDuration"],
         "Boolean State Configuration": ["CurrentSensitivityLevel"],
+        "Water Heater Management": [
+            "HeaterTypes",
+            "HeatDemand",
+            "TankVolume",
+            "EstimatedHeatRequired",
+            "TankPercentage",
+            "BoostState",
+            "FeatureMap",
+            "ClusterRevision"
+        ],
         "Water Heater Mode": ["SupportedModes", "CurrentMode", "FeatureMap"],
-        "Wi-Fi Network Management": ["SSID"]
+        "Wi-Fi Network Management": ["SSID", "PassphraseSurrogate"],
+        "Thread Network Directory": [
+            "PreferredExtendedPanID",
+            "ThreadNetworks",
+            "ThreadNetworkTableSize"
+        ]
     },
     "defaultReportingPolicy": "mandatory",
     "ZCLDataTypes": ["ARRAY", "BITMAP", "ENUM", "NUMBER", "STRING", "STRUCT"],

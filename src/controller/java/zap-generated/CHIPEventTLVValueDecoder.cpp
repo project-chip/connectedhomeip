@@ -500,6 +500,117 @@ jobject DecodeEventValue(const app::ConcreteEventPath & aPath, TLV::TLVReader & 
 
             return value;
         }
+        case Events::AccessRestrictionEntryChanged::Id: {
+            Events::AccessRestrictionEntryChanged::DecodableType cppValue;
+            *aError = app::DataModel::Decode(aReader, cppValue);
+            if (*aError != CHIP_NO_ERROR)
+            {
+                return nullptr;
+            }
+            jobject value_fabricIndex;
+            std::string value_fabricIndexClassName     = "java/lang/Integer";
+            std::string value_fabricIndexCtorSignature = "(I)V";
+            jint jnivalue_fabricIndex                  = static_cast<jint>(cppValue.fabricIndex);
+            chip::JniReferences::GetInstance().CreateBoxedObject<jint>(value_fabricIndexClassName.c_str(),
+                                                                       value_fabricIndexCtorSignature.c_str(), jnivalue_fabricIndex,
+                                                                       value_fabricIndex);
+
+            jclass accessRestrictionEntryChangedStructClass;
+            err = chip::JniReferences::GetInstance().GetLocalClassRef(
+                env, "chip/devicecontroller/ChipEventStructs$AccessControlClusterAccessRestrictionEntryChangedEvent",
+                accessRestrictionEntryChangedStructClass);
+            if (err != CHIP_NO_ERROR)
+            {
+                ChipLogError(Zcl, "Could not find class ChipEventStructs$AccessControlClusterAccessRestrictionEntryChangedEvent");
+                return nullptr;
+            }
+
+            jmethodID accessRestrictionEntryChangedStructCtor;
+            err = chip::JniReferences::GetInstance().FindMethod(env, accessRestrictionEntryChangedStructClass, "<init>",
+                                                                "(Ljava/lang/Integer;)V", &accessRestrictionEntryChangedStructCtor);
+            if (err != CHIP_NO_ERROR || accessRestrictionEntryChangedStructCtor == nullptr)
+            {
+                ChipLogError(Zcl,
+                             "Could not find ChipEventStructs$AccessControlClusterAccessRestrictionEntryChangedEvent constructor");
+                return nullptr;
+            }
+
+            jobject value = env->NewObject(accessRestrictionEntryChangedStructClass, accessRestrictionEntryChangedStructCtor,
+                                           value_fabricIndex);
+
+            return value;
+        }
+        case Events::FabricRestrictionReviewUpdate::Id: {
+            Events::FabricRestrictionReviewUpdate::DecodableType cppValue;
+            *aError = app::DataModel::Decode(aReader, cppValue);
+            if (*aError != CHIP_NO_ERROR)
+            {
+                return nullptr;
+            }
+            jobject value_token;
+            std::string value_tokenClassName     = "java/lang/Long";
+            std::string value_tokenCtorSignature = "(J)V";
+            jlong jnivalue_token                 = static_cast<jlong>(cppValue.token);
+            chip::JniReferences::GetInstance().CreateBoxedObject<jlong>(
+                value_tokenClassName.c_str(), value_tokenCtorSignature.c_str(), jnivalue_token, value_token);
+
+            jobject value_instruction;
+            if (cppValue.instruction.IsNull())
+            {
+                value_instruction = nullptr;
+            }
+            else
+            {
+                LogErrorOnFailure(
+                    chip::JniReferences::GetInstance().CharToStringUTF(cppValue.instruction.Value(), value_instruction));
+            }
+
+            jobject value_redirectURL;
+            if (cppValue.redirectURL.IsNull())
+            {
+                value_redirectURL = nullptr;
+            }
+            else
+            {
+                LogErrorOnFailure(
+                    chip::JniReferences::GetInstance().CharToStringUTF(cppValue.redirectURL.Value(), value_redirectURL));
+            }
+
+            jobject value_fabricIndex;
+            std::string value_fabricIndexClassName     = "java/lang/Integer";
+            std::string value_fabricIndexCtorSignature = "(I)V";
+            jint jnivalue_fabricIndex                  = static_cast<jint>(cppValue.fabricIndex);
+            chip::JniReferences::GetInstance().CreateBoxedObject<jint>(value_fabricIndexClassName.c_str(),
+                                                                       value_fabricIndexCtorSignature.c_str(), jnivalue_fabricIndex,
+                                                                       value_fabricIndex);
+
+            jclass fabricRestrictionReviewUpdateStructClass;
+            err = chip::JniReferences::GetInstance().GetLocalClassRef(
+                env, "chip/devicecontroller/ChipEventStructs$AccessControlClusterFabricRestrictionReviewUpdateEvent",
+                fabricRestrictionReviewUpdateStructClass);
+            if (err != CHIP_NO_ERROR)
+            {
+                ChipLogError(Zcl, "Could not find class ChipEventStructs$AccessControlClusterFabricRestrictionReviewUpdateEvent");
+                return nullptr;
+            }
+
+            jmethodID fabricRestrictionReviewUpdateStructCtor;
+            err = chip::JniReferences::GetInstance().FindMethod(
+                env, fabricRestrictionReviewUpdateStructClass, "<init>",
+                "(Ljava/lang/Long;Ljava/lang/String;Ljava/lang/String;Ljava/lang/Integer;)V",
+                &fabricRestrictionReviewUpdateStructCtor);
+            if (err != CHIP_NO_ERROR || fabricRestrictionReviewUpdateStructCtor == nullptr)
+            {
+                ChipLogError(Zcl,
+                             "Could not find ChipEventStructs$AccessControlClusterFabricRestrictionReviewUpdateEvent constructor");
+                return nullptr;
+            }
+
+            jobject value = env->NewObject(fabricRestrictionReviewUpdateStructClass, fabricRestrictionReviewUpdateStructCtor,
+                                           value_token, value_instruction, value_redirectURL, value_fabricIndex);
+
+            return value;
+        }
         default:
             *aError = CHIP_ERROR_IM_MALFORMED_EVENT_PATH_IB;
             break;
@@ -2156,6 +2267,45 @@ jobject DecodeEventValue(const app::ConcreteEventPath & aPath, TLV::TLVReader & 
             }
 
             jobject value = env->NewObject(reachableChangedStructClass, reachableChangedStructCtor, value_reachableNewValue);
+
+            return value;
+        }
+        case Events::ActiveChanged::Id: {
+            Events::ActiveChanged::DecodableType cppValue;
+            *aError = app::DataModel::Decode(aReader, cppValue);
+            if (*aError != CHIP_NO_ERROR)
+            {
+                return nullptr;
+            }
+            jobject value_promisedActiveDuration;
+            std::string value_promisedActiveDurationClassName     = "java/lang/Long";
+            std::string value_promisedActiveDurationCtorSignature = "(J)V";
+            jlong jnivalue_promisedActiveDuration                 = static_cast<jlong>(cppValue.promisedActiveDuration);
+            chip::JniReferences::GetInstance().CreateBoxedObject<jlong>(
+                value_promisedActiveDurationClassName.c_str(), value_promisedActiveDurationCtorSignature.c_str(),
+                jnivalue_promisedActiveDuration, value_promisedActiveDuration);
+
+            jclass activeChangedStructClass;
+            err = chip::JniReferences::GetInstance().GetLocalClassRef(
+                env, "chip/devicecontroller/ChipEventStructs$BridgedDeviceBasicInformationClusterActiveChangedEvent",
+                activeChangedStructClass);
+            if (err != CHIP_NO_ERROR)
+            {
+                ChipLogError(Zcl, "Could not find class ChipEventStructs$BridgedDeviceBasicInformationClusterActiveChangedEvent");
+                return nullptr;
+            }
+
+            jmethodID activeChangedStructCtor;
+            err = chip::JniReferences::GetInstance().FindMethod(env, activeChangedStructClass, "<init>", "(Ljava/lang/Long;)V",
+                                                                &activeChangedStructCtor);
+            if (err != CHIP_NO_ERROR || activeChangedStructCtor == nullptr)
+            {
+                ChipLogError(Zcl,
+                             "Could not find ChipEventStructs$BridgedDeviceBasicInformationClusterActiveChangedEvent constructor");
+                return nullptr;
+            }
+
+            jobject value = env->NewObject(activeChangedStructClass, activeChangedStructCtor, value_promisedActiveDuration);
 
             return value;
         }
@@ -7481,44 +7631,6 @@ jobject DecodeEventValue(const app::ConcreteEventPath & aPath, TLV::TLVReader & 
         using namespace app::Clusters::ThreadNetworkDirectory;
         switch (aPath.mEventId)
         {
-        case Events::NetworkChanged::Id: {
-            Events::NetworkChanged::DecodableType cppValue;
-            *aError = app::DataModel::Decode(aReader, cppValue);
-            if (*aError != CHIP_NO_ERROR)
-            {
-                return nullptr;
-            }
-            jobject value_extendedPanID;
-            std::string value_extendedPanIDClassName     = "java/lang/Long";
-            std::string value_extendedPanIDCtorSignature = "(J)V";
-            jlong jnivalue_extendedPanID                 = static_cast<jlong>(cppValue.extendedPanID);
-            chip::JniReferences::GetInstance().CreateBoxedObject<jlong>(value_extendedPanIDClassName.c_str(),
-                                                                        value_extendedPanIDCtorSignature.c_str(),
-                                                                        jnivalue_extendedPanID, value_extendedPanID);
-
-            jclass networkChangedStructClass;
-            err = chip::JniReferences::GetInstance().GetLocalClassRef(
-                env, "chip/devicecontroller/ChipEventStructs$ThreadNetworkDirectoryClusterNetworkChangedEvent",
-                networkChangedStructClass);
-            if (err != CHIP_NO_ERROR)
-            {
-                ChipLogError(Zcl, "Could not find class ChipEventStructs$ThreadNetworkDirectoryClusterNetworkChangedEvent");
-                return nullptr;
-            }
-
-            jmethodID networkChangedStructCtor;
-            err = chip::JniReferences::GetInstance().FindMethod(env, networkChangedStructClass, "<init>", "(Ljava/lang/Long;)V",
-                                                                &networkChangedStructCtor);
-            if (err != CHIP_NO_ERROR || networkChangedStructCtor == nullptr)
-            {
-                ChipLogError(Zcl, "Could not find ChipEventStructs$ThreadNetworkDirectoryClusterNetworkChangedEvent constructor");
-                return nullptr;
-            }
-
-            jobject value = env->NewObject(networkChangedStructClass, networkChangedStructCtor, value_extendedPanID);
-
-            return value;
-        }
         default:
             *aError = CHIP_ERROR_IM_MALFORMED_EVENT_PATH_IB;
             break;
@@ -7970,6 +8082,16 @@ jobject DecodeEventValue(const app::ConcreteEventPath & aPath, TLV::TLVReader & 
     }
     case app::Clusters::ContentAppObserver::Id: {
         using namespace app::Clusters::ContentAppObserver;
+        switch (aPath.mEventId)
+        {
+        default:
+            *aError = CHIP_ERROR_IM_MALFORMED_EVENT_PATH_IB;
+            break;
+        }
+        break;
+    }
+    case app::Clusters::EcosystemInformation::Id: {
+        using namespace app::Clusters::EcosystemInformation;
         switch (aPath.mEventId)
         {
         default:

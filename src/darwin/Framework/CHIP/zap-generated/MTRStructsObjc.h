@@ -19,6 +19,13 @@
 
 NS_ASSUME_NONNULL_BEGIN
 
+MTR_PROVISIONALLY_AVAILABLE
+@interface MTRDataTypeTestGlobalStruct : NSObject <NSCopying>
+@property (nonatomic, copy) NSString * _Nonnull name MTR_PROVISIONALLY_AVAILABLE;
+@property (nonatomic, copy) NSNumber * _Nullable myBitmap MTR_PROVISIONALLY_AVAILABLE;
+@property (nonatomic, copy) NSNumber * _Nullable myEnum MTR_PROVISIONALLY_AVAILABLE;
+@end
+
 MTR_AVAILABLE(ios(16.2), macos(13.1), watchos(9.2), tvos(16.2))
 @interface MTRDescriptorClusterDeviceTypeStruct : NSObject <NSCopying>
 @property (nonatomic, copy) NSNumber * _Nonnull deviceType MTR_AVAILABLE(ios(16.4), macos(13.3), watchos(9.4), tvos(16.4));
@@ -46,6 +53,27 @@ MTR_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
 @property (nonatomic, copy) NSNumber * _Nullable endpoint MTR_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1));
 @property (nonatomic, copy) NSNumber * _Nullable cluster MTR_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1));
 @property (nonatomic, copy) NSNumber * _Nonnull fabricIndex MTR_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1));
+@end
+
+MTR_PROVISIONALLY_AVAILABLE
+@interface MTRAccessControlClusterAccessRestrictionStruct : NSObject <NSCopying>
+@property (nonatomic, copy) NSNumber * _Nonnull type MTR_PROVISIONALLY_AVAILABLE;
+@property (nonatomic, copy) NSNumber * _Nullable id MTR_PROVISIONALLY_AVAILABLE;
+@end
+
+MTR_PROVISIONALLY_AVAILABLE
+@interface MTRAccessControlClusterCommissioningAccessRestrictionEntryStruct : NSObject <NSCopying>
+@property (nonatomic, copy) NSNumber * _Nonnull endpoint MTR_PROVISIONALLY_AVAILABLE;
+@property (nonatomic, copy) NSNumber * _Nonnull cluster MTR_PROVISIONALLY_AVAILABLE;
+@property (nonatomic, copy) NSArray * _Nonnull restrictions MTR_PROVISIONALLY_AVAILABLE;
+@end
+
+MTR_PROVISIONALLY_AVAILABLE
+@interface MTRAccessControlClusterAccessRestrictionEntryStruct : NSObject <NSCopying>
+@property (nonatomic, copy) NSNumber * _Nonnull endpoint MTR_PROVISIONALLY_AVAILABLE;
+@property (nonatomic, copy) NSNumber * _Nonnull cluster MTR_PROVISIONALLY_AVAILABLE;
+@property (nonatomic, copy) NSArray * _Nonnull restrictions MTR_PROVISIONALLY_AVAILABLE;
+@property (nonatomic, copy) NSNumber * _Nonnull fabricIndex MTR_PROVISIONALLY_AVAILABLE;
 @end
 
 MTR_AVAILABLE(ios(17.0), macos(14.0), watchos(10.0), tvos(17.0))
@@ -108,6 +136,19 @@ MTR_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
 @property (nonatomic, copy) NSNumber * _Nonnull changeType MTR_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1));
 @property (nonatomic, copy) MTRAccessControlClusterAccessControlExtensionStruct * _Nullable latestValue MTR_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1));
 @property (nonatomic, copy) NSNumber * _Nonnull fabricIndex MTR_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1));
+@end
+
+MTR_PROVISIONALLY_AVAILABLE
+@interface MTRAccessControlClusterAccessRestrictionEntryChangedEvent : NSObject <NSCopying>
+@property (nonatomic, copy) NSNumber * _Nonnull fabricIndex MTR_PROVISIONALLY_AVAILABLE;
+@end
+
+MTR_PROVISIONALLY_AVAILABLE
+@interface MTRAccessControlClusterFabricRestrictionReviewUpdateEvent : NSObject <NSCopying>
+@property (nonatomic, copy) NSNumber * _Nonnull token MTR_PROVISIONALLY_AVAILABLE;
+@property (nonatomic, copy) NSString * _Nullable instruction MTR_PROVISIONALLY_AVAILABLE;
+@property (nonatomic, copy) NSString * _Nullable redirectURL MTR_PROVISIONALLY_AVAILABLE;
+@property (nonatomic, copy) NSNumber * _Nonnull fabricIndex MTR_PROVISIONALLY_AVAILABLE;
 @end
 
 MTR_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
@@ -647,6 +688,11 @@ MTR_AVAILABLE(ios(16.4), macos(13.3), watchos(9.4), tvos(16.4))
 MTR_DEPRECATED("Please use MTRBridgedDeviceBasicInformationClusterReachableChangedEvent", ios(16.1, 17.0), macos(13.0, 14.0), watchos(9.1, 10.0), tvos(16.1, 17.0))
 @interface MTRBridgedDeviceBasicClusterReachableChangedEvent : MTRBridgedDeviceBasicInformationClusterReachableChangedEvent
 @property (nonatomic, copy) NSNumber * _Nonnull reachableNewValue MTR_DEPRECATED("Please use MTRBridgedDeviceBasicInformationClusterReachableChangedEvent", ios(16.1, 17.0), macos(13.0, 14.0), watchos(9.1, 10.0), tvos(16.1, 17.0));
+@end
+
+MTR_PROVISIONALLY_AVAILABLE
+@interface MTRBridgedDeviceBasicInformationClusterActiveChangedEvent : NSObject <NSCopying>
+@property (nonatomic, copy) NSNumber * _Nonnull promisedActiveDuration MTR_PROVISIONALLY_AVAILABLE;
 @end
 
 MTR_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
@@ -1535,7 +1581,7 @@ MTR_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
 @end
 
 MTR_PROVISIONALLY_AVAILABLE
-@interface MTRServiceAreaClusterHomeLocationStruct : NSObject <NSCopying>
+@interface MTRServiceAreaClusterLocationDescriptorStruct : NSObject <NSCopying>
 @property (nonatomic, copy) NSString * _Nonnull locationName MTR_PROVISIONALLY_AVAILABLE;
 @property (nonatomic, copy) NSNumber * _Nullable floorNumber MTR_PROVISIONALLY_AVAILABLE;
 @property (nonatomic, copy) NSNumber * _Nullable areaType MTR_PROVISIONALLY_AVAILABLE;
@@ -1543,7 +1589,7 @@ MTR_PROVISIONALLY_AVAILABLE
 
 MTR_PROVISIONALLY_AVAILABLE
 @interface MTRServiceAreaClusterLocationInfoStruct : NSObject <NSCopying>
-@property (nonatomic, copy) MTRServiceAreaClusterHomeLocationStruct * _Nullable locationInfo MTR_PROVISIONALLY_AVAILABLE;
+@property (nonatomic, copy) MTRServiceAreaClusterLocationDescriptorStruct * _Nullable locationInfo MTR_PROVISIONALLY_AVAILABLE;
 @property (nonatomic, copy) NSNumber * _Nullable landmarkTag MTR_PROVISIONALLY_AVAILABLE;
 @property (nonatomic, copy) NSNumber * _Nullable positionTag MTR_PROVISIONALLY_AVAILABLE;
 @property (nonatomic, copy) NSNumber * _Nullable surfaceTag MTR_PROVISIONALLY_AVAILABLE;
@@ -1676,12 +1722,6 @@ MTR_PROVISIONALLY_AVAILABLE
 @end
 
 MTR_PROVISIONALLY_AVAILABLE
-@interface MTRThermostatClusterQueuedPresetStruct : NSObject <NSCopying>
-@property (nonatomic, copy) NSData * _Nullable presetHandle MTR_PROVISIONALLY_AVAILABLE;
-@property (nonatomic, copy) NSNumber * _Nullable transitionTimestamp MTR_PROVISIONALLY_AVAILABLE;
-@end
-
-MTR_PROVISIONALLY_AVAILABLE
 @interface MTRThermostatClusterScheduleTypeStruct : NSObject <NSCopying>
 @property (nonatomic, copy) NSNumber * _Nonnull systemMode MTR_PROVISIONALLY_AVAILABLE;
 @property (nonatomic, copy) NSNumber * _Nonnull numberOfSchedules MTR_PROVISIONALLY_AVAILABLE;
@@ -1711,14 +1751,10 @@ MTR_PROVISIONALLY_AVAILABLE
 
 MTR_PROVISIONALLY_AVAILABLE
 @interface MTRThreadNetworkDirectoryClusterThreadNetworkStruct : NSObject <NSCopying>
-@property (nonatomic, copy) NSNumber * _Nonnull extendedPanID MTR_PROVISIONALLY_AVAILABLE;
+@property (nonatomic, copy) NSData * _Nonnull extendedPanID MTR_PROVISIONALLY_AVAILABLE;
 @property (nonatomic, copy) NSString * _Nonnull networkName MTR_PROVISIONALLY_AVAILABLE;
 @property (nonatomic, copy) NSNumber * _Nonnull channel MTR_PROVISIONALLY_AVAILABLE;
-@end
-
-MTR_PROVISIONALLY_AVAILABLE
-@interface MTRThreadNetworkDirectoryClusterNetworkChangedEvent : NSObject <NSCopying>
-@property (nonatomic, copy) NSNumber * _Nonnull extendedPanID MTR_PROVISIONALLY_AVAILABLE;
+@property (nonatomic, copy) NSNumber * _Nonnull activeTimestamp MTR_PROVISIONALLY_AVAILABLE;
 @end
 
 MTR_PROVISIONALLY_AVAILABLE
@@ -2050,6 +2086,39 @@ MTR_PROVISIONALLY_AVAILABLE
 
 MTR_PROVISIONALLY_AVAILABLE
 @interface MTRContentControlClusterRemainingScreenTimeExpiredEvent : NSObject <NSCopying>
+@end
+
+MTR_PROVISIONALLY_AVAILABLE
+@interface MTREcosystemInformationClusterLocationDescriptorStruct : NSObject <NSCopying>
+@property (nonatomic, copy) NSString * _Nonnull locationName MTR_PROVISIONALLY_AVAILABLE;
+@property (nonatomic, copy) NSNumber * _Nullable floorNumber MTR_PROVISIONALLY_AVAILABLE;
+@property (nonatomic, copy) NSNumber * _Nullable areaType MTR_PROVISIONALLY_AVAILABLE;
+@end
+
+MTR_PROVISIONALLY_AVAILABLE
+@interface MTREcosystemInformationClusterEcosystemLocationStruct : NSObject <NSCopying>
+@property (nonatomic, copy) NSString * _Nonnull uniqueLocationID MTR_PROVISIONALLY_AVAILABLE;
+@property (nonatomic, copy) MTREcosystemInformationClusterLocationDescriptorStruct * _Nonnull locationDescriptor MTR_PROVISIONALLY_AVAILABLE;
+@property (nonatomic, copy) NSNumber * _Nonnull locationDescriptorLastEdit MTR_PROVISIONALLY_AVAILABLE;
+@property (nonatomic, copy) NSNumber * _Nonnull fabricIndex MTR_PROVISIONALLY_AVAILABLE;
+@end
+
+MTR_PROVISIONALLY_AVAILABLE
+@interface MTREcosystemInformationClusterDeviceTypeStruct : NSObject <NSCopying>
+@property (nonatomic, copy) NSNumber * _Nonnull deviceType MTR_PROVISIONALLY_AVAILABLE;
+@property (nonatomic, copy) NSNumber * _Nonnull revision MTR_PROVISIONALLY_AVAILABLE;
+@end
+
+MTR_PROVISIONALLY_AVAILABLE
+@interface MTREcosystemInformationClusterEcosystemDeviceStruct : NSObject <NSCopying>
+@property (nonatomic, copy) NSString * _Nullable deviceName MTR_PROVISIONALLY_AVAILABLE;
+@property (nonatomic, copy) NSNumber * _Nullable deviceNameLastEdit MTR_PROVISIONALLY_AVAILABLE;
+@property (nonatomic, copy) NSNumber * _Nonnull bridgedEndpoint MTR_PROVISIONALLY_AVAILABLE;
+@property (nonatomic, copy) NSNumber * _Nonnull originalEndpoint MTR_PROVISIONALLY_AVAILABLE;
+@property (nonatomic, copy) NSArray * _Nonnull deviceTypes MTR_PROVISIONALLY_AVAILABLE;
+@property (nonatomic, copy) NSArray * _Nonnull uniqueLocationIDs MTR_PROVISIONALLY_AVAILABLE;
+@property (nonatomic, copy) NSNumber * _Nonnull uniqueLocationIDsLastEdit MTR_PROVISIONALLY_AVAILABLE;
+@property (nonatomic, copy) NSNumber * _Nonnull fabricIndex MTR_PROVISIONALLY_AVAILABLE;
 @end
 
 MTR_PROVISIONALLY_AVAILABLE
