@@ -3436,6 +3436,7 @@ public:
     BridgedDeviceBasicInformationKeepActive(CredentialIssuerCommands * credsIssuerConfig) :
         ClusterCommand("keep-active", credsIssuerConfig)
     {
+        AddArgument("StayActiveDuration", 0, UINT32_MAX, &mRequest.stayActiveDuration);
         ClusterCommand::AddArguments();
     }
 
