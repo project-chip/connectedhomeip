@@ -5050,6 +5050,193 @@ jobject DecodeEventValue(const app::ConcreteEventPath & aPath, TLV::TLVReader & 
         using namespace app::Clusters::WaterHeaterManagement;
         switch (aPath.mEventId)
         {
+        case Events::BoostStarted::Id: {
+            Events::BoostStarted::DecodableType cppValue;
+            *aError = app::DataModel::Decode(aReader, cppValue);
+            if (*aError != CHIP_NO_ERROR)
+            {
+                return nullptr;
+            }
+            jobject value_boostInfo;
+            jobject value_boostInfo_duration;
+            std::string value_boostInfo_durationClassName     = "java/lang/Long";
+            std::string value_boostInfo_durationCtorSignature = "(J)V";
+            jlong jnivalue_boostInfo_duration                 = static_cast<jlong>(cppValue.boostInfo.duration);
+            chip::JniReferences::GetInstance().CreateBoxedObject<jlong>(value_boostInfo_durationClassName.c_str(),
+                                                                        value_boostInfo_durationCtorSignature.c_str(),
+                                                                        jnivalue_boostInfo_duration, value_boostInfo_duration);
+            jobject value_boostInfo_oneShot;
+            if (!cppValue.boostInfo.oneShot.HasValue())
+            {
+                chip::JniReferences::GetInstance().CreateOptional(nullptr, value_boostInfo_oneShot);
+            }
+            else
+            {
+                jobject value_boostInfo_oneShotInsideOptional;
+                std::string value_boostInfo_oneShotInsideOptionalClassName     = "java/lang/Boolean";
+                std::string value_boostInfo_oneShotInsideOptionalCtorSignature = "(Z)V";
+                jboolean jnivalue_boostInfo_oneShotInsideOptional = static_cast<jboolean>(cppValue.boostInfo.oneShot.Value());
+                chip::JniReferences::GetInstance().CreateBoxedObject<jboolean>(
+                    value_boostInfo_oneShotInsideOptionalClassName.c_str(),
+                    value_boostInfo_oneShotInsideOptionalCtorSignature.c_str(), jnivalue_boostInfo_oneShotInsideOptional,
+                    value_boostInfo_oneShotInsideOptional);
+                chip::JniReferences::GetInstance().CreateOptional(value_boostInfo_oneShotInsideOptional, value_boostInfo_oneShot);
+            }
+            jobject value_boostInfo_emergencyBoost;
+            if (!cppValue.boostInfo.emergencyBoost.HasValue())
+            {
+                chip::JniReferences::GetInstance().CreateOptional(nullptr, value_boostInfo_emergencyBoost);
+            }
+            else
+            {
+                jobject value_boostInfo_emergencyBoostInsideOptional;
+                std::string value_boostInfo_emergencyBoostInsideOptionalClassName     = "java/lang/Boolean";
+                std::string value_boostInfo_emergencyBoostInsideOptionalCtorSignature = "(Z)V";
+                jboolean jnivalue_boostInfo_emergencyBoostInsideOptional =
+                    static_cast<jboolean>(cppValue.boostInfo.emergencyBoost.Value());
+                chip::JniReferences::GetInstance().CreateBoxedObject<jboolean>(
+                    value_boostInfo_emergencyBoostInsideOptionalClassName.c_str(),
+                    value_boostInfo_emergencyBoostInsideOptionalCtorSignature.c_str(),
+                    jnivalue_boostInfo_emergencyBoostInsideOptional, value_boostInfo_emergencyBoostInsideOptional);
+                chip::JniReferences::GetInstance().CreateOptional(value_boostInfo_emergencyBoostInsideOptional,
+                                                                  value_boostInfo_emergencyBoost);
+            }
+            jobject value_boostInfo_temporarySetpoint;
+            if (!cppValue.boostInfo.temporarySetpoint.HasValue())
+            {
+                chip::JniReferences::GetInstance().CreateOptional(nullptr, value_boostInfo_temporarySetpoint);
+            }
+            else
+            {
+                jobject value_boostInfo_temporarySetpointInsideOptional;
+                std::string value_boostInfo_temporarySetpointInsideOptionalClassName     = "java/lang/Integer";
+                std::string value_boostInfo_temporarySetpointInsideOptionalCtorSignature = "(I)V";
+                jint jnivalue_boostInfo_temporarySetpointInsideOptional =
+                    static_cast<jint>(cppValue.boostInfo.temporarySetpoint.Value());
+                chip::JniReferences::GetInstance().CreateBoxedObject<jint>(
+                    value_boostInfo_temporarySetpointInsideOptionalClassName.c_str(),
+                    value_boostInfo_temporarySetpointInsideOptionalCtorSignature.c_str(),
+                    jnivalue_boostInfo_temporarySetpointInsideOptional, value_boostInfo_temporarySetpointInsideOptional);
+                chip::JniReferences::GetInstance().CreateOptional(value_boostInfo_temporarySetpointInsideOptional,
+                                                                  value_boostInfo_temporarySetpoint);
+            }
+            jobject value_boostInfo_targetPercentage;
+            if (!cppValue.boostInfo.targetPercentage.HasValue())
+            {
+                chip::JniReferences::GetInstance().CreateOptional(nullptr, value_boostInfo_targetPercentage);
+            }
+            else
+            {
+                jobject value_boostInfo_targetPercentageInsideOptional;
+                std::string value_boostInfo_targetPercentageInsideOptionalClassName     = "java/lang/Integer";
+                std::string value_boostInfo_targetPercentageInsideOptionalCtorSignature = "(I)V";
+                jint jnivalue_boostInfo_targetPercentageInsideOptional =
+                    static_cast<jint>(cppValue.boostInfo.targetPercentage.Value());
+                chip::JniReferences::GetInstance().CreateBoxedObject<jint>(
+                    value_boostInfo_targetPercentageInsideOptionalClassName.c_str(),
+                    value_boostInfo_targetPercentageInsideOptionalCtorSignature.c_str(),
+                    jnivalue_boostInfo_targetPercentageInsideOptional, value_boostInfo_targetPercentageInsideOptional);
+                chip::JniReferences::GetInstance().CreateOptional(value_boostInfo_targetPercentageInsideOptional,
+                                                                  value_boostInfo_targetPercentage);
+            }
+            jobject value_boostInfo_targetReheat;
+            if (!cppValue.boostInfo.targetReheat.HasValue())
+            {
+                chip::JniReferences::GetInstance().CreateOptional(nullptr, value_boostInfo_targetReheat);
+            }
+            else
+            {
+                jobject value_boostInfo_targetReheatInsideOptional;
+                std::string value_boostInfo_targetReheatInsideOptionalClassName     = "java/lang/Integer";
+                std::string value_boostInfo_targetReheatInsideOptionalCtorSignature = "(I)V";
+                jint jnivalue_boostInfo_targetReheatInsideOptional = static_cast<jint>(cppValue.boostInfo.targetReheat.Value());
+                chip::JniReferences::GetInstance().CreateBoxedObject<jint>(
+                    value_boostInfo_targetReheatInsideOptionalClassName.c_str(),
+                    value_boostInfo_targetReheatInsideOptionalCtorSignature.c_str(), jnivalue_boostInfo_targetReheatInsideOptional,
+                    value_boostInfo_targetReheatInsideOptional);
+                chip::JniReferences::GetInstance().CreateOptional(value_boostInfo_targetReheatInsideOptional,
+                                                                  value_boostInfo_targetReheat);
+            }
+
+            jclass waterHeaterBoostInfoStructStructClass_0;
+            err = chip::JniReferences::GetInstance().GetLocalClassRef(
+                env, "chip/devicecontroller/ChipStructs$WaterHeaterManagementClusterWaterHeaterBoostInfoStruct",
+                waterHeaterBoostInfoStructStructClass_0);
+            if (err != CHIP_NO_ERROR)
+            {
+                ChipLogError(Zcl, "Could not find class ChipStructs$WaterHeaterManagementClusterWaterHeaterBoostInfoStruct");
+                return nullptr;
+            }
+
+            jmethodID waterHeaterBoostInfoStructStructCtor_0;
+            err = chip::JniReferences::GetInstance().FindMethod(env, waterHeaterBoostInfoStructStructClass_0, "<init>",
+                                                                "(Ljava/lang/Long;Ljava/util/Optional;Ljava/util/Optional;Ljava/"
+                                                                "util/Optional;Ljava/util/Optional;Ljava/util/Optional;)V",
+                                                                &waterHeaterBoostInfoStructStructCtor_0);
+            if (err != CHIP_NO_ERROR || waterHeaterBoostInfoStructStructCtor_0 == nullptr)
+            {
+                ChipLogError(Zcl, "Could not find ChipStructs$WaterHeaterManagementClusterWaterHeaterBoostInfoStruct constructor");
+                return nullptr;
+            }
+
+            value_boostInfo =
+                env->NewObject(waterHeaterBoostInfoStructStructClass_0, waterHeaterBoostInfoStructStructCtor_0,
+                               value_boostInfo_duration, value_boostInfo_oneShot, value_boostInfo_emergencyBoost,
+                               value_boostInfo_temporarySetpoint, value_boostInfo_targetPercentage, value_boostInfo_targetReheat);
+
+            jclass boostStartedStructClass;
+            err = chip::JniReferences::GetInstance().GetLocalClassRef(
+                env, "chip/devicecontroller/ChipEventStructs$WaterHeaterManagementClusterBoostStartedEvent",
+                boostStartedStructClass);
+            if (err != CHIP_NO_ERROR)
+            {
+                ChipLogError(Zcl, "Could not find class ChipEventStructs$WaterHeaterManagementClusterBoostStartedEvent");
+                return nullptr;
+            }
+
+            jmethodID boostStartedStructCtor;
+            err = chip::JniReferences::GetInstance().FindMethod(
+                env, boostStartedStructClass, "<init>",
+                "(Lchip/devicecontroller/ChipStructs$WaterHeaterManagementClusterWaterHeaterBoostInfoStruct;)V",
+                &boostStartedStructCtor);
+            if (err != CHIP_NO_ERROR || boostStartedStructCtor == nullptr)
+            {
+                ChipLogError(Zcl, "Could not find ChipEventStructs$WaterHeaterManagementClusterBoostStartedEvent constructor");
+                return nullptr;
+            }
+
+            jobject value = env->NewObject(boostStartedStructClass, boostStartedStructCtor, value_boostInfo);
+
+            return value;
+        }
+        case Events::BoostEnded::Id: {
+            Events::BoostEnded::DecodableType cppValue;
+            *aError = app::DataModel::Decode(aReader, cppValue);
+            if (*aError != CHIP_NO_ERROR)
+            {
+                return nullptr;
+            }
+            jclass boostEndedStructClass;
+            err = chip::JniReferences::GetInstance().GetLocalClassRef(
+                env, "chip/devicecontroller/ChipEventStructs$WaterHeaterManagementClusterBoostEndedEvent", boostEndedStructClass);
+            if (err != CHIP_NO_ERROR)
+            {
+                ChipLogError(Zcl, "Could not find class ChipEventStructs$WaterHeaterManagementClusterBoostEndedEvent");
+                return nullptr;
+            }
+
+            jmethodID boostEndedStructCtor;
+            err = chip::JniReferences::GetInstance().FindMethod(env, boostEndedStructClass, "<init>", "()V", &boostEndedStructCtor);
+            if (err != CHIP_NO_ERROR || boostEndedStructCtor == nullptr)
+            {
+                ChipLogError(Zcl, "Could not find ChipEventStructs$WaterHeaterManagementClusterBoostEndedEvent constructor");
+                return nullptr;
+            }
+
+            jobject value = env->NewObject(boostEndedStructClass, boostEndedStructCtor);
+
+            return value;
+        }
         default:
             *aError = CHIP_ERROR_IM_MALFORMED_EVENT_PATH_IB;
             break;

@@ -9415,7 +9415,9 @@ public class ClusterIDMapping {
             }
         }
 
-        public enum Event {;
+        public enum Event {
+            BoostStarted(0L),
+            BoostEnded(1L),;
             private final long id;
             Event(long id) {
                 this.id = id;
@@ -9455,7 +9457,7 @@ public class ClusterIDMapping {
                 }
                 throw new NoSuchFieldError();
             }
-        }public enum BoostCommandField {Duration(0),OneShot(1),EmergencyBoost(2),TemporarySetpoint(3),TargetPercentage(4),TargetReheat(5),;
+        }public enum BoostCommandField {BoostInfo(0),;
                     private final int id;
                     BoostCommandField(int id) {
                         this.id = id;

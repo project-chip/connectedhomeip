@@ -30541,37 +30541,17 @@ public class ChipClusters {
       return 0L;
     }
 
-    public void boost(DefaultClusterCallback callback, Long duration, Optional<Boolean> oneShot, Optional<Boolean> emergencyBoost, Optional<Integer> temporarySetpoint, Optional<Integer> targetPercentage, Optional<Integer> targetReheat) {
-      boost(callback, duration, oneShot, emergencyBoost, temporarySetpoint, targetPercentage, targetReheat, 0);
+    public void boost(DefaultClusterCallback callback, ChipStructs.WaterHeaterManagementClusterWaterHeaterBoostInfoStruct boostInfo) {
+      boost(callback, boostInfo, 0);
     }
 
-    public void boost(DefaultClusterCallback callback, Long duration, Optional<Boolean> oneShot, Optional<Boolean> emergencyBoost, Optional<Integer> temporarySetpoint, Optional<Integer> targetPercentage, Optional<Integer> targetReheat, int timedInvokeTimeoutMs) {
+    public void boost(DefaultClusterCallback callback, ChipStructs.WaterHeaterManagementClusterWaterHeaterBoostInfoStruct boostInfo, int timedInvokeTimeoutMs) {
       final long commandId = 0L;
 
       ArrayList<StructElement> elements = new ArrayList<>();
-      final long durationFieldID = 0L;
-      BaseTLVType durationtlvValue = new UIntType(duration);
-      elements.add(new StructElement(durationFieldID, durationtlvValue));
-
-      final long oneShotFieldID = 1L;
-      BaseTLVType oneShottlvValue = oneShot.<BaseTLVType>map((nonOptionaloneShot) -> new BooleanType(nonOptionaloneShot)).orElse(new EmptyType());
-      elements.add(new StructElement(oneShotFieldID, oneShottlvValue));
-
-      final long emergencyBoostFieldID = 2L;
-      BaseTLVType emergencyBoosttlvValue = emergencyBoost.<BaseTLVType>map((nonOptionalemergencyBoost) -> new BooleanType(nonOptionalemergencyBoost)).orElse(new EmptyType());
-      elements.add(new StructElement(emergencyBoostFieldID, emergencyBoosttlvValue));
-
-      final long temporarySetpointFieldID = 3L;
-      BaseTLVType temporarySetpointtlvValue = temporarySetpoint.<BaseTLVType>map((nonOptionaltemporarySetpoint) -> new IntType(nonOptionaltemporarySetpoint)).orElse(new EmptyType());
-      elements.add(new StructElement(temporarySetpointFieldID, temporarySetpointtlvValue));
-
-      final long targetPercentageFieldID = 4L;
-      BaseTLVType targetPercentagetlvValue = targetPercentage.<BaseTLVType>map((nonOptionaltargetPercentage) -> new UIntType(nonOptionaltargetPercentage)).orElse(new EmptyType());
-      elements.add(new StructElement(targetPercentageFieldID, targetPercentagetlvValue));
-
-      final long targetReheatFieldID = 5L;
-      BaseTLVType targetReheattlvValue = targetReheat.<BaseTLVType>map((nonOptionaltargetReheat) -> new UIntType(nonOptionaltargetReheat)).orElse(new EmptyType());
-      elements.add(new StructElement(targetReheatFieldID, targetReheattlvValue));
+      final long boostInfoFieldID = 0L;
+      BaseTLVType boostInfotlvValue = boostInfo.encodeTlv();
+      elements.add(new StructElement(boostInfoFieldID, boostInfotlvValue));
 
       StructType commandArgs = new StructType(elements);
       invoke(new InvokeCallbackImpl(callback) {

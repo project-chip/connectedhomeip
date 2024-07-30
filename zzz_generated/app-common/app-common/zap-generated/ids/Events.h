@@ -443,6 +443,20 @@ static constexpr EventId Id = 0x00000001;
 } // namespace Events
 } // namespace ElectricalEnergyMeasurement
 
+namespace WaterHeaterManagement {
+namespace Events {
+
+namespace BoostStarted {
+static constexpr EventId Id = 0x00000000;
+} // namespace BoostStarted
+
+namespace BoostEnded {
+static constexpr EventId Id = 0x00000001;
+} // namespace BoostEnded
+
+} // namespace Events
+} // namespace WaterHeaterManagement
+
 namespace DemandResponseLoadControl {
 namespace Events {
 

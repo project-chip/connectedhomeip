@@ -6744,6 +6744,127 @@ public static class ElectricalEnergyMeasurementClusterEnergyMeasurementStruct {
     return output.toString();
   }
 }
+public static class WaterHeaterManagementClusterWaterHeaterBoostInfoStruct {
+  public Long duration;
+  public Optional<Boolean> oneShot;
+  public Optional<Boolean> emergencyBoost;
+  public Optional<Integer> temporarySetpoint;
+  public Optional<Integer> targetPercentage;
+  public Optional<Integer> targetReheat;
+  private static final long DURATION_ID = 0L;
+  private static final long ONE_SHOT_ID = 1L;
+  private static final long EMERGENCY_BOOST_ID = 2L;
+  private static final long TEMPORARY_SETPOINT_ID = 3L;
+  private static final long TARGET_PERCENTAGE_ID = 4L;
+  private static final long TARGET_REHEAT_ID = 5L;
+
+  public WaterHeaterManagementClusterWaterHeaterBoostInfoStruct(
+    Long duration,
+    Optional<Boolean> oneShot,
+    Optional<Boolean> emergencyBoost,
+    Optional<Integer> temporarySetpoint,
+    Optional<Integer> targetPercentage,
+    Optional<Integer> targetReheat
+  ) {
+    this.duration = duration;
+    this.oneShot = oneShot;
+    this.emergencyBoost = emergencyBoost;
+    this.temporarySetpoint = temporarySetpoint;
+    this.targetPercentage = targetPercentage;
+    this.targetReheat = targetReheat;
+  }
+
+  public StructType encodeTlv() {
+    ArrayList<StructElement> values = new ArrayList<>();
+    values.add(new StructElement(DURATION_ID, new UIntType(duration)));
+    values.add(new StructElement(ONE_SHOT_ID, oneShot.<BaseTLVType>map((nonOptionaloneShot) -> new BooleanType(nonOptionaloneShot)).orElse(new EmptyType())));
+    values.add(new StructElement(EMERGENCY_BOOST_ID, emergencyBoost.<BaseTLVType>map((nonOptionalemergencyBoost) -> new BooleanType(nonOptionalemergencyBoost)).orElse(new EmptyType())));
+    values.add(new StructElement(TEMPORARY_SETPOINT_ID, temporarySetpoint.<BaseTLVType>map((nonOptionaltemporarySetpoint) -> new IntType(nonOptionaltemporarySetpoint)).orElse(new EmptyType())));
+    values.add(new StructElement(TARGET_PERCENTAGE_ID, targetPercentage.<BaseTLVType>map((nonOptionaltargetPercentage) -> new UIntType(nonOptionaltargetPercentage)).orElse(new EmptyType())));
+    values.add(new StructElement(TARGET_REHEAT_ID, targetReheat.<BaseTLVType>map((nonOptionaltargetReheat) -> new UIntType(nonOptionaltargetReheat)).orElse(new EmptyType())));
+
+    return new StructType(values);
+  }
+
+  public static WaterHeaterManagementClusterWaterHeaterBoostInfoStruct decodeTlv(BaseTLVType tlvValue) {
+    if (tlvValue == null || tlvValue.type() != TLVType.Struct) {
+      return null;
+    }
+    Long duration = null;
+    Optional<Boolean> oneShot = Optional.empty();
+    Optional<Boolean> emergencyBoost = Optional.empty();
+    Optional<Integer> temporarySetpoint = Optional.empty();
+    Optional<Integer> targetPercentage = Optional.empty();
+    Optional<Integer> targetReheat = Optional.empty();
+    for (StructElement element: ((StructType)tlvValue).value()) {
+      if (element.contextTagNum() == DURATION_ID) {
+        if (element.value(BaseTLVType.class).type() == TLVType.UInt) {
+          UIntType castingValue = element.value(UIntType.class);
+          duration = castingValue.value(Long.class);
+        }
+      } else if (element.contextTagNum() == ONE_SHOT_ID) {
+        if (element.value(BaseTLVType.class).type() == TLVType.Boolean) {
+          BooleanType castingValue = element.value(BooleanType.class);
+          oneShot = Optional.of(castingValue.value(Boolean.class));
+        }
+      } else if (element.contextTagNum() == EMERGENCY_BOOST_ID) {
+        if (element.value(BaseTLVType.class).type() == TLVType.Boolean) {
+          BooleanType castingValue = element.value(BooleanType.class);
+          emergencyBoost = Optional.of(castingValue.value(Boolean.class));
+        }
+      } else if (element.contextTagNum() == TEMPORARY_SETPOINT_ID) {
+        if (element.value(BaseTLVType.class).type() == TLVType.Int) {
+          IntType castingValue = element.value(IntType.class);
+          temporarySetpoint = Optional.of(castingValue.value(Integer.class));
+        }
+      } else if (element.contextTagNum() == TARGET_PERCENTAGE_ID) {
+        if (element.value(BaseTLVType.class).type() == TLVType.UInt) {
+          UIntType castingValue = element.value(UIntType.class);
+          targetPercentage = Optional.of(castingValue.value(Integer.class));
+        }
+      } else if (element.contextTagNum() == TARGET_REHEAT_ID) {
+        if (element.value(BaseTLVType.class).type() == TLVType.UInt) {
+          UIntType castingValue = element.value(UIntType.class);
+          targetReheat = Optional.of(castingValue.value(Integer.class));
+        }
+      }
+    }
+    return new WaterHeaterManagementClusterWaterHeaterBoostInfoStruct(
+      duration,
+      oneShot,
+      emergencyBoost,
+      temporarySetpoint,
+      targetPercentage,
+      targetReheat
+    );
+  }
+
+  @Override
+  public String toString() {
+    StringBuilder output = new StringBuilder();
+    output.append("WaterHeaterManagementClusterWaterHeaterBoostInfoStruct {\n");
+    output.append("\tduration: ");
+    output.append(duration);
+    output.append("\n");
+    output.append("\toneShot: ");
+    output.append(oneShot);
+    output.append("\n");
+    output.append("\temergencyBoost: ");
+    output.append(emergencyBoost);
+    output.append("\n");
+    output.append("\ttemporarySetpoint: ");
+    output.append(temporarySetpoint);
+    output.append("\n");
+    output.append("\ttargetPercentage: ");
+    output.append(targetPercentage);
+    output.append("\n");
+    output.append("\ttargetReheat: ");
+    output.append(targetReheat);
+    output.append("\n");
+    output.append("}\n");
+    return output.toString();
+  }
+}
 public static class DemandResponseLoadControlClusterHeatingSourceControlStruct {
   public Integer heatingSource;
   private static final long HEATING_SOURCE_ID = 0L;

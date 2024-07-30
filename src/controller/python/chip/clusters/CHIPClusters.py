@@ -6658,12 +6658,7 @@ class ChipClusters:
                 "commandId": 0x00000000,
                 "commandName": "Boost",
                 "args": {
-                    "duration": "int",
-                    "oneShot": "bool",
-                    "emergencyBoost": "bool",
-                    "temporarySetpoint": "int",
-                    "targetPercentage": "int",
-                    "targetReheat": "int",
+                    "boostInfo": "WaterHeaterBoostInfoStruct",
                 },
             },
             0x00000001: {
