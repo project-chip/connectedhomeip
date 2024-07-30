@@ -10934,6 +10934,7 @@ namespace Commands {
 namespace KeepActive {
 enum class Fields : uint8_t
 {
+    kStayActiveDuration = 0,
 };
 
 struct Type
@@ -10942,6 +10943,8 @@ public:
     // Use GetCommandId instead of commandId directly to avoid naming conflict with CommandIdentification in ExecutionOfACommand
     static constexpr CommandId GetCommandId() { return Commands::KeepActive::Id; }
     static constexpr ClusterId GetClusterId() { return Clusters::BridgedDeviceBasicInformation::Id; }
+
+    uint32_t stayActiveDuration = static_cast<uint32_t>(0);
 
     CHIP_ERROR Encode(TLV::TLVWriter & aWriter, TLV::Tag aTag) const;
 
@@ -10956,6 +10959,7 @@ public:
     static constexpr CommandId GetCommandId() { return Commands::KeepActive::Id; }
     static constexpr ClusterId GetClusterId() { return Clusters::BridgedDeviceBasicInformation::Id; }
 
+    uint32_t stayActiveDuration = static_cast<uint32_t>(0);
     CHIP_ERROR Decode(TLV::TLVReader & reader);
 };
 }; // namespace KeepActive
