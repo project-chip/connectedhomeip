@@ -70,37 +70,30 @@ class TC_OCC_2_3(MatterBaseTest):
         if attributes.OccupancySensorType.attribute_id in attribute_list:
             occupancy_sensor_type_dut = await self.read_occ_attribute_expect_success(endpoint=endpoint, attribute=attributes.OccupancySensorType)
 
-            if occupancy_sensor_type_dut != NullValue:
-                asserts.assert_less_equal(occupancy_sensor_type_dut, 3, "OccupancySensorType attribute is out of range")
-                asserts.assert_greater_equal(occupancy_sensor_type_dut, 0, "OccupancySensorType attribute is out of range")
-                
-    
+            asserts.assert_less_equal(occupancy_sensor_type_dut, 3, "OccupancySensorType attribute is out of range")
+            asserts.assert_greater_equal(occupancy_sensor_type_dut, 0, "OccupancySensorType attribute is out of range")
         else:
             logging.info("OccupancySensorType attribute doesn't exist. Test step skipped")
 
         self.step(4)
-        if occupancy_sensor_type_dut == 0:
+        if occupancy_sensor_type_dut == Clusters.OccupancySensing.Enums.OccupancySensorTypeEnum.kPir:
             occupancy_pir_otou_delay_dut = await self.read_occ_attribute_expect_success(endpoint=endpoint, attribute=attributes.PIROccupiedToUnoccupiedDelay)
-            
-            if occupancy_pir_otou_delay_dut != NullValue:
-                asserts.assert_equal(occupancy_pir_otou_delay_dut, occupancy_hold_time_dut, "HoldTime attribute value is not equal to PIROccupiedToUnoccupiedDelay")
+
+            asserts.assert_equal(occupancy_pir_otou_delay_dut, occupancy_hold_time_dut, "HoldTime attribute value is not equal to PIROccupiedToUnoccupiedDelay")
                 
-        elif occupancy_sensor_type_dut == 1:
+        elif occupancy_sensor_type_dut == Clusters.OccupancySensing.Enums.OccupancySensorTypeEnum.kUltrasonic:
             occupancy_us_otou_delay_dut = await self.read_occ_attribute_expect_success(endpoint=endpoint, attribute=attributes.UltrasonicOccupiedToUnoccupiedDelay)
             
-            if occupancy_us_otou_delay_dut != NullValue:
-                asserts.assert_equal(occupancy_us_otou_delay_dut, occupancy_hold_time_dut, "HoldTime attribute value is not equal to UltrasonicOccupiedToUnoccupiedDelay")
+            asserts.assert_equal(occupancy_us_otou_delay_dut, occupancy_hold_time_dut, "HoldTime attribute value is not equal to UltrasonicOccupiedToUnoccupiedDelay")
 
-        elif occupancy_sensor_type_dut == 2:
+        elif occupancy_sensor_type_dut == Clusters.OccupancySensing.Enums.OccupancySensorTypeEnum.kPIRAndUltrasonic:
             occupancy_pirus_otou_delay_dut = await self.read_occ_attribute_expect_success(endpoint=endpoint, attribute=attributes.PIROccupiedToUnoccupiedDelay)
-            
-            if occupancy_pirus_otou_delay_dut != NullValue:
-                asserts.assert_equal(occupancy_pirus_otou_delay_dut, occupancy_hold_time_dut, "HoldTime attribute value is not equal to PIROccupiedToUnoccupiedDelay")                
 
-        elif occupancy_sensor_type_dut == 3:
+            asserts.assert_equal(occupancy_pirus_otou_delay_dut, occupancy_hold_time_dut, "HoldTime attribute value is not equal to PIROccupiedToUnoccupiedDelay")                
+
+        elif occupancy_sensor_type_dut == Clusters.OccupancySensing.Enums.OccupancySensorTypeEnum.kPhysicalContact:
             occupancy_phy_otou_delay_dut = await self.read_occ_attribute_expect_success(endpoint=endpoint, attribute=attributes.PhysicalContactOccupiedToUnoccupiedDelay)
-            
-            if occupancy_phy_otou_delay_dut != NullValue:
-                asserts.assert_equal(occupancy_phy_otou_delay_dut, occupancy_hold_time_dut, "HoldTime attribute value is not equal to PhysicalContactOccupiedToUnoccupiedDelay") 
+        
+            asserts.assert_equal(occupancy_phy_otou_delay_dut, occupancy_hold_time_dut, "HoldTime attribute value is not equal to PhysicalContactOccupiedToUnoccupiedDelay") 
         else:
             logging.info("OccupancySensorType attribute value is out of range")
