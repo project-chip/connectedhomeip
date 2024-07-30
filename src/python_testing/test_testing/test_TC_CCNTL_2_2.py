@@ -17,6 +17,7 @@
 #
 
 import base64
+import click
 import os
 import pathlib
 import sys
@@ -29,11 +30,11 @@ from chip.interaction_model import InteractionModelError, Status
 from MockTestRunner import AsyncMock, MockTestRunner
 
 try:
-    from matter_testing_support import get_default_paa_trust_store, run_tests_no_exit
+    from matter_testing_support import MatterTestConfig, get_default_paa_trust_store, run_tests_no_exit
 except ImportError:
     sys.path.append(os.path.abspath(
         os.path.join(os.path.dirname(__file__), '..')))
-    from matter_testing_support import get_default_paa_trust_store, run_tests_no_exit
+    from matter_testing_support import MatterTestConfig, get_default_paa_trust_store, run_tests_no_exit
 
 invoke_call_count = 0
 event_call_count = 0
@@ -147,7 +148,9 @@ class MyMock(MockTestRunner):
         return run_tests_no_exit(self.test_class, self.config, hooks, self.default_controller, self.stack)
 
 
-def main():
+@click.command()
+@click.argument('th_server_app', type=click.Path(exists=True))
+def main(th_server_app: str):
     root = os.path.abspath(os.path.join(pathlib.Path(__file__).resolve().parent, '..', '..', '..'))
     print(f'root = {root}')
     paa_path = get_default_paa_trust_store(root)
@@ -155,6 +158,9 @@ def main():
 
     pics = {"PICS_SDK_CI_ONLY": True}
     test_runner = MyMock('TC_CCTRL_2_2', 'TC_CCTRL_2_2', 'test_TC_CCTRL_2_2', 1, paa_trust_store_path=paa_path, pics=pics)
+    config = MatterTestConfig()
+    config.user_params = {'th_server_app_path': th_server_app}
+    test_runner.set_test_config(config)
 
     test_runner.run_test_with_mock(dynamic_invoke_return, dynamic_event_return, wildcard())
     test_runner.Shutdown()
