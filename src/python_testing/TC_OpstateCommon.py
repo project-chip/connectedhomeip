@@ -28,7 +28,7 @@ from chip.clusters import ClusterObjects as ClusterObjects
 from chip.clusters.Attribute import EventReadResult, SubscriptionTransaction
 from chip.clusters.Types import NullValue
 from chip.interaction_model import InteractionModelError, Status
-from matter_testing_support import EventChangeCallback, TestStep
+from matter_testing_support import (ClusterAttributeChangeAccumulator, EventChangeCallback, TestStep)
 from mobly import asserts
 
 
@@ -1221,3 +1221,78 @@ class TC_OPSTATE_BASE():
             self.skip_step(20)
             self.skip_step(21)
             self.skip_step(22)
+
+    ############################
+    #   TEST CASE 2.6 - Optional Reports with DUT as Server
+    ############################
+    def steps_TC_OPSTATE_BASE_2_6(self) -> list[TestStep]:
+        steps = [TestStep(1, "Commissioning, already done", is_commissioning=True),
+                 TestStep(2, "Subscribe to CountdownTime attribute"),
+                 TestStep(3, "Manually put the DUT into a state where it will use the CountdownTime attribute, "
+                             "the initial value of the CountdownTime is greater than 30, "
+                             "and it will begin counting down the CountdownTime attribute."),
+                 TestStep(4, "Over a period of 30 seconds, TH counts all report transactions with an attribute "
+                             "report for the CountdownTime attribute in numberOfReportsReceived"),
+                 TestStep(5, "Until the current operation finishes, TH counts all report transactions with "
+                             "an attribute report for the CountdownTime attribute in numberOfReportsReceived and saves up to 5 such reports."),
+                 TestStep(6, "Manually put the DUT into a state where it will use the CountdownTime attribute, "
+                             "the initial value of the CountdownTime is greater than 30, and it will begin counting down the CountdownTime attribute."),
+                 TestStep(7, "TH reads from the DUT the OperationalState attribute"),
+                 TestStep(8, "Manually put the device in the Paused(0x02) operational state")
+                 ]
+        return steps
+
+    async def TEST_TC_OPSTATE_BASE_2_6(self, endpoint=1):
+        cluster = self.test_info.cluster
+        attributes = cluster.Attributes
+        events = cluster.Events
+
+        self.init_test()
+
+        # commission
+        self.step(1)
+
+        # Note that this does a subscribe-all instead of subscribing only to the CountdownTime attribute.
+        # To-Do: Update the TP to subscribe-all.
+        self.step(2)
+        sub_handler = ClusterAttributeChangeAccumulator(cluster)
+        await sub_handler.start(self.default_controller, self.dut_node_id, self.matter_test_config.endpoint)
+
+        self.step(3)
+        self.wait_for_user_input(prompt_msg="Press Enter when ready.\n")
+        count = sub_handler.attribute_report_counts[attributes.CountdownTime]
+        asserts.assert_greater(count, 0, "Did not receive any reports for CountdownTime")
+
+        sub_handler.attribute_report_counts.reset()
+        self.step(4)
+        logging.info('Test will now collect data for 30 seconds')
+        time.sleep(30)
+
+        count = sub_handler.attribute_report_counts[attributes.CountdownTime]
+        sub_handler.attribute_report_counts.reset()
+        asserts.assert_less_equal(count, 5, "Received more than 5 reports for CountdownTime")
+        asserts.assert_greater(count, 0, "Did not receive any reports for CountdownTime")
+
+        self.step(5)
+        #while operation not ended
+        count = sub_handler.attribute_report_counts[attributes.CountdownTime]
+        asserts.assert_less_equal(count, 5, "Received more than 5 reports for CountdownTime")
+        asserts.assert_greater(count, 0, "Did not receive any reports for CountdownTime")
+        # ensure at least one report 
+
+        sub_handler.attribute_report_counts.reset()
+        self.step(6)
+        self.wait_for_user_input(prompt_msg="Press Enter when ready.\n")
+        count = sub_handler.attribute_report_counts[attributes.CountdownTime]
+        asserts.assert_greater(count, 0, "Did not receive any reports for CountdownTime")
+
+        self.step(7)
+        await self.read_and_expect_value(endpoint=endpoint,
+                                            attribute=attributes.OperationalState,
+                                            expected_value=cluster.Enums.OperationalStateEnum.kRunning)
+
+        sub_handler.attribute_report_counts.reset()
+        self.step(8)
+        self.wait_for_user_input(prompt_msg="Press Enter when ready.\n")
+        count = sub_handler.attribute_report_counts[attributes.CountdownTime]
+        asserts.assert_greater(count, 0, "Did not receive any reports for CountdownTime")
