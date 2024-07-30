@@ -2776,7 +2776,7 @@ PICS:
     - label: 
           "Does the DUT(server) support the AliroSupportedBLEUWBProtocolVersions attribute 
 	   and is ReadOnly" 
-      id: DRLK.S.ReadOnly
+      id: DRLK.S.A0085.ReadOnly
   
     - label: 
           "Does the DUT(server) support the AliroBLEAdvertisingVersion attribute 
@@ -2786,12 +2786,12 @@ PICS:
     - label: 
           "Does the DUT(server) support the NumberOfAliroCredentialIssuerKeysSupported attribute 
 	   and is ReadOnly" 
-      id: DRLK.S.A0086.ReadOnly
+      id: DRLK.S.A0087.ReadOnly
     
     - label: 
           "Does the DUT(server) support the NumberOfAliroEndpointKeysSupported attribute 
 	   and is ReadOnly" 
-      id: DRLK.S.A0086.ReadOnly
+      id: DRLK.S.A0088.ReadOnly
 
     #
     # Server write attributes
