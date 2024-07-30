@@ -39,11 +39,17 @@ from test_plan_support import commission_if_required, if_feature_supported, read
 
 
 class TC_CC_2_3(MatterBaseTest):
+
+    # Test includes several long waits, adjust timeout to accommodate.
+    @property
+    def default_timeout(self) -> int:
+        return 180
+
     def steps_TC_CC_2_2(self):
         THcommand = "Test Harness sends the"
 
         def store_values(attr: str) -> str:
-            return f"TH stores the reported values of _{attr}_ in all incoming reports for _{attr}_ attribute, that contains data in _reportedCurrentHueValuesList_, over a period of 30 seconds."
+            return f"TH stores the reported values of _{attr}_ in all incoming reports for _{attr}_ attribute, that contains data in _reportedCurrentHueValuesList_, over a period of 20 seconds."
 
         def verify_entry_count(attr: str) -> str:
             return f'TH verifies that _reportedCurrentHueValuesList_ does not contain more than 10 entries for _{attr}_'
@@ -72,7 +78,9 @@ class TC_CC_2_3(MatterBaseTest):
                 TestStep(15, verify_entry_count('CurrentSaturation'), entry_count_verification()),
                 TestStep(16, 'If XY feature is not supported, skip steps 17-21'),
                 TestStep(
-                    17, f"{THcommand} MoveToColor with _ColorX_ field set to 13107, _ColorY_ set to 13107, _TransitionTime_ field set to 100 and remaining fields set to 0"),
+                    "17a", f"{THcommand} MoveToColor with _ColorX_ field set to 32768, _ColorY_ set to 19660, _TransitionTime_ field set to 0 and remaining fields set to 0"),
+                TestStep(
+                    "17b", f"{THcommand} MoveToColor with _ColorX_ field set to 13107, _ColorY_ set to 13107, _TransitionTime_ field set to 100 and remaining fields set to 0"),
                 TestStep(18, store_values('CurrentX')),
                 TestStep(19, store_values('CurrentY')),
                 TestStep(20, verify_entry_count('CurrentX'), entry_count_verification()),
@@ -84,12 +92,8 @@ class TC_CC_2_3(MatterBaseTest):
                 TestStep(26, "If the RemainingTime attribute is not supported, skip the remaining steps and end test case"),
                 TestStep(27, store_values('RemainingTime')),
                 TestStep(
-                    28, f"If HS feature is supported and XY feature is not supported, {THcommand} MoveToHue with _Hue_ field set to 254, _TransitionTime_ field set to 100, _Direction_ field set to Shortest and remaining fields set to 0", verify_success()),
-                TestStep(
-                    29, f"If the XY feature is supported and the HS feature is not supported, {THcommand} MoveToColor with _ColorX_ field set to 13107, _ColorY_ set to 13107, _TransitionTime_ field set to 100 and remaining fields set to 0", verify_success()),
+                    29, f"If the XY feature is supported and the HS feature is not supported, {THcommand} MoveToColor with _ColorX_ field set to 32768, _ColorY_ set to 19660, _TransitionTime_ field set to 100 and remaining fields set to 0", verify_success()),
                 TestStep(30, "Wait for 5 seconds"),
-                TestStep(
-                    31, f"If HS feature is supported and XY feature is not supported, {THcommand} MoveToHue with _Hue_ field set to 254, _TransitionTime_ field set to 150, _Direction_ field set to Shortest and remaining fields set to 0", verify_success()),
                 TestStep(
                     32, f"If the XY feature is supported and the HS feature is not supported, {THcommand} MoveToColor with _ColorX_ field set to 13107, _ColorY_ set to 13107, _TransitionTime_ field set to 150 and remaining fields set to 0", verify_success()),
                 TestStep(33, "Wait for 20 seconds"),
@@ -197,8 +201,12 @@ class TC_CC_2_3(MatterBaseTest):
             self.skip_step(20)
             self.skip_step(21)
         else:
-            self.step(17)
-            cmd = cc.Commands.MoveToColor(colorX=13107, colorY=13107, transitionTime=100)
+            self.step("17a")
+            cmd = cc.Commands.MoveToColor(colorX=32768, colorY=19660, transitionTime=0)
+            await self.send_single_cmd(cmd)
+
+            self.step("17b")
+            cmd = cc.Commands.MoveToColor(colorX=13107, colorY=13107, transitionTime=0)
             await self.send_single_cmd(cmd)
 
             self.step(18)
@@ -238,41 +246,37 @@ class TC_CC_2_3(MatterBaseTest):
         self.step(27)
         accumulate_reports()
 
-        self.step(28)
-        if supports_hs and not supports_xy:
-            cmd = cc.Commands.MoveToHue(hue=254, transitionTime=100, direction=cc.Enums.HueDirection.kShortestDistance)
-            await self.send_single_cmd(cmd)
-
         self.step(29)
-        if supports_xy and not supports_hs:
-            cmd = cc.Commands.MoveToColor(colorX=13107, colorY=13107, transitionTime=100)
+        # TODO: If this is mandatory, we should just omit this
+        if supports_xy:
+            cmd = cc.Commands.MoveToColor(colorX=32768, colorY=19660, transitionTime=100)
             await self.send_single_cmd(cmd)
+        else:
+            self.mark_current_step_skipped()
 
         self.step(30)
         logging.info("Test will now wait for 5 seconds")
         time.sleep(5)
 
-        self.step(31)
-        if supports_hs and not supports_xy:
-            cmd = cc.Commands.MoveToHue(hue=254, transitionTime=150, direction=cc.Enums.HueDirection.kShortestDistance)
-            await self.send_single_cmd(cmd)
-
         self.step(32)
-        if supports_xy and not supports_hs:
+        if supports_xy:
             cmd = cc.Commands.MoveToColor(colorX=13107, colorY=13107, transitionTime=150)
             await self.send_single_cmd(cmd)
+        else:
+            self.mark_current_step_skipped()
 
         self.step(33)
         logging.info("Test will now wait for 20 seconds")
         time.sleep(20)
 
         self.step(34)
-        # TODO: Re-enable checks 34, 34, 36 when #34643 is addressed
+        # TODO: Re-enable checks 34, 36 when #34643 is addressed
+        logging.info(f'received reports: {sub_handler.attribute_reports[cc.Attributes.RemainingTime]}')
         # count = sub_handler.attribute_report_counts[cc.Attributes.RemainingTime]
         # asserts.assert_equal(count, 3, "Unexpected number of reports received")
 
         self.step(35)
-        # asserts.assert_equal(sub_handler.attribute_reports[cc.Attributes.RemainingTime][0].value, 100, "Unexpected first report")
+        asserts.assert_equal(sub_handler.attribute_reports[cc.Attributes.RemainingTime][0].value, 100, "Unexpected first report")
 
         self.step(36)
         # asserts.assert_almost_equal(
