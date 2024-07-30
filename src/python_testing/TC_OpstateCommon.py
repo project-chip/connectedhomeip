@@ -1258,9 +1258,17 @@ class TC_OPSTATE_BASE():
         await sub_handler.start(self.default_controller, self.dut_node_id, self.matter_test_config.endpoint)
 
         self.step(3)
-        self.wait_for_user_input(prompt_msg="Press Enter when ready.\n")
-        count = sub_handler.attribute_report_counts[attributes.CountdownTime]
-        asserts.assert_greater(count, 0, "Did not receive any reports for CountdownTime")
+        if self.pics_guard(self.check_pics(f"{self.test_info.pics_code}.S.M.ST_RUNNING")):
+            self.send_manual_or_pipe_command(name="OperationalStateChange",
+                                             device=self.device,
+                                             operation="Start")
+            await self.read_and_expect_value(endpoint=endpoint,
+                                             attribute=attributes.OperationalState,
+                                             expected_value=cluster.Enums.OperationalStateEnum.kRunning)
+            count = sub_handler.attribute_report_counts[attributes.CountdownTime]
+            asserts.assert_greater(count, 0, "Did not receive any reports for CountdownTime")
+        else:
+            self.skip_step(3)
 
         sub_handler.attribute_report_counts.reset()
         self.step(4)
@@ -1273,17 +1281,31 @@ class TC_OPSTATE_BASE():
         asserts.assert_greater(count, 0, "Did not receive any reports for CountdownTime")
 
         self.step(5)
-        # while operation not ended
+        attr_value = await self.read_expect_success(
+            endpoint=endpoint,
+            attribute=attributes.OperationalState)
+        while attr_value != cluster.Enums.OperationalStateEnum.kStopped:
+            time.sleep(1)
+            attr_value = await self.read_expect_success(
+                endpoint=endpoint,
+                attribute=attribute)
         count = sub_handler.attribute_report_counts[attributes.CountdownTime]
         asserts.assert_less_equal(count, 5, "Received more than 5 reports for CountdownTime")
         asserts.assert_greater(count, 0, "Did not receive any reports for CountdownTime")
-        # ensure at least one report
 
         sub_handler.attribute_report_counts.reset()
         self.step(6)
-        self.wait_for_user_input(prompt_msg="Press Enter when ready.\n")
-        count = sub_handler.attribute_report_counts[attributes.CountdownTime]
-        asserts.assert_greater(count, 0, "Did not receive any reports for CountdownTime")
+        if self.pics_guard(self.check_pics(f"{self.test_info.pics_code}.S.M.ST_RUNNING")):
+            self.send_manual_or_pipe_command(name="OperationalStateChange",
+                                             device=self.device,
+                                             operation="Start")
+            await self.read_and_expect_value(endpoint=endpoint,
+                                             attribute=attributes.OperationalState,
+                                             expected_value=cluster.Enums.OperationalStateEnum.kRunning)
+            count = sub_handler.attribute_report_counts[attributes.CountdownTime]
+            asserts.assert_greater(count, 0, "Did not receive any reports for CountdownTime")
+        else:
+            self.skip_step(6)
 
         self.step(7)
         await self.read_and_expect_value(endpoint=endpoint,
@@ -1292,6 +1314,11 @@ class TC_OPSTATE_BASE():
 
         sub_handler.attribute_report_counts.reset()
         self.step(8)
-        self.wait_for_user_input(prompt_msg="Press Enter when ready.\n")
+        if self.pics_guard(self.check_pics(f"{self.test_info.pics_code}.S.M.ST_PAUSED")):
+            self.send_manual_or_pipe_command(name="OperationalStateChange",
+                                                device=self.device,
+                                                operation="Pause")
+        else:
+            self.skip_step(8)
         count = sub_handler.attribute_report_counts[attributes.CountdownTime]
         asserts.assert_greater(count, 0, "Did not receive any reports for CountdownTime")
