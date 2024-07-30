@@ -15,7 +15,7 @@
 name: Test Fabric Synchronization condition on Bridged Node Device Type
 
 PICS:
-    - MCORE.BRIDGE.FS
+    - MCORE.FS
 
 config:
     nodeId: 0x12344321
