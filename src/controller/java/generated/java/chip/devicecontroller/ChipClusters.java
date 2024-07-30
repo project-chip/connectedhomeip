@@ -3982,11 +3982,11 @@ public class ChipClusters {
       return 0L;
     }
 
-    public void reviewFabricRestrictions(DefaultClusterCallback callback, ArrayList<ChipStructs.AccessControlClusterAccessRestrictionStruct> arl) {
+    public void reviewFabricRestrictions(DefaultClusterCallback callback, ArrayList<ChipStructs.AccessControlClusterCommissioningAccessRestrictionEntryStruct> arl) {
       reviewFabricRestrictions(callback, arl, 0);
     }
 
-    public void reviewFabricRestrictions(DefaultClusterCallback callback, ArrayList<ChipStructs.AccessControlClusterAccessRestrictionStruct> arl, int timedInvokeTimeoutMs) {
+    public void reviewFabricRestrictions(DefaultClusterCallback callback, ArrayList<ChipStructs.AccessControlClusterCommissioningAccessRestrictionEntryStruct> arl, int timedInvokeTimeoutMs) {
       final long commandId = 0L;
 
       ArrayList<StructElement> elements = new ArrayList<>();

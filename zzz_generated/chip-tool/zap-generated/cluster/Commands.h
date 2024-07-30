@@ -1313,8 +1313,8 @@ public:
 
 private:
     chip::app::Clusters::AccessControl::Commands::ReviewFabricRestrictions::Type mRequest;
-    TypedComplexArgument<
-        chip::app::DataModel::List<const chip::app::Clusters::AccessControl::Structs::AccessRestrictionStruct::Type>>
+    TypedComplexArgument<chip::app::DataModel::List<
+        const chip::app::Clusters::AccessControl::Structs::CommissioningAccessRestrictionEntryStruct::Type>>
         mComplex_Arl;
 };
 

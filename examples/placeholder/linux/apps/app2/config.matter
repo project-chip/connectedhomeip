@@ -740,7 +740,7 @@ cluster AccessControl = 31 {
   readonly attribute int16u clusterRevision = 65533;
 
   request struct ReviewFabricRestrictionsRequest {
-    AccessRestrictionStruct arl[] = 0;
+    CommissioningAccessRestrictionEntryStruct arl[] = 0;
   }
 
   response struct ReviewFabricRestrictionsResponse = 1 {
