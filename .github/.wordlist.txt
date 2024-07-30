@@ -402,6 +402,7 @@ DevKitM
 devtype
 df
 dfe
+DFILE
 dfu
 DgDxsfHx
 dhclient
@@ -1354,6 +1355,7 @@ SVR
 SWD
 SWU
 symlinks
+sysbuild
 sysconfdir
 SysConfig
 sysctl
