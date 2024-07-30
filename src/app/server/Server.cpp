@@ -1,6 +1,6 @@
 /*
  *
- *    Copyright (c) 2021 Project CHIP Authors
+ *    Copyright (c) 2021-2024 Project CHIP Authors
  *
  *    Licensed under the Apache License, Version 2.0 (the "License");
  *    you may not use this file except in compliance with the License.
@@ -21,6 +21,8 @@
 
 #include <app/EventManagement.h>
 #include <app/InteractionModelEngine.h>
+#include <app/server/DefaultEnhancedSetupFlowProvider.h>
+#include <app/server/DefaultTermsAndConditionsProvider.h>
 #include <app/server/Dnssd.h>
 #include <app/server/EchoHandler.h>
 #include <app/util/DataModelHandler.h>
@@ -105,6 +107,110 @@ static ::chip::PersistedCounter<chip::EventNumber> sGlobalEventIdCounter;
 static ::chip::app::CircularEventBuffer sLoggingBuffer[CHIP_NUM_EVENT_LOGGING_BUFFERS];
 #endif // CHIP_CONFIG_ENABLE_SERVER_IM_EVENT
 
+#if defined (CHIP_CONFIG_TC_REQUIRED_ACKNOWLEDGEMENTS) && defined (CHIP_CONFIG_TC_REQUIRED_ACKNOWLEDGEMENTS_VERSION)
+app::DefaultEnhancedSetupFlowProvider sDefaultEnhancedSetupFlowProviderInstance;
+app::EnhancedSetupFlowProvider * CommonCaseDeviceServerInitParams::sDefaultEnhancedSetupFlowProvider =
+    &sDefaultEnhancedSetupFlowProviderInstance;
+
+app::DefaultTermsAndConditionsProvider sDefaultTermsAndConditionsProviderInstance;
+app::TermsAndConditionsProvider * CommonCaseDeviceServerInitParams::sDefaultTermsAndConditionsProvider =
+    &sDefaultTermsAndConditionsProviderInstance;
+#endif
+
+CHIP_ERROR CommonCaseDeviceServerInitParams::InitializeStaticResourcesBeforeServerInit()
+{
+    chip::DeviceLayer::PersistedStorage::KeyValueStoreManager & kvsManager = DeviceLayer::PersistedStorage::KeyValueStoreMgr();
+
+    // KVS-based persistent storage delegate injection
+    if (persistentStorageDelegate == nullptr)
+    {
+        ReturnErrorOnFailure(sKvsPersistenStorageDelegate.Init(&kvsManager));
+        this->persistentStorageDelegate = &sKvsPersistenStorageDelegate;
+    }
+
+    // PersistentStorageDelegate "software-based" operational key access injection
+    if (this->operationalKeystore == nullptr)
+    {
+        // WARNING: PersistentStorageOperationalKeystore::Finish() is never called. It's fine for
+        //          for examples and for now.
+        ReturnErrorOnFailure(sPersistentStorageOperationalKeystore.Init(this->persistentStorageDelegate));
+        this->operationalKeystore = &sPersistentStorageOperationalKeystore;
+    }
+
+    // OpCertStore can be injected but default to persistent storage default
+    // for simplicity of the examples.
+    if (this->opCertStore == nullptr)
+    {
+        // WARNING: PersistentStorageOpCertStore::Finish() is never called. It's fine for
+        //          for examples and for now, since all storage is immediate for that impl.
+        ReturnErrorOnFailure(sPersistentStorageOpCertStore.Init(this->persistentStorageDelegate));
+        this->opCertStore = &sPersistentStorageOpCertStore;
+    }
+
+    // Injection of report scheduler WILL lead to two schedulers being allocated. As recommended above, this should only be used
+    // for IN-TREE examples. If a default scheduler is desired, the basic ServerInitParams should be used by the application and
+    // CommonCaseDeviceServerInitParams should not be allocated.
+    if (this->reportScheduler == nullptr)
+    {
+        reportScheduler = &sReportScheduler;
+    }
+
+#if defined (CHIP_CONFIG_TC_REQUIRED_ACKNOWLEDGEMENTS) && defined (CHIP_CONFIG_TC_REQUIRED_ACKNOWLEDGEMENTS_VERSION)
+    if (this->termsAndConditionsProvider == nullptr)
+    {
+        ReturnErrorOnFailure(sDefaultTermsAndConditionsProviderInstance.Init(this->persistentStorageDelegate,
+                                                                             CHIP_CONFIG_TC_REQUIRED_ACKNOWLEDGEMENTS,
+                                                                             CHIP_CONFIG_TC_REQUIRED_ACKNOWLEDGEMENTS_VERSION));
+        this->termsAndConditionsProvider = sDefaultTermsAndConditionsProvider;
+    }
+
+    if (this->enhancedSetupFlowProvider == nullptr)
+    {
+        ReturnErrorOnFailure(sDefaultEnhancedSetupFlowProviderInstance.Init(this->termsAndConditionsProvider));
+        this->enhancedSetupFlowProvider = sDefaultEnhancedSetupFlowProvider;
+    }
+#endif
+
+    // Session Keystore injection
+    this->sessionKeystore = &sSessionKeystore;
+
+    // Group Data provider injection
+    sGroupDataProvider.SetStorageDelegate(this->persistentStorageDelegate);
+    sGroupDataProvider.SetSessionKeystore(this->sessionKeystore);
+    ReturnErrorOnFailure(sGroupDataProvider.Init());
+    this->groupDataProvider = &sGroupDataProvider;
+
+#if CHIP_CONFIG_ENABLE_SESSION_RESUMPTION
+    ReturnErrorOnFailure(sSessionResumptionStorage.Init(this->persistentStorageDelegate));
+    this->sessionResumptionStorage = &sSessionResumptionStorage;
+#else
+    this->sessionResumptionStorage = nullptr;
+#endif
+
+    // Inject access control delegate
+    this->accessDelegate = Access::Examples::GetAccessControlDelegate();
+
+    // Inject ACL storage. (Don't initialize it.)
+    this->aclStorage = &sAclStorage;
+
+#if CHIP_CONFIG_PERSIST_SUBSCRIPTIONS
+    ChipLogProgress(AppServer, "Initializing subscription resumption storage...");
+    ReturnErrorOnFailure(sSubscriptionResumptionStorage.Init(this->persistentStorageDelegate));
+    this->subscriptionResumptionStorage = &sSubscriptionResumptionStorage;
+#else
+    ChipLogProgress(AppServer, "Subscription persistence not supported");
+#endif
+
+#if CHIP_CONFIG_ENABLE_ICD_CIP
+        if (this->icdCheckInBackOffStrategy == nullptr)
+        {
+            this->icdCheckInBackOffStrategy = &sDefaultICDCheckInBackOffStrategy;
+        }
+#endif
+
+    return CHIP_NO_ERROR;
+}
+
 CHIP_ERROR Server::Init(const ServerInitParams & initParams)
 {
     ChipLogProgress(AppServer, "Server initializing...");
@@ -129,6 +235,10 @@ CHIP_ERROR Server::Init(const ServerInitParams & initParams)
     VerifyOrExit(initParams.operationalKeystore != nullptr, err = CHIP_ERROR_INVALID_ARGUMENT);
     VerifyOrExit(initParams.opCertStore != nullptr, err = CHIP_ERROR_INVALID_ARGUMENT);
     VerifyOrExit(initParams.reportScheduler != nullptr, err = CHIP_ERROR_INVALID_ARGUMENT);
+#if defined (CHIP_CONFIG_TC_REQUIRED_ACKNOWLEDGEMENTS) && defined (CHIP_CONFIG_TC_REQUIRED_ACKNOWLEDGEMENTS_VERSION)
+    VerifyOrExit(initParams.enhancedSetupFlowProvider != nullptr, err = CHIP_ERROR_INVALID_ARGUMENT);
+    VerifyOrExit(initParams.termsAndConditionsProvider != nullptr, err = CHIP_ERROR_INVALID_ARGUMENT);
+#endif
 
     // TODO(16969): Remove chip::Platform::MemoryInit() call from Server class, it belongs to outer code
     chip::Platform::MemoryInit();
@@ -184,6 +294,11 @@ CHIP_ERROR Server::Init(const ServerInitParams & initParams)
     SetGroupDataProvider(mGroupsProvider);
 
     mReportScheduler = initParams.reportScheduler;
+
+#if defined (CHIP_CONFIG_TC_REQUIRED_ACKNOWLEDGEMENTS) && defined (CHIP_CONFIG_TC_REQUIRED_ACKNOWLEDGEMENTS_VERSION)
+    mTermsAndConditionsProvider = initParams.termsAndConditionsProvider;
+    mEnhancedSetupFlowProvider  = initParams.enhancedSetupFlowProvider;
+#endif
 
     mTestEventTriggerDelegate = initParams.testEventTriggerDelegate;
     if (mTestEventTriggerDelegate == nullptr)
