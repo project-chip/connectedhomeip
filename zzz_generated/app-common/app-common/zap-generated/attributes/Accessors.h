@@ -919,6 +919,30 @@ Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint64_t valu
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint64_t value, MarkAttributeDirty markDirty);
 } // namespace Breadcrumb
 
+namespace TCAcceptedVersion {
+Protocols::InteractionModel::Status Get(chip::EndpointId endpoint, uint16_t * value); // int16u
+Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint16_t value);
+Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint16_t value, MarkAttributeDirty markDirty);
+} // namespace TCAcceptedVersion
+
+namespace TCMinRequiredVersion {
+Protocols::InteractionModel::Status Get(chip::EndpointId endpoint, uint16_t * value); // int16u
+Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint16_t value);
+Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint16_t value, MarkAttributeDirty markDirty);
+} // namespace TCMinRequiredVersion
+
+namespace TCAcknowledgements {
+Protocols::InteractionModel::Status Get(chip::EndpointId endpoint, uint16_t * value); // bitmap16
+Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint16_t value);
+Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint16_t value, MarkAttributeDirty markDirty);
+} // namespace TCAcknowledgements
+
+namespace TCAcknowledgementsRequired {
+Protocols::InteractionModel::Status Get(chip::EndpointId endpoint, bool * value); // boolean
+Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, bool value);
+Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, bool value, MarkAttributeDirty markDirty);
+} // namespace TCAcknowledgementsRequired
+
 namespace FeatureMap {
 Protocols::InteractionModel::Status Get(chip::EndpointId endpoint, uint32_t * value); // bitmap32
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint32_t value);

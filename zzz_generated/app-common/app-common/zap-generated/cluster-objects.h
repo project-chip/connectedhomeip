@@ -6340,6 +6340,16 @@ struct Type;
 struct DecodableType;
 } // namespace CommissioningCompleteResponse
 
+namespace SetTCAcknowledgements {
+struct Type;
+struct DecodableType;
+} // namespace SetTCAcknowledgements
+
+namespace SetTCAcknowledgementsResponse {
+struct Type;
+struct DecodableType;
+} // namespace SetTCAcknowledgementsResponse
+
 } // namespace Commands
 
 namespace Commands {
@@ -6549,6 +6559,73 @@ public:
     CHIP_ERROR Decode(TLV::TLVReader & reader);
 };
 }; // namespace CommissioningCompleteResponse
+namespace SetTCAcknowledgements {
+enum class Fields : uint8_t
+{
+    kTCVersion      = 0,
+    kTCUserResponse = 1,
+};
+
+struct Type
+{
+public:
+    // Use GetCommandId instead of commandId directly to avoid naming conflict with CommandIdentification in ExecutionOfACommand
+    static constexpr CommandId GetCommandId() { return Commands::SetTCAcknowledgements::Id; }
+    static constexpr ClusterId GetClusterId() { return Clusters::GeneralCommissioning::Id; }
+
+    uint16_t TCVersion      = static_cast<uint16_t>(0);
+    uint16_t TCUserResponse = static_cast<uint16_t>(0);
+
+    CHIP_ERROR Encode(TLV::TLVWriter & aWriter, TLV::Tag aTag) const;
+
+    using ResponseType = Clusters::GeneralCommissioning::Commands::SetTCAcknowledgementsResponse::DecodableType;
+
+    static constexpr bool MustUseTimedInvoke() { return false; }
+};
+
+struct DecodableType
+{
+public:
+    static constexpr CommandId GetCommandId() { return Commands::SetTCAcknowledgements::Id; }
+    static constexpr ClusterId GetClusterId() { return Clusters::GeneralCommissioning::Id; }
+
+    uint16_t TCVersion      = static_cast<uint16_t>(0);
+    uint16_t TCUserResponse = static_cast<uint16_t>(0);
+    CHIP_ERROR Decode(TLV::TLVReader & reader);
+};
+}; // namespace SetTCAcknowledgements
+namespace SetTCAcknowledgementsResponse {
+enum class Fields : uint8_t
+{
+    kErrorCode = 0,
+};
+
+struct Type
+{
+public:
+    // Use GetCommandId instead of commandId directly to avoid naming conflict with CommandIdentification in ExecutionOfACommand
+    static constexpr CommandId GetCommandId() { return Commands::SetTCAcknowledgementsResponse::Id; }
+    static constexpr ClusterId GetClusterId() { return Clusters::GeneralCommissioning::Id; }
+
+    CommissioningErrorEnum errorCode = static_cast<CommissioningErrorEnum>(0);
+
+    CHIP_ERROR Encode(TLV::TLVWriter & aWriter, TLV::Tag aTag) const;
+
+    using ResponseType = DataModel::NullObjectType;
+
+    static constexpr bool MustUseTimedInvoke() { return false; }
+};
+
+struct DecodableType
+{
+public:
+    static constexpr CommandId GetCommandId() { return Commands::SetTCAcknowledgementsResponse::Id; }
+    static constexpr ClusterId GetClusterId() { return Clusters::GeneralCommissioning::Id; }
+
+    CommissioningErrorEnum errorCode = static_cast<CommissioningErrorEnum>(0);
+    CHIP_ERROR Decode(TLV::TLVReader & reader);
+};
+}; // namespace SetTCAcknowledgementsResponse
 } // namespace Commands
 
 namespace Attributes {
@@ -6613,6 +6690,54 @@ struct TypeInfo
     static constexpr bool MustUseTimedWrite() { return false; }
 };
 } // namespace SupportsConcurrentConnection
+namespace TCAcceptedVersion {
+struct TypeInfo
+{
+    using Type             = uint16_t;
+    using DecodableType    = uint16_t;
+    using DecodableArgType = uint16_t;
+
+    static constexpr ClusterId GetClusterId() { return Clusters::GeneralCommissioning::Id; }
+    static constexpr AttributeId GetAttributeId() { return Attributes::TCAcceptedVersion::Id; }
+    static constexpr bool MustUseTimedWrite() { return false; }
+};
+} // namespace TCAcceptedVersion
+namespace TCMinRequiredVersion {
+struct TypeInfo
+{
+    using Type             = uint16_t;
+    using DecodableType    = uint16_t;
+    using DecodableArgType = uint16_t;
+
+    static constexpr ClusterId GetClusterId() { return Clusters::GeneralCommissioning::Id; }
+    static constexpr AttributeId GetAttributeId() { return Attributes::TCMinRequiredVersion::Id; }
+    static constexpr bool MustUseTimedWrite() { return false; }
+};
+} // namespace TCMinRequiredVersion
+namespace TCAcknowledgements {
+struct TypeInfo
+{
+    using Type             = uint16_t;
+    using DecodableType    = uint16_t;
+    using DecodableArgType = uint16_t;
+
+    static constexpr ClusterId GetClusterId() { return Clusters::GeneralCommissioning::Id; }
+    static constexpr AttributeId GetAttributeId() { return Attributes::TCAcknowledgements::Id; }
+    static constexpr bool MustUseTimedWrite() { return false; }
+};
+} // namespace TCAcknowledgements
+namespace TCAcknowledgementsRequired {
+struct TypeInfo
+{
+    using Type             = bool;
+    using DecodableType    = bool;
+    using DecodableArgType = bool;
+
+    static constexpr ClusterId GetClusterId() { return Clusters::GeneralCommissioning::Id; }
+    static constexpr AttributeId GetAttributeId() { return Attributes::TCAcknowledgementsRequired::Id; }
+    static constexpr bool MustUseTimedWrite() { return false; }
+};
+} // namespace TCAcknowledgementsRequired
 namespace GeneratedCommandList {
 struct TypeInfo : public Clusters::Globals::Attributes::GeneratedCommandList::TypeInfo
 {
@@ -6665,6 +6790,10 @@ struct TypeInfo
         Attributes::LocationCapability::TypeInfo::DecodableType locationCapability =
             static_cast<chip::app::Clusters::GeneralCommissioning::RegulatoryLocationTypeEnum>(0);
         Attributes::SupportsConcurrentConnection::TypeInfo::DecodableType supportsConcurrentConnection = static_cast<bool>(0);
+        Attributes::TCAcceptedVersion::TypeInfo::DecodableType TCAcceptedVersion                       = static_cast<uint16_t>(0);
+        Attributes::TCMinRequiredVersion::TypeInfo::DecodableType TCMinRequiredVersion                 = static_cast<uint16_t>(0);
+        Attributes::TCAcknowledgements::TypeInfo::DecodableType TCAcknowledgements                     = static_cast<uint16_t>(0);
+        Attributes::TCAcknowledgementsRequired::TypeInfo::DecodableType TCAcknowledgementsRequired     = static_cast<bool>(0);
         Attributes::GeneratedCommandList::TypeInfo::DecodableType generatedCommandList;
         Attributes::AcceptedCommandList::TypeInfo::DecodableType acceptedCommandList;
         Attributes::EventList::TypeInfo::DecodableType eventList;
