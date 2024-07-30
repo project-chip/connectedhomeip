@@ -21,7 +21,6 @@ import time
 from chip import ChipDeviceCtrl
 from chip.interaction_model import Status
 import chip.clusters as Clusters
-from chip.clusters.Types import NullValue
 from matter_testing_support import MatterBaseTest, TestStep, async_test_body, default_matter_test_main
 from mobly import asserts
 
@@ -112,3 +111,6 @@ class TC_OCC_3_1(MatterBaseTest):
         else:          
             logging.info("HoldTime attribute not supported. Skip this test procedure.")
             self.skip_step(5)
+
+if __name__ == "__main__":
+    default_matter_test_main()
