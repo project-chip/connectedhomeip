@@ -900,6 +900,18 @@ static BOOL AttributeIsSpecifiedInGeneralCommissioningCluster(AttributeId aAttri
     case Attributes::SupportsConcurrentConnection::Id: {
         return YES;
     }
+    case Attributes::TCAcceptedVersion::Id: {
+        return YES;
+    }
+    case Attributes::TCMinRequiredVersion::Id: {
+        return YES;
+    }
+    case Attributes::TCAcknowledgements::Id: {
+        return YES;
+    }
+    case Attributes::TCAcknowledgementsRequired::Id: {
+        return YES;
+    }
     case Attributes::GeneratedCommandList::Id: {
         return YES;
     }

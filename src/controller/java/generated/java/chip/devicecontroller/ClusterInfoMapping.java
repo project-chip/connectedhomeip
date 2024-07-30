@@ -2838,6 +2838,28 @@ public class ClusterInfoMapping {
       callback.onFailure(error);
     }
   }
+
+  public static class DelegatedGeneralCommissioningClusterSetTCAcknowledgementsResponseCallback implements ChipClusters.GeneralCommissioningCluster.SetTCAcknowledgementsResponseCallback, DelegatedClusterCallback {
+    private ClusterCommandCallback callback;
+    @Override
+    public void setCallbackDelegate(ClusterCommandCallback callback) {
+      this.callback = callback;
+    }
+
+    @Override
+    public void onSuccess(Integer errorCode) {
+      Map<CommandResponseInfo, Object> responseValues = new LinkedHashMap<>();
+
+      CommandResponseInfo errorCodeResponseValue = new CommandResponseInfo("errorCode", "Integer");
+      responseValues.put(errorCodeResponseValue, errorCode);
+      callback.onSuccess(responseValues);
+    }
+
+    @Override
+    public void onError(Exception error) {
+      callback.onFailure(error);
+    }
+  }
   public static class DelegatedGeneralCommissioningClusterBasicCommissioningInfoAttributeCallback implements ChipClusters.GeneralCommissioningCluster.BasicCommissioningInfoAttributeCallback, DelegatedClusterCallback {
     private ClusterCommandCallback callback;
     @Override
@@ -23818,6 +23840,30 @@ public class ClusterInfoMapping {
         generalCommissioningcommissioningCompleteCommandParams
       );
     generalCommissioningClusterInteractionInfoMap.put("commissioningComplete", generalCommissioningcommissioningCompleteInteractionInfo);
+
+    Map<String, CommandParameterInfo> generalCommissioningsetTCAcknowledgementsCommandParams = new LinkedHashMap<String, CommandParameterInfo>();
+
+    CommandParameterInfo generalCommissioningsetTCAcknowledgementsTCVersionCommandParameterInfo = new CommandParameterInfo("TCVersion", Integer.class, Integer.class);
+    generalCommissioningsetTCAcknowledgementsCommandParams.put("TCVersion",generalCommissioningsetTCAcknowledgementsTCVersionCommandParameterInfo);
+
+    CommandParameterInfo generalCommissioningsetTCAcknowledgementsTCUserResponseCommandParameterInfo = new CommandParameterInfo("TCUserResponse", Integer.class, Integer.class);
+    generalCommissioningsetTCAcknowledgementsCommandParams.put("TCUserResponse",generalCommissioningsetTCAcknowledgementsTCUserResponseCommandParameterInfo);
+    InteractionInfo generalCommissioningsetTCAcknowledgementsInteractionInfo = new InteractionInfo(
+      (cluster, callback, commandArguments) -> {
+        ((ChipClusters.GeneralCommissioningCluster) cluster)
+          .setTCAcknowledgements((ChipClusters.GeneralCommissioningCluster.SetTCAcknowledgementsResponseCallback) callback
+           , (Integer)
+             commandArguments.get("TCVersion")
+
+           , (Integer)
+             commandArguments.get("TCUserResponse")
+
+            );
+        },
+        () -> new DelegatedGeneralCommissioningClusterSetTCAcknowledgementsResponseCallback(),
+        generalCommissioningsetTCAcknowledgementsCommandParams
+      );
+    generalCommissioningClusterInteractionInfoMap.put("setTCAcknowledgements", generalCommissioningsetTCAcknowledgementsInteractionInfo);
 
     commandMap.put("generalCommissioning", generalCommissioningClusterInteractionInfoMap);
 
