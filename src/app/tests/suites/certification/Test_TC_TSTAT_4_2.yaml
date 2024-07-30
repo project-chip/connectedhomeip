@@ -498,8 +498,8 @@ tests:
                 value: "y"
 
     - label:
-          "Step 5a:  Test Harness calls the SetActivePresetRequest
-          command to set the active preset handle"
+          "Step 5a:  Test Harness calls the SetActivePresetRequest command to
+          set the active preset handle"
       PICS: TSTAT.S.F08 && TSTAT.S.C06.Rsp
       verification: |
           Optional Attribute - If it is supported, then in TH log it will results in displaying the value, else it will display UNSUPPORTED_ATTRIBUTE. Below is the log of RPI the result may be vary on the basis of dut implementation.
@@ -542,7 +542,8 @@ tests:
               - name: "expectedValue"
                 value: "y"
 
-    - label: "Step 5c:  Test Harness calls the StartPresetsSchedulesEditRequest
+    - label:
+          "Step 5c:  Test Harness calls the StartPresetsSchedulesEditRequest
           command to edit presets"
       PICS: TSTAT.S.F08 && TSTAT.S.C07.Rsp
       verification: |
@@ -2009,7 +2010,8 @@ tests:
               - name: "expectedValue"
                 value: "y"
 
-    - label: "Step 13b:  Test Harness writes to the Presets attribute but calls
+    - label:
+          "Step 13b:  Test Harness writes to the Presets attribute but calls
           CancelPresetsSchedulesEditRequest command to cancel the edit request"
       PICS: TSTAT.S.F08 && TSTAT.S.A0050
       verification: |
@@ -2165,8 +2167,8 @@ tests:
                 value: "y"
 
     - label:
-          "Step 13d:  Test Harness reads the Presets attribute after calling
-          the CancelPresetsSchedulesEditRequest command"
+          "Step 13d:  Test Harness reads the Presets attribute after calling the
+          CancelPresetsSchedulesEditRequest command"
       PICS: TSTAT.S.F08 && TSTAT.S.A0050
       verification: |
           Optional Attribute - If it is supported, then in TH log it will results in displaying the value, else it will display UNSUPPORTED_ATTRIBUTE. Below is the log of RPI the result may be vary on the basis of dut implementation.
