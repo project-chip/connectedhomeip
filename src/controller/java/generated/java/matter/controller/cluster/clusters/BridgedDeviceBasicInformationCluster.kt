@@ -40,6 +40,7 @@ import matter.controller.cluster.structs.*
 import matter.controller.model.AttributePath
 import matter.controller.model.CommandPath
 import matter.tlv.AnonymousTag
+import matter.tlv.ContextSpecificTag
 import matter.tlv.TlvReader
 import matter.tlv.TlvWriter
 
@@ -100,11 +101,14 @@ class BridgedDeviceBasicInformationCluster(
     object SubscriptionEstablished : AttributeListAttributeSubscriptionState()
   }
 
-  suspend fun keepActive(timedInvokeTimeout: Duration? = null) {
+  suspend fun keepActive(stayActiveDuration: UInt, timedInvokeTimeout: Duration? = null) {
     val commandId: UInt = 128u
 
     val tlvWriter = TlvWriter()
     tlvWriter.startStructure(AnonymousTag)
+
+    val TAG_STAY_ACTIVE_DURATION_REQ: Int = 0
+    tlvWriter.put(ContextSpecificTag(TAG_STAY_ACTIVE_DURATION_REQ), stayActiveDuration)
     tlvWriter.endStructure()
 
     val request: InvokeRequest =

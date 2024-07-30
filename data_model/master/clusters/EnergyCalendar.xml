@@ -59,9 +59,9 @@ Davis, CA 95616, USA
 -->
 <cluster xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="types types.xsd cluster cluster.xsd" id="0x009A" name="Energy Calendar Cluster" revision="3">
   <revisionHistory>
-    <revision revision="1" summary="mandatory global ClusterRevision attribute added; Added from SE1.4; CCB 2068"/>
+    <revision revision="1" summary="Mandatory global ClusterRevision attribute added; Added from SE1.4; CCB 2068"/>
     <revision revision="2" summary="CCB 3042"/>
-    <revision revision="3" summary="Initial Matter Release"/>
+    <revision revision="3" summary="Initial Matter revision"/>
   </revisionHistory>
   <clusterIds>
     <clusterId id="0x009A" name="Energy Calendar"/>

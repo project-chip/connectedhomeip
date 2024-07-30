@@ -867,6 +867,13 @@ class ChipClusters:
         "clusterName": "AccessControl",
         "clusterId": 0x0000001F,
         "commands": {
+            0x00000000: {
+                "commandId": 0x00000000,
+                "commandName": "ReviewFabricRestrictions",
+                "args": {
+                    "arl": "AccessRestrictionStruct",
+                },
+            },
         },
         "attributes": {
             0x00000000: {
@@ -899,6 +906,18 @@ class ChipClusters:
                 "attributeName": "AccessControlEntriesPerFabric",
                 "attributeId": 0x00000004,
                 "type": "int",
+                "reportable": True,
+            },
+            0x00000005: {
+                "attributeName": "CommissioningARL",
+                "attributeId": 0x00000005,
+                "type": "",
+                "reportable": True,
+            },
+            0x00000006: {
+                "attributeName": "Arl",
+                "attributeId": 0x00000006,
+                "type": "",
                 "reportable": True,
             },
             0x0000FFF8: {
@@ -1932,6 +1951,14 @@ class ChipClusters:
                 "args": {
                 },
             },
+            0x00000006: {
+                "commandId": 0x00000006,
+                "commandName": "SetTCAcknowledgements",
+                "args": {
+                    "TCVersion": "int",
+                    "TCUserResponse": "int",
+                },
+            },
         },
         "attributes": {
             0x00000000: {
@@ -1962,6 +1989,30 @@ class ChipClusters:
             0x00000004: {
                 "attributeName": "SupportsConcurrentConnection",
                 "attributeId": 0x00000004,
+                "type": "bool",
+                "reportable": True,
+            },
+            0x00000005: {
+                "attributeName": "TCAcceptedVersion",
+                "attributeId": 0x00000005,
+                "type": "int",
+                "reportable": True,
+            },
+            0x00000006: {
+                "attributeName": "TCMinRequiredVersion",
+                "attributeId": 0x00000006,
+                "type": "int",
+                "reportable": True,
+            },
+            0x00000007: {
+                "attributeName": "TCAcknowledgements",
+                "attributeId": 0x00000007,
+                "type": "int",
+                "reportable": True,
+            },
+            0x00000008: {
+                "attributeName": "TCAcknowledgementsRequired",
+                "attributeId": 0x00000008,
                 "type": "bool",
                 "reportable": True,
             },
@@ -3250,6 +3301,7 @@ class ChipClusters:
                 "commandId": 0x00000080,
                 "commandName": "KeepActive",
                 "args": {
+                    "stayActiveDuration": "int",
                 },
             },
         },
@@ -8846,13 +8898,6 @@ class ChipClusters:
                 "args": {
                 },
             },
-            0x0000000B: {
-                "commandId": 0x0000000B,
-                "commandName": "SetTemperatureSetpointHoldPolicy",
-                "args": {
-                    "temperatureSetpointHoldPolicy": "int",
-                },
-            },
         },
         "attributes": {
             0x00000000: {
@@ -9245,14 +9290,8 @@ class ChipClusters:
                 "reportable": True,
             },
             0x00000053: {
-                "attributeName": "TemperatureSetpointHoldPolicy",
-                "attributeId": 0x00000053,
-                "type": "int",
-                "reportable": True,
-            },
-            0x00000054: {
                 "attributeName": "SetpointHoldExpiryTimestamp",
-                "attributeId": 0x00000054,
+                "attributeId": 0x00000053,
                 "type": "int",
                 "reportable": True,
             },
@@ -11828,10 +11867,16 @@ class ChipClusters:
             },
         },
         "attributes": {
-            0x00000001: {
+            0x00000000: {
                 "attributeName": "Ssid",
-                "attributeId": 0x00000001,
+                "attributeId": 0x00000000,
                 "type": "bytes",
+                "reportable": True,
+            },
+            0x00000001: {
+                "attributeName": "PassphraseSurrogate",
+                "attributeId": 0x00000001,
+                "type": "int",
                 "reportable": True,
             },
             0x0000FFF8: {
