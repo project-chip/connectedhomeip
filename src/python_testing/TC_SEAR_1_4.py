@@ -70,7 +70,9 @@ class TC_SEAR_1_4(MatterBaseTest):
             endpoint=self.endpoint, attribute=Clusters.ServiceArea.Attributes.AttributeList)
         logging.info("AttributeList: %s" % (attribute_list))
 
-        if not (Clusters.ServiceArea.Attributes.CurrentArea in attribute_list and Clusters.ServiceArea.Attributes.Progress in attribute_list):
+        if Clusters.ServiceArea.Attributes.CurrentArea not in attribute_list \
+            and Clusters.ServiceArea.Attributes.Progress not in attribute_list:
+            
             cmd_list = await self.read_sear_attribute_expect_success(
             endpoint=self.endpoint, attribute=Clusters.ServiceArea.Attributes.AcceptedCommandList)
             logging.info("AcceptedCommandList: %s" % (cmd_list))

@@ -130,13 +130,12 @@ class TC_SEAR_1_2(MatterBaseTest):
                              f"SelectedAreas(len {len(selected_areas)}) should have at most {len(self.areaid_list)} entries")
 
         asserts.assert_true(len(set(selected_areas)) == len(selected_areas), "SelectedAreas must have unique AreaID values!")
-        selareaid_list = []        
-        for a in selected_areas:
-            selareaid_list.append(a)
+        
+        for a in selected_areas:        
             asserts.assert_true(a in self.areaid_list,
                             f"SelectedAreas entry {a} has invalid value")
         #save so other methods can use this if neeeded
-        self.selareaid_list = selareaid_list
+        self.selareaid_list = selected_areas
 
     async def read_and_validate_current_area(self, step):
         self.print_step(step, "Read CurrentArea attribute")

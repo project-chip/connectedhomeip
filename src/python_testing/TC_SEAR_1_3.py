@@ -53,10 +53,7 @@ class TC_SEAR_1_3(MatterBaseTest):
             endpoint=self.endpoint, attribute=Clusters.ServiceArea.Attributes.SupportedAreas)
         logging.info("SupportedAreas: %s" % (supported_areas))
 
-        areaid_list = []
-        for a in supported_areas:
-            areaid_list.append(a.areaID)
-        return areaid_list
+        return [a.areaID for a in supported_areas]
 
     async def read_selected_areas(self, step):
         self.print_step(step, "Read SelectedAreas attribute")
@@ -64,11 +61,7 @@ class TC_SEAR_1_3(MatterBaseTest):
             endpoint=self.endpoint, attribute=Clusters.ServiceArea.Attributes.SelectedAreas)
         logging.info(f"SelectedAreas {selected_areas}")
 
-        selareaid_list = []
-        for a in selected_areas:
-            selareaid_list.append(a.areaID)
-        return selareaid_list
-
+        return [a.areaID for a in selected_areas]
         
     async def send_cmd_select_areas_expect_response(self, step, new_areas, expected_response):
         self.print_step(step, f"Send SelectAreas command with NewAreas({new_areas})")

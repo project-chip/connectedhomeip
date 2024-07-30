@@ -53,10 +53,7 @@ class TC_SEAR_1_6(MatterBaseTest):
             endpoint=self.endpoint, attribute=Clusters.ServiceArea.Attributes.SupportedAreas)
         logging.info("SupportedAreas: %s" % (supported_areas))
 
-        areaid_list = []
-        for a in supported_areas:
-            areaid_list.append(a.areaID)
-        return areaid_list
+        return [a.areaID for a in supported_areas]
 
     async def read_selected_areas(self, step):
         self.print_step(step, "Read SelectedAreas attribute")
@@ -64,10 +61,7 @@ class TC_SEAR_1_6(MatterBaseTest):
             endpoint=self.endpoint, attribute=Clusters.ServiceArea.Attributes.SelectedAreas)
         logging.info(f"SelectedAreas {selected_areas}")
 
-        selareaid_list = []
-        for a in selected_areas:
-            selareaid_list.append(a.areaID)
-        return selareaid_list
+        return selected_areas
 
     async def read_progress(self, step):
         self.print_step(step, "Read Progress attribute")
@@ -86,7 +80,7 @@ class TC_SEAR_1_6(MatterBaseTest):
         sleep(0.001)
 
     def TC_SEAR_1_6(self) -> list[str]:
-        return ["SEAR.S", "SEAR.S.A0005", "SEAR.S.M.HAS_MANUAL_OPERATING_STATE_CONTROL"]
+        return ["SEAR.S", "SEAR.S.A0005", "SEAR.S.A0000", "SEAR.S.A0002", "SEAR.S.M.HAS_MANUAL_OPERATING_STATE_CONTROL"]
 
     @async_test_body
     async def test_TC_SEAR_1_6(self):
@@ -106,7 +100,7 @@ class TC_SEAR_1_6(MatterBaseTest):
             self.write_to_app_pipe('{"Name": "Reset"}')
 
         #FIXME is this necesssary? I'm not sure what TC_SEAR_1_6() is used for
-        if not (self.check_pics("SEAR.S.A0005") and self.check_pics("SEAR.S.M.HAS_MANUAL_OPERATING_STATE_CONTROL")):
+        if not self.check_pics("SEAR.S.A0005"):
             return
         
         test_step = "Manually intervene to put the device in the idle state and ensure SupportedAreas and SelectedAreas are not empty"
