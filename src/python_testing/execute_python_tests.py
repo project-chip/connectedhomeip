@@ -63,6 +63,7 @@ def main(search_directory, env_file):
         "TC_EEVSE_Utils.py",
         "TC_ECOINFO_2_1.py",
         "TC_ECOINFO_2_2.py",
+        "TC_EWATERHTRBase.py",
         "TC_EnergyReporting_Utils.py",
         "TC_OpstateCommon.py",
         "TC_pics_checker.py",
