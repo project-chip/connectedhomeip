@@ -28,7 +28,6 @@
 # === END CI TEST ARGUMENTS ===
 
 import logging
-import queue
 import time
 
 import chip.clusters as Clusters
@@ -36,10 +35,6 @@ import test_plan_support
 from matter_testing_support import (ClusterAttributeChangeAccumulator, MatterBaseTest, TestStep, default_matter_test_main,
                                     has_cluster, per_endpoint_test)
 from mobly import asserts
-
-# This test requires several additional command line arguments
-# run with
-# --endpoint endpoint
 
 
 class TC_LVL_2_3(MatterBaseTest):
