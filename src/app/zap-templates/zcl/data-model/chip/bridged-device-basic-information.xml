@@ -96,6 +96,7 @@ limitations under the License.
 
         <command source="client" code="0x80" name="KeepActive" optional="true" apiMaturity="provisional">
           <description> The server SHALL attempt to keep the devices specified active for StayActiveDuration milliseconds when they are next active.</description>
+          <arg name="StayActiveDuration" type="int32u"/>
         </command>
 
         <event side="server" code="0x00" name="StartUp" priority="critical" optional="true">
