@@ -1551,16 +1551,7 @@ tests:
       response:
           value: NumberOfCredentialsSupportedPerUserValue
 
-    - label: "Cleanup the created user"
-      PICS: DRLK.S.F00 && DRLK.S.F07
-      command: "ClearUser"
-      timedInteractionTimeoutMs: 1000
-      arguments:
-          values:
-              - name: "UserIndex"
-                value: 1
-
-    - label: "Clean the created credential"
+    - label: "Step 36: TH sends ClearCredential Command to DUT"
       PICS: DRLK.S.F00 && DRLK.S.F07 && DRLK.S.C26.Rsp
       command: "ClearCredential"
       timedInteractionTimeoutMs: 1000
@@ -1568,3 +1559,288 @@ tests:
           values:
               - name: "Credential"
                 value: { CredentialType: 1, CredentialIndex: 1 }
+
+    - label:
+          "Step 37: TH sends ClearUser Command to DUT with the UserIndex as 1"
+      PICS: DRLK.S.F07 && DRLK.S.C1d.Rsp
+      command: "ClearUser"
+      timedInteractionTimeoutMs: 1000
+      arguments:
+          values:
+              - name: "UserIndex"
+                value: 1
+
+    - label: "Step 38a: TH reads AliroReaderVerificationKey attribute from DUT"
+      PICS: DRLK.S.F0d && DRLK.S.A0080
+      command: "readAttribute"
+      attribute: "AliroReaderVerificationKey"
+      response:
+          saveAs: verificationkey
+          constraints:
+              type: octet_string
+              minLength: 65
+              maxLength: 65
+
+    - label:
+          "Step 38b: TH writes AliroReaderVerificationKey attribute as an octstr
+          value of length 65 which is different from verificationkey"
+      PICS: DRLK.S.F0d && DRLK.S.A0080
+      command: "writeAttribute"
+      attribute: "AliroReaderVerificationKey"
+      arguments:
+          value: "047a4c992d753924cdf3779a3c84fec2debaa6f0b3084450878acc7ddcce7856ae57b1ebbe2561015103dd7474c2a183675378ec55f1e465ac3436bf3dd5ca54d4"
+      response:
+          error: UNSUPPORTED_WRITE
+
+    - label: "Step 38c: TH reads AliroReaderVerificationKey attribute from DUT"
+
+      PICS: DRLK.S.F0d && DRLK.S.A0080
+      command: "readAttribute"
+      attribute: "AliroReaderVerificationKey"
+      response:
+          value: verificationkey
+
+    - label: "Step 39a: TH reads AliroReaderGroupIdentifier attribute from DUT"
+      PICS: DRLK.S.F0d && DRLK.S.A0081
+      command: "readAttribute"
+      attribute: "AliroReaderGroupIdentifier"
+      response:
+          saveAs: aliroreadergrpidentifier
+          constraints:
+              type: octet_string
+              minLength: 16
+              maxLength: 16
+
+    - label:
+          "Step 39b: TH writes AliroReaderGroupIdentifier attribute as octstr
+          value of length 16 which is different from aliroreadergrpidentifier"
+      PICS: DRLK.S.F0d && DRLK.S.A0081
+      command: "writeAttribute"
+      attribute: "AliroReaderVerificationKey"
+      arguments:
+          value: "047a4c992d753924"
+      response:
+          error: UNSUPPORTED_WRITE
+
+    - label: "Step 39c: TH reads AliroReaderGroupIdentifier attribute from DUT"
+      PICS: DRLK.S.F0d && DRLK.S.A0081
+      command: "readAttribute"
+      attribute: "AliroReaderGroupIdentifier"
+      response:
+          value: aliroreadergrpidentifier
+    - label:
+          "Step 40a: TH reads AliroReaderGroupSubIdentifier attribute from DUT"
+      PICS: DRLK.S.F0d && DRLK.S.A0082
+      command: "readAttribute"
+      attribute: "AliroReaderGroupSubIdentifier"
+      response:
+          saveAs: aliroreadergrpsubidentifier
+          constraints:
+              type: octet_string
+              minLength: 16
+              maxLength: 16
+
+    - label:
+          "Step 40b: TH writes AliroReaderGroupSubIdentifier attribute as octstr
+          value of length 16 which is different from aliroreadergrpsubidentifier"
+      PICS: DRLK.S.F0d && DRLK.S.A0082
+      command: "writeAttribute"
+      attribute: "AliroReaderGroupSubIdentifier"
+      arguments:
+          value: "047a4c992d75368"
+      response:
+          error: UNSUPPORTED_WRITE
+
+    - label: "Step 40c: TH reads AliroReaderGroupIdentifier attribute from DUT"
+      PICS: DRLK.S.F0d && DRLK.S.A0082
+      command: "readAttribute"
+      attribute: "AliroReaderGroupSubIdentifier"
+      response:
+          value: aliroreadergrpsubidentifier
+
+    - label:
+          "Step 41a: TH reads AliroExpeditedTransactionSupportedProtocolVersions
+          attribute from DUT"
+      PICS: DRLK.S.F0d && DRLK.S.A0083
+      command: "readAttribute"
+      attribute: "AliroExpeditedTransactionSupportedProtocolVersions"
+      response:
+          saveAs: aliroprotocolversion
+          constraints:
+              type: list
+              maxLength: 16
+
+    - label:
+          "Step 41b: TH writes
+          AliroExpeditedTransactionSupportedProtocolVersions attribute as list
+          which is different from aliroprotocolversion"
+      PICS: DRLK.S.F0d && DRLK.S.A0083
+      command: "writeAttribute"
+      attribute: "AliroExpeditedTransactionSupportedProtocolVersions"
+      arguments:
+          value: ["\x01", "\x02"]
+      response:
+          error: UNSUPPORTED_WRITE
+
+    - label:
+          "Step 41c: TH reads AliroExpeditedTransactionSupportedProtocolVersions
+          attribute from DUT"
+      PICS: DRLK.S.F0d && DRLK.S.A0083
+      command: "readAttribute"
+      attribute: "AliroExpeditedTransactionSupportedProtocolVersions"
+      response:
+          value: aliroprotocolversion
+
+    - label: "Step 42a: TH reads AliroGroupResolvingKey attribute from DUT"
+      PICS: DRLK.S.F0d && DRLK.S.A0084
+      command: "readAttribute"
+      attribute: "AliroGroupResolvingKey"
+      response:
+          saveAs: alirogrpresolvingkey
+          constraints:
+              type: octet_string
+              minLength: 16
+              maxLength: 16
+
+    - label:
+          "Step 42b: TH writes AliroGroupResolvingKey attribute as octstr value
+          of length 16 which is different from alirogrpresolvingkey"
+      PICS: DRLK.S.F0d && DRLK.S.A0084
+      command: "writeAttribute"
+      attribute: "AliroGroupResolvingKey"
+      arguments:
+          value: "047a4c992d75368"
+      response:
+          error: UNSUPPORTED_WRITE
+
+    - label: "Step 42c: TH reads AliroGroupResolvingKey attribute from DUT"
+      PICS: DRLK.S.F0d && DRLK.S.A0084
+      command: "readAttribute"
+      attribute: "AliroGroupResolvingKey"
+      response:
+          value: alirogrpresolvingkey
+
+    - label:
+          "Step 43a: TH reads AliroSupportedBLEUWBProtocolVersions attribute
+          from DUT"
+      PICS: DRLK.S.F0d && DRLK.S.A0085
+      command: "readAttribute"
+      attribute: "AliroSupportedBLEUWBProtocolVersions"
+      response:
+          saveAs: alirobleuwbprotocolversion
+          constraints:
+              type: list
+              maxLength: 16
+
+    - label:
+          "Step 43b: TH writes AliroSupportedBLEUWBProtocolVersions attribute as
+          list which is different from alirobleuwbprotocolversion"
+      PICS: DRLK.S.F0d && DRLK.S.A0085
+      command: "writeAttribute"
+      attribute: "AliroSupportedBLEUWBProtocolVersions"
+      arguments:
+          value: ["\x01", "\x02"]
+      response:
+          error: UNSUPPORTED_WRITE
+
+    - label: "Step 43c: TH reads AliroGroupResolvingKey attribute from DUT"
+      PICS: DRLK.S.F0d && DRLK.S.A0085
+      command: "readAttribute"
+      attribute: "AliroSupportedBLEUWBProtocolVersions"
+      response:
+          value: alirobleuwbprotocolversion
+
+    - label: "Step 44a: TH reads AliroBLEAdvertisingVersion attribute from DUT"
+      PICS: DRLK.S.F0d && DRLK.S.A0086
+      command: "readAttribute"
+      attribute: "AliroBLEAdvertisingVersion"
+      response:
+          saveAs: alirobleadvversion
+          constraints:
+              type: int8u
+              minValue: 0
+              maxValue: 255
+
+    - label:
+          "Step 44b: TH writes AliroBLEAdvertisingVersion attribute as any value
+          different from alirobleadvversion"
+      PICS: DRLK.S.F0d && DRLK.S.A0086
+      command: "writeAttribute"
+      attribute: "AliroBLEAdvertisingVersion"
+      arguments:
+          value: 85
+      response:
+          error: UNSUPPORTED_WRITE
+
+    - label: "Step 44c: TH reads AliroBLEAdvertisingVersion attribute from DUT"
+      PICS: DRLK.S.F0d && DRLK.S.A0086
+      command: "readAttribute"
+      attribute: "AliroBLEAdvertisingVersion"
+      response:
+          value: alirobleadvversion
+
+    - label:
+          "Step 45a: TH reads NumberOfAliroCredentialIssuerKeysSupported
+          attribute from DUT"
+      PICS: DRLK.S.F0d && DRLK.S.A0087
+      command: "readAttribute"
+      attribute: "NumberOfAliroCredentialIssuerKeysSupported"
+      response:
+          saveAs: alirokeysupported
+          constraints:
+              type: int16u
+              minValue: 0
+              maxValue: 65534
+
+    - label:
+          "Step 45b: TH writes NumberOfAliroCredentialIssuerKeysSupported
+          attribute as any value different from alirokeysupported"
+      PICS: DRLK.S.F0d && DRLK.S.A0087
+      command: "writeAttribute"
+      attribute: "NumberOfAliroCredentialIssuerKeysSupported"
+      arguments:
+          value: 30
+      response:
+          error: UNSUPPORTED_WRITE
+
+    - label:
+          "Step 45c: TH reads NumberOfAliroCredentialIssuerKeysSupported
+          attribute from DUT"
+      PICS: DRLK.S.F0d && DRLK.S.A0087
+      command: "readAttribute"
+      attribute: "NumberOfAliroCredentialIssuerKeysSupported"
+      response:
+          value: alirokeysupported
+
+    - label:
+          "Step 46a: TH reads NumberOfAliroEndpointKeysSupported attribute from
+          DUT"
+      PICS: DRLK.S.F0d && DRLK.S.A0088
+      command: "readAttribute"
+      attribute: "NumberOfAliroEndpointKeysSupported"
+      response:
+          saveAs: aliroepkeysupported
+          constraints:
+              type: int16u
+              minValue: 0
+              maxValue: 65534
+
+    - label:
+          "Step 46b: TH writes NumberOfAliroEndpointKeysSupported attribute as
+          any value different from aliroepkeysupported"
+      PICS: DRLK.S.F0d && DRLK.S.A0088
+      command: "writeAttribute"
+      attribute: "NumberOfAliroEndpointKeysSupported"
+      arguments:
+          value: 1000
+      response:
+          error: UNSUPPORTED_WRITE
+
+    - label:
+          "Step 46c: TH reads NumberOfAliroEndpointKeysSupported attribute from
+          DUT"
+      PICS: DRLK.S.F0d && DRLK.S.A0088
+      command: "readAttribute"
+      attribute: "NumberOfAliroEndpointKeysSupported"
+      response:
+          value: aliroepkeysupported

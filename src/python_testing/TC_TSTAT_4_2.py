@@ -117,11 +117,11 @@ class TC_TSTAT_4_2(MatterBaseTest):
             TestStep("1", "Commissioning, already done",
                      is_commissioning=True),
             TestStep("2", "TH writes to the Presets attribute without calling the StartPresetsSchedulesEditRequest command",
-                     "Verify that the Presets attribute was not updated."),
+                     " Verify that the write request returns INVALID_IN_STATE error since the client didn't send a request to edit the presets by calling StartPresetsSchedulesEditRequest command."),
             TestStep("3", "TH writes to the Presets attribute after calling the StartPresetsSchedulesEditRequest command but doesn't call CommitPresetsSchedulesRequest to commit",
-                     "Verify that the Presets attribute was not updated."),
+                     "Verify that the Presets attribute was not updated since CommitPresetsSchedulesRequest command was not called."),
             TestStep("4", "TH writes to the Presets attribute after calling the StartPresetsSchedulesEditRequest command and calls CommitPresetsSchedulesRequest to commit",
-                     "Verify that the Presets attribute was updated."),
+                     "Verify that the Presets attribute was updated with new presets."),
             TestStep("5", "TH writes to the Presets attribute with a built-in preset removed",
                      "Verify that the CommitPresetsSchedulesRequest returned UNSUPPORTED_ACCESS (0x7e)."),
             TestStep("6", "TH writes to the Presets attribute with a preset removed whose handle matches the value in the ActivePresetHandle attribute",
@@ -132,11 +132,13 @@ class TC_TSTAT_4_2(MatterBaseTest):
                      "Verify that the CommitPresetsSchedulesRequest returned CONSTRAINT_ERROR (0x87)."),
             TestStep("9", "TH writes to the Presets attribute with a new preset having a preset handle that doesn't exist in the Presets attribute",
                      "Verify that the CommitPresetsSchedulesRequest returned NOT_FOUND (0x8b)."),
-            TestStep("10", "TH writes to the Presets attribute with a non built-in preset modified to be built-in",
-                     "Verify that the CommitPresetsSchedulesRequest returned UNSUPPORTED_ACCESS (0x7e)."),
-            TestStep("11", "TH writes to the Presets attribute with a preset that doesn't support names in the PresetTypeFeatures bitmap but has a name",
+            TestStep("10", "TH writes to the Presets attribute with duplicate presets",
                      "Verify that the CommitPresetsSchedulesRequest returned CONSTRAINT_ERROR (0x87)."),
-            TestStep("12", "TH writes to the Presets attribute but calls the CancelPresetsSchedulesEditRequest command to cancel the edit request",
+            TestStep("11", "TH writes to the Presets attribute with a non built-in preset modified to be built-in",
+                     "Verify that the CommitPresetsSchedulesRequest returned UNSUPPORTED_ACCESS (0x7e)."),
+            TestStep("12", "TH writes to the Presets attribute with a preset that doesn't support names in the PresetTypeFeatures bitmap but has a name",
+                     "Verify that the CommitPresetsSchedulesRequest returned CONSTRAINT_ERROR (0x87)."),
+            TestStep("13", "TH writes to the Presets attribute but calls the CancelPresetsSchedulesEditRequest command to cancel the edit request",
                      "Verify that the edit request was cancelled"),
         ]
 
@@ -161,7 +163,7 @@ class TC_TSTAT_4_2(MatterBaseTest):
             asserts.assert_true(status_ok, "Presets write did not return InvalidInState as expected")
 
         self.step("3")
-        if self.pics_guard(self.check_pics("TSTAT.S.F08") and self.check_pics("TSTAT.S.A0050") and self.check_pics("TSTAT.S.C07.Rsp") and self.check_pics("TSTAT.S.C09.Rsp")):
+        if self.pics_guard(self.check_pics("TSTAT.S.F08") and self.check_pics("TSTAT.S.A0050") and self.check_pics("TSTAT.S.C07.Rsp")):
             await self.send_edit_preset_request_command()
 
             # Write to the presets attribute after calling StartPresetsSchedulesEditRequest command
@@ -292,6 +294,24 @@ class TC_TSTAT_4_2(MatterBaseTest):
             # Send the StartPresetsSchedulesEditRequest command
             await self.send_edit_preset_request_command()
 
+            # Write to the presets attribute after adding a duplicate preset with handle (b'\x03')
+            test_presets = copy.deepcopy(new_presets_with_handle)
+            test_presets.append(cluster.Structs.PresetStruct(
+                presetHandle=b'\x03', presetScenario=cluster.Enums.PresetScenarioEnum.kSleep, name="Sleep", coolingSetpoint=2700, heatingSetpoint=1900, builtIn=False))
+
+            status = await self.write_presets(endpoint=endpoint, presets=test_presets)
+            status_ok = (status == Status.Success)
+            asserts.assert_true(status_ok, "Presets write did not return Success as expected")
+
+            # Send the CommitPresetsSchedulesRequest command and expect ConstraintError
+            await self.send_commit_preset_request_command(expected_status=Status.ConstraintError)
+
+        self.step("11")
+        if self.pics_guard(self.check_pics("TSTAT.S.F08") and self.check_pics("TSTAT.S.A0050") and self.check_pics("TSTAT.S.C07.Rsp") and self.check_pics("TSTAT.S.C09.Rsp")):
+
+            # Send the StartPresetsSchedulesEditRequest command
+            await self.send_edit_preset_request_command()
+
             # Write to the presets attribute after setting the builtIn flag to True for preset with handle (b'\x03')
             test_presets = copy.deepcopy(new_presets_with_handle)
             test_presets[2].builtIn = True
@@ -303,7 +323,7 @@ class TC_TSTAT_4_2(MatterBaseTest):
             # Send the CommitPresetsSchedulesRequest command and expect UnsupportedAccess
             await self.send_commit_preset_request_command(expected_status=Status.UnsupportedAccess)
 
-        self.step("11")
+        self.step("12")
         if self.pics_guard(self.check_pics("TSTAT.S.F08") and self.check_pics("TSTAT.S.A0050") and self.check_pics("TSTAT.S.C07.Rsp") and self.check_pics("TSTAT.S.C09.Rsp")):
 
             # Send the StartPresetsSchedulesEditRequest command
@@ -320,7 +340,7 @@ class TC_TSTAT_4_2(MatterBaseTest):
             # Send the CommitPresetsSchedulesRequest command and expect ConstraintError
             await self.send_commit_preset_request_command(expected_status=Status.ConstraintError)
 
-        self.step("12")
+        self.step("13")
         if self.pics_guard(self.check_pics("TSTAT.S.F08") and self.check_pics("TSTAT.S.A0050") and self.check_pics("TSTAT.S.C07.Rsp") and self.check_pics("TSTAT.S.C09.Rsp")):
 
             # Send the StartPresetsSchedulesEditRequest command
