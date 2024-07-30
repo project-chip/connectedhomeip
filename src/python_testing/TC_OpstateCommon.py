@@ -1273,11 +1273,11 @@ class TC_OPSTATE_BASE():
         asserts.assert_greater(count, 0, "Did not receive any reports for CountdownTime")
 
         self.step(5)
-        #while operation not ended
+        # while operation not ended
         count = sub_handler.attribute_report_counts[attributes.CountdownTime]
         asserts.assert_less_equal(count, 5, "Received more than 5 reports for CountdownTime")
         asserts.assert_greater(count, 0, "Did not receive any reports for CountdownTime")
-        # ensure at least one report 
+        # ensure at least one report
 
         sub_handler.attribute_report_counts.reset()
         self.step(6)
@@ -1287,8 +1287,8 @@ class TC_OPSTATE_BASE():
 
         self.step(7)
         await self.read_and_expect_value(endpoint=endpoint,
-                                            attribute=attributes.OperationalState,
-                                            expected_value=cluster.Enums.OperationalStateEnum.kRunning)
+                                         attribute=attributes.OperationalState,
+                                         expected_value=cluster.Enums.OperationalStateEnum.kRunning)
 
         sub_handler.attribute_report_counts.reset()
         self.step(8)
