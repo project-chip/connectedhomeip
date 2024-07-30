@@ -429,8 +429,8 @@ void ThermostatManager::UpdateRunningModeForHeating()
 
 void ThermostatManager::UpdateRunningModeForCooling()
 {
-    const int16_t coolingOffThreshold = mOccupiedCoolingSetpoint - (int16_t) mOccupiedSetback * 10;
-    const int16_t coolingOnThreshold  = mOccupiedCoolingSetpoint + (int16_t) mOccupiedSetback * 10;
+    const int16_t coolingOffThreshold = mOccupiedCoolingSetpoint - static_cast<int16_t>(mOccupiedSetback * 10);
+    const int16_t coolingOnThreshold  = mOccupiedCoolingSetpoint + static_cast<int16_t>(mOccupiedSetback * 10);
 
     if (mRunningMode == ThermostatRunningModeEnum::kCool)
     {
