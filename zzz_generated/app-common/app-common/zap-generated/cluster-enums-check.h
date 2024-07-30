@@ -129,6 +129,20 @@ static auto __attribute__((unused)) EnsureKnownEnumValue(detail::AreaTypeTag val
         return EnumType::kUnknownEnumValue;
     }
 }
+static auto __attribute__((unused)) EnsureKnownEnumValue(Globals::AtomicRequestTypeEnum val)
+{
+    using EnumType = Globals::AtomicRequestTypeEnum;
+    switch (val)
+    {
+    case EnumType::kBeginWrite:
+    case EnumType::kCommitWrite:
+    case EnumType::kRollbackWrite:
+        return val;
+    default:
+        return EnumType::kUnknownEnumValue;
+    }
+}
+
 static auto __attribute__((unused)) EnsureKnownEnumValue(detail::ChangeIndicationEnum val)
 {
     using EnumType = detail::ChangeIndicationEnum;
@@ -2683,19 +2697,6 @@ static auto __attribute__((unused)) EnsureKnownEnumValue(Thermostat::ACTypeEnum 
     case EnumType::kHeatPumpFixed:
     case EnumType::kCoolingInverter:
     case EnumType::kHeatPumpInverter:
-        return val;
-    default:
-        return EnumType::kUnknownEnumValue;
-    }
-}
-static auto __attribute__((unused)) EnsureKnownEnumValue(Thermostat::AtomicRequestTypeEnum val)
-{
-    using EnumType = Thermostat::AtomicRequestTypeEnum;
-    switch (val)
-    {
-    case EnumType::kBeginWrite:
-    case EnumType::kCommitWrite:
-    case EnumType::kRollbackWrite:
         return val;
     default:
         return EnumType::kUnknownEnumValue;

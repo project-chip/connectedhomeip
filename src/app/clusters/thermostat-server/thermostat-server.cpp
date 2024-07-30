@@ -1361,7 +1361,7 @@ bool handleAtomicBegin(chip::app::CommandHandler * commandObj, const ScopedNodeI
     if (inAtomicWrite)
     {
         chip::app::Clusters::Thermostat::Commands::AtomicResponse::Type response;
-        Structs::AtomicAttributeStatusStruct::Type attributeStatus[] = {
+        Globals::Structs::AtomicAttributeStatusStruct::Type attributeStatus[] = {
             { .attributeID = Presets::Id, .statusCode = static_cast<uint8_t>(imcode::Busy) },
             { .attributeID = Schedules::Id, .statusCode = static_cast<uint8_t>(imcode::Busy) }
         };
@@ -1380,7 +1380,7 @@ bool handleAtomicBegin(chip::app::CommandHandler * commandObj, const ScopedNodeI
     gThermostatAttrAccess.SetAtomicWrite(endpoint, true);
     gThermostatAttrAccess.SetAtomicWriteScopedNodeId(endpoint, GetSourceScopedNodeId(commandObj));
     chip::app::Clusters::Thermostat::Commands::AtomicResponse::Type response;
-    Structs::AtomicAttributeStatusStruct::Type attributeStatus[] = {
+    Globals::Structs::AtomicAttributeStatusStruct::Type attributeStatus[] = {
         { .attributeID = Presets::Id, .statusCode = static_cast<uint8_t>(imcode::Success) },
         { .attributeID = Schedules::Id, .statusCode = static_cast<uint8_t>(imcode::Success) }
     };
@@ -1643,13 +1643,13 @@ bool emberAfThermostatClusterAtomicRequestCallback(
 
     switch (requestType)
     {
-    case AtomicRequestTypeEnum::kBeginWrite:
+    case Globals::AtomicRequestTypeEnum::kBeginWrite:
         return handleAtomicBegin(commandObj, sourceNodeId, commandPath, commandData);
-    case AtomicRequestTypeEnum::kCommitWrite:
+    case Globals::AtomicRequestTypeEnum::kCommitWrite:
         return handleAtomicCommit(commandObj, sourceNodeId, commandPath, commandData);
-    case AtomicRequestTypeEnum::kRollbackWrite:
+    case Globals::AtomicRequestTypeEnum::kRollbackWrite:
         return handleAtomicRollback(commandObj, sourceNodeId, commandPath, commandData);
-    case AtomicRequestTypeEnum::kUnknownEnumValue:
+    case Globals::AtomicRequestTypeEnum::kUnknownEnumValue:
         commandObj->AddStatus(commandPath, imcode::InvalidCommand);
         return true;
     }
@@ -1706,13 +1706,13 @@ bool emberAfThermostatClusterSetpointRaiseLowerCallback(app::CommandHandler * co
             {
                 DesiredCoolingSetpoint = static_cast<int16_t>(CoolingSetpoint + amount * 10);
                 CoolLimit              = static_cast<int16_t>(DesiredCoolingSetpoint -
-                                                 EnforceCoolingSetpointLimits(DesiredCoolingSetpoint, aEndpointId));
+                                                              EnforceCoolingSetpointLimits(DesiredCoolingSetpoint, aEndpointId));
                 {
                     if (OccupiedHeatingSetpoint::Get(aEndpointId, &HeatingSetpoint) == imcode::Success)
                     {
                         DesiredHeatingSetpoint = static_cast<int16_t>(HeatingSetpoint + amount * 10);
                         HeatLimit              = static_cast<int16_t>(DesiredHeatingSetpoint -
-                                                         EnforceHeatingSetpointLimits(DesiredHeatingSetpoint, aEndpointId));
+                                                                      EnforceHeatingSetpointLimits(DesiredHeatingSetpoint, aEndpointId));
                         {
                             if (CoolLimit != 0 || HeatLimit != 0)
                             {

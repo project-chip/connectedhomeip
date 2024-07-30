@@ -25,7 +25,6 @@ TODO: Make these structures global rather than defining them for each cluster.
   <domain name="CHIP"/>
 
   <struct name="AtomicAttributeStatusStruct">
-    <cluster code="0x0201"/>
     <item fieldId="0" name="AttributeID" type="attrib_id" />
     <item fieldId="1" name="StatusCode" type="status"/>
   </struct>

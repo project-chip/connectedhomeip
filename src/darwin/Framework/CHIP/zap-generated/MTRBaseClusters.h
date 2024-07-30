@@ -17113,6 +17113,12 @@ MTR_DEPRECATED("Please use MTRBaseClusterUnitTesting", ios(16.1, 16.4), macos(13
 @interface MTRBaseClusterTestCluster : MTRBaseClusterUnitTesting
 @end
 
+typedef NS_ENUM(uint8_t, MTRDataTypeAtomicRequestTypeEnum) {
+    MTRDataTypeAtomicRequestTypeEnumBeginWrite MTR_PROVISIONALLY_AVAILABLE = 0x00,
+    MTRDataTypeAtomicRequestTypeEnumCommitWrite MTR_PROVISIONALLY_AVAILABLE = 0x01,
+    MTRDataTypeAtomicRequestTypeEnumRollbackWrite MTR_PROVISIONALLY_AVAILABLE = 0x02,
+} MTR_PROVISIONALLY_AVAILABLE;
+
 typedef NS_ENUM(uint8_t, MTRDataTypeTestGlobalEnum) {
     MTRDataTypeTestGlobalEnumSomeValue MTR_PROVISIONALLY_AVAILABLE = 0x00,
     MTRDataTypeTestGlobalEnumSomeOtherValue MTR_PROVISIONALLY_AVAILABLE = 0x01,
@@ -19826,12 +19832,6 @@ typedef NS_ENUM(uint8_t, MTRThermostatACType) {
     MTRThermostatACTypeHeatPumpFixed MTR_PROVISIONALLY_AVAILABLE = 0x02,
     MTRThermostatACTypeCoolingInverter MTR_PROVISIONALLY_AVAILABLE = 0x03,
     MTRThermostatACTypeHeatPumpInverter MTR_PROVISIONALLY_AVAILABLE = 0x04,
-} MTR_PROVISIONALLY_AVAILABLE;
-
-typedef NS_ENUM(uint8_t, MTRThermostatAtomicRequestType) {
-    MTRThermostatAtomicRequestTypeBeginWrite MTR_PROVISIONALLY_AVAILABLE = 0x00,
-    MTRThermostatAtomicRequestTypeCommitWrite MTR_PROVISIONALLY_AVAILABLE = 0x01,
-    MTRThermostatAtomicRequestTypeRollbackWrite MTR_PROVISIONALLY_AVAILABLE = 0x02,
 } MTR_PROVISIONALLY_AVAILABLE;
 
 typedef NS_ENUM(uint8_t, MTRThermostatControlSequenceOfOperation) {

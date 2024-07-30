@@ -1,6 +1,12 @@
 // This IDL was generated automatically by ZAP.
 // It is for view/code review purposes only.
 
+enum AtomicRequestTypeEnum : enum8 {
+  kBeginWrite = 0;
+  kCommitWrite = 1;
+  kRollbackWrite = 2;
+}
+
 enum TestGlobalEnum : enum8 {
   kSomeValue = 0;
   kSomeOtherValue = 1;
@@ -10,6 +16,11 @@ enum TestGlobalEnum : enum8 {
 bitmap TestGlobalBitmap : bitmap32 {
   kFirstBit = 0x1;
   kSecondBit = 0x2;
+}
+
+struct AtomicAttributeStatusStruct {
+  attrib_id attributeID = 0;
+  status statusCode = 1;
 }
 
 struct TestGlobalStruct {
@@ -3606,12 +3617,6 @@ cluster Thermostat = 513 {
     kHeatPumpInverter = 4;
   }
 
-  enum AtomicRequestTypeEnum : enum8 {
-    kBeginWrite = 0;
-    kCommitWrite = 1;
-    kRollbackWrite = 2;
-  }
-
   enum ControlSequenceOfOperationEnum : enum8 {
     kCoolingOnly = 0;
     kCoolingWithReheat = 1;
@@ -3773,11 +3778,6 @@ cluster Thermostat = 513 {
     optional octet_string<16> presetHandle = 3;
     ScheduleTransitionStruct transitions[] = 4;
     nullable boolean builtIn = 5;
-  }
-
-  struct AtomicAttributeStatusStruct {
-    attrib_id attributeID = 0;
-    status statusCode = 1;
   }
 
   struct PresetStruct {

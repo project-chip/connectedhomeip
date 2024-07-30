@@ -25,7 +25,6 @@ TODO: Make these structures global rather than defining them for each cluster.
   <domain name="CHIP"/>
 
   <enum name="AtomicRequestTypeEnum" type="enum8">
-    <cluster code="0x0201"/>
     <item name="BeginWrite" value="0x00"/>
     <item name="CommitWrite" value="0x01"/>
     <item name="RollbackWrite" value="0x02"/>

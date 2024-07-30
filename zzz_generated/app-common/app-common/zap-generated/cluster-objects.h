@@ -323,6 +323,30 @@ namespace Globals {
 // Global structs.
 namespace Structs {
 
+namespace AtomicAttributeStatusStruct {
+enum class Fields : uint8_t
+{
+    kAttributeID = 0,
+    kStatusCode  = 1,
+};
+
+struct Type
+{
+public:
+    chip::AttributeId attributeID = static_cast<chip::AttributeId>(0);
+    uint8_t statusCode            = static_cast<uint8_t>(0);
+
+    CHIP_ERROR Decode(TLV::TLVReader & reader);
+
+    static constexpr bool kIsFabricScoped = false;
+
+    CHIP_ERROR Encode(TLV::TLVWriter & aWriter, TLV::Tag aTag) const;
+};
+
+using DecodableType = Type;
+
+} // namespace AtomicAttributeStatusStruct
+
 namespace TestGlobalStruct {
 enum class Fields : uint8_t
 {
@@ -29499,29 +29523,6 @@ public:
 };
 
 } // namespace ScheduleStruct
-namespace AtomicAttributeStatusStruct {
-enum class Fields : uint8_t
-{
-    kAttributeID = 0,
-    kStatusCode  = 1,
-};
-
-struct Type
-{
-public:
-    chip::AttributeId attributeID = static_cast<chip::AttributeId>(0);
-    uint8_t statusCode            = static_cast<uint8_t>(0);
-
-    CHIP_ERROR Decode(TLV::TLVReader & reader);
-
-    static constexpr bool kIsFabricScoped = false;
-
-    CHIP_ERROR Encode(TLV::TLVWriter & aWriter, TLV::Tag aTag) const;
-};
-
-using DecodableType = Type;
-
-} // namespace AtomicAttributeStatusStruct
 namespace PresetStruct {
 enum class Fields : uint8_t
 {
@@ -29941,7 +29942,7 @@ public:
     static constexpr ClusterId GetClusterId() { return Clusters::Thermostat::Id; }
 
     uint8_t statusCode = static_cast<uint8_t>(0);
-    DataModel::List<const Structs::AtomicAttributeStatusStruct::Type> attributeStatus;
+    DataModel::List<const Globals::Structs::AtomicAttributeStatusStruct::Type> attributeStatus;
     Optional<uint16_t> timeout;
 
     CHIP_ERROR Encode(TLV::TLVWriter & aWriter, TLV::Tag aTag) const;
@@ -29958,7 +29959,7 @@ public:
     static constexpr ClusterId GetClusterId() { return Clusters::Thermostat::Id; }
 
     uint8_t statusCode = static_cast<uint8_t>(0);
-    DataModel::DecodableList<Structs::AtomicAttributeStatusStruct::DecodableType> attributeStatus;
+    DataModel::DecodableList<Globals::Structs::AtomicAttributeStatusStruct::DecodableType> attributeStatus;
     Optional<uint16_t> timeout;
     CHIP_ERROR Decode(TLV::TLVReader & reader);
 };
@@ -29978,7 +29979,7 @@ public:
     static constexpr CommandId GetCommandId() { return Commands::AtomicRequest::Id; }
     static constexpr ClusterId GetClusterId() { return Clusters::Thermostat::Id; }
 
-    AtomicRequestTypeEnum requestType = static_cast<AtomicRequestTypeEnum>(0);
+    Globals::AtomicRequestTypeEnum requestType = static_cast<Globals::AtomicRequestTypeEnum>(0);
     DataModel::List<const chip::AttributeId> attributeRequests;
     Optional<uint16_t> timeout;
 
@@ -29995,7 +29996,7 @@ public:
     static constexpr CommandId GetCommandId() { return Commands::AtomicRequest::Id; }
     static constexpr ClusterId GetClusterId() { return Clusters::Thermostat::Id; }
 
-    AtomicRequestTypeEnum requestType = static_cast<AtomicRequestTypeEnum>(0);
+    Globals::AtomicRequestTypeEnum requestType = static_cast<Globals::AtomicRequestTypeEnum>(0);
     DataModel::DecodableList<chip::AttributeId> attributeRequests;
     Optional<uint16_t> timeout;
     CHIP_ERROR Decode(TLV::TLVReader & reader);

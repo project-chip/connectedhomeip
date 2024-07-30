@@ -279,6 +279,19 @@ enum class ProductIdentifierTypeEnum : uint8_t
 namespace Globals {
 // Global enums.
 
+// Enum for AtomicRequestTypeEnum
+enum class AtomicRequestTypeEnum : uint8_t
+{
+    kBeginWrite    = 0x00,
+    kCommitWrite   = 0x01,
+    kRollbackWrite = 0x02,
+    // All received enum values that are not listed above will be mapped
+    // to kUnknownEnumValue. This is a helper enum value that should only
+    // be used by code to process how it handles receiving and unknown
+    // enum value. This specific should never be transmitted.
+    kUnknownEnumValue = 3,
+};
+
 // Enum for TestGlobalEnum
 enum class TestGlobalEnum : uint8_t
 {
@@ -3964,19 +3977,6 @@ enum class ACTypeEnum : uint8_t
     // be used by code to process how it handles receiving and unknown
     // enum value. This specific should never be transmitted.
     kUnknownEnumValue = 5,
-};
-
-// Enum for AtomicRequestTypeEnum
-enum class AtomicRequestTypeEnum : uint8_t
-{
-    kBeginWrite    = 0x00,
-    kCommitWrite   = 0x01,
-    kRollbackWrite = 0x02,
-    // All received enum values that are not listed above will be mapped
-    // to kUnknownEnumValue. This is a helper enum value that should only
-    // be used by code to process how it handles receiving and unknown
-    // enum value. This specific should never be transmitted.
-    kUnknownEnumValue = 3,
 };
 
 // Enum for ControlSequenceOfOperationEnum

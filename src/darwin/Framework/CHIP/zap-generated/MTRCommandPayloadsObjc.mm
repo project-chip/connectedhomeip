@@ -22702,8 +22702,8 @@ NS_ASSUME_NONNULL_BEGIN
             auto iter_0 = decodableStruct.attributeStatus.begin();
             while (iter_0.Next()) {
                 auto & entry_0 = iter_0.GetValue();
-                MTRThermostatClusterAtomicAttributeStatusStruct * newElement_0;
-                newElement_0 = [MTRThermostatClusterAtomicAttributeStatusStruct new];
+                MTRDataTypeAtomicAttributeStatusStruct * newElement_0;
+                newElement_0 = [MTRDataTypeAtomicAttributeStatusStruct new];
                 newElement_0.attributeID = [NSNumber numberWithUnsignedInt:entry_0.attributeID];
                 newElement_0.statusCode = [NSNumber numberWithUnsignedChar:entry_0.statusCode];
                 [array_0 addObject:newElement_0];

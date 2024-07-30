@@ -38,6 +38,16 @@ from .Types import Nullable, NullValue
 
 class Globals:
     class Enums:
+        class AtomicRequestTypeEnum(MatterIntEnum):
+            kBeginWrite = 0x00
+            kCommitWrite = 0x01
+            kRollbackWrite = 0x02
+            # All received enum values that are not listed above will be mapped
+            # to kUnknownEnumValue. This is a helper enum value that should only
+            # be used by code to process how it handles receiving an unknown
+            # enum value. This specific value should never be transmitted.
+            kUnknownEnumValue = 3,
+
         class TestGlobalEnum(MatterIntEnum):
             kSomeValue = 0x00
             kSomeOtherValue = 0x01
@@ -54,6 +64,19 @@ class Globals:
             kSecondBit = 0x2
 
     class Structs:
+        @dataclass
+        class AtomicAttributeStatusStruct(ClusterObject):
+            @ChipUtility.classproperty
+            def descriptor(cls) -> ClusterObjectDescriptor:
+                return ClusterObjectDescriptor(
+                    Fields=[
+                        ClusterObjectFieldDescriptor(Label="attributeID", Tag=0, Type=uint),
+                        ClusterObjectFieldDescriptor(Label="statusCode", Tag=1, Type=uint),
+                    ])
+
+            attributeID: 'uint' = 0
+            statusCode: 'uint' = 0
+
         @dataclass
         class TestGlobalStruct(ClusterObject):
             @ChipUtility.classproperty
@@ -32423,16 +32446,6 @@ class Thermostat(Cluster):
             # enum value. This specific value should never be transmitted.
             kUnknownEnumValue = 5,
 
-        class AtomicRequestTypeEnum(MatterIntEnum):
-            kBeginWrite = 0x00
-            kCommitWrite = 0x01
-            kRollbackWrite = 0x02
-            # All received enum values that are not listed above will be mapped
-            # to kUnknownEnumValue. This is a helper enum value that should only
-            # be used by code to process how it handles receiving an unknown
-            # enum value. This specific value should never be transmitted.
-            kUnknownEnumValue = 3,
-
         class ControlSequenceOfOperationEnum(MatterIntEnum):
             kCoolingOnly = 0x00
             kCoolingWithReheat = 0x01
@@ -32644,19 +32657,6 @@ class Thermostat(Cluster):
             builtIn: 'typing.Union[Nullable, bool]' = NullValue
 
         @dataclass
-        class AtomicAttributeStatusStruct(ClusterObject):
-            @ChipUtility.classproperty
-            def descriptor(cls) -> ClusterObjectDescriptor:
-                return ClusterObjectDescriptor(
-                    Fields=[
-                        ClusterObjectFieldDescriptor(Label="attributeID", Tag=0, Type=uint),
-                        ClusterObjectFieldDescriptor(Label="statusCode", Tag=1, Type=uint),
-                    ])
-
-            attributeID: 'uint' = 0
-            statusCode: 'uint' = 0
-
-        @dataclass
         class PresetStruct(ClusterObject):
             @ChipUtility.classproperty
             def descriptor(cls) -> ClusterObjectDescriptor:
@@ -32860,12 +32860,12 @@ class Thermostat(Cluster):
                 return ClusterObjectDescriptor(
                     Fields=[
                         ClusterObjectFieldDescriptor(Label="statusCode", Tag=0, Type=uint),
-                        ClusterObjectFieldDescriptor(Label="attributeStatus", Tag=1, Type=typing.List[Thermostat.Structs.AtomicAttributeStatusStruct]),
+                        ClusterObjectFieldDescriptor(Label="attributeStatus", Tag=1, Type=typing.List[Globals.Structs.AtomicAttributeStatusStruct]),
                         ClusterObjectFieldDescriptor(Label="timeout", Tag=2, Type=typing.Optional[uint]),
                     ])
 
             statusCode: 'uint' = 0
-            attributeStatus: 'typing.List[Thermostat.Structs.AtomicAttributeStatusStruct]' = field(default_factory=lambda: [])
+            attributeStatus: 'typing.List[Globals.Structs.AtomicAttributeStatusStruct]' = field(default_factory=lambda: [])
             timeout: 'typing.Optional[uint]' = None
 
         @dataclass
@@ -32879,12 +32879,12 @@ class Thermostat(Cluster):
             def descriptor(cls) -> ClusterObjectDescriptor:
                 return ClusterObjectDescriptor(
                     Fields=[
-                        ClusterObjectFieldDescriptor(Label="requestType", Tag=0, Type=Thermostat.Enums.AtomicRequestTypeEnum),
+                        ClusterObjectFieldDescriptor(Label="requestType", Tag=0, Type=Globals.Enums.AtomicRequestTypeEnum),
                         ClusterObjectFieldDescriptor(Label="attributeRequests", Tag=1, Type=typing.List[uint]),
                         ClusterObjectFieldDescriptor(Label="timeout", Tag=2, Type=typing.Optional[uint]),
                     ])
 
-            requestType: 'Thermostat.Enums.AtomicRequestTypeEnum' = 0
+            requestType: 'Globals.Enums.AtomicRequestTypeEnum' = 0
             attributeRequests: 'typing.List[uint]' = field(default_factory=lambda: [])
             timeout: 'typing.Optional[uint]' = None
 
