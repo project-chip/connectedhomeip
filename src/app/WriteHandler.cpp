@@ -51,7 +51,7 @@ CHIP_ERROR WriteHandler::Init(DataModel::Provider * apProvider, WriteHandlerDele
     mDataModelProvider = apProvider;
 #endif
 
-    mDelegate          = apWriteHandlerDelegate;
+    mDelegate = apWriteHandlerDelegate;
     MoveToState(State::Initialized);
 
     mACLCheckCache.ClearValue();
@@ -70,7 +70,7 @@ void WriteHandler::Close()
     // successful.
     DeliverFinalListWriteEnd(false /* wasSuccessful */);
     mExchangeCtx.Release();
-    mSuppressResponse  = false;
+    mSuppressResponse = false;
 #if CHIP_CONFIG_USE_DATA_MODEL_INTERFACE
     mDataModelProvider = nullptr;
 #endif
@@ -711,7 +711,7 @@ CHIP_ERROR WriteHandler::WriteClusterData(const Access::SubjectDescriptor & subj
 
     DataModel::WriteAttributeRequest request;
 
-    request.path = path;
+    request.path              = path;
     request.subjectDescriptor = subject;
     request.writeFlags.Set(DataModel::WriteFlags::kTimed, IsTimedWrite());
 

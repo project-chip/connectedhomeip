@@ -718,6 +718,7 @@ private:
         }
 
         ~ScopedExchangeContext() { mEngine.mCurrentExchange = nullptr; }
+
     private:
         InteractionModelEngine & mEngine;
     };

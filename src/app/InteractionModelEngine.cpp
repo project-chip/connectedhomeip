@@ -1731,9 +1731,9 @@ DataModel::Provider * InteractionModelEngine::SetDataModelProvider(DataModel::Pr
     {
         DataModel::InteractionModelContext context;
 
-        context.eventsGenerator = &EventManagement::GetInstance();
+        context.eventsGenerator         = &EventManagement::GetInstance();
         context.dataModelChangeListener = &mReportingEngine;
-        context.actionContext = this;
+        context.actionContext           = this;
 
         CHIP_ERROR err = mDataModelProvider->Startup(context);
         if (err != CHIP_NO_ERROR)
