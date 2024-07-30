@@ -31,7 +31,6 @@ import time
 import uuid
 
 import chip.clusters as Clusters
-import chip.exceptions
 from chip import ChipDeviceCtrl
 from chip.interaction_model import InteractionModelError, Status
 from matter_testing_support import (MatterBaseTest, TestStep, async_test_body, default_matter_test_main, has_cluster,
