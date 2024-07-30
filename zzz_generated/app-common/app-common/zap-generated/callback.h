@@ -6060,18 +6060,6 @@ bool emberAfValveConfigurationAndControlClusterCloseCallback(
     chip::app::CommandHandler * commandObj, const chip::app::ConcreteCommandPath & commandPath,
     const chip::app::Clusters::ValveConfigurationAndControl::Commands::Close::DecodableType & commandData);
 /**
- * @brief Water Heater Management Cluster Boost Command callback (from client)
- */
-bool emberAfWaterHeaterManagementClusterBoostCallback(
-    chip::app::CommandHandler * commandObj, const chip::app::ConcreteCommandPath & commandPath,
-    const chip::app::Clusters::WaterHeaterManagement::Commands::Boost::DecodableType & commandData);
-/**
- * @brief Water Heater Management Cluster CancelBoost Command callback (from client)
- */
-bool emberAfWaterHeaterManagementClusterCancelBoostCallback(
-    chip::app::CommandHandler * commandObj, const chip::app::ConcreteCommandPath & commandPath,
-    const chip::app::Clusters::WaterHeaterManagement::Commands::CancelBoost::DecodableType & commandData);
-/**
  * @brief Demand Response Load Control Cluster RegisterLoadControlProgramRequest Command callback (from client)
  */
 bool emberAfDemandResponseLoadControlClusterRegisterLoadControlProgramRequestCallback(
@@ -6468,30 +6456,6 @@ bool emberAfColorControlClusterMoveColorTemperatureCallback(
 bool emberAfColorControlClusterStepColorTemperatureCallback(
     chip::app::CommandHandler * commandObj, const chip::app::ConcreteCommandPath & commandPath,
     const chip::app::Clusters::ColorControl::Commands::StepColorTemperature::DecodableType & commandData);
-/**
- * @brief Thread Border Router Management Cluster GetActiveDatasetRequest Command callback (from client)
- */
-bool emberAfThreadBorderRouterManagementClusterGetActiveDatasetRequestCallback(
-    chip::app::CommandHandler * commandObj, const chip::app::ConcreteCommandPath & commandPath,
-    const chip::app::Clusters::ThreadBorderRouterManagement::Commands::GetActiveDatasetRequest::DecodableType & commandData);
-/**
- * @brief Thread Border Router Management Cluster GetPendingDatasetRequest Command callback (from client)
- */
-bool emberAfThreadBorderRouterManagementClusterGetPendingDatasetRequestCallback(
-    chip::app::CommandHandler * commandObj, const chip::app::ConcreteCommandPath & commandPath,
-    const chip::app::Clusters::ThreadBorderRouterManagement::Commands::GetPendingDatasetRequest::DecodableType & commandData);
-/**
- * @brief Thread Border Router Management Cluster SetActiveDatasetRequest Command callback (from client)
- */
-bool emberAfThreadBorderRouterManagementClusterSetActiveDatasetRequestCallback(
-    chip::app::CommandHandler * commandObj, const chip::app::ConcreteCommandPath & commandPath,
-    const chip::app::Clusters::ThreadBorderRouterManagement::Commands::SetActiveDatasetRequest::DecodableType & commandData);
-/**
- * @brief Thread Border Router Management Cluster SetPendingDatasetRequest Command callback (from client)
- */
-bool emberAfThreadBorderRouterManagementClusterSetPendingDatasetRequestCallback(
-    chip::app::CommandHandler * commandObj, const chip::app::ConcreteCommandPath & commandPath,
-    const chip::app::Clusters::ThreadBorderRouterManagement::Commands::SetPendingDatasetRequest::DecodableType & commandData);
 /**
  * @brief Channel Cluster ChangeChannel Command callback (from client)
  */
