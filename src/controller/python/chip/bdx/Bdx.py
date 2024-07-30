@@ -90,7 +90,7 @@ async def PrepareToReceiveBdxData(future: Future):
     transaction = AsyncTransferObtainedTransaction(future=future)
 
     ctypes.pythonapi.Py_IncRef(ctypes.py_object(transaction))
-    return await builtins.chipStack.CallAsync(
+    return await builtins.chipStack.CallAsyncWithResult(
         lambda: handle.pychip_Bdx_ExpectBdxTransfer(ctypes.py_object(transaction))
     )
 
@@ -100,7 +100,7 @@ async def PrepareToSendBdxData(future: Future, data: bytes):
     transaction = AsyncTransferObtainedTransaction(future=future, data=data)
 
     ctypes.pythonapi.Py_IncRef(ctypes.py_object(transaction))
-    return await builtins.chipStack.CallAsync(
+    return await builtins.chipStack.CallAsyncWithResult(
         lambda: handle.pychip_Bdx_ExpectBdxTransfer(ctypes.py_object(transaction))
     )
 
@@ -109,21 +109,21 @@ async def AcceptSendTransfer(transfer: c_void_p, dataReceivedClosure, transferCo
     handle = chip.native.GetLibraryHandle()
     ctypes.pythonapi.Py_IncRef(ctypes.py_object(dataReceivedClosure))
     ctypes.pythonapi.Py_IncRef(ctypes.py_object(transferComplete))
-    return await builtins.chipStack.CallAsync(
+    return await builtins.chipStack.CallAsyncWithResult(
         lambda: handle.pychip_Bdx_AcceptSendTransfer(transfer, dataReceivedClosure, transferComplete)
     )
 
 
 async def AcceptReceiveTransfer(transfer: c_void_p, data: bytes, transferComplete: Future):
     handle = chip.native.GetLibraryHandle()
-    return await builtins.chipStack.CallAsync(
+    return await builtins.chipStack.CallAsyncWithResult(
         lambda: handle.pychip_Bdx_AcceptReceiveTransfer(transfer, ctypes.c_char_p(data), len(data), transferComplete)
     )
 
 
 async def RejectTransfer(transfer: c_void_p):
     handle = chip.native.GetLibraryHandle()
-    return await builtins.chipStack.CallAsync(
+    return await builtins.chipStack.CallAsyncWithResult(
         lambda: handle.pychip_Bdx_RejectTransfer(transfer)
     )
 
