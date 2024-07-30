@@ -114,6 +114,7 @@ class TC_MCORE_FS_1_3(MatterBaseTest):
                  TestStep(4, "DUT_FSA synchronizes TH_SED_TH onto DUT_FSAs fabric and copies the UniqueID presented by TH_FSAs Bridged Device Basic Information Cluster.")]
         return steps
 
+    @async_test_body
     async def test_TC_MCORE_FS_1_3(self):
         self.is_ci = self.check_pics('PICS_SDK_CI_ONLY')
         self.print_step(0, "Commissioning DUT to TH, already done")
@@ -121,8 +122,7 @@ class TC_MCORE_FS_1_3(MatterBaseTest):
         # These steps are not explicitly in step 1, but they help identify the dynamically added endpoint in step 1.
         root_node_endpoint = 0
         root_part_list = await self.read_single_attribute_check_success(cluster=Clusters.Descriptor, attribute=Clusters.Descriptor.Attributes.PartsList, endpoint=root_node_endpoint)
-        set_of_endpoints_before_adding_device = set(root_part_list[root_node_endpoint]
-                                                    [Clusters.Descriptor][Clusters.Descriptor.Attributes.PartsList])
+        set_of_endpoints_before_adding_device = set(root_part_list)
 
         discriminator, setup_pin_code = await self.create_device_for_dut_ecosystem()
         self.wait_for_user_input(
@@ -133,15 +133,14 @@ class TC_MCORE_FS_1_3(MatterBaseTest):
                         f">>> pairing onnetwork 111 {setup_pin_code}")
         
         root_part_list = await self.read_single_attribute_check_success(cluster=Clusters.Descriptor, attribute=Clusters.Descriptor.Attributes.PartsList, endpoint=root_node_endpoint)
-        set_of_endpoints_after_adding_device = set(root_part_list[root_node_endpoint]
-                                                   [Clusters.Descriptor][Clusters.Descriptor.Attributes.PartsList])
+        set_of_endpoints_after_adding_device = set(root_part_list)
                                                   
         asserts.assert_true(set_of_endpoints_after_adding_device.issuperset(set_of_endpoints_before_adding_device), "Expected only new endpoints to be added")
         unique_endpoints_set = set_of_endpoints_after_adding_device - set_of_endpoints_before_adding_device
         asserts.assert_equal(len(unique_endpoints_set), 1, "Expected only one new endpoint")
         newly_added_endpoint = list(unique_endpoints_set)[0]
 
-        th_sed_dut_unique_id = await self.read_single_attribute_check_success(cluster=Clusters.BasicInformation, attribute=Clusters.BasicInformation.Attributes.UniqueID, endpoint=newly_added_endpoint)
+        th_sed_dut_unique_id = await self.read_single_attribute_check_success(cluster=Clusters.BridgedDeviceBasicInformation, attribute=Clusters.BridgedDeviceBasicInformation.Attributes.UniqueID, endpoint=newly_added_endpoint)
         asserts.assert_true(type_matches(th_sed_dut_unique_id, str), "UniqueID should be a string")
         asserts.assert_true(th_sed_dut_unique_id, "UniqueID should not be an empty string")
 
