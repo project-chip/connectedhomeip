@@ -74,7 +74,7 @@ class TC_OCC_3_2(MatterBaseTest):
         steps = [
             TestStep(1, "Commission DUT to TH if not already done", is_commissioning=True),
             TestStep(2, "TH establishes a wildcard subscription to all attributes on Occupancy Sensing Cluster on the endpoint under test. Subscription min interval = 0 and max interval = 30 seconds."),
-            TestStep(3a, "Don’t trigger DUT for occupancy state change."),
+            TestStep(3a, "Do not trigger DUT for occupancy state change."),
             TestStep(3b, "TH reads DUT Occupancy attribute and saves the initial value as initial"),
             TestStep(3c, "Trigger DUT to change the occupancy state."),
             TestStep(3d, "TH awaits a ReportDataMessage containing an attribute report for DUT Occupancy attribute."),
