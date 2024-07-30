@@ -90,6 +90,7 @@ tests:
           saveAs: fabric-idx
     
     - label: "Step 1b: TH sends ClearUser Command to DUT with the UserIndex as 0xFFFE to clear all the users"
+      PICS: PICS_SKIP_SAMPLE_APP && DRLK.S.C1d.Rsp
       command: "ClearUser"
       timedInteractionTimeoutMs: 1000
       arguments:
@@ -99,6 +100,7 @@ tests:
     
     - label: "Step 1c: TH sends ClearCredential Command to DUT to clear all the credentials. Credential as null, 0xFFFE (CredentialType,CredentialIndex)"
       command: "ClearCredential"
+      PICS: PICS_SKIP_SAMPLE_APP && DRLK.S.C26.Rsp
       timedInteractionTimeoutMs: 1000
       arguments:
           values:
@@ -111,7 +113,7 @@ tests:
       command: "ClearAliroReaderConfig"
 
     - label: "Step 2b: TH sends SetAliroReaderConfig Command to DUT with the following fields, SigningKey as signingkey, VerificationKey as verificationkey, GroupIdentifier as groupidentifier, GroupResolvingKey not present."
-      PICS: DRLK.S.F0d && !DRLK.S.F0e && DRLK.S.C28.Rsp
+      PICS: PICS_SKIP_SAMPLE_APP && DRLK.S.F0d && !DRLK.S.F0e && DRLK.S.C28.Rsp
       command: "SetAliroReaderConfig"
       arguments:
           values:
@@ -125,7 +127,7 @@ tests:
                 value: ""
     
     - label: "Step 2c: TH sends SetAliroReaderConfig Command to DUT with the following fields, SigningKey as signingkey, VerificationKey as verificationkey, GroupIdentifier as groupidentifier, GroupResolvingKey as groupresolvingkey."
-      PICS: DRLK.S.F0e && DRLK.S.C28.Rsp
+      PICS: PICS_SKIP_SAMPLE_APP && DRLK.S.F0e && DRLK.S.C28.Rsp
       command: "SetAliroReaderConfig"
       arguments:
           values:
@@ -139,28 +141,28 @@ tests:
                 value: groupresolvingkey
 
     - label: "Step 3: TH reads AliroReaderVerificationKey attribute from DUT"
-      PICS: DRLK.S.F0d && DRLK.S.A0080
+      PICS: PICS_SKIP_SAMPLE_APP && DRLK.S.F0d && DRLK.S.A0080
       command: "readAttribute"
       attribute: "AliroReaderVerificationKey"
       response:
           value: verificationkey
     
     - label: "Step 4: TH reads AliroReaderGroupIdentifier attribute from DUT"
-      PICS: DRLK.S.F0d && DRLK.S.A0081
+      PICS: PICS_SKIP_SAMPLE_APP && DRLK.S.F0d && DRLK.S.A0081
       command: "readAttribute"
       attribute: "AliroReaderGroupIdentifier"
       response:
           value: groupidentifier
     
     - label: "Step 5: TH reads AliroGroupResolvingKey attribute from DUT"
-      PICS: DRLK.S.F0d && DRLK.S.F0e && DRLK.S.A0084
+      PICS: PICS_SKIP_SAMPLE_APP && DRLK.S.F0d && DRLK.S.F0e && DRLK.S.A0084
       command: "readAttribute"
       attribute: "AliroGroupResolvingKey"
       response:
           value: groupresolvingkey
     
     - label: "Step 6a: TH sends SetAliroReaderConfig Command to DUT with the following fields (with the same keys), SigningKey as signingkey, VerificationKey as verificationkey, GroupIdentifier as groupidentifier, GroupResolvingKey not present."
-      PICS: DRLK.S.F0d && !DRLK.S.F0e && DRLK.S.C28.Rsp
+      PICS: PICS_SKIP_SAMPLE_APP && DRLK.S.F0d && !DRLK.S.F0e && DRLK.S.C28.Rsp
       command: "SetAliroReaderConfig"
       arguments:
           values:
@@ -176,7 +178,7 @@ tests:
           value: INVALID_IN_STATE
     
     - label: "Step 6b: TH sends SetAliroReaderConfig Command to DUT with the following fields (with the same keys), SigningKey as signingkey, VerificationKey as verificationkey, GroupIdentifier as groupidentifier, GroupResolvingKey as groupresolvingkey."
-      PICS: DRLK.S.F0e && DRLK.S.C28.Rsp
+      PICS: PICS_SKIP_SAMPLE_APP && DRLK.S.F0e && DRLK.S.C28.Rsp
       command: "SetAliroReaderConfig"
       arguments:
           values:
@@ -192,32 +194,32 @@ tests:
           value: INVALID_IN_STATE
     
     - label: "Step 7: TH sends ClearAliroReaderConfig Command to DUT"
-      PICS: DRLK.S.C29.Rsp
+      PICS: PICS_SKIP_SAMPLE_APP && DRLK.S.C29.Rsp
       command: "ClearAliroReaderConfig"
     
     - label: "Step 8: TH reads AliroReaderVerificationKey attribute from DUT"
-      PICS: DRLK.S.F0d && DRLK.S.A0080
+      PICS: PICS_SKIP_SAMPLE_APP && DRLK.S.F0d && DRLK.S.A0080
       command: "readAttribute"
       attribute: "AliroReaderVerificationKey"
       response:
           value: null
     
     - label: "Step 9: TH reads AliroReaderGroupIdentifier attribute from DUT"
-      PICS: DRLK.S.F0d && DRLK.S.A0081
+      PICS: PICS_SKIP_SAMPLE_APP && DRLK.S.F0d && DRLK.S.A0081
       command: "readAttribute"
       attribute: "AliroReaderGroupIdentifier"
       response:
           value: null
     
     - label: "Step 10: TH reads AliroGroupResolvingKey attribute from DUT"
-      PICS: DRLK.S.F0d && DRLK.S.F0e && DRLK.S.A0084
+      PICS: PICS_SKIP_SAMPLE_APP && DRLK.S.F0d && DRLK.S.F0e && DRLK.S.A0084
       command: "readAttribute"
       attribute: "AliroGroupResolvingKey"
       response:
           value: null
     
     - label: "Step 11a: TH sends SetAliroReaderConfig Command to DUT with the following fields, SigningKey as signingkey, VerificationKey as verificationkey, GroupIdentifier as groupidentifier, GroupResolvingKey not present."
-      PICS: DRLK.S.F0d && !DRLK.S.F0e && DRLK.S.C28.Rsp
+      PICS: PICS_SKIP_SAMPLE_APP && DRLK.S.F0d && !DRLK.S.F0e && DRLK.S.C28.Rsp
       command: "SetAliroReaderConfig"
       arguments:
           values:
@@ -231,7 +233,7 @@ tests:
                 value: ""
     
     - label: "Step 11b: TH sends SetAliroReaderConfig Command to DUT with the following fields, SigningKey as signingkey, VerificationKey as verificationkey, GroupIdentifier as groupidentifier, GroupResolvingKey as groupresolvingkey."
-      PICS: DRLK.S.F0e && DRLK.S.C28.Rsp
+      PICS: PICS_SKIP_SAMPLE_APP && DRLK.S.F0e && DRLK.S.C28.Rsp
       command: "SetAliroReaderConfig"
       arguments:
           values:
@@ -245,7 +247,7 @@ tests:
                 value: groupresolvingkey
     
     - label: "Step 12: TH sends SetUser Command to DUT to create an Aliro user with the following values: OperationType as 0( DataOperationTypeEnum.Add), UserIndex as 1, UserName as alirouser, UserUniqueID as 111, UserStatus as 1(UserStatusEnum.OccupiedEnabled), UserType as 0(UserTypeEnum.UnrestrictedUser), CredentialRule as 0(CredentialRuleEnum.Single)"
-      PICS: DRLK.S.F08 && DRLK.S.C1a.Rsp
+      PICS: PICS_SKIP_SAMPLE_APP && DRLK.S.F08 && DRLK.S.C1a.Rsp
       command: "SetUser"
       timedInteractionTimeoutMs: 1000
       arguments:
@@ -266,7 +268,7 @@ tests:
                 value: 0
     
     - label: "Step 13: TH sends SetCredential Command to DUT with CredentialType as AliroCredentialIssuerKey and CredentialData as alirocredentialissuerkey for the alirouser, OperationType as 0(DataOperationTypeEnum.Add), Credential as 6 1(CredentialType.AliroCredentialIssuerKey,CredentialIndex), CredentialData as alirocredentialissuerkey, UserIndex as 1, UserStatus as null, UserType as null"
-      PICS: DRLK.S.F0d && DRLK.S.C22.Rsp && DRLK.S.C23.Tx
+      PICS: PICS_SKIP_SAMPLE_APP && DRLK.S.F0d && DRLK.S.C22.Rsp && DRLK.S.C23.Tx
       command: "SetCredential"
       timedInteractionTimeoutMs: 1000
       arguments:
@@ -290,7 +292,7 @@ tests:
     
     #NEED TO CHECK WITH VALUES
     - label: "Step 14: TH reads the LockUserChange event list from DUT"
-      PICS: DRLK.S.F0d || DRLK.S.E04
+      PICS: PICS_SKIP_SAMPLE_APP && DRLK.S.F0d || DRLK.S.E04
       command: "readEvent"
       event: "LockUserChange"
       response:
@@ -306,7 +308,7 @@ tests:
               }
     
     - label: "Step 15: TH sends GetCredentialStatus Command with Credential as 6 1 (CredentialTypeEnum.AliroCredentialIssuerKey,CredentialIndex)"
-      PICS: DRLK.S.F0d && DRLK.S.C24.Rsp && DRLK.S.C25.Tx
+      PICS: PICS_SKIP_SAMPLE_APP && DRLK.S.F0d && DRLK.S.C24.Rsp && DRLK.S.C25.Tx
       command: "GetCredentialStatus"
       arguments:
           values:
@@ -323,7 +325,7 @@ tests:
 
     - label:
           "Step 16: TH sends ClearCredential Command to DUT to clear the CredentialType of AliroCredentialIssuerKey Credential as 6 1 (CredentialTypeEnum.AliroCredentialIssuerKey,CredentialIndex)"
-      PICS: DRLK.S.F0d && DRLK.S.C26.Rsp
+      PICS: PICS_SKIP_SAMPLE_APP && DRLK.S.F0d && DRLK.S.C26.Rsp
       command: "ClearCredential"
       timedInteractionTimeoutMs: 1000
       arguments:
@@ -333,7 +335,7 @@ tests:
     
     #NEED TO CHECK WITH VALUES
     - label: "Step 17: TH reads the LockUserChange event list from DUT"
-      PICS: DRLK.S.F0d && DRLK.S.E04
+      PICS: PICS_SKIP_SAMPLE_APP && DRLK.S.F0d && DRLK.S.E04
       command: "readEvent"
       event: "LockUserChange"
       response:
@@ -349,7 +351,7 @@ tests:
               }
     
     - label: "Step 18: TH sends SetCredential Command to DUT with CredentialType as AliroEvictableEndpointKey and CredentialData as aliroevictableendpointkey for the alirouser, OperationType as 0(DataOperationTypeEnum.Add), Credential as 7 1(CredentialType.AliroEvictableEndpointKey,CredentialIndex), CredentialData as aliroevictableendpointkey, UserIndex as 1, UserStatus as null, UserType as null"
-      PICS: DRLK.S.F0d && DRLK.S.C22.Rsp && DRLK.S.C23.Tx
+      PICS: PICS_SKIP_SAMPLE_APP && DRLK.S.F0d && DRLK.S.C22.Rsp && DRLK.S.C23.Tx
       command: "SetCredential"
       timedInteractionTimeoutMs: 1000
       arguments:
@@ -373,7 +375,7 @@ tests:
     
     #NEED TO CHECK WITH VALUES
     - label: "Step 19: TH reads the LockUserChange event list from DUT"
-      PICS: DRLK.S.F0d && DRLK.S.E04
+      PICS: PICS_SKIP_SAMPLE_APP && DRLK.S.F0d && DRLK.S.E04
       command: "readEvent"
       event: "LockUserChange"
       response:
@@ -389,7 +391,7 @@ tests:
               }
     
     - label: "Step 20: TH sends GetCredentialStatus Command with Credential as 7 1 (CredentialTypeEnum.AliroEvictableEndpointKey,CredentialIndex)"
-      PICS: DRLK.S.F0d && DRLK.S.C24.Rsp && DRLK.S.C25.Tx
+      PICS: PICS_SKIP_SAMPLE_APP && DRLK.S.F0d && DRLK.S.C24.Rsp && DRLK.S.C25.Tx
       command: "GetCredentialStatus"
       arguments:
           values:
@@ -406,7 +408,7 @@ tests:
     
     - label:
           "Step 21: TH sends ClearCredential Command to DUT to clear the CredentialType of AliroEvictableEndpointKey Credential as 7 1 (CredentialTypeEnum.AliroEvictableEndpointKey,CredentialIndex)"
-      PICS: DRLK.S.F0d && DRLK.S.C26.Rsp
+      PICS: PICS_SKIP_SAMPLE_APP && DRLK.S.F0d && DRLK.S.C26.Rsp
       command: "ClearCredential"
       timedInteractionTimeoutMs: 1000
       arguments:
@@ -416,7 +418,7 @@ tests:
     
     #NEED TO CHECK WITH VALUES
     - label: "Step 22: TH reads the LockUserChange event list from DUT"
-      PICS: DRLK.S.F0d && DRLK.S.E04
+      PICS: PICS_SKIP_SAMPLE_APP && DRLK.S.F0d && DRLK.S.E04
       command: "readEvent"
       event: "LockUserChange"
       response:
@@ -432,7 +434,7 @@ tests:
               }
     
     - label: "Step 23: TH sends SetCredential Command to DUT with CredentialType as alirononevictableendpointkey for the alirouser and CredentialData as aliroevictableendpointkey for the alirouser, OperationType as 0(DataOperationTypeEnum.Add), Credential as 8 1(CredentialType.AliroEvictableEndpointKey,CredentialIndex), CredentialData as alirononevictableendpointkey, UserIndex as 1, UserStatus as null, UserType as null"
-      PICS: DRLK.S.F0d && DRLK.S.C22.Rsp && DRLK.S.C23.Tx
+      PICS: PICS_SKIP_SAMPLE_APP && DRLK.S.F0d && DRLK.S.C22.Rsp && DRLK.S.C23.Tx
       command: "SetCredential"
       timedInteractionTimeoutMs: 1000
       arguments:
@@ -456,7 +458,7 @@ tests:
     
     #NEED TO CHECK WITH VALUES
     - label: "Step 24: TH reads the LockUserChange event list from DUT"
-      PICS: DRLK.S.F0d && DRLK.S.E04
+      PICS: PICS_SKIP_SAMPLE_APP && DRLK.S.F0d && DRLK.S.E04
       command: "readEvent"
       event: "LockUserChange"
       response:
@@ -472,7 +474,7 @@ tests:
               }
     
     - label: "Step 25: TH sends GetCredentialStatus Command with Credential as 8 1 (CredentialTypeEnum.AliroNonEvictableEndpointKey,CredentialIndex)"
-      PICS: DRLK.S.F0d && DRLK.S.C24.Rsp && DRLK.S.C25.Tx
+      PICS: PICS_SKIP_SAMPLE_APP && DRLK.S.F0d && DRLK.S.C24.Rsp && DRLK.S.C25.Tx
       command: "GetCredentialStatus"
       arguments:
           values:
@@ -489,7 +491,7 @@ tests:
     
     - label:
           "Step 26: TH sends ClearCredential Command to DUT to clear the CredentialType of AliroEvictableEndpointKey Credential as 8 1 (CredentialTypeEnum.AliroNonEvictableEndpointKey,CredentialIndex)"
-      PICS: DRLK.S.F0d && DRLK.S.C26.Rsp
+      PICS: PICS_SKIP_SAMPLE_APP && DRLK.S.F0d && DRLK.S.C26.Rsp
       command: "ClearCredential"
       timedInteractionTimeoutMs: 1000
       arguments:
@@ -499,7 +501,7 @@ tests:
     
     #NEED TO CHECK WITH VALUES
     - label: "Step 27: TH reads the LockUserChange event list from DUT"
-      PICS: DRLK.S.F0d && DRLK.S.E04
+      PICS: PICS_SKIP_SAMPLE_APP && DRLK.S.F0d && DRLK.S.E04
       command: "readEvent"
       event: "LockUserChange"
       response:
@@ -515,7 +517,7 @@ tests:
               }
     
     - label: "Step 28a: TH reads NumberOfAliroEndpointKeysSupported attribute and saves the value as max_aliro_keys_supported"
-      PICS: DRLK.S.A0088
+      PICS: PICS_SKIP_SAMPLE_APP && DRLK.S.A0088
       command: "readAttribute"
       attribute: "NumberOfAliroEndpointKeysSupported"
       response:
@@ -523,7 +525,7 @@ tests:
     
     - label:
           "Step 28b: TH reads NumberOfCredentialsSupportedPerUser attribute and saves the value as numberofcredentialsupportedperuser"
-      PICS: DRLK.S.A001c
+      PICS: PICS_SKIP_SAMPLE_APP && DRLK.S.A001c
       command: "readAttribute"
       attribute: "NumberOfCredentialsSupportedPerUser"
       response:
@@ -539,6 +541,7 @@ tests:
 
 
     - label: "Step 34a: TH sends ClearCredential Command to DUT to clear the ALIRO CredentialType Credential as 6 1(CredentialTypeEnum.AliroCredentialIssuerKey,CredentialIndex)"
+      PICS: PICS_SKIP_SAMPLE_APP && DRLK.S.C26.Rsp
       command: "ClearCredential"
       timedInteractionTimeoutMs: 1000
       arguments:
@@ -547,6 +550,7 @@ tests:
                 value: { CredentialType: 6, CredentialIndex: 1 }
     
     - label: "Step 34b: TH sends ClearCredential Command to DUT to clear the ALIRO CredentialType Credential as 7 1(CredentialTypeEnum.AliroEvictableEndpointKey)"
+      PICS: PICS_SKIP_SAMPLE_APP && DRLK.S.C26.Rsp
       command: "ClearCredential"
       timedInteractionTimeoutMs: 1000
       arguments:
@@ -555,6 +559,7 @@ tests:
                 value: { CredentialType: 7, CredentialIndex: 1 }
     
     - label: "Step 34c: TH sends ClearCredential Command to DUT to clear the ALIRO CredentialType Credential as 8 1(CredentialTypeEnum.AliroNonEvictableEndpointKey)"
+      PICS: PICS_SKIP_SAMPLE_APP && DRLK.S.C26.Rsp
       command: "ClearCredential"
       timedInteractionTimeoutMs: 1000
       arguments:
@@ -563,6 +568,7 @@ tests:
                 value: { CredentialType: 8, CredentialIndex: 1 }
     
     - label: "Step 35: TH sends ClearUser Command to DUT with the UserIndex as 1"
+      PICS: PICS_SKIP_SAMPLE_APP && DRLK.S.C1d.Rsp
       command: "ClearUser"
       timedInteractionTimeoutMs: 1000
       arguments:
