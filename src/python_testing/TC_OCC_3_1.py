@@ -57,7 +57,7 @@ class TC_OCC_3_1(MatterBaseTest):
         
         node_id = self.matter_test_config.dut_node_ids[0]
         
-        hold_time = 10 # 10 seconds
+        hold_time = 10 # 10 seconds for occupancy state hold time
 
         self.step(1) # commissioning and getting cluster attribute list
         attributes = Clusters.OccupancySensing.Attributes
@@ -70,46 +70,45 @@ class TC_OCC_3_1(MatterBaseTest):
             asserts.assert_equal(write_res[0].status, Status.Success, "Write HoldTime failed")
 
         else:
-            logging.info("No HoldTime attribute supports. Just test occupancy attribute triggering")
+            logging.info("No HoldTime attribute supports. Will test only occupancy attribute triggering functionality")
             
         self.step(3)
         # check if Occupancy attribute is 0
         occupancy_dut = await self.read_occ_attribute_expect_success(endpoint=endpoint, attribute=attributes.Occupancy)
-        
+
+        # if occupancy is on, then wait until the sensor occupancy state is 0.
         if occupancy_dut == 1:
             # Don't trigger occupancy sensor to render occupancy attribute to 0
             if attributes.HoldTime.attribute_id in attribute_list:
-                self.wait_for_user_input(prompt_msg="Type any letter and press ENTER after not triggering the sensor for HoldTime period to ensure occupancy attribute = 0")
+                time.sleep(hold_time + 2) # add some extra 2 seconds to ensure hold time has passed.
                 
-            else: # a user wait until a sensor specific time to change occupancy attribute to 0
+            else: # a user wait until a sensor specific time to change occupancy attribute to 0.  This is the case where the sensor doesn't support HoldTime.
                 self.wait_for_user_input(prompt_msg="Type any letter and press ENTER after the sensor occupancy is detection ready state (occupancy attribute = 0)")
-        
+
+        # check sensor occupancy state is 0 for the next test step
         occupancy_dut = await self.read_occ_attribute_expect_success(endpoint=endpoint, attribute=attributes.Occupancy)        
-        asserts.assert_equal(occupancy_dut, 0, "Occupancy attribute is 1.")
+        asserts.assert_equal(occupancy_dut, 0, "Occupancy attribute is still 1.")
 
         self.step(4)
         # Trigger occupancy sensor to change Occupancy attribute value to 1 => TEST ACTION on DUT
-        self.wait_for_user_input(prompt_msg="Type any letter and press ENTER after a user triggers sensor occupancy.")
+        self.wait_for_user_input(prompt_msg="Type any letter and press ENTER after a sensor occupancy is triggered.")
 
         # And then check if Occupancy attribute has changed.
         occupancy_dut = await self.read_occ_attribute_expect_success(endpoint=endpoint, attribute=attributes.Occupancy)
-        asserts.assert_equal(occupancy_dut, 1, "Occupancy state is not 1")
+        asserts.assert_equal(occupancy_dut, 1, "Occupancy state is not changed to 1")
             
-        # step 5
+        self.step(5)
         # check if Occupancy attribute is back to 0 after HoldTime attribute period
         if attributes.HoldTime.attribute_id in attribute_list:
-            self.step(5)
-
-            # Trigger occupancy sensor to change Occupancy attribute value to 1 => TEST ACTION on DUT
-            self.wait_for_user_input(prompt_msg="Type any letter and press ENTER after a user triggers sensor occupancy.")
+            # message to the tester
+            self.wait_for_user_input(prompt_msg="Do not trigger sensor during HoldTime.")
         
             # Start a timer based on HoldTime
-            time.sleep(hold_time) # wait 10 seconds
+            time.sleep(hold_time+2) # add some extra 2 seconds to ensure hold time has passed.
         
             occupancy_dut = await self.read_occ_attribute_expect_success(endpoint=endpoint, attribute=attributes.Occupancy)
             asserts.assert_equal(occupancy_dut, 0, "Occupancy state is not 0 after HoldTime period")
             
-        else:
-            
-            logging.info("No HoldTime attribute supports. Skip this test procedure.")
+        else:          
+            logging.info("HoldTime attribute not supported. Skip this test procedure.")
             self.skip_step(5)
