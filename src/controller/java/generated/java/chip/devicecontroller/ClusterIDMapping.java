@@ -4498,24 +4498,7 @@ public class ClusterIDMapping {
                 }
                 throw new NoSuchFieldError();
             }
-        }public enum KeepActiveCommandField {StayActiveDuration(0),;
-                    private final int id;
-                    KeepActiveCommandField(int id) {
-                        this.id = id;
-                    }
-
-                    public int getID() {
-                        return id;
-                    }
-                    public static KeepActiveCommandField value(int id) throws NoSuchFieldError {
-                        for (KeepActiveCommandField field : KeepActiveCommandField.values()) {
-                        if (field.getID() == id) {
-                            return field;
-                        }
-                        }
-                        throw new NoSuchFieldError();
-                    }
-                }@Override
+        }@Override
         public String getAttributeName(long id) throws NoSuchFieldError {
             return Attribute.value(id).toString();
         }

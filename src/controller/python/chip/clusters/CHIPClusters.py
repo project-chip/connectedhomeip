@@ -3250,7 +3250,6 @@ class ChipClusters:
                 "commandId": 0x00000080,
                 "commandName": "KeepActive",
                 "args": {
-                    "stayActiveDuration": "int",
                 },
             },
         },
