@@ -800,7 +800,7 @@ bool Instance::RenameSupportedMap(uint8_t aMapId, const CharSpan & newMapName)
 
         if (entry.IsNameEqual(newMapName))
         {
-            ChipLogError(Zcl, "AddSupportedMap %u - map already exists with same name '%.*s'", aMapId,
+            ChipLogError(Zcl, "RenameSupportedMap %u - map already exists with same name '%.*s'", aMapId,
                          static_cast<int>(entry.GetName().size()), entry.GetName().data());
             return false;
         }
@@ -1059,7 +1059,7 @@ bool Instance::SetProgressTotalOperationalTime(uint32_t aLocationId, const DataM
     }
 
     // set the time in the local copy
-    progressElement.totalOperationalTime.Emplace() = aTotalOperationalTime;
+    progressElement.totalOperationalTime.Emplace(aTotalOperationalTime);
 
     // add the updated element to the progress attribute
     if (!mDelegate->ModifyProgressElement(listIndex, progressElement))
@@ -1089,7 +1089,7 @@ bool Instance::SetProgressEstimatedTime(uint32_t aLocationId, const DataModel::N
     };
 
     // set the time in the local copy
-    progressElement.estimatedTime.Emplace() = aEstimatedTime;
+    progressElement.estimatedTime.Emplace(aEstimatedTime);
 
     // add the updated element to the progress attribute
     if (!mDelegate->ModifyProgressElement(listIndex, progressElement))
