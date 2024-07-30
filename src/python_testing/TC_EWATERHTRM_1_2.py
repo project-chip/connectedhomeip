@@ -50,7 +50,7 @@ class TC_EWATERHTRM_1_2(MatterBaseTest):
 
     def pics_TC_EWATERHTRM_1_2(self) -> list[str]:
         pics = [
-            "EWATERHTRM.S",
+            "WHM.S",
         ]
         return pics
 
