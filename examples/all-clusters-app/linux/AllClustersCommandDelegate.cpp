@@ -64,7 +64,7 @@ bool HasNumericField(Json::Value & jsonValue, const std::string & field)
  *
  * JSON Arguments:
  *   - "Name": Must be "SimulateLongPress"
- *   - "EndpointId": number of endpoint having a switch cluster
+ *   - "EndpointId": ID of endpoint having a switch cluster
  *   - "ButtonId": switch position in the switch cluster for "down" button (not idle)
  *   - "LongPressDelayMillis": Time in milliseconds before the LongPress
  *   - "LongPressDurationMillis": Total duration in milliseconds from start of the press to LongRelease
@@ -129,7 +129,7 @@ void HandleSimulateLongPress(Json::Value & jsonValue)
  *
  * JSON Arguments:
  *   - "Name": Must be "SimulateActionSwitchMultiPress"
- *   - "EndpointId": number of endpoint having a switch cluster
+ *   - "EndpointId": ID of endpoint having a switch cluster
  *   - "ButtonId": switch position in the switch cluster for "down" button (not idle)
  *   - "MultiPressPressedTimeMillis": Pressed time in milliseconds for each press
  *   - "MultiPressReleasedTimeMillis": Released time in milliseconds after each press
@@ -194,6 +194,57 @@ void HandleSimulateMultiPress(Json::Value & jsonValue)
     }
 
     sButtonSimulatorInstance = std::move(buttonSimulator);
+}
+
+/**
+ * Named pipe handler for simulating a latched switch movement.
+ *
+ * Usage example:
+ *   echo '{"Name": "SimulateLatchedPosition", "EndpointId": 3, "PositionId": 1}' > /tmp/chip_all_clusters_fifo_1146610
+ *
+ * JSON Arguments:
+ *   - "Name": Must be "SimulateLatchedPosition"
+ *   - "EndpointId": ID of endpoint having a switch cluster
+ *   - "PositionId": switch position for new CurrentPosition to set in switch cluster
+ *
+ * @param jsonValue - JSON payload from named pipe
+ */
+
+void HandleSimulateLatchedPosition(Json::Value & jsonValue)
+{
+    bool hasEndpointId = HasNumericField(jsonValue, "EndpointId");
+    bool hasPositionId = HasNumericField(jsonValue, "PositionId");
+
+    if (!hasEndpointId || !hasPositionId)
+    {
+        std::string inputJson = jsonValue.toStyledString();
+        ChipLogError(NotSpecified,
+                     "Missing or invalid value for one of EndpointId, PositionId in %s",
+                     inputJson.c_str());
+        return;
+    }
+
+    EndpointId endpointId = static_cast<EndpointId>(jsonValue["EndpointId"].asUInt());
+    uint8_t positionId      = static_cast<uint8_t>(jsonValue["PositionId"].asUInt());
+
+    uint8_t previousPositionId = 0;
+    Protocols::InteractionModel::Status status = Switch::Attributes::CurrentPosition::Get(endpointId, &previousPositionId);
+    VerifyOrReturn(Protocols::InteractionModel::Status::Success == status,
+                   ChipLogError(NotSpecified, "Failed to get CurrentPosition attribute"));
+
+    if (positionId != previousPositionId)
+    {
+        status = Switch::Attributes::CurrentPosition::Set(endpoint, positionId);
+        VerifyOrReturn(Protocols::InteractionModel::Status::Success == status,
+                      ChipLogError(NotSpecified, "Failed to set CurrentPosition attribute"));
+        ChipLogDetail(NotSpecified, "The latching switch is moved to a new position: %u", static_cast<unsigned>(positionId));
+
+        Clusters::SwitchServer::Instance().OnSwitchLatch(endpointId, positionId);
+    }
+    else
+    {
+        ChipLogDetail(NotSpecified, "Not moving latching switch to a new position, already at %u", static_cast<unsigned>(positionId));
+    }
 }
 
 } // namespace
@@ -352,6 +403,10 @@ void AllClustersAppCommandHandler::HandleCommand(intptr_t context)
     else if (name == "SimulateMultiPress")
     {
         HandleSimulateMultiPress(self->mJsonValue);
+    }
+    else if (name == "SimulateLatchPosition")
+    {
+        HandleSimulateLatchedPosition(self->mJsonValue);
     }
     else
     {
