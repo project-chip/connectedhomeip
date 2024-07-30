@@ -85,24 +85,30 @@ class AsyncTransferObtainedTransaction:
         self._future.set_exception(result.to_exception())
 
 
-async def PrepareToReceiveBdxData(future: Future):
+def PrepareToReceiveBdxData(future: Future) -> PyChipError:
     handle = chip.native.GetLibraryHandle()
     transaction = AsyncTransferObtainedTransaction(future=future)
 
     ctypes.pythonapi.Py_IncRef(ctypes.py_object(transaction))
-    return await builtins.chipStack.CallAsyncWithResult(
+    res = builtins.chipStack.Call(
         lambda: handle.pychip_Bdx_ExpectBdxTransfer(ctypes.py_object(transaction))
     )
+    if not res.is_success:
+      ctypes.pythonapi.Py_DecRef(ctypes.py_object(transaction))
+    return res
 
 
-async def PrepareToSendBdxData(future: Future, data: bytes):
+def PrepareToSendBdxData(future: Future, data: bytes) -> PyChipError:
     handle = chip.native.GetLibraryHandle()
     transaction = AsyncTransferObtainedTransaction(future=future, data=data)
 
     ctypes.pythonapi.Py_IncRef(ctypes.py_object(transaction))
-    return await builtins.chipStack.CallAsyncWithResult(
+    res = builtins.chipStack.CallAsyncWithResult(
         lambda: handle.pychip_Bdx_ExpectBdxTransfer(ctypes.py_object(transaction))
     )
+    if not res.is_success:
+      ctypes.pythonapi.Py_DecRef(ctypes.py_object(transaction))
+    return res
 
 
 async def AcceptSendTransfer(transfer: c_void_p, dataReceivedClosure, transferComplete: Future):
