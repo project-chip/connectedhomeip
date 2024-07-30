@@ -112,7 +112,7 @@ class TC_EWATERHTRM_2_1(MatterBaseTest):
         ret = await self.send_change_to_mode_cmd(newMode=old_current_mode)
         logging.info(f"ret.status {ret.status}")
         asserts.assert_equal(ret.status, Status.Success,
-                            "Changing the mode to the current mode should be a no-op")
+                             "Changing the mode to the current mode should be a no-op")
 
         # Steps 5-9 are not performed as EWATERHTRM.S.M.CAN_TEST_MODE_FAILURE is false
         self.step(5)
