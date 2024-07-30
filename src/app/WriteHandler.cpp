@@ -46,10 +46,12 @@ CHIP_ERROR WriteHandler::Init(DataModel::Provider * apProvider, WriteHandlerDele
 {
     VerifyOrReturnError(!mExchangeCtx, CHIP_ERROR_INCORRECT_STATE);
     VerifyOrReturnError(apWriteHandlerDelegate, CHIP_ERROR_INVALID_ARGUMENT);
+#if CHIP_CONFIG_USE_DATA_MODEL_INTERFACE
     VerifyOrReturnError(apProvider, CHIP_ERROR_INVALID_ARGUMENT);
+    mDataModelProvider = apProvider;
+#endif
 
     mDelegate          = apWriteHandlerDelegate;
-    mDataModelProvider = apProvider;
     MoveToState(State::Initialized);
 
     mACLCheckCache.ClearValue();
@@ -69,7 +71,9 @@ void WriteHandler::Close()
     DeliverFinalListWriteEnd(false /* wasSuccessful */);
     mExchangeCtx.Release();
     mSuppressResponse  = false;
+#if CHIP_CONFIG_USE_DATA_MODEL_INTERFACE
     mDataModelProvider = nullptr;
+#endif
     MoveToState(State::Uninitialized);
 }
 

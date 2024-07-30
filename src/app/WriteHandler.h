@@ -18,6 +18,7 @@
 
 #pragma once
 
+#include <app/AppConfig.h>
 #include <app/AttributeAccessToken.h>
 #include <app/AttributePathParams.h>
 #include <app/InteractionModelDelegatePointers.h>
@@ -206,7 +207,9 @@ private:
     bool mAttributeWriteSuccessful                = false;
     Optional<AttributeAccessToken> mACLCheckCache = NullOptional;
 
+#if CHIP_CONFIG_USE_DATA_MODEL_INTERFACE
     DataModel::Provider * mDataModelProvider = nullptr;
+#endif
 
     // This may be a "fake" pointer or a real delegate pointer, depending
     // on CHIP_CONFIG_STATIC_GLOBAL_INTERACTION_MODEL_ENGINE setting.
