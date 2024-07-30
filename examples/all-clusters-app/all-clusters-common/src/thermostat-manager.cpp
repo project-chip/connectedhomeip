@@ -274,7 +274,7 @@ void ThermostatManager::ThermostatClusterAttributeChangeHandler(AttributeId attr
     break;
 
     default: {
-        ChipLogError(AppServer, "Unhandled thermostat attribute %lx", attributeId);
+        ChipLogError(AppServer, "Unhandled thermostat attribute %u", static_cast<uint>(attributeId));
         return;
     }
     break;
@@ -398,8 +398,8 @@ void ThermostatManager::EvalThermostatState()
 
 void ThermostatManager::UpdateRunningModeForHeating()
 {
-    const int16_t heatingOnThreshold  = (int16_t) (mOccupiedHeatingSetpoint - mOccupiedSetback * 10);
-    const int16_t heatingOffThreshold = (int16_t) (mOccupiedHeatingSetpoint + mOccupiedSetback * 10);
+    const int16_t heatingOnThreshold  = mOccupiedHeatingSetpoint - static_cast<int16_t>(mOccupiedSetback * 10);
+    const int16_t heatingOffThreshold = mOccupiedHeatingSetpoint + static_cast<int16_t>(mOccupiedSetback * 10);
 
     if (mRunningMode == ThermostatRunningModeEnum::kHeat)
     {
