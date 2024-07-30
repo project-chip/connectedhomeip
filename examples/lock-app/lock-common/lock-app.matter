@@ -2603,7 +2603,7 @@ endpoint 0 {
     callback attribute acceptedCommandList;
     callback attribute eventList;
     callback attribute attributeList;
-    ram      attribute featureMap default = 0;
+    ram      attribute featureMap default = 1;
     callback attribute clusterRevision;
   }
 
