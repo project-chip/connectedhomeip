@@ -18,7 +18,6 @@
 import logging
 
 import chip.clusters as Clusters
-from chip.clusters.Types import NullValue
 from matter_testing_support import MatterBaseTest, TestStep, async_test_body, default_matter_test_main
 from mobly import asserts
 
@@ -105,3 +104,6 @@ class TC_OCC_2_2(MatterBaseTest):
 
         else:
             logging.info("OccupancySensorTypeBitmap mandatory attribute is not supported. Test step skipped")
+
+if __name__ == "__main__":
+    default_matter_test_main()
