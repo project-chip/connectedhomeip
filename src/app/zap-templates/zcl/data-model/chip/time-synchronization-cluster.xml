@@ -114,18 +114,45 @@ limitations under the License.
       </feature>
     </features>
 
-    <attribute side="server" code="0x0000" define="UTC_TIME" type="epoch_us" isNullable="true" optional="false">UTCTime</attribute>
+    <attribute side="server" code="0x0000" define="UTC_TIME" type="epoch_us" isNullable="true" optional="false">
+        <description>UTCTime</description>
+        <quality changeOmitted= "true" />
+    </attribute>
     <attribute side="server" code="0x0001" define="GRANULARITY" type="GranularityEnum" default="0x00" optional="false">Granularity</attribute>
     <attribute side="server" code="0x0002" define="TIME_SOURCE" type="TimeSourceEnum" default="0x00" optional="true">TimeSource</attribute>
-    <attribute side="server" code="0x0003" define="TRUSTED_TIME_SOURCE" type="TrustedTimeSourceStruct" isNullable="true" optional="true">TrustedTimeSource</attribute>
-    <attribute side="server" code="0x0004" define="DEFAULT_NTP" type="char_string" length="128" isNullable="true" optional="true">DefaultNTP</attribute>
-    <attribute side="server" code="0x0005" define="TIME_ZONE" type="array" entryType="TimeZoneStruct" optional="true">TimeZone</attribute>
-    <attribute side="server" code="0x0006" define="DST_OFFSET" type="array" entryType="DSTOffsetStruct" optional="true">DSTOffset</attribute>
-    <attribute side="server" code="0x0007" define="LOCAL_TIME" type="epoch_us" default="0xFFFFFFFFFFFFFFFF" isNullable="true" optional="true">LocalTime</attribute>
-    <attribute side="server" code="0x0008" define="TIME_ZONE_DATABASE" type="TimeZoneDatabaseEnum" default="2" optional="true">TimeZoneDatabase</attribute>
+    <attribute side="server" code="0x0003" define="TRUSTED_TIME_SOURCE" type="TrustedTimeSourceStruct" isNullable="true" optional="true">
+        <description>TrustedTimeSource</description>
+        <quality persistence= "nonVolatile" />
+    </attribute>
+    <attribute side="server" code="0x0004" define="DEFAULT_NTP" type="char_string" length="128" isNullable="true" optional="true">
+        <description>DefaultNTP</description>
+        <quality persistence= "nonVolatile" />
+    </attribute>
+    <attribute side="server" code="0x0005" define="TIME_ZONE" type="array" entryType="TimeZoneStruct" optional="true">
+        <description>TimeZone</description>
+        <quality persistence= "nonVolatile" />
+    </attribute>
+    <attribute side="server" code="0x0006" define="DST_OFFSET" type="array" entryType="DSTOffsetStruct" optional="true">
+        <description>DSTOffset</description>
+        <quality persistence= "nonVolatile" />
+    </attribute>
+    <attribute side="server" code="0x0007" define="LOCAL_TIME" type="epoch_us" default="0xFFFFFFFFFFFFFFFF" isNullable="true" optional="true">
+        <description>LocalTime</description>
+        <quality changeOmitted= "true" />
+    </attribute>
+    <attribute side="server" code="0x0008" define="TIME_ZONE_DATABASE" type="TimeZoneDatabaseEnum" default="2" optional="true">
+        <description>TimeZoneDatabase</description>
+        <quality persistence= "fixed" />
+    </attribute>
     <attribute side="server" code="0x0009" define="NTP_SERVER_AVAILABLE" type="boolean" default="false" optional="true">NTPServerAvailable</attribute>
-    <attribute side="server" code="0x000A" define="TIME_ZONE_LIST_MAX_SIZE" type="int8u" min="1" max="2" optional="true">TimeZoneListMaxSize</attribute>
-    <attribute side="server" code="0x000B" define="DST_OFFSET_LIST_MAX_SIZE" type="int8u" min="1" optional="true">DSTOffsetListMaxSize</attribute>
+    <attribute side="server" code="0x000A" define="TIME_ZONE_LIST_MAX_SIZE" type="int8u" min="1" max="2" optional="true">
+        <description>TimeZoneListMaxSize</description>
+        <quality persistence= "fixed" />
+    </attribute>
+    <attribute side="server" code="0x000B" define="DST_OFFSET_LIST_MAX_SIZE" type="int8u" min="1" optional="true">
+        <description>DSTOffsetListMaxSize</description>
+        <quality persistence= "fixed" />
+    </attribute>
     <attribute side="server" code="0x000C" define="SUPPORTS_DNS_RESOLVE" type="boolean" default="false" optional="true">SupportsDNSResolve</attribute>
 
     <command source="client" code="0x00" name="SetUTCTime" optional="false">

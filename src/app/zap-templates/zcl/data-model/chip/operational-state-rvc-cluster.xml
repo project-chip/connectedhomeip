@@ -49,7 +49,10 @@ limitations under the License.
 
     <attribute side="server" code="0x0000" define="PHASE_LIST"              type="array" entryType="char_string"                                     writable="false" isNullable="true"  optional="false">PhaseList</attribute>
     <attribute side="server" code="0x0001" define="CURRENT_PHASE"           type="int8u"                                    min="0x00" max="0x1F"    writable="false" isNullable="true"  optional="false">CurrentPhase</attribute>
-    <attribute side="server" code="0x0002" define="COUNTDOWN_TIME"          type="elapsed_s"                                min="0"    max="259200"  writable="false" isNullable="true"  optional="true">CountdownTime</attribute>
+    <attribute side="server" code="0x0002" define="COUNTDOWN_TIME"          type="elapsed_s"                                min="0"    max="259200"  writable="false" isNullable="true"  optional="true">
+        <description>CountdownTime</description>
+        <quality changeOmitted= "true" />
+    </attribute>
     <attribute side="server" code="0x0003" define="OPERATIONAL_STATE_LIST"  type="array" entryType="OperationalStateStruct"                          writable="false"                    optional="false">OperationalStateList</attribute>
 
 <!--

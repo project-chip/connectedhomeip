@@ -44,9 +44,15 @@ limitations under the License.
     </features>
 
     <attribute side="server" code="0x0000" define="MASK"      type="AlarmBitmap" default="0" writable="false" optional="false">Mask</attribute>
-    <attribute side="server" code="0x0001" define="LATCH"     type="AlarmBitmap" default="0" writable="false" optional="true">Latch</attribute>
+    <attribute side="server" code="0x0001" define="LATCH"     type="AlarmBitmap" default="0" writable="false" optional="true">
+        <description>Latch</description>
+        <quality persistence= "fixed" />
+    </attribute>
     <attribute side="server" code="0x0002" define="STATE"     type="AlarmBitmap" default="0" writable="false" optional="false">State</attribute>
-    <attribute side="server" code="0x0003" define="SUPPORTED" type="AlarmBitmap" default="0" writable="false" optional="false">Supported</attribute>
+    <attribute side="server" code="0x0003" define="SUPPORTED" type="AlarmBitmap" default="0" writable="false" optional="false">
+        <description>Supported</description>
+        <quality persistence= "fixed" />
+    </attribute>
 
     <command source="client" code="0x00" name="Reset" optional="true">
         <description>Reset alarm</description>

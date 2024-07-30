@@ -75,7 +75,10 @@ planned operation.">
       </feature>
     </features>
     <!--Attributes-->
-    <attribute code="0x0000" side="server" type="ESATypeEnum" define="ESA_TYPE" min="0x00" max="0xFF" default="0xFF">ESAType</attribute>
+    <attribute code="0x0000" side="server" type="ESATypeEnum" define="ESA_TYPE" min="0x00" max="0xFF" default="0xFF">
+        <description>ESAType</description>
+        <quality persistence= "fixed" />
+    </attribute>
     <attribute code="0x0001" side="server" type="boolean" define="ESA_CAN_GENERATE" default="0">ESACanGenerate</attribute>
     <attribute code="0x0002" side="server" type="ESAStateEnum" define="ESA_STATE" default="0x00" min="0x00" max="0x04">ESAState</attribute>
     <attribute code="0x0003" side="server" type="power_mw" define="ABS_MIN_POWER" default="0">AbsMinPower</attribute>

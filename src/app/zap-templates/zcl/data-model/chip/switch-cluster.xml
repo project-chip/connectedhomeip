@@ -78,9 +78,18 @@ Interactions with the switch device are exposed as attributes (for the latching 
       </feature>
     </features>
 
-    <attribute side="server" code="0x0000" define="NUMBER_OF_POSITIONS" type="int8u" writable="false" optional="false" default="2" min="2">NumberOfPositions</attribute>
-    <attribute side="server" code="0x0001" define="CURRENT_POSITION" type="int8u" writable="false" reportable="true" optional="false">CurrentPosition</attribute>
-    <attribute side="server" code="0x0002" define="MULTI_PRESS_MAX" type="int8u" writable="false" optional="true" default="2" min="2">MultiPressMax</attribute>
+    <attribute side="server" code="0x0000" define="NUMBER_OF_POSITIONS" type="int8u" writable="false" optional="false" default="2" min="2">
+        <description>NumberOfPositions</description>
+        <quality persistence= "fixed" />
+    </attribute>
+    <attribute side="server" code="0x0001" define="CURRENT_POSITION" type="int8u" writable="false" reportable="true" optional="false">
+        <description>CurrentPosition</description>
+        <quality persistence= "nonVolatile" />
+    </attribute>
+    <attribute side="server" code="0x0002" define="MULTI_PRESS_MAX" type="int8u" writable="false" optional="true" default="2" min="2">
+        <description>MultiPressMax</description>
+        <quality persistence= "fixed" />
+    </attribute>
     <event side="server" code="0x00" priority="info" name="SwitchLatched" optional="true">
       <description>SwitchLatched</description>
       <field id="0" name="NewPosition" type="int8u" />

@@ -43,13 +43,25 @@ limitations under the License.
 
     <!--Attributes-->
     <attribute code="0x0000" side="server" define="ACCURACY" type="MeasurementAccuracyStruct">Accuracy</attribute>
-    <attribute code="0x0001" side="server" define="CUMULATIVE_ENERGY_IMPORTED" type="EnergyMeasurementStruct" optional="true" isNullable="true">CumulativeEnergyImported</attribute>
+    <attribute code="0x0001" side="server" define="CUMULATIVE_ENERGY_IMPORTED" type="EnergyMeasurementStruct" optional="true" isNullable="true">
+        <description>CumulativeEnergyImported</description>
+        <quality quieterReporting= "true"/>
+    </attribute>
     <!--Conformance feature IMPE & CUME - for now optional-->
-    <attribute code="0x0002" side="server" define="CUMULATIVE_ENERGY_EXPORTED" type="EnergyMeasurementStruct" isNullable="true" optional="true">CumulativeEnergyExported</attribute>
+    <attribute code="0x0002" side="server" define="CUMULATIVE_ENERGY_EXPORTED" type="EnergyMeasurementStruct" isNullable="true" optional="true">
+        <description>CumulativeEnergyExported</description>
+        <quality quieterReporting= "true"/>
+    </attribute>
     <!--Conformance feature EXPE & CUME - for now optional-->
-    <attribute code="0x0003" side="server" define="PERIODIC_ENERGY_IMPORTED" type="EnergyMeasurementStruct" isNullable="true" optional="true">PeriodicEnergyImported</attribute>
+    <attribute code="0x0003" side="server" define="PERIODIC_ENERGY_IMPORTED" type="EnergyMeasurementStruct" isNullable="true" optional="true">
+        <description>PeriodicEnergyImported</description>
+        <quality quieterReporting= "true"/>
+    </attribute>
     <!--Conformance feature IMPE & PERE - for now optional-->
-    <attribute code="0x0004" side="server" define="PERIODIC_ENERGY_EXPORTED" type="EnergyMeasurementStruct" isNullable="true" optional="true">PeriodicEnergyExported</attribute>
+    <attribute code="0x0004" side="server" define="PERIODIC_ENERGY_EXPORTED" type="EnergyMeasurementStruct" isNullable="true" optional="true">
+        <description>PeriodicEnergyExported</description>
+        <quality quieterReporting= "true"/>
+    </attribute>
     <attribute code="0x0005" side="server" define="CUMULATIVE_ENERGY_RESET" type="CumulativeEnergyResetStruct" isNullable="true" optional="true">CumulativeEnergyReset</attribute>
     <!--Conformance feature EXPE & PERE - for now optional-->
     <event code="0x00" side="server" name="CumulativeEnergyMeasured" priority="info" optional="true">

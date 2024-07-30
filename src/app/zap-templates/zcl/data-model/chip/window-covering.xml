@@ -59,43 +59,91 @@ limitations under the License.
     <!-- Conformance feature M -->
     <attribute side="server" writable="false" code="0x0000" define="WC_TYPE"                                      type="Type"     min="0x00"   max="0x09"   default="0x00"   optional="false">Type</attribute>
     <!-- Conformance feature [LF & PA_LF & ABS] - for now optional -->
-    <attribute side="server" writable="false" code="0x0001" define="WC_PHYSICAL_CLOSED_LIMIT_LIFT"                type="int16u"   min="0x0000" max="0xFFFF" default="0x0000" optional="true" >PhysicalClosedLimitLift</attribute>
+    <attribute side="server" writable="false" code="0x0001" define="WC_PHYSICAL_CLOSED_LIMIT_LIFT"                type="int16u"   min="0x0000" max="0xFFFF" default="0x0000" optional="true" >
+        <description>PhysicalClosedLimitLift</description>
+        <quality persistence= "fixed" />
+    </attribute>
     <!-- Conformance feature [TL & PA_TL & ABS] - for now optional -->
-    <attribute side="server" writable="false" code="0x0002" define="WC_PHYSICAL_CLOSED_LIMIT_TILT"                type="int16u"   min="0x0000" max="0xFFFF" default="0x0000" optional="true" >PhysicalClosedLimitTilt</attribute>
+    <attribute side="server" writable="false" code="0x0002" define="WC_PHYSICAL_CLOSED_LIMIT_TILT"                type="int16u"   min="0x0000" max="0xFFFF" default="0x0000" optional="true" >
+        <description>PhysicalClosedLimitTilt</description>
+        <quality persistence= "fixed" />
+    </attribute>
     <!-- Conformance feature [LF & PA_LF & ABS] - for now optional -->
-    <attribute side="server" writable="false" code="0x0003" define="WC_CURRENT_POSITION_LIFT"                     type="int16u"   min="0x0000" max="0xFFFF" isNullable="true" optional="true">CurrentPositionLift</attribute>
+    <attribute side="server" writable="false" code="0x0003" define="WC_CURRENT_POSITION_LIFT"                     type="int16u"   min="0x0000" max="0xFFFF" isNullable="true" optional="true">
+        <description>CurrentPositionLift</description>
+        <quality persistence= "nonVolatile" />
+    </attribute>
     <!-- Conformance feature [TL & PA_TL & ABS] - for now optional -->
-    <attribute side="server" writable="false" code="0x0004" define="WC_CURRENT_POSITION_TILT"                     type="int16u"   min="0x0000" max="0xFFFF" isNullable="true" optional="true">CurrentPositionTilt</attribute>
+    <attribute side="server" writable="false" code="0x0004" define="WC_CURRENT_POSITION_TILT"                     type="int16u"   min="0x0000" max="0xFFFF" isNullable="true" optional="true">
+        <description>CurrentPositionTilt</description>
+        <quality persistence= "nonVolatile" />
+    </attribute>
     <!-- Conformance feature [LF] - for now optional -->
-    <attribute side="server" writable="false" code="0x0005" define="WC_NUMBER_OF_ACTUATIONS_LIFT"                 type="int16u"   min="0x0000" max="0xFFFF" default="0x0000" optional="true" >NumberOfActuationsLift</attribute>
+    <attribute side="server" writable="false" code="0x0005" define="WC_NUMBER_OF_ACTUATIONS_LIFT"                 type="int16u"   min="0x0000" max="0xFFFF" default="0x0000" optional="true" >
+        <description>NumberOfActuationsLift</description>
+        <quality persistence= "nonVolatile" />
+    </attribute>
     <!-- Conformance feature [TL] - for now optional -->
-    <attribute side="server" writable="false" code="0x0006" define="WC_NUMBER_OF_ACTUATIONS_TILT"                 type="int16u"   min="0x0000" max="0xFFFF" default="0x0000" optional="true" >NumberOfActuationsTilt</attribute>
+    <attribute side="server" writable="false" code="0x0006" define="WC_NUMBER_OF_ACTUATIONS_TILT"                 type="int16u"   min="0x0000" max="0xFFFF" default="0x0000" optional="true" >
+        <description>NumberOfActuationsTilt</description>
+        <quality persistence= "nonVolatile" />
+    </attribute>
     <!-- Conformance feature M -->
     <attribute side="server" writable="false" code="0x0007" define="WC_CONFIG_STATUS"                             type="ConfigStatus" min="0x00"   max="0x7F"   default="0x03"   optional="false">ConfigStatus</attribute>
     <!-- Conformance feature [LF & PA_LF] - for now optional -->
-    <attribute side="server" writable="false" code="0x0008" define="WC_CURRENT_POSITION_LIFT_PERCENTAGE"          type="percent"  min="0"      max="100"    isNullable="true" optional="true" reportable="true" >CurrentPositionLiftPercentage</attribute>
+    <attribute side="server" writable="false" code="0x0008" define="WC_CURRENT_POSITION_LIFT_PERCENTAGE"          type="percent"  min="0"      max="100"    isNullable="true" optional="true" reportable="true" >
+        <description>CurrentPositionLiftPercentage</description>
+        <quality scene= "true" persistence= "nonVolatile" />
+    </attribute>
     <!-- Conformance feature [TL & PA_TL] - for now optional -->
-    <attribute side="server" writable="false" code="0x0009" define="WC_CURRENT_POSITION_TILT_PERCENTAGE"          type="percent"  min="0"      max="100"    isNullable="true" optional="true" reportable="true" >CurrentPositionTiltPercentage</attribute>
+    <attribute side="server" writable="false" code="0x0009" define="WC_CURRENT_POSITION_TILT_PERCENTAGE"          type="percent"  min="0"      max="100"    isNullable="true" optional="true" reportable="true" >
+        <description>CurrentPositionTiltPercentage</description>
+        <quality scene= "true" persistence= "nonVolatile" />
+    </attribute>
     <!-- Conformance feature M -->
     <attribute side="server" writable="false" code="0x000A" define="WC_OPERATIONAL_STATUS"                        type="OperationalStatus" min="0x00"   max="0x7F"   default="0x00"   optional="false" reportable="true" >OperationalStatus</attribute>
     <!-- Conformance feature LF & PA_LF - for now optional -->
-    <attribute side="server" writable="false" code="0x000B" define="WC_TARGET_POSITION_LIFT_PERCENT100THS"        type="percent100ths" min="0" max="10000"  isNullable="true" optional="true" reportable="true" >TargetPositionLiftPercent100ths</attribute>
+    <attribute side="server" writable="false" code="0x000B" define="WC_TARGET_POSITION_LIFT_PERCENT100THS"        type="percent100ths" min="0" max="10000"  isNullable="true" optional="true" reportable="true" >
+        <description>TargetPositionLiftPercent100ths</description>
+        <quality scene= "true" />
+    </attribute>
     <!-- Conformance feature TL & PA_TL - for now optional -->
-    <attribute side="server" writable="false" code="0x000C" define="WC_TARGET_POSITION_TILT_PERCENT100THS"        type="percent100ths" min="0" max="10000"  isNullable="true" optional="true" reportable="true" >TargetPositionTiltPercent100ths</attribute>
+    <attribute side="server" writable="false" code="0x000C" define="WC_TARGET_POSITION_TILT_PERCENT100THS"        type="percent100ths" min="0" max="10000"  isNullable="true" optional="true" reportable="true" >
+        <description>TargetPositionTiltPercent100ths</description>
+        <quality scene= "true" />
+    </attribute>
     <!-- Conformance feature M -->
     <attribute side="server" writable="false" code="0x000D" define="WC_END_PRODUCT_TYPE"                          type="EndProductType" min="0x00"   max="0x20"   default="0x00"   optional="false" >EndProductType</attribute>
     <!-- Conformance feature LF & PA_LF - for now optional -->
-    <attribute side="server" writable="false" code="0x000E" define="WC_CURRENT_POSITION_LIFT_PERCENT100THS"       type="percent100ths" min="0" max="10000"  isNullable="true" optional="true" reportable="true" >CurrentPositionLiftPercent100ths</attribute>
+    <attribute side="server" writable="false" code="0x000E" define="WC_CURRENT_POSITION_LIFT_PERCENT100THS"       type="percent100ths" min="0" max="10000"  isNullable="true" optional="true" reportable="true" >
+        <description>CurrentPositionLiftPercent100ths</description>
+        <quality persistence= "nonVolatile" />
+    </attribute>
     <!-- Conformance feature TL & PA_TL - for now optional -->
-    <attribute side="server" writable="false" code="0x000F" define="WC_CURRENT_POSITION_TILT_PERCENT100THS"       type="percent100ths" min="0" max="10000"  isNullable="true" optional="true" reportable="true" >CurrentPositionTiltPercent100ths</attribute>
+    <attribute side="server" writable="false" code="0x000F" define="WC_CURRENT_POSITION_TILT_PERCENT100THS"       type="percent100ths" min="0" max="10000"  isNullable="true" optional="true" reportable="true" >
+        <description>CurrentPositionTiltPercent100ths</description>
+        <quality persistence= "nonVolatile" />
+    </attribute>
 
     <!-- Window Covering Settings Attribute Set -->
     <!-- Conformance feature LF & PA_LF & ABS - for now optional -->
-    <attribute side="server" writable="false" code="0x0010" define="WC_INSTALLED_OPEN_LIMIT_LIFT"                 type="int16u"   min="0x0000" max="0xFFFF" default="0x0000" optional="true" >InstalledOpenLimitLift</attribute>
-    <attribute side="server" writable="false" code="0x0011" define="WC_INSTALLED_CLOSED_LIMIT_LIFT"               type="int16u"   min="0x0000" max="0xFFFF" default="0xFFFF" optional="true" >InstalledClosedLimitLift</attribute>
+    <attribute side="server" writable="false" code="0x0010" define="WC_INSTALLED_OPEN_LIMIT_LIFT"                 type="int16u"   min="0x0000" max="0xFFFF" default="0x0000" optional="true" >
+        <description>InstalledOpenLimitLift</description>
+        <quality persistence= "nonVolatile" />
+    </attribute>
+    <attribute side="server" writable="false" code="0x0011" define="WC_INSTALLED_CLOSED_LIMIT_LIFT"               type="int16u"   min="0x0000" max="0xFFFF" default="0xFFFF" optional="true" >
+        <description>InstalledClosedLimitLift</description>
+        <quality persistence= "nonVolatile" />
+    </attribute>
     <!-- Conformance feature TL & PA_TL & ABS - for now optional -->
-    <attribute side="server" writable="false" code="0x0012" define="WC_INSTALLED_OPEN_LIMIT_TILT"                 type="int16u"   min="0x0000" max="0xFFFF" default="0x0000" optional="true" >InstalledOpenLimitTilt</attribute>
-    <attribute side="server" writable="false" code="0x0013" define="WC_INSTALLED_CLOSED_LIMIT_TILT"               type="int16u"   min="0x0000" max="0xFFFF" default="0xFFFF" optional="true" >InstalledClosedLimitTilt</attribute>
+    <attribute side="server" writable="false" code="0x0012" define="WC_INSTALLED_OPEN_LIMIT_TILT"                 type="int16u"   min="0x0000" max="0xFFFF" default="0x0000" optional="true" >
+        <description>InstalledOpenLimitTilt</description>
+        <quality persistence= "nonVolatile" />
+    </attribute>
+    <attribute side="server" writable="false" code="0x0013" define="WC_INSTALLED_CLOSED_LIMIT_TILT"               type="int16u"   min="0x0000" max="0xFFFF" default="0xFFFF" optional="true" >
+        <description>InstalledClosedLimitTilt</description>
+        <quality persistence= "nonVolatile" />
+    </attribute>
     <!-- Conformance Deprecated -->
     <!-- attribute side="server" writable="true"  code="0x0014" define="WC_VELOCITY_LIFT"                         type="int16u"   min="0x0000" max="0xFFFF" default="0x0000" optional="true" >VelocityLift -->
     <!-- attribute side="server" writable="true"  code="0x0015" define="WC_ACCELERATION_TIME_LIFT"                type="int16u"   min="0x0000" max="0xFFFF" default="0x0000" optional="true" >AccelerationTimeLift -->
@@ -103,6 +151,7 @@ limitations under the License.
     <!-- Conformance feature M -->
     <attribute side="server" writable="true"  code="0x0017" define="WC_MODE"                                      type="Mode"  min="0x00"   max="0x0F"   default="0x00"   optional="false" >
       <description>Mode</description>
+        <quality persistence= "nonVolatile" />
       <access op="read" role="view" />
       <access op="write" role="manage" />
     </attribute>

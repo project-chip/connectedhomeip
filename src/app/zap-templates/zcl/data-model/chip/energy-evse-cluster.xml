@@ -119,9 +119,15 @@ limitations under the License.
     <attribute code="0x0000" side="server" type="StateEnum" define="STATE" isNullable="true" min="0x00" max="0x06">State</attribute>
     <attribute code="0x0001" side="server" type="SupplyStateEnum" define="SUPPLY_STATE" min="0x00" max="0x05">SupplyState</attribute>
     <attribute code="0x0002" side="server" type="FaultStateEnum" define="FAULT_STATE" min="0x00" max="0xFF">FaultState</attribute>
-    <attribute code="0x0003" side="server" type="epoch_s" define="CHARGING_ENABLED_UNTIL" isNullable="true" default="0">ChargingEnabledUntil</attribute>
+    <attribute code="0x0003" side="server" type="epoch_s" define="CHARGING_ENABLED_UNTIL" isNullable="true" default="0">
+        <description>ChargingEnabledUntil</description>
+        <quality persistence= "nonVolatile" />
+    </attribute>
     <!--Conformance feature V2X - for now optional-->
-    <attribute code="0x0004" side="server" type="epoch_s" define="DISCHARGING_ENABLED_UNTIL" isNullable="true" default="0" optional="true">DischargingEnabledUntil</attribute>
+    <attribute code="0x0004" side="server" type="epoch_s" define="DISCHARGING_ENABLED_UNTIL" isNullable="true" default="0" optional="true">
+        <description>DischargingEnabledUntil</description>
+        <quality persistence= "nonVolatile" />
+    </attribute>
     <attribute code="0x0005" side="server" type="amperage_ma" define="CIRCUIT_CAPACITY" default="0" min="0">CircuitCapacity</attribute>
     <attribute code="0x0006" side="server" type="amperage_ma" define="MINIMUM_CHARGE_CURRENT" default="6000" min="0">MinimumChargeCurrent</attribute>
     <attribute code="0x0007" side="server" type="amperage_ma" define="MAXIMUM_CHARGE_CURRENT" default="0" min="0">MaximumChargeCurrent</attribute>
@@ -130,10 +136,12 @@ limitations under the License.
     <attribute code="0x0009" side="server" type="amperage_ma" define="USER_MAXIMUM_CHARGE_CURRENT" default="0" writable="true" optional="true">
       <access op="write" privilege="manage"/>
       <description>UserMaximumChargeCurrent</description>
+        <quality persistence= "nonVolatile" />
     </attribute>
     <attribute code="0x000A" side="server" type="elapsed_s" define="RANDOMIZATION_DELAY_WINDOW" default="600" writable="true" optional="true">
       <access op="write" privilege="manage"/>
       <description>RandomizationDelayWindow</description>
+        <quality persistence= "nonVolatile" />
     </attribute>
     <!--Conformance feature PREF - for now optional-->
     <!--Conformance feature PREF - for now optional-->
@@ -149,6 +157,7 @@ limitations under the License.
     <attribute code="0x0027" side="server" type="int16u" define="APPROXIMATE_EV_EFFICIENCY" isNullable="true" writable="true" optional="true" max="0xFFFE">
       <access op="write" privilege="manage"/>
       <description>ApproximateEVEfficiency</description>
+        <quality persistence= "nonVolatile" />
     </attribute>
     <!--Conformance feature SOC - for now optional-->
     <attribute code="0x0030" side="server" type="percent" define="STATE_OF_CHARGE" isNullable="true" optional="true">StateOfCharge</attribute>
@@ -156,8 +165,14 @@ limitations under the License.
     <attribute code="0x0031" side="server" type="energy_mwh" define="BATTERY_CAPACITY" isNullable="true" min="0" optional="true">BatteryCapacity</attribute>
     <!--Conformance feature PNC - for now optional-->
     <attribute code="0x0032" side="server" type="char_string" define="VEHICLE_ID" isNullable="true" length="32" optional="true">VehicleID</attribute>
-    <attribute code="0x0040" side="server" type="int32u" define="SESSION_ID" isNullable="true">SessionID</attribute>
-    <attribute code="0x0041" side="server" type="elapsed_s" define="SESSION_DURATION" isNullable="true">SessionDuration</attribute>
+    <attribute code="0x0040" side="server" type="int32u" define="SESSION_ID" isNullable="true">
+        <description>SessionID</description>
+        <quality persistence= "nonVolatile" />
+    </attribute>
+    <attribute code="0x0041" side="server" type="elapsed_s" define="SESSION_DURATION" isNullable="true">
+        <description>SessionDuration</description>
+        <quality persistence= "nonVolatile" />
+    </attribute>
     <attribute code="0x0042" side="server" type="energy_mwh" define="SESSION_ENERGY_CHARGED" isNullable="true" min="0">SessionEnergyCharged</attribute>
     <!--Conformance feature V2X - for now optional-->
     <attribute code="0x0043" side="server" type="energy_mwh" define="SESSION_ENERGY_DISCHARGED" isNullable="true" min="0" optional="true">SessionEnergyDischarged</attribute>

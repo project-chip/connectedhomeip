@@ -51,41 +51,69 @@ limitations under the License.
     </features>
 
     <attribute side="server" code="0x0000" define="MAX_PRESSURE" type="int16s" isNullable="true" min="0x8001" max="0x7FFF" writable="false" optional="false">MaxPressure</attribute>
-    <attribute side="server" code="0x0001" define="MAX_SPEED" type="int16u" isNullable="true" min="0x0000" max="0xFFFE" writable="false" optional="false">MaxSpeed</attribute>
-    <attribute side="server" code="0x0002" define="MAX_FLOW" type="int16u" isNullable="true" min="0x0000" max="0xFFFE" writable="false" optional="false">MaxFlow</attribute>
+    <attribute side="server" code="0x0001" define="MAX_SPEED" type="int16u" isNullable="true" min="0x0000" max="0xFFFE" writable="false" optional="false">
+        <description>MaxSpeed</description>
+        <quality persistence= "fixed" />
+    </attribute>
+    <attribute side="server" code="0x0002" define="MAX_FLOW" type="int16u" isNullable="true" min="0x0000" max="0xFFFE" writable="false" optional="false">
+        <description>MaxFlow</description>
+        <quality persistence= "fixed" />
+    </attribute>
     <attribute side="server" code="0x0003" define="MIN_CONST_PRESSURE" type="int16s" isNullable="true" min="0x8001" max="0x7FFF" writable="false" optional="true">MinConstPressure</attribute>
     <attribute side="server" code="0x0004" define="MAX_CONST_PRESSURE" type="int16s" isNullable="true" min="0x8001" max="0x7FFF" writable="false" optional="true">MaxConstPressure</attribute>
     <attribute side="server" code="0x0005" define="MIN_COMP_PRESSURE" type="int16s" isNullable="true" min="0x8001" max="0x7FFF" writable="false" optional="true">MinCompPressure</attribute>
     <attribute side="server" code="0x0006" define="MAX_COMP_PRESSURE" type="int16s" isNullable="true" min="0x8001" max="0x7FFF" writable="false" optional="true">MaxCompPressure</attribute>
-    <attribute side="server" code="0x0007" define="MIN_CONST_SPEED" type="int16u" isNullable="true" min="0x0000" max="0xFFFE" writable="false" optional="true">MinConstSpeed</attribute>
-    <attribute side="server" code="0x0008" define="MAX_CONST_SPEED" type="int16u" isNullable="true" min="0x0000" max="0xFFFE" writable="false" optional="true">MaxConstSpeed</attribute>
-    <attribute side="server" code="0x0009" define="MIN_CONST_FLOW" type="int16u" isNullable="true" min="0x0000" max="0xFFFE" writable="false" optional="true">MinConstFlow</attribute>
-    <attribute side="server" code="0x000A" define="MAX_CONST_FLOW" type="int16u" isNullable="true" min="0x0000" max="0xFFFE" writable="false" optional="true">MaxConstFlow</attribute>
+    <attribute side="server" code="0x0007" define="MIN_CONST_SPEED" type="int16u" isNullable="true" min="0x0000" max="0xFFFE" writable="false" optional="true">
+        <description>MinConstSpeed</description>
+        <quality persistence= "fixed" />
+    </attribute>
+    <attribute side="server" code="0x0008" define="MAX_CONST_SPEED" type="int16u" isNullable="true" min="0x0000" max="0xFFFE" writable="false" optional="true">
+        <description>MaxConstSpeed</description>
+        <quality persistence= "fixed" />
+    </attribute>
+    <attribute side="server" code="0x0009" define="MIN_CONST_FLOW" type="int16u" isNullable="true" min="0x0000" max="0xFFFE" writable="false" optional="true">
+        <description>MinConstFlow</description>
+        <quality persistence= "fixed" />
+    </attribute>
+    <attribute side="server" code="0x000A" define="MAX_CONST_FLOW" type="int16u" isNullable="true" min="0x0000" max="0xFFFE" writable="false" optional="true">
+        <description>MaxConstFlow</description>
+        <quality persistence= "fixed" />
+    </attribute>
     <attribute side="server" code="0x000B" define="MIN_CONST_TEMP" type="int16s" isNullable="true" min="0x954D" max="32767" writable="false" optional="true">MinConstTemp</attribute>
     <attribute side="server" code="0x000C" define="MAX_CONST_TEMP" type="int16s" isNullable="true" min="0x954D" max="0x7FFF" writable="false" optional="true">MaxConstTemp</attribute>
     <attribute side="server" code="0x0010" define="PUMP_STATUS" type="PumpStatusBitmap" writable="false" default="0x0000" reportable="true" optional="true">PumpStatus</attribute>
-    <attribute side="server" code="0x0011" define="EFFECTIVE_OPERATION_MODE" type="OperationModeEnum" min="0x00" max="0x03" writable="false" optional="false">EffectiveOperationMode</attribute>
-    <attribute side="server" code="0x0012" define="EFFECTIVE_CONTROL_MODE" type="ControlModeEnum" min="0x00" max="0x07" writable="false" optional="false">EffectiveControlMode</attribute>
+    <attribute side="server" code="0x0011" define="EFFECTIVE_OPERATION_MODE" type="OperationModeEnum" min="0x00" max="0x03" writable="false" optional="false">
+        <description>EffectiveOperationMode</description>
+        <quality persistence= "nonVolatile" />
+    </attribute>
+    <attribute side="server" code="0x0012" define="EFFECTIVE_CONTROL_MODE" type="ControlModeEnum" min="0x00" max="0x07" writable="false" optional="false">
+        <description>EffectiveControlMode</description>
+        <quality persistence= "nonVolatile" />
+    </attribute>
     <attribute side="server" code="0x0013" define="CAPACITY" type="int16s" isNullable="true" min="0x0000" max="0x7FFF" writable="false" reportable="true" optional="false">Capacity</attribute>
     <attribute side="server" code="0x0014" define="SPEED" type="int16u" isNullable="true" min="0x0000" max="0xFFFE" writable="false" optional="true">Speed</attribute>
     <attribute side="server" code="0x0015" define="LIFETIME_RUNNING_HOURS" type="int24u" isNullable="true" writable="true" default="0x000000" optional="true">
       <description>LifetimeRunningHours</description>
+        <quality persistence= "nonVolatile" />
       <access op="read" privilege="view"/>
       <access op="write" privilege="manage"/>
     </attribute>
     <attribute side="server" code="0x0016" define="PUMP_POWER" type="int24u" isNullable="true" writable="false" optional="true">Power</attribute>
     <attribute side="server" code="0x0017" define="LIFETIME_ENERGY_CONSUMED" type="int32u" isNullable="true" writable="true" default="0x00000000" optional="true">
       <description>LifetimeEnergyConsumed</description>
+        <quality persistence= "nonVolatile" />
       <access op="read" privilege="view"/>
       <access op="write" privilege="manage"/>
     </attribute>
     <attribute side="server" code="0x0020" define="OPERATION_MODE" type="OperationModeEnum" min="0x00" max="0x03" writable="true" default="0x00" optional="false">
       <description>OperationMode</description>
+        <quality persistence= "nonVolatile" />
       <access op="read" privilege="view"/>
       <access op="write" privilege="manage"/>
     </attribute>
     <attribute side="server" code="0x0021" define="CONTROL_MODE" type="ControlModeEnum" min="0x00" max="0x07" writable="true" default="0x00" optional="true">
       <description>ControlMode</description>
+        <quality persistence= "nonVolatile" />
       <access op="read" privilege="view"/>
       <access op="write" privilege="manage"/>
     </attribute>

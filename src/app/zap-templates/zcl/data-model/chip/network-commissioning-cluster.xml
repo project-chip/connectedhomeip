@@ -114,16 +114,24 @@ limitations under the License.
 
         <attribute side="server" code="0x0000" define="MAX_NETWORKS" type="int8u" writable="false" optional="false">
             <description>MaxNetworks</description>
+        <quality persistence= "fixed" />
             <access op="read" privilege="administer"/>
         </attribute>
         <attribute side="server" code="0x0001" define="NETWORKS" type="array" entryType="NetworkInfoStruct" writable="false" optional="false">
             <description>Networks</description>
             <access op="read" privilege="administer"/>
         </attribute>
-        <attribute side="server" code="0x0002" define="SCAN_MAX_TIME_SECONDS" type="int8u" writable="false" optional="true">ScanMaxTimeSeconds</attribute>
-        <attribute side="server" code="0x0003" define="CONNECT_MAX_TIME_SECONDS" type="int8u" writable="false" optional="true">ConnectMaxTimeSeconds</attribute>
+        <attribute side="server" code="0x0002" define="SCAN_MAX_TIME_SECONDS" type="int8u" writable="false" optional="true">
+        <description>ScanMaxTimeSeconds</description>
+        <quality persistence= "fixed" />
+    </attribute>
+        <attribute side="server" code="0x0003" define="CONNECT_MAX_TIME_SECONDS" type="int8u" writable="false" optional="true">
+        <description>ConnectMaxTimeSeconds</description>
+        <quality persistence= "fixed" />
+    </attribute>
         <attribute side="server" code="0x0004" define="INTERFACE_ENABLED" type="boolean" writable="true" optional="false">
             <description>InterfaceEnabled</description>
+        <quality persistence= "nonVolatile" />
             <access op="read" privilege="view"/>
             <access op="write" privilege="administer"/>
         </attribute>
@@ -141,12 +149,15 @@ limitations under the License.
         </attribute>
         <attribute side="server" code="0x0008" define="SUPPORTED_WIFI_BANDS" type="array" entryType="WiFiBandEnum" writable="false" optional="true" apiMaturity="provisional">
           <description>SupportedWiFiBands</description>
+        <quality persistence= "fixed" />
         </attribute>
         <attribute side="server" code="0x0009" define="SUPPORTED_THREAD_FEATURES" type="ThreadCapabilitiesBitmap" writable="false" optional="true" apiMaturity="provisional">
           <description>SupportedThreadFeatures</description>
+        <quality persistence= "fixed" />
         </attribute>
         <attribute side="server" code="0x000A" define="THREAD_VERSION" type="int16u" writable="false" optional="true" apiMaturity="provisional">
           <description>ThreadVersion</description>
+        <quality persistence= "fixed" />
         </attribute>
 
         <command source="client" code="0x00" name="ScanNetworks" optional="true" response="ScanNetworksResponse" cli="chip network_commissioning scannetworks">

@@ -96,16 +96,31 @@ limitations under the License.
       </feature>
     </features>
 
-    <attribute side="server" code="0x0000" define="FAN_MODE" type="FanModeEnum" min="0" max="6" writable="true" default="0" optional="false">FanMode</attribute>
-    <attribute side="server" code="0x0001" define="FAN_MODE_SEQUENCE" type="FanModeSequenceEnum" min="0" max="5" writable="false" default="2" optional="false">FanModeSequence</attribute>
+    <attribute side="server" code="0x0000" define="FAN_MODE" type="FanModeEnum" min="0" max="6" writable="true" default="0" optional="false">
+        <description>FanMode</description>
+        <quality persistence= "nonVolatile" />
+    </attribute>
+    <attribute side="server" code="0x0001" define="FAN_MODE_SEQUENCE" type="FanModeSequenceEnum" min="0" max="5" writable="false" default="2" optional="false">
+        <description>FanModeSequence</description>
+        <quality persistence= "nonVolatile" />
+    </attribute>
     <attribute side="server" code="0x0002" define="PERCENT_SETTING" type="percent" min="0" max="100" writable="true" default="0" isNullable="true" optional="false">PercentSetting</attribute>
     <attribute side="server" code="0x0003" define="PERCENT_CURRENT" type="percent" min="0" max="100" writable="false" default="0" optional="false">PercentCurrent</attribute>
-    <attribute side="server" code="0x0004" define="SPEED_MAX" type="int8u" min="1" max="100" writable="false" default="1" optional="true">SpeedMax</attribute>
+    <attribute side="server" code="0x0004" define="SPEED_MAX" type="int8u" min="1" max="100" writable="false" default="1" optional="true">
+        <description>SpeedMax</description>
+        <quality persistence= "fixed" />
+    </attribute>
     <attribute side="server" code="0x0005" define="SPEED_SETTING" type="int8u" min="0" max="100" writable="true" default="0" isNullable="true" optional="true">SpeedSetting</attribute>
     <attribute side="server" code="0x0006" define="SPEED_CURRENT" type="int8u" min="0" max="100" writable="false" default="0" optional="true">SpeedCurrent</attribute>
-    <attribute side="server" code="0x0007" define="ROCK_SUPPORT" type="RockBitmap" writable="false" default="0x00" optional="true">RockSupport</attribute>
+    <attribute side="server" code="0x0007" define="ROCK_SUPPORT" type="RockBitmap" writable="false" default="0x00" optional="true">
+        <description>RockSupport</description>
+        <quality persistence= "fixed" />
+    </attribute>
     <attribute side="server" code="0x0008" define="ROCK_SETTING" type="RockBitmap" writable="true" default="0x00" optional="true">RockSetting</attribute>
-    <attribute side="server" code="0x0009" define="WIND_SUPPORT" type="WindBitmap" writable="false" default="0x00" optional="true">WindSupport</attribute>
+    <attribute side="server" code="0x0009" define="WIND_SUPPORT" type="WindBitmap" writable="false" default="0x00" optional="true">
+        <description>WindSupport</description>
+        <quality persistence= "fixed" />
+    </attribute>
     <attribute side="server" code="0x000A" define="WIND_SETTING" type="WindBitmap" writable="true" default="0x00" optional="true">WindSetting</attribute>
     <attribute side="server" code="0x000B" define="AIRFLOW_DIRECTION" type="AirflowDirectionEnum" writable="true" default="0" optional="true">AirflowDirection</attribute>
 

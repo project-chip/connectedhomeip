@@ -86,16 +86,19 @@ limitations under the License.
 
     <attribute side="server" code="0x0002" define="SUBJECTS_PER_ACCESS_CONTROL_ENTRY" type="int16u" writable="false">
       <description>SubjectsPerAccessControlEntry</description>
+        <quality persistence= "fixed" />
       <access op="read" privilege="view"/>
     </attribute>
 
     <attribute side="server" code="0x0003" define="TARGETS_PER_ACCESS_CONTROL_ENTRY" type="int16u" writable="false">
       <description>TargetsPerAccessControlEntry</description>
+        <quality persistence= "fixed" />
       <access op="read" privilege="view"/>
     </attribute>
 
     <attribute side="server" code="0x0004" define="ACCESS_CONTROL_ENTRIES_PER_FABRIC" type="int16u" writable="false">
       <description>AccessControlEntriesPerFabric</description>
+        <quality persistence= "fixed" />
       <access op="read" privilege="view"/>
     </attribute>
 

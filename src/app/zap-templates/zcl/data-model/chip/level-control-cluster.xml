@@ -62,11 +62,17 @@ limitations under the License.
       </feature>
     </features>
 
-    <attribute side="server" code="0x0000" define="CURRENT_LEVEL"                 type="int8u"                isNullable="true"           writable="false" default="0x00"   optional="false">CurrentLevel</attribute>
+    <attribute side="server" code="0x0000" define="CURRENT_LEVEL"                 type="int8u"                isNullable="true"           writable="false" default="0x00"   optional="false">
+        <description>CurrentLevel</description>
+        <quality scene= "true" persistence= "nonVolatile" />
+    </attribute>
     <attribute side="server" code="0x0001" define="LEVEL_CONTROL_REMAINING_TIME"  type="int16u"               min="0x0000"  max="0xFFFF"  writable="false" default="0x0000" optional="true">RemainingTime</attribute>
     <attribute side="server" code="0x0002" define="MINIMUM_LEVEL"                 type="int8u"                min="0x00"    max="0xFF"    writable="false" default="0x00"   optional="true">MinLevel</attribute>
     <attribute side="server" code="0x0003" define="MAXIMUM_LEVEL"                 type="int8u"                min="0x00"    max="0xFF"    writable="false" default="0xFE"   optional="true">MaxLevel</attribute>
-    <attribute side="server" code="0x0004" define="CURRENT_FREQUENCY"             type="int16u"               min="0x0000"  max="0xFFFF"  writable="false" default="0x0000" optional="true">CurrentFrequency</attribute>
+    <attribute side="server" code="0x0004" define="CURRENT_FREQUENCY"             type="int16u"               min="0x0000"  max="0xFFFF"  writable="false" default="0x0000" optional="true">
+        <description>CurrentFrequency</description>
+        <quality scene= "true" />
+    </attribute>
     <attribute side="server" code="0x0005" define="MIN_FREQUENCY"                 type="int16u"               min="0x0000"  max="0xFFFF"  writable="false" default="0x0000" optional="true">MinFrequency</attribute>
     <attribute side="server" code="0x0006" define="MAX_FREQUENCY"                 type="int16u"               min="0x0000"  max="0xFFFF"  writable="false" default="0x0000" optional="true">MaxFrequency</attribute>
     
@@ -78,6 +84,7 @@ limitations under the License.
     <attribute side="server" code="0x000F" define="OPTIONS"                       type="OptionsBitmap"        min="0x00" max="0x03"     writable="true"  default="0x00"     optional="false">Options</attribute>
     <attribute side="server" code="0x4000" define="START_UP_CURRENT_LEVEL"        type="int8u"                isNullable="true"         writable="true"                     optional="true">
       <description>StartUpCurrentLevel</description>
+        <quality persistence= "nonVolatile" />
       <access op="read" role="view"/>
       <access op="write" role="manage"/>
     </attribute>

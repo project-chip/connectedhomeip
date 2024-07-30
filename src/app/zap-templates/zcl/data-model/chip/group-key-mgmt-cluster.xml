@@ -63,12 +63,19 @@ limitations under the License.
 
     <attribute side="server" code="0x0000" define="GROUP_KEY_MAP" type="array" length="254" entryType="GroupKeyMapStruct" writable="true" optional="false">
       <description>GroupKeyMap</description>
+        <quality persistence= "nonVolatile" />
       <access op="read" privilege="view"/>
       <access op="write" privilege="manage"/>
     </attribute>
     <attribute side="server" code="0x0001" define="GROUP_TABLE" type="array" length="254" entryType="GroupInfoMapStruct" writable="false" optional="false">GroupTable</attribute>
-    <attribute side="server" code="0x0002" define="MAX_GROUPS_PER_FABRIC" type="int16u" writable="false" optional="false">MaxGroupsPerFabric</attribute>
-    <attribute side="server" code="0x0003" define="MAX_GROUP_KEYS_PER_FABRIC" type="int16u" writable="false" optional="false">MaxGroupKeysPerFabric</attribute>
+    <attribute side="server" code="0x0002" define="MAX_GROUPS_PER_FABRIC" type="int16u" writable="false" optional="false">
+        <description>MaxGroupsPerFabric</description>
+        <quality persistence= "fixed" />
+    </attribute>
+    <attribute side="server" code="0x0003" define="MAX_GROUP_KEYS_PER_FABRIC" type="int16u" writable="false" optional="false">
+        <description>MaxGroupKeysPerFabric</description>
+        <quality persistence= "fixed" />
+    </attribute>
 
     <command source="client" code="0x00" name="KeySetWrite" isFabricScoped="true" optional="false" cli="zcl GroupKeyManagement KeySetWrite">
       <description>Write a new set of keys for the given key set id.</description>
