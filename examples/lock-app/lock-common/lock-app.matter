@@ -106,7 +106,7 @@ cluster Descriptor = 29 {
       and enforce Access Control for the Node's endpoints and their associated
       cluster instances. */
 cluster AccessControl = 31 {
-  revision 1; // NOTE: Default/not specifically set
+  revision 2;
 
   enum AccessControlEntryAuthModeEnum : enum8 {
     kPASE = 1;
@@ -122,10 +122,40 @@ cluster AccessControl = 31 {
     kAdminister = 5;
   }
 
+  enum AccessRestrictionTypeEnum : enum8 {
+    kAttributeAccessForbidden = 0;
+    kAttributeWriteForbidden = 1;
+    kCommandForbidden = 2;
+    kEventForbidden = 3;
+  }
+
   enum ChangeTypeEnum : enum8 {
     kChanged = 0;
     kAdded = 1;
     kRemoved = 2;
+  }
+
+  bitmap Feature : bitmap32 {
+    kExtension = 0x1;
+    kManagedDevice = 0x2;
+  }
+
+  struct AccessRestrictionStruct {
+    AccessRestrictionTypeEnum type = 0;
+    nullable int32u id = 1;
+  }
+
+  struct CommissioningAccessRestrictionEntryStruct {
+    endpoint_no endpoint = 0;
+    cluster_id cluster = 1;
+    AccessRestrictionStruct restrictions[] = 2;
+  }
+
+  fabric_scoped struct AccessRestrictionEntryStruct {
+    fabric_sensitive endpoint_no endpoint = 0;
+    fabric_sensitive cluster_id cluster = 1;
+    fabric_sensitive AccessRestrictionStruct restrictions[] = 2;
+    fabric_idx fabricIndex = 254;
   }
 
   struct AccessControlTargetStruct {
@@ -163,17 +193,41 @@ cluster AccessControl = 31 {
     fabric_idx fabricIndex = 254;
   }
 
+  fabric_sensitive info event access(read: administer) AccessRestrictionEntryChanged = 2 {
+    fabric_idx fabricIndex = 254;
+  }
+
+  fabric_sensitive info event access(read: administer) FabricRestrictionReviewUpdate = 3 {
+    int64u token = 0;
+    nullable long_char_string instruction = 1;
+    nullable long_char_string redirectURL = 2;
+    fabric_idx fabricIndex = 254;
+  }
+
   attribute access(read: administer, write: administer) AccessControlEntryStruct acl[] = 0;
   attribute access(read: administer, write: administer) optional AccessControlExtensionStruct extension[] = 1;
   readonly attribute int16u subjectsPerAccessControlEntry = 2;
   readonly attribute int16u targetsPerAccessControlEntry = 3;
   readonly attribute int16u accessControlEntriesPerFabric = 4;
+  readonly attribute optional CommissioningAccessRestrictionEntryStruct commissioningARL[] = 5;
+  readonly attribute optional AccessRestrictionEntryStruct arl[] = 6;
   readonly attribute command_id generatedCommandList[] = 65528;
   readonly attribute command_id acceptedCommandList[] = 65529;
   readonly attribute event_id eventList[] = 65530;
   readonly attribute attrib_id attributeList[] = 65531;
   readonly attribute bitmap32 featureMap = 65532;
   readonly attribute int16u clusterRevision = 65533;
+
+  request struct ReviewFabricRestrictionsRequest {
+    AccessRestrictionStruct arl[] = 0;
+  }
+
+  response struct ReviewFabricRestrictionsResponse = 1 {
+    int64u token = 0;
+  }
+
+  /** This command signals to the service associated with the device vendor that the fabric administrator would like a review of the current restrictions on the accessing fabric. */
+  fabric command access(invoke: administer) ReviewFabricRestrictions(ReviewFabricRestrictionsRequest): DefaultSuccess = 0;
 }
 
 /** This cluster provides attributes and events for determining basic information about Nodes, which supports both
@@ -2549,7 +2603,7 @@ endpoint 0 {
     callback attribute acceptedCommandList;
     callback attribute eventList;
     callback attribute attributeList;
-    ram      attribute featureMap default = 0;
+    ram      attribute featureMap default = 1;
     callback attribute clusterRevision;
   }
 

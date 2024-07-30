@@ -35,6 +35,9 @@
 #if INET_CONFIG_ENABLE_TCP_ENDPOINT
 #include <inet/TCPEndPoint.h>
 #endif
+#if CHIP_DEVICE_CONFIG_ENABLE_WIFIPAF
+#include <transport/raw/WiFiPAF.h>
+#endif
 
 namespace chip {
 
@@ -171,6 +174,19 @@ public:
     bool IsWiFiStationProvisioned();
     void ClearWiFiStationProvision();
     CHIP_ERROR GetAndLogWiFiStatsCounters();
+#if CHIP_DEVICE_CONFIG_ENABLE_WIFIPAF
+    struct WiFiPAFAdvertiseParam;
+
+    CHIP_ERROR SetWiFiPAFAdvertisingEnabled(WiFiPAFAdvertiseParam & args);
+    typedef void (*OnConnectionCompleteFunct)(void * appState);
+    typedef void (*OnConnectionErrorFunct)(void * appState, CHIP_ERROR err);
+    CHIP_ERROR WiFiPAFConnect(const SetupDiscriminator & connDiscriminator, void * appState, OnConnectionCompleteFunct onSuccess,
+                              OnConnectionErrorFunct onError);
+    CHIP_ERROR WiFiPAFCancelConnect();
+    CHIP_ERROR WiFiPAFSend(System::PacketBufferHandle && msgBuf);
+    Transport::WiFiPAFBase * GetWiFiPAF();
+    void SetWiFiPAF(Transport::WiFiPAFBase * pmWiFiPAF);
+#endif
 
     // WiFi AP methods
     WiFiAPMode GetWiFiAPMode();
@@ -267,6 +283,16 @@ struct ConnectivityManager::SEDIntervalsConfig
      * Only meaningful when the device is acting as a sleepy end node. */
     System::Clock::Milliseconds32 IdleIntervalMS;
 };
+
+#if CHIP_DEVICE_CONFIG_ENABLE_WIFIPAF
+struct ConnectivityManager::WiFiPAFAdvertiseParam
+{
+    /* To enable/disable WiFiPAF Commissioning */
+    bool enable;
+    /* The optional commands */
+    const char * ExtCmds;
+};
+#endif
 
 /**
  * Returns a reference to the public interface of the ConnectivityManager singleton object.
@@ -407,6 +433,29 @@ inline CHIP_ERROR ConnectivityManager::GetAndLogWiFiStatsCounters()
     return static_cast<ImplClass *>(this)->_GetAndLogWiFiStatsCounters();
 }
 
+#if CHIP_DEVICE_CONFIG_ENABLE_WIFIPAF
+inline CHIP_ERROR ConnectivityManager::SetWiFiPAFAdvertisingEnabled(WiFiPAFAdvertiseParam & args)
+{
+    return static_cast<ImplClass *>(this)->_SetWiFiPAFAdvertisingEnabled(args);
+}
+
+inline CHIP_ERROR ConnectivityManager::WiFiPAFConnect(const SetupDiscriminator & connDiscriminator, void * appState,
+                                                      OnConnectionCompleteFunct onSuccess, OnConnectionErrorFunct onError)
+{
+    return static_cast<ImplClass *>(this)->_WiFiPAFConnect(connDiscriminator, appState, onSuccess, onError);
+}
+
+inline CHIP_ERROR ConnectivityManager::WiFiPAFCancelConnect()
+{
+    return static_cast<ImplClass *>(this)->_WiFiPAFCancelConnect();
+}
+
+inline CHIP_ERROR ConnectivityManager::WiFiPAFSend(chip::System::PacketBufferHandle && msgBuf)
+{
+    return static_cast<ImplClass *>(this)->_WiFiPAFSend(std::move(msgBuf));
+}
+#endif
+
 inline bool ConnectivityManager::IsThreadEnabled()
 {
     return static_cast<ImplClass *>(this)->_IsThreadEnabled();
@@ -450,6 +499,18 @@ inline void ConnectivityManager::ResetThreadNetworkDiagnosticsCounts()
 {
     static_cast<ImplClass *>(this)->_ResetThreadNetworkDiagnosticsCounts();
 }
+
+#if CHIP_DEVICE_CONFIG_ENABLE_WIFIPAF
+inline Transport::WiFiPAFBase * ConnectivityManager::GetWiFiPAF()
+{
+    return static_cast<ImplClass *>(this)->_GetWiFiPAF();
+}
+
+inline void ConnectivityManager::SetWiFiPAF(Transport::WiFiPAFBase * pWiFiPAF)
+{
+    return static_cast<ImplClass *>(this)->_SetWiFiPAF(pWiFiPAF);
+}
+#endif
 
 inline Ble::BleLayer * ConnectivityManager::GetBleLayer()
 {
