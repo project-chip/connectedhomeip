@@ -29,6 +29,7 @@
 #include <app/InteractionModelEngine.h>
 #include <app/reporting/reporting.h>
 #include <app/util/attribute-storage.h>
+#include <lib/support/logging/CHIPLogging.h>
 
 using namespace chip;
 using namespace chip::app;
@@ -100,11 +101,11 @@ CHIP_ERROR Instance::SetOperationalState(uint8_t aOpState)
         return CHIP_ERROR_INVALID_ARGUMENT;
     }
 
-    bool runUpdateCountdownTime = false;
+    bool countdownTimeUpdateNeeded = false;
     if (mOperationalError.errorStateID != to_underlying(ErrorStateEnum::kNoError))
     {
         mOperationalError.Set(to_underlying(ErrorStateEnum::kNoError));
-        runUpdateCountdownTime = true;
+        countdownTimeUpdateNeeded = true;
         MatterReportingAttributeChangeCallback(mEndpointId, mClusterId, Attributes::OperationalError::Id);
     }
 
@@ -113,10 +114,10 @@ CHIP_ERROR Instance::SetOperationalState(uint8_t aOpState)
     if (mOperationalState != oldState)
     {
         MatterReportingAttributeChangeCallback(mEndpointId, mClusterId, Attributes::OperationalState::Id);
-        runUpdateCountdownTime = true;
+        countdownTimeUpdateNeeded = true;
     }
 
-    if (runUpdateCountdownTime)
+    if (countdownTimeUpdateNeeded)
     {
         UpdateCountdownTimeFromClusterLogic();
     }
@@ -348,18 +349,18 @@ CHIP_ERROR Instance::Read(const ConcreteReadAttributePath & aPath, AttributeValu
             }
             return err;
         });
+        break;
     }
-    break;
 
     case OperationalState::Attributes::OperationalState::Id: {
         ReturnErrorOnFailure(aEncoder.Encode(GetCurrentOperationalState()));
+        break;
     }
-    break;
 
     case OperationalState::Attributes::OperationalError::Id: {
         ReturnErrorOnFailure(aEncoder.Encode(mOperationalError));
+        break;
     }
-    break;
 
     case OperationalState::Attributes::PhaseList::Id: {
 
@@ -386,18 +387,19 @@ CHIP_ERROR Instance::Read(const ConcreteReadAttributePath & aPath, AttributeValu
                 ReturnErrorOnFailure(encoder.Encode(phase2));
             }
         });
+        break;
     }
-    break;
 
     case OperationalState::Attributes::CurrentPhase::Id: {
         ReturnErrorOnFailure(aEncoder.Encode(GetCurrentPhase()));
+        break;
     }
-    break;
 
     case OperationalState::Attributes::CountdownTime::Id: {
-        ReturnErrorOnFailure(aEncoder.Encode(mCountdownTime.value()));
+        // Read through to get value closest to reality.
+        ReturnErrorOnFailure(aEncoder.Encode(mDelegate->GetCountdownTime()));
+        break;
     }
-    break;
     }
     return CHIP_NO_ERROR;
 }

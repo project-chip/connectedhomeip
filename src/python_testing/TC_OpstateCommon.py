@@ -354,7 +354,7 @@ class TC_OPSTATE_BASE():
             if phase_list is not NullValue:
                 phase_list_len = len(phase_list)
                 asserts.assert_less_equal(phase_list_len, 32,
-                                          f"PhaseList length({phase_list_len}) must be at most than 32 entries!")
+                                          f"PhaseList length({phase_list_len}) must be at most 32 entries!")
 
         # STEP 3: TH reads from the DUT the CurrentPhase attribute
         self.step(3)
