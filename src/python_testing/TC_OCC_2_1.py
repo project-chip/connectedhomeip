@@ -101,7 +101,7 @@ class TC_OCC_2_1(MatterBaseTest):
                 asserts.assert_less_equal(hold_time_limits_dut.HoldTimeDefault, hold_time_limits_dut.HoldTimeMax, "HoldTimeMin is not in valid range")
                 asserts.assert_greater_equal(hold_time_limits_dut.HoldTimeDefault, hold_time_limits_dut.HoldTimeMin, "HoldTimeMin is not in valid range")
             else:
-                loggin.info("HoldTime conformance failed.  Test step skipped")
+                logging.info("HoldTime conformance failed.  Test step skipped")
 
         else:
             logging.info("HoldTimeLimits not supported. Test step skipped")
@@ -110,8 +110,8 @@ class TC_OCC_2_1(MatterBaseTest):
         if attributes.HoldTime.attribute_id in attribute_list:
             hold_time_dut = await self.read_occ_attribute_expect_success(endpoint=endpoint, attribute=attributes.HoldTime)
 
-            asserts.assert_less_equal(hold_time_dut_dut, 0xFFFE, "HoldTime attribute is out of range")
-            asserts.assert_greater_equal(hold_time_dut_dut, 0, "HoldTime attribute is out of range")
+            asserts.assert_less_equal(hold_time_dut, 0xFFFE, "HoldTime attribute is out of range")
+            asserts.assert_greater_equal(hold_time_dut, 0, "HoldTime attribute is out of range")
         else:
             logging.info("HoldTime not supported. The rest of legacy attribute test can be skipped")
 
