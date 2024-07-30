@@ -234,7 +234,7 @@ void Instance::HandleSelectLocationsCmd(HandlerContext & ctx, const Commands::Se
 
         // If the device determines that it can't operate at all locations from the list,
         // the SelectLocationsResponse command's Status field SHALL indicate InvalidSet.
-        if (((numberOfLocations == 0) || (numberOfLocations > kMaxNumSelectedLocations)))
+        if (numberOfLocations > kMaxNumSelectedLocations)
         {
             exitResponse(SelectLocationsStatus::kInvalidSet, "invalid number of locations"_span);
             return;
