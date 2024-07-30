@@ -6349,12 +6349,6 @@ bool emberAfThermostatClusterCommitPresetsSchedulesRequestCallback(
     chip::app::CommandHandler * commandObj, const chip::app::ConcreteCommandPath & commandPath,
     const chip::app::Clusters::Thermostat::Commands::CommitPresetsSchedulesRequest::DecodableType & commandData);
 /**
- * @brief Thermostat Cluster SetTemperatureSetpointHoldPolicy Command callback (from client)
- */
-bool emberAfThermostatClusterSetTemperatureSetpointHoldPolicyCallback(
-    chip::app::CommandHandler * commandObj, const chip::app::ConcreteCommandPath & commandPath,
-    const chip::app::Clusters::Thermostat::Commands::SetTemperatureSetpointHoldPolicy::DecodableType & commandData);
-/**
  * @brief Fan Control Cluster Step Command callback (from client)
  */
 bool emberAfFanControlClusterStepCallback(chip::app::CommandHandler * commandObj,

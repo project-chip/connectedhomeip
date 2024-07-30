@@ -12905,17 +12905,6 @@ public class ClusterReadMapping {
           readThermostatPresetsSchedulesEditableCommandParams
         );
         result.put("readPresetsSchedulesEditableAttribute", readThermostatPresetsSchedulesEditableAttributeInteractionInfo);
-     Map<String, CommandParameterInfo> readThermostatTemperatureSetpointHoldPolicyCommandParams = new LinkedHashMap<String, CommandParameterInfo>();
-        InteractionInfo readThermostatTemperatureSetpointHoldPolicyAttributeInteractionInfo = new InteractionInfo(
-          (cluster, callback, commandArguments) -> {
-            ((ChipClusters.ThermostatCluster) cluster).readTemperatureSetpointHoldPolicyAttribute(
-              (ChipClusters.IntegerAttributeCallback) callback
-            );
-          },
-          () -> new ClusterInfoMapping.DelegatedIntegerAttributeCallback(),
-          readThermostatTemperatureSetpointHoldPolicyCommandParams
-        );
-        result.put("readTemperatureSetpointHoldPolicyAttribute", readThermostatTemperatureSetpointHoldPolicyAttributeInteractionInfo);
      Map<String, CommandParameterInfo> readThermostatSetpointHoldExpiryTimestampCommandParams = new LinkedHashMap<String, CommandParameterInfo>();
         InteractionInfo readThermostatSetpointHoldExpiryTimestampAttributeInteractionInfo = new InteractionInfo(
           (cluster, callback, commandArguments) -> {

@@ -32116,8 +32116,7 @@ class Thermostat(Cluster):
                 ClusterObjectFieldDescriptor(Label="presets", Tag=0x00000050, Type=typing.Optional[typing.List[Thermostat.Structs.PresetStruct]]),
                 ClusterObjectFieldDescriptor(Label="schedules", Tag=0x00000051, Type=typing.Optional[typing.List[Thermostat.Structs.ScheduleStruct]]),
                 ClusterObjectFieldDescriptor(Label="presetsSchedulesEditable", Tag=0x00000052, Type=typing.Optional[bool]),
-                ClusterObjectFieldDescriptor(Label="temperatureSetpointHoldPolicy", Tag=0x00000053, Type=typing.Optional[uint]),
-                ClusterObjectFieldDescriptor(Label="setpointHoldExpiryTimestamp", Tag=0x00000054, Type=typing.Union[None, Nullable, uint]),
+                ClusterObjectFieldDescriptor(Label="setpointHoldExpiryTimestamp", Tag=0x00000053, Type=typing.Union[None, Nullable, uint]),
                 ClusterObjectFieldDescriptor(Label="generatedCommandList", Tag=0x0000FFF8, Type=typing.List[uint]),
                 ClusterObjectFieldDescriptor(Label="acceptedCommandList", Tag=0x0000FFF9, Type=typing.List[uint]),
                 ClusterObjectFieldDescriptor(Label="eventList", Tag=0x0000FFFA, Type=typing.List[uint]),
@@ -32186,7 +32185,6 @@ class Thermostat(Cluster):
     presets: 'typing.Optional[typing.List[Thermostat.Structs.PresetStruct]]' = None
     schedules: 'typing.Optional[typing.List[Thermostat.Structs.ScheduleStruct]]' = None
     presetsSchedulesEditable: 'typing.Optional[bool]' = None
-    temperatureSetpointHoldPolicy: 'typing.Optional[uint]' = None
     setpointHoldExpiryTimestamp: 'typing.Union[None, Nullable, uint]' = None
     generatedCommandList: 'typing.List[uint]' = None
     acceptedCommandList: 'typing.List[uint]' = None
@@ -32270,7 +32268,8 @@ class Thermostat(Cluster):
             kSleep = 0x03
             kWake = 0x04
             kVacation = 0x05
-            kUserDefined = 0x06
+            kGoingToSleep = 0x06
+            kUserDefined = 0xFE
             # All received enum values that are not listed above will be mapped
             # to kUnknownEnumValue. This is a helper enum value that should only
             # be used by code to process how it handles receiving an unknown
@@ -32414,10 +32413,6 @@ class Thermostat(Cluster):
             kSupportsSetpoints = 0x2
             kSupportsNames = 0x4
             kSupportsOff = 0x8
-
-        class TemperatureSetpointHoldPolicyBitmap(IntFlag):
-            kHoldDurationElapsed = 0x1
-            kHoldDurationElapsedOrPresetChanged = 0x2
 
     class Structs:
         @dataclass
@@ -32695,22 +32690,6 @@ class Thermostat(Cluster):
                 return ClusterObjectDescriptor(
                     Fields=[
                     ])
-
-        @dataclass
-        class SetTemperatureSetpointHoldPolicy(ClusterCommand):
-            cluster_id: typing.ClassVar[int] = 0x00000201
-            command_id: typing.ClassVar[int] = 0x0000000B
-            is_client: typing.ClassVar[bool] = True
-            response_type: typing.ClassVar[str] = None
-
-            @ChipUtility.classproperty
-            def descriptor(cls) -> ClusterObjectDescriptor:
-                return ClusterObjectDescriptor(
-                    Fields=[
-                        ClusterObjectFieldDescriptor(Label="temperatureSetpointHoldPolicy", Tag=0, Type=uint),
-                    ])
-
-            temperatureSetpointHoldPolicy: 'uint' = 0
 
     class Attributes:
         @dataclass
@@ -33674,22 +33653,6 @@ class Thermostat(Cluster):
             value: 'typing.Optional[bool]' = None
 
         @dataclass
-        class TemperatureSetpointHoldPolicy(ClusterAttributeDescriptor):
-            @ChipUtility.classproperty
-            def cluster_id(cls) -> int:
-                return 0x00000201
-
-            @ChipUtility.classproperty
-            def attribute_id(cls) -> int:
-                return 0x00000053
-
-            @ChipUtility.classproperty
-            def attribute_type(cls) -> ClusterObjectFieldDescriptor:
-                return ClusterObjectFieldDescriptor(Type=typing.Optional[uint])
-
-            value: 'typing.Optional[uint]' = None
-
-        @dataclass
         class SetpointHoldExpiryTimestamp(ClusterAttributeDescriptor):
             @ChipUtility.classproperty
             def cluster_id(cls) -> int:
@@ -33697,7 +33660,7 @@ class Thermostat(Cluster):
 
             @ChipUtility.classproperty
             def attribute_id(cls) -> int:
-                return 0x00000054
+                return 0x00000053
 
             @ChipUtility.classproperty
             def attribute_type(cls) -> ClusterObjectFieldDescriptor:

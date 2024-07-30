@@ -40225,8 +40225,7 @@ public class ChipClusters {
     private static final long PRESETS_ATTRIBUTE_ID = 80L;
     private static final long SCHEDULES_ATTRIBUTE_ID = 81L;
     private static final long PRESETS_SCHEDULES_EDITABLE_ATTRIBUTE_ID = 82L;
-    private static final long TEMPERATURE_SETPOINT_HOLD_POLICY_ATTRIBUTE_ID = 83L;
-    private static final long SETPOINT_HOLD_EXPIRY_TIMESTAMP_ATTRIBUTE_ID = 84L;
+    private static final long SETPOINT_HOLD_EXPIRY_TIMESTAMP_ATTRIBUTE_ID = 83L;
     private static final long GENERATED_COMMAND_LIST_ATTRIBUTE_ID = 65528L;
     private static final long ACCEPTED_COMMAND_LIST_ATTRIBUTE_ID = 65529L;
     private static final long EVENT_LIST_ATTRIBUTE_ID = 65530L;
@@ -40455,26 +40454,6 @@ public class ChipClusters {
       final long commandId = 9L;
 
       ArrayList<StructElement> elements = new ArrayList<>();
-      StructType commandArgs = new StructType(elements);
-      invoke(new InvokeCallbackImpl(callback) {
-          @Override
-          public void onResponse(StructType invokeStructValue) {
-          callback.onSuccess();
-        }}, commandId, commandArgs, timedInvokeTimeoutMs);
-    }
-
-    public void setTemperatureSetpointHoldPolicy(DefaultClusterCallback callback, Integer temperatureSetpointHoldPolicy) {
-      setTemperatureSetpointHoldPolicy(callback, temperatureSetpointHoldPolicy, 0);
-    }
-
-    public void setTemperatureSetpointHoldPolicy(DefaultClusterCallback callback, Integer temperatureSetpointHoldPolicy, int timedInvokeTimeoutMs) {
-      final long commandId = 11L;
-
-      ArrayList<StructElement> elements = new ArrayList<>();
-      final long temperatureSetpointHoldPolicyFieldID = 0L;
-      BaseTLVType temperatureSetpointHoldPolicytlvValue = new UIntType(temperatureSetpointHoldPolicy);
-      elements.add(new StructElement(temperatureSetpointHoldPolicyFieldID, temperatureSetpointHoldPolicytlvValue));
-
       StructType commandArgs = new StructType(elements);
       invoke(new InvokeCallbackImpl(callback) {
           @Override
@@ -42398,32 +42377,6 @@ public class ChipClusters {
             callback.onSuccess(value);
           }
         }, PRESETS_SCHEDULES_EDITABLE_ATTRIBUTE_ID, minInterval, maxInterval);
-    }
-
-    public void readTemperatureSetpointHoldPolicyAttribute(
-        IntegerAttributeCallback callback) {
-      ChipAttributePath path = ChipAttributePath.newInstance(endpointId, clusterId, TEMPERATURE_SETPOINT_HOLD_POLICY_ATTRIBUTE_ID);
-
-      readAttribute(new ReportCallbackImpl(callback, path) {
-          @Override
-          public void onSuccess(byte[] tlv) {
-            Integer value = ChipTLVValueDecoder.decodeAttributeValue(path, tlv);
-            callback.onSuccess(value);
-          }
-        }, TEMPERATURE_SETPOINT_HOLD_POLICY_ATTRIBUTE_ID, true);
-    }
-
-    public void subscribeTemperatureSetpointHoldPolicyAttribute(
-        IntegerAttributeCallback callback, int minInterval, int maxInterval) {
-      ChipAttributePath path = ChipAttributePath.newInstance(endpointId, clusterId, TEMPERATURE_SETPOINT_HOLD_POLICY_ATTRIBUTE_ID);
-
-      subscribeAttribute(new ReportCallbackImpl(callback, path) {
-          @Override
-          public void onSuccess(byte[] tlv) {
-            Integer value = ChipTLVValueDecoder.decodeAttributeValue(path, tlv);
-            callback.onSuccess(value);
-          }
-        }, TEMPERATURE_SETPOINT_HOLD_POLICY_ATTRIBUTE_ID, minInterval, maxInterval);
     }
 
     public void readSetpointHoldExpiryTimestampAttribute(

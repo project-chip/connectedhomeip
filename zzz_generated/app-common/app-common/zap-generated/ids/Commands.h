@@ -1338,10 +1338,6 @@ namespace CommitPresetsSchedulesRequest {
 static constexpr CommandId Id = 0x00000009;
 } // namespace CommitPresetsSchedulesRequest
 
-namespace SetTemperatureSetpointHoldPolicy {
-static constexpr CommandId Id = 0x0000000B;
-} // namespace SetTemperatureSetpointHoldPolicy
-
 } // namespace Commands
 } // namespace Thermostat
 

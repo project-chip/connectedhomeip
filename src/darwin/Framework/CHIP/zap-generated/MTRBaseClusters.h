@@ -10021,12 +10021,6 @@ MTR_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
 - (void)commitPresetsSchedulesRequestWithParams:(MTRThermostatClusterCommitPresetsSchedulesRequestParams * _Nullable)params completion:(MTRStatusCompletion)completion MTR_PROVISIONALLY_AVAILABLE;
 - (void)commitPresetsSchedulesRequestWithCompletion:(MTRStatusCompletion)completion
     MTR_PROVISIONALLY_AVAILABLE;
-/**
- * Command SetTemperatureSetpointHoldPolicy
- *
- * This command sets the set point hold policy.
- */
-- (void)setTemperatureSetpointHoldPolicyWithParams:(MTRThermostatClusterSetTemperatureSetpointHoldPolicyParams *)params completion:(MTRStatusCompletion)completion MTR_PROVISIONALLY_AVAILABLE;
 
 - (void)readAttributeLocalTemperatureWithCompletion:(void (^)(NSNumber * _Nullable value, NSError * _Nullable error))completion MTR_AVAILABLE(ios(16.4), macos(13.3), watchos(9.4), tvos(16.4));
 - (void)subscribeAttributeLocalTemperatureWithParams:(MTRSubscribeParams *)params
@@ -10445,12 +10439,6 @@ MTR_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
                                      subscriptionEstablished:(MTRSubscriptionEstablishedHandler _Nullable)subscriptionEstablished
                                                reportHandler:(void (^)(NSNumber * _Nullable value, NSError * _Nullable error))reportHandler MTR_PROVISIONALLY_AVAILABLE;
 + (void)readAttributePresetsSchedulesEditableWithClusterStateCache:(MTRClusterStateCacheContainer *)clusterStateCacheContainer endpoint:(NSNumber *)endpoint queue:(dispatch_queue_t)queue completion:(void (^)(NSNumber * _Nullable value, NSError * _Nullable error))completion MTR_PROVISIONALLY_AVAILABLE;
-
-- (void)readAttributeTemperatureSetpointHoldPolicyWithCompletion:(void (^)(NSNumber * _Nullable value, NSError * _Nullable error))completion MTR_PROVISIONALLY_AVAILABLE;
-- (void)subscribeAttributeTemperatureSetpointHoldPolicyWithParams:(MTRSubscribeParams *)params
-                                          subscriptionEstablished:(MTRSubscriptionEstablishedHandler _Nullable)subscriptionEstablished
-                                                    reportHandler:(void (^)(NSNumber * _Nullable value, NSError * _Nullable error))reportHandler MTR_PROVISIONALLY_AVAILABLE;
-+ (void)readAttributeTemperatureSetpointHoldPolicyWithClusterStateCache:(MTRClusterStateCacheContainer *)clusterStateCacheContainer endpoint:(NSNumber *)endpoint queue:(dispatch_queue_t)queue completion:(void (^)(NSNumber * _Nullable value, NSError * _Nullable error))completion MTR_PROVISIONALLY_AVAILABLE;
 
 - (void)readAttributeSetpointHoldExpiryTimestampWithCompletion:(void (^)(NSNumber * _Nullable value, NSError * _Nullable error))completion MTR_PROVISIONALLY_AVAILABLE;
 - (void)subscribeAttributeSetpointHoldExpiryTimestampWithParams:(MTRSubscribeParams *)params
@@ -19858,7 +19846,8 @@ typedef NS_ENUM(uint8_t, MTRThermostatPresetScenario) {
     MTRThermostatPresetScenarioSleep MTR_PROVISIONALLY_AVAILABLE = 0x03,
     MTRThermostatPresetScenarioWake MTR_PROVISIONALLY_AVAILABLE = 0x04,
     MTRThermostatPresetScenarioVacation MTR_PROVISIONALLY_AVAILABLE = 0x05,
-    MTRThermostatPresetScenarioUserDefined MTR_PROVISIONALLY_AVAILABLE = 0x06,
+    MTRThermostatPresetScenarioGoingToSleep MTR_PROVISIONALLY_AVAILABLE = 0x06,
+    MTRThermostatPresetScenarioUserDefined MTR_PROVISIONALLY_AVAILABLE = 0xFE,
 } MTR_PROVISIONALLY_AVAILABLE;
 
 typedef NS_ENUM(uint8_t, MTRThermostatSetpointChangeSource) {
@@ -20013,11 +20002,6 @@ typedef NS_OPTIONS(uint16_t, MTRThermostatScheduleTypeFeaturesBitmap) {
     MTRThermostatScheduleTypeFeaturesBitmapSupportsSetpoints MTR_PROVISIONALLY_AVAILABLE = 0x2,
     MTRThermostatScheduleTypeFeaturesBitmapSupportsNames MTR_PROVISIONALLY_AVAILABLE = 0x4,
     MTRThermostatScheduleTypeFeaturesBitmapSupportsOff MTR_PROVISIONALLY_AVAILABLE = 0x8,
-} MTR_PROVISIONALLY_AVAILABLE;
-
-typedef NS_OPTIONS(uint8_t, MTRThermostatTemperatureSetpointHoldPolicyBitmap) {
-    MTRThermostatTemperatureSetpointHoldPolicyBitmapHoldDurationElapsed MTR_PROVISIONALLY_AVAILABLE = 0x1,
-    MTRThermostatTemperatureSetpointHoldPolicyBitmapHoldDurationElapsedOrPresetChanged MTR_PROVISIONALLY_AVAILABLE = 0x2,
 } MTR_PROVISIONALLY_AVAILABLE;
 
 typedef NS_ENUM(uint8_t, MTRFanControlAirflowDirection) {
