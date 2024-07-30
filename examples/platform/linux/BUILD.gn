@@ -54,6 +54,10 @@ source_set("energy-reporting-test-event-trigger") {
   sources = [ "${chip_root}/src/app/clusters/electrical-energy-measurement-server/EnergyReportingTestEventTriggerHandler.h" ]
 }
 
+source_set("water-heater-management-test-event-trigger") {
+  sources = [ "${chip_root}/src/app/clusters/water-heater-management-server/WaterHeaterManagementTestEventTriggerHandler.h" ]
+}
+
 source_set("device-energy-management-test-event-trigger") {
   sources = [ "${chip_root}/src/app/clusters/device-energy-management-server/DeviceEnergyManagementTestEventTriggerHandler.h" ]
 }
@@ -85,6 +89,7 @@ source_set("app-main") {
     ":energy-evse-test-event-trigger",
     ":energy-reporting-test-event-trigger",
     ":smco-test-event-trigger",
+    ":water-heater-management-test-event-trigger",
     "${chip_root}/src/controller:controller",
     "${chip_root}/src/controller:gen_check_chip_controller_headers",
     "${chip_root}/src/lib",

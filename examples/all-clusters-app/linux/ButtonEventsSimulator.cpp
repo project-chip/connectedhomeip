@@ -114,6 +114,42 @@ void EmitMultiPressComplete(EndpointId endpointId, uint8_t previousPosition, uin
     }
 }
 
+void EmitShortRelease(EndpointId endpointId, uint8_t previousPosition)
+{
+    Clusters::Switch::Events::ShortRelease::Type event{};
+    event.previousPosition  = previousPosition;
+    EventNumber eventNumber = 0;
+
+    CHIP_ERROR err = LogEvent(event, endpointId, eventNumber);
+    if (err != CHIP_NO_ERROR)
+    {
+        ChipLogError(NotSpecified, "Failed to log ShortRelease event: %" CHIP_ERROR_FORMAT, err.Format());
+    }
+    else
+    {
+        ChipLogProgress(NotSpecified, "Logged ShortRelease on Endpoint %u", static_cast<unsigned>(endpointId));
+    }
+}
+
+void EmitMultiPressOngoing(EndpointId endpointId, uint8_t newPosition, uint8_t count)
+{
+    Clusters::Switch::Events::MultiPressOngoing::Type event{};
+    event.newPosition                   = newPosition;
+    event.currentNumberOfPressesCounted = count;
+    EventNumber eventNumber             = 0;
+
+    CHIP_ERROR err = LogEvent(event, endpointId, eventNumber);
+    if (err != CHIP_NO_ERROR)
+    {
+        ChipLogError(NotSpecified, "Failed to log MultiPressOngoing event: %" CHIP_ERROR_FORMAT, err.Format());
+    }
+    else
+    {
+        ChipLogProgress(NotSpecified, "Logged MultiPressOngoing on Endpoint %u position %u, count %u",
+                        static_cast<unsigned>(endpointId), newPosition, count);
+    }
+}
+
 } // namespace
 
 void ButtonEventsSimulator::OnTimerDone(System::Layer * layer, void * appState)
@@ -186,19 +222,65 @@ void ButtonEventsSimulator::Next()
     }
     case ButtonEventsSimulator::State::kEmitLongRelease: {
         SetButtonPosition(mEndpointId, mIdleButtonId);
-        EmitLongRelease(mEndpointId, mPressedButtonId);
+        if (mFeatureMap & static_cast<uint32_t>(Clusters::Switch::Feature::kMomentarySwitchLongPress))
+        {
+            EmitLongRelease(mEndpointId, mPressedButtonId);
+        }
+        else if (mFeatureMap & static_cast<uint32_t>(Clusters::Switch::Feature::kMomentarySwitchRelease))
+        {
+            EmitShortRelease(mEndpointId, mPressedButtonId);
+        }
         SetState(ButtonEventsSimulator::State::kIdle);
         mDoneCallback();
         break;
     }
     case ButtonEventsSimulator::State::kEmitStartOfMultiPress: {
         EmitInitialPress(mEndpointId, mPressedButtonId);
-        StartTimer(mMultiPressNumPresses * (mMultiPressPressedTimeMillis + mMultiPressReleasedTimeMillis));
-        SetState(ButtonEventsSimulator::State::kEmitEndOfMultiPress);
+        if (mFeatureMap & static_cast<uint32_t>(Clusters::Switch::Feature::kActionSwitch))
+        {
+            StartTimer(mMultiPressNumPresses * (mMultiPressPressedTimeMillis + mMultiPressReleasedTimeMillis));
+            SetState(ButtonEventsSimulator::State::kEmitEndOfMultiPress);
+        }
+        else
+        {
+            SetState(ButtonEventsSimulator::State::kMultiPressButtonRelease);
+            StartTimer(mMultiPressPressedTimeMillis);
+        }
         break;
     }
+    case ButtonEventsSimulator::State::kMultiPressButtonRelease: {
+        ++mMultiPressPressesDone;
+        if (mMultiPressPressesDone > 1)
+        {
+            EmitMultiPressOngoing(mEndpointId, mPressedButtonId, mMultiPressPressesDone);
+        }
+
+        if (mMultiPressPressesDone == mMultiPressNumPresses)
+        {
+            SetState(ButtonEventsSimulator::State::kEmitEndOfMultiPress);
+        }
+        else
+        {
+            SetState(ButtonEventsSimulator::State::kEmitStartOfMultiPress);
+        }
+
+        if (mFeatureMap & static_cast<uint32_t>(Clusters::Switch::Feature::kMomentarySwitchRelease))
+        {
+            EmitShortRelease(mEndpointId, mPressedButtonId);
+        }
+        StartTimer(mMultiPressReleasedTimeMillis);
+        break;
+    }
+
     case ButtonEventsSimulator::State::kEmitEndOfMultiPress: {
-        EmitMultiPressComplete(mEndpointId, mPressedButtonId, mMultiPressNumPresses);
+        if (mFeatureMap & static_cast<uint32_t>(Clusters::Switch::Feature::kActionSwitch) && mMultiPressNumPresses > mMultiPressMax)
+        {
+            EmitMultiPressComplete(mEndpointId, mPressedButtonId, 0);
+        }
+        else
+        {
+            EmitMultiPressComplete(mEndpointId, mPressedButtonId, mMultiPressNumPresses);
+        }
         SetState(ButtonEventsSimulator::State::kIdle);
         mDoneCallback();
         break;
