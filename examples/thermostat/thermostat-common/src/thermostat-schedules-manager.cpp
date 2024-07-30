@@ -1,4 +1,3 @@
-#if 0
 #include <app/clusters/thermostat-server/thermostat-server.h>
 #include <app/MessageDef/StatusIB.h>
 #include <vector>
@@ -76,30 +75,84 @@ static std::array<ScheduleStruct::Type, kMaxSchedules> gsActiveSchedules;
 static unsigned int gsEditingSchedulesEmptyIndex = 0;
 static std::array<ScheduleStruct::Type, kMaxSchedules> gsEditingSchedules;
 
-static void onEditStart(ThermostatMatterScheduleManager * mgr)
+struct ExampleThermostatScheduleManager : public ThermostatMatterScheduleManager
 {
-    ChipLogProgress(Zcl, "ThermstatScheduleManager - onEditStart");
-}
+    ExampleThermostatScheduleManager() : ThermostatMatterScheduleManager()
+    {
+        for (gsActivePresetsEmptyIndex = 0; gsActivePresetsEmptyIndex < sizeof(BuiltInPresets) / sizeof(BuiltInPresets[0]);
+             ++gsActivePresetsEmptyIndex)
+        {
+            gsActivePresets[gsActivePresetsEmptyIndex] = BuiltInPresets[gsActivePresetsEmptyIndex];
+        }
+        SetActiveInstance(this);
+    }
 
-static void onEditCancel(ThermostatMatterScheduleManager * mgr)
+    virtual ~ExampleThermostatScheduleManager() {};
+
+    virtual bool IsEditing() { return IsEditing (1); };
+    virtual bool IsEditing(chip::EndpointId aEndpoint) { return mEditing; };
+    
+    virtual CHIP_ERROR StartEditing(chip::EndpointId aEndpoint);
+    virtual CHIP_ERROR RollbackEdits();
+    virtual CHIP_ERROR RollbackEdits(chip::EndpointId aEndpoint);    
+
+    virtual chip::Protocols::InteractionModel::Status CommitEdits(chip::EndpointId aEndpoint);
+
+    // presets
+    virtual CHIP_ERROR GetPresetTypeAtIndex(chip::EndpointId aEndpoint, size_t aIndex, PresetTypeStruct::Type & outPresetType) const;
+    virtual CHIP_ERROR GetPresetAtIndex(chip::EndpointId aEndpoint, size_t aIndex, PresetStruct::Type & outPreset) const;
+    virtual CHIP_ERROR ClearPresets(chip::EndpointId aEndpoint);
+    virtual CHIP_ERROR AppendPreset(chip::EndpointId aEndpoint, const PresetStruct::DecodableType & preset);
+
+    // schedules
+    virtual CHIP_ERROR GetScheduleTypeAtIndex(chip::EndpointId aEndpoint, size_t index, ScheduleTypeStruct::Type & scheduleType) const;
+    virtual CHIP_ERROR GetScheduleAtIndex(chip::EndpointId aEndpoint, size_t index, ScheduleStruct::Type & schedule) const;
+    virtual CHIP_ERROR ClearSchedules(chip::EndpointId aEndpoint);
+    virtual CHIP_ERROR AppendSchedule(chip::EndpointId aEndpoint, const Structs::ScheduleStruct::DecodableType & schedule);
+
+private:
+    bool mEditing = false;
+};
+
+
+CHIP_ERROR ExampleThermostatScheduleManager::StartEditing(chip::EndpointId aEndpoint)
 {
-    ChipLogProgress(Zcl, "ThermstatScheduleManager - onEditCancel");
+    ChipLogProgress(Zcl, "ExampleThermostatScheduleManager - StartEditing");
+    if (mEditing == true)
+        return CHIP_ERROR_BUSY;
+
+    mEditing = true;
     gsEditingPresetsEmptyIndex = 0;
     gsEditingSchedulesEmptyIndex = 0;
+
+    return CHIP_NO_ERROR;
 }
 
-static Status onEditCommit(ThermostatMatterScheduleManager * mgr)
+CHIP_ERROR ExampleThermostatScheduleManager::RollbackEdits()
+{
+    return RollbackEdits(1);
+}
+
+CHIP_ERROR ExampleThermostatScheduleManager::RollbackEdits(chip::EndpointId aEndpoint)
+{
+    ChipLogProgress(Zcl, "ExampleThermostatScheduleManager - RollbackEdits");
+    gsEditingPresetsEmptyIndex = 0;
+    gsEditingSchedulesEmptyIndex = 0;
+    return CHIP_NO_ERROR;
+}
+
+Status ExampleThermostatScheduleManager::CommitEdits(chip::EndpointId aEndpoint)
 {
     Status status = Status::Success;
 
-    ChipLogProgress(Zcl, "ThermstatScheduleManager - onEditCommit");
+    ChipLogProgress(Zcl, "ExampleThermostatScheduleManager - CommitEdits");
 
     if (gsEditingPresetsEmptyIndex != 0)
     {
         Span<PresetStruct::Type> oldPresets = Span<PresetStruct::Type>(gsActivePresets).SubSpan(0, gsActivePresetsEmptyIndex);
         Span<PresetStruct::Type> newPresets = Span<PresetStruct::Type>(gsEditingPresets).SubSpan(0, gsEditingPresetsEmptyIndex);
 
-        status = mgr->ThermostatMatterScheduleManager::ValidatePresetsForCommitting(oldPresets, newPresets);
+        status = ValidatePresetsForCommitting(aEndpoint, oldPresets, newPresets);
         {
             StatusIB statusIB(status);
             SuccessOrExit(statusIB.ToChipError());    
@@ -123,7 +176,7 @@ static Status onEditCommit(ThermostatMatterScheduleManager * mgr)
         Span<PresetStruct::Type> presets = gsEditingPresetsEmptyIndex > 0 ? Span<PresetStruct::Type>(gsEditingPresets).SubSpan(0, gsEditingPresetsEmptyIndex) :
                                                                             Span<PresetStruct::Type>(gsActivePresets).SubSpan(0, gsActivePresetsEmptyIndex);
 
-        status = mgr->ThermostatMatterScheduleManager::ValidateSchedulesForCommitting(oldSchedules, newSchedules, presets);
+        status = ValidateSchedulesForCommitting(aEndpoint, oldSchedules, newSchedules, presets);
         {
             StatusIB statusIB(status);
             SuccessOrExit(statusIB.ToChipError());
@@ -157,7 +210,7 @@ exit:
     return status;
 }
 
-static CHIP_ERROR getPresetTypeAtIndex(ThermostatMatterScheduleManager * mgr, size_t index, PresetTypeStruct::Type & presetType)
+CHIP_ERROR ExampleThermostatScheduleManager::GetPresetTypeAtIndex(chip::EndpointId aEndpoint, size_t index, PresetTypeStruct::Type & presetType) const
 {
     static PresetTypeStruct::Type presetTypes[] = {
         { .presetScenario  = PresetScenarioEnum::kOccupied,
@@ -190,7 +243,7 @@ static CHIP_ERROR getPresetTypeAtIndex(ThermostatMatterScheduleManager * mgr, si
     return CHIP_ERROR_NOT_FOUND;
 }
 
-static CHIP_ERROR getPresetAtIndex(ThermostatMatterScheduleManager * mgr, size_t index, PresetStruct::Type & preset)
+CHIP_ERROR ExampleThermostatScheduleManager::GetPresetAtIndex(chip::EndpointId aEndpoint, size_t index, PresetStruct::Type & preset) const
 {
     if (index < gsActivePresets.size())
     {
@@ -200,13 +253,13 @@ static CHIP_ERROR getPresetAtIndex(ThermostatMatterScheduleManager * mgr, size_t
     return CHIP_ERROR_NOT_FOUND;
 }
 
-static CHIP_ERROR clearPresets(ThermostatMatterScheduleManager * mgr)
+CHIP_ERROR ExampleThermostatScheduleManager::ClearPresets(chip::EndpointId aEndpoint)
 {
     gsEditingPresetsEmptyIndex = 0;
     return CHIP_NO_ERROR;
 }
 
-static CHIP_ERROR appendPreset(ThermostatMatterScheduleManager * mgr, const PresetStruct::DecodableType & preset)
+CHIP_ERROR ExampleThermostatScheduleManager::AppendPreset(chip::EndpointId aEndpoint, const PresetStruct::DecodableType & preset)
 {
     if (gsEditingPresetsEmptyIndex >= gsEditingPresets.size())
         return CHIP_ERROR_INVALID_ARGUMENT;
@@ -217,7 +270,7 @@ static CHIP_ERROR appendPreset(ThermostatMatterScheduleManager * mgr, const Pres
     return CHIP_NO_ERROR;
 }
 
-static CHIP_ERROR getScheduleTypeAtIndex(ThermostatMatterScheduleManager * mgr, size_t index, ScheduleTypeStruct::Type & scheduleType)
+CHIP_ERROR ExampleThermostatScheduleManager::GetScheduleTypeAtIndex(chip::EndpointId aEndpoint, size_t index, ScheduleTypeStruct::Type & scheduleType) const
 {
 #if 0
     static ScheduleTypeStruct::Type presetTypes[] = {
@@ -252,7 +305,7 @@ static CHIP_ERROR getScheduleTypeAtIndex(ThermostatMatterScheduleManager * mgr, 
     return CHIP_ERROR_NOT_FOUND;
 }
 
-static CHIP_ERROR getScheduleAtIndex(ThermostatMatterScheduleManager * mgr, size_t index, ScheduleStruct::Type & schedule)
+CHIP_ERROR ExampleThermostatScheduleManager::GetScheduleAtIndex(chip::EndpointId aEndpoint, size_t index, ScheduleStruct::Type & schedule) const
 {
     if (index < gsActiveSchedules.size())
     {
@@ -262,13 +315,13 @@ static CHIP_ERROR getScheduleAtIndex(ThermostatMatterScheduleManager * mgr, size
     return CHIP_ERROR_NOT_FOUND;
 }
 
-static CHIP_ERROR clearSchedules(ThermostatMatterScheduleManager * mgr)
+CHIP_ERROR ExampleThermostatScheduleManager::ClearSchedules(chip::EndpointId aEndpoint)
 {
     gsEditingSchedulesEmptyIndex = 0;
     return CHIP_NO_ERROR;
 }
 
-static CHIP_ERROR appendSchedule(ThermostatMatterScheduleManager * mgr, const ScheduleStruct::DecodableType & schedule)
+CHIP_ERROR ExampleThermostatScheduleManager::AppendSchedule(chip::EndpointId aEndpoint, const ScheduleStruct::DecodableType & schedule)
 {
     if (gsEditingSchedulesEmptyIndex >= gsEditingSchedules.size())
         return CHIP_ERROR_INVALID_ARGUMENT;
@@ -286,30 +339,5 @@ static CHIP_ERROR appendSchedule(ThermostatMatterScheduleManager * mgr, const Sc
     return CHIP_NO_ERROR;
 }
 
-struct ExampleThermostatScheduleManager : public ThermostatMatterScheduleManager
-{
-    ExampleThermostatScheduleManager(chip::EndpointId endpoint) :
-        ThermostatMatterScheduleManager(endpoint, 
-            onEditStart, 
-            onEditCancel, 
-            onEditCommit, 
-            getPresetTypeAtIndex, 
-            getPresetAtIndex,
-            appendPreset, 
-            clearPresets,
-            getScheduleTypeAtIndex, 
-            getScheduleAtIndex,
-            appendSchedule, 
-            clearSchedules)
-    {
-        for (gsActivePresetsEmptyIndex = 0; gsActivePresetsEmptyIndex < sizeof(BuiltInPresets) / sizeof(BuiltInPresets[0]);
-             ++gsActivePresetsEmptyIndex)
-        {
-            gsActivePresets[gsActivePresetsEmptyIndex] = BuiltInPresets[gsActivePresetsEmptyIndex];
-        }
-    }
-};
-
 // Instantiate the manager for endpoint 1
-static ExampleThermostatScheduleManager gThermostatPresetManager(1);
-#endif
+static ExampleThermostatScheduleManager gThermostatPresetManager;

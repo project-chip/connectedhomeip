@@ -1262,15 +1262,20 @@ bool emberAfThermostatClusterAtomicRequestCallback(
     {
         switch (commandData.requestType)
         {
-            case AtomicRequestTypeEnum::kBeginWrite: 
-                return StartEditRequest(commandObj, commandPath, commandData.timeout);
+            case AtomicRequestTypeEnum::kBeginWrite:
+                if (commandData.timeout.HasValue() == true)
+                    return StartEditRequest(commandObj, commandPath, commandData.timeout.Value());
+                break;
             case AtomicRequestTypeEnum::kCommitWrite: 
                 return CommitEditRequest(commandObj, commandPath);
+                break;
             case AtomicRequestTypeEnum::kRollbackWrite: 
                 return CancelEditRequest(commandObj, commandPath);
+                break;
             default:
                 commandObj->AddStatus(commandPath, imcode::InvalidInState);
                 return true;
+                break;
         }
     }
 

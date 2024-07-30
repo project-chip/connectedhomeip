@@ -1,4 +1,3 @@
-#if 0
 
 #include "thermostat-server.h"
 #include <app/util/attribute-storage.h>
@@ -73,26 +72,26 @@ public:
 };
 #endif
 
-static bool IsPresetHandleReferenced(ThermostatMatterScheduleManager & mgr, const chip::ByteSpan & handle)
+static bool IsPresetHandleReferenced(ThermostatMatterScheduleManager & mgr, chip::EndpointId endpointId, const chip::ByteSpan & handle)
 {
     imcode status = imcode::Success;
     uint32_t ourFeatureMap;
-    FeatureMap::Get(mgr.mEndpoint, &ourFeatureMap);
+    FeatureMap::Get(endpointId, &ourFeatureMap);
     const bool enhancedSchedulesSupported = ourFeatureMap & to_underlying(Feature::kMatterScheduleConfiguration);
 
     // Check Active Preset Handle
     DataModel::Nullable<chip::MutableByteSpan> activePresetHandle;
-    status = ActivePresetHandle::Get(mgr.mEndpoint, activePresetHandle);
+    status = ActivePresetHandle::Get(endpointId, activePresetHandle);
     VerifyOrDie(status == imcode::Success);
     if ((activePresetHandle.IsNull() == false) && activePresetHandle.Value().data_equal(handle))
         return true;
 
     // Check for the preset on the Schedules
-    if (enhancedSchedulesSupported && mgr.mGetScheduleAtIndexCb)
+    if (enhancedSchedulesSupported)
     {
         size_t index = 0;
         ScheduleStruct::Type schedule;
-        while (mgr.mGetScheduleAtIndexCb(&mgr, index, schedule) != CHIP_ERROR_NOT_FOUND)
+        while (mgr.GetScheduleAtIndex(endpointId, index, schedule) != CHIP_ERROR_NOT_FOUND)
         {
             if (schedule.presetHandle.HasValue() && schedule.presetHandle.Value().data_equal(handle))
                 return true;
@@ -150,14 +149,13 @@ enum class PresetTypeFeaturesBitmap : uint8_t
 
 #endif
 
-static imcode CheckPresetType(ThermostatMatterScheduleManager & mgr, PresetStruct::Type & preset)
+static imcode CheckPresetType(ThermostatMatterScheduleManager & mgr, chip::EndpointId endpointId, PresetStruct::Type & preset)
 {
     imcode status = imcode::ConstraintError;
     size_t index         = 0;
     PresetTypeStruct::Type presetType;
 
-    VerifyOrDie(mgr.mGetPresetTypeAtIndexCb);
-    while (mgr.mGetPresetTypeAtIndexCb(&mgr, index, presetType) != CHIP_ERROR_NOT_FOUND)
+    while (mgr.GetPresetTypeAtIndex(endpointId, index, presetType) != CHIP_ERROR_NOT_FOUND)
     {
         // look for the preset type that supports this scenario
         if (presetType.presetScenario == preset.presetScenario)
@@ -178,7 +176,7 @@ static imcode CheckPresetType(ThermostatMatterScheduleManager & mgr, PresetStruc
     return status;
 }
 
-imcode ThermostatMatterScheduleManager::ValidatePresetsForCommitting(Span<PresetStruct::Type> & oldlist,
+imcode ThermostatMatterScheduleManager::ValidatePresetsForCommitting(chip::EndpointId endpointId, Span<PresetStruct::Type> & oldlist,
                                                                             Span<PresetStruct::Type> & newlist)
 {
     imcode status = imcode::Success;
@@ -186,7 +184,7 @@ imcode ThermostatMatterScheduleManager::ValidatePresetsForCommitting(Span<Preset
 
     // Check that new_list can fit.
     uint8_t numPresets;
-    status = NumberOfPresets::Get(mEndpoint, &numPresets);
+    status = NumberOfPresets::Get(endpointId, &numPresets);
     SuccessOrExit(StatusIB(status).ToChipError());
     VerifyOrExit(newlist.size() <= numPresets, status = imcode::ResourceExhausted);
 
@@ -207,7 +205,7 @@ imcode ThermostatMatterScheduleManager::ValidatePresetsForCommitting(Span<Preset
         // Check 2 and 3 and 4. -- If the preset is currently being referenced but would be deleted.
         // if its a builtin preset we don't need to search again, we know it's there from the above check.
         if ((old_preset.builtIn.IsNull() || old_preset.builtIn.Value() == false) &&
-            IsPresetHandleReferenced(*this, old_preset.presetHandle.Value()))
+            IsPresetHandleReferenced(*this, endpointId, old_preset.presetHandle.Value()))
         {
             status = FindPresetByHandle(old_preset.presetHandle.Value(), newlist, queryPreset);
             VerifyOrExit(status == imcode::Success, status = imcode::InvalidInState);
@@ -240,11 +238,10 @@ imcode ThermostatMatterScheduleManager::ValidatePresetsForCommitting(Span<Preset
         }
 
         // Check for Preset Scenario in Preset Types and that the Name support is valid (3 and 4)
-        status = CheckPresetType(*this, new_preset);
+        status = CheckPresetType(*this, endpointId, new_preset);
         SuccessOrExit(StatusIB(status).ToChipError());
     }
 
 exit:
     return status;
 }
-#endif
