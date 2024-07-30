@@ -115,6 +115,7 @@ class TC_WHM_2_1(MatterBaseTest):
                              "Changing the mode to the current mode should be a no-op")
 
         # Steps 5-9 are not performed as WHM.S.M.CAN_TEST_MODE_FAILURE is false
+        # TODO - see issue 34565
         self.step(5)
         self.step(6)
         self.step(7)
