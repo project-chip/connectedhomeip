@@ -73,26 +73,26 @@ class TC_OCC_3_2(MatterBaseTest):
     def steps_TC_OCC_3_2(self) -> list[TestStep]:
         steps = [
             TestStep(1, "Commission DUT to TH if not already done", is_commissioning=True),
-            TestStep(2, "TH establishes a wildcard subscription to all attributes on Occupancy Sensing Cluster on the endpoint under test"),
+            TestStep(2, "TH establishes a wildcard subscription to all attributes on Occupancy Sensing Cluster on the endpoint under test. Subscription min interval = 0 and max interval = 30 seconds."),
             TestStep(3a, "Don’t trigger DUT for occupancy state change."),
             TestStep(3b, "TH reads DUT Occupancy attribute and saves the initial value as initial"),
             TestStep(3c, "Trigger DUT to change the occupancy state."),
             TestStep(3d, "TH awaits a ReportDataMessage containing an attribute report for DUT Occupancy attribute."),
             TestStep(4a, "Check if DUT supports HoldTime attribute, If not supported, then stop and skip the rest of test cases."),
             TestStep(4b, "TH reads DUT HoldTime attribute and saves the initial value as initial"),
-            TestStep(4c, "TH writes 10 seconds to DUT HoldTime attribute."),
+            TestStep(4c, "TH writes a different value to DUT HoldTime attribute."),
             TestStep(4d, "TH awaits a ReportDataMessage containing an attribute report for DUT HoldTime attribute."),
             TestStep(5a, "Check if DUT supports DUT feature flag PIR or OTHER, If not supported, then stop and skip to 6a."),
             TestStep(5b, "TH reads DUT PIROccupiedToUnoccupiedDelay attribute and saves the initial value as initial"),
-            TestStep(5c, "TH writes 10 seconds to DUT PIROccupiedToUnoccupiedDelay attribute."),
+            TestStep(5c, "TH writes a different value to DUT PIROccupiedToUnoccupiedDelay attribute."),
             TestStep(5d, "TH awaits a ReportDataMessage containing an attribute report for DUT PIROccupiedToUnoccupiedDelay attribute."),
             TestStep(6a, "Check if DUT supports DUT feature flag US, If not supported, then stop and skip to 7a."),
             TestStep(6b, "TH reads DUT UltrasonicOccupiedToUnoccupiedDelay attribute and saves the initial value as initial"),
-            TestStep(6c, "TH writes 10 seconds to DUT UltrasonicOccupiedToUnoccupiedDelay attribute."),
+            TestStep(6c, "TH writes a different value to DUT UltrasonicOccupiedToUnoccupiedDelay attribute."),
             TestStep(6d, "TH awaits a ReportDataMessage containing an attribute report for DUT UltrasonicOccupiedToUnoccupiedDelay attribute."),
             TestStep(7a, "Check if DUT supports DUT feature flag PHY, If not supported, terminate this test case."),
             TestStep(7b, "TH reads DUT PhysicalContactOccupiedToUnoccupiedDelay attribute and saves the initial value as initial"),
-            TestStep(7c, "TH writes 10 seconds to DUT PhysicalContactOccupiedToUnoccupiedDelay attribute."),
+            TestStep(7c, "TH writes a different value to DUT PhysicalContactOccupiedToUnoccupiedDelay attribute."),
             TestStep(7d, "TH awaits a ReportDataMessage containing an attribute report for DUT PhysicalContactOccupiedToUnoccupiedDelay attribute.")            
         ]
         return steps
@@ -128,9 +128,7 @@ class TC_OCC_3_2(MatterBaseTest):
         self.step(3b)
         if attributes.Occupancy.attribute_id in attribute_list:
             initial_dut = await self.read_occ_attribute_expect_success(endpoint=endpoint, attribute=attributes.Occupancy)
-
-            if initial_dut != NullValue:
-                asserts.assert_equal(initial_dut, 0, "Occupancy attribute is still detected state")
+            asserts.assert_equal(initial_dut, 0, "Occupancy attribute is still detected state")
 
         self.step(3c)
         self.wait_for_user_input(prompt_msg="Type any letter and press ENTER after the sensor occupancy is triggered and its occupancy state changed.")
@@ -147,15 +145,16 @@ class TC_OCC_3_2(MatterBaseTest):
         initial_dut = await self.read_occ_attribute_expect_success(endpoint=endpoint, attribute=attributes.HoldTime)
         
         self.step(4c)
-        # write 10 as a HoldTime attibute
-        write_res = await ChipDeviceCtrl.WriteAttribute(node_id, [(endpoint, attributes.HoldTime(10))])
+        # write a different a HoldTime attibute
+        diff_val = 12
+        write_res = await ChipDeviceCtrl.WriteAttribute(node_id, [(endpoint, attributes.HoldTime(diff_val))])
         
         self.step(4d)
         self._await_sequence_of_reports(report_queue=attrib_listener.attribute_queue, endpoint_id=endpoint_id, attribute=cluster.Attributes.HoldTime, sequence=[
-                                        initial_dut, 10], timeout_sec=post_prompt_settle_delay_seconds)
+                                        initial_dut, diff_val], timeout_sec=post_prompt_settle_delay_seconds)
         
         self.step(5a)
-        if (Clusters.OccupancySensing.Bitmaps.Feature.kPIR | Clusters.OccupancySensing.Bitmaps.Feature.kOTHER) != 1:
+        if (Clusters.OccupancySensing.Bitmaps.Feature.kPassiveInfrared | Clusters.OccupancySensing.Bitmaps.Feature.kOther) != 1:
             self.skip(5b)
             self.skip(5c)
             self.skip(5d)
@@ -166,18 +165,18 @@ class TC_OCC_3_2(MatterBaseTest):
         
         else:        
             logging.info("No PIROccupiedToUnoccupiedDelay attribute supports. Terminate this test case")
-            self.skip_all_remaining_steps(5c)
         
         self.step(5c)
-        # write 10 for the new attribute value
-        write_res = await ChipDeviceCtrl.WriteAttribute(node_id, [(endpoint, attributes.PIROccupiedToUnoccupiedDelay(10))])
+        # write the new attribute value
+        diff_val = 11
+        write_res = await ChipDeviceCtrl.WriteAttribute(node_id, [(endpoint, attributes.PIROccupiedToUnoccupiedDelay(diff_val))])
         
         self.step(5d)
         self._await_sequence_of_reports(report_queue=attrib_listener.attribute_queue, endpoint_id=endpoint_id, attribute=cluster.Attributes.PIROccupiedToUnoccupiedDelay, sequence=[
-                                        initial_dut, 10], timeout_sec=post_prompt_settle_delay_seconds)
+                                        initial_dut, diff_val], timeout_sec=post_prompt_settle_delay_seconds)
                                         
         self.step(6a)
-        if Clusters.OccupancySensing.Bitmaps.Feature.kUS != 1:
+        if Clusters.OccupancySensing.Bitmaps.Feature.kUltrasonic != 1:
             self.skip(6b)
             self.skip(6c)
             self.skip(6d)
@@ -188,18 +187,18 @@ class TC_OCC_3_2(MatterBaseTest):
         
         else:        
             logging.info("No UltrasonicOccupiedToUnoccupiedDelay attribute supports. Terminate this test case")
-            self.skip_all_remaining_steps(6c)
         
         self.step(6c)
-        # write 10 for the new attribute value
-        write_res = await ChipDeviceCtrl.WriteAttribute(node_id, [(endpoint, attributes.UltrasonicOccupiedToUnoccupiedDelay(10))])
+        # write the new attribute value
+        diff_val = 14
+        write_res = await ChipDeviceCtrl.WriteAttribute(node_id, [(endpoint, attributes.UltrasonicOccupiedToUnoccupiedDelay(diff_val))])
         
         self.step(6d)
         self._await_sequence_of_reports(report_queue=attrib_listener.attribute_queue, endpoint_id=endpoint_id, attribute=cluster.Attributes.UltrasonicOccupiedToUnoccupiedDelay, sequence=[
-                                        initial_dut, 10], timeout_sec=post_prompt_settle_delay_seconds)
+                                        initial_dut, diff_val], timeout_sec=post_prompt_settle_delay_seconds)
                                         
         self.step(7a)
-        if Clusters.OccupancySensing.Bitmaps.Feature.kPHY != 1:
+        if Clusters.OccupancySensing.Bitmaps.Feature.kPhysicalContact != 1:
             self.skip(7b)
             self.skip(7c)
             self.skip(7d)
@@ -210,12 +209,12 @@ class TC_OCC_3_2(MatterBaseTest):
         
         else:        
             logging.info("No UltrasonicOccupiedToUnoccupiedDelay attribute supports. Terminate this test case")
-            self.skip_all_remaining_steps(7c)
         
         self.step(7c)
-        # write 10 for the new attribute value
-        write_res = await ChipDeviceCtrl.WriteAttribute(node_id, [(endpoint, attributes.PhysicalContactOccupiedToUnoccupiedDelay(10))])
+        # write the new attribute value
+        diff_val = 9
+        write_res = await ChipDeviceCtrl.WriteAttribute(node_id, [(endpoint, attributes.PhysicalContactOccupiedToUnoccupiedDelay(diff_val))])
         
         self.step(7d)
         self._await_sequence_of_reports(report_queue=attrib_listener.attribute_queue, endpoint_id=endpoint_id, attribute=cluster.Attributes.PhysicalContactOccupiedToUnoccupiedDelay, sequence=[
-                                        initial_dut, 10], timeout_sec=post_prompt_settle_delay_seconds)                                        
+                                        initial_dut, diff_val], timeout_sec=post_prompt_settle_delay_seconds)                                        
