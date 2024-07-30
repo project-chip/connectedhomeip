@@ -408,7 +408,12 @@ Status emAfWriteAttribute(EndpointId endpoint, ClusterId cluster, AttributeId at
 
     if (!valueChanging)
     {
-        // Just do nothing.
+        // Just do nothing, except triggering reporting if forced.
+        if (markDirty == MarkAttributeDirty::kYes)
+        {
+            MatterReportingAttributeChangeCallback(endpoint, cluster, attributeID);
+        }
+
         return Status::Success;
     }
 
