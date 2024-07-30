@@ -35,13 +35,13 @@ from matter_testing_support import MatterBaseTest, TestStep, async_test_body, de
 from mobly import asserts
 
 
-class TC_EWATERHTRM_2_1(MatterBaseTest):
+class TC_WHM_2_1(MatterBaseTest):
 
     def __init__(self, *args):
         super().__init__(*args)
         self.endpoint = 0
 
-    def steps_TC_EWATERHTRM_2_1(self) -> list[TestStep]:
+    def steps_TC_WHM_2_1(self) -> list[TestStep]:
         steps = [
             TestStep(1, "Commissioning, already done", is_commissioning=True),
             TestStep(2, "Read the SupportedModes attribute"),
@@ -70,11 +70,11 @@ class TC_EWATERHTRM_2_1(MatterBaseTest):
                             "Unexpected return type for Water Heater Mode ChangeToMode")
         return ret
 
-    def pics_TC_EWATERHTRM_2_1(self) -> list[str]:
-        return ["EWATERHTRM.S"]
+    def pics_TC_WHM_2_1(self) -> list[str]:
+        return ["WHM.S"]
 
     @async_test_body
-    async def test_TC_EWATERHTRM_2_1(self):
+    async def test_TC_WHM_2_1(self):
 
         # Valid modes. Only ModeManual referred to in this test
         # ModeOff    = 0
@@ -114,7 +114,7 @@ class TC_EWATERHTRM_2_1(MatterBaseTest):
         asserts.assert_equal(ret.status, Status.Success,
                              "Changing the mode to the current mode should be a no-op")
 
-        # Steps 5-9 are not performed as EWATERHTRM.S.M.CAN_TEST_MODE_FAILURE is false
+        # Steps 5-9 are not performed as WHM.S.M.CAN_TEST_MODE_FAILURE is false
         self.step(5)
         self.step(6)
         self.step(7)

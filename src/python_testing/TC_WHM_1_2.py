@@ -31,16 +31,16 @@ from matter_testing_support import MatterBaseTest, TestStep, async_test_body, de
 from mobly import asserts
 
 
-class TC_EWATERHTRM_1_2(MatterBaseTest):
+class TC_WHM_1_2(MatterBaseTest):
 
     async def read_mode_attribute_expect_success(self, endpoint, attribute):
         cluster = Clusters.Objects.WaterHeaterMode
         return await self.read_single_attribute_check_success(endpoint=endpoint, cluster=cluster, attribute=attribute)
 
-    def desc_TC_EWATERHTRM_1_2(self) -> str:
-        return "[TC-EWATERHTRM-1.2] Cluster attributes with DUT as Server"
+    def desc_TC_WHM_1_2(self) -> str:
+        return "[TC-WHM-1.2] Cluster attributes with DUT as Server"
 
-    def steps_TC_EWATERHTRM_1_2(self) -> list[TestStep]:
+    def steps_TC_WHM_1_2(self) -> list[TestStep]:
         steps = [
             TestStep(1, "Commissioning, already done", is_commissioning=True),
             TestStep(2, "Read the SupportedModes attribute"),
@@ -48,14 +48,14 @@ class TC_EWATERHTRM_1_2(MatterBaseTest):
         ]
         return steps
 
-    def pics_TC_EWATERHTRM_1_2(self) -> list[str]:
+    def pics_TC_WHM_1_2(self) -> list[str]:
         pics = [
             "WHM.S",
         ]
         return pics
 
     @async_test_body
-    async def test_TC_EWATERHTRM_1_2(self):
+    async def test_TC_WHM_1_2(self):
 
         endpoint = self.user_params.get("endpoint", 1)
 
