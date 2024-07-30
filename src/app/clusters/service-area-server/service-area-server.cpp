@@ -542,10 +542,16 @@ bool Instance::ReportEstimatedEndTimeChange(const DataModel::Nullable<uint32_t> 
     }
 
     // The value of this attribute SHALL only be reported in the following cases:
-    // - when it changes from null to any non-zero value
+    // - when it changes from null.
     if (mEstimatedEndTime.IsNull())
     {
-        return (aEstimatedEndTime.Value() != 0);
+        return true;
+    }
+
+    // - when it changes from 0
+    if (mEstimatedEndTime.Value() == 0)
+    {
+        return true;
     }
 
     if (aEstimatedEndTime.IsNull())
@@ -555,8 +561,8 @@ bool Instance::ReportEstimatedEndTimeChange(const DataModel::Nullable<uint32_t> 
 
     // From this point we know that mEstimatedEndTime and aEstimatedEndTime are not null and not the same.
 
-    // - when it changes from 0 to any other value and vice versa
-    if (mEstimatedEndTime.Value() == 0 || aEstimatedEndTime.Value() == 0)
+    // - when it changes to 0
+    if (aEstimatedEndTime.Value() == 0)
     {
         return true;
     }
