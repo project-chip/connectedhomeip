@@ -44,6 +44,7 @@
 #include <inttypes.h>
 #include <stdarg.h>
 #include <stdint.h>
+#include <typeinfo>
 
 #if CHIP_SYSTEM_CONFIG_PLATFORM_LOG && defined(CHIP_SYSTEM_CONFIG_PLATFORM_LOG_INCLUDE)
 #include CHIP_SYSTEM_CONFIG_PLATFORM_LOG_INCLUDE
@@ -291,6 +292,22 @@ using LogRedirectCallback_t = void (*)(const char * module, uint8_t category, co
 // A received header's initiator boolean is the inverse of the exchange's.
 #define ChipLogValueExchangeIdFromReceivedHeader(payloadHeader)                                                                    \
     ChipLogValueExchangeId((payloadHeader).GetExchangeID(), !(payloadHeader).IsInitiator())
+
+/**
+ * Logging helpers for RTTI, primarily useful when logging fatal errors in DumpToLog().
+ *
+ * Example:
+ * @code
+ * ChipLogError(Foo, "Delegate=" ChipLogFormatRtti, ChipLogValueRtti(mDelegate));
+ * @endcode
+ */
+#if __has_feature(cxx_rtti)
+#define ChipLogFormatRtti "%s"
+#define ChipLogValueRtti(ptr) ((ptr) != nullptr ? typeid(*(ptr)).name() : "0")
+#else
+#define ChipLogFormatRtti "%c"
+#define ChipLogValueRtti(ptr) ((ptr) != nullptr ? '?' : '0')
+#endif
 
 /**
  * Logging helpers for protocol ids.  A protocol id is a (vendor-id,

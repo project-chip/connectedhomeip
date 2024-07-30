@@ -132,7 +132,10 @@ source_set("text_only_logging") {
 }
 
 source_set("verifymacros") {
-  sources = [ "CodeUtils.h" ]
+  sources = [
+    "CodeUtils.h",
+    "ObjectDump.h",
+  ]
 
   public_deps = [
     ":attributes",
