@@ -23,6 +23,8 @@ import java.util.logging.Logger
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.transform
 import matter.controller.BooleanSubscriptionState
+import matter.controller.InvokeRequest
+import matter.controller.InvokeResponse
 import matter.controller.MatterController
 import matter.controller.ReadData
 import matter.controller.ReadRequest
@@ -36,7 +38,9 @@ import matter.controller.WriteRequests
 import matter.controller.WriteResponse
 import matter.controller.cluster.structs.*
 import matter.controller.model.AttributePath
+import matter.controller.model.CommandPath
 import matter.tlv.AnonymousTag
+import matter.tlv.ContextSpecificTag
 import matter.tlv.TlvReader
 import matter.tlv.TlvWriter
 
@@ -95,6 +99,27 @@ class BridgedDeviceBasicInformationCluster(
     data class Error(val exception: Exception) : AttributeListAttributeSubscriptionState()
 
     object SubscriptionEstablished : AttributeListAttributeSubscriptionState()
+  }
+
+  suspend fun keepActive(stayActiveDuration: UInt, timedInvokeTimeout: Duration? = null) {
+    val commandId: UInt = 128u
+
+    val tlvWriter = TlvWriter()
+    tlvWriter.startStructure(AnonymousTag)
+
+    val TAG_STAY_ACTIVE_DURATION_REQ: Int = 0
+    tlvWriter.put(ContextSpecificTag(TAG_STAY_ACTIVE_DURATION_REQ), stayActiveDuration)
+    tlvWriter.endStructure()
+
+    val request: InvokeRequest =
+      InvokeRequest(
+        CommandPath(endpointId, clusterId = CLUSTER_ID, commandId),
+        tlvPayload = tlvWriter.getEncoded(),
+        timedRequest = timedInvokeTimeout,
+      )
+
+    val response: InvokeResponse = controller.invoke(request)
+    logger.log(Level.FINE, "Invoke command succeeded: ${response}")
   }
 
   suspend fun readVendorNameAttribute(): String? {
@@ -1411,7 +1436,7 @@ class BridgedDeviceBasicInformationCluster(
     }
   }
 
-  suspend fun readUniqueIDAttribute(): String? {
+  suspend fun readUniqueIDAttribute(): String {
     val ATTRIBUTE_ID: UInt = 18u
 
     val attributePath =
@@ -1437,12 +1462,7 @@ class BridgedDeviceBasicInformationCluster(
 
     // Decode the TLV data into the appropriate type
     val tlvReader = TlvReader(attributeData.data)
-    val decodedValue: String? =
-      if (tlvReader.isNextTag(AnonymousTag)) {
-        tlvReader.getString(AnonymousTag)
-      } else {
-        null
-      }
+    val decodedValue: String = tlvReader.getString(AnonymousTag)
 
     return decodedValue
   }
@@ -1486,14 +1506,9 @@ class BridgedDeviceBasicInformationCluster(
 
           // Decode the TLV data into the appropriate type
           val tlvReader = TlvReader(attributeData.data)
-          val decodedValue: String? =
-            if (tlvReader.isNextTag(AnonymousTag)) {
-              tlvReader.getString(AnonymousTag)
-            } else {
-              null
-            }
+          val decodedValue: String = tlvReader.getString(AnonymousTag)
 
-          decodedValue?.let { emit(StringSubscriptionState.Success(it)) }
+          emit(StringSubscriptionState.Success(decodedValue))
         }
         SubscriptionState.SubscriptionEstablished -> {
           emit(StringSubscriptionState.SubscriptionEstablished)

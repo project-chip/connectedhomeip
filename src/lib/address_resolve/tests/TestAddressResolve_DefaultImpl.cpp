@@ -13,9 +13,11 @@
  *    See the License for the specific language governing permissions and
  *    limitations under the License.
  */
-#include <gtest/gtest.h>
+
+#include <pw_unit_test/framework.h>
 
 #include <lib/address_resolve/AddressResolve_DefaultImpl.h>
+#include <lib/core/StringBuilderAdapters.h>
 
 using namespace chip;
 using namespace chip::AddressResolve;

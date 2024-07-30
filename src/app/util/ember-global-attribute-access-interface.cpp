@@ -15,6 +15,7 @@
  */
 #include <app/util/ember-global-attribute-access-interface.h>
 
+#include <app/CommandHandlerInterfaceRegistry.h>
 #include <app/GlobalAttributes.h>
 #include <app/InteractionModelEngine.h>
 
@@ -96,7 +97,7 @@ CHIP_ERROR GlobalAttributeReader::EncodeCommandList(const ConcreteClusterPath & 
 {
     return aEncoder.EncodeList([&](const auto & encoder) {
         auto * commandHandler =
-            InteractionModelEngine::GetInstance()->FindCommandHandler(aClusterPath.mEndpointId, aClusterPath.mClusterId);
+            CommandHandlerInterfaceRegistry::GetCommandHandler(aClusterPath.mEndpointId, aClusterPath.mClusterId);
         if (commandHandler)
         {
             struct Context

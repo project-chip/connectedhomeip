@@ -867,6 +867,13 @@ class ChipClusters:
         "clusterName": "AccessControl",
         "clusterId": 0x0000001F,
         "commands": {
+            0x00000000: {
+                "commandId": 0x00000000,
+                "commandName": "ReviewFabricRestrictions",
+                "args": {
+                    "arl": "AccessRestrictionStruct",
+                },
+            },
         },
         "attributes": {
             0x00000000: {
@@ -899,6 +906,18 @@ class ChipClusters:
                 "attributeName": "AccessControlEntriesPerFabric",
                 "attributeId": 0x00000004,
                 "type": "int",
+                "reportable": True,
+            },
+            0x00000005: {
+                "attributeName": "CommissioningARL",
+                "attributeId": 0x00000005,
+                "type": "",
+                "reportable": True,
+            },
+            0x00000006: {
+                "attributeName": "Arl",
+                "attributeId": 0x00000006,
+                "type": "",
                 "reportable": True,
             },
             0x0000FFF8: {
@@ -3246,6 +3265,13 @@ class ChipClusters:
         "clusterName": "BridgedDeviceBasicInformation",
         "clusterId": 0x00000039,
         "commands": {
+            0x00000080: {
+                "commandId": 0x00000080,
+                "commandName": "KeepActive",
+                "args": {
+                    "stayActiveDuration": "int",
+                },
+            },
         },
         "attributes": {
             0x00000001: {
@@ -4135,6 +4161,12 @@ class ChipClusters:
             0x00000008: {
                 "attributeName": "OperatingMode",
                 "attributeId": 0x00000008,
+                "type": "int",
+                "reportable": True,
+            },
+            0x00000009: {
+                "attributeName": "MaximumCheckInBackOff",
+                "attributeId": 0x00000009,
                 "type": "int",
                 "reportable": True,
             },
@@ -6580,6 +6612,104 @@ class ChipClusters:
             },
         },
     }
+    _WATER_HEATER_MANAGEMENT_CLUSTER_INFO = {
+        "clusterName": "WaterHeaterManagement",
+        "clusterId": 0x00000094,
+        "commands": {
+            0x00000000: {
+                "commandId": 0x00000000,
+                "commandName": "Boost",
+                "args": {
+                    "duration": "int",
+                    "oneShot": "bool",
+                    "emergencyBoost": "bool",
+                    "temporarySetpoint": "int",
+                    "targetPercentage": "int",
+                    "targetReheat": "int",
+                },
+            },
+            0x00000001: {
+                "commandId": 0x00000001,
+                "commandName": "CancelBoost",
+                "args": {
+                },
+            },
+        },
+        "attributes": {
+            0x00000000: {
+                "attributeName": "HeaterTypes",
+                "attributeId": 0x00000000,
+                "type": "int",
+                "reportable": True,
+            },
+            0x00000001: {
+                "attributeName": "HeatDemand",
+                "attributeId": 0x00000001,
+                "type": "int",
+                "reportable": True,
+            },
+            0x00000002: {
+                "attributeName": "TankVolume",
+                "attributeId": 0x00000002,
+                "type": "int",
+                "reportable": True,
+            },
+            0x00000003: {
+                "attributeName": "EstimatedHeatRequired",
+                "attributeId": 0x00000003,
+                "type": "int",
+                "reportable": True,
+            },
+            0x00000004: {
+                "attributeName": "TankPercentage",
+                "attributeId": 0x00000004,
+                "type": "int",
+                "reportable": True,
+            },
+            0x00000005: {
+                "attributeName": "BoostState",
+                "attributeId": 0x00000005,
+                "type": "int",
+                "reportable": True,
+            },
+            0x0000FFF8: {
+                "attributeName": "GeneratedCommandList",
+                "attributeId": 0x0000FFF8,
+                "type": "int",
+                "reportable": True,
+            },
+            0x0000FFF9: {
+                "attributeName": "AcceptedCommandList",
+                "attributeId": 0x0000FFF9,
+                "type": "int",
+                "reportable": True,
+            },
+            0x0000FFFA: {
+                "attributeName": "EventList",
+                "attributeId": 0x0000FFFA,
+                "type": "int",
+                "reportable": True,
+            },
+            0x0000FFFB: {
+                "attributeName": "AttributeList",
+                "attributeId": 0x0000FFFB,
+                "type": "int",
+                "reportable": True,
+            },
+            0x0000FFFC: {
+                "attributeName": "FeatureMap",
+                "attributeId": 0x0000FFFC,
+                "type": "int",
+                "reportable": True,
+            },
+            0x0000FFFD: {
+                "attributeName": "ClusterRevision",
+                "attributeId": 0x0000FFFD,
+                "type": "int",
+                "reportable": True,
+            },
+        },
+    }
     _DEMAND_RESPONSE_LOAD_CONTROL_CLUSTER_INFO = {
         "clusterName": "DemandResponseLoadControl",
         "clusterId": 0x00000096,
@@ -7305,6 +7435,83 @@ class ChipClusters:
     _ENERGY_EVSE_MODE_CLUSTER_INFO = {
         "clusterName": "EnergyEvseMode",
         "clusterId": 0x0000009D,
+        "commands": {
+            0x00000000: {
+                "commandId": 0x00000000,
+                "commandName": "ChangeToMode",
+                "args": {
+                    "newMode": "int",
+                },
+            },
+        },
+        "attributes": {
+            0x00000000: {
+                "attributeName": "SupportedModes",
+                "attributeId": 0x00000000,
+                "type": "",
+                "reportable": True,
+            },
+            0x00000001: {
+                "attributeName": "CurrentMode",
+                "attributeId": 0x00000001,
+                "type": "int",
+                "reportable": True,
+            },
+            0x00000002: {
+                "attributeName": "StartUpMode",
+                "attributeId": 0x00000002,
+                "type": "int",
+                "reportable": True,
+                "writable": True,
+            },
+            0x00000003: {
+                "attributeName": "OnMode",
+                "attributeId": 0x00000003,
+                "type": "int",
+                "reportable": True,
+                "writable": True,
+            },
+            0x0000FFF8: {
+                "attributeName": "GeneratedCommandList",
+                "attributeId": 0x0000FFF8,
+                "type": "int",
+                "reportable": True,
+            },
+            0x0000FFF9: {
+                "attributeName": "AcceptedCommandList",
+                "attributeId": 0x0000FFF9,
+                "type": "int",
+                "reportable": True,
+            },
+            0x0000FFFA: {
+                "attributeName": "EventList",
+                "attributeId": 0x0000FFFA,
+                "type": "int",
+                "reportable": True,
+            },
+            0x0000FFFB: {
+                "attributeName": "AttributeList",
+                "attributeId": 0x0000FFFB,
+                "type": "int",
+                "reportable": True,
+            },
+            0x0000FFFC: {
+                "attributeName": "FeatureMap",
+                "attributeId": 0x0000FFFC,
+                "type": "int",
+                "reportable": True,
+            },
+            0x0000FFFD: {
+                "attributeName": "ClusterRevision",
+                "attributeId": 0x0000FFFD,
+                "type": "int",
+                "reportable": True,
+            },
+        },
+    }
+    _WATER_HEATER_MODE_CLUSTER_INFO = {
+        "clusterName": "WaterHeaterMode",
+        "clusterId": 0x0000009E,
         "commands": {
             0x00000000: {
                 "commandId": 0x00000000,
@@ -8638,7 +8845,6 @@ class ChipClusters:
                 "commandName": "SetActivePresetRequest",
                 "args": {
                     "presetHandle": "bytes",
-                    "delayMinutes": "int",
                 },
             },
             0x00000007: {
@@ -8658,19 +8864,6 @@ class ChipClusters:
                 "commandId": 0x00000009,
                 "commandName": "CommitPresetsSchedulesRequest",
                 "args": {
-                },
-            },
-            0x0000000A: {
-                "commandId": 0x0000000A,
-                "commandName": "CancelSetActivePresetRequest",
-                "args": {
-                },
-            },
-            0x0000000B: {
-                "commandId": 0x0000000B,
-                "commandName": "SetTemperatureSetpointHoldPolicy",
-                "args": {
-                    "temperatureSetpointHoldPolicy": "int",
                 },
             },
         },
@@ -9065,21 +9258,9 @@ class ChipClusters:
                 "reportable": True,
             },
             0x00000053: {
-                "attributeName": "TemperatureSetpointHoldPolicy",
+                "attributeName": "SetpointHoldExpiryTimestamp",
                 "attributeId": 0x00000053,
                 "type": "int",
-                "reportable": True,
-            },
-            0x00000054: {
-                "attributeName": "SetpointHoldExpiryTimestamp",
-                "attributeId": 0x00000054,
-                "type": "int",
-                "reportable": True,
-            },
-            0x00000055: {
-                "attributeName": "QueuedPreset",
-                "attributeId": 0x00000055,
-                "type": "",
                 "reportable": True,
             },
             0x0000FFF8: {
@@ -11654,10 +11835,16 @@ class ChipClusters:
             },
         },
         "attributes": {
-            0x00000001: {
+            0x00000000: {
                 "attributeName": "Ssid",
-                "attributeId": 0x00000001,
+                "attributeId": 0x00000000,
                 "type": "bytes",
+                "reportable": True,
+            },
+            0x00000001: {
+                "attributeName": "PassphraseSurrogate",
+                "attributeId": 0x00000001,
+                "type": "int",
                 "reportable": True,
             },
             0x0000FFF8: {
@@ -11714,16 +11901,16 @@ class ChipClusters:
                 "args": {
                 },
             },
-            0x00000004: {
-                "commandId": 0x00000004,
+            0x00000003: {
+                "commandId": 0x00000003,
                 "commandName": "SetActiveDatasetRequest",
                 "args": {
                     "activeDataset": "bytes",
                     "breadcrumb": "int",
                 },
             },
-            0x00000005: {
-                "commandId": 0x00000005,
+            0x00000004: {
+                "commandId": 0x00000004,
                 "commandName": "SetPendingDatasetRequest",
                 "args": {
                     "pendingDataset": "bytes",
@@ -11755,9 +11942,9 @@ class ChipClusters:
                 "type": "bool",
                 "reportable": True,
             },
-            0x00000005: {
+            0x00000004: {
                 "attributeName": "ActiveDatasetTimestamp",
-                "attributeId": 0x00000005,
+                "attributeId": 0x00000004,
                 "type": "int",
                 "reportable": True,
             },
@@ -11814,14 +12001,14 @@ class ChipClusters:
                 "commandId": 0x00000001,
                 "commandName": "RemoveNetwork",
                 "args": {
-                    "extendedPanID": "int",
+                    "extendedPanID": "bytes",
                 },
             },
             0x00000002: {
                 "commandId": 0x00000002,
                 "commandName": "GetOperationalDataset",
                 "args": {
-                    "extendedPanID": "int",
+                    "extendedPanID": "bytes",
                 },
             },
         },
@@ -11829,7 +12016,7 @@ class ChipClusters:
             0x00000000: {
                 "attributeName": "PreferredExtendedPanID",
                 "attributeId": 0x00000000,
-                "type": "int",
+                "type": "bytes",
                 "reportable": True,
                 "writable": True,
             },
@@ -13063,6 +13250,138 @@ class ChipClusters:
             },
         },
         "attributes": {
+            0x0000FFF8: {
+                "attributeName": "GeneratedCommandList",
+                "attributeId": 0x0000FFF8,
+                "type": "int",
+                "reportable": True,
+            },
+            0x0000FFF9: {
+                "attributeName": "AcceptedCommandList",
+                "attributeId": 0x0000FFF9,
+                "type": "int",
+                "reportable": True,
+            },
+            0x0000FFFA: {
+                "attributeName": "EventList",
+                "attributeId": 0x0000FFFA,
+                "type": "int",
+                "reportable": True,
+            },
+            0x0000FFFB: {
+                "attributeName": "AttributeList",
+                "attributeId": 0x0000FFFB,
+                "type": "int",
+                "reportable": True,
+            },
+            0x0000FFFC: {
+                "attributeName": "FeatureMap",
+                "attributeId": 0x0000FFFC,
+                "type": "int",
+                "reportable": True,
+            },
+            0x0000FFFD: {
+                "attributeName": "ClusterRevision",
+                "attributeId": 0x0000FFFD,
+                "type": "int",
+                "reportable": True,
+            },
+        },
+    }
+    _ECOSYSTEM_INFORMATION_CLUSTER_INFO = {
+        "clusterName": "EcosystemInformation",
+        "clusterId": 0x00000750,
+        "commands": {
+        },
+        "attributes": {
+            0x00000000: {
+                "attributeName": "RemovedOn",
+                "attributeId": 0x00000000,
+                "type": "int",
+                "reportable": True,
+            },
+            0x00000001: {
+                "attributeName": "DeviceDirectory",
+                "attributeId": 0x00000001,
+                "type": "",
+                "reportable": True,
+            },
+            0x00000002: {
+                "attributeName": "LocationDirectory",
+                "attributeId": 0x00000002,
+                "type": "",
+                "reportable": True,
+            },
+            0x0000FFF8: {
+                "attributeName": "GeneratedCommandList",
+                "attributeId": 0x0000FFF8,
+                "type": "int",
+                "reportable": True,
+            },
+            0x0000FFF9: {
+                "attributeName": "AcceptedCommandList",
+                "attributeId": 0x0000FFF9,
+                "type": "int",
+                "reportable": True,
+            },
+            0x0000FFFA: {
+                "attributeName": "EventList",
+                "attributeId": 0x0000FFFA,
+                "type": "int",
+                "reportable": True,
+            },
+            0x0000FFFB: {
+                "attributeName": "AttributeList",
+                "attributeId": 0x0000FFFB,
+                "type": "int",
+                "reportable": True,
+            },
+            0x0000FFFC: {
+                "attributeName": "FeatureMap",
+                "attributeId": 0x0000FFFC,
+                "type": "int",
+                "reportable": True,
+            },
+            0x0000FFFD: {
+                "attributeName": "ClusterRevision",
+                "attributeId": 0x0000FFFD,
+                "type": "int",
+                "reportable": True,
+            },
+        },
+    }
+    _COMMISSIONER_CONTROL_CLUSTER_INFO = {
+        "clusterName": "CommissionerControl",
+        "clusterId": 0x00000751,
+        "commands": {
+            0x00000000: {
+                "commandId": 0x00000000,
+                "commandName": "RequestCommissioningApproval",
+                "args": {
+                    "requestId": "int",
+                    "vendorId": "int",
+                    "productId": "int",
+                    "label": "str",
+                },
+            },
+            0x00000001: {
+                "commandId": 0x00000001,
+                "commandName": "CommissionNode",
+                "args": {
+                    "requestId": "int",
+                    "responseTimeoutSeconds": "int",
+                    "ipAddress": "bytes",
+                    "port": "int",
+                },
+            },
+        },
+        "attributes": {
+            0x00000000: {
+                "attributeName": "SupportedDeviceCategories",
+                "attributeId": 0x00000000,
+                "type": "int",
+                "reportable": True,
+            },
             0x0000FFF8: {
                 "attributeName": "GeneratedCommandList",
                 "attributeId": 0x0000FFF8,
@@ -14960,6 +15279,7 @@ class ChipClusters:
         0x00000081: _VALVE_CONFIGURATION_AND_CONTROL_CLUSTER_INFO,
         0x00000090: _ELECTRICAL_POWER_MEASUREMENT_CLUSTER_INFO,
         0x00000091: _ELECTRICAL_ENERGY_MEASUREMENT_CLUSTER_INFO,
+        0x00000094: _WATER_HEATER_MANAGEMENT_CLUSTER_INFO,
         0x00000096: _DEMAND_RESPONSE_LOAD_CONTROL_CLUSTER_INFO,
         0x00000097: _MESSAGES_CLUSTER_INFO,
         0x00000098: _DEVICE_ENERGY_MANAGEMENT_CLUSTER_INFO,
@@ -14967,6 +15287,7 @@ class ChipClusters:
         0x0000009B: _ENERGY_PREFERENCE_CLUSTER_INFO,
         0x0000009C: _POWER_TOPOLOGY_CLUSTER_INFO,
         0x0000009D: _ENERGY_EVSE_MODE_CLUSTER_INFO,
+        0x0000009E: _WATER_HEATER_MODE_CLUSTER_INFO,
         0x0000009F: _DEVICE_ENERGY_MANAGEMENT_MODE_CLUSTER_INFO,
         0x00000101: _DOOR_LOCK_CLUSTER_INFO,
         0x00000102: _WINDOW_COVERING_CLUSTER_INFO,
@@ -15011,6 +15332,8 @@ class ChipClusters:
         0x0000050E: _ACCOUNT_LOGIN_CLUSTER_INFO,
         0x0000050F: _CONTENT_CONTROL_CLUSTER_INFO,
         0x00000510: _CONTENT_APP_OBSERVER_CLUSTER_INFO,
+        0x00000750: _ECOSYSTEM_INFORMATION_CLUSTER_INFO,
+        0x00000751: _COMMISSIONER_CONTROL_CLUSTER_INFO,
         0x00000B04: _ELECTRICAL_MEASUREMENT_CLUSTER_INFO,
         0xFFF1FC05: _UNIT_TESTING_CLUSTER_INFO,
         0xFFF1FC06: _FAULT_INJECTION_CLUSTER_INFO,
@@ -15085,6 +15408,7 @@ class ChipClusters:
         "ValveConfigurationAndControl": _VALVE_CONFIGURATION_AND_CONTROL_CLUSTER_INFO,
         "ElectricalPowerMeasurement": _ELECTRICAL_POWER_MEASUREMENT_CLUSTER_INFO,
         "ElectricalEnergyMeasurement": _ELECTRICAL_ENERGY_MEASUREMENT_CLUSTER_INFO,
+        "WaterHeaterManagement": _WATER_HEATER_MANAGEMENT_CLUSTER_INFO,
         "DemandResponseLoadControl": _DEMAND_RESPONSE_LOAD_CONTROL_CLUSTER_INFO,
         "Messages": _MESSAGES_CLUSTER_INFO,
         "DeviceEnergyManagement": _DEVICE_ENERGY_MANAGEMENT_CLUSTER_INFO,
@@ -15092,6 +15416,7 @@ class ChipClusters:
         "EnergyPreference": _ENERGY_PREFERENCE_CLUSTER_INFO,
         "PowerTopology": _POWER_TOPOLOGY_CLUSTER_INFO,
         "EnergyEvseMode": _ENERGY_EVSE_MODE_CLUSTER_INFO,
+        "WaterHeaterMode": _WATER_HEATER_MODE_CLUSTER_INFO,
         "DeviceEnergyManagementMode": _DEVICE_ENERGY_MANAGEMENT_MODE_CLUSTER_INFO,
         "DoorLock": _DOOR_LOCK_CLUSTER_INFO,
         "WindowCovering": _WINDOW_COVERING_CLUSTER_INFO,
@@ -15136,6 +15461,8 @@ class ChipClusters:
         "AccountLogin": _ACCOUNT_LOGIN_CLUSTER_INFO,
         "ContentControl": _CONTENT_CONTROL_CLUSTER_INFO,
         "ContentAppObserver": _CONTENT_APP_OBSERVER_CLUSTER_INFO,
+        "EcosystemInformation": _ECOSYSTEM_INFORMATION_CLUSTER_INFO,
+        "CommissionerControl": _COMMISSIONER_CONTROL_CLUSTER_INFO,
         "ElectricalMeasurement": _ELECTRICAL_MEASUREMENT_CLUSTER_INFO,
         "UnitTesting": _UNIT_TESTING_CLUSTER_INFO,
         "FaultInjection": _FAULT_INJECTION_CLUSTER_INFO,

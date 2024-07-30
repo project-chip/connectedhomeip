@@ -157,6 +157,12 @@ menu "CHIP Core"
             help
                 Option to enable/disable CHIP log level filtering APIs.
 
+        config ENABLE_CHIP_DATA_MODEL
+            bool "Enable CHIP data model"
+            default y
+            help
+                Option to enable/disable CHIP data model.
+
     endmenu # "General Options"
 
     menu "Networking Options"
@@ -330,9 +336,11 @@ menu "CHIP Device Layer"
         config MAX_EVENT_QUEUE_SIZE
             int "Max Event Queue Size"
             range 0 65535
-            default 25
+            default 40
             help
                 The maximum number of events that can be held in the CHIP Platform event queue.
+                Should be set greater than CONFIG_ESP32_WIFI_DYNAMIC_RX_BUFFER_NUM. For SoCs other than
+                ESP32-C2, where the Wi-Fi buffer number is 8, recommended to use the default value.
 
         config ENABLE_EXTENDED_DISCOVERY
             bool "Enable Extended discovery Support"
@@ -1284,6 +1292,54 @@ menu "CHIP Device Layer"
             default 4
             help
                 The maximum number of retransmissions before giving up.
+
+    endmenu
+
+    menu "Network Commissioning Driver Endpoint Id"
+        config THREAD_NETWORK_COMMISSIONING_DRIVER
+            bool "Use the generic Thread network commissioning driver"
+            depends on ENABLE_MATTER_OVER_THREAD && ENABLE_CHIP_DATA_MODEL
+            default y
+            help
+                Option to enable/disable the use of generic Thread network commissioning driver.
+
+        config THREAD_NETWORK_ENDPOINT_ID
+            int "Endpoint Id for Thread network"
+            depends on THREAD_NETWORK_COMMISSIONING_DRIVER
+            range 0 65534
+            default 0
+            help
+                The endpoint id for the generic Thread network commissioning driver.
+
+        config WIFI_NETWORK_COMMISSIONING_DRIVER
+            bool "Use ESP Wi-Fi network commissioning driver"
+            depends on (ENABLE_WIFI_STATION || ENABLE_WIFI_AP) && ENABLE_CHIP_DATA_MODEL
+            default y
+            help
+                Option to enable/disable the use of ESP Wi-Fi network commissioning driver.
+
+        config WIFI_NETWORK_ENDPOINT_ID
+            int "Endpoint Id for Wi-Fi network"
+            depends on WIFI_NETWORK_COMMISSIONING_DRIVER
+            range 0 65534
+            default 0
+            help
+                The endpoint id for the ESP Wi-Fi network commissioning driver.
+
+        config ETHERNET_NETWORK_COMMISSIONING_DRIVER
+            bool "Use ESP Ethernet network commissioning driver"
+            depends on ENABLE_ETHERNET_TELEMETRY && ENABLE_CHIP_DATA_MODEL
+            default y
+            help
+                Option to enable/disable the use of ESP Ethernet network commissioning driver.
+
+        config ETHERNET_NETWORK_ENDPOINT_ID
+            int "Endpoint Id for Ethernet network"
+            depends on ETHERNET_NETWORK_COMMISSIONING_DRIVER
+            range 0 65534
+            default 0
+            help
+                The endpoint id for the ESP Ethernet network commissioning driver.
 
     endmenu
 

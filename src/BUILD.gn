@@ -50,6 +50,8 @@ if (chip_build_tests) {
   chip_test_group("tests") {
     deps = []
     tests = [
+      "${chip_root}/src/app/data-model/tests",
+      "${chip_root}/src/app/cluster-building-blocks/tests",
       "${chip_root}/src/app/data-model-interface/tests",
       "${chip_root}/src/access/tests",
       "${chip_root}/src/crypto/tests",
@@ -150,6 +152,15 @@ if (chip_build_tests) {
       build_monolithic_library = true
       output_name = "libCHIP_tests"
       output_dir = "${root_out_dir}/lib"
+    }
+  }
+
+  chip_test_group("example_tests") {
+    deps = []
+    tests = []
+    if (chip_device_platform != "esp32" && chip_device_platform != "efr32" &&
+        current_os != "android") {
+      tests += [ "${chip_root}/examples/energy-management-app/energy-management-common/tests" ]
     }
   }
 

@@ -59,7 +59,7 @@ Davis, CA 95616, USA
 -->
 <cluster xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="types types.xsd cluster cluster.xsd" id="0x0003" name="Identify Cluster" revision="5">
   <revisionHistory>
-    <revision revision="1" summary="Global mandatory ClusterRevision attribute added"/>
+    <revision revision="1" summary="Mandatory global ClusterRevision attribute added"/>
     <revision revision="2" summary="CCB 2808"/>
     <revision revision="3" summary="All Hubs changes"/>
     <revision revision="4" summary="New data model format and notation; add IdentifyType"/>
@@ -122,7 +122,7 @@ Davis, CA 95616, USA
   <attributes>
     <attribute id="0x0000" name="IdentifyTime" type="uint16" default="0">
       <access read="true" write="true" readPrivilege="view" writePrivilege="operate"/>
-      <quality changeOmitted="false" nullable="false" scene="false" persistence="volatile" reportable="false"/>
+      <quality changeOmitted="false" nullable="false" scene="false" persistence="volatile" reportable="false" sourceAttribution="false" quieterReporting="true"/>
       <mandatoryConform/>
     </attribute>
     <attribute id="0x0001" name="IdentifyType" type="IdentifyTypeEnum" default="MS">

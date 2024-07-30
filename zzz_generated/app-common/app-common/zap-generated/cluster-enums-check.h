@@ -24,6 +24,111 @@
 namespace chip {
 namespace app {
 namespace Clusters {
+static auto __attribute__((unused)) EnsureKnownEnumValue(detail::AreaTypeTag val)
+{
+    using EnumType = detail::AreaTypeTag;
+    switch (val)
+    {
+    case EnumType::kAisle:
+    case EnumType::kAttic:
+    case EnumType::kBackDoor:
+    case EnumType::kBackYard:
+    case EnumType::kBalcony:
+    case EnumType::kBallroom:
+    case EnumType::kBathroom:
+    case EnumType::kBedroom:
+    case EnumType::kBorder:
+    case EnumType::kBoxroom:
+    case EnumType::kBreakfastRoom:
+    case EnumType::kCarport:
+    case EnumType::kCellar:
+    case EnumType::kCloakroom:
+    case EnumType::kCloset:
+    case EnumType::kConservatory:
+    case EnumType::kCorridor:
+    case EnumType::kCraftRoom:
+    case EnumType::kCupboard:
+    case EnumType::kDeck:
+    case EnumType::kDen:
+    case EnumType::kDining:
+    case EnumType::kDrawingRoom:
+    case EnumType::kDressingRoom:
+    case EnumType::kDriveway:
+    case EnumType::kElevator:
+    case EnumType::kEnsuite:
+    case EnumType::kEntrance:
+    case EnumType::kEntryway:
+    case EnumType::kFamilyRoom:
+    case EnumType::kFoyer:
+    case EnumType::kFrontDoor:
+    case EnumType::kFrontYard:
+    case EnumType::kGameRoom:
+    case EnumType::kGarage:
+    case EnumType::kGarageDoor:
+    case EnumType::kGarden:
+    case EnumType::kGardenDoor:
+    case EnumType::kGuestBathroom:
+    case EnumType::kGuestBedroom:
+    case EnumType::kGuestRestroom:
+    case EnumType::kGuestRoom:
+    case EnumType::kGym:
+    case EnumType::kHallway:
+    case EnumType::kHearthRoom:
+    case EnumType::kKidsRoom:
+    case EnumType::kKidsBedroom:
+    case EnumType::kKitchen:
+    case EnumType::kLarder:
+    case EnumType::kLaundryRoom:
+    case EnumType::kLawn:
+    case EnumType::kLibrary:
+    case EnumType::kLivingRoom:
+    case EnumType::kLounge:
+    case EnumType::kMediaTvRoom:
+    case EnumType::kMudRoom:
+    case EnumType::kMusicRoom:
+    case EnumType::kNursery:
+    case EnumType::kOffice:
+    case EnumType::kOutdoorKitchen:
+    case EnumType::kOutside:
+    case EnumType::kPantry:
+    case EnumType::kParkingLot:
+    case EnumType::kParlor:
+    case EnumType::kPatio:
+    case EnumType::kPlayRoom:
+    case EnumType::kPoolRoom:
+    case EnumType::kPorch:
+    case EnumType::kPrimaryBathroom:
+    case EnumType::kPrimaryBedroom:
+    case EnumType::kRamp:
+    case EnumType::kReceptionRoom:
+    case EnumType::kRecreationRoom:
+    case EnumType::kRestroom:
+    case EnumType::kRoof:
+    case EnumType::kSauna:
+    case EnumType::kScullery:
+    case EnumType::kSewingRoom:
+    case EnumType::kShed:
+    case EnumType::kSideDoor:
+    case EnumType::kSideYard:
+    case EnumType::kSittingRoom:
+    case EnumType::kSnug:
+    case EnumType::kSpa:
+    case EnumType::kStaircase:
+    case EnumType::kSteamRoom:
+    case EnumType::kStorageRoom:
+    case EnumType::kStudio:
+    case EnumType::kStudy:
+    case EnumType::kSunRoom:
+    case EnumType::kSwimmingPool:
+    case EnumType::kTerrace:
+    case EnumType::kUtilityRoom:
+    case EnumType::kWard:
+    case EnumType::kWorkshop:
+        return val;
+    default:
+        return EnumType::kUnknownEnumValue;
+    }
+}
 static auto __attribute__((unused)) EnsureKnownEnumValue(detail::ChangeIndicationEnum val)
 {
     using EnumType = detail::ChangeIndicationEnum;
@@ -158,6 +263,19 @@ static auto __attribute__((unused)) EnsureKnownEnumValue(detail::ProductIdentifi
     case EnumType::kEan:
     case EnumType::kGtin14:
     case EnumType::kOem:
+        return val;
+    default:
+        return EnumType::kUnknownEnumValue;
+    }
+}
+static auto __attribute__((unused)) EnsureKnownEnumValue(Globals::TestGlobalEnum val)
+{
+    using EnumType = Globals::TestGlobalEnum;
+    switch (val)
+    {
+    case EnumType::kSomeValue:
+    case EnumType::kSomeOtherValue:
+    case EnumType::kFinalValue:
         return val;
     default:
         return EnumType::kUnknownEnumValue;
@@ -306,6 +424,20 @@ static auto __attribute__((unused)) EnsureKnownEnumValue(AccessControl::AccessCo
     case EnumType::kOperate:
     case EnumType::kManage:
     case EnumType::kAdminister:
+        return val;
+    default:
+        return EnumType::kUnknownEnumValue;
+    }
+}
+static auto __attribute__((unused)) EnsureKnownEnumValue(AccessControl::AccessRestrictionTypeEnum val)
+{
+    using EnumType = AccessControl::AccessRestrictionTypeEnum;
+    switch (val)
+    {
+    case EnumType::kAttributeAccessForbidden:
+    case EnumType::kAttributeWriteForbidden:
+    case EnumType::kCommandForbidden:
+    case EnumType::kEventForbidden:
         return val;
     default:
         return EnumType::kUnknownEnumValue;
@@ -1572,6 +1704,19 @@ static auto __attribute__((unused)) EnsureKnownEnumValue(ElectricalPowerMeasurem
     }
 }
 
+static auto __attribute__((unused)) EnsureKnownEnumValue(WaterHeaterManagement::BoostStateEnum val)
+{
+    using EnumType = WaterHeaterManagement::BoostStateEnum;
+    switch (val)
+    {
+    case EnumType::kInactive:
+    case EnumType::kActive:
+        return val;
+    default:
+        return EnumType::kUnknownEnumValue;
+    }
+}
+
 static auto __attribute__((unused)) EnsureKnownEnumValue(DemandResponseLoadControl::CriticalityLevelEnum val)
 {
     using EnumType = DemandResponseLoadControl::CriticalityLevelEnum;
@@ -1860,6 +2005,7 @@ static auto __attribute__((unused)) EnsureKnownEnumValue(EnergyEvse::SupplyState
     case EnumType::kDischargingEnabled:
     case EnumType::kDisabledError:
     case EnumType::kDisabledDiagnostics:
+    case EnumType::kEnabled:
         return val;
     default:
         return EnumType::kUnknownEnumValue;
@@ -2280,111 +2426,6 @@ static auto __attribute__((unused)) EnsureKnownEnumValue(WindowCovering::Type va
     }
 }
 
-static auto __attribute__((unused)) EnsureKnownEnumValue(ServiceArea::AreaTypeTag val)
-{
-    using EnumType = ServiceArea::AreaTypeTag;
-    switch (val)
-    {
-    case EnumType::kAisle:
-    case EnumType::kAttic:
-    case EnumType::kBackDoor:
-    case EnumType::kBackYard:
-    case EnumType::kBalcony:
-    case EnumType::kBallroom:
-    case EnumType::kBathroom:
-    case EnumType::kBedroom:
-    case EnumType::kBorder:
-    case EnumType::kBoxroom:
-    case EnumType::kBreakfastRoom:
-    case EnumType::kCarport:
-    case EnumType::kCellar:
-    case EnumType::kCloakroom:
-    case EnumType::kCloset:
-    case EnumType::kConservatory:
-    case EnumType::kCorridor:
-    case EnumType::kCraftRoom:
-    case EnumType::kCupboard:
-    case EnumType::kDeck:
-    case EnumType::kDen:
-    case EnumType::kDining:
-    case EnumType::kDrawingRoom:
-    case EnumType::kDressingRoom:
-    case EnumType::kDriveway:
-    case EnumType::kElevator:
-    case EnumType::kEnsuite:
-    case EnumType::kEntrance:
-    case EnumType::kEntryway:
-    case EnumType::kFamilyRoom:
-    case EnumType::kFoyer:
-    case EnumType::kFrontDoor:
-    case EnumType::kFrontYard:
-    case EnumType::kGameRoom:
-    case EnumType::kGarage:
-    case EnumType::kGarageDoor:
-    case EnumType::kGarden:
-    case EnumType::kGardenDoor:
-    case EnumType::kGuestBathroom:
-    case EnumType::kGuestBedroom:
-    case EnumType::kGuestRestroom:
-    case EnumType::kGuestRoom:
-    case EnumType::kGym:
-    case EnumType::kHallway:
-    case EnumType::kHearthRoom:
-    case EnumType::kKidsRoom:
-    case EnumType::kKidsBedroom:
-    case EnumType::kKitchen:
-    case EnumType::kLarder:
-    case EnumType::kLaundryRoom:
-    case EnumType::kLawn:
-    case EnumType::kLibrary:
-    case EnumType::kLivingRoom:
-    case EnumType::kLounge:
-    case EnumType::kMediaTvRoom:
-    case EnumType::kMudRoom:
-    case EnumType::kMusicRoom:
-    case EnumType::kNursery:
-    case EnumType::kOffice:
-    case EnumType::kOutdoorKitchen:
-    case EnumType::kOutside:
-    case EnumType::kPantry:
-    case EnumType::kParkingLot:
-    case EnumType::kParlor:
-    case EnumType::kPatio:
-    case EnumType::kPlayRoom:
-    case EnumType::kPoolRoom:
-    case EnumType::kPorch:
-    case EnumType::kPrimaryBathroom:
-    case EnumType::kPrimaryBedroom:
-    case EnumType::kRamp:
-    case EnumType::kReceptionRoom:
-    case EnumType::kRecreationRoom:
-    case EnumType::kRestroom:
-    case EnumType::kRoof:
-    case EnumType::kSauna:
-    case EnumType::kScullery:
-    case EnumType::kSewingRoom:
-    case EnumType::kShed:
-    case EnumType::kSideDoor:
-    case EnumType::kSideYard:
-    case EnumType::kSittingRoom:
-    case EnumType::kSnug:
-    case EnumType::kSpa:
-    case EnumType::kStaircase:
-    case EnumType::kSteamRoom:
-    case EnumType::kStorageRoom:
-    case EnumType::kStudio:
-    case EnumType::kStudy:
-    case EnumType::kSunRoom:
-    case EnumType::kSwimmingPool:
-    case EnumType::kTerrace:
-    case EnumType::kUtilityRoom:
-    case EnumType::kWard:
-    case EnumType::kWorkshop:
-        return val;
-    default:
-        return EnumType::kUnknownEnumValue;
-    }
-}
 static auto __attribute__((unused)) EnsureKnownEnumValue(ServiceArea::FloorSurfaceTag val)
 {
     using EnumType = ServiceArea::FloorSurfaceTag;
@@ -2674,6 +2715,7 @@ static auto __attribute__((unused)) EnsureKnownEnumValue(Thermostat::PresetScena
     case EnumType::kSleep:
     case EnumType::kWake:
     case EnumType::kVacation:
+    case EnumType::kGoingToSleep:
     case EnumType::kUserDefined:
         return val;
     default:

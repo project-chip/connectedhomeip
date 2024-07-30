@@ -1,6 +1,23 @@
 // This IDL was generated automatically by ZAP.
 // It is for view/code review purposes only.
 
+enum TestGlobalEnum : enum8 {
+  kSomeValue = 0;
+  kSomeOtherValue = 1;
+  kFinalValue = 2;
+}
+
+bitmap TestGlobalBitmap : bitmap32 {
+  kFirstBit = 0x1;
+  kSecondBit = 0x2;
+}
+
+struct TestGlobalStruct {
+  char_string<128> name = 0;
+  nullable TestGlobalBitmap myBitmap = 1;
+  optional nullable TestGlobalEnum myEnum = 2;
+}
+
 /** Attributes and commands for putting a device into Identification mode (e.g. flashing a light). */
 cluster Identify = 3 {
   revision 4;
@@ -89,7 +106,7 @@ cluster Descriptor = 29 {
       and enforce Access Control for the Node's endpoints and their associated
       cluster instances. */
 cluster AccessControl = 31 {
-  revision 1; // NOTE: Default/not specifically set
+  revision 2;
 
   enum AccessControlEntryAuthModeEnum : enum8 {
     kPASE = 1;
@@ -105,10 +122,40 @@ cluster AccessControl = 31 {
     kAdminister = 5;
   }
 
+  enum AccessRestrictionTypeEnum : enum8 {
+    kAttributeAccessForbidden = 0;
+    kAttributeWriteForbidden = 1;
+    kCommandForbidden = 2;
+    kEventForbidden = 3;
+  }
+
   enum ChangeTypeEnum : enum8 {
     kChanged = 0;
     kAdded = 1;
     kRemoved = 2;
+  }
+
+  bitmap Feature : bitmap32 {
+    kExtension = 0x1;
+    kManagedDevice = 0x2;
+  }
+
+  struct AccessRestrictionStruct {
+    AccessRestrictionTypeEnum type = 0;
+    nullable int32u id = 1;
+  }
+
+  struct CommissioningAccessRestrictionEntryStruct {
+    endpoint_no endpoint = 0;
+    cluster_id cluster = 1;
+    AccessRestrictionStruct restrictions[] = 2;
+  }
+
+  fabric_scoped struct AccessRestrictionEntryStruct {
+    fabric_sensitive endpoint_no endpoint = 0;
+    fabric_sensitive cluster_id cluster = 1;
+    fabric_sensitive AccessRestrictionStruct restrictions[] = 2;
+    fabric_idx fabricIndex = 254;
   }
 
   struct AccessControlTargetStruct {
@@ -146,17 +193,41 @@ cluster AccessControl = 31 {
     fabric_idx fabricIndex = 254;
   }
 
+  fabric_sensitive info event access(read: administer) AccessRestrictionEntryChanged = 2 {
+    fabric_idx fabricIndex = 254;
+  }
+
+  fabric_sensitive info event access(read: administer) FabricRestrictionReviewUpdate = 3 {
+    int64u token = 0;
+    nullable long_char_string instruction = 1;
+    nullable long_char_string redirectURL = 2;
+    fabric_idx fabricIndex = 254;
+  }
+
   attribute access(read: administer, write: administer) AccessControlEntryStruct acl[] = 0;
   attribute access(read: administer, write: administer) optional AccessControlExtensionStruct extension[] = 1;
   readonly attribute int16u subjectsPerAccessControlEntry = 2;
   readonly attribute int16u targetsPerAccessControlEntry = 3;
   readonly attribute int16u accessControlEntriesPerFabric = 4;
+  readonly attribute optional CommissioningAccessRestrictionEntryStruct commissioningARL[] = 5;
+  readonly attribute optional AccessRestrictionEntryStruct arl[] = 6;
   readonly attribute command_id generatedCommandList[] = 65528;
   readonly attribute command_id acceptedCommandList[] = 65529;
   readonly attribute event_id eventList[] = 65530;
   readonly attribute attrib_id attributeList[] = 65531;
   readonly attribute bitmap32 featureMap = 65532;
   readonly attribute int16u clusterRevision = 65533;
+
+  request struct ReviewFabricRestrictionsRequest {
+    AccessRestrictionStruct arl[] = 0;
+  }
+
+  response struct ReviewFabricRestrictionsResponse = 1 {
+    int64u token = 0;
+  }
+
+  /** This command signals to the service associated with the device vendor that the fabric administrator would like a review of the current restrictions on the accessing fabric. */
+  fabric command access(invoke: administer) ReviewFabricRestrictions(ReviewFabricRestrictionsRequest): DefaultSuccess = 0;
 }
 
 /** The Access Control Cluster exposes a data model view of a
@@ -164,7 +235,7 @@ cluster AccessControl = 31 {
       and enforce Access Control for the Node's endpoints and their associated
       cluster instances. */
 cluster AccessControl = 31 {
-  revision 1; // NOTE: Default/not specifically set
+  revision 2;
 
   enum AccessControlEntryAuthModeEnum : enum8 {
     kPASE = 1;
@@ -180,10 +251,40 @@ cluster AccessControl = 31 {
     kAdminister = 5;
   }
 
+  enum AccessRestrictionTypeEnum : enum8 {
+    kAttributeAccessForbidden = 0;
+    kAttributeWriteForbidden = 1;
+    kCommandForbidden = 2;
+    kEventForbidden = 3;
+  }
+
   enum ChangeTypeEnum : enum8 {
     kChanged = 0;
     kAdded = 1;
     kRemoved = 2;
+  }
+
+  bitmap Feature : bitmap32 {
+    kExtension = 0x1;
+    kManagedDevice = 0x2;
+  }
+
+  struct AccessRestrictionStruct {
+    AccessRestrictionTypeEnum type = 0;
+    nullable int32u id = 1;
+  }
+
+  struct CommissioningAccessRestrictionEntryStruct {
+    endpoint_no endpoint = 0;
+    cluster_id cluster = 1;
+    AccessRestrictionStruct restrictions[] = 2;
+  }
+
+  fabric_scoped struct AccessRestrictionEntryStruct {
+    fabric_sensitive endpoint_no endpoint = 0;
+    fabric_sensitive cluster_id cluster = 1;
+    fabric_sensitive AccessRestrictionStruct restrictions[] = 2;
+    fabric_idx fabricIndex = 254;
   }
 
   struct AccessControlTargetStruct {
@@ -221,17 +322,41 @@ cluster AccessControl = 31 {
     fabric_idx fabricIndex = 254;
   }
 
+  fabric_sensitive info event access(read: administer) AccessRestrictionEntryChanged = 2 {
+    fabric_idx fabricIndex = 254;
+  }
+
+  fabric_sensitive info event access(read: administer) FabricRestrictionReviewUpdate = 3 {
+    int64u token = 0;
+    nullable long_char_string instruction = 1;
+    nullable long_char_string redirectURL = 2;
+    fabric_idx fabricIndex = 254;
+  }
+
   attribute access(read: administer, write: administer) AccessControlEntryStruct acl[] = 0;
   attribute access(read: administer, write: administer) optional AccessControlExtensionStruct extension[] = 1;
   readonly attribute int16u subjectsPerAccessControlEntry = 2;
   readonly attribute int16u targetsPerAccessControlEntry = 3;
   readonly attribute int16u accessControlEntriesPerFabric = 4;
+  readonly attribute optional CommissioningAccessRestrictionEntryStruct commissioningARL[] = 5;
+  readonly attribute optional AccessRestrictionEntryStruct arl[] = 6;
   readonly attribute command_id generatedCommandList[] = 65528;
   readonly attribute command_id acceptedCommandList[] = 65529;
   readonly attribute event_id eventList[] = 65530;
   readonly attribute attrib_id attributeList[] = 65531;
   readonly attribute bitmap32 featureMap = 65532;
   readonly attribute int16u clusterRevision = 65533;
+
+  request struct ReviewFabricRestrictionsRequest {
+    AccessRestrictionStruct arl[] = 0;
+  }
+
+  response struct ReviewFabricRestrictionsResponse = 1 {
+    int64u token = 0;
+  }
+
+  /** This command signals to the service associated with the device vendor that the fabric administrator would like a review of the current restrictions on the accessing fabric. */
+  fabric command access(invoke: administer) ReviewFabricRestrictions(ReviewFabricRestrictionsRequest): DefaultSuccess = 0;
 }
 
 /** This cluster provides attributes and events for determining basic information about Nodes, which supports both
@@ -316,7 +441,7 @@ cluster BasicInformation = 40 {
   readonly attribute optional char_string<32> serialNumber = 15;
   attribute access(write: manage) optional boolean localConfigDisabled = 16;
   readonly attribute optional boolean reachable = 17;
-  readonly attribute optional char_string<32> uniqueID = 18;
+  readonly attribute char_string<32> uniqueID = 18;
   readonly attribute CapabilityMinimaStruct capabilityMinima = 19;
   readonly attribute optional ProductAppearanceStruct productAppearance = 20;
   readonly attribute int32u specificationVersion = 21;
@@ -1334,6 +1459,57 @@ cluster GroupKeyManagement = 63 {
   fabric command access(invoke: administer) KeySetReadAllIndices(): KeySetReadAllIndicesResponse = 4;
 }
 
+/** Supports the ability for clients to request the commissioning of themselves or other nodes onto a fabric which the cluster server can commission onto. */
+provisional cluster CommissionerControl = 1873 {
+  revision 1;
+
+  bitmap SupportedDeviceCategoryBitmap : bitmap32 {
+    kFabricSynchronization = 0x1;
+  }
+
+  fabric_sensitive info event access(read: manage) CommissioningRequestResult = 0 {
+    int64u requestId = 0;
+    node_id clientNodeId = 1;
+    enum8 statusCode = 2;
+    fabric_idx fabricIndex = 254;
+  }
+
+  readonly attribute access(read: manage) SupportedDeviceCategoryBitmap supportedDeviceCategories = 0;
+  readonly attribute command_id generatedCommandList[] = 65528;
+  readonly attribute command_id acceptedCommandList[] = 65529;
+  readonly attribute event_id eventList[] = 65530;
+  readonly attribute attrib_id attributeList[] = 65531;
+  readonly attribute bitmap32 featureMap = 65532;
+  readonly attribute int16u clusterRevision = 65533;
+
+  request struct RequestCommissioningApprovalRequest {
+    int64u requestId = 0;
+    vendor_id vendorId = 1;
+    int16u productId = 2;
+    optional char_string<64> label = 3;
+  }
+
+  request struct CommissionNodeRequest {
+    int64u requestId = 0;
+    int16u responseTimeoutSeconds = 1;
+    optional octet_string ipAddress = 2;
+    optional int16u port = 3;
+  }
+
+  response struct ReverseOpenCommissioningWindow = 2 {
+    int16u commissioningTimeout = 0;
+    octet_string PAKEPasscodeVerifier = 1;
+    int16u discriminator = 2;
+    int32u iterations = 3;
+    octet_string<32> salt = 4;
+  }
+
+  /** This command is sent by a client to request approval for a future CommissionNode call. */
+  command access(invoke: manage) RequestCommissioningApproval(RequestCommissioningApprovalRequest): DefaultSuccess = 0;
+  /** This command is sent by a client to request that the server begins commissioning a previously approved request. */
+  command access(invoke: manage) CommissionNode(CommissionNodeRequest): ReverseOpenCommissioningWindow = 1;
+}
+
 endpoint 0 {
   device type ma_rootdevice = 22, version 1;
 
@@ -1646,6 +1822,21 @@ endpoint 0 {
     handle command KeySetRemove;
     handle command KeySetReadAllIndices;
     handle command KeySetReadAllIndicesResponse;
+  }
+
+  server cluster CommissionerControl {
+    emits event CommissioningRequestResult;
+    ram      attribute supportedDeviceCategories default = 0;
+    callback attribute generatedCommandList;
+    callback attribute acceptedCommandList;
+    callback attribute eventList;
+    callback attribute attributeList;
+    ram      attribute featureMap default = 0;
+    ram      attribute clusterRevision default = 1;
+
+    handle command RequestCommissioningApproval;
+    handle command CommissionNode;
+    handle command ReverseOpenCommissioningWindow;
   }
 }
 endpoint 1 {

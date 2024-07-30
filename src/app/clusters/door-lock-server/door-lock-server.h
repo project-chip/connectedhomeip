@@ -86,19 +86,8 @@ struct EmberAfDoorLockEndpointContext
 {
     chip::System::Clock::Timestamp lockoutEndTimestamp;
     int wrongCodeEntryAttempts;
+    chip::app::Clusters::DoorLock::Delegate * delegate = nullptr;
 };
-
-namespace chip {
-namespace app {
-namespace Clusters {
-namespace DoorLock {
-
-void SetDefaultDelegate(EndpointId endpoint, Delegate * delegate);
-
-} // namespace DoorLock
-} // namespace Clusters
-} // namespace app
-} // namespace chip
 
 /**
  * @brief Door Lock Server Plugin class.
@@ -112,7 +101,28 @@ public:
     using Feature                       = chip::app::Clusters::DoorLock::Feature;
     using OnFabricRemovedCustomCallback = void (*)(chip::EndpointId endpointId, chip::FabricIndex fabricIndex);
 
-    void InitServer(chip::EndpointId endpointId);
+    /**
+     * Multiple InitEndpoint calls can happen for different endpoints.  Calling
+     * InitEndpoint twice for the same endpoint requires a ShutdownEndpoint call
+     * for that endpoint in between.
+     *
+     * A DoorLock::Delegate is optional, but needs to be provided in either
+     * InitEndpoint or in a separate SetDelegate call for Aliro features, and
+     * possibly other new features, to work.
+     */
+    CHIP_ERROR InitEndpoint(chip::EndpointId endpointId, chip::app::Clusters::DoorLock::Delegate * delegate = nullptr);
+
+    void ShutdownEndpoint(chip::EndpointId endpointId);
+
+    // InitServer is a deprecated alias for InitEndpoint with no delegate.
+    void InitServer(chip::EndpointId endpointid);
+
+    /**
+     * Delegate is not supposed to be null. Removing a delegate
+     * should only happen when shutting down the door lock cluster on the
+     * endpoint, via ShutdownEndpoint.
+     */
+    CHIP_ERROR SetDelegate(chip::EndpointId endpointId, chip::app::Clusters::DoorLock::Delegate * delegate);
 
     /**
      * Updates the LockState attribute with new value and sends LockOperation event.
@@ -350,6 +360,12 @@ private:
                               const EmberAfPluginDoorLockCredentialInfo & existingCredential, const chip::ByteSpan & credentialData,
                               Nullable<uint16_t> userIndex, const Nullable<UserStatusEnum> & userStatus,
                               Nullable<UserTypeEnum> userType, uint16_t & createdUserIndex);
+    /**
+     * countOccupiedCredentials counts the number of occupied credentials of the
+     * given type.  Returns false on application-side errors (i.e. if the count
+     * cannot be determined).
+     */
+    bool countOccupiedCredentials(chip::EndpointId endpointId, CredentialTypeEnum credentialType, size_t & occupiedCount);
     DlStatus modifyProgrammingPIN(chip::EndpointId endpointId, chip::FabricIndex modifierFabricIndex, chip::NodeId sourceNodeId,
                                   uint16_t credentialIndex, CredentialTypeEnum credentialType,
                                   const EmberAfPluginDoorLockCredentialInfo & existingCredential,
@@ -489,6 +505,13 @@ private:
                                     chip::Protocols::InteractionModel::ClusterStatusCode status);
 
     /**
+     * Get the DoorLock::Delegate for the given endpoint, if any. Will return
+     * null if there is no door lock server initialized on that endpoint or if
+     * there is no delegate associated with the initialized server.
+     */
+    chip::app::Clusters::DoorLock::Delegate * GetDelegate(chip::EndpointId endpointId);
+
+    /**
      * @brief Common handler for LockDoor, UnlockDoor, UnlockWithTimeout commands
      *
      * @param commandObj    original command context
@@ -576,29 +599,25 @@ private:
     /**
      * @brief Reads AliroExpeditedTransactionSupportedProtocolVersions attribute for door lock
      *
-     * @param aPath         attribute path.
      * @param aEncoder      attribute value encoder.
      * @param delegate      door lock cluster delegate that will provide the value
      *
      * @return CHIP_NO_ERROR  on success
      * @return CHIP_ERROR     if attribute read failed
      */
-    CHIP_ERROR ReadAliroExpeditedTransactionSupportedProtocolVersions(const chip::app::ConcreteReadAttributePath & aPath,
-                                                                      chip::app::AttributeValueEncoder & aEncoder,
+    CHIP_ERROR ReadAliroExpeditedTransactionSupportedProtocolVersions(chip::app::AttributeValueEncoder & aEncoder,
                                                                       chip::app::Clusters::DoorLock::Delegate * delegate);
 
     /**
      * @brief Reads AliroSupportedBLEUWBProtocolVersions attribute for door lock
      *
-     * @param aPath         attribute path.
      * @param aEncoder      attribute value encoder.
      * @param delegate      door lock cluster delegate that will provide the value
      *
      * @return CHIP_NO_ERROR  on success
      * @return CHIP_ERROR     if attribute read failed
      */
-    CHIP_ERROR ReadAliroSupportedBLEUWBProtocolVersions(const chip::app::ConcreteReadAttributePath & aPath,
-                                                        chip::app::AttributeValueEncoder & aEncoder,
+    CHIP_ERROR ReadAliroSupportedBLEUWBProtocolVersions(chip::app::AttributeValueEncoder & aEncoder,
                                                         chip::app::Clusters::DoorLock::Delegate * delegate);
 
     /**

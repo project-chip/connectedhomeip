@@ -635,7 +635,7 @@ For example, the build command for the nRF52840 DK could look like this:
 ```
 $ west build -b nrf52840dk_nrf52840 -- \
 -DCONFIG_CHIP_FACTORY_DATA=y \
--DCONFIG_CHIP_FACTORY_DATA_BUILD=y \
+-DSB_CONFIG_MATTER_FACTORY_DATA_GENERATE=y \
 -DCONFIG_CHIP_FACTORY_DATA_GENERATE_ONBOARDING_CODES=y
 ```
 
@@ -760,13 +760,13 @@ $ python scripts/tools/nrfconnect/nrfconnect_generate_partition.py -h
 **Example of the command for the nRF52840 DK:**
 
 ```
-$ python scripts/tools/nrfconnect/nrfconnect_generate_partition.py -i build/zephyr/factory_data.json -o build/zephyr/factory_data --offset 0xfb000 --size 0x1000
+$ python scripts/tools/nrfconnect/nrfconnect_generate_partition.py -i build/light_bulb/zephyr/factory_data.json -o build/light_bulb/zephyr/factory_data --offset 0xfb000 --size 0x1000
 ```
 
 As a result, `factory_data.hex` and `factory_data.bin` files are created in the
-`/build/zephyr/` directory. The first file contains the memory offset. For this
-reason, it can be programmed directly to the device using a programmer (for
-example, `nrfjprog`).
+`/build/light_bulb/zephyr/` directory. The first file contains the memory
+offset. For this reason, it can be programmed directly to the device using a
+programmer (for example, `nrfjprog`).
 
 <hr>
 
@@ -783,11 +783,11 @@ directory and build the example with the following option (replace
 `nrf52840dk_nrf52840` with your board name):
 
 ```
-$ west build -b nrf52840dk_nrf52840 -- -DCONFIG_CHIP_FACTORY_DATA=y -DCONFIG_CHIP_FACTORY_DATA_BUILD=y
+$ west build -b nrf52840dk_nrf52840 -- -DCONFIG_CHIP_FACTORY_DATA=y -DSB_CONFIG_MATTER_FACTORY_DATA_GENERATE=y
 ```
 
-Alternatively, you can also add `CONFIG_CHIP_FACTORY_DATA_BUILD=y` Kconfig
-setting to the example's `prj.conf` file.
+Alternatively, you can also add `SB_CONFIG_MATTER_FACTORY_DATA_GENERATE=y`
+Kconfig setting to the example's `sysbuild.conf` file.
 
 Each factory data parameter has a default value. These are described in the
 [Kconfig file](../../config/nrfconnect/chip-module/Kconfig). Setting a new value
@@ -802,7 +802,7 @@ them as an additional option for the west command. For example (replace
 `nrf52840dk_nrf52840` with own board name):
 
 ```
-$ west build -b nrf52840dk_nrf52840 -- -DCONFIG_CHIP_FACTORY_DATA=y --DCONFIG_CHIP_FACTORY_DATA_BUILD=y --DCONFIG_CHIP_DEVICE_DISCRIMINATOR=0xF11
+$ west build -b nrf52840dk_nrf52840 -- -DCONFIG_CHIP_FACTORY_DATA=y --DSB_CONFIG_MATTER_FACTORY_DATA_GENERATE=y --DCONFIG_CHIP_DEVICE_DISCRIMINATOR=0xF11
 ```
 
 Alternatively, you can add the relevant Kconfig option lines to the example's
@@ -916,32 +916,32 @@ $ nrfjprog --family NRF52 --program factory_data.hex
 ```
 
 > Note: For more information about how to use the `nrfjprog` utility, visit
-> [Nordic Semiconductor's Infocenter](https://infocenter.nordicsemi.com/index.jsp?topic=%2Fug_nrf_cltools%2FUG%2Fcltools%2Fnrf_nrfjprogexe.html).
+> [Programming SoCs with nrfjprog](https://docs.nordicsemi.com/bundle/ug_nrf_cltools/page/UG/cltools/nrf_nrfjprogexe.html)
 
 Another way to program the factory data to a device is to use the nRF Connect
 platform build system described in
 [Building an example with factory data](#building-an-example-with-factory-data),
 and build an example with the additional option
-`-DCONFIG_CHIP_FACTORY_DATA_MERGE_WITH_FIRMWARE=y`:
+`-DSB_CONFIG_MATTER_FACTORY_DATA_MERGE_WITH_FIRMWARE=y`:
 
 ```
 $ west build -b nrf52840dk_nrf52840 -- \
 -DCONFIG_CHIP_FACTORY_DATA=y \
--DCONFIG_CHIP_FACTORY_DATA_BUILD=y \
--DCONFIG_CHIP_FACTORY_DATA_MERGE_WITH_FIRMWARE=y
+-DSB_CONFIG_MATTER_FACTORY_DATA_GENERATE=y \
+-DSB_CONFIG_MATTER_FACTORY_DATA_MERGE_WITH_FIRMWARE=y
 ```
 
 You can also build an example with auto-generation of new CD, DAC and PAI
 certificates. The newly generated certificates will be added to factory data set
 automatically. To generate new certificates disable using default certificates
 by building an example with the additional option
-`-DCHIP_FACTORY_DATA_USE_DEFAULT_CERTS=n`:
+`-DCONFIG_CHIP_FACTORY_DATA_USE_DEFAULT_CERTS=n`:
 
 ```
 $ west build -b nrf52840dk_nrf52840 -- \
 -DCONFIG_CHIP_FACTORY_DATA=y \
--DCONFIG_CHIP_FACTORY_DATA_BUILD=y \
--DCONFIG_CHIP_FACTORY_DATA_MERGE_WITH_FIRMWARE=y \
+-DSB_CONFIG_MATTER_FACTORY_DATA_GENERATE=y \
+-DSB_CONFIG_MATTER_FACTORY_DATA_MERGE_WITH_FIRMWARE=y \
 -DCONFIG_CHIP_FACTORY_DATA_USE_DEFAULT_CERTS=n
 ```
 

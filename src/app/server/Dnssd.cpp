@@ -188,7 +188,7 @@ void DnssdServer::GetPrimaryOrFallbackMACAddress(chip::MutableByteSpan mac)
 /// Set MDNS operational advertisement
 CHIP_ERROR DnssdServer::AdvertiseOperational()
 {
-    VerifyOrDie(mFabricTable != nullptr);
+    VerifyOrReturnError(mFabricTable != nullptr, CHIP_ERROR_INCORRECT_STATE);
 
     for (const FabricInfo & fabricInfo : *mFabricTable)
     {
@@ -213,6 +213,9 @@ CHIP_ERROR DnssdServer::AdvertiseOperational()
         AddICDKeyToAdvertisement(advertiseParameters);
 #endif
 
+#if INET_CONFIG_ENABLE_TCP_ENDPOINT
+        advertiseParameters.SetTCPSupportModes(chip::Dnssd::TCPModeAdvertise::kTCPClientServer);
+#endif
         auto & mdnsAdvertiser = chip::Dnssd::ServiceAdvertiser::Instance();
 
         ChipLogProgress(Discovery, "Advertise operational node " ChipLogFormatX64 "-" ChipLogFormatX64,

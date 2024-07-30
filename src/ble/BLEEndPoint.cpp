@@ -133,11 +133,8 @@ CHIP_ERROR BLEEndPoint::StartConnect()
     // Add reference to message fragment for duration of platform's GATT write attempt. CHIP retains partial
     // ownership of message fragment's packet buffer, since this is the same buffer as that of the whole message, just
     // with a fragmenter-modified payload offset and data length, by a Retain() on the handle when calling this function.
-    if (!SendWrite(buf.Retain()))
-    {
-        err = BLE_ERROR_GATT_WRITE_FAILED;
-        ExitNow();
-    }
+    err = SendWrite(buf.Retain());
+    SuccessOrExit(err);
 
     // Free request buffer on write confirmation. Stash a reference to it in mSendQueue, which we don't use anyway
     // until the connection has been set up.
@@ -213,13 +210,13 @@ void BLEEndPoint::HandleSubscribeReceived()
     // Add reference to message fragment for duration of platform's GATT indication attempt. CHIP retains partial
     // ownership of message fragment's packet buffer, since this is the same buffer as that of the whole message, just
     // with a fragmenter-modified payload offset and data length.
-    if (!SendIndication(mSendQueue.Retain()))
+    err = SendIndication(mSendQueue.Retain());
+    if (err != CHIP_NO_ERROR)
     {
         // Ensure transmit queue is empty and set to NULL.
         mSendQueue = nullptr;
 
         ChipLogError(Ble, "cap resp ind failed");
-        err = BLE_ERROR_GATT_INDICATE_FAILED;
         ExitNow();
     }
 
@@ -389,9 +386,10 @@ void BLEEndPoint::FinalizeClose(uint8_t oldState, uint8_t flags, CHIP_ERROR err)
             // Indicate close of chipConnection to peripheral via GATT unsubscribe. Keep end point allocated until
             // unsubscribe completes or times out, so platform doesn't close underlying BLE connection before
             // we're really sure the unsubscribe request has been sent.
-            if (!mBle->mPlatformDelegate->UnsubscribeCharacteristic(mConnObj, &CHIP_BLE_SVC_ID, &CHIP_BLE_CHAR_2_UUID))
+            err = mBle->mPlatformDelegate->UnsubscribeCharacteristic(mConnObj, &CHIP_BLE_SVC_ID, &CHIP_BLE_CHAR_2_UUID);
+            if (err != CHIP_NO_ERROR)
             {
-                ChipLogError(Ble, "BtpEngine unsub failed");
+                ChipLogError(Ble, "BtpEngine unsubscribe failed %" CHIP_ERROR_FORMAT, err.Format());
 
                 // If unsubscribe fails, release BLE connection and free end point immediately.
                 Free();
@@ -568,31 +566,20 @@ CHIP_ERROR BLEEndPoint::SendCharacteristic(PacketBufferHandle && buf)
 
     if (mRole == kBleRole_Central)
     {
-        if (!SendWrite(std::move(buf)))
-        {
-            err = BLE_ERROR_GATT_WRITE_FAILED;
-        }
-        else
-        {
-            // Write succeeded, so shrink remote receive window counter by 1.
-            mRemoteReceiveWindowSize = static_cast<SequenceNumber_t>(mRemoteReceiveWindowSize - 1);
-            ChipLogDebugBleEndPoint(Ble, "decremented remote rx window, new size = %u", mRemoteReceiveWindowSize);
-        }
+        SuccessOrExit(err = SendWrite(std::move(buf)));
+        // Write succeeded, so shrink remote receive window counter by 1.
+        mRemoteReceiveWindowSize = static_cast<SequenceNumber_t>(mRemoteReceiveWindowSize - 1);
+        ChipLogDebugBleEndPoint(Ble, "decremented remote rx window, new size = %u", mRemoteReceiveWindowSize);
     }
     else // (mRole == kBleRole_Peripheral), verified on Init
     {
-        if (!SendIndication(std::move(buf)))
-        {
-            err = BLE_ERROR_GATT_INDICATE_FAILED;
-        }
-        else
-        {
-            // Indication succeeded, so shrink remote receive window counter by 1.
-            mRemoteReceiveWindowSize = static_cast<SequenceNumber_t>(mRemoteReceiveWindowSize - 1);
-            ChipLogDebugBleEndPoint(Ble, "decremented remote rx window, new size = %u", mRemoteReceiveWindowSize);
-        }
+        SuccessOrExit(err = SendIndication(std::move(buf)));
+        // Indication succeeded, so shrink remote receive window counter by 1.
+        mRemoteReceiveWindowSize = static_cast<SequenceNumber_t>(mRemoteReceiveWindowSize - 1);
+        ChipLogDebugBleEndPoint(Ble, "decremented remote rx window, new size = %u", mRemoteReceiveWindowSize);
     }
 
+exit:
     return err;
 }
 
@@ -750,8 +737,8 @@ CHIP_ERROR BLEEndPoint::HandleHandshakeConfirmationReceived()
     {
         // Subscribe to characteristic which peripheral will use to send indications. Prompts peripheral to send
         // BLE transport capabilities indication.
-        VerifyOrExit(mBle->mPlatformDelegate->SubscribeCharacteristic(mConnObj, &CHIP_BLE_SVC_ID, &CHIP_BLE_CHAR_2_UUID),
-                     err = BLE_ERROR_GATT_SUBSCRIBE_FAILED);
+        err = mBle->mPlatformDelegate->SubscribeCharacteristic(mConnObj, &CHIP_BLE_SVC_ID, &CHIP_BLE_CHAR_2_UUID);
+        SuccessOrExit(err);
 
         // We just sent a GATT subscribe request, so make sure to attempt unsubscribe on close.
         mConnStateFlags.Set(ConnectionStateFlag::kDidBeginSubscribe);
@@ -1309,18 +1296,25 @@ exit:
     return err;
 }
 
-bool BLEEndPoint::SendWrite(PacketBufferHandle && buf)
+CHIP_ERROR BLEEndPoint::SendWrite(PacketBufferHandle && buf)
 {
     mConnStateFlags.Set(ConnectionStateFlag::kGattOperationInFlight);
 
-    return mBle->mPlatformDelegate->SendWriteRequest(mConnObj, &CHIP_BLE_SVC_ID, &CHIP_BLE_CHAR_1_UUID, std::move(buf));
+    auto err = mBle->mPlatformDelegate->SendWriteRequest(mConnObj, &CHIP_BLE_SVC_ID, &CHIP_BLE_CHAR_1_UUID, std::move(buf));
+    VerifyOrReturnError(err == CHIP_NO_ERROR, err,
+                        ChipLogError(Ble, "Send write request failed: %" CHIP_ERROR_FORMAT, err.Format()));
+
+    return err;
 }
 
-bool BLEEndPoint::SendIndication(PacketBufferHandle && buf)
+CHIP_ERROR BLEEndPoint::SendIndication(PacketBufferHandle && buf)
 {
     mConnStateFlags.Set(ConnectionStateFlag::kGattOperationInFlight);
 
-    return mBle->mPlatformDelegate->SendIndication(mConnObj, &CHIP_BLE_SVC_ID, &CHIP_BLE_CHAR_2_UUID, std::move(buf));
+    auto err = mBle->mPlatformDelegate->SendIndication(mConnObj, &CHIP_BLE_SVC_ID, &CHIP_BLE_CHAR_2_UUID, std::move(buf));
+    VerifyOrReturnError(err == CHIP_NO_ERROR, err, ChipLogError(Ble, "Send indication failed: %" CHIP_ERROR_FORMAT, err.Format()));
+
+    return err;
 }
 
 CHIP_ERROR BLEEndPoint::StartConnectTimer()

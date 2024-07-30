@@ -223,17 +223,17 @@ Davis, CA 95616, USA
     </attribute>
     <attribute id="0x0001" name="RebootCount" type="uint16">
       <access read="true" readPrivilege="view"/>
-      <quality changeOmitted="false" nullable="false" scene="false" persistence="nonVolatile" reportable="false"/>
+      <quality changeOmitted="false" nullable="false" scene="false" persistence="nonVolatile" reportable="false" sourceAttribution="false" quieterReporting="false"/>
       <mandatoryConform/>
     </attribute>
     <attribute id="0x0002" name="UpTime" type="uint64">
       <access read="true" readPrivilege="view"/>
-      <quality changeOmitted="true" nullable="false" scene="false" persistence="volatile" reportable="false"/>
+      <quality changeOmitted="true" nullable="false" scene="false" persistence="volatile" reportable="false" sourceAttribution="false" quieterReporting="false"/>
       <mandatoryConform/>
     </attribute>
     <attribute id="0x0003" name="TotalOperationalHours" type="uint32">
       <access read="true" readPrivilege="view"/>
-      <quality changeOmitted="true" nullable="false" scene="false" persistence="nonVolatile" reportable="false"/>
+      <quality changeOmitted="true" nullable="false" scene="false" persistence="nonVolatile" reportable="false" sourceAttribution="false" quieterReporting="false"/>
       <optionalConform/>
     </attribute>
     <attribute id="0x0004" name="BootReason" type="BootReasonEnum">
@@ -310,7 +310,6 @@ Davis, CA 95616, USA
       </field>
     </command>
     <command id="0x04" name="PayloadTestResponse" direction="responseFromServer">
-      <access invokePrivilege="manage"/>
       <mandatoryConform>
         <feature name="DMTEST"/>
       </mandatoryConform>

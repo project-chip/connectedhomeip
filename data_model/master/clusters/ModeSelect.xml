@@ -57,7 +57,7 @@ Davis, CA 95616, USA
 -->
 <cluster xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="types types.xsd cluster cluster.xsd" id="0x0050" name="Mode Select Cluster" revision="2">
   <revisionHistory>
-    <revision revision="1" summary="Initial version"/>
+    <revision revision="1" summary="Initial revision"/>
     <revision revision="2" summary="The MfgCode field was marked non-nullable. Updated the related text. Reorder sections."/>
   </revisionHistory>
   <clusterIds>
@@ -97,38 +97,38 @@ Davis, CA 95616, USA
   <attributes>
     <attribute id="0x0000" name="Description" type="string" default="MS">
       <access read="true" readPrivilege="view"/>
-      <quality changeOmitted="false" nullable="false" scene="false" persistence="fixed" reportable="false"/>
+      <quality changeOmitted="false" nullable="false" scene="false" persistence="fixed" reportable="false" sourceAttribution="false" quieterReporting="false"/>
       <mandatoryConform/>
       <constraint type="maxLength" value="64"/>
     </attribute>
     <attribute id="0x0001" name="StandardNamespace" type="enum16" default="null">
       <access read="true" readPrivilege="view"/>
-      <quality changeOmitted="false" nullable="true" scene="false" persistence="fixed" reportable="false"/>
+      <quality changeOmitted="false" nullable="true" scene="false" persistence="fixed" reportable="false" sourceAttribution="false" quieterReporting="false"/>
       <mandatoryConform/>
       <constraint type="desc"/>
     </attribute>
     <attribute id="0x0002" name="SupportedModes" type="list" default="MS">
       <entry type="ModeOptionStruct"/>
       <access read="true" readPrivilege="view"/>
-      <quality changeOmitted="false" nullable="false" scene="false" persistence="fixed" reportable="false"/>
+      <quality changeOmitted="false" nullable="false" scene="false" persistence="fixed" reportable="false" sourceAttribution="false" quieterReporting="false"/>
       <mandatoryConform/>
       <constraint type="maxCount" value="255"/>
     </attribute>
     <attribute id="0x0003" name="CurrentMode" type="uint8" default="MS">
       <access read="true" readPrivilege="view"/>
-      <quality changeOmitted="false" nullable="false" scene="true" persistence="nonVolatile" reportable="false"/>
+      <quality changeOmitted="false" nullable="false" scene="false" persistence="nonVolatile" reportable="false" sourceAttribution="false" quieterReporting="false"/>
       <mandatoryConform/>
       <constraint type="desc"/>
     </attribute>
     <attribute id="0x0004" name="StartUpMode" type="uint8" default="MS">
       <access read="true" write="true" readPrivilege="view" writePrivilege="operate"/>
-      <quality changeOmitted="false" nullable="true" scene="false" persistence="nonVolatile" reportable="false"/>
+      <quality changeOmitted="false" nullable="true" scene="false" persistence="nonVolatile" reportable="false" sourceAttribution="false" quieterReporting="false"/>
       <optionalConform/>
       <constraint type="desc"/>
     </attribute>
     <attribute id="0x0005" name="OnMode" type="uint8" default="null">
       <access read="true" write="true" readPrivilege="view" writePrivilege="operate"/>
-      <quality changeOmitted="false" nullable="true" scene="false" persistence="nonVolatile" reportable="false"/>
+      <quality changeOmitted="false" nullable="true" scene="false" persistence="nonVolatile" reportable="false" sourceAttribution="false" quieterReporting="false"/>
       <mandatoryConform>
         <feature name="DEPONOFF"/>
       </mandatoryConform>

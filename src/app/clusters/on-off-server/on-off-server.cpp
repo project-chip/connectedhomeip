@@ -89,6 +89,12 @@ void UpdateModeBaseCurrentModeToOnMode(EndpointId endpoint)
 
 #endif // MATTER_DM_PLUGIN_MODE_BASE
 
+template <typename EnumType>
+bool IsKnownEnumValue(EnumType value)
+{
+    return (EnsureKnownEnumValue(value) != EnumType::kUnknownEnumValue);
+}
+
 } // namespace
 
 #ifdef MATTER_DM_PLUGIN_LEVEL_CONTROL
@@ -150,7 +156,7 @@ public:
     /// @return CHIP_NO_ERROR if successfully serialized the data, CHIP_ERROR_INVALID_ARGUMENT otherwise
     CHIP_ERROR SerializeSave(EndpointId endpoint, ClusterId cluster, MutableByteSpan & serializedBytes) override
     {
-        using AttributeValuePair = ScenesManagement::Structs::AttributeValuePair::Type;
+        using AttributeValuePair = ScenesManagement::Structs::AttributeValuePairStruct::Type;
 
         bool currentValue;
         // read current on/off value
@@ -163,8 +169,8 @@ public:
 
         AttributeValuePair pairs[scenableAttributeCount];
 
-        pairs[0].attributeID    = Attributes::OnOff::Id;
-        pairs[0].attributeValue = currentValue;
+        pairs[0].attributeID = Attributes::OnOff::Id;
+        pairs[0].valueUnsigned8.SetValue(currentValue);
 
         app::DataModel::List<AttributeValuePair> attributeValueList(pairs);
 
@@ -180,7 +186,7 @@ public:
     CHIP_ERROR ApplyScene(EndpointId endpoint, ClusterId cluster, const ByteSpan & serializedBytes,
                           scenes::TransitionTimeMs timeMs) override
     {
-        app::DataModel::DecodableList<ScenesManagement::Structs::AttributeValuePair::DecodableType> attributeValueList;
+        app::DataModel::DecodableList<ScenesManagement::Structs::AttributeValuePairStruct::DecodableType> attributeValueList;
 
         VerifyOrReturnError(cluster == OnOff::Id, CHIP_ERROR_INVALID_ARGUMENT);
 
@@ -195,8 +201,9 @@ public:
         {
             auto & decodePair = pair_iterator.GetValue();
             VerifyOrReturnError(decodePair.attributeID == Attributes::OnOff::Id, CHIP_ERROR_INVALID_ARGUMENT);
-            ReturnErrorOnFailure(
-                mSceneEndpointStatePairs.InsertPair(OnOffEndPointPair(endpoint, static_cast<bool>(decodePair.attributeValue))));
+            VerifyOrReturnError(decodePair.valueUnsigned8.HasValue(), CHIP_ERROR_INVALID_ARGUMENT);
+            ReturnErrorOnFailure(mSceneEndpointStatePairs.InsertPair(
+                OnOffEndPointPair(endpoint, static_cast<bool>(decodePair.valueUnsigned8.Value()))));
         }
         // Verify that the EFS was completely read
         CHIP_ERROR err = pair_iterator.GetStatus();
@@ -206,19 +213,8 @@ public:
             return err;
         }
 
-        // This handler assumes it is being used with the default handler for the level control. Therefore if the level control
-        // cluster with on off feature is present on the endpoint and the level control handler is registered, it assumes this
-        // handler will take action on the on-off state. This assumes the level control attributes were also saved in the scene.
-        // This is to prevent a behavior where the on off state is set by this handler, and then the level control handler or vice
-        // versa.
-#ifdef MATTER_DM_PLUGIN_LEVEL_CONTROL
-        if (!(LevelControlWithOnOffFeaturePresent(endpoint) &&
-              ScenesManagement::ScenesServer::Instance().IsHandlerRegistered(endpoint, LevelControlServer::GetSceneHandler())))
-#endif
-        {
-            VerifyOrReturnError(mTransitionTimeInterface.sceneEventControl(endpoint) != nullptr, CHIP_ERROR_INVALID_ARGUMENT);
-            OnOffServer::Instance().scheduleTimerCallbackMs(mTransitionTimeInterface.sceneEventControl(endpoint), timeMs);
-        }
+        VerifyOrReturnError(mTransitionTimeInterface.sceneEventControl(endpoint) != nullptr, CHIP_ERROR_INVALID_ARGUMENT);
+        OnOffServer::Instance().scheduleTimerCallbackMs(mTransitionTimeInterface.sceneEventControl(endpoint), timeMs);
 
         return CHIP_NO_ERROR;
     }
@@ -607,6 +603,35 @@ bool OnOffServer::offWithEffectCommand(app::CommandHandler * commandObj, const a
     auto effectVariant        = commandData.effectVariant;
     chip::EndpointId endpoint = commandPath.mEndpointId;
     Status status             = Status::Success;
+
+    if (effectId != EffectIdentifierEnum::kUnknownEnumValue)
+    {
+        // Depending on effectId value, effectVariant enum type varies.
+        // The following check validates that effectVariant value is valid in relation to the applicable enum type.
+        // DelayedAllOffEffectVariantEnum or DyingLightEffectVariantEnum
+        if (effectId == EffectIdentifierEnum::kDelayedAllOff &&
+            !IsKnownEnumValue(static_cast<DelayedAllOffEffectVariantEnum>(effectVariant)))
+        {
+            // The server does not support the given variant, it SHALL use the default variant.
+            effectVariant = to_underlying(DelayedAllOffEffectVariantEnum::kDelayedOffFastFade);
+        }
+        else if (effectId == EffectIdentifierEnum::kDyingLight &&
+                 !IsKnownEnumValue(static_cast<DyingLightEffectVariantEnum>(effectVariant)))
+        {
+            // The server does not support the given variant, it SHALL use the default variant.
+            effectVariant = to_underlying(DyingLightEffectVariantEnum::kDyingLightFadeOff);
+        }
+    }
+    else
+    {
+        status = Status::ConstraintError;
+    }
+
+    if (status != Status::Success)
+    {
+        commandObj->AddStatus(commandPath, status);
+        return true;
+    }
 
     if (SupportsLightingApplications(endpoint))
     {

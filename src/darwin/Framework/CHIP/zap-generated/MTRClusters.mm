@@ -1617,6 +1617,33 @@ using chip::System::Clock::Timeout;
 
 @implementation MTRClusterAccessControl
 
+- (void)reviewFabricRestrictionsWithParams:(MTRAccessControlClusterReviewFabricRestrictionsParams *)params expectedValues:(NSArray<NSDictionary<NSString *, id> *> * _Nullable)expectedValues expectedValueInterval:(NSNumber * _Nullable)expectedValueIntervalMs completion:(MTRStatusCompletion)completion
+{
+    if (params == nil) {
+        params = [[MTRAccessControlClusterReviewFabricRestrictionsParams
+            alloc] init];
+    }
+
+    auto responseHandler = ^(id _Nullable response, NSError * _Nullable error) {
+        completion(error);
+    };
+
+    auto * timedInvokeTimeoutMs = params.timedInvokeTimeoutMs;
+
+    using RequestType = AccessControl::Commands::ReviewFabricRestrictions::Type;
+    [self.device _invokeKnownCommandWithEndpointID:self.endpointID
+                                         clusterID:@(RequestType::GetClusterId())
+                                         commandID:@(RequestType::GetCommandId())
+                                    commandPayload:params
+                                    expectedValues:expectedValues
+                             expectedValueInterval:expectedValueIntervalMs
+                                timedInvokeTimeout:timedInvokeTimeoutMs
+                       serverSideProcessingTimeout:params.serverSideProcessingTimeout
+                                     responseClass:nil
+                                             queue:self.callbackQueue
+                                        completion:responseHandler];
+}
+
 - (NSDictionary<NSString *, id> * _Nullable)readAttributeACLWithParams:(MTRReadParams * _Nullable)params
 {
     return [self.device readAttributeWithEndpointID:self.endpointID clusterID:@(MTRClusterIDTypeAccessControlID) attributeID:@(MTRAttributeIDTypeClusterAccessControlAttributeACLID) params:params];
@@ -1662,6 +1689,16 @@ using chip::System::Clock::Timeout;
 - (NSDictionary<NSString *, id> * _Nullable)readAttributeAccessControlEntriesPerFabricWithParams:(MTRReadParams * _Nullable)params
 {
     return [self.device readAttributeWithEndpointID:self.endpointID clusterID:@(MTRClusterIDTypeAccessControlID) attributeID:@(MTRAttributeIDTypeClusterAccessControlAttributeAccessControlEntriesPerFabricID) params:params];
+}
+
+- (NSDictionary<NSString *, id> * _Nullable)readAttributeCommissioningARLWithParams:(MTRReadParams * _Nullable)params
+{
+    return [self.device readAttributeWithEndpointID:self.endpointID clusterID:@(MTRClusterIDTypeAccessControlID) attributeID:@(MTRAttributeIDTypeClusterAccessControlAttributeCommissioningARLID) params:params];
+}
+
+- (NSDictionary<NSString *, id> * _Nullable)readAttributeARLWithParams:(MTRReadParams * _Nullable)params
+{
+    return [self.device readAttributeWithEndpointID:self.endpointID clusterID:@(MTRClusterIDTypeAccessControlID) attributeID:@(MTRAttributeIDTypeClusterAccessControlAttributeARLID) params:params];
 }
 
 - (NSDictionary<NSString *, id> * _Nullable)readAttributeGeneratedCommandListWithParams:(MTRReadParams * _Nullable)params
@@ -4944,6 +4981,33 @@ using chip::System::Clock::Timeout;
 
 @implementation MTRClusterBridgedDeviceBasicInformation
 
+- (void)keepActiveWithParams:(MTRBridgedDeviceBasicInformationClusterKeepActiveParams *)params expectedValues:(NSArray<NSDictionary<NSString *, id> *> * _Nullable)expectedValues expectedValueInterval:(NSNumber * _Nullable)expectedValueIntervalMs completion:(MTRStatusCompletion)completion
+{
+    if (params == nil) {
+        params = [[MTRBridgedDeviceBasicInformationClusterKeepActiveParams
+            alloc] init];
+    }
+
+    auto responseHandler = ^(id _Nullable response, NSError * _Nullable error) {
+        completion(error);
+    };
+
+    auto * timedInvokeTimeoutMs = params.timedInvokeTimeoutMs;
+
+    using RequestType = BridgedDeviceBasicInformation::Commands::KeepActive::Type;
+    [self.device _invokeKnownCommandWithEndpointID:self.endpointID
+                                         clusterID:@(RequestType::GetClusterId())
+                                         commandID:@(RequestType::GetCommandId())
+                                    commandPayload:params
+                                    expectedValues:expectedValues
+                             expectedValueInterval:expectedValueIntervalMs
+                                timedInvokeTimeout:timedInvokeTimeoutMs
+                       serverSideProcessingTimeout:params.serverSideProcessingTimeout
+                                     responseClass:nil
+                                             queue:self.callbackQueue
+                                        completion:responseHandler];
+}
+
 - (NSDictionary<NSString *, id> * _Nullable)readAttributeVendorNameWithParams:(MTRReadParams * _Nullable)params
 {
     return [self.device readAttributeWithEndpointID:self.endpointID clusterID:@(MTRClusterIDTypeBridgedDeviceBasicInformationID) attributeID:@(MTRAttributeIDTypeClusterBridgedDeviceBasicInformationAttributeVendorNameID) params:params];
@@ -6150,6 +6214,11 @@ using chip::System::Clock::Timeout;
 - (NSDictionary<NSString *, id> * _Nullable)readAttributeOperatingModeWithParams:(MTRReadParams * _Nullable)params
 {
     return [self.device readAttributeWithEndpointID:self.endpointID clusterID:@(MTRClusterIDTypeICDManagementID) attributeID:@(MTRAttributeIDTypeClusterICDManagementAttributeOperatingModeID) params:params];
+}
+
+- (NSDictionary<NSString *, id> * _Nullable)readAttributeMaximumCheckInBackOffWithParams:(MTRReadParams * _Nullable)params
+{
+    return [self.device readAttributeWithEndpointID:self.endpointID clusterID:@(MTRClusterIDTypeICDManagementID) attributeID:@(MTRAttributeIDTypeClusterICDManagementAttributeMaximumCheckInBackOffID) params:params];
 }
 
 - (NSDictionary<NSString *, id> * _Nullable)readAttributeGeneratedCommandListWithParams:(MTRReadParams * _Nullable)params
@@ -9285,6 +9354,128 @@ using chip::System::Clock::Timeout;
 
 @end
 
+@implementation MTRClusterWaterHeaterManagement
+
+- (void)boostWithParams:(MTRWaterHeaterManagementClusterBoostParams *)params expectedValues:(NSArray<NSDictionary<NSString *, id> *> * _Nullable)expectedValues expectedValueInterval:(NSNumber * _Nullable)expectedValueIntervalMs completion:(MTRStatusCompletion)completion
+{
+    if (params == nil) {
+        params = [[MTRWaterHeaterManagementClusterBoostParams
+            alloc] init];
+    }
+
+    auto responseHandler = ^(id _Nullable response, NSError * _Nullable error) {
+        completion(error);
+    };
+
+    auto * timedInvokeTimeoutMs = params.timedInvokeTimeoutMs;
+
+    using RequestType = WaterHeaterManagement::Commands::Boost::Type;
+    [self.device _invokeKnownCommandWithEndpointID:self.endpointID
+                                         clusterID:@(RequestType::GetClusterId())
+                                         commandID:@(RequestType::GetCommandId())
+                                    commandPayload:params
+                                    expectedValues:expectedValues
+                             expectedValueInterval:expectedValueIntervalMs
+                                timedInvokeTimeout:timedInvokeTimeoutMs
+                       serverSideProcessingTimeout:params.serverSideProcessingTimeout
+                                     responseClass:nil
+                                             queue:self.callbackQueue
+                                        completion:responseHandler];
+}
+
+- (void)cancelBoostWithExpectedValues:(NSArray<NSDictionary<NSString *, id> *> *)expectedValues expectedValueInterval:(NSNumber *)expectedValueIntervalMs completion:(MTRStatusCompletion)completion
+{
+    [self cancelBoostWithParams:nil expectedValues:expectedValues expectedValueInterval:expectedValueIntervalMs completion:completion];
+}
+- (void)cancelBoostWithParams:(MTRWaterHeaterManagementClusterCancelBoostParams * _Nullable)params expectedValues:(NSArray<NSDictionary<NSString *, id> *> * _Nullable)expectedValues expectedValueInterval:(NSNumber * _Nullable)expectedValueIntervalMs completion:(MTRStatusCompletion)completion
+{
+    if (params == nil) {
+        params = [[MTRWaterHeaterManagementClusterCancelBoostParams
+            alloc] init];
+    }
+
+    auto responseHandler = ^(id _Nullable response, NSError * _Nullable error) {
+        completion(error);
+    };
+
+    auto * timedInvokeTimeoutMs = params.timedInvokeTimeoutMs;
+
+    using RequestType = WaterHeaterManagement::Commands::CancelBoost::Type;
+    [self.device _invokeKnownCommandWithEndpointID:self.endpointID
+                                         clusterID:@(RequestType::GetClusterId())
+                                         commandID:@(RequestType::GetCommandId())
+                                    commandPayload:params
+                                    expectedValues:expectedValues
+                             expectedValueInterval:expectedValueIntervalMs
+                                timedInvokeTimeout:timedInvokeTimeoutMs
+                       serverSideProcessingTimeout:params.serverSideProcessingTimeout
+                                     responseClass:nil
+                                             queue:self.callbackQueue
+                                        completion:responseHandler];
+}
+
+- (NSDictionary<NSString *, id> * _Nullable)readAttributeHeaterTypesWithParams:(MTRReadParams * _Nullable)params
+{
+    return [self.device readAttributeWithEndpointID:self.endpointID clusterID:@(MTRClusterIDTypeWaterHeaterManagementID) attributeID:@(MTRAttributeIDTypeClusterWaterHeaterManagementAttributeHeaterTypesID) params:params];
+}
+
+- (NSDictionary<NSString *, id> * _Nullable)readAttributeHeatDemandWithParams:(MTRReadParams * _Nullable)params
+{
+    return [self.device readAttributeWithEndpointID:self.endpointID clusterID:@(MTRClusterIDTypeWaterHeaterManagementID) attributeID:@(MTRAttributeIDTypeClusterWaterHeaterManagementAttributeHeatDemandID) params:params];
+}
+
+- (NSDictionary<NSString *, id> * _Nullable)readAttributeTankVolumeWithParams:(MTRReadParams * _Nullable)params
+{
+    return [self.device readAttributeWithEndpointID:self.endpointID clusterID:@(MTRClusterIDTypeWaterHeaterManagementID) attributeID:@(MTRAttributeIDTypeClusterWaterHeaterManagementAttributeTankVolumeID) params:params];
+}
+
+- (NSDictionary<NSString *, id> * _Nullable)readAttributeEstimatedHeatRequiredWithParams:(MTRReadParams * _Nullable)params
+{
+    return [self.device readAttributeWithEndpointID:self.endpointID clusterID:@(MTRClusterIDTypeWaterHeaterManagementID) attributeID:@(MTRAttributeIDTypeClusterWaterHeaterManagementAttributeEstimatedHeatRequiredID) params:params];
+}
+
+- (NSDictionary<NSString *, id> * _Nullable)readAttributeTankPercentageWithParams:(MTRReadParams * _Nullable)params
+{
+    return [self.device readAttributeWithEndpointID:self.endpointID clusterID:@(MTRClusterIDTypeWaterHeaterManagementID) attributeID:@(MTRAttributeIDTypeClusterWaterHeaterManagementAttributeTankPercentageID) params:params];
+}
+
+- (NSDictionary<NSString *, id> * _Nullable)readAttributeBoostStateWithParams:(MTRReadParams * _Nullable)params
+{
+    return [self.device readAttributeWithEndpointID:self.endpointID clusterID:@(MTRClusterIDTypeWaterHeaterManagementID) attributeID:@(MTRAttributeIDTypeClusterWaterHeaterManagementAttributeBoostStateID) params:params];
+}
+
+- (NSDictionary<NSString *, id> * _Nullable)readAttributeGeneratedCommandListWithParams:(MTRReadParams * _Nullable)params
+{
+    return [self.device readAttributeWithEndpointID:self.endpointID clusterID:@(MTRClusterIDTypeWaterHeaterManagementID) attributeID:@(MTRAttributeIDTypeClusterWaterHeaterManagementAttributeGeneratedCommandListID) params:params];
+}
+
+- (NSDictionary<NSString *, id> * _Nullable)readAttributeAcceptedCommandListWithParams:(MTRReadParams * _Nullable)params
+{
+    return [self.device readAttributeWithEndpointID:self.endpointID clusterID:@(MTRClusterIDTypeWaterHeaterManagementID) attributeID:@(MTRAttributeIDTypeClusterWaterHeaterManagementAttributeAcceptedCommandListID) params:params];
+}
+
+- (NSDictionary<NSString *, id> * _Nullable)readAttributeEventListWithParams:(MTRReadParams * _Nullable)params
+{
+    return [self.device readAttributeWithEndpointID:self.endpointID clusterID:@(MTRClusterIDTypeWaterHeaterManagementID) attributeID:@(MTRAttributeIDTypeClusterWaterHeaterManagementAttributeEventListID) params:params];
+}
+
+- (NSDictionary<NSString *, id> * _Nullable)readAttributeAttributeListWithParams:(MTRReadParams * _Nullable)params
+{
+    return [self.device readAttributeWithEndpointID:self.endpointID clusterID:@(MTRClusterIDTypeWaterHeaterManagementID) attributeID:@(MTRAttributeIDTypeClusterWaterHeaterManagementAttributeAttributeListID) params:params];
+}
+
+- (NSDictionary<NSString *, id> * _Nullable)readAttributeFeatureMapWithParams:(MTRReadParams * _Nullable)params
+{
+    return [self.device readAttributeWithEndpointID:self.endpointID clusterID:@(MTRClusterIDTypeWaterHeaterManagementID) attributeID:@(MTRAttributeIDTypeClusterWaterHeaterManagementAttributeFeatureMapID) params:params];
+}
+
+- (NSDictionary<NSString *, id> * _Nullable)readAttributeClusterRevisionWithParams:(MTRReadParams * _Nullable)params
+{
+    return [self.device readAttributeWithEndpointID:self.endpointID clusterID:@(MTRClusterIDTypeWaterHeaterManagementID) attributeID:@(MTRAttributeIDTypeClusterWaterHeaterManagementAttributeClusterRevisionID) params:params];
+}
+
+@end
+
 @implementation MTRClusterDemandResponseLoadControl
 
 - (void)registerLoadControlProgramRequestWithParams:(MTRDemandResponseLoadControlClusterRegisterLoadControlProgramRequestParams *)params expectedValues:(NSArray<NSDictionary<NSString *, id> *> * _Nullable)expectedValues expectedValueInterval:(NSNumber * _Nullable)expectedValueIntervalMs completion:(MTRStatusCompletion)completion
@@ -10552,6 +10743,109 @@ using chip::System::Clock::Timeout;
 - (NSDictionary<NSString *, id> * _Nullable)readAttributeClusterRevisionWithParams:(MTRReadParams * _Nullable)params
 {
     return [self.device readAttributeWithEndpointID:self.endpointID clusterID:@(MTRClusterIDTypeEnergyEVSEModeID) attributeID:@(MTRAttributeIDTypeClusterEnergyEVSEModeAttributeClusterRevisionID) params:params];
+}
+
+@end
+
+@implementation MTRClusterWaterHeaterMode
+
+- (void)changeToModeWithParams:(MTRWaterHeaterModeClusterChangeToModeParams *)params expectedValues:(NSArray<NSDictionary<NSString *, id> *> * _Nullable)expectedValues expectedValueInterval:(NSNumber * _Nullable)expectedValueIntervalMs completion:(void (^)(MTRWaterHeaterModeClusterChangeToModeResponseParams * _Nullable data, NSError * _Nullable error))completion
+{
+    if (params == nil) {
+        params = [[MTRWaterHeaterModeClusterChangeToModeParams
+            alloc] init];
+    }
+
+    auto responseHandler = ^(id _Nullable response, NSError * _Nullable error) {
+        completion(response, error);
+    };
+
+    auto * timedInvokeTimeoutMs = params.timedInvokeTimeoutMs;
+
+    using RequestType = WaterHeaterMode::Commands::ChangeToMode::Type;
+    [self.device _invokeKnownCommandWithEndpointID:self.endpointID
+                                         clusterID:@(RequestType::GetClusterId())
+                                         commandID:@(RequestType::GetCommandId())
+                                    commandPayload:params
+                                    expectedValues:expectedValues
+                             expectedValueInterval:expectedValueIntervalMs
+                                timedInvokeTimeout:timedInvokeTimeoutMs
+                       serverSideProcessingTimeout:params.serverSideProcessingTimeout
+                                     responseClass:MTRWaterHeaterModeClusterChangeToModeResponseParams.class
+                                             queue:self.callbackQueue
+                                        completion:responseHandler];
+}
+
+- (NSDictionary<NSString *, id> * _Nullable)readAttributeSupportedModesWithParams:(MTRReadParams * _Nullable)params
+{
+    return [self.device readAttributeWithEndpointID:self.endpointID clusterID:@(MTRClusterIDTypeWaterHeaterModeID) attributeID:@(MTRAttributeIDTypeClusterWaterHeaterModeAttributeSupportedModesID) params:params];
+}
+
+- (NSDictionary<NSString *, id> * _Nullable)readAttributeCurrentModeWithParams:(MTRReadParams * _Nullable)params
+{
+    return [self.device readAttributeWithEndpointID:self.endpointID clusterID:@(MTRClusterIDTypeWaterHeaterModeID) attributeID:@(MTRAttributeIDTypeClusterWaterHeaterModeAttributeCurrentModeID) params:params];
+}
+
+- (NSDictionary<NSString *, id> * _Nullable)readAttributeStartUpModeWithParams:(MTRReadParams * _Nullable)params
+{
+    return [self.device readAttributeWithEndpointID:self.endpointID clusterID:@(MTRClusterIDTypeWaterHeaterModeID) attributeID:@(MTRAttributeIDTypeClusterWaterHeaterModeAttributeStartUpModeID) params:params];
+}
+
+- (void)writeAttributeStartUpModeWithValue:(NSDictionary<NSString *, id> *)dataValueDictionary expectedValueInterval:(NSNumber *)expectedValueIntervalMs
+{
+    [self writeAttributeStartUpModeWithValue:dataValueDictionary expectedValueInterval:expectedValueIntervalMs params:nil];
+}
+- (void)writeAttributeStartUpModeWithValue:(NSDictionary<NSString *, id> *)dataValueDictionary expectedValueInterval:(NSNumber *)expectedValueIntervalMs params:(MTRWriteParams * _Nullable)params
+{
+    NSNumber * timedWriteTimeout = params.timedWriteTimeout;
+
+    [self.device writeAttributeWithEndpointID:self.endpointID clusterID:@(MTRClusterIDTypeWaterHeaterModeID) attributeID:@(MTRAttributeIDTypeClusterWaterHeaterModeAttributeStartUpModeID) value:dataValueDictionary expectedValueInterval:expectedValueIntervalMs timedWriteTimeout:timedWriteTimeout];
+}
+
+- (NSDictionary<NSString *, id> * _Nullable)readAttributeOnModeWithParams:(MTRReadParams * _Nullable)params
+{
+    return [self.device readAttributeWithEndpointID:self.endpointID clusterID:@(MTRClusterIDTypeWaterHeaterModeID) attributeID:@(MTRAttributeIDTypeClusterWaterHeaterModeAttributeOnModeID) params:params];
+}
+
+- (void)writeAttributeOnModeWithValue:(NSDictionary<NSString *, id> *)dataValueDictionary expectedValueInterval:(NSNumber *)expectedValueIntervalMs
+{
+    [self writeAttributeOnModeWithValue:dataValueDictionary expectedValueInterval:expectedValueIntervalMs params:nil];
+}
+- (void)writeAttributeOnModeWithValue:(NSDictionary<NSString *, id> *)dataValueDictionary expectedValueInterval:(NSNumber *)expectedValueIntervalMs params:(MTRWriteParams * _Nullable)params
+{
+    NSNumber * timedWriteTimeout = params.timedWriteTimeout;
+
+    [self.device writeAttributeWithEndpointID:self.endpointID clusterID:@(MTRClusterIDTypeWaterHeaterModeID) attributeID:@(MTRAttributeIDTypeClusterWaterHeaterModeAttributeOnModeID) value:dataValueDictionary expectedValueInterval:expectedValueIntervalMs timedWriteTimeout:timedWriteTimeout];
+}
+
+- (NSDictionary<NSString *, id> * _Nullable)readAttributeGeneratedCommandListWithParams:(MTRReadParams * _Nullable)params
+{
+    return [self.device readAttributeWithEndpointID:self.endpointID clusterID:@(MTRClusterIDTypeWaterHeaterModeID) attributeID:@(MTRAttributeIDTypeClusterWaterHeaterModeAttributeGeneratedCommandListID) params:params];
+}
+
+- (NSDictionary<NSString *, id> * _Nullable)readAttributeAcceptedCommandListWithParams:(MTRReadParams * _Nullable)params
+{
+    return [self.device readAttributeWithEndpointID:self.endpointID clusterID:@(MTRClusterIDTypeWaterHeaterModeID) attributeID:@(MTRAttributeIDTypeClusterWaterHeaterModeAttributeAcceptedCommandListID) params:params];
+}
+
+- (NSDictionary<NSString *, id> * _Nullable)readAttributeEventListWithParams:(MTRReadParams * _Nullable)params
+{
+    return [self.device readAttributeWithEndpointID:self.endpointID clusterID:@(MTRClusterIDTypeWaterHeaterModeID) attributeID:@(MTRAttributeIDTypeClusterWaterHeaterModeAttributeEventListID) params:params];
+}
+
+- (NSDictionary<NSString *, id> * _Nullable)readAttributeAttributeListWithParams:(MTRReadParams * _Nullable)params
+{
+    return [self.device readAttributeWithEndpointID:self.endpointID clusterID:@(MTRClusterIDTypeWaterHeaterModeID) attributeID:@(MTRAttributeIDTypeClusterWaterHeaterModeAttributeAttributeListID) params:params];
+}
+
+- (NSDictionary<NSString *, id> * _Nullable)readAttributeFeatureMapWithParams:(MTRReadParams * _Nullable)params
+{
+    return [self.device readAttributeWithEndpointID:self.endpointID clusterID:@(MTRClusterIDTypeWaterHeaterModeID) attributeID:@(MTRAttributeIDTypeClusterWaterHeaterModeAttributeFeatureMapID) params:params];
+}
+
+- (NSDictionary<NSString *, id> * _Nullable)readAttributeClusterRevisionWithParams:(MTRReadParams * _Nullable)params
+{
+    return [self.device readAttributeWithEndpointID:self.endpointID clusterID:@(MTRClusterIDTypeWaterHeaterModeID) attributeID:@(MTRAttributeIDTypeClusterWaterHeaterModeAttributeClusterRevisionID) params:params];
 }
 
 @end
@@ -13070,64 +13364,6 @@ using chip::System::Clock::Timeout;
                                         completion:responseHandler];
 }
 
-- (void)cancelSetActivePresetRequestWithExpectedValues:(NSArray<NSDictionary<NSString *, id> *> *)expectedValues expectedValueInterval:(NSNumber *)expectedValueIntervalMs completion:(MTRStatusCompletion)completion
-{
-    [self cancelSetActivePresetRequestWithParams:nil expectedValues:expectedValues expectedValueInterval:expectedValueIntervalMs completion:completion];
-}
-- (void)cancelSetActivePresetRequestWithParams:(MTRThermostatClusterCancelSetActivePresetRequestParams * _Nullable)params expectedValues:(NSArray<NSDictionary<NSString *, id> *> * _Nullable)expectedValues expectedValueInterval:(NSNumber * _Nullable)expectedValueIntervalMs completion:(MTRStatusCompletion)completion
-{
-    if (params == nil) {
-        params = [[MTRThermostatClusterCancelSetActivePresetRequestParams
-            alloc] init];
-    }
-
-    auto responseHandler = ^(id _Nullable response, NSError * _Nullable error) {
-        completion(error);
-    };
-
-    auto * timedInvokeTimeoutMs = params.timedInvokeTimeoutMs;
-
-    using RequestType = Thermostat::Commands::CancelSetActivePresetRequest::Type;
-    [self.device _invokeKnownCommandWithEndpointID:self.endpointID
-                                         clusterID:@(RequestType::GetClusterId())
-                                         commandID:@(RequestType::GetCommandId())
-                                    commandPayload:params
-                                    expectedValues:expectedValues
-                             expectedValueInterval:expectedValueIntervalMs
-                                timedInvokeTimeout:timedInvokeTimeoutMs
-                       serverSideProcessingTimeout:params.serverSideProcessingTimeout
-                                     responseClass:nil
-                                             queue:self.callbackQueue
-                                        completion:responseHandler];
-}
-
-- (void)setTemperatureSetpointHoldPolicyWithParams:(MTRThermostatClusterSetTemperatureSetpointHoldPolicyParams *)params expectedValues:(NSArray<NSDictionary<NSString *, id> *> * _Nullable)expectedValues expectedValueInterval:(NSNumber * _Nullable)expectedValueIntervalMs completion:(MTRStatusCompletion)completion
-{
-    if (params == nil) {
-        params = [[MTRThermostatClusterSetTemperatureSetpointHoldPolicyParams
-            alloc] init];
-    }
-
-    auto responseHandler = ^(id _Nullable response, NSError * _Nullable error) {
-        completion(error);
-    };
-
-    auto * timedInvokeTimeoutMs = params.timedInvokeTimeoutMs;
-
-    using RequestType = Thermostat::Commands::SetTemperatureSetpointHoldPolicy::Type;
-    [self.device _invokeKnownCommandWithEndpointID:self.endpointID
-                                         clusterID:@(RequestType::GetClusterId())
-                                         commandID:@(RequestType::GetCommandId())
-                                    commandPayload:params
-                                    expectedValues:expectedValues
-                             expectedValueInterval:expectedValueIntervalMs
-                                timedInvokeTimeout:timedInvokeTimeoutMs
-                       serverSideProcessingTimeout:params.serverSideProcessingTimeout
-                                     responseClass:nil
-                                             queue:self.callbackQueue
-                                        completion:responseHandler];
-}
-
 - (NSDictionary<NSString *, id> * _Nullable)readAttributeLocalTemperatureWithParams:(MTRReadParams * _Nullable)params
 {
     return [self.device readAttributeWithEndpointID:self.endpointID clusterID:@(MTRClusterIDTypeThermostatID) attributeID:@(MTRAttributeIDTypeClusterThermostatAttributeLocalTemperatureID) params:params];
@@ -13747,19 +13983,9 @@ using chip::System::Clock::Timeout;
     return [self.device readAttributeWithEndpointID:self.endpointID clusterID:@(MTRClusterIDTypeThermostatID) attributeID:@(MTRAttributeIDTypeClusterThermostatAttributePresetsSchedulesEditableID) params:params];
 }
 
-- (NSDictionary<NSString *, id> * _Nullable)readAttributeTemperatureSetpointHoldPolicyWithParams:(MTRReadParams * _Nullable)params
-{
-    return [self.device readAttributeWithEndpointID:self.endpointID clusterID:@(MTRClusterIDTypeThermostatID) attributeID:@(MTRAttributeIDTypeClusterThermostatAttributeTemperatureSetpointHoldPolicyID) params:params];
-}
-
 - (NSDictionary<NSString *, id> * _Nullable)readAttributeSetpointHoldExpiryTimestampWithParams:(MTRReadParams * _Nullable)params
 {
     return [self.device readAttributeWithEndpointID:self.endpointID clusterID:@(MTRClusterIDTypeThermostatID) attributeID:@(MTRAttributeIDTypeClusterThermostatAttributeSetpointHoldExpiryTimestampID) params:params];
-}
-
-- (NSDictionary<NSString *, id> * _Nullable)readAttributeQueuedPresetWithParams:(MTRReadParams * _Nullable)params
-{
-    return [self.device readAttributeWithEndpointID:self.endpointID clusterID:@(MTRClusterIDTypeThermostatID) attributeID:@(MTRAttributeIDTypeClusterThermostatAttributeQueuedPresetID) params:params];
 }
 
 - (NSDictionary<NSString *, id> * _Nullable)readAttributeGeneratedCommandListWithParams:(MTRReadParams * _Nullable)params
@@ -16949,6 +17175,11 @@ using chip::System::Clock::Timeout;
     return [self.device readAttributeWithEndpointID:self.endpointID clusterID:@(MTRClusterIDTypeWiFiNetworkManagementID) attributeID:@(MTRAttributeIDTypeClusterWiFiNetworkManagementAttributeSSIDID) params:params];
 }
 
+- (NSDictionary<NSString *, id> * _Nullable)readAttributePassphraseSurrogateWithParams:(MTRReadParams * _Nullable)params
+{
+    return [self.device readAttributeWithEndpointID:self.endpointID clusterID:@(MTRClusterIDTypeWiFiNetworkManagementID) attributeID:@(MTRAttributeIDTypeClusterWiFiNetworkManagementAttributePassphraseSurrogateID) params:params];
+}
+
 - (NSDictionary<NSString *, id> * _Nullable)readAttributeGeneratedCommandListWithParams:(MTRReadParams * _Nullable)params
 {
     return [self.device readAttributeWithEndpointID:self.endpointID clusterID:@(MTRClusterIDTypeWiFiNetworkManagementID) attributeID:@(MTRAttributeIDTypeClusterWiFiNetworkManagementAttributeGeneratedCommandListID) params:params];
@@ -17230,9 +17461,6 @@ using chip::System::Clock::Timeout;
     };
 
     auto * timedInvokeTimeoutMs = params.timedInvokeTimeoutMs;
-    if (timedInvokeTimeoutMs == nil) {
-        timedInvokeTimeoutMs = @(MTR_DEFAULT_TIMED_INTERACTION_TIMEOUT_MS);
-    }
 
     using RequestType = ThreadNetworkDirectory::Commands::GetOperationalDataset::Type;
     [self.device _invokeKnownCommandWithEndpointID:self.endpointID
@@ -19780,6 +20008,148 @@ using chip::System::Clock::Timeout;
 - (NSDictionary<NSString *, id> * _Nullable)readAttributeClusterRevisionWithParams:(MTRReadParams * _Nullable)params
 {
     return [self.device readAttributeWithEndpointID:self.endpointID clusterID:@(MTRClusterIDTypeContentAppObserverID) attributeID:@(MTRAttributeIDTypeClusterContentAppObserverAttributeClusterRevisionID) params:params];
+}
+
+@end
+
+@implementation MTRClusterEcosystemInformation
+
+- (NSDictionary<NSString *, id> * _Nullable)readAttributeRemovedOnWithParams:(MTRReadParams * _Nullable)params
+{
+    return [self.device readAttributeWithEndpointID:self.endpointID clusterID:@(MTRClusterIDTypeEcosystemInformationID) attributeID:@(MTRAttributeIDTypeClusterEcosystemInformationAttributeRemovedOnID) params:params];
+}
+
+- (NSDictionary<NSString *, id> * _Nullable)readAttributeDeviceDirectoryWithParams:(MTRReadParams * _Nullable)params
+{
+    return [self.device readAttributeWithEndpointID:self.endpointID clusterID:@(MTRClusterIDTypeEcosystemInformationID) attributeID:@(MTRAttributeIDTypeClusterEcosystemInformationAttributeDeviceDirectoryID) params:params];
+}
+
+- (NSDictionary<NSString *, id> * _Nullable)readAttributeLocationDirectoryWithParams:(MTRReadParams * _Nullable)params
+{
+    return [self.device readAttributeWithEndpointID:self.endpointID clusterID:@(MTRClusterIDTypeEcosystemInformationID) attributeID:@(MTRAttributeIDTypeClusterEcosystemInformationAttributeLocationDirectoryID) params:params];
+}
+
+- (NSDictionary<NSString *, id> * _Nullable)readAttributeGeneratedCommandListWithParams:(MTRReadParams * _Nullable)params
+{
+    return [self.device readAttributeWithEndpointID:self.endpointID clusterID:@(MTRClusterIDTypeEcosystemInformationID) attributeID:@(MTRAttributeIDTypeClusterEcosystemInformationAttributeGeneratedCommandListID) params:params];
+}
+
+- (NSDictionary<NSString *, id> * _Nullable)readAttributeAcceptedCommandListWithParams:(MTRReadParams * _Nullable)params
+{
+    return [self.device readAttributeWithEndpointID:self.endpointID clusterID:@(MTRClusterIDTypeEcosystemInformationID) attributeID:@(MTRAttributeIDTypeClusterEcosystemInformationAttributeAcceptedCommandListID) params:params];
+}
+
+- (NSDictionary<NSString *, id> * _Nullable)readAttributeEventListWithParams:(MTRReadParams * _Nullable)params
+{
+    return [self.device readAttributeWithEndpointID:self.endpointID clusterID:@(MTRClusterIDTypeEcosystemInformationID) attributeID:@(MTRAttributeIDTypeClusterEcosystemInformationAttributeEventListID) params:params];
+}
+
+- (NSDictionary<NSString *, id> * _Nullable)readAttributeAttributeListWithParams:(MTRReadParams * _Nullable)params
+{
+    return [self.device readAttributeWithEndpointID:self.endpointID clusterID:@(MTRClusterIDTypeEcosystemInformationID) attributeID:@(MTRAttributeIDTypeClusterEcosystemInformationAttributeAttributeListID) params:params];
+}
+
+- (NSDictionary<NSString *, id> * _Nullable)readAttributeFeatureMapWithParams:(MTRReadParams * _Nullable)params
+{
+    return [self.device readAttributeWithEndpointID:self.endpointID clusterID:@(MTRClusterIDTypeEcosystemInformationID) attributeID:@(MTRAttributeIDTypeClusterEcosystemInformationAttributeFeatureMapID) params:params];
+}
+
+- (NSDictionary<NSString *, id> * _Nullable)readAttributeClusterRevisionWithParams:(MTRReadParams * _Nullable)params
+{
+    return [self.device readAttributeWithEndpointID:self.endpointID clusterID:@(MTRClusterIDTypeEcosystemInformationID) attributeID:@(MTRAttributeIDTypeClusterEcosystemInformationAttributeClusterRevisionID) params:params];
+}
+
+@end
+
+@implementation MTRClusterCommissionerControl
+
+- (void)requestCommissioningApprovalWithParams:(MTRCommissionerControlClusterRequestCommissioningApprovalParams *)params expectedValues:(NSArray<NSDictionary<NSString *, id> *> * _Nullable)expectedValues expectedValueInterval:(NSNumber * _Nullable)expectedValueIntervalMs completion:(MTRStatusCompletion)completion
+{
+    if (params == nil) {
+        params = [[MTRCommissionerControlClusterRequestCommissioningApprovalParams
+            alloc] init];
+    }
+
+    auto responseHandler = ^(id _Nullable response, NSError * _Nullable error) {
+        completion(error);
+    };
+
+    auto * timedInvokeTimeoutMs = params.timedInvokeTimeoutMs;
+
+    using RequestType = CommissionerControl::Commands::RequestCommissioningApproval::Type;
+    [self.device _invokeKnownCommandWithEndpointID:self.endpointID
+                                         clusterID:@(RequestType::GetClusterId())
+                                         commandID:@(RequestType::GetCommandId())
+                                    commandPayload:params
+                                    expectedValues:expectedValues
+                             expectedValueInterval:expectedValueIntervalMs
+                                timedInvokeTimeout:timedInvokeTimeoutMs
+                       serverSideProcessingTimeout:params.serverSideProcessingTimeout
+                                     responseClass:nil
+                                             queue:self.callbackQueue
+                                        completion:responseHandler];
+}
+
+- (void)commissionNodeWithParams:(MTRCommissionerControlClusterCommissionNodeParams *)params expectedValues:(NSArray<NSDictionary<NSString *, id> *> * _Nullable)expectedValues expectedValueInterval:(NSNumber * _Nullable)expectedValueIntervalMs completion:(void (^)(MTRCommissionerControlClusterReverseOpenCommissioningWindowParams * _Nullable data, NSError * _Nullable error))completion
+{
+    if (params == nil) {
+        params = [[MTRCommissionerControlClusterCommissionNodeParams
+            alloc] init];
+    }
+
+    auto responseHandler = ^(id _Nullable response, NSError * _Nullable error) {
+        completion(response, error);
+    };
+
+    auto * timedInvokeTimeoutMs = params.timedInvokeTimeoutMs;
+
+    using RequestType = CommissionerControl::Commands::CommissionNode::Type;
+    [self.device _invokeKnownCommandWithEndpointID:self.endpointID
+                                         clusterID:@(RequestType::GetClusterId())
+                                         commandID:@(RequestType::GetCommandId())
+                                    commandPayload:params
+                                    expectedValues:expectedValues
+                             expectedValueInterval:expectedValueIntervalMs
+                                timedInvokeTimeout:timedInvokeTimeoutMs
+                       serverSideProcessingTimeout:params.serverSideProcessingTimeout
+                                     responseClass:MTRCommissionerControlClusterReverseOpenCommissioningWindowParams.class
+                                             queue:self.callbackQueue
+                                        completion:responseHandler];
+}
+
+- (NSDictionary<NSString *, id> * _Nullable)readAttributeSupportedDeviceCategoriesWithParams:(MTRReadParams * _Nullable)params
+{
+    return [self.device readAttributeWithEndpointID:self.endpointID clusterID:@(MTRClusterIDTypeCommissionerControlID) attributeID:@(MTRAttributeIDTypeClusterCommissionerControlAttributeSupportedDeviceCategoriesID) params:params];
+}
+
+- (NSDictionary<NSString *, id> * _Nullable)readAttributeGeneratedCommandListWithParams:(MTRReadParams * _Nullable)params
+{
+    return [self.device readAttributeWithEndpointID:self.endpointID clusterID:@(MTRClusterIDTypeCommissionerControlID) attributeID:@(MTRAttributeIDTypeClusterCommissionerControlAttributeGeneratedCommandListID) params:params];
+}
+
+- (NSDictionary<NSString *, id> * _Nullable)readAttributeAcceptedCommandListWithParams:(MTRReadParams * _Nullable)params
+{
+    return [self.device readAttributeWithEndpointID:self.endpointID clusterID:@(MTRClusterIDTypeCommissionerControlID) attributeID:@(MTRAttributeIDTypeClusterCommissionerControlAttributeAcceptedCommandListID) params:params];
+}
+
+- (NSDictionary<NSString *, id> * _Nullable)readAttributeEventListWithParams:(MTRReadParams * _Nullable)params
+{
+    return [self.device readAttributeWithEndpointID:self.endpointID clusterID:@(MTRClusterIDTypeCommissionerControlID) attributeID:@(MTRAttributeIDTypeClusterCommissionerControlAttributeEventListID) params:params];
+}
+
+- (NSDictionary<NSString *, id> * _Nullable)readAttributeAttributeListWithParams:(MTRReadParams * _Nullable)params
+{
+    return [self.device readAttributeWithEndpointID:self.endpointID clusterID:@(MTRClusterIDTypeCommissionerControlID) attributeID:@(MTRAttributeIDTypeClusterCommissionerControlAttributeAttributeListID) params:params];
+}
+
+- (NSDictionary<NSString *, id> * _Nullable)readAttributeFeatureMapWithParams:(MTRReadParams * _Nullable)params
+{
+    return [self.device readAttributeWithEndpointID:self.endpointID clusterID:@(MTRClusterIDTypeCommissionerControlID) attributeID:@(MTRAttributeIDTypeClusterCommissionerControlAttributeFeatureMapID) params:params];
+}
+
+- (NSDictionary<NSString *, id> * _Nullable)readAttributeClusterRevisionWithParams:(MTRReadParams * _Nullable)params
+{
+    return [self.device readAttributeWithEndpointID:self.endpointID clusterID:@(MTRClusterIDTypeCommissionerControlID) attributeID:@(MTRAttributeIDTypeClusterCommissionerControlAttributeClusterRevisionID) params:params];
 }
 
 @end
