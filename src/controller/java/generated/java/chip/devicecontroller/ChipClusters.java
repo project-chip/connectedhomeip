@@ -3963,6 +3963,8 @@ public class ChipClusters {
     private static final long SUBJECTS_PER_ACCESS_CONTROL_ENTRY_ATTRIBUTE_ID = 2L;
     private static final long TARGETS_PER_ACCESS_CONTROL_ENTRY_ATTRIBUTE_ID = 3L;
     private static final long ACCESS_CONTROL_ENTRIES_PER_FABRIC_ATTRIBUTE_ID = 4L;
+    private static final long COMMISSIONING_A_R_L_ATTRIBUTE_ID = 5L;
+    private static final long ARL_ATTRIBUTE_ID = 6L;
     private static final long GENERATED_COMMAND_LIST_ATTRIBUTE_ID = 65528L;
     private static final long ACCEPTED_COMMAND_LIST_ATTRIBUTE_ID = 65529L;
     private static final long EVENT_LIST_ATTRIBUTE_ID = 65530L;
@@ -3980,12 +3982,40 @@ public class ChipClusters {
       return 0L;
     }
 
+    public void reviewFabricRestrictions(DefaultClusterCallback callback, ArrayList<ChipStructs.AccessControlClusterAccessRestrictionStruct> arl) {
+      reviewFabricRestrictions(callback, arl, 0);
+    }
+
+    public void reviewFabricRestrictions(DefaultClusterCallback callback, ArrayList<ChipStructs.AccessControlClusterAccessRestrictionStruct> arl, int timedInvokeTimeoutMs) {
+      final long commandId = 0L;
+
+      ArrayList<StructElement> elements = new ArrayList<>();
+      final long arlFieldID = 0L;
+      BaseTLVType arltlvValue = ArrayType.generateArrayType(arl, (elementarl) -> elementarl.encodeTlv());
+      elements.add(new StructElement(arlFieldID, arltlvValue));
+
+      StructType commandArgs = new StructType(elements);
+      invoke(new InvokeCallbackImpl(callback) {
+          @Override
+          public void onResponse(StructType invokeStructValue) {
+          callback.onSuccess();
+        }}, commandId, commandArgs, timedInvokeTimeoutMs);
+    }
+
     public interface AclAttributeCallback extends BaseAttributeCallback {
       void onSuccess(List<ChipStructs.AccessControlClusterAccessControlEntryStruct> value);
     }
 
     public interface ExtensionAttributeCallback extends BaseAttributeCallback {
       void onSuccess(List<ChipStructs.AccessControlClusterAccessControlExtensionStruct> value);
+    }
+
+    public interface CommissioningARLAttributeCallback extends BaseAttributeCallback {
+      void onSuccess(List<ChipStructs.AccessControlClusterCommissioningAccessRestrictionEntryStruct> value);
+    }
+
+    public interface ArlAttributeCallback extends BaseAttributeCallback {
+      void onSuccess(List<ChipStructs.AccessControlClusterAccessRestrictionEntryStruct> value);
     }
 
     public interface GeneratedCommandListAttributeCallback extends BaseAttributeCallback {
@@ -4160,6 +4190,63 @@ public class ChipClusters {
             callback.onSuccess(value);
           }
         }, ACCESS_CONTROL_ENTRIES_PER_FABRIC_ATTRIBUTE_ID, minInterval, maxInterval);
+    }
+
+    public void readCommissioningARLAttribute(
+        CommissioningARLAttributeCallback callback) {
+      ChipAttributePath path = ChipAttributePath.newInstance(endpointId, clusterId, COMMISSIONING_A_R_L_ATTRIBUTE_ID);
+
+      readAttribute(new ReportCallbackImpl(callback, path) {
+          @Override
+          public void onSuccess(byte[] tlv) {
+            List<ChipStructs.AccessControlClusterCommissioningAccessRestrictionEntryStruct> value = ChipTLVValueDecoder.decodeAttributeValue(path, tlv);
+            callback.onSuccess(value);
+          }
+        }, COMMISSIONING_A_R_L_ATTRIBUTE_ID, true);
+    }
+
+    public void subscribeCommissioningARLAttribute(
+        CommissioningARLAttributeCallback callback, int minInterval, int maxInterval) {
+      ChipAttributePath path = ChipAttributePath.newInstance(endpointId, clusterId, COMMISSIONING_A_R_L_ATTRIBUTE_ID);
+
+      subscribeAttribute(new ReportCallbackImpl(callback, path) {
+          @Override
+          public void onSuccess(byte[] tlv) {
+            List<ChipStructs.AccessControlClusterCommissioningAccessRestrictionEntryStruct> value = ChipTLVValueDecoder.decodeAttributeValue(path, tlv);
+            callback.onSuccess(value);
+          }
+        }, COMMISSIONING_A_R_L_ATTRIBUTE_ID, minInterval, maxInterval);
+    }
+
+    public void readArlAttribute(
+        ArlAttributeCallback callback) {
+      readArlAttributeWithFabricFilter(callback, true);
+    }
+
+    public void readArlAttributeWithFabricFilter(
+        ArlAttributeCallback callback, boolean isFabricFiltered) {
+      ChipAttributePath path = ChipAttributePath.newInstance(endpointId, clusterId, ARL_ATTRIBUTE_ID);
+
+      readAttribute(new ReportCallbackImpl(callback, path) {
+          @Override
+          public void onSuccess(byte[] tlv) {
+            List<ChipStructs.AccessControlClusterAccessRestrictionEntryStruct> value = ChipTLVValueDecoder.decodeAttributeValue(path, tlv);
+            callback.onSuccess(value);
+          }
+        }, ARL_ATTRIBUTE_ID, isFabricFiltered);
+    }
+
+    public void subscribeArlAttribute(
+        ArlAttributeCallback callback, int minInterval, int maxInterval) {
+      ChipAttributePath path = ChipAttributePath.newInstance(endpointId, clusterId, ARL_ATTRIBUTE_ID);
+
+      subscribeAttribute(new ReportCallbackImpl(callback, path) {
+          @Override
+          public void onSuccess(byte[] tlv) {
+            List<ChipStructs.AccessControlClusterAccessRestrictionEntryStruct> value = ChipTLVValueDecoder.decodeAttributeValue(path, tlv);
+            callback.onSuccess(value);
+          }
+        }, ARL_ATTRIBUTE_ID, minInterval, maxInterval);
     }
 
     public void readGeneratedCommandListAttribute(
@@ -40225,8 +40312,7 @@ public class ChipClusters {
     private static final long PRESETS_ATTRIBUTE_ID = 80L;
     private static final long SCHEDULES_ATTRIBUTE_ID = 81L;
     private static final long PRESETS_SCHEDULES_EDITABLE_ATTRIBUTE_ID = 82L;
-    private static final long TEMPERATURE_SETPOINT_HOLD_POLICY_ATTRIBUTE_ID = 83L;
-    private static final long SETPOINT_HOLD_EXPIRY_TIMESTAMP_ATTRIBUTE_ID = 84L;
+    private static final long SETPOINT_HOLD_EXPIRY_TIMESTAMP_ATTRIBUTE_ID = 83L;
     private static final long GENERATED_COMMAND_LIST_ATTRIBUTE_ID = 65528L;
     private static final long ACCEPTED_COMMAND_LIST_ATTRIBUTE_ID = 65529L;
     private static final long EVENT_LIST_ATTRIBUTE_ID = 65530L;
@@ -40455,26 +40541,6 @@ public class ChipClusters {
       final long commandId = 9L;
 
       ArrayList<StructElement> elements = new ArrayList<>();
-      StructType commandArgs = new StructType(elements);
-      invoke(new InvokeCallbackImpl(callback) {
-          @Override
-          public void onResponse(StructType invokeStructValue) {
-          callback.onSuccess();
-        }}, commandId, commandArgs, timedInvokeTimeoutMs);
-    }
-
-    public void setTemperatureSetpointHoldPolicy(DefaultClusterCallback callback, Integer temperatureSetpointHoldPolicy) {
-      setTemperatureSetpointHoldPolicy(callback, temperatureSetpointHoldPolicy, 0);
-    }
-
-    public void setTemperatureSetpointHoldPolicy(DefaultClusterCallback callback, Integer temperatureSetpointHoldPolicy, int timedInvokeTimeoutMs) {
-      final long commandId = 11L;
-
-      ArrayList<StructElement> elements = new ArrayList<>();
-      final long temperatureSetpointHoldPolicyFieldID = 0L;
-      BaseTLVType temperatureSetpointHoldPolicytlvValue = new UIntType(temperatureSetpointHoldPolicy);
-      elements.add(new StructElement(temperatureSetpointHoldPolicyFieldID, temperatureSetpointHoldPolicytlvValue));
-
       StructType commandArgs = new StructType(elements);
       invoke(new InvokeCallbackImpl(callback) {
           @Override
@@ -42398,32 +42464,6 @@ public class ChipClusters {
             callback.onSuccess(value);
           }
         }, PRESETS_SCHEDULES_EDITABLE_ATTRIBUTE_ID, minInterval, maxInterval);
-    }
-
-    public void readTemperatureSetpointHoldPolicyAttribute(
-        IntegerAttributeCallback callback) {
-      ChipAttributePath path = ChipAttributePath.newInstance(endpointId, clusterId, TEMPERATURE_SETPOINT_HOLD_POLICY_ATTRIBUTE_ID);
-
-      readAttribute(new ReportCallbackImpl(callback, path) {
-          @Override
-          public void onSuccess(byte[] tlv) {
-            Integer value = ChipTLVValueDecoder.decodeAttributeValue(path, tlv);
-            callback.onSuccess(value);
-          }
-        }, TEMPERATURE_SETPOINT_HOLD_POLICY_ATTRIBUTE_ID, true);
-    }
-
-    public void subscribeTemperatureSetpointHoldPolicyAttribute(
-        IntegerAttributeCallback callback, int minInterval, int maxInterval) {
-      ChipAttributePath path = ChipAttributePath.newInstance(endpointId, clusterId, TEMPERATURE_SETPOINT_HOLD_POLICY_ATTRIBUTE_ID);
-
-      subscribeAttribute(new ReportCallbackImpl(callback, path) {
-          @Override
-          public void onSuccess(byte[] tlv) {
-            Integer value = ChipTLVValueDecoder.decodeAttributeValue(path, tlv);
-            callback.onSuccess(value);
-          }
-        }, TEMPERATURE_SETPOINT_HOLD_POLICY_ATTRIBUTE_ID, minInterval, maxInterval);
     }
 
     public void readSetpointHoldExpiryTimestampAttribute(
@@ -54135,7 +54175,8 @@ public class ChipClusters {
   public static class WiFiNetworkManagementCluster extends BaseChipCluster {
     public static final long CLUSTER_ID = 1105L;
 
-    private static final long SSID_ATTRIBUTE_ID = 1L;
+    private static final long SSID_ATTRIBUTE_ID = 0L;
+    private static final long PASSPHRASE_SURROGATE_ATTRIBUTE_ID = 1L;
     private static final long GENERATED_COMMAND_LIST_ATTRIBUTE_ID = 65528L;
     private static final long ACCEPTED_COMMAND_LIST_ATTRIBUTE_ID = 65529L;
     private static final long EVENT_LIST_ATTRIBUTE_ID = 65530L;
@@ -54187,6 +54228,10 @@ public class ChipClusters {
       void onSuccess(@Nullable byte[] value);
     }
 
+    public interface PassphraseSurrogateAttributeCallback extends BaseAttributeCallback {
+      void onSuccess(@Nullable Long value);
+    }
+
     public interface GeneratedCommandListAttributeCallback extends BaseAttributeCallback {
       void onSuccess(List<Long> value);
     }
@@ -54227,6 +54272,32 @@ public class ChipClusters {
             callback.onSuccess(value);
           }
         }, SSID_ATTRIBUTE_ID, minInterval, maxInterval);
+    }
+
+    public void readPassphraseSurrogateAttribute(
+        PassphraseSurrogateAttributeCallback callback) {
+      ChipAttributePath path = ChipAttributePath.newInstance(endpointId, clusterId, PASSPHRASE_SURROGATE_ATTRIBUTE_ID);
+
+      readAttribute(new ReportCallbackImpl(callback, path) {
+          @Override
+          public void onSuccess(byte[] tlv) {
+            @Nullable Long value = ChipTLVValueDecoder.decodeAttributeValue(path, tlv);
+            callback.onSuccess(value);
+          }
+        }, PASSPHRASE_SURROGATE_ATTRIBUTE_ID, true);
+    }
+
+    public void subscribePassphraseSurrogateAttribute(
+        PassphraseSurrogateAttributeCallback callback, int minInterval, int maxInterval) {
+      ChipAttributePath path = ChipAttributePath.newInstance(endpointId, clusterId, PASSPHRASE_SURROGATE_ATTRIBUTE_ID);
+
+      subscribeAttribute(new ReportCallbackImpl(callback, path) {
+          @Override
+          public void onSuccess(byte[] tlv) {
+            @Nullable Long value = ChipTLVValueDecoder.decodeAttributeValue(path, tlv);
+            callback.onSuccess(value);
+          }
+        }, PASSPHRASE_SURROGATE_ATTRIBUTE_ID, minInterval, maxInterval);
     }
 
     public void readGeneratedCommandListAttribute(
@@ -54875,6 +54946,9 @@ public class ChipClusters {
         }}, commandId, commandArgs, timedInvokeTimeoutMs);
     }
 
+    public void getOperationalDataset(OperationalDatasetResponseCallback callback, byte[] extendedPanID) {
+      getOperationalDataset(callback, extendedPanID, 0);
+    }
 
     public void getOperationalDataset(OperationalDatasetResponseCallback callback, byte[] extendedPanID, int timedInvokeTimeoutMs) {
       final long commandId = 2L;
