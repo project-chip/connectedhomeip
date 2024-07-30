@@ -29360,11 +29360,6 @@ struct Type;
 struct DecodableType;
 } // namespace CommitPresetsSchedulesRequest
 
-namespace SetTemperatureSetpointHoldPolicy {
-struct Type;
-struct DecodableType;
-} // namespace SetTemperatureSetpointHoldPolicy
-
 } // namespace Commands
 
 namespace Commands {
@@ -29700,40 +29695,6 @@ public:
     CHIP_ERROR Decode(TLV::TLVReader & reader);
 };
 }; // namespace CommitPresetsSchedulesRequest
-namespace SetTemperatureSetpointHoldPolicy {
-enum class Fields : uint8_t
-{
-    kTemperatureSetpointHoldPolicy = 0,
-};
-
-struct Type
-{
-public:
-    // Use GetCommandId instead of commandId directly to avoid naming conflict with CommandIdentification in ExecutionOfACommand
-    static constexpr CommandId GetCommandId() { return Commands::SetTemperatureSetpointHoldPolicy::Id; }
-    static constexpr ClusterId GetClusterId() { return Clusters::Thermostat::Id; }
-
-    chip::BitMask<TemperatureSetpointHoldPolicyBitmap> temperatureSetpointHoldPolicy =
-        static_cast<chip::BitMask<TemperatureSetpointHoldPolicyBitmap>>(0);
-
-    CHIP_ERROR Encode(TLV::TLVWriter & aWriter, TLV::Tag aTag) const;
-
-    using ResponseType = DataModel::NullObjectType;
-
-    static constexpr bool MustUseTimedInvoke() { return false; }
-};
-
-struct DecodableType
-{
-public:
-    static constexpr CommandId GetCommandId() { return Commands::SetTemperatureSetpointHoldPolicy::Id; }
-    static constexpr ClusterId GetClusterId() { return Clusters::Thermostat::Id; }
-
-    chip::BitMask<TemperatureSetpointHoldPolicyBitmap> temperatureSetpointHoldPolicy =
-        static_cast<chip::BitMask<TemperatureSetpointHoldPolicyBitmap>>(0);
-    CHIP_ERROR Decode(TLV::TLVReader & reader);
-};
-}; // namespace SetTemperatureSetpointHoldPolicy
 } // namespace Commands
 
 namespace Attributes {
@@ -30468,18 +30429,6 @@ struct TypeInfo
     static constexpr bool MustUseTimedWrite() { return false; }
 };
 } // namespace PresetsSchedulesEditable
-namespace TemperatureSetpointHoldPolicy {
-struct TypeInfo
-{
-    using Type             = chip::BitMask<chip::app::Clusters::Thermostat::TemperatureSetpointHoldPolicyBitmap>;
-    using DecodableType    = chip::BitMask<chip::app::Clusters::Thermostat::TemperatureSetpointHoldPolicyBitmap>;
-    using DecodableArgType = chip::BitMask<chip::app::Clusters::Thermostat::TemperatureSetpointHoldPolicyBitmap>;
-
-    static constexpr ClusterId GetClusterId() { return Clusters::Thermostat::Id; }
-    static constexpr AttributeId GetAttributeId() { return Attributes::TemperatureSetpointHoldPolicy::Id; }
-    static constexpr bool MustUseTimedWrite() { return false; }
-};
-} // namespace TemperatureSetpointHoldPolicy
 namespace SetpointHoldExpiryTimestamp {
 struct TypeInfo
 {
@@ -30611,8 +30560,6 @@ struct TypeInfo
         Attributes::Presets::TypeInfo::DecodableType presets;
         Attributes::Schedules::TypeInfo::DecodableType schedules;
         Attributes::PresetsSchedulesEditable::TypeInfo::DecodableType presetsSchedulesEditable = static_cast<bool>(0);
-        Attributes::TemperatureSetpointHoldPolicy::TypeInfo::DecodableType temperatureSetpointHoldPolicy =
-            static_cast<chip::BitMask<chip::app::Clusters::Thermostat::TemperatureSetpointHoldPolicyBitmap>>(0);
         Attributes::SetpointHoldExpiryTimestamp::TypeInfo::DecodableType setpointHoldExpiryTimestamp;
         Attributes::GeneratedCommandList::TypeInfo::DecodableType generatedCommandList;
         Attributes::AcceptedCommandList::TypeInfo::DecodableType acceptedCommandList;

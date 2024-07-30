@@ -26924,23 +26924,6 @@ public class ClusterInfoMapping {
     );
     thermostatClusterInteractionInfoMap.put("commitPresetsSchedulesRequest", thermostatcommitPresetsSchedulesRequestInteractionInfo);
 
-    Map<String, CommandParameterInfo> thermostatsetTemperatureSetpointHoldPolicyCommandParams = new LinkedHashMap<String, CommandParameterInfo>();
-
-    CommandParameterInfo thermostatsetTemperatureSetpointHoldPolicytemperatureSetpointHoldPolicyCommandParameterInfo = new CommandParameterInfo("temperatureSetpointHoldPolicy", Integer.class, Integer.class);
-    thermostatsetTemperatureSetpointHoldPolicyCommandParams.put("temperatureSetpointHoldPolicy",thermostatsetTemperatureSetpointHoldPolicytemperatureSetpointHoldPolicyCommandParameterInfo);
-    InteractionInfo thermostatsetTemperatureSetpointHoldPolicyInteractionInfo = new InteractionInfo(
-      (cluster, callback, commandArguments) -> {
-        ((ChipClusters.ThermostatCluster) cluster)
-        .setTemperatureSetpointHoldPolicy((DefaultClusterCallback) callback
-        , (Integer)
-        commandArguments.get("temperatureSetpointHoldPolicy")
-        );
-      },
-      () -> new DelegatedDefaultClusterCallback(),
-        thermostatsetTemperatureSetpointHoldPolicyCommandParams
-    );
-    thermostatClusterInteractionInfoMap.put("setTemperatureSetpointHoldPolicy", thermostatsetTemperatureSetpointHoldPolicyInteractionInfo);
-
     commandMap.put("thermostat", thermostatClusterInteractionInfoMap);
 
     Map<String, InteractionInfo> fanControlClusterInteractionInfoMap = new LinkedHashMap<>();

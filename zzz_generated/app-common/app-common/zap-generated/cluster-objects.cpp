@@ -21358,40 +21358,6 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
     }
 }
 } // namespace CommitPresetsSchedulesRequest.
-namespace SetTemperatureSetpointHoldPolicy {
-CHIP_ERROR Type::Encode(TLV::TLVWriter & aWriter, TLV::Tag aTag) const
-{
-    DataModel::WrappedStructEncoder encoder{ aWriter, aTag };
-    encoder.Encode(to_underlying(Fields::kTemperatureSetpointHoldPolicy), temperatureSetpointHoldPolicy);
-    return encoder.Finalize();
-}
-
-CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
-{
-    detail::StructDecodeIterator __iterator(reader);
-    while (true)
-    {
-        auto __element = __iterator.Next();
-        if (std::holds_alternative<CHIP_ERROR>(__element))
-        {
-            return std::get<CHIP_ERROR>(__element);
-        }
-
-        CHIP_ERROR err              = CHIP_NO_ERROR;
-        const uint8_t __context_tag = std::get<uint8_t>(__element);
-
-        if (__context_tag == to_underlying(Fields::kTemperatureSetpointHoldPolicy))
-        {
-            err = DataModel::Decode(reader, temperatureSetpointHoldPolicy);
-        }
-        else
-        {
-        }
-
-        ReturnErrorOnFailure(err);
-    }
-}
-} // namespace SetTemperatureSetpointHoldPolicy.
 } // namespace Commands
 
 namespace Attributes {
@@ -21519,8 +21485,6 @@ CHIP_ERROR TypeInfo::DecodableType::Decode(TLV::TLVReader & reader, const Concre
         return DataModel::Decode(reader, schedules);
     case Attributes::PresetsSchedulesEditable::TypeInfo::GetAttributeId():
         return DataModel::Decode(reader, presetsSchedulesEditable);
-    case Attributes::TemperatureSetpointHoldPolicy::TypeInfo::GetAttributeId():
-        return DataModel::Decode(reader, temperatureSetpointHoldPolicy);
     case Attributes::SetpointHoldExpiryTimestamp::TypeInfo::GetAttributeId():
         return DataModel::Decode(reader, setpointHoldExpiryTimestamp);
     case Attributes::GeneratedCommandList::TypeInfo::GetAttributeId():

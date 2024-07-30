@@ -2701,6 +2701,7 @@ static auto __attribute__((unused)) EnsureKnownEnumValue(Thermostat::PresetScena
     case EnumType::kSleep:
     case EnumType::kWake:
     case EnumType::kVacation:
+    case EnumType::kGoingToSleep:
     case EnumType::kUserDefined:
         return val;
     default:
