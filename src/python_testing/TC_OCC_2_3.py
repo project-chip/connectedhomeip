@@ -17,9 +17,7 @@
 
 import logging
 
-from chip import ChipDeviceCtrl
 import chip.clusters as Clusters
-from chip.clusters.Types import NullValue
 from matter_testing_support import MatterBaseTest, TestStep, async_test_body, default_matter_test_main
 from mobly import asserts
 
@@ -96,3 +94,6 @@ class TC_OCC_2_3(MatterBaseTest):
             asserts.assert_equal(occupancy_phy_otou_delay_dut, occupancy_hold_time_dut, "HoldTime attribute value is not equal to PhysicalContactOccupiedToUnoccupiedDelay") 
         else:
             logging.info("OccupancySensorType attribute value is out of range")
+
+if __name__ == "__main__":
+    default_matter_test_main()
