@@ -159,6 +159,20 @@ static constexpr CommandId Id = 0x00000008;
 } // namespace Commands
 } // namespace LevelControl
 
+namespace AccessControl {
+namespace Commands {
+
+namespace ReviewFabricRestrictions {
+static constexpr CommandId Id = 0x00000000;
+} // namespace ReviewFabricRestrictions
+
+namespace ReviewFabricRestrictionsResponse {
+static constexpr CommandId Id = 0x00000001;
+} // namespace ReviewFabricRestrictionsResponse
+
+} // namespace Commands
+} // namespace AccessControl
+
 namespace Actions {
 namespace Commands {
 

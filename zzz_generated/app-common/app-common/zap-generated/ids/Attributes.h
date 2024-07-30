@@ -504,6 +504,14 @@ namespace AccessControlEntriesPerFabric {
 static constexpr AttributeId Id = 0x00000004;
 } // namespace AccessControlEntriesPerFabric
 
+namespace CommissioningARL {
+static constexpr AttributeId Id = 0x00000005;
+} // namespace CommissioningARL
+
+namespace Arl {
+static constexpr AttributeId Id = 0x00000006;
+} // namespace Arl
+
 namespace GeneratedCommandList {
 static constexpr AttributeId Id = Globals::Attributes::GeneratedCommandList::Id;
 } // namespace GeneratedCommandList
