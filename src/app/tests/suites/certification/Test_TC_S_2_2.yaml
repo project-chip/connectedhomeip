@@ -303,6 +303,27 @@ tests:
                 value: 0x01
 
     - label:
+          "Step 2d: TH sends a StoreScene command to DUT with the GroupID field
+          set to G1 and the SceneID field set to 0xFF, which is outside of the
+          constraints for a SceneID."
+      PICS: S.S.C04.Rsp
+      command: "StoreScene"
+      arguments:
+          values:
+              - name: "GroupID"
+                value: GI
+              - name: "SceneID"
+                value: 0xFF
+      response:
+          values:
+              - name: "Status"
+                value: 0x87
+              - name: "GroupID"
+                value: GI
+              - name: "SceneID"
+                value: 0xFF
+
+    - label:
           "Step 3a: TH configures AC2 on DUT for all implemented application
           clusters supporting scenes."
       cluster: "Level Control"
@@ -445,6 +466,21 @@ tests:
                 value: 0x01
 
     - label:
+          "Step 4e: TH sends a RecallScene command to DUT with the GroupID field
+          set to G1 and the SceneID field set to 0xFF, which is outside of the
+          constraints for a SceneID."
+      PICS: S.S.C05.Rsp
+      command: "RecallScene"
+      arguments:
+          values:
+              - name: "GroupID"
+                value: G1
+              - name: "SceneID"
+                value: 0xFF
+      response:
+          error: CONSTRAINT_ERROR
+
+    - label:
           "Step 5a: TH sends a ViewScene command to DUT with the GroupID field
           set to G1 and the SceneID field set to 0x01."
       PICS: S.S.C01.Rsp && PICS_SDK_CI_ONLY
@@ -554,6 +590,27 @@ tests:
                 value: G1
               - name: "SceneID"
                 value: 0xFE
+
+    - label:
+          "Step 5d: TH sends a ViewScene command to DUT with the GroupID field
+          set to G1 and the SceneID field set to 0xFF, which is outside of the
+          constraints for a SceneID."
+      PICS: S.S.C01.Rsp
+      command: "ViewScene"
+      arguments:
+          values:
+              - name: "GroupID"
+                value: G1
+              - name: "SceneID"
+                value: 0xFF
+      response:
+          values:
+              - name: "Status"
+                value: 0x87
+              - name: "GroupID"
+                value: G1
+              - name: "SceneID"
+                value: 0xFF
 
     - label:
           "Step 6: TH sends a GetSceneMembership command to DUT with the GroupID
@@ -734,7 +791,7 @@ tests:
           "Step 8d: TH sends a AddScene command to DUT with the GroupID field
           set to G1, the SceneID field set to 0x01, the TransitionTime field set
           to 70 000 000 (70 000s) and no extension field sets. This should fail
-          and return a status of 0x85 (INVALID_COMMAND)."
+          and return a status of 0x87 (CONSTRAINT_ERROR)."
       PICS: S.S.C00.Rsp
       command: "AddScene"
       arguments:
@@ -752,7 +809,7 @@ tests:
       response:
           values:
               - name: "Status"
-                value: 0x85
+                value: 0x87
               - name: "GroupID"
                 value: G1
               - name: "SceneID"
@@ -762,7 +819,7 @@ tests:
           "Step 8e: TH sends a AddScene command to DUT with the GroupID field
           set to G1, the SceneID field set to 0x01, the TransitionTime field set
           to 60 000 001 (60 000.001s) and no extension field sets. This should
-          fail and return a status of 0x85 (INVALID_COMMAND)."
+          fail and return a status of 0x87 (CONSTRAINT_ERROR)."
       PICS: S.S.C00.Rsp
       command: "AddScene"
       arguments:
@@ -780,11 +837,40 @@ tests:
       response:
           values:
               - name: "Status"
-                value: 0x85
+                value: 0x87
               - name: "GroupID"
                 value: G1
               - name: "SceneID"
                 value: 0x01
+
+    - label:
+          "Step 8f: TH sends a AddScene command to DUT with the GroupID field
+          set to G1, the SceneID field set to 0xFF, which is outside of the
+          constraints for a SceneID, the TransitionTime field set to 1000 (1s)
+          and no extension field sets. This should fail and return a status of
+          0x87 (CONSTRAINT_ERROR)."
+      PICS: S.S.C00.Rsp
+      command: "AddScene"
+      arguments:
+          values:
+              - name: "GroupID"
+                value: G1
+              - name: "SceneID"
+                value: 0xFF
+              - name: "TransitionTime"
+                value: 1000
+              - name: "SceneName"
+                value: "Scene1"
+              - name: "ExtensionFieldSets"
+                value: []
+      response:
+          values:
+              - name: "Status"
+                value: 0x87
+              - name: "GroupID"
+                value: G1
+              - name: "SceneID"
+                value: 0xFF
 
     - label:
           "Step 9a: TH sends a RemoveScene command to DUT with the GroupID field
@@ -848,7 +934,28 @@ tests:
                 value: 0x01
 
     - label:
-          "Step 9d: TH sends a GetSceneMembership command to DUT with the
+          "Step 9d: TH sends a RemoveScene command to DUT with the GroupID field
+          set to G1 and the SceneID field set to 0xFF, which is outside of the
+          constraints for a SceneID."
+      PICS: S.S.C02.Rsp
+      command: "RemoveScene"
+      arguments:
+          values:
+              - name: "GroupID"
+                value: GI
+              - name: "SceneID"
+                value: 0xFF
+      response:
+          values:
+              - name: "Status"
+                value: 0x87
+              - name: "GroupID"
+                value: GI
+              - name: "SceneID"
+                value: 0xFF
+
+    - label:
+          "Step 9e: TH sends a GetSceneMembership command to DUT with the
           GroupID field set to G1."
       PICS: S.S.C06.Rsp
       command: "GetSceneMembership"

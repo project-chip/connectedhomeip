@@ -237,6 +237,12 @@ else()
     chip_gn_arg_append("chip_openthread_ftd"                    "false")
 endif()
 
+if (CONFIG_OPENTHREAD_BORDER_ROUTER)
+    chip_gn_arg_append("chip_openthread_border_router"       "true")
+else()
+    chip_gn_arg_append("chip_openthread_border_router"       "false")
+endif()
+
 if (CONFIG_ENABLE_OTA_REQUESTOR)
     chip_gn_arg_append("chip_enable_ota_requestor"                 "true")
 endif()
@@ -466,7 +472,11 @@ if (CONFIG_ENABLE_ENCRYPTED_OTA)
     list(APPEND chip_libraries $<TARGET_FILE:${esp_encrypted_img_lib}>)
 endif()
 
-idf_component_get_property(main_lib main COMPONENT_LIB)
+# Let user set EXECUTABLE_COMPONENT_NAME and defaults to main if not specified
+if (NOT EXECUTABLE_COMPONENT_NAME)
+  set(EXECUTABLE_COMPONENT_NAME "main")
+endif()
+idf_component_get_property(main_lib ${EXECUTABLE_COMPONENT_NAME} COMPONENT_LIB)
 list(APPEND chip_libraries $<TARGET_FILE:${main_lib}>)
 
 if (CONFIG_SEC_CERT_DAC_PROVIDER)
