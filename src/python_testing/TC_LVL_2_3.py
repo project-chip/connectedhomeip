@@ -127,6 +127,8 @@ class TC_LVL_2_3(MatterBaseTest):
         if count == 1:
             entry = sub_handler.attribute_reports[lvl.Attributes.CurrentLevel][-1]
             asserts.assert_equal(entry.value, max_level, "Entry is not equal to max level")
+        else:
+            self.mark_current_step_skipped()
 
         if count > 1:
             self.step(11)
