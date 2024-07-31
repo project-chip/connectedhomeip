@@ -131,7 +131,7 @@ tests:
                 value: signingkey
               - name: "VerificationKey"
                 value: verificationkey
-              - name: "GroupIdentifier "
+              - name: "GroupIdentifier"
                 value: groupidentifier
               - name: "GroupResolvingKey"
                 value: ""
@@ -149,7 +149,7 @@ tests:
                 value: signingkey
               - name: "VerificationKey"
                 value: verificationkey
-              - name: "GroupIdentifier "
+              - name: "GroupIdentifier"
                 value: groupidentifier
               - name: "GroupResolvingKey"
                 value: groupresolvingkey
@@ -188,7 +188,7 @@ tests:
                 value: signingkey
               - name: "VerificationKey"
                 value: verificationkey
-              - name: "GroupIdentifier "
+              - name: "GroupIdentifier"
                 value: groupidentifier
               - name: "GroupResolvingKey"
                 value: ""
@@ -208,7 +208,7 @@ tests:
                 value: signingkey
               - name: "VerificationKey"
                 value: verificationkey
-              - name: "GroupIdentifier "
+              - name: "GroupIdentifier"
                 value: groupidentifier
               - name: "GroupResolvingKey"
                 value: groupresolvingkey
@@ -253,7 +253,7 @@ tests:
                 value: signingkey
               - name: "VerificationKey"
                 value: verificationkey
-              - name: "GroupIdentifier "
+              - name: "GroupIdentifier"
                 value: groupidentifier
               - name: "GroupResolvingKey"
                 value: ""
@@ -271,7 +271,7 @@ tests:
                 value: signingkey
               - name: "VerificationKey"
                 value: verificationkey
-              - name: "GroupIdentifier "
+              - name: "GroupIdentifier"
                 value: groupidentifier
               - name: "GroupResolvingKey"
                 value: groupresolvingkey
