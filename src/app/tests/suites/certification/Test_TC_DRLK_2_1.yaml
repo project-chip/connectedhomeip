@@ -1571,7 +1571,7 @@ tests:
                 value: 1
 
     - label: "Step 38a: TH reads AliroReaderVerificationKey attribute from DUT"
-      PICS: PICS_SKIP_SAMPLE_APP && DRLK.S.F0d && DRLK.S.A0080
+      PICS: DRLK.S.F0d && DRLK.S.A0080
       command: "readAttribute"
       attribute: "AliroReaderVerificationKey"
       response:
@@ -1583,7 +1583,7 @@ tests:
     - label:
           "Step 38b: TH writes AliroReaderVerificationKey attribute as an octstr
           value of length 65 which is different from verificationkey"
-      PICS: PICS_SKIP_SAMPLE_APP && DRLK.S.F0d && DRLK.S.A0080
+      PICS: DRLK.S.F0d && DRLK.S.A0080
       command: "writeAttribute"
       attribute: "AliroReaderVerificationKey"
       arguments:
@@ -1592,14 +1592,15 @@ tests:
           error: UNSUPPORTED_WRITE
 
     - label: "Step 38c: TH reads AliroReaderVerificationKey attribute from DUT"
-      PICS: PICS_SKIP_SAMPLE_APP && DRLK.S.F0d && DRLK.S.A0080
+
+      PICS: DRLK.S.F0d && DRLK.S.A0080
       command: "readAttribute"
       attribute: "AliroReaderVerificationKey"
       response:
           value: verificationkey
 
     - label: "Step 39a: TH reads AliroReaderGroupIdentifier attribute from DUT"
-      PICS: PICS_SKIP_SAMPLE_APP && DRLK.S.F0d && DRLK.S.A0081
+      PICS: DRLK.S.F0d && DRLK.S.A0081
       command: "readAttribute"
       attribute: "AliroReaderGroupIdentifier"
       response:
@@ -1607,11 +1608,10 @@ tests:
           constraints:
               type: octet_string
               minLength: 16
-
     - label:
           "Step 39b: TH writes AliroReaderGroupIdentifier attribute as octstr
           value of length 16 which is different from aliroreadergrpidentifier"
-      PICS: PICS_SKIP_SAMPLE_APP && DRLK.S.F0d && DRLK.S.A0081
+      PICS: DRLK.S.F0d && DRLK.S.A0081
       command: "writeAttribute"
       attribute: "AliroReaderVerificationKey"
       arguments:
@@ -1620,15 +1620,14 @@ tests:
           error: UNSUPPORTED_WRITE
 
     - label: "Step 39c: TH reads AliroReaderGroupIdentifier attribute from DUT"
-      PICS: PICS_SKIP_SAMPLE_APP && DRLK.S.F0d && DRLK.S.A0081
+      PICS: DRLK.S.F0d && DRLK.S.A0081
       command: "readAttribute"
       attribute: "AliroReaderGroupIdentifier"
       response:
           value: aliroreadergrpidentifier
-
     - label:
           "Step 40a: TH reads AliroReaderGroupSubIdentifier attribute from DUT"
-      PICS: PICS_SKIP_SAMPLE_APP && DRLK.S.F0d && DRLK.S.A0082
+      PICS: DRLK.S.F0d && DRLK.S.A0082
       command: "readAttribute"
       attribute: "AliroReaderGroupSubIdentifier"
       response:
@@ -1640,7 +1639,7 @@ tests:
     - label:
           "Step 40b: TH writes AliroReaderGroupSubIdentifier attribute as octstr
           value of length 16 which is different from aliroreadergrpsubidentifier"
-      PICS: PICS_SKIP_SAMPLE_APP && DRLK.S.F0d && DRLK.S.A0082
+      PICS: DRLK.S.F0d && DRLK.S.A0082
       command: "writeAttribute"
       attribute: "AliroReaderGroupSubIdentifier"
       arguments:
@@ -1649,7 +1648,7 @@ tests:
           error: UNSUPPORTED_WRITE
 
     - label: "Step 40c: TH reads AliroReaderGroupIdentifier attribute from DUT"
-      PICS: PICS_SKIP_SAMPLE_APP && DRLK.S.F0d && DRLK.S.A0082
+      PICS: DRLK.S.F0d && DRLK.S.A0082
       command: "readAttribute"
       attribute: "AliroReaderGroupSubIdentifier"
       response:
@@ -1658,7 +1657,7 @@ tests:
     - label:
           "Step 41a: TH reads AliroExpeditedTransactionSupportedProtocolVersions
           attribute from DUT"
-      PICS: PICS_SKIP_SAMPLE_APP && DRLK.S.F0d && DRLK.S.A0083
+      PICS: DRLK.S.F0d && DRLK.S.A0083
       command: "readAttribute"
       attribute: "AliroExpeditedTransactionSupportedProtocolVersions"
       response:
@@ -1666,19 +1665,17 @@ tests:
           constraints:
               type: list
               maxLength: 16
-
     - label:
           "Step 41b: TH writes
           AliroExpeditedTransactionSupportedProtocolVersions attribute as list
           which is different from aliroprotocolversion"
-      PICS: PICS_SKIP_SAMPLE_APP && DRLK.S.F0d && DRLK.S.A0083
+      PICS: DRLK.S.F0d && DRLK.S.A0083
       command: "writeAttribute"
       attribute: "AliroExpeditedTransactionSupportedProtocolVersions"
       arguments:
-          value: [1, 2]
+          value: ["0x1", "0x2"]
       response:
           error: UNSUPPORTED_WRITE
-
     - label:
           "Step 41c: TH reads AliroExpeditedTransactionSupportedProtocolVersions
           attribute from DUT"
@@ -1689,7 +1686,7 @@ tests:
           value: aliroprotocolversion
 
     - label: "Step 42a: TH reads AliroGroupResolvingKey attribute from DUT"
-      PICS: PICS_SKIP_SAMPLE_APP && DRLK.S.F0d && DRLK.S.A0084
+      PICS: DRLK.S.F0d && DRLK.S.A0084
       command: "readAttribute"
       attribute: "AliroGroupResolvingKey"
       response:
@@ -1701,7 +1698,7 @@ tests:
     - label:
           "Step 42b: TH writes AliroGroupResolvingKey attribute as octstr value
           of length 16 which is different from alirogrpresolvingkey"
-      PICS: PICS_SKIP_SAMPLE_APP && DRLK.S.F0d && DRLK.S.A0084
+      PICS: DRLK.S.F0d && DRLK.S.A0084
       command: "writeAttribute"
       attribute: "AliroGroupResolvingKey"
       arguments:
@@ -1710,16 +1707,15 @@ tests:
           error: UNSUPPORTED_WRITE
 
     - label: "Step 42c: TH reads AliroGroupResolvingKey attribute from DUT"
-      PICS: PICS_SKIP_SAMPLE_APP && DRLK.S.F0d && DRLK.S.A0084
+      PICS: DRLK.S.F0d && DRLK.S.A0084
       command: "readAttribute"
       attribute: "AliroGroupResolvingKey"
       response:
           value: alirogrpresolvingkey
-
     - label:
           "Step 43a: TH reads AliroSupportedBLEUWBProtocolVersions attribute
           from DUT"
-      PICS: PICS_SKIP_SAMPLE_APP && DRLK.S.F0d && DRLK.S.A0085
+      PICS: DRLK.S.F0d && DRLK.S.A0085
       command: "readAttribute"
       attribute: "AliroSupportedBLEUWBProtocolVersions"
       response:
@@ -1731,7 +1727,7 @@ tests:
     - label:
           "Step 43b: TH writes AliroSupportedBLEUWBProtocolVersions attribute as
           list which is different from alirobleuwbprotocolversion"
-      PICS: PICS_SKIP_SAMPLE_APP && DRLK.S.F0d && DRLK.S.A0085
+      PICS: DRLK.S.F0d && DRLK.S.A0085
       command: "writeAttribute"
       attribute: "AliroSupportedBLEUWBProtocolVersions"
       arguments:
@@ -1740,14 +1736,14 @@ tests:
           error: UNSUPPORTED_WRITE
 
     - label: "Step 43c: TH reads AliroGroupResolvingKey attribute from DUT"
-      PICS: PICS_SKIP_SAMPLE_APP && DRLK.S.F0d && DRLK.S.A0085
+      PICS: DRLK.S.F0d && DRLK.S.A0085
       command: "readAttribute"
       attribute: "AliroSupportedBLEUWBProtocolVersions"
       response:
           value: alirobleuwbprotocolversion
 
     - label: "Step 44a: TH reads AliroBLEAdvertisingVersion attribute from DUT"
-      PICS: PICS_SKIP_SAMPLE_APP && DRLK.S.F0d && DRLK.S.A0086
+      PICS: DRLK.S.F0d && DRLK.S.A0086
       command: "readAttribute"
       attribute: "AliroBLEAdvertisingVersion"
       response:
@@ -1760,7 +1756,7 @@ tests:
     - label:
           "Step 44b: TH writes AliroBLEAdvertisingVersion attribute as any value
           different from alirobleadvversion"
-      PICS: PICS_SKIP_SAMPLE_APP && DRLK.S.F0d && DRLK.S.A0086
+      PICS: DRLK.S.F0d && DRLK.S.A0086
       command: "writeAttribute"
       attribute: "AliroBLEAdvertisingVersion"
       arguments:
@@ -1769,7 +1765,7 @@ tests:
           error: UNSUPPORTED_WRITE
 
     - label: "Step 44c: TH reads AliroBLEAdvertisingVersion attribute from DUT"
-      PICS: PICS_SKIP_SAMPLE_APP && DRLK.S.F0d && DRLK.S.A0086
+      PICS: DRLK.S.F0d && DRLK.S.A0086
       command: "readAttribute"
       attribute: "AliroBLEAdvertisingVersion"
       response:
@@ -1778,7 +1774,7 @@ tests:
     - label:
           "Step 45a: TH reads NumberOfAliroCredentialIssuerKeysSupported
           attribute from DUT"
-      PICS: PICS_SKIP_SAMPLE_APP && DRLK.S.F0d && DRLK.S.A0087
+      PICS: DRLK.S.F0d && DRLK.S.A0087
       command: "readAttribute"
       attribute: "NumberOfAliroCredentialIssuerKeysSupported"
       response:
@@ -1791,7 +1787,7 @@ tests:
     - label:
           "Step 45b: TH writes NumberOfAliroCredentialIssuerKeysSupported
           attribute as any value different from alirokeysupported"
-      PICS: PICS_SKIP_SAMPLE_APP && DRLK.S.F0d && DRLK.S.A0087
+      PICS: DRLK.S.F0d && DRLK.S.A0087
       command: "writeAttribute"
       attribute: "NumberOfAliroCredentialIssuerKeysSupported"
       arguments:
@@ -1802,7 +1798,7 @@ tests:
     - label:
           "Step 45c: TH reads NumberOfAliroCredentialIssuerKeysSupported
           attribute from DUT"
-      PICS: PICS_SKIP_SAMPLE_APP && DRLK.S.F0d && DRLK.S.A0087
+      PICS: DRLK.S.F0d && DRLK.S.A0087
       command: "readAttribute"
       attribute: "NumberOfAliroCredentialIssuerKeysSupported"
       response:
@@ -1811,7 +1807,7 @@ tests:
     - label:
           "Step 46a: TH reads NumberOfAliroEndpointKeysSupported attribute from
           DUT"
-      PICS: PICS_SKIP_SAMPLE_APP && DRLK.S.F0d && DRLK.S.A0088
+      PICS: DRLK.S.F0d && DRLK.S.A0088
       command: "readAttribute"
       attribute: "NumberOfAliroEndpointKeysSupported"
       response:
@@ -1824,7 +1820,7 @@ tests:
     - label:
           "Step 46b: TH writes NumberOfAliroEndpointKeysSupported attribute as
           any value different from aliroepkeysupported"
-      PICS: PICS_SKIP_SAMPLE_APP && DRLK.S.F0d && DRLK.S.A0088
+      PICS: DRLK.S.F0d && DRLK.S.A0088
       command: "writeAttribute"
       attribute: "NumberOfAliroEndpointKeysSupported"
       arguments:
@@ -1835,7 +1831,7 @@ tests:
     - label:
           "Step 46c: TH reads NumberOfAliroEndpointKeysSupported attribute from
           DUT"
-      PICS: PICS_SKIP_SAMPLE_APP && DRLK.S.F0d && DRLK.S.A0088
+      PICS: DRLK.S.F0d && DRLK.S.A0088
       command: "readAttribute"
       attribute: "NumberOfAliroEndpointKeysSupported"
       response:
