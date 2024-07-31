@@ -41,6 +41,8 @@ event_call_count = 0
 
 
 def dynamic_invoke_return(*args, **argv):
+    ''' Returns the response to a mocked SendCommand call.
+    '''
     global invoke_call_count
     invoke_call_count += 1
 
@@ -79,6 +81,8 @@ def dynamic_invoke_return(*args, **argv):
 
 
 def dynamic_event_return(*args, **argv):
+    ''' Returns the response to a mocked ReadEvent call.
+    '''
     global event_call_count
     event_call_count += 1
 
@@ -105,6 +109,12 @@ def dynamic_event_return(*args, **argv):
 
 
 def wildcard() -> Attribute.AsyncReadTransaction.ReadResponse:
+    ''' Returns the response to a wildcard read.
+        For this test, we just need descriptors and a few attributes
+        Tree
+        EP1 (Aggregator): Descriptor
+          - EP2 (Bridged Node): Descriptor, Bridged Device Basic Information, Ecosystem Information
+    '''
     cc = Clusters.CommissionerControl
     ei = Clusters.EcosystemInformation
     desc = Clusters.Descriptor
@@ -134,9 +144,20 @@ def wildcard() -> Attribute.AsyncReadTransaction.ReadResponse:
 
 
 class MyMock(MockTestRunner):
-    # TODO consolidate with above
     def run_test_with_mock(self, dynamic_invoke_return: typing.Callable, dynamic_event_return: typing.Callable, read_cache: Attribute.AsyncReadTransaction.ReadResponse, hooks=None):
-        ''' Effects is a list of callable functions with *args, **kwargs parameters. It can either throw an InteractionModelException or return the command response.'''
+        ''' Run the test using the Mocked versions of Read, SendCommand, OpenCommissioningWindow, FindOrEstablishPASESession and ReadEvent
+            dynamic_invoke_return: Callable function that returns the result of a SendCommand call
+                                   Function should return one of
+                                   - command response for commands with responses
+                                   - None for commands with success results
+                                   - raise InteractionModelError for error results
+            dynamic_event_return: Callable function that returns the result of a ReadEvent call
+                                  Function should return one of
+                                  - list of EventReadResult for successful reads
+                                  - raise InteractionModelError for error results
+            read_cache          : Response to a Read call. For this test, this will be the wildcard read of all teh attributes
+            hooks               : Test harness hook object if desired.
+        '''
         self.default_controller.Read = AsyncMock(return_value=read_cache)
         self.default_controller.SendCommand = AsyncMock(return_value=None, side_effect=dynamic_invoke_return)
         # It doesn't actually matter what we return here because I'm going to catch the next pase session connection anyway
