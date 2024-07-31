@@ -46,7 +46,7 @@ static_assert(IsDumpable<DumpableTypeExample>::value);
  * Calls DumpToLog() on the object, if supported.
  */
 template <class T>
-void DumpObjectToLog(const T * object)
+void DumpObjectToLog([[maybe_unused]] const T * object)
 {
     if constexpr (IsDumpable<T>::value)
     {
