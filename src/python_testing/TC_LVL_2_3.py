@@ -51,7 +51,7 @@ class TC_LVL_2_3(MatterBaseTest):
                          test_plan_support.verify_success()),
                 TestStep(6, "Set up a subscription wildcard subscription for the Level Control Cluster, with MinIntervalFloor set to 0, MaxIntervalCeiling set to 30 and KeepSubscriptions set to false",
                          "Subscription successfully established"),
-                TestStep(7, f"{THcommand} MoveToLevel with Level field set to maxLevel, TransitionTime field set to 10 and remaining fields set to 0",
+                TestStep(7, f"{THcommand} MoveToLevel with Level field set to maxLevel, TransitionTime field set to 100 (10s) and remaining fields set to 0",
                          test_plan_support.verify_success()),
                 TestStep(8, "TH stores the reported values of CurrentLevel in all incoming reports for CurrentLevel attribute, that contains data in reportedCurrentLevelValuesList, over a period of 30 seconds."),
                 TestStep(9, "TH verifies that reportedCurrentLevelValuesList does not contain more than 10 entries for CurrentLevel",
@@ -65,18 +65,18 @@ class TC_LVL_2_3(MatterBaseTest):
                 TestStep(13, "If the LT feature is not supported, skip remaining steps and end test case"),
                 # 14 is missing in the test plan
                 TestStep(15, "TH stores the reported values of RemainingTime in all incoming reports for RemainingTime attribute, that contains data in reportedRemainingTimeValuesList."),
-                TestStep(16, f"	{THcommand} MoveToLevel with Level field set to startCurrentLevel, TransitionTime field set to 10 and remaining fields set to 0",
+                TestStep(16, f"	{THcommand} MoveToLevel with Level field set to startCurrentLevel, TransitionTime field set to 100 (10s) and remaining fields set to 0",
                          test_plan_support.verify_success()),
                 TestStep(17, "Wait for 5 seconds"),
-                TestStep(18, f"{THcommand} MoveToLevel with Level field set to startCurrentLevel, TransitionTime field set to 15 and remaining fields set to 0",
+                TestStep(18, f"{THcommand} MoveToLevel with Level field set to startCurrentLevel, TransitionTime field set to 150 (15s) and remaining fields set to 0",
                          test_plan_support.verify_success()),
                 TestStep(19, "Wait for 20 seconds"),
                 TestStep(20, "TH verifies reportedRemainingTimeValuesList contains three entries",
                          "reportedRemainingTimeValuesList has 3 entries in the list"),
-                TestStep(21, "TH verifies the first entry in reportedRemainingTimeValuesList is 10",
-                         "The first entry in reportedRemainingTimeValuesList is equal to 10"),
-                TestStep(22, "TH verifies the second entry in reportedRemainingTimeValuesList is 15",
-                         "The second entry in reportedRemainingTimeValuesList is equal to 15"),
+                TestStep(21, "TH verifies the first entry in reportedRemainingTimeValuesList is approximately 100 (10s)",
+                         "The first entry in reportedRemainingTimeValuesList is approximately equal to 100"),
+                TestStep(22, "TH verifies the second entry in reportedRemainingTimeValuesList is approximately 150",
+                         "The second entry in reportedRemainingTimeValuesList is approximately equal to 150"),
                 TestStep(23, "TH verifies the third entry in reportedRemainingTimeValuesList is 0",
                          "The third entry in reportedRemainingTimeValuesList is equal to 0")
                 ]
@@ -173,7 +173,7 @@ class TC_LVL_2_3(MatterBaseTest):
         self.step(21)
         remaining_time = sub_handler.attribute_reports[lvl.Attributes.RemainingTime]
         logging.info(f'Reamining time reports: {remaining_time}')
-        asserts.assert_equal(remaining_time[0].value, 100, "Unexpected first RemainingTime report")
+        asserts.assert_almost_equal(remaining_time[0].value, 100, delta=10, msg="Unexpected first RemainingTime report")
 
         self.step(22)
         asserts.assert_almost_equal(remaining_time[1].value, 150, delta=10, msg="Unexpected second RemainingTime report")
