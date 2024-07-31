@@ -182,7 +182,12 @@ tests:
           [1657235198856] [31506:16834043] CHIP: [TOO] Device commissioning completed with success
       disabled: true
 
-    - label: "Step 2e: Custom Commissioning Flow: Use a Commissionee with a QR code that has the Custom Flow field set to 2 and supports Wi-Fi PAF for its Discovery Capability. Commissionee is NOT in commissioning mode. Ensure the Version bit string follows the current Matter spec. documentation."
+    - label:
+          "Step 2e: Custom Commissioning Flow: Use a Commissionee with a QR code
+          that has the Custom Flow field set to 2 and supports Wi-Fi PAF for its
+          Discovery Capability. Commissionee is NOT in commissioning mode.
+          Ensure the Version bit string follows the current Matter spec.
+          documentation."
       PICS: MCORE.DD.DISCOVERY_PAF
       verification: |
           1. User has a QR code to pass into DUT.
@@ -218,7 +223,12 @@ tests:
 
       disabled: true
 
-    - label: "Step 2h: User should follow any TH-specific steps, unless the DUT has alternative means to guide the user to successful commissioning, for putting the TH Commissionee into commissioning mode, for triggering the DUT Commissioner for commissioning, and for completing the commissioning process using BLE."
+    - label:
+          "Step 2h: User should follow any TH-specific steps, unless the DUT has
+          alternative means to guide the user to successful commissioning, for
+          putting the TH Commissionee into commissioning mode, for triggering
+          the DUT Commissioner for commissioning, and for completing the
+          commissioning process using BLE."
       PICS: MCORE.DD.DISCOVERY_PAF
       verification: |
           1. DUT commissions TH to the Matter network.

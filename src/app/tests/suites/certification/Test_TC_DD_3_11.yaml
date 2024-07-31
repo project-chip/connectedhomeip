@@ -200,7 +200,10 @@ tests:
           [1719392883.120944][28468:28468] CHIP:SPL: Passcode: 20202021
       disabled: true
 
-    - label: "Step 2f: Using the DUT, parse the TH’s QR code and follow any steps needed for the Commissioner/Commissionee to complete the commissioning process using Wi-Fi PAF"
+    - label:
+          "Step 2f: Using the DUT, parse the TH’s QR code and follow any steps
+          needed for the Commissioner/Commissionee to complete the commissioning
+          process using Wi-Fi PAF"
       PICS: MCORE.DD.DISCOVERY_PAF
       verification: |
           1. DUT parses QR code and DUT commissions TH to the Matter network
