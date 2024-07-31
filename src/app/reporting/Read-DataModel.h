@@ -19,7 +19,7 @@
 #include <access/SubjectDescriptor.h>
 #include <app/AttributeEncodeState.h>
 #include <app/MessageDef/AttributeReportIBs.h>
-#include <app/data-model-interface/DataModel.h>
+#include <app/data-model-provider/Provider.h>
 #include <lib/core/CHIPError.h>
 
 namespace chip {
@@ -27,7 +27,7 @@ namespace app {
 namespace reporting {
 namespace DataModelImpl {
 
-CHIP_ERROR RetrieveClusterData(InteractionModel::DataModel * dataModel, const Access::SubjectDescriptor & subjectDescriptor,
+CHIP_ERROR RetrieveClusterData(DataModel::Provider * dataModel, const Access::SubjectDescriptor & subjectDescriptor,
                                bool isFabricFiltered, AttributeReportIBs::Builder & reportBuilder,
                                const ConcreteReadAttributePath & path, AttributeEncodeState * encoderState);
 
