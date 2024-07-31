@@ -136,7 +136,7 @@ class TC_MCORE_FS_1_2(MatterBaseTest):
         while time_remaining > 0 and th_sed_later_bdbi_endpoint < 0:
             try:
                 item = unique_id_queue.get(block=True, timeout=time_remaining)
-                client_name, endpoint, attribute, value = item['name'], item['endpoint'], item['attribute'], item['value']
+                endpoint, attribute, value = item['endpoint'], item['attribute'], item['value']
 
                 # Record arrival of an expected subscription change when seen
                 if attribute == Clusters.BridgedDeviceBasicInformation.Attributes.UniqueID and endpoint != th_sed_dut_bdbi_endpoint and th_sed_later_unique_id != th_sed_dut_unique_id:
