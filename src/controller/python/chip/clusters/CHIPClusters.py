@@ -871,7 +871,7 @@ class ChipClusters:
                 "commandId": 0x00000000,
                 "commandName": "ReviewFabricRestrictions",
                 "args": {
-                    "arl": "AccessRestrictionStruct",
+                    "arl": "CommissioningAccessRestrictionEntryStruct",
                 },
             },
         },
@@ -1951,6 +1951,14 @@ class ChipClusters:
                 "args": {
                 },
             },
+            0x00000006: {
+                "commandId": 0x00000006,
+                "commandName": "SetTCAcknowledgements",
+                "args": {
+                    "TCVersion": "int",
+                    "TCUserResponse": "int",
+                },
+            },
         },
         "attributes": {
             0x00000000: {
@@ -1981,6 +1989,30 @@ class ChipClusters:
             0x00000004: {
                 "attributeName": "SupportsConcurrentConnection",
                 "attributeId": 0x00000004,
+                "type": "bool",
+                "reportable": True,
+            },
+            0x00000005: {
+                "attributeName": "TCAcceptedVersion",
+                "attributeId": 0x00000005,
+                "type": "int",
+                "reportable": True,
+            },
+            0x00000006: {
+                "attributeName": "TCMinRequiredVersion",
+                "attributeId": 0x00000006,
+                "type": "int",
+                "reportable": True,
+            },
+            0x00000007: {
+                "attributeName": "TCAcknowledgements",
+                "attributeId": 0x00000007,
+                "type": "int",
+                "reportable": True,
+            },
+            0x00000008: {
+                "attributeName": "TCAcknowledgementsRequired",
+                "attributeId": 0x00000008,
                 "type": "bool",
                 "reportable": True,
             },
@@ -3269,6 +3301,7 @@ class ChipClusters:
                 "commandId": 0x00000080,
                 "commandName": "KeepActive",
                 "args": {
+                    "stayActiveDuration": "int",
                 },
             },
         },
