@@ -53,6 +53,7 @@ class TC_SwitchTests(MatterBaseTest):
         """Returns a description of this test"""
         return "[TC-SWTCH-2.4] Momentary Switch Long Press Verification"
 
+    # TODO(#34656): Fill test steps
     # def steps_TC_SWTCH_2_4(self) -> list[TestStep]:
     #     steps = [
     #         TestStep("0", "Commissioning, already done", is_commissioning=True),
@@ -164,7 +165,7 @@ class TC_SwitchTests(MatterBaseTest):
             time.sleep(self.keep_pressed_delay/1000)
 
     def _placeholder_for_step(self, step_id: str):
-        # TODO: Global search an replace of `self._placeholder_for_step` with `self.step` when done.
+        # TODO(#34656): Global search an replace of `self._placeholder_for_step` with `self.step` when done.
         logging.info(f"Step {step_id}")
         pass
 
@@ -270,7 +271,7 @@ class TC_SwitchTests(MatterBaseTest):
 
     @per_endpoint_test(has_feature(Clusters.Switch, Clusters.Switch.Bitmaps.Feature.kMomentarySwitch))
     async def test_TC_SWTCH_2_4(self):
-        # TODO: Make this come from PIXIT
+        # TODO(#34656): Make this come from PIXIT
         switch_pressed_position = 1
         post_prompt_settle_delay_seconds = 10.0
 
@@ -429,7 +430,7 @@ class TC_SwitchTests(MatterBaseTest):
         asserts.assert_equal(button_val, expected_switch_position, f"Switch position is not {expected_switch_position}")
 
         # Step 7: If there are more than 2 positions, test subsequent positions of the DUT
-        # TODO: Implement loop for > 2 total positions
+        # # TODO(#34656): Implement loop for > 2 total positions
         self.skip_step(7)
 
         # Step 8: Operator sets switch to first position on the DUT.
