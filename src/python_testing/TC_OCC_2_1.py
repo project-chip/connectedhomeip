@@ -81,6 +81,7 @@ class TC_OCC_2_1(MatterBaseTest):
                                 "OccupancySensorType is not in valid range")
         else:
             logging.info("OccupancySensorType attribute is a mandatory attribute. Test step fails")
+            asserts.fail("Missing mandatory attribute OccupancySensorType")
 
         self.step(4)
         if attributes.OccupancySensorTypeBitmap.attribute_id in attribute_list:
