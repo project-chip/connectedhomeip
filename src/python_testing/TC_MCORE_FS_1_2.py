@@ -118,11 +118,11 @@ class TC_MCORE_FS_1_2(MatterBaseTest):
 
         self.step(4)
         if not self.is_ci:
-            self.wait_for_use_input("Commission TH_SED_DUT onto DUT_FSA’s fabric using the manufacturer specified mechanism. (ensure Synchronization is enabled.)")
+            self.wait_for_use_input(
+                "Commission TH_SED_DUT onto DUT_FSA’s fabric using the manufacturer specified mechanism. (ensure Synchronization is enabled.)")
         else:
             logging.info("Stopping after step 3 while running in CI to avoid manual steps.")
             return
-
 
         self.step(5)
 
@@ -170,6 +170,7 @@ class TC_MCORE_FS_1_2(MatterBaseTest):
         self.th_sed_later_nodeid = 2222
         await self.TH_server_controller.CommissionOnNetwork(nodeId=self.th_sed_later_nodeid, setupPinCode=self.sync_passcode, filterType=ChipDeviceCtrl.DiscoveryFilterType.LONG_DISCRIMINATOR, filter=self.th_sed_later_discriminator)
         logging.info("Commissioning TH_SED_L complete")
+
 
 if __name__ == "__main__":
     default_matter_test_main()
