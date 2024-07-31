@@ -560,7 +560,7 @@ inline void chipDie(void)
     nlABORT_ACTION(aCondition, ::chip::DumpObjectToLog(aObject);                                                                   \
                    ChipLogError(Support, "VerifyOrDie failure at %s:%d: %s", __FILE__, __LINE__, #aCondition))
 #else // CHIP_CONFIG_VERBOSE_VERIFY_OR_DIE
-#define VerifyOrDie(aCondition, aObject) VerifyOrDieWithoutLogging(aCondition)
+#define VerifyOrDieWithObject(aCondition, aObject) VerifyOrDieWithoutLogging(aCondition)
 #endif // CHIP_CONFIG_VERBOSE_VERIFY_OR_DIE
 
 /**
