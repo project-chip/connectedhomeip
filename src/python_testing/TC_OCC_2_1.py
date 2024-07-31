@@ -218,7 +218,7 @@ class TC_OCC_2_1(MatterBaseTest):
                                  Clusters.OccupancySensing.Enums.OccupancySensorTypeEnum.kPhysicalContact) != 0
             has_phycon_delay = attributes.PhysicalContactOccupiedToUnoccupiedDelay.attribute_id in attribute_list
             asserts.assert_equal(has_phycon_bitmap, has_phycon_delay, "Bad conformance on PhysicalContact bitmap")
-            phycontact_otou_delay_dut = await self.read_occ_attribute_expect_success(endpoint=endpoint, attribute=attributes.PhysicalContactOccupiedToUnoccupiedDelay)          
+            phycontact_otou_delay_dut = await self.read_occ_attribute_expect_success(endpoint=endpoint, attribute=attributes.PhysicalContactOccupiedToUnoccupiedDelay)
             asserts.assert_less_equal(phycontact_otou_delay_dut, 0xFFFE,
                                       "PhysicalContactOccupiedToUnoccupiedDelay is not in valid range")
             asserts.assert_greater_equal(phycontact_otou_delay_dut, 0,
