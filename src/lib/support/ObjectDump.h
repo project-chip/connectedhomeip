@@ -24,7 +24,8 @@ namespace chip {
 
 /**
  * A dumpable object that can log some useful state for debugging in fatal
- * error scenarios by exposing a DumpToLog() const method.
+ * error scenarios by exposing a `void DumpToLog() const` method. The method
+ * should log key details about the state of object using ChipLogError().
  */
 template <class, class = void>
 struct IsDumpable : std::false_type

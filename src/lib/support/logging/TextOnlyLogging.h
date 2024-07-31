@@ -36,6 +36,7 @@
 
 #include <lib/core/CHIPConfig.h>
 
+#include <lib/support/Compiler.h>
 #include <lib/support/DLLUtil.h>
 #include <lib/support/EnforceFormat.h>
 #include <lib/support/VerificationMacrosNoLogging.h>
@@ -294,7 +295,10 @@ using LogRedirectCallback_t = void (*)(const char * module, uint8_t category, co
     ChipLogValueExchangeId((payloadHeader).GetExchangeID(), !(payloadHeader).IsInitiator())
 
 /**
- * Logging helpers for RTTI, primarily useful when logging fatal errors in DumpToLog().
+ * Logging helpers for logging the dynamic type of an object, if possible.
+ *
+ * Primarily useful when logging the type of delegates or similar objects when
+ * performing logging for a fatal error in DumpToLog().
  *
  * Example:
  * @code
@@ -302,7 +306,7 @@ using LogRedirectCallback_t = void (*)(const char * module, uint8_t category, co
  * @endcode
  */
 #define ChipLogFormatRtti "%s"
-#if __has_feature(cxx_rtti)
+#if CHIP_HAVE_RTTI
 #define ChipLogValueRtti(ptr) ((ptr) != nullptr ? typeid(*(ptr)).name() : "null")
 #else
 #define ChipLogValueRtti(ptr) ((ptr) != nullptr ? "?" : "null")

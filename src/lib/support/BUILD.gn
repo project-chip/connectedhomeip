@@ -68,6 +68,7 @@ source_set("logging_constants") {
 
 source_set("attributes") {
   sources = [
+    "Compiler.h",
     "DLLUtil.h",
     "EnforceFormat.h",
   ]
