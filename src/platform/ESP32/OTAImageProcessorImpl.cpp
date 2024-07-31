@@ -135,9 +135,9 @@ CHIP_ERROR OTAImageProcessorImpl::ProcessBlock(ByteSpan & block)
 }
 
 #ifdef CONFIG_ENABLE_DELTA_OTA
-static bool verify_chip_id(void * bin_header_data)
+bool OTAImageProcessorImpl::VerifyChipId(void * binHeaderData)
 {
-    esp_image_header_t * header = (esp_image_header_t *) bin_header_data;
+    esp_image_header_t * header = (esp_image_header_t *) binHeaderData;
     if (header->chip_id != CONFIG_IDF_FIRMWARE_CHIP_ID)
     {
         ESP_LOGE(TAG, "Mismatch chip id, expected %d, found %d", CONFIG_IDF_FIRMWARE_CHIP_ID, header->chip_id);
@@ -146,16 +146,16 @@ static bool verify_chip_id(void * bin_header_data)
     return true;
 }
 
-static bool verify_patch_header(void * img_hdr_data)
+bool OTAImageProcessorImpl::VerifyPatchHeader(void * imgHeaderData)
 {
-    const uint32_t esp_delta_ota_magic = 0xfccdde10;
-    if (!img_hdr_data)
+    const uint32_t espDeltaOtaMagic = 0xfccdde10;
+    if (!imgHeaderData)
     {
         return false;
     }
-    uint32_t recv_magic = *(uint32_t *) img_hdr_data;
-    uint8_t * digest    = (uint8_t *) ((uint8_t *) img_hdr_data + 4);
-    if (recv_magic != esp_delta_ota_magic)
+    uint32_t recvMagic = *(uint32_t *) imgHeaderData;
+    uint8_t * digest   = (uint8_t *) ((uint8_t *) imgHeaderData + 4);
+    if (recvMagic != espDeltaOtaMagic)
     {
         ESP_LOGE(TAG, "Invalid magic word in patch");
         return false;
@@ -170,49 +170,61 @@ static bool verify_patch_header(void * img_hdr_data)
     return true;
 }
 
-esp_err_t verify_header_data(const uint8_t * buf_p, size_t size, int * index)
+esp_err_t OTAImageProcessorImpl::VerifyHeaderData(const uint8_t * buf, size_t size, int * index)
 {
-    static bool patch_header_verified = false;
-    static char patch_header[PATCH_HEADER_SIZE];
-    static int header_data_read = 0;
-    if (!patch_header_verified)
+    static char patchHeader[PATCH_HEADER_SIZE];
+    static int headerDataRead = 0;
+    if (!patchHeaderVerified)
     {
-        if (header_data_read + size < PATCH_HEADER_SIZE)
+        if (headerDataRead + size < PATCH_HEADER_SIZE)
         {
-            memcpy(patch_header + header_data_read, buf_p, size);
-            header_data_read += size;
+            memcpy(patchHeader + headerDataRead, buf, size);
+            headerDataRead += size;
             return ESP_OK;
         }
         else
         {
-            *index = PATCH_HEADER_SIZE - header_data_read;
-            memcpy(patch_header + header_data_read, buf_p, *index);
-            if (!verify_patch_header(patch_header))
+            *index = PATCH_HEADER_SIZE - headerDataRead;
+            memcpy(patchHeader + headerDataRead, buf, *index);
+            if (!VerifyPatchHeader(patchHeader))
             {
                 return ESP_ERR_INVALID_VERSION;
             }
-            header_data_read      = 0;
-            *index                = PATCH_HEADER_SIZE;
-            patch_header_verified = true;
+            headerDataRead      = 0;
+            *index              = PATCH_HEADER_SIZE;
+            patchHeaderVerified = true;
         }
     }
     return ESP_OK;
 }
 
-esp_err_t OTAImageProcessorImpl::DeltaOTAReadCallback(uint8_t * buf_p, size_t size, int src_offset)
+void OTAImageProcessorImpl::DeltaOTACleanUp(intptr_t context)
 {
-    if (size <= 0 || buf_p == NULL)
+    auto * imageProcessor = reinterpret_cast<OTAImageProcessorImpl *>(context);
+    if (imageProcessor == nullptr)
+    {
+        ChipLogError(SoftwareUpdate, "ImageProcessor context is null");
+        return;
+    }
+    imageProcessor->patchHeaderVerified = false;
+    imageProcessor->chipIdVerified      = false;
+    return;
+}
+
+esp_err_t OTAImageProcessorImpl::DeltaOTAReadCallback(uint8_t * buf, size_t size, int srcOffset)
+{
+    if (size <= 0 || buf == NULL)
     {
         return ESP_ERR_INVALID_ARG;
     }
 
-    const esp_partition_t * current_partition = esp_ota_get_running_partition();
-    if (current_partition == NULL)
+    const esp_partition_t * currentPartition = esp_ota_get_running_partition();
+    if (currentPartition == NULL)
     {
         return ESP_FAIL;
     }
 
-    esp_err_t err = esp_partition_read(current_partition, src_offset, buf_p, size);
+    esp_err_t err = esp_partition_read(currentPartition, srcOffset, buf, size);
 
     if (err != ESP_OK)
     {
@@ -222,40 +234,39 @@ esp_err_t OTAImageProcessorImpl::DeltaOTAReadCallback(uint8_t * buf_p, size_t si
     return err;
 }
 
-esp_err_t OTAImageProcessorImpl::DeltaOTAWriteCallback(const uint8_t * buf_p, size_t size, void * arg)
+esp_err_t OTAImageProcessorImpl::DeltaOTAWriteCallback(const uint8_t * buf, size_t size, void * arg)
 {
     auto * imageProcessor = reinterpret_cast<OTAImageProcessorImpl *>(arg);
-    if (size <= 0 || buf_p == NULL)
+    if (size <= 0 || buf == NULL)
     {
         return ESP_ERR_INVALID_ARG;
     }
 
-    int index                   = 0;
-    static int header_data_read = 0;
-    static char header_data[IMG_HEADER_LEN];
-    static bool chip_id_verified = false;
+    int index                 = 0;
+    static int headerDataRead = 0;
+    static char headerData[IMG_HEADER_LEN];
 
-    if (!chip_id_verified)
+    if (!imageProcessor->chipIdVerified)
     {
-        if (header_data_read + size - index <= IMG_HEADER_LEN)
+        if (headerDataRead + size - index <= IMG_HEADER_LEN)
         {
-            memcpy(header_data + header_data_read, buf_p, size - index);
-            header_data_read += size - index;
+            memcpy(headerData + headerDataRead, buf, size - index);
+            headerDataRead += size - index;
             return ESP_OK;
         }
         else
         {
-            index = IMG_HEADER_LEN - header_data_read;
-            memcpy(header_data + header_data_read, buf_p, index);
+            index = IMG_HEADER_LEN - headerDataRead;
+            memcpy(headerData + headerDataRead, buf, index);
 
-            if (!verify_chip_id(header_data))
+            if (!VerifyChipId(headerData))
             {
                 return ESP_ERR_INVALID_VERSION;
             }
-            chip_id_verified = true;
+            imageProcessor->chipIdVerified = true;
 
-            // Write data in header_data buffer.
-            esp_err_t err = esp_ota_write(imageProcessor->mOTAUpdateHandle, header_data, IMG_HEADER_LEN);
+            // Write data in headerData buffer.
+            esp_err_t err = esp_ota_write(imageProcessor->mOTAUpdateHandle, headerData, IMG_HEADER_LEN);
             if (err != ESP_OK)
             {
                 return err;
@@ -263,7 +274,7 @@ esp_err_t OTAImageProcessorImpl::DeltaOTAWriteCallback(const uint8_t * buf_p, si
         }
     }
 
-    esp_err_t err = esp_ota_write(imageProcessor->mOTAUpdateHandle, buf_p + index, size - index);
+    esp_err_t err = esp_ota_write(imageProcessor->mOTAUpdateHandle, buf + index, size - index);
     if (err != ESP_OK)
     {
         ESP_LOGE(TAG, "esp_ota_write failed (%s)!", esp_err_to_name(err));
@@ -306,11 +317,11 @@ void OTAImageProcessorImpl::HandlePrepareDownload(intptr_t context)
         return;
     }
 #ifdef CONFIG_ENABLE_DELTA_OTA
-    imageProcessor->delta_ota_cfg.user_data               = imageProcessor,
-    imageProcessor->delta_ota_cfg.read_cb                 = &(imageProcessor->DeltaOTAReadCallback),
-    imageProcessor->delta_ota_cfg.write_cb_with_user_data = &(imageProcessor->DeltaOTAWriteCallback),
+    imageProcessor->deltaOtaCfg.user_data               = imageProcessor,
+    imageProcessor->deltaOtaCfg.read_cb                 = &(imageProcessor->DeltaOTAReadCallback),
+    imageProcessor->deltaOtaCfg.write_cb_with_user_data = &(imageProcessor->DeltaOTAWriteCallback),
 
-    imageProcessor->mDeltaOTAUpdateHandle = esp_delta_ota_init(&imageProcessor->delta_ota_cfg);
+    imageProcessor->mDeltaOTAUpdateHandle = esp_delta_ota_init(&imageProcessor->deltaOtaCfg);
     if (imageProcessor->mDeltaOTAUpdateHandle == NULL)
     {
         ChipLogError(SoftwareUpdate, "esp_delta_ota_init failed");
@@ -370,6 +381,7 @@ void OTAImageProcessorImpl::HandleFinalize(intptr_t context)
     }
 
     err = esp_ota_end(imageProcessor->mOTAUpdateHandle);
+    DeltaOTACleanUp(reinterpret_cast<intptr_t>(imageProcessor));
 #else
     esp_err_t err = esp_ota_end(imageProcessor->mOTAUpdateHandle);
 #endif // CONFIG_ENABLE_DELTA_OTA
@@ -406,6 +418,10 @@ void OTAImageProcessorImpl::HandleAbort(intptr_t context)
 #ifdef CONFIG_ENABLE_ENCRYPTED_OTA
     imageProcessor->DecryptAbort();
 #endif // CONFIG_ENABLE_ENCRYPTED_OTA
+
+#ifdef CONFIG_ENABLE_DELTA_OTA
+    DeltaOTACleanUp(reinterpret_cast<intptr_t>(imageProcessor));
+#endif // CONFIG_ENABLE_DELTA_OTA
 
     if (esp_ota_abort(imageProcessor->mOTAUpdateHandle) != ESP_OK)
     {
@@ -457,7 +473,7 @@ void OTAImageProcessorImpl::HandleProcessBlock(intptr_t context)
 #ifdef CONFIG_ENABLE_DELTA_OTA
 
     int index = 0;
-    err       = verify_header_data(blockToWrite.data(), blockToWrite.size(), &index);
+    err       = imageProcessor->VerifyHeaderData(blockToWrite.data(), blockToWrite.size(), &index);
 
     if (err != ESP_OK)
     {
@@ -467,6 +483,7 @@ void OTAImageProcessorImpl::HandleProcessBlock(intptr_t context)
         return;
     }
 
+    // Apply the patch and writes that data to the passive partition.
     err = esp_delta_ota_feed_patch(imageProcessor->mDeltaOTAUpdateHandle, blockToWrite.data() + index, blockToWrite.size() - index);
 #else
     err           = esp_ota_write(imageProcessor->mOTAUpdateHandle, blockToWrite.data(), blockToWrite.size());

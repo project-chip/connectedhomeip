@@ -54,10 +54,6 @@ public:
     // @return CHIP_NO_ERROR on success, appropriate error code otherwise
     CHIP_ERROR InitEncryptedOTA(const CharSpan & key);
 #endif // CONFIG_ENABLE_ENCRYPTED_OTA
-#ifdef CONFIG_ENABLE_DELTA_OTA
-    static esp_err_t DeltaOTAReadCallback(uint8_t * buf_p, size_t size, int src_offset);
-    static esp_err_t DeltaOTAWriteCallback(const uint8_t * buf_p, size_t size, void * arg);
-#endif // CONFIG_ENABLE_DELTA_OTA
 
 private:
     static void HandlePrepareDownload(intptr_t context);
@@ -76,7 +72,16 @@ private:
     esp_ota_handle_t mOTAUpdateHandle;
 #ifdef CONFIG_ENABLE_DELTA_OTA
     esp_delta_ota_handle_t mDeltaOTAUpdateHandle;
-    esp_delta_ota_cfg_t delta_ota_cfg;
+    esp_delta_ota_cfg_t deltaOtaCfg;
+    bool patchHeaderVerified = false;
+    bool chipIdVerified      = false;
+
+    static void DeltaOTACleanUp(intptr_t context);
+    static bool VerifyChipId(void * binHeaderData);
+    static bool VerifyPatchHeader(void * imgHeaderData);
+    esp_err_t VerifyHeaderData(const uint8_t * buf, size_t size, int * index);
+    static esp_err_t DeltaOTAReadCallback(uint8_t * buf_p, size_t size, int src_offset);
+    static esp_err_t DeltaOTAWriteCallback(const uint8_t * buf_p, size_t size, void * arg);
 #endif // CONFIG_ENABLE_DELTA_OTA
     OTAImageHeaderParser mHeaderParser;
 

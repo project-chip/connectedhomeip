@@ -161,7 +161,7 @@ Please follow the steps below to generate an application image for OTA upgrades:
 
 ## Encrypted Delta OTA
 
-To use enctryped delta OTA, follow the below steps.
+To use encrypted delta OTA, follow the below steps.
 
 ### Firmware Changes
 
