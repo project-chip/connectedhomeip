@@ -220,7 +220,7 @@ class TC_BRBINFO_4_1(MatterBaseTest):
         logging.info("Waiting for ActiveChanged from DUT...")
         promised_active_duration = await self._wait_for_active_changed_event((idle_mode_duration + max(active_mode_duration, stay_active_duration))/1000)
 
-        asserts.assert_true(promised_active_duration >= stay_active_duration, "PromisedActiveDuration < StayActiveDuration")
+        asserts.assert_greater_equal(promised_active_duration, stay_active_duration, "PromisedActiveDuration < StayActiveDuration")
 
         self.step("2")
 
