@@ -67,8 +67,8 @@ constexpr std::array<char[size], kMaxNetworks> createNetworkStorageKeys(const ch
         {
             arr[i][j] = keyName[j];
         }
-        // We assume that keyName[size - 1] is null terminated. Adding the check to this function
-        // does not make the function a consteval. The check can be added in when compiling the code with c++20
+        // We assume keyName[size - 1] is null-terminated. Adding this check to the function won't 
+        // make it a consteval. The check can be incorporated when compiling the code with C++20.
         arr[i][size - 2] = intToChar(i);
     }
     return arr;
