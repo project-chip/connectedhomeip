@@ -160,6 +160,8 @@ class TC_OCC_2_1(MatterBaseTest):
                 logging.info("PIRUnoccupiedToOccupiedThreshold conformance failed. Test step skipped")
         else:
             logging.info("PIRUnoccupiedToOccupiedThreshold not supported. Test step skipped")
+            self.mark_current_step_skipped()
+
 
         self.step(10)
         if attributes.UltrasonicOccupiedToUnoccupiedDelay.attribute_id in attribute_list:
