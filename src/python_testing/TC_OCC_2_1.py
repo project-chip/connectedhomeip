@@ -130,7 +130,8 @@ class TC_OCC_2_1(MatterBaseTest):
                 asserts.assert_less_equal(pir_otou_delay_dut, 0xFFFE, "PIROccupiedToUnoccupiedDelay is not in valid range")
                 asserts.assert_greater_equal(pir_otou_delay_dut, 0, "PIROccupiedToUnoccupiedDelay is not in valid range")
             else:
-                logging.info("PIROccupiedToUnoccupiedDelay conformance failed. Test step skipped")
+                logging.info("PIROccupiedToUnoccupiedDelay conformance failed".)
+                asserts.fail("PIROccupiedToUnoccupiedDelay conformance is incorrect")
         else:
             logging.info("PIROccupiedToUnoccupiedDelay not supported. Test step skipped")
 
