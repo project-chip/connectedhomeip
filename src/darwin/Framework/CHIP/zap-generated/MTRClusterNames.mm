@@ -15,6 +15,8 @@
  *    limitations under the License.
  */
 
+
+
 #import <Matter/MTRClusterNames.h>
 
 // @implementation MTRClusterAttributeIDType
@@ -24,383 +26,384 @@
 NSString * MTRClusterNameForID(MTRClusterIDType clusterID)
 {
     NSString * result = nil;
-
+    
     switch (clusterID) {
 
-    case MTRClusterIDTypeIdentifyID:
-        result = @"Identify";
-        break;
-    case MTRClusterIDTypeGroupsID:
-        result = @"Groups";
-        break;
-    case MTRClusterIDTypeOnOffID:
-        result = @"OnOff";
-        break;
-    case MTRClusterIDTypeOnOffSwitchConfigurationID:
-        result = @"OnOffSwitchConfiguration";
-        break;
-    case MTRClusterIDTypeLevelControlID:
-        result = @"LevelControl";
-        break;
-    case MTRClusterIDTypeBinaryInputBasicID:
-        result = @"BinaryInputBasic";
-        break;
-    case MTRClusterIDTypePulseWidthModulationID:
-        result = @"PulseWidthModulation";
-        break;
-    case MTRClusterIDTypeDescriptorID:
-        result = @"Descriptor";
-        break;
-    case MTRClusterIDTypeBindingID:
-        result = @"Binding";
-        break;
-    case MTRClusterIDTypeAccessControlID:
-        result = @"AccessControl";
-        break;
-    case MTRClusterIDTypeActionsID:
-        result = @"Actions";
-        break;
-    case MTRClusterIDTypeBasicInformationID:
-        result = @"BasicInformation";
-        break;
-    case MTRClusterIDTypeOTASoftwareUpdateProviderID:
-        result = @"OTASoftwareUpdateProvider";
-        break;
-    case MTRClusterIDTypeOTASoftwareUpdateRequestorID:
-        result = @"OTASoftwareUpdateRequestor";
-        break;
-    case MTRClusterIDTypeLocalizationConfigurationID:
-        result = @"LocalizationConfiguration";
-        break;
-    case MTRClusterIDTypeTimeFormatLocalizationID:
-        result = @"TimeFormatLocalization";
-        break;
-    case MTRClusterIDTypeUnitLocalizationID:
-        result = @"UnitLocalization";
-        break;
-    case MTRClusterIDTypePowerSourceConfigurationID:
-        result = @"PowerSourceConfiguration";
-        break;
-    case MTRClusterIDTypePowerSourceID:
-        result = @"PowerSource";
-        break;
-    case MTRClusterIDTypeGeneralCommissioningID:
-        result = @"GeneralCommissioning";
-        break;
-    case MTRClusterIDTypeNetworkCommissioningID:
-        result = @"NetworkCommissioning";
-        break;
-    case MTRClusterIDTypeDiagnosticLogsID:
-        result = @"DiagnosticLogs";
-        break;
-    case MTRClusterIDTypeGeneralDiagnosticsID:
-        result = @"GeneralDiagnostics";
-        break;
-    case MTRClusterIDTypeSoftwareDiagnosticsID:
-        result = @"SoftwareDiagnostics";
-        break;
-    case MTRClusterIDTypeThreadNetworkDiagnosticsID:
-        result = @"ThreadNetworkDiagnostics";
-        break;
-    case MTRClusterIDTypeWiFiNetworkDiagnosticsID:
-        result = @"WiFiNetworkDiagnostics";
-        break;
-    case MTRClusterIDTypeEthernetNetworkDiagnosticsID:
-        result = @"EthernetNetworkDiagnostics";
-        break;
-    case MTRClusterIDTypeTimeSynchronizationID:
-        result = @"TimeSynchronization";
-        break;
-    case MTRClusterIDTypeBridgedDeviceBasicInformationID:
-        result = @"BridgedDeviceBasicInformation";
-        break;
-    case MTRClusterIDTypeSwitchID:
-        result = @"Switch";
-        break;
-    case MTRClusterIDTypeAdministratorCommissioningID:
-        result = @"AdministratorCommissioning";
-        break;
-    case MTRClusterIDTypeOperationalCredentialsID:
-        result = @"OperationalCredentials";
-        break;
-    case MTRClusterIDTypeGroupKeyManagementID:
-        result = @"GroupKeyManagement";
-        break;
-    case MTRClusterIDTypeFixedLabelID:
-        result = @"FixedLabel";
-        break;
-    case MTRClusterIDTypeUserLabelID:
-        result = @"UserLabel";
-        break;
-    case MTRClusterIDTypeBooleanStateID:
-        result = @"BooleanState";
-        break;
-    case MTRClusterIDTypeICDManagementID:
-        result = @"ICDManagement";
-        break;
-    case MTRClusterIDTypeTimerID:
-        result = @"Timer";
-        break;
-    case MTRClusterIDTypeOvenCavityOperationalStateID:
-        result = @"OvenCavityOperationalState";
-        break;
-    case MTRClusterIDTypeOvenModeID:
-        result = @"OvenMode";
-        break;
-    case MTRClusterIDTypeLaundryDryerControlsID:
-        result = @"LaundryDryerControls";
-        break;
-    case MTRClusterIDTypeModeSelectID:
-        result = @"ModeSelect";
-        break;
-    case MTRClusterIDTypeLaundryWasherModeID:
-        result = @"LaundryWasherMode";
-        break;
-    case MTRClusterIDTypeRefrigeratorAndTemperatureControlledCabinetModeID:
-        result = @"RefrigeratorAndTemperatureControlledCabinetMode";
-        break;
-    case MTRClusterIDTypeLaundryWasherControlsID:
-        result = @"LaundryWasherControls";
-        break;
-    case MTRClusterIDTypeRVCRunModeID:
-        result = @"RVCRunMode";
-        break;
-    case MTRClusterIDTypeRVCCleanModeID:
-        result = @"RVCCleanMode";
-        break;
-    case MTRClusterIDTypeTemperatureControlID:
-        result = @"TemperatureControl";
-        break;
-    case MTRClusterIDTypeRefrigeratorAlarmID:
-        result = @"RefrigeratorAlarm";
-        break;
-    case MTRClusterIDTypeDishwasherModeID:
-        result = @"DishwasherMode";
-        break;
-    case MTRClusterIDTypeAirQualityID:
-        result = @"AirQuality";
-        break;
-    case MTRClusterIDTypeSmokeCOAlarmID:
-        result = @"SmokeCOAlarm";
-        break;
-    case MTRClusterIDTypeDishwasherAlarmID:
-        result = @"DishwasherAlarm";
-        break;
-    case MTRClusterIDTypeMicrowaveOvenModeID:
-        result = @"MicrowaveOvenMode";
-        break;
-    case MTRClusterIDTypeMicrowaveOvenControlID:
-        result = @"MicrowaveOvenControl";
-        break;
-    case MTRClusterIDTypeOperationalStateID:
-        result = @"OperationalState";
-        break;
-    case MTRClusterIDTypeRVCOperationalStateID:
-        result = @"RVCOperationalState";
-        break;
-    case MTRClusterIDTypeScenesManagementID:
-        result = @"ScenesManagement";
-        break;
-    case MTRClusterIDTypeHEPAFilterMonitoringID:
-        result = @"HEPAFilterMonitoring";
-        break;
-    case MTRClusterIDTypeActivatedCarbonFilterMonitoringID:
-        result = @"ActivatedCarbonFilterMonitoring";
-        break;
-    case MTRClusterIDTypeBooleanStateConfigurationID:
-        result = @"BooleanStateConfiguration";
-        break;
-    case MTRClusterIDTypeValveConfigurationAndControlID:
-        result = @"ValveConfigurationAndControl";
-        break;
-    case MTRClusterIDTypeElectricalPowerMeasurementID:
-        result = @"ElectricalPowerMeasurement";
-        break;
-    case MTRClusterIDTypeElectricalEnergyMeasurementID:
-        result = @"ElectricalEnergyMeasurement";
-        break;
-    case MTRClusterIDTypeWaterHeaterManagementID:
-        result = @"WaterHeaterManagement";
-        break;
-    case MTRClusterIDTypeDemandResponseLoadControlID:
-        result = @"DemandResponseLoadControl";
-        break;
-    case MTRClusterIDTypeMessagesID:
-        result = @"Messages";
-        break;
-    case MTRClusterIDTypeDeviceEnergyManagementID:
-        result = @"DeviceEnergyManagement";
-        break;
-    case MTRClusterIDTypeEnergyEVSEID:
-        result = @"EnergyEVSE";
-        break;
-    case MTRClusterIDTypeEnergyPreferenceID:
-        result = @"EnergyPreference";
-        break;
-    case MTRClusterIDTypePowerTopologyID:
-        result = @"PowerTopology";
-        break;
-    case MTRClusterIDTypeEnergyEVSEModeID:
-        result = @"EnergyEVSEMode";
-        break;
-    case MTRClusterIDTypeWaterHeaterModeID:
-        result = @"WaterHeaterMode";
-        break;
-    case MTRClusterIDTypeDeviceEnergyManagementModeID:
-        result = @"DeviceEnergyManagementMode";
-        break;
-    case MTRClusterIDTypeDoorLockID:
-        result = @"DoorLock";
-        break;
-    case MTRClusterIDTypeWindowCoveringID:
-        result = @"WindowCovering";
-        break;
-    case MTRClusterIDTypeBarrierControlID:
-        result = @"BarrierControl";
-        break;
-    case MTRClusterIDTypeServiceAreaID:
-        result = @"ServiceArea";
-        break;
-    case MTRClusterIDTypePumpConfigurationAndControlID:
-        result = @"PumpConfigurationAndControl";
-        break;
-    case MTRClusterIDTypeThermostatID:
-        result = @"Thermostat";
-        break;
-    case MTRClusterIDTypeFanControlID:
-        result = @"FanControl";
-        break;
-    case MTRClusterIDTypeThermostatUserInterfaceConfigurationID:
-        result = @"ThermostatUserInterfaceConfiguration";
-        break;
-    case MTRClusterIDTypeColorControlID:
-        result = @"ColorControl";
-        break;
-    case MTRClusterIDTypeBallastConfigurationID:
-        result = @"BallastConfiguration";
-        break;
-    case MTRClusterIDTypeIlluminanceMeasurementID:
-        result = @"IlluminanceMeasurement";
-        break;
-    case MTRClusterIDTypeTemperatureMeasurementID:
-        result = @"TemperatureMeasurement";
-        break;
-    case MTRClusterIDTypePressureMeasurementID:
-        result = @"PressureMeasurement";
-        break;
-    case MTRClusterIDTypeFlowMeasurementID:
-        result = @"FlowMeasurement";
-        break;
-    case MTRClusterIDTypeRelativeHumidityMeasurementID:
-        result = @"RelativeHumidityMeasurement";
-        break;
-    case MTRClusterIDTypeOccupancySensingID:
-        result = @"OccupancySensing";
-        break;
-    case MTRClusterIDTypeCarbonMonoxideConcentrationMeasurementID:
-        result = @"CarbonMonoxideConcentrationMeasurement";
-        break;
-    case MTRClusterIDTypeCarbonDioxideConcentrationMeasurementID:
-        result = @"CarbonDioxideConcentrationMeasurement";
-        break;
-    case MTRClusterIDTypeNitrogenDioxideConcentrationMeasurementID:
-        result = @"NitrogenDioxideConcentrationMeasurement";
-        break;
-    case MTRClusterIDTypeOzoneConcentrationMeasurementID:
-        result = @"OzoneConcentrationMeasurement";
-        break;
-    case MTRClusterIDTypePM25ConcentrationMeasurementID:
-        result = @"PM25ConcentrationMeasurement";
-        break;
-    case MTRClusterIDTypeFormaldehydeConcentrationMeasurementID:
-        result = @"FormaldehydeConcentrationMeasurement";
-        break;
-    case MTRClusterIDTypePM1ConcentrationMeasurementID:
-        result = @"PM1ConcentrationMeasurement";
-        break;
-    case MTRClusterIDTypePM10ConcentrationMeasurementID:
-        result = @"PM10ConcentrationMeasurement";
-        break;
-    case MTRClusterIDTypeTotalVolatileOrganicCompoundsConcentrationMeasurementID:
-        result = @"TotalVolatileOrganicCompoundsConcentrationMeasurement";
-        break;
-    case MTRClusterIDTypeRadonConcentrationMeasurementID:
-        result = @"RadonConcentrationMeasurement";
-        break;
-    case MTRClusterIDTypeWiFiNetworkManagementID:
-        result = @"WiFiNetworkManagement";
-        break;
-    case MTRClusterIDTypeThreadBorderRouterManagementID:
-        result = @"ThreadBorderRouterManagement";
-        break;
-    case MTRClusterIDTypeThreadNetworkDirectoryID:
-        result = @"ThreadNetworkDirectory";
-        break;
-    case MTRClusterIDTypeWakeOnLANID:
-        result = @"WakeOnLAN";
-        break;
-    case MTRClusterIDTypeChannelID:
-        result = @"Channel";
-        break;
-    case MTRClusterIDTypeTargetNavigatorID:
-        result = @"TargetNavigator";
-        break;
-    case MTRClusterIDTypeMediaPlaybackID:
-        result = @"MediaPlayback";
-        break;
-    case MTRClusterIDTypeMediaInputID:
-        result = @"MediaInput";
-        break;
-    case MTRClusterIDTypeLowPowerID:
-        result = @"LowPower";
-        break;
-    case MTRClusterIDTypeKeypadInputID:
-        result = @"KeypadInput";
-        break;
-    case MTRClusterIDTypeContentLauncherID:
-        result = @"ContentLauncher";
-        break;
-    case MTRClusterIDTypeAudioOutputID:
-        result = @"AudioOutput";
-        break;
-    case MTRClusterIDTypeApplicationLauncherID:
-        result = @"ApplicationLauncher";
-        break;
-    case MTRClusterIDTypeApplicationBasicID:
-        result = @"ApplicationBasic";
-        break;
-    case MTRClusterIDTypeAccountLoginID:
-        result = @"AccountLogin";
-        break;
-    case MTRClusterIDTypeContentControlID:
-        result = @"ContentControl";
-        break;
-    case MTRClusterIDTypeContentAppObserverID:
-        result = @"ContentAppObserver";
-        break;
-    case MTRClusterIDTypeEcosystemInformationID:
-        result = @"EcosystemInformation";
-        break;
-    case MTRClusterIDTypeCommissionerControlID:
-        result = @"CommissionerControl";
-        break;
-    case MTRClusterIDTypeElectricalMeasurementID:
-        result = @"ElectricalMeasurement";
-        break;
-    case MTRClusterIDTypeUnitTestingID:
-        result = @"UnitTesting";
-        break;
-    case MTRClusterIDTypeSampleMEIID:
-        result = @"SampleMEI";
-        break;
+case MTRClusterIDTypeIdentifyID:
+            result = @"Identify";
+            break;
+case MTRClusterIDTypeGroupsID:
+            result = @"Groups";
+            break;
+case MTRClusterIDTypeOnOffID:
+            result = @"OnOff";
+            break;
+case MTRClusterIDTypeOnOffSwitchConfigurationID:
+            result = @"OnOffSwitchConfiguration";
+            break;
+case MTRClusterIDTypeLevelControlID:
+            result = @"LevelControl";
+            break;
+case MTRClusterIDTypeBinaryInputBasicID:
+            result = @"BinaryInputBasic";
+            break;
+case MTRClusterIDTypePulseWidthModulationID:
+            result = @"PulseWidthModulation";
+            break;
+case MTRClusterIDTypeDescriptorID:
+            result = @"Descriptor";
+            break;
+case MTRClusterIDTypeBindingID:
+            result = @"Binding";
+            break;
+case MTRClusterIDTypeAccessControlID:
+            result = @"AccessControl";
+            break;
+case MTRClusterIDTypeActionsID:
+            result = @"Actions";
+            break;
+case MTRClusterIDTypeBasicInformationID:
+            result = @"BasicInformation";
+            break;
+case MTRClusterIDTypeOTASoftwareUpdateProviderID:
+            result = @"OTASoftwareUpdateProvider";
+            break;
+case MTRClusterIDTypeOTASoftwareUpdateRequestorID:
+            result = @"OTASoftwareUpdateRequestor";
+            break;
+case MTRClusterIDTypeLocalizationConfigurationID:
+            result = @"LocalizationConfiguration";
+            break;
+case MTRClusterIDTypeTimeFormatLocalizationID:
+            result = @"TimeFormatLocalization";
+            break;
+case MTRClusterIDTypeUnitLocalizationID:
+            result = @"UnitLocalization";
+            break;
+case MTRClusterIDTypePowerSourceConfigurationID:
+            result = @"PowerSourceConfiguration";
+            break;
+case MTRClusterIDTypePowerSourceID:
+            result = @"PowerSource";
+            break;
+case MTRClusterIDTypeGeneralCommissioningID:
+            result = @"GeneralCommissioning";
+            break;
+case MTRClusterIDTypeNetworkCommissioningID:
+            result = @"NetworkCommissioning";
+            break;
+case MTRClusterIDTypeDiagnosticLogsID:
+            result = @"DiagnosticLogs";
+            break;
+case MTRClusterIDTypeGeneralDiagnosticsID:
+            result = @"GeneralDiagnostics";
+            break;
+case MTRClusterIDTypeSoftwareDiagnosticsID:
+            result = @"SoftwareDiagnostics";
+            break;
+case MTRClusterIDTypeThreadNetworkDiagnosticsID:
+            result = @"ThreadNetworkDiagnostics";
+            break;
+case MTRClusterIDTypeWiFiNetworkDiagnosticsID:
+            result = @"WiFiNetworkDiagnostics";
+            break;
+case MTRClusterIDTypeEthernetNetworkDiagnosticsID:
+            result = @"EthernetNetworkDiagnostics";
+            break;
+case MTRClusterIDTypeTimeSynchronizationID:
+            result = @"TimeSynchronization";
+            break;
+case MTRClusterIDTypeBridgedDeviceBasicInformationID:
+            result = @"BridgedDeviceBasicInformation";
+            break;
+case MTRClusterIDTypeSwitchID:
+            result = @"Switch";
+            break;
+case MTRClusterIDTypeAdministratorCommissioningID:
+            result = @"AdministratorCommissioning";
+            break;
+case MTRClusterIDTypeOperationalCredentialsID:
+            result = @"OperationalCredentials";
+            break;
+case MTRClusterIDTypeGroupKeyManagementID:
+            result = @"GroupKeyManagement";
+            break;
+case MTRClusterIDTypeFixedLabelID:
+            result = @"FixedLabel";
+            break;
+case MTRClusterIDTypeUserLabelID:
+            result = @"UserLabel";
+            break;
+case MTRClusterIDTypeBooleanStateID:
+            result = @"BooleanState";
+            break;
+case MTRClusterIDTypeICDManagementID:
+            result = @"ICDManagement";
+            break;
+case MTRClusterIDTypeTimerID:
+            result = @"Timer";
+            break;
+case MTRClusterIDTypeOvenCavityOperationalStateID:
+            result = @"OvenCavityOperationalState";
+            break;
+case MTRClusterIDTypeOvenModeID:
+            result = @"OvenMode";
+            break;
+case MTRClusterIDTypeLaundryDryerControlsID:
+            result = @"LaundryDryerControls";
+            break;
+case MTRClusterIDTypeModeSelectID:
+            result = @"ModeSelect";
+            break;
+case MTRClusterIDTypeLaundryWasherModeID:
+            result = @"LaundryWasherMode";
+            break;
+case MTRClusterIDTypeRefrigeratorAndTemperatureControlledCabinetModeID:
+            result = @"RefrigeratorAndTemperatureControlledCabinetMode";
+            break;
+case MTRClusterIDTypeLaundryWasherControlsID:
+            result = @"LaundryWasherControls";
+            break;
+case MTRClusterIDTypeRVCRunModeID:
+            result = @"RVCRunMode";
+            break;
+case MTRClusterIDTypeRVCCleanModeID:
+            result = @"RVCCleanMode";
+            break;
+case MTRClusterIDTypeTemperatureControlID:
+            result = @"TemperatureControl";
+            break;
+case MTRClusterIDTypeRefrigeratorAlarmID:
+            result = @"RefrigeratorAlarm";
+            break;
+case MTRClusterIDTypeDishwasherModeID:
+            result = @"DishwasherMode";
+            break;
+case MTRClusterIDTypeAirQualityID:
+            result = @"AirQuality";
+            break;
+case MTRClusterIDTypeSmokeCOAlarmID:
+            result = @"SmokeCOAlarm";
+            break;
+case MTRClusterIDTypeDishwasherAlarmID:
+            result = @"DishwasherAlarm";
+            break;
+case MTRClusterIDTypeMicrowaveOvenModeID:
+            result = @"MicrowaveOvenMode";
+            break;
+case MTRClusterIDTypeMicrowaveOvenControlID:
+            result = @"MicrowaveOvenControl";
+            break;
+case MTRClusterIDTypeOperationalStateID:
+            result = @"OperationalState";
+            break;
+case MTRClusterIDTypeRVCOperationalStateID:
+            result = @"RVCOperationalState";
+            break;
+case MTRClusterIDTypeScenesManagementID:
+            result = @"ScenesManagement";
+            break;
+case MTRClusterIDTypeHEPAFilterMonitoringID:
+            result = @"HEPAFilterMonitoring";
+            break;
+case MTRClusterIDTypeActivatedCarbonFilterMonitoringID:
+            result = @"ActivatedCarbonFilterMonitoring";
+            break;
+case MTRClusterIDTypeBooleanStateConfigurationID:
+            result = @"BooleanStateConfiguration";
+            break;
+case MTRClusterIDTypeValveConfigurationAndControlID:
+            result = @"ValveConfigurationAndControl";
+            break;
+case MTRClusterIDTypeElectricalPowerMeasurementID:
+            result = @"ElectricalPowerMeasurement";
+            break;
+case MTRClusterIDTypeElectricalEnergyMeasurementID:
+            result = @"ElectricalEnergyMeasurement";
+            break;
+case MTRClusterIDTypeWaterHeaterManagementID:
+            result = @"WaterHeaterManagement";
+            break;
+case MTRClusterIDTypeDemandResponseLoadControlID:
+            result = @"DemandResponseLoadControl";
+            break;
+case MTRClusterIDTypeMessagesID:
+            result = @"Messages";
+            break;
+case MTRClusterIDTypeDeviceEnergyManagementID:
+            result = @"DeviceEnergyManagement";
+            break;
+case MTRClusterIDTypeEnergyEVSEID:
+            result = @"EnergyEVSE";
+            break;
+case MTRClusterIDTypeEnergyPreferenceID:
+            result = @"EnergyPreference";
+            break;
+case MTRClusterIDTypePowerTopologyID:
+            result = @"PowerTopology";
+            break;
+case MTRClusterIDTypeEnergyEVSEModeID:
+            result = @"EnergyEVSEMode";
+            break;
+case MTRClusterIDTypeWaterHeaterModeID:
+            result = @"WaterHeaterMode";
+            break;
+case MTRClusterIDTypeDeviceEnergyManagementModeID:
+            result = @"DeviceEnergyManagementMode";
+            break;
+case MTRClusterIDTypeDoorLockID:
+            result = @"DoorLock";
+            break;
+case MTRClusterIDTypeWindowCoveringID:
+            result = @"WindowCovering";
+            break;
+case MTRClusterIDTypeBarrierControlID:
+            result = @"BarrierControl";
+            break;
+case MTRClusterIDTypeServiceAreaID:
+            result = @"ServiceArea";
+            break;
+case MTRClusterIDTypePumpConfigurationAndControlID:
+            result = @"PumpConfigurationAndControl";
+            break;
+case MTRClusterIDTypeThermostatID:
+            result = @"Thermostat";
+            break;
+case MTRClusterIDTypeFanControlID:
+            result = @"FanControl";
+            break;
+case MTRClusterIDTypeThermostatUserInterfaceConfigurationID:
+            result = @"ThermostatUserInterfaceConfiguration";
+            break;
+case MTRClusterIDTypeColorControlID:
+            result = @"ColorControl";
+            break;
+case MTRClusterIDTypeBallastConfigurationID:
+            result = @"BallastConfiguration";
+            break;
+case MTRClusterIDTypeIlluminanceMeasurementID:
+            result = @"IlluminanceMeasurement";
+            break;
+case MTRClusterIDTypeTemperatureMeasurementID:
+            result = @"TemperatureMeasurement";
+            break;
+case MTRClusterIDTypePressureMeasurementID:
+            result = @"PressureMeasurement";
+            break;
+case MTRClusterIDTypeFlowMeasurementID:
+            result = @"FlowMeasurement";
+            break;
+case MTRClusterIDTypeRelativeHumidityMeasurementID:
+            result = @"RelativeHumidityMeasurement";
+            break;
+case MTRClusterIDTypeOccupancySensingID:
+            result = @"OccupancySensing";
+            break;
+case MTRClusterIDTypeCarbonMonoxideConcentrationMeasurementID:
+            result = @"CarbonMonoxideConcentrationMeasurement";
+            break;
+case MTRClusterIDTypeCarbonDioxideConcentrationMeasurementID:
+            result = @"CarbonDioxideConcentrationMeasurement";
+            break;
+case MTRClusterIDTypeNitrogenDioxideConcentrationMeasurementID:
+            result = @"NitrogenDioxideConcentrationMeasurement";
+            break;
+case MTRClusterIDTypeOzoneConcentrationMeasurementID:
+            result = @"OzoneConcentrationMeasurement";
+            break;
+case MTRClusterIDTypePM25ConcentrationMeasurementID:
+            result = @"PM25ConcentrationMeasurement";
+            break;
+case MTRClusterIDTypeFormaldehydeConcentrationMeasurementID:
+            result = @"FormaldehydeConcentrationMeasurement";
+            break;
+case MTRClusterIDTypePM1ConcentrationMeasurementID:
+            result = @"PM1ConcentrationMeasurement";
+            break;
+case MTRClusterIDTypePM10ConcentrationMeasurementID:
+            result = @"PM10ConcentrationMeasurement";
+            break;
+case MTRClusterIDTypeTotalVolatileOrganicCompoundsConcentrationMeasurementID:
+            result = @"TotalVolatileOrganicCompoundsConcentrationMeasurement";
+            break;
+case MTRClusterIDTypeRadonConcentrationMeasurementID:
+            result = @"RadonConcentrationMeasurement";
+            break;
+case MTRClusterIDTypeWiFiNetworkManagementID:
+            result = @"WiFiNetworkManagement";
+            break;
+case MTRClusterIDTypeThreadBorderRouterManagementID:
+            result = @"ThreadBorderRouterManagement";
+            break;
+case MTRClusterIDTypeThreadNetworkDirectoryID:
+            result = @"ThreadNetworkDirectory";
+            break;
+case MTRClusterIDTypeWakeOnLANID:
+            result = @"WakeOnLAN";
+            break;
+case MTRClusterIDTypeChannelID:
+            result = @"Channel";
+            break;
+case MTRClusterIDTypeTargetNavigatorID:
+            result = @"TargetNavigator";
+            break;
+case MTRClusterIDTypeMediaPlaybackID:
+            result = @"MediaPlayback";
+            break;
+case MTRClusterIDTypeMediaInputID:
+            result = @"MediaInput";
+            break;
+case MTRClusterIDTypeLowPowerID:
+            result = @"LowPower";
+            break;
+case MTRClusterIDTypeKeypadInputID:
+            result = @"KeypadInput";
+            break;
+case MTRClusterIDTypeContentLauncherID:
+            result = @"ContentLauncher";
+            break;
+case MTRClusterIDTypeAudioOutputID:
+            result = @"AudioOutput";
+            break;
+case MTRClusterIDTypeApplicationLauncherID:
+            result = @"ApplicationLauncher";
+            break;
+case MTRClusterIDTypeApplicationBasicID:
+            result = @"ApplicationBasic";
+            break;
+case MTRClusterIDTypeAccountLoginID:
+            result = @"AccountLogin";
+            break;
+case MTRClusterIDTypeContentControlID:
+            result = @"ContentControl";
+            break;
+case MTRClusterIDTypeContentAppObserverID:
+            result = @"ContentAppObserver";
+            break;
+case MTRClusterIDTypeEcosystemInformationID:
+            result = @"EcosystemInformation";
+            break;
+case MTRClusterIDTypeCommissionerControlID:
+            result = @"CommissionerControl";
+            break;
+case MTRClusterIDTypeElectricalMeasurementID:
+            result = @"ElectricalMeasurement";
+            break;
+case MTRClusterIDTypeUnitTestingID:
+            result = @"UnitTesting";
+            break;
+case MTRClusterIDTypeSampleMEIID:
+            result = @"SampleMEI";
+            break;
 
-    default:
-        result = [NSString stringWithFormat:@"<Unknown clusterID %d>", clusterID];
-        break;
+        default:
+            result = [NSString stringWithFormat:@"<Unknown clusterID %d>", clusterID];
+            break;
     }
-
+    
     return result;
 }
+
 
 #pragma mark - Attributes IDs
 
@@ -410,8834 +413,9220 @@ NSString * MTRAttributeNameForID(MTRClusterIDType clusterID, MTRAttributeIDType 
 
     switch (clusterID) {
 
-    case MTRClusterIDTypeIdentifyID:
+case MTRClusterIDTypeIdentifyID:
 
-        switch (attributeID) {
+            switch (attributeID) {
 
-            // Cluster Identify attributes
-        case MTRAttributeIDTypeClusterIdentifyAttributeIdentifyTimeID:
-            result = @"IdentifyTime";
-            break;
 
-        case MTRAttributeIDTypeClusterIdentifyAttributeIdentifyTypeID:
-            result = @"IdentifyType";
-            break;
 
-        case MTRAttributeIDTypeClusterIdentifyAttributeGeneratedCommandListID:
-            result = @"GeneratedCommandList";
-            break;
+// Cluster Identify attributes
+            case MTRAttributeIDTypeClusterIdentifyAttributeIdentifyTimeID:
+                result = @"IdentifyTime";
+                break;
 
-        case MTRAttributeIDTypeClusterIdentifyAttributeAcceptedCommandListID:
-            result = @"AcceptedCommandList";
-            break;
+            case MTRAttributeIDTypeClusterIdentifyAttributeIdentifyTypeID:
+                result = @"IdentifyType";
+                break;
 
-        case MTRAttributeIDTypeClusterIdentifyAttributeEventListID:
-            result = @"EventList";
-            break;
+            case MTRAttributeIDTypeClusterIdentifyAttributeGeneratedCommandListID:
+                result = @"GeneratedCommandList";
+                break;
 
-        case MTRAttributeIDTypeClusterIdentifyAttributeAttributeListID:
-            result = @"AttributeList";
-            break;
+            case MTRAttributeIDTypeClusterIdentifyAttributeAcceptedCommandListID:
+                result = @"AcceptedCommandList";
+                break;
 
-        case MTRAttributeIDTypeClusterIdentifyAttributeFeatureMapID:
-            result = @"FeatureMap";
-            break;
+            case MTRAttributeIDTypeClusterIdentifyAttributeEventListID:
+                result = @"EventList";
+                break;
 
-        case MTRAttributeIDTypeClusterIdentifyAttributeClusterRevisionID:
-            result = @"ClusterRevision";
-            break;
+            case MTRAttributeIDTypeClusterIdentifyAttributeAttributeListID:
+                result = @"AttributeList";
+                break;
 
-        default:
-            result = [NSString stringWithFormat:@"<Unknown attributeID %d>", attributeID];
-            break;
+            case MTRAttributeIDTypeClusterIdentifyAttributeFeatureMapID:
+                result = @"FeatureMap";
+                break;
+
+            case MTRAttributeIDTypeClusterIdentifyAttributeClusterRevisionID:
+                result = @"ClusterRevision";
+                break;
+
+
+            default:
+                result = [NSString stringWithFormat:@"<Unknown attributeID %d>", attributeID];
+                break;
         }
 
-    case MTRClusterIDTypeGroupsID:
+case MTRClusterIDTypeGroupsID:
 
-        switch (attributeID) {
+            switch (attributeID) {
 
-            // Cluster Groups attributes
-        case MTRAttributeIDTypeClusterGroupsAttributeNameSupportID:
-            result = @"NameSupport";
-            break;
 
-        case MTRAttributeIDTypeClusterGroupsAttributeGeneratedCommandListID:
-            result = @"GeneratedCommandList";
-            break;
 
-        case MTRAttributeIDTypeClusterGroupsAttributeAcceptedCommandListID:
-            result = @"AcceptedCommandList";
-            break;
+// Cluster Groups attributes
+            case MTRAttributeIDTypeClusterGroupsAttributeNameSupportID:
+                result = @"NameSupport";
+                break;
 
-        case MTRAttributeIDTypeClusterGroupsAttributeEventListID:
-            result = @"EventList";
-            break;
+            case MTRAttributeIDTypeClusterGroupsAttributeGeneratedCommandListID:
+                result = @"GeneratedCommandList";
+                break;
 
-        case MTRAttributeIDTypeClusterGroupsAttributeAttributeListID:
-            result = @"AttributeList";
-            break;
+            case MTRAttributeIDTypeClusterGroupsAttributeAcceptedCommandListID:
+                result = @"AcceptedCommandList";
+                break;
 
-        case MTRAttributeIDTypeClusterGroupsAttributeFeatureMapID:
-            result = @"FeatureMap";
-            break;
+            case MTRAttributeIDTypeClusterGroupsAttributeEventListID:
+                result = @"EventList";
+                break;
 
-        case MTRAttributeIDTypeClusterGroupsAttributeClusterRevisionID:
-            result = @"ClusterRevision";
-            break;
+            case MTRAttributeIDTypeClusterGroupsAttributeAttributeListID:
+                result = @"AttributeList";
+                break;
 
-        default:
-            result = [NSString stringWithFormat:@"<Unknown attributeID %d>", attributeID];
-            break;
+            case MTRAttributeIDTypeClusterGroupsAttributeFeatureMapID:
+                result = @"FeatureMap";
+                break;
+
+            case MTRAttributeIDTypeClusterGroupsAttributeClusterRevisionID:
+                result = @"ClusterRevision";
+                break;
+
+
+            default:
+                result = [NSString stringWithFormat:@"<Unknown attributeID %d>", attributeID];
+                break;
         }
 
-    case MTRClusterIDTypeOnOffID:
+case MTRClusterIDTypeOnOffID:
 
-        switch (attributeID) {
+            switch (attributeID) {
 
-            // Cluster OnOff attributes
-        case MTRAttributeIDTypeClusterOnOffAttributeOnOffID:
-            result = @"OnOff";
-            break;
 
-        case MTRAttributeIDTypeClusterOnOffAttributeGlobalSceneControlID:
-            result = @"GlobalSceneControl";
-            break;
 
-        case MTRAttributeIDTypeClusterOnOffAttributeOnTimeID:
-            result = @"OnTime";
-            break;
+// Cluster OnOff attributes
+            case MTRAttributeIDTypeClusterOnOffAttributeOnOffID:
+                result = @"OnOff";
+                break;
 
-        case MTRAttributeIDTypeClusterOnOffAttributeOffWaitTimeID:
-            result = @"OffWaitTime";
-            break;
+            case MTRAttributeIDTypeClusterOnOffAttributeGlobalSceneControlID:
+                result = @"GlobalSceneControl";
+                break;
 
-        case MTRAttributeIDTypeClusterOnOffAttributeStartUpOnOffID:
-            result = @"StartUpOnOff";
-            break;
+            case MTRAttributeIDTypeClusterOnOffAttributeOnTimeID:
+                result = @"OnTime";
+                break;
 
-        case MTRAttributeIDTypeClusterOnOffAttributeGeneratedCommandListID:
-            result = @"GeneratedCommandList";
-            break;
+            case MTRAttributeIDTypeClusterOnOffAttributeOffWaitTimeID:
+                result = @"OffWaitTime";
+                break;
 
-        case MTRAttributeIDTypeClusterOnOffAttributeAcceptedCommandListID:
-            result = @"AcceptedCommandList";
-            break;
+            case MTRAttributeIDTypeClusterOnOffAttributeStartUpOnOffID:
+                result = @"StartUpOnOff";
+                break;
 
-        case MTRAttributeIDTypeClusterOnOffAttributeEventListID:
-            result = @"EventList";
-            break;
+            case MTRAttributeIDTypeClusterOnOffAttributeGeneratedCommandListID:
+                result = @"GeneratedCommandList";
+                break;
 
-        case MTRAttributeIDTypeClusterOnOffAttributeAttributeListID:
-            result = @"AttributeList";
-            break;
+            case MTRAttributeIDTypeClusterOnOffAttributeAcceptedCommandListID:
+                result = @"AcceptedCommandList";
+                break;
 
-        case MTRAttributeIDTypeClusterOnOffAttributeFeatureMapID:
-            result = @"FeatureMap";
-            break;
+            case MTRAttributeIDTypeClusterOnOffAttributeEventListID:
+                result = @"EventList";
+                break;
 
-        case MTRAttributeIDTypeClusterOnOffAttributeClusterRevisionID:
-            result = @"ClusterRevision";
-            break;
+            case MTRAttributeIDTypeClusterOnOffAttributeAttributeListID:
+                result = @"AttributeList";
+                break;
 
-        default:
-            result = [NSString stringWithFormat:@"<Unknown attributeID %d>", attributeID];
-            break;
+            case MTRAttributeIDTypeClusterOnOffAttributeFeatureMapID:
+                result = @"FeatureMap";
+                break;
+
+            case MTRAttributeIDTypeClusterOnOffAttributeClusterRevisionID:
+                result = @"ClusterRevision";
+                break;
+
+
+            default:
+                result = [NSString stringWithFormat:@"<Unknown attributeID %d>", attributeID];
+                break;
         }
 
-    case MTRClusterIDTypeOnOffSwitchConfigurationID:
+case MTRClusterIDTypeOnOffSwitchConfigurationID:
 
-        switch (attributeID) {
+            switch (attributeID) {
 
-            // Cluster OnOffSwitchConfiguration attributes
-        case MTRAttributeIDTypeClusterOnOffSwitchConfigurationAttributeSwitchTypeID:
-            result = @"SwitchType";
-            break;
 
-        case MTRAttributeIDTypeClusterOnOffSwitchConfigurationAttributeSwitchActionsID:
-            result = @"SwitchActions";
-            break;
 
-        case MTRAttributeIDTypeClusterOnOffSwitchConfigurationAttributeGeneratedCommandListID:
-            result = @"GeneratedCommandList";
-            break;
+// Cluster OnOffSwitchConfiguration attributes
+            case MTRAttributeIDTypeClusterOnOffSwitchConfigurationAttributeSwitchTypeID:
+                result = @"SwitchType";
+                break;
 
-        case MTRAttributeIDTypeClusterOnOffSwitchConfigurationAttributeAcceptedCommandListID:
-            result = @"AcceptedCommandList";
-            break;
+            case MTRAttributeIDTypeClusterOnOffSwitchConfigurationAttributeSwitchActionsID:
+                result = @"SwitchActions";
+                break;
 
-        case MTRAttributeIDTypeClusterOnOffSwitchConfigurationAttributeEventListID:
-            result = @"EventList";
-            break;
+            case MTRAttributeIDTypeClusterOnOffSwitchConfigurationAttributeGeneratedCommandListID:
+                result = @"GeneratedCommandList";
+                break;
 
-        case MTRAttributeIDTypeClusterOnOffSwitchConfigurationAttributeAttributeListID:
-            result = @"AttributeList";
-            break;
+            case MTRAttributeIDTypeClusterOnOffSwitchConfigurationAttributeAcceptedCommandListID:
+                result = @"AcceptedCommandList";
+                break;
 
-        case MTRAttributeIDTypeClusterOnOffSwitchConfigurationAttributeFeatureMapID:
-            result = @"FeatureMap";
-            break;
+            case MTRAttributeIDTypeClusterOnOffSwitchConfigurationAttributeEventListID:
+                result = @"EventList";
+                break;
 
-        case MTRAttributeIDTypeClusterOnOffSwitchConfigurationAttributeClusterRevisionID:
-            result = @"ClusterRevision";
-            break;
+            case MTRAttributeIDTypeClusterOnOffSwitchConfigurationAttributeAttributeListID:
+                result = @"AttributeList";
+                break;
 
-        default:
-            result = [NSString stringWithFormat:@"<Unknown attributeID %d>", attributeID];
-            break;
+            case MTRAttributeIDTypeClusterOnOffSwitchConfigurationAttributeFeatureMapID:
+                result = @"FeatureMap";
+                break;
+
+            case MTRAttributeIDTypeClusterOnOffSwitchConfigurationAttributeClusterRevisionID:
+                result = @"ClusterRevision";
+                break;
+
+
+            default:
+                result = [NSString stringWithFormat:@"<Unknown attributeID %d>", attributeID];
+                break;
         }
 
-    case MTRClusterIDTypeLevelControlID:
+case MTRClusterIDTypeLevelControlID:
 
-        switch (attributeID) {
+            switch (attributeID) {
 
-            // Cluster LevelControl attributes
-        case MTRAttributeIDTypeClusterLevelControlAttributeCurrentLevelID:
-            result = @"CurrentLevel";
-            break;
 
-        case MTRAttributeIDTypeClusterLevelControlAttributeRemainingTimeID:
-            result = @"RemainingTime";
-            break;
 
-        case MTRAttributeIDTypeClusterLevelControlAttributeMinLevelID:
-            result = @"MinLevel";
-            break;
+// Cluster LevelControl attributes
+            case MTRAttributeIDTypeClusterLevelControlAttributeCurrentLevelID:
+                result = @"CurrentLevel";
+                break;
 
-        case MTRAttributeIDTypeClusterLevelControlAttributeMaxLevelID:
-            result = @"MaxLevel";
-            break;
+            case MTRAttributeIDTypeClusterLevelControlAttributeRemainingTimeID:
+                result = @"RemainingTime";
+                break;
 
-        case MTRAttributeIDTypeClusterLevelControlAttributeCurrentFrequencyID:
-            result = @"CurrentFrequency";
-            break;
+            case MTRAttributeIDTypeClusterLevelControlAttributeMinLevelID:
+                result = @"MinLevel";
+                break;
 
-        case MTRAttributeIDTypeClusterLevelControlAttributeMinFrequencyID:
-            result = @"MinFrequency";
-            break;
+            case MTRAttributeIDTypeClusterLevelControlAttributeMaxLevelID:
+                result = @"MaxLevel";
+                break;
 
-        case MTRAttributeIDTypeClusterLevelControlAttributeMaxFrequencyID:
-            result = @"MaxFrequency";
-            break;
+            case MTRAttributeIDTypeClusterLevelControlAttributeCurrentFrequencyID:
+                result = @"CurrentFrequency";
+                break;
 
-        case MTRAttributeIDTypeClusterLevelControlAttributeOptionsID:
-            result = @"Options";
-            break;
+            case MTRAttributeIDTypeClusterLevelControlAttributeMinFrequencyID:
+                result = @"MinFrequency";
+                break;
 
-        case MTRAttributeIDTypeClusterLevelControlAttributeOnOffTransitionTimeID:
-            result = @"OnOffTransitionTime";
-            break;
+            case MTRAttributeIDTypeClusterLevelControlAttributeMaxFrequencyID:
+                result = @"MaxFrequency";
+                break;
 
-        case MTRAttributeIDTypeClusterLevelControlAttributeOnLevelID:
-            result = @"OnLevel";
-            break;
+            case MTRAttributeIDTypeClusterLevelControlAttributeOptionsID:
+                result = @"Options";
+                break;
 
-        case MTRAttributeIDTypeClusterLevelControlAttributeOnTransitionTimeID:
-            result = @"OnTransitionTime";
-            break;
+            case MTRAttributeIDTypeClusterLevelControlAttributeOnOffTransitionTimeID:
+                result = @"OnOffTransitionTime";
+                break;
 
-        case MTRAttributeIDTypeClusterLevelControlAttributeOffTransitionTimeID:
-            result = @"OffTransitionTime";
-            break;
+            case MTRAttributeIDTypeClusterLevelControlAttributeOnLevelID:
+                result = @"OnLevel";
+                break;
 
-        case MTRAttributeIDTypeClusterLevelControlAttributeDefaultMoveRateID:
-            result = @"DefaultMoveRate";
-            break;
+            case MTRAttributeIDTypeClusterLevelControlAttributeOnTransitionTimeID:
+                result = @"OnTransitionTime";
+                break;
 
-        case MTRAttributeIDTypeClusterLevelControlAttributeStartUpCurrentLevelID:
-            result = @"StartUpCurrentLevel";
-            break;
+            case MTRAttributeIDTypeClusterLevelControlAttributeOffTransitionTimeID:
+                result = @"OffTransitionTime";
+                break;
 
-        case MTRAttributeIDTypeClusterLevelControlAttributeGeneratedCommandListID:
-            result = @"GeneratedCommandList";
-            break;
+            case MTRAttributeIDTypeClusterLevelControlAttributeDefaultMoveRateID:
+                result = @"DefaultMoveRate";
+                break;
 
-        case MTRAttributeIDTypeClusterLevelControlAttributeAcceptedCommandListID:
-            result = @"AcceptedCommandList";
-            break;
+            case MTRAttributeIDTypeClusterLevelControlAttributeStartUpCurrentLevelID:
+                result = @"StartUpCurrentLevel";
+                break;
 
-        case MTRAttributeIDTypeClusterLevelControlAttributeEventListID:
-            result = @"EventList";
-            break;
+            case MTRAttributeIDTypeClusterLevelControlAttributeGeneratedCommandListID:
+                result = @"GeneratedCommandList";
+                break;
 
-        case MTRAttributeIDTypeClusterLevelControlAttributeAttributeListID:
-            result = @"AttributeList";
-            break;
+            case MTRAttributeIDTypeClusterLevelControlAttributeAcceptedCommandListID:
+                result = @"AcceptedCommandList";
+                break;
 
-        case MTRAttributeIDTypeClusterLevelControlAttributeFeatureMapID:
-            result = @"FeatureMap";
-            break;
+            case MTRAttributeIDTypeClusterLevelControlAttributeEventListID:
+                result = @"EventList";
+                break;
 
-        case MTRAttributeIDTypeClusterLevelControlAttributeClusterRevisionID:
-            result = @"ClusterRevision";
-            break;
+            case MTRAttributeIDTypeClusterLevelControlAttributeAttributeListID:
+                result = @"AttributeList";
+                break;
 
-        default:
-            result = [NSString stringWithFormat:@"<Unknown attributeID %d>", attributeID];
-            break;
+            case MTRAttributeIDTypeClusterLevelControlAttributeFeatureMapID:
+                result = @"FeatureMap";
+                break;
+
+            case MTRAttributeIDTypeClusterLevelControlAttributeClusterRevisionID:
+                result = @"ClusterRevision";
+                break;
+
+
+            default:
+                result = [NSString stringWithFormat:@"<Unknown attributeID %d>", attributeID];
+                break;
         }
 
-    case MTRClusterIDTypeBinaryInputBasicID:
+case MTRClusterIDTypeBinaryInputBasicID:
 
-        switch (attributeID) {
+            switch (attributeID) {
 
-            // Cluster BinaryInputBasic attributes
-        case MTRAttributeIDTypeClusterBinaryInputBasicAttributeActiveTextID:
-            result = @"ActiveText";
-            break;
 
-        case MTRAttributeIDTypeClusterBinaryInputBasicAttributeDescriptionID:
-            result = @"Description";
-            break;
 
-        case MTRAttributeIDTypeClusterBinaryInputBasicAttributeInactiveTextID:
-            result = @"InactiveText";
-            break;
+// Cluster BinaryInputBasic attributes
+            case MTRAttributeIDTypeClusterBinaryInputBasicAttributeActiveTextID:
+                result = @"ActiveText";
+                break;
 
-        case MTRAttributeIDTypeClusterBinaryInputBasicAttributeOutOfServiceID:
-            result = @"OutOfService";
-            break;
+            case MTRAttributeIDTypeClusterBinaryInputBasicAttributeDescriptionID:
+                result = @"Description";
+                break;
 
-        case MTRAttributeIDTypeClusterBinaryInputBasicAttributePolarityID:
-            result = @"Polarity";
-            break;
+            case MTRAttributeIDTypeClusterBinaryInputBasicAttributeInactiveTextID:
+                result = @"InactiveText";
+                break;
 
-        case MTRAttributeIDTypeClusterBinaryInputBasicAttributePresentValueID:
-            result = @"PresentValue";
-            break;
+            case MTRAttributeIDTypeClusterBinaryInputBasicAttributeOutOfServiceID:
+                result = @"OutOfService";
+                break;
 
-        case MTRAttributeIDTypeClusterBinaryInputBasicAttributeReliabilityID:
-            result = @"Reliability";
-            break;
+            case MTRAttributeIDTypeClusterBinaryInputBasicAttributePolarityID:
+                result = @"Polarity";
+                break;
 
-        case MTRAttributeIDTypeClusterBinaryInputBasicAttributeStatusFlagsID:
-            result = @"StatusFlags";
-            break;
+            case MTRAttributeIDTypeClusterBinaryInputBasicAttributePresentValueID:
+                result = @"PresentValue";
+                break;
 
-        case MTRAttributeIDTypeClusterBinaryInputBasicAttributeApplicationTypeID:
-            result = @"ApplicationType";
-            break;
+            case MTRAttributeIDTypeClusterBinaryInputBasicAttributeReliabilityID:
+                result = @"Reliability";
+                break;
 
-        case MTRAttributeIDTypeClusterBinaryInputBasicAttributeGeneratedCommandListID:
-            result = @"GeneratedCommandList";
-            break;
+            case MTRAttributeIDTypeClusterBinaryInputBasicAttributeStatusFlagsID:
+                result = @"StatusFlags";
+                break;
 
-        case MTRAttributeIDTypeClusterBinaryInputBasicAttributeAcceptedCommandListID:
-            result = @"AcceptedCommandList";
-            break;
+            case MTRAttributeIDTypeClusterBinaryInputBasicAttributeApplicationTypeID:
+                result = @"ApplicationType";
+                break;
 
-        case MTRAttributeIDTypeClusterBinaryInputBasicAttributeEventListID:
-            result = @"EventList";
-            break;
+            case MTRAttributeIDTypeClusterBinaryInputBasicAttributeGeneratedCommandListID:
+                result = @"GeneratedCommandList";
+                break;
 
-        case MTRAttributeIDTypeClusterBinaryInputBasicAttributeAttributeListID:
-            result = @"AttributeList";
-            break;
+            case MTRAttributeIDTypeClusterBinaryInputBasicAttributeAcceptedCommandListID:
+                result = @"AcceptedCommandList";
+                break;
 
-        case MTRAttributeIDTypeClusterBinaryInputBasicAttributeFeatureMapID:
-            result = @"FeatureMap";
-            break;
+            case MTRAttributeIDTypeClusterBinaryInputBasicAttributeEventListID:
+                result = @"EventList";
+                break;
 
-        case MTRAttributeIDTypeClusterBinaryInputBasicAttributeClusterRevisionID:
-            result = @"ClusterRevision";
-            break;
+            case MTRAttributeIDTypeClusterBinaryInputBasicAttributeAttributeListID:
+                result = @"AttributeList";
+                break;
 
-        default:
-            result = [NSString stringWithFormat:@"<Unknown attributeID %d>", attributeID];
-            break;
+            case MTRAttributeIDTypeClusterBinaryInputBasicAttributeFeatureMapID:
+                result = @"FeatureMap";
+                break;
+
+            case MTRAttributeIDTypeClusterBinaryInputBasicAttributeClusterRevisionID:
+                result = @"ClusterRevision";
+                break;
+
+
+            default:
+                result = [NSString stringWithFormat:@"<Unknown attributeID %d>", attributeID];
+                break;
         }
 
-    case MTRClusterIDTypePulseWidthModulationID:
+case MTRClusterIDTypePulseWidthModulationID:
 
-        switch (attributeID) {
+            switch (attributeID) {
 
-            // Cluster PulseWidthModulation attributes
-        case MTRAttributeIDTypeClusterPulseWidthModulationAttributeGeneratedCommandListID:
-            result = @"GeneratedCommandList";
-            break;
 
-        case MTRAttributeIDTypeClusterPulseWidthModulationAttributeAcceptedCommandListID:
-            result = @"AcceptedCommandList";
-            break;
 
-        case MTRAttributeIDTypeClusterPulseWidthModulationAttributeEventListID:
-            result = @"EventList";
-            break;
+// Cluster PulseWidthModulation attributes
+            case MTRAttributeIDTypeClusterPulseWidthModulationAttributeGeneratedCommandListID:
+                result = @"GeneratedCommandList";
+                break;
 
-        case MTRAttributeIDTypeClusterPulseWidthModulationAttributeAttributeListID:
-            result = @"AttributeList";
-            break;
+            case MTRAttributeIDTypeClusterPulseWidthModulationAttributeAcceptedCommandListID:
+                result = @"AcceptedCommandList";
+                break;
 
-        case MTRAttributeIDTypeClusterPulseWidthModulationAttributeFeatureMapID:
-            result = @"FeatureMap";
-            break;
+            case MTRAttributeIDTypeClusterPulseWidthModulationAttributeEventListID:
+                result = @"EventList";
+                break;
 
-        case MTRAttributeIDTypeClusterPulseWidthModulationAttributeClusterRevisionID:
-            result = @"ClusterRevision";
-            break;
+            case MTRAttributeIDTypeClusterPulseWidthModulationAttributeAttributeListID:
+                result = @"AttributeList";
+                break;
 
-        default:
-            result = [NSString stringWithFormat:@"<Unknown attributeID %d>", attributeID];
-            break;
+            case MTRAttributeIDTypeClusterPulseWidthModulationAttributeFeatureMapID:
+                result = @"FeatureMap";
+                break;
+
+            case MTRAttributeIDTypeClusterPulseWidthModulationAttributeClusterRevisionID:
+                result = @"ClusterRevision";
+                break;
+
+
+            default:
+                result = [NSString stringWithFormat:@"<Unknown attributeID %d>", attributeID];
+                break;
         }
 
-    case MTRClusterIDTypeDescriptorID:
+case MTRClusterIDTypeDescriptorID:
 
-        switch (attributeID) {
+            switch (attributeID) {
 
-            // Cluster Descriptor attributes
-        case MTRAttributeIDTypeClusterDescriptorAttributeDeviceTypeListID:
-            result = @"DeviceTypeList";
-            break;
 
-        case MTRAttributeIDTypeClusterDescriptorAttributeServerListID:
-            result = @"ServerList";
-            break;
 
-        case MTRAttributeIDTypeClusterDescriptorAttributeClientListID:
-            result = @"ClientList";
-            break;
+// Cluster Descriptor attributes
+            case MTRAttributeIDTypeClusterDescriptorAttributeDeviceTypeListID:
+                result = @"DeviceTypeList";
+                break;
 
-        case MTRAttributeIDTypeClusterDescriptorAttributePartsListID:
-            result = @"PartsList";
-            break;
+            case MTRAttributeIDTypeClusterDescriptorAttributeServerListID:
+                result = @"ServerList";
+                break;
 
-        case MTRAttributeIDTypeClusterDescriptorAttributeTagListID:
-            result = @"TagList";
-            break;
+            case MTRAttributeIDTypeClusterDescriptorAttributeClientListID:
+                result = @"ClientList";
+                break;
 
-        case MTRAttributeIDTypeClusterDescriptorAttributeGeneratedCommandListID:
-            result = @"GeneratedCommandList";
-            break;
+            case MTRAttributeIDTypeClusterDescriptorAttributePartsListID:
+                result = @"PartsList";
+                break;
 
-        case MTRAttributeIDTypeClusterDescriptorAttributeAcceptedCommandListID:
-            result = @"AcceptedCommandList";
-            break;
+            case MTRAttributeIDTypeClusterDescriptorAttributeTagListID:
+                result = @"TagList";
+                break;
 
-        case MTRAttributeIDTypeClusterDescriptorAttributeEventListID:
-            result = @"EventList";
-            break;
+            case MTRAttributeIDTypeClusterDescriptorAttributeGeneratedCommandListID:
+                result = @"GeneratedCommandList";
+                break;
 
-        case MTRAttributeIDTypeClusterDescriptorAttributeAttributeListID:
-            result = @"AttributeList";
-            break;
+            case MTRAttributeIDTypeClusterDescriptorAttributeAcceptedCommandListID:
+                result = @"AcceptedCommandList";
+                break;
 
-        case MTRAttributeIDTypeClusterDescriptorAttributeFeatureMapID:
-            result = @"FeatureMap";
-            break;
+            case MTRAttributeIDTypeClusterDescriptorAttributeEventListID:
+                result = @"EventList";
+                break;
 
-        case MTRAttributeIDTypeClusterDescriptorAttributeClusterRevisionID:
-            result = @"ClusterRevision";
-            break;
+            case MTRAttributeIDTypeClusterDescriptorAttributeAttributeListID:
+                result = @"AttributeList";
+                break;
 
-        default:
-            result = [NSString stringWithFormat:@"<Unknown attributeID %d>", attributeID];
-            break;
+            case MTRAttributeIDTypeClusterDescriptorAttributeFeatureMapID:
+                result = @"FeatureMap";
+                break;
+
+            case MTRAttributeIDTypeClusterDescriptorAttributeClusterRevisionID:
+                result = @"ClusterRevision";
+                break;
+
+
+            default:
+                result = [NSString stringWithFormat:@"<Unknown attributeID %d>", attributeID];
+                break;
         }
 
-    case MTRClusterIDTypeBindingID:
+case MTRClusterIDTypeBindingID:
 
-        switch (attributeID) {
+            switch (attributeID) {
 
-            // Cluster Binding attributes
-        case MTRAttributeIDTypeClusterBindingAttributeBindingID:
-            result = @"Binding";
-            break;
 
-        case MTRAttributeIDTypeClusterBindingAttributeGeneratedCommandListID:
-            result = @"GeneratedCommandList";
-            break;
 
-        case MTRAttributeIDTypeClusterBindingAttributeAcceptedCommandListID:
-            result = @"AcceptedCommandList";
-            break;
+// Cluster Binding attributes
+            case MTRAttributeIDTypeClusterBindingAttributeBindingID:
+                result = @"Binding";
+                break;
 
-        case MTRAttributeIDTypeClusterBindingAttributeEventListID:
-            result = @"EventList";
-            break;
+            case MTRAttributeIDTypeClusterBindingAttributeGeneratedCommandListID:
+                result = @"GeneratedCommandList";
+                break;
 
-        case MTRAttributeIDTypeClusterBindingAttributeAttributeListID:
-            result = @"AttributeList";
-            break;
+            case MTRAttributeIDTypeClusterBindingAttributeAcceptedCommandListID:
+                result = @"AcceptedCommandList";
+                break;
 
-        case MTRAttributeIDTypeClusterBindingAttributeFeatureMapID:
-            result = @"FeatureMap";
-            break;
+            case MTRAttributeIDTypeClusterBindingAttributeEventListID:
+                result = @"EventList";
+                break;
 
-        case MTRAttributeIDTypeClusterBindingAttributeClusterRevisionID:
-            result = @"ClusterRevision";
-            break;
+            case MTRAttributeIDTypeClusterBindingAttributeAttributeListID:
+                result = @"AttributeList";
+                break;
 
-        default:
-            result = [NSString stringWithFormat:@"<Unknown attributeID %d>", attributeID];
-            break;
+            case MTRAttributeIDTypeClusterBindingAttributeFeatureMapID:
+                result = @"FeatureMap";
+                break;
+
+            case MTRAttributeIDTypeClusterBindingAttributeClusterRevisionID:
+                result = @"ClusterRevision";
+                break;
+
+
+            default:
+                result = [NSString stringWithFormat:@"<Unknown attributeID %d>", attributeID];
+                break;
         }
 
-    case MTRClusterIDTypeAccessControlID:
+case MTRClusterIDTypeAccessControlID:
 
-        switch (attributeID) {
+            switch (attributeID) {
 
-            // Cluster AccessControl attributes
-        case MTRAttributeIDTypeClusterAccessControlAttributeACLID:
-            result = @"ACL";
-            break;
 
-        case MTRAttributeIDTypeClusterAccessControlAttributeExtensionID:
-            result = @"Extension";
-            break;
 
-        case MTRAttributeIDTypeClusterAccessControlAttributeSubjectsPerAccessControlEntryID:
-            result = @"SubjectsPerAccessControlEntry";
-            break;
+// Cluster AccessControl attributes
+            case MTRAttributeIDTypeClusterAccessControlAttributeACLID:
+                result = @"ACL";
+                break;
 
-        case MTRAttributeIDTypeClusterAccessControlAttributeTargetsPerAccessControlEntryID:
-            result = @"TargetsPerAccessControlEntry";
-            break;
+            case MTRAttributeIDTypeClusterAccessControlAttributeExtensionID:
+                result = @"Extension";
+                break;
 
-        case MTRAttributeIDTypeClusterAccessControlAttributeAccessControlEntriesPerFabricID:
-            result = @"AccessControlEntriesPerFabric";
-            break;
+            case MTRAttributeIDTypeClusterAccessControlAttributeSubjectsPerAccessControlEntryID:
+                result = @"SubjectsPerAccessControlEntry";
+                break;
 
-        case MTRAttributeIDTypeClusterAccessControlAttributeCommissioningARLID:
-            result = @"CommissioningARL";
-            break;
+            case MTRAttributeIDTypeClusterAccessControlAttributeTargetsPerAccessControlEntryID:
+                result = @"TargetsPerAccessControlEntry";
+                break;
 
-        case MTRAttributeIDTypeClusterAccessControlAttributeARLID:
-            result = @"ARL";
-            break;
+            case MTRAttributeIDTypeClusterAccessControlAttributeAccessControlEntriesPerFabricID:
+                result = @"AccessControlEntriesPerFabric";
+                break;
 
-        case MTRAttributeIDTypeClusterAccessControlAttributeGeneratedCommandListID:
-            result = @"GeneratedCommandList";
-            break;
+            case MTRAttributeIDTypeClusterAccessControlAttributeCommissioningARLID:
+                result = @"CommissioningARL";
+                break;
 
-        case MTRAttributeIDTypeClusterAccessControlAttributeAcceptedCommandListID:
-            result = @"AcceptedCommandList";
-            break;
+            case MTRAttributeIDTypeClusterAccessControlAttributeARLID:
+                result = @"ARL";
+                break;
 
-        case MTRAttributeIDTypeClusterAccessControlAttributeEventListID:
-            result = @"EventList";
-            break;
+            case MTRAttributeIDTypeClusterAccessControlAttributeGeneratedCommandListID:
+                result = @"GeneratedCommandList";
+                break;
 
-        case MTRAttributeIDTypeClusterAccessControlAttributeAttributeListID:
-            result = @"AttributeList";
-            break;
+            case MTRAttributeIDTypeClusterAccessControlAttributeAcceptedCommandListID:
+                result = @"AcceptedCommandList";
+                break;
 
-        case MTRAttributeIDTypeClusterAccessControlAttributeFeatureMapID:
-            result = @"FeatureMap";
-            break;
+            case MTRAttributeIDTypeClusterAccessControlAttributeEventListID:
+                result = @"EventList";
+                break;
 
-        case MTRAttributeIDTypeClusterAccessControlAttributeClusterRevisionID:
-            result = @"ClusterRevision";
-            break;
+            case MTRAttributeIDTypeClusterAccessControlAttributeAttributeListID:
+                result = @"AttributeList";
+                break;
 
-        default:
-            result = [NSString stringWithFormat:@"<Unknown attributeID %d>", attributeID];
-            break;
+            case MTRAttributeIDTypeClusterAccessControlAttributeFeatureMapID:
+                result = @"FeatureMap";
+                break;
+
+            case MTRAttributeIDTypeClusterAccessControlAttributeClusterRevisionID:
+                result = @"ClusterRevision";
+                break;
+
+
+            default:
+                result = [NSString stringWithFormat:@"<Unknown attributeID %d>", attributeID];
+                break;
         }
 
-    case MTRClusterIDTypeActionsID:
+case MTRClusterIDTypeActionsID:
 
-        switch (attributeID) {
+            switch (attributeID) {
 
-            // Cluster Actions attributes
-        case MTRAttributeIDTypeClusterActionsAttributeActionListID:
-            result = @"ActionList";
-            break;
 
-        case MTRAttributeIDTypeClusterActionsAttributeEndpointListsID:
-            result = @"EndpointLists";
-            break;
 
-        case MTRAttributeIDTypeClusterActionsAttributeSetupURLID:
-            result = @"SetupURL";
-            break;
+// Cluster Actions attributes
+            case MTRAttributeIDTypeClusterActionsAttributeActionListID:
+                result = @"ActionList";
+                break;
 
-        case MTRAttributeIDTypeClusterActionsAttributeGeneratedCommandListID:
-            result = @"GeneratedCommandList";
-            break;
+            case MTRAttributeIDTypeClusterActionsAttributeEndpointListsID:
+                result = @"EndpointLists";
+                break;
 
-        case MTRAttributeIDTypeClusterActionsAttributeAcceptedCommandListID:
-            result = @"AcceptedCommandList";
-            break;
+            case MTRAttributeIDTypeClusterActionsAttributeSetupURLID:
+                result = @"SetupURL";
+                break;
 
-        case MTRAttributeIDTypeClusterActionsAttributeEventListID:
-            result = @"EventList";
-            break;
+            case MTRAttributeIDTypeClusterActionsAttributeGeneratedCommandListID:
+                result = @"GeneratedCommandList";
+                break;
 
-        case MTRAttributeIDTypeClusterActionsAttributeAttributeListID:
-            result = @"AttributeList";
-            break;
+            case MTRAttributeIDTypeClusterActionsAttributeAcceptedCommandListID:
+                result = @"AcceptedCommandList";
+                break;
 
-        case MTRAttributeIDTypeClusterActionsAttributeFeatureMapID:
-            result = @"FeatureMap";
-            break;
+            case MTRAttributeIDTypeClusterActionsAttributeEventListID:
+                result = @"EventList";
+                break;
 
-        case MTRAttributeIDTypeClusterActionsAttributeClusterRevisionID:
-            result = @"ClusterRevision";
-            break;
+            case MTRAttributeIDTypeClusterActionsAttributeAttributeListID:
+                result = @"AttributeList";
+                break;
 
-        default:
-            result = [NSString stringWithFormat:@"<Unknown attributeID %d>", attributeID];
-            break;
+            case MTRAttributeIDTypeClusterActionsAttributeFeatureMapID:
+                result = @"FeatureMap";
+                break;
+
+            case MTRAttributeIDTypeClusterActionsAttributeClusterRevisionID:
+                result = @"ClusterRevision";
+                break;
+
+
+            default:
+                result = [NSString stringWithFormat:@"<Unknown attributeID %d>", attributeID];
+                break;
         }
 
-    case MTRClusterIDTypeBasicInformationID:
+case MTRClusterIDTypeBasicInformationID:
 
-        switch (attributeID) {
+            switch (attributeID) {
 
-            // Cluster BasicInformation attributes
-        case MTRAttributeIDTypeClusterBasicInformationAttributeDataModelRevisionID:
-            result = @"DataModelRevision";
-            break;
 
-        case MTRAttributeIDTypeClusterBasicInformationAttributeVendorNameID:
-            result = @"VendorName";
-            break;
 
-        case MTRAttributeIDTypeClusterBasicInformationAttributeVendorIDID:
-            result = @"VendorID";
-            break;
+// Cluster BasicInformation attributes
+            case MTRAttributeIDTypeClusterBasicInformationAttributeDataModelRevisionID:
+                result = @"DataModelRevision";
+                break;
 
-        case MTRAttributeIDTypeClusterBasicInformationAttributeProductNameID:
-            result = @"ProductName";
-            break;
+            case MTRAttributeIDTypeClusterBasicInformationAttributeVendorNameID:
+                result = @"VendorName";
+                break;
 
-        case MTRAttributeIDTypeClusterBasicInformationAttributeProductIDID:
-            result = @"ProductID";
-            break;
+            case MTRAttributeIDTypeClusterBasicInformationAttributeVendorIDID:
+                result = @"VendorID";
+                break;
 
-        case MTRAttributeIDTypeClusterBasicInformationAttributeNodeLabelID:
-            result = @"NodeLabel";
-            break;
+            case MTRAttributeIDTypeClusterBasicInformationAttributeProductNameID:
+                result = @"ProductName";
+                break;
 
-        case MTRAttributeIDTypeClusterBasicInformationAttributeLocationID:
-            result = @"Location";
-            break;
+            case MTRAttributeIDTypeClusterBasicInformationAttributeProductIDID:
+                result = @"ProductID";
+                break;
 
-        case MTRAttributeIDTypeClusterBasicInformationAttributeHardwareVersionID:
-            result = @"HardwareVersion";
-            break;
+            case MTRAttributeIDTypeClusterBasicInformationAttributeNodeLabelID:
+                result = @"NodeLabel";
+                break;
 
-        case MTRAttributeIDTypeClusterBasicInformationAttributeHardwareVersionStringID:
-            result = @"HardwareVersionString";
-            break;
+            case MTRAttributeIDTypeClusterBasicInformationAttributeLocationID:
+                result = @"Location";
+                break;
 
-        case MTRAttributeIDTypeClusterBasicInformationAttributeSoftwareVersionID:
-            result = @"SoftwareVersion";
-            break;
+            case MTRAttributeIDTypeClusterBasicInformationAttributeHardwareVersionID:
+                result = @"HardwareVersion";
+                break;
 
-        case MTRAttributeIDTypeClusterBasicInformationAttributeSoftwareVersionStringID:
-            result = @"SoftwareVersionString";
-            break;
+            case MTRAttributeIDTypeClusterBasicInformationAttributeHardwareVersionStringID:
+                result = @"HardwareVersionString";
+                break;
 
-        case MTRAttributeIDTypeClusterBasicInformationAttributeManufacturingDateID:
-            result = @"ManufacturingDate";
-            break;
+            case MTRAttributeIDTypeClusterBasicInformationAttributeSoftwareVersionID:
+                result = @"SoftwareVersion";
+                break;
 
-        case MTRAttributeIDTypeClusterBasicInformationAttributePartNumberID:
-            result = @"PartNumber";
-            break;
+            case MTRAttributeIDTypeClusterBasicInformationAttributeSoftwareVersionStringID:
+                result = @"SoftwareVersionString";
+                break;
 
-        case MTRAttributeIDTypeClusterBasicInformationAttributeProductURLID:
-            result = @"ProductURL";
-            break;
+            case MTRAttributeIDTypeClusterBasicInformationAttributeManufacturingDateID:
+                result = @"ManufacturingDate";
+                break;
 
-        case MTRAttributeIDTypeClusterBasicInformationAttributeProductLabelID:
-            result = @"ProductLabel";
-            break;
+            case MTRAttributeIDTypeClusterBasicInformationAttributePartNumberID:
+                result = @"PartNumber";
+                break;
 
-        case MTRAttributeIDTypeClusterBasicInformationAttributeSerialNumberID:
-            result = @"SerialNumber";
-            break;
+            case MTRAttributeIDTypeClusterBasicInformationAttributeProductURLID:
+                result = @"ProductURL";
+                break;
 
-        case MTRAttributeIDTypeClusterBasicInformationAttributeLocalConfigDisabledID:
-            result = @"LocalConfigDisabled";
-            break;
+            case MTRAttributeIDTypeClusterBasicInformationAttributeProductLabelID:
+                result = @"ProductLabel";
+                break;
 
-        case MTRAttributeIDTypeClusterBasicInformationAttributeReachableID:
-            result = @"Reachable";
-            break;
+            case MTRAttributeIDTypeClusterBasicInformationAttributeSerialNumberID:
+                result = @"SerialNumber";
+                break;
 
-        case MTRAttributeIDTypeClusterBasicInformationAttributeUniqueIDID:
-            result = @"UniqueID";
-            break;
+            case MTRAttributeIDTypeClusterBasicInformationAttributeLocalConfigDisabledID:
+                result = @"LocalConfigDisabled";
+                break;
 
-        case MTRAttributeIDTypeClusterBasicInformationAttributeCapabilityMinimaID:
-            result = @"CapabilityMinima";
-            break;
+            case MTRAttributeIDTypeClusterBasicInformationAttributeReachableID:
+                result = @"Reachable";
+                break;
 
-        case MTRAttributeIDTypeClusterBasicInformationAttributeProductAppearanceID:
-            result = @"ProductAppearance";
-            break;
+            case MTRAttributeIDTypeClusterBasicInformationAttributeUniqueIDID:
+                result = @"UniqueID";
+                break;
 
-        case MTRAttributeIDTypeClusterBasicInformationAttributeSpecificationVersionID:
-            result = @"SpecificationVersion";
-            break;
+            case MTRAttributeIDTypeClusterBasicInformationAttributeCapabilityMinimaID:
+                result = @"CapabilityMinima";
+                break;
 
-        case MTRAttributeIDTypeClusterBasicInformationAttributeMaxPathsPerInvokeID:
-            result = @"MaxPathsPerInvoke";
-            break;
+            case MTRAttributeIDTypeClusterBasicInformationAttributeProductAppearanceID:
+                result = @"ProductAppearance";
+                break;
 
-        case MTRAttributeIDTypeClusterBasicInformationAttributeGeneratedCommandListID:
-            result = @"GeneratedCommandList";
-            break;
+            case MTRAttributeIDTypeClusterBasicInformationAttributeSpecificationVersionID:
+                result = @"SpecificationVersion";
+                break;
 
-        case MTRAttributeIDTypeClusterBasicInformationAttributeAcceptedCommandListID:
-            result = @"AcceptedCommandList";
-            break;
+            case MTRAttributeIDTypeClusterBasicInformationAttributeMaxPathsPerInvokeID:
+                result = @"MaxPathsPerInvoke";
+                break;
 
-        case MTRAttributeIDTypeClusterBasicInformationAttributeEventListID:
-            result = @"EventList";
-            break;
+            case MTRAttributeIDTypeClusterBasicInformationAttributeGeneratedCommandListID:
+                result = @"GeneratedCommandList";
+                break;
 
-        case MTRAttributeIDTypeClusterBasicInformationAttributeAttributeListID:
-            result = @"AttributeList";
-            break;
+            case MTRAttributeIDTypeClusterBasicInformationAttributeAcceptedCommandListID:
+                result = @"AcceptedCommandList";
+                break;
 
-        case MTRAttributeIDTypeClusterBasicInformationAttributeFeatureMapID:
-            result = @"FeatureMap";
-            break;
+            case MTRAttributeIDTypeClusterBasicInformationAttributeEventListID:
+                result = @"EventList";
+                break;
 
-        case MTRAttributeIDTypeClusterBasicInformationAttributeClusterRevisionID:
-            result = @"ClusterRevision";
-            break;
+            case MTRAttributeIDTypeClusterBasicInformationAttributeAttributeListID:
+                result = @"AttributeList";
+                break;
 
-        default:
-            result = [NSString stringWithFormat:@"<Unknown attributeID %d>", attributeID];
-            break;
+            case MTRAttributeIDTypeClusterBasicInformationAttributeFeatureMapID:
+                result = @"FeatureMap";
+                break;
+
+            case MTRAttributeIDTypeClusterBasicInformationAttributeClusterRevisionID:
+                result = @"ClusterRevision";
+                break;
+
+
+            default:
+                result = [NSString stringWithFormat:@"<Unknown attributeID %d>", attributeID];
+                break;
         }
 
-    case MTRClusterIDTypeOTASoftwareUpdateProviderID:
+case MTRClusterIDTypeOTASoftwareUpdateProviderID:
 
-        switch (attributeID) {
+            switch (attributeID) {
 
-            // Cluster OTASoftwareUpdateProvider attributes
-        case MTRAttributeIDTypeClusterOTASoftwareUpdateProviderAttributeGeneratedCommandListID:
-            result = @"GeneratedCommandList";
-            break;
 
-        case MTRAttributeIDTypeClusterOTASoftwareUpdateProviderAttributeAcceptedCommandListID:
-            result = @"AcceptedCommandList";
-            break;
 
-        case MTRAttributeIDTypeClusterOTASoftwareUpdateProviderAttributeEventListID:
-            result = @"EventList";
-            break;
+// Cluster OTASoftwareUpdateProvider attributes
+            case MTRAttributeIDTypeClusterOTASoftwareUpdateProviderAttributeGeneratedCommandListID:
+                result = @"GeneratedCommandList";
+                break;
 
-        case MTRAttributeIDTypeClusterOTASoftwareUpdateProviderAttributeAttributeListID:
-            result = @"AttributeList";
-            break;
+            case MTRAttributeIDTypeClusterOTASoftwareUpdateProviderAttributeAcceptedCommandListID:
+                result = @"AcceptedCommandList";
+                break;
 
-        case MTRAttributeIDTypeClusterOTASoftwareUpdateProviderAttributeFeatureMapID:
-            result = @"FeatureMap";
-            break;
+            case MTRAttributeIDTypeClusterOTASoftwareUpdateProviderAttributeEventListID:
+                result = @"EventList";
+                break;
 
-        case MTRAttributeIDTypeClusterOTASoftwareUpdateProviderAttributeClusterRevisionID:
-            result = @"ClusterRevision";
-            break;
+            case MTRAttributeIDTypeClusterOTASoftwareUpdateProviderAttributeAttributeListID:
+                result = @"AttributeList";
+                break;
 
-        default:
-            result = [NSString stringWithFormat:@"<Unknown attributeID %d>", attributeID];
-            break;
+            case MTRAttributeIDTypeClusterOTASoftwareUpdateProviderAttributeFeatureMapID:
+                result = @"FeatureMap";
+                break;
+
+            case MTRAttributeIDTypeClusterOTASoftwareUpdateProviderAttributeClusterRevisionID:
+                result = @"ClusterRevision";
+                break;
+
+
+            default:
+                result = [NSString stringWithFormat:@"<Unknown attributeID %d>", attributeID];
+                break;
         }
 
-    case MTRClusterIDTypeOTASoftwareUpdateRequestorID:
+case MTRClusterIDTypeOTASoftwareUpdateRequestorID:
 
-        switch (attributeID) {
+            switch (attributeID) {
 
-            // Cluster OTASoftwareUpdateRequestor attributes
-        case MTRAttributeIDTypeClusterOTASoftwareUpdateRequestorAttributeDefaultOTAProvidersID:
-            result = @"DefaultOTAProviders";
-            break;
 
-        case MTRAttributeIDTypeClusterOTASoftwareUpdateRequestorAttributeUpdatePossibleID:
-            result = @"UpdatePossible";
-            break;
 
-        case MTRAttributeIDTypeClusterOTASoftwareUpdateRequestorAttributeUpdateStateID:
-            result = @"UpdateState";
-            break;
+// Cluster OTASoftwareUpdateRequestor attributes
+            case MTRAttributeIDTypeClusterOTASoftwareUpdateRequestorAttributeDefaultOTAProvidersID:
+                result = @"DefaultOTAProviders";
+                break;
 
-        case MTRAttributeIDTypeClusterOTASoftwareUpdateRequestorAttributeUpdateStateProgressID:
-            result = @"UpdateStateProgress";
-            break;
+            case MTRAttributeIDTypeClusterOTASoftwareUpdateRequestorAttributeUpdatePossibleID:
+                result = @"UpdatePossible";
+                break;
 
-        case MTRAttributeIDTypeClusterOTASoftwareUpdateRequestorAttributeGeneratedCommandListID:
-            result = @"GeneratedCommandList";
-            break;
+            case MTRAttributeIDTypeClusterOTASoftwareUpdateRequestorAttributeUpdateStateID:
+                result = @"UpdateState";
+                break;
 
-        case MTRAttributeIDTypeClusterOTASoftwareUpdateRequestorAttributeAcceptedCommandListID:
-            result = @"AcceptedCommandList";
-            break;
+            case MTRAttributeIDTypeClusterOTASoftwareUpdateRequestorAttributeUpdateStateProgressID:
+                result = @"UpdateStateProgress";
+                break;
 
-        case MTRAttributeIDTypeClusterOTASoftwareUpdateRequestorAttributeEventListID:
-            result = @"EventList";
-            break;
+            case MTRAttributeIDTypeClusterOTASoftwareUpdateRequestorAttributeGeneratedCommandListID:
+                result = @"GeneratedCommandList";
+                break;
 
-        case MTRAttributeIDTypeClusterOTASoftwareUpdateRequestorAttributeAttributeListID:
-            result = @"AttributeList";
-            break;
+            case MTRAttributeIDTypeClusterOTASoftwareUpdateRequestorAttributeAcceptedCommandListID:
+                result = @"AcceptedCommandList";
+                break;
 
-        case MTRAttributeIDTypeClusterOTASoftwareUpdateRequestorAttributeFeatureMapID:
-            result = @"FeatureMap";
-            break;
+            case MTRAttributeIDTypeClusterOTASoftwareUpdateRequestorAttributeEventListID:
+                result = @"EventList";
+                break;
 
-        case MTRAttributeIDTypeClusterOTASoftwareUpdateRequestorAttributeClusterRevisionID:
-            result = @"ClusterRevision";
-            break;
+            case MTRAttributeIDTypeClusterOTASoftwareUpdateRequestorAttributeAttributeListID:
+                result = @"AttributeList";
+                break;
 
-        default:
-            result = [NSString stringWithFormat:@"<Unknown attributeID %d>", attributeID];
-            break;
+            case MTRAttributeIDTypeClusterOTASoftwareUpdateRequestorAttributeFeatureMapID:
+                result = @"FeatureMap";
+                break;
+
+            case MTRAttributeIDTypeClusterOTASoftwareUpdateRequestorAttributeClusterRevisionID:
+                result = @"ClusterRevision";
+                break;
+
+
+            default:
+                result = [NSString stringWithFormat:@"<Unknown attributeID %d>", attributeID];
+                break;
         }
 
-    case MTRClusterIDTypeLocalizationConfigurationID:
+case MTRClusterIDTypeLocalizationConfigurationID:
 
-        switch (attributeID) {
+            switch (attributeID) {
 
-            // Cluster LocalizationConfiguration attributes
-        case MTRAttributeIDTypeClusterLocalizationConfigurationAttributeActiveLocaleID:
-            result = @"ActiveLocale";
-            break;
 
-        case MTRAttributeIDTypeClusterLocalizationConfigurationAttributeSupportedLocalesID:
-            result = @"SupportedLocales";
-            break;
 
-        case MTRAttributeIDTypeClusterLocalizationConfigurationAttributeGeneratedCommandListID:
-            result = @"GeneratedCommandList";
-            break;
+// Cluster LocalizationConfiguration attributes
+            case MTRAttributeIDTypeClusterLocalizationConfigurationAttributeActiveLocaleID:
+                result = @"ActiveLocale";
+                break;
 
-        case MTRAttributeIDTypeClusterLocalizationConfigurationAttributeAcceptedCommandListID:
-            result = @"AcceptedCommandList";
-            break;
+            case MTRAttributeIDTypeClusterLocalizationConfigurationAttributeSupportedLocalesID:
+                result = @"SupportedLocales";
+                break;
 
-        case MTRAttributeIDTypeClusterLocalizationConfigurationAttributeEventListID:
-            result = @"EventList";
-            break;
+            case MTRAttributeIDTypeClusterLocalizationConfigurationAttributeGeneratedCommandListID:
+                result = @"GeneratedCommandList";
+                break;
 
-        case MTRAttributeIDTypeClusterLocalizationConfigurationAttributeAttributeListID:
-            result = @"AttributeList";
-            break;
+            case MTRAttributeIDTypeClusterLocalizationConfigurationAttributeAcceptedCommandListID:
+                result = @"AcceptedCommandList";
+                break;
 
-        case MTRAttributeIDTypeClusterLocalizationConfigurationAttributeFeatureMapID:
-            result = @"FeatureMap";
-            break;
+            case MTRAttributeIDTypeClusterLocalizationConfigurationAttributeEventListID:
+                result = @"EventList";
+                break;
 
-        case MTRAttributeIDTypeClusterLocalizationConfigurationAttributeClusterRevisionID:
-            result = @"ClusterRevision";
-            break;
+            case MTRAttributeIDTypeClusterLocalizationConfigurationAttributeAttributeListID:
+                result = @"AttributeList";
+                break;
 
-        default:
-            result = [NSString stringWithFormat:@"<Unknown attributeID %d>", attributeID];
-            break;
+            case MTRAttributeIDTypeClusterLocalizationConfigurationAttributeFeatureMapID:
+                result = @"FeatureMap";
+                break;
+
+            case MTRAttributeIDTypeClusterLocalizationConfigurationAttributeClusterRevisionID:
+                result = @"ClusterRevision";
+                break;
+
+
+            default:
+                result = [NSString stringWithFormat:@"<Unknown attributeID %d>", attributeID];
+                break;
         }
 
-    case MTRClusterIDTypeTimeFormatLocalizationID:
+case MTRClusterIDTypeTimeFormatLocalizationID:
 
-        switch (attributeID) {
+            switch (attributeID) {
 
-            // Cluster TimeFormatLocalization attributes
-        case MTRAttributeIDTypeClusterTimeFormatLocalizationAttributeHourFormatID:
-            result = @"HourFormat";
-            break;
 
-        case MTRAttributeIDTypeClusterTimeFormatLocalizationAttributeActiveCalendarTypeID:
-            result = @"ActiveCalendarType";
-            break;
 
-        case MTRAttributeIDTypeClusterTimeFormatLocalizationAttributeSupportedCalendarTypesID:
-            result = @"SupportedCalendarTypes";
-            break;
+// Cluster TimeFormatLocalization attributes
+            case MTRAttributeIDTypeClusterTimeFormatLocalizationAttributeHourFormatID:
+                result = @"HourFormat";
+                break;
 
-        case MTRAttributeIDTypeClusterTimeFormatLocalizationAttributeGeneratedCommandListID:
-            result = @"GeneratedCommandList";
-            break;
+            case MTRAttributeIDTypeClusterTimeFormatLocalizationAttributeActiveCalendarTypeID:
+                result = @"ActiveCalendarType";
+                break;
 
-        case MTRAttributeIDTypeClusterTimeFormatLocalizationAttributeAcceptedCommandListID:
-            result = @"AcceptedCommandList";
-            break;
+            case MTRAttributeIDTypeClusterTimeFormatLocalizationAttributeSupportedCalendarTypesID:
+                result = @"SupportedCalendarTypes";
+                break;
 
-        case MTRAttributeIDTypeClusterTimeFormatLocalizationAttributeEventListID:
-            result = @"EventList";
-            break;
+            case MTRAttributeIDTypeClusterTimeFormatLocalizationAttributeGeneratedCommandListID:
+                result = @"GeneratedCommandList";
+                break;
 
-        case MTRAttributeIDTypeClusterTimeFormatLocalizationAttributeAttributeListID:
-            result = @"AttributeList";
-            break;
+            case MTRAttributeIDTypeClusterTimeFormatLocalizationAttributeAcceptedCommandListID:
+                result = @"AcceptedCommandList";
+                break;
 
-        case MTRAttributeIDTypeClusterTimeFormatLocalizationAttributeFeatureMapID:
-            result = @"FeatureMap";
-            break;
+            case MTRAttributeIDTypeClusterTimeFormatLocalizationAttributeEventListID:
+                result = @"EventList";
+                break;
 
-        case MTRAttributeIDTypeClusterTimeFormatLocalizationAttributeClusterRevisionID:
-            result = @"ClusterRevision";
-            break;
+            case MTRAttributeIDTypeClusterTimeFormatLocalizationAttributeAttributeListID:
+                result = @"AttributeList";
+                break;
 
-        default:
-            result = [NSString stringWithFormat:@"<Unknown attributeID %d>", attributeID];
-            break;
+            case MTRAttributeIDTypeClusterTimeFormatLocalizationAttributeFeatureMapID:
+                result = @"FeatureMap";
+                break;
+
+            case MTRAttributeIDTypeClusterTimeFormatLocalizationAttributeClusterRevisionID:
+                result = @"ClusterRevision";
+                break;
+
+
+            default:
+                result = [NSString stringWithFormat:@"<Unknown attributeID %d>", attributeID];
+                break;
         }
 
-    case MTRClusterIDTypeUnitLocalizationID:
+case MTRClusterIDTypeUnitLocalizationID:
 
-        switch (attributeID) {
+            switch (attributeID) {
 
-            // Cluster UnitLocalization attributes
-        case MTRAttributeIDTypeClusterUnitLocalizationAttributeTemperatureUnitID:
-            result = @"TemperatureUnit";
-            break;
 
-        case MTRAttributeIDTypeClusterUnitLocalizationAttributeGeneratedCommandListID:
-            result = @"GeneratedCommandList";
-            break;
 
-        case MTRAttributeIDTypeClusterUnitLocalizationAttributeAcceptedCommandListID:
-            result = @"AcceptedCommandList";
-            break;
+// Cluster UnitLocalization attributes
+            case MTRAttributeIDTypeClusterUnitLocalizationAttributeTemperatureUnitID:
+                result = @"TemperatureUnit";
+                break;
 
-        case MTRAttributeIDTypeClusterUnitLocalizationAttributeEventListID:
-            result = @"EventList";
-            break;
+            case MTRAttributeIDTypeClusterUnitLocalizationAttributeGeneratedCommandListID:
+                result = @"GeneratedCommandList";
+                break;
 
-        case MTRAttributeIDTypeClusterUnitLocalizationAttributeAttributeListID:
-            result = @"AttributeList";
-            break;
+            case MTRAttributeIDTypeClusterUnitLocalizationAttributeAcceptedCommandListID:
+                result = @"AcceptedCommandList";
+                break;
 
-        case MTRAttributeIDTypeClusterUnitLocalizationAttributeFeatureMapID:
-            result = @"FeatureMap";
-            break;
+            case MTRAttributeIDTypeClusterUnitLocalizationAttributeEventListID:
+                result = @"EventList";
+                break;
 
-        case MTRAttributeIDTypeClusterUnitLocalizationAttributeClusterRevisionID:
-            result = @"ClusterRevision";
-            break;
+            case MTRAttributeIDTypeClusterUnitLocalizationAttributeAttributeListID:
+                result = @"AttributeList";
+                break;
 
-        default:
-            result = [NSString stringWithFormat:@"<Unknown attributeID %d>", attributeID];
-            break;
+            case MTRAttributeIDTypeClusterUnitLocalizationAttributeFeatureMapID:
+                result = @"FeatureMap";
+                break;
+
+            case MTRAttributeIDTypeClusterUnitLocalizationAttributeClusterRevisionID:
+                result = @"ClusterRevision";
+                break;
+
+
+            default:
+                result = [NSString stringWithFormat:@"<Unknown attributeID %d>", attributeID];
+                break;
         }
 
-    case MTRClusterIDTypePowerSourceConfigurationID:
+case MTRClusterIDTypePowerSourceConfigurationID:
 
-        switch (attributeID) {
+            switch (attributeID) {
 
-            // Cluster PowerSourceConfiguration attributes
-        case MTRAttributeIDTypeClusterPowerSourceConfigurationAttributeSourcesID:
-            result = @"Sources";
-            break;
 
-        case MTRAttributeIDTypeClusterPowerSourceConfigurationAttributeGeneratedCommandListID:
-            result = @"GeneratedCommandList";
-            break;
 
-        case MTRAttributeIDTypeClusterPowerSourceConfigurationAttributeAcceptedCommandListID:
-            result = @"AcceptedCommandList";
-            break;
+// Cluster PowerSourceConfiguration attributes
+            case MTRAttributeIDTypeClusterPowerSourceConfigurationAttributeSourcesID:
+                result = @"Sources";
+                break;
 
-        case MTRAttributeIDTypeClusterPowerSourceConfigurationAttributeEventListID:
-            result = @"EventList";
-            break;
+            case MTRAttributeIDTypeClusterPowerSourceConfigurationAttributeGeneratedCommandListID:
+                result = @"GeneratedCommandList";
+                break;
 
-        case MTRAttributeIDTypeClusterPowerSourceConfigurationAttributeAttributeListID:
-            result = @"AttributeList";
-            break;
+            case MTRAttributeIDTypeClusterPowerSourceConfigurationAttributeAcceptedCommandListID:
+                result = @"AcceptedCommandList";
+                break;
 
-        case MTRAttributeIDTypeClusterPowerSourceConfigurationAttributeFeatureMapID:
-            result = @"FeatureMap";
-            break;
+            case MTRAttributeIDTypeClusterPowerSourceConfigurationAttributeEventListID:
+                result = @"EventList";
+                break;
 
-        case MTRAttributeIDTypeClusterPowerSourceConfigurationAttributeClusterRevisionID:
-            result = @"ClusterRevision";
-            break;
+            case MTRAttributeIDTypeClusterPowerSourceConfigurationAttributeAttributeListID:
+                result = @"AttributeList";
+                break;
 
-        default:
-            result = [NSString stringWithFormat:@"<Unknown attributeID %d>", attributeID];
-            break;
+            case MTRAttributeIDTypeClusterPowerSourceConfigurationAttributeFeatureMapID:
+                result = @"FeatureMap";
+                break;
+
+            case MTRAttributeIDTypeClusterPowerSourceConfigurationAttributeClusterRevisionID:
+                result = @"ClusterRevision";
+                break;
+
+
+            default:
+                result = [NSString stringWithFormat:@"<Unknown attributeID %d>", attributeID];
+                break;
         }
 
-    case MTRClusterIDTypePowerSourceID:
+case MTRClusterIDTypePowerSourceID:
 
-        switch (attributeID) {
+            switch (attributeID) {
 
-            // Cluster PowerSource attributes
-        case MTRAttributeIDTypeClusterPowerSourceAttributeStatusID:
-            result = @"Status";
-            break;
 
-        case MTRAttributeIDTypeClusterPowerSourceAttributeOrderID:
-            result = @"Order";
-            break;
 
-        case MTRAttributeIDTypeClusterPowerSourceAttributeDescriptionID:
-            result = @"Description";
-            break;
+// Cluster PowerSource attributes
+            case MTRAttributeIDTypeClusterPowerSourceAttributeStatusID:
+                result = @"Status";
+                break;
 
-        case MTRAttributeIDTypeClusterPowerSourceAttributeWiredAssessedInputVoltageID:
-            result = @"WiredAssessedInputVoltage";
-            break;
+            case MTRAttributeIDTypeClusterPowerSourceAttributeOrderID:
+                result = @"Order";
+                break;
 
-        case MTRAttributeIDTypeClusterPowerSourceAttributeWiredAssessedInputFrequencyID:
-            result = @"WiredAssessedInputFrequency";
-            break;
+            case MTRAttributeIDTypeClusterPowerSourceAttributeDescriptionID:
+                result = @"Description";
+                break;
 
-        case MTRAttributeIDTypeClusterPowerSourceAttributeWiredCurrentTypeID:
-            result = @"WiredCurrentType";
-            break;
+            case MTRAttributeIDTypeClusterPowerSourceAttributeWiredAssessedInputVoltageID:
+                result = @"WiredAssessedInputVoltage";
+                break;
 
-        case MTRAttributeIDTypeClusterPowerSourceAttributeWiredAssessedCurrentID:
-            result = @"WiredAssessedCurrent";
-            break;
+            case MTRAttributeIDTypeClusterPowerSourceAttributeWiredAssessedInputFrequencyID:
+                result = @"WiredAssessedInputFrequency";
+                break;
 
-        case MTRAttributeIDTypeClusterPowerSourceAttributeWiredNominalVoltageID:
-            result = @"WiredNominalVoltage";
-            break;
+            case MTRAttributeIDTypeClusterPowerSourceAttributeWiredCurrentTypeID:
+                result = @"WiredCurrentType";
+                break;
 
-        case MTRAttributeIDTypeClusterPowerSourceAttributeWiredMaximumCurrentID:
-            result = @"WiredMaximumCurrent";
-            break;
+            case MTRAttributeIDTypeClusterPowerSourceAttributeWiredAssessedCurrentID:
+                result = @"WiredAssessedCurrent";
+                break;
 
-        case MTRAttributeIDTypeClusterPowerSourceAttributeWiredPresentID:
-            result = @"WiredPresent";
-            break;
+            case MTRAttributeIDTypeClusterPowerSourceAttributeWiredNominalVoltageID:
+                result = @"WiredNominalVoltage";
+                break;
 
-        case MTRAttributeIDTypeClusterPowerSourceAttributeActiveWiredFaultsID:
-            result = @"ActiveWiredFaults";
-            break;
+            case MTRAttributeIDTypeClusterPowerSourceAttributeWiredMaximumCurrentID:
+                result = @"WiredMaximumCurrent";
+                break;
 
-        case MTRAttributeIDTypeClusterPowerSourceAttributeBatVoltageID:
-            result = @"BatVoltage";
-            break;
+            case MTRAttributeIDTypeClusterPowerSourceAttributeWiredPresentID:
+                result = @"WiredPresent";
+                break;
 
-        case MTRAttributeIDTypeClusterPowerSourceAttributeBatPercentRemainingID:
-            result = @"BatPercentRemaining";
-            break;
+            case MTRAttributeIDTypeClusterPowerSourceAttributeActiveWiredFaultsID:
+                result = @"ActiveWiredFaults";
+                break;
 
-        case MTRAttributeIDTypeClusterPowerSourceAttributeBatTimeRemainingID:
-            result = @"BatTimeRemaining";
-            break;
+            case MTRAttributeIDTypeClusterPowerSourceAttributeBatVoltageID:
+                result = @"BatVoltage";
+                break;
 
-        case MTRAttributeIDTypeClusterPowerSourceAttributeBatChargeLevelID:
-            result = @"BatChargeLevel";
-            break;
+            case MTRAttributeIDTypeClusterPowerSourceAttributeBatPercentRemainingID:
+                result = @"BatPercentRemaining";
+                break;
 
-        case MTRAttributeIDTypeClusterPowerSourceAttributeBatReplacementNeededID:
-            result = @"BatReplacementNeeded";
-            break;
+            case MTRAttributeIDTypeClusterPowerSourceAttributeBatTimeRemainingID:
+                result = @"BatTimeRemaining";
+                break;
 
-        case MTRAttributeIDTypeClusterPowerSourceAttributeBatReplaceabilityID:
-            result = @"BatReplaceability";
-            break;
+            case MTRAttributeIDTypeClusterPowerSourceAttributeBatChargeLevelID:
+                result = @"BatChargeLevel";
+                break;
 
-        case MTRAttributeIDTypeClusterPowerSourceAttributeBatPresentID:
-            result = @"BatPresent";
-            break;
+            case MTRAttributeIDTypeClusterPowerSourceAttributeBatReplacementNeededID:
+                result = @"BatReplacementNeeded";
+                break;
 
-        case MTRAttributeIDTypeClusterPowerSourceAttributeActiveBatFaultsID:
-            result = @"ActiveBatFaults";
-            break;
+            case MTRAttributeIDTypeClusterPowerSourceAttributeBatReplaceabilityID:
+                result = @"BatReplaceability";
+                break;
 
-        case MTRAttributeIDTypeClusterPowerSourceAttributeBatReplacementDescriptionID:
-            result = @"BatReplacementDescription";
-            break;
+            case MTRAttributeIDTypeClusterPowerSourceAttributeBatPresentID:
+                result = @"BatPresent";
+                break;
 
-        case MTRAttributeIDTypeClusterPowerSourceAttributeBatCommonDesignationID:
-            result = @"BatCommonDesignation";
-            break;
+            case MTRAttributeIDTypeClusterPowerSourceAttributeActiveBatFaultsID:
+                result = @"ActiveBatFaults";
+                break;
 
-        case MTRAttributeIDTypeClusterPowerSourceAttributeBatANSIDesignationID:
-            result = @"BatANSIDesignation";
-            break;
+            case MTRAttributeIDTypeClusterPowerSourceAttributeBatReplacementDescriptionID:
+                result = @"BatReplacementDescription";
+                break;
 
-        case MTRAttributeIDTypeClusterPowerSourceAttributeBatIECDesignationID:
-            result = @"BatIECDesignation";
-            break;
+            case MTRAttributeIDTypeClusterPowerSourceAttributeBatCommonDesignationID:
+                result = @"BatCommonDesignation";
+                break;
 
-        case MTRAttributeIDTypeClusterPowerSourceAttributeBatApprovedChemistryID:
-            result = @"BatApprovedChemistry";
-            break;
+            case MTRAttributeIDTypeClusterPowerSourceAttributeBatANSIDesignationID:
+                result = @"BatANSIDesignation";
+                break;
 
-        case MTRAttributeIDTypeClusterPowerSourceAttributeBatCapacityID:
-            result = @"BatCapacity";
-            break;
+            case MTRAttributeIDTypeClusterPowerSourceAttributeBatIECDesignationID:
+                result = @"BatIECDesignation";
+                break;
 
-        case MTRAttributeIDTypeClusterPowerSourceAttributeBatQuantityID:
-            result = @"BatQuantity";
-            break;
+            case MTRAttributeIDTypeClusterPowerSourceAttributeBatApprovedChemistryID:
+                result = @"BatApprovedChemistry";
+                break;
 
-        case MTRAttributeIDTypeClusterPowerSourceAttributeBatChargeStateID:
-            result = @"BatChargeState";
-            break;
+            case MTRAttributeIDTypeClusterPowerSourceAttributeBatCapacityID:
+                result = @"BatCapacity";
+                break;
 
-        case MTRAttributeIDTypeClusterPowerSourceAttributeBatTimeToFullChargeID:
-            result = @"BatTimeToFullCharge";
-            break;
+            case MTRAttributeIDTypeClusterPowerSourceAttributeBatQuantityID:
+                result = @"BatQuantity";
+                break;
 
-        case MTRAttributeIDTypeClusterPowerSourceAttributeBatFunctionalWhileChargingID:
-            result = @"BatFunctionalWhileCharging";
-            break;
+            case MTRAttributeIDTypeClusterPowerSourceAttributeBatChargeStateID:
+                result = @"BatChargeState";
+                break;
 
-        case MTRAttributeIDTypeClusterPowerSourceAttributeBatChargingCurrentID:
-            result = @"BatChargingCurrent";
-            break;
+            case MTRAttributeIDTypeClusterPowerSourceAttributeBatTimeToFullChargeID:
+                result = @"BatTimeToFullCharge";
+                break;
 
-        case MTRAttributeIDTypeClusterPowerSourceAttributeActiveBatChargeFaultsID:
-            result = @"ActiveBatChargeFaults";
-            break;
+            case MTRAttributeIDTypeClusterPowerSourceAttributeBatFunctionalWhileChargingID:
+                result = @"BatFunctionalWhileCharging";
+                break;
 
-        case MTRAttributeIDTypeClusterPowerSourceAttributeEndpointListID:
-            result = @"EndpointList";
-            break;
+            case MTRAttributeIDTypeClusterPowerSourceAttributeBatChargingCurrentID:
+                result = @"BatChargingCurrent";
+                break;
 
-        case MTRAttributeIDTypeClusterPowerSourceAttributeGeneratedCommandListID:
-            result = @"GeneratedCommandList";
-            break;
+            case MTRAttributeIDTypeClusterPowerSourceAttributeActiveBatChargeFaultsID:
+                result = @"ActiveBatChargeFaults";
+                break;
 
-        case MTRAttributeIDTypeClusterPowerSourceAttributeAcceptedCommandListID:
-            result = @"AcceptedCommandList";
-            break;
+            case MTRAttributeIDTypeClusterPowerSourceAttributeEndpointListID:
+                result = @"EndpointList";
+                break;
 
-        case MTRAttributeIDTypeClusterPowerSourceAttributeEventListID:
-            result = @"EventList";
-            break;
+            case MTRAttributeIDTypeClusterPowerSourceAttributeGeneratedCommandListID:
+                result = @"GeneratedCommandList";
+                break;
 
-        case MTRAttributeIDTypeClusterPowerSourceAttributeAttributeListID:
-            result = @"AttributeList";
-            break;
+            case MTRAttributeIDTypeClusterPowerSourceAttributeAcceptedCommandListID:
+                result = @"AcceptedCommandList";
+                break;
 
-        case MTRAttributeIDTypeClusterPowerSourceAttributeFeatureMapID:
-            result = @"FeatureMap";
-            break;
+            case MTRAttributeIDTypeClusterPowerSourceAttributeEventListID:
+                result = @"EventList";
+                break;
 
-        case MTRAttributeIDTypeClusterPowerSourceAttributeClusterRevisionID:
-            result = @"ClusterRevision";
-            break;
+            case MTRAttributeIDTypeClusterPowerSourceAttributeAttributeListID:
+                result = @"AttributeList";
+                break;
 
-        default:
-            result = [NSString stringWithFormat:@"<Unknown attributeID %d>", attributeID];
-            break;
+            case MTRAttributeIDTypeClusterPowerSourceAttributeFeatureMapID:
+                result = @"FeatureMap";
+                break;
+
+            case MTRAttributeIDTypeClusterPowerSourceAttributeClusterRevisionID:
+                result = @"ClusterRevision";
+                break;
+
+
+            default:
+                result = [NSString stringWithFormat:@"<Unknown attributeID %d>", attributeID];
+                break;
         }
 
-    case MTRClusterIDTypeGeneralCommissioningID:
+case MTRClusterIDTypeGeneralCommissioningID:
 
-        switch (attributeID) {
+            switch (attributeID) {
 
-            // Cluster GeneralCommissioning attributes
-        case MTRAttributeIDTypeClusterGeneralCommissioningAttributeBreadcrumbID:
-            result = @"Breadcrumb";
-            break;
 
-        case MTRAttributeIDTypeClusterGeneralCommissioningAttributeBasicCommissioningInfoID:
-            result = @"BasicCommissioningInfo";
-            break;
 
-        case MTRAttributeIDTypeClusterGeneralCommissioningAttributeRegulatoryConfigID:
-            result = @"RegulatoryConfig";
-            break;
+// Cluster GeneralCommissioning attributes
+            case MTRAttributeIDTypeClusterGeneralCommissioningAttributeBreadcrumbID:
+                result = @"Breadcrumb";
+                break;
 
-        case MTRAttributeIDTypeClusterGeneralCommissioningAttributeLocationCapabilityID:
-            result = @"LocationCapability";
-            break;
+            case MTRAttributeIDTypeClusterGeneralCommissioningAttributeBasicCommissioningInfoID:
+                result = @"BasicCommissioningInfo";
+                break;
 
-        case MTRAttributeIDTypeClusterGeneralCommissioningAttributeSupportsConcurrentConnectionID:
-            result = @"SupportsConcurrentConnection";
-            break;
+            case MTRAttributeIDTypeClusterGeneralCommissioningAttributeRegulatoryConfigID:
+                result = @"RegulatoryConfig";
+                break;
 
-        case MTRAttributeIDTypeClusterGeneralCommissioningAttributeGeneratedCommandListID:
-            result = @"GeneratedCommandList";
-            break;
+            case MTRAttributeIDTypeClusterGeneralCommissioningAttributeLocationCapabilityID:
+                result = @"LocationCapability";
+                break;
 
-        case MTRAttributeIDTypeClusterGeneralCommissioningAttributeAcceptedCommandListID:
-            result = @"AcceptedCommandList";
-            break;
+            case MTRAttributeIDTypeClusterGeneralCommissioningAttributeSupportsConcurrentConnectionID:
+                result = @"SupportsConcurrentConnection";
+                break;
 
-        case MTRAttributeIDTypeClusterGeneralCommissioningAttributeEventListID:
-            result = @"EventList";
-            break;
+            case MTRAttributeIDTypeClusterGeneralCommissioningAttributeGeneratedCommandListID:
+                result = @"GeneratedCommandList";
+                break;
 
-        case MTRAttributeIDTypeClusterGeneralCommissioningAttributeAttributeListID:
-            result = @"AttributeList";
-            break;
+            case MTRAttributeIDTypeClusterGeneralCommissioningAttributeAcceptedCommandListID:
+                result = @"AcceptedCommandList";
+                break;
 
-        case MTRAttributeIDTypeClusterGeneralCommissioningAttributeFeatureMapID:
-            result = @"FeatureMap";
-            break;
+            case MTRAttributeIDTypeClusterGeneralCommissioningAttributeEventListID:
+                result = @"EventList";
+                break;
 
-        case MTRAttributeIDTypeClusterGeneralCommissioningAttributeClusterRevisionID:
-            result = @"ClusterRevision";
-            break;
+            case MTRAttributeIDTypeClusterGeneralCommissioningAttributeAttributeListID:
+                result = @"AttributeList";
+                break;
 
-        default:
-            result = [NSString stringWithFormat:@"<Unknown attributeID %d>", attributeID];
-            break;
+            case MTRAttributeIDTypeClusterGeneralCommissioningAttributeFeatureMapID:
+                result = @"FeatureMap";
+                break;
+
+            case MTRAttributeIDTypeClusterGeneralCommissioningAttributeClusterRevisionID:
+                result = @"ClusterRevision";
+                break;
+
+
+            default:
+                result = [NSString stringWithFormat:@"<Unknown attributeID %d>", attributeID];
+                break;
         }
 
-    case MTRClusterIDTypeNetworkCommissioningID:
+case MTRClusterIDTypeNetworkCommissioningID:
 
-        switch (attributeID) {
+            switch (attributeID) {
 
-            // Cluster NetworkCommissioning attributes
-        case MTRAttributeIDTypeClusterNetworkCommissioningAttributeMaxNetworksID:
-            result = @"MaxNetworks";
-            break;
 
-        case MTRAttributeIDTypeClusterNetworkCommissioningAttributeNetworksID:
-            result = @"Networks";
-            break;
 
-        case MTRAttributeIDTypeClusterNetworkCommissioningAttributeScanMaxTimeSecondsID:
-            result = @"ScanMaxTimeSeconds";
-            break;
+// Cluster NetworkCommissioning attributes
+            case MTRAttributeIDTypeClusterNetworkCommissioningAttributeMaxNetworksID:
+                result = @"MaxNetworks";
+                break;
 
-        case MTRAttributeIDTypeClusterNetworkCommissioningAttributeConnectMaxTimeSecondsID:
-            result = @"ConnectMaxTimeSeconds";
-            break;
+            case MTRAttributeIDTypeClusterNetworkCommissioningAttributeNetworksID:
+                result = @"Networks";
+                break;
 
-        case MTRAttributeIDTypeClusterNetworkCommissioningAttributeInterfaceEnabledID:
-            result = @"InterfaceEnabled";
-            break;
+            case MTRAttributeIDTypeClusterNetworkCommissioningAttributeScanMaxTimeSecondsID:
+                result = @"ScanMaxTimeSeconds";
+                break;
 
-        case MTRAttributeIDTypeClusterNetworkCommissioningAttributeLastNetworkingStatusID:
-            result = @"LastNetworkingStatus";
-            break;
+            case MTRAttributeIDTypeClusterNetworkCommissioningAttributeConnectMaxTimeSecondsID:
+                result = @"ConnectMaxTimeSeconds";
+                break;
 
-        case MTRAttributeIDTypeClusterNetworkCommissioningAttributeLastNetworkIDID:
-            result = @"LastNetworkID";
-            break;
+            case MTRAttributeIDTypeClusterNetworkCommissioningAttributeInterfaceEnabledID:
+                result = @"InterfaceEnabled";
+                break;
 
-        case MTRAttributeIDTypeClusterNetworkCommissioningAttributeLastConnectErrorValueID:
-            result = @"LastConnectErrorValue";
-            break;
+            case MTRAttributeIDTypeClusterNetworkCommissioningAttributeLastNetworkingStatusID:
+                result = @"LastNetworkingStatus";
+                break;
 
-        case MTRAttributeIDTypeClusterNetworkCommissioningAttributeSupportedWiFiBandsID:
-            result = @"SupportedWiFiBands";
-            break;
+            case MTRAttributeIDTypeClusterNetworkCommissioningAttributeLastNetworkIDID:
+                result = @"LastNetworkID";
+                break;
 
-        case MTRAttributeIDTypeClusterNetworkCommissioningAttributeSupportedThreadFeaturesID:
-            result = @"SupportedThreadFeatures";
-            break;
+            case MTRAttributeIDTypeClusterNetworkCommissioningAttributeLastConnectErrorValueID:
+                result = @"LastConnectErrorValue";
+                break;
 
-        case MTRAttributeIDTypeClusterNetworkCommissioningAttributeThreadVersionID:
-            result = @"ThreadVersion";
-            break;
+            case MTRAttributeIDTypeClusterNetworkCommissioningAttributeSupportedWiFiBandsID:
+                result = @"SupportedWiFiBands";
+                break;
 
-        case MTRAttributeIDTypeClusterNetworkCommissioningAttributeGeneratedCommandListID:
-            result = @"GeneratedCommandList";
-            break;
+            case MTRAttributeIDTypeClusterNetworkCommissioningAttributeSupportedThreadFeaturesID:
+                result = @"SupportedThreadFeatures";
+                break;
 
-        case MTRAttributeIDTypeClusterNetworkCommissioningAttributeAcceptedCommandListID:
-            result = @"AcceptedCommandList";
-            break;
+            case MTRAttributeIDTypeClusterNetworkCommissioningAttributeThreadVersionID:
+                result = @"ThreadVersion";
+                break;
 
-        case MTRAttributeIDTypeClusterNetworkCommissioningAttributeEventListID:
-            result = @"EventList";
-            break;
+            case MTRAttributeIDTypeClusterNetworkCommissioningAttributeGeneratedCommandListID:
+                result = @"GeneratedCommandList";
+                break;
 
-        case MTRAttributeIDTypeClusterNetworkCommissioningAttributeAttributeListID:
-            result = @"AttributeList";
-            break;
+            case MTRAttributeIDTypeClusterNetworkCommissioningAttributeAcceptedCommandListID:
+                result = @"AcceptedCommandList";
+                break;
 
-        case MTRAttributeIDTypeClusterNetworkCommissioningAttributeFeatureMapID:
-            result = @"FeatureMap";
-            break;
+            case MTRAttributeIDTypeClusterNetworkCommissioningAttributeEventListID:
+                result = @"EventList";
+                break;
 
-        case MTRAttributeIDTypeClusterNetworkCommissioningAttributeClusterRevisionID:
-            result = @"ClusterRevision";
-            break;
+            case MTRAttributeIDTypeClusterNetworkCommissioningAttributeAttributeListID:
+                result = @"AttributeList";
+                break;
 
-        default:
-            result = [NSString stringWithFormat:@"<Unknown attributeID %d>", attributeID];
-            break;
+            case MTRAttributeIDTypeClusterNetworkCommissioningAttributeFeatureMapID:
+                result = @"FeatureMap";
+                break;
+
+            case MTRAttributeIDTypeClusterNetworkCommissioningAttributeClusterRevisionID:
+                result = @"ClusterRevision";
+                break;
+
+
+            default:
+                result = [NSString stringWithFormat:@"<Unknown attributeID %d>", attributeID];
+                break;
         }
 
-    case MTRClusterIDTypeDiagnosticLogsID:
+case MTRClusterIDTypeDiagnosticLogsID:
 
-        switch (attributeID) {
+            switch (attributeID) {
 
-            // Cluster DiagnosticLogs attributes
-        case MTRAttributeIDTypeClusterDiagnosticLogsAttributeGeneratedCommandListID:
-            result = @"GeneratedCommandList";
-            break;
 
-        case MTRAttributeIDTypeClusterDiagnosticLogsAttributeAcceptedCommandListID:
-            result = @"AcceptedCommandList";
-            break;
 
-        case MTRAttributeIDTypeClusterDiagnosticLogsAttributeEventListID:
-            result = @"EventList";
-            break;
+// Cluster DiagnosticLogs attributes
+            case MTRAttributeIDTypeClusterDiagnosticLogsAttributeGeneratedCommandListID:
+                result = @"GeneratedCommandList";
+                break;
 
-        case MTRAttributeIDTypeClusterDiagnosticLogsAttributeAttributeListID:
-            result = @"AttributeList";
-            break;
+            case MTRAttributeIDTypeClusterDiagnosticLogsAttributeAcceptedCommandListID:
+                result = @"AcceptedCommandList";
+                break;
 
-        case MTRAttributeIDTypeClusterDiagnosticLogsAttributeFeatureMapID:
-            result = @"FeatureMap";
-            break;
+            case MTRAttributeIDTypeClusterDiagnosticLogsAttributeEventListID:
+                result = @"EventList";
+                break;
 
-        case MTRAttributeIDTypeClusterDiagnosticLogsAttributeClusterRevisionID:
-            result = @"ClusterRevision";
-            break;
+            case MTRAttributeIDTypeClusterDiagnosticLogsAttributeAttributeListID:
+                result = @"AttributeList";
+                break;
 
-        default:
-            result = [NSString stringWithFormat:@"<Unknown attributeID %d>", attributeID];
-            break;
+            case MTRAttributeIDTypeClusterDiagnosticLogsAttributeFeatureMapID:
+                result = @"FeatureMap";
+                break;
+
+            case MTRAttributeIDTypeClusterDiagnosticLogsAttributeClusterRevisionID:
+                result = @"ClusterRevision";
+                break;
+
+
+            default:
+                result = [NSString stringWithFormat:@"<Unknown attributeID %d>", attributeID];
+                break;
         }
 
-    case MTRClusterIDTypeGeneralDiagnosticsID:
+case MTRClusterIDTypeGeneralDiagnosticsID:
 
-        switch (attributeID) {
+            switch (attributeID) {
 
-            // Cluster GeneralDiagnostics attributes
-        case MTRAttributeIDTypeClusterGeneralDiagnosticsAttributeNetworkInterfacesID:
-            result = @"NetworkInterfaces";
-            break;
 
-        case MTRAttributeIDTypeClusterGeneralDiagnosticsAttributeRebootCountID:
-            result = @"RebootCount";
-            break;
 
-        case MTRAttributeIDTypeClusterGeneralDiagnosticsAttributeUpTimeID:
-            result = @"UpTime";
-            break;
+// Cluster GeneralDiagnostics attributes
+            case MTRAttributeIDTypeClusterGeneralDiagnosticsAttributeNetworkInterfacesID:
+                result = @"NetworkInterfaces";
+                break;
 
-        case MTRAttributeIDTypeClusterGeneralDiagnosticsAttributeTotalOperationalHoursID:
-            result = @"TotalOperationalHours";
-            break;
+            case MTRAttributeIDTypeClusterGeneralDiagnosticsAttributeRebootCountID:
+                result = @"RebootCount";
+                break;
 
-        case MTRAttributeIDTypeClusterGeneralDiagnosticsAttributeBootReasonID:
-            result = @"BootReason";
-            break;
+            case MTRAttributeIDTypeClusterGeneralDiagnosticsAttributeUpTimeID:
+                result = @"UpTime";
+                break;
 
-        case MTRAttributeIDTypeClusterGeneralDiagnosticsAttributeActiveHardwareFaultsID:
-            result = @"ActiveHardwareFaults";
-            break;
+            case MTRAttributeIDTypeClusterGeneralDiagnosticsAttributeTotalOperationalHoursID:
+                result = @"TotalOperationalHours";
+                break;
 
-        case MTRAttributeIDTypeClusterGeneralDiagnosticsAttributeActiveRadioFaultsID:
-            result = @"ActiveRadioFaults";
-            break;
+            case MTRAttributeIDTypeClusterGeneralDiagnosticsAttributeBootReasonID:
+                result = @"BootReason";
+                break;
 
-        case MTRAttributeIDTypeClusterGeneralDiagnosticsAttributeActiveNetworkFaultsID:
-            result = @"ActiveNetworkFaults";
-            break;
+            case MTRAttributeIDTypeClusterGeneralDiagnosticsAttributeActiveHardwareFaultsID:
+                result = @"ActiveHardwareFaults";
+                break;
 
-        case MTRAttributeIDTypeClusterGeneralDiagnosticsAttributeTestEventTriggersEnabledID:
-            result = @"TestEventTriggersEnabled";
-            break;
+            case MTRAttributeIDTypeClusterGeneralDiagnosticsAttributeActiveRadioFaultsID:
+                result = @"ActiveRadioFaults";
+                break;
 
-        case MTRAttributeIDTypeClusterGeneralDiagnosticsAttributeGeneratedCommandListID:
-            result = @"GeneratedCommandList";
-            break;
+            case MTRAttributeIDTypeClusterGeneralDiagnosticsAttributeActiveNetworkFaultsID:
+                result = @"ActiveNetworkFaults";
+                break;
 
-        case MTRAttributeIDTypeClusterGeneralDiagnosticsAttributeAcceptedCommandListID:
-            result = @"AcceptedCommandList";
-            break;
+            case MTRAttributeIDTypeClusterGeneralDiagnosticsAttributeTestEventTriggersEnabledID:
+                result = @"TestEventTriggersEnabled";
+                break;
 
-        case MTRAttributeIDTypeClusterGeneralDiagnosticsAttributeEventListID:
-            result = @"EventList";
-            break;
+            case MTRAttributeIDTypeClusterGeneralDiagnosticsAttributeGeneratedCommandListID:
+                result = @"GeneratedCommandList";
+                break;
 
-        case MTRAttributeIDTypeClusterGeneralDiagnosticsAttributeAttributeListID:
-            result = @"AttributeList";
-            break;
+            case MTRAttributeIDTypeClusterGeneralDiagnosticsAttributeAcceptedCommandListID:
+                result = @"AcceptedCommandList";
+                break;
 
-        case MTRAttributeIDTypeClusterGeneralDiagnosticsAttributeFeatureMapID:
-            result = @"FeatureMap";
-            break;
+            case MTRAttributeIDTypeClusterGeneralDiagnosticsAttributeEventListID:
+                result = @"EventList";
+                break;
 
-        case MTRAttributeIDTypeClusterGeneralDiagnosticsAttributeClusterRevisionID:
-            result = @"ClusterRevision";
-            break;
+            case MTRAttributeIDTypeClusterGeneralDiagnosticsAttributeAttributeListID:
+                result = @"AttributeList";
+                break;
 
-        default:
-            result = [NSString stringWithFormat:@"<Unknown attributeID %d>", attributeID];
-            break;
+            case MTRAttributeIDTypeClusterGeneralDiagnosticsAttributeFeatureMapID:
+                result = @"FeatureMap";
+                break;
+
+            case MTRAttributeIDTypeClusterGeneralDiagnosticsAttributeClusterRevisionID:
+                result = @"ClusterRevision";
+                break;
+
+
+            default:
+                result = [NSString stringWithFormat:@"<Unknown attributeID %d>", attributeID];
+                break;
         }
 
-    case MTRClusterIDTypeSoftwareDiagnosticsID:
+case MTRClusterIDTypeSoftwareDiagnosticsID:
 
-        switch (attributeID) {
+            switch (attributeID) {
 
-            // Cluster SoftwareDiagnostics attributes
-        case MTRAttributeIDTypeClusterSoftwareDiagnosticsAttributeThreadMetricsID:
-            result = @"ThreadMetrics";
-            break;
 
-        case MTRAttributeIDTypeClusterSoftwareDiagnosticsAttributeCurrentHeapFreeID:
-            result = @"CurrentHeapFree";
-            break;
 
-        case MTRAttributeIDTypeClusterSoftwareDiagnosticsAttributeCurrentHeapUsedID:
-            result = @"CurrentHeapUsed";
-            break;
+// Cluster SoftwareDiagnostics attributes
+            case MTRAttributeIDTypeClusterSoftwareDiagnosticsAttributeThreadMetricsID:
+                result = @"ThreadMetrics";
+                break;
 
-        case MTRAttributeIDTypeClusterSoftwareDiagnosticsAttributeCurrentHeapHighWatermarkID:
-            result = @"CurrentHeapHighWatermark";
-            break;
+            case MTRAttributeIDTypeClusterSoftwareDiagnosticsAttributeCurrentHeapFreeID:
+                result = @"CurrentHeapFree";
+                break;
 
-        case MTRAttributeIDTypeClusterSoftwareDiagnosticsAttributeGeneratedCommandListID:
-            result = @"GeneratedCommandList";
-            break;
+            case MTRAttributeIDTypeClusterSoftwareDiagnosticsAttributeCurrentHeapUsedID:
+                result = @"CurrentHeapUsed";
+                break;
 
-        case MTRAttributeIDTypeClusterSoftwareDiagnosticsAttributeAcceptedCommandListID:
-            result = @"AcceptedCommandList";
-            break;
+            case MTRAttributeIDTypeClusterSoftwareDiagnosticsAttributeCurrentHeapHighWatermarkID:
+                result = @"CurrentHeapHighWatermark";
+                break;
 
-        case MTRAttributeIDTypeClusterSoftwareDiagnosticsAttributeEventListID:
-            result = @"EventList";
-            break;
+            case MTRAttributeIDTypeClusterSoftwareDiagnosticsAttributeGeneratedCommandListID:
+                result = @"GeneratedCommandList";
+                break;
 
-        case MTRAttributeIDTypeClusterSoftwareDiagnosticsAttributeAttributeListID:
-            result = @"AttributeList";
-            break;
+            case MTRAttributeIDTypeClusterSoftwareDiagnosticsAttributeAcceptedCommandListID:
+                result = @"AcceptedCommandList";
+                break;
 
-        case MTRAttributeIDTypeClusterSoftwareDiagnosticsAttributeFeatureMapID:
-            result = @"FeatureMap";
-            break;
+            case MTRAttributeIDTypeClusterSoftwareDiagnosticsAttributeEventListID:
+                result = @"EventList";
+                break;
 
-        case MTRAttributeIDTypeClusterSoftwareDiagnosticsAttributeClusterRevisionID:
-            result = @"ClusterRevision";
-            break;
+            case MTRAttributeIDTypeClusterSoftwareDiagnosticsAttributeAttributeListID:
+                result = @"AttributeList";
+                break;
 
-        default:
-            result = [NSString stringWithFormat:@"<Unknown attributeID %d>", attributeID];
-            break;
+            case MTRAttributeIDTypeClusterSoftwareDiagnosticsAttributeFeatureMapID:
+                result = @"FeatureMap";
+                break;
+
+            case MTRAttributeIDTypeClusterSoftwareDiagnosticsAttributeClusterRevisionID:
+                result = @"ClusterRevision";
+                break;
+
+
+            default:
+                result = [NSString stringWithFormat:@"<Unknown attributeID %d>", attributeID];
+                break;
         }
 
-    case MTRClusterIDTypeThreadNetworkDiagnosticsID:
+case MTRClusterIDTypeThreadNetworkDiagnosticsID:
 
-        switch (attributeID) {
+            switch (attributeID) {
 
-            // Cluster ThreadNetworkDiagnostics attributes
-        case MTRAttributeIDTypeClusterThreadNetworkDiagnosticsAttributeChannelID:
-            result = @"Channel";
-            break;
 
-        case MTRAttributeIDTypeClusterThreadNetworkDiagnosticsAttributeRoutingRoleID:
-            result = @"RoutingRole";
-            break;
 
-        case MTRAttributeIDTypeClusterThreadNetworkDiagnosticsAttributeNetworkNameID:
-            result = @"NetworkName";
-            break;
+// Cluster ThreadNetworkDiagnostics attributes
+            case MTRAttributeIDTypeClusterThreadNetworkDiagnosticsAttributeChannelID:
+                result = @"Channel";
+                break;
 
-        case MTRAttributeIDTypeClusterThreadNetworkDiagnosticsAttributePanIdID:
-            result = @"PanId";
-            break;
+            case MTRAttributeIDTypeClusterThreadNetworkDiagnosticsAttributeRoutingRoleID:
+                result = @"RoutingRole";
+                break;
 
-        case MTRAttributeIDTypeClusterThreadNetworkDiagnosticsAttributeExtendedPanIdID:
-            result = @"ExtendedPanId";
-            break;
+            case MTRAttributeIDTypeClusterThreadNetworkDiagnosticsAttributeNetworkNameID:
+                result = @"NetworkName";
+                break;
 
-        case MTRAttributeIDTypeClusterThreadNetworkDiagnosticsAttributeMeshLocalPrefixID:
-            result = @"MeshLocalPrefix";
-            break;
+            case MTRAttributeIDTypeClusterThreadNetworkDiagnosticsAttributePanIdID:
+                result = @"PanId";
+                break;
 
-        case MTRAttributeIDTypeClusterThreadNetworkDiagnosticsAttributeOverrunCountID:
-            result = @"OverrunCount";
-            break;
+            case MTRAttributeIDTypeClusterThreadNetworkDiagnosticsAttributeExtendedPanIdID:
+                result = @"ExtendedPanId";
+                break;
 
-        case MTRAttributeIDTypeClusterThreadNetworkDiagnosticsAttributeNeighborTableID:
-            result = @"NeighborTable";
-            break;
+            case MTRAttributeIDTypeClusterThreadNetworkDiagnosticsAttributeMeshLocalPrefixID:
+                result = @"MeshLocalPrefix";
+                break;
 
-        case MTRAttributeIDTypeClusterThreadNetworkDiagnosticsAttributeRouteTableID:
-            result = @"RouteTable";
-            break;
+            case MTRAttributeIDTypeClusterThreadNetworkDiagnosticsAttributeOverrunCountID:
+                result = @"OverrunCount";
+                break;
 
-        case MTRAttributeIDTypeClusterThreadNetworkDiagnosticsAttributePartitionIdID:
-            result = @"PartitionId";
-            break;
+            case MTRAttributeIDTypeClusterThreadNetworkDiagnosticsAttributeNeighborTableID:
+                result = @"NeighborTable";
+                break;
 
-        case MTRAttributeIDTypeClusterThreadNetworkDiagnosticsAttributeWeightingID:
-            result = @"Weighting";
-            break;
+            case MTRAttributeIDTypeClusterThreadNetworkDiagnosticsAttributeRouteTableID:
+                result = @"RouteTable";
+                break;
 
-        case MTRAttributeIDTypeClusterThreadNetworkDiagnosticsAttributeDataVersionID:
-            result = @"DataVersion";
-            break;
+            case MTRAttributeIDTypeClusterThreadNetworkDiagnosticsAttributePartitionIdID:
+                result = @"PartitionId";
+                break;
 
-        case MTRAttributeIDTypeClusterThreadNetworkDiagnosticsAttributeStableDataVersionID:
-            result = @"StableDataVersion";
-            break;
+            case MTRAttributeIDTypeClusterThreadNetworkDiagnosticsAttributeWeightingID:
+                result = @"Weighting";
+                break;
 
-        case MTRAttributeIDTypeClusterThreadNetworkDiagnosticsAttributeLeaderRouterIdID:
-            result = @"LeaderRouterId";
-            break;
+            case MTRAttributeIDTypeClusterThreadNetworkDiagnosticsAttributeDataVersionID:
+                result = @"DataVersion";
+                break;
 
-        case MTRAttributeIDTypeClusterThreadNetworkDiagnosticsAttributeDetachedRoleCountID:
-            result = @"DetachedRoleCount";
-            break;
+            case MTRAttributeIDTypeClusterThreadNetworkDiagnosticsAttributeStableDataVersionID:
+                result = @"StableDataVersion";
+                break;
 
-        case MTRAttributeIDTypeClusterThreadNetworkDiagnosticsAttributeChildRoleCountID:
-            result = @"ChildRoleCount";
-            break;
+            case MTRAttributeIDTypeClusterThreadNetworkDiagnosticsAttributeLeaderRouterIdID:
+                result = @"LeaderRouterId";
+                break;
 
-        case MTRAttributeIDTypeClusterThreadNetworkDiagnosticsAttributeRouterRoleCountID:
-            result = @"RouterRoleCount";
-            break;
+            case MTRAttributeIDTypeClusterThreadNetworkDiagnosticsAttributeDetachedRoleCountID:
+                result = @"DetachedRoleCount";
+                break;
 
-        case MTRAttributeIDTypeClusterThreadNetworkDiagnosticsAttributeLeaderRoleCountID:
-            result = @"LeaderRoleCount";
-            break;
+            case MTRAttributeIDTypeClusterThreadNetworkDiagnosticsAttributeChildRoleCountID:
+                result = @"ChildRoleCount";
+                break;
 
-        case MTRAttributeIDTypeClusterThreadNetworkDiagnosticsAttributeAttachAttemptCountID:
-            result = @"AttachAttemptCount";
-            break;
+            case MTRAttributeIDTypeClusterThreadNetworkDiagnosticsAttributeRouterRoleCountID:
+                result = @"RouterRoleCount";
+                break;
 
-        case MTRAttributeIDTypeClusterThreadNetworkDiagnosticsAttributePartitionIdChangeCountID:
-            result = @"PartitionIdChangeCount";
-            break;
+            case MTRAttributeIDTypeClusterThreadNetworkDiagnosticsAttributeLeaderRoleCountID:
+                result = @"LeaderRoleCount";
+                break;
 
-        case MTRAttributeIDTypeClusterThreadNetworkDiagnosticsAttributeBetterPartitionAttachAttemptCountID:
-            result = @"BetterPartitionAttachAttemptCount";
-            break;
+            case MTRAttributeIDTypeClusterThreadNetworkDiagnosticsAttributeAttachAttemptCountID:
+                result = @"AttachAttemptCount";
+                break;
 
-        case MTRAttributeIDTypeClusterThreadNetworkDiagnosticsAttributeParentChangeCountID:
-            result = @"ParentChangeCount";
-            break;
+            case MTRAttributeIDTypeClusterThreadNetworkDiagnosticsAttributePartitionIdChangeCountID:
+                result = @"PartitionIdChangeCount";
+                break;
 
-        case MTRAttributeIDTypeClusterThreadNetworkDiagnosticsAttributeTxTotalCountID:
-            result = @"TxTotalCount";
-            break;
+            case MTRAttributeIDTypeClusterThreadNetworkDiagnosticsAttributeBetterPartitionAttachAttemptCountID:
+                result = @"BetterPartitionAttachAttemptCount";
+                break;
 
-        case MTRAttributeIDTypeClusterThreadNetworkDiagnosticsAttributeTxUnicastCountID:
-            result = @"TxUnicastCount";
-            break;
+            case MTRAttributeIDTypeClusterThreadNetworkDiagnosticsAttributeParentChangeCountID:
+                result = @"ParentChangeCount";
+                break;
 
-        case MTRAttributeIDTypeClusterThreadNetworkDiagnosticsAttributeTxBroadcastCountID:
-            result = @"TxBroadcastCount";
-            break;
+            case MTRAttributeIDTypeClusterThreadNetworkDiagnosticsAttributeTxTotalCountID:
+                result = @"TxTotalCount";
+                break;
 
-        case MTRAttributeIDTypeClusterThreadNetworkDiagnosticsAttributeTxAckRequestedCountID:
-            result = @"TxAckRequestedCount";
-            break;
+            case MTRAttributeIDTypeClusterThreadNetworkDiagnosticsAttributeTxUnicastCountID:
+                result = @"TxUnicastCount";
+                break;
 
-        case MTRAttributeIDTypeClusterThreadNetworkDiagnosticsAttributeTxAckedCountID:
-            result = @"TxAckedCount";
-            break;
+            case MTRAttributeIDTypeClusterThreadNetworkDiagnosticsAttributeTxBroadcastCountID:
+                result = @"TxBroadcastCount";
+                break;
 
-        case MTRAttributeIDTypeClusterThreadNetworkDiagnosticsAttributeTxNoAckRequestedCountID:
-            result = @"TxNoAckRequestedCount";
-            break;
+            case MTRAttributeIDTypeClusterThreadNetworkDiagnosticsAttributeTxAckRequestedCountID:
+                result = @"TxAckRequestedCount";
+                break;
 
-        case MTRAttributeIDTypeClusterThreadNetworkDiagnosticsAttributeTxDataCountID:
-            result = @"TxDataCount";
-            break;
+            case MTRAttributeIDTypeClusterThreadNetworkDiagnosticsAttributeTxAckedCountID:
+                result = @"TxAckedCount";
+                break;
 
-        case MTRAttributeIDTypeClusterThreadNetworkDiagnosticsAttributeTxDataPollCountID:
-            result = @"TxDataPollCount";
-            break;
+            case MTRAttributeIDTypeClusterThreadNetworkDiagnosticsAttributeTxNoAckRequestedCountID:
+                result = @"TxNoAckRequestedCount";
+                break;
 
-        case MTRAttributeIDTypeClusterThreadNetworkDiagnosticsAttributeTxBeaconCountID:
-            result = @"TxBeaconCount";
-            break;
+            case MTRAttributeIDTypeClusterThreadNetworkDiagnosticsAttributeTxDataCountID:
+                result = @"TxDataCount";
+                break;
 
-        case MTRAttributeIDTypeClusterThreadNetworkDiagnosticsAttributeTxBeaconRequestCountID:
-            result = @"TxBeaconRequestCount";
-            break;
+            case MTRAttributeIDTypeClusterThreadNetworkDiagnosticsAttributeTxDataPollCountID:
+                result = @"TxDataPollCount";
+                break;
 
-        case MTRAttributeIDTypeClusterThreadNetworkDiagnosticsAttributeTxOtherCountID:
-            result = @"TxOtherCount";
-            break;
+            case MTRAttributeIDTypeClusterThreadNetworkDiagnosticsAttributeTxBeaconCountID:
+                result = @"TxBeaconCount";
+                break;
 
-        case MTRAttributeIDTypeClusterThreadNetworkDiagnosticsAttributeTxRetryCountID:
-            result = @"TxRetryCount";
-            break;
+            case MTRAttributeIDTypeClusterThreadNetworkDiagnosticsAttributeTxBeaconRequestCountID:
+                result = @"TxBeaconRequestCount";
+                break;
 
-        case MTRAttributeIDTypeClusterThreadNetworkDiagnosticsAttributeTxDirectMaxRetryExpiryCountID:
-            result = @"TxDirectMaxRetryExpiryCount";
-            break;
+            case MTRAttributeIDTypeClusterThreadNetworkDiagnosticsAttributeTxOtherCountID:
+                result = @"TxOtherCount";
+                break;
 
-        case MTRAttributeIDTypeClusterThreadNetworkDiagnosticsAttributeTxIndirectMaxRetryExpiryCountID:
-            result = @"TxIndirectMaxRetryExpiryCount";
-            break;
+            case MTRAttributeIDTypeClusterThreadNetworkDiagnosticsAttributeTxRetryCountID:
+                result = @"TxRetryCount";
+                break;
 
-        case MTRAttributeIDTypeClusterThreadNetworkDiagnosticsAttributeTxErrCcaCountID:
-            result = @"TxErrCcaCount";
-            break;
+            case MTRAttributeIDTypeClusterThreadNetworkDiagnosticsAttributeTxDirectMaxRetryExpiryCountID:
+                result = @"TxDirectMaxRetryExpiryCount";
+                break;
 
-        case MTRAttributeIDTypeClusterThreadNetworkDiagnosticsAttributeTxErrAbortCountID:
-            result = @"TxErrAbortCount";
-            break;
+            case MTRAttributeIDTypeClusterThreadNetworkDiagnosticsAttributeTxIndirectMaxRetryExpiryCountID:
+                result = @"TxIndirectMaxRetryExpiryCount";
+                break;
 
-        case MTRAttributeIDTypeClusterThreadNetworkDiagnosticsAttributeTxErrBusyChannelCountID:
-            result = @"TxErrBusyChannelCount";
-            break;
+            case MTRAttributeIDTypeClusterThreadNetworkDiagnosticsAttributeTxErrCcaCountID:
+                result = @"TxErrCcaCount";
+                break;
 
-        case MTRAttributeIDTypeClusterThreadNetworkDiagnosticsAttributeRxTotalCountID:
-            result = @"RxTotalCount";
-            break;
+            case MTRAttributeIDTypeClusterThreadNetworkDiagnosticsAttributeTxErrAbortCountID:
+                result = @"TxErrAbortCount";
+                break;
 
-        case MTRAttributeIDTypeClusterThreadNetworkDiagnosticsAttributeRxUnicastCountID:
-            result = @"RxUnicastCount";
-            break;
+            case MTRAttributeIDTypeClusterThreadNetworkDiagnosticsAttributeTxErrBusyChannelCountID:
+                result = @"TxErrBusyChannelCount";
+                break;
 
-        case MTRAttributeIDTypeClusterThreadNetworkDiagnosticsAttributeRxBroadcastCountID:
-            result = @"RxBroadcastCount";
-            break;
+            case MTRAttributeIDTypeClusterThreadNetworkDiagnosticsAttributeRxTotalCountID:
+                result = @"RxTotalCount";
+                break;
 
-        case MTRAttributeIDTypeClusterThreadNetworkDiagnosticsAttributeRxDataCountID:
-            result = @"RxDataCount";
-            break;
+            case MTRAttributeIDTypeClusterThreadNetworkDiagnosticsAttributeRxUnicastCountID:
+                result = @"RxUnicastCount";
+                break;
 
-        case MTRAttributeIDTypeClusterThreadNetworkDiagnosticsAttributeRxDataPollCountID:
-            result = @"RxDataPollCount";
-            break;
+            case MTRAttributeIDTypeClusterThreadNetworkDiagnosticsAttributeRxBroadcastCountID:
+                result = @"RxBroadcastCount";
+                break;
 
-        case MTRAttributeIDTypeClusterThreadNetworkDiagnosticsAttributeRxBeaconCountID:
-            result = @"RxBeaconCount";
-            break;
+            case MTRAttributeIDTypeClusterThreadNetworkDiagnosticsAttributeRxDataCountID:
+                result = @"RxDataCount";
+                break;
 
-        case MTRAttributeIDTypeClusterThreadNetworkDiagnosticsAttributeRxBeaconRequestCountID:
-            result = @"RxBeaconRequestCount";
-            break;
+            case MTRAttributeIDTypeClusterThreadNetworkDiagnosticsAttributeRxDataPollCountID:
+                result = @"RxDataPollCount";
+                break;
 
-        case MTRAttributeIDTypeClusterThreadNetworkDiagnosticsAttributeRxOtherCountID:
-            result = @"RxOtherCount";
-            break;
+            case MTRAttributeIDTypeClusterThreadNetworkDiagnosticsAttributeRxBeaconCountID:
+                result = @"RxBeaconCount";
+                break;
 
-        case MTRAttributeIDTypeClusterThreadNetworkDiagnosticsAttributeRxAddressFilteredCountID:
-            result = @"RxAddressFilteredCount";
-            break;
+            case MTRAttributeIDTypeClusterThreadNetworkDiagnosticsAttributeRxBeaconRequestCountID:
+                result = @"RxBeaconRequestCount";
+                break;
 
-        case MTRAttributeIDTypeClusterThreadNetworkDiagnosticsAttributeRxDestAddrFilteredCountID:
-            result = @"RxDestAddrFilteredCount";
-            break;
+            case MTRAttributeIDTypeClusterThreadNetworkDiagnosticsAttributeRxOtherCountID:
+                result = @"RxOtherCount";
+                break;
 
-        case MTRAttributeIDTypeClusterThreadNetworkDiagnosticsAttributeRxDuplicatedCountID:
-            result = @"RxDuplicatedCount";
-            break;
+            case MTRAttributeIDTypeClusterThreadNetworkDiagnosticsAttributeRxAddressFilteredCountID:
+                result = @"RxAddressFilteredCount";
+                break;
 
-        case MTRAttributeIDTypeClusterThreadNetworkDiagnosticsAttributeRxErrNoFrameCountID:
-            result = @"RxErrNoFrameCount";
-            break;
+            case MTRAttributeIDTypeClusterThreadNetworkDiagnosticsAttributeRxDestAddrFilteredCountID:
+                result = @"RxDestAddrFilteredCount";
+                break;
 
-        case MTRAttributeIDTypeClusterThreadNetworkDiagnosticsAttributeRxErrUnknownNeighborCountID:
-            result = @"RxErrUnknownNeighborCount";
-            break;
+            case MTRAttributeIDTypeClusterThreadNetworkDiagnosticsAttributeRxDuplicatedCountID:
+                result = @"RxDuplicatedCount";
+                break;
 
-        case MTRAttributeIDTypeClusterThreadNetworkDiagnosticsAttributeRxErrInvalidSrcAddrCountID:
-            result = @"RxErrInvalidSrcAddrCount";
-            break;
+            case MTRAttributeIDTypeClusterThreadNetworkDiagnosticsAttributeRxErrNoFrameCountID:
+                result = @"RxErrNoFrameCount";
+                break;
 
-        case MTRAttributeIDTypeClusterThreadNetworkDiagnosticsAttributeRxErrSecCountID:
-            result = @"RxErrSecCount";
-            break;
+            case MTRAttributeIDTypeClusterThreadNetworkDiagnosticsAttributeRxErrUnknownNeighborCountID:
+                result = @"RxErrUnknownNeighborCount";
+                break;
 
-        case MTRAttributeIDTypeClusterThreadNetworkDiagnosticsAttributeRxErrFcsCountID:
-            result = @"RxErrFcsCount";
-            break;
+            case MTRAttributeIDTypeClusterThreadNetworkDiagnosticsAttributeRxErrInvalidSrcAddrCountID:
+                result = @"RxErrInvalidSrcAddrCount";
+                break;
 
-        case MTRAttributeIDTypeClusterThreadNetworkDiagnosticsAttributeRxErrOtherCountID:
-            result = @"RxErrOtherCount";
-            break;
+            case MTRAttributeIDTypeClusterThreadNetworkDiagnosticsAttributeRxErrSecCountID:
+                result = @"RxErrSecCount";
+                break;
 
-        case MTRAttributeIDTypeClusterThreadNetworkDiagnosticsAttributeActiveTimestampID:
-            result = @"ActiveTimestamp";
-            break;
+            case MTRAttributeIDTypeClusterThreadNetworkDiagnosticsAttributeRxErrFcsCountID:
+                result = @"RxErrFcsCount";
+                break;
 
-        case MTRAttributeIDTypeClusterThreadNetworkDiagnosticsAttributePendingTimestampID:
-            result = @"PendingTimestamp";
-            break;
+            case MTRAttributeIDTypeClusterThreadNetworkDiagnosticsAttributeRxErrOtherCountID:
+                result = @"RxErrOtherCount";
+                break;
 
-        case MTRAttributeIDTypeClusterThreadNetworkDiagnosticsAttributeDelayID:
-            result = @"Delay";
-            break;
+            case MTRAttributeIDTypeClusterThreadNetworkDiagnosticsAttributeActiveTimestampID:
+                result = @"ActiveTimestamp";
+                break;
 
-        case MTRAttributeIDTypeClusterThreadNetworkDiagnosticsAttributeSecurityPolicyID:
-            result = @"SecurityPolicy";
-            break;
+            case MTRAttributeIDTypeClusterThreadNetworkDiagnosticsAttributePendingTimestampID:
+                result = @"PendingTimestamp";
+                break;
 
-        case MTRAttributeIDTypeClusterThreadNetworkDiagnosticsAttributeChannelPage0MaskID:
-            result = @"ChannelPage0Mask";
-            break;
+            case MTRAttributeIDTypeClusterThreadNetworkDiagnosticsAttributeDelayID:
+                result = @"Delay";
+                break;
 
-        case MTRAttributeIDTypeClusterThreadNetworkDiagnosticsAttributeOperationalDatasetComponentsID:
-            result = @"OperationalDatasetComponents";
-            break;
+            case MTRAttributeIDTypeClusterThreadNetworkDiagnosticsAttributeSecurityPolicyID:
+                result = @"SecurityPolicy";
+                break;
 
-        case MTRAttributeIDTypeClusterThreadNetworkDiagnosticsAttributeActiveNetworkFaultsListID:
-            result = @"ActiveNetworkFaultsList";
-            break;
+            case MTRAttributeIDTypeClusterThreadNetworkDiagnosticsAttributeChannelPage0MaskID:
+                result = @"ChannelPage0Mask";
+                break;
 
-        case MTRAttributeIDTypeClusterThreadNetworkDiagnosticsAttributeGeneratedCommandListID:
-            result = @"GeneratedCommandList";
-            break;
+            case MTRAttributeIDTypeClusterThreadNetworkDiagnosticsAttributeOperationalDatasetComponentsID:
+                result = @"OperationalDatasetComponents";
+                break;
 
-        case MTRAttributeIDTypeClusterThreadNetworkDiagnosticsAttributeAcceptedCommandListID:
-            result = @"AcceptedCommandList";
-            break;
+            case MTRAttributeIDTypeClusterThreadNetworkDiagnosticsAttributeActiveNetworkFaultsListID:
+                result = @"ActiveNetworkFaultsList";
+                break;
 
-        case MTRAttributeIDTypeClusterThreadNetworkDiagnosticsAttributeEventListID:
-            result = @"EventList";
-            break;
+            case MTRAttributeIDTypeClusterThreadNetworkDiagnosticsAttributeGeneratedCommandListID:
+                result = @"GeneratedCommandList";
+                break;
 
-        case MTRAttributeIDTypeClusterThreadNetworkDiagnosticsAttributeAttributeListID:
-            result = @"AttributeList";
-            break;
+            case MTRAttributeIDTypeClusterThreadNetworkDiagnosticsAttributeAcceptedCommandListID:
+                result = @"AcceptedCommandList";
+                break;
 
-        case MTRAttributeIDTypeClusterThreadNetworkDiagnosticsAttributeFeatureMapID:
-            result = @"FeatureMap";
-            break;
+            case MTRAttributeIDTypeClusterThreadNetworkDiagnosticsAttributeEventListID:
+                result = @"EventList";
+                break;
 
-        case MTRAttributeIDTypeClusterThreadNetworkDiagnosticsAttributeClusterRevisionID:
-            result = @"ClusterRevision";
-            break;
+            case MTRAttributeIDTypeClusterThreadNetworkDiagnosticsAttributeAttributeListID:
+                result = @"AttributeList";
+                break;
 
-        default:
-            result = [NSString stringWithFormat:@"<Unknown attributeID %d>", attributeID];
-            break;
+            case MTRAttributeIDTypeClusterThreadNetworkDiagnosticsAttributeFeatureMapID:
+                result = @"FeatureMap";
+                break;
+
+            case MTRAttributeIDTypeClusterThreadNetworkDiagnosticsAttributeClusterRevisionID:
+                result = @"ClusterRevision";
+                break;
+
+
+            default:
+                result = [NSString stringWithFormat:@"<Unknown attributeID %d>", attributeID];
+                break;
         }
 
-    case MTRClusterIDTypeWiFiNetworkDiagnosticsID:
+case MTRClusterIDTypeWiFiNetworkDiagnosticsID:
 
-        switch (attributeID) {
+            switch (attributeID) {
 
-            // Cluster WiFiNetworkDiagnostics attributes
-        case MTRAttributeIDTypeClusterWiFiNetworkDiagnosticsAttributeBSSIDID:
-            result = @"BSSID";
-            break;
 
-        case MTRAttributeIDTypeClusterWiFiNetworkDiagnosticsAttributeSecurityTypeID:
-            result = @"SecurityType";
-            break;
 
-        case MTRAttributeIDTypeClusterWiFiNetworkDiagnosticsAttributeWiFiVersionID:
-            result = @"WiFiVersion";
-            break;
+// Cluster WiFiNetworkDiagnostics attributes
+            case MTRAttributeIDTypeClusterWiFiNetworkDiagnosticsAttributeBSSIDID:
+                result = @"BSSID";
+                break;
 
-        case MTRAttributeIDTypeClusterWiFiNetworkDiagnosticsAttributeChannelNumberID:
-            result = @"ChannelNumber";
-            break;
+            case MTRAttributeIDTypeClusterWiFiNetworkDiagnosticsAttributeSecurityTypeID:
+                result = @"SecurityType";
+                break;
 
-        case MTRAttributeIDTypeClusterWiFiNetworkDiagnosticsAttributeRSSIID:
-            result = @"RSSI";
-            break;
+            case MTRAttributeIDTypeClusterWiFiNetworkDiagnosticsAttributeWiFiVersionID:
+                result = @"WiFiVersion";
+                break;
 
-        case MTRAttributeIDTypeClusterWiFiNetworkDiagnosticsAttributeBeaconLostCountID:
-            result = @"BeaconLostCount";
-            break;
+            case MTRAttributeIDTypeClusterWiFiNetworkDiagnosticsAttributeChannelNumberID:
+                result = @"ChannelNumber";
+                break;
 
-        case MTRAttributeIDTypeClusterWiFiNetworkDiagnosticsAttributeBeaconRxCountID:
-            result = @"BeaconRxCount";
-            break;
+            case MTRAttributeIDTypeClusterWiFiNetworkDiagnosticsAttributeRSSIID:
+                result = @"RSSI";
+                break;
 
-        case MTRAttributeIDTypeClusterWiFiNetworkDiagnosticsAttributePacketMulticastRxCountID:
-            result = @"PacketMulticastRxCount";
-            break;
+            case MTRAttributeIDTypeClusterWiFiNetworkDiagnosticsAttributeBeaconLostCountID:
+                result = @"BeaconLostCount";
+                break;
 
-        case MTRAttributeIDTypeClusterWiFiNetworkDiagnosticsAttributePacketMulticastTxCountID:
-            result = @"PacketMulticastTxCount";
-            break;
+            case MTRAttributeIDTypeClusterWiFiNetworkDiagnosticsAttributeBeaconRxCountID:
+                result = @"BeaconRxCount";
+                break;
 
-        case MTRAttributeIDTypeClusterWiFiNetworkDiagnosticsAttributePacketUnicastRxCountID:
-            result = @"PacketUnicastRxCount";
-            break;
+            case MTRAttributeIDTypeClusterWiFiNetworkDiagnosticsAttributePacketMulticastRxCountID:
+                result = @"PacketMulticastRxCount";
+                break;
 
-        case MTRAttributeIDTypeClusterWiFiNetworkDiagnosticsAttributePacketUnicastTxCountID:
-            result = @"PacketUnicastTxCount";
-            break;
+            case MTRAttributeIDTypeClusterWiFiNetworkDiagnosticsAttributePacketMulticastTxCountID:
+                result = @"PacketMulticastTxCount";
+                break;
 
-        case MTRAttributeIDTypeClusterWiFiNetworkDiagnosticsAttributeCurrentMaxRateID:
-            result = @"CurrentMaxRate";
-            break;
+            case MTRAttributeIDTypeClusterWiFiNetworkDiagnosticsAttributePacketUnicastRxCountID:
+                result = @"PacketUnicastRxCount";
+                break;
 
-        case MTRAttributeIDTypeClusterWiFiNetworkDiagnosticsAttributeOverrunCountID:
-            result = @"OverrunCount";
-            break;
+            case MTRAttributeIDTypeClusterWiFiNetworkDiagnosticsAttributePacketUnicastTxCountID:
+                result = @"PacketUnicastTxCount";
+                break;
 
-        case MTRAttributeIDTypeClusterWiFiNetworkDiagnosticsAttributeGeneratedCommandListID:
-            result = @"GeneratedCommandList";
-            break;
+            case MTRAttributeIDTypeClusterWiFiNetworkDiagnosticsAttributeCurrentMaxRateID:
+                result = @"CurrentMaxRate";
+                break;
 
-        case MTRAttributeIDTypeClusterWiFiNetworkDiagnosticsAttributeAcceptedCommandListID:
-            result = @"AcceptedCommandList";
-            break;
+            case MTRAttributeIDTypeClusterWiFiNetworkDiagnosticsAttributeOverrunCountID:
+                result = @"OverrunCount";
+                break;
 
-        case MTRAttributeIDTypeClusterWiFiNetworkDiagnosticsAttributeEventListID:
-            result = @"EventList";
-            break;
+            case MTRAttributeIDTypeClusterWiFiNetworkDiagnosticsAttributeGeneratedCommandListID:
+                result = @"GeneratedCommandList";
+                break;
 
-        case MTRAttributeIDTypeClusterWiFiNetworkDiagnosticsAttributeAttributeListID:
-            result = @"AttributeList";
-            break;
+            case MTRAttributeIDTypeClusterWiFiNetworkDiagnosticsAttributeAcceptedCommandListID:
+                result = @"AcceptedCommandList";
+                break;
 
-        case MTRAttributeIDTypeClusterWiFiNetworkDiagnosticsAttributeFeatureMapID:
-            result = @"FeatureMap";
-            break;
+            case MTRAttributeIDTypeClusterWiFiNetworkDiagnosticsAttributeEventListID:
+                result = @"EventList";
+                break;
 
-        case MTRAttributeIDTypeClusterWiFiNetworkDiagnosticsAttributeClusterRevisionID:
-            result = @"ClusterRevision";
-            break;
+            case MTRAttributeIDTypeClusterWiFiNetworkDiagnosticsAttributeAttributeListID:
+                result = @"AttributeList";
+                break;
 
-        default:
-            result = [NSString stringWithFormat:@"<Unknown attributeID %d>", attributeID];
-            break;
+            case MTRAttributeIDTypeClusterWiFiNetworkDiagnosticsAttributeFeatureMapID:
+                result = @"FeatureMap";
+                break;
+
+            case MTRAttributeIDTypeClusterWiFiNetworkDiagnosticsAttributeClusterRevisionID:
+                result = @"ClusterRevision";
+                break;
+
+
+            default:
+                result = [NSString stringWithFormat:@"<Unknown attributeID %d>", attributeID];
+                break;
         }
 
-    case MTRClusterIDTypeEthernetNetworkDiagnosticsID:
+case MTRClusterIDTypeEthernetNetworkDiagnosticsID:
 
-        switch (attributeID) {
+            switch (attributeID) {
 
-            // Cluster EthernetNetworkDiagnostics attributes
-        case MTRAttributeIDTypeClusterEthernetNetworkDiagnosticsAttributePHYRateID:
-            result = @"PHYRate";
-            break;
 
-        case MTRAttributeIDTypeClusterEthernetNetworkDiagnosticsAttributeFullDuplexID:
-            result = @"FullDuplex";
-            break;
 
-        case MTRAttributeIDTypeClusterEthernetNetworkDiagnosticsAttributePacketRxCountID:
-            result = @"PacketRxCount";
-            break;
+// Cluster EthernetNetworkDiagnostics attributes
+            case MTRAttributeIDTypeClusterEthernetNetworkDiagnosticsAttributePHYRateID:
+                result = @"PHYRate";
+                break;
 
-        case MTRAttributeIDTypeClusterEthernetNetworkDiagnosticsAttributePacketTxCountID:
-            result = @"PacketTxCount";
-            break;
+            case MTRAttributeIDTypeClusterEthernetNetworkDiagnosticsAttributeFullDuplexID:
+                result = @"FullDuplex";
+                break;
 
-        case MTRAttributeIDTypeClusterEthernetNetworkDiagnosticsAttributeTxErrCountID:
-            result = @"TxErrCount";
-            break;
+            case MTRAttributeIDTypeClusterEthernetNetworkDiagnosticsAttributePacketRxCountID:
+                result = @"PacketRxCount";
+                break;
 
-        case MTRAttributeIDTypeClusterEthernetNetworkDiagnosticsAttributeCollisionCountID:
-            result = @"CollisionCount";
-            break;
+            case MTRAttributeIDTypeClusterEthernetNetworkDiagnosticsAttributePacketTxCountID:
+                result = @"PacketTxCount";
+                break;
 
-        case MTRAttributeIDTypeClusterEthernetNetworkDiagnosticsAttributeOverrunCountID:
-            result = @"OverrunCount";
-            break;
+            case MTRAttributeIDTypeClusterEthernetNetworkDiagnosticsAttributeTxErrCountID:
+                result = @"TxErrCount";
+                break;
 
-        case MTRAttributeIDTypeClusterEthernetNetworkDiagnosticsAttributeCarrierDetectID:
-            result = @"CarrierDetect";
-            break;
+            case MTRAttributeIDTypeClusterEthernetNetworkDiagnosticsAttributeCollisionCountID:
+                result = @"CollisionCount";
+                break;
 
-        case MTRAttributeIDTypeClusterEthernetNetworkDiagnosticsAttributeTimeSinceResetID:
-            result = @"TimeSinceReset";
-            break;
+            case MTRAttributeIDTypeClusterEthernetNetworkDiagnosticsAttributeOverrunCountID:
+                result = @"OverrunCount";
+                break;
 
-        case MTRAttributeIDTypeClusterEthernetNetworkDiagnosticsAttributeGeneratedCommandListID:
-            result = @"GeneratedCommandList";
-            break;
+            case MTRAttributeIDTypeClusterEthernetNetworkDiagnosticsAttributeCarrierDetectID:
+                result = @"CarrierDetect";
+                break;
 
-        case MTRAttributeIDTypeClusterEthernetNetworkDiagnosticsAttributeAcceptedCommandListID:
-            result = @"AcceptedCommandList";
-            break;
+            case MTRAttributeIDTypeClusterEthernetNetworkDiagnosticsAttributeTimeSinceResetID:
+                result = @"TimeSinceReset";
+                break;
 
-        case MTRAttributeIDTypeClusterEthernetNetworkDiagnosticsAttributeEventListID:
-            result = @"EventList";
-            break;
+            case MTRAttributeIDTypeClusterEthernetNetworkDiagnosticsAttributeGeneratedCommandListID:
+                result = @"GeneratedCommandList";
+                break;
 
-        case MTRAttributeIDTypeClusterEthernetNetworkDiagnosticsAttributeAttributeListID:
-            result = @"AttributeList";
-            break;
+            case MTRAttributeIDTypeClusterEthernetNetworkDiagnosticsAttributeAcceptedCommandListID:
+                result = @"AcceptedCommandList";
+                break;
 
-        case MTRAttributeIDTypeClusterEthernetNetworkDiagnosticsAttributeFeatureMapID:
-            result = @"FeatureMap";
-            break;
+            case MTRAttributeIDTypeClusterEthernetNetworkDiagnosticsAttributeEventListID:
+                result = @"EventList";
+                break;
 
-        case MTRAttributeIDTypeClusterEthernetNetworkDiagnosticsAttributeClusterRevisionID:
-            result = @"ClusterRevision";
-            break;
+            case MTRAttributeIDTypeClusterEthernetNetworkDiagnosticsAttributeAttributeListID:
+                result = @"AttributeList";
+                break;
 
-        default:
-            result = [NSString stringWithFormat:@"<Unknown attributeID %d>", attributeID];
-            break;
+            case MTRAttributeIDTypeClusterEthernetNetworkDiagnosticsAttributeFeatureMapID:
+                result = @"FeatureMap";
+                break;
+
+            case MTRAttributeIDTypeClusterEthernetNetworkDiagnosticsAttributeClusterRevisionID:
+                result = @"ClusterRevision";
+                break;
+
+
+            default:
+                result = [NSString stringWithFormat:@"<Unknown attributeID %d>", attributeID];
+                break;
         }
 
-    case MTRClusterIDTypeTimeSynchronizationID:
+case MTRClusterIDTypeTimeSynchronizationID:
 
-        switch (attributeID) {
+            switch (attributeID) {
 
-            // Cluster TimeSynchronization attributes
-        case MTRAttributeIDTypeClusterTimeSynchronizationAttributeUTCTimeID:
-            result = @"UTCTime";
-            break;
 
-        case MTRAttributeIDTypeClusterTimeSynchronizationAttributeGranularityID:
-            result = @"Granularity";
-            break;
 
-        case MTRAttributeIDTypeClusterTimeSynchronizationAttributeTimeSourceID:
-            result = @"TimeSource";
-            break;
+// Cluster TimeSynchronization attributes
+            case MTRAttributeIDTypeClusterTimeSynchronizationAttributeUTCTimeID:
+                result = @"UTCTime";
+                break;
 
-        case MTRAttributeIDTypeClusterTimeSynchronizationAttributeTrustedTimeSourceID:
-            result = @"TrustedTimeSource";
-            break;
+            case MTRAttributeIDTypeClusterTimeSynchronizationAttributeGranularityID:
+                result = @"Granularity";
+                break;
 
-        case MTRAttributeIDTypeClusterTimeSynchronizationAttributeDefaultNTPID:
-            result = @"DefaultNTP";
-            break;
+            case MTRAttributeIDTypeClusterTimeSynchronizationAttributeTimeSourceID:
+                result = @"TimeSource";
+                break;
 
-        case MTRAttributeIDTypeClusterTimeSynchronizationAttributeTimeZoneID:
-            result = @"TimeZone";
-            break;
+            case MTRAttributeIDTypeClusterTimeSynchronizationAttributeTrustedTimeSourceID:
+                result = @"TrustedTimeSource";
+                break;
 
-        case MTRAttributeIDTypeClusterTimeSynchronizationAttributeDSTOffsetID:
-            result = @"DSTOffset";
-            break;
+            case MTRAttributeIDTypeClusterTimeSynchronizationAttributeDefaultNTPID:
+                result = @"DefaultNTP";
+                break;
 
-        case MTRAttributeIDTypeClusterTimeSynchronizationAttributeLocalTimeID:
-            result = @"LocalTime";
-            break;
+            case MTRAttributeIDTypeClusterTimeSynchronizationAttributeTimeZoneID:
+                result = @"TimeZone";
+                break;
 
-        case MTRAttributeIDTypeClusterTimeSynchronizationAttributeTimeZoneDatabaseID:
-            result = @"TimeZoneDatabase";
-            break;
+            case MTRAttributeIDTypeClusterTimeSynchronizationAttributeDSTOffsetID:
+                result = @"DSTOffset";
+                break;
 
-        case MTRAttributeIDTypeClusterTimeSynchronizationAttributeNTPServerAvailableID:
-            result = @"NTPServerAvailable";
-            break;
+            case MTRAttributeIDTypeClusterTimeSynchronizationAttributeLocalTimeID:
+                result = @"LocalTime";
+                break;
 
-        case MTRAttributeIDTypeClusterTimeSynchronizationAttributeTimeZoneListMaxSizeID:
-            result = @"TimeZoneListMaxSize";
-            break;
+            case MTRAttributeIDTypeClusterTimeSynchronizationAttributeTimeZoneDatabaseID:
+                result = @"TimeZoneDatabase";
+                break;
 
-        case MTRAttributeIDTypeClusterTimeSynchronizationAttributeDSTOffsetListMaxSizeID:
-            result = @"DSTOffsetListMaxSize";
-            break;
+            case MTRAttributeIDTypeClusterTimeSynchronizationAttributeNTPServerAvailableID:
+                result = @"NTPServerAvailable";
+                break;
 
-        case MTRAttributeIDTypeClusterTimeSynchronizationAttributeSupportsDNSResolveID:
-            result = @"SupportsDNSResolve";
-            break;
+            case MTRAttributeIDTypeClusterTimeSynchronizationAttributeTimeZoneListMaxSizeID:
+                result = @"TimeZoneListMaxSize";
+                break;
 
-        case MTRAttributeIDTypeClusterTimeSynchronizationAttributeGeneratedCommandListID:
-            result = @"GeneratedCommandList";
-            break;
+            case MTRAttributeIDTypeClusterTimeSynchronizationAttributeDSTOffsetListMaxSizeID:
+                result = @"DSTOffsetListMaxSize";
+                break;
 
-        case MTRAttributeIDTypeClusterTimeSynchronizationAttributeAcceptedCommandListID:
-            result = @"AcceptedCommandList";
-            break;
+            case MTRAttributeIDTypeClusterTimeSynchronizationAttributeSupportsDNSResolveID:
+                result = @"SupportsDNSResolve";
+                break;
 
-        case MTRAttributeIDTypeClusterTimeSynchronizationAttributeEventListID:
-            result = @"EventList";
-            break;
+            case MTRAttributeIDTypeClusterTimeSynchronizationAttributeGeneratedCommandListID:
+                result = @"GeneratedCommandList";
+                break;
 
-        case MTRAttributeIDTypeClusterTimeSynchronizationAttributeAttributeListID:
-            result = @"AttributeList";
-            break;
+            case MTRAttributeIDTypeClusterTimeSynchronizationAttributeAcceptedCommandListID:
+                result = @"AcceptedCommandList";
+                break;
 
-        case MTRAttributeIDTypeClusterTimeSynchronizationAttributeFeatureMapID:
-            result = @"FeatureMap";
-            break;
+            case MTRAttributeIDTypeClusterTimeSynchronizationAttributeEventListID:
+                result = @"EventList";
+                break;
 
-        case MTRAttributeIDTypeClusterTimeSynchronizationAttributeClusterRevisionID:
-            result = @"ClusterRevision";
-            break;
+            case MTRAttributeIDTypeClusterTimeSynchronizationAttributeAttributeListID:
+                result = @"AttributeList";
+                break;
 
-        default:
-            result = [NSString stringWithFormat:@"<Unknown attributeID %d>", attributeID];
-            break;
+            case MTRAttributeIDTypeClusterTimeSynchronizationAttributeFeatureMapID:
+                result = @"FeatureMap";
+                break;
+
+            case MTRAttributeIDTypeClusterTimeSynchronizationAttributeClusterRevisionID:
+                result = @"ClusterRevision";
+                break;
+
+
+            default:
+                result = [NSString stringWithFormat:@"<Unknown attributeID %d>", attributeID];
+                break;
         }
 
-    case MTRClusterIDTypeBridgedDeviceBasicInformationID:
+case MTRClusterIDTypeBridgedDeviceBasicInformationID:
 
-        switch (attributeID) {
+            switch (attributeID) {
 
-            // Cluster BridgedDeviceBasicInformation attributes
-        case MTRAttributeIDTypeClusterBridgedDeviceBasicInformationAttributeVendorNameID:
-            result = @"VendorName";
-            break;
 
-        case MTRAttributeIDTypeClusterBridgedDeviceBasicInformationAttributeVendorIDID:
-            result = @"VendorID";
-            break;
 
-        case MTRAttributeIDTypeClusterBridgedDeviceBasicInformationAttributeProductNameID:
-            result = @"ProductName";
-            break;
+// Cluster BridgedDeviceBasicInformation attributes
+            case MTRAttributeIDTypeClusterBridgedDeviceBasicInformationAttributeVendorNameID:
+                result = @"VendorName";
+                break;
 
-        case MTRAttributeIDTypeClusterBridgedDeviceBasicInformationAttributeNodeLabelID:
-            result = @"NodeLabel";
-            break;
+            case MTRAttributeIDTypeClusterBridgedDeviceBasicInformationAttributeVendorIDID:
+                result = @"VendorID";
+                break;
 
-        case MTRAttributeIDTypeClusterBridgedDeviceBasicInformationAttributeHardwareVersionID:
-            result = @"HardwareVersion";
-            break;
+            case MTRAttributeIDTypeClusterBridgedDeviceBasicInformationAttributeProductNameID:
+                result = @"ProductName";
+                break;
 
-        case MTRAttributeIDTypeClusterBridgedDeviceBasicInformationAttributeHardwareVersionStringID:
-            result = @"HardwareVersionString";
-            break;
+            case MTRAttributeIDTypeClusterBridgedDeviceBasicInformationAttributeProductIDID:
+                result = @"ProductID";
+                break;
 
-        case MTRAttributeIDTypeClusterBridgedDeviceBasicInformationAttributeSoftwareVersionID:
-            result = @"SoftwareVersion";
-            break;
+            case MTRAttributeIDTypeClusterBridgedDeviceBasicInformationAttributeNodeLabelID:
+                result = @"NodeLabel";
+                break;
 
-        case MTRAttributeIDTypeClusterBridgedDeviceBasicInformationAttributeSoftwareVersionStringID:
-            result = @"SoftwareVersionString";
-            break;
+            case MTRAttributeIDTypeClusterBridgedDeviceBasicInformationAttributeHardwareVersionID:
+                result = @"HardwareVersion";
+                break;
 
-        case MTRAttributeIDTypeClusterBridgedDeviceBasicInformationAttributeManufacturingDateID:
-            result = @"ManufacturingDate";
-            break;
+            case MTRAttributeIDTypeClusterBridgedDeviceBasicInformationAttributeHardwareVersionStringID:
+                result = @"HardwareVersionString";
+                break;
 
-        case MTRAttributeIDTypeClusterBridgedDeviceBasicInformationAttributePartNumberID:
-            result = @"PartNumber";
-            break;
+            case MTRAttributeIDTypeClusterBridgedDeviceBasicInformationAttributeSoftwareVersionID:
+                result = @"SoftwareVersion";
+                break;
 
-        case MTRAttributeIDTypeClusterBridgedDeviceBasicInformationAttributeProductURLID:
-            result = @"ProductURL";
-            break;
+            case MTRAttributeIDTypeClusterBridgedDeviceBasicInformationAttributeSoftwareVersionStringID:
+                result = @"SoftwareVersionString";
+                break;
 
-        case MTRAttributeIDTypeClusterBridgedDeviceBasicInformationAttributeProductLabelID:
-            result = @"ProductLabel";
-            break;
+            case MTRAttributeIDTypeClusterBridgedDeviceBasicInformationAttributeManufacturingDateID:
+                result = @"ManufacturingDate";
+                break;
 
-        case MTRAttributeIDTypeClusterBridgedDeviceBasicInformationAttributeSerialNumberID:
-            result = @"SerialNumber";
-            break;
+            case MTRAttributeIDTypeClusterBridgedDeviceBasicInformationAttributePartNumberID:
+                result = @"PartNumber";
+                break;
 
-        case MTRAttributeIDTypeClusterBridgedDeviceBasicInformationAttributeReachableID:
-            result = @"Reachable";
-            break;
+            case MTRAttributeIDTypeClusterBridgedDeviceBasicInformationAttributeProductURLID:
+                result = @"ProductURL";
+                break;
 
-        case MTRAttributeIDTypeClusterBridgedDeviceBasicInformationAttributeUniqueIDID:
-            result = @"UniqueID";
-            break;
+            case MTRAttributeIDTypeClusterBridgedDeviceBasicInformationAttributeProductLabelID:
+                result = @"ProductLabel";
+                break;
 
-        case MTRAttributeIDTypeClusterBridgedDeviceBasicInformationAttributeProductAppearanceID:
-            result = @"ProductAppearance";
-            break;
+            case MTRAttributeIDTypeClusterBridgedDeviceBasicInformationAttributeSerialNumberID:
+                result = @"SerialNumber";
+                break;
 
-        case MTRAttributeIDTypeClusterBridgedDeviceBasicInformationAttributeGeneratedCommandListID:
-            result = @"GeneratedCommandList";
-            break;
+            case MTRAttributeIDTypeClusterBridgedDeviceBasicInformationAttributeReachableID:
+                result = @"Reachable";
+                break;
 
-        case MTRAttributeIDTypeClusterBridgedDeviceBasicInformationAttributeAcceptedCommandListID:
-            result = @"AcceptedCommandList";
-            break;
+            case MTRAttributeIDTypeClusterBridgedDeviceBasicInformationAttributeUniqueIDID:
+                result = @"UniqueID";
+                break;
 
-        case MTRAttributeIDTypeClusterBridgedDeviceBasicInformationAttributeEventListID:
-            result = @"EventList";
-            break;
+            case MTRAttributeIDTypeClusterBridgedDeviceBasicInformationAttributeProductAppearanceID:
+                result = @"ProductAppearance";
+                break;
 
-        case MTRAttributeIDTypeClusterBridgedDeviceBasicInformationAttributeAttributeListID:
-            result = @"AttributeList";
-            break;
+            case MTRAttributeIDTypeClusterBridgedDeviceBasicInformationAttributeGeneratedCommandListID:
+                result = @"GeneratedCommandList";
+                break;
 
-        case MTRAttributeIDTypeClusterBridgedDeviceBasicInformationAttributeFeatureMapID:
-            result = @"FeatureMap";
-            break;
+            case MTRAttributeIDTypeClusterBridgedDeviceBasicInformationAttributeAcceptedCommandListID:
+                result = @"AcceptedCommandList";
+                break;
 
-        case MTRAttributeIDTypeClusterBridgedDeviceBasicInformationAttributeClusterRevisionID:
-            result = @"ClusterRevision";
-            break;
+            case MTRAttributeIDTypeClusterBridgedDeviceBasicInformationAttributeEventListID:
+                result = @"EventList";
+                break;
 
-        default:
-            result = [NSString stringWithFormat:@"<Unknown attributeID %d>", attributeID];
-            break;
+            case MTRAttributeIDTypeClusterBridgedDeviceBasicInformationAttributeAttributeListID:
+                result = @"AttributeList";
+                break;
+
+            case MTRAttributeIDTypeClusterBridgedDeviceBasicInformationAttributeFeatureMapID:
+                result = @"FeatureMap";
+                break;
+
+            case MTRAttributeIDTypeClusterBridgedDeviceBasicInformationAttributeClusterRevisionID:
+                result = @"ClusterRevision";
+                break;
+
+
+            default:
+                result = [NSString stringWithFormat:@"<Unknown attributeID %d>", attributeID];
+                break;
         }
 
-    case MTRClusterIDTypeSwitchID:
+case MTRClusterIDTypeSwitchID:
 
-        switch (attributeID) {
+            switch (attributeID) {
 
-            // Cluster Switch attributes
-        case MTRAttributeIDTypeClusterSwitchAttributeNumberOfPositionsID:
-            result = @"NumberOfPositions";
-            break;
 
-        case MTRAttributeIDTypeClusterSwitchAttributeCurrentPositionID:
-            result = @"CurrentPosition";
-            break;
 
-        case MTRAttributeIDTypeClusterSwitchAttributeMultiPressMaxID:
-            result = @"MultiPressMax";
-            break;
+// Cluster Switch attributes
+            case MTRAttributeIDTypeClusterSwitchAttributeNumberOfPositionsID:
+                result = @"NumberOfPositions";
+                break;
 
-        case MTRAttributeIDTypeClusterSwitchAttributeGeneratedCommandListID:
-            result = @"GeneratedCommandList";
-            break;
+            case MTRAttributeIDTypeClusterSwitchAttributeCurrentPositionID:
+                result = @"CurrentPosition";
+                break;
 
-        case MTRAttributeIDTypeClusterSwitchAttributeAcceptedCommandListID:
-            result = @"AcceptedCommandList";
-            break;
+            case MTRAttributeIDTypeClusterSwitchAttributeMultiPressMaxID:
+                result = @"MultiPressMax";
+                break;
 
-        case MTRAttributeIDTypeClusterSwitchAttributeEventListID:
-            result = @"EventList";
-            break;
+            case MTRAttributeIDTypeClusterSwitchAttributeGeneratedCommandListID:
+                result = @"GeneratedCommandList";
+                break;
 
-        case MTRAttributeIDTypeClusterSwitchAttributeAttributeListID:
-            result = @"AttributeList";
-            break;
+            case MTRAttributeIDTypeClusterSwitchAttributeAcceptedCommandListID:
+                result = @"AcceptedCommandList";
+                break;
 
-        case MTRAttributeIDTypeClusterSwitchAttributeFeatureMapID:
-            result = @"FeatureMap";
-            break;
+            case MTRAttributeIDTypeClusterSwitchAttributeEventListID:
+                result = @"EventList";
+                break;
 
-        case MTRAttributeIDTypeClusterSwitchAttributeClusterRevisionID:
-            result = @"ClusterRevision";
-            break;
+            case MTRAttributeIDTypeClusterSwitchAttributeAttributeListID:
+                result = @"AttributeList";
+                break;
 
-        default:
-            result = [NSString stringWithFormat:@"<Unknown attributeID %d>", attributeID];
-            break;
+            case MTRAttributeIDTypeClusterSwitchAttributeFeatureMapID:
+                result = @"FeatureMap";
+                break;
+
+            case MTRAttributeIDTypeClusterSwitchAttributeClusterRevisionID:
+                result = @"ClusterRevision";
+                break;
+
+
+            default:
+                result = [NSString stringWithFormat:@"<Unknown attributeID %d>", attributeID];
+                break;
         }
 
-    case MTRClusterIDTypeAdministratorCommissioningID:
+case MTRClusterIDTypeAdministratorCommissioningID:
 
-        switch (attributeID) {
+            switch (attributeID) {
 
-            // Cluster AdministratorCommissioning attributes
-        case MTRAttributeIDTypeClusterAdministratorCommissioningAttributeWindowStatusID:
-            result = @"WindowStatus";
-            break;
 
-        case MTRAttributeIDTypeClusterAdministratorCommissioningAttributeAdminFabricIndexID:
-            result = @"AdminFabricIndex";
-            break;
 
-        case MTRAttributeIDTypeClusterAdministratorCommissioningAttributeAdminVendorIdID:
-            result = @"AdminVendorId";
-            break;
+// Cluster AdministratorCommissioning attributes
+            case MTRAttributeIDTypeClusterAdministratorCommissioningAttributeWindowStatusID:
+                result = @"WindowStatus";
+                break;
 
-        case MTRAttributeIDTypeClusterAdministratorCommissioningAttributeGeneratedCommandListID:
-            result = @"GeneratedCommandList";
-            break;
+            case MTRAttributeIDTypeClusterAdministratorCommissioningAttributeAdminFabricIndexID:
+                result = @"AdminFabricIndex";
+                break;
 
-        case MTRAttributeIDTypeClusterAdministratorCommissioningAttributeAcceptedCommandListID:
-            result = @"AcceptedCommandList";
-            break;
+            case MTRAttributeIDTypeClusterAdministratorCommissioningAttributeAdminVendorIdID:
+                result = @"AdminVendorId";
+                break;
 
-        case MTRAttributeIDTypeClusterAdministratorCommissioningAttributeEventListID:
-            result = @"EventList";
-            break;
+            case MTRAttributeIDTypeClusterAdministratorCommissioningAttributeGeneratedCommandListID:
+                result = @"GeneratedCommandList";
+                break;
 
-        case MTRAttributeIDTypeClusterAdministratorCommissioningAttributeAttributeListID:
-            result = @"AttributeList";
-            break;
+            case MTRAttributeIDTypeClusterAdministratorCommissioningAttributeAcceptedCommandListID:
+                result = @"AcceptedCommandList";
+                break;
 
-        case MTRAttributeIDTypeClusterAdministratorCommissioningAttributeFeatureMapID:
-            result = @"FeatureMap";
-            break;
+            case MTRAttributeIDTypeClusterAdministratorCommissioningAttributeEventListID:
+                result = @"EventList";
+                break;
 
-        case MTRAttributeIDTypeClusterAdministratorCommissioningAttributeClusterRevisionID:
-            result = @"ClusterRevision";
-            break;
+            case MTRAttributeIDTypeClusterAdministratorCommissioningAttributeAttributeListID:
+                result = @"AttributeList";
+                break;
 
-        default:
-            result = [NSString stringWithFormat:@"<Unknown attributeID %d>", attributeID];
-            break;
+            case MTRAttributeIDTypeClusterAdministratorCommissioningAttributeFeatureMapID:
+                result = @"FeatureMap";
+                break;
+
+            case MTRAttributeIDTypeClusterAdministratorCommissioningAttributeClusterRevisionID:
+                result = @"ClusterRevision";
+                break;
+
+
+            default:
+                result = [NSString stringWithFormat:@"<Unknown attributeID %d>", attributeID];
+                break;
         }
 
-    case MTRClusterIDTypeOperationalCredentialsID:
+case MTRClusterIDTypeOperationalCredentialsID:
 
-        switch (attributeID) {
+            switch (attributeID) {
 
-            // Cluster OperationalCredentials attributes
-        case MTRAttributeIDTypeClusterOperationalCredentialsAttributeNOCsID:
-            result = @"NOCs";
-            break;
 
-        case MTRAttributeIDTypeClusterOperationalCredentialsAttributeFabricsID:
-            result = @"Fabrics";
-            break;
 
-        case MTRAttributeIDTypeClusterOperationalCredentialsAttributeSupportedFabricsID:
-            result = @"SupportedFabrics";
-            break;
+// Cluster OperationalCredentials attributes
+            case MTRAttributeIDTypeClusterOperationalCredentialsAttributeNOCsID:
+                result = @"NOCs";
+                break;
 
-        case MTRAttributeIDTypeClusterOperationalCredentialsAttributeCommissionedFabricsID:
-            result = @"CommissionedFabrics";
-            break;
+            case MTRAttributeIDTypeClusterOperationalCredentialsAttributeFabricsID:
+                result = @"Fabrics";
+                break;
 
-        case MTRAttributeIDTypeClusterOperationalCredentialsAttributeTrustedRootCertificatesID:
-            result = @"TrustedRootCertificates";
-            break;
+            case MTRAttributeIDTypeClusterOperationalCredentialsAttributeSupportedFabricsID:
+                result = @"SupportedFabrics";
+                break;
 
-        case MTRAttributeIDTypeClusterOperationalCredentialsAttributeCurrentFabricIndexID:
-            result = @"CurrentFabricIndex";
-            break;
+            case MTRAttributeIDTypeClusterOperationalCredentialsAttributeCommissionedFabricsID:
+                result = @"CommissionedFabrics";
+                break;
 
-        case MTRAttributeIDTypeClusterOperationalCredentialsAttributeGeneratedCommandListID:
-            result = @"GeneratedCommandList";
-            break;
+            case MTRAttributeIDTypeClusterOperationalCredentialsAttributeTrustedRootCertificatesID:
+                result = @"TrustedRootCertificates";
+                break;
 
-        case MTRAttributeIDTypeClusterOperationalCredentialsAttributeAcceptedCommandListID:
-            result = @"AcceptedCommandList";
-            break;
+            case MTRAttributeIDTypeClusterOperationalCredentialsAttributeCurrentFabricIndexID:
+                result = @"CurrentFabricIndex";
+                break;
 
-        case MTRAttributeIDTypeClusterOperationalCredentialsAttributeEventListID:
-            result = @"EventList";
-            break;
+            case MTRAttributeIDTypeClusterOperationalCredentialsAttributeGeneratedCommandListID:
+                result = @"GeneratedCommandList";
+                break;
 
-        case MTRAttributeIDTypeClusterOperationalCredentialsAttributeAttributeListID:
-            result = @"AttributeList";
-            break;
+            case MTRAttributeIDTypeClusterOperationalCredentialsAttributeAcceptedCommandListID:
+                result = @"AcceptedCommandList";
+                break;
 
-        case MTRAttributeIDTypeClusterOperationalCredentialsAttributeFeatureMapID:
-            result = @"FeatureMap";
-            break;
+            case MTRAttributeIDTypeClusterOperationalCredentialsAttributeEventListID:
+                result = @"EventList";
+                break;
 
-        case MTRAttributeIDTypeClusterOperationalCredentialsAttributeClusterRevisionID:
-            result = @"ClusterRevision";
-            break;
+            case MTRAttributeIDTypeClusterOperationalCredentialsAttributeAttributeListID:
+                result = @"AttributeList";
+                break;
 
-        default:
-            result = [NSString stringWithFormat:@"<Unknown attributeID %d>", attributeID];
-            break;
+            case MTRAttributeIDTypeClusterOperationalCredentialsAttributeFeatureMapID:
+                result = @"FeatureMap";
+                break;
+
+            case MTRAttributeIDTypeClusterOperationalCredentialsAttributeClusterRevisionID:
+                result = @"ClusterRevision";
+                break;
+
+
+            default:
+                result = [NSString stringWithFormat:@"<Unknown attributeID %d>", attributeID];
+                break;
         }
 
-    case MTRClusterIDTypeGroupKeyManagementID:
+case MTRClusterIDTypeGroupKeyManagementID:
 
-        switch (attributeID) {
+            switch (attributeID) {
 
-            // Cluster GroupKeyManagement attributes
-        case MTRAttributeIDTypeClusterGroupKeyManagementAttributeGroupKeyMapID:
-            result = @"GroupKeyMap";
-            break;
 
-        case MTRAttributeIDTypeClusterGroupKeyManagementAttributeGroupTableID:
-            result = @"GroupTable";
-            break;
 
-        case MTRAttributeIDTypeClusterGroupKeyManagementAttributeMaxGroupsPerFabricID:
-            result = @"MaxGroupsPerFabric";
-            break;
+// Cluster GroupKeyManagement attributes
+            case MTRAttributeIDTypeClusterGroupKeyManagementAttributeGroupKeyMapID:
+                result = @"GroupKeyMap";
+                break;
 
-        case MTRAttributeIDTypeClusterGroupKeyManagementAttributeMaxGroupKeysPerFabricID:
-            result = @"MaxGroupKeysPerFabric";
-            break;
+            case MTRAttributeIDTypeClusterGroupKeyManagementAttributeGroupTableID:
+                result = @"GroupTable";
+                break;
 
-        case MTRAttributeIDTypeClusterGroupKeyManagementAttributeGeneratedCommandListID:
-            result = @"GeneratedCommandList";
-            break;
+            case MTRAttributeIDTypeClusterGroupKeyManagementAttributeMaxGroupsPerFabricID:
+                result = @"MaxGroupsPerFabric";
+                break;
 
-        case MTRAttributeIDTypeClusterGroupKeyManagementAttributeAcceptedCommandListID:
-            result = @"AcceptedCommandList";
-            break;
+            case MTRAttributeIDTypeClusterGroupKeyManagementAttributeMaxGroupKeysPerFabricID:
+                result = @"MaxGroupKeysPerFabric";
+                break;
 
-        case MTRAttributeIDTypeClusterGroupKeyManagementAttributeEventListID:
-            result = @"EventList";
-            break;
+            case MTRAttributeIDTypeClusterGroupKeyManagementAttributeGeneratedCommandListID:
+                result = @"GeneratedCommandList";
+                break;
 
-        case MTRAttributeIDTypeClusterGroupKeyManagementAttributeAttributeListID:
-            result = @"AttributeList";
-            break;
+            case MTRAttributeIDTypeClusterGroupKeyManagementAttributeAcceptedCommandListID:
+                result = @"AcceptedCommandList";
+                break;
 
-        case MTRAttributeIDTypeClusterGroupKeyManagementAttributeFeatureMapID:
-            result = @"FeatureMap";
-            break;
+            case MTRAttributeIDTypeClusterGroupKeyManagementAttributeEventListID:
+                result = @"EventList";
+                break;
 
-        case MTRAttributeIDTypeClusterGroupKeyManagementAttributeClusterRevisionID:
-            result = @"ClusterRevision";
-            break;
+            case MTRAttributeIDTypeClusterGroupKeyManagementAttributeAttributeListID:
+                result = @"AttributeList";
+                break;
 
-        default:
-            result = [NSString stringWithFormat:@"<Unknown attributeID %d>", attributeID];
-            break;
+            case MTRAttributeIDTypeClusterGroupKeyManagementAttributeFeatureMapID:
+                result = @"FeatureMap";
+                break;
+
+            case MTRAttributeIDTypeClusterGroupKeyManagementAttributeClusterRevisionID:
+                result = @"ClusterRevision";
+                break;
+
+
+            default:
+                result = [NSString stringWithFormat:@"<Unknown attributeID %d>", attributeID];
+                break;
         }
 
-    case MTRClusterIDTypeFixedLabelID:
+case MTRClusterIDTypeFixedLabelID:
 
-        switch (attributeID) {
+            switch (attributeID) {
 
-            // Cluster FixedLabel attributes
-        case MTRAttributeIDTypeClusterFixedLabelAttributeLabelListID:
-            result = @"LabelList";
-            break;
 
-        case MTRAttributeIDTypeClusterFixedLabelAttributeGeneratedCommandListID:
-            result = @"GeneratedCommandList";
-            break;
 
-        case MTRAttributeIDTypeClusterFixedLabelAttributeAcceptedCommandListID:
-            result = @"AcceptedCommandList";
-            break;
+// Cluster FixedLabel attributes
+            case MTRAttributeIDTypeClusterFixedLabelAttributeLabelListID:
+                result = @"LabelList";
+                break;
 
-        case MTRAttributeIDTypeClusterFixedLabelAttributeEventListID:
-            result = @"EventList";
-            break;
+            case MTRAttributeIDTypeClusterFixedLabelAttributeGeneratedCommandListID:
+                result = @"GeneratedCommandList";
+                break;
 
-        case MTRAttributeIDTypeClusterFixedLabelAttributeAttributeListID:
-            result = @"AttributeList";
-            break;
+            case MTRAttributeIDTypeClusterFixedLabelAttributeAcceptedCommandListID:
+                result = @"AcceptedCommandList";
+                break;
 
-        case MTRAttributeIDTypeClusterFixedLabelAttributeFeatureMapID:
-            result = @"FeatureMap";
-            break;
+            case MTRAttributeIDTypeClusterFixedLabelAttributeEventListID:
+                result = @"EventList";
+                break;
 
-        case MTRAttributeIDTypeClusterFixedLabelAttributeClusterRevisionID:
-            result = @"ClusterRevision";
-            break;
+            case MTRAttributeIDTypeClusterFixedLabelAttributeAttributeListID:
+                result = @"AttributeList";
+                break;
 
-        default:
-            result = [NSString stringWithFormat:@"<Unknown attributeID %d>", attributeID];
-            break;
+            case MTRAttributeIDTypeClusterFixedLabelAttributeFeatureMapID:
+                result = @"FeatureMap";
+                break;
+
+            case MTRAttributeIDTypeClusterFixedLabelAttributeClusterRevisionID:
+                result = @"ClusterRevision";
+                break;
+
+
+            default:
+                result = [NSString stringWithFormat:@"<Unknown attributeID %d>", attributeID];
+                break;
         }
 
-    case MTRClusterIDTypeUserLabelID:
+case MTRClusterIDTypeUserLabelID:
 
-        switch (attributeID) {
+            switch (attributeID) {
 
-            // Cluster UserLabel attributes
-        case MTRAttributeIDTypeClusterUserLabelAttributeLabelListID:
-            result = @"LabelList";
-            break;
 
-        case MTRAttributeIDTypeClusterUserLabelAttributeGeneratedCommandListID:
-            result = @"GeneratedCommandList";
-            break;
 
-        case MTRAttributeIDTypeClusterUserLabelAttributeAcceptedCommandListID:
-            result = @"AcceptedCommandList";
-            break;
+// Cluster UserLabel attributes
+            case MTRAttributeIDTypeClusterUserLabelAttributeLabelListID:
+                result = @"LabelList";
+                break;
 
-        case MTRAttributeIDTypeClusterUserLabelAttributeEventListID:
-            result = @"EventList";
-            break;
+            case MTRAttributeIDTypeClusterUserLabelAttributeGeneratedCommandListID:
+                result = @"GeneratedCommandList";
+                break;
 
-        case MTRAttributeIDTypeClusterUserLabelAttributeAttributeListID:
-            result = @"AttributeList";
-            break;
+            case MTRAttributeIDTypeClusterUserLabelAttributeAcceptedCommandListID:
+                result = @"AcceptedCommandList";
+                break;
 
-        case MTRAttributeIDTypeClusterUserLabelAttributeFeatureMapID:
-            result = @"FeatureMap";
-            break;
+            case MTRAttributeIDTypeClusterUserLabelAttributeEventListID:
+                result = @"EventList";
+                break;
 
-        case MTRAttributeIDTypeClusterUserLabelAttributeClusterRevisionID:
-            result = @"ClusterRevision";
-            break;
+            case MTRAttributeIDTypeClusterUserLabelAttributeAttributeListID:
+                result = @"AttributeList";
+                break;
 
-        default:
-            result = [NSString stringWithFormat:@"<Unknown attributeID %d>", attributeID];
-            break;
+            case MTRAttributeIDTypeClusterUserLabelAttributeFeatureMapID:
+                result = @"FeatureMap";
+                break;
+
+            case MTRAttributeIDTypeClusterUserLabelAttributeClusterRevisionID:
+                result = @"ClusterRevision";
+                break;
+
+
+            default:
+                result = [NSString stringWithFormat:@"<Unknown attributeID %d>", attributeID];
+                break;
         }
 
-    case MTRClusterIDTypeBooleanStateID:
 
-        switch (attributeID) {
 
-            // Cluster BooleanState attributes
-        case MTRAttributeIDTypeClusterBooleanStateAttributeStateValueID:
-            result = @"StateValue";
-            break;
 
-        case MTRAttributeIDTypeClusterBooleanStateAttributeGeneratedCommandListID:
-            result = @"GeneratedCommandList";
-            break;
 
-        case MTRAttributeIDTypeClusterBooleanStateAttributeAcceptedCommandListID:
-            result = @"AcceptedCommandList";
-            break;
 
-        case MTRAttributeIDTypeClusterBooleanStateAttributeEventListID:
-            result = @"EventList";
-            break;
 
-        case MTRAttributeIDTypeClusterBooleanStateAttributeAttributeListID:
-            result = @"AttributeList";
-            break;
 
-        case MTRAttributeIDTypeClusterBooleanStateAttributeFeatureMapID:
-            result = @"FeatureMap";
-            break;
 
-        case MTRAttributeIDTypeClusterBooleanStateAttributeClusterRevisionID:
-            result = @"ClusterRevision";
-            break;
 
-        default:
-            result = [NSString stringWithFormat:@"<Unknown attributeID %d>", attributeID];
-            break;
+
+
+
+case MTRClusterIDTypeBooleanStateID:
+
+            switch (attributeID) {
+
+
+
+// Cluster BooleanState attributes
+            case MTRAttributeIDTypeClusterBooleanStateAttributeStateValueID:
+                result = @"StateValue";
+                break;
+
+            case MTRAttributeIDTypeClusterBooleanStateAttributeGeneratedCommandListID:
+                result = @"GeneratedCommandList";
+                break;
+
+            case MTRAttributeIDTypeClusterBooleanStateAttributeAcceptedCommandListID:
+                result = @"AcceptedCommandList";
+                break;
+
+            case MTRAttributeIDTypeClusterBooleanStateAttributeEventListID:
+                result = @"EventList";
+                break;
+
+            case MTRAttributeIDTypeClusterBooleanStateAttributeAttributeListID:
+                result = @"AttributeList";
+                break;
+
+            case MTRAttributeIDTypeClusterBooleanStateAttributeFeatureMapID:
+                result = @"FeatureMap";
+                break;
+
+            case MTRAttributeIDTypeClusterBooleanStateAttributeClusterRevisionID:
+                result = @"ClusterRevision";
+                break;
+
+
+            default:
+                result = [NSString stringWithFormat:@"<Unknown attributeID %d>", attributeID];
+                break;
         }
 
-    case MTRClusterIDTypeICDManagementID:
+case MTRClusterIDTypeICDManagementID:
 
-        switch (attributeID) {
+            switch (attributeID) {
 
-            // Cluster ICDManagement attributes
-        case MTRAttributeIDTypeClusterICDManagementAttributeIdleModeDurationID:
-            result = @"IdleModeDuration";
-            break;
 
-        case MTRAttributeIDTypeClusterICDManagementAttributeActiveModeDurationID:
-            result = @"ActiveModeDuration";
-            break;
 
-        case MTRAttributeIDTypeClusterICDManagementAttributeActiveModeThresholdID:
-            result = @"ActiveModeThreshold";
-            break;
+// Cluster ICDManagement attributes
+            case MTRAttributeIDTypeClusterICDManagementAttributeIdleModeDurationID:
+                result = @"IdleModeDuration";
+                break;
 
-        case MTRAttributeIDTypeClusterICDManagementAttributeRegisteredClientsID:
-            result = @"RegisteredClients";
-            break;
+            case MTRAttributeIDTypeClusterICDManagementAttributeActiveModeDurationID:
+                result = @"ActiveModeDuration";
+                break;
 
-        case MTRAttributeIDTypeClusterICDManagementAttributeICDCounterID:
-            result = @"ICDCounter";
-            break;
+            case MTRAttributeIDTypeClusterICDManagementAttributeActiveModeThresholdID:
+                result = @"ActiveModeThreshold";
+                break;
 
-        case MTRAttributeIDTypeClusterICDManagementAttributeClientsSupportedPerFabricID:
-            result = @"ClientsSupportedPerFabric";
-            break;
+            case MTRAttributeIDTypeClusterICDManagementAttributeRegisteredClientsID:
+                result = @"RegisteredClients";
+                break;
 
-        case MTRAttributeIDTypeClusterICDManagementAttributeUserActiveModeTriggerHintID:
-            result = @"UserActiveModeTriggerHint";
-            break;
+            case MTRAttributeIDTypeClusterICDManagementAttributeICDCounterID:
+                result = @"ICDCounter";
+                break;
 
-        case MTRAttributeIDTypeClusterICDManagementAttributeUserActiveModeTriggerInstructionID:
-            result = @"UserActiveModeTriggerInstruction";
-            break;
+            case MTRAttributeIDTypeClusterICDManagementAttributeClientsSupportedPerFabricID:
+                result = @"ClientsSupportedPerFabric";
+                break;
 
-        case MTRAttributeIDTypeClusterICDManagementAttributeOperatingModeID:
-            result = @"OperatingMode";
-            break;
+            case MTRAttributeIDTypeClusterICDManagementAttributeUserActiveModeTriggerHintID:
+                result = @"UserActiveModeTriggerHint";
+                break;
 
-        case MTRAttributeIDTypeClusterICDManagementAttributeMaximumCheckInBackOffID:
-            result = @"MaximumCheckInBackOff";
-            break;
+            case MTRAttributeIDTypeClusterICDManagementAttributeUserActiveModeTriggerInstructionID:
+                result = @"UserActiveModeTriggerInstruction";
+                break;
 
-        case MTRAttributeIDTypeClusterICDManagementAttributeGeneratedCommandListID:
-            result = @"GeneratedCommandList";
-            break;
+            case MTRAttributeIDTypeClusterICDManagementAttributeOperatingModeID:
+                result = @"OperatingMode";
+                break;
 
-        case MTRAttributeIDTypeClusterICDManagementAttributeAcceptedCommandListID:
-            result = @"AcceptedCommandList";
-            break;
+            case MTRAttributeIDTypeClusterICDManagementAttributeMaximumCheckInBackOffID:
+                result = @"MaximumCheckInBackOff";
+                break;
 
-        case MTRAttributeIDTypeClusterICDManagementAttributeEventListID:
-            result = @"EventList";
-            break;
+            case MTRAttributeIDTypeClusterICDManagementAttributeGeneratedCommandListID:
+                result = @"GeneratedCommandList";
+                break;
 
-        case MTRAttributeIDTypeClusterICDManagementAttributeAttributeListID:
-            result = @"AttributeList";
-            break;
+            case MTRAttributeIDTypeClusterICDManagementAttributeAcceptedCommandListID:
+                result = @"AcceptedCommandList";
+                break;
 
-        case MTRAttributeIDTypeClusterICDManagementAttributeFeatureMapID:
-            result = @"FeatureMap";
-            break;
+            case MTRAttributeIDTypeClusterICDManagementAttributeEventListID:
+                result = @"EventList";
+                break;
 
-        case MTRAttributeIDTypeClusterICDManagementAttributeClusterRevisionID:
-            result = @"ClusterRevision";
-            break;
+            case MTRAttributeIDTypeClusterICDManagementAttributeAttributeListID:
+                result = @"AttributeList";
+                break;
 
-        default:
-            result = [NSString stringWithFormat:@"<Unknown attributeID %d>", attributeID];
-            break;
+            case MTRAttributeIDTypeClusterICDManagementAttributeFeatureMapID:
+                result = @"FeatureMap";
+                break;
+
+            case MTRAttributeIDTypeClusterICDManagementAttributeClusterRevisionID:
+                result = @"ClusterRevision";
+                break;
+
+
+            default:
+                result = [NSString stringWithFormat:@"<Unknown attributeID %d>", attributeID];
+                break;
         }
 
-    case MTRClusterIDTypeTimerID:
+case MTRClusterIDTypeTimerID:
 
-        switch (attributeID) {
+            switch (attributeID) {
 
-            // Cluster Timer attributes
-        case MTRAttributeIDTypeClusterTimerAttributeSetTimeID:
-            result = @"SetTime";
-            break;
 
-        case MTRAttributeIDTypeClusterTimerAttributeTimeRemainingID:
-            result = @"TimeRemaining";
-            break;
 
-        case MTRAttributeIDTypeClusterTimerAttributeTimerStateID:
-            result = @"TimerState";
-            break;
+// Cluster Timer attributes
+            case MTRAttributeIDTypeClusterTimerAttributeSetTimeID:
+                result = @"SetTime";
+                break;
 
-        case MTRAttributeIDTypeClusterTimerAttributeGeneratedCommandListID:
-            result = @"GeneratedCommandList";
-            break;
+            case MTRAttributeIDTypeClusterTimerAttributeTimeRemainingID:
+                result = @"TimeRemaining";
+                break;
 
-        case MTRAttributeIDTypeClusterTimerAttributeAcceptedCommandListID:
-            result = @"AcceptedCommandList";
-            break;
+            case MTRAttributeIDTypeClusterTimerAttributeTimerStateID:
+                result = @"TimerState";
+                break;
 
-        case MTRAttributeIDTypeClusterTimerAttributeEventListID:
-            result = @"EventList";
-            break;
+            case MTRAttributeIDTypeClusterTimerAttributeGeneratedCommandListID:
+                result = @"GeneratedCommandList";
+                break;
 
-        case MTRAttributeIDTypeClusterTimerAttributeAttributeListID:
-            result = @"AttributeList";
-            break;
+            case MTRAttributeIDTypeClusterTimerAttributeAcceptedCommandListID:
+                result = @"AcceptedCommandList";
+                break;
 
-        case MTRAttributeIDTypeClusterTimerAttributeFeatureMapID:
-            result = @"FeatureMap";
-            break;
+            case MTRAttributeIDTypeClusterTimerAttributeEventListID:
+                result = @"EventList";
+                break;
 
-        case MTRAttributeIDTypeClusterTimerAttributeClusterRevisionID:
-            result = @"ClusterRevision";
-            break;
+            case MTRAttributeIDTypeClusterTimerAttributeAttributeListID:
+                result = @"AttributeList";
+                break;
 
-        default:
-            result = [NSString stringWithFormat:@"<Unknown attributeID %d>", attributeID];
-            break;
+            case MTRAttributeIDTypeClusterTimerAttributeFeatureMapID:
+                result = @"FeatureMap";
+                break;
+
+            case MTRAttributeIDTypeClusterTimerAttributeClusterRevisionID:
+                result = @"ClusterRevision";
+                break;
+
+
+            default:
+                result = [NSString stringWithFormat:@"<Unknown attributeID %d>", attributeID];
+                break;
         }
 
-    case MTRClusterIDTypeOvenCavityOperationalStateID:
+case MTRClusterIDTypeOvenCavityOperationalStateID:
 
-        switch (attributeID) {
+            switch (attributeID) {
 
-            // Cluster OvenCavityOperationalState attributes
-        case MTRAttributeIDTypeClusterOvenCavityOperationalStateAttributePhaseListID:
-            result = @"PhaseList";
-            break;
 
-        case MTRAttributeIDTypeClusterOvenCavityOperationalStateAttributeCurrentPhaseID:
-            result = @"CurrentPhase";
-            break;
 
-        case MTRAttributeIDTypeClusterOvenCavityOperationalStateAttributeCountdownTimeID:
-            result = @"CountdownTime";
-            break;
+// Cluster OvenCavityOperationalState attributes
+            case MTRAttributeIDTypeClusterOvenCavityOperationalStateAttributePhaseListID:
+                result = @"PhaseList";
+                break;
 
-        case MTRAttributeIDTypeClusterOvenCavityOperationalStateAttributeOperationalStateListID:
-            result = @"OperationalStateList";
-            break;
+            case MTRAttributeIDTypeClusterOvenCavityOperationalStateAttributeCurrentPhaseID:
+                result = @"CurrentPhase";
+                break;
 
-        case MTRAttributeIDTypeClusterOvenCavityOperationalStateAttributeOperationalStateID:
-            result = @"OperationalState";
-            break;
+            case MTRAttributeIDTypeClusterOvenCavityOperationalStateAttributeCountdownTimeID:
+                result = @"CountdownTime";
+                break;
 
-        case MTRAttributeIDTypeClusterOvenCavityOperationalStateAttributeOperationalErrorID:
-            result = @"OperationalError";
-            break;
+            case MTRAttributeIDTypeClusterOvenCavityOperationalStateAttributeOperationalStateListID:
+                result = @"OperationalStateList";
+                break;
 
-        case MTRAttributeIDTypeClusterOvenCavityOperationalStateAttributeGeneratedCommandListID:
-            result = @"GeneratedCommandList";
-            break;
+            case MTRAttributeIDTypeClusterOvenCavityOperationalStateAttributeOperationalStateID:
+                result = @"OperationalState";
+                break;
 
-        case MTRAttributeIDTypeClusterOvenCavityOperationalStateAttributeAcceptedCommandListID:
-            result = @"AcceptedCommandList";
-            break;
+            case MTRAttributeIDTypeClusterOvenCavityOperationalStateAttributeOperationalErrorID:
+                result = @"OperationalError";
+                break;
 
-        case MTRAttributeIDTypeClusterOvenCavityOperationalStateAttributeEventListID:
-            result = @"EventList";
-            break;
+            case MTRAttributeIDTypeClusterOvenCavityOperationalStateAttributeGeneratedCommandListID:
+                result = @"GeneratedCommandList";
+                break;
 
-        case MTRAttributeIDTypeClusterOvenCavityOperationalStateAttributeAttributeListID:
-            result = @"AttributeList";
-            break;
+            case MTRAttributeIDTypeClusterOvenCavityOperationalStateAttributeAcceptedCommandListID:
+                result = @"AcceptedCommandList";
+                break;
 
-        case MTRAttributeIDTypeClusterOvenCavityOperationalStateAttributeFeatureMapID:
-            result = @"FeatureMap";
-            break;
+            case MTRAttributeIDTypeClusterOvenCavityOperationalStateAttributeEventListID:
+                result = @"EventList";
+                break;
 
-        case MTRAttributeIDTypeClusterOvenCavityOperationalStateAttributeClusterRevisionID:
-            result = @"ClusterRevision";
-            break;
+            case MTRAttributeIDTypeClusterOvenCavityOperationalStateAttributeAttributeListID:
+                result = @"AttributeList";
+                break;
 
-        default:
-            result = [NSString stringWithFormat:@"<Unknown attributeID %d>", attributeID];
-            break;
+            case MTRAttributeIDTypeClusterOvenCavityOperationalStateAttributeFeatureMapID:
+                result = @"FeatureMap";
+                break;
+
+            case MTRAttributeIDTypeClusterOvenCavityOperationalStateAttributeClusterRevisionID:
+                result = @"ClusterRevision";
+                break;
+
+
+            default:
+                result = [NSString stringWithFormat:@"<Unknown attributeID %d>", attributeID];
+                break;
         }
 
-    case MTRClusterIDTypeOvenModeID:
+case MTRClusterIDTypeOvenModeID:
 
-        switch (attributeID) {
+            switch (attributeID) {
 
-            // Cluster OvenMode attributes
-        case MTRAttributeIDTypeClusterOvenModeAttributeSupportedModesID:
-            result = @"SupportedModes";
-            break;
 
-        case MTRAttributeIDTypeClusterOvenModeAttributeCurrentModeID:
-            result = @"CurrentMode";
-            break;
 
-        case MTRAttributeIDTypeClusterOvenModeAttributeStartUpModeID:
-            result = @"StartUpMode";
-            break;
+// Cluster OvenMode attributes
+            case MTRAttributeIDTypeClusterOvenModeAttributeSupportedModesID:
+                result = @"SupportedModes";
+                break;
 
-        case MTRAttributeIDTypeClusterOvenModeAttributeOnModeID:
-            result = @"OnMode";
-            break;
+            case MTRAttributeIDTypeClusterOvenModeAttributeCurrentModeID:
+                result = @"CurrentMode";
+                break;
 
-        case MTRAttributeIDTypeClusterOvenModeAttributeGeneratedCommandListID:
-            result = @"GeneratedCommandList";
-            break;
+            case MTRAttributeIDTypeClusterOvenModeAttributeStartUpModeID:
+                result = @"StartUpMode";
+                break;
 
-        case MTRAttributeIDTypeClusterOvenModeAttributeAcceptedCommandListID:
-            result = @"AcceptedCommandList";
-            break;
+            case MTRAttributeIDTypeClusterOvenModeAttributeOnModeID:
+                result = @"OnMode";
+                break;
 
-        case MTRAttributeIDTypeClusterOvenModeAttributeEventListID:
-            result = @"EventList";
-            break;
+            case MTRAttributeIDTypeClusterOvenModeAttributeGeneratedCommandListID:
+                result = @"GeneratedCommandList";
+                break;
 
-        case MTRAttributeIDTypeClusterOvenModeAttributeAttributeListID:
-            result = @"AttributeList";
-            break;
+            case MTRAttributeIDTypeClusterOvenModeAttributeAcceptedCommandListID:
+                result = @"AcceptedCommandList";
+                break;
 
-        case MTRAttributeIDTypeClusterOvenModeAttributeFeatureMapID:
-            result = @"FeatureMap";
-            break;
+            case MTRAttributeIDTypeClusterOvenModeAttributeEventListID:
+                result = @"EventList";
+                break;
 
-        case MTRAttributeIDTypeClusterOvenModeAttributeClusterRevisionID:
-            result = @"ClusterRevision";
-            break;
+            case MTRAttributeIDTypeClusterOvenModeAttributeAttributeListID:
+                result = @"AttributeList";
+                break;
 
-        default:
-            result = [NSString stringWithFormat:@"<Unknown attributeID %d>", attributeID];
-            break;
+            case MTRAttributeIDTypeClusterOvenModeAttributeFeatureMapID:
+                result = @"FeatureMap";
+                break;
+
+            case MTRAttributeIDTypeClusterOvenModeAttributeClusterRevisionID:
+                result = @"ClusterRevision";
+                break;
+
+
+            default:
+                result = [NSString stringWithFormat:@"<Unknown attributeID %d>", attributeID];
+                break;
         }
 
-    case MTRClusterIDTypeLaundryDryerControlsID:
+case MTRClusterIDTypeLaundryDryerControlsID:
 
-        switch (attributeID) {
+            switch (attributeID) {
 
-            // Cluster LaundryDryerControls attributes
-        case MTRAttributeIDTypeClusterLaundryDryerControlsAttributeSupportedDrynessLevelsID:
-            result = @"SupportedDrynessLevels";
-            break;
 
-        case MTRAttributeIDTypeClusterLaundryDryerControlsAttributeSelectedDrynessLevelID:
-            result = @"SelectedDrynessLevel";
-            break;
 
-        case MTRAttributeIDTypeClusterLaundryDryerControlsAttributeGeneratedCommandListID:
-            result = @"GeneratedCommandList";
-            break;
+// Cluster LaundryDryerControls attributes
+            case MTRAttributeIDTypeClusterLaundryDryerControlsAttributeSupportedDrynessLevelsID:
+                result = @"SupportedDrynessLevels";
+                break;
 
-        case MTRAttributeIDTypeClusterLaundryDryerControlsAttributeAcceptedCommandListID:
-            result = @"AcceptedCommandList";
-            break;
+            case MTRAttributeIDTypeClusterLaundryDryerControlsAttributeSelectedDrynessLevelID:
+                result = @"SelectedDrynessLevel";
+                break;
 
-        case MTRAttributeIDTypeClusterLaundryDryerControlsAttributeEventListID:
-            result = @"EventList";
-            break;
+            case MTRAttributeIDTypeClusterLaundryDryerControlsAttributeGeneratedCommandListID:
+                result = @"GeneratedCommandList";
+                break;
 
-        case MTRAttributeIDTypeClusterLaundryDryerControlsAttributeAttributeListID:
-            result = @"AttributeList";
-            break;
+            case MTRAttributeIDTypeClusterLaundryDryerControlsAttributeAcceptedCommandListID:
+                result = @"AcceptedCommandList";
+                break;
 
-        case MTRAttributeIDTypeClusterLaundryDryerControlsAttributeFeatureMapID:
-            result = @"FeatureMap";
-            break;
+            case MTRAttributeIDTypeClusterLaundryDryerControlsAttributeEventListID:
+                result = @"EventList";
+                break;
 
-        case MTRAttributeIDTypeClusterLaundryDryerControlsAttributeClusterRevisionID:
-            result = @"ClusterRevision";
-            break;
+            case MTRAttributeIDTypeClusterLaundryDryerControlsAttributeAttributeListID:
+                result = @"AttributeList";
+                break;
 
-        default:
-            result = [NSString stringWithFormat:@"<Unknown attributeID %d>", attributeID];
-            break;
+            case MTRAttributeIDTypeClusterLaundryDryerControlsAttributeFeatureMapID:
+                result = @"FeatureMap";
+                break;
+
+            case MTRAttributeIDTypeClusterLaundryDryerControlsAttributeClusterRevisionID:
+                result = @"ClusterRevision";
+                break;
+
+
+            default:
+                result = [NSString stringWithFormat:@"<Unknown attributeID %d>", attributeID];
+                break;
         }
 
-    case MTRClusterIDTypeModeSelectID:
+case MTRClusterIDTypeModeSelectID:
 
-        switch (attributeID) {
+            switch (attributeID) {
 
-            // Cluster ModeSelect attributes
-        case MTRAttributeIDTypeClusterModeSelectAttributeDescriptionID:
-            result = @"Description";
-            break;
 
-        case MTRAttributeIDTypeClusterModeSelectAttributeStandardNamespaceID:
-            result = @"StandardNamespace";
-            break;
 
-        case MTRAttributeIDTypeClusterModeSelectAttributeSupportedModesID:
-            result = @"SupportedModes";
-            break;
+// Cluster ModeSelect attributes
+            case MTRAttributeIDTypeClusterModeSelectAttributeDescriptionID:
+                result = @"Description";
+                break;
 
-        case MTRAttributeIDTypeClusterModeSelectAttributeCurrentModeID:
-            result = @"CurrentMode";
-            break;
+            case MTRAttributeIDTypeClusterModeSelectAttributeStandardNamespaceID:
+                result = @"StandardNamespace";
+                break;
 
-        case MTRAttributeIDTypeClusterModeSelectAttributeStartUpModeID:
-            result = @"StartUpMode";
-            break;
+            case MTRAttributeIDTypeClusterModeSelectAttributeSupportedModesID:
+                result = @"SupportedModes";
+                break;
 
-        case MTRAttributeIDTypeClusterModeSelectAttributeOnModeID:
-            result = @"OnMode";
-            break;
+            case MTRAttributeIDTypeClusterModeSelectAttributeCurrentModeID:
+                result = @"CurrentMode";
+                break;
 
-        case MTRAttributeIDTypeClusterModeSelectAttributeGeneratedCommandListID:
-            result = @"GeneratedCommandList";
-            break;
+            case MTRAttributeIDTypeClusterModeSelectAttributeStartUpModeID:
+                result = @"StartUpMode";
+                break;
 
-        case MTRAttributeIDTypeClusterModeSelectAttributeAcceptedCommandListID:
-            result = @"AcceptedCommandList";
-            break;
+            case MTRAttributeIDTypeClusterModeSelectAttributeOnModeID:
+                result = @"OnMode";
+                break;
 
-        case MTRAttributeIDTypeClusterModeSelectAttributeEventListID:
-            result = @"EventList";
-            break;
+            case MTRAttributeIDTypeClusterModeSelectAttributeGeneratedCommandListID:
+                result = @"GeneratedCommandList";
+                break;
 
-        case MTRAttributeIDTypeClusterModeSelectAttributeAttributeListID:
-            result = @"AttributeList";
-            break;
+            case MTRAttributeIDTypeClusterModeSelectAttributeAcceptedCommandListID:
+                result = @"AcceptedCommandList";
+                break;
 
-        case MTRAttributeIDTypeClusterModeSelectAttributeFeatureMapID:
-            result = @"FeatureMap";
-            break;
+            case MTRAttributeIDTypeClusterModeSelectAttributeEventListID:
+                result = @"EventList";
+                break;
 
-        case MTRAttributeIDTypeClusterModeSelectAttributeClusterRevisionID:
-            result = @"ClusterRevision";
-            break;
+            case MTRAttributeIDTypeClusterModeSelectAttributeAttributeListID:
+                result = @"AttributeList";
+                break;
 
-        default:
-            result = [NSString stringWithFormat:@"<Unknown attributeID %d>", attributeID];
-            break;
+            case MTRAttributeIDTypeClusterModeSelectAttributeFeatureMapID:
+                result = @"FeatureMap";
+                break;
+
+            case MTRAttributeIDTypeClusterModeSelectAttributeClusterRevisionID:
+                result = @"ClusterRevision";
+                break;
+
+
+            default:
+                result = [NSString stringWithFormat:@"<Unknown attributeID %d>", attributeID];
+                break;
         }
 
-    case MTRClusterIDTypeLaundryWasherModeID:
+case MTRClusterIDTypeLaundryWasherModeID:
 
-        switch (attributeID) {
+            switch (attributeID) {
 
-            // Cluster LaundryWasherMode attributes
-        case MTRAttributeIDTypeClusterLaundryWasherModeAttributeSupportedModesID:
-            result = @"SupportedModes";
-            break;
 
-        case MTRAttributeIDTypeClusterLaundryWasherModeAttributeCurrentModeID:
-            result = @"CurrentMode";
-            break;
 
-        case MTRAttributeIDTypeClusterLaundryWasherModeAttributeStartUpModeID:
-            result = @"StartUpMode";
-            break;
+// Cluster LaundryWasherMode attributes
+            case MTRAttributeIDTypeClusterLaundryWasherModeAttributeSupportedModesID:
+                result = @"SupportedModes";
+                break;
 
-        case MTRAttributeIDTypeClusterLaundryWasherModeAttributeOnModeID:
-            result = @"OnMode";
-            break;
+            case MTRAttributeIDTypeClusterLaundryWasherModeAttributeCurrentModeID:
+                result = @"CurrentMode";
+                break;
 
-        case MTRAttributeIDTypeClusterLaundryWasherModeAttributeGeneratedCommandListID:
-            result = @"GeneratedCommandList";
-            break;
+            case MTRAttributeIDTypeClusterLaundryWasherModeAttributeStartUpModeID:
+                result = @"StartUpMode";
+                break;
 
-        case MTRAttributeIDTypeClusterLaundryWasherModeAttributeAcceptedCommandListID:
-            result = @"AcceptedCommandList";
-            break;
+            case MTRAttributeIDTypeClusterLaundryWasherModeAttributeOnModeID:
+                result = @"OnMode";
+                break;
 
-        case MTRAttributeIDTypeClusterLaundryWasherModeAttributeEventListID:
-            result = @"EventList";
-            break;
+            case MTRAttributeIDTypeClusterLaundryWasherModeAttributeGeneratedCommandListID:
+                result = @"GeneratedCommandList";
+                break;
 
-        case MTRAttributeIDTypeClusterLaundryWasherModeAttributeAttributeListID:
-            result = @"AttributeList";
-            break;
+            case MTRAttributeIDTypeClusterLaundryWasherModeAttributeAcceptedCommandListID:
+                result = @"AcceptedCommandList";
+                break;
 
-        case MTRAttributeIDTypeClusterLaundryWasherModeAttributeFeatureMapID:
-            result = @"FeatureMap";
-            break;
+            case MTRAttributeIDTypeClusterLaundryWasherModeAttributeEventListID:
+                result = @"EventList";
+                break;
 
-        case MTRAttributeIDTypeClusterLaundryWasherModeAttributeClusterRevisionID:
-            result = @"ClusterRevision";
-            break;
+            case MTRAttributeIDTypeClusterLaundryWasherModeAttributeAttributeListID:
+                result = @"AttributeList";
+                break;
 
-        default:
-            result = [NSString stringWithFormat:@"<Unknown attributeID %d>", attributeID];
-            break;
+            case MTRAttributeIDTypeClusterLaundryWasherModeAttributeFeatureMapID:
+                result = @"FeatureMap";
+                break;
+
+            case MTRAttributeIDTypeClusterLaundryWasherModeAttributeClusterRevisionID:
+                result = @"ClusterRevision";
+                break;
+
+
+            default:
+                result = [NSString stringWithFormat:@"<Unknown attributeID %d>", attributeID];
+                break;
         }
 
-    case MTRClusterIDTypeRefrigeratorAndTemperatureControlledCabinetModeID:
+case MTRClusterIDTypeRefrigeratorAndTemperatureControlledCabinetModeID:
 
-        switch (attributeID) {
+            switch (attributeID) {
 
-            // Cluster RefrigeratorAndTemperatureControlledCabinetMode attributes
-        case MTRAttributeIDTypeClusterRefrigeratorAndTemperatureControlledCabinetModeAttributeSupportedModesID:
-            result = @"SupportedModes";
-            break;
 
-        case MTRAttributeIDTypeClusterRefrigeratorAndTemperatureControlledCabinetModeAttributeCurrentModeID:
-            result = @"CurrentMode";
-            break;
 
-        case MTRAttributeIDTypeClusterRefrigeratorAndTemperatureControlledCabinetModeAttributeStartUpModeID:
-            result = @"StartUpMode";
-            break;
+// Cluster RefrigeratorAndTemperatureControlledCabinetMode attributes
+            case MTRAttributeIDTypeClusterRefrigeratorAndTemperatureControlledCabinetModeAttributeSupportedModesID:
+                result = @"SupportedModes";
+                break;
 
-        case MTRAttributeIDTypeClusterRefrigeratorAndTemperatureControlledCabinetModeAttributeOnModeID:
-            result = @"OnMode";
-            break;
+            case MTRAttributeIDTypeClusterRefrigeratorAndTemperatureControlledCabinetModeAttributeCurrentModeID:
+                result = @"CurrentMode";
+                break;
 
-        case MTRAttributeIDTypeClusterRefrigeratorAndTemperatureControlledCabinetModeAttributeGeneratedCommandListID:
-            result = @"GeneratedCommandList";
-            break;
+            case MTRAttributeIDTypeClusterRefrigeratorAndTemperatureControlledCabinetModeAttributeStartUpModeID:
+                result = @"StartUpMode";
+                break;
 
-        case MTRAttributeIDTypeClusterRefrigeratorAndTemperatureControlledCabinetModeAttributeAcceptedCommandListID:
-            result = @"AcceptedCommandList";
-            break;
+            case MTRAttributeIDTypeClusterRefrigeratorAndTemperatureControlledCabinetModeAttributeOnModeID:
+                result = @"OnMode";
+                break;
 
-        case MTRAttributeIDTypeClusterRefrigeratorAndTemperatureControlledCabinetModeAttributeEventListID:
-            result = @"EventList";
-            break;
+            case MTRAttributeIDTypeClusterRefrigeratorAndTemperatureControlledCabinetModeAttributeGeneratedCommandListID:
+                result = @"GeneratedCommandList";
+                break;
 
-        case MTRAttributeIDTypeClusterRefrigeratorAndTemperatureControlledCabinetModeAttributeAttributeListID:
-            result = @"AttributeList";
-            break;
+            case MTRAttributeIDTypeClusterRefrigeratorAndTemperatureControlledCabinetModeAttributeAcceptedCommandListID:
+                result = @"AcceptedCommandList";
+                break;
 
-        case MTRAttributeIDTypeClusterRefrigeratorAndTemperatureControlledCabinetModeAttributeFeatureMapID:
-            result = @"FeatureMap";
-            break;
+            case MTRAttributeIDTypeClusterRefrigeratorAndTemperatureControlledCabinetModeAttributeEventListID:
+                result = @"EventList";
+                break;
 
-        case MTRAttributeIDTypeClusterRefrigeratorAndTemperatureControlledCabinetModeAttributeClusterRevisionID:
-            result = @"ClusterRevision";
-            break;
+            case MTRAttributeIDTypeClusterRefrigeratorAndTemperatureControlledCabinetModeAttributeAttributeListID:
+                result = @"AttributeList";
+                break;
 
-        default:
-            result = [NSString stringWithFormat:@"<Unknown attributeID %d>", attributeID];
-            break;
+            case MTRAttributeIDTypeClusterRefrigeratorAndTemperatureControlledCabinetModeAttributeFeatureMapID:
+                result = @"FeatureMap";
+                break;
+
+            case MTRAttributeIDTypeClusterRefrigeratorAndTemperatureControlledCabinetModeAttributeClusterRevisionID:
+                result = @"ClusterRevision";
+                break;
+
+
+            default:
+                result = [NSString stringWithFormat:@"<Unknown attributeID %d>", attributeID];
+                break;
         }
 
-    case MTRClusterIDTypeLaundryWasherControlsID:
+case MTRClusterIDTypeLaundryWasherControlsID:
 
-        switch (attributeID) {
+            switch (attributeID) {
 
-            // Cluster LaundryWasherControls attributes
-        case MTRAttributeIDTypeClusterLaundryWasherControlsAttributeSpinSpeedsID:
-            result = @"SpinSpeeds";
-            break;
 
-        case MTRAttributeIDTypeClusterLaundryWasherControlsAttributeSpinSpeedCurrentID:
-            result = @"SpinSpeedCurrent";
-            break;
 
-        case MTRAttributeIDTypeClusterLaundryWasherControlsAttributeNumberOfRinsesID:
-            result = @"NumberOfRinses";
-            break;
+// Cluster LaundryWasherControls attributes
+            case MTRAttributeIDTypeClusterLaundryWasherControlsAttributeSpinSpeedsID:
+                result = @"SpinSpeeds";
+                break;
 
-        case MTRAttributeIDTypeClusterLaundryWasherControlsAttributeSupportedRinsesID:
-            result = @"SupportedRinses";
-            break;
+            case MTRAttributeIDTypeClusterLaundryWasherControlsAttributeSpinSpeedCurrentID:
+                result = @"SpinSpeedCurrent";
+                break;
 
-        case MTRAttributeIDTypeClusterLaundryWasherControlsAttributeGeneratedCommandListID:
-            result = @"GeneratedCommandList";
-            break;
+            case MTRAttributeIDTypeClusterLaundryWasherControlsAttributeNumberOfRinsesID:
+                result = @"NumberOfRinses";
+                break;
 
-        case MTRAttributeIDTypeClusterLaundryWasherControlsAttributeAcceptedCommandListID:
-            result = @"AcceptedCommandList";
-            break;
+            case MTRAttributeIDTypeClusterLaundryWasherControlsAttributeSupportedRinsesID:
+                result = @"SupportedRinses";
+                break;
 
-        case MTRAttributeIDTypeClusterLaundryWasherControlsAttributeEventListID:
-            result = @"EventList";
-            break;
+            case MTRAttributeIDTypeClusterLaundryWasherControlsAttributeGeneratedCommandListID:
+                result = @"GeneratedCommandList";
+                break;
 
-        case MTRAttributeIDTypeClusterLaundryWasherControlsAttributeAttributeListID:
-            result = @"AttributeList";
-            break;
+            case MTRAttributeIDTypeClusterLaundryWasherControlsAttributeAcceptedCommandListID:
+                result = @"AcceptedCommandList";
+                break;
 
-        case MTRAttributeIDTypeClusterLaundryWasherControlsAttributeFeatureMapID:
-            result = @"FeatureMap";
-            break;
+            case MTRAttributeIDTypeClusterLaundryWasherControlsAttributeEventListID:
+                result = @"EventList";
+                break;
 
-        case MTRAttributeIDTypeClusterLaundryWasherControlsAttributeClusterRevisionID:
-            result = @"ClusterRevision";
-            break;
+            case MTRAttributeIDTypeClusterLaundryWasherControlsAttributeAttributeListID:
+                result = @"AttributeList";
+                break;
 
-        default:
-            result = [NSString stringWithFormat:@"<Unknown attributeID %d>", attributeID];
-            break;
+            case MTRAttributeIDTypeClusterLaundryWasherControlsAttributeFeatureMapID:
+                result = @"FeatureMap";
+                break;
+
+            case MTRAttributeIDTypeClusterLaundryWasherControlsAttributeClusterRevisionID:
+                result = @"ClusterRevision";
+                break;
+
+
+            default:
+                result = [NSString stringWithFormat:@"<Unknown attributeID %d>", attributeID];
+                break;
         }
 
-    case MTRClusterIDTypeRVCRunModeID:
+case MTRClusterIDTypeRVCRunModeID:
 
-        switch (attributeID) {
+            switch (attributeID) {
 
-            // Cluster RVCRunMode attributes
-        case MTRAttributeIDTypeClusterRVCRunModeAttributeSupportedModesID:
-            result = @"SupportedModes";
-            break;
 
-        case MTRAttributeIDTypeClusterRVCRunModeAttributeCurrentModeID:
-            result = @"CurrentMode";
-            break;
 
-        case MTRAttributeIDTypeClusterRVCRunModeAttributeGeneratedCommandListID:
-            result = @"GeneratedCommandList";
-            break;
+// Cluster RVCRunMode attributes
+            case MTRAttributeIDTypeClusterRVCRunModeAttributeSupportedModesID:
+                result = @"SupportedModes";
+                break;
 
-        case MTRAttributeIDTypeClusterRVCRunModeAttributeAcceptedCommandListID:
-            result = @"AcceptedCommandList";
-            break;
+            case MTRAttributeIDTypeClusterRVCRunModeAttributeCurrentModeID:
+                result = @"CurrentMode";
+                break;
 
-        case MTRAttributeIDTypeClusterRVCRunModeAttributeEventListID:
-            result = @"EventList";
-            break;
+            case MTRAttributeIDTypeClusterRVCRunModeAttributeGeneratedCommandListID:
+                result = @"GeneratedCommandList";
+                break;
 
-        case MTRAttributeIDTypeClusterRVCRunModeAttributeAttributeListID:
-            result = @"AttributeList";
-            break;
+            case MTRAttributeIDTypeClusterRVCRunModeAttributeAcceptedCommandListID:
+                result = @"AcceptedCommandList";
+                break;
 
-        case MTRAttributeIDTypeClusterRVCRunModeAttributeFeatureMapID:
-            result = @"FeatureMap";
-            break;
+            case MTRAttributeIDTypeClusterRVCRunModeAttributeEventListID:
+                result = @"EventList";
+                break;
 
-        case MTRAttributeIDTypeClusterRVCRunModeAttributeClusterRevisionID:
-            result = @"ClusterRevision";
-            break;
+            case MTRAttributeIDTypeClusterRVCRunModeAttributeAttributeListID:
+                result = @"AttributeList";
+                break;
 
-        default:
-            result = [NSString stringWithFormat:@"<Unknown attributeID %d>", attributeID];
-            break;
+            case MTRAttributeIDTypeClusterRVCRunModeAttributeFeatureMapID:
+                result = @"FeatureMap";
+                break;
+
+            case MTRAttributeIDTypeClusterRVCRunModeAttributeClusterRevisionID:
+                result = @"ClusterRevision";
+                break;
+
+
+            default:
+                result = [NSString stringWithFormat:@"<Unknown attributeID %d>", attributeID];
+                break;
         }
 
-    case MTRClusterIDTypeRVCCleanModeID:
+case MTRClusterIDTypeRVCCleanModeID:
 
-        switch (attributeID) {
+            switch (attributeID) {
 
-            // Cluster RVCCleanMode attributes
-        case MTRAttributeIDTypeClusterRVCCleanModeAttributeSupportedModesID:
-            result = @"SupportedModes";
-            break;
 
-        case MTRAttributeIDTypeClusterRVCCleanModeAttributeCurrentModeID:
-            result = @"CurrentMode";
-            break;
 
-        case MTRAttributeIDTypeClusterRVCCleanModeAttributeGeneratedCommandListID:
-            result = @"GeneratedCommandList";
-            break;
+// Cluster RVCCleanMode attributes
+            case MTRAttributeIDTypeClusterRVCCleanModeAttributeSupportedModesID:
+                result = @"SupportedModes";
+                break;
 
-        case MTRAttributeIDTypeClusterRVCCleanModeAttributeAcceptedCommandListID:
-            result = @"AcceptedCommandList";
-            break;
+            case MTRAttributeIDTypeClusterRVCCleanModeAttributeCurrentModeID:
+                result = @"CurrentMode";
+                break;
 
-        case MTRAttributeIDTypeClusterRVCCleanModeAttributeEventListID:
-            result = @"EventList";
-            break;
+            case MTRAttributeIDTypeClusterRVCCleanModeAttributeGeneratedCommandListID:
+                result = @"GeneratedCommandList";
+                break;
 
-        case MTRAttributeIDTypeClusterRVCCleanModeAttributeAttributeListID:
-            result = @"AttributeList";
-            break;
+            case MTRAttributeIDTypeClusterRVCCleanModeAttributeAcceptedCommandListID:
+                result = @"AcceptedCommandList";
+                break;
 
-        case MTRAttributeIDTypeClusterRVCCleanModeAttributeFeatureMapID:
-            result = @"FeatureMap";
-            break;
+            case MTRAttributeIDTypeClusterRVCCleanModeAttributeEventListID:
+                result = @"EventList";
+                break;
 
-        case MTRAttributeIDTypeClusterRVCCleanModeAttributeClusterRevisionID:
-            result = @"ClusterRevision";
-            break;
+            case MTRAttributeIDTypeClusterRVCCleanModeAttributeAttributeListID:
+                result = @"AttributeList";
+                break;
 
-        default:
-            result = [NSString stringWithFormat:@"<Unknown attributeID %d>", attributeID];
-            break;
+            case MTRAttributeIDTypeClusterRVCCleanModeAttributeFeatureMapID:
+                result = @"FeatureMap";
+                break;
+
+            case MTRAttributeIDTypeClusterRVCCleanModeAttributeClusterRevisionID:
+                result = @"ClusterRevision";
+                break;
+
+
+            default:
+                result = [NSString stringWithFormat:@"<Unknown attributeID %d>", attributeID];
+                break;
         }
 
-    case MTRClusterIDTypeTemperatureControlID:
+case MTRClusterIDTypeTemperatureControlID:
 
-        switch (attributeID) {
+            switch (attributeID) {
 
-            // Cluster TemperatureControl attributes
-        case MTRAttributeIDTypeClusterTemperatureControlAttributeTemperatureSetpointID:
-            result = @"TemperatureSetpoint";
-            break;
 
-        case MTRAttributeIDTypeClusterTemperatureControlAttributeMinTemperatureID:
-            result = @"MinTemperature";
-            break;
 
-        case MTRAttributeIDTypeClusterTemperatureControlAttributeMaxTemperatureID:
-            result = @"MaxTemperature";
-            break;
+// Cluster TemperatureControl attributes
+            case MTRAttributeIDTypeClusterTemperatureControlAttributeTemperatureSetpointID:
+                result = @"TemperatureSetpoint";
+                break;
 
-        case MTRAttributeIDTypeClusterTemperatureControlAttributeStepID:
-            result = @"Step";
-            break;
+            case MTRAttributeIDTypeClusterTemperatureControlAttributeMinTemperatureID:
+                result = @"MinTemperature";
+                break;
 
-        case MTRAttributeIDTypeClusterTemperatureControlAttributeSelectedTemperatureLevelID:
-            result = @"SelectedTemperatureLevel";
-            break;
+            case MTRAttributeIDTypeClusterTemperatureControlAttributeMaxTemperatureID:
+                result = @"MaxTemperature";
+                break;
 
-        case MTRAttributeIDTypeClusterTemperatureControlAttributeSupportedTemperatureLevelsID:
-            result = @"SupportedTemperatureLevels";
-            break;
+            case MTRAttributeIDTypeClusterTemperatureControlAttributeStepID:
+                result = @"Step";
+                break;
 
-        case MTRAttributeIDTypeClusterTemperatureControlAttributeGeneratedCommandListID:
-            result = @"GeneratedCommandList";
-            break;
+            case MTRAttributeIDTypeClusterTemperatureControlAttributeSelectedTemperatureLevelID:
+                result = @"SelectedTemperatureLevel";
+                break;
 
-        case MTRAttributeIDTypeClusterTemperatureControlAttributeAcceptedCommandListID:
-            result = @"AcceptedCommandList";
-            break;
+            case MTRAttributeIDTypeClusterTemperatureControlAttributeSupportedTemperatureLevelsID:
+                result = @"SupportedTemperatureLevels";
+                break;
 
-        case MTRAttributeIDTypeClusterTemperatureControlAttributeEventListID:
-            result = @"EventList";
-            break;
+            case MTRAttributeIDTypeClusterTemperatureControlAttributeGeneratedCommandListID:
+                result = @"GeneratedCommandList";
+                break;
 
-        case MTRAttributeIDTypeClusterTemperatureControlAttributeAttributeListID:
-            result = @"AttributeList";
-            break;
+            case MTRAttributeIDTypeClusterTemperatureControlAttributeAcceptedCommandListID:
+                result = @"AcceptedCommandList";
+                break;
 
-        case MTRAttributeIDTypeClusterTemperatureControlAttributeFeatureMapID:
-            result = @"FeatureMap";
-            break;
+            case MTRAttributeIDTypeClusterTemperatureControlAttributeEventListID:
+                result = @"EventList";
+                break;
 
-        case MTRAttributeIDTypeClusterTemperatureControlAttributeClusterRevisionID:
-            result = @"ClusterRevision";
-            break;
+            case MTRAttributeIDTypeClusterTemperatureControlAttributeAttributeListID:
+                result = @"AttributeList";
+                break;
 
-        default:
-            result = [NSString stringWithFormat:@"<Unknown attributeID %d>", attributeID];
-            break;
+            case MTRAttributeIDTypeClusterTemperatureControlAttributeFeatureMapID:
+                result = @"FeatureMap";
+                break;
+
+            case MTRAttributeIDTypeClusterTemperatureControlAttributeClusterRevisionID:
+                result = @"ClusterRevision";
+                break;
+
+
+            default:
+                result = [NSString stringWithFormat:@"<Unknown attributeID %d>", attributeID];
+                break;
         }
 
-    case MTRClusterIDTypeRefrigeratorAlarmID:
+case MTRClusterIDTypeRefrigeratorAlarmID:
 
-        switch (attributeID) {
+            switch (attributeID) {
 
-            // Cluster RefrigeratorAlarm attributes
-        case MTRAttributeIDTypeClusterRefrigeratorAlarmAttributeMaskID:
-            result = @"Mask";
-            break;
 
-        case MTRAttributeIDTypeClusterRefrigeratorAlarmAttributeStateID:
-            result = @"State";
-            break;
 
-        case MTRAttributeIDTypeClusterRefrigeratorAlarmAttributeSupportedID:
-            result = @"Supported";
-            break;
+// Cluster RefrigeratorAlarm attributes
+            case MTRAttributeIDTypeClusterRefrigeratorAlarmAttributeMaskID:
+                result = @"Mask";
+                break;
 
-        case MTRAttributeIDTypeClusterRefrigeratorAlarmAttributeGeneratedCommandListID:
-            result = @"GeneratedCommandList";
-            break;
+            case MTRAttributeIDTypeClusterRefrigeratorAlarmAttributeStateID:
+                result = @"State";
+                break;
 
-        case MTRAttributeIDTypeClusterRefrigeratorAlarmAttributeAcceptedCommandListID:
-            result = @"AcceptedCommandList";
-            break;
+            case MTRAttributeIDTypeClusterRefrigeratorAlarmAttributeSupportedID:
+                result = @"Supported";
+                break;
 
-        case MTRAttributeIDTypeClusterRefrigeratorAlarmAttributeEventListID:
-            result = @"EventList";
-            break;
+            case MTRAttributeIDTypeClusterRefrigeratorAlarmAttributeGeneratedCommandListID:
+                result = @"GeneratedCommandList";
+                break;
 
-        case MTRAttributeIDTypeClusterRefrigeratorAlarmAttributeAttributeListID:
-            result = @"AttributeList";
-            break;
+            case MTRAttributeIDTypeClusterRefrigeratorAlarmAttributeAcceptedCommandListID:
+                result = @"AcceptedCommandList";
+                break;
 
-        case MTRAttributeIDTypeClusterRefrigeratorAlarmAttributeFeatureMapID:
-            result = @"FeatureMap";
-            break;
+            case MTRAttributeIDTypeClusterRefrigeratorAlarmAttributeEventListID:
+                result = @"EventList";
+                break;
 
-        case MTRAttributeIDTypeClusterRefrigeratorAlarmAttributeClusterRevisionID:
-            result = @"ClusterRevision";
-            break;
+            case MTRAttributeIDTypeClusterRefrigeratorAlarmAttributeAttributeListID:
+                result = @"AttributeList";
+                break;
 
-        default:
-            result = [NSString stringWithFormat:@"<Unknown attributeID %d>", attributeID];
-            break;
+            case MTRAttributeIDTypeClusterRefrigeratorAlarmAttributeFeatureMapID:
+                result = @"FeatureMap";
+                break;
+
+            case MTRAttributeIDTypeClusterRefrigeratorAlarmAttributeClusterRevisionID:
+                result = @"ClusterRevision";
+                break;
+
+
+            default:
+                result = [NSString stringWithFormat:@"<Unknown attributeID %d>", attributeID];
+                break;
         }
 
-    case MTRClusterIDTypeDishwasherModeID:
+case MTRClusterIDTypeDishwasherModeID:
 
-        switch (attributeID) {
+            switch (attributeID) {
 
-            // Cluster DishwasherMode attributes
-        case MTRAttributeIDTypeClusterDishwasherModeAttributeSupportedModesID:
-            result = @"SupportedModes";
-            break;
 
-        case MTRAttributeIDTypeClusterDishwasherModeAttributeCurrentModeID:
-            result = @"CurrentMode";
-            break;
 
-        case MTRAttributeIDTypeClusterDishwasherModeAttributeStartUpModeID:
-            result = @"StartUpMode";
-            break;
+// Cluster DishwasherMode attributes
+            case MTRAttributeIDTypeClusterDishwasherModeAttributeSupportedModesID:
+                result = @"SupportedModes";
+                break;
 
-        case MTRAttributeIDTypeClusterDishwasherModeAttributeOnModeID:
-            result = @"OnMode";
-            break;
+            case MTRAttributeIDTypeClusterDishwasherModeAttributeCurrentModeID:
+                result = @"CurrentMode";
+                break;
 
-        case MTRAttributeIDTypeClusterDishwasherModeAttributeGeneratedCommandListID:
-            result = @"GeneratedCommandList";
-            break;
+            case MTRAttributeIDTypeClusterDishwasherModeAttributeStartUpModeID:
+                result = @"StartUpMode";
+                break;
 
-        case MTRAttributeIDTypeClusterDishwasherModeAttributeAcceptedCommandListID:
-            result = @"AcceptedCommandList";
-            break;
+            case MTRAttributeIDTypeClusterDishwasherModeAttributeOnModeID:
+                result = @"OnMode";
+                break;
 
-        case MTRAttributeIDTypeClusterDishwasherModeAttributeEventListID:
-            result = @"EventList";
-            break;
+            case MTRAttributeIDTypeClusterDishwasherModeAttributeGeneratedCommandListID:
+                result = @"GeneratedCommandList";
+                break;
 
-        case MTRAttributeIDTypeClusterDishwasherModeAttributeAttributeListID:
-            result = @"AttributeList";
-            break;
+            case MTRAttributeIDTypeClusterDishwasherModeAttributeAcceptedCommandListID:
+                result = @"AcceptedCommandList";
+                break;
 
-        case MTRAttributeIDTypeClusterDishwasherModeAttributeFeatureMapID:
-            result = @"FeatureMap";
-            break;
+            case MTRAttributeIDTypeClusterDishwasherModeAttributeEventListID:
+                result = @"EventList";
+                break;
 
-        case MTRAttributeIDTypeClusterDishwasherModeAttributeClusterRevisionID:
-            result = @"ClusterRevision";
-            break;
+            case MTRAttributeIDTypeClusterDishwasherModeAttributeAttributeListID:
+                result = @"AttributeList";
+                break;
 
-        default:
-            result = [NSString stringWithFormat:@"<Unknown attributeID %d>", attributeID];
-            break;
+            case MTRAttributeIDTypeClusterDishwasherModeAttributeFeatureMapID:
+                result = @"FeatureMap";
+                break;
+
+            case MTRAttributeIDTypeClusterDishwasherModeAttributeClusterRevisionID:
+                result = @"ClusterRevision";
+                break;
+
+
+            default:
+                result = [NSString stringWithFormat:@"<Unknown attributeID %d>", attributeID];
+                break;
         }
 
-    case MTRClusterIDTypeAirQualityID:
+case MTRClusterIDTypeAirQualityID:
 
-        switch (attributeID) {
+            switch (attributeID) {
 
-            // Cluster AirQuality attributes
-        case MTRAttributeIDTypeClusterAirQualityAttributeAirQualityID:
-            result = @"AirQuality";
-            break;
 
-        case MTRAttributeIDTypeClusterAirQualityAttributeGeneratedCommandListID:
-            result = @"GeneratedCommandList";
-            break;
 
-        case MTRAttributeIDTypeClusterAirQualityAttributeAcceptedCommandListID:
-            result = @"AcceptedCommandList";
-            break;
+// Cluster AirQuality attributes
+            case MTRAttributeIDTypeClusterAirQualityAttributeAirQualityID:
+                result = @"AirQuality";
+                break;
 
-        case MTRAttributeIDTypeClusterAirQualityAttributeEventListID:
-            result = @"EventList";
-            break;
+            case MTRAttributeIDTypeClusterAirQualityAttributeGeneratedCommandListID:
+                result = @"GeneratedCommandList";
+                break;
 
-        case MTRAttributeIDTypeClusterAirQualityAttributeAttributeListID:
-            result = @"AttributeList";
-            break;
+            case MTRAttributeIDTypeClusterAirQualityAttributeAcceptedCommandListID:
+                result = @"AcceptedCommandList";
+                break;
 
-        case MTRAttributeIDTypeClusterAirQualityAttributeFeatureMapID:
-            result = @"FeatureMap";
-            break;
+            case MTRAttributeIDTypeClusterAirQualityAttributeEventListID:
+                result = @"EventList";
+                break;
 
-        case MTRAttributeIDTypeClusterAirQualityAttributeClusterRevisionID:
-            result = @"ClusterRevision";
-            break;
+            case MTRAttributeIDTypeClusterAirQualityAttributeAttributeListID:
+                result = @"AttributeList";
+                break;
 
-        default:
-            result = [NSString stringWithFormat:@"<Unknown attributeID %d>", attributeID];
-            break;
+            case MTRAttributeIDTypeClusterAirQualityAttributeFeatureMapID:
+                result = @"FeatureMap";
+                break;
+
+            case MTRAttributeIDTypeClusterAirQualityAttributeClusterRevisionID:
+                result = @"ClusterRevision";
+                break;
+
+
+            default:
+                result = [NSString stringWithFormat:@"<Unknown attributeID %d>", attributeID];
+                break;
         }
 
-    case MTRClusterIDTypeSmokeCOAlarmID:
+case MTRClusterIDTypeSmokeCOAlarmID:
 
-        switch (attributeID) {
+            switch (attributeID) {
 
-            // Cluster SmokeCOAlarm attributes
-        case MTRAttributeIDTypeClusterSmokeCOAlarmAttributeExpressedStateID:
-            result = @"ExpressedState";
-            break;
 
-        case MTRAttributeIDTypeClusterSmokeCOAlarmAttributeSmokeStateID:
-            result = @"SmokeState";
-            break;
 
-        case MTRAttributeIDTypeClusterSmokeCOAlarmAttributeCOStateID:
-            result = @"COState";
-            break;
+// Cluster SmokeCOAlarm attributes
+            case MTRAttributeIDTypeClusterSmokeCOAlarmAttributeExpressedStateID:
+                result = @"ExpressedState";
+                break;
 
-        case MTRAttributeIDTypeClusterSmokeCOAlarmAttributeBatteryAlertID:
-            result = @"BatteryAlert";
-            break;
+            case MTRAttributeIDTypeClusterSmokeCOAlarmAttributeSmokeStateID:
+                result = @"SmokeState";
+                break;
 
-        case MTRAttributeIDTypeClusterSmokeCOAlarmAttributeDeviceMutedID:
-            result = @"DeviceMuted";
-            break;
+            case MTRAttributeIDTypeClusterSmokeCOAlarmAttributeCOStateID:
+                result = @"COState";
+                break;
 
-        case MTRAttributeIDTypeClusterSmokeCOAlarmAttributeTestInProgressID:
-            result = @"TestInProgress";
-            break;
+            case MTRAttributeIDTypeClusterSmokeCOAlarmAttributeBatteryAlertID:
+                result = @"BatteryAlert";
+                break;
 
-        case MTRAttributeIDTypeClusterSmokeCOAlarmAttributeHardwareFaultAlertID:
-            result = @"HardwareFaultAlert";
-            break;
+            case MTRAttributeIDTypeClusterSmokeCOAlarmAttributeDeviceMutedID:
+                result = @"DeviceMuted";
+                break;
 
-        case MTRAttributeIDTypeClusterSmokeCOAlarmAttributeEndOfServiceAlertID:
-            result = @"EndOfServiceAlert";
-            break;
+            case MTRAttributeIDTypeClusterSmokeCOAlarmAttributeTestInProgressID:
+                result = @"TestInProgress";
+                break;
 
-        case MTRAttributeIDTypeClusterSmokeCOAlarmAttributeInterconnectSmokeAlarmID:
-            result = @"InterconnectSmokeAlarm";
-            break;
+            case MTRAttributeIDTypeClusterSmokeCOAlarmAttributeHardwareFaultAlertID:
+                result = @"HardwareFaultAlert";
+                break;
 
-        case MTRAttributeIDTypeClusterSmokeCOAlarmAttributeInterconnectCOAlarmID:
-            result = @"InterconnectCOAlarm";
-            break;
+            case MTRAttributeIDTypeClusterSmokeCOAlarmAttributeEndOfServiceAlertID:
+                result = @"EndOfServiceAlert";
+                break;
 
-        case MTRAttributeIDTypeClusterSmokeCOAlarmAttributeContaminationStateID:
-            result = @"ContaminationState";
-            break;
+            case MTRAttributeIDTypeClusterSmokeCOAlarmAttributeInterconnectSmokeAlarmID:
+                result = @"InterconnectSmokeAlarm";
+                break;
 
-        case MTRAttributeIDTypeClusterSmokeCOAlarmAttributeSmokeSensitivityLevelID:
-            result = @"SmokeSensitivityLevel";
-            break;
+            case MTRAttributeIDTypeClusterSmokeCOAlarmAttributeInterconnectCOAlarmID:
+                result = @"InterconnectCOAlarm";
+                break;
 
-        case MTRAttributeIDTypeClusterSmokeCOAlarmAttributeExpiryDateID:
-            result = @"ExpiryDate";
-            break;
+            case MTRAttributeIDTypeClusterSmokeCOAlarmAttributeContaminationStateID:
+                result = @"ContaminationState";
+                break;
 
-        case MTRAttributeIDTypeClusterSmokeCOAlarmAttributeGeneratedCommandListID:
-            result = @"GeneratedCommandList";
-            break;
+            case MTRAttributeIDTypeClusterSmokeCOAlarmAttributeSmokeSensitivityLevelID:
+                result = @"SmokeSensitivityLevel";
+                break;
 
-        case MTRAttributeIDTypeClusterSmokeCOAlarmAttributeAcceptedCommandListID:
-            result = @"AcceptedCommandList";
-            break;
+            case MTRAttributeIDTypeClusterSmokeCOAlarmAttributeExpiryDateID:
+                result = @"ExpiryDate";
+                break;
 
-        case MTRAttributeIDTypeClusterSmokeCOAlarmAttributeEventListID:
-            result = @"EventList";
-            break;
+            case MTRAttributeIDTypeClusterSmokeCOAlarmAttributeGeneratedCommandListID:
+                result = @"GeneratedCommandList";
+                break;
 
-        case MTRAttributeIDTypeClusterSmokeCOAlarmAttributeAttributeListID:
-            result = @"AttributeList";
-            break;
+            case MTRAttributeIDTypeClusterSmokeCOAlarmAttributeAcceptedCommandListID:
+                result = @"AcceptedCommandList";
+                break;
 
-        case MTRAttributeIDTypeClusterSmokeCOAlarmAttributeFeatureMapID:
-            result = @"FeatureMap";
-            break;
+            case MTRAttributeIDTypeClusterSmokeCOAlarmAttributeEventListID:
+                result = @"EventList";
+                break;
 
-        case MTRAttributeIDTypeClusterSmokeCOAlarmAttributeClusterRevisionID:
-            result = @"ClusterRevision";
-            break;
+            case MTRAttributeIDTypeClusterSmokeCOAlarmAttributeAttributeListID:
+                result = @"AttributeList";
+                break;
 
-        default:
-            result = [NSString stringWithFormat:@"<Unknown attributeID %d>", attributeID];
-            break;
+            case MTRAttributeIDTypeClusterSmokeCOAlarmAttributeFeatureMapID:
+                result = @"FeatureMap";
+                break;
+
+            case MTRAttributeIDTypeClusterSmokeCOAlarmAttributeClusterRevisionID:
+                result = @"ClusterRevision";
+                break;
+
+
+            default:
+                result = [NSString stringWithFormat:@"<Unknown attributeID %d>", attributeID];
+                break;
         }
 
-    case MTRClusterIDTypeDishwasherAlarmID:
+case MTRClusterIDTypeDishwasherAlarmID:
 
-        switch (attributeID) {
+            switch (attributeID) {
 
-            // Cluster DishwasherAlarm attributes
-        case MTRAttributeIDTypeClusterDishwasherAlarmAttributeMaskID:
-            result = @"Mask";
-            break;
 
-        case MTRAttributeIDTypeClusterDishwasherAlarmAttributeLatchID:
-            result = @"Latch";
-            break;
 
-        case MTRAttributeIDTypeClusterDishwasherAlarmAttributeStateID:
-            result = @"State";
-            break;
+// Cluster DishwasherAlarm attributes
+            case MTRAttributeIDTypeClusterDishwasherAlarmAttributeMaskID:
+                result = @"Mask";
+                break;
 
-        case MTRAttributeIDTypeClusterDishwasherAlarmAttributeSupportedID:
-            result = @"Supported";
-            break;
+            case MTRAttributeIDTypeClusterDishwasherAlarmAttributeLatchID:
+                result = @"Latch";
+                break;
 
-        case MTRAttributeIDTypeClusterDishwasherAlarmAttributeGeneratedCommandListID:
-            result = @"GeneratedCommandList";
-            break;
+            case MTRAttributeIDTypeClusterDishwasherAlarmAttributeStateID:
+                result = @"State";
+                break;
 
-        case MTRAttributeIDTypeClusterDishwasherAlarmAttributeAcceptedCommandListID:
-            result = @"AcceptedCommandList";
-            break;
+            case MTRAttributeIDTypeClusterDishwasherAlarmAttributeSupportedID:
+                result = @"Supported";
+                break;
 
-        case MTRAttributeIDTypeClusterDishwasherAlarmAttributeEventListID:
-            result = @"EventList";
-            break;
+            case MTRAttributeIDTypeClusterDishwasherAlarmAttributeGeneratedCommandListID:
+                result = @"GeneratedCommandList";
+                break;
 
-        case MTRAttributeIDTypeClusterDishwasherAlarmAttributeAttributeListID:
-            result = @"AttributeList";
-            break;
+            case MTRAttributeIDTypeClusterDishwasherAlarmAttributeAcceptedCommandListID:
+                result = @"AcceptedCommandList";
+                break;
 
-        case MTRAttributeIDTypeClusterDishwasherAlarmAttributeFeatureMapID:
-            result = @"FeatureMap";
-            break;
+            case MTRAttributeIDTypeClusterDishwasherAlarmAttributeEventListID:
+                result = @"EventList";
+                break;
 
-        case MTRAttributeIDTypeClusterDishwasherAlarmAttributeClusterRevisionID:
-            result = @"ClusterRevision";
-            break;
+            case MTRAttributeIDTypeClusterDishwasherAlarmAttributeAttributeListID:
+                result = @"AttributeList";
+                break;
 
-        default:
-            result = [NSString stringWithFormat:@"<Unknown attributeID %d>", attributeID];
-            break;
+            case MTRAttributeIDTypeClusterDishwasherAlarmAttributeFeatureMapID:
+                result = @"FeatureMap";
+                break;
+
+            case MTRAttributeIDTypeClusterDishwasherAlarmAttributeClusterRevisionID:
+                result = @"ClusterRevision";
+                break;
+
+
+            default:
+                result = [NSString stringWithFormat:@"<Unknown attributeID %d>", attributeID];
+                break;
         }
 
-    case MTRClusterIDTypeMicrowaveOvenModeID:
+case MTRClusterIDTypeMicrowaveOvenModeID:
 
-        switch (attributeID) {
+            switch (attributeID) {
 
-            // Cluster MicrowaveOvenMode attributes
-        case MTRAttributeIDTypeClusterMicrowaveOvenModeAttributeSupportedModesID:
-            result = @"SupportedModes";
-            break;
 
-        case MTRAttributeIDTypeClusterMicrowaveOvenModeAttributeCurrentModeID:
-            result = @"CurrentMode";
-            break;
 
-        case MTRAttributeIDTypeClusterMicrowaveOvenModeAttributeGeneratedCommandListID:
-            result = @"GeneratedCommandList";
-            break;
+// Cluster MicrowaveOvenMode attributes
+            case MTRAttributeIDTypeClusterMicrowaveOvenModeAttributeSupportedModesID:
+                result = @"SupportedModes";
+                break;
 
-        case MTRAttributeIDTypeClusterMicrowaveOvenModeAttributeAcceptedCommandListID:
-            result = @"AcceptedCommandList";
-            break;
+            case MTRAttributeIDTypeClusterMicrowaveOvenModeAttributeCurrentModeID:
+                result = @"CurrentMode";
+                break;
 
-        case MTRAttributeIDTypeClusterMicrowaveOvenModeAttributeEventListID:
-            result = @"EventList";
-            break;
+            case MTRAttributeIDTypeClusterMicrowaveOvenModeAttributeGeneratedCommandListID:
+                result = @"GeneratedCommandList";
+                break;
 
-        case MTRAttributeIDTypeClusterMicrowaveOvenModeAttributeAttributeListID:
-            result = @"AttributeList";
-            break;
+            case MTRAttributeIDTypeClusterMicrowaveOvenModeAttributeAcceptedCommandListID:
+                result = @"AcceptedCommandList";
+                break;
 
-        case MTRAttributeIDTypeClusterMicrowaveOvenModeAttributeFeatureMapID:
-            result = @"FeatureMap";
-            break;
+            case MTRAttributeIDTypeClusterMicrowaveOvenModeAttributeEventListID:
+                result = @"EventList";
+                break;
 
-        case MTRAttributeIDTypeClusterMicrowaveOvenModeAttributeClusterRevisionID:
-            result = @"ClusterRevision";
-            break;
+            case MTRAttributeIDTypeClusterMicrowaveOvenModeAttributeAttributeListID:
+                result = @"AttributeList";
+                break;
 
-        default:
-            result = [NSString stringWithFormat:@"<Unknown attributeID %d>", attributeID];
-            break;
+            case MTRAttributeIDTypeClusterMicrowaveOvenModeAttributeFeatureMapID:
+                result = @"FeatureMap";
+                break;
+
+            case MTRAttributeIDTypeClusterMicrowaveOvenModeAttributeClusterRevisionID:
+                result = @"ClusterRevision";
+                break;
+
+
+            default:
+                result = [NSString stringWithFormat:@"<Unknown attributeID %d>", attributeID];
+                break;
         }
 
-    case MTRClusterIDTypeMicrowaveOvenControlID:
+case MTRClusterIDTypeMicrowaveOvenControlID:
 
-        switch (attributeID) {
+            switch (attributeID) {
 
-            // Cluster MicrowaveOvenControl attributes
-        case MTRAttributeIDTypeClusterMicrowaveOvenControlAttributeCookTimeID:
-            result = @"CookTime";
-            break;
 
-        case MTRAttributeIDTypeClusterMicrowaveOvenControlAttributeMaxCookTimeID:
-            result = @"MaxCookTime";
-            break;
 
-        case MTRAttributeIDTypeClusterMicrowaveOvenControlAttributePowerSettingID:
-            result = @"PowerSetting";
-            break;
+// Cluster MicrowaveOvenControl attributes
+            case MTRAttributeIDTypeClusterMicrowaveOvenControlAttributeCookTimeID:
+                result = @"CookTime";
+                break;
 
-        case MTRAttributeIDTypeClusterMicrowaveOvenControlAttributeMinPowerID:
-            result = @"MinPower";
-            break;
+            case MTRAttributeIDTypeClusterMicrowaveOvenControlAttributeMaxCookTimeID:
+                result = @"MaxCookTime";
+                break;
 
-        case MTRAttributeIDTypeClusterMicrowaveOvenControlAttributeMaxPowerID:
-            result = @"MaxPower";
-            break;
+            case MTRAttributeIDTypeClusterMicrowaveOvenControlAttributePowerSettingID:
+                result = @"PowerSetting";
+                break;
 
-        case MTRAttributeIDTypeClusterMicrowaveOvenControlAttributePowerStepID:
-            result = @"PowerStep";
-            break;
+            case MTRAttributeIDTypeClusterMicrowaveOvenControlAttributeMinPowerID:
+                result = @"MinPower";
+                break;
 
-        case MTRAttributeIDTypeClusterMicrowaveOvenControlAttributeSupportedWattsID:
-            result = @"SupportedWatts";
-            break;
+            case MTRAttributeIDTypeClusterMicrowaveOvenControlAttributeMaxPowerID:
+                result = @"MaxPower";
+                break;
 
-        case MTRAttributeIDTypeClusterMicrowaveOvenControlAttributeSelectedWattIndexID:
-            result = @"SelectedWattIndex";
-            break;
+            case MTRAttributeIDTypeClusterMicrowaveOvenControlAttributePowerStepID:
+                result = @"PowerStep";
+                break;
 
-        case MTRAttributeIDTypeClusterMicrowaveOvenControlAttributeWattRatingID:
-            result = @"WattRating";
-            break;
+            case MTRAttributeIDTypeClusterMicrowaveOvenControlAttributeSupportedWattsID:
+                result = @"SupportedWatts";
+                break;
 
-        case MTRAttributeIDTypeClusterMicrowaveOvenControlAttributeGeneratedCommandListID:
-            result = @"GeneratedCommandList";
-            break;
+            case MTRAttributeIDTypeClusterMicrowaveOvenControlAttributeSelectedWattIndexID:
+                result = @"SelectedWattIndex";
+                break;
 
-        case MTRAttributeIDTypeClusterMicrowaveOvenControlAttributeAcceptedCommandListID:
-            result = @"AcceptedCommandList";
-            break;
+            case MTRAttributeIDTypeClusterMicrowaveOvenControlAttributeWattRatingID:
+                result = @"WattRating";
+                break;
 
-        case MTRAttributeIDTypeClusterMicrowaveOvenControlAttributeEventListID:
-            result = @"EventList";
-            break;
+            case MTRAttributeIDTypeClusterMicrowaveOvenControlAttributeGeneratedCommandListID:
+                result = @"GeneratedCommandList";
+                break;
 
-        case MTRAttributeIDTypeClusterMicrowaveOvenControlAttributeAttributeListID:
-            result = @"AttributeList";
-            break;
+            case MTRAttributeIDTypeClusterMicrowaveOvenControlAttributeAcceptedCommandListID:
+                result = @"AcceptedCommandList";
+                break;
 
-        case MTRAttributeIDTypeClusterMicrowaveOvenControlAttributeFeatureMapID:
-            result = @"FeatureMap";
-            break;
+            case MTRAttributeIDTypeClusterMicrowaveOvenControlAttributeEventListID:
+                result = @"EventList";
+                break;
 
-        case MTRAttributeIDTypeClusterMicrowaveOvenControlAttributeClusterRevisionID:
-            result = @"ClusterRevision";
-            break;
+            case MTRAttributeIDTypeClusterMicrowaveOvenControlAttributeAttributeListID:
+                result = @"AttributeList";
+                break;
 
-        default:
-            result = [NSString stringWithFormat:@"<Unknown attributeID %d>", attributeID];
-            break;
+            case MTRAttributeIDTypeClusterMicrowaveOvenControlAttributeFeatureMapID:
+                result = @"FeatureMap";
+                break;
+
+            case MTRAttributeIDTypeClusterMicrowaveOvenControlAttributeClusterRevisionID:
+                result = @"ClusterRevision";
+                break;
+
+
+            default:
+                result = [NSString stringWithFormat:@"<Unknown attributeID %d>", attributeID];
+                break;
         }
 
-    case MTRClusterIDTypeOperationalStateID:
+case MTRClusterIDTypeOperationalStateID:
 
-        switch (attributeID) {
+            switch (attributeID) {
 
-            // Cluster OperationalState attributes
-        case MTRAttributeIDTypeClusterOperationalStateAttributePhaseListID:
-            result = @"PhaseList";
-            break;
 
-        case MTRAttributeIDTypeClusterOperationalStateAttributeCurrentPhaseID:
-            result = @"CurrentPhase";
-            break;
 
-        case MTRAttributeIDTypeClusterOperationalStateAttributeCountdownTimeID:
-            result = @"CountdownTime";
-            break;
+// Cluster OperationalState attributes
+            case MTRAttributeIDTypeClusterOperationalStateAttributePhaseListID:
+                result = @"PhaseList";
+                break;
 
-        case MTRAttributeIDTypeClusterOperationalStateAttributeOperationalStateListID:
-            result = @"OperationalStateList";
-            break;
+            case MTRAttributeIDTypeClusterOperationalStateAttributeCurrentPhaseID:
+                result = @"CurrentPhase";
+                break;
 
-        case MTRAttributeIDTypeClusterOperationalStateAttributeOperationalStateID:
-            result = @"OperationalState";
-            break;
+            case MTRAttributeIDTypeClusterOperationalStateAttributeCountdownTimeID:
+                result = @"CountdownTime";
+                break;
 
-        case MTRAttributeIDTypeClusterOperationalStateAttributeOperationalErrorID:
-            result = @"OperationalError";
-            break;
+            case MTRAttributeIDTypeClusterOperationalStateAttributeOperationalStateListID:
+                result = @"OperationalStateList";
+                break;
 
-        case MTRAttributeIDTypeClusterOperationalStateAttributeGeneratedCommandListID:
-            result = @"GeneratedCommandList";
-            break;
+            case MTRAttributeIDTypeClusterOperationalStateAttributeOperationalStateID:
+                result = @"OperationalState";
+                break;
 
-        case MTRAttributeIDTypeClusterOperationalStateAttributeAcceptedCommandListID:
-            result = @"AcceptedCommandList";
-            break;
+            case MTRAttributeIDTypeClusterOperationalStateAttributeOperationalErrorID:
+                result = @"OperationalError";
+                break;
 
-        case MTRAttributeIDTypeClusterOperationalStateAttributeEventListID:
-            result = @"EventList";
-            break;
+            case MTRAttributeIDTypeClusterOperationalStateAttributeGeneratedCommandListID:
+                result = @"GeneratedCommandList";
+                break;
 
-        case MTRAttributeIDTypeClusterOperationalStateAttributeAttributeListID:
-            result = @"AttributeList";
-            break;
+            case MTRAttributeIDTypeClusterOperationalStateAttributeAcceptedCommandListID:
+                result = @"AcceptedCommandList";
+                break;
 
-        case MTRAttributeIDTypeClusterOperationalStateAttributeFeatureMapID:
-            result = @"FeatureMap";
-            break;
+            case MTRAttributeIDTypeClusterOperationalStateAttributeEventListID:
+                result = @"EventList";
+                break;
 
-        case MTRAttributeIDTypeClusterOperationalStateAttributeClusterRevisionID:
-            result = @"ClusterRevision";
-            break;
+            case MTRAttributeIDTypeClusterOperationalStateAttributeAttributeListID:
+                result = @"AttributeList";
+                break;
 
-        default:
-            result = [NSString stringWithFormat:@"<Unknown attributeID %d>", attributeID];
-            break;
+            case MTRAttributeIDTypeClusterOperationalStateAttributeFeatureMapID:
+                result = @"FeatureMap";
+                break;
+
+            case MTRAttributeIDTypeClusterOperationalStateAttributeClusterRevisionID:
+                result = @"ClusterRevision";
+                break;
+
+
+            default:
+                result = [NSString stringWithFormat:@"<Unknown attributeID %d>", attributeID];
+                break;
         }
 
-    case MTRClusterIDTypeRVCOperationalStateID:
+case MTRClusterIDTypeRVCOperationalStateID:
 
-        switch (attributeID) {
+            switch (attributeID) {
 
-            // Cluster RVCOperationalState attributes
-        case MTRAttributeIDTypeClusterRVCOperationalStateAttributePhaseListID:
-            result = @"PhaseList";
-            break;
 
-        case MTRAttributeIDTypeClusterRVCOperationalStateAttributeCurrentPhaseID:
-            result = @"CurrentPhase";
-            break;
 
-        case MTRAttributeIDTypeClusterRVCOperationalStateAttributeCountdownTimeID:
-            result = @"CountdownTime";
-            break;
+// Cluster RVCOperationalState attributes
+            case MTRAttributeIDTypeClusterRVCOperationalStateAttributePhaseListID:
+                result = @"PhaseList";
+                break;
 
-        case MTRAttributeIDTypeClusterRVCOperationalStateAttributeOperationalStateListID:
-            result = @"OperationalStateList";
-            break;
+            case MTRAttributeIDTypeClusterRVCOperationalStateAttributeCurrentPhaseID:
+                result = @"CurrentPhase";
+                break;
 
-        case MTRAttributeIDTypeClusterRVCOperationalStateAttributeOperationalStateID:
-            result = @"OperationalState";
-            break;
+            case MTRAttributeIDTypeClusterRVCOperationalStateAttributeCountdownTimeID:
+                result = @"CountdownTime";
+                break;
 
-        case MTRAttributeIDTypeClusterRVCOperationalStateAttributeOperationalErrorID:
-            result = @"OperationalError";
-            break;
+            case MTRAttributeIDTypeClusterRVCOperationalStateAttributeOperationalStateListID:
+                result = @"OperationalStateList";
+                break;
 
-        case MTRAttributeIDTypeClusterRVCOperationalStateAttributeGeneratedCommandListID:
-            result = @"GeneratedCommandList";
-            break;
+            case MTRAttributeIDTypeClusterRVCOperationalStateAttributeOperationalStateID:
+                result = @"OperationalState";
+                break;
 
-        case MTRAttributeIDTypeClusterRVCOperationalStateAttributeAcceptedCommandListID:
-            result = @"AcceptedCommandList";
-            break;
+            case MTRAttributeIDTypeClusterRVCOperationalStateAttributeOperationalErrorID:
+                result = @"OperationalError";
+                break;
 
-        case MTRAttributeIDTypeClusterRVCOperationalStateAttributeEventListID:
-            result = @"EventList";
-            break;
+            case MTRAttributeIDTypeClusterRVCOperationalStateAttributeGeneratedCommandListID:
+                result = @"GeneratedCommandList";
+                break;
 
-        case MTRAttributeIDTypeClusterRVCOperationalStateAttributeAttributeListID:
-            result = @"AttributeList";
-            break;
+            case MTRAttributeIDTypeClusterRVCOperationalStateAttributeAcceptedCommandListID:
+                result = @"AcceptedCommandList";
+                break;
 
-        case MTRAttributeIDTypeClusterRVCOperationalStateAttributeFeatureMapID:
-            result = @"FeatureMap";
-            break;
+            case MTRAttributeIDTypeClusterRVCOperationalStateAttributeEventListID:
+                result = @"EventList";
+                break;
 
-        case MTRAttributeIDTypeClusterRVCOperationalStateAttributeClusterRevisionID:
-            result = @"ClusterRevision";
-            break;
+            case MTRAttributeIDTypeClusterRVCOperationalStateAttributeAttributeListID:
+                result = @"AttributeList";
+                break;
 
-        default:
-            result = [NSString stringWithFormat:@"<Unknown attributeID %d>", attributeID];
-            break;
+            case MTRAttributeIDTypeClusterRVCOperationalStateAttributeFeatureMapID:
+                result = @"FeatureMap";
+                break;
+
+            case MTRAttributeIDTypeClusterRVCOperationalStateAttributeClusterRevisionID:
+                result = @"ClusterRevision";
+                break;
+
+
+            default:
+                result = [NSString stringWithFormat:@"<Unknown attributeID %d>", attributeID];
+                break;
         }
 
-    case MTRClusterIDTypeScenesManagementID:
+case MTRClusterIDTypeScenesManagementID:
 
-        switch (attributeID) {
+            switch (attributeID) {
 
-            // Cluster ScenesManagement attributes
-        case MTRAttributeIDTypeClusterScenesManagementAttributeLastConfiguredByID:
-            result = @"LastConfiguredBy";
-            break;
 
-        case MTRAttributeIDTypeClusterScenesManagementAttributeSceneTableSizeID:
-            result = @"SceneTableSize";
-            break;
 
-        case MTRAttributeIDTypeClusterScenesManagementAttributeFabricSceneInfoID:
-            result = @"FabricSceneInfo";
-            break;
+// Cluster ScenesManagement attributes
+            case MTRAttributeIDTypeClusterScenesManagementAttributeLastConfiguredByID:
+                result = @"LastConfiguredBy";
+                break;
 
-        case MTRAttributeIDTypeClusterScenesManagementAttributeGeneratedCommandListID:
-            result = @"GeneratedCommandList";
-            break;
+            case MTRAttributeIDTypeClusterScenesManagementAttributeSceneTableSizeID:
+                result = @"SceneTableSize";
+                break;
 
-        case MTRAttributeIDTypeClusterScenesManagementAttributeAcceptedCommandListID:
-            result = @"AcceptedCommandList";
-            break;
+            case MTRAttributeIDTypeClusterScenesManagementAttributeFabricSceneInfoID:
+                result = @"FabricSceneInfo";
+                break;
 
-        case MTRAttributeIDTypeClusterScenesManagementAttributeEventListID:
-            result = @"EventList";
-            break;
+            case MTRAttributeIDTypeClusterScenesManagementAttributeGeneratedCommandListID:
+                result = @"GeneratedCommandList";
+                break;
 
-        case MTRAttributeIDTypeClusterScenesManagementAttributeAttributeListID:
-            result = @"AttributeList";
-            break;
+            case MTRAttributeIDTypeClusterScenesManagementAttributeAcceptedCommandListID:
+                result = @"AcceptedCommandList";
+                break;
 
-        case MTRAttributeIDTypeClusterScenesManagementAttributeFeatureMapID:
-            result = @"FeatureMap";
-            break;
+            case MTRAttributeIDTypeClusterScenesManagementAttributeEventListID:
+                result = @"EventList";
+                break;
 
-        case MTRAttributeIDTypeClusterScenesManagementAttributeClusterRevisionID:
-            result = @"ClusterRevision";
-            break;
+            case MTRAttributeIDTypeClusterScenesManagementAttributeAttributeListID:
+                result = @"AttributeList";
+                break;
 
-        default:
-            result = [NSString stringWithFormat:@"<Unknown attributeID %d>", attributeID];
-            break;
+            case MTRAttributeIDTypeClusterScenesManagementAttributeFeatureMapID:
+                result = @"FeatureMap";
+                break;
+
+            case MTRAttributeIDTypeClusterScenesManagementAttributeClusterRevisionID:
+                result = @"ClusterRevision";
+                break;
+
+
+            default:
+                result = [NSString stringWithFormat:@"<Unknown attributeID %d>", attributeID];
+                break;
         }
 
-    case MTRClusterIDTypeHEPAFilterMonitoringID:
+case MTRClusterIDTypeHEPAFilterMonitoringID:
 
-        switch (attributeID) {
+            switch (attributeID) {
 
-            // Cluster HEPAFilterMonitoring attributes
-        case MTRAttributeIDTypeClusterHEPAFilterMonitoringAttributeConditionID:
-            result = @"Condition";
-            break;
 
-        case MTRAttributeIDTypeClusterHEPAFilterMonitoringAttributeDegradationDirectionID:
-            result = @"DegradationDirection";
-            break;
 
-        case MTRAttributeIDTypeClusterHEPAFilterMonitoringAttributeChangeIndicationID:
-            result = @"ChangeIndication";
-            break;
+// Cluster HEPAFilterMonitoring attributes
+            case MTRAttributeIDTypeClusterHEPAFilterMonitoringAttributeConditionID:
+                result = @"Condition";
+                break;
 
-        case MTRAttributeIDTypeClusterHEPAFilterMonitoringAttributeInPlaceIndicatorID:
-            result = @"InPlaceIndicator";
-            break;
+            case MTRAttributeIDTypeClusterHEPAFilterMonitoringAttributeDegradationDirectionID:
+                result = @"DegradationDirection";
+                break;
 
-        case MTRAttributeIDTypeClusterHEPAFilterMonitoringAttributeLastChangedTimeID:
-            result = @"LastChangedTime";
-            break;
+            case MTRAttributeIDTypeClusterHEPAFilterMonitoringAttributeChangeIndicationID:
+                result = @"ChangeIndication";
+                break;
 
-        case MTRAttributeIDTypeClusterHEPAFilterMonitoringAttributeReplacementProductListID:
-            result = @"ReplacementProductList";
-            break;
+            case MTRAttributeIDTypeClusterHEPAFilterMonitoringAttributeInPlaceIndicatorID:
+                result = @"InPlaceIndicator";
+                break;
 
-        case MTRAttributeIDTypeClusterHEPAFilterMonitoringAttributeGeneratedCommandListID:
-            result = @"GeneratedCommandList";
-            break;
+            case MTRAttributeIDTypeClusterHEPAFilterMonitoringAttributeLastChangedTimeID:
+                result = @"LastChangedTime";
+                break;
 
-        case MTRAttributeIDTypeClusterHEPAFilterMonitoringAttributeAcceptedCommandListID:
-            result = @"AcceptedCommandList";
-            break;
+            case MTRAttributeIDTypeClusterHEPAFilterMonitoringAttributeReplacementProductListID:
+                result = @"ReplacementProductList";
+                break;
 
-        case MTRAttributeIDTypeClusterHEPAFilterMonitoringAttributeEventListID:
-            result = @"EventList";
-            break;
+            case MTRAttributeIDTypeClusterHEPAFilterMonitoringAttributeGeneratedCommandListID:
+                result = @"GeneratedCommandList";
+                break;
 
-        case MTRAttributeIDTypeClusterHEPAFilterMonitoringAttributeAttributeListID:
-            result = @"AttributeList";
-            break;
+            case MTRAttributeIDTypeClusterHEPAFilterMonitoringAttributeAcceptedCommandListID:
+                result = @"AcceptedCommandList";
+                break;
 
-        case MTRAttributeIDTypeClusterHEPAFilterMonitoringAttributeFeatureMapID:
-            result = @"FeatureMap";
-            break;
+            case MTRAttributeIDTypeClusterHEPAFilterMonitoringAttributeEventListID:
+                result = @"EventList";
+                break;
 
-        case MTRAttributeIDTypeClusterHEPAFilterMonitoringAttributeClusterRevisionID:
-            result = @"ClusterRevision";
-            break;
+            case MTRAttributeIDTypeClusterHEPAFilterMonitoringAttributeAttributeListID:
+                result = @"AttributeList";
+                break;
 
-        default:
-            result = [NSString stringWithFormat:@"<Unknown attributeID %d>", attributeID];
-            break;
+            case MTRAttributeIDTypeClusterHEPAFilterMonitoringAttributeFeatureMapID:
+                result = @"FeatureMap";
+                break;
+
+            case MTRAttributeIDTypeClusterHEPAFilterMonitoringAttributeClusterRevisionID:
+                result = @"ClusterRevision";
+                break;
+
+
+            default:
+                result = [NSString stringWithFormat:@"<Unknown attributeID %d>", attributeID];
+                break;
         }
 
-    case MTRClusterIDTypeActivatedCarbonFilterMonitoringID:
+case MTRClusterIDTypeActivatedCarbonFilterMonitoringID:
 
-        switch (attributeID) {
+            switch (attributeID) {
 
-            // Cluster ActivatedCarbonFilterMonitoring attributes
-        case MTRAttributeIDTypeClusterActivatedCarbonFilterMonitoringAttributeConditionID:
-            result = @"Condition";
-            break;
 
-        case MTRAttributeIDTypeClusterActivatedCarbonFilterMonitoringAttributeDegradationDirectionID:
-            result = @"DegradationDirection";
-            break;
 
-        case MTRAttributeIDTypeClusterActivatedCarbonFilterMonitoringAttributeChangeIndicationID:
-            result = @"ChangeIndication";
-            break;
+// Cluster ActivatedCarbonFilterMonitoring attributes
+            case MTRAttributeIDTypeClusterActivatedCarbonFilterMonitoringAttributeConditionID:
+                result = @"Condition";
+                break;
 
-        case MTRAttributeIDTypeClusterActivatedCarbonFilterMonitoringAttributeInPlaceIndicatorID:
-            result = @"InPlaceIndicator";
-            break;
+            case MTRAttributeIDTypeClusterActivatedCarbonFilterMonitoringAttributeDegradationDirectionID:
+                result = @"DegradationDirection";
+                break;
 
-        case MTRAttributeIDTypeClusterActivatedCarbonFilterMonitoringAttributeLastChangedTimeID:
-            result = @"LastChangedTime";
-            break;
+            case MTRAttributeIDTypeClusterActivatedCarbonFilterMonitoringAttributeChangeIndicationID:
+                result = @"ChangeIndication";
+                break;
 
-        case MTRAttributeIDTypeClusterActivatedCarbonFilterMonitoringAttributeReplacementProductListID:
-            result = @"ReplacementProductList";
-            break;
+            case MTRAttributeIDTypeClusterActivatedCarbonFilterMonitoringAttributeInPlaceIndicatorID:
+                result = @"InPlaceIndicator";
+                break;
 
-        case MTRAttributeIDTypeClusterActivatedCarbonFilterMonitoringAttributeGeneratedCommandListID:
-            result = @"GeneratedCommandList";
-            break;
+            case MTRAttributeIDTypeClusterActivatedCarbonFilterMonitoringAttributeLastChangedTimeID:
+                result = @"LastChangedTime";
+                break;
 
-        case MTRAttributeIDTypeClusterActivatedCarbonFilterMonitoringAttributeAcceptedCommandListID:
-            result = @"AcceptedCommandList";
-            break;
+            case MTRAttributeIDTypeClusterActivatedCarbonFilterMonitoringAttributeReplacementProductListID:
+                result = @"ReplacementProductList";
+                break;
 
-        case MTRAttributeIDTypeClusterActivatedCarbonFilterMonitoringAttributeEventListID:
-            result = @"EventList";
-            break;
+            case MTRAttributeIDTypeClusterActivatedCarbonFilterMonitoringAttributeGeneratedCommandListID:
+                result = @"GeneratedCommandList";
+                break;
 
-        case MTRAttributeIDTypeClusterActivatedCarbonFilterMonitoringAttributeAttributeListID:
-            result = @"AttributeList";
-            break;
+            case MTRAttributeIDTypeClusterActivatedCarbonFilterMonitoringAttributeAcceptedCommandListID:
+                result = @"AcceptedCommandList";
+                break;
 
-        case MTRAttributeIDTypeClusterActivatedCarbonFilterMonitoringAttributeFeatureMapID:
-            result = @"FeatureMap";
-            break;
+            case MTRAttributeIDTypeClusterActivatedCarbonFilterMonitoringAttributeEventListID:
+                result = @"EventList";
+                break;
 
-        case MTRAttributeIDTypeClusterActivatedCarbonFilterMonitoringAttributeClusterRevisionID:
-            result = @"ClusterRevision";
-            break;
+            case MTRAttributeIDTypeClusterActivatedCarbonFilterMonitoringAttributeAttributeListID:
+                result = @"AttributeList";
+                break;
 
-        default:
-            result = [NSString stringWithFormat:@"<Unknown attributeID %d>", attributeID];
-            break;
+            case MTRAttributeIDTypeClusterActivatedCarbonFilterMonitoringAttributeFeatureMapID:
+                result = @"FeatureMap";
+                break;
+
+            case MTRAttributeIDTypeClusterActivatedCarbonFilterMonitoringAttributeClusterRevisionID:
+                result = @"ClusterRevision";
+                break;
+
+
+            default:
+                result = [NSString stringWithFormat:@"<Unknown attributeID %d>", attributeID];
+                break;
         }
 
-    case MTRClusterIDTypeBooleanStateConfigurationID:
+case MTRClusterIDTypeBooleanStateConfigurationID:
 
-        switch (attributeID) {
+            switch (attributeID) {
 
-            // Cluster BooleanStateConfiguration attributes
-        case MTRAttributeIDTypeClusterBooleanStateConfigurationAttributeCurrentSensitivityLevelID:
-            result = @"CurrentSensitivityLevel";
-            break;
 
-        case MTRAttributeIDTypeClusterBooleanStateConfigurationAttributeSupportedSensitivityLevelsID:
-            result = @"SupportedSensitivityLevels";
-            break;
 
-        case MTRAttributeIDTypeClusterBooleanStateConfigurationAttributeDefaultSensitivityLevelID:
-            result = @"DefaultSensitivityLevel";
-            break;
+// Cluster BooleanStateConfiguration attributes
+            case MTRAttributeIDTypeClusterBooleanStateConfigurationAttributeCurrentSensitivityLevelID:
+                result = @"CurrentSensitivityLevel";
+                break;
 
-        case MTRAttributeIDTypeClusterBooleanStateConfigurationAttributeAlarmsActiveID:
-            result = @"AlarmsActive";
-            break;
+            case MTRAttributeIDTypeClusterBooleanStateConfigurationAttributeSupportedSensitivityLevelsID:
+                result = @"SupportedSensitivityLevels";
+                break;
 
-        case MTRAttributeIDTypeClusterBooleanStateConfigurationAttributeAlarmsSuppressedID:
-            result = @"AlarmsSuppressed";
-            break;
+            case MTRAttributeIDTypeClusterBooleanStateConfigurationAttributeDefaultSensitivityLevelID:
+                result = @"DefaultSensitivityLevel";
+                break;
 
-        case MTRAttributeIDTypeClusterBooleanStateConfigurationAttributeAlarmsEnabledID:
-            result = @"AlarmsEnabled";
-            break;
+            case MTRAttributeIDTypeClusterBooleanStateConfigurationAttributeAlarmsActiveID:
+                result = @"AlarmsActive";
+                break;
 
-        case MTRAttributeIDTypeClusterBooleanStateConfigurationAttributeAlarmsSupportedID:
-            result = @"AlarmsSupported";
-            break;
+            case MTRAttributeIDTypeClusterBooleanStateConfigurationAttributeAlarmsSuppressedID:
+                result = @"AlarmsSuppressed";
+                break;
 
-        case MTRAttributeIDTypeClusterBooleanStateConfigurationAttributeSensorFaultID:
-            result = @"SensorFault";
-            break;
+            case MTRAttributeIDTypeClusterBooleanStateConfigurationAttributeAlarmsEnabledID:
+                result = @"AlarmsEnabled";
+                break;
 
-        case MTRAttributeIDTypeClusterBooleanStateConfigurationAttributeGeneratedCommandListID:
-            result = @"GeneratedCommandList";
-            break;
+            case MTRAttributeIDTypeClusterBooleanStateConfigurationAttributeAlarmsSupportedID:
+                result = @"AlarmsSupported";
+                break;
 
-        case MTRAttributeIDTypeClusterBooleanStateConfigurationAttributeAcceptedCommandListID:
-            result = @"AcceptedCommandList";
-            break;
+            case MTRAttributeIDTypeClusterBooleanStateConfigurationAttributeSensorFaultID:
+                result = @"SensorFault";
+                break;
 
-        case MTRAttributeIDTypeClusterBooleanStateConfigurationAttributeEventListID:
-            result = @"EventList";
-            break;
+            case MTRAttributeIDTypeClusterBooleanStateConfigurationAttributeGeneratedCommandListID:
+                result = @"GeneratedCommandList";
+                break;
 
-        case MTRAttributeIDTypeClusterBooleanStateConfigurationAttributeAttributeListID:
-            result = @"AttributeList";
-            break;
+            case MTRAttributeIDTypeClusterBooleanStateConfigurationAttributeAcceptedCommandListID:
+                result = @"AcceptedCommandList";
+                break;
 
-        case MTRAttributeIDTypeClusterBooleanStateConfigurationAttributeFeatureMapID:
-            result = @"FeatureMap";
-            break;
+            case MTRAttributeIDTypeClusterBooleanStateConfigurationAttributeEventListID:
+                result = @"EventList";
+                break;
 
-        case MTRAttributeIDTypeClusterBooleanStateConfigurationAttributeClusterRevisionID:
-            result = @"ClusterRevision";
-            break;
+            case MTRAttributeIDTypeClusterBooleanStateConfigurationAttributeAttributeListID:
+                result = @"AttributeList";
+                break;
 
-        default:
-            result = [NSString stringWithFormat:@"<Unknown attributeID %d>", attributeID];
-            break;
+            case MTRAttributeIDTypeClusterBooleanStateConfigurationAttributeFeatureMapID:
+                result = @"FeatureMap";
+                break;
+
+            case MTRAttributeIDTypeClusterBooleanStateConfigurationAttributeClusterRevisionID:
+                result = @"ClusterRevision";
+                break;
+
+
+            default:
+                result = [NSString stringWithFormat:@"<Unknown attributeID %d>", attributeID];
+                break;
         }
 
-    case MTRClusterIDTypeValveConfigurationAndControlID:
+case MTRClusterIDTypeValveConfigurationAndControlID:
 
-        switch (attributeID) {
+            switch (attributeID) {
 
-            // Cluster ValveConfigurationAndControl attributes
-        case MTRAttributeIDTypeClusterValveConfigurationAndControlAttributeOpenDurationID:
-            result = @"OpenDuration";
-            break;
 
-        case MTRAttributeIDTypeClusterValveConfigurationAndControlAttributeDefaultOpenDurationID:
-            result = @"DefaultOpenDuration";
-            break;
 
-        case MTRAttributeIDTypeClusterValveConfigurationAndControlAttributeAutoCloseTimeID:
-            result = @"AutoCloseTime";
-            break;
+// Cluster ValveConfigurationAndControl attributes
+            case MTRAttributeIDTypeClusterValveConfigurationAndControlAttributeOpenDurationID:
+                result = @"OpenDuration";
+                break;
 
-        case MTRAttributeIDTypeClusterValveConfigurationAndControlAttributeRemainingDurationID:
-            result = @"RemainingDuration";
-            break;
+            case MTRAttributeIDTypeClusterValveConfigurationAndControlAttributeDefaultOpenDurationID:
+                result = @"DefaultOpenDuration";
+                break;
 
-        case MTRAttributeIDTypeClusterValveConfigurationAndControlAttributeCurrentStateID:
-            result = @"CurrentState";
-            break;
+            case MTRAttributeIDTypeClusterValveConfigurationAndControlAttributeAutoCloseTimeID:
+                result = @"AutoCloseTime";
+                break;
 
-        case MTRAttributeIDTypeClusterValveConfigurationAndControlAttributeTargetStateID:
-            result = @"TargetState";
-            break;
+            case MTRAttributeIDTypeClusterValveConfigurationAndControlAttributeRemainingDurationID:
+                result = @"RemainingDuration";
+                break;
 
-        case MTRAttributeIDTypeClusterValveConfigurationAndControlAttributeCurrentLevelID:
-            result = @"CurrentLevel";
-            break;
+            case MTRAttributeIDTypeClusterValveConfigurationAndControlAttributeCurrentStateID:
+                result = @"CurrentState";
+                break;
 
-        case MTRAttributeIDTypeClusterValveConfigurationAndControlAttributeTargetLevelID:
-            result = @"TargetLevel";
-            break;
+            case MTRAttributeIDTypeClusterValveConfigurationAndControlAttributeTargetStateID:
+                result = @"TargetState";
+                break;
 
-        case MTRAttributeIDTypeClusterValveConfigurationAndControlAttributeDefaultOpenLevelID:
-            result = @"DefaultOpenLevel";
-            break;
+            case MTRAttributeIDTypeClusterValveConfigurationAndControlAttributeCurrentLevelID:
+                result = @"CurrentLevel";
+                break;
 
-        case MTRAttributeIDTypeClusterValveConfigurationAndControlAttributeValveFaultID:
-            result = @"ValveFault";
-            break;
+            case MTRAttributeIDTypeClusterValveConfigurationAndControlAttributeTargetLevelID:
+                result = @"TargetLevel";
+                break;
 
-        case MTRAttributeIDTypeClusterValveConfigurationAndControlAttributeLevelStepID:
-            result = @"LevelStep";
-            break;
+            case MTRAttributeIDTypeClusterValveConfigurationAndControlAttributeDefaultOpenLevelID:
+                result = @"DefaultOpenLevel";
+                break;
 
-        case MTRAttributeIDTypeClusterValveConfigurationAndControlAttributeGeneratedCommandListID:
-            result = @"GeneratedCommandList";
-            break;
+            case MTRAttributeIDTypeClusterValveConfigurationAndControlAttributeValveFaultID:
+                result = @"ValveFault";
+                break;
 
-        case MTRAttributeIDTypeClusterValveConfigurationAndControlAttributeAcceptedCommandListID:
-            result = @"AcceptedCommandList";
-            break;
+            case MTRAttributeIDTypeClusterValveConfigurationAndControlAttributeLevelStepID:
+                result = @"LevelStep";
+                break;
 
-        case MTRAttributeIDTypeClusterValveConfigurationAndControlAttributeEventListID:
-            result = @"EventList";
-            break;
+            case MTRAttributeIDTypeClusterValveConfigurationAndControlAttributeGeneratedCommandListID:
+                result = @"GeneratedCommandList";
+                break;
 
-        case MTRAttributeIDTypeClusterValveConfigurationAndControlAttributeAttributeListID:
-            result = @"AttributeList";
-            break;
+            case MTRAttributeIDTypeClusterValveConfigurationAndControlAttributeAcceptedCommandListID:
+                result = @"AcceptedCommandList";
+                break;
 
-        case MTRAttributeIDTypeClusterValveConfigurationAndControlAttributeFeatureMapID:
-            result = @"FeatureMap";
-            break;
+            case MTRAttributeIDTypeClusterValveConfigurationAndControlAttributeEventListID:
+                result = @"EventList";
+                break;
 
-        case MTRAttributeIDTypeClusterValveConfigurationAndControlAttributeClusterRevisionID:
-            result = @"ClusterRevision";
-            break;
+            case MTRAttributeIDTypeClusterValveConfigurationAndControlAttributeAttributeListID:
+                result = @"AttributeList";
+                break;
 
-        default:
-            result = [NSString stringWithFormat:@"<Unknown attributeID %d>", attributeID];
-            break;
+            case MTRAttributeIDTypeClusterValveConfigurationAndControlAttributeFeatureMapID:
+                result = @"FeatureMap";
+                break;
+
+            case MTRAttributeIDTypeClusterValveConfigurationAndControlAttributeClusterRevisionID:
+                result = @"ClusterRevision";
+                break;
+
+
+            default:
+                result = [NSString stringWithFormat:@"<Unknown attributeID %d>", attributeID];
+                break;
         }
 
-    case MTRClusterIDTypeElectricalPowerMeasurementID:
+case MTRClusterIDTypeElectricalPowerMeasurementID:
 
-        switch (attributeID) {
+            switch (attributeID) {
 
-            // Cluster ElectricalPowerMeasurement attributes
-        case MTRAttributeIDTypeClusterElectricalPowerMeasurementAttributePowerModeID:
-            result = @"PowerMode";
-            break;
 
-        case MTRAttributeIDTypeClusterElectricalPowerMeasurementAttributeNumberOfMeasurementTypesID:
-            result = @"NumberOfMeasurementTypes";
-            break;
 
-        case MTRAttributeIDTypeClusterElectricalPowerMeasurementAttributeAccuracyID:
-            result = @"Accuracy";
-            break;
+// Cluster ElectricalPowerMeasurement attributes
+            case MTRAttributeIDTypeClusterElectricalPowerMeasurementAttributePowerModeID:
+                result = @"PowerMode";
+                break;
 
-        case MTRAttributeIDTypeClusterElectricalPowerMeasurementAttributeRangesID:
-            result = @"Ranges";
-            break;
+            case MTRAttributeIDTypeClusterElectricalPowerMeasurementAttributeNumberOfMeasurementTypesID:
+                result = @"NumberOfMeasurementTypes";
+                break;
 
-        case MTRAttributeIDTypeClusterElectricalPowerMeasurementAttributeVoltageID:
-            result = @"Voltage";
-            break;
+            case MTRAttributeIDTypeClusterElectricalPowerMeasurementAttributeAccuracyID:
+                result = @"Accuracy";
+                break;
 
-        case MTRAttributeIDTypeClusterElectricalPowerMeasurementAttributeActiveCurrentID:
-            result = @"ActiveCurrent";
-            break;
+            case MTRAttributeIDTypeClusterElectricalPowerMeasurementAttributeRangesID:
+                result = @"Ranges";
+                break;
 
-        case MTRAttributeIDTypeClusterElectricalPowerMeasurementAttributeReactiveCurrentID:
-            result = @"ReactiveCurrent";
-            break;
+            case MTRAttributeIDTypeClusterElectricalPowerMeasurementAttributeVoltageID:
+                result = @"Voltage";
+                break;
 
-        case MTRAttributeIDTypeClusterElectricalPowerMeasurementAttributeApparentCurrentID:
-            result = @"ApparentCurrent";
-            break;
+            case MTRAttributeIDTypeClusterElectricalPowerMeasurementAttributeActiveCurrentID:
+                result = @"ActiveCurrent";
+                break;
 
-        case MTRAttributeIDTypeClusterElectricalPowerMeasurementAttributeActivePowerID:
-            result = @"ActivePower";
-            break;
+            case MTRAttributeIDTypeClusterElectricalPowerMeasurementAttributeReactiveCurrentID:
+                result = @"ReactiveCurrent";
+                break;
 
-        case MTRAttributeIDTypeClusterElectricalPowerMeasurementAttributeReactivePowerID:
-            result = @"ReactivePower";
-            break;
+            case MTRAttributeIDTypeClusterElectricalPowerMeasurementAttributeApparentCurrentID:
+                result = @"ApparentCurrent";
+                break;
 
-        case MTRAttributeIDTypeClusterElectricalPowerMeasurementAttributeApparentPowerID:
-            result = @"ApparentPower";
-            break;
+            case MTRAttributeIDTypeClusterElectricalPowerMeasurementAttributeActivePowerID:
+                result = @"ActivePower";
+                break;
 
-        case MTRAttributeIDTypeClusterElectricalPowerMeasurementAttributeRMSVoltageID:
-            result = @"RMSVoltage";
-            break;
+            case MTRAttributeIDTypeClusterElectricalPowerMeasurementAttributeReactivePowerID:
+                result = @"ReactivePower";
+                break;
 
-        case MTRAttributeIDTypeClusterElectricalPowerMeasurementAttributeRMSCurrentID:
-            result = @"RMSCurrent";
-            break;
+            case MTRAttributeIDTypeClusterElectricalPowerMeasurementAttributeApparentPowerID:
+                result = @"ApparentPower";
+                break;
 
-        case MTRAttributeIDTypeClusterElectricalPowerMeasurementAttributeRMSPowerID:
-            result = @"RMSPower";
-            break;
+            case MTRAttributeIDTypeClusterElectricalPowerMeasurementAttributeRMSVoltageID:
+                result = @"RMSVoltage";
+                break;
 
-        case MTRAttributeIDTypeClusterElectricalPowerMeasurementAttributeFrequencyID:
-            result = @"Frequency";
-            break;
+            case MTRAttributeIDTypeClusterElectricalPowerMeasurementAttributeRMSCurrentID:
+                result = @"RMSCurrent";
+                break;
 
-        case MTRAttributeIDTypeClusterElectricalPowerMeasurementAttributeHarmonicCurrentsID:
-            result = @"HarmonicCurrents";
-            break;
+            case MTRAttributeIDTypeClusterElectricalPowerMeasurementAttributeRMSPowerID:
+                result = @"RMSPower";
+                break;
 
-        case MTRAttributeIDTypeClusterElectricalPowerMeasurementAttributeHarmonicPhasesID:
-            result = @"HarmonicPhases";
-            break;
+            case MTRAttributeIDTypeClusterElectricalPowerMeasurementAttributeFrequencyID:
+                result = @"Frequency";
+                break;
 
-        case MTRAttributeIDTypeClusterElectricalPowerMeasurementAttributePowerFactorID:
-            result = @"PowerFactor";
-            break;
+            case MTRAttributeIDTypeClusterElectricalPowerMeasurementAttributeHarmonicCurrentsID:
+                result = @"HarmonicCurrents";
+                break;
 
-        case MTRAttributeIDTypeClusterElectricalPowerMeasurementAttributeNeutralCurrentID:
-            result = @"NeutralCurrent";
-            break;
+            case MTRAttributeIDTypeClusterElectricalPowerMeasurementAttributeHarmonicPhasesID:
+                result = @"HarmonicPhases";
+                break;
 
-        case MTRAttributeIDTypeClusterElectricalPowerMeasurementAttributeGeneratedCommandListID:
-            result = @"GeneratedCommandList";
-            break;
+            case MTRAttributeIDTypeClusterElectricalPowerMeasurementAttributePowerFactorID:
+                result = @"PowerFactor";
+                break;
 
-        case MTRAttributeIDTypeClusterElectricalPowerMeasurementAttributeAcceptedCommandListID:
-            result = @"AcceptedCommandList";
-            break;
+            case MTRAttributeIDTypeClusterElectricalPowerMeasurementAttributeNeutralCurrentID:
+                result = @"NeutralCurrent";
+                break;
 
-        case MTRAttributeIDTypeClusterElectricalPowerMeasurementAttributeEventListID:
-            result = @"EventList";
-            break;
+            case MTRAttributeIDTypeClusterElectricalPowerMeasurementAttributeGeneratedCommandListID:
+                result = @"GeneratedCommandList";
+                break;
 
-        case MTRAttributeIDTypeClusterElectricalPowerMeasurementAttributeAttributeListID:
-            result = @"AttributeList";
-            break;
+            case MTRAttributeIDTypeClusterElectricalPowerMeasurementAttributeAcceptedCommandListID:
+                result = @"AcceptedCommandList";
+                break;
 
-        case MTRAttributeIDTypeClusterElectricalPowerMeasurementAttributeFeatureMapID:
-            result = @"FeatureMap";
-            break;
+            case MTRAttributeIDTypeClusterElectricalPowerMeasurementAttributeEventListID:
+                result = @"EventList";
+                break;
 
-        case MTRAttributeIDTypeClusterElectricalPowerMeasurementAttributeClusterRevisionID:
-            result = @"ClusterRevision";
-            break;
+            case MTRAttributeIDTypeClusterElectricalPowerMeasurementAttributeAttributeListID:
+                result = @"AttributeList";
+                break;
 
-        default:
-            result = [NSString stringWithFormat:@"<Unknown attributeID %d>", attributeID];
-            break;
+            case MTRAttributeIDTypeClusterElectricalPowerMeasurementAttributeFeatureMapID:
+                result = @"FeatureMap";
+                break;
+
+            case MTRAttributeIDTypeClusterElectricalPowerMeasurementAttributeClusterRevisionID:
+                result = @"ClusterRevision";
+                break;
+
+
+            default:
+                result = [NSString stringWithFormat:@"<Unknown attributeID %d>", attributeID];
+                break;
         }
 
-    case MTRClusterIDTypeElectricalEnergyMeasurementID:
+case MTRClusterIDTypeElectricalEnergyMeasurementID:
 
-        switch (attributeID) {
+            switch (attributeID) {
 
-            // Cluster ElectricalEnergyMeasurement attributes
-        case MTRAttributeIDTypeClusterElectricalEnergyMeasurementAttributeAccuracyID:
-            result = @"Accuracy";
-            break;
 
-        case MTRAttributeIDTypeClusterElectricalEnergyMeasurementAttributeCumulativeEnergyImportedID:
-            result = @"CumulativeEnergyImported";
-            break;
 
-        case MTRAttributeIDTypeClusterElectricalEnergyMeasurementAttributeCumulativeEnergyExportedID:
-            result = @"CumulativeEnergyExported";
-            break;
+// Cluster ElectricalEnergyMeasurement attributes
+            case MTRAttributeIDTypeClusterElectricalEnergyMeasurementAttributeAccuracyID:
+                result = @"Accuracy";
+                break;
 
-        case MTRAttributeIDTypeClusterElectricalEnergyMeasurementAttributePeriodicEnergyImportedID:
-            result = @"PeriodicEnergyImported";
-            break;
+            case MTRAttributeIDTypeClusterElectricalEnergyMeasurementAttributeCumulativeEnergyImportedID:
+                result = @"CumulativeEnergyImported";
+                break;
 
-        case MTRAttributeIDTypeClusterElectricalEnergyMeasurementAttributePeriodicEnergyExportedID:
-            result = @"PeriodicEnergyExported";
-            break;
+            case MTRAttributeIDTypeClusterElectricalEnergyMeasurementAttributeCumulativeEnergyExportedID:
+                result = @"CumulativeEnergyExported";
+                break;
 
-        case MTRAttributeIDTypeClusterElectricalEnergyMeasurementAttributeCumulativeEnergyResetID:
-            result = @"CumulativeEnergyReset";
-            break;
+            case MTRAttributeIDTypeClusterElectricalEnergyMeasurementAttributePeriodicEnergyImportedID:
+                result = @"PeriodicEnergyImported";
+                break;
 
-        case MTRAttributeIDTypeClusterElectricalEnergyMeasurementAttributeGeneratedCommandListID:
-            result = @"GeneratedCommandList";
-            break;
+            case MTRAttributeIDTypeClusterElectricalEnergyMeasurementAttributePeriodicEnergyExportedID:
+                result = @"PeriodicEnergyExported";
+                break;
 
-        case MTRAttributeIDTypeClusterElectricalEnergyMeasurementAttributeAcceptedCommandListID:
-            result = @"AcceptedCommandList";
-            break;
+            case MTRAttributeIDTypeClusterElectricalEnergyMeasurementAttributeCumulativeEnergyResetID:
+                result = @"CumulativeEnergyReset";
+                break;
 
-        case MTRAttributeIDTypeClusterElectricalEnergyMeasurementAttributeEventListID:
-            result = @"EventList";
-            break;
+            case MTRAttributeIDTypeClusterElectricalEnergyMeasurementAttributeGeneratedCommandListID:
+                result = @"GeneratedCommandList";
+                break;
 
-        case MTRAttributeIDTypeClusterElectricalEnergyMeasurementAttributeAttributeListID:
-            result = @"AttributeList";
-            break;
+            case MTRAttributeIDTypeClusterElectricalEnergyMeasurementAttributeAcceptedCommandListID:
+                result = @"AcceptedCommandList";
+                break;
 
-        case MTRAttributeIDTypeClusterElectricalEnergyMeasurementAttributeFeatureMapID:
-            result = @"FeatureMap";
-            break;
+            case MTRAttributeIDTypeClusterElectricalEnergyMeasurementAttributeEventListID:
+                result = @"EventList";
+                break;
 
-        case MTRAttributeIDTypeClusterElectricalEnergyMeasurementAttributeClusterRevisionID:
-            result = @"ClusterRevision";
-            break;
+            case MTRAttributeIDTypeClusterElectricalEnergyMeasurementAttributeAttributeListID:
+                result = @"AttributeList";
+                break;
 
-        default:
-            result = [NSString stringWithFormat:@"<Unknown attributeID %d>", attributeID];
-            break;
+            case MTRAttributeIDTypeClusterElectricalEnergyMeasurementAttributeFeatureMapID:
+                result = @"FeatureMap";
+                break;
+
+            case MTRAttributeIDTypeClusterElectricalEnergyMeasurementAttributeClusterRevisionID:
+                result = @"ClusterRevision";
+                break;
+
+
+            default:
+                result = [NSString stringWithFormat:@"<Unknown attributeID %d>", attributeID];
+                break;
         }
 
-    case MTRClusterIDTypeWaterHeaterManagementID:
+case MTRClusterIDTypeWaterHeaterManagementID:
 
-        switch (attributeID) {
+            switch (attributeID) {
 
-            // Cluster WaterHeaterManagement attributes
-        case MTRAttributeIDTypeClusterWaterHeaterManagementAttributeHeaterTypesID:
-            result = @"HeaterTypes";
-            break;
 
-        case MTRAttributeIDTypeClusterWaterHeaterManagementAttributeHeatDemandID:
-            result = @"HeatDemand";
-            break;
 
-        case MTRAttributeIDTypeClusterWaterHeaterManagementAttributeTankVolumeID:
-            result = @"TankVolume";
-            break;
+// Cluster WaterHeaterManagement attributes
+            case MTRAttributeIDTypeClusterWaterHeaterManagementAttributeHeaterTypesID:
+                result = @"HeaterTypes";
+                break;
 
-        case MTRAttributeIDTypeClusterWaterHeaterManagementAttributeEstimatedHeatRequiredID:
-            result = @"EstimatedHeatRequired";
-            break;
+            case MTRAttributeIDTypeClusterWaterHeaterManagementAttributeHeatDemandID:
+                result = @"HeatDemand";
+                break;
 
-        case MTRAttributeIDTypeClusterWaterHeaterManagementAttributeTankPercentageID:
-            result = @"TankPercentage";
-            break;
+            case MTRAttributeIDTypeClusterWaterHeaterManagementAttributeTankVolumeID:
+                result = @"TankVolume";
+                break;
 
-        case MTRAttributeIDTypeClusterWaterHeaterManagementAttributeBoostStateID:
-            result = @"BoostState";
-            break;
+            case MTRAttributeIDTypeClusterWaterHeaterManagementAttributeEstimatedHeatRequiredID:
+                result = @"EstimatedHeatRequired";
+                break;
 
-        case MTRAttributeIDTypeClusterWaterHeaterManagementAttributeGeneratedCommandListID:
-            result = @"GeneratedCommandList";
-            break;
+            case MTRAttributeIDTypeClusterWaterHeaterManagementAttributeTankPercentageID:
+                result = @"TankPercentage";
+                break;
 
-        case MTRAttributeIDTypeClusterWaterHeaterManagementAttributeAcceptedCommandListID:
-            result = @"AcceptedCommandList";
-            break;
+            case MTRAttributeIDTypeClusterWaterHeaterManagementAttributeBoostStateID:
+                result = @"BoostState";
+                break;
 
-        case MTRAttributeIDTypeClusterWaterHeaterManagementAttributeEventListID:
-            result = @"EventList";
-            break;
+            case MTRAttributeIDTypeClusterWaterHeaterManagementAttributeGeneratedCommandListID:
+                result = @"GeneratedCommandList";
+                break;
 
-        case MTRAttributeIDTypeClusterWaterHeaterManagementAttributeAttributeListID:
-            result = @"AttributeList";
-            break;
+            case MTRAttributeIDTypeClusterWaterHeaterManagementAttributeAcceptedCommandListID:
+                result = @"AcceptedCommandList";
+                break;
 
-        case MTRAttributeIDTypeClusterWaterHeaterManagementAttributeFeatureMapID:
-            result = @"FeatureMap";
-            break;
+            case MTRAttributeIDTypeClusterWaterHeaterManagementAttributeEventListID:
+                result = @"EventList";
+                break;
 
-        case MTRAttributeIDTypeClusterWaterHeaterManagementAttributeClusterRevisionID:
-            result = @"ClusterRevision";
-            break;
+            case MTRAttributeIDTypeClusterWaterHeaterManagementAttributeAttributeListID:
+                result = @"AttributeList";
+                break;
 
-        default:
-            result = [NSString stringWithFormat:@"<Unknown attributeID %d>", attributeID];
-            break;
+            case MTRAttributeIDTypeClusterWaterHeaterManagementAttributeFeatureMapID:
+                result = @"FeatureMap";
+                break;
+
+            case MTRAttributeIDTypeClusterWaterHeaterManagementAttributeClusterRevisionID:
+                result = @"ClusterRevision";
+                break;
+
+
+            default:
+                result = [NSString stringWithFormat:@"<Unknown attributeID %d>", attributeID];
+                break;
         }
 
-    case MTRClusterIDTypeDemandResponseLoadControlID:
+case MTRClusterIDTypeDemandResponseLoadControlID:
 
-        switch (attributeID) {
+            switch (attributeID) {
 
-            // Cluster DemandResponseLoadControl attributes
-        case MTRAttributeIDTypeClusterDemandResponseLoadControlAttributeLoadControlProgramsID:
-            result = @"LoadControlPrograms";
-            break;
 
-        case MTRAttributeIDTypeClusterDemandResponseLoadControlAttributeNumberOfLoadControlProgramsID:
-            result = @"NumberOfLoadControlPrograms";
-            break;
 
-        case MTRAttributeIDTypeClusterDemandResponseLoadControlAttributeEventsID:
-            result = @"Events";
-            break;
+// Cluster DemandResponseLoadControl attributes
+            case MTRAttributeIDTypeClusterDemandResponseLoadControlAttributeLoadControlProgramsID:
+                result = @"LoadControlPrograms";
+                break;
 
-        case MTRAttributeIDTypeClusterDemandResponseLoadControlAttributeActiveEventsID:
-            result = @"ActiveEvents";
-            break;
+            case MTRAttributeIDTypeClusterDemandResponseLoadControlAttributeNumberOfLoadControlProgramsID:
+                result = @"NumberOfLoadControlPrograms";
+                break;
 
-        case MTRAttributeIDTypeClusterDemandResponseLoadControlAttributeNumberOfEventsPerProgramID:
-            result = @"NumberOfEventsPerProgram";
-            break;
+            case MTRAttributeIDTypeClusterDemandResponseLoadControlAttributeEventsID:
+                result = @"Events";
+                break;
 
-        case MTRAttributeIDTypeClusterDemandResponseLoadControlAttributeNumberOfTransitionsID:
-            result = @"NumberOfTransitions";
-            break;
+            case MTRAttributeIDTypeClusterDemandResponseLoadControlAttributeActiveEventsID:
+                result = @"ActiveEvents";
+                break;
 
-        case MTRAttributeIDTypeClusterDemandResponseLoadControlAttributeDefaultRandomStartID:
-            result = @"DefaultRandomStart";
-            break;
+            case MTRAttributeIDTypeClusterDemandResponseLoadControlAttributeNumberOfEventsPerProgramID:
+                result = @"NumberOfEventsPerProgram";
+                break;
 
-        case MTRAttributeIDTypeClusterDemandResponseLoadControlAttributeDefaultRandomDurationID:
-            result = @"DefaultRandomDuration";
-            break;
+            case MTRAttributeIDTypeClusterDemandResponseLoadControlAttributeNumberOfTransitionsID:
+                result = @"NumberOfTransitions";
+                break;
 
-        case MTRAttributeIDTypeClusterDemandResponseLoadControlAttributeGeneratedCommandListID:
-            result = @"GeneratedCommandList";
-            break;
+            case MTRAttributeIDTypeClusterDemandResponseLoadControlAttributeDefaultRandomStartID:
+                result = @"DefaultRandomStart";
+                break;
 
-        case MTRAttributeIDTypeClusterDemandResponseLoadControlAttributeAcceptedCommandListID:
-            result = @"AcceptedCommandList";
-            break;
+            case MTRAttributeIDTypeClusterDemandResponseLoadControlAttributeDefaultRandomDurationID:
+                result = @"DefaultRandomDuration";
+                break;
 
-        case MTRAttributeIDTypeClusterDemandResponseLoadControlAttributeEventListID:
-            result = @"EventList";
-            break;
+            case MTRAttributeIDTypeClusterDemandResponseLoadControlAttributeGeneratedCommandListID:
+                result = @"GeneratedCommandList";
+                break;
 
-        case MTRAttributeIDTypeClusterDemandResponseLoadControlAttributeAttributeListID:
-            result = @"AttributeList";
-            break;
+            case MTRAttributeIDTypeClusterDemandResponseLoadControlAttributeAcceptedCommandListID:
+                result = @"AcceptedCommandList";
+                break;
 
-        case MTRAttributeIDTypeClusterDemandResponseLoadControlAttributeFeatureMapID:
-            result = @"FeatureMap";
-            break;
+            case MTRAttributeIDTypeClusterDemandResponseLoadControlAttributeEventListID:
+                result = @"EventList";
+                break;
 
-        case MTRAttributeIDTypeClusterDemandResponseLoadControlAttributeClusterRevisionID:
-            result = @"ClusterRevision";
-            break;
+            case MTRAttributeIDTypeClusterDemandResponseLoadControlAttributeAttributeListID:
+                result = @"AttributeList";
+                break;
 
-        default:
-            result = [NSString stringWithFormat:@"<Unknown attributeID %d>", attributeID];
-            break;
+            case MTRAttributeIDTypeClusterDemandResponseLoadControlAttributeFeatureMapID:
+                result = @"FeatureMap";
+                break;
+
+            case MTRAttributeIDTypeClusterDemandResponseLoadControlAttributeClusterRevisionID:
+                result = @"ClusterRevision";
+                break;
+
+
+            default:
+                result = [NSString stringWithFormat:@"<Unknown attributeID %d>", attributeID];
+                break;
         }
 
-    case MTRClusterIDTypeMessagesID:
+case MTRClusterIDTypeMessagesID:
 
-        switch (attributeID) {
+            switch (attributeID) {
 
-            // Cluster Messages attributes
-        case MTRAttributeIDTypeClusterMessagesAttributeMessagesID:
-            result = @"Messages";
-            break;
 
-        case MTRAttributeIDTypeClusterMessagesAttributeActiveMessageIDsID:
-            result = @"ActiveMessageIDs";
-            break;
 
-        case MTRAttributeIDTypeClusterMessagesAttributeGeneratedCommandListID:
-            result = @"GeneratedCommandList";
-            break;
+// Cluster Messages attributes
+            case MTRAttributeIDTypeClusterMessagesAttributeMessagesID:
+                result = @"Messages";
+                break;
 
-        case MTRAttributeIDTypeClusterMessagesAttributeAcceptedCommandListID:
-            result = @"AcceptedCommandList";
-            break;
+            case MTRAttributeIDTypeClusterMessagesAttributeActiveMessageIDsID:
+                result = @"ActiveMessageIDs";
+                break;
 
-        case MTRAttributeIDTypeClusterMessagesAttributeEventListID:
-            result = @"EventList";
-            break;
+            case MTRAttributeIDTypeClusterMessagesAttributeGeneratedCommandListID:
+                result = @"GeneratedCommandList";
+                break;
 
-        case MTRAttributeIDTypeClusterMessagesAttributeAttributeListID:
-            result = @"AttributeList";
-            break;
+            case MTRAttributeIDTypeClusterMessagesAttributeAcceptedCommandListID:
+                result = @"AcceptedCommandList";
+                break;
 
-        case MTRAttributeIDTypeClusterMessagesAttributeFeatureMapID:
-            result = @"FeatureMap";
-            break;
+            case MTRAttributeIDTypeClusterMessagesAttributeEventListID:
+                result = @"EventList";
+                break;
 
-        case MTRAttributeIDTypeClusterMessagesAttributeClusterRevisionID:
-            result = @"ClusterRevision";
-            break;
+            case MTRAttributeIDTypeClusterMessagesAttributeAttributeListID:
+                result = @"AttributeList";
+                break;
 
-        default:
-            result = [NSString stringWithFormat:@"<Unknown attributeID %d>", attributeID];
-            break;
+            case MTRAttributeIDTypeClusterMessagesAttributeFeatureMapID:
+                result = @"FeatureMap";
+                break;
+
+            case MTRAttributeIDTypeClusterMessagesAttributeClusterRevisionID:
+                result = @"ClusterRevision";
+                break;
+
+
+            default:
+                result = [NSString stringWithFormat:@"<Unknown attributeID %d>", attributeID];
+                break;
         }
 
-    case MTRClusterIDTypeDeviceEnergyManagementID:
+case MTRClusterIDTypeDeviceEnergyManagementID:
 
-        switch (attributeID) {
+            switch (attributeID) {
 
-            // Cluster DeviceEnergyManagement attributes
-        case MTRAttributeIDTypeClusterDeviceEnergyManagementAttributeESATypeID:
-            result = @"ESAType";
-            break;
 
-        case MTRAttributeIDTypeClusterDeviceEnergyManagementAttributeESACanGenerateID:
-            result = @"ESACanGenerate";
-            break;
 
-        case MTRAttributeIDTypeClusterDeviceEnergyManagementAttributeESAStateID:
-            result = @"ESAState";
-            break;
+// Cluster DeviceEnergyManagement attributes
+            case MTRAttributeIDTypeClusterDeviceEnergyManagementAttributeESATypeID:
+                result = @"ESAType";
+                break;
 
-        case MTRAttributeIDTypeClusterDeviceEnergyManagementAttributeAbsMinPowerID:
-            result = @"AbsMinPower";
-            break;
+            case MTRAttributeIDTypeClusterDeviceEnergyManagementAttributeESACanGenerateID:
+                result = @"ESACanGenerate";
+                break;
 
-        case MTRAttributeIDTypeClusterDeviceEnergyManagementAttributeAbsMaxPowerID:
-            result = @"AbsMaxPower";
-            break;
+            case MTRAttributeIDTypeClusterDeviceEnergyManagementAttributeESAStateID:
+                result = @"ESAState";
+                break;
 
-        case MTRAttributeIDTypeClusterDeviceEnergyManagementAttributePowerAdjustmentCapabilityID:
-            result = @"PowerAdjustmentCapability";
-            break;
+            case MTRAttributeIDTypeClusterDeviceEnergyManagementAttributeAbsMinPowerID:
+                result = @"AbsMinPower";
+                break;
 
-        case MTRAttributeIDTypeClusterDeviceEnergyManagementAttributeForecastID:
-            result = @"Forecast";
-            break;
+            case MTRAttributeIDTypeClusterDeviceEnergyManagementAttributeAbsMaxPowerID:
+                result = @"AbsMaxPower";
+                break;
 
-        case MTRAttributeIDTypeClusterDeviceEnergyManagementAttributeOptOutStateID:
-            result = @"OptOutState";
-            break;
+            case MTRAttributeIDTypeClusterDeviceEnergyManagementAttributePowerAdjustmentCapabilityID:
+                result = @"PowerAdjustmentCapability";
+                break;
 
-        case MTRAttributeIDTypeClusterDeviceEnergyManagementAttributeGeneratedCommandListID:
-            result = @"GeneratedCommandList";
-            break;
+            case MTRAttributeIDTypeClusterDeviceEnergyManagementAttributeForecastID:
+                result = @"Forecast";
+                break;
 
-        case MTRAttributeIDTypeClusterDeviceEnergyManagementAttributeAcceptedCommandListID:
-            result = @"AcceptedCommandList";
-            break;
+            case MTRAttributeIDTypeClusterDeviceEnergyManagementAttributeOptOutStateID:
+                result = @"OptOutState";
+                break;
 
-        case MTRAttributeIDTypeClusterDeviceEnergyManagementAttributeEventListID:
-            result = @"EventList";
-            break;
+            case MTRAttributeIDTypeClusterDeviceEnergyManagementAttributeGeneratedCommandListID:
+                result = @"GeneratedCommandList";
+                break;
 
-        case MTRAttributeIDTypeClusterDeviceEnergyManagementAttributeAttributeListID:
-            result = @"AttributeList";
-            break;
+            case MTRAttributeIDTypeClusterDeviceEnergyManagementAttributeAcceptedCommandListID:
+                result = @"AcceptedCommandList";
+                break;
 
-        case MTRAttributeIDTypeClusterDeviceEnergyManagementAttributeFeatureMapID:
-            result = @"FeatureMap";
-            break;
+            case MTRAttributeIDTypeClusterDeviceEnergyManagementAttributeEventListID:
+                result = @"EventList";
+                break;
 
-        case MTRAttributeIDTypeClusterDeviceEnergyManagementAttributeClusterRevisionID:
-            result = @"ClusterRevision";
-            break;
+            case MTRAttributeIDTypeClusterDeviceEnergyManagementAttributeAttributeListID:
+                result = @"AttributeList";
+                break;
 
-        default:
-            result = [NSString stringWithFormat:@"<Unknown attributeID %d>", attributeID];
-            break;
+            case MTRAttributeIDTypeClusterDeviceEnergyManagementAttributeFeatureMapID:
+                result = @"FeatureMap";
+                break;
+
+            case MTRAttributeIDTypeClusterDeviceEnergyManagementAttributeClusterRevisionID:
+                result = @"ClusterRevision";
+                break;
+
+
+            default:
+                result = [NSString stringWithFormat:@"<Unknown attributeID %d>", attributeID];
+                break;
         }
 
-    case MTRClusterIDTypeEnergyEVSEID:
+case MTRClusterIDTypeEnergyEVSEID:
 
-        switch (attributeID) {
+            switch (attributeID) {
 
-            // Cluster EnergyEVSE attributes
-        case MTRAttributeIDTypeClusterEnergyEVSEAttributeStateID:
-            result = @"State";
-            break;
 
-        case MTRAttributeIDTypeClusterEnergyEVSEAttributeSupplyStateID:
-            result = @"SupplyState";
-            break;
 
-        case MTRAttributeIDTypeClusterEnergyEVSEAttributeFaultStateID:
-            result = @"FaultState";
-            break;
+// Cluster EnergyEVSE attributes
+            case MTRAttributeIDTypeClusterEnergyEVSEAttributeStateID:
+                result = @"State";
+                break;
 
-        case MTRAttributeIDTypeClusterEnergyEVSEAttributeChargingEnabledUntilID:
-            result = @"ChargingEnabledUntil";
-            break;
+            case MTRAttributeIDTypeClusterEnergyEVSEAttributeSupplyStateID:
+                result = @"SupplyState";
+                break;
 
-        case MTRAttributeIDTypeClusterEnergyEVSEAttributeDischargingEnabledUntilID:
-            result = @"DischargingEnabledUntil";
-            break;
+            case MTRAttributeIDTypeClusterEnergyEVSEAttributeFaultStateID:
+                result = @"FaultState";
+                break;
 
-        case MTRAttributeIDTypeClusterEnergyEVSEAttributeCircuitCapacityID:
-            result = @"CircuitCapacity";
-            break;
+            case MTRAttributeIDTypeClusterEnergyEVSEAttributeChargingEnabledUntilID:
+                result = @"ChargingEnabledUntil";
+                break;
 
-        case MTRAttributeIDTypeClusterEnergyEVSEAttributeMinimumChargeCurrentID:
-            result = @"MinimumChargeCurrent";
-            break;
+            case MTRAttributeIDTypeClusterEnergyEVSEAttributeDischargingEnabledUntilID:
+                result = @"DischargingEnabledUntil";
+                break;
 
-        case MTRAttributeIDTypeClusterEnergyEVSEAttributeMaximumChargeCurrentID:
-            result = @"MaximumChargeCurrent";
-            break;
+            case MTRAttributeIDTypeClusterEnergyEVSEAttributeCircuitCapacityID:
+                result = @"CircuitCapacity";
+                break;
 
-        case MTRAttributeIDTypeClusterEnergyEVSEAttributeMaximumDischargeCurrentID:
-            result = @"MaximumDischargeCurrent";
-            break;
+            case MTRAttributeIDTypeClusterEnergyEVSEAttributeMinimumChargeCurrentID:
+                result = @"MinimumChargeCurrent";
+                break;
 
-        case MTRAttributeIDTypeClusterEnergyEVSEAttributeUserMaximumChargeCurrentID:
-            result = @"UserMaximumChargeCurrent";
-            break;
+            case MTRAttributeIDTypeClusterEnergyEVSEAttributeMaximumChargeCurrentID:
+                result = @"MaximumChargeCurrent";
+                break;
 
-        case MTRAttributeIDTypeClusterEnergyEVSEAttributeRandomizationDelayWindowID:
-            result = @"RandomizationDelayWindow";
-            break;
+            case MTRAttributeIDTypeClusterEnergyEVSEAttributeMaximumDischargeCurrentID:
+                result = @"MaximumDischargeCurrent";
+                break;
 
-        case MTRAttributeIDTypeClusterEnergyEVSEAttributeNextChargeStartTimeID:
-            result = @"NextChargeStartTime";
-            break;
+            case MTRAttributeIDTypeClusterEnergyEVSEAttributeUserMaximumChargeCurrentID:
+                result = @"UserMaximumChargeCurrent";
+                break;
 
-        case MTRAttributeIDTypeClusterEnergyEVSEAttributeNextChargeTargetTimeID:
-            result = @"NextChargeTargetTime";
-            break;
+            case MTRAttributeIDTypeClusterEnergyEVSEAttributeRandomizationDelayWindowID:
+                result = @"RandomizationDelayWindow";
+                break;
 
-        case MTRAttributeIDTypeClusterEnergyEVSEAttributeNextChargeRequiredEnergyID:
-            result = @"NextChargeRequiredEnergy";
-            break;
+            case MTRAttributeIDTypeClusterEnergyEVSEAttributeNextChargeStartTimeID:
+                result = @"NextChargeStartTime";
+                break;
 
-        case MTRAttributeIDTypeClusterEnergyEVSEAttributeNextChargeTargetSoCID:
-            result = @"NextChargeTargetSoC";
-            break;
+            case MTRAttributeIDTypeClusterEnergyEVSEAttributeNextChargeTargetTimeID:
+                result = @"NextChargeTargetTime";
+                break;
 
-        case MTRAttributeIDTypeClusterEnergyEVSEAttributeApproximateEVEfficiencyID:
-            result = @"ApproximateEVEfficiency";
-            break;
+            case MTRAttributeIDTypeClusterEnergyEVSEAttributeNextChargeRequiredEnergyID:
+                result = @"NextChargeRequiredEnergy";
+                break;
 
-        case MTRAttributeIDTypeClusterEnergyEVSEAttributeStateOfChargeID:
-            result = @"StateOfCharge";
-            break;
+            case MTRAttributeIDTypeClusterEnergyEVSEAttributeNextChargeTargetSoCID:
+                result = @"NextChargeTargetSoC";
+                break;
 
-        case MTRAttributeIDTypeClusterEnergyEVSEAttributeBatteryCapacityID:
-            result = @"BatteryCapacity";
-            break;
+            case MTRAttributeIDTypeClusterEnergyEVSEAttributeApproximateEVEfficiencyID:
+                result = @"ApproximateEVEfficiency";
+                break;
 
-        case MTRAttributeIDTypeClusterEnergyEVSEAttributeVehicleIDID:
-            result = @"VehicleID";
-            break;
+            case MTRAttributeIDTypeClusterEnergyEVSEAttributeStateOfChargeID:
+                result = @"StateOfCharge";
+                break;
 
-        case MTRAttributeIDTypeClusterEnergyEVSEAttributeSessionIDID:
-            result = @"SessionID";
-            break;
+            case MTRAttributeIDTypeClusterEnergyEVSEAttributeBatteryCapacityID:
+                result = @"BatteryCapacity";
+                break;
 
-        case MTRAttributeIDTypeClusterEnergyEVSEAttributeSessionDurationID:
-            result = @"SessionDuration";
-            break;
+            case MTRAttributeIDTypeClusterEnergyEVSEAttributeVehicleIDID:
+                result = @"VehicleID";
+                break;
 
-        case MTRAttributeIDTypeClusterEnergyEVSEAttributeSessionEnergyChargedID:
-            result = @"SessionEnergyCharged";
-            break;
+            case MTRAttributeIDTypeClusterEnergyEVSEAttributeSessionIDID:
+                result = @"SessionID";
+                break;
 
-        case MTRAttributeIDTypeClusterEnergyEVSEAttributeSessionEnergyDischargedID:
-            result = @"SessionEnergyDischarged";
-            break;
+            case MTRAttributeIDTypeClusterEnergyEVSEAttributeSessionDurationID:
+                result = @"SessionDuration";
+                break;
 
-        case MTRAttributeIDTypeClusterEnergyEVSEAttributeGeneratedCommandListID:
-            result = @"GeneratedCommandList";
-            break;
+            case MTRAttributeIDTypeClusterEnergyEVSEAttributeSessionEnergyChargedID:
+                result = @"SessionEnergyCharged";
+                break;
 
-        case MTRAttributeIDTypeClusterEnergyEVSEAttributeAcceptedCommandListID:
-            result = @"AcceptedCommandList";
-            break;
+            case MTRAttributeIDTypeClusterEnergyEVSEAttributeSessionEnergyDischargedID:
+                result = @"SessionEnergyDischarged";
+                break;
 
-        case MTRAttributeIDTypeClusterEnergyEVSEAttributeEventListID:
-            result = @"EventList";
-            break;
+            case MTRAttributeIDTypeClusterEnergyEVSEAttributeGeneratedCommandListID:
+                result = @"GeneratedCommandList";
+                break;
 
-        case MTRAttributeIDTypeClusterEnergyEVSEAttributeAttributeListID:
-            result = @"AttributeList";
-            break;
+            case MTRAttributeIDTypeClusterEnergyEVSEAttributeAcceptedCommandListID:
+                result = @"AcceptedCommandList";
+                break;
 
-        case MTRAttributeIDTypeClusterEnergyEVSEAttributeFeatureMapID:
-            result = @"FeatureMap";
-            break;
+            case MTRAttributeIDTypeClusterEnergyEVSEAttributeEventListID:
+                result = @"EventList";
+                break;
 
-        case MTRAttributeIDTypeClusterEnergyEVSEAttributeClusterRevisionID:
-            result = @"ClusterRevision";
-            break;
+            case MTRAttributeIDTypeClusterEnergyEVSEAttributeAttributeListID:
+                result = @"AttributeList";
+                break;
 
-        default:
-            result = [NSString stringWithFormat:@"<Unknown attributeID %d>", attributeID];
-            break;
+            case MTRAttributeIDTypeClusterEnergyEVSEAttributeFeatureMapID:
+                result = @"FeatureMap";
+                break;
+
+            case MTRAttributeIDTypeClusterEnergyEVSEAttributeClusterRevisionID:
+                result = @"ClusterRevision";
+                break;
+
+
+            default:
+                result = [NSString stringWithFormat:@"<Unknown attributeID %d>", attributeID];
+                break;
         }
 
-    case MTRClusterIDTypeEnergyPreferenceID:
+case MTRClusterIDTypeEnergyPreferenceID:
 
-        switch (attributeID) {
+            switch (attributeID) {
 
-            // Cluster EnergyPreference attributes
-        case MTRAttributeIDTypeClusterEnergyPreferenceAttributeEnergyBalancesID:
-            result = @"EnergyBalances";
-            break;
 
-        case MTRAttributeIDTypeClusterEnergyPreferenceAttributeCurrentEnergyBalanceID:
-            result = @"CurrentEnergyBalance";
-            break;
 
-        case MTRAttributeIDTypeClusterEnergyPreferenceAttributeEnergyPrioritiesID:
-            result = @"EnergyPriorities";
-            break;
+// Cluster EnergyPreference attributes
+            case MTRAttributeIDTypeClusterEnergyPreferenceAttributeEnergyBalancesID:
+                result = @"EnergyBalances";
+                break;
 
-        case MTRAttributeIDTypeClusterEnergyPreferenceAttributeLowPowerModeSensitivitiesID:
-            result = @"LowPowerModeSensitivities";
-            break;
+            case MTRAttributeIDTypeClusterEnergyPreferenceAttributeCurrentEnergyBalanceID:
+                result = @"CurrentEnergyBalance";
+                break;
 
-        case MTRAttributeIDTypeClusterEnergyPreferenceAttributeCurrentLowPowerModeSensitivityID:
-            result = @"CurrentLowPowerModeSensitivity";
-            break;
+            case MTRAttributeIDTypeClusterEnergyPreferenceAttributeEnergyPrioritiesID:
+                result = @"EnergyPriorities";
+                break;
 
-        case MTRAttributeIDTypeClusterEnergyPreferenceAttributeGeneratedCommandListID:
-            result = @"GeneratedCommandList";
-            break;
+            case MTRAttributeIDTypeClusterEnergyPreferenceAttributeLowPowerModeSensitivitiesID:
+                result = @"LowPowerModeSensitivities";
+                break;
 
-        case MTRAttributeIDTypeClusterEnergyPreferenceAttributeAcceptedCommandListID:
-            result = @"AcceptedCommandList";
-            break;
+            case MTRAttributeIDTypeClusterEnergyPreferenceAttributeCurrentLowPowerModeSensitivityID:
+                result = @"CurrentLowPowerModeSensitivity";
+                break;
 
-        case MTRAttributeIDTypeClusterEnergyPreferenceAttributeEventListID:
-            result = @"EventList";
-            break;
+            case MTRAttributeIDTypeClusterEnergyPreferenceAttributeGeneratedCommandListID:
+                result = @"GeneratedCommandList";
+                break;
 
-        case MTRAttributeIDTypeClusterEnergyPreferenceAttributeAttributeListID:
-            result = @"AttributeList";
-            break;
+            case MTRAttributeIDTypeClusterEnergyPreferenceAttributeAcceptedCommandListID:
+                result = @"AcceptedCommandList";
+                break;
 
-        case MTRAttributeIDTypeClusterEnergyPreferenceAttributeFeatureMapID:
-            result = @"FeatureMap";
-            break;
+            case MTRAttributeIDTypeClusterEnergyPreferenceAttributeEventListID:
+                result = @"EventList";
+                break;
 
-        case MTRAttributeIDTypeClusterEnergyPreferenceAttributeClusterRevisionID:
-            result = @"ClusterRevision";
-            break;
+            case MTRAttributeIDTypeClusterEnergyPreferenceAttributeAttributeListID:
+                result = @"AttributeList";
+                break;
 
-        default:
-            result = [NSString stringWithFormat:@"<Unknown attributeID %d>", attributeID];
-            break;
+            case MTRAttributeIDTypeClusterEnergyPreferenceAttributeFeatureMapID:
+                result = @"FeatureMap";
+                break;
+
+            case MTRAttributeIDTypeClusterEnergyPreferenceAttributeClusterRevisionID:
+                result = @"ClusterRevision";
+                break;
+
+
+            default:
+                result = [NSString stringWithFormat:@"<Unknown attributeID %d>", attributeID];
+                break;
         }
 
-    case MTRClusterIDTypePowerTopologyID:
+case MTRClusterIDTypePowerTopologyID:
 
-        switch (attributeID) {
+            switch (attributeID) {
 
-            // Cluster PowerTopology attributes
-        case MTRAttributeIDTypeClusterPowerTopologyAttributeAvailableEndpointsID:
-            result = @"AvailableEndpoints";
-            break;
 
-        case MTRAttributeIDTypeClusterPowerTopologyAttributeActiveEndpointsID:
-            result = @"ActiveEndpoints";
-            break;
 
-        case MTRAttributeIDTypeClusterPowerTopologyAttributeGeneratedCommandListID:
-            result = @"GeneratedCommandList";
-            break;
+// Cluster PowerTopology attributes
+            case MTRAttributeIDTypeClusterPowerTopologyAttributeAvailableEndpointsID:
+                result = @"AvailableEndpoints";
+                break;
 
-        case MTRAttributeIDTypeClusterPowerTopologyAttributeAcceptedCommandListID:
-            result = @"AcceptedCommandList";
-            break;
+            case MTRAttributeIDTypeClusterPowerTopologyAttributeActiveEndpointsID:
+                result = @"ActiveEndpoints";
+                break;
 
-        case MTRAttributeIDTypeClusterPowerTopologyAttributeEventListID:
-            result = @"EventList";
-            break;
+            case MTRAttributeIDTypeClusterPowerTopologyAttributeGeneratedCommandListID:
+                result = @"GeneratedCommandList";
+                break;
 
-        case MTRAttributeIDTypeClusterPowerTopologyAttributeAttributeListID:
-            result = @"AttributeList";
-            break;
+            case MTRAttributeIDTypeClusterPowerTopologyAttributeAcceptedCommandListID:
+                result = @"AcceptedCommandList";
+                break;
 
-        case MTRAttributeIDTypeClusterPowerTopologyAttributeFeatureMapID:
-            result = @"FeatureMap";
-            break;
+            case MTRAttributeIDTypeClusterPowerTopologyAttributeEventListID:
+                result = @"EventList";
+                break;
 
-        case MTRAttributeIDTypeClusterPowerTopologyAttributeClusterRevisionID:
-            result = @"ClusterRevision";
-            break;
+            case MTRAttributeIDTypeClusterPowerTopologyAttributeAttributeListID:
+                result = @"AttributeList";
+                break;
 
-        default:
-            result = [NSString stringWithFormat:@"<Unknown attributeID %d>", attributeID];
-            break;
+            case MTRAttributeIDTypeClusterPowerTopologyAttributeFeatureMapID:
+                result = @"FeatureMap";
+                break;
+
+            case MTRAttributeIDTypeClusterPowerTopologyAttributeClusterRevisionID:
+                result = @"ClusterRevision";
+                break;
+
+
+            default:
+                result = [NSString stringWithFormat:@"<Unknown attributeID %d>", attributeID];
+                break;
         }
 
-    case MTRClusterIDTypeEnergyEVSEModeID:
+case MTRClusterIDTypeEnergyEVSEModeID:
 
-        switch (attributeID) {
+            switch (attributeID) {
 
-            // Cluster EnergyEVSEMode attributes
-        case MTRAttributeIDTypeClusterEnergyEVSEModeAttributeSupportedModesID:
-            result = @"SupportedModes";
-            break;
 
-        case MTRAttributeIDTypeClusterEnergyEVSEModeAttributeCurrentModeID:
-            result = @"CurrentMode";
-            break;
 
-        case MTRAttributeIDTypeClusterEnergyEVSEModeAttributeStartUpModeID:
-            result = @"StartUpMode";
-            break;
+// Cluster EnergyEVSEMode attributes
+            case MTRAttributeIDTypeClusterEnergyEVSEModeAttributeSupportedModesID:
+                result = @"SupportedModes";
+                break;
 
-        case MTRAttributeIDTypeClusterEnergyEVSEModeAttributeOnModeID:
-            result = @"OnMode";
-            break;
+            case MTRAttributeIDTypeClusterEnergyEVSEModeAttributeCurrentModeID:
+                result = @"CurrentMode";
+                break;
 
-        case MTRAttributeIDTypeClusterEnergyEVSEModeAttributeGeneratedCommandListID:
-            result = @"GeneratedCommandList";
-            break;
+            case MTRAttributeIDTypeClusterEnergyEVSEModeAttributeStartUpModeID:
+                result = @"StartUpMode";
+                break;
 
-        case MTRAttributeIDTypeClusterEnergyEVSEModeAttributeAcceptedCommandListID:
-            result = @"AcceptedCommandList";
-            break;
+            case MTRAttributeIDTypeClusterEnergyEVSEModeAttributeOnModeID:
+                result = @"OnMode";
+                break;
 
-        case MTRAttributeIDTypeClusterEnergyEVSEModeAttributeEventListID:
-            result = @"EventList";
-            break;
+            case MTRAttributeIDTypeClusterEnergyEVSEModeAttributeGeneratedCommandListID:
+                result = @"GeneratedCommandList";
+                break;
 
-        case MTRAttributeIDTypeClusterEnergyEVSEModeAttributeAttributeListID:
-            result = @"AttributeList";
-            break;
+            case MTRAttributeIDTypeClusterEnergyEVSEModeAttributeAcceptedCommandListID:
+                result = @"AcceptedCommandList";
+                break;
 
-        case MTRAttributeIDTypeClusterEnergyEVSEModeAttributeFeatureMapID:
-            result = @"FeatureMap";
-            break;
+            case MTRAttributeIDTypeClusterEnergyEVSEModeAttributeEventListID:
+                result = @"EventList";
+                break;
 
-        case MTRAttributeIDTypeClusterEnergyEVSEModeAttributeClusterRevisionID:
-            result = @"ClusterRevision";
-            break;
+            case MTRAttributeIDTypeClusterEnergyEVSEModeAttributeAttributeListID:
+                result = @"AttributeList";
+                break;
 
-        default:
-            result = [NSString stringWithFormat:@"<Unknown attributeID %d>", attributeID];
-            break;
+            case MTRAttributeIDTypeClusterEnergyEVSEModeAttributeFeatureMapID:
+                result = @"FeatureMap";
+                break;
+
+            case MTRAttributeIDTypeClusterEnergyEVSEModeAttributeClusterRevisionID:
+                result = @"ClusterRevision";
+                break;
+
+
+            default:
+                result = [NSString stringWithFormat:@"<Unknown attributeID %d>", attributeID];
+                break;
         }
 
-    case MTRClusterIDTypeWaterHeaterModeID:
+case MTRClusterIDTypeWaterHeaterModeID:
 
-        switch (attributeID) {
+            switch (attributeID) {
 
-            // Cluster WaterHeaterMode attributes
-        case MTRAttributeIDTypeClusterWaterHeaterModeAttributeSupportedModesID:
-            result = @"SupportedModes";
-            break;
 
-        case MTRAttributeIDTypeClusterWaterHeaterModeAttributeCurrentModeID:
-            result = @"CurrentMode";
-            break;
 
-        case MTRAttributeIDTypeClusterWaterHeaterModeAttributeStartUpModeID:
-            result = @"StartUpMode";
-            break;
+// Cluster WaterHeaterMode attributes
+            case MTRAttributeIDTypeClusterWaterHeaterModeAttributeSupportedModesID:
+                result = @"SupportedModes";
+                break;
 
-        case MTRAttributeIDTypeClusterWaterHeaterModeAttributeOnModeID:
-            result = @"OnMode";
-            break;
+            case MTRAttributeIDTypeClusterWaterHeaterModeAttributeCurrentModeID:
+                result = @"CurrentMode";
+                break;
 
-        case MTRAttributeIDTypeClusterWaterHeaterModeAttributeGeneratedCommandListID:
-            result = @"GeneratedCommandList";
-            break;
+            case MTRAttributeIDTypeClusterWaterHeaterModeAttributeStartUpModeID:
+                result = @"StartUpMode";
+                break;
 
-        case MTRAttributeIDTypeClusterWaterHeaterModeAttributeAcceptedCommandListID:
-            result = @"AcceptedCommandList";
-            break;
+            case MTRAttributeIDTypeClusterWaterHeaterModeAttributeOnModeID:
+                result = @"OnMode";
+                break;
 
-        case MTRAttributeIDTypeClusterWaterHeaterModeAttributeEventListID:
-            result = @"EventList";
-            break;
+            case MTRAttributeIDTypeClusterWaterHeaterModeAttributeGeneratedCommandListID:
+                result = @"GeneratedCommandList";
+                break;
 
-        case MTRAttributeIDTypeClusterWaterHeaterModeAttributeAttributeListID:
-            result = @"AttributeList";
-            break;
+            case MTRAttributeIDTypeClusterWaterHeaterModeAttributeAcceptedCommandListID:
+                result = @"AcceptedCommandList";
+                break;
 
-        case MTRAttributeIDTypeClusterWaterHeaterModeAttributeFeatureMapID:
-            result = @"FeatureMap";
-            break;
+            case MTRAttributeIDTypeClusterWaterHeaterModeAttributeEventListID:
+                result = @"EventList";
+                break;
 
-        case MTRAttributeIDTypeClusterWaterHeaterModeAttributeClusterRevisionID:
-            result = @"ClusterRevision";
-            break;
+            case MTRAttributeIDTypeClusterWaterHeaterModeAttributeAttributeListID:
+                result = @"AttributeList";
+                break;
 
-        default:
-            result = [NSString stringWithFormat:@"<Unknown attributeID %d>", attributeID];
-            break;
+            case MTRAttributeIDTypeClusterWaterHeaterModeAttributeFeatureMapID:
+                result = @"FeatureMap";
+                break;
+
+            case MTRAttributeIDTypeClusterWaterHeaterModeAttributeClusterRevisionID:
+                result = @"ClusterRevision";
+                break;
+
+
+            default:
+                result = [NSString stringWithFormat:@"<Unknown attributeID %d>", attributeID];
+                break;
         }
 
-    case MTRClusterIDTypeDeviceEnergyManagementModeID:
+case MTRClusterIDTypeDeviceEnergyManagementModeID:
 
-        switch (attributeID) {
+            switch (attributeID) {
 
-            // Cluster DeviceEnergyManagementMode attributes
-        case MTRAttributeIDTypeClusterDeviceEnergyManagementModeAttributeSupportedModesID:
-            result = @"SupportedModes";
-            break;
 
-        case MTRAttributeIDTypeClusterDeviceEnergyManagementModeAttributeCurrentModeID:
-            result = @"CurrentMode";
-            break;
 
-        case MTRAttributeIDTypeClusterDeviceEnergyManagementModeAttributeStartUpModeID:
-            result = @"StartUpMode";
-            break;
+// Cluster DeviceEnergyManagementMode attributes
+            case MTRAttributeIDTypeClusterDeviceEnergyManagementModeAttributeSupportedModesID:
+                result = @"SupportedModes";
+                break;
 
-        case MTRAttributeIDTypeClusterDeviceEnergyManagementModeAttributeOnModeID:
-            result = @"OnMode";
-            break;
+            case MTRAttributeIDTypeClusterDeviceEnergyManagementModeAttributeCurrentModeID:
+                result = @"CurrentMode";
+                break;
 
-        case MTRAttributeIDTypeClusterDeviceEnergyManagementModeAttributeGeneratedCommandListID:
-            result = @"GeneratedCommandList";
-            break;
+            case MTRAttributeIDTypeClusterDeviceEnergyManagementModeAttributeStartUpModeID:
+                result = @"StartUpMode";
+                break;
 
-        case MTRAttributeIDTypeClusterDeviceEnergyManagementModeAttributeAcceptedCommandListID:
-            result = @"AcceptedCommandList";
-            break;
+            case MTRAttributeIDTypeClusterDeviceEnergyManagementModeAttributeOnModeID:
+                result = @"OnMode";
+                break;
 
-        case MTRAttributeIDTypeClusterDeviceEnergyManagementModeAttributeEventListID:
-            result = @"EventList";
-            break;
+            case MTRAttributeIDTypeClusterDeviceEnergyManagementModeAttributeGeneratedCommandListID:
+                result = @"GeneratedCommandList";
+                break;
 
-        case MTRAttributeIDTypeClusterDeviceEnergyManagementModeAttributeAttributeListID:
-            result = @"AttributeList";
-            break;
+            case MTRAttributeIDTypeClusterDeviceEnergyManagementModeAttributeAcceptedCommandListID:
+                result = @"AcceptedCommandList";
+                break;
 
-        case MTRAttributeIDTypeClusterDeviceEnergyManagementModeAttributeFeatureMapID:
-            result = @"FeatureMap";
-            break;
+            case MTRAttributeIDTypeClusterDeviceEnergyManagementModeAttributeEventListID:
+                result = @"EventList";
+                break;
 
-        case MTRAttributeIDTypeClusterDeviceEnergyManagementModeAttributeClusterRevisionID:
-            result = @"ClusterRevision";
-            break;
+            case MTRAttributeIDTypeClusterDeviceEnergyManagementModeAttributeAttributeListID:
+                result = @"AttributeList";
+                break;
 
-        default:
-            result = [NSString stringWithFormat:@"<Unknown attributeID %d>", attributeID];
-            break;
+            case MTRAttributeIDTypeClusterDeviceEnergyManagementModeAttributeFeatureMapID:
+                result = @"FeatureMap";
+                break;
+
+            case MTRAttributeIDTypeClusterDeviceEnergyManagementModeAttributeClusterRevisionID:
+                result = @"ClusterRevision";
+                break;
+
+
+            default:
+                result = [NSString stringWithFormat:@"<Unknown attributeID %d>", attributeID];
+                break;
         }
 
-    case MTRClusterIDTypeDoorLockID:
+case MTRClusterIDTypeDoorLockID:
 
-        switch (attributeID) {
+            switch (attributeID) {
 
-            // Cluster DoorLock attributes
-        case MTRAttributeIDTypeClusterDoorLockAttributeLockStateID:
-            result = @"LockState";
-            break;
 
-        case MTRAttributeIDTypeClusterDoorLockAttributeLockTypeID:
-            result = @"LockType";
-            break;
 
-        case MTRAttributeIDTypeClusterDoorLockAttributeActuatorEnabledID:
-            result = @"ActuatorEnabled";
-            break;
+// Cluster DoorLock attributes
+            case MTRAttributeIDTypeClusterDoorLockAttributeLockStateID:
+                result = @"LockState";
+                break;
 
-        case MTRAttributeIDTypeClusterDoorLockAttributeDoorStateID:
-            result = @"DoorState";
-            break;
+            case MTRAttributeIDTypeClusterDoorLockAttributeLockTypeID:
+                result = @"LockType";
+                break;
 
-        case MTRAttributeIDTypeClusterDoorLockAttributeDoorOpenEventsID:
-            result = @"DoorOpenEvents";
-            break;
+            case MTRAttributeIDTypeClusterDoorLockAttributeActuatorEnabledID:
+                result = @"ActuatorEnabled";
+                break;
 
-        case MTRAttributeIDTypeClusterDoorLockAttributeDoorClosedEventsID:
-            result = @"DoorClosedEvents";
-            break;
+            case MTRAttributeIDTypeClusterDoorLockAttributeDoorStateID:
+                result = @"DoorState";
+                break;
 
-        case MTRAttributeIDTypeClusterDoorLockAttributeOpenPeriodID:
-            result = @"OpenPeriod";
-            break;
+            case MTRAttributeIDTypeClusterDoorLockAttributeDoorOpenEventsID:
+                result = @"DoorOpenEvents";
+                break;
 
-        case MTRAttributeIDTypeClusterDoorLockAttributeNumberOfTotalUsersSupportedID:
-            result = @"NumberOfTotalUsersSupported";
-            break;
+            case MTRAttributeIDTypeClusterDoorLockAttributeDoorClosedEventsID:
+                result = @"DoorClosedEvents";
+                break;
 
-        case MTRAttributeIDTypeClusterDoorLockAttributeNumberOfPINUsersSupportedID:
-            result = @"NumberOfPINUsersSupported";
-            break;
+            case MTRAttributeIDTypeClusterDoorLockAttributeOpenPeriodID:
+                result = @"OpenPeriod";
+                break;
 
-        case MTRAttributeIDTypeClusterDoorLockAttributeNumberOfRFIDUsersSupportedID:
-            result = @"NumberOfRFIDUsersSupported";
-            break;
+            case MTRAttributeIDTypeClusterDoorLockAttributeNumberOfTotalUsersSupportedID:
+                result = @"NumberOfTotalUsersSupported";
+                break;
 
-        case MTRAttributeIDTypeClusterDoorLockAttributeNumberOfWeekDaySchedulesSupportedPerUserID:
-            result = @"NumberOfWeekDaySchedulesSupportedPerUser";
-            break;
+            case MTRAttributeIDTypeClusterDoorLockAttributeNumberOfPINUsersSupportedID:
+                result = @"NumberOfPINUsersSupported";
+                break;
 
-        case MTRAttributeIDTypeClusterDoorLockAttributeNumberOfYearDaySchedulesSupportedPerUserID:
-            result = @"NumberOfYearDaySchedulesSupportedPerUser";
-            break;
+            case MTRAttributeIDTypeClusterDoorLockAttributeNumberOfRFIDUsersSupportedID:
+                result = @"NumberOfRFIDUsersSupported";
+                break;
 
-        case MTRAttributeIDTypeClusterDoorLockAttributeNumberOfHolidaySchedulesSupportedID:
-            result = @"NumberOfHolidaySchedulesSupported";
-            break;
+            case MTRAttributeIDTypeClusterDoorLockAttributeNumberOfWeekDaySchedulesSupportedPerUserID:
+                result = @"NumberOfWeekDaySchedulesSupportedPerUser";
+                break;
 
-        case MTRAttributeIDTypeClusterDoorLockAttributeMaxPINCodeLengthID:
-            result = @"MaxPINCodeLength";
-            break;
+            case MTRAttributeIDTypeClusterDoorLockAttributeNumberOfYearDaySchedulesSupportedPerUserID:
+                result = @"NumberOfYearDaySchedulesSupportedPerUser";
+                break;
 
-        case MTRAttributeIDTypeClusterDoorLockAttributeMinPINCodeLengthID:
-            result = @"MinPINCodeLength";
-            break;
+            case MTRAttributeIDTypeClusterDoorLockAttributeNumberOfHolidaySchedulesSupportedID:
+                result = @"NumberOfHolidaySchedulesSupported";
+                break;
 
-        case MTRAttributeIDTypeClusterDoorLockAttributeMaxRFIDCodeLengthID:
-            result = @"MaxRFIDCodeLength";
-            break;
+            case MTRAttributeIDTypeClusterDoorLockAttributeMaxPINCodeLengthID:
+                result = @"MaxPINCodeLength";
+                break;
 
-        case MTRAttributeIDTypeClusterDoorLockAttributeMinRFIDCodeLengthID:
-            result = @"MinRFIDCodeLength";
-            break;
+            case MTRAttributeIDTypeClusterDoorLockAttributeMinPINCodeLengthID:
+                result = @"MinPINCodeLength";
+                break;
 
-        case MTRAttributeIDTypeClusterDoorLockAttributeCredentialRulesSupportID:
-            result = @"CredentialRulesSupport";
-            break;
+            case MTRAttributeIDTypeClusterDoorLockAttributeMaxRFIDCodeLengthID:
+                result = @"MaxRFIDCodeLength";
+                break;
 
-        case MTRAttributeIDTypeClusterDoorLockAttributeNumberOfCredentialsSupportedPerUserID:
-            result = @"NumberOfCredentialsSupportedPerUser";
-            break;
+            case MTRAttributeIDTypeClusterDoorLockAttributeMinRFIDCodeLengthID:
+                result = @"MinRFIDCodeLength";
+                break;
 
-        case MTRAttributeIDTypeClusterDoorLockAttributeLanguageID:
-            result = @"Language";
-            break;
+            case MTRAttributeIDTypeClusterDoorLockAttributeCredentialRulesSupportID:
+                result = @"CredentialRulesSupport";
+                break;
 
-        case MTRAttributeIDTypeClusterDoorLockAttributeLEDSettingsID:
-            result = @"LEDSettings";
-            break;
+            case MTRAttributeIDTypeClusterDoorLockAttributeNumberOfCredentialsSupportedPerUserID:
+                result = @"NumberOfCredentialsSupportedPerUser";
+                break;
 
-        case MTRAttributeIDTypeClusterDoorLockAttributeAutoRelockTimeID:
-            result = @"AutoRelockTime";
-            break;
+            case MTRAttributeIDTypeClusterDoorLockAttributeLanguageID:
+                result = @"Language";
+                break;
 
-        case MTRAttributeIDTypeClusterDoorLockAttributeSoundVolumeID:
-            result = @"SoundVolume";
-            break;
+            case MTRAttributeIDTypeClusterDoorLockAttributeLEDSettingsID:
+                result = @"LEDSettings";
+                break;
 
-        case MTRAttributeIDTypeClusterDoorLockAttributeOperatingModeID:
-            result = @"OperatingMode";
-            break;
+            case MTRAttributeIDTypeClusterDoorLockAttributeAutoRelockTimeID:
+                result = @"AutoRelockTime";
+                break;
 
-        case MTRAttributeIDTypeClusterDoorLockAttributeSupportedOperatingModesID:
-            result = @"SupportedOperatingModes";
-            break;
+            case MTRAttributeIDTypeClusterDoorLockAttributeSoundVolumeID:
+                result = @"SoundVolume";
+                break;
 
-        case MTRAttributeIDTypeClusterDoorLockAttributeDefaultConfigurationRegisterID:
-            result = @"DefaultConfigurationRegister";
-            break;
+            case MTRAttributeIDTypeClusterDoorLockAttributeOperatingModeID:
+                result = @"OperatingMode";
+                break;
 
-        case MTRAttributeIDTypeClusterDoorLockAttributeEnableLocalProgrammingID:
-            result = @"EnableLocalProgramming";
-            break;
+            case MTRAttributeIDTypeClusterDoorLockAttributeSupportedOperatingModesID:
+                result = @"SupportedOperatingModes";
+                break;
 
-        case MTRAttributeIDTypeClusterDoorLockAttributeEnableOneTouchLockingID:
-            result = @"EnableOneTouchLocking";
-            break;
+            case MTRAttributeIDTypeClusterDoorLockAttributeDefaultConfigurationRegisterID:
+                result = @"DefaultConfigurationRegister";
+                break;
 
-        case MTRAttributeIDTypeClusterDoorLockAttributeEnableInsideStatusLEDID:
-            result = @"EnableInsideStatusLED";
-            break;
+            case MTRAttributeIDTypeClusterDoorLockAttributeEnableLocalProgrammingID:
+                result = @"EnableLocalProgramming";
+                break;
 
-        case MTRAttributeIDTypeClusterDoorLockAttributeEnablePrivacyModeButtonID:
-            result = @"EnablePrivacyModeButton";
-            break;
+            case MTRAttributeIDTypeClusterDoorLockAttributeEnableOneTouchLockingID:
+                result = @"EnableOneTouchLocking";
+                break;
 
-        case MTRAttributeIDTypeClusterDoorLockAttributeLocalProgrammingFeaturesID:
-            result = @"LocalProgrammingFeatures";
-            break;
+            case MTRAttributeIDTypeClusterDoorLockAttributeEnableInsideStatusLEDID:
+                result = @"EnableInsideStatusLED";
+                break;
 
-        case MTRAttributeIDTypeClusterDoorLockAttributeWrongCodeEntryLimitID:
-            result = @"WrongCodeEntryLimit";
-            break;
+            case MTRAttributeIDTypeClusterDoorLockAttributeEnablePrivacyModeButtonID:
+                result = @"EnablePrivacyModeButton";
+                break;
 
-        case MTRAttributeIDTypeClusterDoorLockAttributeUserCodeTemporaryDisableTimeID:
-            result = @"UserCodeTemporaryDisableTime";
-            break;
+            case MTRAttributeIDTypeClusterDoorLockAttributeLocalProgrammingFeaturesID:
+                result = @"LocalProgrammingFeatures";
+                break;
 
-        case MTRAttributeIDTypeClusterDoorLockAttributeSendPINOverTheAirID:
-            result = @"SendPINOverTheAir";
-            break;
+            case MTRAttributeIDTypeClusterDoorLockAttributeWrongCodeEntryLimitID:
+                result = @"WrongCodeEntryLimit";
+                break;
 
-        case MTRAttributeIDTypeClusterDoorLockAttributeRequirePINforRemoteOperationID:
-            result = @"RequirePINforRemoteOperation";
-            break;
+            case MTRAttributeIDTypeClusterDoorLockAttributeUserCodeTemporaryDisableTimeID:
+                result = @"UserCodeTemporaryDisableTime";
+                break;
 
-        case MTRAttributeIDTypeClusterDoorLockAttributeExpiringUserTimeoutID:
-            result = @"ExpiringUserTimeout";
-            break;
+            case MTRAttributeIDTypeClusterDoorLockAttributeSendPINOverTheAirID:
+                result = @"SendPINOverTheAir";
+                break;
 
-        case MTRAttributeIDTypeClusterDoorLockAttributeAliroReaderVerificationKeyID:
-            result = @"AliroReaderVerificationKey";
-            break;
+            case MTRAttributeIDTypeClusterDoorLockAttributeRequirePINforRemoteOperationID:
+                result = @"RequirePINforRemoteOperation";
+                break;
 
-        case MTRAttributeIDTypeClusterDoorLockAttributeAliroReaderGroupIdentifierID:
-            result = @"AliroReaderGroupIdentifier";
-            break;
+            case MTRAttributeIDTypeClusterDoorLockAttributeExpiringUserTimeoutID:
+                result = @"ExpiringUserTimeout";
+                break;
 
-        case MTRAttributeIDTypeClusterDoorLockAttributeAliroReaderGroupSubIdentifierID:
-            result = @"AliroReaderGroupSubIdentifier";
-            break;
+            case MTRAttributeIDTypeClusterDoorLockAttributeAliroReaderVerificationKeyID:
+                result = @"AliroReaderVerificationKey";
+                break;
 
-        case MTRAttributeIDTypeClusterDoorLockAttributeAliroExpeditedTransactionSupportedProtocolVersionsID:
-            result = @"AliroExpeditedTransactionSupportedProtocolVersions";
-            break;
+            case MTRAttributeIDTypeClusterDoorLockAttributeAliroReaderGroupIdentifierID:
+                result = @"AliroReaderGroupIdentifier";
+                break;
 
-        case MTRAttributeIDTypeClusterDoorLockAttributeAliroGroupResolvingKeyID:
-            result = @"AliroGroupResolvingKey";
-            break;
+            case MTRAttributeIDTypeClusterDoorLockAttributeAliroReaderGroupSubIdentifierID:
+                result = @"AliroReaderGroupSubIdentifier";
+                break;
 
-        case MTRAttributeIDTypeClusterDoorLockAttributeAliroSupportedBLEUWBProtocolVersionsID:
-            result = @"AliroSupportedBLEUWBProtocolVersions";
-            break;
+            case MTRAttributeIDTypeClusterDoorLockAttributeAliroExpeditedTransactionSupportedProtocolVersionsID:
+                result = @"AliroExpeditedTransactionSupportedProtocolVersions";
+                break;
 
-        case MTRAttributeIDTypeClusterDoorLockAttributeAliroBLEAdvertisingVersionID:
-            result = @"AliroBLEAdvertisingVersion";
-            break;
+            case MTRAttributeIDTypeClusterDoorLockAttributeAliroGroupResolvingKeyID:
+                result = @"AliroGroupResolvingKey";
+                break;
 
-        case MTRAttributeIDTypeClusterDoorLockAttributeNumberOfAliroCredentialIssuerKeysSupportedID:
-            result = @"NumberOfAliroCredentialIssuerKeysSupported";
-            break;
+            case MTRAttributeIDTypeClusterDoorLockAttributeAliroSupportedBLEUWBProtocolVersionsID:
+                result = @"AliroSupportedBLEUWBProtocolVersions";
+                break;
 
-        case MTRAttributeIDTypeClusterDoorLockAttributeNumberOfAliroEndpointKeysSupportedID:
-            result = @"NumberOfAliroEndpointKeysSupported";
-            break;
+            case MTRAttributeIDTypeClusterDoorLockAttributeAliroBLEAdvertisingVersionID:
+                result = @"AliroBLEAdvertisingVersion";
+                break;
 
-        case MTRAttributeIDTypeClusterDoorLockAttributeGeneratedCommandListID:
-            result = @"GeneratedCommandList";
-            break;
+            case MTRAttributeIDTypeClusterDoorLockAttributeNumberOfAliroCredentialIssuerKeysSupportedID:
+                result = @"NumberOfAliroCredentialIssuerKeysSupported";
+                break;
 
-        case MTRAttributeIDTypeClusterDoorLockAttributeAcceptedCommandListID:
-            result = @"AcceptedCommandList";
-            break;
+            case MTRAttributeIDTypeClusterDoorLockAttributeNumberOfAliroEndpointKeysSupportedID:
+                result = @"NumberOfAliroEndpointKeysSupported";
+                break;
 
-        case MTRAttributeIDTypeClusterDoorLockAttributeEventListID:
-            result = @"EventList";
-            break;
+            case MTRAttributeIDTypeClusterDoorLockAttributeGeneratedCommandListID:
+                result = @"GeneratedCommandList";
+                break;
 
-        case MTRAttributeIDTypeClusterDoorLockAttributeAttributeListID:
-            result = @"AttributeList";
-            break;
+            case MTRAttributeIDTypeClusterDoorLockAttributeAcceptedCommandListID:
+                result = @"AcceptedCommandList";
+                break;
 
-        case MTRAttributeIDTypeClusterDoorLockAttributeFeatureMapID:
-            result = @"FeatureMap";
-            break;
+            case MTRAttributeIDTypeClusterDoorLockAttributeEventListID:
+                result = @"EventList";
+                break;
 
-        case MTRAttributeIDTypeClusterDoorLockAttributeClusterRevisionID:
-            result = @"ClusterRevision";
-            break;
+            case MTRAttributeIDTypeClusterDoorLockAttributeAttributeListID:
+                result = @"AttributeList";
+                break;
 
-        default:
-            result = [NSString stringWithFormat:@"<Unknown attributeID %d>", attributeID];
-            break;
+            case MTRAttributeIDTypeClusterDoorLockAttributeFeatureMapID:
+                result = @"FeatureMap";
+                break;
+
+            case MTRAttributeIDTypeClusterDoorLockAttributeClusterRevisionID:
+                result = @"ClusterRevision";
+                break;
+
+
+            default:
+                result = [NSString stringWithFormat:@"<Unknown attributeID %d>", attributeID];
+                break;
         }
 
-    case MTRClusterIDTypeWindowCoveringID:
+case MTRClusterIDTypeWindowCoveringID:
 
-        switch (attributeID) {
+            switch (attributeID) {
 
-            // Cluster WindowCovering attributes
-        case MTRAttributeIDTypeClusterWindowCoveringAttributeTypeID:
-            result = @"Type";
-            break;
 
-        case MTRAttributeIDTypeClusterWindowCoveringAttributePhysicalClosedLimitLiftID:
-            result = @"PhysicalClosedLimitLift";
-            break;
 
-        case MTRAttributeIDTypeClusterWindowCoveringAttributePhysicalClosedLimitTiltID:
-            result = @"PhysicalClosedLimitTilt";
-            break;
+// Cluster WindowCovering attributes
+            case MTRAttributeIDTypeClusterWindowCoveringAttributeTypeID:
+                result = @"Type";
+                break;
 
-        case MTRAttributeIDTypeClusterWindowCoveringAttributeCurrentPositionLiftID:
-            result = @"CurrentPositionLift";
-            break;
+            case MTRAttributeIDTypeClusterWindowCoveringAttributePhysicalClosedLimitLiftID:
+                result = @"PhysicalClosedLimitLift";
+                break;
 
-        case MTRAttributeIDTypeClusterWindowCoveringAttributeCurrentPositionTiltID:
-            result = @"CurrentPositionTilt";
-            break;
+            case MTRAttributeIDTypeClusterWindowCoveringAttributePhysicalClosedLimitTiltID:
+                result = @"PhysicalClosedLimitTilt";
+                break;
 
-        case MTRAttributeIDTypeClusterWindowCoveringAttributeNumberOfActuationsLiftID:
-            result = @"NumberOfActuationsLift";
-            break;
+            case MTRAttributeIDTypeClusterWindowCoveringAttributeCurrentPositionLiftID:
+                result = @"CurrentPositionLift";
+                break;
 
-        case MTRAttributeIDTypeClusterWindowCoveringAttributeNumberOfActuationsTiltID:
-            result = @"NumberOfActuationsTilt";
-            break;
+            case MTRAttributeIDTypeClusterWindowCoveringAttributeCurrentPositionTiltID:
+                result = @"CurrentPositionTilt";
+                break;
 
-        case MTRAttributeIDTypeClusterWindowCoveringAttributeConfigStatusID:
-            result = @"ConfigStatus";
-            break;
+            case MTRAttributeIDTypeClusterWindowCoveringAttributeNumberOfActuationsLiftID:
+                result = @"NumberOfActuationsLift";
+                break;
 
-        case MTRAttributeIDTypeClusterWindowCoveringAttributeCurrentPositionLiftPercentageID:
-            result = @"CurrentPositionLiftPercentage";
-            break;
+            case MTRAttributeIDTypeClusterWindowCoveringAttributeNumberOfActuationsTiltID:
+                result = @"NumberOfActuationsTilt";
+                break;
 
-        case MTRAttributeIDTypeClusterWindowCoveringAttributeCurrentPositionTiltPercentageID:
-            result = @"CurrentPositionTiltPercentage";
-            break;
+            case MTRAttributeIDTypeClusterWindowCoveringAttributeConfigStatusID:
+                result = @"ConfigStatus";
+                break;
 
-        case MTRAttributeIDTypeClusterWindowCoveringAttributeOperationalStatusID:
-            result = @"OperationalStatus";
-            break;
+            case MTRAttributeIDTypeClusterWindowCoveringAttributeCurrentPositionLiftPercentageID:
+                result = @"CurrentPositionLiftPercentage";
+                break;
 
-        case MTRAttributeIDTypeClusterWindowCoveringAttributeTargetPositionLiftPercent100thsID:
-            result = @"TargetPositionLiftPercent100ths";
-            break;
+            case MTRAttributeIDTypeClusterWindowCoveringAttributeCurrentPositionTiltPercentageID:
+                result = @"CurrentPositionTiltPercentage";
+                break;
 
-        case MTRAttributeIDTypeClusterWindowCoveringAttributeTargetPositionTiltPercent100thsID:
-            result = @"TargetPositionTiltPercent100ths";
-            break;
+            case MTRAttributeIDTypeClusterWindowCoveringAttributeOperationalStatusID:
+                result = @"OperationalStatus";
+                break;
 
-        case MTRAttributeIDTypeClusterWindowCoveringAttributeEndProductTypeID:
-            result = @"EndProductType";
-            break;
+            case MTRAttributeIDTypeClusterWindowCoveringAttributeTargetPositionLiftPercent100thsID:
+                result = @"TargetPositionLiftPercent100ths";
+                break;
 
-        case MTRAttributeIDTypeClusterWindowCoveringAttributeCurrentPositionLiftPercent100thsID:
-            result = @"CurrentPositionLiftPercent100ths";
-            break;
+            case MTRAttributeIDTypeClusterWindowCoveringAttributeTargetPositionTiltPercent100thsID:
+                result = @"TargetPositionTiltPercent100ths";
+                break;
 
-        case MTRAttributeIDTypeClusterWindowCoveringAttributeCurrentPositionTiltPercent100thsID:
-            result = @"CurrentPositionTiltPercent100ths";
-            break;
+            case MTRAttributeIDTypeClusterWindowCoveringAttributeEndProductTypeID:
+                result = @"EndProductType";
+                break;
 
-        case MTRAttributeIDTypeClusterWindowCoveringAttributeInstalledOpenLimitLiftID:
-            result = @"InstalledOpenLimitLift";
-            break;
+            case MTRAttributeIDTypeClusterWindowCoveringAttributeCurrentPositionLiftPercent100thsID:
+                result = @"CurrentPositionLiftPercent100ths";
+                break;
 
-        case MTRAttributeIDTypeClusterWindowCoveringAttributeInstalledClosedLimitLiftID:
-            result = @"InstalledClosedLimitLift";
-            break;
+            case MTRAttributeIDTypeClusterWindowCoveringAttributeCurrentPositionTiltPercent100thsID:
+                result = @"CurrentPositionTiltPercent100ths";
+                break;
 
-        case MTRAttributeIDTypeClusterWindowCoveringAttributeInstalledOpenLimitTiltID:
-            result = @"InstalledOpenLimitTilt";
-            break;
+            case MTRAttributeIDTypeClusterWindowCoveringAttributeInstalledOpenLimitLiftID:
+                result = @"InstalledOpenLimitLift";
+                break;
 
-        case MTRAttributeIDTypeClusterWindowCoveringAttributeInstalledClosedLimitTiltID:
-            result = @"InstalledClosedLimitTilt";
-            break;
+            case MTRAttributeIDTypeClusterWindowCoveringAttributeInstalledClosedLimitLiftID:
+                result = @"InstalledClosedLimitLift";
+                break;
 
-        case MTRAttributeIDTypeClusterWindowCoveringAttributeModeID:
-            result = @"Mode";
-            break;
+            case MTRAttributeIDTypeClusterWindowCoveringAttributeInstalledOpenLimitTiltID:
+                result = @"InstalledOpenLimitTilt";
+                break;
 
-        case MTRAttributeIDTypeClusterWindowCoveringAttributeSafetyStatusID:
-            result = @"SafetyStatus";
-            break;
+            case MTRAttributeIDTypeClusterWindowCoveringAttributeInstalledClosedLimitTiltID:
+                result = @"InstalledClosedLimitTilt";
+                break;
 
-        case MTRAttributeIDTypeClusterWindowCoveringAttributeGeneratedCommandListID:
-            result = @"GeneratedCommandList";
-            break;
+            case MTRAttributeIDTypeClusterWindowCoveringAttributeModeID:
+                result = @"Mode";
+                break;
 
-        case MTRAttributeIDTypeClusterWindowCoveringAttributeAcceptedCommandListID:
-            result = @"AcceptedCommandList";
-            break;
+            case MTRAttributeIDTypeClusterWindowCoveringAttributeSafetyStatusID:
+                result = @"SafetyStatus";
+                break;
 
-        case MTRAttributeIDTypeClusterWindowCoveringAttributeEventListID:
-            result = @"EventList";
-            break;
+            case MTRAttributeIDTypeClusterWindowCoveringAttributeGeneratedCommandListID:
+                result = @"GeneratedCommandList";
+                break;
 
-        case MTRAttributeIDTypeClusterWindowCoveringAttributeAttributeListID:
-            result = @"AttributeList";
-            break;
+            case MTRAttributeIDTypeClusterWindowCoveringAttributeAcceptedCommandListID:
+                result = @"AcceptedCommandList";
+                break;
 
-        case MTRAttributeIDTypeClusterWindowCoveringAttributeFeatureMapID:
-            result = @"FeatureMap";
-            break;
+            case MTRAttributeIDTypeClusterWindowCoveringAttributeEventListID:
+                result = @"EventList";
+                break;
 
-        case MTRAttributeIDTypeClusterWindowCoveringAttributeClusterRevisionID:
-            result = @"ClusterRevision";
-            break;
+            case MTRAttributeIDTypeClusterWindowCoveringAttributeAttributeListID:
+                result = @"AttributeList";
+                break;
 
-        default:
-            result = [NSString stringWithFormat:@"<Unknown attributeID %d>", attributeID];
-            break;
+            case MTRAttributeIDTypeClusterWindowCoveringAttributeFeatureMapID:
+                result = @"FeatureMap";
+                break;
+
+            case MTRAttributeIDTypeClusterWindowCoveringAttributeClusterRevisionID:
+                result = @"ClusterRevision";
+                break;
+
+
+            default:
+                result = [NSString stringWithFormat:@"<Unknown attributeID %d>", attributeID];
+                break;
         }
 
-    case MTRClusterIDTypeBarrierControlID:
+case MTRClusterIDTypeBarrierControlID:
 
-        switch (attributeID) {
+            switch (attributeID) {
 
-            // Cluster BarrierControl attributes
-        case MTRAttributeIDTypeClusterBarrierControlAttributeBarrierMovingStateID:
-            result = @"BarrierMovingState";
-            break;
 
-        case MTRAttributeIDTypeClusterBarrierControlAttributeBarrierSafetyStatusID:
-            result = @"BarrierSafetyStatus";
-            break;
 
-        case MTRAttributeIDTypeClusterBarrierControlAttributeBarrierCapabilitiesID:
-            result = @"BarrierCapabilities";
-            break;
+// Cluster BarrierControl attributes
+            case MTRAttributeIDTypeClusterBarrierControlAttributeBarrierMovingStateID:
+                result = @"BarrierMovingState";
+                break;
 
-        case MTRAttributeIDTypeClusterBarrierControlAttributeBarrierOpenEventsID:
-            result = @"BarrierOpenEvents";
-            break;
+            case MTRAttributeIDTypeClusterBarrierControlAttributeBarrierSafetyStatusID:
+                result = @"BarrierSafetyStatus";
+                break;
 
-        case MTRAttributeIDTypeClusterBarrierControlAttributeBarrierCloseEventsID:
-            result = @"BarrierCloseEvents";
-            break;
+            case MTRAttributeIDTypeClusterBarrierControlAttributeBarrierCapabilitiesID:
+                result = @"BarrierCapabilities";
+                break;
 
-        case MTRAttributeIDTypeClusterBarrierControlAttributeBarrierCommandOpenEventsID:
-            result = @"BarrierCommandOpenEvents";
-            break;
+            case MTRAttributeIDTypeClusterBarrierControlAttributeBarrierOpenEventsID:
+                result = @"BarrierOpenEvents";
+                break;
 
-        case MTRAttributeIDTypeClusterBarrierControlAttributeBarrierCommandCloseEventsID:
-            result = @"BarrierCommandCloseEvents";
-            break;
+            case MTRAttributeIDTypeClusterBarrierControlAttributeBarrierCloseEventsID:
+                result = @"BarrierCloseEvents";
+                break;
 
-        case MTRAttributeIDTypeClusterBarrierControlAttributeBarrierOpenPeriodID:
-            result = @"BarrierOpenPeriod";
-            break;
+            case MTRAttributeIDTypeClusterBarrierControlAttributeBarrierCommandOpenEventsID:
+                result = @"BarrierCommandOpenEvents";
+                break;
 
-        case MTRAttributeIDTypeClusterBarrierControlAttributeBarrierClosePeriodID:
-            result = @"BarrierClosePeriod";
-            break;
+            case MTRAttributeIDTypeClusterBarrierControlAttributeBarrierCommandCloseEventsID:
+                result = @"BarrierCommandCloseEvents";
+                break;
 
-        case MTRAttributeIDTypeClusterBarrierControlAttributeBarrierPositionID:
-            result = @"BarrierPosition";
-            break;
+            case MTRAttributeIDTypeClusterBarrierControlAttributeBarrierOpenPeriodID:
+                result = @"BarrierOpenPeriod";
+                break;
 
-        case MTRAttributeIDTypeClusterBarrierControlAttributeGeneratedCommandListID:
-            result = @"GeneratedCommandList";
-            break;
+            case MTRAttributeIDTypeClusterBarrierControlAttributeBarrierClosePeriodID:
+                result = @"BarrierClosePeriod";
+                break;
 
-        case MTRAttributeIDTypeClusterBarrierControlAttributeAcceptedCommandListID:
-            result = @"AcceptedCommandList";
-            break;
+            case MTRAttributeIDTypeClusterBarrierControlAttributeBarrierPositionID:
+                result = @"BarrierPosition";
+                break;
 
-        case MTRAttributeIDTypeClusterBarrierControlAttributeEventListID:
-            result = @"EventList";
-            break;
+            case MTRAttributeIDTypeClusterBarrierControlAttributeGeneratedCommandListID:
+                result = @"GeneratedCommandList";
+                break;
 
-        case MTRAttributeIDTypeClusterBarrierControlAttributeAttributeListID:
-            result = @"AttributeList";
-            break;
+            case MTRAttributeIDTypeClusterBarrierControlAttributeAcceptedCommandListID:
+                result = @"AcceptedCommandList";
+                break;
 
-        case MTRAttributeIDTypeClusterBarrierControlAttributeFeatureMapID:
-            result = @"FeatureMap";
-            break;
+            case MTRAttributeIDTypeClusterBarrierControlAttributeEventListID:
+                result = @"EventList";
+                break;
 
-        case MTRAttributeIDTypeClusterBarrierControlAttributeClusterRevisionID:
-            result = @"ClusterRevision";
-            break;
+            case MTRAttributeIDTypeClusterBarrierControlAttributeAttributeListID:
+                result = @"AttributeList";
+                break;
 
-        default:
-            result = [NSString stringWithFormat:@"<Unknown attributeID %d>", attributeID];
-            break;
+            case MTRAttributeIDTypeClusterBarrierControlAttributeFeatureMapID:
+                result = @"FeatureMap";
+                break;
+
+            case MTRAttributeIDTypeClusterBarrierControlAttributeClusterRevisionID:
+                result = @"ClusterRevision";
+                break;
+
+
+            default:
+                result = [NSString stringWithFormat:@"<Unknown attributeID %d>", attributeID];
+                break;
         }
 
-    case MTRClusterIDTypeServiceAreaID:
+case MTRClusterIDTypeServiceAreaID:
 
-        switch (attributeID) {
+            switch (attributeID) {
 
-            // Cluster ServiceArea attributes
-        case MTRAttributeIDTypeClusterServiceAreaAttributeSupportedLocationsID:
-            result = @"SupportedLocations";
-            break;
 
-        case MTRAttributeIDTypeClusterServiceAreaAttributeSupportedMapsID:
-            result = @"SupportedMaps";
-            break;
 
-        case MTRAttributeIDTypeClusterServiceAreaAttributeSelectedLocationsID:
-            result = @"SelectedLocations";
-            break;
+// Cluster ServiceArea attributes
+            case MTRAttributeIDTypeClusterServiceAreaAttributeSupportedLocationsID:
+                result = @"SupportedLocations";
+                break;
 
-        case MTRAttributeIDTypeClusterServiceAreaAttributeCurrentLocationID:
-            result = @"CurrentLocation";
-            break;
+            case MTRAttributeIDTypeClusterServiceAreaAttributeSupportedMapsID:
+                result = @"SupportedMaps";
+                break;
 
-        case MTRAttributeIDTypeClusterServiceAreaAttributeEstimatedEndTimeID:
-            result = @"EstimatedEndTime";
-            break;
+            case MTRAttributeIDTypeClusterServiceAreaAttributeSelectedLocationsID:
+                result = @"SelectedLocations";
+                break;
 
-        case MTRAttributeIDTypeClusterServiceAreaAttributeProgressID:
-            result = @"Progress";
-            break;
+            case MTRAttributeIDTypeClusterServiceAreaAttributeCurrentLocationID:
+                result = @"CurrentLocation";
+                break;
 
-        case MTRAttributeIDTypeClusterServiceAreaAttributeGeneratedCommandListID:
-            result = @"GeneratedCommandList";
-            break;
+            case MTRAttributeIDTypeClusterServiceAreaAttributeEstimatedEndTimeID:
+                result = @"EstimatedEndTime";
+                break;
 
-        case MTRAttributeIDTypeClusterServiceAreaAttributeAcceptedCommandListID:
-            result = @"AcceptedCommandList";
-            break;
+            case MTRAttributeIDTypeClusterServiceAreaAttributeProgressID:
+                result = @"Progress";
+                break;
 
-        case MTRAttributeIDTypeClusterServiceAreaAttributeEventListID:
-            result = @"EventList";
-            break;
+            case MTRAttributeIDTypeClusterServiceAreaAttributeGeneratedCommandListID:
+                result = @"GeneratedCommandList";
+                break;
 
-        case MTRAttributeIDTypeClusterServiceAreaAttributeAttributeListID:
-            result = @"AttributeList";
-            break;
+            case MTRAttributeIDTypeClusterServiceAreaAttributeAcceptedCommandListID:
+                result = @"AcceptedCommandList";
+                break;
 
-        case MTRAttributeIDTypeClusterServiceAreaAttributeFeatureMapID:
-            result = @"FeatureMap";
-            break;
+            case MTRAttributeIDTypeClusterServiceAreaAttributeEventListID:
+                result = @"EventList";
+                break;
 
-        case MTRAttributeIDTypeClusterServiceAreaAttributeClusterRevisionID:
-            result = @"ClusterRevision";
-            break;
+            case MTRAttributeIDTypeClusterServiceAreaAttributeAttributeListID:
+                result = @"AttributeList";
+                break;
 
-        default:
-            result = [NSString stringWithFormat:@"<Unknown attributeID %d>", attributeID];
-            break;
+            case MTRAttributeIDTypeClusterServiceAreaAttributeFeatureMapID:
+                result = @"FeatureMap";
+                break;
+
+            case MTRAttributeIDTypeClusterServiceAreaAttributeClusterRevisionID:
+                result = @"ClusterRevision";
+                break;
+
+
+            default:
+                result = [NSString stringWithFormat:@"<Unknown attributeID %d>", attributeID];
+                break;
         }
 
-    case MTRClusterIDTypePumpConfigurationAndControlID:
+case MTRClusterIDTypePumpConfigurationAndControlID:
 
-        switch (attributeID) {
+            switch (attributeID) {
 
-            // Cluster PumpConfigurationAndControl attributes
-        case MTRAttributeIDTypeClusterPumpConfigurationAndControlAttributeMaxPressureID:
-            result = @"MaxPressure";
-            break;
 
-        case MTRAttributeIDTypeClusterPumpConfigurationAndControlAttributeMaxSpeedID:
-            result = @"MaxSpeed";
-            break;
 
-        case MTRAttributeIDTypeClusterPumpConfigurationAndControlAttributeMaxFlowID:
-            result = @"MaxFlow";
-            break;
+// Cluster PumpConfigurationAndControl attributes
+            case MTRAttributeIDTypeClusterPumpConfigurationAndControlAttributeMaxPressureID:
+                result = @"MaxPressure";
+                break;
 
-        case MTRAttributeIDTypeClusterPumpConfigurationAndControlAttributeMinConstPressureID:
-            result = @"MinConstPressure";
-            break;
+            case MTRAttributeIDTypeClusterPumpConfigurationAndControlAttributeMaxSpeedID:
+                result = @"MaxSpeed";
+                break;
 
-        case MTRAttributeIDTypeClusterPumpConfigurationAndControlAttributeMaxConstPressureID:
-            result = @"MaxConstPressure";
-            break;
+            case MTRAttributeIDTypeClusterPumpConfigurationAndControlAttributeMaxFlowID:
+                result = @"MaxFlow";
+                break;
 
-        case MTRAttributeIDTypeClusterPumpConfigurationAndControlAttributeMinCompPressureID:
-            result = @"MinCompPressure";
-            break;
+            case MTRAttributeIDTypeClusterPumpConfigurationAndControlAttributeMinConstPressureID:
+                result = @"MinConstPressure";
+                break;
 
-        case MTRAttributeIDTypeClusterPumpConfigurationAndControlAttributeMaxCompPressureID:
-            result = @"MaxCompPressure";
-            break;
+            case MTRAttributeIDTypeClusterPumpConfigurationAndControlAttributeMaxConstPressureID:
+                result = @"MaxConstPressure";
+                break;
 
-        case MTRAttributeIDTypeClusterPumpConfigurationAndControlAttributeMinConstSpeedID:
-            result = @"MinConstSpeed";
-            break;
+            case MTRAttributeIDTypeClusterPumpConfigurationAndControlAttributeMinCompPressureID:
+                result = @"MinCompPressure";
+                break;
 
-        case MTRAttributeIDTypeClusterPumpConfigurationAndControlAttributeMaxConstSpeedID:
-            result = @"MaxConstSpeed";
-            break;
+            case MTRAttributeIDTypeClusterPumpConfigurationAndControlAttributeMaxCompPressureID:
+                result = @"MaxCompPressure";
+                break;
 
-        case MTRAttributeIDTypeClusterPumpConfigurationAndControlAttributeMinConstFlowID:
-            result = @"MinConstFlow";
-            break;
+            case MTRAttributeIDTypeClusterPumpConfigurationAndControlAttributeMinConstSpeedID:
+                result = @"MinConstSpeed";
+                break;
 
-        case MTRAttributeIDTypeClusterPumpConfigurationAndControlAttributeMaxConstFlowID:
-            result = @"MaxConstFlow";
-            break;
+            case MTRAttributeIDTypeClusterPumpConfigurationAndControlAttributeMaxConstSpeedID:
+                result = @"MaxConstSpeed";
+                break;
 
-        case MTRAttributeIDTypeClusterPumpConfigurationAndControlAttributeMinConstTempID:
-            result = @"MinConstTemp";
-            break;
+            case MTRAttributeIDTypeClusterPumpConfigurationAndControlAttributeMinConstFlowID:
+                result = @"MinConstFlow";
+                break;
 
-        case MTRAttributeIDTypeClusterPumpConfigurationAndControlAttributeMaxConstTempID:
-            result = @"MaxConstTemp";
-            break;
+            case MTRAttributeIDTypeClusterPumpConfigurationAndControlAttributeMaxConstFlowID:
+                result = @"MaxConstFlow";
+                break;
 
-        case MTRAttributeIDTypeClusterPumpConfigurationAndControlAttributePumpStatusID:
-            result = @"PumpStatus";
-            break;
+            case MTRAttributeIDTypeClusterPumpConfigurationAndControlAttributeMinConstTempID:
+                result = @"MinConstTemp";
+                break;
 
-        case MTRAttributeIDTypeClusterPumpConfigurationAndControlAttributeEffectiveOperationModeID:
-            result = @"EffectiveOperationMode";
-            break;
+            case MTRAttributeIDTypeClusterPumpConfigurationAndControlAttributeMaxConstTempID:
+                result = @"MaxConstTemp";
+                break;
 
-        case MTRAttributeIDTypeClusterPumpConfigurationAndControlAttributeEffectiveControlModeID:
-            result = @"EffectiveControlMode";
-            break;
+            case MTRAttributeIDTypeClusterPumpConfigurationAndControlAttributePumpStatusID:
+                result = @"PumpStatus";
+                break;
 
-        case MTRAttributeIDTypeClusterPumpConfigurationAndControlAttributeCapacityID:
-            result = @"Capacity";
-            break;
+            case MTRAttributeIDTypeClusterPumpConfigurationAndControlAttributeEffectiveOperationModeID:
+                result = @"EffectiveOperationMode";
+                break;
 
-        case MTRAttributeIDTypeClusterPumpConfigurationAndControlAttributeSpeedID:
-            result = @"Speed";
-            break;
+            case MTRAttributeIDTypeClusterPumpConfigurationAndControlAttributeEffectiveControlModeID:
+                result = @"EffectiveControlMode";
+                break;
 
-        case MTRAttributeIDTypeClusterPumpConfigurationAndControlAttributeLifetimeRunningHoursID:
-            result = @"LifetimeRunningHours";
-            break;
+            case MTRAttributeIDTypeClusterPumpConfigurationAndControlAttributeCapacityID:
+                result = @"Capacity";
+                break;
 
-        case MTRAttributeIDTypeClusterPumpConfigurationAndControlAttributePowerID:
-            result = @"Power";
-            break;
+            case MTRAttributeIDTypeClusterPumpConfigurationAndControlAttributeSpeedID:
+                result = @"Speed";
+                break;
 
-        case MTRAttributeIDTypeClusterPumpConfigurationAndControlAttributeLifetimeEnergyConsumedID:
-            result = @"LifetimeEnergyConsumed";
-            break;
+            case MTRAttributeIDTypeClusterPumpConfigurationAndControlAttributeLifetimeRunningHoursID:
+                result = @"LifetimeRunningHours";
+                break;
 
-        case MTRAttributeIDTypeClusterPumpConfigurationAndControlAttributeOperationModeID:
-            result = @"OperationMode";
-            break;
+            case MTRAttributeIDTypeClusterPumpConfigurationAndControlAttributePowerID:
+                result = @"Power";
+                break;
 
-        case MTRAttributeIDTypeClusterPumpConfigurationAndControlAttributeControlModeID:
-            result = @"ControlMode";
-            break;
+            case MTRAttributeIDTypeClusterPumpConfigurationAndControlAttributeLifetimeEnergyConsumedID:
+                result = @"LifetimeEnergyConsumed";
+                break;
 
-        case MTRAttributeIDTypeClusterPumpConfigurationAndControlAttributeGeneratedCommandListID:
-            result = @"GeneratedCommandList";
-            break;
+            case MTRAttributeIDTypeClusterPumpConfigurationAndControlAttributeOperationModeID:
+                result = @"OperationMode";
+                break;
 
-        case MTRAttributeIDTypeClusterPumpConfigurationAndControlAttributeAcceptedCommandListID:
-            result = @"AcceptedCommandList";
-            break;
+            case MTRAttributeIDTypeClusterPumpConfigurationAndControlAttributeControlModeID:
+                result = @"ControlMode";
+                break;
 
-        case MTRAttributeIDTypeClusterPumpConfigurationAndControlAttributeEventListID:
-            result = @"EventList";
-            break;
+            case MTRAttributeIDTypeClusterPumpConfigurationAndControlAttributeGeneratedCommandListID:
+                result = @"GeneratedCommandList";
+                break;
 
-        case MTRAttributeIDTypeClusterPumpConfigurationAndControlAttributeAttributeListID:
-            result = @"AttributeList";
-            break;
+            case MTRAttributeIDTypeClusterPumpConfigurationAndControlAttributeAcceptedCommandListID:
+                result = @"AcceptedCommandList";
+                break;
 
-        case MTRAttributeIDTypeClusterPumpConfigurationAndControlAttributeFeatureMapID:
-            result = @"FeatureMap";
-            break;
+            case MTRAttributeIDTypeClusterPumpConfigurationAndControlAttributeEventListID:
+                result = @"EventList";
+                break;
 
-        case MTRAttributeIDTypeClusterPumpConfigurationAndControlAttributeClusterRevisionID:
-            result = @"ClusterRevision";
-            break;
+            case MTRAttributeIDTypeClusterPumpConfigurationAndControlAttributeAttributeListID:
+                result = @"AttributeList";
+                break;
 
-        default:
-            result = [NSString stringWithFormat:@"<Unknown attributeID %d>", attributeID];
-            break;
+            case MTRAttributeIDTypeClusterPumpConfigurationAndControlAttributeFeatureMapID:
+                result = @"FeatureMap";
+                break;
+
+            case MTRAttributeIDTypeClusterPumpConfigurationAndControlAttributeClusterRevisionID:
+                result = @"ClusterRevision";
+                break;
+
+
+            default:
+                result = [NSString stringWithFormat:@"<Unknown attributeID %d>", attributeID];
+                break;
         }
 
-    case MTRClusterIDTypeThermostatID:
+case MTRClusterIDTypeThermostatID:
 
-        switch (attributeID) {
+            switch (attributeID) {
 
-            // Cluster Thermostat attributes
-        case MTRAttributeIDTypeClusterThermostatAttributeLocalTemperatureID:
-            result = @"LocalTemperature";
-            break;
 
-        case MTRAttributeIDTypeClusterThermostatAttributeOutdoorTemperatureID:
-            result = @"OutdoorTemperature";
-            break;
 
-        case MTRAttributeIDTypeClusterThermostatAttributeOccupancyID:
-            result = @"Occupancy";
-            break;
+// Cluster Thermostat attributes
+            case MTRAttributeIDTypeClusterThermostatAttributeLocalTemperatureID:
+                result = @"LocalTemperature";
+                break;
 
-        case MTRAttributeIDTypeClusterThermostatAttributeAbsMinHeatSetpointLimitID:
-            result = @"AbsMinHeatSetpointLimit";
-            break;
+            case MTRAttributeIDTypeClusterThermostatAttributeOutdoorTemperatureID:
+                result = @"OutdoorTemperature";
+                break;
 
-        case MTRAttributeIDTypeClusterThermostatAttributeAbsMaxHeatSetpointLimitID:
-            result = @"AbsMaxHeatSetpointLimit";
-            break;
+            case MTRAttributeIDTypeClusterThermostatAttributeOccupancyID:
+                result = @"Occupancy";
+                break;
 
-        case MTRAttributeIDTypeClusterThermostatAttributeAbsMinCoolSetpointLimitID:
-            result = @"AbsMinCoolSetpointLimit";
-            break;
+            case MTRAttributeIDTypeClusterThermostatAttributeAbsMinHeatSetpointLimitID:
+                result = @"AbsMinHeatSetpointLimit";
+                break;
 
-        case MTRAttributeIDTypeClusterThermostatAttributeAbsMaxCoolSetpointLimitID:
-            result = @"AbsMaxCoolSetpointLimit";
-            break;
+            case MTRAttributeIDTypeClusterThermostatAttributeAbsMaxHeatSetpointLimitID:
+                result = @"AbsMaxHeatSetpointLimit";
+                break;
 
-        case MTRAttributeIDTypeClusterThermostatAttributePICoolingDemandID:
-            result = @"PICoolingDemand";
-            break;
+            case MTRAttributeIDTypeClusterThermostatAttributeAbsMinCoolSetpointLimitID:
+                result = @"AbsMinCoolSetpointLimit";
+                break;
 
-        case MTRAttributeIDTypeClusterThermostatAttributePIHeatingDemandID:
-            result = @"PIHeatingDemand";
-            break;
+            case MTRAttributeIDTypeClusterThermostatAttributeAbsMaxCoolSetpointLimitID:
+                result = @"AbsMaxCoolSetpointLimit";
+                break;
 
-        case MTRAttributeIDTypeClusterThermostatAttributeHVACSystemTypeConfigurationID:
-            result = @"HVACSystemTypeConfiguration";
-            break;
+            case MTRAttributeIDTypeClusterThermostatAttributePICoolingDemandID:
+                result = @"PICoolingDemand";
+                break;
 
-        case MTRAttributeIDTypeClusterThermostatAttributeLocalTemperatureCalibrationID:
-            result = @"LocalTemperatureCalibration";
-            break;
+            case MTRAttributeIDTypeClusterThermostatAttributePIHeatingDemandID:
+                result = @"PIHeatingDemand";
+                break;
 
-        case MTRAttributeIDTypeClusterThermostatAttributeOccupiedCoolingSetpointID:
-            result = @"OccupiedCoolingSetpoint";
-            break;
+            case MTRAttributeIDTypeClusterThermostatAttributeHVACSystemTypeConfigurationID:
+                result = @"HVACSystemTypeConfiguration";
+                break;
 
-        case MTRAttributeIDTypeClusterThermostatAttributeOccupiedHeatingSetpointID:
-            result = @"OccupiedHeatingSetpoint";
-            break;
+            case MTRAttributeIDTypeClusterThermostatAttributeLocalTemperatureCalibrationID:
+                result = @"LocalTemperatureCalibration";
+                break;
 
-        case MTRAttributeIDTypeClusterThermostatAttributeUnoccupiedCoolingSetpointID:
-            result = @"UnoccupiedCoolingSetpoint";
-            break;
+            case MTRAttributeIDTypeClusterThermostatAttributeOccupiedCoolingSetpointID:
+                result = @"OccupiedCoolingSetpoint";
+                break;
 
-        case MTRAttributeIDTypeClusterThermostatAttributeUnoccupiedHeatingSetpointID:
-            result = @"UnoccupiedHeatingSetpoint";
-            break;
+            case MTRAttributeIDTypeClusterThermostatAttributeOccupiedHeatingSetpointID:
+                result = @"OccupiedHeatingSetpoint";
+                break;
 
-        case MTRAttributeIDTypeClusterThermostatAttributeMinHeatSetpointLimitID:
-            result = @"MinHeatSetpointLimit";
-            break;
+            case MTRAttributeIDTypeClusterThermostatAttributeUnoccupiedCoolingSetpointID:
+                result = @"UnoccupiedCoolingSetpoint";
+                break;
 
-        case MTRAttributeIDTypeClusterThermostatAttributeMaxHeatSetpointLimitID:
-            result = @"MaxHeatSetpointLimit";
-            break;
+            case MTRAttributeIDTypeClusterThermostatAttributeUnoccupiedHeatingSetpointID:
+                result = @"UnoccupiedHeatingSetpoint";
+                break;
 
-        case MTRAttributeIDTypeClusterThermostatAttributeMinCoolSetpointLimitID:
-            result = @"MinCoolSetpointLimit";
-            break;
+            case MTRAttributeIDTypeClusterThermostatAttributeMinHeatSetpointLimitID:
+                result = @"MinHeatSetpointLimit";
+                break;
 
-        case MTRAttributeIDTypeClusterThermostatAttributeMaxCoolSetpointLimitID:
-            result = @"MaxCoolSetpointLimit";
-            break;
+            case MTRAttributeIDTypeClusterThermostatAttributeMaxHeatSetpointLimitID:
+                result = @"MaxHeatSetpointLimit";
+                break;
 
-        case MTRAttributeIDTypeClusterThermostatAttributeMinSetpointDeadBandID:
-            result = @"MinSetpointDeadBand";
-            break;
+            case MTRAttributeIDTypeClusterThermostatAttributeMinCoolSetpointLimitID:
+                result = @"MinCoolSetpointLimit";
+                break;
 
-        case MTRAttributeIDTypeClusterThermostatAttributeRemoteSensingID:
-            result = @"RemoteSensing";
-            break;
+            case MTRAttributeIDTypeClusterThermostatAttributeMaxCoolSetpointLimitID:
+                result = @"MaxCoolSetpointLimit";
+                break;
 
-        case MTRAttributeIDTypeClusterThermostatAttributeControlSequenceOfOperationID:
-            result = @"ControlSequenceOfOperation";
-            break;
+            case MTRAttributeIDTypeClusterThermostatAttributeMinSetpointDeadBandID:
+                result = @"MinSetpointDeadBand";
+                break;
 
-        case MTRAttributeIDTypeClusterThermostatAttributeSystemModeID:
-            result = @"SystemMode";
-            break;
+            case MTRAttributeIDTypeClusterThermostatAttributeRemoteSensingID:
+                result = @"RemoteSensing";
+                break;
 
-        case MTRAttributeIDTypeClusterThermostatAttributeThermostatRunningModeID:
-            result = @"ThermostatRunningMode";
-            break;
+            case MTRAttributeIDTypeClusterThermostatAttributeControlSequenceOfOperationID:
+                result = @"ControlSequenceOfOperation";
+                break;
 
-        case MTRAttributeIDTypeClusterThermostatAttributeStartOfWeekID:
-            result = @"StartOfWeek";
-            break;
+            case MTRAttributeIDTypeClusterThermostatAttributeSystemModeID:
+                result = @"SystemMode";
+                break;
 
-        case MTRAttributeIDTypeClusterThermostatAttributeNumberOfWeeklyTransitionsID:
-            result = @"NumberOfWeeklyTransitions";
-            break;
+            case MTRAttributeIDTypeClusterThermostatAttributeThermostatRunningModeID:
+                result = @"ThermostatRunningMode";
+                break;
 
-        case MTRAttributeIDTypeClusterThermostatAttributeNumberOfDailyTransitionsID:
-            result = @"NumberOfDailyTransitions";
-            break;
+            case MTRAttributeIDTypeClusterThermostatAttributeStartOfWeekID:
+                result = @"StartOfWeek";
+                break;
 
-        case MTRAttributeIDTypeClusterThermostatAttributeTemperatureSetpointHoldID:
-            result = @"TemperatureSetpointHold";
-            break;
+            case MTRAttributeIDTypeClusterThermostatAttributeNumberOfWeeklyTransitionsID:
+                result = @"NumberOfWeeklyTransitions";
+                break;
 
-        case MTRAttributeIDTypeClusterThermostatAttributeTemperatureSetpointHoldDurationID:
-            result = @"TemperatureSetpointHoldDuration";
-            break;
+            case MTRAttributeIDTypeClusterThermostatAttributeNumberOfDailyTransitionsID:
+                result = @"NumberOfDailyTransitions";
+                break;
 
-        case MTRAttributeIDTypeClusterThermostatAttributeThermostatProgrammingOperationModeID:
-            result = @"ThermostatProgrammingOperationMode";
-            break;
+            case MTRAttributeIDTypeClusterThermostatAttributeTemperatureSetpointHoldID:
+                result = @"TemperatureSetpointHold";
+                break;
 
-        case MTRAttributeIDTypeClusterThermostatAttributeThermostatRunningStateID:
-            result = @"ThermostatRunningState";
-            break;
+            case MTRAttributeIDTypeClusterThermostatAttributeTemperatureSetpointHoldDurationID:
+                result = @"TemperatureSetpointHoldDuration";
+                break;
 
-        case MTRAttributeIDTypeClusterThermostatAttributeSetpointChangeSourceID:
-            result = @"SetpointChangeSource";
-            break;
+            case MTRAttributeIDTypeClusterThermostatAttributeThermostatProgrammingOperationModeID:
+                result = @"ThermostatProgrammingOperationMode";
+                break;
 
-        case MTRAttributeIDTypeClusterThermostatAttributeSetpointChangeAmountID:
-            result = @"SetpointChangeAmount";
-            break;
+            case MTRAttributeIDTypeClusterThermostatAttributeThermostatRunningStateID:
+                result = @"ThermostatRunningState";
+                break;
 
-        case MTRAttributeIDTypeClusterThermostatAttributeSetpointChangeSourceTimestampID:
-            result = @"SetpointChangeSourceTimestamp";
-            break;
+            case MTRAttributeIDTypeClusterThermostatAttributeSetpointChangeSourceID:
+                result = @"SetpointChangeSource";
+                break;
 
-        case MTRAttributeIDTypeClusterThermostatAttributeOccupiedSetbackID:
-            result = @"OccupiedSetback";
-            break;
+            case MTRAttributeIDTypeClusterThermostatAttributeSetpointChangeAmountID:
+                result = @"SetpointChangeAmount";
+                break;
 
-        case MTRAttributeIDTypeClusterThermostatAttributeOccupiedSetbackMinID:
-            result = @"OccupiedSetbackMin";
-            break;
+            case MTRAttributeIDTypeClusterThermostatAttributeSetpointChangeSourceTimestampID:
+                result = @"SetpointChangeSourceTimestamp";
+                break;
 
-        case MTRAttributeIDTypeClusterThermostatAttributeOccupiedSetbackMaxID:
-            result = @"OccupiedSetbackMax";
-            break;
+            case MTRAttributeIDTypeClusterThermostatAttributeOccupiedSetbackID:
+                result = @"OccupiedSetback";
+                break;
 
-        case MTRAttributeIDTypeClusterThermostatAttributeUnoccupiedSetbackID:
-            result = @"UnoccupiedSetback";
-            break;
+            case MTRAttributeIDTypeClusterThermostatAttributeOccupiedSetbackMinID:
+                result = @"OccupiedSetbackMin";
+                break;
 
-        case MTRAttributeIDTypeClusterThermostatAttributeUnoccupiedSetbackMinID:
-            result = @"UnoccupiedSetbackMin";
-            break;
+            case MTRAttributeIDTypeClusterThermostatAttributeOccupiedSetbackMaxID:
+                result = @"OccupiedSetbackMax";
+                break;
 
-        case MTRAttributeIDTypeClusterThermostatAttributeUnoccupiedSetbackMaxID:
-            result = @"UnoccupiedSetbackMax";
-            break;
+            case MTRAttributeIDTypeClusterThermostatAttributeUnoccupiedSetbackID:
+                result = @"UnoccupiedSetback";
+                break;
 
-        case MTRAttributeIDTypeClusterThermostatAttributeEmergencyHeatDeltaID:
-            result = @"EmergencyHeatDelta";
-            break;
+            case MTRAttributeIDTypeClusterThermostatAttributeUnoccupiedSetbackMinID:
+                result = @"UnoccupiedSetbackMin";
+                break;
 
-        case MTRAttributeIDTypeClusterThermostatAttributeACTypeID:
-            result = @"ACType";
-            break;
+            case MTRAttributeIDTypeClusterThermostatAttributeUnoccupiedSetbackMaxID:
+                result = @"UnoccupiedSetbackMax";
+                break;
 
-        case MTRAttributeIDTypeClusterThermostatAttributeACCapacityID:
-            result = @"ACCapacity";
-            break;
+            case MTRAttributeIDTypeClusterThermostatAttributeEmergencyHeatDeltaID:
+                result = @"EmergencyHeatDelta";
+                break;
 
-        case MTRAttributeIDTypeClusterThermostatAttributeACRefrigerantTypeID:
-            result = @"ACRefrigerantType";
-            break;
+            case MTRAttributeIDTypeClusterThermostatAttributeACTypeID:
+                result = @"ACType";
+                break;
 
-        case MTRAttributeIDTypeClusterThermostatAttributeACCompressorTypeID:
-            result = @"ACCompressorType";
-            break;
+            case MTRAttributeIDTypeClusterThermostatAttributeACCapacityID:
+                result = @"ACCapacity";
+                break;
 
-        case MTRAttributeIDTypeClusterThermostatAttributeACErrorCodeID:
-            result = @"ACErrorCode";
-            break;
+            case MTRAttributeIDTypeClusterThermostatAttributeACRefrigerantTypeID:
+                result = @"ACRefrigerantType";
+                break;
 
-        case MTRAttributeIDTypeClusterThermostatAttributeACLouverPositionID:
-            result = @"ACLouverPosition";
-            break;
+            case MTRAttributeIDTypeClusterThermostatAttributeACCompressorTypeID:
+                result = @"ACCompressorType";
+                break;
 
-        case MTRAttributeIDTypeClusterThermostatAttributeACCoilTemperatureID:
-            result = @"ACCoilTemperature";
-            break;
+            case MTRAttributeIDTypeClusterThermostatAttributeACErrorCodeID:
+                result = @"ACErrorCode";
+                break;
 
-        case MTRAttributeIDTypeClusterThermostatAttributeACCapacityformatID:
-            result = @"ACCapacityformat";
-            break;
+            case MTRAttributeIDTypeClusterThermostatAttributeACLouverPositionID:
+                result = @"ACLouverPosition";
+                break;
 
-        case MTRAttributeIDTypeClusterThermostatAttributePresetTypesID:
-            result = @"PresetTypes";
-            break;
+            case MTRAttributeIDTypeClusterThermostatAttributeACCoilTemperatureID:
+                result = @"ACCoilTemperature";
+                break;
 
-        case MTRAttributeIDTypeClusterThermostatAttributeScheduleTypesID:
-            result = @"ScheduleTypes";
-            break;
+            case MTRAttributeIDTypeClusterThermostatAttributeACCapacityformatID:
+                result = @"ACCapacityformat";
+                break;
 
-        case MTRAttributeIDTypeClusterThermostatAttributeNumberOfPresetsID:
-            result = @"NumberOfPresets";
-            break;
+            case MTRAttributeIDTypeClusterThermostatAttributePresetTypesID:
+                result = @"PresetTypes";
+                break;
 
-        case MTRAttributeIDTypeClusterThermostatAttributeNumberOfSchedulesID:
-            result = @"NumberOfSchedules";
-            break;
+            case MTRAttributeIDTypeClusterThermostatAttributeScheduleTypesID:
+                result = @"ScheduleTypes";
+                break;
 
-        case MTRAttributeIDTypeClusterThermostatAttributeNumberOfScheduleTransitionsID:
-            result = @"NumberOfScheduleTransitions";
-            break;
+            case MTRAttributeIDTypeClusterThermostatAttributeNumberOfPresetsID:
+                result = @"NumberOfPresets";
+                break;
 
-        case MTRAttributeIDTypeClusterThermostatAttributeNumberOfScheduleTransitionPerDayID:
-            result = @"NumberOfScheduleTransitionPerDay";
-            break;
+            case MTRAttributeIDTypeClusterThermostatAttributeNumberOfSchedulesID:
+                result = @"NumberOfSchedules";
+                break;
 
-        case MTRAttributeIDTypeClusterThermostatAttributeActivePresetHandleID:
-            result = @"ActivePresetHandle";
-            break;
+            case MTRAttributeIDTypeClusterThermostatAttributeNumberOfScheduleTransitionsID:
+                result = @"NumberOfScheduleTransitions";
+                break;
 
-        case MTRAttributeIDTypeClusterThermostatAttributeActiveScheduleHandleID:
-            result = @"ActiveScheduleHandle";
-            break;
+            case MTRAttributeIDTypeClusterThermostatAttributeNumberOfScheduleTransitionPerDayID:
+                result = @"NumberOfScheduleTransitionPerDay";
+                break;
 
-        case MTRAttributeIDTypeClusterThermostatAttributePresetsID:
-            result = @"Presets";
-            break;
+            case MTRAttributeIDTypeClusterThermostatAttributeActivePresetHandleID:
+                result = @"ActivePresetHandle";
+                break;
 
-        case MTRAttributeIDTypeClusterThermostatAttributeSchedulesID:
-            result = @"Schedules";
-            break;
+            case MTRAttributeIDTypeClusterThermostatAttributeActiveScheduleHandleID:
+                result = @"ActiveScheduleHandle";
+                break;
 
-        case MTRAttributeIDTypeClusterThermostatAttributePresetsSchedulesEditableID:
-            result = @"PresetsSchedulesEditable";
-            break;
+            case MTRAttributeIDTypeClusterThermostatAttributePresetsID:
+                result = @"Presets";
+                break;
 
-        case MTRAttributeIDTypeClusterThermostatAttributeSetpointHoldExpiryTimestampID:
-            result = @"SetpointHoldExpiryTimestamp";
-            break;
+            case MTRAttributeIDTypeClusterThermostatAttributeSchedulesID:
+                result = @"Schedules";
+                break;
 
-        case MTRAttributeIDTypeClusterThermostatAttributeGeneratedCommandListID:
-            result = @"GeneratedCommandList";
-            break;
+            case MTRAttributeIDTypeClusterThermostatAttributePresetsSchedulesEditableID:
+                result = @"PresetsSchedulesEditable";
+                break;
 
-        case MTRAttributeIDTypeClusterThermostatAttributeAcceptedCommandListID:
-            result = @"AcceptedCommandList";
-            break;
+            case MTRAttributeIDTypeClusterThermostatAttributeSetpointHoldExpiryTimestampID:
+                result = @"SetpointHoldExpiryTimestamp";
+                break;
 
-        case MTRAttributeIDTypeClusterThermostatAttributeEventListID:
-            result = @"EventList";
-            break;
+            case MTRAttributeIDTypeClusterThermostatAttributeGeneratedCommandListID:
+                result = @"GeneratedCommandList";
+                break;
 
-        case MTRAttributeIDTypeClusterThermostatAttributeAttributeListID:
-            result = @"AttributeList";
-            break;
+            case MTRAttributeIDTypeClusterThermostatAttributeAcceptedCommandListID:
+                result = @"AcceptedCommandList";
+                break;
 
-        case MTRAttributeIDTypeClusterThermostatAttributeFeatureMapID:
-            result = @"FeatureMap";
-            break;
+            case MTRAttributeIDTypeClusterThermostatAttributeEventListID:
+                result = @"EventList";
+                break;
 
-        case MTRAttributeIDTypeClusterThermostatAttributeClusterRevisionID:
-            result = @"ClusterRevision";
-            break;
+            case MTRAttributeIDTypeClusterThermostatAttributeAttributeListID:
+                result = @"AttributeList";
+                break;
 
-        default:
-            result = [NSString stringWithFormat:@"<Unknown attributeID %d>", attributeID];
-            break;
+            case MTRAttributeIDTypeClusterThermostatAttributeFeatureMapID:
+                result = @"FeatureMap";
+                break;
+
+            case MTRAttributeIDTypeClusterThermostatAttributeClusterRevisionID:
+                result = @"ClusterRevision";
+                break;
+
+
+            default:
+                result = [NSString stringWithFormat:@"<Unknown attributeID %d>", attributeID];
+                break;
         }
 
-    case MTRClusterIDTypeFanControlID:
+case MTRClusterIDTypeFanControlID:
 
-        switch (attributeID) {
+            switch (attributeID) {
 
-            // Cluster FanControl attributes
-        case MTRAttributeIDTypeClusterFanControlAttributeFanModeID:
-            result = @"FanMode";
-            break;
 
-        case MTRAttributeIDTypeClusterFanControlAttributeFanModeSequenceID:
-            result = @"FanModeSequence";
-            break;
 
-        case MTRAttributeIDTypeClusterFanControlAttributePercentSettingID:
-            result = @"PercentSetting";
-            break;
+// Cluster FanControl attributes
+            case MTRAttributeIDTypeClusterFanControlAttributeFanModeID:
+                result = @"FanMode";
+                break;
 
-        case MTRAttributeIDTypeClusterFanControlAttributePercentCurrentID:
-            result = @"PercentCurrent";
-            break;
+            case MTRAttributeIDTypeClusterFanControlAttributeFanModeSequenceID:
+                result = @"FanModeSequence";
+                break;
 
-        case MTRAttributeIDTypeClusterFanControlAttributeSpeedMaxID:
-            result = @"SpeedMax";
-            break;
+            case MTRAttributeIDTypeClusterFanControlAttributePercentSettingID:
+                result = @"PercentSetting";
+                break;
 
-        case MTRAttributeIDTypeClusterFanControlAttributeSpeedSettingID:
-            result = @"SpeedSetting";
-            break;
+            case MTRAttributeIDTypeClusterFanControlAttributePercentCurrentID:
+                result = @"PercentCurrent";
+                break;
 
-        case MTRAttributeIDTypeClusterFanControlAttributeSpeedCurrentID:
-            result = @"SpeedCurrent";
-            break;
+            case MTRAttributeIDTypeClusterFanControlAttributeSpeedMaxID:
+                result = @"SpeedMax";
+                break;
 
-        case MTRAttributeIDTypeClusterFanControlAttributeRockSupportID:
-            result = @"RockSupport";
-            break;
+            case MTRAttributeIDTypeClusterFanControlAttributeSpeedSettingID:
+                result = @"SpeedSetting";
+                break;
 
-        case MTRAttributeIDTypeClusterFanControlAttributeRockSettingID:
-            result = @"RockSetting";
-            break;
+            case MTRAttributeIDTypeClusterFanControlAttributeSpeedCurrentID:
+                result = @"SpeedCurrent";
+                break;
 
-        case MTRAttributeIDTypeClusterFanControlAttributeWindSupportID:
-            result = @"WindSupport";
-            break;
+            case MTRAttributeIDTypeClusterFanControlAttributeRockSupportID:
+                result = @"RockSupport";
+                break;
 
-        case MTRAttributeIDTypeClusterFanControlAttributeWindSettingID:
-            result = @"WindSetting";
-            break;
+            case MTRAttributeIDTypeClusterFanControlAttributeRockSettingID:
+                result = @"RockSetting";
+                break;
 
-        case MTRAttributeIDTypeClusterFanControlAttributeAirflowDirectionID:
-            result = @"AirflowDirection";
-            break;
+            case MTRAttributeIDTypeClusterFanControlAttributeWindSupportID:
+                result = @"WindSupport";
+                break;
 
-        case MTRAttributeIDTypeClusterFanControlAttributeGeneratedCommandListID:
-            result = @"GeneratedCommandList";
-            break;
+            case MTRAttributeIDTypeClusterFanControlAttributeWindSettingID:
+                result = @"WindSetting";
+                break;
 
-        case MTRAttributeIDTypeClusterFanControlAttributeAcceptedCommandListID:
-            result = @"AcceptedCommandList";
-            break;
+            case MTRAttributeIDTypeClusterFanControlAttributeAirflowDirectionID:
+                result = @"AirflowDirection";
+                break;
 
-        case MTRAttributeIDTypeClusterFanControlAttributeEventListID:
-            result = @"EventList";
-            break;
+            case MTRAttributeIDTypeClusterFanControlAttributeGeneratedCommandListID:
+                result = @"GeneratedCommandList";
+                break;
 
-        case MTRAttributeIDTypeClusterFanControlAttributeAttributeListID:
-            result = @"AttributeList";
-            break;
+            case MTRAttributeIDTypeClusterFanControlAttributeAcceptedCommandListID:
+                result = @"AcceptedCommandList";
+                break;
 
-        case MTRAttributeIDTypeClusterFanControlAttributeFeatureMapID:
-            result = @"FeatureMap";
-            break;
+            case MTRAttributeIDTypeClusterFanControlAttributeEventListID:
+                result = @"EventList";
+                break;
 
-        case MTRAttributeIDTypeClusterFanControlAttributeClusterRevisionID:
-            result = @"ClusterRevision";
-            break;
+            case MTRAttributeIDTypeClusterFanControlAttributeAttributeListID:
+                result = @"AttributeList";
+                break;
 
-        default:
-            result = [NSString stringWithFormat:@"<Unknown attributeID %d>", attributeID];
-            break;
+            case MTRAttributeIDTypeClusterFanControlAttributeFeatureMapID:
+                result = @"FeatureMap";
+                break;
+
+            case MTRAttributeIDTypeClusterFanControlAttributeClusterRevisionID:
+                result = @"ClusterRevision";
+                break;
+
+
+            default:
+                result = [NSString stringWithFormat:@"<Unknown attributeID %d>", attributeID];
+                break;
         }
 
-    case MTRClusterIDTypeThermostatUserInterfaceConfigurationID:
+case MTRClusterIDTypeThermostatUserInterfaceConfigurationID:
 
-        switch (attributeID) {
+            switch (attributeID) {
 
-            // Cluster ThermostatUserInterfaceConfiguration attributes
-        case MTRAttributeIDTypeClusterThermostatUserInterfaceConfigurationAttributeTemperatureDisplayModeID:
-            result = @"TemperatureDisplayMode";
-            break;
 
-        case MTRAttributeIDTypeClusterThermostatUserInterfaceConfigurationAttributeKeypadLockoutID:
-            result = @"KeypadLockout";
-            break;
 
-        case MTRAttributeIDTypeClusterThermostatUserInterfaceConfigurationAttributeScheduleProgrammingVisibilityID:
-            result = @"ScheduleProgrammingVisibility";
-            break;
+// Cluster ThermostatUserInterfaceConfiguration attributes
+            case MTRAttributeIDTypeClusterThermostatUserInterfaceConfigurationAttributeTemperatureDisplayModeID:
+                result = @"TemperatureDisplayMode";
+                break;
 
-        case MTRAttributeIDTypeClusterThermostatUserInterfaceConfigurationAttributeGeneratedCommandListID:
-            result = @"GeneratedCommandList";
-            break;
+            case MTRAttributeIDTypeClusterThermostatUserInterfaceConfigurationAttributeKeypadLockoutID:
+                result = @"KeypadLockout";
+                break;
 
-        case MTRAttributeIDTypeClusterThermostatUserInterfaceConfigurationAttributeAcceptedCommandListID:
-            result = @"AcceptedCommandList";
-            break;
+            case MTRAttributeIDTypeClusterThermostatUserInterfaceConfigurationAttributeScheduleProgrammingVisibilityID:
+                result = @"ScheduleProgrammingVisibility";
+                break;
 
-        case MTRAttributeIDTypeClusterThermostatUserInterfaceConfigurationAttributeEventListID:
-            result = @"EventList";
-            break;
+            case MTRAttributeIDTypeClusterThermostatUserInterfaceConfigurationAttributeGeneratedCommandListID:
+                result = @"GeneratedCommandList";
+                break;
 
-        case MTRAttributeIDTypeClusterThermostatUserInterfaceConfigurationAttributeAttributeListID:
-            result = @"AttributeList";
-            break;
+            case MTRAttributeIDTypeClusterThermostatUserInterfaceConfigurationAttributeAcceptedCommandListID:
+                result = @"AcceptedCommandList";
+                break;
 
-        case MTRAttributeIDTypeClusterThermostatUserInterfaceConfigurationAttributeFeatureMapID:
-            result = @"FeatureMap";
-            break;
+            case MTRAttributeIDTypeClusterThermostatUserInterfaceConfigurationAttributeEventListID:
+                result = @"EventList";
+                break;
 
-        case MTRAttributeIDTypeClusterThermostatUserInterfaceConfigurationAttributeClusterRevisionID:
-            result = @"ClusterRevision";
-            break;
+            case MTRAttributeIDTypeClusterThermostatUserInterfaceConfigurationAttributeAttributeListID:
+                result = @"AttributeList";
+                break;
 
-        default:
-            result = [NSString stringWithFormat:@"<Unknown attributeID %d>", attributeID];
-            break;
+            case MTRAttributeIDTypeClusterThermostatUserInterfaceConfigurationAttributeFeatureMapID:
+                result = @"FeatureMap";
+                break;
+
+            case MTRAttributeIDTypeClusterThermostatUserInterfaceConfigurationAttributeClusterRevisionID:
+                result = @"ClusterRevision";
+                break;
+
+
+            default:
+                result = [NSString stringWithFormat:@"<Unknown attributeID %d>", attributeID];
+                break;
         }
 
-    case MTRClusterIDTypeColorControlID:
+case MTRClusterIDTypeColorControlID:
 
-        switch (attributeID) {
+            switch (attributeID) {
 
-            // Cluster ColorControl attributes
-        case MTRAttributeIDTypeClusterColorControlAttributeCurrentHueID:
-            result = @"CurrentHue";
-            break;
 
-        case MTRAttributeIDTypeClusterColorControlAttributeCurrentSaturationID:
-            result = @"CurrentSaturation";
-            break;
 
-        case MTRAttributeIDTypeClusterColorControlAttributeRemainingTimeID:
-            result = @"RemainingTime";
-            break;
+// Cluster ColorControl attributes
+            case MTRAttributeIDTypeClusterColorControlAttributeCurrentHueID:
+                result = @"CurrentHue";
+                break;
 
-        case MTRAttributeIDTypeClusterColorControlAttributeCurrentXID:
-            result = @"CurrentX";
-            break;
+            case MTRAttributeIDTypeClusterColorControlAttributeCurrentSaturationID:
+                result = @"CurrentSaturation";
+                break;
 
-        case MTRAttributeIDTypeClusterColorControlAttributeCurrentYID:
-            result = @"CurrentY";
-            break;
+            case MTRAttributeIDTypeClusterColorControlAttributeRemainingTimeID:
+                result = @"RemainingTime";
+                break;
 
-        case MTRAttributeIDTypeClusterColorControlAttributeDriftCompensationID:
-            result = @"DriftCompensation";
-            break;
+            case MTRAttributeIDTypeClusterColorControlAttributeCurrentXID:
+                result = @"CurrentX";
+                break;
 
-        case MTRAttributeIDTypeClusterColorControlAttributeCompensationTextID:
-            result = @"CompensationText";
-            break;
+            case MTRAttributeIDTypeClusterColorControlAttributeCurrentYID:
+                result = @"CurrentY";
+                break;
 
-        case MTRAttributeIDTypeClusterColorControlAttributeColorTemperatureMiredsID:
-            result = @"ColorTemperatureMireds";
-            break;
+            case MTRAttributeIDTypeClusterColorControlAttributeDriftCompensationID:
+                result = @"DriftCompensation";
+                break;
 
-        case MTRAttributeIDTypeClusterColorControlAttributeColorModeID:
-            result = @"ColorMode";
-            break;
+            case MTRAttributeIDTypeClusterColorControlAttributeCompensationTextID:
+                result = @"CompensationText";
+                break;
 
-        case MTRAttributeIDTypeClusterColorControlAttributeOptionsID:
-            result = @"Options";
-            break;
+            case MTRAttributeIDTypeClusterColorControlAttributeColorTemperatureMiredsID:
+                result = @"ColorTemperatureMireds";
+                break;
 
-        case MTRAttributeIDTypeClusterColorControlAttributeNumberOfPrimariesID:
-            result = @"NumberOfPrimaries";
-            break;
+            case MTRAttributeIDTypeClusterColorControlAttributeColorModeID:
+                result = @"ColorMode";
+                break;
 
-        case MTRAttributeIDTypeClusterColorControlAttributePrimary1XID:
-            result = @"Primary1X";
-            break;
+            case MTRAttributeIDTypeClusterColorControlAttributeOptionsID:
+                result = @"Options";
+                break;
 
-        case MTRAttributeIDTypeClusterColorControlAttributePrimary1YID:
-            result = @"Primary1Y";
-            break;
+            case MTRAttributeIDTypeClusterColorControlAttributeNumberOfPrimariesID:
+                result = @"NumberOfPrimaries";
+                break;
 
-        case MTRAttributeIDTypeClusterColorControlAttributePrimary1IntensityID:
-            result = @"Primary1Intensity";
-            break;
+            case MTRAttributeIDTypeClusterColorControlAttributePrimary1XID:
+                result = @"Primary1X";
+                break;
 
-        case MTRAttributeIDTypeClusterColorControlAttributePrimary2XID:
-            result = @"Primary2X";
-            break;
+            case MTRAttributeIDTypeClusterColorControlAttributePrimary1YID:
+                result = @"Primary1Y";
+                break;
 
-        case MTRAttributeIDTypeClusterColorControlAttributePrimary2YID:
-            result = @"Primary2Y";
-            break;
+            case MTRAttributeIDTypeClusterColorControlAttributePrimary1IntensityID:
+                result = @"Primary1Intensity";
+                break;
 
-        case MTRAttributeIDTypeClusterColorControlAttributePrimary2IntensityID:
-            result = @"Primary2Intensity";
-            break;
+            case MTRAttributeIDTypeClusterColorControlAttributePrimary2XID:
+                result = @"Primary2X";
+                break;
 
-        case MTRAttributeIDTypeClusterColorControlAttributePrimary3XID:
-            result = @"Primary3X";
-            break;
+            case MTRAttributeIDTypeClusterColorControlAttributePrimary2YID:
+                result = @"Primary2Y";
+                break;
 
-        case MTRAttributeIDTypeClusterColorControlAttributePrimary3YID:
-            result = @"Primary3Y";
-            break;
+            case MTRAttributeIDTypeClusterColorControlAttributePrimary2IntensityID:
+                result = @"Primary2Intensity";
+                break;
 
-        case MTRAttributeIDTypeClusterColorControlAttributePrimary3IntensityID:
-            result = @"Primary3Intensity";
-            break;
+            case MTRAttributeIDTypeClusterColorControlAttributePrimary3XID:
+                result = @"Primary3X";
+                break;
 
-        case MTRAttributeIDTypeClusterColorControlAttributePrimary4XID:
-            result = @"Primary4X";
-            break;
+            case MTRAttributeIDTypeClusterColorControlAttributePrimary3YID:
+                result = @"Primary3Y";
+                break;
 
-        case MTRAttributeIDTypeClusterColorControlAttributePrimary4YID:
-            result = @"Primary4Y";
-            break;
+            case MTRAttributeIDTypeClusterColorControlAttributePrimary3IntensityID:
+                result = @"Primary3Intensity";
+                break;
 
-        case MTRAttributeIDTypeClusterColorControlAttributePrimary4IntensityID:
-            result = @"Primary4Intensity";
-            break;
+            case MTRAttributeIDTypeClusterColorControlAttributePrimary4XID:
+                result = @"Primary4X";
+                break;
 
-        case MTRAttributeIDTypeClusterColorControlAttributePrimary5XID:
-            result = @"Primary5X";
-            break;
+            case MTRAttributeIDTypeClusterColorControlAttributePrimary4YID:
+                result = @"Primary4Y";
+                break;
 
-        case MTRAttributeIDTypeClusterColorControlAttributePrimary5YID:
-            result = @"Primary5Y";
-            break;
+            case MTRAttributeIDTypeClusterColorControlAttributePrimary4IntensityID:
+                result = @"Primary4Intensity";
+                break;
 
-        case MTRAttributeIDTypeClusterColorControlAttributePrimary5IntensityID:
-            result = @"Primary5Intensity";
-            break;
+            case MTRAttributeIDTypeClusterColorControlAttributePrimary5XID:
+                result = @"Primary5X";
+                break;
 
-        case MTRAttributeIDTypeClusterColorControlAttributePrimary6XID:
-            result = @"Primary6X";
-            break;
+            case MTRAttributeIDTypeClusterColorControlAttributePrimary5YID:
+                result = @"Primary5Y";
+                break;
 
-        case MTRAttributeIDTypeClusterColorControlAttributePrimary6YID:
-            result = @"Primary6Y";
-            break;
+            case MTRAttributeIDTypeClusterColorControlAttributePrimary5IntensityID:
+                result = @"Primary5Intensity";
+                break;
 
-        case MTRAttributeIDTypeClusterColorControlAttributePrimary6IntensityID:
-            result = @"Primary6Intensity";
-            break;
+            case MTRAttributeIDTypeClusterColorControlAttributePrimary6XID:
+                result = @"Primary6X";
+                break;
 
-        case MTRAttributeIDTypeClusterColorControlAttributeWhitePointXID:
-            result = @"WhitePointX";
-            break;
+            case MTRAttributeIDTypeClusterColorControlAttributePrimary6YID:
+                result = @"Primary6Y";
+                break;
 
-        case MTRAttributeIDTypeClusterColorControlAttributeWhitePointYID:
-            result = @"WhitePointY";
-            break;
+            case MTRAttributeIDTypeClusterColorControlAttributePrimary6IntensityID:
+                result = @"Primary6Intensity";
+                break;
 
-        case MTRAttributeIDTypeClusterColorControlAttributeColorPointRXID:
-            result = @"ColorPointRX";
-            break;
+            case MTRAttributeIDTypeClusterColorControlAttributeWhitePointXID:
+                result = @"WhitePointX";
+                break;
 
-        case MTRAttributeIDTypeClusterColorControlAttributeColorPointRYID:
-            result = @"ColorPointRY";
-            break;
+            case MTRAttributeIDTypeClusterColorControlAttributeWhitePointYID:
+                result = @"WhitePointY";
+                break;
 
-        case MTRAttributeIDTypeClusterColorControlAttributeColorPointRIntensityID:
-            result = @"ColorPointRIntensity";
-            break;
+            case MTRAttributeIDTypeClusterColorControlAttributeColorPointRXID:
+                result = @"ColorPointRX";
+                break;
 
-        case MTRAttributeIDTypeClusterColorControlAttributeColorPointGXID:
-            result = @"ColorPointGX";
-            break;
+            case MTRAttributeIDTypeClusterColorControlAttributeColorPointRYID:
+                result = @"ColorPointRY";
+                break;
 
-        case MTRAttributeIDTypeClusterColorControlAttributeColorPointGYID:
-            result = @"ColorPointGY";
-            break;
+            case MTRAttributeIDTypeClusterColorControlAttributeColorPointRIntensityID:
+                result = @"ColorPointRIntensity";
+                break;
 
-        case MTRAttributeIDTypeClusterColorControlAttributeColorPointGIntensityID:
-            result = @"ColorPointGIntensity";
-            break;
+            case MTRAttributeIDTypeClusterColorControlAttributeColorPointGXID:
+                result = @"ColorPointGX";
+                break;
 
-        case MTRAttributeIDTypeClusterColorControlAttributeColorPointBXID:
-            result = @"ColorPointBX";
-            break;
+            case MTRAttributeIDTypeClusterColorControlAttributeColorPointGYID:
+                result = @"ColorPointGY";
+                break;
 
-        case MTRAttributeIDTypeClusterColorControlAttributeColorPointBYID:
-            result = @"ColorPointBY";
-            break;
+            case MTRAttributeIDTypeClusterColorControlAttributeColorPointGIntensityID:
+                result = @"ColorPointGIntensity";
+                break;
 
-        case MTRAttributeIDTypeClusterColorControlAttributeColorPointBIntensityID:
-            result = @"ColorPointBIntensity";
-            break;
+            case MTRAttributeIDTypeClusterColorControlAttributeColorPointBXID:
+                result = @"ColorPointBX";
+                break;
 
-        case MTRAttributeIDTypeClusterColorControlAttributeEnhancedCurrentHueID:
-            result = @"EnhancedCurrentHue";
-            break;
+            case MTRAttributeIDTypeClusterColorControlAttributeColorPointBYID:
+                result = @"ColorPointBY";
+                break;
 
-        case MTRAttributeIDTypeClusterColorControlAttributeEnhancedColorModeID:
-            result = @"EnhancedColorMode";
-            break;
+            case MTRAttributeIDTypeClusterColorControlAttributeColorPointBIntensityID:
+                result = @"ColorPointBIntensity";
+                break;
 
-        case MTRAttributeIDTypeClusterColorControlAttributeColorLoopActiveID:
-            result = @"ColorLoopActive";
-            break;
+            case MTRAttributeIDTypeClusterColorControlAttributeEnhancedCurrentHueID:
+                result = @"EnhancedCurrentHue";
+                break;
 
-        case MTRAttributeIDTypeClusterColorControlAttributeColorLoopDirectionID:
-            result = @"ColorLoopDirection";
-            break;
+            case MTRAttributeIDTypeClusterColorControlAttributeEnhancedColorModeID:
+                result = @"EnhancedColorMode";
+                break;
 
-        case MTRAttributeIDTypeClusterColorControlAttributeColorLoopTimeID:
-            result = @"ColorLoopTime";
-            break;
+            case MTRAttributeIDTypeClusterColorControlAttributeColorLoopActiveID:
+                result = @"ColorLoopActive";
+                break;
 
-        case MTRAttributeIDTypeClusterColorControlAttributeColorLoopStartEnhancedHueID:
-            result = @"ColorLoopStartEnhancedHue";
-            break;
+            case MTRAttributeIDTypeClusterColorControlAttributeColorLoopDirectionID:
+                result = @"ColorLoopDirection";
+                break;
 
-        case MTRAttributeIDTypeClusterColorControlAttributeColorLoopStoredEnhancedHueID:
-            result = @"ColorLoopStoredEnhancedHue";
-            break;
+            case MTRAttributeIDTypeClusterColorControlAttributeColorLoopTimeID:
+                result = @"ColorLoopTime";
+                break;
 
-        case MTRAttributeIDTypeClusterColorControlAttributeColorCapabilitiesID:
-            result = @"ColorCapabilities";
-            break;
+            case MTRAttributeIDTypeClusterColorControlAttributeColorLoopStartEnhancedHueID:
+                result = @"ColorLoopStartEnhancedHue";
+                break;
 
-        case MTRAttributeIDTypeClusterColorControlAttributeColorTempPhysicalMinMiredsID:
-            result = @"ColorTempPhysicalMinMireds";
-            break;
+            case MTRAttributeIDTypeClusterColorControlAttributeColorLoopStoredEnhancedHueID:
+                result = @"ColorLoopStoredEnhancedHue";
+                break;
 
-        case MTRAttributeIDTypeClusterColorControlAttributeColorTempPhysicalMaxMiredsID:
-            result = @"ColorTempPhysicalMaxMireds";
-            break;
+            case MTRAttributeIDTypeClusterColorControlAttributeColorCapabilitiesID:
+                result = @"ColorCapabilities";
+                break;
 
-        case MTRAttributeIDTypeClusterColorControlAttributeCoupleColorTempToLevelMinMiredsID:
-            result = @"CoupleColorTempToLevelMinMireds";
-            break;
+            case MTRAttributeIDTypeClusterColorControlAttributeColorTempPhysicalMinMiredsID:
+                result = @"ColorTempPhysicalMinMireds";
+                break;
 
-        case MTRAttributeIDTypeClusterColorControlAttributeStartUpColorTemperatureMiredsID:
-            result = @"StartUpColorTemperatureMireds";
-            break;
+            case MTRAttributeIDTypeClusterColorControlAttributeColorTempPhysicalMaxMiredsID:
+                result = @"ColorTempPhysicalMaxMireds";
+                break;
 
-        case MTRAttributeIDTypeClusterColorControlAttributeGeneratedCommandListID:
-            result = @"GeneratedCommandList";
-            break;
+            case MTRAttributeIDTypeClusterColorControlAttributeCoupleColorTempToLevelMinMiredsID:
+                result = @"CoupleColorTempToLevelMinMireds";
+                break;
 
-        case MTRAttributeIDTypeClusterColorControlAttributeAcceptedCommandListID:
-            result = @"AcceptedCommandList";
-            break;
+            case MTRAttributeIDTypeClusterColorControlAttributeStartUpColorTemperatureMiredsID:
+                result = @"StartUpColorTemperatureMireds";
+                break;
 
-        case MTRAttributeIDTypeClusterColorControlAttributeEventListID:
-            result = @"EventList";
-            break;
+            case MTRAttributeIDTypeClusterColorControlAttributeGeneratedCommandListID:
+                result = @"GeneratedCommandList";
+                break;
 
-        case MTRAttributeIDTypeClusterColorControlAttributeAttributeListID:
-            result = @"AttributeList";
-            break;
+            case MTRAttributeIDTypeClusterColorControlAttributeAcceptedCommandListID:
+                result = @"AcceptedCommandList";
+                break;
 
-        case MTRAttributeIDTypeClusterColorControlAttributeFeatureMapID:
-            result = @"FeatureMap";
-            break;
+            case MTRAttributeIDTypeClusterColorControlAttributeEventListID:
+                result = @"EventList";
+                break;
 
-        case MTRAttributeIDTypeClusterColorControlAttributeClusterRevisionID:
-            result = @"ClusterRevision";
-            break;
+            case MTRAttributeIDTypeClusterColorControlAttributeAttributeListID:
+                result = @"AttributeList";
+                break;
 
-        default:
-            result = [NSString stringWithFormat:@"<Unknown attributeID %d>", attributeID];
-            break;
+            case MTRAttributeIDTypeClusterColorControlAttributeFeatureMapID:
+                result = @"FeatureMap";
+                break;
+
+            case MTRAttributeIDTypeClusterColorControlAttributeClusterRevisionID:
+                result = @"ClusterRevision";
+                break;
+
+
+            default:
+                result = [NSString stringWithFormat:@"<Unknown attributeID %d>", attributeID];
+                break;
         }
 
-    case MTRClusterIDTypeBallastConfigurationID:
+case MTRClusterIDTypeBallastConfigurationID:
 
-        switch (attributeID) {
+            switch (attributeID) {
 
-            // Cluster BallastConfiguration attributes
-        case MTRAttributeIDTypeClusterBallastConfigurationAttributePhysicalMinLevelID:
-            result = @"PhysicalMinLevel";
-            break;
 
-        case MTRAttributeIDTypeClusterBallastConfigurationAttributePhysicalMaxLevelID:
-            result = @"PhysicalMaxLevel";
-            break;
 
-        case MTRAttributeIDTypeClusterBallastConfigurationAttributeBallastStatusID:
-            result = @"BallastStatus";
-            break;
+// Cluster BallastConfiguration attributes
+            case MTRAttributeIDTypeClusterBallastConfigurationAttributePhysicalMinLevelID:
+                result = @"PhysicalMinLevel";
+                break;
 
-        case MTRAttributeIDTypeClusterBallastConfigurationAttributeMinLevelID:
-            result = @"MinLevel";
-            break;
+            case MTRAttributeIDTypeClusterBallastConfigurationAttributePhysicalMaxLevelID:
+                result = @"PhysicalMaxLevel";
+                break;
 
-        case MTRAttributeIDTypeClusterBallastConfigurationAttributeMaxLevelID:
-            result = @"MaxLevel";
-            break;
+            case MTRAttributeIDTypeClusterBallastConfigurationAttributeBallastStatusID:
+                result = @"BallastStatus";
+                break;
 
-        case MTRAttributeIDTypeClusterBallastConfigurationAttributeIntrinsicBallastFactorID:
-            result = @"IntrinsicBallastFactor";
-            break;
+            case MTRAttributeIDTypeClusterBallastConfigurationAttributeMinLevelID:
+                result = @"MinLevel";
+                break;
 
-        case MTRAttributeIDTypeClusterBallastConfigurationAttributeBallastFactorAdjustmentID:
-            result = @"BallastFactorAdjustment";
-            break;
+            case MTRAttributeIDTypeClusterBallastConfigurationAttributeMaxLevelID:
+                result = @"MaxLevel";
+                break;
 
-        case MTRAttributeIDTypeClusterBallastConfigurationAttributeLampQuantityID:
-            result = @"LampQuantity";
-            break;
+            case MTRAttributeIDTypeClusterBallastConfigurationAttributeIntrinsicBallastFactorID:
+                result = @"IntrinsicBallastFactor";
+                break;
 
-        case MTRAttributeIDTypeClusterBallastConfigurationAttributeLampTypeID:
-            result = @"LampType";
-            break;
+            case MTRAttributeIDTypeClusterBallastConfigurationAttributeBallastFactorAdjustmentID:
+                result = @"BallastFactorAdjustment";
+                break;
 
-        case MTRAttributeIDTypeClusterBallastConfigurationAttributeLampManufacturerID:
-            result = @"LampManufacturer";
-            break;
+            case MTRAttributeIDTypeClusterBallastConfigurationAttributeLampQuantityID:
+                result = @"LampQuantity";
+                break;
 
-        case MTRAttributeIDTypeClusterBallastConfigurationAttributeLampRatedHoursID:
-            result = @"LampRatedHours";
-            break;
+            case MTRAttributeIDTypeClusterBallastConfigurationAttributeLampTypeID:
+                result = @"LampType";
+                break;
 
-        case MTRAttributeIDTypeClusterBallastConfigurationAttributeLampBurnHoursID:
-            result = @"LampBurnHours";
-            break;
+            case MTRAttributeIDTypeClusterBallastConfigurationAttributeLampManufacturerID:
+                result = @"LampManufacturer";
+                break;
 
-        case MTRAttributeIDTypeClusterBallastConfigurationAttributeLampAlarmModeID:
-            result = @"LampAlarmMode";
-            break;
+            case MTRAttributeIDTypeClusterBallastConfigurationAttributeLampRatedHoursID:
+                result = @"LampRatedHours";
+                break;
 
-        case MTRAttributeIDTypeClusterBallastConfigurationAttributeLampBurnHoursTripPointID:
-            result = @"LampBurnHoursTripPoint";
-            break;
+            case MTRAttributeIDTypeClusterBallastConfigurationAttributeLampBurnHoursID:
+                result = @"LampBurnHours";
+                break;
 
-        case MTRAttributeIDTypeClusterBallastConfigurationAttributeGeneratedCommandListID:
-            result = @"GeneratedCommandList";
-            break;
+            case MTRAttributeIDTypeClusterBallastConfigurationAttributeLampAlarmModeID:
+                result = @"LampAlarmMode";
+                break;
 
-        case MTRAttributeIDTypeClusterBallastConfigurationAttributeAcceptedCommandListID:
-            result = @"AcceptedCommandList";
-            break;
+            case MTRAttributeIDTypeClusterBallastConfigurationAttributeLampBurnHoursTripPointID:
+                result = @"LampBurnHoursTripPoint";
+                break;
 
-        case MTRAttributeIDTypeClusterBallastConfigurationAttributeEventListID:
-            result = @"EventList";
-            break;
+            case MTRAttributeIDTypeClusterBallastConfigurationAttributeGeneratedCommandListID:
+                result = @"GeneratedCommandList";
+                break;
 
-        case MTRAttributeIDTypeClusterBallastConfigurationAttributeAttributeListID:
-            result = @"AttributeList";
-            break;
+            case MTRAttributeIDTypeClusterBallastConfigurationAttributeAcceptedCommandListID:
+                result = @"AcceptedCommandList";
+                break;
 
-        case MTRAttributeIDTypeClusterBallastConfigurationAttributeFeatureMapID:
-            result = @"FeatureMap";
-            break;
+            case MTRAttributeIDTypeClusterBallastConfigurationAttributeEventListID:
+                result = @"EventList";
+                break;
 
-        case MTRAttributeIDTypeClusterBallastConfigurationAttributeClusterRevisionID:
-            result = @"ClusterRevision";
-            break;
+            case MTRAttributeIDTypeClusterBallastConfigurationAttributeAttributeListID:
+                result = @"AttributeList";
+                break;
 
-        default:
-            result = [NSString stringWithFormat:@"<Unknown attributeID %d>", attributeID];
-            break;
+            case MTRAttributeIDTypeClusterBallastConfigurationAttributeFeatureMapID:
+                result = @"FeatureMap";
+                break;
+
+            case MTRAttributeIDTypeClusterBallastConfigurationAttributeClusterRevisionID:
+                result = @"ClusterRevision";
+                break;
+
+
+            default:
+                result = [NSString stringWithFormat:@"<Unknown attributeID %d>", attributeID];
+                break;
         }
 
-    case MTRClusterIDTypeIlluminanceMeasurementID:
+case MTRClusterIDTypeIlluminanceMeasurementID:
 
-        switch (attributeID) {
+            switch (attributeID) {
 
-            // Cluster IlluminanceMeasurement attributes
-        case MTRAttributeIDTypeClusterIlluminanceMeasurementAttributeMeasuredValueID:
-            result = @"MeasuredValue";
-            break;
 
-        case MTRAttributeIDTypeClusterIlluminanceMeasurementAttributeMinMeasuredValueID:
-            result = @"MinMeasuredValue";
-            break;
 
-        case MTRAttributeIDTypeClusterIlluminanceMeasurementAttributeMaxMeasuredValueID:
-            result = @"MaxMeasuredValue";
-            break;
+// Cluster IlluminanceMeasurement attributes
+            case MTRAttributeIDTypeClusterIlluminanceMeasurementAttributeMeasuredValueID:
+                result = @"MeasuredValue";
+                break;
 
-        case MTRAttributeIDTypeClusterIlluminanceMeasurementAttributeToleranceID:
-            result = @"Tolerance";
-            break;
+            case MTRAttributeIDTypeClusterIlluminanceMeasurementAttributeMinMeasuredValueID:
+                result = @"MinMeasuredValue";
+                break;
 
-        case MTRAttributeIDTypeClusterIlluminanceMeasurementAttributeLightSensorTypeID:
-            result = @"LightSensorType";
-            break;
+            case MTRAttributeIDTypeClusterIlluminanceMeasurementAttributeMaxMeasuredValueID:
+                result = @"MaxMeasuredValue";
+                break;
 
-        case MTRAttributeIDTypeClusterIlluminanceMeasurementAttributeGeneratedCommandListID:
-            result = @"GeneratedCommandList";
-            break;
+            case MTRAttributeIDTypeClusterIlluminanceMeasurementAttributeToleranceID:
+                result = @"Tolerance";
+                break;
 
-        case MTRAttributeIDTypeClusterIlluminanceMeasurementAttributeAcceptedCommandListID:
-            result = @"AcceptedCommandList";
-            break;
+            case MTRAttributeIDTypeClusterIlluminanceMeasurementAttributeLightSensorTypeID:
+                result = @"LightSensorType";
+                break;
 
-        case MTRAttributeIDTypeClusterIlluminanceMeasurementAttributeEventListID:
-            result = @"EventList";
-            break;
+            case MTRAttributeIDTypeClusterIlluminanceMeasurementAttributeGeneratedCommandListID:
+                result = @"GeneratedCommandList";
+                break;
 
-        case MTRAttributeIDTypeClusterIlluminanceMeasurementAttributeAttributeListID:
-            result = @"AttributeList";
-            break;
+            case MTRAttributeIDTypeClusterIlluminanceMeasurementAttributeAcceptedCommandListID:
+                result = @"AcceptedCommandList";
+                break;
 
-        case MTRAttributeIDTypeClusterIlluminanceMeasurementAttributeFeatureMapID:
-            result = @"FeatureMap";
-            break;
+            case MTRAttributeIDTypeClusterIlluminanceMeasurementAttributeEventListID:
+                result = @"EventList";
+                break;
 
-        case MTRAttributeIDTypeClusterIlluminanceMeasurementAttributeClusterRevisionID:
-            result = @"ClusterRevision";
-            break;
+            case MTRAttributeIDTypeClusterIlluminanceMeasurementAttributeAttributeListID:
+                result = @"AttributeList";
+                break;
 
-        default:
-            result = [NSString stringWithFormat:@"<Unknown attributeID %d>", attributeID];
-            break;
+            case MTRAttributeIDTypeClusterIlluminanceMeasurementAttributeFeatureMapID:
+                result = @"FeatureMap";
+                break;
+
+            case MTRAttributeIDTypeClusterIlluminanceMeasurementAttributeClusterRevisionID:
+                result = @"ClusterRevision";
+                break;
+
+
+            default:
+                result = [NSString stringWithFormat:@"<Unknown attributeID %d>", attributeID];
+                break;
         }
 
-    case MTRClusterIDTypeTemperatureMeasurementID:
+case MTRClusterIDTypeTemperatureMeasurementID:
 
-        switch (attributeID) {
+            switch (attributeID) {
 
-            // Cluster TemperatureMeasurement attributes
-        case MTRAttributeIDTypeClusterTemperatureMeasurementAttributeMeasuredValueID:
-            result = @"MeasuredValue";
-            break;
 
-        case MTRAttributeIDTypeClusterTemperatureMeasurementAttributeMinMeasuredValueID:
-            result = @"MinMeasuredValue";
-            break;
 
-        case MTRAttributeIDTypeClusterTemperatureMeasurementAttributeMaxMeasuredValueID:
-            result = @"MaxMeasuredValue";
-            break;
+// Cluster TemperatureMeasurement attributes
+            case MTRAttributeIDTypeClusterTemperatureMeasurementAttributeMeasuredValueID:
+                result = @"MeasuredValue";
+                break;
 
-        case MTRAttributeIDTypeClusterTemperatureMeasurementAttributeToleranceID:
-            result = @"Tolerance";
-            break;
+            case MTRAttributeIDTypeClusterTemperatureMeasurementAttributeMinMeasuredValueID:
+                result = @"MinMeasuredValue";
+                break;
 
-        case MTRAttributeIDTypeClusterTemperatureMeasurementAttributeGeneratedCommandListID:
-            result = @"GeneratedCommandList";
-            break;
+            case MTRAttributeIDTypeClusterTemperatureMeasurementAttributeMaxMeasuredValueID:
+                result = @"MaxMeasuredValue";
+                break;
 
-        case MTRAttributeIDTypeClusterTemperatureMeasurementAttributeAcceptedCommandListID:
-            result = @"AcceptedCommandList";
-            break;
+            case MTRAttributeIDTypeClusterTemperatureMeasurementAttributeToleranceID:
+                result = @"Tolerance";
+                break;
 
-        case MTRAttributeIDTypeClusterTemperatureMeasurementAttributeEventListID:
-            result = @"EventList";
-            break;
+            case MTRAttributeIDTypeClusterTemperatureMeasurementAttributeGeneratedCommandListID:
+                result = @"GeneratedCommandList";
+                break;
 
-        case MTRAttributeIDTypeClusterTemperatureMeasurementAttributeAttributeListID:
-            result = @"AttributeList";
-            break;
+            case MTRAttributeIDTypeClusterTemperatureMeasurementAttributeAcceptedCommandListID:
+                result = @"AcceptedCommandList";
+                break;
 
-        case MTRAttributeIDTypeClusterTemperatureMeasurementAttributeFeatureMapID:
-            result = @"FeatureMap";
-            break;
+            case MTRAttributeIDTypeClusterTemperatureMeasurementAttributeEventListID:
+                result = @"EventList";
+                break;
 
-        case MTRAttributeIDTypeClusterTemperatureMeasurementAttributeClusterRevisionID:
-            result = @"ClusterRevision";
-            break;
+            case MTRAttributeIDTypeClusterTemperatureMeasurementAttributeAttributeListID:
+                result = @"AttributeList";
+                break;
 
-        default:
-            result = [NSString stringWithFormat:@"<Unknown attributeID %d>", attributeID];
-            break;
+            case MTRAttributeIDTypeClusterTemperatureMeasurementAttributeFeatureMapID:
+                result = @"FeatureMap";
+                break;
+
+            case MTRAttributeIDTypeClusterTemperatureMeasurementAttributeClusterRevisionID:
+                result = @"ClusterRevision";
+                break;
+
+
+            default:
+                result = [NSString stringWithFormat:@"<Unknown attributeID %d>", attributeID];
+                break;
         }
 
-    case MTRClusterIDTypePressureMeasurementID:
+case MTRClusterIDTypePressureMeasurementID:
 
-        switch (attributeID) {
+            switch (attributeID) {
 
-            // Cluster PressureMeasurement attributes
-        case MTRAttributeIDTypeClusterPressureMeasurementAttributeMeasuredValueID:
-            result = @"MeasuredValue";
-            break;
 
-        case MTRAttributeIDTypeClusterPressureMeasurementAttributeMinMeasuredValueID:
-            result = @"MinMeasuredValue";
-            break;
 
-        case MTRAttributeIDTypeClusterPressureMeasurementAttributeMaxMeasuredValueID:
-            result = @"MaxMeasuredValue";
-            break;
+// Cluster PressureMeasurement attributes
+            case MTRAttributeIDTypeClusterPressureMeasurementAttributeMeasuredValueID:
+                result = @"MeasuredValue";
+                break;
 
-        case MTRAttributeIDTypeClusterPressureMeasurementAttributeToleranceID:
-            result = @"Tolerance";
-            break;
+            case MTRAttributeIDTypeClusterPressureMeasurementAttributeMinMeasuredValueID:
+                result = @"MinMeasuredValue";
+                break;
 
-        case MTRAttributeIDTypeClusterPressureMeasurementAttributeScaledValueID:
-            result = @"ScaledValue";
-            break;
+            case MTRAttributeIDTypeClusterPressureMeasurementAttributeMaxMeasuredValueID:
+                result = @"MaxMeasuredValue";
+                break;
 
-        case MTRAttributeIDTypeClusterPressureMeasurementAttributeMinScaledValueID:
-            result = @"MinScaledValue";
-            break;
+            case MTRAttributeIDTypeClusterPressureMeasurementAttributeToleranceID:
+                result = @"Tolerance";
+                break;
 
-        case MTRAttributeIDTypeClusterPressureMeasurementAttributeMaxScaledValueID:
-            result = @"MaxScaledValue";
-            break;
+            case MTRAttributeIDTypeClusterPressureMeasurementAttributeScaledValueID:
+                result = @"ScaledValue";
+                break;
 
-        case MTRAttributeIDTypeClusterPressureMeasurementAttributeScaledToleranceID:
-            result = @"ScaledTolerance";
-            break;
+            case MTRAttributeIDTypeClusterPressureMeasurementAttributeMinScaledValueID:
+                result = @"MinScaledValue";
+                break;
 
-        case MTRAttributeIDTypeClusterPressureMeasurementAttributeScaleID:
-            result = @"Scale";
-            break;
+            case MTRAttributeIDTypeClusterPressureMeasurementAttributeMaxScaledValueID:
+                result = @"MaxScaledValue";
+                break;
 
-        case MTRAttributeIDTypeClusterPressureMeasurementAttributeGeneratedCommandListID:
-            result = @"GeneratedCommandList";
-            break;
+            case MTRAttributeIDTypeClusterPressureMeasurementAttributeScaledToleranceID:
+                result = @"ScaledTolerance";
+                break;
 
-        case MTRAttributeIDTypeClusterPressureMeasurementAttributeAcceptedCommandListID:
-            result = @"AcceptedCommandList";
-            break;
+            case MTRAttributeIDTypeClusterPressureMeasurementAttributeScaleID:
+                result = @"Scale";
+                break;
 
-        case MTRAttributeIDTypeClusterPressureMeasurementAttributeEventListID:
-            result = @"EventList";
-            break;
+            case MTRAttributeIDTypeClusterPressureMeasurementAttributeGeneratedCommandListID:
+                result = @"GeneratedCommandList";
+                break;
 
-        case MTRAttributeIDTypeClusterPressureMeasurementAttributeAttributeListID:
-            result = @"AttributeList";
-            break;
+            case MTRAttributeIDTypeClusterPressureMeasurementAttributeAcceptedCommandListID:
+                result = @"AcceptedCommandList";
+                break;
 
-        case MTRAttributeIDTypeClusterPressureMeasurementAttributeFeatureMapID:
-            result = @"FeatureMap";
-            break;
+            case MTRAttributeIDTypeClusterPressureMeasurementAttributeEventListID:
+                result = @"EventList";
+                break;
 
-        case MTRAttributeIDTypeClusterPressureMeasurementAttributeClusterRevisionID:
-            result = @"ClusterRevision";
-            break;
+            case MTRAttributeIDTypeClusterPressureMeasurementAttributeAttributeListID:
+                result = @"AttributeList";
+                break;
 
-        default:
-            result = [NSString stringWithFormat:@"<Unknown attributeID %d>", attributeID];
-            break;
+            case MTRAttributeIDTypeClusterPressureMeasurementAttributeFeatureMapID:
+                result = @"FeatureMap";
+                break;
+
+            case MTRAttributeIDTypeClusterPressureMeasurementAttributeClusterRevisionID:
+                result = @"ClusterRevision";
+                break;
+
+
+            default:
+                result = [NSString stringWithFormat:@"<Unknown attributeID %d>", attributeID];
+                break;
         }
 
-    case MTRClusterIDTypeFlowMeasurementID:
+case MTRClusterIDTypeFlowMeasurementID:
 
-        switch (attributeID) {
+            switch (attributeID) {
 
-            // Cluster FlowMeasurement attributes
-        case MTRAttributeIDTypeClusterFlowMeasurementAttributeMeasuredValueID:
-            result = @"MeasuredValue";
-            break;
 
-        case MTRAttributeIDTypeClusterFlowMeasurementAttributeMinMeasuredValueID:
-            result = @"MinMeasuredValue";
-            break;
 
-        case MTRAttributeIDTypeClusterFlowMeasurementAttributeMaxMeasuredValueID:
-            result = @"MaxMeasuredValue";
-            break;
+// Cluster FlowMeasurement attributes
+            case MTRAttributeIDTypeClusterFlowMeasurementAttributeMeasuredValueID:
+                result = @"MeasuredValue";
+                break;
 
-        case MTRAttributeIDTypeClusterFlowMeasurementAttributeToleranceID:
-            result = @"Tolerance";
-            break;
+            case MTRAttributeIDTypeClusterFlowMeasurementAttributeMinMeasuredValueID:
+                result = @"MinMeasuredValue";
+                break;
 
-        case MTRAttributeIDTypeClusterFlowMeasurementAttributeGeneratedCommandListID:
-            result = @"GeneratedCommandList";
-            break;
+            case MTRAttributeIDTypeClusterFlowMeasurementAttributeMaxMeasuredValueID:
+                result = @"MaxMeasuredValue";
+                break;
 
-        case MTRAttributeIDTypeClusterFlowMeasurementAttributeAcceptedCommandListID:
-            result = @"AcceptedCommandList";
-            break;
+            case MTRAttributeIDTypeClusterFlowMeasurementAttributeToleranceID:
+                result = @"Tolerance";
+                break;
 
-        case MTRAttributeIDTypeClusterFlowMeasurementAttributeEventListID:
-            result = @"EventList";
-            break;
+            case MTRAttributeIDTypeClusterFlowMeasurementAttributeGeneratedCommandListID:
+                result = @"GeneratedCommandList";
+                break;
 
-        case MTRAttributeIDTypeClusterFlowMeasurementAttributeAttributeListID:
-            result = @"AttributeList";
-            break;
+            case MTRAttributeIDTypeClusterFlowMeasurementAttributeAcceptedCommandListID:
+                result = @"AcceptedCommandList";
+                break;
 
-        case MTRAttributeIDTypeClusterFlowMeasurementAttributeFeatureMapID:
-            result = @"FeatureMap";
-            break;
+            case MTRAttributeIDTypeClusterFlowMeasurementAttributeEventListID:
+                result = @"EventList";
+                break;
 
-        case MTRAttributeIDTypeClusterFlowMeasurementAttributeClusterRevisionID:
-            result = @"ClusterRevision";
-            break;
+            case MTRAttributeIDTypeClusterFlowMeasurementAttributeAttributeListID:
+                result = @"AttributeList";
+                break;
 
-        default:
-            result = [NSString stringWithFormat:@"<Unknown attributeID %d>", attributeID];
-            break;
+            case MTRAttributeIDTypeClusterFlowMeasurementAttributeFeatureMapID:
+                result = @"FeatureMap";
+                break;
+
+            case MTRAttributeIDTypeClusterFlowMeasurementAttributeClusterRevisionID:
+                result = @"ClusterRevision";
+                break;
+
+
+            default:
+                result = [NSString stringWithFormat:@"<Unknown attributeID %d>", attributeID];
+                break;
         }
 
-    case MTRClusterIDTypeRelativeHumidityMeasurementID:
+case MTRClusterIDTypeRelativeHumidityMeasurementID:
 
-        switch (attributeID) {
+            switch (attributeID) {
 
-            // Cluster RelativeHumidityMeasurement attributes
-        case MTRAttributeIDTypeClusterRelativeHumidityMeasurementAttributeMeasuredValueID:
-            result = @"MeasuredValue";
-            break;
 
-        case MTRAttributeIDTypeClusterRelativeHumidityMeasurementAttributeMinMeasuredValueID:
-            result = @"MinMeasuredValue";
-            break;
 
-        case MTRAttributeIDTypeClusterRelativeHumidityMeasurementAttributeMaxMeasuredValueID:
-            result = @"MaxMeasuredValue";
-            break;
+// Cluster RelativeHumidityMeasurement attributes
+            case MTRAttributeIDTypeClusterRelativeHumidityMeasurementAttributeMeasuredValueID:
+                result = @"MeasuredValue";
+                break;
 
-        case MTRAttributeIDTypeClusterRelativeHumidityMeasurementAttributeToleranceID:
-            result = @"Tolerance";
-            break;
+            case MTRAttributeIDTypeClusterRelativeHumidityMeasurementAttributeMinMeasuredValueID:
+                result = @"MinMeasuredValue";
+                break;
 
-        case MTRAttributeIDTypeClusterRelativeHumidityMeasurementAttributeGeneratedCommandListID:
-            result = @"GeneratedCommandList";
-            break;
+            case MTRAttributeIDTypeClusterRelativeHumidityMeasurementAttributeMaxMeasuredValueID:
+                result = @"MaxMeasuredValue";
+                break;
 
-        case MTRAttributeIDTypeClusterRelativeHumidityMeasurementAttributeAcceptedCommandListID:
-            result = @"AcceptedCommandList";
-            break;
+            case MTRAttributeIDTypeClusterRelativeHumidityMeasurementAttributeToleranceID:
+                result = @"Tolerance";
+                break;
 
-        case MTRAttributeIDTypeClusterRelativeHumidityMeasurementAttributeEventListID:
-            result = @"EventList";
-            break;
+            case MTRAttributeIDTypeClusterRelativeHumidityMeasurementAttributeGeneratedCommandListID:
+                result = @"GeneratedCommandList";
+                break;
 
-        case MTRAttributeIDTypeClusterRelativeHumidityMeasurementAttributeAttributeListID:
-            result = @"AttributeList";
-            break;
+            case MTRAttributeIDTypeClusterRelativeHumidityMeasurementAttributeAcceptedCommandListID:
+                result = @"AcceptedCommandList";
+                break;
 
-        case MTRAttributeIDTypeClusterRelativeHumidityMeasurementAttributeFeatureMapID:
-            result = @"FeatureMap";
-            break;
+            case MTRAttributeIDTypeClusterRelativeHumidityMeasurementAttributeEventListID:
+                result = @"EventList";
+                break;
 
-        case MTRAttributeIDTypeClusterRelativeHumidityMeasurementAttributeClusterRevisionID:
-            result = @"ClusterRevision";
-            break;
+            case MTRAttributeIDTypeClusterRelativeHumidityMeasurementAttributeAttributeListID:
+                result = @"AttributeList";
+                break;
 
-        default:
-            result = [NSString stringWithFormat:@"<Unknown attributeID %d>", attributeID];
-            break;
+            case MTRAttributeIDTypeClusterRelativeHumidityMeasurementAttributeFeatureMapID:
+                result = @"FeatureMap";
+                break;
+
+            case MTRAttributeIDTypeClusterRelativeHumidityMeasurementAttributeClusterRevisionID:
+                result = @"ClusterRevision";
+                break;
+
+
+            default:
+                result = [NSString stringWithFormat:@"<Unknown attributeID %d>", attributeID];
+                break;
         }
 
-    case MTRClusterIDTypeOccupancySensingID:
+case MTRClusterIDTypeOccupancySensingID:
 
-        switch (attributeID) {
+            switch (attributeID) {
 
-            // Cluster OccupancySensing attributes
-        case MTRAttributeIDTypeClusterOccupancySensingAttributeOccupancyID:
-            result = @"Occupancy";
-            break;
 
-        case MTRAttributeIDTypeClusterOccupancySensingAttributeOccupancySensorTypeID:
-            result = @"OccupancySensorType";
-            break;
 
-        case MTRAttributeIDTypeClusterOccupancySensingAttributeOccupancySensorTypeBitmapID:
-            result = @"OccupancySensorTypeBitmap";
-            break;
+// Cluster OccupancySensing attributes
+            case MTRAttributeIDTypeClusterOccupancySensingAttributeOccupancyID:
+                result = @"Occupancy";
+                break;
 
-        case MTRAttributeIDTypeClusterOccupancySensingAttributeHoldTimeID:
-            result = @"HoldTime";
-            break;
+            case MTRAttributeIDTypeClusterOccupancySensingAttributeOccupancySensorTypeID:
+                result = @"OccupancySensorType";
+                break;
 
-        case MTRAttributeIDTypeClusterOccupancySensingAttributeHoldTimeLimitsID:
-            result = @"HoldTimeLimits";
-            break;
+            case MTRAttributeIDTypeClusterOccupancySensingAttributeOccupancySensorTypeBitmapID:
+                result = @"OccupancySensorTypeBitmap";
+                break;
 
-        case MTRAttributeIDTypeClusterOccupancySensingAttributePIROccupiedToUnoccupiedDelayID:
-            result = @"PIROccupiedToUnoccupiedDelay";
-            break;
+            case MTRAttributeIDTypeClusterOccupancySensingAttributeHoldTimeID:
+                result = @"HoldTime";
+                break;
 
-        case MTRAttributeIDTypeClusterOccupancySensingAttributePIRUnoccupiedToOccupiedDelayID:
-            result = @"PIRUnoccupiedToOccupiedDelay";
-            break;
+            case MTRAttributeIDTypeClusterOccupancySensingAttributeHoldTimeLimitsID:
+                result = @"HoldTimeLimits";
+                break;
 
-        case MTRAttributeIDTypeClusterOccupancySensingAttributePIRUnoccupiedToOccupiedThresholdID:
-            result = @"PIRUnoccupiedToOccupiedThreshold";
-            break;
+            case MTRAttributeIDTypeClusterOccupancySensingAttributePIROccupiedToUnoccupiedDelayID:
+                result = @"PIROccupiedToUnoccupiedDelay";
+                break;
 
-        case MTRAttributeIDTypeClusterOccupancySensingAttributeUltrasonicOccupiedToUnoccupiedDelayID:
-            result = @"UltrasonicOccupiedToUnoccupiedDelay";
-            break;
+            case MTRAttributeIDTypeClusterOccupancySensingAttributePIRUnoccupiedToOccupiedDelayID:
+                result = @"PIRUnoccupiedToOccupiedDelay";
+                break;
 
-        case MTRAttributeIDTypeClusterOccupancySensingAttributeUltrasonicUnoccupiedToOccupiedDelayID:
-            result = @"UltrasonicUnoccupiedToOccupiedDelay";
-            break;
+            case MTRAttributeIDTypeClusterOccupancySensingAttributePIRUnoccupiedToOccupiedThresholdID:
+                result = @"PIRUnoccupiedToOccupiedThreshold";
+                break;
 
-        case MTRAttributeIDTypeClusterOccupancySensingAttributeUltrasonicUnoccupiedToOccupiedThresholdID:
-            result = @"UltrasonicUnoccupiedToOccupiedThreshold";
-            break;
+            case MTRAttributeIDTypeClusterOccupancySensingAttributeUltrasonicOccupiedToUnoccupiedDelayID:
+                result = @"UltrasonicOccupiedToUnoccupiedDelay";
+                break;
 
-        case MTRAttributeIDTypeClusterOccupancySensingAttributePhysicalContactOccupiedToUnoccupiedDelayID:
-            result = @"PhysicalContactOccupiedToUnoccupiedDelay";
-            break;
+            case MTRAttributeIDTypeClusterOccupancySensingAttributeUltrasonicUnoccupiedToOccupiedDelayID:
+                result = @"UltrasonicUnoccupiedToOccupiedDelay";
+                break;
 
-        case MTRAttributeIDTypeClusterOccupancySensingAttributePhysicalContactUnoccupiedToOccupiedDelayID:
-            result = @"PhysicalContactUnoccupiedToOccupiedDelay";
-            break;
+            case MTRAttributeIDTypeClusterOccupancySensingAttributeUltrasonicUnoccupiedToOccupiedThresholdID:
+                result = @"UltrasonicUnoccupiedToOccupiedThreshold";
+                break;
 
-        case MTRAttributeIDTypeClusterOccupancySensingAttributePhysicalContactUnoccupiedToOccupiedThresholdID:
-            result = @"PhysicalContactUnoccupiedToOccupiedThreshold";
-            break;
+            case MTRAttributeIDTypeClusterOccupancySensingAttributePhysicalContactOccupiedToUnoccupiedDelayID:
+                result = @"PhysicalContactOccupiedToUnoccupiedDelay";
+                break;
 
-        case MTRAttributeIDTypeClusterOccupancySensingAttributeGeneratedCommandListID:
-            result = @"GeneratedCommandList";
-            break;
+            case MTRAttributeIDTypeClusterOccupancySensingAttributePhysicalContactUnoccupiedToOccupiedDelayID:
+                result = @"PhysicalContactUnoccupiedToOccupiedDelay";
+                break;
 
-        case MTRAttributeIDTypeClusterOccupancySensingAttributeAcceptedCommandListID:
-            result = @"AcceptedCommandList";
-            break;
+            case MTRAttributeIDTypeClusterOccupancySensingAttributePhysicalContactUnoccupiedToOccupiedThresholdID:
+                result = @"PhysicalContactUnoccupiedToOccupiedThreshold";
+                break;
 
-        case MTRAttributeIDTypeClusterOccupancySensingAttributeEventListID:
-            result = @"EventList";
-            break;
+            case MTRAttributeIDTypeClusterOccupancySensingAttributeGeneratedCommandListID:
+                result = @"GeneratedCommandList";
+                break;
 
-        case MTRAttributeIDTypeClusterOccupancySensingAttributeAttributeListID:
-            result = @"AttributeList";
-            break;
+            case MTRAttributeIDTypeClusterOccupancySensingAttributeAcceptedCommandListID:
+                result = @"AcceptedCommandList";
+                break;
 
-        case MTRAttributeIDTypeClusterOccupancySensingAttributeFeatureMapID:
-            result = @"FeatureMap";
-            break;
+            case MTRAttributeIDTypeClusterOccupancySensingAttributeEventListID:
+                result = @"EventList";
+                break;
 
-        case MTRAttributeIDTypeClusterOccupancySensingAttributeClusterRevisionID:
-            result = @"ClusterRevision";
-            break;
+            case MTRAttributeIDTypeClusterOccupancySensingAttributeAttributeListID:
+                result = @"AttributeList";
+                break;
 
-        default:
-            result = [NSString stringWithFormat:@"<Unknown attributeID %d>", attributeID];
-            break;
+            case MTRAttributeIDTypeClusterOccupancySensingAttributeFeatureMapID:
+                result = @"FeatureMap";
+                break;
+
+            case MTRAttributeIDTypeClusterOccupancySensingAttributeClusterRevisionID:
+                result = @"ClusterRevision";
+                break;
+
+
+            default:
+                result = [NSString stringWithFormat:@"<Unknown attributeID %d>", attributeID];
+                break;
         }
 
-    case MTRClusterIDTypeCarbonMonoxideConcentrationMeasurementID:
+case MTRClusterIDTypeCarbonMonoxideConcentrationMeasurementID:
 
-        switch (attributeID) {
+            switch (attributeID) {
 
-            // Cluster CarbonMonoxideConcentrationMeasurement attributes
-        case MTRAttributeIDTypeClusterCarbonMonoxideConcentrationMeasurementAttributeMeasuredValueID:
-            result = @"MeasuredValue";
-            break;
 
-        case MTRAttributeIDTypeClusterCarbonMonoxideConcentrationMeasurementAttributeMinMeasuredValueID:
-            result = @"MinMeasuredValue";
-            break;
 
-        case MTRAttributeIDTypeClusterCarbonMonoxideConcentrationMeasurementAttributeMaxMeasuredValueID:
-            result = @"MaxMeasuredValue";
-            break;
+// Cluster CarbonMonoxideConcentrationMeasurement attributes
+            case MTRAttributeIDTypeClusterCarbonMonoxideConcentrationMeasurementAttributeMeasuredValueID:
+                result = @"MeasuredValue";
+                break;
 
-        case MTRAttributeIDTypeClusterCarbonMonoxideConcentrationMeasurementAttributePeakMeasuredValueID:
-            result = @"PeakMeasuredValue";
-            break;
+            case MTRAttributeIDTypeClusterCarbonMonoxideConcentrationMeasurementAttributeMinMeasuredValueID:
+                result = @"MinMeasuredValue";
+                break;
 
-        case MTRAttributeIDTypeClusterCarbonMonoxideConcentrationMeasurementAttributePeakMeasuredValueWindowID:
-            result = @"PeakMeasuredValueWindow";
-            break;
+            case MTRAttributeIDTypeClusterCarbonMonoxideConcentrationMeasurementAttributeMaxMeasuredValueID:
+                result = @"MaxMeasuredValue";
+                break;
 
-        case MTRAttributeIDTypeClusterCarbonMonoxideConcentrationMeasurementAttributeAverageMeasuredValueID:
-            result = @"AverageMeasuredValue";
-            break;
+            case MTRAttributeIDTypeClusterCarbonMonoxideConcentrationMeasurementAttributePeakMeasuredValueID:
+                result = @"PeakMeasuredValue";
+                break;
 
-        case MTRAttributeIDTypeClusterCarbonMonoxideConcentrationMeasurementAttributeAverageMeasuredValueWindowID:
-            result = @"AverageMeasuredValueWindow";
-            break;
+            case MTRAttributeIDTypeClusterCarbonMonoxideConcentrationMeasurementAttributePeakMeasuredValueWindowID:
+                result = @"PeakMeasuredValueWindow";
+                break;
 
-        case MTRAttributeIDTypeClusterCarbonMonoxideConcentrationMeasurementAttributeUncertaintyID:
-            result = @"Uncertainty";
-            break;
+            case MTRAttributeIDTypeClusterCarbonMonoxideConcentrationMeasurementAttributeAverageMeasuredValueID:
+                result = @"AverageMeasuredValue";
+                break;
 
-        case MTRAttributeIDTypeClusterCarbonMonoxideConcentrationMeasurementAttributeMeasurementUnitID:
-            result = @"MeasurementUnit";
-            break;
+            case MTRAttributeIDTypeClusterCarbonMonoxideConcentrationMeasurementAttributeAverageMeasuredValueWindowID:
+                result = @"AverageMeasuredValueWindow";
+                break;
 
-        case MTRAttributeIDTypeClusterCarbonMonoxideConcentrationMeasurementAttributeMeasurementMediumID:
-            result = @"MeasurementMedium";
-            break;
+            case MTRAttributeIDTypeClusterCarbonMonoxideConcentrationMeasurementAttributeUncertaintyID:
+                result = @"Uncertainty";
+                break;
 
-        case MTRAttributeIDTypeClusterCarbonMonoxideConcentrationMeasurementAttributeLevelValueID:
-            result = @"LevelValue";
-            break;
+            case MTRAttributeIDTypeClusterCarbonMonoxideConcentrationMeasurementAttributeMeasurementUnitID:
+                result = @"MeasurementUnit";
+                break;
 
-        case MTRAttributeIDTypeClusterCarbonMonoxideConcentrationMeasurementAttributeGeneratedCommandListID:
-            result = @"GeneratedCommandList";
-            break;
+            case MTRAttributeIDTypeClusterCarbonMonoxideConcentrationMeasurementAttributeMeasurementMediumID:
+                result = @"MeasurementMedium";
+                break;
 
-        case MTRAttributeIDTypeClusterCarbonMonoxideConcentrationMeasurementAttributeAcceptedCommandListID:
-            result = @"AcceptedCommandList";
-            break;
+            case MTRAttributeIDTypeClusterCarbonMonoxideConcentrationMeasurementAttributeLevelValueID:
+                result = @"LevelValue";
+                break;
 
-        case MTRAttributeIDTypeClusterCarbonMonoxideConcentrationMeasurementAttributeEventListID:
-            result = @"EventList";
-            break;
+            case MTRAttributeIDTypeClusterCarbonMonoxideConcentrationMeasurementAttributeGeneratedCommandListID:
+                result = @"GeneratedCommandList";
+                break;
 
-        case MTRAttributeIDTypeClusterCarbonMonoxideConcentrationMeasurementAttributeAttributeListID:
-            result = @"AttributeList";
-            break;
+            case MTRAttributeIDTypeClusterCarbonMonoxideConcentrationMeasurementAttributeAcceptedCommandListID:
+                result = @"AcceptedCommandList";
+                break;
 
-        case MTRAttributeIDTypeClusterCarbonMonoxideConcentrationMeasurementAttributeFeatureMapID:
-            result = @"FeatureMap";
-            break;
+            case MTRAttributeIDTypeClusterCarbonMonoxideConcentrationMeasurementAttributeEventListID:
+                result = @"EventList";
+                break;
 
-        case MTRAttributeIDTypeClusterCarbonMonoxideConcentrationMeasurementAttributeClusterRevisionID:
-            result = @"ClusterRevision";
-            break;
+            case MTRAttributeIDTypeClusterCarbonMonoxideConcentrationMeasurementAttributeAttributeListID:
+                result = @"AttributeList";
+                break;
 
-        default:
-            result = [NSString stringWithFormat:@"<Unknown attributeID %d>", attributeID];
-            break;
+            case MTRAttributeIDTypeClusterCarbonMonoxideConcentrationMeasurementAttributeFeatureMapID:
+                result = @"FeatureMap";
+                break;
+
+            case MTRAttributeIDTypeClusterCarbonMonoxideConcentrationMeasurementAttributeClusterRevisionID:
+                result = @"ClusterRevision";
+                break;
+
+
+            default:
+                result = [NSString stringWithFormat:@"<Unknown attributeID %d>", attributeID];
+                break;
         }
 
-    case MTRClusterIDTypeCarbonDioxideConcentrationMeasurementID:
+case MTRClusterIDTypeCarbonDioxideConcentrationMeasurementID:
 
-        switch (attributeID) {
+            switch (attributeID) {
 
-            // Cluster CarbonDioxideConcentrationMeasurement attributes
-        case MTRAttributeIDTypeClusterCarbonDioxideConcentrationMeasurementAttributeMeasuredValueID:
-            result = @"MeasuredValue";
-            break;
 
-        case MTRAttributeIDTypeClusterCarbonDioxideConcentrationMeasurementAttributeMinMeasuredValueID:
-            result = @"MinMeasuredValue";
-            break;
 
-        case MTRAttributeIDTypeClusterCarbonDioxideConcentrationMeasurementAttributeMaxMeasuredValueID:
-            result = @"MaxMeasuredValue";
-            break;
+// Cluster CarbonDioxideConcentrationMeasurement attributes
+            case MTRAttributeIDTypeClusterCarbonDioxideConcentrationMeasurementAttributeMeasuredValueID:
+                result = @"MeasuredValue";
+                break;
 
-        case MTRAttributeIDTypeClusterCarbonDioxideConcentrationMeasurementAttributePeakMeasuredValueID:
-            result = @"PeakMeasuredValue";
-            break;
+            case MTRAttributeIDTypeClusterCarbonDioxideConcentrationMeasurementAttributeMinMeasuredValueID:
+                result = @"MinMeasuredValue";
+                break;
 
-        case MTRAttributeIDTypeClusterCarbonDioxideConcentrationMeasurementAttributePeakMeasuredValueWindowID:
-            result = @"PeakMeasuredValueWindow";
-            break;
+            case MTRAttributeIDTypeClusterCarbonDioxideConcentrationMeasurementAttributeMaxMeasuredValueID:
+                result = @"MaxMeasuredValue";
+                break;
 
-        case MTRAttributeIDTypeClusterCarbonDioxideConcentrationMeasurementAttributeAverageMeasuredValueID:
-            result = @"AverageMeasuredValue";
-            break;
+            case MTRAttributeIDTypeClusterCarbonDioxideConcentrationMeasurementAttributePeakMeasuredValueID:
+                result = @"PeakMeasuredValue";
+                break;
 
-        case MTRAttributeIDTypeClusterCarbonDioxideConcentrationMeasurementAttributeAverageMeasuredValueWindowID:
-            result = @"AverageMeasuredValueWindow";
-            break;
+            case MTRAttributeIDTypeClusterCarbonDioxideConcentrationMeasurementAttributePeakMeasuredValueWindowID:
+                result = @"PeakMeasuredValueWindow";
+                break;
 
-        case MTRAttributeIDTypeClusterCarbonDioxideConcentrationMeasurementAttributeUncertaintyID:
-            result = @"Uncertainty";
-            break;
+            case MTRAttributeIDTypeClusterCarbonDioxideConcentrationMeasurementAttributeAverageMeasuredValueID:
+                result = @"AverageMeasuredValue";
+                break;
 
-        case MTRAttributeIDTypeClusterCarbonDioxideConcentrationMeasurementAttributeMeasurementUnitID:
-            result = @"MeasurementUnit";
-            break;
+            case MTRAttributeIDTypeClusterCarbonDioxideConcentrationMeasurementAttributeAverageMeasuredValueWindowID:
+                result = @"AverageMeasuredValueWindow";
+                break;
 
-        case MTRAttributeIDTypeClusterCarbonDioxideConcentrationMeasurementAttributeMeasurementMediumID:
-            result = @"MeasurementMedium";
-            break;
+            case MTRAttributeIDTypeClusterCarbonDioxideConcentrationMeasurementAttributeUncertaintyID:
+                result = @"Uncertainty";
+                break;
 
-        case MTRAttributeIDTypeClusterCarbonDioxideConcentrationMeasurementAttributeLevelValueID:
-            result = @"LevelValue";
-            break;
+            case MTRAttributeIDTypeClusterCarbonDioxideConcentrationMeasurementAttributeMeasurementUnitID:
+                result = @"MeasurementUnit";
+                break;
 
-        case MTRAttributeIDTypeClusterCarbonDioxideConcentrationMeasurementAttributeGeneratedCommandListID:
-            result = @"GeneratedCommandList";
-            break;
+            case MTRAttributeIDTypeClusterCarbonDioxideConcentrationMeasurementAttributeMeasurementMediumID:
+                result = @"MeasurementMedium";
+                break;
 
-        case MTRAttributeIDTypeClusterCarbonDioxideConcentrationMeasurementAttributeAcceptedCommandListID:
-            result = @"AcceptedCommandList";
-            break;
+            case MTRAttributeIDTypeClusterCarbonDioxideConcentrationMeasurementAttributeLevelValueID:
+                result = @"LevelValue";
+                break;
 
-        case MTRAttributeIDTypeClusterCarbonDioxideConcentrationMeasurementAttributeEventListID:
-            result = @"EventList";
-            break;
+            case MTRAttributeIDTypeClusterCarbonDioxideConcentrationMeasurementAttributeGeneratedCommandListID:
+                result = @"GeneratedCommandList";
+                break;
 
-        case MTRAttributeIDTypeClusterCarbonDioxideConcentrationMeasurementAttributeAttributeListID:
-            result = @"AttributeList";
-            break;
+            case MTRAttributeIDTypeClusterCarbonDioxideConcentrationMeasurementAttributeAcceptedCommandListID:
+                result = @"AcceptedCommandList";
+                break;
 
-        case MTRAttributeIDTypeClusterCarbonDioxideConcentrationMeasurementAttributeFeatureMapID:
-            result = @"FeatureMap";
-            break;
+            case MTRAttributeIDTypeClusterCarbonDioxideConcentrationMeasurementAttributeEventListID:
+                result = @"EventList";
+                break;
 
-        case MTRAttributeIDTypeClusterCarbonDioxideConcentrationMeasurementAttributeClusterRevisionID:
-            result = @"ClusterRevision";
-            break;
+            case MTRAttributeIDTypeClusterCarbonDioxideConcentrationMeasurementAttributeAttributeListID:
+                result = @"AttributeList";
+                break;
 
-        default:
-            result = [NSString stringWithFormat:@"<Unknown attributeID %d>", attributeID];
-            break;
+            case MTRAttributeIDTypeClusterCarbonDioxideConcentrationMeasurementAttributeFeatureMapID:
+                result = @"FeatureMap";
+                break;
+
+            case MTRAttributeIDTypeClusterCarbonDioxideConcentrationMeasurementAttributeClusterRevisionID:
+                result = @"ClusterRevision";
+                break;
+
+
+            default:
+                result = [NSString stringWithFormat:@"<Unknown attributeID %d>", attributeID];
+                break;
         }
 
-    case MTRClusterIDTypeNitrogenDioxideConcentrationMeasurementID:
+case MTRClusterIDTypeNitrogenDioxideConcentrationMeasurementID:
 
-        switch (attributeID) {
+            switch (attributeID) {
 
-            // Cluster NitrogenDioxideConcentrationMeasurement attributes
-        case MTRAttributeIDTypeClusterNitrogenDioxideConcentrationMeasurementAttributeMeasuredValueID:
-            result = @"MeasuredValue";
-            break;
 
-        case MTRAttributeIDTypeClusterNitrogenDioxideConcentrationMeasurementAttributeMinMeasuredValueID:
-            result = @"MinMeasuredValue";
-            break;
 
-        case MTRAttributeIDTypeClusterNitrogenDioxideConcentrationMeasurementAttributeMaxMeasuredValueID:
-            result = @"MaxMeasuredValue";
-            break;
+// Cluster NitrogenDioxideConcentrationMeasurement attributes
+            case MTRAttributeIDTypeClusterNitrogenDioxideConcentrationMeasurementAttributeMeasuredValueID:
+                result = @"MeasuredValue";
+                break;
 
-        case MTRAttributeIDTypeClusterNitrogenDioxideConcentrationMeasurementAttributePeakMeasuredValueID:
-            result = @"PeakMeasuredValue";
-            break;
+            case MTRAttributeIDTypeClusterNitrogenDioxideConcentrationMeasurementAttributeMinMeasuredValueID:
+                result = @"MinMeasuredValue";
+                break;
 
-        case MTRAttributeIDTypeClusterNitrogenDioxideConcentrationMeasurementAttributePeakMeasuredValueWindowID:
-            result = @"PeakMeasuredValueWindow";
-            break;
+            case MTRAttributeIDTypeClusterNitrogenDioxideConcentrationMeasurementAttributeMaxMeasuredValueID:
+                result = @"MaxMeasuredValue";
+                break;
 
-        case MTRAttributeIDTypeClusterNitrogenDioxideConcentrationMeasurementAttributeAverageMeasuredValueID:
-            result = @"AverageMeasuredValue";
-            break;
+            case MTRAttributeIDTypeClusterNitrogenDioxideConcentrationMeasurementAttributePeakMeasuredValueID:
+                result = @"PeakMeasuredValue";
+                break;
 
-        case MTRAttributeIDTypeClusterNitrogenDioxideConcentrationMeasurementAttributeAverageMeasuredValueWindowID:
-            result = @"AverageMeasuredValueWindow";
-            break;
+            case MTRAttributeIDTypeClusterNitrogenDioxideConcentrationMeasurementAttributePeakMeasuredValueWindowID:
+                result = @"PeakMeasuredValueWindow";
+                break;
 
-        case MTRAttributeIDTypeClusterNitrogenDioxideConcentrationMeasurementAttributeUncertaintyID:
-            result = @"Uncertainty";
-            break;
+            case MTRAttributeIDTypeClusterNitrogenDioxideConcentrationMeasurementAttributeAverageMeasuredValueID:
+                result = @"AverageMeasuredValue";
+                break;
 
-        case MTRAttributeIDTypeClusterNitrogenDioxideConcentrationMeasurementAttributeMeasurementUnitID:
-            result = @"MeasurementUnit";
-            break;
+            case MTRAttributeIDTypeClusterNitrogenDioxideConcentrationMeasurementAttributeAverageMeasuredValueWindowID:
+                result = @"AverageMeasuredValueWindow";
+                break;
 
-        case MTRAttributeIDTypeClusterNitrogenDioxideConcentrationMeasurementAttributeMeasurementMediumID:
-            result = @"MeasurementMedium";
-            break;
+            case MTRAttributeIDTypeClusterNitrogenDioxideConcentrationMeasurementAttributeUncertaintyID:
+                result = @"Uncertainty";
+                break;
 
-        case MTRAttributeIDTypeClusterNitrogenDioxideConcentrationMeasurementAttributeLevelValueID:
-            result = @"LevelValue";
-            break;
+            case MTRAttributeIDTypeClusterNitrogenDioxideConcentrationMeasurementAttributeMeasurementUnitID:
+                result = @"MeasurementUnit";
+                break;
 
-        case MTRAttributeIDTypeClusterNitrogenDioxideConcentrationMeasurementAttributeGeneratedCommandListID:
-            result = @"GeneratedCommandList";
-            break;
+            case MTRAttributeIDTypeClusterNitrogenDioxideConcentrationMeasurementAttributeMeasurementMediumID:
+                result = @"MeasurementMedium";
+                break;
 
-        case MTRAttributeIDTypeClusterNitrogenDioxideConcentrationMeasurementAttributeAcceptedCommandListID:
-            result = @"AcceptedCommandList";
-            break;
+            case MTRAttributeIDTypeClusterNitrogenDioxideConcentrationMeasurementAttributeLevelValueID:
+                result = @"LevelValue";
+                break;
 
-        case MTRAttributeIDTypeClusterNitrogenDioxideConcentrationMeasurementAttributeEventListID:
-            result = @"EventList";
-            break;
+            case MTRAttributeIDTypeClusterNitrogenDioxideConcentrationMeasurementAttributeGeneratedCommandListID:
+                result = @"GeneratedCommandList";
+                break;
 
-        case MTRAttributeIDTypeClusterNitrogenDioxideConcentrationMeasurementAttributeAttributeListID:
-            result = @"AttributeList";
-            break;
+            case MTRAttributeIDTypeClusterNitrogenDioxideConcentrationMeasurementAttributeAcceptedCommandListID:
+                result = @"AcceptedCommandList";
+                break;
 
-        case MTRAttributeIDTypeClusterNitrogenDioxideConcentrationMeasurementAttributeFeatureMapID:
-            result = @"FeatureMap";
-            break;
+            case MTRAttributeIDTypeClusterNitrogenDioxideConcentrationMeasurementAttributeEventListID:
+                result = @"EventList";
+                break;
 
-        case MTRAttributeIDTypeClusterNitrogenDioxideConcentrationMeasurementAttributeClusterRevisionID:
-            result = @"ClusterRevision";
-            break;
+            case MTRAttributeIDTypeClusterNitrogenDioxideConcentrationMeasurementAttributeAttributeListID:
+                result = @"AttributeList";
+                break;
 
-        default:
-            result = [NSString stringWithFormat:@"<Unknown attributeID %d>", attributeID];
-            break;
+            case MTRAttributeIDTypeClusterNitrogenDioxideConcentrationMeasurementAttributeFeatureMapID:
+                result = @"FeatureMap";
+                break;
+
+            case MTRAttributeIDTypeClusterNitrogenDioxideConcentrationMeasurementAttributeClusterRevisionID:
+                result = @"ClusterRevision";
+                break;
+
+
+            default:
+                result = [NSString stringWithFormat:@"<Unknown attributeID %d>", attributeID];
+                break;
         }
 
-    case MTRClusterIDTypeOzoneConcentrationMeasurementID:
+case MTRClusterIDTypeOzoneConcentrationMeasurementID:
 
-        switch (attributeID) {
+            switch (attributeID) {
 
-            // Cluster OzoneConcentrationMeasurement attributes
-        case MTRAttributeIDTypeClusterOzoneConcentrationMeasurementAttributeMeasuredValueID:
-            result = @"MeasuredValue";
-            break;
 
-        case MTRAttributeIDTypeClusterOzoneConcentrationMeasurementAttributeMinMeasuredValueID:
-            result = @"MinMeasuredValue";
-            break;
 
-        case MTRAttributeIDTypeClusterOzoneConcentrationMeasurementAttributeMaxMeasuredValueID:
-            result = @"MaxMeasuredValue";
-            break;
+// Cluster OzoneConcentrationMeasurement attributes
+            case MTRAttributeIDTypeClusterOzoneConcentrationMeasurementAttributeMeasuredValueID:
+                result = @"MeasuredValue";
+                break;
 
-        case MTRAttributeIDTypeClusterOzoneConcentrationMeasurementAttributePeakMeasuredValueID:
-            result = @"PeakMeasuredValue";
-            break;
+            case MTRAttributeIDTypeClusterOzoneConcentrationMeasurementAttributeMinMeasuredValueID:
+                result = @"MinMeasuredValue";
+                break;
 
-        case MTRAttributeIDTypeClusterOzoneConcentrationMeasurementAttributePeakMeasuredValueWindowID:
-            result = @"PeakMeasuredValueWindow";
-            break;
+            case MTRAttributeIDTypeClusterOzoneConcentrationMeasurementAttributeMaxMeasuredValueID:
+                result = @"MaxMeasuredValue";
+                break;
 
-        case MTRAttributeIDTypeClusterOzoneConcentrationMeasurementAttributeAverageMeasuredValueID:
-            result = @"AverageMeasuredValue";
-            break;
+            case MTRAttributeIDTypeClusterOzoneConcentrationMeasurementAttributePeakMeasuredValueID:
+                result = @"PeakMeasuredValue";
+                break;
 
-        case MTRAttributeIDTypeClusterOzoneConcentrationMeasurementAttributeAverageMeasuredValueWindowID:
-            result = @"AverageMeasuredValueWindow";
-            break;
+            case MTRAttributeIDTypeClusterOzoneConcentrationMeasurementAttributePeakMeasuredValueWindowID:
+                result = @"PeakMeasuredValueWindow";
+                break;
 
-        case MTRAttributeIDTypeClusterOzoneConcentrationMeasurementAttributeUncertaintyID:
-            result = @"Uncertainty";
-            break;
+            case MTRAttributeIDTypeClusterOzoneConcentrationMeasurementAttributeAverageMeasuredValueID:
+                result = @"AverageMeasuredValue";
+                break;
 
-        case MTRAttributeIDTypeClusterOzoneConcentrationMeasurementAttributeMeasurementUnitID:
-            result = @"MeasurementUnit";
-            break;
+            case MTRAttributeIDTypeClusterOzoneConcentrationMeasurementAttributeAverageMeasuredValueWindowID:
+                result = @"AverageMeasuredValueWindow";
+                break;
 
-        case MTRAttributeIDTypeClusterOzoneConcentrationMeasurementAttributeMeasurementMediumID:
-            result = @"MeasurementMedium";
-            break;
+            case MTRAttributeIDTypeClusterOzoneConcentrationMeasurementAttributeUncertaintyID:
+                result = @"Uncertainty";
+                break;
 
-        case MTRAttributeIDTypeClusterOzoneConcentrationMeasurementAttributeLevelValueID:
-            result = @"LevelValue";
-            break;
+            case MTRAttributeIDTypeClusterOzoneConcentrationMeasurementAttributeMeasurementUnitID:
+                result = @"MeasurementUnit";
+                break;
 
-        case MTRAttributeIDTypeClusterOzoneConcentrationMeasurementAttributeGeneratedCommandListID:
-            result = @"GeneratedCommandList";
-            break;
+            case MTRAttributeIDTypeClusterOzoneConcentrationMeasurementAttributeMeasurementMediumID:
+                result = @"MeasurementMedium";
+                break;
 
-        case MTRAttributeIDTypeClusterOzoneConcentrationMeasurementAttributeAcceptedCommandListID:
-            result = @"AcceptedCommandList";
-            break;
+            case MTRAttributeIDTypeClusterOzoneConcentrationMeasurementAttributeLevelValueID:
+                result = @"LevelValue";
+                break;
 
-        case MTRAttributeIDTypeClusterOzoneConcentrationMeasurementAttributeEventListID:
-            result = @"EventList";
-            break;
+            case MTRAttributeIDTypeClusterOzoneConcentrationMeasurementAttributeGeneratedCommandListID:
+                result = @"GeneratedCommandList";
+                break;
 
-        case MTRAttributeIDTypeClusterOzoneConcentrationMeasurementAttributeAttributeListID:
-            result = @"AttributeList";
-            break;
+            case MTRAttributeIDTypeClusterOzoneConcentrationMeasurementAttributeAcceptedCommandListID:
+                result = @"AcceptedCommandList";
+                break;
 
-        case MTRAttributeIDTypeClusterOzoneConcentrationMeasurementAttributeFeatureMapID:
-            result = @"FeatureMap";
-            break;
+            case MTRAttributeIDTypeClusterOzoneConcentrationMeasurementAttributeEventListID:
+                result = @"EventList";
+                break;
 
-        case MTRAttributeIDTypeClusterOzoneConcentrationMeasurementAttributeClusterRevisionID:
-            result = @"ClusterRevision";
-            break;
+            case MTRAttributeIDTypeClusterOzoneConcentrationMeasurementAttributeAttributeListID:
+                result = @"AttributeList";
+                break;
 
-        default:
-            result = [NSString stringWithFormat:@"<Unknown attributeID %d>", attributeID];
-            break;
+            case MTRAttributeIDTypeClusterOzoneConcentrationMeasurementAttributeFeatureMapID:
+                result = @"FeatureMap";
+                break;
+
+            case MTRAttributeIDTypeClusterOzoneConcentrationMeasurementAttributeClusterRevisionID:
+                result = @"ClusterRevision";
+                break;
+
+
+            default:
+                result = [NSString stringWithFormat:@"<Unknown attributeID %d>", attributeID];
+                break;
         }
 
-    case MTRClusterIDTypePM25ConcentrationMeasurementID:
+case MTRClusterIDTypePM25ConcentrationMeasurementID:
 
-        switch (attributeID) {
+            switch (attributeID) {
 
-            // Cluster PM25ConcentrationMeasurement attributes
-        case MTRAttributeIDTypeClusterPM25ConcentrationMeasurementAttributeMeasuredValueID:
-            result = @"MeasuredValue";
-            break;
 
-        case MTRAttributeIDTypeClusterPM25ConcentrationMeasurementAttributeMinMeasuredValueID:
-            result = @"MinMeasuredValue";
-            break;
 
-        case MTRAttributeIDTypeClusterPM25ConcentrationMeasurementAttributeMaxMeasuredValueID:
-            result = @"MaxMeasuredValue";
-            break;
+// Cluster PM25ConcentrationMeasurement attributes
+            case MTRAttributeIDTypeClusterPM25ConcentrationMeasurementAttributeMeasuredValueID:
+                result = @"MeasuredValue";
+                break;
 
-        case MTRAttributeIDTypeClusterPM25ConcentrationMeasurementAttributePeakMeasuredValueID:
-            result = @"PeakMeasuredValue";
-            break;
+            case MTRAttributeIDTypeClusterPM25ConcentrationMeasurementAttributeMinMeasuredValueID:
+                result = @"MinMeasuredValue";
+                break;
 
-        case MTRAttributeIDTypeClusterPM25ConcentrationMeasurementAttributePeakMeasuredValueWindowID:
-            result = @"PeakMeasuredValueWindow";
-            break;
+            case MTRAttributeIDTypeClusterPM25ConcentrationMeasurementAttributeMaxMeasuredValueID:
+                result = @"MaxMeasuredValue";
+                break;
 
-        case MTRAttributeIDTypeClusterPM25ConcentrationMeasurementAttributeAverageMeasuredValueID:
-            result = @"AverageMeasuredValue";
-            break;
+            case MTRAttributeIDTypeClusterPM25ConcentrationMeasurementAttributePeakMeasuredValueID:
+                result = @"PeakMeasuredValue";
+                break;
 
-        case MTRAttributeIDTypeClusterPM25ConcentrationMeasurementAttributeAverageMeasuredValueWindowID:
-            result = @"AverageMeasuredValueWindow";
-            break;
+            case MTRAttributeIDTypeClusterPM25ConcentrationMeasurementAttributePeakMeasuredValueWindowID:
+                result = @"PeakMeasuredValueWindow";
+                break;
 
-        case MTRAttributeIDTypeClusterPM25ConcentrationMeasurementAttributeUncertaintyID:
-            result = @"Uncertainty";
-            break;
+            case MTRAttributeIDTypeClusterPM25ConcentrationMeasurementAttributeAverageMeasuredValueID:
+                result = @"AverageMeasuredValue";
+                break;
 
-        case MTRAttributeIDTypeClusterPM25ConcentrationMeasurementAttributeMeasurementUnitID:
-            result = @"MeasurementUnit";
-            break;
+            case MTRAttributeIDTypeClusterPM25ConcentrationMeasurementAttributeAverageMeasuredValueWindowID:
+                result = @"AverageMeasuredValueWindow";
+                break;
 
-        case MTRAttributeIDTypeClusterPM25ConcentrationMeasurementAttributeMeasurementMediumID:
-            result = @"MeasurementMedium";
-            break;
+            case MTRAttributeIDTypeClusterPM25ConcentrationMeasurementAttributeUncertaintyID:
+                result = @"Uncertainty";
+                break;
 
-        case MTRAttributeIDTypeClusterPM25ConcentrationMeasurementAttributeLevelValueID:
-            result = @"LevelValue";
-            break;
+            case MTRAttributeIDTypeClusterPM25ConcentrationMeasurementAttributeMeasurementUnitID:
+                result = @"MeasurementUnit";
+                break;
 
-        case MTRAttributeIDTypeClusterPM25ConcentrationMeasurementAttributeGeneratedCommandListID:
-            result = @"GeneratedCommandList";
-            break;
+            case MTRAttributeIDTypeClusterPM25ConcentrationMeasurementAttributeMeasurementMediumID:
+                result = @"MeasurementMedium";
+                break;
 
-        case MTRAttributeIDTypeClusterPM25ConcentrationMeasurementAttributeAcceptedCommandListID:
-            result = @"AcceptedCommandList";
-            break;
+            case MTRAttributeIDTypeClusterPM25ConcentrationMeasurementAttributeLevelValueID:
+                result = @"LevelValue";
+                break;
 
-        case MTRAttributeIDTypeClusterPM25ConcentrationMeasurementAttributeEventListID:
-            result = @"EventList";
-            break;
+            case MTRAttributeIDTypeClusterPM25ConcentrationMeasurementAttributeGeneratedCommandListID:
+                result = @"GeneratedCommandList";
+                break;
 
-        case MTRAttributeIDTypeClusterPM25ConcentrationMeasurementAttributeAttributeListID:
-            result = @"AttributeList";
-            break;
+            case MTRAttributeIDTypeClusterPM25ConcentrationMeasurementAttributeAcceptedCommandListID:
+                result = @"AcceptedCommandList";
+                break;
 
-        case MTRAttributeIDTypeClusterPM25ConcentrationMeasurementAttributeFeatureMapID:
-            result = @"FeatureMap";
-            break;
+            case MTRAttributeIDTypeClusterPM25ConcentrationMeasurementAttributeEventListID:
+                result = @"EventList";
+                break;
 
-        case MTRAttributeIDTypeClusterPM25ConcentrationMeasurementAttributeClusterRevisionID:
-            result = @"ClusterRevision";
-            break;
+            case MTRAttributeIDTypeClusterPM25ConcentrationMeasurementAttributeAttributeListID:
+                result = @"AttributeList";
+                break;
 
-        default:
-            result = [NSString stringWithFormat:@"<Unknown attributeID %d>", attributeID];
-            break;
+            case MTRAttributeIDTypeClusterPM25ConcentrationMeasurementAttributeFeatureMapID:
+                result = @"FeatureMap";
+                break;
+
+            case MTRAttributeIDTypeClusterPM25ConcentrationMeasurementAttributeClusterRevisionID:
+                result = @"ClusterRevision";
+                break;
+
+
+            default:
+                result = [NSString stringWithFormat:@"<Unknown attributeID %d>", attributeID];
+                break;
         }
 
-    case MTRClusterIDTypeFormaldehydeConcentrationMeasurementID:
+case MTRClusterIDTypeFormaldehydeConcentrationMeasurementID:
 
-        switch (attributeID) {
+            switch (attributeID) {
 
-            // Cluster FormaldehydeConcentrationMeasurement attributes
-        case MTRAttributeIDTypeClusterFormaldehydeConcentrationMeasurementAttributeMeasuredValueID:
-            result = @"MeasuredValue";
-            break;
 
-        case MTRAttributeIDTypeClusterFormaldehydeConcentrationMeasurementAttributeMinMeasuredValueID:
-            result = @"MinMeasuredValue";
-            break;
 
-        case MTRAttributeIDTypeClusterFormaldehydeConcentrationMeasurementAttributeMaxMeasuredValueID:
-            result = @"MaxMeasuredValue";
-            break;
+// Cluster FormaldehydeConcentrationMeasurement attributes
+            case MTRAttributeIDTypeClusterFormaldehydeConcentrationMeasurementAttributeMeasuredValueID:
+                result = @"MeasuredValue";
+                break;
 
-        case MTRAttributeIDTypeClusterFormaldehydeConcentrationMeasurementAttributePeakMeasuredValueID:
-            result = @"PeakMeasuredValue";
-            break;
+            case MTRAttributeIDTypeClusterFormaldehydeConcentrationMeasurementAttributeMinMeasuredValueID:
+                result = @"MinMeasuredValue";
+                break;
 
-        case MTRAttributeIDTypeClusterFormaldehydeConcentrationMeasurementAttributePeakMeasuredValueWindowID:
-            result = @"PeakMeasuredValueWindow";
-            break;
+            case MTRAttributeIDTypeClusterFormaldehydeConcentrationMeasurementAttributeMaxMeasuredValueID:
+                result = @"MaxMeasuredValue";
+                break;
 
-        case MTRAttributeIDTypeClusterFormaldehydeConcentrationMeasurementAttributeAverageMeasuredValueID:
-            result = @"AverageMeasuredValue";
-            break;
+            case MTRAttributeIDTypeClusterFormaldehydeConcentrationMeasurementAttributePeakMeasuredValueID:
+                result = @"PeakMeasuredValue";
+                break;
 
-        case MTRAttributeIDTypeClusterFormaldehydeConcentrationMeasurementAttributeAverageMeasuredValueWindowID:
-            result = @"AverageMeasuredValueWindow";
-            break;
+            case MTRAttributeIDTypeClusterFormaldehydeConcentrationMeasurementAttributePeakMeasuredValueWindowID:
+                result = @"PeakMeasuredValueWindow";
+                break;
 
-        case MTRAttributeIDTypeClusterFormaldehydeConcentrationMeasurementAttributeUncertaintyID:
-            result = @"Uncertainty";
-            break;
+            case MTRAttributeIDTypeClusterFormaldehydeConcentrationMeasurementAttributeAverageMeasuredValueID:
+                result = @"AverageMeasuredValue";
+                break;
 
-        case MTRAttributeIDTypeClusterFormaldehydeConcentrationMeasurementAttributeMeasurementUnitID:
-            result = @"MeasurementUnit";
-            break;
+            case MTRAttributeIDTypeClusterFormaldehydeConcentrationMeasurementAttributeAverageMeasuredValueWindowID:
+                result = @"AverageMeasuredValueWindow";
+                break;
 
-        case MTRAttributeIDTypeClusterFormaldehydeConcentrationMeasurementAttributeMeasurementMediumID:
-            result = @"MeasurementMedium";
-            break;
+            case MTRAttributeIDTypeClusterFormaldehydeConcentrationMeasurementAttributeUncertaintyID:
+                result = @"Uncertainty";
+                break;
 
-        case MTRAttributeIDTypeClusterFormaldehydeConcentrationMeasurementAttributeLevelValueID:
-            result = @"LevelValue";
-            break;
+            case MTRAttributeIDTypeClusterFormaldehydeConcentrationMeasurementAttributeMeasurementUnitID:
+                result = @"MeasurementUnit";
+                break;
 
-        case MTRAttributeIDTypeClusterFormaldehydeConcentrationMeasurementAttributeGeneratedCommandListID:
-            result = @"GeneratedCommandList";
-            break;
+            case MTRAttributeIDTypeClusterFormaldehydeConcentrationMeasurementAttributeMeasurementMediumID:
+                result = @"MeasurementMedium";
+                break;
 
-        case MTRAttributeIDTypeClusterFormaldehydeConcentrationMeasurementAttributeAcceptedCommandListID:
-            result = @"AcceptedCommandList";
-            break;
+            case MTRAttributeIDTypeClusterFormaldehydeConcentrationMeasurementAttributeLevelValueID:
+                result = @"LevelValue";
+                break;
 
-        case MTRAttributeIDTypeClusterFormaldehydeConcentrationMeasurementAttributeEventListID:
-            result = @"EventList";
-            break;
+            case MTRAttributeIDTypeClusterFormaldehydeConcentrationMeasurementAttributeGeneratedCommandListID:
+                result = @"GeneratedCommandList";
+                break;
 
-        case MTRAttributeIDTypeClusterFormaldehydeConcentrationMeasurementAttributeAttributeListID:
-            result = @"AttributeList";
-            break;
+            case MTRAttributeIDTypeClusterFormaldehydeConcentrationMeasurementAttributeAcceptedCommandListID:
+                result = @"AcceptedCommandList";
+                break;
 
-        case MTRAttributeIDTypeClusterFormaldehydeConcentrationMeasurementAttributeFeatureMapID:
-            result = @"FeatureMap";
-            break;
+            case MTRAttributeIDTypeClusterFormaldehydeConcentrationMeasurementAttributeEventListID:
+                result = @"EventList";
+                break;
 
-        case MTRAttributeIDTypeClusterFormaldehydeConcentrationMeasurementAttributeClusterRevisionID:
-            result = @"ClusterRevision";
-            break;
+            case MTRAttributeIDTypeClusterFormaldehydeConcentrationMeasurementAttributeAttributeListID:
+                result = @"AttributeList";
+                break;
 
-        default:
-            result = [NSString stringWithFormat:@"<Unknown attributeID %d>", attributeID];
-            break;
+            case MTRAttributeIDTypeClusterFormaldehydeConcentrationMeasurementAttributeFeatureMapID:
+                result = @"FeatureMap";
+                break;
+
+            case MTRAttributeIDTypeClusterFormaldehydeConcentrationMeasurementAttributeClusterRevisionID:
+                result = @"ClusterRevision";
+                break;
+
+
+            default:
+                result = [NSString stringWithFormat:@"<Unknown attributeID %d>", attributeID];
+                break;
         }
 
-    case MTRClusterIDTypePM1ConcentrationMeasurementID:
+case MTRClusterIDTypePM1ConcentrationMeasurementID:
 
-        switch (attributeID) {
+            switch (attributeID) {
 
-            // Cluster PM1ConcentrationMeasurement attributes
-        case MTRAttributeIDTypeClusterPM1ConcentrationMeasurementAttributeMeasuredValueID:
-            result = @"MeasuredValue";
-            break;
 
-        case MTRAttributeIDTypeClusterPM1ConcentrationMeasurementAttributeMinMeasuredValueID:
-            result = @"MinMeasuredValue";
-            break;
 
-        case MTRAttributeIDTypeClusterPM1ConcentrationMeasurementAttributeMaxMeasuredValueID:
-            result = @"MaxMeasuredValue";
-            break;
+// Cluster PM1ConcentrationMeasurement attributes
+            case MTRAttributeIDTypeClusterPM1ConcentrationMeasurementAttributeMeasuredValueID:
+                result = @"MeasuredValue";
+                break;
 
-        case MTRAttributeIDTypeClusterPM1ConcentrationMeasurementAttributePeakMeasuredValueID:
-            result = @"PeakMeasuredValue";
-            break;
+            case MTRAttributeIDTypeClusterPM1ConcentrationMeasurementAttributeMinMeasuredValueID:
+                result = @"MinMeasuredValue";
+                break;
 
-        case MTRAttributeIDTypeClusterPM1ConcentrationMeasurementAttributePeakMeasuredValueWindowID:
-            result = @"PeakMeasuredValueWindow";
-            break;
+            case MTRAttributeIDTypeClusterPM1ConcentrationMeasurementAttributeMaxMeasuredValueID:
+                result = @"MaxMeasuredValue";
+                break;
 
-        case MTRAttributeIDTypeClusterPM1ConcentrationMeasurementAttributeAverageMeasuredValueID:
-            result = @"AverageMeasuredValue";
-            break;
+            case MTRAttributeIDTypeClusterPM1ConcentrationMeasurementAttributePeakMeasuredValueID:
+                result = @"PeakMeasuredValue";
+                break;
 
-        case MTRAttributeIDTypeClusterPM1ConcentrationMeasurementAttributeAverageMeasuredValueWindowID:
-            result = @"AverageMeasuredValueWindow";
-            break;
+            case MTRAttributeIDTypeClusterPM1ConcentrationMeasurementAttributePeakMeasuredValueWindowID:
+                result = @"PeakMeasuredValueWindow";
+                break;
 
-        case MTRAttributeIDTypeClusterPM1ConcentrationMeasurementAttributeUncertaintyID:
-            result = @"Uncertainty";
-            break;
+            case MTRAttributeIDTypeClusterPM1ConcentrationMeasurementAttributeAverageMeasuredValueID:
+                result = @"AverageMeasuredValue";
+                break;
 
-        case MTRAttributeIDTypeClusterPM1ConcentrationMeasurementAttributeMeasurementUnitID:
-            result = @"MeasurementUnit";
-            break;
+            case MTRAttributeIDTypeClusterPM1ConcentrationMeasurementAttributeAverageMeasuredValueWindowID:
+                result = @"AverageMeasuredValueWindow";
+                break;
 
-        case MTRAttributeIDTypeClusterPM1ConcentrationMeasurementAttributeMeasurementMediumID:
-            result = @"MeasurementMedium";
-            break;
+            case MTRAttributeIDTypeClusterPM1ConcentrationMeasurementAttributeUncertaintyID:
+                result = @"Uncertainty";
+                break;
 
-        case MTRAttributeIDTypeClusterPM1ConcentrationMeasurementAttributeLevelValueID:
-            result = @"LevelValue";
-            break;
+            case MTRAttributeIDTypeClusterPM1ConcentrationMeasurementAttributeMeasurementUnitID:
+                result = @"MeasurementUnit";
+                break;
 
-        case MTRAttributeIDTypeClusterPM1ConcentrationMeasurementAttributeGeneratedCommandListID:
-            result = @"GeneratedCommandList";
-            break;
+            case MTRAttributeIDTypeClusterPM1ConcentrationMeasurementAttributeMeasurementMediumID:
+                result = @"MeasurementMedium";
+                break;
 
-        case MTRAttributeIDTypeClusterPM1ConcentrationMeasurementAttributeAcceptedCommandListID:
-            result = @"AcceptedCommandList";
-            break;
+            case MTRAttributeIDTypeClusterPM1ConcentrationMeasurementAttributeLevelValueID:
+                result = @"LevelValue";
+                break;
 
-        case MTRAttributeIDTypeClusterPM1ConcentrationMeasurementAttributeEventListID:
-            result = @"EventList";
-            break;
+            case MTRAttributeIDTypeClusterPM1ConcentrationMeasurementAttributeGeneratedCommandListID:
+                result = @"GeneratedCommandList";
+                break;
 
-        case MTRAttributeIDTypeClusterPM1ConcentrationMeasurementAttributeAttributeListID:
-            result = @"AttributeList";
-            break;
+            case MTRAttributeIDTypeClusterPM1ConcentrationMeasurementAttributeAcceptedCommandListID:
+                result = @"AcceptedCommandList";
+                break;
 
-        case MTRAttributeIDTypeClusterPM1ConcentrationMeasurementAttributeFeatureMapID:
-            result = @"FeatureMap";
-            break;
+            case MTRAttributeIDTypeClusterPM1ConcentrationMeasurementAttributeEventListID:
+                result = @"EventList";
+                break;
 
-        case MTRAttributeIDTypeClusterPM1ConcentrationMeasurementAttributeClusterRevisionID:
-            result = @"ClusterRevision";
-            break;
+            case MTRAttributeIDTypeClusterPM1ConcentrationMeasurementAttributeAttributeListID:
+                result = @"AttributeList";
+                break;
 
-        default:
-            result = [NSString stringWithFormat:@"<Unknown attributeID %d>", attributeID];
-            break;
+            case MTRAttributeIDTypeClusterPM1ConcentrationMeasurementAttributeFeatureMapID:
+                result = @"FeatureMap";
+                break;
+
+            case MTRAttributeIDTypeClusterPM1ConcentrationMeasurementAttributeClusterRevisionID:
+                result = @"ClusterRevision";
+                break;
+
+
+            default:
+                result = [NSString stringWithFormat:@"<Unknown attributeID %d>", attributeID];
+                break;
         }
 
-    case MTRClusterIDTypePM10ConcentrationMeasurementID:
+case MTRClusterIDTypePM10ConcentrationMeasurementID:
 
-        switch (attributeID) {
+            switch (attributeID) {
 
-            // Cluster PM10ConcentrationMeasurement attributes
-        case MTRAttributeIDTypeClusterPM10ConcentrationMeasurementAttributeMeasuredValueID:
-            result = @"MeasuredValue";
-            break;
 
-        case MTRAttributeIDTypeClusterPM10ConcentrationMeasurementAttributeMinMeasuredValueID:
-            result = @"MinMeasuredValue";
-            break;
 
-        case MTRAttributeIDTypeClusterPM10ConcentrationMeasurementAttributeMaxMeasuredValueID:
-            result = @"MaxMeasuredValue";
-            break;
+// Cluster PM10ConcentrationMeasurement attributes
+            case MTRAttributeIDTypeClusterPM10ConcentrationMeasurementAttributeMeasuredValueID:
+                result = @"MeasuredValue";
+                break;
 
-        case MTRAttributeIDTypeClusterPM10ConcentrationMeasurementAttributePeakMeasuredValueID:
-            result = @"PeakMeasuredValue";
-            break;
+            case MTRAttributeIDTypeClusterPM10ConcentrationMeasurementAttributeMinMeasuredValueID:
+                result = @"MinMeasuredValue";
+                break;
 
-        case MTRAttributeIDTypeClusterPM10ConcentrationMeasurementAttributePeakMeasuredValueWindowID:
-            result = @"PeakMeasuredValueWindow";
-            break;
+            case MTRAttributeIDTypeClusterPM10ConcentrationMeasurementAttributeMaxMeasuredValueID:
+                result = @"MaxMeasuredValue";
+                break;
 
-        case MTRAttributeIDTypeClusterPM10ConcentrationMeasurementAttributeAverageMeasuredValueID:
-            result = @"AverageMeasuredValue";
-            break;
+            case MTRAttributeIDTypeClusterPM10ConcentrationMeasurementAttributePeakMeasuredValueID:
+                result = @"PeakMeasuredValue";
+                break;
 
-        case MTRAttributeIDTypeClusterPM10ConcentrationMeasurementAttributeAverageMeasuredValueWindowID:
-            result = @"AverageMeasuredValueWindow";
-            break;
+            case MTRAttributeIDTypeClusterPM10ConcentrationMeasurementAttributePeakMeasuredValueWindowID:
+                result = @"PeakMeasuredValueWindow";
+                break;
 
-        case MTRAttributeIDTypeClusterPM10ConcentrationMeasurementAttributeUncertaintyID:
-            result = @"Uncertainty";
-            break;
+            case MTRAttributeIDTypeClusterPM10ConcentrationMeasurementAttributeAverageMeasuredValueID:
+                result = @"AverageMeasuredValue";
+                break;
 
-        case MTRAttributeIDTypeClusterPM10ConcentrationMeasurementAttributeMeasurementUnitID:
-            result = @"MeasurementUnit";
-            break;
+            case MTRAttributeIDTypeClusterPM10ConcentrationMeasurementAttributeAverageMeasuredValueWindowID:
+                result = @"AverageMeasuredValueWindow";
+                break;
 
-        case MTRAttributeIDTypeClusterPM10ConcentrationMeasurementAttributeMeasurementMediumID:
-            result = @"MeasurementMedium";
-            break;
+            case MTRAttributeIDTypeClusterPM10ConcentrationMeasurementAttributeUncertaintyID:
+                result = @"Uncertainty";
+                break;
 
-        case MTRAttributeIDTypeClusterPM10ConcentrationMeasurementAttributeLevelValueID:
-            result = @"LevelValue";
-            break;
+            case MTRAttributeIDTypeClusterPM10ConcentrationMeasurementAttributeMeasurementUnitID:
+                result = @"MeasurementUnit";
+                break;
 
-        case MTRAttributeIDTypeClusterPM10ConcentrationMeasurementAttributeGeneratedCommandListID:
-            result = @"GeneratedCommandList";
-            break;
+            case MTRAttributeIDTypeClusterPM10ConcentrationMeasurementAttributeMeasurementMediumID:
+                result = @"MeasurementMedium";
+                break;
 
-        case MTRAttributeIDTypeClusterPM10ConcentrationMeasurementAttributeAcceptedCommandListID:
-            result = @"AcceptedCommandList";
-            break;
+            case MTRAttributeIDTypeClusterPM10ConcentrationMeasurementAttributeLevelValueID:
+                result = @"LevelValue";
+                break;
 
-        case MTRAttributeIDTypeClusterPM10ConcentrationMeasurementAttributeEventListID:
-            result = @"EventList";
-            break;
+            case MTRAttributeIDTypeClusterPM10ConcentrationMeasurementAttributeGeneratedCommandListID:
+                result = @"GeneratedCommandList";
+                break;
 
-        case MTRAttributeIDTypeClusterPM10ConcentrationMeasurementAttributeAttributeListID:
-            result = @"AttributeList";
-            break;
+            case MTRAttributeIDTypeClusterPM10ConcentrationMeasurementAttributeAcceptedCommandListID:
+                result = @"AcceptedCommandList";
+                break;
 
-        case MTRAttributeIDTypeClusterPM10ConcentrationMeasurementAttributeFeatureMapID:
-            result = @"FeatureMap";
-            break;
+            case MTRAttributeIDTypeClusterPM10ConcentrationMeasurementAttributeEventListID:
+                result = @"EventList";
+                break;
 
-        case MTRAttributeIDTypeClusterPM10ConcentrationMeasurementAttributeClusterRevisionID:
-            result = @"ClusterRevision";
-            break;
+            case MTRAttributeIDTypeClusterPM10ConcentrationMeasurementAttributeAttributeListID:
+                result = @"AttributeList";
+                break;
 
-        default:
-            result = [NSString stringWithFormat:@"<Unknown attributeID %d>", attributeID];
-            break;
+            case MTRAttributeIDTypeClusterPM10ConcentrationMeasurementAttributeFeatureMapID:
+                result = @"FeatureMap";
+                break;
+
+            case MTRAttributeIDTypeClusterPM10ConcentrationMeasurementAttributeClusterRevisionID:
+                result = @"ClusterRevision";
+                break;
+
+
+            default:
+                result = [NSString stringWithFormat:@"<Unknown attributeID %d>", attributeID];
+                break;
         }
 
-    case MTRClusterIDTypeTotalVolatileOrganicCompoundsConcentrationMeasurementID:
+case MTRClusterIDTypeTotalVolatileOrganicCompoundsConcentrationMeasurementID:
 
-        switch (attributeID) {
+            switch (attributeID) {
 
-            // Cluster TotalVolatileOrganicCompoundsConcentrationMeasurement attributes
-        case MTRAttributeIDTypeClusterTotalVolatileOrganicCompoundsConcentrationMeasurementAttributeMeasuredValueID:
-            result = @"MeasuredValue";
-            break;
 
-        case MTRAttributeIDTypeClusterTotalVolatileOrganicCompoundsConcentrationMeasurementAttributeMinMeasuredValueID:
-            result = @"MinMeasuredValue";
-            break;
 
-        case MTRAttributeIDTypeClusterTotalVolatileOrganicCompoundsConcentrationMeasurementAttributeMaxMeasuredValueID:
-            result = @"MaxMeasuredValue";
-            break;
+// Cluster TotalVolatileOrganicCompoundsConcentrationMeasurement attributes
+            case MTRAttributeIDTypeClusterTotalVolatileOrganicCompoundsConcentrationMeasurementAttributeMeasuredValueID:
+                result = @"MeasuredValue";
+                break;
 
-        case MTRAttributeIDTypeClusterTotalVolatileOrganicCompoundsConcentrationMeasurementAttributePeakMeasuredValueID:
-            result = @"PeakMeasuredValue";
-            break;
+            case MTRAttributeIDTypeClusterTotalVolatileOrganicCompoundsConcentrationMeasurementAttributeMinMeasuredValueID:
+                result = @"MinMeasuredValue";
+                break;
 
-        case MTRAttributeIDTypeClusterTotalVolatileOrganicCompoundsConcentrationMeasurementAttributePeakMeasuredValueWindowID:
-            result = @"PeakMeasuredValueWindow";
-            break;
+            case MTRAttributeIDTypeClusterTotalVolatileOrganicCompoundsConcentrationMeasurementAttributeMaxMeasuredValueID:
+                result = @"MaxMeasuredValue";
+                break;
 
-        case MTRAttributeIDTypeClusterTotalVolatileOrganicCompoundsConcentrationMeasurementAttributeAverageMeasuredValueID:
-            result = @"AverageMeasuredValue";
-            break;
+            case MTRAttributeIDTypeClusterTotalVolatileOrganicCompoundsConcentrationMeasurementAttributePeakMeasuredValueID:
+                result = @"PeakMeasuredValue";
+                break;
 
-        case MTRAttributeIDTypeClusterTotalVolatileOrganicCompoundsConcentrationMeasurementAttributeAverageMeasuredValueWindowID:
-            result = @"AverageMeasuredValueWindow";
-            break;
+            case MTRAttributeIDTypeClusterTotalVolatileOrganicCompoundsConcentrationMeasurementAttributePeakMeasuredValueWindowID:
+                result = @"PeakMeasuredValueWindow";
+                break;
 
-        case MTRAttributeIDTypeClusterTotalVolatileOrganicCompoundsConcentrationMeasurementAttributeUncertaintyID:
-            result = @"Uncertainty";
-            break;
+            case MTRAttributeIDTypeClusterTotalVolatileOrganicCompoundsConcentrationMeasurementAttributeAverageMeasuredValueID:
+                result = @"AverageMeasuredValue";
+                break;
 
-        case MTRAttributeIDTypeClusterTotalVolatileOrganicCompoundsConcentrationMeasurementAttributeMeasurementUnitID:
-            result = @"MeasurementUnit";
-            break;
+            case MTRAttributeIDTypeClusterTotalVolatileOrganicCompoundsConcentrationMeasurementAttributeAverageMeasuredValueWindowID:
+                result = @"AverageMeasuredValueWindow";
+                break;
 
-        case MTRAttributeIDTypeClusterTotalVolatileOrganicCompoundsConcentrationMeasurementAttributeMeasurementMediumID:
-            result = @"MeasurementMedium";
-            break;
+            case MTRAttributeIDTypeClusterTotalVolatileOrganicCompoundsConcentrationMeasurementAttributeUncertaintyID:
+                result = @"Uncertainty";
+                break;
 
-        case MTRAttributeIDTypeClusterTotalVolatileOrganicCompoundsConcentrationMeasurementAttributeLevelValueID:
-            result = @"LevelValue";
-            break;
+            case MTRAttributeIDTypeClusterTotalVolatileOrganicCompoundsConcentrationMeasurementAttributeMeasurementUnitID:
+                result = @"MeasurementUnit";
+                break;
 
-        case MTRAttributeIDTypeClusterTotalVolatileOrganicCompoundsConcentrationMeasurementAttributeGeneratedCommandListID:
-            result = @"GeneratedCommandList";
-            break;
+            case MTRAttributeIDTypeClusterTotalVolatileOrganicCompoundsConcentrationMeasurementAttributeMeasurementMediumID:
+                result = @"MeasurementMedium";
+                break;
 
-        case MTRAttributeIDTypeClusterTotalVolatileOrganicCompoundsConcentrationMeasurementAttributeAcceptedCommandListID:
-            result = @"AcceptedCommandList";
-            break;
+            case MTRAttributeIDTypeClusterTotalVolatileOrganicCompoundsConcentrationMeasurementAttributeLevelValueID:
+                result = @"LevelValue";
+                break;
 
-        case MTRAttributeIDTypeClusterTotalVolatileOrganicCompoundsConcentrationMeasurementAttributeEventListID:
-            result = @"EventList";
-            break;
+            case MTRAttributeIDTypeClusterTotalVolatileOrganicCompoundsConcentrationMeasurementAttributeGeneratedCommandListID:
+                result = @"GeneratedCommandList";
+                break;
 
-        case MTRAttributeIDTypeClusterTotalVolatileOrganicCompoundsConcentrationMeasurementAttributeAttributeListID:
-            result = @"AttributeList";
-            break;
+            case MTRAttributeIDTypeClusterTotalVolatileOrganicCompoundsConcentrationMeasurementAttributeAcceptedCommandListID:
+                result = @"AcceptedCommandList";
+                break;
 
-        case MTRAttributeIDTypeClusterTotalVolatileOrganicCompoundsConcentrationMeasurementAttributeFeatureMapID:
-            result = @"FeatureMap";
-            break;
+            case MTRAttributeIDTypeClusterTotalVolatileOrganicCompoundsConcentrationMeasurementAttributeEventListID:
+                result = @"EventList";
+                break;
 
-        case MTRAttributeIDTypeClusterTotalVolatileOrganicCompoundsConcentrationMeasurementAttributeClusterRevisionID:
-            result = @"ClusterRevision";
-            break;
+            case MTRAttributeIDTypeClusterTotalVolatileOrganicCompoundsConcentrationMeasurementAttributeAttributeListID:
+                result = @"AttributeList";
+                break;
 
-        default:
-            result = [NSString stringWithFormat:@"<Unknown attributeID %d>", attributeID];
-            break;
+            case MTRAttributeIDTypeClusterTotalVolatileOrganicCompoundsConcentrationMeasurementAttributeFeatureMapID:
+                result = @"FeatureMap";
+                break;
+
+            case MTRAttributeIDTypeClusterTotalVolatileOrganicCompoundsConcentrationMeasurementAttributeClusterRevisionID:
+                result = @"ClusterRevision";
+                break;
+
+
+            default:
+                result = [NSString stringWithFormat:@"<Unknown attributeID %d>", attributeID];
+                break;
         }
 
-    case MTRClusterIDTypeRadonConcentrationMeasurementID:
+case MTRClusterIDTypeRadonConcentrationMeasurementID:
 
-        switch (attributeID) {
+            switch (attributeID) {
 
-            // Cluster RadonConcentrationMeasurement attributes
-        case MTRAttributeIDTypeClusterRadonConcentrationMeasurementAttributeMeasuredValueID:
-            result = @"MeasuredValue";
-            break;
 
-        case MTRAttributeIDTypeClusterRadonConcentrationMeasurementAttributeMinMeasuredValueID:
-            result = @"MinMeasuredValue";
-            break;
 
-        case MTRAttributeIDTypeClusterRadonConcentrationMeasurementAttributeMaxMeasuredValueID:
-            result = @"MaxMeasuredValue";
-            break;
+// Cluster RadonConcentrationMeasurement attributes
+            case MTRAttributeIDTypeClusterRadonConcentrationMeasurementAttributeMeasuredValueID:
+                result = @"MeasuredValue";
+                break;
 
-        case MTRAttributeIDTypeClusterRadonConcentrationMeasurementAttributePeakMeasuredValueID:
-            result = @"PeakMeasuredValue";
-            break;
+            case MTRAttributeIDTypeClusterRadonConcentrationMeasurementAttributeMinMeasuredValueID:
+                result = @"MinMeasuredValue";
+                break;
 
-        case MTRAttributeIDTypeClusterRadonConcentrationMeasurementAttributePeakMeasuredValueWindowID:
-            result = @"PeakMeasuredValueWindow";
-            break;
+            case MTRAttributeIDTypeClusterRadonConcentrationMeasurementAttributeMaxMeasuredValueID:
+                result = @"MaxMeasuredValue";
+                break;
 
-        case MTRAttributeIDTypeClusterRadonConcentrationMeasurementAttributeAverageMeasuredValueID:
-            result = @"AverageMeasuredValue";
-            break;
+            case MTRAttributeIDTypeClusterRadonConcentrationMeasurementAttributePeakMeasuredValueID:
+                result = @"PeakMeasuredValue";
+                break;
 
-        case MTRAttributeIDTypeClusterRadonConcentrationMeasurementAttributeAverageMeasuredValueWindowID:
-            result = @"AverageMeasuredValueWindow";
-            break;
+            case MTRAttributeIDTypeClusterRadonConcentrationMeasurementAttributePeakMeasuredValueWindowID:
+                result = @"PeakMeasuredValueWindow";
+                break;
 
-        case MTRAttributeIDTypeClusterRadonConcentrationMeasurementAttributeUncertaintyID:
-            result = @"Uncertainty";
-            break;
+            case MTRAttributeIDTypeClusterRadonConcentrationMeasurementAttributeAverageMeasuredValueID:
+                result = @"AverageMeasuredValue";
+                break;
 
-        case MTRAttributeIDTypeClusterRadonConcentrationMeasurementAttributeMeasurementUnitID:
-            result = @"MeasurementUnit";
-            break;
+            case MTRAttributeIDTypeClusterRadonConcentrationMeasurementAttributeAverageMeasuredValueWindowID:
+                result = @"AverageMeasuredValueWindow";
+                break;
 
-        case MTRAttributeIDTypeClusterRadonConcentrationMeasurementAttributeMeasurementMediumID:
-            result = @"MeasurementMedium";
-            break;
+            case MTRAttributeIDTypeClusterRadonConcentrationMeasurementAttributeUncertaintyID:
+                result = @"Uncertainty";
+                break;
 
-        case MTRAttributeIDTypeClusterRadonConcentrationMeasurementAttributeLevelValueID:
-            result = @"LevelValue";
-            break;
+            case MTRAttributeIDTypeClusterRadonConcentrationMeasurementAttributeMeasurementUnitID:
+                result = @"MeasurementUnit";
+                break;
 
-        case MTRAttributeIDTypeClusterRadonConcentrationMeasurementAttributeGeneratedCommandListID:
-            result = @"GeneratedCommandList";
-            break;
+            case MTRAttributeIDTypeClusterRadonConcentrationMeasurementAttributeMeasurementMediumID:
+                result = @"MeasurementMedium";
+                break;
 
-        case MTRAttributeIDTypeClusterRadonConcentrationMeasurementAttributeAcceptedCommandListID:
-            result = @"AcceptedCommandList";
-            break;
+            case MTRAttributeIDTypeClusterRadonConcentrationMeasurementAttributeLevelValueID:
+                result = @"LevelValue";
+                break;
 
-        case MTRAttributeIDTypeClusterRadonConcentrationMeasurementAttributeEventListID:
-            result = @"EventList";
-            break;
+            case MTRAttributeIDTypeClusterRadonConcentrationMeasurementAttributeGeneratedCommandListID:
+                result = @"GeneratedCommandList";
+                break;
 
-        case MTRAttributeIDTypeClusterRadonConcentrationMeasurementAttributeAttributeListID:
-            result = @"AttributeList";
-            break;
+            case MTRAttributeIDTypeClusterRadonConcentrationMeasurementAttributeAcceptedCommandListID:
+                result = @"AcceptedCommandList";
+                break;
 
-        case MTRAttributeIDTypeClusterRadonConcentrationMeasurementAttributeFeatureMapID:
-            result = @"FeatureMap";
-            break;
+            case MTRAttributeIDTypeClusterRadonConcentrationMeasurementAttributeEventListID:
+                result = @"EventList";
+                break;
 
-        case MTRAttributeIDTypeClusterRadonConcentrationMeasurementAttributeClusterRevisionID:
-            result = @"ClusterRevision";
-            break;
+            case MTRAttributeIDTypeClusterRadonConcentrationMeasurementAttributeAttributeListID:
+                result = @"AttributeList";
+                break;
 
-        default:
-            result = [NSString stringWithFormat:@"<Unknown attributeID %d>", attributeID];
-            break;
+            case MTRAttributeIDTypeClusterRadonConcentrationMeasurementAttributeFeatureMapID:
+                result = @"FeatureMap";
+                break;
+
+            case MTRAttributeIDTypeClusterRadonConcentrationMeasurementAttributeClusterRevisionID:
+                result = @"ClusterRevision";
+                break;
+
+
+            default:
+                result = [NSString stringWithFormat:@"<Unknown attributeID %d>", attributeID];
+                break;
         }
 
-    case MTRClusterIDTypeWiFiNetworkManagementID:
+case MTRClusterIDTypeWiFiNetworkManagementID:
 
-        switch (attributeID) {
+            switch (attributeID) {
 
-            // Cluster WiFiNetworkManagement attributes
-        case MTRAttributeIDTypeClusterWiFiNetworkManagementAttributeSSIDID:
-            result = @"SSID";
-            break;
 
-        case MTRAttributeIDTypeClusterWiFiNetworkManagementAttributePassphraseSurrogateID:
-            result = @"PassphraseSurrogate";
-            break;
 
-        case MTRAttributeIDTypeClusterWiFiNetworkManagementAttributeGeneratedCommandListID:
-            result = @"GeneratedCommandList";
-            break;
+// Cluster WiFiNetworkManagement attributes
+            case MTRAttributeIDTypeClusterWiFiNetworkManagementAttributeSSIDID:
+                result = @"SSID";
+                break;
 
-        case MTRAttributeIDTypeClusterWiFiNetworkManagementAttributeAcceptedCommandListID:
-            result = @"AcceptedCommandList";
-            break;
+            case MTRAttributeIDTypeClusterWiFiNetworkManagementAttributePassphraseSurrogateID:
+                result = @"PassphraseSurrogate";
+                break;
 
-        case MTRAttributeIDTypeClusterWiFiNetworkManagementAttributeEventListID:
-            result = @"EventList";
-            break;
+            case MTRAttributeIDTypeClusterWiFiNetworkManagementAttributeGeneratedCommandListID:
+                result = @"GeneratedCommandList";
+                break;
 
-        case MTRAttributeIDTypeClusterWiFiNetworkManagementAttributeAttributeListID:
-            result = @"AttributeList";
-            break;
+            case MTRAttributeIDTypeClusterWiFiNetworkManagementAttributeAcceptedCommandListID:
+                result = @"AcceptedCommandList";
+                break;
 
-        case MTRAttributeIDTypeClusterWiFiNetworkManagementAttributeFeatureMapID:
-            result = @"FeatureMap";
-            break;
+            case MTRAttributeIDTypeClusterWiFiNetworkManagementAttributeEventListID:
+                result = @"EventList";
+                break;
 
-        case MTRAttributeIDTypeClusterWiFiNetworkManagementAttributeClusterRevisionID:
-            result = @"ClusterRevision";
-            break;
+            case MTRAttributeIDTypeClusterWiFiNetworkManagementAttributeAttributeListID:
+                result = @"AttributeList";
+                break;
 
-        default:
-            result = [NSString stringWithFormat:@"<Unknown attributeID %d>", attributeID];
-            break;
+            case MTRAttributeIDTypeClusterWiFiNetworkManagementAttributeFeatureMapID:
+                result = @"FeatureMap";
+                break;
+
+            case MTRAttributeIDTypeClusterWiFiNetworkManagementAttributeClusterRevisionID:
+                result = @"ClusterRevision";
+                break;
+
+
+            default:
+                result = [NSString stringWithFormat:@"<Unknown attributeID %d>", attributeID];
+                break;
         }
 
-    case MTRClusterIDTypeThreadBorderRouterManagementID:
+case MTRClusterIDTypeThreadBorderRouterManagementID:
 
-        switch (attributeID) {
+            switch (attributeID) {
 
-            // Cluster ThreadBorderRouterManagement attributes
-        case MTRAttributeIDTypeClusterThreadBorderRouterManagementAttributeBorderRouterNameID:
-            result = @"BorderRouterName";
-            break;
 
-        case MTRAttributeIDTypeClusterThreadBorderRouterManagementAttributeBorderAgentIDID:
-            result = @"BorderAgentID";
-            break;
 
-        case MTRAttributeIDTypeClusterThreadBorderRouterManagementAttributeThreadVersionID:
-            result = @"ThreadVersion";
-            break;
+// Cluster ThreadBorderRouterManagement attributes
+            case MTRAttributeIDTypeClusterThreadBorderRouterManagementAttributeBorderRouterNameID:
+                result = @"BorderRouterName";
+                break;
 
-        case MTRAttributeIDTypeClusterThreadBorderRouterManagementAttributeInterfaceEnabledID:
-            result = @"InterfaceEnabled";
-            break;
+            case MTRAttributeIDTypeClusterThreadBorderRouterManagementAttributeBorderAgentIDID:
+                result = @"BorderAgentID";
+                break;
 
-        case MTRAttributeIDTypeClusterThreadBorderRouterManagementAttributeActiveDatasetTimestampID:
-            result = @"ActiveDatasetTimestamp";
-            break;
+            case MTRAttributeIDTypeClusterThreadBorderRouterManagementAttributeThreadVersionID:
+                result = @"ThreadVersion";
+                break;
 
-        case MTRAttributeIDTypeClusterThreadBorderRouterManagementAttributeGeneratedCommandListID:
-            result = @"GeneratedCommandList";
-            break;
+            case MTRAttributeIDTypeClusterThreadBorderRouterManagementAttributeInterfaceEnabledID:
+                result = @"InterfaceEnabled";
+                break;
 
-        case MTRAttributeIDTypeClusterThreadBorderRouterManagementAttributeAcceptedCommandListID:
-            result = @"AcceptedCommandList";
-            break;
+            case MTRAttributeIDTypeClusterThreadBorderRouterManagementAttributeActiveDatasetTimestampID:
+                result = @"ActiveDatasetTimestamp";
+                break;
 
-        case MTRAttributeIDTypeClusterThreadBorderRouterManagementAttributeEventListID:
-            result = @"EventList";
-            break;
+            case MTRAttributeIDTypeClusterThreadBorderRouterManagementAttributeGeneratedCommandListID:
+                result = @"GeneratedCommandList";
+                break;
 
-        case MTRAttributeIDTypeClusterThreadBorderRouterManagementAttributeAttributeListID:
-            result = @"AttributeList";
-            break;
+            case MTRAttributeIDTypeClusterThreadBorderRouterManagementAttributeAcceptedCommandListID:
+                result = @"AcceptedCommandList";
+                break;
 
-        case MTRAttributeIDTypeClusterThreadBorderRouterManagementAttributeFeatureMapID:
-            result = @"FeatureMap";
-            break;
+            case MTRAttributeIDTypeClusterThreadBorderRouterManagementAttributeEventListID:
+                result = @"EventList";
+                break;
 
-        case MTRAttributeIDTypeClusterThreadBorderRouterManagementAttributeClusterRevisionID:
-            result = @"ClusterRevision";
-            break;
+            case MTRAttributeIDTypeClusterThreadBorderRouterManagementAttributeAttributeListID:
+                result = @"AttributeList";
+                break;
 
-        default:
-            result = [NSString stringWithFormat:@"<Unknown attributeID %d>", attributeID];
-            break;
+            case MTRAttributeIDTypeClusterThreadBorderRouterManagementAttributeFeatureMapID:
+                result = @"FeatureMap";
+                break;
+
+            case MTRAttributeIDTypeClusterThreadBorderRouterManagementAttributeClusterRevisionID:
+                result = @"ClusterRevision";
+                break;
+
+
+            default:
+                result = [NSString stringWithFormat:@"<Unknown attributeID %d>", attributeID];
+                break;
         }
 
-    case MTRClusterIDTypeThreadNetworkDirectoryID:
+case MTRClusterIDTypeThreadNetworkDirectoryID:
 
-        switch (attributeID) {
+            switch (attributeID) {
 
-            // Cluster ThreadNetworkDirectory attributes
-        case MTRAttributeIDTypeClusterThreadNetworkDirectoryAttributePreferredExtendedPanIDID:
-            result = @"PreferredExtendedPanID";
-            break;
 
-        case MTRAttributeIDTypeClusterThreadNetworkDirectoryAttributeThreadNetworksID:
-            result = @"ThreadNetworks";
-            break;
 
-        case MTRAttributeIDTypeClusterThreadNetworkDirectoryAttributeThreadNetworkTableSizeID:
-            result = @"ThreadNetworkTableSize";
-            break;
+// Cluster ThreadNetworkDirectory attributes
+            case MTRAttributeIDTypeClusterThreadNetworkDirectoryAttributePreferredExtendedPanIDID:
+                result = @"PreferredExtendedPanID";
+                break;
 
-        case MTRAttributeIDTypeClusterThreadNetworkDirectoryAttributeGeneratedCommandListID:
-            result = @"GeneratedCommandList";
-            break;
+            case MTRAttributeIDTypeClusterThreadNetworkDirectoryAttributeThreadNetworksID:
+                result = @"ThreadNetworks";
+                break;
 
-        case MTRAttributeIDTypeClusterThreadNetworkDirectoryAttributeAcceptedCommandListID:
-            result = @"AcceptedCommandList";
-            break;
+            case MTRAttributeIDTypeClusterThreadNetworkDirectoryAttributeThreadNetworkTableSizeID:
+                result = @"ThreadNetworkTableSize";
+                break;
 
-        case MTRAttributeIDTypeClusterThreadNetworkDirectoryAttributeEventListID:
-            result = @"EventList";
-            break;
+            case MTRAttributeIDTypeClusterThreadNetworkDirectoryAttributeGeneratedCommandListID:
+                result = @"GeneratedCommandList";
+                break;
 
-        case MTRAttributeIDTypeClusterThreadNetworkDirectoryAttributeAttributeListID:
-            result = @"AttributeList";
-            break;
+            case MTRAttributeIDTypeClusterThreadNetworkDirectoryAttributeAcceptedCommandListID:
+                result = @"AcceptedCommandList";
+                break;
 
-        case MTRAttributeIDTypeClusterThreadNetworkDirectoryAttributeFeatureMapID:
-            result = @"FeatureMap";
-            break;
+            case MTRAttributeIDTypeClusterThreadNetworkDirectoryAttributeEventListID:
+                result = @"EventList";
+                break;
 
-        case MTRAttributeIDTypeClusterThreadNetworkDirectoryAttributeClusterRevisionID:
-            result = @"ClusterRevision";
-            break;
+            case MTRAttributeIDTypeClusterThreadNetworkDirectoryAttributeAttributeListID:
+                result = @"AttributeList";
+                break;
 
-        default:
-            result = [NSString stringWithFormat:@"<Unknown attributeID %d>", attributeID];
-            break;
+            case MTRAttributeIDTypeClusterThreadNetworkDirectoryAttributeFeatureMapID:
+                result = @"FeatureMap";
+                break;
+
+            case MTRAttributeIDTypeClusterThreadNetworkDirectoryAttributeClusterRevisionID:
+                result = @"ClusterRevision";
+                break;
+
+
+            default:
+                result = [NSString stringWithFormat:@"<Unknown attributeID %d>", attributeID];
+                break;
         }
 
-    case MTRClusterIDTypeWakeOnLANID:
+case MTRClusterIDTypeWakeOnLANID:
 
-        switch (attributeID) {
+            switch (attributeID) {
 
-            // Cluster WakeOnLAN attributes
-        case MTRAttributeIDTypeClusterWakeOnLANAttributeMACAddressID:
-            result = @"MACAddress";
-            break;
 
-        case MTRAttributeIDTypeClusterWakeOnLANAttributeLinkLocalAddressID:
-            result = @"LinkLocalAddress";
-            break;
 
-        case MTRAttributeIDTypeClusterWakeOnLANAttributeGeneratedCommandListID:
-            result = @"GeneratedCommandList";
-            break;
+// Cluster WakeOnLAN attributes
+            case MTRAttributeIDTypeClusterWakeOnLANAttributeMACAddressID:
+                result = @"MACAddress";
+                break;
 
-        case MTRAttributeIDTypeClusterWakeOnLANAttributeAcceptedCommandListID:
-            result = @"AcceptedCommandList";
-            break;
+            case MTRAttributeIDTypeClusterWakeOnLANAttributeLinkLocalAddressID:
+                result = @"LinkLocalAddress";
+                break;
 
-        case MTRAttributeIDTypeClusterWakeOnLANAttributeEventListID:
-            result = @"EventList";
-            break;
+            case MTRAttributeIDTypeClusterWakeOnLANAttributeGeneratedCommandListID:
+                result = @"GeneratedCommandList";
+                break;
 
-        case MTRAttributeIDTypeClusterWakeOnLANAttributeAttributeListID:
-            result = @"AttributeList";
-            break;
+            case MTRAttributeIDTypeClusterWakeOnLANAttributeAcceptedCommandListID:
+                result = @"AcceptedCommandList";
+                break;
 
-        case MTRAttributeIDTypeClusterWakeOnLANAttributeFeatureMapID:
-            result = @"FeatureMap";
-            break;
+            case MTRAttributeIDTypeClusterWakeOnLANAttributeEventListID:
+                result = @"EventList";
+                break;
 
-        case MTRAttributeIDTypeClusterWakeOnLANAttributeClusterRevisionID:
-            result = @"ClusterRevision";
-            break;
+            case MTRAttributeIDTypeClusterWakeOnLANAttributeAttributeListID:
+                result = @"AttributeList";
+                break;
 
-        default:
-            result = [NSString stringWithFormat:@"<Unknown attributeID %d>", attributeID];
-            break;
+            case MTRAttributeIDTypeClusterWakeOnLANAttributeFeatureMapID:
+                result = @"FeatureMap";
+                break;
+
+            case MTRAttributeIDTypeClusterWakeOnLANAttributeClusterRevisionID:
+                result = @"ClusterRevision";
+                break;
+
+
+            default:
+                result = [NSString stringWithFormat:@"<Unknown attributeID %d>", attributeID];
+                break;
         }
 
-    case MTRClusterIDTypeChannelID:
+case MTRClusterIDTypeChannelID:
 
-        switch (attributeID) {
+            switch (attributeID) {
 
-            // Cluster Channel attributes
-        case MTRAttributeIDTypeClusterChannelAttributeChannelListID:
-            result = @"ChannelList";
-            break;
 
-        case MTRAttributeIDTypeClusterChannelAttributeLineupID:
-            result = @"Lineup";
-            break;
 
-        case MTRAttributeIDTypeClusterChannelAttributeCurrentChannelID:
-            result = @"CurrentChannel";
-            break;
+// Cluster Channel attributes
+            case MTRAttributeIDTypeClusterChannelAttributeChannelListID:
+                result = @"ChannelList";
+                break;
 
-        case MTRAttributeIDTypeClusterChannelAttributeGeneratedCommandListID:
-            result = @"GeneratedCommandList";
-            break;
+            case MTRAttributeIDTypeClusterChannelAttributeLineupID:
+                result = @"Lineup";
+                break;
 
-        case MTRAttributeIDTypeClusterChannelAttributeAcceptedCommandListID:
-            result = @"AcceptedCommandList";
-            break;
+            case MTRAttributeIDTypeClusterChannelAttributeCurrentChannelID:
+                result = @"CurrentChannel";
+                break;
 
-        case MTRAttributeIDTypeClusterChannelAttributeEventListID:
-            result = @"EventList";
-            break;
+            case MTRAttributeIDTypeClusterChannelAttributeGeneratedCommandListID:
+                result = @"GeneratedCommandList";
+                break;
 
-        case MTRAttributeIDTypeClusterChannelAttributeAttributeListID:
-            result = @"AttributeList";
-            break;
+            case MTRAttributeIDTypeClusterChannelAttributeAcceptedCommandListID:
+                result = @"AcceptedCommandList";
+                break;
 
-        case MTRAttributeIDTypeClusterChannelAttributeFeatureMapID:
-            result = @"FeatureMap";
-            break;
+            case MTRAttributeIDTypeClusterChannelAttributeEventListID:
+                result = @"EventList";
+                break;
 
-        case MTRAttributeIDTypeClusterChannelAttributeClusterRevisionID:
-            result = @"ClusterRevision";
-            break;
+            case MTRAttributeIDTypeClusterChannelAttributeAttributeListID:
+                result = @"AttributeList";
+                break;
 
-        default:
-            result = [NSString stringWithFormat:@"<Unknown attributeID %d>", attributeID];
-            break;
+            case MTRAttributeIDTypeClusterChannelAttributeFeatureMapID:
+                result = @"FeatureMap";
+                break;
+
+            case MTRAttributeIDTypeClusterChannelAttributeClusterRevisionID:
+                result = @"ClusterRevision";
+                break;
+
+
+            default:
+                result = [NSString stringWithFormat:@"<Unknown attributeID %d>", attributeID];
+                break;
         }
 
-    case MTRClusterIDTypeTargetNavigatorID:
+case MTRClusterIDTypeTargetNavigatorID:
 
-        switch (attributeID) {
+            switch (attributeID) {
 
-            // Cluster TargetNavigator attributes
-        case MTRAttributeIDTypeClusterTargetNavigatorAttributeTargetListID:
-            result = @"TargetList";
-            break;
 
-        case MTRAttributeIDTypeClusterTargetNavigatorAttributeCurrentTargetID:
-            result = @"CurrentTarget";
-            break;
 
-        case MTRAttributeIDTypeClusterTargetNavigatorAttributeGeneratedCommandListID:
-            result = @"GeneratedCommandList";
-            break;
+// Cluster TargetNavigator attributes
+            case MTRAttributeIDTypeClusterTargetNavigatorAttributeTargetListID:
+                result = @"TargetList";
+                break;
 
-        case MTRAttributeIDTypeClusterTargetNavigatorAttributeAcceptedCommandListID:
-            result = @"AcceptedCommandList";
-            break;
+            case MTRAttributeIDTypeClusterTargetNavigatorAttributeCurrentTargetID:
+                result = @"CurrentTarget";
+                break;
 
-        case MTRAttributeIDTypeClusterTargetNavigatorAttributeEventListID:
-            result = @"EventList";
-            break;
+            case MTRAttributeIDTypeClusterTargetNavigatorAttributeGeneratedCommandListID:
+                result = @"GeneratedCommandList";
+                break;
 
-        case MTRAttributeIDTypeClusterTargetNavigatorAttributeAttributeListID:
-            result = @"AttributeList";
-            break;
+            case MTRAttributeIDTypeClusterTargetNavigatorAttributeAcceptedCommandListID:
+                result = @"AcceptedCommandList";
+                break;
 
-        case MTRAttributeIDTypeClusterTargetNavigatorAttributeFeatureMapID:
-            result = @"FeatureMap";
-            break;
+            case MTRAttributeIDTypeClusterTargetNavigatorAttributeEventListID:
+                result = @"EventList";
+                break;
 
-        case MTRAttributeIDTypeClusterTargetNavigatorAttributeClusterRevisionID:
-            result = @"ClusterRevision";
-            break;
+            case MTRAttributeIDTypeClusterTargetNavigatorAttributeAttributeListID:
+                result = @"AttributeList";
+                break;
 
-        default:
-            result = [NSString stringWithFormat:@"<Unknown attributeID %d>", attributeID];
-            break;
+            case MTRAttributeIDTypeClusterTargetNavigatorAttributeFeatureMapID:
+                result = @"FeatureMap";
+                break;
+
+            case MTRAttributeIDTypeClusterTargetNavigatorAttributeClusterRevisionID:
+                result = @"ClusterRevision";
+                break;
+
+
+            default:
+                result = [NSString stringWithFormat:@"<Unknown attributeID %d>", attributeID];
+                break;
         }
 
-    case MTRClusterIDTypeMediaPlaybackID:
+case MTRClusterIDTypeMediaPlaybackID:
 
-        switch (attributeID) {
+            switch (attributeID) {
 
-            // Cluster MediaPlayback attributes
-        case MTRAttributeIDTypeClusterMediaPlaybackAttributeCurrentStateID:
-            result = @"CurrentState";
-            break;
 
-        case MTRAttributeIDTypeClusterMediaPlaybackAttributeStartTimeID:
-            result = @"StartTime";
-            break;
 
-        case MTRAttributeIDTypeClusterMediaPlaybackAttributeDurationID:
-            result = @"Duration";
-            break;
+// Cluster MediaPlayback attributes
+            case MTRAttributeIDTypeClusterMediaPlaybackAttributeCurrentStateID:
+                result = @"CurrentState";
+                break;
 
-        case MTRAttributeIDTypeClusterMediaPlaybackAttributeSampledPositionID:
-            result = @"SampledPosition";
-            break;
+            case MTRAttributeIDTypeClusterMediaPlaybackAttributeStartTimeID:
+                result = @"StartTime";
+                break;
 
-        case MTRAttributeIDTypeClusterMediaPlaybackAttributePlaybackSpeedID:
-            result = @"PlaybackSpeed";
-            break;
+            case MTRAttributeIDTypeClusterMediaPlaybackAttributeDurationID:
+                result = @"Duration";
+                break;
 
-        case MTRAttributeIDTypeClusterMediaPlaybackAttributeSeekRangeEndID:
-            result = @"SeekRangeEnd";
-            break;
+            case MTRAttributeIDTypeClusterMediaPlaybackAttributeSampledPositionID:
+                result = @"SampledPosition";
+                break;
 
-        case MTRAttributeIDTypeClusterMediaPlaybackAttributeSeekRangeStartID:
-            result = @"SeekRangeStart";
-            break;
+            case MTRAttributeIDTypeClusterMediaPlaybackAttributePlaybackSpeedID:
+                result = @"PlaybackSpeed";
+                break;
 
-        case MTRAttributeIDTypeClusterMediaPlaybackAttributeActiveAudioTrackID:
-            result = @"ActiveAudioTrack";
-            break;
+            case MTRAttributeIDTypeClusterMediaPlaybackAttributeSeekRangeEndID:
+                result = @"SeekRangeEnd";
+                break;
 
-        case MTRAttributeIDTypeClusterMediaPlaybackAttributeAvailableAudioTracksID:
-            result = @"AvailableAudioTracks";
-            break;
+            case MTRAttributeIDTypeClusterMediaPlaybackAttributeSeekRangeStartID:
+                result = @"SeekRangeStart";
+                break;
 
-        case MTRAttributeIDTypeClusterMediaPlaybackAttributeActiveTextTrackID:
-            result = @"ActiveTextTrack";
-            break;
+            case MTRAttributeIDTypeClusterMediaPlaybackAttributeActiveAudioTrackID:
+                result = @"ActiveAudioTrack";
+                break;
 
-        case MTRAttributeIDTypeClusterMediaPlaybackAttributeAvailableTextTracksID:
-            result = @"AvailableTextTracks";
-            break;
+            case MTRAttributeIDTypeClusterMediaPlaybackAttributeAvailableAudioTracksID:
+                result = @"AvailableAudioTracks";
+                break;
 
-        case MTRAttributeIDTypeClusterMediaPlaybackAttributeGeneratedCommandListID:
-            result = @"GeneratedCommandList";
-            break;
+            case MTRAttributeIDTypeClusterMediaPlaybackAttributeActiveTextTrackID:
+                result = @"ActiveTextTrack";
+                break;
 
-        case MTRAttributeIDTypeClusterMediaPlaybackAttributeAcceptedCommandListID:
-            result = @"AcceptedCommandList";
-            break;
+            case MTRAttributeIDTypeClusterMediaPlaybackAttributeAvailableTextTracksID:
+                result = @"AvailableTextTracks";
+                break;
 
-        case MTRAttributeIDTypeClusterMediaPlaybackAttributeEventListID:
-            result = @"EventList";
-            break;
+            case MTRAttributeIDTypeClusterMediaPlaybackAttributeGeneratedCommandListID:
+                result = @"GeneratedCommandList";
+                break;
 
-        case MTRAttributeIDTypeClusterMediaPlaybackAttributeAttributeListID:
-            result = @"AttributeList";
-            break;
+            case MTRAttributeIDTypeClusterMediaPlaybackAttributeAcceptedCommandListID:
+                result = @"AcceptedCommandList";
+                break;
 
-        case MTRAttributeIDTypeClusterMediaPlaybackAttributeFeatureMapID:
-            result = @"FeatureMap";
-            break;
+            case MTRAttributeIDTypeClusterMediaPlaybackAttributeEventListID:
+                result = @"EventList";
+                break;
 
-        case MTRAttributeIDTypeClusterMediaPlaybackAttributeClusterRevisionID:
-            result = @"ClusterRevision";
-            break;
+            case MTRAttributeIDTypeClusterMediaPlaybackAttributeAttributeListID:
+                result = @"AttributeList";
+                break;
 
-        default:
-            result = [NSString stringWithFormat:@"<Unknown attributeID %d>", attributeID];
-            break;
+            case MTRAttributeIDTypeClusterMediaPlaybackAttributeFeatureMapID:
+                result = @"FeatureMap";
+                break;
+
+            case MTRAttributeIDTypeClusterMediaPlaybackAttributeClusterRevisionID:
+                result = @"ClusterRevision";
+                break;
+
+
+            default:
+                result = [NSString stringWithFormat:@"<Unknown attributeID %d>", attributeID];
+                break;
         }
 
-    case MTRClusterIDTypeMediaInputID:
+case MTRClusterIDTypeMediaInputID:
 
-        switch (attributeID) {
+            switch (attributeID) {
 
-            // Cluster MediaInput attributes
-        case MTRAttributeIDTypeClusterMediaInputAttributeInputListID:
-            result = @"InputList";
-            break;
 
-        case MTRAttributeIDTypeClusterMediaInputAttributeCurrentInputID:
-            result = @"CurrentInput";
-            break;
 
-        case MTRAttributeIDTypeClusterMediaInputAttributeGeneratedCommandListID:
-            result = @"GeneratedCommandList";
-            break;
+// Cluster MediaInput attributes
+            case MTRAttributeIDTypeClusterMediaInputAttributeInputListID:
+                result = @"InputList";
+                break;
 
-        case MTRAttributeIDTypeClusterMediaInputAttributeAcceptedCommandListID:
-            result = @"AcceptedCommandList";
-            break;
+            case MTRAttributeIDTypeClusterMediaInputAttributeCurrentInputID:
+                result = @"CurrentInput";
+                break;
 
-        case MTRAttributeIDTypeClusterMediaInputAttributeEventListID:
-            result = @"EventList";
-            break;
+            case MTRAttributeIDTypeClusterMediaInputAttributeGeneratedCommandListID:
+                result = @"GeneratedCommandList";
+                break;
 
-        case MTRAttributeIDTypeClusterMediaInputAttributeAttributeListID:
-            result = @"AttributeList";
-            break;
+            case MTRAttributeIDTypeClusterMediaInputAttributeAcceptedCommandListID:
+                result = @"AcceptedCommandList";
+                break;
 
-        case MTRAttributeIDTypeClusterMediaInputAttributeFeatureMapID:
-            result = @"FeatureMap";
-            break;
+            case MTRAttributeIDTypeClusterMediaInputAttributeEventListID:
+                result = @"EventList";
+                break;
 
-        case MTRAttributeIDTypeClusterMediaInputAttributeClusterRevisionID:
-            result = @"ClusterRevision";
-            break;
+            case MTRAttributeIDTypeClusterMediaInputAttributeAttributeListID:
+                result = @"AttributeList";
+                break;
 
-        default:
-            result = [NSString stringWithFormat:@"<Unknown attributeID %d>", attributeID];
-            break;
+            case MTRAttributeIDTypeClusterMediaInputAttributeFeatureMapID:
+                result = @"FeatureMap";
+                break;
+
+            case MTRAttributeIDTypeClusterMediaInputAttributeClusterRevisionID:
+                result = @"ClusterRevision";
+                break;
+
+
+            default:
+                result = [NSString stringWithFormat:@"<Unknown attributeID %d>", attributeID];
+                break;
         }
 
-    case MTRClusterIDTypeLowPowerID:
+case MTRClusterIDTypeLowPowerID:
 
-        switch (attributeID) {
+            switch (attributeID) {
 
-            // Cluster LowPower attributes
-        case MTRAttributeIDTypeClusterLowPowerAttributeGeneratedCommandListID:
-            result = @"GeneratedCommandList";
-            break;
 
-        case MTRAttributeIDTypeClusterLowPowerAttributeAcceptedCommandListID:
-            result = @"AcceptedCommandList";
-            break;
 
-        case MTRAttributeIDTypeClusterLowPowerAttributeEventListID:
-            result = @"EventList";
-            break;
+// Cluster LowPower attributes
+            case MTRAttributeIDTypeClusterLowPowerAttributeGeneratedCommandListID:
+                result = @"GeneratedCommandList";
+                break;
 
-        case MTRAttributeIDTypeClusterLowPowerAttributeAttributeListID:
-            result = @"AttributeList";
-            break;
+            case MTRAttributeIDTypeClusterLowPowerAttributeAcceptedCommandListID:
+                result = @"AcceptedCommandList";
+                break;
 
-        case MTRAttributeIDTypeClusterLowPowerAttributeFeatureMapID:
-            result = @"FeatureMap";
-            break;
+            case MTRAttributeIDTypeClusterLowPowerAttributeEventListID:
+                result = @"EventList";
+                break;
 
-        case MTRAttributeIDTypeClusterLowPowerAttributeClusterRevisionID:
-            result = @"ClusterRevision";
-            break;
+            case MTRAttributeIDTypeClusterLowPowerAttributeAttributeListID:
+                result = @"AttributeList";
+                break;
 
-        default:
-            result = [NSString stringWithFormat:@"<Unknown attributeID %d>", attributeID];
-            break;
+            case MTRAttributeIDTypeClusterLowPowerAttributeFeatureMapID:
+                result = @"FeatureMap";
+                break;
+
+            case MTRAttributeIDTypeClusterLowPowerAttributeClusterRevisionID:
+                result = @"ClusterRevision";
+                break;
+
+
+            default:
+                result = [NSString stringWithFormat:@"<Unknown attributeID %d>", attributeID];
+                break;
         }
 
-    case MTRClusterIDTypeKeypadInputID:
+case MTRClusterIDTypeKeypadInputID:
 
-        switch (attributeID) {
+            switch (attributeID) {
 
-            // Cluster KeypadInput attributes
-        case MTRAttributeIDTypeClusterKeypadInputAttributeGeneratedCommandListID:
-            result = @"GeneratedCommandList";
-            break;
 
-        case MTRAttributeIDTypeClusterKeypadInputAttributeAcceptedCommandListID:
-            result = @"AcceptedCommandList";
-            break;
 
-        case MTRAttributeIDTypeClusterKeypadInputAttributeEventListID:
-            result = @"EventList";
-            break;
+// Cluster KeypadInput attributes
+            case MTRAttributeIDTypeClusterKeypadInputAttributeGeneratedCommandListID:
+                result = @"GeneratedCommandList";
+                break;
 
-        case MTRAttributeIDTypeClusterKeypadInputAttributeAttributeListID:
-            result = @"AttributeList";
-            break;
+            case MTRAttributeIDTypeClusterKeypadInputAttributeAcceptedCommandListID:
+                result = @"AcceptedCommandList";
+                break;
 
-        case MTRAttributeIDTypeClusterKeypadInputAttributeFeatureMapID:
-            result = @"FeatureMap";
-            break;
+            case MTRAttributeIDTypeClusterKeypadInputAttributeEventListID:
+                result = @"EventList";
+                break;
 
-        case MTRAttributeIDTypeClusterKeypadInputAttributeClusterRevisionID:
-            result = @"ClusterRevision";
-            break;
+            case MTRAttributeIDTypeClusterKeypadInputAttributeAttributeListID:
+                result = @"AttributeList";
+                break;
 
-        default:
-            result = [NSString stringWithFormat:@"<Unknown attributeID %d>", attributeID];
-            break;
+            case MTRAttributeIDTypeClusterKeypadInputAttributeFeatureMapID:
+                result = @"FeatureMap";
+                break;
+
+            case MTRAttributeIDTypeClusterKeypadInputAttributeClusterRevisionID:
+                result = @"ClusterRevision";
+                break;
+
+
+            default:
+                result = [NSString stringWithFormat:@"<Unknown attributeID %d>", attributeID];
+                break;
         }
 
-    case MTRClusterIDTypeContentLauncherID:
+case MTRClusterIDTypeContentLauncherID:
 
-        switch (attributeID) {
+            switch (attributeID) {
 
-            // Cluster ContentLauncher attributes
-        case MTRAttributeIDTypeClusterContentLauncherAttributeAcceptHeaderID:
-            result = @"AcceptHeader";
-            break;
 
-        case MTRAttributeIDTypeClusterContentLauncherAttributeSupportedStreamingProtocolsID:
-            result = @"SupportedStreamingProtocols";
-            break;
 
-        case MTRAttributeIDTypeClusterContentLauncherAttributeGeneratedCommandListID:
-            result = @"GeneratedCommandList";
-            break;
+// Cluster ContentLauncher attributes
+            case MTRAttributeIDTypeClusterContentLauncherAttributeAcceptHeaderID:
+                result = @"AcceptHeader";
+                break;
 
-        case MTRAttributeIDTypeClusterContentLauncherAttributeAcceptedCommandListID:
-            result = @"AcceptedCommandList";
-            break;
+            case MTRAttributeIDTypeClusterContentLauncherAttributeSupportedStreamingProtocolsID:
+                result = @"SupportedStreamingProtocols";
+                break;
 
-        case MTRAttributeIDTypeClusterContentLauncherAttributeEventListID:
-            result = @"EventList";
-            break;
+            case MTRAttributeIDTypeClusterContentLauncherAttributeGeneratedCommandListID:
+                result = @"GeneratedCommandList";
+                break;
 
-        case MTRAttributeIDTypeClusterContentLauncherAttributeAttributeListID:
-            result = @"AttributeList";
-            break;
+            case MTRAttributeIDTypeClusterContentLauncherAttributeAcceptedCommandListID:
+                result = @"AcceptedCommandList";
+                break;
 
-        case MTRAttributeIDTypeClusterContentLauncherAttributeFeatureMapID:
-            result = @"FeatureMap";
-            break;
+            case MTRAttributeIDTypeClusterContentLauncherAttributeEventListID:
+                result = @"EventList";
+                break;
 
-        case MTRAttributeIDTypeClusterContentLauncherAttributeClusterRevisionID:
-            result = @"ClusterRevision";
-            break;
+            case MTRAttributeIDTypeClusterContentLauncherAttributeAttributeListID:
+                result = @"AttributeList";
+                break;
 
-        default:
-            result = [NSString stringWithFormat:@"<Unknown attributeID %d>", attributeID];
-            break;
+            case MTRAttributeIDTypeClusterContentLauncherAttributeFeatureMapID:
+                result = @"FeatureMap";
+                break;
+
+            case MTRAttributeIDTypeClusterContentLauncherAttributeClusterRevisionID:
+                result = @"ClusterRevision";
+                break;
+
+
+            default:
+                result = [NSString stringWithFormat:@"<Unknown attributeID %d>", attributeID];
+                break;
         }
 
-    case MTRClusterIDTypeAudioOutputID:
+case MTRClusterIDTypeAudioOutputID:
 
-        switch (attributeID) {
+            switch (attributeID) {
 
-            // Cluster AudioOutput attributes
-        case MTRAttributeIDTypeClusterAudioOutputAttributeOutputListID:
-            result = @"OutputList";
-            break;
 
-        case MTRAttributeIDTypeClusterAudioOutputAttributeCurrentOutputID:
-            result = @"CurrentOutput";
-            break;
 
-        case MTRAttributeIDTypeClusterAudioOutputAttributeGeneratedCommandListID:
-            result = @"GeneratedCommandList";
-            break;
+// Cluster AudioOutput attributes
+            case MTRAttributeIDTypeClusterAudioOutputAttributeOutputListID:
+                result = @"OutputList";
+                break;
 
-        case MTRAttributeIDTypeClusterAudioOutputAttributeAcceptedCommandListID:
-            result = @"AcceptedCommandList";
-            break;
+            case MTRAttributeIDTypeClusterAudioOutputAttributeCurrentOutputID:
+                result = @"CurrentOutput";
+                break;
 
-        case MTRAttributeIDTypeClusterAudioOutputAttributeEventListID:
-            result = @"EventList";
-            break;
+            case MTRAttributeIDTypeClusterAudioOutputAttributeGeneratedCommandListID:
+                result = @"GeneratedCommandList";
+                break;
 
-        case MTRAttributeIDTypeClusterAudioOutputAttributeAttributeListID:
-            result = @"AttributeList";
-            break;
+            case MTRAttributeIDTypeClusterAudioOutputAttributeAcceptedCommandListID:
+                result = @"AcceptedCommandList";
+                break;
 
-        case MTRAttributeIDTypeClusterAudioOutputAttributeFeatureMapID:
-            result = @"FeatureMap";
-            break;
+            case MTRAttributeIDTypeClusterAudioOutputAttributeEventListID:
+                result = @"EventList";
+                break;
 
-        case MTRAttributeIDTypeClusterAudioOutputAttributeClusterRevisionID:
-            result = @"ClusterRevision";
-            break;
+            case MTRAttributeIDTypeClusterAudioOutputAttributeAttributeListID:
+                result = @"AttributeList";
+                break;
 
-        default:
-            result = [NSString stringWithFormat:@"<Unknown attributeID %d>", attributeID];
-            break;
+            case MTRAttributeIDTypeClusterAudioOutputAttributeFeatureMapID:
+                result = @"FeatureMap";
+                break;
+
+            case MTRAttributeIDTypeClusterAudioOutputAttributeClusterRevisionID:
+                result = @"ClusterRevision";
+                break;
+
+
+            default:
+                result = [NSString stringWithFormat:@"<Unknown attributeID %d>", attributeID];
+                break;
         }
 
-    case MTRClusterIDTypeApplicationLauncherID:
+case MTRClusterIDTypeApplicationLauncherID:
 
-        switch (attributeID) {
+            switch (attributeID) {
 
-            // Cluster ApplicationLauncher attributes
-        case MTRAttributeIDTypeClusterApplicationLauncherAttributeCatalogListID:
-            result = @"CatalogList";
-            break;
 
-        case MTRAttributeIDTypeClusterApplicationLauncherAttributeCurrentAppID:
-            result = @"CurrentApp";
-            break;
 
-        case MTRAttributeIDTypeClusterApplicationLauncherAttributeGeneratedCommandListID:
-            result = @"GeneratedCommandList";
-            break;
+// Cluster ApplicationLauncher attributes
+            case MTRAttributeIDTypeClusterApplicationLauncherAttributeCatalogListID:
+                result = @"CatalogList";
+                break;
 
-        case MTRAttributeIDTypeClusterApplicationLauncherAttributeAcceptedCommandListID:
-            result = @"AcceptedCommandList";
-            break;
+            case MTRAttributeIDTypeClusterApplicationLauncherAttributeCurrentAppID:
+                result = @"CurrentApp";
+                break;
 
-        case MTRAttributeIDTypeClusterApplicationLauncherAttributeEventListID:
-            result = @"EventList";
-            break;
+            case MTRAttributeIDTypeClusterApplicationLauncherAttributeGeneratedCommandListID:
+                result = @"GeneratedCommandList";
+                break;
 
-        case MTRAttributeIDTypeClusterApplicationLauncherAttributeAttributeListID:
-            result = @"AttributeList";
-            break;
+            case MTRAttributeIDTypeClusterApplicationLauncherAttributeAcceptedCommandListID:
+                result = @"AcceptedCommandList";
+                break;
 
-        case MTRAttributeIDTypeClusterApplicationLauncherAttributeFeatureMapID:
-            result = @"FeatureMap";
-            break;
+            case MTRAttributeIDTypeClusterApplicationLauncherAttributeEventListID:
+                result = @"EventList";
+                break;
 
-        case MTRAttributeIDTypeClusterApplicationLauncherAttributeClusterRevisionID:
-            result = @"ClusterRevision";
-            break;
+            case MTRAttributeIDTypeClusterApplicationLauncherAttributeAttributeListID:
+                result = @"AttributeList";
+                break;
 
-        default:
-            result = [NSString stringWithFormat:@"<Unknown attributeID %d>", attributeID];
-            break;
+            case MTRAttributeIDTypeClusterApplicationLauncherAttributeFeatureMapID:
+                result = @"FeatureMap";
+                break;
+
+            case MTRAttributeIDTypeClusterApplicationLauncherAttributeClusterRevisionID:
+                result = @"ClusterRevision";
+                break;
+
+
+            default:
+                result = [NSString stringWithFormat:@"<Unknown attributeID %d>", attributeID];
+                break;
         }
 
-    case MTRClusterIDTypeApplicationBasicID:
+case MTRClusterIDTypeApplicationBasicID:
 
-        switch (attributeID) {
+            switch (attributeID) {
 
-            // Cluster ApplicationBasic attributes
-        case MTRAttributeIDTypeClusterApplicationBasicAttributeVendorNameID:
-            result = @"VendorName";
-            break;
 
-        case MTRAttributeIDTypeClusterApplicationBasicAttributeVendorIDID:
-            result = @"VendorID";
-            break;
 
-        case MTRAttributeIDTypeClusterApplicationBasicAttributeApplicationNameID:
-            result = @"ApplicationName";
-            break;
+// Cluster ApplicationBasic attributes
+            case MTRAttributeIDTypeClusterApplicationBasicAttributeVendorNameID:
+                result = @"VendorName";
+                break;
 
-        case MTRAttributeIDTypeClusterApplicationBasicAttributeProductIDID:
-            result = @"ProductID";
-            break;
+            case MTRAttributeIDTypeClusterApplicationBasicAttributeVendorIDID:
+                result = @"VendorID";
+                break;
 
-        case MTRAttributeIDTypeClusterApplicationBasicAttributeApplicationID:
-            result = @"Application";
-            break;
+            case MTRAttributeIDTypeClusterApplicationBasicAttributeApplicationNameID:
+                result = @"ApplicationName";
+                break;
 
-        case MTRAttributeIDTypeClusterApplicationBasicAttributeStatusID:
-            result = @"Status";
-            break;
+            case MTRAttributeIDTypeClusterApplicationBasicAttributeProductIDID:
+                result = @"ProductID";
+                break;
 
-        case MTRAttributeIDTypeClusterApplicationBasicAttributeApplicationVersionID:
-            result = @"ApplicationVersion";
-            break;
+            case MTRAttributeIDTypeClusterApplicationBasicAttributeApplicationID:
+                result = @"Application";
+                break;
 
-        case MTRAttributeIDTypeClusterApplicationBasicAttributeAllowedVendorListID:
-            result = @"AllowedVendorList";
-            break;
+            case MTRAttributeIDTypeClusterApplicationBasicAttributeStatusID:
+                result = @"Status";
+                break;
 
-        case MTRAttributeIDTypeClusterApplicationBasicAttributeGeneratedCommandListID:
-            result = @"GeneratedCommandList";
-            break;
+            case MTRAttributeIDTypeClusterApplicationBasicAttributeApplicationVersionID:
+                result = @"ApplicationVersion";
+                break;
 
-        case MTRAttributeIDTypeClusterApplicationBasicAttributeAcceptedCommandListID:
-            result = @"AcceptedCommandList";
-            break;
+            case MTRAttributeIDTypeClusterApplicationBasicAttributeAllowedVendorListID:
+                result = @"AllowedVendorList";
+                break;
 
-        case MTRAttributeIDTypeClusterApplicationBasicAttributeEventListID:
-            result = @"EventList";
-            break;
+            case MTRAttributeIDTypeClusterApplicationBasicAttributeGeneratedCommandListID:
+                result = @"GeneratedCommandList";
+                break;
 
-        case MTRAttributeIDTypeClusterApplicationBasicAttributeAttributeListID:
-            result = @"AttributeList";
-            break;
+            case MTRAttributeIDTypeClusterApplicationBasicAttributeAcceptedCommandListID:
+                result = @"AcceptedCommandList";
+                break;
 
-        case MTRAttributeIDTypeClusterApplicationBasicAttributeFeatureMapID:
-            result = @"FeatureMap";
-            break;
+            case MTRAttributeIDTypeClusterApplicationBasicAttributeEventListID:
+                result = @"EventList";
+                break;
 
-        case MTRAttributeIDTypeClusterApplicationBasicAttributeClusterRevisionID:
-            result = @"ClusterRevision";
-            break;
+            case MTRAttributeIDTypeClusterApplicationBasicAttributeAttributeListID:
+                result = @"AttributeList";
+                break;
 
-        default:
-            result = [NSString stringWithFormat:@"<Unknown attributeID %d>", attributeID];
-            break;
+            case MTRAttributeIDTypeClusterApplicationBasicAttributeFeatureMapID:
+                result = @"FeatureMap";
+                break;
+
+            case MTRAttributeIDTypeClusterApplicationBasicAttributeClusterRevisionID:
+                result = @"ClusterRevision";
+                break;
+
+
+            default:
+                result = [NSString stringWithFormat:@"<Unknown attributeID %d>", attributeID];
+                break;
         }
 
-    case MTRClusterIDTypeAccountLoginID:
+case MTRClusterIDTypeAccountLoginID:
 
-        switch (attributeID) {
+            switch (attributeID) {
 
-            // Cluster AccountLogin attributes
-        case MTRAttributeIDTypeClusterAccountLoginAttributeGeneratedCommandListID:
-            result = @"GeneratedCommandList";
-            break;
 
-        case MTRAttributeIDTypeClusterAccountLoginAttributeAcceptedCommandListID:
-            result = @"AcceptedCommandList";
-            break;
 
-        case MTRAttributeIDTypeClusterAccountLoginAttributeEventListID:
-            result = @"EventList";
-            break;
+// Cluster AccountLogin attributes
+            case MTRAttributeIDTypeClusterAccountLoginAttributeGeneratedCommandListID:
+                result = @"GeneratedCommandList";
+                break;
 
-        case MTRAttributeIDTypeClusterAccountLoginAttributeAttributeListID:
-            result = @"AttributeList";
-            break;
+            case MTRAttributeIDTypeClusterAccountLoginAttributeAcceptedCommandListID:
+                result = @"AcceptedCommandList";
+                break;
 
-        case MTRAttributeIDTypeClusterAccountLoginAttributeFeatureMapID:
-            result = @"FeatureMap";
-            break;
+            case MTRAttributeIDTypeClusterAccountLoginAttributeEventListID:
+                result = @"EventList";
+                break;
 
-        case MTRAttributeIDTypeClusterAccountLoginAttributeClusterRevisionID:
-            result = @"ClusterRevision";
-            break;
+            case MTRAttributeIDTypeClusterAccountLoginAttributeAttributeListID:
+                result = @"AttributeList";
+                break;
 
-        default:
-            result = [NSString stringWithFormat:@"<Unknown attributeID %d>", attributeID];
-            break;
+            case MTRAttributeIDTypeClusterAccountLoginAttributeFeatureMapID:
+                result = @"FeatureMap";
+                break;
+
+            case MTRAttributeIDTypeClusterAccountLoginAttributeClusterRevisionID:
+                result = @"ClusterRevision";
+                break;
+
+
+            default:
+                result = [NSString stringWithFormat:@"<Unknown attributeID %d>", attributeID];
+                break;
         }
 
-    case MTRClusterIDTypeContentControlID:
+case MTRClusterIDTypeContentControlID:
 
-        switch (attributeID) {
+            switch (attributeID) {
 
-            // Cluster ContentControl attributes
-        case MTRAttributeIDTypeClusterContentControlAttributeEnabledID:
-            result = @"Enabled";
-            break;
 
-        case MTRAttributeIDTypeClusterContentControlAttributeOnDemandRatingsID:
-            result = @"OnDemandRatings";
-            break;
 
-        case MTRAttributeIDTypeClusterContentControlAttributeOnDemandRatingThresholdID:
-            result = @"OnDemandRatingThreshold";
-            break;
+// Cluster ContentControl attributes
+            case MTRAttributeIDTypeClusterContentControlAttributeEnabledID:
+                result = @"Enabled";
+                break;
 
-        case MTRAttributeIDTypeClusterContentControlAttributeScheduledContentRatingsID:
-            result = @"ScheduledContentRatings";
-            break;
+            case MTRAttributeIDTypeClusterContentControlAttributeOnDemandRatingsID:
+                result = @"OnDemandRatings";
+                break;
 
-        case MTRAttributeIDTypeClusterContentControlAttributeScheduledContentRatingThresholdID:
-            result = @"ScheduledContentRatingThreshold";
-            break;
+            case MTRAttributeIDTypeClusterContentControlAttributeOnDemandRatingThresholdID:
+                result = @"OnDemandRatingThreshold";
+                break;
 
-        case MTRAttributeIDTypeClusterContentControlAttributeScreenDailyTimeID:
-            result = @"ScreenDailyTime";
-            break;
+            case MTRAttributeIDTypeClusterContentControlAttributeScheduledContentRatingsID:
+                result = @"ScheduledContentRatings";
+                break;
 
-        case MTRAttributeIDTypeClusterContentControlAttributeRemainingScreenTimeID:
-            result = @"RemainingScreenTime";
-            break;
+            case MTRAttributeIDTypeClusterContentControlAttributeScheduledContentRatingThresholdID:
+                result = @"ScheduledContentRatingThreshold";
+                break;
 
-        case MTRAttributeIDTypeClusterContentControlAttributeBlockUnratedID:
-            result = @"BlockUnrated";
-            break;
+            case MTRAttributeIDTypeClusterContentControlAttributeScreenDailyTimeID:
+                result = @"ScreenDailyTime";
+                break;
 
-        case MTRAttributeIDTypeClusterContentControlAttributeGeneratedCommandListID:
-            result = @"GeneratedCommandList";
-            break;
+            case MTRAttributeIDTypeClusterContentControlAttributeRemainingScreenTimeID:
+                result = @"RemainingScreenTime";
+                break;
 
-        case MTRAttributeIDTypeClusterContentControlAttributeAcceptedCommandListID:
-            result = @"AcceptedCommandList";
-            break;
+            case MTRAttributeIDTypeClusterContentControlAttributeBlockUnratedID:
+                result = @"BlockUnrated";
+                break;
 
-        case MTRAttributeIDTypeClusterContentControlAttributeEventListID:
-            result = @"EventList";
-            break;
+            case MTRAttributeIDTypeClusterContentControlAttributeGeneratedCommandListID:
+                result = @"GeneratedCommandList";
+                break;
 
-        case MTRAttributeIDTypeClusterContentControlAttributeAttributeListID:
-            result = @"AttributeList";
-            break;
+            case MTRAttributeIDTypeClusterContentControlAttributeAcceptedCommandListID:
+                result = @"AcceptedCommandList";
+                break;
 
-        case MTRAttributeIDTypeClusterContentControlAttributeFeatureMapID:
-            result = @"FeatureMap";
-            break;
+            case MTRAttributeIDTypeClusterContentControlAttributeEventListID:
+                result = @"EventList";
+                break;
 
-        case MTRAttributeIDTypeClusterContentControlAttributeClusterRevisionID:
-            result = @"ClusterRevision";
-            break;
+            case MTRAttributeIDTypeClusterContentControlAttributeAttributeListID:
+                result = @"AttributeList";
+                break;
 
-        default:
-            result = [NSString stringWithFormat:@"<Unknown attributeID %d>", attributeID];
-            break;
+            case MTRAttributeIDTypeClusterContentControlAttributeFeatureMapID:
+                result = @"FeatureMap";
+                break;
+
+            case MTRAttributeIDTypeClusterContentControlAttributeClusterRevisionID:
+                result = @"ClusterRevision";
+                break;
+
+
+            default:
+                result = [NSString stringWithFormat:@"<Unknown attributeID %d>", attributeID];
+                break;
         }
 
-    case MTRClusterIDTypeContentAppObserverID:
+case MTRClusterIDTypeContentAppObserverID:
 
-        switch (attributeID) {
+            switch (attributeID) {
 
-            // Cluster ContentAppObserver attributes
-        case MTRAttributeIDTypeClusterContentAppObserverAttributeGeneratedCommandListID:
-            result = @"GeneratedCommandList";
-            break;
 
-        case MTRAttributeIDTypeClusterContentAppObserverAttributeAcceptedCommandListID:
-            result = @"AcceptedCommandList";
-            break;
 
-        case MTRAttributeIDTypeClusterContentAppObserverAttributeEventListID:
-            result = @"EventList";
-            break;
+// Cluster ContentAppObserver attributes
+            case MTRAttributeIDTypeClusterContentAppObserverAttributeGeneratedCommandListID:
+                result = @"GeneratedCommandList";
+                break;
 
-        case MTRAttributeIDTypeClusterContentAppObserverAttributeAttributeListID:
-            result = @"AttributeList";
-            break;
+            case MTRAttributeIDTypeClusterContentAppObserverAttributeAcceptedCommandListID:
+                result = @"AcceptedCommandList";
+                break;
 
-        case MTRAttributeIDTypeClusterContentAppObserverAttributeFeatureMapID:
-            result = @"FeatureMap";
-            break;
+            case MTRAttributeIDTypeClusterContentAppObserverAttributeEventListID:
+                result = @"EventList";
+                break;
 
-        case MTRAttributeIDTypeClusterContentAppObserverAttributeClusterRevisionID:
-            result = @"ClusterRevision";
-            break;
+            case MTRAttributeIDTypeClusterContentAppObserverAttributeAttributeListID:
+                result = @"AttributeList";
+                break;
 
-        default:
-            result = [NSString stringWithFormat:@"<Unknown attributeID %d>", attributeID];
-            break;
+            case MTRAttributeIDTypeClusterContentAppObserverAttributeFeatureMapID:
+                result = @"FeatureMap";
+                break;
+
+            case MTRAttributeIDTypeClusterContentAppObserverAttributeClusterRevisionID:
+                result = @"ClusterRevision";
+                break;
+
+
+            default:
+                result = [NSString stringWithFormat:@"<Unknown attributeID %d>", attributeID];
+                break;
         }
 
-    case MTRClusterIDTypeEcosystemInformationID:
+case MTRClusterIDTypeEcosystemInformationID:
 
-        switch (attributeID) {
+            switch (attributeID) {
 
-            // Cluster EcosystemInformation attributes
-        case MTRAttributeIDTypeClusterEcosystemInformationAttributeRemovedOnID:
-            result = @"RemovedOn";
-            break;
 
-        case MTRAttributeIDTypeClusterEcosystemInformationAttributeDeviceDirectoryID:
-            result = @"DeviceDirectory";
-            break;
 
-        case MTRAttributeIDTypeClusterEcosystemInformationAttributeLocationDirectoryID:
-            result = @"LocationDirectory";
-            break;
+// Cluster EcosystemInformation attributes
+            case MTRAttributeIDTypeClusterEcosystemInformationAttributeRemovedOnID:
+                result = @"RemovedOn";
+                break;
 
-        case MTRAttributeIDTypeClusterEcosystemInformationAttributeGeneratedCommandListID:
-            result = @"GeneratedCommandList";
-            break;
+            case MTRAttributeIDTypeClusterEcosystemInformationAttributeDeviceDirectoryID:
+                result = @"DeviceDirectory";
+                break;
 
-        case MTRAttributeIDTypeClusterEcosystemInformationAttributeAcceptedCommandListID:
-            result = @"AcceptedCommandList";
-            break;
+            case MTRAttributeIDTypeClusterEcosystemInformationAttributeLocationDirectoryID:
+                result = @"LocationDirectory";
+                break;
 
-        case MTRAttributeIDTypeClusterEcosystemInformationAttributeEventListID:
-            result = @"EventList";
-            break;
+            case MTRAttributeIDTypeClusterEcosystemInformationAttributeGeneratedCommandListID:
+                result = @"GeneratedCommandList";
+                break;
 
-        case MTRAttributeIDTypeClusterEcosystemInformationAttributeAttributeListID:
-            result = @"AttributeList";
-            break;
+            case MTRAttributeIDTypeClusterEcosystemInformationAttributeAcceptedCommandListID:
+                result = @"AcceptedCommandList";
+                break;
 
-        case MTRAttributeIDTypeClusterEcosystemInformationAttributeFeatureMapID:
-            result = @"FeatureMap";
-            break;
+            case MTRAttributeIDTypeClusterEcosystemInformationAttributeEventListID:
+                result = @"EventList";
+                break;
 
-        case MTRAttributeIDTypeClusterEcosystemInformationAttributeClusterRevisionID:
-            result = @"ClusterRevision";
-            break;
+            case MTRAttributeIDTypeClusterEcosystemInformationAttributeAttributeListID:
+                result = @"AttributeList";
+                break;
 
-        default:
-            result = [NSString stringWithFormat:@"<Unknown attributeID %d>", attributeID];
-            break;
+            case MTRAttributeIDTypeClusterEcosystemInformationAttributeFeatureMapID:
+                result = @"FeatureMap";
+                break;
+
+            case MTRAttributeIDTypeClusterEcosystemInformationAttributeClusterRevisionID:
+                result = @"ClusterRevision";
+                break;
+
+
+            default:
+                result = [NSString stringWithFormat:@"<Unknown attributeID %d>", attributeID];
+                break;
         }
 
-    case MTRClusterIDTypeCommissionerControlID:
+case MTRClusterIDTypeCommissionerControlID:
 
-        switch (attributeID) {
+            switch (attributeID) {
 
-            // Cluster CommissionerControl attributes
-        case MTRAttributeIDTypeClusterCommissionerControlAttributeSupportedDeviceCategoriesID:
-            result = @"SupportedDeviceCategories";
-            break;
 
-        case MTRAttributeIDTypeClusterCommissionerControlAttributeGeneratedCommandListID:
-            result = @"GeneratedCommandList";
-            break;
 
-        case MTRAttributeIDTypeClusterCommissionerControlAttributeAcceptedCommandListID:
-            result = @"AcceptedCommandList";
-            break;
+// Cluster CommissionerControl attributes
+            case MTRAttributeIDTypeClusterCommissionerControlAttributeSupportedDeviceCategoriesID:
+                result = @"SupportedDeviceCategories";
+                break;
 
-        case MTRAttributeIDTypeClusterCommissionerControlAttributeEventListID:
-            result = @"EventList";
-            break;
+            case MTRAttributeIDTypeClusterCommissionerControlAttributeGeneratedCommandListID:
+                result = @"GeneratedCommandList";
+                break;
 
-        case MTRAttributeIDTypeClusterCommissionerControlAttributeAttributeListID:
-            result = @"AttributeList";
-            break;
+            case MTRAttributeIDTypeClusterCommissionerControlAttributeAcceptedCommandListID:
+                result = @"AcceptedCommandList";
+                break;
 
-        case MTRAttributeIDTypeClusterCommissionerControlAttributeFeatureMapID:
-            result = @"FeatureMap";
-            break;
+            case MTRAttributeIDTypeClusterCommissionerControlAttributeEventListID:
+                result = @"EventList";
+                break;
 
-        case MTRAttributeIDTypeClusterCommissionerControlAttributeClusterRevisionID:
-            result = @"ClusterRevision";
-            break;
+            case MTRAttributeIDTypeClusterCommissionerControlAttributeAttributeListID:
+                result = @"AttributeList";
+                break;
 
-        default:
-            result = [NSString stringWithFormat:@"<Unknown attributeID %d>", attributeID];
-            break;
+            case MTRAttributeIDTypeClusterCommissionerControlAttributeFeatureMapID:
+                result = @"FeatureMap";
+                break;
+
+            case MTRAttributeIDTypeClusterCommissionerControlAttributeClusterRevisionID:
+                result = @"ClusterRevision";
+                break;
+
+
+            default:
+                result = [NSString stringWithFormat:@"<Unknown attributeID %d>", attributeID];
+                break;
         }
 
-    case MTRClusterIDTypeElectricalMeasurementID:
+case MTRClusterIDTypeElectricalMeasurementID:
 
-        switch (attributeID) {
+            switch (attributeID) {
 
-            // Cluster ElectricalMeasurement attributes
-        case MTRAttributeIDTypeClusterElectricalMeasurementAttributeMeasurementTypeID:
-            result = @"MeasurementType";
-            break;
 
-        case MTRAttributeIDTypeClusterElectricalMeasurementAttributeDcVoltageID:
-            result = @"DcVoltage";
-            break;
 
-        case MTRAttributeIDTypeClusterElectricalMeasurementAttributeDcVoltageMinID:
-            result = @"DcVoltageMin";
-            break;
+// Cluster ElectricalMeasurement attributes
+            case MTRAttributeIDTypeClusterElectricalMeasurementAttributeMeasurementTypeID:
+                result = @"MeasurementType";
+                break;
 
-        case MTRAttributeIDTypeClusterElectricalMeasurementAttributeDcVoltageMaxID:
-            result = @"DcVoltageMax";
-            break;
+            case MTRAttributeIDTypeClusterElectricalMeasurementAttributeDcVoltageID:
+                result = @"DcVoltage";
+                break;
 
-        case MTRAttributeIDTypeClusterElectricalMeasurementAttributeDcCurrentID:
-            result = @"DcCurrent";
-            break;
+            case MTRAttributeIDTypeClusterElectricalMeasurementAttributeDcVoltageMinID:
+                result = @"DcVoltageMin";
+                break;
 
-        case MTRAttributeIDTypeClusterElectricalMeasurementAttributeDcCurrentMinID:
-            result = @"DcCurrentMin";
-            break;
+            case MTRAttributeIDTypeClusterElectricalMeasurementAttributeDcVoltageMaxID:
+                result = @"DcVoltageMax";
+                break;
 
-        case MTRAttributeIDTypeClusterElectricalMeasurementAttributeDcCurrentMaxID:
-            result = @"DcCurrentMax";
-            break;
+            case MTRAttributeIDTypeClusterElectricalMeasurementAttributeDcCurrentID:
+                result = @"DcCurrent";
+                break;
 
-        case MTRAttributeIDTypeClusterElectricalMeasurementAttributeDcPowerID:
-            result = @"DcPower";
-            break;
+            case MTRAttributeIDTypeClusterElectricalMeasurementAttributeDcCurrentMinID:
+                result = @"DcCurrentMin";
+                break;
 
-        case MTRAttributeIDTypeClusterElectricalMeasurementAttributeDcPowerMinID:
-            result = @"DcPowerMin";
-            break;
+            case MTRAttributeIDTypeClusterElectricalMeasurementAttributeDcCurrentMaxID:
+                result = @"DcCurrentMax";
+                break;
 
-        case MTRAttributeIDTypeClusterElectricalMeasurementAttributeDcPowerMaxID:
-            result = @"DcPowerMax";
-            break;
+            case MTRAttributeIDTypeClusterElectricalMeasurementAttributeDcPowerID:
+                result = @"DcPower";
+                break;
 
-        case MTRAttributeIDTypeClusterElectricalMeasurementAttributeDcVoltageMultiplierID:
-            result = @"DcVoltageMultiplier";
-            break;
+            case MTRAttributeIDTypeClusterElectricalMeasurementAttributeDcPowerMinID:
+                result = @"DcPowerMin";
+                break;
 
-        case MTRAttributeIDTypeClusterElectricalMeasurementAttributeDcVoltageDivisorID:
-            result = @"DcVoltageDivisor";
-            break;
+            case MTRAttributeIDTypeClusterElectricalMeasurementAttributeDcPowerMaxID:
+                result = @"DcPowerMax";
+                break;
 
-        case MTRAttributeIDTypeClusterElectricalMeasurementAttributeDcCurrentMultiplierID:
-            result = @"DcCurrentMultiplier";
-            break;
+            case MTRAttributeIDTypeClusterElectricalMeasurementAttributeDcVoltageMultiplierID:
+                result = @"DcVoltageMultiplier";
+                break;
 
-        case MTRAttributeIDTypeClusterElectricalMeasurementAttributeDcCurrentDivisorID:
-            result = @"DcCurrentDivisor";
-            break;
+            case MTRAttributeIDTypeClusterElectricalMeasurementAttributeDcVoltageDivisorID:
+                result = @"DcVoltageDivisor";
+                break;
 
-        case MTRAttributeIDTypeClusterElectricalMeasurementAttributeDcPowerMultiplierID:
-            result = @"DcPowerMultiplier";
-            break;
+            case MTRAttributeIDTypeClusterElectricalMeasurementAttributeDcCurrentMultiplierID:
+                result = @"DcCurrentMultiplier";
+                break;
 
-        case MTRAttributeIDTypeClusterElectricalMeasurementAttributeDcPowerDivisorID:
-            result = @"DcPowerDivisor";
-            break;
+            case MTRAttributeIDTypeClusterElectricalMeasurementAttributeDcCurrentDivisorID:
+                result = @"DcCurrentDivisor";
+                break;
 
-        case MTRAttributeIDTypeClusterElectricalMeasurementAttributeAcFrequencyID:
-            result = @"AcFrequency";
-            break;
+            case MTRAttributeIDTypeClusterElectricalMeasurementAttributeDcPowerMultiplierID:
+                result = @"DcPowerMultiplier";
+                break;
 
-        case MTRAttributeIDTypeClusterElectricalMeasurementAttributeAcFrequencyMinID:
-            result = @"AcFrequencyMin";
-            break;
+            case MTRAttributeIDTypeClusterElectricalMeasurementAttributeDcPowerDivisorID:
+                result = @"DcPowerDivisor";
+                break;
 
-        case MTRAttributeIDTypeClusterElectricalMeasurementAttributeAcFrequencyMaxID:
-            result = @"AcFrequencyMax";
-            break;
+            case MTRAttributeIDTypeClusterElectricalMeasurementAttributeAcFrequencyID:
+                result = @"AcFrequency";
+                break;
 
-        case MTRAttributeIDTypeClusterElectricalMeasurementAttributeNeutralCurrentID:
-            result = @"NeutralCurrent";
-            break;
+            case MTRAttributeIDTypeClusterElectricalMeasurementAttributeAcFrequencyMinID:
+                result = @"AcFrequencyMin";
+                break;
 
-        case MTRAttributeIDTypeClusterElectricalMeasurementAttributeTotalActivePowerID:
-            result = @"TotalActivePower";
-            break;
+            case MTRAttributeIDTypeClusterElectricalMeasurementAttributeAcFrequencyMaxID:
+                result = @"AcFrequencyMax";
+                break;
 
-        case MTRAttributeIDTypeClusterElectricalMeasurementAttributeTotalReactivePowerID:
-            result = @"TotalReactivePower";
-            break;
+            case MTRAttributeIDTypeClusterElectricalMeasurementAttributeNeutralCurrentID:
+                result = @"NeutralCurrent";
+                break;
 
-        case MTRAttributeIDTypeClusterElectricalMeasurementAttributeTotalApparentPowerID:
-            result = @"TotalApparentPower";
-            break;
+            case MTRAttributeIDTypeClusterElectricalMeasurementAttributeTotalActivePowerID:
+                result = @"TotalActivePower";
+                break;
 
-        case MTRAttributeIDTypeClusterElectricalMeasurementAttributeMeasured1stHarmonicCurrentID:
-            result = @"Measured1stHarmonicCurrent";
-            break;
+            case MTRAttributeIDTypeClusterElectricalMeasurementAttributeTotalReactivePowerID:
+                result = @"TotalReactivePower";
+                break;
 
-        case MTRAttributeIDTypeClusterElectricalMeasurementAttributeMeasured3rdHarmonicCurrentID:
-            result = @"Measured3rdHarmonicCurrent";
-            break;
+            case MTRAttributeIDTypeClusterElectricalMeasurementAttributeTotalApparentPowerID:
+                result = @"TotalApparentPower";
+                break;
 
-        case MTRAttributeIDTypeClusterElectricalMeasurementAttributeMeasured5thHarmonicCurrentID:
-            result = @"Measured5thHarmonicCurrent";
-            break;
+            case MTRAttributeIDTypeClusterElectricalMeasurementAttributeMeasured1stHarmonicCurrentID:
+                result = @"Measured1stHarmonicCurrent";
+                break;
 
-        case MTRAttributeIDTypeClusterElectricalMeasurementAttributeMeasured7thHarmonicCurrentID:
-            result = @"Measured7thHarmonicCurrent";
-            break;
+            case MTRAttributeIDTypeClusterElectricalMeasurementAttributeMeasured3rdHarmonicCurrentID:
+                result = @"Measured3rdHarmonicCurrent";
+                break;
 
-        case MTRAttributeIDTypeClusterElectricalMeasurementAttributeMeasured9thHarmonicCurrentID:
-            result = @"Measured9thHarmonicCurrent";
-            break;
+            case MTRAttributeIDTypeClusterElectricalMeasurementAttributeMeasured5thHarmonicCurrentID:
+                result = @"Measured5thHarmonicCurrent";
+                break;
 
-        case MTRAttributeIDTypeClusterElectricalMeasurementAttributeMeasured11thHarmonicCurrentID:
-            result = @"Measured11thHarmonicCurrent";
-            break;
+            case MTRAttributeIDTypeClusterElectricalMeasurementAttributeMeasured7thHarmonicCurrentID:
+                result = @"Measured7thHarmonicCurrent";
+                break;
 
-        case MTRAttributeIDTypeClusterElectricalMeasurementAttributeMeasuredPhase1stHarmonicCurrentID:
-            result = @"MeasuredPhase1stHarmonicCurrent";
-            break;
+            case MTRAttributeIDTypeClusterElectricalMeasurementAttributeMeasured9thHarmonicCurrentID:
+                result = @"Measured9thHarmonicCurrent";
+                break;
 
-        case MTRAttributeIDTypeClusterElectricalMeasurementAttributeMeasuredPhase3rdHarmonicCurrentID:
-            result = @"MeasuredPhase3rdHarmonicCurrent";
-            break;
+            case MTRAttributeIDTypeClusterElectricalMeasurementAttributeMeasured11thHarmonicCurrentID:
+                result = @"Measured11thHarmonicCurrent";
+                break;
 
-        case MTRAttributeIDTypeClusterElectricalMeasurementAttributeMeasuredPhase5thHarmonicCurrentID:
-            result = @"MeasuredPhase5thHarmonicCurrent";
-            break;
+            case MTRAttributeIDTypeClusterElectricalMeasurementAttributeMeasuredPhase1stHarmonicCurrentID:
+                result = @"MeasuredPhase1stHarmonicCurrent";
+                break;
 
-        case MTRAttributeIDTypeClusterElectricalMeasurementAttributeMeasuredPhase7thHarmonicCurrentID:
-            result = @"MeasuredPhase7thHarmonicCurrent";
-            break;
+            case MTRAttributeIDTypeClusterElectricalMeasurementAttributeMeasuredPhase3rdHarmonicCurrentID:
+                result = @"MeasuredPhase3rdHarmonicCurrent";
+                break;
 
-        case MTRAttributeIDTypeClusterElectricalMeasurementAttributeMeasuredPhase9thHarmonicCurrentID:
-            result = @"MeasuredPhase9thHarmonicCurrent";
-            break;
+            case MTRAttributeIDTypeClusterElectricalMeasurementAttributeMeasuredPhase5thHarmonicCurrentID:
+                result = @"MeasuredPhase5thHarmonicCurrent";
+                break;
 
-        case MTRAttributeIDTypeClusterElectricalMeasurementAttributeMeasuredPhase11thHarmonicCurrentID:
-            result = @"MeasuredPhase11thHarmonicCurrent";
-            break;
+            case MTRAttributeIDTypeClusterElectricalMeasurementAttributeMeasuredPhase7thHarmonicCurrentID:
+                result = @"MeasuredPhase7thHarmonicCurrent";
+                break;
 
-        case MTRAttributeIDTypeClusterElectricalMeasurementAttributeAcFrequencyMultiplierID:
-            result = @"AcFrequencyMultiplier";
-            break;
+            case MTRAttributeIDTypeClusterElectricalMeasurementAttributeMeasuredPhase9thHarmonicCurrentID:
+                result = @"MeasuredPhase9thHarmonicCurrent";
+                break;
 
-        case MTRAttributeIDTypeClusterElectricalMeasurementAttributeAcFrequencyDivisorID:
-            result = @"AcFrequencyDivisor";
-            break;
+            case MTRAttributeIDTypeClusterElectricalMeasurementAttributeMeasuredPhase11thHarmonicCurrentID:
+                result = @"MeasuredPhase11thHarmonicCurrent";
+                break;
 
-        case MTRAttributeIDTypeClusterElectricalMeasurementAttributePowerMultiplierID:
-            result = @"PowerMultiplier";
-            break;
+            case MTRAttributeIDTypeClusterElectricalMeasurementAttributeAcFrequencyMultiplierID:
+                result = @"AcFrequencyMultiplier";
+                break;
 
-        case MTRAttributeIDTypeClusterElectricalMeasurementAttributePowerDivisorID:
-            result = @"PowerDivisor";
-            break;
+            case MTRAttributeIDTypeClusterElectricalMeasurementAttributeAcFrequencyDivisorID:
+                result = @"AcFrequencyDivisor";
+                break;
 
-        case MTRAttributeIDTypeClusterElectricalMeasurementAttributeHarmonicCurrentMultiplierID:
-            result = @"HarmonicCurrentMultiplier";
-            break;
+            case MTRAttributeIDTypeClusterElectricalMeasurementAttributePowerMultiplierID:
+                result = @"PowerMultiplier";
+                break;
 
-        case MTRAttributeIDTypeClusterElectricalMeasurementAttributePhaseHarmonicCurrentMultiplierID:
-            result = @"PhaseHarmonicCurrentMultiplier";
-            break;
+            case MTRAttributeIDTypeClusterElectricalMeasurementAttributePowerDivisorID:
+                result = @"PowerDivisor";
+                break;
 
-        case MTRAttributeIDTypeClusterElectricalMeasurementAttributeInstantaneousVoltageID:
-            result = @"InstantaneousVoltage";
-            break;
+            case MTRAttributeIDTypeClusterElectricalMeasurementAttributeHarmonicCurrentMultiplierID:
+                result = @"HarmonicCurrentMultiplier";
+                break;
 
-        case MTRAttributeIDTypeClusterElectricalMeasurementAttributeInstantaneousLineCurrentID:
-            result = @"InstantaneousLineCurrent";
-            break;
+            case MTRAttributeIDTypeClusterElectricalMeasurementAttributePhaseHarmonicCurrentMultiplierID:
+                result = @"PhaseHarmonicCurrentMultiplier";
+                break;
 
-        case MTRAttributeIDTypeClusterElectricalMeasurementAttributeInstantaneousActiveCurrentID:
-            result = @"InstantaneousActiveCurrent";
-            break;
+            case MTRAttributeIDTypeClusterElectricalMeasurementAttributeInstantaneousVoltageID:
+                result = @"InstantaneousVoltage";
+                break;
 
-        case MTRAttributeIDTypeClusterElectricalMeasurementAttributeInstantaneousReactiveCurrentID:
-            result = @"InstantaneousReactiveCurrent";
-            break;
+            case MTRAttributeIDTypeClusterElectricalMeasurementAttributeInstantaneousLineCurrentID:
+                result = @"InstantaneousLineCurrent";
+                break;
 
-        case MTRAttributeIDTypeClusterElectricalMeasurementAttributeInstantaneousPowerID:
-            result = @"InstantaneousPower";
-            break;
+            case MTRAttributeIDTypeClusterElectricalMeasurementAttributeInstantaneousActiveCurrentID:
+                result = @"InstantaneousActiveCurrent";
+                break;
 
-        case MTRAttributeIDTypeClusterElectricalMeasurementAttributeRmsVoltageID:
-            result = @"RmsVoltage";
-            break;
+            case MTRAttributeIDTypeClusterElectricalMeasurementAttributeInstantaneousReactiveCurrentID:
+                result = @"InstantaneousReactiveCurrent";
+                break;
 
-        case MTRAttributeIDTypeClusterElectricalMeasurementAttributeRmsVoltageMinID:
-            result = @"RmsVoltageMin";
-            break;
+            case MTRAttributeIDTypeClusterElectricalMeasurementAttributeInstantaneousPowerID:
+                result = @"InstantaneousPower";
+                break;
 
-        case MTRAttributeIDTypeClusterElectricalMeasurementAttributeRmsVoltageMaxID:
-            result = @"RmsVoltageMax";
-            break;
+            case MTRAttributeIDTypeClusterElectricalMeasurementAttributeRmsVoltageID:
+                result = @"RmsVoltage";
+                break;
 
-        case MTRAttributeIDTypeClusterElectricalMeasurementAttributeRmsCurrentID:
-            result = @"RmsCurrent";
-            break;
+            case MTRAttributeIDTypeClusterElectricalMeasurementAttributeRmsVoltageMinID:
+                result = @"RmsVoltageMin";
+                break;
 
-        case MTRAttributeIDTypeClusterElectricalMeasurementAttributeRmsCurrentMinID:
-            result = @"RmsCurrentMin";
-            break;
+            case MTRAttributeIDTypeClusterElectricalMeasurementAttributeRmsVoltageMaxID:
+                result = @"RmsVoltageMax";
+                break;
 
-        case MTRAttributeIDTypeClusterElectricalMeasurementAttributeRmsCurrentMaxID:
-            result = @"RmsCurrentMax";
-            break;
+            case MTRAttributeIDTypeClusterElectricalMeasurementAttributeRmsCurrentID:
+                result = @"RmsCurrent";
+                break;
 
-        case MTRAttributeIDTypeClusterElectricalMeasurementAttributeActivePowerID:
-            result = @"ActivePower";
-            break;
+            case MTRAttributeIDTypeClusterElectricalMeasurementAttributeRmsCurrentMinID:
+                result = @"RmsCurrentMin";
+                break;
 
-        case MTRAttributeIDTypeClusterElectricalMeasurementAttributeActivePowerMinID:
-            result = @"ActivePowerMin";
-            break;
+            case MTRAttributeIDTypeClusterElectricalMeasurementAttributeRmsCurrentMaxID:
+                result = @"RmsCurrentMax";
+                break;
 
-        case MTRAttributeIDTypeClusterElectricalMeasurementAttributeActivePowerMaxID:
-            result = @"ActivePowerMax";
-            break;
+            case MTRAttributeIDTypeClusterElectricalMeasurementAttributeActivePowerID:
+                result = @"ActivePower";
+                break;
 
-        case MTRAttributeIDTypeClusterElectricalMeasurementAttributeReactivePowerID:
-            result = @"ReactivePower";
-            break;
+            case MTRAttributeIDTypeClusterElectricalMeasurementAttributeActivePowerMinID:
+                result = @"ActivePowerMin";
+                break;
 
-        case MTRAttributeIDTypeClusterElectricalMeasurementAttributeApparentPowerID:
-            result = @"ApparentPower";
-            break;
+            case MTRAttributeIDTypeClusterElectricalMeasurementAttributeActivePowerMaxID:
+                result = @"ActivePowerMax";
+                break;
 
-        case MTRAttributeIDTypeClusterElectricalMeasurementAttributePowerFactorID:
-            result = @"PowerFactor";
-            break;
+            case MTRAttributeIDTypeClusterElectricalMeasurementAttributeReactivePowerID:
+                result = @"ReactivePower";
+                break;
 
-        case MTRAttributeIDTypeClusterElectricalMeasurementAttributeAverageRmsVoltageMeasurementPeriodID:
-            result = @"AverageRmsVoltageMeasurementPeriod";
-            break;
+            case MTRAttributeIDTypeClusterElectricalMeasurementAttributeApparentPowerID:
+                result = @"ApparentPower";
+                break;
 
-        case MTRAttributeIDTypeClusterElectricalMeasurementAttributeAverageRmsUnderVoltageCounterID:
-            result = @"AverageRmsUnderVoltageCounter";
-            break;
+            case MTRAttributeIDTypeClusterElectricalMeasurementAttributePowerFactorID:
+                result = @"PowerFactor";
+                break;
 
-        case MTRAttributeIDTypeClusterElectricalMeasurementAttributeRmsExtremeOverVoltagePeriodID:
-            result = @"RmsExtremeOverVoltagePeriod";
-            break;
+            case MTRAttributeIDTypeClusterElectricalMeasurementAttributeAverageRmsVoltageMeasurementPeriodID:
+                result = @"AverageRmsVoltageMeasurementPeriod";
+                break;
 
-        case MTRAttributeIDTypeClusterElectricalMeasurementAttributeRmsExtremeUnderVoltagePeriodID:
-            result = @"RmsExtremeUnderVoltagePeriod";
-            break;
+            case MTRAttributeIDTypeClusterElectricalMeasurementAttributeAverageRmsUnderVoltageCounterID:
+                result = @"AverageRmsUnderVoltageCounter";
+                break;
 
-        case MTRAttributeIDTypeClusterElectricalMeasurementAttributeRmsVoltageSagPeriodID:
-            result = @"RmsVoltageSagPeriod";
-            break;
+            case MTRAttributeIDTypeClusterElectricalMeasurementAttributeRmsExtremeOverVoltagePeriodID:
+                result = @"RmsExtremeOverVoltagePeriod";
+                break;
 
-        case MTRAttributeIDTypeClusterElectricalMeasurementAttributeRmsVoltageSwellPeriodID:
-            result = @"RmsVoltageSwellPeriod";
-            break;
+            case MTRAttributeIDTypeClusterElectricalMeasurementAttributeRmsExtremeUnderVoltagePeriodID:
+                result = @"RmsExtremeUnderVoltagePeriod";
+                break;
 
-        case MTRAttributeIDTypeClusterElectricalMeasurementAttributeAcVoltageMultiplierID:
-            result = @"AcVoltageMultiplier";
-            break;
+            case MTRAttributeIDTypeClusterElectricalMeasurementAttributeRmsVoltageSagPeriodID:
+                result = @"RmsVoltageSagPeriod";
+                break;
 
-        case MTRAttributeIDTypeClusterElectricalMeasurementAttributeAcVoltageDivisorID:
-            result = @"AcVoltageDivisor";
-            break;
+            case MTRAttributeIDTypeClusterElectricalMeasurementAttributeRmsVoltageSwellPeriodID:
+                result = @"RmsVoltageSwellPeriod";
+                break;
 
-        case MTRAttributeIDTypeClusterElectricalMeasurementAttributeAcCurrentMultiplierID:
-            result = @"AcCurrentMultiplier";
-            break;
+            case MTRAttributeIDTypeClusterElectricalMeasurementAttributeAcVoltageMultiplierID:
+                result = @"AcVoltageMultiplier";
+                break;
 
-        case MTRAttributeIDTypeClusterElectricalMeasurementAttributeAcCurrentDivisorID:
-            result = @"AcCurrentDivisor";
-            break;
+            case MTRAttributeIDTypeClusterElectricalMeasurementAttributeAcVoltageDivisorID:
+                result = @"AcVoltageDivisor";
+                break;
 
-        case MTRAttributeIDTypeClusterElectricalMeasurementAttributeAcPowerMultiplierID:
-            result = @"AcPowerMultiplier";
-            break;
+            case MTRAttributeIDTypeClusterElectricalMeasurementAttributeAcCurrentMultiplierID:
+                result = @"AcCurrentMultiplier";
+                break;
 
-        case MTRAttributeIDTypeClusterElectricalMeasurementAttributeAcPowerDivisorID:
-            result = @"AcPowerDivisor";
-            break;
+            case MTRAttributeIDTypeClusterElectricalMeasurementAttributeAcCurrentDivisorID:
+                result = @"AcCurrentDivisor";
+                break;
 
-        case MTRAttributeIDTypeClusterElectricalMeasurementAttributeOverloadAlarmsMaskID:
-            result = @"OverloadAlarmsMask";
-            break;
+            case MTRAttributeIDTypeClusterElectricalMeasurementAttributeAcPowerMultiplierID:
+                result = @"AcPowerMultiplier";
+                break;
 
-        case MTRAttributeIDTypeClusterElectricalMeasurementAttributeVoltageOverloadID:
-            result = @"VoltageOverload";
-            break;
+            case MTRAttributeIDTypeClusterElectricalMeasurementAttributeAcPowerDivisorID:
+                result = @"AcPowerDivisor";
+                break;
 
-        case MTRAttributeIDTypeClusterElectricalMeasurementAttributeCurrentOverloadID:
-            result = @"CurrentOverload";
-            break;
+            case MTRAttributeIDTypeClusterElectricalMeasurementAttributeOverloadAlarmsMaskID:
+                result = @"OverloadAlarmsMask";
+                break;
 
-        case MTRAttributeIDTypeClusterElectricalMeasurementAttributeAcOverloadAlarmsMaskID:
-            result = @"AcOverloadAlarmsMask";
-            break;
+            case MTRAttributeIDTypeClusterElectricalMeasurementAttributeVoltageOverloadID:
+                result = @"VoltageOverload";
+                break;
 
-        case MTRAttributeIDTypeClusterElectricalMeasurementAttributeAcVoltageOverloadID:
-            result = @"AcVoltageOverload";
-            break;
+            case MTRAttributeIDTypeClusterElectricalMeasurementAttributeCurrentOverloadID:
+                result = @"CurrentOverload";
+                break;
 
-        case MTRAttributeIDTypeClusterElectricalMeasurementAttributeAcCurrentOverloadID:
-            result = @"AcCurrentOverload";
-            break;
+            case MTRAttributeIDTypeClusterElectricalMeasurementAttributeAcOverloadAlarmsMaskID:
+                result = @"AcOverloadAlarmsMask";
+                break;
 
-        case MTRAttributeIDTypeClusterElectricalMeasurementAttributeAcActivePowerOverloadID:
-            result = @"AcActivePowerOverload";
-            break;
+            case MTRAttributeIDTypeClusterElectricalMeasurementAttributeAcVoltageOverloadID:
+                result = @"AcVoltageOverload";
+                break;
 
-        case MTRAttributeIDTypeClusterElectricalMeasurementAttributeAcReactivePowerOverloadID:
-            result = @"AcReactivePowerOverload";
-            break;
+            case MTRAttributeIDTypeClusterElectricalMeasurementAttributeAcCurrentOverloadID:
+                result = @"AcCurrentOverload";
+                break;
 
-        case MTRAttributeIDTypeClusterElectricalMeasurementAttributeAverageRmsOverVoltageID:
-            result = @"AverageRmsOverVoltage";
-            break;
+            case MTRAttributeIDTypeClusterElectricalMeasurementAttributeAcActivePowerOverloadID:
+                result = @"AcActivePowerOverload";
+                break;
 
-        case MTRAttributeIDTypeClusterElectricalMeasurementAttributeAverageRmsUnderVoltageID:
-            result = @"AverageRmsUnderVoltage";
-            break;
+            case MTRAttributeIDTypeClusterElectricalMeasurementAttributeAcReactivePowerOverloadID:
+                result = @"AcReactivePowerOverload";
+                break;
 
-        case MTRAttributeIDTypeClusterElectricalMeasurementAttributeRmsExtremeOverVoltageID:
-            result = @"RmsExtremeOverVoltage";
-            break;
+            case MTRAttributeIDTypeClusterElectricalMeasurementAttributeAverageRmsOverVoltageID:
+                result = @"AverageRmsOverVoltage";
+                break;
 
-        case MTRAttributeIDTypeClusterElectricalMeasurementAttributeRmsExtremeUnderVoltageID:
-            result = @"RmsExtremeUnderVoltage";
-            break;
+            case MTRAttributeIDTypeClusterElectricalMeasurementAttributeAverageRmsUnderVoltageID:
+                result = @"AverageRmsUnderVoltage";
+                break;
 
-        case MTRAttributeIDTypeClusterElectricalMeasurementAttributeRmsVoltageSagID:
-            result = @"RmsVoltageSag";
-            break;
+            case MTRAttributeIDTypeClusterElectricalMeasurementAttributeRmsExtremeOverVoltageID:
+                result = @"RmsExtremeOverVoltage";
+                break;
 
-        case MTRAttributeIDTypeClusterElectricalMeasurementAttributeRmsVoltageSwellID:
-            result = @"RmsVoltageSwell";
-            break;
+            case MTRAttributeIDTypeClusterElectricalMeasurementAttributeRmsExtremeUnderVoltageID:
+                result = @"RmsExtremeUnderVoltage";
+                break;
 
-        case MTRAttributeIDTypeClusterElectricalMeasurementAttributeLineCurrentPhaseBID:
-            result = @"LineCurrentPhaseB";
-            break;
+            case MTRAttributeIDTypeClusterElectricalMeasurementAttributeRmsVoltageSagID:
+                result = @"RmsVoltageSag";
+                break;
 
-        case MTRAttributeIDTypeClusterElectricalMeasurementAttributeActiveCurrentPhaseBID:
-            result = @"ActiveCurrentPhaseB";
-            break;
+            case MTRAttributeIDTypeClusterElectricalMeasurementAttributeRmsVoltageSwellID:
+                result = @"RmsVoltageSwell";
+                break;
 
-        case MTRAttributeIDTypeClusterElectricalMeasurementAttributeReactiveCurrentPhaseBID:
-            result = @"ReactiveCurrentPhaseB";
-            break;
+            case MTRAttributeIDTypeClusterElectricalMeasurementAttributeLineCurrentPhaseBID:
+                result = @"LineCurrentPhaseB";
+                break;
 
-        case MTRAttributeIDTypeClusterElectricalMeasurementAttributeRmsVoltagePhaseBID:
-            result = @"RmsVoltagePhaseB";
-            break;
+            case MTRAttributeIDTypeClusterElectricalMeasurementAttributeActiveCurrentPhaseBID:
+                result = @"ActiveCurrentPhaseB";
+                break;
 
-        case MTRAttributeIDTypeClusterElectricalMeasurementAttributeRmsVoltageMinPhaseBID:
-            result = @"RmsVoltageMinPhaseB";
-            break;
+            case MTRAttributeIDTypeClusterElectricalMeasurementAttributeReactiveCurrentPhaseBID:
+                result = @"ReactiveCurrentPhaseB";
+                break;
 
-        case MTRAttributeIDTypeClusterElectricalMeasurementAttributeRmsVoltageMaxPhaseBID:
-            result = @"RmsVoltageMaxPhaseB";
-            break;
+            case MTRAttributeIDTypeClusterElectricalMeasurementAttributeRmsVoltagePhaseBID:
+                result = @"RmsVoltagePhaseB";
+                break;
 
-        case MTRAttributeIDTypeClusterElectricalMeasurementAttributeRmsCurrentPhaseBID:
-            result = @"RmsCurrentPhaseB";
-            break;
+            case MTRAttributeIDTypeClusterElectricalMeasurementAttributeRmsVoltageMinPhaseBID:
+                result = @"RmsVoltageMinPhaseB";
+                break;
 
-        case MTRAttributeIDTypeClusterElectricalMeasurementAttributeRmsCurrentMinPhaseBID:
-            result = @"RmsCurrentMinPhaseB";
-            break;
+            case MTRAttributeIDTypeClusterElectricalMeasurementAttributeRmsVoltageMaxPhaseBID:
+                result = @"RmsVoltageMaxPhaseB";
+                break;
 
-        case MTRAttributeIDTypeClusterElectricalMeasurementAttributeRmsCurrentMaxPhaseBID:
-            result = @"RmsCurrentMaxPhaseB";
-            break;
+            case MTRAttributeIDTypeClusterElectricalMeasurementAttributeRmsCurrentPhaseBID:
+                result = @"RmsCurrentPhaseB";
+                break;
 
-        case MTRAttributeIDTypeClusterElectricalMeasurementAttributeActivePowerPhaseBID:
-            result = @"ActivePowerPhaseB";
-            break;
+            case MTRAttributeIDTypeClusterElectricalMeasurementAttributeRmsCurrentMinPhaseBID:
+                result = @"RmsCurrentMinPhaseB";
+                break;
 
-        case MTRAttributeIDTypeClusterElectricalMeasurementAttributeActivePowerMinPhaseBID:
-            result = @"ActivePowerMinPhaseB";
-            break;
+            case MTRAttributeIDTypeClusterElectricalMeasurementAttributeRmsCurrentMaxPhaseBID:
+                result = @"RmsCurrentMaxPhaseB";
+                break;
 
-        case MTRAttributeIDTypeClusterElectricalMeasurementAttributeActivePowerMaxPhaseBID:
-            result = @"ActivePowerMaxPhaseB";
-            break;
+            case MTRAttributeIDTypeClusterElectricalMeasurementAttributeActivePowerPhaseBID:
+                result = @"ActivePowerPhaseB";
+                break;
 
-        case MTRAttributeIDTypeClusterElectricalMeasurementAttributeReactivePowerPhaseBID:
-            result = @"ReactivePowerPhaseB";
-            break;
+            case MTRAttributeIDTypeClusterElectricalMeasurementAttributeActivePowerMinPhaseBID:
+                result = @"ActivePowerMinPhaseB";
+                break;
 
-        case MTRAttributeIDTypeClusterElectricalMeasurementAttributeApparentPowerPhaseBID:
-            result = @"ApparentPowerPhaseB";
-            break;
+            case MTRAttributeIDTypeClusterElectricalMeasurementAttributeActivePowerMaxPhaseBID:
+                result = @"ActivePowerMaxPhaseB";
+                break;
 
-        case MTRAttributeIDTypeClusterElectricalMeasurementAttributePowerFactorPhaseBID:
-            result = @"PowerFactorPhaseB";
-            break;
+            case MTRAttributeIDTypeClusterElectricalMeasurementAttributeReactivePowerPhaseBID:
+                result = @"ReactivePowerPhaseB";
+                break;
 
-        case MTRAttributeIDTypeClusterElectricalMeasurementAttributeAverageRmsVoltageMeasurementPeriodPhaseBID:
-            result = @"AverageRmsVoltageMeasurementPeriodPhaseB";
-            break;
+            case MTRAttributeIDTypeClusterElectricalMeasurementAttributeApparentPowerPhaseBID:
+                result = @"ApparentPowerPhaseB";
+                break;
 
-        case MTRAttributeIDTypeClusterElectricalMeasurementAttributeAverageRmsOverVoltageCounterPhaseBID:
-            result = @"AverageRmsOverVoltageCounterPhaseB";
-            break;
+            case MTRAttributeIDTypeClusterElectricalMeasurementAttributePowerFactorPhaseBID:
+                result = @"PowerFactorPhaseB";
+                break;
 
-        case MTRAttributeIDTypeClusterElectricalMeasurementAttributeAverageRmsUnderVoltageCounterPhaseBID:
-            result = @"AverageRmsUnderVoltageCounterPhaseB";
-            break;
+            case MTRAttributeIDTypeClusterElectricalMeasurementAttributeAverageRmsVoltageMeasurementPeriodPhaseBID:
+                result = @"AverageRmsVoltageMeasurementPeriodPhaseB";
+                break;
 
-        case MTRAttributeIDTypeClusterElectricalMeasurementAttributeRmsExtremeOverVoltagePeriodPhaseBID:
-            result = @"RmsExtremeOverVoltagePeriodPhaseB";
-            break;
+            case MTRAttributeIDTypeClusterElectricalMeasurementAttributeAverageRmsOverVoltageCounterPhaseBID:
+                result = @"AverageRmsOverVoltageCounterPhaseB";
+                break;
 
-        case MTRAttributeIDTypeClusterElectricalMeasurementAttributeRmsExtremeUnderVoltagePeriodPhaseBID:
-            result = @"RmsExtremeUnderVoltagePeriodPhaseB";
-            break;
+            case MTRAttributeIDTypeClusterElectricalMeasurementAttributeAverageRmsUnderVoltageCounterPhaseBID:
+                result = @"AverageRmsUnderVoltageCounterPhaseB";
+                break;
 
-        case MTRAttributeIDTypeClusterElectricalMeasurementAttributeRmsVoltageSagPeriodPhaseBID:
-            result = @"RmsVoltageSagPeriodPhaseB";
-            break;
+            case MTRAttributeIDTypeClusterElectricalMeasurementAttributeRmsExtremeOverVoltagePeriodPhaseBID:
+                result = @"RmsExtremeOverVoltagePeriodPhaseB";
+                break;
 
-        case MTRAttributeIDTypeClusterElectricalMeasurementAttributeRmsVoltageSwellPeriodPhaseBID:
-            result = @"RmsVoltageSwellPeriodPhaseB";
-            break;
+            case MTRAttributeIDTypeClusterElectricalMeasurementAttributeRmsExtremeUnderVoltagePeriodPhaseBID:
+                result = @"RmsExtremeUnderVoltagePeriodPhaseB";
+                break;
 
-        case MTRAttributeIDTypeClusterElectricalMeasurementAttributeLineCurrentPhaseCID:
-            result = @"LineCurrentPhaseC";
-            break;
+            case MTRAttributeIDTypeClusterElectricalMeasurementAttributeRmsVoltageSagPeriodPhaseBID:
+                result = @"RmsVoltageSagPeriodPhaseB";
+                break;
 
-        case MTRAttributeIDTypeClusterElectricalMeasurementAttributeActiveCurrentPhaseCID:
-            result = @"ActiveCurrentPhaseC";
-            break;
+            case MTRAttributeIDTypeClusterElectricalMeasurementAttributeRmsVoltageSwellPeriodPhaseBID:
+                result = @"RmsVoltageSwellPeriodPhaseB";
+                break;
 
-        case MTRAttributeIDTypeClusterElectricalMeasurementAttributeReactiveCurrentPhaseCID:
-            result = @"ReactiveCurrentPhaseC";
-            break;
+            case MTRAttributeIDTypeClusterElectricalMeasurementAttributeLineCurrentPhaseCID:
+                result = @"LineCurrentPhaseC";
+                break;
 
-        case MTRAttributeIDTypeClusterElectricalMeasurementAttributeRmsVoltagePhaseCID:
-            result = @"RmsVoltagePhaseC";
-            break;
+            case MTRAttributeIDTypeClusterElectricalMeasurementAttributeActiveCurrentPhaseCID:
+                result = @"ActiveCurrentPhaseC";
+                break;
 
-        case MTRAttributeIDTypeClusterElectricalMeasurementAttributeRmsVoltageMinPhaseCID:
-            result = @"RmsVoltageMinPhaseC";
-            break;
+            case MTRAttributeIDTypeClusterElectricalMeasurementAttributeReactiveCurrentPhaseCID:
+                result = @"ReactiveCurrentPhaseC";
+                break;
 
-        case MTRAttributeIDTypeClusterElectricalMeasurementAttributeRmsVoltageMaxPhaseCID:
-            result = @"RmsVoltageMaxPhaseC";
-            break;
+            case MTRAttributeIDTypeClusterElectricalMeasurementAttributeRmsVoltagePhaseCID:
+                result = @"RmsVoltagePhaseC";
+                break;
 
-        case MTRAttributeIDTypeClusterElectricalMeasurementAttributeRmsCurrentPhaseCID:
-            result = @"RmsCurrentPhaseC";
-            break;
+            case MTRAttributeIDTypeClusterElectricalMeasurementAttributeRmsVoltageMinPhaseCID:
+                result = @"RmsVoltageMinPhaseC";
+                break;
 
-        case MTRAttributeIDTypeClusterElectricalMeasurementAttributeRmsCurrentMinPhaseCID:
-            result = @"RmsCurrentMinPhaseC";
-            break;
+            case MTRAttributeIDTypeClusterElectricalMeasurementAttributeRmsVoltageMaxPhaseCID:
+                result = @"RmsVoltageMaxPhaseC";
+                break;
 
-        case MTRAttributeIDTypeClusterElectricalMeasurementAttributeRmsCurrentMaxPhaseCID:
-            result = @"RmsCurrentMaxPhaseC";
-            break;
+            case MTRAttributeIDTypeClusterElectricalMeasurementAttributeRmsCurrentPhaseCID:
+                result = @"RmsCurrentPhaseC";
+                break;
 
-        case MTRAttributeIDTypeClusterElectricalMeasurementAttributeActivePowerPhaseCID:
-            result = @"ActivePowerPhaseC";
-            break;
+            case MTRAttributeIDTypeClusterElectricalMeasurementAttributeRmsCurrentMinPhaseCID:
+                result = @"RmsCurrentMinPhaseC";
+                break;
 
-        case MTRAttributeIDTypeClusterElectricalMeasurementAttributeActivePowerMinPhaseCID:
-            result = @"ActivePowerMinPhaseC";
-            break;
+            case MTRAttributeIDTypeClusterElectricalMeasurementAttributeRmsCurrentMaxPhaseCID:
+                result = @"RmsCurrentMaxPhaseC";
+                break;
 
-        case MTRAttributeIDTypeClusterElectricalMeasurementAttributeActivePowerMaxPhaseCID:
-            result = @"ActivePowerMaxPhaseC";
-            break;
+            case MTRAttributeIDTypeClusterElectricalMeasurementAttributeActivePowerPhaseCID:
+                result = @"ActivePowerPhaseC";
+                break;
 
-        case MTRAttributeIDTypeClusterElectricalMeasurementAttributeReactivePowerPhaseCID:
-            result = @"ReactivePowerPhaseC";
-            break;
+            case MTRAttributeIDTypeClusterElectricalMeasurementAttributeActivePowerMinPhaseCID:
+                result = @"ActivePowerMinPhaseC";
+                break;
 
-        case MTRAttributeIDTypeClusterElectricalMeasurementAttributeApparentPowerPhaseCID:
-            result = @"ApparentPowerPhaseC";
-            break;
+            case MTRAttributeIDTypeClusterElectricalMeasurementAttributeActivePowerMaxPhaseCID:
+                result = @"ActivePowerMaxPhaseC";
+                break;
 
-        case MTRAttributeIDTypeClusterElectricalMeasurementAttributePowerFactorPhaseCID:
-            result = @"PowerFactorPhaseC";
-            break;
+            case MTRAttributeIDTypeClusterElectricalMeasurementAttributeReactivePowerPhaseCID:
+                result = @"ReactivePowerPhaseC";
+                break;
 
-        case MTRAttributeIDTypeClusterElectricalMeasurementAttributeAverageRmsVoltageMeasurementPeriodPhaseCID:
-            result = @"AverageRmsVoltageMeasurementPeriodPhaseC";
-            break;
+            case MTRAttributeIDTypeClusterElectricalMeasurementAttributeApparentPowerPhaseCID:
+                result = @"ApparentPowerPhaseC";
+                break;
 
-        case MTRAttributeIDTypeClusterElectricalMeasurementAttributeAverageRmsOverVoltageCounterPhaseCID:
-            result = @"AverageRmsOverVoltageCounterPhaseC";
-            break;
+            case MTRAttributeIDTypeClusterElectricalMeasurementAttributePowerFactorPhaseCID:
+                result = @"PowerFactorPhaseC";
+                break;
 
-        case MTRAttributeIDTypeClusterElectricalMeasurementAttributeAverageRmsUnderVoltageCounterPhaseCID:
-            result = @"AverageRmsUnderVoltageCounterPhaseC";
-            break;
+            case MTRAttributeIDTypeClusterElectricalMeasurementAttributeAverageRmsVoltageMeasurementPeriodPhaseCID:
+                result = @"AverageRmsVoltageMeasurementPeriodPhaseC";
+                break;
 
-        case MTRAttributeIDTypeClusterElectricalMeasurementAttributeRmsExtremeOverVoltagePeriodPhaseCID:
-            result = @"RmsExtremeOverVoltagePeriodPhaseC";
-            break;
+            case MTRAttributeIDTypeClusterElectricalMeasurementAttributeAverageRmsOverVoltageCounterPhaseCID:
+                result = @"AverageRmsOverVoltageCounterPhaseC";
+                break;
 
-        case MTRAttributeIDTypeClusterElectricalMeasurementAttributeRmsExtremeUnderVoltagePeriodPhaseCID:
-            result = @"RmsExtremeUnderVoltagePeriodPhaseC";
-            break;
+            case MTRAttributeIDTypeClusterElectricalMeasurementAttributeAverageRmsUnderVoltageCounterPhaseCID:
+                result = @"AverageRmsUnderVoltageCounterPhaseC";
+                break;
 
-        case MTRAttributeIDTypeClusterElectricalMeasurementAttributeRmsVoltageSagPeriodPhaseCID:
-            result = @"RmsVoltageSagPeriodPhaseC";
-            break;
+            case MTRAttributeIDTypeClusterElectricalMeasurementAttributeRmsExtremeOverVoltagePeriodPhaseCID:
+                result = @"RmsExtremeOverVoltagePeriodPhaseC";
+                break;
 
-        case MTRAttributeIDTypeClusterElectricalMeasurementAttributeRmsVoltageSwellPeriodPhaseCID:
-            result = @"RmsVoltageSwellPeriodPhaseC";
-            break;
+            case MTRAttributeIDTypeClusterElectricalMeasurementAttributeRmsExtremeUnderVoltagePeriodPhaseCID:
+                result = @"RmsExtremeUnderVoltagePeriodPhaseC";
+                break;
 
-        case MTRAttributeIDTypeClusterElectricalMeasurementAttributeGeneratedCommandListID:
-            result = @"GeneratedCommandList";
-            break;
+            case MTRAttributeIDTypeClusterElectricalMeasurementAttributeRmsVoltageSagPeriodPhaseCID:
+                result = @"RmsVoltageSagPeriodPhaseC";
+                break;
 
-        case MTRAttributeIDTypeClusterElectricalMeasurementAttributeAcceptedCommandListID:
-            result = @"AcceptedCommandList";
-            break;
+            case MTRAttributeIDTypeClusterElectricalMeasurementAttributeRmsVoltageSwellPeriodPhaseCID:
+                result = @"RmsVoltageSwellPeriodPhaseC";
+                break;
 
-        case MTRAttributeIDTypeClusterElectricalMeasurementAttributeEventListID:
-            result = @"EventList";
-            break;
+            case MTRAttributeIDTypeClusterElectricalMeasurementAttributeGeneratedCommandListID:
+                result = @"GeneratedCommandList";
+                break;
 
-        case MTRAttributeIDTypeClusterElectricalMeasurementAttributeAttributeListID:
-            result = @"AttributeList";
-            break;
+            case MTRAttributeIDTypeClusterElectricalMeasurementAttributeAcceptedCommandListID:
+                result = @"AcceptedCommandList";
+                break;
 
-        case MTRAttributeIDTypeClusterElectricalMeasurementAttributeFeatureMapID:
-            result = @"FeatureMap";
-            break;
+            case MTRAttributeIDTypeClusterElectricalMeasurementAttributeEventListID:
+                result = @"EventList";
+                break;
 
-        case MTRAttributeIDTypeClusterElectricalMeasurementAttributeClusterRevisionID:
-            result = @"ClusterRevision";
-            break;
+            case MTRAttributeIDTypeClusterElectricalMeasurementAttributeAttributeListID:
+                result = @"AttributeList";
+                break;
 
-        default:
-            result = [NSString stringWithFormat:@"<Unknown attributeID %d>", attributeID];
-            break;
+            case MTRAttributeIDTypeClusterElectricalMeasurementAttributeFeatureMapID:
+                result = @"FeatureMap";
+                break;
+
+            case MTRAttributeIDTypeClusterElectricalMeasurementAttributeClusterRevisionID:
+                result = @"ClusterRevision";
+                break;
+
+
+            default:
+                result = [NSString stringWithFormat:@"<Unknown attributeID %d>", attributeID];
+                break;
         }
 
-    case MTRClusterIDTypeUnitTestingID:
+case MTRClusterIDTypeUnitTestingID:
 
-        switch (attributeID) {
+            switch (attributeID) {
 
-            // Cluster UnitTesting attributes
-        case MTRAttributeIDTypeClusterUnitTestingAttributeBooleanID:
-            result = @"Boolean";
-            break;
 
-        case MTRAttributeIDTypeClusterUnitTestingAttributeBitmap8ID:
-            result = @"Bitmap8";
-            break;
 
-        case MTRAttributeIDTypeClusterUnitTestingAttributeBitmap16ID:
-            result = @"Bitmap16";
-            break;
+// Cluster UnitTesting attributes
+            case MTRAttributeIDTypeClusterUnitTestingAttributeBooleanID:
+                result = @"Boolean";
+                break;
 
-        case MTRAttributeIDTypeClusterUnitTestingAttributeBitmap32ID:
-            result = @"Bitmap32";
-            break;
+            case MTRAttributeIDTypeClusterUnitTestingAttributeBitmap8ID:
+                result = @"Bitmap8";
+                break;
 
-        case MTRAttributeIDTypeClusterUnitTestingAttributeBitmap64ID:
-            result = @"Bitmap64";
-            break;
+            case MTRAttributeIDTypeClusterUnitTestingAttributeBitmap16ID:
+                result = @"Bitmap16";
+                break;
 
-        case MTRAttributeIDTypeClusterUnitTestingAttributeInt8uID:
-            result = @"Int8u";
-            break;
+            case MTRAttributeIDTypeClusterUnitTestingAttributeBitmap32ID:
+                result = @"Bitmap32";
+                break;
 
-        case MTRAttributeIDTypeClusterUnitTestingAttributeInt16uID:
-            result = @"Int16u";
-            break;
+            case MTRAttributeIDTypeClusterUnitTestingAttributeBitmap64ID:
+                result = @"Bitmap64";
+                break;
 
-        case MTRAttributeIDTypeClusterUnitTestingAttributeInt24uID:
-            result = @"Int24u";
-            break;
+            case MTRAttributeIDTypeClusterUnitTestingAttributeInt8uID:
+                result = @"Int8u";
+                break;
 
-        case MTRAttributeIDTypeClusterUnitTestingAttributeInt32uID:
-            result = @"Int32u";
-            break;
+            case MTRAttributeIDTypeClusterUnitTestingAttributeInt16uID:
+                result = @"Int16u";
+                break;
 
-        case MTRAttributeIDTypeClusterUnitTestingAttributeInt40uID:
-            result = @"Int40u";
-            break;
+            case MTRAttributeIDTypeClusterUnitTestingAttributeInt24uID:
+                result = @"Int24u";
+                break;
 
-        case MTRAttributeIDTypeClusterUnitTestingAttributeInt48uID:
-            result = @"Int48u";
-            break;
+            case MTRAttributeIDTypeClusterUnitTestingAttributeInt32uID:
+                result = @"Int32u";
+                break;
 
-        case MTRAttributeIDTypeClusterUnitTestingAttributeInt56uID:
-            result = @"Int56u";
-            break;
+            case MTRAttributeIDTypeClusterUnitTestingAttributeInt40uID:
+                result = @"Int40u";
+                break;
 
-        case MTRAttributeIDTypeClusterUnitTestingAttributeInt64uID:
-            result = @"Int64u";
-            break;
+            case MTRAttributeIDTypeClusterUnitTestingAttributeInt48uID:
+                result = @"Int48u";
+                break;
 
-        case MTRAttributeIDTypeClusterUnitTestingAttributeInt8sID:
-            result = @"Int8s";
-            break;
+            case MTRAttributeIDTypeClusterUnitTestingAttributeInt56uID:
+                result = @"Int56u";
+                break;
 
-        case MTRAttributeIDTypeClusterUnitTestingAttributeInt16sID:
-            result = @"Int16s";
-            break;
+            case MTRAttributeIDTypeClusterUnitTestingAttributeInt64uID:
+                result = @"Int64u";
+                break;
 
-        case MTRAttributeIDTypeClusterUnitTestingAttributeInt24sID:
-            result = @"Int24s";
-            break;
+            case MTRAttributeIDTypeClusterUnitTestingAttributeInt8sID:
+                result = @"Int8s";
+                break;
 
-        case MTRAttributeIDTypeClusterUnitTestingAttributeInt32sID:
-            result = @"Int32s";
-            break;
+            case MTRAttributeIDTypeClusterUnitTestingAttributeInt16sID:
+                result = @"Int16s";
+                break;
 
-        case MTRAttributeIDTypeClusterUnitTestingAttributeInt40sID:
-            result = @"Int40s";
-            break;
+            case MTRAttributeIDTypeClusterUnitTestingAttributeInt24sID:
+                result = @"Int24s";
+                break;
 
-        case MTRAttributeIDTypeClusterUnitTestingAttributeInt48sID:
-            result = @"Int48s";
-            break;
+            case MTRAttributeIDTypeClusterUnitTestingAttributeInt32sID:
+                result = @"Int32s";
+                break;
 
-        case MTRAttributeIDTypeClusterUnitTestingAttributeInt56sID:
-            result = @"Int56s";
-            break;
+            case MTRAttributeIDTypeClusterUnitTestingAttributeInt40sID:
+                result = @"Int40s";
+                break;
 
-        case MTRAttributeIDTypeClusterUnitTestingAttributeInt64sID:
-            result = @"Int64s";
-            break;
+            case MTRAttributeIDTypeClusterUnitTestingAttributeInt48sID:
+                result = @"Int48s";
+                break;
 
-        case MTRAttributeIDTypeClusterUnitTestingAttributeEnum8ID:
-            result = @"Enum8";
-            break;
+            case MTRAttributeIDTypeClusterUnitTestingAttributeInt56sID:
+                result = @"Int56s";
+                break;
 
-        case MTRAttributeIDTypeClusterUnitTestingAttributeEnum16ID:
-            result = @"Enum16";
-            break;
+            case MTRAttributeIDTypeClusterUnitTestingAttributeInt64sID:
+                result = @"Int64s";
+                break;
 
-        case MTRAttributeIDTypeClusterUnitTestingAttributeFloatSingleID:
-            result = @"FloatSingle";
-            break;
+            case MTRAttributeIDTypeClusterUnitTestingAttributeEnum8ID:
+                result = @"Enum8";
+                break;
 
-        case MTRAttributeIDTypeClusterUnitTestingAttributeFloatDoubleID:
-            result = @"FloatDouble";
-            break;
+            case MTRAttributeIDTypeClusterUnitTestingAttributeEnum16ID:
+                result = @"Enum16";
+                break;
 
-        case MTRAttributeIDTypeClusterUnitTestingAttributeOctetStringID:
-            result = @"OctetString";
-            break;
+            case MTRAttributeIDTypeClusterUnitTestingAttributeFloatSingleID:
+                result = @"FloatSingle";
+                break;
 
-        case MTRAttributeIDTypeClusterUnitTestingAttributeListInt8uID:
-            result = @"ListInt8u";
-            break;
+            case MTRAttributeIDTypeClusterUnitTestingAttributeFloatDoubleID:
+                result = @"FloatDouble";
+                break;
 
-        case MTRAttributeIDTypeClusterUnitTestingAttributeListOctetStringID:
-            result = @"ListOctetString";
-            break;
+            case MTRAttributeIDTypeClusterUnitTestingAttributeOctetStringID:
+                result = @"OctetString";
+                break;
 
-        case MTRAttributeIDTypeClusterUnitTestingAttributeListStructOctetStringID:
-            result = @"ListStructOctetString";
-            break;
+            case MTRAttributeIDTypeClusterUnitTestingAttributeListInt8uID:
+                result = @"ListInt8u";
+                break;
 
-        case MTRAttributeIDTypeClusterUnitTestingAttributeLongOctetStringID:
-            result = @"LongOctetString";
-            break;
+            case MTRAttributeIDTypeClusterUnitTestingAttributeListOctetStringID:
+                result = @"ListOctetString";
+                break;
 
-        case MTRAttributeIDTypeClusterUnitTestingAttributeCharStringID:
-            result = @"CharString";
-            break;
+            case MTRAttributeIDTypeClusterUnitTestingAttributeListStructOctetStringID:
+                result = @"ListStructOctetString";
+                break;
 
-        case MTRAttributeIDTypeClusterUnitTestingAttributeLongCharStringID:
-            result = @"LongCharString";
-            break;
+            case MTRAttributeIDTypeClusterUnitTestingAttributeLongOctetStringID:
+                result = @"LongOctetString";
+                break;
 
-        case MTRAttributeIDTypeClusterUnitTestingAttributeEpochUsID:
-            result = @"EpochUs";
-            break;
+            case MTRAttributeIDTypeClusterUnitTestingAttributeCharStringID:
+                result = @"CharString";
+                break;
 
-        case MTRAttributeIDTypeClusterUnitTestingAttributeEpochSID:
-            result = @"EpochS";
-            break;
+            case MTRAttributeIDTypeClusterUnitTestingAttributeLongCharStringID:
+                result = @"LongCharString";
+                break;
 
-        case MTRAttributeIDTypeClusterUnitTestingAttributeVendorIdID:
-            result = @"VendorId";
-            break;
+            case MTRAttributeIDTypeClusterUnitTestingAttributeEpochUsID:
+                result = @"EpochUs";
+                break;
 
-        case MTRAttributeIDTypeClusterUnitTestingAttributeListNullablesAndOptionalsStructID:
-            result = @"ListNullablesAndOptionalsStruct";
-            break;
+            case MTRAttributeIDTypeClusterUnitTestingAttributeEpochSID:
+                result = @"EpochS";
+                break;
 
-        case MTRAttributeIDTypeClusterUnitTestingAttributeEnumAttrID:
-            result = @"EnumAttr";
-            break;
+            case MTRAttributeIDTypeClusterUnitTestingAttributeVendorIdID:
+                result = @"VendorId";
+                break;
 
-        case MTRAttributeIDTypeClusterUnitTestingAttributeStructAttrID:
-            result = @"StructAttr";
-            break;
+            case MTRAttributeIDTypeClusterUnitTestingAttributeListNullablesAndOptionalsStructID:
+                result = @"ListNullablesAndOptionalsStruct";
+                break;
 
-        case MTRAttributeIDTypeClusterUnitTestingAttributeRangeRestrictedInt8uID:
-            result = @"RangeRestrictedInt8u";
-            break;
+            case MTRAttributeIDTypeClusterUnitTestingAttributeEnumAttrID:
+                result = @"EnumAttr";
+                break;
 
-        case MTRAttributeIDTypeClusterUnitTestingAttributeRangeRestrictedInt8sID:
-            result = @"RangeRestrictedInt8s";
-            break;
+            case MTRAttributeIDTypeClusterUnitTestingAttributeStructAttrID:
+                result = @"StructAttr";
+                break;
 
-        case MTRAttributeIDTypeClusterUnitTestingAttributeRangeRestrictedInt16uID:
-            result = @"RangeRestrictedInt16u";
-            break;
+            case MTRAttributeIDTypeClusterUnitTestingAttributeRangeRestrictedInt8uID:
+                result = @"RangeRestrictedInt8u";
+                break;
 
-        case MTRAttributeIDTypeClusterUnitTestingAttributeRangeRestrictedInt16sID:
-            result = @"RangeRestrictedInt16s";
-            break;
+            case MTRAttributeIDTypeClusterUnitTestingAttributeRangeRestrictedInt8sID:
+                result = @"RangeRestrictedInt8s";
+                break;
 
-        case MTRAttributeIDTypeClusterUnitTestingAttributeListLongOctetStringID:
-            result = @"ListLongOctetString";
-            break;
+            case MTRAttributeIDTypeClusterUnitTestingAttributeRangeRestrictedInt16uID:
+                result = @"RangeRestrictedInt16u";
+                break;
 
-        case MTRAttributeIDTypeClusterUnitTestingAttributeListFabricScopedID:
-            result = @"ListFabricScoped";
-            break;
+            case MTRAttributeIDTypeClusterUnitTestingAttributeRangeRestrictedInt16sID:
+                result = @"RangeRestrictedInt16s";
+                break;
 
-        case MTRAttributeIDTypeClusterUnitTestingAttributeTimedWriteBooleanID:
-            result = @"TimedWriteBoolean";
-            break;
+            case MTRAttributeIDTypeClusterUnitTestingAttributeListLongOctetStringID:
+                result = @"ListLongOctetString";
+                break;
 
-        case MTRAttributeIDTypeClusterUnitTestingAttributeGeneralErrorBooleanID:
-            result = @"GeneralErrorBoolean";
-            break;
+            case MTRAttributeIDTypeClusterUnitTestingAttributeListFabricScopedID:
+                result = @"ListFabricScoped";
+                break;
 
-        case MTRAttributeIDTypeClusterUnitTestingAttributeClusterErrorBooleanID:
-            result = @"ClusterErrorBoolean";
-            break;
+            case MTRAttributeIDTypeClusterUnitTestingAttributeTimedWriteBooleanID:
+                result = @"TimedWriteBoolean";
+                break;
 
-        case MTRAttributeIDTypeClusterUnitTestingAttributeUnsupportedID:
-            result = @"Unsupported";
-            break;
+            case MTRAttributeIDTypeClusterUnitTestingAttributeGeneralErrorBooleanID:
+                result = @"GeneralErrorBoolean";
+                break;
 
-        case MTRAttributeIDTypeClusterUnitTestingAttributeNullableBooleanID:
-            result = @"NullableBoolean";
-            break;
+            case MTRAttributeIDTypeClusterUnitTestingAttributeClusterErrorBooleanID:
+                result = @"ClusterErrorBoolean";
+                break;
 
-        case MTRAttributeIDTypeClusterUnitTestingAttributeNullableBitmap8ID:
-            result = @"NullableBitmap8";
-            break;
+            case MTRAttributeIDTypeClusterUnitTestingAttributeUnsupportedID:
+                result = @"Unsupported";
+                break;
 
-        case MTRAttributeIDTypeClusterUnitTestingAttributeNullableBitmap16ID:
-            result = @"NullableBitmap16";
-            break;
+            case MTRAttributeIDTypeClusterUnitTestingAttributeNullableBooleanID:
+                result = @"NullableBoolean";
+                break;
 
-        case MTRAttributeIDTypeClusterUnitTestingAttributeNullableBitmap32ID:
-            result = @"NullableBitmap32";
-            break;
+            case MTRAttributeIDTypeClusterUnitTestingAttributeNullableBitmap8ID:
+                result = @"NullableBitmap8";
+                break;
 
-        case MTRAttributeIDTypeClusterUnitTestingAttributeNullableBitmap64ID:
-            result = @"NullableBitmap64";
-            break;
+            case MTRAttributeIDTypeClusterUnitTestingAttributeNullableBitmap16ID:
+                result = @"NullableBitmap16";
+                break;
 
-        case MTRAttributeIDTypeClusterUnitTestingAttributeNullableInt8uID:
-            result = @"NullableInt8u";
-            break;
+            case MTRAttributeIDTypeClusterUnitTestingAttributeNullableBitmap32ID:
+                result = @"NullableBitmap32";
+                break;
 
-        case MTRAttributeIDTypeClusterUnitTestingAttributeNullableInt16uID:
-            result = @"NullableInt16u";
-            break;
+            case MTRAttributeIDTypeClusterUnitTestingAttributeNullableBitmap64ID:
+                result = @"NullableBitmap64";
+                break;
 
-        case MTRAttributeIDTypeClusterUnitTestingAttributeNullableInt24uID:
-            result = @"NullableInt24u";
-            break;
+            case MTRAttributeIDTypeClusterUnitTestingAttributeNullableInt8uID:
+                result = @"NullableInt8u";
+                break;
 
-        case MTRAttributeIDTypeClusterUnitTestingAttributeNullableInt32uID:
-            result = @"NullableInt32u";
-            break;
+            case MTRAttributeIDTypeClusterUnitTestingAttributeNullableInt16uID:
+                result = @"NullableInt16u";
+                break;
 
-        case MTRAttributeIDTypeClusterUnitTestingAttributeNullableInt40uID:
-            result = @"NullableInt40u";
-            break;
+            case MTRAttributeIDTypeClusterUnitTestingAttributeNullableInt24uID:
+                result = @"NullableInt24u";
+                break;
 
-        case MTRAttributeIDTypeClusterUnitTestingAttributeNullableInt48uID:
-            result = @"NullableInt48u";
-            break;
+            case MTRAttributeIDTypeClusterUnitTestingAttributeNullableInt32uID:
+                result = @"NullableInt32u";
+                break;
 
-        case MTRAttributeIDTypeClusterUnitTestingAttributeNullableInt56uID:
-            result = @"NullableInt56u";
-            break;
+            case MTRAttributeIDTypeClusterUnitTestingAttributeNullableInt40uID:
+                result = @"NullableInt40u";
+                break;
 
-        case MTRAttributeIDTypeClusterUnitTestingAttributeNullableInt64uID:
-            result = @"NullableInt64u";
-            break;
+            case MTRAttributeIDTypeClusterUnitTestingAttributeNullableInt48uID:
+                result = @"NullableInt48u";
+                break;
 
-        case MTRAttributeIDTypeClusterUnitTestingAttributeNullableInt8sID:
-            result = @"NullableInt8s";
-            break;
+            case MTRAttributeIDTypeClusterUnitTestingAttributeNullableInt56uID:
+                result = @"NullableInt56u";
+                break;
 
-        case MTRAttributeIDTypeClusterUnitTestingAttributeNullableInt16sID:
-            result = @"NullableInt16s";
-            break;
+            case MTRAttributeIDTypeClusterUnitTestingAttributeNullableInt64uID:
+                result = @"NullableInt64u";
+                break;
 
-        case MTRAttributeIDTypeClusterUnitTestingAttributeNullableInt24sID:
-            result = @"NullableInt24s";
-            break;
+            case MTRAttributeIDTypeClusterUnitTestingAttributeNullableInt8sID:
+                result = @"NullableInt8s";
+                break;
 
-        case MTRAttributeIDTypeClusterUnitTestingAttributeNullableInt32sID:
-            result = @"NullableInt32s";
-            break;
+            case MTRAttributeIDTypeClusterUnitTestingAttributeNullableInt16sID:
+                result = @"NullableInt16s";
+                break;
 
-        case MTRAttributeIDTypeClusterUnitTestingAttributeNullableInt40sID:
-            result = @"NullableInt40s";
-            break;
+            case MTRAttributeIDTypeClusterUnitTestingAttributeNullableInt24sID:
+                result = @"NullableInt24s";
+                break;
 
-        case MTRAttributeIDTypeClusterUnitTestingAttributeNullableInt48sID:
-            result = @"NullableInt48s";
-            break;
+            case MTRAttributeIDTypeClusterUnitTestingAttributeNullableInt32sID:
+                result = @"NullableInt32s";
+                break;
 
-        case MTRAttributeIDTypeClusterUnitTestingAttributeNullableInt56sID:
-            result = @"NullableInt56s";
-            break;
+            case MTRAttributeIDTypeClusterUnitTestingAttributeNullableInt40sID:
+                result = @"NullableInt40s";
+                break;
 
-        case MTRAttributeIDTypeClusterUnitTestingAttributeNullableInt64sID:
-            result = @"NullableInt64s";
-            break;
+            case MTRAttributeIDTypeClusterUnitTestingAttributeNullableInt48sID:
+                result = @"NullableInt48s";
+                break;
 
-        case MTRAttributeIDTypeClusterUnitTestingAttributeNullableEnum8ID:
-            result = @"NullableEnum8";
-            break;
+            case MTRAttributeIDTypeClusterUnitTestingAttributeNullableInt56sID:
+                result = @"NullableInt56s";
+                break;
 
-        case MTRAttributeIDTypeClusterUnitTestingAttributeNullableEnum16ID:
-            result = @"NullableEnum16";
-            break;
+            case MTRAttributeIDTypeClusterUnitTestingAttributeNullableInt64sID:
+                result = @"NullableInt64s";
+                break;
 
-        case MTRAttributeIDTypeClusterUnitTestingAttributeNullableFloatSingleID:
-            result = @"NullableFloatSingle";
-            break;
+            case MTRAttributeIDTypeClusterUnitTestingAttributeNullableEnum8ID:
+                result = @"NullableEnum8";
+                break;
 
-        case MTRAttributeIDTypeClusterUnitTestingAttributeNullableFloatDoubleID:
-            result = @"NullableFloatDouble";
-            break;
+            case MTRAttributeIDTypeClusterUnitTestingAttributeNullableEnum16ID:
+                result = @"NullableEnum16";
+                break;
 
-        case MTRAttributeIDTypeClusterUnitTestingAttributeNullableOctetStringID:
-            result = @"NullableOctetString";
-            break;
+            case MTRAttributeIDTypeClusterUnitTestingAttributeNullableFloatSingleID:
+                result = @"NullableFloatSingle";
+                break;
 
-        case MTRAttributeIDTypeClusterUnitTestingAttributeNullableCharStringID:
-            result = @"NullableCharString";
-            break;
+            case MTRAttributeIDTypeClusterUnitTestingAttributeNullableFloatDoubleID:
+                result = @"NullableFloatDouble";
+                break;
 
-        case MTRAttributeIDTypeClusterUnitTestingAttributeNullableEnumAttrID:
-            result = @"NullableEnumAttr";
-            break;
+            case MTRAttributeIDTypeClusterUnitTestingAttributeNullableOctetStringID:
+                result = @"NullableOctetString";
+                break;
 
-        case MTRAttributeIDTypeClusterUnitTestingAttributeNullableStructID:
-            result = @"NullableStruct";
-            break;
+            case MTRAttributeIDTypeClusterUnitTestingAttributeNullableCharStringID:
+                result = @"NullableCharString";
+                break;
 
-        case MTRAttributeIDTypeClusterUnitTestingAttributeNullableRangeRestrictedInt8uID:
-            result = @"NullableRangeRestrictedInt8u";
-            break;
+            case MTRAttributeIDTypeClusterUnitTestingAttributeNullableEnumAttrID:
+                result = @"NullableEnumAttr";
+                break;
 
-        case MTRAttributeIDTypeClusterUnitTestingAttributeNullableRangeRestrictedInt8sID:
-            result = @"NullableRangeRestrictedInt8s";
-            break;
+            case MTRAttributeIDTypeClusterUnitTestingAttributeNullableStructID:
+                result = @"NullableStruct";
+                break;
 
-        case MTRAttributeIDTypeClusterUnitTestingAttributeNullableRangeRestrictedInt16uID:
-            result = @"NullableRangeRestrictedInt16u";
-            break;
+            case MTRAttributeIDTypeClusterUnitTestingAttributeNullableRangeRestrictedInt8uID:
+                result = @"NullableRangeRestrictedInt8u";
+                break;
 
-        case MTRAttributeIDTypeClusterUnitTestingAttributeNullableRangeRestrictedInt16sID:
-            result = @"NullableRangeRestrictedInt16s";
-            break;
+            case MTRAttributeIDTypeClusterUnitTestingAttributeNullableRangeRestrictedInt8sID:
+                result = @"NullableRangeRestrictedInt8s";
+                break;
 
-        case MTRAttributeIDTypeClusterUnitTestingAttributeWriteOnlyInt8uID:
-            result = @"WriteOnlyInt8u";
-            break;
+            case MTRAttributeIDTypeClusterUnitTestingAttributeNullableRangeRestrictedInt16uID:
+                result = @"NullableRangeRestrictedInt16u";
+                break;
 
-        case MTRAttributeIDTypeClusterUnitTestingAttributeGeneratedCommandListID:
-            result = @"GeneratedCommandList";
-            break;
+            case MTRAttributeIDTypeClusterUnitTestingAttributeNullableRangeRestrictedInt16sID:
+                result = @"NullableRangeRestrictedInt16s";
+                break;
 
-        case MTRAttributeIDTypeClusterUnitTestingAttributeAcceptedCommandListID:
-            result = @"AcceptedCommandList";
-            break;
+            case MTRAttributeIDTypeClusterUnitTestingAttributeWriteOnlyInt8uID:
+                result = @"WriteOnlyInt8u";
+                break;
 
-        case MTRAttributeIDTypeClusterUnitTestingAttributeEventListID:
-            result = @"EventList";
-            break;
+            case MTRAttributeIDTypeClusterUnitTestingAttributeGeneratedCommandListID:
+                result = @"GeneratedCommandList";
+                break;
 
-        case MTRAttributeIDTypeClusterUnitTestingAttributeAttributeListID:
-            result = @"AttributeList";
-            break;
+            case MTRAttributeIDTypeClusterUnitTestingAttributeAcceptedCommandListID:
+                result = @"AcceptedCommandList";
+                break;
 
-        case MTRAttributeIDTypeClusterUnitTestingAttributeFeatureMapID:
-            result = @"FeatureMap";
-            break;
+            case MTRAttributeIDTypeClusterUnitTestingAttributeEventListID:
+                result = @"EventList";
+                break;
 
-        case MTRAttributeIDTypeClusterUnitTestingAttributeClusterRevisionID:
-            result = @"ClusterRevision";
-            break;
+            case MTRAttributeIDTypeClusterUnitTestingAttributeAttributeListID:
+                result = @"AttributeList";
+                break;
 
-        case MTRAttributeIDTypeClusterUnitTestingAttributeMeiInt8uID:
-            result = @"MeiInt8u";
-            break;
+            case MTRAttributeIDTypeClusterUnitTestingAttributeFeatureMapID:
+                result = @"FeatureMap";
+                break;
 
-        default:
-            result = [NSString stringWithFormat:@"<Unknown attributeID %d>", attributeID];
-            break;
+            case MTRAttributeIDTypeClusterUnitTestingAttributeClusterRevisionID:
+                result = @"ClusterRevision";
+                break;
+
+            case MTRAttributeIDTypeClusterUnitTestingAttributeMeiInt8uID:
+                result = @"MeiInt8u";
+                break;
+
+
+            default:
+                result = [NSString stringWithFormat:@"<Unknown attributeID %d>", attributeID];
+                break;
         }
 
-    case MTRClusterIDTypeSampleMEIID:
 
-        switch (attributeID) {
 
-            // Cluster SampleMEI attributes
-        case MTRAttributeIDTypeClusterSampleMEIAttributeFlipFlopID:
-            result = @"FlipFlop";
-            break;
 
-        case MTRAttributeIDTypeClusterSampleMEIAttributeGeneratedCommandListID:
-            result = @"GeneratedCommandList";
-            break;
 
-        case MTRAttributeIDTypeClusterSampleMEIAttributeAcceptedCommandListID:
-            result = @"AcceptedCommandList";
-            break;
+case MTRClusterIDTypeSampleMEIID:
 
-        case MTRAttributeIDTypeClusterSampleMEIAttributeEventListID:
-            result = @"EventList";
-            break;
+            switch (attributeID) {
 
-        case MTRAttributeIDTypeClusterSampleMEIAttributeAttributeListID:
-            result = @"AttributeList";
-            break;
 
-        case MTRAttributeIDTypeClusterSampleMEIAttributeFeatureMapID:
-            result = @"FeatureMap";
-            break;
 
-        case MTRAttributeIDTypeClusterSampleMEIAttributeClusterRevisionID:
-            result = @"ClusterRevision";
-            break;
+// Cluster SampleMEI attributes
+            case MTRAttributeIDTypeClusterSampleMEIAttributeFlipFlopID:
+                result = @"FlipFlop";
+                break;
 
-        default:
-            result = [NSString stringWithFormat:@"<Unknown attributeID %d>", attributeID];
-            break;
+            case MTRAttributeIDTypeClusterSampleMEIAttributeGeneratedCommandListID:
+                result = @"GeneratedCommandList";
+                break;
+
+            case MTRAttributeIDTypeClusterSampleMEIAttributeAcceptedCommandListID:
+                result = @"AcceptedCommandList";
+                break;
+
+            case MTRAttributeIDTypeClusterSampleMEIAttributeEventListID:
+                result = @"EventList";
+                break;
+
+            case MTRAttributeIDTypeClusterSampleMEIAttributeAttributeListID:
+                result = @"AttributeList";
+                break;
+
+            case MTRAttributeIDTypeClusterSampleMEIAttributeFeatureMapID:
+                result = @"FeatureMap";
+                break;
+
+            case MTRAttributeIDTypeClusterSampleMEIAttributeClusterRevisionID:
+                result = @"ClusterRevision";
+                break;
+
+
+            default:
+                result = [NSString stringWithFormat:@"<Unknown attributeID %d>", attributeID];
+                break;
         }
 
-    default:
-        result = [NSString stringWithFormat:@"<Unknown clusterID %d>", clusterID];
-        break;
-    }
+        default:
+           result = [NSString stringWithFormat:@"<Unknown clusterID %d>", clusterID];
+           break;
+        }
 
     return result;
 }
