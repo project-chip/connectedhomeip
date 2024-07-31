@@ -30,6 +30,7 @@ from chip import ChipDeviceCtrl
 from matter_testing_support import MatterBaseTest, TestStep, async_test_body, default_matter_test_main, type_matches
 from mobly import asserts
 
+
 class TC_MCORE_FS_1_3(MatterBaseTest):
     @async_test_body
     async def setup_class(self):
@@ -41,7 +42,6 @@ class TC_MCORE_FS_1_3(MatterBaseTest):
         self.device_for_dut_eco_kvs = None
         self.device_for_dut_eco_port = 5544
         self.app_process_for_dut_eco = None
-
 
     def teardown_class(self):
         if self.app_process_for_dut_eco is not None:
@@ -57,7 +57,6 @@ class TC_MCORE_FS_1_3(MatterBaseTest):
         if self.device_for_th_eco_kvs is not None:
             os.remove(self.device_for_th_eco_kvs)
         super().teardown_class()
-
 
     async def create_device_for_dut_ecosystem(self):
         # TODO: confirm whether we can open processes like this on the TH
@@ -76,7 +75,6 @@ class TC_MCORE_FS_1_3(MatterBaseTest):
         logging.info("Started TH device for DUT ecosystem")
         time.sleep(3)
         return discriminator, passcode
-
 
     async def create_and_commission_device_for_th_ecosystem(self):
         # TODO: confirm whether we can open processes like this on the TH
@@ -123,15 +121,16 @@ class TC_MCORE_FS_1_3(MatterBaseTest):
         discriminator, setup_pin_code = await self.create_device_for_dut_ecosystem()
         self.wait_for_user_input(
             prompt_msg=f"Using the DUT vendor's provided interface, commission the device using the following parameters:\n"
-                        f"- discriminator: {discriminator}\n"
-                        f"- setupPinCode: {setup_pin_code}\n"
-                        f"If using FabricSync Admin, you may type:\n"
-                        f">>> pairing onnetwork 111 {setup_pin_code}")
-        
+            f"- discriminator: {discriminator}\n"
+            f"- setupPinCode: {setup_pin_code}\n"
+            f"If using FabricSync Admin, you may type:\n"
+            f">>> pairing onnetwork 111 {setup_pin_code}")
+
         root_part_list = await self.read_single_attribute_check_success(cluster=Clusters.Descriptor, attribute=Clusters.Descriptor.Attributes.PartsList, endpoint=root_node_endpoint)
         set_of_endpoints_after_adding_device = set(root_part_list)
-                                                  
-        asserts.assert_true(set_of_endpoints_after_adding_device.issuperset(set_of_endpoints_before_adding_device), "Expected only new endpoints to be added")
+
+        asserts.assert_true(set_of_endpoints_after_adding_device.issuperset(
+            set_of_endpoints_before_adding_device), "Expected only new endpoints to be added")
         unique_endpoints_set = set_of_endpoints_after_adding_device - set_of_endpoints_before_adding_device
         asserts.assert_equal(len(unique_endpoints_set), 1, "Expected only one new endpoint")
         newly_added_endpoint = list(unique_endpoints_set)[0]
