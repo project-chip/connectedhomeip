@@ -140,6 +140,9 @@ PICS:
     - label: "Does the commissioner support Discovery Capability over SoftAP?"
       id: MCORE.DD.DISCOVERY_SOFTAP
 
+    - label: "Does the commissioner support Discovery Capability over Wifi-PAF?"
+      id: MCORE.DD.DISCOVERY_PAF
+
     - label: "Does the DUT support Standard Commissioning Flow?"
       id: MCORE.DD.STANDARD_COMM_FLOW
 
