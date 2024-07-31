@@ -410,7 +410,7 @@ Davis, CA 95616, USA
     <event id="0x00" name="OccupancyChanged" priority="info">
       <access readPrivilege="view"/>
       <optionalConform/>
-      <field id="0" name="Occupancy" type="bool">
+      <field id="0" name="Occupancy" type="OccupancyBitmap">
         <mandatoryConform/>
       </field>
     </event>
