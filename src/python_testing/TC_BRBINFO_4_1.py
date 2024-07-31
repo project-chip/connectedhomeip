@@ -16,7 +16,7 @@
 #
 
 # This test requires a TH_SERVER application. Please specify with --string-arg th_server_app_path:<path_to_app>
-# TH_SERVER must support following arguments: --secured-device-port --discriminator --passcode --KVS --secured-device-port
+# TH_SERVER must support following arguments: --secured-device-port --discriminator --passcode --KVS
 # E.g: python3 src/python_testing/TC_BRBINFO_4_1.py --commissioning-method on-network --qr-code MT:-24J042C00KA0648G00 \
 #      --string-arg th_server_app_path:out/linux-x64-lit-icd/lit-icd-app
 
@@ -34,10 +34,7 @@ from matter_testing_support import MatterBaseTest, SimpleEventCallback, TestStep
 from mobly import asserts
 
 logger = logging.getLogger(__name__)
-kRootEndpointId = 0
-kMaxUserActiveModeBitmap = 0x1FFFF
-kMaxUserActiveModeTriggerInstructionByteLength = 128
-
+_ROOT_ENDPOINT_ID = 0
 
 class TC_BRBINFO_4_1(MatterBaseTest):
 
@@ -47,10 +44,6 @@ class TC_BRBINFO_4_1(MatterBaseTest):
 
     async def _read_attribute_expect_success(self, endpoint, cluster, attribute, node_id):
         return await self.read_single_attribute_check_success(endpoint=endpoint, cluster=cluster, attribute=attribute, node_id=node_id)
-
-    #
-    # Test Harness Helpers
-    #
 
     # Override default timeout to support a 60 min wait
     @property
@@ -95,7 +88,7 @@ class TC_BRBINFO_4_1(MatterBaseTest):
             asserts.fail("Timeout on event ActiveChanged")
 
     async def _get_dynamic_endpoint(self) -> int:
-        root_part_list = await self.read_single_attribute_check_success(cluster=Clusters.Descriptor, attribute=Clusters.Descriptor.Attributes.PartsList, endpoint=kRootEndpointId)
+        root_part_list = await self.read_single_attribute_check_success(cluster=Clusters.Descriptor, attribute=Clusters.Descriptor.Attributes.PartsList, endpoint=_ROOT_ENDPOINT_ID)
         set_of_endpoints_after_adding_device = set(root_part_list)
 
         asserts.assert_true(set_of_endpoints_after_adding_device.issuperset(
@@ -109,7 +102,7 @@ class TC_BRBINFO_4_1(MatterBaseTest):
     async def setup_class(self):
         # These steps are not explicitly, but they help identify the dynamically added endpoint
         # The second part of this process happens on _get_dynamic_endpoint()
-        root_part_list = await self.read_single_attribute_check_success(cluster=Clusters.Descriptor, attribute=Clusters.Descriptor.Attributes.PartsList, endpoint=kRootEndpointId)
+        root_part_list = await self.read_single_attribute_check_success(cluster=Clusters.Descriptor, attribute=Clusters.Descriptor.Attributes.PartsList, endpoint=_ROOT_ENDPOINT_ID)
         self.set_of_dut_endpoints_before_adding_device = set(root_part_list)
 
         super().setup_class()
@@ -170,7 +163,7 @@ class TC_BRBINFO_4_1(MatterBaseTest):
 
         # Confirms commissioning of DUT on TH as it reads its fature map
         await self._read_attribute_expect_success(
-            kRootEndpointId,
+            _ROOT_ENDPOINT_ID,
             basic_info_cluster,
             basic_info_attributes.FeatureMap,
             self.dut_node_id
@@ -180,7 +173,7 @@ class TC_BRBINFO_4_1(MatterBaseTest):
 
         # Confirms commissioning of ICD on TH as it reads its feature map
         await self._read_attribute_expect_success(
-            kRootEndpointId,
+            _ROOT_ENDPOINT_ID,
             basic_info_cluster,
             basic_info_attributes.FeatureMap,
             self.icd_nodeid
@@ -189,7 +182,7 @@ class TC_BRBINFO_4_1(MatterBaseTest):
         self.step("1a")
 
         idle_mode_duration = await self._read_attribute_expect_success(
-            kRootEndpointId,
+            _ROOT_ENDPOINT_ID,
             icdm_cluster,
             icdm_attributes.IdleModeDuration,
             self.icd_nodeid
@@ -197,7 +190,7 @@ class TC_BRBINFO_4_1(MatterBaseTest):
         logging.info(f"IdleModeDuration: {idle_mode_duration}")
 
         active_mode_duration = await self._read_attribute_expect_success(
-            kRootEndpointId,
+            _ROOT_ENDPOINT_ID,
             icdm_cluster,
             icdm_attributes.ActiveModeDuration,
             self.icd_nodeid
