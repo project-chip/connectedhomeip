@@ -27,6 +27,7 @@ import uuid
 
 import chip.clusters as Clusters
 from chip import ChipDeviceCtrl
+from chip.interaction_model import InteractionModelError, Status
 from matter_testing_support import MatterBaseTest, TestStep, async_test_body, default_matter_test_main, type_matches
 from mobly import asserts
 
@@ -42,6 +43,12 @@ class TC_MCORE_FS_1_3(MatterBaseTest):
         self.device_for_dut_eco_kvs = None
         self.device_for_dut_eco_port = 5544
         self.app_process_for_dut_eco = None
+
+        # Create a second controller on a new fabric to communicate to the server
+        new_certificate_authority = self.certificate_authority_manager.NewCertificateAuthority()
+        new_fabric_admin = new_certificate_authority.NewFabricAdmin(vendorId=0xFFF1, fabricId=2)
+        paa_path = str(self.matter_test_config.paa_trust_store_path)
+        self.TH_server_controller = new_fabric_admin.NewController(nodeId=112233, paaTrustStorePath=paa_path)
 
     def teardown_class(self):
         if self.app_process_for_dut_eco is not None:
@@ -60,7 +67,7 @@ class TC_MCORE_FS_1_3(MatterBaseTest):
 
     async def create_device_for_dut_ecosystem(self):
         # TODO: confirm whether we can open processes like this on the TH
-        app = self.matter_test_config.user_params.get("th_server_app_path", None)
+        app = self.user_params.get("th_server_app_path", None)
         if not app:
             asserts.fail('This test requires a TH_SERVER app. Specify app path with --string-arg th_server_app_path:<path_to_app>')
 
@@ -75,11 +82,16 @@ class TC_MCORE_FS_1_3(MatterBaseTest):
         self.app_process_for_dut_eco = subprocess.Popen(cmd, bufsize=0, shell=True)
         logging.info("Started TH device for DUT ecosystem")
         time.sleep(3)
-        return discriminator, passcode
+
+        logging.info("Commissioning from separate fabric")
+        self.device_for_dut_eco_nodeid = 1111
+        await self.TH_server_controller.CommissionOnNetwork(nodeId=self.device_for_dut_eco_nodeid, setupPinCode=passcode, filterType=ChipDeviceCtrl.DiscoveryFilterType.LONG_DISCRIMINATOR, filter=discriminator)
+        logging.info("Commissioning device for DUT ecosystem onto TH for managing")
+        return passcode
 
     async def create_and_commission_device_for_th_ecosystem(self):
         # TODO: confirm whether we can open processes like this on the TH
-        app = self.matter_test_config.user_params.get("th_server_app_path", None)
+        app = self.user_params.get("th_server_app_path", None)
 
         self.device_for_th_eco_kvs = f'kvs_{str(uuid.uuid4())}'
         discriminator = random.randint(0, 4095)
@@ -93,12 +105,7 @@ class TC_MCORE_FS_1_3(MatterBaseTest):
         time.sleep(3)
 
         logging.info("Commissioning from separate fabric")
-        # Create a second controller on a new fabric to communicate to the server
-        new_certificate_authority = self.certificate_authority_manager.NewCertificateAuthority()
-        new_fabric_admin = new_certificate_authority.NewFabricAdmin(vendorId=0xFFF1, fabricId=2)
-        paa_path = str(self.matter_test_config.paa_trust_store_path)
-        self.TH_server_controller = new_fabric_admin.NewController(nodeId=112233, paaTrustStorePath=paa_path)
-        self.server_nodeid = 1111
+        self.server_nodeid = 1112
         await self.TH_server_controller.CommissionOnNetwork(nodeId=self.server_nodeid, setupPinCode=passcode, filterType=ChipDeviceCtrl.DiscoveryFilterType.LONG_DISCRIMINATOR, filter=discriminator)
         logging.info("Commissioning TH device for TH ecosystem")
 
@@ -119,12 +126,25 @@ class TC_MCORE_FS_1_3(MatterBaseTest):
         root_part_list = await self.read_single_attribute_check_success(cluster=Clusters.Descriptor, attribute=Clusters.Descriptor.Attributes.PartsList, endpoint=root_node_endpoint)
         set_of_endpoints_before_adding_device = set(root_part_list)
 
-        discriminator, passcode = await self.create_device_for_dut_ecosystem()
+        passcode = await self.create_device_for_dut_ecosystem()
+        read_result = await self.TH_server_controller.ReadAttribute(self.device_for_dut_eco_nodeid, [(root_node_endpoint, Clusters.BasicInformation.Attributes.UniqueID)])
+        result = read_result[root_node_endpoint][Clusters.BasicInformation][Clusters.BasicInformation.Attributes.UniqueID]
+        asserts.assert_true(type_matches(result, Clusters.Attribute.ValueDecodeFailure), "We were expecting a value decode failure")
+        asserts.assert_equal(result.Reason.status, Status.UnsupportedAttribute, "Incorrect error returned from reading UniqueID")
+
+        discriminator = 3840
+        device_for_dut_ecosystem_vendor_id = await self.read_single_attribute_check_success(cluster=Clusters.BasicInformation, attribute=Clusters.BasicInformation.Attributes.VendorID, dev_ctrl=self.TH_server_controller, node_id=self.device_for_dut_eco_nodeid, endpoint=root_node_endpoint)
+        device_for_dut_ecosystem_product_id = await self.read_single_attribute_check_success(cluster=Clusters.BasicInformation, attribute=Clusters.BasicInformation.Attributes.ProductID, dev_ctrl=self.TH_server_controller, node_id=self.device_for_dut_eco_nodeid, endpoint=root_node_endpoint)
         # To prevent need for runtime QR code generation test makes some assumptions
         # about the app that it valiudates here.
-        asserts.assert_equal(discriminator, 3840, "Test implementation assumption incorrect for discriminator")
-        asserts.assert_equal(passcode, 3840, "Test implementation assumption incorrect for passcode")
-        setup_qrcode = "MT:Y.K90-Q000KA0648G00"
+        asserts.assert_equal(passcode, 20202021, "Test implementation assumption incorrect for passcode")
+        asserts.assert_equal(device_for_dut_ecosystem_vendor_id, 0xFFF1, "Test implementation assumption incorrect for vendor ID")
+        asserts.assert_equal(device_for_dut_ecosystem_product_id, 0x8001, "Test implementation assumption incorrect for product ID")
+
+        self.TH_server_controller.OpenCommissioningWindow(nodeid=self.device_for_dut_eco_nodeid, timeout=900, iteration=1000,
+                                                          discriminator=discriminator, option=1)
+
+        setup_qrcode = "MT:-24J0-Q000KA0648G00"
         self.wait_for_user_input(
             prompt_msg=f"Using the DUT vendor's provided interface, commission the device using the following parameters:\n"
             f"- discriminator: {discriminator}\n"
