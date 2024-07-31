@@ -212,7 +212,10 @@ tests:
           Run command failure: ../../third_party/connectedhomeip/src/controller/SetUpCodePairer.cpp:50: CHIP Error 0x0000002F: Invalid argument
       disabled: true
 
-    - label: "Step 4c: Using the QR code from Step 1, ensure the TH’s Discovery Capability bit string is NOT set to Wi-Fi PAF for discovery (i.e. set to OnNetwork discovery capability)"
+    - label:
+          "Step 4c: Using the QR code from Step 1, ensure the TH’s Discovery
+          Capability bit string is NOT set to Wi-Fi PAF for discovery (i.e. set
+          to OnNetwork discovery capability)"
       PICS: MCORE.DD.DISCOVERY_PAF
       verification: |
           User has a QR code generated to pass into DUT. Using the example provided above, the payload would be "MT:-24J029Q00KA0648G00".

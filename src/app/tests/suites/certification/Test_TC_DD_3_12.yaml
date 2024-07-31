@@ -170,7 +170,9 @@ tests:
       disabled: true
 
     - label:
-          "Step 2e: User-Intent Commissioning Flow: Use a Commissionee with a QR code that has the Custom Flow field set to 1 and supports Wi-Fi PAF for its Discovery Capability. "
+          "Step 2e: User-Intent Commissioning Flow: Use a Commissionee with a QR
+          code that has the Custom Flow field set to 1 and supports Wi-Fi PAF
+          for its Discovery Capability. "
       PICS: MCORE.DD.DISCOVERY_PAF
       verification: |
           User has a QR code to pass into DUT.
@@ -181,15 +183,13 @@ tests:
           [1719393010.693246][1592:1592] CHIP:SVR: Manual pairing code: [749701123365521327694]
       disabled: true
 
-    - label:
-          "Step 2f: Scan the QR code from the previous step using the DUT."
+    - label: "Step 2f: Scan the QR code from the previous step using the DUT."
       PICS: MCORE.DD.SCAN_QR_CODE
       verification: |
           Verify the QR code has been scanned successfully.
       disabled: true
 
-    - label:
-          "Step 2g: DUT parses QR code."
+    - label: "Step 2g: DUT parses QR code."
       PICS: MCORE.DD.DISCOVERY_PAF
       verification: |
           Verify DUT has parsed the QR code. Verify TH has not been commissioned to the Matter network.
@@ -208,7 +208,9 @@ tests:
       disabled: true
 
     - label:
-          "Step 2h: User should follow any TH-specific steps for putting the TH Commissionee device into commissioning mode and to complete the commissioning process using Wi-Fi PAF."
+          "Step 2h: User should follow any TH-specific steps for putting the TH
+          Commissionee device into commissioning mode and to complete the
+          commissioning process using Wi-Fi PAF."
       PICS: MCORE.DD.DISCOVERY_PAF
       verification: |
           DUT commissions TH to the Matter network.

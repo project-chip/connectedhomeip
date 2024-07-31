@@ -187,7 +187,7 @@ tests:
       PICS: MCORE.DD.SCAN_QR_CODE
       verification: |
           1. Verify the QR code has been scanned successfully.
-          
+
           $ sudo ./chip-tool payload parse-setup-payload MT:-24J0M3810KA0648G00
           [1719392883.120482][28468:28468] CHIP:DL: ChipLinuxStorage::Init: Using KVS config file: /tmp/chip_tool_kvs
           [1719392883.120687][28468:28468] CHIP:SPL: Parsing base38Representation: MT:-24J0M3810KA0648G00
@@ -200,11 +200,14 @@ tests:
           [1719392883.120944][28468:28468] CHIP:SPL: Passcode: 20202021
       disabled: true
 
-    - label: "Step 2f: Using the DUT, parse the TH’s QR code and follow any steps needed for the Commissioner/Commissionee to complete the commissioning process using Wi-Fi PAF"
+    - label:
+          "Step 2f: Using the DUT, parse the TH’s QR code and follow any steps
+          needed for the Commissioner/Commissionee to complete the commissioning
+          process using Wi-Fi PAF"
       PICS: MCORE.DD.DISCOVERY_PAF
       verification: |
           1. DUT parses QR code and DUT commissions TH to the Matter network
-          
+
           $ sudo ./chip-tool pairing code-wifi 1 n_m_2g nxp12345 MT:-24J0M3810KA0648G00
       disabled: true
 
