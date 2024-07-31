@@ -86,7 +86,7 @@ AppTask AppTask::sAppTask;
 #if CHIP_DEVICE_CONFIG_ENABLE_OTA_REQUESTOR
 void StartTimer(uint32_t aTimeoutMs);
 void CancelTimer(void);
-#endif 
+#endif
 
 uint8_t sTestEventTriggerEnableKey[TestEventTriggerDelegate::kEnableKeyLength] = { 0x00, 0x11, 0x22, 0x33, 0x44, 0x55, 0x66, 0x77,
                                                                                    0x88, 0x99, 0xaa, 0xbb, 0xcc, 0xdd, 0xee, 0xff };
@@ -244,7 +244,7 @@ int AppTask::Init()
     {
         PLAT_LOG("sOTAInitTimer timer created successfully ");
     }
-#endif 
+#endif
 
     ret = ThreadStackMgr().InitThreadStack();
     if (ret != CHIP_NO_ERROR)

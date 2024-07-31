@@ -235,7 +235,7 @@ int AppTask::Init()
                                  false,                            // no timer reload (==one-shot)
                                  (void *) this,                    // init timer id = light obj context
                                  OTAInitTimerEventHandler          // timer callback handler
-    ); 
+    );
 
     if (sOTAInitTimer == NULL)
     {
