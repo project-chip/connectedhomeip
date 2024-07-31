@@ -73,6 +73,7 @@ void GenericOperationalStateDelegateImpl::HandlePauseStateCallback(GenericOperat
 
 void GenericOperationalStateDelegateImpl::HandleResumeStateCallback(GenericOperationalError & err)
 {
+    // This gets called when it comes over the wire.
     ChipLogDetail(AppServer,
                 "------> Received resume command in OpState delegate HandleResumeStateCallback.");
 

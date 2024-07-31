@@ -342,9 +342,10 @@ void AllClustersAppCommandHandler::HandleCommand(intptr_t context)
     else if (name == "OperationalStateChange")
     {
         ChipLogDetail(AppServer,
-                    "------> [rmb] Got some OperationalStateChange.");
+                    "------> [rmb] Got some OperationalStateChange from the pipe?");
         std::string device    = self->mJsonValue["Device"].asString();
         std::string operation = self->mJsonValue["Operation"].asString();
+        // Should this go to the delegate and not the "base"
         self->OnOperationalStateChange(device, operation, self->mJsonValue["Param"]);
     }
     else if (name == "SimulateLongPress")
