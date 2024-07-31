@@ -209,8 +209,9 @@ CHIP_ERROR GenericOpenThreadBorderRouterDelegate::SetPendingDataset(const Thread
     VerifyOrReturnError(otInst, CHIP_ERROR_INCORRECT_STATE);
 
     otOperationalDatasetTlvs datasetTlvs;
+    VerifyOrDie(pendingDataset.AsByteSpan().size() <= OT_OPERATIONAL_DATASET_MAX_LENGTH);
     memcpy(datasetTlvs.mTlvs, pendingDataset.AsByteSpan().data(), pendingDataset.AsByteSpan().size());
-    datasetTlvs.mLength = pendingDataset.AsByteSpan().size();
+    datasetTlvs.mLength = static_cast<uint8_t>(pendingDataset.AsByteSpan().size());
     {
         ScopedThreadLock threadLock;
         ReturnErrorCodeIf(otDatasetSetPendingTlvs(otInst, &datasetTlvs) != OT_ERROR_NONE, CHIP_ERROR_INTERNAL);

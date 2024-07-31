@@ -518,6 +518,12 @@ if (chip_device_platform != "none") {
         "OpenThread/GenericNetworkCommissioningThreadDriver.cpp",
         "OpenThread/GenericNetworkCommissioningThreadDriver.h",
       ]
+      if (chip_openthread_border_router) {
+        sources += [
+          "OpenThread/GenericThreadBorderRouterDelegate.cpp",
+          "OpenThread/GenericThreadBorderRouterDelegate.h",
+        ]
+      }
     }
 
     cflags = [ "-Wconversion" ]
