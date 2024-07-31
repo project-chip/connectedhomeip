@@ -190,8 +190,8 @@ class TC_EWATERHTR_2_2(MatterBaseTest, EWATERHTRBase):
         heaterTypes = await self.read_whm_attribute_expect_success(attribute="HeaterTypes")
         asserts.assert_greater(heaterTypes, 0,
                                f"Unexpected HeaterTypes value - expected {heaterTypes} > 0")
-        asserts.assert_less_equal(heaterTypes, Clusters.WaterHeaterManagement.Bitmaps.WaterHeaterTypeBitmap.kOther,
-                                  f"Unexpected HeaterTypes value - expected {heaterTypes} <= WaterHeaterTypeBitmap.kOther")
+        asserts.assert_less_equal(heaterTypes, Clusters.WaterHeaterManagement.Bitmaps.WaterHeaterHeatSourceBitmap.kOther,
+                                  f"Unexpected HeaterTypes value - expected {heaterTypes} <= WaterHeaterHeatSourceBitmap.kOther")
 
         self.step("4")
         await self.send_test_event_trigger_manual_mode_test_event()

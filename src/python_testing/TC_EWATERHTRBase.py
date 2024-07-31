@@ -42,15 +42,16 @@ class EWATERHTRBase:
                                  endpoint: int = None, timedRequestTimeoutMs: int = 3000,
                                  expected_status: Status = Status.Success):
         try:
-            await self.send_single_cmd(cmd=Clusters.WaterHeaterManagement.Commands.Boost(
-                duration=duration,
-                oneShot=one_shot,
-                emergencyBoost=emergency_boost,
-                temporarySetpoint=temporary_setpoint,
-                targetPercentage=target_percentage,
-                targetReheat=target_reheat),
-                endpoint=endpoint,
-                timedRequestTimeoutMs=timedRequestTimeoutMs)
+            boostInfo = Clusters.WaterHeaterManagement.Structs.WaterHeaterBoostInfoStruct(duration=duration,
+                                                                                          oneShot=one_shot,
+                                                                                          emergencyBoost=emergency_boost,
+                                                                                          temporarySetpoint=temporary_setpoint,
+                                                                                          targetPercentage=target_percentage,
+                                                                                          targetReheat=target_reheat)
+
+            await self.send_single_cmd(cmd=Clusters.WaterHeaterManagement.Commands.Boost(boostInfo=boostInfo),
+                                       endpoint=endpoint,
+                                       timedRequestTimeoutMs=timedRequestTimeoutMs)
 
             asserts.assert_equal(expected_status, Status.Success)
 
