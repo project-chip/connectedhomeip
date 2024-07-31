@@ -64,7 +64,6 @@ source_set("chip-all-clusters-common") {
     "${chip_root}/examples/all-clusters-app/all-clusters-common/src/tcc-mode.cpp",
     "${chip_root}/examples/all-clusters-app/all-clusters-common/src/water-heater-mode.cpp",
     "${chip_root}/examples/all-clusters-app/linux/diagnostic-logs-provider-delegate-impl.cpp",
-    "${chip_root}/examples/all-clusters-app/linux/thermostat-delegate-impl.cpp",
     "${chip_root}/examples/energy-management-app/energy-management-common/src/ChargingTargetsMemMgr.cpp",
     "${chip_root}/examples/energy-management-app/energy-management-common/src/DeviceEnergyManagementDelegateImpl.cpp",
     "${chip_root}/examples/energy-management-app/energy-management-common/src/DeviceEnergyManagementManager.cpp",
@@ -76,6 +75,7 @@ source_set("chip-all-clusters-common") {
     "${chip_root}/examples/energy-management-app/energy-management-common/src/EnergyTimeUtils.cpp",
     "${chip_root}/examples/energy-management-app/energy-management-common/src/device-energy-management-mode.cpp",
     "${chip_root}/examples/energy-management-app/energy-management-common/src/energy-evse-mode.cpp",
+    "${chip_root}/examples/thermostat/linux/thermostat-delegate-impl.cpp",
     "AllClustersCommandDelegate.cpp",
     "AllClustersCommandDelegate.h",
     "AppOptions.cpp",
@@ -99,6 +99,7 @@ source_set("chip-all-clusters-common") {
   include_dirs = [
     "${chip_root}/examples/all-clusters-app/all-clusters-common/include",
     "${chip_root}/examples/energy-management-app/energy-management-common/include",
+    "${chip_root}/examples/thermostat/linux/include",
   ]
 
   if (chip_enable_pw_rpc) {

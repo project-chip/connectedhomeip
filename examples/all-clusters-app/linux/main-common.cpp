@@ -25,7 +25,6 @@
 #include "dishwasher-mode.h"
 #include "energy-evse-modes.h"
 #include "include/diagnostic-logs-provider-delegate-impl.h"
-#include "include/thermostat-delegate-impl.h"
 #include "include/tv-callbacks.h"
 #include "laundry-dryer-controls-delegate-impl.h"
 #include "laundry-washer-controls-delegate-impl.h"
@@ -38,6 +37,7 @@
 #include "rvc-modes.h"
 #include "rvc-operational-state-delegate-impl.h"
 #include "tcc-mode.h"
+#include "thermostat-delegate-impl.h"
 #include "water-heater-mode.h"
 #include <Options.h>
 #include <app-common/zap-generated/attributes/Accessors.h>
