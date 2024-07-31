@@ -17,13 +17,13 @@
 #
 
 import base64
-import click
 import os
 import pathlib
 import sys
 import typing
 
 import chip.clusters as Clusters
+import click
 from chip import ChipDeviceCtrl
 from chip.clusters import Attribute
 from chip.interaction_model import InteractionModelError, Status
