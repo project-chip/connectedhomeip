@@ -401,7 +401,7 @@ void CancelTimer(void)
         PLAT_LOG("sOTAInitTimer stop() failed");
     }
 }
-#endif 
+#endif
 
 void AppTask::ActionInitiated(LightingManager::Action_t aAction, int32_t aActor)
 {

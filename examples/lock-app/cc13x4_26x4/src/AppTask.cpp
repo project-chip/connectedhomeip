@@ -451,7 +451,7 @@ void CancelTimer(void)
         PLAT_LOG("sOTAInitTimer stop() failed");
     }
 }
-#endif 
+#endif
 
 void AppTask::ActionInitiated(LockManager::Action_t aAction)
 {
