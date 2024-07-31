@@ -25,6 +25,7 @@
 #include "dishwasher-mode.h"
 #include "energy-evse-modes.h"
 #include "include/diagnostic-logs-provider-delegate-impl.h"
+#include "include/thermostat-delegate-impl.h"
 #include "include/tv-callbacks.h"
 #include "laundry-dryer-controls-delegate-impl.h"
 #include "laundry-washer-controls-delegate-impl.h"
@@ -46,6 +47,7 @@
 #include <app/clusters/laundry-dryer-controls-server/laundry-dryer-controls-server.h>
 #include <app/clusters/laundry-washer-controls-server/laundry-washer-controls-server.h>
 #include <app/clusters/mode-base-server/mode-base-server.h>
+#include <app/clusters/thermostat-server/thermostat-server.h>
 #include <app/clusters/time-synchronization-server/time-synchronization-server.h>
 #include <app/clusters/valve-configuration-and-control-server/valve-configuration-and-control-server.h>
 #include <app/server/Server.h>
@@ -322,4 +324,13 @@ void emberAfDiagnosticLogsClusterInitCallback(chip::EndpointId endpoint)
     logProvider.SetCrashLogFilePath(AppOptions::GetCrashLogFilePath());
 
     DiagnosticLogsServer::Instance().SetDiagnosticLogsProviderDelegate(endpoint, &logProvider);
+}
+
+using namespace chip::app::Clusters::Thermostat;
+void emberAfThermostatClusterInitCallback(EndpointId endpoint)
+{
+    // Register the delegate for the Thermostat
+    auto & delegate = ThermostatDelegate::GetInstance();
+
+    SetDefaultDelegate(endpoint, &delegate);
 }
