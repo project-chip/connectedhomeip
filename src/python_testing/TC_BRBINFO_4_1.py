@@ -44,6 +44,7 @@ kRootEndpointId = 0
 kMaxUserActiveModeBitmap = 0x1FFFF
 kMaxUserActiveModeTriggerInstructionByteLength = 128
 
+
 class TC_BRBINFO_4_1(MatterBaseTest):
 
     #
@@ -62,7 +63,6 @@ class TC_BRBINFO_4_1(MatterBaseTest):
     def default_timeout(self) -> int:
         return 63*60
 
-
     def desc_TC_BRBINFO_4_1(self) -> str:
         """Returns a description of this test"""
         return "[TC_BRBINFO_4_1] Verification of KeepActive Command [DUT-Server]"
@@ -80,12 +80,12 @@ class TC_BRBINFO_4_1(MatterBaseTest):
     def _ask_for_vendor_commissioniong_ux_operation(self, discriminator, setupPinCode, setupManualCode, setupQRCode):
         self.wait_for_user_input(
             prompt_msg=f"Using the DUT vendor's provided interface, commission the ICD device using the following parameters:\n"
-                        f"- discriminator: {discriminator}\n"
-                        f"- setupPinCode: {setupPinCode}\n"
-                        f"- setupQRCode: {setupQRCode}\n"
-                        f"- setupManualcode: {setupManualCode}\n"
-                        f"If using FabricSync Admin test app, you may type:\n"
-                        f">>> pairing onnetwork 111 {setupPinCode}")
+            f"- discriminator: {discriminator}\n"
+            f"- setupPinCode: {setupPinCode}\n"
+            f"- setupQRCode: {setupQRCode}\n"
+            f"- setupManualcode: {setupManualCode}\n"
+            f"If using FabricSync Admin test app, you may type:\n"
+            f">>> pairing onnetwork 111 {setupPinCode}")
 
     async def _send_keep_active_command(self, duration, endpoint_id) -> int:
         logging.info("Sending keep active command")
@@ -104,12 +104,12 @@ class TC_BRBINFO_4_1(MatterBaseTest):
         root_part_list = await self.read_single_attribute_check_success(cluster=Clusters.Descriptor, attribute=Clusters.Descriptor.Attributes.PartsList, endpoint=kRootEndpointId)
         set_of_endpoints_after_adding_device = set(root_part_list)
 
-        asserts.assert_true(set_of_endpoints_after_adding_device.issuperset(self.set_of_dut_endpoints_before_adding_device), "Expected only new endpoints to be added")
+        asserts.assert_true(set_of_endpoints_after_adding_device.issuperset(
+            self.set_of_dut_endpoints_before_adding_device), "Expected only new endpoints to be added")
         unique_endpoints_set = set_of_endpoints_after_adding_device - self.set_of_dut_endpoints_before_adding_device
         asserts.assert_equal(len(unique_endpoints_set), 1, "Expected only one new endpoint")
         newly_added_endpoint = list(unique_endpoints_set)[0]
         return newly_added_endpoint
-
 
     @async_test_body
     async def setup_class(self):
@@ -128,7 +128,7 @@ class TC_BRBINFO_4_1(MatterBaseTest):
         discriminator = 3850
         passcode = 20202021
         app_args = f'--secured-device-port {self.port} --discriminator {discriminator} --passcode {passcode} --KVS {self.kvs} ' + \
-          '--secured-device-port 5545'
+            '--secured-device-port 5545'
         cmd = f'{app} {app_args}'
 
         logging.info("Starting ICD Server App")
@@ -145,7 +145,7 @@ class TC_BRBINFO_4_1(MatterBaseTest):
         params = await self.openCommissioningWindow(dev_ctrl=self.default_controller, node_id=self.icd_nodeid)
 
         self._ask_for_vendor_commissioniong_ux_operation(params.randomDiscriminator, params.commissioningParameters.setupPinCode,
-            params.commissioningParameters.setupManualCode, params.commissioningParameters.setupQRCode)
+                                                         params.commissioningParameters.setupManualCode, params.commissioningParameters.setupQRCode)
 
     def teardown_class(self):
         logging.warning("Stopping app with SIGTERM")
@@ -177,37 +177,37 @@ class TC_BRBINFO_4_1(MatterBaseTest):
 
         # Confirms commissioning of DUT on TH as it reads its fature map
         await self._read_attribute_expect_success(
-          kRootEndpointId,
-          basic_info_cluster,
-          basic_info_attributes.FeatureMap,
-          self.dut_node_id
+            kRootEndpointId,
+            basic_info_cluster,
+            basic_info_attributes.FeatureMap,
+            self.dut_node_id
         )
 
         logging.info("Ensuring ICD is commissioned to TH")
 
         # Confirms commissioning of ICD on TH as it reads its feature map
         await self._read_attribute_expect_success(
-          kRootEndpointId,
-          basic_info_cluster,
-          basic_info_attributes.FeatureMap,
-          self.icd_nodeid
+            kRootEndpointId,
+            basic_info_cluster,
+            basic_info_attributes.FeatureMap,
+            self.icd_nodeid
         )
 
         self.step("1a")
 
         idle_mode_duration = await self._read_attribute_expect_success(
-          kRootEndpointId,
-          icdm_cluster,
-          icdm_attributes.IdleModeDuration,
-          self.icd_nodeid
+            kRootEndpointId,
+            icdm_cluster,
+            icdm_attributes.IdleModeDuration,
+            self.icd_nodeid
         )
         logging.info(f"IdleModeDuration: {idle_mode_duration}")
 
         active_mode_duration = await self._read_attribute_expect_success(
-          kRootEndpointId,
-          icdm_cluster,
-          icdm_attributes.ActiveModeDuration,
-          self.icd_nodeid
+            kRootEndpointId,
+            icdm_cluster,
+            icdm_attributes.ActiveModeDuration,
+            self.icd_nodeid
         )
         logging.info(f"ActiveModeDuration: {active_mode_duration}")
 
@@ -265,7 +265,7 @@ class TC_BRBINFO_4_1(MatterBaseTest):
         logging.info(f"Sending KeepActiveCommand({stay_active_duration})")
         self._send_keep_active_command(stay_active_duration, dynamic_endpoint_id)
 
-        ## stops (halts) the ICD server process by sending a SIGTOP signal
+        # stops (halts) the ICD server process by sending a SIGTOP signal
         self.app_process.send_signal(signal.SIGSTOP.value)
 
         if not self.is_ci:
@@ -273,7 +273,7 @@ class TC_BRBINFO_4_1(MatterBaseTest):
             self._timeout
             time.sleep(60*60)
 
-        ## resumes (continues) the ICD server process by sending a SIGCONT signal
+        # resumes (continues) the ICD server process by sending a SIGCONT signal
         self.app_process.send_signal(signal.SIGCONT.value)
 
         # wait for active changed event, expect no event will be sent
@@ -282,6 +282,7 @@ class TC_BRBINFO_4_1(MatterBaseTest):
             promised_active_duration = self.q.get(block=True, timeout=event_timeout)
         finally:
             asserts.assert_true(queue.Empty(), "ActiveChanged event received when not expected")
+
 
 if __name__ == "__main__":
     default_matter_test_main()
