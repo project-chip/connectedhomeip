@@ -829,7 +829,7 @@ CHIP_ERROR ThermostatAttrAccess::Write(const ConcreteDataAttributePath & aPath, 
     VerifyOrDie(aPath.mClusterId == Thermostat::Id);
 
     EndpointId endpoint                               = aPath.mEndpointId;
-    const Access::SubjectDescriptor subjectDescriptor = aDecoder.GetSubjectDescriptor();
+    auto & subjectDescriptor = aDecoder.GetSubjectDescriptor();
     ScopedNodeId scopedNodeId                         = ScopedNodeId();
 
     // Get the node id if the authentication mode is CASE.
@@ -1306,7 +1306,7 @@ bool emberAfThermostatClusterSetActivePresetRequestCallback(
     return true;
 }
 
-bool validAtomicAttributes(const chip::app::Clusters::Thermostat::Commands::AtomicRequest::DecodableType & commandData)
+bool validAtomicAttributes(Commands::AtomicRequest::DecodableType & commandData)
 {
     auto attributeIdsIter = commandData.attributeRequests.begin();
     bool requestedPresets, requestedSchedules;
@@ -1337,9 +1337,9 @@ bool validAtomicAttributes(const chip::app::Clusters::Thermostat::Commands::Atom
     return true;
 }
 
-bool handleAtomicBegin(chip::app::CommandHandler * commandObj, const ScopedNodeId & sourceNodeId,
-                       const chip::app::ConcreteCommandPath & commandPath,
-                       const chip::app::Clusters::Thermostat::Commands::AtomicRequest::DecodableType & commandData)
+bool handleAtomicBegin(CommandHandler * commandObj, const ScopedNodeId & sourceNodeId,
+                       const ConcreteCommandPath & commandPath,
+                       const Commands::AtomicRequest::DecodableType & commandData)
 {
     EndpointId endpoint = commandPath.mEndpointId;
 
@@ -1360,16 +1360,15 @@ bool handleAtomicBegin(chip::app::CommandHandler * commandObj, const ScopedNodeI
     bool inAtomicWrite = gThermostatAttrAccess.InAtomicWrite(endpoint);
     if (inAtomicWrite)
     {
-        chip::app::Clusters::Thermostat::Commands::AtomicResponse::Type response;
+        Commands::AtomicResponse::Type response;
         Globals::Structs::AtomicAttributeStatusStruct::Type attributeStatus[] = {
-            { .attributeID = Presets::Id, .statusCode = static_cast<uint8_t>(imcode::Busy) },
-            { .attributeID = Schedules::Id, .statusCode = static_cast<uint8_t>(imcode::Busy) }
+            { .attributeID = Presets::Id, .statusCode = to_underlying(imcode::Busy) },
+            { .attributeID = Schedules::Id, .statusCode = to_underlying(imcode::Busy) }
         };
 
-        response.statusCode      = static_cast<uint8_t>(imcode::Failure);
+        response.statusCode      = to_underlying(imcode::Failure);
         response.attributeStatus = attributeStatus;
         commandObj->AddResponse(commandPath, response);
-        // commandObj->AddStatus(commandPath, imcode::Busy);
         return true;
     }
 
@@ -1379,13 +1378,13 @@ bool handleAtomicBegin(chip::app::CommandHandler * commandObj, const ScopedNodeI
     ScheduleTimer(endpoint, timeout);
     gThermostatAttrAccess.SetAtomicWrite(endpoint, true);
     gThermostatAttrAccess.SetAtomicWriteScopedNodeId(endpoint, GetSourceScopedNodeId(commandObj));
-    chip::app::Clusters::Thermostat::Commands::AtomicResponse::Type response;
+    Commands::AtomicResponse::Type response;
     Globals::Structs::AtomicAttributeStatusStruct::Type attributeStatus[] = {
-        { .attributeID = Presets::Id, .statusCode = static_cast<uint8_t>(imcode::Success) },
-        { .attributeID = Schedules::Id, .statusCode = static_cast<uint8_t>(imcode::Success) }
+        { .attributeID = Presets::Id, .statusCode = to_underlying(imcode::Success) },
+        { .attributeID = Schedules::Id, .statusCode = to_underlying(imcode::Success) }
     };
 
-    response.statusCode      = static_cast<uint8_t>(imcode::Failure);
+    response.statusCode      = to_underlying(imcode::Failure);
     response.attributeStatus = attributeStatus;
     response.timeout.Emplace(timeout);
     commandObj->AddResponse(commandPath, response);
@@ -1393,9 +1392,9 @@ bool handleAtomicBegin(chip::app::CommandHandler * commandObj, const ScopedNodeI
     return true;
 }
 
-bool handleAtomicCommit(chip::app::CommandHandler * commandObj, const ScopedNodeId & sourceNodeId,
-                        const chip::app::ConcreteCommandPath & commandPath,
-                        const chip::app::Clusters::Thermostat::Commands::AtomicRequest::DecodableType & commandData)
+bool handleAtomicCommit(CommandHandler * commandObj, const ScopedNodeId & sourceNodeId,
+                        const ConcreteCommandPath & commandPath,
+                        const Commands::AtomicRequest::DecodableType & commandData)
 {
     if (!validAtomicAttributes(commandData))
     {
@@ -1548,7 +1547,7 @@ bool handleAtomicCommit(chip::app::CommandHandler * commandObj, const ScopedNode
             return SendResponseAndCleanUp(delegate, endpoint, commandObj, commandPath, imcode::ConstraintError);
         }
 
-        // If the preset type for the preset scenario does not support name and a name is specified, return CONSTRAINT_ERROR.
+        // If the preset type for the preset scenario does not support names and a name is specified, return CONSTRAINT_ERROR.
         if (!PresetTypeSupportsNames(delegate, presetScenario) && pendingPreset.GetName().HasValue())
         {
             return SendResponseAndCleanUp(delegate, endpoint, commandObj, commandPath, imcode::ConstraintError);
@@ -1599,9 +1598,9 @@ bool handleAtomicCommit(chip::app::CommandHandler * commandObj, const ScopedNode
     return SendResponseAndCleanUp(delegate, endpoint, commandObj, commandPath, imcode::Success);
 }
 
-bool handleAtomicRollback(chip::app::CommandHandler * commandObj, const ScopedNodeId & sourceNodeId,
-                          const chip::app::ConcreteCommandPath & commandPath,
-                          const chip::app::Clusters::Thermostat::Commands::AtomicRequest::DecodableType & commandData)
+bool handleAtomicRollback(CommandHandler * commandObj, const ScopedNodeId & sourceNodeId,
+                          const ConcreteCommandPath & commandPath,
+                          const Commands::AtomicRequest::DecodableType & commandData)
 {
     if (!validAtomicAttributes(commandData))
     {
@@ -1637,7 +1636,6 @@ bool emberAfThermostatClusterAtomicRequestCallback(
     const chip::app::Clusters::Thermostat::Commands::AtomicRequest::DecodableType & commandData)
 {
     auto & requestType = commandData.requestType;
-    // auto & timeout     = commandData.timeout;
 
     ScopedNodeId sourceNodeId = GetSourceScopedNodeId(commandObj);
 
