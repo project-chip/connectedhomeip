@@ -161,6 +161,12 @@ class TC_BRBINFO_4_1(MatterBaseTest):
     @async_test_body
     async def test_TC_BRBINFO_4_1(self):
         self.is_ci = self.check_pics('PICS_SDK_CI_ONLY')
+        icdm_cluster = Clusters.Objects.IcdManagement
+        icdm_attributes = icdm_cluster.Attributes
+        brb_info_cluster = Clusters.Objects.BridgedDeviceBasicInformation
+        brb_info_attributes = brb_info_cluster.Attributes
+        basic_info_cluster = Clusters.Objects.BasicInformation
+        basic_info_attributes = basic_info_cluster.Attributes
 
         # Preconditions
         self.step("0")
@@ -186,13 +192,6 @@ class TC_BRBINFO_4_1(MatterBaseTest):
         )
 
         self.step("1a")
-
-        icdm_cluster = Clusters.Objects.IcdManagement
-        icdm_attributes = icdm_cluster.Attributes
-        brb_info_cluster = Clusters.Objects.BridgedDeviceBasicInformation
-        brb_info_attributes = brb_info_cluster.Attributes
-        basic_info_cluster = Clusters.Objects.BasicInformation
-        basic_info_attributes = basic_info_cluster.Attributes
 
         idle_mode_duration = await self._read_attribute_expect_success(
           kICDMEndpointId,
@@ -225,9 +224,9 @@ class TC_BRBINFO_4_1(MatterBaseTest):
         self._send_keep_active_command(stay_active_duration)
 
         logging.info(f"Waiting for ActiveChanged from DUT...")
-        PromisedActiveDuration = await self._wait_for_active_changed_event((idle_mode_duration + max(active_mode_duration, stay_active_duration))/1000)
+        promised_active_duration = await self._wait_for_active_changed_event((idle_mode_duration + max(active_mode_duration, stay_active_duration))/1000)
 
-        asserts.assert_true(PromisedActiveDuration >= stay_active_duration, "PromisedActiveDuration < StayActiveDuration")
+        asserts.assert_true(promised_active_duration >= stay_active_duration, "PromisedActiveDuration < StayActiveDuration")
 
         self.step("2")
 
@@ -236,7 +235,7 @@ class TC_BRBINFO_4_1(MatterBaseTest):
         self._send_keep_active_command(stay_active_duration)
 
         logging.info(f"Waiting for ActiveChanged from DUT...")
-        PromisedActiveDuration = await self._wait_for_active_changed_event((idle_mode_duration + max(active_mode_duration, stay_active_duration))/1000)
+        promised_active_duration = await self._wait_for_active_changed_event((idle_mode_duration + max(active_mode_duration, stay_active_duration))/1000)
 
         # wait for active time duration
         time.sleep(max(stay_active_duration/1000, active_mode_duration))
@@ -254,7 +253,7 @@ class TC_BRBINFO_4_1(MatterBaseTest):
         time.sleep(100)
 
         logging.info(f"Waiting for ActiveChanged from DUT...")
-        PromisedActiveDuration = await self._wait_for_active_changed_event((idle_mode_duration + max(active_mode_duration, stay_active_duration))/1000)
+        promised_active_duration = await self._wait_for_active_changed_event((idle_mode_duration + max(active_mode_duration, stay_active_duration))/1000)
 
         asserts.assert_true(q.qSize() == 0, "More than one event received from DUT")
 
@@ -277,7 +276,7 @@ class TC_BRBINFO_4_1(MatterBaseTest):
         # wait for active changed event, expect no event will be sent
         event_timeout = (idle_mode_duration + max(active_mode_duration, stay_active_duration))/1000
         try:
-            PromisedActiveDuration = self.q.get(block=True, timeout=event_timeout)
+            promised_active_duration = self.q.get(block=True, timeout=event_timeout)
         finally:
             asserts.assert_true(queue.Empty(), "ActiveChanged event received when not expected")
 
