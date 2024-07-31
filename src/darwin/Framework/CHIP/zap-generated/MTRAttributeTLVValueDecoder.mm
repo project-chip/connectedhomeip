@@ -2398,6 +2398,50 @@ static id _Nullable DecodeAttributeValueForGeneralCommissioningCluster(Attribute
         value = [NSNumber numberWithBool:cppValue];
         return value;
     }
+    case Attributes::TCAcceptedVersion::Id: {
+        using TypeInfo = Attributes::TCAcceptedVersion::TypeInfo;
+        TypeInfo::DecodableType cppValue;
+        *aError = DataModel::Decode(aReader, cppValue);
+        if (*aError != CHIP_NO_ERROR) {
+            return nil;
+        }
+        NSNumber * _Nonnull value;
+        value = [NSNumber numberWithUnsignedShort:cppValue];
+        return value;
+    }
+    case Attributes::TCMinRequiredVersion::Id: {
+        using TypeInfo = Attributes::TCMinRequiredVersion::TypeInfo;
+        TypeInfo::DecodableType cppValue;
+        *aError = DataModel::Decode(aReader, cppValue);
+        if (*aError != CHIP_NO_ERROR) {
+            return nil;
+        }
+        NSNumber * _Nonnull value;
+        value = [NSNumber numberWithUnsignedShort:cppValue];
+        return value;
+    }
+    case Attributes::TCAcknowledgements::Id: {
+        using TypeInfo = Attributes::TCAcknowledgements::TypeInfo;
+        TypeInfo::DecodableType cppValue;
+        *aError = DataModel::Decode(aReader, cppValue);
+        if (*aError != CHIP_NO_ERROR) {
+            return nil;
+        }
+        NSNumber * _Nonnull value;
+        value = [NSNumber numberWithUnsignedShort:cppValue];
+        return value;
+    }
+    case Attributes::TCAcknowledgementsRequired::Id: {
+        using TypeInfo = Attributes::TCAcknowledgementsRequired::TypeInfo;
+        TypeInfo::DecodableType cppValue;
+        *aError = DataModel::Decode(aReader, cppValue);
+        if (*aError != CHIP_NO_ERROR) {
+            return nil;
+        }
+        NSNumber * _Nonnull value;
+        value = [NSNumber numberWithBool:cppValue];
+        return value;
+    }
     default: {
         break;
     }
