@@ -15,7 +15,7 @@
 #    limitations under the License.
 #
 
-# TODO - this was copied/pasted from abother test, it needs to be reviewed and updated
+# TODO - this was copied/pasted from another test, it needs to be reviewed and updated
 # See https://github.com/project-chip/connectedhomeip/blob/master/docs/testing/python.md#defining-the-ci-test-arguments
 # for details about the block below.
 #
