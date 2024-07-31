@@ -61,7 +61,7 @@ class TC_SEAR_1_3(MatterBaseTest):
             endpoint=self.endpoint, attribute=Clusters.ServiceArea.Attributes.SelectedAreas)
         logging.info(f"SelectedAreas {selected_areas}")
 
-        return [a.areaID for a in selected_areas]
+        return selected_areas
         
     async def send_cmd_select_areas_expect_response(self, step, new_areas, expected_response):
         self.print_step(step, f"Send SelectAreas command with NewAreas({new_areas})")

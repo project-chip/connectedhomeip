@@ -63,18 +63,13 @@ class TC_SEAR_1_2(MatterBaseTest):
         logging.info("SupportedMaps: %s" % (supported_maps))
         asserts.assert_less_equal(len(supported_maps), 255,
                              "SupportedMaps should have max 255 entries")
-        mapid_list = []
-        for m in supported_maps:
-            if m.mapID in mapid_list:
-                asserts.fail("SupportedMaps must have unique MapID values!")
-            else:
-                mapid_list.append(m.mapID)
-        name_list = []
-        for m in supported_maps:
-            if m.name in name_list:
-                asserts.fail("SupportedMaps must have unique Name values!")
-            else:
-                name_list.append(m.name)
+        
+        mapid_list = [m.mapID for m in supported_maps]
+        asserts.assert_true(len(set(mapid_list)) == len(mapid_list), "SupportedMaps must have unique MapID values!")
+
+        name_list = [m.name for m in supported_maps]
+        asserts.assert_true(len(set(name_list)) == len(name_list), "SupportedMaps must have unique Name values!")
+
         #save so other methods can use this if neeeded
         self.mapid_list = mapid_list
 
