@@ -122,8 +122,6 @@ public:
      */
     void HandleStartStateCallback(GenericOperationalError & err) override
     {
-        ChipLogDetail(AppServer,
-                    "------> [rmb] OperationalStateDelegate::HandleStartStateCallback called.");
         mCountDownTime.SetNonNull(static_cast<uint32_t>(kExampleCountDown));
         GenericOperationalStateDelegateImpl::HandleStartStateCallback(err);
     }
