@@ -118,6 +118,9 @@ class TC_OCC_2_1(MatterBaseTest):
             asserts.assert_greater_equal(hold_time_dut, 0, "HoldTime attribute is out of range")
         else:
             logging.info("HoldTime not supported. The rest of legacy attribute test can be skipped")
+            self.skip_all_remaining_steps(7)
+            return
+
 
         self.step(7)
         if attributes.PIROccupiedToUnoccupiedDelay.attribute_id in attribute_list:
