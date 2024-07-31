@@ -17,6 +17,7 @@
 #
 
 import base64
+import click
 import os
 import pathlib
 import sys
@@ -29,17 +30,19 @@ from chip.interaction_model import InteractionModelError, Status
 from MockTestRunner import AsyncMock, MockTestRunner
 
 try:
-    from matter_testing_support import get_default_paa_trust_store, run_tests_no_exit
+    from matter_testing_support import MatterTestConfig, get_default_paa_trust_store, run_tests_no_exit
 except ImportError:
     sys.path.append(os.path.abspath(
         os.path.join(os.path.dirname(__file__), '..')))
-    from matter_testing_support import get_default_paa_trust_store, run_tests_no_exit
+    from matter_testing_support import MatterTestConfig, get_default_paa_trust_store, run_tests_no_exit
 
 invoke_call_count = 0
 event_call_count = 0
 
 
 def dynamic_invoke_return(*args, **argv):
+    ''' Returns the response to a mocked SendCommand call.
+    '''
     global invoke_call_count
     invoke_call_count += 1
 
@@ -58,6 +61,8 @@ def dynamic_invoke_return(*args, **argv):
 
 
 def dynamic_event_return(*args, **argv):
+    ''' Returns the response to a mocked ReadEvent call.
+    '''
     global event_call_count
     event_call_count += 1
 
@@ -75,6 +80,12 @@ def dynamic_event_return(*args, **argv):
 
 
 def wildcard() -> Attribute.AsyncReadTransaction.ReadResponse:
+    ''' Returns the response to a wildcard read.
+        For this test, we just need descriptors and a few attributes
+        Tree
+        EP1 (Aggregator): Descriptor
+          - EP2 (Bridged Node): Descriptor, Bridged Device Basic Information, Ecosystem Information
+    '''
     cc = Clusters.CommissionerControl
     ei = Clusters.EcosystemInformation
     desc = Clusters.Descriptor
@@ -104,9 +115,20 @@ def wildcard() -> Attribute.AsyncReadTransaction.ReadResponse:
 
 
 class MyMock(MockTestRunner):
-    # TODO consolidate with above
     def run_test_with_mock(self, dynamic_invoke_return: typing.Callable, dynamic_event_return: typing.Callable, read_cache: Attribute.AsyncReadTransaction.ReadResponse, hooks=None):
-        ''' Effects is a list of callable functions with *args, **kwargs parameters. It can either throw an InteractionModelException or return the command response.'''
+        ''' Run the test using the Mocked versions of Read, SendCommand, OpenCommissioningWindow, FindOrEstablishPASESession and ReadEvent
+            dynamic_invoke_return: Callable function that returns the result of a SendCommand call
+                                   Function should return one of
+                                   - command response for commands with responses
+                                   - None for commands with success results
+                                   - raise InteractionModelError for error results
+            dynamic_event_return: Callable function that returns the result of a ReadEvent call
+                                  Function should return one of
+                                  - list of EventReadResult for successful reads
+                                  - raise InteractionModelError for error results
+            read_cache          : Response to a Read call. For this test, this will be the wildcard read of all teh attributes
+            hooks               : Test harness hook object if desired.
+        '''
         self.default_controller.Read = AsyncMock(return_value=read_cache)
         self.default_controller.SendCommand = AsyncMock(return_value=None, side_effect=dynamic_invoke_return)
         # It doesn't actually matter what we return here because I'm going to catch the next pase session connection anyway
@@ -118,7 +140,9 @@ class MyMock(MockTestRunner):
         return run_tests_no_exit(self.test_class, self.config, hooks, self.default_controller, self.stack)
 
 
-def main():
+@click.command()
+@click.argument('th_server_app', type=click.Path(exists=True))
+def main(th_server_app: str):
     root = os.path.abspath(os.path.join(pathlib.Path(__file__).resolve().parent, '..', '..', '..'))
     print(f'root = {root}')
     paa_path = get_default_paa_trust_store(root)
@@ -126,6 +150,9 @@ def main():
 
     pics = {"PICS_SDK_CI_ONLY": True}
     test_runner = MyMock('TC_MCORE_FS_1_1', 'TC_MCORE_FS_1_1', 'test_TC_MCORE_FS_1_1', 1, paa_trust_store_path=paa_path, pics=pics)
+    config = MatterTestConfig()
+    config.user_params = {'th_server_app_path': th_server_app}
+    test_runner.set_test_config(config)
 
     test_runner.run_test_with_mock(dynamic_invoke_return, dynamic_event_return, wildcard())
     test_runner.Shutdown()

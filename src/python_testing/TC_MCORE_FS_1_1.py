@@ -15,13 +15,10 @@
 #    limitations under the License.
 #
 
-# See https://github.com/project-chip/connectedhomeip/blob/master/docs/testing/python.md#defining-the-ci-test-arguments
-# for details about the block below.
-#
+# This test requires a TH_SERVER application. Please specify with --string-arg th_server_app_path:<path_to_app>
 
 import logging
 import os
-import pathlib
 import random
 import signal
 import subprocess
@@ -39,16 +36,14 @@ class TC_MCORE_FS_1_1(MatterBaseTest):
     @async_test_body
     async def setup_class(self):
         super().setup_class()
-        # TODO: This needs to come from an arg and needs to be something available on the TH
         # TODO: confirm whether we can open processes like this on the TH
-        # TODO: When bridge device is more stable switch from acll-clusters-app to bridge app.
-        app = os.path.join(pathlib.Path(__file__).resolve().parent, '..', '..', 'out',
-                           'linux-x64-all-clusters-no-ble', 'chip-all-clusters-app')
+        app = self.matter_test_config.user_params.get("th_server_app_path", None)
+        if not app:
+            asserts.fail('This test requires a TH_SERVER app. Specify app path with --string-arg th_server_app_path:<path_to_app>')
 
         self.kvs = f'kvs_{str(uuid.uuid4())}'
         self.port = 5543
         discriminator = random.randint(0, 4095)
-        discriminator = 3840
         passcode = 20202021
         app_args = f'--secured-device-port {self.port} --discriminator {discriminator} --passcode {passcode} --KVS {self.kvs}'
         cmd = f'{app} {app_args}'
@@ -72,7 +67,6 @@ class TC_MCORE_FS_1_1(MatterBaseTest):
         logging.warning("Stopping app with SIGTERM")
         self.app_process.send_signal(signal.SIGTERM.value)
         self.app_process.wait()
-        # TODO: Use timeout, if term doesn't work, try SIGINT
 
         os.remove(self.kvs)
         super().teardown_class()
