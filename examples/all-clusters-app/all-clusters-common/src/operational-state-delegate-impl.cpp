@@ -55,9 +55,6 @@ CHIP_ERROR GenericOperationalStateDelegateImpl::GetOperationalPhaseAtIndex(size_
 
 void GenericOperationalStateDelegateImpl::HandlePauseStateCallback(GenericOperationalError & err)
 {
-    ChipLogDetail(AppServer,
-                "------> [rmb] Received pause command in OpState delegate GenericOperationalStateDelegateImpl::HandlePauseStateCallback.");
-
     // placeholder implementation
     auto error = GetInstance()->SetOperationalState(to_underlying(OperationalState::OperationalStateEnum::kPaused));
     if (error == CHIP_NO_ERROR)
@@ -73,10 +70,6 @@ void GenericOperationalStateDelegateImpl::HandlePauseStateCallback(GenericOperat
 
 void GenericOperationalStateDelegateImpl::HandleResumeStateCallback(GenericOperationalError & err)
 {
-    // This gets called when it comes over the wire.
-    ChipLogDetail(AppServer,
-                "------> [rmb] Received resume command in OpState GenericOperationalStateDelegateImpl::HandleResumeStateCallback.");
-
     // placeholder implementation
     auto error = GetInstance()->SetOperationalState(to_underlying(OperationalStateEnum::kRunning));
     if (error == CHIP_NO_ERROR)
@@ -95,9 +88,6 @@ void GenericOperationalStateDelegateImpl::HandleStartStateCallback(GenericOperat
     OperationalState::GenericOperationalError current_err(to_underlying(OperationalState::ErrorStateEnum::kNoError));
     GetInstance()->GetCurrentOperationalError(current_err);
 
-    ChipLogDetail(AppServer,
-                "------> [rmb] Received start command in OpState delegate GenericOperationalStateDelegateImpl::HandleStartStateCallback.");
-
     if (current_err.errorStateID != to_underlying(OperationalState::ErrorStateEnum::kNoError))
     {
         err.Set(to_underlying(OperationalState::ErrorStateEnum::kUnableToStartOrResume));
@@ -109,8 +99,6 @@ void GenericOperationalStateDelegateImpl::HandleStartStateCallback(GenericOperat
     if (error == CHIP_NO_ERROR)
     {
         GetInstance()->UpdateCountdownTimeFromDelegate();
-        ChipLogDetail(AppServer,
-                    "------> [rmb] Starting timer tick.");
         (void) DeviceLayer::SystemLayer().StartTimer(System::Clock::Seconds16(1), onOperationalStateTimerTick, this);
         err.Set(to_underlying(ErrorStateEnum::kNoError));
     }
@@ -122,9 +110,6 @@ void GenericOperationalStateDelegateImpl::HandleStartStateCallback(GenericOperat
 
 void GenericOperationalStateDelegateImpl::HandleStopStateCallback(GenericOperationalError & err)
 {
-    ChipLogDetail(AppServer,
-                "------> [rmb] Received stop command in OpState delegate GenericOperationalStateDelegateImpl::HandleStopStateCallback.");
-
     // placeholder implementation
     auto error = GetInstance()->SetOperationalState(to_underlying(OperationalStateEnum::kStopped));
     if (error == CHIP_NO_ERROR)
@@ -155,9 +140,6 @@ static void onOperationalStateTimerTick(System::Layer * systemLayer, void * data
 {
     GenericOperationalStateDelegateImpl * delegate = reinterpret_cast<GenericOperationalStateDelegateImpl *>(data);
 
-    ChipLogDetail(AppServer,
-                "------> [rmb] Received a timer tick in onOperationalStateTimerTick timer callback.");
-
     OperationalState::Instance * instance = OperationalState::GetOperationalStateInstance();
     OperationalState::OperationalStateEnum state =
         static_cast<OperationalState::OperationalStateEnum>(instance->GetCurrentOperationalState());
@@ -168,21 +150,15 @@ static void onOperationalStateTimerTick(System::Layer * systemLayer, void * data
     {
         if (state == OperationalState::OperationalStateEnum::kRunning)
         {
-            ChipLogDetail(AppServer,
-                        "------> [rmb] Inrementing the running timer.");
             delegate->mRunningTime++;
         }
         else if (state == OperationalState::OperationalStateEnum::kPaused)
         {
-            ChipLogDetail(AppServer,
-                        "------> [rmb] Inrementing the paused timer.");
             delegate->mPausedTime++;
         }
     }
     else
     {
-        ChipLogDetail(AppServer,
-                    "------> [rmb] Operation complete, calling HandleStopStateCallback.");
         OperationalState::GenericOperationalError noError(to_underlying(OperationalState::ErrorStateEnum::kNoError));
         delegate->HandleStopStateCallback(noError);
     }

@@ -341,8 +341,6 @@ void AllClustersAppCommandHandler::HandleCommand(intptr_t context)
     }
     else if (name == "OperationalStateChange")
     {
-        ChipLogDetail(AppServer,
-                    "------> [rmb] Got some OperationalStateChange command in AllClustersAppCommandHandler::HandleCommand");
         std::string device    = self->mJsonValue["Device"].asString();
         std::string operation = self->mJsonValue["Operation"].asString();
         // Should this go to the delegate and not the "base"
@@ -637,9 +635,6 @@ void AllClustersAppCommandHandler::OnGenericOperationalStateChange(std::string d
     OperationalState::GenericOperationalError noError(to_underlying(OperationalState::ErrorStateEnum::kNoError));
     if (operation == "Start")
     {
-        ChipLogDetail(AppServer,
-            "------> [rmb] AllClustersAppCommandHandler::OnOperationalStateChange, calling SetOperationalState in instance.");
-
         operationalStateDelegate->HandleStartStateCallback(noError);
     }
     else if (operation == "Resume")
@@ -678,9 +673,6 @@ void AllClustersAppCommandHandler::OnOvenOperationalStateChange(std::string devi
     OperationalState::Instance * operationalStateInstance = OvenCavityOperationalState::GetOperationalStateInstance();
     if (operation == "Start" || operation == "Resume")
     {
-        ChipLogDetail(AppServer,
-            "------> [rmb] AllClustersAppCommandHandler::OnOperationalStateChange, calling SetOperationalState in instance.");
-
         // operationalStateInstance->SetOperationalState(to_underlying(OperationalState::OperationalStateEnum::kRunning));
         operationalStateInstance->SetOperationalState(to_underlying(OperationalState::OperationalStateEnum::kRunning));
     }
