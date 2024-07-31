@@ -1323,8 +1323,8 @@ class TC_OPSTATE_BASE():
         self.step(8)
         if self.pics_guard(self.check_pics(f"{self.test_info.pics_code}.S.M.ST_PAUSED")):
             self.send_manual_or_pipe_command(name="OperationalStateChange",
-                                                device=self.device,
-                                                operation="Pause")
+                                             device=self.device,
+                                             operation="Pause")
             time.sleep(1)
             count = sub_handler.attribute_report_counts[attributes.CountdownTime]
             asserts.assert_greater(count, 0, "Did not receive any reports for CountdownTime")
