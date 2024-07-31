@@ -121,8 +121,7 @@ class TC_BRBINFO_4_1(MatterBaseTest):
         self.port = 5543
         discriminator = 3850
         passcode = 20202021
-        app_args = f'--secured-device-port {self.port} --discriminator {discriminator} --passcode {passcode} --KVS {self.kvs} ' + \
-            '--secured-device-port 5545'
+        app_args = f'--secured-device-port {self.port} --discriminator {discriminator} --passcode {passcode} --KVS {self.kvs} '
         cmd = f'{app} {app_args}'
 
         logging.info("Starting ICD Server App")
