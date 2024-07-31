@@ -1255,8 +1255,6 @@ class TC_OPSTATE_BASE():
         # To-Do: Update the TP to subscribe-all.
         self.step(2)
         sub_handler = ClusterAttributeChangeAccumulator(cluster)
-        logging.info(f'---------> dut node id: {self.dut_node_id}')
-        logging.info(f'---------> endpoint: {endpoint}')
         await sub_handler.start(self.default_controller, self.dut_node_id, endpoint)
 
         self.step(3)
