@@ -38,8 +38,17 @@ struct LocationStructureWrapper : public chip::app::Clusters::ServiceArea::Struc
 {
     LocationStructureWrapper()
     {
-        Set(0, 0, CharSpan(), DataModel::Nullable<int16_t>(), DataModel::Nullable<AreaTypeTag>(),
-            DataModel::Nullable<LandmarkTag>(), DataModel::Nullable<PositionTag>(), DataModel::Nullable<FloorSurfaceTag>());
+        SetLocationID(0);
+        SetMapID(DataModel::Nullable<uint8_t>());
+        SetLandmarkTag(DataModel::Nullable<LandmarkTag>());
+        SetPositionTag(DataModel::Nullable<PositionTag>());
+        SetSurfaceTag(DataModel::Nullable<FloorSurfaceTag>());
+
+        // 'true' forces the 'canonical' form specified by the cluster requirements
+        // where the LocationDescriptorStruct is null if all it's elements are/would be empty or null.
+        SetLocationName(CharSpan(mLocationNameBuffer, 0), true);
+        SetFloorNumber(DataModel::Nullable<int16_t>(), true);
+        SetAreaType(DataModel::Nullable<AreaTypeTag>(), true);
     }
 
     /**
@@ -48,7 +57,7 @@ struct LocationStructureWrapper : public chip::app::Clusters::ServiceArea::Struc
      * @param[in] aMapId The identifier of the supported map associated with this location.
      * @param[in] aLocationName A human readable name for this location (empty string if not used).
      * @param[in] aFloorNumber The floor level of this location - use negative values for below ground.
-     * @param[in] aAreaTypeTag A common namespace Area tag - indicates an association of the location with an indoor or outdoor area
+     * @param[in] aAreaType A common namespace Area tag - indicates an association of the location with an indoor or outdoor area
      * of a home.
      * @param[in] aLandmarkTag A common namespace Landmark tag - indicates an association of the location with a home landmark.
      * @param[in] aPositionTag A common namespace Position tag - indicates the position of the location with respect to the
@@ -57,16 +66,28 @@ struct LocationStructureWrapper : public chip::app::Clusters::ServiceArea::Struc
      *
      * @note Requirements regarding what combinations of fields and values are valid are not checked by this class.
      * @note If aLocationName is larger than kLocationNameMaxSize, it will be truncated.
-     * @note If aLocationName is an empty string and aFloorNumber and aAreaTypeTag are null, locationInfo will be set to null.
+     * @note If aLocationName is an empty string and aFloorNumber and aAreaType are null, locationInfo.locationinfo will be set to null.
      */
-    LocationStructureWrapper(uint32_t aLocationId, const DataModel::Nullable<uint8_t> & aMapId, const CharSpan & aLocationName,
+    LocationStructureWrapper(uint32_t aLocationId, 
+                             const DataModel::Nullable<uint8_t> & aMapId, 
+                             const CharSpan & aLocationName,
                              const DataModel::Nullable<int16_t> & aFloorNumber,
-                             const DataModel::Nullable<AreaTypeTag> & aAreaTypeTag,
+                             const DataModel::Nullable<AreaTypeTag> & aAreaType,
                              const DataModel::Nullable<LandmarkTag> & aLandmarkTag,
                              const DataModel::Nullable<PositionTag> & aPositionTag,
                              const DataModel::Nullable<FloorSurfaceTag> & aSurfaceTag)
     {
-        Set(aLocationId, aMapId, aLocationName, aFloorNumber, aAreaTypeTag, aLandmarkTag, aPositionTag, aSurfaceTag);
+        SetLocationID(aLocationId);
+        SetMapID(aMapId);
+        SetLandmarkTag(aLandmarkTag);
+        SetPositionTag(aPositionTag);
+        SetSurfaceTag(aSurfaceTag);
+
+        // 'true' forces the 'canonical' form specified by the cluster requirements
+        // where the LocationDescriptorStruct is null if all it's elements are/would be empty or null.
+        SetLocationName(aLocationName, true);
+        SetFloorNumber(aFloorNumber, true);
+        SetAreaType(aAreaType, true );
     }
 
     /**
@@ -83,69 +104,76 @@ struct LocationStructureWrapper : public chip::app::Clusters::ServiceArea::Struc
      * values are deep copied.
      * @param[in] aOther The location object to copy.
      *
-     * @note If the locationName is empty string and aFloorNumber and aAreaTypeTag are null, locationInfo will be set to null.
+     * @note This will do an EXACT copy of the other object. 
      */
     LocationStructureWrapper & operator=(const LocationStructureWrapper & aOther)
     {
-        if (aOther.locationInfo.locationInfo.IsNull())
+        SetLocationID(aOther.locationID);
+        SetMapID(aOther.mapID);
+        SetLandmarkTag(aOther.locationInfo.landmarkTag);
+        SetPositionTag(aOther.locationInfo.positionTag);
+        SetSurfaceTag(aOther.locationInfo.surfaceTag);
+
+        if (!aOther.locationInfo.locationInfo.IsNull())
         {
-            Set(aOther.locationID, aOther.mapID, CharSpan(), NullOptional, NullOptional, aOther.locationInfo.landmarkTag,
-                aOther.locationInfo.positionTag, aOther.locationInfo.surfaceTag);
-        }
-        else
-        {
-            Set(aOther.locationID, aOther.mapID, aOther.locationInfo.locationInfo.Value().locationName,
-                aOther.locationInfo.locationInfo.Value().floorNumber, aOther.locationInfo.locationInfo.Value().areaType,
-                aOther.locationInfo.landmarkTag, aOther.locationInfo.positionTag, aOther.locationInfo.surfaceTag);
+            // 'true' forces the 'canonical' form specified by the cluster requirements
+            // where the LocationDescriptorStruct is null if all it's elements are/would be empty or null.
+            // We want an exact copy for "=", so that option is disabled here.
+            SetLocationName(aOther.locationInfo.locationInfo.Value().locationName, false);
+            SetFloorNumber(aOther.locationInfo.locationInfo.Value().floorNumber, false);
+            SetAreaType(aOther.locationInfo.locationInfo.Value().areaType, false);
         }
 
         return *this;
     }
 
     /**
-     * @brief Set all fields of the location object. All values are deep copied.
+     * @brief setter for locationID
      * @param[in] aLocationId The unique identifier of this location.
-     * @param[in] aMapId The identifier of the supported map associated with this location.
-     * @param[in] aLocationName A human readable name for this location (empty string if not used).
-     * @param[in] aFloorNumber The floor level of this location - use negative values for below ground.
-     * @param[in] aAreaTypeTag A common namespace Area tag - indicates an association of the location with an indoor or outdoor area
-     * of a home.
-     * @param[in] aLandmarkTag A common namespace Landmark tag - indicates an association of the location with a home landmark.
-     * @param[in] aPositionTag A common namespace Position tag - indicates the position of the location with respect to the
-     * landmark.
-     * @param[in] aSurfaceTag A common namespace Floor Surface tag - indicates an association of the location with a surface type.
-     *
-     * @note Requirements regarding what combinations of fields and values are valid are not checked by this class.
-     * @note If aLocationName is larger than kLocationNameMaxSize, it will be truncated.
-     * @note If aLocationName is an empty string and aFloorNumber and aAreaTypeTag are null, locationInfo will be set to null.
      */
-    void Set(uint32_t aLocationId, const DataModel::Nullable<uint8_t> & aMapId, const CharSpan & aLocationName,
-             const DataModel::Nullable<int16_t> & aFloorNumber, const DataModel::Nullable<AreaTypeTag> & aAreaType,
-             const DataModel::Nullable<LandmarkTag> & aLandmarkTag, const DataModel::Nullable<PositionTag> & aPositionTag,
-             const DataModel::Nullable<FloorSurfaceTag> & aSurfaceTag)
+    void SetLocationID(uint32_t aLocationId)
     {
         locationID = aLocationId;
-        mapID      = aMapId;
+    }
 
-        // If there is at least one non-null value for locationInfo, add it to the location structure.
-        if ((!aLocationName.empty()) || (!aFloorNumber.IsNull()) || (!aAreaType.IsNull()))
+    /**
+     * @brief setter for mapID
+     * @param[in] aMapId The identifier of the supported map associated with this location.
+     */
+    void SetMapID(const DataModel::Nullable<uint8_t> & aMapId)
+    {
+        mapID = aMapId;
+    }
+
+    /**
+     * @brief setter for location name
+     * @param[in] aLocationName A human readable name for this location (empty string if not used).
+     * @param[in] doInfoStructCleanup If true, locationInfo.locationInfo will be set to null if
+     *            aLocationName is an empty string and floorNumber and areaType are null.
+     *            This generates the 'canonical' form specified by the cluster requirements.
+     * @note If aLocationName is larger than kLocationNameMaxSize, it will be truncated.
+     */
+    void SetLocationName(const CharSpan & aLocationName, bool doInfoStructCleanup)
+    {
+        // does the locationInfo structure need to be added?
+        if ((!aLocationName.empty()) && 
+            (locationInfo.locationInfo.IsNull()))
         {
-            // Create a home location info structure and fill it in except for the location name. This is done below.
+            // Create a location info structure
             locationInfo.locationInfo.SetNonNull(Structs::LocationDescriptorStruct::Type());
-
-            locationInfo.locationInfo.Value().floorNumber = aFloorNumber;
-            locationInfo.locationInfo.Value().areaType    = aAreaType;
         }
-        else
+
+        // does the locationInfo structure need to be removed and set to NULL?
+        if ((doInfoStructCleanup) &&
+            (aLocationName.empty()) && 
+            (!locationInfo.locationInfo.IsNull()) && 
+            (locationInfo.locationInfo.Value().floorNumber.IsNull()) &&
+            (locationInfo.locationInfo.Value().areaType.IsNull()))
         {
             locationInfo.locationInfo.SetNull();
         }
 
-        locationInfo.landmarkTag = aLandmarkTag;
-        locationInfo.positionTag = aPositionTag;
-        locationInfo.surfaceTag  = aSurfaceTag;
-
-        // this assumes locationInfo structure was created above, if appropriate
+        // if locationInfo.locationInfo structure exists update the location name (non-existance implies location name is empty)
         if (!locationInfo.locationInfo.IsNull())
         {
             if (aLocationName.empty())
@@ -165,6 +193,104 @@ struct LocationStructureWrapper : public chip::app::Clusters::ServiceArea::Struc
                 locationInfo.locationInfo.Value().locationName = CharSpan(mLocationNameBuffer, aLocationName.size());
             }
         }
+    }
+
+    /**
+     * @brief setter for floor number
+     * @param[in] aFloorNumber The floor level of this location - use negative values for below ground.
+     * @param[in] doInfoStructCleanup If true, locationInfo.locationInfo will be set to null if
+     *            aFloorNumber is null, locationName is an empty string and areaType is null.
+     *            This generates the 'canonical' form specified by the cluster requirements.
+     */
+    void SetFloorNumber(const DataModel::Nullable<int16_t> & aFloorNumber, bool doInfoStructCleanup)
+    {
+        // does the locationInfo structure need to be added?
+        if ((!aFloorNumber.IsNull()) && 
+            (locationInfo.locationInfo.IsNull()))
+        {
+            // Create a location info structure
+            locationInfo.locationInfo.SetNonNull(Structs::LocationDescriptorStruct::Type());
+        }
+
+        // does the locationInfo structure need to be removed and set to NULL?
+        if ((doInfoStructCleanup) &&
+            (aFloorNumber.IsNull()) &&
+            (!locationInfo.locationInfo.IsNull()) && 
+            (locationInfo.locationInfo.Value().locationName.size() == 0) && 
+            (locationInfo.locationInfo.Value().areaType.IsNull()))
+        {
+            locationInfo.locationInfo.SetNull();
+        }
+
+        // if locationInfo structure exists update the floor number (non-existance implies floor number is null)
+        if (!locationInfo.locationInfo.IsNull())
+        {
+            locationInfo.locationInfo.Value().floorNumber = aFloorNumber;
+        }
+    }
+
+    /**
+     * @brief setter for area type
+     * @param[in] aAreaType common namespace Area tag - indicates an association of the location with an indoor or outdoor area
+     * of a home.
+     * @param[in] doInfoStructCleanup If true, locationInfo.locationInfo will be set to null if
+     *            aAreaType and floorNumber are null, and locationName is an empty string
+     *            This generates the 'canonical' form specified by the cluster requirements.
+     */
+    void SetAreaType(const DataModel::Nullable<AreaTypeTag> & aAreaType, bool doInfoStructCleanup)
+    {
+        // does the locationInfo structure need to be added?
+        if ((!aAreaType.IsNull()) && 
+            (locationInfo.locationInfo.IsNull()))
+        {
+            // Create a location info structure
+            locationInfo.locationInfo.SetNonNull(Structs::LocationDescriptorStruct::Type());
+        }
+
+        // does the locationInfo structure need to be removed and set to NULL?
+        if ((doInfoStructCleanup) &&
+            (aAreaType.IsNull()) &&
+            (!locationInfo.locationInfo.IsNull()) && 
+            (locationInfo.locationInfo.Value().locationName.size() == 0) && 
+            (locationInfo.locationInfo.Value().areaType.IsNull()))
+        {
+            locationInfo.locationInfo.SetNull();
+        }
+
+        // if locationInfo structure exists update the area type (non-existance implies area type is null)
+        if (!locationInfo.locationInfo.IsNull())
+        {
+            locationInfo.locationInfo.Value().areaType = aAreaType;
+        }
+    }
+
+    /**
+     * @brief setter for landmark tag
+     * @param[in] aLandmarkTag A common namespace Landmark tag - indicates an association of the location with a home landmark.
+     */
+    void SetLandmarkTag(const DataModel::Nullable<LandmarkTag> & aLandmarkTag)
+    {
+        locationInfo.landmarkTag = aLandmarkTag;
+    }
+
+    /**
+     * @brief setter for position tag
+     * @param[in] aPositionTag A common namespace Position tag - indicates the position of the location with respect to the
+     * landmark.
+     */
+    void SetPositionTag(const DataModel::Nullable<PositionTag> & aPositionTag)
+    {
+        locationInfo.positionTag = aPositionTag;
+    }
+
+
+    /**
+     * @brief setter for surface tag
+     * @param[in] aSurfaceTag A common namespace Floor Surface tag - indicates an association of the location with a surface type.
+     */
+    void SetSurfaceTag(const DataModel::Nullable<FloorSurfaceTag> & aSurfaceTag)
+    {
+        locationInfo.surfaceTag  = aSurfaceTag;
     }
 
     /**
