@@ -8813,14 +8813,23 @@ endpoint 1 {
     ram      attribute minSetpointDeadBand default = 0x19;
     ram      attribute controlSequenceOfOperation default = 0x04;
     ram      attribute systemMode default = 0x01;
+    callback attribute presetTypes;
+    ram      attribute numberOfPresets default = 0;
+    ram      attribute activePresetHandle;
+    callback attribute presets;
+    ram      attribute presetsSchedulesEditable;
     callback attribute generatedCommandList;
     callback attribute acceptedCommandList;
     callback attribute eventList;
     callback attribute attributeList;
-    ram      attribute featureMap default = 0x0023;
+    ram      attribute featureMap default = 0x0123;
     ram      attribute clusterRevision default = 6;
 
     handle command SetpointRaiseLower;
+    handle command SetActivePresetRequest;
+    handle command StartPresetsSchedulesEditRequest;
+    handle command CancelPresetsSchedulesEditRequest;
+    handle command CommitPresetsSchedulesRequest;
   }
 
   server cluster FanControl {
