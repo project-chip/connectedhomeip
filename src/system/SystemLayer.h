@@ -293,7 +293,17 @@ public:
 class LayerSocketsLoop;
 
 /**
- * Enables the participation of subordinate event loops in the SystemLayer event loop.
+ * EventLoopHandlers can be registered with a LayerSocketsLoop instance to enable
+ * participation of those handlers in the processing cycle of the event loop. This makes
+ * it possible to implement adapters that allow components utilizing a third-party event
+ * loop API to participate in the Matter event loop, instead of having to run an entirely
+ * separate event loop on another thread.
+ *
+ * Specifically, the `PrepareEvents` and `HandleEvents` methods of registered event loop
+ * handlers will be called from the LayerSocketsLoop methods of the same names.
+ *
+ * @see LayerSocketsLoop::PrepareEvents
+ * @see LayerSocketsLoop::HandleEvents
  */
 class EventLoopHandler : public chip::IntrusiveListNodeBase<>
 {
@@ -312,8 +322,10 @@ public:
     virtual void HandleEvents() = 0;
 
 private:
+    // mState is provided exclusively for use by the LayerSocketsLoop implementation
+    // sub-class and can be accessed by it via the LayerSocketsLoop::LoopHandlerState() helper.
     friend class LayerSocketsLoop;
-    intptr_t mState = 0; // For use by the event loop implementation
+    intptr_t mState = 0;
 };
 
 class LayerSocketsLoop : public LayerSockets
@@ -340,7 +352,7 @@ public:
 #endif // CHIP_SYSTEM_CONFIG_USE_DISPATCH/LIBEV
 
 protected:
-    // Expose EventLoopHandler.mState to sub-classes
+    // Expose EventLoopHandler.mState as a non-const reference to sub-classes
     decltype(EventLoopHandler::mState) & LoopHandlerState(EventLoopHandler & handler) { return handler.mState; }
 };
 
