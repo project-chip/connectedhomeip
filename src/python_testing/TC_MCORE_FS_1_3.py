@@ -65,7 +65,8 @@ class TC_MCORE_FS_1_3(MatterBaseTest):
             asserts.fail('This test requires a TH_SERVER app. Specify app path with --string-arg th_server_app_path:<path_to_app>')
 
         self.device_for_dut_eco_kvs = f'kvs_{str(uuid.uuid4())}'
-        discriminator = random.randint(0, 4095)
+        # This discriminator is fixed so we can rely on pregenerated QR code
+        discriminator = 3840
         passcode = 20202021
         app_args = f'--secured-device-port {self.device_for_dut_eco_port} --discriminator {discriminator} --passcode {passcode} --KVS {self.device_for_dut_eco_kvs}'
         cmd = f'{app} {app_args}'
@@ -118,13 +119,19 @@ class TC_MCORE_FS_1_3(MatterBaseTest):
         root_part_list = await self.read_single_attribute_check_success(cluster=Clusters.Descriptor, attribute=Clusters.Descriptor.Attributes.PartsList, endpoint=root_node_endpoint)
         set_of_endpoints_before_adding_device = set(root_part_list)
 
-        discriminator, setup_pin_code = await self.create_device_for_dut_ecosystem()
+        discriminator, passcode = await self.create_device_for_dut_ecosystem()
+        # To prevent need for runtime QR code generation test makes some assumptions
+        # about the app that it valiudates here.
+        asserts.assert_equal(discriminator, 3840, "Test implementation assumption incorrect for discriminator")
+        asserts.assert_equal(passcode, 3840, "Test implementation assumption incorrect for passcode")
+        setup_qrcode = "MT:Y.K90-Q000KA0648G00"
         self.wait_for_user_input(
             prompt_msg=f"Using the DUT vendor's provided interface, commission the device using the following parameters:\n"
             f"- discriminator: {discriminator}\n"
-            f"- setupPinCode: {setup_pin_code}\n"
+            f"- passcode: {passcode}\n"
+            f"- setupPinCode: {setup_qrcode}\n"
             f"If using FabricSync Admin, you may type:\n"
-            f">>> pairing onnetwork 111 {setup_pin_code}")
+            f">>> pairing onnetwork 111 {setup_qrcode}")
 
         root_part_list = await self.read_single_attribute_check_success(cluster=Clusters.Descriptor, attribute=Clusters.Descriptor.Attributes.PartsList, endpoint=root_node_endpoint)
         set_of_endpoints_after_adding_device = set(root_part_list)
