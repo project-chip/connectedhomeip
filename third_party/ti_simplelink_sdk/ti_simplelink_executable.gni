@@ -484,6 +484,9 @@ template("ti_simplelink_executable") {
     } else {
       # The executable is the final target.
       data_deps = [ ":${simplelink_target_name}.out" ]
+      if (custom_factory_data) {
+        data_deps += [ ":${simplelink_target_name}-and-factory-data.hex" ]
+      }
     }
 
     if (defined(invoker.data_deps)) {
