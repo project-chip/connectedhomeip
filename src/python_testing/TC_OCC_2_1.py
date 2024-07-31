@@ -108,6 +108,7 @@ class TC_OCC_2_1(MatterBaseTest):
 
         else:
             logging.info("HoldTimeLimits not supported. Test step skipped")
+            self.mark_current_step_skipped()
         
         self.step(6)
         if attributes.HoldTime.attribute_id in attribute_list:
