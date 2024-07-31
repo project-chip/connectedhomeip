@@ -270,7 +270,7 @@ class TC_SwitchTests(MatterBaseTest):
     @per_endpoint_test(has_feature(Clusters.Switch, Clusters.Switch.Bitmaps.Feature.kMomentarySwitch))
     async def test_TC_SWTCH_2_4(self):
         # TODO: Make this come from PIXIT
-        switch_pressed_position = 1
+        switch_pressed_position                          = 1
         post_prompt_settle_delay_seconds = 10.0
 
         # Commission DUT - already done
