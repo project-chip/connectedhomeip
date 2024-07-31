@@ -369,7 +369,7 @@ static void reallyUpdateCoupledColorTemp(EndpointId endpoint)
 /*
  * @brief
  * This function is used to update the current level attribute
- * while respecting it's defined quiet reporting quality:
+ * while respecting its defined quiet reporting quality:
  * The attribute will be reported:
  * - At most once per second, or
  * - At the start of the movement/transition, or
@@ -386,8 +386,7 @@ static Status SetCurrentLevelQuietReport(EndpointId endpoint, EmberAfLevelContro
                                          DataModel::Nullable<uint8_t> newValue, bool isStartOrEndOfTransition)
 {
     AttributeDirtyState dirtyState;
-    MarkAttributeDirty markDirty = MarkAttributeDirty::kNo;
-    auto now                     = System::SystemClock().GetMonotonicTimestamp();
+    auto now = System::SystemClock().GetMonotonicTimestamp();
 
     if (isStartOrEndOfTransition)
     {
@@ -406,9 +405,10 @@ static Status SetCurrentLevelQuietReport(EndpointId endpoint, EmberAfLevelContro
         dirtyState     = state->quietCurrentLevel.SetValue(newValue, now, predicate);
     }
 
+    MarkAttributeDirty markDirty = MarkAttributeDirty::kNo;
     if (dirtyState == AttributeDirtyState::kMustReport)
     {
-        markDirty = MarkAttributeDirty::kIfChanged;
+        markDirty = MarkAttributeDirty::kYes;
     }
     return Attributes::CurrentLevel::Set(endpoint, state->quietCurrentLevel.value(), markDirty);
 }
@@ -542,7 +542,7 @@ static void writeRemainingTime(EndpointId endpoint, uint16_t remainingTimeMs)
         // - kMarkDirtyOnIncrement : When the value increases.
         if (state->quietRemainingTime.SetValue(remainingTimeDs, now) == AttributeDirtyState::kMustReport)
         {
-            markDirty = MarkAttributeDirty::kIfChanged;
+            markDirty = MarkAttributeDirty::kYes;
         }
 
         Attributes::RemainingTime::Set(endpoint, state->quietRemainingTime.value().ValueOr(0), markDirty);
