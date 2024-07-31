@@ -34,8 +34,6 @@
 #include <protocols/Protocols.h>
 #include <transport/SessionManager.h>
 
-#include <typeinfo>
-
 namespace chip {
 
 namespace Messaging {
