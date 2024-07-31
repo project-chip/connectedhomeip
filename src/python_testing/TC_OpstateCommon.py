@@ -1082,6 +1082,7 @@ class TC_OPSTATE_BASE():
 
             # STEP 7: TH waits for initial-countdown-time
             self.step(7)
+            logging.info(f'Sleeping for {initial_countdown_time:.1f} seconds.')
             time.sleep(initial_countdown_time)
 
             # STEP 8: TH sends Stop command to the DUT

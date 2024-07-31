@@ -632,6 +632,8 @@ void AllClustersAppCommandHandler::OnGenericOperationalStateChange(std::string d
     OperationalState::Instance * operationalStateInstance                 = OperationalState::GetOperationalStateInstance();
     OperationalState::OperationalStateDelegate * operationalStateDelegate = OperationalState::GetOperationalStateDelegate();
     OperationalState::GenericOperationalError noError(to_underlying(OperationalState::ErrorStateEnum::kNoError));
+    OperationalState::OperationalStateEnum state =
+        static_cast<OperationalState::OperationalStateEnum>(operationalStateInstance->GetCurrentOperationalState());
     if (operation == "Start")
     {
         operationalStateDelegate->HandleStartStateCallback(noError);
@@ -644,13 +646,12 @@ void AllClustersAppCommandHandler::OnGenericOperationalStateChange(std::string d
     {
         operationalStateDelegate->HandlePauseStateCallback(noError);
     }
-    else if (operation == "Stop")
+    else if (operation == "Stop" && state == OperationalState::OperationalStateEnum::kRunning)
     {
         operationalStateDelegate->HandleStopStateCallback(noError);
     }
     else if (operation == "OnFault")
     {
-
         uint8_t event_id = to_underlying(OperationalState::ErrorStateEnum::kUnableToCompleteOperation);
         if (!param.isNull())
         {
