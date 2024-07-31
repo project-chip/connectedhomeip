@@ -98,10 +98,6 @@ class TC_SEAR_1_6(MatterBaseTest):
         # Ensure that the device is in the correct state
         if self.is_ci:
             self.write_to_app_pipe('{"Name": "Reset"}')
-
-        #FIXME is this necesssary? I'm not sure what TC_SEAR_1_6() is used for
-        if not self.check_pics("SEAR.S.A0005"):
-            return
         
         test_step = "Manually intervene to put the device in the idle state and ensure SupportedAreas and SelectedAreas are not empty"
         self.print_step("2", test_step)
