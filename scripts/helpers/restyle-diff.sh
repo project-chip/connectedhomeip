@@ -1,7 +1,7 @@
 #!/usr/bin/env bash
 
 #
-# Copyright (c) 2020 Project CHIP Authors
+# Copyright (c) 2024 Project CHIP Authors
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -21,10 +21,11 @@
 #  you've written is kosher to CI
 #
 # Usage:
-#  restyle-diff.sh [-d] [ref]
+#  restyle-diff.sh [-d] [-p] [ref]
 #
 # if unspecified, ref defaults to upstream/master (or master)
 # -d sets container's log level to DEBUG, if unspecified the default log level will remain (info level)
+# -p pulls the Docker image before running the restyle paths
 #
 
 here=${0%/*}
@@ -45,31 +46,65 @@ docker_run() {
 }
 
 restyle-paths() {
-
     image=restyled/restyler:edge
+    batch_size=4
+    batch=()
 
     for path in "$@"; do
-        (
-            docker_run --tty --interactive --rm \
-                --env LOG_LEVEL \
-                --env LOG_DESTINATION \
-                --env LOG_FORMAT \
-                --env LOG_COLOR \
-                --env HOST_DIRECTORY="$PWD" \
-                --env UNRESTRICTED=1 \
-                --volume "$PWD":/code \
-                --volume /tmp:/tmp \
-                --volume /var/run/docker.sock:/var/run/docker.sock \
-                --entrypoint restyle-path \
-                "$image" "$path"
-        )
+        batch+=("$path")
+        if [[ ${#batch[@]} -eq $batch_size ]]; then
+            for p in "${batch[@]}"; do
+                (
+                    docker_run \
+                        --env LOG_LEVEL \
+                        --env LOG_DESTINATION \
+                        --env LOG_FORMAT \
+                        --env LOG_COLOR \
+                        --env HOST_DIRECTORY="$PWD" \
+                        --env UNRESTRICTED=1 \
+                        --volume "$PWD":/code \
+                        --volume /tmp:/tmp \
+                        --volume /var/run/docker.sock:/var/run/docker.sock \
+                        --entrypoint restyle-path \
+                        "$image" "$p"
+                ) &
+            done
+            wait
+            batch=()
+        fi
     done
+
+    if [[ ${#batch[@]} -gt 0 ]]; then
+        for p in "${batch[@]}"; do
+            (
+                docker_run \
+                    --env LOG_LEVEL \
+                    --env LOG_DESTINATION \
+                    --env LOG_FORMAT \
+                    --env LOG_COLOR \
+                    --env HOST_DIRECTORY="$PWD" \
+                    --env UNRESTRICTED=1 \
+                    --volume "$PWD":/code \
+                    --volume /tmp:/tmp \
+                    --volume /var/run/docker.sock:/var/run/docker.sock \
+                    --entrypoint restyle-path \
+                    "$image" "$p"
+            ) &
+        done
+        wait
+    fi
 }
+
+pull_image=0
 
 while [[ $# -gt 0 ]]; do
     case "$1" in
         -d)
             export LOG_LEVEL="DEBUG"
+            shift
+            ;;
+        -p)
+            pull_image=1
             shift
             ;;
         *)
@@ -81,7 +116,11 @@ done
 
 if [[ -z "$ref" ]]; then
     ref="master"
-    git remote | grep -qxF upstream && ref="upstream/master"
+    git remote | grep -qxF upstream && ref="upstream/master" && git fetch upstream
+fi
+
+if [[ $pull_image -eq 1 ]]; then
+    docker pull restyled/restyler:edge
 fi
 
 mapfile -t paths < <(git diff --ignore-submodules --name-only --merge-base "$ref")
