@@ -25,7 +25,6 @@
 import ipaddress
 import logging
 import os
-import pathlib
 import random
 import signal
 import subprocess
