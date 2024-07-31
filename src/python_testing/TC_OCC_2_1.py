@@ -201,6 +201,7 @@ class TC_OCC_2_1(MatterBaseTest):
                 logging.info("UltrasonicUnoccupiedToOccupiedThreshold conformance failed. Test step skipped")
         else:
             logging.info("UltrasonicUnoccupiedToOccupiedThreshold not supported. Test step skipped")
+            self.mark_current_step_skipped()
 
         self.step(13)
         if attributes.PhysicalContactOccupiedToUnoccupiedDelay.attribute_id in attribute_list:
