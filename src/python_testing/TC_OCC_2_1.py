@@ -89,6 +89,7 @@ class TC_OCC_2_1(MatterBaseTest):
             asserts.assert_less_equal(occupancy_sensor_type_bitmap_dut, 0b00000111, "OccupancySensorTypeBitmap attribute is not in valid range")
         else:
             logging.info("OccupancySensorTypeBitmap attribute is a mandatory attribute. Test step fails")
+            asserts.fail("Missing mandatory attribute OccupancySensorTypeBitmap")
 
         self.step(5)
         if attributes.HoldTimeLimits.attribute_id in attribute_list:
