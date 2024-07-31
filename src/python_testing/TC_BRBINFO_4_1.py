@@ -36,6 +36,7 @@ from mobly import asserts
 logger = logging.getLogger(__name__)
 _ROOT_ENDPOINT_ID = 0
 
+
 class TC_BRBINFO_4_1(MatterBaseTest):
 
     #
