@@ -976,6 +976,9 @@ static auto __attribute__((unused)) EnsureKnownEnumValue(GeneralCommissioning::C
     case EnumType::kInvalidAuthentication:
     case EnumType::kNoFailSafe:
     case EnumType::kBusyWithOtherAdmin:
+    case EnumType::kRequiredTCNotAccepted:
+    case EnumType::kTCAcknowledgementsNotReceived:
+    case EnumType::kTCMinVersionNotMet:
         return val;
     default:
         return EnumType::kUnknownEnumValue;
