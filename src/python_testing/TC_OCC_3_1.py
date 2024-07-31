@@ -22,6 +22,10 @@
 # test-runner-run/run1/app-args: --discriminator 1234 --KVS kvs1 --trace-to json:${TRACE_APP}.json
 # test-runner-run/run1/script-args: --storage-path admin_storage.json --commissioning-method on-network --discriminator 1234 --passcode 20202021 --trace-to json:${TRACE_TEST_JSON}.json --trace-to perfetto:${TRACE_TEST_PERFETTO}.perfetto
 # === END CI TEST ARGUMENTS ===
+#  There are CI issues to be followed up for the test cases below that implements manually controlling sensor device for 
+#  the occupancy state ON/OFF change.
+#  [TC-OCC-3.1] test procedure step 4
+#  [TC-OCC-3.2] test precedure step 3c
 
 import logging
 import time
