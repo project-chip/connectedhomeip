@@ -104,11 +104,9 @@ tests:
       timedInteractionTimeoutMs: 1000
       arguments:
           values:
-              - name: "CredentialType"
-                value: null
-              - name: "CredentialIndex"
-                value: 0xFFFE
-
+              - name: "Credential"
+                value: { CredentialType: null, CredentialIndex: 0xFFFE }
+           
     - label: "Step 2a: TH sends ClearAliroReaderConfig Command to DUT to clear any existing Aliro Configuration"
       command: "ClearAliroReaderConfig"
 
