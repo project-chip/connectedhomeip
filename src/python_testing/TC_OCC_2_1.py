@@ -175,6 +175,7 @@ class TC_OCC_2_1(MatterBaseTest):
                 logging.info("UltrasonicOccupiedToUnoccupiedDelay conformance failed. Test step skipped")
         else:
             logging.info("UltrasonicOccupiedToUnoccupiedDelay not supported. Test step skipped")
+            self.mark_current_step_skipped()
 
         self.step(11)
         if attributes.UltrasonicUnoccupiedToOccupiedDelay.attribute_id in attribute_list: 
