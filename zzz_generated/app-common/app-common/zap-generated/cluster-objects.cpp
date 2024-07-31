@@ -294,52 +294,6 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
 
 } // namespace MeasurementAccuracyStruct
 
-namespace LocationDescriptorStruct {
-CHIP_ERROR Type::Encode(TLV::TLVWriter & aWriter, TLV::Tag aTag) const
-{
-    DataModel::WrappedStructEncoder encoder{ aWriter, aTag };
-    encoder.Encode(to_underlying(Fields::kLocationName), locationName);
-    encoder.Encode(to_underlying(Fields::kFloorNumber), floorNumber);
-    encoder.Encode(to_underlying(Fields::kAreaType), areaType);
-    return encoder.Finalize();
-}
-
-CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
-{
-    detail::StructDecodeIterator __iterator(reader);
-    while (true)
-    {
-        auto __element = __iterator.Next();
-        if (std::holds_alternative<CHIP_ERROR>(__element))
-        {
-            return std::get<CHIP_ERROR>(__element);
-        }
-
-        CHIP_ERROR err              = CHIP_NO_ERROR;
-        const uint8_t __context_tag = std::get<uint8_t>(__element);
-
-        if (__context_tag == to_underlying(Fields::kLocationName))
-        {
-            err = DataModel::Decode(reader, locationName);
-        }
-        else if (__context_tag == to_underlying(Fields::kFloorNumber))
-        {
-            err = DataModel::Decode(reader, floorNumber);
-        }
-        else if (__context_tag == to_underlying(Fields::kAreaType))
-        {
-            err = DataModel::Decode(reader, areaType);
-        }
-        else
-        {
-        }
-
-        ReturnErrorOnFailure(err);
-    }
-}
-
-} // namespace LocationDescriptorStruct
-
 namespace DeviceTypeStruct {
 CHIP_ERROR Type::Encode(TLV::TLVWriter & aWriter, TLV::Tag aTag) const
 {
@@ -555,6 +509,52 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
 namespace Globals {
 // Global structs
 namespace Structs {
+
+namespace LocationDescriptorStruct {
+CHIP_ERROR Type::Encode(TLV::TLVWriter & aWriter, TLV::Tag aTag) const
+{
+    DataModel::WrappedStructEncoder encoder{ aWriter, aTag };
+    encoder.Encode(to_underlying(Fields::kLocationName), locationName);
+    encoder.Encode(to_underlying(Fields::kFloorNumber), floorNumber);
+    encoder.Encode(to_underlying(Fields::kAreaType), areaType);
+    return encoder.Finalize();
+}
+
+CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
+{
+    detail::StructDecodeIterator __iterator(reader);
+    while (true)
+    {
+        auto __element = __iterator.Next();
+        if (std::holds_alternative<CHIP_ERROR>(__element))
+        {
+            return std::get<CHIP_ERROR>(__element);
+        }
+
+        CHIP_ERROR err              = CHIP_NO_ERROR;
+        const uint8_t __context_tag = std::get<uint8_t>(__element);
+
+        if (__context_tag == to_underlying(Fields::kLocationName))
+        {
+            err = DataModel::Decode(reader, locationName);
+        }
+        else if (__context_tag == to_underlying(Fields::kFloorNumber))
+        {
+            err = DataModel::Decode(reader, floorNumber);
+        }
+        else if (__context_tag == to_underlying(Fields::kAreaType))
+        {
+            err = DataModel::Decode(reader, areaType);
+        }
+        else
+        {
+        }
+
+        ReturnErrorOnFailure(err);
+    }
+}
+
+} // namespace LocationDescriptorStruct
 
 namespace TestGlobalStruct {
 CHIP_ERROR Type::Encode(TLV::TLVWriter & aWriter, TLV::Tag aTag) const
@@ -28458,83 +28458,6 @@ namespace Events {} // namespace Events
 namespace EcosystemInformation {
 namespace Structs {
 
-namespace EcosystemLocationStruct {
-CHIP_ERROR Type::EncodeForWrite(TLV::TLVWriter & aWriter, TLV::Tag aTag) const
-{
-    return DoEncode(aWriter, aTag, NullOptional);
-}
-
-CHIP_ERROR Type::EncodeForRead(TLV::TLVWriter & aWriter, TLV::Tag aTag, FabricIndex aAccessingFabricIndex) const
-{
-    return DoEncode(aWriter, aTag, MakeOptional(aAccessingFabricIndex));
-}
-
-CHIP_ERROR Type::DoEncode(TLV::TLVWriter & aWriter, TLV::Tag aTag, const Optional<FabricIndex> & aAccessingFabricIndex) const
-{
-    bool includeSensitive = !aAccessingFabricIndex.HasValue() || (aAccessingFabricIndex.Value() == fabricIndex);
-
-    DataModel::WrappedStructEncoder encoder{ aWriter, aTag };
-
-    if (includeSensitive)
-    {
-        encoder.Encode(to_underlying(Fields::kUniqueLocationID), uniqueLocationID);
-    }
-    if (includeSensitive)
-    {
-        encoder.Encode(to_underlying(Fields::kLocationDescriptor), locationDescriptor);
-    }
-    if (includeSensitive)
-    {
-        encoder.Encode(to_underlying(Fields::kLocationDescriptorLastEdit), locationDescriptorLastEdit);
-    }
-    if (aAccessingFabricIndex.HasValue())
-    {
-        encoder.Encode(to_underlying(Fields::kFabricIndex), fabricIndex);
-    }
-
-    return encoder.Finalize();
-}
-
-CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
-{
-    detail::StructDecodeIterator __iterator(reader);
-    while (true)
-    {
-        auto __element = __iterator.Next();
-        if (std::holds_alternative<CHIP_ERROR>(__element))
-        {
-            return std::get<CHIP_ERROR>(__element);
-        }
-
-        CHIP_ERROR err              = CHIP_NO_ERROR;
-        const uint8_t __context_tag = std::get<uint8_t>(__element);
-
-        if (__context_tag == to_underlying(Fields::kUniqueLocationID))
-        {
-            err = DataModel::Decode(reader, uniqueLocationID);
-        }
-        else if (__context_tag == to_underlying(Fields::kLocationDescriptor))
-        {
-            err = DataModel::Decode(reader, locationDescriptor);
-        }
-        else if (__context_tag == to_underlying(Fields::kLocationDescriptorLastEdit))
-        {
-            err = DataModel::Decode(reader, locationDescriptorLastEdit);
-        }
-        else if (__context_tag == to_underlying(Fields::kFabricIndex))
-        {
-            err = DataModel::Decode(reader, fabricIndex);
-        }
-        else
-        {
-        }
-
-        ReturnErrorOnFailure(err);
-    }
-}
-
-} // namespace EcosystemLocationStruct
-
 namespace EcosystemDeviceStruct {
 CHIP_ERROR Type::EncodeForWrite(TLV::TLVWriter & aWriter, TLV::Tag aTag) const
 {
@@ -28643,6 +28566,83 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
 }
 
 } // namespace EcosystemDeviceStruct
+
+namespace EcosystemLocationStruct {
+CHIP_ERROR Type::EncodeForWrite(TLV::TLVWriter & aWriter, TLV::Tag aTag) const
+{
+    return DoEncode(aWriter, aTag, NullOptional);
+}
+
+CHIP_ERROR Type::EncodeForRead(TLV::TLVWriter & aWriter, TLV::Tag aTag, FabricIndex aAccessingFabricIndex) const
+{
+    return DoEncode(aWriter, aTag, MakeOptional(aAccessingFabricIndex));
+}
+
+CHIP_ERROR Type::DoEncode(TLV::TLVWriter & aWriter, TLV::Tag aTag, const Optional<FabricIndex> & aAccessingFabricIndex) const
+{
+    bool includeSensitive = !aAccessingFabricIndex.HasValue() || (aAccessingFabricIndex.Value() == fabricIndex);
+
+    DataModel::WrappedStructEncoder encoder{ aWriter, aTag };
+
+    if (includeSensitive)
+    {
+        encoder.Encode(to_underlying(Fields::kUniqueLocationID), uniqueLocationID);
+    }
+    if (includeSensitive)
+    {
+        encoder.Encode(to_underlying(Fields::kLocationDescriptor), locationDescriptor);
+    }
+    if (includeSensitive)
+    {
+        encoder.Encode(to_underlying(Fields::kLocationDescriptorLastEdit), locationDescriptorLastEdit);
+    }
+    if (aAccessingFabricIndex.HasValue())
+    {
+        encoder.Encode(to_underlying(Fields::kFabricIndex), fabricIndex);
+    }
+
+    return encoder.Finalize();
+}
+
+CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
+{
+    detail::StructDecodeIterator __iterator(reader);
+    while (true)
+    {
+        auto __element = __iterator.Next();
+        if (std::holds_alternative<CHIP_ERROR>(__element))
+        {
+            return std::get<CHIP_ERROR>(__element);
+        }
+
+        CHIP_ERROR err              = CHIP_NO_ERROR;
+        const uint8_t __context_tag = std::get<uint8_t>(__element);
+
+        if (__context_tag == to_underlying(Fields::kUniqueLocationID))
+        {
+            err = DataModel::Decode(reader, uniqueLocationID);
+        }
+        else if (__context_tag == to_underlying(Fields::kLocationDescriptor))
+        {
+            err = DataModel::Decode(reader, locationDescriptor);
+        }
+        else if (__context_tag == to_underlying(Fields::kLocationDescriptorLastEdit))
+        {
+            err = DataModel::Decode(reader, locationDescriptorLastEdit);
+        }
+        else if (__context_tag == to_underlying(Fields::kFabricIndex))
+        {
+            err = DataModel::Decode(reader, fabricIndex);
+        }
+        else
+        {
+        }
+
+        ReturnErrorOnFailure(err);
+    }
+}
+
+} // namespace EcosystemLocationStruct
 } // namespace Structs
 
 namespace Commands {} // namespace Commands

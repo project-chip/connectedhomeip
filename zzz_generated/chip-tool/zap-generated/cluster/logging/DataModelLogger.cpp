@@ -203,7 +203,7 @@ CHIP_ERROR DataModelLogger::LogValue(const char * label, size_t indent,
 }
 
 CHIP_ERROR DataModelLogger::LogValue(const char * label, size_t indent,
-                                     const chip::app::Clusters::detail::Structs::LocationDescriptorStruct::DecodableType & value)
+                                     const chip::app::Clusters::Globals::Structs::LocationDescriptorStruct::DecodableType & value)
 {
     DataModelLogger::LogString(label, indent, "{");
     {
@@ -4901,48 +4901,6 @@ CHIP_ERROR DataModelLogger::LogValue(const char * label, size_t indent,
 
 CHIP_ERROR
 DataModelLogger::LogValue(const char * label, size_t indent,
-                          const chip::app::Clusters::EcosystemInformation::Structs::EcosystemLocationStruct::DecodableType & value)
-{
-    DataModelLogger::LogString(label, indent, "{");
-    {
-        CHIP_ERROR err = LogValue("UniqueLocationID", indent + 1, value.uniqueLocationID);
-        if (err != CHIP_NO_ERROR)
-        {
-            DataModelLogger::LogString(indent + 1, "Struct truncated due to invalid value for 'UniqueLocationID'");
-            return err;
-        }
-    }
-    {
-        CHIP_ERROR err = LogValue("LocationDescriptor", indent + 1, value.locationDescriptor);
-        if (err != CHIP_NO_ERROR)
-        {
-            DataModelLogger::LogString(indent + 1, "Struct truncated due to invalid value for 'LocationDescriptor'");
-            return err;
-        }
-    }
-    {
-        CHIP_ERROR err = LogValue("LocationDescriptorLastEdit", indent + 1, value.locationDescriptorLastEdit);
-        if (err != CHIP_NO_ERROR)
-        {
-            DataModelLogger::LogString(indent + 1, "Struct truncated due to invalid value for 'LocationDescriptorLastEdit'");
-            return err;
-        }
-    }
-    {
-        CHIP_ERROR err = LogValue("FabricIndex", indent + 1, value.fabricIndex);
-        if (err != CHIP_NO_ERROR)
-        {
-            DataModelLogger::LogString(indent + 1, "Struct truncated due to invalid value for 'FabricIndex'");
-            return err;
-        }
-    }
-    DataModelLogger::LogString(indent, "}");
-
-    return CHIP_NO_ERROR;
-}
-
-CHIP_ERROR
-DataModelLogger::LogValue(const char * label, size_t indent,
                           const chip::app::Clusters::EcosystemInformation::Structs::EcosystemDeviceStruct::DecodableType & value)
 {
     DataModelLogger::LogString(label, indent, "{");
@@ -4999,6 +4957,48 @@ DataModelLogger::LogValue(const char * label, size_t indent,
         if (err != CHIP_NO_ERROR)
         {
             DataModelLogger::LogString(indent + 1, "Struct truncated due to invalid value for 'UniqueLocationIDsLastEdit'");
+            return err;
+        }
+    }
+    {
+        CHIP_ERROR err = LogValue("FabricIndex", indent + 1, value.fabricIndex);
+        if (err != CHIP_NO_ERROR)
+        {
+            DataModelLogger::LogString(indent + 1, "Struct truncated due to invalid value for 'FabricIndex'");
+            return err;
+        }
+    }
+    DataModelLogger::LogString(indent, "}");
+
+    return CHIP_NO_ERROR;
+}
+
+CHIP_ERROR
+DataModelLogger::LogValue(const char * label, size_t indent,
+                          const chip::app::Clusters::EcosystemInformation::Structs::EcosystemLocationStruct::DecodableType & value)
+{
+    DataModelLogger::LogString(label, indent, "{");
+    {
+        CHIP_ERROR err = LogValue("UniqueLocationID", indent + 1, value.uniqueLocationID);
+        if (err != CHIP_NO_ERROR)
+        {
+            DataModelLogger::LogString(indent + 1, "Struct truncated due to invalid value for 'UniqueLocationID'");
+            return err;
+        }
+    }
+    {
+        CHIP_ERROR err = LogValue("LocationDescriptor", indent + 1, value.locationDescriptor);
+        if (err != CHIP_NO_ERROR)
+        {
+            DataModelLogger::LogString(indent + 1, "Struct truncated due to invalid value for 'LocationDescriptor'");
+            return err;
+        }
+    }
+    {
+        CHIP_ERROR err = LogValue("LocationDescriptorLastEdit", indent + 1, value.locationDescriptorLastEdit);
+        if (err != CHIP_NO_ERROR)
+        {
+            DataModelLogger::LogString(indent + 1, "Struct truncated due to invalid value for 'LocationDescriptorLastEdit'");
             return err;
         }
     }
