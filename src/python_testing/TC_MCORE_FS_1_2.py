@@ -19,40 +19,18 @@
 # for details about the block below.
 #
 
-import ipaddress
+import base64
 import logging
-import os
-import pathlib
 import queue
-import random
-import signal
-import subprocess
 import time
-import uuid
 
 import chip.clusters as Clusters
 from chip import ChipDeviceCtrl
-from chip.interaction_model import InteractionModelError, Status
-from matter_testing_support import MatterBaseTest, TestStep, async_test_body, default_matter_test_main, has_cluster, per_endpoint_test
-from mobly import asserts
+from matter_testing_support import MatterBaseTest, TestStep, async_test_body, default_matter_test_main
 from TC_SC_3_6 import AttributeChangeAccumulator
 
 
 class TC_MCORE_FS_1_2(MatterBaseTest):
-
-    @async_test_body
-    async def setup_class(self):
-        super().setup_class()
-
-        # Create a second controller on a new fabric to act as the TH_FSA and commission devices through the DUT_FSA
-        new_certificate_authority = self.certificate_authority_manager.NewCertificateAuthority()
-        new_fabric_admin = new_certificate_authority.NewFabricAdmin(vendorId=0xFFF1, fabricId=2)
-        paa_path = str(self.matter_test_config.paa_trust_store_path)
-        self.TH_FSA = new_fabric_admin.NewController(nodeId=112233, paaTrustStorePath=paa_path)
-
-    def teardown_class(self):
-        super().teardown_class()
-
     def steps_TC_MCORE_FS_1_2(self) -> list[TestStep]:
         steps = [TestStep(1, "TH_FSA subscribes to all the Bridged Device Basic Information clusters provided by DUT_FSA to identify the presence of a Bridged Node endpoint with a UniqueID matching the UniqueID provided by the BasicInformationCluster of the TH_SED_DUT."),
                  TestStep(2, "TH_FSA initiates commissioning of TH_SED_DUT by sending the OpenCommissioningWindow command to the Administrator Commissioning Cluster on the endpoint with the uniqueID matching that of TH_SED_DUT."),
@@ -62,6 +40,11 @@ class TC_MCORE_FS_1_2(MatterBaseTest):
                  TestStep(6, "TH_FSA initiates commissions of TH_SED_L by sending the OpenCommissioningWindow command to the Administrator Commissioning Cluster on the endpoint with the uniqueID matching that of TH_SED_L."),
                  TestStep(7, "TH_FSA completes commissioning of TH_SED_L using the Enhanced Commissioning Method.")]
         return steps
+
+    @property
+    def default_timeout(self) -> int:
+        max_report_interval_sec = self.user_params.get("max_report_interval_sec", 10 * 60)
+        return self.user_params.get("timeout_delay_sec", max_report_interval_sec * 2)
 
     @async_test_body
     async def test_TC_MCORE_FS_1_2(self):
@@ -86,7 +69,6 @@ class TC_MCORE_FS_1_2(MatterBaseTest):
         attribute_handler = AttributeChangeAccumulator(
             name=self.default_controller.name, expected_attribute=Clusters.BridgedDeviceBasicInformation.Attributes.UniqueID, output=unique_id_queue)
         sub.SetAttributeUpdateCallback(attribute_handler)
-        sub_handlers.append(attribute_handler)
 
         logging.info("Waiting for First BridgedDeviceBasicInformation.")
         start_time = time.time()
@@ -99,7 +81,7 @@ class TC_MCORE_FS_1_2(MatterBaseTest):
         while time_remaining > 0 and th_sed_dut_bdbi_endpoint < 0:
             try:
                 item = unique_id_queue.get(block=True, timeout=time_remaining)
-                client_name, endpoint, attribute, value = item['name'], item['endpoint'], item['attribute'], item['value']
+                endpoint, attribute, value = item['endpoint'], item['attribute'], item['value']
 
                 # Record arrival of an expected subscription change when seen
                 if attribute == Clusters.BridgedDeviceBasicInformation.Attributes.UniqueID:
@@ -136,6 +118,10 @@ class TC_MCORE_FS_1_2(MatterBaseTest):
         self.step(4)
         if not self.is_ci:
             self.wait_for_use_input("Commission TH_SED_DUT onto DUT_FSA’s fabric using the manufacturer specified mechanism. (ensure Synchronization is enabled.)")
+        else:
+            logging.info("Stopping after step 3 while running in CI to avoid manual steps.")
+            return
+
 
         self.step(5)
 
