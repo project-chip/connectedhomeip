@@ -87,7 +87,6 @@ class TC_MCORE_FS_1_3(MatterBaseTest):
         self.device_for_dut_eco_nodeid = 1111
         await self.TH_server_controller.CommissionOnNetwork(nodeId=self.device_for_dut_eco_nodeid, setupPinCode=passcode, filterType=ChipDeviceCtrl.DiscoveryFilterType.LONG_DISCRIMINATOR, filter=discriminator)
         logging.info("Commissioning device for DUT ecosystem onto TH for managing")
-        return passcode
 
     async def create_and_commission_device_for_th_ecosystem(self):
         # TODO: confirm whether we can open processes like this on the TH
@@ -126,32 +125,22 @@ class TC_MCORE_FS_1_3(MatterBaseTest):
         root_part_list = await self.read_single_attribute_check_success(cluster=Clusters.Descriptor, attribute=Clusters.Descriptor.Attributes.PartsList, endpoint=root_node_endpoint)
         set_of_endpoints_before_adding_device = set(root_part_list)
 
-        passcode = await self.create_device_for_dut_ecosystem()
+        await self.create_device_for_dut_ecosystem()
         read_result = await self.TH_server_controller.ReadAttribute(self.device_for_dut_eco_nodeid, [(root_node_endpoint, Clusters.BasicInformation.Attributes.UniqueID)])
         result = read_result[root_node_endpoint][Clusters.BasicInformation][Clusters.BasicInformation.Attributes.UniqueID]
         asserts.assert_true(type_matches(result, Clusters.Attribute.ValueDecodeFailure), "We were expecting a value decode failure")
         asserts.assert_equal(result.Reason.status, Status.UnsupportedAttribute, "Incorrect error returned from reading UniqueID")
 
-        discriminator = 3840
-        device_for_dut_ecosystem_vendor_id = await self.read_single_attribute_check_success(cluster=Clusters.BasicInformation, attribute=Clusters.BasicInformation.Attributes.VendorID, dev_ctrl=self.TH_server_controller, node_id=self.device_for_dut_eco_nodeid, endpoint=root_node_endpoint)
-        device_for_dut_ecosystem_product_id = await self.read_single_attribute_check_success(cluster=Clusters.BasicInformation, attribute=Clusters.BasicInformation.Attributes.ProductID, dev_ctrl=self.TH_server_controller, node_id=self.device_for_dut_eco_nodeid, endpoint=root_node_endpoint)
-        # To prevent need for runtime QR code generation test makes some assumptions
-        # about the app that it valiudates here.
-        asserts.assert_equal(passcode, 20202021, "Test implementation assumption incorrect for passcode")
-        asserts.assert_equal(device_for_dut_ecosystem_vendor_id, 0xFFF1, "Test implementation assumption incorrect for vendor ID")
-        asserts.assert_equal(device_for_dut_ecosystem_product_id, 0x8001, "Test implementation assumption incorrect for product ID")
+        params = await self.openCommissioningWindow(dev_ctrl=self.TH_server_controller, node_id=self.device_for_dut_eco_nodeid)
 
-        self.TH_server_controller.OpenCommissioningWindow(nodeid=self.device_for_dut_eco_nodeid, timeout=900, iteration=1000,
-                                                          discriminator=discriminator, option=1)
-
-        setup_qrcode = "MT:-24J0-Q000KA0648G00"
         self.wait_for_user_input(
             prompt_msg=f"Using the DUT vendor's provided interface, commission the device using the following parameters:\n"
-            f"- discriminator: {discriminator}\n"
-            f"- passcode: {passcode}\n"
-            f"- setupPinCode: {setup_qrcode}\n"
+            f"- discriminator: {params.randomDiscriminator}\n"
+            f"- setupPinCode: {params.commissioningParameters.setupPinCode}\n"
+            f"- setupQRCode: {params.commissioningParameters.setupQRCode}\n"
+            f"- setupManualcode: {params.commissioningParameters.setupManualCode}\n"
             f"If using FabricSync Admin, you may type:\n"
-            f">>> pairing onnetwork 111 {setup_qrcode}")
+            f">>> pairing onnetwork <desired_node_id> {params.commissioningParameters.setupPinCode}")
 
         root_part_list = await self.read_single_attribute_check_success(cluster=Clusters.Descriptor, attribute=Clusters.Descriptor.Attributes.PartsList, endpoint=root_node_endpoint)
         set_of_endpoints_after_adding_device = set(root_part_list)
