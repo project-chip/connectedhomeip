@@ -16,7 +16,7 @@ limitations under the License.
 -->
 <configurator>
   <domain name="Energy Management"/>
-  <bitmap name="WaterHeaterHeatSourceBitmap" type="bitmap8">
+  <bitmap name="WaterHeaterHeatSourceBitmap" type="bitmap8" apiMaturity="provisional">
     <cluster code="0x0094"/>
     <field name="ImmersionElement1" mask="0x01"/>
     <field name="ImmersionElement2" mask="0x02"/>
