@@ -15,10 +15,6 @@
 #    limitations under the License.
 #
 
-# See https://github.com/project-chip/connectedhomeip/blob/master/docs/testing/python.md#defining-the-ci-test-arguments
-# for details about the block below.
-#
-
 # This test requires a TH_SERVER application. Please specify with --string-arg th_server_app_path:<path_to_app>
 # TH_SERVER must support following arguments: --secured-device-port --discriminator --passcode --KVS --secured-device-port
 # E.g: python3 src/python_testing/TC_BRBINFO_4_1.py --commissioning-method on-network --qr-code MT:-24J042C00KA0648G00 \
