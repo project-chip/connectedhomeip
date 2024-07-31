@@ -36,6 +36,40 @@ from .ClusterObjects import (Cluster, ClusterAttributeDescriptor, ClusterCommand
                              ClusterObjectDescriptor, ClusterObjectFieldDescriptor)
 from .Types import Nullable, NullValue
 
+class Globals:
+    class Enums:
+        class TestGlobalEnum(MatterIntEnum):
+            kSomeValue = 0x00
+            kSomeOtherValue = 0x01
+            kFinalValue = 0x02
+            # All received enum values that are not listed above will be mapped
+            # to kUnknownEnumValue. This is a helper enum value that should only
+            # be used by code to process how it handles receiving an unknown
+            # enum value. This specific value should never be transmitted.
+            kUnknownEnumValue = 3,
+
+    class Bitmaps:
+        class TestGlobalBitmap(IntFlag):
+            kFirstBit = 0x1
+            kSecondBit = 0x2
+
+    class Structs:
+        @dataclass
+        class TestGlobalStruct(ClusterObject):
+            @ChipUtility.classproperty
+            def descriptor(cls) -> ClusterObjectDescriptor:
+                return ClusterObjectDescriptor(
+                    Fields=[
+                        ClusterObjectFieldDescriptor(Label="name", Tag=0, Type=str),
+                        ClusterObjectFieldDescriptor(Label="myBitmap", Tag=1, Type=typing.Union[Nullable, uint]),
+                        ClusterObjectFieldDescriptor(Label="myEnum", Tag=2, Type=typing.Union[None, Nullable, Globals.Enums.TestGlobalEnum]),
+                    ])
+
+            name: 'str' = ""
+            myBitmap: 'typing.Union[Nullable, uint]' = NullValue
+            myEnum: 'typing.Union[None, Nullable, Globals.Enums.TestGlobalEnum]' = None
+
+
 
 @dataclass
 class Identify(Cluster):
@@ -74,16 +108,16 @@ class Identify(Cluster):
             kStopEffect = 0xFF
             # All received enum values that are not listed above will be mapped
             # to kUnknownEnumValue. This is a helper enum value that should only
-            # be used by code to process how it handles receiving and unknown
-            # enum value. This specific should never be transmitted.
+            # be used by code to process how it handles receiving an unknown
+            # enum value. This specific value should never be transmitted.
             kUnknownEnumValue = 3,
 
         class EffectVariantEnum(MatterIntEnum):
             kDefault = 0x00
             # All received enum values that are not listed above will be mapped
             # to kUnknownEnumValue. This is a helper enum value that should only
-            # be used by code to process how it handles receiving and unknown
-            # enum value. This specific should never be transmitted.
+            # be used by code to process how it handles receiving an unknown
+            # enum value. This specific value should never be transmitted.
             kUnknownEnumValue = 1,
 
         class IdentifyTypeEnum(MatterIntEnum):
@@ -95,8 +129,8 @@ class Identify(Cluster):
             kActuator = 0x05
             # All received enum values that are not listed above will be mapped
             # to kUnknownEnumValue. This is a helper enum value that should only
-            # be used by code to process how it handles receiving and unknown
-            # enum value. This specific should never be transmitted.
+            # be used by code to process how it handles receiving an unknown
+            # enum value. This specific value should never be transmitted.
             kUnknownEnumValue = 6,
 
     class Commands:
@@ -622,16 +656,16 @@ class OnOff(Cluster):
             kDelayedOffSlowFade = 0x02
             # All received enum values that are not listed above will be mapped
             # to kUnknownEnumValue. This is a helper enum value that should only
-            # be used by code to process how it handles receiving and unknown
-            # enum value. This specific should never be transmitted.
+            # be used by code to process how it handles receiving an unknown
+            # enum value. This specific value should never be transmitted.
             kUnknownEnumValue = 3,
 
         class DyingLightEffectVariantEnum(MatterIntEnum):
             kDyingLightFadeOff = 0x00
             # All received enum values that are not listed above will be mapped
             # to kUnknownEnumValue. This is a helper enum value that should only
-            # be used by code to process how it handles receiving and unknown
-            # enum value. This specific should never be transmitted.
+            # be used by code to process how it handles receiving an unknown
+            # enum value. This specific value should never be transmitted.
             kUnknownEnumValue = 1,
 
         class EffectIdentifierEnum(MatterIntEnum):
@@ -639,8 +673,8 @@ class OnOff(Cluster):
             kDyingLight = 0x01
             # All received enum values that are not listed above will be mapped
             # to kUnknownEnumValue. This is a helper enum value that should only
-            # be used by code to process how it handles receiving and unknown
-            # enum value. This specific should never be transmitted.
+            # be used by code to process how it handles receiving an unknown
+            # enum value. This specific value should never be transmitted.
             kUnknownEnumValue = 2,
 
         class StartUpOnOffEnum(MatterIntEnum):
@@ -649,8 +683,8 @@ class OnOff(Cluster):
             kToggle = 0x02
             # All received enum values that are not listed above will be mapped
             # to kUnknownEnumValue. This is a helper enum value that should only
-            # be used by code to process how it handles receiving and unknown
-            # enum value. This specific should never be transmitted.
+            # be used by code to process how it handles receiving an unknown
+            # enum value. This specific value should never be transmitted.
             kUnknownEnumValue = 3,
 
     class Bitmaps:
@@ -1145,8 +1179,8 @@ class LevelControl(Cluster):
             kDown = 0x01
             # All received enum values that are not listed above will be mapped
             # to kUnknownEnumValue. This is a helper enum value that should only
-            # be used by code to process how it handles receiving and unknown
-            # enum value. This specific should never be transmitted.
+            # be used by code to process how it handles receiving an unknown
+            # enum value. This specific value should never be transmitted.
             kUnknownEnumValue = 2,
 
         class StepModeEnum(MatterIntEnum):
@@ -1154,8 +1188,8 @@ class LevelControl(Cluster):
             kDown = 0x01
             # All received enum values that are not listed above will be mapped
             # to kUnknownEnumValue. This is a helper enum value that should only
-            # be used by code to process how it handles receiving and unknown
-            # enum value. This specific should never be transmitted.
+            # be used by code to process how it handles receiving an unknown
+            # enum value. This specific value should never be transmitted.
             kUnknownEnumValue = 2,
 
     class Bitmaps:
@@ -2501,6 +2535,8 @@ class AccessControl(Cluster):
                 ClusterObjectFieldDescriptor(Label="subjectsPerAccessControlEntry", Tag=0x00000002, Type=uint),
                 ClusterObjectFieldDescriptor(Label="targetsPerAccessControlEntry", Tag=0x00000003, Type=uint),
                 ClusterObjectFieldDescriptor(Label="accessControlEntriesPerFabric", Tag=0x00000004, Type=uint),
+                ClusterObjectFieldDescriptor(Label="commissioningARL", Tag=0x00000005, Type=typing.Optional[typing.List[AccessControl.Structs.CommissioningAccessRestrictionEntryStruct]]),
+                ClusterObjectFieldDescriptor(Label="arl", Tag=0x00000006, Type=typing.Optional[typing.List[AccessControl.Structs.AccessRestrictionEntryStruct]]),
                 ClusterObjectFieldDescriptor(Label="generatedCommandList", Tag=0x0000FFF8, Type=typing.List[uint]),
                 ClusterObjectFieldDescriptor(Label="acceptedCommandList", Tag=0x0000FFF9, Type=typing.List[uint]),
                 ClusterObjectFieldDescriptor(Label="eventList", Tag=0x0000FFFA, Type=typing.List[uint]),
@@ -2514,6 +2550,8 @@ class AccessControl(Cluster):
     subjectsPerAccessControlEntry: 'uint' = None
     targetsPerAccessControlEntry: 'uint' = None
     accessControlEntriesPerFabric: 'uint' = None
+    commissioningARL: 'typing.Optional[typing.List[AccessControl.Structs.CommissioningAccessRestrictionEntryStruct]]' = None
+    arl: 'typing.Optional[typing.List[AccessControl.Structs.AccessRestrictionEntryStruct]]' = None
     generatedCommandList: 'typing.List[uint]' = None
     acceptedCommandList: 'typing.List[uint]' = None
     eventList: 'typing.List[uint]' = None
@@ -2528,8 +2566,8 @@ class AccessControl(Cluster):
             kGroup = 0x03
             # All received enum values that are not listed above will be mapped
             # to kUnknownEnumValue. This is a helper enum value that should only
-            # be used by code to process how it handles receiving and unknown
-            # enum value. This specific should never be transmitted.
+            # be used by code to process how it handles receiving an unknown
+            # enum value. This specific value should never be transmitted.
             kUnknownEnumValue = 0,
 
         class AccessControlEntryPrivilegeEnum(MatterIntEnum):
@@ -2540,9 +2578,20 @@ class AccessControl(Cluster):
             kAdminister = 0x05
             # All received enum values that are not listed above will be mapped
             # to kUnknownEnumValue. This is a helper enum value that should only
-            # be used by code to process how it handles receiving and unknown
-            # enum value. This specific should never be transmitted.
+            # be used by code to process how it handles receiving an unknown
+            # enum value. This specific value should never be transmitted.
             kUnknownEnumValue = 0,
+
+        class AccessRestrictionTypeEnum(MatterIntEnum):
+            kAttributeAccessForbidden = 0x00
+            kAttributeWriteForbidden = 0x01
+            kCommandForbidden = 0x02
+            kEventForbidden = 0x03
+            # All received enum values that are not listed above will be mapped
+            # to kUnknownEnumValue. This is a helper enum value that should only
+            # be used by code to process how it handles receiving an unknown
+            # enum value. This specific value should never be transmitted.
+            kUnknownEnumValue = 4,
 
         class ChangeTypeEnum(MatterIntEnum):
             kChanged = 0x00
@@ -2550,11 +2599,61 @@ class AccessControl(Cluster):
             kRemoved = 0x02
             # All received enum values that are not listed above will be mapped
             # to kUnknownEnumValue. This is a helper enum value that should only
-            # be used by code to process how it handles receiving and unknown
-            # enum value. This specific should never be transmitted.
+            # be used by code to process how it handles receiving an unknown
+            # enum value. This specific value should never be transmitted.
             kUnknownEnumValue = 3,
 
+    class Bitmaps:
+        class Feature(IntFlag):
+            kExtension = 0x1
+            kManagedDevice = 0x2
+
     class Structs:
+        @dataclass
+        class AccessRestrictionStruct(ClusterObject):
+            @ChipUtility.classproperty
+            def descriptor(cls) -> ClusterObjectDescriptor:
+                return ClusterObjectDescriptor(
+                    Fields=[
+                        ClusterObjectFieldDescriptor(Label="type", Tag=0, Type=AccessControl.Enums.AccessRestrictionTypeEnum),
+                        ClusterObjectFieldDescriptor(Label="id", Tag=1, Type=typing.Union[Nullable, uint]),
+                    ])
+
+            type: 'AccessControl.Enums.AccessRestrictionTypeEnum' = 0
+            id: 'typing.Union[Nullable, uint]' = NullValue
+
+        @dataclass
+        class CommissioningAccessRestrictionEntryStruct(ClusterObject):
+            @ChipUtility.classproperty
+            def descriptor(cls) -> ClusterObjectDescriptor:
+                return ClusterObjectDescriptor(
+                    Fields=[
+                        ClusterObjectFieldDescriptor(Label="endpoint", Tag=0, Type=uint),
+                        ClusterObjectFieldDescriptor(Label="cluster", Tag=1, Type=uint),
+                        ClusterObjectFieldDescriptor(Label="restrictions", Tag=2, Type=typing.List[AccessControl.Structs.AccessRestrictionStruct]),
+                    ])
+
+            endpoint: 'uint' = 0
+            cluster: 'uint' = 0
+            restrictions: 'typing.List[AccessControl.Structs.AccessRestrictionStruct]' = field(default_factory=lambda: [])
+
+        @dataclass
+        class AccessRestrictionEntryStruct(ClusterObject):
+            @ChipUtility.classproperty
+            def descriptor(cls) -> ClusterObjectDescriptor:
+                return ClusterObjectDescriptor(
+                    Fields=[
+                        ClusterObjectFieldDescriptor(Label="endpoint", Tag=0, Type=uint),
+                        ClusterObjectFieldDescriptor(Label="cluster", Tag=1, Type=uint),
+                        ClusterObjectFieldDescriptor(Label="restrictions", Tag=2, Type=typing.List[AccessControl.Structs.AccessRestrictionStruct]),
+                        ClusterObjectFieldDescriptor(Label="fabricIndex", Tag=254, Type=uint),
+                    ])
+
+            endpoint: 'uint' = 0
+            cluster: 'uint' = 0
+            restrictions: 'typing.List[AccessControl.Structs.AccessRestrictionStruct]' = field(default_factory=lambda: [])
+            fabricIndex: 'uint' = 0
+
         @dataclass
         class AccessControlTargetStruct(ClusterObject):
             @ChipUtility.classproperty
@@ -2601,6 +2700,39 @@ class AccessControl(Cluster):
 
             data: 'bytes' = b""
             fabricIndex: 'uint' = 0
+
+    class Commands:
+        @dataclass
+        class ReviewFabricRestrictions(ClusterCommand):
+            cluster_id: typing.ClassVar[int] = 0x0000001F
+            command_id: typing.ClassVar[int] = 0x00000000
+            is_client: typing.ClassVar[bool] = True
+            response_type: typing.ClassVar[str] = None
+
+            @ChipUtility.classproperty
+            def descriptor(cls) -> ClusterObjectDescriptor:
+                return ClusterObjectDescriptor(
+                    Fields=[
+                        ClusterObjectFieldDescriptor(Label="arl", Tag=0, Type=typing.List[AccessControl.Structs.CommissioningAccessRestrictionEntryStruct]),
+                    ])
+
+            arl: 'typing.List[AccessControl.Structs.CommissioningAccessRestrictionEntryStruct]' = field(default_factory=lambda: [])
+
+        @dataclass
+        class ReviewFabricRestrictionsResponse(ClusterCommand):
+            cluster_id: typing.ClassVar[int] = 0x0000001F
+            command_id: typing.ClassVar[int] = 0x00000001
+            is_client: typing.ClassVar[bool] = False
+            response_type: typing.ClassVar[str] = None
+
+            @ChipUtility.classproperty
+            def descriptor(cls) -> ClusterObjectDescriptor:
+                return ClusterObjectDescriptor(
+                    Fields=[
+                        ClusterObjectFieldDescriptor(Label="token", Tag=0, Type=uint),
+                    ])
+
+            token: 'uint' = 0
 
     class Attributes:
         @dataclass
@@ -2682,6 +2814,38 @@ class AccessControl(Cluster):
                 return ClusterObjectFieldDescriptor(Type=uint)
 
             value: 'uint' = 0
+
+        @dataclass
+        class CommissioningARL(ClusterAttributeDescriptor):
+            @ChipUtility.classproperty
+            def cluster_id(cls) -> int:
+                return 0x0000001F
+
+            @ChipUtility.classproperty
+            def attribute_id(cls) -> int:
+                return 0x00000005
+
+            @ChipUtility.classproperty
+            def attribute_type(cls) -> ClusterObjectFieldDescriptor:
+                return ClusterObjectFieldDescriptor(Type=typing.Optional[typing.List[AccessControl.Structs.CommissioningAccessRestrictionEntryStruct]])
+
+            value: 'typing.Optional[typing.List[AccessControl.Structs.CommissioningAccessRestrictionEntryStruct]]' = None
+
+        @dataclass
+        class Arl(ClusterAttributeDescriptor):
+            @ChipUtility.classproperty
+            def cluster_id(cls) -> int:
+                return 0x0000001F
+
+            @ChipUtility.classproperty
+            def attribute_id(cls) -> int:
+                return 0x00000006
+
+            @ChipUtility.classproperty
+            def attribute_type(cls) -> ClusterObjectFieldDescriptor:
+                return ClusterObjectFieldDescriptor(Type=typing.Optional[typing.List[AccessControl.Structs.AccessRestrictionEntryStruct]])
+
+            value: 'typing.Optional[typing.List[AccessControl.Structs.AccessRestrictionEntryStruct]]' = None
 
         @dataclass
         class GeneratedCommandList(ClusterAttributeDescriptor):
@@ -2834,6 +2998,50 @@ class AccessControl(Cluster):
             latestValue: 'typing.Union[Nullable, AccessControl.Structs.AccessControlExtensionStruct]' = NullValue
             fabricIndex: 'uint' = 0
 
+        @dataclass
+        class AccessRestrictionEntryChanged(ClusterEvent):
+            @ChipUtility.classproperty
+            def cluster_id(cls) -> int:
+                return 0x0000001F
+
+            @ChipUtility.classproperty
+            def event_id(cls) -> int:
+                return 0x00000002
+
+            @ChipUtility.classproperty
+            def descriptor(cls) -> ClusterObjectDescriptor:
+                return ClusterObjectDescriptor(
+                    Fields=[
+                        ClusterObjectFieldDescriptor(Label="fabricIndex", Tag=254, Type=uint),
+                    ])
+
+            fabricIndex: 'uint' = 0
+
+        @dataclass
+        class FabricRestrictionReviewUpdate(ClusterEvent):
+            @ChipUtility.classproperty
+            def cluster_id(cls) -> int:
+                return 0x0000001F
+
+            @ChipUtility.classproperty
+            def event_id(cls) -> int:
+                return 0x00000003
+
+            @ChipUtility.classproperty
+            def descriptor(cls) -> ClusterObjectDescriptor:
+                return ClusterObjectDescriptor(
+                    Fields=[
+                        ClusterObjectFieldDescriptor(Label="token", Tag=0, Type=uint),
+                        ClusterObjectFieldDescriptor(Label="instruction", Tag=1, Type=typing.Union[Nullable, str]),
+                        ClusterObjectFieldDescriptor(Label="redirectURL", Tag=2, Type=typing.Union[Nullable, str]),
+                        ClusterObjectFieldDescriptor(Label="fabricIndex", Tag=254, Type=uint),
+                    ])
+
+            token: 'uint' = 0
+            instruction: 'typing.Union[Nullable, str]' = NullValue
+            redirectURL: 'typing.Union[Nullable, str]' = NullValue
+            fabricIndex: 'uint' = 0
+
 
 @dataclass
 class Actions(Cluster):
@@ -2870,8 +3078,8 @@ class Actions(Cluster):
             kInterrupted = 0x01
             # All received enum values that are not listed above will be mapped
             # to kUnknownEnumValue. This is a helper enum value that should only
-            # be used by code to process how it handles receiving and unknown
-            # enum value. This specific should never be transmitted.
+            # be used by code to process how it handles receiving an unknown
+            # enum value. This specific value should never be transmitted.
             kUnknownEnumValue = 2,
 
         class ActionStateEnum(MatterIntEnum):
@@ -2881,8 +3089,8 @@ class Actions(Cluster):
             kDisabled = 0x03
             # All received enum values that are not listed above will be mapped
             # to kUnknownEnumValue. This is a helper enum value that should only
-            # be used by code to process how it handles receiving and unknown
-            # enum value. This specific should never be transmitted.
+            # be used by code to process how it handles receiving an unknown
+            # enum value. This specific value should never be transmitted.
             kUnknownEnumValue = 4,
 
         class ActionTypeEnum(MatterIntEnum):
@@ -2895,8 +3103,8 @@ class Actions(Cluster):
             kAlarm = 0x06
             # All received enum values that are not listed above will be mapped
             # to kUnknownEnumValue. This is a helper enum value that should only
-            # be used by code to process how it handles receiving and unknown
-            # enum value. This specific should never be transmitted.
+            # be used by code to process how it handles receiving an unknown
+            # enum value. This specific value should never be transmitted.
             kUnknownEnumValue = 7,
 
         class EndpointListTypeEnum(MatterIntEnum):
@@ -2905,8 +3113,8 @@ class Actions(Cluster):
             kZone = 0x02
             # All received enum values that are not listed above will be mapped
             # to kUnknownEnumValue. This is a helper enum value that should only
-            # be used by code to process how it handles receiving and unknown
-            # enum value. This specific should never be transmitted.
+            # be used by code to process how it handles receiving an unknown
+            # enum value. This specific value should never be transmitted.
             kUnknownEnumValue = 3,
 
     class Bitmaps:
@@ -3479,8 +3687,8 @@ class BasicInformation(Cluster):
             kGold = 0x14
             # All received enum values that are not listed above will be mapped
             # to kUnknownEnumValue. This is a helper enum value that should only
-            # be used by code to process how it handles receiving and unknown
-            # enum value. This specific should never be transmitted.
+            # be used by code to process how it handles receiving an unknown
+            # enum value. This specific value should never be transmitted.
             kUnknownEnumValue = 21,
 
         class ProductFinishEnum(MatterIntEnum):
@@ -3492,8 +3700,8 @@ class BasicInformation(Cluster):
             kFabric = 0x05
             # All received enum values that are not listed above will be mapped
             # to kUnknownEnumValue. This is a helper enum value that should only
-            # be used by code to process how it handles receiving and unknown
-            # enum value. This specific should never be transmitted.
+            # be used by code to process how it handles receiving an unknown
+            # enum value. This specific value should never be transmitted.
             kUnknownEnumValue = 6,
 
     class Structs:
@@ -4107,8 +4315,8 @@ class OtaSoftwareUpdateProvider(Cluster):
             kDiscontinue = 0x02
             # All received enum values that are not listed above will be mapped
             # to kUnknownEnumValue. This is a helper enum value that should only
-            # be used by code to process how it handles receiving and unknown
-            # enum value. This specific should never be transmitted.
+            # be used by code to process how it handles receiving an unknown
+            # enum value. This specific value should never be transmitted.
             kUnknownEnumValue = 3,
 
         class DownloadProtocolEnum(MatterIntEnum):
@@ -4118,8 +4326,8 @@ class OtaSoftwareUpdateProvider(Cluster):
             kVendorSpecific = 0x03
             # All received enum values that are not listed above will be mapped
             # to kUnknownEnumValue. This is a helper enum value that should only
-            # be used by code to process how it handles receiving and unknown
-            # enum value. This specific should never be transmitted.
+            # be used by code to process how it handles receiving an unknown
+            # enum value. This specific value should never be transmitted.
             kUnknownEnumValue = 4,
 
         class StatusEnum(MatterIntEnum):
@@ -4129,8 +4337,8 @@ class OtaSoftwareUpdateProvider(Cluster):
             kDownloadProtocolNotSupported = 0x03
             # All received enum values that are not listed above will be mapped
             # to kUnknownEnumValue. This is a helper enum value that should only
-            # be used by code to process how it handles receiving and unknown
-            # enum value. This specific should never be transmitted.
+            # be used by code to process how it handles receiving an unknown
+            # enum value. This specific value should never be transmitted.
             kUnknownEnumValue = 4,
 
     class Commands:
@@ -4384,8 +4592,8 @@ class OtaSoftwareUpdateRequestor(Cluster):
             kUrgentUpdateAvailable = 0x02
             # All received enum values that are not listed above will be mapped
             # to kUnknownEnumValue. This is a helper enum value that should only
-            # be used by code to process how it handles receiving and unknown
-            # enum value. This specific should never be transmitted.
+            # be used by code to process how it handles receiving an unknown
+            # enum value. This specific value should never be transmitted.
             kUnknownEnumValue = 3,
 
         class ChangeReasonEnum(MatterIntEnum):
@@ -4396,8 +4604,8 @@ class OtaSoftwareUpdateRequestor(Cluster):
             kDelayByProvider = 0x04
             # All received enum values that are not listed above will be mapped
             # to kUnknownEnumValue. This is a helper enum value that should only
-            # be used by code to process how it handles receiving and unknown
-            # enum value. This specific should never be transmitted.
+            # be used by code to process how it handles receiving an unknown
+            # enum value. This specific value should never be transmitted.
             kUnknownEnumValue = 5,
 
         class UpdateStateEnum(MatterIntEnum):
@@ -4412,8 +4620,8 @@ class OtaSoftwareUpdateRequestor(Cluster):
             kDelayedOnUserConsent = 0x08
             # All received enum values that are not listed above will be mapped
             # to kUnknownEnumValue. This is a helper enum value that should only
-            # be used by code to process how it handles receiving and unknown
-            # enum value. This specific should never be transmitted.
+            # be used by code to process how it handles receiving an unknown
+            # enum value. This specific value should never be transmitted.
             kUnknownEnumValue = 9,
 
     class Structs:
@@ -4894,8 +5102,8 @@ class TimeFormatLocalization(Cluster):
             kUseActiveLocale = 0xFF
             # All received enum values that are not listed above will be mapped
             # to kUnknownEnumValue. This is a helper enum value that should only
-            # be used by code to process how it handles receiving and unknown
-            # enum value. This specific should never be transmitted.
+            # be used by code to process how it handles receiving an unknown
+            # enum value. This specific value should never be transmitted.
             kUnknownEnumValue = 12,
 
         class HourFormatEnum(MatterIntEnum):
@@ -4904,8 +5112,8 @@ class TimeFormatLocalization(Cluster):
             kUseActiveLocale = 0xFF
             # All received enum values that are not listed above will be mapped
             # to kUnknownEnumValue. This is a helper enum value that should only
-            # be used by code to process how it handles receiving and unknown
-            # enum value. This specific should never be transmitted.
+            # be used by code to process how it handles receiving an unknown
+            # enum value. This specific value should never be transmitted.
             kUnknownEnumValue = 2,
 
     class Bitmaps:
@@ -5090,8 +5298,8 @@ class UnitLocalization(Cluster):
             kKelvin = 0x02
             # All received enum values that are not listed above will be mapped
             # to kUnknownEnumValue. This is a helper enum value that should only
-            # be used by code to process how it handles receiving and unknown
-            # enum value. This specific should never be transmitted.
+            # be used by code to process how it handles receiving an unknown
+            # enum value. This specific value should never be transmitted.
             kUnknownEnumValue = 3,
 
     class Bitmaps:
@@ -5475,8 +5683,8 @@ class PowerSource(Cluster):
             kZincCerium = 0x20
             # All received enum values that are not listed above will be mapped
             # to kUnknownEnumValue. This is a helper enum value that should only
-            # be used by code to process how it handles receiving and unknown
-            # enum value. This specific should never be transmitted.
+            # be used by code to process how it handles receiving an unknown
+            # enum value. This specific value should never be transmitted.
             kUnknownEnumValue = 33,
 
         class BatChargeFaultEnum(MatterIntEnum):
@@ -5493,8 +5701,8 @@ class PowerSource(Cluster):
             kSafetyTimeout = 0x0A
             # All received enum values that are not listed above will be mapped
             # to kUnknownEnumValue. This is a helper enum value that should only
-            # be used by code to process how it handles receiving and unknown
-            # enum value. This specific should never be transmitted.
+            # be used by code to process how it handles receiving an unknown
+            # enum value. This specific value should never be transmitted.
             kUnknownEnumValue = 11,
 
         class BatChargeLevelEnum(MatterIntEnum):
@@ -5503,8 +5711,8 @@ class PowerSource(Cluster):
             kCritical = 0x02
             # All received enum values that are not listed above will be mapped
             # to kUnknownEnumValue. This is a helper enum value that should only
-            # be used by code to process how it handles receiving and unknown
-            # enum value. This specific should never be transmitted.
+            # be used by code to process how it handles receiving an unknown
+            # enum value. This specific value should never be transmitted.
             kUnknownEnumValue = 3,
 
         class BatChargeStateEnum(MatterIntEnum):
@@ -5514,8 +5722,8 @@ class PowerSource(Cluster):
             kIsNotCharging = 0x03
             # All received enum values that are not listed above will be mapped
             # to kUnknownEnumValue. This is a helper enum value that should only
-            # be used by code to process how it handles receiving and unknown
-            # enum value. This specific should never be transmitted.
+            # be used by code to process how it handles receiving an unknown
+            # enum value. This specific value should never be transmitted.
             kUnknownEnumValue = 4,
 
         class BatCommonDesignationEnum(MatterIntEnum):
@@ -5602,8 +5810,8 @@ class PowerSource(Cluster):
             k32600 = 0x50
             # All received enum values that are not listed above will be mapped
             # to kUnknownEnumValue. This is a helper enum value that should only
-            # be used by code to process how it handles receiving and unknown
-            # enum value. This specific should never be transmitted.
+            # be used by code to process how it handles receiving an unknown
+            # enum value. This specific value should never be transmitted.
             kUnknownEnumValue = 81,
 
         class BatFaultEnum(MatterIntEnum):
@@ -5612,8 +5820,8 @@ class PowerSource(Cluster):
             kUnderTemp = 0x02
             # All received enum values that are not listed above will be mapped
             # to kUnknownEnumValue. This is a helper enum value that should only
-            # be used by code to process how it handles receiving and unknown
-            # enum value. This specific should never be transmitted.
+            # be used by code to process how it handles receiving an unknown
+            # enum value. This specific value should never be transmitted.
             kUnknownEnumValue = 3,
 
         class BatReplaceabilityEnum(MatterIntEnum):
@@ -5623,8 +5831,8 @@ class PowerSource(Cluster):
             kFactoryReplaceable = 0x03
             # All received enum values that are not listed above will be mapped
             # to kUnknownEnumValue. This is a helper enum value that should only
-            # be used by code to process how it handles receiving and unknown
-            # enum value. This specific should never be transmitted.
+            # be used by code to process how it handles receiving an unknown
+            # enum value. This specific value should never be transmitted.
             kUnknownEnumValue = 4,
 
         class PowerSourceStatusEnum(MatterIntEnum):
@@ -5634,8 +5842,8 @@ class PowerSource(Cluster):
             kUnavailable = 0x03
             # All received enum values that are not listed above will be mapped
             # to kUnknownEnumValue. This is a helper enum value that should only
-            # be used by code to process how it handles receiving and unknown
-            # enum value. This specific should never be transmitted.
+            # be used by code to process how it handles receiving an unknown
+            # enum value. This specific value should never be transmitted.
             kUnknownEnumValue = 4,
 
         class WiredCurrentTypeEnum(MatterIntEnum):
@@ -5643,8 +5851,8 @@ class PowerSource(Cluster):
             kDc = 0x01
             # All received enum values that are not listed above will be mapped
             # to kUnknownEnumValue. This is a helper enum value that should only
-            # be used by code to process how it handles receiving and unknown
-            # enum value. This specific should never be transmitted.
+            # be used by code to process how it handles receiving an unknown
+            # enum value. This specific value should never be transmitted.
             kUnknownEnumValue = 2,
 
         class WiredFaultEnum(MatterIntEnum):
@@ -5653,8 +5861,8 @@ class PowerSource(Cluster):
             kUnderVoltage = 0x02
             # All received enum values that are not listed above will be mapped
             # to kUnknownEnumValue. This is a helper enum value that should only
-            # be used by code to process how it handles receiving and unknown
-            # enum value. This specific should never be transmitted.
+            # be used by code to process how it handles receiving an unknown
+            # enum value. This specific value should never be transmitted.
             kUnknownEnumValue = 3,
 
     class Bitmaps:
@@ -6391,6 +6599,10 @@ class GeneralCommissioning(Cluster):
                 ClusterObjectFieldDescriptor(Label="regulatoryConfig", Tag=0x00000002, Type=GeneralCommissioning.Enums.RegulatoryLocationTypeEnum),
                 ClusterObjectFieldDescriptor(Label="locationCapability", Tag=0x00000003, Type=GeneralCommissioning.Enums.RegulatoryLocationTypeEnum),
                 ClusterObjectFieldDescriptor(Label="supportsConcurrentConnection", Tag=0x00000004, Type=bool),
+                ClusterObjectFieldDescriptor(Label="TCAcceptedVersion", Tag=0x00000005, Type=typing.Optional[uint]),
+                ClusterObjectFieldDescriptor(Label="TCMinRequiredVersion", Tag=0x00000006, Type=typing.Optional[uint]),
+                ClusterObjectFieldDescriptor(Label="TCAcknowledgements", Tag=0x00000007, Type=typing.Optional[uint]),
+                ClusterObjectFieldDescriptor(Label="TCAcknowledgementsRequired", Tag=0x00000008, Type=typing.Optional[bool]),
                 ClusterObjectFieldDescriptor(Label="generatedCommandList", Tag=0x0000FFF8, Type=typing.List[uint]),
                 ClusterObjectFieldDescriptor(Label="acceptedCommandList", Tag=0x0000FFF9, Type=typing.List[uint]),
                 ClusterObjectFieldDescriptor(Label="eventList", Tag=0x0000FFFA, Type=typing.List[uint]),
@@ -6404,6 +6616,10 @@ class GeneralCommissioning(Cluster):
     regulatoryConfig: 'GeneralCommissioning.Enums.RegulatoryLocationTypeEnum' = None
     locationCapability: 'GeneralCommissioning.Enums.RegulatoryLocationTypeEnum' = None
     supportsConcurrentConnection: 'bool' = None
+    TCAcceptedVersion: 'typing.Optional[uint]' = None
+    TCMinRequiredVersion: 'typing.Optional[uint]' = None
+    TCAcknowledgements: 'typing.Optional[uint]' = None
+    TCAcknowledgementsRequired: 'typing.Optional[bool]' = None
     generatedCommandList: 'typing.List[uint]' = None
     acceptedCommandList: 'typing.List[uint]' = None
     eventList: 'typing.List[uint]' = None
@@ -6418,11 +6634,14 @@ class GeneralCommissioning(Cluster):
             kInvalidAuthentication = 0x02
             kNoFailSafe = 0x03
             kBusyWithOtherAdmin = 0x04
+            kRequiredTCNotAccepted = 0x05
+            kTCAcknowledgementsNotReceived = 0x06
+            kTCMinVersionNotMet = 0x07
             # All received enum values that are not listed above will be mapped
             # to kUnknownEnumValue. This is a helper enum value that should only
-            # be used by code to process how it handles receiving and unknown
-            # enum value. This specific should never be transmitted.
-            kUnknownEnumValue = 5,
+            # be used by code to process how it handles receiving an unknown
+            # enum value. This specific value should never be transmitted.
+            kUnknownEnumValue = 8,
 
         class RegulatoryLocationTypeEnum(MatterIntEnum):
             kIndoor = 0x00
@@ -6430,9 +6649,13 @@ class GeneralCommissioning(Cluster):
             kIndoorOutdoor = 0x02
             # All received enum values that are not listed above will be mapped
             # to kUnknownEnumValue. This is a helper enum value that should only
-            # be used by code to process how it handles receiving and unknown
-            # enum value. This specific should never be transmitted.
+            # be used by code to process how it handles receiving an unknown
+            # enum value. This specific value should never be transmitted.
             kUnknownEnumValue = 3,
+
+    class Bitmaps:
+        class Feature(IntFlag):
+            kTermsAndConditions = 0x1
 
     class Structs:
         @dataclass
@@ -6554,6 +6777,40 @@ class GeneralCommissioning(Cluster):
             errorCode: 'GeneralCommissioning.Enums.CommissioningErrorEnum' = 0
             debugText: 'str' = ""
 
+        @dataclass
+        class SetTCAcknowledgements(ClusterCommand):
+            cluster_id: typing.ClassVar[int] = 0x00000030
+            command_id: typing.ClassVar[int] = 0x00000006
+            is_client: typing.ClassVar[bool] = True
+            response_type: typing.ClassVar[str] = 'SetTCAcknowledgementsResponse'
+
+            @ChipUtility.classproperty
+            def descriptor(cls) -> ClusterObjectDescriptor:
+                return ClusterObjectDescriptor(
+                    Fields=[
+                        ClusterObjectFieldDescriptor(Label="TCVersion", Tag=0, Type=uint),
+                        ClusterObjectFieldDescriptor(Label="TCUserResponse", Tag=1, Type=uint),
+                    ])
+
+            TCVersion: 'uint' = 0
+            TCUserResponse: 'uint' = 0
+
+        @dataclass
+        class SetTCAcknowledgementsResponse(ClusterCommand):
+            cluster_id: typing.ClassVar[int] = 0x00000030
+            command_id: typing.ClassVar[int] = 0x00000007
+            is_client: typing.ClassVar[bool] = False
+            response_type: typing.ClassVar[str] = None
+
+            @ChipUtility.classproperty
+            def descriptor(cls) -> ClusterObjectDescriptor:
+                return ClusterObjectDescriptor(
+                    Fields=[
+                        ClusterObjectFieldDescriptor(Label="errorCode", Tag=0, Type=GeneralCommissioning.Enums.CommissioningErrorEnum),
+                    ])
+
+            errorCode: 'GeneralCommissioning.Enums.CommissioningErrorEnum' = 0
+
     class Attributes:
         @dataclass
         class Breadcrumb(ClusterAttributeDescriptor):
@@ -6634,6 +6891,70 @@ class GeneralCommissioning(Cluster):
                 return ClusterObjectFieldDescriptor(Type=bool)
 
             value: 'bool' = False
+
+        @dataclass
+        class TCAcceptedVersion(ClusterAttributeDescriptor):
+            @ChipUtility.classproperty
+            def cluster_id(cls) -> int:
+                return 0x00000030
+
+            @ChipUtility.classproperty
+            def attribute_id(cls) -> int:
+                return 0x00000005
+
+            @ChipUtility.classproperty
+            def attribute_type(cls) -> ClusterObjectFieldDescriptor:
+                return ClusterObjectFieldDescriptor(Type=typing.Optional[uint])
+
+            value: 'typing.Optional[uint]' = None
+
+        @dataclass
+        class TCMinRequiredVersion(ClusterAttributeDescriptor):
+            @ChipUtility.classproperty
+            def cluster_id(cls) -> int:
+                return 0x00000030
+
+            @ChipUtility.classproperty
+            def attribute_id(cls) -> int:
+                return 0x00000006
+
+            @ChipUtility.classproperty
+            def attribute_type(cls) -> ClusterObjectFieldDescriptor:
+                return ClusterObjectFieldDescriptor(Type=typing.Optional[uint])
+
+            value: 'typing.Optional[uint]' = None
+
+        @dataclass
+        class TCAcknowledgements(ClusterAttributeDescriptor):
+            @ChipUtility.classproperty
+            def cluster_id(cls) -> int:
+                return 0x00000030
+
+            @ChipUtility.classproperty
+            def attribute_id(cls) -> int:
+                return 0x00000007
+
+            @ChipUtility.classproperty
+            def attribute_type(cls) -> ClusterObjectFieldDescriptor:
+                return ClusterObjectFieldDescriptor(Type=typing.Optional[uint])
+
+            value: 'typing.Optional[uint]' = None
+
+        @dataclass
+        class TCAcknowledgementsRequired(ClusterAttributeDescriptor):
+            @ChipUtility.classproperty
+            def cluster_id(cls) -> int:
+                return 0x00000030
+
+            @ChipUtility.classproperty
+            def attribute_id(cls) -> int:
+                return 0x00000008
+
+            @ChipUtility.classproperty
+            def attribute_type(cls) -> ClusterObjectFieldDescriptor:
+                return ClusterObjectFieldDescriptor(Type=typing.Optional[bool])
+
+            value: 'typing.Optional[bool]' = None
 
         @dataclass
         class GeneratedCommandList(ClusterAttributeDescriptor):
@@ -6794,8 +7115,8 @@ class NetworkCommissioning(Cluster):
             kUnknownError = 0x0C
             # All received enum values that are not listed above will be mapped
             # to kUnknownEnumValue. This is a helper enum value that should only
-            # be used by code to process how it handles receiving and unknown
-            # enum value. This specific should never be transmitted.
+            # be used by code to process how it handles receiving an unknown
+            # enum value. This specific value should never be transmitted.
             kUnknownEnumValue = 13,
 
         class WiFiBandEnum(MatterIntEnum):
@@ -6807,8 +7128,8 @@ class NetworkCommissioning(Cluster):
             k1g = 0x05
             # All received enum values that are not listed above will be mapped
             # to kUnknownEnumValue. This is a helper enum value that should only
-            # be used by code to process how it handles receiving and unknown
-            # enum value. This specific should never be transmitted.
+            # be used by code to process how it handles receiving an unknown
+            # enum value. This specific value should never be transmitted.
             kUnknownEnumValue = 6,
 
     class Bitmaps:
@@ -7422,8 +7743,8 @@ class DiagnosticLogs(Cluster):
             kCrashLogs = 0x02
             # All received enum values that are not listed above will be mapped
             # to kUnknownEnumValue. This is a helper enum value that should only
-            # be used by code to process how it handles receiving and unknown
-            # enum value. This specific should never be transmitted.
+            # be used by code to process how it handles receiving an unknown
+            # enum value. This specific value should never be transmitted.
             kUnknownEnumValue = 3,
 
         class StatusEnum(MatterIntEnum):
@@ -7434,8 +7755,8 @@ class DiagnosticLogs(Cluster):
             kDenied = 0x04
             # All received enum values that are not listed above will be mapped
             # to kUnknownEnumValue. This is a helper enum value that should only
-            # be used by code to process how it handles receiving and unknown
-            # enum value. This specific should never be transmitted.
+            # be used by code to process how it handles receiving an unknown
+            # enum value. This specific value should never be transmitted.
             kUnknownEnumValue = 5,
 
         class TransferProtocolEnum(MatterIntEnum):
@@ -7443,8 +7764,8 @@ class DiagnosticLogs(Cluster):
             kBdx = 0x01
             # All received enum values that are not listed above will be mapped
             # to kUnknownEnumValue. This is a helper enum value that should only
-            # be used by code to process how it handles receiving and unknown
-            # enum value. This specific should never be transmitted.
+            # be used by code to process how it handles receiving an unknown
+            # enum value. This specific value should never be transmitted.
             kUnknownEnumValue = 2,
 
     class Commands:
@@ -7640,8 +7961,8 @@ class GeneralDiagnostics(Cluster):
             kSoftwareReset = 0x06
             # All received enum values that are not listed above will be mapped
             # to kUnknownEnumValue. This is a helper enum value that should only
-            # be used by code to process how it handles receiving and unknown
-            # enum value. This specific should never be transmitted.
+            # be used by code to process how it handles receiving an unknown
+            # enum value. This specific value should never be transmitted.
             kUnknownEnumValue = 7,
 
         class HardwareFaultEnum(MatterIntEnum):
@@ -7658,8 +7979,8 @@ class GeneralDiagnostics(Cluster):
             kTamperDetected = 0x0A
             # All received enum values that are not listed above will be mapped
             # to kUnknownEnumValue. This is a helper enum value that should only
-            # be used by code to process how it handles receiving and unknown
-            # enum value. This specific should never be transmitted.
+            # be used by code to process how it handles receiving an unknown
+            # enum value. This specific value should never be transmitted.
             kUnknownEnumValue = 11,
 
         class InterfaceTypeEnum(MatterIntEnum):
@@ -7670,8 +7991,8 @@ class GeneralDiagnostics(Cluster):
             kThread = 0x04
             # All received enum values that are not listed above will be mapped
             # to kUnknownEnumValue. This is a helper enum value that should only
-            # be used by code to process how it handles receiving and unknown
-            # enum value. This specific should never be transmitted.
+            # be used by code to process how it handles receiving an unknown
+            # enum value. This specific value should never be transmitted.
             kUnknownEnumValue = 5,
 
         class NetworkFaultEnum(MatterIntEnum):
@@ -7681,8 +8002,8 @@ class GeneralDiagnostics(Cluster):
             kConnectionFailed = 0x03
             # All received enum values that are not listed above will be mapped
             # to kUnknownEnumValue. This is a helper enum value that should only
-            # be used by code to process how it handles receiving and unknown
-            # enum value. This specific should never be transmitted.
+            # be used by code to process how it handles receiving an unknown
+            # enum value. This specific value should never be transmitted.
             kUnknownEnumValue = 4,
 
         class RadioFaultEnum(MatterIntEnum):
@@ -7695,8 +8016,8 @@ class GeneralDiagnostics(Cluster):
             kEthernetFault = 0x06
             # All received enum values that are not listed above will be mapped
             # to kUnknownEnumValue. This is a helper enum value that should only
-            # be used by code to process how it handles receiving and unknown
-            # enum value. This specific should never be transmitted.
+            # be used by code to process how it handles receiving an unknown
+            # enum value. This specific value should never be transmitted.
             kUnknownEnumValue = 7,
 
     class Bitmaps:
@@ -8550,8 +8871,8 @@ class ThreadNetworkDiagnostics(Cluster):
             kNotConnected = 0x01
             # All received enum values that are not listed above will be mapped
             # to kUnknownEnumValue. This is a helper enum value that should only
-            # be used by code to process how it handles receiving and unknown
-            # enum value. This specific should never be transmitted.
+            # be used by code to process how it handles receiving an unknown
+            # enum value. This specific value should never be transmitted.
             kUnknownEnumValue = 2,
 
         class NetworkFaultEnum(MatterIntEnum):
@@ -8561,8 +8882,8 @@ class ThreadNetworkDiagnostics(Cluster):
             kNetworkJammed = 0x03
             # All received enum values that are not listed above will be mapped
             # to kUnknownEnumValue. This is a helper enum value that should only
-            # be used by code to process how it handles receiving and unknown
-            # enum value. This specific should never be transmitted.
+            # be used by code to process how it handles receiving an unknown
+            # enum value. This specific value should never be transmitted.
             kUnknownEnumValue = 4,
 
         class RoutingRoleEnum(MatterIntEnum):
@@ -8575,8 +8896,8 @@ class ThreadNetworkDiagnostics(Cluster):
             kLeader = 0x06
             # All received enum values that are not listed above will be mapped
             # to kUnknownEnumValue. This is a helper enum value that should only
-            # be used by code to process how it handles receiving and unknown
-            # enum value. This specific should never be transmitted.
+            # be used by code to process how it handles receiving an unknown
+            # enum value. This specific value should never be transmitted.
             kUnknownEnumValue = 7,
 
     class Bitmaps:
@@ -9917,8 +10238,8 @@ class WiFiNetworkDiagnostics(Cluster):
             kSsidNotFound = 0x03
             # All received enum values that are not listed above will be mapped
             # to kUnknownEnumValue. This is a helper enum value that should only
-            # be used by code to process how it handles receiving and unknown
-            # enum value. This specific should never be transmitted.
+            # be used by code to process how it handles receiving an unknown
+            # enum value. This specific value should never be transmitted.
             kUnknownEnumValue = 4,
 
         class ConnectionStatusEnum(MatterIntEnum):
@@ -9926,8 +10247,8 @@ class WiFiNetworkDiagnostics(Cluster):
             kNotConnected = 0x01
             # All received enum values that are not listed above will be mapped
             # to kUnknownEnumValue. This is a helper enum value that should only
-            # be used by code to process how it handles receiving and unknown
-            # enum value. This specific should never be transmitted.
+            # be used by code to process how it handles receiving an unknown
+            # enum value. This specific value should never be transmitted.
             kUnknownEnumValue = 2,
 
         class SecurityTypeEnum(MatterIntEnum):
@@ -9939,8 +10260,8 @@ class WiFiNetworkDiagnostics(Cluster):
             kWpa3 = 0x05
             # All received enum values that are not listed above will be mapped
             # to kUnknownEnumValue. This is a helper enum value that should only
-            # be used by code to process how it handles receiving and unknown
-            # enum value. This specific should never be transmitted.
+            # be used by code to process how it handles receiving an unknown
+            # enum value. This specific value should never be transmitted.
             kUnknownEnumValue = 6,
 
         class WiFiVersionEnum(MatterIntEnum):
@@ -9953,8 +10274,8 @@ class WiFiNetworkDiagnostics(Cluster):
             kAh = 0x06
             # All received enum values that are not listed above will be mapped
             # to kUnknownEnumValue. This is a helper enum value that should only
-            # be used by code to process how it handles receiving and unknown
-            # enum value. This specific should never be transmitted.
+            # be used by code to process how it handles receiving an unknown
+            # enum value. This specific value should never be transmitted.
             kUnknownEnumValue = 7,
 
     class Bitmaps:
@@ -10397,8 +10718,8 @@ class EthernetNetworkDiagnostics(Cluster):
             kRate400G = 0x09
             # All received enum values that are not listed above will be mapped
             # to kUnknownEnumValue. This is a helper enum value that should only
-            # be used by code to process how it handles receiving and unknown
-            # enum value. This specific should never be transmitted.
+            # be used by code to process how it handles receiving an unknown
+            # enum value. This specific value should never be transmitted.
             kUnknownEnumValue = 10,
 
     class Bitmaps:
@@ -10720,16 +11041,16 @@ class TimeSynchronization(Cluster):
             kMicrosecondsGranularity = 0x04
             # All received enum values that are not listed above will be mapped
             # to kUnknownEnumValue. This is a helper enum value that should only
-            # be used by code to process how it handles receiving and unknown
-            # enum value. This specific should never be transmitted.
+            # be used by code to process how it handles receiving an unknown
+            # enum value. This specific value should never be transmitted.
             kUnknownEnumValue = 5,
 
         class StatusCode(MatterIntEnum):
             kTimeNotAccepted = 0x02
             # All received enum values that are not listed above will be mapped
             # to kUnknownEnumValue. This is a helper enum value that should only
-            # be used by code to process how it handles receiving and unknown
-            # enum value. This specific should never be transmitted.
+            # be used by code to process how it handles receiving an unknown
+            # enum value. This specific value should never be transmitted.
             kUnknownEnumValue = 0,
 
         class TimeSourceEnum(MatterIntEnum):
@@ -10752,8 +11073,8 @@ class TimeSynchronization(Cluster):
             kGnss = 0x10
             # All received enum values that are not listed above will be mapped
             # to kUnknownEnumValue. This is a helper enum value that should only
-            # be used by code to process how it handles receiving and unknown
-            # enum value. This specific should never be transmitted.
+            # be used by code to process how it handles receiving an unknown
+            # enum value. This specific value should never be transmitted.
             kUnknownEnumValue = 17,
 
         class TimeZoneDatabaseEnum(MatterIntEnum):
@@ -10762,8 +11083,8 @@ class TimeSynchronization(Cluster):
             kNone = 0x02
             # All received enum values that are not listed above will be mapped
             # to kUnknownEnumValue. This is a helper enum value that should only
-            # be used by code to process how it handles receiving and unknown
-            # enum value. This specific should never be transmitted.
+            # be used by code to process how it handles receiving an unknown
+            # enum value. This specific value should never be transmitted.
             kUnknownEnumValue = 3,
 
     class Bitmaps:
@@ -11408,8 +11729,8 @@ class BridgedDeviceBasicInformation(Cluster):
             kGold = 0x14
             # All received enum values that are not listed above will be mapped
             # to kUnknownEnumValue. This is a helper enum value that should only
-            # be used by code to process how it handles receiving and unknown
-            # enum value. This specific should never be transmitted.
+            # be used by code to process how it handles receiving an unknown
+            # enum value. This specific value should never be transmitted.
             kUnknownEnumValue = 21,
 
         class ProductFinishEnum(MatterIntEnum):
@@ -11421,8 +11742,8 @@ class BridgedDeviceBasicInformation(Cluster):
             kFabric = 0x05
             # All received enum values that are not listed above will be mapped
             # to kUnknownEnumValue. This is a helper enum value that should only
-            # be used by code to process how it handles receiving and unknown
-            # enum value. This specific should never be transmitted.
+            # be used by code to process how it handles receiving an unknown
+            # enum value. This specific value should never be transmitted.
             kUnknownEnumValue = 6,
 
     class Bitmaps:
@@ -11455,7 +11776,10 @@ class BridgedDeviceBasicInformation(Cluster):
             def descriptor(cls) -> ClusterObjectDescriptor:
                 return ClusterObjectDescriptor(
                     Fields=[
+                        ClusterObjectFieldDescriptor(Label="stayActiveDuration", Tag=0, Type=uint),
                     ])
+
+            stayActiveDuration: 'uint' = 0
 
     class Attributes:
         @dataclass
@@ -12259,8 +12583,8 @@ class AdministratorCommissioning(Cluster):
             kBasicWindowOpen = 0x02
             # All received enum values that are not listed above will be mapped
             # to kUnknownEnumValue. This is a helper enum value that should only
-            # be used by code to process how it handles receiving and unknown
-            # enum value. This specific should never be transmitted.
+            # be used by code to process how it handles receiving an unknown
+            # enum value. This specific value should never be transmitted.
             kUnknownEnumValue = 3,
 
         class StatusCode(MatterIntEnum):
@@ -12269,8 +12593,8 @@ class AdministratorCommissioning(Cluster):
             kWindowNotOpen = 0x04
             # All received enum values that are not listed above will be mapped
             # to kUnknownEnumValue. This is a helper enum value that should only
-            # be used by code to process how it handles receiving and unknown
-            # enum value. This specific should never be transmitted.
+            # be used by code to process how it handles receiving an unknown
+            # enum value. This specific value should never be transmitted.
             kUnknownEnumValue = 0,
 
     class Bitmaps:
@@ -12530,8 +12854,8 @@ class OperationalCredentials(Cluster):
             kPAICertificate = 0x02
             # All received enum values that are not listed above will be mapped
             # to kUnknownEnumValue. This is a helper enum value that should only
-            # be used by code to process how it handles receiving and unknown
-            # enum value. This specific should never be transmitted.
+            # be used by code to process how it handles receiving an unknown
+            # enum value. This specific value should never be transmitted.
             kUnknownEnumValue = 0,
 
         class NodeOperationalCertStatusEnum(MatterIntEnum):
@@ -12547,8 +12871,8 @@ class OperationalCredentials(Cluster):
             kInvalidFabricIndex = 0x0B
             # All received enum values that are not listed above will be mapped
             # to kUnknownEnumValue. This is a helper enum value that should only
-            # be used by code to process how it handles receiving and unknown
-            # enum value. This specific should never be transmitted.
+            # be used by code to process how it handles receiving an unknown
+            # enum value. This specific value should never be transmitted.
             kUnknownEnumValue = 7,
 
     class Structs:
@@ -13032,8 +13356,8 @@ class GroupKeyManagement(Cluster):
             kCacheAndSync = 0x01
             # All received enum values that are not listed above will be mapped
             # to kUnknownEnumValue. This is a helper enum value that should only
-            # be used by code to process how it handles receiving and unknown
-            # enum value. This specific should never be transmitted.
+            # be used by code to process how it handles receiving an unknown
+            # enum value. This specific value should never be transmitted.
             kUnknownEnumValue = 2,
 
     class Bitmaps:
@@ -14231,8 +14555,8 @@ class IcdManagement(Cluster):
             kEphemeral = 0x01
             # All received enum values that are not listed above will be mapped
             # to kUnknownEnumValue. This is a helper enum value that should only
-            # be used by code to process how it handles receiving and unknown
-            # enum value. This specific should never be transmitted.
+            # be used by code to process how it handles receiving an unknown
+            # enum value. This specific value should never be transmitted.
             kUnknownEnumValue = 2,
 
         class OperatingModeEnum(MatterIntEnum):
@@ -14240,8 +14564,8 @@ class IcdManagement(Cluster):
             kLit = 0x01
             # All received enum values that are not listed above will be mapped
             # to kUnknownEnumValue. This is a helper enum value that should only
-            # be used by code to process how it handles receiving and unknown
-            # enum value. This specific should never be transmitted.
+            # be used by code to process how it handles receiving an unknown
+            # enum value. This specific value should never be transmitted.
             kUnknownEnumValue = 2,
 
     class Bitmaps:
@@ -14674,8 +14998,8 @@ class Timer(Cluster):
             kReady = 0x03
             # All received enum values that are not listed above will be mapped
             # to kUnknownEnumValue. This is a helper enum value that should only
-            # be used by code to process how it handles receiving and unknown
-            # enum value. This specific should never be transmitted.
+            # be used by code to process how it handles receiving an unknown
+            # enum value. This specific value should never be transmitted.
             kUnknownEnumValue = 4,
 
     class Bitmaps:
@@ -14933,8 +15257,8 @@ class OvenCavityOperationalState(Cluster):
             kCommandInvalidInState = 0x03
             # All received enum values that are not listed above will be mapped
             # to kUnknownEnumValue. This is a helper enum value that should only
-            # be used by code to process how it handles receiving and unknown
-            # enum value. This specific should never be transmitted.
+            # be used by code to process how it handles receiving an unknown
+            # enum value. This specific value should never be transmitted.
             kUnknownEnumValue = 4,
 
         class OperationalStateEnum(MatterIntEnum):
@@ -14944,8 +15268,8 @@ class OvenCavityOperationalState(Cluster):
             kError = 0x03
             # All received enum values that are not listed above will be mapped
             # to kUnknownEnumValue. This is a helper enum value that should only
-            # be used by code to process how it handles receiving and unknown
-            # enum value. This specific should never be transmitted.
+            # be used by code to process how it handles receiving an unknown
+            # enum value. This specific value should never be transmitted.
             kUnknownEnumValue = 4,
 
     class Structs:
@@ -15327,8 +15651,8 @@ class OvenMode(Cluster):
             kProofing = 0x4008
             # All received enum values that are not listed above will be mapped
             # to kUnknownEnumValue. This is a helper enum value that should only
-            # be used by code to process how it handles receiving and unknown
-            # enum value. This specific should never be transmitted.
+            # be used by code to process how it handles receiving an unknown
+            # enum value. This specific value should never be transmitted.
             kUnknownEnumValue = 0,
 
     class Bitmaps:
@@ -15596,8 +15920,8 @@ class LaundryDryerControls(Cluster):
             kMax = 0x03
             # All received enum values that are not listed above will be mapped
             # to kUnknownEnumValue. This is a helper enum value that should only
-            # be used by code to process how it handles receiving and unknown
-            # enum value. This specific should never be transmitted.
+            # be used by code to process how it handles receiving an unknown
+            # enum value. This specific value should never be transmitted.
             kUnknownEnumValue = 4,
 
     class Attributes:
@@ -16592,8 +16916,8 @@ class LaundryWasherControls(Cluster):
             kMax = 0x03
             # All received enum values that are not listed above will be mapped
             # to kUnknownEnumValue. This is a helper enum value that should only
-            # be used by code to process how it handles receiving and unknown
-            # enum value. This specific should never be transmitted.
+            # be used by code to process how it handles receiving an unknown
+            # enum value. This specific value should never be transmitted.
             kUnknownEnumValue = 4,
 
     class Bitmaps:
@@ -18025,8 +18349,8 @@ class AirQuality(Cluster):
             kExtremelyPoor = 0x06
             # All received enum values that are not listed above will be mapped
             # to kUnknownEnumValue. This is a helper enum value that should only
-            # be used by code to process how it handles receiving and unknown
-            # enum value. This specific should never be transmitted.
+            # be used by code to process how it handles receiving an unknown
+            # enum value. This specific value should never be transmitted.
             kUnknownEnumValue = 7,
 
     class Bitmaps:
@@ -18206,8 +18530,8 @@ class SmokeCoAlarm(Cluster):
             kCritical = 0x02
             # All received enum values that are not listed above will be mapped
             # to kUnknownEnumValue. This is a helper enum value that should only
-            # be used by code to process how it handles receiving and unknown
-            # enum value. This specific should never be transmitted.
+            # be used by code to process how it handles receiving an unknown
+            # enum value. This specific value should never be transmitted.
             kUnknownEnumValue = 3,
 
         class ContaminationStateEnum(MatterIntEnum):
@@ -18217,8 +18541,8 @@ class SmokeCoAlarm(Cluster):
             kCritical = 0x03
             # All received enum values that are not listed above will be mapped
             # to kUnknownEnumValue. This is a helper enum value that should only
-            # be used by code to process how it handles receiving and unknown
-            # enum value. This specific should never be transmitted.
+            # be used by code to process how it handles receiving an unknown
+            # enum value. This specific value should never be transmitted.
             kUnknownEnumValue = 4,
 
         class EndOfServiceEnum(MatterIntEnum):
@@ -18226,8 +18550,8 @@ class SmokeCoAlarm(Cluster):
             kExpired = 0x01
             # All received enum values that are not listed above will be mapped
             # to kUnknownEnumValue. This is a helper enum value that should only
-            # be used by code to process how it handles receiving and unknown
-            # enum value. This specific should never be transmitted.
+            # be used by code to process how it handles receiving an unknown
+            # enum value. This specific value should never be transmitted.
             kUnknownEnumValue = 2,
 
         class ExpressedStateEnum(MatterIntEnum):
@@ -18242,8 +18566,8 @@ class SmokeCoAlarm(Cluster):
             kInterconnectCO = 0x08
             # All received enum values that are not listed above will be mapped
             # to kUnknownEnumValue. This is a helper enum value that should only
-            # be used by code to process how it handles receiving and unknown
-            # enum value. This specific should never be transmitted.
+            # be used by code to process how it handles receiving an unknown
+            # enum value. This specific value should never be transmitted.
             kUnknownEnumValue = 9,
 
         class MuteStateEnum(MatterIntEnum):
@@ -18251,8 +18575,8 @@ class SmokeCoAlarm(Cluster):
             kMuted = 0x01
             # All received enum values that are not listed above will be mapped
             # to kUnknownEnumValue. This is a helper enum value that should only
-            # be used by code to process how it handles receiving and unknown
-            # enum value. This specific should never be transmitted.
+            # be used by code to process how it handles receiving an unknown
+            # enum value. This specific value should never be transmitted.
             kUnknownEnumValue = 2,
 
         class SensitivityEnum(MatterIntEnum):
@@ -18261,8 +18585,8 @@ class SmokeCoAlarm(Cluster):
             kLow = 0x02
             # All received enum values that are not listed above will be mapped
             # to kUnknownEnumValue. This is a helper enum value that should only
-            # be used by code to process how it handles receiving and unknown
-            # enum value. This specific should never be transmitted.
+            # be used by code to process how it handles receiving an unknown
+            # enum value. This specific value should never be transmitted.
             kUnknownEnumValue = 3,
 
     class Bitmaps:
@@ -19079,8 +19403,8 @@ class MicrowaveOvenMode(Cluster):
             kDefrost = 0x4001
             # All received enum values that are not listed above will be mapped
             # to kUnknownEnumValue. This is a helper enum value that should only
-            # be used by code to process how it handles receiving and unknown
-            # enum value. This specific should never be transmitted.
+            # be used by code to process how it handles receiving an unknown
+            # enum value. This specific value should never be transmitted.
             kUnknownEnumValue = 0,
 
     class Bitmaps:
@@ -19619,8 +19943,8 @@ class OperationalState(Cluster):
             kCommandInvalidInState = 0x03
             # All received enum values that are not listed above will be mapped
             # to kUnknownEnumValue. This is a helper enum value that should only
-            # be used by code to process how it handles receiving and unknown
-            # enum value. This specific should never be transmitted.
+            # be used by code to process how it handles receiving an unknown
+            # enum value. This specific value should never be transmitted.
             kUnknownEnumValue = 4,
 
         class OperationalStateEnum(MatterIntEnum):
@@ -19630,8 +19954,8 @@ class OperationalState(Cluster):
             kError = 0x03
             # All received enum values that are not listed above will be mapped
             # to kUnknownEnumValue. This is a helper enum value that should only
-            # be used by code to process how it handles receiving and unknown
-            # enum value. This specific should never be transmitted.
+            # be used by code to process how it handles receiving an unknown
+            # enum value. This specific value should never be transmitted.
             kUnknownEnumValue = 4,
 
     class Structs:
@@ -20939,8 +21263,8 @@ class HepaFilterMonitoring(Cluster):
             kCritical = 0x02
             # All received enum values that are not listed above will be mapped
             # to kUnknownEnumValue. This is a helper enum value that should only
-            # be used by code to process how it handles receiving and unknown
-            # enum value. This specific should never be transmitted.
+            # be used by code to process how it handles receiving an unknown
+            # enum value. This specific value should never be transmitted.
             kUnknownEnumValue = 3,
 
         class DegradationDirectionEnum(MatterIntEnum):
@@ -20948,8 +21272,8 @@ class HepaFilterMonitoring(Cluster):
             kDown = 0x01
             # All received enum values that are not listed above will be mapped
             # to kUnknownEnumValue. This is a helper enum value that should only
-            # be used by code to process how it handles receiving and unknown
-            # enum value. This specific should never be transmitted.
+            # be used by code to process how it handles receiving an unknown
+            # enum value. This specific value should never be transmitted.
             kUnknownEnumValue = 2,
 
         class ProductIdentifierTypeEnum(MatterIntEnum):
@@ -20960,8 +21284,8 @@ class HepaFilterMonitoring(Cluster):
             kOem = 0x04
             # All received enum values that are not listed above will be mapped
             # to kUnknownEnumValue. This is a helper enum value that should only
-            # be used by code to process how it handles receiving and unknown
-            # enum value. This specific should never be transmitted.
+            # be used by code to process how it handles receiving an unknown
+            # enum value. This specific value should never be transmitted.
             kUnknownEnumValue = 5,
 
     class Bitmaps:
@@ -21234,8 +21558,8 @@ class ActivatedCarbonFilterMonitoring(Cluster):
             kCritical = 0x02
             # All received enum values that are not listed above will be mapped
             # to kUnknownEnumValue. This is a helper enum value that should only
-            # be used by code to process how it handles receiving and unknown
-            # enum value. This specific should never be transmitted.
+            # be used by code to process how it handles receiving an unknown
+            # enum value. This specific value should never be transmitted.
             kUnknownEnumValue = 3,
 
         class DegradationDirectionEnum(MatterIntEnum):
@@ -21243,8 +21567,8 @@ class ActivatedCarbonFilterMonitoring(Cluster):
             kDown = 0x01
             # All received enum values that are not listed above will be mapped
             # to kUnknownEnumValue. This is a helper enum value that should only
-            # be used by code to process how it handles receiving and unknown
-            # enum value. This specific should never be transmitted.
+            # be used by code to process how it handles receiving an unknown
+            # enum value. This specific value should never be transmitted.
             kUnknownEnumValue = 2,
 
         class ProductIdentifierTypeEnum(MatterIntEnum):
@@ -21255,8 +21579,8 @@ class ActivatedCarbonFilterMonitoring(Cluster):
             kOem = 0x04
             # All received enum values that are not listed above will be mapped
             # to kUnknownEnumValue. This is a helper enum value that should only
-            # be used by code to process how it handles receiving and unknown
-            # enum value. This specific should never be transmitted.
+            # be used by code to process how it handles receiving an unknown
+            # enum value. This specific value should never be transmitted.
             kUnknownEnumValue = 5,
 
     class Bitmaps:
@@ -21890,8 +22214,8 @@ class ValveConfigurationAndControl(Cluster):
             kFailureDueToFault = 0x02
             # All received enum values that are not listed above will be mapped
             # to kUnknownEnumValue. This is a helper enum value that should only
-            # be used by code to process how it handles receiving and unknown
-            # enum value. This specific should never be transmitted.
+            # be used by code to process how it handles receiving an unknown
+            # enum value. This specific value should never be transmitted.
             kUnknownEnumValue = 0,
 
         class ValveStateEnum(MatterIntEnum):
@@ -21900,8 +22224,8 @@ class ValveConfigurationAndControl(Cluster):
             kTransitioning = 0x02
             # All received enum values that are not listed above will be mapped
             # to kUnknownEnumValue. This is a helper enum value that should only
-            # be used by code to process how it handles receiving and unknown
-            # enum value. This specific should never be transmitted.
+            # be used by code to process how it handles receiving an unknown
+            # enum value. This specific value should never be transmitted.
             kUnknownEnumValue = 3,
 
     class Bitmaps:
@@ -22344,8 +22668,8 @@ class ElectricalPowerMeasurement(Cluster):
             kElectricalEnergy = 0x0E
             # All received enum values that are not listed above will be mapped
             # to kUnknownEnumValue. This is a helper enum value that should only
-            # be used by code to process how it handles receiving and unknown
-            # enum value. This specific should never be transmitted.
+            # be used by code to process how it handles receiving an unknown
+            # enum value. This specific value should never be transmitted.
             kUnknownEnumValue = 15,
 
         class PowerModeEnum(MatterIntEnum):
@@ -22354,8 +22678,8 @@ class ElectricalPowerMeasurement(Cluster):
             kAc = 0x02
             # All received enum values that are not listed above will be mapped
             # to kUnknownEnumValue. This is a helper enum value that should only
-            # be used by code to process how it handles receiving and unknown
-            # enum value. This specific should never be transmitted.
+            # be used by code to process how it handles receiving an unknown
+            # enum value. This specific value should never be transmitted.
             kUnknownEnumValue = 3,
 
     class Bitmaps:
@@ -22931,8 +23255,8 @@ class ElectricalEnergyMeasurement(Cluster):
             kElectricalEnergy = 0x0E
             # All received enum values that are not listed above will be mapped
             # to kUnknownEnumValue. This is a helper enum value that should only
-            # be used by code to process how it handles receiving and unknown
-            # enum value. This specific should never be transmitted.
+            # be used by code to process how it handles receiving an unknown
+            # enum value. This specific value should never be transmitted.
             kUnknownEnumValue = 15,
 
     class Bitmaps:
@@ -23301,8 +23625,8 @@ class WaterHeaterManagement(Cluster):
             kActive = 0x01
             # All received enum values that are not listed above will be mapped
             # to kUnknownEnumValue. This is a helper enum value that should only
-            # be used by code to process how it handles receiving and unknown
-            # enum value. This specific should never be transmitted.
+            # be used by code to process how it handles receiving an unknown
+            # enum value. This specific value should never be transmitted.
             kUnknownEnumValue = 2,
 
     class Bitmaps:
@@ -23611,8 +23935,8 @@ class DemandResponseLoadControl(Cluster):
             kServiceDisconnect = 0x09
             # All received enum values that are not listed above will be mapped
             # to kUnknownEnumValue. This is a helper enum value that should only
-            # be used by code to process how it handles receiving and unknown
-            # enum value. This specific should never be transmitted.
+            # be used by code to process how it handles receiving an unknown
+            # enum value. This specific value should never be transmitted.
             kUnknownEnumValue = 10,
 
         class HeatingSourceEnum(MatterIntEnum):
@@ -23621,8 +23945,8 @@ class DemandResponseLoadControl(Cluster):
             kNonElectric = 0x02
             # All received enum values that are not listed above will be mapped
             # to kUnknownEnumValue. This is a helper enum value that should only
-            # be used by code to process how it handles receiving and unknown
-            # enum value. This specific should never be transmitted.
+            # be used by code to process how it handles receiving an unknown
+            # enum value. This specific value should never be transmitted.
             kUnknownEnumValue = 3,
 
         class LoadControlEventChangeSourceEnum(MatterIntEnum):
@@ -23630,8 +23954,8 @@ class DemandResponseLoadControl(Cluster):
             kUserAction = 0x01
             # All received enum values that are not listed above will be mapped
             # to kUnknownEnumValue. This is a helper enum value that should only
-            # be used by code to process how it handles receiving and unknown
-            # enum value. This specific should never be transmitted.
+            # be used by code to process how it handles receiving an unknown
+            # enum value. This specific value should never be transmitted.
             kUnknownEnumValue = 2,
 
         class LoadControlEventStatusEnum(MatterIntEnum):
@@ -23650,8 +23974,8 @@ class DemandResponseLoadControl(Cluster):
             kFailed = 0x0C
             # All received enum values that are not listed above will be mapped
             # to kUnknownEnumValue. This is a helper enum value that should only
-            # be used by code to process how it handles receiving and unknown
-            # enum value. This specific should never be transmitted.
+            # be used by code to process how it handles receiving an unknown
+            # enum value. This specific value should never be transmitted.
             kUnknownEnumValue = 13,
 
     class Bitmaps:
@@ -24202,8 +24526,8 @@ class Messages(Cluster):
             kBanned = 0x04
             # All received enum values that are not listed above will be mapped
             # to kUnknownEnumValue. This is a helper enum value that should only
-            # be used by code to process how it handles receiving and unknown
-            # enum value. This specific should never be transmitted.
+            # be used by code to process how it handles receiving an unknown
+            # enum value. This specific value should never be transmitted.
             kUnknownEnumValue = 5,
 
         class MessagePriorityEnum(MatterIntEnum):
@@ -24213,8 +24537,8 @@ class Messages(Cluster):
             kCritical = 0x03
             # All received enum values that are not listed above will be mapped
             # to kUnknownEnumValue. This is a helper enum value that should only
-            # be used by code to process how it handles receiving and unknown
-            # enum value. This specific should never be transmitted.
+            # be used by code to process how it handles receiving an unknown
+            # enum value. This specific value should never be transmitted.
             kUnknownEnumValue = 4,
 
     class Bitmaps:
@@ -24552,8 +24876,8 @@ class DeviceEnergyManagement(Cluster):
             kGridOptimization = 0x01
             # All received enum values that are not listed above will be mapped
             # to kUnknownEnumValue. This is a helper enum value that should only
-            # be used by code to process how it handles receiving and unknown
-            # enum value. This specific should never be transmitted.
+            # be used by code to process how it handles receiving an unknown
+            # enum value. This specific value should never be transmitted.
             kUnknownEnumValue = 2,
 
         class CauseEnum(MatterIntEnum):
@@ -24564,8 +24888,8 @@ class DeviceEnergyManagement(Cluster):
             kCancelled = 0x04
             # All received enum values that are not listed above will be mapped
             # to kUnknownEnumValue. This is a helper enum value that should only
-            # be used by code to process how it handles receiving and unknown
-            # enum value. This specific should never be transmitted.
+            # be used by code to process how it handles receiving an unknown
+            # enum value. This specific value should never be transmitted.
             kUnknownEnumValue = 5,
 
         class CostTypeEnum(MatterIntEnum):
@@ -24575,8 +24899,8 @@ class DeviceEnergyManagement(Cluster):
             kTemperature = 0x03
             # All received enum values that are not listed above will be mapped
             # to kUnknownEnumValue. This is a helper enum value that should only
-            # be used by code to process how it handles receiving and unknown
-            # enum value. This specific should never be transmitted.
+            # be used by code to process how it handles receiving an unknown
+            # enum value. This specific value should never be transmitted.
             kUnknownEnumValue = 4,
 
         class ESAStateEnum(MatterIntEnum):
@@ -24587,8 +24911,8 @@ class DeviceEnergyManagement(Cluster):
             kPaused = 0x04
             # All received enum values that are not listed above will be mapped
             # to kUnknownEnumValue. This is a helper enum value that should only
-            # be used by code to process how it handles receiving and unknown
-            # enum value. This specific should never be transmitted.
+            # be used by code to process how it handles receiving an unknown
+            # enum value. This specific value should never be transmitted.
             kUnknownEnumValue = 5,
 
         class ESATypeEnum(MatterIntEnum):
@@ -24609,8 +24933,8 @@ class DeviceEnergyManagement(Cluster):
             kOther = 0xFF
             # All received enum values that are not listed above will be mapped
             # to kUnknownEnumValue. This is a helper enum value that should only
-            # be used by code to process how it handles receiving and unknown
-            # enum value. This specific should never be transmitted.
+            # be used by code to process how it handles receiving an unknown
+            # enum value. This specific value should never be transmitted.
             kUnknownEnumValue = 14,
 
         class ForecastUpdateReasonEnum(MatterIntEnum):
@@ -24619,8 +24943,8 @@ class DeviceEnergyManagement(Cluster):
             kGridOptimization = 0x02
             # All received enum values that are not listed above will be mapped
             # to kUnknownEnumValue. This is a helper enum value that should only
-            # be used by code to process how it handles receiving and unknown
-            # enum value. This specific should never be transmitted.
+            # be used by code to process how it handles receiving an unknown
+            # enum value. This specific value should never be transmitted.
             kUnknownEnumValue = 3,
 
         class OptOutStateEnum(MatterIntEnum):
@@ -24630,8 +24954,8 @@ class DeviceEnergyManagement(Cluster):
             kOptOut = 0x03
             # All received enum values that are not listed above will be mapped
             # to kUnknownEnumValue. This is a helper enum value that should only
-            # be used by code to process how it handles receiving and unknown
-            # enum value. This specific should never be transmitted.
+            # be used by code to process how it handles receiving an unknown
+            # enum value. This specific value should never be transmitted.
             kUnknownEnumValue = 4,
 
         class PowerAdjustReasonEnum(MatterIntEnum):
@@ -24640,8 +24964,8 @@ class DeviceEnergyManagement(Cluster):
             kGridOptimizationAdjustment = 0x02
             # All received enum values that are not listed above will be mapped
             # to kUnknownEnumValue. This is a helper enum value that should only
-            # be used by code to process how it handles receiving and unknown
-            # enum value. This specific should never be transmitted.
+            # be used by code to process how it handles receiving an unknown
+            # enum value. This specific value should never be transmitted.
             kUnknownEnumValue = 3,
 
     class Bitmaps:
@@ -25319,8 +25643,8 @@ class EnergyEvse(Cluster):
             kOther = 0x02
             # All received enum values that are not listed above will be mapped
             # to kUnknownEnumValue. This is a helper enum value that should only
-            # be used by code to process how it handles receiving and unknown
-            # enum value. This specific should never be transmitted.
+            # be used by code to process how it handles receiving an unknown
+            # enum value. This specific value should never be transmitted.
             kUnknownEnumValue = 3,
 
         class FaultStateEnum(MatterIntEnum):
@@ -25343,8 +25667,8 @@ class EnergyEvse(Cluster):
             kOther = 0xFF
             # All received enum values that are not listed above will be mapped
             # to kUnknownEnumValue. This is a helper enum value that should only
-            # be used by code to process how it handles receiving and unknown
-            # enum value. This specific should never be transmitted.
+            # be used by code to process how it handles receiving an unknown
+            # enum value. This specific value should never be transmitted.
             kUnknownEnumValue = 16,
 
         class StateEnum(MatterIntEnum):
@@ -25357,8 +25681,8 @@ class EnergyEvse(Cluster):
             kFault = 0x06
             # All received enum values that are not listed above will be mapped
             # to kUnknownEnumValue. This is a helper enum value that should only
-            # be used by code to process how it handles receiving and unknown
-            # enum value. This specific should never be transmitted.
+            # be used by code to process how it handles receiving an unknown
+            # enum value. This specific value should never be transmitted.
             kUnknownEnumValue = 7,
 
         class SupplyStateEnum(MatterIntEnum):
@@ -25370,8 +25694,8 @@ class EnergyEvse(Cluster):
             kEnabled = 0x05
             # All received enum values that are not listed above will be mapped
             # to kUnknownEnumValue. This is a helper enum value that should only
-            # be used by code to process how it handles receiving and unknown
-            # enum value. This specific should never be transmitted.
+            # be used by code to process how it handles receiving an unknown
+            # enum value. This specific value should never be transmitted.
             kUnknownEnumValue = 6,
 
     class Bitmaps:
@@ -26221,8 +26545,8 @@ class EnergyPreference(Cluster):
             kWaterConsumption = 0x03
             # All received enum values that are not listed above will be mapped
             # to kUnknownEnumValue. This is a helper enum value that should only
-            # be used by code to process how it handles receiving and unknown
-            # enum value. This specific should never be transmitted.
+            # be used by code to process how it handles receiving an unknown
+            # enum value. This specific value should never be transmitted.
             kUnknownEnumValue = 4,
 
     class Bitmaps:
@@ -27528,8 +27852,8 @@ class DoorLock(Cluster):
             kForcedUser = 0x08
             # All received enum values that are not listed above will be mapped
             # to kUnknownEnumValue. This is a helper enum value that should only
-            # be used by code to process how it handles receiving and unknown
-            # enum value. This specific should never be transmitted.
+            # be used by code to process how it handles receiving an unknown
+            # enum value. This specific value should never be transmitted.
             kUnknownEnumValue = 2,
 
         class CredentialRuleEnum(MatterIntEnum):
@@ -27538,8 +27862,8 @@ class DoorLock(Cluster):
             kTri = 0x02
             # All received enum values that are not listed above will be mapped
             # to kUnknownEnumValue. This is a helper enum value that should only
-            # be used by code to process how it handles receiving and unknown
-            # enum value. This specific should never be transmitted.
+            # be used by code to process how it handles receiving an unknown
+            # enum value. This specific value should never be transmitted.
             kUnknownEnumValue = 3,
 
         class CredentialTypeEnum(MatterIntEnum):
@@ -27554,8 +27878,8 @@ class DoorLock(Cluster):
             kAliroNonEvictableEndpointKey = 0x08
             # All received enum values that are not listed above will be mapped
             # to kUnknownEnumValue. This is a helper enum value that should only
-            # be used by code to process how it handles receiving and unknown
-            # enum value. This specific should never be transmitted.
+            # be used by code to process how it handles receiving an unknown
+            # enum value. This specific value should never be transmitted.
             kUnknownEnumValue = 9,
 
         class DataOperationTypeEnum(MatterIntEnum):
@@ -27564,8 +27888,8 @@ class DoorLock(Cluster):
             kModify = 0x02
             # All received enum values that are not listed above will be mapped
             # to kUnknownEnumValue. This is a helper enum value that should only
-            # be used by code to process how it handles receiving and unknown
-            # enum value. This specific should never be transmitted.
+            # be used by code to process how it handles receiving an unknown
+            # enum value. This specific value should never be transmitted.
             kUnknownEnumValue = 3,
 
         class DlLockState(MatterIntEnum):
@@ -27575,8 +27899,8 @@ class DoorLock(Cluster):
             kUnlatched = 0x03
             # All received enum values that are not listed above will be mapped
             # to kUnknownEnumValue. This is a helper enum value that should only
-            # be used by code to process how it handles receiving and unknown
-            # enum value. This specific should never be transmitted.
+            # be used by code to process how it handles receiving an unknown
+            # enum value. This specific value should never be transmitted.
             kUnknownEnumValue = 4,
 
         class DlLockType(MatterIntEnum):
@@ -27594,8 +27918,8 @@ class DoorLock(Cluster):
             kEurocylinder = 0x0B
             # All received enum values that are not listed above will be mapped
             # to kUnknownEnumValue. This is a helper enum value that should only
-            # be used by code to process how it handles receiving and unknown
-            # enum value. This specific should never be transmitted.
+            # be used by code to process how it handles receiving an unknown
+            # enum value. This specific value should never be transmitted.
             kUnknownEnumValue = 12,
 
         class DlStatus(MatterIntEnum):
@@ -27608,8 +27932,8 @@ class DoorLock(Cluster):
             kNotFound = 0x8B
             # All received enum values that are not listed above will be mapped
             # to kUnknownEnumValue. This is a helper enum value that should only
-            # be used by code to process how it handles receiving and unknown
-            # enum value. This specific should never be transmitted.
+            # be used by code to process how it handles receiving an unknown
+            # enum value. This specific value should never be transmitted.
             kUnknownEnumValue = 4,
 
         class DoorLockOperationEventCode(MatterIntEnum):
@@ -27630,8 +27954,8 @@ class DoorLock(Cluster):
             kManualUnlock = 0x0E
             # All received enum values that are not listed above will be mapped
             # to kUnknownEnumValue. This is a helper enum value that should only
-            # be used by code to process how it handles receiving and unknown
-            # enum value. This specific should never be transmitted.
+            # be used by code to process how it handles receiving an unknown
+            # enum value. This specific value should never be transmitted.
             kUnknownEnumValue = 15,
 
         class DoorLockProgrammingEventCode(MatterIntEnum):
@@ -27644,8 +27968,8 @@ class DoorLock(Cluster):
             kIdDeleted = 0x06
             # All received enum values that are not listed above will be mapped
             # to kUnknownEnumValue. This is a helper enum value that should only
-            # be used by code to process how it handles receiving and unknown
-            # enum value. This specific should never be transmitted.
+            # be used by code to process how it handles receiving an unknown
+            # enum value. This specific value should never be transmitted.
             kUnknownEnumValue = 7,
 
         class DoorLockSetPinOrIdStatus(MatterIntEnum):
@@ -27655,8 +27979,8 @@ class DoorLock(Cluster):
             kDuplicateCodeError = 0x03
             # All received enum values that are not listed above will be mapped
             # to kUnknownEnumValue. This is a helper enum value that should only
-            # be used by code to process how it handles receiving and unknown
-            # enum value. This specific should never be transmitted.
+            # be used by code to process how it handles receiving an unknown
+            # enum value. This specific value should never be transmitted.
             kUnknownEnumValue = 4,
 
         class DoorLockUserStatus(MatterIntEnum):
@@ -27666,8 +27990,8 @@ class DoorLock(Cluster):
             kNotSupported = 0xFF
             # All received enum values that are not listed above will be mapped
             # to kUnknownEnumValue. This is a helper enum value that should only
-            # be used by code to process how it handles receiving and unknown
-            # enum value. This specific should never be transmitted.
+            # be used by code to process how it handles receiving an unknown
+            # enum value. This specific value should never be transmitted.
             kUnknownEnumValue = 2,
 
         class DoorLockUserType(MatterIntEnum):
@@ -27679,8 +28003,8 @@ class DoorLock(Cluster):
             kNotSupported = 0xFF
             # All received enum values that are not listed above will be mapped
             # to kUnknownEnumValue. This is a helper enum value that should only
-            # be used by code to process how it handles receiving and unknown
-            # enum value. This specific should never be transmitted.
+            # be used by code to process how it handles receiving an unknown
+            # enum value. This specific value should never be transmitted.
             kUnknownEnumValue = 5,
 
         class DoorStateEnum(MatterIntEnum):
@@ -27692,8 +28016,8 @@ class DoorLock(Cluster):
             kDoorAjar = 0x05
             # All received enum values that are not listed above will be mapped
             # to kUnknownEnumValue. This is a helper enum value that should only
-            # be used by code to process how it handles receiving and unknown
-            # enum value. This specific should never be transmitted.
+            # be used by code to process how it handles receiving an unknown
+            # enum value. This specific value should never be transmitted.
             kUnknownEnumValue = 6,
 
         class LockDataTypeEnum(MatterIntEnum):
@@ -27713,8 +28037,8 @@ class DoorLock(Cluster):
             kAliroNonEvictableEndpointKey = 0x0D
             # All received enum values that are not listed above will be mapped
             # to kUnknownEnumValue. This is a helper enum value that should only
-            # be used by code to process how it handles receiving and unknown
-            # enum value. This specific should never be transmitted.
+            # be used by code to process how it handles receiving an unknown
+            # enum value. This specific value should never be transmitted.
             kUnknownEnumValue = 14,
 
         class LockOperationTypeEnum(MatterIntEnum):
@@ -27725,8 +28049,8 @@ class DoorLock(Cluster):
             kUnlatch = 0x04
             # All received enum values that are not listed above will be mapped
             # to kUnknownEnumValue. This is a helper enum value that should only
-            # be used by code to process how it handles receiving and unknown
-            # enum value. This specific should never be transmitted.
+            # be used by code to process how it handles receiving an unknown
+            # enum value. This specific value should never be transmitted.
             kUnknownEnumValue = 5,
 
         class OperatingModeEnum(MatterIntEnum):
@@ -27737,8 +28061,8 @@ class DoorLock(Cluster):
             kPassage = 0x04
             # All received enum values that are not listed above will be mapped
             # to kUnknownEnumValue. This is a helper enum value that should only
-            # be used by code to process how it handles receiving and unknown
-            # enum value. This specific should never be transmitted.
+            # be used by code to process how it handles receiving an unknown
+            # enum value. This specific value should never be transmitted.
             kUnknownEnumValue = 5,
 
         class OperationErrorEnum(MatterIntEnum):
@@ -27749,8 +28073,8 @@ class DoorLock(Cluster):
             kInsufficientBattery = 0x04
             # All received enum values that are not listed above will be mapped
             # to kUnknownEnumValue. This is a helper enum value that should only
-            # be used by code to process how it handles receiving and unknown
-            # enum value. This specific should never be transmitted.
+            # be used by code to process how it handles receiving an unknown
+            # enum value. This specific value should never be transmitted.
             kUnknownEnumValue = 5,
 
         class OperationSourceEnum(MatterIntEnum):
@@ -27767,8 +28091,8 @@ class DoorLock(Cluster):
             kAliro = 0x0A
             # All received enum values that are not listed above will be mapped
             # to kUnknownEnumValue. This is a helper enum value that should only
-            # be used by code to process how it handles receiving and unknown
-            # enum value. This specific should never be transmitted.
+            # be used by code to process how it handles receiving an unknown
+            # enum value. This specific value should never be transmitted.
             kUnknownEnumValue = 11,
 
         class UserStatusEnum(MatterIntEnum):
@@ -27777,8 +28101,8 @@ class DoorLock(Cluster):
             kOccupiedDisabled = 0x03
             # All received enum values that are not listed above will be mapped
             # to kUnknownEnumValue. This is a helper enum value that should only
-            # be used by code to process how it handles receiving and unknown
-            # enum value. This specific should never be transmitted.
+            # be used by code to process how it handles receiving an unknown
+            # enum value. This specific value should never be transmitted.
             kUnknownEnumValue = 2,
 
         class UserTypeEnum(MatterIntEnum):
@@ -27794,8 +28118,8 @@ class DoorLock(Cluster):
             kRemoteOnlyUser = 0x09
             # All received enum values that are not listed above will be mapped
             # to kUnknownEnumValue. This is a helper enum value that should only
-            # be used by code to process how it handles receiving and unknown
-            # enum value. This specific should never be transmitted.
+            # be used by code to process how it handles receiving an unknown
+            # enum value. This specific value should never be transmitted.
             kUnknownEnumValue = 10,
 
     class Bitmaps:
@@ -29577,8 +29901,8 @@ class WindowCovering(Cluster):
             kUnknown = 0xFF
             # All received enum values that are not listed above will be mapped
             # to kUnknownEnumValue. This is a helper enum value that should only
-            # be used by code to process how it handles receiving and unknown
-            # enum value. This specific should never be transmitted.
+            # be used by code to process how it handles receiving an unknown
+            # enum value. This specific value should never be transmitted.
             kUnknownEnumValue = 24,
 
         class Type(MatterIntEnum):
@@ -29595,8 +29919,8 @@ class WindowCovering(Cluster):
             kUnknown = 0xFF
             # All received enum values that are not listed above will be mapped
             # to kUnknownEnumValue. This is a helper enum value that should only
-            # be used by code to process how it handles receiving and unknown
-            # enum value. This specific should never be transmitted.
+            # be used by code to process how it handles receiving an unknown
+            # enum value. This specific value should never be transmitted.
             kUnknownEnumValue = 10,
 
     class Bitmaps:
@@ -30670,8 +30994,8 @@ class ServiceArea(Cluster):
             kWorkshop = 0x5E
             # All received enum values that are not listed above will be mapped
             # to kUnknownEnumValue. This is a helper enum value that should only
-            # be used by code to process how it handles receiving and unknown
-            # enum value. This specific should never be transmitted.
+            # be used by code to process how it handles receiving an unknown
+            # enum value. This specific value should never be transmitted.
             kUnknownEnumValue = 95,
 
         class FloorSurfaceTag(MatterIntEnum):
@@ -30701,8 +31025,8 @@ class ServiceArea(Cluster):
             kVinyl = 0x17
             # All received enum values that are not listed above will be mapped
             # to kUnknownEnumValue. This is a helper enum value that should only
-            # be used by code to process how it handles receiving and unknown
-            # enum value. This specific should never be transmitted.
+            # be used by code to process how it handles receiving an unknown
+            # enum value. This specific value should never be transmitted.
             kUnknownEnumValue = 24,
 
         class LandmarkTag(MatterIntEnum):
@@ -30759,8 +31083,8 @@ class ServiceArea(Cluster):
             kWineCooler = 0x32
             # All received enum values that are not listed above will be mapped
             # to kUnknownEnumValue. This is a helper enum value that should only
-            # be used by code to process how it handles receiving and unknown
-            # enum value. This specific should never be transmitted.
+            # be used by code to process how it handles receiving an unknown
+            # enum value. This specific value should never be transmitted.
             kUnknownEnumValue = 51,
 
         class OperationalStatusEnum(MatterIntEnum):
@@ -30770,8 +31094,8 @@ class ServiceArea(Cluster):
             kCompleted = 0x03
             # All received enum values that are not listed above will be mapped
             # to kUnknownEnumValue. This is a helper enum value that should only
-            # be used by code to process how it handles receiving and unknown
-            # enum value. This specific should never be transmitted.
+            # be used by code to process how it handles receiving an unknown
+            # enum value. This specific value should never be transmitted.
             kUnknownEnumValue = 4,
 
         class PositionTag(MatterIntEnum):
@@ -30791,8 +31115,8 @@ class ServiceArea(Cluster):
             kBehind = 0x0D
             # All received enum values that are not listed above will be mapped
             # to kUnknownEnumValue. This is a helper enum value that should only
-            # be used by code to process how it handles receiving and unknown
-            # enum value. This specific should never be transmitted.
+            # be used by code to process how it handles receiving an unknown
+            # enum value. This specific value should never be transmitted.
             kUnknownEnumValue = 14,
 
         class SelectLocationsStatus(MatterIntEnum):
@@ -30803,8 +31127,8 @@ class ServiceArea(Cluster):
             kInvalidSet = 0x04
             # All received enum values that are not listed above will be mapped
             # to kUnknownEnumValue. This is a helper enum value that should only
-            # be used by code to process how it handles receiving and unknown
-            # enum value. This specific should never be transmitted.
+            # be used by code to process how it handles receiving an unknown
+            # enum value. This specific value should never be transmitted.
             kUnknownEnumValue = 5,
 
         class SkipCurrentLocationStatus(MatterIntEnum):
@@ -30813,8 +31137,8 @@ class ServiceArea(Cluster):
             kInvalidInMode = 0x02
             # All received enum values that are not listed above will be mapped
             # to kUnknownEnumValue. This is a helper enum value that should only
-            # be used by code to process how it handles receiving and unknown
-            # enum value. This specific should never be transmitted.
+            # be used by code to process how it handles receiving an unknown
+            # enum value. This specific value should never be transmitted.
             kUnknownEnumValue = 3,
 
     class Bitmaps:
@@ -31239,8 +31563,8 @@ class PumpConfigurationAndControl(Cluster):
             kAutomatic = 0x07
             # All received enum values that are not listed above will be mapped
             # to kUnknownEnumValue. This is a helper enum value that should only
-            # be used by code to process how it handles receiving and unknown
-            # enum value. This specific should never be transmitted.
+            # be used by code to process how it handles receiving an unknown
+            # enum value. This specific value should never be transmitted.
             kUnknownEnumValue = 4,
 
         class OperationModeEnum(MatterIntEnum):
@@ -31250,8 +31574,8 @@ class PumpConfigurationAndControl(Cluster):
             kLocal = 0x03
             # All received enum values that are not listed above will be mapped
             # to kUnknownEnumValue. This is a helper enum value that should only
-            # be used by code to process how it handles receiving and unknown
-            # enum value. This specific should never be transmitted.
+            # be used by code to process how it handles receiving an unknown
+            # enum value. This specific value should never be transmitted.
             kUnknownEnumValue = 4,
 
     class Bitmaps:
@@ -32082,8 +32406,7 @@ class Thermostat(Cluster):
                 ClusterObjectFieldDescriptor(Label="presets", Tag=0x00000050, Type=typing.Optional[typing.List[Thermostat.Structs.PresetStruct]]),
                 ClusterObjectFieldDescriptor(Label="schedules", Tag=0x00000051, Type=typing.Optional[typing.List[Thermostat.Structs.ScheduleStruct]]),
                 ClusterObjectFieldDescriptor(Label="presetsSchedulesEditable", Tag=0x00000052, Type=typing.Optional[bool]),
-                ClusterObjectFieldDescriptor(Label="temperatureSetpointHoldPolicy", Tag=0x00000053, Type=typing.Optional[uint]),
-                ClusterObjectFieldDescriptor(Label="setpointHoldExpiryTimestamp", Tag=0x00000054, Type=typing.Union[None, Nullable, uint]),
+                ClusterObjectFieldDescriptor(Label="setpointHoldExpiryTimestamp", Tag=0x00000053, Type=typing.Union[None, Nullable, uint]),
                 ClusterObjectFieldDescriptor(Label="generatedCommandList", Tag=0x0000FFF8, Type=typing.List[uint]),
                 ClusterObjectFieldDescriptor(Label="acceptedCommandList", Tag=0x0000FFF9, Type=typing.List[uint]),
                 ClusterObjectFieldDescriptor(Label="eventList", Tag=0x0000FFFA, Type=typing.List[uint]),
@@ -32152,7 +32475,6 @@ class Thermostat(Cluster):
     presets: 'typing.Optional[typing.List[Thermostat.Structs.PresetStruct]]' = None
     schedules: 'typing.Optional[typing.List[Thermostat.Structs.ScheduleStruct]]' = None
     presetsSchedulesEditable: 'typing.Optional[bool]' = None
-    temperatureSetpointHoldPolicy: 'typing.Optional[uint]' = None
     setpointHoldExpiryTimestamp: 'typing.Union[None, Nullable, uint]' = None
     generatedCommandList: 'typing.List[uint]' = None
     acceptedCommandList: 'typing.List[uint]' = None
@@ -32166,8 +32488,8 @@ class Thermostat(Cluster):
             kBTUh = 0x00
             # All received enum values that are not listed above will be mapped
             # to kUnknownEnumValue. This is a helper enum value that should only
-            # be used by code to process how it handles receiving and unknown
-            # enum value. This specific should never be transmitted.
+            # be used by code to process how it handles receiving an unknown
+            # enum value. This specific value should never be transmitted.
             kUnknownEnumValue = 1,
 
         class ACCompressorTypeEnum(MatterIntEnum):
@@ -32177,8 +32499,8 @@ class Thermostat(Cluster):
             kT3 = 0x03
             # All received enum values that are not listed above will be mapped
             # to kUnknownEnumValue. This is a helper enum value that should only
-            # be used by code to process how it handles receiving and unknown
-            # enum value. This specific should never be transmitted.
+            # be used by code to process how it handles receiving an unknown
+            # enum value. This specific value should never be transmitted.
             kUnknownEnumValue = 4,
 
         class ACLouverPositionEnum(MatterIntEnum):
@@ -32189,8 +32511,8 @@ class Thermostat(Cluster):
             kThreeQuarters = 0x05
             # All received enum values that are not listed above will be mapped
             # to kUnknownEnumValue. This is a helper enum value that should only
-            # be used by code to process how it handles receiving and unknown
-            # enum value. This specific should never be transmitted.
+            # be used by code to process how it handles receiving an unknown
+            # enum value. This specific value should never be transmitted.
             kUnknownEnumValue = 0,
 
         class ACRefrigerantTypeEnum(MatterIntEnum):
@@ -32200,8 +32522,8 @@ class Thermostat(Cluster):
             kR407c = 0x03
             # All received enum values that are not listed above will be mapped
             # to kUnknownEnumValue. This is a helper enum value that should only
-            # be used by code to process how it handles receiving and unknown
-            # enum value. This specific should never be transmitted.
+            # be used by code to process how it handles receiving an unknown
+            # enum value. This specific value should never be transmitted.
             kUnknownEnumValue = 4,
 
         class ACTypeEnum(MatterIntEnum):
@@ -32212,8 +32534,8 @@ class Thermostat(Cluster):
             kHeatPumpInverter = 0x04
             # All received enum values that are not listed above will be mapped
             # to kUnknownEnumValue. This is a helper enum value that should only
-            # be used by code to process how it handles receiving and unknown
-            # enum value. This specific should never be transmitted.
+            # be used by code to process how it handles receiving an unknown
+            # enum value. This specific value should never be transmitted.
             kUnknownEnumValue = 5,
 
         class ControlSequenceOfOperationEnum(MatterIntEnum):
@@ -32225,8 +32547,8 @@ class Thermostat(Cluster):
             kCoolingAndHeatingWithReheat = 0x05
             # All received enum values that are not listed above will be mapped
             # to kUnknownEnumValue. This is a helper enum value that should only
-            # be used by code to process how it handles receiving and unknown
-            # enum value. This specific should never be transmitted.
+            # be used by code to process how it handles receiving an unknown
+            # enum value. This specific value should never be transmitted.
             kUnknownEnumValue = 6,
 
         class PresetScenarioEnum(MatterIntEnum):
@@ -32236,11 +32558,12 @@ class Thermostat(Cluster):
             kSleep = 0x03
             kWake = 0x04
             kVacation = 0x05
-            kUserDefined = 0x06
+            kGoingToSleep = 0x06
+            kUserDefined = 0xFE
             # All received enum values that are not listed above will be mapped
             # to kUnknownEnumValue. This is a helper enum value that should only
-            # be used by code to process how it handles receiving and unknown
-            # enum value. This specific should never be transmitted.
+            # be used by code to process how it handles receiving an unknown
+            # enum value. This specific value should never be transmitted.
             kUnknownEnumValue = 7,
 
         class SetpointChangeSourceEnum(MatterIntEnum):
@@ -32249,8 +32572,8 @@ class Thermostat(Cluster):
             kExternal = 0x02
             # All received enum values that are not listed above will be mapped
             # to kUnknownEnumValue. This is a helper enum value that should only
-            # be used by code to process how it handles receiving and unknown
-            # enum value. This specific should never be transmitted.
+            # be used by code to process how it handles receiving an unknown
+            # enum value. This specific value should never be transmitted.
             kUnknownEnumValue = 3,
 
         class SetpointRaiseLowerModeEnum(MatterIntEnum):
@@ -32259,8 +32582,8 @@ class Thermostat(Cluster):
             kBoth = 0x02
             # All received enum values that are not listed above will be mapped
             # to kUnknownEnumValue. This is a helper enum value that should only
-            # be used by code to process how it handles receiving and unknown
-            # enum value. This specific should never be transmitted.
+            # be used by code to process how it handles receiving an unknown
+            # enum value. This specific value should never be transmitted.
             kUnknownEnumValue = 3,
 
         class StartOfWeekEnum(MatterIntEnum):
@@ -32273,8 +32596,8 @@ class Thermostat(Cluster):
             kSaturday = 0x06
             # All received enum values that are not listed above will be mapped
             # to kUnknownEnumValue. This is a helper enum value that should only
-            # be used by code to process how it handles receiving and unknown
-            # enum value. This specific should never be transmitted.
+            # be used by code to process how it handles receiving an unknown
+            # enum value. This specific value should never be transmitted.
             kUnknownEnumValue = 7,
 
         class SystemModeEnum(MatterIntEnum):
@@ -32289,8 +32612,8 @@ class Thermostat(Cluster):
             kSleep = 0x09
             # All received enum values that are not listed above will be mapped
             # to kUnknownEnumValue. This is a helper enum value that should only
-            # be used by code to process how it handles receiving and unknown
-            # enum value. This specific should never be transmitted.
+            # be used by code to process how it handles receiving an unknown
+            # enum value. This specific value should never be transmitted.
             kUnknownEnumValue = 2,
 
         class TemperatureSetpointHoldEnum(MatterIntEnum):
@@ -32298,8 +32621,8 @@ class Thermostat(Cluster):
             kSetpointHoldOn = 0x01
             # All received enum values that are not listed above will be mapped
             # to kUnknownEnumValue. This is a helper enum value that should only
-            # be used by code to process how it handles receiving and unknown
-            # enum value. This specific should never be transmitted.
+            # be used by code to process how it handles receiving an unknown
+            # enum value. This specific value should never be transmitted.
             kUnknownEnumValue = 2,
 
         class ThermostatRunningModeEnum(MatterIntEnum):
@@ -32308,8 +32631,8 @@ class Thermostat(Cluster):
             kHeat = 0x04
             # All received enum values that are not listed above will be mapped
             # to kUnknownEnumValue. This is a helper enum value that should only
-            # be used by code to process how it handles receiving and unknown
-            # enum value. This specific should never be transmitted.
+            # be used by code to process how it handles receiving an unknown
+            # enum value. This specific value should never be transmitted.
             kUnknownEnumValue = 1,
 
     class Bitmaps:
@@ -32380,10 +32703,6 @@ class Thermostat(Cluster):
             kSupportsSetpoints = 0x2
             kSupportsNames = 0x4
             kSupportsOff = 0x8
-
-        class TemperatureSetpointHoldPolicyBitmap(IntFlag):
-            kHoldDurationElapsed = 0x1
-            kHoldDurationElapsedOrPresetChanged = 0x2
 
     class Structs:
         @dataclass
@@ -32661,22 +32980,6 @@ class Thermostat(Cluster):
                 return ClusterObjectDescriptor(
                     Fields=[
                     ])
-
-        @dataclass
-        class SetTemperatureSetpointHoldPolicy(ClusterCommand):
-            cluster_id: typing.ClassVar[int] = 0x00000201
-            command_id: typing.ClassVar[int] = 0x0000000B
-            is_client: typing.ClassVar[bool] = True
-            response_type: typing.ClassVar[str] = None
-
-            @ChipUtility.classproperty
-            def descriptor(cls) -> ClusterObjectDescriptor:
-                return ClusterObjectDescriptor(
-                    Fields=[
-                        ClusterObjectFieldDescriptor(Label="temperatureSetpointHoldPolicy", Tag=0, Type=uint),
-                    ])
-
-            temperatureSetpointHoldPolicy: 'uint' = 0
 
     class Attributes:
         @dataclass
@@ -33640,22 +33943,6 @@ class Thermostat(Cluster):
             value: 'typing.Optional[bool]' = None
 
         @dataclass
-        class TemperatureSetpointHoldPolicy(ClusterAttributeDescriptor):
-            @ChipUtility.classproperty
-            def cluster_id(cls) -> int:
-                return 0x00000201
-
-            @ChipUtility.classproperty
-            def attribute_id(cls) -> int:
-                return 0x00000053
-
-            @ChipUtility.classproperty
-            def attribute_type(cls) -> ClusterObjectFieldDescriptor:
-                return ClusterObjectFieldDescriptor(Type=typing.Optional[uint])
-
-            value: 'typing.Optional[uint]' = None
-
-        @dataclass
         class SetpointHoldExpiryTimestamp(ClusterAttributeDescriptor):
             @ChipUtility.classproperty
             def cluster_id(cls) -> int:
@@ -33663,7 +33950,7 @@ class Thermostat(Cluster):
 
             @ChipUtility.classproperty
             def attribute_id(cls) -> int:
-                return 0x00000054
+                return 0x00000053
 
             @ChipUtility.classproperty
             def attribute_type(cls) -> ClusterObjectFieldDescriptor:
@@ -33821,8 +34108,8 @@ class FanControl(Cluster):
             kReverse = 0x01
             # All received enum values that are not listed above will be mapped
             # to kUnknownEnumValue. This is a helper enum value that should only
-            # be used by code to process how it handles receiving and unknown
-            # enum value. This specific should never be transmitted.
+            # be used by code to process how it handles receiving an unknown
+            # enum value. This specific value should never be transmitted.
             kUnknownEnumValue = 2,
 
         class FanModeEnum(MatterIntEnum):
@@ -33835,8 +34122,8 @@ class FanControl(Cluster):
             kSmart = 0x06
             # All received enum values that are not listed above will be mapped
             # to kUnknownEnumValue. This is a helper enum value that should only
-            # be used by code to process how it handles receiving and unknown
-            # enum value. This specific should never be transmitted.
+            # be used by code to process how it handles receiving an unknown
+            # enum value. This specific value should never be transmitted.
             kUnknownEnumValue = 7,
 
         class FanModeSequenceEnum(MatterIntEnum):
@@ -33848,8 +34135,8 @@ class FanControl(Cluster):
             kOffHigh = 0x05
             # All received enum values that are not listed above will be mapped
             # to kUnknownEnumValue. This is a helper enum value that should only
-            # be used by code to process how it handles receiving and unknown
-            # enum value. This specific should never be transmitted.
+            # be used by code to process how it handles receiving an unknown
+            # enum value. This specific value should never be transmitted.
             kUnknownEnumValue = 6,
 
         class StepDirectionEnum(MatterIntEnum):
@@ -33857,8 +34144,8 @@ class FanControl(Cluster):
             kDecrease = 0x01
             # All received enum values that are not listed above will be mapped
             # to kUnknownEnumValue. This is a helper enum value that should only
-            # be used by code to process how it handles receiving and unknown
-            # enum value. This specific should never be transmitted.
+            # be used by code to process how it handles receiving an unknown
+            # enum value. This specific value should never be transmitted.
             kUnknownEnumValue = 2,
 
     class Bitmaps:
@@ -34229,8 +34516,8 @@ class ThermostatUserInterfaceConfiguration(Cluster):
             kLockout5 = 0x05
             # All received enum values that are not listed above will be mapped
             # to kUnknownEnumValue. This is a helper enum value that should only
-            # be used by code to process how it handles receiving and unknown
-            # enum value. This specific should never be transmitted.
+            # be used by code to process how it handles receiving an unknown
+            # enum value. This specific value should never be transmitted.
             kUnknownEnumValue = 6,
 
         class ScheduleProgrammingVisibilityEnum(MatterIntEnum):
@@ -34238,8 +34525,8 @@ class ThermostatUserInterfaceConfiguration(Cluster):
             kScheduleProgrammingDenied = 0x01
             # All received enum values that are not listed above will be mapped
             # to kUnknownEnumValue. This is a helper enum value that should only
-            # be used by code to process how it handles receiving and unknown
-            # enum value. This specific should never be transmitted.
+            # be used by code to process how it handles receiving an unknown
+            # enum value. This specific value should never be transmitted.
             kUnknownEnumValue = 2,
 
         class TemperatureDisplayModeEnum(MatterIntEnum):
@@ -34247,8 +34534,8 @@ class ThermostatUserInterfaceConfiguration(Cluster):
             kFahrenheit = 0x01
             # All received enum values that are not listed above will be mapped
             # to kUnknownEnumValue. This is a helper enum value that should only
-            # be used by code to process how it handles receiving and unknown
-            # enum value. This specific should never be transmitted.
+            # be used by code to process how it handles receiving an unknown
+            # enum value. This specific value should never be transmitted.
             kUnknownEnumValue = 2,
 
     class Attributes:
@@ -34531,8 +34818,8 @@ class ColorControl(Cluster):
             kActivateFromEnhancedCurrentHue = 0x02
             # All received enum values that are not listed above will be mapped
             # to kUnknownEnumValue. This is a helper enum value that should only
-            # be used by code to process how it handles receiving and unknown
-            # enum value. This specific should never be transmitted.
+            # be used by code to process how it handles receiving an unknown
+            # enum value. This specific value should never be transmitted.
             kUnknownEnumValue = 3,
 
         class ColorLoopDirection(MatterIntEnum):
@@ -34540,8 +34827,8 @@ class ColorControl(Cluster):
             kIncrementHue = 0x01
             # All received enum values that are not listed above will be mapped
             # to kUnknownEnumValue. This is a helper enum value that should only
-            # be used by code to process how it handles receiving and unknown
-            # enum value. This specific should never be transmitted.
+            # be used by code to process how it handles receiving an unknown
+            # enum value. This specific value should never be transmitted.
             kUnknownEnumValue = 2,
 
         class ColorMode(MatterIntEnum):
@@ -34550,8 +34837,8 @@ class ColorControl(Cluster):
             kColorTemperature = 0x02
             # All received enum values that are not listed above will be mapped
             # to kUnknownEnumValue. This is a helper enum value that should only
-            # be used by code to process how it handles receiving and unknown
-            # enum value. This specific should never be transmitted.
+            # be used by code to process how it handles receiving an unknown
+            # enum value. This specific value should never be transmitted.
             kUnknownEnumValue = 3,
 
         class HueDirection(MatterIntEnum):
@@ -34561,8 +34848,8 @@ class ColorControl(Cluster):
             kDown = 0x03
             # All received enum values that are not listed above will be mapped
             # to kUnknownEnumValue. This is a helper enum value that should only
-            # be used by code to process how it handles receiving and unknown
-            # enum value. This specific should never be transmitted.
+            # be used by code to process how it handles receiving an unknown
+            # enum value. This specific value should never be transmitted.
             kUnknownEnumValue = 4,
 
         class HueMoveMode(MatterIntEnum):
@@ -34571,8 +34858,8 @@ class ColorControl(Cluster):
             kDown = 0x03
             # All received enum values that are not listed above will be mapped
             # to kUnknownEnumValue. This is a helper enum value that should only
-            # be used by code to process how it handles receiving and unknown
-            # enum value. This specific should never be transmitted.
+            # be used by code to process how it handles receiving an unknown
+            # enum value. This specific value should never be transmitted.
             kUnknownEnumValue = 2,
 
         class HueStepMode(MatterIntEnum):
@@ -34580,8 +34867,8 @@ class ColorControl(Cluster):
             kDown = 0x03
             # All received enum values that are not listed above will be mapped
             # to kUnknownEnumValue. This is a helper enum value that should only
-            # be used by code to process how it handles receiving and unknown
-            # enum value. This specific should never be transmitted.
+            # be used by code to process how it handles receiving an unknown
+            # enum value. This specific value should never be transmitted.
             kUnknownEnumValue = 0,
 
         class SaturationMoveMode(MatterIntEnum):
@@ -34590,8 +34877,8 @@ class ColorControl(Cluster):
             kDown = 0x03
             # All received enum values that are not listed above will be mapped
             # to kUnknownEnumValue. This is a helper enum value that should only
-            # be used by code to process how it handles receiving and unknown
-            # enum value. This specific should never be transmitted.
+            # be used by code to process how it handles receiving an unknown
+            # enum value. This specific value should never be transmitted.
             kUnknownEnumValue = 2,
 
         class SaturationStepMode(MatterIntEnum):
@@ -34599,8 +34886,8 @@ class ColorControl(Cluster):
             kDown = 0x03
             # All received enum values that are not listed above will be mapped
             # to kUnknownEnumValue. This is a helper enum value that should only
-            # be used by code to process how it handles receiving and unknown
-            # enum value. This specific should never be transmitted.
+            # be used by code to process how it handles receiving an unknown
+            # enum value. This specific value should never be transmitted.
             kUnknownEnumValue = 0,
 
     class Bitmaps:
@@ -36423,8 +36710,8 @@ class IlluminanceMeasurement(Cluster):
             kCmos = 0x01
             # All received enum values that are not listed above will be mapped
             # to kUnknownEnumValue. This is a helper enum value that should only
-            # be used by code to process how it handles receiving and unknown
-            # enum value. This specific should never be transmitted.
+            # be used by code to process how it handles receiving an unknown
+            # enum value. This specific value should never be transmitted.
             kUnknownEnumValue = 2,
 
     class Attributes:
@@ -37530,8 +37817,8 @@ class OccupancySensing(Cluster):
             kPhysicalContact = 0x03
             # All received enum values that are not listed above will be mapped
             # to kUnknownEnumValue. This is a helper enum value that should only
-            # be used by code to process how it handles receiving and unknown
-            # enum value. This specific should never be transmitted.
+            # be used by code to process how it handles receiving an unknown
+            # enum value. This specific value should never be transmitted.
             kUnknownEnumValue = 4,
 
     class Bitmaps:
@@ -37945,8 +38232,8 @@ class CarbonMonoxideConcentrationMeasurement(Cluster):
             kCritical = 0x04
             # All received enum values that are not listed above will be mapped
             # to kUnknownEnumValue. This is a helper enum value that should only
-            # be used by code to process how it handles receiving and unknown
-            # enum value. This specific should never be transmitted.
+            # be used by code to process how it handles receiving an unknown
+            # enum value. This specific value should never be transmitted.
             kUnknownEnumValue = 5,
 
         class MeasurementMediumEnum(MatterIntEnum):
@@ -37955,8 +38242,8 @@ class CarbonMonoxideConcentrationMeasurement(Cluster):
             kSoil = 0x02
             # All received enum values that are not listed above will be mapped
             # to kUnknownEnumValue. This is a helper enum value that should only
-            # be used by code to process how it handles receiving and unknown
-            # enum value. This specific should never be transmitted.
+            # be used by code to process how it handles receiving an unknown
+            # enum value. This specific value should never be transmitted.
             kUnknownEnumValue = 3,
 
         class MeasurementUnitEnum(MatterIntEnum):
@@ -37970,8 +38257,8 @@ class CarbonMonoxideConcentrationMeasurement(Cluster):
             kBqm3 = 0x07
             # All received enum values that are not listed above will be mapped
             # to kUnknownEnumValue. This is a helper enum value that should only
-            # be used by code to process how it handles receiving and unknown
-            # enum value. This specific should never be transmitted.
+            # be used by code to process how it handles receiving an unknown
+            # enum value. This specific value should never be transmitted.
             kUnknownEnumValue = 8,
 
     class Bitmaps:
@@ -38311,8 +38598,8 @@ class CarbonDioxideConcentrationMeasurement(Cluster):
             kCritical = 0x04
             # All received enum values that are not listed above will be mapped
             # to kUnknownEnumValue. This is a helper enum value that should only
-            # be used by code to process how it handles receiving and unknown
-            # enum value. This specific should never be transmitted.
+            # be used by code to process how it handles receiving an unknown
+            # enum value. This specific value should never be transmitted.
             kUnknownEnumValue = 5,
 
         class MeasurementMediumEnum(MatterIntEnum):
@@ -38321,8 +38608,8 @@ class CarbonDioxideConcentrationMeasurement(Cluster):
             kSoil = 0x02
             # All received enum values that are not listed above will be mapped
             # to kUnknownEnumValue. This is a helper enum value that should only
-            # be used by code to process how it handles receiving and unknown
-            # enum value. This specific should never be transmitted.
+            # be used by code to process how it handles receiving an unknown
+            # enum value. This specific value should never be transmitted.
             kUnknownEnumValue = 3,
 
         class MeasurementUnitEnum(MatterIntEnum):
@@ -38336,8 +38623,8 @@ class CarbonDioxideConcentrationMeasurement(Cluster):
             kBqm3 = 0x07
             # All received enum values that are not listed above will be mapped
             # to kUnknownEnumValue. This is a helper enum value that should only
-            # be used by code to process how it handles receiving and unknown
-            # enum value. This specific should never be transmitted.
+            # be used by code to process how it handles receiving an unknown
+            # enum value. This specific value should never be transmitted.
             kUnknownEnumValue = 8,
 
     class Bitmaps:
@@ -38677,8 +38964,8 @@ class NitrogenDioxideConcentrationMeasurement(Cluster):
             kCritical = 0x04
             # All received enum values that are not listed above will be mapped
             # to kUnknownEnumValue. This is a helper enum value that should only
-            # be used by code to process how it handles receiving and unknown
-            # enum value. This specific should never be transmitted.
+            # be used by code to process how it handles receiving an unknown
+            # enum value. This specific value should never be transmitted.
             kUnknownEnumValue = 5,
 
         class MeasurementMediumEnum(MatterIntEnum):
@@ -38687,8 +38974,8 @@ class NitrogenDioxideConcentrationMeasurement(Cluster):
             kSoil = 0x02
             # All received enum values that are not listed above will be mapped
             # to kUnknownEnumValue. This is a helper enum value that should only
-            # be used by code to process how it handles receiving and unknown
-            # enum value. This specific should never be transmitted.
+            # be used by code to process how it handles receiving an unknown
+            # enum value. This specific value should never be transmitted.
             kUnknownEnumValue = 3,
 
         class MeasurementUnitEnum(MatterIntEnum):
@@ -38702,8 +38989,8 @@ class NitrogenDioxideConcentrationMeasurement(Cluster):
             kBqm3 = 0x07
             # All received enum values that are not listed above will be mapped
             # to kUnknownEnumValue. This is a helper enum value that should only
-            # be used by code to process how it handles receiving and unknown
-            # enum value. This specific should never be transmitted.
+            # be used by code to process how it handles receiving an unknown
+            # enum value. This specific value should never be transmitted.
             kUnknownEnumValue = 8,
 
     class Bitmaps:
@@ -39043,8 +39330,8 @@ class OzoneConcentrationMeasurement(Cluster):
             kCritical = 0x04
             # All received enum values that are not listed above will be mapped
             # to kUnknownEnumValue. This is a helper enum value that should only
-            # be used by code to process how it handles receiving and unknown
-            # enum value. This specific should never be transmitted.
+            # be used by code to process how it handles receiving an unknown
+            # enum value. This specific value should never be transmitted.
             kUnknownEnumValue = 5,
 
         class MeasurementMediumEnum(MatterIntEnum):
@@ -39053,8 +39340,8 @@ class OzoneConcentrationMeasurement(Cluster):
             kSoil = 0x02
             # All received enum values that are not listed above will be mapped
             # to kUnknownEnumValue. This is a helper enum value that should only
-            # be used by code to process how it handles receiving and unknown
-            # enum value. This specific should never be transmitted.
+            # be used by code to process how it handles receiving an unknown
+            # enum value. This specific value should never be transmitted.
             kUnknownEnumValue = 3,
 
         class MeasurementUnitEnum(MatterIntEnum):
@@ -39068,8 +39355,8 @@ class OzoneConcentrationMeasurement(Cluster):
             kBqm3 = 0x07
             # All received enum values that are not listed above will be mapped
             # to kUnknownEnumValue. This is a helper enum value that should only
-            # be used by code to process how it handles receiving and unknown
-            # enum value. This specific should never be transmitted.
+            # be used by code to process how it handles receiving an unknown
+            # enum value. This specific value should never be transmitted.
             kUnknownEnumValue = 8,
 
     class Bitmaps:
@@ -39409,8 +39696,8 @@ class Pm25ConcentrationMeasurement(Cluster):
             kCritical = 0x04
             # All received enum values that are not listed above will be mapped
             # to kUnknownEnumValue. This is a helper enum value that should only
-            # be used by code to process how it handles receiving and unknown
-            # enum value. This specific should never be transmitted.
+            # be used by code to process how it handles receiving an unknown
+            # enum value. This specific value should never be transmitted.
             kUnknownEnumValue = 5,
 
         class MeasurementMediumEnum(MatterIntEnum):
@@ -39419,8 +39706,8 @@ class Pm25ConcentrationMeasurement(Cluster):
             kSoil = 0x02
             # All received enum values that are not listed above will be mapped
             # to kUnknownEnumValue. This is a helper enum value that should only
-            # be used by code to process how it handles receiving and unknown
-            # enum value. This specific should never be transmitted.
+            # be used by code to process how it handles receiving an unknown
+            # enum value. This specific value should never be transmitted.
             kUnknownEnumValue = 3,
 
         class MeasurementUnitEnum(MatterIntEnum):
@@ -39434,8 +39721,8 @@ class Pm25ConcentrationMeasurement(Cluster):
             kBqm3 = 0x07
             # All received enum values that are not listed above will be mapped
             # to kUnknownEnumValue. This is a helper enum value that should only
-            # be used by code to process how it handles receiving and unknown
-            # enum value. This specific should never be transmitted.
+            # be used by code to process how it handles receiving an unknown
+            # enum value. This specific value should never be transmitted.
             kUnknownEnumValue = 8,
 
     class Bitmaps:
@@ -39775,8 +40062,8 @@ class FormaldehydeConcentrationMeasurement(Cluster):
             kCritical = 0x04
             # All received enum values that are not listed above will be mapped
             # to kUnknownEnumValue. This is a helper enum value that should only
-            # be used by code to process how it handles receiving and unknown
-            # enum value. This specific should never be transmitted.
+            # be used by code to process how it handles receiving an unknown
+            # enum value. This specific value should never be transmitted.
             kUnknownEnumValue = 5,
 
         class MeasurementMediumEnum(MatterIntEnum):
@@ -39785,8 +40072,8 @@ class FormaldehydeConcentrationMeasurement(Cluster):
             kSoil = 0x02
             # All received enum values that are not listed above will be mapped
             # to kUnknownEnumValue. This is a helper enum value that should only
-            # be used by code to process how it handles receiving and unknown
-            # enum value. This specific should never be transmitted.
+            # be used by code to process how it handles receiving an unknown
+            # enum value. This specific value should never be transmitted.
             kUnknownEnumValue = 3,
 
         class MeasurementUnitEnum(MatterIntEnum):
@@ -39800,8 +40087,8 @@ class FormaldehydeConcentrationMeasurement(Cluster):
             kBqm3 = 0x07
             # All received enum values that are not listed above will be mapped
             # to kUnknownEnumValue. This is a helper enum value that should only
-            # be used by code to process how it handles receiving and unknown
-            # enum value. This specific should never be transmitted.
+            # be used by code to process how it handles receiving an unknown
+            # enum value. This specific value should never be transmitted.
             kUnknownEnumValue = 8,
 
     class Bitmaps:
@@ -40141,8 +40428,8 @@ class Pm1ConcentrationMeasurement(Cluster):
             kCritical = 0x04
             # All received enum values that are not listed above will be mapped
             # to kUnknownEnumValue. This is a helper enum value that should only
-            # be used by code to process how it handles receiving and unknown
-            # enum value. This specific should never be transmitted.
+            # be used by code to process how it handles receiving an unknown
+            # enum value. This specific value should never be transmitted.
             kUnknownEnumValue = 5,
 
         class MeasurementMediumEnum(MatterIntEnum):
@@ -40151,8 +40438,8 @@ class Pm1ConcentrationMeasurement(Cluster):
             kSoil = 0x02
             # All received enum values that are not listed above will be mapped
             # to kUnknownEnumValue. This is a helper enum value that should only
-            # be used by code to process how it handles receiving and unknown
-            # enum value. This specific should never be transmitted.
+            # be used by code to process how it handles receiving an unknown
+            # enum value. This specific value should never be transmitted.
             kUnknownEnumValue = 3,
 
         class MeasurementUnitEnum(MatterIntEnum):
@@ -40166,8 +40453,8 @@ class Pm1ConcentrationMeasurement(Cluster):
             kBqm3 = 0x07
             # All received enum values that are not listed above will be mapped
             # to kUnknownEnumValue. This is a helper enum value that should only
-            # be used by code to process how it handles receiving and unknown
-            # enum value. This specific should never be transmitted.
+            # be used by code to process how it handles receiving an unknown
+            # enum value. This specific value should never be transmitted.
             kUnknownEnumValue = 8,
 
     class Bitmaps:
@@ -40507,8 +40794,8 @@ class Pm10ConcentrationMeasurement(Cluster):
             kCritical = 0x04
             # All received enum values that are not listed above will be mapped
             # to kUnknownEnumValue. This is a helper enum value that should only
-            # be used by code to process how it handles receiving and unknown
-            # enum value. This specific should never be transmitted.
+            # be used by code to process how it handles receiving an unknown
+            # enum value. This specific value should never be transmitted.
             kUnknownEnumValue = 5,
 
         class MeasurementMediumEnum(MatterIntEnum):
@@ -40517,8 +40804,8 @@ class Pm10ConcentrationMeasurement(Cluster):
             kSoil = 0x02
             # All received enum values that are not listed above will be mapped
             # to kUnknownEnumValue. This is a helper enum value that should only
-            # be used by code to process how it handles receiving and unknown
-            # enum value. This specific should never be transmitted.
+            # be used by code to process how it handles receiving an unknown
+            # enum value. This specific value should never be transmitted.
             kUnknownEnumValue = 3,
 
         class MeasurementUnitEnum(MatterIntEnum):
@@ -40532,8 +40819,8 @@ class Pm10ConcentrationMeasurement(Cluster):
             kBqm3 = 0x07
             # All received enum values that are not listed above will be mapped
             # to kUnknownEnumValue. This is a helper enum value that should only
-            # be used by code to process how it handles receiving and unknown
-            # enum value. This specific should never be transmitted.
+            # be used by code to process how it handles receiving an unknown
+            # enum value. This specific value should never be transmitted.
             kUnknownEnumValue = 8,
 
     class Bitmaps:
@@ -40873,8 +41160,8 @@ class TotalVolatileOrganicCompoundsConcentrationMeasurement(Cluster):
             kCritical = 0x04
             # All received enum values that are not listed above will be mapped
             # to kUnknownEnumValue. This is a helper enum value that should only
-            # be used by code to process how it handles receiving and unknown
-            # enum value. This specific should never be transmitted.
+            # be used by code to process how it handles receiving an unknown
+            # enum value. This specific value should never be transmitted.
             kUnknownEnumValue = 5,
 
         class MeasurementMediumEnum(MatterIntEnum):
@@ -40883,8 +41170,8 @@ class TotalVolatileOrganicCompoundsConcentrationMeasurement(Cluster):
             kSoil = 0x02
             # All received enum values that are not listed above will be mapped
             # to kUnknownEnumValue. This is a helper enum value that should only
-            # be used by code to process how it handles receiving and unknown
-            # enum value. This specific should never be transmitted.
+            # be used by code to process how it handles receiving an unknown
+            # enum value. This specific value should never be transmitted.
             kUnknownEnumValue = 3,
 
         class MeasurementUnitEnum(MatterIntEnum):
@@ -40898,8 +41185,8 @@ class TotalVolatileOrganicCompoundsConcentrationMeasurement(Cluster):
             kBqm3 = 0x07
             # All received enum values that are not listed above will be mapped
             # to kUnknownEnumValue. This is a helper enum value that should only
-            # be used by code to process how it handles receiving and unknown
-            # enum value. This specific should never be transmitted.
+            # be used by code to process how it handles receiving an unknown
+            # enum value. This specific value should never be transmitted.
             kUnknownEnumValue = 8,
 
     class Bitmaps:
@@ -41239,8 +41526,8 @@ class RadonConcentrationMeasurement(Cluster):
             kCritical = 0x04
             # All received enum values that are not listed above will be mapped
             # to kUnknownEnumValue. This is a helper enum value that should only
-            # be used by code to process how it handles receiving and unknown
-            # enum value. This specific should never be transmitted.
+            # be used by code to process how it handles receiving an unknown
+            # enum value. This specific value should never be transmitted.
             kUnknownEnumValue = 5,
 
         class MeasurementMediumEnum(MatterIntEnum):
@@ -41249,8 +41536,8 @@ class RadonConcentrationMeasurement(Cluster):
             kSoil = 0x02
             # All received enum values that are not listed above will be mapped
             # to kUnknownEnumValue. This is a helper enum value that should only
-            # be used by code to process how it handles receiving and unknown
-            # enum value. This specific should never be transmitted.
+            # be used by code to process how it handles receiving an unknown
+            # enum value. This specific value should never be transmitted.
             kUnknownEnumValue = 3,
 
         class MeasurementUnitEnum(MatterIntEnum):
@@ -41264,8 +41551,8 @@ class RadonConcentrationMeasurement(Cluster):
             kBqm3 = 0x07
             # All received enum values that are not listed above will be mapped
             # to kUnknownEnumValue. This is a helper enum value that should only
-            # be used by code to process how it handles receiving and unknown
-            # enum value. This specific should never be transmitted.
+            # be used by code to process how it handles receiving an unknown
+            # enum value. This specific value should never be transmitted.
             kUnknownEnumValue = 8,
 
     class Bitmaps:
@@ -41559,7 +41846,8 @@ class WiFiNetworkManagement(Cluster):
     def descriptor(cls) -> ClusterObjectDescriptor:
         return ClusterObjectDescriptor(
             Fields=[
-                ClusterObjectFieldDescriptor(Label="ssid", Tag=0x00000001, Type=typing.Union[Nullable, bytes]),
+                ClusterObjectFieldDescriptor(Label="ssid", Tag=0x00000000, Type=typing.Union[Nullable, bytes]),
+                ClusterObjectFieldDescriptor(Label="passphraseSurrogate", Tag=0x00000001, Type=typing.Union[Nullable, uint]),
                 ClusterObjectFieldDescriptor(Label="generatedCommandList", Tag=0x0000FFF8, Type=typing.List[uint]),
                 ClusterObjectFieldDescriptor(Label="acceptedCommandList", Tag=0x0000FFF9, Type=typing.List[uint]),
                 ClusterObjectFieldDescriptor(Label="eventList", Tag=0x0000FFFA, Type=typing.List[uint]),
@@ -41569,6 +41857,7 @@ class WiFiNetworkManagement(Cluster):
             ])
 
     ssid: 'typing.Union[Nullable, bytes]' = None
+    passphraseSurrogate: 'typing.Union[Nullable, uint]' = None
     generatedCommandList: 'typing.List[uint]' = None
     acceptedCommandList: 'typing.List[uint]' = None
     eventList: 'typing.List[uint]' = None
@@ -41615,13 +41904,29 @@ class WiFiNetworkManagement(Cluster):
 
             @ChipUtility.classproperty
             def attribute_id(cls) -> int:
-                return 0x00000001
+                return 0x00000000
 
             @ChipUtility.classproperty
             def attribute_type(cls) -> ClusterObjectFieldDescriptor:
                 return ClusterObjectFieldDescriptor(Type=typing.Union[Nullable, bytes])
 
             value: 'typing.Union[Nullable, bytes]' = NullValue
+
+        @dataclass
+        class PassphraseSurrogate(ClusterAttributeDescriptor):
+            @ChipUtility.classproperty
+            def cluster_id(cls) -> int:
+                return 0x00000451
+
+            @ChipUtility.classproperty
+            def attribute_id(cls) -> int:
+                return 0x00000001
+
+            @ChipUtility.classproperty
+            def attribute_type(cls) -> ClusterObjectFieldDescriptor:
+                return ClusterObjectFieldDescriptor(Type=typing.Union[Nullable, uint])
+
+            value: 'typing.Union[Nullable, uint]' = NullValue
 
         @dataclass
         class GeneratedCommandList(ClusterAttributeDescriptor):
@@ -42114,10 +42419,6 @@ class ThreadNetworkDirectory(Cluster):
                         ClusterObjectFieldDescriptor(Label="extendedPanID", Tag=0, Type=bytes),
                     ])
 
-            @ChipUtility.classproperty
-            def must_use_timed_invoke(cls) -> bool:
-                return True
-
             extendedPanID: 'bytes' = b""
 
         @dataclass
@@ -42476,16 +42777,16 @@ class Channel(Cluster):
             kOtt = 0x03
             # All received enum values that are not listed above will be mapped
             # to kUnknownEnumValue. This is a helper enum value that should only
-            # be used by code to process how it handles receiving and unknown
-            # enum value. This specific should never be transmitted.
+            # be used by code to process how it handles receiving an unknown
+            # enum value. This specific value should never be transmitted.
             kUnknownEnumValue = 4,
 
         class LineupInfoTypeEnum(MatterIntEnum):
             kMso = 0x00
             # All received enum values that are not listed above will be mapped
             # to kUnknownEnumValue. This is a helper enum value that should only
-            # be used by code to process how it handles receiving and unknown
-            # enum value. This specific should never be transmitted.
+            # be used by code to process how it handles receiving an unknown
+            # enum value. This specific value should never be transmitted.
             kUnknownEnumValue = 1,
 
         class StatusEnum(MatterIntEnum):
@@ -42494,8 +42795,8 @@ class Channel(Cluster):
             kNoMatches = 0x02
             # All received enum values that are not listed above will be mapped
             # to kUnknownEnumValue. This is a helper enum value that should only
-            # be used by code to process how it handles receiving and unknown
-            # enum value. This specific should never be transmitted.
+            # be used by code to process how it handles receiving an unknown
+            # enum value. This specific value should never be transmitted.
             kUnknownEnumValue = 3,
 
     class Bitmaps:
@@ -43017,8 +43318,8 @@ class TargetNavigator(Cluster):
             kNotAllowed = 0x02
             # All received enum values that are not listed above will be mapped
             # to kUnknownEnumValue. This is a helper enum value that should only
-            # be used by code to process how it handles receiving and unknown
-            # enum value. This specific should never be transmitted.
+            # be used by code to process how it handles receiving an unknown
+            # enum value. This specific value should never be transmitted.
             kUnknownEnumValue = 3,
 
     class Structs:
@@ -43293,8 +43594,8 @@ class MediaPlayback(Cluster):
             kKaraoke = 0x11
             # All received enum values that are not listed above will be mapped
             # to kUnknownEnumValue. This is a helper enum value that should only
-            # be used by code to process how it handles receiving and unknown
-            # enum value. This specific should never be transmitted.
+            # be used by code to process how it handles receiving an unknown
+            # enum value. This specific value should never be transmitted.
             kUnknownEnumValue = 18,
 
         class PlaybackStateEnum(MatterIntEnum):
@@ -43304,8 +43605,8 @@ class MediaPlayback(Cluster):
             kBuffering = 0x03
             # All received enum values that are not listed above will be mapped
             # to kUnknownEnumValue. This is a helper enum value that should only
-            # be used by code to process how it handles receiving and unknown
-            # enum value. This specific should never be transmitted.
+            # be used by code to process how it handles receiving an unknown
+            # enum value. This specific value should never be transmitted.
             kUnknownEnumValue = 4,
 
         class StatusEnum(MatterIntEnum):
@@ -43317,8 +43618,8 @@ class MediaPlayback(Cluster):
             kSeekOutOfRange = 0x05
             # All received enum values that are not listed above will be mapped
             # to kUnknownEnumValue. This is a helper enum value that should only
-            # be used by code to process how it handles receiving and unknown
-            # enum value. This specific should never be transmitted.
+            # be used by code to process how it handles receiving an unknown
+            # enum value. This specific value should never be transmitted.
             kUnknownEnumValue = 6,
 
     class Bitmaps:
@@ -43946,8 +44247,8 @@ class MediaInput(Cluster):
             kOther = 0x0B
             # All received enum values that are not listed above will be mapped
             # to kUnknownEnumValue. This is a helper enum value that should only
-            # be used by code to process how it handles receiving and unknown
-            # enum value. This specific should never be transmitted.
+            # be used by code to process how it handles receiving an unknown
+            # enum value. This specific value should never be transmitted.
             kUnknownEnumValue = 12,
 
     class Bitmaps:
@@ -44411,8 +44712,8 @@ class KeypadInput(Cluster):
             kData = 0x76
             # All received enum values that are not listed above will be mapped
             # to kUnknownEnumValue. This is a helper enum value that should only
-            # be used by code to process how it handles receiving and unknown
-            # enum value. This specific should never be transmitted.
+            # be used by code to process how it handles receiving an unknown
+            # enum value. This specific value should never be transmitted.
             kUnknownEnumValue = 14,
 
         class StatusEnum(MatterIntEnum):
@@ -44421,8 +44722,8 @@ class KeypadInput(Cluster):
             kInvalidKeyInCurrentState = 0x02
             # All received enum values that are not listed above will be mapped
             # to kUnknownEnumValue. This is a helper enum value that should only
-            # be used by code to process how it handles receiving and unknown
-            # enum value. This specific should never be transmitted.
+            # be used by code to process how it handles receiving an unknown
+            # enum value. This specific value should never be transmitted.
             kUnknownEnumValue = 3,
 
     class Bitmaps:
@@ -44611,8 +44912,8 @@ class ContentLauncher(Cluster):
             kKaraoke = 0x11
             # All received enum values that are not listed above will be mapped
             # to kUnknownEnumValue. This is a helper enum value that should only
-            # be used by code to process how it handles receiving and unknown
-            # enum value. This specific should never be transmitted.
+            # be used by code to process how it handles receiving an unknown
+            # enum value. This specific value should never be transmitted.
             kUnknownEnumValue = 18,
 
         class MetricTypeEnum(MatterIntEnum):
@@ -44620,8 +44921,8 @@ class ContentLauncher(Cluster):
             kPercentage = 0x01
             # All received enum values that are not listed above will be mapped
             # to kUnknownEnumValue. This is a helper enum value that should only
-            # be used by code to process how it handles receiving and unknown
-            # enum value. This specific should never be transmitted.
+            # be used by code to process how it handles receiving an unknown
+            # enum value. This specific value should never be transmitted.
             kUnknownEnumValue = 2,
 
         class ParameterEnum(MatterIntEnum):
@@ -44644,8 +44945,8 @@ class ContentLauncher(Cluster):
             kAny = 0x10
             # All received enum values that are not listed above will be mapped
             # to kUnknownEnumValue. This is a helper enum value that should only
-            # be used by code to process how it handles receiving and unknown
-            # enum value. This specific should never be transmitted.
+            # be used by code to process how it handles receiving an unknown
+            # enum value. This specific value should never be transmitted.
             kUnknownEnumValue = 17,
 
         class StatusEnum(MatterIntEnum):
@@ -44656,8 +44957,8 @@ class ContentLauncher(Cluster):
             kAudioTrackNotAvailable = 0x04
             # All received enum values that are not listed above will be mapped
             # to kUnknownEnumValue. This is a helper enum value that should only
-            # be used by code to process how it handles receiving and unknown
-            # enum value. This specific should never be transmitted.
+            # be used by code to process how it handles receiving an unknown
+            # enum value. This specific value should never be transmitted.
             kUnknownEnumValue = 5,
 
     class Bitmaps:
@@ -45023,8 +45324,8 @@ class AudioOutput(Cluster):
             kOther = 0x05
             # All received enum values that are not listed above will be mapped
             # to kUnknownEnumValue. This is a helper enum value that should only
-            # be used by code to process how it handles receiving and unknown
-            # enum value. This specific should never be transmitted.
+            # be used by code to process how it handles receiving an unknown
+            # enum value. This specific value should never be transmitted.
             kUnknownEnumValue = 6,
 
     class Bitmaps:
@@ -45246,8 +45547,8 @@ class ApplicationLauncher(Cluster):
             kSystemBusy = 0x02
             # All received enum values that are not listed above will be mapped
             # to kUnknownEnumValue. This is a helper enum value that should only
-            # be used by code to process how it handles receiving and unknown
-            # enum value. This specific should never be transmitted.
+            # be used by code to process how it handles receiving an unknown
+            # enum value. This specific value should never be transmitted.
             kUnknownEnumValue = 3,
 
     class Bitmaps:
@@ -45527,8 +45828,8 @@ class ApplicationBasic(Cluster):
             kActiveVisibleNotFocus = 0x03
             # All received enum values that are not listed above will be mapped
             # to kUnknownEnumValue. This is a helper enum value that should only
-            # be used by code to process how it handles receiving and unknown
-            # enum value. This specific should never be transmitted.
+            # be used by code to process how it handles receiving an unknown
+            # enum value. This specific value should never be transmitted.
             kUnknownEnumValue = 4,
 
     class Structs:
@@ -46492,8 +46793,8 @@ class ContentAppObserver(Cluster):
             kUnexpectedData = 0x01
             # All received enum values that are not listed above will be mapped
             # to kUnknownEnumValue. This is a helper enum value that should only
-            # be used by code to process how it handles receiving and unknown
-            # enum value. This specific should never be transmitted.
+            # be used by code to process how it handles receiving an unknown
+            # enum value. This specific value should never be transmitted.
             kUnknownEnumValue = 2,
 
     class Commands:
@@ -46761,8 +47062,8 @@ class EcosystemInformation(Cluster):
             kWorkshop = 0x5E
             # All received enum values that are not listed above will be mapped
             # to kUnknownEnumValue. This is a helper enum value that should only
-            # be used by code to process how it handles receiving and unknown
-            # enum value. This specific should never be transmitted.
+            # be used by code to process how it handles receiving an unknown
+            # enum value. This specific value should never be transmitted.
             kUnknownEnumValue = 95,
 
     class Structs:
@@ -49924,8 +50225,8 @@ class UnitTesting(Cluster):
             kValueC = 0x03
             # All received enum values that are not listed above will be mapped
             # to kUnknownEnumValue. This is a helper enum value that should only
-            # be used by code to process how it handles receiving and unknown
-            # enum value. This specific should never be transmitted.
+            # be used by code to process how it handles receiving an unknown
+            # enum value. This specific value should never be transmitted.
             kUnknownEnumValue = 4,
 
     class Bitmaps:
@@ -52402,8 +52703,8 @@ class FaultInjection(Cluster):
             kCertFault = 0x04
             # All received enum values that are not listed above will be mapped
             # to kUnknownEnumValue. This is a helper enum value that should only
-            # be used by code to process how it handles receiving and unknown
-            # enum value. This specific should never be transmitted.
+            # be used by code to process how it handles receiving an unknown
+            # enum value. This specific value should never be transmitted.
             kUnknownEnumValue = 5,
 
     class Commands:

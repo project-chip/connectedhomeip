@@ -1140,6 +1140,28 @@ public class ClusterReadMapping {
           readAccessControlAccessControlEntriesPerFabricCommandParams
         );
         result.put("readAccessControlEntriesPerFabricAttribute", readAccessControlAccessControlEntriesPerFabricAttributeInteractionInfo);
+     Map<String, CommandParameterInfo> readAccessControlCommissioningARLCommandParams = new LinkedHashMap<String, CommandParameterInfo>();
+        InteractionInfo readAccessControlCommissioningARLAttributeInteractionInfo = new InteractionInfo(
+          (cluster, callback, commandArguments) -> {
+            ((ChipClusters.AccessControlCluster) cluster).readCommissioningARLAttribute(
+              (ChipClusters.AccessControlCluster.CommissioningARLAttributeCallback) callback
+            );
+          },
+          () -> new ClusterInfoMapping.DelegatedAccessControlClusterCommissioningARLAttributeCallback(),
+          readAccessControlCommissioningARLCommandParams
+        );
+        result.put("readCommissioningARLAttribute", readAccessControlCommissioningARLAttributeInteractionInfo);
+     Map<String, CommandParameterInfo> readAccessControlArlCommandParams = new LinkedHashMap<String, CommandParameterInfo>();
+        InteractionInfo readAccessControlArlAttributeInteractionInfo = new InteractionInfo(
+          (cluster, callback, commandArguments) -> {
+            ((ChipClusters.AccessControlCluster) cluster).readArlAttribute(
+              (ChipClusters.AccessControlCluster.ArlAttributeCallback) callback
+            );
+          },
+          () -> new ClusterInfoMapping.DelegatedAccessControlClusterArlAttributeCallback(),
+          readAccessControlArlCommandParams
+        );
+        result.put("readArlAttribute", readAccessControlArlAttributeInteractionInfo);
      Map<String, CommandParameterInfo> readAccessControlGeneratedCommandListCommandParams = new LinkedHashMap<String, CommandParameterInfo>();
         InteractionInfo readAccessControlGeneratedCommandListAttributeInteractionInfo = new InteractionInfo(
           (cluster, callback, commandArguments) -> {
@@ -2621,6 +2643,50 @@ public class ClusterReadMapping {
           readGeneralCommissioningSupportsConcurrentConnectionCommandParams
         );
         result.put("readSupportsConcurrentConnectionAttribute", readGeneralCommissioningSupportsConcurrentConnectionAttributeInteractionInfo);
+     Map<String, CommandParameterInfo> readGeneralCommissioningTCAcceptedVersionCommandParams = new LinkedHashMap<String, CommandParameterInfo>();
+        InteractionInfo readGeneralCommissioningTCAcceptedVersionAttributeInteractionInfo = new InteractionInfo(
+          (cluster, callback, commandArguments) -> {
+            ((ChipClusters.GeneralCommissioningCluster) cluster).readTCAcceptedVersionAttribute(
+              (ChipClusters.IntegerAttributeCallback) callback
+            );
+          },
+          () -> new ClusterInfoMapping.DelegatedIntegerAttributeCallback(),
+          readGeneralCommissioningTCAcceptedVersionCommandParams
+        );
+        result.put("readTCAcceptedVersionAttribute", readGeneralCommissioningTCAcceptedVersionAttributeInteractionInfo);
+     Map<String, CommandParameterInfo> readGeneralCommissioningTCMinRequiredVersionCommandParams = new LinkedHashMap<String, CommandParameterInfo>();
+        InteractionInfo readGeneralCommissioningTCMinRequiredVersionAttributeInteractionInfo = new InteractionInfo(
+          (cluster, callback, commandArguments) -> {
+            ((ChipClusters.GeneralCommissioningCluster) cluster).readTCMinRequiredVersionAttribute(
+              (ChipClusters.IntegerAttributeCallback) callback
+            );
+          },
+          () -> new ClusterInfoMapping.DelegatedIntegerAttributeCallback(),
+          readGeneralCommissioningTCMinRequiredVersionCommandParams
+        );
+        result.put("readTCMinRequiredVersionAttribute", readGeneralCommissioningTCMinRequiredVersionAttributeInteractionInfo);
+     Map<String, CommandParameterInfo> readGeneralCommissioningTCAcknowledgementsCommandParams = new LinkedHashMap<String, CommandParameterInfo>();
+        InteractionInfo readGeneralCommissioningTCAcknowledgementsAttributeInteractionInfo = new InteractionInfo(
+          (cluster, callback, commandArguments) -> {
+            ((ChipClusters.GeneralCommissioningCluster) cluster).readTCAcknowledgementsAttribute(
+              (ChipClusters.IntegerAttributeCallback) callback
+            );
+          },
+          () -> new ClusterInfoMapping.DelegatedIntegerAttributeCallback(),
+          readGeneralCommissioningTCAcknowledgementsCommandParams
+        );
+        result.put("readTCAcknowledgementsAttribute", readGeneralCommissioningTCAcknowledgementsAttributeInteractionInfo);
+     Map<String, CommandParameterInfo> readGeneralCommissioningTCAcknowledgementsRequiredCommandParams = new LinkedHashMap<String, CommandParameterInfo>();
+        InteractionInfo readGeneralCommissioningTCAcknowledgementsRequiredAttributeInteractionInfo = new InteractionInfo(
+          (cluster, callback, commandArguments) -> {
+            ((ChipClusters.GeneralCommissioningCluster) cluster).readTCAcknowledgementsRequiredAttribute(
+              (ChipClusters.BooleanAttributeCallback) callback
+            );
+          },
+          () -> new ClusterInfoMapping.DelegatedBooleanAttributeCallback(),
+          readGeneralCommissioningTCAcknowledgementsRequiredCommandParams
+        );
+        result.put("readTCAcknowledgementsRequiredAttribute", readGeneralCommissioningTCAcknowledgementsRequiredAttributeInteractionInfo);
      Map<String, CommandParameterInfo> readGeneralCommissioningGeneratedCommandListCommandParams = new LinkedHashMap<String, CommandParameterInfo>();
         InteractionInfo readGeneralCommissioningGeneratedCommandListAttributeInteractionInfo = new InteractionInfo(
           (cluster, callback, commandArguments) -> {
@@ -12905,17 +12971,6 @@ public class ClusterReadMapping {
           readThermostatPresetsSchedulesEditableCommandParams
         );
         result.put("readPresetsSchedulesEditableAttribute", readThermostatPresetsSchedulesEditableAttributeInteractionInfo);
-     Map<String, CommandParameterInfo> readThermostatTemperatureSetpointHoldPolicyCommandParams = new LinkedHashMap<String, CommandParameterInfo>();
-        InteractionInfo readThermostatTemperatureSetpointHoldPolicyAttributeInteractionInfo = new InteractionInfo(
-          (cluster, callback, commandArguments) -> {
-            ((ChipClusters.ThermostatCluster) cluster).readTemperatureSetpointHoldPolicyAttribute(
-              (ChipClusters.IntegerAttributeCallback) callback
-            );
-          },
-          () -> new ClusterInfoMapping.DelegatedIntegerAttributeCallback(),
-          readThermostatTemperatureSetpointHoldPolicyCommandParams
-        );
-        result.put("readTemperatureSetpointHoldPolicyAttribute", readThermostatTemperatureSetpointHoldPolicyAttributeInteractionInfo);
      Map<String, CommandParameterInfo> readThermostatSetpointHoldExpiryTimestampCommandParams = new LinkedHashMap<String, CommandParameterInfo>();
         InteractionInfo readThermostatSetpointHoldExpiryTimestampAttributeInteractionInfo = new InteractionInfo(
           (cluster, callback, commandArguments) -> {
@@ -16938,6 +16993,17 @@ public class ClusterReadMapping {
           readWiFiNetworkManagementSsidCommandParams
         );
         result.put("readSsidAttribute", readWiFiNetworkManagementSsidAttributeInteractionInfo);
+     Map<String, CommandParameterInfo> readWiFiNetworkManagementPassphraseSurrogateCommandParams = new LinkedHashMap<String, CommandParameterInfo>();
+        InteractionInfo readWiFiNetworkManagementPassphraseSurrogateAttributeInteractionInfo = new InteractionInfo(
+          (cluster, callback, commandArguments) -> {
+            ((ChipClusters.WiFiNetworkManagementCluster) cluster).readPassphraseSurrogateAttribute(
+              (ChipClusters.WiFiNetworkManagementCluster.PassphraseSurrogateAttributeCallback) callback
+            );
+          },
+          () -> new ClusterInfoMapping.DelegatedWiFiNetworkManagementClusterPassphraseSurrogateAttributeCallback(),
+          readWiFiNetworkManagementPassphraseSurrogateCommandParams
+        );
+        result.put("readPassphraseSurrogateAttribute", readWiFiNetworkManagementPassphraseSurrogateAttributeInteractionInfo);
      Map<String, CommandParameterInfo> readWiFiNetworkManagementGeneratedCommandListCommandParams = new LinkedHashMap<String, CommandParameterInfo>();
         InteractionInfo readWiFiNetworkManagementGeneratedCommandListAttributeInteractionInfo = new InteractionInfo(
           (cluster, callback, commandArguments) -> {

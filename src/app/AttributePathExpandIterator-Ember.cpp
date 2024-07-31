@@ -53,7 +53,7 @@ extern bool emberAfEndpointIndexIsEnabled(uint16_t index);
 namespace chip {
 namespace app {
 
-AttributePathExpandIteratorEmber::AttributePathExpandIteratorEmber(InteractionModel::DataModel *,
+AttributePathExpandIteratorEmber::AttributePathExpandIteratorEmber(DataModel::Provider *,
                                                                    SingleLinkedListNode<AttributePathParams> * aAttributePath) :
     mpAttributePath(aAttributePath)
 {

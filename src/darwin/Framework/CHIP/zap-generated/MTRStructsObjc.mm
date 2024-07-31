@@ -19,6 +19,39 @@
 
 NS_ASSUME_NONNULL_BEGIN
 
+@implementation MTRDataTypeTestGlobalStruct
+- (instancetype)init
+{
+    if (self = [super init]) {
+
+        _name = @"";
+
+        _myBitmap = nil;
+
+        _myEnum = nil;
+    }
+    return self;
+}
+
+- (id)copyWithZone:(NSZone * _Nullable)zone
+{
+    auto other = [[MTRDataTypeTestGlobalStruct alloc] init];
+
+    other.name = self.name;
+    other.myBitmap = self.myBitmap;
+    other.myEnum = self.myEnum;
+
+    return other;
+}
+
+- (NSString *)description
+{
+    NSString * descriptionString = [NSString stringWithFormat:@"<%@: name:%@; myBitmap:%@; myEnum:%@; >", NSStringFromClass([self class]), _name, _myBitmap, _myEnum];
+    return descriptionString;
+}
+
+@end
+
 @implementation MTRDescriptorClusterDeviceTypeStruct
 - (instancetype)init
 {
@@ -133,6 +166,105 @@ NS_ASSUME_NONNULL_BEGIN
 - (NSString *)description
 {
     NSString * descriptionString = [NSString stringWithFormat:@"<%@: node:%@; group:%@; endpoint:%@; cluster:%@; fabricIndex:%@; >", NSStringFromClass([self class]), _node, _group, _endpoint, _cluster, _fabricIndex];
+    return descriptionString;
+}
+
+@end
+
+@implementation MTRAccessControlClusterAccessRestrictionStruct
+- (instancetype)init
+{
+    if (self = [super init]) {
+
+        _type = @(0);
+
+        _id = nil;
+    }
+    return self;
+}
+
+- (id)copyWithZone:(NSZone * _Nullable)zone
+{
+    auto other = [[MTRAccessControlClusterAccessRestrictionStruct alloc] init];
+
+    other.type = self.type;
+    other.id = self.id;
+
+    return other;
+}
+
+- (NSString *)description
+{
+    NSString * descriptionString = [NSString stringWithFormat:@"<%@: type:%@; id:%@; >", NSStringFromClass([self class]), _type, _id];
+    return descriptionString;
+}
+
+@end
+
+@implementation MTRAccessControlClusterCommissioningAccessRestrictionEntryStruct
+- (instancetype)init
+{
+    if (self = [super init]) {
+
+        _endpoint = @(0);
+
+        _cluster = @(0);
+
+        _restrictions = [NSArray array];
+    }
+    return self;
+}
+
+- (id)copyWithZone:(NSZone * _Nullable)zone
+{
+    auto other = [[MTRAccessControlClusterCommissioningAccessRestrictionEntryStruct alloc] init];
+
+    other.endpoint = self.endpoint;
+    other.cluster = self.cluster;
+    other.restrictions = self.restrictions;
+
+    return other;
+}
+
+- (NSString *)description
+{
+    NSString * descriptionString = [NSString stringWithFormat:@"<%@: endpoint:%@; cluster:%@; restrictions:%@; >", NSStringFromClass([self class]), _endpoint, _cluster, _restrictions];
+    return descriptionString;
+}
+
+@end
+
+@implementation MTRAccessControlClusterAccessRestrictionEntryStruct
+- (instancetype)init
+{
+    if (self = [super init]) {
+
+        _endpoint = @(0);
+
+        _cluster = @(0);
+
+        _restrictions = [NSArray array];
+
+        _fabricIndex = @(0);
+    }
+    return self;
+}
+
+- (id)copyWithZone:(NSZone * _Nullable)zone
+{
+    auto other = [[MTRAccessControlClusterAccessRestrictionEntryStruct alloc] init];
+
+    other.endpoint = self.endpoint;
+    other.cluster = self.cluster;
+    other.restrictions = self.restrictions;
+    other.fabricIndex = self.fabricIndex;
+
+    return other;
+}
+
+- (NSString *)description
+{
+    NSString * descriptionString = [NSString stringWithFormat:@"<%@: endpoint:%@; cluster:%@; restrictions:%@; fabricIndex:%@; >", NSStringFromClass([self class]), _endpoint, _cluster, _restrictions, _fabricIndex];
     return descriptionString;
 }
 
@@ -332,6 +464,69 @@ NS_ASSUME_NONNULL_BEGIN
 - (NSString *)description
 {
     NSString * descriptionString = [NSString stringWithFormat:@"<%@: adminNodeID:%@; adminPasscodeID:%@; changeType:%@; latestValue:%@; fabricIndex:%@; >", NSStringFromClass([self class]), _adminNodeID, _adminPasscodeID, _changeType, _latestValue, _fabricIndex];
+    return descriptionString;
+}
+
+@end
+
+@implementation MTRAccessControlClusterAccessRestrictionEntryChangedEvent
+- (instancetype)init
+{
+    if (self = [super init]) {
+
+        _fabricIndex = @(0);
+    }
+    return self;
+}
+
+- (id)copyWithZone:(NSZone * _Nullable)zone
+{
+    auto other = [[MTRAccessControlClusterAccessRestrictionEntryChangedEvent alloc] init];
+
+    other.fabricIndex = self.fabricIndex;
+
+    return other;
+}
+
+- (NSString *)description
+{
+    NSString * descriptionString = [NSString stringWithFormat:@"<%@: fabricIndex:%@; >", NSStringFromClass([self class]), _fabricIndex];
+    return descriptionString;
+}
+
+@end
+
+@implementation MTRAccessControlClusterFabricRestrictionReviewUpdateEvent
+- (instancetype)init
+{
+    if (self = [super init]) {
+
+        _token = @(0);
+
+        _instruction = nil;
+
+        _redirectURL = nil;
+
+        _fabricIndex = @(0);
+    }
+    return self;
+}
+
+- (id)copyWithZone:(NSZone * _Nullable)zone
+{
+    auto other = [[MTRAccessControlClusterFabricRestrictionReviewUpdateEvent alloc] init];
+
+    other.token = self.token;
+    other.instruction = self.instruction;
+    other.redirectURL = self.redirectURL;
+    other.fabricIndex = self.fabricIndex;
+
+    return other;
+}
+
+- (NSString *)description
+{
+    NSString * descriptionString = [NSString stringWithFormat:@"<%@: token:%@; instruction:%@; redirectURL:%@; fabricIndex:%@; >", NSStringFromClass([self class]), _token, _instruction, _redirectURL, _fabricIndex];
     return descriptionString;
 }
 

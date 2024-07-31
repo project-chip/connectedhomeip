@@ -268,6 +268,19 @@ static auto __attribute__((unused)) EnsureKnownEnumValue(detail::ProductIdentifi
         return EnumType::kUnknownEnumValue;
     }
 }
+static auto __attribute__((unused)) EnsureKnownEnumValue(Globals::TestGlobalEnum val)
+{
+    using EnumType = Globals::TestGlobalEnum;
+    switch (val)
+    {
+    case EnumType::kSomeValue:
+    case EnumType::kSomeOtherValue:
+    case EnumType::kFinalValue:
+        return val;
+    default:
+        return EnumType::kUnknownEnumValue;
+    }
+}
 
 static auto __attribute__((unused)) EnsureKnownEnumValue(Identify::EffectIdentifierEnum val)
 {
@@ -411,6 +424,20 @@ static auto __attribute__((unused)) EnsureKnownEnumValue(AccessControl::AccessCo
     case EnumType::kOperate:
     case EnumType::kManage:
     case EnumType::kAdminister:
+        return val;
+    default:
+        return EnumType::kUnknownEnumValue;
+    }
+}
+static auto __attribute__((unused)) EnsureKnownEnumValue(AccessControl::AccessRestrictionTypeEnum val)
+{
+    using EnumType = AccessControl::AccessRestrictionTypeEnum;
+    switch (val)
+    {
+    case EnumType::kAttributeAccessForbidden:
+    case EnumType::kAttributeWriteForbidden:
+    case EnumType::kCommandForbidden:
+    case EnumType::kEventForbidden:
         return val;
     default:
         return EnumType::kUnknownEnumValue;
@@ -935,6 +962,9 @@ static auto __attribute__((unused)) EnsureKnownEnumValue(GeneralCommissioning::C
     case EnumType::kInvalidAuthentication:
     case EnumType::kNoFailSafe:
     case EnumType::kBusyWithOtherAdmin:
+    case EnumType::kRequiredTCNotAccepted:
+    case EnumType::kTCAcknowledgementsNotReceived:
+    case EnumType::kTCMinVersionNotMet:
         return val;
     default:
         return EnumType::kUnknownEnumValue;
@@ -2688,6 +2718,7 @@ static auto __attribute__((unused)) EnsureKnownEnumValue(Thermostat::PresetScena
     case EnumType::kSleep:
     case EnumType::kWake:
     case EnumType::kVacation:
+    case EnumType::kGoingToSleep:
     case EnumType::kUserDefined:
         return val;
     default:

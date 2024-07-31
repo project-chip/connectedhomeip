@@ -72,7 +72,7 @@
         "NETWORK_COMMISSIONING_CLUSTER": [],
         "SAMPLE_MEI_CLUSTER": [],
         "NITROGEN_DIOXIDE_CONCENTRATION_MEASUREMENT_CLUSTER": [],
-        "OCCUPANCY_SENSING_CLUSTER": ["occupancy-sensor-server"],
+        "OCCUPANCY_SENSING_CLUSTER": [],
         "ON_OFF_CLUSTER": [],
         "ON_OFF_SWITCH_CONFIGURATION_CLUSTER": [],
         "OPERATIONAL_CREDENTIALS_CLUSTER": [],
@@ -108,6 +108,7 @@
         "RVC_CLEAN_MODE_CLUSTER": [],
         "RVC_RUN_MODE_CLUSTER": [],
         "SCENES_CLUSTER": [],
+        "SERVICE_AREA_CLUSTER": [],
         "SMOKE_CO_ALARM_CLUSTER": [],
         "SOFTWARE_DIAGNOSTICS_CLUSTER": [],
         "SWITCH_CLUSTER": [],
@@ -284,6 +285,7 @@
         "RVC_CLEAN_MODE_CLUSTER": ["mode-base-server"],
         "RVC_RUN_MODE_CLUSTER": ["mode-base-server"],
         "SCENES_CLUSTER": ["scenes-server"],
+        "SERVICE_AREA_CLUSTER": ["service-area-server"],
         "SMOKE_CO_ALARM_CLUSTER": ["smoke-co-alarm-server"],
         "SOFTWARE_DIAGNOSTICS_CLUSTER": ["software-diagnostics-server"],
         "SWITCH_CLUSTER": ["switch-server"],
@@ -294,7 +296,9 @@
         "THERMOSTAT_USER_INTERFACE_CONFIGURATION_CLUSTER": [
             "thermostat-user-interface-configuration-server"
         ],
-        "THREAD_BORDER_ROUTER_MANAGEMENT_CLUSTER": [],
+        "THREAD_BORDER_ROUTER_MANAGEMENT_CLUSTER": [
+            "thread-border-router-management-server"
+        ],
         "THREAD_NETWORK_DIAGNOSTICS_CLUSTER": [
             "thread-network-diagnostics-server"
         ],
