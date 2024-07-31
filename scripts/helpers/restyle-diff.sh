@@ -40,20 +40,20 @@ cd "$CHIP_ROOT"
 
 restyle-paths() {
     image=restyled/restyler:edge
-    (
-        docker run \
-            --env LOG_LEVEL \
-            --env LOG_DESTINATION \
-            --env LOG_FORMAT \
-            --env LOG_COLOR \
-            --env HOST_DIRECTORY="$PWD" \
-            --env UNRESTRICTED=1 \
-            --volume "$PWD":/code \
-            --volume /tmp:/tmp \
-            --volume /var/run/docker.sock:/var/run/docker.sock \
-            --entrypoint restyle-path \
-            "$image" "$@"
-    )
+
+    docker run \
+        --env LOG_LEVEL \
+        --env LOG_DESTINATION \
+        --env LOG_FORMAT \
+        --env LOG_COLOR \
+        --env HOST_DIRECTORY="$PWD" \
+        --env UNRESTRICTED=1 \
+        --volume "$PWD":/code \
+        --volume /tmp:/tmp \
+        --volume /var/run/docker.sock:/var/run/docker.sock \
+        --entrypoint restyle-path \
+        "$image" "$@"
+
 }
 
 #This was added to be able to use xargs to call the function restyle-paths
@@ -61,18 +61,18 @@ export -f restyle-paths
 
 while [[ $# -gt 0 ]]; do
     case "$1" in
-    -d)
-        export LOG_LEVEL="DEBUG"
-        shift
-        ;;
-    -p)
-        pull_image=1
-        shift
-        ;;
-    *)
-        ref="$1"
-        shift
-        ;;
+        -d)
+            export LOG_LEVEL="DEBUG"
+            shift
+            ;;
+        -p)
+            pull_image=1
+            shift
+            ;;
+        *)
+            ref="$1"
+            shift
+            ;;
     esac
 done
 
@@ -87,4 +87,4 @@ fi
 
 paths=$(git diff --ignore-submodules --name-only --merge-base "$ref")
 
-echo "$paths" | xargs -n $MAX_ARGS bash -c 'restyle-paths "$@"'
+echo "$paths" | xargs -n "$MAX_ARGS" bash -c 'restyle-paths "$@"'
