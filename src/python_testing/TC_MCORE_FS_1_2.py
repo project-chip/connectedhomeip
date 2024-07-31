@@ -15,7 +15,7 @@
 #    limitations under the License.
 #
 
-# See https://github.com/project-chip/connectedhomeip/blob/master/docs/testing/python.md#defining-the-ci-test-arguments
+# TODO: add to CI. See https://github.com/project-chip/connectedhomeip/issues/34676
 # for details about the block below.
 #
 
@@ -119,7 +119,6 @@ class TC_MCORE_FS_1_2(MatterBaseTest):
 
         self.sync_passcode = 20202024
         self.th_sed_dut_discriminator = 2222
-        # min commissioning timeout is 3*60 seconds, so use that even though the command said 30.
         cmd = Clusters.AdministratorCommissioning.Commands.OpenCommissioningWindow(commissioningTimeout=3*60,
                                                                                    PAKEPasscodeVerifier=b"+w1qZQR05Zn0bc2LDyNaDAhsrhDS5iRHPTN10+EmNx8E2OpIPC4SjWRDQVOgqcbnXdYMlpiZ168xLBqn1fx9659gGK/7f9Yc6GxpoJH8kwAUYAYyLGsYeEBt1kL6kpXjgA==",
                                                                                    discriminator=self.th_sed_dut_discriminator,
