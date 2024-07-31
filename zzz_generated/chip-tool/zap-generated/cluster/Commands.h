@@ -2237,6 +2237,7 @@ private:
 | * ArmFailSafe                                                       |   0x00 |
 | * SetRegulatoryConfig                                               |   0x02 |
 | * CommissioningComplete                                             |   0x04 |
+| * SetTCAcknowledgements                                             |   0x06 |
 |------------------------------------------------------------------------------|
 | Attributes:                                                         |        |
 | * Breadcrumb                                                        | 0x0000 |
@@ -2244,6 +2245,10 @@ private:
 | * RegulatoryConfig                                                  | 0x0002 |
 | * LocationCapability                                                | 0x0003 |
 | * SupportsConcurrentConnection                                      | 0x0004 |
+| * TCAcceptedVersion                                                 | 0x0005 |
+| * TCMinRequiredVersion                                              | 0x0006 |
+| * TCAcknowledgements                                                | 0x0007 |
+| * TCAcknowledgementsRequired                                        | 0x0008 |
 | * GeneratedCommandList                                              | 0xFFF8 |
 | * AcceptedCommandList                                               | 0xFFF9 |
 | * EventList                                                         | 0xFFFA |
@@ -2368,6 +2373,45 @@ public:
 
 private:
     chip::app::Clusters::GeneralCommissioning::Commands::CommissioningComplete::Type mRequest;
+};
+
+/*
+ * Command SetTCAcknowledgements
+ */
+class GeneralCommissioningSetTCAcknowledgements : public ClusterCommand
+{
+public:
+    GeneralCommissioningSetTCAcknowledgements(CredentialIssuerCommands * credsIssuerConfig) :
+        ClusterCommand("set-tcacknowledgements", credsIssuerConfig)
+    {
+        AddArgument("TCVersion", 0, UINT16_MAX, &mRequest.TCVersion);
+        AddArgument("TCUserResponse", 0, UINT16_MAX, &mRequest.TCUserResponse);
+        ClusterCommand::AddArguments();
+    }
+
+    CHIP_ERROR SendCommand(chip::DeviceProxy * device, std::vector<chip::EndpointId> endpointIds) override
+    {
+        constexpr chip::ClusterId clusterId = chip::app::Clusters::GeneralCommissioning::Id;
+        constexpr chip::CommandId commandId = chip::app::Clusters::GeneralCommissioning::Commands::SetTCAcknowledgements::Id;
+
+        ChipLogProgress(chipTool, "Sending cluster (0x%08" PRIX32 ") command (0x%08" PRIX32 ") on endpoint %u", clusterId,
+                        commandId, endpointIds.at(0));
+        return ClusterCommand::SendCommand(device, endpointIds.at(0), clusterId, commandId, mRequest);
+    }
+
+    CHIP_ERROR SendGroupCommand(chip::GroupId groupId, chip::FabricIndex fabricIndex) override
+    {
+        constexpr chip::ClusterId clusterId = chip::app::Clusters::GeneralCommissioning::Id;
+        constexpr chip::CommandId commandId = chip::app::Clusters::GeneralCommissioning::Commands::SetTCAcknowledgements::Id;
+
+        ChipLogProgress(chipTool, "Sending cluster (0x%08" PRIX32 ") command (0x%08" PRIX32 ") on Group %u", clusterId, commandId,
+                        groupId);
+
+        return ClusterCommand::SendGroupCommand(groupId, fabricIndex, clusterId, commandId, mRequest);
+    }
+
+private:
+    chip::app::Clusters::GeneralCommissioning::Commands::SetTCAcknowledgements::Type mRequest;
 };
 
 /*----------------------------------------------------------------------------*\
@@ -17107,6 +17151,7 @@ void registerClusterGeneralCommissioning(Commands & commands, CredentialIssuerCo
         make_unique<GeneralCommissioningArmFailSafe>(credsIssuerConfig),           //
         make_unique<GeneralCommissioningSetRegulatoryConfig>(credsIssuerConfig),   //
         make_unique<GeneralCommissioningCommissioningComplete>(credsIssuerConfig), //
+        make_unique<GeneralCommissioningSetTCAcknowledgements>(credsIssuerConfig), //
         //
         // Attributes
         //
@@ -17116,6 +17161,11 @@ void registerClusterGeneralCommissioning(Commands & commands, CredentialIssuerCo
         make_unique<ReadAttribute>(Id, "regulatory-config", Attributes::RegulatoryConfig::Id, credsIssuerConfig),              //
         make_unique<ReadAttribute>(Id, "location-capability", Attributes::LocationCapability::Id, credsIssuerConfig),          //
         make_unique<ReadAttribute>(Id, "supports-concurrent-connection", Attributes::SupportsConcurrentConnection::Id,
+                                   credsIssuerConfig),                                                                     //
+        make_unique<ReadAttribute>(Id, "tcaccepted-version", Attributes::TCAcceptedVersion::Id, credsIssuerConfig),        //
+        make_unique<ReadAttribute>(Id, "tcmin-required-version", Attributes::TCMinRequiredVersion::Id, credsIssuerConfig), //
+        make_unique<ReadAttribute>(Id, "tcacknowledgements", Attributes::TCAcknowledgements::Id, credsIssuerConfig),       //
+        make_unique<ReadAttribute>(Id, "tcacknowledgements-required", Attributes::TCAcknowledgementsRequired::Id,
                                    credsIssuerConfig),                                                                     //
         make_unique<ReadAttribute>(Id, "generated-command-list", Attributes::GeneratedCommandList::Id, credsIssuerConfig), //
         make_unique<ReadAttribute>(Id, "accepted-command-list", Attributes::AcceptedCommandList::Id, credsIssuerConfig),   //
@@ -17137,6 +17187,14 @@ void registerClusterGeneralCommissioning(Commands & commands, CredentialIssuerCo
             credsIssuerConfig), //
         make_unique<WriteAttribute<bool>>(Id, "supports-concurrent-connection", 0, 1, Attributes::SupportsConcurrentConnection::Id,
                                           WriteCommandType::kForceWrite, credsIssuerConfig), //
+        make_unique<WriteAttribute<uint16_t>>(Id, "tcaccepted-version", 0, UINT16_MAX, Attributes::TCAcceptedVersion::Id,
+                                              WriteCommandType::kForceWrite, credsIssuerConfig), //
+        make_unique<WriteAttribute<uint16_t>>(Id, "tcmin-required-version", 0, UINT16_MAX, Attributes::TCMinRequiredVersion::Id,
+                                              WriteCommandType::kForceWrite, credsIssuerConfig), //
+        make_unique<WriteAttribute<uint16_t>>(Id, "tcacknowledgements", 0, UINT16_MAX, Attributes::TCAcknowledgements::Id,
+                                              WriteCommandType::kForceWrite, credsIssuerConfig), //
+        make_unique<WriteAttribute<bool>>(Id, "tcacknowledgements-required", 0, 1, Attributes::TCAcknowledgementsRequired::Id,
+                                          WriteCommandType::kForceWrite, credsIssuerConfig), //
         make_unique<WriteAttributeAsComplex<chip::app::DataModel::List<const chip::CommandId>>>(
             Id, "generated-command-list", Attributes::GeneratedCommandList::Id, WriteCommandType::kForceWrite,
             credsIssuerConfig), //
@@ -17157,6 +17215,11 @@ void registerClusterGeneralCommissioning(Commands & commands, CredentialIssuerCo
         make_unique<SubscribeAttribute>(Id, "regulatory-config", Attributes::RegulatoryConfig::Id, credsIssuerConfig),     //
         make_unique<SubscribeAttribute>(Id, "location-capability", Attributes::LocationCapability::Id, credsIssuerConfig), //
         make_unique<SubscribeAttribute>(Id, "supports-concurrent-connection", Attributes::SupportsConcurrentConnection::Id,
+                                        credsIssuerConfig),                                                                     //
+        make_unique<SubscribeAttribute>(Id, "tcaccepted-version", Attributes::TCAcceptedVersion::Id, credsIssuerConfig),        //
+        make_unique<SubscribeAttribute>(Id, "tcmin-required-version", Attributes::TCMinRequiredVersion::Id, credsIssuerConfig), //
+        make_unique<SubscribeAttribute>(Id, "tcacknowledgements", Attributes::TCAcknowledgements::Id, credsIssuerConfig),       //
+        make_unique<SubscribeAttribute>(Id, "tcacknowledgements-required", Attributes::TCAcknowledgementsRequired::Id,
                                         credsIssuerConfig),                                                                     //
         make_unique<SubscribeAttribute>(Id, "generated-command-list", Attributes::GeneratedCommandList::Id, credsIssuerConfig), //
         make_unique<SubscribeAttribute>(Id, "accepted-command-list", Attributes::AcceptedCommandList::Id, credsIssuerConfig),   //
