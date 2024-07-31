@@ -402,6 +402,7 @@ DevKitM
 devtype
 df
 dfe
+DFILE
 dfu
 DgDxsfHx
 dhclient
@@ -649,6 +650,7 @@ href
 HSM
 hsm
 HTTPS
+Humidistat
 HW
 hwadr
 HydrogenConcentrationMeasurement
@@ -1354,6 +1356,7 @@ SVR
 SWD
 SWU
 symlinks
+sysbuild
 sysconfdir
 SysConfig
 sysctl

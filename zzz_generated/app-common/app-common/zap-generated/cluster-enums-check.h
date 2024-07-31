@@ -429,6 +429,20 @@ static auto __attribute__((unused)) EnsureKnownEnumValue(AccessControl::AccessCo
         return EnumType::kUnknownEnumValue;
     }
 }
+static auto __attribute__((unused)) EnsureKnownEnumValue(AccessControl::AccessRestrictionTypeEnum val)
+{
+    using EnumType = AccessControl::AccessRestrictionTypeEnum;
+    switch (val)
+    {
+    case EnumType::kAttributeAccessForbidden:
+    case EnumType::kAttributeWriteForbidden:
+    case EnumType::kCommandForbidden:
+    case EnumType::kEventForbidden:
+        return val;
+    default:
+        return EnumType::kUnknownEnumValue;
+    }
+}
 static auto __attribute__((unused)) EnsureKnownEnumValue(AccessControl::ChangeTypeEnum val)
 {
     using EnumType = AccessControl::ChangeTypeEnum;
@@ -948,6 +962,9 @@ static auto __attribute__((unused)) EnsureKnownEnumValue(GeneralCommissioning::C
     case EnumType::kInvalidAuthentication:
     case EnumType::kNoFailSafe:
     case EnumType::kBusyWithOtherAdmin:
+    case EnumType::kRequiredTCNotAccepted:
+    case EnumType::kTCAcknowledgementsNotReceived:
+    case EnumType::kTCMinVersionNotMet:
         return val;
     default:
         return EnumType::kUnknownEnumValue;
@@ -2701,6 +2718,7 @@ static auto __attribute__((unused)) EnsureKnownEnumValue(Thermostat::PresetScena
     case EnumType::kSleep:
     case EnumType::kWake:
     case EnumType::kVacation:
+    case EnumType::kGoingToSleep:
     case EnumType::kUserDefined:
         return val;
     default:
