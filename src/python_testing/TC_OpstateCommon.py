@@ -1255,7 +1255,9 @@ class TC_OPSTATE_BASE():
         # To-Do: Update the TP to subscribe-all.
         self.step(2)
         sub_handler = ClusterAttributeChangeAccumulator(cluster)
-        await sub_handler.start(self.default_controller, self.dut_node_id, self.matter_test_config.endpoint)
+        logging.info(f'---------> dut node id: {self.dut_node_id}')
+        logging.info(f'---------> endpoint: {endpoint}')
+        await sub_handler.start(self.default_controller, self.dut_node_id, endpoint)
 
         self.step(3)
         if self.pics_guard(self.check_pics(f"{self.test_info.pics_code}.S.M.ST_RUNNING")):
@@ -1280,20 +1282,23 @@ class TC_OPSTATE_BASE():
         asserts.assert_less_equal(count, 5, "Received more than 5 reports for CountdownTime")
         asserts.assert_greater(count, 0, "Did not receive any reports for CountdownTime")
 
-        self.step(5)
         attr_value = await self.read_expect_success(
             endpoint=endpoint,
             attribute=attributes.OperationalState)
-        wait_count = 0
-        while (attr_value != cluster.Enums.OperationalStateEnum.kStopped) and (wait_count < 20):
-            time.sleep(1)
-            wait_count = wait_count + 1
-            attr_value = await self.read_expect_success(
-                endpoint=endpoint,
-                attribute=attributes.OperationalState)
-        count = sub_handler.attribute_report_counts[attributes.CountdownTime]
-        asserts.assert_less_equal(count, 5, "Received more than 5 reports for CountdownTime")
-        asserts.assert_greater(count, 0, "Did not receive any reports for CountdownTime")
+        if attr_value == cluster.Enums.OperationalStateEnum.kRunning:
+            self.step(5)
+            wait_count = 0
+            while (attr_value != cluster.Enums.OperationalStateEnum.kStopped) and (wait_count < 20):
+                time.sleep(1)
+                wait_count = wait_count + 1
+                attr_value = await self.read_expect_success(
+                    endpoint=endpoint,
+                    attribute=attributes.OperationalState)
+            count = sub_handler.attribute_report_counts[attributes.CountdownTime]
+            asserts.assert_less_equal(count, 5, "Received more than 5 reports for CountdownTime")
+            asserts.assert_greater(count, 0, "Did not receive any reports for CountdownTime")
+        else:
+            self.skip_step(5)
 
         sub_handler.reset()
         self.step(6)

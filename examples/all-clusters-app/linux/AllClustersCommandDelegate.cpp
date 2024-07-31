@@ -341,6 +341,8 @@ void AllClustersAppCommandHandler::HandleCommand(intptr_t context)
     }
     else if (name == "OperationalStateChange")
     {
+        ChipLogDetail(AppServer,
+                    "------> [rmb] Got some OperationalStateChange.");
         std::string device    = self->mJsonValue["Device"].asString();
         std::string operation = self->mJsonValue["Operation"].asString();
         self->OnOperationalStateChange(device, operation, self->mJsonValue["Param"]);
@@ -629,6 +631,9 @@ void AllClustersAppCommandHandler::OnOperationalStateChange(std::string device, 
 
     if (operation == "Start" || operation == "Resume")
     {
+        ChipLogDetail(AppServer,
+            "------> AllClustersAppCommandHandler::OnOperationalStateChange, calling SetOperationalState in instance.");
+
         operationalStateInstance->SetOperationalState(to_underlying(OperationalState::OperationalStateEnum::kRunning));
     }
     else if (operation == "Pause")

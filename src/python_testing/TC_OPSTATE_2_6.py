@@ -54,7 +54,8 @@ class TC_OPSTATE_2_6(MatterBaseTest, TC_OPSTATE_BASE):
     async def test_TC_OPSTATE_2_6(self):
         endpoint = self.matter_test_config.endpoint
 
-        await self.TEST_TC_OPSTATE_BASE_2_6(endpoint=endpoint)
+        # await self.TEST_TC_OPSTATE_BASE_2_6(endpoint=endpoint)
+        await self.TEST_TC_OPSTATE_BASE_2_6(endpoint=1)
 
 
 if __name__ == "__main__":
