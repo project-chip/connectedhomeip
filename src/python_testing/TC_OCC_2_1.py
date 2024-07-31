@@ -147,6 +147,7 @@ class TC_OCC_2_1(MatterBaseTest):
                 logging.info("PIRUnoccupiedToOccupiedDelay conformance failed. Test step skipped")
         else:
             logging.info("PIRUnoccupiedToOccupiedDelay not supported. Test step skipped")
+            self.mark_current_step_skipped()
 
         self.step(9)
         if attributes.PIRUnoccupiedToOccupiedThreshold.attribute_id in attribute_list:
