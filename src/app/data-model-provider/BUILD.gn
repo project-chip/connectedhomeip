@@ -16,6 +16,8 @@ import("//build_overrides/chip.gni")
 source_set("data-model-provider") {
   sources = [
     "ActionContext.h",
+    "ActionReturnStatus.cpp",
+    "ActionReturnStatus.h",
     "Context.h",
     "EventsGenerator.h",
     "MetadataTypes.cpp",
