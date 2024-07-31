@@ -27,17 +27,15 @@
 import logging
 import os
 import queue
-import uuid
+import signal
 import subprocess
 import time
-import signal
-
+import uuid
 
 import chip.clusters as Clusters
 from chip import ChipDeviceCtrl
-from matter_testing_support import (MatterBaseTest, TestStep, async_test_body, default_matter_test_main, SimpleEventCallback)
+from matter_testing_support import MatterBaseTest, SimpleEventCallback, TestStep, async_test_body, default_matter_test_main
 from mobly import asserts
-
 
 logger = logging.getLogger(__name__)
 kRootEndpointId = 0
