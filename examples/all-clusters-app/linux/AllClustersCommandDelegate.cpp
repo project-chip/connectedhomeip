@@ -200,17 +200,17 @@ void HandleSimulateMultiPress(Json::Value & jsonValue)
  * Named pipe handler for simulating a latched switch movement.
  *
  * Usage example:
- *   echo '{"Name": "SimulateLatchedPosition", "EndpointId": 3, "PositionId": 1}' > /tmp/chip_all_clusters_fifo_1146610
+ *   echo '{"Name": "SimulateLatchPosition", "EndpointId": 3, "PositionId": 1}' > /tmp/chip_all_clusters_fifo_1146610
  *
  * JSON Arguments:
- *   - "Name": Must be "SimulateLatchedPosition"
+ *   - "Name": Must be "SimulateLatchPosition"
  *   - "EndpointId": ID of endpoint having a switch cluster
  *   - "PositionId": switch position for new CurrentPosition to set in switch cluster
  *
  * @param jsonValue - JSON payload from named pipe
  */
 
-void HandleSimulateLatchedPosition(Json::Value & jsonValue)
+void HandleSimulateLatchPosition(Json::Value & jsonValue)
 {
     bool hasEndpointId = HasNumericField(jsonValue, "EndpointId");
     bool hasPositionId = HasNumericField(jsonValue, "PositionId");
@@ -234,7 +234,7 @@ void HandleSimulateLatchedPosition(Json::Value & jsonValue)
 
     if (positionId != previousPositionId)
     {
-        status = Switch::Attributes::CurrentPosition::Set(endpoint, positionId);
+        status = Switch::Attributes::CurrentPosition::Set(endpointId, positionId);
         VerifyOrReturn(Protocols::InteractionModel::Status::Success == status,
                       ChipLogError(NotSpecified, "Failed to set CurrentPosition attribute"));
         ChipLogDetail(NotSpecified, "The latching switch is moved to a new position: %u", static_cast<unsigned>(positionId));
@@ -406,11 +406,12 @@ void AllClustersAppCommandHandler::HandleCommand(intptr_t context)
     }
     else if (name == "SimulateLatchPosition")
     {
-        HandleSimulateLatchedPosition(self->mJsonValue);
+        HandleSimulateLatchPosition(self->mJsonValue);
     }
     else
     {
-        ChipLogError(NotSpecified, "Unhandled command: Should never happens");
+        ChipLogError(NotSpecified, "Unhandled command '%s': this hould never happen", name.c_str());
+        VerifyOrDie(false && "Named pipe command not supported, see log above.");
     }
 
 exit:
