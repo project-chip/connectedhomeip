@@ -58,24 +58,24 @@ Mac OS.
     source ./scripts/activate.sh -p bouffalolab
     ```
 
+    > After environment setup `Bouffalo Lab` flash tool, `bflb-iot-tool`,
+    > imports under this environment. If not, please try
+    > `scripts/bootstrap.sh -p bouffalolab` for matter environment update.
+
 -   Setup build environment for `Bouffalo Lab` SoC
 
-    Enter  **connectedhomeip** repo under terminal and execute `setup.sh` script
-    to install `Bouffalo Lab` SDK as below.
+    Run `setup.sh` to install `Bouffalo Lab` SDK to /opt/bouffalolab_sdk
 
     ```
-    bash integrations/docker/images/stage-2/chip-build-bouffalolab/setup.sh
+    cd third_party/bouffalolab/repo
+    sudo bash scripts/setup.sh
     ```
 
-    Script `setup.sh` requires to input expected installation path, or default
-    path `/opt/bouffalolab_sdk`. If default path `/opt/bouffalolab_sdk` is used,
-    please add `sudo` to execute script for `/opt` access permission.
-
-    Before building, please export environment variable `BOUFFALOLAB_SDK_ROOT`
-    to specify toolchain installation path as below.
+    Please execute following command to export `BOUFFALOLAB_SDK_ROOT` before
+    building.
 
     ```
-    export BOUFFALOLAB_SDK_ROOT=<toolchain installation path>
+    export BOUFFALOLAB_SDK_ROOT=/opt/bouffalolab_sdk
     ```
 
 ## Build CHIP Lighting App example

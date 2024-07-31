@@ -19,7 +19,6 @@ import os
 import pathlib
 import re
 import shutil
-import subprocess
 import sys
 
 import coloredlogs
@@ -56,7 +55,7 @@ BOUFFALO_OPTIONS = {
             }
         },
         'xtal': {
-            'help': 'XTAL configuration for bl iot sdk',
+            'help': 'XTAL for board',
             'default': None,
             'argparse': {
                 'metavar': 'XTAL',
@@ -132,8 +131,7 @@ class Flasher(firmware_utils.Flasher):
 
         for root, dirs, files in os.walk(config_path, topdown=False):
             for name in files:
-                if "boot2" not in name.lower():
-                    continue
+                logging.info("get_boot_image {} {}".format(root, boot2_image))
                 if boot2_image:
                     return os.path.join(root, boot2_image)
                 else:
@@ -168,28 +166,33 @@ class Flasher(firmware_utils.Flasher):
         """Perform actions on the device according to self.option."""
         self.log(3, 'Options:', self.option)
 
-        tool_path = os.environ.get('BOUFFALOLAB_SDK_ROOT') + "/flashtool/BouffaloLabDevCube-v1.9.0"
-        bflb_tools_dict = {
-            "linux": {"flash_tool": "bflb_iot_tool-ubuntu"},
-            "win32": {"flash_tool": "bflb_iot_tool.exe"},
-            "darwin": {"flash_tool": "bflb_iot_tool-macos"},
-        }
-
         try:
-            flashtool_exe = tool_path + "/" + bflb_tools_dict[sys.platform]["flash_tool"]
+            import bflb_iot_tool
+            import bflb_iot_tool.__main__
+
+            version_target_str = "1.8.6"
+            version_target = version_target_str.split('.')
+            version_target = "".join(["%03d" % int(var) for var in version_target])
+
+            version_current_str = importlib.metadata.version("bflb_iot_tool")
+            version_current = version_current_str.split('.')
+            version_current = "".join(["%03d" % int(var) for var in version_current])
+
+            if version_current < version_target:
+                raise Exception("bflb_iot_tool {} version is less than {}".format(version_current_str, version_target_str))
+
         except Exception as e:
-            raise Exception("Do NOT support {} operating system to program firmware.".format(sys.platform))
 
-        if not os.path.exists(flashtool_exe):
-            logging.fatal('*' * 80)
-            logging.error('Flashtool is not installed, or environment variable BOUFFALOLAB_SDK_ROOT is not exported.')
-            logging.fatal('\tPlease make sure Bouffalo Lab SDK installs as below:')
-            logging.fatal('\t\t./integrations/docker/images/stage-2/chip-build-bouffalolab/setup.sh')
+            logging.error('Please try the following command to setup or upgrade Bouffalo Lab environment:')
+            logging.error('source scripts/activate.sh -p bouffalolab')
+            logging.error('Or')
+            logging.error('source scripts/bootstrap.sh -p bouffalolab')
 
-            logging.fatal('\tPlease make sure BOUFFALOLAB_SDK_ROOT exports before building as below:')
-            logging.fatal('\t\texport BOUFFALOLAB_SDK_ROOT="your install path"')
-            logging.fatal('*' * 80)
+            logging.error('If upgrade bflb_iot_tool failed, try pip uninstall bflb_iot_tool first.')
+
             raise Exception(e)
+
+        tool_path = os.path.dirname(bflb_iot_tool.__file__)
 
         options_keys = BOUFFALO_OPTIONS["configuration"].keys()
         arguments = [__file__]
@@ -215,7 +218,6 @@ class Flasher(firmware_utils.Flasher):
         boot2_image = None
 
         command_args = {}
-
         for (key, value) in dict(vars(self.option)).items():
 
             if self.option.build and value:
@@ -244,7 +246,7 @@ class Flasher(firmware_utils.Flasher):
                 else:
                     arg = ("--{}={}".format(key, value)).strip()
 
-                arguments = arguments + arg.split('=')
+                arguments.append(arg)
 
             if key == "chipname":
                 chip_name = value
@@ -301,7 +303,7 @@ class Flasher(firmware_utils.Flasher):
                 arguments.append(boot2_image)
 
         os.chdir(work_dir)
-        arguments[0] = re.sub(r'(-script\.pyw|\.exe)?$', '', flashtool_exe)
+        arguments[0] = re.sub(r'(-script\.pyw|\.exe)?$', '', arguments[0])
         sys.argv = arguments
 
         if ota_output_folder:
@@ -309,12 +311,8 @@ class Flasher(firmware_utils.Flasher):
                 shutil.rmtree(ota_output_folder)
             os.mkdir(ota_output_folder)
 
-        logging.info("Arguments {}".format(" ".join(arguments)))
-        process = subprocess.Popen(arguments, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
-        while process.poll() is None:
-            line = process.stdout.readline().decode('utf-8').rstrip()
-            if line:
-                logging.info(line)
+        logging.info("Arguments {}".format(arguments))
+        bflb_iot_tool.__main__.run_main()
 
         if ota_output_folder:
             ota_images = os.listdir(ota_output_folder)
