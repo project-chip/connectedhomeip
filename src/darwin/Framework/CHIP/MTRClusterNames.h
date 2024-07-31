@@ -41,3 +41,12 @@ MTR_EXTERN MTR_AVAILABLE(ios(17.6), macos(14.6), watchos(10.6), tvos(17.6)) NSSt
  * will be returned.
  */
 MTR_EXTERN MTR_AVAILABLE(ios(17.6), macos(14.6), watchos(10.6), tvos(17.6)) NSString * MTRAttributeNameForID(MTRClusterIDType clusterID, MTRAttributeIDType attributeID);
+
+/**
+ * Resolve Matter event IDs into a descriptive string.
+ *
+ * For unknown IDs, a string '<Unknown clusterID %d>' (if the cluster ID is not known)
+ * or '<Unknown eventID %d>' (if the cluster ID is known but the event ID is not known)
+ * will be returned.
+ */
+MTR_EXTERN MTR_NEWLY_AVAILABLE NSString * MTREventNameForID(MTRClusterIDType clusterID, MTREventIDType eventID);
