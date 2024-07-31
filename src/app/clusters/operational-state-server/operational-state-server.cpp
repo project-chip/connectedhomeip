@@ -96,7 +96,7 @@ CHIP_ERROR Instance::SetCurrentPhase(const DataModel::Nullable<uint8_t> & aPhase
 CHIP_ERROR Instance::SetOperationalState(uint8_t aOpState)
 {
     ChipLogDetail(AppServer,
-                "------> Got a call to SetOperationalState in the OpState base.");
+                "------> [rmb] Got a call to SetOperationalState in the OpState server Instance::SetOperationalState.");
 
     // Error is only allowed to be set by OnOperationalErrorDetected.
     if (aOpState == to_underlying(OperationalStateEnum::kError) || !IsSupportedOperationalState(aOpState))
@@ -123,7 +123,7 @@ CHIP_ERROR Instance::SetOperationalState(uint8_t aOpState)
         // Functionality seems to work ok using chip-tool from a command line.  Meaning, if I send a command I see the right messages
         // on the terminal, time ticks and presumably the right reports are sent.
         ChipLogDetail(AppServer,
-                    "------> States differ, so reporting that change to Matter?");
+                    "------> [rmb] States differ, so reporting that change to Matter?");
 
         MatterReportingAttributeChangeCallback(mEndpointId, mClusterId, Attributes::OperationalState::Id);
         countdownTimeUpdateNeeded = true;

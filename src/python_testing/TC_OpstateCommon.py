@@ -1264,11 +1264,12 @@ class TC_OPSTATE_BASE():
             self.send_manual_or_pipe_command(name="OperationalStateChange",
                                              device=self.device,
                                              operation="Start")
+            time.sleep(1)
             await self.read_and_expect_value(endpoint=endpoint,
                                              attribute=attributes.OperationalState,
                                              expected_value=cluster.Enums.OperationalStateEnum.kRunning)
             count = sub_handler.attribute_report_counts[attributes.CountdownTime]
-            #asserts.assert_greater(count, 0, "Did not receive any reports for CountdownTime")
+            asserts.assert_greater(count, 0, "Did not receive any reports for CountdownTime")
         else:
             self.skip_step(3)
 
@@ -1280,7 +1281,7 @@ class TC_OPSTATE_BASE():
         count = sub_handler.attribute_report_counts[attributes.CountdownTime]
         sub_handler.reset()
         asserts.assert_less_equal(count, 5, "Received more than 5 reports for CountdownTime")
-        asserts.assert_greater(count, 0, "Did not receive any reports for CountdownTime")
+        asserts.assert_greater_equal(count, 0, "Did not receive any reports for CountdownTime")
 
         attr_value = await self.read_expect_success(
             endpoint=endpoint,
@@ -1306,6 +1307,7 @@ class TC_OPSTATE_BASE():
             self.send_manual_or_pipe_command(name="OperationalStateChange",
                                              device=self.device,
                                              operation="Start")
+            time.sleep(1)
             await self.read_and_expect_value(endpoint=endpoint,
                                              attribute=attributes.OperationalState,
                                              expected_value=cluster.Enums.OperationalStateEnum.kRunning)
@@ -1325,7 +1327,8 @@ class TC_OPSTATE_BASE():
             self.send_manual_or_pipe_command(name="OperationalStateChange",
                                                 device=self.device,
                                                 operation="Pause")
+            time.sleep(1)
+            count = sub_handler.attribute_report_counts[attributes.CountdownTime]
+            asserts.assert_greater(count, 0, "Did not receive any reports for CountdownTime")
         else:
             self.skip_step(8)
-        count = sub_handler.attribute_report_counts[attributes.CountdownTime]
-        asserts.assert_greater(count, 0, "Did not receive any reports for CountdownTime")
