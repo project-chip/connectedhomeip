@@ -262,7 +262,7 @@ used to control an antenna switch. In order to use this feature, user must set
 
 In case signing errors are encountered when running the "sign_images.sh" script
 (run automatically) install the recommanded packages (python version > 3, pip3,
-pycrypto, pycryptodome):
+pycryptodome):
 
 ```
 user@ubuntu:~$ python3 --version
@@ -270,7 +270,6 @@ Python 3.8.2
 user@ubuntu:~$ pip3 --version
 pip 20.0.2 from /usr/lib/python3/dist-packages/pip (python 3.8)
 user@ubuntu:~$ pip3 list | grep -i pycrypto
-pycrypto               2.6.1
 pycryptodome           3.9.8
 ```
 
