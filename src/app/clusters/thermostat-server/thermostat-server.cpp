@@ -295,14 +295,14 @@ CHIP_ERROR ThermostatAttrAccess::Write(const ConcreteDataAttributePath & aPath, 
             auto iterator = list.begin();
             while (iterator.Next())
             {
-                ReturnErrorOnFailure(manager->AppendPreset(aPath.mEndpointId, iterator.GetValue()));
+                ReturnErrorOnFailure(StatusIB(manager->AppendPreset(aPath.mEndpointId, iterator.GetValue())).ToChipError());
             }
         }
         else if (aPath.mListOp == ConcreteDataAttributePath::ListOperation::AppendItem)
         {
             PresetStruct::DecodableType decodableType;
             ReturnErrorOnFailure(aDecoder.Decode(decodableType));
-            ReturnErrorOnFailure(manager->AppendPreset(aPath.mEndpointId, decodableType));
+            ReturnErrorOnFailure(StatusIB(manager->AppendPreset(aPath.mEndpointId, decodableType)).ToChipError());
         }
         else
         {
@@ -340,14 +340,14 @@ CHIP_ERROR ThermostatAttrAccess::Write(const ConcreteDataAttributePath & aPath, 
             auto iterator = list.begin();
             while (iterator.Next())
             {
-                ReturnErrorOnFailure(manager->AppendSchedule(aPath.mEndpointId, iterator.GetValue()));
+                ReturnErrorOnFailure(StatusIB(manager->AppendSchedule(aPath.mEndpointId, iterator.GetValue())).ToChipError());
             }
         }
         else if (aPath.mListOp == ConcreteDataAttributePath::ListOperation::AppendItem)
         {
             ScheduleStruct::DecodableType decodableType;
             ReturnErrorOnFailure(aDecoder.Decode(decodableType));
-            ReturnErrorOnFailure(manager->AppendSchedule(aPath.mEndpointId, decodableType));
+            ReturnErrorOnFailure(StatusIB(manager->AppendSchedule(aPath.mEndpointId, decodableType)).ToChipError());
         }
         else
         {

@@ -44,20 +44,19 @@ struct ThermostatMatterScheduleManager
     virtual CHIP_ERROR RollbackEdits() = 0; // rollback all edits
     virtual CHIP_ERROR RollbackEdits(chip::EndpointId aEndpoint) = 0;    
 
-//    virtual CHIP_ERROR ValidateEdits(chip::EndpointId aEndpoint) = 0;
     virtual chip::Protocols::InteractionModel::Status CommitEdits(chip::EndpointId aEndpoint) = 0;
 
     // presets
     virtual CHIP_ERROR GetPresetTypeAtIndex(chip::EndpointId aEndpoint, size_t aIndex, chip::app::Clusters::Thermostat::Structs::PresetTypeStruct::Type & outPresetType) const { return CHIP_ERROR_NOT_IMPLEMENTED; }
     virtual CHIP_ERROR GetPresetAtIndex(chip::EndpointId aEndpoint, size_t aIndex, chip::app::Clusters::Thermostat::Structs::PresetStruct::Type & outPreset) const { return CHIP_ERROR_NOT_IMPLEMENTED; }
     virtual CHIP_ERROR ClearPresets(chip::EndpointId aEndpoint) { return CHIP_ERROR_NOT_IMPLEMENTED; }
-    virtual CHIP_ERROR AppendPreset(chip::EndpointId aEndpoint, const chip::app::Clusters::Thermostat::Structs::PresetStruct::DecodableType & preset) { return CHIP_ERROR_NOT_IMPLEMENTED; }
+    virtual chip::Protocols::InteractionModel::Status AppendPreset(chip::EndpointId aEndpoint, const chip::app::Clusters::Thermostat::Structs::PresetStruct::DecodableType & preset) { return chip::Protocols::InteractionModel::Status::UnsupportedWrite; }
 
     // schedules
     virtual CHIP_ERROR GetScheduleTypeAtIndex(chip::EndpointId aEndpoint, size_t index, chip::app::Clusters::Thermostat::Structs::ScheduleTypeStruct::Type & scheduleType) const { return CHIP_ERROR_NOT_IMPLEMENTED; }
     virtual CHIP_ERROR GetScheduleAtIndex(chip::EndpointId aEndpoint, size_t index, chip::app::Clusters::Thermostat::Structs::ScheduleStruct::Type & schedule) const { return CHIP_ERROR_NOT_IMPLEMENTED; }
     virtual CHIP_ERROR ClearSchedules(chip::EndpointId aEndpoint) { return CHIP_ERROR_NOT_IMPLEMENTED; }
-    virtual CHIP_ERROR AppendSchedule(chip::EndpointId aEndpoint, const chip::app::Clusters::Thermostat::Structs::ScheduleStruct::DecodableType & schedule) { return CHIP_ERROR_NOT_IMPLEMENTED; }
+    virtual chip::Protocols::InteractionModel::Status AppendSchedule(chip::EndpointId aEndpoint, const chip::app::Clusters::Thermostat::Structs::ScheduleStruct::DecodableType & schedule) { return chip::Protocols::InteractionModel::Status::UnsupportedWrite; }
 
     static void SetActiveInstance(ThermostatMatterScheduleManager * inManager);
     static ThermostatMatterScheduleManager * GetActiveInstance();
