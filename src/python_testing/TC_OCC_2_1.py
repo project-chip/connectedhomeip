@@ -72,6 +72,7 @@ class TC_OCC_2_1(MatterBaseTest):
             asserts.assert_less_equal(occupancy_dut, 0b00000001, "Occupancy attribute is not in valid range")
         else:
             logging.info("Occupancy attribute is a mandatory attribute. Test step fails.")
+            asserts.fail("Missing mandatory attribute Occupancy")
 
         self.step(3)
         if attributes.OccupancySensorType.attribute_id in attribute_list:
