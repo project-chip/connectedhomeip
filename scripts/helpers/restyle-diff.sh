@@ -32,85 +32,47 @@ here=${0%/*}
 
 set -e
 
+MAX_ARGS=256
+pull_image=0
+
 CHIP_ROOT=$(cd "$here/../.." && pwd)
 cd "$CHIP_ROOT"
 
-docker_run() {
-    if [ -t 0 ]; then
-        exec docker run --tty "$@"
-
-    else
-        exec docker run "$@"
-
-    fi
-}
-
 restyle-paths() {
     image=restyled/restyler:edge
-    batch_size=4
-    batch=()
-
-    for path in "$@"; do
-        batch+=("$path")
-        if [[ ${#batch[@]} -eq $batch_size ]]; then
-            for p in "${batch[@]}"; do
-                (
-                    docker_run \
-                        --env LOG_LEVEL \
-                        --env LOG_DESTINATION \
-                        --env LOG_FORMAT \
-                        --env LOG_COLOR \
-                        --env HOST_DIRECTORY="$PWD" \
-                        --env UNRESTRICTED=1 \
-                        --volume "$PWD":/code \
-                        --volume /tmp:/tmp \
-                        --volume /var/run/docker.sock:/var/run/docker.sock \
-                        --entrypoint restyle-path \
-                        "$image" "$p"
-                ) &
-            done
-            wait
-            batch=()
-        fi
-    done
-
-    if [[ ${#batch[@]} -gt 0 ]]; then
-        for p in "${batch[@]}"; do
-            (
-                docker_run \
-                    --env LOG_LEVEL \
-                    --env LOG_DESTINATION \
-                    --env LOG_FORMAT \
-                    --env LOG_COLOR \
-                    --env HOST_DIRECTORY="$PWD" \
-                    --env UNRESTRICTED=1 \
-                    --volume "$PWD":/code \
-                    --volume /tmp:/tmp \
-                    --volume /var/run/docker.sock:/var/run/docker.sock \
-                    --entrypoint restyle-path \
-                    "$image" "$p"
-            ) &
-        done
-        wait
-    fi
+    (
+        docker run \
+            --env LOG_LEVEL \
+            --env LOG_DESTINATION \
+            --env LOG_FORMAT \
+            --env LOG_COLOR \
+            --env HOST_DIRECTORY="$PWD" \
+            --env UNRESTRICTED=1 \
+            --volume "$PWD":/code \
+            --volume /tmp:/tmp \
+            --volume /var/run/docker.sock:/var/run/docker.sock \
+            --entrypoint restyle-path \
+            "$image" "$@"
+    )
 }
 
-pull_image=0
+#This was added to be able to use xargs to call the function restyle-paths
+export -f restyle-paths
 
 while [[ $# -gt 0 ]]; do
     case "$1" in
-        -d)
-            export LOG_LEVEL="DEBUG"
-            shift
-            ;;
-        -p)
-            pull_image=1
-            shift
-            ;;
-        *)
-            ref="$1"
-            shift
-            ;;
+    -d)
+        export LOG_LEVEL="DEBUG"
+        shift
+        ;;
+    -p)
+        pull_image=1
+        shift
+        ;;
+    *)
+        ref="$1"
+        shift
+        ;;
     esac
 done
 
@@ -123,5 +85,6 @@ if [[ $pull_image -eq 1 ]]; then
     docker pull restyled/restyler:edge
 fi
 
-mapfile -t paths < <(git diff --ignore-submodules --name-only --merge-base "$ref")
-restyle-paths "${paths[@]}"
+paths=$(git diff --ignore-submodules --name-only --merge-base "$ref")
+
+echo "$paths" | xargs -n $MAX_ARGS bash -c 'restyle-paths "$@"'
