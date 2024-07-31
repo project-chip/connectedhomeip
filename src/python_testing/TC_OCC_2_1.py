@@ -134,6 +134,7 @@ class TC_OCC_2_1(MatterBaseTest):
                 asserts.fail("PIROccupiedToUnoccupiedDelay conformance is incorrect")
         else:
             logging.info("PIROccupiedToUnoccupiedDelay not supported. Test step skipped")
+            self.mark_current_step_skipped()
 
         self.step(8)
         if attributes.PIRUnoccupiedToOccupiedDelay.attribute_id in attribute_list: 
