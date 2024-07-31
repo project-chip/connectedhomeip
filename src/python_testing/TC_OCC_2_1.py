@@ -104,6 +104,7 @@ class TC_OCC_2_1(MatterBaseTest):
                 asserts.assert_greater_equal(hold_time_limits_dut.HoldTimeDefault, hold_time_limits_dut.HoldTimeMin, "HoldTimeMin is not in valid range")
             else:
                 logging.info("HoldTime conformance failed.  Test step skipped")
+                asserts.fail("HoldTime conformance is incorrect")
 
         else:
             logging.info("HoldTimeLimits not supported. Test step skipped")
