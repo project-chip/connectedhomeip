@@ -280,11 +280,7 @@
             "ClientsSupportedPerFabric",
             "MaximumCheckInBackOff"
         ],
-        "Occupancy Sensing": [
-            "HoldTimeLimits",
-            "HoldTime",
-            "FeatureMap"
-        ],
+        "Occupancy Sensing": ["HoldTimeLimits", "HoldTime", "FeatureMap"],
         "Operational Credentials": [
             "SupportedFabrics",
             "CommissionedFabrics",
