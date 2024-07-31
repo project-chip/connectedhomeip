@@ -29,15 +29,12 @@
 
 import logging
 import os
-import random
-import re
 import queue
 import pathlib
 import uuid
 import subprocess
 import time
 import signal
-import time
 
 
 import chip.clusters as Clusters
@@ -45,8 +42,6 @@ from matter_testing_support import MatterBaseTest, TestStep, async_test_body, de
 from mobly import asserts
 
 from chip import ChipDeviceCtrl  # Needed before chip.FabricAdmin
-import chip.CertificateAuthority
-from chip.ChipDeviceCtrl import CommissioningParameters
 
 logger = logging.getLogger(__name__)
 kRootEndpointId = 0
@@ -150,7 +145,7 @@ class TC_BRBINFO_4_1(MatterBaseTest):
     def teardown_class(self):
         logging.warning("Stopping app with SIGTERM")
         self.app_process.send_signal(signal.SIGTERM.value)
-        test_app_exit_code = self.app_process.wait()
+        self.app_process.wait()
         os.remove(self.kvs)
         super().teardown_class()
 
@@ -164,14 +159,13 @@ class TC_BRBINFO_4_1(MatterBaseTest):
         icdm_cluster = Clusters.Objects.IcdManagement
         icdm_attributes = icdm_cluster.Attributes
         brb_info_cluster = Clusters.Objects.BridgedDeviceBasicInformation
-        brb_info_attributes = brb_info_cluster.Attributes
         basic_info_cluster = Clusters.Objects.BasicInformation
         basic_info_attributes = basic_info_cluster.Attributes
 
         # Preconditions
         self.step("0")
 
-        logging.info(f"Ensuring DUT is commissioned to TH")
+        logging.info("Ensuring DUT is commissioned to TH")
 
         # Confirms commissioning of DUT on TH as it reads basic info
         await self._read_attribute_expect_success(
@@ -181,7 +175,7 @@ class TC_BRBINFO_4_1(MatterBaseTest):
           self.dut_node_id
         )
 
-        logging.info(f"Ensuring ICD is commissioned to TH")
+        logging.info("Ensuring ICD is commissioned to TH")
 
         # Confirms commissioning of ICD on TH as it reads basic info
         await self._read_attribute_expect_success(
@@ -223,7 +217,7 @@ class TC_BRBINFO_4_1(MatterBaseTest):
         logging.info(f"Sending KeepActiveCommand({stay_active_duration}ms)")
         self._send_keep_active_command(stay_active_duration)
 
-        logging.info(f"Waiting for ActiveChanged from DUT...")
+        logging.info("Waiting for ActiveChanged from DUT...")
         promised_active_duration = await self._wait_for_active_changed_event((idle_mode_duration + max(active_mode_duration, stay_active_duration))/1000)
 
         asserts.assert_true(promised_active_duration >= stay_active_duration, "PromisedActiveDuration < StayActiveDuration")
@@ -234,7 +228,7 @@ class TC_BRBINFO_4_1(MatterBaseTest):
         logging.info(f"Sending KeepActiveCommand({stay_active_duration}ms)")
         self._send_keep_active_command(stay_active_duration)
 
-        logging.info(f"Waiting for ActiveChanged from DUT...")
+        logging.info("Waiting for ActiveChanged from DUT...")
         promised_active_duration = await self._wait_for_active_changed_event((idle_mode_duration + max(active_mode_duration, stay_active_duration))/1000)
 
         # wait for active time duration
@@ -252,10 +246,10 @@ class TC_BRBINFO_4_1(MatterBaseTest):
         self._send_keep_active_command(stay_active_duration)
         time.sleep(100)
 
-        logging.info(f"Waiting for ActiveChanged from DUT...")
+        logging.info("Waiting for ActiveChanged from DUT...")
         promised_active_duration = await self._wait_for_active_changed_event((idle_mode_duration + max(active_mode_duration, stay_active_duration))/1000)
 
-        asserts.assert_true(q.qSize() == 0, "More than one event received from DUT")
+        asserts.assert_true(self.q.qSize() == 0, "More than one event received from DUT")
 
         self.step("3")
 
@@ -267,7 +261,7 @@ class TC_BRBINFO_4_1(MatterBaseTest):
         self.app_process.send_signal(signal.SIGSTOP.value)
 
         if not self.is_ci:
-            logging.info(f"Waiting for 60 minutes")
+            logging.info("Waiting for 60 minutes")
             time.sleep(60*60)
 
         ## resume the ICD
