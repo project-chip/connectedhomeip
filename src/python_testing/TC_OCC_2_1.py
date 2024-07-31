@@ -226,6 +226,7 @@ class TC_OCC_2_1(MatterBaseTest):
                 logging.info("PhysicalContactUnoccupiedToOccupiedDelay conformance failed. Test step skipped")
         else:
             logging.info("PhysicalContactUnoccupiedToOccupiedDelay not supported. Test step skipped")
+            self.mark_current_step_skipped()
 
         self.step(15)
         if attributes.PhysicalContactUnoccupiedToOccupiedThreshold.attribute_id in attribute_list:
