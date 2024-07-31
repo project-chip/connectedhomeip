@@ -165,7 +165,8 @@ class TC_OCC_2_1(MatterBaseTest):
 
         self.step(10)
         if attributes.UltrasonicOccupiedToUnoccupiedDelay.attribute_id in attribute_list:
-            if occupancy_sensor_type_bitmap_dut == 0b00000010:
+            if (occupancy_sensor_type_bitmap_dut & Clusters.OccupancySensing.Enums.OccupancySensorTypeEnum.kUltrasonic) != 0:
+
                 ultrasonic_otou_delay_dut = await self.read_occ_attribute_expect_success(endpoint=endpoint, attribute=attributes.UltrasonicOccupiedToUnoccupiedDelay)
     
                 asserts.assert_less_equal(ultrasonic_otou_delay_dut, 0xFFFE, "UltrasonicOccupiedToUnoccupiedDelay is not in valid range")
