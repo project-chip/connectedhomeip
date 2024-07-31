@@ -27,6 +27,7 @@ import time
 import chip.clusters as Clusters
 from chip import ChipDeviceCtrl
 from matter_testing_support import MatterBaseTest, TestStep, async_test_body, default_matter_test_main
+from mobly import asserts
 from TC_SC_3_6 import AttributeChangeAccumulator
 
 
@@ -50,8 +51,8 @@ class TC_MCORE_FS_1_2(MatterBaseTest):
     async def test_TC_MCORE_FS_1_2(self):
         self.is_ci = self.check_pics('PICS_SDK_CI_ONLY')
         min_report_interval_sec = self.user_params.get("min_report_interval_sec", 0)
-        max_report_interval_sec = self.user_params.get("max_report_interval_sec", 10 * 60)
-        timeout_delay_sec = self.user_params.get("timeout_delay_sec", max_report_interval_sec * 2)
+        max_report_interval_sec = self.user_params.get("max_report_interval_sec", 2)
+        report_waiting_timeout_delay_sec = self.user_params.get("report_waiting_timeout_delay_sec", 10)
 
         self.step(1)
 
@@ -73,7 +74,7 @@ class TC_MCORE_FS_1_2(MatterBaseTest):
         logging.info("Waiting for First BridgedDeviceBasicInformation.")
         start_time = time.time()
         elapsed = 0
-        time_remaining = timeout_delay_sec
+        time_remaining = report_waiting_timeout_delay_sec
 
         th_sed_dut_bdbi_endpoint = -1
         th_sed_dut_unique_id = -1
@@ -93,8 +94,9 @@ class TC_MCORE_FS_1_2(MatterBaseTest):
                 pass
 
             elapsed = time.time() - start_time
-            time_remaining = timeout_delay_sec - elapsed
+            time_remaining = report_waiting_timeout_delay_sec - elapsed
 
+        asserts.assert_greater(th_sed_dut_bdbi_endpoint, 0, "Failed to find any BDBI instances with UniqueID present.")
         logging.info("Found BDBI with UniqueID (%d) on endpoint %d." % th_sed_dut_unique_id, th_sed_dut_bdbi_endpoint)
 
         self.step(2)
@@ -128,6 +130,9 @@ class TC_MCORE_FS_1_2(MatterBaseTest):
         th_sed_later_bdbi_endpoint = -1
         th_sed_later_unique_id = -1
         logging.info("Waiting for Second BridgedDeviceBasicInformation.")
+        start_time = time.time()
+        elapsed = 0
+        time_remaining = report_waiting_timeout_delay_sec
 
         while time_remaining > 0 and th_sed_later_bdbi_endpoint < 0:
             try:
@@ -144,8 +149,9 @@ class TC_MCORE_FS_1_2(MatterBaseTest):
                 pass
 
             elapsed = time.time() - start_time
-            time_remaining = timeout_delay_sec - elapsed
+            time_remaining = report_waiting_timeout_delay_sec - elapsed
 
+        asserts.assert_greater(th_sed_later_bdbi_endpoint, 0, "Failed to find any BDBI instances with UniqueID present.")
         logging.info("Found another BDBI with UniqueID (%d) on endpoint %d." % th_sed_later_unique_id, th_sed_later_bdbi_endpoint)
 
         self.step(6)
