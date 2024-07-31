@@ -78,7 +78,7 @@ public:
     static const char * _WiFiAPModeToStr(ConnectivityManager::WiFiAPMode mode);
     static const char * _WiFiStationStateToStr(ConnectivityManager::WiFiStationState state);
     static const char * _WiFiAPStateToStr(ConnectivityManager::WiFiAPState state);
-    // TODO ICD rework: ambiguous declaration of _SetPollingInterval when thread and wifi are both build together
+    // TODO ICD rework: ambiguous declaration of _SetPollingInterval when thread and no-wifi are both built together
 #if CHIP_CONFIG_ENABLE_ICD_SERVER && !CHIP_DEVICE_CONFIG_ENABLE_THREAD
     CHIP_ERROR _SetPollingInterval(System::Clock::Milliseconds32 pollingInterval);
 #endif
