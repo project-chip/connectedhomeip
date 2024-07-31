@@ -183,7 +183,8 @@ public:
      * @note if aLocationName is larger than kLocationNameMaxSize, it will be truncated.
      */
     bool AddSupportedLocation(uint32_t aLocationId, const DataModel::Nullable<uint8_t> & aMapId, const CharSpan & aLocationName,
-                              const DataModel::Nullable<int16_t> & aFloorNumber, const DataModel::Nullable<Globals::AreaTypeTag> & aAreaType,
+                              const DataModel::Nullable<int16_t> & aFloorNumber,
+                              const DataModel::Nullable<Globals::AreaTypeTag> & aAreaType,
                               const DataModel::Nullable<Globals::LandmarkTag> & aLandmarkTag,
                               const DataModel::Nullable<Globals::PositionTag> & aPositionTag,
                               const DataModel::Nullable<Globals::FloorSurfaceTag> & aSurfaceTag);

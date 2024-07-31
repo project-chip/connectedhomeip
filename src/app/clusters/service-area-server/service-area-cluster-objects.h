@@ -39,7 +39,8 @@ struct LocationStructureWrapper : public chip::app::Clusters::ServiceArea::Struc
     LocationStructureWrapper()
     {
         Set(0, 0, CharSpan(), DataModel::Nullable<int16_t>(), DataModel::Nullable<Globals::AreaTypeTag>(),
-            DataModel::Nullable<Globals::LandmarkTag>(), DataModel::Nullable<Globals::PositionTag>(), DataModel::Nullable<Globals::FloorSurfaceTag>());
+            DataModel::Nullable<Globals::LandmarkTag>(), DataModel::Nullable<Globals::PositionTag>(),
+            DataModel::Nullable<Globals::FloorSurfaceTag>());
     }
 
     /**
@@ -121,7 +122,8 @@ struct LocationStructureWrapper : public chip::app::Clusters::ServiceArea::Struc
      */
     void Set(uint32_t aLocationId, const DataModel::Nullable<uint8_t> & aMapId, const CharSpan & aLocationName,
              const DataModel::Nullable<int16_t> & aFloorNumber, const DataModel::Nullable<Globals::AreaTypeTag> & aAreaType,
-             const DataModel::Nullable<Globals::LandmarkTag> & aLandmarkTag, const DataModel::Nullable<Globals::PositionTag> & aPositionTag,
+             const DataModel::Nullable<Globals::LandmarkTag> & aLandmarkTag,
+             const DataModel::Nullable<Globals::PositionTag> & aPositionTag,
              const DataModel::Nullable<Globals::FloorSurfaceTag> & aSurfaceTag)
     {
         locationID = aLocationId;
