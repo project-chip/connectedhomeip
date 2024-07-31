@@ -250,7 +250,7 @@ class TC_BRBINFO_4_1(MatterBaseTest):
         logging.info("Waiting for ActiveChanged from DUT...")
         promised_active_duration = await self._wait_for_active_changed_event((idle_mode_duration + max(active_mode_duration, stay_active_duration))/1000)
 
-        asserts.assert_true(self.q.qSize() == 0, "More than one event received from DUT")
+        asserts.assert_equal(self.q.qSize(), 0, "More than one event received from DUT")
 
         self.step("3")
 
