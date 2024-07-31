@@ -44,8 +44,7 @@ class TC_MCORE_FS_1_2(MatterBaseTest):
 
     @property
     def default_timeout(self) -> int:
-        max_report_interval_sec = self.user_params.get("max_report_interval_sec", 10 * 60)
-        return self.user_params.get("timeout_delay_sec", max_report_interval_sec * 2)
+        return self.user_params.get("report_waiting_timeout_delay_sec", 10)*2 + 60
 
     @async_test_body
     async def test_TC_MCORE_FS_1_2(self):
