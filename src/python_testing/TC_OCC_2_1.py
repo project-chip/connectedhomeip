@@ -70,33 +70,25 @@ class TC_OCC_2_1(MatterBaseTest):
         attribute_list = await self.read_occ_attribute_expect_success(endpoint=endpoint, attribute=attributes.AttributeList)
 
         self.step(2)
-        if attributes.Occupancy.attribute_id in attribute_list:
-            occupancy_dut = await self.read_occ_attribute_expect_success(endpoint=endpoint, attribute=attributes.Occupancy)
-            asserts.assert_less_equal(occupancy_dut, 0b00000001, "Occupancy attribute is not in valid range")
-        else:
-            logging.info("Occupancy attribute is a mandatory attribute. Test step fails.")
-            asserts.fail("Missing mandatory attribute Occupancy")
+        asserts.assert_in(attributes.Occupancy.attribute_id, attribute_list, "Occupancy attribute is mandatory")
+        occupancy_dut = await self.read_occ_attribute_expect_success(endpoint=endpoint, attribute=attributes.Occupancy)
+        asserts.assert_less_equal(occupancy_dut, 0b00000001, "Occupancy attribute is not in valid range")
 
         self.step(3)
-        if attributes.OccupancySensorType.attribute_id in attribute_list:
-            occupancy_sensor_type_dut = await self.read_occ_attribute_expect_success(endpoint=endpoint, attribute=attributes.OccupancySensorType)
-            asserts.assert_less(occupancy_sensor_type_dut, Clusters.Objects.OccupancySensing.Enums.OccupancySensorTypeEnum.kUnknownEnumValue,
-                                "OccupancySensorType is not in valid range")
-            asserts.assert_in(occupancy_sensor_type_dut, {Clusters.Objects.OccupancySensing.Enums.OccupancySensorTypeEnum.kPIR,
-                                                          Clusters.Objects.OccupancySensing.Enums.OccupancySensorTypeEnum.kUltrasonic,
-                                                          Clusters.Objects.OccupancySensing.Enums.OccupancySensorTypeEnum.kPIRAndUltrasonic,
-                                                          Clusters.Objects.OccupancySensing.Enums.OccupancySensorTypeEnum.kPhysicalContact},"OccupancySensorType is not in valid range")
-        else:
-            logging.info("OccupancySensorType attribute is a mandatory attribute. Test step fails")
-            asserts.fail("Missing mandatory attribute OccupancySensorType")
+        asserts.assert_in(attributes.OccupancySensorType.attribute_id, attribute_list, "OccupancySensorType attribute is a mandatory attribute.")
 
+        occupancy_sensor_type_dut = await self.read_occ_attribute_expect_success(endpoint=endpoint, attribute=attributes.OccupancySensorType)
+        asserts.assert_less(occupancy_sensor_type_dut, Clusters.Objects.OccupancySensing.Enums.OccupancySensorTypeEnum.kUnknownEnumValue,
+                            "OccupancySensorType is not in valid range")
+        asserts.assert_in(occupancy_sensor_type_dut, {Clusters.Objects.OccupancySensing.Enums.OccupancySensorTypeEnum.kPIR,
+                                                      Clusters.Objects.OccupancySensing.Enums.OccupancySensorTypeEnum.kUltrasonic,
+                                                      Clusters.Objects.OccupancySensing.Enums.OccupancySensorTypeEnum.kPIRAndUltrasonic,
+                                                      Clusters.Objects.OccupancySensing.Enums.OccupancySensorTypeEnum.kPhysicalContact},"OccupancySensorType is not in valid range")
         self.step(4)
-        if attributes.OccupancySensorTypeBitmap.attribute_id in attribute_list:
-            occupancy_sensor_type_bitmap_dut = await self.read_occ_attribute_expect_success(endpoint=endpoint, attribute=attributes.OccupancySensorTypeBitmap)
-            asserts.assert_less_equal(occupancy_sensor_type_bitmap_dut, 0b00000111, "OccupancySensorTypeBitmap attribute is not in valid range")
-        else:
-            logging.info("OccupancySensorTypeBitmap attribute is a mandatory attribute. Test step fails")
-            asserts.fail("Missing mandatory attribute OccupancySensorTypeBitmap")
+        asserts.assert_in(attributes.OccupancySensorTypeBitmap.attribute_id, attribute_list, "OccupancySensorTypeBitmap attribute is a mandatory attribute.")
+
+        occupancy_sensor_type_bitmap_dut = await self.read_occ_attribute_expect_success(endpoint=endpoint, attribute=attributes.OccupancySensorTypeBitmap)
+        asserts.assert_less_equal(occupancy_sensor_type_bitmap_dut, 0b00000111, "OccupancySensorTypeBitmap attribute is not in valid range")
 
         self.step(5)
         if attributes.HoldTimeLimits.attribute_id in attribute_list:
