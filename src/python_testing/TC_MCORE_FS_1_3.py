@@ -36,10 +36,12 @@ class TC_MCORE_FS_1_3(MatterBaseTest):
     @async_test_body
     async def setup_class(self):
         super().setup_class()
+        self.device_for_th_eco_nodeid = 1111
         self.device_for_th_eco_kvs = None
         self.device_for_th_eco_port = 5543
         self.app_process_for_th_eco = None
 
+        self.device_for_dut_eco_nodeid = 1112
         self.device_for_dut_eco_kvs = None
         self.device_for_dut_eco_port = 5544
         self.app_process_for_dut_eco = None
@@ -65,27 +67,24 @@ class TC_MCORE_FS_1_3(MatterBaseTest):
             os.remove(self.device_for_th_eco_kvs)
         super().teardown_class()
 
-    async def create_device_for_dut_ecosystem(self):
+    async def create_device_and_commission_to_th_fabric(self, kvs, port, node_id_for_th, device_info):
         # TODO: confirm whether we can open processes like this on the TH
         app = self.user_params.get("th_server_app_path", None)
         if not app:
             asserts.fail('This test requires a TH_SERVER app. Specify app path with --string-arg th_server_app_path:<path_to_app>')
 
-        self.device_for_dut_eco_kvs = f'kvs_{str(uuid.uuid4())}'
-        # This discriminator is fixed so we can rely on pregenerated QR code
-        discriminator = 3840
+        discriminator = random.randint(0, 4095)
         passcode = 20202021
-        app_args = f'--secured-device-port {self.device_for_dut_eco_port} --discriminator {discriminator} --passcode {passcode} --KVS {self.device_for_dut_eco_kvs}'
+        app_args = f'--secured-device-port {port} --discriminator {discriminator} --passcode {passcode} --KVS {kvs}'
         cmd = f'{app} {app_args}'
         # TODO: Determine if we want these logs cooked or pushed to somewhere else
-        logging.info("Starting TH device for DUT ecosystem")
+        logging.info(f"Starting TH device for {device_info}")
         self.app_process_for_dut_eco = subprocess.Popen(cmd, bufsize=0, shell=True)
-        logging.info("Started TH device for DUT ecosystem")
+        logging.info(f"Started TH device for {device_info}")
         time.sleep(3)
 
         logging.info("Commissioning from separate fabric")
-        self.device_for_dut_eco_nodeid = 1111
-        await self.TH_server_controller.CommissionOnNetwork(nodeId=self.device_for_dut_eco_nodeid, setupPinCode=passcode, filterType=ChipDeviceCtrl.DiscoveryFilterType.LONG_DISCRIMINATOR, filter=discriminator)
+        await self.TH_server_controller.CommissionOnNetwork(nodeId=node_id_for_th, setupPinCode=passcode, filterType=ChipDeviceCtrl.DiscoveryFilterType.LONG_DISCRIMINATOR, filter=discriminator)
         logging.info("Commissioning device for DUT ecosystem onto TH for managing")
 
     async def create_and_commission_device_for_th_ecosystem(self):
@@ -125,7 +124,10 @@ class TC_MCORE_FS_1_3(MatterBaseTest):
         root_part_list = await self.read_single_attribute_check_success(cluster=Clusters.Descriptor, attribute=Clusters.Descriptor.Attributes.PartsList, endpoint=root_node_endpoint)
         set_of_endpoints_before_adding_device = set(root_part_list)
 
-        await self.create_device_for_dut_ecosystem()
+        kvs = f'kvs_{str(uuid.uuid4())}'
+        device_info = "for DUT ecosystem"
+        await self.create_device_and_commission_to_th_fabric(kvs, self.device_for_dut_eco_port, self.device_for_dut_eco_nodeid, device_info)
+        self.device_for_dut_eco_kvs = kvs
         read_result = await self.TH_server_controller.ReadAttribute(self.device_for_dut_eco_nodeid, [(root_node_endpoint, Clusters.BasicInformation.Attributes.UniqueID)])
         result = read_result[root_node_endpoint][Clusters.BasicInformation][Clusters.BasicInformation.Attributes.UniqueID]
         asserts.assert_true(type_matches(result, Clusters.Attribute.ValueDecodeFailure), "We were expecting a value decode failure")
@@ -156,9 +158,12 @@ class TC_MCORE_FS_1_3(MatterBaseTest):
         asserts.assert_true(th_sed_dut_unique_id, "UniqueID should not be an empty string")
 
         self.step(2)
-        await self.create_and_commission_device_for_th_ecosystem()
+        kvs = f'kvs_{str(uuid.uuid4())}'
+        device_info = "for TH_FSA ecosystem"
+        await self.create_device_and_commission_to_th_fabric(kvs, self.device_for_th_eco_port, self.device_for_th_eco_nodeid, device_info)
+        self.device_for_th_eco_kvs = kvs
         # TODO(https://github.com/CHIP-Specifications/chip-test-plans/issues/4375) During setup we need to create the TH_FSA device
-        # where we would commission device created in create_and_commission_device_for_th_ecosystem to be commissioned into TH_FSA.
+        # where we would commission device created in create_device_and_commission_to_th_fabric to be commissioned into TH_FSA.
 
         # TODO(https://github.com/CHIP-Specifications/chip-test-plans/issues/4375) Because we cannot create a TH_FSA and there is
         # no way to mock it the following 2 test steps are skipped for now.
