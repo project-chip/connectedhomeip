@@ -22,19 +22,21 @@
 # test-runner-run/run1/app-args: --discriminator 1234 --KVS kvs1 --trace-to json:${TRACE_APP}.json
 # test-runner-run/run1/script-args: --storage-path admin_storage.json --commissioning-method on-network --discriminator 1234 --passcode 20202021 --trace-to json:${TRACE_TEST_JSON}.json --trace-to perfetto:${TRACE_TEST_PERFETTO}.perfetto
 # === END CI TEST ARGUMENTS ===
-#  There are CI issues to be followed up for the test cases below that implements manually controlling sensor device for 
+#  TODO: There are CI issues to be followed up for the test cases below that implements manually controlling sensor device for
 #  the occupancy state ON/OFF change.
 #  [TC-OCC-3.1] test procedure step 4
 #  [TC-OCC-3.2] test precedure step 3a, 3c
 
 import logging
-import time
 import queue
+import time
 from typing import Any
-from chip import ChipDeviceCtrl
+
 import chip.clusters as Clusters
+from chip import ChipDeviceCtrl
 from chip.clusters.Attribute import TypedAttributePath
-from matter_testing_support import MatterBaseTest, ClusterAttributeChangeAccumulator, AttributeValue, TestStep, async_test_body, default_matter_test_main
+from matter_testing_support import (AttributeValue, ClusterAttributeChangeAccumulator, MatterBaseTest, TestStep, async_test_body, 
+                                    default_matter_test_main)
 from mobly import asserts
 
 
@@ -80,7 +82,7 @@ class TC_OCC_3_2(MatterBaseTest):
             time_remaining = timeout_sec - elapsed
 
         asserts.fail(f"Did not get full sequence {sequence} in {timeout_sec:.1f} seconds. Got {actual_values} before time-out.")
-    
+        
     def desc_TC_OCC_3_2(self) -> str:
         return "[TC-OCC-3.2] Subscription Report Verification with server as DUT"
 
@@ -107,7 +109,7 @@ class TC_OCC_3_2(MatterBaseTest):
             TestStep("7a", "Check if DUT supports DUT feature flag PHY, If not supported, terminate this test case."),
             TestStep("7b", "TH reads DUT PhysicalContactOccupiedToUnoccupiedDelay attribute and saves the initial value as initial"),
             TestStep("7c", "TH writes a different value to DUT PhysicalContactOccupiedToUnoccupiedDelay attribute."),
-            TestStep("7d", "TH awaits a ReportDataMessage containing an attribute report for DUT PhysicalContactOccupiedToUnoccupiedDelay attribute.")            
+            TestStep("7d", "TH awaits a ReportDataMessage containing an attribute report for DUT PhysicalContactOccupiedToUnoccupiedDelay attribute.")
         ]
         return steps
 
@@ -135,7 +137,7 @@ class TC_OCC_3_2(MatterBaseTest):
         # min interval = 0, and max interval = 30 seconds
         attrib_listener = ClusterAttributeChangeAccumulator(Clusters.Objects.OccupancySensing)
         await attrib_listener.start(ChipDeviceCtrl, node_id, endpoint=endpoint_id)
-            
+        
         self.step("3a")
         self.wait_for_user_input(prompt_msg="Type any letter and press ENTER after DUT goes back to unoccupied state.")
         
@@ -143,7 +145,7 @@ class TC_OCC_3_2(MatterBaseTest):
         if attributes.Occupancy.attribute_id in attribute_list:
             initial_dut = await self.read_occ_attribute_expect_success(endpoint=endpoint, attribute=attributes.Occupancy)
             asserts.assert_equal(initial_dut, 0, "Occupancy attribute is still detected state")
-
+        
         self.step("3c")
         self.wait_for_user_input(prompt_msg="Type any letter and press ENTER after the sensor occupancy is triggered and its occupancy state changed.")
         
@@ -155,7 +157,7 @@ class TC_OCC_3_2(MatterBaseTest):
         if attributes.HoldTime.attribute_id not in attribute_list:
             logging.info("No HoldTime attribute supports. Terminate this test case")
             self.skip_all_remaining_steps("4b")
-        
+            
         self.step("4b")
         initial_dut = await self.read_occ_attribute_expect_success(endpoint=endpoint, attribute=attributes.HoldTime)
         
@@ -233,7 +235,7 @@ class TC_OCC_3_2(MatterBaseTest):
         
         self.step("7d")
         self._await_sequence_of_reports(report_queue=attrib_listener.attribute_queue, endpoint_id=endpoint_id, attribute=cluster.Attributes.PhysicalContactOccupiedToUnoccupiedDelay, sequence=[
-                                        initial_dut, diff_val], timeout_sec=post_prompt_settle_delay_seconds)                                        
-
+                                        initial_dut, diff_val], timeout_sec=post_prompt_settle_delay_seconds)
+        
 if __name__ == "__main__":
     default_matter_test_main()
