@@ -17,7 +17,7 @@
 #  There are CI issues to be followed up for the test cases below that implements manually controlling sensor device for 
 #  the occupancy state ON/OFF change.
 #  [TC-OCC-3.1] test procedure step 4
-#  [TC-OCC-3.2] test precedure step 3c
+#  [TC-OCC-3.2] test precedure step 3a, 3c
 
 import logging
 
