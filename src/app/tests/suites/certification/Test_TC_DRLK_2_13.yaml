@@ -662,7 +662,6 @@ tests:
           values:
               - name: "UserIndex"
                 value: 1
-
     # - label: "Step 30: TH sends SetCredential Command to DUT with CredentialType as AliroEvictableEndpointKey for the alirouser, OperationType as 0(DataOperationTypeEnum.Add), Credential as 7 startcredentialindex+1 (CredentialTypeEnum.AliroEvictableEndpointKey,CredentialIndex), CredentialData as aliroevictableendpointkey, UserIndex as 1, UserStatus as null, UserType as null"
     #   PICS: DRLK.S.F0d && DRLK.S.C22.Rsp && DRLK.S.C23.Tx
     #   command: "SetCredential"
@@ -685,7 +684,6 @@ tests:
     #       values:
     #           - name: "Status"
     #             value: 0
-
     # - label: "Step 31: TH sends SetCredential Command to DUT with CredentialType as AliroNonEvictableEndpointKey and number of credentials for alirouser exceeds the max_aliro_keys_supported CredentialData as aliroevictableendpointkey for the alirouser, OperationType as 0(DataOperationTypeEnum.Add), Credential as 8 startcredentialindex+1 (CredentialTypeEnum.AliroNonEvictableEndpointKey,CredentialIndex), CredentialData as alirononevictableendpointkey1, UserIndex as 1, UserStatus as null, UserType as null"
     #   PICS: DRLK.S.F0d && DRLK.S.C22.Rsp && DRLK.S.C23.Tx
     #   command: "SetCredential"
