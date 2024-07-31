@@ -37,21 +37,20 @@ class TC_OCC_2_1(MatterBaseTest):
     def steps_TC_OCC_2_1(self) -> list[TestStep]:
         steps = [
             TestStep(1, "Commissioning, already done", is_commissioning=True),
-            TestStep(2, "Read attribute list to determine supported attributes"),
-            TestStep(3, "Read Occupancy attribute."),
-            TestStep(4, "Read OccupancySensorType attribute."),
-            TestStep(5, "Read OccupancySensorTypeBitmap attribute."),
+            TestStep(2, "Read Occupancy attribute."),
+            TestStep(3, "Read OccupancySensorType attribute."),
+            TestStep(4, "Read OccupancySensorTypeBitmap attribute."),
+            TestStep(5, "Read HoldTimeLimits attribute, if supported"),
             TestStep(6, "Read HoldTime attribute, if supported"),
-            TestStep(7, "Read HoldTimeLimits attribute, if supported"),
-            TestStep(8, "Read PIROccupiedToUnoccupiedDelay attribute, if supported"),
-            TestStep(9, "Read PIRUnoccupiedToOccupiedDelay attribute, if supported"),
-            TestStep(10, "Read PIRUnoccupiedToOccupiedThreshold attribute, if supported"),
-            TestStep(11, "Read UltrasonicOccupiedToUnoccupiedDelay attribute, if supported"),
-            TestStep(12, "Read UltrasonicUnoccupiedToOccupiedDelay attribute, if supported"),
-            TestStep(13, "Read UltrasonicUnoccupiedToOccupiedThreshold attribute, if supported"),
-            TestStep(14, "Read PhysicalContactOccupiedToUnoccupiedDelay attribute, if supported"),
-            TestStep(15, "Read PhysicalContactUnoccupiedToOccupiedDelay attribute, if supported"),
-            TestStep(16, "Read PhysicalContactUnoccupiedToOccupiedThreshold attribute, if supported")
+            TestStep(7, "Read PIROccupiedToUnoccupiedDelay attribute, if supported"),
+            TestStep(8, "Read PIRUnoccupiedToOccupiedDelay attribute, if supported"),
+            TestStep(9, "Read PIRUnoccupiedToOccupiedThreshold attribute, if supported"),
+            TestStep(10, "Read UltrasonicOccupiedToUnoccupiedDelay attribute, if supported"),
+            TestStep(11, "Read UltrasonicUnoccupiedToOccupiedDelay attribute, if supported"),
+            TestStep(12, "Read UltrasonicUnoccupiedToOccupiedThreshold attribute, if supported"),
+            TestStep(13, "Read PhysicalContactOccupiedToUnoccupiedDelay attribute, if supported"),
+            TestStep(14, "Read PhysicalContactUnoccupiedToOccupiedDelay attribute, if supported"),
+            TestStep(15, "Read PhysicalContactUnoccupiedToOccupiedThreshold attribute, if supported")
         ]
         return steps
 
