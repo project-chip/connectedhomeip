@@ -62,12 +62,12 @@ class TC_SEAR_1_3(MatterBaseTest):
         logging.info(f"SelectedAreas {selected_areas}")
 
         return selected_areas
-        
+
     async def send_cmd_select_areas_expect_response(self, step, new_areas, expected_response):
         self.print_step(step, f"Send SelectAreas command with NewAreas({new_areas})")
         ret = await self.send_single_cmd(cmd=Clusters.Objects.ServiceArea.Commands.SelectAreas(newAreas=new_areas),
                                          endpoint=self.endpoint)
-         
+
         asserts.assert_equal(ret.commandResponseState.errorStateID,
                              expected_response,
                              f"Command response ({ret.commandResponseState}) doesn't match the expected one")
@@ -107,7 +107,7 @@ class TC_SEAR_1_3(MatterBaseTest):
 
         duplicated_areas = [valid_area_id, valid_area_id]
 
-        #FIXME need to check if this is the correct name of this status code
+        # FIXME need to check if this is the correct name of this status code
         await self.send_cmd_select_areas_expect_response(step=3, new_areas=duplicated_areas, expected_response=Clusters.ServiceArea.SelectAreasStatus.kDuplicatedAreas)
 
         await self.send_cmd_select_areas_expect_response(step=4, new_areas=[], expected_response=Clusters.ServiceArea.SelectAreasStatus.kSuccess)
@@ -134,7 +134,8 @@ class TC_SEAR_1_3(MatterBaseTest):
             await self.send_cmd_select_areas_expect_response(step=10, new_areas=supported_area_ids, expected_response=Clusters.ServiceArea.SelectAreasStatus.kSuccess)
 
             selected_areas = await self.read_selected_areas(step=11)
-            asserts.assert_true(len(selected_areas) == len(supported_area_ids), f"SelectedAreas({selected_areas}) should match SupportedAreas({supported_area_ids})")
+            asserts.assert_true(len(selected_areas) == len(supported_area_ids),
+                                f"SelectedAreas({selected_areas}) should match SupportedAreas({supported_area_ids})")
 
             await self.send_cmd_select_areas_expect_response(step=12, new_areas=supported_area_ids, expected_response=Clusters.ServiceArea.SelectAreasStatus.kSuccess)
 
@@ -148,7 +149,6 @@ class TC_SEAR_1_3(MatterBaseTest):
                 await self.send_cmd_select_areas_expect_response(step=14, new_areas=[valid_area_id], expected_response=Clusters.ServiceArea.SelectAreasStatus.kSuccess)
             else:
                 await self.send_cmd_select_areas_expect_response(step=14, new_areas=[valid_area_id], expected_response=Clusters.ServiceArea.SelectAreasStatus.kInvalidInMode)
-
 
 
 if __name__ == "__main__":

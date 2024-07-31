@@ -36,6 +36,7 @@ from chip.clusters.Types import NullValue
 from matter_testing_support import MatterBaseTest, async_test_body, default_matter_test_main
 from mobly import asserts
 
+
 class TC_SEAR_1_5(MatterBaseTest):
     def __init__(self, *args):
         super().__init__(*args)
@@ -83,13 +84,13 @@ class TC_SEAR_1_5(MatterBaseTest):
         self.print_step(step, f"Send SkipArea command with SkippedArea({skipped_area})")
         ret = await self.send_single_cmd(cmd=Clusters.Objects.ServiceArea.Commands.SkipArea(skippedArea=skipped_area),
                                          endpoint=self.endpoint)
-         
+
         asserts.assert_equal(ret.commandResponseState.errorStateID,
                              expected_response,
                              f"Command response ({ret.commandResponseState}) doesn't match the expected one")
 
-
     # Sends and out-of-band command to the rvc-app
+
     def write_to_app_pipe(self, command):
         with open(self.app_pipe, "w") as app_pipe:
             app_pipe.write(command + "\n")
@@ -128,8 +129,8 @@ class TC_SEAR_1_5(MatterBaseTest):
             self.print_step("3", test_step)
             if not self.is_ci:
                 self.wait_for_user_input(prompt_msg=f"{test_step}, and press Enter when done.\n")
-            
-                await self.send_cmd_skip_area_expect_response(step=4, skipped_area=valid_area_id, 
+
+                await self.send_cmd_skip_area_expect_response(step=4, skipped_area=valid_area_id,
                                                               expected_response=Clusters.ServiceArea.SkipAreaStatus.kInvalidInMode)
 
         if self.check_pics("SEAR.S.M.NO_SELAREA_FOR_SKIP") and self.check_pics("SEAR.S.M.HAS_MANUAL_SKIP_STATE_CONTROL"):
@@ -138,7 +139,7 @@ class TC_SEAR_1_5(MatterBaseTest):
             self.print_step("5", test_step)
             if not self.is_ci:
                 self.wait_for_user_input(prompt_msg=f"{test_step}, and press Enter when done.\n")
-            
+
                 await self.send_cmd_skip_area_expect_response(step=6, skipped_area=valid_area_id,
                                                               expected_response=Clusters.ServiceArea.SkipAreaStatus.kInvalidAreaList)
 
@@ -147,13 +148,13 @@ class TC_SEAR_1_5(MatterBaseTest):
             self.print_step("7", test_step)
             if not self.is_ci:
                 self.wait_for_user_input(prompt_msg=f"{test_step}, and press Enter when done.\n")
-            
+
                 await self.send_cmd_skip_area_expect_response(step=8, skipped_area=invalid_area_id,
                                                               expected_response=Clusters.ServiceArea.SkipAreaStatus.kInvalidSkippedArea)
 
         if not self.check_pics("SEAR.S.M.VALID_STATE_FOR_SKIP"):
             return
-        
+
         if self.check_pics("SEAR.S.A0005"):
             old_progress_list = await self.read_progress(step=9)
             asserts.assert_true(len(old_progress_list) > 0, f"len of Progress({len(old_progress_list)}) should not be zero)")
@@ -178,7 +179,8 @@ class TC_SEAR_1_5(MatterBaseTest):
 
                 if self.check_pics("SEAR.S.A0005"):
                     new_progress_list = await self.read_progress(step=15)
-                    asserts.assert_true(len(new_progress_list) > 0, f"len of Progress({len(new_progress_list)}) should not be zero)")
+                    asserts.assert_true(len(new_progress_list) > 0,
+                                        f"len of Progress({len(new_progress_list)}) should not be zero)")
 
                     prog_areas = [p.areaID for p in new_progress_list]
 
@@ -187,7 +189,7 @@ class TC_SEAR_1_5(MatterBaseTest):
                     new_current_area = await self.read_current_area(step=16)
                     for p in new_progress_list:
                         if p.areaID == old_current_area:
-                            asserts.assert_true(p.status == Clusters.ServiceArea.OperationalStatusEnum.kSkipped, 
+                            asserts.assert_true(p.status == Clusters.ServiceArea.OperationalStatusEnum.kSkipped,
                                                 "Progress for areaID({old_current_area}) should be Skipped")
                             break
                     test_step = "Indicate whether the device has stopped operating (y/n)"
@@ -197,7 +199,7 @@ class TC_SEAR_1_5(MatterBaseTest):
                     if ret != "y":
                         for p in new_progress_list:
                             if p.areaID == new_current_area:
-                                asserts.assert_true(p.status == Clusters.ServiceArea.OperationalStatusEnum.kOperating, 
+                                asserts.assert_true(p.status == Clusters.ServiceArea.OperationalStatusEnum.kOperating,
                                                     "Progress for areaID({new_current_area}) should be Operating")
                                 break
 
@@ -206,7 +208,7 @@ class TC_SEAR_1_5(MatterBaseTest):
                     was_only_skipped_or_completed = True
                     for p in old_progress_list:
                         if p.areaID != old_current_area:
-                            if p.status not in (Clusters.ServiceArea.OperationalStatusEnum.kSkipped, 
+                            if p.status not in (Clusters.ServiceArea.OperationalStatusEnum.kSkipped,
                                                 Clusters.ServiceArea.OperationalStatusEnum.kCompleted):
                                 was_only_skipped_or_completed = False
                                 break
@@ -215,10 +217,10 @@ class TC_SEAR_1_5(MatterBaseTest):
 
                     self.print_step("17", "")
                     return
-        
+
         if not self.check_pics("SEAR.S.A0005"):
             return
-        
+
         if self.check_pics("SEAR.S.M.HAS_MANUAL_SKIP_STATE_CONTROL"):
             test_step = "Manually intervene to put the device in a state that allows it to execute the SkipArea command"
             self.print_step("18", test_step)
@@ -228,11 +230,11 @@ class TC_SEAR_1_5(MatterBaseTest):
         self.print_step("19", "")
         if len(old_progress_list) == 0:
             return
-    
+
         area_to_skip = NullValue
         self.print_step("20", "")
         for p in old_progress_list:
-            if p.status in (Clusters.ServiceArea.OperationalStatusEnum.kPending, 
+            if p.status in (Clusters.ServiceArea.OperationalStatusEnum.kPending,
                             Clusters.ServiceArea.OperationalStatusEnum.kOperating):
                 area_to_skip = p.areaID
                 break
@@ -241,7 +243,7 @@ class TC_SEAR_1_5(MatterBaseTest):
             return
 
         await self.send_cmd_skip_area_expect_response(step=21, skipped_area=area_to_skip,
-                                                        expected_response=Clusters.ServiceArea.SkipAreaStatus.kSuccess)
+                                                      expected_response=Clusters.ServiceArea.SkipAreaStatus.kSuccess)
 
         if self.check_pics("SEAR.S.M.HAS_MANUAL_SKIP_STATE_CONTROL"):
             test_step = "(Manual operation) wait for the device to update Progress or to stop operating"
@@ -254,7 +256,7 @@ class TC_SEAR_1_5(MatterBaseTest):
 
         for p in new_progress_list:
             if p.areaID == area_to_skip:
-                asserts.assert_true(p.status == Clusters.ServiceArea.OperationalStatusEnum.kSkipped, 
+                asserts.assert_true(p.status == Clusters.ServiceArea.OperationalStatusEnum.kSkipped,
                                     "Progress for areaID({new_current_area}) should be Skipped")
                 break
 
@@ -264,7 +266,7 @@ class TC_SEAR_1_5(MatterBaseTest):
         was_only_skipped_or_completed = True
         for p in old_progress_list:
             if p.areaID != area_to_skip:
-                if p.status not in (Clusters.ServiceArea.OperationalStatusEnum.kSkipped, 
+                if p.status not in (Clusters.ServiceArea.OperationalStatusEnum.kSkipped,
                                     Clusters.ServiceArea.OperationalStatusEnum.kCompleted):
                     was_only_skipped_or_completed = False
                     break
@@ -272,9 +274,10 @@ class TC_SEAR_1_5(MatterBaseTest):
             asserts.assert_true(ret == "y", "The device should not be operating")
             for p in new_progress_list:
                 if p.areaID == old_current_area:
-                    asserts.assert_true(p.status == Clusters.ServiceArea.OperationalStatusEnum.kSkipped, 
-                                    "Progress for areaID({old_current_area}) should be Skipped")
+                    asserts.assert_true(p.status == Clusters.ServiceArea.OperationalStatusEnum.kSkipped,
+                                        "Progress for areaID({old_current_area}) should be Skipped")
                 break
+
 
 if __name__ == "__main__":
     default_matter_test_main()

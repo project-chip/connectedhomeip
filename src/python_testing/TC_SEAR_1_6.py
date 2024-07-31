@@ -36,6 +36,7 @@ from chip.clusters.Types import NullValue
 from matter_testing_support import MatterBaseTest, async_test_body, default_matter_test_main
 from mobly import asserts
 
+
 class TC_SEAR_1_6(MatterBaseTest):
     def __init__(self, *args):
         super().__init__(*args)
@@ -98,7 +99,7 @@ class TC_SEAR_1_6(MatterBaseTest):
         # Ensure that the device is in the correct state
         if self.is_ci:
             self.write_to_app_pipe('{"Name": "Reset"}')
-        
+
         test_step = "Manually intervene to put the device in the idle state and ensure SupportedAreas and SelectedAreas are not empty"
         self.print_step("2", test_step)
         if not self.is_ci:
@@ -116,13 +117,14 @@ class TC_SEAR_1_6(MatterBaseTest):
             self.wait_for_user_input(prompt_msg=f"{test_step}, and press Enter when done.\n")
 
         progress_list_operating = await self.read_progress(step=6)
-        asserts.assert_true(len(selected_areas) == len(progress_list_operating), f"len of SelectedAreas({len(selected_areas)}) should be equal to len of Progress({len(progress_list_operating)})")
+        asserts.assert_true(len(selected_areas) == len(progress_list_operating),
+                            f"len of SelectedAreas({len(selected_areas)}) should be equal to len of Progress({len(progress_list_operating)})")
 
         for p in progress_list_operating:
             asserts.assert_true(p.areaID in selected_areas, f"Progress entry with unknown AreaID({p.areaID})")
             asserts.assert_true(p.status in (Clusters.ServiceArea.OperationalStatusEnum.kPending,
-                                             Clusters.ServiceArea.OperationalStatusEnum.kOperating), 
-                                             f"Progress entry with unexpected Status({p.status})")
+                                             Clusters.ServiceArea.OperationalStatusEnum.kOperating),
+                                f"Progress entry with unexpected Status({p.status})")
             asserts.assert_true(p.TotalOperationalTime is NullValue, "Progress entry with non-null TotalOperationalTime")
 
         test_step = "While all entries in Progress show the Pending or Operating status (i.e. \
@@ -133,12 +135,13 @@ class TC_SEAR_1_6(MatterBaseTest):
             self.wait_for_user_input(prompt_msg=f"{test_step}, and press Enter when done.\n")
 
         progress_list_idle = await self.read_progress(step=8)
-        asserts.assert_true(len(selected_areas) == len(progress_list_idle), f"len of SelectedAreas({len(selected_areas)}) should be equal to len of Progress({len(progress_list_idle)})")
+        asserts.assert_true(len(selected_areas) == len(progress_list_idle),
+                            f"len of SelectedAreas({len(selected_areas)}) should be equal to len of Progress({len(progress_list_idle)})")
 
         for p in progress_list_idle:
             asserts.assert_true(p.areaID in selected_areas, f"Progress entry with unknown AreaID({p.areaID})")
             asserts.assert_true(p.status == Clusters.ServiceArea.OperationalStatusEnum.kSkipped,
-                                            f"Progress entry with unexpected Status({p.status})")
+                                f"Progress entry with unexpected Status({p.status})")
 
 
 if __name__ == "__main__":
