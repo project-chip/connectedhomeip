@@ -4659,6 +4659,38 @@
               "source": "client",
               "isIncoming": 1,
               "isEnabled": 1
+            },
+            {
+              "name": "SetActivePresetRequest",
+              "code": 6,
+              "mfgCode": null,
+              "source": "client",
+              "isIncoming": 1,
+              "isEnabled": 1
+            },
+            {
+              "name": "StartPresetsSchedulesEditRequest",
+              "code": 7,
+              "mfgCode": null,
+              "source": "client",
+              "isIncoming": 1,
+              "isEnabled": 1
+            },
+            {
+              "name": "CancelPresetsSchedulesEditRequest",
+              "code": 8,
+              "mfgCode": null,
+              "source": "client",
+              "isIncoming": 1,
+              "isEnabled": 1
+            },
+            {
+              "name": "CommitPresetsSchedulesRequest",
+              "code": 9,
+              "mfgCode": null,
+              "source": "client",
+              "isIncoming": 1,
+              "isEnabled": 1
             }
           ],
           "attributes": [
@@ -4740,6 +4772,22 @@
               "reportable": 1,
               "minInterval": 0,
               "maxInterval": 65344,
+              "reportableChange": 0
+            },
+            {
+              "name": "LocalTemperatureCalibration",
+              "code": 16,
+              "mfgCode": null,
+              "side": "server",
+              "type": "int8s",
+              "included": 1,
+              "storageOption": "RAM",
+              "singleton": 0,
+              "bounded": 0,
+              "defaultValue": "0x00",
+              "reportable": 1,
+              "minInterval": 1,
+              "maxInterval": 65534,
               "reportableChange": 0
             },
             {
@@ -4887,6 +4935,86 @@
               "reportableChange": 0
             },
             {
+              "name": "PresetTypes",
+              "code": 72,
+              "mfgCode": null,
+              "side": "server",
+              "type": "array",
+              "included": 1,
+              "storageOption": "External",
+              "singleton": 0,
+              "bounded": 0,
+              "defaultValue": null,
+              "reportable": 1,
+              "minInterval": 1,
+              "maxInterval": 65534,
+              "reportableChange": 0
+            },
+            {
+              "name": "NumberOfPresets",
+              "code": 74,
+              "mfgCode": null,
+              "side": "server",
+              "type": "int8u",
+              "included": 1,
+              "storageOption": "RAM",
+              "singleton": 0,
+              "bounded": 0,
+              "defaultValue": "0",
+              "reportable": 1,
+              "minInterval": 1,
+              "maxInterval": 65534,
+              "reportableChange": 0
+            },
+            {
+              "name": "ActivePresetHandle",
+              "code": 78,
+              "mfgCode": null,
+              "side": "server",
+              "type": "octet_string",
+              "included": 1,
+              "storageOption": "RAM",
+              "singleton": 0,
+              "bounded": 0,
+              "defaultValue": "",
+              "reportable": 1,
+              "minInterval": 1,
+              "maxInterval": 65534,
+              "reportableChange": 0
+            },
+            {
+              "name": "Presets",
+              "code": 80,
+              "mfgCode": null,
+              "side": "server",
+              "type": "array",
+              "included": 1,
+              "storageOption": "External",
+              "singleton": 0,
+              "bounded": 0,
+              "defaultValue": null,
+              "reportable": 1,
+              "minInterval": 1,
+              "maxInterval": 65534,
+              "reportableChange": 0
+            },
+            {
+              "name": "PresetsSchedulesEditable",
+              "code": 82,
+              "mfgCode": null,
+              "side": "server",
+              "type": "boolean",
+              "included": 1,
+              "storageOption": "RAM",
+              "singleton": 0,
+              "bounded": 0,
+              "defaultValue": "",
+              "reportable": 1,
+              "minInterval": 1,
+              "maxInterval": 65534,
+              "reportableChange": 0
+            },
+            {
               "name": "GeneratedCommandList",
               "code": 65528,
               "mfgCode": null,
@@ -4944,7 +5072,7 @@
               "storageOption": "RAM",
               "singleton": 0,
               "bounded": 0,
-              "defaultValue": "0x23",
+              "defaultValue": "0x123",
               "reportable": 1,
               "minInterval": 0,
               "maxInterval": 65344,

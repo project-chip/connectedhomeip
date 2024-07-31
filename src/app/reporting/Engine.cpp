@@ -182,7 +182,7 @@ CHIP_ERROR Engine::BuildSingleReportDataAttributeReportIBs(ReportDataMessage::Bu
             ConcreteReadAttributePath pathForRetrieval(readPath);
             // Load the saved state from previous encoding session for chunking of one single attribute (list chunking).
             AttributeEncodeState encodeState = apReadHandler->GetAttributeEncodeState();
-            err = Impl::RetrieveClusterData(mpImEngine->GetDataModel(), apReadHandler->GetSubjectDescriptor(),
+            err = Impl::RetrieveClusterData(mpImEngine->GetDataModelProvider(), apReadHandler->GetSubjectDescriptor(),
                                             apReadHandler->IsFabricFiltered(), attributeReportIBs, pathForRetrieval, &encodeState);
             if (err != CHIP_NO_ERROR)
             {

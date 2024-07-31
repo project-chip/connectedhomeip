@@ -24,6 +24,7 @@ CommandHandlerInterfaceOnlyClusters:
     - Scenes Management
     - RVC Run Mode
     - RVC Clean Mode
+    - Service Area
     - Dishwasher Mode
     - Laundry Washer Mode
     - Oven Mode
@@ -42,7 +43,9 @@ CommandHandlerInterfaceOnlyClusters:
     - Electrical Power Measurement
     - Electrical Energy Measurement
     - Wi-Fi Network Management
+    - Thread Border Router Management
     - Thread Network Directory
+    - Water Heater Management
     - Water Heater Mode
 
 # We need a more configurable way of deciding which clusters have which init functions....

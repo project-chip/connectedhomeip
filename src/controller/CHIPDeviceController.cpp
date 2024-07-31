@@ -66,6 +66,9 @@
 #include <ble/Ble.h>
 #include <transport/raw/BLE.h>
 #endif
+#if CHIP_DEVICE_CONFIG_ENABLE_WIFIPAF
+#include <transport/raw/WiFiPAF.h>
+#endif
 
 #include <errno.h>
 #include <inttypes.h>
@@ -466,6 +469,13 @@ DeviceCommissioner::DeviceCommissioner() :
     mDeviceNOCChainCallback(OnDeviceNOCChainGeneration, this), mSetUpCodePairer(this)
 {}
 
+DeviceCommissioner::~DeviceCommissioner()
+{
+#if CHIP_DEVICE_CONFIG_ENABLE_WIFIPAF
+    DeviceLayer::ConnectivityMgr().WiFiPAFCancelConnect();
+#endif
+}
+
 CHIP_ERROR DeviceCommissioner::Init(CommissionerInitParams params)
 {
     VerifyOrReturnError(params.operationalCredentialsDelegate != nullptr, CHIP_ERROR_INVALID_ARGUMENT);
@@ -730,6 +740,12 @@ CHIP_ERROR DeviceCommissioner::EstablishPASEConnection(NodeId remoteDeviceId, Re
         peerAddress = Transport::PeerAddress::UDP(params.GetPeerAddress().GetIPAddress(), params.GetPeerAddress().GetPort(),
                                                   params.GetPeerAddress().GetInterface());
     }
+#if CHIP_DEVICE_CONFIG_ENABLE_WIFIPAF
+    else if (params.GetPeerAddress().GetTransportType() == Transport::Type::kWiFiPAF)
+    {
+        peerAddress = Transport::PeerAddress::WiFiPAF(remoteDeviceId);
+    }
+#endif // CHIP_DEVICE_CONFIG_ENABLE_WIFIPAF
 
     current = FindCommissioneeDevice(peerAddress);
     if (current != nullptr)
@@ -805,6 +821,24 @@ CHIP_ERROR DeviceCommissioner::EstablishPASEConnection(NodeId remoteDeviceId, Re
         }
     }
 #endif
+#if CHIP_DEVICE_CONFIG_ENABLE_WIFIPAF
+    if (params.GetPeerAddress().GetTransportType() == Transport::Type::kWiFiPAF)
+    {
+        if (DeviceLayer::ConnectivityMgr().GetWiFiPAF()->GetWiFiPAFState() != Transport::WiFiPAFBase::State::kConnected)
+        {
+            ChipLogProgress(Controller, "WiFi-PAF: Subscribing the NAN-USD devices");
+            if (!DeviceLayer::ConnectivityMgrImpl().IsWiFiManagementStarted())
+            {
+                ChipLogError(Controller, "Wi-Fi Management should have be started now.");
+                ExitNow(CHIP_ERROR_INTERNAL);
+            }
+            mRendezvousParametersForDeviceDiscoveredOverWiFiPAF = params;
+            DeviceLayer::ConnectivityMgr().WiFiPAFConnect(params.GetSetupDiscriminator().value(), (void *) this,
+                                                          OnWiFiPAFSubscribeComplete, OnWiFiPAFSubscribeError);
+            ExitNow(CHIP_NO_ERROR);
+        }
+    }
+#endif
     session = mSystemState->SessionMgr()->CreateUnauthenticatedSession(params.GetPeerAddress(), params.GetMRPConfig());
     VerifyOrExit(session.HasValue(), err = CHIP_ERROR_NO_MEMORY);
 
@@ -871,6 +905,43 @@ void DeviceCommissioner::OnDiscoveredDeviceOverBleError(void * appState, CHIP_ER
     }
 }
 #endif // CONFIG_NETWORK_LAYER_BLE
+
+#if CHIP_DEVICE_CONFIG_ENABLE_WIFIPAF
+void DeviceCommissioner::OnWiFiPAFSubscribeComplete(void * appState)
+{
+    auto self   = (DeviceCommissioner *) appState;
+    auto device = self->mDeviceInPASEEstablishment;
+
+    if (nullptr != device && device->GetDeviceTransportType() == Transport::Type::kWiFiPAF)
+    {
+        ChipLogProgress(Controller, "WiFi-PAF: Subscription Completed, dev_id = %lu", device->GetDeviceId());
+        auto remoteId = device->GetDeviceId();
+        auto params   = self->mRendezvousParametersForDeviceDiscoveredOverWiFiPAF;
+
+        self->mRendezvousParametersForDeviceDiscoveredOverWiFiPAF = RendezvousParameters();
+        self->ReleaseCommissioneeDevice(device);
+        LogErrorOnFailure(self->EstablishPASEConnection(remoteId, params));
+    }
+}
+
+void DeviceCommissioner::OnWiFiPAFSubscribeError(void * appState, CHIP_ERROR err)
+{
+    auto self   = (DeviceCommissioner *) appState;
+    auto device = self->mDeviceInPASEEstablishment;
+
+    if (nullptr != device && device->GetDeviceTransportType() == Transport::Type::kWiFiPAF)
+    {
+        ChipLogError(Controller, "WiFi-PAF: Subscription Error, id = %lu, err = %" CHIP_ERROR_FORMAT, device->GetDeviceId(),
+                     err.Format());
+        self->ReleaseCommissioneeDevice(device);
+        self->mRendezvousParametersForDeviceDiscoveredOverWiFiPAF = RendezvousParameters();
+        if (self->mPairingDelegate != nullptr)
+        {
+            self->mPairingDelegate->OnPairingComplete(err);
+        }
+    }
+}
+#endif
 
 CHIP_ERROR DeviceCommissioner::Commission(NodeId remoteDeviceId, CommissioningParameters & params)
 {

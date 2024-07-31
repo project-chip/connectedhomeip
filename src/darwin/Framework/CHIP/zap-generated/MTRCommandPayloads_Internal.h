@@ -184,6 +184,18 @@ NS_ASSUME_NONNULL_BEGIN
 
 @end
 
+@interface MTRAccessControlClusterReviewFabricRestrictionsParams (InternalMethods)
+
+- (NSDictionary<NSString *, id> * _Nullable)_encodeAsDataValue:(NSError * __autoreleasing *)error;
+
+@end
+
+@interface MTRAccessControlClusterReviewFabricRestrictionsResponseParams (InternalMethods)
+
+- (CHIP_ERROR)_setFieldsFromDecodableStruct:(const chip::app::Clusters::AccessControl::Commands::ReviewFabricRestrictionsResponse::DecodableType &)decodableStruct;
+
+@end
+
 @interface MTRActionsClusterInstantActionParams (InternalMethods)
 
 - (NSDictionary<NSString *, id> * _Nullable)_encodeAsDataValue:(NSError * __autoreleasing *)error;
@@ -325,6 +337,18 @@ NS_ASSUME_NONNULL_BEGIN
 @interface MTRGeneralCommissioningClusterCommissioningCompleteResponseParams (InternalMethods)
 
 - (CHIP_ERROR)_setFieldsFromDecodableStruct:(const chip::app::Clusters::GeneralCommissioning::Commands::CommissioningCompleteResponse::DecodableType &)decodableStruct;
+
+@end
+
+@interface MTRGeneralCommissioningClusterSetTCAcknowledgementsParams (InternalMethods)
+
+- (NSDictionary<NSString *, id> * _Nullable)_encodeAsDataValue:(NSError * __autoreleasing *)error;
+
+@end
+
+@interface MTRGeneralCommissioningClusterSetTCAcknowledgementsResponseParams (InternalMethods)
+
+- (CHIP_ERROR)_setFieldsFromDecodableStruct:(const chip::app::Clusters::GeneralCommissioning::Commands::SetTCAcknowledgementsResponse::DecodableType &)decodableStruct;
 
 @end
 
@@ -1487,12 +1511,6 @@ NS_ASSUME_NONNULL_BEGIN
 @end
 
 @interface MTRThermostatClusterCommitPresetsSchedulesRequestParams (InternalMethods)
-
-- (NSDictionary<NSString *, id> * _Nullable)_encodeAsDataValue:(NSError * __autoreleasing *)error;
-
-@end
-
-@interface MTRThermostatClusterSetTemperatureSetpointHoldPolicyParams (InternalMethods)
 
 - (NSDictionary<NSString *, id> * _Nullable)_encodeAsDataValue:(NSError * __autoreleasing *)error;
 

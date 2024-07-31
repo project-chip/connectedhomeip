@@ -54,9 +54,9 @@ def attribute_name(attribute: Attribute) -> str:
 
 def not_stable(maturity: ApiMaturity):
     """Determine if the given api maturity allows binary/api changes or not."""
-    # TODO: internal and deprecated not currently widely used,
-    #       so we enforce stability on them for now.
-    return maturity == ApiMaturity.PROVISIONAL
+    # NOTE: deprecated are not to be used, so we expect no changes. They were
+    #       probably "stable" at some point
+    return (maturity == ApiMaturity.PROVISIONAL) or (maturity == ApiMaturity.INTERNAL)
 
 
 class CompatibilityChecker:
