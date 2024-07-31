@@ -629,7 +629,7 @@ void AllClustersAppCommandHandler::OnOperationalStateChange(std::string device, 
 
 void AllClustersAppCommandHandler::OnGenericOperationalStateChange(std::string device, std::string operation, Json::Value param)
 {
-    OperationalState::Instance * operationalStateInstance = OperationalState::GetOperationalStateInstance();
+    OperationalState::Instance * operationalStateInstance                 = OperationalState::GetOperationalStateInstance();
     OperationalState::OperationalStateDelegate * operationalStateDelegate = OperationalState::GetOperationalStateDelegate();
     OperationalState::GenericOperationalError noError(to_underlying(OperationalState::ErrorStateEnum::kNoError));
     if (operation == "Start")
