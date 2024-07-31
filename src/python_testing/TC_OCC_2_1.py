@@ -107,7 +107,6 @@ class TC_OCC_2_1(MatterBaseTest):
                                       hold_time_limits_dut.HoldTimeMax, "HoldTimeMin is not in valid range")
             asserts.assert_greater_equal(hold_time_limits_dut.HoldTimeDefault,
                                          hold_time_limits_dut.HoldTimeMin, "HoldTimeMin is not in valid range")
-
         else:
             logging.info("HoldTimeLimits not supported. Test step skipped")
             self.mark_current_step_skipped()
@@ -132,7 +131,7 @@ class TC_OCC_2_1(MatterBaseTest):
                                      Clusters.OccupancySensing.Enums.OccupancySensorTypeEnum.kUltrasonic) == 1
             has_phy_bitmap = (occupancy_sensor_type_bitmap_dut &
                               Clusters.OccupancySensing.Enums.OccupancySensorTypeEnum.kPhysicalContact) == 1
-            if (has_pir_bitmap == 1) or ((has_pir_bitmap == 0)&(has_ultrasonic_bitmap == 0)&(has_phy_bitmap == 0)):
+            if (has_pir_bitmap == 1) or ((has_pir_bitmap == 0) & (has_ultrasonic_bitmap == 0) & (has_phy_bitmap == 0)):
                 pir_otou_delay_dut = await self.read_occ_attribute_expect_success(endpoint=endpoint, attribute=attributes.PIROccupiedToUnoccupiedDelay)
                 asserts.assert_less_equal(pir_otou_delay_dut, 0xFFFE, "PIROccupiedToUnoccupiedDelay is not in valid range")
                 asserts.assert_greater_equal(pir_otou_delay_dut, 0, "PIROccupiedToUnoccupiedDelay is not in valid range")
@@ -148,7 +147,6 @@ class TC_OCC_2_1(MatterBaseTest):
             has_delay = attributes.PIRUnoccupiedToOccupiedDelay.attribute_id in attribute_list
             has_threshold = attributes.PIRUnoccupiedToOccupiedThreshold.attribute_id in attribute_list
             asserts.assert_equal(has_delay, has_threshold, "PIRUnoccupiedToOccupiedDelay conformance failure")
-            
             pir_utoo_delay_dut = await self.read_occ_attribute_expect_success(endpoint=endpoint, attribute=attributes.PIRUnoccupiedToOccupiedDelay)
             asserts.assert_less_equal(pir_utoo_delay_dut, 0xFFFE, "PIRUnoccupiedToOccupiedDelay is not in valid range")
             asserts.assert_greater_equal(pir_utoo_delay_dut, 0, "PIRUnoccupiedToOccupiedDelay is not in valid range")
@@ -161,7 +159,6 @@ class TC_OCC_2_1(MatterBaseTest):
             has_delay = attributes.PIRUnoccupiedToOccupiedDelay.attribute_id in attribute_list
             has_threshold = attributes.PIRUnoccupiedToOccupiedThreshold.attribute_id in attribute_list
             asserts.assert_equal(has_delay, has_threshold, "PIRUnoccupiedToOccupiedThreshold conformance failure")
-            
             pir_utoo_threshold_dut = await self.read_occ_attribute_expect_success(endpoint=endpoint, attribute=attributes.PIRUnoccupiedToOccupiedThreshold)
             asserts.assert_less_equal(pir_utoo_threshold_dut, 0xFE, "PIRUnoccupiedToOccupiedThreshold is not in valid range")
             asserts.assert_greater_equal(pir_utoo_threshold_dut, 0, "PIRUnoccupiedToOccupiedThreshold is not in valid range")
@@ -221,7 +218,6 @@ class TC_OCC_2_1(MatterBaseTest):
                                  Clusters.OccupancySensing.Enums.OccupancySensorTypeEnum.kPhysicalContact) != 0
             has_phycon_delay = attributes.PhysicalContactOccupiedToUnoccupiedDelay.attribute_id in attribute_list
             asserts.assert_equal(has_phycon_bitmap, has_phycon_delay, "Bad conformance on PhysicalContact bitmap")
-
             phycontact_otou_delay_dut = await self.read_occ_attribute_expect_success(endpoint=endpoint, attribute=attributes.PhysicalContactOccupiedToUnoccupiedDelay)          
             asserts.assert_less_equal(phycontact_otou_delay_dut, 0xFFFE,
                                       "PhysicalContactOccupiedToUnoccupiedDelay is not in valid range")
