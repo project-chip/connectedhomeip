@@ -115,7 +115,8 @@ class TC_SwitchTests(MatterBaseTest):
             self.wait_for_user_input(msg)
         else:
             # This is just a simulator, ignore the long press instruction for now, it doesn't matter for the CI. It does for cert.
-            self._send_multi_press_named_pipe_command(endpoint_id, number_of_presses=2, pressed_position=pressed_position, feature_map=feature_map, multi_press_max=multi_press_max)
+            self._send_multi_press_named_pipe_command(
+                endpoint_id, number_of_presses=2, pressed_position=pressed_position, feature_map=feature_map, multi_press_max=multi_press_max)
 
     def _ask_for_multi_press_long_short(self, endpoint_id, pressed_position, feature_map: int):
         if not self._use_button_simulator():
@@ -419,7 +420,8 @@ class TC_SwitchTests(MatterBaseTest):
 
         data = event_listener.wait_for_event_report(cluster.Events.SwitchLatched, timeout_sec=post_prompt_settle_delay_seconds)
         logging.info(f"-> SwitchLatched event last received: {data}")
-        asserts.assert_equal(data, cluster.Events.SwitchLatched(newPosition=expected_switch_position), "Did not get expected switch position")
+        asserts.assert_equal(data, cluster.Events.SwitchLatched(
+            newPosition=expected_switch_position), "Did not get expected switch position")
 
         # Step 6: TH reads the CurrentPosition attribute from the DUT", "Verify that the value is 1
         self.step(6)
@@ -445,7 +447,8 @@ class TC_SwitchTests(MatterBaseTest):
         asserts.assert_is_not_none(last_event, "Did not get SwitchLatched events since last operator action.")
         last_event_data = last_event.Data
         logging.info(f"-> SwitchLatched event last received: {last_event_data}")
-        asserts.assert_equal(last_event_data, cluster.Events.SwitchLatched(newPosition=expected_switch_position), "Did not get expected switch position")
+        asserts.assert_equal(last_event_data, cluster.Events.SwitchLatched(
+            newPosition=expected_switch_position), "Did not get expected switch position")
 
         # Step 10: TH reads the CurrentPosition attribute from the DUT.
         # Verify that the value is 0

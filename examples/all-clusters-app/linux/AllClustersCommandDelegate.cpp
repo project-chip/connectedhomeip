@@ -218,16 +218,14 @@ void HandleSimulateLatchPosition(Json::Value & jsonValue)
     if (!hasEndpointId || !hasPositionId)
     {
         std::string inputJson = jsonValue.toStyledString();
-        ChipLogError(NotSpecified,
-                     "Missing or invalid value for one of EndpointId, PositionId in %s",
-                     inputJson.c_str());
+        ChipLogError(NotSpecified, "Missing or invalid value for one of EndpointId, PositionId in %s", inputJson.c_str());
         return;
     }
 
     EndpointId endpointId = static_cast<EndpointId>(jsonValue["EndpointId"].asUInt());
-    uint8_t positionId      = static_cast<uint8_t>(jsonValue["PositionId"].asUInt());
+    uint8_t positionId    = static_cast<uint8_t>(jsonValue["PositionId"].asUInt());
 
-    uint8_t previousPositionId = 0;
+    uint8_t previousPositionId                 = 0;
     Protocols::InteractionModel::Status status = Switch::Attributes::CurrentPosition::Get(endpointId, &previousPositionId);
     VerifyOrReturn(Protocols::InteractionModel::Status::Success == status,
                    ChipLogError(NotSpecified, "Failed to get CurrentPosition attribute"));
@@ -236,14 +234,15 @@ void HandleSimulateLatchPosition(Json::Value & jsonValue)
     {
         status = Switch::Attributes::CurrentPosition::Set(endpointId, positionId);
         VerifyOrReturn(Protocols::InteractionModel::Status::Success == status,
-                      ChipLogError(NotSpecified, "Failed to set CurrentPosition attribute"));
+                       ChipLogError(NotSpecified, "Failed to set CurrentPosition attribute"));
         ChipLogDetail(NotSpecified, "The latching switch is moved to a new position: %u", static_cast<unsigned>(positionId));
 
         Clusters::SwitchServer::Instance().OnSwitchLatch(endpointId, positionId);
     }
     else
     {
-        ChipLogDetail(NotSpecified, "Not moving latching switch to a new position, already at %u", static_cast<unsigned>(positionId));
+        ChipLogDetail(NotSpecified, "Not moving latching switch to a new position, already at %u",
+                      static_cast<unsigned>(positionId));
     }
 }
 
