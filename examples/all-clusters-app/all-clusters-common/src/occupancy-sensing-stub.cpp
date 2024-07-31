@@ -36,8 +36,7 @@ static constexpr size_t kOccupancySensingClusterTableSize =
 
 static_assert(kOccupancySensingClusterTableSize <= kEmberInvalidEndpointIndex, "Occupancy Sensing Cluster table size error");
 
-static std::unique_ptr<Instance>
-    gOccupancySensingClusterInstances[kOccupancySensingClusterTableSize];
+static std::unique_ptr<Instance> gOccupancySensingClusterInstances[kOccupancySensingClusterTableSize];
 
 } // namespace
 
@@ -50,8 +49,8 @@ void emberAfOccupancySensingClusterInitCallback(EndpointId endpointId)
     {
         VerifyOrDie(!gOccupancySensingClusterInstances[epIndex]);
 
-        gOccupancySensingClusterInstances[epIndex] = 
-          std::make_unique<Instance>(BitMask<OccupancySensing::Feature, uint32_t>(OccupancySensing::Feature::kOther));
+        gOccupancySensingClusterInstances[epIndex] =
+            std::make_unique<Instance>(BitMask<OccupancySensing::Feature, uint32_t>(OccupancySensing::Feature::kOther));
 
         OccupancySensing::Structs::HoldTimeLimitsStruct::Type holdTimeLimits = {
             .holdTimeMin     = 1,
