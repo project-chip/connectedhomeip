@@ -239,6 +239,7 @@ class TC_OCC_2_1(MatterBaseTest):
                 logging.info("PhysicalContactUnoccupiedToOccupiedThreshold conformance failed. Test step skipped")
         else:
             logging.info("PhysicalContactUnoccupiedToOccupiedThreshold not supported. Test step skipped")
+            self.mark_current_step_skipped()
 
 if __name__ == "__main__":
     default_matter_test_main()
