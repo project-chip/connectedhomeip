@@ -142,10 +142,11 @@ class TC_MCORE_FS_1_3(MatterBaseTest):
 
         self.step(2)
         await self.create_and_commission_device_for_th_ecosystem()
-        # TODO During setup we need to create the TH_FSA device where we would commission device created
-        # in create_and_commission_device_for_th_ecosystem to be commissioned into TH_FSA.
+        # TODO(https://github.com/CHIP-Specifications/chip-test-plans/issues/4375) During setup we need to create the TH_FSA device
+        # where we would commission device created in create_and_commission_device_for_th_ecosystem to be commissioned into TH_FSA.
 
-        # TODO Because we cannot create a TH_FSA and there is no way to mock it the following 2 test steps are skipped for now.
+        # TODO(https://github.com/CHIP-Specifications/chip-test-plans/issues/4375) Because we cannot create a TH_FSA and there is
+        # no way to mock it the following 2 test steps are skipped for now.
         self.skip_step(3)
         self.skip_step(4)
 
