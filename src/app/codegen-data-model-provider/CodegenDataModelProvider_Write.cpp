@@ -14,14 +14,14 @@
  *    See the License for the specific language governing permissions and
  *    limitations under the License.
  */
-#include <app/codegen-data-model/CodegenDataModel.h>
+#include <app/codegen-data-model-provider/CodegenDataModelProvider.h>
 
 #include <access/AccessControl.h>
 #include <app-common/zap-generated/attribute-type.h>
 #include <app/AttributeAccessInterface.h>
 #include <app/AttributeAccessInterfaceRegistry.h>
 #include <app/RequiredPrivilege.h>
-#include <app/codegen-data-model/EmberMetadata.h>
+#include <app/codegen-data-model-provider/EmberMetadata.h>
 #include <app/data-model/FabricScoped.h>
 #include <app/reporting/reporting.h>
 #include <app/util/af-types.h>
@@ -266,14 +266,14 @@ CHIP_ERROR DecodeValueIntoEmberBuffer(AttributeValueDecoder & decoder, const Emb
 
 } // namespace
 
-CHIP_ERROR CodegenDataModel::WriteAttribute(const InteractionModel::WriteAttributeRequest & request,
-                                            AttributeValueDecoder & decoder)
+CHIP_ERROR CodegenDataModelProvider::WriteAttribute(const DataModel::WriteAttributeRequest & request,
+                                                    AttributeValueDecoder & decoder)
 {
     ChipLogDetail(DataManagement, "Writing attribute: Cluster=" ChipLogFormatMEI " Endpoint=0x%x AttributeId=" ChipLogFormatMEI,
                   ChipLogValueMEI(request.path.mClusterId), request.path.mEndpointId, ChipLogValueMEI(request.path.mAttributeId));
 
     // ACL check for non-internal requests
-    if (!request.operationFlags.Has(InteractionModel::OperationFlags::kInternal))
+    if (!request.operationFlags.Has(DataModel::OperationFlags::kInternal))
     {
         ReturnErrorCodeIf(!request.subjectDescriptor.has_value(), CHIP_IM_GLOBAL_STATUS(UnsupportedAccess));
 
@@ -314,12 +314,11 @@ CHIP_ERROR CodegenDataModel::WriteAttribute(const InteractionModel::WriteAttribu
     bool isReadOnly = (attributeMetadata == nullptr) || (*attributeMetadata)->IsReadOnly();
 
     // Internal is allowed to bypass timed writes and read-only.
-    if (!request.operationFlags.Has(InteractionModel::OperationFlags::kInternal))
+    if (!request.operationFlags.Has(DataModel::OperationFlags::kInternal))
     {
         VerifyOrReturnError(!isReadOnly, CHIP_IM_GLOBAL_STATUS(UnsupportedWrite));
 
-        VerifyOrReturnError(!(*attributeMetadata)->MustUseTimedWrite() ||
-                                request.writeFlags.Has(InteractionModel::WriteFlags::kTimed),
+        VerifyOrReturnError(!(*attributeMetadata)->MustUseTimedWrite() || request.writeFlags.Has(DataModel::WriteFlags::kTimed),
                             CHIP_IM_GLOBAL_STATUS(NeedsTimedInteraction));
     }
 
@@ -329,7 +328,7 @@ CHIP_ERROR CodegenDataModel::WriteAttribute(const InteractionModel::WriteAttribu
 
     if (request.path.mDataVersion.HasValue())
     {
-        std::optional<InteractionModel::ClusterInfo> clusterInfo = GetClusterInfo(request.path);
+        std::optional<DataModel::ClusterInfo> clusterInfo = GetClusterInfo(request.path);
         if (!clusterInfo.has_value())
         {
             ChipLogError(DataManagement, "Unable to get cluster info for Endpoint 0x%x, Cluster " ChipLogFormatMEI,
@@ -371,7 +370,7 @@ CHIP_ERROR CodegenDataModel::WriteAttribute(const InteractionModel::WriteAttribu
         return CHIP_IM_GLOBAL_STATUS(InvalidValue);
     }
 
-    if (request.operationFlags.Has(InteractionModel::OperationFlags::kInternal))
+    if (request.operationFlags.Has(DataModel::OperationFlags::kInternal))
     {
         // Internal requests use the non-External interface that has less enforcement
         // than the external version (e.g. does not check/enforce writable settings, does not

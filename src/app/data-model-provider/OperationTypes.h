@@ -26,7 +26,7 @@
 
 namespace chip {
 namespace app {
-namespace InteractionModel {
+namespace DataModel {
 
 /// Contains common flags among all interaction model operations: read/write/invoke
 enum class OperationFlags : uint32_t
@@ -92,6 +92,6 @@ struct InvokeRequest : OperationRequest
     BitFlags<InvokeFlags> invokeFlags;
 };
 
-} // namespace InteractionModel
+} // namespace DataModel
 } // namespace app
 } // namespace chip

@@ -14,28 +14,17 @@
  *    See the License for the specific language governing permissions and
  *    limitations under the License.
  */
-#pragma once
-
-#include <app/data-model-interface/ActionContext.h>
-#include <app/data-model-interface/DataModelChangeListener.h>
-#include <app/data-model-interface/EventsGenerator.h>
+#include <app/codegen-data-model-provider/CodegenDataModelProvider.h>
+#include <app/codegen-data-model-provider/Instance.h>
 
 namespace chip {
 namespace app {
-namespace InteractionModel {
 
-/// Data provided to data models in order to interface with the interaction model environment.
-///
-/// Provides callback-style functionality to notify the interaction model of changes
-/// (e.g. using paths to notify of attribute data changes or events to generate events)
-/// as well as fetching current state (via actionContext)
-struct InteractionModelContext
+DataModel::Provider * CodegenDataModelProviderInstance()
 {
-    EventsGenerator * eventsGenerator;
-    DataModelChangeListener * dataModelChangeListener;
-    ActionContext * actionContext;
-};
+    static CodegenDataModelProvider gCodegenModel;
+    return &gCodegenModel;
+}
 
-} // namespace InteractionModel
 } // namespace app
 } // namespace chip

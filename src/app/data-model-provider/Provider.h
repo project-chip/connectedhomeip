@@ -23,13 +23,13 @@
 #include <app/AttributeValueEncoder.h>
 #include <app/CommandHandler.h>
 
-#include <app/data-model-interface/Context.h>
-#include <app/data-model-interface/MetadataTypes.h>
-#include <app/data-model-interface/OperationTypes.h>
+#include <app/data-model-provider/Context.h>
+#include <app/data-model-provider/MetadataTypes.h>
+#include <app/data-model-provider/OperationTypes.h>
 
 namespace chip {
 namespace app {
-namespace InteractionModel {
+namespace DataModel {
 
 /// Represents operations against a matter-defined data model.
 ///
@@ -38,10 +38,10 @@ namespace InteractionModel {
 ///     thread or equivalent
 ///   - class is allowed to attempt to cache indexes/locations for faster
 ///     lookups of things (e.g during iterations)
-class DataModel : public DataModelMetadataTree
+class Provider : public ProviderMetadataTree
 {
 public:
-    virtual ~DataModel() = default;
+    virtual ~Provider() = default;
 
     // `context` pointers  will be guaranteed valid until Shutdown is called()
     virtual CHIP_ERROR Startup(InteractionModelContext context)
@@ -107,6 +107,6 @@ private:
     InteractionModelContext mContext = { nullptr };
 };
 
-} // namespace InteractionModel
+} // namespace DataModel
 } // namespace app
 } // namespace chip

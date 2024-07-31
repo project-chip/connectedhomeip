@@ -20,7 +20,7 @@
 
 namespace chip {
 namespace app {
-namespace InteractionModel {
+namespace DataModel {
 
 /// Notification listener for changes of the underlying data in a
 /// data model.
@@ -31,10 +31,10 @@ namespace InteractionModel {
 /// Methods on this class MUST be called from within the matter
 /// main loop as they will likely trigger interaction model
 /// internal updates and subscription data reporting.
-class DataModelChangeListener
+class ProviderChangeListener
 {
 public:
-    virtual ~DataModelChangeListener() = default;
+    virtual ~ProviderChangeListener() = default;
 
     /// Mark all attributes matching the given path (which may be a wildcard) dirty.
     ///
@@ -42,6 +42,6 @@ public:
     virtual void MarkDirty(const ConcreteAttributePath & path) = 0;
 };
 
-} // namespace InteractionModel
+} // namespace DataModel
 } // namespace app
 } // namespace chip

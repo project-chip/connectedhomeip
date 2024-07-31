@@ -14,7 +14,7 @@
  *    See the License for the specific language governing permissions and
  *    limitations under the License.
  */
-#include <app/codegen-data-model/CodegenDataModel.h>
+#include <app/codegen-data-model-provider/CodegenDataModelProvider.h>
 
 #include <app-common/zap-generated/attribute-type.h>
 #include <app/RequiredPrivilege.h>
@@ -31,8 +31,7 @@ namespace app {
 namespace {
 
 /// Load the cluster information into the specified destination
-std::variant<CHIP_ERROR, InteractionModel::ClusterInfo> LoadClusterInfo(const ConcreteClusterPath & path,
-                                                                        const EmberAfCluster & cluster)
+std::variant<CHIP_ERROR, DataModel::ClusterInfo> LoadClusterInfo(const ConcreteClusterPath & path, const EmberAfCluster & cluster)
 {
     DataVersion * versionPtr = emberAfDataVersionStorage(path);
     if (versionPtr == nullptr)
@@ -42,7 +41,7 @@ std::variant<CHIP_ERROR, InteractionModel::ClusterInfo> LoadClusterInfo(const Co
         return CHIP_ERROR_NOT_FOUND;
     }
 
-    InteractionModel::ClusterInfo info(*versionPtr);
+    DataModel::ClusterInfo info(*versionPtr);
 
     // TODO: set entry flags:
     //   info->flags.Set(ClusterQualityFlags::kDiagnosticsData)
@@ -51,7 +50,7 @@ std::variant<CHIP_ERROR, InteractionModel::ClusterInfo> LoadClusterInfo(const Co
 }
 
 /// Converts a EmberAfCluster into a ClusterEntry
-std::variant<CHIP_ERROR, InteractionModel::ClusterEntry> ClusterEntryFrom(EndpointId endpointId, const EmberAfCluster & cluster)
+std::variant<CHIP_ERROR, DataModel::ClusterEntry> ClusterEntryFrom(EndpointId endpointId, const EmberAfCluster & cluster)
 {
     ConcreteClusterPath clusterPath(endpointId, cluster.clusterId);
     auto info = LoadClusterInfo(clusterPath, cluster);
@@ -61,9 +60,9 @@ std::variant<CHIP_ERROR, InteractionModel::ClusterEntry> ClusterEntryFrom(Endpoi
         return *err;
     }
 
-    if (InteractionModel::ClusterInfo * infoValue = std::get_if<InteractionModel::ClusterInfo>(&info))
+    if (DataModel::ClusterInfo * infoValue = std::get_if<DataModel::ClusterInfo>(&info))
     {
-        return InteractionModel::ClusterEntry{
+        return DataModel::ClusterEntry{
             .path = clusterPath,
             .info = *infoValue,
         };
@@ -74,8 +73,8 @@ std::variant<CHIP_ERROR, InteractionModel::ClusterEntry> ClusterEntryFrom(Endpoi
 /// Finds the first server cluster entry for the given endpoint data starting at [start_index]
 ///
 /// Returns an invalid entry if no more server clusters are found
-InteractionModel::ClusterEntry FirstServerClusterEntry(EndpointId endpointId, const EmberAfEndpointType * endpoint,
-                                                       unsigned start_index, unsigned & found_index)
+DataModel::ClusterEntry FirstServerClusterEntry(EndpointId endpointId, const EmberAfEndpointType * endpoint, unsigned start_index,
+                                                unsigned & found_index)
 {
     for (unsigned cluster_idx = start_index; cluster_idx < endpoint->clusterCount; cluster_idx++)
     {
@@ -88,7 +87,7 @@ InteractionModel::ClusterEntry FirstServerClusterEntry(EndpointId endpointId, co
         found_index = cluster_idx;
         auto entry  = ClusterEntryFrom(endpointId, cluster);
 
-        if (InteractionModel::ClusterEntry * entryValue = std::get_if<InteractionModel::ClusterEntry>(&entry))
+        if (DataModel::ClusterEntry * entryValue = std::get_if<DataModel::ClusterEntry>(&entry))
         {
             return *entryValue;
         }
@@ -106,14 +105,14 @@ InteractionModel::ClusterEntry FirstServerClusterEntry(EndpointId endpointId, co
 #endif
     }
 
-    return InteractionModel::ClusterEntry::kInvalid;
+    return DataModel::ClusterEntry::kInvalid;
 }
 
 /// Load the attribute information into the specified destination
 ///
 /// `info` is assumed to be default-constructed/clear (i.e. this sets flags, but does not reset them).
 void LoadAttributeInfo(const ConcreteAttributePath & path, const EmberAfAttributeMetadata & attribute,
-                       InteractionModel::AttributeInfo * info)
+                       DataModel::AttributeInfo * info)
 {
     info->readPrivilege = RequiredPrivilege::ForReadAttribute(path);
     if (!attribute.IsReadOnly())
@@ -121,8 +120,8 @@ void LoadAttributeInfo(const ConcreteAttributePath & path, const EmberAfAttribut
         info->writePrivilege = RequiredPrivilege::ForWriteAttribute(path);
     }
 
-    info->flags.Set(InteractionModel::AttributeQualityFlags::kListAttribute, (attribute.attributeType == ZCL_ARRAY_ATTRIBUTE_TYPE));
-    info->flags.Set(InteractionModel::AttributeQualityFlags::kTimed, attribute.MustUseTimedWrite());
+    info->flags.Set(DataModel::AttributeQualityFlags::kListAttribute, (attribute.attributeType == ZCL_ARRAY_ATTRIBUTE_TYPE));
+    info->flags.Set(DataModel::AttributeQualityFlags::kTimed, attribute.MustUseTimedWrite());
 
     // NOTE: we do NOT provide additional info for:
     //    - IsExternal/IsSingleton/IsAutomaticallyPersisted is not used by IM handling
@@ -131,15 +130,14 @@ void LoadAttributeInfo(const ConcreteAttributePath & path, const EmberAfAttribut
     //      fixed, source attribution)
 
     // TODO: Set additional flags:
-    // info->flags.Set(InteractionModel::AttributeQualityFlags::kFabricScoped)
-    // info->flags.Set(InteractionModel::AttributeQualityFlags::kFabricSensitive)
-    // info->flags.Set(InteractionModel::AttributeQualityFlags::kChangesOmitted)
+    // info->flags.Set(DataModel::AttributeQualityFlags::kFabricScoped)
+    // info->flags.Set(DataModel::AttributeQualityFlags::kFabricSensitive)
+    // info->flags.Set(DataModel::AttributeQualityFlags::kChangesOmitted)
 }
 
-InteractionModel::AttributeEntry AttributeEntryFrom(const ConcreteClusterPath & clusterPath,
-                                                    const EmberAfAttributeMetadata & attribute)
+DataModel::AttributeEntry AttributeEntryFrom(const ConcreteClusterPath & clusterPath, const EmberAfAttributeMetadata & attribute)
 {
-    InteractionModel::AttributeEntry entry;
+    DataModel::AttributeEntry entry;
 
     entry.path = ConcreteAttributePath(clusterPath.mEndpointId, clusterPath.mClusterId, attribute.attributeId);
     LoadAttributeInfo(entry.path, attribute, &entry.info);
@@ -147,16 +145,15 @@ InteractionModel::AttributeEntry AttributeEntryFrom(const ConcreteClusterPath & 
     return entry;
 }
 
-InteractionModel::CommandEntry CommandEntryFrom(const ConcreteClusterPath & clusterPath, CommandId clusterCommandId)
+DataModel::CommandEntry CommandEntryFrom(const ConcreteClusterPath & clusterPath, CommandId clusterCommandId)
 {
-    InteractionModel::CommandEntry entry;
+    DataModel::CommandEntry entry;
     entry.path                 = ConcreteCommandPath(clusterPath.mEndpointId, clusterPath.mClusterId, clusterCommandId);
     entry.info.invokePrivilege = RequiredPrivilege::ForInvokeCommand(entry.path);
 
-    entry.info.flags.Set(InteractionModel::CommandQualityFlags::kTimed,
-                         CommandNeedsTimedInvoke(clusterPath.mClusterId, clusterCommandId));
+    entry.info.flags.Set(DataModel::CommandQualityFlags::kTimed, CommandNeedsTimedInvoke(clusterPath.mClusterId, clusterCommandId));
 
-    entry.info.flags.Set(InteractionModel::CommandQualityFlags::kFabricScoped,
+    entry.info.flags.Set(DataModel::CommandQualityFlags::kFabricScoped,
                          CommandIsFabricScoped(clusterPath.mClusterId, clusterCommandId));
 
     return entry;
@@ -166,7 +163,7 @@ const ConcreteCommandPath kInvalidCommandPath(kInvalidEndpointId, kInvalidCluste
 
 } // namespace
 
-std::optional<CommandId> CodegenDataModel::EmberCommandListIterator::First(const CommandId * list)
+std::optional<CommandId> CodegenDataModelProvider::EmberCommandListIterator::First(const CommandId * list)
 {
     VerifyOrReturnValue(list != nullptr, std::nullopt);
     mCurrentList = mCurrentHint = list;
@@ -175,7 +172,7 @@ std::optional<CommandId> CodegenDataModel::EmberCommandListIterator::First(const
     return *mCurrentList;
 }
 
-std::optional<CommandId> CodegenDataModel::EmberCommandListIterator::Next(const CommandId * list, CommandId previousId)
+std::optional<CommandId> CodegenDataModelProvider::EmberCommandListIterator::Next(const CommandId * list, CommandId previousId)
 {
     VerifyOrReturnValue(list != nullptr, std::nullopt);
     VerifyOrReturnValue(previousId != kInvalidCommandId, std::nullopt);
@@ -204,7 +201,7 @@ std::optional<CommandId> CodegenDataModel::EmberCommandListIterator::Next(const 
     return (*mCurrentHint == kInvalidCommandId) ? std::nullopt : std::make_optional(*mCurrentHint);
 }
 
-bool CodegenDataModel::EmberCommandListIterator::Exists(const CommandId * list, CommandId toCheck)
+bool CodegenDataModelProvider::EmberCommandListIterator::Exists(const CommandId * list, CommandId toCheck)
 {
     VerifyOrReturnValue(list != nullptr, false);
     VerifyOrReturnValue(toCheck != kInvalidCommandId, false);
@@ -232,8 +229,8 @@ bool CodegenDataModel::EmberCommandListIterator::Exists(const CommandId * list, 
     return (*mCurrentHint == toCheck);
 }
 
-CHIP_ERROR CodegenDataModel::Invoke(const InteractionModel::InvokeRequest & request, TLV::TLVReader & input_arguments,
-                                    CommandHandler * handler)
+CHIP_ERROR CodegenDataModelProvider::Invoke(const DataModel::InvokeRequest & request, TLV::TLVReader & input_arguments,
+                                            CommandHandler * handler)
 {
     // TODO: CommandHandlerInterface support is currently
     //       residing in InteractionModelEngine itself. We may want to separate this out
@@ -248,7 +245,7 @@ CHIP_ERROR CodegenDataModel::Invoke(const InteractionModel::InvokeRequest & requ
     return CHIP_NO_ERROR;
 }
 
-EndpointId CodegenDataModel::FirstEndpoint()
+EndpointId CodegenDataModelProvider::FirstEndpoint()
 {
     // find the first enabled index
     const uint16_t lastEndpointIndex = emberAfEndpointCount();
@@ -265,7 +262,7 @@ EndpointId CodegenDataModel::FirstEndpoint()
     return kInvalidEndpointId;
 }
 
-std::optional<unsigned> CodegenDataModel::TryFindEndpointIndex(EndpointId id) const
+std::optional<unsigned> CodegenDataModelProvider::TryFindEndpointIndex(EndpointId id) const
 {
     const uint16_t lastEndpointIndex = emberAfEndpointCount();
 
@@ -285,7 +282,7 @@ std::optional<unsigned> CodegenDataModel::TryFindEndpointIndex(EndpointId id) co
     return std::make_optional<unsigned>(idx);
 }
 
-EndpointId CodegenDataModel::NextEndpoint(EndpointId before)
+EndpointId CodegenDataModelProvider::NextEndpoint(EndpointId before)
 {
     const unsigned lastEndpointIndex = emberAfEndpointCount();
 
@@ -309,17 +306,18 @@ EndpointId CodegenDataModel::NextEndpoint(EndpointId before)
     return kInvalidEndpointId;
 }
 
-InteractionModel::ClusterEntry CodegenDataModel::FirstCluster(EndpointId endpointId)
+DataModel::ClusterEntry CodegenDataModelProvider::FirstCluster(EndpointId endpointId)
 {
     const EmberAfEndpointType * endpoint = emberAfFindEndpointType(endpointId);
-    VerifyOrReturnValue(endpoint != nullptr, InteractionModel::ClusterEntry::kInvalid);
-    VerifyOrReturnValue(endpoint->clusterCount > 0, InteractionModel::ClusterEntry::kInvalid);
-    VerifyOrReturnValue(endpoint->cluster != nullptr, InteractionModel::ClusterEntry::kInvalid);
+    VerifyOrReturnValue(endpoint != nullptr, DataModel::ClusterEntry::kInvalid);
+    VerifyOrReturnValue(endpoint->clusterCount > 0, DataModel::ClusterEntry::kInvalid);
+    VerifyOrReturnValue(endpoint->cluster != nullptr, DataModel::ClusterEntry::kInvalid);
 
     return FirstServerClusterEntry(endpointId, endpoint, 0, mClusterIterationHint);
 }
 
-std::optional<unsigned> CodegenDataModel::TryFindServerClusterIndex(const EmberAfEndpointType * endpoint, ClusterId id) const
+std::optional<unsigned> CodegenDataModelProvider::TryFindServerClusterIndex(const EmberAfEndpointType * endpoint,
+                                                                            ClusterId id) const
 {
     const unsigned clusterCount = endpoint->clusterCount;
 
@@ -347,26 +345,26 @@ std::optional<unsigned> CodegenDataModel::TryFindServerClusterIndex(const EmberA
     return std::nullopt;
 }
 
-InteractionModel::ClusterEntry CodegenDataModel::NextCluster(const ConcreteClusterPath & before)
+DataModel::ClusterEntry CodegenDataModelProvider::NextCluster(const ConcreteClusterPath & before)
 {
     // TODO: This search still seems slow (ember will loop). Should use index hints as long
     //       as ember API supports it
     const EmberAfEndpointType * endpoint = emberAfFindEndpointType(before.mEndpointId);
 
-    VerifyOrReturnValue(endpoint != nullptr, InteractionModel::ClusterEntry::kInvalid);
-    VerifyOrReturnValue(endpoint->clusterCount > 0, InteractionModel::ClusterEntry::kInvalid);
-    VerifyOrReturnValue(endpoint->cluster != nullptr, InteractionModel::ClusterEntry::kInvalid);
+    VerifyOrReturnValue(endpoint != nullptr, DataModel::ClusterEntry::kInvalid);
+    VerifyOrReturnValue(endpoint->clusterCount > 0, DataModel::ClusterEntry::kInvalid);
+    VerifyOrReturnValue(endpoint->cluster != nullptr, DataModel::ClusterEntry::kInvalid);
 
     std::optional<unsigned> cluster_idx = TryFindServerClusterIndex(endpoint, before.mClusterId);
     if (!cluster_idx.has_value())
     {
-        return InteractionModel::ClusterEntry::kInvalid;
+        return DataModel::ClusterEntry::kInvalid;
     }
 
     return FirstServerClusterEntry(before.mEndpointId, endpoint, *cluster_idx + 1, mClusterIterationHint);
 }
 
-std::optional<InteractionModel::ClusterInfo> CodegenDataModel::GetClusterInfo(const ConcreteClusterPath & path)
+std::optional<DataModel::ClusterInfo> CodegenDataModelProvider::GetClusterInfo(const ConcreteClusterPath & path)
 {
     const EmberAfCluster * cluster = FindServerCluster(path);
 
@@ -384,22 +382,22 @@ std::optional<InteractionModel::ClusterInfo> CodegenDataModel::GetClusterInfo(co
         return std::nullopt;
     }
 
-    return std::make_optional(std::get<InteractionModel::ClusterInfo>(info));
+    return std::make_optional(std::get<DataModel::ClusterInfo>(info));
 }
 
-InteractionModel::AttributeEntry CodegenDataModel::FirstAttribute(const ConcreteClusterPath & path)
+DataModel::AttributeEntry CodegenDataModelProvider::FirstAttribute(const ConcreteClusterPath & path)
 {
     const EmberAfCluster * cluster = FindServerCluster(path);
 
-    VerifyOrReturnValue(cluster != nullptr, InteractionModel::AttributeEntry::kInvalid);
-    VerifyOrReturnValue(cluster->attributeCount > 0, InteractionModel::AttributeEntry::kInvalid);
-    VerifyOrReturnValue(cluster->attributes != nullptr, InteractionModel::AttributeEntry::kInvalid);
+    VerifyOrReturnValue(cluster != nullptr, DataModel::AttributeEntry::kInvalid);
+    VerifyOrReturnValue(cluster->attributeCount > 0, DataModel::AttributeEntry::kInvalid);
+    VerifyOrReturnValue(cluster->attributes != nullptr, DataModel::AttributeEntry::kInvalid);
 
     mAttributeIterationHint = 0;
     return AttributeEntryFrom(path, cluster->attributes[0]);
 }
 
-std::optional<unsigned> CodegenDataModel::TryFindAttributeIndex(const EmberAfCluster * cluster, AttributeId id) const
+std::optional<unsigned> CodegenDataModelProvider::TryFindAttributeIndex(const EmberAfCluster * cluster, AttributeId id) const
 {
     const unsigned attributeCount = cluster->attributeCount;
 
@@ -422,7 +420,7 @@ std::optional<unsigned> CodegenDataModel::TryFindAttributeIndex(const EmberAfClu
     return std::nullopt;
 }
 
-const EmberAfCluster * CodegenDataModel::FindServerCluster(const ConcreteClusterPath & path)
+const EmberAfCluster * CodegenDataModelProvider::FindServerCluster(const ConcreteClusterPath & path)
 {
     // cache things
     if (mPreviouslyFoundCluster.has_value() && (mPreviouslyFoundCluster->path == path))
@@ -438,18 +436,18 @@ const EmberAfCluster * CodegenDataModel::FindServerCluster(const ConcreteCluster
     return cluster;
 }
 
-InteractionModel::AttributeEntry CodegenDataModel::NextAttribute(const ConcreteAttributePath & before)
+DataModel::AttributeEntry CodegenDataModelProvider::NextAttribute(const ConcreteAttributePath & before)
 {
     const EmberAfCluster * cluster = FindServerCluster(before);
-    VerifyOrReturnValue(cluster != nullptr, InteractionModel::AttributeEntry::kInvalid);
-    VerifyOrReturnValue(cluster->attributeCount > 0, InteractionModel::AttributeEntry::kInvalid);
-    VerifyOrReturnValue(cluster->attributes != nullptr, InteractionModel::AttributeEntry::kInvalid);
+    VerifyOrReturnValue(cluster != nullptr, DataModel::AttributeEntry::kInvalid);
+    VerifyOrReturnValue(cluster->attributeCount > 0, DataModel::AttributeEntry::kInvalid);
+    VerifyOrReturnValue(cluster->attributes != nullptr, DataModel::AttributeEntry::kInvalid);
 
     // find the given attribute in the list and then return the next one
     std::optional<unsigned> attribute_idx = TryFindAttributeIndex(cluster, before.mAttributeId);
     if (!attribute_idx.has_value())
     {
-        return InteractionModel::AttributeEntry::kInvalid;
+        return DataModel::AttributeEntry::kInvalid;
     }
 
     unsigned next_idx = *attribute_idx + 1;
@@ -460,10 +458,10 @@ InteractionModel::AttributeEntry CodegenDataModel::NextAttribute(const ConcreteA
     }
 
     // iteration complete
-    return InteractionModel::AttributeEntry::kInvalid;
+    return DataModel::AttributeEntry::kInvalid;
 }
 
-std::optional<InteractionModel::AttributeInfo> CodegenDataModel::GetAttributeInfo(const ConcreteAttributePath & path)
+std::optional<DataModel::AttributeInfo> CodegenDataModelProvider::GetAttributeInfo(const ConcreteAttributePath & path)
 {
     const EmberAfCluster * cluster = FindServerCluster(path);
 
@@ -478,36 +476,36 @@ std::optional<InteractionModel::AttributeInfo> CodegenDataModel::GetAttributeInf
         return std::nullopt;
     }
 
-    InteractionModel::AttributeInfo info;
+    DataModel::AttributeInfo info;
     LoadAttributeInfo(path, cluster->attributes[*attribute_idx], &info);
     return std::make_optional(info);
 }
 
-InteractionModel::CommandEntry CodegenDataModel::FirstAcceptedCommand(const ConcreteClusterPath & path)
+DataModel::CommandEntry CodegenDataModelProvider::FirstAcceptedCommand(const ConcreteClusterPath & path)
 {
     const EmberAfCluster * cluster = FindServerCluster(path);
 
-    VerifyOrReturnValue(cluster != nullptr, InteractionModel::CommandEntry::kInvalid);
+    VerifyOrReturnValue(cluster != nullptr, DataModel::CommandEntry::kInvalid);
 
     std::optional<CommandId> commandId = mAcceptedCommandsIterator.First(cluster->acceptedCommandList);
-    VerifyOrReturnValue(commandId.has_value(), InteractionModel::CommandEntry::kInvalid);
+    VerifyOrReturnValue(commandId.has_value(), DataModel::CommandEntry::kInvalid);
 
     return CommandEntryFrom(path, *commandId);
 }
 
-InteractionModel::CommandEntry CodegenDataModel::NextAcceptedCommand(const ConcreteCommandPath & before)
+DataModel::CommandEntry CodegenDataModelProvider::NextAcceptedCommand(const ConcreteCommandPath & before)
 {
     const EmberAfCluster * cluster = FindServerCluster(before);
 
-    VerifyOrReturnValue(cluster != nullptr, InteractionModel::CommandEntry::kInvalid);
+    VerifyOrReturnValue(cluster != nullptr, DataModel::CommandEntry::kInvalid);
 
     std::optional<CommandId> commandId = mAcceptedCommandsIterator.Next(cluster->acceptedCommandList, before.mCommandId);
-    VerifyOrReturnValue(commandId.has_value(), InteractionModel::CommandEntry::kInvalid);
+    VerifyOrReturnValue(commandId.has_value(), DataModel::CommandEntry::kInvalid);
 
     return CommandEntryFrom(before, *commandId);
 }
 
-std::optional<InteractionModel::CommandInfo> CodegenDataModel::GetAcceptedCommandInfo(const ConcreteCommandPath & path)
+std::optional<DataModel::CommandInfo> CodegenDataModelProvider::GetAcceptedCommandInfo(const ConcreteCommandPath & path)
 {
     const EmberAfCluster * cluster = FindServerCluster(path);
 
@@ -517,7 +515,7 @@ std::optional<InteractionModel::CommandInfo> CodegenDataModel::GetAcceptedComman
     return CommandEntryFrom(path, path.mCommandId).info;
 }
 
-ConcreteCommandPath CodegenDataModel::FirstGeneratedCommand(const ConcreteClusterPath & path)
+ConcreteCommandPath CodegenDataModelProvider::FirstGeneratedCommand(const ConcreteClusterPath & path)
 {
     const EmberAfCluster * cluster = FindServerCluster(path);
 
@@ -528,7 +526,7 @@ ConcreteCommandPath CodegenDataModel::FirstGeneratedCommand(const ConcreteCluste
     return ConcreteCommandPath(path.mEndpointId, path.mClusterId, *commandId);
 }
 
-ConcreteCommandPath CodegenDataModel::NextGeneratedCommand(const ConcreteCommandPath & before)
+ConcreteCommandPath CodegenDataModelProvider::NextGeneratedCommand(const ConcreteCommandPath & before)
 {
     const EmberAfCluster * cluster = FindServerCluster(before);
 

@@ -29,7 +29,7 @@
 
 namespace chip {
 namespace app {
-namespace InteractionModel {
+namespace DataModel {
 
 namespace internal {
 template <typename T>
@@ -131,6 +131,6 @@ public:
     }
 };
 
-} // namespace InteractionModel
+} // namespace DataModel
 } // namespace app
 } // namespace chip

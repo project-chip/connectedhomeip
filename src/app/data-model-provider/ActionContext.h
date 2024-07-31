@@ -14,17 +14,30 @@
  *    See the License for the specific language governing permissions and
  *    limitations under the License.
  */
-#include <app/codegen-data-model/CodegenDataModel.h>
-#include <app/codegen-data-model/Instance.h>
+#pragma once
+
+#include <messaging/ExchangeContext.h>
 
 namespace chip {
 namespace app {
+namespace DataModel {
 
-InteractionModel::DataModel * CodegenDataModelInstance()
+// Context for a currently executing action
+class ActionContext
 {
-    static CodegenDataModel gCodegenModel;
-    return &gCodegenModel;
-}
+public:
+    virtual ~ActionContext() = default;
 
+    /// Valid ONLY during synchronous handling of an action.
+    ///
+    /// Used sparingly, however some operations will require these. An example
+    /// usage is "Operational Credentials aborting communications on removed fabrics"
+    ///
+    /// Callers MUST check for null here (e.g. unit tests mocks may set this to
+    /// nullptr due to object complexity)
+    virtual Messaging::ExchangeContext * CurrentExchange() = 0;
+};
+
+} // namespace DataModel
 } // namespace app
 } // namespace chip

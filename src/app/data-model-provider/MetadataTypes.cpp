@@ -14,11 +14,11 @@
  *    See the License for the specific language governing permissions and
  *    limitations under the License.
  */
-#include <app/data-model-interface/MetadataTypes.h>
+#include <app/data-model-provider/MetadataTypes.h>
 
 namespace chip {
 namespace app {
-namespace InteractionModel {
+namespace DataModel {
 
 const AttributeEntry AttributeEntry::kInvalid{ .path = ConcreteAttributePath(kInvalidEndpointId, kInvalidClusterId,
                                                                              kInvalidAttributeId) };
@@ -30,6 +30,6 @@ const ClusterEntry ClusterEntry::kInvalid{
     .info = ClusterInfo(0 /* version */), // version of invalid cluster entry does not matter
 };
 
-} // namespace InteractionModel
+} // namespace DataModel
 } // namespace app
 } // namespace chip

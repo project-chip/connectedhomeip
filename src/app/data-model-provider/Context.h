@@ -16,28 +16,26 @@
  */
 #pragma once
 
-#include <messaging/ExchangeContext.h>
+#include <app/data-model-provider/ActionContext.h>
+#include <app/data-model-provider/EventsGenerator.h>
+#include <app/data-model-provider/ProviderChangeListener.h>
 
 namespace chip {
 namespace app {
-namespace InteractionModel {
+namespace DataModel {
 
-// Context for a currently executing action
-class ActionContext
+/// Data provided to data models in order to interface with the interaction model environment.
+///
+/// Provides callback-style functionality to notify the interaction model of changes
+/// (e.g. using paths to notify of attribute data changes or events to generate events)
+/// as well as fetching current state (via actionContext)
+struct InteractionModelContext
 {
-public:
-    virtual ~ActionContext() = default;
-
-    /// Valid ONLY during synchronous handling of an action.
-    ///
-    /// Used sparingly, however some operations will require these. An example
-    /// usage is "Operational Credentials aborting communications on removed fabrics"
-    ///
-    /// Callers MUST check for null here (e.g. unit tests mocks may set this to
-    /// nullptr due to object complexity)
-    virtual Messaging::ExchangeContext * CurrentExchange() = 0;
+    EventsGenerator * eventsGenerator;
+    ProviderChangeListener * dataModelChangeListener;
+    ActionContext * actionContext;
 };
 
-} // namespace InteractionModel
+} // namespace DataModel
 } // namespace app
 } // namespace chip

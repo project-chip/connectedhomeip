@@ -16,12 +16,12 @@
  */
 #pragma once
 
-#include <app/data-model-interface/DataModel.h>
+#include <app/data-model-provider/Provider.h>
 
 namespace chip {
 namespace app {
 
-InteractionModel::DataModel * CodegenDataModelInstance();
+DataModel::Provider * CodegenDataModelProviderInstance();
 
 } // namespace app
 } // namespace chip

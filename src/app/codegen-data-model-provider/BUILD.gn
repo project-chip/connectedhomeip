@@ -20,10 +20,10 @@ import("//build_overrides/chip.gni")
 # be available at link time for this model to use
 #
 # Use `model.gni` to get access to:
-#   CodegenDataModel.cpp
-#   CodegenDataModel.h
-#   CodegenDataModel_Read.cpp
-#   CodegenDataModel_Write.cpp
+#   CodegenDataModelProvider.cpp
+#   CodegenDataModelProvider.h
+#   CodegenDataModelProvider_Read.cpp
+#   CodegenDataModelProvider_Write.cpp
 #   EmberMetadata.cpp
 #   EmberMetadata.h
 #   Instance.cpp

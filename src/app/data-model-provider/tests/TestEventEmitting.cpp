@@ -17,7 +17,7 @@
  */
 
 #include <app-common/zap-generated/cluster-objects.h>
-#include <app/data-model-interface/EventsGenerator.h>
+#include <app/data-model-provider/EventsGenerator.h>
 #include <app/data-model/Decode.h>
 #include <lib/core/StringBuilderAdapters.h>
 #include <lib/support/CodeUtils.h>
@@ -28,7 +28,7 @@ namespace {
 
 using namespace chip;
 using namespace chip::app;
-using namespace chip::app::InteractionModel;
+using namespace chip::app::DataModel;
 
 using StartUpEventType              = chip::app::Clusters::BasicInformation::Events::StartUp::Type;
 using AccessControlEntryChangedType = chip::app::Clusters::AccessControl::Events::AccessControlEntryChanged::Type;

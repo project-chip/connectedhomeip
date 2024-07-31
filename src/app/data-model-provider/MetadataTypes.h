@@ -28,7 +28,7 @@
 
 namespace chip {
 namespace app {
-namespace InteractionModel {
+namespace DataModel {
 
 enum class ClusterQualityFlags : uint32_t
 {
@@ -121,10 +121,10 @@ struct CommandEntry
 ///       are returned, when iterating over a cluster, all attributes/commands are iterated over)
 ///     - uniqueness and completeness (iterate over all possible distinct values as long as no
 ///       internal structural changes occur)
-class DataModelMetadataTree
+class ProviderMetadataTree
 {
 public:
-    virtual ~DataModelMetadataTree() = default;
+    virtual ~ProviderMetadataTree() = default;
 
     virtual EndpointId FirstEndpoint()                 = 0;
     virtual EndpointId NextEndpoint(EndpointId before) = 0;
@@ -150,6 +150,6 @@ public:
     virtual ConcreteCommandPath NextGeneratedCommand(const ConcreteCommandPath & before)   = 0;
 };
 
-} // namespace InteractionModel
+} // namespace DataModel
 } // namespace app
 } // namespace chip
