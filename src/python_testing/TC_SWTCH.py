@@ -53,6 +53,7 @@ class TC_SwitchTests(MatterBaseTest):
         """Returns a description of this test"""
         return "[TC-SWTCH-2.4] Momentary Switch Long Press Verification"
 
+    # TODO(#34656): Fill test steps
     # def steps_TC_SWTCH_2_4(self) -> list[TestStep]:
     #     steps = [
     #         TestStep("0", "Commissioning, already done", is_commissioning=True),
@@ -79,10 +80,6 @@ class TC_SwitchTests(MatterBaseTest):
     def _use_button_simulator(self) -> bool:
         return self.check_pics("PICS_SDK_CI_ONLY") or self.user_params.get("use_button_simulator", False)
 
-    def _ask_for_switch_idle(self):
-        if not self._use_button_simulator():
-            self.wait_for_user_input(prompt_msg="Ensure switch is idle")
-
     def _send_multi_press_named_pipe_command(self, endpoint_id: int, number_of_presses: int, pressed_position: int, feature_map: uint, multi_press_max: uint):
         command_dict = {"Name": 'SimulateMultiPress', "EndpointId": endpoint_id,
                         "ButtonId": pressed_position, "MultiPressPressedTimeMillis": 500, "MultiPressReleasedTimeMillis": 500,
@@ -93,6 +90,20 @@ class TC_SwitchTests(MatterBaseTest):
         command_dict = {"Name": "SimulateLongPress", "EndpointId": endpoint_id,
                         "ButtonId": pressed_position, "LongPressDelayMillis": 5000, "LongPressDurationMillis": 5500, "FeatureMap": feature_map}
         self._send_named_pipe_command(command_dict)
+
+    def _send_latching_switch_named_pipe_command(self, endpoint_id: int, new_position: int):
+        command_dict = {"Name": "SimulateLatchPosition", "EndpointId": endpoint_id, "PositionId": new_position}
+        self._send_named_pipe_command(command_dict)
+
+    def _ask_for_switch_idle(self):
+        if not self._use_button_simulator():
+            self.wait_for_user_input(prompt_msg="Ensure switch is idle")
+
+    def _ask_for_switch_position(self, endpoint_id: int, new_position: int):
+        if not self._use_button_simulator():
+            self.wait_for_user_input(prompt_msg=f"Move latched switch to position {new_position}, if it is not already there.")
+        else:
+            self._send_latching_switch_named_pipe_command(endpoint_id, new_position)
 
     def _ask_for_multi_press_short_long(self, endpoint_id: int, pressed_position: int, feature_map: uint, multi_press_max: uint):
         if not self._use_button_simulator():
@@ -105,7 +116,8 @@ class TC_SwitchTests(MatterBaseTest):
             self.wait_for_user_input(msg)
         else:
             # This is just a simulator, ignore the long press instruction for now, it doesn't matter for the CI. It does for cert.
-            self._send_multi_press_named_pipe_command(endpoint_id, 2, pressed_position, feature_map, multi_press_max)
+            self._send_multi_press_named_pipe_command(
+                endpoint_id, number_of_presses=2, pressed_position=pressed_position, feature_map=feature_map, multi_press_max=multi_press_max)
 
     def _ask_for_multi_press_long_short(self, endpoint_id, pressed_position, feature_map: int):
         if not self._use_button_simulator():
@@ -153,7 +165,7 @@ class TC_SwitchTests(MatterBaseTest):
             time.sleep(self.keep_pressed_delay/1000)
 
     def _placeholder_for_step(self, step_id: str):
-        # TODO: Global search an replace of `self._placeholder_for_step` with `self.step` when done.
+        # TODO(#34656): Global search an replace of `self._placeholder_for_step` with `self.step` when done.
         logging.info(f"Step {step_id}")
         pass
 
@@ -259,7 +271,7 @@ class TC_SwitchTests(MatterBaseTest):
 
     @per_endpoint_test(has_feature(Clusters.Switch, Clusters.Switch.Bitmaps.Feature.kMomentarySwitch))
     async def test_TC_SWTCH_2_4(self):
-        # TODO: Make this come from PIXIT
+        # TODO(#34656): Make this come from PIXIT
         switch_pressed_position = 1
         post_prompt_settle_delay_seconds = 10.0
 
@@ -360,6 +372,90 @@ class TC_SwitchTests(MatterBaseTest):
                 return True
             remaining = end_time - datetime.now()
         return False
+
+    def steps_TC_SWTCH_2_2(self):
+        return [TestStep(1, test_plan_support.commission_if_required(), "", is_commissioning=True),
+                TestStep(2, "Set up subscription to all events of Switch cluster on the endpoint"),
+                TestStep(3, "Operator sets switch to first position on the DUT"),
+                TestStep(4, "TH reads the CurrentPosition attribute from the DUT", "Verify that the value is 0"),
+                TestStep(5, "Operator sets switch to second position (one) on the DUT",
+                         "Verify that the TH receives SwitchLatched event with NewPosition set to 1 from the DUT"),
+                TestStep(6, "TH reads the CurrentPosition attribute from the DUT", "Verify that the value is 1"),
+                TestStep(7, "If there are more than 2 positions, test subsequent positions of the DUT"),
+                TestStep(8, "Operator sets switch to first position on the DUT."),
+                TestStep(9, "Wait 10 seconds for event reports stable." "Verify that last SwitchLatched event received is for NewPosition 0."),
+                TestStep(10, "TH reads the CurrentPosition attribute from the DUT", "Verify that the value is 0"),
+                ]
+
+    @per_endpoint_test(has_feature(Clusters.Switch, Clusters.Switch.Bitmaps.Feature.kLatchingSwitch))
+    async def test_TC_SWTCH_2_2(self):
+        post_prompt_settle_delay_seconds = 10.0
+
+        # Step 1: Commissioning - already done
+        self.step(1)
+
+        cluster = Clusters.Switch
+        endpoint_id = self.matter_test_config.endpoint
+
+        # Step 2: Set up subscription to all events of Switch cluster on the endpoint.
+        self.step(2)
+        event_listener = EventChangeCallback(cluster)
+        await event_listener.start(self.default_controller, self.dut_node_id, endpoint=endpoint_id)
+
+        # Step 3: Operator sets switch to first position on the DUT.
+        self.step(3)
+        self._ask_for_switch_position(endpoint_id, new_position=0)
+        event_listener.flush_events()
+
+        # Step 4: TH reads the CurrentPosition attribute from the DUT.
+        # Verify that the value is 0.
+        self.step(4)
+        button_val = await self.read_single_attribute_check_success(cluster=cluster, attribute=cluster.Attributes.CurrentPosition)
+        asserts.assert_equal(button_val, 0, "Switch position value is not 0")
+
+        # Step 5: Operator sets switch to second position (one) on the DUT",
+        # Verify that the TH receives SwitchLatched event with NewPosition set to 1 from the DUT
+        self.step(5)
+        expected_switch_position = 1
+        self._ask_for_switch_position(endpoint_id, expected_switch_position)
+
+        data = event_listener.wait_for_event_report(cluster.Events.SwitchLatched, timeout_sec=post_prompt_settle_delay_seconds)
+        logging.info(f"-> SwitchLatched event last received: {data}")
+        asserts.assert_equal(data, cluster.Events.SwitchLatched(
+            newPosition=expected_switch_position), "Did not get expected switch position")
+
+        # Step 6: TH reads the CurrentPosition attribute from the DUT", "Verify that the value is 1
+        self.step(6)
+        button_val = await self.read_single_attribute_check_success(cluster=cluster, attribute=cluster.Attributes.CurrentPosition)
+        asserts.assert_equal(button_val, expected_switch_position, f"Switch position is not {expected_switch_position}")
+
+        # Step 7: If there are more than 2 positions, test subsequent positions of the DUT
+        # # TODO(#34656): Implement loop for > 2 total positions
+        self.skip_step(7)
+
+        # Step 8: Operator sets switch to first position on the DUT.
+        self.step(8)
+        event_listener.flush_events()
+        self._ask_for_switch_position(endpoint_id, new_position=0)
+
+        # Step 9: Wait 10 seconds for event reports stable.
+        # Verify that last SwitchLatched event received is for NewPosition 0.
+        self.step(9)
+        time.sleep(10.0)
+
+        expected_switch_position = 0
+        last_event = event_listener.get_last_event()
+        asserts.assert_is_not_none(last_event, "Did not get SwitchLatched events since last operator action.")
+        last_event_data = last_event.Data
+        logging.info(f"-> SwitchLatched event last received: {last_event_data}")
+        asserts.assert_equal(last_event_data, cluster.Events.SwitchLatched(
+            newPosition=expected_switch_position), "Did not get expected switch position")
+
+        # Step 10: TH reads the CurrentPosition attribute from the DUT.
+        # Verify that the value is 0
+        self.step(10)
+        button_val = await self.read_single_attribute_check_success(cluster=cluster, attribute=cluster.Attributes.CurrentPosition)
+        asserts.assert_equal(button_val, 0, "Button value is not 0")
 
     def steps_TC_SWTCH_2_3(self):
         return [TestStep(1, test_plan_support.commission_if_required(), "", is_commissioning=True),
