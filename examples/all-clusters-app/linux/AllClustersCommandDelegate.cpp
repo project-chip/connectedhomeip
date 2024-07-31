@@ -672,7 +672,6 @@ void AllClustersAppCommandHandler::OnOvenOperationalStateChange(std::string devi
     OperationalState::Instance * operationalStateInstance = OvenCavityOperationalState::GetOperationalStateInstance();
     if (operation == "Start" || operation == "Resume")
     {
-        // operationalStateInstance->SetOperationalState(to_underlying(OperationalState::OperationalStateEnum::kRunning));
         operationalStateInstance->SetOperationalState(to_underlying(OperationalState::OperationalStateEnum::kRunning));
     }
     else if (operation == "Pause")
