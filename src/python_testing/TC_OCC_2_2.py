@@ -79,7 +79,7 @@ class TC_OCC_2_2(MatterBaseTest):
             (N, N, N): TypeEnum.kPir,
             (Y, N, N): TypeEnum.kPir,
             (N, Y, N): TypeEnum.kUltrasonic,
-            (Y, Y, N): TypeEnum.kUltrasonic,
+            (Y, Y, N): TypeEnum.kPIRAndUltrasonic,
             (N, N, Y): TypeEnum.kPhysicalContact,
             (Y, N, Y): TypeEnum.kPir,
             (N, Y, Y): TypeEnum.kUltrasonic,
