@@ -26,9 +26,9 @@ namespace Ember {
 
 using Protocols::InteractionModel::Status;
 
-std::variant<const EmberAfCluster *,             // global attribute, data from a cluster
-             const EmberAfAttributeMetadata *,   // a specific attribute stored by ember
-             Status // one of Status::Unsupported*
+std::variant<const EmberAfCluster *,           // global attribute, data from a cluster
+             const EmberAfAttributeMetadata *, // a specific attribute stored by ember
+             Status                            // one of Status::Unsupported*
              >
 FindAttributeMetadata(const ConcreteAttributePath & aPath)
 {

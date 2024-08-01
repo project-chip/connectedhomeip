@@ -90,7 +90,7 @@ public:
     /// `handler` is used to send back the reply.
     ///    - returning a value other than Success implies an error reply (error and data are mutually exclusive)
     ///
-    /// Returning anything other than CHIP_NO_ERROR or Status::Success (i.e. success without a return code) 
+    /// Returning anything other than CHIP_NO_ERROR or Status::Success (i.e. success without a return code)
     /// means that the invoke will be considered to be returning the given status WITHOUT any data (any data
     /// that was sent via Handler is to be rolled back/discarded).
     ///
