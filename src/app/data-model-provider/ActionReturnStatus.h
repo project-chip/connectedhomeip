@@ -32,13 +32,12 @@ namespace DataModel {
 /// which is a code (InteractionModel::Status) and may have an associated
 /// cluster-specific code.
 ///
-/// However some actions specifically may return additional errors for
-/// chunking (i.e. out of space, retry or send existing partial data) hence
-/// the exitance of this class:
+/// However some actions specifically may return additional information for
+/// chunking, hence the existence of this class:
 ///
 ///   - encapsulates a ClusterStatusCode for an actual action result
 ///   - encapsulates a underlying CHIP_ERROR for reporting purposes
-///     and to check for out-of-space specific errors
+///   - has a way to check for "chunking needed" status.
 ///
 /// The class is directly constructible from statuses (non-exlicit) to make
 /// returning of values easy.
@@ -75,7 +74,7 @@ public:
     /// Generally this is when the return is based on CHIP_ERROR_NO_MEMORY or CHIP_ERROR_BUFFER_TOO_SMALL
     bool IsOutOfSpaceEncodingResponse() const;
 
-    // NOTE: operator== will assume statues the same between CHIP_GLOBAL_IM_ERROR and a raw cluster status
+    // NOTE: operator== will treat a CHIP_GLOBAL_IM_ERROR and a raw cluster status as equal if the statuses match,
     //       even though a CHIP_ERROR has some formatting info like file/line
     bool operator==(const ActionReturnStatus & other) const;
     bool operator!=(const ActionReturnStatus & other) const { return !(*this == other); }
