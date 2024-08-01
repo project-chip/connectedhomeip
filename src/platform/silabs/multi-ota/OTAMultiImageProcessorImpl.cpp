@@ -420,9 +420,6 @@ void OTAMultiImageProcessorImpl::HandleApply(intptr_t context)
 
     ChipLogProgress(SoftwareUpdate, "HandleApply: Finished");
 
-    // TODO: check where to put this
-    // ConfigurationManagerImpl().StoreSoftwareUpdateCompleted();
-
     // This reboots the device
     CORE_CRITICAL_SECTION(bootloader_rebootAndInstall();)
 }

@@ -52,7 +52,7 @@ if (chip_build_tests) {
     tests = [
       "${chip_root}/src/app/data-model/tests",
       "${chip_root}/src/app/cluster-building-blocks/tests",
-      "${chip_root}/src/app/data-model-interface/tests",
+      "${chip_root}/src/app/data-model-provider/tests",
       "${chip_root}/src/access/tests",
       "${chip_root}/src/crypto/tests",
       "${chip_root}/src/inet/tests",
@@ -87,11 +87,11 @@ if (chip_build_tests) {
       # are split, we can re-visit this (and likely many others)
       #
       # In particular:
-      #   "app/codegen-data-model/tests" contains symbols for ember mocks which
+      #   "app/codegen-data-model-provider/tests" contains symbols for ember mocks which
       #                                  are used by other tests
 
       tests += [
-        "${chip_root}/src/app/codegen-data-model/tests",
+        "${chip_root}/src/app/codegen-data-model-provider/tests",
         "${chip_root}/src/setup_payload/tests",
         "${chip_root}/src/transport/raw/tests",
       ]

@@ -59,23 +59,28 @@ Davis, CA 95616, USA
 -->
 <cluster xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="types types.xsd cluster cluster.xsd" id="0x0451" name="Wi-Fi Network Management Cluster" revision="1">
   <revisionHistory>
-    <revision revision="1" summary="Initial Release"/>
+    <revision revision="1" summary="Initial revision"/>
   </revisionHistory>
   <clusterIds>
     <clusterId id="0x0451" name="Wi-Fi Network Management"/>
   </clusterIds>
   <classification hierarchy="base" role="application" picsCode="WIFINM" scope="Endpoint"/>
   <attributes>
-    <attribute id="0x0001" name="SSID" type="octstr" default="null">
+    <attribute id="0x0000" name="SSID" type="octstr" default="null">
       <access read="true" readPrivilege="view"/>
       <quality changeOmitted="false" nullable="true" scene="false" persistence="nonVolatile" reportable="false" sourceAttribution="false" quieterReporting="false"/>
       <mandatoryConform/>
       <constraint type="lengthBetween" from="1" to="32"/>
     </attribute>
+    <attribute id="0x0001" name="PassphraseSurrogate" type="uint64" default="null">
+      <access read="true" readPrivilege="manage"/>
+      <quality changeOmitted="false" nullable="true" scene="false" persistence="nonVolatile" reportable="false" sourceAttribution="false" quieterReporting="false"/>
+      <mandatoryConform/>
+    </attribute>
   </attributes>
   <commands>
     <command id="0x00" name="NetworkPassphraseRequest" direction="commandToServer" response="NetworkPassphraseResponse">
-      <access invokePrivilege="admin"/>
+      <access invokePrivilege="manage"/>
       <mandatoryConform/>
     </command>
     <command id="0x01" name="NetworkPassphraseResponse" direction="responseFromServer">

@@ -17,7 +17,7 @@
 #include <app/reporting/Read-DataModel.h>
 
 #include <app/AppConfig.h>
-#include <app/data-model-interface/DataModel.h>
+#include <app/data-model-provider/Provider.h>
 #include <app/util/MatterCallbacks.h>
 
 namespace chip {
@@ -33,7 +33,7 @@ bool IsOutOfSpaceError(CHIP_ERROR err)
 
 } // namespace
 
-CHIP_ERROR RetrieveClusterData(InteractionModel::DataModel * dataModel, const Access::SubjectDescriptor & subjectDescriptor,
+CHIP_ERROR RetrieveClusterData(DataModel::Provider * dataModel, const Access::SubjectDescriptor & subjectDescriptor,
                                bool isFabricFiltered, AttributeReportIBs::Builder & reportBuilder,
                                const ConcreteReadAttributePath & path, AttributeEncodeState * encoderState)
 {
@@ -45,17 +45,17 @@ CHIP_ERROR RetrieveClusterData(InteractionModel::DataModel * dataModel, const Ac
                                                           DataModelCallbacks::OperationOrder::Pre, path);
 #endif // !CHIP_CONFIG_USE_EMBER_DATA_MODEL
 
-    InteractionModel::ReadAttributeRequest readRequest;
+    DataModel::ReadAttributeRequest readRequest;
 
     if (isFabricFiltered)
     {
-        readRequest.readFlags.Set(InteractionModel::ReadFlags::kFabricFiltered);
+        readRequest.readFlags.Set(DataModel::ReadFlags::kFabricFiltered);
     }
     readRequest.subjectDescriptor = subjectDescriptor;
     readRequest.path              = path;
 
     DataVersion version = 0;
-    if (std::optional<InteractionModel::ClusterInfo> clusterInfo = dataModel->GetClusterInfo(path); clusterInfo.has_value())
+    if (std::optional<DataModel::ClusterInfo> clusterInfo = dataModel->GetClusterInfo(path); clusterInfo.has_value())
     {
         version = clusterInfo->dataVersion;
     }

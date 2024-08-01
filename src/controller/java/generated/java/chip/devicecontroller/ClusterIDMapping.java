@@ -3086,6 +3086,10 @@ public class ClusterIDMapping {
             RegulatoryConfig(2L),
             LocationCapability(3L),
             SupportsConcurrentConnection(4L),
+            TCAcceptedVersion(5L),
+            TCMinRequiredVersion(6L),
+            TCAcknowledgements(7L),
+            TCAcknowledgementsRequired(8L),
             GeneratedCommandList(65528L),
             AcceptedCommandList(65529L),
             EventList(65530L),
@@ -3134,7 +3138,8 @@ public class ClusterIDMapping {
         public enum Command {
             ArmFailSafe(0L),
             SetRegulatoryConfig(2L),
-            CommissioningComplete(4L),;
+            CommissioningComplete(4L),
+            SetTCAcknowledgements(6L),;
             private final long id;
             Command(long id) {
                 this.id = id;
@@ -3180,6 +3185,23 @@ public class ClusterIDMapping {
                     }
                     public static SetRegulatoryConfigCommandField value(int id) throws NoSuchFieldError {
                         for (SetRegulatoryConfigCommandField field : SetRegulatoryConfigCommandField.values()) {
+                        if (field.getID() == id) {
+                            return field;
+                        }
+                        }
+                        throw new NoSuchFieldError();
+                    }
+                }public enum SetTCAcknowledgementsCommandField {TCVersion(0),TCUserResponse(1),;
+                    private final int id;
+                    SetTCAcknowledgementsCommandField(int id) {
+                        this.id = id;
+                    }
+
+                    public int getID() {
+                        return id;
+                    }
+                    public static SetTCAcknowledgementsCommandField value(int id) throws NoSuchFieldError {
+                        for (SetTCAcknowledgementsCommandField field : SetTCAcknowledgementsCommandField.values()) {
                         if (field.getID() == id) {
                             return field;
                         }
@@ -4438,6 +4460,7 @@ public class ClusterIDMapping {
             VendorName(1L),
             VendorID(2L),
             ProductName(3L),
+            ProductID(4L),
             NodeLabel(5L),
             HardwareVersion(7L),
             HardwareVersionString(8L),
@@ -4520,7 +4543,24 @@ public class ClusterIDMapping {
                 }
                 throw new NoSuchFieldError();
             }
-        }@Override
+        }public enum KeepActiveCommandField {StayActiveDuration(0),;
+                    private final int id;
+                    KeepActiveCommandField(int id) {
+                        this.id = id;
+                    }
+
+                    public int getID() {
+                        return id;
+                    }
+                    public static KeepActiveCommandField value(int id) throws NoSuchFieldError {
+                        for (KeepActiveCommandField field : KeepActiveCommandField.values()) {
+                        if (field.getID() == id) {
+                            return field;
+                        }
+                        }
+                        throw new NoSuchFieldError();
+                    }
+                }@Override
         public String getAttributeName(long id) throws NoSuchFieldError {
             return Attribute.value(id).toString();
         }
@@ -17715,6 +17755,8 @@ public class ClusterIDMapping {
             TimedWriteBoolean(48L),
             GeneralErrorBoolean(49L),
             ClusterErrorBoolean(50L),
+            GlobalEnum(51L),
+            GlobalStruct(52L),
             Unsupported(255L),
             NullableBoolean(16384L),
             NullableBitmap8(16385L),
@@ -17750,6 +17792,8 @@ public class ClusterIDMapping {
             NullableRangeRestrictedInt16u(16424L),
             NullableRangeRestrictedInt16s(16425L),
             WriteOnlyInt8u(16426L),
+            NullableGlobalEnum(16435L),
+            NullableGlobalStruct(16436L),
             MeiInt8u(4294070017L),
             GeneratedCommandList(65528L),
             AcceptedCommandList(65529L),
@@ -17825,6 +17869,7 @@ public class ClusterIDMapping {
             TestBatchHelperRequest(22L),
             TestSecondBatchHelperRequest(23L),
             StringEchoRequest(24L),
+            GlobalEchoRequest(25L),
             TestDifferentVendorMeiRequest(4294049962L),;
             private final long id;
             Command(long id) {
@@ -18177,6 +18222,23 @@ public class ClusterIDMapping {
                     }
                     public static StringEchoRequestCommandField value(int id) throws NoSuchFieldError {
                         for (StringEchoRequestCommandField field : StringEchoRequestCommandField.values()) {
+                        if (field.getID() == id) {
+                            return field;
+                        }
+                        }
+                        throw new NoSuchFieldError();
+                    }
+                }public enum GlobalEchoRequestCommandField {Field1(0),Field2(1),;
+                    private final int id;
+                    GlobalEchoRequestCommandField(int id) {
+                        this.id = id;
+                    }
+
+                    public int getID() {
+                        return id;
+                    }
+                    public static GlobalEchoRequestCommandField value(int id) throws NoSuchFieldError {
+                        for (GlobalEchoRequestCommandField field : GlobalEchoRequestCommandField.values()) {
                         if (field.getID() == id) {
                             return field;
                         }

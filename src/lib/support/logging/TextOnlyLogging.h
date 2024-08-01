@@ -36,6 +36,7 @@
 
 #include <lib/core/CHIPConfig.h>
 
+#include <lib/support/Compiler.h>
 #include <lib/support/DLLUtil.h>
 #include <lib/support/EnforceFormat.h>
 #include <lib/support/VerificationMacrosNoLogging.h>
@@ -44,6 +45,7 @@
 #include <inttypes.h>
 #include <stdarg.h>
 #include <stdint.h>
+#include <typeinfo>
 
 #if CHIP_SYSTEM_CONFIG_PLATFORM_LOG && defined(CHIP_SYSTEM_CONFIG_PLATFORM_LOG_INCLUDE)
 #include CHIP_SYSTEM_CONFIG_PLATFORM_LOG_INCLUDE
@@ -291,6 +293,24 @@ using LogRedirectCallback_t = void (*)(const char * module, uint8_t category, co
 // A received header's initiator boolean is the inverse of the exchange's.
 #define ChipLogValueExchangeIdFromReceivedHeader(payloadHeader)                                                                    \
     ChipLogValueExchangeId((payloadHeader).GetExchangeID(), !(payloadHeader).IsInitiator())
+
+/**
+ * Logging helpers for logging the dynamic type of an object, if possible.
+ *
+ * Primarily useful when logging the type of delegates or similar objects when
+ * performing logging for a fatal error in DumpToLog().
+ *
+ * Example:
+ * @code
+ * ChipLogError(Foo, "Delegate=" ChipLogFormatRtti, ChipLogValueRtti(mDelegate));
+ * @endcode
+ */
+#define ChipLogFormatRtti "%s"
+#if CHIP_HAVE_RTTI
+#define ChipLogValueRtti(ptr) ((ptr) != nullptr ? typeid(*(ptr)).name() : "null")
+#else
+#define ChipLogValueRtti(ptr) ((ptr) != nullptr ? "?" : "null")
+#endif
 
 /**
  * Logging helpers for protocol ids.  A protocol id is a (vendor-id,

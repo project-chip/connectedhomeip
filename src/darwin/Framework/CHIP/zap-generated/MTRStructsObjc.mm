@@ -8825,6 +8825,8 @@ NS_ASSUME_NONNULL_BEGIN
         _g = @(0);
 
         _h = @(0);
+
+        _i = nil;
     }
     return self;
 }
@@ -8841,13 +8843,14 @@ NS_ASSUME_NONNULL_BEGIN
     other.f = self.f;
     other.g = self.g;
     other.h = self.h;
+    other.i = self.i;
 
     return other;
 }
 
 - (NSString *)description
 {
-    NSString * descriptionString = [NSString stringWithFormat:@"<%@: a:%@; b:%@; c:%@; d:%@; e:%@; f:%@; g:%@; h:%@; >", NSStringFromClass([self class]), _a, _b, _c, [_d base64EncodedStringWithOptions:0], _e, _f, _g, _h];
+    NSString * descriptionString = [NSString stringWithFormat:@"<%@: a:%@; b:%@; c:%@; d:%@; e:%@; f:%@; g:%@; h:%@; i:%@; >", NSStringFromClass([self class]), _a, _b, _c, [_d base64EncodedStringWithOptions:0], _e, _f, _g, _h, _i];
     return descriptionString;
 }
 
@@ -9008,6 +9011,8 @@ NS_ASSUME_NONNULL_BEGIN
         _b = @(0);
 
         _c = [MTRUnitTestingClusterSimpleStruct new];
+
+        _d = nil;
     }
     return self;
 }
@@ -9019,13 +9024,14 @@ NS_ASSUME_NONNULL_BEGIN
     other.a = self.a;
     other.b = self.b;
     other.c = self.c;
+    other.d = self.d;
 
     return other;
 }
 
 - (NSString *)description
 {
-    NSString * descriptionString = [NSString stringWithFormat:@"<%@: a:%@; b:%@; c:%@; >", NSStringFromClass([self class]), _a, _b, _c];
+    NSString * descriptionString = [NSString stringWithFormat:@"<%@: a:%@; b:%@; c:%@; d:%@; >", NSStringFromClass([self class]), _a, _b, _c, _d];
     return descriptionString;
 }
 

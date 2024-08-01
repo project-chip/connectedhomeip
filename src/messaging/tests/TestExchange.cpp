@@ -23,6 +23,7 @@
 #include <lib/core/StringBuilderAdapters.h>
 #include <lib/support/CHIPMem.h>
 #include <lib/support/CodeUtils.h>
+#include <lib/support/Pool.h>
 #include <messaging/ExchangeContext.h>
 #include <messaging/ExchangeMgr.h>
 #include <messaging/Flags.h>
@@ -219,4 +220,15 @@ TEST_F(TestExchange, CheckBasicExchangeMessageDispatch)
             });
     }
 }
+
+// A crude test to exercise VerifyOrDieWithObject() in ObjectPool and
+// the resulting DumpToLog() call on the ExchangeContext.
+// TODO: Find a way to automate this test without killing the process.
+// TEST_F(TestExchange, DumpExchangePoolToLog)
+// {
+//     MockExchangeDelegate delegate;
+//     ObjectPool<ExchangeContext, CHIP_CONFIG_MAX_EXCHANGE_CONTEXTS> pool;
+//     pool.CreateObject(&GetExchangeManager(), static_cast<uint16_t>(1234), GetSessionAliceToBob(), true, &delegate);
+// }
+
 } // namespace

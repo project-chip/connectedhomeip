@@ -116,9 +116,6 @@ Davis, CA 95616, USA
         </optionalConform>
       </otherwiseConform>
     </feature>
-    <feature bit="9" code="NOT" name="Notification" summary="Operation and Programming Notifications">
-      <optionalConform/>
-    </feature>
     <feature bit="10" code="YDSCH" name="YearDayAccessSchedules" summary="Lock supports year day user access schedules">
       <optionalConform/>
     </feature>
@@ -277,23 +274,6 @@ Davis, CA 95616, USA
         <optionalConform>
           <feature name="DPS"/>
         </optionalConform>
-      </item>
-    </enum>
-    <enum name="EventSourceEnum">
-      <item value="0" name="Keypad" summary="Event source is keypad">
-        <mandatoryConform/>
-      </item>
-      <item value="1" name="Remote" summary="Event source is remote">
-        <mandatoryConform/>
-      </item>
-      <item value="2" name="Manual" summary="Event source is manual">
-        <mandatoryConform/>
-      </item>
-      <item value="3" name="RFID" summary="Event source is RFID">
-        <mandatoryConform/>
-      </item>
-      <item value="255" name="Indeterminate" summary="Event source is unknown">
-        <mandatoryConform/>
       </item>
     </enum>
     <enum name="EventTypeEnum">
@@ -494,66 +474,6 @@ Davis, CA 95616, USA
         <optionalConform/>
       </item>
     </enum>
-    <enum name="OperationEventCodeEnum">
-      <item value="0" name="UnknownOrMfgSpecific" summary="Event code is unknown">
-        <optionalConform/>
-      </item>
-      <item value="1" name="Lock" summary="Event code is lock">
-        <optionalConform/>
-      </item>
-      <item value="2" name="Unlock" summary="Event code is unlock">
-        <optionalConform/>
-      </item>
-      <item value="3" name="LockFailureInvalidPINorRFID" summary="Event code is lock failure due to invalid PIN or RFID">
-        <optionalConform/>
-      </item>
-      <item value="4" name="LockFailureInvalidSchedule" summary="Event code is lock failure due to invalid schedule">
-        <optionalConform/>
-      </item>
-      <item value="5" name="UnlockFailureInvalidPINorRFID" summary="Event code is unlock failure due to invalid PIN or RFID">
-        <optionalConform/>
-      </item>
-      <item value="6" name="UnlockFailureInvalidSchedule" summary="Event code is unlock failure due to invalid schedule">
-        <optionalConform/>
-      </item>
-      <item value="7" name="OneTouchLock" summary="Event code is one touch lock">
-        <optionalConform/>
-      </item>
-      <item value="8" name="KeyLock" summary="Event code is key lock">
-        <optionalConform/>
-      </item>
-      <item value="9" name="KeyUnlock" summary="Event code is key unlock">
-        <optionalConform/>
-      </item>
-      <item value="10" name="AutoLock" summary="Event code is auto lock">
-        <optionalConform/>
-      </item>
-      <item value="11" name="ScheduleLock" summary="Event code is schedule lock">
-        <mandatoryConform>
-          <orTerm>
-            <feature name="WDSCH"/>
-            <feature name="YDSCH"/>
-          </orTerm>
-        </mandatoryConform>
-      </item>
-      <item value="12" name="ScheduleUnlock" summary="Event code is schedule unlock">
-        <mandatoryConform>
-          <orTerm>
-            <feature name="WDSCH"/>
-            <feature name="YDSCH"/>
-          </orTerm>
-        </mandatoryConform>
-      </item>
-      <item value="13" name="ManualLock" summary="Event code is manual lock (Key or Thumbturn)">
-        <optionalConform/>
-      </item>
-      <item value="14" name="ManualUnlock" summary="Event code is manual unlock (Key or Thumbturn)">
-        <optionalConform/>
-      </item>
-      <item value="15" name="NonAccessUserOperationEvent" summary="Event code is non access user operation">
-        <optionalConform/>
-      </item>
-    </enum>
     <enum name="OperationSourceEnum">
       <item value="0" name="Unspecified" summary="Lock/unlock operation came from unspecified source">
         <optionalConform/>
@@ -596,29 +516,6 @@ Davis, CA 95616, USA
         <mandatoryConform>
           <feature name="ALIRO"/>
         </mandatoryConform>
-      </item>
-    </enum>
-    <enum name="ProgrammingEventCodeEnum">
-      <item value="0" name="UnknownOrMfgSpecific" summary="Event code is unknown">
-        <optionalConform/>
-      </item>
-      <item value="1" name="ProgrammingCodeChanged" summary="Event code is code changed">
-        <optionalConform/>
-      </item>
-      <item value="2" name="PINCodeAdded" summary="Event code is PIN added">
-        <optionalConform/>
-      </item>
-      <item value="3" name="PINCodeCleared" summary="Event code is PIN cleared">
-        <optionalConform/>
-      </item>
-      <item value="4" name="PINCodeChanged" summary="Event code is PIN changed">
-        <optionalConform/>
-      </item>
-      <item value="5" name="RFIDCodeAdded" summary="Event code is RFID added">
-        <optionalConform/>
-      </item>
-      <item value="6" name="RFIDCodeCleared" summary="Event code is RFID cleared">
-        <optionalConform/>
       </item>
     </enum>
     <enum name="SoundVolumeEnum">
@@ -778,56 +675,6 @@ Davis, CA 95616, USA
         <mandatoryConform/>
       </bitfield>
     </bitmap>
-    <bitmap name="EventMaskBitmap">
-      <bitfield name="Bit0" bit="0" summary="State of bit 0">
-        <mandatoryConform/>
-      </bitfield>
-      <bitfield name="Bit1" bit="1" summary="State of bit 1">
-        <mandatoryConform/>
-      </bitfield>
-      <bitfield name="Bit2" bit="2" summary="State of bit 2">
-        <mandatoryConform/>
-      </bitfield>
-      <bitfield name="Bit3" bit="3" summary="State of bit 3">
-        <mandatoryConform/>
-      </bitfield>
-      <bitfield name="Bit4" bit="4" summary="State of bit 4">
-        <mandatoryConform/>
-      </bitfield>
-      <bitfield name="Bit5" bit="5" summary="State of bit 5">
-        <mandatoryConform/>
-      </bitfield>
-      <bitfield name="Bit6" bit="6" summary="State of bit 6">
-        <mandatoryConform/>
-      </bitfield>
-      <bitfield name="Bit7" bit="7" summary="State of bit 7">
-        <mandatoryConform/>
-      </bitfield>
-      <bitfield name="Bit8" bit="8" summary="State of bit 8">
-        <mandatoryConform/>
-      </bitfield>
-      <bitfield name="Bit9" bit="9" summary="State of bit 9">
-        <mandatoryConform/>
-      </bitfield>
-      <bitfield name="Bit10" bit="10" summary="State of bit 10">
-        <mandatoryConform/>
-      </bitfield>
-      <bitfield name="Bit11" bit="11" summary="State of bit 11">
-        <mandatoryConform/>
-      </bitfield>
-      <bitfield name="Bit12" bit="12" summary="State of bit 12">
-        <mandatoryConform/>
-      </bitfield>
-      <bitfield name="Bit13" bit="13" summary="State of bit 13">
-        <mandatoryConform/>
-      </bitfield>
-      <bitfield name="Bit14" bit="14" summary="State of bit 14">
-        <mandatoryConform/>
-      </bitfield>
-      <bitfield name="Bit15" bit="15" summary="State of bit 15">
-        <mandatoryConform/>
-      </bitfield>
-    </bitmap>
     <bitmap name="LocalProgrammingFeaturesBitmap">
       <bitfield name="AddUsersCredentialsSchedules" bit="0" summary="The state of the ability to add users, credentials or schedules on the device">
         <mandatoryConform/>
@@ -871,7 +718,7 @@ Davis, CA 95616, USA
   <attributes>
     <attribute id="0x0000" name="LockState" type="LockStateEnum">
       <access read="true" readPrivilege="view"/>
-      <quality changeOmitted="false" nullable="true" scene="true" persistence="volatile" reportable="true" sourceAttribution="false" quieterReporting="false"/>
+      <quality changeOmitted="false" nullable="true" scene="false" persistence="volatile" reportable="true" sourceAttribution="false" quieterReporting="false"/>
       <mandatoryConform/>
       <constraint type="desc"/>
     </attribute>
@@ -1119,67 +966,6 @@ Davis, CA 95616, USA
       <access read="true" write="true" readPrivilege="view" writePrivilege="admin"/>
       <quality changeOmitted="false" nullable="false" scene="false" persistence="volatile" reportable="true" sourceAttribution="false" quieterReporting="false"/>
       <optionalConform/>
-    </attribute>
-    <attribute id="0x0041" name="KeypadOperationEventMask" type="EventMaskBitmap" default="0xFFFF">
-      <access read="true" write="true" readPrivilege="view" writePrivilege="admin"/>
-      <quality changeOmitted="false" nullable="false" scene="false" persistence="volatile" reportable="true" sourceAttribution="false" quieterReporting="false"/>
-      <optionalConform>
-        <andTerm>
-          <feature name="NOT"/>
-          <feature name="PIN"/>
-        </andTerm>
-      </optionalConform>
-    </attribute>
-    <attribute id="0x0042" name="RemoteOperationEventMask" type="EventMaskBitmap" default="0xFFFF">
-      <access read="true" write="true" readPrivilege="view" writePrivilege="admin"/>
-      <quality changeOmitted="false" nullable="false" scene="false" persistence="volatile" reportable="true" sourceAttribution="false" quieterReporting="false"/>
-      <optionalConform>
-        <feature name="NOT"/>
-      </optionalConform>
-    </attribute>
-    <attribute id="0x0043" name="ManualOperationEventMask" type="EventMaskBitmap" default="0xFFFF">
-      <access read="true" write="true" readPrivilege="view" writePrivilege="admin"/>
-      <quality changeOmitted="false" nullable="false" scene="false" persistence="volatile" reportable="true" sourceAttribution="false" quieterReporting="false"/>
-      <optionalConform>
-        <feature name="NOT"/>
-      </optionalConform>
-    </attribute>
-    <attribute id="0x0044" name="RFIDOperationEventMask" type="EventMaskBitmap" default="0xFFFF">
-      <access read="true" write="true" readPrivilege="view" writePrivilege="admin"/>
-      <quality changeOmitted="false" nullable="false" scene="false" persistence="volatile" reportable="true" sourceAttribution="false" quieterReporting="false"/>
-      <optionalConform>
-        <andTerm>
-          <feature name="NOT"/>
-          <feature name="RID"/>
-        </andTerm>
-      </optionalConform>
-    </attribute>
-    <attribute id="0x0045" name="KeypadProgrammingEventMask" type="EventMaskBitmap" default="0xFFFF">
-      <access read="true" write="true" readPrivilege="view" writePrivilege="admin"/>
-      <quality changeOmitted="false" nullable="false" scene="false" persistence="volatile" reportable="true" sourceAttribution="false" quieterReporting="false"/>
-      <optionalConform>
-        <andTerm>
-          <feature name="NOT"/>
-          <feature name="PIN"/>
-        </andTerm>
-      </optionalConform>
-    </attribute>
-    <attribute id="0x0046" name="RemoteProgrammingEventMask" type="EventMaskBitmap" default="0xFFFF">
-      <access read="true" write="true" readPrivilege="view" writePrivilege="admin"/>
-      <quality changeOmitted="false" nullable="false" scene="false" persistence="volatile" reportable="true" sourceAttribution="false" quieterReporting="false"/>
-      <optionalConform>
-        <feature name="NOT"/>
-      </optionalConform>
-    </attribute>
-    <attribute id="0x0047" name="RFIDProgrammingEventMask" type="EventMaskBitmap" default="0xFFFF">
-      <access read="true" write="true" readPrivilege="view" writePrivilege="admin"/>
-      <quality changeOmitted="false" nullable="false" scene="false" persistence="volatile" reportable="true" sourceAttribution="false" quieterReporting="false"/>
-      <optionalConform>
-        <andTerm>
-          <feature name="NOT"/>
-          <feature name="RID"/>
-        </andTerm>
-      </optionalConform>
     </attribute>
     <attribute id="0x0080" name="AliroReaderVerificationKey" type="octstr" default="null">
       <access read="true" readPrivilege="admin"/>
@@ -1956,47 +1742,6 @@ Davis, CA 95616, USA
         <mandatoryConform/>
         <constraint type="between" from="1" to="NumberOfTotalUsersSupported"/>
         <constraint type="allowed" value="0xFFFE"/>
-      </field>
-    </command>
-    <command id="0x20" name="OperatingEventNotification" direction="commandToClient">
-      <access invokePrivilege="operate"/>
-      <optionalConform>
-        <feature name="NOT"/>
-      </optionalConform>
-    </command>
-    <command id="0x21" name="ProgrammingEventNotification" direction="commandToClient">
-      <access invokePrivilege="operate"/>
-      <optionalConform>
-        <feature name="NOT"/>
-      </optionalConform>
-      <field id="0" name="ProgramEventSource" type="EventSourceEnum">
-        <mandatoryConform/>
-        <constraint type="desc"/>
-      </field>
-      <field id="1" name="ProgramEventCode" type="ProgrammingEventCodeEnum">
-        <mandatoryConform/>
-        <constraint type="desc"/>
-      </field>
-      <field id="2" name="UserID" type="uint16">
-        <mandatoryConform/>
-        <constraint type="desc"/>
-      </field>
-      <field id="3" name="PIN" type="octstr">
-        <mandatoryConform/>
-      </field>
-      <field id="4" name="UserType" type="UserTypeEnum">
-        <mandatoryConform/>
-        <constraint type="desc"/>
-      </field>
-      <field id="5" name="UserStatus" type="UserStatusEnum">
-        <mandatoryConform/>
-        <constraint type="desc"/>
-      </field>
-      <field id="6" name="LocalTime" type="epoch-s">
-        <mandatoryConform/>
-      </field>
-      <field id="7" name="Data" type="string">
-        <optionalConform/>
       </field>
     </command>
     <command id="0x22" name="SetCredential" direction="commandToServer" response="SetCredentialResponse">

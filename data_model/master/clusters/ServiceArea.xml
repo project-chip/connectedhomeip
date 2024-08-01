@@ -57,95 +57,77 @@ Davis, CA 95616, USA
 -->
 <cluster xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="types types.xsd cluster cluster.xsd" id="0x0150" name="Service Area Cluster" revision="1">
   <revisionHistory>
-    <revision revision="1" summary="Initial version"/>
+    <revision revision="1" summary="Initial revision"/>
   </revisionHistory>
   <clusterIds>
     <clusterId id="0x0150" name="Service Area"/>
   </clusterIds>
   <classification hierarchy="base" role="application" picsCode="SEAR" scope="Endpoint"/>
   <features>
-    <feature bit="0" code="LISTORDER" name="ListOrder" summary="The device operates at the selected locations in the list order">
+    <feature bit="0" code="SELRUN" name="SelectWhileRunning" summary="The device allows changing the selected areas while running">
       <optionalConform/>
     </feature>
-    <feature bit="1" code="SELRUN" name="SelectWhileRunning" summary="The device allows changing the selected locations while running">
+    <feature bit="1" code="PROG" name="ProgressReporting" summary="The device implements the progress reporting feature">
+      <optionalConform/>
+    </feature>
+    <feature bit="2" code="MAPS" name="Maps" summary="The device has map support">
       <optionalConform/>
     </feature>
   </features>
   <dataTypes>
     <enum name="OperationalStatusEnum">
-      <item value="0x00" name="Pending" summary="The device has not yet started operating, or has not finished but it is not currently operating, at the given location">
+      <item value="0x00" name="Pending" summary="The device has not yet started operating at the given area,
+                         or has not finished operating at that area but it is not currently
+                         operating at the area">
         <mandatoryConform/>
       </item>
-      <item value="0x01" name="Operating" summary="The device is currently operating at the given location">
+      <item value="0x01" name="Operating" summary="The device is currently operating at the given area">
         <mandatoryConform/>
       </item>
-      <item value="0x02" name="Skipped" summary="The device has skipped the given location, before or during operating at it">
+      <item value="0x02" name="Skipped" summary="The device has skipped the given area, before or during operating at it,
+                         due to a SkipArea command, due an out of band command (e.g. from the vendor's application),
+                         due to a vendor specific reason, such as a time limit used by the device,
+                         or due the device ending operating unsuccessfully">
         <mandatoryConform/>
       </item>
-      <item value="0x03" name="Completed" summary="The device has completed operating at the given location">
-        <mandatoryConform/>
-      </item>
-    </enum>
-    <enum name="SelectLocationsStatus">
-      <item value="0x00" name="Success" summary="Attempting to operate in the locations identified by the entries of the NewLocations field is allowed and possible. The SelectedLocations attribute is set to the value of the NewLocations field.">
-        <mandatoryConform/>
-      </item>
-      <item value="0x01" name="UnsupportedLocation" summary="The value of at least one of the entries of the NewLocations field doesn't match any entries in the SupportedLocations attribute.">
-        <mandatoryConform/>
-      </item>
-      <item value="0x02" name="DuplicatedLocations" summary="The NewLocations field contains at least two identical entries.">
-        <mandatoryConform/>
-      </item>
-      <item value="0x03" name="InvalidInMode" summary="The received request cannot be handled due to the current mode of the device.">
-        <mandatoryConform/>
-      </item>
-      <item value="0x04" name="InvalidSet" summary="The set of values is empty or invalid. For example, locations on different floors, that a robot knows it can't reach on its own.">
+      <item value="0x03" name="Completed" summary="The device has completed operating at the given area">
         <mandatoryConform/>
       </item>
     </enum>
-    <enum name="SkipCurrentLocationStatus">
-      <item value="0x00" name="Success" summary="Skipping to the next location is allowed and possible, or the device was operating at the last location and has stopped.">
-        <mandatoryConform/>
-      </item>
-      <item value="0x01" name="InvalidLocationList" summary="The SelectedLocations attribute is null.">
-        <mandatoryConform/>
-      </item>
-      <item value="0x02" name="InvalidInMode" summary="The received request cannot be handled due to the current mode of the device. For example, the CurrentLocation attribute is null.">
-        <mandatoryConform/>
-      </item>
-    </enum>
-    <struct name="LocationInfoStruct">
-      <field id="0" name="LocationInfo" type="homeloc">
+    <struct name="AreaInfoStruct">
+      <field id="0" name="LocationInfo" type="locationdesc">
         <quality nullable="true"/>
         <mandatoryConform/>
       </field>
-      <field id="1" name="LandmarkTag" type="tag">
-        <quality nullable="true"/>
-        <mandatoryConform/>
-      </field>
-      <field id="2" name="PositionTag" type="tag">
-        <quality nullable="true"/>
-        <mandatoryConform/>
-      </field>
-      <field id="3" name="SurfaceTag" type="tag">
+      <field id="1" name="LandmarkInfo" type="LandmarkInfoStruct">
         <quality nullable="true"/>
         <mandatoryConform/>
       </field>
     </struct>
-    <struct name="LocationStruct">
-      <field id="0" name="LocationID" type="uint32" default="MS">
+    <struct name="AreaStruct">
+      <field id="0" name="AreaID" type="uint32" default="MS">
         <mandatoryConform/>
       </field>
-      <field id="1" name="MapID" type="uint8" default="MS">
+      <field id="1" name="MapID" type="uint32" default="MS">
         <quality nullable="true"/>
         <mandatoryConform/>
+        <constraint type="desc"/>
       </field>
-      <field id="2" name="LocationInfo" type="LocationInfoStruct" default="MS">
+      <field id="2" name="AreaDesc" type="AreaInfoStruct" default="MS">
+        <mandatoryConform/>
+      </field>
+    </struct>
+    <struct name="LandmarkInfoStruct">
+      <field id="0" name="LandmarkTag" type="tag">
+        <mandatoryConform/>
+      </field>
+      <field id="1" name="PositionTag" type="tag">
+        <quality nullable="true"/>
         <mandatoryConform/>
       </field>
     </struct>
     <struct name="MapStruct">
-      <field id="0" name="MapID" type="uint8" default="MS">
+      <field id="0" name="MapID" type="uint32" default="MS">
         <mandatoryConform/>
       </field>
       <field id="1" name="Name" type="string" default="MS">
@@ -154,7 +136,7 @@ Davis, CA 95616, USA
       </field>
     </struct>
     <struct name="ProgressStruct">
-      <field id="0" name="LocationID" type="uint32" default="MS">
+      <field id="0" name="AreaID" type="uint32" default="MS">
         <mandatoryConform/>
       </field>
       <field id="1" name="Status" type="OperationalStatusEnum" default="MS">
@@ -164,92 +146,91 @@ Davis, CA 95616, USA
         <quality nullable="true"/>
         <optionalConform/>
       </field>
-      <field id="3" name="EstimatedTime" type="elapsed-s" default="MS">
+      <field id="3" name="InitialTimeEstimate" type="elapsed-s" default="MS">
         <quality nullable="true"/>
         <optionalConform/>
       </field>
     </struct>
   </dataTypes>
   <attributes>
-    <attribute id="0x0000" name="SupportedLocations" type="list" default="MS">
-      <entry type="LocationStruct"/>
+    <attribute id="0x0000" name="SupportedAreas" type="list" default="MS">
+      <entry type="AreaStruct"/>
       <access read="true" readPrivilege="view"/>
       <mandatoryConform/>
-      <constraint type="countBetween" from="1" to="255"/>
+      <constraint type="maxCount" value="255"/>
     </attribute>
     <attribute id="0x0001" name="SupportedMaps" type="list" default="MS">
       <entry type="MapStruct"/>
       <access read="true" readPrivilege="view"/>
-      <quality changeOmitted="false" nullable="true" scene="false" persistence="volatile" reportable="false" sourceAttribution="false" quieterReporting="false"/>
-      <mandatoryConform/>
-      <constraint type="countBetween" from="1" to="255"/>
+      <mandatoryConform>
+        <feature name="MAPS"/>
+      </mandatoryConform>
+      <constraint type="maxCount" value="255"/>
     </attribute>
-    <attribute id="0x0002" name="SelectedLocations" type="list" default="null">
+    <attribute id="0x0002" name="SelectedAreas" type="list" default="empty">
       <entry type="uint32"/>
       <access read="true" readPrivilege="view"/>
-      <quality changeOmitted="false" nullable="true" scene="false" persistence="volatile" reportable="false" sourceAttribution="false" quieterReporting="false"/>
       <mandatoryConform/>
       <constraint type="desc"/>
     </attribute>
-    <attribute id="0x0003" name="CurrentLocation" type="uint32" default="null">
+    <attribute id="0x0003" name="CurrentArea" type="uint32" default="null">
       <access read="true" readPrivilege="view"/>
       <quality changeOmitted="false" nullable="true" scene="false" persistence="volatile" reportable="false" sourceAttribution="false" quieterReporting="false"/>
-      <optionalConform/>
       <constraint type="desc"/>
     </attribute>
     <attribute id="0x0004" name="EstimatedEndTime" type="epoch-s" default="null">
       <access read="true" readPrivilege="view"/>
       <quality changeOmitted="false" nullable="true" scene="false" persistence="volatile" reportable="false" sourceAttribution="false" quieterReporting="true"/>
       <optionalConform>
-        <attribute name="CurrentLocation"/>
+        <attribute name="CurrentArea"/>
       </optionalConform>
     </attribute>
-    <attribute id="0x0005" name="Progress" type="list" default="null">
+    <attribute id="0x0005" name="Progress" type="list" default="empty">
       <entry type="ProgressStruct"/>
       <access read="true" readPrivilege="view"/>
-      <quality changeOmitted="false" nullable="true" scene="false" persistence="volatile" reportable="false" sourceAttribution="false" quieterReporting="false"/>
-      <optionalConform/>
-      <constraint type="countBetween" from="1" to="255"/>
+      <mandatoryConform>
+        <feature name="PROG"/>
+      </mandatoryConform>
+      <constraint type="maxCount" value="255"/>
     </attribute>
   </attributes>
   <commands>
-    <command id="0x00" name="SelectLocations" direction="commandToServer" response="SelectLocationsResponse">
+    <command id="0x00" name="SelectAreas" direction="commandToServer" response="SelectAreasResponse">
       <access invokePrivilege="operate"/>
       <mandatoryConform/>
-      <field id="0" name="NewLocations" type="list">
+      <field id="0" name="NewAreas" type="list">
         <entry type="uint32"/>
-        <quality nullable="true"/>
         <mandatoryConform/>
         <constraint type="desc"/>
       </field>
     </command>
-    <command id="0x01" name="SelectLocationsResponse" direction="responseFromServer">
-      <mandatoryConform>
-        <command name="SelectLocations"/>
-      </mandatoryConform>
-      <field id="0" name="Status" type="SelectLocationsStatus">
+    <command id="0x01" name="SelectAreasResponse" direction="responseFromServer">
+      <mandatoryConform/>
+      <field id="0" name="Status" type="SelectAreasStatus">
         <mandatoryConform/>
-        <constraint type="desc"/>
       </field>
       <field id="1" name="StatusText" type="string">
+        <mandatoryConform/>
         <constraint type="maxLength" value="256"/>
       </field>
     </command>
-    <command id="0x02" name="SkipCurrentLocation" direction="commandToServer" response="SkipCurrentLocationResponse">
+    <command id="0x02" name="SkipArea" direction="commandToServer" response="SkipAreaResponse">
       <access invokePrivilege="operate"/>
-      <optionalConform>
-        <attribute name="CurrentLocation"/>
-      </optionalConform>
+      <field id="0" name="SkippedArea" type="uint32">
+        <mandatoryConform/>
+        <constraint type="desc"/>
+      </field>
     </command>
-    <command id="0x03" name="SkipCurrentLocationResponse" direction="responseFromServer">
+    <command id="0x03" name="SkipAreaResponse" direction="responseFromServer">
       <mandatoryConform>
-        <command name="SkipCurrentLocation"/>
+        <command name="SkipArea"/>
       </mandatoryConform>
-      <field id="0" name="Status" type="SkipCurrentLocationStatus">
+      <field id="0" name="Status" type="SkipAreaStatus">
         <mandatoryConform/>
         <constraint type="desc"/>
       </field>
       <field id="1" name="StatusText" type="string">
+        <mandatoryConform/>
         <constraint type="maxLength" value="256"/>
       </field>
     </command>

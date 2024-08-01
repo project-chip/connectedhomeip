@@ -57,7 +57,7 @@ Davis, CA 95616, USA
 -->
 <cluster xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="types types.xsd cluster cluster.xsd" id="0x0053" name="Laundry Washer Controls Cluster" revision="2">
   <revisionHistory>
-    <revision revision="1" summary="Initial release"/>
+    <revision revision="1" summary="Initial revision"/>
     <revision revision="2" summary="Updated Feature Map Conformance"/>
   </revisionHistory>
   <clusterIds>

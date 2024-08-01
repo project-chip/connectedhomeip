@@ -17,7 +17,7 @@
  */
 
 #include <app/InteractionModelEngine.h>
-#include <app/codegen-data-model/Instance.h>
+#include <app/codegen-data-model-provider/Instance.h>
 #include <app/reporting/ReportSchedulerImpl.h>
 #include <app/reporting/SynchronizedReportSchedulerImpl.h>
 #include <app/tests/AppTestContext.h>
@@ -276,7 +276,7 @@ TEST_F_FROM_FIXTURE(TestReportScheduler, TestReadHandlerList)
     for (size_t i = 0; i < kNumMaxReadHandlers; i++)
     {
         ReadHandler * readHandler = readHandlerPool.CreateObject(nullCallback, exchangeCtx, ReadHandler::InteractionType::Subscribe,
-                                                                 &sScheduler, CodegenDataModelInstance());
+                                                                 &sScheduler, CodegenDataModelProviderInstance());
         sScheduler.OnSubscriptionEstablished(readHandler);
         ASSERT_NE(nullptr, readHandler);
         ASSERT_NE(nullptr, sScheduler.FindReadHandlerNode(readHandler));
@@ -340,19 +340,19 @@ TEST_F_FROM_FIXTURE(TestReportScheduler, TestReportTiming)
     // Dirty read handler, will be triggered at min interval
     // Test OnReadHandler created
     ReadHandler * readHandler1 = readHandlerPool.CreateObject(nullCallback, exchangeCtx, ReadHandler::InteractionType::Subscribe,
-                                                              &sScheduler, CodegenDataModelInstance());
+                                                              &sScheduler, CodegenDataModelProviderInstance());
 
     EXPECT_EQ(CHIP_NO_ERROR, MockReadHandlerSubscriptionTransaction(readHandler1, &sScheduler, 1, 2));
     readHandler1->ForceDirtyState();
 
     // Clean read handler, will be triggered at max interval
     ReadHandler * readHandler2 = readHandlerPool.CreateObject(nullCallback, exchangeCtx, ReadHandler::InteractionType::Subscribe,
-                                                              &sScheduler, CodegenDataModelInstance());
+                                                              &sScheduler, CodegenDataModelProviderInstance());
     EXPECT_EQ(CHIP_NO_ERROR, MockReadHandlerSubscriptionTransaction(readHandler2, &sScheduler, 0, 3));
 
     // Clean read handler, will be triggered at max interval, but will be cancelled before
     ReadHandler * readHandler3 = readHandlerPool.CreateObject(nullCallback, exchangeCtx, ReadHandler::InteractionType::Subscribe,
-                                                              &sScheduler, CodegenDataModelInstance());
+                                                              &sScheduler, CodegenDataModelProviderInstance());
     EXPECT_EQ(CHIP_NO_ERROR, MockReadHandlerSubscriptionTransaction(readHandler3, &sScheduler, 0, 3));
 
     // Confirms that none of the ReadHandlers are currently reportable
@@ -406,7 +406,7 @@ TEST_F_FROM_FIXTURE(TestReportScheduler, TestObserverCallbacks)
     sTestTimerDelegate.SetMockSystemTimestamp(Milliseconds64(0));
 
     ReadHandler * readHandler = readHandlerPool.CreateObject(nullCallback, exchangeCtx, ReadHandler::InteractionType::Subscribe,
-                                                             &sScheduler, CodegenDataModelInstance());
+                                                             &sScheduler, CodegenDataModelProviderInstance());
 
     EXPECT_EQ(CHIP_NO_ERROR, MockReadHandlerSubscriptionTransaction(readHandler, &sScheduler, 1, 2));
 
@@ -482,13 +482,13 @@ TEST_F_FROM_FIXTURE(TestReportScheduler, TestSynchronizedScheduler)
     sTestTimerSynchronizedDelegate.SetMockSystemTimestamp(System::Clock::Milliseconds64(0));
 
     ReadHandler * readHandler1 = readHandlerPool.CreateObject(nullCallback, exchangeCtx, ReadHandler::InteractionType::Subscribe,
-                                                              &syncScheduler, CodegenDataModelInstance());
+                                                              &syncScheduler, CodegenDataModelProviderInstance());
 
     EXPECT_EQ(CHIP_NO_ERROR, MockReadHandlerSubscriptionTransaction(readHandler1, &syncScheduler, 0, 2));
     ReadHandlerNode * node1 = syncScheduler.FindReadHandlerNode(readHandler1);
 
     ReadHandler * readHandler2 = readHandlerPool.CreateObject(nullCallback, exchangeCtx, ReadHandler::InteractionType::Subscribe,
-                                                              &syncScheduler, CodegenDataModelInstance());
+                                                              &syncScheduler, CodegenDataModelProviderInstance());
     EXPECT_EQ(CHIP_NO_ERROR, MockReadHandlerSubscriptionTransaction(readHandler2, &syncScheduler, 1, 3));
 
     ReadHandlerNode * node2 = syncScheduler.FindReadHandlerNode(readHandler2);
@@ -616,7 +616,7 @@ TEST_F_FROM_FIXTURE(TestReportScheduler, TestSynchronizedScheduler)
     sTestTimerSynchronizedDelegate.IncrementMockTimestamp(System::Clock::Milliseconds64(1000));
 
     ReadHandler * readHandler3 = readHandlerPool.CreateObject(nullCallback, exchangeCtx, ReadHandler::InteractionType::Subscribe,
-                                                              &syncScheduler, CodegenDataModelInstance());
+                                                              &syncScheduler, CodegenDataModelProviderInstance());
 
     EXPECT_EQ(CHIP_NO_ERROR, MockReadHandlerSubscriptionTransaction(readHandler3, &syncScheduler, 2, 3));
     ReadHandlerNode * node3 = syncScheduler.FindReadHandlerNode(readHandler3);
@@ -670,7 +670,7 @@ TEST_F_FROM_FIXTURE(TestReportScheduler, TestSynchronizedScheduler)
 
     // Now simulate a new readHandler being added with a max forcing a conflict
     ReadHandler * readHandler4 = readHandlerPool.CreateObject(nullCallback, exchangeCtx, ReadHandler::InteractionType::Subscribe,
-                                                              &syncScheduler, CodegenDataModelInstance());
+                                                              &syncScheduler, CodegenDataModelProviderInstance());
 
     EXPECT_EQ(CHIP_NO_ERROR, MockReadHandlerSubscriptionTransaction(readHandler4, &syncScheduler, 0, 1));
     ReadHandlerNode * node4 = syncScheduler.FindReadHandlerNode(readHandler4);

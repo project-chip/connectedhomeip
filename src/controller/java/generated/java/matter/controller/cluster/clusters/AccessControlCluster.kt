@@ -134,7 +134,7 @@ class AccessControlCluster(
   }
 
   suspend fun reviewFabricRestrictions(
-    arl: List<AccessControlClusterAccessRestrictionStruct>,
+    arl: List<AccessControlClusterCommissioningAccessRestrictionEntryStruct>,
     timedInvokeTimeout: Duration? = null,
   ) {
     val commandId: UInt = 0u

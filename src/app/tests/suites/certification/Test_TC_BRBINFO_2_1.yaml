@@ -140,21 +140,15 @@ tests:
       response:
           value: ProductNameValue
 
-    - label:
-          "Step 14: TH reads attribute ID 4 from the DUT (matches in ID to
-          ProductID in the parent cluster, but is absent on the
-          BridgedDeviceBasicInformation cluster)."
-      PICS: BRBINFO.S
-      cluster: "AnyCommands"
-      command: "ReadById"
-      arguments:
-          values:
-              - name: "ClusterId"
-                value: BRBINFO.ClusterId
-              - name: "AttributeId"
-                value: 0x0004
+    - label: "Step 14: TH reads ProductID from the DUT"
+      PICS: BRBINFO.S.A0004
+      command: "readAttribute"
+      attribute: "ProductID"
       response:
-          error: UNSUPPORTED_ATTRIBUTE
+          constraints:
+              type: int16u
+              minValue: 1
+              maxValue: 65534
 
     - label: "Step 17: TH reads NodeLabel from the DUT"
       PICS: BRBINFO.S.A0005

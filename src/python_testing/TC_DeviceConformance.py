@@ -76,8 +76,7 @@ class DeviceConformanceTests(BasicCompositionTests):
         ignore_attributes: dict[int, list[int]] = {}
         if ignore_in_progress:
             # This is a manually curated list of attributes that are in-progress in the SDK, but have landed in the spec
-            in_progress_attributes = {Clusters.BasicInformation.id: [0x15, 0x016],
-                                      Clusters.PowerSource.id: [0x20, 0x21, 0x22, 0x23, 0x24, 0x25, 0x26, 0x27, 0x28, 0x29, 0x2A]}
+            in_progress_attributes = {Clusters.ThreadNetworkDiagnostics.id: [0x3F, 0x40]}
             ignore_attributes.update(in_progress_attributes)
 
         if is_ci:
@@ -337,7 +336,9 @@ class TC_DeviceConformance(MatterBaseTest, DeviceConformanceTests):
         await self.setup_class_helper()
 
     def test_TC_IDM_10_2(self):
-        ignore_in_progress = self.user_params.get("ignore_in_progress", False)
+        # TODO: Turn this off after TE2
+        # https://github.com/project-chip/connectedhomeip/issues/34615
+        ignore_in_progress = self.user_params.get("ignore_in_progress", True)
         is_ci = self.check_pics('PICS_SDK_CI_ONLY')
         success, problems = self.check_conformance(ignore_in_progress, is_ci)
         self.problems.extend(problems)

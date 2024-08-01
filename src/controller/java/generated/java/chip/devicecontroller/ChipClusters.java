@@ -3982,11 +3982,11 @@ public class ChipClusters {
       return 0L;
     }
 
-    public void reviewFabricRestrictions(DefaultClusterCallback callback, ArrayList<ChipStructs.AccessControlClusterAccessRestrictionStruct> arl) {
+    public void reviewFabricRestrictions(DefaultClusterCallback callback, ArrayList<ChipStructs.AccessControlClusterCommissioningAccessRestrictionEntryStruct> arl) {
       reviewFabricRestrictions(callback, arl, 0);
     }
 
-    public void reviewFabricRestrictions(DefaultClusterCallback callback, ArrayList<ChipStructs.AccessControlClusterAccessRestrictionStruct> arl, int timedInvokeTimeoutMs) {
+    public void reviewFabricRestrictions(DefaultClusterCallback callback, ArrayList<ChipStructs.AccessControlClusterCommissioningAccessRestrictionEntryStruct> arl, int timedInvokeTimeoutMs) {
       final long commandId = 0L;
 
       ArrayList<StructElement> elements = new ArrayList<>();
@@ -8715,6 +8715,10 @@ public class ChipClusters {
     private static final long REGULATORY_CONFIG_ATTRIBUTE_ID = 2L;
     private static final long LOCATION_CAPABILITY_ATTRIBUTE_ID = 3L;
     private static final long SUPPORTS_CONCURRENT_CONNECTION_ATTRIBUTE_ID = 4L;
+    private static final long T_C_ACCEPTED_VERSION_ATTRIBUTE_ID = 5L;
+    private static final long T_C_MIN_REQUIRED_VERSION_ATTRIBUTE_ID = 6L;
+    private static final long T_C_ACKNOWLEDGEMENTS_ATTRIBUTE_ID = 7L;
+    private static final long T_C_ACKNOWLEDGEMENTS_REQUIRED_ATTRIBUTE_ID = 8L;
     private static final long GENERATED_COMMAND_LIST_ATTRIBUTE_ID = 65528L;
     private static final long ACCEPTED_COMMAND_LIST_ATTRIBUTE_ID = 65529L;
     private static final long EVENT_LIST_ATTRIBUTE_ID = 65530L;
@@ -8851,6 +8855,40 @@ public class ChipClusters {
         }}, commandId, commandArgs, timedInvokeTimeoutMs);
     }
 
+    public void setTCAcknowledgements(SetTCAcknowledgementsResponseCallback callback, Integer TCVersion, Integer TCUserResponse) {
+      setTCAcknowledgements(callback, TCVersion, TCUserResponse, 0);
+    }
+
+    public void setTCAcknowledgements(SetTCAcknowledgementsResponseCallback callback, Integer TCVersion, Integer TCUserResponse, int timedInvokeTimeoutMs) {
+      final long commandId = 6L;
+
+      ArrayList<StructElement> elements = new ArrayList<>();
+      final long TCVersionFieldID = 0L;
+      BaseTLVType TCVersiontlvValue = new UIntType(TCVersion);
+      elements.add(new StructElement(TCVersionFieldID, TCVersiontlvValue));
+
+      final long TCUserResponseFieldID = 1L;
+      BaseTLVType TCUserResponsetlvValue = new UIntType(TCUserResponse);
+      elements.add(new StructElement(TCUserResponseFieldID, TCUserResponsetlvValue));
+
+      StructType commandArgs = new StructType(elements);
+      invoke(new InvokeCallbackImpl(callback) {
+          @Override
+          public void onResponse(StructType invokeStructValue) {
+          final long errorCodeFieldID = 0L;
+          Integer errorCode = null;
+          for (StructElement element: invokeStructValue.value()) {
+            if (element.contextTagNum() == errorCodeFieldID) {
+              if (element.value(BaseTLVType.class).type() == TLVType.UInt) {
+                UIntType castingValue = element.value(UIntType.class);
+                errorCode = castingValue.value(Integer.class);
+              }
+            }
+          }
+          callback.onSuccess(errorCode);
+        }}, commandId, commandArgs, timedInvokeTimeoutMs);
+    }
+
     public interface ArmFailSafeResponseCallback extends BaseClusterCallback {
       void onSuccess(Integer errorCode, String debugText);
     }
@@ -8861,6 +8899,10 @@ public class ChipClusters {
 
     public interface CommissioningCompleteResponseCallback extends BaseClusterCallback {
       void onSuccess(Integer errorCode, String debugText);
+    }
+
+    public interface SetTCAcknowledgementsResponseCallback extends BaseClusterCallback {
+      void onSuccess(Integer errorCode);
     }
 
     public interface BasicCommissioningInfoAttributeCallback extends BaseAttributeCallback {
@@ -9020,6 +9062,110 @@ public class ChipClusters {
             callback.onSuccess(value);
           }
         }, SUPPORTS_CONCURRENT_CONNECTION_ATTRIBUTE_ID, minInterval, maxInterval);
+    }
+
+    public void readTCAcceptedVersionAttribute(
+        IntegerAttributeCallback callback) {
+      ChipAttributePath path = ChipAttributePath.newInstance(endpointId, clusterId, T_C_ACCEPTED_VERSION_ATTRIBUTE_ID);
+
+      readAttribute(new ReportCallbackImpl(callback, path) {
+          @Override
+          public void onSuccess(byte[] tlv) {
+            Integer value = ChipTLVValueDecoder.decodeAttributeValue(path, tlv);
+            callback.onSuccess(value);
+          }
+        }, T_C_ACCEPTED_VERSION_ATTRIBUTE_ID, true);
+    }
+
+    public void subscribeTCAcceptedVersionAttribute(
+        IntegerAttributeCallback callback, int minInterval, int maxInterval) {
+      ChipAttributePath path = ChipAttributePath.newInstance(endpointId, clusterId, T_C_ACCEPTED_VERSION_ATTRIBUTE_ID);
+
+      subscribeAttribute(new ReportCallbackImpl(callback, path) {
+          @Override
+          public void onSuccess(byte[] tlv) {
+            Integer value = ChipTLVValueDecoder.decodeAttributeValue(path, tlv);
+            callback.onSuccess(value);
+          }
+        }, T_C_ACCEPTED_VERSION_ATTRIBUTE_ID, minInterval, maxInterval);
+    }
+
+    public void readTCMinRequiredVersionAttribute(
+        IntegerAttributeCallback callback) {
+      ChipAttributePath path = ChipAttributePath.newInstance(endpointId, clusterId, T_C_MIN_REQUIRED_VERSION_ATTRIBUTE_ID);
+
+      readAttribute(new ReportCallbackImpl(callback, path) {
+          @Override
+          public void onSuccess(byte[] tlv) {
+            Integer value = ChipTLVValueDecoder.decodeAttributeValue(path, tlv);
+            callback.onSuccess(value);
+          }
+        }, T_C_MIN_REQUIRED_VERSION_ATTRIBUTE_ID, true);
+    }
+
+    public void subscribeTCMinRequiredVersionAttribute(
+        IntegerAttributeCallback callback, int minInterval, int maxInterval) {
+      ChipAttributePath path = ChipAttributePath.newInstance(endpointId, clusterId, T_C_MIN_REQUIRED_VERSION_ATTRIBUTE_ID);
+
+      subscribeAttribute(new ReportCallbackImpl(callback, path) {
+          @Override
+          public void onSuccess(byte[] tlv) {
+            Integer value = ChipTLVValueDecoder.decodeAttributeValue(path, tlv);
+            callback.onSuccess(value);
+          }
+        }, T_C_MIN_REQUIRED_VERSION_ATTRIBUTE_ID, minInterval, maxInterval);
+    }
+
+    public void readTCAcknowledgementsAttribute(
+        IntegerAttributeCallback callback) {
+      ChipAttributePath path = ChipAttributePath.newInstance(endpointId, clusterId, T_C_ACKNOWLEDGEMENTS_ATTRIBUTE_ID);
+
+      readAttribute(new ReportCallbackImpl(callback, path) {
+          @Override
+          public void onSuccess(byte[] tlv) {
+            Integer value = ChipTLVValueDecoder.decodeAttributeValue(path, tlv);
+            callback.onSuccess(value);
+          }
+        }, T_C_ACKNOWLEDGEMENTS_ATTRIBUTE_ID, true);
+    }
+
+    public void subscribeTCAcknowledgementsAttribute(
+        IntegerAttributeCallback callback, int minInterval, int maxInterval) {
+      ChipAttributePath path = ChipAttributePath.newInstance(endpointId, clusterId, T_C_ACKNOWLEDGEMENTS_ATTRIBUTE_ID);
+
+      subscribeAttribute(new ReportCallbackImpl(callback, path) {
+          @Override
+          public void onSuccess(byte[] tlv) {
+            Integer value = ChipTLVValueDecoder.decodeAttributeValue(path, tlv);
+            callback.onSuccess(value);
+          }
+        }, T_C_ACKNOWLEDGEMENTS_ATTRIBUTE_ID, minInterval, maxInterval);
+    }
+
+    public void readTCAcknowledgementsRequiredAttribute(
+        BooleanAttributeCallback callback) {
+      ChipAttributePath path = ChipAttributePath.newInstance(endpointId, clusterId, T_C_ACKNOWLEDGEMENTS_REQUIRED_ATTRIBUTE_ID);
+
+      readAttribute(new ReportCallbackImpl(callback, path) {
+          @Override
+          public void onSuccess(byte[] tlv) {
+            Boolean value = ChipTLVValueDecoder.decodeAttributeValue(path, tlv);
+            callback.onSuccess(value);
+          }
+        }, T_C_ACKNOWLEDGEMENTS_REQUIRED_ATTRIBUTE_ID, true);
+    }
+
+    public void subscribeTCAcknowledgementsRequiredAttribute(
+        BooleanAttributeCallback callback, int minInterval, int maxInterval) {
+      ChipAttributePath path = ChipAttributePath.newInstance(endpointId, clusterId, T_C_ACKNOWLEDGEMENTS_REQUIRED_ATTRIBUTE_ID);
+
+      subscribeAttribute(new ReportCallbackImpl(callback, path) {
+          @Override
+          public void onSuccess(byte[] tlv) {
+            Boolean value = ChipTLVValueDecoder.decodeAttributeValue(path, tlv);
+            callback.onSuccess(value);
+          }
+        }, T_C_ACKNOWLEDGEMENTS_REQUIRED_ATTRIBUTE_ID, minInterval, maxInterval);
     }
 
     public void readGeneratedCommandListAttribute(
@@ -15020,6 +15166,7 @@ public class ChipClusters {
     private static final long VENDOR_NAME_ATTRIBUTE_ID = 1L;
     private static final long VENDOR_I_D_ATTRIBUTE_ID = 2L;
     private static final long PRODUCT_NAME_ATTRIBUTE_ID = 3L;
+    private static final long PRODUCT_I_D_ATTRIBUTE_ID = 4L;
     private static final long NODE_LABEL_ATTRIBUTE_ID = 5L;
     private static final long HARDWARE_VERSION_ATTRIBUTE_ID = 7L;
     private static final long HARDWARE_VERSION_STRING_ATTRIBUTE_ID = 8L;
@@ -15050,14 +15197,18 @@ public class ChipClusters {
       return 0L;
     }
 
-    public void keepActive(DefaultClusterCallback callback) {
-      keepActive(callback, 0);
+    public void keepActive(DefaultClusterCallback callback, Long stayActiveDuration) {
+      keepActive(callback, stayActiveDuration, 0);
     }
 
-    public void keepActive(DefaultClusterCallback callback, int timedInvokeTimeoutMs) {
+    public void keepActive(DefaultClusterCallback callback, Long stayActiveDuration, int timedInvokeTimeoutMs) {
       final long commandId = 128L;
 
       ArrayList<StructElement> elements = new ArrayList<>();
+      final long stayActiveDurationFieldID = 0L;
+      BaseTLVType stayActiveDurationtlvValue = new UIntType(stayActiveDuration);
+      elements.add(new StructElement(stayActiveDurationFieldID, stayActiveDurationtlvValue));
+
       StructType commandArgs = new StructType(elements);
       invoke(new InvokeCallbackImpl(callback) {
           @Override
@@ -15162,6 +15313,32 @@ public class ChipClusters {
             callback.onSuccess(value);
           }
         }, PRODUCT_NAME_ATTRIBUTE_ID, minInterval, maxInterval);
+    }
+
+    public void readProductIDAttribute(
+        IntegerAttributeCallback callback) {
+      ChipAttributePath path = ChipAttributePath.newInstance(endpointId, clusterId, PRODUCT_I_D_ATTRIBUTE_ID);
+
+      readAttribute(new ReportCallbackImpl(callback, path) {
+          @Override
+          public void onSuccess(byte[] tlv) {
+            Integer value = ChipTLVValueDecoder.decodeAttributeValue(path, tlv);
+            callback.onSuccess(value);
+          }
+        }, PRODUCT_I_D_ATTRIBUTE_ID, true);
+    }
+
+    public void subscribeProductIDAttribute(
+        IntegerAttributeCallback callback, int minInterval, int maxInterval) {
+      ChipAttributePath path = ChipAttributePath.newInstance(endpointId, clusterId, PRODUCT_I_D_ATTRIBUTE_ID);
+
+      subscribeAttribute(new ReportCallbackImpl(callback, path) {
+          @Override
+          public void onSuccess(byte[] tlv) {
+            Integer value = ChipTLVValueDecoder.decodeAttributeValue(path, tlv);
+            callback.onSuccess(value);
+          }
+        }, PRODUCT_I_D_ATTRIBUTE_ID, minInterval, maxInterval);
     }
 
     public void readNodeLabelAttribute(
@@ -65033,6 +65210,8 @@ public class ChipClusters {
     private static final long TIMED_WRITE_BOOLEAN_ATTRIBUTE_ID = 48L;
     private static final long GENERAL_ERROR_BOOLEAN_ATTRIBUTE_ID = 49L;
     private static final long CLUSTER_ERROR_BOOLEAN_ATTRIBUTE_ID = 50L;
+    private static final long GLOBAL_ENUM_ATTRIBUTE_ID = 51L;
+    private static final long GLOBAL_STRUCT_ATTRIBUTE_ID = 52L;
     private static final long UNSUPPORTED_ATTRIBUTE_ID = 255L;
     private static final long NULLABLE_BOOLEAN_ATTRIBUTE_ID = 16384L;
     private static final long NULLABLE_BITMAP8_ATTRIBUTE_ID = 16385L;
@@ -65068,6 +65247,8 @@ public class ChipClusters {
     private static final long NULLABLE_RANGE_RESTRICTED_INT16U_ATTRIBUTE_ID = 16424L;
     private static final long NULLABLE_RANGE_RESTRICTED_INT16S_ATTRIBUTE_ID = 16425L;
     private static final long WRITE_ONLY_INT8U_ATTRIBUTE_ID = 16426L;
+    private static final long NULLABLE_GLOBAL_ENUM_ATTRIBUTE_ID = 16435L;
+    private static final long NULLABLE_GLOBAL_STRUCT_ATTRIBUTE_ID = 16436L;
     private static final long MEI_INT8U_ATTRIBUTE_ID = 4294070017L;
     private static final long GENERATED_COMMAND_LIST_ATTRIBUTE_ID = 65528L;
     private static final long ACCEPTED_COMMAND_LIST_ATTRIBUTE_ID = 65529L;
@@ -66111,6 +66292,47 @@ public class ChipClusters {
         }}, commandId, commandArgs, timedInvokeTimeoutMs);
     }
 
+    public void globalEchoRequest(GlobalEchoResponseCallback callback, ChipStructs.UnitTestingClusterTestGlobalStruct field1, Integer field2) {
+      globalEchoRequest(callback, field1, field2, 0);
+    }
+
+    public void globalEchoRequest(GlobalEchoResponseCallback callback, ChipStructs.UnitTestingClusterTestGlobalStruct field1, Integer field2, int timedInvokeTimeoutMs) {
+      final long commandId = 25L;
+
+      ArrayList<StructElement> elements = new ArrayList<>();
+      final long field1FieldID = 0L;
+      BaseTLVType field1tlvValue = field1.encodeTlv();
+      elements.add(new StructElement(field1FieldID, field1tlvValue));
+
+      final long field2FieldID = 1L;
+      BaseTLVType field2tlvValue = new UIntType(field2);
+      elements.add(new StructElement(field2FieldID, field2tlvValue));
+
+      StructType commandArgs = new StructType(elements);
+      invoke(new InvokeCallbackImpl(callback) {
+          @Override
+          public void onResponse(StructType invokeStructValue) {
+          final long field1FieldID = 0L;
+          ChipStructs.UnitTestingClusterTestGlobalStruct field1 = null;
+          final long field2FieldID = 1L;
+          Integer field2 = null;
+          for (StructElement element: invokeStructValue.value()) {
+            if (element.contextTagNum() == field1FieldID) {
+              if (element.value(BaseTLVType.class).type() == TLVType.Struct) {
+                StructType castingValue = element.value(StructType.class);
+                field1 = ChipStructs.UnitTestingClusterTestGlobalStruct.decodeTlv(castingValue);
+              }
+            } else if (element.contextTagNum() == field2FieldID) {
+              if (element.value(BaseTLVType.class).type() == TLVType.UInt) {
+                UIntType castingValue = element.value(UIntType.class);
+                field2 = castingValue.value(Integer.class);
+              }
+            }
+          }
+          callback.onSuccess(field1, field2);
+        }}, commandId, commandArgs, timedInvokeTimeoutMs);
+    }
+
     public void testDifferentVendorMeiRequest(TestDifferentVendorMeiResponseCallback callback, Integer arg1) {
       testDifferentVendorMeiRequest(callback, arg1, 0);
     }
@@ -66204,6 +66426,10 @@ public class ChipClusters {
       void onSuccess(byte[] payload);
     }
 
+    public interface GlobalEchoResponseCallback extends BaseClusterCallback {
+      void onSuccess(ChipStructs.UnitTestingClusterTestGlobalStruct field1, Integer field2);
+    }
+
     public interface TestDifferentVendorMeiResponseCallback extends BaseClusterCallback {
       void onSuccess(Integer arg1, Long eventNumber);
     }
@@ -66234,6 +66460,10 @@ public class ChipClusters {
 
     public interface ListFabricScopedAttributeCallback extends BaseAttributeCallback {
       void onSuccess(List<ChipStructs.UnitTestingClusterTestFabricScoped> value);
+    }
+
+    public interface GlobalStructAttributeCallback extends BaseAttributeCallback {
+      void onSuccess(ChipStructs.UnitTestingClusterTestGlobalStruct value);
     }
 
     public interface NullableBooleanAttributeCallback extends BaseAttributeCallback {
@@ -66366,6 +66596,14 @@ public class ChipClusters {
 
     public interface NullableRangeRestrictedInt16sAttributeCallback extends BaseAttributeCallback {
       void onSuccess(@Nullable Integer value);
+    }
+
+    public interface NullableGlobalEnumAttributeCallback extends BaseAttributeCallback {
+      void onSuccess(@Nullable Integer value);
+    }
+
+    public interface NullableGlobalStructAttributeCallback extends BaseAttributeCallback {
+      void onSuccess(@Nullable ChipStructs.UnitTestingClusterTestGlobalStruct value);
     }
 
     public interface GeneratedCommandListAttributeCallback extends BaseAttributeCallback {
@@ -68030,6 +68268,76 @@ public class ChipClusters {
         }, CLUSTER_ERROR_BOOLEAN_ATTRIBUTE_ID, minInterval, maxInterval);
     }
 
+    public void readGlobalEnumAttribute(
+        IntegerAttributeCallback callback) {
+      ChipAttributePath path = ChipAttributePath.newInstance(endpointId, clusterId, GLOBAL_ENUM_ATTRIBUTE_ID);
+
+      readAttribute(new ReportCallbackImpl(callback, path) {
+          @Override
+          public void onSuccess(byte[] tlv) {
+            Integer value = ChipTLVValueDecoder.decodeAttributeValue(path, tlv);
+            callback.onSuccess(value);
+          }
+        }, GLOBAL_ENUM_ATTRIBUTE_ID, true);
+    }
+
+    public void writeGlobalEnumAttribute(DefaultClusterCallback callback, Integer value) {
+      writeGlobalEnumAttribute(callback, value, 0);
+    }
+
+    public void writeGlobalEnumAttribute(DefaultClusterCallback callback, Integer value, int timedWriteTimeoutMs) {
+      BaseTLVType tlvValue = new UIntType(value);
+      writeAttribute(new WriteAttributesCallbackImpl(callback), GLOBAL_ENUM_ATTRIBUTE_ID, tlvValue, timedWriteTimeoutMs);
+    }
+
+    public void subscribeGlobalEnumAttribute(
+        IntegerAttributeCallback callback, int minInterval, int maxInterval) {
+      ChipAttributePath path = ChipAttributePath.newInstance(endpointId, clusterId, GLOBAL_ENUM_ATTRIBUTE_ID);
+
+      subscribeAttribute(new ReportCallbackImpl(callback, path) {
+          @Override
+          public void onSuccess(byte[] tlv) {
+            Integer value = ChipTLVValueDecoder.decodeAttributeValue(path, tlv);
+            callback.onSuccess(value);
+          }
+        }, GLOBAL_ENUM_ATTRIBUTE_ID, minInterval, maxInterval);
+    }
+
+    public void readGlobalStructAttribute(
+        GlobalStructAttributeCallback callback) {
+      ChipAttributePath path = ChipAttributePath.newInstance(endpointId, clusterId, GLOBAL_STRUCT_ATTRIBUTE_ID);
+
+      readAttribute(new ReportCallbackImpl(callback, path) {
+          @Override
+          public void onSuccess(byte[] tlv) {
+            ChipStructs.UnitTestingClusterTestGlobalStruct value = ChipTLVValueDecoder.decodeAttributeValue(path, tlv);
+            callback.onSuccess(value);
+          }
+        }, GLOBAL_STRUCT_ATTRIBUTE_ID, true);
+    }
+
+    public void writeGlobalStructAttribute(DefaultClusterCallback callback, ChipStructs.UnitTestingClusterTestGlobalStruct value) {
+      writeGlobalStructAttribute(callback, value, 0);
+    }
+
+    public void writeGlobalStructAttribute(DefaultClusterCallback callback, ChipStructs.UnitTestingClusterTestGlobalStruct value, int timedWriteTimeoutMs) {
+      BaseTLVType tlvValue = value.encodeTlv();
+      writeAttribute(new WriteAttributesCallbackImpl(callback), GLOBAL_STRUCT_ATTRIBUTE_ID, tlvValue, timedWriteTimeoutMs);
+    }
+
+    public void subscribeGlobalStructAttribute(
+        GlobalStructAttributeCallback callback, int minInterval, int maxInterval) {
+      ChipAttributePath path = ChipAttributePath.newInstance(endpointId, clusterId, GLOBAL_STRUCT_ATTRIBUTE_ID);
+
+      subscribeAttribute(new ReportCallbackImpl(callback, path) {
+          @Override
+          public void onSuccess(byte[] tlv) {
+            ChipStructs.UnitTestingClusterTestGlobalStruct value = ChipTLVValueDecoder.decodeAttributeValue(path, tlv);
+            callback.onSuccess(value);
+          }
+        }, GLOBAL_STRUCT_ATTRIBUTE_ID, minInterval, maxInterval);
+    }
+
     public void readUnsupportedAttribute(
         BooleanAttributeCallback callback) {
       ChipAttributePath path = ChipAttributePath.newInstance(endpointId, clusterId, UNSUPPORTED_ATTRIBUTE_ID);
@@ -69253,6 +69561,76 @@ public class ChipClusters {
             callback.onSuccess(value);
           }
         }, WRITE_ONLY_INT8U_ATTRIBUTE_ID, minInterval, maxInterval);
+    }
+
+    public void readNullableGlobalEnumAttribute(
+        NullableGlobalEnumAttributeCallback callback) {
+      ChipAttributePath path = ChipAttributePath.newInstance(endpointId, clusterId, NULLABLE_GLOBAL_ENUM_ATTRIBUTE_ID);
+
+      readAttribute(new ReportCallbackImpl(callback, path) {
+          @Override
+          public void onSuccess(byte[] tlv) {
+            @Nullable Integer value = ChipTLVValueDecoder.decodeAttributeValue(path, tlv);
+            callback.onSuccess(value);
+          }
+        }, NULLABLE_GLOBAL_ENUM_ATTRIBUTE_ID, true);
+    }
+
+    public void writeNullableGlobalEnumAttribute(DefaultClusterCallback callback, Integer value) {
+      writeNullableGlobalEnumAttribute(callback, value, 0);
+    }
+
+    public void writeNullableGlobalEnumAttribute(DefaultClusterCallback callback, Integer value, int timedWriteTimeoutMs) {
+      BaseTLVType tlvValue = value != null ? new UIntType(value) : new NullType();
+      writeAttribute(new WriteAttributesCallbackImpl(callback), NULLABLE_GLOBAL_ENUM_ATTRIBUTE_ID, tlvValue, timedWriteTimeoutMs);
+    }
+
+    public void subscribeNullableGlobalEnumAttribute(
+        NullableGlobalEnumAttributeCallback callback, int minInterval, int maxInterval) {
+      ChipAttributePath path = ChipAttributePath.newInstance(endpointId, clusterId, NULLABLE_GLOBAL_ENUM_ATTRIBUTE_ID);
+
+      subscribeAttribute(new ReportCallbackImpl(callback, path) {
+          @Override
+          public void onSuccess(byte[] tlv) {
+            @Nullable Integer value = ChipTLVValueDecoder.decodeAttributeValue(path, tlv);
+            callback.onSuccess(value);
+          }
+        }, NULLABLE_GLOBAL_ENUM_ATTRIBUTE_ID, minInterval, maxInterval);
+    }
+
+    public void readNullableGlobalStructAttribute(
+        NullableGlobalStructAttributeCallback callback) {
+      ChipAttributePath path = ChipAttributePath.newInstance(endpointId, clusterId, NULLABLE_GLOBAL_STRUCT_ATTRIBUTE_ID);
+
+      readAttribute(new ReportCallbackImpl(callback, path) {
+          @Override
+          public void onSuccess(byte[] tlv) {
+            @Nullable ChipStructs.UnitTestingClusterTestGlobalStruct value = ChipTLVValueDecoder.decodeAttributeValue(path, tlv);
+            callback.onSuccess(value);
+          }
+        }, NULLABLE_GLOBAL_STRUCT_ATTRIBUTE_ID, true);
+    }
+
+    public void writeNullableGlobalStructAttribute(DefaultClusterCallback callback, ChipStructs.UnitTestingClusterTestGlobalStruct value) {
+      writeNullableGlobalStructAttribute(callback, value, 0);
+    }
+
+    public void writeNullableGlobalStructAttribute(DefaultClusterCallback callback, ChipStructs.UnitTestingClusterTestGlobalStruct value, int timedWriteTimeoutMs) {
+      BaseTLVType tlvValue = value != null ? value.encodeTlv() : new NullType();
+      writeAttribute(new WriteAttributesCallbackImpl(callback), NULLABLE_GLOBAL_STRUCT_ATTRIBUTE_ID, tlvValue, timedWriteTimeoutMs);
+    }
+
+    public void subscribeNullableGlobalStructAttribute(
+        NullableGlobalStructAttributeCallback callback, int minInterval, int maxInterval) {
+      ChipAttributePath path = ChipAttributePath.newInstance(endpointId, clusterId, NULLABLE_GLOBAL_STRUCT_ATTRIBUTE_ID);
+
+      subscribeAttribute(new ReportCallbackImpl(callback, path) {
+          @Override
+          public void onSuccess(byte[] tlv) {
+            @Nullable ChipStructs.UnitTestingClusterTestGlobalStruct value = ChipTLVValueDecoder.decodeAttributeValue(path, tlv);
+            callback.onSuccess(value);
+          }
+        }, NULLABLE_GLOBAL_STRUCT_ATTRIBUTE_ID, minInterval, maxInterval);
     }
 
     public void readMeiInt8uAttribute(

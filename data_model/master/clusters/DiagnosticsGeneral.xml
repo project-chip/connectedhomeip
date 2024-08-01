@@ -57,7 +57,7 @@ Davis, CA 95616, USA
 -->
 <cluster xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="types types.xsd cluster cluster.xsd" id="0x0033" name="General Diagnostics Cluster" revision="2">
   <revisionHistory>
-    <revision revision="1" summary="Initial Release"/>
+    <revision revision="1" summary="Initial revision"/>
     <revision revision="2" summary="UpTime attribute now mandatory, and added TimeSnapshot command, added DMTEST feature."/>
   </revisionHistory>
   <clusterIds>
@@ -200,12 +200,12 @@ Davis, CA 95616, USA
         <mandatoryConform/>
       </field>
       <field id="5" name="IPv4Addresses" type="list">
-        <entry type="ref_Ipv4Adr"/>
+        <entry type="ref_IPv4Address"/>
         <mandatoryConform/>
         <constraint type="maxCount" value="4"/>
       </field>
       <field id="6" name="IPv6Addresses" type="list">
-        <entry type="ref_Ipv6Adr"/>
+        <entry type="ref_IPv6Address"/>
         <mandatoryConform/>
         <constraint type="maxCount" value="8"/>
       </field>

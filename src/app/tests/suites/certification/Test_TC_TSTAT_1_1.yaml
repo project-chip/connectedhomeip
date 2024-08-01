@@ -129,6 +129,17 @@ tests:
               type: bitmap32
               hasMasksSet: [0x40]
 
+    - label:
+          "Step 3i: Given TSTAT.S.F08(PRES ensure featuremap has the correct bit
+          set"
+      PICS: TSTAT.S.F08
+      command: "readAttribute"
+      attribute: "FeatureMap"
+      response:
+          constraints:
+              type: bitmap32
+              hasMasksSet: [0x100]
+
     - label: "Step 4a: TH reads from the DUT the AttributeList attribute."
       PICS: PICS_EVENT_LIST_ENABLED
       command: "readAttribute"
@@ -555,6 +566,17 @@ tests:
               type: list
               contains: [30]
 
+    - label:
+          "Step 4j: TH reads the Feature dependent(TSTAT.S.F08(PRES) attribute
+          in AttributeList"
+      PICS: TSTAT.S.F08
+      command: "readAttribute"
+      attribute: "AttributeList"
+      response:
+          constraints:
+              type: list
+              contains: [72, 74, 78, 80, 82]
+
     - label: "Step 5: TH reads EventList attribute from the DUT."
       PICS: PICS_EVENT_LIST_ENABLED
       command: "readAttribute"
@@ -593,6 +615,16 @@ tests:
           constraints:
               type: list
               contains: [4]
+    - label:
+          "Step 6d: TH reads Feature dependent(TSTAT.S.F08(PRES)) commands in
+          AcceptedCommandList"
+      PICS: TSTAT.S.F08
+      command: "readAttribute"
+      attribute: "AcceptedCommandList"
+      response:
+          constraints:
+              type: list
+              contains: [6, 7, 8, 9]
 
     - label:
           "Step 7a: TH reads from the DUT the GeneratedCommandList attribute."

@@ -213,6 +213,35 @@ tests:
       disabled: true
 
     - label:
+          "Step 4c: Using the QR code from Step 1, ensure the TH’s Discovery
+          Capability bit string is NOT set to Wi-Fi PAF for discovery (i.e. set
+          to OnNetwork discovery capability)"
+      PICS: MCORE.DD.DISCOVERY_PAF
+      verification: |
+          User has a QR code generated to pass into DUT. Using the example provided above, the payload would be "MT:-24J029Q00KA0648G00".
+          $ ./out/all-clusters-app/chip-all-clusters-app --version 0 --vendor-id 0xFFF1 --product-id 0x8001 --custom-flow 2 --capabilities 4 --discriminator 3840 --passcode 20202021
+          [1657235470.970680][371041:371041] CHIP:DL: Device Configuration:
+          [1657235470.970772][371041:371041] CHIP:DL: Serial Number: (not set)
+          [1657235470.970811][371041:371041] CHIP:DL: Vendor Id: 65521 (0xFFF1)
+          [1657235470.970845][371041:371041] CHIP:DL: Product Id: 32769 (0x8001)
+          [1657235470.970892][371041:371041] CHIP:DL: Hardware Version: 0
+          [1657235470.970929][371041:371041] CHIP:DL: Setup Pin Code (0 for UNKNOWN/ERROR): 20202021
+          [1657235470.970984][371041:371041] CHIP:DL: Setup Discriminator (0xFFFF for UNKNOWN/ERROR): 3840 (0xF00)
+          [1657235470.971031][371041:371041] CHIP:DL: Manufacturing Date: (not set)
+          [1657235470.971095][371041:371041] CHIP:DL: Device Type: 65535 (0xFFFF)
+          [1657235470.971147][371041:371041] CHIP:-: ==== Onboarding payload for Standard Commissioning Flow ====
+          [1657235470.971199][371041:371041] CHIP:SVR: SetupQRCode: [MT:-24J029Q00KA0648G00]
+          [1657235470.971258][371041:371041] CHIP:SVR: Copy/paste the below URL in a browser to see the QR Code:
+          [1657235470.971293][371041:371041] CHIP:SVR: https://dhrishi.github.io/connectedhomeip/qrcode.html?data=MT%3A-24J029Q00KA0648G00"
+      disabled: true
+
+    - label: "Step 4d: Scan/read the QR code of the TH device using the DUT"
+      PICS: MCORE.DD.DISCOVERY_PAF
+      verification: |
+          If TH Commissionee’s Discovery Capabilities do not support Wi-Fi PAF, ensure that the DUT commissions the TH onto the Matter network over a capability that is NOT BLE. In this example, over OnNetwork.
+      disabled: true
+
+    - label:
           "Step 5a: Prefix: Using the QR code from Step 1, generate a new QR
           code but substituting out the current Prefix with an invalid Prefix
           that is not 'MT:' (i.e. Prefix='AB:')"

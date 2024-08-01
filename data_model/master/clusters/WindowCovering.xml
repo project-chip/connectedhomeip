@@ -340,13 +340,13 @@ Davis, CA 95616, USA
       </bitfield>
     </bitmap>
     <bitmap name="OperationalStatusBitmap">
-      <bitfield name="Global" from="0" to="1" summary="Global operational state.">
+      <bitfield name="Global" from="1" to="0" summary="Global operational state.">
         <mandatoryConform/>
       </bitfield>
-      <bitfield name="Lift" from="2" to="3" summary="Lift operational state.">
+      <bitfield name="Lift" from="3" to="2" summary="Lift operational state.">
         <mandatoryConform/>
       </bitfield>
-      <bitfield name="Tilt" from="4" to="5" summary="Tilt operational state.">
+      <bitfield name="Tilt" from="5" to="4" summary="Tilt operational state.">
         <mandatoryConform/>
       </bitfield>
     </bitmap>
@@ -464,7 +464,7 @@ Davis, CA 95616, USA
     </attribute>
     <attribute id="0x0008" name="CurrentPositionLiftPercentage" type="percent" default="null">
       <access read="true" readPrivilege="view"/>
-      <quality changeOmitted="false" nullable="true" scene="true" persistence="nonVolatile" reportable="true" sourceAttribution="false" quieterReporting="true"/>
+      <quality changeOmitted="false" nullable="true" scene="false" persistence="nonVolatile" reportable="true" sourceAttribution="false" quieterReporting="true"/>
       <optionalConform>
         <andTerm>
           <feature name="LF"/>
@@ -474,7 +474,7 @@ Davis, CA 95616, USA
     </attribute>
     <attribute id="0x0009" name="CurrentPositionTiltPercentage" type="percent" default="null">
       <access read="true" readPrivilege="view"/>
-      <quality changeOmitted="false" nullable="true" scene="true" persistence="nonVolatile" reportable="true" sourceAttribution="false" quieterReporting="true"/>
+      <quality changeOmitted="false" nullable="true" scene="false" persistence="nonVolatile" reportable="true" sourceAttribution="false" quieterReporting="true"/>
       <optionalConform>
         <andTerm>
           <feature name="TL"/>
@@ -491,7 +491,7 @@ Davis, CA 95616, USA
     </attribute>
     <attribute id="0x000B" name="TargetPositionLiftPercent100ths" type="percent100ths" default="null">
       <access read="true" readPrivilege="view"/>
-      <quality changeOmitted="false" nullable="true" scene="true" persistence="volatile" reportable="true" sourceAttribution="false" quieterReporting="false"/>
+      <quality changeOmitted="false" nullable="true" scene="false" persistence="volatile" reportable="true" sourceAttribution="false" quieterReporting="false"/>
       <mandatoryConform>
         <andTerm>
           <feature name="LF"/>
@@ -501,7 +501,7 @@ Davis, CA 95616, USA
     </attribute>
     <attribute id="0x000C" name="TargetPositionTiltPercent100ths" type="percent100ths" default="null">
       <access read="true" readPrivilege="view"/>
-      <quality changeOmitted="false" nullable="true" scene="true" persistence="volatile" reportable="true" sourceAttribution="false" quieterReporting="false"/>
+      <quality changeOmitted="false" nullable="true" scene="false" persistence="volatile" reportable="true" sourceAttribution="false" quieterReporting="false"/>
       <mandatoryConform>
         <andTerm>
           <feature name="TL"/>

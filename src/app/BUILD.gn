@@ -234,8 +234,8 @@ static_library("interaction-model") {
     ":paths",
     ":subscription-info-provider",
     "${chip_root}/src/app/MessageDef",
-    "${chip_root}/src/app/codegen-data-model:instance-header",
-    "${chip_root}/src/app/data-model-interface",
+    "${chip_root}/src/app/codegen-data-model-provider:instance-header",
+    "${chip_root}/src/app/data-model-provider",
     "${chip_root}/src/app/icd/server:icd-server-config",
     "${chip_root}/src/app/icd/server:manager",
     "${chip_root}/src/app/icd/server:observer",
@@ -265,13 +265,13 @@ static_library("interaction-model") {
       "reporting/Read-Ember.cpp",
       "reporting/Read-Ember.h",
     ]
-    public_deps += [ "${chip_root}/src/app/data-model-interface" ]
+    public_deps += [ "${chip_root}/src/app/data-model-provider" ]
   } else {  # enabled
     sources += [
       "reporting/Read-DataModel.cpp",
       "reporting/Read-DataModel.h",
     ]
-    public_deps += [ "${chip_root}/src/app/data-model-interface" ]
+    public_deps += [ "${chip_root}/src/app/data-model-provider" ]
   }
 
   if (chip_enable_read_client) {
@@ -491,14 +491,14 @@ static_library("app") {
       "AttributePathExpandIterator-Ember.h",
       "AttributePathExpandIterator.h",
     ]
-    public_deps += [ "${chip_root}/src/app/data-model-interface" ]
+    public_deps += [ "${chip_root}/src/app/data-model-provider" ]
   } else {  # enabled
     sources += [
       "AttributePathExpandIterator-DataModel.cpp",
       "AttributePathExpandIterator-DataModel.h",
       "AttributePathExpandIterator.h",
     ]
-    public_deps += [ "${chip_root}/src/app/data-model-interface" ]
+    public_deps += [ "${chip_root}/src/app/data-model-provider" ]
   }
 
   if (chip_enable_read_client) {

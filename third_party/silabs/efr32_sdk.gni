@@ -80,6 +80,8 @@ declare_args() {
 
   # Multi-chip OTA
   chip_enable_multi_ota_requestor = false
+  chip_enable_multi_ota_encryption = false
+  chip_enable_ota_custom_tlv_testing = false
 }
 
 examples_plat_dir = "${chip_root}/examples/platform/silabs/efr32"
@@ -494,6 +496,14 @@ template("efr32_sdk") {
         "SL_OPENTHREAD_ENABLE_APP_TASK=0",
         "SL_OPENTHREAD_ENABLE_CLI_TASK=0",
       ]
+    }
+
+    if (chip_enable_multi_ota_encryption && chip_enable_multi_ota_requestor) {
+      defines += [ "OTA_ENCRYPTION_ENABLE=1" ]
+    }
+
+    if (chip_enable_ota_custom_tlv_testing && chip_enable_multi_ota_requestor) {
+      defines += [ "OTA_TEST_CUSTOM_TLVS=1" ]
     }
 
     if (defined(invoker.chip_enable_wifi) && invoker.chip_enable_wifi) {
