@@ -216,7 +216,7 @@ CHIP_ERROR Engine::BuildSingleReportDataAttributeReportIBs(ReportDataMessage::Bu
                     attributeReportIBs.Rollback(attributeBackup);
                     apReadHandler->SetAttributeEncodeState(AttributeEncodeState());
 
-                    if (status.IsOutOfSpaceError())
+                    if (!status.IsOutOfSpaceError())
                     {
                         ChipLogError(DataManagement,
                                      "Fail to retrieve data, roll back and encode status on clusterId: " ChipLogFormatMEI
