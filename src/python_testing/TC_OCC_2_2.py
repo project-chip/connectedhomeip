@@ -51,9 +51,10 @@ class TC_OCC_2_2(MatterBaseTest):
 
         attributes = Clusters.OccupancySensing.Attributes
         feature_map = await self.read_occ_attribute_expect_success(endpoint=endpoint, attribute=attributes.FeatureMap)
-        is_pir_feature_supported = feature_map & Clusters.OccupancySensing.Bitmaps.Feature.kPassiveInfrared
-        is_us_feature_supported = feature_map & Clusters.OccupancySensing.Bitmaps.Feature.kUltrasonic
-        is_phy_feature_supported = feature_map & Clusters.OccupancySensing.Bitmaps.Feature.kPhysicalContact
+        is_pir_feature_supported = (feature_map & Clusters.OccupancySensing.Bitmaps.Feature.kPassiveInfrared) != 0
+        is_us_feature_supported = (feature_map & Clusters.OccupancySensing.Bitmaps.Feature.kUltrasonic) != 0
+        is_phy_feature_supported = (feature_map & Clusters.OccupancySensing.Bitmaps.Feature.kPhysicalContact) != 0
+
 
         self.step(1)
         attribute_list = await self.read_occ_attribute_expect_success(endpoint=endpoint, attribute=attributes.AttributeList)
