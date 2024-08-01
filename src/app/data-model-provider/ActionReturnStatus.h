@@ -54,6 +54,12 @@ public:
     /// or converts the underlying CHIP_ERROR into a cluster status code.
     Protocols::InteractionModel::ClusterStatusCode GetStatusCode() const;
 
+    /// Gets the underlying CHIP_ERROR if it exists, otherwise it will
+    /// return a CHIP_ERROR corresponding to the underlying return status.
+    ///
+    /// Success statusess will result in CHIP_NO_ERROR (i.e. cluster specitic success codes are lost)
+    CHIP_ERROR GetUnderlyingError() const;
+
     /// If this is a CHIP_NO_ERROR or a Status::Success
     bool IsSuccess() const;
 
@@ -72,6 +78,10 @@ public:
     /// a CHIP_ERROR, the error is reported. Otherwise the cluster status code data
     /// is logged.
     void LogError(const char * prefix) const;
+
+
+    bool operator==(const ActionReturnStatus & other) const { return mReturnStatus == other.mReturnStatus; }
+    bool operator!=(const ActionReturnStatus & other) const { return mReturnStatus != other.mReturnStatus; }
 
 private:
     std::variant<CHIP_ERROR, Protocols::InteractionModel::ClusterStatusCode> mReturnStatus;

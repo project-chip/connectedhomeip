@@ -14,6 +14,7 @@
  *    See the License for the specific language governing permissions and
  *    limitations under the License.
  */
+#include "app/data-model-provider/ActionReturnStatus.h"
 #include <app/reporting/Read-DataModel.h>
 
 #include <app/AppConfig.h>
@@ -24,18 +25,11 @@ namespace chip {
 namespace app {
 namespace reporting {
 namespace DataModelImpl {
-namespace {
 
-bool IsOutOfSpaceError(CHIP_ERROR err)
-{
-    return (err == CHIP_ERROR_NO_MEMORY || err == CHIP_ERROR_BUFFER_TOO_SMALL);
-}
-
-} // namespace
-
-CHIP_ERROR RetrieveClusterData(DataModel::Provider * dataModel, const Access::SubjectDescriptor & subjectDescriptor,
-                               bool isFabricFiltered, AttributeReportIBs::Builder & reportBuilder,
-                               const ConcreteReadAttributePath & path, AttributeEncodeState * encoderState)
+DataModel::ActionReturnStatus RetrieveClusterData(DataModel::Provider * dataModel,
+                                                  const Access::SubjectDescriptor & subjectDescriptor, bool isFabricFiltered,
+                                                  AttributeReportIBs::Builder & reportBuilder,
+                                                  const ConcreteReadAttributePath & path, AttributeEncodeState * encoderState)
 {
     // Odd ifdef is to only do this if the `Read-Check` does not do it already.
 #if !CHIP_CONFIG_USE_EMBER_DATA_MODEL
@@ -68,9 +62,10 @@ CHIP_ERROR RetrieveClusterData(DataModel::Provider * dataModel, const Access::Su
     reportBuilder.Checkpoint(checkpoint);
 
     AttributeValueEncoder attributeValueEncoder(reportBuilder, subjectDescriptor, path, version, isFabricFiltered, encoderState);
-    CHIP_ERROR err = dataModel->ReadAttribute(readRequest, attributeValueEncoder);
 
-    if (err == CHIP_NO_ERROR)
+    DataModel::ActionReturnStatus status = dataModel->ReadAttribute(readRequest, attributeValueEncoder);
+
+    if (status.IsSuccess())
     {
         // Odd ifdef is to only do this if the `Read-Check` does not do it already.
 #if !CHIP_CONFIG_USE_EMBER_DATA_MODEL
@@ -82,7 +77,7 @@ CHIP_ERROR RetrieveClusterData(DataModel::Provider * dataModel, const Access::Su
         DataModelCallbacks::GetInstance()->AttributeOperation(DataModelCallbacks::OperationType::Read,
                                                               DataModelCallbacks::OperationOrder::Post, path);
 #endif // !CHIP_CONFIG_USE_EMBER_DATA_MODEL
-        return CHIP_NO_ERROR;
+        return status;
     }
 
     // Encoder state is relevant for errors in case they are retryable.
@@ -97,11 +92,11 @@ CHIP_ERROR RetrieveClusterData(DataModel::Provider * dataModel, const Access::Su
     // Out of space errors may be chunked data, reporting those cases would be very confusing
     // as they are not fully errors. Report only others (which presumably are not recoverable
     // and will be sent to the client as well).
-    if (!IsOutOfSpaceError(err))
+    if (!status.IsOutOfSpaceError())
     {
-        ChipLogError(DataManagement, "Failed to read attribute: %" CHIP_ERROR_FORMAT, err.Format());
+        status.LogError("Failed to read attribute: ");
     }
-    return err;
+    return status;
 }
 
 } // namespace DataModelImpl

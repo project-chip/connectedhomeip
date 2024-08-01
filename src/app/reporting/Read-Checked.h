@@ -16,6 +16,7 @@
  */
 #pragma once
 
+#include "app/data-model-provider/ActionReturnStatus.h"
 #include <access/SubjectDescriptor.h>
 #include <app/AttributeEncodeState.h>
 #include <app/MessageDef/AttributeReportIBs.h>
@@ -27,7 +28,7 @@ namespace app {
 namespace reporting {
 namespace CheckedImpl {
 
-CHIP_ERROR RetrieveClusterData(DataModel::Provider * dataModel, const Access::SubjectDescriptor & subjectDescriptor,
+DataModel::ActionReturnStatus RetrieveClusterData(DataModel::Provider * dataModel, const Access::SubjectDescriptor & subjectDescriptor,
                                bool isFabricFiltered, AttributeReportIBs::Builder & reportBuilder,
                                const ConcreteReadAttributePath & path, AttributeEncodeState * encoderState);
 

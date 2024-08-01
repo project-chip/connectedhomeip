@@ -276,7 +276,7 @@ DataModel::ActionReturnStatus CodegenDataModelProvider::WriteAttribute(const Dat
     // ACL check for non-internal requests
     if (!request.operationFlags.Has(DataModel::OperationFlags::kInternal))
     {
-        ReturnErrorCodeIf(!request.subjectDescriptor.has_value(), CHIP_IM_GLOBAL_STATUS(UnsupportedAccess));
+        ReturnErrorCodeIf(!request.subjectDescriptor.has_value(), Status::UnsupportedAccess);
 
         Access::RequestPath requestPath{ .cluster = request.path.mClusterId, .endpoint = request.path.mEndpointId };
         CHIP_ERROR err = Access::GetAccessControl().Check(*request.subjectDescriptor, requestPath,
@@ -287,7 +287,7 @@ DataModel::ActionReturnStatus CodegenDataModelProvider::WriteAttribute(const Dat
             ReturnErrorCodeIf(err != CHIP_ERROR_ACCESS_DENIED, err);
 
             // TODO: when wildcard/group writes are supported, handle them to discard rather than fail with status
-            return CHIP_IM_GLOBAL_STATUS(UnsupportedAccess);
+            return Status::UnsupportedAccess;
         }
     }
 
@@ -318,15 +318,15 @@ DataModel::ActionReturnStatus CodegenDataModelProvider::WriteAttribute(const Dat
     // Internal is allowed to bypass timed writes and read-only.
     if (!request.operationFlags.Has(DataModel::OperationFlags::kInternal))
     {
-        VerifyOrReturnError(!isReadOnly, CHIP_IM_GLOBAL_STATUS(UnsupportedWrite));
+        VerifyOrReturnError(!isReadOnly, Status::UnsupportedWrite);
 
         VerifyOrReturnError(!(*attributeMetadata)->MustUseTimedWrite() || request.writeFlags.Has(DataModel::WriteFlags::kTimed),
-                            CHIP_IM_GLOBAL_STATUS(NeedsTimedInteraction));
+                            Status::NeedsTimedInteraction);
     }
 
     // Extra check: internal requests can bypass the read only check, however global attributes
     // have no underlying storage, so write still cannot be done
-    VerifyOrReturnError(attributeMetadata != nullptr, CHIP_IM_GLOBAL_STATUS(UnsupportedWrite));
+    VerifyOrReturnError(attributeMetadata != nullptr, Status::UnsupportedWrite);
 
     if (request.path.mDataVersion.HasValue())
     {
@@ -335,14 +335,14 @@ DataModel::ActionReturnStatus CodegenDataModelProvider::WriteAttribute(const Dat
         {
             ChipLogError(DataManagement, "Unable to get cluster info for Endpoint 0x%x, Cluster " ChipLogFormatMEI,
                          request.path.mEndpointId, ChipLogValueMEI(request.path.mClusterId));
-            return CHIP_IM_GLOBAL_STATUS(DataVersionMismatch);
+            return Status::DataVersionMismatch;
         }
 
         if (request.path.mDataVersion.Value() != clusterInfo->dataVersion)
         {
             ChipLogError(DataManagement, "Write Version mismatch for Endpoint 0x%x, Cluster " ChipLogFormatMEI,
                          request.path.mEndpointId, ChipLogValueMEI(request.path.mClusterId));
-            return CHIP_IM_GLOBAL_STATUS(DataVersionMismatch);
+            return Status::DataVersionMismatch;
         }
     }
 
@@ -369,7 +369,7 @@ DataModel::ActionReturnStatus CodegenDataModelProvider::WriteAttribute(const Dat
     if (dataBuffer.size() > (*attributeMetadata)->size)
     {
         ChipLogDetail(Zcl, "Data to write exceeds the attribute size claimed.");
-        return CHIP_IM_GLOBAL_STATUS(InvalidValue);
+        return Status::InvalidValue;
     }
 
     if (request.operationFlags.Has(DataModel::OperationFlags::kInternal))
@@ -388,7 +388,7 @@ DataModel::ActionReturnStatus CodegenDataModelProvider::WriteAttribute(const Dat
 
     if (status != Protocols::InteractionModel::Status::Success)
     {
-        return CHIP_ERROR_IM_GLOBAL_STATUS_VALUE(status);
+        return status;
     }
 
     // TODO: this WILL requre updates

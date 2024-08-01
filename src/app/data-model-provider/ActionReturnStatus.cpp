@@ -14,7 +14,9 @@
  *    See the License for the specific language governing permissions and
  *    limitations under the License.
  */
+#include "lib/core/CHIPError.h"
 #include "lib/support/CodeUtils.h"
+#include "protocols/interaction_model/StatusCode.h"
 #include <app/data-model-provider/ActionReturnStatus.h>
 
 #include <lib/support/StringBuilder.h>
@@ -25,6 +27,30 @@ namespace DataModel {
 
 using Protocols::InteractionModel::ClusterStatusCode;
 using Protocols::InteractionModel::Status;
+
+CHIP_ERROR ActionReturnStatus::GetUnderlyingError() const
+{
+
+    if (const CHIP_ERROR * err = std::get_if<CHIP_ERROR>(&mReturnStatus))
+    {
+        return *err;
+    }
+
+    if (const ClusterStatusCode * status = std::get_if<ClusterStatusCode>(&mReturnStatus))
+    {
+        if (status->IsSuccess())
+        {
+            return CHIP_NO_ERROR;
+        }
+
+        chip::Optional<ClusterStatus> code = status->GetClusterSpecificCode();
+
+        return code.HasValue() ? CHIP_ERROR_IM_CLUSTER_STATUS_VALUE(code.Value())
+                               : CHIP_ERROR_IM_GLOBAL_STATUS_VALUE(status->GetStatus());
+    }
+
+    chipDie();
+}
 
 ClusterStatusCode ActionReturnStatus::GetStatusCode() const
 {
