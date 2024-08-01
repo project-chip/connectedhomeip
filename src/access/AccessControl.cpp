@@ -175,14 +175,14 @@ char GetRequestTypeStringForLogging(RequestType requestType)
 {
     switch (requestType)
     {
-    case RequestType::kReadRequest:
+    case RequestType::kAttributeReadRequest:
         return 'r';
-    case RequestType::kWriteRequest:
+    case RequestType::kAttributeWriteRequest:
         return 'w';
-    case RequestType::kInvokeRequest:
+    case RequestType::kCommandInvokeRequest:
         return 'i';
-    case RequestType::kSubscribeEventRequest:
-        return 's';
+    case RequestType::kEventReadOrSubscribeRequest:
+        return 'e';
     default:
         return '?';
     }

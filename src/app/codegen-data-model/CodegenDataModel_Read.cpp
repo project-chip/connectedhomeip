@@ -271,7 +271,7 @@ CHIP_ERROR CodegenDataModel::ReadAttribute(const InteractionModel::ReadAttribute
         ReturnErrorCodeIf(!request.subjectDescriptor.has_value(), CHIP_ERROR_INVALID_ARGUMENT);
 
         Access::RequestPath requestPath{ .cluster = request.path.mClusterId, .endpoint = request.path.mEndpointId,
-                                         .requestType = Access::RequestType::kReadRequest, .entityId = request.path.mAttributeId };
+                                         .requestType = Access::RequestType::kAttributeReadRequest, .entityId = request.path.mAttributeId };
         CHIP_ERROR err = Access::GetAccessControl().Check(*request.subjectDescriptor, requestPath,
                                                           RequiredPrivilege::ForReadAttribute(request.path));
         if (err != CHIP_NO_ERROR)

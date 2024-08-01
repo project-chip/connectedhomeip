@@ -294,7 +294,7 @@ CHIP_ERROR ReadSingleClusterData(const SubjectDescriptor & aSubjectDescriptor, b
 
     {
         Access::RequestPath requestPath{ .cluster = aPath.mClusterId, .endpoint = aPath.mEndpointId,
-                                         .requestType = Access::RequestType::kReadRequest, .entityId = aPath.mAttributeId };
+                                         .requestType = Access::RequestType::kAttributeReadRequest, .entityId = aPath.mAttributeId };
         Access::Privilege requestPrivilege = RequiredPrivilege::ForReadAttribute(aPath);
         CHIP_ERROR err                     = Access::GetAccessControl().Check(aSubjectDescriptor, requestPath, requestPrivilege);
         if (err != CHIP_NO_ERROR)
@@ -686,7 +686,7 @@ CHIP_ERROR WriteSingleClusterData(const SubjectDescriptor & aSubjectDescriptor, 
 
     {
         Access::RequestPath requestPath{ .cluster = aPath.mClusterId, .endpoint = aPath.mEndpointId,
-                                         .requestType = Access::RequestType::kWriteRequest, .entityId = aPath.mAttributeId };
+                                         .requestType = Access::RequestType::kAttributeWriteRequest, .entityId = aPath.mAttributeId };
         Access::Privilege requestPrivilege = RequiredPrivilege::ForWriteAttribute(aPath);
         CHIP_ERROR err                     = CHIP_NO_ERROR;
         if (!apWriteHandler->ACLCheckCacheHit({ aPath, requestPrivilege }))

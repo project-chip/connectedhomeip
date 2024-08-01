@@ -493,7 +493,7 @@ CHIP_ERROR InteractionModelEngine::ParseAttributePaths(const Access::SubjectDesc
             for (; pathIterator.Get(readPath); pathIterator.Next())
             {
                 //leave requestPath.entityId optional value unset to indicate wildcard
-                Access::RequestPath requestPath{ .cluster = readPath.mClusterId, .endpoint = readPath.mEndpointId, .requestType = Access::RequestType::kReadRequest };
+                Access::RequestPath requestPath{ .cluster = readPath.mClusterId, .endpoint = readPath.mEndpointId, .requestType = Access::RequestType::kAttributeReadRequest };
                 err = Access::GetAccessControl().Check(aSubjectDescriptor, requestPath,
                                                        RequiredPrivilege::ForReadAttribute(readPath));
                 if (err == CHIP_NO_ERROR)
@@ -510,7 +510,7 @@ CHIP_ERROR InteractionModelEngine::ParseAttributePaths(const Access::SubjectDesc
             if (ConcreteAttributePathExists(concretePath))
             {
                 Access::RequestPath requestPath{ .cluster = concretePath.mClusterId, .endpoint = concretePath.mEndpointId,
-                                                 .requestType = Access::RequestType::kReadRequest, .entityId = paramsList.mValue.mAttributeId };
+                                                 .requestType = Access::RequestType::kAttributeReadRequest, .entityId = paramsList.mValue.mAttributeId };
 
                 err = Access::GetAccessControl().Check(aSubjectDescriptor, requestPath,
                                                        RequiredPrivilege::ForReadAttribute(concretePath));
@@ -535,7 +535,7 @@ CHIP_ERROR InteractionModelEngine::ParseAttributePaths(const Access::SubjectDesc
 static bool CanAccess(const Access::SubjectDescriptor & aSubjectDescriptor, const ConcreteClusterPath & aPath,
                       Access::Privilege aNeededPrivilege)
 {
-    Access::RequestPath requestPath{ .cluster = aPath.mClusterId, .endpoint = aPath.mEndpointId, .requestType = Access::RequestType::kSubscribeEventRequest };
+    Access::RequestPath requestPath{ .cluster = aPath.mClusterId, .endpoint = aPath.mEndpointId, .requestType = Access::RequestType::kEventReadOrSubscribeRequest };
     //leave requestPath.entityId optional value unset to indicate wildcard
     CHIP_ERROR err = Access::GetAccessControl().Check(aSubjectDescriptor, requestPath, aNeededPrivilege);
     return (err == CHIP_NO_ERROR);
@@ -544,7 +544,7 @@ static bool CanAccess(const Access::SubjectDescriptor & aSubjectDescriptor, cons
 static bool CanAccess(const Access::SubjectDescriptor & aSubjectDescriptor, const ConcreteEventPath & aPath)
 {
     Access::RequestPath requestPath{ .cluster = aPath.mClusterId, .endpoint = aPath.mEndpointId,
-                                     .requestType = Access::RequestType::kSubscribeEventRequest, .entityId = aPath.mEventId };
+                                     .requestType = Access::RequestType::kEventReadOrSubscribeRequest, .entityId = aPath.mEventId };
     CHIP_ERROR err = Access::GetAccessControl().Check(aSubjectDescriptor, requestPath, RequiredPrivilege::ForReadEvent(aPath));
     return (err == CHIP_NO_ERROR);   
 }

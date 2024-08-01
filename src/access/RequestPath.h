@@ -27,10 +27,10 @@ namespace Access {
 enum class RequestType : uint8_t
 {
     kRequestTypeUnknown,
-    kReadRequest,
-    kWriteRequest,
-    kInvokeRequest,
-    kSubscribeEventRequest
+    kAttributeReadRequest,
+    kAttributeWriteRequest,
+    kCommandInvokeRequest,
+    kEventReadOrSubscribeRequest
 };
 
 struct RequestPath

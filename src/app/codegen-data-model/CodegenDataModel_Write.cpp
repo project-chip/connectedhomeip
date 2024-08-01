@@ -278,7 +278,7 @@ CHIP_ERROR CodegenDataModel::WriteAttribute(const InteractionModel::WriteAttribu
         ReturnErrorCodeIf(!request.subjectDescriptor.has_value(), CHIP_IM_GLOBAL_STATUS(UnsupportedAccess));
 
         Access::RequestPath requestPath{ .cluster = request.path.mClusterId, .endpoint = request.path.mEndpointId,
-                                         .requestType = Access::RequestType::kWriteRequest, .entityId = request.path.mAttributeId };
+                                         .requestType = Access::RequestType::kAttributeWriteRequest, .entityId = request.path.mAttributeId };
         CHIP_ERROR err = Access::GetAccessControl().Check(*request.subjectDescriptor, requestPath,
                                                           RequiredPrivilege::ForWriteAttribute(request.path));
 
