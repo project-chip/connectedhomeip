@@ -147,7 +147,7 @@ private:
      * @brief Check if the given location adheres to the restrictions required by the supported locations attribute.
      * @return true if the aLocation meets all checks.
      */
-    bool IsValidSupportedLocation(const LocationStructureWrapper & aLocation);
+    bool IsValidSupportedLocation(const AreaStructureWrapper & aLocation);
 
     /**
      * @brief check if aLocation is unique with regard to supported locations.
@@ -157,7 +157,7 @@ private:
      *
      * @note This method may ignore checking the MapId uniqueness. This depends on whether the SupportedMaps attribute is null.
      */
-    bool IsUniqueSupportedLocation(const LocationStructureWrapper & aLocation, bool ignoreAreaId);
+    bool IsUniqueSupportedLocation(const AreaStructureWrapper & aLocation, bool ignoreAreaId);
 
     /**
      * @brief Check if changing the estimated end time attribute to aEstimatedEndTime requires the change to be reported.

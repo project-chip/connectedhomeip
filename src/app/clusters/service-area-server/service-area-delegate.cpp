@@ -3,7 +3,7 @@
 
 using namespace chip::app::Clusters::ServiceArea;
 
-bool Delegate::GetSupportedLocationById(uint32_t aAreaId, uint32_t & listIndex, LocationStructureWrapper & aSupportedLocation)
+bool Delegate::GetSupportedLocationById(uint32_t aAreaId, uint32_t & listIndex, AreaStructureWrapper & aSupportedLocation)
 {
     listIndex = 0;
 

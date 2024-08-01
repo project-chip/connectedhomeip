@@ -34,9 +34,9 @@ inline constexpr size_t kMapNameMaxSize      = 64u;
  * This class is used to wrap the AreaStruct object and provide a more user-friendly interface for the data.
  * It provides a way to store the location name in a buffer, and provides a way to compare the location name with a given string.
  */
-struct LocationStructureWrapper : public chip::app::Clusters::ServiceArea::Structs::AreaStruct::Type
+struct AreaStructureWrapper : public chip::app::Clusters::ServiceArea::Structs::AreaStruct::Type
 {
-    LocationStructureWrapper()
+    AreaStructureWrapper()
     {
         Set(0, 0, CharSpan(), DataModel::Nullable<int16_t>(), DataModel::Nullable<Globals::AreaTypeTag>(),
             DataModel::Nullable<Globals::LandmarkTag>(), DataModel::Nullable<Globals::PositionTag>(),
@@ -60,7 +60,7 @@ struct LocationStructureWrapper : public chip::app::Clusters::ServiceArea::Struc
      * @note If aLocationName is larger than kLocationNameMaxSize, it will be truncated.
      * @note If aLocationName is an empty string and aFloorNumber and aAreaTypeTag are null, locationInfo will be set to null.
      */
-    LocationStructureWrapper(uint32_t aAreaID, const DataModel::Nullable<uint8_t> & aMapId, const CharSpan & aLocationName,
+    AreaStructureWrapper(uint32_t aAreaID, const DataModel::Nullable<uint8_t> & aMapId, const CharSpan & aLocationName,
                              const DataModel::Nullable<int16_t> & aFloorNumber,
                              const DataModel::Nullable<Globals::AreaTypeTag> & aAreaTypeTag,
                              const DataModel::Nullable<Globals::LandmarkTag> & aLandmarkTag,
@@ -77,7 +77,7 @@ struct LocationStructureWrapper : public chip::app::Clusters::ServiceArea::Struc
      *
      * @note If the locationName is empty string and aFloorNumber and aAreaTypeTag are null, locationInfo will be set to null.
      */
-    LocationStructureWrapper(const LocationStructureWrapper & aOther) { *this = aOther; }
+    AreaStructureWrapper(const AreaStructureWrapper & aOther) { *this = aOther; }
 
     /**
      * @brief This is an assignment operator that initializes the location object with the values from another location object. All
@@ -86,7 +86,7 @@ struct LocationStructureWrapper : public chip::app::Clusters::ServiceArea::Struc
      *
      * @note If the locationName is empty string and aFloorNumber and aAreaTypeTag are null, locationInfo will be set to null.
      */
-    LocationStructureWrapper & operator=(const LocationStructureWrapper & aOther)
+    AreaStructureWrapper & operator=(const AreaStructureWrapper & aOther)
     {
         if (aOther.areaDesc.locationInfo.IsNull())
         {
@@ -197,12 +197,12 @@ struct LocationStructureWrapper : public chip::app::Clusters::ServiceArea::Struc
     };
 
     /**
-     * @brief Checks if the given LocationStructureWrapper is equal to this one.
+     * @brief Checks if the given AreaStructureWrapper is equal to this one.
      * @param aOther The location to compare with.
      * @param aConfig Set if the area IDs and/or the map IDs should be ignored when checking for equality.
      * @return True if both locations are equal. False otherwise.
      */
-    bool IsEqual(const LocationStructureWrapper & aOther, BitMask<IsEqualConfig> aConfig) const
+    bool IsEqual(const AreaStructureWrapper & aOther, BitMask<IsEqualConfig> aConfig) const
     {
         if (!aConfig.Has(IsEqualConfig::kIgnoreAreaID) && (areaID != aOther.areaID))
         {

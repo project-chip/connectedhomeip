@@ -151,7 +151,7 @@ public:
      * @param[out] aSupportedLocation  copy of the location contents, if found.
      * @return true if location found, false otherwise.
      */
-    virtual bool GetSupportedLocationByIndex(uint32_t listIndex, LocationStructureWrapper & aSupportedLocation) = 0;
+    virtual bool GetSupportedLocationByIndex(uint32_t listIndex, AreaStructureWrapper & aSupportedLocation) = 0;
 
     /**
      * @brief Get a supported location that matches a areaID.
@@ -163,7 +163,7 @@ public:
      * @note may be overloaded in device implementation for optimization, if desired.
      */
     virtual bool GetSupportedLocationById(uint32_t aAreaId, uint32_t & listIndex,
-                                          LocationStructureWrapper & aSupportedLocation);
+                                          AreaStructureWrapper & aSupportedLocation);
 
     /**
      * This method is called by the server instance to add a new location to the list.
@@ -174,7 +174,7 @@ public:
 
      * @note this function SHOULD double check that the added location won't exceed the maximum list size.
      */
-    virtual bool AddSupportedLocation(const LocationStructureWrapper & newArea, uint32_t & listIndex) = 0;
+    virtual bool AddSupportedLocation(const AreaStructureWrapper & newArea, uint32_t & listIndex) = 0;
 
     /**
      * This method is called by the server instance to modify an existing location in the list.
@@ -185,7 +185,7 @@ public:
      *
      * @note this function SHOULD double check that newArea's areaID matches the object at listIndex.
      */
-    virtual bool ModifySupportedLocation(uint32_t listIndex, const LocationStructureWrapper & modifiedLocation) = 0;
+    virtual bool ModifySupportedLocation(uint32_t listIndex, const AreaStructureWrapper & modifiedLocation) = 0;
 
     /**
      * @return true if supported locations was not already null, false otherwise.

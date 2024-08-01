@@ -139,7 +139,7 @@ CHIP_ERROR Instance::ReadSupportedAreas(AttributeValueEncoder & aEncoder)
 
     return aEncoder.EncodeList([this](const auto & encoder) -> CHIP_ERROR {
         uint8_t locationIndex = 0;
-        LocationStructureWrapper supportedLocation;
+        AreaStructureWrapper supportedLocation;
 
         while (mDelegate->GetSupportedLocationByIndex(locationIndex++, supportedLocation))
         {
@@ -443,12 +443,12 @@ void Instance::NotifyProgressChanged()
 bool Instance::IsSupportedLocation(uint32_t aAreaId)
 {
     uint32_t ignoredIndex;
-    LocationStructureWrapper ignoredLocation;
+    AreaStructureWrapper ignoredLocation;
 
     return mDelegate->GetSupportedLocationById(aAreaId, ignoredIndex, ignoredLocation);
 }
 
-bool Instance::IsValidSupportedLocation(const LocationStructureWrapper & aLocation)
+bool Instance::IsValidSupportedLocation(const AreaStructureWrapper & aLocation)
 {
     // If the HomeLocationInfo field is null, the LandmarkTag field SHALL NOT be null.
     // If the LandmarkTag field is null, the HomeLocationInfo field SHALL NOT be null.
@@ -504,13 +504,13 @@ bool Instance::IsValidSupportedLocation(const LocationStructureWrapper & aLocati
     return true;
 }
 
-bool Instance::IsUniqueSupportedLocation(const LocationStructureWrapper & aLocation, bool ignoreAreaId)
+bool Instance::IsUniqueSupportedLocation(const AreaStructureWrapper & aLocation, bool ignoreAreaId)
 {
-    BitMask<LocationStructureWrapper::IsEqualConfig> config;
+    BitMask<AreaStructureWrapper::IsEqualConfig> config;
 
     if (ignoreAreaId)
     {
-        config.Set(LocationStructureWrapper::IsEqualConfig::kIgnoreAreaID);
+        config.Set(AreaStructureWrapper::IsEqualConfig::kIgnoreAreaID);
     }
 
     // If the SupportedMaps attribute is not null, each entry in this list SHALL have a unique value for the combination of the
@@ -518,11 +518,11 @@ bool Instance::IsUniqueSupportedLocation(const LocationStructureWrapper & aLocat
     // the LocationInfo field.
     if (mDelegate->GetNumberOfSupportedMaps() == 0)
     {
-        config.Set(LocationStructureWrapper::IsEqualConfig::kIgnoreMapId);
+        config.Set(AreaStructureWrapper::IsEqualConfig::kIgnoreMapId);
     }
 
     uint8_t locationIndex = 0;
-    LocationStructureWrapper entry;
+    AreaStructureWrapper entry;
     while (mDelegate->GetSupportedLocationByIndex(locationIndex++, entry))
     {
         if (aLocation.IsEqual(entry, config))
@@ -579,7 +579,7 @@ bool Instance::AddSupportedLocation(uint32_t aAreaId, const DataModel::Nullable<
                                     const DataModel::Nullable<Globals::FloorSurfaceTag> & aSurfaceTag)
 {
     // Create location object for validation.
-    LocationStructureWrapper aNewArea(aAreaId, aMapId, aLocationName, aFloorNumber, aAreaType, aLandmarkTag, aPositionTag,
+    AreaStructureWrapper aNewArea(aAreaId, aMapId, aLocationName, aFloorNumber, aAreaType, aLandmarkTag, aPositionTag,
                                           aSurfaceTag);
 
     // Does device mode allow this attribute to be updated?
@@ -634,7 +634,7 @@ bool Instance::ModifySupportedLocation(uint32_t aAreaId, const DataModel::Nullab
     uint32_t listIndex;
 
     // get existing supported location to modify
-    LocationStructureWrapper supportedLocation;
+    AreaStructureWrapper supportedLocation;
     if (!mDelegate->GetSupportedLocationById(aAreaId, listIndex, supportedLocation))
     {
         ChipLogError(Zcl, "ModifySupportedLocation %u - not a supported areaID", aAreaId);
@@ -655,7 +655,7 @@ bool Instance::ModifySupportedLocation(uint32_t aAreaId, const DataModel::Nullab
         }
 
         // create new location object for validation
-        LocationStructureWrapper aNewArea(aAreaId, aMapId, aLocationName, aFloorNumber, aAreaType, aLandmarkTag,
+        AreaStructureWrapper aNewArea(aAreaId, aMapId, aLocationName, aFloorNumber, aAreaType, aLandmarkTag,
                                               aPositionTag, aSurfaceTag);
 
         // verify cluster requirements concerning valid fields and field relationships

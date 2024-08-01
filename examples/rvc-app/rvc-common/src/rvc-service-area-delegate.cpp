@@ -106,7 +106,7 @@ uint32_t RvcServiceAreaDelegate::GetNumberOfSupportedAreas()
     return static_cast<uint32_t>(mSupportedAreas.size());
 }
 
-bool RvcServiceAreaDelegate::GetSupportedLocationByIndex(uint32_t listIndex, LocationStructureWrapper & aSupportedLocation)
+bool RvcServiceAreaDelegate::GetSupportedLocationByIndex(uint32_t listIndex, AreaStructureWrapper & aSupportedLocation)
 {
     if (listIndex < mSupportedAreas.size())
     {
@@ -118,7 +118,7 @@ bool RvcServiceAreaDelegate::GetSupportedLocationByIndex(uint32_t listIndex, Loc
 };
 
 bool RvcServiceAreaDelegate::GetSupportedLocationById(uint32_t aAreaID, uint32_t & listIndex,
-                                                      LocationStructureWrapper & aSupportedLocation)
+                                                      AreaStructureWrapper & aSupportedLocation)
 {
     // We do not need to reimplement this method as it's already done by the SDK.
     // We are reimplementing this method, still using linear search, but with some optimization on the SDK implementation
@@ -139,7 +139,7 @@ bool RvcServiceAreaDelegate::GetSupportedLocationById(uint32_t aAreaID, uint32_t
     return false;
 };
 
-bool RvcServiceAreaDelegate::AddSupportedLocation(const LocationStructureWrapper & newArea, uint32_t & listIndex)
+bool RvcServiceAreaDelegate::AddSupportedLocation(const AreaStructureWrapper & newArea, uint32_t & listIndex)
 {
     // The server instance (caller) is responsible for ensuring that there are no duplicate area IDs, list size not exceeded,
     // etc.
@@ -159,7 +159,7 @@ bool RvcServiceAreaDelegate::AddSupportedLocation(const LocationStructureWrapper
     return false;
 }
 
-bool RvcServiceAreaDelegate::ModifySupportedLocation(uint32_t listIndex, const LocationStructureWrapper & modifiedLocation)
+bool RvcServiceAreaDelegate::ModifySupportedLocation(uint32_t listIndex, const AreaStructureWrapper & modifiedLocation)
 {
     // The server instance (caller) is responsible for ensuring that there are no duplicate area IDs, list size not exceeded,
     // etc.

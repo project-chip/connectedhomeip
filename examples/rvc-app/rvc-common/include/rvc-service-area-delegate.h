@@ -35,7 +35,7 @@ class RvcServiceAreaDelegate : public Delegate
 {
 private:
     // containers for array attributes.
-    std::vector<ServiceArea::LocationStructureWrapper> mSupportedAreas;
+    std::vector<ServiceArea::AreaStructureWrapper> mSupportedAreas;
     std::vector<ServiceArea::MapStructureWrapper> mSupportedMaps;
     std::vector<uint32_t> mSelectedAreas;
     std::vector<ServiceArea::Structs::ProgressStruct::Type> mProgressList;
@@ -58,14 +58,14 @@ public:
 
     uint32_t GetNumberOfSupportedAreas() override;
 
-    bool GetSupportedLocationByIndex(uint32_t listIndex, ServiceArea::LocationStructureWrapper & supportedLocation) override;
+    bool GetSupportedLocationByIndex(uint32_t listIndex, ServiceArea::AreaStructureWrapper & supportedLocation) override;
 
     bool GetSupportedLocationById(uint32_t aAreaId, uint32_t & listIndex,
-                                  ServiceArea::LocationStructureWrapper & supportedLocation) override;
+                                  ServiceArea::AreaStructureWrapper & supportedLocation) override;
 
-    bool AddSupportedLocation(const ServiceArea::LocationStructureWrapper & newArea, uint32_t & listIndex) override;
+    bool AddSupportedLocation(const ServiceArea::AreaStructureWrapper & newArea, uint32_t & listIndex) override;
 
-    bool ModifySupportedLocation(uint32_t listIndex, const ServiceArea::LocationStructureWrapper & modifiedLocation) override;
+    bool ModifySupportedLocation(uint32_t listIndex, const ServiceArea::AreaStructureWrapper & modifiedLocation) override;
 
     bool ClearSupportedAreas() override;
 
