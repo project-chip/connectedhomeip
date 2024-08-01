@@ -153,7 +153,7 @@ const char * ActionReturnStatus::c_str() const
 #if CHIP_CONFIG_ERROR_FORMAT_AS_STRING
         return err->Format(); // any length
 #else
-        sFormatBuffer.Reset().AddFormat("%" CHIP_ERROR_FORMAT, *err);
+        sFormatBuffer.Reset().AddFormat("%" CHIP_ERROR_FORMAT, err->Format());
         return sFormatBuffer.c_str();
 #endif
     }
