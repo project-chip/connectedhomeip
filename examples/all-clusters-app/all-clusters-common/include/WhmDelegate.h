@@ -167,7 +167,7 @@ public:
      * @param percentageReplaced  The % of water being replaced with water with a temperature of replacedWaterTemperature.
      * @param replacedWaterTemperature  The temperature of the percentageReplaced water.
      */
-    void DrawOffHotWater(uint8_t percentageReplaced, uint16_t replacedWaterTemperature);
+    void DrawOffHotWater(chip::Percent percentageReplaced, uint16_t replacedWaterTemperature);
 
 private:
     /**
