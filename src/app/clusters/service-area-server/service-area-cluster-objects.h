@@ -45,7 +45,7 @@ struct LocationStructureWrapper : public chip::app::Clusters::ServiceArea::Struc
         SetSurfaceTag(DataModel::Nullable<FloorSurfaceTag>());
 
         // 'true' forces the 'canonical' form specified by the cluster requirements
-        // where the LocationDescriptorStruct is null if all it's elements are/would be empty or null.
+        // where the LocationDescriptorStruct is null if all its elements are/would be empty or null.
         SetLocationName(CharSpan(mLocationNameBuffer, 0), true);
         SetFloorNumber(DataModel::Nullable<int16_t>(), true);
         SetAreaType(DataModel::Nullable<AreaTypeTag>(), true);
