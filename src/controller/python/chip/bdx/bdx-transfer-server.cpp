@@ -30,6 +30,7 @@ CHIP_ERROR BdxTransferServer::Init(Messaging::ExchangeManager * exchangeManager)
 {
     VerifyOrReturnError(exchangeManager != nullptr, CHIP_ERROR_INVALID_ARGUMENT);
     mExchangeManager = exchangeManager;
+    mExchangeManager->UnregisterUnsolicitedMessageHandlerForType(MessageType::SendInit);
     return mExchangeManager->RegisterUnsolicitedMessageHandlerForProtocol(Protocols::BDX::Id, this);
 }
 

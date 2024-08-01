@@ -19,6 +19,8 @@
 
 #include <protocols/bdx/BdxMessages.h>
 
+#include <controller/CHIPDeviceControllerFactory.h>
+#include <controller/CHIPDeviceControllerSystemState.h>
 #include <controller/python/chip/bdx/bdx-transfer.h>
 #include <controller/python/chip/bdx/bdx-transfer-manager.h>
 #include <controller/python/chip/bdx/bdx-transfer-server.h>
@@ -174,6 +176,9 @@ void pychip_Bdx_InitCallbacks(OnTransferObtainedCallback onTransferObtainedCallb
     gOnTransferObtainedCallback  = onTransferObtainedCallback;
     gOnDataReceivedCallback      = onDataReceivedCallback;
     gOnTransferCompletedCallback = onTransferCompletedCallback;
+    // TODO: Move this into its own method maybe.
+    chip::Controller::DeviceControllerFactory & factory = chip::Controller::DeviceControllerFactory::GetInstance();
+    gBdxTransferServer.Init(factory.GetSystemState()->ExchangeMgr());
 }
 
 PyChipError pychip_Bdx_ExpectBdxTransfer(PyObject transferObtainedContext)
