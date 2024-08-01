@@ -192,24 +192,6 @@ ScopedNodeId GetSourceScopedNodeId(CommandHandler * commandObj)
 }
 
 /**
- * @brief Utility to clean up state by clearing the pending presets list, canceling the timer
- *        and setting PresetsEditable to false and clear the originator scoped node id.
- *
- * @param[in] delegate The delegate to use.
- * @param[in] endpoint The endpoint to use.
- */
-void CleanUp(Delegate * delegate, EndpointId endpoint)
-{
-    if (delegate != nullptr)
-    {
-        delegate->ClearPendingPresetList();
-    }
-    ClearTimer(endpoint);
-    gThermostatAttrAccess.SetAtomicWrite(endpoint, false);
-    gThermostatAttrAccess.SetAtomicWriteScopedNodeId(endpoint, ScopedNodeId());
-}
-
-/**
  * @brief Sends a response for the command and cleans up state by calling CleanUp()
  *
  * @param[in] delegate The delegate to use.
@@ -218,14 +200,16 @@ void CleanUp(Delegate * delegate, EndpointId endpoint)
  * @param[in] commandPath The command path.
  * @param[in] status The status code to send as the response.
  *
- * @return true to indicate the response has been sent and command has been handled.
  */
-bool SendResponseAndCleanUp(Delegate * delegate, EndpointId endpoint, CommandHandler * commandObj,
-                            const ConcreteCommandPath & commandPath, imcode status)
+void resetAtomicWrite(Delegate * delegate, EndpointId endpoint)
 {
-    commandObj->AddStatus(commandPath, status);
-    CleanUp(delegate, endpoint);
-    return true;
+    if (delegate != nullptr)
+    {
+        delegate->ClearPendingPresetList();
+    }
+    ClearTimer(endpoint);
+    gThermostatAttrAccess.SetAtomicWrite(endpoint, false);
+    gThermostatAttrAccess.SetAtomicWriteScopedNodeId(endpoint, ScopedNodeId());
 }
 
 /**
@@ -849,15 +833,8 @@ CHIP_ERROR ThermostatAttrAccess::Write(const ConcreteDataAttributePath & aPath, 
 {
     VerifyOrDie(aPath.mClusterId == Thermostat::Id);
 
-    EndpointId endpoint       = aPath.mEndpointId;
-    auto & subjectDescriptor  = aDecoder.GetSubjectDescriptor();
-    ScopedNodeId scopedNodeId = ScopedNodeId();
-
-    // Get the node id if the authentication mode is CASE.
-    if (subjectDescriptor.authMode == Access::AuthMode::kCase)
-    {
-        scopedNodeId = ScopedNodeId(subjectDescriptor.subject, subjectDescriptor.fabricIndex);
-    }
+    EndpointId endpoint      = aPath.mEndpointId;
+    auto & subjectDescriptor = aDecoder.GetSubjectDescriptor();
 
     // Check atomic attributes first
     switch (aPath.mAttributeId)
@@ -871,9 +848,9 @@ CHIP_ERROR ThermostatAttrAccess::Write(const ConcreteDataAttributePath & aPath, 
         VerifyOrReturnError(InAtomicWrite(endpoint), CHIP_IM_GLOBAL_STATUS(InvalidInState),
                             ChipLogError(Zcl, "Presets are not editable"));
 
-        // Check if the OriginatorScopedNodeId at the endpoint is the same as the node editing the presets,
+        // OK, we're in an atomic write, make sure the requesting node is the same one that started the atomic write,
         // otherwise return BUSY.
-        if (GetAtomicWriteScopedNodeId(endpoint) != scopedNodeId)
+        if (!InAtomicWrite(subjectDescriptor, endpoint))
         {
             ChipLogError(Zcl, "Another node is editing presets. Server is busy. Try again later");
             return CHIP_IM_GLOBAL_STATUS(Busy);
@@ -926,10 +903,10 @@ CHIP_ERROR ThermostatAttrAccess::Write(const ConcreteDataAttributePath & aPath, 
     }
 
     // This is not an atomic attribute, so check to make sure we don't have an atomic write going for this client
-    if (InAtomicWrite(endpoint))
+    if (InAtomicWrite(subjectDescriptor, endpoint))
     {
-        VerifyOrReturnError(GetAtomicWriteScopedNodeId(endpoint) != scopedNodeId, CHIP_IM_GLOBAL_STATUS(InvalidInState),
-                            ChipLogError(Zcl, "Can not write to non-atomic attributes during atomic write"));
+        ChipLogError(Zcl, "Can not write to non-atomic attributes during atomic write");
+        return CHIP_IM_GLOBAL_STATUS(InvalidInState);
     }
 
     uint32_t ourFeatureMap;
@@ -1279,16 +1256,16 @@ bool emberAfThermostatClusterSetWeeklyScheduleCallback(app::CommandHandler * com
 }
 
 bool emberAfThermostatClusterSetActiveScheduleRequestCallback(
-    chip::app::CommandHandler * commandObj, const chip::app::ConcreteCommandPath & commandPath,
-    const chip::app::Clusters::Thermostat::Commands::SetActiveScheduleRequest::DecodableType & commandData)
+    CommandHandler * commandObj, const ConcreteCommandPath & commandPath,
+    const Clusters::Thermostat::Commands::SetActiveScheduleRequest::DecodableType & commandData)
 {
     // TODO
     return false;
 }
 
 bool emberAfThermostatClusterSetActivePresetRequestCallback(
-    chip::app::CommandHandler * commandObj, const chip::app::ConcreteCommandPath & commandPath,
-    const chip::app::Clusters::Thermostat::Commands::SetActivePresetRequest::DecodableType & commandData)
+    CommandHandler * commandObj, const ConcreteCommandPath & commandPath,
+    const Clusters::Thermostat::Commands::SetActivePresetRequest::DecodableType & commandData)
 {
     EndpointId endpoint = commandPath.mEndpointId;
     Delegate * delegate = GetDelegate(endpoint);
@@ -1322,7 +1299,7 @@ bool emberAfThermostatClusterSetActivePresetRequestCallback(
     return true;
 }
 
-bool validAtomicAttributes(const Commands::AtomicRequest::DecodableType & commandData)
+bool validAtomicAttributes(const Commands::AtomicRequest::DecodableType & commandData, bool requireBoth)
 {
     auto attributeIdsIter = commandData.attributeRequests.begin();
     bool requestedPresets = false, requestedSchedules = false;
@@ -1354,11 +1331,27 @@ bool validAtomicAttributes(const Commands::AtomicRequest::DecodableType & comman
     {
         return false;
     }
+    if (requireBoth)
+    {
+        return (requestedPresets && requestedSchedules);
+    }
     // If the atomic request doesn't contain at least one of these attributes, it's invalid
     return (requestedPresets || requestedSchedules);
 }
 
-bool handleAtomicBegin(chip::app::CommandHandler * commandObj, const chip::app::ConcreteCommandPath & commandPath,
+Commands::AtomicResponse::Type buildAtomicResponse(imcode status, imcode presetsStatus, imcode schedulesStatus)
+{
+    Commands::AtomicResponse::Type response;
+    Globals::Structs::AtomicAttributeStatusStruct::Type attributeStatus[] = {
+        { .attributeID = Presets::Id, .statusCode = to_underlying(presetsStatus) },
+        { .attributeID = Schedules::Id, .statusCode = to_underlying(schedulesStatus) }
+    };
+    response.statusCode      = to_underlying(status);
+    response.attributeStatus = attributeStatus;
+    return response;
+}
+
+void handleAtomicBegin(CommandHandler * commandObj, const ConcreteCommandPath & commandPath,
                        const Commands::AtomicRequest::DecodableType & commandData)
 {
     EndpointId endpoint = commandPath.mEndpointId;
@@ -1367,35 +1360,27 @@ bool handleAtomicBegin(chip::app::CommandHandler * commandObj, const chip::app::
     {
         // This client already has an open atomic write
         commandObj->AddStatus(commandPath, imcode::InvalidInState);
-        return true;
+        return;
     }
 
     if (!commandData.timeout.HasValue())
     {
         commandObj->AddStatus(commandPath, imcode::InvalidCommand);
-        return true;
+        return;
     }
 
     auto timeout = commandData.timeout.Value();
 
-    if (!validAtomicAttributes(commandData))
+    if (!validAtomicAttributes(commandData, false))
     {
         commandObj->AddStatus(commandPath, imcode::InvalidCommand);
-        return true;
+        return;
     }
 
     if (gThermostatAttrAccess.InAtomicWrite(endpoint))
     {
-        Commands::AtomicResponse::Type response;
-        Globals::Structs::AtomicAttributeStatusStruct::Type attributeStatus[] = {
-            { .attributeID = Presets::Id, .statusCode = to_underlying(imcode::Busy) },
-            { .attributeID = Schedules::Id, .statusCode = to_underlying(imcode::Busy) }
-        };
-
-        response.statusCode      = to_underlying(imcode::Failure);
-        response.attributeStatus = attributeStatus;
-        commandObj->AddResponse(commandPath, response);
-        return true;
+        commandObj->AddResponse(commandPath, buildAtomicResponse(imcode::Failure, imcode::Busy, imcode::Busy));
+        return;
     }
 
     // This is a valid request to open an atomic write. Note that
@@ -1406,45 +1391,14 @@ bool handleAtomicBegin(chip::app::CommandHandler * commandObj, const chip::app::
     ScheduleTimer(endpoint, static_cast<System::Clock::Milliseconds16>(timeout));
     gThermostatAttrAccess.SetAtomicWrite(endpoint, true);
     gThermostatAttrAccess.SetAtomicWriteScopedNodeId(endpoint, GetSourceScopedNodeId(commandObj));
-    Commands::AtomicResponse::Type response;
-    Globals::Structs::AtomicAttributeStatusStruct::Type attributeStatus[] = {
-        { .attributeID = Presets::Id, .statusCode = to_underlying(imcode::Success) },
-        { .attributeID = Schedules::Id, .statusCode = to_underlying(imcode::Success) }
-    };
-
-    response.statusCode      = to_underlying(imcode::Success);
-    response.attributeStatus = attributeStatus;
+    auto response = buildAtomicResponse(imcode::Success, imcode::Success, imcode::Success);
     response.timeout.Emplace(timeout);
     commandObj->AddResponse(commandPath, response);
-
-    return true;
+    return;
 }
 
-bool handleAtomicCommit(chip::app::CommandHandler * commandObj, const chip::app::ConcreteCommandPath & commandPath,
-                        const Commands::AtomicRequest::DecodableType & commandData)
+imcode commitPresets(Delegate * delegate, EndpointId endpoint)
 {
-    if (!validAtomicAttributes(commandData))
-    {
-        commandObj->AddStatus(commandPath, imcode::InvalidCommand);
-        return true;
-    }
-    EndpointId endpoint = commandPath.mEndpointId;
-    bool inAtomicWrite  = gThermostatAttrAccess.InAtomicWrite(commandObj, endpoint);
-    if (!inAtomicWrite)
-    {
-        commandObj->AddStatus(commandPath, imcode::InvalidInState);
-        return true;
-    }
-
-    Delegate * delegate = GetDelegate(endpoint);
-
-    if (delegate == nullptr)
-    {
-        ChipLogError(Zcl, "Delegate is null");
-        commandObj->AddStatus(commandPath, imcode::InvalidInState);
-        return true;
-    }
-
     PresetStructWithOwnedMembers preset;
     CHIP_ERROR err = CHIP_NO_ERROR;
 
@@ -1464,7 +1418,7 @@ bool handleAtomicCommit(chip::app::CommandHandler * commandObj, const chip::app:
                          "emberAfThermostatClusterCommitPresetsSchedulesRequestCallback: GetPresetAtIndex failed with error "
                          "%" CHIP_ERROR_FORMAT,
                          err.Format());
-            return SendResponseAndCleanUp(delegate, endpoint, commandObj, commandPath, imcode::InvalidInState);
+            return imcode::InvalidInState;
         }
 
         bool found = MatchingPendingPresetExists(delegate, preset);
@@ -1473,7 +1427,7 @@ bool handleAtomicCommit(chip::app::CommandHandler * commandObj, const chip::app:
         // CONSTRAINT_ERROR.
         if (IsBuiltIn(preset) && !found)
         {
-            return SendResponseAndCleanUp(delegate, endpoint, commandObj, commandPath, imcode::ConstraintError);
+            return imcode::ConstraintError;
         }
     }
 
@@ -1487,7 +1441,7 @@ bool handleAtomicCommit(chip::app::CommandHandler * commandObj, const chip::app:
 
     if (err != CHIP_NO_ERROR)
     {
-        return SendResponseAndCleanUp(delegate, endpoint, commandObj, commandPath, imcode::InvalidInState);
+        return imcode::InvalidInState;
     }
 
     if (!activePresetHandle.empty())
@@ -1495,7 +1449,7 @@ bool handleAtomicCommit(chip::app::CommandHandler * commandObj, const chip::app:
         uint8_t count = CountPresetsInPendingListWithPresetHandle(delegate, activePresetHandle);
         if (count == 0)
         {
-            return SendResponseAndCleanUp(delegate, endpoint, commandObj, commandPath, imcode::InvalidInState);
+            return imcode::InvalidInState;
         }
     }
     // For each preset in the pending presets list, check that the preset does not violate any spec constraints.
@@ -1514,7 +1468,7 @@ bool handleAtomicCommit(chip::app::CommandHandler * commandObj, const chip::app:
                          "emberAfThermostatClusterCommitPresetsSchedulesRequestCallback: GetPendingPresetAtIndex failed with error "
                          "%" CHIP_ERROR_FORMAT,
                          err.Format());
-            return SendResponseAndCleanUp(delegate, endpoint, commandObj, commandPath, imcode::InvalidInState);
+            return imcode::InvalidInState;
         }
 
         bool isPendingPresetWithNullPresetHandle = pendingPreset.GetPresetHandle().IsNull();
@@ -1522,7 +1476,7 @@ bool handleAtomicCommit(chip::app::CommandHandler * commandObj, const chip::app:
         // If the preset handle is null and the built in field is set to true, return CONSTRAINT_ERROR.
         if (isPendingPresetWithNullPresetHandle && IsBuiltIn(pendingPreset))
         {
-            return SendResponseAndCleanUp(delegate, endpoint, commandObj, commandPath, imcode::ConstraintError);
+            return imcode::ConstraintError;
         }
 
         bool foundMatchingPresetInPresets = false;
@@ -1535,7 +1489,7 @@ bool handleAtomicCommit(chip::app::CommandHandler * commandObj, const chip::app:
             // presets attribute list, return NOT_FOUND.
             if (!foundMatchingPresetInPresets)
             {
-                return SendResponseAndCleanUp(delegate, endpoint, commandObj, commandPath, imcode::NotFound);
+                return imcode::NotFound;
             }
 
             // Find the number of presets in the pending preset list that match the preset handle. If there are duplicate
@@ -1543,35 +1497,37 @@ bool handleAtomicCommit(chip::app::CommandHandler * commandObj, const chip::app:
             uint8_t count = CountPresetsInPendingListWithPresetHandle(delegate, pendingPreset.GetPresetHandle().Value());
             if (count > 1)
             {
-                return SendResponseAndCleanUp(delegate, endpoint, commandObj, commandPath, imcode::ConstraintError);
+                return imcode::ConstraintError;
             }
         }
 
-        // If the preset is found in the  presets attribute list and the preset is builtIn in the pending presets list
-        //  but not in the presets attribute list, return UNSUPPORTED_ACCESS.
+        // If the BuiltIn field is true, and the PresetStruct in the current value with a
+        // matching PresetHandle field has a BuiltIn field set to false, a response
+        // with the status code CONSTRAINT_ERROR SHALL be returned.
         if (foundMatchingPresetInPresets && (IsBuiltIn(pendingPreset) && !IsBuiltIn(matchingPreset)))
         {
-            return SendResponseAndCleanUp(delegate, endpoint, commandObj, commandPath, imcode::UnsupportedAccess);
+            return imcode::ConstraintError;
         }
 
-        // If the preset is found in the  presets attribute list and the preset is builtIn in the presets attribute
-        //  but not in the pending presets list, return UNSUPPORTED_ACCESS.
+        // If the BuiltIn field is false, and the PresetStruct in the current value with a
+        // matching PresetHandle field has a BuiltIn field set to true, a response
+        // with the status code CONSTRAINT_ERROR SHALL be returned.
         if (foundMatchingPresetInPresets && (!IsBuiltIn(pendingPreset) && IsBuiltIn(matchingPreset)))
         {
-            return SendResponseAndCleanUp(delegate, endpoint, commandObj, commandPath, imcode::UnsupportedAccess);
+            return imcode::ConstraintError;
         }
 
         // If the presetScenario is not found in the preset types, return CONSTRAINT_ERROR.
         PresetScenarioEnum presetScenario = pendingPreset.GetPresetScenario();
         if (!PresetScenarioExistsInPresetTypes(delegate, presetScenario))
         {
-            return SendResponseAndCleanUp(delegate, endpoint, commandObj, commandPath, imcode::ConstraintError);
+            return imcode::ConstraintError;
         }
 
         // If the preset type for the preset scenario does not support names and a name is specified, return CONSTRAINT_ERROR.
         if (!PresetTypeSupportsNames(delegate, presetScenario) && pendingPreset.GetName().HasValue())
         {
-            return SendResponseAndCleanUp(delegate, endpoint, commandObj, commandPath, imcode::ConstraintError);
+            return imcode::ConstraintError;
         }
 
         // Enforce the Setpoint Limits for both the cooling and heating setpoints in the pending preset.
@@ -1595,14 +1551,14 @@ bool handleAtomicCommit(chip::app::CommandHandler * commandObj, const chip::app:
     if (numberOfPresetsSupported == 0)
     {
         ChipLogError(Zcl, "emberAfThermostatClusterCommitPresetsSchedulesRequestCallback: Failed to get NumberOfPresets");
-        return SendResponseAndCleanUp(delegate, endpoint, commandObj, commandPath, imcode::InvalidInState);
+        return imcode::InvalidInState;
     }
 
     // If the expected length of the presets attribute with the applied changes exceeds the total number of presets supported,
     // return RESOURCE_EXHAUSTED. Note that the changes are not yet applied.
     if (numberOfPresetsSupported > 0 && totalCount > numberOfPresetsSupported)
     {
-        return SendResponseAndCleanUp(delegate, endpoint, commandObj, commandPath, imcode::ResourceExhausted);
+        return imcode::ResourceExhausted;
     }
 
     // TODO: Check if the number of presets for each presetScenario exceeds the max number of presets supported for that
@@ -1613,26 +1569,25 @@ bool handleAtomicCommit(chip::app::CommandHandler * commandObj, const chip::app:
 
     if (err != CHIP_NO_ERROR)
     {
-        return SendResponseAndCleanUp(delegate, endpoint, commandObj, commandPath, imcode::InvalidInState);
+        return imcode::InvalidInState;
     }
-
-    return SendResponseAndCleanUp(delegate, endpoint, commandObj, commandPath, imcode::Success);
+    return imcode::Success;
 }
 
-bool handleAtomicRollback(chip::app::CommandHandler * commandObj, const chip::app::ConcreteCommandPath & commandPath,
-                          const Commands::AtomicRequest::DecodableType & commandData)
+void handleAtomicCommit(CommandHandler * commandObj, const ConcreteCommandPath & commandPath,
+                        const Commands::AtomicRequest::DecodableType & commandData)
 {
-    if (!validAtomicAttributes(commandData))
+    if (!validAtomicAttributes(commandData, true))
     {
         commandObj->AddStatus(commandPath, imcode::InvalidCommand);
-        return true;
+        return;
     }
     EndpointId endpoint = commandPath.mEndpointId;
     bool inAtomicWrite  = gThermostatAttrAccess.InAtomicWrite(commandObj, endpoint);
     if (!inAtomicWrite)
     {
         commandObj->AddStatus(commandPath, imcode::InvalidInState);
-        return true;
+        return;
     }
 
     Delegate * delegate = GetDelegate(endpoint);
@@ -1641,14 +1596,47 @@ bool handleAtomicRollback(chip::app::CommandHandler * commandObj, const chip::ap
     {
         ChipLogError(Zcl, "Delegate is null");
         commandObj->AddStatus(commandPath, imcode::InvalidInState);
-        return true;
+        return;
     }
-    return SendResponseAndCleanUp(delegate, endpoint, commandObj, commandPath, imcode::Success);
+
+    auto presetsStatus = commitPresets(delegate, endpoint);
+    // TODO: copy over schedules code
+    auto schedulesStatus = imcode::Success;
+    resetAtomicWrite(delegate, endpoint);
+    imcode status = (presetsStatus == imcode::Success && schedulesStatus == imcode::Success) ? imcode::Success : imcode::Failure;
+    commandObj->AddResponse(commandPath, buildAtomicResponse(status, presetsStatus, schedulesStatus));
 }
 
-bool emberAfThermostatClusterAtomicRequestCallback(
-    chip::app::CommandHandler * commandObj, const chip::app::ConcreteCommandPath & commandPath,
-    const chip::app::Clusters::Thermostat::Commands::AtomicRequest::DecodableType & commandData)
+void handleAtomicRollback(CommandHandler * commandObj, const ConcreteCommandPath & commandPath,
+                          const Commands::AtomicRequest::DecodableType & commandData)
+{
+    if (!validAtomicAttributes(commandData, true))
+    {
+        commandObj->AddStatus(commandPath, imcode::InvalidCommand);
+        return;
+    }
+    EndpointId endpoint = commandPath.mEndpointId;
+    bool inAtomicWrite  = gThermostatAttrAccess.InAtomicWrite(commandObj, endpoint);
+    if (!inAtomicWrite)
+    {
+        commandObj->AddStatus(commandPath, imcode::InvalidInState);
+        return;
+    }
+
+    Delegate * delegate = GetDelegate(endpoint);
+
+    if (delegate == nullptr)
+    {
+        ChipLogError(Zcl, "Delegate is null");
+        commandObj->AddStatus(commandPath, imcode::InvalidInState);
+        return;
+    }
+    resetAtomicWrite(delegate, endpoint);
+    commandObj->AddResponse(commandPath, buildAtomicResponse(imcode::Success, imcode::Success, imcode::Success));
+}
+
+bool emberAfThermostatClusterAtomicRequestCallback(CommandHandler * commandObj, const ConcreteCommandPath & commandPath,
+                                                   const Clusters::Thermostat::Commands::AtomicRequest::DecodableType & commandData)
 {
     auto & requestType = commandData.requestType;
 
@@ -1658,11 +1646,14 @@ bool emberAfThermostatClusterAtomicRequestCallback(
     switch (requestType)
     {
     case Globals::AtomicRequestTypeEnum::kBeginWrite:
-        return handleAtomicBegin(commandObj, commandPath, commandData);
+        handleAtomicBegin(commandObj, commandPath, commandData);
+        return true;
     case Globals::AtomicRequestTypeEnum::kCommitWrite:
-        return handleAtomicCommit(commandObj, commandPath, commandData);
+        handleAtomicCommit(commandObj, commandPath, commandData);
+        return true;
     case Globals::AtomicRequestTypeEnum::kRollbackWrite:
-        return handleAtomicRollback(commandObj, commandPath, commandData);
+        handleAtomicRollback(commandObj, commandPath, commandData);
+        return true;
     case Globals::AtomicRequestTypeEnum::kUnknownEnumValue:
         commandObj->AddStatus(commandPath, imcode::InvalidCommand);
         return true;
