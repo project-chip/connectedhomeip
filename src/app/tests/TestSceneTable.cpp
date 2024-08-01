@@ -21,6 +21,7 @@
 #include <app/util/mock/Constants.h>
 #include <app/util/mock/Functions.h>
 #include <app/util/mock/MockNodeConfig.h>
+#include <app/util/odd-sized-integers.h>
 #include <crypto/DefaultSessionKeystore.h>
 #include <lib/core/TLV.h>
 #include <lib/support/Span.h>
@@ -150,7 +151,7 @@ static app::Clusters::ScenesManagement::Structs::ExtensionFieldSet::Type CCexten
 
 static app::Clusters::ScenesManagement::Structs::AttributeValuePairStruct::Type OOPairs[1];
 static app::Clusters::ScenesManagement::Structs::AttributeValuePairStruct::Type LCPairs[2];
-static app::Clusters::ScenesManagement::Structs::AttributeValuePairStruct::Type CCPairs[8];
+static app::Clusters::ScenesManagement::Structs::AttributeValuePairStruct::Type CCPairs[9];
 
 static uint8_t OO_buffer[scenes::kMaxFieldBytesPerCluster] = { 0 };
 static uint8_t LC_buffer[scenes::kMaxFieldBytesPerCluster] = { 0 };
@@ -169,8 +170,11 @@ static const uint8_t defaultValueData64[] = { 0x00, 0x00, 0x00, 0x00, 0x00, 0x00
 // static const uint8_t maxValueData32[] = { 0xFF, 0xFF, 0x7F, 0x00 }; // Equivalent, in little-endian, to 0x007FFFFF
 // #endif
 
-static EmberAfAttributeMinMaxValue minMaxValueBool = { static_cast<uint8_t>(0), static_cast<uint8_t>(0), static_cast<uint8_t>(1) };
-static EmberAfAttributeMinMaxValue minMaxValue8 = { static_cast<uint8_t>(0), static_cast<uint8_t>(1), static_cast<uint8_t>(0xFE) };
+static EmberAfAttributeMinMaxValue minMaxValueBool = { static_cast<bool>(0), static_cast<bool>(0), static_cast<bool>(1) };
+static EmberAfAttributeMinMaxValue minMaxValue8  = { static_cast<uint8_t>(0), static_cast<uint8_t>(1), static_cast<uint8_t>(0xFE) };
+static EmberAfAttributeMinMaxValue minMaxValue8S = { static_cast<int8_t>(0), static_cast<int8_t>(-1), static_cast<int8_t>(0x7F) };
+static EmberAfAttributeMinMaxValue minMaxValue16S = { static_cast<uint16_t>(0), static_cast<uint16_t>(-1),
+                                                      static_cast<uint16_t>(0x7FFE) };
 // static EmberAfAttributeMinMaxValue minMaxValue16 = { static_cast<uint16_t>(0), static_cast<uint16_t>(1),
 //                                                      static_cast<uint16_t>(0xFFFE) };
 // static EmberAfAttributeMinMaxValue minMaxValue32 = { defaultValueData32, minValueData32, maxValueData32 };
@@ -196,7 +200,7 @@ static EmberAfAttributeMetadata mockMetadataUint8Max = {
     .attributeId   = 0,
     .size          = 1,
     .attributeType = ZCL_INT8U_ATTRIBUTE_TYPE,
-    .mask          = ATTRIBUTE_MASK_WRITABLE | ATTRIBUTE_MASK_NULLABLE,
+    .mask          = ATTRIBUTE_MASK_WRITABLE | ATTRIBUTE_MASK_NULLABLE | ATTRIBUTE_MASK_MIN_MAX,
 };
 
 static EmberAfAttributeMetadata mockMetadataUint16 = {
@@ -248,19 +252,19 @@ static EmberAfAttributeMetadata mockMetadataUint64 = {
 };
 
 static EmberAfAttributeMetadata mockMetadataInt8 = {
-    .defaultValue  = EmberAfDefaultOrMinMaxAttributeValue(static_cast<int8_t>(0)),
+    .defaultValue  = EmberAfDefaultOrMinMaxAttributeValue(&minMaxValue8S),
     .attributeId   = 0,
     .size          = 1,
     .attributeType = ZCL_INT8S_ATTRIBUTE_TYPE,
-    .mask          = ATTRIBUTE_MASK_WRITABLE | ATTRIBUTE_MASK_NULLABLE,
+    .mask          = ATTRIBUTE_MASK_WRITABLE | ATTRIBUTE_MASK_NULLABLE | ATTRIBUTE_MASK_MIN_MAX,
 };
 
 static EmberAfAttributeMetadata mockMetadataInt16 = {
-    .defaultValue  = EmberAfDefaultOrMinMaxAttributeValue(static_cast<int32_t>(0)),
+    .defaultValue  = EmberAfDefaultOrMinMaxAttributeValue(&minMaxValue16S),
     .attributeId   = 0,
     .size          = 2,
     .attributeType = ZCL_INT16S_ATTRIBUTE_TYPE,
-    .mask          = ATTRIBUTE_MASK_WRITABLE | ATTRIBUTE_MASK_NULLABLE,
+    .mask          = ATTRIBUTE_MASK_WRITABLE | ATTRIBUTE_MASK_NULLABLE | ATTRIBUTE_MASK_MIN_MAX,
 };
 
 static EmberAfAttributeMetadata mockMetadataInt24 = {
@@ -324,7 +328,7 @@ static const MockNodeConfig SceneMockNodeConfig({
             MockAttributeConfig(kCurrentYId, mockMetadataUint16), MockAttributeConfig(kColorTemperatureMiredsId, mockMetadataUint16),
             MockAttributeConfig(kEnhancedCurrentHueId, mockMetadataUint16), MockAttributeConfig(kEnhancedColorMode, mockMetadataUint8), 
             MockAttributeConfig(kColorLoopActiveId, mockMetadataUint8), MockAttributeConfig(kColorLoopDirectionId, mockMetadataUint8), 
-            MockAttributeConfig(kColorLoopTimeId, mockMetadataUint8)
+            MockAttributeConfig(kColorLoopTimeId, mockMetadataUint16)
         }),
     }),
     MockEndpointConfig(kTestEndpoint3, {
@@ -753,34 +757,32 @@ TEST_F(TestSceneTable, TestHandlerFunctions)
     TLV::TLVReader reader;
     TLV::TLVWriter writer;
 
-    static const uint8_t OO_av_payload     = 0x01;
-    static const uint16_t LC_av_payload[2] = { 0x64, 0x01F0 };
-    static const uint16_t CC_av_payload[8] = { 0 };
-
     OOPairs[0].attributeID = kOnOffAttId;
-    OOPairs[0].valueUnsigned8.SetValue(OO_av_payload);
+    OOPairs[0].valueUnsigned8.SetValue(0x01);
 
     LCPairs[0].attributeID = kCurrentLevelId;
-    LCPairs[0].valueUnsigned8.SetValue(static_cast<uint8_t>(LC_av_payload[0]));
+    LCPairs[0].valueUnsigned8.SetValue(0x64);
     LCPairs[1].attributeID = kCurrentFrequencyId;
-    LCPairs[1].valueUnsigned16.SetValue(LC_av_payload[1]);
+    LCPairs[1].valueUnsigned16.SetValue(0x01F0);
 
     CCPairs[0].attributeID = kCurrentSaturationId;
-    CCPairs[0].valueUnsigned8.SetValue(static_cast<uint8_t>(CC_av_payload[0]));
+    CCPairs[0].valueUnsigned8.SetValue(0);
     CCPairs[1].attributeID = kCurrentXId;
-    CCPairs[1].valueUnsigned16.SetValue(CC_av_payload[1]);
+    CCPairs[1].valueUnsigned16.SetValue(0);
     CCPairs[2].attributeID = kCurrentYId;
-    CCPairs[2].valueUnsigned16.SetValue(CC_av_payload[2]);
+    CCPairs[2].valueUnsigned16.SetValue(0);
     CCPairs[3].attributeID = kColorTemperatureMiredsId;
-    CCPairs[3].valueUnsigned16.SetValue(CC_av_payload[3]);
+    CCPairs[3].valueUnsigned16.SetValue(0);
     CCPairs[4].attributeID = kEnhancedCurrentHueId;
-    CCPairs[4].valueUnsigned16.SetValue(CC_av_payload[4]);
-    CCPairs[5].attributeID = kColorLoopActiveId;
-    CCPairs[5].valueUnsigned8.SetValue(static_cast<uint8_t>(CC_av_payload[5]));
-    CCPairs[6].attributeID = kColorLoopDirectionId;
-    CCPairs[6].valueUnsigned8.SetValue(static_cast<uint8_t>(CC_av_payload[6]));
-    CCPairs[7].attributeID = kColorLoopTimeId;
-    CCPairs[7].valueUnsigned8.SetValue(static_cast<uint8_t>(CC_av_payload[7]));
+    CCPairs[4].valueUnsigned16.SetValue(0);
+    CCPairs[5].attributeID = kEnhancedColorMode;
+    CCPairs[5].valueUnsigned8.SetValue(0);
+    CCPairs[6].attributeID = kColorLoopActiveId;
+    CCPairs[6].valueUnsigned8.SetValue(0);
+    CCPairs[7].attributeID = kColorLoopDirectionId;
+    CCPairs[7].valueUnsigned8.SetValue(0);
+    CCPairs[8].attributeID = kColorLoopTimeId;
+    CCPairs[8].valueUnsigned16.SetValue(0);
 
     // Initialize Extension Field sets as if they were received by add commands
     OOextensionFieldSet.clusterID          = kOnOffClusterId;
@@ -956,40 +958,293 @@ TEST_F(TestSceneTable, TestHandlerFunctions)
     // Clear buffer
     memset(buffer, 0, buff_span.size());
 
-    // Test Serialize Add of an attribute value that is smaller than the mock attribute min (-2)
-    // OOPairs[0].valueUnsigned8.SetValue(OO_av_payload);
+    // Test Serialize Add of an attribute value that is smaller than the mock attribute min (1) for LC current level
+    LCPairs[0].valueUnsigned8.SetValue(0);
 
-    // extensionFieldValueCapOut.clusterID          = kOnOffClusterId;
-    // extensionFieldValueCapOut.attributeValueList = OOPairs;
+    extensionFieldValueCapOut.clusterID          = kLevelControlClusterId;
+    extensionFieldValueCapOut.attributeValueList = LCPairs;
 
-    // /// Setup of input EFS (by temporary using the output one)
-    // buff_span = MutableByteSpan(buffer);
-    // writer.Init(buff_span);
-    // NL_TEST_ASSERT(
-    //     aSuite, CHIP_NO_ERROR == app::DataModel::Encode(writer, TLV::AnonymousTag(),
-    //     extensionFieldValueCapOut.attributeValueList));
+    /// Setup of input EFS (by temporary using the output one)
+    buff_span = MutableByteSpan(buffer);
+    writer.Init(buff_span);
+    EXPECT_EQ(CHIP_NO_ERROR, app::DataModel::Encode(writer, TLV::AnonymousTag(), extensionFieldValueCapOut.attributeValueList));
 
-    // reader.Init(buffer);
-    // extensionFieldValueCapIn.clusterID = kOnOffClusterId;
-    // NL_TEST_ASSERT(aSuite, CHIP_NO_ERROR == reader.Next());
-    // NL_TEST_ASSERT(aSuite, CHIP_NO_ERROR == extensionFieldValueCapIn.attributeValueList.Decode(reader));
+    reader.Init(buffer);
+    extensionFieldValueCapIn.clusterID = kLevelControlClusterId;
+    EXPECT_EQ(CHIP_NO_ERROR, reader.Next());
+    EXPECT_EQ(CHIP_NO_ERROR, extensionFieldValueCapIn.attributeValueList.Decode(reader));
 
-    // // Verify that the initial value is not capped
-    // auto iterator = extensionFieldValueCapIn.attributeValueList.begin();
-    // iterator.Next();
-    // pair = iterator.GetValue();
-    // NL_TEST_ASSERT(aSuite, pair.attributeValue == OOPairs[0].attributeValue);
+    // Verify that the initial value is not capped
+    auto iteratorMin = extensionFieldValueCapIn.attributeValueList.begin();
+    iteratorMin.Next();
+    pair = iteratorMin.GetValue();
+    EXPECT_EQ(pair.valueUnsigned8.Value(), LCPairs[0].valueUnsigned8.Value());
 
-    // // Verify that we cap the value to the mock attribute size when serializing
-    // NL_TEST_ASSERT(aSuite, CHIP_NO_ERROR == sHandler.SerializeAdd(kTestEndpoint1, extensionFieldValueCapIn, buff_span));
-    // NL_TEST_ASSERT(aSuite,
-    //                CHIP_NO_ERROR == sHandler.Deserialize(kTestEndpoint1, kOnOffClusterId, buff_span, extensionFieldValueCapOut));
+    // Verify that we cap the value to the mock attribute size when serializing
+    EXPECT_EQ(CHIP_NO_ERROR, mpSceneHandler->SerializeAdd(kTestEndpoint1, extensionFieldValueCapIn, buff_span));
+    EXPECT_EQ(CHIP_NO_ERROR,
+              mpSceneHandler->Deserialize(kTestEndpoint1, kLevelControlClusterId, buff_span, extensionFieldValueCapOut));
 
-    // // Verify that the output value is capped to -1 (0xFFFFFFFF)
-    // NL_TEST_ASSERT(aSuite, extensionFieldValueCapOut.attributeValueList[0].attributeValue == 0xFFFFFFFF);
+    // Verify that the output value is capped to 1
+    EXPECT_EQ(1, extensionFieldValueCapOut.attributeValueList[0].valueUnsigned8.Value());
 
-    // // Clear buffer
-    // memset(buffer, 0, buff_span.size());
+    // Clear buffer
+    memset(buffer, 0, buff_span.size());
+
+    // Test Serialize Add of an attribute value that is higher than the mock attribute max (0xFE) for LC current level
+    LCPairs[0].valueUnsigned8.SetValue(0xFF);
+
+    extensionFieldValueCapOut.clusterID          = kLevelControlClusterId;
+    extensionFieldValueCapOut.attributeValueList = LCPairs;
+
+    /// Setup of input EFS (by temporary using the output one)
+    buff_span = MutableByteSpan(buffer);
+    writer.Init(buff_span);
+    EXPECT_EQ(CHIP_NO_ERROR, app::DataModel::Encode(writer, TLV::AnonymousTag(), extensionFieldValueCapOut.attributeValueList));
+
+    reader.Init(buffer);
+    extensionFieldValueCapIn.clusterID = kLevelControlClusterId;
+    EXPECT_EQ(CHIP_NO_ERROR, reader.Next());
+    EXPECT_EQ(CHIP_NO_ERROR, extensionFieldValueCapIn.attributeValueList.Decode(reader));
+
+    // Verify that the initial value is not capped
+    auto iteratorMax = extensionFieldValueCapIn.attributeValueList.begin();
+    iteratorMax.Next();
+    pair = iteratorMax.GetValue();
+    EXPECT_EQ(pair.valueUnsigned8.Value(), LCPairs[0].valueUnsigned8.Value());
+
+    // Verify that we cap the value to the mock attribute size when serializing
+    EXPECT_EQ(CHIP_NO_ERROR, mpSceneHandler->SerializeAdd(kTestEndpoint1, extensionFieldValueCapIn, buff_span));
+    EXPECT_EQ(CHIP_NO_ERROR,
+              mpSceneHandler->Deserialize(kTestEndpoint1, kLevelControlClusterId, buff_span, extensionFieldValueCapOut));
+
+    // Verify that the output value is capped to 0xFE
+    EXPECT_EQ(0xFE, extensionFieldValueCapOut.attributeValueList[0].valueUnsigned8.Value());
+
+    // Clear buffer
+    memset(buffer, 0, buff_span.size());
+
+    // MockEndpointConfig(kTestEndpoint4,
+    //                    {
+    //                        MockClusterConfig(kScenesClusterId, {}),
+    //                        MockClusterConfig(MockClusterId(kColorControlClusterId),
+    //                                          { MockAttributeConfig(MockAttributeId(kCurrentSaturationId), mockMetadataUint24),
+    //                                            MockAttributeConfig(MockAttributeId(kCurrentXId), mockMetadataUint32),
+    //                                            MockAttributeConfig(MockAttributeId(kCurrentYId), mockMetadataUint48),
+    //                                            MockAttributeConfig(MockAttributeId(kColorTemperatureMiredsId),
+    //                                            mockMetadataUint56), MockAttributeConfig(MockAttributeId(kEnhancedCurrentHueId),
+    //                                            mockMetadataUint64), MockAttributeConfig(MockAttributeId(kEnhancedColorMode),
+    //                                            mockMetadataInt8), MockAttributeConfig(MockAttributeId(kColorLoopActiveId),
+    //                                            mockMetadataInt16), MockAttributeConfig(MockAttributeId(kColorLoopDirectionId),
+    //                                            mockMetadataInt24), MockAttributeConfig(MockAttributeId(kColorLoopTimeId),
+    //                                            mockMetadataInt32) }),
+    //                        MockClusterConfig(MockClusterId(kOnOffClusterId),
+    //                                          { MockAttributeConfig(MockAttributeId(kOnOffAttId), mockMetadataInt48) }),
+    //                        MockClusterConfig(MockClusterId(kLevelControlClusterId),
+    //                                          { MockAttributeConfig(MockAttributeId(kCurrentLevelId), mockMetadataInt56),
+    //                                            MockAttributeConfig(MockAttributeId(kCurrentFrequencyId), mockMetadataInt64) }),
+    //                    }),
+
+    // Test for attribtues types that are in no Real clusters yet but are supported in scenes
+    {
+        // Setup EFS for mock cluster testing all attributes types
+        app::Clusters::ScenesManagement::Structs::AttributeValuePairStruct::Type MockOOPairs[1];
+        app::Clusters::ScenesManagement::Structs::AttributeValuePairStruct::Type MockLCPairs[2];
+        app::Clusters::ScenesManagement::Structs::AttributeValuePairStruct::Type MockCCPairs[9];
+        // Mock CC
+        MockCCPairs[0].attributeID = MockAttributeId(kCurrentSaturationId);
+        MockCCPairs[0].valueUnsigned32.SetValue(UINT32_MAX); // will cap to 0x00FFFFFF (uint24)
+        MockCCPairs[1].attributeID = MockAttributeId(kCurrentXId);
+        MockCCPairs[1].valueUnsigned32.SetValue(UINT32_MAX); // not capped
+        MockCCPairs[2].attributeID = MockAttributeId(kCurrentYId);
+        MockCCPairs[2].valueUnsigned64.SetValue(UINT64_MAX); // will cap to 0x0000FFFFFFFFFFFF (uint48)
+        MockCCPairs[3].attributeID = MockAttributeId(kColorTemperatureMiredsId);
+        MockCCPairs[3].valueUnsigned64.SetValue(UINT64_MAX); // will cap to 0x00FFFFFFFFFFFFFF (uint56)
+        MockCCPairs[4].attributeID = MockAttributeId(kEnhancedCurrentHueId);
+        MockCCPairs[4].valueUnsigned64.SetValue(UINT64_MAX); // not capped
+        MockCCPairs[5].attributeID = MockAttributeId(kEnhancedColorMode);
+        MockCCPairs[5].valueSigned8.SetValue(static_cast<int8_t>(-2)); // will cap to -1
+        MockCCPairs[6].attributeID = MockAttributeId(kColorLoopActiveId);
+        MockCCPairs[6].valueSigned16.SetValue(static_cast<int16_t>(0x7FFF)); // will cap to 0x7FFE in int16
+        MockCCPairs[7].attributeID = MockAttributeId(kColorLoopDirectionId);
+        MockCCPairs[7].valueSigned32.SetValue(INT32_MIN); // will cap to -1 in int24
+        MockCCPairs[8].attributeID = MockAttributeId(kColorLoopTimeId);
+        MockCCPairs[8].valueSigned32.SetValue(INT32_MIN); // not capped
+        // Mock OO
+        MockOOPairs[0].attributeID = MockAttributeId(kOnOffAttId);
+        MockOOPairs[0].valueSigned64.SetValue(INT64_MAX); // will cap to 0x00007FFFFFFFFFFF (int48)
+        // Mock LC
+        MockLCPairs[0].attributeID = MockAttributeId(kCurrentLevelId);
+        MockLCPairs[0].valueSigned64.SetValue(INT64_MIN); // will cap to 0x00FFFFFFFFFFFFFF (int56)
+        MockLCPairs[1].attributeID = MockAttributeId(kCurrentFrequencyId);
+        MockLCPairs[1].valueSigned64.SetValue(INT64_MIN); // not capped
+
+        // Initialize Extension Field sets as if they were received by add commands
+        OOextensionFieldSet.clusterID          = MockClusterId(kOnOffClusterId);
+        OOextensionFieldSet.attributeValueList = MockOOPairs;
+        LCextensionFieldSet.clusterID          = MockClusterId(kLevelControlClusterId);
+        LCextensionFieldSet.attributeValueList = MockLCPairs;
+        CCextensionFieldSet.clusterID          = MockClusterId(kColorControlClusterId);
+        CCextensionFieldSet.attributeValueList = MockCCPairs;
+
+        uint8_t mock_OO_buffer[scenes::kMaxFieldBytesPerCluster]     = { 0 };
+        uint8_t mock_LC_buffer[scenes::kMaxFieldBytesPerCluster]     = { 0 };
+        uint8_t mock_CC_buffer[scenes::kMaxFieldBytesPerCluster * 2] = {
+            0
+        }; // Using mock attributes way bigger than the real ones so we increase the buffer size for this test
+        ByteSpan Mock_OO_list(mock_OO_buffer);
+        ByteSpan Mock_LC_list(mock_LC_buffer);
+        ByteSpan Mock_CC_list(mock_CC_buffer);
+
+        uint8_t mock_buffer[scenes::kMaxFieldBytesPerCluster] = { 0 };
+        MutableByteSpan mock_buff_span(mock_buffer);
+
+        // Serialize Extension Field sets as if they were recovered from memory
+        writer.Init(OO_buffer);
+        EXPECT_EQ(CHIP_NO_ERROR, app::DataModel::Encode(writer, TLV::AnonymousTag(), OOextensionFieldSet.attributeValueList));
+        OO_buffer_serialized_length = writer.GetLengthWritten();
+
+        writer.Init(LC_buffer);
+        EXPECT_EQ(CHIP_NO_ERROR, app::DataModel::Encode(writer, TLV::AnonymousTag(), LCextensionFieldSet.attributeValueList));
+        LC_buffer_serialized_length = writer.GetLengthWritten();
+
+        writer.Init(CC_buffer);
+        EXPECT_EQ(CHIP_NO_ERROR, app::DataModel::Encode(writer, TLV::AnonymousTag(), CCextensionFieldSet.attributeValueList));
+        CC_buffer_serialized_length = writer.GetLengthWritten();
+
+        // Test Registering SceneHandler
+        sceneTable->RegisterHandler(mpSceneHandler);
+        EXPECT_FALSE(sceneTable->HandlerListEmpty());
+
+        // Setup the On Off Extension field set in the expected state from a command
+        reader.Init(mock_buffer);
+        extensionFieldValueCapIn.clusterID = MockClusterId(kOnOffClusterId);
+        EXPECT_EQ(CHIP_NO_ERROR, reader.Next());
+        EXPECT_EQ(CHIP_NO_ERROR, extensionFieldValueCapIn.attributeValueList.Decode(reader));
+
+        // Verify that the initial value is not capped
+        auto iteratorOO = extensionFieldValueCapIn.attributeValueList.begin();
+        iteratorOO.Next();
+        pair = iteratorOO.GetValue();
+        EXPECT_EQ(pair.valueSigned64.Value(), MockOOPairs[0].valueSigned64.Value());
+
+        // Verify that we cap the value to the mock attribute size when serializing
+        EXPECT_EQ(CHIP_NO_ERROR, mpSceneHandler->SerializeAdd(kTestEndpoint4, extensionFieldValueCapIn, mock_buff_span));
+        EXPECT_EQ(
+            CHIP_NO_ERROR,
+            mpSceneHandler->Deserialize(kTestEndpoint4, MockClusterId(kOnOffClusterId), mock_buff_span, extensionFieldValueCapOut));
+
+        // Verify that the output value is capped to int48 max value
+        using Int48Type = app::NumericAttributeTraits<app::OddSizedInteger<6, true>>::WorkingType;
+        EXPECT_EQ(static_cast<Int48Type>(INT64_MAX), extensionFieldValueCapOut.attributeValueList[0].valueUnsigned8.Value());
+
+        // Clear buffer
+        memset(mock_buffer, 0, mock_buff_span.size());
+
+        reader.Init(mock_buffer);
+        extensionFieldValueCapIn.clusterID = MockClusterId(kLevelControlClusterId);
+        EXPECT_EQ(CHIP_NO_ERROR, reader.Next());
+        EXPECT_EQ(CHIP_NO_ERROR, extensionFieldValueCapIn.attributeValueList.Decode(reader));
+
+        // Verify that the initial values are not capped
+        auto iteratorLC = extensionFieldValueCapIn.attributeValueList.begin();
+        iteratorLC.Next();
+        pair = iteratorLC.GetValue();
+        EXPECT_EQ(pair.valueSigned64.Value(), LCPairs[0].valueSigned64.Value());
+        iteratorLC.Next();
+        pair = iteratorLC.GetValue();
+        EXPECT_EQ(pair.valueSigned64.Value(), LCPairs[1].valueSigned64.Value());
+
+        // Verify that we cap the value to the mock attribute size when serializing
+        EXPECT_EQ(CHIP_NO_ERROR, mpSceneHandler->SerializeAdd(kTestEndpoint4, extensionFieldValueCapIn, mock_buff_span));
+        EXPECT_EQ(CHIP_NO_ERROR,
+                  mpSceneHandler->Deserialize(kTestEndpoint4, MockClusterId(kLevelControlClusterId), mock_buff_span,
+                                              extensionFieldValueCapOut));
+
+        // Verify that the output value is capped to -1 in int56
+        using Int56Type = app::NumericAttributeTraits<app::OddSizedInteger<6, true>>::WorkingType;
+        EXPECT_EQ(static_cast<Int56Type>(INT64_MIN), extensionFieldValueCapOut.attributeValueList[0].valueSigned64.Value());
+        // Verify that the output value is not capped
+        EXPECT_EQ(INT64_MIN, extensionFieldValueCapOut.attributeValueList[1].valueSigned64.Value());
+
+        // Clear buffer
+        memset(buffer, 0, mock_buff_span.size());
+
+        reader.Init(mock_buffer);
+        extensionFieldValueCapIn.clusterID = MockClusterId(kColorControlClusterId);
+        EXPECT_EQ(CHIP_NO_ERROR, reader.Next());
+        EXPECT_EQ(CHIP_NO_ERROR, extensionFieldValueCapIn.attributeValueList.Decode(reader));
+
+        // Verify that the initial values are not capped
+        auto iteratorCC = extensionFieldValueCapIn.attributeValueList.begin();
+        iteratorCC.Next();
+        pair = iteratorCC.GetValue();
+        EXPECT_EQ(pair.valueUnsigned32.Value(), MockCCPairs[0].valueUnsigned32.Value());
+        iteratorCC.Next();
+        pair = iteratorCC.GetValue();
+        EXPECT_EQ(pair.valueUnsigned32.Value(), MockCCPairs[1].valueUnsigned32.Value());
+        iteratorCC.Next();
+        pair = iteratorCC.GetValue();
+        EXPECT_EQ(pair.valueUnsigned64.Value(), MockCCPairs[2].valueUnsigned64.Value());
+        iteratorCC.Next();
+        pair = iteratorCC.GetValue();
+        EXPECT_EQ(pair.valueUnsigned64.Value(), MockCCPairs[3].valueUnsigned64.Value());
+        iteratorCC.Next();
+        pair = iteratorCC.GetValue();
+        EXPECT_EQ(pair.valueUnsigned64.Value(), MockCCPairs[4].valueUnsigned64.Value());
+        iteratorCC.Next();
+        pair = iteratorCC.GetValue();
+        EXPECT_EQ(pair.valueSigned8.Value(), MockCCPairs[5].valueSigned8.Value());
+        iteratorCC.Next();
+        pair = iteratorCC.GetValue();
+        EXPECT_EQ(pair.valueSigned16.Value(), MockCCPairs[6].valueSigned16.Value());
+        iteratorCC.Next();
+        pair = iteratorCC.GetValue();
+        EXPECT_EQ(pair.valueSigned32.Value(), MockCCPairs[7].valueSigned32.Value());
+        iteratorCC.Next();
+        pair = iteratorCC.GetValue();
+        EXPECT_EQ(pair.valueSigned32.Value(), MockCCPairs[8].valueSigned32.Value());
+
+        // Verify that we cap the value to the mock attribute size when serializing
+        EXPECT_EQ(CHIP_NO_ERROR, mpSceneHandler->SerializeAdd(kTestEndpoint4, extensionFieldValueCapIn, mock_buff_span));
+        EXPECT_EQ(CHIP_NO_ERROR,
+                  mpSceneHandler->Deserialize(kTestEndpoint4, MockClusterId(kColorControlClusterId), mock_buff_span,
+                                              extensionFieldValueCapOut));
+
+        // Verify that the output value is capped to uint24t max value
+        using Uint24Type = app::NumericAttributeTraits<app::OddSizedInteger<3, false>>::WorkingType;
+        EXPECT_EQ(static_cast<Uint24Type>(UINT32_MAX), extensionFieldValueCapOut.attributeValueList[0].valueUnsigned32.Value());
+
+        // Verify that the output value is not capped
+        EXPECT_EQ(UINT32_MAX, extensionFieldValueCapOut.attributeValueList[1].valueUnsigned32.Value());
+
+        // Verify that the output value is capped to -1 in int48_t
+        using Uint48Type = app::NumericAttributeTraits<app::OddSizedInteger<6, false>>::WorkingType;
+        EXPECT_EQ(static_cast<Uint48Type>(UINT64_MAX), extensionFieldValueCapOut.attributeValueList[2].valueUnsigned64.Value());
+
+        // Verify that the output value is capped to -1 in int56_t
+        using UInt56Type = app::NumericAttributeTraits<app::OddSizedInteger<7, false>>::WorkingType;
+        EXPECT_EQ(static_cast<UInt56Type>(UINT64_MAX), extensionFieldValueCapOut.attributeValueList[3].valueUnsigned64.Value());
+
+        // Verify that the output value is capped to -1 in int56
+        EXPECT_EQ(UINT64_MAX, extensionFieldValueCapOut.attributeValueList[4].valueUnsigned64.Value());
+
+        // Verify that the output value is capped to the defined min for this attribute
+        EXPECT_EQ(static_cast<int8_t>(-1), extensionFieldValueCapOut.attributeValueList[5].valueSigned8.Value());
+
+        // Verify that the output value is capped to the defined max for this attribute
+        EXPECT_EQ(0x7FFE, extensionFieldValueCapOut.attributeValueList[6].valueSigned16.Value());
+
+        // Verify that the output value is not capped to -1 in int24t
+        using Int24Type = app::NumericAttributeTraits<app::OddSizedInteger<3, true>>::WorkingType;
+        EXPECT_EQ(static_cast<Int24Type>(INT32_MAX), extensionFieldValueCapOut.attributeValueList[7].valueSigned32.Value());
+
+        // Verify that the output value will not cap
+        EXPECT_EQ(INT32_MAX, extensionFieldValueCapOut.attributeValueList[8].valueSigned32.Value());
+
+        // Clear buffer
+        memset(buffer, 0, mock_buff_span.size());
+    }
 };
 
 TEST_F(TestSceneTable, TestStoreScenes)

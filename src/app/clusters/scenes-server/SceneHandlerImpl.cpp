@@ -118,24 +118,8 @@ void CapAttributeID(typename app::NumericAttributeTraits<Type>::WorkingType & Va
     if (metadata->HasMinMax())
     {
         const EmberAfAttributeMinMaxValue * minMaxValue = metadata->defaultValue.ptrToMinMaxValue;
-        WorkingType rangeMin                            = ConvertDefaultValueToWorkingValue<Type>(minMaxValue->minValue);
-        WorkingType rangeMax                            = ConvertDefaultValueToWorkingValue<Type>(minMaxValue->maxValue);
-
-        // Cap based on minimum value
-        if (rangeMin > Value)
-        {
-            Value = rangeMin;
-            // We assume the max is >= min therefore we can return
-            return;
-        }
-
-        // Adjust maxValue if greater than the meta data's max value
-        if (rangeMax < Value)
-        {
-            maxValue = rangeMax;
-            // We assume the metadata's max value respects the odd size integers limits so we can return
-            return;
-        }
+        minValue                                        = ConvertDefaultValueToWorkingValue<Type>(minMaxValue->minValue);
+        maxValue                                        = ConvertDefaultValueToWorkingValue<Type>(minMaxValue->maxValue);
     }
 
     if (minValue > Value)
