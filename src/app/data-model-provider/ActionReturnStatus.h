@@ -73,7 +73,7 @@ public:
     /// chunking can handle by sending partial list data).
     ///
     /// Generally this is when the return is based on CHIP_ERROR_NO_MEMORY or CHIP_ERROR_BUFFER_TOO_SMALL
-    bool IsOutOfSpaceError() const;
+    bool IsOutOfSpaceEncodingResponse() const;
 
     // NOTE: operator== will assume statues the same between CHIP_GLOBAL_IM_ERROR and a raw cluster status
     //       even though a CHIP_ERROR has some formatting info like file/line

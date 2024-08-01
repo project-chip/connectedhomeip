@@ -83,7 +83,7 @@ DataModel::ActionReturnStatus RetrieveClusterData(DataModel::Provider * dataMode
 
     // Encoder state is relevant for errors in case they are retryable.
     //
-    // Generally only IsOutOfSpaceError(err) would be retryable, however we save the state
+    // Generally only out of space encoding errors would be retryable, however we save the state
     // for all errors in case this is information that is useful (retry or error position).
     if (encoderState != nullptr)
     {
@@ -93,7 +93,7 @@ DataModel::ActionReturnStatus RetrieveClusterData(DataModel::Provider * dataMode
     // Out of space errors may be chunked data, reporting those cases would be very confusing
     // as they are not fully errors. Report only others (which presumably are not recoverable
     // and will be sent to the client as well).
-    if (!status.IsOutOfSpaceError())
+    if (!status.IsOutOfSpaceEncodingResponse())
     {
         StringBuilder<128> buffer;
         status.AddTo(buffer);

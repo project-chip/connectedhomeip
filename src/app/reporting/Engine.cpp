@@ -196,7 +196,7 @@ CHIP_ERROR Engine::BuildSingleReportDataAttributeReportIBs(ReportDataMessage::Bu
                 // Otherwise, if partial data allowed, save the encode state.
                 // Otherwise roll back. If we have already encoded some chunks, we are done; otherwise encode status.
 
-                if (encodeState.AllowPartialData() && status.IsOutOfSpaceError())
+                if (encodeState.AllowPartialData() && status.IsOutOfSpaceEncodingResponse())
                 {
                     ChipLogDetail(DataManagement,
                                   "List does not fit in packet, chunk between list items for clusterId: " ChipLogFormatMEI
@@ -216,7 +216,7 @@ CHIP_ERROR Engine::BuildSingleReportDataAttributeReportIBs(ReportDataMessage::Bu
                     attributeReportIBs.Rollback(attributeBackup);
                     apReadHandler->SetAttributeEncodeState(AttributeEncodeState());
 
-                    if (!status.IsOutOfSpaceError())
+                    if (!status.IsOutOfSpaceEncodingResponse())
                     {
                         ChipLogError(DataManagement,
                                      "Fail to retrieve data, roll back and encode status on clusterId: " ChipLogFormatMEI

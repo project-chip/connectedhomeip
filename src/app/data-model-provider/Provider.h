@@ -69,7 +69,7 @@ public:
     ///           granted to access the cluster in the path, then the path SHALL be discarded.
     ///
     /// Return value notes:
-    ///   ActionReturnStatus::IsOutOfSpaceError(i.e. CHIP_ERROR_NO_MEMORY or CHIP_ERROR_BUFFER_TOO_SMALL):
+    ///   ActionReturnStatus::IsOutOfSpaceEncodingResponse
     ///      - Indicates that list encoding had insufficient buffer space to encode elements.
     ///      - encoder::GetState().AllowPartialData() determines if these errors are permanent (no partial
     ///        data allowed) or further encoding can be retried (AllowPartialData true for list encoding)
@@ -85,12 +85,6 @@ public:
     ///     - ACL validation (see notes on OperationFlags::kInternal)
     ///     - Validation of readability/writability (also controlled by OperationFlags::kInternal)
     ///     - Validation of timed interaction required (also controlled by OperationFlags::kInternal)
-    ///
-    /// Return notes:
-    ///    - The following codes are interesting/expected to be possible:
-    ///      - `UnsupportedWrite` for attempts to write read-only data
-    ///      - `UnsupportedAccess` for ACL failures
-    ///      - `NeedsTimedInteraction` for writes that are not timed however are required to be so
     virtual ActionReturnStatus WriteAttribute(const WriteAttributeRequest & request, AttributeValueDecoder & decoder) = 0;
 
     /// `handler` is used to send back the reply.

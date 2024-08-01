@@ -145,7 +145,7 @@ bool ActionReturnStatus::IsSuccess() const
     chipDie();
 }
 
-bool ActionReturnStatus::IsOutOfSpaceError() const
+bool ActionReturnStatus::IsOutOfSpaceEncodingResponse() const
 {
     if (const CHIP_ERROR * err = std::get_if<CHIP_ERROR>(&mReturnStatus))
     {
