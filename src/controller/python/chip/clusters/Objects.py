@@ -237,18 +237,25 @@ class Globals:
             kMiddle = 0x04
             kRow = 0x05
             kColumn = 0x06
-            kUnder = 0x07
-            kNextTo = 0x08
-            kAround = 0x09
-            kOn = 0x0A
-            kAbove = 0x0B
-            kFrontOf = 0x0C
-            kBehind = 0x0D
             # All received enum values that are not listed above will be mapped
             # to kUnknownEnumValue. This is a helper enum value that should only
             # be used by code to process how it handles receiving an unknown
             # enum value. This specific value should never be transmitted.
-            kUnknownEnumValue = 14,
+            kUnknownEnumValue = 7,
+
+        class RelativePositionTag(MatterIntEnum):
+            kUnder = 0x00
+            kNextTo = 0x01
+            kAround = 0x02
+            kOn = 0x03
+            kAbove = 0x04
+            kFrontOf = 0x05
+            kBehind = 0x06
+            # All received enum values that are not listed above will be mapped
+            # to kUnknownEnumValue. This is a helper enum value that should only
+            # be used by code to process how it handles receiving an unknown
+            # enum value. This specific value should never be transmitted.
+            kUnknownEnumValue = 7,
 
         class TestGlobalEnum(MatterIntEnum):
             kSomeValue = 0x00

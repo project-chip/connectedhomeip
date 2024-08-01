@@ -363,13 +363,6 @@ static auto __attribute__((unused)) EnsureKnownEnumValue(Globals::PositionTag va
     case EnumType::kMiddle:
     case EnumType::kRow:
     case EnumType::kColumn:
-    case EnumType::kUnder:
-    case EnumType::kNextTo:
-    case EnumType::kAround:
-    case EnumType::kOn:
-    case EnumType::kAbove:
-    case EnumType::kFrontOf:
-    case EnumType::kBehind:
         return val;
     default:
         return EnumType::kUnknownEnumValue;
@@ -391,6 +384,24 @@ static auto __attribute__((unused)) EnsureKnownEnumValue(detail::ProductIdentifi
         return EnumType::kUnknownEnumValue;
     }
 }
+static auto __attribute__((unused)) EnsureKnownEnumValue(Globals::RelativePositionTag val)
+{
+    using EnumType = Globals::RelativePositionTag;
+    switch (val)
+    {
+    case EnumType::kUnder:
+    case EnumType::kNextTo:
+    case EnumType::kAround:
+    case EnumType::kOn:
+    case EnumType::kAbove:
+    case EnumType::kFrontOf:
+    case EnumType::kBehind:
+        return val;
+    default:
+        return EnumType::kUnknownEnumValue;
+    }
+}
+
 static auto __attribute__((unused)) EnsureKnownEnumValue(Globals::TestGlobalEnum val)
 {
     using EnumType = Globals::TestGlobalEnum;
