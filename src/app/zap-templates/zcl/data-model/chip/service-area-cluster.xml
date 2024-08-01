@@ -96,30 +96,30 @@ limitations under the License.
     <attribute side="server" code="0x0005" define="Progress"            type="array"     entryType="ProgressStruct"  writable="false" isNullable="true"  optional="true" >Progress</attribute>
 
     <!-- Commands -->
-    <command source="client" code="0x00" name="SelectLocations" response="SelectLocationsResponse" optional="false">
+    <command source="client" code="0x00" name="SelectAreas" response="SelectAreasResponse" optional="false">
       <description>
-        Command used to select a set of device locations, where the device is to operate
+        Command used to select a set of device areas, where the device is to operate.
       </description>
-      <arg name="NewLocations" type="int32u" array="true" isNullable="true"/>
+      <arg name="NewAreas" type="int32u" array="true" isNullable="true"/>
     </command>
 
-    <command source="server" code="0x01" name="SelectLocationsResponse" disableDefaultResponse="true" optional="false">
+    <command source="server" code="0x01" name="SelectAreasResponse" disableDefaultResponse="true" optional="false">
       <description>
-        This command is sent by the device on receipt of the SelectLocations command.
+        This command is sent by the device on receipt of the SelectAreas command.
       </description>
       <arg name="Status"     type="SelectAreasStatus"         optional="false"/>
       <arg name="StatusText" type="char_string"  length="256" optional="true"/>
     </command>
 
-    <command source="client" code="0x02" name="SkipCurrentLocation" response="SkipCurrentLocationResponse" optional="true">
+    <command source="client" code="0x02" name="SkipArea" response="SkipAreaResponse" optional="true">
       <description>
-        This command is used to skip the current location where the device operates.
+        This command is used to skip an area where the device operates.
       </description>
     </command>
 
-    <command source="server" code="0x03" name="SkipCurrentLocationResponse" disableDefaultResponse="true" optional="true">
+    <command source="server" code="0x03" name="SkipAreaResponse" disableDefaultResponse="true" optional="true">
       <description>
-        This command is sent by the device on receipt of the SelectLocations command.
+        This command is sent by the device on receipt of the SkipArea command.
       </description>
       <arg name="Status"     type="SkipAreaStatus"  optional="false"/>
       <arg name="StatusText" type="char_string"     length="256" optional="true"/>
