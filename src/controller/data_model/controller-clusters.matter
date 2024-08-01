@@ -6461,7 +6461,7 @@ provisional cluster ServiceArea = 336 {
     kSelectWhileRunning = 0x2;
   }
 
-  struct LocationInfoStruct {
+  struct AreaInfoStruct {
     nullable LocationDescriptorStruct locationInfo = 0;
     nullable LandmarkTag landmarkTag = 1;
     nullable PositionTag positionTag = 2;
@@ -6471,7 +6471,7 @@ provisional cluster ServiceArea = 336 {
   struct LocationStruct {
     int32u locationID = 0;
     nullable int8u mapID = 1;
-    LocationInfoStruct locationInfo = 2;
+    AreaInfoStruct locationInfo = 2;
   }
 
   struct MapStruct {

@@ -11186,7 +11186,7 @@ static id _Nullable DecodeAttributeValueForServiceAreaCluster(AttributeId aAttri
                 } else {
                     newElement_0.mapID = [NSNumber numberWithUnsignedChar:entry_0.mapID.Value()];
                 }
-                newElement_0.locationInfo = [MTRServiceAreaClusterLocationInfoStruct new];
+                newElement_0.locationInfo = [MTRServiceAreaClusterAreaInfoStruct new];
                 if (entry_0.locationInfo.locationInfo.IsNull()) {
                     newElement_0.locationInfo.locationInfo = nil;
                 } else {

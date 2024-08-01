@@ -25,7 +25,7 @@ import matter.tlv.TlvWriter
 class ServiceAreaClusterLocationStruct(
   val locationID: UInt,
   val mapID: UByte?,
-  val locationInfo: ServiceAreaClusterLocationInfoStruct,
+  val locationInfo: ServiceAreaClusterAreaInfoStruct,
 ) {
   override fun toString(): String = buildString {
     append("ServiceAreaClusterLocationStruct {\n")
@@ -65,10 +65,7 @@ class ServiceAreaClusterLocationStruct(
           null
         }
       val locationInfo =
-        ServiceAreaClusterLocationInfoStruct.fromTlv(
-          ContextSpecificTag(TAG_LOCATION_INFO),
-          tlvReader,
-        )
+        ServiceAreaClusterAreaInfoStruct.fromTlv(ContextSpecificTag(TAG_LOCATION_INFO), tlvReader)
 
       tlvReader.exitContainer()
 

@@ -6610,7 +6610,7 @@ NS_ASSUME_NONNULL_BEGIN
 
 @end
 
-@implementation MTRServiceAreaClusterLocationInfoStruct
+@implementation MTRServiceAreaClusterAreaInfoStruct
 - (instancetype)init
 {
     if (self = [super init]) {
@@ -6628,7 +6628,7 @@ NS_ASSUME_NONNULL_BEGIN
 
 - (id)copyWithZone:(NSZone * _Nullable)zone
 {
-    auto other = [[MTRServiceAreaClusterLocationInfoStruct alloc] init];
+    auto other = [[MTRServiceAreaClusterAreaInfoStruct alloc] init];
 
     other.locationInfo = self.locationInfo;
     other.landmarkTag = self.landmarkTag;
@@ -6655,7 +6655,7 @@ NS_ASSUME_NONNULL_BEGIN
 
         _mapID = nil;
 
-        _locationInfo = [MTRServiceAreaClusterLocationInfoStruct new];
+        _locationInfo = [MTRServiceAreaClusterAreaInfoStruct new];
     }
     return self;
 }

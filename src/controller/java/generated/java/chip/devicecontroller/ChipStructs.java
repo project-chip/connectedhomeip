@@ -9171,7 +9171,7 @@ public static class DoorLockClusterCredentialStruct {
     return output.toString();
   }
 }
-public static class ServiceAreaClusterLocationInfoStruct {
+public static class ServiceAreaClusterAreaInfoStruct {
   public @Nullable ChipStructs.ServiceAreaClusterLocationDescriptorStruct locationInfo;
   public @Nullable Integer landmarkTag;
   public @Nullable Integer positionTag;
@@ -9181,7 +9181,7 @@ public static class ServiceAreaClusterLocationInfoStruct {
   private static final long POSITION_TAG_ID = 2L;
   private static final long SURFACE_TAG_ID = 3L;
 
-  public ServiceAreaClusterLocationInfoStruct(
+  public ServiceAreaClusterAreaInfoStruct(
     @Nullable ChipStructs.ServiceAreaClusterLocationDescriptorStruct locationInfo,
     @Nullable Integer landmarkTag,
     @Nullable Integer positionTag,
@@ -9203,7 +9203,7 @@ public static class ServiceAreaClusterLocationInfoStruct {
     return new StructType(values);
   }
 
-  public static ServiceAreaClusterLocationInfoStruct decodeTlv(BaseTLVType tlvValue) {
+  public static ServiceAreaClusterAreaInfoStruct decodeTlv(BaseTLVType tlvValue) {
     if (tlvValue == null || tlvValue.type() != TLVType.Struct) {
       return null;
     }
@@ -9234,7 +9234,7 @@ public static class ServiceAreaClusterLocationInfoStruct {
         }
       }
     }
-    return new ServiceAreaClusterLocationInfoStruct(
+    return new ServiceAreaClusterAreaInfoStruct(
       locationInfo,
       landmarkTag,
       positionTag,
@@ -9245,7 +9245,7 @@ public static class ServiceAreaClusterLocationInfoStruct {
   @Override
   public String toString() {
     StringBuilder output = new StringBuilder();
-    output.append("ServiceAreaClusterLocationInfoStruct {\n");
+    output.append("ServiceAreaClusterAreaInfoStruct {\n");
     output.append("\tlocationInfo: ");
     output.append(locationInfo);
     output.append("\n");
@@ -9265,7 +9265,7 @@ public static class ServiceAreaClusterLocationInfoStruct {
 public static class ServiceAreaClusterLocationStruct {
   public Long locationID;
   public @Nullable Integer mapID;
-  public ChipStructs.ServiceAreaClusterLocationInfoStruct locationInfo;
+  public ChipStructs.ServiceAreaClusterAreaInfoStruct locationInfo;
   private static final long LOCATION_I_D_ID = 0L;
   private static final long MAP_I_D_ID = 1L;
   private static final long LOCATION_INFO_ID = 2L;
@@ -9273,7 +9273,7 @@ public static class ServiceAreaClusterLocationStruct {
   public ServiceAreaClusterLocationStruct(
     Long locationID,
     @Nullable Integer mapID,
-    ChipStructs.ServiceAreaClusterLocationInfoStruct locationInfo
+    ChipStructs.ServiceAreaClusterAreaInfoStruct locationInfo
   ) {
     this.locationID = locationID;
     this.mapID = mapID;
@@ -9295,7 +9295,7 @@ public static class ServiceAreaClusterLocationStruct {
     }
     Long locationID = null;
     @Nullable Integer mapID = null;
-    ChipStructs.ServiceAreaClusterLocationInfoStruct locationInfo = null;
+    ChipStructs.ServiceAreaClusterAreaInfoStruct locationInfo = null;
     for (StructElement element: ((StructType)tlvValue).value()) {
       if (element.contextTagNum() == LOCATION_I_D_ID) {
         if (element.value(BaseTLVType.class).type() == TLVType.UInt) {
@@ -9310,7 +9310,7 @@ public static class ServiceAreaClusterLocationStruct {
       } else if (element.contextTagNum() == LOCATION_INFO_ID) {
         if (element.value(BaseTLVType.class).type() == TLVType.Struct) {
           StructType castingValue = element.value(StructType.class);
-          locationInfo = ChipStructs.ServiceAreaClusterLocationInfoStruct.decodeTlv(castingValue);
+          locationInfo = ChipStructs.ServiceAreaClusterAreaInfoStruct.decodeTlv(castingValue);
         }
       }
     }

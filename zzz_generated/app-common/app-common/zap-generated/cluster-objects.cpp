@@ -20314,7 +20314,7 @@ namespace Events {} // namespace Events
 namespace ServiceArea {
 namespace Structs {
 
-namespace LocationInfoStruct {
+namespace AreaInfoStruct {
 CHIP_ERROR Type::Encode(TLV::TLVWriter & aWriter, TLV::Tag aTag) const
 {
     DataModel::WrappedStructEncoder encoder{ aWriter, aTag };
@@ -20363,7 +20363,7 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
     }
 }
 
-} // namespace LocationInfoStruct
+} // namespace AreaInfoStruct
 
 namespace LocationStruct {
 CHIP_ERROR Type::Encode(TLV::TLVWriter & aWriter, TLV::Tag aTag) const

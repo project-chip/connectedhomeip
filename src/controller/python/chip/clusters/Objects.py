@@ -31163,7 +31163,7 @@ class ServiceArea(Cluster):
 
     class Structs:
         @dataclass
-        class LocationInfoStruct(ClusterObject):
+        class AreaInfoStruct(ClusterObject):
             @ChipUtility.classproperty
             def descriptor(cls) -> ClusterObjectDescriptor:
                 return ClusterObjectDescriptor(
@@ -31187,12 +31187,12 @@ class ServiceArea(Cluster):
                     Fields=[
                         ClusterObjectFieldDescriptor(Label="locationID", Tag=0, Type=uint),
                         ClusterObjectFieldDescriptor(Label="mapID", Tag=1, Type=typing.Union[Nullable, uint]),
-                        ClusterObjectFieldDescriptor(Label="locationInfo", Tag=2, Type=ServiceArea.Structs.LocationInfoStruct),
+                        ClusterObjectFieldDescriptor(Label="locationInfo", Tag=2, Type=ServiceArea.Structs.AreaInfoStruct),
                     ])
 
             locationID: 'uint' = 0
             mapID: 'typing.Union[Nullable, uint]' = NullValue
-            locationInfo: 'ServiceArea.Structs.LocationInfoStruct' = field(default_factory=lambda: ServiceArea.Structs.LocationInfoStruct())
+            locationInfo: 'ServiceArea.Structs.AreaInfoStruct' = field(default_factory=lambda: ServiceArea.Structs.AreaInfoStruct())
 
         @dataclass
         class MapStruct(ClusterObject):

@@ -28307,7 +28307,7 @@ struct TypeInfo
 } // namespace BarrierControl
 namespace ServiceArea {
 namespace Structs {
-namespace LocationInfoStruct {
+namespace AreaInfoStruct {
 enum class Fields : uint8_t
 {
     kLocationInfo = 0,
@@ -28333,7 +28333,7 @@ public:
 
 using DecodableType = Type;
 
-} // namespace LocationInfoStruct
+} // namespace AreaInfoStruct
 namespace LocationStruct {
 enum class Fields : uint8_t
 {
@@ -28347,7 +28347,7 @@ struct Type
 public:
     uint32_t locationID = static_cast<uint32_t>(0);
     DataModel::Nullable<uint8_t> mapID;
-    Structs::LocationInfoStruct::Type locationInfo;
+    Structs::AreaInfoStruct::Type locationInfo;
 
     CHIP_ERROR Decode(TLV::TLVReader & reader);
 

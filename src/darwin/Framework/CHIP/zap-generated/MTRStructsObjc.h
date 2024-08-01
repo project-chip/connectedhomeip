@@ -1588,7 +1588,7 @@ MTR_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
 @end
 
 MTR_PROVISIONALLY_AVAILABLE
-@interface MTRServiceAreaClusterLocationInfoStruct : NSObject <NSCopying>
+@interface MTRServiceAreaClusterAreaInfoStruct : NSObject <NSCopying>
 @property (nonatomic, copy) MTRDataTypeLocationDescriptorStruct * _Nullable locationInfo MTR_PROVISIONALLY_AVAILABLE;
 @property (nonatomic, copy) NSNumber * _Nullable landmarkTag MTR_PROVISIONALLY_AVAILABLE;
 @property (nonatomic, copy) NSNumber * _Nullable positionTag MTR_PROVISIONALLY_AVAILABLE;
@@ -1599,7 +1599,7 @@ MTR_PROVISIONALLY_AVAILABLE
 @interface MTRServiceAreaClusterLocationStruct : NSObject <NSCopying>
 @property (nonatomic, copy) NSNumber * _Nonnull locationID MTR_PROVISIONALLY_AVAILABLE;
 @property (nonatomic, copy) NSNumber * _Nullable mapID MTR_PROVISIONALLY_AVAILABLE;
-@property (nonatomic, copy) MTRServiceAreaClusterLocationInfoStruct * _Nonnull locationInfo MTR_PROVISIONALLY_AVAILABLE;
+@property (nonatomic, copy) MTRServiceAreaClusterAreaInfoStruct * _Nonnull locationInfo MTR_PROVISIONALLY_AVAILABLE;
 @end
 
 MTR_PROVISIONALLY_AVAILABLE

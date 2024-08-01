@@ -3943,7 +3943,7 @@ void ComplexArgumentParser::Finalize(chip::app::Clusters::DoorLock::Structs::Cre
 }
 
 CHIP_ERROR ComplexArgumentParser::Setup(const char * label,
-                                        chip::app::Clusters::ServiceArea::Structs::LocationInfoStruct::Type & request,
+                                        chip::app::Clusters::ServiceArea::Structs::AreaInfoStruct::Type & request,
                                         Json::Value & value)
 {
     VerifyOrReturnError(value.isObject(), CHIP_ERROR_INVALID_ARGUMENT);
@@ -3951,14 +3951,14 @@ CHIP_ERROR ComplexArgumentParser::Setup(const char * label,
     // Copy to track which members we already processed.
     Json::Value valueCopy(value);
 
-    ReturnErrorOnFailure(ComplexArgumentParser::EnsureMemberExist("LocationInfoStruct.locationInfo", "locationInfo",
-                                                                  value.isMember("locationInfo")));
     ReturnErrorOnFailure(
-        ComplexArgumentParser::EnsureMemberExist("LocationInfoStruct.landmarkTag", "landmarkTag", value.isMember("landmarkTag")));
+        ComplexArgumentParser::EnsureMemberExist("AreaInfoStruct.locationInfo", "locationInfo", value.isMember("locationInfo")));
     ReturnErrorOnFailure(
-        ComplexArgumentParser::EnsureMemberExist("LocationInfoStruct.positionTag", "positionTag", value.isMember("positionTag")));
+        ComplexArgumentParser::EnsureMemberExist("AreaInfoStruct.landmarkTag", "landmarkTag", value.isMember("landmarkTag")));
     ReturnErrorOnFailure(
-        ComplexArgumentParser::EnsureMemberExist("LocationInfoStruct.surfaceTag", "surfaceTag", value.isMember("surfaceTag")));
+        ComplexArgumentParser::EnsureMemberExist("AreaInfoStruct.positionTag", "positionTag", value.isMember("positionTag")));
+    ReturnErrorOnFailure(
+        ComplexArgumentParser::EnsureMemberExist("AreaInfoStruct.surfaceTag", "surfaceTag", value.isMember("surfaceTag")));
 
     char labelWithMember[kMaxLabelLength];
     snprintf(labelWithMember, sizeof(labelWithMember), "%s.%s", label, "locationInfo");
@@ -3980,7 +3980,7 @@ CHIP_ERROR ComplexArgumentParser::Setup(const char * label,
     return ComplexArgumentParser::EnsureNoMembersRemaining(label, valueCopy);
 }
 
-void ComplexArgumentParser::Finalize(chip::app::Clusters::ServiceArea::Structs::LocationInfoStruct::Type & request)
+void ComplexArgumentParser::Finalize(chip::app::Clusters::ServiceArea::Structs::AreaInfoStruct::Type & request)
 {
     ComplexArgumentParser::Finalize(request.locationInfo);
     ComplexArgumentParser::Finalize(request.landmarkTag);
