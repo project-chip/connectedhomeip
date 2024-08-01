@@ -1447,10 +1447,10 @@ provisional cluster ServiceArea = 336 {
     nullable FloorSurfaceTag surfaceTag = 3;
   }
 
-  struct LocationStruct {
-    int32u locationID = 0;
+  struct AreaStruct {
+    int32u areaID = 0;
     nullable int8u mapID = 1;
-    AreaInfoStruct locationInfo = 2;
+    AreaInfoStruct areaDesc = 2;
   }
 
   struct MapStruct {
@@ -1465,7 +1465,7 @@ provisional cluster ServiceArea = 336 {
     optional nullable elapsed_s estimatedTime = 3;
   }
 
-  readonly attribute LocationStruct supportedLocations[] = 0;
+  readonly attribute AreaStruct supportedLocations[] = 0;
   readonly attribute nullable MapStruct supportedMaps[] = 1;
   readonly attribute nullable int32u selectedLocations[] = 2;
   readonly attribute optional nullable int32u currentLocation = 3;

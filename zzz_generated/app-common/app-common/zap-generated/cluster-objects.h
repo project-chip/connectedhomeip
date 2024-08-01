@@ -28334,20 +28334,20 @@ public:
 using DecodableType = Type;
 
 } // namespace AreaInfoStruct
-namespace LocationStruct {
+namespace AreaStruct {
 enum class Fields : uint8_t
 {
-    kLocationID   = 0,
-    kMapID        = 1,
-    kLocationInfo = 2,
+    kAreaID   = 0,
+    kMapID    = 1,
+    kAreaDesc = 2,
 };
 
 struct Type
 {
 public:
-    uint32_t locationID = static_cast<uint32_t>(0);
+    uint32_t areaID = static_cast<uint32_t>(0);
     DataModel::Nullable<uint8_t> mapID;
-    Structs::AreaInfoStruct::Type locationInfo;
+    Structs::AreaInfoStruct::Type areaDesc;
 
     CHIP_ERROR Decode(TLV::TLVReader & reader);
 
@@ -28358,7 +28358,7 @@ public:
 
 using DecodableType = Type;
 
-} // namespace LocationStruct
+} // namespace AreaStruct
 namespace MapStruct {
 enum class Fields : uint8_t
 {
@@ -28574,11 +28574,10 @@ namespace Attributes {
 namespace SupportedLocations {
 struct TypeInfo
 {
-    using Type = chip::app::DataModel::List<const chip::app::Clusters::ServiceArea::Structs::LocationStruct::Type>;
-    using DecodableType =
-        chip::app::DataModel::DecodableList<chip::app::Clusters::ServiceArea::Structs::LocationStruct::DecodableType>;
+    using Type          = chip::app::DataModel::List<const chip::app::Clusters::ServiceArea::Structs::AreaStruct::Type>;
+    using DecodableType = chip::app::DataModel::DecodableList<chip::app::Clusters::ServiceArea::Structs::AreaStruct::DecodableType>;
     using DecodableArgType =
-        const chip::app::DataModel::DecodableList<chip::app::Clusters::ServiceArea::Structs::LocationStruct::DecodableType> &;
+        const chip::app::DataModel::DecodableList<chip::app::Clusters::ServiceArea::Structs::AreaStruct::DecodableType> &;
 
     static constexpr ClusterId GetClusterId() { return Clusters::ServiceArea::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::SupportedLocations::Id; }

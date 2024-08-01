@@ -39125,7 +39125,7 @@ public class ChipClusters {
     }
 
     public interface SupportedLocationsAttributeCallback extends BaseAttributeCallback {
-      void onSuccess(List<ChipStructs.ServiceAreaClusterLocationStruct> value);
+      void onSuccess(List<ChipStructs.ServiceAreaClusterAreaStruct> value);
     }
 
     public interface SupportedMapsAttributeCallback extends BaseAttributeCallback {
@@ -39171,7 +39171,7 @@ public class ChipClusters {
       readAttribute(new ReportCallbackImpl(callback, path) {
           @Override
           public void onSuccess(byte[] tlv) {
-            List<ChipStructs.ServiceAreaClusterLocationStruct> value = ChipTLVValueDecoder.decodeAttributeValue(path, tlv);
+            List<ChipStructs.ServiceAreaClusterAreaStruct> value = ChipTLVValueDecoder.decodeAttributeValue(path, tlv);
             callback.onSuccess(value);
           }
         }, SUPPORTED_LOCATIONS_ATTRIBUTE_ID, true);
@@ -39184,7 +39184,7 @@ public class ChipClusters {
       subscribeAttribute(new ReportCallbackImpl(callback, path) {
           @Override
           public void onSuccess(byte[] tlv) {
-            List<ChipStructs.ServiceAreaClusterLocationStruct> value = ChipTLVValueDecoder.decodeAttributeValue(path, tlv);
+            List<ChipStructs.ServiceAreaClusterAreaStruct> value = ChipTLVValueDecoder.decodeAttributeValue(path, tlv);
             callback.onSuccess(value);
           }
         }, SUPPORTED_LOCATIONS_ATTRIBUTE_ID, minInterval, maxInterval);

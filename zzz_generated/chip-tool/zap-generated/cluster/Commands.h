@@ -22816,8 +22816,8 @@ void registerClusterServiceArea(Commands & commands, CredentialIssuerCommands * 
         make_unique<ReadAttribute>(Id, "feature-map", Attributes::FeatureMap::Id, credsIssuerConfig),                      //
         make_unique<ReadAttribute>(Id, "cluster-revision", Attributes::ClusterRevision::Id, credsIssuerConfig),            //
         make_unique<WriteAttribute<>>(Id, credsIssuerConfig),                                                              //
-        make_unique<WriteAttributeAsComplex<
-            chip::app::DataModel::List<const chip::app::Clusters::ServiceArea::Structs::LocationStruct::Type>>>(
+        make_unique<
+            WriteAttributeAsComplex<chip::app::DataModel::List<const chip::app::Clusters::ServiceArea::Structs::AreaStruct::Type>>>(
             Id, "supported-locations", Attributes::SupportedLocations::Id, WriteCommandType::kForceWrite, credsIssuerConfig), //
         make_unique<WriteAttributeAsComplex<chip::app::DataModel::Nullable<
             chip::app::DataModel::List<const chip::app::Clusters::ServiceArea::Structs::MapStruct::Type>>>>(

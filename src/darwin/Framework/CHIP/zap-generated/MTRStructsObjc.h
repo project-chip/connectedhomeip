@@ -1596,10 +1596,10 @@ MTR_PROVISIONALLY_AVAILABLE
 @end
 
 MTR_PROVISIONALLY_AVAILABLE
-@interface MTRServiceAreaClusterLocationStruct : NSObject <NSCopying>
-@property (nonatomic, copy) NSNumber * _Nonnull locationID MTR_PROVISIONALLY_AVAILABLE;
+@interface MTRServiceAreaClusterAreaStruct : NSObject <NSCopying>
+@property (nonatomic, copy) NSNumber * _Nonnull areaID MTR_PROVISIONALLY_AVAILABLE;
 @property (nonatomic, copy) NSNumber * _Nullable mapID MTR_PROVISIONALLY_AVAILABLE;
-@property (nonatomic, copy) MTRServiceAreaClusterAreaInfoStruct * _Nonnull locationInfo MTR_PROVISIONALLY_AVAILABLE;
+@property (nonatomic, copy) MTRServiceAreaClusterAreaInfoStruct * _Nonnull areaDesc MTR_PROVISIONALLY_AVAILABLE;
 @end
 
 MTR_PROVISIONALLY_AVAILABLE

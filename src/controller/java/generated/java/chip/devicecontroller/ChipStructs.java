@@ -9262,77 +9262,77 @@ public static class ServiceAreaClusterAreaInfoStruct {
     return output.toString();
   }
 }
-public static class ServiceAreaClusterLocationStruct {
-  public Long locationID;
+public static class ServiceAreaClusterAreaStruct {
+  public Long areaID;
   public @Nullable Integer mapID;
-  public ChipStructs.ServiceAreaClusterAreaInfoStruct locationInfo;
-  private static final long LOCATION_I_D_ID = 0L;
+  public ChipStructs.ServiceAreaClusterAreaInfoStruct areaDesc;
+  private static final long AREA_I_D_ID = 0L;
   private static final long MAP_I_D_ID = 1L;
-  private static final long LOCATION_INFO_ID = 2L;
+  private static final long AREA_DESC_ID = 2L;
 
-  public ServiceAreaClusterLocationStruct(
-    Long locationID,
+  public ServiceAreaClusterAreaStruct(
+    Long areaID,
     @Nullable Integer mapID,
-    ChipStructs.ServiceAreaClusterAreaInfoStruct locationInfo
+    ChipStructs.ServiceAreaClusterAreaInfoStruct areaDesc
   ) {
-    this.locationID = locationID;
+    this.areaID = areaID;
     this.mapID = mapID;
-    this.locationInfo = locationInfo;
+    this.areaDesc = areaDesc;
   }
 
   public StructType encodeTlv() {
     ArrayList<StructElement> values = new ArrayList<>();
-    values.add(new StructElement(LOCATION_I_D_ID, new UIntType(locationID)));
+    values.add(new StructElement(AREA_I_D_ID, new UIntType(areaID)));
     values.add(new StructElement(MAP_I_D_ID, mapID != null ? new UIntType(mapID) : new NullType()));
-    values.add(new StructElement(LOCATION_INFO_ID, locationInfo.encodeTlv()));
+    values.add(new StructElement(AREA_DESC_ID, areaDesc.encodeTlv()));
 
     return new StructType(values);
   }
 
-  public static ServiceAreaClusterLocationStruct decodeTlv(BaseTLVType tlvValue) {
+  public static ServiceAreaClusterAreaStruct decodeTlv(BaseTLVType tlvValue) {
     if (tlvValue == null || tlvValue.type() != TLVType.Struct) {
       return null;
     }
-    Long locationID = null;
+    Long areaID = null;
     @Nullable Integer mapID = null;
-    ChipStructs.ServiceAreaClusterAreaInfoStruct locationInfo = null;
+    ChipStructs.ServiceAreaClusterAreaInfoStruct areaDesc = null;
     for (StructElement element: ((StructType)tlvValue).value()) {
-      if (element.contextTagNum() == LOCATION_I_D_ID) {
+      if (element.contextTagNum() == AREA_I_D_ID) {
         if (element.value(BaseTLVType.class).type() == TLVType.UInt) {
           UIntType castingValue = element.value(UIntType.class);
-          locationID = castingValue.value(Long.class);
+          areaID = castingValue.value(Long.class);
         }
       } else if (element.contextTagNum() == MAP_I_D_ID) {
         if (element.value(BaseTLVType.class).type() == TLVType.UInt) {
           UIntType castingValue = element.value(UIntType.class);
           mapID = castingValue.value(Integer.class);
         }
-      } else if (element.contextTagNum() == LOCATION_INFO_ID) {
+      } else if (element.contextTagNum() == AREA_DESC_ID) {
         if (element.value(BaseTLVType.class).type() == TLVType.Struct) {
           StructType castingValue = element.value(StructType.class);
-          locationInfo = ChipStructs.ServiceAreaClusterAreaInfoStruct.decodeTlv(castingValue);
+          areaDesc = ChipStructs.ServiceAreaClusterAreaInfoStruct.decodeTlv(castingValue);
         }
       }
     }
-    return new ServiceAreaClusterLocationStruct(
-      locationID,
+    return new ServiceAreaClusterAreaStruct(
+      areaID,
       mapID,
-      locationInfo
+      areaDesc
     );
   }
 
   @Override
   public String toString() {
     StringBuilder output = new StringBuilder();
-    output.append("ServiceAreaClusterLocationStruct {\n");
-    output.append("\tlocationID: ");
-    output.append(locationID);
+    output.append("ServiceAreaClusterAreaStruct {\n");
+    output.append("\tareaID: ");
+    output.append(areaID);
     output.append("\n");
     output.append("\tmapID: ");
     output.append(mapID);
     output.append("\n");
-    output.append("\tlocationInfo: ");
-    output.append(locationInfo);
+    output.append("\tareaDesc: ");
+    output.append(areaDesc);
     output.append("\n");
     output.append("}\n");
     return output.toString();

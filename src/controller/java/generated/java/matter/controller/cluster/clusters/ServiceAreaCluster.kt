@@ -44,10 +44,10 @@ class ServiceAreaCluster(private val controller: MatterController, private val e
 
   class SkipCurrentLocationResponse(val status: UByte, val statusText: String?)
 
-  class SupportedLocationsAttribute(val value: List<ServiceAreaClusterLocationStruct>)
+  class SupportedLocationsAttribute(val value: List<ServiceAreaClusterAreaStruct>)
 
   sealed class SupportedLocationsAttributeSubscriptionState {
-    data class Success(val value: List<ServiceAreaClusterLocationStruct>) :
+    data class Success(val value: List<ServiceAreaClusterAreaStruct>) :
       SupportedLocationsAttributeSubscriptionState()
 
     data class Error(val exception: Exception) : SupportedLocationsAttributeSubscriptionState()
@@ -303,11 +303,11 @@ class ServiceAreaCluster(private val controller: MatterController, private val e
 
     // Decode the TLV data into the appropriate type
     val tlvReader = TlvReader(attributeData.data)
-    val decodedValue: List<ServiceAreaClusterLocationStruct> =
-      buildList<ServiceAreaClusterLocationStruct> {
+    val decodedValue: List<ServiceAreaClusterAreaStruct> =
+      buildList<ServiceAreaClusterAreaStruct> {
         tlvReader.enterArray(AnonymousTag)
         while (!tlvReader.isEndOfContainer()) {
-          add(ServiceAreaClusterLocationStruct.fromTlv(AnonymousTag, tlvReader))
+          add(ServiceAreaClusterAreaStruct.fromTlv(AnonymousTag, tlvReader))
         }
         tlvReader.exitContainer()
       }
@@ -356,11 +356,11 @@ class ServiceAreaCluster(private val controller: MatterController, private val e
 
           // Decode the TLV data into the appropriate type
           val tlvReader = TlvReader(attributeData.data)
-          val decodedValue: List<ServiceAreaClusterLocationStruct> =
-            buildList<ServiceAreaClusterLocationStruct> {
+          val decodedValue: List<ServiceAreaClusterAreaStruct> =
+            buildList<ServiceAreaClusterAreaStruct> {
               tlvReader.enterArray(AnonymousTag)
               while (!tlvReader.isEndOfContainer()) {
-                add(ServiceAreaClusterLocationStruct.fromTlv(AnonymousTag, tlvReader))
+                add(ServiceAreaClusterAreaStruct.fromTlv(AnonymousTag, tlvReader))
               }
               tlvReader.exitContainer()
             }

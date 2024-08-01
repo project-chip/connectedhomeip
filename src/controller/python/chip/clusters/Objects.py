@@ -31095,7 +31095,7 @@ class ServiceArea(Cluster):
     def descriptor(cls) -> ClusterObjectDescriptor:
         return ClusterObjectDescriptor(
             Fields=[
-                ClusterObjectFieldDescriptor(Label="supportedLocations", Tag=0x00000000, Type=typing.List[ServiceArea.Structs.LocationStruct]),
+                ClusterObjectFieldDescriptor(Label="supportedLocations", Tag=0x00000000, Type=typing.List[ServiceArea.Structs.AreaStruct]),
                 ClusterObjectFieldDescriptor(Label="supportedMaps", Tag=0x00000001, Type=typing.Union[Nullable, typing.List[ServiceArea.Structs.MapStruct]]),
                 ClusterObjectFieldDescriptor(Label="selectedLocations", Tag=0x00000002, Type=typing.Union[Nullable, typing.List[uint]]),
                 ClusterObjectFieldDescriptor(Label="currentLocation", Tag=0x00000003, Type=typing.Union[None, Nullable, uint]),
@@ -31109,7 +31109,7 @@ class ServiceArea(Cluster):
                 ClusterObjectFieldDescriptor(Label="clusterRevision", Tag=0x0000FFFD, Type=uint),
             ])
 
-    supportedLocations: 'typing.List[ServiceArea.Structs.LocationStruct]' = None
+    supportedLocations: 'typing.List[ServiceArea.Structs.AreaStruct]' = None
     supportedMaps: 'typing.Union[Nullable, typing.List[ServiceArea.Structs.MapStruct]]' = None
     selectedLocations: 'typing.Union[Nullable, typing.List[uint]]' = None
     currentLocation: 'typing.Union[None, Nullable, uint]' = None
@@ -31180,19 +31180,19 @@ class ServiceArea(Cluster):
             surfaceTag: 'typing.Union[Nullable, Globals.Enums.FloorSurfaceTag]' = NullValue
 
         @dataclass
-        class LocationStruct(ClusterObject):
+        class AreaStruct(ClusterObject):
             @ChipUtility.classproperty
             def descriptor(cls) -> ClusterObjectDescriptor:
                 return ClusterObjectDescriptor(
                     Fields=[
-                        ClusterObjectFieldDescriptor(Label="locationID", Tag=0, Type=uint),
+                        ClusterObjectFieldDescriptor(Label="areaID", Tag=0, Type=uint),
                         ClusterObjectFieldDescriptor(Label="mapID", Tag=1, Type=typing.Union[Nullable, uint]),
-                        ClusterObjectFieldDescriptor(Label="locationInfo", Tag=2, Type=ServiceArea.Structs.AreaInfoStruct),
+                        ClusterObjectFieldDescriptor(Label="areaDesc", Tag=2, Type=ServiceArea.Structs.AreaInfoStruct),
                     ])
 
-            locationID: 'uint' = 0
+            areaID: 'uint' = 0
             mapID: 'typing.Union[Nullable, uint]' = NullValue
-            locationInfo: 'ServiceArea.Structs.AreaInfoStruct' = field(default_factory=lambda: ServiceArea.Structs.AreaInfoStruct())
+            areaDesc: 'ServiceArea.Structs.AreaInfoStruct' = field(default_factory=lambda: ServiceArea.Structs.AreaInfoStruct())
 
         @dataclass
         class MapStruct(ClusterObject):
@@ -31303,9 +31303,9 @@ class ServiceArea(Cluster):
 
             @ChipUtility.classproperty
             def attribute_type(cls) -> ClusterObjectFieldDescriptor:
-                return ClusterObjectFieldDescriptor(Type=typing.List[ServiceArea.Structs.LocationStruct])
+                return ClusterObjectFieldDescriptor(Type=typing.List[ServiceArea.Structs.AreaStruct])
 
-            value: 'typing.List[ServiceArea.Structs.LocationStruct]' = field(default_factory=lambda: [])
+            value: 'typing.List[ServiceArea.Structs.AreaStruct]' = field(default_factory=lambda: [])
 
         @dataclass
         class SupportedMaps(ClusterAttributeDescriptor):

@@ -6646,34 +6646,34 @@ NS_ASSUME_NONNULL_BEGIN
 
 @end
 
-@implementation MTRServiceAreaClusterLocationStruct
+@implementation MTRServiceAreaClusterAreaStruct
 - (instancetype)init
 {
     if (self = [super init]) {
 
-        _locationID = @(0);
+        _areaID = @(0);
 
         _mapID = nil;
 
-        _locationInfo = [MTRServiceAreaClusterAreaInfoStruct new];
+        _areaDesc = [MTRServiceAreaClusterAreaInfoStruct new];
     }
     return self;
 }
 
 - (id)copyWithZone:(NSZone * _Nullable)zone
 {
-    auto other = [[MTRServiceAreaClusterLocationStruct alloc] init];
+    auto other = [[MTRServiceAreaClusterAreaStruct alloc] init];
 
-    other.locationID = self.locationID;
+    other.areaID = self.areaID;
     other.mapID = self.mapID;
-    other.locationInfo = self.locationInfo;
+    other.areaDesc = self.areaDesc;
 
     return other;
 }
 
 - (NSString *)description
 {
-    NSString * descriptionString = [NSString stringWithFormat:@"<%@: locationID:%@; mapID:%@; locationInfo:%@; >", NSStringFromClass([self class]), _locationID, _mapID, _locationInfo];
+    NSString * descriptionString = [NSString stringWithFormat:@"<%@: areaID:%@; mapID:%@; areaDesc:%@; >", NSStringFromClass([self class]), _areaID, _mapID, _areaDesc];
     return descriptionString;
 }
 

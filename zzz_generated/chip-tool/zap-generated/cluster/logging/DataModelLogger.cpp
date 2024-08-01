@@ -3531,14 +3531,14 @@ CHIP_ERROR DataModelLogger::LogValue(const char * label, size_t indent,
 }
 
 CHIP_ERROR DataModelLogger::LogValue(const char * label, size_t indent,
-                                     const chip::app::Clusters::ServiceArea::Structs::LocationStruct::DecodableType & value)
+                                     const chip::app::Clusters::ServiceArea::Structs::AreaStruct::DecodableType & value)
 {
     DataModelLogger::LogString(label, indent, "{");
     {
-        CHIP_ERROR err = LogValue("LocationID", indent + 1, value.locationID);
+        CHIP_ERROR err = LogValue("AreaID", indent + 1, value.areaID);
         if (err != CHIP_NO_ERROR)
         {
-            DataModelLogger::LogString(indent + 1, "Struct truncated due to invalid value for 'LocationID'");
+            DataModelLogger::LogString(indent + 1, "Struct truncated due to invalid value for 'AreaID'");
             return err;
         }
     }
@@ -3551,10 +3551,10 @@ CHIP_ERROR DataModelLogger::LogValue(const char * label, size_t indent,
         }
     }
     {
-        CHIP_ERROR err = LogValue("LocationInfo", indent + 1, value.locationInfo);
+        CHIP_ERROR err = LogValue("AreaDesc", indent + 1, value.areaDesc);
         if (err != CHIP_NO_ERROR)
         {
-            DataModelLogger::LogString(indent + 1, "Struct truncated due to invalid value for 'LocationInfo'");
+            DataModelLogger::LogString(indent + 1, "Struct truncated due to invalid value for 'AreaDesc'");
             return err;
         }
     }
@@ -14668,7 +14668,7 @@ CHIP_ERROR DataModelLogger::LogAttribute(const chip::app::ConcreteDataAttributeP
         switch (path.mAttributeId)
         {
         case ServiceArea::Attributes::SupportedLocations::Id: {
-            chip::app::DataModel::DecodableList<chip::app::Clusters::ServiceArea::Structs::LocationStruct::DecodableType> value;
+            chip::app::DataModel::DecodableList<chip::app::Clusters::ServiceArea::Structs::AreaStruct::DecodableType> value;
             ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
             return DataModelLogger::LogValue("SupportedLocations", 1, value);
         }

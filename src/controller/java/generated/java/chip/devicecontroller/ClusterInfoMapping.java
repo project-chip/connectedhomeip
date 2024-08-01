@@ -13172,9 +13172,9 @@ public class ClusterInfoMapping {
     }
 
     @Override
-    public void onSuccess(List<ChipStructs.ServiceAreaClusterLocationStruct> valueList) {
+    public void onSuccess(List<ChipStructs.ServiceAreaClusterAreaStruct> valueList) {
       Map<CommandResponseInfo, Object> responseValues = new LinkedHashMap<>();
-      CommandResponseInfo commandResponseInfo = new CommandResponseInfo("valueList", "List<ChipStructs.ServiceAreaClusterLocationStruct>");
+      CommandResponseInfo commandResponseInfo = new CommandResponseInfo("valueList", "List<ChipStructs.ServiceAreaClusterAreaStruct>");
       responseValues.put(commandResponseInfo, valueList);
       callback.onSuccess(responseValues);
     }

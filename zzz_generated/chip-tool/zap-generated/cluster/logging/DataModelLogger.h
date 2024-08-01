@@ -287,7 +287,7 @@ static CHIP_ERROR LogValue(const char * label, size_t indent,
                            const chip::app::Clusters::ServiceArea::Structs::AreaInfoStruct::DecodableType & value);
 
 static CHIP_ERROR LogValue(const char * label, size_t indent,
-                           const chip::app::Clusters::ServiceArea::Structs::LocationStruct::DecodableType & value);
+                           const chip::app::Clusters::ServiceArea::Structs::AreaStruct::DecodableType & value);
 
 static CHIP_ERROR LogValue(const char * label, size_t indent,
                            const chip::app::Clusters::ServiceArea::Structs::MapStruct::DecodableType & value);
