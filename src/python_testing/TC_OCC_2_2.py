@@ -74,7 +74,8 @@ class TC_OCC_2_2(MatterBaseTest):
             # Bitmap supports US, then OccupancySensorType should be US
             elif (is_pir_feature_supported != 1) & (is_us_feature_supported == 1) & (is_phy_feature_supported != 1):
                 asserts.assert_equal(
-                    occupancy_sensor_type_dut, Clusters.OccupancySensing.Enums.OccupancySensorTypeEnum.kUltrasonci, "OccupancySensorType is not Ultrasonic")
+                    occupancy_sensor_type_dut, Clusters.OccupancySensing.Enums.OccupancySensorTypeEnum.kUltrasonic, "OccupancySensorType is not Ultrasonic")
+
             # Bitmap supports PIR and US, then OccupancySensorType should be PIRAndUltrasonic
             elif (is_pir_feature_supported == 1) & (is_us_feature_supported == 1) & (is_phy_feature_supported != 1):
                 asserts.assert_equal(occupancy_sensor_type_dut, Clusters.OccupancySensing.Enums.OccupancySensorTypeEnum.kPIRAndUltrasonic,
