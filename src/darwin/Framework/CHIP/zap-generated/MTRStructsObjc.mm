@@ -19,36 +19,6 @@
 
 NS_ASSUME_NONNULL_BEGIN
 
-@implementation MTRDataTypeAtomicAttributeStatusStruct
-- (instancetype)init
-{
-    if (self = [super init]) {
-
-        _attributeID = @(0);
-
-        _statusCode = @(0);
-    }
-    return self;
-}
-
-- (id)copyWithZone:(NSZone * _Nullable)zone
-{
-    auto other = [[MTRDataTypeAtomicAttributeStatusStruct alloc] init];
-
-    other.attributeID = self.attributeID;
-    other.statusCode = self.statusCode;
-
-    return other;
-}
-
-- (NSString *)description
-{
-    NSString * descriptionString = [NSString stringWithFormat:@"<%@: attributeID:%@; statusCode:%@; >", NSStringFromClass([self class]), _attributeID, _statusCode];
-    return descriptionString;
-}
-
-@end
-
 @implementation MTRDataTypeTestGlobalStruct
 - (instancetype)init
 {
@@ -77,6 +47,36 @@ NS_ASSUME_NONNULL_BEGIN
 - (NSString *)description
 {
     NSString * descriptionString = [NSString stringWithFormat:@"<%@: name:%@; myBitmap:%@; myEnum:%@; >", NSStringFromClass([self class]), _name, _myBitmap, _myEnum];
+    return descriptionString;
+}
+
+@end
+
+@implementation MTRDataTypeAtomicAttributeStatusStruct
+- (instancetype)init
+{
+    if (self = [super init]) {
+
+        _attributeID = @(0);
+
+        _statusCode = @(0);
+    }
+    return self;
+}
+
+- (id)copyWithZone:(NSZone * _Nullable)zone
+{
+    auto other = [[MTRDataTypeAtomicAttributeStatusStruct alloc] init];
+
+    other.attributeID = self.attributeID;
+    other.statusCode = self.statusCode;
+
+    return other;
+}
+
+- (NSString *)description
+{
+    NSString * descriptionString = [NSString stringWithFormat:@"<%@: attributeID:%@; statusCode:%@; >", NSStringFromClass([self class]), _attributeID, _statusCode];
     return descriptionString;
 }
 

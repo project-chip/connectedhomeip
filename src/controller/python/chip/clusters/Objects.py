@@ -65,19 +65,6 @@ class Globals:
 
     class Structs:
         @dataclass
-        class AtomicAttributeStatusStruct(ClusterObject):
-            @ChipUtility.classproperty
-            def descriptor(cls) -> ClusterObjectDescriptor:
-                return ClusterObjectDescriptor(
-                    Fields=[
-                        ClusterObjectFieldDescriptor(Label="attributeID", Tag=0, Type=uint),
-                        ClusterObjectFieldDescriptor(Label="statusCode", Tag=1, Type=uint),
-                    ])
-
-            attributeID: 'uint' = 0
-            statusCode: 'uint' = 0
-
-        @dataclass
         class TestGlobalStruct(ClusterObject):
             @ChipUtility.classproperty
             def descriptor(cls) -> ClusterObjectDescriptor:
@@ -91,6 +78,19 @@ class Globals:
             name: 'str' = ""
             myBitmap: 'typing.Union[Nullable, uint]' = NullValue
             myEnum: 'typing.Union[None, Nullable, Globals.Enums.TestGlobalEnum]' = None
+
+        @dataclass
+        class AtomicAttributeStatusStruct(ClusterObject):
+            @ChipUtility.classproperty
+            def descriptor(cls) -> ClusterObjectDescriptor:
+                return ClusterObjectDescriptor(
+                    Fields=[
+                        ClusterObjectFieldDescriptor(Label="attributeID", Tag=0, Type=uint),
+                        ClusterObjectFieldDescriptor(Label="statusCode", Tag=1, Type=uint),
+                    ])
+
+            attributeID: 'uint' = 0
+            statusCode: 'uint' = 0
 
 
 
