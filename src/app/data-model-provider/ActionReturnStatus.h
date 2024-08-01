@@ -32,9 +32,8 @@ namespace DataModel {
 /// which is a code (InteractionModel::Status) and may have an associated
 /// cluster-specific code.
 ///
-/// However some actions specifically may return additional errors for
-/// chunking (i.e. out of space, retry or send existing partial data) hence
-/// the exitance of this class:
+/// However some actions specifically may return additional information for
+/// chunking, hence the existence of this class:
 ///
 ///   - encapsulates a ClusterStatusCode for an actual action result
 ///   - encapsulates a underlying CHIP_ERROR for reporting purposes
