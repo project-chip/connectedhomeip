@@ -71,5 +71,6 @@ void emberAfOccupancySensingClusterInitCallback(EndpointId endpointId)
     }
     else
     {
+        ChipLogError(AppServer, "Error: invalid/unexpected OccupancySensing Cluster endpoint index.");
     }
 }
