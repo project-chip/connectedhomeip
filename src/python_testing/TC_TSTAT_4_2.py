@@ -42,14 +42,19 @@ cluster = Clusters.Thermostat
 
 
 initial_presets = []
-initial_presets.append(cluster.Structs.PresetStruct(presetHandle=b'\x01', presetScenario=cluster.Enums.PresetScenarioEnum.kOccupied, name=None, coolingSetpoint=2500, heatingSetpoint=2100, builtIn=True))
-initial_presets.append(cluster.Structs.PresetStruct(presetHandle=b'\x02', presetScenario=cluster.Enums.PresetScenarioEnum.kUnoccupied, name=None, coolingSetpoint=2600, heatingSetpoint=2000, builtIn=True))
+initial_presets.append(cluster.Structs.PresetStruct(presetHandle=b'\x01', presetScenario=cluster.Enums.PresetScenarioEnum.kOccupied,
+                       name=None, coolingSetpoint=2500, heatingSetpoint=2100, builtIn=True))
+initial_presets.append(cluster.Structs.PresetStruct(presetHandle=b'\x02', presetScenario=cluster.Enums.PresetScenarioEnum.kUnoccupied,
+                       name=None, coolingSetpoint=2600, heatingSetpoint=2000, builtIn=True))
 
 new_presets = initial_presets.copy()
-new_presets.append(cluster.Structs.PresetStruct(presetHandle=NullValue, presetScenario=cluster.Enums.PresetScenarioEnum.kSleep, name="Sleep", coolingSetpoint=2700, heatingSetpoint=1900, builtIn=False))
+new_presets.append(cluster.Structs.PresetStruct(presetHandle=NullValue, presetScenario=cluster.Enums.PresetScenarioEnum.kSleep,
+                   name="Sleep", coolingSetpoint=2700, heatingSetpoint=1900, builtIn=False))
 
 new_presets_with_handle = initial_presets.copy()
-new_presets_with_handle.append(cluster.Structs.PresetStruct(presetHandle=b'\x03', presetScenario=cluster.Enums.PresetScenarioEnum.kSleep, name="Sleep", coolingSetpoint=2700, heatingSetpoint=1900, builtIn=False))
+new_presets_with_handle.append(cluster.Structs.PresetStruct(
+    presetHandle=b'\x03', presetScenario=cluster.Enums.PresetScenarioEnum.kSleep, name="Sleep", coolingSetpoint=2700, heatingSetpoint=1900, builtIn=False))
+
 
 class TC_TSTAT_4_2(MatterBaseTest):
 
@@ -58,8 +63,8 @@ class TC_TSTAT_4_2(MatterBaseTest):
         return result[0].Status
 
     async def send_edit_preset_request_command(self,
-                                          endpoint: int = None,
-                                          expected_status: Status = Status.Success):
+                                               endpoint: int = None,
+                                               expected_status: Status = Status.Success):
         try:
             await self.send_single_cmd(cmd=cluster.Commands.StartPresetsSchedulesEditRequest(timeoutSeconds=180),
                                        endpoint=endpoint)
@@ -69,8 +74,8 @@ class TC_TSTAT_4_2(MatterBaseTest):
             asserts.assert_equal(e.status, expected_status, "Unexpected error returned")
 
     async def send_commit_preset_request_command(self,
-                                          endpoint: int = None,
-                                          expected_status: Status = Status.Success):
+                                                 endpoint: int = None,
+                                                 expected_status: Status = Status.Success):
         try:
             await self.send_single_cmd(cmd=cluster.Commands.CommitPresetsSchedulesRequest(),
                                        endpoint=endpoint)
@@ -79,8 +84,8 @@ class TC_TSTAT_4_2(MatterBaseTest):
             asserts.assert_equal(e.status, expected_status, "Unexpected error returned")
 
     async def send_cancel_preset_request_command(self,
-                                          endpoint: int = None,
-                                          expected_status: Status = Status.Success):
+                                                 endpoint: int = None,
+                                                 expected_status: Status = Status.Success):
         try:
             await self.send_single_cmd(cmd=cluster.Commands.CancelPresetsSchedulesEditRequest(),
                                        endpoint=endpoint)
@@ -89,9 +94,9 @@ class TC_TSTAT_4_2(MatterBaseTest):
             asserts.assert_equal(e.status, expected_status, "Unexpected error returned")
 
     async def send_set_active_preset_handle_request_command(self,
-                                          endpoint: int = None,
-                                          value: bytes = None,
-                                          expected_status: Status = Status.Success):
+                                                            endpoint: int = None,
+                                                            value: bytes = None,
+                                                            expected_status: Status = Status.Success):
         try:
             await self.send_single_cmd(cmd=cluster.Commands.SetActivePresetRequest(value),
                                        endpoint=endpoint)
@@ -152,7 +157,7 @@ class TC_TSTAT_4_2(MatterBaseTest):
             asserts.assert_equal(presets, initial_presets, "Presets do not match initial value")
 
             # Write to the presets attribute without calling StartPresetsSchedulesEditRequest command
-            status = await self.write_presets(endpoint= endpoint, presets=new_presets);
+            status = await self.write_presets(endpoint=endpoint, presets=new_presets)
             status_ok = (status == Status.InvalidInState)
             asserts.assert_true(status_ok, "Presets write did not return InvalidInState as expected")
 
@@ -161,7 +166,7 @@ class TC_TSTAT_4_2(MatterBaseTest):
             await self.send_edit_preset_request_command()
 
             # Write to the presets attribute after calling StartPresetsSchedulesEditRequest command
-            status = await self.write_presets(endpoint= endpoint, presets=new_presets);
+            status = await self.write_presets(endpoint=endpoint, presets=new_presets)
             status_ok = (status == Status.Success)
             asserts.assert_true(status_ok, "Presets write did not return Success as expected")
 
@@ -177,7 +182,7 @@ class TC_TSTAT_4_2(MatterBaseTest):
             await self.send_edit_preset_request_command()
 
             # Write to the presets attribute after calling StartPresetsSchedulesEditRequest command
-            status = await self.write_presets(endpoint= endpoint, presets=new_presets);
+            status = await self.write_presets(endpoint=endpoint, presets=new_presets)
             status_ok = (status == Status.Success)
             asserts.assert_true(status_ok, "Presets write did not return Success as expected")
 
@@ -198,7 +203,7 @@ class TC_TSTAT_4_2(MatterBaseTest):
             # Write to the presets attribute after removing a built in preset from the list. Remove the first entry.
             test_presets = new_presets_with_handle.copy()
             test_presets.pop(0)
-            status = await self.write_presets(endpoint= endpoint, presets=test_presets);
+            status = await self.write_presets(endpoint=endpoint, presets=test_presets)
             status_ok = (status == Status.Success)
             asserts.assert_true(status_ok, "Presets write did not return Success as expected")
 
@@ -211,7 +216,7 @@ class TC_TSTAT_4_2(MatterBaseTest):
             # Send the SetActivePresetRequest command
             await self.send_set_active_preset_handle_request_command(value=b'\x03')
 
-            # Read the active preset handle attribute and verify it was updated to preset handle 
+            # Read the active preset handle attribute and verify it was updated to preset handle
             activePresetHandle = await self.read_single_attribute_check_success(endpoint=endpoint, cluster=cluster, attribute=cluster.Attributes.ActivePresetHandle)
             logger.info(f"Rx'd ActivePresetHandle: {activePresetHandle}")
             asserts.assert_equal(activePresetHandle, b'\x03', "Active preset handle was not updated as expected")
@@ -222,7 +227,7 @@ class TC_TSTAT_4_2(MatterBaseTest):
             # Write to the presets attribute after removing the preset that was set as the active preset handle. Remove the last entry with preset handle (b'\x03')
             test_presets = new_presets_with_handle.copy()
             del test_presets[-1]
-            status = await self.write_presets(endpoint= endpoint, presets=test_presets);
+            status = await self.write_presets(endpoint=endpoint, presets=test_presets)
             status_ok = (status == Status.Success)
             asserts.assert_true(status_ok, "Presets write did not return Success as expected")
 
@@ -238,8 +243,8 @@ class TC_TSTAT_4_2(MatterBaseTest):
             # Write to the presets attribute after setting the builtIn flag to False for preset with handle (b'\x01')
             test_presets = copy.deepcopy(new_presets_with_handle)
             test_presets[0].builtIn = False
-            
-            status = await self.write_presets(endpoint= endpoint, presets=test_presets);
+
+            status = await self.write_presets(endpoint=endpoint, presets=test_presets)
             status_ok = (status == Status.Success)
             asserts.assert_true(status_ok, "Presets write did not return Success as expected")
 
@@ -254,9 +259,10 @@ class TC_TSTAT_4_2(MatterBaseTest):
 
             # Write to the presets attribute after adding a preset with builtIn set to True
             test_presets = copy.deepcopy(new_presets_with_handle)
-            test_presets.append(cluster.Structs.PresetStruct(presetHandle=NullValue, presetScenario=cluster.Enums.PresetScenarioEnum.kWake, name="Wake", coolingSetpoint=2800, heatingSetpoint=1800, builtIn=True))
-            
-            status = await self.write_presets(endpoint= endpoint, presets=test_presets);
+            test_presets.append(cluster.Structs.PresetStruct(presetHandle=NullValue, presetScenario=cluster.Enums.PresetScenarioEnum.kWake,
+                                name="Wake", coolingSetpoint=2800, heatingSetpoint=1800, builtIn=True))
+
+            status = await self.write_presets(endpoint=endpoint, presets=test_presets)
             status_ok = (status == Status.Success)
             asserts.assert_true(status_ok, "Presets write did not return Success as expected")
 
@@ -271,9 +277,10 @@ class TC_TSTAT_4_2(MatterBaseTest):
 
             # Write to the presets attribute after adding a preset with a preset handle that doesn't exist in Presets attribute
             test_presets = copy.deepcopy(new_presets_with_handle)
-            test_presets.append(cluster.Structs.PresetStruct(presetHandle=b'\x08', presetScenario=cluster.Enums.PresetScenarioEnum.kWake, name="Wake", coolingSetpoint=2800, heatingSetpoint=1800, builtIn=True))
-            
-            status = await self.write_presets(endpoint= endpoint, presets=test_presets);
+            test_presets.append(cluster.Structs.PresetStruct(presetHandle=b'\x08', presetScenario=cluster.Enums.PresetScenarioEnum.kWake,
+                                name="Wake", coolingSetpoint=2800, heatingSetpoint=1800, builtIn=True))
+
+            status = await self.write_presets(endpoint=endpoint, presets=test_presets)
             status_ok = (status == Status.Success)
             asserts.assert_true(status_ok, "Presets write did not return Success as expected")
 
@@ -289,8 +296,8 @@ class TC_TSTAT_4_2(MatterBaseTest):
             # Write to the presets attribute after setting the builtIn flag to True for preset with handle (b'\x03')
             test_presets = copy.deepcopy(new_presets_with_handle)
             test_presets[2].builtIn = True
-            
-            status = await self.write_presets(endpoint= endpoint, presets=test_presets);
+
+            status = await self.write_presets(endpoint=endpoint, presets=test_presets)
             status_ok = (status == Status.Success)
             asserts.assert_true(status_ok, "Presets write did not return Success as expected")
 
@@ -306,8 +313,8 @@ class TC_TSTAT_4_2(MatterBaseTest):
             # Write to the presets attribute after setting a name for preset with handle (b'\x01') that doesn't support names
             test_presets = copy.deepcopy(new_presets_with_handle)
             test_presets[0].name = "Occupied"
-            
-            status = await self.write_presets(endpoint= endpoint, presets=test_presets);
+
+            status = await self.write_presets(endpoint=endpoint, presets=test_presets)
             status_ok = (status == Status.Success)
             asserts.assert_true(status_ok, "Presets write did not return Success as expected")
 
@@ -322,19 +329,21 @@ class TC_TSTAT_4_2(MatterBaseTest):
 
             # Write to the presets attribute with a new valid preset added
             test_presets = copy.deepcopy(new_presets_with_handle)
-            test_presets.append(cluster.Structs.PresetStruct(presetHandle=b'\x04', presetScenario=cluster.Enums.PresetScenarioEnum.kWake, name="Wake", coolingSetpoint=2800, heatingSetpoint=1800, builtIn=False))
-            
-            status = await self.write_presets(endpoint= endpoint, presets=test_presets);
+            test_presets.append(cluster.Structs.PresetStruct(presetHandle=b'\x04', presetScenario=cluster.Enums.PresetScenarioEnum.kWake,
+                                name="Wake", coolingSetpoint=2800, heatingSetpoint=1800, builtIn=False))
+
+            status = await self.write_presets(endpoint=endpoint, presets=test_presets)
             status_ok = (status == Status.Success)
             asserts.assert_true(status_ok, "Presets write did not return Success as expected")
 
-            # Send the CancelPresetsSchedulesRequest command 
+            # Send the CancelPresetsSchedulesRequest command
             await self.send_cancel_preset_request_command()
 
             # Send the CommitPresetsSchedulesRequest command and expect InvalidInState as the previous edit request was cancelled
             await self.send_commit_preset_request_command(expected_status=Status.InvalidInState)
 
-            #TODO: Add tests for the total number of Presets exceeds the NumberOfPresets supported. Also Add tests for adding presets with preset scenario not present in PresetTypes.     
+            # TODO: Add tests for the total number of Presets exceeds the NumberOfPresets supported. Also Add tests for adding presets with preset scenario not present in PresetTypes.
+
 
 if __name__ == "__main__":
     default_matter_test_main()
