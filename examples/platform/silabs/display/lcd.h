@@ -64,9 +64,9 @@ public:
     } DisplayStatus_t;
 
 #ifdef SL_ENABLE_ICD_LCD
-    static const uint32_t kDefaultLCDTimeout = 3000;
-    const uint32_t kActivityLCDTimeout       = 5000;
-    const uint32_t kQRCodeScreenTimeout      = 10000;
+    static const uint32_t kDefaultLCDTimeout   = 3000;
+    static const uint32_t kActivityLCDTimeout  = 5000;
+    static const uint32_t kQRCodeScreenTimeout = 10000;
 #endif // SL_ENABLE_ICD_LCD
 
     typedef void (*customUICB)(GLIB_Context_t * context);

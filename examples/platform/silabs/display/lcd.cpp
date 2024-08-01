@@ -292,7 +292,7 @@ CHIP_ERROR SilabsLCD::TurnOff(void)
     status             = SilabsLCD::Clear();
     if (status != SL_STATUS_OK)
     {
-        ChipLogError(DeviceLayer, "LCD clear failed: %ld", status);
+        ChipLogError(DeviceLayer, "SilabsLCD::Clear failed: %ld", status);
         return CHIP_ERROR_INTERNAL;
     }
 #if (SLI_SI91X_MCU_INTERFACE)
@@ -305,14 +305,12 @@ CHIP_ERROR SilabsLCD::TurnOff(void)
         ChipLogError(DeviceLayer, "sl_board_disable_display failed: %ld", status);
         return CHIP_ERROR_INTERNAL;
     }
-    ChipLogDetail(DeviceLayer, "SilabsLCD::TurnOff completed");
     return CHIP_NO_ERROR;
 }
 
 #ifdef SL_ENABLE_ICD_LCD
 CHIP_ERROR SilabsLCD::TurnOff(uint32_t delayInMs)
 {
-    ChipLogDetail(DeviceLayer, "start LCD timeout timer");
     sl_sleeptimer_restart_timer(&lcdTimerHandle, sl_sleeptimer_ms_to_tick(delayInMs), LcdTimeoutCallback, this, 0,
                                 SL_SLEEPTIMER_NO_HIGH_PRECISION_HF_CLOCKS_REQUIRED_FLAG);
     return CHIP_NO_ERROR;
