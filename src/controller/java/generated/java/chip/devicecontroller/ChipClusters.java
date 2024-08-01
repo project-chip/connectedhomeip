@@ -15166,6 +15166,7 @@ public class ChipClusters {
     private static final long VENDOR_NAME_ATTRIBUTE_ID = 1L;
     private static final long VENDOR_I_D_ATTRIBUTE_ID = 2L;
     private static final long PRODUCT_NAME_ATTRIBUTE_ID = 3L;
+    private static final long PRODUCT_I_D_ATTRIBUTE_ID = 4L;
     private static final long NODE_LABEL_ATTRIBUTE_ID = 5L;
     private static final long HARDWARE_VERSION_ATTRIBUTE_ID = 7L;
     private static final long HARDWARE_VERSION_STRING_ATTRIBUTE_ID = 8L;
@@ -15312,6 +15313,32 @@ public class ChipClusters {
             callback.onSuccess(value);
           }
         }, PRODUCT_NAME_ATTRIBUTE_ID, minInterval, maxInterval);
+    }
+
+    public void readProductIDAttribute(
+        IntegerAttributeCallback callback) {
+      ChipAttributePath path = ChipAttributePath.newInstance(endpointId, clusterId, PRODUCT_I_D_ATTRIBUTE_ID);
+
+      readAttribute(new ReportCallbackImpl(callback, path) {
+          @Override
+          public void onSuccess(byte[] tlv) {
+            Integer value = ChipTLVValueDecoder.decodeAttributeValue(path, tlv);
+            callback.onSuccess(value);
+          }
+        }, PRODUCT_I_D_ATTRIBUTE_ID, true);
+    }
+
+    public void subscribeProductIDAttribute(
+        IntegerAttributeCallback callback, int minInterval, int maxInterval) {
+      ChipAttributePath path = ChipAttributePath.newInstance(endpointId, clusterId, PRODUCT_I_D_ATTRIBUTE_ID);
+
+      subscribeAttribute(new ReportCallbackImpl(callback, path) {
+          @Override
+          public void onSuccess(byte[] tlv) {
+            Integer value = ChipTLVValueDecoder.decodeAttributeValue(path, tlv);
+            callback.onSuccess(value);
+          }
+        }, PRODUCT_I_D_ATTRIBUTE_ID, minInterval, maxInterval);
     }
 
     public void readNodeLabelAttribute(

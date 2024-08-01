@@ -4460,6 +4460,7 @@ public class ClusterIDMapping {
             VendorName(1L),
             VendorID(2L),
             ProductName(3L),
+            ProductID(4L),
             NodeLabel(5L),
             HardwareVersion(7L),
             HardwareVersionString(8L),

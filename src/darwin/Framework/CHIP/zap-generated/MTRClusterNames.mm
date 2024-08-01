@@ -2391,6 +2391,10 @@ NSString * MTRAttributeNameForID(MTRClusterIDType clusterID, MTRAttributeIDType 
             result = @"ProductName";
             break;
 
+        case MTRAttributeIDTypeClusterBridgedDeviceBasicInformationAttributeProductIDID:
+            result = @"ProductID";
+            break;
+
         case MTRAttributeIDTypeClusterBridgedDeviceBasicInformationAttributeNodeLabelID:
             result = @"NodeLabel";
             break;

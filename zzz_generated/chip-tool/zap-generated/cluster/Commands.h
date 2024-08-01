@@ -3489,6 +3489,7 @@ private:
 | * VendorName                                                        | 0x0001 |
 | * VendorID                                                          | 0x0002 |
 | * ProductName                                                       | 0x0003 |
+| * ProductID                                                         | 0x0004 |
 | * NodeLabel                                                         | 0x0005 |
 | * HardwareVersion                                                   | 0x0007 |
 | * HardwareVersionString                                             | 0x0008 |
@@ -18274,6 +18275,7 @@ void registerClusterBridgedDeviceBasicInformation(Commands & commands, Credentia
         make_unique<ReadAttribute>(Id, "vendor-name", Attributes::VendorName::Id, credsIssuerConfig),                        //
         make_unique<ReadAttribute>(Id, "vendor-id", Attributes::VendorID::Id, credsIssuerConfig),                            //
         make_unique<ReadAttribute>(Id, "product-name", Attributes::ProductName::Id, credsIssuerConfig),                      //
+        make_unique<ReadAttribute>(Id, "product-id", Attributes::ProductID::Id, credsIssuerConfig),                          //
         make_unique<ReadAttribute>(Id, "node-label", Attributes::NodeLabel::Id, credsIssuerConfig),                          //
         make_unique<ReadAttribute>(Id, "hardware-version", Attributes::HardwareVersion::Id, credsIssuerConfig),              //
         make_unique<ReadAttribute>(Id, "hardware-version-string", Attributes::HardwareVersionString::Id, credsIssuerConfig), //
@@ -18300,6 +18302,8 @@ void registerClusterBridgedDeviceBasicInformation(Commands & commands, Credentia
                                                     WriteCommandType::kForceWrite, credsIssuerConfig), //
         make_unique<WriteAttribute<chip::CharSpan>>(Id, "product-name", Attributes::ProductName::Id, WriteCommandType::kForceWrite,
                                                     credsIssuerConfig), //
+        make_unique<WriteAttribute<uint16_t>>(Id, "product-id", 0, UINT16_MAX, Attributes::ProductID::Id,
+                                              WriteCommandType::kForceWrite, credsIssuerConfig), //
         make_unique<WriteAttribute<chip::CharSpan>>(Id, "node-label", Attributes::NodeLabel::Id, WriteCommandType::kWrite,
                                                     credsIssuerConfig), //
         make_unique<WriteAttribute<uint16_t>>(Id, "hardware-version", 0, UINT16_MAX, Attributes::HardwareVersion::Id,
@@ -18344,6 +18348,7 @@ void registerClusterBridgedDeviceBasicInformation(Commands & commands, Credentia
         make_unique<SubscribeAttribute>(Id, "vendor-name", Attributes::VendorName::Id, credsIssuerConfig),                        //
         make_unique<SubscribeAttribute>(Id, "vendor-id", Attributes::VendorID::Id, credsIssuerConfig),                            //
         make_unique<SubscribeAttribute>(Id, "product-name", Attributes::ProductName::Id, credsIssuerConfig),                      //
+        make_unique<SubscribeAttribute>(Id, "product-id", Attributes::ProductID::Id, credsIssuerConfig),                          //
         make_unique<SubscribeAttribute>(Id, "node-label", Attributes::NodeLabel::Id, credsIssuerConfig),                          //
         make_unique<SubscribeAttribute>(Id, "hardware-version", Attributes::HardwareVersion::Id, credsIssuerConfig),              //
         make_unique<SubscribeAttribute>(Id, "hardware-version-string", Attributes::HardwareVersionString::Id, credsIssuerConfig), //

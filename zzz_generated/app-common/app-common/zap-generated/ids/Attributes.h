@@ -1894,6 +1894,10 @@ namespace ProductName {
 static constexpr AttributeId Id = 0x00000003;
 } // namespace ProductName
 
+namespace ProductID {
+static constexpr AttributeId Id = 0x00000004;
+} // namespace ProductID
+
 namespace NodeLabel {
 static constexpr AttributeId Id = 0x00000005;
 } // namespace NodeLabel

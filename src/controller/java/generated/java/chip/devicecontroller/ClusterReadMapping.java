@@ -4659,6 +4659,17 @@ public class ClusterReadMapping {
           readBridgedDeviceBasicInformationProductNameCommandParams
         );
         result.put("readProductNameAttribute", readBridgedDeviceBasicInformationProductNameAttributeInteractionInfo);
+     Map<String, CommandParameterInfo> readBridgedDeviceBasicInformationProductIDCommandParams = new LinkedHashMap<String, CommandParameterInfo>();
+        InteractionInfo readBridgedDeviceBasicInformationProductIDAttributeInteractionInfo = new InteractionInfo(
+          (cluster, callback, commandArguments) -> {
+            ((ChipClusters.BridgedDeviceBasicInformationCluster) cluster).readProductIDAttribute(
+              (ChipClusters.IntegerAttributeCallback) callback
+            );
+          },
+          () -> new ClusterInfoMapping.DelegatedIntegerAttributeCallback(),
+          readBridgedDeviceBasicInformationProductIDCommandParams
+        );
+        result.put("readProductIDAttribute", readBridgedDeviceBasicInformationProductIDAttributeInteractionInfo);
      Map<String, CommandParameterInfo> readBridgedDeviceBasicInformationNodeLabelCommandParams = new LinkedHashMap<String, CommandParameterInfo>();
         InteractionInfo readBridgedDeviceBasicInformationNodeLabelAttributeInteractionInfo = new InteractionInfo(
           (cluster, callback, commandArguments) -> {

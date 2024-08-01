@@ -8228,6 +8228,8 @@ CHIP_ERROR TypeInfo::DecodableType::Decode(TLV::TLVReader & reader, const Concre
         return DataModel::Decode(reader, vendorID);
     case Attributes::ProductName::TypeInfo::GetAttributeId():
         return DataModel::Decode(reader, productName);
+    case Attributes::ProductID::TypeInfo::GetAttributeId():
+        return DataModel::Decode(reader, productID);
     case Attributes::NodeLabel::TypeInfo::GetAttributeId():
         return DataModel::Decode(reader, nodeLabel);
     case Attributes::HardwareVersion::TypeInfo::GetAttributeId():
