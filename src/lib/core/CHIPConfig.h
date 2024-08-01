@@ -1625,6 +1625,15 @@ extern const char CHIP_NON_PRODUCTION_MARKER[];
 #endif
 
 /**
+ * @def CHIP_CONFIG_ICD_MAXIMUM_CHECK_IN_BACKOFF
+ *
+ * @brief Default value for the ICD Management cluster MaximumCheckInBackoff attribute, in seconds
+ */
+#ifndef CHIP_CONFIG_ICD_MAXIMUM_CHECK_IN_BACKOFF_SEC
+#define CHIP_CONFIG_ICD_MAXIMUM_CHECK_IN_BACKOFF_SEC CHIP_CONFIG_ICD_IDLE_MODE_DURATION_SEC
+#endif
+
+/**
  *  @name Configuation for resuming subscriptions that timed out
  *
  *  @brief
@@ -1700,6 +1709,24 @@ extern const char CHIP_NON_PRODUCTION_MARKER[];
  */
 #ifndef CHIP_CONFIG_MAX_ICD_CLIENTS_INFO_STORAGE_CONCURRENT_ITERATORS
 #define CHIP_CONFIG_MAX_ICD_CLIENTS_INFO_STORAGE_CONCURRENT_ITERATORS 1
+#endif
+
+/**
+ * @def CHIP_CONFIG_MAX_THREAD_NETWORK_DIRECTORY_STORAGE_CAPACITY
+ *
+ * Defines the number of networks the default ThreadNetworkDirectoryStorage implementation will store.
+ */
+#ifndef CHIP_CONFIG_MAX_THREAD_NETWORK_DIRECTORY_STORAGE_CAPACITY
+#define CHIP_CONFIG_MAX_THREAD_NETWORK_DIRECTORY_STORAGE_CAPACITY (CHIP_CONFIG_MAX_FABRICS * 2)
+#endif
+
+/**
+ * @def CHIP_CONFIG_MAX_THREAD_NETWORK_DIRECTORY_STORAGE_CONCURRENT_ITERATORS
+ *
+ * Defines the number of ThreadNetworkDirectoryStorage iterators that can be allocated at any one time.
+ */
+#ifndef CHIP_CONFIG_MAX_THREAD_NETWORK_DIRECTORY_STORAGE_CONCURRENT_ITERATORS
+#define CHIP_CONFIG_MAX_THREAD_NETWORK_DIRECTORY_STORAGE_CONCURRENT_ITERATORS 1
 #endif
 
 /**

@@ -20,6 +20,8 @@
 #include "pw_rpc_system_server/rpc_server.h"
 #include "pw_rpc_system_server/socket.h"
 
+#include <commands/fabric-sync/FabricSyncCommand.h>
+#include <commands/interactive/InteractiveCommands.h>
 #include <system/SystemClock.h>
 #include <thread>
 
@@ -27,17 +29,39 @@
 #include "pigweed/rpc_services/FabricAdmin.h"
 #endif
 
+using namespace ::chip;
+
 namespace {
 
 #if defined(PW_RPC_FABRIC_ADMIN_SERVICE) && PW_RPC_FABRIC_ADMIN_SERVICE
-class FabricAdmin final : public chip::rpc::FabricAdmin
+class FabricAdmin final : public rpc::FabricAdmin
 {
 public:
-    pw::Status OpenCommissioningWindow(const chip_rpc_DeviceInfo & request, chip_rpc_OperationStatus & response) override
+    pw::Status OpenCommissioningWindow(const chip_rpc_DeviceCommissioningWindowInfo & request,
+                                       chip_rpc_OperationStatus & response) override
     {
-        chip::NodeId nodeId = request.node_id;
+        NodeId nodeId                 = request.node_id;
+        uint32_t commissioningTimeout = request.commissioning_timeout;
+        uint32_t iterations           = request.iterations;
+        uint32_t discriminator        = request.discriminator;
+
+        char saltHex[Crypto::kSpake2p_Max_PBKDF_Salt_Length * 2 + 1];
+        Encoding::BytesToHex(request.salt.bytes, request.salt.size, saltHex, sizeof(saltHex), Encoding::HexFlags::kNullTerminate);
+
+        char verifierHex[Crypto::kSpake2p_VerifierSerialized_Length * 2 + 1];
+        Encoding::BytesToHex(request.verifier.bytes, request.verifier.size, verifierHex, sizeof(verifierHex),
+                             Encoding::HexFlags::kNullTerminate);
+
         ChipLogProgress(NotSpecified, "Received OpenCommissioningWindow request: 0x%lx", nodeId);
-        response.success = false;
+
+        char command[512];
+        snprintf(command, sizeof(command), "pairing open-commissioning-window %ld %d %d %d %d %d --salt hex:%s --verifier hex:%s",
+                 nodeId, kRootEndpointId, kEnhancedCommissioningMethod, commissioningTimeout, iterations, discriminator, saltHex,
+                 verifierHex);
+
+        PushCommand(command);
+
+        response.success = true;
 
         return pw::OkStatus();
     }

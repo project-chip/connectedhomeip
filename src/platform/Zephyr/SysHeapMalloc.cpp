@@ -30,9 +30,6 @@ extern "C" {
 #include <cstdint>
 #include <cstring>
 
-// Construct name of the given function wrapped with the `--wrap=symbol` GCC option.
-#define WRAP(f) __wrap_##f
-
 using namespace chip;
 
 namespace {
@@ -67,7 +64,7 @@ LockGuard::~LockGuard()
     }
 }
 
-int initHeap()
+int InitSysHeapMalloc()
 {
     sys_heap_init(&sHeap, sHeapMemory, sizeof(sHeapMemory));
     return 0;
@@ -77,7 +74,7 @@ int initHeap()
 
 // Initialize the heap in the POST_KERNEL phase to make sure that it is ready even before
 // C++ static constructors are called (which happens prior to the APPLICATION initialization phase).
-SYS_INIT(initHeap, POST_KERNEL, CONFIG_KERNEL_INIT_PRIORITY_DEFAULT);
+SYS_INIT(InitSysHeapMalloc, POST_KERNEL, CONFIG_KERNEL_INIT_PRIORITY_DEFAULT);
 
 namespace chip {
 namespace DeviceLayer {
@@ -99,7 +96,7 @@ void * Calloc(size_t num, size_t size)
         return nullptr;
     }
 
-    void * mem = malloc(totalSize);
+    void * mem = Malloc(totalSize);
 
     if (mem)
     {
@@ -156,27 +153,37 @@ void ResetMaxStats()
 
 extern "C" {
 
-void * WRAP(malloc)(size_t size) __attribute((alias("_ZN4chip11DeviceLayer6Malloc6MallocEj")));
-void * WRAP(calloc)(size_t num, size_t size) __attribute((alias("_ZN4chip11DeviceLayer6Malloc6CallocEjj")));
-void * WRAP(realloc)(void * mem, size_t size) __attribute((alias("_ZN4chip11DeviceLayer6Malloc7ReallocEPvj")));
-void WRAP(free)(void * mem) __attribute((alias("_ZN4chip11DeviceLayer6Malloc4FreeEPv")));
+// Construct the name of a function wrapped with the `--wrap=symbol` GCC option.
+#define WRAP(f) __wrap_##f
 
-void * WRAP(_malloc_r)(_reent *, size_t size)
+// Define a function as an alias of another function.
+#define ALIAS(f) __attribute((alias(f)))
+
+// Mark a function as externally visible so that it is not optimized-away even
+// if LTO or whole-program optimization is enabled.
+#define EXTERNALLY_VISIBLE __attribute((externally_visible))
+
+EXTERNALLY_VISIBLE void * WRAP(malloc)(size_t size) ALIAS("_ZN4chip11DeviceLayer6Malloc6MallocEj");
+EXTERNALLY_VISIBLE void * WRAP(calloc)(size_t num, size_t size) ALIAS("_ZN4chip11DeviceLayer6Malloc6CallocEjj");
+EXTERNALLY_VISIBLE void * WRAP(realloc)(void * mem, size_t size) ALIAS("_ZN4chip11DeviceLayer6Malloc7ReallocEPvj");
+EXTERNALLY_VISIBLE void WRAP(free)(void * mem) ALIAS("_ZN4chip11DeviceLayer6Malloc4FreeEPv");
+
+EXTERNALLY_VISIBLE void * WRAP(_malloc_r)(_reent *, size_t size)
 {
     return WRAP(malloc)(size);
 }
 
-void * WRAP(_calloc_r)(_reent *, size_t num, size_t size)
+EXTERNALLY_VISIBLE void * WRAP(_calloc_r)(_reent *, size_t num, size_t size)
 {
     return WRAP(calloc)(num, size);
 }
 
-void * WRAP(_realloc_r)(_reent *, void * mem, size_t size)
+EXTERNALLY_VISIBLE void * WRAP(_realloc_r)(_reent *, void * mem, size_t size)
 {
     return WRAP(realloc)(mem, size);
 }
 
-void WRAP(_free_r)(_reent *, void * mem)
+EXTERNALLY_VISIBLE void WRAP(_free_r)(_reent *, void * mem)
 {
     WRAP(free)(mem);
 }

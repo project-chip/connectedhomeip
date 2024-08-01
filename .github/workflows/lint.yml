@@ -35,7 +35,7 @@ jobs:
         if: github.actor != 'restyled-io[bot]'
 
         container:
-            image: ghcr.io/project-chip/chip-build:54
+            image: ghcr.io/project-chip/chip-build:66
 
         steps:
             - name: Checkout
@@ -98,7 +98,6 @@ jobs:
                      --known-failure controller/ExamplePersistentStorage.cpp \
                      --known-failure controller/ExamplePersistentStorage.h \
                      --known-failure app/AttributeAccessToken.h \
-                     --known-failure app/CommandHandlerInterface.h \
                      --known-failure app/CommandResponseSender.h \
                      --known-failure app/CommandSenderLegacyCallback.h \
                      --known-failure app/ReadHandler.h \
@@ -288,7 +287,18 @@ jobs:
                   type-safe setters
               if: always()
               run: |
-                  git grep -I -n 'emberAfWriteAttribute' -- './*' ':(exclude).github/workflows/lint.yml' ':(exclude)zzz_generated/app-common/app-common/zap-generated/attributes/Accessors.cpp' ':(exclude)src/app/zap-templates/templates/app/attributes/Accessors-src.zapt' ':(exclude)src/app/util/attribute-table.cpp' ':(exclude)examples/common/pigweed/rpc_services/Attributes.h' ':(exclude)src/app/util/attribute-table.h' ':(exclude)src/app/util/ember-compatibility-functions.cpp' && exit 1 || exit 0
+                  git grep -I -n 'emberAfWriteAttribute' -- './*'                                            \
+                      ':(exclude).github/workflows/lint.yml'                                                 \
+                      ':(exclude)examples/common/pigweed/rpc_services/Attributes.h'                          \
+                      ':(exclude)src/app/codegen-data-model-provider/CodegenDataModelProvider_Write.cpp'     \
+                      ':(exclude)src/app/codegen-data-model-provider/tests/EmberReadWriteOverride.cpp'       \
+                      ':(exclude)src/app/util/attribute-table.cpp'                                           \
+                      ':(exclude)src/app/util/attribute-table.h'                                             \
+                      ':(exclude)src/app/util/ember-compatibility-functions.cpp'                             \
+                      ':(exclude)src/app/util/mock/CodegenEmberMocks.cpp'                                    \
+                      ':(exclude)src/app/zap-templates/templates/app/attributes/Accessors-src.zapt'          \
+                      ':(exclude)zzz_generated/app-common/app-common/zap-generated/attributes/Accessors.cpp' \
+                      && exit 1 || exit 0
 
             # Run ruff python linter
             - name: Check for errors using ruff Python linter

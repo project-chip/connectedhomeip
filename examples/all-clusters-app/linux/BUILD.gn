@@ -29,6 +29,10 @@ if (chip_enable_pw_rpc) {
 
 source_set("chip-all-clusters-common") {
   sources = [
+    "${chip_root}/examples/all-clusters-app/all-clusters-common/src/WhmDelegateImpl.cpp",
+    "${chip_root}/examples/all-clusters-app/all-clusters-common/src/WhmInstance.cpp",
+    "${chip_root}/examples/all-clusters-app/all-clusters-common/src/WhmMain.cpp",
+    "${chip_root}/examples/all-clusters-app/all-clusters-common/src/WhmManufacturer.cpp",
     "${chip_root}/examples/all-clusters-app/all-clusters-common/src/air-quality-instance.cpp",
     "${chip_root}/examples/all-clusters-app/all-clusters-common/src/binding-handler.cpp",
     "${chip_root}/examples/all-clusters-app/all-clusters-common/src/boolcfg-stub.cpp",
@@ -46,6 +50,7 @@ source_set("chip-all-clusters-common") {
     "${chip_root}/examples/all-clusters-app/all-clusters-common/src/laundry-washer-controls-delegate-impl.cpp",
     "${chip_root}/examples/all-clusters-app/all-clusters-common/src/laundry-washer-mode.cpp",
     "${chip_root}/examples/all-clusters-app/all-clusters-common/src/microwave-oven-mode.cpp",
+    "${chip_root}/examples/all-clusters-app/all-clusters-common/src/occupancy-sensing-stub.cpp",
     "${chip_root}/examples/all-clusters-app/all-clusters-common/src/operational-state-delegate-impl.cpp",
     "${chip_root}/examples/all-clusters-app/all-clusters-common/src/oven-modes.cpp",
     "${chip_root}/examples/all-clusters-app/all-clusters-common/src/oven-operational-state-delegate.cpp",
@@ -57,16 +62,25 @@ source_set("chip-all-clusters-common") {
     "${chip_root}/examples/all-clusters-app/all-clusters-common/src/static-supported-modes-manager.cpp",
     "${chip_root}/examples/all-clusters-app/all-clusters-common/src/static-supported-temperature-levels.cpp",
     "${chip_root}/examples/all-clusters-app/all-clusters-common/src/tcc-mode.cpp",
+    "${chip_root}/examples/all-clusters-app/all-clusters-common/src/water-heater-mode.cpp",
     "${chip_root}/examples/all-clusters-app/linux/diagnostic-logs-provider-delegate-impl.cpp",
+    "${chip_root}/examples/energy-management-app/energy-management-common/src/ChargingTargetsMemMgr.cpp",
     "${chip_root}/examples/energy-management-app/energy-management-common/src/DeviceEnergyManagementDelegateImpl.cpp",
     "${chip_root}/examples/energy-management-app/energy-management-common/src/DeviceEnergyManagementManager.cpp",
+    "${chip_root}/examples/energy-management-app/energy-management-common/src/EVSEManufacturerImpl.cpp",
     "${chip_root}/examples/energy-management-app/energy-management-common/src/ElectricalPowerMeasurementDelegate.cpp",
     "${chip_root}/examples/energy-management-app/energy-management-common/src/EnergyEvseDelegateImpl.cpp",
     "${chip_root}/examples/energy-management-app/energy-management-common/src/EnergyEvseManager.cpp",
+    "${chip_root}/examples/energy-management-app/energy-management-common/src/EnergyEvseTargetsStore.cpp",
+    "${chip_root}/examples/energy-management-app/energy-management-common/src/EnergyTimeUtils.cpp",
     "${chip_root}/examples/energy-management-app/energy-management-common/src/device-energy-management-mode.cpp",
     "${chip_root}/examples/energy-management-app/energy-management-common/src/energy-evse-mode.cpp",
+    "${chip_root}/examples/thermostat/linux/thermostat-delegate-impl.cpp",
     "AllClustersCommandDelegate.cpp",
+    "AllClustersCommandDelegate.h",
     "AppOptions.cpp",
+    "ButtonEventsSimulator.cpp",
+    "ButtonEventsSimulator.h",
     "ValveControlDelegate.cpp",
     "WindowCoveringManager.cpp",
     "include/tv-callbacks.cpp",
@@ -85,6 +99,7 @@ source_set("chip-all-clusters-common") {
   include_dirs = [
     "${chip_root}/examples/all-clusters-app/all-clusters-common/include",
     "${chip_root}/examples/energy-management-app/energy-management-common/include",
+    "${chip_root}/examples/thermostat/linux/include",
   ]
 
   if (chip_enable_pw_rpc) {

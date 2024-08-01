@@ -163,6 +163,14 @@ There are several test scripts provided for EVSE (in
 -   `TC_EEVSE_2_3`: This validates Get/Set/Clear target commands
 -   `TC_EEVSE_2_4`: This validates Faults
 -   `TC_EEVSE_2_5`: This validates EVSE diagnostic command (optional)
+-   `TC_EEVSE_2_6`: This validates EVSE Forecast Adjustment with State Forecast
+    Reporting feature functionality
+-   `TC_EEVSE_2_7`: This validates EVSE Constraints-based Adjustment with Power
+    Forecast Reporting feature functionality
+-   `TC_EEVSE_2_8`: This validates EVSE Constraints-based Adjustment with State
+    Forecast Reporting feature functionality
+-   `TC_EEVSE_2_9`: This validates EVSE Power or State Forecast Reporting
+    feature functionality
 
 These scripts require the use of Test Event Triggers via the GeneralDiagnostics
 cluster on Endpoint 0. This requires an `enableKey` (16 bytes) and a set of
@@ -183,6 +191,39 @@ chosen enable key is using the `--enable-key` command line option.
 
 From the top-level of the connectedhomeip repo type:
 
+Start the chip-energy-management-app:
+
+```bash
+rm -f evse.bin; out/debug/chip-energy-management-app --enable-key 000102030405060708090a0b0c0d0e0f --KVS evse.bin --featureSet $featureSet
+```
+
+where the \$featureSet depends on the test being run:
+
+```
+TC_DEM_2_2.py: 0x01  // PA
+TC_DEM_2_3.py: 0x3b  // STA, PAU, FA, CON + (PFR | SFR)
+TC_DEM_2_4.py: 0x3b  // STA, PAU, FA, CON + (PFR | SFR)
+TC_DEM_2_5.py: 0x3b  // STA, PAU, FA, CON + PFR
+TC_DEM_2_6.py: 0x3d  // STA, PAU, FA, CON + SFR
+TC_DEM_2_7.py: 0x3b  // STA, PAU, FA, CON + PFR
+TC_DEM_2_8.py: 0x3d  // STA, PAU, FA, CON + SFR
+TC_DEM_2_9.py: 0x3f  // STA, PAU, FA, CON + PFR + SFR
+```
+
+where
+
+```
+PA  - DEM.S.F00(PowerAdjustment)
+PFR - DEM.S.F01(PowerForecastReporting)
+SFR - DEM.S.F02(StateForecastReporting)
+STA - DEM.S.F03(StartTimeAdjustment)
+PAU - DEM.S.F04(Pausable)
+FA  - DEM.S.F05(ForecastAdjustment)
+CON  -DEM.S.F06(ConstraintBasedAdjustment)
+```
+
+Then run the test:
+
 ```bash
      $ python src/python_testing/TC_EEVSE_2_2.py --endpoint 1 -m on-network -n 1234 -p 20202021 -d 3840 --hex-arg enableKey:000102030405060708090a0b0c0d0e0f
 ```
@@ -190,6 +231,12 @@ From the top-level of the connectedhomeip repo type:
 -   Note that the `--endpoint 1` must be used with the example, since the EVSE
     cluster is on endpoint 1. The `--hex-arg enableKey:<key>` value must match
     the `--enable-key <key>` used on chip-energy-management-app args.
+
+The chip-energy-management-app will need to be stopped before running each test
+script as each test commissions the chip-energy-management-app in the first
+step. That is also why the evse.bin is deleted before running
+chip-energy-management-app as this is where the app stores the matter persistent
+data (e.g. fabric info).
 
 ## CHIP-REPL Interaction
 

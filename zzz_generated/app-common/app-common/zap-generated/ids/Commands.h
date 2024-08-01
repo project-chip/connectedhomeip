@@ -159,6 +159,20 @@ static constexpr CommandId Id = 0x00000008;
 } // namespace Commands
 } // namespace LevelControl
 
+namespace AccessControl {
+namespace Commands {
+
+namespace ReviewFabricRestrictions {
+static constexpr CommandId Id = 0x00000000;
+} // namespace ReviewFabricRestrictions
+
+namespace ReviewFabricRestrictionsResponse {
+static constexpr CommandId Id = 0x00000001;
+} // namespace ReviewFabricRestrictionsResponse
+
+} // namespace Commands
+} // namespace AccessControl
+
 namespace Actions {
 namespace Commands {
 
@@ -285,6 +299,14 @@ static constexpr CommandId Id = 0x00000004;
 namespace CommissioningCompleteResponse {
 static constexpr CommandId Id = 0x00000005;
 } // namespace CommissioningCompleteResponse
+
+namespace SetTCAcknowledgements {
+static constexpr CommandId Id = 0x00000006;
+} // namespace SetTCAcknowledgements
+
+namespace SetTCAcknowledgementsResponse {
+static constexpr CommandId Id = 0x00000007;
+} // namespace SetTCAcknowledgementsResponse
 
 } // namespace Commands
 } // namespace GeneralCommissioning
@@ -448,6 +470,16 @@ static constexpr CommandId Id = 0x00000005;
 
 } // namespace Commands
 } // namespace TimeSynchronization
+
+namespace BridgedDeviceBasicInformation {
+namespace Commands {
+
+namespace KeepActive {
+static constexpr CommandId Id = 0x00000080;
+} // namespace KeepActive
+
+} // namespace Commands
+} // namespace BridgedDeviceBasicInformation
 
 namespace AdministratorCommissioning {
 namespace Commands {
@@ -929,6 +961,20 @@ static constexpr CommandId Id = 0x00000001;
 } // namespace Commands
 } // namespace ValveConfigurationAndControl
 
+namespace WaterHeaterManagement {
+namespace Commands {
+
+namespace Boost {
+static constexpr CommandId Id = 0x00000000;
+} // namespace Boost
+
+namespace CancelBoost {
+static constexpr CommandId Id = 0x00000001;
+} // namespace CancelBoost
+
+} // namespace Commands
+} // namespace WaterHeaterManagement
+
 namespace DemandResponseLoadControl {
 namespace Commands {
 
@@ -1058,6 +1104,20 @@ static constexpr CommandId Id = 0x00000001;
 
 } // namespace Commands
 } // namespace EnergyEvseMode
+
+namespace WaterHeaterMode {
+namespace Commands {
+
+namespace ChangeToMode {
+static constexpr CommandId Id = 0x00000000;
+} // namespace ChangeToMode
+
+namespace ChangeToModeResponse {
+static constexpr CommandId Id = 0x00000001;
+} // namespace ChangeToModeResponse
+
+} // namespace Commands
+} // namespace WaterHeaterMode
 
 namespace DeviceEnergyManagementMode {
 namespace Commands {
@@ -1300,14 +1360,6 @@ namespace CommitPresetsSchedulesRequest {
 static constexpr CommandId Id = 0x00000009;
 } // namespace CommitPresetsSchedulesRequest
 
-namespace CancelSetActivePresetRequest {
-static constexpr CommandId Id = 0x0000000A;
-} // namespace CancelSetActivePresetRequest
-
-namespace SetTemperatureSetpointHoldPolicy {
-static constexpr CommandId Id = 0x0000000B;
-} // namespace SetTemperatureSetpointHoldPolicy
-
 } // namespace Commands
 } // namespace Thermostat
 
@@ -1429,15 +1481,15 @@ static constexpr CommandId Id = 0x00000001;
 } // namespace GetPendingDatasetRequest
 
 namespace DatasetResponse {
-static constexpr CommandId Id = 0x00000003;
+static constexpr CommandId Id = 0x00000002;
 } // namespace DatasetResponse
 
 namespace SetActiveDatasetRequest {
-static constexpr CommandId Id = 0x00000004;
+static constexpr CommandId Id = 0x00000003;
 } // namespace SetActiveDatasetRequest
 
 namespace SetPendingDatasetRequest {
-static constexpr CommandId Id = 0x00000005;
+static constexpr CommandId Id = 0x00000004;
 } // namespace SetPendingDatasetRequest
 
 } // namespace Commands
@@ -1769,6 +1821,24 @@ static constexpr CommandId Id = 0x00000001;
 } // namespace Commands
 } // namespace ContentAppObserver
 
+namespace CommissionerControl {
+namespace Commands {
+
+namespace RequestCommissioningApproval {
+static constexpr CommandId Id = 0x00000000;
+} // namespace RequestCommissioningApproval
+
+namespace CommissionNode {
+static constexpr CommandId Id = 0x00000001;
+} // namespace CommissionNode
+
+namespace ReverseOpenCommissioningWindow {
+static constexpr CommandId Id = 0x00000002;
+} // namespace ReverseOpenCommissioningWindow
+
+} // namespace Commands
+} // namespace CommissionerControl
+
 namespace ElectricalMeasurement {
 namespace Commands {
 
@@ -1902,9 +1972,17 @@ namespace TestListInt8UReverseRequest {
 static constexpr CommandId Id = 0x0000000D;
 } // namespace TestListInt8UReverseRequest
 
+namespace StringEchoResponse {
+static constexpr CommandId Id = 0x0000000D;
+} // namespace StringEchoResponse
+
 namespace TestEnumsRequest {
 static constexpr CommandId Id = 0x0000000E;
 } // namespace TestEnumsRequest
+
+namespace GlobalEchoResponse {
+static constexpr CommandId Id = 0x0000000E;
+} // namespace GlobalEchoResponse
 
 namespace TestNullableOptionalRequest {
 static constexpr CommandId Id = 0x0000000F;
@@ -1941,6 +2019,14 @@ static constexpr CommandId Id = 0x00000016;
 namespace TestSecondBatchHelperRequest {
 static constexpr CommandId Id = 0x00000017;
 } // namespace TestSecondBatchHelperRequest
+
+namespace StringEchoRequest {
+static constexpr CommandId Id = 0x00000018;
+} // namespace StringEchoRequest
+
+namespace GlobalEchoRequest {
+static constexpr CommandId Id = 0x00000019;
+} // namespace GlobalEchoRequest
 
 namespace TestDifferentVendorMeiRequest {
 static constexpr CommandId Id = 0xFFF200AA;

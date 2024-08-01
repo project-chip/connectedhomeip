@@ -37,6 +37,8 @@
 #include "rvc-modes.h"
 #include "rvc-operational-state-delegate-impl.h"
 #include "tcc-mode.h"
+#include "thermostat-delegate-impl.h"
+#include "water-heater-mode.h"
 #include <Options.h>
 #include <app-common/zap-generated/attributes/Accessors.h>
 #include <app/CommandHandler.h>
@@ -45,6 +47,7 @@
 #include <app/clusters/laundry-dryer-controls-server/laundry-dryer-controls-server.h>
 #include <app/clusters/laundry-washer-controls-server/laundry-washer-controls-server.h>
 #include <app/clusters/mode-base-server/mode-base-server.h>
+#include <app/clusters/thermostat-server/thermostat-server.h>
 #include <app/clusters/time-synchronization-server/time-synchronization-server.h>
 #include <app/clusters/valve-configuration-and-control-server/valve-configuration-and-control-server.h>
 #include <app/server/Server.h>
@@ -61,6 +64,8 @@
 #include <transport/raw/PeerAddress.h>
 
 #include <string>
+
+#include <WhmMain.h>
 
 using namespace chip;
 using namespace chip::app;
@@ -79,13 +84,19 @@ Clusters::ValveConfigurationAndControl::ValveControlDelegate sValveDelegate;
 Clusters::TimeSynchronization::ExtendedTimeSyncDelegate sTimeSyncDelegate;
 
 // Please refer to https://github.com/CHIP-Specifications/connectedhomeip-spec/blob/master/src/namespaces
-constexpr const uint8_t kNamespaceCommon = 7;
+constexpr const uint8_t kNamespaceCommon   = 7;
+constexpr const uint8_t kNamespaceSwitches = 0x43;
+
 // Common Number Namespace: 7, tag 0 (Zero)
 constexpr const uint8_t kTagCommonZero = 0;
 // Common Number Namespace: 7, tag 1 (One)
 constexpr const uint8_t kTagCommonOne = 1;
 // Common Number Namespace: 7, tag 2 (Two)
 constexpr const uint8_t kTagCommonTwo = 2;
+// Switches namespace: 0x43, tag = 0x03 (Up)
+constexpr const uint8_t kTagSwitchesUp = 0x03;
+// Switches namespace: 0x43, tag = 0x04 (Down)
+constexpr const uint8_t kTagSwitchesDown = 0x04;
 
 constexpr const uint8_t kNamespacePosition = 8;
 // Common Position Namespace: 8, tag: 0 (Left)
@@ -103,6 +114,11 @@ const Clusters::Descriptor::Structs::SemanticTagStruct::Type gEp1TagList[] = {
 const Clusters::Descriptor::Structs::SemanticTagStruct::Type gEp2TagList[] = {
     { .namespaceID = kNamespaceCommon, .tag = kTagCommonTwo }, { .namespaceID = kNamespacePosition, .tag = kTagPositionRight }
 };
+// Endpoints 3 and 4 are an action switch and a non-action switch. On the device, they're tagged as up and down because why not.
+const Clusters::Descriptor::Structs::SemanticTagStruct::Type gEp3TagList[] = { { .namespaceID = kNamespaceSwitches,
+                                                                                 .tag         = kTagSwitchesUp } };
+const Clusters::Descriptor::Structs::SemanticTagStruct::Type gEp4TagList[] = { { .namespaceID = kNamespaceSwitches,
+                                                                                 .tag         = kTagSwitchesDown } };
 } // namespace
 
 #ifdef MATTER_DM_PLUGIN_DISHWASHER_ALARM_SERVER
@@ -234,9 +250,13 @@ void ApplicationInit()
     Clusters::ValveConfigurationAndControl::SetDefaultDelegate(chip::EndpointId(1), &sValveDelegate);
     Clusters::TimeSynchronization::SetDefaultDelegate(&sTimeSyncDelegate);
 
+    Clusters::WaterHeaterManagement::WhmApplicationInit();
+
     SetTagList(/* endpoint= */ 0, Span<const Clusters::Descriptor::Structs::SemanticTagStruct::Type>(gEp0TagList));
     SetTagList(/* endpoint= */ 1, Span<const Clusters::Descriptor::Structs::SemanticTagStruct::Type>(gEp1TagList));
     SetTagList(/* endpoint= */ 2, Span<const Clusters::Descriptor::Structs::SemanticTagStruct::Type>(gEp2TagList));
+    SetTagList(/* endpoint= */ 3, Span<const Clusters::Descriptor::Structs::SemanticTagStruct::Type>(gEp3TagList));
+    SetTagList(/* endpoint= */ 4, Span<const Clusters::Descriptor::Structs::SemanticTagStruct::Type>(gEp4TagList));
 }
 
 void ApplicationShutdown()
@@ -259,6 +279,10 @@ void ApplicationShutdown()
 
     Clusters::DeviceEnergyManagementMode::Shutdown();
     Clusters::EnergyEvseMode::Shutdown();
+    Clusters::WaterHeaterMode::Shutdown();
+
+    Clusters::WaterHeaterManagement::WhmApplicationShutdown();
+    Clusters::WaterHeaterMode::Shutdown();
 
     if (sChipNamedPipeCommands.Stop() != CHIP_NO_ERROR)
     {
@@ -300,4 +324,13 @@ void emberAfDiagnosticLogsClusterInitCallback(chip::EndpointId endpoint)
     logProvider.SetCrashLogFilePath(AppOptions::GetCrashLogFilePath());
 
     DiagnosticLogsServer::Instance().SetDiagnosticLogsProviderDelegate(endpoint, &logProvider);
+}
+
+using namespace chip::app::Clusters::Thermostat;
+void emberAfThermostatClusterInitCallback(EndpointId endpoint)
+{
+    // Register the delegate for the Thermostat
+    auto & delegate = ThermostatDelegate::GetInstance();
+
+    SetDefaultDelegate(endpoint, &delegate);
 }

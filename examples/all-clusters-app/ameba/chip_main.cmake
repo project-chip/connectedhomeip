@@ -187,11 +187,15 @@ list(
 
     ${chip_dir}/examples/microwave-oven-app/microwave-oven-common/src/microwave-oven-device.cpp
 
+    ${chip_dir}/examples/energy-management-app/energy-management-common/src/ChargingTargetsMemMgr.cpp
     ${chip_dir}/examples/energy-management-app/energy-management-common/src/DeviceEnergyManagementDelegateImpl.cpp
     ${chip_dir}/examples/energy-management-app/energy-management-common/src/DeviceEnergyManagementManager.cpp
+    ${chip_dir}/examples/energy-management-app/energy-management-common/src/EVSEManufacturerImpl.cpp
     ${chip_dir}/examples/energy-management-app/energy-management-common/src/ElectricalPowerMeasurementDelegate.cpp
     ${chip_dir}/examples/energy-management-app/energy-management-common/src/EnergyEvseDelegateImpl.cpp
     ${chip_dir}/examples/energy-management-app/energy-management-common/src/EnergyEvseManager.cpp
+    ${chip_dir}/examples/energy-management-app/energy-management-common/src/EnergyEvseTargetsStore.cpp
+    ${chip_dir}/examples/energy-management-app/energy-management-common/src/EnergyTimeUtils.cpp
 
     ${chip_dir}/examples/platform/ameba/route_hook/ameba_route_hook.c
     ${chip_dir}/examples/platform/ameba/route_hook/ameba_route_table.c
@@ -254,7 +258,6 @@ target_include_directories(
     ${chip_dir}/src/app/server/
     ${chip_dir}/src/controller/data_model
     ${chip_dir}/third_party/nlio/repo/include/
-    ${chip_dir}/third_party/nlunit-test/repo/src
 )
 
 if (matter_enable_rpc)
