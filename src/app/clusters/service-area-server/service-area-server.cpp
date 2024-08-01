@@ -579,8 +579,14 @@ bool Instance::AddSupportedLocation(uint32_t aLocationId, const DataModel::Nulla
                                     const DataModel::Nullable<FloorSurfaceTag> & aSurfaceTag)
 {
     // Create location object for validation.
-    LocationStructureWrapper aNewLocation(aLocationId, aMapId, aLocationName, aFloorNumber, aAreaType, aLandmarkTag, aPositionTag,
-                                          aSurfaceTag);
+    LocationStructureWrapper aNewLocation;
+
+    // 'true' forces the 'canonical' form specified by the cluster requirements
+    // where the LocationDescriptorStruct is null if all it's elements are/would be empty or null.
+    aNewLocation.SetLocationID(aLocationId).SetMapID(aMapId).SetLandmarkTag(aLandmarkTag);
+    aNewLocation.SetPositionTag(aPositionTag).SetSurfaceTag(aSurfaceTag);
+    aNewLocation.SetLocationName(aLocationName, true).SetFloorNumber(aFloorNumber, true).SetAreaType(aAreaType, true);
+
 
     // Does device mode allow this attribute to be updated?
     if (!mDelegate->IsSupportedLocationsChangeAllowed())
@@ -654,9 +660,14 @@ bool Instance::ModifySupportedLocation(uint32_t aLocationId, const DataModel::Nu
             mapIDChanged = true;
         }
 
-        // create new location object for validation
-        LocationStructureWrapper aNewLocation(aLocationId, aMapId, aLocationName, aFloorNumber, aAreaType, aLandmarkTag,
-                                              aPositionTag, aSurfaceTag);
+        // Create location object for validation.
+        LocationStructureWrapper aNewLocation;
+
+        // 'true' forces the 'canonical' form specified by the cluster requirements
+        // where the LocationDescriptorStruct is null if all it's elements are/would be empty or null.
+        aNewLocation.SetLocationID(aLocationId).SetMapID(aMapId).SetLandmarkTag(aLandmarkTag);
+        aNewLocation.SetPositionTag(aPositionTag).SetSurfaceTag(aSurfaceTag);
+        aNewLocation.SetLocationName(aLocationName, true).SetFloorNumber(aFloorNumber, true).SetAreaType(aAreaType, true);
 
         // verify cluster requirements concerning valid fields and field relationships
         if (!IsValidSupportedLocation(aNewLocation))
