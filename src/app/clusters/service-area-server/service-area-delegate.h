@@ -133,7 +133,7 @@ public:
      * @return true if the current device state allows the SupportedLocations attribute to be updated.
      *
      * @note The SupportedLocations attribute list changes (adding or deleting entries,
-     *       changing their MapID fields, changing the LocationID fields, or nulling the entire list)
+     *       changing their MapID fields, changing the AreaID fields, or nulling the entire list)
      *       SHOULD NOT be allowed while the device is operating, to reduce the impact on the clients,
      *       and the potential confusion for the users.
      *
@@ -154,15 +154,15 @@ public:
     virtual bool GetSupportedLocationByIndex(uint32_t listIndex, LocationStructureWrapper & aSupportedLocation) = 0;
 
     /**
-     * @brief Get a supported location that matches a locationID.
-     * @param[in] aLocationId the locationID to search for.
+     * @brief Get a supported location that matches a areaID.
+     * @param[in] aAreaId the areaID to search for.
      * @param[out] listIndex the location's index in the list, if found.
      * @param[out] aSupportedLocation  copy of the location contents, if found.
      * @return true if location found, false otherwise.
      *
      * @note may be overloaded in device implementation for optimization, if desired.
      */
-    virtual bool GetSupportedLocationById(uint32_t aLocationId, uint32_t & listIndex,
+    virtual bool GetSupportedLocationById(uint32_t aAreaId, uint32_t & listIndex,
                                           LocationStructureWrapper & aSupportedLocation);
 
     /**
@@ -183,7 +183,7 @@ public:
      * @param[in] modifiedLocation A location with the modified contents.
      * @return true if successful, false otherwise.
      *
-     * @note this function SHOULD double check that newLocation's locationID matches the object at listIndex.
+     * @note this function SHOULD double check that newLocation's areaID matches the object at listIndex.
      */
     virtual bool ModifySupportedLocation(uint32_t listIndex, const LocationStructureWrapper & modifiedLocation) = 0;
 
@@ -288,23 +288,23 @@ public:
     virtual bool GetSelectedLocationByIndex(uint32_t listIndex, uint32_t & selectedLocation) = 0;
 
     /**
-     * @return true if the aLocationId locationID is found in the SelectedLocations list, false otherwise.
+     * @return true if the aAreaId areaID is found in the SelectedLocations list, false otherwise.
      *
      * @note may be overloaded in device implementation for optimization, if desired.
      */
-    virtual bool IsSelectedLocation(uint32_t aLocationId);
+    virtual bool IsSelectedLocation(uint32_t aAreaId);
 
     /**
      * This method is called by the server instance to add a new selected location to the list.
-     * The server instance will ensure that the aLocationId references a SUPPORTED location, and is unique within selected
+     * The server instance will ensure that the aAreaId references a SUPPORTED location, and is unique within selected
      * locations.
-     * @param[in] aLocationId The new locationID to add.
+     * @param[in] aAreaId The new areaID to add.
      * @param[out] listIndex filled with the list index of the new location, if successful.
      * @return true if successful, false otherwise.
      *
      * @note this function SHOULD double check that the added location won't exceed the maximum list size.
      */
-    virtual bool AddSelectedLocation(uint32_t aLocationId, uint32_t & listIndex) = 0;
+    virtual bool AddSelectedLocation(uint32_t aAreaId, uint32_t & listIndex) = 0;
 
     /**
      * @return true if selected locations was not already null, false otherwise.
@@ -325,23 +325,23 @@ public:
     virtual bool GetProgressElementByIndex(uint32_t listIndex, Structs::ProgressStruct::Type & aProgressElement) = 0;
 
     /**
-     * @brief Get a progress element that matches a locationID.
-     * @param[in] aLocationId the locationID to search for.
+     * @brief Get a progress element that matches a areaID.
+     * @param[in] aAreaId the areaID to search for.
      * @param[out] listIndex the location's index in the list, if found.
      * @param[out] aProgressElement  copy of the progress element contents, if found.
      * @return true if a progress element is found, false otherwise.
      *
      * @note may be overloaded in device implementation for optimization, if desired.
      */
-    virtual bool GetProgressElementById(uint32_t aLocationId, uint32_t & listIndex,
+    virtual bool GetProgressElementById(uint32_t aAreaId, uint32_t & listIndex,
                                         Structs::ProgressStruct::Type & aProgressElement);
 
     /**
      * @brief Is the progress element in the progress list?
-     * @param[in] aLocationId location id of the progress element.
+     * @param[in] aAreaId location id of the progress element.
      * @return true if the progress element identified by Id is in the progress list.
      */
-    virtual bool IsProgressElement(uint32_t aLocationId);
+    virtual bool IsProgressElement(uint32_t aAreaId);
 
     /**
      * This method is called by the server instance to add a new progress element to the list.
@@ -361,7 +361,7 @@ public:
      * @param[in] modifiedProgressElement modified element's contents.
      * @return true if successful, false otherwise.
      *
-     * @note this function SHOULD double check that modifiedProgressElement's locationID matches the object at listIndex
+     * @note this function SHOULD double check that modifiedProgressElement's areaID matches the object at listIndex
      */
     virtual bool ModifyProgressElement(uint32_t listIndex, const Structs::ProgressStruct::Type & modifiedProgressElement) = 0;
 

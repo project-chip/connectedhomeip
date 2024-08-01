@@ -139,9 +139,9 @@ private:
     // Supported Locations manipulators
 
     /**
-     * @return true if a location with the aLocationId ID exists in the supported locations attribute. False otherwise.
+     * @return true if a location with the aAreaId ID exists in the supported locations attribute. False otherwise.
      */
-    bool IsSupportedLocation(uint32_t aLocationId);
+    bool IsSupportedLocation(uint32_t aAreaId);
 
     /**
      * @brief Check if the given location adheres to the restrictions required by the supported locations attribute.
@@ -152,12 +152,12 @@ private:
     /**
      * @brief check if aLocation is unique with regard to supported locations.
      * @param[in] aLocation the location to check.
-     * @param[out] ignoreLocationId if true, we do not check if the location ID is unique.
+     * @param[out] ignoreAreaId if true, we do not check if the area ID is unique.
      * @return true if there isn't a location in supported locations that matches aLocation.
      *
      * @note This method may ignore checking the MapId uniqueness. This depends on whether the SupportedMaps attribute is null.
      */
-    bool IsUniqueSupportedLocation(const LocationStructureWrapper & aLocation, bool ignoreLocationId);
+    bool IsUniqueSupportedLocation(const LocationStructureWrapper & aLocation, bool ignoreAreaId);
 
     /**
      * @brief Check if changing the estimated end time attribute to aEstimatedEndTime requires the change to be reported.
@@ -169,7 +169,7 @@ private:
 public:
     /**
      * @brief Add new location to the supported locations list.
-     * @param[in] aLocationId unique identifier of this location.
+     * @param[in] aAreaId unique identifier of this location.
      * @param[in] aMapId identifier of supported map.
      * @param[in] aLocationName human readable name for this location (empty string if not used).
      * @param[in] aFloorNumber represents floor level - negative values for below ground.
@@ -182,7 +182,7 @@ public:
      *
      * @note if aLocationName is larger than kLocationNameMaxSize, it will be truncated.
      */
-    bool AddSupportedLocation(uint32_t aLocationId, const DataModel::Nullable<uint8_t> & aMapId, const CharSpan & aLocationName,
+    bool AddSupportedLocation(uint32_t aAreaId, const DataModel::Nullable<uint8_t> & aMapId, const CharSpan & aLocationName,
                               const DataModel::Nullable<int16_t> & aFloorNumber,
                               const DataModel::Nullable<Globals::AreaTypeTag> & aAreaType,
                               const DataModel::Nullable<Globals::LandmarkTag> & aLandmarkTag,
@@ -191,7 +191,7 @@ public:
 
     /**
      * @brief Modify/replace an existing location in the supported locations list.
-     * @param[in] aLocationId unique identifier of this location.
+     * @param[in] aAreaId unique identifier of this location.
      * @param[in] aMapId identifier of supported map (will not be modified).
      * @param[in] aLocationName human readable name for this location (empty string if not used).
      * @param[in] aFloorNumber represents floor level - negative values for below ground.
@@ -206,7 +206,7 @@ public:
      * @note if aLocationName is larger than kLocationNameMaxSize, it will be truncated.
      * @note if mapID is changed, the delegate's HandleSupportedLocationsUpdated method is called.
      */
-    bool ModifySupportedLocation(uint32_t aLocationId, const DataModel::Nullable<uint8_t> & aMapId, const CharSpan & aLocationName,
+    bool ModifySupportedLocation(uint32_t aAreaId, const DataModel::Nullable<uint8_t> & aMapId, const CharSpan & aLocationName,
                                  const DataModel::Nullable<int16_t> & aFloorNumber,
                                  const DataModel::Nullable<Globals::AreaTypeTag> & aAreaType,
                                  const DataModel::Nullable<Globals::LandmarkTag> & aLandmarkTag,
@@ -258,7 +258,7 @@ public:
 
     /**
      * @brief Add a selected location.
-     * @param[in] aSelectedLocation The locationID to add.
+     * @param[in] aSelectedLocation The areaID to add.
      * @bool true if successfully added.
      */
     bool AddSelectedLocation(uint32_t & aSelectedLocation);
@@ -274,7 +274,7 @@ public:
     DataModel::Nullable<uint32_t> GetCurrentLocation();
 
     /**
-     * @param[in] aCurrentLocation The location ID that the CurrentLocation attribute should be set to. Must be a supported location
+     * @param[in] aCurrentLocation The area ID that the CurrentLocation attribute should be set to. Must be a supported location
      * or NULL.
      * @return true if the current location is set, false otherwise.
      *
@@ -303,36 +303,36 @@ public:
 
     /**
      * @brief Add a progress element in a pending status to the progress list.
-     * @param[in] aLocationId location id of the progress element.
+     * @param[in] aAreaId location id of the progress element.
      * @return true if the new progress element passed validation checks and was successfully added to the list, false otherwise.
      */
-    bool AddPendingProgressElement(uint32_t aLocationId);
+    bool AddPendingProgressElement(uint32_t aAreaId);
 
     /**
-     * @brief Set the status of progress element identified by locationID.
-     * @param[in] aLocationId The locationID of the progress element to update.
+     * @brief Set the status of progress element identified by areaID.
+     * @param[in] aAreaId The areaID of the progress element to update.
      * @param[in] status The location cluster operation status for this location.
      * @return true if progress element is found and status is set, false otherwise.
      *
      * @note TotalOperationalTime is set to null if resulting opStatus is not equal to Completed or Skipped.
      */
-    bool SetProgressStatus(uint32_t aLocationId, OperationalStatusEnum opStatus);
+    bool SetProgressStatus(uint32_t aAreaId, OperationalStatusEnum opStatus);
 
     /**
-     * @brief Set the total operational time for the progress element identified by locationID.
-     * @param[in] aLocationId The locationID of the progress element to update.
+     * @brief Set the total operational time for the progress element identified by areaID.
+     * @param[in] aAreaId The areaID of the progress element to update.
      * @param[in] aTotalOperationalTime The total operational time for this location.
      * @return true if progress element is found and operational time is set, false otherwise.
      */
-    bool SetProgressTotalOperationalTime(uint32_t aLocationId, const DataModel::Nullable<uint32_t> & aTotalOperationalTime);
+    bool SetProgressTotalOperationalTime(uint32_t aAreaId, const DataModel::Nullable<uint32_t> & aTotalOperationalTime);
 
     /**
-     * @brief Set the estimated time for the  progress element identified by locationID.
-     * @param[in] aLocationId The locationID of the progress element to update.
+     * @brief Set the estimated time for the  progress element identified by areaID.
+     * @param[in] aAreaId The areaID of the progress element to update.
      * @param[in] aEstimatedTime The estimated time for this location.
      * @return true if progress element is found and estimated time is set, false otherwise.
      */
-    bool SetProgressEstimatedTime(uint32_t aLocationId, const DataModel::Nullable<uint32_t> & aEstimatedTime);
+    bool SetProgressEstimatedTime(uint32_t aAreaId, const DataModel::Nullable<uint32_t> & aEstimatedTime);
 
     /**
      * @return true if the progress list was not already null, false otherwise.

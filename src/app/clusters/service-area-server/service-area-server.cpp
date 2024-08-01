@@ -256,7 +256,7 @@ void Instance::HandleSelectLocationsCmd(HandlerContext & ctx, const Commands::Se
             {
                 uint32_t aSelectedLocation = iLocationIter.GetValue();
 
-                // each item in this list SHALL match the LocationID field of an entry on the SupportedLocations attribute's list
+                // each item in this list SHALL match the AreaID field of an entry on the SupportedLocations attribute's list
                 // If the Status field is set to UnsupportedLocation, the StatusText field SHALL be an empty string.
                 if (!IsSupportedLocation(aSelectedLocation))
                 {
@@ -440,43 +440,43 @@ void Instance::NotifyProgressChanged()
 // ****************************************************************************
 //  Supported Locations manipulators
 
-bool Instance::IsSupportedLocation(uint32_t aLocationId)
+bool Instance::IsSupportedLocation(uint32_t aAreaId)
 {
     uint32_t ignoredIndex;
     LocationStructureWrapper ignoredLocation;
 
-    return mDelegate->GetSupportedLocationById(aLocationId, ignoredIndex, ignoredLocation);
+    return mDelegate->GetSupportedLocationById(aAreaId, ignoredIndex, ignoredLocation);
 }
 
 bool Instance::IsValidSupportedLocation(const LocationStructureWrapper & aLocation)
 {
     // If the HomeLocationInfo field is null, the LandmarkTag field SHALL NOT be null.
     // If the LandmarkTag field is null, the HomeLocationInfo field SHALL NOT be null.
-    if (aLocation.locationInfo.locationInfo.IsNull() && aLocation.locationInfo.landmarkTag.IsNull())
+    if (aLocation.areaDesc.locationInfo.IsNull() && aLocation.areaDesc.landmarkTag.IsNull())
     {
-        ChipLogDetail(Zcl, "IsValidAsSupportedLocation %u - must have locationInfo and/or LandmarkTag", aLocation.locationID);
+        ChipLogDetail(Zcl, "IsValidAsSupportedLocation %u - must have locationInfo and/or LandmarkTag", aLocation.areaID);
         return false;
     }
 
     // If HomeLocationInfo is not null, and its LocationName field is an empty string, at least one of the following SHALL NOT
     // be null: HomeLocationInfo's FloorNumber field, HomeLocationInfo's AreaType field, the LandmarkTag field
-    if (!aLocation.locationInfo.locationInfo.IsNull())
+    if (!aLocation.areaDesc.locationInfo.IsNull())
     {
-        if (aLocation.locationInfo.locationInfo.Value().locationName.empty() &&
-            aLocation.locationInfo.locationInfo.Value().floorNumber.IsNull() &&
-            aLocation.locationInfo.locationInfo.Value().areaType.IsNull() && aLocation.locationInfo.landmarkTag.IsNull())
+        if (aLocation.areaDesc.locationInfo.Value().locationName.empty() &&
+            aLocation.areaDesc.locationInfo.Value().floorNumber.IsNull() &&
+            aLocation.areaDesc.locationInfo.Value().areaType.IsNull() && aLocation.areaDesc.landmarkTag.IsNull())
         {
             ChipLogDetail(
                 Zcl, "IsValidAsSupportedLocation %u - LocationName is empty string, FloorNumber, AreaType, LandmarkTag are null",
-                aLocation.locationID);
+                aLocation.areaID);
             return false;
         }
     }
 
     // If the LandmarkTag field is null, the PositionTag field SHALL be null.
-    if (aLocation.locationInfo.landmarkTag.IsNull() && !aLocation.locationInfo.positionTag.IsNull())
+    if (aLocation.areaDesc.landmarkTag.IsNull() && !aLocation.areaDesc.positionTag.IsNull())
     {
-        ChipLogDetail(Zcl, "IsValidAsSupportedLocation %u - PositionTag with no LandmarkTag", aLocation.locationID);
+        ChipLogDetail(Zcl, "IsValidAsSupportedLocation %u - PositionTag with no LandmarkTag", aLocation.areaID);
         return false;
     }
 
@@ -485,7 +485,7 @@ bool Instance::IsValidSupportedLocation(const LocationStructureWrapper & aLocati
         // If the SupportedMaps attribute is null, mapid SHALL be null.
         if (!aLocation.mapID.IsNull())
         {
-            ChipLogDetail(Zcl, "IsValidSupportedLocation %u - map Id %u is not in empty supported map list", aLocation.locationID,
+            ChipLogDetail(Zcl, "IsValidSupportedLocation %u - map Id %u is not in empty supported map list", aLocation.areaID,
                           aLocation.mapID.Value());
             return false;
         }
@@ -495,7 +495,7 @@ bool Instance::IsValidSupportedLocation(const LocationStructureWrapper & aLocati
         // If the SupportedMaps attribute is not null, mapID SHALL be the ID of an entry from the SupportedMaps attribute.
         if (!IsSupportedMap(aLocation.mapID.Value()))
         {
-            ChipLogError(Zcl, "IsValidSupportedLocation %u - map Id %u is not in supported map list", aLocation.locationID,
+            ChipLogError(Zcl, "IsValidSupportedLocation %u - map Id %u is not in supported map list", aLocation.areaID,
                          aLocation.mapID.Value());
             return false;
         }
@@ -504,13 +504,13 @@ bool Instance::IsValidSupportedLocation(const LocationStructureWrapper & aLocati
     return true;
 }
 
-bool Instance::IsUniqueSupportedLocation(const LocationStructureWrapper & aLocation, bool ignoreLocationId)
+bool Instance::IsUniqueSupportedLocation(const LocationStructureWrapper & aLocation, bool ignoreAreaId)
 {
     BitMask<LocationStructureWrapper::IsEqualConfig> config;
 
-    if (ignoreLocationId)
+    if (ignoreAreaId)
     {
-        config.Set(LocationStructureWrapper::IsEqualConfig::kIgnoreLocationId);
+        config.Set(LocationStructureWrapper::IsEqualConfig::kIgnoreAreaID);
     }
 
     // If the SupportedMaps attribute is not null, each entry in this list SHALL have a unique value for the combination of the
@@ -571,7 +571,7 @@ bool Instance::ReportEstimatedEndTimeChange(const DataModel::Nullable<uint32_t> 
     return (aEstimatedEndTime.Value() < mEstimatedEndTime.Value());
 }
 
-bool Instance::AddSupportedLocation(uint32_t aLocationId, const DataModel::Nullable<uint8_t> & aMapId,
+bool Instance::AddSupportedLocation(uint32_t aAreaId, const DataModel::Nullable<uint8_t> & aMapId,
                                     const CharSpan & aLocationName, const DataModel::Nullable<int16_t> & aFloorNumber,
                                     const DataModel::Nullable<Globals::AreaTypeTag> & aAreaType,
                                     const DataModel::Nullable<Globals::LandmarkTag> & aLandmarkTag,
@@ -579,7 +579,7 @@ bool Instance::AddSupportedLocation(uint32_t aLocationId, const DataModel::Nulla
                                     const DataModel::Nullable<Globals::FloorSurfaceTag> & aSurfaceTag)
 {
     // Create location object for validation.
-    LocationStructureWrapper aNewLocation(aLocationId, aMapId, aLocationName, aFloorNumber, aAreaType, aLandmarkTag, aPositionTag,
+    LocationStructureWrapper aNewLocation(aAreaId, aMapId, aLocationName, aFloorNumber, aAreaType, aLandmarkTag, aPositionTag,
                                           aSurfaceTag);
 
     // Does device mode allow this attribute to be updated?
@@ -591,14 +591,14 @@ bool Instance::AddSupportedLocation(uint32_t aLocationId, const DataModel::Nulla
     // Check there is space for the entry.
     if (mDelegate->GetNumberOfSupportedLocations() >= kMaxNumSupportedLocations)
     {
-        ChipLogError(Zcl, "AddSupportedLocation %u - too many entries", aLocationId);
+        ChipLogError(Zcl, "AddSupportedLocation %u - too many entries", aAreaId);
         return false;
     }
 
     // Verify cluster requirements concerning valid fields and field relationships.
     if (!IsValidSupportedLocation(aNewLocation))
     {
-        ChipLogError(Zcl, "AddSupportedLocation %u - not a valid location object", aNewLocation.locationID);
+        ChipLogError(Zcl, "AddSupportedLocation %u - not a valid location object", aNewLocation.areaID);
         return false;
     }
 
@@ -608,7 +608,7 @@ bool Instance::AddSupportedLocation(uint32_t aLocationId, const DataModel::Nulla
     // the LocationInfo field.
     if (!IsUniqueSupportedLocation(aNewLocation, false))
     {
-        ChipLogError(Zcl, "AddSupportedLocation %u - not a unique location object", aNewLocation.locationID);
+        ChipLogError(Zcl, "AddSupportedLocation %u - not a unique location object", aNewLocation.areaID);
         return false;
     }
 
@@ -623,7 +623,7 @@ bool Instance::AddSupportedLocation(uint32_t aLocationId, const DataModel::Nulla
     return true;
 }
 
-bool Instance::ModifySupportedLocation(uint32_t aLocationId, const DataModel::Nullable<uint8_t> & aMapId,
+bool Instance::ModifySupportedLocation(uint32_t aAreaId, const DataModel::Nullable<uint8_t> & aMapId,
                                        const CharSpan & aLocationName, const DataModel::Nullable<int16_t> & aFloorNumber,
                                        const DataModel::Nullable<Globals::AreaTypeTag> & aAreaType,
                                        const DataModel::Nullable<Globals::LandmarkTag> & aLandmarkTag,
@@ -635,9 +635,9 @@ bool Instance::ModifySupportedLocation(uint32_t aLocationId, const DataModel::Nu
 
     // get existing supported location to modify
     LocationStructureWrapper supportedLocation;
-    if (!mDelegate->GetSupportedLocationById(aLocationId, listIndex, supportedLocation))
+    if (!mDelegate->GetSupportedLocationById(aAreaId, listIndex, supportedLocation))
     {
-        ChipLogError(Zcl, "ModifySupportedLocation %u - not a supported locationID", aLocationId);
+        ChipLogError(Zcl, "ModifySupportedLocation %u - not a supported areaID", aAreaId);
         return false;
     }
 
@@ -655,21 +655,21 @@ bool Instance::ModifySupportedLocation(uint32_t aLocationId, const DataModel::Nu
         }
 
         // create new location object for validation
-        LocationStructureWrapper aNewLocation(aLocationId, aMapId, aLocationName, aFloorNumber, aAreaType, aLandmarkTag,
+        LocationStructureWrapper aNewLocation(aAreaId, aMapId, aLocationName, aFloorNumber, aAreaType, aLandmarkTag,
                                               aPositionTag, aSurfaceTag);
 
         // verify cluster requirements concerning valid fields and field relationships
         if (!IsValidSupportedLocation(aNewLocation))
         {
-            ChipLogError(Zcl, "ModifySupportedLocation %u - not a valid location object", aNewLocation.locationID);
+            ChipLogError(Zcl, "ModifySupportedLocation %u - not a valid location object", aNewLocation.areaID);
             return false;
         }
 
         // Updated location description must not match another existing location description.
-        // We ignore comparing the location ID as one of the locations will match this one.
+        // We ignore comparing the area ID as one of the locations will match this one.
         if (!IsUniqueSupportedLocation(aNewLocation, true))
         {
-            ChipLogError(Zcl, "ModifySupportedLocation %u - not a unique location object", aNewLocation.locationID);
+            ChipLogError(Zcl, "ModifySupportedLocation %u - not a unique location object", aNewLocation.areaID);
             return false;
         }
 
@@ -854,7 +854,7 @@ bool Instance::AddSelectedLocation(uint32_t & aSelectedLocation)
         return false;
     }
 
-    // each item in this list SHALL match the LocationID field of an entry on the SupportedLocations attribute's list
+    // each item in this list SHALL match the AreaID field of an entry on the SupportedLocations attribute's list
     if (!IsSupportedLocation(aSelectedLocation))
     {
         ChipLogError(Zcl, "AddSelectedLocation %u - not a supported location", aSelectedLocation);
@@ -904,7 +904,7 @@ DataModel::Nullable<uint32_t> Instance::GetCurrentLocation()
 
 bool Instance::SetCurrentLocation(const DataModel::Nullable<uint32_t> & aCurrentLocation)
 {
-    // If not null, the value of this attribute SHALL match the LocationID field of an entry on the SupportedLocations attribute's
+    // If not null, the value of this attribute SHALL match the AreaID field of an entry on the SupportedLocations attribute's
     // list.
     if ((!aCurrentLocation.IsNull()) && (!IsSupportedLocation(aCurrentLocation.Value())))
     {
@@ -962,10 +962,10 @@ bool Instance::SetEstimatedEndTime(const DataModel::Nullable<uint32_t> & aEstima
 //*************************************************************************
 // Progress list manipulators
 
-bool Instance::AddPendingProgressElement(uint32_t aLocationId)
+bool Instance::AddPendingProgressElement(uint32_t aAreaId)
 {
     // create progress element
-    Structs::ProgressStruct::Type inactiveProgress = { aLocationId, OperationalStatusEnum::kPending };
+    Structs::ProgressStruct::Type inactiveProgress = { aAreaId, OperationalStatusEnum::kPending };
 
     // check max# of list entries
     if (mDelegate->GetNumberOfProgressElements() >= kMaxNumProgressElements)
@@ -974,17 +974,17 @@ bool Instance::AddPendingProgressElement(uint32_t aLocationId)
         return false;
     }
 
-    // For each entry in this list, the LocationID field SHALL match an entry on the SupportedLocations attribute's list.
-    if (!IsSupportedLocation(aLocationId))
+    // For each entry in this list, the AreaID field SHALL match an entry on the SupportedLocations attribute's list.
+    if (!IsSupportedLocation(aAreaId))
     {
-        ChipLogError(Zcl, "AddPendingProgressElement - not a supported location %u", aLocationId);
+        ChipLogError(Zcl, "AddPendingProgressElement - not a supported location %u", aAreaId);
         return false;
     }
 
-    // Each entry in this list SHALL have a unique value for the LocationID field.
-    if (mDelegate->IsProgressElement(aLocationId))
+    // Each entry in this list SHALL have a unique value for the AreaID field.
+    if (mDelegate->IsProgressElement(aAreaId))
     {
-        ChipLogError(Zcl, "AddPendingProgressElement - progress element already exists for location %u", aLocationId);
+        ChipLogError(Zcl, "AddPendingProgressElement - progress element already exists for location %u", aAreaId);
         return false;
     }
 
@@ -999,14 +999,14 @@ bool Instance::AddPendingProgressElement(uint32_t aLocationId)
     return true;
 }
 
-bool Instance::SetProgressStatus(uint32_t aLocationId, OperationalStatusEnum opStatus)
+bool Instance::SetProgressStatus(uint32_t aAreaId, OperationalStatusEnum opStatus)
 {
     uint32_t listIndex;
     Structs::ProgressStruct::Type progressElement;
 
-    if (!mDelegate->GetProgressElementById(aLocationId, listIndex, progressElement))
+    if (!mDelegate->GetProgressElementById(aAreaId, listIndex, progressElement))
     {
-        ChipLogError(Zcl, "SetProgressStatus - progress element does not exist for location %u", aLocationId);
+        ChipLogError(Zcl, "SetProgressStatus - progress element does not exist for location %u", aAreaId);
         return false;
     }
 
@@ -1035,14 +1035,14 @@ bool Instance::SetProgressStatus(uint32_t aLocationId, OperationalStatusEnum opS
     return true;
 }
 
-bool Instance::SetProgressTotalOperationalTime(uint32_t aLocationId, const DataModel::Nullable<uint32_t> & aTotalOperationalTime)
+bool Instance::SetProgressTotalOperationalTime(uint32_t aAreaId, const DataModel::Nullable<uint32_t> & aTotalOperationalTime)
 {
     uint32_t listIndex;
     Structs::ProgressStruct::Type progressElement;
 
-    if (!mDelegate->GetProgressElementById(aLocationId, listIndex, progressElement))
+    if (!mDelegate->GetProgressElementById(aAreaId, listIndex, progressElement))
     {
-        ChipLogError(Zcl, "SetProgressTotalOperationalTime - progress element does not exist for location %u", aLocationId);
+        ChipLogError(Zcl, "SetProgressTotalOperationalTime - progress element does not exist for location %u", aAreaId);
         return false;
     }
 
@@ -1060,7 +1060,7 @@ bool Instance::SetProgressTotalOperationalTime(uint32_t aLocationId, const DataM
         ChipLogError(Zcl,
                      "SetProgressTotalOperationalTime - location %u opStatus value %u - can be non-null only if opStatus is "
                      "Completed or Skipped",
-                     aLocationId, to_underlying(progressElement.status));
+                     aAreaId, to_underlying(progressElement.status));
         return false;
     }
 
@@ -1077,14 +1077,14 @@ bool Instance::SetProgressTotalOperationalTime(uint32_t aLocationId, const DataM
     return true;
 }
 
-bool Instance::SetProgressEstimatedTime(uint32_t aLocationId, const DataModel::Nullable<uint32_t> & aEstimatedTime)
+bool Instance::SetProgressEstimatedTime(uint32_t aAreaId, const DataModel::Nullable<uint32_t> & aEstimatedTime)
 {
     uint32_t listIndex;
     Structs::ProgressStruct::Type progressElement;
 
-    if (!mDelegate->GetProgressElementById(aLocationId, listIndex, progressElement))
+    if (!mDelegate->GetProgressElementById(aAreaId, listIndex, progressElement))
     {
-        ChipLogError(Zcl, "SetProgressEstimatedTime - progress element does not exist for location %u", aLocationId);
+        ChipLogError(Zcl, "SetProgressEstimatedTime - progress element does not exist for location %u", aAreaId);
         return false;
     }
 

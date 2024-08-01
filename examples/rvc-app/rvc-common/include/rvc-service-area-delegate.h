@@ -60,7 +60,7 @@ public:
 
     bool GetSupportedLocationByIndex(uint32_t listIndex, ServiceArea::LocationStructureWrapper & supportedLocation) override;
 
-    bool GetSupportedLocationById(uint32_t aLocationId, uint32_t & listIndex,
+    bool GetSupportedLocationById(uint32_t aAreaId, uint32_t & listIndex,
                                   ServiceArea::LocationStructureWrapper & supportedLocation) override;
 
     bool AddSupportedLocation(const ServiceArea::LocationStructureWrapper & newLocation, uint32_t & listIndex) override;
@@ -95,7 +95,7 @@ public:
 
     // IsSelectedLocation() no override
 
-    bool AddSelectedLocation(uint32_t aLocationId, uint32_t & listIndex) override;
+    bool AddSelectedLocation(uint32_t aAreaId, uint32_t & listIndex) override;
 
     bool ClearSelectedLocations() override;
 
@@ -106,7 +106,7 @@ public:
 
     bool GetProgressElementByIndex(uint32_t listIndex, ServiceArea::Structs::ProgressStruct::Type & aProgressElement) override;
 
-    bool GetProgressElementById(uint32_t aLocationId, uint32_t & listIndex,
+    bool GetProgressElementById(uint32_t aAreaId, uint32_t & listIndex,
                                 ServiceArea::Structs::ProgressStruct::Type & aProgressElement) override;
 
     bool AddProgressElement(const ServiceArea::Structs::ProgressStruct::Type & newProgressElement, uint32_t & listIndex) override;
