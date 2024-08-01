@@ -571,16 +571,15 @@ bool Instance::ReportEstimatedEndTimeChange(const DataModel::Nullable<uint32_t> 
     return (aEstimatedEndTime.Value() < mEstimatedEndTime.Value());
 }
 
-bool Instance::AddSupportedLocation(uint32_t aAreaId, const DataModel::Nullable<uint8_t> & aMapId,
-                                    const CharSpan & aLocationName, const DataModel::Nullable<int16_t> & aFloorNumber,
+bool Instance::AddSupportedLocation(uint32_t aAreaId, const DataModel::Nullable<uint8_t> & aMapId, const CharSpan & aLocationName,
+                                    const DataModel::Nullable<int16_t> & aFloorNumber,
                                     const DataModel::Nullable<Globals::AreaTypeTag> & aAreaType,
                                     const DataModel::Nullable<Globals::LandmarkTag> & aLandmarkTag,
                                     const DataModel::Nullable<Globals::PositionTag> & aPositionTag,
                                     const DataModel::Nullable<Globals::FloorSurfaceTag> & aSurfaceTag)
 {
     // Create location object for validation.
-    AreaStructureWrapper aNewArea(aAreaId, aMapId, aLocationName, aFloorNumber, aAreaType, aLandmarkTag, aPositionTag,
-                                          aSurfaceTag);
+    AreaStructureWrapper aNewArea(aAreaId, aMapId, aLocationName, aFloorNumber, aAreaType, aLandmarkTag, aPositionTag, aSurfaceTag);
 
     // Does device mode allow this attribute to be updated?
     if (!mDelegate->IsSupportedAreasChangeAllowed())
@@ -655,8 +654,8 @@ bool Instance::ModifySupportedLocation(uint32_t aAreaId, const DataModel::Nullab
         }
 
         // create new location object for validation
-        AreaStructureWrapper aNewArea(aAreaId, aMapId, aLocationName, aFloorNumber, aAreaType, aLandmarkTag,
-                                              aPositionTag, aSurfaceTag);
+        AreaStructureWrapper aNewArea(aAreaId, aMapId, aLocationName, aFloorNumber, aAreaType, aLandmarkTag, aPositionTag,
+                                      aSurfaceTag);
 
         // verify cluster requirements concerning valid fields and field relationships
         if (!IsValidSupportedLocation(aNewArea))

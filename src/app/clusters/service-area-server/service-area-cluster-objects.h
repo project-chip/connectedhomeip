@@ -61,11 +61,11 @@ struct AreaStructureWrapper : public chip::app::Clusters::ServiceArea::Structs::
      * @note If aLocationName is an empty string and aFloorNumber and aAreaTypeTag are null, locationInfo will be set to null.
      */
     AreaStructureWrapper(uint32_t aAreaID, const DataModel::Nullable<uint8_t> & aMapId, const CharSpan & aLocationName,
-                             const DataModel::Nullable<int16_t> & aFloorNumber,
-                             const DataModel::Nullable<Globals::AreaTypeTag> & aAreaTypeTag,
-                             const DataModel::Nullable<Globals::LandmarkTag> & aLandmarkTag,
-                             const DataModel::Nullable<Globals::PositionTag> & aPositionTag,
-                             const DataModel::Nullable<Globals::FloorSurfaceTag> & aSurfaceTag)
+                         const DataModel::Nullable<int16_t> & aFloorNumber,
+                         const DataModel::Nullable<Globals::AreaTypeTag> & aAreaTypeTag,
+                         const DataModel::Nullable<Globals::LandmarkTag> & aLandmarkTag,
+                         const DataModel::Nullable<Globals::PositionTag> & aPositionTag,
+                         const DataModel::Nullable<Globals::FloorSurfaceTag> & aSurfaceTag)
     {
         Set(aAreaID, aMapId, aLocationName, aFloorNumber, aAreaTypeTag, aLandmarkTag, aPositionTag, aSurfaceTag);
     }
@@ -193,7 +193,7 @@ struct AreaStructureWrapper : public chip::app::Clusters::ServiceArea::Structs::
     enum class IsEqualConfig : uint8_t
     {
         kIgnoreAreaID = 0x1,
-        kIgnoreMapId      = 0x2,
+        kIgnoreMapId  = 0x2,
     };
 
     /**

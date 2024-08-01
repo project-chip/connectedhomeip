@@ -31,10 +31,10 @@ class Instance;
 // *****************************************************************************
 // cluster constraints
 
-constexpr size_t kMaxNumSupportedAreas = 255;
-constexpr size_t kMaxNumSupportedMaps      = 255;
-constexpr size_t kMaxNumSelectedAreas  = 255;
-constexpr size_t kMaxNumProgressElements   = 255;
+constexpr size_t kMaxNumSupportedAreas   = 255;
+constexpr size_t kMaxNumSupportedMaps    = 255;
+constexpr size_t kMaxNumSelectedAreas    = 255;
+constexpr size_t kMaxNumProgressElements = 255;
 
 constexpr size_t kMaxSizeStatusText = 256;
 
@@ -90,8 +90,8 @@ public:
      * @note If the SelectAreas command is allowed when the device is operating and the selected locations change to none, the
      * device must stop.
      */
-    virtual bool IsValidSelectAreasSet(const Commands::SelectAreas::DecodableType & req,
-                                           SelectAreasStatus & locationStatus, MutableCharSpan statusText) = 0;
+    virtual bool IsValidSelectAreasSet(const Commands::SelectAreas::DecodableType & req, SelectAreasStatus & locationStatus,
+                                       MutableCharSpan statusText) = 0;
 
     /**
      * @brief The server instance ensures that the SelectedAreas and CurrentArea attributes are not null before
@@ -162,8 +162,7 @@ public:
      *
      * @note may be overloaded in device implementation for optimization, if desired.
      */
-    virtual bool GetSupportedLocationById(uint32_t aAreaId, uint32_t & listIndex,
-                                          AreaStructureWrapper & aSupportedLocation);
+    virtual bool GetSupportedLocationById(uint32_t aAreaId, uint32_t & listIndex, AreaStructureWrapper & aSupportedLocation);
 
     /**
      * This method is called by the server instance to add a new location to the list.
@@ -333,8 +332,7 @@ public:
      *
      * @note may be overloaded in device implementation for optimization, if desired.
      */
-    virtual bool GetProgressElementById(uint32_t aAreaId, uint32_t & listIndex,
-                                        Structs::ProgressStruct::Type & aProgressElement);
+    virtual bool GetProgressElementById(uint32_t aAreaId, uint32_t & listIndex, Structs::ProgressStruct::Type & aProgressElement);
 
     /**
      * @brief Is the progress element in the progress list?
