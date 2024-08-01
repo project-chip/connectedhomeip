@@ -150,7 +150,7 @@ class TC_TSTAT_4_2(MatterBaseTest):
         # Commission DUT - already done
 
         self.step("2")
-        if self.pics_guard(self.check_pics("TSTAT.S.F08") and self.check_pics("TSTAT.S.A0048")):
+        if self.pics_guard(self.check_pics("TSTAT.S.F08") and self.check_pics("TSTAT.S.A0050")):
             presets = await self.read_single_attribute_check_success(endpoint=endpoint, cluster=cluster, attribute=cluster.Attributes.Presets)
             logger.info(f"Rx'd Presets: {presets}")
             asserts.assert_equal(presets, initial_presets, "Presets do not match initial value")
@@ -161,7 +161,7 @@ class TC_TSTAT_4_2(MatterBaseTest):
             asserts.assert_true(status_ok, "Presets write did not return InvalidInState as expected")
 
         self.step("3")
-        if self.pics_guard(self.check_pics("TSTAT.S.F08") and self.check_pics("TSTAT.S.A0048") and self.check_pics("TSTAT.S.C07.Rsp") and self.check_pics("TSTAT.S.C09.Rsp")):
+        if self.pics_guard(self.check_pics("TSTAT.S.F08") and self.check_pics("TSTAT.S.A0050") and self.check_pics("TSTAT.S.C07.Rsp") and self.check_pics("TSTAT.S.C09.Rsp")):
             await self.send_edit_preset_request_command()
 
             # Write to the presets attribute after calling StartPresetsSchedulesEditRequest command
@@ -175,7 +175,7 @@ class TC_TSTAT_4_2(MatterBaseTest):
             asserts.assert_equal(presets, initial_presets, "Presets were updated which is not expected")
 
         self.step("4")
-        if self.pics_guard(self.check_pics("TSTAT.S.F08") and self.check_pics("TSTAT.S.A0048") and self.check_pics("TSTAT.S.C07.Rsp") and self.check_pics("TSTAT.S.C09.Rsp")):
+        if self.pics_guard(self.check_pics("TSTAT.S.F08") and self.check_pics("TSTAT.S.A0050") and self.check_pics("TSTAT.S.C07.Rsp") and self.check_pics("TSTAT.S.C09.Rsp")):
 
             # Send the StartPresetsSchedulesEditRequest command
             await self.send_edit_preset_request_command()
@@ -194,7 +194,7 @@ class TC_TSTAT_4_2(MatterBaseTest):
             asserts.assert_equal(presets, new_presets_with_handle, "Presets were not updated which is not expected")
 
         self.step("5")
-        if self.pics_guard(self.check_pics("TSTAT.S.F08") and self.check_pics("TSTAT.S.A0048") and self.check_pics("TSTAT.S.C07.Rsp") and self.check_pics("TSTAT.S.C09.Rsp")):
+        if self.pics_guard(self.check_pics("TSTAT.S.F08") and self.check_pics("TSTAT.S.A0050") and self.check_pics("TSTAT.S.C07.Rsp") and self.check_pics("TSTAT.S.C09.Rsp")):
 
             # Send the StartPresetsSchedulesEditRequest command
             await self.send_edit_preset_request_command()
@@ -210,7 +210,7 @@ class TC_TSTAT_4_2(MatterBaseTest):
             await self.send_commit_preset_request_command(expected_status=Status.UnsupportedAccess)
 
         self.step("6")
-        if self.pics_guard(self.check_pics("TSTAT.S.F08") and self.check_pics("TSTAT.S.A0048") and self.check_pics("TSTAT.S.C06.Rsp") and self.check_pics("TSTAT.S.C07.Rsp") and self.check_pics("TSTAT.S.C09.Rsp")):
+        if self.pics_guard(self.check_pics("TSTAT.S.F08") and self.check_pics("TSTAT.S.A0050") and self.check_pics("TSTAT.S.C06.Rsp") and self.check_pics("TSTAT.S.C07.Rsp") and self.check_pics("TSTAT.S.C09.Rsp")):
 
             # Send the SetActivePresetRequest command
             await self.send_set_active_preset_handle_request_command(value=b'\x03')
@@ -234,7 +234,7 @@ class TC_TSTAT_4_2(MatterBaseTest):
             await self.send_commit_preset_request_command(expected_status=Status.InvalidInState)
 
         self.step("7")
-        if self.pics_guard(self.check_pics("TSTAT.S.F08") and self.check_pics("TSTAT.S.A0048") and self.check_pics("TSTAT.S.C07.Rsp") and self.check_pics("TSTAT.S.C09.Rsp")):
+        if self.pics_guard(self.check_pics("TSTAT.S.F08") and self.check_pics("TSTAT.S.A0050") and self.check_pics("TSTAT.S.C07.Rsp") and self.check_pics("TSTAT.S.C09.Rsp")):
 
             # Send the StartPresetsSchedulesEditRequest command
             await self.send_edit_preset_request_command()
@@ -251,7 +251,7 @@ class TC_TSTAT_4_2(MatterBaseTest):
             await self.send_commit_preset_request_command(expected_status=Status.UnsupportedAccess)
 
         self.step("8")
-        if self.pics_guard(self.check_pics("TSTAT.S.F08") and self.check_pics("TSTAT.S.A0048") and self.check_pics("TSTAT.S.C07.Rsp") and self.check_pics("TSTAT.S.C09.Rsp")):
+        if self.pics_guard(self.check_pics("TSTAT.S.F08") and self.check_pics("TSTAT.S.A0050") and self.check_pics("TSTAT.S.C07.Rsp") and self.check_pics("TSTAT.S.C09.Rsp")):
 
             # Send the StartPresetsSchedulesEditRequest command
             await self.send_edit_preset_request_command()
@@ -269,7 +269,7 @@ class TC_TSTAT_4_2(MatterBaseTest):
             await self.send_commit_preset_request_command(expected_status=Status.ConstraintError)
 
         self.step("9")
-        if self.pics_guard(self.check_pics("TSTAT.S.F08") and self.check_pics("TSTAT.S.A0048") and self.check_pics("TSTAT.S.C07.Rsp") and self.check_pics("TSTAT.S.C09.Rsp")):
+        if self.pics_guard(self.check_pics("TSTAT.S.F08") and self.check_pics("TSTAT.S.A0050") and self.check_pics("TSTAT.S.C07.Rsp") and self.check_pics("TSTAT.S.C09.Rsp")):
 
             # Send the StartPresetsSchedulesEditRequest command
             await self.send_edit_preset_request_command()
@@ -287,7 +287,7 @@ class TC_TSTAT_4_2(MatterBaseTest):
             await self.send_commit_preset_request_command(expected_status=Status.NotFound)
 
         self.step("10")
-        if self.pics_guard(self.check_pics("TSTAT.S.F08") and self.check_pics("TSTAT.S.A0048") and self.check_pics("TSTAT.S.C07.Rsp") and self.check_pics("TSTAT.S.C09.Rsp")):
+        if self.pics_guard(self.check_pics("TSTAT.S.F08") and self.check_pics("TSTAT.S.A0050") and self.check_pics("TSTAT.S.C07.Rsp") and self.check_pics("TSTAT.S.C09.Rsp")):
 
             # Send the StartPresetsSchedulesEditRequest command
             await self.send_edit_preset_request_command()
@@ -304,7 +304,7 @@ class TC_TSTAT_4_2(MatterBaseTest):
             await self.send_commit_preset_request_command(expected_status=Status.UnsupportedAccess)
 
         self.step("11")
-        if self.pics_guard(self.check_pics("TSTAT.S.F08") and self.check_pics("TSTAT.S.A0048") and self.check_pics("TSTAT.S.C07.Rsp") and self.check_pics("TSTAT.S.C09.Rsp")):
+        if self.pics_guard(self.check_pics("TSTAT.S.F08") and self.check_pics("TSTAT.S.A0050") and self.check_pics("TSTAT.S.C07.Rsp") and self.check_pics("TSTAT.S.C09.Rsp")):
 
             # Send the StartPresetsSchedulesEditRequest command
             await self.send_edit_preset_request_command()
@@ -321,7 +321,7 @@ class TC_TSTAT_4_2(MatterBaseTest):
             await self.send_commit_preset_request_command(expected_status=Status.ConstraintError)
 
         self.step("12")
-        if self.pics_guard(self.check_pics("TSTAT.S.F08") and self.check_pics("TSTAT.S.A0048") and self.check_pics("TSTAT.S.C07.Rsp") and self.check_pics("TSTAT.S.C09.Rsp")):
+        if self.pics_guard(self.check_pics("TSTAT.S.F08") and self.check_pics("TSTAT.S.A0050") and self.check_pics("TSTAT.S.C07.Rsp") and self.check_pics("TSTAT.S.C09.Rsp")):
 
             # Send the StartPresetsSchedulesEditRequest command
             await self.send_edit_preset_request_command()
@@ -341,7 +341,7 @@ class TC_TSTAT_4_2(MatterBaseTest):
             # Send the CommitPresetsSchedulesRequest command and expect InvalidInState as the previous edit request was cancelled
             await self.send_commit_preset_request_command(expected_status=Status.InvalidInState)
 
-            # TODO: Add tests for the total number of Presets exceeds the NumberOfPresets supported. Also Add tests for adding presets with preset scenario not present in PresetTypes.
+        # TODO: Add tests for the total number of Presets exceeds the NumberOfPresets supported. Also Add tests for adding presets with preset scenario not present in PresetTypes.
 
 
 if __name__ == "__main__":
