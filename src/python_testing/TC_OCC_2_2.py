@@ -58,43 +58,33 @@ class TC_OCC_2_2(MatterBaseTest):
 
         self.step(2)
         # OccupancySensorType will be determined by FeatureMap matching table at 2.7.6.2.
-        asserts.assert_in(attributes.OccupancySensor.attribute_id, attribute_list,
+        asserts.assert_in(attributes.OccupancySensorType.attribute_id, attribute_list,
                           "OccupancySensorType attribute is a mandatory attribute.")
         occupancy_sensor_type_dut = await self.read_occ_attribute_expect_success(endpoint=endpoint, attribute=attributes.OccupancySensorType)
 
-        # No Bitmap support from PIR, US, Physical Contact, then OccupancySensorType should be PIR
-        if (is_pir_feature_supported != 1) & (is_us_feature_supported != 1) & (is_phy_feature_supported != 1):
-            asserts.assert_equal(occupancy_sensor_type_dut,
-                                 Clusters.OccupancySensing.Enums.OccupancySensorTypeEnum.kPir, "OccupancySensorType is not PIR")
-        # Bitmap supports PIR, then OccupancySensorType should be PIR
-        elif (is_pir_feature_supported == 1) & (is_us_feature_supported != 1) & (is_phy_feature_supported != 1):
-            asserts.assert_equal(occupancy_sensor_type_dut,
-                                 Clusters.OccupancySensing.Enums.OccupancySensorTypeEnum.kPir, "OccupancySensorType is not PIR")
-        # Bitmap supports US, then OccupancySensorType should be US
-        elif (is_pir_feature_supported != 1) & (is_us_feature_supported == 1) & (is_phy_feature_supported != 1):
-            asserts.assert_equal(
-                occupancy_sensor_type_dut, Clusters.OccupancySensing.Enums.OccupancySensorTypeEnum.kUltrasonic, "OccupancySensorType is not Ultrasonic")
+        # if OccupancySensorType is PIR, check bitmaps
+        assert.assert_equal(occupancy_sensor_type_dut == Clusters.OccupancySensing.Enums.OccupancySensorTypeEnum.kPir,
+                            not is_pir_feature_supported && not is_us_feature_supported && not is_phy_feature_supported)
+        assert.assert_equal(occupancy_sensor_type_dut == Clusters.OccupancySensing.Enums.OccupancySensorTypeEnum.kPir,
+                            is_pir_feature_supported && not is_us_feature_supported && not is_phy_feature_supported)
+        assert.assert_equal(occupancy_sensor_type_dut == Clusters.OccupancySensing.Enums.OccupancySensorTypeEnum.kPir,
+                            is_pir_feature_supported && not is_us_feature_supported && is_phy_feature_supported)
 
-        # Bitmap supports PIR and US, then OccupancySensorType should be PIRAndUltrasonic
-        elif (is_pir_feature_supported == 1) & (is_us_feature_supported == 1) & (is_phy_feature_supported != 1):
-            asserts.assert_equal(occupancy_sensor_type_dut, Clusters.OccupancySensing.Enums.OccupancySensorTypeEnum.kPIRAndUltrasonic,
-                                 "OccupancySensorType is not PIRAndUltrasonic")
-        # Bitmap supports Physical Contact, then OccupancySensorType should be Physical Contact
-        elif (is_pir_feature_supported != 1) & (is_us_feature_supported != 1) & (is_phy_feature_supported == 1):
-            asserts.assert_equal(occupancy_sensor_type_dut, Clusters.OccupancySensing.Enums.OccupancySensorTypeEnum.kPhysicalContact,
-                                 "OccupancySensorType is not PhysicalContact")
-        # Bitmap supports Physical Contact and PIR, then OccupancySensorType should be PIR
-        elif (is_pir_feature_supported == 1) & (is_us_feature_supported != 1) & (is_phy_feature_supported == 1):
-            asserts.assert_equal(occupancy_sensor_type_dut,
-                                 Clusters.OccupancySensing.Enums.OccupancySensorTypeEnum.kPir, "OccupancySensorType is not PIR")
-        # Bitmap supports US and Physical Contact, then OccupancySensorType should be US
-        elif (is_pir_feature_supported != 1) & (is_us_feature_supported == 1) & (is_phy_feature_supported == 1):
-            asserts.assert_equal(
-                occupancy_sensor_type_dut, Clusters.OccupancySensing.Enums.OccupancySensorTypeEnum.kUltrasonic, "OccupancySensorType is not Ultrasonic")
-        # Bitmap supports PIR, US and Physical Contact, then OccupancySensorType should be PIRAndUltrasonic
-        elif (is_pir_feature_supported == 1) & (is_us_feature_supported == 1) & (is_phy_feature_supported == 1):
-            asserts.assert_equal(occupancy_sensor_type_dut, Clusters.OccupancySensing.Enums.OccupancySensorTypeEnum.kPIRAndUltrasonic,
-                                 "OccupancySensorType is not PIRAndUltrasonic")
+        # if OccupancySensorType is Ultrasonic, check bitmaps
+        assert.assert_equal(occupancy_sensor_type_dut == Clusters.OccupancySensing.Enums.OccupancySensorTypeEnum.kUltrasonic,
+                            not is_pir_feature_supported && is_us_feature_supported && not is_phy_feature_supported)
+        assert.assert_equal(occupancy_sensor_type_dut == Clusters.OccupancySensing.Enums.OccupancySensorTypeEnum.kUltrasonic,
+                            not is_pir_feature_supported && is_us_feature_supported && is_phy_feature_supported)
+
+        # if OccupancySensorType is PIRAndUltrasonic, check bitmaps
+        assert.assert_equal(occupancy_sensor_type_dut == Clusters.OccupancySensing.Enums.OccupancySensorTypeEnum.kPIRAndUltrasonic,
+                            is_pir_feature_supported && is_us_feature_supported && not is_phy_feature_supported)
+        assert.assert_equal(occupancy_sensor_type_dut == Clusters.OccupancySensing.Enums.OccupancySensorTypeEnum.kPIRAndUltrasonic,
+                            is_pir_feature_supported && is_us_feature_supported && is_phy_feature_supported)
+
+        # if OccupancySensorType is PhysicalContact, check bitmaps
+        assert.assert_equal(occupancy_sensor_type_dut == Clusters.OccupancySensing.Enums.OccupancySensorTypeEnum.kPhysicalContact,
+                            not is_pir_feature_supported && not is_us_feature_supported && is_phy_feature_supported)
 
         self.step(3)
         # OccupancySensorTypeBitmap will be determined by FeatureMap matching table at 2.7.6.2.
