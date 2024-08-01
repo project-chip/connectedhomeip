@@ -57,16 +57,16 @@ ClusterStatusCode ActionReturnStatus::GetStatusCode() const
     chipDie();
 }
 
-bool ActionReturnStatus::IsError() const
+bool ActionReturnStatus::IsSuccess() const
 {
     if (const CHIP_ERROR * err = std::get_if<CHIP_ERROR>(&mReturnStatus))
     {
-        return (*err != CHIP_NO_ERROR);
+        return (*err == CHIP_NO_ERROR);
     }
 
     if (const ClusterStatusCode * status = std::get_if<ClusterStatusCode>(&mReturnStatus))
     {
-        return !status->IsSuccess();
+        return status->IsSuccess();
     }
 
     // all std::variant cases exhausted

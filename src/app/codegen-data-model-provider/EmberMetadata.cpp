@@ -24,9 +24,11 @@ namespace chip {
 namespace app {
 namespace Ember {
 
-std::variant<const EmberAfCluster *,           // global attribute, data from a cluster
-             const EmberAfAttributeMetadata *, // a specific attribute stored by ember
-             CHIP_ERROR                        // error, this will NEVER be CHIP_NO_ERROR
+using Protocols::InteractionModel::Status;
+
+std::variant<const EmberAfCluster *,             // global attribute, data from a cluster
+             const EmberAfAttributeMetadata *,   // a specific attribute stored by ember
+             Protocols::InteractionModel::Status // one of Status::Unsupported*
              >
 FindAttributeMetadata(const ConcreteAttributePath & aPath)
 {
@@ -41,8 +43,8 @@ FindAttributeMetadata(const ConcreteAttributePath & aPath)
                 const EmberAfCluster * cluster = emberAfFindServerCluster(aPath.mEndpointId, aPath.mClusterId);
                 if (cluster == nullptr)
                 {
-                    return (emberAfFindEndpointType(aPath.mEndpointId) == nullptr) ? CHIP_IM_GLOBAL_STATUS(UnsupportedEndpoint)
-                                                                                   : CHIP_IM_GLOBAL_STATUS(UnsupportedCluster);
+                    return (emberAfFindEndpointType(aPath.mEndpointId) == nullptr) ? Status::UnsupportedEndpoint
+                                                                                   : Status::UnsupportedCluster;
                 }
 
                 return cluster;
@@ -57,18 +59,18 @@ FindAttributeMetadata(const ConcreteAttributePath & aPath)
         const EmberAfEndpointType * type = emberAfFindEndpointType(aPath.mEndpointId);
         if (type == nullptr)
         {
-            return CHIP_IM_GLOBAL_STATUS(UnsupportedEndpoint);
+            return Status::UnsupportedEndpoint;
         }
 
         const EmberAfCluster * cluster = emberAfFindClusterInType(type, aPath.mClusterId, CLUSTER_MASK_SERVER);
         if (cluster == nullptr)
         {
-            return CHIP_IM_GLOBAL_STATUS(UnsupportedCluster);
+            return Status::UnsupportedCluster;
         }
 
         // Since we know the attribute is unsupported and the endpoint/cluster are
         // OK, this is the only option left.
-        return CHIP_IM_GLOBAL_STATUS(UnsupportedAttribute);
+        return Status::UnsupportedAttribute;
     }
 
     return metadata;

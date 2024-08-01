@@ -43,6 +43,7 @@ namespace app {
 namespace {
 
 using namespace chip::app::Compatibility::Internal;
+using Protocols::InteractionModel::Status;
 
 /// Attempts to write via an attribute access interface (AAI)
 ///
@@ -266,8 +267,8 @@ CHIP_ERROR DecodeValueIntoEmberBuffer(AttributeValueDecoder & decoder, const Emb
 
 } // namespace
 
-CHIP_ERROR CodegenDataModelProvider::WriteAttribute(const DataModel::WriteAttributeRequest & request,
-                                                    AttributeValueDecoder & decoder)
+DataModel::ActionReturnStatus CodegenDataModelProvider::WriteAttribute(const DataModel::WriteAttributeRequest & request,
+                                                                       AttributeValueDecoder & decoder)
 {
     ChipLogDetail(DataManagement, "Writing attribute: Cluster=" ChipLogFormatMEI " Endpoint=0x%x AttributeId=" ChipLogFormatMEI,
                   ChipLogValueMEI(request.path.mClusterId), request.path.mEndpointId, ChipLogValueMEI(request.path.mAttributeId));
@@ -292,12 +293,13 @@ CHIP_ERROR CodegenDataModelProvider::WriteAttribute(const DataModel::WriteAttrib
 
     auto metadata = Ember::FindAttributeMetadata(request.path);
 
-    if (const CHIP_ERROR * err = std::get_if<CHIP_ERROR>(&metadata))
+    // Explicit failure in finding a suitable metadata
+    if (const Status * status = std::get_if<Status>(&metadata))
     {
-        VerifyOrDie((*err == CHIP_IM_GLOBAL_STATUS(UnsupportedEndpoint)) || //
-                    (*err == CHIP_IM_GLOBAL_STATUS(UnsupportedCluster)) ||  //
-                    (*err == CHIP_IM_GLOBAL_STATUS(UnsupportedAttribute)));
-        return *err;
+        VerifyOrDie((*status == Status::UnsupportedEndpoint) || //
+                    (*status == Status::UnsupportedCluster) ||  //
+                    (*status == Status::UnsupportedAttribute));
+        return *status;
     }
 
     const EmberAfAttributeMetadata ** attributeMetadata = std::get_if<const EmberAfAttributeMetadata *>(&metadata);

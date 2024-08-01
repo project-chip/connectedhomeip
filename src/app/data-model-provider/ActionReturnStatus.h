@@ -44,27 +44,34 @@ namespace DataModel {
 class ActionReturnStatus
 {
 public:
-    ActionReturnStatus(CHIP_ERROR error): mReturnStatus(error) {}
-    ActionReturnStatus(Protocols::InteractionModel::Status status): mReturnStatus(Protocols::InteractionModel::ClusterStatusCode(status)) {}
-    ActionReturnStatus(Protocols::InteractionModel::ClusterStatusCode status): mReturnStatus(status) {}
+    ActionReturnStatus(CHIP_ERROR error) : mReturnStatus(error) {}
+    ActionReturnStatus(Protocols::InteractionModel::Status status) :
+        mReturnStatus(Protocols::InteractionModel::ClusterStatusCode(status))
+    {}
+    ActionReturnStatus(Protocols::InteractionModel::ClusterStatusCode status) : mReturnStatus(status) {}
 
     /// Constructs a status code. Either returns the underlying code directly
     /// or converts the underlying CHIP_ERROR into a cluster status code.
     Protocols::InteractionModel::ClusterStatusCode GetStatusCode() const;
 
+    /// If this is a CHIP_NO_ERROR or a Status::Success
+    bool IsSuccess() const;
+
     /// Considers if the underlying error is an error or not (CHIP_NO_ERROR is the only non-erro)
     /// or if the underlying statuscode is not an error (success and cluster specific successes
     /// are not an error).
-    bool IsError() const;
+    bool IsError() const { return !IsSuccess(); }
 
     /// Checks if the underlying error is an out of space condition (i.e. something that
     /// chunking can handle by sending partial list data).
+    ///
+    /// Generally this is when the return is based on CHIP_ERROR_NO_MEMORY or CHIP_ERROR_BUFFER_TOO_SMALL
     bool IsOutOfSpaceError() const;
 
     /// Logs the underlying code as a ChipLogError. If the underlying data contains
     /// a CHIP_ERROR, the error is reported. Otherwise the cluster status code data
     /// is logged.
-    void LogError(const char *prefix) const;
+    void LogError(const char * prefix) const;
 
 private:
     std::variant<CHIP_ERROR, Protocols::InteractionModel::ClusterStatusCode> mReturnStatus;
