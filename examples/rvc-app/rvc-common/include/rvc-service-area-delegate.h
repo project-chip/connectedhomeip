@@ -35,28 +35,28 @@ class RvcServiceAreaDelegate : public Delegate
 {
 private:
     // containers for array attributes.
-    std::vector<ServiceArea::LocationStructureWrapper> mSupportedLocations;
+    std::vector<ServiceArea::LocationStructureWrapper> mSupportedAreas;
     std::vector<ServiceArea::MapStructureWrapper> mSupportedMaps;
-    std::vector<uint32_t> mSelectedLocations;
+    std::vector<uint32_t> mSelectedAreas;
     std::vector<ServiceArea::Structs::ProgressStruct::Type> mProgressList;
 
 public:
     CHIP_ERROR Init() override;
 
     // command support
-    bool IsSetSelectedLocationsAllowed(MutableCharSpan statusText) override;
+    bool IsSetSelectedAreasAllowed(MutableCharSpan statusText) override;
 
     bool IsValidSelectLocationsSet(const ServiceArea::Commands::SelectLocations::DecodableType & req,
                                    ServiceArea::SelectAreasStatus & locationStatus, MutableCharSpan statusText) override;
 
-    bool HandleSkipCurrentLocation(MutableCharSpan skipStatusText) override;
+    bool HandleSkipCurrentArea(MutableCharSpan skipStatusText) override;
 
     //*************************************************************************
     // Supported Locations accessors
 
-    bool IsSupportedLocationsChangeAllowed() override;
+    bool IsSupportedAreasChangeAllowed() override;
 
-    uint32_t GetNumberOfSupportedLocations() override;
+    uint32_t GetNumberOfSupportedAreas() override;
 
     bool GetSupportedLocationByIndex(uint32_t listIndex, ServiceArea::LocationStructureWrapper & supportedLocation) override;
 
@@ -67,7 +67,7 @@ public:
 
     bool ModifySupportedLocation(uint32_t listIndex, const ServiceArea::LocationStructureWrapper & modifiedLocation) override;
 
-    bool ClearSupportedLocations() override;
+    bool ClearSupportedAreas() override;
 
     //*************************************************************************
     // Supported Maps accessors
@@ -89,7 +89,7 @@ public:
     //*************************************************************************
     // Selected Locations accessors
 
-    uint32_t GetNumberOfSelectedLocations() override;
+    uint32_t GetNumberOfSelectedAreas() override;
 
     bool GetSelectedLocationByIndex(uint32_t listIndex, uint32_t & selectedLocation) override;
 
@@ -97,7 +97,7 @@ public:
 
     bool AddSelectedLocation(uint32_t aAreaId, uint32_t & listIndex) override;
 
-    bool ClearSelectedLocations() override;
+    bool ClearSelectedAreas() override;
 
     //*************************************************************************
     // Progress accessors

@@ -31,9 +31,9 @@ class Instance;
 // *****************************************************************************
 // cluster constraints
 
-constexpr size_t kMaxNumSupportedLocations = 255;
+constexpr size_t kMaxNumSupportedAreas = 255;
 constexpr size_t kMaxNumSupportedMaps      = 255;
-constexpr size_t kMaxNumSelectedLocations  = 255;
+constexpr size_t kMaxNumSelectedAreas  = 255;
 constexpr size_t kMaxNumProgressElements   = 255;
 
 constexpr size_t kMaxSizeStatusText = 256;
@@ -71,10 +71,10 @@ public:
      * @note The statusText field SHOULD indicate why the request is not allowed, given the current mode
      *       of the device, which may involve other clusters.
      */
-    virtual bool IsSetSelectedLocationsAllowed(MutableCharSpan statusText) = 0;
+    virtual bool IsSetSelectedAreasAllowed(MutableCharSpan statusText) = 0;
 
     /**
-     * Given a set of locations to be set to the SelectedLocations attribute, this method should check that
+     * Given a set of locations to be set to the SelectedAreas attribute, this method should check that
      * the set of locations as a whole is valid and reachable by the device.
      * If the set of locations is invalid, the locationStatus should be set to InvalidSet and
      * the statusText SHALL include a vendor-defined error description.
@@ -94,7 +94,7 @@ public:
                                            SelectAreasStatus & locationStatus, MutableCharSpan statusText) = 0;
 
     /**
-     * @brief The server instance ensures that the SelectedLocations and CurrentLocation attributes are not null before
+     * @brief The server instance ensures that the SelectedAreas and CurrentArea attributes are not null before
      * calling this method.
      * @param[out] skipStatusText text describing why current location cannot be skipped.
      * @return true if command is successful, false if the received skip request cannot be handled due to the current mode of the
@@ -104,13 +104,13 @@ public:
      *
      * @note If the device successfully accepts the request and the ListOrder feature is set to 1:
      *       The server SHALL stop operating at the current location.
-     *       The server SHALL attempt to operate at the remaining locations on the SelectedLocations attribute list, starting with
-     * the next entry. If the end of the SelectedLocations attribute list is reached, the server SHALL stop operating.
+     *       The server SHALL attempt to operate at the remaining locations on the SelectedAreas attribute list, starting with
+     * the next entry. If the end of the SelectedAreas attribute list is reached, the server SHALL stop operating.
      *
      * @note If the device successfully accepts the request and the ListOrder feature is set to 0:
      *       The server SHALL stop operating at the current location.
-     *       The server SHALL attempt to operate at the locations on the SelectedLocations attribute list where operating has not
-     * been completed, using a vendor defined order. If the server has completed operating at all locations on the SelectedLocations
+     *       The server SHALL attempt to operate at the locations on the SelectedAreas attribute list where operating has not
+     * been completed, using a vendor defined order. If the server has completed operating at all locations on the SelectedAreas
      * attribute list, the server SHALL stop operating.
      *
      * @note If the Status field is set to InvalidLocationList, the StatusText field SHALL be an empty string.
@@ -119,7 +119,7 @@ public:
      * InvalidInMode, the StatusText field SHOULD indicate why the request is not allowed, given the current mode of the device,
      * which may involve other clusters.
      */
-    virtual bool HandleSkipCurrentLocation(MutableCharSpan skipStatusText)
+    virtual bool HandleSkipCurrentArea(MutableCharSpan skipStatusText)
     {
         // device support of this command is optional
         CopyCharSpanToMutableCharSpan("Skip Current Location command not supported by device"_span, skipStatusText);
@@ -130,20 +130,20 @@ public:
     // Supported Areas accessors
 
     /**
-     * @return true if the current device state allows the SupportedLocations attribute to be updated.
+     * @return true if the current device state allows the SupportedAreas attribute to be updated.
      *
-     * @note The SupportedLocations attribute list changes (adding or deleting entries,
+     * @note The SupportedAreas attribute list changes (adding or deleting entries,
      *       changing their MapID fields, changing the AreaID fields, or nulling the entire list)
      *       SHOULD NOT be allowed while the device is operating, to reduce the impact on the clients,
      *       and the potential confusion for the users.
      *
      * @note The device implementation MAY allow supported location changes while operating if the device
-     *       repopulates the SupportedMaps, SupportedLocations, CurrentLocation, and Progress attributes with
+     *       repopulates the SupportedMaps, SupportedAreas, CurrentArea, and Progress attributes with
      *       data matching the constraints listed in the requirements for each attribute.
      */
-    virtual bool IsSupportedLocationsChangeAllowed() = 0;
+    virtual bool IsSupportedAreasChangeAllowed() = 0;
 
-    virtual uint32_t GetNumberOfSupportedLocations() = 0;
+    virtual uint32_t GetNumberOfSupportedAreas() = 0;
 
     /**
      * @brief Get a supported location using the position in the list.
@@ -190,24 +190,24 @@ public:
     /**
      * @return true if supported locations was not already null, false otherwise.
      */
-    virtual bool ClearSupportedLocations() = 0;
+    virtual bool ClearSupportedAreas() = 0;
 
     /**
-     * @brief Ensure that when the Supported locations is modified, the required restrictions for the SelectedLocations,
-     * CurrentLocation, and Progress attributes are maintained.
+     * @brief Ensure that when the Supported locations is modified, the required restrictions for the SelectedAreas,
+     * CurrentArea, and Progress attributes are maintained.
      *
      * This method will be called by the SDK whenever the adherence to the restrictions for these attributes cannot be guaranteed.
-     * For example, if there are deletions in the SupportedMops or SupportedLocations attributes, or if there are changes to their
-     * IDs. This method will no be called if the changes made to the SupportedMops or SupportedLocations attributes, ensure that the
+     * For example, if there are deletions in the SupportedMops or SupportedAreas attributes, or if there are changes to their
+     * IDs. This method will no be called if the changes made to the SupportedMops or SupportedAreas attributes, ensure that the
      * restrictions are adhered. For example, if there are additions or the modifications do not involve changing IDs in the
-     * SupportedMops or SupportedLocations attributes.
+     * SupportedMops or SupportedAreas attributes.
      *
-     * The default implementation will set the SelectedLocations, CurrentLocation, and Progress attributes to null.
+     * The default implementation will set the SelectedAreas, CurrentArea, and Progress attributes to null.
      *
      * The user is free the redefine this method as their device may have more information on what has changed and may be able to
      * maintain the restrictions on these attributes by selectively editing them.
      */
-    virtual void HandleSupportedLocationsUpdated();
+    virtual void HandleSupportedAreasUpdated();
 
     //*************************************************************************
     // Supported Maps accessors
@@ -221,7 +221,7 @@ public:
      *       and the potential confusion for the users.
      *
      * @note The device implementation MAY allow supported maps changes while operating if the device
-     *       repopulates the SupportedLocations, CurrentLocation, and Progress attributes with
+     *       repopulates the SupportedAreas, CurrentArea, and Progress attributes with
      *       data matching the constraints listed in the requirements for each attribute.
      */
     virtual bool IsSupportedMapChangeAllowed() = 0;
@@ -277,7 +277,7 @@ public:
     //*************************************************************************
     // Selected Locations accessors
 
-    virtual uint32_t GetNumberOfSelectedLocations() = 0;
+    virtual uint32_t GetNumberOfSelectedAreas() = 0;
 
     /**
      * @brief Get a selected location using the position in the list.
@@ -288,7 +288,7 @@ public:
     virtual bool GetSelectedLocationByIndex(uint32_t listIndex, uint32_t & selectedLocation) = 0;
 
     /**
-     * @return true if the aAreaId areaID is found in the SelectedLocations list, false otherwise.
+     * @return true if the aAreaId areaID is found in the SelectedAreas list, false otherwise.
      *
      * @note may be overloaded in device implementation for optimization, if desired.
      */
@@ -309,7 +309,7 @@ public:
     /**
      * @return true if selected locations was not already null, false otherwise.
      */
-    virtual bool ClearSelectedLocations() = 0;
+    virtual bool ClearSelectedAreas() = 0;
 
     //*************************************************************************
     // Progress accessors

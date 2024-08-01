@@ -65,7 +65,7 @@ CHIP_ERROR RvcServiceAreaDelegate::Init()
                                         DataModel::Nullable<Globals::PositionTag>(Globals::PositionTag::kNextTo),
                                         DataModel::Nullable<Globals::FloorSurfaceTag>(Globals::FloorSurfaceTag::kHardwood));
 
-    GetInstance()->SetCurrentLocation(supportedAreaID_C);
+    GetInstance()->SetCurrentArea(supportedAreaID_C);
 
     return CHIP_NO_ERROR;
 }
@@ -73,7 +73,7 @@ CHIP_ERROR RvcServiceAreaDelegate::Init()
 //*************************************************************************
 // command support
 
-bool RvcServiceAreaDelegate::IsSetSelectedLocationsAllowed(MutableCharSpan statusText)
+bool RvcServiceAreaDelegate::IsSetSelectedAreasAllowed(MutableCharSpan statusText)
 {
     // TODO IMPLEMENT
     return true;
@@ -86,7 +86,7 @@ bool RvcServiceAreaDelegate::IsValidSelectLocationsSet(const Commands::SelectLoc
     return true;
 };
 
-bool RvcServiceAreaDelegate::HandleSkipCurrentLocation(MutableCharSpan skipStatusText)
+bool RvcServiceAreaDelegate::HandleSkipCurrentArea(MutableCharSpan skipStatusText)
 {
     // TODO IMPLEMENT
     return true;
@@ -95,22 +95,22 @@ bool RvcServiceAreaDelegate::HandleSkipCurrentLocation(MutableCharSpan skipStatu
 //*************************************************************************
 // Supported Locations accessors
 
-bool RvcServiceAreaDelegate::IsSupportedLocationsChangeAllowed()
+bool RvcServiceAreaDelegate::IsSupportedAreasChangeAllowed()
 {
     // TODO IMPLEMENT
     return true;
 }
 
-uint32_t RvcServiceAreaDelegate::GetNumberOfSupportedLocations()
+uint32_t RvcServiceAreaDelegate::GetNumberOfSupportedAreas()
 {
-    return static_cast<uint32_t>(mSupportedLocations.size());
+    return static_cast<uint32_t>(mSupportedAreas.size());
 }
 
 bool RvcServiceAreaDelegate::GetSupportedLocationByIndex(uint32_t listIndex, LocationStructureWrapper & aSupportedLocation)
 {
-    if (listIndex < mSupportedLocations.size())
+    if (listIndex < mSupportedAreas.size())
     {
-        aSupportedLocation = mSupportedLocations[listIndex];
+        aSupportedLocation = mSupportedAreas[listIndex];
         return true;
     }
 
@@ -125,11 +125,11 @@ bool RvcServiceAreaDelegate::GetSupportedLocationById(uint32_t aAreaID, uint32_t
     // since we have direct access to the list.
     listIndex = 0;
 
-    while (listIndex < mSupportedLocations.size())
+    while (listIndex < mSupportedAreas.size())
     {
-        if (mSupportedLocations[listIndex].areaID == aAreaID)
+        if (mSupportedAreas[listIndex].areaID == aAreaID)
         {
-            aSupportedLocation = mSupportedLocations[listIndex];
+            aSupportedLocation = mSupportedAreas[listIndex];
             return true;
         }
 
@@ -145,16 +145,16 @@ bool RvcServiceAreaDelegate::AddSupportedLocation(const LocationStructureWrapper
     // etc.
 
     // Double-check list size to ensure there no memory issues.
-    if (mSupportedLocations.size() < kMaxNumSupportedLocations)
+    if (mSupportedAreas.size() < kMaxNumSupportedAreas)
     {
         // not sorting list, number of locations normally expected to be small, max 255
-        mSupportedLocations.push_back(newLocation);
+        mSupportedAreas.push_back(newLocation);
         listIndex = static_cast<uint32_t>(mSupportedMaps.size()) - 1; // new element is last in list
         return true;
     }
 
     ChipLogError(Zcl, "AddSupportedLocation %u - supported locations list is already at maximum size %u", newLocation.areaID,
-                 static_cast<uint32_t>(kMaxNumSupportedLocations));
+                 static_cast<uint32_t>(kMaxNumSupportedAreas));
 
     return false;
 }
@@ -165,23 +165,23 @@ bool RvcServiceAreaDelegate::ModifySupportedLocation(uint32_t listIndex, const L
     // etc.
 
     // Double-check that areaID's match.
-    if (modifiedLocation.areaID != mSupportedLocations[listIndex].areaID)
+    if (modifiedLocation.areaID != mSupportedAreas[listIndex].areaID)
     {
         ChipLogError(Zcl, "ModifySupportedLocation - areaID's do not match, new areaID %u, existing areaID %u",
-                     modifiedLocation.areaID, mSupportedLocations[listIndex].areaID);
+                     modifiedLocation.areaID, mSupportedAreas[listIndex].areaID);
         return false;
     }
 
     // checks passed, update the attribute
-    mSupportedLocations[listIndex] = modifiedLocation;
+    mSupportedAreas[listIndex] = modifiedLocation;
     return true;
 }
 
-bool RvcServiceAreaDelegate::ClearSupportedLocations()
+bool RvcServiceAreaDelegate::ClearSupportedAreas()
 {
-    if (!mSupportedLocations.empty())
+    if (!mSupportedAreas.empty())
     {
-        mSupportedLocations.clear();
+        mSupportedAreas.clear();
         return true;
     }
 
@@ -285,16 +285,16 @@ bool RvcServiceAreaDelegate::ClearSupportedMaps()
 //*************************************************************************
 // Selected Locations accessors
 
-uint32_t RvcServiceAreaDelegate::GetNumberOfSelectedLocations()
+uint32_t RvcServiceAreaDelegate::GetNumberOfSelectedAreas()
 {
-    return static_cast<uint32_t>(mSelectedLocations.size());
+    return static_cast<uint32_t>(mSelectedAreas.size());
 }
 
 bool RvcServiceAreaDelegate::GetSelectedLocationByIndex(uint32_t listIndex, uint32_t & aSelectedLocation)
 {
-    if (listIndex < mSelectedLocations.size())
+    if (listIndex < mSelectedAreas.size())
     {
-        aSelectedLocation = mSelectedLocations[listIndex];
+        aSelectedLocation = mSelectedAreas[listIndex];
         return true;
     }
 
@@ -307,24 +307,24 @@ bool RvcServiceAreaDelegate::AddSelectedLocation(uint32_t aAreaID, uint32_t & li
     // etc.
 
     // Double-check list size to ensure there no memory issues.
-    if (mSelectedLocations.size() < kMaxNumSelectedLocations)
+    if (mSelectedAreas.size() < kMaxNumSelectedAreas)
     {
         // not sorting list, number of locations normally expected to be small, max 255
-        mSelectedLocations.push_back(aAreaID);
-        listIndex = static_cast<uint32_t>(mSelectedLocations.size()) - 1; // new element is last in list
+        mSelectedAreas.push_back(aAreaID);
+        listIndex = static_cast<uint32_t>(mSelectedAreas.size()) - 1; // new element is last in list
         return true;
     }
     ChipLogError(Zcl, "AddSelectedLocation %u - selected locations list is already at maximum size %u", aAreaID,
-                 static_cast<uint32_t>(kMaxNumSelectedLocations));
+                 static_cast<uint32_t>(kMaxNumSelectedAreas));
 
     return false;
 }
 
-bool RvcServiceAreaDelegate::ClearSelectedLocations()
+bool RvcServiceAreaDelegate::ClearSelectedAreas()
 {
-    if (!mSelectedLocations.empty())
+    if (!mSelectedAreas.empty())
     {
-        mSelectedLocations.clear();
+        mSelectedAreas.clear();
         return true;
     }
 

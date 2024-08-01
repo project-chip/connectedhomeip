@@ -21,10 +21,10 @@ bool Delegate::GetSupportedLocationById(uint32_t aAreaId, uint32_t & listIndex, 
     return false;
 }
 
-void Delegate::HandleSupportedLocationsUpdated()
+void Delegate::HandleSupportedAreasUpdated()
 {
-    mInstance->ClearSelectedLocations();
-    mInstance->SetCurrentLocation(DataModel::NullNullable);
+    mInstance->ClearSelectedAreas();
+    mInstance->SetCurrentArea(DataModel::NullNullable);
     mInstance->ClearProgress();
 }
 

@@ -79,7 +79,7 @@ private:
     ClusterId mClusterId;
 
     // Attribute Data Store
-    DataModel::Nullable<uint32_t> mCurrentLocation;
+    DataModel::Nullable<uint32_t> mCurrentArea;
     DataModel::Nullable<uint32_t> mEstimatedEndTime;
     BitMask<ServiceArea::Feature> mFeature;
 
@@ -101,11 +101,11 @@ private:
     //*************************************************************************
     // attribute readers
 
-    CHIP_ERROR ReadSupportedLocations(chip::app::AttributeValueEncoder & aEncoder);
+    CHIP_ERROR ReadSupportedAreas(chip::app::AttributeValueEncoder & aEncoder);
 
     CHIP_ERROR ReadSupportedMaps(chip::app::AttributeValueEncoder & aEncoder);
 
-    CHIP_ERROR ReadSelectedLocations(chip::app::AttributeValueEncoder & aEncoder);
+    CHIP_ERROR ReadSelectedAreas(chip::app::AttributeValueEncoder & aEncoder);
 
     CHIP_ERROR ReadProgress(chip::app::AttributeValueEncoder & aEncoder);
 
@@ -123,15 +123,15 @@ private:
      * @param[in, out] ctx Returns the Interaction Model status code which was user determined in the business logic.
      *                     If the input value is invalid, returns the Interaction Model status code of INVALID_COMMAND.
      */
-    void HandleSkipCurrentLocationCmd(HandlerContext & ctx);
+    void HandleSkipCurrentAreaCmd(HandlerContext & ctx);
 
     //*************************************************************************
     // attribute notifications
 
-    void NotifySupportedLocationsChanged();
+    void NotifySupportedAreasChanged();
     void NotifySupportedMapsChanged();
-    void NotifySelectedLocationsChanged();
-    void NotifyCurrentLocationChanged();
+    void NotifySelectedAreasChanged();
+    void NotifyCurrentAreaChanged();
     void NotifyEstimatedEndTimeChanged();
     void NotifyProgressChanged();
 
@@ -204,7 +204,7 @@ public:
      * location was modified.
      *
      * @note if aLocationName is larger than kLocationNameMaxSize, it will be truncated.
-     * @note if mapID is changed, the delegate's HandleSupportedLocationsUpdated method is called.
+     * @note if mapID is changed, the delegate's HandleSupportedAreasUpdated method is called.
      */
     bool ModifySupportedLocation(uint32_t aAreaId, const DataModel::Nullable<uint8_t> & aMapId, const CharSpan & aLocationName,
                                  const DataModel::Nullable<int16_t> & aFloorNumber,
@@ -214,11 +214,11 @@ public:
                                  const DataModel::Nullable<Globals::FloorSurfaceTag> & aSurfaceTag);
 
     /**
-     * @return true if the SupportedLocations attribute was not already null.
+     * @return true if the SupportedAreas attribute was not already null.
      *
-     * @note if SupportedLocations is cleared, the delegate's HandleSupportedLocationsUpdated method is called.
+     * @note if SupportedAreas is cleared, the delegate's HandleSupportedAreasUpdated method is called.
      */
-    bool ClearSupportedLocations();
+    bool ClearSupportedAreas();
 
     //*************************************************************************
     // Supported Maps manipulators
@@ -249,7 +249,7 @@ public:
     /**
      * @return true if the SupportedMaps attribute was not already null.
      *
-     * @note if SupportedMaps is cleared, the delegate's HandleSupportedLocationsUpdated method is called.
+     * @note if SupportedMaps is cleared, the delegate's HandleSupportedAreasUpdated method is called.
      */
     bool ClearSupportedMaps();
 
@@ -264,36 +264,36 @@ public:
     bool AddSelectedLocation(uint32_t & aSelectedLocation);
 
     /**
-     * @return true if the SelectedLocations attribute was not already null.
+     * @return true if the SelectedAreas attribute was not already null.
      */
-    bool ClearSelectedLocations();
+    bool ClearSelectedAreas();
 
     //*************************************************************************
     // Current Location manipulators
 
-    DataModel::Nullable<uint32_t> GetCurrentLocation();
+    DataModel::Nullable<uint32_t> GetCurrentArea();
 
     /**
-     * @param[in] aCurrentLocation The area ID that the CurrentLocation attribute should be set to. Must be a supported location
+     * @param[in] aCurrentArea The area ID that the CurrentArea attribute should be set to. Must be a supported location
      * or NULL.
      * @return true if the current location is set, false otherwise.
      *
      * @note if current location is set to null, estimated end time will be set to null.
      */
-    bool SetCurrentLocation(const DataModel::Nullable<uint32_t> & aCurrentLocation);
+    bool SetCurrentArea(const DataModel::Nullable<uint32_t> & aCurrentArea);
 
     //*************************************************************************
     // Estimated End Time manipulators
 
     /**
-     * @return The estimated epoch time in seconds when operation at the location indicated by the CurrentLocation attribute will be
+     * @return The estimated epoch time in seconds when operation at the location indicated by the CurrentArea attribute will be
      * completed.
      */
     DataModel::Nullable<uint32_t> GetEstimatedEndTime();
 
     /**
      * @param[in] aEstimatedEndTime The estimated epoch time in seconds when operation at the location indicated by the
-     * CurrentLocation attribute will be completed.
+     * CurrentArea attribute will be completed.
      * @return true if attribute is set, false otherwise.
      */
     bool SetEstimatedEndTime(const DataModel::Nullable<uint32_t> & aEstimatedEndTime);
