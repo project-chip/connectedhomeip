@@ -55,19 +55,19 @@ limitations under the License.
     <item name="EstimatedTime"          type="elapsed_s"              optional="true" isNullable="true"/>
   </struct>
 
-  <enum name="SelectLocationsStatus" type="enum8">
+  <enum name="SelectAreasStatus" type="enum8">
     <cluster code="0x0150"/>
     <item value="0x00" name="Success"/>
-    <item value="0x01" name="UnsupportedLocation"/>
-    <item value="0x02" name="DuplicatedLocations"/>
+    <item value="0x01" name="UnsupportedArea"/>
+    <item value="0x02" name="DuplicatedAreas"/>
     <item value="0x03" name="InvalidInMode"/>
     <item value="0x04" name="InvalidSet"/>
   </enum>
 
-  <enum name="SkipCurrentLocationStatus" type="enum8">
+  <enum name="SkipAreaStatus" type="enum8">
     <cluster code="0x0150"/>
     <item value="0x00" name="Success"/>
-    <item value="0x01" name="InvalidLocationList"/>
+    <item value="0x01" name="InvalidAreaList"/>
     <item value="0x02" name="InvalidInMode"/>
   </enum>
 
@@ -107,7 +107,7 @@ limitations under the License.
       <description>
         This command is sent by the device on receipt of the SelectLocations command.
       </description>
-      <arg name="Status"     type="SelectLocationsStatus"     optional="false"/>
+      <arg name="Status"     type="SelectAreasStatus"         optional="false"/>
       <arg name="StatusText" type="char_string"  length="256" optional="true"/>
     </command>
 
@@ -121,8 +121,8 @@ limitations under the License.
       <description>
         This command is sent by the device on receipt of the SelectLocations command.
       </description>
-      <arg name="Status"     type="SkipCurrentLocationStatus"  optional="false"/>
-      <arg name="StatusText" type="char_string"                length="256" optional="true"/>
+      <arg name="Status"     type="SkipAreaStatus"  optional="false"/>
+      <arg name="StatusText" type="char_string"     length="256" optional="true"/>
     </command>
 
   </cluster>
