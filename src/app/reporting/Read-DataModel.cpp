@@ -15,6 +15,7 @@
  *    limitations under the License.
  */
 #include "app/data-model-provider/ActionReturnStatus.h"
+#include "lib/support/logging/TextOnlyLogging.h"
 #include <app/reporting/Read-DataModel.h>
 
 #include <app/AppConfig.h>
@@ -94,7 +95,9 @@ DataModel::ActionReturnStatus RetrieveClusterData(DataModel::Provider * dataMode
     // and will be sent to the client as well).
     if (!status.IsOutOfSpaceError())
     {
-        status.LogError("Failed to read attribute: ");
+        StringBuilder<128> buffer;
+        status.AddTo(buffer);
+        ChipLogError(DataManagement, "Failed to read attribute: %s", buffer.c_str());
     }
     return status;
 }

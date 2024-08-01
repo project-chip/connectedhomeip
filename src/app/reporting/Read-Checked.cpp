@@ -15,6 +15,7 @@
  *    limitations under the License.
  */
 #include "app/data-model-provider/ActionReturnStatus.h"
+#include "lib/support/StringBuilder.h"
 #include <app/reporting/Read-Checked.h>
 
 #include <app/reporting/Read-DataModel.h>
@@ -81,11 +82,14 @@ ActionReturnStatus RetrieveClusterData(DataModel::Provider * dataModel, const Ac
 
     if (statusEmber != statusDm)
     {
+        StringBuilder<128> buffer;
         // Note log + chipDie instead of VerifyOrDie so that breakpoints (and usage of rr)
         // is easier to debug.
         ChipLogError(Test, "Different return codes between ember and DM");
-        statusEmber.LogError("  Ember status: ");
-        statusDm.LogError("  DM status:    ");
+        statusEmber.AddTo(buffer.Reset());
+        ChipLogError(Test, "  Ember status: %s", buffer.c_str());
+        statusDm.AddTo(buffer.Reset());
+        ChipLogError(Test, "  DM status:    %s", buffer.c_str());
 
         // For time-dependent data, we may have size differences here: one data fitting in buffer
         // while another not, resulting in different errors (success vs out of space).

@@ -17,6 +17,7 @@
 #pragma once
 
 #include <lib/core/CHIPError.h>
+#include <lib/support/StringBuilder.h>
 #include <protocols/interaction_model/StatusCode.h>
 
 #include <variant>
@@ -74,14 +75,14 @@ public:
     /// Generally this is when the return is based on CHIP_ERROR_NO_MEMORY or CHIP_ERROR_BUFFER_TOO_SMALL
     bool IsOutOfSpaceError() const;
 
-    /// Logs the underlying code as a ChipLogError. If the underlying data contains
-    /// a CHIP_ERROR, the error is reported. Otherwise the cluster status code data
-    /// is logged.
-    void LogError(const char * prefix) const;
-
-
     bool operator==(const ActionReturnStatus & other) const { return mReturnStatus == other.mReturnStatus; }
     bool operator!=(const ActionReturnStatus & other) const { return mReturnStatus != other.mReturnStatus; }
+
+    // specialization that allows compare with both ClusterStatusCode AND CHIP_ERROR global IM status
+    bool operator==(Protocols::InteractionModel::Status status);
+
+    /// Get the formatted string of this status.
+    void AddTo(StringBuilderBase & buffer) const;
 
 private:
     std::variant<CHIP_ERROR, Protocols::InteractionModel::ClusterStatusCode> mReturnStatus;

@@ -28,6 +28,26 @@ namespace DataModel {
 using Protocols::InteractionModel::ClusterStatusCode;
 using Protocols::InteractionModel::Status;
 
+bool ActionReturnStatus::operator==(Protocols::InteractionModel::Status status)
+{
+    if (const CHIP_ERROR * err = std::get_if<CHIP_ERROR>(&mReturnStatus))
+    {
+        return *err == CHIP_ERROR_IM_GLOBAL_STATUS_VALUE(status);
+    }
+
+    if (const ClusterStatusCode * internal_status = std::get_if<ClusterStatusCode>(&mReturnStatus))
+    {
+        if (internal_status->HasClusterSpecificCode())
+        {
+            return false; // status has no cluster-specific code, so reject equality
+        }
+
+        return internal_status->GetStatus() == status;
+    }
+
+    chipDie();
+}
+
 CHIP_ERROR ActionReturnStatus::GetUnderlyingError() const
 {
 
@@ -109,39 +129,36 @@ bool ActionReturnStatus::IsOutOfSpaceError() const
     return false;
 }
 
-void ActionReturnStatus::LogError(const char * prefix) const
+void ActionReturnStatus::AddTo(StringBuilderBase & buffer) const
 {
-
     if (const CHIP_ERROR * err = std::get_if<CHIP_ERROR>(&mReturnStatus))
     {
-        ChipLogError(InteractionModel, "%s: %" CHIP_ERROR_FORMAT, prefix, err->Format());
+        buffer.AddFormat("%" CHIP_ERROR_FORMAT, err->Format());
+        return;
     }
 
     if (const ClusterStatusCode * status = std::get_if<ClusterStatusCode>(&mReturnStatus))
     {
-        StringBuilder<48> txt;
-
 #if CHIP_CONFIG_IM_STATUS_CODE_VERBOSE_FORMAT
-        txt.AddFormat("%s(%d)", Protocols::InteractionModel::StatusName(status->GetStatus()),
+        buffer.AddFormat("%s(%d)", Protocols::InteractionModel::StatusName(status->GetStatus()),
                       static_cast<int>(status->GetStatus()));
 #else
         if (status->IsSuccess())
         {
-            txt.Add("Success");
+            buffer.Add("Success");
         }
         else
         {
-            txt.AddFormat("Status<%d>", static_cast<int>(status->GetStatus()));
+            buffer.AddFormat("Status<%d>", static_cast<int>(status->GetStatus()));
         }
 #endif
 
         chip::Optional<ClusterStatus> clusterCode = status->GetClusterSpecificCode();
         if (clusterCode.HasValue())
         {
-            txt.AddFormat(", Code %d", static_cast<int>(clusterCode.Value()));
+            buffer.AddFormat(", Code %d", static_cast<int>(clusterCode.Value()));
         }
-
-        ChipLogError(InteractionModel, "%s: %s", prefix, txt.c_str());
+        return;
     }
 
     // all std::variant cases exhausted
