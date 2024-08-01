@@ -127,7 +127,7 @@ ActionReturnStatus RetrieveClusterData(DataModel::Provider * dataModel, const Ac
 
     // For chunked reads, the encoder state MUST be identical (since this is what controls
     // where chunking resumes).
-    if ((statusEmber == CHIP_ERROR_NO_MEMORY) || (statusEmber == CHIP_ERROR_BUFFER_TOO_SMALL))
+    if (statusEmber.IsOutOfSpaceEncodingResponse())
     {
         // Encoder state MUST match on partial reads (used by chunking)
         // specifically ReadViaAccessInterface in ember-compatibility-functions only
