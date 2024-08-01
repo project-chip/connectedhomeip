@@ -8260,6 +8260,22 @@ jobject DecodeEventValue(const app::ConcreteEventPath & aPath, TLV::TLVReader & 
             jdouble jnivalue_arg4_h               = static_cast<jdouble>(cppValue.arg4.h);
             chip::JniReferences::GetInstance().CreateBoxedObject<jdouble>(
                 value_arg4_hClassName.c_str(), value_arg4_hCtorSignature.c_str(), jnivalue_arg4_h, value_arg4_h);
+            jobject value_arg4_i;
+            if (!cppValue.arg4.i.HasValue())
+            {
+                chip::JniReferences::GetInstance().CreateOptional(nullptr, value_arg4_i);
+            }
+            else
+            {
+                jobject value_arg4_iInsideOptional;
+                std::string value_arg4_iInsideOptionalClassName     = "java/lang/Integer";
+                std::string value_arg4_iInsideOptionalCtorSignature = "(I)V";
+                jint jnivalue_arg4_iInsideOptional                  = static_cast<jint>(cppValue.arg4.i.Value());
+                chip::JniReferences::GetInstance().CreateBoxedObject<jint>(
+                    value_arg4_iInsideOptionalClassName.c_str(), value_arg4_iInsideOptionalCtorSignature.c_str(),
+                    jnivalue_arg4_iInsideOptional, value_arg4_iInsideOptional);
+                chip::JniReferences::GetInstance().CreateOptional(value_arg4_iInsideOptional, value_arg4_i);
+            }
 
             jclass simpleStructStructClass_0;
             err = chip::JniReferences::GetInstance().GetLocalClassRef(
@@ -8274,7 +8290,7 @@ jobject DecodeEventValue(const app::ConcreteEventPath & aPath, TLV::TLVReader & 
             err = chip::JniReferences::GetInstance().FindMethod(
                 env, simpleStructStructClass_0, "<init>",
                 "(Ljava/lang/Integer;Ljava/lang/Boolean;Ljava/lang/Integer;[BLjava/lang/String;Ljava/lang/Integer;Ljava/lang/"
-                "Float;Ljava/lang/Double;)V",
+                "Float;Ljava/lang/Double;Ljava/util/Optional;)V",
                 &simpleStructStructCtor_0);
             if (err != CHIP_NO_ERROR || simpleStructStructCtor_0 == nullptr)
             {
@@ -8282,8 +8298,9 @@ jobject DecodeEventValue(const app::ConcreteEventPath & aPath, TLV::TLVReader & 
                 return nullptr;
             }
 
-            value_arg4 = env->NewObject(simpleStructStructClass_0, simpleStructStructCtor_0, value_arg4_a, value_arg4_b,
-                                        value_arg4_c, value_arg4_d, value_arg4_e, value_arg4_f, value_arg4_g, value_arg4_h);
+            value_arg4 =
+                env->NewObject(simpleStructStructClass_0, simpleStructStructCtor_0, value_arg4_a, value_arg4_b, value_arg4_c,
+                               value_arg4_d, value_arg4_e, value_arg4_f, value_arg4_g, value_arg4_h, value_arg4_i);
 
             jobject value_arg5;
             chip::JniReferences::GetInstance().CreateArrayList(value_arg5);
@@ -8336,6 +8353,22 @@ jobject DecodeEventValue(const app::ConcreteEventPath & aPath, TLV::TLVReader & 
                 jdouble jninewElement_0_h               = static_cast<jdouble>(entry_0.h);
                 chip::JniReferences::GetInstance().CreateBoxedObject<jdouble>(
                     newElement_0_hClassName.c_str(), newElement_0_hCtorSignature.c_str(), jninewElement_0_h, newElement_0_h);
+                jobject newElement_0_i;
+                if (!entry_0.i.HasValue())
+                {
+                    chip::JniReferences::GetInstance().CreateOptional(nullptr, newElement_0_i);
+                }
+                else
+                {
+                    jobject newElement_0_iInsideOptional;
+                    std::string newElement_0_iInsideOptionalClassName     = "java/lang/Integer";
+                    std::string newElement_0_iInsideOptionalCtorSignature = "(I)V";
+                    jint jninewElement_0_iInsideOptional                  = static_cast<jint>(entry_0.i.Value());
+                    chip::JniReferences::GetInstance().CreateBoxedObject<jint>(
+                        newElement_0_iInsideOptionalClassName.c_str(), newElement_0_iInsideOptionalCtorSignature.c_str(),
+                        jninewElement_0_iInsideOptional, newElement_0_iInsideOptional);
+                    chip::JniReferences::GetInstance().CreateOptional(newElement_0_iInsideOptional, newElement_0_i);
+                }
 
                 jclass simpleStructStructClass_1;
                 err = chip::JniReferences::GetInstance().GetLocalClassRef(
@@ -8350,7 +8383,7 @@ jobject DecodeEventValue(const app::ConcreteEventPath & aPath, TLV::TLVReader & 
                 err = chip::JniReferences::GetInstance().FindMethod(
                     env, simpleStructStructClass_1, "<init>",
                     "(Ljava/lang/Integer;Ljava/lang/Boolean;Ljava/lang/Integer;[BLjava/lang/String;Ljava/lang/Integer;Ljava/lang/"
-                    "Float;Ljava/lang/Double;)V",
+                    "Float;Ljava/lang/Double;Ljava/util/Optional;)V",
                     &simpleStructStructCtor_1);
                 if (err != CHIP_NO_ERROR || simpleStructStructCtor_1 == nullptr)
                 {
@@ -8358,9 +8391,9 @@ jobject DecodeEventValue(const app::ConcreteEventPath & aPath, TLV::TLVReader & 
                     return nullptr;
                 }
 
-                newElement_0 =
-                    env->NewObject(simpleStructStructClass_1, simpleStructStructCtor_1, newElement_0_a, newElement_0_b,
-                                   newElement_0_c, newElement_0_d, newElement_0_e, newElement_0_f, newElement_0_g, newElement_0_h);
+                newElement_0 = env->NewObject(simpleStructStructClass_1, simpleStructStructCtor_1, newElement_0_a, newElement_0_b,
+                                              newElement_0_c, newElement_0_d, newElement_0_e, newElement_0_f, newElement_0_g,
+                                              newElement_0_h, newElement_0_i);
                 chip::JniReferences::GetInstance().AddToList(value_arg5, newElement_0);
             }
 
