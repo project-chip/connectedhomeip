@@ -74,7 +74,7 @@ public:
     /// Generally this is when the return is based on CHIP_ERROR_NO_MEMORY or CHIP_ERROR_BUFFER_TOO_SMALL
     bool IsOutOfSpaceError() const;
 
-    // NOTE: operator== will assume statues the same between CHIP_GLOBAL_IM_ERROR and a raw cluster status
+    // NOTE: operator== will treat a CHIP_GLOBAL_IM_ERROR and a raw cluster status as equal if the statuses match,
     //       even though a CHIP_ERROR has some formatting info like file/line
     bool operator==(const ActionReturnStatus & other) const;
     bool operator!=(const ActionReturnStatus & other) const { return !(*this == other); }
