@@ -14,6 +14,9 @@
 #    See the License for the specific language governing permissions and
 #    limitations under the License.
 #
+# See https://github.com/project-chip/connectedhomeip/blob/master/docs/testing/python.md#defining-the-ci-test-arguments
+# for details about the block below.
+#
 # === BEGIN CI TEST ARGUMENTS ===
 # test-runner-runs: run1
 # test-runner-run/run1/app: ${TYPE_OF_APP}
@@ -138,6 +141,7 @@ class TC_OCC_3_2(MatterBaseTest):
         attrib_listener = ClusterAttributeChangeAccumulator(Clusters.Objects.OccupancySensing)
         await attrib_listener.start(ChipDeviceCtrl, node_id, endpoint=endpoint_id)
 
+        # TODO - Will add Namepiped to assimilate the manual sensor untrigger here
         self.step("3a")
         self.wait_for_user_input(prompt_msg="Type any letter and press ENTER after DUT goes back to unoccupied state.")
 
@@ -146,6 +150,7 @@ class TC_OCC_3_2(MatterBaseTest):
             initial_dut = await self.read_occ_attribute_expect_success(endpoint=endpoint, attribute=attributes.Occupancy)
             asserts.assert_equal(initial_dut, 0, "Occupancy attribute is still detected state")
 
+        # TODO - Will add Namepiped to assimilate the manual sensor trigger here
         self.step("3c")
         self.wait_for_user_input(
             prompt_msg="Type any letter and press ENTER after the sensor occupancy is triggered and its occupancy state changed.")
@@ -173,49 +178,43 @@ class TC_OCC_3_2(MatterBaseTest):
 
         self.step("5a")
         if (occupancy_sensor_type_bitmap_dut & Clusters.OccupancySensing.Enums.OccupancySensorTypeEnum.kPir) == 0:
-            logging.info("No PIR timing attribute supports. Skip this test case")
-            self.skip("5b")
-            self.skip("5c")
-            self.skip("5d")
-
-        self.step("5b")
-        if attributes.PIROccupiedToUnoccupiedDelay.attribute_id in attribute_list:
-            initial_dut = await self.read_occ_attribute_expect_success(endpoint=endpoint, attribute=attributes.PIROccupiedToUnoccupiedDelay)
-
-        else:
-            logging.info("No PIROccupiedToUnoccupiedDelay attribute supports. Terminate this test case")
-
-        self.step("5c")
-        # write the new attribute value
-        diff_val = 11
-        await ChipDeviceCtrl.WriteAttribute(node_id, [(endpoint, attributes.PIROccupiedToUnoccupiedDelay(diff_val))])
-
-        self.step("5d")
-        self._await_sequence_of_reports(report_queue=attrib_listener.attribute_queue, endpoint_id=endpoint_id, attribute=cluster.Attributes.PIROccupiedToUnoccupiedDelay, sequence=[
-                                        initial_dut, diff_val], timeout_sec=post_prompt_settle_delay_seconds)
-
+            logging.info("No PIR timing attribute supports. Skip this test cases, 5b, 5c, 5d")
+        else: 
+            self.step("5b")
+            if attributes.PIROccupiedToUnoccupiedDelay.attribute_id in attribute_list:
+                initial_dut = await self.read_occ_attribute_expect_success(endpoint=endpoint, attribute=attributes.PIROccupiedToUnoccupiedDelay)
+    
+            else:
+                logging.info("No PIROccupiedToUnoccupiedDelay attribute supports. Terminate this test case")
+    
+            self.step("5c")
+            # write the new attribute value
+            diff_val = 11
+            await ChipDeviceCtrl.WriteAttribute(node_id, [(endpoint, attributes.PIROccupiedToUnoccupiedDelay(diff_val))])
+    
+            self.step("5d")
+            self._await_sequence_of_reports(report_queue=attrib_listener.attribute_queue, endpoint_id=endpoint_id, attribute=cluster.Attributes.PIROccupiedToUnoccupiedDelay, sequence=[
+                                            initial_dut, diff_val], timeout_sec=post_prompt_settle_delay_seconds)
+  
         self.step("6a")
         if (occupancy_sensor_type_bitmap_dut & Clusters.OccupancySensing.Enums.OccupancySensorTypeEnum.kUltrasonic) == 0:
-            logging.info("No Ultrasonic timing attribute supports. Skip this test case")
-            self.skip("6b")
-            self.skip("6c")
-            self.skip("6d")
-
-        self.step("6b")
-        if attributes.UltrasonicOccupiedToUnoccupiedDelay.attribute_id in attribute_list:
-            initial_dut = await self.read_occ_attribute_expect_success(endpoint=endpoint, attribute=attributes.UltrasonicOccupiedToUnoccupiedDelay)
-
+            logging.info("No Ultrasonic timing attribute supports. Skip this test cases, 6b, 6c, 6d")
         else:
-            logging.info("No UltrasonicOccupiedToUnoccupiedDelay attribute supports. Skip this test case")
-
-        self.step("6c")
-        # write the new attribute value
-        diff_val = 14
-        await ChipDeviceCtrl.WriteAttribute(node_id, [(endpoint, attributes.UltrasonicOccupiedToUnoccupiedDelay(diff_val))])
-
-        self.step("6d")
-        self._await_sequence_of_reports(report_queue=attrib_listener.attribute_queue, endpoint_id=endpoint_id, attribute=cluster.Attributes.UltrasonicOccupiedToUnoccupiedDelay, sequence=[
-                                        initial_dut, diff_val], timeout_sec=post_prompt_settle_delay_seconds)
+            self.step("6b")
+            if attributes.UltrasonicOccupiedToUnoccupiedDelay.attribute_id in attribute_list:
+                initial_dut = await self.read_occ_attribute_expect_success(endpoint=endpoint, attribute=attributes.UltrasonicOccupiedToUnoccupiedDelay)
+    
+            else:
+                logging.info("No UltrasonicOccupiedToUnoccupiedDelay attribute supports. Skip this test case")
+    
+            self.step("6c")
+            # write the new attribute value
+            diff_val = 14
+            await ChipDeviceCtrl.WriteAttribute(node_id, [(endpoint, attributes.UltrasonicOccupiedToUnoccupiedDelay(diff_val))])
+    
+            self.step("6d")
+            self._await_sequence_of_reports(report_queue=attrib_listener.attribute_queue, endpoint_id=endpoint_id, attribute=cluster.Attributes.UltrasonicOccupiedToUnoccupiedDelay, sequence=[
+                                            initial_dut, diff_val], timeout_sec=post_prompt_settle_delay_seconds)
 
         self.step("7a")
         if (occupancy_sensor_type_bitmap_dut & Clusters.OccupancySensing.Enums.OccupancySensorTypeEnum.kPhysicalContact) == 0:
