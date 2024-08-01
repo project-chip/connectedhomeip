@@ -37,7 +37,7 @@ namespace DataModel {
 ///
 ///   - encapsulates a ClusterStatusCode for an actual action result
 ///   - encapsulates a underlying CHIP_ERROR for reporting purposes
-///     and to check for out-of-space specific errors
+///   - has a way to check for "chunking needed" status.
 ///
 /// The class is directly constructible from statuses (non-exlicit) to make
 /// returning of values easy.
