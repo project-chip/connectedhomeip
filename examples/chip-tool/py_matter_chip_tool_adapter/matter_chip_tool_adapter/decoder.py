@@ -322,7 +322,7 @@ class StructFieldsNameConverter():
                     provided_field_name = provided_field_name[0].lower(
                     ) + provided_field_name[1:]
 
-                if provided_field_name in value and provided_field_name != field_name:
+                if provided_field_name in value:
                     value[field_name] = self.run(
                         specs,
                         value[provided_field_name],
@@ -330,7 +330,8 @@ class StructFieldsNameConverter():
                         field_type,
                         field_array
                     )
-                    del value[provided_field_name]
+                    if provided_field_name != field_name:
+                        del value[provided_field_name]
 
             if specs.is_fabric_scoped(struct):
                 if _FABRIC_INDEX_FIELD_CODE in value:

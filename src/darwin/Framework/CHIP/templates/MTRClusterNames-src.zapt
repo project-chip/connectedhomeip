@@ -75,6 +75,62 @@ NSString * MTRAttributeNameForID(MTRClusterIDType clusterID, MTRAttributeIDType 
                 result = [NSString stringWithFormat:@"<Unknown attributeID %d>", attributeID];
                 break;
         }
+        break;
+{{/if}}
+
+{{/zcl_clusters}}
+        default:
+           result = [NSString stringWithFormat:@"<Unknown clusterID %d>", clusterID];
+           break;
+        }
+
+    return result;
+}
+
+
+#pragma mark - Event IDs
+
+NSString * MTREventNameForID(MTRClusterIDType clusterID, MTREventIDType eventID)
+{
+    NSString * result = nil;
+
+    switch (clusterID) {
+
+{{#zcl_clusters}}
+{{#if (isSupported (asUpperCamelCase label preserveAcronyms=true) isForIds=true)}}
+{{~#*inline "cluster"}}{{asUpperCamelCase label preserveAcronyms=true}}{{/inline~}}
+        case MTRClusterIDType{{>cluster}}ID:
+
+            switch (eventID) {
+
+{{/if}}
+
+{{#*inline "eventIDs"}}
+{{#zcl_events}}
+{{~#*inline "cluster"}}{{asUpperCamelCase ../clusterName preserveAcronyms=true}}{{/inline~}}
+{{~#*inline "event"}}{{asUpperCamelCase name preserveAcronyms=true}}{{/inline~}}
+{{#first}}
+{{#if (isSupported (asUpperCamelCase ../clusterName preserveAcronyms=true) isForIds=true)}}
+// Cluster {{> cluster}} events
+{{/if}}
+{{/first}}
+{{#if (isSupported (asUpperCamelCase ../clusterName preserveAcronyms=true) event=(asUpperCamelCase name preserveAcronyms=true) isForIds=true)}}
+            case MTREventIDTypeCluster{{>cluster}}Event{{>event}}ID:
+                result = @"{{>event}}";
+                break;
+
+{{/if}}
+{{/zcl_events}}
+{{/inline}}
+
+{{> eventIDs clusterName=label}}
+
+{{#if (isSupported (asUpperCamelCase label preserveAcronyms=true) isForIds=true)}}
+            default:
+                result = [NSString stringWithFormat:@"<Unknown eventID %d>", eventID];
+                break;
+        }
+        break;
 {{/if}}
 
 {{/zcl_clusters}}

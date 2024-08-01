@@ -26,8 +26,7 @@ namespace app {
 class AttributePathExpandIteratorChecked
 {
 public:
-    AttributePathExpandIteratorChecked(InteractionModel::DataModel * dataModel,
-                                       SingleLinkedListNode<AttributePathParams> * attributePath);
+    AttributePathExpandIteratorChecked(DataModel::Provider * dataModel, SingleLinkedListNode<AttributePathParams> * attributePath);
 
     bool Next();
     bool Get(ConcreteAttributePath & aPath);
