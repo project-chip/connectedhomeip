@@ -3079,11 +3079,20 @@ endpoint 1 {
     ram      attribute wrongCodeEntryLimit default = 3;
     ram      attribute userCodeTemporaryDisableTime default = 10;
     ram      attribute requirePINforRemoteOperation default = 0;
+    callback attribute aliroReaderVerificationKey;
+    callback attribute aliroReaderGroupIdentifier;
+    callback attribute aliroReaderGroupSubIdentifier;
+    callback attribute aliroExpeditedTransactionSupportedProtocolVersions;
+    callback attribute aliroGroupResolvingKey;
+    callback attribute aliroSupportedBLEUWBProtocolVersions;
+    callback attribute aliroBLEAdvertisingVersion;
+    callback attribute numberOfAliroCredentialIssuerKeysSupported;
+    callback attribute numberOfAliroEndpointKeysSupported;
     callback attribute generatedCommandList;
     callback attribute acceptedCommandList;
     callback attribute eventList;
     callback attribute attributeList;
-    ram      attribute featureMap default = 0x1DB3;
+    ram      attribute featureMap default = 0x7DB3;
     ram      attribute clusterRevision default = 7;
 
     handle command LockDoor;
@@ -3111,6 +3120,8 @@ endpoint 1 {
     handle command GetCredentialStatusResponse;
     handle command ClearCredential;
     handle command UnboltDoor;
+    handle command SetAliroReaderConfig;
+    handle command ClearAliroReaderConfig;
   }
 }
 
