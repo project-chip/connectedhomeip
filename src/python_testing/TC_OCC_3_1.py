@@ -99,7 +99,7 @@ class TC_OCC_3_1(MatterBaseTest):
         asserts.assert_equal(occupancy_dut, 0, "Occupancy attribute is still 1.")
 
         self.step(4)
-        # Trigger occupancy sensor to change Occupancy attribute value to 1 => TEST ACTION on DUT
+        # Trigger occupancy sensor to change Occupancy attribute value to 1 => TESTER ACTION on DUT
         self.wait_for_user_input(prompt_msg="Type any letter and press ENTER after a sensor occupancy is triggered.")
 
         # And then check if Occupancy attribute has changed.
@@ -108,9 +108,8 @@ class TC_OCC_3_1(MatterBaseTest):
 
         self.step(5)
         # check if Occupancy attribute is back to 0 after HoldTime attribute period
+        # Tester should not be triggering the sensor for this test step.
         if attributes.HoldTime.attribute_id in attribute_list:
-            # message to the tester
-            self.wait_for_user_input(prompt_msg="Do not trigger sensor during HoldTime.")
 
             # Start a timer based on HoldTime
             time.sleep(hold_time+2)  # add some extra 2 seconds to ensure hold time has passed.
@@ -119,7 +118,7 @@ class TC_OCC_3_1(MatterBaseTest):
             asserts.assert_equal(occupancy_dut, 0, "Occupancy state is not 0 after HoldTime period")
 
         else:
-            logging.info("HoldTime attribute not supported. Skip this test procedure.")
+            logging.info("HoldTime attribute not supported. Skip this return to 0 timing test procedure.")
             self.skip_step(5)
 
 
