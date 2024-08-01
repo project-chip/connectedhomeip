@@ -107,22 +107,7 @@ ClusterStatusCode ActionReturnStatus::GetStatusCode() const
 
     if (const CHIP_ERROR * err = std::get_if<CHIP_ERROR>(&mReturnStatus))
     {
-        if (err->IsPart(ChipError::SdkPart::kIMClusterStatus))
-        {
-            return ClusterStatusCode::ClusterSpecificFailure(err->GetSdkCode());
-        }
-
-        if (*err == CHIP_NO_ERROR)
-        {
-            return ClusterStatusCode(Status::Success);
-        }
-
-        if (err->IsPart(ChipError::SdkPart::kIMGlobalStatus))
-        {
-            return ClusterStatusCode(static_cast<Status>(err->GetSdkCode()));
-        }
-
-        return ClusterStatusCode(Status::Failure);
+        return ClusterStatusCode(*err);
     }
 
     // all std::variant cases exhausted
