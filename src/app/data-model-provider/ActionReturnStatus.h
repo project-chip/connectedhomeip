@@ -83,10 +83,10 @@ public:
     ///
     /// NOTE: this is NOT thread safe in the general case, however the safety guarantees
     ///       are similar to chip::ErrorStr which also assumes a static buffer.
-    /// 
-    /// Use this in the chip main event loop (and since that is a single thread, 
+    ///
+    /// Use this in the chip main event loop (and since that is a single thread,
     /// there should be no races)
-    const char *c_str() const;
+    const char * c_str() const;
 
 private:
     std::variant<CHIP_ERROR, Protocols::InteractionModel::ClusterStatusCode> mReturnStatus;
