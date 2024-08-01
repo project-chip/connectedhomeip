@@ -2753,8 +2753,7 @@ PICS:
           AliroExpeditedTransactionSupportedProtocolVersions attribute"
       id: DRLK.S.A0083
 
-    - label:
-          "Does the DUT(server) support the AliroGroupResolvingKey attribute"
+    - label: "Does the DUT(server) support the AliroGroupResolvingKey attribute"
       id: DRLK.S.A0084
 
     - label:
