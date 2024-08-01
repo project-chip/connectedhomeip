@@ -179,6 +179,9 @@ class TC_OCC_3_2(MatterBaseTest):
         self.step("5a")
         if (occupancy_sensor_type_bitmap_dut & Clusters.OccupancySensing.Enums.OccupancySensorTypeEnum.kPir) == 0:
             logging.info("No PIR timing attribute supports. Skip this test cases, 5b, 5c, 5d")
+            self.skip_step("5b")
+            self.skip_test("5c")
+            self.skip_step("5d")       
         else: 
             self.step("5b")
             if attributes.PIROccupiedToUnoccupiedDelay.attribute_id in attribute_list:
@@ -199,6 +202,9 @@ class TC_OCC_3_2(MatterBaseTest):
         self.step("6a")
         if (occupancy_sensor_type_bitmap_dut & Clusters.OccupancySensing.Enums.OccupancySensorTypeEnum.kUltrasonic) == 0:
             logging.info("No Ultrasonic timing attribute supports. Skip this test cases, 6b, 6c, 6d")
+            self.skip_step("6b")
+            self.skip_test("6c")
+            self.skip_step("6d")
         else:
             self.step("6b")
             if attributes.UltrasonicOccupiedToUnoccupiedDelay.attribute_id in attribute_list:
