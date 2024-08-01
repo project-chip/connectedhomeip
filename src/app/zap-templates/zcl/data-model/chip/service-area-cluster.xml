@@ -18,7 +18,7 @@ limitations under the License.
   <domain name="CHIP"/>
 
   Data types
-  <struct name="LocationInfoStruct" apiMaturity="provisional">
+  <struct name="AreaInfoStruct" apiMaturity="provisional">
     <cluster code="0x0150"/>
     <item name="LocationInfo"  type="LocationDescriptorStruct" optional="false" isNullable="true"/>
     <item name="LandmarkTag"   type="LandmarkTag"              optional="false" isNullable="true"/>
@@ -36,7 +36,7 @@ limitations under the License.
     <cluster code="0x0150"/>
     <item name="LocationID"   type="int32u"                  optional="false" isNullable="false"/>
     <item name="MapID"        type="int8u"                   optional="false" isNullable="true"/>
-    <item name="LocationInfo" type="LocationInfoStruct"      optional="false" isNullable="false"/>
+    <item name="LocationInfo" type="AreaInfoStruct"      optional="false" isNullable="false"/>
   </struct>
 
   <enum name="OperationalStatusEnum" type="enum8">
