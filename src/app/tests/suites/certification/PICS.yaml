@@ -2744,7 +2744,7 @@ PICS:
       id: DRLK.S.A0081
 
     - label:
-          "Does the DUT(server) support the AliroReaderGroupSubIdentifier 
+          "Does the DUT(server) support the AliroReaderGroupSubIdentifier
           attribute"
       id: DRLK.S.A0082
 
