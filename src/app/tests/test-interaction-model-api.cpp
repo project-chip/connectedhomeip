@@ -174,7 +174,7 @@ ActionReturnStatus TestImCustomDataModel::WriteAttribute(const WriteAttributeReq
 }
 
 ActionReturnStatus TestImCustomDataModel::Invoke(const InvokeRequest & request, chip::TLV::TLVReader & input_arguments,
-                                         CommandHandler * handler)
+                                                 CommandHandler * handler)
 {
     return CHIP_ERROR_NOT_IMPLEMENTED;
 }

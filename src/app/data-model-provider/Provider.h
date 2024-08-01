@@ -24,10 +24,10 @@
 #include <app/AttributeValueEncoder.h>
 #include <app/CommandHandler.h>
 
+#include <app/data-model-provider/ActionReturnStatus.h>
 #include <app/data-model-provider/Context.h>
 #include <app/data-model-provider/MetadataTypes.h>
 #include <app/data-model-provider/OperationTypes.h>
-#include <app/data-model-provider/ActionReturnStatus.h>
 
 namespace chip {
 namespace app {
@@ -95,7 +95,8 @@ public:
 
     /// `handler` is used to send back the reply.
     ///    - returning a value other than Success implies an error reply (error and data are mutually exclusive)
-    virtual ActionReturnStatus Invoke(const InvokeRequest & request, chip::TLV::TLVReader & input_arguments, CommandHandler * handler) = 0;
+    virtual ActionReturnStatus Invoke(const InvokeRequest & request, chip::TLV::TLVReader & input_arguments,
+                                      CommandHandler * handler) = 0;
 
 private:
     InteractionModelContext mContext = { nullptr };
