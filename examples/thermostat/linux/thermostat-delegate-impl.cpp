@@ -135,22 +135,6 @@ CHIP_ERROR ThermostatDelegate::GetPresetAtIndex(size_t index, PresetStructWithOw
     return CHIP_ERROR_PROVIDER_LIST_EXHAUSTED;
 }
 
-void ThermostatDelegate::BeginPendingPresetList()
-{
-    mNextFreeIndexInPendingPresetsList = 0;
-    for (uint8_t indexInPresets = 0; indexInPresets < mNextFreeIndexInPresetsList; indexInPresets++)
-    {
-        auto preset = mPresets[indexInPresets];
-        mPendingPresets[mNextFreeIndexInPendingPresetsList].SetPresetHandle(preset.GetPresetHandle());
-        mPendingPresets[mNextFreeIndexInPendingPresetsList].SetPresetScenario(preset.GetPresetScenario());
-        mPendingPresets[mNextFreeIndexInPendingPresetsList].SetName(preset.GetName());
-        mPendingPresets[mNextFreeIndexInPendingPresetsList].SetCoolingSetpoint(preset.GetCoolingSetpoint());
-        mPendingPresets[mNextFreeIndexInPendingPresetsList].SetHeatingSetpoint(preset.GetHeatingSetpoint());
-        mPendingPresets[mNextFreeIndexInPendingPresetsList].SetBuiltIn(preset.GetBuiltIn());
-        mNextFreeIndexInPendingPresetsList++;
-    }
-}
-
 CHIP_ERROR ThermostatDelegate::GetActivePresetHandle(MutableByteSpan & activePresetHandle)
 {
     return CopySpanToMutableSpan(ByteSpan(mActivePresetHandleData, mActivePresetHandleDataSize), activePresetHandle);
@@ -182,10 +166,21 @@ CHIP_ERROR ThermostatDelegate::SetActivePresetHandle(const DataModel::Nullable<B
     return CHIP_NO_ERROR;
 }
 
+void ThermostatDelegate::InitializePendingPresets()
+{
+    mNextFreeIndexInPendingPresetsList = 0;
+    for (uint8_t indexInPresets = 0; indexInPresets < mNextFreeIndexInPresetsList; indexInPresets++)
+    {
+        mPendingPresets[mNextFreeIndexInPendingPresetsList] = mPresets[indexInPresets];
+        mNextFreeIndexInPendingPresetsList++;
+    }
+}
+
 CHIP_ERROR ThermostatDelegate::AppendToPendingPresetList(const PresetStruct::Type & preset)
 {
     if (mNextFreeIndexInPendingPresetsList < ArraySize(mPendingPresets))
     {
+        mPendingPresets[mNextFreeIndexInPendingPresetsList] = preset;
         if (preset.presetHandle.IsNull())
         {
             // TODO: #34556 Since we support only one preset of each type, using the octet string containing the preset scenario
@@ -194,15 +189,6 @@ CHIP_ERROR ThermostatDelegate::AppendToPendingPresetList(const PresetStruct::Typ
             const uint8_t handle[] = { static_cast<uint8_t>(preset.presetScenario) };
             mPendingPresets[mNextFreeIndexInPendingPresetsList].SetPresetHandle(DataModel::MakeNullable(ByteSpan(handle)));
         }
-        else
-        {
-            mPendingPresets[mNextFreeIndexInPendingPresetsList].SetPresetHandle(preset.presetHandle);
-        }
-        mPendingPresets[mNextFreeIndexInPendingPresetsList].SetPresetScenario(preset.presetScenario);
-        mPendingPresets[mNextFreeIndexInPendingPresetsList].SetName(preset.name);
-        mPendingPresets[mNextFreeIndexInPendingPresetsList].SetCoolingSetpoint(preset.coolingSetpoint);
-        mPendingPresets[mNextFreeIndexInPendingPresetsList].SetHeatingSetpoint(preset.heatingSetpoint);
-        mPendingPresets[mNextFreeIndexInPendingPresetsList].SetBuiltIn(preset.builtIn);
         mNextFreeIndexInPendingPresetsList++;
         return CHIP_NO_ERROR;
     }
@@ -252,16 +238,4 @@ CHIP_ERROR ThermostatDelegate::ApplyPendingPresets()
 void ThermostatDelegate::ClearPendingPresetList()
 {
     mNextFreeIndexInPendingPresetsList = 0;
-}
-
-void ThermostatDelegate::AttributeChanged(EndpointId endpointId, ClusterId clusterId, AttributeId attributeId, uint8_t * value,
-                                          uint16_t size)
-{
-    ChipLogProgress(AppServer, "ThermostatDelegate AttributeChanged callback: " ChipLogFormatMEI, ChipLogValueMEI(clusterId));
-
-    ChipLogProgress(AppServer,
-                    "Attribute ID changed: " ChipLogFormatMEI " Endpoint: %d ClusterId: " ChipLogFormatMEI " Value: %u, length %u",
-                    ChipLogValueMEI(attributeId), endpointId, ChipLogValueMEI(clusterId), *value, size);
-
-    ThermostatManager().AttributeChangeHandler(endpointId, clusterId, attributeId, value, size);
 }

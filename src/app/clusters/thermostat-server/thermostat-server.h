@@ -27,6 +27,7 @@
 #include "thermostat-delegate.h"
 
 #include <app/AttributeAccessInterfaceRegistry.h>
+#include <app/CommandHandler.h>
 
 namespace chip {
 namespace app {
@@ -82,6 +83,26 @@ public:
      * @return Whether an atomic write is in progress for the given endpoint
      */
     bool InAtomicWrite(EndpointId endpoint);
+
+    /**
+     * @brief Gets whether an atomic write is in progress for the given endpoint
+     *
+     * @param[in] subjectDescriptor The subject descriptor.
+     * @param[in] endpoint The endpoint.
+     *
+     * @return Whether an atomic write is in progress for the given endpoint
+     */
+    bool InAtomicWrite(const Access::SubjectDescriptor & subjectDescriptor, EndpointId endpoint);
+
+    /**
+     * @brief Gets whether an atomic write is in progress for the given endpoint
+     *
+     * @param[in] commandObj The command handler.
+     * @param[in] endpoint The endpoint.
+     *
+     * @return Whether an atomic write is in progress for the given endpoint
+     */
+    bool InAtomicWrite(CommandHandler * commandObj, EndpointId endpoint);
 
 private:
     ScopedNodeId mAtomicWriteNodeIds[kThermostatEndpointCount];

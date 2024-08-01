@@ -50,11 +50,11 @@ public:
 
     CHIP_ERROR GetPresetAtIndex(size_t index, PresetStructWithOwnedMembers & preset) override;
 
-    void BeginPendingPresetList() override;
-
     CHIP_ERROR GetActivePresetHandle(MutableByteSpan & activePresetHandle) override;
 
     CHIP_ERROR SetActivePresetHandle(const DataModel::Nullable<ByteSpan> & newActivePresetHandle) override;
+
+    void InitializePendingPresets() override;
 
     CHIP_ERROR AppendToPendingPresetList(const Structs::PresetStruct::Type & preset) override;
 
@@ -63,9 +63,6 @@ public:
     CHIP_ERROR ApplyPendingPresets() override;
 
     void ClearPendingPresetList() override;
-
-    void AttributeChanged(EndpointId endpointId, ClusterId clusterId, AttributeId attributeId, uint8_t * value,
-                          uint16_t size) override;
 
 private:
     static ThermostatDelegate sInstance;

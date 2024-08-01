@@ -126,9 +126,9 @@ void TimerExpiredCallback(System::Layer * systemLayer, void * callbackContext)
  * @param[in] endpoint The endpoint to use.
  * @param[in] timeoutMilliseconds The timeout in milliseconds.
  */
-void ScheduleTimer(EndpointId endpoint, uint16_t timeoutMilliseconds)
+void ScheduleTimer(EndpointId endpoint, System::Clock::Milliseconds16 timeout)
 {
-    DeviceLayer::SystemLayer().StartTimer(System::Clock::Milliseconds16(timeoutMilliseconds), TimerExpiredCallback,
+    DeviceLayer::SystemLayer().StartTimer(timeout, TimerExpiredCallback,
                                           reinterpret_cast<void *>(static_cast<uintptr_t>(endpoint)));
 }
 
@@ -674,6 +674,26 @@ bool ThermostatAttrAccess::InAtomicWrite(EndpointId endpoint)
     return inAtomicWrite;
 }
 
+bool ThermostatAttrAccess::InAtomicWrite(const Access::SubjectDescriptor & subjectDescriptor, EndpointId endpoint)
+{
+    if (!InAtomicWrite(endpoint))
+    {
+        return false;
+    }
+    return subjectDescriptor.authMode == Access::AuthMode::kCase &&
+        GetAtomicWriteScopedNodeId(endpoint) == ScopedNodeId(subjectDescriptor.subject, subjectDescriptor.fabricIndex);
+}
+
+bool ThermostatAttrAccess::InAtomicWrite(CommandHandler * commandObj, EndpointId endpoint)
+{
+    if (!InAtomicWrite(endpoint))
+    {
+        return false;
+    }
+    ScopedNodeId sourceNodeId = GetSourceScopedNodeId(commandObj);
+    return GetAtomicWriteScopedNodeId(endpoint) == sourceNodeId;
+}
+
 void ThermostatAttrAccess::SetAtomicWriteScopedNodeId(EndpointId endpoint, ScopedNodeId originatorNodeId)
 {
     uint16_t ep =
@@ -758,7 +778,8 @@ CHIP_ERROR ThermostatAttrAccess::Read(const ConcreteReadAttributePath & aPath, A
         Delegate * delegate = GetDelegate(aPath.mEndpointId);
         VerifyOrReturnError(delegate != nullptr, CHIP_ERROR_INCORRECT_STATE, ChipLogError(Zcl, "Delegate is null"));
 
-        if (InAtomicWrite(aPath.mEndpointId))
+        auto & subjectDescriptor = aEncoder.GetSubjectDescriptor();
+        if (InAtomicWrite(subjectDescriptor, aPath.mEndpointId))
         {
             return aEncoder.EncodeList([delegate](const auto & encoder) -> CHIP_ERROR {
                 for (uint8_t i = 0; true; i++)
@@ -1079,7 +1100,7 @@ MatterThermostatClusterServerPreAttributeChangedCallback(const app::ConcreteAttr
             if (requested > OccupiedCoolingSetpoint - DeadBandTemp)
                 return imcode::InvalidValue;
         }
-        break;
+        return imcode::Success;
     }
 
     case OccupiedCoolingSetpoint::Id: {
@@ -1094,7 +1115,7 @@ MatterThermostatClusterServerPreAttributeChangedCallback(const app::ConcreteAttr
             if (requested < OccupiedHeatingSetpoint + DeadBandTemp)
                 return imcode::InvalidValue;
         }
-        break;
+        return imcode::Success;
     }
 
     case UnoccupiedHeatingSetpoint::Id: {
@@ -1109,7 +1130,7 @@ MatterThermostatClusterServerPreAttributeChangedCallback(const app::ConcreteAttr
             if (requested > UnoccupiedCoolingSetpoint - DeadBandTemp)
                 return imcode::InvalidValue;
         }
-        break;
+        return imcode::Success;
     }
     case UnoccupiedCoolingSetpoint::Id: {
         requested = static_cast<int16_t>(chip::Encoding::LittleEndian::Get16(value));
@@ -1123,7 +1144,7 @@ MatterThermostatClusterServerPreAttributeChangedCallback(const app::ConcreteAttr
             if (requested < UnoccupiedHeatingSetpoint + DeadBandTemp)
                 return imcode::InvalidValue;
         }
-        break;
+        return imcode::Success;
     }
 
     case MinHeatSetpointLimit::Id: {
@@ -1137,7 +1158,7 @@ MatterThermostatClusterServerPreAttributeChangedCallback(const app::ConcreteAttr
             if (requested > MinCoolSetpointLimit - DeadBandTemp)
                 return imcode::InvalidValue;
         }
-        break;
+        return imcode::Success;
     }
     case MaxHeatSetpointLimit::Id: {
         requested = static_cast<int16_t>(chip::Encoding::LittleEndian::Get16(value));
@@ -1150,7 +1171,7 @@ MatterThermostatClusterServerPreAttributeChangedCallback(const app::ConcreteAttr
             if (requested > MaxCoolSetpointLimit - DeadBandTemp)
                 return imcode::InvalidValue;
         }
-        break;
+        return imcode::Success;
     }
     case MinCoolSetpointLimit::Id: {
         requested = static_cast<int16_t>(chip::Encoding::LittleEndian::Get16(value));
@@ -1163,7 +1184,7 @@ MatterThermostatClusterServerPreAttributeChangedCallback(const app::ConcreteAttr
             if (requested < MinHeatSetpointLimit + DeadBandTemp)
                 return imcode::InvalidValue;
         }
-        break;
+        return imcode::Success;
     }
     case MaxCoolSetpointLimit::Id: {
         requested = static_cast<int16_t>(chip::Encoding::LittleEndian::Get16(value));
@@ -1176,7 +1197,7 @@ MatterThermostatClusterServerPreAttributeChangedCallback(const app::ConcreteAttr
             if (requested < MaxHeatSetpointLimit + DeadBandTemp)
                 return imcode::InvalidValue;
         }
-        break;
+        return imcode::Success;
     }
     case MinSetpointDeadBand::Id: {
         requested = *value;
@@ -1184,7 +1205,7 @@ MatterThermostatClusterServerPreAttributeChangedCallback(const app::ConcreteAttr
             return imcode::UnsupportedAttribute;
         if (requested < 0 || requested > 25)
             return imcode::InvalidValue;
-        break;
+        return imcode::Success;
     }
 
     case ControlSequenceOfOperation::Id: {
@@ -1192,7 +1213,7 @@ MatterThermostatClusterServerPreAttributeChangedCallback(const app::ConcreteAttr
         requestedCSO = *value;
         if (requestedCSO > to_underlying(ControlSequenceOfOperationEnum::kCoolingAndHeatingWithReheat))
             return imcode::InvalidValue;
-        break;
+        return imcode::Success;
     }
 
     case SystemMode::Id: {
@@ -1215,27 +1236,22 @@ MatterThermostatClusterServerPreAttributeChangedCallback(const app::ConcreteAttr
         case ControlSequenceOfOperationEnum::kCoolingWithReheat:
             if (RequestedSystemMode == SystemModeEnum::kHeat || RequestedSystemMode == SystemModeEnum::kEmergencyHeat)
                 return imcode::InvalidValue;
-            break;
+            else
+                return imcode::Success;
 
         case ControlSequenceOfOperationEnum::kHeatingOnly:
         case ControlSequenceOfOperationEnum::kHeatingWithReheat:
             if (RequestedSystemMode == SystemModeEnum::kCool || RequestedSystemMode == SystemModeEnum::kPrecooling)
                 return imcode::InvalidValue;
-            break;
+            else
+                return imcode::Success;
         default:
-            break;
+            return imcode::Success;
         }
-        break;
     }
     default:
-        break;
+        return imcode::Success;
     }
-    Delegate * delegate = GetDelegate(endpoint);
-    if (delegate != nullptr)
-    {
-        delegate->AttributeChanged(attributePath.mEndpointId, attributePath.mClusterId, attributePath.mAttributeId, value, size);
-    }
-    return imcode::Success;
 }
 
 bool emberAfThermostatClusterClearWeeklyScheduleCallback(app::CommandHandler * commandObj,
@@ -1309,7 +1325,7 @@ bool emberAfThermostatClusterSetActivePresetRequestCallback(
 bool validAtomicAttributes(const chip::app::Clusters::Thermostat::Commands::AtomicRequest::DecodableType & commandData)
 {
     auto attributeIdsIter = commandData.attributeRequests.begin();
-    bool requestedPresets, requestedSchedules;
+    bool requestedPresets = false, requestedSchedules = false;
     while (attributeIdsIter.Next())
     {
         auto & attributeId = attributeIdsIter.GetValue();
@@ -1317,14 +1333,14 @@ bool validAtomicAttributes(const chip::app::Clusters::Thermostat::Commands::Atom
         switch (attributeId)
         {
         case Presets::Id:
-            if (requestedPresets)
+            if (requestedPresets) // Double-requesting an attribute is invalid
             {
                 return false;
             }
             requestedPresets = true;
             break;
         case Schedules::Id:
-            if (requestedSchedules)
+            if (requestedSchedules) // Double-requesting an attribute is invalid
             {
                 return false;
             }
@@ -1334,14 +1350,25 @@ bool validAtomicAttributes(const chip::app::Clusters::Thermostat::Commands::Atom
             return false;
         }
     }
-    return true;
+    if (attributeIdsIter.GetStatus() != CHIP_NO_ERROR)
+    {
+        return false;
+    }
+    // If the atomic request doesn't contain at least one of these attributes, it's invalid
+    return (requestedPresets || requestedSchedules);
 }
 
-bool handleAtomicBegin(chip::app::CommandHandler * commandObj, const ScopedNodeId & sourceNodeId,
-                       const chip::app::ConcreteCommandPath & commandPath,
+bool handleAtomicBegin(chip::app::CommandHandler * commandObj, const chip::app::ConcreteCommandPath & commandPath,
                        const chip::app::Clusters::Thermostat::Commands::AtomicRequest::DecodableType & commandData)
 {
     EndpointId endpoint = commandPath.mEndpointId;
+
+    if (gThermostatAttrAccess.InAtomicWrite(commandObj, endpoint))
+    {
+        // This client already has an open atomic write
+        commandObj->AddStatus(commandPath, imcode::InvalidInState);
+        return true;
+    }
 
     if (!commandData.timeout.HasValue())
     {
@@ -1357,9 +1384,9 @@ bool handleAtomicBegin(chip::app::CommandHandler * commandObj, const ScopedNodeI
         return true;
     }
 
-    bool inAtomicWrite = gThermostatAttrAccess.InAtomicWrite(endpoint);
-    if (inAtomicWrite)
+    if (gThermostatAttrAccess.InAtomicWrite(endpoint))
     {
+        // Some other client has an open atomic write, return busy
         chip::app::Clusters::Thermostat::Commands::AtomicResponse::Type response;
         Globals::Structs::AtomicAttributeStatusStruct::Type attributeStatus[] = {
             { .attributeID = Presets::Id, .statusCode = static_cast<uint8_t>(imcode::Busy) },
@@ -1369,14 +1396,15 @@ bool handleAtomicBegin(chip::app::CommandHandler * commandObj, const ScopedNodeI
         response.statusCode      = static_cast<uint8_t>(imcode::Failure);
         response.attributeStatus = attributeStatus;
         commandObj->AddResponse(commandPath, response);
-        // commandObj->AddStatus(commandPath, imcode::Busy);
         return true;
     }
+
+    // This is a valid request to open an atomic write. Note that
 
     uint16_t maxTimeout = 5000;
     timeout             = std::min(timeout, maxTimeout);
 
-    ScheduleTimer(endpoint, timeout);
+    ScheduleTimer(endpoint, static_cast<System::Clock::Milliseconds16>(timeout));
     gThermostatAttrAccess.SetAtomicWrite(endpoint, true);
     gThermostatAttrAccess.SetAtomicWriteScopedNodeId(endpoint, GetSourceScopedNodeId(commandObj));
     chip::app::Clusters::Thermostat::Commands::AtomicResponse::Type response;
@@ -1385,7 +1413,7 @@ bool handleAtomicBegin(chip::app::CommandHandler * commandObj, const ScopedNodeI
         { .attributeID = Schedules::Id, .statusCode = static_cast<uint8_t>(imcode::Success) }
     };
 
-    response.statusCode      = static_cast<uint8_t>(imcode::Failure);
+    response.statusCode      = static_cast<uint8_t>(imcode::Success);
     response.attributeStatus = attributeStatus;
     response.timeout.Emplace(timeout);
     commandObj->AddResponse(commandPath, response);
@@ -1393,8 +1421,7 @@ bool handleAtomicBegin(chip::app::CommandHandler * commandObj, const ScopedNodeI
     return true;
 }
 
-bool handleAtomicCommit(chip::app::CommandHandler * commandObj, const ScopedNodeId & sourceNodeId,
-                        const chip::app::ConcreteCommandPath & commandPath,
+bool handleAtomicCommit(chip::app::CommandHandler * commandObj, const chip::app::ConcreteCommandPath & commandPath,
                         const chip::app::Clusters::Thermostat::Commands::AtomicRequest::DecodableType & commandData)
 {
     if (!validAtomicAttributes(commandData))
@@ -1403,14 +1430,8 @@ bool handleAtomicCommit(chip::app::CommandHandler * commandObj, const ScopedNode
         return true;
     }
     EndpointId endpoint = commandPath.mEndpointId;
-    bool inAtomicWrite  = gThermostatAttrAccess.InAtomicWrite(endpoint);
+    bool inAtomicWrite  = gThermostatAttrAccess.InAtomicWrite(commandObj, endpoint);
     if (!inAtomicWrite)
-    {
-        commandObj->AddStatus(commandPath, imcode::InvalidInState);
-        return true;
-    }
-
-    if (gThermostatAttrAccess.GetAtomicWriteScopedNodeId(endpoint) != sourceNodeId)
     {
         commandObj->AddStatus(commandPath, imcode::InvalidInState);
         return true;
@@ -1599,8 +1620,7 @@ bool handleAtomicCommit(chip::app::CommandHandler * commandObj, const ScopedNode
     return SendResponseAndCleanUp(delegate, endpoint, commandObj, commandPath, imcode::Success);
 }
 
-bool handleAtomicRollback(chip::app::CommandHandler * commandObj, const ScopedNodeId & sourceNodeId,
-                          const chip::app::ConcreteCommandPath & commandPath,
+bool handleAtomicRollback(chip::app::CommandHandler * commandObj, const chip::app::ConcreteCommandPath & commandPath,
                           const chip::app::Clusters::Thermostat::Commands::AtomicRequest::DecodableType & commandData)
 {
     if (!validAtomicAttributes(commandData))
@@ -1609,18 +1629,13 @@ bool handleAtomicRollback(chip::app::CommandHandler * commandObj, const ScopedNo
         return true;
     }
     EndpointId endpoint = commandPath.mEndpointId;
-    bool inAtomicWrite  = gThermostatAttrAccess.InAtomicWrite(endpoint);
+    bool inAtomicWrite  = gThermostatAttrAccess.InAtomicWrite(commandObj, endpoint);
     if (!inAtomicWrite)
     {
         commandObj->AddStatus(commandPath, imcode::InvalidInState);
         return true;
     }
 
-    if (gThermostatAttrAccess.GetAtomicWriteScopedNodeId(endpoint) != sourceNodeId)
-    {
-        commandObj->AddStatus(commandPath, imcode::InvalidInState);
-        return true;
-    }
     Delegate * delegate = GetDelegate(endpoint);
 
     if (delegate == nullptr)
@@ -1637,18 +1652,18 @@ bool emberAfThermostatClusterAtomicRequestCallback(
     const chip::app::Clusters::Thermostat::Commands::AtomicRequest::DecodableType & commandData)
 {
     auto & requestType = commandData.requestType;
-    // auto & timeout     = commandData.timeout;
 
-    ScopedNodeId sourceNodeId = GetSourceScopedNodeId(commandObj);
+    // If we've gotten this far, then the client has manage permission to call AtomicRequest, which is also the
+    // privilege necessary to write to the atomic attributes, so no need to check
 
     switch (requestType)
     {
     case Globals::AtomicRequestTypeEnum::kBeginWrite:
-        return handleAtomicBegin(commandObj, sourceNodeId, commandPath, commandData);
+        return handleAtomicBegin(commandObj, commandPath, commandData);
     case Globals::AtomicRequestTypeEnum::kCommitWrite:
-        return handleAtomicCommit(commandObj, sourceNodeId, commandPath, commandData);
+        return handleAtomicCommit(commandObj, commandPath, commandData);
     case Globals::AtomicRequestTypeEnum::kRollbackWrite:
-        return handleAtomicRollback(commandObj, sourceNodeId, commandPath, commandData);
+        return handleAtomicRollback(commandObj, commandPath, commandData);
     case Globals::AtomicRequestTypeEnum::kUnknownEnumValue:
         commandObj->AddStatus(commandPath, imcode::InvalidCommand);
         return true;
@@ -1706,13 +1721,13 @@ bool emberAfThermostatClusterSetpointRaiseLowerCallback(app::CommandHandler * co
             {
                 DesiredCoolingSetpoint = static_cast<int16_t>(CoolingSetpoint + amount * 10);
                 CoolLimit              = static_cast<int16_t>(DesiredCoolingSetpoint -
-                                                 EnforceCoolingSetpointLimits(DesiredCoolingSetpoint, aEndpointId));
+                                                              EnforceCoolingSetpointLimits(DesiredCoolingSetpoint, aEndpointId));
                 {
                     if (OccupiedHeatingSetpoint::Get(aEndpointId, &HeatingSetpoint) == imcode::Success)
                     {
                         DesiredHeatingSetpoint = static_cast<int16_t>(HeatingSetpoint + amount * 10);
                         HeatLimit              = static_cast<int16_t>(DesiredHeatingSetpoint -
-                                                         EnforceHeatingSetpointLimits(DesiredHeatingSetpoint, aEndpointId));
+                                                                      EnforceHeatingSetpointLimits(DesiredHeatingSetpoint, aEndpointId));
                         {
                             if (CoolLimit != 0 || HeatLimit != 0)
                             {

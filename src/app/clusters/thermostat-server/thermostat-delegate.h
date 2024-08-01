@@ -65,12 +65,6 @@ public:
     virtual CHIP_ERROR GetPresetAtIndex(size_t index, PresetStructWithOwnedMembers & preset) = 0;
 
     /**
-     * @brief Creates a new pending presets list.
-     *
-     */
-    virtual void BeginPendingPresetList() = 0;
-
-    /**
      * @brief Get the ActivePresetHandle attribute value.
      *
      * @param[out] activePresetHandle The MutableByteSpan to copy the active preset handle into. On success,
@@ -85,6 +79,11 @@ public:
      * @param[in] newActivePresetHandle The octet string to set the active preset handle to.
      */
     virtual CHIP_ERROR SetActivePresetHandle(const DataModel::Nullable<ByteSpan> & newActivePresetHandle) = 0;
+
+    /**
+     * @brief Copies existing presets to the pending preset list
+     */
+    virtual void InitializePendingPresets() = 0;
 
     /**
      * @brief Appends a preset to the pending presets list maintained by the delegate.
@@ -127,19 +126,6 @@ public:
      *
      */
     virtual void ClearPendingPresetList() = 0;
-
-    /**
-     * @brief Informs of a change in a non-atomic thermostat attribute
-     *
-     * @param[in] endpointId The endpoint for the thermostat cluster.
-     * @param[in] clusterId The ID of the cluster.
-     * @param[in] attributeId The ID of the attribute being updated.
-     * @param[in] value The new value of the attribute.
-     * @param[in] size The size of the new value of the attribute.
-     *
-     */
-    virtual void AttributeChanged(EndpointId endpointId, ClusterId clusterId, AttributeId attributeId, uint8_t * value,
-                                  uint16_t size) = 0;
 };
 
 } // namespace Thermostat
