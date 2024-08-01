@@ -80,7 +80,7 @@ bool RvcServiceAreaDelegate::IsSetSelectedLocationsAllowed(MutableCharSpan statu
 };
 
 bool RvcServiceAreaDelegate::IsValidSelectLocationsSet(const Commands::SelectLocations::DecodableType & req,
-                                                       SelectLocationsStatus & locationStatus, MutableCharSpan statusText)
+                                                       SelectAreasStatus & locationStatus, MutableCharSpan statusText)
 {
     // TODO IMPLEMENT
     return true;

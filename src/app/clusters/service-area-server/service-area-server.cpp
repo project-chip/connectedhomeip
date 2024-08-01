@@ -214,7 +214,7 @@ void Instance::HandleSelectLocationsCmd(HandlerContext & ctx, const Commands::Se
     ChipLogDetail(Zcl, "Service Area: HandleSelectLocationsCmd");
 
     // On receipt of this command the device SHALL respond with a SelectLocationsResponse command.
-    auto exitResponse = [ctx](SelectLocationsStatus status, CharSpan statusText) {
+    auto exitResponse = [ctx](SelectAreasStatus status, CharSpan statusText) {
         Commands::SelectLocationsResponse::Type response{
             .status     = status,
             .statusText = Optional(statusText),
@@ -236,7 +236,7 @@ void Instance::HandleSelectLocationsCmd(HandlerContext & ctx, const Commands::Se
         // the SelectLocationsResponse command's Status field SHALL indicate InvalidSet.
         if (numberOfLocations > kMaxNumSelectedLocations)
         {
-            exitResponse(SelectLocationsStatus::kInvalidSet, "invalid number of locations"_span);
+            exitResponse(SelectAreasStatus::kInvalidSet, "invalid number of locations"_span);
             return;
         }
     }
@@ -260,7 +260,7 @@ void Instance::HandleSelectLocationsCmd(HandlerContext & ctx, const Commands::Se
                 // If the Status field is set to UnsupportedLocation, the StatusText field SHALL be an empty string.
                 if (!IsSupportedLocation(aSelectedLocation))
                 {
-                    exitResponse(SelectLocationsStatus::kUnsupportedLocation, ""_span);
+                    exitResponse(SelectAreasStatus::kUnsupportedArea, ""_span);
                     return;
                 }
 
@@ -273,7 +273,7 @@ void Instance::HandleSelectLocationsCmd(HandlerContext & ctx, const Commands::Se
                         .Next(); // Since j < i and i is valid, we can safely call Next() without checking the return value.
                     if (jLocationIter.GetValue() == aSelectedLocation)
                     {
-                        exitResponse(SelectLocationsStatus::kDuplicatedLocations, ""_span);
+                        exitResponse(SelectAreasStatus::kDuplicatedAreas, ""_span);
                         return;
                     }
                     j += 1;
@@ -306,7 +306,7 @@ void Instance::HandleSelectLocationsCmd(HandlerContext & ctx, const Commands::Se
     // the StatusText field MAY be supplied with a human-readable string or include an empty string.
     if (matchesCurrentSelectedLocations)
     {
-        exitResponse(SelectLocationsStatus::kSuccess, ""_span);
+        exitResponse(SelectAreasStatus::kSuccess, ""_span);
         return;
     }
 
@@ -320,7 +320,7 @@ void Instance::HandleSelectLocationsCmd(HandlerContext & ctx, const Commands::Se
     // (note - locationStatusText to be filled out by delegated function for if return value is false)
     if (!mDelegate->IsSetSelectedLocationsAllowed(delegateStatusText))
     {
-        exitResponse(SelectLocationsStatus::kInvalidInMode, delegateStatusText);
+        exitResponse(SelectAreasStatus::kInvalidInMode, delegateStatusText);
         return;
     }
 
@@ -329,7 +329,7 @@ void Instance::HandleSelectLocationsCmd(HandlerContext & ctx, const Commands::Se
 
     // ask the device to handle SelectLocations Command
     // (note - locationStatusText to be filled out by delegated function for kInvalidInMode and InvalidSet)
-    auto locationStatus = SelectLocationsStatus::kSuccess;
+    auto locationStatus = SelectAreasStatus::kSuccess;
     if (!mDelegate->IsValidSelectLocationsSet(req, locationStatus, delegateStatusText))
     {
         exitResponse(locationStatus, delegateStatusText);
@@ -356,7 +356,7 @@ void Instance::HandleSelectLocationsCmd(HandlerContext & ctx, const Commands::Se
         NotifySelectedLocationsChanged();
     }
 
-    exitResponse(SelectLocationsStatus::kSuccess, ""_span);
+    exitResponse(SelectAreasStatus::kSuccess, ""_span);
 }
 
 void Instance::HandleSkipCurrentLocationCmd(HandlerContext & ctx)
@@ -364,7 +364,7 @@ void Instance::HandleSkipCurrentLocationCmd(HandlerContext & ctx)
     ChipLogDetail(Zcl, "Service Area: HandleSkipCurrentLocation");
 
     // On receipt of this command the device SHALL respond with a SkipCurrentLocationResponse command.
-    auto exitResponse = [ctx](SkipCurrentLocationStatus status, CharSpan statusText) {
+    auto exitResponse = [ctx](SkipAreaStatus status, CharSpan statusText) {
         Commands::SkipCurrentLocationResponse::Type response{
             .status     = status,
             .statusText = Optional(statusText),
@@ -377,7 +377,7 @@ void Instance::HandleSkipCurrentLocationCmd(HandlerContext & ctx)
     if (mDelegate->GetNumberOfSelectedLocations() == 0)
     {
         ChipLogError(Zcl, "Selected Locations attribute is null");
-        exitResponse(SkipCurrentLocationStatus::kInvalidLocationList, ""_span);
+        exitResponse(SkipAreaStatus::kInvalidAreaList, ""_span);
         return;
     }
 
@@ -386,7 +386,7 @@ void Instance::HandleSkipCurrentLocationCmd(HandlerContext & ctx)
     // description.
     if (mCurrentLocation.IsNull())
     {
-        exitResponse(SkipCurrentLocationStatus::kInvalidInMode, "Current Location attribute is null"_span);
+        exitResponse(SkipAreaStatus::kInvalidInMode, "Current Location attribute is null"_span);
         return;
     }
 
@@ -399,7 +399,7 @@ void Instance::HandleSkipCurrentLocationCmd(HandlerContext & ctx)
 
     if (!mDelegate->HandleSkipCurrentLocation(skipStatusText))
     {
-        exitResponse(SkipCurrentLocationStatus::kInvalidInMode, skipStatusText);
+        exitResponse(SkipAreaStatus::kInvalidInMode, skipStatusText);
         return;
     }
 }

@@ -91,7 +91,7 @@ public:
      * device must stop.
      */
     virtual bool IsValidSelectLocationsSet(const Commands::SelectLocations::DecodableType & req,
-                                           SelectLocationsStatus & locationStatus, MutableCharSpan statusText) = 0;
+                                           SelectAreasStatus & locationStatus, MutableCharSpan statusText) = 0;
 
     /**
      * @brief The server instance ensures that the SelectedLocations and CurrentLocation attributes are not null before

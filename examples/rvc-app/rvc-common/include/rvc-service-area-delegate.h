@@ -47,7 +47,7 @@ public:
     bool IsSetSelectedLocationsAllowed(MutableCharSpan statusText) override;
 
     bool IsValidSelectLocationsSet(const ServiceArea::Commands::SelectLocations::DecodableType & req,
-                                   ServiceArea::SelectLocationsStatus & locationStatus, MutableCharSpan statusText) override;
+                                   ServiceArea::SelectAreasStatus & locationStatus, MutableCharSpan statusText) override;
 
     bool HandleSkipCurrentLocation(MutableCharSpan skipStatusText) override;
 
