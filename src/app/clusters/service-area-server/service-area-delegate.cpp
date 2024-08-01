@@ -70,7 +70,7 @@ bool Delegate::GetProgressElementById(uint32_t aAreaId, uint32_t & listIndex, St
     // simple linear iteration to find the progress element with the desired areaID.
     while (GetProgressElementByIndex(listIndex, aProgressElement))
     {
-        if (aProgressElement.locationID == aAreaId)
+        if (aProgressElement.areaID == aAreaId)
         {
             return true;
         }

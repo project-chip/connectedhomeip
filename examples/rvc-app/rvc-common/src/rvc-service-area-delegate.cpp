@@ -360,7 +360,7 @@ bool RvcServiceAreaDelegate::GetProgressElementById(uint32_t aAreaID, uint32_t &
 
     while (listIndex < mProgressList.size())
     {
-        if (mProgressList[listIndex].locationID == aAreaID)
+        if (mProgressList[listIndex].areaID == aAreaID)
         {
             aProgressElement = mProgressList[listIndex];
             return true;
@@ -385,7 +385,7 @@ bool RvcServiceAreaDelegate::AddProgressElement(const Structs::ProgressStruct::T
         listIndex = static_cast<uint32_t>(mProgressList.size()) - 1; // new element is last in list
         return true;
     }
-    ChipLogError(Zcl, "AddProgressElement %u -progress list is already at maximum size %u", newProgressElement.locationID,
+    ChipLogError(Zcl, "AddProgressElement %u -progress list is already at maximum size %u", newProgressElement.areaID,
                  static_cast<uint32_t>(kMaxNumProgressElements));
 
     return false;
