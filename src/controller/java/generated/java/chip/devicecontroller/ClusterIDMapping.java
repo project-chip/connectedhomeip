@@ -17752,6 +17752,8 @@ public class ClusterIDMapping {
             TimedWriteBoolean(48L),
             GeneralErrorBoolean(49L),
             ClusterErrorBoolean(50L),
+            GlobalEnum(51L),
+            GlobalStruct(52L),
             Unsupported(255L),
             NullableBoolean(16384L),
             NullableBitmap8(16385L),
@@ -17787,6 +17789,8 @@ public class ClusterIDMapping {
             NullableRangeRestrictedInt16u(16424L),
             NullableRangeRestrictedInt16s(16425L),
             WriteOnlyInt8u(16426L),
+            NullableGlobalEnum(16435L),
+            NullableGlobalStruct(16436L),
             MeiInt8u(4294070017L),
             GeneratedCommandList(65528L),
             AcceptedCommandList(65529L),
@@ -17862,6 +17866,7 @@ public class ClusterIDMapping {
             TestBatchHelperRequest(22L),
             TestSecondBatchHelperRequest(23L),
             StringEchoRequest(24L),
+            GlobalEchoRequest(25L),
             TestDifferentVendorMeiRequest(4294049962L),;
             private final long id;
             Command(long id) {
@@ -18214,6 +18219,23 @@ public class ClusterIDMapping {
                     }
                     public static StringEchoRequestCommandField value(int id) throws NoSuchFieldError {
                         for (StringEchoRequestCommandField field : StringEchoRequestCommandField.values()) {
+                        if (field.getID() == id) {
+                            return field;
+                        }
+                        }
+                        throw new NoSuchFieldError();
+                    }
+                }public enum GlobalEchoRequestCommandField {Field1(0),Field2(1),;
+                    private final int id;
+                    GlobalEchoRequestCommandField(int id) {
+                        this.id = id;
+                    }
+
+                    public int getID() {
+                        return id;
+                    }
+                    public static GlobalEchoRequestCommandField value(int id) throws NoSuchFieldError {
+                        for (GlobalEchoRequestCommandField field : GlobalEchoRequestCommandField.values()) {
                         if (field.getID() == id) {
                             return field;
                         }

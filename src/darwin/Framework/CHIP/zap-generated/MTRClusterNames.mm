@@ -9159,6 +9159,14 @@ NSString * MTRAttributeNameForID(MTRClusterIDType clusterID, MTRAttributeIDType 
             result = @"ClusterErrorBoolean";
             break;
 
+        case MTRAttributeIDTypeClusterUnitTestingAttributeGlobalEnumID:
+            result = @"GlobalEnum";
+            break;
+
+        case MTRAttributeIDTypeClusterUnitTestingAttributeGlobalStructID:
+            result = @"GlobalStruct";
+            break;
+
         case MTRAttributeIDTypeClusterUnitTestingAttributeUnsupportedID:
             result = @"Unsupported";
             break;
@@ -9297,6 +9305,14 @@ NSString * MTRAttributeNameForID(MTRClusterIDType clusterID, MTRAttributeIDType 
 
         case MTRAttributeIDTypeClusterUnitTestingAttributeWriteOnlyInt8uID:
             result = @"WriteOnlyInt8u";
+            break;
+
+        case MTRAttributeIDTypeClusterUnitTestingAttributeNullableGlobalEnumID:
+            result = @"NullableGlobalEnum";
+            break;
+
+        case MTRAttributeIDTypeClusterUnitTestingAttributeNullableGlobalStructID:
+            result = @"NullableGlobalStruct";
             break;
 
         case MTRAttributeIDTypeClusterUnitTestingAttributeGeneratedCommandListID:

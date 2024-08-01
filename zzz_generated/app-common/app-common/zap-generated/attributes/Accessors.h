@@ -6959,6 +6959,14 @@ Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, bool value);
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, bool value, MarkAttributeDirty markDirty);
 } // namespace TimedWriteBoolean
 
+namespace GlobalEnum {
+Protocols::InteractionModel::Status Get(chip::EndpointId endpoint,
+                                        chip::app::Clusters::Globals::TestGlobalEnum * value); // TestGlobalEnum
+Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, chip::app::Clusters::Globals::TestGlobalEnum value);
+Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, chip::app::Clusters::Globals::TestGlobalEnum value,
+                                        MarkAttributeDirty markDirty);
+} // namespace GlobalEnum
+
 namespace Unsupported {
 Protocols::InteractionModel::Status Get(chip::EndpointId endpoint, bool * value); // boolean
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, bool value);
@@ -7363,6 +7371,21 @@ Protocols::InteractionModel::Status Get(chip::EndpointId endpoint, uint8_t * val
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint8_t value);
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint8_t value, MarkAttributeDirty markDirty);
 } // namespace WriteOnlyInt8u
+
+namespace NullableGlobalEnum {
+Protocols::InteractionModel::Status
+Get(chip::EndpointId endpoint, DataModel::Nullable<chip::app::Clusters::Globals::TestGlobalEnum> & value); // TestGlobalEnum
+Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, chip::app::Clusters::Globals::TestGlobalEnum value);
+Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, chip::app::Clusters::Globals::TestGlobalEnum value,
+                                        MarkAttributeDirty markDirty);
+Protocols::InteractionModel::Status SetNull(chip::EndpointId endpoint);
+Protocols::InteractionModel::Status SetNull(chip::EndpointId endpoint, MarkAttributeDirty markDirty);
+Protocols::InteractionModel::Status Set(chip::EndpointId endpoint,
+                                        const chip::app::DataModel::Nullable<chip::app::Clusters::Globals::TestGlobalEnum> & value);
+Protocols::InteractionModel::Status Set(chip::EndpointId endpoint,
+                                        const chip::app::DataModel::Nullable<chip::app::Clusters::Globals::TestGlobalEnum> & value,
+                                        MarkAttributeDirty markDirty);
+} // namespace NullableGlobalEnum
 
 namespace FeatureMap {
 Protocols::InteractionModel::Status Get(chip::EndpointId endpoint, uint32_t * value); // bitmap32

@@ -152,6 +152,7 @@ structs_sources = [
   "${chip_root}/src/controller/java/generated/java/chip/devicecontroller/cluster/structs/UnitTestingClusterNullablesAndOptionalsStruct.kt",
   "${chip_root}/src/controller/java/generated/java/chip/devicecontroller/cluster/structs/UnitTestingClusterSimpleStruct.kt",
   "${chip_root}/src/controller/java/generated/java/chip/devicecontroller/cluster/structs/UnitTestingClusterTestFabricScoped.kt",
+  "${chip_root}/src/controller/java/generated/java/chip/devicecontroller/cluster/structs/UnitTestingClusterTestGlobalStruct.kt",
   "${chip_root}/src/controller/java/generated/java/chip/devicecontroller/cluster/structs/UnitTestingClusterTestListStructOctet.kt",
   "${chip_root}/src/controller/java/generated/java/chip/devicecontroller/cluster/structs/UserLabelClusterLabelStruct.kt",
   "${chip_root}/src/controller/java/generated/java/chip/devicecontroller/cluster/structs/WaterHeaterModeClusterModeOptionStruct.kt",

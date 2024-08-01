@@ -6918,6 +6918,12 @@ bool emberAfUnitTestingClusterStringEchoRequestCallback(
     chip::app::CommandHandler * commandObj, const chip::app::ConcreteCommandPath & commandPath,
     const chip::app::Clusters::UnitTesting::Commands::StringEchoRequest::DecodableType & commandData);
 /**
+ * @brief Unit Testing Cluster GlobalEchoRequest Command callback (from client)
+ */
+bool emberAfUnitTestingClusterGlobalEchoRequestCallback(
+    chip::app::CommandHandler * commandObj, const chip::app::ConcreteCommandPath & commandPath,
+    const chip::app::Clusters::UnitTesting::Commands::GlobalEchoRequest::DecodableType & commandData);
+/**
  * @brief Unit Testing Cluster TestDifferentVendorMeiRequest Command callback (from client)
  */
 bool emberAfUnitTestingClusterTestDifferentVendorMeiRequestCallback(
