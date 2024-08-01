@@ -211,16 +211,16 @@ bitmap TestGlobalBitmap : bitmap32 {
   kSecondBit = 0x2;
 }
 
-struct LocationDescriptorStruct {
-  char_string<128> locationName = 0;
-  nullable int16s floorNumber = 1;
-  nullable AreaTypeTag areaType = 2;
-}
-
 struct TestGlobalStruct {
   char_string<128> name = 0;
   nullable TestGlobalBitmap myBitmap = 1;
   optional nullable TestGlobalEnum myEnum = 2;
+}
+
+struct LocationDescriptorStruct {
+  char_string<128> locationName = 0;
+  nullable int16s floorNumber = 1;
+  nullable AreaTypeTag areaType = 2;
 }
 
 /** Attributes and commands for switching devices between 'On' and 'Off' states. */
