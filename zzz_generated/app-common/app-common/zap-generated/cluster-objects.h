@@ -28483,7 +28483,7 @@ public:
     static constexpr CommandId GetCommandId() { return Commands::SelectLocationsResponse::Id; }
     static constexpr ClusterId GetClusterId() { return Clusters::ServiceArea::Id; }
 
-    SelectLocationsStatus status = static_cast<SelectLocationsStatus>(0);
+    SelectAreasStatus status = static_cast<SelectAreasStatus>(0);
     Optional<chip::CharSpan> statusText;
 
     CHIP_ERROR Encode(TLV::TLVWriter & aWriter, TLV::Tag aTag) const;
@@ -28499,7 +28499,7 @@ public:
     static constexpr CommandId GetCommandId() { return Commands::SelectLocationsResponse::Id; }
     static constexpr ClusterId GetClusterId() { return Clusters::ServiceArea::Id; }
 
-    SelectLocationsStatus status = static_cast<SelectLocationsStatus>(0);
+    SelectAreasStatus status = static_cast<SelectAreasStatus>(0);
     Optional<chip::CharSpan> statusText;
     CHIP_ERROR Decode(TLV::TLVReader & reader);
 };
@@ -28546,7 +28546,7 @@ public:
     static constexpr CommandId GetCommandId() { return Commands::SkipCurrentLocationResponse::Id; }
     static constexpr ClusterId GetClusterId() { return Clusters::ServiceArea::Id; }
 
-    SkipCurrentLocationStatus status = static_cast<SkipCurrentLocationStatus>(0);
+    SkipAreaStatus status = static_cast<SkipAreaStatus>(0);
     Optional<chip::CharSpan> statusText;
 
     CHIP_ERROR Encode(TLV::TLVWriter & aWriter, TLV::Tag aTag) const;
@@ -28562,7 +28562,7 @@ public:
     static constexpr CommandId GetCommandId() { return Commands::SkipCurrentLocationResponse::Id; }
     static constexpr ClusterId GetClusterId() { return Clusters::ServiceArea::Id; }
 
-    SkipCurrentLocationStatus status = static_cast<SkipCurrentLocationStatus>(0);
+    SkipAreaStatus status = static_cast<SkipAreaStatus>(0);
     Optional<chip::CharSpan> statusText;
     CHIP_ERROR Decode(TLV::TLVReader & reader);
 };

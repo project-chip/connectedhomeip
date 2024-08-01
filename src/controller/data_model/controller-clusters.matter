@@ -6442,17 +6442,17 @@ provisional cluster ServiceArea = 336 {
     kCompleted = 3;
   }
 
-  enum SelectLocationsStatus : enum8 {
+  enum SelectAreasStatus : enum8 {
     kSuccess = 0;
-    kUnsupportedLocation = 1;
-    kDuplicatedLocations = 2;
+    kUnsupportedArea = 1;
+    kDuplicatedAreas = 2;
     kInvalidInMode = 3;
     kInvalidSet = 4;
   }
 
-  enum SkipCurrentLocationStatus : enum8 {
+  enum SkipAreaStatus : enum8 {
     kSuccess = 0;
-    kInvalidLocationList = 1;
+    kInvalidAreaList = 1;
     kInvalidInMode = 2;
   }
 
@@ -6504,12 +6504,12 @@ provisional cluster ServiceArea = 336 {
   }
 
   response struct SelectLocationsResponse = 1 {
-    SelectLocationsStatus status = 0;
+    SelectAreasStatus status = 0;
     optional char_string<256> statusText = 1;
   }
 
   response struct SkipCurrentLocationResponse = 3 {
-    SkipCurrentLocationStatus status = 0;
+    SkipAreaStatus status = 0;
     optional char_string<256> statusText = 1;
   }
 

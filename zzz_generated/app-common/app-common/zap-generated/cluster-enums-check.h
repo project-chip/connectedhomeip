@@ -2566,14 +2566,14 @@ static auto __attribute__((unused)) EnsureKnownEnumValue(ServiceArea::Operationa
         return EnumType::kUnknownEnumValue;
     }
 }
-static auto __attribute__((unused)) EnsureKnownEnumValue(ServiceArea::SelectLocationsStatus val)
+static auto __attribute__((unused)) EnsureKnownEnumValue(ServiceArea::SelectAreasStatus val)
 {
-    using EnumType = ServiceArea::SelectLocationsStatus;
+    using EnumType = ServiceArea::SelectAreasStatus;
     switch (val)
     {
     case EnumType::kSuccess:
-    case EnumType::kUnsupportedLocation:
-    case EnumType::kDuplicatedLocations:
+    case EnumType::kUnsupportedArea:
+    case EnumType::kDuplicatedAreas:
     case EnumType::kInvalidInMode:
     case EnumType::kInvalidSet:
         return val;
@@ -2581,13 +2581,13 @@ static auto __attribute__((unused)) EnsureKnownEnumValue(ServiceArea::SelectLoca
         return EnumType::kUnknownEnumValue;
     }
 }
-static auto __attribute__((unused)) EnsureKnownEnumValue(ServiceArea::SkipCurrentLocationStatus val)
+static auto __attribute__((unused)) EnsureKnownEnumValue(ServiceArea::SkipAreaStatus val)
 {
-    using EnumType = ServiceArea::SkipCurrentLocationStatus;
+    using EnumType = ServiceArea::SkipAreaStatus;
     switch (val)
     {
     case EnumType::kSuccess:
-    case EnumType::kInvalidLocationList:
+    case EnumType::kInvalidAreaList:
     case EnumType::kInvalidInMode:
         return val;
     default:

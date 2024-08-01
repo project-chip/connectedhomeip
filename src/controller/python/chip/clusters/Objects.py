@@ -31134,10 +31134,10 @@ class ServiceArea(Cluster):
             # enum value. This specific value should never be transmitted.
             kUnknownEnumValue = 4,
 
-        class SelectLocationsStatus(MatterIntEnum):
+        class SelectAreasStatus(MatterIntEnum):
             kSuccess = 0x00
-            kUnsupportedLocation = 0x01
-            kDuplicatedLocations = 0x02
+            kUnsupportedArea = 0x01
+            kDuplicatedAreas = 0x02
             kInvalidInMode = 0x03
             kInvalidSet = 0x04
             # All received enum values that are not listed above will be mapped
@@ -31146,9 +31146,9 @@ class ServiceArea(Cluster):
             # enum value. This specific value should never be transmitted.
             kUnknownEnumValue = 5,
 
-        class SkipCurrentLocationStatus(MatterIntEnum):
+        class SkipAreaStatus(MatterIntEnum):
             kSuccess = 0x00
-            kInvalidLocationList = 0x01
+            kInvalidAreaList = 0x01
             kInvalidInMode = 0x02
             # All received enum values that are not listed above will be mapped
             # to kUnknownEnumValue. This is a helper enum value that should only
@@ -31252,11 +31252,11 @@ class ServiceArea(Cluster):
             def descriptor(cls) -> ClusterObjectDescriptor:
                 return ClusterObjectDescriptor(
                     Fields=[
-                        ClusterObjectFieldDescriptor(Label="status", Tag=0, Type=ServiceArea.Enums.SelectLocationsStatus),
+                        ClusterObjectFieldDescriptor(Label="status", Tag=0, Type=ServiceArea.Enums.SelectAreasStatus),
                         ClusterObjectFieldDescriptor(Label="statusText", Tag=1, Type=typing.Optional[str]),
                     ])
 
-            status: 'ServiceArea.Enums.SelectLocationsStatus' = 0
+            status: 'ServiceArea.Enums.SelectAreasStatus' = 0
             statusText: 'typing.Optional[str]' = None
 
         @dataclass
@@ -31283,11 +31283,11 @@ class ServiceArea(Cluster):
             def descriptor(cls) -> ClusterObjectDescriptor:
                 return ClusterObjectDescriptor(
                     Fields=[
-                        ClusterObjectFieldDescriptor(Label="status", Tag=0, Type=ServiceArea.Enums.SkipCurrentLocationStatus),
+                        ClusterObjectFieldDescriptor(Label="status", Tag=0, Type=ServiceArea.Enums.SkipAreaStatus),
                         ClusterObjectFieldDescriptor(Label="statusText", Tag=1, Type=typing.Optional[str]),
                     ])
 
-            status: 'ServiceArea.Enums.SkipCurrentLocationStatus' = 0
+            status: 'ServiceArea.Enums.SkipAreaStatus' = 0
             statusText: 'typing.Optional[str]' = None
 
     class Attributes:

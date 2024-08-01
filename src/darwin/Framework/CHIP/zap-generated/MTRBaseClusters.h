@@ -19756,18 +19756,18 @@ typedef NS_ENUM(uint8_t, MTRServiceAreaOperationalStatus) {
     MTRServiceAreaOperationalStatusCompleted MTR_PROVISIONALLY_AVAILABLE = 0x03,
 } MTR_PROVISIONALLY_AVAILABLE;
 
-typedef NS_ENUM(uint8_t, MTRServiceAreaSelectLocationsStatus) {
-    MTRServiceAreaSelectLocationsStatusSuccess MTR_PROVISIONALLY_AVAILABLE = 0x00,
-    MTRServiceAreaSelectLocationsStatusUnsupportedLocation MTR_PROVISIONALLY_AVAILABLE = 0x01,
-    MTRServiceAreaSelectLocationsStatusDuplicatedLocations MTR_PROVISIONALLY_AVAILABLE = 0x02,
-    MTRServiceAreaSelectLocationsStatusInvalidInMode MTR_PROVISIONALLY_AVAILABLE = 0x03,
-    MTRServiceAreaSelectLocationsStatusInvalidSet MTR_PROVISIONALLY_AVAILABLE = 0x04,
+typedef NS_ENUM(uint8_t, MTRServiceAreaSelectAreasStatus) {
+    MTRServiceAreaSelectAreasStatusSuccess MTR_PROVISIONALLY_AVAILABLE = 0x00,
+    MTRServiceAreaSelectAreasStatusUnsupportedArea MTR_PROVISIONALLY_AVAILABLE = 0x01,
+    MTRServiceAreaSelectAreasStatusDuplicatedAreas MTR_PROVISIONALLY_AVAILABLE = 0x02,
+    MTRServiceAreaSelectAreasStatusInvalidInMode MTR_PROVISIONALLY_AVAILABLE = 0x03,
+    MTRServiceAreaSelectAreasStatusInvalidSet MTR_PROVISIONALLY_AVAILABLE = 0x04,
 } MTR_PROVISIONALLY_AVAILABLE;
 
-typedef NS_ENUM(uint8_t, MTRServiceAreaSkipCurrentLocationStatus) {
-    MTRServiceAreaSkipCurrentLocationStatusSuccess MTR_PROVISIONALLY_AVAILABLE = 0x00,
-    MTRServiceAreaSkipCurrentLocationStatusInvalidLocationList MTR_PROVISIONALLY_AVAILABLE = 0x01,
-    MTRServiceAreaSkipCurrentLocationStatusInvalidInMode MTR_PROVISIONALLY_AVAILABLE = 0x02,
+typedef NS_ENUM(uint8_t, MTRServiceAreaSkipAreaStatus) {
+    MTRServiceAreaSkipAreaStatusSuccess MTR_PROVISIONALLY_AVAILABLE = 0x00,
+    MTRServiceAreaSkipAreaStatusInvalidAreaList MTR_PROVISIONALLY_AVAILABLE = 0x01,
+    MTRServiceAreaSkipAreaStatusInvalidInMode MTR_PROVISIONALLY_AVAILABLE = 0x02,
 } MTR_PROVISIONALLY_AVAILABLE;
 
 typedef NS_OPTIONS(uint32_t, MTRServiceAreaFeature) {
