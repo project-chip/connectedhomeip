@@ -14,6 +14,7 @@
  *    See the License for the specific language governing permissions and
  *    limitations under the License.
  */
+#include "lib/support/CodeUtils.h"
 #include <app/data-model-provider/ActionReturnStatus.h>
 
 #include <lib/support/StringBuilder.h>
@@ -22,51 +23,94 @@ namespace chip {
 namespace app {
 namespace DataModel {
 
-Protocols::InteractionModel::ClusterStatusCode ActionReturnStatus::GetStatusCode() const
+using Protocols::InteractionModel::ClusterStatusCode;
+using Protocols::InteractionModel::Status;
+
+ClusterStatusCode ActionReturnStatus::GetStatusCode() const
 {
-    // FIXME
+    if (const ClusterStatusCode * status = std::get_if<ClusterStatusCode>(&mReturnStatus))
+    {
+        return *status;
+    }
+
+    if (const CHIP_ERROR * err = std::get_if<CHIP_ERROR>(&mReturnStatus))
+    {
+        if (err->IsPart(ChipError::SdkPart::kIMClusterStatus))
+        {
+            return ClusterStatusCode::ClusterSpecificFailure(err->GetSdkCode());
+        }
+
+        if (*err == CHIP_NO_ERROR)
+        {
+            return ClusterStatusCode(Status::Success);
+        }
+
+        if (err->IsPart(ChipError::SdkPart::kIMGlobalStatus))
+        {
+            return ClusterStatusCode(static_cast<Status>(err->GetSdkCode()));
+        }
+
+        return ClusterStatusCode(Status::Failure);
+    }
+
+    // all std::variant cases exhausted
+    chipDie();
 }
 
 bool ActionReturnStatus::IsError() const
 {
+    if (const CHIP_ERROR * err = std::get_if<CHIP_ERROR>(&mReturnStatus))
+    {
+        return (*err != CHIP_NO_ERROR);
+    }
 
-    // FIXME
+    if (const ClusterStatusCode * status = std::get_if<ClusterStatusCode>(&mReturnStatus))
+    {
+        return !status->IsSuccess();
+    }
+
+    // all std::variant cases exhausted
+    chipDie();
 }
 
 bool ActionReturnStatus::IsOutOfSpaceError() const
 {
+    if (const CHIP_ERROR * err = std::get_if<CHIP_ERROR>(&mReturnStatus))
+    {
+        return (*err == CHIP_ERROR_NO_MEMORY) || (*err == CHIP_ERROR_BUFFER_TOO_SMALL);
+    }
 
-    // FIXME
+    return false;
 }
 
 void ActionReturnStatus::LogError(const char * prefix) const
 {
 
-    if (mError.has_value())
+    if (const CHIP_ERROR * err = std::get_if<CHIP_ERROR>(&mReturnStatus))
     {
-        ChipLogError(InteractionModel, "%s: %" CHIP_ERROR_FORMAT, prefix, mError->Format());
+        ChipLogError(InteractionModel, "%s: %" CHIP_ERROR_FORMAT, prefix, err->Format());
     }
 
-    if (mStatusCode.has_value())
+    if (const ClusterStatusCode * status = std::get_if<ClusterStatusCode>(&mReturnStatus))
     {
         StringBuilder<48> txt;
 
 #if CHIP_CONFIG_IM_STATUS_CODE_VERBOSE_FORMAT
-        txt.AddFormat("%s(%d)", Protocols::InteractionModel::StatusName(mStatusCode->GetStatus()),
-                      static_cast<int>(mStatusCode->GetStatus()));
+        txt.AddFormat("%s(%d)", Protocols::InteractionModel::StatusName(status->GetStatus()),
+                      static_cast<int>(status->GetStatus()));
 #else
-        if (mStatusCode->IsSuccess())
+        if (status->IsSuccess())
         {
             txt.Add("Success");
         }
         else
         {
-            txt.AddFormat("Status<%d>", static_cast<int>(mStatusCode->GetStatus()));
+            txt.AddFormat("Status<%d>", static_cast<int>(status->GetStatus()));
         }
 #endif
 
-        chip::Optional<ClusterStatus> clusterCode = mStatusCode->GetClusterSpecificCode();
-        if (mStatusCode.has_value())
+        chip::Optional<ClusterStatus> clusterCode = status->GetClusterSpecificCode();
+        if (clusterCode.HasValue())
         {
             txt.AddFormat(", Code %d", static_cast<int>(clusterCode.Value()));
         }
@@ -74,11 +118,8 @@ void ActionReturnStatus::LogError(const char * prefix) const
         ChipLogError(InteractionModel, "%s: %s", prefix, txt.c_str());
     }
 
-    if (!mError.has_value() && !mStatusCode.has_value())
-    {
-        // This should be impossible - we enforce this in constructors ...
-        ChipLogError(InteractionModel, "%s: Unknown/Invalid action return status", prefix);
-    }
+    // all std::variant cases exhausted
+    chipDie();
 }
 
 } // namespace DataModel

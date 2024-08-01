@@ -19,7 +19,7 @@
 #include <lib/core/CHIPError.h>
 #include <protocols/interaction_model/StatusCode.h>
 
-#include <optional>
+#include <variant>
 
 namespace chip {
 namespace app {
@@ -44,9 +44,9 @@ namespace DataModel {
 class ActionReturnStatus
 {
 public:
-    ActionReturnStatus(CHIP_ERROR error): mError(error) {}
-    ActionReturnStatus(Protocols::InteractionModel::Status status): mStatusCode(status) {}
-    ActionReturnStatus(Protocols::InteractionModel::ClusterStatusCode status): mStatusCode(status) {}
+    ActionReturnStatus(CHIP_ERROR error): mReturnStatus(error) {}
+    ActionReturnStatus(Protocols::InteractionModel::Status status): mReturnStatus(Protocols::InteractionModel::ClusterStatusCode(status)) {}
+    ActionReturnStatus(Protocols::InteractionModel::ClusterStatusCode status): mReturnStatus(status) {}
 
     /// Constructs a status code. Either returns the underlying code directly
     /// or converts the underlying CHIP_ERROR into a cluster status code.
@@ -67,8 +67,7 @@ public:
     void LogError(const char *prefix) const;
 
 private:
-    std::optional<CHIP_ERROR> mError;
-    std::optional<Protocols::InteractionModel::ClusterStatusCode> mStatusCode;
+    std::variant<CHIP_ERROR, Protocols::InteractionModel::ClusterStatusCode> mReturnStatus;
 };
 
 } // namespace DataModel
