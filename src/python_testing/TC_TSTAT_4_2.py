@@ -117,7 +117,7 @@ class TC_TSTAT_4_2(MatterBaseTest):
             TestStep("1", "Commissioning, already done",
                      is_commissioning=True),
             TestStep("2", "TH writes to the Presets attribute without calling the StartPresetsSchedulesEditRequest command",
-                     "Verify that we get an INVALID_IN_STATE error since the client didn't send a request to edit the presets by calling StartPresetsSchedulesEditRequest command."),
+                     " Verify that the write request returns INVALID_IN_STATE error since the client didn't send a request to edit the presets by calling StartPresetsSchedulesEditRequest command."),
             TestStep("3", "TH writes to the Presets attribute after calling the StartPresetsSchedulesEditRequest command but doesn't call CommitPresetsSchedulesRequest to commit",
                      "Verify that the Presets attribute was not updated since CommitPresetsSchedulesRequest command was not called."),
             TestStep("4", "TH writes to the Presets attribute after calling the StartPresetsSchedulesEditRequest command and calls CommitPresetsSchedulesRequest to commit",
