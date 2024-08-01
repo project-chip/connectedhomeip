@@ -1562,7 +1562,7 @@ tests:
 
     - label:
           "Step 37: TH sends ClearUser Command to DUT with the UserIndex as 1"
-      PICS: DRLK.S.F00 && DRLK.S.F07 && DRLK.S.C1d.Rsp
+      PICS: DRLK.S.F07 && DRLK.S.C1d.Rsp
       command: "ClearUser"
       timedInteractionTimeoutMs: 1000
       arguments:
