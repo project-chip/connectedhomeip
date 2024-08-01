@@ -14491,6 +14491,14 @@ class ChipClusters:
                     "payload": "bytes",
                 },
             },
+            0x00000019: {
+                "commandId": 0x00000019,
+                "commandName": "GlobalEchoRequest",
+                "args": {
+                    "field1": "TestGlobalStruct",
+                    "field2": "int",
+                },
+            },
             0xFFF200AA: {
                 "commandId": 0xFFF200AA,
                 "commandName": "TestDifferentVendorMeiRequest",
@@ -14829,6 +14837,20 @@ class ChipClusters:
                 "reportable": True,
                 "writable": True,
             },
+            0x00000033: {
+                "attributeName": "GlobalEnum",
+                "attributeId": 0x00000033,
+                "type": "int",
+                "reportable": True,
+                "writable": True,
+            },
+            0x00000034: {
+                "attributeName": "GlobalStruct",
+                "attributeId": 0x00000034,
+                "type": "",
+                "reportable": True,
+                "writable": True,
+            },
             0x000000FF: {
                 "attributeName": "Unsupported",
                 "attributeId": 0x000000FF,
@@ -15071,6 +15093,20 @@ class ChipClusters:
                 "attributeName": "WriteOnlyInt8u",
                 "attributeId": 0x0000402A,
                 "type": "int",
+                "reportable": True,
+                "writable": True,
+            },
+            0x00004033: {
+                "attributeName": "NullableGlobalEnum",
+                "attributeId": 0x00004033,
+                "type": "int",
+                "reportable": True,
+                "writable": True,
+            },
+            0x00004034: {
+                "attributeName": "NullableGlobalStruct",
+                "attributeId": 0x00004034,
+                "type": "",
                 "reportable": True,
                 "writable": True,
             },

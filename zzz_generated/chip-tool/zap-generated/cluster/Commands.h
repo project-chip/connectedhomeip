@@ -14243,6 +14243,7 @@ private:
 | * TestBatchHelperRequest                                            |   0x16 |
 | * TestSecondBatchHelperRequest                                      |   0x17 |
 | * StringEchoRequest                                                 |   0x18 |
+| * GlobalEchoRequest                                                 |   0x19 |
 | * TestDifferentVendorMeiRequest                                     |   0xFFF200AA|
 |------------------------------------------------------------------------------|
 | Attributes:                                                         |        |
@@ -14293,6 +14294,8 @@ private:
 | * TimedWriteBoolean                                                 | 0x0030 |
 | * GeneralErrorBoolean                                               | 0x0031 |
 | * ClusterErrorBoolean                                               | 0x0032 |
+| * GlobalEnum                                                        | 0x0033 |
+| * GlobalStruct                                                      | 0x0034 |
 | * Unsupported                                                       | 0x00FF |
 | * NullableBoolean                                                   | 0x4000 |
 | * NullableBitmap8                                                   | 0x4001 |
@@ -14328,6 +14331,8 @@ private:
 | * NullableRangeRestrictedInt16u                                     | 0x4028 |
 | * NullableRangeRestrictedInt16s                                     | 0x4029 |
 | * WriteOnlyInt8u                                                    | 0x402A |
+| * NullableGlobalEnum                                                | 0x4033 |
+| * NullableGlobalStruct                                              | 0x4034 |
 | * GeneratedCommandList                                              | 0xFFF8 |
 | * AcceptedCommandList                                               | 0xFFF9 |
 | * EventList                                                         | 0xFFFA |
@@ -15342,6 +15347,46 @@ public:
 
 private:
     chip::app::Clusters::UnitTesting::Commands::StringEchoRequest::Type mRequest;
+};
+
+/*
+ * Command GlobalEchoRequest
+ */
+class UnitTestingGlobalEchoRequest : public ClusterCommand
+{
+public:
+    UnitTestingGlobalEchoRequest(CredentialIssuerCommands * credsIssuerConfig) :
+        ClusterCommand("global-echo-request", credsIssuerConfig), mComplex_Field1(&mRequest.field1)
+    {
+        AddArgument("Field1", &mComplex_Field1);
+        AddArgument("Field2", 0, UINT8_MAX, &mRequest.field2);
+        ClusterCommand::AddArguments();
+    }
+
+    CHIP_ERROR SendCommand(chip::DeviceProxy * device, std::vector<chip::EndpointId> endpointIds) override
+    {
+        constexpr chip::ClusterId clusterId = chip::app::Clusters::UnitTesting::Id;
+        constexpr chip::CommandId commandId = chip::app::Clusters::UnitTesting::Commands::GlobalEchoRequest::Id;
+
+        ChipLogProgress(chipTool, "Sending cluster (0x%08" PRIX32 ") command (0x%08" PRIX32 ") on endpoint %u", clusterId,
+                        commandId, endpointIds.at(0));
+        return ClusterCommand::SendCommand(device, endpointIds.at(0), clusterId, commandId, mRequest);
+    }
+
+    CHIP_ERROR SendGroupCommand(chip::GroupId groupId, chip::FabricIndex fabricIndex) override
+    {
+        constexpr chip::ClusterId clusterId = chip::app::Clusters::UnitTesting::Id;
+        constexpr chip::CommandId commandId = chip::app::Clusters::UnitTesting::Commands::GlobalEchoRequest::Id;
+
+        ChipLogProgress(chipTool, "Sending cluster (0x%08" PRIX32 ") command (0x%08" PRIX32 ") on Group %u", clusterId, commandId,
+                        groupId);
+
+        return ClusterCommand::SendGroupCommand(groupId, fabricIndex, clusterId, commandId, mRequest);
+    }
+
+private:
+    chip::app::Clusters::UnitTesting::Commands::GlobalEchoRequest::Type mRequest;
+    TypedComplexArgument<chip::app::Clusters::Globals::Structs::TestGlobalStruct::Type> mComplex_Field1;
 };
 
 /*
@@ -27673,6 +27718,7 @@ void registerClusterUnitTesting(Commands & commands, CredentialIssuerCommands * 
         make_unique<UnitTestingTestBatchHelperRequest>(credsIssuerConfig),                  //
         make_unique<UnitTestingTestSecondBatchHelperRequest>(credsIssuerConfig),            //
         make_unique<UnitTestingStringEchoRequest>(credsIssuerConfig),                       //
+        make_unique<UnitTestingGlobalEchoRequest>(credsIssuerConfig),                       //
         make_unique<UnitTestingTestDifferentVendorMeiRequest>(credsIssuerConfig),           //
         //
         // Attributes
@@ -27726,6 +27772,8 @@ void registerClusterUnitTesting(Commands & commands, CredentialIssuerCommands * 
         make_unique<ReadAttribute>(Id, "timed-write-boolean", Attributes::TimedWriteBoolean::Id, credsIssuerConfig),         //
         make_unique<ReadAttribute>(Id, "general-error-boolean", Attributes::GeneralErrorBoolean::Id, credsIssuerConfig),     //
         make_unique<ReadAttribute>(Id, "cluster-error-boolean", Attributes::ClusterErrorBoolean::Id, credsIssuerConfig),     //
+        make_unique<ReadAttribute>(Id, "global-enum", Attributes::GlobalEnum::Id, credsIssuerConfig),                        //
+        make_unique<ReadAttribute>(Id, "global-struct", Attributes::GlobalStruct::Id, credsIssuerConfig),                    //
         make_unique<ReadAttribute>(Id, "unsupported", Attributes::Unsupported::Id, credsIssuerConfig),                       //
         make_unique<ReadAttribute>(Id, "nullable-boolean", Attributes::NullableBoolean::Id, credsIssuerConfig),              //
         make_unique<ReadAttribute>(Id, "nullable-bitmap8", Attributes::NullableBitmap8::Id, credsIssuerConfig),              //
@@ -27765,6 +27813,8 @@ void registerClusterUnitTesting(Commands & commands, CredentialIssuerCommands * 
         make_unique<ReadAttribute>(Id, "nullable-range-restricted-int16s", Attributes::NullableRangeRestrictedInt16s::Id,
                                    credsIssuerConfig),                                                                     //
         make_unique<ReadAttribute>(Id, "write-only-int8u", Attributes::WriteOnlyInt8u::Id, credsIssuerConfig),             //
+        make_unique<ReadAttribute>(Id, "nullable-global-enum", Attributes::NullableGlobalEnum::Id, credsIssuerConfig),     //
+        make_unique<ReadAttribute>(Id, "nullable-global-struct", Attributes::NullableGlobalStruct::Id, credsIssuerConfig), //
         make_unique<ReadAttribute>(Id, "generated-command-list", Attributes::GeneratedCommandList::Id, credsIssuerConfig), //
         make_unique<ReadAttribute>(Id, "accepted-command-list", Attributes::AcceptedCommandList::Id, credsIssuerConfig),   //
         make_unique<ReadAttribute>(Id, "event-list", Attributes::EventList::Id, credsIssuerConfig),                        //
@@ -27873,6 +27923,10 @@ void registerClusterUnitTesting(Commands & commands, CredentialIssuerCommands * 
                                           WriteCommandType::kWrite, credsIssuerConfig), //
         make_unique<WriteAttribute<bool>>(Id, "cluster-error-boolean", 0, 1, Attributes::ClusterErrorBoolean::Id,
                                           WriteCommandType::kWrite, credsIssuerConfig), //
+        make_unique<WriteAttribute<chip::app::Clusters::Globals::TestGlobalEnum>>(
+            Id, "global-enum", 0, UINT8_MAX, Attributes::GlobalEnum::Id, WriteCommandType::kWrite, credsIssuerConfig), //
+        make_unique<WriteAttributeAsComplex<chip::app::Clusters::Globals::Structs::TestGlobalStruct::Type>>(
+            Id, "global-struct", Attributes::GlobalStruct::Id, WriteCommandType::kWrite, credsIssuerConfig), //
         make_unique<WriteAttribute<bool>>(Id, "unsupported", 0, 1, Attributes::Unsupported::Id, WriteCommandType::kWrite,
                                           credsIssuerConfig), //
         make_unique<WriteAttribute<chip::app::DataModel::Nullable<bool>>>(
@@ -27966,6 +28020,12 @@ void registerClusterUnitTesting(Commands & commands, CredentialIssuerCommands * 
             WriteCommandType::kWrite, credsIssuerConfig), //
         make_unique<WriteAttribute<uint8_t>>(Id, "write-only-int8u", 0, UINT8_MAX, Attributes::WriteOnlyInt8u::Id,
                                              WriteCommandType::kWrite, credsIssuerConfig), //
+        make_unique<WriteAttribute<chip::app::DataModel::Nullable<chip::app::Clusters::Globals::TestGlobalEnum>>>(
+            Id, "nullable-global-enum", 0, UINT8_MAX, Attributes::NullableGlobalEnum::Id, WriteCommandType::kWrite,
+            credsIssuerConfig), //
+        make_unique<
+            WriteAttributeAsComplex<chip::app::DataModel::Nullable<chip::app::Clusters::Globals::Structs::TestGlobalStruct::Type>>>(
+            Id, "nullable-global-struct", Attributes::NullableGlobalStruct::Id, WriteCommandType::kWrite, credsIssuerConfig), //
         make_unique<WriteAttributeAsComplex<chip::app::DataModel::List<const chip::CommandId>>>(
             Id, "generated-command-list", Attributes::GeneratedCommandList::Id, WriteCommandType::kForceWrite,
             credsIssuerConfig), //
@@ -28031,6 +28091,8 @@ void registerClusterUnitTesting(Commands & commands, CredentialIssuerCommands * 
         make_unique<SubscribeAttribute>(Id, "timed-write-boolean", Attributes::TimedWriteBoolean::Id, credsIssuerConfig),         //
         make_unique<SubscribeAttribute>(Id, "general-error-boolean", Attributes::GeneralErrorBoolean::Id, credsIssuerConfig),     //
         make_unique<SubscribeAttribute>(Id, "cluster-error-boolean", Attributes::ClusterErrorBoolean::Id, credsIssuerConfig),     //
+        make_unique<SubscribeAttribute>(Id, "global-enum", Attributes::GlobalEnum::Id, credsIssuerConfig),                        //
+        make_unique<SubscribeAttribute>(Id, "global-struct", Attributes::GlobalStruct::Id, credsIssuerConfig),                    //
         make_unique<SubscribeAttribute>(Id, "unsupported", Attributes::Unsupported::Id, credsIssuerConfig),                       //
         make_unique<SubscribeAttribute>(Id, "nullable-boolean", Attributes::NullableBoolean::Id, credsIssuerConfig),              //
         make_unique<SubscribeAttribute>(Id, "nullable-bitmap8", Attributes::NullableBitmap8::Id, credsIssuerConfig),              //
@@ -28070,6 +28132,8 @@ void registerClusterUnitTesting(Commands & commands, CredentialIssuerCommands * 
         make_unique<SubscribeAttribute>(Id, "nullable-range-restricted-int16s", Attributes::NullableRangeRestrictedInt16s::Id,
                                         credsIssuerConfig),                                                                     //
         make_unique<SubscribeAttribute>(Id, "write-only-int8u", Attributes::WriteOnlyInt8u::Id, credsIssuerConfig),             //
+        make_unique<SubscribeAttribute>(Id, "nullable-global-enum", Attributes::NullableGlobalEnum::Id, credsIssuerConfig),     //
+        make_unique<SubscribeAttribute>(Id, "nullable-global-struct", Attributes::NullableGlobalStruct::Id, credsIssuerConfig), //
         make_unique<SubscribeAttribute>(Id, "generated-command-list", Attributes::GeneratedCommandList::Id, credsIssuerConfig), //
         make_unique<SubscribeAttribute>(Id, "accepted-command-list", Attributes::AcceptedCommandList::Id, credsIssuerConfig),   //
         make_unique<SubscribeAttribute>(Id, "event-list", Attributes::EventList::Id, credsIssuerConfig),                        //

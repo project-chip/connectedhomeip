@@ -9695,29 +9695,38 @@
           - WaterHeaterMode
           - WiFiNetworkManagement
       attributes:
-          OccupancySensing:
-              # Targeting 1.4
-              - HoldTime
-              - HoldTimeLimits
           GeneralCommissioning:
               # Targeting 1.4
               - TCAcceptedVersion
               - TCMinRequiredVersion
               - TCAcknowledgements
               - TCAcknowledgementsRequired
+          OccupancySensing:
+              # Targeting 1.4
+              - HoldTime
+              - HoldTimeLimits
+          UnitTesting:
+              # Ideally none of UnitTesting would be exposed as public API, but
+              # for now just start doing that for new additions to it.
+              - GlobalEnum
+              - GlobalStruct
+              - NullableGlobalEnum
+              - NullableGlobalStruct
       commands:
           BridgedDeviceBasicInformation:
               # Targeting 1.4
               - KeepActive
-          UnitTesting:
-              # Ideally none of UnitTesting would be exposed as public API, but
-              # for now just start doing that for new additions to it.
-              - StringEchoRequest
-              - StringEchoResponse
           GeneralCommissioning:
               # Targeting 1.4
               - SetTCAcknowledgements
               - SetTCAcknowledgementsResponse
+          UnitTesting:
+              # Ideally none of UnitTesting would be exposed as public API, but
+              # for now just start doing that for new additions to it.
+              - GlobalEchoRequest
+              - GlobalEchoResponse
+              - StringEchoRequest
+              - StringEchoResponse
       structs:
           Globals:
               # Test-only value
@@ -9725,6 +9734,14 @@
           OccupancySensing:
               # Targeting 1.4
               - HoldTimeLimitsStruct
+      struct fields:
+          UnitTesting:
+              # Ideally none of UnitTesting would be exposed as public API, but
+              # for now just start doing that for new additions to it.
+              SimpleStruct:
+                  - i
+              NestedStruct:
+                  - d
       events:
           BridgedDeviceBasicInformation:
               # Targeting 1.4
@@ -9744,10 +9761,10 @@
           BridgedDeviceBasicInformation:
               # Targeting 1.4
               - Feature
-          OccupancySensing:
+          GeneralCommissioning:
               # Targeting 1.4
               - Feature
-          GeneralCommissioning:
+          OccupancySensing:
               # Targeting 1.4
               - Feature
       bitmap values:
