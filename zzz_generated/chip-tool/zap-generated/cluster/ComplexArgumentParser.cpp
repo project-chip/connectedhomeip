@@ -4061,14 +4061,13 @@ CHIP_ERROR ComplexArgumentParser::Setup(const char * label,
     // Copy to track which members we already processed.
     Json::Value valueCopy(value);
 
-    ReturnErrorOnFailure(
-        ComplexArgumentParser::EnsureMemberExist("ProgressStruct.locationID", "locationID", value.isMember("locationID")));
+    ReturnErrorOnFailure(ComplexArgumentParser::EnsureMemberExist("ProgressStruct.areaID", "areaID", value.isMember("areaID")));
     ReturnErrorOnFailure(ComplexArgumentParser::EnsureMemberExist("ProgressStruct.status", "status", value.isMember("status")));
 
     char labelWithMember[kMaxLabelLength];
-    snprintf(labelWithMember, sizeof(labelWithMember), "%s.%s", label, "locationID");
-    ReturnErrorOnFailure(ComplexArgumentParser::Setup(labelWithMember, request.locationID, value["locationID"]));
-    valueCopy.removeMember("locationID");
+    snprintf(labelWithMember, sizeof(labelWithMember), "%s.%s", label, "areaID");
+    ReturnErrorOnFailure(ComplexArgumentParser::Setup(labelWithMember, request.areaID, value["areaID"]));
+    valueCopy.removeMember("areaID");
 
     snprintf(labelWithMember, sizeof(labelWithMember), "%s.%s", label, "status");
     ReturnErrorOnFailure(ComplexArgumentParser::Setup(labelWithMember, request.status, value["status"]));
@@ -4094,7 +4093,7 @@ CHIP_ERROR ComplexArgumentParser::Setup(const char * label,
 
 void ComplexArgumentParser::Finalize(chip::app::Clusters::ServiceArea::Structs::ProgressStruct::Type & request)
 {
-    ComplexArgumentParser::Finalize(request.locationID);
+    ComplexArgumentParser::Finalize(request.areaID);
     ComplexArgumentParser::Finalize(request.status);
     ComplexArgumentParser::Finalize(request.totalOperationalTime);
     ComplexArgumentParser::Finalize(request.estimatedTime);

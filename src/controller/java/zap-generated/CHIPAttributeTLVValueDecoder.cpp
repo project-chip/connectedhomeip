@@ -28951,13 +28951,13 @@ jobject DecodeAttributeValue(const app::ConcreteAttributePath & aPath, TLV::TLVR
                 {
                     auto & entry_1 = iter_value_1.GetValue();
                     jobject newElement_1;
-                    jobject newElement_1_locationID;
-                    std::string newElement_1_locationIDClassName     = "java/lang/Long";
-                    std::string newElement_1_locationIDCtorSignature = "(J)V";
-                    jlong jninewElement_1_locationID                 = static_cast<jlong>(entry_1.locationID);
-                    chip::JniReferences::GetInstance().CreateBoxedObject<jlong>(
-                        newElement_1_locationIDClassName.c_str(), newElement_1_locationIDCtorSignature.c_str(),
-                        jninewElement_1_locationID, newElement_1_locationID);
+                    jobject newElement_1_areaID;
+                    std::string newElement_1_areaIDClassName     = "java/lang/Long";
+                    std::string newElement_1_areaIDCtorSignature = "(J)V";
+                    jlong jninewElement_1_areaID                 = static_cast<jlong>(entry_1.areaID);
+                    chip::JniReferences::GetInstance().CreateBoxedObject<jlong>(newElement_1_areaIDClassName.c_str(),
+                                                                                newElement_1_areaIDCtorSignature.c_str(),
+                                                                                jninewElement_1_areaID, newElement_1_areaID);
                     jobject newElement_1_status;
                     std::string newElement_1_statusClassName     = "java/lang/Integer";
                     std::string newElement_1_statusCtorSignature = "(I)V";
@@ -29040,7 +29040,7 @@ jobject DecodeAttributeValue(const app::ConcreteAttributePath & aPath, TLV::TLVR
                     }
 
                     newElement_1 =
-                        env->NewObject(progressStructStructClass_2, progressStructStructCtor_2, newElement_1_locationID,
+                        env->NewObject(progressStructStructClass_2, progressStructStructCtor_2, newElement_1_areaID,
                                        newElement_1_status, newElement_1_totalOperationalTime, newElement_1_estimatedTime);
                     chip::JniReferences::GetInstance().AddToList(value, newElement_1);
                 }

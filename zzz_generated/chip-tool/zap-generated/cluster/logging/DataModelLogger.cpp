@@ -3593,10 +3593,10 @@ CHIP_ERROR DataModelLogger::LogValue(const char * label, size_t indent,
 {
     DataModelLogger::LogString(label, indent, "{");
     {
-        CHIP_ERROR err = LogValue("LocationID", indent + 1, value.locationID);
+        CHIP_ERROR err = LogValue("AreaID", indent + 1, value.areaID);
         if (err != CHIP_NO_ERROR)
         {
-            DataModelLogger::LogString(indent + 1, "Struct truncated due to invalid value for 'LocationID'");
+            DataModelLogger::LogString(indent + 1, "Struct truncated due to invalid value for 'AreaID'");
             return err;
         }
     }

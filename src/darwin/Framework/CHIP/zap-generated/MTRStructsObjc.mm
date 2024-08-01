@@ -6714,7 +6714,7 @@ NS_ASSUME_NONNULL_BEGIN
 {
     if (self = [super init]) {
 
-        _locationID = @(0);
+        _areaID = @(0);
 
         _status = @(0);
 
@@ -6729,7 +6729,7 @@ NS_ASSUME_NONNULL_BEGIN
 {
     auto other = [[MTRServiceAreaClusterProgressStruct alloc] init];
 
-    other.locationID = self.locationID;
+    other.areaID = self.areaID;
     other.status = self.status;
     other.totalOperationalTime = self.totalOperationalTime;
     other.estimatedTime = self.estimatedTime;
@@ -6739,7 +6739,7 @@ NS_ASSUME_NONNULL_BEGIN
 
 - (NSString *)description
 {
-    NSString * descriptionString = [NSString stringWithFormat:@"<%@: locationID:%@; status:%@; totalOperationalTime:%@; estimatedTime:%@; >", NSStringFromClass([self class]), _locationID, _status, _totalOperationalTime, _estimatedTime];
+    NSString * descriptionString = [NSString stringWithFormat:@"<%@: areaID:%@; status:%@; totalOperationalTime:%@; estimatedTime:%@; >", NSStringFromClass([self class]), _areaID, _status, _totalOperationalTime, _estimatedTime];
     return descriptionString;
 }
 

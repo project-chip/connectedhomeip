@@ -20456,7 +20456,7 @@ namespace ProgressStruct {
 CHIP_ERROR Type::Encode(TLV::TLVWriter & aWriter, TLV::Tag aTag) const
 {
     DataModel::WrappedStructEncoder encoder{ aWriter, aTag };
-    encoder.Encode(to_underlying(Fields::kLocationID), locationID);
+    encoder.Encode(to_underlying(Fields::kAreaID), areaID);
     encoder.Encode(to_underlying(Fields::kStatus), status);
     encoder.Encode(to_underlying(Fields::kTotalOperationalTime), totalOperationalTime);
     encoder.Encode(to_underlying(Fields::kEstimatedTime), estimatedTime);
@@ -20477,9 +20477,9 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
         CHIP_ERROR err              = CHIP_NO_ERROR;
         const uint8_t __context_tag = std::get<uint8_t>(__element);
 
-        if (__context_tag == to_underlying(Fields::kLocationID))
+        if (__context_tag == to_underlying(Fields::kAreaID))
         {
-            err = DataModel::Decode(reader, locationID);
+            err = DataModel::Decode(reader, areaID);
         }
         else if (__context_tag == to_underlying(Fields::kStatus))
         {

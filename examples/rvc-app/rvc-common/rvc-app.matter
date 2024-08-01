@@ -1459,7 +1459,7 @@ provisional cluster ServiceArea = 336 {
   }
 
   struct ProgressStruct {
-    int32u locationID = 0;
+    int32u areaID = 0;
     OperationalStatusEnum status = 1;
     optional nullable elapsed_s totalOperationalTime = 2;
     optional nullable elapsed_s estimatedTime = 3;

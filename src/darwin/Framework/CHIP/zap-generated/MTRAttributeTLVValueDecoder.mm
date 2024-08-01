@@ -11349,7 +11349,7 @@ static id _Nullable DecodeAttributeValueForServiceAreaCluster(AttributeId aAttri
                     auto & entry_1 = iter_1.GetValue();
                     MTRServiceAreaClusterProgressStruct * newElement_1;
                     newElement_1 = [MTRServiceAreaClusterProgressStruct new];
-                    newElement_1.locationID = [NSNumber numberWithUnsignedInt:entry_1.locationID];
+                    newElement_1.areaID = [NSNumber numberWithUnsignedInt:entry_1.areaID];
                     newElement_1.status = [NSNumber numberWithUnsignedChar:chip::to_underlying(entry_1.status)];
                     if (entry_1.totalOperationalTime.HasValue()) {
                         if (entry_1.totalOperationalTime.Value().IsNull()) {

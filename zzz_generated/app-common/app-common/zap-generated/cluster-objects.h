@@ -28385,7 +28385,7 @@ using DecodableType = Type;
 namespace ProgressStruct {
 enum class Fields : uint8_t
 {
-    kLocationID           = 0,
+    kAreaID               = 0,
     kStatus               = 1,
     kTotalOperationalTime = 2,
     kEstimatedTime        = 3,
@@ -28394,7 +28394,7 @@ enum class Fields : uint8_t
 struct Type
 {
 public:
-    uint32_t locationID          = static_cast<uint32_t>(0);
+    uint32_t areaID              = static_cast<uint32_t>(0);
     OperationalStatusEnum status = static_cast<OperationalStatusEnum>(0);
     Optional<DataModel::Nullable<uint32_t>> totalOperationalTime;
     Optional<DataModel::Nullable<uint32_t>> estimatedTime;
