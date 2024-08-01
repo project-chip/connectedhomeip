@@ -54,7 +54,7 @@ CHIP_ERROR RvcServiceAreaDelegate::Init()
                                         DataModel::Nullable<int16_t>(-1),
                                         DataModel::Nullable<Globals::AreaTypeTag>(Globals::AreaTypeTag::kPlayRoom),
                                         DataModel::Nullable<Globals::LandmarkTag>(Globals::LandmarkTag::kBackDoor),
-                                        DataModel::Nullable<Globals::PositionTag>(Globals::PositionTag::kNextTo),
+                                        DataModel::Nullable<Globals::PositionTag>(Globals::PositionTag::kLeft),
                                         DataModel::Nullable<Globals::FloorSurfaceTag>(Globals::FloorSurfaceTag::kConcrete));
 
     // Location D has null values for all HomeLocationStruct fields, Map YY
@@ -62,7 +62,7 @@ CHIP_ERROR RvcServiceAreaDelegate::Init()
                                         "My Location D"_span, DataModel::Nullable<int16_t>(),
                                         DataModel::Nullable<Globals::AreaTypeTag>(),
                                         DataModel::Nullable<Globals::LandmarkTag>(Globals::LandmarkTag::kCouch),
-                                        DataModel::Nullable<Globals::PositionTag>(Globals::PositionTag::kNextTo),
+                                        DataModel::Nullable<Globals::PositionTag>(Globals::PositionTag::kLeft),
                                         DataModel::Nullable<Globals::FloorSurfaceTag>(Globals::FloorSurfaceTag::kHardwood));
 
     GetInstance()->SetCurrentLocation(supportedLocationId_C);
