@@ -117,7 +117,7 @@ class TC_OCC_2_2(MatterBaseTest):
 
         for sensor_bit, feature_bit, name in must_match_bits:
             asserts.assert_equal(
-                (occupancy_sensor_bitmap_dut & sensor_bit) != 0,
+                (occupancy_sensor_type_bitmap_dut & sensor_bit) != 0,
                 (feature_map & feature_bit) != 0,
                 f"Feature bit and sensor bitmap must be equal for {name}"
             )
