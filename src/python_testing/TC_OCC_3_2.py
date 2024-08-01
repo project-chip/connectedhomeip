@@ -181,24 +181,24 @@ class TC_OCC_3_2(MatterBaseTest):
             logging.info("No PIR timing attribute supports. Skip this test cases, 5b, 5c, 5d")
             self.skip_step("5b")
             self.skip_test("5c")
-            self.skip_step("5d")       
-        else: 
+            self.skip_step("5d")
+        else:
             self.step("5b")
             if attributes.PIROccupiedToUnoccupiedDelay.attribute_id in attribute_list:
                 initial_dut = await self.read_occ_attribute_expect_success(endpoint=endpoint, attribute=attributes.PIROccupiedToUnoccupiedDelay)
-    
+
             else:
                 logging.info("No PIROccupiedToUnoccupiedDelay attribute supports. Terminate this test case")
-    
+
             self.step("5c")
             # write the new attribute value
             diff_val = 11
             await ChipDeviceCtrl.WriteAttribute(node_id, [(endpoint, attributes.PIROccupiedToUnoccupiedDelay(diff_val))])
-    
+
             self.step("5d")
             self._await_sequence_of_reports(report_queue=attrib_listener.attribute_queue, endpoint_id=endpoint_id, attribute=cluster.Attributes.PIROccupiedToUnoccupiedDelay, sequence=[
                                             initial_dut, diff_val], timeout_sec=post_prompt_settle_delay_seconds)
-  
+
         self.step("6a")
         if (occupancy_sensor_type_bitmap_dut & Clusters.OccupancySensing.Enums.OccupancySensorTypeEnum.kUltrasonic) == 0:
             logging.info("No Ultrasonic timing attribute supports. Skip this test cases, 6b, 6c, 6d")
@@ -209,15 +209,15 @@ class TC_OCC_3_2(MatterBaseTest):
             self.step("6b")
             if attributes.UltrasonicOccupiedToUnoccupiedDelay.attribute_id in attribute_list:
                 initial_dut = await self.read_occ_attribute_expect_success(endpoint=endpoint, attribute=attributes.UltrasonicOccupiedToUnoccupiedDelay)
-    
+
             else:
                 logging.info("No UltrasonicOccupiedToUnoccupiedDelay attribute supports. Skip this test case")
-    
+
             self.step("6c")
             # write the new attribute value
             diff_val = 14
             await ChipDeviceCtrl.WriteAttribute(node_id, [(endpoint, attributes.UltrasonicOccupiedToUnoccupiedDelay(diff_val))])
-    
+
             self.step("6d")
             self._await_sequence_of_reports(report_queue=attrib_listener.attribute_queue, endpoint_id=endpoint_id, attribute=cluster.Attributes.UltrasonicOccupiedToUnoccupiedDelay, sequence=[
                                             initial_dut, diff_val], timeout_sec=post_prompt_settle_delay_seconds)
