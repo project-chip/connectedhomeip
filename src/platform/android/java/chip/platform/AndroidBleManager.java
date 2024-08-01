@@ -89,6 +89,7 @@ public class AndroidBleManager implements BleManager {
   private static final int MSG_BLE_SCAN = 0;
   private static final int MSG_BLE_CONNECT = 1;
   private static final int MSG_BLE_CONNECT_SUCCESS = 2;
+  private static final int MSG_BLE_CONNECT_RETRY = 3;
   private static final int MSG_BLE_FAIL = 99;
 
   private static final int BLE_TIMEOUT_MS = 10000;
@@ -501,7 +502,10 @@ public class AndroidBleManager implements BleManager {
           break;
         case MSG_BLE_CONNECT:
           stopBleScan();
-          connectBLE(msg.obj);
+          connectBLE(new ConnectionGattCallback((BluetoothDevice) msg.obj));
+          break;
+        case MSG_BLE_CONNECT_RETRY:
+          connectBLE((ConnectionGattCallback) msg.obj);
           break;
         case MSG_BLE_CONNECT_SUCCESS:
           bleConnectSuccess(msg.obj);
@@ -567,20 +571,16 @@ public class AndroidBleManager implements BleManager {
     }
   }
 
-  private void connectBLE(Object bluetoothDeviceObj) {
-    if (bluetoothDeviceObj == null) {
-      return;
-    }
-
+  private void connectBLE(ConnectionGattCallback callback) {
     // Fail Timer reset.
     mConnectionHandler.removeMessages(MSG_BLE_FAIL);
     mConnectionHandler.sendEmptyMessageDelayed(MSG_BLE_FAIL, BLE_TIMEOUT_MS);
 
     @SuppressWarnings("unchecked")
-    BluetoothDevice device = (BluetoothDevice) bluetoothDeviceObj;
+    BluetoothDevice device = callback.getTargetDevice();
 
     Log.i(TAG, "Connecting");
-    BluetoothGatt gatt = device.connectGatt(mContext, false, new ConnectionGattCallback());
+    device.connectGatt(mContext, false, callback, BluetoothDevice.TRANSPORT_LE);
   }
 
   class ConnectionGattCallback extends AndroidBluetoothGattCallback {
@@ -589,6 +589,16 @@ public class AndroidBleManager implements BleManager {
     private static final int STATE_REQUEST_MTU = 3;
 
     private int mState = STATE_INIT;
+    private BluetoothDevice mDevice;
+    private int connectRetriesLeft = 3;
+
+    public ConnectionGattCallback(BluetoothDevice device) {
+      mDevice = device;
+    }
+
+    public BluetoothDevice getTargetDevice() {
+      return mDevice;
+    }
 
     @Override
     public void onConnectionStateChange(BluetoothGatt gatt, int status, int newState) {
@@ -599,9 +609,28 @@ public class AndroidBleManager implements BleManager {
         mState = STATE_DISCOVER_SERVICE;
         gatt.discoverServices();
         return;
-      } else if (newState == BluetoothProfile.STATE_DISCONNECTED) {
+      }
+
+      if (newState == BluetoothProfile.STATE_DISCONNECTED
+          && status == 133
+          && connectRetriesLeft-- > 0) {
+        Log.i(TAG, "GATT_ERROR 133. Retrying connect...");
+        Log.i(TAG, "Retries left: " + connectRetriesLeft);
+
+        gatt.close();
+
+        Message msg = mConnectionHandler.obtainMessage();
+        msg.what = MSG_BLE_CONNECT_RETRY;
+        msg.obj = (Object) this;
+        mConnectionHandler.sendMessage(msg);
+
+        return;
+      }
+
+      if (newState == BluetoothProfile.STATE_DISCONNECTED) {
         Log.i(TAG, "Services Disconnected");
       }
+
       mConnectionHandler.sendEmptyMessage(MSG_BLE_FAIL);
     }
 
