@@ -57,7 +57,7 @@ chip_test_suite("tests") {
 
   cflags = [ "-Wconversion" ]
 
-  public_deps = [ 
+  public_deps = [
     ":mock_model",
     "${chip_root}/src/app/data-model-provider:string-builder-adapters",
   ]
