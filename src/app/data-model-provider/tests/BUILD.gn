@@ -18,9 +18,8 @@ chip_test_suite("tests") {
   output_name = "libIMInterfaceTests"
 
   test_sources = [
-    "TestEventEmitting.cpp",
     "TestActionReturnStatus.cpp",
-
+    "TestEventEmitting.cpp",
   ]
 
   cflags = [ "-Wconversion" ]
