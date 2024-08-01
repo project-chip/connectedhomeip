@@ -1775,6 +1775,7 @@ internal cluster UnitTesting = 4294048773 {
     SimpleBitmap f = 5;
     single g = 6;
     double h = 7;
+    optional TestGlobalEnum i = 8;
   }
 
   fabric_scoped struct TestFabricScoped {
@@ -1807,6 +1808,7 @@ internal cluster UnitTesting = 4294048773 {
     int8u a = 0;
     boolean b = 1;
     SimpleStruct c = 2;
+    optional TestGlobalStruct d = 3;
   }
 
   struct NestedStructList {
@@ -1892,6 +1894,8 @@ internal cluster UnitTesting = 4294048773 {
   timedwrite attribute boolean timedWriteBoolean = 48;
   attribute boolean generalErrorBoolean = 49;
   attribute boolean clusterErrorBoolean = 50;
+  attribute TestGlobalEnum globalEnum = 51;
+  attribute TestGlobalStruct globalStruct = 52;
   attribute optional boolean unsupported = 255;
   attribute nullable boolean nullableBoolean = 16384;
   attribute nullable Bitmap8MaskMap nullableBitmap8 = 16385;
@@ -1927,6 +1931,8 @@ internal cluster UnitTesting = 4294048773 {
   attribute nullable int16u nullableRangeRestrictedInt16u = 16424;
   attribute nullable int16s nullableRangeRestrictedInt16s = 16425;
   attribute optional int8u writeOnlyInt8u = 16426;
+  attribute nullable TestGlobalEnum nullableGlobalEnum = 16435;
+  attribute nullable TestGlobalStruct nullableGlobalStruct = 16436;
   attribute int8u meiInt8u = 4294070017;
   readonly attribute command_id generatedCommandList[] = 65528;
   readonly attribute command_id acceptedCommandList[] = 65529;
@@ -2078,6 +2084,11 @@ internal cluster UnitTesting = 4294048773 {
     SimpleEnum arg2 = 1;
   }
 
+  response struct GlobalEchoResponse = 14 {
+    TestGlobalStruct field1 = 0;
+    TestGlobalEnum field2 = 1;
+  }
+
   request struct TestNullableOptionalRequestRequest {
     optional nullable int8u arg1 = 0;
   }
@@ -2129,6 +2140,11 @@ internal cluster UnitTesting = 4294048773 {
 
   request struct StringEchoRequestRequest {
     octet_string payload = 0;
+  }
+
+  request struct GlobalEchoRequestRequest {
+    TestGlobalStruct field1 = 0;
+    TestGlobalEnum field2 = 1;
   }
 
   request struct TestDifferentVendorMeiRequestRequest {
@@ -2214,6 +2230,9 @@ internal cluster UnitTesting = 4294048773 {
         the string back. If the string is large then it would require a session that
         supports large payloads. */
   command StringEchoRequest(StringEchoRequestRequest): StringEchoResponse = 24;
+  /** Command that takes arguments that are global structs/enums and the
+        response just echoes them back. */
+  command GlobalEchoRequest(GlobalEchoRequestRequest): GlobalEchoResponse = 25;
   /** Command having a different MEI vendor ID than the cluster. Also emits TestDifferentVendorMeiEvent. */
   command TestDifferentVendorMeiRequest(TestDifferentVendorMeiRequestRequest): TestDifferentVendorMeiResponse = 4294049962;
 }
@@ -2537,6 +2556,8 @@ endpoint 1 {
     ram      attribute timedWriteBoolean;
     callback attribute generalErrorBoolean;
     callback attribute clusterErrorBoolean;
+    ram      attribute globalEnum;
+    callback attribute globalStruct;
     ram      attribute nullableBoolean default = false;
     ram      attribute nullableBitmap8 default = 0;
     ram      attribute nullableBitmap16 default = 0;
@@ -2571,6 +2592,8 @@ endpoint 1 {
     ram      attribute nullableRangeRestrictedInt16u default = 200;
     ram      attribute nullableRangeRestrictedInt16s default = -100;
     callback attribute writeOnlyInt8u default = 0;
+    ram      attribute nullableGlobalEnum;
+    callback attribute nullableGlobalStruct;
     ram      attribute featureMap default = 0;
     ram      attribute clusterRevision default = 1;
     ram      attribute meiInt8u default = 0;
@@ -2595,6 +2618,7 @@ endpoint 1 {
     handle command TestListNestedStructListArgumentRequest;
     handle command TestListInt8UReverseRequest;
     handle command TestEnumsRequest;
+    handle command GlobalEchoResponse;
     handle command TestNullableOptionalRequest;
     handle command SimpleStructEchoRequest;
     handle command TimedInvokeRequest;
@@ -2603,6 +2627,7 @@ endpoint 1 {
     handle command TestEmitTestFabricScopedEventRequest;
     handle command TestBatchHelperRequest;
     handle command TestSecondBatchHelperRequest;
+    handle command GlobalEchoRequest;
     handle command TestDifferentVendorMeiRequest;
     handle command TestDifferentVendorMeiResponse;
   }
