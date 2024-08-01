@@ -28414,47 +28414,47 @@ using DecodableType = Type;
 namespace Commands {
 // Forward-declarations so we can reference these later.
 
-namespace SelectLocations {
+namespace SelectAreas {
 struct Type;
 struct DecodableType;
-} // namespace SelectLocations
+} // namespace SelectAreas
 
-namespace SelectLocationsResponse {
+namespace SelectAreasResponse {
 struct Type;
 struct DecodableType;
-} // namespace SelectLocationsResponse
+} // namespace SelectAreasResponse
 
-namespace SkipCurrentLocation {
+namespace SkipArea {
 struct Type;
 struct DecodableType;
-} // namespace SkipCurrentLocation
+} // namespace SkipArea
 
-namespace SkipCurrentLocationResponse {
+namespace SkipAreaResponse {
 struct Type;
 struct DecodableType;
-} // namespace SkipCurrentLocationResponse
+} // namespace SkipAreaResponse
 
 } // namespace Commands
 
 namespace Commands {
-namespace SelectLocations {
+namespace SelectAreas {
 enum class Fields : uint8_t
 {
-    kNewLocations = 0,
+    kNewAreas = 0,
 };
 
 struct Type
 {
 public:
     // Use GetCommandId instead of commandId directly to avoid naming conflict with CommandIdentification in ExecutionOfACommand
-    static constexpr CommandId GetCommandId() { return Commands::SelectLocations::Id; }
+    static constexpr CommandId GetCommandId() { return Commands::SelectAreas::Id; }
     static constexpr ClusterId GetClusterId() { return Clusters::ServiceArea::Id; }
 
-    DataModel::Nullable<DataModel::List<const uint32_t>> newLocations;
+    DataModel::Nullable<DataModel::List<const uint32_t>> newAreas;
 
     CHIP_ERROR Encode(TLV::TLVWriter & aWriter, TLV::Tag aTag) const;
 
-    using ResponseType = Clusters::ServiceArea::Commands::SelectLocationsResponse::DecodableType;
+    using ResponseType = Clusters::ServiceArea::Commands::SelectAreasResponse::DecodableType;
 
     static constexpr bool MustUseTimedInvoke() { return false; }
 };
@@ -28462,14 +28462,14 @@ public:
 struct DecodableType
 {
 public:
-    static constexpr CommandId GetCommandId() { return Commands::SelectLocations::Id; }
+    static constexpr CommandId GetCommandId() { return Commands::SelectAreas::Id; }
     static constexpr ClusterId GetClusterId() { return Clusters::ServiceArea::Id; }
 
-    DataModel::Nullable<DataModel::DecodableList<uint32_t>> newLocations;
+    DataModel::Nullable<DataModel::DecodableList<uint32_t>> newAreas;
     CHIP_ERROR Decode(TLV::TLVReader & reader);
 };
-}; // namespace SelectLocations
-namespace SelectLocationsResponse {
+}; // namespace SelectAreas
+namespace SelectAreasResponse {
 enum class Fields : uint8_t
 {
     kStatus     = 0,
@@ -28480,7 +28480,7 @@ struct Type
 {
 public:
     // Use GetCommandId instead of commandId directly to avoid naming conflict with CommandIdentification in ExecutionOfACommand
-    static constexpr CommandId GetCommandId() { return Commands::SelectLocationsResponse::Id; }
+    static constexpr CommandId GetCommandId() { return Commands::SelectAreasResponse::Id; }
     static constexpr ClusterId GetClusterId() { return Clusters::ServiceArea::Id; }
 
     SelectAreasStatus status = static_cast<SelectAreasStatus>(0);
@@ -28496,15 +28496,15 @@ public:
 struct DecodableType
 {
 public:
-    static constexpr CommandId GetCommandId() { return Commands::SelectLocationsResponse::Id; }
+    static constexpr CommandId GetCommandId() { return Commands::SelectAreasResponse::Id; }
     static constexpr ClusterId GetClusterId() { return Clusters::ServiceArea::Id; }
 
     SelectAreasStatus status = static_cast<SelectAreasStatus>(0);
     Optional<chip::CharSpan> statusText;
     CHIP_ERROR Decode(TLV::TLVReader & reader);
 };
-}; // namespace SelectLocationsResponse
-namespace SkipCurrentLocation {
+}; // namespace SelectAreasResponse
+namespace SkipArea {
 enum class Fields : uint8_t
 {
 };
@@ -28513,12 +28513,12 @@ struct Type
 {
 public:
     // Use GetCommandId instead of commandId directly to avoid naming conflict with CommandIdentification in ExecutionOfACommand
-    static constexpr CommandId GetCommandId() { return Commands::SkipCurrentLocation::Id; }
+    static constexpr CommandId GetCommandId() { return Commands::SkipArea::Id; }
     static constexpr ClusterId GetClusterId() { return Clusters::ServiceArea::Id; }
 
     CHIP_ERROR Encode(TLV::TLVWriter & aWriter, TLV::Tag aTag) const;
 
-    using ResponseType = Clusters::ServiceArea::Commands::SkipCurrentLocationResponse::DecodableType;
+    using ResponseType = Clusters::ServiceArea::Commands::SkipAreaResponse::DecodableType;
 
     static constexpr bool MustUseTimedInvoke() { return false; }
 };
@@ -28526,13 +28526,13 @@ public:
 struct DecodableType
 {
 public:
-    static constexpr CommandId GetCommandId() { return Commands::SkipCurrentLocation::Id; }
+    static constexpr CommandId GetCommandId() { return Commands::SkipArea::Id; }
     static constexpr ClusterId GetClusterId() { return Clusters::ServiceArea::Id; }
 
     CHIP_ERROR Decode(TLV::TLVReader & reader);
 };
-}; // namespace SkipCurrentLocation
-namespace SkipCurrentLocationResponse {
+}; // namespace SkipArea
+namespace SkipAreaResponse {
 enum class Fields : uint8_t
 {
     kStatus     = 0,
@@ -28543,7 +28543,7 @@ struct Type
 {
 public:
     // Use GetCommandId instead of commandId directly to avoid naming conflict with CommandIdentification in ExecutionOfACommand
-    static constexpr CommandId GetCommandId() { return Commands::SkipCurrentLocationResponse::Id; }
+    static constexpr CommandId GetCommandId() { return Commands::SkipAreaResponse::Id; }
     static constexpr ClusterId GetClusterId() { return Clusters::ServiceArea::Id; }
 
     SkipAreaStatus status = static_cast<SkipAreaStatus>(0);
@@ -28559,14 +28559,14 @@ public:
 struct DecodableType
 {
 public:
-    static constexpr CommandId GetCommandId() { return Commands::SkipCurrentLocationResponse::Id; }
+    static constexpr CommandId GetCommandId() { return Commands::SkipAreaResponse::Id; }
     static constexpr ClusterId GetClusterId() { return Clusters::ServiceArea::Id; }
 
     SkipAreaStatus status = static_cast<SkipAreaStatus>(0);
     Optional<chip::CharSpan> statusText;
     CHIP_ERROR Decode(TLV::TLVReader & reader);
 };
-}; // namespace SkipCurrentLocationResponse
+}; // namespace SkipAreaResponse
 } // namespace Commands
 
 namespace Attributes {

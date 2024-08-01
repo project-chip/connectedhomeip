@@ -21784,12 +21784,12 @@ NS_ASSUME_NONNULL_BEGIN
 }
 @end
 
-@implementation MTRServiceAreaClusterSelectLocationsParams
+@implementation MTRServiceAreaClusterSelectAreasParams
 - (instancetype)init
 {
     if (self = [super init]) {
 
-        _newLocations = nil;
+        _newAreas = nil;
         _timedInvokeTimeoutMs = nil;
         _serverSideProcessingTimeout = nil;
     }
@@ -21798,9 +21798,9 @@ NS_ASSUME_NONNULL_BEGIN
 
 - (id)copyWithZone:(NSZone * _Nullable)zone;
 {
-    auto other = [[MTRServiceAreaClusterSelectLocationsParams alloc] init];
+    auto other = [[MTRServiceAreaClusterSelectAreasParams alloc] init];
 
-    other.newLocations = self.newLocations;
+    other.newAreas = self.newAreas;
     other.timedInvokeTimeoutMs = self.timedInvokeTimeoutMs;
     other.serverSideProcessingTimeout = self.serverSideProcessingTimeout;
 
@@ -21809,41 +21809,41 @@ NS_ASSUME_NONNULL_BEGIN
 
 - (NSString *)description
 {
-    NSString * descriptionString = [NSString stringWithFormat:@"<%@: newLocations:%@; >", NSStringFromClass([self class]), _newLocations];
+    NSString * descriptionString = [NSString stringWithFormat:@"<%@: newAreas:%@; >", NSStringFromClass([self class]), _newAreas];
     return descriptionString;
 }
 
 @end
 
-@implementation MTRServiceAreaClusterSelectLocationsParams (InternalMethods)
+@implementation MTRServiceAreaClusterSelectAreasParams (InternalMethods)
 
 - (CHIP_ERROR)_encodeToTLVReader:(chip::System::PacketBufferTLVReader &)reader
 {
-    chip::app::Clusters::ServiceArea::Commands::SelectLocations::Type encodableStruct;
+    chip::app::Clusters::ServiceArea::Commands::SelectAreas::Type encodableStruct;
     ListFreer listFreer;
     {
-        if (self.newLocations == nil) {
-            encodableStruct.newLocations.SetNull();
+        if (self.newAreas == nil) {
+            encodableStruct.newAreas.SetNull();
         } else {
-            auto & nonNullValue_0 = encodableStruct.newLocations.SetNonNull();
+            auto & nonNullValue_0 = encodableStruct.newAreas.SetNonNull();
             {
                 using ListType_1 = std::remove_reference_t<decltype(nonNullValue_0)>;
                 using ListMemberType_1 = ListMemberTypeGetter<ListType_1>::Type;
-                if (self.newLocations.count != 0) {
-                    auto * listHolder_1 = new ListHolder<ListMemberType_1>(self.newLocations.count);
+                if (self.newAreas.count != 0) {
+                    auto * listHolder_1 = new ListHolder<ListMemberType_1>(self.newAreas.count);
                     if (listHolder_1 == nullptr || listHolder_1->mList == nullptr) {
                         return CHIP_ERROR_INVALID_ARGUMENT;
                     }
                     listFreer.add(listHolder_1);
-                    for (size_t i_1 = 0; i_1 < self.newLocations.count; ++i_1) {
-                        if (![self.newLocations[i_1] isKindOfClass:[NSNumber class]]) {
+                    for (size_t i_1 = 0; i_1 < self.newAreas.count; ++i_1) {
+                        if (![self.newAreas[i_1] isKindOfClass:[NSNumber class]]) {
                             // Wrong kind of value.
                             return CHIP_ERROR_INVALID_ARGUMENT;
                         }
-                        auto element_1 = (NSNumber *) self.newLocations[i_1];
+                        auto element_1 = (NSNumber *) self.newAreas[i_1];
                         listHolder_1->mList[i_1] = element_1.unsignedIntValue;
                     }
-                    nonNullValue_0 = ListType_1(listHolder_1->mList, self.newLocations.count);
+                    nonNullValue_0 = ListType_1(listHolder_1->mList, self.newAreas.count);
                 } else {
                     nonNullValue_0 = ListType_1();
                 }
@@ -21889,7 +21889,7 @@ NS_ASSUME_NONNULL_BEGIN
 }
 @end
 
-@implementation MTRServiceAreaClusterSelectLocationsResponseParams
+@implementation MTRServiceAreaClusterSelectAreasResponseParams
 - (instancetype)init
 {
     if (self = [super init]) {
@@ -21903,7 +21903,7 @@ NS_ASSUME_NONNULL_BEGIN
 
 - (id)copyWithZone:(NSZone * _Nullable)zone;
 {
-    auto other = [[MTRServiceAreaClusterSelectLocationsResponseParams alloc] init];
+    auto other = [[MTRServiceAreaClusterSelectAreasResponseParams alloc] init];
 
     other.status = self.status;
     other.statusText = self.statusText;
@@ -21924,7 +21924,7 @@ NS_ASSUME_NONNULL_BEGIN
         return nil;
     }
 
-    using DecodableType = chip::app::Clusters::ServiceArea::Commands::SelectLocationsResponse::DecodableType;
+    using DecodableType = chip::app::Clusters::ServiceArea::Commands::SelectAreasResponse::DecodableType;
     chip::System::PacketBufferHandle buffer = [MTRBaseDevice _responseDataForCommand:responseValue
                                                                            clusterID:DecodableType::GetClusterId()
                                                                            commandID:DecodableType::GetCommandId()
@@ -21959,9 +21959,9 @@ NS_ASSUME_NONNULL_BEGIN
 
 @end
 
-@implementation MTRServiceAreaClusterSelectLocationsResponseParams (InternalMethods)
+@implementation MTRServiceAreaClusterSelectAreasResponseParams (InternalMethods)
 
-- (CHIP_ERROR)_setFieldsFromDecodableStruct:(const chip::app::Clusters::ServiceArea::Commands::SelectLocationsResponse::DecodableType &)decodableStruct
+- (CHIP_ERROR)_setFieldsFromDecodableStruct:(const chip::app::Clusters::ServiceArea::Commands::SelectAreasResponse::DecodableType &)decodableStruct
 {
     {
         self.status = [NSNumber numberWithUnsignedChar:chip::to_underlying(decodableStruct.status)];
@@ -21982,7 +21982,7 @@ NS_ASSUME_NONNULL_BEGIN
 
 @end
 
-@implementation MTRServiceAreaClusterSkipCurrentLocationParams
+@implementation MTRServiceAreaClusterSkipAreaParams
 - (instancetype)init
 {
     if (self = [super init]) {
@@ -21994,7 +21994,7 @@ NS_ASSUME_NONNULL_BEGIN
 
 - (id)copyWithZone:(NSZone * _Nullable)zone;
 {
-    auto other = [[MTRServiceAreaClusterSkipCurrentLocationParams alloc] init];
+    auto other = [[MTRServiceAreaClusterSkipAreaParams alloc] init];
 
     other.timedInvokeTimeoutMs = self.timedInvokeTimeoutMs;
     other.serverSideProcessingTimeout = self.serverSideProcessingTimeout;
@@ -22010,11 +22010,11 @@ NS_ASSUME_NONNULL_BEGIN
 
 @end
 
-@implementation MTRServiceAreaClusterSkipCurrentLocationParams (InternalMethods)
+@implementation MTRServiceAreaClusterSkipAreaParams (InternalMethods)
 
 - (CHIP_ERROR)_encodeToTLVReader:(chip::System::PacketBufferTLVReader &)reader
 {
-    chip::app::Clusters::ServiceArea::Commands::SkipCurrentLocation::Type encodableStruct;
+    chip::app::Clusters::ServiceArea::Commands::SkipArea::Type encodableStruct;
     ListFreer listFreer;
 
     auto buffer = chip::System::PacketBufferHandle::New(chip::System::PacketBuffer::kMaxSizeWithoutReserve, 0);
@@ -22055,7 +22055,7 @@ NS_ASSUME_NONNULL_BEGIN
 }
 @end
 
-@implementation MTRServiceAreaClusterSkipCurrentLocationResponseParams
+@implementation MTRServiceAreaClusterSkipAreaResponseParams
 - (instancetype)init
 {
     if (self = [super init]) {
@@ -22069,7 +22069,7 @@ NS_ASSUME_NONNULL_BEGIN
 
 - (id)copyWithZone:(NSZone * _Nullable)zone;
 {
-    auto other = [[MTRServiceAreaClusterSkipCurrentLocationResponseParams alloc] init];
+    auto other = [[MTRServiceAreaClusterSkipAreaResponseParams alloc] init];
 
     other.status = self.status;
     other.statusText = self.statusText;
@@ -22090,7 +22090,7 @@ NS_ASSUME_NONNULL_BEGIN
         return nil;
     }
 
-    using DecodableType = chip::app::Clusters::ServiceArea::Commands::SkipCurrentLocationResponse::DecodableType;
+    using DecodableType = chip::app::Clusters::ServiceArea::Commands::SkipAreaResponse::DecodableType;
     chip::System::PacketBufferHandle buffer = [MTRBaseDevice _responseDataForCommand:responseValue
                                                                            clusterID:DecodableType::GetClusterId()
                                                                            commandID:DecodableType::GetCommandId()
@@ -22125,9 +22125,9 @@ NS_ASSUME_NONNULL_BEGIN
 
 @end
 
-@implementation MTRServiceAreaClusterSkipCurrentLocationResponseParams (InternalMethods)
+@implementation MTRServiceAreaClusterSkipAreaResponseParams (InternalMethods)
 
-- (CHIP_ERROR)_setFieldsFromDecodableStruct:(const chip::app::Clusters::ServiceArea::Commands::SkipCurrentLocationResponse::DecodableType &)decodableStruct
+- (CHIP_ERROR)_setFieldsFromDecodableStruct:(const chip::app::Clusters::ServiceArea::Commands::SkipAreaResponse::DecodableType &)decodableStruct
 {
     {
         self.status = [NSNumber numberWithUnsignedChar:chip::to_underlying(decodableStruct.status)];

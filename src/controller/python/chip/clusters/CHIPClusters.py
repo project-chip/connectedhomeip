@@ -8556,14 +8556,14 @@ class ChipClusters:
         "commands": {
             0x00000000: {
                 "commandId": 0x00000000,
-                "commandName": "SelectLocations",
+                "commandName": "SelectAreas",
                 "args": {
-                    "newLocations": "int",
+                    "newAreas": "int",
                 },
             },
             0x00000002: {
                 "commandId": 0x00000002,
-                "commandName": "SkipCurrentLocation",
+                "commandName": "SkipArea",
                 "args": {
                 },
             },

@@ -31226,23 +31226,23 @@ class ServiceArea(Cluster):
 
     class Commands:
         @dataclass
-        class SelectLocations(ClusterCommand):
+        class SelectAreas(ClusterCommand):
             cluster_id: typing.ClassVar[int] = 0x00000150
             command_id: typing.ClassVar[int] = 0x00000000
             is_client: typing.ClassVar[bool] = True
-            response_type: typing.ClassVar[str] = 'SelectLocationsResponse'
+            response_type: typing.ClassVar[str] = 'SelectAreasResponse'
 
             @ChipUtility.classproperty
             def descriptor(cls) -> ClusterObjectDescriptor:
                 return ClusterObjectDescriptor(
                     Fields=[
-                        ClusterObjectFieldDescriptor(Label="newLocations", Tag=0, Type=typing.Union[Nullable, typing.List[uint]]),
+                        ClusterObjectFieldDescriptor(Label="newAreas", Tag=0, Type=typing.Union[Nullable, typing.List[uint]]),
                     ])
 
-            newLocations: 'typing.Union[Nullable, typing.List[uint]]' = NullValue
+            newAreas: 'typing.Union[Nullable, typing.List[uint]]' = NullValue
 
         @dataclass
-        class SelectLocationsResponse(ClusterCommand):
+        class SelectAreasResponse(ClusterCommand):
             cluster_id: typing.ClassVar[int] = 0x00000150
             command_id: typing.ClassVar[int] = 0x00000001
             is_client: typing.ClassVar[bool] = False
@@ -31260,11 +31260,11 @@ class ServiceArea(Cluster):
             statusText: 'typing.Optional[str]' = None
 
         @dataclass
-        class SkipCurrentLocation(ClusterCommand):
+        class SkipArea(ClusterCommand):
             cluster_id: typing.ClassVar[int] = 0x00000150
             command_id: typing.ClassVar[int] = 0x00000002
             is_client: typing.ClassVar[bool] = True
-            response_type: typing.ClassVar[str] = 'SkipCurrentLocationResponse'
+            response_type: typing.ClassVar[str] = 'SkipAreaResponse'
 
             @ChipUtility.classproperty
             def descriptor(cls) -> ClusterObjectDescriptor:
@@ -31273,7 +31273,7 @@ class ServiceArea(Cluster):
                     ])
 
         @dataclass
-        class SkipCurrentLocationResponse(ClusterCommand):
+        class SkipAreaResponse(ClusterCommand):
             cluster_id: typing.ClassVar[int] = 0x00000150
             command_id: typing.ClassVar[int] = 0x00000003
             is_client: typing.ClassVar[bool] = False

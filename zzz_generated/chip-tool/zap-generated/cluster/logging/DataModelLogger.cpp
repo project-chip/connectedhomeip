@@ -8426,7 +8426,7 @@ CHIP_ERROR DataModelLogger::LogValue(const char * label, size_t indent,
     return CHIP_NO_ERROR;
 }
 CHIP_ERROR DataModelLogger::LogValue(const char * label, size_t indent,
-                                     const ServiceArea::Commands::SelectLocationsResponse::DecodableType & value)
+                                     const ServiceArea::Commands::SelectAreasResponse::DecodableType & value)
 {
     DataModelLogger::LogString(label, indent, "{");
     ReturnErrorOnFailure(DataModelLogger::LogValue("status", indent + 1, value.status));
@@ -8435,7 +8435,7 @@ CHIP_ERROR DataModelLogger::LogValue(const char * label, size_t indent,
     return CHIP_NO_ERROR;
 }
 CHIP_ERROR DataModelLogger::LogValue(const char * label, size_t indent,
-                                     const ServiceArea::Commands::SkipCurrentLocationResponse::DecodableType & value)
+                                     const ServiceArea::Commands::SkipAreaResponse::DecodableType & value)
 {
     DataModelLogger::LogString(label, indent, "{");
     ReturnErrorOnFailure(DataModelLogger::LogValue("status", indent + 1, value.status));
@@ -19725,15 +19725,15 @@ CHIP_ERROR DataModelLogger::LogCommand(const chip::app::ConcreteCommandPath & pa
     case ServiceArea::Id: {
         switch (path.mCommandId)
         {
-        case ServiceArea::Commands::SelectLocationsResponse::Id: {
-            ServiceArea::Commands::SelectLocationsResponse::DecodableType value;
+        case ServiceArea::Commands::SelectAreasResponse::Id: {
+            ServiceArea::Commands::SelectAreasResponse::DecodableType value;
             ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
-            return DataModelLogger::LogValue("SelectLocationsResponse", 1, value);
+            return DataModelLogger::LogValue("SelectAreasResponse", 1, value);
         }
-        case ServiceArea::Commands::SkipCurrentLocationResponse::Id: {
-            ServiceArea::Commands::SkipCurrentLocationResponse::DecodableType value;
+        case ServiceArea::Commands::SkipAreaResponse::Id: {
+            ServiceArea::Commands::SkipAreaResponse::DecodableType value;
             ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
-            return DataModelLogger::LogValue("SkipCurrentLocationResponse", 1, value);
+            return DataModelLogger::LogValue("SkipAreaResponse", 1, value);
         }
         }
         break;

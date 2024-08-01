@@ -9361,8 +9361,8 @@ private:
 | Cluster ServiceArea                                                 | 0x0150 |
 |------------------------------------------------------------------------------|
 | Commands:                                                           |        |
-| * SelectLocations                                                   |   0x00 |
-| * SkipCurrentLocation                                               |   0x02 |
+| * SelectAreas                                                       |   0x00 |
+| * SkipArea                                                          |   0x02 |
 |------------------------------------------------------------------------------|
 | Attributes:                                                         |        |
 | * SupportedAreas                                                    | 0x0000 |
@@ -9382,22 +9382,22 @@ private:
 \*----------------------------------------------------------------------------*/
 
 /*
- * Command SelectLocations
+ * Command SelectAreas
  */
-class ServiceAreaSelectLocations : public ClusterCommand
+class ServiceAreaSelectAreas : public ClusterCommand
 {
 public:
-    ServiceAreaSelectLocations(CredentialIssuerCommands * credsIssuerConfig) :
-        ClusterCommand("select-locations", credsIssuerConfig), mComplex_NewLocations(&mRequest.newLocations)
+    ServiceAreaSelectAreas(CredentialIssuerCommands * credsIssuerConfig) :
+        ClusterCommand("select-areas", credsIssuerConfig), mComplex_NewAreas(&mRequest.newAreas)
     {
-        AddArgument("NewLocations", &mComplex_NewLocations);
+        AddArgument("NewAreas", &mComplex_NewAreas);
         ClusterCommand::AddArguments();
     }
 
     CHIP_ERROR SendCommand(chip::DeviceProxy * device, std::vector<chip::EndpointId> endpointIds) override
     {
         constexpr chip::ClusterId clusterId = chip::app::Clusters::ServiceArea::Id;
-        constexpr chip::CommandId commandId = chip::app::Clusters::ServiceArea::Commands::SelectLocations::Id;
+        constexpr chip::CommandId commandId = chip::app::Clusters::ServiceArea::Commands::SelectAreas::Id;
 
         ChipLogProgress(chipTool, "Sending cluster (0x%08" PRIX32 ") command (0x%08" PRIX32 ") on endpoint %u", clusterId,
                         commandId, endpointIds.at(0));
@@ -9407,7 +9407,7 @@ public:
     CHIP_ERROR SendGroupCommand(chip::GroupId groupId, chip::FabricIndex fabricIndex) override
     {
         constexpr chip::ClusterId clusterId = chip::app::Clusters::ServiceArea::Id;
-        constexpr chip::CommandId commandId = chip::app::Clusters::ServiceArea::Commands::SelectLocations::Id;
+        constexpr chip::CommandId commandId = chip::app::Clusters::ServiceArea::Commands::SelectAreas::Id;
 
         ChipLogProgress(chipTool, "Sending cluster (0x%08" PRIX32 ") command (0x%08" PRIX32 ") on Group %u", clusterId, commandId,
                         groupId);
@@ -9416,18 +9416,17 @@ public:
     }
 
 private:
-    chip::app::Clusters::ServiceArea::Commands::SelectLocations::Type mRequest;
-    TypedComplexArgument<chip::app::DataModel::Nullable<chip::app::DataModel::List<const uint32_t>>> mComplex_NewLocations;
+    chip::app::Clusters::ServiceArea::Commands::SelectAreas::Type mRequest;
+    TypedComplexArgument<chip::app::DataModel::Nullable<chip::app::DataModel::List<const uint32_t>>> mComplex_NewAreas;
 };
 
 /*
- * Command SkipCurrentLocation
+ * Command SkipArea
  */
-class ServiceAreaSkipCurrentLocation : public ClusterCommand
+class ServiceAreaSkipArea : public ClusterCommand
 {
 public:
-    ServiceAreaSkipCurrentLocation(CredentialIssuerCommands * credsIssuerConfig) :
-        ClusterCommand("skip-current-location", credsIssuerConfig)
+    ServiceAreaSkipArea(CredentialIssuerCommands * credsIssuerConfig) : ClusterCommand("skip-area", credsIssuerConfig)
     {
         ClusterCommand::AddArguments();
     }
@@ -9435,7 +9434,7 @@ public:
     CHIP_ERROR SendCommand(chip::DeviceProxy * device, std::vector<chip::EndpointId> endpointIds) override
     {
         constexpr chip::ClusterId clusterId = chip::app::Clusters::ServiceArea::Id;
-        constexpr chip::CommandId commandId = chip::app::Clusters::ServiceArea::Commands::SkipCurrentLocation::Id;
+        constexpr chip::CommandId commandId = chip::app::Clusters::ServiceArea::Commands::SkipArea::Id;
 
         ChipLogProgress(chipTool, "Sending cluster (0x%08" PRIX32 ") command (0x%08" PRIX32 ") on endpoint %u", clusterId,
                         commandId, endpointIds.at(0));
@@ -9445,7 +9444,7 @@ public:
     CHIP_ERROR SendGroupCommand(chip::GroupId groupId, chip::FabricIndex fabricIndex) override
     {
         constexpr chip::ClusterId clusterId = chip::app::Clusters::ServiceArea::Id;
-        constexpr chip::CommandId commandId = chip::app::Clusters::ServiceArea::Commands::SkipCurrentLocation::Id;
+        constexpr chip::CommandId commandId = chip::app::Clusters::ServiceArea::Commands::SkipArea::Id;
 
         ChipLogProgress(chipTool, "Sending cluster (0x%08" PRIX32 ") command (0x%08" PRIX32 ") on Group %u", clusterId, commandId,
                         groupId);
@@ -9454,7 +9453,7 @@ public:
     }
 
 private:
-    chip::app::Clusters::ServiceArea::Commands::SkipCurrentLocation::Type mRequest;
+    chip::app::Clusters::ServiceArea::Commands::SkipArea::Type mRequest;
 };
 
 /*----------------------------------------------------------------------------*\
@@ -22796,9 +22795,9 @@ void registerClusterServiceArea(Commands & commands, CredentialIssuerCommands * 
         //
         // Commands
         //
-        make_unique<ClusterCommand>(Id, credsIssuerConfig),             //
-        make_unique<ServiceAreaSelectLocations>(credsIssuerConfig),     //
-        make_unique<ServiceAreaSkipCurrentLocation>(credsIssuerConfig), //
+        make_unique<ClusterCommand>(Id, credsIssuerConfig),     //
+        make_unique<ServiceAreaSelectAreas>(credsIssuerConfig), //
+        make_unique<ServiceAreaSkipArea>(credsIssuerConfig),    //
         //
         // Attributes
         //

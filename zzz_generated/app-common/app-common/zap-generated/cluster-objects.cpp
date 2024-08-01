@@ -20505,11 +20505,11 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
 } // namespace Structs
 
 namespace Commands {
-namespace SelectLocations {
+namespace SelectAreas {
 CHIP_ERROR Type::Encode(TLV::TLVWriter & aWriter, TLV::Tag aTag) const
 {
     DataModel::WrappedStructEncoder encoder{ aWriter, aTag };
-    encoder.Encode(to_underlying(Fields::kNewLocations), newLocations);
+    encoder.Encode(to_underlying(Fields::kNewAreas), newAreas);
     return encoder.Finalize();
 }
 
@@ -20527,9 +20527,9 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
         CHIP_ERROR err              = CHIP_NO_ERROR;
         const uint8_t __context_tag = std::get<uint8_t>(__element);
 
-        if (__context_tag == to_underlying(Fields::kNewLocations))
+        if (__context_tag == to_underlying(Fields::kNewAreas))
         {
-            err = DataModel::Decode(reader, newLocations);
+            err = DataModel::Decode(reader, newAreas);
         }
         else
         {
@@ -20538,8 +20538,8 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
         ReturnErrorOnFailure(err);
     }
 }
-} // namespace SelectLocations.
-namespace SelectLocationsResponse {
+} // namespace SelectAreas.
+namespace SelectAreasResponse {
 CHIP_ERROR Type::Encode(TLV::TLVWriter & aWriter, TLV::Tag aTag) const
 {
     DataModel::WrappedStructEncoder encoder{ aWriter, aTag };
@@ -20577,8 +20577,8 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
         ReturnErrorOnFailure(err);
     }
 }
-} // namespace SelectLocationsResponse.
-namespace SkipCurrentLocation {
+} // namespace SelectAreasResponse.
+namespace SkipArea {
 CHIP_ERROR Type::Encode(TLV::TLVWriter & aWriter, TLV::Tag aTag) const
 {
     DataModel::WrappedStructEncoder encoder{ aWriter, aTag };
@@ -20597,8 +20597,8 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
         }
     }
 }
-} // namespace SkipCurrentLocation.
-namespace SkipCurrentLocationResponse {
+} // namespace SkipArea.
+namespace SkipAreaResponse {
 CHIP_ERROR Type::Encode(TLV::TLVWriter & aWriter, TLV::Tag aTag) const
 {
     DataModel::WrappedStructEncoder encoder{ aWriter, aTag };
@@ -20636,7 +20636,7 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
         ReturnErrorOnFailure(err);
     }
 }
-} // namespace SkipCurrentLocationResponse.
+} // namespace SkipAreaResponse.
 } // namespace Commands
 
 namespace Attributes {

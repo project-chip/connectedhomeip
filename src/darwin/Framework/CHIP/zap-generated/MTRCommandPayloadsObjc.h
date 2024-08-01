@@ -7637,9 +7637,9 @@ MTR_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
 @end
 
 MTR_PROVISIONALLY_AVAILABLE
-@interface MTRServiceAreaClusterSelectLocationsParams : NSObject <NSCopying>
+@interface MTRServiceAreaClusterSelectAreasParams : NSObject <NSCopying>
 
-@property (nonatomic, copy, getter=getNewLocations) NSArray * _Nullable newLocations MTR_PROVISIONALLY_AVAILABLE;
+@property (nonatomic, copy, getter=getNewAreas) NSArray * _Nullable newAreas MTR_PROVISIONALLY_AVAILABLE;
 /**
  * Controls whether the command is a timed command (using Timed Invoke).
  *
@@ -7667,14 +7667,14 @@ MTR_PROVISIONALLY_AVAILABLE
 @end
 
 MTR_PROVISIONALLY_AVAILABLE
-@interface MTRServiceAreaClusterSelectLocationsResponseParams : NSObject <NSCopying>
+@interface MTRServiceAreaClusterSelectAreasResponseParams : NSObject <NSCopying>
 
 @property (nonatomic, copy) NSNumber * _Nonnull status MTR_PROVISIONALLY_AVAILABLE;
 
 @property (nonatomic, copy) NSString * _Nullable statusText MTR_PROVISIONALLY_AVAILABLE;
 
 /**
- * Initialize an MTRServiceAreaClusterSelectLocationsResponseParams with a response-value dictionary
+ * Initialize an MTRServiceAreaClusterSelectAreasResponseParams with a response-value dictionary
  * of the sort that MTRDeviceResponseHandler would receive.
  *
  * Will return nil and hand out an error if the response-value dictionary is not
@@ -7688,7 +7688,7 @@ MTR_PROVISIONALLY_AVAILABLE
 @end
 
 MTR_PROVISIONALLY_AVAILABLE
-@interface MTRServiceAreaClusterSkipCurrentLocationParams : NSObject <NSCopying>
+@interface MTRServiceAreaClusterSkipAreaParams : NSObject <NSCopying>
 /**
  * Controls whether the command is a timed command (using Timed Invoke).
  *
@@ -7716,14 +7716,14 @@ MTR_PROVISIONALLY_AVAILABLE
 @end
 
 MTR_PROVISIONALLY_AVAILABLE
-@interface MTRServiceAreaClusterSkipCurrentLocationResponseParams : NSObject <NSCopying>
+@interface MTRServiceAreaClusterSkipAreaResponseParams : NSObject <NSCopying>
 
 @property (nonatomic, copy) NSNumber * _Nonnull status MTR_PROVISIONALLY_AVAILABLE;
 
 @property (nonatomic, copy) NSString * _Nullable statusText MTR_PROVISIONALLY_AVAILABLE;
 
 /**
- * Initialize an MTRServiceAreaClusterSkipCurrentLocationResponseParams with a response-value dictionary
+ * Initialize an MTRServiceAreaClusterSkipAreaResponseParams with a response-value dictionary
  * of the sort that MTRDeviceResponseHandler would receive.
  *
  * Will return nil and hand out an error if the response-value dictionary is not

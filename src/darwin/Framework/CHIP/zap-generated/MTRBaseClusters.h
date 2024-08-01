@@ -9690,18 +9690,18 @@ MTR_PROVISIONALLY_AVAILABLE
 @interface MTRBaseClusterServiceArea : MTRGenericBaseCluster
 
 /**
- * Command SelectLocations
+ * Command SelectAreas
  *
- * Command used to select a set of device locations, where the device is to operate
+ * Command used to select a set of device areas, where the device is to operate.
  */
-- (void)selectLocationsWithParams:(MTRServiceAreaClusterSelectLocationsParams *)params completion:(void (^)(MTRServiceAreaClusterSelectLocationsResponseParams * _Nullable data, NSError * _Nullable error))completion MTR_PROVISIONALLY_AVAILABLE;
+- (void)selectAreasWithParams:(MTRServiceAreaClusterSelectAreasParams *)params completion:(void (^)(MTRServiceAreaClusterSelectAreasResponseParams * _Nullable data, NSError * _Nullable error))completion MTR_PROVISIONALLY_AVAILABLE;
 /**
- * Command SkipCurrentLocation
+ * Command SkipArea
  *
- * This command is used to skip the current location where the device operates.
+ * This command is used to skip an area where the device operates.
  */
-- (void)skipCurrentLocationWithParams:(MTRServiceAreaClusterSkipCurrentLocationParams * _Nullable)params completion:(void (^)(MTRServiceAreaClusterSkipCurrentLocationResponseParams * _Nullable data, NSError * _Nullable error))completion MTR_PROVISIONALLY_AVAILABLE;
-- (void)skipCurrentLocationWithCompletion:(void (^)(MTRServiceAreaClusterSkipCurrentLocationResponseParams * _Nullable data, NSError * _Nullable error))completion
+- (void)skipAreaWithParams:(MTRServiceAreaClusterSkipAreaParams * _Nullable)params completion:(void (^)(MTRServiceAreaClusterSkipAreaResponseParams * _Nullable data, NSError * _Nullable error))completion MTR_PROVISIONALLY_AVAILABLE;
+- (void)skipAreaWithCompletion:(void (^)(MTRServiceAreaClusterSkipAreaResponseParams * _Nullable data, NSError * _Nullable error))completion
     MTR_PROVISIONALLY_AVAILABLE;
 
 - (void)readAttributeSupportedAreasWithCompletion:(void (^)(NSArray * _Nullable value, NSError * _Nullable error))completion MTR_PROVISIONALLY_AVAILABLE;

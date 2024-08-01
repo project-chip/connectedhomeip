@@ -1478,24 +1478,24 @@ provisional cluster ServiceArea = 336 {
   readonly attribute bitmap32 featureMap = 65532;
   readonly attribute int16u clusterRevision = 65533;
 
-  request struct SelectLocationsRequest {
-    nullable int32u newLocations[] = 0;
+  request struct SelectAreasRequest {
+    nullable int32u newAreas[] = 0;
   }
 
-  response struct SelectLocationsResponse = 1 {
+  response struct SelectAreasResponse = 1 {
     SelectAreasStatus status = 0;
     optional char_string<256> statusText = 1;
   }
 
-  response struct SkipCurrentLocationResponse = 3 {
+  response struct SkipAreaResponse = 3 {
     SkipAreaStatus status = 0;
     optional char_string<256> statusText = 1;
   }
 
-  /** Command used to select a set of device locations, where the device is to operate */
-  command SelectLocations(SelectLocationsRequest): SelectLocationsResponse = 0;
-  /** This command is used to skip the current location where the device operates. */
-  command SkipCurrentLocation(): SkipCurrentLocationResponse = 2;
+  /** Command used to select a set of device areas, where the device is to operate. */
+  command SelectAreas(SelectAreasRequest): SelectAreasResponse = 0;
+  /** This command is used to skip an area where the device operates. */
+  command SkipArea(): SkipAreaResponse = 2;
 }
 
 endpoint 0 {
@@ -1768,10 +1768,10 @@ endpoint 1 {
     callback attribute featureMap;
     ram      attribute clusterRevision default = 1;
 
-    handle command SelectLocations;
-    handle command SelectLocationsResponse;
-    handle command SkipCurrentLocation;
-    handle command SkipCurrentLocationResponse;
+    handle command SelectAreas;
+    handle command SelectAreasResponse;
+    handle command SkipArea;
+    handle command SkipAreaResponse;
   }
 }
 

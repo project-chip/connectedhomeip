@@ -793,9 +793,9 @@ static CHIP_ERROR LogValue(const char * label, size_t indent,
 static CHIP_ERROR LogValue(const char * label, size_t indent,
                            const chip::app::Clusters::DoorLock::Commands::GetCredentialStatusResponse::DecodableType & value);
 static CHIP_ERROR LogValue(const char * label, size_t indent,
-                           const chip::app::Clusters::ServiceArea::Commands::SelectLocationsResponse::DecodableType & value);
+                           const chip::app::Clusters::ServiceArea::Commands::SelectAreasResponse::DecodableType & value);
 static CHIP_ERROR LogValue(const char * label, size_t indent,
-                           const chip::app::Clusters::ServiceArea::Commands::SkipCurrentLocationResponse::DecodableType & value);
+                           const chip::app::Clusters::ServiceArea::Commands::SkipAreaResponse::DecodableType & value);
 static CHIP_ERROR LogValue(const char * label, size_t indent,
                            const chip::app::Clusters::Thermostat::Commands::GetWeeklyScheduleResponse::DecodableType & value);
 static CHIP_ERROR

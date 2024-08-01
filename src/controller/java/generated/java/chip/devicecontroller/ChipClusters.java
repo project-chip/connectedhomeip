@@ -39046,17 +39046,17 @@ public class ChipClusters {
       return 0L;
     }
 
-    public void selectLocations(SelectLocationsResponseCallback callback, @Nullable ArrayList<Long> newLocations) {
-      selectLocations(callback, newLocations, 0);
+    public void selectAreas(SelectAreasResponseCallback callback, @Nullable ArrayList<Long> newAreas) {
+      selectAreas(callback, newAreas, 0);
     }
 
-    public void selectLocations(SelectLocationsResponseCallback callback, @Nullable ArrayList<Long> newLocations, int timedInvokeTimeoutMs) {
+    public void selectAreas(SelectAreasResponseCallback callback, @Nullable ArrayList<Long> newAreas, int timedInvokeTimeoutMs) {
       final long commandId = 0L;
 
       ArrayList<StructElement> elements = new ArrayList<>();
-      final long newLocationsFieldID = 0L;
-      BaseTLVType newLocationstlvValue = newLocations != null ? ArrayType.generateArrayType(newLocations, (elementnewLocations) -> new UIntType(elementnewLocations)) : new NullType();
-      elements.add(new StructElement(newLocationsFieldID, newLocationstlvValue));
+      final long newAreasFieldID = 0L;
+      BaseTLVType newAreastlvValue = newAreas != null ? ArrayType.generateArrayType(newAreas, (elementnewAreas) -> new UIntType(elementnewAreas)) : new NullType();
+      elements.add(new StructElement(newAreasFieldID, newAreastlvValue));
 
       StructType commandArgs = new StructType(elements);
       invoke(new InvokeCallbackImpl(callback) {
@@ -39083,11 +39083,11 @@ public class ChipClusters {
         }}, commandId, commandArgs, timedInvokeTimeoutMs);
     }
 
-    public void skipCurrentLocation(SkipCurrentLocationResponseCallback callback) {
-      skipCurrentLocation(callback, 0);
+    public void skipArea(SkipAreaResponseCallback callback) {
+      skipArea(callback, 0);
     }
 
-    public void skipCurrentLocation(SkipCurrentLocationResponseCallback callback, int timedInvokeTimeoutMs) {
+    public void skipArea(SkipAreaResponseCallback callback, int timedInvokeTimeoutMs) {
       final long commandId = 2L;
 
       ArrayList<StructElement> elements = new ArrayList<>();
@@ -39116,11 +39116,11 @@ public class ChipClusters {
         }}, commandId, commandArgs, timedInvokeTimeoutMs);
     }
 
-    public interface SelectLocationsResponseCallback extends BaseClusterCallback {
+    public interface SelectAreasResponseCallback extends BaseClusterCallback {
       void onSuccess(Integer status, Optional<String> statusText);
     }
 
-    public interface SkipCurrentLocationResponseCallback extends BaseClusterCallback {
+    public interface SkipAreaResponseCallback extends BaseClusterCallback {
       void onSuccess(Integer status, Optional<String> statusText);
     }
 

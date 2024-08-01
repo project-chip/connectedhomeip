@@ -40,9 +40,9 @@ import matter.tlv.TlvReader
 import matter.tlv.TlvWriter
 
 class ServiceAreaCluster(private val controller: MatterController, private val endpointId: UShort) {
-  class SelectLocationsResponse(val status: UByte, val statusText: String?)
+  class SelectAreasResponse(val status: UByte, val statusText: String?)
 
-  class SkipCurrentLocationResponse(val status: UByte, val statusText: String?)
+  class SkipAreaResponse(val status: UByte, val statusText: String?)
 
   class SupportedAreasAttribute(val value: List<ServiceAreaClusterAreaStruct>)
 
@@ -147,19 +147,19 @@ class ServiceAreaCluster(private val controller: MatterController, private val e
     object SubscriptionEstablished : AttributeListAttributeSubscriptionState()
   }
 
-  suspend fun selectLocations(
-    newLocations: List<UInt>?,
+  suspend fun selectAreas(
+    newAreas: List<UInt>?,
     timedInvokeTimeout: Duration? = null,
-  ): SelectLocationsResponse {
+  ): SelectAreasResponse {
     val commandId: UInt = 0u
 
     val tlvWriter = TlvWriter()
     tlvWriter.startStructure(AnonymousTag)
 
-    val TAG_NEW_LOCATIONS_REQ: Int = 0
-    newLocations?.let {
-      tlvWriter.startArray(ContextSpecificTag(TAG_NEW_LOCATIONS_REQ))
-      for (item in newLocations.iterator()) {
+    val TAG_NEW_AREAS_REQ: Int = 0
+    newAreas?.let {
+      tlvWriter.startArray(ContextSpecificTag(TAG_NEW_AREAS_REQ))
+      for (item in newAreas.iterator()) {
         tlvWriter.put(AnonymousTag, item)
       }
       tlvWriter.endArray()
@@ -214,12 +214,10 @@ class ServiceAreaCluster(private val controller: MatterController, private val e
 
     tlvReader.exitContainer()
 
-    return SelectLocationsResponse(status_decoded, statusText_decoded)
+    return SelectAreasResponse(status_decoded, statusText_decoded)
   }
 
-  suspend fun skipCurrentLocation(
-    timedInvokeTimeout: Duration? = null
-  ): SkipCurrentLocationResponse {
+  suspend fun skipArea(timedInvokeTimeout: Duration? = null): SkipAreaResponse {
     val commandId: UInt = 2u
 
     val tlvWriter = TlvWriter()
@@ -274,7 +272,7 @@ class ServiceAreaCluster(private val controller: MatterController, private val e
 
     tlvReader.exitContainer()
 
-    return SkipCurrentLocationResponse(status_decoded, statusText_decoded)
+    return SkipAreaResponse(status_decoded, statusText_decoded)
   }
 
   suspend fun readSupportedAreasAttribute(): SupportedAreasAttribute {
