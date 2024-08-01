@@ -532,7 +532,7 @@ CHIP_ERROR InteractionModelEngine::ParseAttributePaths(const Access::SubjectDesc
     return err;
 }
 
-static bool CanAccess(const Access::SubjectDescriptor & aSubjectDescriptor, const ConcreteClusterPath & aPath,
+static bool CanAccessEvent(const Access::SubjectDescriptor & aSubjectDescriptor, const ConcreteClusterPath & aPath,
                       Access::Privilege aNeededPrivilege)
 {
     Access::RequestPath requestPath{ .cluster = aPath.mClusterId, .endpoint = aPath.mEndpointId, .requestType = Access::RequestType::kEventReadOrSubscribeRequest };
@@ -541,7 +541,7 @@ static bool CanAccess(const Access::SubjectDescriptor & aSubjectDescriptor, cons
     return (err == CHIP_NO_ERROR);
 }
 
-static bool CanAccess(const Access::SubjectDescriptor & aSubjectDescriptor, const ConcreteEventPath & aPath)
+static bool CanAccessEvent(const Access::SubjectDescriptor & aSubjectDescriptor, const ConcreteEventPath & aPath)
 {
     Access::RequestPath requestPath{ .cluster = aPath.mClusterId, .endpoint = aPath.mEndpointId,
                                      .requestType = Access::RequestType::kEventReadOrSubscribeRequest, .entityId = aPath.mEventId };
@@ -563,7 +563,7 @@ static bool HasValidEventPathForEndpointAndCluster(EndpointId aEndpoint, const E
         {
             ConcreteEventPath path(aEndpoint, aCluster->clusterId, aCluster->eventList[idx]);
             // If we get here, the path exists.  We just have to do an ACL check for it.
-            bool isValid = CanAccess(aSubjectDescriptor, path);
+            bool isValid = CanAccessEvent(aSubjectDescriptor, path);
             if (isValid)
             {
                 return true;
@@ -575,7 +575,7 @@ static bool HasValidEventPathForEndpointAndCluster(EndpointId aEndpoint, const E
         // We have no way to expand wildcards.  Just assume that we would need
         // View permissions for whatever events are involved.
         ConcreteClusterPath clusterPath(aEndpoint, aCluster->clusterId);
-        return CanAccess(aSubjectDescriptor, clusterPath, Access::Privilege::kView);
+        return CanAccessEvent(aSubjectDescriptor, clusterPath, Access::Privilege::kView);
 #endif
     }
 
@@ -585,7 +585,7 @@ static bool HasValidEventPathForEndpointAndCluster(EndpointId aEndpoint, const E
         // Not an existing event path.
         return false;
     }
-    return CanAccess(aSubjectDescriptor, path);
+    return CanAccessEvent(aSubjectDescriptor, path);
 }
 
 /**
