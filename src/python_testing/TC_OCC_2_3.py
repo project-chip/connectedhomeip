@@ -123,6 +123,5 @@ class TC_OCC_2_3(MatterBaseTest):
             logging.info("OccupancySensorType attribute value is out of range")
 
 
-
 if __name__ == "__main__":
     default_matter_test_main()
