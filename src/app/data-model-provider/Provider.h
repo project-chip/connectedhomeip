@@ -89,6 +89,15 @@ public:
 
     /// `handler` is used to send back the reply.
     ///    - returning a value other than Success implies an error reply (error and data are mutually exclusive)
+    ///
+    /// Returning anything other than CHIP_NO_ERROR or Status::Success (i.e. success without a return code) 
+    /// means that the invoke will be considered to be returning the given status WITHOUT any data (any data
+    /// that was sent via Handler is to be rolled back/discarded).
+    ///
+    /// This is because only one of the following may be encoded in a response:
+    ///    - data (as CommandDataIB) which is assumed a "response as a success"
+    ///    - status (as a CommandStatusIB) which is considered a final status, usually an error however
+    ///      cluster-specific success statuses also exist.
     virtual ActionReturnStatus Invoke(const InvokeRequest & request, chip::TLV::TLVReader & input_arguments,
                                       CommandHandler * handler) = 0;
 
