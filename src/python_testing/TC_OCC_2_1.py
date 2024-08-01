@@ -138,18 +138,18 @@ class TC_OCC_2_1(MatterBaseTest):
         self.step(7)
         if attributes.PIROccupiedToUnoccupiedDelay.attribute_id in attribute_list:
             has_pir_bitmap = (occupancy_sensor_type_bitmap_dut &
-                              Clusters.OccupancySensing.Enums.OccupancySensorTypeEnum.kPir) == 1
+                              Clusters.OccupancySensing.Bitmaps.OccupancySensorTypeBitmap.kPir) != 0 
             has_ultrasonic_bitmap = (occupancy_sensor_type_bitmap_dut &
-                                     Clusters.OccupancySensing.Enums.OccupancySensorTypeEnum.kUltrasonic) == 1
+                                     Clusters.OccupancySensing.Bitmaps.OccupancySensorTypeBitmap.kUltrasonic) != 0
             has_phy_bitmap = (occupancy_sensor_type_bitmap_dut &
-                              Clusters.OccupancySensing.Enums.OccupancySensorTypeEnum.kPhysicalContact) == 1
-            if (has_pir_bitmap == 1) or ((has_pir_bitmap == 0) & (has_ultrasonic_bitmap == 0) & (has_phy_bitmap == 0)):
+                              Clusters.OccupancySensing.Bitmaps.OccupancySensorTypeBitmap.kPhysicalContact) != 0
+            if has_pir_bitmap or (not has_ultrasonic_bitmap  and not has_phy_bitmap):
                 pir_otou_delay_dut = await self.read_occ_attribute_expect_success(endpoint=endpoint, attribute=attributes.PIROccupiedToUnoccupiedDelay)
                 asserts.assert_less_equal(pir_otou_delay_dut, 0xFFFE, "PIROccupiedToUnoccupiedDelay is not in valid range")
                 asserts.assert_greater_equal(pir_otou_delay_dut, 0, "PIROccupiedToUnoccupiedDelay is not in valid range")
             else:
                 logging.info("PIROccupiedToUnoccupiedDelay conformance failed")
-                asserts.fail("PIROccupiedToUnoccupiedDelay conformance is incorrect")
+                asserts.fail(f"PIROccupiedToUnoccupiedDelay conformance is incorrect: {has_pir_bitmap}, {has_ultrasonic_bitmap}, {has_phy_bitmap}")
         else:
             logging.info("PIROccupiedToUnoccupiedDelay not supported. Test step skipped")
             self.mark_current_step_skipped()
