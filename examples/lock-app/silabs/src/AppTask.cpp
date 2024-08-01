@@ -234,7 +234,10 @@ CHIP_ERROR AppTask::Init()
         GetLCD().ShowQRCode(true);
     }
 #endif // QR_CODE_ENABLED
-#endif
+#ifdef SL_ENABLE_ICD_LCD
+    GetLCD().TurnOff(SilabsLCD::kDefaultLCDTimeout);
+#endif // SL_ENABLE_ICD_LCD
+#endif // DISPLAY_ENABLED
 
     chip::DeviceLayer::PlatformMgr().ScheduleWork(UpdateClusterState, reinterpret_cast<intptr_t>(nullptr));
 
@@ -347,7 +350,13 @@ void AppTask::ActionInitiated(LockManager::Action_t aAction, int32_t aActor)
         sLockLED.Set(!locked);
 
 #ifdef DISPLAY_ENABLED
+#ifdef SL_ENABLE_ICD_LCD
+        sAppTask.GetLCD().TurnOn();
+#endif // SL_ENABLE_ICD_LCD
         sAppTask.GetLCD().WriteDemoUI(locked);
+#ifdef SL_ENABLE_ICD_LCD
+        sAppTask.GetLCD().TurnOff(SilabsLCD::kActivityLCDTimeout);
+#endif // SL_ENABLE_ICD_LCD
 #endif // DISPLAY_ENABLED
     }
     else if (aAction == LockManager::UNLATCH_ACTION)
