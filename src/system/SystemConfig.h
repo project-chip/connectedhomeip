@@ -808,3 +808,57 @@ struct LwIPEvent;
 #ifndef CHIP_SYSTEM_CONFIG_MAX_LARGE_BUFFER_SIZE_BYTES
 #define CHIP_SYSTEM_CONFIG_MAX_LARGE_BUFFER_SIZE_BYTES (64000)
 #endif
+
+/**
+ * @file
+ * Configuration settings for Terms and Conditions (TC) acknowledgements during device commissioning.
+ */
+
+/**
+ * @def CHIP_CONFIG_TC_REQUIRED
+ *
+ * @brief Indicates whether terms and conditions are required during commissioning.
+ *
+ * This macro defines whether the device commissioning process requires the user to acknowledge terms and conditions.
+ * - 1: Terms and conditions are required.
+ * - 0: Terms and conditions are not required.
+ *
+ * If this is set to 1, both CHIP_CONFIG_TC_REQUIRED_ACKNOWLEDGEMENTS and
+ * CHIP_CONFIG_TC_REQUIRED_ACKNOWLEDGEMENTS_VERSION must be defined.
+ */
+#ifndef CHIP_CONFIG_TC_REQUIRED
+#define CHIP_CONFIG_TC_REQUIRED (0)
+#endif
+
+#if CHIP_CONFIG_TC_REQUIRED
+
+/**
+ * @def CHIP_CONFIG_TC_REQUIRED_ACKNOWLEDGEMENTS
+ *
+ * @brief Configures the required terms and conditions acknowledgements bitmask.
+ *
+ * This macro defines the required terms and conditions acknowledgements bitmask. The bit-field is 16 bits long, so the possible
+ * value range is [0, 65535). This setting can be used to require that terms and conditions are presented to the user during
+ * commissioning.
+ */
+#ifndef CHIP_CONFIG_TC_REQUIRED_ACKNOWLEDGEMENTS
+#error "CHIP_CONFIG_TC_REQUIRED_ACKNOWLEDGEMENTS must be defined when CHIP_CONFIG_TC_REQUIRED is enabled."
+#endif
+
+/**
+ * @def CHIP_CONFIG_TC_REQUIRED_ACKNOWLEDGEMENTS_VERSION
+ *
+ * @brief Configures the latest known version of the terms and conditions.
+ *
+ * This macro defines the version number of the latest terms and conditions. It allows the application to iterate on revisions of
+ * the terms and conditions. A value of 0 indicates that no specific version is required. This setting can be used to enforce
+ * version-specific terms and conditions acknowledgements in the application. When the set of terms and conditions needs to be
+ * changed, the version number should be monotonically increased. If the latest terms and conditions version is updated (most
+ * likely during an OTA), then this may signal to the Administrator that updated terms and conditions should be presented to the
+ * user.
+ */
+#ifndef CHIP_CONFIG_TC_REQUIRED_ACKNOWLEDGEMENTS_VERSION
+#error "CHIP_CONFIG_TC_REQUIRED_ACKNOWLEDGEMENTS_VERSION must be defined when CHIP_CONFIG_TC_REQUIRED is enabled."
+#endif
+
+#endif // CHIP_CONFIG_TC_REQUIRED

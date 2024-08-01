@@ -23,6 +23,7 @@
 #include <lib/core/TLVTypes.h>
 #include <lib/support/CodeUtils.h>
 #include <lib/support/DefaultStorageKeyAllocator.h>
+#include <lib/support/SafeInt.h>
 
 namespace {
 constexpr chip::TLV::Tag kSerializationVersionTag            = chip::TLV::ContextTag(1);
@@ -58,6 +59,7 @@ CHIP_ERROR chip::app::DefaultTermsAndConditionsProvider::ClearAcceptance()
 CHIP_ERROR chip::app::DefaultTermsAndConditionsProvider::GetAcceptance(uint16_t & outAcknowledgementsValue,
                                                                        uint16_t & outAcknowledgementsVersionValue) const
 {
+    uint8_t serializationVersion     = 0;
     uint16_t acknowledgements        = 0;
     uint16_t acknowledgementsVersion = 0;
 
@@ -81,14 +83,21 @@ CHIP_ERROR chip::app::DefaultTermsAndConditionsProvider::GetAcceptance(uint16_t 
 
     VerifyOrReturnError(CHIP_NO_ERROR == err, err);
 
-    tlvReader.Init(buffer);
+    tlvReader.Init(buffer, bufferSize);
     ReturnErrorOnFailure(tlvReader.Next(chip::TLV::kTLVType_Structure, chip::TLV::AnonymousTag()));
     ReturnErrorOnFailure(tlvReader.EnterContainer(tlvContainer));
+    ReturnErrorOnFailure(tlvReader.Next(kSerializationVersionTag));
+    ReturnErrorOnFailure(tlvReader.Get(serializationVersion));
     ReturnErrorOnFailure(tlvReader.Next(kAcceptedAcknowledgementsTag));
     ReturnErrorOnFailure(tlvReader.Get(acknowledgements));
     ReturnErrorOnFailure(tlvReader.Next(kAcceptedAcknowledgementsVersionTag));
     ReturnErrorOnFailure(tlvReader.Get(acknowledgementsVersion));
     ReturnErrorOnFailure(tlvReader.ExitContainer(tlvContainer));
+
+    if (kSerializationVersion != serializationVersion)
+    {
+        return CHIP_ERROR_VERSION_MISMATCH;
+    }
 
     outAcknowledgementsValue        = acknowledgements;
     outAcknowledgementsVersionValue = acknowledgementsVersion;
@@ -121,9 +130,12 @@ CHIP_ERROR chip::app::DefaultTermsAndConditionsProvider::SetAcceptance(uint16_t 
     ReturnErrorOnFailure(tlvWriter.Put(kAcceptedAcknowledgementsVersionTag, inAcceptedAcknowledgementsVersionValue));
     ReturnErrorOnFailure(tlvWriter.EndContainer(tlvContainer));
     ReturnErrorOnFailure(tlvWriter.Finalize());
+    uint32_t lengthWritten = tlvWriter.GetLengthWritten();
+    VerifyOrReturnError(CanCastTo<uint16_t>(lengthWritten), CHIP_ERROR_BUFFER_TOO_SMALL);
 
     const chip::StorageKeyName storageKey = DefaultStorageKeyAllocator::TermsAndConditionsAcceptance();
-    ReturnErrorOnFailure(mPersistentStorageDelegate->SyncSetKeyValue(storageKey.KeyName(), buffer, sizeof(buffer)));
+    ReturnErrorOnFailure(
+        mPersistentStorageDelegate->SyncSetKeyValue(storageKey.KeyName(), buffer, static_cast<uint16_t>(lengthWritten)));
 
     return CHIP_NO_ERROR;
 }

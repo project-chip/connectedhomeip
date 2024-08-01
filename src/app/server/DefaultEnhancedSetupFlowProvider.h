@@ -37,7 +37,6 @@ public:
      * @brief Initializes the EnhancedSetupFlowProvider.
      *
      * @param[in] inTermsAndConditionsProvider The terms and conditions provide dependency.
-     * @return CHIP_ERROR On success returns CHIP_NO_ERROR, otherwise returns an error code.
      */
     CHIP_ERROR Init(TermsAndConditionsProvider * const inTermsAndConditionsProvider);
 

@@ -38,7 +38,6 @@ public:
      * @param[in] inPersistentStorageDelegate Persistent storage delegate dependency.
      * @param[in] inRequiredAcknowledgementsValue The bitmask of required acknowledgements.
      * @param[in] inRequiredAcknowledgementsVersionValue The version of the required acknowledgements.
-     * @return CHIP_ERROR On success returns CHIP_NO_ERROR, otherwise returns an error code.
      */
     CHIP_ERROR Init(PersistentStorageDelegate * const inPersistentStorageDelegate, uint16_t inRequiredAcknowledgementsValue,
                     uint16_t inRequiredAcknowledgementsVersionValue);

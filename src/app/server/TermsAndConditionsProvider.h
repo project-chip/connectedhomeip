@@ -40,8 +40,6 @@ public:
 
     /**
      * @brief Sets the acceptance status of the required terms and conditions.
-     *
-     * @return CHIP_ERROR On success returns CHIP_NO_ERROR, otherwise returns an error code.
      */
     virtual CHIP_ERROR ClearAcceptance() = 0;
 
@@ -50,7 +48,6 @@ public:
      *
      * @param[out] outAcknowledgementsValue The bitmask of acknowledgements accepted.
      * @param[out] outAcknowledgementsVersionValue The version of the accepted acknowledgements.
-     * @return CHIP_ERROR On success returns CHIP_NO_ERROR, otherwise returns an error code.
      */
     virtual CHIP_ERROR GetAcceptance(uint16_t & outAcknowledgementsValue, uint16_t & outAcknowledgementsVersionValue) const = 0;
 
@@ -59,7 +56,6 @@ public:
      *
      * @param[out] outAcknowledgementsValue The bitmask of required acknowledgements.
      * @param[out] outAcknowledgementsVersionValue The version of the required acknowledgements.
-     * @return CHIP_ERROR On success returns CHIP_NO_ERROR, otherwise returns an error code.
      */
     virtual CHIP_ERROR GetRequirements(uint16_t & outAcknowledgementsValue, uint16_t & outAcknowledgementsVersionValue) const = 0;
 
@@ -68,7 +64,6 @@ public:
      *
      * @param[in] inAcknowledgementsValue The bitmask of acknowledgements that was accepted.
      * @param[in] inAcknowledgementsVersionValue The version of the acknowledgements that was accepted.
-     * @return CHIP_ERROR On success returns CHIP_NO_ERROR, otherwise returns an error code.
      */
     virtual CHIP_ERROR SetAcceptance(uint16_t inAcknowledgementsValue, uint16_t inAcknowledgementsVersionValue) = 0;
 };

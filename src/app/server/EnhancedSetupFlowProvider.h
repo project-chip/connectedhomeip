@@ -30,7 +30,7 @@ namespace app {
 /**
  * @brief Feature state access layer for the EnhancedSetupFlowProvider.
  *
- * This class provides access to the state of the feature through the TermsAndConditionsProvider.
+ * This class provides access to the state of the Enhanced Setup Flow feature.
  */
 class EnhancedSetupFlowProvider
 {
@@ -44,7 +44,6 @@ public:
      * @brief Checks if the required terms and conditions acknowledgements have been accepted.
      *
      * @param[out] outAccepted true if the required acknowledgements have been accepted, false otherwise.
-     * @return CHIP_ERROR On success returns CHIP_NO_ERROR, otherwise returns an error code.
      */
     virtual CHIP_ERROR HasTermsAndConditionsRequiredAcknowledgementsBeenAccepted(bool & outAccepted) const = 0;
 
@@ -52,7 +51,6 @@ public:
      * @brief Checks if the required terms and conditions acknowledgements version has been accepted.
      *
      * @param[out] outAccepted true if the required acknowledgements version has been accepted, false otherwise.
-     * @return CHIP_ERROR On success returns CHIP_NO_ERROR, otherwise returns an error code.
      */
     virtual CHIP_ERROR HasTermsAndConditionsRequiredAcknowledgementsVersionBeenAccepted(bool & outAccepted) const = 0;
 
@@ -60,7 +58,6 @@ public:
      * @brief Retrieves the required terms and conditions acknowledgements.
      *
      * @param[out] outValue The version of the required acknowledgements.
-     * @return CHIP_ERROR On success returns CHIP_NO_ERROR, otherwise returns an error code.
      */
     virtual CHIP_ERROR GetTermsAndConditionsRequiredAcknowledgements(uint16_t & outValue) const = 0;
 
@@ -68,7 +65,6 @@ public:
      * @brief Retrieves the required terms and conditions acknowledgements version.
      *
      * @param[out] outValue The outValue of the required acknowledgements version.
-     * @return CHIP_ERROR On success returns CHIP_NO_ERROR, otherwise returns an error code.
      */
     virtual CHIP_ERROR GetTermsAndConditionsRequiredAcknowledgementsVersion(uint16_t & outValue) const = 0;
 
@@ -76,7 +72,6 @@ public:
      * @brief Retrieves the accepted terms and conditions acknowledgements.
      *
      * @param[out] outValue The outValue of the accepted acknowledgements.
-     * @return CHIP_ERROR On success returns CHIP_NO_ERROR, otherwise returns an error code.
      */
     virtual CHIP_ERROR GetTermsAndConditionsAcceptedAcknowledgements(uint16_t & outValue) const = 0;
 
@@ -84,7 +79,6 @@ public:
      * @brief Retrieves the accepted terms and conditions acknowledgements version.
      *
      * @param[out] outValue The outValue of the accepted acknowledgements version.
-     * @return CHIP_ERROR On success returns CHIP_NO_ERROR, otherwise returns an error code.
      */
     virtual CHIP_ERROR GetTermsAndConditionsAcceptedAcknowledgementsVersion(uint16_t & outValue) const = 0;
 
@@ -93,7 +87,6 @@ public:
      *
      * @param[in] inTCAcknowledgements The acknowledgements to accept.
      * @param[in] inTCAcknowledgementsVersionValue The version of the acknowledgements to accept.
-     * @return CHIP_ERROR On success returns CHIP_NO_ERROR, otherwise returns an error code.
      */
     virtual CHIP_ERROR SetTermsAndConditionsAcceptance(uint16_t inTCAcknowledgementsValue,
                                                        uint16_t inTCAcknowledgementsVersionValue) = 0;
@@ -101,7 +94,6 @@ public:
     /**
      * @brief Clears the acceptance status of the terms and conditions.
      *
-     * @return CHIP_ERROR On success returns CHIP_NO_ERROR, otherwise returns an error code.
      */
     virtual CHIP_ERROR ClearTermsAndConditionsAcceptance() = 0;
 };
