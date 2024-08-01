@@ -49,7 +49,7 @@ limitations under the License.
 
   <struct name="ProgressStruct">
     <cluster code="0x0150"/>
-    <item name="LocationID"             type="int32u"                 optional="false"/>
+    <item name="AreaID"                 type="int32u"                 optional="false"/>
     <item name="Status"                 type="OperationalStatusEnum"  optional="false"/>
     <item name="TotalOperationalTime"   type="elapsed_s"              optional="true" isNullable="true"/>
     <item name="EstimatedTime"          type="elapsed_s"              optional="true" isNullable="true"/>
