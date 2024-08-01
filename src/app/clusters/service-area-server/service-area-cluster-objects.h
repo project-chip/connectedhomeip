@@ -39,16 +39,16 @@ struct LocationStructureWrapper : public chip::app::Clusters::ServiceArea::Struc
     LocationStructureWrapper()
     {
         SetLocationID(0);
-        SetMapID(DataModel::Nullable<uint8_t>());
-        SetLandmarkTag(DataModel::Nullable<LandmarkTag>());
-        SetPositionTag(DataModel::Nullable<PositionTag>());
-        SetSurfaceTag(DataModel::Nullable<FloorSurfaceTag>());
+        SetMapID(DataModel::NullNullable);
+        SetLandmarkTag(DataModel::NullNullable);
+        SetPositionTag(DataModel::NullNullable);
+        SetSurfaceTag(DataModel::NullNullable);
 
         // 'true' forces the 'canonical' form specified by the cluster requirements
         // where the LocationDescriptorStruct is null if all its elements are/would be empty or null.
         SetLocationName(CharSpan(mLocationNameBuffer, 0), true);
-        SetFloorNumber(DataModel::Nullable<int16_t>(), true);
-        SetAreaType(DataModel::Nullable<AreaTypeTag>(), true);
+        SetFloorNumber(DataModel::NullNullable, true);
+        SetAreaType(DataModel::NullNullable, true);
     }
 
     /**
