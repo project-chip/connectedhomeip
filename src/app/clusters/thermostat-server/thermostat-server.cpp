@@ -74,7 +74,8 @@ constexpr int8_t kDefaultDeadBand                 = 25; // 2.5C is the default
 // Object Tracking
 static ThermostatMatterScheduleManager * gsMatterScheduleEditor = nullptr;
 
-void ThermostatMatterScheduleManager::SetActiveInstance(ThermostatMatterScheduleManager * inManager)
+void 
+ThermostatMatterScheduleManager::SetActiveInstance(ThermostatMatterScheduleManager * inManager)
 {
     if (gsMatterScheduleEditor != nullptr)
     {
@@ -90,6 +91,16 @@ void ThermostatMatterScheduleManager::SetActiveInstance(ThermostatMatterSchedule
 ThermostatMatterScheduleManager * ThermostatMatterScheduleManager::GetActiveInstance()
 {
     return gsMatterScheduleEditor;
+}
+
+bool 
+ThermostatMatterScheduleManager::areDescriptorsEqualAndValid(const Access::SubjectDescriptor &desc1, const Access::SubjectDescriptor &desc2)
+{
+    if (desc1.fabricIndex == kUndefinedFabricIndex || desc1.subject == kUndefinedNodeId)
+        return false;
+    if (desc2.fabricIndex == kUndefinedFabricIndex || desc2.subject == kUndefinedNodeId)
+        return false;
+    return ((desc1.fabricIndex == desc2.fabricIndex) && (desc1.subject == desc2.subject));
 }
 
 namespace {
@@ -284,7 +295,11 @@ CHIP_ERROR ThermostatAttrAccess::Write(const ConcreteDataAttributePath & aPath, 
             return statusIB.ToChipError();
         }
 
-        // TODO: make sure it's the right session for editing???
+        if (!(manager->IsActiveSubjectDescriptor(aPath.mEndpointId, aDecoder.GetSubjectDescriptor())))
+        {
+            StatusIB statusIB(imcode::InvalidInState);
+            return statusIB.ToChipError();
+        }
 
         if (!aPath.IsListItemOperation())
         {
@@ -329,7 +344,11 @@ CHIP_ERROR ThermostatAttrAccess::Write(const ConcreteDataAttributePath & aPath, 
             return statusIB.ToChipError();
         }
 
-        // TODO: make sure it's the right session for editing
+        if (!(manager->IsActiveSubjectDescriptor(aPath.mEndpointId, aDecoder.GetSubjectDescriptor())))
+        {
+            StatusIB statusIB(imcode::InvalidInState);
+            return statusIB.ToChipError();
+        }
 
         if (!aPath.IsListItemOperation())
         {
@@ -1067,7 +1086,6 @@ static void onThermostatEditorTick(chip::System::Layer * systemLayer, void * app
     {
         if (manager->IsEditing(endpoint))
         {
-            manager->mSession.Release(); // this should clear the handle
             manager->RollbackEdits(endpoint);
         }
     }
@@ -1088,7 +1106,7 @@ static bool StartEditRequest(chip::app::CommandHandler * commandObj, const chip:
 
     currentlyEditing = manager->IsEditing(commandPath.mEndpointId);
 
-    if (currentlyEditing && manager->mSession.Contains(commandObj->GetExchangeContext()->GetSessionHandle()))
+    if (currentlyEditing && !(manager->IsActiveSubjectDescriptor(commandPath.mEndpointId, commandObj->GetSubjectDescriptor())))
     {
         DeviceLayer::SystemLayer().ExtendTimerTo(System::Clock::Milliseconds16(timeout), onThermostatEditorTick, reinterpret_cast<void *>(endpointAsAppstate));
     }
@@ -1096,8 +1114,7 @@ static bool StartEditRequest(chip::app::CommandHandler * commandObj, const chip:
     {
         VerifyOrExit(currentlyEditing == false, status = imcode::Busy);
 
-        manager->mSession = commandObj->GetExchangeContext()->GetSessionHandle();
-        manager->StartEditing(commandPath.mEndpointId);
+        manager->StartEditing(commandPath.mEndpointId, commandObj->GetSubjectDescriptor());
         DeviceLayer::SystemLayer().StartTimer(System::Clock::Milliseconds16(timeout), onThermostatEditorTick, reinterpret_cast<void *>(endpointAsAppstate));
     }
 
@@ -1118,7 +1135,7 @@ static bool CancelEditRequest(chip::app::CommandHandler * commandObj, const chip
 
     currentlyEditing = manager->IsEditing(commandPath.mEndpointId);
 
-    if (currentlyEditing && !(manager->mSession.Contains(commandObj->GetExchangeContext()->GetSessionHandle())))
+    if (currentlyEditing && !(manager->IsActiveSubjectDescriptor(commandPath.mEndpointId, commandObj->GetSubjectDescriptor())))
     {
         status = imcode::UnsupportedAccess;
     }
@@ -1145,7 +1162,7 @@ static bool CommitEditRequest(chip::app::CommandHandler * commandObj, const chip
     VerifyOrExit(manager != nullptr, status = imcode::InvalidCommand);
 
     currentlyEditing = manager->IsEditing(commandPath.mEndpointId);
-    if (currentlyEditing && !(manager->mSession.Contains(commandObj->GetExchangeContext()->GetSessionHandle())))
+    if (currentlyEditing && !(manager->IsActiveSubjectDescriptor(commandPath.mEndpointId, commandObj->GetSubjectDescriptor())))
     {
         status = imcode::UnsupportedAccess;
     }
@@ -1154,9 +1171,6 @@ static bool CommitEditRequest(chip::app::CommandHandler * commandObj, const chip
         VerifyOrExit(currentlyEditing == true, status = imcode::InvalidInState);
 
         status = manager->CommitEdits(commandPath.mEndpointId);
-        SuccessOrExit(StatusIB(status).ToChipError());
-        manager->mSession.Release(); // this should clear the handle
-
         SuccessOrExit(StatusIB(status).ToChipError());
 
         (void) chip::DeviceLayer::SystemLayer().CancelTimer(onThermostatEditorTick, reinterpret_cast<void *>(endpointAsAppstate));

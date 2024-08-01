@@ -33,13 +33,10 @@ struct ThermostatMatterScheduleManager
     ThermostatMatterScheduleManager() {};
     virtual ~ThermostatMatterScheduleManager() {};
 
-    // TODO: Verify this is the right object to be tracking to ensure that the client 
-    // that started editing is the only one that can edit until it sends a cancel or commit
-    chip::SessionHolder mSession;
-
     virtual bool IsEditing() = 0;  // is any endpoint currently being edited?
     virtual bool IsEditing(chip::EndpointId aEndpoint) = 0;
-    virtual CHIP_ERROR StartEditing(chip::EndpointId aEndpoint) = 0;
+    virtual CHIP_ERROR StartEditing(chip::EndpointId aEndpoint, const chip::Access::SubjectDescriptor &inDescriptor) = 0;
+    virtual bool IsActiveSubjectDescriptor(chip::EndpointId aEndpoint, const chip::Access::SubjectDescriptor &inDescriptor) = 0;
 
     virtual CHIP_ERROR RollbackEdits() = 0; // rollback all edits
     virtual CHIP_ERROR RollbackEdits(chip::EndpointId aEndpoint) = 0;    
@@ -67,4 +64,5 @@ protected:
                                    chip::Span<chip::app::Clusters::Thermostat::Structs::ScheduleStruct::Type> & newList,
                                    chip::Span<chip::app::Clusters::Thermostat::Structs::PresetStruct::Type> & presetList);
 
+    bool areDescriptorsEqualAndValid(const chip::Access::SubjectDescriptor &desc1, const chip::Access::SubjectDescriptor &desc2);
 };

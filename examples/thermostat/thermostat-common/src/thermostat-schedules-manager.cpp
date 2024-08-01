@@ -103,7 +103,9 @@ struct ExampleThermostatScheduleManager : public ThermostatMatterScheduleManager
     virtual bool IsEditing() { return IsEditing (1); };
     virtual bool IsEditing(chip::EndpointId aEndpoint) { return mEditing; };
     
-    virtual CHIP_ERROR StartEditing(chip::EndpointId aEndpoint);
+    virtual CHIP_ERROR StartEditing(chip::EndpointId aEndpoint, const chip::Access::SubjectDescriptor &inDescriptor);
+    virtual bool IsActiveSubjectDescriptor(chip::EndpointId aEndpoint, const chip::Access::SubjectDescriptor &inDescriptor);
+
     virtual CHIP_ERROR RollbackEdits();
     virtual CHIP_ERROR RollbackEdits(chip::EndpointId aEndpoint);    
 
@@ -122,21 +124,30 @@ struct ExampleThermostatScheduleManager : public ThermostatMatterScheduleManager
     virtual chip::Protocols::InteractionModel::Status AppendSchedule(chip::EndpointId aEndpoint, const Structs::ScheduleStruct::DecodableType & schedule);
 
 private:
+    // example app is only worrying about 1 endpoint.
     bool mEditing = false;
+    Access::SubjectDescriptor mSubjectDescriptor;
 };
 
 
-CHIP_ERROR ExampleThermostatScheduleManager::StartEditing(chip::EndpointId aEndpoint)
+CHIP_ERROR ExampleThermostatScheduleManager::StartEditing(chip::EndpointId aEndpoint, const chip::Access::SubjectDescriptor &inDescriptor)
 {
     ChipLogProgress(Zcl, "ExampleThermostatScheduleManager - StartEditing");
     if (mEditing == true)
         return CHIP_ERROR_BUSY;
 
     mEditing = true;
+    mSubjectDescriptor = inDescriptor;
     gsEditingPresetsEmptyIndex = 0;
     gsEditingSchedulesEmptyIndex = 0;
 
     return CHIP_NO_ERROR;
+}
+
+bool 
+ExampleThermostatScheduleManager::IsActiveSubjectDescriptor(chip::EndpointId aEndpoint, const chip::Access::SubjectDescriptor &inDescriptor)
+{
+    return areDescriptorsEqualAndValid(mSubjectDescriptor, inDescriptor);
 }
 
 CHIP_ERROR ExampleThermostatScheduleManager::RollbackEdits()
@@ -149,6 +160,8 @@ CHIP_ERROR ExampleThermostatScheduleManager::RollbackEdits(chip::EndpointId aEnd
     ChipLogProgress(Zcl, "ExampleThermostatScheduleManager - RollbackEdits");
     gsEditingPresetsEmptyIndex = 0;
     gsEditingSchedulesEmptyIndex = 0;
+    mSubjectDescriptor.fabricIndex = kUndefinedFabricIndex;
+    mSubjectDescriptor.subject = kUndefinedNodeId;
     return CHIP_NO_ERROR;
 }
 
@@ -221,6 +234,9 @@ Status ExampleThermostatScheduleManager::CommitEdits(chip::EndpointId aEndpoint)
 
     // TODO: update thermostat attributes for new presets.
     
+    mSubjectDescriptor.fabricIndex = kUndefinedFabricIndex;
+    mSubjectDescriptor.subject = kUndefinedNodeId;
+
 exit:
     return status;
 }
