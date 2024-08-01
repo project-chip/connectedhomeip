@@ -1388,7 +1388,7 @@ void handleAtomicBegin(CommandHandler * commandObj, const ConcreteCommandPath & 
     uint16_t maxTimeout = 5000;
     timeout             = std::min(timeout, maxTimeout);
 
-    ScheduleTimer(endpoint, static_cast<System::Clock::Milliseconds16>(timeout));
+    ScheduleTimer(endpoint, System::Clock::Milliseconds16(timeout));
     gThermostatAttrAccess.SetAtomicWrite(endpoint, true);
     gThermostatAttrAccess.SetAtomicWriteScopedNodeId(endpoint, GetSourceScopedNodeId(commandObj));
     auto response = buildAtomicResponse(imcode::Success, imcode::Success, imcode::Success);
