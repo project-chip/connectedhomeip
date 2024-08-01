@@ -25,6 +25,9 @@
 #include <platform/CHIPDeviceConfig.h>
 #include <platform/silabs/SilabsConfig.h>
 #include <string.h>
+#ifdef OTA_ENCRYPTION_ENABLE
+#include <platform/silabs/multi-ota/OtaTlvEncryptionKey.h>
+#endif // OTA_ENCRYPTION_ENABLE
 
 using namespace chip::Credentials;
 
@@ -708,7 +711,7 @@ CHIP_ERROR Storage::SetOtaTlvEncryptionKey(const ByteSpan & value)
 {
     return CHIP_ERROR_NOT_IMPLEMENTED;
 }
-#endif
+#endif // OTA_ENCRYPTION_ENABLE
 
 CHIP_ERROR Storage::GetTestEventTriggerKey(MutableByteSpan & keySpan)
 {
