@@ -32,11 +32,11 @@ limitations under the License.
     <item name="Name"    type="char_string" length="64" optional="false"/>
   </struct>
 
-  <struct name="LocationStruct">
+  <struct name="AreaStruct">
     <cluster code="0x0150"/>
-    <item name="LocationID"   type="int32u"                  optional="false" isNullable="false"/>
-    <item name="MapID"        type="int8u"                   optional="false" isNullable="true"/>
-    <item name="LocationInfo" type="AreaInfoStruct"      optional="false" isNullable="false"/>
+    <item name="AreaID"   type="int32u"              optional="false" isNullable="false"/>
+    <item name="MapID"    type="int8u"               optional="false" isNullable="true"/>
+    <item name="AreaDesc" type="AreaInfoStruct"      optional="false" isNullable="false"/>
   </struct>
 
   <enum name="OperationalStatusEnum" type="enum8">
@@ -88,7 +88,7 @@ limitations under the License.
     </features>
 
     <!-- Attributes -->
-    <attribute side="server" code="0x0000" define="SupportedLocations"  type="array"     entryType="LocationStruct"  writable="false" isNullable="false" optional="false">SupportedLocations</attribute>
+    <attribute side="server" code="0x0000" define="SupportedLocations"  type="array"     entryType="AreaStruct"      writable="false" isNullable="false" optional="false">SupportedLocations</attribute>
     <attribute side="server" code="0x0001" define="SupportedMaps"       type="array"     entryType="MapStruct"       writable="false" isNullable="true"  optional="false">SupportedMaps</attribute>
     <attribute side="server" code="0x0002" define="SelectedLocations"   type="array"     entryType="int32u"          writable="false" isNullable="true"  optional="false">SelectedLocations</attribute>
     <attribute side="server" code="0x0003" define="CurrentLocation"     type="int32u"                                writable="false" isNullable="true"  optional="true">CurrentLocation</attribute>
