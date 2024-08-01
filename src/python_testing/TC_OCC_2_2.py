@@ -27,18 +27,9 @@
 # test-runner-run/run1/script-args: --storage-path admin_storage.json --commissioning-method on-network --discriminator 1234 --passcode 20202021 --PICS src/app/tests/suites/certification/ci-pics-values --trace-to json:${TRACE_TEST_JSON}.json --trace-to perfetto:${TRACE_TEST_PERFETTO}.perfetto
 # === END CI TEST ARGUMENTS ===
 
-from dataclasses import dataclass
-
 import chip.clusters as Clusters
 from matter_testing_support import MatterBaseTest, TestStep, async_test_body, default_matter_test_main
 from mobly import asserts
-
-
-@dataclass
-class FeatureMapping:
-    """Maps feature flags to a specific bitmap and sensor type"""
-    feature_map: int
-    sensor_type: Clusters.OccupancySensing.Enums.OccupancySensorTypeEnum
 
 
 class TC_OCC_2_2(MatterBaseTest):
@@ -133,7 +124,7 @@ class TC_OCC_2_2(MatterBaseTest):
             asserts.assert_equal(
                 (occupancy_sensor_type_bitmap_dut & sensor_bit) != 0,
                 (feature_map & feature_bit) != 0,
-                f"Feature bit and sensor bitmap must be equal for {name}"
+                f"Feature bit and sensor bitmap must be equal for {name} (BITMAP: 0x{occupancy_sensor_type_bitmap_dut:02X}, FEATUREMAP: 0x{feature_map:02X})"
             )
 
 
