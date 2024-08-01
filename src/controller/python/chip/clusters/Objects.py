@@ -11683,6 +11683,7 @@ class BridgedDeviceBasicInformation(Cluster):
                 ClusterObjectFieldDescriptor(Label="vendorName", Tag=0x00000001, Type=typing.Optional[str]),
                 ClusterObjectFieldDescriptor(Label="vendorID", Tag=0x00000002, Type=typing.Optional[uint]),
                 ClusterObjectFieldDescriptor(Label="productName", Tag=0x00000003, Type=typing.Optional[str]),
+                ClusterObjectFieldDescriptor(Label="productID", Tag=0x00000004, Type=typing.Optional[uint]),
                 ClusterObjectFieldDescriptor(Label="nodeLabel", Tag=0x00000005, Type=typing.Optional[str]),
                 ClusterObjectFieldDescriptor(Label="hardwareVersion", Tag=0x00000007, Type=typing.Optional[uint]),
                 ClusterObjectFieldDescriptor(Label="hardwareVersionString", Tag=0x00000008, Type=typing.Optional[str]),
@@ -11707,6 +11708,7 @@ class BridgedDeviceBasicInformation(Cluster):
     vendorName: 'typing.Optional[str]' = None
     vendorID: 'typing.Optional[uint]' = None
     productName: 'typing.Optional[str]' = None
+    productID: 'typing.Optional[uint]' = None
     nodeLabel: 'typing.Optional[str]' = None
     hardwareVersion: 'typing.Optional[uint]' = None
     hardwareVersionString: 'typing.Optional[str]' = None
@@ -11852,6 +11854,22 @@ class BridgedDeviceBasicInformation(Cluster):
                 return ClusterObjectFieldDescriptor(Type=typing.Optional[str])
 
             value: 'typing.Optional[str]' = None
+
+        @dataclass
+        class ProductID(ClusterAttributeDescriptor):
+            @ChipUtility.classproperty
+            def cluster_id(cls) -> int:
+                return 0x00000039
+
+            @ChipUtility.classproperty
+            def attribute_id(cls) -> int:
+                return 0x00000004
+
+            @ChipUtility.classproperty
+            def attribute_type(cls) -> ClusterObjectFieldDescriptor:
+                return ClusterObjectFieldDescriptor(Type=typing.Optional[uint])
+
+            value: 'typing.Optional[uint]' = None
 
         @dataclass
         class NodeLabel(ClusterAttributeDescriptor):

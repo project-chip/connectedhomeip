@@ -1530,6 +1530,9 @@ static BOOL AttributeIsSpecifiedInBridgedDeviceBasicInformationCluster(Attribute
     case Attributes::ProductName::Id: {
         return YES;
     }
+    case Attributes::ProductID::Id: {
+        return YES;
+    }
     case Attributes::NodeLabel::Id: {
         return YES;
     }

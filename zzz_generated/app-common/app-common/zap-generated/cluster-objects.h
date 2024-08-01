@@ -11158,6 +11158,18 @@ struct TypeInfo
     static constexpr size_t MaxLength() { return 32; }
 };
 } // namespace ProductName
+namespace ProductID {
+struct TypeInfo
+{
+    using Type             = uint16_t;
+    using DecodableType    = uint16_t;
+    using DecodableArgType = uint16_t;
+
+    static constexpr ClusterId GetClusterId() { return Clusters::BridgedDeviceBasicInformation::Id; }
+    static constexpr AttributeId GetAttributeId() { return Attributes::ProductID::Id; }
+    static constexpr bool MustUseTimedWrite() { return false; }
+};
+} // namespace ProductID
 namespace NodeLabel {
 struct TypeInfo
 {
@@ -11372,6 +11384,7 @@ struct TypeInfo
         Attributes::VendorName::TypeInfo::DecodableType vendorName;
         Attributes::VendorID::TypeInfo::DecodableType vendorID = static_cast<chip::VendorId>(0);
         Attributes::ProductName::TypeInfo::DecodableType productName;
+        Attributes::ProductID::TypeInfo::DecodableType productID = static_cast<uint16_t>(0);
         Attributes::NodeLabel::TypeInfo::DecodableType nodeLabel;
         Attributes::HardwareVersion::TypeInfo::DecodableType hardwareVersion = static_cast<uint16_t>(0);
         Attributes::HardwareVersionString::TypeInfo::DecodableType hardwareVersionString;

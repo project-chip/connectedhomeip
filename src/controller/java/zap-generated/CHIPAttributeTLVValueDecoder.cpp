@@ -10140,6 +10140,22 @@ jobject DecodeAttributeValue(const app::ConcreteAttributePath & aPath, TLV::TLVR
             LogErrorOnFailure(chip::JniReferences::GetInstance().CharToStringUTF(cppValue, value));
             return value;
         }
+        case Attributes::ProductID::Id: {
+            using TypeInfo = Attributes::ProductID::TypeInfo;
+            TypeInfo::DecodableType cppValue;
+            *aError = app::DataModel::Decode(aReader, cppValue);
+            if (*aError != CHIP_NO_ERROR)
+            {
+                return nullptr;
+            }
+            jobject value;
+            std::string valueClassName     = "java/lang/Integer";
+            std::string valueCtorSignature = "(I)V";
+            jint jnivalue                  = static_cast<jint>(cppValue);
+            chip::JniReferences::GetInstance().CreateBoxedObject<jint>(valueClassName.c_str(), valueCtorSignature.c_str(), jnivalue,
+                                                                       value);
+            return value;
+        }
         case Attributes::NodeLabel::Id: {
             using TypeInfo = Attributes::NodeLabel::TypeInfo;
             TypeInfo::DecodableType cppValue;

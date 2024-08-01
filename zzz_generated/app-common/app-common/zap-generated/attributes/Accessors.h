@@ -1225,6 +1225,12 @@ Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, chip::CharSpa
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, chip::CharSpan value, MarkAttributeDirty markDirty);
 } // namespace ProductName
 
+namespace ProductID {
+Protocols::InteractionModel::Status Get(chip::EndpointId endpoint, uint16_t * value); // int16u
+Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint16_t value);
+Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint16_t value, MarkAttributeDirty markDirty);
+} // namespace ProductID
+
 namespace NodeLabel {
 Protocols::InteractionModel::Status Get(chip::EndpointId endpoint, chip::MutableCharSpan & value); // char_string
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, chip::CharSpan value);

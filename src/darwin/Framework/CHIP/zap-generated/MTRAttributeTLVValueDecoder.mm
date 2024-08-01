@@ -4450,6 +4450,17 @@ static id _Nullable DecodeAttributeValueForBridgedDeviceBasicInformationCluster(
         }
         return value;
     }
+    case Attributes::ProductID::Id: {
+        using TypeInfo = Attributes::ProductID::TypeInfo;
+        TypeInfo::DecodableType cppValue;
+        *aError = DataModel::Decode(aReader, cppValue);
+        if (*aError != CHIP_NO_ERROR) {
+            return nil;
+        }
+        NSNumber * _Nonnull value;
+        value = [NSNumber numberWithUnsignedShort:cppValue];
+        return value;
+    }
     case Attributes::NodeLabel::Id: {
         using TypeInfo = Attributes::NodeLabel::TypeInfo;
         TypeInfo::DecodableType cppValue;

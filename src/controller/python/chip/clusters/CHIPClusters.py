@@ -3324,6 +3324,12 @@ class ChipClusters:
                 "type": "str",
                 "reportable": True,
             },
+            0x00000004: {
+                "attributeName": "ProductID",
+                "attributeId": 0x00000004,
+                "type": "int",
+                "reportable": True,
+            },
             0x00000005: {
                 "attributeName": "NodeLabel",
                 "attributeId": 0x00000005,
