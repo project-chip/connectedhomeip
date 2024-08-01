@@ -117,7 +117,7 @@ private:
      *                     If the input value is invalid, returns the Interaction Model status code of INVALID_COMMAND.
      * @param[in] req the command parameters
      */
-    void HandleSelectLocationsCmd(HandlerContext & ctx, const Commands::SelectLocations::DecodableType & req);
+    void HandleSelectAreasCmd(HandlerContext & ctx, const Commands::SelectAreas::DecodableType & req);
 
     /**
      * @param[in, out] ctx Returns the Interaction Model status code which was user determined in the business logic.

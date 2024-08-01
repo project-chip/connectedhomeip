@@ -46,7 +46,7 @@ public:
     // command support
     bool IsSetSelectedAreasAllowed(MutableCharSpan statusText) override;
 
-    bool IsValidSelectLocationsSet(const ServiceArea::Commands::SelectLocations::DecodableType & req,
+    bool IsValidSelectAreasSet(const ServiceArea::Commands::SelectAreas::DecodableType & req,
                                    ServiceArea::SelectAreasStatus & locationStatus, MutableCharSpan statusText) override;
 
     bool HandleSkipCurrentArea(MutableCharSpan skipStatusText) override;
@@ -63,7 +63,7 @@ public:
     bool GetSupportedLocationById(uint32_t aAreaId, uint32_t & listIndex,
                                   ServiceArea::LocationStructureWrapper & supportedLocation) override;
 
-    bool AddSupportedLocation(const ServiceArea::LocationStructureWrapper & newLocation, uint32_t & listIndex) override;
+    bool AddSupportedLocation(const ServiceArea::LocationStructureWrapper & newArea, uint32_t & listIndex) override;
 
     bool ModifySupportedLocation(uint32_t listIndex, const ServiceArea::LocationStructureWrapper & modifiedLocation) override;
 

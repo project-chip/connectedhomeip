@@ -79,7 +79,7 @@ bool RvcServiceAreaDelegate::IsSetSelectedAreasAllowed(MutableCharSpan statusTex
     return true;
 };
 
-bool RvcServiceAreaDelegate::IsValidSelectLocationsSet(const Commands::SelectLocations::DecodableType & req,
+bool RvcServiceAreaDelegate::IsValidSelectAreasSet(const Commands::SelectAreas::DecodableType & req,
                                                        SelectAreasStatus & locationStatus, MutableCharSpan statusText)
 {
     // TODO IMPLEMENT
@@ -139,7 +139,7 @@ bool RvcServiceAreaDelegate::GetSupportedLocationById(uint32_t aAreaID, uint32_t
     return false;
 };
 
-bool RvcServiceAreaDelegate::AddSupportedLocation(const LocationStructureWrapper & newLocation, uint32_t & listIndex)
+bool RvcServiceAreaDelegate::AddSupportedLocation(const LocationStructureWrapper & newArea, uint32_t & listIndex)
 {
     // The server instance (caller) is responsible for ensuring that there are no duplicate area IDs, list size not exceeded,
     // etc.
@@ -148,12 +148,12 @@ bool RvcServiceAreaDelegate::AddSupportedLocation(const LocationStructureWrapper
     if (mSupportedAreas.size() < kMaxNumSupportedAreas)
     {
         // not sorting list, number of locations normally expected to be small, max 255
-        mSupportedAreas.push_back(newLocation);
+        mSupportedAreas.push_back(newArea);
         listIndex = static_cast<uint32_t>(mSupportedMaps.size()) - 1; // new element is last in list
         return true;
     }
 
-    ChipLogError(Zcl, "AddSupportedLocation %u - supported locations list is already at maximum size %u", newLocation.areaID,
+    ChipLogError(Zcl, "AddSupportedLocation %u - supported locations list is already at maximum size %u", newArea.areaID,
                  static_cast<uint32_t>(kMaxNumSupportedAreas));
 
     return false;

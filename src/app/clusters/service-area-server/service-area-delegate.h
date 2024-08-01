@@ -87,10 +87,10 @@ public:
      * @param[out] statusText text describing failure (see description above), size kMaxSizeStatusText.
      * @return true if success.
      *
-     * @note If the SelectLocations command is allowed when the device is operating and the selected locations change to none, the
+     * @note If the SelectAreas command is allowed when the device is operating and the selected locations change to none, the
      * device must stop.
      */
-    virtual bool IsValidSelectLocationsSet(const Commands::SelectLocations::DecodableType & req,
+    virtual bool IsValidSelectAreasSet(const Commands::SelectAreas::DecodableType & req,
                                            SelectAreasStatus & locationStatus, MutableCharSpan statusText) = 0;
 
     /**
@@ -167,14 +167,14 @@ public:
 
     /**
      * This method is called by the server instance to add a new location to the list.
-     * The server instance will ensure that the newLocation is a valid, unique location.
-     * @param [in] newLocation new location to add.
+     * The server instance will ensure that the newArea is a valid, unique location.
+     * @param [in] newArea new location to add.
      * @param [out] listIndex filled with the list index for the new location, if successful.
      * @return true if successful, false otherwise.
 
      * @note this function SHOULD double check that the added location won't exceed the maximum list size.
      */
-    virtual bool AddSupportedLocation(const LocationStructureWrapper & newLocation, uint32_t & listIndex) = 0;
+    virtual bool AddSupportedLocation(const LocationStructureWrapper & newArea, uint32_t & listIndex) = 0;
 
     /**
      * This method is called by the server instance to modify an existing location in the list.
@@ -183,7 +183,7 @@ public:
      * @param[in] modifiedLocation A location with the modified contents.
      * @return true if successful, false otherwise.
      *
-     * @note this function SHOULD double check that newLocation's areaID matches the object at listIndex.
+     * @note this function SHOULD double check that newArea's areaID matches the object at listIndex.
      */
     virtual bool ModifySupportedLocation(uint32_t listIndex, const LocationStructureWrapper & modifiedLocation) = 0;
 
