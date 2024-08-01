@@ -1950,13 +1950,13 @@ cluster Thermostat = 513 {
 
   /** Upon receipt, the attributes for the indicated setpoint(s) SHALL have the amount specified in the Amount field added to them. */
   command SetpointRaiseLower(SetpointRaiseLowerRequest): DefaultSuccess = 0;
-  /** Upon receipt, the weekly schedule for updating setpoints SHALL be stored in the */
+  /** This command is used to update the thermostat weekly setpoint schedule from a management system. */
   command access(invoke: manage) SetWeeklySchedule(SetWeeklyScheduleRequest): DefaultSuccess = 1;
-  /** Upon receipt, the unit SHOULD send in return the Get */
+  /** The Current Weekly Schedule Command is sent from the server in response to the Get Weekly Schedule Command. */
   command GetWeeklySchedule(GetWeeklyScheduleRequest): GetWeeklyScheduleResponse = 2;
   /** This command is used to clear the weekly schedule. */
   command access(invoke: manage) ClearWeeklySchedule(): DefaultSuccess = 3;
-  /** Upon receipt, if the */
+  /** Upon receipt, if the Schedules attribute contains a ScheduleStruct whose ScheduleHandle field matches the value of the ScheduleHandle field, the server SHALL set the thermostat's ActiveScheduleHandle attribute to the value of the ScheduleHandle field. */
   command SetActiveScheduleRequest(SetActiveScheduleRequestRequest): DefaultSuccess = 5;
   /** ID */
   command SetActivePresetRequest(SetActivePresetRequestRequest): DefaultSuccess = 6;
