@@ -14,6 +14,7 @@
  *    See the License for the specific language governing permissions and
  *    limitations under the License.
  */
+#include "lib/core/CHIPConfig.h"
 #include "lib/core/CHIPError.h"
 #include "lib/support/CodeUtils.h"
 #include "protocols/interaction_model/StatusCode.h"
@@ -140,36 +141,45 @@ bool ActionReturnStatus::IsOutOfSpaceEncodingResponse() const
     return false;
 }
 
-void ActionReturnStatus::AddTo(StringBuilderBase & buffer) const
+const char * ActionReturnStatus::c_str() const
 {
+
+    // Generally size should be sufficient.
+    // len("Status<123>, Code 255") == 21 (and then 22 for null terminator. We have slack.)
+    static chip::StringBuilder<32> sFormatBuffer;
+
     if (const CHIP_ERROR * err = std::get_if<CHIP_ERROR>(&mReturnStatus))
     {
-        buffer.AddFormat("%" CHIP_ERROR_FORMAT, err->Format());
-        return;
+#if CHIP_CONFIG_ERROR_FORMAT_AS_STRING
+        return err->Format(); // any length
+#else
+        sFormatBuffer.Reset().AddFormat("%" CHIP_ERROR_FORMAT, *err);
+        return sFormatBuffer.c_str();
+#endif
     }
 
     if (const ClusterStatusCode * status = std::get_if<ClusterStatusCode>(&mReturnStatus))
     {
 #if CHIP_CONFIG_IM_STATUS_CODE_VERBOSE_FORMAT
-        buffer.AddFormat("%s(%d)", Protocols::InteractionModel::StatusName(status->GetStatus()),
-                         static_cast<int>(status->GetStatus()));
+        sFormatBuffer.AddFormat("%s(%d)", Protocols::InteractionModel::StatusName(status->GetStatus()),
+                                static_cast<int>(status->GetStatus()));
 #else
         if (status->IsSuccess())
         {
-            buffer.Add("Success");
+            sFormatBuffer.Add("Success");
         }
         else
         {
-            buffer.AddFormat("Status<%d>", static_cast<int>(status->GetStatus()));
+            sFormatBuffer.AddFormat("Status<%d>", static_cast<int>(status->GetStatus()));
         }
 #endif
 
         chip::Optional<ClusterStatus> clusterCode = status->GetClusterSpecificCode();
         if (clusterCode.HasValue())
         {
-            buffer.AddFormat(", Code %d", static_cast<int>(clusterCode.Value()));
+            sFormatBuffer.AddFormat(", Code %d", static_cast<int>(clusterCode.Value()));
         }
-        return;
+        return sFormatBuffer.c_str();
     }
 
     // all std::variant cases exhausted

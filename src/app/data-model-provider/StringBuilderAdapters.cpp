@@ -23,10 +23,7 @@ template <>
 StatusWithSize ToString<chip::app::DataModel::ActionReturnStatus>(const chip::app::DataModel::ActionReturnStatus & status,
                                                                   pw::span<char> buffer)
 {
-    chip::StringBuilder<256> formatted;
-    status.AddTo(formatted);
-
-    return pw::string::Format(buffer, "ActionReturnStatus<%s>", formatted.c_str());
+    return pw::string::Format(buffer, "ActionReturnStatus<%s>", status.c_str());
 }
 
 } // namespace pw

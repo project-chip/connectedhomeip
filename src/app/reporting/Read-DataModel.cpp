@@ -95,9 +95,7 @@ DataModel::ActionReturnStatus RetrieveClusterData(DataModel::Provider * dataMode
     // and will be sent to the client as well).
     if (!status.IsOutOfSpaceEncodingResponse())
     {
-        StringBuilder<128> buffer;
-        status.AddTo(buffer);
-        ChipLogError(DataManagement, "Failed to read attribute: %s", buffer.c_str());
+        ChipLogError(DataManagement, "Failed to read attribute: %s", status.c_str());
     }
     return status;
 }
