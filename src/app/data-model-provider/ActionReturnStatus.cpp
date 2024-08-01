@@ -28,24 +28,50 @@ namespace DataModel {
 using Protocols::InteractionModel::ClusterStatusCode;
 using Protocols::InteractionModel::Status;
 
-bool ActionReturnStatus::operator==(Protocols::InteractionModel::Status status)
+namespace {
+
+bool StatusIsTheSameAsError(const ClusterStatusCode & status, const CHIP_ERROR & err)
 {
-    if (const CHIP_ERROR * err = std::get_if<CHIP_ERROR>(&mReturnStatus))
+    auto cluster_code = status.GetClusterSpecificCode();
+    if (!cluster_code.HasValue())
     {
-        return *err == CHIP_ERROR_IM_GLOBAL_STATUS_VALUE(status);
+        return err == CHIP_ERROR_IM_GLOBAL_STATUS_VALUE(status.GetStatus());
     }
 
-    if (const ClusterStatusCode * internal_status = std::get_if<ClusterStatusCode>(&mReturnStatus))
+    if (status.GetStatus() != Status::Failure)
     {
-        if (internal_status->HasClusterSpecificCode())
-        {
-            return false; // status has no cluster-specific code, so reject equality
-        }
-
-        return internal_status->GetStatus() == status;
+        return false;
     }
 
-    chipDie();
+    return err == CHIP_ERROR_IM_CLUSTER_STATUS_VALUE(cluster_code.Value());
+}
+
+} // namespace
+
+bool ActionReturnStatus::operator==(const ActionReturnStatus & other) const
+{
+    if (mReturnStatus == other.mReturnStatus)
+    {
+        return true;
+    }
+
+    const ClusterStatusCode * thisStatus  = std::get_if<ClusterStatusCode>(&mReturnStatus);
+    const ClusterStatusCode * otherStatus = std::get_if<ClusterStatusCode>(&other.mReturnStatus);
+
+    const CHIP_ERROR * thisErr  = std::get_if<CHIP_ERROR>(&mReturnStatus);
+    const CHIP_ERROR * otherErr = std::get_if<CHIP_ERROR>(&other.mReturnStatus);
+
+    if (thisStatus && otherErr)
+    {
+        return StatusIsTheSameAsError(*thisStatus, *otherErr);
+    }
+
+    if (otherStatus && thisErr)
+    {
+        return StatusIsTheSameAsError(*otherStatus, *thisErr);
+    }
+
+    return false;
 }
 
 CHIP_ERROR ActionReturnStatus::GetUnderlyingError() const
@@ -141,7 +167,7 @@ void ActionReturnStatus::AddTo(StringBuilderBase & buffer) const
     {
 #if CHIP_CONFIG_IM_STATUS_CODE_VERBOSE_FORMAT
         buffer.AddFormat("%s(%d)", Protocols::InteractionModel::StatusName(status->GetStatus()),
-                      static_cast<int>(status->GetStatus()));
+                         static_cast<int>(status->GetStatus()));
 #else
         if (status->IsSuccess())
         {

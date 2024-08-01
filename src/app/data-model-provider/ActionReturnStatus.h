@@ -75,11 +75,10 @@ public:
     /// Generally this is when the return is based on CHIP_ERROR_NO_MEMORY or CHIP_ERROR_BUFFER_TOO_SMALL
     bool IsOutOfSpaceError() const;
 
-    bool operator==(const ActionReturnStatus & other) const { return mReturnStatus == other.mReturnStatus; }
-    bool operator!=(const ActionReturnStatus & other) const { return mReturnStatus != other.mReturnStatus; }
-
-    // specialization that allows compare with both ClusterStatusCode AND CHIP_ERROR global IM status
-    bool operator==(Protocols::InteractionModel::Status status);
+    // NOTE: operator== will assume statues the same between CHIP_GLOBAL_IM_ERROR and a raw cluster status
+    //       even though a CHIP_ERROR has some formatting info like file/line
+    bool operator==(const ActionReturnStatus & other) const;
+    bool operator!=(const ActionReturnStatus & other) const { return !(*this == other); }
 
     /// Get the formatted string of this status.
     void AddTo(StringBuilderBase & buffer) const;
