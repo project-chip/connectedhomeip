@@ -18,6 +18,7 @@
 
 #include "lib/core/CHIPError.h"
 #include "protocols/interaction_model/StatusCode.h"
+#include "pw_unit_test/framework_backend.h"
 #include <app/data-model-provider/ActionReturnStatus.h>
 #include <app/data-model-provider/StringBuilderAdapters.h>
 #include <lib/support/CodeUtils.h>
@@ -32,7 +33,7 @@ TEST(TestActionReturnStatus, TestEquality)
 {
     // equality should happen between equivalent statuses and chip_errors
     ASSERT_EQ(ActionReturnStatus(Status::UnsupportedRead), Status::UnsupportedRead);
-    ASSERT_EQ(ActionReturnStatus(Status::UnsupportedWrite), CHIP_IM_GLOBAL_STATUS(UnsupportedRead));
+    ASSERT_EQ(ActionReturnStatus(Status::UnsupportedWrite), CHIP_IM_GLOBAL_STATUS(UnsupportedWrite));
 
     ASSERT_EQ(ActionReturnStatus(CHIP_IM_GLOBAL_STATUS(Busy)), Status::Busy);
     ASSERT_EQ(ActionReturnStatus(CHIP_IM_GLOBAL_STATUS(Busy)), CHIP_IM_GLOBAL_STATUS(Busy));
@@ -45,5 +46,13 @@ TEST(TestActionReturnStatus, TestEquality)
 
 TEST(TestActionReturnStatus, TestIsError)
 {
-    AS
+    ASSERT_TRUE(ActionReturnStatus(CHIP_IM_CLUSTER_STATUS(123)).IsError());
+    ASSERT_TRUE(ActionReturnStatus(CHIP_ERROR_INTERNAL).IsError());
+    ASSERT_TRUE(ActionReturnStatus(CHIP_ERROR_NO_MEMORY).IsError());
+    ASSERT_TRUE(ActionReturnStatus(Status::UnsupportedRead).IsError());
+    ASSERT_TRUE(ActionReturnStatus(ClusterStatusCode::ClusterSpecificFailure(123)).IsError());
+
+    ASSERT_FALSE(ActionReturnStatus(Status::Success).IsError());
+    ASSERT_FALSE(ActionReturnStatus(ClusterStatusCode::ClusterSpecificSuccess(123)).IsError());
+    ASSERT_FALSE(ActionReturnStatus(CHIP_NO_ERROR).IsError());
 }
