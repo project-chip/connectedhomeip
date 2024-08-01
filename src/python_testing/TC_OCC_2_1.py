@@ -93,7 +93,7 @@ class TC_OCC_2_1(MatterBaseTest):
         occupancy_sensor_type_dut = await self.read_occ_attribute_expect_success(endpoint=endpoint, attribute=attributes.OccupancySensorType)
         asserts.assert_less(occupancy_sensor_type_dut, Clusters.Objects.OccupancySensing.Enums.OccupancySensorTypeEnum.kUnknownEnumValue,
                             "OccupancySensorType is not in valid range")
-        asserts.assert_in(occupancy_sensor_type_dut, {Clusters.Objects.OccupancySensing.Enums.OccupancySensorTypeEnum.kPIR,
+        asserts.assert_in(occupancy_sensor_type_dut, {Clusters.Objects.OccupancySensing.Enums.OccupancySensorTypeEnum.kPir,
                                                       Clusters.Objects.OccupancySensing.Enums.OccupancySensorTypeEnum.kUltrasonic,
                                                       Clusters.Objects.OccupancySensing.Enums.OccupancySensorTypeEnum.kPIRAndUltrasonic,
                                                       Clusters.Objects.OccupancySensing.Enums.OccupancySensorTypeEnum.kPhysicalContact}, "OccupancySensorType is not in valid range")
@@ -109,16 +109,16 @@ class TC_OCC_2_1(MatterBaseTest):
         if attributes.HoldTimeLimits.attribute_id in attribute_list:
             asserts.assert_in(attributes.HoldTime.attribute_id, attribute_list, "HoldTime attribute conformance failed.")
             hold_time_limits_dut = await self.read_occ_attribute_expect_success(endpoint=endpoint, attribute=attributes.HoldTimeLimits)
-            asserts.assert_less_equal(hold_time_limits_dut.HoldTimeMin, hold_time_limits_dut.HoldTimeMax,
+            asserts.assert_less_equal(hold_time_limits_dut.holdTimeMin, hold_time_limits_dut.holdTimeMax,
                                       "HoldTimeMin is not in valid range")
-            asserts.assert_greater_equal(hold_time_limits_dut.HoldTimeMin, 0, "HoldTimeMin is not in valid range")
-            asserts.assert_less_equal(hold_time_limits_dut.HoldTimeMax, 0xFFFE, "HoldTimeMin is not in valid range")
-            asserts.assert_greater_equal(hold_time_limits_dut.HoldTimeMax,
-                                         hold_time_limits_dut.HoldTimeMin, "HoldTimeMin is not in valid range")
-            asserts.assert_less_equal(hold_time_limits_dut.HoldTimeDefault,
-                                      hold_time_limits_dut.HoldTimeMax, "HoldTimeMin is not in valid range")
-            asserts.assert_greater_equal(hold_time_limits_dut.HoldTimeDefault,
-                                         hold_time_limits_dut.HoldTimeMin, "HoldTimeMin is not in valid range")
+            asserts.assert_greater_equal(hold_time_limits_dut.holdTimeMin, 0, "HoldTimeMin is not in valid range")
+            asserts.assert_less_equal(hold_time_limits_dut.holdTimeMax, 0xFFFE, "HoldTimeMin is not in valid range")
+            asserts.assert_greater_equal(hold_time_limits_dut.holdTimeMax,
+                                         hold_time_limits_dut.holdTimeMin, "HoldTimeMin is not in valid range")
+            asserts.assert_less_equal(hold_time_limits_dut.holdTimeDefault,
+                                      hold_time_limits_dut.holdTimeMax, "HoldTimeMin is not in valid range")
+            asserts.assert_greater_equal(hold_time_limits_dut.holdTimeDefault,
+                                         hold_time_limits_dut.holdTimeMin, "HoldTimeMin is not in valid range")
         else:
             logging.info("HoldTimeLimits not supported. Test step skipped")
             self.mark_current_step_skipped()
@@ -128,8 +128,8 @@ class TC_OCC_2_1(MatterBaseTest):
             hold_time_dut = await self.read_occ_attribute_expect_success(endpoint=endpoint, attribute=attributes.HoldTime)
             hold_time_limits_dut = await self.read_occ_attribute_expect_success(endpoint=endpoint, attribute=attributes.HoldTimeLimits)
 
-            asserts.assert_less_equal(hold_time_dut, hold_time_limits_dut.HoldTimeMax, "HoldTime attribute is out of range")
-            asserts.assert_greater_equal(hold_time_dut, hold_time_limits_dut.HoldTimeMin, "HoldTime attribute is out of range")
+            asserts.assert_less_equal(hold_time_dut, hold_time_limits_dut.holdTimeMax, "HoldTime attribute is out of range")
+            asserts.assert_greater_equal(hold_time_dut, hold_time_limits_dut.holdTimeMin, "HoldTime attribute is out of range")
         else:
             logging.info("HoldTime not supported. The rest of legacy attribute test can be skipped")
             self.skip_all_remaining_steps(7)
