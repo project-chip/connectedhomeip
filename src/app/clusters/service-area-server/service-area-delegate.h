@@ -127,7 +127,7 @@ public:
     }
 
     //*************************************************************************
-    // Supported Locations accessors
+    // Supported Areas accessors
 
     /**
      * @return true if the current device state allows the SupportedLocations attribute to be updated.

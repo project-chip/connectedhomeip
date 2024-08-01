@@ -20644,14 +20644,14 @@ CHIP_ERROR TypeInfo::DecodableType::Decode(TLV::TLVReader & reader, const Concre
 {
     switch (path.mAttributeId)
     {
-    case Attributes::SupportedLocations::TypeInfo::GetAttributeId():
-        return DataModel::Decode(reader, supportedLocations);
+    case Attributes::SupportedAreas::TypeInfo::GetAttributeId():
+        return DataModel::Decode(reader, supportedAreas);
     case Attributes::SupportedMaps::TypeInfo::GetAttributeId():
         return DataModel::Decode(reader, supportedMaps);
-    case Attributes::SelectedLocations::TypeInfo::GetAttributeId():
-        return DataModel::Decode(reader, selectedLocations);
-    case Attributes::CurrentLocation::TypeInfo::GetAttributeId():
-        return DataModel::Decode(reader, currentLocation);
+    case Attributes::SelectedAreas::TypeInfo::GetAttributeId():
+        return DataModel::Decode(reader, selectedAreas);
+    case Attributes::CurrentArea::TypeInfo::GetAttributeId():
+        return DataModel::Decode(reader, currentArea);
     case Attributes::EstimatedEndTime::TypeInfo::GetAttributeId():
         return DataModel::Decode(reader, estimatedEndTime);
     case Attributes::Progress::TypeInfo::GetAttributeId():

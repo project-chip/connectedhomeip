@@ -44,15 +44,15 @@ class ServiceAreaCluster(private val controller: MatterController, private val e
 
   class SkipCurrentLocationResponse(val status: UByte, val statusText: String?)
 
-  class SupportedLocationsAttribute(val value: List<ServiceAreaClusterAreaStruct>)
+  class SupportedAreasAttribute(val value: List<ServiceAreaClusterAreaStruct>)
 
-  sealed class SupportedLocationsAttributeSubscriptionState {
+  sealed class SupportedAreasAttributeSubscriptionState {
     data class Success(val value: List<ServiceAreaClusterAreaStruct>) :
-      SupportedLocationsAttributeSubscriptionState()
+      SupportedAreasAttributeSubscriptionState()
 
-    data class Error(val exception: Exception) : SupportedLocationsAttributeSubscriptionState()
+    data class Error(val exception: Exception) : SupportedAreasAttributeSubscriptionState()
 
-    object SubscriptionEstablished : SupportedLocationsAttributeSubscriptionState()
+    object SubscriptionEstablished : SupportedAreasAttributeSubscriptionState()
   }
 
   class SupportedMapsAttribute(val value: List<ServiceAreaClusterMapStruct>?)
@@ -66,24 +66,24 @@ class ServiceAreaCluster(private val controller: MatterController, private val e
     object SubscriptionEstablished : SupportedMapsAttributeSubscriptionState()
   }
 
-  class SelectedLocationsAttribute(val value: List<UInt>?)
+  class SelectedAreasAttribute(val value: List<UInt>?)
 
-  sealed class SelectedLocationsAttributeSubscriptionState {
-    data class Success(val value: List<UInt>?) : SelectedLocationsAttributeSubscriptionState()
+  sealed class SelectedAreasAttributeSubscriptionState {
+    data class Success(val value: List<UInt>?) : SelectedAreasAttributeSubscriptionState()
 
-    data class Error(val exception: Exception) : SelectedLocationsAttributeSubscriptionState()
+    data class Error(val exception: Exception) : SelectedAreasAttributeSubscriptionState()
 
-    object SubscriptionEstablished : SelectedLocationsAttributeSubscriptionState()
+    object SubscriptionEstablished : SelectedAreasAttributeSubscriptionState()
   }
 
-  class CurrentLocationAttribute(val value: UInt?)
+  class CurrentAreaAttribute(val value: UInt?)
 
-  sealed class CurrentLocationAttributeSubscriptionState {
-    data class Success(val value: UInt?) : CurrentLocationAttributeSubscriptionState()
+  sealed class CurrentAreaAttributeSubscriptionState {
+    data class Success(val value: UInt?) : CurrentAreaAttributeSubscriptionState()
 
-    data class Error(val exception: Exception) : CurrentLocationAttributeSubscriptionState()
+    data class Error(val exception: Exception) : CurrentAreaAttributeSubscriptionState()
 
-    object SubscriptionEstablished : CurrentLocationAttributeSubscriptionState()
+    object SubscriptionEstablished : CurrentAreaAttributeSubscriptionState()
   }
 
   class EstimatedEndTimeAttribute(val value: UInt?)
@@ -277,7 +277,7 @@ class ServiceAreaCluster(private val controller: MatterController, private val e
     return SkipCurrentLocationResponse(status_decoded, statusText_decoded)
   }
 
-  suspend fun readSupportedLocationsAttribute(): SupportedLocationsAttribute {
+  suspend fun readSupportedAreasAttribute(): SupportedAreasAttribute {
     val ATTRIBUTE_ID: UInt = 0u
 
     val attributePath =
@@ -299,7 +299,7 @@ class ServiceAreaCluster(private val controller: MatterController, private val e
         it.path.attributeId == ATTRIBUTE_ID
       }
 
-    requireNotNull(attributeData) { "Supportedlocations attribute not found in response" }
+    requireNotNull(attributeData) { "Supportedareas attribute not found in response" }
 
     // Decode the TLV data into the appropriate type
     val tlvReader = TlvReader(attributeData.data)
@@ -312,13 +312,13 @@ class ServiceAreaCluster(private val controller: MatterController, private val e
         tlvReader.exitContainer()
       }
 
-    return SupportedLocationsAttribute(decodedValue)
+    return SupportedAreasAttribute(decodedValue)
   }
 
-  suspend fun subscribeSupportedLocationsAttribute(
+  suspend fun subscribeSupportedAreasAttribute(
     minInterval: Int,
     maxInterval: Int,
-  ): Flow<SupportedLocationsAttributeSubscriptionState> {
+  ): Flow<SupportedAreasAttributeSubscriptionState> {
     val ATTRIBUTE_ID: UInt = 0u
     val attributePaths =
       listOf(
@@ -337,7 +337,7 @@ class ServiceAreaCluster(private val controller: MatterController, private val e
       when (subscriptionState) {
         is SubscriptionState.SubscriptionErrorNotification -> {
           emit(
-            SupportedLocationsAttributeSubscriptionState.Error(
+            SupportedAreasAttributeSubscriptionState.Error(
               Exception(
                 "Subscription terminated with error code: ${subscriptionState.terminationCause}"
               )
@@ -351,7 +351,7 @@ class ServiceAreaCluster(private val controller: MatterController, private val e
               .firstOrNull { it.path.attributeId == ATTRIBUTE_ID }
 
           requireNotNull(attributeData) {
-            "Supportedlocations attribute not found in Node State update"
+            "Supportedareas attribute not found in Node State update"
           }
 
           // Decode the TLV data into the appropriate type
@@ -365,10 +365,10 @@ class ServiceAreaCluster(private val controller: MatterController, private val e
               tlvReader.exitContainer()
             }
 
-          emit(SupportedLocationsAttributeSubscriptionState.Success(decodedValue))
+          emit(SupportedAreasAttributeSubscriptionState.Success(decodedValue))
         }
         SubscriptionState.SubscriptionEstablished -> {
-          emit(SupportedLocationsAttributeSubscriptionState.SubscriptionEstablished)
+          emit(SupportedAreasAttributeSubscriptionState.SubscriptionEstablished)
         }
       }
     }
@@ -479,7 +479,7 @@ class ServiceAreaCluster(private val controller: MatterController, private val e
     }
   }
 
-  suspend fun readSelectedLocationsAttribute(): SelectedLocationsAttribute {
+  suspend fun readSelectedAreasAttribute(): SelectedAreasAttribute {
     val ATTRIBUTE_ID: UInt = 2u
 
     val attributePath =
@@ -501,7 +501,7 @@ class ServiceAreaCluster(private val controller: MatterController, private val e
         it.path.attributeId == ATTRIBUTE_ID
       }
 
-    requireNotNull(attributeData) { "Selectedlocations attribute not found in response" }
+    requireNotNull(attributeData) { "Selectedareas attribute not found in response" }
 
     // Decode the TLV data into the appropriate type
     val tlvReader = TlvReader(attributeData.data)
@@ -519,13 +519,13 @@ class ServiceAreaCluster(private val controller: MatterController, private val e
         null
       }
 
-    return SelectedLocationsAttribute(decodedValue)
+    return SelectedAreasAttribute(decodedValue)
   }
 
-  suspend fun subscribeSelectedLocationsAttribute(
+  suspend fun subscribeSelectedAreasAttribute(
     minInterval: Int,
     maxInterval: Int,
-  ): Flow<SelectedLocationsAttributeSubscriptionState> {
+  ): Flow<SelectedAreasAttributeSubscriptionState> {
     val ATTRIBUTE_ID: UInt = 2u
     val attributePaths =
       listOf(
@@ -544,7 +544,7 @@ class ServiceAreaCluster(private val controller: MatterController, private val e
       when (subscriptionState) {
         is SubscriptionState.SubscriptionErrorNotification -> {
           emit(
-            SelectedLocationsAttributeSubscriptionState.Error(
+            SelectedAreasAttributeSubscriptionState.Error(
               Exception(
                 "Subscription terminated with error code: ${subscriptionState.terminationCause}"
               )
@@ -557,9 +557,7 @@ class ServiceAreaCluster(private val controller: MatterController, private val e
               .filterIsInstance<ReadData.Attribute>()
               .firstOrNull { it.path.attributeId == ATTRIBUTE_ID }
 
-          requireNotNull(attributeData) {
-            "Selectedlocations attribute not found in Node State update"
-          }
+          requireNotNull(attributeData) { "Selectedareas attribute not found in Node State update" }
 
           // Decode the TLV data into the appropriate type
           val tlvReader = TlvReader(attributeData.data)
@@ -577,16 +575,16 @@ class ServiceAreaCluster(private val controller: MatterController, private val e
               null
             }
 
-          decodedValue?.let { emit(SelectedLocationsAttributeSubscriptionState.Success(it)) }
+          decodedValue?.let { emit(SelectedAreasAttributeSubscriptionState.Success(it)) }
         }
         SubscriptionState.SubscriptionEstablished -> {
-          emit(SelectedLocationsAttributeSubscriptionState.SubscriptionEstablished)
+          emit(SelectedAreasAttributeSubscriptionState.SubscriptionEstablished)
         }
       }
     }
   }
 
-  suspend fun readCurrentLocationAttribute(): CurrentLocationAttribute {
+  suspend fun readCurrentAreaAttribute(): CurrentAreaAttribute {
     val ATTRIBUTE_ID: UInt = 3u
 
     val attributePath =
@@ -608,7 +606,7 @@ class ServiceAreaCluster(private val controller: MatterController, private val e
         it.path.attributeId == ATTRIBUTE_ID
       }
 
-    requireNotNull(attributeData) { "Currentlocation attribute not found in response" }
+    requireNotNull(attributeData) { "Currentarea attribute not found in response" }
 
     // Decode the TLV data into the appropriate type
     val tlvReader = TlvReader(attributeData.data)
@@ -624,13 +622,13 @@ class ServiceAreaCluster(private val controller: MatterController, private val e
         null
       }
 
-    return CurrentLocationAttribute(decodedValue)
+    return CurrentAreaAttribute(decodedValue)
   }
 
-  suspend fun subscribeCurrentLocationAttribute(
+  suspend fun subscribeCurrentAreaAttribute(
     minInterval: Int,
     maxInterval: Int,
-  ): Flow<CurrentLocationAttributeSubscriptionState> {
+  ): Flow<CurrentAreaAttributeSubscriptionState> {
     val ATTRIBUTE_ID: UInt = 3u
     val attributePaths =
       listOf(
@@ -649,7 +647,7 @@ class ServiceAreaCluster(private val controller: MatterController, private val e
       when (subscriptionState) {
         is SubscriptionState.SubscriptionErrorNotification -> {
           emit(
-            CurrentLocationAttributeSubscriptionState.Error(
+            CurrentAreaAttributeSubscriptionState.Error(
               Exception(
                 "Subscription terminated with error code: ${subscriptionState.terminationCause}"
               )
@@ -662,9 +660,7 @@ class ServiceAreaCluster(private val controller: MatterController, private val e
               .filterIsInstance<ReadData.Attribute>()
               .firstOrNull { it.path.attributeId == ATTRIBUTE_ID }
 
-          requireNotNull(attributeData) {
-            "Currentlocation attribute not found in Node State update"
-          }
+          requireNotNull(attributeData) { "Currentarea attribute not found in Node State update" }
 
           // Decode the TLV data into the appropriate type
           val tlvReader = TlvReader(attributeData.data)
@@ -680,10 +676,10 @@ class ServiceAreaCluster(private val controller: MatterController, private val e
               null
             }
 
-          decodedValue?.let { emit(CurrentLocationAttributeSubscriptionState.Success(it)) }
+          decodedValue?.let { emit(CurrentAreaAttributeSubscriptionState.Success(it)) }
         }
         SubscriptionState.SubscriptionEstablished -> {
-          emit(CurrentLocationAttributeSubscriptionState.SubscriptionEstablished)
+          emit(CurrentAreaAttributeSubscriptionState.SubscriptionEstablished)
         }
       }
     }

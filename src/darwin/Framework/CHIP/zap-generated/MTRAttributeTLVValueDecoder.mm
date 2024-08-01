@@ -11165,8 +11165,8 @@ static id _Nullable DecodeAttributeValueForServiceAreaCluster(AttributeId aAttri
 {
     using namespace Clusters::ServiceArea;
     switch (aAttributeId) {
-    case Attributes::SupportedLocations::Id: {
-        using TypeInfo = Attributes::SupportedLocations::TypeInfo;
+    case Attributes::SupportedAreas::Id: {
+        using TypeInfo = Attributes::SupportedAreas::TypeInfo;
         TypeInfo::DecodableType cppValue;
         *aError = DataModel::Decode(aReader, cppValue);
         if (*aError != CHIP_NO_ERROR) {
@@ -11271,8 +11271,8 @@ static id _Nullable DecodeAttributeValueForServiceAreaCluster(AttributeId aAttri
         }
         return value;
     }
-    case Attributes::SelectedLocations::Id: {
-        using TypeInfo = Attributes::SelectedLocations::TypeInfo;
+    case Attributes::SelectedAreas::Id: {
+        using TypeInfo = Attributes::SelectedAreas::TypeInfo;
         TypeInfo::DecodableType cppValue;
         *aError = DataModel::Decode(aReader, cppValue);
         if (*aError != CHIP_NO_ERROR) {
@@ -11301,8 +11301,8 @@ static id _Nullable DecodeAttributeValueForServiceAreaCluster(AttributeId aAttri
         }
         return value;
     }
-    case Attributes::CurrentLocation::Id: {
-        using TypeInfo = Attributes::CurrentLocation::TypeInfo;
+    case Attributes::CurrentArea::Id: {
+        using TypeInfo = Attributes::CurrentArea::TypeInfo;
         TypeInfo::DecodableType cppValue;
         *aError = DataModel::Decode(aReader, cppValue);
         if (*aError != CHIP_NO_ERROR) {

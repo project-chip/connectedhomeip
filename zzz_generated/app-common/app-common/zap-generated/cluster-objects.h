@@ -28571,7 +28571,7 @@ public:
 
 namespace Attributes {
 
-namespace SupportedLocations {
+namespace SupportedAreas {
 struct TypeInfo
 {
     using Type          = chip::app::DataModel::List<const chip::app::Clusters::ServiceArea::Structs::AreaStruct::Type>;
@@ -28580,10 +28580,10 @@ struct TypeInfo
         const chip::app::DataModel::DecodableList<chip::app::Clusters::ServiceArea::Structs::AreaStruct::DecodableType> &;
 
     static constexpr ClusterId GetClusterId() { return Clusters::ServiceArea::Id; }
-    static constexpr AttributeId GetAttributeId() { return Attributes::SupportedLocations::Id; }
+    static constexpr AttributeId GetAttributeId() { return Attributes::SupportedAreas::Id; }
     static constexpr bool MustUseTimedWrite() { return false; }
 };
-} // namespace SupportedLocations
+} // namespace SupportedAreas
 namespace SupportedMaps {
 struct TypeInfo
 {
@@ -28599,7 +28599,7 @@ struct TypeInfo
     static constexpr bool MustUseTimedWrite() { return false; }
 };
 } // namespace SupportedMaps
-namespace SelectedLocations {
+namespace SelectedAreas {
 struct TypeInfo
 {
     using Type             = chip::app::DataModel::Nullable<chip::app::DataModel::List<const uint32_t>>;
@@ -28607,11 +28607,11 @@ struct TypeInfo
     using DecodableArgType = const chip::app::DataModel::Nullable<chip::app::DataModel::DecodableList<uint32_t>> &;
 
     static constexpr ClusterId GetClusterId() { return Clusters::ServiceArea::Id; }
-    static constexpr AttributeId GetAttributeId() { return Attributes::SelectedLocations::Id; }
+    static constexpr AttributeId GetAttributeId() { return Attributes::SelectedAreas::Id; }
     static constexpr bool MustUseTimedWrite() { return false; }
 };
-} // namespace SelectedLocations
-namespace CurrentLocation {
+} // namespace SelectedAreas
+namespace CurrentArea {
 struct TypeInfo
 {
     using Type             = chip::app::DataModel::Nullable<uint32_t>;
@@ -28619,10 +28619,10 @@ struct TypeInfo
     using DecodableArgType = const chip::app::DataModel::Nullable<uint32_t> &;
 
     static constexpr ClusterId GetClusterId() { return Clusters::ServiceArea::Id; }
-    static constexpr AttributeId GetAttributeId() { return Attributes::CurrentLocation::Id; }
+    static constexpr AttributeId GetAttributeId() { return Attributes::CurrentArea::Id; }
     static constexpr bool MustUseTimedWrite() { return false; }
 };
-} // namespace CurrentLocation
+} // namespace CurrentArea
 namespace EstimatedEndTime {
 struct TypeInfo
 {
@@ -28695,10 +28695,10 @@ struct TypeInfo
 
         CHIP_ERROR Decode(TLV::TLVReader & reader, const ConcreteAttributePath & path);
 
-        Attributes::SupportedLocations::TypeInfo::DecodableType supportedLocations;
+        Attributes::SupportedAreas::TypeInfo::DecodableType supportedAreas;
         Attributes::SupportedMaps::TypeInfo::DecodableType supportedMaps;
-        Attributes::SelectedLocations::TypeInfo::DecodableType selectedLocations;
-        Attributes::CurrentLocation::TypeInfo::DecodableType currentLocation;
+        Attributes::SelectedAreas::TypeInfo::DecodableType selectedAreas;
+        Attributes::CurrentArea::TypeInfo::DecodableType currentArea;
         Attributes::EstimatedEndTime::TypeInfo::DecodableType estimatedEndTime;
         Attributes::Progress::TypeInfo::DecodableType progress;
         Attributes::GeneratedCommandList::TypeInfo::DecodableType generatedCommandList;

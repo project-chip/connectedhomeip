@@ -11633,10 +11633,10 @@ public class ClusterIDMapping {
         }
 
         public enum Attribute {
-            SupportedLocations(0L),
+            SupportedAreas(0L),
             SupportedMaps(1L),
-            SelectedLocations(2L),
-            CurrentLocation(3L),
+            SelectedAreas(2L),
+            CurrentArea(3L),
             EstimatedEndTime(4L),
             Progress(5L),
             GeneratedCommandList(65528L),

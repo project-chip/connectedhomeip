@@ -14667,10 +14667,10 @@ CHIP_ERROR DataModelLogger::LogAttribute(const chip::app::ConcreteDataAttributeP
     case ServiceArea::Id: {
         switch (path.mAttributeId)
         {
-        case ServiceArea::Attributes::SupportedLocations::Id: {
+        case ServiceArea::Attributes::SupportedAreas::Id: {
             chip::app::DataModel::DecodableList<chip::app::Clusters::ServiceArea::Structs::AreaStruct::DecodableType> value;
             ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
-            return DataModelLogger::LogValue("SupportedLocations", 1, value);
+            return DataModelLogger::LogValue("SupportedAreas", 1, value);
         }
         case ServiceArea::Attributes::SupportedMaps::Id: {
             chip::app::DataModel::Nullable<
@@ -14679,15 +14679,15 @@ CHIP_ERROR DataModelLogger::LogAttribute(const chip::app::ConcreteDataAttributeP
             ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
             return DataModelLogger::LogValue("SupportedMaps", 1, value);
         }
-        case ServiceArea::Attributes::SelectedLocations::Id: {
+        case ServiceArea::Attributes::SelectedAreas::Id: {
             chip::app::DataModel::Nullable<chip::app::DataModel::DecodableList<uint32_t>> value;
             ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
-            return DataModelLogger::LogValue("SelectedLocations", 1, value);
+            return DataModelLogger::LogValue("SelectedAreas", 1, value);
         }
-        case ServiceArea::Attributes::CurrentLocation::Id: {
+        case ServiceArea::Attributes::CurrentArea::Id: {
             chip::app::DataModel::Nullable<uint32_t> value;
             ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
-            return DataModelLogger::LogValue("CurrentLocation", 1, value);
+            return DataModelLogger::LogValue("CurrentArea", 1, value);
         }
         case ServiceArea::Attributes::EstimatedEndTime::Id: {
             chip::app::DataModel::Nullable<uint32_t> value;

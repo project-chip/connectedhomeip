@@ -28594,8 +28594,8 @@ jobject DecodeAttributeValue(const app::ConcreteAttributePath & aPath, TLV::TLVR
         using namespace app::Clusters::ServiceArea;
         switch (aPath.mAttributeId)
         {
-        case Attributes::SupportedLocations::Id: {
-            using TypeInfo = Attributes::SupportedLocations::TypeInfo;
+        case Attributes::SupportedAreas::Id: {
+            using TypeInfo = Attributes::SupportedAreas::TypeInfo;
             TypeInfo::DecodableType cppValue;
             *aError = app::DataModel::Decode(aReader, cppValue);
             if (*aError != CHIP_NO_ERROR)
@@ -28851,8 +28851,8 @@ jobject DecodeAttributeValue(const app::ConcreteAttributePath & aPath, TLV::TLVR
             }
             return value;
         }
-        case Attributes::SelectedLocations::Id: {
-            using TypeInfo = Attributes::SelectedLocations::TypeInfo;
+        case Attributes::SelectedAreas::Id: {
+            using TypeInfo = Attributes::SelectedAreas::TypeInfo;
             TypeInfo::DecodableType cppValue;
             *aError = app::DataModel::Decode(aReader, cppValue);
             if (*aError != CHIP_NO_ERROR)
@@ -28883,8 +28883,8 @@ jobject DecodeAttributeValue(const app::ConcreteAttributePath & aPath, TLV::TLVR
             }
             return value;
         }
-        case Attributes::CurrentLocation::Id: {
-            using TypeInfo = Attributes::CurrentLocation::TypeInfo;
+        case Attributes::CurrentArea::Id: {
+            using TypeInfo = Attributes::CurrentArea::TypeInfo;
             TypeInfo::DecodableType cppValue;
             *aError = app::DataModel::Decode(aReader, cppValue);
             if (*aError != CHIP_NO_ERROR)

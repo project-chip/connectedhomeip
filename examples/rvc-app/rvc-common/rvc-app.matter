@@ -1465,10 +1465,10 @@ provisional cluster ServiceArea = 336 {
     optional nullable elapsed_s estimatedTime = 3;
   }
 
-  readonly attribute AreaStruct supportedLocations[] = 0;
+  readonly attribute AreaStruct supportedAreas[] = 0;
   readonly attribute nullable MapStruct supportedMaps[] = 1;
-  readonly attribute nullable int32u selectedLocations[] = 2;
-  readonly attribute optional nullable int32u currentLocation = 3;
+  readonly attribute nullable int32u selectedAreas[] = 2;
+  readonly attribute optional nullable int32u currentArea = 3;
   readonly attribute optional nullable epoch_s estimatedEndTime = 4;
   readonly attribute optional nullable ProgressStruct progress[] = 5;
   readonly attribute command_id generatedCommandList[] = 65528;
@@ -1755,10 +1755,10 @@ endpoint 1 {
   }
 
   server cluster ServiceArea {
-    callback attribute supportedLocations;
+    callback attribute supportedAreas;
     callback attribute supportedMaps;
-    callback attribute selectedLocations;
-    callback attribute currentLocation;
+    callback attribute selectedAreas;
+    callback attribute currentArea;
     callback attribute estimatedEndTime;
     callback attribute progress;
     callback attribute generatedCommandList;

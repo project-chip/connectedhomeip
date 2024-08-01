@@ -4794,21 +4794,21 @@ static constexpr AttributeId Id = Globals::Attributes::ClusterRevision::Id;
 namespace ServiceArea {
 namespace Attributes {
 
-namespace SupportedLocations {
+namespace SupportedAreas {
 static constexpr AttributeId Id = 0x00000000;
-} // namespace SupportedLocations
+} // namespace SupportedAreas
 
 namespace SupportedMaps {
 static constexpr AttributeId Id = 0x00000001;
 } // namespace SupportedMaps
 
-namespace SelectedLocations {
+namespace SelectedAreas {
 static constexpr AttributeId Id = 0x00000002;
-} // namespace SelectedLocations
+} // namespace SelectedAreas
 
-namespace CurrentLocation {
+namespace CurrentArea {
 static constexpr AttributeId Id = 0x00000003;
-} // namespace CurrentLocation
+} // namespace CurrentArea
 
 namespace EstimatedEndTime {
 static constexpr AttributeId Id = 0x00000004;
