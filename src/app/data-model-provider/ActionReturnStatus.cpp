@@ -14,11 +14,11 @@
  *    See the License for the specific language governing permissions and
  *    limitations under the License.
  */
-#include "lib/core/CHIPConfig.h"
-#include "lib/core/CHIPError.h"
-#include "lib/support/CodeUtils.h"
-#include "protocols/interaction_model/StatusCode.h"
 #include <app/data-model-provider/ActionReturnStatus.h>
+#include <lib/core/CHIPConfig.h>
+#include <lib/core/CHIPError.h>
+#include <lib/support/CodeUtils.h>
+#include <protocols/interaction_model/StatusCode.h>
 
 #include <lib/support/StringBuilder.h>
 
