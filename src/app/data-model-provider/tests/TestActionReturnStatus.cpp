@@ -26,8 +26,8 @@
 #include <pw_unit_test/framework.h>
 
 using chip::app::DataModel::ActionReturnStatus;
-using chip::Protocols::InteractionModel::Status;
 using chip::Protocols::InteractionModel::ClusterStatusCode;
+using chip::Protocols::InteractionModel::Status;
 
 TEST(TestActionReturnStatus, TestEquality)
 {
@@ -55,4 +55,24 @@ TEST(TestActionReturnStatus, TestIsError)
     ASSERT_FALSE(ActionReturnStatus(Status::Success).IsError());
     ASSERT_FALSE(ActionReturnStatus(ClusterStatusCode::ClusterSpecificSuccess(123)).IsError());
     ASSERT_FALSE(ActionReturnStatus(CHIP_NO_ERROR).IsError());
+}
+
+TEST(TestActionReturnStatus, TestUnderlyingError)
+{
+    ASSERT_EQ(ActionReturnStatus(ClusterStatusCode::ClusterSpecificFailure(123)).GetUnderlyingError(), CHIP_IM_CLUSTER_STATUS(123));
+    ASSERT_EQ(ActionReturnStatus(ClusterStatusCode::ClusterSpecificSuccess(123)).GetUnderlyingError(), CHIP_NO_ERROR);
+    ASSERT_EQ(ActionReturnStatus(Status::Busy).GetUnderlyingError(), CHIP_IM_GLOBAL_STATUS(Busy));
+    ASSERT_EQ(ActionReturnStatus(CHIP_ERROR_INTERNAL).GetUnderlyingError(), CHIP_ERROR_INTERNAL);
+}
+
+TEST(TestActionReturnStatus, TestStatusCode)
+{
+    ASSERT_EQ(ActionReturnStatus(CHIP_ERROR_INTERNAL).GetStatusCode(), ClusterStatusCode(Status::Failure));
+    ASSERT_EQ(ActionReturnStatus(Status::Busy).GetStatusCode(), ClusterStatusCode(Status::Busy));
+    ASSERT_EQ(ActionReturnStatus(ClusterStatusCode::ClusterSpecificSuccess(123)).GetStatusCode(),
+              ClusterStatusCode::ClusterSpecificSuccess(123));
+    ASSERT_EQ(ActionReturnStatus(ClusterStatusCode::ClusterSpecificFailure(123)).GetStatusCode(),
+              ClusterStatusCode::ClusterSpecificFailure(123));
+    ASSERT_EQ(ActionReturnStatus(CHIP_IM_CLUSTER_STATUS(0x12)).GetStatusCode(), ClusterStatusCode::ClusterSpecificFailure(0x12));
+    ASSERT_EQ(ActionReturnStatus(CHIP_IM_GLOBAL_STATUS(Timeout)).GetStatusCode(), ClusterStatusCode(Status::Timeout));
 }
