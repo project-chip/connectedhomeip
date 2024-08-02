@@ -17,6 +17,7 @@
  */
 #include <app-common/zap-generated/attributes/Accessors.h>
 #include <rvc-service-area-delegate.h>
+#include <vector>
 
 using namespace chip;
 using namespace chip::app::Clusters;
