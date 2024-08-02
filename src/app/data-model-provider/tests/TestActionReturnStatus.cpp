@@ -54,6 +54,29 @@ TEST(TestActionReturnStatus, TestEquality)
     ASSERT_NE(ActionReturnStatus(ClusterStatusCode::ClusterSpecificSuccess(123)), Status::Success);
     ASSERT_NE(ActionReturnStatus(CHIP_NO_ERROR), ClusterStatusCode::ClusterSpecificSuccess(123));
     ASSERT_NE(ActionReturnStatus(Status::Success), ClusterStatusCode::ClusterSpecificSuccess(123));
+
+    // things that are just not equal
+    ASSERT_NE(ActionReturnStatus(ClusterStatusCode::ClusterSpecificSuccess(11)), ClusterStatusCode::ClusterSpecificSuccess(22));
+    ASSERT_NE(ActionReturnStatus(ClusterStatusCode::ClusterSpecificFailure(11)), ClusterStatusCode::ClusterSpecificSuccess(11));
+    ASSERT_NE(ActionReturnStatus(ClusterStatusCode::ClusterSpecificFailure(11)), ClusterStatusCode::ClusterSpecificFailure(22));
+    ASSERT_NE(ActionReturnStatus(CHIP_NO_ERROR), CHIP_ERROR_NOT_FOUND);
+    ASSERT_NE(ActionReturnStatus(CHIP_ERROR_INVALID_ARGUMENT), CHIP_ERROR_NOT_FOUND);
+    ASSERT_NE(ActionReturnStatus(CHIP_ERROR_INVALID_ARGUMENT), CHIP_NO_ERROR);
+    ASSERT_NE(ActionReturnStatus(CHIP_ERROR_INVALID_ARGUMENT), Status::Success);
+    ASSERT_NE(ActionReturnStatus(CHIP_ERROR_INVALID_ARGUMENT), Status::UnsupportedRead);
+    ASSERT_NE(ActionReturnStatus(Status::Success), Status::UnsupportedRead);
+    ASSERT_NE(ActionReturnStatus(Status::Success), CHIP_ERROR_INVALID_ARGUMENT);
+    ASSERT_NE(ActionReturnStatus(CHIP_ERROR_NOT_FOUND), Status::Failure);
+    ASSERT_NE(ActionReturnStatus(Status::Failure), CHIP_NO_ERROR);
+    ASSERT_NE(ActionReturnStatus(Status::Failure), CHIP_ERROR_INVALID_ARGUMENT);
+    ASSERT_NE(ActionReturnStatus(Status::Failure), ClusterStatusCode::ClusterSpecificSuccess(1));
+    ASSERT_NE(ActionReturnStatus(Status::Failure), ClusterStatusCode::ClusterSpecificFailure(2));
+    ASSERT_NE(ActionReturnStatus(ClusterStatusCode::ClusterSpecificSuccess(1)), CHIP_NO_ERROR);
+    ASSERT_NE(ActionReturnStatus(ClusterStatusCode::ClusterSpecificFailure(2)), CHIP_NO_ERROR);
+    ASSERT_NE(ActionReturnStatus(ClusterStatusCode::ClusterSpecificSuccess(3)), Status::Failure);
+    ASSERT_NE(ActionReturnStatus(ClusterStatusCode::ClusterSpecificFailure(4)), Status::Failure);
+    ASSERT_NE(ActionReturnStatus(ClusterStatusCode::ClusterSpecificSuccess(3)), Status::Success);
+    ASSERT_NE(ActionReturnStatus(ClusterStatusCode::ClusterSpecificFailure(4)), Status::Success);
 }
 
 TEST(TestActionReturnStatus, TestIsError)
