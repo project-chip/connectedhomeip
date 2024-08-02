@@ -44,6 +44,15 @@ namespace DataModel {
 class ActionReturnStatus
 {
 public:
+    /// Provides storage for the c_str() call for the action status.
+    struct StringStorage
+    {
+        // Generally size should be sufficient.
+        // len("Status<123>, Code 255") == 21 (and then 22 for null terminator. We have slack.)
+        // CHIP_ERROR has its own (global/static!) storage
+        chip::StringBuilder<32> formatBuffer;
+    };
+
     ActionReturnStatus(CHIP_ERROR error) : mReturnStatus(error) {}
     ActionReturnStatus(Protocols::InteractionModel::Status status) :
         mReturnStatus(Protocols::InteractionModel::ClusterStatusCode(status))
@@ -81,12 +90,8 @@ public:
 
     /// Get the formatted string of this status.
     ///
-    /// NOTE: this is NOT thread safe in the general case, however the safety guarantees
-    ///       are similar to chip::ErrorStr which also assumes a static buffer.
-    ///
-    /// Use this in the chip main event loop (and since that is a single thread,
-    /// there should be no races)
-    const char * c_str() const;
+    /// May use `storage` for storying the actual underlying character string.
+    const char * c_str(StringStorage & storage) const;
 
 private:
     std::variant<CHIP_ERROR, Protocols::InteractionModel::ClusterStatusCode> mReturnStatus;

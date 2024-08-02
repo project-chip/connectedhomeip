@@ -13,6 +13,7 @@
  *    See the License for the specific language governing permissions and
  *    limitations under the License.
  */
+#include "app/data-model-provider/ActionReturnStatus.h"
 #include <app/data-model-provider/StringBuilderAdapters.h>
 
 #include <lib/core/StringBuilderAdapters.h>
@@ -23,7 +24,8 @@ template <>
 StatusWithSize ToString<chip::app::DataModel::ActionReturnStatus>(const chip::app::DataModel::ActionReturnStatus & status,
                                                                   pw::span<char> buffer)
 {
-    return pw::string::Format(buffer, "ActionReturnStatus<%s>", status.c_str());
+    chip::app::DataModel::ActionReturnStatus::StringStorage storage;
+    return pw::string::Format(buffer, "ActionReturnStatus<%s>", status.c_str(storage));
 }
 
 } // namespace pw
