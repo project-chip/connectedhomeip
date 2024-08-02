@@ -48,10 +48,9 @@ MCUBoot is an open-source secure bootloader used by RW61x to apply the
 self-upgrade. For more details, please refer to the
 [MCUBoot documentation](https://github.com/mcu-tools/mcuboot/blob/main/docs/design.md).
 
-In our use case, the bootloader runs the application residing in the primary
-partition. In order to run the OTA update image, the bootloader will swap the
-content of the primary and the secondary partitions. This type of upgrade is
-called swap-move and is the default upgrade configured by MCUBoot.
+For RW61x platform, the bootloader is configured to use the flash remapping
+mechanism by default, in order to perform the image upgrade. This is achieved by
+using the MCUBoot DIRECT-XIP upgrade mode.
 
 ## OTA Software Update process for RW61x example application
 
@@ -87,6 +86,7 @@ J-Link > erase 0x8000000, 0x88a0000
 ```
 
 -   MCUBoot application can be built with SDK installed, using instructions
+   
     below.
 -   Retrieve the mcuboot directory with :
 
@@ -216,6 +216,10 @@ To generate the OTA update image the same procedure can be followed from the
 sub-section, replacing the "--version "1.0"" argument with "--version "2.0""
 (recent version of the update), without arguments "--pad" "--confirm" when
 running `imgtool` script during OTA Update Image generation.
+
+Note : When building the update image, the build arguments
+nxp_software_version=2 nxp_sofware_version_string=\"2.0\" can be added to the gn
+gen command in order to specify the upgraded version.
 
 When the signed binary of the update is generated, the file should be converted
 into OTA format. To do so, the ota_image_tool is provided in the repo and can be
