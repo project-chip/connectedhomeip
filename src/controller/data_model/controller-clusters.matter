@@ -6488,11 +6488,11 @@ provisional cluster ServiceArea = 336 {
   }
 
   readonly attribute AreaStruct supportedAreas[] = 0;
-  readonly attribute nullable MapStruct supportedMaps[] = 1;
-  readonly attribute nullable int32u selectedAreas[] = 2;
+  readonly attribute MapStruct supportedMaps[] = 1;
+  readonly attribute int32u selectedAreas[] = 2;
   readonly attribute optional nullable int32u currentArea = 3;
   readonly attribute optional nullable epoch_s estimatedEndTime = 4;
-  readonly attribute optional nullable ProgressStruct progress[] = 5;
+  readonly attribute optional ProgressStruct progress[] = 5;
   readonly attribute command_id generatedCommandList[] = 65528;
   readonly attribute command_id acceptedCommandList[] = 65529;
   readonly attribute event_id eventList[] = 65530;
@@ -6501,7 +6501,7 @@ provisional cluster ServiceArea = 336 {
   readonly attribute int16u clusterRevision = 65533;
 
   request struct SelectAreasRequest {
-    nullable int32u newAreas[] = 0;
+    int32u newAreas[] = 0;
   }
 
   response struct SelectAreasResponse = 1 {
