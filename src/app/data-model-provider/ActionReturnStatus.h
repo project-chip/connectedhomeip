@@ -54,7 +54,7 @@ public:
         //    "FAILURE(1), Code 255\0")                // cluster failure, verbose
         //    "SUCCESS(0), Code 255\0")                // cluster success, verbose
         //    "Status<197>, Code 255\0")               // Cluster failure, non-verbose
-        // 
+        //
         // CHIP_ERROR has its own (global/static!) storage
         chip::StringBuilder<32> formatBuffer;
     };
