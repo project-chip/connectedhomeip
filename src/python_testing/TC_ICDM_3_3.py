@@ -29,7 +29,6 @@
 # === END CI TEST ARGUMENTS ===
 
 import logging
-import os
 from dataclasses import dataclass
 
 import chip.clusters as Clusters
@@ -194,7 +193,7 @@ class TC_ICDM_3_3(MatterBaseTest):
             self.step("2a")
             try:
                 await self._send_single_icdm_command(commands.RegisterClient(checkInNodeID=client2.checkInNodeID, monitoredSubject=client2.subjectId, key=client2.key, clientType=client2.clientType))
-            except:
+            except InteractionModelError as e:
                 asserts.assert_equal(
                     e.status, Status.Success, "Unexpected error returned")
 
@@ -361,7 +360,7 @@ class TC_ICDM_3_3(MatterBaseTest):
             # Reset ACLs
             try:
                 await self.default_controller.WriteAttribute(nodeid=self.dut_node_id, attributes=[(0, ac.Attributes.Acl(previousAcl))])
-            except:
+            except InteractionModelError as e:
                 asserts.assert_equal(
                     e.status, Status.Success, "Unexpected error returned")
 
