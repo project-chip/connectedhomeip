@@ -24,7 +24,6 @@
 #include <cstring>
 #include <type_traits>
 
-#include <lib/core/CHIPError.h>
 #include <lib/core/Unchecked.h>
 #include <lib/support/CodeUtils.h>
 

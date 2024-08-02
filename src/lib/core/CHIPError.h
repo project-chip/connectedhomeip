@@ -31,7 +31,7 @@
 #include <lib/core/CHIPConfig.h>
 #include <lib/support/TypeTraits.h>
 
-#include <cinttypes>
+#include <inttypes.h>
 #include <limits>
 #include <type_traits>
 
@@ -102,15 +102,14 @@ public:
      */
     enum class SdkPart : uint8_t
     {
-        kCore                   = 0, ///< SDK core errors.
-        kInet                   = 1, ///< Inet layer errors; see <inet/InetError.h>.
-        kDevice                 = 2, ///< Device layer errors; see <platform/CHIPDeviceError.h>.
-        kASN1                   = 3, ///< ASN1 errors; see <asn1/ASN1Error.h>.
-        kBLE                    = 4, ///< BLE layer errors; see <ble/BleError.h>.
-        kIMGlobalStatus         = 5, ///< Interaction Model global status code.
-        kIMClusterStatusFailure = 6, ///< Interaction Model cluster-specific status code (failure)
-        kApplication            = 7, ///< Application-defined errors; see CHIP_APPLICATION_ERROR
-        kIMClusterStatusSuccess = 8, ///< Interaction Model cluster-specific status code (success)
+        kCore            = 0, ///< SDK core errors.
+        kInet            = 1, ///< Inet layer errors; see <inet/InetError.h>.
+        kDevice          = 2, ///< Device layer errors; see <platform/CHIPDeviceError.h>.
+        kASN1            = 3, ///< ASN1 errors; see <asn1/ASN1Error.h>.
+        kBLE             = 4, ///< BLE layer errors; see <ble/BleError.h>.
+        kIMGlobalStatus  = 5, ///< Interaction Model global status code.
+        kIMClusterStatus = 6, ///< Interaction Model cluster-specific status code.
+        kApplication     = 7, ///< Application-defined errors; see CHIP_APPLICATION_ERROR
     };
 
     ChipError() = default;
@@ -306,8 +305,7 @@ public:
     {
         // Open question: should CHIP_NO_ERROR be treated as an IM status for
         // purposes of this test?
-        return IsPart(SdkPart::kIMGlobalStatus) || IsPart(SdkPart::kIMClusterStatusFailure) ||
-            IsPart(SdkPart::kIMClusterStatusSuccess);
+        return IsPart(SdkPart::kIMGlobalStatus) || IsPart(SdkPart::kIMClusterStatus);
     }
 
 #if CHIP_CONFIG_ERROR_SOURCE
@@ -345,7 +343,7 @@ private:
      *  31    28      24      20      16      12       8       4       0    Bit
      *  |       |       |       |       |       |       |       |       |
      *  |     range     |                     value                     |
-     *  |    kSdk==0    |       0               |   part|    code       |   SDK error
+     *  |    kSdk==0    |       0               |0| part|    code       |   SDK error
      *  |    01 - FF    |          encapsulated error code              |   Encapsulated error
      */
     static constexpr int kRangeStart  = 24;
@@ -354,7 +352,7 @@ private:
     static constexpr int kValueLength = 24;
 
     static constexpr int kSdkPartStart  = 8;
-    static constexpr int kSdkPartLength = 4;
+    static constexpr int kSdkPartLength = 3;
     static constexpr int kSdkCodeStart  = 0;
     static constexpr int kSdkCodeLength = 8;
 
@@ -451,18 +449,9 @@ using CHIP_ERROR = ::chip::ChipError;
 #endif // CHIP_CONFIG_ERROR_SOURCE
 
 //
-// value must be a compile-time constant as mandated by CHIP_SDK_ERROR.
+// type must be a compile-time constant as mandated by CHIP_SDK_ERROR.
 //
-// NOTE: CLUSTER_STATUS are generally treated as ERRORS for most logging since
-//       they do not equal CHIP_NO_ERROR and return false on IsSuccess.
-//
-//       The existence of IM_CLUSTER_STATUS_SUCCESS is for complete conversion
-//       to a StatusIB.
-//
-// value MUST be uint8_t sized
-//
-#define CHIP_IM_CLUSTER_STATUS_FAILURE(value) CHIP_SDK_ERROR(::chip::ChipError::SdkPart::kIMClusterStatusFailure, value)
-#define CHIP_IM_CLUSTER_STATUS_SUCCESS(value) CHIP_SDK_ERROR(::chip::ChipError::SdkPart::kIMClusterStatusSuccess, value)
+#define CHIP_IM_CLUSTER_STATUS(type) CHIP_SDK_ERROR(::chip::ChipError::SdkPart::kIMClusterStatus, type)
 
 // clang-format off
 
