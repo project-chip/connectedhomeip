@@ -32,13 +32,9 @@
 #  [TC-OCC-3.2] test precedure step 3a, 3c
 
 import logging
-import queue
-import time
-from typing import Any
 
 import chip.clusters as Clusters
-from chip.clusters.Attribute import TypedAttributePath
-from matter_testing_support import (AttributeValue, ClusterAttributeChangeAccumulator, MatterBaseTest, TestStep, async_test_body,
+from matter_testing_support import (ClusterAttributeChangeAccumulator, MatterBaseTest, TestStep, async_test_body,
                                     await_sequence_of_reports, default_matter_test_main)
 from mobly import asserts
 
