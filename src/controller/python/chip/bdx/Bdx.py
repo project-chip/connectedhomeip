@@ -15,6 +15,7 @@
 #    limitations under the License.
 #
 
+import asyncio
 import builtins
 import ctypes
 from asyncio.futures import Future
@@ -41,17 +42,18 @@ _OnTransferCompletedCallbackFunct = CFUNCTYPE(
 def _OnTransferObtainedCallback(future: Future, result: PyChipError, bdxTransfer, transferControlFlags: int, maxBlockSize: int,
                                 startOffset: int, length: int, fileDesignator, fileDesignatorLength: int, metadata,
                                 metadataLength: int):
-    if result is CHIP_NO_ERROR:
+    if result.is_success:
         fileDesignatorData = ctypes.string_at(fileDesignator, fileDesignatorLength)
         metadataData = ctypes.string_at(metadata, metadataLength)
 
-        initMessage = BdxTransfer.InitMessage()
-        initMessage.TransferControlFlags = transferControlFlags
-        initMessage.MaxBlockSize = maxBlockSize
-        initMessage.StartOffset = startOffset
-        initMessage.Length = length
-        initMessage.FileDesignator = fileDesignatorData[:]
-        initMessage.Metadata = metadataData[:]
+        initMessage = BdxTransfer.InitMessage(
+            transferControlFlags,
+            maxBlockSize,
+            startOffset,
+            length,
+            fileDesignatorData[:],
+            metadataData[:],
+        )
 
         future.handleTransfer(bdxTransfer, initMessage)
     else:
@@ -66,28 +68,35 @@ def _OnDataReceivedCallback(context, dataBuffer, bufferLength: int):
 
 @_OnTransferCompletedCallbackFunct
 def _OnTransferCompletedCallback(future: Future, result: PyChipError):
-    if result is CHIP_NO_ERROR:
+    if result.is_success:
         future.set_result(result)
     else:
         future.set_exception(result.to_exception())
 
 
 class AsyncTransferObtainedTransaction:
-    def __init__(self, future, data=None):
+    def __init__(self, future, event_loop, data=None):
         self._future = future
         self._data = data
+        self._event_loop = event_loop
 
-    def handleTransfer(self, bdxTransfer, initMessage: BdxTransfer.InitMessage):
-        transfer = BdxTransfer(bdx_transfer=bdxTransfer, init_message=initMessage, data=self._data)
+    def _handleTransfer(self, bdxTransfer, initMessage: BdxTransfer.InitMessage):
+        transfer = BdxTransfer.BdxTransfer(bdx_transfer=bdxTransfer, init_message=initMessage, data=self._data)
         self._future.set_result(transfer)
 
-    def handleError(self, result: PyChipError):
+    def handleTransfer(self, bdxTransfer, initMessage: BdxTransfer.InitMessage):
+        self._event_loop.call_soon_threadsafe(self._handleTransfer, bdxTransfer, initMessage)
+
+    def _handleError(self, result: PyChipError):
         self._future.set_exception(result.to_exception())
+
+    def handleError(self, result: PyChipError):
+        self._event_loop.call_soon_threadsafe(self._handleError, result)
 
 
 def PrepareToReceiveBdxData(future: Future) -> PyChipError:
     handle = chip.native.GetLibraryHandle()
-    transaction = AsyncTransferObtainedTransaction(future=future)
+    transaction = AsyncTransferObtainedTransaction(future=future, event_loop=asyncio.get_running_loop())
 
     ctypes.pythonapi.Py_IncRef(ctypes.py_object(transaction))
     res = builtins.chipStack.Call(
@@ -100,7 +109,7 @@ def PrepareToReceiveBdxData(future: Future) -> PyChipError:
 
 def PrepareToSendBdxData(future: Future, data: bytes) -> PyChipError:
     handle = chip.native.GetLibraryHandle()
-    transaction = AsyncTransferObtainedTransaction(future=future, data=data)
+    transaction = AsyncTransferObtainedTransaction(future=future, event_loop=asyncio.get_running_loop(), data=data)
 
     ctypes.pythonapi.Py_IncRef(ctypes.py_object(transaction))
     res = builtins.chipStack.CallAsyncWithResult(

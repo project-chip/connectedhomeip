@@ -21,6 +21,13 @@
 
 namespace chip {
 namespace bdx {
+namespace {
+
+constexpr uint32_t kMaxBdxBlockSize = 1024;
+constexpr System::Clock::Timeout kBdxPollInterval = System::Clock::Milliseconds32(50);
+constexpr System::Clock::Timeout kBdxTimeout = System::Clock::Seconds16(5 * 60);
+
+}  // namespace
 
 void BdxTransfer::SetDelegate(BdxTransfer::Delegate * delegate)
 {
@@ -175,6 +182,32 @@ CHIP_ERROR BdxTransfer::SendBlock()
     mDataTransferredCount += block.Length;
     ScheduleImmediatePoll();
     return CHIP_NO_ERROR;
+}
+
+CHIP_ERROR BdxTransfer::OnMessageReceived(chip::Messaging::ExchangeContext * exchangeContext,
+                                          const chip::PayloadHeader & payloadHeader,
+                                          chip::System::PacketBufferHandle && payload) {
+  FabricIndex fabricIndex = exchangeContext->GetSessionHandle()->GetFabricIndex();
+  NodeId peerNodeId       = exchangeContext->GetSessionHandle()->GetPeer().GetNodeId();
+  VerifyOrReturnError(fabricIndex != kUndefinedFabricIndex, CHIP_ERROR_INVALID_ARGUMENT);
+  VerifyOrReturnError(peerNodeId != kUndefinedNodeId, CHIP_ERROR_INVALID_ARGUMENT);
+  // TODO: Is invalid argument the right error type?
+  VerifyOrReturnError(payloadHeader.HasMessageType(MessageType::SendInit) ||
+                      payloadHeader.HasMessageType(MessageType::ReceiveInit), CHIP_ERROR_INVALID_ARGUMENT);
+
+  TransferControlFlags flags;
+  TransferRole role;
+  if (payloadHeader.HasMessageType(MessageType::SendInit)) {
+    flags = TransferControlFlags::kSenderDrive;
+    role = TransferRole::kReceiver;
+  } else if (payloadHeader.HasMessageType(MessageType::ReceiveInit)) {
+    flags = TransferControlFlags::kReceiverDrive;
+    role = TransferRole::kSender;
+  }
+  ReturnLogErrorOnFailure(
+      Responder::PrepareForTransfer(mSystemLayer, role, flags, kMaxBdxBlockSize, kBdxTimeout, kBdxPollInterval));
+
+  return Responder::OnMessageReceived(exchangeContext, payloadHeader, std::move(payload));
 }
 
 }  // namespace bdx

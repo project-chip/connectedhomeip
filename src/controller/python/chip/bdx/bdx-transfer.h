@@ -45,6 +45,8 @@ public:
         virtual void TransferCompleted(BdxTransfer * transfer, CHIP_ERROR result) = 0;
     };
 
+    BdxTransfer(System::Layer * systemLayer) : mSystemLayer(systemLayer) {}
+
     ~BdxTransfer() override;
 
     // Accepts the transfer. When a block of data arrives the delegate is invoked with the block. This must only be called if the
@@ -63,6 +65,10 @@ public:
     void HandleTransferSessionOutput(TransferSession::OutputEvent & event) override;
     void OnExchangeClosing(Messaging::ExchangeContext * exchangeContext) override;
 
+    CHIP_ERROR OnMessageReceived(chip::Messaging::ExchangeContext * exchangeContext,
+                                 const chip::PayloadHeader & payloadHeader,
+                                 chip::System::PacketBufferHandle && payload) override;
+
 private:
     void EndSession(CHIP_ERROR result);
     CHIP_ERROR SendMessage(TransferSession::OutputEvent & event);
@@ -70,6 +76,8 @@ private:
 
     Delegate * mDelegate = nullptr;
     bool mAwaitingAccept = false;
+
+    System::Layer * mSystemLayer = nullptr;
 
     // TODO: Request the data from a data source rather than copy the data here.
     uint8_t * mData = nullptr;

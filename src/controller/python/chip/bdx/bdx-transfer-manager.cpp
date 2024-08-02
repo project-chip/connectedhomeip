@@ -29,6 +29,13 @@ BdxTransferManager::~BdxTransferManager()
     mTransferPool.ReleaseAll();
 }
 
+CHIP_ERROR BdxTransferManager::Init(System::Layer * systemLayer)
+{
+    VerifyOrReturnError(systemLayer != nullptr, CHIP_ERROR_INVALID_ARGUMENT);
+    mSystemLayer = systemLayer;
+    return CHIP_NO_ERROR;
+}
+
 void BdxTransferManager::ExpectATransfer()
 {
     ++mExpectedTransfers;
@@ -46,7 +53,7 @@ BdxTransfer * BdxTransferManager::Allocate()
 {
     VerifyOrReturnValue(mExpectedTransfers != 0, nullptr);
 
-    BdxTransfer * result = mTransferPool.CreateObject();
+    BdxTransfer * result = mTransferPool.CreateObject(mSystemLayer);
     VerifyOrReturnValue(result != nullptr, nullptr);
     result->SetDelegate(this);
 

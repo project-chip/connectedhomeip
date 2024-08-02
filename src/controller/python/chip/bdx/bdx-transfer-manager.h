@@ -34,6 +34,8 @@ public:
     BdxTransferManager(BdxTransfer::Delegate * bdxTransferDelegate);
     ~BdxTransferManager() override;
 
+    CHIP_ERROR Init(System::Layer * systemLayer);
+
     // These keep track of the number of expected transfers.
     void ExpectATransfer();
     void StopExpectingATransfer();
@@ -47,6 +49,7 @@ public:
 
 private:
     ObjectPool<BdxTransfer, 2> mTransferPool;
+    System::Layer * mSystemLayer = nullptr;
     BdxTransfer::Delegate * mBdxTransferDelegate = nullptr;
     size_t mExpectedTransfers = 0;
 };
