@@ -138,16 +138,12 @@ CHIP_ERROR StatusIB::ToChipError() const
 {
     if (mStatus == Status::Success)
     {
-        // NOTE: this explicitly does not return CHIP_IM_CLUSTER_STATUS_SUCCESS
-        //       even though those constants could be returned. This is to make
-        //       error handling easy/consistent (can verify against CHIP_NO_ERROR)
-        //
         return CHIP_NO_ERROR;
     }
 
     if (mClusterStatus.HasValue())
     {
-        return ChipError(ChipError::SdkPart::kIMClusterStatusFailure, mClusterStatus.Value());
+        return ChipError(ChipError::SdkPart::kIMClusterStatus, mClusterStatus.Value());
     }
 
     return ChipError(ChipError::SdkPart::kIMGlobalStatus, to_underlying(mStatus));
@@ -155,18 +151,9 @@ CHIP_ERROR StatusIB::ToChipError() const
 
 void StatusIB::InitFromChipError(CHIP_ERROR aError)
 {
-    if (aError.IsPart(ChipError::SdkPart::kIMClusterStatusFailure))
+    if (aError.IsPart(ChipError::SdkPart::kIMClusterStatus))
     {
-        // cluster statuses may be successes or failures. Figure it out ...
         mStatus        = Status::Failure;
-        mClusterStatus = MakeOptional(aError.GetSdkCode());
-        return;
-    }
-
-    if (aError.IsPart(ChipError::SdkPart::kIMClusterStatusSuccess))
-    {
-        // cluster statuses may be successes or failures. Figure it out ...
-        mStatus        = Status::Success;
         mClusterStatus = MakeOptional(aError.GetSdkCode());
         return;
     }

@@ -538,7 +538,7 @@ ActionReturnStatus CustomDataModel::WriteAttribute(const WriteAttributeRequest &
 
     if (request.path.mDataVersion.HasValue() && request.path.mDataVersion.Value() == kRejectedDataVersion)
     {
-        return CHIP_IM_GLOBAL_STATUS(DataVersionMismatch);
+        return InteractionModel::Status::DataVersionMismatch;
     }
 
     if (request.path.mClusterId == Clusters::UnitTesting::Id &&
@@ -636,9 +636,9 @@ ActionReturnStatus CustomDataModel::WriteAttribute(const WriteAttributeRequest &
         switch (gWriteResponseDirective)
         {
         case WriteResponseDirective::kSendMultipleSuccess:
-            return CHIP_NO_ERROR;
+            return InteractionModel::Status::Success;
         case WriteResponseDirective::kSendMultipleErrors:
-            return CHIP_IM_GLOBAL_STATUS(Failure);
+            return InteractionModel::Status::Failure;
         default:
             chipDie();
         }
@@ -650,9 +650,9 @@ ActionReturnStatus CustomDataModel::WriteAttribute(const WriteAttributeRequest &
         switch (gWriteResponseDirective)
         {
         case WriteResponseDirective::kSendClusterSpecificSuccess:
-            return CHIP_IM_CLUSTER_STATUS_SUCCESS(kExampleClusterSpecificSuccess);
+            return InteractionModel::ClusterStatusCode::ClusterSpecificSuccess(kExampleClusterSpecificSuccess);
         case WriteResponseDirective::kSendClusterSpecificFailure:
-            return CHIP_IM_CLUSTER_STATUS_FAILURE(kExampleClusterSpecificFailure);
+            return InteractionModel::ClusterStatusCode::ClusterSpecificFailure(kExampleClusterSpecificSuccess);
         default:
             // this should not be reached, our tests only set up these for this test case
             chipDie();

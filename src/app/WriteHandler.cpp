@@ -509,7 +509,7 @@ CHIP_ERROR WriteHandler::ProcessGroupAttributeDataIBs(TLV::TLVReader & aAttribut
             DataModelCallbacks::GetInstance()->AttributeOperation(DataModelCallbacks::OperationType::Write,
                                                                   DataModelCallbacks::OperationOrder::Pre, dataAttributePath);
             err = WriteClusterData(subjectDescriptor, dataAttributePath, tmpDataReader);
-            if ((err != CHIP_NO_ERROR) && !err.IsPart(ChipError::SdkPart::kIMClusterStatusSuccess))
+            if (err != CHIP_NO_ERROR)
             {
                 ChipLogError(DataManagement,
                              "WriteClusterData Endpoint=%u Cluster=" ChipLogFormatMEI " Attribute =" ChipLogFormatMEI
@@ -717,9 +717,9 @@ CHIP_ERROR WriteHandler::WriteClusterData(const Access::SubjectDescriptor & subj
 
     AttributeValueDecoder decoder(data, subject);
 
-    StatusIB statusIB;
-    statusIB.InitFromChipError(mDataModelProvider->WriteAttribute(request, decoder));
-    return AddStatusInternal(path, statusIB);
+    DataModel::ActionReturnStatus status = mDataModelProvider->WriteAttribute(request, decoder);
+
+    return AddStatusInternal(path, StatusIB(status.GetStatusCode()));
 #else
     return WriteSingleClusterData(subject, path, data, this);
 #endif // CHIP_CONFIG_USE_DATA_MODEL_INTERFACE
