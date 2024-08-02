@@ -110,6 +110,7 @@ void BdxTransfer::HandleTransferSessionOutput(TransferSession::OutputEvent & eve
         {
             ByteSpan data(event.blockdata.Data, event.blockdata.Length);
             mDelegate->DataReceived(this, data);
+            mTransfer.PrepareBlockAck();
         }
         break;
     case TransferSession::OutputEventType::kMsgToSend:
@@ -188,25 +189,25 @@ CHIP_ERROR BdxTransfer::SendBlock()
 CHIP_ERROR BdxTransfer::OnMessageReceived(chip::Messaging::ExchangeContext * exchangeContext,
                                           const chip::PayloadHeader & payloadHeader,
                                           chip::System::PacketBufferHandle && payload) {
-  FabricIndex fabricIndex = exchangeContext->GetSessionHandle()->GetFabricIndex();
-  NodeId peerNodeId       = exchangeContext->GetSessionHandle()->GetPeer().GetNodeId();
-  VerifyOrReturnError(fabricIndex != kUndefinedFabricIndex, CHIP_ERROR_INVALID_ARGUMENT);
-  VerifyOrReturnError(peerNodeId != kUndefinedNodeId, CHIP_ERROR_INVALID_ARGUMENT);
-  // TODO: Is invalid argument the right error type?
-  VerifyOrReturnError(payloadHeader.HasMessageType(MessageType::SendInit) ||
-                      payloadHeader.HasMessageType(MessageType::ReceiveInit), CHIP_ERROR_INVALID_ARGUMENT);
+  if (payloadHeader.HasMessageType(MessageType::SendInit) ||
+      payloadHeader.HasMessageType(MessageType::ReceiveInit)) {
+    FabricIndex fabricIndex = exchangeContext->GetSessionHandle()->GetFabricIndex();
+    NodeId peerNodeId       = exchangeContext->GetSessionHandle()->GetPeer().GetNodeId();
+    VerifyOrReturnError(fabricIndex != kUndefinedFabricIndex, CHIP_ERROR_INVALID_ARGUMENT);
+    VerifyOrReturnError(peerNodeId != kUndefinedNodeId, CHIP_ERROR_INVALID_ARGUMENT);
 
-  TransferControlFlags flags;
-  TransferRole role;
-  if (payloadHeader.HasMessageType(MessageType::SendInit)) {
-    flags = TransferControlFlags::kSenderDrive;
-    role = TransferRole::kReceiver;
-  } else if (payloadHeader.HasMessageType(MessageType::ReceiveInit)) {
-    flags = TransferControlFlags::kReceiverDrive;
-    role = TransferRole::kSender;
+    TransferControlFlags flags;
+    TransferRole role;
+    if (payloadHeader.HasMessageType(MessageType::SendInit)) {
+      flags = TransferControlFlags::kSenderDrive;
+      role = TransferRole::kReceiver;
+    } else if (payloadHeader.HasMessageType(MessageType::ReceiveInit)) {
+      flags = TransferControlFlags::kReceiverDrive;
+      role = TransferRole::kSender;
+    }
+    ReturnLogErrorOnFailure(
+        Responder::PrepareForTransfer(mSystemLayer, role, flags, kMaxBdxBlockSize, kBdxTimeout, kBdxPollInterval));
   }
-  ReturnLogErrorOnFailure(
-      Responder::PrepareForTransfer(mSystemLayer, role, flags, kMaxBdxBlockSize, kBdxTimeout, kBdxPollInterval));
 
   return Responder::OnMessageReceived(exchangeContext, payloadHeader, std::move(payload));
 }
