@@ -34,7 +34,6 @@ class SupportedModesManager
 {
 
     using ModeOptionStructType = Structs::ModeOptionStruct::Type;
-
 public:
     /**
      * A class that can return the supported ModeOptions for a specific endpoint.
@@ -80,9 +79,12 @@ public:
                                                                     const ModeOptionStructType ** dataPtr) const = 0;
 
     virtual ~SupportedModesManager() {}
+
 };
 
 const SupportedModesManager * getSupportedModesManager();
+
+void setSupportedModesManager(SupportedModesManager * aSupportedModesManager);
 
 } // namespace ModeSelect
 } // namespace Clusters

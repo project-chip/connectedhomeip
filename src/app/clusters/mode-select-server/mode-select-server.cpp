@@ -49,6 +49,17 @@ using BootReasonType = GeneralDiagnostics::BootReasonEnum;
 
 static InteractionModel::Status verifyModeValue(const EndpointId endpointId, const uint8_t newMode);
 
+ModeSelect::SupportedModesManager *sSupportedModesManager = nullptr;
+
+const SupportedModesManager * ModeSelect::getSupportedModesManager()
+{
+    return sSupportedModesManager;
+}
+
+void ModeSelect::setSupportedModesManager(ModeSelect::SupportedModesManager * aSupportedModesManager)
+{
+    sSupportedModesManager = aSupportedModesManager;
+}
 namespace {
 
 inline bool areStartUpModeAndCurrentModeNonVolatile(EndpointId endpoint);
