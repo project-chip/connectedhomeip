@@ -256,6 +256,7 @@ Example:
 -   [ESP32 All Clusters](/examples/all-clusters-app/esp32/README.md)
 -   [ESP32 Lighting](/examples/lighting-app/esp32/README.md)
 -   [ESP32 Temperature Sensor](/examples/temperature-measurement-app/esp32/README.md)
+-   [ESP32 Thread Border Router](/examples/thread-br-app/esp32/README.md)
 -   [mbedOS](/examples/all-clusters-app/mbed/README.md)
 -   [nRF Connect All Clusters](./nrfconnect_examples_configuration.md)
 -   [nRF Connect Pump](/examples/pump-app/nrfconnect/README.md)
