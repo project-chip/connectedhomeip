@@ -610,11 +610,14 @@ CHIP_ERROR DefaultDACVerifier::VerifyNodeOperationalCSRInformation(const ByteSpa
 void DefaultDACVerifier::CheckForRevokedDACChain(const AttestationInfo & info,
                                                  Callback::Callback<OnAttestationInformationVerification> * onCompletion)
 {
-    AttestationVerificationResult attestationError = AttestationVerificationResult::kSuccess;
-
-    // TODO(#33124): Implement default version of CheckForRevokedDACChain
-
-    onCompletion->mCall(onCompletion->mContext, info, attestationError);
+    if (mRevocationDelegate != nullptr)
+    {
+        mRevocationDelegate->CheckForRevokedDACChain(info, onCompletion);
+    }
+    else
+    {
+        onCompletion->mCall(onCompletion->mContext, info, AttestationVerificationResult::kSuccess);
+    }
 }
 
 bool CsaCdKeysTrustStore::IsCdTestKey(const ByteSpan & kid) const
@@ -693,9 +696,10 @@ const AttestationTrustStore * GetTestAttestationTrustStore()
     return &gTestAttestationTrustStore.get();
 }
 
-DeviceAttestationVerifier * GetDefaultDACVerifier(const AttestationTrustStore * paaRootStore)
+DeviceAttestationVerifier * GetDefaultDACVerifier(const AttestationTrustStore * paaRootStore,
+                                                  DeviceAttestationRevocationDelegate * revocationDelegate)
 {
-    static DefaultDACVerifier defaultDACVerifier{ paaRootStore };
+    static DefaultDACVerifier defaultDACVerifier{ paaRootStore, revocationDelegate };
 
     return &defaultDACVerifier;
 }

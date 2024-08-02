@@ -867,6 +867,13 @@ class ChipClusters:
         "clusterName": "AccessControl",
         "clusterId": 0x0000001F,
         "commands": {
+            0x00000000: {
+                "commandId": 0x00000000,
+                "commandName": "ReviewFabricRestrictions",
+                "args": {
+                    "arl": "CommissioningAccessRestrictionEntryStruct",
+                },
+            },
         },
         "attributes": {
             0x00000000: {
@@ -899,6 +906,18 @@ class ChipClusters:
                 "attributeName": "AccessControlEntriesPerFabric",
                 "attributeId": 0x00000004,
                 "type": "int",
+                "reportable": True,
+            },
+            0x00000005: {
+                "attributeName": "CommissioningARL",
+                "attributeId": 0x00000005,
+                "type": "",
+                "reportable": True,
+            },
+            0x00000006: {
+                "attributeName": "Arl",
+                "attributeId": 0x00000006,
+                "type": "",
                 "reportable": True,
             },
             0x0000FFF8: {
@@ -1932,6 +1951,14 @@ class ChipClusters:
                 "args": {
                 },
             },
+            0x00000006: {
+                "commandId": 0x00000006,
+                "commandName": "SetTCAcknowledgements",
+                "args": {
+                    "TCVersion": "int",
+                    "TCUserResponse": "int",
+                },
+            },
         },
         "attributes": {
             0x00000000: {
@@ -1962,6 +1989,30 @@ class ChipClusters:
             0x00000004: {
                 "attributeName": "SupportsConcurrentConnection",
                 "attributeId": 0x00000004,
+                "type": "bool",
+                "reportable": True,
+            },
+            0x00000005: {
+                "attributeName": "TCAcceptedVersion",
+                "attributeId": 0x00000005,
+                "type": "int",
+                "reportable": True,
+            },
+            0x00000006: {
+                "attributeName": "TCMinRequiredVersion",
+                "attributeId": 0x00000006,
+                "type": "int",
+                "reportable": True,
+            },
+            0x00000007: {
+                "attributeName": "TCAcknowledgements",
+                "attributeId": 0x00000007,
+                "type": "int",
+                "reportable": True,
+            },
+            0x00000008: {
+                "attributeName": "TCAcknowledgementsRequired",
+                "attributeId": 0x00000008,
                 "type": "bool",
                 "reportable": True,
             },
@@ -3250,6 +3301,7 @@ class ChipClusters:
                 "commandId": 0x00000080,
                 "commandName": "KeepActive",
                 "args": {
+                    "stayActiveDuration": "int",
                 },
             },
         },
@@ -3270,6 +3322,12 @@ class ChipClusters:
                 "attributeName": "ProductName",
                 "attributeId": 0x00000003,
                 "type": "str",
+                "reportable": True,
+            },
+            0x00000004: {
+                "attributeName": "ProductID",
+                "attributeId": 0x00000004,
+                "type": "int",
                 "reportable": True,
             },
             0x00000005: {
@@ -8846,13 +8904,6 @@ class ChipClusters:
                 "args": {
                 },
             },
-            0x0000000B: {
-                "commandId": 0x0000000B,
-                "commandName": "SetTemperatureSetpointHoldPolicy",
-                "args": {
-                    "temperatureSetpointHoldPolicy": "int",
-                },
-            },
         },
         "attributes": {
             0x00000000: {
@@ -9245,14 +9296,8 @@ class ChipClusters:
                 "reportable": True,
             },
             0x00000053: {
-                "attributeName": "TemperatureSetpointHoldPolicy",
-                "attributeId": 0x00000053,
-                "type": "int",
-                "reportable": True,
-            },
-            0x00000054: {
                 "attributeName": "SetpointHoldExpiryTimestamp",
-                "attributeId": 0x00000054,
+                "attributeId": 0x00000053,
                 "type": "int",
                 "reportable": True,
             },
@@ -11828,10 +11873,16 @@ class ChipClusters:
             },
         },
         "attributes": {
-            0x00000001: {
+            0x00000000: {
                 "attributeName": "Ssid",
-                "attributeId": 0x00000001,
+                "attributeId": 0x00000000,
                 "type": "bytes",
+                "reportable": True,
+            },
+            0x00000001: {
+                "attributeName": "PassphraseSurrogate",
+                "attributeId": 0x00000001,
+                "type": "int",
                 "reportable": True,
             },
             0x0000FFF8: {
@@ -14440,6 +14491,14 @@ class ChipClusters:
                     "payload": "bytes",
                 },
             },
+            0x00000019: {
+                "commandId": 0x00000019,
+                "commandName": "GlobalEchoRequest",
+                "args": {
+                    "field1": "TestGlobalStruct",
+                    "field2": "int",
+                },
+            },
             0xFFF200AA: {
                 "commandId": 0xFFF200AA,
                 "commandName": "TestDifferentVendorMeiRequest",
@@ -14778,6 +14837,20 @@ class ChipClusters:
                 "reportable": True,
                 "writable": True,
             },
+            0x00000033: {
+                "attributeName": "GlobalEnum",
+                "attributeId": 0x00000033,
+                "type": "int",
+                "reportable": True,
+                "writable": True,
+            },
+            0x00000034: {
+                "attributeName": "GlobalStruct",
+                "attributeId": 0x00000034,
+                "type": "",
+                "reportable": True,
+                "writable": True,
+            },
             0x000000FF: {
                 "attributeName": "Unsupported",
                 "attributeId": 0x000000FF,
@@ -15020,6 +15093,20 @@ class ChipClusters:
                 "attributeName": "WriteOnlyInt8u",
                 "attributeId": 0x0000402A,
                 "type": "int",
+                "reportable": True,
+                "writable": True,
+            },
+            0x00004033: {
+                "attributeName": "NullableGlobalEnum",
+                "attributeId": 0x00004033,
+                "type": "int",
+                "reportable": True,
+                "writable": True,
+            },
+            0x00004034: {
+                "attributeName": "NullableGlobalStruct",
+                "attributeId": 0x00004034,
+                "type": "",
                 "reportable": True,
                 "writable": True,
             },
@@ -15462,7 +15549,7 @@ class ChipClusters:
     def GetClusterInfoById(self, cluster_id: int):
         data = ChipClusters._CLUSTER_ID_DICT.get(cluster_id, None)
         if not data:
-            raise exceptions.UnknownCluster(cluster_id)
+            raise exceptions.UnknownCluster(f"Cluster ID: {cluster_id}")
         return data
 
     def ListClusterInfo(self):

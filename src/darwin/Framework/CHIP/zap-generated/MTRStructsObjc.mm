@@ -171,6 +171,105 @@ NS_ASSUME_NONNULL_BEGIN
 
 @end
 
+@implementation MTRAccessControlClusterAccessRestrictionStruct
+- (instancetype)init
+{
+    if (self = [super init]) {
+
+        _type = @(0);
+
+        _id = nil;
+    }
+    return self;
+}
+
+- (id)copyWithZone:(NSZone * _Nullable)zone
+{
+    auto other = [[MTRAccessControlClusterAccessRestrictionStruct alloc] init];
+
+    other.type = self.type;
+    other.id = self.id;
+
+    return other;
+}
+
+- (NSString *)description
+{
+    NSString * descriptionString = [NSString stringWithFormat:@"<%@: type:%@; id:%@; >", NSStringFromClass([self class]), _type, _id];
+    return descriptionString;
+}
+
+@end
+
+@implementation MTRAccessControlClusterCommissioningAccessRestrictionEntryStruct
+- (instancetype)init
+{
+    if (self = [super init]) {
+
+        _endpoint = @(0);
+
+        _cluster = @(0);
+
+        _restrictions = [NSArray array];
+    }
+    return self;
+}
+
+- (id)copyWithZone:(NSZone * _Nullable)zone
+{
+    auto other = [[MTRAccessControlClusterCommissioningAccessRestrictionEntryStruct alloc] init];
+
+    other.endpoint = self.endpoint;
+    other.cluster = self.cluster;
+    other.restrictions = self.restrictions;
+
+    return other;
+}
+
+- (NSString *)description
+{
+    NSString * descriptionString = [NSString stringWithFormat:@"<%@: endpoint:%@; cluster:%@; restrictions:%@; >", NSStringFromClass([self class]), _endpoint, _cluster, _restrictions];
+    return descriptionString;
+}
+
+@end
+
+@implementation MTRAccessControlClusterAccessRestrictionEntryStruct
+- (instancetype)init
+{
+    if (self = [super init]) {
+
+        _endpoint = @(0);
+
+        _cluster = @(0);
+
+        _restrictions = [NSArray array];
+
+        _fabricIndex = @(0);
+    }
+    return self;
+}
+
+- (id)copyWithZone:(NSZone * _Nullable)zone
+{
+    auto other = [[MTRAccessControlClusterAccessRestrictionEntryStruct alloc] init];
+
+    other.endpoint = self.endpoint;
+    other.cluster = self.cluster;
+    other.restrictions = self.restrictions;
+    other.fabricIndex = self.fabricIndex;
+
+    return other;
+}
+
+- (NSString *)description
+{
+    NSString * descriptionString = [NSString stringWithFormat:@"<%@: endpoint:%@; cluster:%@; restrictions:%@; fabricIndex:%@; >", NSStringFromClass([self class]), _endpoint, _cluster, _restrictions, _fabricIndex];
+    return descriptionString;
+}
+
+@end
+
 @implementation MTRAccessControlClusterAccessControlTargetStruct
 - (instancetype)init
 {
@@ -365,6 +464,69 @@ NS_ASSUME_NONNULL_BEGIN
 - (NSString *)description
 {
     NSString * descriptionString = [NSString stringWithFormat:@"<%@: adminNodeID:%@; adminPasscodeID:%@; changeType:%@; latestValue:%@; fabricIndex:%@; >", NSStringFromClass([self class]), _adminNodeID, _adminPasscodeID, _changeType, _latestValue, _fabricIndex];
+    return descriptionString;
+}
+
+@end
+
+@implementation MTRAccessControlClusterAccessRestrictionEntryChangedEvent
+- (instancetype)init
+{
+    if (self = [super init]) {
+
+        _fabricIndex = @(0);
+    }
+    return self;
+}
+
+- (id)copyWithZone:(NSZone * _Nullable)zone
+{
+    auto other = [[MTRAccessControlClusterAccessRestrictionEntryChangedEvent alloc] init];
+
+    other.fabricIndex = self.fabricIndex;
+
+    return other;
+}
+
+- (NSString *)description
+{
+    NSString * descriptionString = [NSString stringWithFormat:@"<%@: fabricIndex:%@; >", NSStringFromClass([self class]), _fabricIndex];
+    return descriptionString;
+}
+
+@end
+
+@implementation MTRAccessControlClusterFabricRestrictionReviewUpdateEvent
+- (instancetype)init
+{
+    if (self = [super init]) {
+
+        _token = @(0);
+
+        _instruction = nil;
+
+        _redirectURL = nil;
+
+        _fabricIndex = @(0);
+    }
+    return self;
+}
+
+- (id)copyWithZone:(NSZone * _Nullable)zone
+{
+    auto other = [[MTRAccessControlClusterFabricRestrictionReviewUpdateEvent alloc] init];
+
+    other.token = self.token;
+    other.instruction = self.instruction;
+    other.redirectURL = self.redirectURL;
+    other.fabricIndex = self.fabricIndex;
+
+    return other;
+}
+
+- (NSString *)description
+{
+    NSString * descriptionString = [NSString stringWithFormat:@"<%@: token:%@; instruction:%@; redirectURL:%@; fabricIndex:%@; >", NSStringFromClass([self class]), _token, _instruction, _redirectURL, _fabricIndex];
     return descriptionString;
 }
 
@@ -8663,6 +8825,8 @@ NS_ASSUME_NONNULL_BEGIN
         _g = @(0);
 
         _h = @(0);
+
+        _i = nil;
     }
     return self;
 }
@@ -8679,13 +8843,14 @@ NS_ASSUME_NONNULL_BEGIN
     other.f = self.f;
     other.g = self.g;
     other.h = self.h;
+    other.i = self.i;
 
     return other;
 }
 
 - (NSString *)description
 {
-    NSString * descriptionString = [NSString stringWithFormat:@"<%@: a:%@; b:%@; c:%@; d:%@; e:%@; f:%@; g:%@; h:%@; >", NSStringFromClass([self class]), _a, _b, _c, [_d base64EncodedStringWithOptions:0], _e, _f, _g, _h];
+    NSString * descriptionString = [NSString stringWithFormat:@"<%@: a:%@; b:%@; c:%@; d:%@; e:%@; f:%@; g:%@; h:%@; i:%@; >", NSStringFromClass([self class]), _a, _b, _c, [_d base64EncodedStringWithOptions:0], _e, _f, _g, _h, _i];
     return descriptionString;
 }
 
@@ -8846,6 +9011,8 @@ NS_ASSUME_NONNULL_BEGIN
         _b = @(0);
 
         _c = [MTRUnitTestingClusterSimpleStruct new];
+
+        _d = nil;
     }
     return self;
 }
@@ -8857,13 +9024,14 @@ NS_ASSUME_NONNULL_BEGIN
     other.a = self.a;
     other.b = self.b;
     other.c = self.c;
+    other.d = self.d;
 
     return other;
 }
 
 - (NSString *)description
 {
-    NSString * descriptionString = [NSString stringWithFormat:@"<%@: a:%@; b:%@; c:%@; >", NSStringFromClass([self class]), _a, _b, _c];
+    NSString * descriptionString = [NSString stringWithFormat:@"<%@: a:%@; b:%@; c:%@; d:%@; >", NSStringFromClass([self class]), _a, _b, _c, _d];
     return descriptionString;
 }
 
