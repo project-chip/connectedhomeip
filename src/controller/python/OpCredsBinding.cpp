@@ -155,7 +155,7 @@ public:
             if (report.Is<chip::Controller::CommissioningErrorInfo>())
             {
                 uint8_t code     = chip::to_underlying(report.Get<chip::Controller::CommissioningErrorInfo>().commissioningError);
-                mCompletionError = chip::ChipError(chip::ChipError::SdkPart::kIMClusterStatusFailure, code);
+                mCompletionError = chip::ChipError(chip::ChipError::SdkPart::kIMClusterStatus, code);
             }
             else
             {
