@@ -163,6 +163,8 @@ const char * ActionReturnStatus::c_str(ActionReturnStatus::StringStorage & stora
 
     if (const ClusterStatusCode * status = std::get_if<ClusterStatusCode>(&mReturnStatus))
     {
+        storage.formatBuffer.Reset();
+
 #if CHIP_CONFIG_IM_STATUS_CODE_VERBOSE_FORMAT
         storage.formatBuffer.AddFormat("%s(%d)", Protocols::InteractionModel::StatusName(status->GetStatus()),
                                        static_cast<int>(status->GetStatus()));
