@@ -30,24 +30,6 @@ using namespace chip::app::Clusters::Thermostat::Structs;
 
 ThermostatDelegate ThermostatDelegate::sInstance;
 
-namespace {
-
-/**
- * @brief Checks if the presets are matching i.e the presetHandles are the same.
- *
- * @param[in] preset The preset to check.
- * @param[in] presetToMatch The preset to match with.
- *
- * @return true If the presets match, false otherwise. If both preset handles are null, returns false
- */
-bool PresetHandlesExistAndMatch(const PresetStructWithOwnedMembers & preset, const PresetStructWithOwnedMembers & presetToMatch)
-{
-    return !preset.GetPresetHandle().IsNull() && !presetToMatch.GetPresetHandle().IsNull() &&
-        preset.GetPresetHandle().Value().data_equal(presetToMatch.GetPresetHandle().Value());
-}
-
-} // anonymous namespace
-
 ThermostatDelegate::ThermostatDelegate()
 {
     mNumberOfPresets                   = kMaxNumberOfPresetTypes * kMaxNumberOfPresetsOfEachType;
@@ -207,30 +189,14 @@ CHIP_ERROR ThermostatDelegate::GetPendingPresetAtIndex(size_t index, PresetStruc
 
 CHIP_ERROR ThermostatDelegate::ApplyPendingPresets()
 {
-
-    // TODO: #34546 - Need to support deletion of presets that are removed from Presets.
+    mNextFreeIndexInPresetsList = 0;
     for (uint8_t indexInPendingPresets = 0; indexInPendingPresets < mNextFreeIndexInPendingPresetsList; indexInPendingPresets++)
     {
         const PresetStructWithOwnedMembers & pendingPreset = mPendingPresets[indexInPendingPresets];
+        mPresets[mNextFreeIndexInPresetsList]              = pendingPreset;
+        mNextFreeIndexInPresetsList++;
+                    ChipLogError(Zcl, "applied pending preset again");
 
-        bool found = false;
-        for (uint8_t indexInPresets = 0; indexInPresets < mNextFreeIndexInPresetsList; indexInPresets++)
-        {
-            if (PresetHandlesExistAndMatch(mPresets[indexInPresets], pendingPreset))
-            {
-                found = true;
-
-                // Replace the  preset with the pending preset
-                mPresets[indexInPresets] = pendingPreset;
-            }
-        }
-
-        // If pending preset was not found in the Presets list, append to the Presets list.
-        if (!found)
-        {
-            mPresets[mNextFreeIndexInPresetsList] = pendingPreset;
-            mNextFreeIndexInPresetsList++;
-        }
     }
     return CHIP_NO_ERROR;
 }

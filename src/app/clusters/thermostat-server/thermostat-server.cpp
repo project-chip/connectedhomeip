@@ -860,6 +860,7 @@ CHIP_ERROR ThermostatAttrAccess::Write(const ConcreteDataAttributePath & aPath, 
         // and add to the pending presets list.
         if (!aPath.IsListOperation() || aPath.mListOp == ConcreteDataAttributePath::ListOperation::ReplaceAll)
         {
+            ChipLogError(Zcl, "Replace all!");
             // Clear the pending presets list
             delegate->ClearPendingPresetList();
 
@@ -886,6 +887,7 @@ CHIP_ERROR ThermostatAttrAccess::Write(const ConcreteDataAttributePath & aPath, 
         // If the list operation is AppendItem, call the delegate to append the item to the list of pending presets.
         if (aPath.mListOp == ConcreteDataAttributePath::ListOperation::AppendItem)
         {
+            ChipLogError(Zcl, "Appending again!");
             PresetStruct::Type preset;
             ReturnErrorOnFailure(aDecoder.Decode(preset));
             if (IsValidPresetEntry(preset))
@@ -1571,12 +1573,14 @@ imcode commitPresets(Delegate * delegate, EndpointId endpoint)
     {
         return imcode::InvalidInState;
     }
+            ChipLogError(Zcl, "committed presets");
     return imcode::Success;
 }
 
 void handleAtomicCommit(CommandHandler * commandObj, const ConcreteCommandPath & commandPath,
                         const Commands::AtomicRequest::DecodableType & commandData)
 {
+            ChipLogError(Zcl, "handleAtomicCommit");
     if (!validAtomicAttributes(commandData, true))
     {
         commandObj->AddStatus(commandPath, imcode::InvalidCommand);
@@ -1711,13 +1715,13 @@ bool emberAfThermostatClusterSetpointRaiseLowerCallback(app::CommandHandler * co
             {
                 DesiredCoolingSetpoint = static_cast<int16_t>(CoolingSetpoint + amount * 10);
                 CoolLimit              = static_cast<int16_t>(DesiredCoolingSetpoint -
-                                                 EnforceCoolingSetpointLimits(DesiredCoolingSetpoint, aEndpointId));
+                                                              EnforceCoolingSetpointLimits(DesiredCoolingSetpoint, aEndpointId));
                 {
                     if (OccupiedHeatingSetpoint::Get(aEndpointId, &HeatingSetpoint) == imcode::Success)
                     {
                         DesiredHeatingSetpoint = static_cast<int16_t>(HeatingSetpoint + amount * 10);
                         HeatLimit              = static_cast<int16_t>(DesiredHeatingSetpoint -
-                                                         EnforceHeatingSetpointLimits(DesiredHeatingSetpoint, aEndpointId));
+                                                                      EnforceHeatingSetpointLimits(DesiredHeatingSetpoint, aEndpointId));
                         {
                             if (CoolLimit != 0 || HeatLimit != 0)
                             {
