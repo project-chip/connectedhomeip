@@ -51,7 +51,7 @@ using Protocols::InteractionModel::Status;
 ///
 /// If it returns std::nullopt, then there is no AAI to handle the given path
 /// and processing should figure out the value otherwise (generally from other ember data)
-std::optional<CHIP_ERROR> TryWriteViaAccessInterface(const ConcreteAttributePath & path, AttributeAccessInterface * aai,
+std::optional<CHIP_ERROR> TryWriteViaAccessInterface(const ConcreteDataAttributePath & path, AttributeAccessInterface * aai,
                                                      AttributeValueDecoder & decoder)
 {
     // Processing can happen only if an attribute access interface actually exists..
