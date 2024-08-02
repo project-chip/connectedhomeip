@@ -479,9 +479,20 @@ bool Instance::IsValidSupportedLocation(const AreaStructureWrapper & aLocation)
         return false;
     }
 
-    if (mDelegate->GetNumberOfSupportedMaps() == 0)
+    // The mapID field SHALL be null if the SupportedMaps is not supported on the SupportedMaps is an empty list.
+    bool shouldMapsBeNull = false;
+    if (mFeature.Has(Feature::kMaps))
     {
-        // If the SupportedMaps attribute is null, mapid SHALL be null.
+        if (mDelegate->GetNumberOfSupportedMaps() == 0)
+        {
+            shouldMapsBeNull = true;
+        }
+    }
+    else {
+        shouldMapsBeNull = true;
+    }
+
+    if (shouldMapsBeNull) {
         if (!aLocation.mapID.IsNull())
         {
             ChipLogDetail(Zcl, "IsValidSupportedLocation %u - map Id %u is not in empty supported map list", aLocation.areaID,
