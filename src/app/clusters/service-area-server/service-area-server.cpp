@@ -217,7 +217,7 @@ void Instance::HandleSelectAreasCmd(HandlerContext & ctx, const Commands::Select
     auto exitResponse = [ctx](SelectAreasStatus status, CharSpan statusText) {
         Commands::SelectAreasResponse::Type response{
             .status     = status,
-            .statusText = Optional(statusText),
+            .statusText = statusText,
         };
         ctx.mCommandHandler.AddResponse(ctx.mRequestPath, response);
     };
@@ -366,7 +366,7 @@ void Instance::HandleSkipCurrentAreaCmd(HandlerContext & ctx, const Commands::Sk
     auto exitResponse = [ctx](SkipAreaStatus status, CharSpan statusText) {
         Commands::SkipAreaResponse::Type response{
             .status     = status,
-            .statusText = Optional(statusText),
+            .statusText = statusText,
         };
         ctx.mCommandHandler.AddResponse(ctx.mRequestPath, response);
     };
@@ -449,34 +449,27 @@ bool Instance::IsSupportedLocation(uint32_t aAreaId)
 
 bool Instance::IsValidSupportedLocation(const AreaStructureWrapper & aLocation)
 {
-    // If the HomeLocationInfo field is null, the LandmarkTag field SHALL NOT be null.
-    // If the LandmarkTag field is null, the HomeLocationInfo field SHALL NOT be null.
-    if (aLocation.areaDesc.locationInfo.IsNull() && aLocation.areaDesc.landmarkTag.IsNull())
+    // If the LocationInfo field is null, the LandmarkInfo field SHALL NOT be null.
+    // If the LandmarkInfo field is null, the LocationInfo field SHALL NOT be null.
+    if (aLocation.areaDesc.locationInfo.IsNull() && aLocation.areaDesc.landmarkInfo.IsNull())
     {
-        ChipLogDetail(Zcl, "IsValidAsSupportedLocation %u - must have locationInfo and/or LandmarkTag", aLocation.areaID);
+        ChipLogDetail(Zcl, "IsValidAsSupportedLocation %u - must have locationInfo and/or LandmarkInfo", aLocation.areaID);
         return false;
     }
 
-    // If HomeLocationInfo is not null, and its LocationName field is an empty string, at least one of the following SHALL NOT
-    // be null: HomeLocationInfo's FloorNumber field, HomeLocationInfo's AreaType field, the LandmarkTag field
+    // If LocationInfo is not null, and its LocationName field is an empty string, at least one of the following SHALL NOT
+    // be null: LocationInfo's FloorNumber field, LocationInfo's AreaType field, the LandmarkInfo
     if (!aLocation.areaDesc.locationInfo.IsNull())
     {
         if (aLocation.areaDesc.locationInfo.Value().locationName.empty() &&
             aLocation.areaDesc.locationInfo.Value().floorNumber.IsNull() &&
-            aLocation.areaDesc.locationInfo.Value().areaType.IsNull() && aLocation.areaDesc.landmarkTag.IsNull())
+            aLocation.areaDesc.locationInfo.Value().areaType.IsNull() && aLocation.areaDesc.landmarkInfo.IsNull())
         {
             ChipLogDetail(
-                Zcl, "IsValidAsSupportedLocation %u - LocationName is empty string, FloorNumber, AreaType, LandmarkTag are null",
+                Zcl, "IsValidAsSupportedLocation %u - LocationName is empty string, FloorNumber, AreaType, LandmarkInfo are null",
                 aLocation.areaID);
             return false;
         }
-    }
-
-    // If the LandmarkTag field is null, the PositionTag field SHALL be null.
-    if (aLocation.areaDesc.landmarkTag.IsNull() && !aLocation.areaDesc.positionTag.IsNull())
-    {
-        ChipLogDetail(Zcl, "IsValidAsSupportedLocation %u - PositionTag with no LandmarkTag", aLocation.areaID);
-        return false;
     }
 
     // The mapID field SHALL be null if the SupportedMaps is not supported on the SupportedMaps is an empty list.
@@ -581,15 +574,16 @@ bool Instance::ReportEstimatedEndTimeChange(const DataModel::Nullable<uint32_t> 
     return (aEstimatedEndTime.Value() < mEstimatedEndTime.Value());
 }
 
-bool Instance::AddSupportedLocation(uint32_t aAreaId, const DataModel::Nullable<uint8_t> & aMapId, const CharSpan & aLocationName,
+bool Instance::AddSupportedLocation(uint32_t aAreaId, const DataModel::Nullable<uint32_t> & aMapId, const CharSpan & aLocationName,
                                     const DataModel::Nullable<int16_t> & aFloorNumber,
                                     const DataModel::Nullable<Globals::AreaTypeTag> & aAreaType,
                                     const DataModel::Nullable<Globals::LandmarkTag> & aLandmarkTag,
-                                    const DataModel::Nullable<Globals::PositionTag> & aPositionTag,
-                                    const DataModel::Nullable<Globals::FloorSurfaceTag> & aSurfaceTag)
+                                    const DataModel::Nullable<Globals::PositionTag> & aPositionTag)
 {
     // Create location object for validation.
-    AreaStructureWrapper aNewArea(aAreaId, aMapId, aLocationName, aFloorNumber, aAreaType, aLandmarkTag, aPositionTag, aSurfaceTag);
+    AreaStructureWrapper aNewArea(aAreaId, aMapId, aLocationName, aFloorNumber, aAreaType, aLandmarkTag, aPositionTag);
+
+    ChipLogError(Zcl, "AddSupportedLocation - 1 - area name: %.*s", static_cast<int>(aLocationName.size()), aLocationName.data());
 
     // Does device mode allow this attribute to be updated?
     if (!mDelegate->IsSupportedAreasChangeAllowed())
@@ -632,12 +626,11 @@ bool Instance::AddSupportedLocation(uint32_t aAreaId, const DataModel::Nullable<
     return true;
 }
 
-bool Instance::ModifySupportedLocation(uint32_t aAreaId, const DataModel::Nullable<uint8_t> & aMapId,
+bool Instance::ModifySupportedLocation(uint32_t aAreaId, const DataModel::Nullable<uint32_t> & aMapId,
                                        const CharSpan & aLocationName, const DataModel::Nullable<int16_t> & aFloorNumber,
                                        const DataModel::Nullable<Globals::AreaTypeTag> & aAreaType,
                                        const DataModel::Nullable<Globals::LandmarkTag> & aLandmarkTag,
-                                       const DataModel::Nullable<Globals::PositionTag> & aPositionTag,
-                                       const DataModel::Nullable<Globals::FloorSurfaceTag> & aSurfaceTag)
+                                       const DataModel::Nullable<Globals::PositionTag> & aPositionTag)
 {
     bool mapIDChanged = false;
     uint32_t listIndex;
@@ -664,8 +657,7 @@ bool Instance::ModifySupportedLocation(uint32_t aAreaId, const DataModel::Nullab
         }
 
         // create new location object for validation
-        AreaStructureWrapper aNewArea(aAreaId, aMapId, aLocationName, aFloorNumber, aAreaType, aLandmarkTag, aPositionTag,
-                                      aSurfaceTag);
+        AreaStructureWrapper aNewArea(aAreaId, aMapId, aLocationName, aFloorNumber, aAreaType, aLandmarkTag, aPositionTag);
 
         // verify cluster requirements concerning valid fields and field relationships
         if (!IsValidSupportedLocation(aNewArea))
@@ -719,7 +711,7 @@ bool Instance::ClearSupportedAreas()
 //*************************************************************************
 // Supported Maps manipulators
 
-bool Instance::IsSupportedMap(uint8_t aMapId)
+bool Instance::IsSupportedMap(uint32_t aMapId)
 {
     uint32_t ignoredIndex;
     MapStructureWrapper ignoredMap;
@@ -727,7 +719,7 @@ bool Instance::IsSupportedMap(uint8_t aMapId)
     return mDelegate->GetSupportedMapById(aMapId, ignoredIndex, ignoredMap);
 }
 
-bool Instance::AddSupportedMap(uint8_t aMapId, const CharSpan & aMapName)
+bool Instance::AddSupportedMap(uint32_t aMapId, const CharSpan & aMapName)
 {
     // check max# of list entries
     if (mDelegate->GetNumberOfSupportedMaps() >= kMaxNumSupportedMaps)
@@ -780,7 +772,7 @@ bool Instance::AddSupportedMap(uint8_t aMapId, const CharSpan & aMapName)
     return true;
 }
 
-bool Instance::RenameSupportedMap(uint8_t aMapId, const CharSpan & newMapName)
+bool Instance::RenameSupportedMap(uint32_t aMapId, const CharSpan & newMapName)
 {
     uint32_t modifiedIndex;
     MapStructureWrapper modifiedMap;

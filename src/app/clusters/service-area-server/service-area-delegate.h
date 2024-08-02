@@ -245,7 +245,7 @@ public:
      *
      * @note may be overloaded in device implementation for optimization, if desired.
      */
-    virtual bool GetSupportedMapById(uint8_t aMapId, uint32_t & listIndex, MapStructureWrapper & aSupportedMap);
+    virtual bool GetSupportedMapById(uint32_t aMapId, uint32_t & listIndex, MapStructureWrapper & aSupportedMap);
 
     /**
      * This method is called by the server instance to add a new map to the list.

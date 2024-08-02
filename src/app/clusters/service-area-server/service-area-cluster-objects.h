@@ -39,8 +39,7 @@ struct AreaStructureWrapper : public chip::app::Clusters::ServiceArea::Structs::
     AreaStructureWrapper()
     {
         Set(0, 0, CharSpan(), DataModel::Nullable<int16_t>(), DataModel::Nullable<Globals::AreaTypeTag>(),
-            DataModel::Nullable<Globals::LandmarkTag>(), DataModel::Nullable<Globals::PositionTag>(),
-            DataModel::Nullable<Globals::FloorSurfaceTag>());
+            DataModel::Nullable<Globals::LandmarkTag>(), DataModel::Nullable<Globals::PositionTag>());
     }
 
     /**
@@ -54,20 +53,18 @@ struct AreaStructureWrapper : public chip::app::Clusters::ServiceArea::Structs::
      * @param[in] aLandmarkTag A common namespace Landmark tag - indicates an association of the location with a home landmark.
      * @param[in] aPositionTag A common namespace Position tag - indicates the position of the location with respect to the
      * landmark.
-     * @param[in] aSurfaceTag A common namespace Floor Surface tag - indicates an association of the location with a surface type.
      *
      * @note Requirements regarding what combinations of fields and values are valid are not checked by this class.
      * @note If aLocationName is larger than kLocationNameMaxSize, it will be truncated.
      * @note If aLocationName is an empty string and aFloorNumber and aAreaTypeTag are null, locationInfo will be set to null.
      */
-    AreaStructureWrapper(uint32_t aAreaID, const DataModel::Nullable<uint8_t> & aMapId, const CharSpan & aLocationName,
+    AreaStructureWrapper(uint32_t aAreaID, const DataModel::Nullable<uint32_t> & aMapId, const CharSpan & aLocationName,
                          const DataModel::Nullable<int16_t> & aFloorNumber,
                          const DataModel::Nullable<Globals::AreaTypeTag> & aAreaTypeTag,
                          const DataModel::Nullable<Globals::LandmarkTag> & aLandmarkTag,
-                         const DataModel::Nullable<Globals::PositionTag> & aPositionTag,
-                         const DataModel::Nullable<Globals::FloorSurfaceTag> & aSurfaceTag)
+                         const DataModel::Nullable<Globals::PositionTag> & aPositionTag)
     {
-        Set(aAreaID, aMapId, aLocationName, aFloorNumber, aAreaTypeTag, aLandmarkTag, aPositionTag, aSurfaceTag);
+        Set(aAreaID, aMapId, aLocationName, aFloorNumber, aAreaTypeTag, aLandmarkTag, aPositionTag);
     }
 
     /**
@@ -88,16 +85,47 @@ struct AreaStructureWrapper : public chip::app::Clusters::ServiceArea::Structs::
      */
     AreaStructureWrapper & operator=(const AreaStructureWrapper & aOther)
     {
+        areaID = aOther.areaID;
+        mapID = aOther.mapID;
+
         if (aOther.areaDesc.locationInfo.IsNull())
         {
-            Set(aOther.areaID, aOther.mapID, CharSpan(), NullOptional, NullOptional, aOther.areaDesc.landmarkTag,
-                aOther.areaDesc.positionTag, aOther.areaDesc.surfaceTag);
+            areaDesc.locationInfo.SetNull();
         }
         else
         {
-            Set(aOther.areaID, aOther.mapID, aOther.areaDesc.locationInfo.Value().locationName,
-                aOther.areaDesc.locationInfo.Value().floorNumber, aOther.areaDesc.locationInfo.Value().areaType,
-                aOther.areaDesc.landmarkTag, aOther.areaDesc.positionTag, aOther.areaDesc.surfaceTag);
+            areaDesc.locationInfo.SetNonNull();
+
+            // deep copy the name.
+            auto sizeToCopy = sizeof(mLocationNameBuffer);
+            if (aOther.areaDesc.locationInfo.Value().locationName.size() < sizeToCopy)
+            {
+                sizeToCopy = aOther.areaDesc.locationInfo.Value().locationName.size();
+            }
+            memcpy(mLocationNameBuffer, aOther.areaDesc.locationInfo.Value().locationName.data(), sizeToCopy);
+            areaDesc.locationInfo.Value().locationName = CharSpan(mLocationNameBuffer, sizeToCopy);
+
+            areaDesc.locationInfo.Value().floorNumber = aOther.areaDesc.locationInfo.Value().floorNumber;
+            areaDesc.locationInfo.Value().areaType    = aOther.areaDesc.locationInfo.Value().areaType;
+        }
+
+        if (aOther.areaDesc.landmarkInfo.IsNull())
+        {
+            areaDesc.landmarkInfo.SetNull();
+        }
+        else
+        {
+            areaDesc.landmarkInfo.SetNonNull();
+            areaDesc.landmarkInfo.Value().landmarkTag = aOther.areaDesc.landmarkInfo.Value().landmarkTag;
+            if (aOther.areaDesc.landmarkInfo.Value().positionTag.IsNull())
+            {
+                areaDesc.landmarkInfo.Value().positionTag.SetNull();
+            }
+            else
+            {
+                areaDesc.landmarkInfo.Value().positionTag.SetNonNull();
+                areaDesc.landmarkInfo.Value().positionTag.Value() = aOther.areaDesc.landmarkInfo.Value().positionTag.Value();
+            }
         }
 
         return *this;
@@ -114,17 +142,15 @@ struct AreaStructureWrapper : public chip::app::Clusters::ServiceArea::Structs::
      * @param[in] aLandmarkTag A common namespace Landmark tag - indicates an association of the location with a home landmark.
      * @param[in] aPositionTag A common namespace Position tag - indicates the position of the location with respect to the
      * landmark.
-     * @param[in] aSurfaceTag A common namespace Floor Surface tag - indicates an association of the location with a surface type.
      *
      * @note Requirements regarding what combinations of fields and values are valid are not checked by this class.
      * @note If aLocationName is larger than kLocationNameMaxSize, it will be truncated.
      * @note If aLocationName is an empty string and aFloorNumber and aAreaTypeTag are null, locationInfo will be set to null.
      */
-    void Set(uint32_t aAreaID, const DataModel::Nullable<uint8_t> & aMapId, const CharSpan & aLocationName,
+    void Set(uint32_t aAreaID, const DataModel::Nullable<uint32_t> & aMapId, const CharSpan & aLocationName,
              const DataModel::Nullable<int16_t> & aFloorNumber, const DataModel::Nullable<Globals::AreaTypeTag> & aAreaType,
              const DataModel::Nullable<Globals::LandmarkTag> & aLandmarkTag,
-             const DataModel::Nullable<Globals::PositionTag> & aPositionTag,
-             const DataModel::Nullable<Globals::FloorSurfaceTag> & aSurfaceTag)
+             const DataModel::Nullable<Globals::PositionTag> & aPositionTag)
     {
         areaID = aAreaID;
         mapID  = aMapId;
@@ -143,9 +169,25 @@ struct AreaStructureWrapper : public chip::app::Clusters::ServiceArea::Structs::
             areaDesc.locationInfo.SetNull();
         }
 
-        areaDesc.landmarkTag = aLandmarkTag;
-        areaDesc.positionTag = aPositionTag;
-        areaDesc.surfaceTag  = aSurfaceTag;
+        // todo improve this when addressing issue https://github.com/project-chip/connectedhomeip/issues/34519
+        if (aLandmarkTag.IsNull())
+        {
+            areaDesc.landmarkInfo.SetNull();
+        }
+        else
+        {
+            areaDesc.landmarkInfo.SetNonNull();
+            areaDesc.landmarkInfo.Value().landmarkTag = aLandmarkTag.Value();
+            if (aPositionTag.IsNull())
+            {
+                areaDesc.landmarkInfo.Value().positionTag.SetNull();
+            }
+            else
+            {
+                areaDesc.landmarkInfo.Value().positionTag.SetNonNull();
+                areaDesc.landmarkInfo.Value().positionTag.Value() = aPositionTag.Value();
+            }
+        }
 
         // this assumes areaDesc structure was created above, if appropriate
         if (!areaDesc.locationInfo.IsNull())
@@ -238,19 +280,22 @@ struct AreaStructureWrapper : public chip::app::Clusters::ServiceArea::Structs::
             }
         }
 
-        if (areaDesc.landmarkTag != aOther.areaDesc.landmarkTag)
+        if (areaDesc.landmarkInfo.IsNull() != aOther.areaDesc.landmarkInfo.IsNull())
         {
             return false;
         }
 
-        if (areaDesc.positionTag != aOther.areaDesc.positionTag)
+        if (!areaDesc.landmarkInfo.IsNull())
         {
-            return false;
-        }
+            if (areaDesc.landmarkInfo.Value().landmarkTag != aOther.areaDesc.landmarkInfo.Value().landmarkTag)
+            {
+                return false;
+            }
 
-        if (areaDesc.surfaceTag != aOther.areaDesc.surfaceTag)
-        {
-            return false;
+            if (areaDesc.landmarkInfo.Value().positionTag != aOther.areaDesc.landmarkInfo.Value().positionTag)
+            {
+                return false;
+            }
         }
 
         return true;
@@ -288,7 +333,7 @@ struct MapStructureWrapper : public chip::app::Clusters::ServiceArea::Structs::M
      * @note Requirements regarding what combinations of fields and values are 'valid' are not checked by this class.
      * @note If aMapName is larger than kMapNameMaxSize, it will be truncated.
      */
-    MapStructureWrapper(uint8_t aMapId, const CharSpan & aMapName) { Set(aMapId, aMapName); }
+    MapStructureWrapper(uint32_t aMapId, const CharSpan & aMapName) { Set(aMapId, aMapName); }
 
     /**
      * @brief This is a copy constructor that initializes the map object with the values from another map object. All values are

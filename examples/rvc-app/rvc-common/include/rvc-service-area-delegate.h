@@ -78,7 +78,7 @@ public:
 
     bool GetSupportedMapByIndex(uint32_t listIndex, ServiceArea::MapStructureWrapper & supportedMap) override;
 
-    bool GetSupportedMapById(uint8_t aMapId, uint32_t & listIndex, ServiceArea::MapStructureWrapper & supportedMap) override;
+    bool GetSupportedMapById(uint32_t aMapId, uint32_t & listIndex, ServiceArea::MapStructureWrapper & supportedMap) override;
 
     bool AddSupportedMap(const ServiceArea::MapStructureWrapper & newMap, uint32_t & listIndex) override;
 
