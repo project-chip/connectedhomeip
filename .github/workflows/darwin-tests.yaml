@@ -95,6 +95,7 @@ jobs:
                         --target darwin-x64-lit-icd-${BUILD_VARIANT} \
                         --target darwin-x64-microwave-oven-${BUILD_VARIANT} \
                         --target darwin-x64-rvc-${BUILD_VARIANT} \
+                        --target darwin-x64-network-manager-${BUILD_VARIANT} \
                         build \
                         --copy-artifacts-to objdir-clone \
                      "
@@ -116,6 +117,7 @@ jobs:
                      --bridge-app ./out/darwin-x64-bridge-${BUILD_VARIANT}/chip-bridge-app \
                      --microwave-oven-app ./out/darwin-x64-microwave-oven-${BUILD_VARIANT}/chip-microwave-oven-app \
                      --rvc-app ./out/darwin-x64-rvc-${BUILD_VARIANT}/chip-rvc-app \
+                     --network-manager-app ./out/darwin-x64-network-manager-${BUILD_VARIANT}/matter-network-manager-app \
                   "
             - name: Run OTA Test
               run: |

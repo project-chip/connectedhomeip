@@ -195,8 +195,8 @@ public:
          * - CHIP_ERROR_TIMEOUT: A response was not received within the expected response timeout.
          * - CHIP_ERROR_*TLV*: A malformed, non-compliant response was received from the server.
          * - CHIP_ERROR encapsulating a StatusIB: If we got a non-path-specific
-         *   status response from the server.  In that case,
-         *   StatusIB::InitFromChipError can be used to extract the status.
+         *   status response from the server.  In that case, constructing
+         *   a StatusIB from the error can be used to extract the status.
          * - CHIP_ERROR*: All other cases.
          *
          * This object MUST continue to exist after this call is completed. The application shall wait until it

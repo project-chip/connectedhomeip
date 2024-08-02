@@ -23,6 +23,7 @@
  *
  */
 
+#include "app/data-model-provider/ActionReturnStatus.h"
 #include <app/icd/server/ICDServerConfig.h>
 #if CHIP_CONFIG_ENABLE_ICD_SERVER
 #include <app/icd/server/ICDNotifier.h> // nogncheck
@@ -182,15 +183,20 @@ CHIP_ERROR Engine::BuildSingleReportDataAttributeReportIBs(ReportDataMessage::Bu
             ConcreteReadAttributePath pathForRetrieval(readPath);
             // Load the saved state from previous encoding session for chunking of one single attribute (list chunking).
             AttributeEncodeState encodeState = apReadHandler->GetAttributeEncodeState();
-            err = Impl::RetrieveClusterData(mpImEngine->GetDataModel(), apReadHandler->GetSubjectDescriptor(),
-                                            apReadHandler->IsFabricFiltered(), attributeReportIBs, pathForRetrieval, &encodeState);
-            if (err != CHIP_NO_ERROR)
+            DataModel::ActionReturnStatus status =
+                Impl::RetrieveClusterData(mpImEngine->GetDataModelProvider(), apReadHandler->GetSubjectDescriptor(),
+                                          apReadHandler->IsFabricFiltered(), attributeReportIBs, pathForRetrieval, &encodeState);
+            if (status.IsError())
             {
+                // Operation error set, since this will affect early return or override on status encoding
+                // it will also be used for error reporting below.
+                err = status.GetUnderlyingError();
+
                 // If error is not an "out of writer space" error, rollback and encode status.
                 // Otherwise, if partial data allowed, save the encode state.
                 // Otherwise roll back. If we have already encoded some chunks, we are done; otherwise encode status.
 
-                if (encodeState.AllowPartialData() && IsOutOfWriterSpaceError(err))
+                if (encodeState.AllowPartialData() && status.IsOutOfSpaceEncodingResponse())
                 {
                     ChipLogDetail(DataManagement,
                                   "List does not fit in packet, chunk between list items for clusterId: " ChipLogFormatMEI
@@ -210,7 +216,7 @@ CHIP_ERROR Engine::BuildSingleReportDataAttributeReportIBs(ReportDataMessage::Bu
                     attributeReportIBs.Rollback(attributeBackup);
                     apReadHandler->SetAttributeEncodeState(AttributeEncodeState());
 
-                    if (!IsOutOfWriterSpaceError(err))
+                    if (!status.IsOutOfSpaceEncodingResponse())
                     {
                         ChipLogError(DataManagement,
                                      "Fail to retrieve data, roll back and encode status on clusterId: " ChipLogFormatMEI
@@ -218,7 +224,7 @@ CHIP_ERROR Engine::BuildSingleReportDataAttributeReportIBs(ReportDataMessage::Bu
                                      ChipLogValueMEI(pathForRetrieval.mClusterId), ChipLogValueMEI(pathForRetrieval.mAttributeId),
                                      err.Format());
                         // Try to encode our error as a status response.
-                        err = attributeReportIBs.EncodeAttributeStatus(pathForRetrieval, StatusIB(err));
+                        err = attributeReportIBs.EncodeAttributeStatus(pathForRetrieval, StatusIB(status.GetStatusCode()));
                         if (err != CHIP_NO_ERROR)
                         {
                             // OK, just roll back again and give up; if we still ran out of space we
