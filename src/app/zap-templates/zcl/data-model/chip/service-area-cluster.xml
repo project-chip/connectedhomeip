@@ -120,6 +120,7 @@ limitations under the License.
       <description>
         This command is used to skip an area where the device operates.
       </description>
+      <arg name="SkippedArea" type="int32u"/>
     </command>
 
     <command source="server" code="0x03" name="SkipAreaResponse" disableDefaultResponse="true" optional="true">
