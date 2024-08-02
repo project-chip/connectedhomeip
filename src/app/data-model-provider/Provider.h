@@ -91,7 +91,7 @@ public:
     ///    - returning a value other than Success implies an error reply (error and data are mutually exclusive)
     ///
     /// Returning anything other than CHIP_NO_ERROR or Status::Success (i.e. success without a return code)
-    /// means that the invoke will be considered to be returning the given status WITHOUT any data (any data
+    /// means that the invoke will be considered to be returning the given path-specific status WITHOUT any data (any data
     /// that was sent via CommandHandler is to be rolled back/discarded).
     ///
     /// This is because only one of the following may be encoded in a response:
