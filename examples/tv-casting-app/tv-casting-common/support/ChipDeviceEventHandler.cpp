@@ -100,7 +100,7 @@ void ChipDeviceEventHandler::HandleFailSafeTimerExpired()
         sUdcInProgress                                            = false;
         CastingPlayer::GetTargetCastingPlayer()->mConnectionState = CASTING_PLAYER_NOT_CONNECTED;
         CastingPlayer::GetTargetCastingPlayer()->mOnCompleted(CHIP_ERROR_TIMEOUT, nullptr);
-        CastingPlayer::GetTargetCastingPlayer()->mOnCompleted         = nullptr;
+        CastingPlayer::GetTargetCastingPlayer()->mOnCompleted = nullptr;
         CastingPlayer::GetTargetCastingPlayer()->mTargetCastingPlayer.reset();
         return;
     }

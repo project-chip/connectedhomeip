@@ -122,7 +122,8 @@ void CastingPlayer::VerifyOrEstablishConnection(ConnectionCallbacks connectionCa
                     nullptr,
                     [](void * context, chip::Messaging::ExchangeManager & exchangeMgr, const chip::SessionHandle & sessionHandle) {
                         ChipLogProgress(AppServer,
-                                        "CastingPlayer::VerifyOrEstablishConnection() FindOrEstablishSession Connection to CastingPlayer successful");
+                                        "CastingPlayer::VerifyOrEstablishConnection() FindOrEstablishSession Connection to "
+                                        "CastingPlayer successful");
                         CastingPlayer::GetTargetCastingPlayer()->mConnectionState = CASTING_PLAYER_CONNECTED;
 
                         // this async call will Load all the endpoints with their respective attributes into the TargetCastingPlayer
@@ -131,7 +132,9 @@ void CastingPlayer::VerifyOrEstablishConnection(ConnectionCallbacks connectionCa
                         support::EndpointListLoader::GetInstance()->Load();
                     },
                     [](void * context, const chip::ScopedNodeId & peerId, CHIP_ERROR error) {
-                        ChipLogError(AppServer, "CastingPlayer::VerifyOrEstablishConnection() FindOrEstablishSession Connection to CastingPlayer failed");
+                        ChipLogError(AppServer,
+                                     "CastingPlayer::VerifyOrEstablishConnection() FindOrEstablishSession Connection to "
+                                     "CastingPlayer failed");
                         CastingPlayer::GetTargetCastingPlayer()->mConnectionState = CASTING_PLAYER_NOT_CONNECTED;
                         CHIP_ERROR e = support::CastingStore::GetInstance()->Delete(*CastingPlayer::GetTargetCastingPlayer());
                         if (e != CHIP_NO_ERROR)
@@ -197,7 +200,7 @@ CHIP_ERROR CastingPlayer::ContinueConnecting()
                      "CastingPlayer::ContinueConnecting() mIdOptions.mCommissionerPasscode == false, ContinueConnecting() should "
                      "only be called when the CastingPlayer/Commissioner-Generated passcode commissioning flow is in progress."););
 
-    CHIP_ERROR err           = CHIP_NO_ERROR;
+    CHIP_ERROR err       = CHIP_NO_ERROR;
     mTargetCastingPlayer = weak_from_this();
 
     ChipLogProgress(AppServer, "CastingPlayer::ContinueConnecting() calling OpenBasicCommissioningWindow()");
@@ -288,7 +291,7 @@ void CastingPlayer::resetState(CHIP_ERROR err)
 void CastingPlayer::Disconnect()
 {
     ChipLogProgress(AppServer, "CastingPlayer::Disconnect()");
-    mConnectionState     = CASTING_PLAYER_NOT_CONNECTED;
+    mConnectionState = CASTING_PLAYER_NOT_CONNECTED;
     mTargetCastingPlayer.reset();
     CastingPlayerDiscovery::GetInstance()->ClearCastingPlayersInternal();
 }
@@ -487,10 +490,14 @@ ConnectionContext::ConnectionContext(void * clientContext, core::CastingPlayer *
         [](void * context, chip::Messaging::ExchangeManager & exchangeMgr, const chip::SessionHandle & sessionHandle) {
             ChipLogProgress(AppServer, "CastingPlayer::ConnectionContext() Device Connection success callback called");
             ConnectionContext * connectionContext = static_cast<ConnectionContext *>(context);
-            VerifyOrReturn(connectionContext != nullptr && connectionContext->mTargetCastingPlayer != nullptr,
-                           ChipLogError(AppServer, "CastingPlayer::ConnectionContext() Invalid ConnectionContext received in DeviceConnection success callback"));
+            VerifyOrReturn(
+                connectionContext != nullptr && connectionContext->mTargetCastingPlayer != nullptr,
+                ChipLogError(
+                    AppServer,
+                    "CastingPlayer::ConnectionContext() Invalid ConnectionContext received in DeviceConnection success callback"));
 
-            ChipLogProgress(AppServer, "CastingPlayer::ConnectionContext() calling mConnectionState = core::CASTING_PLAYER_CONNECTED");
+            ChipLogProgress(AppServer,
+                            "CastingPlayer::ConnectionContext() calling mConnectionState = core::CASTING_PLAYER_CONNECTED");
             connectionContext->mTargetCastingPlayer->mConnectionState = core::CASTING_PLAYER_CONNECTED;
             ChipLogProgress(AppServer, "CastingPlayer::ConnectionContext() calling mOnDeviceConnectedFn");
             connectionContext->mOnDeviceConnectedFn(connectionContext->mClientContext, exchangeMgr, sessionHandle);
@@ -501,10 +508,15 @@ ConnectionContext::ConnectionContext(void * clientContext, core::CastingPlayer *
 
     mOnConnectionFailureCallback = new chip::Callback::Callback<chip::OnDeviceConnectionFailure>(
         [](void * context, const chip::ScopedNodeId & peerId, CHIP_ERROR error) {
-            ChipLogError(AppServer, "CastingPlayer::ConnectionContext() Device Connection failure callback called with %" CHIP_ERROR_FORMAT, error.Format());
+            ChipLogError(AppServer,
+                         "CastingPlayer::ConnectionContext() Device Connection failure callback called with %" CHIP_ERROR_FORMAT,
+                         error.Format());
             ConnectionContext * connectionContext = static_cast<ConnectionContext *>(context);
-            VerifyOrReturn(connectionContext != nullptr && connectionContext->mTargetCastingPlayer != nullptr,
-                           ChipLogError(AppServer, "CastingPlayer::ConnectionContext() Invalid ConnectionContext received in DeviceConnection failure callback"));
+            VerifyOrReturn(
+                connectionContext != nullptr && connectionContext->mTargetCastingPlayer != nullptr,
+                ChipLogError(
+                    AppServer,
+                    "CastingPlayer::ConnectionContext() Invalid ConnectionContext received in DeviceConnection failure callback"));
             connectionContext->mTargetCastingPlayer->mConnectionState = CASTING_PLAYER_NOT_CONNECTED;
             connectionContext->mOnDeviceConnectionFailureFn(connectionContext->mClientContext, peerId, error);
             delete connectionContext;

@@ -67,7 +67,8 @@ public class DiscoveryExampleFragment extends Fragment {
             public void onAdded(CastingPlayer castingPlayer) {
               Log.i(
                   TAG,
-                  "DiscoveryExampleFragment onAdded() Discovered CastingPlayer deviceId: " + castingPlayer.getDeviceId());
+                  "DiscoveryExampleFragment onAdded() Discovered CastingPlayer deviceId: "
+                      + castingPlayer.getDeviceId());
               // Display CastingPlayer info on the screen
               new Handler(Looper.getMainLooper())
                   .post(
@@ -216,7 +217,8 @@ public class DiscoveryExampleFragment extends Fragment {
   public void onPause() {
     super.onPause();
     Log.i(TAG, "DiscoveryExampleFragment onPause() called, calling stopDiscovery()");
-    // Stop discovery when leaving the fragment, for example, while displaying the ConnectionExampleFragment.
+    // Stop discovery when leaving the fragment, for example, while displaying the
+    // ConnectionExampleFragment.
     stopDiscovery();
   }
 

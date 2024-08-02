@@ -104,7 +104,7 @@ private:
      *
      * @param castingPlayers vector of CastingPlayers to clear
      */
-    void ClearDisconnectedCastingPlayers(std::vector<std::shared_ptr<CastingPlayer>>& castingPlayers);
+    void ClearDisconnectedCastingPlayers(std::vector<std::shared_ptr<CastingPlayer>> & castingPlayers);
 
     /**
      * @brief Clear all CastingPlayers in mCastingPlayersInternal
@@ -113,7 +113,8 @@ private:
 
 public:
     static CastingPlayerDiscovery * GetInstance();
-    ~CastingPlayerDiscovery() {
+    ~CastingPlayerDiscovery()
+    {
         mCastingPlayers.clear();
         mCastingPlayersInternal.clear();
     }

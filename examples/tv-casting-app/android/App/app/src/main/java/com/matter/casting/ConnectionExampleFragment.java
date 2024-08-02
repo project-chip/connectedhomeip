@@ -58,7 +58,8 @@ public class ConnectionExampleFragment extends Fragment {
   private TextView connectionFragmentStatusTextView;
   private Button connectionFragmentNextButton;
 
-  // Get a singleton instance of the MatterCastingPlayerDiscovery. Which can be used to call stopDiscovery() during connection.
+  // Get a singleton instance of the MatterCastingPlayerDiscovery. Which can be used to call
+  // stopDiscovery() during connection.
   static final CastingPlayerDiscovery matterCastingPlayerDiscovery =
       MatterCastingPlayerDiscovery.getInstance();
 
@@ -369,15 +370,20 @@ public class ConnectionExampleFragment extends Fragment {
   }
 
   private void stopDiscovery() {
-    Log.i(TAG, "ConnectionExampleFragment stopDiscovery() called, calling MatterCastingPlayerDiscovery.stopDiscovery()");
+    Log.i(
+        TAG,
+        "ConnectionExampleFragment stopDiscovery() called, calling MatterCastingPlayerDiscovery.stopDiscovery()");
 
     MatterError err = matterCastingPlayerDiscovery.stopDiscovery();
     if (err.hasError()) {
       Log.e(
           TAG,
-          "ConnectionExampleFragment stopDiscovery() MatterCastingPlayerDiscovery.stopDiscovery() called, err Stop: " + err);
+          "ConnectionExampleFragment stopDiscovery() MatterCastingPlayerDiscovery.stopDiscovery() called, err Stop: "
+              + err);
     } else {
-      Log.d(TAG, "ConnectionExampleFragment stopDiscovery() MatterCastingPlayerDiscovery.stopDiscovery() success");
+      Log.d(
+          TAG,
+          "ConnectionExampleFragment stopDiscovery() MatterCastingPlayerDiscovery.stopDiscovery() success");
     }
   }
 

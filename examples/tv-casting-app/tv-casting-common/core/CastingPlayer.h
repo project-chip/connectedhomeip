@@ -100,16 +100,25 @@ public:
     /**
      * @brief Get the CastingPlayer object targeted currently (may not be connected)
      */
-    static CastingPlayer * GetTargetCastingPlayer() {
+    static CastingPlayer * GetTargetCastingPlayer()
+    {
         ChipLogProgress(AppServer, "CastingPlayer::GetTargetCastingPlayer() called");
         std::shared_ptr<CastingPlayer> sharedPtr = mTargetCastingPlayer.lock();
-        CastingPlayer* rawPtr = nullptr;
-        if (sharedPtr) {
+        CastingPlayer * rawPtr                   = nullptr;
+        if (sharedPtr)
+        {
             rawPtr = sharedPtr.get();
-            ChipLogProgress(AppServer, "CastingPlayer::GetTargetCastingPlayer() Got rawPtr from mTargetCastingPlayer, sharedPtr reference count: %lu", sharedPtr.use_count());
+            ChipLogProgress(
+                AppServer,
+                "CastingPlayer::GetTargetCastingPlayer() Got rawPtr from mTargetCastingPlayer, sharedPtr reference count: %lu",
+                sharedPtr.use_count());
             sharedPtr.reset();
-        } else {
-            ChipLogError(AppServer, "CastingPlayer::GetTargetCastingPlayer() The shared pointer observed by mTargetCastingPlayer has expired (become nullptr)");
+        }
+        else
+        {
+            ChipLogError(AppServer,
+                         "CastingPlayer::GetTargetCastingPlayer() The shared pointer observed by mTargetCastingPlayer has expired "
+                         "(become nullptr)");
         }
         return rawPtr;
     }
@@ -272,9 +281,7 @@ public:
     /**
      * @brief Return the current state of the CastingPlayer
      */
-    ConnectionState GetConnectionState() const {
-        return mConnectionState;
-    }
+    ConnectionState GetConnectionState() const { return mConnectionState; }
 
 private:
     std::vector<memory::Strong<Endpoint>> mEndpoints;

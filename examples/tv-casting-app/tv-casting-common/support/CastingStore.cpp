@@ -40,7 +40,8 @@ CastingStore * CastingStore::GetInstance()
 
 CHIP_ERROR CastingStore::AddOrUpdate(core::CastingPlayer castingPlayer)
 {
-    ChipLogProgress(AppServer, "CastingStore::AddOrUpdate() called with CastingPlayer deviceName: %s", castingPlayer.GetDeviceName());
+    ChipLogProgress(AppServer, "CastingStore::AddOrUpdate() called with CastingPlayer deviceName: %s",
+                    castingPlayer.GetDeviceName());
 
     // Read cache of CastingPlayers
     std::vector<core::CastingPlayer> castingPlayers = ReadAll();
@@ -445,7 +446,8 @@ std::vector<core::CastingPlayer> CastingStore::ReadAll()
     VerifyOrReturnValue(err == CHIP_NO_ERROR, std::vector<core::CastingPlayer>(),
                         ChipLogError(AppServer, "TLVReader.ExitContainer failed %" CHIP_ERROR_FORMAT, err.Format()));
 
-    ChipLogProgress(AppServer, "CastingStore::ReadAll() CastingPlayers size: %lu", static_cast<unsigned long>(castingPlayers.size()));
+    ChipLogProgress(AppServer, "CastingStore::ReadAll() CastingPlayers size: %lu",
+                    static_cast<unsigned long>(castingPlayers.size()));
     return castingPlayers;
 }
 
