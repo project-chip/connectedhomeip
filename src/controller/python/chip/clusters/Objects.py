@@ -31176,8 +31176,9 @@ class ServiceArea(Cluster):
 
     class Bitmaps:
         class Feature(IntFlag):
-            kListOrder = 0x1
-            kSelectWhileRunning = 0x2
+            kSelectWhileRunning = 0x1
+            kProgressReporting = 0x2
+            kMaps = 0x4
 
     class Structs:
         @dataclass

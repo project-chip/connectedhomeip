@@ -6458,8 +6458,9 @@ provisional cluster ServiceArea = 336 {
   }
 
   bitmap Feature : bitmap32 {
-    kListOrder = 0x1;
-    kSelectWhileRunning = 0x2;
+    kSelectWhileRunning = 0x1;
+    kProgressReporting = 0x2;
+    kMaps = 0x4;
   }
 
   struct AreaInfoStruct {

@@ -3838,8 +3838,9 @@ enum class SkipAreaStatus : uint8_t
 // Bitmap for Feature
 enum class Feature : uint32_t
 {
-    kListOrder          = 0x1,
-    kSelectWhileRunning = 0x2,
+    kSelectWhileRunning = 0x1,
+    kProgressReporting  = 0x2,
+    kMaps               = 0x4,
 };
 } // namespace ServiceArea
 

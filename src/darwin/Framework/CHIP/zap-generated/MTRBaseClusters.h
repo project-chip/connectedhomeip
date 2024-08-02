@@ -19816,8 +19816,9 @@ typedef NS_ENUM(uint8_t, MTRServiceAreaSkipAreaStatus) {
 } MTR_PROVISIONALLY_AVAILABLE;
 
 typedef NS_OPTIONS(uint32_t, MTRServiceAreaFeature) {
-    MTRServiceAreaFeatureListOrder MTR_PROVISIONALLY_AVAILABLE = 0x1,
-    MTRServiceAreaFeatureSelectWhileRunning MTR_PROVISIONALLY_AVAILABLE = 0x2,
+    MTRServiceAreaFeatureSelectWhileRunning MTR_PROVISIONALLY_AVAILABLE = 0x1,
+    MTRServiceAreaFeatureProgressReporting MTR_PROVISIONALLY_AVAILABLE = 0x2,
+    MTRServiceAreaFeatureMaps MTR_PROVISIONALLY_AVAILABLE = 0x4,
 } MTR_PROVISIONALLY_AVAILABLE;
 
 typedef NS_ENUM(uint8_t, MTRPumpConfigurationAndControlControlMode) {
