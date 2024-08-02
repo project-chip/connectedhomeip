@@ -37,6 +37,7 @@ config:
     # PSKc: 0a133626c411d7de02a570ca3c3d8047
     # Security Policy: 672 onrc 0
 
+test:
 # pre-requisis ??
 #    - label: "Wait for the commissioned device to be retrieved"
 #      cluster: DelayCommands
