@@ -16395,6 +16395,14 @@
               "isEnabled": 1
             },
             {
+              "name": "SetActivePresetRequest",
+              "code": 6,
+              "mfgCode": null,
+              "source": "client",
+              "isIncoming": 1,
+              "isEnabled": 1
+            },
+            {
               "name": "AtomicResponse",
               "code": 253,
               "mfgCode": null,

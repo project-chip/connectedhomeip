@@ -50,6 +50,11 @@ void PresetStructWithOwnedMembers::operator=(const PresetStruct::Type & other)
     SetBuiltIn(other.builtIn);
 }
 
+void PresetStructWithOwnedMembers::operator=(const PresetStructWithOwnedMembers & other)
+{
+    *this = static_cast<const PresetStruct::Type &>(other);
+}
+
 void PresetStructWithOwnedMembers::SetPresetScenario(PresetScenarioEnum enumValue)
 {
     presetScenario = enumValue;

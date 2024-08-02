@@ -195,8 +195,6 @@ CHIP_ERROR ThermostatDelegate::ApplyPendingPresets()
         const PresetStructWithOwnedMembers & pendingPreset = mPendingPresets[indexInPendingPresets];
         mPresets[mNextFreeIndexInPresetsList]              = pendingPreset;
         mNextFreeIndexInPresetsList++;
-                    ChipLogError(Zcl, "applied pending preset again");
-
     }
     return CHIP_NO_ERROR;
 }
