@@ -19,39 +19,6 @@
 
 NS_ASSUME_NONNULL_BEGIN
 
-@implementation MTRDataTypeLocationDescriptorStruct
-- (instancetype)init
-{
-    if (self = [super init]) {
-
-        _locationName = @"";
-
-        _floorNumber = nil;
-
-        _areaType = nil;
-    }
-    return self;
-}
-
-- (id)copyWithZone:(NSZone * _Nullable)zone
-{
-    auto other = [[MTRDataTypeLocationDescriptorStruct alloc] init];
-
-    other.locationName = self.locationName;
-    other.floorNumber = self.floorNumber;
-    other.areaType = self.areaType;
-
-    return other;
-}
-
-- (NSString *)description
-{
-    NSString * descriptionString = [NSString stringWithFormat:@"<%@: locationName:%@; floorNumber:%@; areaType:%@; >", NSStringFromClass([self class]), _locationName, _floorNumber, _areaType];
-    return descriptionString;
-}
-
-@end
-
 @implementation MTRDataTypeTestGlobalStruct
 - (instancetype)init
 {
@@ -80,6 +47,39 @@ NS_ASSUME_NONNULL_BEGIN
 - (NSString *)description
 {
     NSString * descriptionString = [NSString stringWithFormat:@"<%@: name:%@; myBitmap:%@; myEnum:%@; >", NSStringFromClass([self class]), _name, _myBitmap, _myEnum];
+    return descriptionString;
+}
+
+@end
+
+@implementation MTRDataTypeLocationDescriptorStruct
+- (instancetype)init
+{
+    if (self = [super init]) {
+
+        _locationName = @"";
+
+        _floorNumber = nil;
+
+        _areaType = nil;
+    }
+    return self;
+}
+
+- (id)copyWithZone:(NSZone * _Nullable)zone
+{
+    auto other = [[MTRDataTypeLocationDescriptorStruct alloc] init];
+
+    other.locationName = self.locationName;
+    other.floorNumber = self.floorNumber;
+    other.areaType = self.areaType;
+
+    return other;
+}
+
+- (NSString *)description
+{
+    NSString * descriptionString = [NSString stringWithFormat:@"<%@: locationName:%@; floorNumber:%@; areaType:%@; >", NSStringFromClass([self class]), _locationName, _floorNumber, _areaType];
     return descriptionString;
 }
 
