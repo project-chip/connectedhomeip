@@ -77,6 +77,7 @@ limitations under the License.
     <description>The Service Area cluster provides an interface for controlling the locations where a device should operate, and for querying the current location.</description>
     <code>0x0150</code>
     <define>SERVICE_AREA_CLUSTER</define>
+    <globalAttribute side="either" code="0xFFFD" value="1" />
 
     <features>
       <feature bit="0" code="LISTORDER" name="ListOrder" summary="The device operates at the selected locations in the list order">
