@@ -92,6 +92,7 @@ void BdxTransfer::HandleTransferSessionOutput(TransferSession::OutputEvent & eve
     switch (event.EventType)
     {
     case TransferSession::OutputEventType::kInitReceived:
+        mAwaitingAccept = true;
         mDelegate->InitMessageReceived(this, event.transferInitData);
         break;
     case TransferSession::OutputEventType::kStatusReceived:
