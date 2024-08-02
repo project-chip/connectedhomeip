@@ -80,12 +80,16 @@ limitations under the License.
     <globalAttribute side="either" code="0xFFFD" value="1" />
 
     <features>
-      <feature bit="0" code="LISTORDER" name="ListOrder" summary="The device operates at the selected locations in the list order">
+      <feature bit="0" code="SELRUN" name="SelectWhileRunning" summary="The device allows changing the selected areas while running">
         <optionalConform/>
       </feature>
-      <feature bit="1" code="SELRUN" name="SelectWhileRunning" summary="The device allows changing the selected locations while running">
+      <feature bit="1" code="PROG" name="ProgressReporting" summary="The device implements the progress reporting feature">
         <optionalConform/>
       </feature>
+      <feature bit="2" code="MAPS" name="Maps" summary="The device has map support">
+        <optionalConform/>
+      </feature>
+
     </features>
 
     <!-- Attributes -->
