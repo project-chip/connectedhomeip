@@ -66,9 +66,9 @@ CHIP_ERROR AttrAccess::Read(const ConcreteReadAttributePath & aPath, AttributeVa
 // TODO(#33223) To improve safety we could make GetEncodableLocationDescriptorStruct a private
 // memeber method where we explicitly delete member method for the parameter that matches
 // (LocationDescriptorStruct && aLocationDescriptor).
-Structs::LocationDescriptorStruct::Type GetEncodableLocationDescriptorStruct(const LocationDescriptorStruct & aLocationDescriptor)
+Globals::Structs::LocationDescriptorStruct::Type GetEncodableLocationDescriptorStruct(const LocationDescriptorStruct & aLocationDescriptor)
 {
-    Structs::LocationDescriptorStruct::Type locationDescriptor;
+    Globals::Structs::LocationDescriptorStruct::Type locationDescriptor;
     // This would imply data is either not properly validated before being
     // stored here or corruption has occurred.
     VerifyOrDie(!aLocationDescriptor.mLocationName.empty());
@@ -199,7 +199,7 @@ EcosystemLocationStruct::Builder & EcosystemLocationStruct::Builder::SetFloorNum
     return *this;
 }
 
-EcosystemLocationStruct::Builder & EcosystemLocationStruct::Builder::SetAreaTypeTag(std::optional<AreaTypeTag> aAreaTypeTag)
+EcosystemLocationStruct::Builder & EcosystemLocationStruct::Builder::SetAreaTypeTag(std::optional<Globals::AreaTypeTag> aAreaTypeTag)
 {
     VerifyOrDie(!mIsAlreadyBuilt);
     mLocationDescriptor.mAreaType = aAreaTypeTag;
