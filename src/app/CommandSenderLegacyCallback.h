@@ -65,8 +65,8 @@ public:
      * - CHIP_ERROR_TIMEOUT: A response was not received within the expected response timeout.
      * - CHIP_ERROR_*TLV*: A malformed, non-compliant response was received from the server.
      * - CHIP_ERROR encapsulating a StatusIB: If we got a non-path-specific or path-specific
-     *   status response from the server.  In that case,
-     *   StatusIB::InitFromChipError can be used to extract the status.
+     *   status response from the server.  In that case, constructing a
+     *   StatusIB from the error can be used to extract the status.
      *      - Note: a CommandSender using `CommandSender::Callback` only supports sending
      *        a single InvokeRequest. As a result, only one path-specific error is expected
      *        to ever be sent to the OnError callback.
