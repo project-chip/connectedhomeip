@@ -39,7 +39,7 @@ from chip.clusters import ClusterObjects as ClusterObjects
 from chip.clusters.Attribute import EventReadResult, TypedAttributePath
 from chip.tlv import uint
 from matter_testing_support import (AttributeValue, ClusterAttributeChangeAccumulator, EventChangeCallback, MatterBaseTest,
-                                    TestStep, default_matter_test_main, has_feature, per_endpoint_test)
+                                    TestStep, await_sequence_of_reports, default_matter_test_main, has_feature, per_endpoint_test)
 from mobly import asserts
 
 logger = logging.getLogger(__name__)
@@ -169,44 +169,6 @@ class TC_SwitchTests(MatterBaseTest):
             )
         else:
             time.sleep(self.keep_pressed_delay/1000)
-
-    def _await_sequence_of_reports(self, report_queue: queue.Queue, endpoint_id: int, attribute: TypedAttributePath, sequence: list[Any], timeout_sec: float):
-        start_time = time.time()
-        elapsed = 0.0
-        time_remaining = timeout_sec
-
-        sequence_idx = 0
-        actual_values = []
-
-        while time_remaining > 0:
-            expected_value = sequence[sequence_idx]
-            logging.info(f"Expecting value {expected_value} for attribute {attribute} on endpoint {endpoint_id}")
-            try:
-                item: AttributeValue = report_queue.get(block=True, timeout=time_remaining)
-
-                # Track arrival of all values for the given attribute.
-                if item.endpoint_id == endpoint_id and item.attribute == attribute:
-                    actual_values.append(item.value)
-
-                    if item.value == expected_value:
-                        logging.info(f"Got expected attribute change {sequence_idx+1}/{len(sequence)} for attribute {attribute}")
-                        sequence_idx += 1
-                    else:
-                        asserts.assert_equal(item.value, expected_value,
-                                             msg="Did not get expected attribute value in correct sequence.")
-
-                    # We are done waiting when we have accumulated all results.
-                    if sequence_idx == len(sequence):
-                        logging.info("Got all attribute changes, done waiting.")
-                        return
-            except queue.Empty:
-                # No error, we update timeouts and keep going
-                pass
-
-            elapsed = time.time() - start_time
-            time_remaining = timeout_sec - elapsed
-
-        asserts.fail(f"Did not get full sequence {sequence} in {timeout_sec:.1f} seconds. Got {actual_values} before time-out.")
 
     def _await_sequence_of_events(self, event_queue: queue.Queue, endpoint_id: int, sequence: list[ClusterObjects.ClusterEvent], timeout_sec: float):
         start_time = time.time()
@@ -511,8 +473,8 @@ class TC_SwitchTests(MatterBaseTest):
         # - TH expects report of CurrentPosition 1, followed by a report of Current Position 0.
         logging.info(
             f"Starting to wait for {post_prompt_settle_delay_seconds:.1f} seconds for CurrentPosition to go {switch_pressed_position}, then 0.")
-        self._await_sequence_of_reports(report_queue=attrib_listener.attribute_queue, endpoint_id=endpoint_id, attribute=cluster.Attributes.CurrentPosition, sequence=[
-                                        switch_pressed_position, 0], timeout_sec=post_prompt_settle_delay_seconds)
+        await_sequence_of_reports(report_queue=attrib_listener.attribute_queue, endpoint_id=endpoint_id, attribute=cluster.Attributes.CurrentPosition, sequence=[
+                                  switch_pressed_position, 0], timeout_sec=post_prompt_settle_delay_seconds)
 
         # - TH expects at least InitialPress with NewPosition = 1
         logging.info(f"Starting to wait for {post_prompt_settle_delay_seconds:.1f} seconds for InitialPress event.")
