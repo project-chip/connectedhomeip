@@ -1579,6 +1579,7 @@ tests:
           constraints:
               type: octet_string
               minLength: 65
+              maxLength: 65
 
     - label:
           "Step 38b: TH writes AliroReaderVerificationKey attribute as an octstr
@@ -1608,6 +1609,8 @@ tests:
           constraints:
               type: octet_string
               minLength: 16
+              maxLength: 16
+
     - label:
           "Step 39b: TH writes AliroReaderGroupIdentifier attribute as octstr
           value of length 16 which is different from aliroreadergrpidentifier"
@@ -1635,6 +1638,7 @@ tests:
           constraints:
               type: octet_string
               minLength: 16
+              maxLength: 16
 
     - label:
           "Step 40b: TH writes AliroReaderGroupSubIdentifier attribute as octstr
@@ -1665,6 +1669,7 @@ tests:
           constraints:
               type: list
               maxLength: 16
+
     - label:
           "Step 41b: TH writes
           AliroExpeditedTransactionSupportedProtocolVersions attribute as list
@@ -1673,9 +1678,10 @@ tests:
       command: "writeAttribute"
       attribute: "AliroExpeditedTransactionSupportedProtocolVersions"
       arguments:
-          value: ["0x1", "0x2"]
+          value: ["\x01", "\x02"]
       response:
           error: UNSUPPORTED_WRITE
+
     - label:
           "Step 41c: TH reads AliroExpeditedTransactionSupportedProtocolVersions
           attribute from DUT"
@@ -1694,6 +1700,7 @@ tests:
           constraints:
               type: octet_string
               minLength: 16
+              maxLength: 16
 
     - label:
           "Step 42b: TH writes AliroGroupResolvingKey attribute as octstr value
@@ -1712,6 +1719,7 @@ tests:
       attribute: "AliroGroupResolvingKey"
       response:
           value: alirogrpresolvingkey
+
     - label:
           "Step 43a: TH reads AliroSupportedBLEUWBProtocolVersions attribute
           from DUT"
@@ -1721,8 +1729,8 @@ tests:
       response:
           saveAs: alirobleuwbprotocolversion
           constraints:
-              type: octet_string
-              minLength: 16
+              type: list
+              maxLength: 16
 
     - label:
           "Step 43b: TH writes AliroSupportedBLEUWBProtocolVersions attribute as
@@ -1731,7 +1739,7 @@ tests:
       command: "writeAttribute"
       attribute: "AliroSupportedBLEUWBProtocolVersions"
       arguments:
-          value: "047a4c992d75368"
+          value: ["\x01", "\x02"]
       response:
           error: UNSUPPORTED_WRITE
 
