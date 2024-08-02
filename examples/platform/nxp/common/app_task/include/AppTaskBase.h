@@ -177,6 +177,13 @@ public:
     virtual void SwitchCommissioningStateHandler(void);
     virtual void FactoryResetHandler(void);
 
+    /**
+     * Cluster-handling functions
+     * Must be overridden by a child class per cluster configuration
+     */
+    virtual bool CheckStateClusterHandler(void);
+    virtual CHIP_ERROR ProcessSetStateClusterHandler(void);
+
 private:
     inline static chip::CommonCaseDeviceServerInitParams initParams;
 
