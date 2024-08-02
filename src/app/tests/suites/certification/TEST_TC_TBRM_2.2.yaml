@@ -38,7 +38,7 @@ config:
         # Security Policy: 672 onrc 0
     
 
-
+tests:
 # pre-requisis ??
 #    - label: "Wait for the commissioned device to be retrieved"
 #      cluster: DelayCommands
