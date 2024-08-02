@@ -32,9 +32,8 @@ c_uint8_p = POINTER(c_uint8)
 
 _OnTransferObtainedCallbackFunct = CFUNCTYPE(
     None, py_object, PyChipError, c_void_p, c_uint8, c_uint16, c_uint64, c_uint64, c_uint8_p, c_uint16, c_uint8_p, c_size_t)
-_OnDataReceivedCallbackFunct = CFUNCTYPE(None, py_object, c_uint16, c_uint8)
-_OnTransferCompletedCallbackFunct = CFUNCTYPE(
-    None, py_object, PyChipError)
+_OnDataReceivedCallbackFunct = CFUNCTYPE(None, py_object, c_uint8_p, c_size_t)
+_OnTransferCompletedCallbackFunct = CFUNCTYPE(None, py_object, PyChipError)
 
 
 @_OnTransferObtainedCallbackFunct
