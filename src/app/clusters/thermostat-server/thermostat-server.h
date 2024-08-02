@@ -105,6 +105,8 @@ public:
     bool InAtomicWrite(CommandHandler * commandObj, EndpointId endpoint);
 
 private:
+    CHIP_ERROR AppendPendingPreset(Delegate * delegate, const Structs::PresetStruct::Type & preset);
+
     ScopedNodeId mAtomicWriteNodeIds[kThermostatEndpointCount];
     bool mAtomicWriteState[kThermostatEndpointCount];
 };
