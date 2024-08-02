@@ -34,10 +34,9 @@ Protocols::InteractionModel::Status emberAfExternalAttributeReadCallback(Endpoin
                                                                          const EmberAfAttributeMetadata * attributeMetadata,
                                                                          uint8_t * buffer, uint16_t maxReadLength)
 {
-    uint16_t endpointIndex  = emberAfGetDynamicIndexFromEndpoint(endpoint);
     AttributeId attributeId = attributeMetadata->attributeId;
 
-    Device * dev = DeviceMgr().GetDevice(endpointIndex);
+    Device * dev = DeviceMgr().GetDevice(endpoint);
     if (dev != nullptr && clusterId == app::Clusters::BridgedDeviceBasicInformation::Id)
     {
         using namespace app::Clusters::BridgedDeviceBasicInformation::Attributes;
