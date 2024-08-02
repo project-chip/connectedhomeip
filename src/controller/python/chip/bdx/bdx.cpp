@@ -178,6 +178,7 @@ void pychip_Bdx_InitCallbacks(OnTransferObtainedCallback onTransferObtainedCallb
     gOnTransferCompletedCallback = onTransferCompletedCallback;
     // TODO: Move this into its own method maybe.
     chip::Controller::DeviceControllerFactory & factory = chip::Controller::DeviceControllerFactory::GetInstance();
+    gBdxTransferManager.Init(factory.GetSystemState()->SystemLayer());
     gBdxTransferServer.Init(factory.GetSystemState()->ExchangeMgr());
 }
 
