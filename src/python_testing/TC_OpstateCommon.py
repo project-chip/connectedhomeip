@@ -1267,25 +1267,32 @@ class TC_OPSTATE_BASE():
             await self.read_and_expect_value(endpoint=endpoint,
                                              attribute=attributes.OperationalState,
                                              expected_value=cluster.Enums.OperationalStateEnum.kRunning)
-            count = sub_handler.attribute_report_counts[attributes.CountdownTime]
-            asserts.assert_greater(count, 0, "Did not receive any reports for CountdownTime")
+            countdownTime = await self.read_expect_success(endpoint=endpoint, attribute=attributes.CountdownTime)
+            if countdownTime is not NullValue:
+                count = sub_handler.attribute_report_counts[attributes.CountdownTime]
+                asserts.assert_greater(count, 0, "Did not receive any reports for CountdownTime")
         else:
             self.skip_step(3)
 
         sub_handler.reset()
-        self.step(4)
-        logging.info('Test will now collect data for 30 seconds')
-        time.sleep(30)
+        countdownTime = await self.read_expect_success(endpoint=endpoint, attribute=attributes.CountdownTime)
+        if countdownTime is not NullValue:
+            self.step(4)
+            logging.info('Test will now collect data for 30 seconds')
+            time.sleep(30)
 
-        count = sub_handler.attribute_report_counts[attributes.CountdownTime]
-        sub_handler.reset()
-        asserts.assert_less_equal(count, 5, "Received more than 5 reports for CountdownTime")
-        asserts.assert_greater_equal(count, 0, "Did not receive any reports for CountdownTime")
+            count = sub_handler.attribute_report_counts[attributes.CountdownTime]
+            sub_handler.reset()
+            asserts.assert_less_equal(count, 5, "Received more than 5 reports for CountdownTime")
+            asserts.assert_greater_equal(count, 0, "Did not receive any reports for CountdownTime")
+        else:
+            self.skip_step(4)
 
         attr_value = await self.read_expect_success(
             endpoint=endpoint,
             attribute=attributes.OperationalState)
-        if attr_value == cluster.Enums.OperationalStateEnum.kRunning:
+        countdownTime = await self.read_expect_success(endpoint=endpoint, attribute=attributes.CountdownTime)
+        if attr_value == cluster.Enums.OperationalStateEnum.kRunning and countdownTime is not NullValue:
             self.step(5)
             wait_count = 0
             while (attr_value != cluster.Enums.OperationalStateEnum.kStopped) and (wait_count < 20):
@@ -1301,8 +1308,8 @@ class TC_OPSTATE_BASE():
             self.skip_step(5)
 
         sub_handler.reset()
-        self.step(6)
         if self.pics_guard(self.check_pics(f"{self.test_info.pics_code}.S.M.ST_RUNNING")):
+            self.step(6)
             self.send_manual_or_pipe_command(name="OperationalStateChange",
                                              device=self.device,
                                              operation="Start")
@@ -1310,8 +1317,10 @@ class TC_OPSTATE_BASE():
             await self.read_and_expect_value(endpoint=endpoint,
                                              attribute=attributes.OperationalState,
                                              expected_value=cluster.Enums.OperationalStateEnum.kRunning)
-            count = sub_handler.attribute_report_counts[attributes.CountdownTime]
-            asserts.assert_greater(count, 0, "Did not receive any reports for CountdownTime")
+            countdownTime = await self.read_expect_success(endpoint=endpoint, attribute=attributes.CountdownTime)
+            if countdownTime is not NullValue:
+                count = sub_handler.attribute_report_counts[attributes.CountdownTime]
+                asserts.assert_greater(count, 0, "Did not receive any reports for CountdownTime")
         else:
             self.skip_step(6)
 
@@ -1321,8 +1330,9 @@ class TC_OPSTATE_BASE():
                                          expected_value=cluster.Enums.OperationalStateEnum.kRunning)
 
         sub_handler.reset()
-        self.step(8)
-        if self.pics_guard(self.check_pics(f"{self.test_info.pics_code}.S.M.ST_PAUSED")):
+        countdownTime = await self.read_expect_success(endpoint=endpoint, attribute=attributes.CountdownTime)
+        if self.pics_guard(self.check_pics(f"{self.test_info.pics_code}.S.M.ST_PAUSED")) and countdownTime is not NullValue:
+            self.step(8)
             self.send_manual_or_pipe_command(name="OperationalStateChange",
                                              device=self.device,
                                              operation="Pause")
