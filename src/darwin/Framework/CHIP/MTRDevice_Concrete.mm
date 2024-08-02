@@ -31,6 +31,7 @@
 #import "MTRDeviceConnectivityMonitor.h"
 #import "MTRDeviceControllerOverXPC.h"
 #import "MTRDeviceController_Internal.h"
+#import "MTRDevice_Concrete.h"
 #import "MTRDevice_Internal.h"
 #import "MTRError_Internal.h"
 #import "MTREventTLVValueDecoder_Internal.h"
@@ -54,10 +55,19 @@
 #import <platform/LockTracker.h>
 #import <platform/PlatformManager.h>
 
-typedef void (^MTRDeviceAttributeReportHandler)(NSArray * _Nonnull);
+// allow readwrite access to superclass properties
+@interface MTRDevice_Concrete ()
 
-NSString * const MTRPreviousDataKey = @"previousData";
-NSString * const MTRDataVersionKey = @"dataVersion";
+@property (nonatomic, readwrite, copy) NSNumber * nodeID;
+@property (nonatomic, readwrite, nullable) MTRDeviceController * deviceController;
+@property (nonatomic, readwrite) MTRAsyncWorkQueue<MTRDevice *> * asyncWorkQueue;
+@property (nonatomic, readwrite) MTRDeviceState state;
+@property (nonatomic, readwrite, nullable) NSDate * estimatedStartTime;
+@property (nonatomic, readwrite, nullable, copy) NSNumber * estimatedSubscriptionLatency;
+
+@end
+
+typedef void (^MTRDeviceAttributeReportHandler)(NSArray * _Nonnull);
 
 #define kSecondsToWaitBeforeMarkingUnreachableAfterSettingUpSubscription 10
 
@@ -69,7 +79,7 @@ NSString * const MTRDataVersionKey = @"dataVersion";
 
 // container of MTRDevice delegate weak reference, its queue, and its interested paths for attribute reports
 MTR_DIRECT_MEMBERS
-@interface MTRDeviceDelegateInfo : NSObject {
+@interface MTRDeviceDelegateInfo_ConcreteCopy : NSObject {
 @private
     void * _delegatePointerValue;
     __weak id _delegate;
@@ -101,7 +111,7 @@ MTR_DIRECT_MEMBERS
 #endif
 @end
 
-@implementation MTRDeviceDelegateInfo
+@implementation MTRDeviceDelegateInfo_ConcreteCopy
 - (instancetype)initWithDelegate:(id<MTRDeviceDelegate>)delegate queue:(dispatch_queue_t)queue interestedPathsForAttributes:(NSArray * _Nullable)interestedPathsForAttributes interestedPathsForEvents:(NSArray * _Nullable)interestedPathsForEvents
 {
     if (self = [super init]) {
@@ -238,106 +248,6 @@ typedef NS_ENUM(NSUInteger, MTRDeviceWorkItemDuplicateTypeID) {
     MTRDeviceWorkItemDuplicateReadTypeID = 1,
 };
 
-@implementation MTRDeviceClusterData {
-    NSMutableDictionary<NSNumber *, MTRDeviceDataValueDictionary> * _attributes;
-}
-
-- (void)storeValue:(MTRDeviceDataValueDictionary _Nullable)value forAttribute:(NSNumber *)attribute
-{
-    _attributes[attribute] = value;
-}
-
-- (void)removeValueForAttribute:(NSNumber *)attribute
-{
-    [_attributes removeObjectForKey:attribute];
-}
-
-- (NSDictionary<NSNumber *, MTRDeviceDataValueDictionary> *)attributes
-{
-    return _attributes;
-}
-
-+ (BOOL)supportsSecureCoding
-{
-    return YES;
-}
-
-- (NSString *)description
-{
-    return [NSString stringWithFormat:@"<MTRDeviceClusterData: dataVersion %@ attributes count %lu>", _dataVersion, static_cast<unsigned long>(_attributes.count)];
-}
-
-- (nullable instancetype)init
-{
-    return [self initWithDataVersion:nil attributes:nil];
-}
-
-// Attributes dictionary is: attributeID => data-value dictionary
-- (nullable instancetype)initWithDataVersion:(NSNumber * _Nullable)dataVersion attributes:(NSDictionary<NSNumber *, MTRDeviceDataValueDictionary> * _Nullable)attributes
-{
-    self = [super init];
-    if (self == nil) {
-        return nil;
-    }
-
-    _dataVersion = [dataVersion copy];
-    _attributes = [NSMutableDictionary dictionaryWithCapacity:attributes.count];
-    [_attributes addEntriesFromDictionary:attributes];
-
-    return self;
-}
-
-- (nullable instancetype)initWithCoder:(NSCoder *)decoder
-{
-    self = [super init];
-    if (self == nil) {
-        return nil;
-    }
-
-    _dataVersion = [decoder decodeObjectOfClass:[NSNumber class] forKey:sDataVersionKey];
-    if (_dataVersion != nil && ![_dataVersion isKindOfClass:[NSNumber class]]) {
-        MTR_LOG_ERROR("MTRDeviceClusterData got %@ for data version, not NSNumber.", _dataVersion);
-        return nil;
-    }
-
-    static NSSet * const sAttributeValueClasses = [NSSet setWithObjects:[NSDictionary class], [NSArray class], [NSData class], [NSString class], [NSNumber class], nil];
-    _attributes = [decoder decodeObjectOfClasses:sAttributeValueClasses forKey:sAttributesKey];
-    if (_attributes != nil && ![_attributes isKindOfClass:[NSDictionary class]]) {
-        MTR_LOG_ERROR("MTRDeviceClusterData got %@ for attributes, not NSDictionary.", _attributes);
-        return nil;
-    }
-
-    return self;
-}
-
-- (void)encodeWithCoder:(NSCoder *)coder
-{
-    [coder encodeObject:self.dataVersion forKey:sDataVersionKey];
-    [coder encodeObject:self.attributes forKey:sAttributesKey];
-}
-
-- (id)copyWithZone:(NSZone *)zone
-{
-    return [[MTRDeviceClusterData alloc] initWithDataVersion:_dataVersion attributes:_attributes];
-}
-
-- (BOOL)isEqualToClusterData:(MTRDeviceClusterData *)otherClusterData
-{
-    return MTREqualObjects(_dataVersion, otherClusterData.dataVersion)
-        && MTREqualObjects(_attributes, otherClusterData.attributes);
-}
-
-- (BOOL)isEqual:(id)object
-{
-    if ([object class] != [self class]) {
-        return NO;
-    }
-
-    return [self isEqualToClusterData:object];
-}
-
-@end
-
 // Minimal time to wait since our last resubscribe failure before we will allow
 // a read attempt to prod our subscription.
 //
@@ -352,7 +262,7 @@ typedef NS_ENUM(NSUInteger, MTRDeviceWorkItemDuplicateTypeID) {
 // better behavior.
 #define MTRDEVICE_SUBSCRIPTION_LATENCY_NEW_VALUE_WEIGHT (1.0 / 3.0)
 
-@interface MTRDevice ()
+@interface MTRDevice_Concrete ()
 @property (nonatomic, readonly) os_unfair_lock lock; // protects the caches and device state
 // protects against concurrent time updates by guarding timeUpdateScheduled flag which manages time updates scheduling,
 // and protects device calls to setUTCTime and setDSTOffset
@@ -422,7 +332,7 @@ typedef NS_ENUM(NSUInteger, MTRDeviceWorkItemDuplicateTypeID) {
 @end
 #endif
 
-@implementation MTRDevice {
+@implementation MTRDevice_Concrete {
 #ifdef DEBUG
     NSUInteger _unitTestAttributesReportedSinceLastCheck;
 #endif
@@ -481,21 +391,24 @@ typedef NS_ENUM(NSUInteger, MTRDeviceWorkItemDuplicateTypeID) {
     // System time change observer reference
     id _systemTimeChangeObserverToken;
 
-    NSMutableSet<MTRDeviceDelegateInfo *> * _delegates;
+    NSMutableSet<MTRDeviceDelegateInfo_ConcreteCopy *> * _delegates;
 }
 
-- (instancetype)initForSubclasses
-{
-    if (self = [super init]) {
-        // nothing, as superclass of MTRDevice is NSObject
-    }
-
-    return self;
-}
+// synthesize superclass property readwrite accessors
+@synthesize nodeID = _nodeID;
+@synthesize deviceController = _deviceController;
+@synthesize queue = _queue;
+@synthesize asyncWorkQueue = _asyncWorkQueue;
+@synthesize state = _state;
+@synthesize estimatedStartTime = _estimatedStartTime;
+@synthesize estimatedSubscriptionLatency = _estimatedSubscriptionLatency;
+//@synthesize lock = _lock;
+//@synthesize persistedClusterData = _persistedClusterData;
 
 - (instancetype)initWithNodeID:(NSNumber *)nodeID controller:(MTRDeviceController *)controller
 {
-    if (self = [super init]) {
+    // `super` was NSObject, is now MTRDevice.  MTRDevice hides its `init`
+    if (self = [super initForSubclasses]) {
         _lock = OS_UNFAIR_LOCK_INIT;
         _timeSyncLock = OS_UNFAIR_LOCK_INIT;
         _nodeID = [nodeID copy];
@@ -810,8 +723,8 @@ typedef NS_ENUM(NSUInteger, MTRDeviceWorkItemDuplicateTypeID) {
     std::lock_guard lock(_lock);
 
     // Replace delegate info with the same delegate object, and opportunistically remove defunct delegate references
-    NSMutableSet<MTRDeviceDelegateInfo *> * delegatesToRemove = [NSMutableSet set];
-    for (MTRDeviceDelegateInfo * delegateInfo in _delegates) {
+    NSMutableSet<MTRDeviceDelegateInfo_ConcreteCopy *> * delegatesToRemove = [NSMutableSet set];
+    for (MTRDeviceDelegateInfo_ConcreteCopy * delegateInfo in _delegates) {
         id<MTRDeviceDelegate> strongDelegate = delegateInfo.delegate;
         if (!strongDelegate) {
             [delegatesToRemove addObject:delegateInfo];
@@ -827,7 +740,7 @@ typedef NS_ENUM(NSUInteger, MTRDeviceWorkItemDuplicateTypeID) {
         MTR_LOG("%@ addDelegate: removed %lu", self, static_cast<unsigned long>(_delegates.count - oldDelegatesCount));
     }
 
-    MTRDeviceDelegateInfo * newDelegateInfo = [[MTRDeviceDelegateInfo alloc] initWithDelegate:delegate queue:queue interestedPathsForAttributes:interestedPathsForAttributes interestedPathsForEvents:interestedPathsForEvents];
+    MTRDeviceDelegateInfo_ConcreteCopy * newDelegateInfo = [[MTRDeviceDelegateInfo_ConcreteCopy alloc] initWithDelegate:delegate queue:queue interestedPathsForAttributes:interestedPathsForAttributes interestedPathsForEvents:interestedPathsForEvents];
     [_delegates addObject:newDelegateInfo];
     MTR_LOG("%@ added delegate info %@", self, newDelegateInfo);
 
@@ -867,8 +780,8 @@ typedef NS_ENUM(NSUInteger, MTRDeviceWorkItemDuplicateTypeID) {
 
     std::lock_guard lock(_lock);
 
-    NSMutableSet<MTRDeviceDelegateInfo *> * delegatesToRemove = [NSMutableSet set];
-    [self _iterateDelegatesWithBlock:^(MTRDeviceDelegateInfo * delegateInfo) {
+    NSMutableSet<MTRDeviceDelegateInfo_ConcreteCopy *> * delegatesToRemove = [NSMutableSet set];
+    [self _iterateDelegatesWithBlock:^(MTRDeviceDelegateInfo_ConcreteCopy * delegateInfo) {
         id<MTRDeviceDelegate> strongDelegate = delegateInfo.delegate;
         if (strongDelegate == delegate) {
             [delegatesToRemove addObject:delegateInfo];
@@ -1054,7 +967,7 @@ typedef NS_ENUM(NSUInteger, MTRDeviceWorkItemDuplicateTypeID) {
 }
 
 // Returns YES if any non-null delegates were found
-- (BOOL)_iterateDelegatesWithBlock:(void(NS_NOESCAPE ^)(MTRDeviceDelegateInfo * delegateInfo)_Nullable)block
+- (BOOL)_iterateDelegatesWithBlock:(void(NS_NOESCAPE ^)(MTRDeviceDelegateInfo_ConcreteCopy * delegateInfo)_Nullable)block
 {
     os_unfair_lock_assert_owner(&self->_lock);
 
@@ -1065,7 +978,7 @@ typedef NS_ENUM(NSUInteger, MTRDeviceWorkItemDuplicateTypeID) {
 
     // Opportunistically remove defunct delegate references on every iteration
     NSMutableSet * delegatesToRemove = nil;
-    for (MTRDeviceDelegateInfo * delegateInfo in _delegates) {
+    for (MTRDeviceDelegateInfo_ConcreteCopy * delegateInfo in _delegates) {
         id<MTRDeviceDelegate> strongDelegate = delegateInfo.delegate;
         if (strongDelegate) {
             if (block) {
@@ -1095,7 +1008,7 @@ typedef NS_ENUM(NSUInteger, MTRDeviceWorkItemDuplicateTypeID) {
     os_unfair_lock_assert_owner(&self->_lock);
 
     __block NSUInteger delegatesCalled = 0;
-    [self _iterateDelegatesWithBlock:^(MTRDeviceDelegateInfo * delegateInfo) {
+    [self _iterateDelegatesWithBlock:^(MTRDeviceDelegateInfo_ConcreteCopy * delegateInfo) {
         if ([delegateInfo callDelegateWithBlock:block]) {
             delegatesCalled++;
         }
@@ -1111,7 +1024,7 @@ typedef NS_ENUM(NSUInteger, MTRDeviceWorkItemDuplicateTypeID) {
 {
     os_unfair_lock_assert_owner(&self->_lock);
 
-    for (MTRDeviceDelegateInfo * delegateInfo in _delegates) {
+    for (MTRDeviceDelegateInfo_ConcreteCopy * delegateInfo in _delegates) {
         if ([delegateInfo callDelegateSynchronouslyWithBlock:block]) {
             MTR_LOG("%@ _callFirstDelegateSynchronouslyWithBlock: successfully called %@", self, delegateInfo);
             return;
@@ -1907,7 +1820,7 @@ typedef NS_ENUM(NSUInteger, MTRDeviceWorkItemDuplicateTypeID) {
 {
     os_unfair_lock_assert_owner(&self->_lock);
     if (attributes.count) {
-        [self _iterateDelegatesWithBlock:^(MTRDeviceDelegateInfo * delegateInfo) {
+        [self _iterateDelegatesWithBlock:^(MTRDeviceDelegateInfo_ConcreteCopy * delegateInfo) {
             // _iterateDelegatesWithBlock calls this with an autorelease pool, and so temporary filtered attributes reports don't bloat memory
             NSArray<NSDictionary<NSString *, id> *> * filteredAttributes = [self _filteredAttributes:attributes forInterestedPaths:delegateInfo.interestedPathsForAttributes];
             if (filteredAttributes.count) {
@@ -2086,7 +1999,7 @@ typedef NS_ENUM(NSUInteger, MTRDeviceWorkItemDuplicateTypeID) {
     }
 
     __block BOOL delegatesCalled = NO;
-    [self _iterateDelegatesWithBlock:^(MTRDeviceDelegateInfo * delegateInfo) {
+    [self _iterateDelegatesWithBlock:^(MTRDeviceDelegateInfo_ConcreteCopy * delegateInfo) {
         // _iterateDelegatesWithBlock calls this with an autorelease pool, and so temporary filtered event reports don't bloat memory
         NSArray<NSDictionary<NSString *, id> *> * filteredEvents = [self _filteredEvents:reportToReturn forInterestedPaths:delegateInfo.interestedPathsForEvents];
         if (filteredEvents.count) {
@@ -2609,7 +2522,7 @@ typedef NS_ENUM(NSUInteger, MTRDeviceWorkItemDuplicateTypeID) {
     std::lock_guard lock(self->_lock);
 
     NSUInteger nonnullDelegateCount = 0;
-    for (MTRDeviceDelegateInfo * delegateInfo in _delegates) {
+    for (MTRDeviceDelegateInfo_ConcreteCopy * delegateInfo in _delegates) {
         if (delegateInfo.delegate) {
             nonnullDelegateCount++;
         }
@@ -2842,7 +2755,7 @@ static BOOL AttributeHasChangesOmittedQuality(MTRAttributePath * attributePath)
             }
             *stop = NO;
         }];
-        [workItem setReadyHandler:^(MTRDevice * self, NSInteger retryCount, MTRAsyncWorkCompletionBlock completion) {
+        [workItem setReadyHandler:^(MTRDevice_Concrete * self, NSInteger retryCount, MTRAsyncWorkCompletionBlock completion) {
             // Sanity check
             if (readRequests.count == 0) {
                 MTR_LOG_ERROR("Read attribute work item [%llu] contained no read requests", workItemID);
@@ -2983,7 +2896,7 @@ static BOOL AttributeHasChangesOmittedQuality(MTRAttributePath * attributePath)
         *isDuplicate = NO;
         *stop = YES;
     }];
-    [workItem setReadyHandler:^(MTRDevice * self, NSInteger retryCount, MTRAsyncWorkCompletionBlock completion) {
+    [workItem setReadyHandler:^(MTRDevice_Concrete * self, NSInteger retryCount, MTRAsyncWorkCompletionBlock completion) {
         MTRBaseDevice * baseDevice = [self newBaseDevice];
         // Make sure to use writeRequests here, because that's what our batching
         // handler will modify as needed.
@@ -3117,7 +3030,7 @@ static BOOL AttributeHasChangesOmittedQuality(MTRAttributePath * attributePath)
         *isDuplicate = NO;
         *stop = YES;
     }];
-    [workItem setReadyHandler:^(MTRDevice * self, NSInteger retryCount, MTRAsyncWorkCompletionBlock workCompletion) {
+    [workItem setReadyHandler:^(MTRDevice_Concrete * self, NSInteger retryCount, MTRAsyncWorkCompletionBlock workCompletion) {
         auto workDone = ^(NSArray<NSDictionary<NSString *, id> *> * _Nullable values, NSError * _Nullable error) {
             dispatch_async(queue, ^{
                 completion(values, error);
@@ -4133,7 +4046,7 @@ static BOOL AttributeHasChangesOmittedQuality(MTRAttributePath * attributePath)
 
 /* BEGIN DRAGONS: Note methods here cannot be renamed, and are used by private callers, do not rename, remove or modify behavior here */
 
-@implementation MTRDevice (MatterPrivateForInternalDragonsDoNotFeed)
+@implementation MTRDevice_Concrete (MatterPrivateForInternalDragonsDoNotFeed)
 
 - (BOOL)_deviceHasActiveSubscription
 {
@@ -4157,7 +4070,7 @@ static BOOL AttributeHasChangesOmittedQuality(MTRAttributePath * attributePath)
 
 @end
 
-@implementation MTRDevice (Deprecated)
+@implementation MTRDevice_Concrete (Deprecated)
 
 + (MTRDevice *)deviceWithNodeID:(uint64_t)nodeID deviceController:(MTRDeviceController *)deviceController
 {
