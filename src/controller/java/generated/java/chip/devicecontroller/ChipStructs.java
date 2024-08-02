@@ -9339,13 +9339,13 @@ public static class ServiceAreaClusterAreaStruct {
   }
 }
 public static class ServiceAreaClusterMapStruct {
-  public Integer mapID;
+  public Long mapID;
   public String name;
   private static final long MAP_I_D_ID = 0L;
   private static final long NAME_ID = 1L;
 
   public ServiceAreaClusterMapStruct(
-    Integer mapID,
+    Long mapID,
     String name
   ) {
     this.mapID = mapID;
@@ -9364,13 +9364,13 @@ public static class ServiceAreaClusterMapStruct {
     if (tlvValue == null || tlvValue.type() != TLVType.Struct) {
       return null;
     }
-    Integer mapID = null;
+    Long mapID = null;
     String name = null;
     for (StructElement element: ((StructType)tlvValue).value()) {
       if (element.contextTagNum() == MAP_I_D_ID) {
         if (element.value(BaseTLVType.class).type() == TLVType.UInt) {
           UIntType castingValue = element.value(UIntType.class);
-          mapID = castingValue.value(Integer.class);
+          mapID = castingValue.value(Long.class);
         }
       } else if (element.contextTagNum() == NAME_ID) {
         if (element.value(BaseTLVType.class).type() == TLVType.String) {

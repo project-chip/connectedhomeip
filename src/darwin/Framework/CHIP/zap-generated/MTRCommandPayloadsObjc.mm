@@ -21981,6 +21981,8 @@ NS_ASSUME_NONNULL_BEGIN
 - (instancetype)init
 {
     if (self = [super init]) {
+
+        _skippedArea = @(0);
         _timedInvokeTimeoutMs = nil;
         _serverSideProcessingTimeout = nil;
     }
@@ -21991,6 +21993,7 @@ NS_ASSUME_NONNULL_BEGIN
 {
     auto other = [[MTRServiceAreaClusterSkipAreaParams alloc] init];
 
+    other.skippedArea = self.skippedArea;
     other.timedInvokeTimeoutMs = self.timedInvokeTimeoutMs;
     other.serverSideProcessingTimeout = self.serverSideProcessingTimeout;
 
@@ -21999,7 +22002,7 @@ NS_ASSUME_NONNULL_BEGIN
 
 - (NSString *)description
 {
-    NSString * descriptionString = [NSString stringWithFormat:@"<%@: >", NSStringFromClass([self class])];
+    NSString * descriptionString = [NSString stringWithFormat:@"<%@: skippedArea:%@; >", NSStringFromClass([self class]), _skippedArea];
     return descriptionString;
 }
 
@@ -22011,6 +22014,9 @@ NS_ASSUME_NONNULL_BEGIN
 {
     chip::app::Clusters::ServiceArea::Commands::SkipArea::Type encodableStruct;
     ListFreer listFreer;
+    {
+        encodableStruct.skippedArea = self.skippedArea.unsignedIntValue;
+    }
 
     auto buffer = chip::System::PacketBufferHandle::New(chip::System::PacketBuffer::kMaxSizeWithoutReserve, 0);
     if (buffer.IsNull()) {

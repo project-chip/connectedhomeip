@@ -28382,7 +28382,7 @@ enum class Fields : uint8_t
 struct Type
 {
 public:
-    uint8_t mapID = static_cast<uint8_t>(0);
+    uint32_t mapID = static_cast<uint32_t>(0);
     chip::CharSpan name;
 
     CHIP_ERROR Decode(TLV::TLVReader & reader);
@@ -28520,6 +28520,7 @@ public:
 namespace SkipArea {
 enum class Fields : uint8_t
 {
+    kSkippedArea = 0,
 };
 
 struct Type
@@ -28528,6 +28529,8 @@ public:
     // Use GetCommandId instead of commandId directly to avoid naming conflict with CommandIdentification in ExecutionOfACommand
     static constexpr CommandId GetCommandId() { return Commands::SkipArea::Id; }
     static constexpr ClusterId GetClusterId() { return Clusters::ServiceArea::Id; }
+
+    uint32_t skippedArea = static_cast<uint32_t>(0);
 
     CHIP_ERROR Encode(TLV::TLVWriter & aWriter, TLV::Tag aTag) const;
 
@@ -28542,6 +28545,7 @@ public:
     static constexpr CommandId GetCommandId() { return Commands::SkipArea::Id; }
     static constexpr ClusterId GetClusterId() { return Clusters::ServiceArea::Id; }
 
+    uint32_t skippedArea = static_cast<uint32_t>(0);
     CHIP_ERROR Decode(TLV::TLVReader & reader);
 };
 }; // namespace SkipArea

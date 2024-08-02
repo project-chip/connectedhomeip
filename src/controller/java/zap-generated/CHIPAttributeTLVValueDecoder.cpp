@@ -28827,12 +28827,12 @@ jobject DecodeAttributeValue(const app::ConcreteAttributePath & aPath, TLV::TLVR
                 auto & entry_0 = iter_value_0.GetValue();
                 jobject newElement_0;
                 jobject newElement_0_mapID;
-                std::string newElement_0_mapIDClassName     = "java/lang/Integer";
-                std::string newElement_0_mapIDCtorSignature = "(I)V";
-                jint jninewElement_0_mapID                  = static_cast<jint>(entry_0.mapID);
-                chip::JniReferences::GetInstance().CreateBoxedObject<jint>(newElement_0_mapIDClassName.c_str(),
-                                                                           newElement_0_mapIDCtorSignature.c_str(),
-                                                                           jninewElement_0_mapID, newElement_0_mapID);
+                std::string newElement_0_mapIDClassName     = "java/lang/Long";
+                std::string newElement_0_mapIDCtorSignature = "(J)V";
+                jlong jninewElement_0_mapID                 = static_cast<jlong>(entry_0.mapID);
+                chip::JniReferences::GetInstance().CreateBoxedObject<jlong>(newElement_0_mapIDClassName.c_str(),
+                                                                            newElement_0_mapIDCtorSignature.c_str(),
+                                                                            jninewElement_0_mapID, newElement_0_mapID);
                 jobject newElement_0_name;
                 LogErrorOnFailure(chip::JniReferences::GetInstance().CharToStringUTF(entry_0.name, newElement_0_name));
 
@@ -28847,7 +28847,7 @@ jobject DecodeAttributeValue(const app::ConcreteAttributePath & aPath, TLV::TLVR
 
                 jmethodID mapStructStructCtor_1;
                 err = chip::JniReferences::GetInstance().FindMethod(
-                    env, mapStructStructClass_1, "<init>", "(Ljava/lang/Integer;Ljava/lang/String;)V", &mapStructStructCtor_1);
+                    env, mapStructStructClass_1, "<init>", "(Ljava/lang/Long;Ljava/lang/String;)V", &mapStructStructCtor_1);
                 if (err != CHIP_NO_ERROR || mapStructStructCtor_1 == nullptr)
                 {
                     ChipLogError(Zcl, "Could not find ChipStructs$ServiceAreaClusterMapStruct constructor");

@@ -1455,7 +1455,7 @@ provisional cluster ServiceArea = 336 {
   }
 
   struct MapStruct {
-    int8u mapID = 0;
+    int32u mapID = 0;
     char_string<64> name = 1;
   }
 
@@ -1488,6 +1488,10 @@ provisional cluster ServiceArea = 336 {
     optional char_string<256> statusText = 1;
   }
 
+  request struct SkipAreaRequest {
+    int32u skippedArea = 0;
+  }
+
   response struct SkipAreaResponse = 3 {
     SkipAreaStatus status = 0;
     optional char_string<256> statusText = 1;
@@ -1496,7 +1500,7 @@ provisional cluster ServiceArea = 336 {
   /** Command used to select a set of device areas, where the device is to operate. */
   command SelectAreas(SelectAreasRequest): SelectAreasResponse = 0;
   /** This command is used to skip an area where the device operates. */
-  command SkipArea(): SkipAreaResponse = 2;
+  command SkipArea(SkipAreaRequest): SkipAreaResponse = 2;
 }
 
 endpoint 0 {

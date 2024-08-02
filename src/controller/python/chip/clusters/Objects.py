@@ -31289,7 +31289,10 @@ class ServiceArea(Cluster):
             def descriptor(cls) -> ClusterObjectDescriptor:
                 return ClusterObjectDescriptor(
                     Fields=[
+                        ClusterObjectFieldDescriptor(Label="skippedArea", Tag=0, Type=uint),
                     ])
+
+            skippedArea: 'uint' = 0
 
         @dataclass
         class SkipAreaResponse(ClusterCommand):

@@ -39110,14 +39110,18 @@ public class ChipClusters {
         }}, commandId, commandArgs, timedInvokeTimeoutMs);
     }
 
-    public void skipArea(SkipAreaResponseCallback callback) {
-      skipArea(callback, 0);
+    public void skipArea(SkipAreaResponseCallback callback, Long skippedArea) {
+      skipArea(callback, skippedArea, 0);
     }
 
-    public void skipArea(SkipAreaResponseCallback callback, int timedInvokeTimeoutMs) {
+    public void skipArea(SkipAreaResponseCallback callback, Long skippedArea, int timedInvokeTimeoutMs) {
       final long commandId = 2L;
 
       ArrayList<StructElement> elements = new ArrayList<>();
+      final long skippedAreaFieldID = 0L;
+      BaseTLVType skippedAreatlvValue = new UIntType(skippedArea);
+      elements.add(new StructElement(skippedAreaFieldID, skippedAreatlvValue));
+
       StructType commandArgs = new StructType(elements);
       invoke(new InvokeCallbackImpl(callback) {
           @Override

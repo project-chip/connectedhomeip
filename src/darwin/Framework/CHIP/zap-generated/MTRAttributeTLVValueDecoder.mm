@@ -11260,7 +11260,7 @@ static id _Nullable DecodeAttributeValueForServiceAreaCluster(AttributeId aAttri
                 auto & entry_0 = iter_0.GetValue();
                 MTRServiceAreaClusterMapStruct * newElement_0;
                 newElement_0 = [MTRServiceAreaClusterMapStruct new];
-                newElement_0.mapID = [NSNumber numberWithUnsignedChar:entry_0.mapID];
+                newElement_0.mapID = [NSNumber numberWithUnsignedInt:entry_0.mapID];
                 newElement_0.name = AsString(entry_0.name);
                 if (newElement_0.name == nil) {
                     CHIP_ERROR err = CHIP_ERROR_INVALID_ARGUMENT;

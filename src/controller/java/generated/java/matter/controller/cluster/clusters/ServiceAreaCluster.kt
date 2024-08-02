@@ -215,11 +215,14 @@ class ServiceAreaCluster(private val controller: MatterController, private val e
     return SelectAreasResponse(status_decoded, statusText_decoded)
   }
 
-  suspend fun skipArea(timedInvokeTimeout: Duration? = null): SkipAreaResponse {
+  suspend fun skipArea(skippedArea: UInt, timedInvokeTimeout: Duration? = null): SkipAreaResponse {
     val commandId: UInt = 2u
 
     val tlvWriter = TlvWriter()
     tlvWriter.startStructure(AnonymousTag)
+
+    val TAG_SKIPPED_AREA_REQ: Int = 0
+    tlvWriter.put(ContextSpecificTag(TAG_SKIPPED_AREA_REQ), skippedArea)
     tlvWriter.endStructure()
 
     val request: InvokeRequest =
