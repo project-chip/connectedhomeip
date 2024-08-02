@@ -1412,7 +1412,7 @@ cluster RvcOperationalState = 97 {
 
 /** The Service Area cluster provides an interface for controlling the locations where a device should operate, and for querying the current location. */
 provisional cluster ServiceArea = 336 {
-  revision 1; // NOTE: Default/not specifically set
+  revision 1;
 
   enum OperationalStatusEnum : enum8 {
     kPending = 0;
