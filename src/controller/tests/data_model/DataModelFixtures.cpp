@@ -50,6 +50,17 @@ private:
     AttributeValueEncoder & mEncoder;
 };
 
+class TestOnlyAttributeValueDecoderAccessor
+{
+public:
+    TestOnlyAttributeValueDecoderAccessor(AttributeValueDecoder & decoder) : mDecoder(decoder) {}
+
+    TLV::TLVReader & GetTlvReader() { return mDecoder.mReader; }
+
+private:
+    AttributeValueDecoder & mDecoder;
+};
+
 namespace DataModelTests {
 
 ScopedChangeOnly<ReadResponseDirective> gReadResponseDirective(ReadResponseDirective::kSendDataResponse);
@@ -300,7 +311,8 @@ CHIP_ERROR WriteSingleClusterData(const Access::SubjectDescriptor & aSubjectDesc
     }
     if (aPath.mClusterId == Clusters::UnitTesting::Id && aPath.mAttributeId == Attributes::ListFabricScoped::Id)
     {
-        // Mock a invalid SubjectDescriptor
+        // Mock an invalid SubjectDescriptor.
+        // NOTE: completely ignores the passed-in subjectDescriptor
         AttributeValueDecoder decoder(aReader, Access::SubjectDescriptor());
         if (!aPath.IsListOperation() || aPath.mListOp == ConcreteDataAttributePath::ListOperation::ReplaceAll)
         {
@@ -522,7 +534,132 @@ ActionReturnStatus CustomDataModel::ReadAttribute(const ReadAttributeRequest & r
 
 ActionReturnStatus CustomDataModel::WriteAttribute(const WriteAttributeRequest & request, AttributeValueDecoder & decoder)
 {
-    return CHIP_ERROR_NOT_IMPLEMENTED;
+    static ListIndex listStructOctetStringElementCount = 0;
+
+    if (request.path.mDataVersion.HasValue() && request.path.mDataVersion.Value() == kRejectedDataVersion)
+    {
+        return InteractionModel::Status::DataVersionMismatch;
+    }
+
+    if (request.path.mClusterId == Clusters::UnitTesting::Id &&
+        request.path.mAttributeId == Attributes::ListStructOctetString::TypeInfo::GetAttributeId())
+    {
+        if (gWriteResponseDirective == WriteResponseDirective::kSendAttributeSuccess)
+        {
+            if (!request.path.IsListOperation() || request.path.mListOp == ConcreteDataAttributePath::ListOperation::ReplaceAll)
+            {
+
+                Attributes::ListStructOctetString::TypeInfo::DecodableType value;
+
+                ReturnErrorOnFailure(decoder.Decode(value));
+
+                auto iter                         = value.begin();
+                listStructOctetStringElementCount = 0;
+                while (iter.Next())
+                {
+                    auto & item = iter.GetValue();
+
+                    VerifyOrReturnError(item.member1 == listStructOctetStringElementCount, CHIP_ERROR_INVALID_ARGUMENT);
+                    listStructOctetStringElementCount++;
+                }
+                return CHIP_NO_ERROR;
+            }
+
+            if (request.path.mListOp == ConcreteDataAttributePath::ListOperation::AppendItem)
+            {
+                Structs::TestListStructOctet::DecodableType item;
+                ReturnErrorOnFailure(decoder.Decode(item));
+                VerifyOrReturnError(item.member1 == listStructOctetStringElementCount, CHIP_ERROR_INVALID_ARGUMENT);
+                listStructOctetStringElementCount++;
+
+                return CHIP_NO_ERROR;
+            }
+
+            return CHIP_ERROR_UNSUPPORTED_CHIP_FEATURE;
+        }
+
+        return CHIP_IM_GLOBAL_STATUS(Failure);
+    }
+    if (request.path.mClusterId == Clusters::UnitTesting::Id && request.path.mAttributeId == Attributes::ListFabricScoped::Id)
+    {
+        // TODO(backwards compatibility): unit tests here undoes the subject descriptor usage
+        //   - original tests were completely bypassing the passed in subject descriptor for this test
+        //     and overriding it with a invalid subject descriptor
+        //   - we do the same here, however this seems somewhat off: decoder.Decode() will fail for list
+        //     items so we could just return the error directly without this extra step
+
+        // Mock an invalid Subject Descriptor
+        AttributeValueDecoder invalidSubjectDescriptorDecoder(TestOnlyAttributeValueDecoderAccessor(decoder).GetTlvReader(),
+                                                              Access::SubjectDescriptor());
+        if (!request.path.IsListOperation() || request.path.mListOp == ConcreteDataAttributePath::ListOperation::ReplaceAll)
+        {
+            Attributes::ListFabricScoped::TypeInfo::DecodableType value;
+
+            ReturnErrorOnFailure(invalidSubjectDescriptorDecoder.Decode(value));
+
+            auto iter = value.begin();
+            while (iter.Next())
+            {
+                auto & item = iter.GetValue();
+                (void) item;
+            }
+        }
+        else if (request.path.mListOp == ConcreteDataAttributePath::ListOperation::AppendItem)
+        {
+            Structs::TestFabricScoped::DecodableType item;
+            ReturnErrorOnFailure(invalidSubjectDescriptorDecoder.Decode(item));
+        }
+        else
+        {
+            return CHIP_ERROR_UNSUPPORTED_CHIP_FEATURE;
+        }
+        return CHIP_NO_ERROR;
+    }
+
+    // Boolean attribute of unit testing cluster triggers "multiple errors" case.
+    if (request.path.mClusterId == Clusters::UnitTesting::Id &&
+        request.path.mAttributeId == Attributes::Boolean::TypeInfo::GetAttributeId())
+    {
+        // TODO(IMDM): this used to send 4 responses (hence the multiple status)
+        //
+        //    for (size_t i = 0; i < 4; ++i)
+        //    {
+        //        aWriteHandler->AddStatus(request.path, status);
+        //    }
+        //
+        // which are NOT encodable by a simple response. It is unclear how this is
+        // convertible (if at all): we write path by path only. Having multiple
+        // responses for the same path within the write code makes no sense
+        //
+        // This should NOT be possible anymore when one can only return a single
+        // status (nobody has access to multiple path status updates at this level)
+        switch (gWriteResponseDirective)
+        {
+        case WriteResponseDirective::kSendMultipleSuccess:
+            return InteractionModel::Status::Success;
+        case WriteResponseDirective::kSendMultipleErrors:
+            return InteractionModel::Status::Failure;
+        default:
+            chipDie();
+        }
+    }
+
+    if (request.path.mClusterId == Clusters::UnitTesting::Id &&
+        request.path.mAttributeId == Attributes::Int8u::TypeInfo::GetAttributeId())
+    {
+        switch (gWriteResponseDirective)
+        {
+        case WriteResponseDirective::kSendClusterSpecificSuccess:
+            return InteractionModel::ClusterStatusCode::ClusterSpecificSuccess(kExampleClusterSpecificSuccess);
+        case WriteResponseDirective::kSendClusterSpecificFailure:
+            return InteractionModel::ClusterStatusCode::ClusterSpecificFailure(kExampleClusterSpecificFailure);
+        default:
+            // this should not be reached, our tests only set up these for this test case
+            chipDie();
+        }
+    }
+
+    return CHIP_ERROR_UNSUPPORTED_CHIP_FEATURE;
 }
 
 ActionReturnStatus CustomDataModel::Invoke(const InvokeRequest & request, chip::TLV::TLVReader & input_arguments,

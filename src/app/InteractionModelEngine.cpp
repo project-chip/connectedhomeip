@@ -24,6 +24,7 @@
  */
 
 #include "InteractionModelEngine.h"
+#include "lib/core/CHIPError.h"
 
 #include <cinttypes>
 
@@ -873,7 +874,7 @@ Protocols::InteractionModel::Status InteractionModelEngine::OnWriteRequest(Messa
     {
         if (writeHandler.IsFree())
         {
-            VerifyOrReturnError(writeHandler.Init(this) == CHIP_NO_ERROR, Status::Busy);
+            VerifyOrReturnError(writeHandler.Init(GetDataModelProvider(), this) == CHIP_NO_ERROR, Status::Busy);
             return writeHandler.OnWriteRequest(apExchangeContext, std::move(aPayload), aIsTimedWrite);
         }
     }
@@ -973,6 +974,10 @@ CHIP_ERROR InteractionModelEngine::OnMessageReceived(Messaging::ExchangeContext 
     using namespace Protocols::InteractionModel;
 
     Protocols::InteractionModel::Status status = Status::Failure;
+
+    // Ensure that DataModel::Provider have access to the currently executing
+    // exchange context.
+    ScopedExchangeContext scopedExchangeContext(*this, apExchangeContext);
 
     // Group Message can only be an InvokeCommandRequest or WriteRequest
     if (apExchangeContext->IsGroupExchangeContext() &&
@@ -1711,16 +1716,43 @@ DataModel::Provider * InteractionModelEngine::SetDataModelProvider(DataModel::Pr
     // Alternting data model should not be done while IM is actively handling requests.
     VerifyOrDie(mReadHandlers.begin() == mReadHandlers.end());
 
-    DataModel::Provider * oldModel = GetDataModelProvider();
-    mDataModelProvider             = model;
+    DataModel::Provider * oldModel = mDataModelProvider;
+    if (oldModel != nullptr)
+    {
+        CHIP_ERROR err = oldModel->Shutdown();
+        if (err != CHIP_NO_ERROR)
+        {
+            ChipLogError(InteractionModel, "Failure on interaction model shutdown: %" CHIP_ERROR_FORMAT, err.Format());
+        }
+    }
+
+    mDataModelProvider = model;
+    if (mDataModelProvider != nullptr)
+    {
+        DataModel::InteractionModelContext context;
+
+        context.eventsGenerator         = &EventManagement::GetInstance();
+        context.dataModelChangeListener = &mReportingEngine;
+        context.actionContext           = this;
+
+        CHIP_ERROR err = mDataModelProvider->Startup(context);
+        if (err != CHIP_NO_ERROR)
+        {
+            ChipLogError(InteractionModel, "Failure on interaction model startup: %" CHIP_ERROR_FORMAT, err.Format());
+        }
+    }
+
     return oldModel;
 }
 
-DataModel::Provider * InteractionModelEngine::GetDataModelProvider() const
+DataModel::Provider * InteractionModelEngine::GetDataModelProvider()
 {
 #if CHIP_CONFIG_USE_DATA_MODEL_INTERFACE
-    // TODO: this should be temporary, we should fully inject the data model
-    VerifyOrReturnValue(mDataModelProvider != nullptr, CodegenDataModelProviderInstance());
+    if (mDataModelProvider == nullptr)
+    {
+        // Generally this is expected to be thread safe as these should be called within the CHIP processing loop.
+        SetDataModelProvider(CodegenDataModelProviderInstance());
+    }
 #endif
     return mDataModelProvider;
 }

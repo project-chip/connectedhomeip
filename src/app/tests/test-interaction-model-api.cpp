@@ -46,6 +46,18 @@ private:
     AttributeValueEncoder & mEncoder;
 };
 
+class TestOnlyAttributeValueDecoderAccessor
+{
+public:
+    TestOnlyAttributeValueDecoderAccessor(AttributeValueDecoder & decoder) : mDecoder(decoder) {}
+
+    TLV::TLVReader & GetTlvReader() { return mDecoder.mReader; }
+    void SetTriedDecode(bool triedDecode) { mDecoder.mTriedDecode = triedDecode; }
+
+private:
+    AttributeValueDecoder & mDecoder;
+};
+
 // Used by the code in TestWriteInteraction.cpp (and generally tests that interact with the WriteHandler may need this).
 const EmberAfAttributeMetadata * GetAttributeMetadata(const ConcreteAttributePath & aConcreteClusterPath)
 {
@@ -170,7 +182,21 @@ ActionReturnStatus TestImCustomDataModel::ReadAttribute(const ReadAttributeReque
 
 ActionReturnStatus TestImCustomDataModel::WriteAttribute(const WriteAttributeRequest & request, AttributeValueDecoder & decoder)
 {
-    return CHIP_ERROR_NOT_IMPLEMENTED;
+    if (request.path.mDataVersion.HasValue() && request.path.mDataVersion.Value() == Test::kRejectedDataVersion)
+    {
+        return CHIP_IM_GLOBAL_STATUS(DataVersionMismatch);
+    }
+
+    TestOnlyAttributeValueDecoderAccessor decodeAccess(decoder);
+
+    decodeAccess.SetTriedDecode(true);
+
+    TLV::TLVWriter writer;
+    writer.Init(chip::Test::attributeDataTLV);
+    writer.CopyElement(TLV::AnonymousTag(), decodeAccess.GetTlvReader());
+    chip::Test::attributeDataTLVLen = writer.GetLengthWritten();
+
+    return CHIP_NO_ERROR;
 }
 
 ActionReturnStatus TestImCustomDataModel::Invoke(const InvokeRequest & request, chip::TLV::TLVReader & input_arguments,

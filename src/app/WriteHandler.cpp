@@ -16,19 +16,23 @@
  *    limitations under the License.
  */
 
-#include "messaging/ExchangeContext.h"
 #include <app/AppConfig.h>
 #include <app/AttributeAccessInterfaceRegistry.h>
+#include <app/AttributeValueDecoder.h>
 #include <app/InteractionModelEngine.h>
 #include <app/MessageDef/EventPathIB.h>
 #include <app/MessageDef/StatusIB.h>
 #include <app/StatusResponse.h>
 #include <app/WriteHandler.h>
+#include <app/data-model-provider/OperationTypes.h>
 #include <app/reporting/Engine.h>
 #include <app/util/MatterCallbacks.h>
 #include <app/util/ember-compatibility-functions.h>
 #include <credentials/GroupDataProvider.h>
+#include <lib/core/CHIPError.h>
+#include <lib/support/CodeUtils.h>
 #include <lib/support/TypeTraits.h>
+#include <messaging/ExchangeContext.h>
 #include <protocols/interaction_model/StatusCode.h>
 
 namespace chip {
@@ -38,10 +42,14 @@ using namespace Protocols::InteractionModel;
 using Status                         = Protocols::InteractionModel::Status;
 constexpr uint8_t kListAttributeType = 0x48;
 
-CHIP_ERROR WriteHandler::Init(WriteHandlerDelegate * apWriteHandlerDelegate)
+CHIP_ERROR WriteHandler::Init(DataModel::Provider * apProvider, WriteHandlerDelegate * apWriteHandlerDelegate)
 {
     VerifyOrReturnError(!mExchangeCtx, CHIP_ERROR_INCORRECT_STATE);
     VerifyOrReturnError(apWriteHandlerDelegate, CHIP_ERROR_INVALID_ARGUMENT);
+#if CHIP_CONFIG_USE_DATA_MODEL_INTERFACE
+    VerifyOrReturnError(apProvider, CHIP_ERROR_INVALID_ARGUMENT);
+    mDataModelProvider = apProvider;
+#endif
 
     mDelegate = apWriteHandlerDelegate;
     MoveToState(State::Initialized);
@@ -63,6 +71,9 @@ void WriteHandler::Close()
     DeliverFinalListWriteEnd(false /* wasSuccessful */);
     mExchangeCtx.Release();
     mSuppressResponse = false;
+#if CHIP_CONFIG_USE_DATA_MODEL_INTERFACE
+    mDataModelProvider = nullptr;
+#endif
     MoveToState(State::Uninitialized);
 }
 
@@ -351,7 +362,7 @@ CHIP_ERROR WriteHandler::ProcessAttributeDataIBs(TLV::TLVReader & aAttributeData
             err = CHIP_NO_ERROR;
         }
         SuccessOrExit(err);
-        err = WriteSingleClusterData(subjectDescriptor, dataAttributePath, dataReader, this);
+        err = WriteClusterData(subjectDescriptor, dataAttributePath, dataReader);
         if (err != CHIP_NO_ERROR)
         {
             mWriteResponseBuilder.GetWriteResponses().Rollback(backup);
@@ -497,12 +508,11 @@ CHIP_ERROR WriteHandler::ProcessGroupAttributeDataIBs(TLV::TLVReader & aAttribut
 
             DataModelCallbacks::GetInstance()->AttributeOperation(DataModelCallbacks::OperationType::Write,
                                                                   DataModelCallbacks::OperationOrder::Pre, dataAttributePath);
-            err = WriteSingleClusterData(subjectDescriptor, dataAttributePath, tmpDataReader, this);
-
+            err = WriteClusterData(subjectDescriptor, dataAttributePath, tmpDataReader);
             if (err != CHIP_NO_ERROR)
             {
                 ChipLogError(DataManagement,
-                             "WriteSingleClusterData Endpoint=%u Cluster=" ChipLogFormatMEI " Attribute =" ChipLogFormatMEI
+                             "WriteClusterData Endpoint=%u Cluster=" ChipLogFormatMEI " Attribute =" ChipLogFormatMEI
                              " failed: %" CHIP_ERROR_FORMAT,
                              mapping.endpoint_id, ChipLogValueMEI(dataAttributePath.mClusterId),
                              ChipLogValueMEI(dataAttributePath.mAttributeId), err.Format());
@@ -689,6 +699,30 @@ void WriteHandler::MoveToState(const State aTargetState)
 {
     mState = aTargetState;
     ChipLogDetail(DataManagement, "IM WH moving to [%s]", GetStateStr());
+}
+
+CHIP_ERROR WriteHandler::WriteClusterData(const Access::SubjectDescriptor & subject, const ConcreteDataAttributePath & path,
+                                          TLV::TLVReader & data)
+{
+    // Writes do not have a checked-path. If data model interface is enabled (both checked and only version)
+    // the write is done via the DataModel interface
+#if CHIP_CONFIG_USE_DATA_MODEL_INTERFACE
+    VerifyOrReturnError(mDataModelProvider != nullptr, CHIP_ERROR_INCORRECT_STATE);
+
+    DataModel::WriteAttributeRequest request;
+
+    request.path              = path;
+    request.subjectDescriptor = subject;
+    request.writeFlags.Set(DataModel::WriteFlags::kTimed, IsTimedWrite());
+
+    AttributeValueDecoder decoder(data, subject);
+
+    DataModel::ActionReturnStatus status = mDataModelProvider->WriteAttribute(request, decoder);
+
+    return AddStatusInternal(path, StatusIB(status.GetStatusCode()));
+#else
+    return WriteSingleClusterData(subject, path, data, this);
+#endif // CHIP_CONFIG_USE_DATA_MODEL_INTERFACE
 }
 
 } // namespace app

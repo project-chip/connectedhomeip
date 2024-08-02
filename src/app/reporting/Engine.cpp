@@ -33,6 +33,7 @@
 #include <app/RequiredPrivilege.h>
 #include <app/reporting/Engine.h>
 #include <app/reporting/Read.h>
+#include <app/reporting/reporting.h>
 #include <app/util/MatterCallbacks.h>
 #include <app/util/ember-compatibility-functions.h>
 
@@ -1004,7 +1005,21 @@ void Engine::ScheduleUrgentEventDeliverySync(Optional<FabricIndex> fabricIndex)
     Run();
 }
 
-}; // namespace reporting
+void Engine::MarkDirty(const ConcreteAttributePath & path)
+{
+    // NOTE: original MatterReportingAttributeChangeCallback ALSO does a
+    //       IncreaseClusterDataVersion. However that ties directly to ember so it is not
+    //       done here. The code should be migrated to execute this.
+
+    AttributePathParams info(path.mEndpointId, path.mClusterId, path.mAttributeId);
+    CHIP_ERROR err = SetDirty(info);
+    if (err != CHIP_NO_ERROR)
+    {
+        ChipLogError(DataManagement, "Failed to set path dirty: %" CHIP_ERROR_FORMAT, err.Format());
+    }
+}
+
+} // namespace reporting
 } // namespace app
 } // namespace chip
 
