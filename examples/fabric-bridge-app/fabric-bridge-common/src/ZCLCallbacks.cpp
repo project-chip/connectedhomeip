@@ -26,6 +26,7 @@ using namespace ::chip;
 using namespace ::chip::app::Clusters;
 
 #define ZCL_DESCRIPTOR_CLUSTER_REVISION (1u)
+#define ZCL_ADMINISTRATOR_COMMISSIONING_CLUSTER_REVISION (1u)
 #define ZCL_BRIDGED_DEVICE_BASIC_INFORMATION_CLUSTER_REVISION (2u)
 #define ZCL_BRIDGED_DEVICE_BASIC_INFORMATION_FEATURE_MAP (0u)
 
@@ -37,9 +38,13 @@ Protocols::InteractionModel::Status emberAfExternalAttributeReadCallback(Endpoin
     AttributeId attributeId = attributeMetadata->attributeId;
 
     Device * dev = DeviceMgr().GetDevice(endpoint);
-    if (dev != nullptr && clusterId == app::Clusters::BridgedDeviceBasicInformation::Id)
+    if (dev == nullptr) {
+        return Protocols::InteractionModel::Status::Failure;
+    }
+
+    if (clusterId == BridgedDeviceBasicInformation::Id)
     {
-        using namespace app::Clusters::BridgedDeviceBasicInformation::Attributes;
+        using namespace BridgedDeviceBasicInformation::Attributes;
         ChipLogProgress(NotSpecified, "HandleReadBridgedDeviceBasicAttribute: attrId=%d, maxReadLength=%d", attributeId,
                         maxReadLength);
 
@@ -67,6 +72,20 @@ Protocols::InteractionModel::Status emberAfExternalAttributeReadCallback(Endpoin
             return Protocols::InteractionModel::Status::Failure;
         }
         return Protocols::InteractionModel::Status::Success;
+    }
+
+    if (clusterId == AdministratorCommissioning::Id)
+    {
+        // TODO(Add issue # here) This is a workaround to prevent crash. CADMIN is still reading incorrect
+        // Attribute values on dynamic endpoint as it only reads the root node and not the actual bridge
+        // device we are representing here.
+        if ((attributeId == AdministratorCommissioning::Attributes::ClusterRevision::Id) && (maxReadLength == 2))
+        {
+            uint16_t rev = ZCL_ADMINISTRATOR_COMMISSIONING_CLUSTER_REVISION;
+            memcpy(buffer, &rev, sizeof(rev));
+            return Protocols::InteractionModel::Status::Success;
+        }
+        return Protocols::InteractionModel::Status::Failure;
     }
 
     return Protocols::InteractionModel::Status::Failure;
