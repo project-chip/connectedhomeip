@@ -257,11 +257,11 @@ class EventChangeCallback:
                 f'Got subscription report for event on cluster {self._expected_cluster}: {res.Data}')
             self._q.put(res)
 
-    def wait_for_event_report(self, expected_event: ClusterObjects.ClusterEvent, timeoutS: int = 10):
-        """This function allows a test script to block waiting for the specific event to arrive with a timeout
-           (specified in seconds). It returns the event data so that the values can be checked."""
+    def wait_for_event_report(self, expected_event: ClusterObjects.ClusterEvent, timeout_sec: float = 10.0) -> Any:
+        """This function allows a test script to block waiting for the specific event to be the next event
+           to arrive within a timeout (specified in seconds). It returns the event data so that the values can be checked."""
         try:
-            res = self._q.get(block=True, timeout=timeoutS)
+            res = self._q.get(block=True, timeout=timeout_sec)
         except queue.Empty:
             asserts.fail("Failed to receive a report for the event {}".format(expected_event))
 
@@ -269,15 +269,29 @@ class EventChangeCallback:
         asserts.assert_equal(res.Header.EventId, expected_event.event_id, "Expected event ID not found in event report")
         return res.Data
 
-    def wait_for_event_expect_no_report(self, timeoutS: int = 10):
-        """This function succceeds/returns if an event does not arrive within the timeout specified in seconds.
-           If an event does arrive, an assert is called."""
+    def wait_for_event_expect_no_report(self, timeout_sec: float = 10.0):
+        """This function returns if an event does not arrive within the timeout specified in seconds.
+           If any event does arrive, an assert failure occurs."""
         try:
-            res = self._q.get(block=True, timeout=timeoutS)
+            res = self._q.get(block=True, timeout=timeout_sec)
         except queue.Empty:
             return
 
         asserts.fail(f"Event reported when not expected {res}")
+
+    def get_last_event(self) -> Optional[Any]:
+        """Flush entire queue, returning last (newest) event only."""
+        last_event: Optional[Any] = None
+        while True:
+            try:
+                last_event = self._q.get(block=False)
+            except queue.Empty:
+                return last_event
+
+    def flush_events(self) -> None:
+        """Flush entire queue, returning nothing."""
+        _ = self.get_last_event()
+        return
 
     @property
     def event_queue(self) -> queue.Queue:
@@ -327,14 +341,19 @@ class AttributeValue:
 
 class ClusterAttributeChangeAccumulator:
     def __init__(self, expected_cluster: ClusterObjects.Cluster):
-        self._q = queue.Queue()
         self._expected_cluster = expected_cluster
         self._subscription = None
+        self.reset()
+
+    def reset(self):
         self._attribute_report_counts = {}
-        attrs = [cls for name, cls in inspect.getmembers(expected_cluster.Attributes) if inspect.isclass(
+        attrs = [cls for name, cls in inspect.getmembers(self._expected_cluster.Attributes) if inspect.isclass(
             cls) and issubclass(cls, ClusterObjects.ClusterAttributeDescriptor)]
+        self._attribute_reports = {}
         for a in attrs:
             self._attribute_report_counts[a] = 0
+            self._attribute_reports[a] = []
+        self._q = queue.Queue()
 
     async def start(self, dev_ctrl, node_id: int, endpoint: int, fabric_filtered: bool = False, min_interval_sec: int = 0, max_interval_sec: int = 5) -> Any:
         """This starts a subscription for attributes on the specified node_id and endpoint. The cluster is specified when the class instance is created."""
@@ -358,6 +377,7 @@ class ClusterAttributeChangeAccumulator:
             logging.info(f"Got subscription report for {path.AttributeType}: {data}")
             self._q.put(value)
             self._attribute_report_counts[path.AttributeType] += 1
+            self._attribute_reports[path.AttributeType].append(value)
 
     @property
     def attribute_queue(self) -> queue.Queue:
@@ -366,6 +386,10 @@ class ClusterAttributeChangeAccumulator:
     @property
     def attribute_report_counts(self) -> dict[ClusterObjects.ClusterAttributeDescriptor, int]:
         return self._attribute_report_counts
+
+    @property
+    def attribute_reports(self) -> dict[ClusterObjects.ClusterAttributeDescriptor, AttributeValue]:
+        return self._attribute_reports
 
 
 class InternalTestRunnerHooks(TestRunnerHooks):
@@ -1805,7 +1829,7 @@ def per_endpoint_test(accept_function: EndpointCheckFunction):
     def per_endpoint_test_internal(body):
         def per_endpoint_runner(self: MatterBaseTest, *args, **kwargs):
             asserts.assert_false(self.get_test_pics(self.current_test_info.name), "pics_ method supplied for per_endpoint_test.")
-            runner_with_timeout = asyncio.wait_for(get_accepted_endpoints_for_test(self, accept_function), timeout=5)
+            runner_with_timeout = asyncio.wait_for(get_accepted_endpoints_for_test(self, accept_function), timeout=30)
             endpoints = asyncio.run(runner_with_timeout)
             if not endpoints:
                 logging.info("No matching endpoints found - skipping test")

@@ -28,7 +28,7 @@
 
 #include <app/ConcreteAttributePath.h>
 #include <app/InteractionModelEngine.h>
-#include <app/codegen-data-model/Instance.h>
+#include <app/codegen-data-model-provider/Instance.h>
 #include <app/reporting/Engine.h>
 #include <app/reporting/tests/MockReportScheduler.h>
 #include <app/tests/AppTestContext.h>
@@ -59,12 +59,12 @@ public:
     void SetUp() override
     {
         chip::Test::AppContext::SetUp();
-        mOldModel = InteractionModelEngine::GetInstance()->SetDataModel(&TestImCustomDataModel::Instance());
+        mOldProvider = InteractionModelEngine::GetInstance()->SetDataModelProvider(&TestImCustomDataModel::Instance());
     }
 
     void TearDown() override
     {
-        InteractionModelEngine::GetInstance()->SetDataModel(mOldModel);
+        InteractionModelEngine::GetInstance()->SetDataModelProvider(mOldProvider);
         chip::Test::AppContext::TearDown();
     }
 
@@ -77,7 +77,7 @@ public:
     void TestMergeAttributePathWhenDirtySetPoolExhausted();
 
 private:
-    chip::app::InteractionModel::DataModel * mOldModel = nullptr;
+    chip::app::DataModel::Provider * mOldProvider = nullptr;
 
     struct ExpectedDirtySetContent : public AttributePathParams
     {
@@ -186,7 +186,7 @@ TEST_F_FROM_FIXTURE(TestReportingEngine, TestBuildAndSendSingleReportData)
     EXPECT_EQ(readRequestBuilder.GetError(), CHIP_NO_ERROR);
     EXPECT_EQ(writer.Finalize(&readRequestbuf), CHIP_NO_ERROR);
     app::ReadHandler readHandler(dummy, exchangeCtx, chip::app::ReadHandler::InteractionType::Read,
-                                 app::reporting::GetDefaultReportScheduler(), CodegenDataModelInstance());
+                                 app::reporting::GetDefaultReportScheduler(), CodegenDataModelProviderInstance());
     readHandler.OnInitialRequest(std::move(readRequestbuf));
 
     EXPECT_EQ(InteractionModelEngine::GetInstance()->GetReportingEngine().BuildAndSendSingleReportData(&readHandler),

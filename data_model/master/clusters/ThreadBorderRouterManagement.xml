@@ -59,12 +59,12 @@ Davis, CA 95616, USA
 -->
 <cluster xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="types types.xsd cluster cluster.xsd" id="0x0452" name="Thread Border Router Management Cluster" revision="1">
   <revisionHistory>
-    <revision revision="1" summary="Initial Release"/>
+    <revision revision="1" summary="Initial revision"/>
   </revisionHistory>
   <clusterIds>
     <clusterId id="0x0452" name="Thread Border Router Management"/>
   </clusterIds>
-  <classification hierarchy="base" role="utility" picsCode="TBRM" scope="Node"/>
+  <classification hierarchy="base" role="application" picsCode="TBRM" scope="Endpoint"/>
   <features>
     <feature bit="0" code="PC" name="PANChange" summary="The ability to change PAN configuration with pending dataset setting request.">
       <optionalConform/>
@@ -119,7 +119,7 @@ Davis, CA 95616, USA
       </field>
     </command>
     <command id="0x03" name="SetActiveDatasetRequest" direction="commandToServer" response="Y">
-      <access invokePrivilege="manage"/>
+      <access invokePrivilege="manage" timed="true"/>
       <mandatoryConform/>
       <field id="0" name="ActiveDataset" type="octstr">
         <mandatoryConform/>
@@ -130,7 +130,7 @@ Davis, CA 95616, USA
       </field>
     </command>
     <command id="0x04" name="SetPendingDatasetRequest" direction="commandToServer" response="Y">
-      <access invokePrivilege="manage"/>
+      <access invokePrivilege="manage" timed="true"/>
       <mandatoryConform>
         <feature name="PC"/>
       </mandatoryConform>

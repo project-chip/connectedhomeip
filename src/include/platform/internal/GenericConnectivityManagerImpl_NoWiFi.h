@@ -78,6 +78,10 @@ public:
     static const char * _WiFiAPModeToStr(ConnectivityManager::WiFiAPMode mode);
     static const char * _WiFiStationStateToStr(ConnectivityManager::WiFiStationState state);
     static const char * _WiFiAPStateToStr(ConnectivityManager::WiFiAPState state);
+    // TODO ICD rework: ambiguous declaration of _SetPollingInterval when thread and no-wifi are both built together
+#if CHIP_CONFIG_ENABLE_ICD_SERVER && !CHIP_DEVICE_CONFIG_ENABLE_THREAD
+    CHIP_ERROR _SetPollingInterval(System::Clock::Milliseconds32 pollingInterval);
+#endif
 
 private:
     ImplClass * Impl() { return static_cast<ImplClass *>(this); }
@@ -220,6 +224,15 @@ inline const char * GenericConnectivityManagerImpl_NoWiFi<ImplClass>::_WiFiAPSta
 {
     return nullptr;
 }
+
+#if CHIP_CONFIG_ENABLE_ICD_SERVER && !CHIP_DEVICE_CONFIG_ENABLE_THREAD
+template <class ImplClass>
+inline CHIP_ERROR
+GenericConnectivityManagerImpl_NoWiFi<ImplClass>::_SetPollingInterval(System::Clock::Milliseconds32 pollingInterval)
+{
+    return CHIP_ERROR_NOT_IMPLEMENTED;
+}
+#endif
 
 } // namespace Internal
 } // namespace DeviceLayer

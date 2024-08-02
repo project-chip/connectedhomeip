@@ -55,11 +55,12 @@ Connectivity Standards Alliance
 508 Second Street, Suite 206
 Davis, CA 95616, USA
 -->
-<deviceType xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="types types.xsd devicetype devicetype.xsd" id="0x0301" name="Thermostat" revision="3">
+<deviceType xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="types types.xsd devicetype devicetype.xsd" id="0x0301" name="Thermostat" revision="4">
   <revisionHistory>
-    <revision revision="1" summary="Initial Zigbee 3.0 release"/>
+    <revision revision="1" summary="Initial Zigbee 3.0 revision"/>
     <revision revision="2" summary="New data model format and notation, added Clusters required for Matter support, restricted legacy elements to Zigbee only"/>
     <revision revision="3" summary="Addition of Energy Preference cluster and updated the Scenes cluster to Scenes Management with Cluster ID: 0x0062"/>
+    <revision revision="4" summary="Remove Time Synchronization cluster and Zigbee only clusters, remove provisional marking from Energy Preference cluster"/>
   </revisionHistory>
   <classification class="simple" scope="endpoint"/>
   <conditions/>
@@ -72,60 +73,27 @@ Davis, CA 95616, USA
         <attribute name="Active"/>
       </mandatoryConform>
     </cluster>
-    <cluster id="0x0009" name="Alarms" side="server">
-      <optionalConform>
-        <condition name="Zigbee"/>
-      </optionalConform>
-    </cluster>
-    <cluster id="0x000A" name="Time" side="client">
-      <optionalConform>
-        <condition name="Zigbee"/>
-      </optionalConform>
-    </cluster>
-    <cluster id="0x0038" name="Time Synchronization" side="server">
-      <optionalConform/>
-    </cluster>
-    <cluster id="0x0038" name="Time Synchronization" side="client">
-      <optionalConform/>
-    </cluster>
-    <cluster id="0x0062" name="Scenes Management" side="server">
-      <otherwiseConform>
-        <provisionalConform/>
-        <optionalConform/>
-      </otherwiseConform>
-    </cluster>
     <cluster id="0x009B" name="Energy Preference" side="server">
       <optionalConform/>
     </cluster>
     <cluster id="0x0201" name="Thermostat" side="server">
       <mandatoryConform/>
       <features>
-        <feature code="" name="Schedule">
-          <otherwiseConform>
-            <optionalConform>
-              <condition name="Zigbee"/>
-            </optionalConform>
-            <provisionalConform/>
-          </otherwiseConform>
+        <feature code="" name="ScheduleConfiguration">
+          <disallowConform/>
         </feature>
       </features>
       <attributes>
         <attribute code="" name="AlarmMask">
-          <optionalConform>
-            <condition name="Zigbee"/>
-          </optionalConform>
+          <disallowConform/>
         </attribute>
       </attributes>
       <commands>
-        <command id="" name="Get Relay Status Log">
-          <optionalConform>
-            <condition name="Zigbee"/>
-          </optionalConform>
+        <command id="" name="GetRelayStatusLog">
+          <disallowConform/>
         </command>
-        <command id="" name="Get Relay Status Log Response">
-          <optionalConform>
-            <condition name="Zigbee"/>
-          </optionalConform>
+        <command id="" name="GetRelayStatusLogResponse">
+          <disallowConform/>
         </command>
       </commands>
     </cluster>
