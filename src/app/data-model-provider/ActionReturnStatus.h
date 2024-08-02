@@ -48,7 +48,13 @@ public:
     struct StringStorage
     {
         // Generally size should be sufficient.
-        // len("Status<123>, Code 255") == 21 (and then 22 for null terminator. We have slack.)
+        // The longest status code from StatusCodeList is NO_UPSTREAM_SUBSCRIPTION(197)
+        // so we need space for one of:
+        //    "NO_UPSTREAM_SUBSCRIPTION(197)\0" = 30   // explicit verbose status code
+        //    "FAILURE(1), Code 255\0")                // cluster failure, verbose
+        //    "SUCCESS(0), Code 255\0")                // cluster success, verbose
+        //    "Status<197>, Code 255\0")               // Cluster failure, non-verbose
+        // 
         // CHIP_ERROR has its own (global/static!) storage
         chip::StringBuilder<32> formatBuffer;
     };
