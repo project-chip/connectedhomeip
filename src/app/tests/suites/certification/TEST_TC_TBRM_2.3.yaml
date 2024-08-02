@@ -39,6 +39,7 @@ config:
     # Security Policy: 672 onrc 0
     ## The name of the Thread Network anb channel MUST change before 1 min (limited duration to reduce the test time)
 
+tests:
 # pre-requisis ??
 #    - label: "Wait for the commissioned device to be retrieved"
 #      cluster: DelayCommands
@@ -60,9 +61,9 @@ config:
           hasValue: true
 
     - label: "TH sends a SetPendingDatasetRequest command to the DUT"
-     command: SetPendingDatasetRequest
+      command: SetPendingDatasetRequest
       arguments: 
-        values : 
+           values : 
             - name: "PendingDataset"
               value: PIXIT.TBRM.THREAD_PENDING_DATASET
       response:
