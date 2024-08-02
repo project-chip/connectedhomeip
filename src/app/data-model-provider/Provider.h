@@ -92,7 +92,7 @@ public:
     ///
     /// Returning anything other than CHIP_NO_ERROR or Status::Success (i.e. success without a return code)
     /// means that the invoke will be considered to be returning the given status WITHOUT any data (any data
-    /// that was sent via Handler is to be rolled back/discarded).
+    /// that was sent via CommandHandler is to be rolled back/discarded).
     ///
     /// This is because only one of the following may be encoded in a response:
     ///    - data (as CommandDataIB) which is assumed a "response as a success"
