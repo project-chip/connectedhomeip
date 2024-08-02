@@ -21891,7 +21891,7 @@ NS_ASSUME_NONNULL_BEGIN
 
         _status = @(0);
 
-        _statusText = nil;
+        _statusText = @"";
     }
     return self;
 }
@@ -21962,14 +21962,10 @@ NS_ASSUME_NONNULL_BEGIN
         self.status = [NSNumber numberWithUnsignedChar:chip::to_underlying(decodableStruct.status)];
     }
     {
-        if (decodableStruct.statusText.HasValue()) {
-            self.statusText = AsString(decodableStruct.statusText.Value());
-            if (self.statusText == nil) {
-                CHIP_ERROR err = CHIP_ERROR_INVALID_ARGUMENT;
-                return err;
-            }
-        } else {
-            self.statusText = nil;
+        self.statusText = AsString(decodableStruct.statusText);
+        if (self.statusText == nil) {
+            CHIP_ERROR err = CHIP_ERROR_INVALID_ARGUMENT;
+            return err;
         }
     }
     return CHIP_NO_ERROR;
@@ -22063,7 +22059,7 @@ NS_ASSUME_NONNULL_BEGIN
 
         _status = @(0);
 
-        _statusText = nil;
+        _statusText = @"";
     }
     return self;
 }
@@ -22134,14 +22130,10 @@ NS_ASSUME_NONNULL_BEGIN
         self.status = [NSNumber numberWithUnsignedChar:chip::to_underlying(decodableStruct.status)];
     }
     {
-        if (decodableStruct.statusText.HasValue()) {
-            self.statusText = AsString(decodableStruct.statusText.Value());
-            if (self.statusText == nil) {
-                CHIP_ERROR err = CHIP_ERROR_INVALID_ARGUMENT;
-                return err;
-            }
-        } else {
-            self.statusText = nil;
+        self.statusText = AsString(decodableStruct.statusText);
+        if (self.statusText == nil) {
+            CHIP_ERROR err = CHIP_ERROR_INVALID_ARGUMENT;
+            return err;
         }
     }
     return CHIP_NO_ERROR;

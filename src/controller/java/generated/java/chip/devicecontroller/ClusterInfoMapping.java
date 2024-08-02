@@ -13125,12 +13125,12 @@ public class ClusterInfoMapping {
     }
 
     @Override
-    public void onSuccess(Integer status, Optional<String> statusText) {
+    public void onSuccess(Integer status, String statusText) {
       Map<CommandResponseInfo, Object> responseValues = new LinkedHashMap<>();
 
       CommandResponseInfo statusResponseValue = new CommandResponseInfo("status", "Integer");
       responseValues.put(statusResponseValue, status);
-      CommandResponseInfo statusTextResponseValue = new CommandResponseInfo("statusText", "Optional<String>");
+      CommandResponseInfo statusTextResponseValue = new CommandResponseInfo("statusText", "String");
       responseValues.put(statusTextResponseValue, statusText);
       callback.onSuccess(responseValues);
     }
@@ -13149,12 +13149,12 @@ public class ClusterInfoMapping {
     }
 
     @Override
-    public void onSuccess(Integer status, Optional<String> statusText) {
+    public void onSuccess(Integer status, String statusText) {
       Map<CommandResponseInfo, Object> responseValues = new LinkedHashMap<>();
 
       CommandResponseInfo statusResponseValue = new CommandResponseInfo("status", "Integer");
       responseValues.put(statusResponseValue, status);
-      CommandResponseInfo statusTextResponseValue = new CommandResponseInfo("statusText", "Optional<String>");
+      CommandResponseInfo statusTextResponseValue = new CommandResponseInfo("statusText", "String");
       responseValues.put(statusTextResponseValue, statusText);
       callback.onSuccess(responseValues);
     }

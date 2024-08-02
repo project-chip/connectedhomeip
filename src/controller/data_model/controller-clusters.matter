@@ -6432,7 +6432,7 @@ deprecated cluster BarrierControl = 259 {
   command BarrierControlStop(): DefaultSuccess = 1;
 }
 
-/** The Service Area cluster provides an interface for controlling the locations where a device should operate, and for querying the current location. */
+/** The Service Area cluster provides an interface for controlling the areas where a device should operate, and for querying the current area being serviced. */
 provisional cluster ServiceArea = 336 {
   revision 1;
 
@@ -6455,6 +6455,7 @@ provisional cluster ServiceArea = 336 {
     kSuccess = 0;
     kInvalidAreaList = 1;
     kInvalidInMode = 2;
+    kInvalidSkippedArea = 3;
   }
 
   bitmap Feature : bitmap32 {
@@ -6463,16 +6464,19 @@ provisional cluster ServiceArea = 336 {
     kMaps = 0x4;
   }
 
+  struct LandmarkInfoStruct {
+    LandmarkTag landmarkTag = 0;
+    nullable PositionTag positionTag = 1;
+  }
+
   struct AreaInfoStruct {
     nullable LocationDescriptorStruct locationInfo = 0;
-    nullable LandmarkTag landmarkTag = 1;
-    nullable PositionTag positionTag = 2;
-    nullable FloorSurfaceTag surfaceTag = 3;
+    nullable LandmarkInfoStruct landmarkInfo = 1;
   }
 
   struct AreaStruct {
     int32u areaID = 0;
-    nullable int8u mapID = 1;
+    nullable int32u mapID = 1;
     AreaInfoStruct areaDesc = 2;
   }
 
@@ -6489,7 +6493,7 @@ provisional cluster ServiceArea = 336 {
   }
 
   readonly attribute AreaStruct supportedAreas[] = 0;
-  readonly attribute MapStruct supportedMaps[] = 1;
+  readonly attribute optional MapStruct supportedMaps[] = 1;
   readonly attribute int32u selectedAreas[] = 2;
   readonly attribute optional nullable int32u currentArea = 3;
   readonly attribute optional nullable epoch_s estimatedEndTime = 4;
@@ -6507,7 +6511,7 @@ provisional cluster ServiceArea = 336 {
 
   response struct SelectAreasResponse = 1 {
     SelectAreasStatus status = 0;
-    optional char_string<256> statusText = 1;
+    char_string<256> statusText = 1;
   }
 
   request struct SkipAreaRequest {
@@ -6516,7 +6520,7 @@ provisional cluster ServiceArea = 336 {
 
   response struct SkipAreaResponse = 3 {
     SkipAreaStatus status = 0;
-    optional char_string<256> statusText = 1;
+    char_string<256> statusText = 1;
   }
 
   /** Command used to select a set of device areas, where the device is to operate. */

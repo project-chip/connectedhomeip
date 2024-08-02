@@ -3943,6 +3943,38 @@ void ComplexArgumentParser::Finalize(chip::app::Clusters::DoorLock::Structs::Cre
 }
 
 CHIP_ERROR ComplexArgumentParser::Setup(const char * label,
+                                        chip::app::Clusters::ServiceArea::Structs::LandmarkInfoStruct::Type & request,
+                                        Json::Value & value)
+{
+    VerifyOrReturnError(value.isObject(), CHIP_ERROR_INVALID_ARGUMENT);
+
+    // Copy to track which members we already processed.
+    Json::Value valueCopy(value);
+
+    ReturnErrorOnFailure(
+        ComplexArgumentParser::EnsureMemberExist("LandmarkInfoStruct.landmarkTag", "landmarkTag", value.isMember("landmarkTag")));
+    ReturnErrorOnFailure(
+        ComplexArgumentParser::EnsureMemberExist("LandmarkInfoStruct.positionTag", "positionTag", value.isMember("positionTag")));
+
+    char labelWithMember[kMaxLabelLength];
+    snprintf(labelWithMember, sizeof(labelWithMember), "%s.%s", label, "landmarkTag");
+    ReturnErrorOnFailure(ComplexArgumentParser::Setup(labelWithMember, request.landmarkTag, value["landmarkTag"]));
+    valueCopy.removeMember("landmarkTag");
+
+    snprintf(labelWithMember, sizeof(labelWithMember), "%s.%s", label, "positionTag");
+    ReturnErrorOnFailure(ComplexArgumentParser::Setup(labelWithMember, request.positionTag, value["positionTag"]));
+    valueCopy.removeMember("positionTag");
+
+    return ComplexArgumentParser::EnsureNoMembersRemaining(label, valueCopy);
+}
+
+void ComplexArgumentParser::Finalize(chip::app::Clusters::ServiceArea::Structs::LandmarkInfoStruct::Type & request)
+{
+    ComplexArgumentParser::Finalize(request.landmarkTag);
+    ComplexArgumentParser::Finalize(request.positionTag);
+}
+
+CHIP_ERROR ComplexArgumentParser::Setup(const char * label,
                                         chip::app::Clusters::ServiceArea::Structs::AreaInfoStruct::Type & request,
                                         Json::Value & value)
 {
@@ -3954,28 +3986,16 @@ CHIP_ERROR ComplexArgumentParser::Setup(const char * label,
     ReturnErrorOnFailure(
         ComplexArgumentParser::EnsureMemberExist("AreaInfoStruct.locationInfo", "locationInfo", value.isMember("locationInfo")));
     ReturnErrorOnFailure(
-        ComplexArgumentParser::EnsureMemberExist("AreaInfoStruct.landmarkTag", "landmarkTag", value.isMember("landmarkTag")));
-    ReturnErrorOnFailure(
-        ComplexArgumentParser::EnsureMemberExist("AreaInfoStruct.positionTag", "positionTag", value.isMember("positionTag")));
-    ReturnErrorOnFailure(
-        ComplexArgumentParser::EnsureMemberExist("AreaInfoStruct.surfaceTag", "surfaceTag", value.isMember("surfaceTag")));
+        ComplexArgumentParser::EnsureMemberExist("AreaInfoStruct.landmarkInfo", "landmarkInfo", value.isMember("landmarkInfo")));
 
     char labelWithMember[kMaxLabelLength];
     snprintf(labelWithMember, sizeof(labelWithMember), "%s.%s", label, "locationInfo");
     ReturnErrorOnFailure(ComplexArgumentParser::Setup(labelWithMember, request.locationInfo, value["locationInfo"]));
     valueCopy.removeMember("locationInfo");
 
-    snprintf(labelWithMember, sizeof(labelWithMember), "%s.%s", label, "landmarkTag");
-    ReturnErrorOnFailure(ComplexArgumentParser::Setup(labelWithMember, request.landmarkTag, value["landmarkTag"]));
-    valueCopy.removeMember("landmarkTag");
-
-    snprintf(labelWithMember, sizeof(labelWithMember), "%s.%s", label, "positionTag");
-    ReturnErrorOnFailure(ComplexArgumentParser::Setup(labelWithMember, request.positionTag, value["positionTag"]));
-    valueCopy.removeMember("positionTag");
-
-    snprintf(labelWithMember, sizeof(labelWithMember), "%s.%s", label, "surfaceTag");
-    ReturnErrorOnFailure(ComplexArgumentParser::Setup(labelWithMember, request.surfaceTag, value["surfaceTag"]));
-    valueCopy.removeMember("surfaceTag");
+    snprintf(labelWithMember, sizeof(labelWithMember), "%s.%s", label, "landmarkInfo");
+    ReturnErrorOnFailure(ComplexArgumentParser::Setup(labelWithMember, request.landmarkInfo, value["landmarkInfo"]));
+    valueCopy.removeMember("landmarkInfo");
 
     return ComplexArgumentParser::EnsureNoMembersRemaining(label, valueCopy);
 }
@@ -3983,9 +4003,7 @@ CHIP_ERROR ComplexArgumentParser::Setup(const char * label,
 void ComplexArgumentParser::Finalize(chip::app::Clusters::ServiceArea::Structs::AreaInfoStruct::Type & request)
 {
     ComplexArgumentParser::Finalize(request.locationInfo);
-    ComplexArgumentParser::Finalize(request.landmarkTag);
-    ComplexArgumentParser::Finalize(request.positionTag);
-    ComplexArgumentParser::Finalize(request.surfaceTag);
+    ComplexArgumentParser::Finalize(request.landmarkInfo);
 }
 
 CHIP_ERROR ComplexArgumentParser::Setup(const char * label, chip::app::Clusters::ServiceArea::Structs::AreaStruct::Type & request,

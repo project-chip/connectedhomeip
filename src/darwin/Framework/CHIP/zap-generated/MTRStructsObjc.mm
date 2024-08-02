@@ -6610,6 +6610,36 @@ NS_ASSUME_NONNULL_BEGIN
 
 @end
 
+@implementation MTRServiceAreaClusterLandmarkInfoStruct
+- (instancetype)init
+{
+    if (self = [super init]) {
+
+        _landmarkTag = @(0);
+
+        _positionTag = nil;
+    }
+    return self;
+}
+
+- (id)copyWithZone:(NSZone * _Nullable)zone
+{
+    auto other = [[MTRServiceAreaClusterLandmarkInfoStruct alloc] init];
+
+    other.landmarkTag = self.landmarkTag;
+    other.positionTag = self.positionTag;
+
+    return other;
+}
+
+- (NSString *)description
+{
+    NSString * descriptionString = [NSString stringWithFormat:@"<%@: landmarkTag:%@; positionTag:%@; >", NSStringFromClass([self class]), _landmarkTag, _positionTag];
+    return descriptionString;
+}
+
+@end
+
 @implementation MTRServiceAreaClusterAreaInfoStruct
 - (instancetype)init
 {
@@ -6617,11 +6647,7 @@ NS_ASSUME_NONNULL_BEGIN
 
         _locationInfo = nil;
 
-        _landmarkTag = nil;
-
-        _positionTag = nil;
-
-        _surfaceTag = nil;
+        _landmarkInfo = nil;
     }
     return self;
 }
@@ -6631,16 +6657,14 @@ NS_ASSUME_NONNULL_BEGIN
     auto other = [[MTRServiceAreaClusterAreaInfoStruct alloc] init];
 
     other.locationInfo = self.locationInfo;
-    other.landmarkTag = self.landmarkTag;
-    other.positionTag = self.positionTag;
-    other.surfaceTag = self.surfaceTag;
+    other.landmarkInfo = self.landmarkInfo;
 
     return other;
 }
 
 - (NSString *)description
 {
-    NSString * descriptionString = [NSString stringWithFormat:@"<%@: locationInfo:%@; landmarkTag:%@; positionTag:%@; surfaceTag:%@; >", NSStringFromClass([self class]), _locationInfo, _landmarkTag, _positionTag, _surfaceTag];
+    NSString * descriptionString = [NSString stringWithFormat:@"<%@: locationInfo:%@; landmarkInfo:%@; >", NSStringFromClass([self class]), _locationInfo, _landmarkInfo];
     return descriptionString;
 }
 

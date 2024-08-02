@@ -2589,6 +2589,7 @@ static auto __attribute__((unused)) EnsureKnownEnumValue(ServiceArea::SkipAreaSt
     case EnumType::kSuccess:
     case EnumType::kInvalidAreaList:
     case EnumType::kInvalidInMode:
+    case EnumType::kInvalidSkippedArea:
         return val;
     default:
         return EnumType::kUnknownEnumValue;
