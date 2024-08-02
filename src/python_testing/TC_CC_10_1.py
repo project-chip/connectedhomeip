@@ -502,7 +502,7 @@ class TC_CC_10_1(MatterBaseTest):
             asserts.assert_equal(ColorLoopDirection, 1, "ColorLoopDirection is not 1")
 
         self.step("9e")
-        if self.pics_guard(self.check_pics("CC.S.C44.Rsp")):
+        if self.pics_guard(self.check_pics("CC.S.F02")):
             ColorLoopTime = await self.read_single_attribute_check_success(cluster, attributes.ColorLoopTime)
             asserts.assert_equal(ColorLoopTime, 5, "ColorLoopTime is not 5")
 
