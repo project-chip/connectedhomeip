@@ -42,12 +42,12 @@ class BdxTransfer:
         future = eventLoop.create_future()
 
         if self._data != None:
-            res = await Bdx.AcceptReceiveTransfer(self._bdx_transfer, self._data, future)
+            res = Bdx.AcceptReceiveTransfer(self._bdx_transfer, self._data, future)
             res.raise_on_error()
             return await future
         else:
             self._data = []
-            res = await Bdx.AcceptSendTransfer(self._bdx_transfer, lambda data: self._data.extend(data), future)
+            res = Bdx.AcceptSendTransfer(self._bdx_transfer, lambda data: self._data.extend(data), future)
             res.raise_on_error()
             await future
             return self._data

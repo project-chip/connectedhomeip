@@ -103,7 +103,7 @@ def PrepareToReceiveBdxData(future: Future) -> PyChipError:
         lambda: handle.pychip_Bdx_ExpectBdxTransfer(ctypes.py_object(transaction))
     )
     if not res.is_success:
-      ctypes.pythonapi.Py_DecRef(ctypes.py_object(transaction))
+        ctypes.pythonapi.Py_DecRef(ctypes.py_object(transaction))
     return res
 
 
@@ -112,26 +112,30 @@ def PrepareToSendBdxData(future: Future, data: bytes) -> PyChipError:
     transaction = AsyncTransferObtainedTransaction(future=future, event_loop=asyncio.get_running_loop(), data=data)
 
     ctypes.pythonapi.Py_IncRef(ctypes.py_object(transaction))
-    res = builtins.chipStack.CallAsyncWithResult(
+    res = builtins.chipStack.Call(
         lambda: handle.pychip_Bdx_ExpectBdxTransfer(ctypes.py_object(transaction))
     )
     if not res.is_success:
-      ctypes.pythonapi.Py_DecRef(ctypes.py_object(transaction))
+        ctypes.pythonapi.Py_DecRef(ctypes.py_object(transaction))
     return res
 
 
-async def AcceptSendTransfer(transfer: c_void_p, dataReceivedClosure, transferComplete: Future):
+def AcceptSendTransfer(transfer: c_void_p, dataReceivedClosure, transferComplete: Future):
     handle = chip.native.GetLibraryHandle()
     ctypes.pythonapi.Py_IncRef(ctypes.py_object(dataReceivedClosure))
     ctypes.pythonapi.Py_IncRef(ctypes.py_object(transferComplete))
-    return await builtins.chipStack.CallAsyncWithResult(
+    res = builtins.chipStack.Call(
         lambda: handle.pychip_Bdx_AcceptSendTransfer(transfer, dataReceivedClosure, transferComplete)
     )
+    if not res.is_success:
+        ctypes.pythonapi.Py_DecRef(ctypes.py_object(dataReceivedClosure))
+        ctypes.pythonapi.Py_DecRef(ctypes.py_object(transferComplete))
+    return res
 
 
-async def AcceptReceiveTransfer(transfer: c_void_p, data: bytes, transferComplete: Future):
+def AcceptReceiveTransfer(transfer: c_void_p, data: bytes, transferComplete: Future):
     handle = chip.native.GetLibraryHandle()
-    return await builtins.chipStack.CallAsyncWithResult(
+    return builtins.chipStack.Call(
         lambda: handle.pychip_Bdx_AcceptReceiveTransfer(transfer, ctypes.c_char_p(data), len(data), transferComplete)
     )
 
