@@ -149,7 +149,7 @@ CHIP_ERROR StatusIB::ToChipError() const
     return ChipError(ChipError::SdkPart::kIMGlobalStatus, to_underlying(mStatus));
 }
 
-void StatusIB::InitFromChipError(CHIP_ERROR aError)
+StatusIB::StatusIB(CHIP_ERROR aError)
 {
     if (aError.IsPart(ChipError::SdkPart::kIMClusterStatus))
     {
@@ -204,8 +204,7 @@ bool FormatStatusIBError(char * buf, uint16_t bufSize, CHIP_ERROR err)
     constexpr size_t formattedSize = max(sizeof(generalFormat) + statusNameMaxLength, sizeof(clusterFormat));
     char formattedString[formattedSize];
 
-    StatusIB status;
-    status.InitFromChipError(err);
+    StatusIB status(err);
     if (status.mClusterStatus.HasValue())
     {
         snprintf(formattedString, formattedSize, clusterFormat, status.mClusterStatus.Value());
