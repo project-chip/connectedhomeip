@@ -115,15 +115,16 @@ private:
     /**
      * @param[in, out] ctx Returns the Interaction Model status code which was user determined in the business logic.
      *                     If the input value is invalid, returns the Interaction Model status code of INVALID_COMMAND.
-     * @param[in] req the command parameters
+     * @param[in] req the command parameters.
      */
     void HandleSelectAreasCmd(HandlerContext & ctx, const Commands::SelectAreas::DecodableType & req);
 
     /**
      * @param[in, out] ctx Returns the Interaction Model status code which was user determined in the business logic.
      *                     If the input value is invalid, returns the Interaction Model status code of INVALID_COMMAND.
+     * @param[in] req the command parameters.
      */
-    void HandleSkipCurrentAreaCmd(HandlerContext & ctx);
+    void HandleSkipCurrentAreaCmd(HandlerContext & ctx, const Commands::SkipArea::DecodableType & req);
 
     //*************************************************************************
     // attribute notifications

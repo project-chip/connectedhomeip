@@ -316,7 +316,7 @@ struct MapStructureWrapper : public chip::app::Clusters::ServiceArea::Structs::M
      * @note Requirements regarding what combinations of fields and values are 'valid' are not checked by this class.
      * @note if aMapName is larger than kMapNameMaxSize, it will be truncated.
      */
-    void Set(uint8_t aMapId, const CharSpan & aMapName)
+    void Set(uint32_t aMapId, const CharSpan & aMapName)
     {
         mapID = aMapId;
 

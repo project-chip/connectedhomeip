@@ -123,7 +123,7 @@ void Instance::InvokeCommand(HandlerContext & handlerContext)
 
     case Commands::SkipArea::Id:
         return CommandHandlerInterface::HandleCommand<Commands::SkipArea::DecodableType>(
-            handlerContext, [this](HandlerContext & ctx, const auto & req) { HandleSkipCurrentAreaCmd(ctx); });
+            handlerContext, [this](HandlerContext & ctx, const auto & req) { HandleSkipCurrentAreaCmd(ctx, req); });
     }
 }
 
@@ -358,7 +358,7 @@ void Instance::HandleSelectAreasCmd(HandlerContext & ctx, const Commands::Select
     exitResponse(SelectAreasStatus::kSuccess, ""_span);
 }
 
-void Instance::HandleSkipCurrentAreaCmd(HandlerContext & ctx)
+void Instance::HandleSkipCurrentAreaCmd(HandlerContext & ctx, const Commands::SkipArea::DecodableType & req)
 {
     ChipLogDetail(Zcl, "Service Area: HandleSkipCurrentArea");
 
@@ -396,7 +396,7 @@ void Instance::HandleSkipCurrentAreaCmd(HandlerContext & ctx)
     char skipStatusBuffer[kMaxSizeStatusText];
     MutableCharSpan skipStatusText(skipStatusBuffer);
 
-    if (!mDelegate->HandleSkipCurrentArea(skipStatusText))
+    if (!mDelegate->HandleSkipCurrentArea(req.skippedArea, skipStatusText))
     {
         exitResponse(SkipAreaStatus::kInvalidInMode, skipStatusText);
         return;
