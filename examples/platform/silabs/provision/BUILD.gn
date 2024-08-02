@@ -47,6 +47,11 @@ source_set("storage") {
   }
 
   deps = [ "${chip_root}/src/lib" ]
+
   public_deps =
       [ "${chip_root}/src/platform/silabs/provision:provision-headers" ]
+
+  public_configs = [
+    "${chip_root}/examples/platform/silabs/efr32:test-event-trigger-config",
+  ]
 }

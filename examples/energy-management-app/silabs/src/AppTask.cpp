@@ -43,7 +43,7 @@
 
 #include <platform/CHIPDeviceLayer.h>
 
-#if SL_MATTER_TEST_EVENT_TRIGGER_ENABLED
+#ifdef SL_MATTER_TEST_EVENT_TRIGGER_ENABLED
 #include <app/TestEventTriggerDelegate.h>
 #include <app/clusters/device-energy-management-server/DeviceEnergyManagementTestEventTriggerHandler.h>
 #include <app/clusters/electrical-energy-measurement-server/EnergyReportingTestEventTriggerHandler.h>
@@ -73,7 +73,7 @@ using namespace ::chip::DeviceLayer::Silabs;
 using namespace ::chip::DeviceLayer::Internal;
 using namespace chip::TLV;
 
-#if SL_MATTER_TEST_EVENT_TRIGGER_ENABLED
+#ifdef SL_MATTER_TEST_EVENT_TRIGGER_ENABLED
 static EnergyEvseTestEventTriggerHandler sEnergyEvseTestEventTriggerHandler;
 static EnergyReportingTestEventTriggerHandler sEnergyReportingTestEventTriggerHandler;
 static DeviceEnergyManagementTestEventTriggerHandler sDeviceEnergyManagementTestEventTriggerHandler;
@@ -133,7 +133,7 @@ CHIP_ERROR AppTask::Init()
 
     ApplicationInit();
 
-#if SL_MATTER_TEST_EVENT_TRIGGER_ENABLED
+#ifdef SL_MATTER_TEST_EVENT_TRIGGER_ENABLED
     if (Server::GetInstance().GetTestEventTriggerDelegate() != nullptr)
     {
         Server::GetInstance().GetTestEventTriggerDelegate()->AddHandler(&sEnergyEvseTestEventTriggerHandler);
