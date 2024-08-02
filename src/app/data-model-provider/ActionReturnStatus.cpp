@@ -36,6 +36,14 @@ bool StatusIsTheSameAsError(const ClusterStatusCode & status, const CHIP_ERROR &
     auto cluster_code = status.GetClusterSpecificCode();
     if (!cluster_code.HasValue())
     {
+        // there exist Status::Success, however that may not be encoded
+        // as a CHIP_ERROR_IM_GLOBAL_STATUS_VALUE as it is just as well a CHIP_NO_ERROR.
+        // handle that separately
+        if ((status.GetStatus() == Status::Success) && (err == CHIP_NO_ERROR))
+        {
+            return true;
+        }
+
         return err == CHIP_ERROR_IM_GLOBAL_STATUS_VALUE(status.GetStatus());
     }
 

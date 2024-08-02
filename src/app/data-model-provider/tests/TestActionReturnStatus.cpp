@@ -42,6 +42,18 @@ TEST(TestActionReturnStatus, TestEquality)
     ASSERT_EQ(ActionReturnStatus(ClusterStatusCode::ClusterSpecificFailure(123)), CHIP_IM_CLUSTER_STATUS(123));
     ASSERT_EQ(ActionReturnStatus(ClusterStatusCode::ClusterSpecificFailure(123)), ClusterStatusCode::ClusterSpecificFailure(123));
     ASSERT_EQ(ActionReturnStatus(ClusterStatusCode::ClusterSpecificSuccess(123)), ClusterStatusCode::ClusterSpecificSuccess(123));
+
+    // Successes (without cluster-specific codes) are equivalent
+    ASSERT_EQ(ActionReturnStatus(Status::Success), Status::Success);
+    ASSERT_EQ(ActionReturnStatus(CHIP_NO_ERROR), Status::Success);
+    ASSERT_EQ(ActionReturnStatus(Status::Success), CHIP_NO_ERROR);
+
+    // status specific success is has more data, so there is no equality (i.e. an action return
+    // with specific success codes has more data than a simple success)
+    ASSERT_NE(ActionReturnStatus(ClusterStatusCode::ClusterSpecificSuccess(123)), CHIP_NO_ERROR);
+    ASSERT_NE(ActionReturnStatus(ClusterStatusCode::ClusterSpecificSuccess(123)), Status::Success);
+    ASSERT_NE(ActionReturnStatus(CHIP_NO_ERROR), ClusterStatusCode::ClusterSpecificSuccess(123));
+    ASSERT_NE(ActionReturnStatus(Status::Success), ClusterStatusCode::ClusterSpecificSuccess(123));
 }
 
 TEST(TestActionReturnStatus, TestIsError)
