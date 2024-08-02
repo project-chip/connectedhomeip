@@ -181,8 +181,8 @@ public:
      * Cluster-handling functions
      * Must be overridden by a child class per cluster configuration
      */
-    virtual bool CheckStateClusterHandler(void);
-    virtual CHIP_ERROR ProcessSetStateClusterHandler(void);
+    virtual bool CheckStateClusterHandler(void) { return false; }
+    virtual CHIP_ERROR ProcessSetStateClusterHandler(void) { return CHIP_ERROR_NOT_IMPLEMENTED; }
 
 private:
     inline static chip::CommonCaseDeviceServerInitParams initParams;
