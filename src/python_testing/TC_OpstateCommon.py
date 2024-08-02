@@ -1284,8 +1284,8 @@ class TC_OPSTATE_BASE():
         countdownTime = await self.read_expect_success(endpoint=endpoint, attribute=attributes.CountdownTime)
         if countdownTime is not NullValue:
             self.step(5)
-            logging.info('Test will now collect data for 30 seconds')
-            time.sleep(30)
+            logging.info('Test will now collect data for 10 seconds')
+            time.sleep(10)
 
             count = sub_handler.attribute_report_counts[attributes.CountdownTime]
             sub_handler.reset()
@@ -1296,24 +1296,21 @@ class TC_OPSTATE_BASE():
 
         self.step(6)
         countdownTime = await self.read_expect_success(endpoint=endpoint, attribute=attributes.CountdownTime)
-        if countdownTime is not NullValue:
-            attr_value = await self.read_expect_success(
-                endpoint=endpoint,
-                attribute=attributes.OperationalState)
-            if attr_value == cluster.Enums.OperationalStateEnum.kRunning:
-                self.step(7)
-                wait_count = 0
-                while (attr_value != cluster.Enums.OperationalStateEnum.kStopped) and (wait_count < 20):
-                    time.sleep(1)
-                    wait_count = wait_count + 1
-                    attr_value = await self.read_expect_success(
-                        endpoint=endpoint,
-                        attribute=attributes.OperationalState)
-                count = sub_handler.attribute_report_counts[attributes.CountdownTime]
-                asserts.assert_less_equal(count, 5, "Received more than 5 reports for CountdownTime")
-                asserts.assert_greater(count, 0, "Did not receive any reports for CountdownTime")
-            else:
-                self.skip_step(7)
+        attr_value = await self.read_expect_success(
+            endpoint=endpoint,
+            attribute=attributes.OperationalState)
+        if attr_value == cluster.Enums.OperationalStateEnum.kRunning and countdownTime is not NullValue:
+            self.step(7)
+            wait_count = 0
+            while (attr_value != cluster.Enums.OperationalStateEnum.kStopped) and (wait_count < 20):
+                time.sleep(1)
+                wait_count = wait_count + 1
+                attr_value = await self.read_expect_success(
+                    endpoint=endpoint,
+                    attribute=attributes.OperationalState)
+            count = sub_handler.attribute_report_counts[attributes.CountdownTime]
+            asserts.assert_less_equal(count, 5, "Received more than 5 reports for CountdownTime")
+            asserts.assert_greater(count, 0, "Did not receive any reports for CountdownTime")
         else:
             self.skip_step(7)
 
