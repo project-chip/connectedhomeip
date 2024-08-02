@@ -298,32 +298,6 @@ namespace Globals {
 // Global structs.
 namespace Structs {
 
-namespace LocationDescriptorStruct {
-enum class Fields : uint8_t
-{
-    kLocationName = 0,
-    kFloorNumber  = 1,
-    kAreaType     = 2,
-};
-
-struct Type
-{
-public:
-    chip::CharSpan locationName;
-    DataModel::Nullable<int16_t> floorNumber;
-    DataModel::Nullable<Globals::AreaTypeTag> areaType;
-
-    CHIP_ERROR Decode(TLV::TLVReader & reader);
-
-    static constexpr bool kIsFabricScoped = false;
-
-    CHIP_ERROR Encode(TLV::TLVWriter & aWriter, TLV::Tag aTag) const;
-};
-
-using DecodableType = Type;
-
-} // namespace LocationDescriptorStruct
-
 namespace TestGlobalStruct {
 enum class Fields : uint8_t
 {
@@ -349,6 +323,32 @@ public:
 using DecodableType = Type;
 
 } // namespace TestGlobalStruct
+
+namespace LocationDescriptorStruct {
+enum class Fields : uint8_t
+{
+    kLocationName = 0,
+    kFloorNumber  = 1,
+    kAreaType     = 2,
+};
+
+struct Type
+{
+public:
+    chip::CharSpan locationName;
+    DataModel::Nullable<int16_t> floorNumber;
+    DataModel::Nullable<Globals::AreaTypeTag> areaType;
+
+    CHIP_ERROR Decode(TLV::TLVReader & reader);
+
+    static constexpr bool kIsFabricScoped = false;
+
+    CHIP_ERROR Encode(TLV::TLVWriter & aWriter, TLV::Tag aTag) const;
+};
+
+using DecodableType = Type;
+
+} // namespace LocationDescriptorStruct
 
 } // namespace Structs
 

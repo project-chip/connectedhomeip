@@ -267,21 +267,6 @@ class Globals:
 
     class Structs:
         @dataclass
-        class LocationDescriptorStruct(ClusterObject):
-            @ChipUtility.classproperty
-            def descriptor(cls) -> ClusterObjectDescriptor:
-                return ClusterObjectDescriptor(
-                    Fields=[
-                        ClusterObjectFieldDescriptor(Label="locationName", Tag=0, Type=str),
-                        ClusterObjectFieldDescriptor(Label="floorNumber", Tag=1, Type=typing.Union[Nullable, int]),
-                        ClusterObjectFieldDescriptor(Label="areaType", Tag=2, Type=typing.Union[Nullable, Globals.Enums.AreaTypeTag]),
-                    ])
-
-            locationName: 'str' = ""
-            floorNumber: 'typing.Union[Nullable, int]' = NullValue
-            areaType: 'typing.Union[Nullable, Globals.Enums.AreaTypeTag]' = NullValue
-
-        @dataclass
         class TestGlobalStruct(ClusterObject):
             @ChipUtility.classproperty
             def descriptor(cls) -> ClusterObjectDescriptor:
@@ -295,6 +280,21 @@ class Globals:
             name: 'str' = ""
             myBitmap: 'typing.Union[Nullable, uint]' = NullValue
             myEnum: 'typing.Union[None, Nullable, Globals.Enums.TestGlobalEnum]' = None
+
+        @dataclass
+        class LocationDescriptorStruct(ClusterObject):
+            @ChipUtility.classproperty
+            def descriptor(cls) -> ClusterObjectDescriptor:
+                return ClusterObjectDescriptor(
+                    Fields=[
+                        ClusterObjectFieldDescriptor(Label="locationName", Tag=0, Type=str),
+                        ClusterObjectFieldDescriptor(Label="floorNumber", Tag=1, Type=typing.Union[Nullable, int]),
+                        ClusterObjectFieldDescriptor(Label="areaType", Tag=2, Type=typing.Union[Nullable, Globals.Enums.AreaTypeTag]),
+                    ])
+
+            locationName: 'str' = ""
+            floorNumber: 'typing.Union[Nullable, int]' = NullValue
+            areaType: 'typing.Union[Nullable, Globals.Enums.AreaTypeTag]' = NullValue
 
 
 
