@@ -652,7 +652,7 @@ ActionReturnStatus CustomDataModel::WriteAttribute(const WriteAttributeRequest &
         case WriteResponseDirective::kSendClusterSpecificSuccess:
             return InteractionModel::ClusterStatusCode::ClusterSpecificSuccess(kExampleClusterSpecificSuccess);
         case WriteResponseDirective::kSendClusterSpecificFailure:
-            return InteractionModel::ClusterStatusCode::ClusterSpecificFailure(kExampleClusterSpecificSuccess);
+            return InteractionModel::ClusterStatusCode::ClusterSpecificFailure(kExampleClusterSpecificFailure);
         default:
             // this should not be reached, our tests only set up these for this test case
             chipDie();
