@@ -20,12 +20,16 @@
 
 #include "AppTask.h"
 #include "CHIPDeviceManager.h"
-#include "ICDUtil.h"
+#include <app-common/zap-generated/attributes/Accessors.h>
 #include <app/InteractionModelEngine.h>
 #include <app/util/attribute-storage.h>
 #include <app/clusters/door-lock-server/door-lock-server.h>
 #include "LockManager.h"
 #include <app/data-model/Nullable.h>
+
+#if !CHIP_CONFIG_ENABLE_ICD_SERVER
+#include "ICDUtil.h"
+#endif
 
 #ifdef ENABLE_CHIP_SHELL
 #include <lib/shell/Engine.h>
@@ -34,9 +38,15 @@ using namespace chip::Shell;
 #define MATTER_CLI_LOG(message) (streamer_printf(streamer_get(), message))
 #endif /* ENABLE_CHIP_SHELL */
 
+#ifndef APP_DEVICE_TYPE_ENDPOINT
+#define APP_DEVICE_TYPE_ENDPOINT 1
+#endif
+
 using namespace chip;
 using namespace ::chip::DeviceLayer;
 using namespace chip::app::Clusters;
+using namespace chip::app::DataModel;
+using namespace chip::Protocols::InteractionModel;
 
 #ifdef ENABLE_CHIP_SHELL
 
@@ -105,7 +115,9 @@ void LockApp::AppTask::PreInitMatterStack()
 
 void LockApp::AppTask::PostInitMatterStack()
 {
+#if !CHIP_CONFIG_ENABLE_ICD_SERVER
     chip::app::InteractionModelEngine::GetInstance()->RegisterReadHandlerAppCallback(&chip::NXP::App::GetICDUtil());
+#endif
 }
 
 void LockApp::AppTask::AppMatter_RegisterCustomCliCommands()
@@ -121,6 +133,25 @@ void LockApp::AppTask::AppMatter_RegisterCustomCliCommands()
 #endif
 }
 
+bool LockApp::AppTask::CheckStateClusterHandler(void)
+{
+    Nullable<DoorLock::DlLockState> state(DlLockState::kUnlocked);
+    DoorLock::Attributes::LockState::Get(APP_DEVICE_TYPE_ENDPOINT, state);
+    return (state.Value() == DlLockState::kUnlocked);
+}
+
+CHIP_ERROR LockApp::AppTask::ProcessSetStateClusterHandler(void)
+{
+    Nullable<DoorLock::DlLockState> state;
+    DoorLock::Attributes::LockState::Get(APP_DEVICE_TYPE_ENDPOINT, state);
+    auto newState = (state.Value() == DlLockState::kUnlocked) ? DlLockState::kLocked : DlLockState::kUnlocked;
+    auto status = DoorLock::Attributes::LockState::Set(APP_DEVICE_TYPE_ENDPOINT, newState);
+
+    VerifyOrReturnError(status == Status::Success, CHIP_ERROR_WRITE_FAILED);
+
+    return CHIP_NO_ERROR;
+}
+
 // This returns an instance of this class.
 LockApp::AppTask & LockApp::AppTask::GetDefaultInstance()
 {
@@ -132,4 +163,3 @@ chip::NXP::App::AppTaskBase & chip::NXP::App::GetAppTask()
 {
     return LockApp::AppTask::GetDefaultInstance();
 }
-

@@ -31,6 +31,10 @@
 
 #include "LockManager.h"
 
+#if CONFIG_ENABLE_FEEDBACK
+#include "UserInterfaceFeedback.h"
+#endif
+
 using namespace ::chip;
 using namespace chip::app::Clusters;
 using namespace chip::app::Clusters::DoorLock;
@@ -143,6 +147,9 @@ void emberAfDoorLockClusterInitCallback(EndpointId endpoint)
 {
     DoorLockServer::Instance().InitServer(endpoint);
     LockManager::Instance().InitEndpoint(endpoint);
+#if CONFIG_ENABLE_FEEDBACK
+    FeedbackMgr().RestoreState();
+#endif
 }
 
 void emberAfPluginDoorLockOnAutoRelock(chip::EndpointId endpointId)

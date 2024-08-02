@@ -33,6 +33,11 @@
 
 #include <lib/support/CodeUtils.h>
 
+#if CONFIG_ENABLE_FEEDBACK
+#include "UserInterfaceFeedback.h"
+#endif
+
+
 using namespace chip::app;
 void OnTriggerEffect(::Identify * identify)
 {
@@ -85,6 +90,9 @@ void LockApp::DeviceCallbacks::PostAttributeChangeCallback(EndpointId endpointId
                     "endpointId " ChipLogFormatMEI " clusterId " ChipLogFormatMEI " attribute ID: " ChipLogFormatMEI
                     " Type: %u Value: %u, length %u",
                     ChipLogValueMEI(endpointId), ChipLogValueMEI(clusterId), ChipLogValueMEI(attributeId), type, *value, size);
+#if CONFIG_ENABLE_FEEDBACK
+    FeedbackMgr().RestoreState();
+#endif
 }
 
 // This returns an instance of this class.
