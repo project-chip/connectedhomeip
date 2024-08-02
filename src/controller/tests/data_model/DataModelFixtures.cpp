@@ -17,7 +17,7 @@
  */
 
 #include "DataModelFixtures.h"
-#include "lib/core/CHIPError.h"
+#include "app/data-model-provider/ActionReturnStatus.h"
 
 #include <app-common/zap-generated/cluster-objects.h>
 #include <app-common/zap-generated/ids/Clusters.h>
@@ -504,7 +504,7 @@ CustomDataModel & CustomDataModel::Instance()
     return model;
 }
 
-CHIP_ERROR CustomDataModel::ReadAttribute(const ReadAttributeRequest & request, AttributeValueEncoder & encoder)
+ActionReturnStatus CustomDataModel::ReadAttribute(const ReadAttributeRequest & request, AttributeValueEncoder & encoder)
 {
     AttributeEncodeState mutableState(&encoder.GetState()); // provide a state copy to start.
 
@@ -532,7 +532,7 @@ CHIP_ERROR CustomDataModel::ReadAttribute(const ReadAttributeRequest & request, 
     return err;
 }
 
-CHIP_ERROR CustomDataModel::WriteAttribute(const WriteAttributeRequest & request, AttributeValueDecoder & decoder)
+ActionReturnStatus CustomDataModel::WriteAttribute(const WriteAttributeRequest & request, AttributeValueDecoder & decoder)
 {
     static ListIndex listStructOctetStringElementCount = 0;
 
@@ -662,7 +662,8 @@ CHIP_ERROR CustomDataModel::WriteAttribute(const WriteAttributeRequest & request
     return CHIP_ERROR_UNSUPPORTED_CHIP_FEATURE;
 }
 
-CHIP_ERROR CustomDataModel::Invoke(const InvokeRequest & request, chip::TLV::TLVReader & input_arguments, CommandHandler * handler)
+ActionReturnStatus CustomDataModel::Invoke(const InvokeRequest & request, chip::TLV::TLVReader & input_arguments,
+                                           CommandHandler * handler)
 {
     return CHIP_ERROR_NOT_IMPLEMENTED;
 }
