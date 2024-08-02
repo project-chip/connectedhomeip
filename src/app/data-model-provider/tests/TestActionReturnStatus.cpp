@@ -152,5 +152,4 @@ TEST(TestActionReturnStatus, TestCString)
     status = ClusterStatusCode::ClusterSpecificFailure(32);
     ASSERT_STREQ(status.c_str(buffer), "Status<1>, Code 32");
 #endif
-
 }
