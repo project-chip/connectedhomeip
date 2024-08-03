@@ -146,7 +146,7 @@ struct FactoryInitParams
     Ble::BleLayer * bleLayer = nullptr;
 #endif
 #if CHIP_DEVICE_CONFIG_ENABLE_WIFIPAF
-    Transport::WiFiPAFLayer * wifipaf_layer = nullptr;
+    WiFiPAF::WiFiPAFLayer * wifipaf_layer = nullptr;
 #endif
 
     //
