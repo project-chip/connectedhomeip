@@ -59,7 +59,6 @@ CHIP_ERROR WiFiPAFBase::Init(const WiFiPAFListenParameters & param)
         if (!DeviceLayer::ConnectivityMgrImpl().IsWiFiManagementStarted())
         {
             ChipLogError(Inet, "Wi-Fi Management taking too long to start - device configuration will be reset.");
-            return CHIP_ERROR_INTERNAL;
         }
         ChipLogProgress(NotSpecified, "Wi-Fi Management is started");
     }
