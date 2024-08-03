@@ -49,7 +49,7 @@
 
 #include <mutex>
 #if CHIP_DEVICE_CONFIG_ENABLE_WIFIPAF
-#include <transport/raw/WiFiPAF.h>
+#include <wifipaf/WiFiPAFLayer.h>
 #endif
 #endif
 
@@ -144,12 +144,12 @@ public:
     CHIP_ERROR _WiFiPAFConnect(const SetupDiscriminator & connDiscriminator, void * appState, OnConnectionCompleteFunct onSuccess,
                                OnConnectionErrorFunct onError);
     CHIP_ERROR _WiFiPAFCancelConnect();
+    CHIP_ERROR _WiFiPAFCancelIncompleteConnect();
     void OnDiscoveryResult(gboolean success, GVariant * obj);
     void OnNanReceive(GVariant * obj);
     void OnNanSubscribeTerminated(gint term_subscribe_id, gint reason);
     CHIP_ERROR _WiFiPAFSend(chip::System::PacketBufferHandle && msgBuf);
-    Transport::WiFiPAFBase * _GetWiFiPAF();
-    void _SetWiFiPAF(Transport::WiFiPAFBase * pWiFiPAF);
+    WiFiPAF::WiFiPAFLayer * _GetWiFiPAF();
 #endif
 
     void PostNetworkConnect();
@@ -250,7 +250,7 @@ private:
 
     OnConnectionCompleteFunct mOnPafSubscribeComplete;
     OnConnectionErrorFunct mOnPafSubscribeError;
-    Transport::WiFiPAFBase * pmWiFiPAF;
+    WiFiPAF::WiFiPAFLayer * pmWiFiPAF;
     void * mAppState;
     CHIP_ERROR _SetWiFiPAFAdvertisingEnabled(WiFiPAFAdvertiseParam & args);
     CHIP_ERROR _WiFiPAFPublish(WiFiPAFAdvertiseParam & args);
