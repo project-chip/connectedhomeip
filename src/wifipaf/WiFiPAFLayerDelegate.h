@@ -31,7 +31,7 @@ namespace WiFiPAF {
 class WiFiPAFLayerDelegate
 {
 public:
-    virtual ~WiFiPAFLayerDelegate() = default;
+    virtual ~WiFiPAFLayerDelegate()                                          = default;
     virtual void OnWiFiPAFMessageReceived(System::PacketBufferHandle && msg) = 0;
 };
 
