@@ -1,12 +1,231 @@
 // This IDL was generated automatically by ZAP.
 // It is for view/code review purposes only.
 
+enum AreaTypeTag : enum8 {
+  kAisle = 0;
+  kAttic = 1;
+  kBackDoor = 2;
+  kBackYard = 3;
+  kBalcony = 4;
+  kBallroom = 5;
+  kBathroom = 6;
+  kBedroom = 7;
+  kBorder = 8;
+  kBoxroom = 9;
+  kBreakfastRoom = 10;
+  kCarport = 11;
+  kCellar = 12;
+  kCloakroom = 13;
+  kCloset = 14;
+  kConservatory = 15;
+  kCorridor = 16;
+  kCraftRoom = 17;
+  kCupboard = 18;
+  kDeck = 19;
+  kDen = 20;
+  kDining = 21;
+  kDrawingRoom = 22;
+  kDressingRoom = 23;
+  kDriveway = 24;
+  kElevator = 25;
+  kEnsuite = 26;
+  kEntrance = 27;
+  kEntryway = 28;
+  kFamilyRoom = 29;
+  kFoyer = 30;
+  kFrontDoor = 31;
+  kFrontYard = 32;
+  kGameRoom = 33;
+  kGarage = 34;
+  kGarageDoor = 35;
+  kGarden = 36;
+  kGardenDoor = 37;
+  kGuestBathroom = 38;
+  kGuestBedroom = 39;
+  kGuestRestroom = 40;
+  kGuestRoom = 41;
+  kGym = 42;
+  kHallway = 43;
+  kHearthRoom = 44;
+  kKidsRoom = 45;
+  kKidsBedroom = 46;
+  kKitchen = 47;
+  kLarder = 48;
+  kLaundryRoom = 49;
+  kLawn = 50;
+  kLibrary = 51;
+  kLivingRoom = 52;
+  kLounge = 53;
+  kMediaTVRoom = 54;
+  kMudRoom = 55;
+  kMusicRoom = 56;
+  kNursery = 57;
+  kOffice = 58;
+  kOutdoorKitchen = 59;
+  kOutside = 60;
+  kPantry = 61;
+  kParkingLot = 62;
+  kParlor = 63;
+  kPatio = 64;
+  kPlayRoom = 65;
+  kPoolRoom = 66;
+  kPorch = 67;
+  kPrimaryBathroom = 68;
+  kPrimaryBedroom = 69;
+  kRamp = 70;
+  kReceptionRoom = 71;
+  kRecreationRoom = 72;
+  kRestroom = 73;
+  kRoof = 74;
+  kSauna = 75;
+  kScullery = 76;
+  kSewingRoom = 77;
+  kShed = 78;
+  kSideDoor = 79;
+  kSideYard = 80;
+  kSittingRoom = 81;
+  kSnug = 82;
+  kSpa = 83;
+  kStaircase = 84;
+  kSteamRoom = 85;
+  kStorageRoom = 86;
+  kStudio = 87;
+  kStudy = 88;
+  kSunRoom = 89;
+  kSwimmingPool = 90;
+  kTerrace = 91;
+  kUtilityRoom = 92;
+  kWard = 93;
+  kWorkshop = 94;
+}
+
+enum FloorSurfaceTag : enum8 {
+  kCarpet = 0;
+  kCeramic = 1;
+  kConcrete = 2;
+  kCork = 3;
+  kDeepCarpet = 4;
+  kDirt = 5;
+  kEngineeredWood = 6;
+  kGlass = 7;
+  kGrass = 8;
+  kHardwood = 9;
+  kLaminate = 10;
+  kLinoleum = 11;
+  kMat = 12;
+  kMetal = 13;
+  kPlastic = 14;
+  kPolishedConcrete = 15;
+  kRubber = 16;
+  kRug = 17;
+  kSand = 18;
+  kStone = 19;
+  kTatami = 20;
+  kTerrazzo = 21;
+  kTile = 22;
+  kVinyl = 23;
+}
+
+enum LandmarkTag : enum8 {
+  kAirConditioner = 0;
+  kAirPurifier = 1;
+  kBackDoor = 2;
+  kBarStool = 3;
+  kBathMat = 4;
+  kBathtub = 5;
+  kBed = 6;
+  kBookshelf = 7;
+  kChair = 8;
+  kChristmasTree = 9;
+  kCoatRack = 10;
+  kCoffeeTable = 11;
+  kCookingRange = 12;
+  kCouch = 13;
+  kCountertop = 14;
+  kCradle = 15;
+  kCrib = 16;
+  kDesk = 17;
+  kDiningTable = 18;
+  kDishwasher = 19;
+  kDoor = 20;
+  kDresser = 21;
+  kLaundryDryer = 22;
+  kFan = 23;
+  kFireplace = 24;
+  kFreezer = 25;
+  kFrontDoor = 26;
+  kHighChair = 27;
+  kKitchenIsland = 28;
+  kLamp = 29;
+  kLitterBox = 30;
+  kMirror = 31;
+  kNightstand = 32;
+  kOven = 33;
+  kPetBed = 34;
+  kPetBowl = 35;
+  kPetCrate = 36;
+  kRefrigerator = 37;
+  kScratchingPost = 38;
+  kShoeRack = 39;
+  kShower = 40;
+  kSideDoor = 41;
+  kSink = 42;
+  kSofa = 43;
+  kStove = 44;
+  kTable = 45;
+  kToilet = 46;
+  kTrashCan = 47;
+  kLaundryWasher = 48;
+  kWindow = 49;
+  kWineCooler = 50;
+}
+
+enum PositionTag : enum8 {
+  kLeft = 0;
+  kRight = 1;
+  kTop = 2;
+  kBottom = 3;
+  kMiddle = 4;
+  kRow = 5;
+  kColumn = 6;
+  kUnder = 7;
+  kNextTo = 8;
+  kAround = 9;
+  kOn = 10;
+  kAbove = 11;
+  kFrontOf = 12;
+  kBehind = 13;
+}
+
+enum TestGlobalEnum : enum8 {
+  kSomeValue = 0;
+  kSomeOtherValue = 1;
+  kFinalValue = 2;
+}
+
+bitmap TestGlobalBitmap : bitmap32 {
+  kFirstBit = 0x1;
+  kSecondBit = 0x2;
+}
+
+struct TestGlobalStruct {
+  char_string<128> name = 0;
+  nullable TestGlobalBitmap myBitmap = 1;
+  optional nullable TestGlobalEnum myEnum = 2;
+}
+
+struct LocationDescriptorStruct {
+  char_string<128> locationName = 0;
+  nullable int16s floorNumber = 1;
+  nullable AreaTypeTag areaType = 2;
+}
+
 /** The Access Control Cluster exposes a data model view of a
       Node's Access Control List (ACL), which codifies the rules used to manage
       and enforce Access Control for the Node's endpoints and their associated
       cluster instances. */
 cluster AccessControl = 31 {
-  revision 1; // NOTE: Default/not specifically set
+  revision 2;
 
   enum AccessControlEntryAuthModeEnum : enum8 {
     kPASE = 1;
@@ -22,10 +241,40 @@ cluster AccessControl = 31 {
     kAdminister = 5;
   }
 
+  enum AccessRestrictionTypeEnum : enum8 {
+    kAttributeAccessForbidden = 0;
+    kAttributeWriteForbidden = 1;
+    kCommandForbidden = 2;
+    kEventForbidden = 3;
+  }
+
   enum ChangeTypeEnum : enum8 {
     kChanged = 0;
     kAdded = 1;
     kRemoved = 2;
+  }
+
+  bitmap Feature : bitmap32 {
+    kExtension = 0x1;
+    kManagedDevice = 0x2;
+  }
+
+  struct AccessRestrictionStruct {
+    AccessRestrictionTypeEnum type = 0;
+    nullable int32u id = 1;
+  }
+
+  struct CommissioningAccessRestrictionEntryStruct {
+    endpoint_no endpoint = 0;
+    cluster_id cluster = 1;
+    AccessRestrictionStruct restrictions[] = 2;
+  }
+
+  fabric_scoped struct AccessRestrictionEntryStruct {
+    fabric_sensitive endpoint_no endpoint = 0;
+    fabric_sensitive cluster_id cluster = 1;
+    fabric_sensitive AccessRestrictionStruct restrictions[] = 2;
+    fabric_idx fabricIndex = 254;
   }
 
   struct AccessControlTargetStruct {
@@ -63,17 +312,41 @@ cluster AccessControl = 31 {
     fabric_idx fabricIndex = 254;
   }
 
+  fabric_sensitive info event access(read: administer) AccessRestrictionEntryChanged = 2 {
+    fabric_idx fabricIndex = 254;
+  }
+
+  fabric_sensitive info event access(read: administer) FabricRestrictionReviewUpdate = 3 {
+    int64u token = 0;
+    nullable long_char_string instruction = 1;
+    nullable long_char_string redirectURL = 2;
+    fabric_idx fabricIndex = 254;
+  }
+
   attribute access(read: administer, write: administer) AccessControlEntryStruct acl[] = 0;
   attribute access(read: administer, write: administer) optional AccessControlExtensionStruct extension[] = 1;
   readonly attribute int16u subjectsPerAccessControlEntry = 2;
   readonly attribute int16u targetsPerAccessControlEntry = 3;
   readonly attribute int16u accessControlEntriesPerFabric = 4;
+  readonly attribute optional CommissioningAccessRestrictionEntryStruct commissioningARL[] = 5;
+  readonly attribute optional AccessRestrictionEntryStruct arl[] = 6;
   readonly attribute command_id generatedCommandList[] = 65528;
   readonly attribute command_id acceptedCommandList[] = 65529;
   readonly attribute event_id eventList[] = 65530;
   readonly attribute attrib_id attributeList[] = 65531;
   readonly attribute bitmap32 featureMap = 65532;
   readonly attribute int16u clusterRevision = 65533;
+
+  request struct ReviewFabricRestrictionsRequest {
+    CommissioningAccessRestrictionEntryStruct arl[] = 0;
+  }
+
+  response struct ReviewFabricRestrictionsResponse = 1 {
+    int64u token = 0;
+  }
+
+  /** This command signals to the service associated with the device vendor that the fabric administrator would like a review of the current restrictions on the accessing fabric. */
+  fabric command access(invoke: administer) ReviewFabricRestrictions(ReviewFabricRestrictionsRequest): DefaultSuccess = 0;
 }
 
 /** This cluster is used to manage global aspects of the Commissioning flow. */
@@ -86,12 +359,19 @@ cluster GeneralCommissioning = 48 {
     kInvalidAuthentication = 2;
     kNoFailSafe = 3;
     kBusyWithOtherAdmin = 4;
+    kRequiredTCNotAccepted = 5;
+    kTCAcknowledgementsNotReceived = 6;
+    kTCMinVersionNotMet = 7;
   }
 
   enum RegulatoryLocationTypeEnum : enum8 {
     kIndoor = 0;
     kOutdoor = 1;
     kIndoorOutdoor = 2;
+  }
+
+  bitmap Feature : bitmap32 {
+    kTermsAndConditions = 0x1;
   }
 
   struct BasicCommissioningInfo {
@@ -104,6 +384,10 @@ cluster GeneralCommissioning = 48 {
   readonly attribute RegulatoryLocationTypeEnum regulatoryConfig = 2;
   readonly attribute RegulatoryLocationTypeEnum locationCapability = 3;
   readonly attribute boolean supportsConcurrentConnection = 4;
+  provisional readonly attribute access(read: administer) optional int16u TCAcceptedVersion = 5;
+  provisional readonly attribute access(read: administer) optional int16u TCMinRequiredVersion = 6;
+  provisional readonly attribute access(read: administer) optional bitmap16 TCAcknowledgements = 7;
+  provisional readonly attribute access(read: administer) optional boolean TCAcknowledgementsRequired = 8;
   readonly attribute command_id generatedCommandList[] = 65528;
   readonly attribute command_id acceptedCommandList[] = 65529;
   readonly attribute event_id eventList[] = 65530;
@@ -137,12 +421,23 @@ cluster GeneralCommissioning = 48 {
     char_string debugText = 1;
   }
 
+  request struct SetTCAcknowledgementsRequest {
+    int16u TCVersion = 0;
+    bitmap16 TCUserResponse = 1;
+  }
+
+  response struct SetTCAcknowledgementsResponse = 7 {
+    CommissioningErrorEnum errorCode = 0;
+  }
+
   /** Arm the persistent fail-safe timer with an expiry time of now + ExpiryLengthSeconds using device clock */
   command access(invoke: administer) ArmFailSafe(ArmFailSafeRequest): ArmFailSafeResponse = 0;
   /** Set the regulatory configuration to be used during commissioning */
   command access(invoke: administer) SetRegulatoryConfig(SetRegulatoryConfigRequest): SetRegulatoryConfigResponse = 2;
   /** Signals the Server that the Client has successfully completed all steps of Commissioning/Recofiguration needed during fail-safe period. */
   fabric command access(invoke: administer) CommissioningComplete(): CommissioningCompleteResponse = 4;
+  /** This command sets the user acknowledgements received in the Enhanced Setup Flow Terms and Conditions into the node. */
+  command access(invoke: administer) SetTCAcknowledgements(SetTCAcknowledgementsRequest): SetTCAcknowledgementsResponse = 6;
 }
 
 /** Functionality to configure, enable, disable network credentials and access on a Matter device. */

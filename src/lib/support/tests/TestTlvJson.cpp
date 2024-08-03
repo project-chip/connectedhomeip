@@ -15,11 +15,12 @@
  *    limitations under the License.
  */
 
-#include <gtest/gtest.h>
+#include <pw_unit_test/framework.h>
 
 #include <app-common/zap-generated/cluster-objects.h>
 #include <app/data-model/Decode.h>
 #include <app/data-model/Encode.h>
+#include <lib/core/StringBuilderAdapters.h>
 #include <lib/support/jsontlv/TlvJson.h>
 #include <system/SystemPacketBuffer.h>
 #include <system/TLVPacketBufferBackingStore.h>

@@ -1,0 +1,358 @@
+/*
+ *
+ *    Copyright (c) 2024 Project CHIP Authors
+ *    All rights reserved.
+ *
+ *    Licensed under the Apache License, Version 2.0 (the "License");
+ *    you may not use this file except in compliance with the License.
+ *    You may obtain a copy of the License at
+ *
+ *        http://www.apache.org/licenses/LICENSE-2.0
+ *
+ *    Unless required by applicable law or agreed to in writing, software
+ *    distributed under the License is distributed on an "AS IS" BASIS,
+ *    WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ *    See the License for the specific language governing permissions and
+ *    limitations under the License.
+ */
+
+#pragma once
+
+#include "service-area-cluster-objects.h"
+#include "service-area-delegate.h"
+#include <app-common/zap-generated/cluster-objects.h>
+
+#include <app/AttributeAccessInterface.h>
+#include <app/CommandHandlerInterface.h>
+#include <app/ConcreteCommandPath.h>
+#include <app/util/af-types.h>
+
+#include <app/util/basic-types.h>
+#include <app/util/config.h>
+#include <lib/support/Span.h>
+#include <platform/CHIPDeviceConfig.h>
+
+namespace chip {
+namespace app {
+namespace Clusters {
+namespace ServiceArea {
+
+/**
+ * Instance is a class that represents an instance of the generic Service Area cluster.
+ * It implements AttributeAccessInterface and CommandHandlerInterface so it can
+ * handle commands for any implementation of the location cluster.
+ * Custom implementations of the Service Area cluster override functions in the Delegate class
+ * must be provided to operate with specific devices.
+ */
+class Instance : public AttributeAccessInterface, public CommandHandlerInterface
+{
+public:
+    /**
+     * @brief Creates a Service Area cluster instance. The Init() method needs to be called for this instance
+     * to be registered and called by the interaction model at the appropriate times.
+     * @param[in] aDelegate A pointer to the delegate to be used by this server.
+     * @param[in] aEndpointId The endpoint on which this cluster exists. This must match the zap configuration.
+     * @param[in] aFeature The supported features of this Service Area Cluster.
+     *
+     * @note the caller must ensure that the delegate lives throughout the instance's lifetime.
+     */
+    Instance(Delegate * aDelegate, EndpointId aEndpointId, BitMask<ServiceArea::Feature> aFeature);
+
+    ~Instance() override;
+
+    /**
+     * Stop this class objects from being copied.
+     */
+    Instance(const Instance &)             = delete;
+    Instance & operator=(const Instance &) = delete;
+
+    /**
+     * @brief Initialise the Service Area server instance.
+     * @return an error if the given endpoint and cluster Id have not been enabled in zap or if the
+     *         CommandHandler or AttributeHandler registration fails, else CHIP_NO_ERROR.
+     */
+    CHIP_ERROR Init();
+
+private:
+    Delegate * mDelegate;
+    EndpointId mEndpointId;
+    ClusterId mClusterId;
+
+    // Attribute Data Store
+    DataModel::Nullable<uint32_t> mCurrentLocation;
+    DataModel::Nullable<uint32_t> mEstimatedEndTime;
+    BitMask<ServiceArea::Feature> mFeature;
+
+    //*************************************************************************
+    // core functions
+
+    /**
+     * @brief Read Attribute - inherited from AttributeAccessInterface.
+     * @return appropriately mapped CHIP_ERROR if applicable.
+     */
+    CHIP_ERROR Read(const ConcreteReadAttributePath & aPath, AttributeValueEncoder & aEncoder) override;
+
+    /**
+     * @brief Command handler - inherited from CommandHandlerInterface.
+     * @param[in, out] ctx command context.
+     */
+    void InvokeCommand(HandlerContext & ctx) override;
+
+    //*************************************************************************
+    // attribute readers
+
+    CHIP_ERROR ReadSupportedLocations(chip::app::AttributeValueEncoder & aEncoder);
+
+    CHIP_ERROR ReadSupportedMaps(chip::app::AttributeValueEncoder & aEncoder);
+
+    CHIP_ERROR ReadSelectedLocations(chip::app::AttributeValueEncoder & aEncoder);
+
+    CHIP_ERROR ReadProgress(chip::app::AttributeValueEncoder & aEncoder);
+
+    //*************************************************************************
+    // command handlers
+
+    /**
+     * @param[in, out] ctx Returns the Interaction Model status code which was user determined in the business logic.
+     *                     If the input value is invalid, returns the Interaction Model status code of INVALID_COMMAND.
+     * @param[in] req the command parameters
+     */
+    void HandleSelectLocationsCmd(HandlerContext & ctx, const Commands::SelectLocations::DecodableType & req);
+
+    /**
+     * @param[in, out] ctx Returns the Interaction Model status code which was user determined in the business logic.
+     *                     If the input value is invalid, returns the Interaction Model status code of INVALID_COMMAND.
+     */
+    void HandleSkipCurrentLocationCmd(HandlerContext & ctx);
+
+    //*************************************************************************
+    // attribute notifications
+
+    void NotifySupportedLocationsChanged();
+    void NotifySupportedMapsChanged();
+    void NotifySelectedLocationsChanged();
+    void NotifyCurrentLocationChanged();
+    void NotifyEstimatedEndTimeChanged();
+    void NotifyProgressChanged();
+
+    //*************************************************************************
+    // Supported Locations manipulators
+
+    /**
+     * @return true if a location with the aLocationId ID exists in the supported locations attribute. False otherwise.
+     */
+    bool IsSupportedLocation(uint32_t aLocationId);
+
+    /**
+     * @brief Check if the given location adheres to the restrictions required by the supported locations attribute.
+     * @return true if the aLocation meets all checks.
+     */
+    bool IsValidSupportedLocation(const LocationStructureWrapper & aLocation);
+
+    /**
+     * @brief check if aLocation is unique with regard to supported locations.
+     * @param[in] aLocation the location to check.
+     * @param[out] ignoreLocationId if true, we do not check if the location ID is unique.
+     * @return true if there isn't a location in supported locations that matches aLocation.
+     *
+     * @note This method may ignore checking the MapId uniqueness. This depends on whether the SupportedMaps attribute is null.
+     */
+    bool IsUniqueSupportedLocation(const LocationStructureWrapper & aLocation, bool ignoreLocationId);
+
+    /**
+     * @brief Check if changing the estimated end time attribute to aEstimatedEndTime requires the change to be reported.
+     * @param aEstimatedEndTime The new estimated end time.
+     * @return true if the change requires a report.
+     */
+    bool ReportEstimatedEndTimeChange(const DataModel::Nullable<uint32_t> & aEstimatedEndTime);
+
+public:
+    /**
+     * @brief Add new location to the supported locations list.
+     * @param[in] aLocationId unique identifier of this location.
+     * @param[in] aMapId identifier of supported map.
+     * @param[in] aLocationName human readable name for this location (empty string if not used).
+     * @param[in] aFloorNumber represents floor level - negative values for below ground.
+     * @param[in] aAreaType common namespace Area tag - indicates an association of the location with an indoor or outdoor area of a
+     * home.
+     * @param[in] aLandmarkTag common namespace Landmark tag - indicates an association of the location with a home landmark.
+     * @param[in] aPositionTag common namespace Position tag - indicates the position of the location with respect to the landmark.
+     * @param[in] aSurfaceTag common namespace Floor Surface tag - indicates an association of the location with a surface type.
+     * @return true if the new location passed validation checks and was successfully added to the list.
+     *
+     * @note if aLocationName is larger than kLocationNameMaxSize, it will be truncated.
+     */
+    bool AddSupportedLocation(uint32_t aLocationId, const DataModel::Nullable<uint8_t> & aMapId, const CharSpan & aLocationName,
+                              const DataModel::Nullable<int16_t> & aFloorNumber,
+                              const DataModel::Nullable<Globals::AreaTypeTag> & aAreaType,
+                              const DataModel::Nullable<Globals::LandmarkTag> & aLandmarkTag,
+                              const DataModel::Nullable<Globals::PositionTag> & aPositionTag,
+                              const DataModel::Nullable<Globals::FloorSurfaceTag> & aSurfaceTag);
+
+    /**
+     * @brief Modify/replace an existing location in the supported locations list.
+     * @param[in] aLocationId unique identifier of this location.
+     * @param[in] aMapId identifier of supported map (will not be modified).
+     * @param[in] aLocationName human readable name for this location (empty string if not used).
+     * @param[in] aFloorNumber represents floor level - negative values for below ground.
+     * @param[in] aAreaType common namespace Area tag - indicates an association of the location with an indoor or outdoor area of a
+     * home.
+     * @param[in] aLandmarkTag common namespace Landmark tag - indicates an association of the location with a home landmark.
+     * @param[in] aPositionTag common namespace Position tag - indicates the position of the location with respect to the landmark.
+     * @param[in] aSurfaceTag common namespace Floor Surface tag - indicates an association of the location with a surface type.
+     * @return true if the location is a member of supported locations, the modifications pass all validation checks and the
+     * location was modified.
+     *
+     * @note if aLocationName is larger than kLocationNameMaxSize, it will be truncated.
+     * @note if mapID is changed, the delegate's HandleSupportedLocationsUpdated method is called.
+     */
+    bool ModifySupportedLocation(uint32_t aLocationId, const DataModel::Nullable<uint8_t> & aMapId, const CharSpan & aLocationName,
+                                 const DataModel::Nullable<int16_t> & aFloorNumber,
+                                 const DataModel::Nullable<Globals::AreaTypeTag> & aAreaType,
+                                 const DataModel::Nullable<Globals::LandmarkTag> & aLandmarkTag,
+                                 const DataModel::Nullable<Globals::PositionTag> & aPositionTag,
+                                 const DataModel::Nullable<Globals::FloorSurfaceTag> & aSurfaceTag);
+
+    /**
+     * @return true if the SupportedLocations attribute was not already null.
+     *
+     * @note if SupportedLocations is cleared, the delegate's HandleSupportedLocationsUpdated method is called.
+     */
+    bool ClearSupportedLocations();
+
+    //*************************************************************************
+    // Supported Maps manipulators
+
+    /**
+     * @return true if a map with the aMapId ID exists in the supported maps attribute. False otherwise.
+     */
+    bool IsSupportedMap(uint8_t aMapId);
+
+    /**
+     * @brief Add a new map to the supported maps list.
+     * @param[in] aMapId The ID of the new map to be added.
+     * @param[in] aMapName The name of the map to be added. This cannot be an empty string.
+     * @return true if the new map passed validation checks and was successfully added to the list.
+     */
+    bool AddSupportedMap(uint8_t aMapId, const CharSpan & aMapName);
+
+    /**
+     * @brief Rename an existing map in the supported maps list.
+     * @param[in] aMapId The id of the map to modify.
+     * @param[in] newMapName The new name of the map. This cannot be empty string.
+     * @return true if the new name passed validation checks and was successfully modified.
+     *
+     * @note if the specified map is not a member of the supported maps list, returns false with no action taken.
+     */
+    bool RenameSupportedMap(uint8_t aMapId, const CharSpan & newMapName);
+
+    /**
+     * @return true if the SupportedMaps attribute was not already null.
+     *
+     * @note if SupportedMaps is cleared, the delegate's HandleSupportedLocationsUpdated method is called.
+     */
+    bool ClearSupportedMaps();
+
+    //*************************************************************************
+    // Selected Locations manipulators
+
+    /**
+     * @brief Add a selected location.
+     * @param[in] aSelectedLocation The locationID to add.
+     * @bool true if successfully added.
+     */
+    bool AddSelectedLocation(uint32_t & aSelectedLocation);
+
+    /**
+     * @return true if the SelectedLocations attribute was not already null.
+     */
+    bool ClearSelectedLocations();
+
+    //*************************************************************************
+    // Current Location manipulators
+
+    DataModel::Nullable<uint32_t> GetCurrentLocation();
+
+    /**
+     * @param[in] aCurrentLocation The location ID that the CurrentLocation attribute should be set to. Must be a supported location
+     * or NULL.
+     * @return true if the current location is set, false otherwise.
+     *
+     * @note if current location is set to null, estimated end time will be set to null.
+     */
+    bool SetCurrentLocation(const DataModel::Nullable<uint32_t> & aCurrentLocation);
+
+    //*************************************************************************
+    // Estimated End Time manipulators
+
+    /**
+     * @return The estimated epoch time in seconds when operation at the location indicated by the CurrentLocation attribute will be
+     * completed.
+     */
+    DataModel::Nullable<uint32_t> GetEstimatedEndTime();
+
+    /**
+     * @param[in] aEstimatedEndTime The estimated epoch time in seconds when operation at the location indicated by the
+     * CurrentLocation attribute will be completed.
+     * @return true if attribute is set, false otherwise.
+     */
+    bool SetEstimatedEndTime(const DataModel::Nullable<uint32_t> & aEstimatedEndTime);
+
+    //*************************************************************************
+    // Progress list manipulators
+
+    /**
+     * @brief Add a progress element in a pending status to the progress list.
+     * @param[in] aLocationId location id of the progress element.
+     * @return true if the new progress element passed validation checks and was successfully added to the list, false otherwise.
+     */
+    bool AddPendingProgressElement(uint32_t aLocationId);
+
+    /**
+     * @brief Set the status of progress element identified by locationID.
+     * @param[in] aLocationId The locationID of the progress element to update.
+     * @param[in] status The location cluster operation status for this location.
+     * @return true if progress element is found and status is set, false otherwise.
+     *
+     * @note TotalOperationalTime is set to null if resulting opStatus is not equal to Completed or Skipped.
+     */
+    bool SetProgressStatus(uint32_t aLocationId, OperationalStatusEnum opStatus);
+
+    /**
+     * @brief Set the total operational time for the progress element identified by locationID.
+     * @param[in] aLocationId The locationID of the progress element to update.
+     * @param[in] aTotalOperationalTime The total operational time for this location.
+     * @return true if progress element is found and operational time is set, false otherwise.
+     */
+    bool SetProgressTotalOperationalTime(uint32_t aLocationId, const DataModel::Nullable<uint32_t> & aTotalOperationalTime);
+
+    /**
+     * @brief Set the estimated time for the  progress element identified by locationID.
+     * @param[in] aLocationId The locationID of the progress element to update.
+     * @param[in] aEstimatedTime The estimated time for this location.
+     * @return true if progress element is found and estimated time is set, false otherwise.
+     */
+    bool SetProgressEstimatedTime(uint32_t aLocationId, const DataModel::Nullable<uint32_t> & aEstimatedTime);
+
+    /**
+     * @return true if the progress list was not already null, false otherwise.
+     */
+    bool ClearProgress();
+
+    //*************************************************************************
+    // Feature Map attribute
+
+    /**
+     * @brief Check if a feature is supported.
+     * @param[in] feature the feature enum.
+     * @return true if the feature is supported.
+     *
+     * @note the Service Area features are set at startup and are read-only to both device and client.
+     */
+    bool HasFeature(ServiceArea::Feature feature) const;
+};
+
+} // namespace ServiceArea
+} // namespace Clusters
+} // namespace app
+} // namespace chip

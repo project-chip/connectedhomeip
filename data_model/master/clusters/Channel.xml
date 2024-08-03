@@ -59,7 +59,7 @@ Davis, CA 95616, USA
 -->
 <cluster xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="types types.xsd cluster cluster.xsd" id="0x0504" name="Channel Cluster" revision="2">
   <revisionHistory>
-    <revision revision="1" summary="Initial Release"/>
+    <revision revision="1" summary="Initial revision"/>
     <revision revision="2" summary="Add EG and RP features, Identifier and Type to Channel Info for Over-the-Top (OTT) channel support."/>
   </revisionHistory>
   <clusterIds>
@@ -307,7 +307,7 @@ Davis, CA 95616, USA
     </attribute>
     <attribute id="0x0001" name="Lineup" type="LineupInfoStruct" default="null">
       <access read="true" readPrivilege="view"/>
-      <quality changeOmitted="false" nullable="true" scene="false" persistence="volatile" reportable="false"/>
+      <quality changeOmitted="false" nullable="true" scene="false" persistence="volatile" reportable="false" sourceAttribution="false" quieterReporting="false"/>
       <mandatoryConform>
         <feature name="LI"/>
       </mandatoryConform>
@@ -315,7 +315,7 @@ Davis, CA 95616, USA
     </attribute>
     <attribute id="0x0002" name="CurrentChannel" type="ChannelInfoStruct" default="null">
       <access read="true" readPrivilege="view"/>
-      <quality changeOmitted="false" nullable="true" scene="false" persistence="volatile" reportable="false"/>
+      <quality changeOmitted="false" nullable="true" scene="false" persistence="volatile" reportable="false" sourceAttribution="false" quieterReporting="false"/>
       <optionalConform/>
       <constraint type="desc"/>
     </attribute>
@@ -366,6 +366,7 @@ Davis, CA 95616, USA
       </field>
     </command>
     <command id="0x04" name="GetProgramGuide" direction="commandToServer" response="ProgramGuideResponse">
+      <quality largeMessage="true"/>
       <access invokePrivilege="operate"/>
       <mandatoryConform>
         <feature name="EG"/>
@@ -400,6 +401,7 @@ Davis, CA 95616, USA
       </field>
     </command>
     <command id="0x05" name="ProgramGuideResponse" direction="responseFromServer">
+      <quality largeMessage="true"/>
       <mandatoryConform>
         <feature name="EG"/>
       </mandatoryConform>
@@ -412,6 +414,7 @@ Davis, CA 95616, USA
       </field>
     </command>
     <command id="0x06" name="RecordProgram" direction="commandToServer" response="Y">
+      <quality largeMessage="true"/>
       <access invokePrivilege="operate"/>
       <mandatoryConform>
         <andTerm>
@@ -437,6 +440,7 @@ Davis, CA 95616, USA
       </field>
     </command>
     <command id="0x07" name="CancelRecordProgram" direction="commandToServer" response="Y">
+      <quality largeMessage="true"/>
       <access invokePrivilege="operate"/>
       <mandatoryConform>
         <andTerm>

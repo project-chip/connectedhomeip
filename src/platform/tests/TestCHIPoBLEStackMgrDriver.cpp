@@ -15,9 +15,11 @@
  *    limitations under the License.
  */
 
-#include <gtest/gtest.h>
-#include <platform/CHIPDeviceConfig.h>
 #include <stdlib.h>
+
+#include <pw_unit_test/framework.h>
+
+#include <platform/CHIPDeviceConfig.h>
 
 int main(int argc, char * argv[])
 {

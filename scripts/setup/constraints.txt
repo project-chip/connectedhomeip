@@ -128,7 +128,7 @@ mobly==1.12.1
     # via -r requirements.all.txt
 msgpack==1.0.4
     # via cachecontrol
-mypy==0.971
+mypy==1.10.1
     # via -r requirements.all.txt
 mypy-extensions==1.0.0
     # via mypy
@@ -261,7 +261,7 @@ types-protobuf==4.24.0.2
     # via
     #   -r requirements.all.txt
     #   mypy-protobuf
-typing-extensions==4.5.0
+typing-extensions==4.6.0
     # via mypy
 urllib3==1.26.14
     # via requests

@@ -14,13 +14,15 @@
  *    See the License for the specific language governing permissions and
  *    limitations under the License.
  */
+
 #include <lib/dnssd/minimal_mdns/ResponseSender.h>
 
 #include <string>
 #include <vector>
 
-#include <gtest/gtest.h>
+#include <pw_unit_test/framework.h>
 
+#include <lib/core/StringBuilderAdapters.h>
 #include <lib/dnssd/minimal_mdns/RecordData.h>
 #include <lib/dnssd/minimal_mdns/core/FlatAllocatedQName.h>
 #include <lib/dnssd/minimal_mdns/core/RecordWriter.h>
@@ -28,7 +30,6 @@
 #include <lib/dnssd/minimal_mdns/responders/Srv.h>
 #include <lib/dnssd/minimal_mdns/responders/Txt.h>
 #include <lib/dnssd/minimal_mdns/tests/CheckOnlyServer.h>
-
 #include <lib/support/CHIPMem.h>
 
 namespace {

@@ -165,7 +165,7 @@ TEST_F(TestCommands, TestMultipleSuccessNoDataResponses)
     // not safe to do so.
     auto onSuccessCb = [&successCalls, &statusCheck](const ConcreteCommandPath & commandPath, const StatusIB & aStatus,
                                                      const auto & dataResponse) {
-        statusCheck = (aStatus.mStatus == InteractionModel::Status::Success);
+        statusCheck = (aStatus.mStatus == Protocols::InteractionModel::Status::Success);
         ++successCalls;
     };
 
@@ -290,7 +290,7 @@ TEST_F(TestCommands, TestMultipleFailures)
     // Passing of stack variables by reference is only safe because of synchronous completion of the interaction. Otherwise, it's
     // not safe to do so.
     auto onFailureCb = [&failureCalls, &statusCheck](CHIP_ERROR aError) {
-        statusCheck = aError.IsIMStatus() && StatusIB(aError).mStatus == InteractionModel::Status::Failure;
+        statusCheck = aError.IsIMStatus() && StatusIB(aError).mStatus == Protocols::InteractionModel::Status::Failure;
         ++failureCalls;
     };
 

@@ -25,9 +25,10 @@
 
 #include <errno.h>
 
-#include <gtest/gtest.h>
+#include <pw_unit_test/framework.h>
 
 #include <lib/core/CHIPCore.h>
+#include <lib/core/StringBuilderAdapters.h>
 #include <lib/support/CodeUtils.h>
 #include <transport/TransportMgr.h>
 #include <transport/raw/UDP.h>
