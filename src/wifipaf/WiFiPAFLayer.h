@@ -17,17 +17,17 @@
 
 #pragma once
 
+#include "WiFiPAFLayerDelegate.h"
 #include <lib/core/CHIPError.h>
 #include <lib/support/DLLUtil.h>
 #include <system/SystemPacketBuffer.h>
-#include "WiFiPAFLayerDelegate.h"
 
 namespace chip {
 namespace WiFiPAF {
 /**
-*  The State of the Wi-Fi-PAF connection
-*
-*/
+ *  The State of the Wi-Fi-PAF connection
+ *
+ */
 enum class State
 {
     kNotReady    = 0, /**< State before initialization. */
@@ -38,11 +38,11 @@ enum class State
 class DLL_EXPORT WiFiPAFLayer
 {
 public:
-    State mAppState = State::kNotReady;
+    State mAppState                          = State::kNotReady;
     WiFiPAFLayerDelegate * mWiFiPAFTransport = nullptr;
 
     WiFiPAFLayer() = default;
-    static WiFiPAFLayer* GetWiFiPAFLayer();
+    static WiFiPAFLayer * GetWiFiPAFLayer();
 
     void OnWiFiPAFMessageReceived(System::PacketBufferHandle && msg);
     State GetWiFiPAFState() { return mAppState; };
