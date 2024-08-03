@@ -29,7 +29,7 @@ import copy
 import logging
 import random
 
-import chip.clusters as Clusters
+import chip.clusters as    Clusters
 import chip.discovery as Discovery
 from chip import ChipDeviceCtrl
 from chip.exceptions import ChipStackError
