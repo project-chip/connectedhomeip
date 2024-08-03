@@ -33,23 +33,12 @@ using namespace chip::System;
 
 namespace chip {
 namespace Transport {
-
-WiFiPAFBase::~WiFiPAFBase()
-{
-    ClearState();
-}
-
-void WiFiPAFBase::ClearState()
-{
-    mState = State::kNotReady;
-}
-
 CHIP_ERROR WiFiPAFBase::Init(const WiFiPAFListenParameters & param)
 {
     ChipLogDetail(Inet, "WiFiPAFBase::Init - setting/overriding transport");
-    VerifyOrReturnError(mState == State::kNotReady, CHIP_ERROR_INCORRECT_STATE);
-    DeviceLayer::ConnectivityMgr().SetWiFiPAF(this);
-    mState = State::kInitialized;
+    mWiFiPAFLayer = DeviceLayer::ConnectivityMgr().GetWiFiPAF();
+    SetWiFiPAFLayerTransportToSelf();
+    mWiFiPAFLayer->SetWiFiPAFState(chip::WiFiPAF::State::kInitialized);
 
     if (!DeviceLayer::ConnectivityMgrImpl().IsWiFiManagementStarted())
     {
@@ -80,11 +69,21 @@ CHIP_ERROR WiFiPAFBase::Init(const WiFiPAFListenParameters & param)
 CHIP_ERROR WiFiPAFBase::SendMessage(const Transport::PeerAddress & address, System::PacketBufferHandle && msgBuf)
 {
     ReturnErrorCodeIf(address.GetTransportType() != Type::kWiFiPAF, CHIP_ERROR_INVALID_ARGUMENT);
-    ReturnErrorCodeIf(mState == State::kNotReady, CHIP_ERROR_INCORRECT_STATE);
+    ReturnErrorCodeIf(mWiFiPAFLayer->GetWiFiPAFState() == chip::WiFiPAF::State::kNotReady, CHIP_ERROR_INCORRECT_STATE);
     DeviceLayer::ConnectivityMgr().WiFiPAFSend(std::move(msgBuf));
 
     return CHIP_NO_ERROR;
 }
+
+bool WiFiPAFBase::CanSendToPeer(const Transport::PeerAddress & address)
+{
+    if (mWiFiPAFLayer != nullptr) {
+        return (mWiFiPAFLayer->GetWiFiPAFState() != chip::WiFiPAF::State::kNotReady) && (address.GetTransportType() == Type::kWiFiPAF);
+    } else {
+        return false;
+    }
+}
+
 
 void WiFiPAFBase::OnWiFiPAFMessageReceived(System::PacketBufferHandle && buffer)
 {
