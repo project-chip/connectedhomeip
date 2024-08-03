@@ -15,8 +15,8 @@
 #
 
 if [[ $# -ne 1 ]]; then
-  echo 'usage: GenerateChipDeviceCtrlDoc.sh build_directory'
-  exit 1
+    echo 'usage: GenerateChipDeviceCtrlDoc.sh build_directory'
+    exit 1
 fi
 
 pydoc-markdown -m chip.ChipDeviceCtrl '{
