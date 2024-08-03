@@ -98,13 +98,11 @@ source_set("chip-all-clusters-common") {
     "${chip_root}/examples/platform/linux:app-main",
     "${chip_root}/src/app:attribute-persistence",
     "${chip_root}/src/lib",
-    "${chip_root}/third_party/jsoncpp",
     "${chip_root}/src/wifipaf:wifipaf",
+    "${chip_root}/third_party/jsoncpp",
   ]
   if (chip_device_config_enable_wifipaf) {
-    deps += [
-      "${chip_root}/src/wifipaf:wifipaf",
-    ]
+    deps += [ "${chip_root}/src/wifipaf:wifipaf" ]
   }
 
   include_dirs = [
