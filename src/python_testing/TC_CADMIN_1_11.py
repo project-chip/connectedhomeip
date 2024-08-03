@@ -51,7 +51,7 @@ class TC_CADMIN_1_11(MatterBaseTest):
             logging.info('Commissioning complete done. Successful? {}, errorcode = {}'.format(errcode.is_success, errcode))
             asserts.assert_false(errcode.is_success, 'Commissioning complete did not error as expected')
             asserts.assert_true(errcode.sdk_code == expectedErrCode,
-                                    'Unexpected error code returned from CommissioningComplete')
+                                'Unexpected error code returned from CommissioningComplete')
 
     async def OpenBasicCommissioningWindow(self, th, expectedErrCode) -> CommissioningParameters:
         if expectedErrCode == 0x00:
@@ -68,7 +68,7 @@ class TC_CADMIN_1_11(MatterBaseTest):
             logging.info('Commissioning complete done. Successful? {}, errorcode = {}'.format(errcode.is_success, errcode))
             asserts.assert_false(errcode.is_success, 'Commissioning complete did not error as expected')
             asserts.assert_true(errcode.sdk_code == expectedErrCode,
-                                    'Unexpected error code returned from CommissioningComplete')
+                                'Unexpected error code returned from CommissioningComplete')
 
     async def read_currentfabricindex(self, th: ChipDeviceCtrl) -> int:
         cluster = Clusters.Objects.OperationalCredentials
@@ -109,9 +109,9 @@ class TC_CADMIN_1_11(MatterBaseTest):
 
         logging.info("-----------------Commissioning with TH_CR2-------------------------")
         await self.th2.CommissionOnNetwork(
-        nodeId=self.dut_node_id, setupPinCode=setupPinCode,
-        filterType=ChipDeviceCtrl.DiscoveryFilterType.LONG_DISCRIMINATOR, filter=self.discriminator)
-        
+            nodeId=self.dut_node_id, setupPinCode=setupPinCode,
+            filterType=ChipDeviceCtrl.DiscoveryFilterType.LONG_DISCRIMINATOR, filter=self.discriminator)
+
     def pics_TC_CADMIN_1_11(self) -> list[str]:
         return ["CADMIN.S"]
 
@@ -142,7 +142,7 @@ class TC_CADMIN_1_11(MatterBaseTest):
 
         self.step(5)
         await self.OpenCommissioningWindow(self.th1, 0x00)
-        
+
         self.step(6)
         await self.OpenCommissioningWindow(self.th1, 0x02)
 
@@ -160,12 +160,12 @@ class TC_CADMIN_1_11(MatterBaseTest):
         features = await self.read_single_attribute(dev_ctrl=self.default_controller, node_id=self.dut_node_id,
                                                     endpoint=0, attribute=AC_cluster.Attributes.FeatureMap)
         self.supports_bc = bool(features & AC_cluster.Bitmaps.Feature.kBasic)
-        
+
         if self.supports_bc:
             self.count = 0
             self.step("9a")
             await self.OpenBasicCommissioningWindow(self.th1, 0x00)
-        
+
             self.step("9b")
             await self.OpenBasicCommissioningWindow(self.th1, 0x00)
 
@@ -191,6 +191,7 @@ class TC_CADMIN_1_11(MatterBaseTest):
         self.step(11)
         removeFabricCmd = Clusters.OperationalCredentials.Commands.RemoveFabric(th2_idx)
         await self.th1.SendCommand(nodeid=self.dut_node_id, endpoint=0, payload=removeFabricCmd)
+
 
 if __name__ == "__main__":
     default_matter_test_main()
