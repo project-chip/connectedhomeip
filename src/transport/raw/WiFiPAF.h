@@ -29,38 +29,23 @@
 #include <system/SystemPacketBuffer.h>
 #include <transport/raw/Base.h>
 #include <utility>
+#include "wifipaf/WiFiPAFLayer.h"
 
 namespace chip {
 namespace Transport {
-
-class WiFiPAFLayer
-{
-public:
-    WiFiPAFLayer() = default;
-};
 class WiFiPAFListenParameters;
 
 /**
  * Implements a transport using Wi-Fi-PAF
  */
-class DLL_EXPORT WiFiPAFBase : public Base
+class DLL_EXPORT WiFiPAFBase : public Base, public WiFiPAF::WiFiPAFLayerDelegate
 {
 public:
-    /**
-     *  The State of the Wi-Fi-PAF connection
-     *
-     */
-    enum class State
-    {
-        kNotReady    = 0, /**< State before initialization. */
-        kInitialized = 1, /**< State after class is connected and ready. */
-        kConnected   = 2, /**< Endpoint connected. */
-    };
     WiFiPAFBase() = default;
     WiFiPAFBase(System::PacketBufferHandle * packetBuffers, size_t packetBuffersSize) :
         mPendingPackets(packetBuffers), mPendingPacketsSize(packetBuffersSize)
     {}
-    ~WiFiPAFBase() override;
+    ~WiFiPAFBase() override {}
 
     /**
      * Initialize a Wi-Fi-PAF transport
@@ -69,22 +54,20 @@ public:
      */
     CHIP_ERROR Init(const WiFiPAFListenParameters & param);
     CHIP_ERROR SendMessage(const Transport::PeerAddress & address, System::PacketBufferHandle && msgBuf) override;
-    bool CanSendToPeer(const Transport::PeerAddress & address) override
-    {
-        return (mState != State::kNotReady) && (address.GetTransportType() == Type::kWiFiPAF);
-    }
+    bool CanSendToPeer(const Transport::PeerAddress & address) override;
     void OnWiFiPAFMessageReceived(System::PacketBufferHandle && buffer);
-    void SetWiFiPAFState(State state) { mState = state; };
-    State GetWiFiPAFState() { return mState; };
+    void SetWiFiPAFLayerTransportToSelf() { mWiFiPAFLayer->mWiFiPAFTransport = this; }
+    bool IsWiFiPAFLayerTransportSetToSelf() { return mWiFiPAFLayer->mWiFiPAFTransport == this; }
 
 private:
-    void ClearState();
     /**
      * Sends the specified message once a connection has been established.
      * @param msg - what buffer to send once a connection has been established.
      */
     CHIP_ERROR SendAfterConnect(System::PacketBufferHandle && msg);
-    State mState = State::kNotReady;
+
+    WiFiPAF::WiFiPAFLayer * mWiFiPAFLayer       = nullptr;          ///< Associated wifipaf layer
+    //WiFiPAF::WiFiPAFLayer::State mState = WiFiPAF::WiFiPAFLayer::State::kNotReady;
 
     System::PacketBufferHandle * mPendingPackets;
     size_t mPendingPacketsSize;

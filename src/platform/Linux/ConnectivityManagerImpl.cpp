@@ -65,9 +65,6 @@
 #include <credentials/CHIPCert.h>
 #include <platform/GLibTypeDeleter.h>
 #include <platform/internal/GenericConnectivityManagerImpl_WiFi.ipp>
-#if CHIP_DEVICE_CONFIG_ENABLE_WIFIPAF
-#include <transport/raw/WiFiPAF.h>
-#endif
 #endif
 
 using namespace ::chip;
@@ -145,6 +142,9 @@ CHIP_ERROR ConnectivityManagerImpl::_Init()
     {
         ChipLogError(DeviceLayer, "Failed to reset WiFi statistic counts");
     }
+#endif
+#if CHIP_DEVICE_CONFIG_ENABLE_WIFIPAF
+    pmWiFiPAF = WiFiPAF::WiFiPAFLayer::GetWiFiPAFLayer();
 #endif
 
     return CHIP_NO_ERROR;
@@ -913,15 +913,9 @@ CHIP_ERROR ConnectivityManagerImpl::_SetWiFiPAFAdvertisingEnabled(WiFiPAFAdverti
     }
 }
 
-Transport::WiFiPAFBase * ConnectivityManagerImpl::_GetWiFiPAF()
+WiFiPAF::WiFiPAFLayer * ConnectivityManagerImpl::_GetWiFiPAF()
 {
     return pmWiFiPAF;
-}
-
-void ConnectivityManagerImpl::_SetWiFiPAF(Transport::WiFiPAFBase * pWiFiPAF)
-{
-    pmWiFiPAF = pWiFiPAF;
-    return;
 }
 #endif
 
@@ -1386,7 +1380,7 @@ void ConnectivityManagerImpl::OnDiscoveryResult(gboolean success, GVariant * dis
         ChipLogProgress(DeviceLayer, "WiFi-PAF: peer_addr: [%02x:%02x:%02x:%02x:%02x:%02x]", mpaf_info.peer_addr[0],
                         mpaf_info.peer_addr[1], mpaf_info.peer_addr[2], mpaf_info.peer_addr[3], mpaf_info.peer_addr[4],
                         mpaf_info.peer_addr[5]);
-        GetWiFiPAF()->SetWiFiPAFState(Transport::WiFiPAFBase::State::kConnected);
+        GetWiFiPAF()->SetWiFiPAFState(WiFiPAF::State::kConnected);
 
         // Read the ssi
         GAutoPtr<GVariant> ssiValue(g_variant_lookup_value(discov_info, "ssi", G_VARIANT_TYPE_BYTESTRING));
@@ -1399,7 +1393,7 @@ void ConnectivityManagerImpl::OnDiscoveryResult(gboolean success, GVariant * dis
     }
     else
     {
-        GetWiFiPAF()->SetWiFiPAFState(Transport::WiFiPAFBase::State::kInitialized);
+        GetWiFiPAF()->SetWiFiPAFState(WiFiPAF::State::kInitialized);
         if (mOnPafSubscribeError != nullptr)
         {
             mOnPafSubscribeError(mAppState, CHIP_ERROR_TIMEOUT);

@@ -60,13 +60,6 @@ CHIP_ERROR GetPayload(const char * setUpCode, SetupPayload & payload)
 }
 } // namespace
 
-SetUpCodePairer::~SetUpCodePairer()
-{
-#if CHIP_DEVICE_CONFIG_ENABLE_WIFIPAF
-    DeviceLayer::ConnectivityMgr().WiFiPAFCancelConnect();
-#endif
-}
-
 CHIP_ERROR SetUpCodePairer::PairDevice(NodeId remoteId, const char * setUpCode, SetupCodePairerBehaviour commission,
                                        DiscoveryType discoveryType, Optional<Dnssd::CommonResolutionData> resolutionData)
 {
@@ -282,6 +275,9 @@ CHIP_ERROR SetUpCodePairer::StartDiscoverOverWiFiPAF(SetupPayload & payload)
 CHIP_ERROR SetUpCodePairer::StopConnectOverWiFiPAF()
 {
     mWaitingForDiscovery[kWiFiPAFTransport] = false;
+#if CHIP_DEVICE_CONFIG_ENABLE_WIFIPAF
+    DeviceLayer::ConnectivityMgr().WiFiPAFCancelIncompleteConnect();
+#endif
     return CHIP_NO_ERROR;
 }
 
@@ -397,13 +393,13 @@ void SetUpCodePairer::OnWifiPAFDiscoveryError(CHIP_ERROR err)
 
 void SetUpCodePairer::OnWiFiPAFSubscribeComplete(void * appState)
 {
-    auto self = (SetUpCodePairer *) appState;
+    auto self = reinterpret_cast<SetUpCodePairer *>(appState);
     self->OnDiscoveredDeviceOverWifiPAF();
 }
 
 void SetUpCodePairer::OnWiFiPAFSubscribeError(void * appState, CHIP_ERROR err)
 {
-    auto self = (SetUpCodePairer *) appState;
+    auto self = reinterpret_cast<SetUpCodePairer *>(appState);
     self->OnWifiPAFDiscoveryError(err);
 }
 #endif

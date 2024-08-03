@@ -476,13 +476,6 @@ DeviceCommissioner::DeviceCommissioner() :
     mDeviceNOCChainCallback(OnDeviceNOCChainGeneration, this), mSetUpCodePairer(this)
 {}
 
-DeviceCommissioner::~DeviceCommissioner()
-{
-#if CHIP_DEVICE_CONFIG_ENABLE_WIFIPAF
-    DeviceLayer::ConnectivityMgr().WiFiPAFCancelConnect();
-#endif
-}
-
 CHIP_ERROR DeviceCommissioner::Init(CommissionerInitParams params)
 {
     VerifyOrReturnError(params.operationalCredentialsDelegate != nullptr, CHIP_ERROR_INVALID_ARGUMENT);
@@ -578,6 +571,9 @@ void DeviceCommissioner::Shutdown()
         mUdcServer = nullptr;
     }
 #endif // CHIP_DEVICE_CONFIG_ENABLE_COMMISSIONER_DISCOVERY
+#if CHIP_DEVICE_CONFIG_ENABLE_WIFIPAF
+    DeviceLayer::ConnectivityMgr().WiFiPAFCancelConnect();
+#endif
 
     // Release everything from the commissionee device pool here.
     // Make sure to use ReleaseCommissioneeDevice so we don't keep dangling
@@ -750,6 +746,7 @@ CHIP_ERROR DeviceCommissioner::EstablishPASEConnection(NodeId remoteDeviceId, Re
 #if CHIP_DEVICE_CONFIG_ENABLE_WIFIPAF
     else if (params.GetPeerAddress().GetTransportType() == Transport::Type::kWiFiPAF)
     {
+        ConnectWiFiPAFTransportToSelf();
         peerAddress = Transport::PeerAddress::WiFiPAF(remoteDeviceId);
     }
 #endif // CHIP_DEVICE_CONFIG_ENABLE_WIFIPAF
@@ -831,16 +828,16 @@ CHIP_ERROR DeviceCommissioner::EstablishPASEConnection(NodeId remoteDeviceId, Re
 #if CHIP_DEVICE_CONFIG_ENABLE_WIFIPAF
     if (params.GetPeerAddress().GetTransportType() == Transport::Type::kWiFiPAF)
     {
-        if (DeviceLayer::ConnectivityMgr().GetWiFiPAF()->GetWiFiPAFState() != Transport::WiFiPAFBase::State::kConnected)
+        if (DeviceLayer::ConnectivityMgr().GetWiFiPAF()->GetWiFiPAFState() != WiFiPAF::State::kConnected)
         {
-            ChipLogProgress(Controller, "WiFi-PAF: Subscribing the NAN-USD devices");
+            ChipLogProgress(Controller, "WiFi-PAF: Subscribing to the NAN-USD devices");
             if (!DeviceLayer::ConnectivityMgrImpl().IsWiFiManagementStarted())
             {
-                ChipLogError(Controller, "Wi-Fi Management should have be started now.");
+                ChipLogError(Controller, "Wi-Fi Management should have been started now.");
                 ExitNow(CHIP_ERROR_INTERNAL);
             }
             mRendezvousParametersForDeviceDiscoveredOverWiFiPAF = params;
-            DeviceLayer::ConnectivityMgr().WiFiPAFConnect(params.GetSetupDiscriminator().value(), (void *) this,
+            DeviceLayer::ConnectivityMgr().WiFiPAFConnect(params.GetSetupDiscriminator().value(), reinterpret_cast<void*>(this),
                                                           OnWiFiPAFSubscribeComplete, OnWiFiPAFSubscribeError);
             ExitNow(CHIP_NO_ERROR);
         }
@@ -916,7 +913,7 @@ void DeviceCommissioner::OnDiscoveredDeviceOverBleError(void * appState, CHIP_ER
 #if CHIP_DEVICE_CONFIG_ENABLE_WIFIPAF
 void DeviceCommissioner::OnWiFiPAFSubscribeComplete(void * appState)
 {
-    auto self   = (DeviceCommissioner *) appState;
+    auto self   = reinterpret_cast<DeviceCommissioner *>(appState);
     auto device = self->mDeviceInPASEEstablishment;
 
     if (nullptr != device && device->GetDeviceTransportType() == Transport::Type::kWiFiPAF)
@@ -1828,6 +1825,17 @@ void DeviceCommissioner::CloseBleConnection()
     // We should be able to distinguish different BLE connections if we want
     // to commission multiple devices at the same time over BLE.
     mSystemState->BleLayer()->CloseAllBleConnections();
+}
+#endif
+
+#if CHIP_DEVICE_CONFIG_ENABLE_WIFIPAF
+void DeviceCommissioner::ConnectWiFiPAFTransportToSelf()
+{
+    Transport::WiFiPAFBase & transport = std::get<Transport::WiFiPAF<1>>(mSystemState->TransportMgr()->GetTransport().GetTransports());
+    if (!transport.IsWiFiPAFLayerTransportSetToSelf())
+    {
+        transport.SetWiFiPAFLayerTransportToSelf();
+    }
 }
 #endif
 
