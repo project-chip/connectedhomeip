@@ -68,9 +68,14 @@ template("silabs_executable") {
     "${chip_root}/scripts/flashing/silabs_firmware_utils.py",
     "${chip_root}/scripts/flashing/firmware_utils.py",
   ]
-  copy(flashing_runtime_target) {
+  action_foreach(flashing_runtime_target) {
+    script = "${build_root}/chip/copy.py"
+    args = [
+      "{{source}}",
+      rebase_path(invoker.output_dir, "") + "/{{source_file_part}}",
+    ]
     sources = flashing_script_inputs
-    outputs = [ "${invoker.output_dir}/${output_base_name}--{{source_file_part}}" ]  #++++ FIXME: Can we avoid adding the "output_base_name--" prefix?.
+    outputs = [ "${invoker.output_dir}/${output_base_name}--{{source_file_part}}" ]  #++++ FIXME: This causes the wrong value to be written to flashbundle.txt by write_runtime_deps.
   }
 
   flashing_script_generator =

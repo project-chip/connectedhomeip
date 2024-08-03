@@ -157,7 +157,7 @@ template("flashable_executable") {
 
       flashing_options += [
         "--application",
-        rebase_path(image_name, invoker.output_dir, root_out_dir),
+        rebase_path(image_name, invoker.output_dir, invoker.output_dir),
       ]
       data_deps = [ ":$image_target" ]
     }
