@@ -77,13 +77,16 @@ CHIP_ERROR WiFiPAFBase::SendMessage(const Transport::PeerAddress & address, Syst
 
 bool WiFiPAFBase::CanSendToPeer(const Transport::PeerAddress & address)
 {
-    if (mWiFiPAFLayer != nullptr) {
-        return (mWiFiPAFLayer->GetWiFiPAFState() != chip::WiFiPAF::State::kNotReady) && (address.GetTransportType() == Type::kWiFiPAF);
-    } else {
+    if (mWiFiPAFLayer != nullptr)
+    {
+        return (mWiFiPAFLayer->GetWiFiPAFState() != chip::WiFiPAF::State::kNotReady) &&
+            (address.GetTransportType() == Type::kWiFiPAF);
+    }
+    else
+    {
         return false;
     }
 }
-
 
 void WiFiPAFBase::OnWiFiPAFMessageReceived(System::PacketBufferHandle && buffer)
 {

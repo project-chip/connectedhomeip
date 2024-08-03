@@ -241,7 +241,8 @@ CHIP_ERROR Server::Init(const ServerInitParams & initParams)
 #endif
 #if CHIP_DEVICE_CONFIG_ENABLE_WIFIPAF
                            ,
-                           Transport::WiFiPAFListenParameters(static_cast<Transport::WiFiPAFBase*>(DeviceLayer::ConnectivityMgr().GetWiFiPAF()->mWiFiPAFTransport))
+                           Transport::WiFiPAFListenParameters(static_cast<Transport::WiFiPAFBase *>(
+                               DeviceLayer::ConnectivityMgr().GetWiFiPAF()->mWiFiPAFTransport))
 #endif
     );
 
