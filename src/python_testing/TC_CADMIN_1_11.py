@@ -63,7 +63,7 @@ class TC_CADMIN_1_11(MatterBaseTest):
             ctx = asserts.assert_raises(ChipStackError)
             with ctx:
                 await th.OpenBasicCommissioningWindow(
-                    nodeid=self.dut_node_id, timeout=self.timeout, iteration=10000, discriminator=self.discriminator, option=1)
+                    nodeid=self.dut_node_id, timeout=self.timeout)
             errcode = ctx.exception.chip_error
             logging.info('Commissioning complete done. Successful? {}, errorcode = {}'.format(errcode.is_success, errcode))
             asserts.assert_false(errcode.is_success, 'Commissioning complete did not error as expected')
