@@ -14,13 +14,17 @@
 # limitations under the License.
 #
 
-SCRIPT_DIR=$(cd -- "$(dirname -- "${BASH_SOURCE[0]}")" &>/dev/null && pwd)
+if [[ $# -ne 1 ]]; then
+  echo 'usage: GenerateChipDeviceCtrlDoc.sh build_directory'
+  exit 1
+fi
 
 pydoc-markdown -m chip.ChipDeviceCtrl '{
     renderer: {
       type: markdown,
       descriptive_class_title: false,
       render_toc: true,
+      render_toc_title: "ChipDeviceCtrl.py API",
       insert_header_anchors: true
     }
-  }' >"$SCRIPT_DIR"/ChipDeviceCtrlAPI.md
+  }' >"$1"/ChipDeviceCtrlAPI.md

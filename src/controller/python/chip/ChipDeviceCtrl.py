@@ -1672,7 +1672,7 @@ class ChipDeviceControllerBase():
                                     You can await events using a trigger mechanism in the callback. ex. queue.SimpleQueue
 
             - read request: AsyncReadTransaction.ReadResponse.events.
-                            This is a List[ClusterEvent].
+                            This is a List[EventReadResult].
 
         Raises:
             - InteractionModelError (chip.interaction_model) on error
