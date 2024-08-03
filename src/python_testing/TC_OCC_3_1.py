@@ -29,7 +29,7 @@
 
 import logging
 import time
-from typing import Optional, Any
+from typing import Any, Optional
 
 import chip.clusters as Clusters
 from chip.interaction_model import Status
@@ -49,7 +49,7 @@ class TC_OCC_3_1(MatterBaseTest):
         endpoint = self.matter_test_config.endpoint
 
         cluster = Clusters.OccupancySensing
-        write_result =  await dev_ctrl.WriteAttribute(node_id, [(endpoint, cluster.Attributes.HoldTime(hold_time))])
+        write_result = await dev_ctrl.WriteAttribute(node_id, [(endpoint, cluster.Attributes.HoldTime(hold_time))])
         return write_result[0].Status
 
     def desc_TC_OCC_3_1(self) -> str:
