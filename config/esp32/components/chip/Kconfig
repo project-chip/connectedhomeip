@@ -168,8 +168,7 @@ menu "CHIP Core"
             default n
             help
                 This option enables the use of heap memory to allocate object pools.
-                When enabled, it do not enforce the maximum number of entries in object pools
-                to allocate.
+                When enabled, it do not enforce the maximum number of entries in object pools.
 
 
     endmenu # "General Options"
