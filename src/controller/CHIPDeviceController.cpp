@@ -830,7 +830,7 @@ CHIP_ERROR DeviceCommissioner::EstablishPASEConnection(NodeId remoteDeviceId, Re
                 ExitNow(CHIP_ERROR_INTERNAL);
             }
             mRendezvousParametersForDeviceDiscoveredOverWiFiPAF = params;
-            DeviceLayer::ConnectivityMgr().WiFiPAFConnect(params.GetSetupDiscriminator().value(), reinterpret_cast<void*>(this),
+            DeviceLayer::ConnectivityMgr().WiFiPAFConnect(params.GetSetupDiscriminator().value(), reinterpret_cast<void *>(this),
                                                           OnWiFiPAFSubscribeComplete, OnWiFiPAFSubscribeError);
             ExitNow(CHIP_NO_ERROR);
         }
@@ -1823,7 +1823,8 @@ void DeviceCommissioner::CloseBleConnection()
 #if CHIP_DEVICE_CONFIG_ENABLE_WIFIPAF
 void DeviceCommissioner::ConnectWiFiPAFTransportToSelf()
 {
-    Transport::WiFiPAFBase & transport = std::get<Transport::WiFiPAF<1>>(mSystemState->TransportMgr()->GetTransport().GetTransports());
+    Transport::WiFiPAFBase & transport =
+        std::get<Transport::WiFiPAF<1>>(mSystemState->TransportMgr()->GetTransport().GetTransports());
     if (!transport.IsWiFiPAFLayerTransportSetToSelf())
     {
         transport.SetWiFiPAFLayerTransportToSelf();
