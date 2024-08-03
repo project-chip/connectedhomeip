@@ -1521,14 +1521,14 @@ CHIP_ERROR ConnectivityManagerImpl::_WiFiPAFCancelConnect()
     snprintf(args, sizeof(args), "subscribe_id=%d", mpresubscribe_id);
     wpa_fi_w1_wpa_supplicant1_interface_call_nancancel_subscribe_sync(mWpaSupplicant.iface, args, nullptr, &err.GetReceiver());
     mOnPafSubscribeComplete = nullptr;
-    mOnPafSubscribeError = nullptr;
+    mOnPafSubscribeError    = nullptr;
     return CHIP_NO_ERROR;
 }
 
 CHIP_ERROR ConnectivityManagerImpl::_WiFiPAFCancelIncompleteConnect()
 {
     mOnPafSubscribeComplete = nullptr;
-    mOnPafSubscribeError = nullptr;
+    mOnPafSubscribeError    = nullptr;
     return CHIP_NO_ERROR;
 }
 
