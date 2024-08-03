@@ -7,7 +7,7 @@ SPHINXOPTS    ?= -W -T --keep-going -c . -d _build/doctrees
 SPHINXBUILD   ?= sphinx-build
 SOURCEDIR     = _build/src
 BUILDDIR      = _build
-PYTHON_API_DIR= ${BUILDDIR}/testing
+PYTHON_API_DIR= ${SOURCEDIR}/testing
 
 # Put it first so that "make" without argument is like "make help".
 help:

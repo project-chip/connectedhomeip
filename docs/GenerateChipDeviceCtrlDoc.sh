@@ -25,6 +25,7 @@ pydoc-markdown -m chip.ChipDeviceCtrl '{
       descriptive_class_title: false,
       render_toc: true,
       render_toc_title: "ChipDeviceCtrl.py API",
-      insert_header_anchors: true
+      insert_header_anchors: true,
+      add_full_prefix: true,
     }
   }' >"$1"/ChipDeviceCtrlAPI.md
