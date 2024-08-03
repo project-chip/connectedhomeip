@@ -29,7 +29,8 @@ namespace WiFiPAF {
 
 void WiFiPAFLayer::OnWiFiPAFMessageReceived(System::PacketBufferHandle && msg)
 {
-    if (mWiFiPAFTransport != nullptr) {
+    if (mWiFiPAFTransport != nullptr)
+    {
         mWiFiPAFTransport->OnWiFiPAFMessageReceived(std::move(msg));
     }
 }
@@ -41,7 +42,7 @@ void WiFiPAFLayer::SetWiFiPAFState(State state)
 }
 
 static WiFiPAFLayer sInstance;
-WiFiPAFLayer* WiFiPAFLayer::GetWiFiPAFLayer()
+WiFiPAFLayer * WiFiPAFLayer::GetWiFiPAFLayer()
 {
     return &sInstance;
 }
