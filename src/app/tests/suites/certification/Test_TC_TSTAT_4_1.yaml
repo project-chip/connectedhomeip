@@ -62,9 +62,7 @@ tests:
       response:
           saveAs: PresetsValue
 
-    - label:
-          "Saving value for comparision in step 6 read Schedules
-          attribute"
+    - label: "Saving value for comparision in step 6 read Schedules attribute"
       PICS: TSTAT.S.A0051
       command: "readAttribute"
       attribute: "Schedules"
@@ -103,8 +101,7 @@ tests:
           constraints:
               type: list
 
-    - label:
-          "Step 6: TH reads the Schedules attribute from the DUT"
+    - label: "Step 6: TH reads the Schedules attribute from the DUT"
       PICS: TSTAT.S.F07 & TSTAT.S.A0051
       command: "readAttribute"
       attribute: "Schedules"
