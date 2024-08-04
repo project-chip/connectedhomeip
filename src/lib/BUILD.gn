@@ -35,6 +35,10 @@ source_set("without-logging") {
     "${chip_root}/src/transport",
   ]
 
+  if (chip_device_config_enable_wifipaf == true) {
+    public_deps += [ "${chip_root}/src/wifipaf" ]
+  }
+
   # See src/lib/lib.gni for declaration of this build arg.
   if (chip_build_controller) {
     public_deps += [ "${chip_root}/src/controller" ]
