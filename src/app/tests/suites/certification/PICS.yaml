@@ -6491,8 +6491,8 @@ PICS:
     - label: "Does the device implement the Presets attribute?"
       id: TSTAT.S.A0050
 
-    - label: "Does the device implement the PresetsSchedulesEditable attribute?"
-      id: TSTAT.S.A0052
+    - label: "Does the device implement the Schedules attribute?"
+      id: TSTAT.S.A0051
 
     #
     # server / commandsReceived
