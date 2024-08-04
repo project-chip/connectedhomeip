@@ -907,10 +907,7 @@ CHIP_ERROR ConnectivityManagerImpl::_SetWiFiPAFAdvertisingEnabled(WiFiPAFAdverti
     {
         return _WiFiPAFPublish(args);
     }
-    else
-    {
-        return _WiFiPAFCancelPublish();
-    }
+    return _WiFiPAFCancelPublish();
 }
 
 WiFiPAF::WiFiPAFLayer * ConnectivityManagerImpl::_GetWiFiPAF()
@@ -1399,8 +1396,6 @@ void ConnectivityManagerImpl::OnDiscoveryResult(gboolean success, GVariant * dis
             mOnPafSubscribeError(mAppState, CHIP_ERROR_TIMEOUT);
         }
     }
-
-    return;
 }
 
 void ConnectivityManagerImpl::OnNanReceive(GVariant * obj)
@@ -1435,8 +1430,6 @@ void ConnectivityManagerImpl::OnNanReceive(GVariant * obj)
     event.Type                           = DeviceEventType::kCHIPoWiFiPAFWriteReceived;
     event.CHIPoWiFiPAFWriteReceived.Data = std::move(buf).UnsafeRelease();
     PlatformMgr().PostEventOrDie(&event);
-
-    return;
 }
 
 void ConnectivityManagerImpl::OnNanSubscribeTerminated(gint term_subscribe_id, gint reason)
@@ -1450,7 +1443,6 @@ void ConnectivityManagerImpl::OnNanSubscribeTerminated(gint term_subscribe_id, g
     {
         mpaf_info.subscribe_id = 0;
     }
-    return;
 }
 
 CHIP_ERROR ConnectivityManagerImpl::_WiFiPAFConnect(const SetupDiscriminator & connDiscriminator, void * appState,
@@ -1469,7 +1461,8 @@ CHIP_ERROR ConnectivityManagerImpl::_WiFiPAFConnect(const SetupDiscriminator & c
         CHIP_ERROR_BUFFER_TOO_SMALL);
     mAppState                = appState;
     PafPublish_ssi.DevOpCode = 0;
-    PafPublish_ssi.DevInfo   = connDiscriminator.GetLongValue();
+    PafPublish_ssi.DevInfo =
+        connDiscriminator.IsShortDiscriminator() ? connDiscriminator.GetShortValue() : connDiscriminator.GetLongValue();
     if (DeviceLayer::GetDeviceInstanceInfoProvider()->GetProductId(PafPublish_ssi.ProductId) != CHIP_NO_ERROR)
     {
         PafPublish_ssi.ProductId = 0;
@@ -1558,8 +1551,10 @@ CHIP_ERROR ConnectivityManagerImpl::_WiFiPAFSend(System::PacketBufferHandle && m
              mpaf_info.peer_publish_id, mpaf_info.peer_addr[0], mpaf_info.peer_addr[1], mpaf_info.peer_addr[2],
              mpaf_info.peer_addr[3], mpaf_info.peer_addr[4], mpaf_info.peer_addr[5]);
 
-    ChipLogProgress(Controller, "===> %s(), (%lu, %u)", __FUNCTION__, (strlen(args) + msgBuf->DataLength()), MAX_PAF_TX_SSI_BUFLEN)
-        VerifyOrReturnError((strlen(args) + msgBuf->DataLength() < MAX_PAF_TX_SSI_BUFLEN), CHIP_ERROR_BUFFER_TOO_SMALL);
+    if (strlen(args) + msgBuf->DataLength() >= MAX_PAF_TX_SSI_BUFLEN)
+    {
+        return CHIP_ERROR_BUFFER_TOO_SMALL;
+    }
 
     ret = chip::Encoding::BytesToUppercaseHexString(msgBuf->Start(), msgBuf->DataLength(), &args[strlen(args)],
                                                     MAX_PAF_TX_SSI_BUFLEN - strlen(args));

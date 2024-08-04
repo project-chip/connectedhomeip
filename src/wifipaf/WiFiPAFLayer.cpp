@@ -38,7 +38,6 @@ void WiFiPAFLayer::OnWiFiPAFMessageReceived(System::PacketBufferHandle && msg)
 void WiFiPAFLayer::SetWiFiPAFState(State state)
 {
     mAppState = state;
-    return;
 }
 
 static WiFiPAFLayer sInstance;

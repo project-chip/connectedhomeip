@@ -155,9 +155,6 @@ executable("chip-tool") {
     ":chip-tool-utils",
     "${chip_root}/src/platform/logging:stdio",
   ]
-  if (chip_device_config_enable_wifipaf) {
-    deps += [ "${chip_root}/src/wifipaf:wifipaf" ]
-  }
 
   output_dir = root_out_dir
 }
