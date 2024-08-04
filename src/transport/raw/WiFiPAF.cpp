@@ -81,16 +81,12 @@ bool WiFiPAFBase::CanSendToPeer(const Transport::PeerAddress & address)
         return (mWiFiPAFLayer->GetWiFiPAFState() != chip::WiFiPAF::State::kNotReady) &&
             (address.GetTransportType() == Type::kWiFiPAF);
     }
-    else
-    {
-        return false;
-    }
+    return false;
 }
 
 void WiFiPAFBase::OnWiFiPAFMessageReceived(System::PacketBufferHandle && buffer)
 {
     HandleMessageReceived(Transport::PeerAddress(Transport::Type::kWiFiPAF), std::move(buffer));
-    return;
 }
 
 CHIP_ERROR WiFiPAFBase::SendAfterConnect(System::PacketBufferHandle && msg)
