@@ -16395,6 +16395,14 @@
               "isEnabled": 1
             },
             {
+              "name": "SetActiveScheduleRequest",
+              "code": 5,
+              "mfgCode": null,
+              "source": "client",
+              "isIncoming": 1,
+              "isEnabled": 1
+            },
+            {
               "name": "SetActivePresetRequest",
               "code": 6,
               "mfgCode": null,

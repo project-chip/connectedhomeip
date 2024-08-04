@@ -15,12 +15,6 @@ See the License for the specific language governing permissions and
 limitations under the License.
 -->
 
-<!--
-TODO: Make these structures global rather than defining them for each cluster.
- This depends on the ability to define global structs via XML tags.
- see: https://github.com/project-chip/connectedhomeip/issues/29818
--->
-
 <configurator>
   <domain name="CHIP"/>
 
@@ -30,10 +24,6 @@ TODO: Make these structures global rather than defining them for each cluster.
   </struct>
 
   <struct name="LocationDescriptorStruct">
-    <cluster code="0x0150"/> <!-- Service Area Cluster -->
-    <cluster code="0x0750"/> <!-- Ecosystem Information Cluster -->
-    <!-- TODO: add Basic Information Cluster code="0x0028" -->
-
     <item fieldId="0" name="LocationName"    type="char_string" length="128" isNullable="false" optional="false"/>
     <item fieldId="1" name="FloorNumber"     type="int16s"                   isNullable="true"  optional="false"/>
     <item fieldId="2" name="AreaType"        type="AreaTypeTag"              isNullable="true"  optional="false"/>

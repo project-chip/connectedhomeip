@@ -27,6 +27,13 @@ MTR_PROVISIONALLY_AVAILABLE
 @end
 
 MTR_PROVISIONALLY_AVAILABLE
+@interface MTRDataTypeLocationDescriptorStruct : NSObject <NSCopying>
+@property (nonatomic, copy) NSString * _Nonnull locationName MTR_PROVISIONALLY_AVAILABLE;
+@property (nonatomic, copy) NSNumber * _Nullable floorNumber MTR_PROVISIONALLY_AVAILABLE;
+@property (nonatomic, copy) NSNumber * _Nullable areaType MTR_PROVISIONALLY_AVAILABLE;
+@end
+
+MTR_PROVISIONALLY_AVAILABLE
 @interface MTRDataTypeAtomicAttributeStatusStruct : NSObject <NSCopying>
 @property (nonatomic, copy) NSNumber * _Nonnull attributeID MTR_PROVISIONALLY_AVAILABLE;
 @property (nonatomic, copy) NSNumber * _Nonnull statusCode MTR_PROVISIONALLY_AVAILABLE;
@@ -1587,15 +1594,8 @@ MTR_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
 @end
 
 MTR_PROVISIONALLY_AVAILABLE
-@interface MTRServiceAreaClusterLocationDescriptorStruct : NSObject <NSCopying>
-@property (nonatomic, copy) NSString * _Nonnull locationName MTR_PROVISIONALLY_AVAILABLE;
-@property (nonatomic, copy) NSNumber * _Nullable floorNumber MTR_PROVISIONALLY_AVAILABLE;
-@property (nonatomic, copy) NSNumber * _Nullable areaType MTR_PROVISIONALLY_AVAILABLE;
-@end
-
-MTR_PROVISIONALLY_AVAILABLE
 @interface MTRServiceAreaClusterLocationInfoStruct : NSObject <NSCopying>
-@property (nonatomic, copy) MTRServiceAreaClusterLocationDescriptorStruct * _Nullable locationInfo MTR_PROVISIONALLY_AVAILABLE;
+@property (nonatomic, copy) MTRDataTypeLocationDescriptorStruct * _Nullable locationInfo MTR_PROVISIONALLY_AVAILABLE;
 @property (nonatomic, copy) NSNumber * _Nullable landmarkTag MTR_PROVISIONALLY_AVAILABLE;
 @property (nonatomic, copy) NSNumber * _Nullable positionTag MTR_PROVISIONALLY_AVAILABLE;
 @property (nonatomic, copy) NSNumber * _Nullable surfaceTag MTR_PROVISIONALLY_AVAILABLE;
@@ -2095,21 +2095,6 @@ MTR_PROVISIONALLY_AVAILABLE
 @end
 
 MTR_PROVISIONALLY_AVAILABLE
-@interface MTREcosystemInformationClusterLocationDescriptorStruct : NSObject <NSCopying>
-@property (nonatomic, copy) NSString * _Nonnull locationName MTR_PROVISIONALLY_AVAILABLE;
-@property (nonatomic, copy) NSNumber * _Nullable floorNumber MTR_PROVISIONALLY_AVAILABLE;
-@property (nonatomic, copy) NSNumber * _Nullable areaType MTR_PROVISIONALLY_AVAILABLE;
-@end
-
-MTR_PROVISIONALLY_AVAILABLE
-@interface MTREcosystemInformationClusterEcosystemLocationStruct : NSObject <NSCopying>
-@property (nonatomic, copy) NSString * _Nonnull uniqueLocationID MTR_PROVISIONALLY_AVAILABLE;
-@property (nonatomic, copy) MTREcosystemInformationClusterLocationDescriptorStruct * _Nonnull locationDescriptor MTR_PROVISIONALLY_AVAILABLE;
-@property (nonatomic, copy) NSNumber * _Nonnull locationDescriptorLastEdit MTR_PROVISIONALLY_AVAILABLE;
-@property (nonatomic, copy) NSNumber * _Nonnull fabricIndex MTR_PROVISIONALLY_AVAILABLE;
-@end
-
-MTR_PROVISIONALLY_AVAILABLE
 @interface MTREcosystemInformationClusterDeviceTypeStruct : NSObject <NSCopying>
 @property (nonatomic, copy) NSNumber * _Nonnull deviceType MTR_PROVISIONALLY_AVAILABLE;
 @property (nonatomic, copy) NSNumber * _Nonnull revision MTR_PROVISIONALLY_AVAILABLE;
@@ -2124,6 +2109,14 @@ MTR_PROVISIONALLY_AVAILABLE
 @property (nonatomic, copy) NSArray * _Nonnull deviceTypes MTR_PROVISIONALLY_AVAILABLE;
 @property (nonatomic, copy) NSArray * _Nonnull uniqueLocationIDs MTR_PROVISIONALLY_AVAILABLE;
 @property (nonatomic, copy) NSNumber * _Nonnull uniqueLocationIDsLastEdit MTR_PROVISIONALLY_AVAILABLE;
+@property (nonatomic, copy) NSNumber * _Nonnull fabricIndex MTR_PROVISIONALLY_AVAILABLE;
+@end
+
+MTR_PROVISIONALLY_AVAILABLE
+@interface MTREcosystemInformationClusterEcosystemLocationStruct : NSObject <NSCopying>
+@property (nonatomic, copy) NSString * _Nonnull uniqueLocationID MTR_PROVISIONALLY_AVAILABLE;
+@property (nonatomic, copy) MTRDataTypeLocationDescriptorStruct * _Nonnull locationDescriptor MTR_PROVISIONALLY_AVAILABLE;
+@property (nonatomic, copy) NSNumber * _Nonnull locationDescriptorLastEdit MTR_PROVISIONALLY_AVAILABLE;
 @property (nonatomic, copy) NSNumber * _Nonnull fabricIndex MTR_PROVISIONALLY_AVAILABLE;
 @end
 

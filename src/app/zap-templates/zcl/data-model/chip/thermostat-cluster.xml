@@ -16,8 +16,6 @@ limitations under the License.
 -->
 <configurator>
   <domain name="HVAC"/>
-
-
   <bitmap name="ACErrorCodeBitmap" type="bitmap32">
     <cluster code="0x0201"/>
     <field name="CompressorFail" mask="0x01"/>
@@ -33,6 +31,11 @@ limitations under the License.
     <field name="HeatingStage" mask="0x0C"/>
     <field name="HeatingIsHeatPump" mask="0x10"/>
     <field name="HeatingUsesFuel" mask="0x20"/>
+  </bitmap>
+
+  <bitmap name="OccupancyBitmap" type="bitmap8">
+    <cluster code="0x0201"/>
+    <field name="Occupied" mask="0x01"/>
   </bitmap>
 
   <bitmap name="ProgrammingOperationModeBitmap" type="bitmap8">
@@ -84,11 +87,6 @@ limitations under the License.
     <cluster code="0x0201"/>
     <field name="HeatSetpointPresent" mask="0x01"/>
     <field name="CoolSetpointPresent" mask="0x02"/>
-  </bitmap>
-
-  <bitmap name="OccupancyBitmap" type="bitmap8">
-    <cluster code="0x0201"/>
-    <field name="Occupied" mask="0x1"/>
   </bitmap>
 
   <bitmap name="PresetTypeFeaturesBitmap" type="bitmap16">

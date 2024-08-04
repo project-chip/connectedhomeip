@@ -9171,82 +9171,6 @@ public static class DoorLockClusterCredentialStruct {
     return output.toString();
   }
 }
-public static class ServiceAreaClusterLocationDescriptorStruct {
-  public String locationName;
-  public @Nullable Integer floorNumber;
-  public @Nullable Integer areaType;
-  private static final long LOCATION_NAME_ID = 0L;
-  private static final long FLOOR_NUMBER_ID = 1L;
-  private static final long AREA_TYPE_ID = 2L;
-
-  public ServiceAreaClusterLocationDescriptorStruct(
-    String locationName,
-    @Nullable Integer floorNumber,
-    @Nullable Integer areaType
-  ) {
-    this.locationName = locationName;
-    this.floorNumber = floorNumber;
-    this.areaType = areaType;
-  }
-
-  public StructType encodeTlv() {
-    ArrayList<StructElement> values = new ArrayList<>();
-    values.add(new StructElement(LOCATION_NAME_ID, new StringType(locationName)));
-    values.add(new StructElement(FLOOR_NUMBER_ID, floorNumber != null ? new IntType(floorNumber) : new NullType()));
-    values.add(new StructElement(AREA_TYPE_ID, areaType != null ? new UIntType(areaType) : new NullType()));
-
-    return new StructType(values);
-  }
-
-  public static ServiceAreaClusterLocationDescriptorStruct decodeTlv(BaseTLVType tlvValue) {
-    if (tlvValue == null || tlvValue.type() != TLVType.Struct) {
-      return null;
-    }
-    String locationName = null;
-    @Nullable Integer floorNumber = null;
-    @Nullable Integer areaType = null;
-    for (StructElement element: ((StructType)tlvValue).value()) {
-      if (element.contextTagNum() == LOCATION_NAME_ID) {
-        if (element.value(BaseTLVType.class).type() == TLVType.String) {
-          StringType castingValue = element.value(StringType.class);
-          locationName = castingValue.value(String.class);
-        }
-      } else if (element.contextTagNum() == FLOOR_NUMBER_ID) {
-        if (element.value(BaseTLVType.class).type() == TLVType.Int) {
-          IntType castingValue = element.value(IntType.class);
-          floorNumber = castingValue.value(Integer.class);
-        }
-      } else if (element.contextTagNum() == AREA_TYPE_ID) {
-        if (element.value(BaseTLVType.class).type() == TLVType.UInt) {
-          UIntType castingValue = element.value(UIntType.class);
-          areaType = castingValue.value(Integer.class);
-        }
-      }
-    }
-    return new ServiceAreaClusterLocationDescriptorStruct(
-      locationName,
-      floorNumber,
-      areaType
-    );
-  }
-
-  @Override
-  public String toString() {
-    StringBuilder output = new StringBuilder();
-    output.append("ServiceAreaClusterLocationDescriptorStruct {\n");
-    output.append("\tlocationName: ");
-    output.append(locationName);
-    output.append("\n");
-    output.append("\tfloorNumber: ");
-    output.append(floorNumber);
-    output.append("\n");
-    output.append("\tareaType: ");
-    output.append(areaType);
-    output.append("\n");
-    output.append("}\n");
-    return output.toString();
-  }
-}
 public static class ServiceAreaClusterLocationInfoStruct {
   public @Nullable ChipStructs.ServiceAreaClusterLocationDescriptorStruct locationInfo;
   public @Nullable Integer landmarkTag;
@@ -9561,6 +9485,82 @@ public static class ServiceAreaClusterProgressStruct {
     output.append("\n");
     output.append("\testimatedTime: ");
     output.append(estimatedTime);
+    output.append("\n");
+    output.append("}\n");
+    return output.toString();
+  }
+}
+public static class ServiceAreaClusterLocationDescriptorStruct {
+  public String locationName;
+  public @Nullable Integer floorNumber;
+  public @Nullable Integer areaType;
+  private static final long LOCATION_NAME_ID = 0L;
+  private static final long FLOOR_NUMBER_ID = 1L;
+  private static final long AREA_TYPE_ID = 2L;
+
+  public ServiceAreaClusterLocationDescriptorStruct(
+    String locationName,
+    @Nullable Integer floorNumber,
+    @Nullable Integer areaType
+  ) {
+    this.locationName = locationName;
+    this.floorNumber = floorNumber;
+    this.areaType = areaType;
+  }
+
+  public StructType encodeTlv() {
+    ArrayList<StructElement> values = new ArrayList<>();
+    values.add(new StructElement(LOCATION_NAME_ID, new StringType(locationName)));
+    values.add(new StructElement(FLOOR_NUMBER_ID, floorNumber != null ? new IntType(floorNumber) : new NullType()));
+    values.add(new StructElement(AREA_TYPE_ID, areaType != null ? new UIntType(areaType) : new NullType()));
+
+    return new StructType(values);
+  }
+
+  public static ServiceAreaClusterLocationDescriptorStruct decodeTlv(BaseTLVType tlvValue) {
+    if (tlvValue == null || tlvValue.type() != TLVType.Struct) {
+      return null;
+    }
+    String locationName = null;
+    @Nullable Integer floorNumber = null;
+    @Nullable Integer areaType = null;
+    for (StructElement element: ((StructType)tlvValue).value()) {
+      if (element.contextTagNum() == LOCATION_NAME_ID) {
+        if (element.value(BaseTLVType.class).type() == TLVType.String) {
+          StringType castingValue = element.value(StringType.class);
+          locationName = castingValue.value(String.class);
+        }
+      } else if (element.contextTagNum() == FLOOR_NUMBER_ID) {
+        if (element.value(BaseTLVType.class).type() == TLVType.Int) {
+          IntType castingValue = element.value(IntType.class);
+          floorNumber = castingValue.value(Integer.class);
+        }
+      } else if (element.contextTagNum() == AREA_TYPE_ID) {
+        if (element.value(BaseTLVType.class).type() == TLVType.UInt) {
+          UIntType castingValue = element.value(UIntType.class);
+          areaType = castingValue.value(Integer.class);
+        }
+      }
+    }
+    return new ServiceAreaClusterLocationDescriptorStruct(
+      locationName,
+      floorNumber,
+      areaType
+    );
+  }
+
+  @Override
+  public String toString() {
+    StringBuilder output = new StringBuilder();
+    output.append("ServiceAreaClusterLocationDescriptorStruct {\n");
+    output.append("\tlocationName: ");
+    output.append(locationName);
+    output.append("\n");
+    output.append("\tfloorNumber: ");
+    output.append(floorNumber);
+    output.append("\n");
+    output.append("\tareaType: ");
+    output.append(areaType);
     output.append("\n");
     output.append("}\n");
     return output.toString();
@@ -12572,173 +12572,6 @@ public static class ContentControlClusterRatingNameStruct {
     return output.toString();
   }
 }
-public static class EcosystemInformationClusterLocationDescriptorStruct {
-  public String locationName;
-  public @Nullable Integer floorNumber;
-  public @Nullable Integer areaType;
-  private static final long LOCATION_NAME_ID = 0L;
-  private static final long FLOOR_NUMBER_ID = 1L;
-  private static final long AREA_TYPE_ID = 2L;
-
-  public EcosystemInformationClusterLocationDescriptorStruct(
-    String locationName,
-    @Nullable Integer floorNumber,
-    @Nullable Integer areaType
-  ) {
-    this.locationName = locationName;
-    this.floorNumber = floorNumber;
-    this.areaType = areaType;
-  }
-
-  public StructType encodeTlv() {
-    ArrayList<StructElement> values = new ArrayList<>();
-    values.add(new StructElement(LOCATION_NAME_ID, new StringType(locationName)));
-    values.add(new StructElement(FLOOR_NUMBER_ID, floorNumber != null ? new IntType(floorNumber) : new NullType()));
-    values.add(new StructElement(AREA_TYPE_ID, areaType != null ? new UIntType(areaType) : new NullType()));
-
-    return new StructType(values);
-  }
-
-  public static EcosystemInformationClusterLocationDescriptorStruct decodeTlv(BaseTLVType tlvValue) {
-    if (tlvValue == null || tlvValue.type() != TLVType.Struct) {
-      return null;
-    }
-    String locationName = null;
-    @Nullable Integer floorNumber = null;
-    @Nullable Integer areaType = null;
-    for (StructElement element: ((StructType)tlvValue).value()) {
-      if (element.contextTagNum() == LOCATION_NAME_ID) {
-        if (element.value(BaseTLVType.class).type() == TLVType.String) {
-          StringType castingValue = element.value(StringType.class);
-          locationName = castingValue.value(String.class);
-        }
-      } else if (element.contextTagNum() == FLOOR_NUMBER_ID) {
-        if (element.value(BaseTLVType.class).type() == TLVType.Int) {
-          IntType castingValue = element.value(IntType.class);
-          floorNumber = castingValue.value(Integer.class);
-        }
-      } else if (element.contextTagNum() == AREA_TYPE_ID) {
-        if (element.value(BaseTLVType.class).type() == TLVType.UInt) {
-          UIntType castingValue = element.value(UIntType.class);
-          areaType = castingValue.value(Integer.class);
-        }
-      }
-    }
-    return new EcosystemInformationClusterLocationDescriptorStruct(
-      locationName,
-      floorNumber,
-      areaType
-    );
-  }
-
-  @Override
-  public String toString() {
-    StringBuilder output = new StringBuilder();
-    output.append("EcosystemInformationClusterLocationDescriptorStruct {\n");
-    output.append("\tlocationName: ");
-    output.append(locationName);
-    output.append("\n");
-    output.append("\tfloorNumber: ");
-    output.append(floorNumber);
-    output.append("\n");
-    output.append("\tareaType: ");
-    output.append(areaType);
-    output.append("\n");
-    output.append("}\n");
-    return output.toString();
-  }
-}
-public static class EcosystemInformationClusterEcosystemLocationStruct {
-  public String uniqueLocationID;
-  public ChipStructs.EcosystemInformationClusterLocationDescriptorStruct locationDescriptor;
-  public Long locationDescriptorLastEdit;
-  public Integer fabricIndex;
-  private static final long UNIQUE_LOCATION_I_D_ID = 0L;
-  private static final long LOCATION_DESCRIPTOR_ID = 1L;
-  private static final long LOCATION_DESCRIPTOR_LAST_EDIT_ID = 2L;
-  private static final long FABRIC_INDEX_ID = 254L;
-
-  public EcosystemInformationClusterEcosystemLocationStruct(
-    String uniqueLocationID,
-    ChipStructs.EcosystemInformationClusterLocationDescriptorStruct locationDescriptor,
-    Long locationDescriptorLastEdit,
-    Integer fabricIndex
-  ) {
-    this.uniqueLocationID = uniqueLocationID;
-    this.locationDescriptor = locationDescriptor;
-    this.locationDescriptorLastEdit = locationDescriptorLastEdit;
-    this.fabricIndex = fabricIndex;
-  }
-
-  public StructType encodeTlv() {
-    ArrayList<StructElement> values = new ArrayList<>();
-    values.add(new StructElement(UNIQUE_LOCATION_I_D_ID, new StringType(uniqueLocationID)));
-    values.add(new StructElement(LOCATION_DESCRIPTOR_ID, locationDescriptor.encodeTlv()));
-    values.add(new StructElement(LOCATION_DESCRIPTOR_LAST_EDIT_ID, new UIntType(locationDescriptorLastEdit)));
-    values.add(new StructElement(FABRIC_INDEX_ID, new UIntType(fabricIndex)));
-
-    return new StructType(values);
-  }
-
-  public static EcosystemInformationClusterEcosystemLocationStruct decodeTlv(BaseTLVType tlvValue) {
-    if (tlvValue == null || tlvValue.type() != TLVType.Struct) {
-      return null;
-    }
-    String uniqueLocationID = null;
-    ChipStructs.EcosystemInformationClusterLocationDescriptorStruct locationDescriptor = null;
-    Long locationDescriptorLastEdit = null;
-    Integer fabricIndex = null;
-    for (StructElement element: ((StructType)tlvValue).value()) {
-      if (element.contextTagNum() == UNIQUE_LOCATION_I_D_ID) {
-        if (element.value(BaseTLVType.class).type() == TLVType.String) {
-          StringType castingValue = element.value(StringType.class);
-          uniqueLocationID = castingValue.value(String.class);
-        }
-      } else if (element.contextTagNum() == LOCATION_DESCRIPTOR_ID) {
-        if (element.value(BaseTLVType.class).type() == TLVType.Struct) {
-          StructType castingValue = element.value(StructType.class);
-          locationDescriptor = ChipStructs.EcosystemInformationClusterLocationDescriptorStruct.decodeTlv(castingValue);
-        }
-      } else if (element.contextTagNum() == LOCATION_DESCRIPTOR_LAST_EDIT_ID) {
-        if (element.value(BaseTLVType.class).type() == TLVType.UInt) {
-          UIntType castingValue = element.value(UIntType.class);
-          locationDescriptorLastEdit = castingValue.value(Long.class);
-        }
-      } else if (element.contextTagNum() == FABRIC_INDEX_ID) {
-        if (element.value(BaseTLVType.class).type() == TLVType.UInt) {
-          UIntType castingValue = element.value(UIntType.class);
-          fabricIndex = castingValue.value(Integer.class);
-        }
-      }
-    }
-    return new EcosystemInformationClusterEcosystemLocationStruct(
-      uniqueLocationID,
-      locationDescriptor,
-      locationDescriptorLastEdit,
-      fabricIndex
-    );
-  }
-
-  @Override
-  public String toString() {
-    StringBuilder output = new StringBuilder();
-    output.append("EcosystemInformationClusterEcosystemLocationStruct {\n");
-    output.append("\tuniqueLocationID: ");
-    output.append(uniqueLocationID);
-    output.append("\n");
-    output.append("\tlocationDescriptor: ");
-    output.append(locationDescriptor);
-    output.append("\n");
-    output.append("\tlocationDescriptorLastEdit: ");
-    output.append(locationDescriptorLastEdit);
-    output.append("\n");
-    output.append("\tfabricIndex: ");
-    output.append(fabricIndex);
-    output.append("\n");
-    output.append("}\n");
-    return output.toString();
-  }
-}
 public static class EcosystemInformationClusterDeviceTypeStruct {
   public Long deviceType;
   public Integer revision;
@@ -12946,6 +12779,173 @@ public static class EcosystemInformationClusterEcosystemDeviceStruct {
     output.append("\n");
     output.append("\tfabricIndex: ");
     output.append(fabricIndex);
+    output.append("\n");
+    output.append("}\n");
+    return output.toString();
+  }
+}
+public static class EcosystemInformationClusterEcosystemLocationStruct {
+  public String uniqueLocationID;
+  public ChipStructs.EcosystemInformationClusterLocationDescriptorStruct locationDescriptor;
+  public Long locationDescriptorLastEdit;
+  public Integer fabricIndex;
+  private static final long UNIQUE_LOCATION_I_D_ID = 0L;
+  private static final long LOCATION_DESCRIPTOR_ID = 1L;
+  private static final long LOCATION_DESCRIPTOR_LAST_EDIT_ID = 2L;
+  private static final long FABRIC_INDEX_ID = 254L;
+
+  public EcosystemInformationClusterEcosystemLocationStruct(
+    String uniqueLocationID,
+    ChipStructs.EcosystemInformationClusterLocationDescriptorStruct locationDescriptor,
+    Long locationDescriptorLastEdit,
+    Integer fabricIndex
+  ) {
+    this.uniqueLocationID = uniqueLocationID;
+    this.locationDescriptor = locationDescriptor;
+    this.locationDescriptorLastEdit = locationDescriptorLastEdit;
+    this.fabricIndex = fabricIndex;
+  }
+
+  public StructType encodeTlv() {
+    ArrayList<StructElement> values = new ArrayList<>();
+    values.add(new StructElement(UNIQUE_LOCATION_I_D_ID, new StringType(uniqueLocationID)));
+    values.add(new StructElement(LOCATION_DESCRIPTOR_ID, locationDescriptor.encodeTlv()));
+    values.add(new StructElement(LOCATION_DESCRIPTOR_LAST_EDIT_ID, new UIntType(locationDescriptorLastEdit)));
+    values.add(new StructElement(FABRIC_INDEX_ID, new UIntType(fabricIndex)));
+
+    return new StructType(values);
+  }
+
+  public static EcosystemInformationClusterEcosystemLocationStruct decodeTlv(BaseTLVType tlvValue) {
+    if (tlvValue == null || tlvValue.type() != TLVType.Struct) {
+      return null;
+    }
+    String uniqueLocationID = null;
+    ChipStructs.EcosystemInformationClusterLocationDescriptorStruct locationDescriptor = null;
+    Long locationDescriptorLastEdit = null;
+    Integer fabricIndex = null;
+    for (StructElement element: ((StructType)tlvValue).value()) {
+      if (element.contextTagNum() == UNIQUE_LOCATION_I_D_ID) {
+        if (element.value(BaseTLVType.class).type() == TLVType.String) {
+          StringType castingValue = element.value(StringType.class);
+          uniqueLocationID = castingValue.value(String.class);
+        }
+      } else if (element.contextTagNum() == LOCATION_DESCRIPTOR_ID) {
+        if (element.value(BaseTLVType.class).type() == TLVType.Struct) {
+          StructType castingValue = element.value(StructType.class);
+          locationDescriptor = ChipStructs.EcosystemInformationClusterLocationDescriptorStruct.decodeTlv(castingValue);
+        }
+      } else if (element.contextTagNum() == LOCATION_DESCRIPTOR_LAST_EDIT_ID) {
+        if (element.value(BaseTLVType.class).type() == TLVType.UInt) {
+          UIntType castingValue = element.value(UIntType.class);
+          locationDescriptorLastEdit = castingValue.value(Long.class);
+        }
+      } else if (element.contextTagNum() == FABRIC_INDEX_ID) {
+        if (element.value(BaseTLVType.class).type() == TLVType.UInt) {
+          UIntType castingValue = element.value(UIntType.class);
+          fabricIndex = castingValue.value(Integer.class);
+        }
+      }
+    }
+    return new EcosystemInformationClusterEcosystemLocationStruct(
+      uniqueLocationID,
+      locationDescriptor,
+      locationDescriptorLastEdit,
+      fabricIndex
+    );
+  }
+
+  @Override
+  public String toString() {
+    StringBuilder output = new StringBuilder();
+    output.append("EcosystemInformationClusterEcosystemLocationStruct {\n");
+    output.append("\tuniqueLocationID: ");
+    output.append(uniqueLocationID);
+    output.append("\n");
+    output.append("\tlocationDescriptor: ");
+    output.append(locationDescriptor);
+    output.append("\n");
+    output.append("\tlocationDescriptorLastEdit: ");
+    output.append(locationDescriptorLastEdit);
+    output.append("\n");
+    output.append("\tfabricIndex: ");
+    output.append(fabricIndex);
+    output.append("\n");
+    output.append("}\n");
+    return output.toString();
+  }
+}
+public static class EcosystemInformationClusterLocationDescriptorStruct {
+  public String locationName;
+  public @Nullable Integer floorNumber;
+  public @Nullable Integer areaType;
+  private static final long LOCATION_NAME_ID = 0L;
+  private static final long FLOOR_NUMBER_ID = 1L;
+  private static final long AREA_TYPE_ID = 2L;
+
+  public EcosystemInformationClusterLocationDescriptorStruct(
+    String locationName,
+    @Nullable Integer floorNumber,
+    @Nullable Integer areaType
+  ) {
+    this.locationName = locationName;
+    this.floorNumber = floorNumber;
+    this.areaType = areaType;
+  }
+
+  public StructType encodeTlv() {
+    ArrayList<StructElement> values = new ArrayList<>();
+    values.add(new StructElement(LOCATION_NAME_ID, new StringType(locationName)));
+    values.add(new StructElement(FLOOR_NUMBER_ID, floorNumber != null ? new IntType(floorNumber) : new NullType()));
+    values.add(new StructElement(AREA_TYPE_ID, areaType != null ? new UIntType(areaType) : new NullType()));
+
+    return new StructType(values);
+  }
+
+  public static EcosystemInformationClusterLocationDescriptorStruct decodeTlv(BaseTLVType tlvValue) {
+    if (tlvValue == null || tlvValue.type() != TLVType.Struct) {
+      return null;
+    }
+    String locationName = null;
+    @Nullable Integer floorNumber = null;
+    @Nullable Integer areaType = null;
+    for (StructElement element: ((StructType)tlvValue).value()) {
+      if (element.contextTagNum() == LOCATION_NAME_ID) {
+        if (element.value(BaseTLVType.class).type() == TLVType.String) {
+          StringType castingValue = element.value(StringType.class);
+          locationName = castingValue.value(String.class);
+        }
+      } else if (element.contextTagNum() == FLOOR_NUMBER_ID) {
+        if (element.value(BaseTLVType.class).type() == TLVType.Int) {
+          IntType castingValue = element.value(IntType.class);
+          floorNumber = castingValue.value(Integer.class);
+        }
+      } else if (element.contextTagNum() == AREA_TYPE_ID) {
+        if (element.value(BaseTLVType.class).type() == TLVType.UInt) {
+          UIntType castingValue = element.value(UIntType.class);
+          areaType = castingValue.value(Integer.class);
+        }
+      }
+    }
+    return new EcosystemInformationClusterLocationDescriptorStruct(
+      locationName,
+      floorNumber,
+      areaType
+    );
+  }
+
+  @Override
+  public String toString() {
+    StringBuilder output = new StringBuilder();
+    output.append("EcosystemInformationClusterLocationDescriptorStruct {\n");
+    output.append("\tlocationName: ");
+    output.append(locationName);
+    output.append("\n");
+    output.append("\tfloorNumber: ");
+    output.append(floorNumber);
+    output.append("\n");
+    output.append("\tareaType: ");
+    output.append(areaType);
     output.append("\n");
     output.append("}\n");
     return output.toString();

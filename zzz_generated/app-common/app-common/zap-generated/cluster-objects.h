@@ -173,31 +173,6 @@ public:
 };
 
 } // namespace MeasurementAccuracyStruct
-namespace LocationDescriptorStruct {
-enum class Fields : uint8_t
-{
-    kLocationName = 0,
-    kFloorNumber  = 1,
-    kAreaType     = 2,
-};
-
-struct Type
-{
-public:
-    chip::CharSpan locationName;
-    DataModel::Nullable<int16_t> floorNumber;
-    DataModel::Nullable<AreaTypeTag> areaType;
-
-    CHIP_ERROR Decode(TLV::TLVReader & reader);
-
-    static constexpr bool kIsFabricScoped = false;
-
-    CHIP_ERROR Encode(TLV::TLVWriter & aWriter, TLV::Tag aTag) const;
-};
-
-using DecodableType = Type;
-
-} // namespace LocationDescriptorStruct
 namespace DeviceTypeStruct {
 enum class Fields : uint8_t
 {
@@ -348,6 +323,32 @@ public:
 using DecodableType = Type;
 
 } // namespace TestGlobalStruct
+
+namespace LocationDescriptorStruct {
+enum class Fields : uint8_t
+{
+    kLocationName = 0,
+    kFloorNumber  = 1,
+    kAreaType     = 2,
+};
+
+struct Type
+{
+public:
+    chip::CharSpan locationName;
+    DataModel::Nullable<int16_t> floorNumber;
+    DataModel::Nullable<Globals::AreaTypeTag> areaType;
+
+    CHIP_ERROR Decode(TLV::TLVReader & reader);
+
+    static constexpr bool kIsFabricScoped = false;
+
+    CHIP_ERROR Encode(TLV::TLVWriter & aWriter, TLV::Tag aTag) const;
+};
+
+using DecodableType = Type;
+
+} // namespace LocationDescriptorStruct
 
 namespace AtomicAttributeStatusStruct {
 enum class Fields : uint8_t
@@ -28343,7 +28344,6 @@ struct TypeInfo
 } // namespace BarrierControl
 namespace ServiceArea {
 namespace Structs {
-namespace LocationDescriptorStruct = Clusters::detail::Structs::LocationDescriptorStruct;
 namespace LocationInfoStruct {
 enum class Fields : uint8_t
 {
@@ -28356,10 +28356,10 @@ enum class Fields : uint8_t
 struct Type
 {
 public:
-    DataModel::Nullable<Structs::LocationDescriptorStruct::Type> locationInfo;
-    DataModel::Nullable<LandmarkTag> landmarkTag;
-    DataModel::Nullable<PositionTag> positionTag;
-    DataModel::Nullable<FloorSurfaceTag> surfaceTag;
+    DataModel::Nullable<Globals::Structs::LocationDescriptorStruct::Type> locationInfo;
+    DataModel::Nullable<Globals::LandmarkTag> landmarkTag;
+    DataModel::Nullable<Globals::PositionTag> positionTag;
+    DataModel::Nullable<Globals::FloorSurfaceTag> surfaceTag;
 
     CHIP_ERROR Decode(TLV::TLVReader & reader);
 
@@ -41606,42 +41606,6 @@ struct TypeInfo
 } // namespace ContentAppObserver
 namespace EcosystemInformation {
 namespace Structs {
-namespace LocationDescriptorStruct = Clusters::detail::Structs::LocationDescriptorStruct;
-namespace EcosystemLocationStruct {
-enum class Fields : uint8_t
-{
-    kUniqueLocationID           = 0,
-    kLocationDescriptor         = 1,
-    kLocationDescriptorLastEdit = 2,
-    kFabricIndex                = 254,
-};
-
-struct Type
-{
-public:
-    chip::CharSpan uniqueLocationID;
-    Structs::LocationDescriptorStruct::Type locationDescriptor;
-    uint64_t locationDescriptorLastEdit = static_cast<uint64_t>(0);
-    chip::FabricIndex fabricIndex       = static_cast<chip::FabricIndex>(0);
-
-    CHIP_ERROR Decode(TLV::TLVReader & reader);
-
-    static constexpr bool kIsFabricScoped = true;
-
-    auto GetFabricIndex() const { return fabricIndex; }
-
-    void SetFabricIndex(chip::FabricIndex fabricIndex_) { fabricIndex = fabricIndex_; }
-
-    CHIP_ERROR EncodeForWrite(TLV::TLVWriter & aWriter, TLV::Tag aTag) const;
-    CHIP_ERROR EncodeForRead(TLV::TLVWriter & aWriter, TLV::Tag aTag, FabricIndex aAccessingFabricIndex) const;
-
-private:
-    CHIP_ERROR DoEncode(TLV::TLVWriter & aWriter, TLV::Tag aTag, const Optional<FabricIndex> & aAccessingFabricIndex) const;
-};
-
-using DecodableType = Type;
-
-} // namespace EcosystemLocationStruct
 namespace DeviceTypeStruct = Clusters::detail::Structs::DeviceTypeStruct;
 namespace EcosystemDeviceStruct {
 enum class Fields : uint8_t
@@ -41703,6 +41667,41 @@ public:
 };
 
 } // namespace EcosystemDeviceStruct
+namespace EcosystemLocationStruct {
+enum class Fields : uint8_t
+{
+    kUniqueLocationID           = 0,
+    kLocationDescriptor         = 1,
+    kLocationDescriptorLastEdit = 2,
+    kFabricIndex                = 254,
+};
+
+struct Type
+{
+public:
+    chip::CharSpan uniqueLocationID;
+    Globals::Structs::LocationDescriptorStruct::Type locationDescriptor;
+    uint64_t locationDescriptorLastEdit = static_cast<uint64_t>(0);
+    chip::FabricIndex fabricIndex       = static_cast<chip::FabricIndex>(0);
+
+    CHIP_ERROR Decode(TLV::TLVReader & reader);
+
+    static constexpr bool kIsFabricScoped = true;
+
+    auto GetFabricIndex() const { return fabricIndex; }
+
+    void SetFabricIndex(chip::FabricIndex fabricIndex_) { fabricIndex = fabricIndex_; }
+
+    CHIP_ERROR EncodeForWrite(TLV::TLVWriter & aWriter, TLV::Tag aTag) const;
+    CHIP_ERROR EncodeForRead(TLV::TLVWriter & aWriter, TLV::Tag aTag, FabricIndex aAccessingFabricIndex) const;
+
+private:
+    CHIP_ERROR DoEncode(TLV::TLVWriter & aWriter, TLV::Tag aTag, const Optional<FabricIndex> & aAccessingFabricIndex) const;
+};
+
+using DecodableType = Type;
+
+} // namespace EcosystemLocationStruct
 } // namespace Structs
 
 namespace Attributes {

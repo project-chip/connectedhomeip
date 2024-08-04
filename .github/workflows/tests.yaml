@@ -513,6 +513,7 @@ jobs:
                   scripts/run_in_python_env.sh out/venv './scripts/tests/run_python_test.py --load-from-env /tmp/test_env.yaml --script src/python_testing/TC_AccessChecker.py'
                   scripts/run_in_python_env.sh out/venv './scripts/tests/run_python_test.py --load-from-env /tmp/test_env.yaml --script src/python_testing/TC_CC_2_2.py'
                   scripts/run_in_python_env.sh out/venv './scripts/tests/run_python_test.py --load-from-env /tmp/test_env.yaml --script src/python_testing/TC_CC_10_1.py'
+                  scripts/run_in_python_env.sh out/venv './scripts/tests/run_python_test.py --load-from-env /tmp/test_env.yaml --script src/python_testing/TC_CADMIN_1_9.py'
                   scripts/run_in_python_env.sh out/venv './scripts/tests/run_python_test.py --load-from-env /tmp/test_env.yaml --script src/python_testing/TC_CGEN_2_4.py'
                   scripts/run_in_python_env.sh out/venv './scripts/tests/run_python_test.py --load-from-env /tmp/test_env.yaml --script src/python_testing/TC_CNET_1_4.py'
                   scripts/run_in_python_env.sh out/venv './scripts/tests/run_python_test.py --load-from-env /tmp/test_env.yaml --script src/python_testing/TC_DA_1_2.py'

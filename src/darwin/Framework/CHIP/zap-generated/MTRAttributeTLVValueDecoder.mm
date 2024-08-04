@@ -11201,7 +11201,7 @@ static id _Nullable DecodeAttributeValueForServiceAreaCluster(AttributeId aAttri
                 if (entry_0.locationInfo.locationInfo.IsNull()) {
                     newElement_0.locationInfo.locationInfo = nil;
                 } else {
-                    newElement_0.locationInfo.locationInfo = [MTRServiceAreaClusterLocationDescriptorStruct new];
+                    newElement_0.locationInfo.locationInfo = [MTRDataTypeLocationDescriptorStruct new];
                     newElement_0.locationInfo.locationInfo.locationName = AsString(entry_0.locationInfo.locationInfo.Value().locationName);
                     if (newElement_0.locationInfo.locationInfo.locationName == nil) {
                         CHIP_ERROR err = CHIP_ERROR_INVALID_ARGUMENT;
@@ -17306,7 +17306,7 @@ static id _Nullable DecodeAttributeValueForEcosystemInformationCluster(Attribute
                     *aError = err;
                     return nil;
                 }
-                newElement_0.locationDescriptor = [MTREcosystemInformationClusterLocationDescriptorStruct new];
+                newElement_0.locationDescriptor = [MTRDataTypeLocationDescriptorStruct new];
                 newElement_0.locationDescriptor.locationName = AsString(entry_0.locationDescriptor.locationName);
                 if (newElement_0.locationDescriptor.locationName == nil) {
                     CHIP_ERROR err = CHIP_ERROR_INVALID_ARGUMENT;

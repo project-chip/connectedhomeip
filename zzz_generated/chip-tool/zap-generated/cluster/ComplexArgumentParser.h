@@ -47,10 +47,10 @@ static CHIP_ERROR Setup(const char * label, chip::app::Clusters::detail::Structs
 
 static void Finalize(chip::app::Clusters::detail::Structs::MeasurementAccuracyStruct::Type & request);
 
-static CHIP_ERROR Setup(const char * label, chip::app::Clusters::detail::Structs::LocationDescriptorStruct::Type & request,
+static CHIP_ERROR Setup(const char * label, chip::app::Clusters::Globals::Structs::LocationDescriptorStruct::Type & request,
                         Json::Value & value);
 
-static void Finalize(chip::app::Clusters::detail::Structs::LocationDescriptorStruct::Type & request);
+static void Finalize(chip::app::Clusters::Globals::Structs::LocationDescriptorStruct::Type & request);
 
 static CHIP_ERROR Setup(const char * label, chip::app::Clusters::detail::Structs::DeviceTypeStruct::Type & request,
                         Json::Value & value);
@@ -648,16 +648,16 @@ static CHIP_ERROR Setup(const char * label, chip::app::Clusters::ContentControl:
 static void Finalize(chip::app::Clusters::ContentControl::Structs::RatingNameStruct::Type & request);
 
 static CHIP_ERROR Setup(const char * label,
-                        chip::app::Clusters::EcosystemInformation::Structs::EcosystemLocationStruct::Type & request,
-                        Json::Value & value);
-
-static void Finalize(chip::app::Clusters::EcosystemInformation::Structs::EcosystemLocationStruct::Type & request);
-
-static CHIP_ERROR Setup(const char * label,
                         chip::app::Clusters::EcosystemInformation::Structs::EcosystemDeviceStruct::Type & request,
                         Json::Value & value);
 
 static void Finalize(chip::app::Clusters::EcosystemInformation::Structs::EcosystemDeviceStruct::Type & request);
+
+static CHIP_ERROR Setup(const char * label,
+                        chip::app::Clusters::EcosystemInformation::Structs::EcosystemLocationStruct::Type & request,
+                        Json::Value & value);
+
+static void Finalize(chip::app::Clusters::EcosystemInformation::Structs::EcosystemLocationStruct::Type & request);
 
 static CHIP_ERROR Setup(const char * label, chip::app::Clusters::UnitTesting::Structs::SimpleStruct::Type & request,
                         Json::Value & value);
