@@ -6615,9 +6615,7 @@ PICS:
           "Does the device implement sending the SetActivePresetRequest command?"
       id: TSTAT.C.C06.Tx
 
-    - label:
-          "Does the device implement sending the
-          AtomicRequest command?"
+    - label: "Does the device implement sending the AtomicRequest command?"
       id: TSTAT.C.CFE.Tx
 
     #
