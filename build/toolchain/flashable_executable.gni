@@ -112,7 +112,10 @@ template("flashable_executable") {
       data_deps += invoker.data_deps
     }
 
-    write_runtime_deps = "${invoker.output_dir}/${flashbundle_name}"
+    # Invoker can stop this template from creating the flashbundle.txt by setting flashbundle_name to empty string.
+    if (flashbundle_name != "") {
+      write_runtime_deps = "${invoker.output_dir}/${flashbundle_name}"
+    }
   }
 
   if (defined(invoker.objcopy_image_name)) {

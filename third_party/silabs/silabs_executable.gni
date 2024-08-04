@@ -68,15 +68,6 @@ template("silabs_executable") {
     "${chip_root}/scripts/flashing/silabs_firmware_utils.py",
     "${chip_root}/scripts/flashing/firmware_utils.py",
   ]
-  action_foreach(flashing_runtime_target) {
-    script = "${build_root}/chip/copy.py"
-    args = [
-      "{{source}}",
-      rebase_path(invoker.output_dir, "") + "/{{source_file_part}}",
-    ]
-    sources = flashing_script_inputs
-    outputs = [ "${invoker.output_dir}/${output_base_name}--{{source_file_part}}" ]  #++++ FIXME: This causes the wrong value to be written to flashbundle.txt by write_runtime_deps.
-  }
 
   flashing_script_generator =
       "${chip_root}/scripts/flashing/gen_flashing_script.py"
@@ -84,10 +75,23 @@ template("silabs_executable") {
   flashing_options = [ "silabs" ]
 
   flash_target_name = target_name + ".flash_executable"
-  flashbundle_name = "${target_name}.flashbundle.txt"
+  flashbundle_name = ""  # Stop flashable_executable from generating flashbundle.txt
   flashable_executable(flash_target_name) {
     forward_variables_from(invoker, "*")
     data_deps = [ ":${flashing_runtime_target}" ]
+  }
+
+  # Generate TestSomething.flashbundle.txt
+  flashbundle_filepath = "${invoker.output_dir}/${target_name}.flashbundle.txt"
+  action(flashing_runtime_target) {
+    script = "${chip_root}/scripts/flashing/gen_flashbundle.py"
+    sources = flashing_script_inputs
+    args = [
+      rebase_path(flashbundle_filepath, root_build_dir),  # Write to here.
+      flashing_script_name,  # Write file name.
+      objcopy_image_name,  # Write file name.
+    ] + rebase_path(sources, root_build_dir)  # Copy files and write file names.
+    outputs = [ flashbundle_filepath ]
   }
 
   # Add a target which generates the hex file in addition to s37.
