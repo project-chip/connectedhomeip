@@ -47,25 +47,32 @@ template("generate_rps_file") {
 }
 
 template("silabs_executable") {
+  # output_dir is optional and will default to root_out_dir
   if (!defined(invoker.output_dir)) {
     invoker.output_dir = root_out_dir
   }
+
+  # output_name is optional and will default to "$target_name.bin"
   if (!defined(invoker.output_name)) {
     invoker.output_name = target_name + ".bin"
   }
+
   output_base_name = get_path_info(invoker.output_name, "name")
   objcopy_image_name = output_base_name + ".s37"
   objcopy_image_format = "srec"
   objcopy = "arm-none-eabi-objcopy"
 
+  if (use_rps_extension) {
+    flashing_image_name = output_base_name + ".rps"
+  }
+
+  # flashable_executable calls a generator script to do the following:
+  # Create a flash.py script with the name of the binary hardcoded in it.
   # Copy flashing dependencies to the output directory so that the output
   # is collectively self-contained; this allows flashing to work reliably
   # even if the build and flashing steps take place on different machines
   # or in different containers.
-
-  if (use_rps_extension) {
-    flashing_image_name = output_base_name + ".rps"
-  }
+  # Create *.flashbundle.txt with a list of all files needed for flashing
 
   flashing_script_generator =
       "${chip_root}/scripts/flashing/gen_flashing_script.py"
@@ -94,14 +101,15 @@ template("silabs_executable") {
     _platform_firmware_utils,
     _firmware_utils,
   ]
-
-  flash_target_name = target_name + ".flash_executable"
   flashbundle_name = ""  # Stop flashable_executable from making flashbundle.
+
+  # Target to generate the s37 file, flashing script, and flashbundle.
+  flash_target_name = target_name + ".flash_executable"
   flashable_executable(flash_target_name) {
     forward_variables_from(invoker, "*")
   }
 
-  # Add a target which generates the hex file in addition to s37.
+  # Target to generate the hex file.
   executable_target = "$flash_target_name.executable"
   hex_image_name = output_base_name + ".hex"
   hex_target_name = target_name + ".hex"
@@ -112,6 +120,7 @@ template("silabs_executable") {
     deps = [ ":$executable_target" ]
   }
 
+  # Target to generate the rps file.
   if (use_rps_extension) {
     rps_target_name = target_name + ".rps"
     generate_rps_file(rps_target_name) {
@@ -123,6 +132,8 @@ template("silabs_executable") {
       ]
     }
   }
+
+  # Main target that deps the targets defined above.
   group(target_name) {
     deps = [
       ":$flash_target_name",
