@@ -20,8 +20,8 @@
  * Includes
  *********************************************************/
 
-#include "include/thermostat-manager.h"
-#include "include/thermostat-delegate-impl.h"
+#include <thermostat-delegate-impl.h>
+#include <thermostat-manager.h>
 
 #include <app/clusters/bindings/BindingManager.h>
 #include <app/clusters/thermostat-server/thermostat-server.h>
@@ -274,7 +274,7 @@ void ThermostatManager::ThermostatClusterAttributeChangeHandler(AttributeId attr
     break;
 
     default: {
-        ChipLogError(AppServer, "Unhandled thermostat attribute %x", attributeId);
+        ChipLogError(AppServer, "Unhandled thermostat attribute %u", static_cast<uint>(attributeId));
         return;
     }
     break;
@@ -490,25 +490,13 @@ static const char * RunningModeString(ThermostatRunningModeEnum runningMode)
     }
 }
 
-void MatterPostAttributeChangeCallback(const ConcreteAttributePath & attributePath, uint8_t type, uint16_t size, uint8_t * value)
-{
-    ClusterId clusterId     = attributePath.mClusterId;
-    AttributeId attributeId = attributePath.mAttributeId;
-    ChipLogProgress(AppServer, "Cluster callback: " ChipLogFormatMEI, ChipLogValueMEI(clusterId));
-
-    ChipLogProgress(AppServer,
-                    "Attribute ID changed: " ChipLogFormatMEI " Endpoint: %d ClusterId: " ChipLogFormatMEI
-                    " Type: %u Value: %u, length %u",
-                    ChipLogValueMEI(attributeId), attributePath.mEndpointId, ChipLogValueMEI(clusterId), type, *value, size);
-
-    ThermostatMgr().AttributeChangeHandler(attributePath.mEndpointId, clusterId, attributeId, value, size);
-}
-
 void emberAfThermostatClusterInitCallback(EndpointId endpoint)
 {
+    ChipLogProgress(Zcl, "Starting Thermostat Manager");
+    ThermostatManager().Init();
+
     // Register the delegate for the Thermostat
     auto & delegate = ThermostatDelegate::GetInstance();
-
     // Set the default delegate for endpoint kThermostatEndpoint.
     VerifyOrDie(endpoint == kThermostatEndpoint);
     SetDefaultDelegate(endpoint, &delegate);

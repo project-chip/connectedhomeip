@@ -10017,25 +10017,25 @@ MTR_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
 /**
  * Command SetpointRaiseLower
  *
- * Command description for SetpointRaiseLower
+ * Upon receipt, the attributes for the indicated setpoint(s) SHALL have the amount specified in the Amount field added to them.
  */
 - (void)setpointRaiseLowerWithParams:(MTRThermostatClusterSetpointRaiseLowerParams *)params completion:(MTRStatusCompletion)completion MTR_AVAILABLE(ios(16.4), macos(13.3), watchos(9.4), tvos(16.4));
 /**
  * Command SetWeeklySchedule
  *
- * Command description for SetWeeklySchedule
+ * This command is used to update the thermostat weekly setpoint schedule from a management system.
  */
 - (void)setWeeklyScheduleWithParams:(MTRThermostatClusterSetWeeklyScheduleParams *)params completion:(MTRStatusCompletion)completion MTR_AVAILABLE(ios(16.4), macos(13.3), watchos(9.4), tvos(16.4));
 /**
  * Command GetWeeklySchedule
  *
- * Command description for GetWeeklySchedule
+ * The Current Weekly Schedule Command is sent from the server in response to the Get Weekly Schedule Command.
  */
 - (void)getWeeklyScheduleWithParams:(MTRThermostatClusterGetWeeklyScheduleParams *)params completion:(void (^)(MTRThermostatClusterGetWeeklyScheduleResponseParams * _Nullable data, NSError * _Nullable error))completion MTR_AVAILABLE(ios(16.4), macos(13.3), watchos(9.4), tvos(16.4));
 /**
  * Command ClearWeeklySchedule
  *
- * This command is used to clear the weekly schedule. The ClearWeeklySchedule command has no payload.
+ * This command is used to clear the weekly schedule.
  */
 - (void)clearWeeklyScheduleWithParams:(MTRThermostatClusterClearWeeklyScheduleParams * _Nullable)params completion:(MTRStatusCompletion)completion MTR_AVAILABLE(ios(16.4), macos(13.3), watchos(9.4), tvos(16.4));
 - (void)clearWeeklyScheduleWithCompletion:(MTRStatusCompletion)completion
@@ -10043,37 +10043,21 @@ MTR_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
 /**
  * Command SetActiveScheduleRequest
  *
- * This command is used to set the active schedule.
+ * Upon receipt, if the Schedules attribute contains a ScheduleStruct whose ScheduleHandle field matches the value of the ScheduleHandle field, the server SHALL set the thermostat's ActiveScheduleHandle attribute to the value of the ScheduleHandle field.
  */
 - (void)setActiveScheduleRequestWithParams:(MTRThermostatClusterSetActiveScheduleRequestParams *)params completion:(MTRStatusCompletion)completion MTR_PROVISIONALLY_AVAILABLE;
 /**
  * Command SetActivePresetRequest
  *
- * This command is used to set the active preset.
+ * ID
  */
 - (void)setActivePresetRequestWithParams:(MTRThermostatClusterSetActivePresetRequestParams *)params completion:(MTRStatusCompletion)completion MTR_PROVISIONALLY_AVAILABLE;
 /**
- * Command StartPresetsSchedulesEditRequest
+ * Command AtomicRequest
  *
- * This command is used to start editing the presets and schedules.
+ * Begins, Commits or Cancels an atomic write
  */
-- (void)startPresetsSchedulesEditRequestWithParams:(MTRThermostatClusterStartPresetsSchedulesEditRequestParams *)params completion:(MTRStatusCompletion)completion MTR_PROVISIONALLY_AVAILABLE;
-/**
- * Command CancelPresetsSchedulesEditRequest
- *
- * This command is used to cancel editing presets and schedules.
- */
-- (void)cancelPresetsSchedulesEditRequestWithParams:(MTRThermostatClusterCancelPresetsSchedulesEditRequestParams * _Nullable)params completion:(MTRStatusCompletion)completion MTR_PROVISIONALLY_AVAILABLE;
-- (void)cancelPresetsSchedulesEditRequestWithCompletion:(MTRStatusCompletion)completion
-    MTR_PROVISIONALLY_AVAILABLE;
-/**
- * Command CommitPresetsSchedulesRequest
- *
- * This command is used to notify the server that all edits are done and should be committed.
- */
-- (void)commitPresetsSchedulesRequestWithParams:(MTRThermostatClusterCommitPresetsSchedulesRequestParams * _Nullable)params completion:(MTRStatusCompletion)completion MTR_PROVISIONALLY_AVAILABLE;
-- (void)commitPresetsSchedulesRequestWithCompletion:(MTRStatusCompletion)completion
-    MTR_PROVISIONALLY_AVAILABLE;
+- (void)atomicRequestWithParams:(MTRThermostatClusterAtomicRequestParams *)params completion:(void (^)(MTRThermostatClusterAtomicResponseParams * _Nullable data, NSError * _Nullable error))completion MTR_PROVISIONALLY_AVAILABLE;
 
 - (void)readAttributeLocalTemperatureWithCompletion:(void (^)(NSNumber * _Nullable value, NSError * _Nullable error))completion MTR_AVAILABLE(ios(16.4), macos(13.3), watchos(9.4), tvos(16.4));
 - (void)subscribeAttributeLocalTemperatureWithParams:(MTRSubscribeParams *)params
@@ -10486,12 +10470,6 @@ MTR_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
                       subscriptionEstablished:(MTRSubscriptionEstablishedHandler _Nullable)subscriptionEstablished
                                 reportHandler:(void (^)(NSArray * _Nullable value, NSError * _Nullable error))reportHandler MTR_PROVISIONALLY_AVAILABLE;
 + (void)readAttributeSchedulesWithClusterStateCache:(MTRClusterStateCacheContainer *)clusterStateCacheContainer endpoint:(NSNumber *)endpoint queue:(dispatch_queue_t)queue completion:(void (^)(NSArray * _Nullable value, NSError * _Nullable error))completion MTR_PROVISIONALLY_AVAILABLE;
-
-- (void)readAttributePresetsSchedulesEditableWithCompletion:(void (^)(NSNumber * _Nullable value, NSError * _Nullable error))completion MTR_PROVISIONALLY_AVAILABLE;
-- (void)subscribeAttributePresetsSchedulesEditableWithParams:(MTRSubscribeParams *)params
-                                     subscriptionEstablished:(MTRSubscriptionEstablishedHandler _Nullable)subscriptionEstablished
-                                               reportHandler:(void (^)(NSNumber * _Nullable value, NSError * _Nullable error))reportHandler MTR_PROVISIONALLY_AVAILABLE;
-+ (void)readAttributePresetsSchedulesEditableWithClusterStateCache:(MTRClusterStateCacheContainer *)clusterStateCacheContainer endpoint:(NSNumber *)endpoint queue:(dispatch_queue_t)queue completion:(void (^)(NSNumber * _Nullable value, NSError * _Nullable error))completion MTR_PROVISIONALLY_AVAILABLE;
 
 - (void)readAttributeSetpointHoldExpiryTimestampWithCompletion:(void (^)(NSNumber * _Nullable value, NSError * _Nullable error))completion MTR_PROVISIONALLY_AVAILABLE;
 - (void)subscribeAttributeSetpointHoldExpiryTimestampWithParams:(MTRSubscribeParams *)params
@@ -17308,6 +17286,12 @@ typedef NS_ENUM(uint8_t, MTRDataTypeAreaTypeTag) {
     MTRDataTypeAreaTypeTagWorkshop MTR_PROVISIONALLY_AVAILABLE = 0x5E,
 } MTR_PROVISIONALLY_AVAILABLE;
 
+typedef NS_ENUM(uint8_t, MTRDataTypeAtomicRequestTypeEnum) {
+    MTRDataTypeAtomicRequestTypeEnumBeginWrite MTR_PROVISIONALLY_AVAILABLE = 0x00,
+    MTRDataTypeAtomicRequestTypeEnumCommitWrite MTR_PROVISIONALLY_AVAILABLE = 0x01,
+    MTRDataTypeAtomicRequestTypeEnumRollbackWrite MTR_PROVISIONALLY_AVAILABLE = 0x02,
+} MTR_PROVISIONALLY_AVAILABLE;
+
 typedef NS_ENUM(uint8_t, MTRDataTypeFloorSurfaceTag) {
     MTRDataTypeFloorSurfaceTagCarpet MTR_PROVISIONALLY_AVAILABLE = 0x00,
     MTRDataTypeFloorSurfaceTagCeramic MTR_PROVISIONALLY_AVAILABLE = 0x01,
@@ -19951,7 +19935,6 @@ typedef NS_ENUM(uint8_t, MTRThermostatControlSequence) {
 } MTR_DEPRECATED("Please use MTRThermostatControlSequenceOfOperation", ios(16.1, 17.4), macos(13.0, 14.4), watchos(9.1, 10.4), tvos(16.1, 17.4));
 
 typedef NS_ENUM(uint8_t, MTRThermostatPresetScenario) {
-    MTRThermostatPresetScenarioUnspecified MTR_PROVISIONALLY_AVAILABLE = 0x00,
     MTRThermostatPresetScenarioOccupied MTR_PROVISIONALLY_AVAILABLE = 0x01,
     MTRThermostatPresetScenarioUnoccupied MTR_PROVISIONALLY_AVAILABLE = 0x02,
     MTRThermostatPresetScenarioSleep MTR_PROVISIONALLY_AVAILABLE = 0x03,
@@ -20036,7 +20019,6 @@ typedef NS_OPTIONS(uint32_t, MTRThermostatFeature) {
     MTRThermostatFeatureLocalTemperatureNotExposed MTR_AVAILABLE(ios(17.0), macos(14.0), watchos(10.0), tvos(17.0)) = 0x40,
     MTRThermostatFeatureMatterScheduleConfiguration MTR_PROVISIONALLY_AVAILABLE = 0x80,
     MTRThermostatFeaturePresets MTR_PROVISIONALLY_AVAILABLE = 0x100,
-    MTRThermostatFeatureSetpoints MTR_PROVISIONALLY_AVAILABLE = 0x200,
 } MTR_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1));
 
 typedef NS_OPTIONS(uint8_t, MTRThermostatHVACSystemTypeBitmap) {
@@ -20044,6 +20026,10 @@ typedef NS_OPTIONS(uint8_t, MTRThermostatHVACSystemTypeBitmap) {
     MTRThermostatHVACSystemTypeBitmapHeatingStage MTR_PROVISIONALLY_AVAILABLE = 0xC,
     MTRThermostatHVACSystemTypeBitmapHeatingIsHeatPump MTR_PROVISIONALLY_AVAILABLE = 0x10,
     MTRThermostatHVACSystemTypeBitmapHeatingUsesFuel MTR_PROVISIONALLY_AVAILABLE = 0x20,
+} MTR_PROVISIONALLY_AVAILABLE;
+
+typedef NS_OPTIONS(uint8_t, MTRThermostatOccupancyBitmap) {
+    MTRThermostatOccupancyBitmapOccupied MTR_PROVISIONALLY_AVAILABLE = 0x1,
 } MTR_PROVISIONALLY_AVAILABLE;
 
 typedef NS_OPTIONS(uint16_t, MTRThermostatPresetTypeFeaturesBitmap) {

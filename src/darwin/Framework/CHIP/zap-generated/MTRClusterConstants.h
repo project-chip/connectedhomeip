@@ -3493,8 +3493,7 @@ typedef NS_ENUM(uint32_t, MTRAttributeIDType) {
     MTRAttributeIDTypeClusterThermostatAttributeActiveScheduleHandleID MTR_PROVISIONALLY_AVAILABLE = 0x0000004F,
     MTRAttributeIDTypeClusterThermostatAttributePresetsID MTR_PROVISIONALLY_AVAILABLE = 0x00000050,
     MTRAttributeIDTypeClusterThermostatAttributeSchedulesID MTR_PROVISIONALLY_AVAILABLE = 0x00000051,
-    MTRAttributeIDTypeClusterThermostatAttributePresetsSchedulesEditableID MTR_PROVISIONALLY_AVAILABLE = 0x00000052,
-    MTRAttributeIDTypeClusterThermostatAttributeSetpointHoldExpiryTimestampID MTR_PROVISIONALLY_AVAILABLE = 0x00000053,
+    MTRAttributeIDTypeClusterThermostatAttributeSetpointHoldExpiryTimestampID MTR_PROVISIONALLY_AVAILABLE = 0x00000052,
     MTRAttributeIDTypeClusterThermostatAttributeGeneratedCommandListID MTR_AVAILABLE(ios(16.4), macos(13.3), watchos(9.4), tvos(16.4)) = MTRAttributeIDTypeGlobalAttributeGeneratedCommandListID,
     MTRAttributeIDTypeClusterThermostatAttributeAcceptedCommandListID MTR_AVAILABLE(ios(16.4), macos(13.3), watchos(9.4), tvos(16.4)) = MTRAttributeIDTypeGlobalAttributeAcceptedCommandListID,
     MTRAttributeIDTypeClusterThermostatAttributeEventListID MTR_PROVISIONALLY_AVAILABLE = MTRAttributeIDTypeGlobalAttributeEventListID,
@@ -6625,9 +6624,8 @@ typedef NS_ENUM(uint32_t, MTRCommandIDType) {
     MTRCommandIDTypeClusterThermostatCommandClearWeeklyScheduleID MTR_AVAILABLE(ios(16.4), macos(13.3), watchos(9.4), tvos(16.4)) = 0x00000003,
     MTRCommandIDTypeClusterThermostatCommandSetActiveScheduleRequestID MTR_PROVISIONALLY_AVAILABLE = 0x00000005,
     MTRCommandIDTypeClusterThermostatCommandSetActivePresetRequestID MTR_PROVISIONALLY_AVAILABLE = 0x00000006,
-    MTRCommandIDTypeClusterThermostatCommandStartPresetsSchedulesEditRequestID MTR_PROVISIONALLY_AVAILABLE = 0x00000007,
-    MTRCommandIDTypeClusterThermostatCommandCancelPresetsSchedulesEditRequestID MTR_PROVISIONALLY_AVAILABLE = 0x00000008,
-    MTRCommandIDTypeClusterThermostatCommandCommitPresetsSchedulesRequestID MTR_PROVISIONALLY_AVAILABLE = 0x00000009,
+    MTRCommandIDTypeClusterThermostatCommandAtomicResponseID MTR_PROVISIONALLY_AVAILABLE = 0x000000FD,
+    MTRCommandIDTypeClusterThermostatCommandAtomicRequestID MTR_PROVISIONALLY_AVAILABLE = 0x000000FE,
 
     // Cluster FanControl deprecated command id names
 
