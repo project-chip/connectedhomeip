@@ -140,6 +140,9 @@ PICS:
     - label: "Does the commissioner support Discovery Capability over SoftAP?"
       id: MCORE.DD.DISCOVERY_SOFTAP
 
+    - label: "Does the commissioner support Discovery Capability over Wifi-PAF?"
+      id: MCORE.DD.DISCOVERY_PAF
+
     - label: "Does the DUT support Standard Commissioning Flow?"
       id: MCORE.DD.STANDARD_COMM_FLOW
 
@@ -2735,6 +2738,46 @@ PICS:
     - label: "Does the DUT(server) support the ExpiringUserTimeOut attribute?"
       id: DRLK.S.A0035
 
+    - label:
+          "Does the DUT(server) support the AliroReaderVerificationKey attribute"
+      id: DRLK.S.A0080
+
+    - label:
+          "Does the DUT(server) support the AliroReaderGroupIdentifier attribute"
+      id: DRLK.S.A0081
+
+    - label:
+          "Does the DUT(server) support the AliroReaderGroupSubIdentifier
+          attribute"
+      id: DRLK.S.A0082
+
+    - label:
+          "Does the DUT(server) support the
+          AliroExpeditedTransactionSupportedProtocolVersions attribute"
+      id: DRLK.S.A0083
+
+    - label: "Does the DUT(server) support the AliroGroupResolvingKey attribute"
+      id: DRLK.S.A0084
+
+    - label:
+          "Does the DUT(server) support the AliroSupportedBLEUWBProtocolVersions
+          attribute"
+      id: DRLK.S.A0085
+
+    - label:
+          "Does the DUT(server) support the AliroBLEAdvertisingVersion attribute"
+      id: DRLK.S.A0086
+
+    - label:
+          "Does the DUT(server) support the
+          NumberOfAliroCredentialIssuerKeysSupported attribute"
+      id: DRLK.S.A0087
+
+    - label:
+          "Does the DUT(server) support the NumberOfAliroEndpointKeysSupported
+          attribute"
+      id: DRLK.S.A0088
+
     #
     #Server ReadOnly attribute
     #
@@ -2866,6 +2909,12 @@ PICS:
     - label: "Does the DUT(server) support the Unbolt Door command?"
       id: DRLK.S.C27.Rsp
 
+    - label: "Does the DUT(server) support the SetAliroReaderConfig command?"
+      id: DRLK.S.C28.Rsp
+
+    - label: "Does the DUT(server) support the ClearAliroReaderConfig command?"
+      id: DRLK.S.C29.Rsp
+
     #
     # server / commandsGenerated
     #
@@ -2966,6 +3015,14 @@ PICS:
 
     - label: "Does the DUT(server) support the Lock supports unbolting feature?"
       id: DRLK.S.F0c
+
+    - label: "Does the DUT(server) support AliroProvisioning feature?"
+      id: DRLK.S.F0d
+
+    - label:
+          "Does the DUT(server) support Bluetooth LE + UWB Access Control Flow
+          feature?"
+      id: DRLK.S.F0e
 
     #
     # server / manually
@@ -6143,20 +6200,23 @@ PICS:
     #
     # server / features
     #
-    - label: "Does the device represent a Latching Switch?"
+    - label: "Does the device represent a Latching Switch (LS)?"
       id: SWTCH.S.F00
 
-    - label: "Does the device represent a Momentary Switch?"
+    - label: "Does the device represent a Momentary Switch (MS)?"
       id: SWTCH.S.F01
 
-    - label: "Does the MS device support Momentary Switch Release?"
+    - label: "Does the MS device support Momentary Switch Release (MSR)?"
       id: SWTCH.S.F02
 
-    - label: "Does the MS device support Momentary Switch LongPress?"
+    - label: "Does the MS device support Momentary Switch LongPress (MSL)?"
       id: SWTCH.S.F03
 
-    - label: "Does the MS device support Momentary Switch MultiPress?"
+    - label: "Does the MS device support Momentary Switch MultiPress (MSM)?"
       id: SWTCH.S.F04
+
+    - label: "Does the device support ActionSwitch feature (AS)?"
+      id: SWTCH.S.F05
 
     #
     # client / features
@@ -6419,6 +6479,21 @@ PICS:
     - label: "Does the device implement the ACCapacityFormat attribute?"
       id: TSTAT.S.A0047
 
+    - label: "Does the device implement the PresetTypes attribute?"
+      id: TSTAT.S.A0048
+
+    - label: "Does the device implement the NumberOfPresets attribute?"
+      id: TSTAT.S.A004a
+
+    - label: "Does the device implement the ActivePresetHandle attribute?"
+      id: TSTAT.S.A004e
+
+    - label: "Does the device implement the Presets attribute?"
+      id: TSTAT.S.A0050
+
+    - label: "Does the device implement the PresetsSchedulesEditable attribute?"
+      id: TSTAT.S.A0052
+
     #
     # server / commandsReceived
     #
@@ -6441,6 +6516,26 @@ PICS:
     - label:
           "Does the device implement receiving the GetRelayStatusLog command?"
       id: TSTAT.S.C04.Rsp
+
+    - label:
+          "Does the device implement receiving the SetActivePresetRequest
+          command?"
+      id: TSTAT.S.C06.Rsp
+
+    - label:
+          "Does the device implement receiving the
+          StartPresetsSchedulesEditRequest command?"
+      id: TSTAT.S.C07.Rsp
+
+    - label:
+          "Does the device implement receiving the
+          CancelPresetsSchedulesEditRequest command?"
+      id: TSTAT.S.C08.Rsp
+
+    - label:
+          "Does the device implement receiving the CommitPresetsSchedulesRequest
+          command?"
+      id: TSTAT.S.C09.Rsp
 
     #
     # server / commandsGenerated
@@ -6478,6 +6573,9 @@ PICS:
 
     - label: "Supports a local temperature not exposed"
       id: TSTAT.S.F06
+
+    - label: "Supports setpoint presets"
+      id: TSTAT.S.F08
 
     #
     # server / manually
@@ -6519,6 +6617,25 @@ PICS:
 
     - label: "Does the device implement sending the GetRelayStatusLog command?"
       id: TSTAT.C.C04.Tx
+
+    - label:
+          "Does the device implement sending the SetActivePresetRequest command?"
+      id: TSTAT.C.C06.Tx
+
+    - label:
+          "Does the device implement sending the
+          StartPresetsSchedulesEditRequest command?"
+      id: TSTAT.C.C07.Tx
+
+    - label:
+          "Does the device implement sending the
+          CancelPresetsSchedulesEditRequest command?"
+      id: TSTAT.C.C08.Tx
+
+    - label:
+          "Does the device implement sending the CommitPresetsSchedulesRequest
+          command?"
+      id: TSTAT.C.C09.Tx
 
     #
     # client / manually
@@ -10199,3 +10316,19 @@ PICS:
 
     - label: "Does the device implement the ActiveEndpoints attribute?"
       id: PWRTL.S.A0001
+
+    #
+    # Thread Network Directory Cluster
+    #
+    - label:
+          "Does the device implement the Thread Network Directory cluster as a
+          server"
+      id: THNETDIR.S
+
+    #
+    # Wi-Fi Network Management Cluster
+    #
+    - label:
+          "Does the device implement the Wi-Fi Network Management cluster as a
+          server"
+      id: WIFINM.S

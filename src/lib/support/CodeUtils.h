@@ -29,6 +29,7 @@
 #include <lib/core/CHIPConfig.h>
 #include <lib/core/CHIPError.h>
 #include <lib/core/ErrorStr.h>
+#include <lib/support/ObjectDump.h>
 #include <lib/support/VerificationMacrosNoLogging.h>
 #include <lib/support/logging/TextOnlyLogging.h>
 
@@ -545,6 +546,21 @@ inline void chipDie(void)
     nlABORT_ACTION(aCondition, ChipLogError(Support, "VerifyOrDie failure at %s:%d: %s", __FILE__, __LINE__, #aCondition))
 #else // CHIP_CONFIG_VERBOSE_VERIFY_OR_DIE
 #define VerifyOrDie(aCondition) VerifyOrDieWithoutLogging(aCondition)
+#endif // CHIP_CONFIG_VERBOSE_VERIFY_OR_DIE
+
+/**
+ * @def VerifyOrDieWithObject(aCondition, aObject)
+ *
+ * Like VerifyOrDie(), but calls DumpObjectToLog()
+ * on the provided object on failure before aborting
+ * if CHIP_CONFIG_VERBOSE_VERIFY_OR_DIE is enabled.
+ */
+#if CHIP_CONFIG_VERBOSE_VERIFY_OR_DIE
+#define VerifyOrDieWithObject(aCondition, aObject)                                                                                 \
+    nlABORT_ACTION(aCondition, ::chip::DumpObjectToLog(aObject);                                                                   \
+                   ChipLogError(Support, "VerifyOrDie failure at %s:%d: %s", __FILE__, __LINE__, #aCondition))
+#else // CHIP_CONFIG_VERBOSE_VERIFY_OR_DIE
+#define VerifyOrDieWithObject(aCondition, aObject) VerifyOrDieWithoutLogging(aCondition)
 #endif // CHIP_CONFIG_VERBOSE_VERIFY_OR_DIE
 
 /**

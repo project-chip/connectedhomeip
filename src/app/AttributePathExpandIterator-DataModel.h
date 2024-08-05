@@ -18,7 +18,7 @@
 
 #include <app/AttributePathParams.h>
 #include <app/ConcreteAttributePath.h>
-#include <app/data-model-interface/DataModel.h>
+#include <app/data-model-provider/Provider.h>
 #include <lib/support/LinkedList.h>
 
 namespace chip {
@@ -53,8 +53,7 @@ namespace app {
 class AttributePathExpandIteratorDataModel
 {
 public:
-    AttributePathExpandIteratorDataModel(InteractionModel::DataModel * dataModel,
-                                         SingleLinkedListNode<AttributePathParams> * attributePath);
+    AttributePathExpandIteratorDataModel(DataModel::Provider * provider, SingleLinkedListNode<AttributePathParams> * attributePath);
 
     /**
      * Proceed the iterator to the next attribute path in the given cluster info.
@@ -85,11 +84,11 @@ public:
     /** Start iterating over the given `paths` */
     inline void ResetTo(SingleLinkedListNode<AttributePathParams> * paths)
     {
-        *this = AttributePathExpandIteratorDataModel(mDataModel, paths);
+        *this = AttributePathExpandIteratorDataModel(mDataModelProvider, paths);
     }
 
 private:
-    InteractionModel::DataModel * mDataModel;
+    DataModel::Provider * mDataModelProvider;
     SingleLinkedListNode<AttributePathParams> * mpAttributePath;
     ConcreteAttributePath mOutputPath;
 

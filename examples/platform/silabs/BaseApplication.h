@@ -132,7 +132,7 @@ public:
      */
     static SilabsLCD & GetLCD(void);
 
-    static void UpdateLCDStatusScreen(void);
+    static void UpdateLCDStatusScreen(bool withChipStackLock = true);
 #endif
 
     /**

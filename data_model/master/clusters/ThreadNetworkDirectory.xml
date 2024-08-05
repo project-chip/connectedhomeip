@@ -59,7 +59,7 @@ Davis, CA 95616, USA
 -->
 <cluster xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="types types.xsd cluster cluster.xsd" id="0x0453" name="Thread Network Directory Cluster" revision="1">
   <revisionHistory>
-    <revision revision="1" summary="Initial Release"/>
+    <revision revision="1" summary="Initial revision"/>
   </revisionHistory>
   <clusterIds>
     <clusterId id="0x0453" name="Thread Network Directory"/>
@@ -67,8 +67,9 @@ Davis, CA 95616, USA
   <classification hierarchy="base" role="application" picsCode="THNETDIR" scope="Endpoint"/>
   <dataTypes>
     <struct name="ThreadNetworkStruct">
-      <field id="0" name="ExtendedPanID" type="uint64">
+      <field id="0" name="ExtendedPanID" type="octstr">
         <mandatoryConform/>
+        <constraint type="maxLength" value="8"/>
       </field>
       <field id="1" name="NetworkName" type="string">
         <mandatoryConform/>
@@ -77,17 +78,21 @@ Davis, CA 95616, USA
       <field id="2" name="Channel" type="uint16">
         <mandatoryConform/>
       </field>
+      <field id="3" name="ActiveTimestamp" type="uint64">
+        <mandatoryConform/>
+      </field>
     </struct>
   </dataTypes>
   <attributes>
-    <attribute id="0x0000" name="PreferredExtendedPanID" type="uint64" default="null">
-      <access read="true" write="true" readPrivilege="manage" writePrivilege="manage"/>
+    <attribute id="0x0000" name="PreferredExtendedPanID" type="octstr" default="null">
+      <access read="true" write="true" readPrivilege="view" writePrivilege="manage"/>
       <quality changeOmitted="false" nullable="true" scene="false" persistence="nonVolatile" reportable="false" sourceAttribution="false" quieterReporting="false"/>
       <mandatoryConform/>
+      <constraint type="maxLength" value="8"/>
     </attribute>
     <attribute id="0x0001" name="ThreadNetworks" type="list">
       <entry type="ThreadNetworkStruct"/>
-      <access read="true" readPrivilege="operate"/>
+      <access read="true" readPrivilege="view"/>
       <quality changeOmitted="false" nullable="false" scene="false" persistence="nonVolatile" reportable="false" sourceAttribution="false" quieterReporting="false"/>
       <mandatoryConform/>
       <constraint type="maxCount" value="ThreadNetworkTableSize"/>
@@ -111,15 +116,17 @@ Davis, CA 95616, USA
     <command id="0x01" name="RemoveNetwork" direction="commandToServer" response="Y">
       <access invokePrivilege="manage" timed="true"/>
       <mandatoryConform/>
-      <field id="0" name="ExtendedPanID" type="uint64">
+      <field id="0" name="ExtendedPanID" type="octstr">
         <mandatoryConform/>
+        <constraint type="maxLength" value="8"/>
       </field>
     </command>
     <command id="0x02" name="GetOperationalDataset" direction="commandToServer" response="OperationalDatasetResponse">
-      <access invokePrivilege="operate" timed="true"/>
+      <access invokePrivilege="manage"/>
       <mandatoryConform/>
-      <field id="0" name="ExtendedPanID" type="uint64">
+      <field id="0" name="ExtendedPanID" type="octstr">
         <mandatoryConform/>
+        <constraint type="maxLength" value="8"/>
       </field>
     </command>
     <command id="0x03" name="OperationalDatasetResponse" direction="responseFromServer">
@@ -130,13 +137,4 @@ Davis, CA 95616, USA
       </field>
     </command>
   </commands>
-  <events>
-    <event id="0x00" name="NetworkChanged" priority="info">
-      <access readPrivilege="operate"/>
-      <mandatoryConform/>
-      <field id="0" name="ExtendedPanID" type="uint64">
-        <mandatoryConform/>
-      </field>
-    </event>
-  </events>
 </cluster>

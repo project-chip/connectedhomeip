@@ -109,6 +109,7 @@ class TC_ICDM_2_1(MatterBaseTest):
             TestStep(
                 9, "TH reads from the DUT the UserActiveModeTriggerInstruction attribute"),
             TestStep(10, "TH reads from the DUT the OperatingMode attribute."),
+            TestStep(11, "TH reads from the DUT the MaximumCheckInBackoff attribute."),
         ]
         return steps
 
@@ -254,8 +255,9 @@ class TC_ICDM_2_1(MatterBaseTest):
                                     "UserActiveModeTriggerInstruction is not in the correct format for the associated UserActiveModeTriggerHint")
 
             if uatHintInstructionDepedentBitmap > 0 and uatHintInstructionDepedentBitmap in kUatColorInstructionBitMask:
-                # TODO: https://github.com/CHIP-Specifications/connectedhomeip-spec/issues/9194
-                asserts.assert_true(False, "Nothing to do for now")
+                pattern = re.compile(r'^[0-9A-F]{6}$')
+                asserts.assert_true(pattern.match(userActiveModeTriggerInstruction),
+                                    "UserActiveModeTriggerInstruction is not in the correct format for the associated UserActiveModeTriggerHint")
         else:
             # Check if the UserActiveModeTriggerInstruction was required
             asserts.assert_false(uatHintInstructionDepedentBitmap in kUatInstructionMandatoryBitMask,
@@ -272,6 +274,16 @@ class TC_ICDM_2_1(MatterBaseTest):
 
             asserts.assert_less(
                 operatingMode, modes.kUnknownEnumValue, "OperatingMode can only have 0 and 1 as valid values")
+        self.step(11)
+        if self.pics_guard(self.check_pics("ICDM.S.A0009")):
+            maximumCheckInBackOff = await self._read_icdm_attribute_expect_success(attributes.MaximumCheckInBackOff)
+
+            asserts.assert_true(self.is_valid_uint32_value(maximumCheckInBackOff),
+                                "MaximumCheckInBackOff attribute is not a valid uint32.")
+            asserts.assert_greater_equal(maximumCheckInBackOff, idleModeDuration,
+                                         "MaximumCheckInBack attribute is not greater or euqal to the IdleModeDuration")
+            asserts.assert_less_equal(maximumCheckInBackOff, 64800,
+                                      "MaximumCheckInBackOff attribute is greater than maximum value (64800).")
 
 
 if __name__ == "__main__":

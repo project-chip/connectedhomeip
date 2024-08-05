@@ -2,8 +2,11 @@
 
 #include "rvc-mode-delegates.h"
 #include "rvc-operational-state-delegate.h"
+#include "rvc-service-area-delegate.h"
 #include <app/clusters/mode-base-server/mode-base-server.h>
 #include <app/clusters/operational-state-server/operational-state-server.h>
+#include <app/clusters/service-area-server/service-area-delegate.h>
+#include <app/clusters/service-area-server/service-area-server.h>
 
 #include <string>
 
@@ -23,6 +26,9 @@ private:
     RvcOperationalState::RvcOperationalStateDelegate mOperationalStateDelegate;
     RvcOperationalState::Instance mOperationalStateInstance;
 
+    ServiceArea::RvcServiceAreaDelegate mServiceAreaDelegate;
+    ServiceArea::Instance mServiceAreaInstance;
+
     bool mDocked   = false;
     bool mCharging = false;
 
@@ -37,7 +43,8 @@ public:
     explicit RvcDevice(EndpointId aRvcClustersEndpoint) :
         mRunModeDelegate(), mRunModeInstance(&mRunModeDelegate, aRvcClustersEndpoint, RvcRunMode::Id, 0), mCleanModeDelegate(),
         mCleanModeInstance(&mCleanModeDelegate, aRvcClustersEndpoint, RvcCleanMode::Id, 0), mOperationalStateDelegate(),
-        mOperationalStateInstance(&mOperationalStateDelegate, aRvcClustersEndpoint)
+        mOperationalStateInstance(&mOperationalStateDelegate, aRvcClustersEndpoint), mServiceAreaDelegate(),
+        mServiceAreaInstance(&mServiceAreaDelegate, aRvcClustersEndpoint, BitMask<ServiceArea::Feature>(0))
     {
         // set the current-mode at start-up
         mRunModeInstance.UpdateCurrentMode(RvcRunMode::ModeIdle);

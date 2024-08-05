@@ -59,7 +59,7 @@ Davis, CA 95616, USA
 -->
 <cluster xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="types types.xsd cluster cluster.xsd" id="0x0098" name="Device Energy Management Cluster" revision="4">
   <revisionHistory>
-    <revision revision="1" summary="Initial Release"/>
+    <revision revision="1" summary="Initial revision"/>
     <revision revision="2" summary="Updates after 0.7 Ballot review"/>
     <revision revision="3" summary="Updates to match cluster spec updates"/>
     <revision revision="4" summary="Bug fixes found during PICS production"/>
