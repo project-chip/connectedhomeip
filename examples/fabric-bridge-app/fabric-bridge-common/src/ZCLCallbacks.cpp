@@ -38,7 +38,8 @@ Protocols::InteractionModel::Status emberAfExternalAttributeReadCallback(Endpoin
     AttributeId attributeId = attributeMetadata->attributeId;
 
     Device * dev = DeviceMgr().GetDevice(endpoint);
-    if (dev == nullptr) {
+    if (dev == nullptr)
+    {
         return Protocols::InteractionModel::Status::Failure;
     }
 
@@ -76,9 +77,10 @@ Protocols::InteractionModel::Status emberAfExternalAttributeReadCallback(Endpoin
 
     if (clusterId == AdministratorCommissioning::Id)
     {
-        // TODO(Add issue # here) This is a workaround to prevent crash. CADMIN is still reading incorrect
+        // TODO(#34791) This is a workaround to prevent crash. CADMIN is still reading incorrect
         // Attribute values on dynamic endpoint as it only reads the root node and not the actual bridge
-        // device we are representing here.
+        // device we are representing here, when addressing the issue over there we can more easily
+        // resolve this workaround.
         if ((attributeId == AdministratorCommissioning::Attributes::ClusterRevision::Id) && (maxReadLength == 2))
         {
             uint16_t rev = ZCL_ADMINISTRATOR_COMMISSIONING_CLUSTER_REVISION;
