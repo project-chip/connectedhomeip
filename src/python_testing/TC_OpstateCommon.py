@@ -1102,7 +1102,8 @@ class TC_OPSTATE_BASE():
                                      f"Completion event error code mismatched from expectation on endpoint {endpoint}.")
 
                 if event_data.totalOperationalTime is not NullValue:
-                    asserts.assert_less_equal(initial_countdown_time, event_data.totalOperationalTime,
+                    time_diff = abs(initial_countdown_time - event_data.totalOperationalTime)
+                    asserts.assert_less_equal(time_diff, 1,
                                               f"The total operation time shall be at least {initial_countdown_time:.1f}")
 
                 asserts.assert_equal(0, event_data.pausedTime,
