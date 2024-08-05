@@ -16,6 +16,7 @@
  */
 #pragma once
 
+#include "lib/core/CHIPError.h"
 #include <lib/core/TLVReader.h>
 #include <lib/core/TLVWriter.h>
 
@@ -23,6 +24,7 @@
 #include <app/AttributeValueEncoder.h>
 #include <app/CommandHandler.h>
 
+#include <app/data-model-provider/ActionReturnStatus.h>
 #include <app/data-model-provider/Context.h>
 #include <app/data-model-provider/MetadataTypes.h>
 #include <app/data-model-provider/OperationTypes.h>
@@ -66,18 +68,12 @@ public:
     ///         > Else if reading from the attribute in the path requires a privilege that is not
     ///           granted to access the cluster in the path, then the path SHALL be discarded.
     ///
-    /// Return codes:
-    ///   CHIP_ERROR_NO_MEMORY or CHIP_ERROR_BUFFER_TOO_SMALL:
+    /// Return value notes:
+    ///   ActionReturnStatus::IsOutOfSpaceEncodingResponse
     ///      - Indicates that list encoding had insufficient buffer space to encode elements.
     ///      - encoder::GetState().AllowPartialData() determines if these errors are permanent (no partial
     ///        data allowed) or further encoding can be retried (AllowPartialData true for list encoding)
-    ///   CHIP_IM_GLOBAL_STATUS(code):
-    ///      - error codes that are translatable in IM status codes (otherwise we expect Failure to be reported)
-    ///      - to check for this, CHIP_ERROR provides:
-    ///        - ::IsPart(ChipError::SdkPart::kIMGlobalStatus) -> bool
-    ///        - ::GetSdkCode() -> uint8_t to translate to the actual code
-    ///   other internal falures
-    virtual CHIP_ERROR ReadAttribute(const ReadAttributeRequest & request, AttributeValueEncoder & encoder) = 0;
+    virtual ActionReturnStatus ReadAttribute(const ReadAttributeRequest & request, AttributeValueEncoder & encoder) = 0;
 
     /// Requests a write of an attribute.
     ///
@@ -89,19 +85,21 @@ public:
     ///     - ACL validation (see notes on OperationFlags::kInternal)
     ///     - Validation of readability/writability (also controlled by OperationFlags::kInternal)
     ///     - Validation of timed interaction required (also controlled by OperationFlags::kInternal)
-    ///
-    /// Return codes
-    ///   CHIP_IM_GLOBAL_STATUS(code):
-    ///       - error codes that are translatable to specific IM codes
-    ///       - in particular, the following codes are interesting/expected
-    ///         - `UnsupportedWrite` for attempts to write read-only data
-    ///         - `UnsupportedAccess` for ACL failures
-    ///         - `NeedsTimedInteraction` for writes that are not timed however are required to be so
-    virtual CHIP_ERROR WriteAttribute(const WriteAttributeRequest & request, AttributeValueDecoder & decoder) = 0;
+    virtual ActionReturnStatus WriteAttribute(const WriteAttributeRequest & request, AttributeValueDecoder & decoder) = 0;
 
     /// `handler` is used to send back the reply.
-    ///    - returning a value other than CHIP_NO_ERROR implies an error reply (error and data are mutually exclusive)
-    virtual CHIP_ERROR Invoke(const InvokeRequest & request, chip::TLV::TLVReader & input_arguments, CommandHandler * handler) = 0;
+    ///    - returning a value other than Success implies an error reply (error and data are mutually exclusive)
+    ///
+    /// Returning anything other than CHIP_NO_ERROR or Status::Success (i.e. success without a return code)
+    /// means that the invoke will be considered to be returning the given path-specific status WITHOUT any data (any data
+    /// that was sent via CommandHandler is to be rolled back/discarded).
+    ///
+    /// This is because only one of the following may be encoded in a response:
+    ///    - data (as CommandDataIB) which is assumed a "response as a success"
+    ///    - status (as a CommandStatusIB) which is considered a final status, usually an error however
+    ///      cluster-specific success statuses also exist.
+    virtual ActionReturnStatus Invoke(const InvokeRequest & request, chip::TLV::TLVReader & input_arguments,
+                                      CommandHandler * handler) = 0;
 
 private:
     InteractionModelContext mContext = { nullptr };
