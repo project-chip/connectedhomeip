@@ -14,9 +14,9 @@ This builds and runs the unit tests on the efr32 device
 
 ## Introduction
 
-This builds a set of test binaries which contain the unit tests and can be flashed onto
-a device. The device is controlled using the included RPCs, through the python
-test runner.
+This builds a set of test binaries which contain the unit tests and can be
+flashed onto a device. The device is controlled using the included RPCs, through
+the python test runner.
 
 <a name="building"></a>
 
