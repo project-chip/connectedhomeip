@@ -211,6 +211,15 @@
             "CurrentMode",
             "FeatureMap"
         ],
+        "Door Lock": [
+            "AliroReaderVerificationKey",
+            "AliroReaderGroupIdentifier",
+            "AliroReaderGroupSubIdentifier",
+            "AliroGroupResolvingKey",
+            "AliroBLEAdvertisingVersion",
+            "NumberOfAliroCredentialIssuerKeysSupported",
+            "NumberOfAliroEndpointKeysSupported"
+        ],
         "Energy EVSE": [
             "State",
             "SupplyState",
@@ -299,7 +308,9 @@
             "struct_attr",
             "nullable_struct",
             "general_error_boolean",
-            "cluster_error_boolean"
+            "cluster_error_boolean",
+            "global_struct",
+            "nullable_global_struct"
         ],
         "Thread Border Router Management": [
             "BorderRouterName",
