@@ -9523,9 +9523,7 @@ private:
 | * ClearWeeklySchedule                                               |   0x03 |
 | * SetActiveScheduleRequest                                          |   0x05 |
 | * SetActivePresetRequest                                            |   0x06 |
-| * StartPresetsSchedulesEditRequest                                  |   0x07 |
-| * CancelPresetsSchedulesEditRequest                                 |   0x08 |
-| * CommitPresetsSchedulesRequest                                     |   0x09 |
+| * AtomicRequest                                                     |   0xFE |
 |------------------------------------------------------------------------------|
 | Attributes:                                                         |        |
 | * LocalTemperature                                                  | 0x0000 |
@@ -9587,8 +9585,7 @@ private:
 | * ActiveScheduleHandle                                              | 0x004F |
 | * Presets                                                           | 0x0050 |
 | * Schedules                                                         | 0x0051 |
-| * PresetsSchedulesEditable                                          | 0x0052 |
-| * SetpointHoldExpiryTimestamp                                       | 0x0053 |
+| * SetpointHoldExpiryTimestamp                                       | 0x0052 |
 | * GeneratedCommandList                                              | 0xFFF8 |
 | * AcceptedCommandList                                               | 0xFFF9 |
 | * EventList                                                         | 0xFFFA |
@@ -9835,22 +9832,24 @@ private:
 };
 
 /*
- * Command StartPresetsSchedulesEditRequest
+ * Command AtomicRequest
  */
-class ThermostatStartPresetsSchedulesEditRequest : public ClusterCommand
+class ThermostatAtomicRequest : public ClusterCommand
 {
 public:
-    ThermostatStartPresetsSchedulesEditRequest(CredentialIssuerCommands * credsIssuerConfig) :
-        ClusterCommand("start-presets-schedules-edit-request", credsIssuerConfig)
+    ThermostatAtomicRequest(CredentialIssuerCommands * credsIssuerConfig) :
+        ClusterCommand("atomic-request", credsIssuerConfig), mComplex_AttributeRequests(&mRequest.attributeRequests)
     {
-        AddArgument("TimeoutSeconds", 0, UINT16_MAX, &mRequest.timeoutSeconds);
+        AddArgument("RequestType", 0, UINT8_MAX, &mRequest.requestType);
+        AddArgument("AttributeRequests", &mComplex_AttributeRequests);
+        AddArgument("Timeout", 0, UINT16_MAX, &mRequest.timeout);
         ClusterCommand::AddArguments();
     }
 
     CHIP_ERROR SendCommand(chip::DeviceProxy * device, std::vector<chip::EndpointId> endpointIds) override
     {
         constexpr chip::ClusterId clusterId = chip::app::Clusters::Thermostat::Id;
-        constexpr chip::CommandId commandId = chip::app::Clusters::Thermostat::Commands::StartPresetsSchedulesEditRequest::Id;
+        constexpr chip::CommandId commandId = chip::app::Clusters::Thermostat::Commands::AtomicRequest::Id;
 
         ChipLogProgress(chipTool, "Sending cluster (0x%08" PRIX32 ") command (0x%08" PRIX32 ") on endpoint %u", clusterId,
                         commandId, endpointIds.at(0));
@@ -9860,7 +9859,7 @@ public:
     CHIP_ERROR SendGroupCommand(chip::GroupId groupId, chip::FabricIndex fabricIndex) override
     {
         constexpr chip::ClusterId clusterId = chip::app::Clusters::Thermostat::Id;
-        constexpr chip::CommandId commandId = chip::app::Clusters::Thermostat::Commands::StartPresetsSchedulesEditRequest::Id;
+        constexpr chip::CommandId commandId = chip::app::Clusters::Thermostat::Commands::AtomicRequest::Id;
 
         ChipLogProgress(chipTool, "Sending cluster (0x%08" PRIX32 ") command (0x%08" PRIX32 ") on Group %u", clusterId, commandId,
                         groupId);
@@ -9869,81 +9868,8 @@ public:
     }
 
 private:
-    chip::app::Clusters::Thermostat::Commands::StartPresetsSchedulesEditRequest::Type mRequest;
-};
-
-/*
- * Command CancelPresetsSchedulesEditRequest
- */
-class ThermostatCancelPresetsSchedulesEditRequest : public ClusterCommand
-{
-public:
-    ThermostatCancelPresetsSchedulesEditRequest(CredentialIssuerCommands * credsIssuerConfig) :
-        ClusterCommand("cancel-presets-schedules-edit-request", credsIssuerConfig)
-    {
-        ClusterCommand::AddArguments();
-    }
-
-    CHIP_ERROR SendCommand(chip::DeviceProxy * device, std::vector<chip::EndpointId> endpointIds) override
-    {
-        constexpr chip::ClusterId clusterId = chip::app::Clusters::Thermostat::Id;
-        constexpr chip::CommandId commandId = chip::app::Clusters::Thermostat::Commands::CancelPresetsSchedulesEditRequest::Id;
-
-        ChipLogProgress(chipTool, "Sending cluster (0x%08" PRIX32 ") command (0x%08" PRIX32 ") on endpoint %u", clusterId,
-                        commandId, endpointIds.at(0));
-        return ClusterCommand::SendCommand(device, endpointIds.at(0), clusterId, commandId, mRequest);
-    }
-
-    CHIP_ERROR SendGroupCommand(chip::GroupId groupId, chip::FabricIndex fabricIndex) override
-    {
-        constexpr chip::ClusterId clusterId = chip::app::Clusters::Thermostat::Id;
-        constexpr chip::CommandId commandId = chip::app::Clusters::Thermostat::Commands::CancelPresetsSchedulesEditRequest::Id;
-
-        ChipLogProgress(chipTool, "Sending cluster (0x%08" PRIX32 ") command (0x%08" PRIX32 ") on Group %u", clusterId, commandId,
-                        groupId);
-
-        return ClusterCommand::SendGroupCommand(groupId, fabricIndex, clusterId, commandId, mRequest);
-    }
-
-private:
-    chip::app::Clusters::Thermostat::Commands::CancelPresetsSchedulesEditRequest::Type mRequest;
-};
-
-/*
- * Command CommitPresetsSchedulesRequest
- */
-class ThermostatCommitPresetsSchedulesRequest : public ClusterCommand
-{
-public:
-    ThermostatCommitPresetsSchedulesRequest(CredentialIssuerCommands * credsIssuerConfig) :
-        ClusterCommand("commit-presets-schedules-request", credsIssuerConfig)
-    {
-        ClusterCommand::AddArguments();
-    }
-
-    CHIP_ERROR SendCommand(chip::DeviceProxy * device, std::vector<chip::EndpointId> endpointIds) override
-    {
-        constexpr chip::ClusterId clusterId = chip::app::Clusters::Thermostat::Id;
-        constexpr chip::CommandId commandId = chip::app::Clusters::Thermostat::Commands::CommitPresetsSchedulesRequest::Id;
-
-        ChipLogProgress(chipTool, "Sending cluster (0x%08" PRIX32 ") command (0x%08" PRIX32 ") on endpoint %u", clusterId,
-                        commandId, endpointIds.at(0));
-        return ClusterCommand::SendCommand(device, endpointIds.at(0), clusterId, commandId, mRequest);
-    }
-
-    CHIP_ERROR SendGroupCommand(chip::GroupId groupId, chip::FabricIndex fabricIndex) override
-    {
-        constexpr chip::ClusterId clusterId = chip::app::Clusters::Thermostat::Id;
-        constexpr chip::CommandId commandId = chip::app::Clusters::Thermostat::Commands::CommitPresetsSchedulesRequest::Id;
-
-        ChipLogProgress(chipTool, "Sending cluster (0x%08" PRIX32 ") command (0x%08" PRIX32 ") on Group %u", clusterId, commandId,
-                        groupId);
-
-        return ClusterCommand::SendGroupCommand(groupId, fabricIndex, clusterId, commandId, mRequest);
-    }
-
-private:
-    chip::app::Clusters::Thermostat::Commands::CommitPresetsSchedulesRequest::Type mRequest;
+    chip::app::Clusters::Thermostat::Commands::AtomicRequest::Type mRequest;
+    TypedComplexArgument<chip::app::DataModel::List<const chip::AttributeId>> mComplex_AttributeRequests;
 };
 
 /*----------------------------------------------------------------------------*\
@@ -23119,16 +23045,14 @@ void registerClusterThermostat(Commands & commands, CredentialIssuerCommands * c
         //
         // Commands
         //
-        make_unique<ClusterCommand>(Id, credsIssuerConfig),                          //
-        make_unique<ThermostatSetpointRaiseLower>(credsIssuerConfig),                //
-        make_unique<ThermostatSetWeeklySchedule>(credsIssuerConfig),                 //
-        make_unique<ThermostatGetWeeklySchedule>(credsIssuerConfig),                 //
-        make_unique<ThermostatClearWeeklySchedule>(credsIssuerConfig),               //
-        make_unique<ThermostatSetActiveScheduleRequest>(credsIssuerConfig),          //
-        make_unique<ThermostatSetActivePresetRequest>(credsIssuerConfig),            //
-        make_unique<ThermostatStartPresetsSchedulesEditRequest>(credsIssuerConfig),  //
-        make_unique<ThermostatCancelPresetsSchedulesEditRequest>(credsIssuerConfig), //
-        make_unique<ThermostatCommitPresetsSchedulesRequest>(credsIssuerConfig),     //
+        make_unique<ClusterCommand>(Id, credsIssuerConfig),                 //
+        make_unique<ThermostatSetpointRaiseLower>(credsIssuerConfig),       //
+        make_unique<ThermostatSetWeeklySchedule>(credsIssuerConfig),        //
+        make_unique<ThermostatGetWeeklySchedule>(credsIssuerConfig),        //
+        make_unique<ThermostatClearWeeklySchedule>(credsIssuerConfig),      //
+        make_unique<ThermostatSetActiveScheduleRequest>(credsIssuerConfig), //
+        make_unique<ThermostatSetActivePresetRequest>(credsIssuerConfig),   //
+        make_unique<ThermostatAtomicRequest>(credsIssuerConfig),            //
         //
         // Attributes
         //
@@ -23208,8 +23132,6 @@ void registerClusterThermostat(Commands & commands, CredentialIssuerCommands * c
         make_unique<ReadAttribute>(Id, "active-schedule-handle", Attributes::ActiveScheduleHandle::Id, credsIssuerConfig), //
         make_unique<ReadAttribute>(Id, "presets", Attributes::Presets::Id, credsIssuerConfig),                             //
         make_unique<ReadAttribute>(Id, "schedules", Attributes::Schedules::Id, credsIssuerConfig),                         //
-        make_unique<ReadAttribute>(Id, "presets-schedules-editable", Attributes::PresetsSchedulesEditable::Id,
-                                   credsIssuerConfig), //
         make_unique<ReadAttribute>(Id, "setpoint-hold-expiry-timestamp", Attributes::SetpointHoldExpiryTimestamp::Id,
                                    credsIssuerConfig),                                                                     //
         make_unique<ReadAttribute>(Id, "generated-command-list", Attributes::GeneratedCommandList::Id, credsIssuerConfig), //
@@ -23225,8 +23147,8 @@ void registerClusterThermostat(Commands & commands, CredentialIssuerCommands * c
         make_unique<WriteAttribute<chip::app::DataModel::Nullable<int16_t>>>(Id, "outdoor-temperature", INT16_MIN, INT16_MAX,
                                                                              Attributes::OutdoorTemperature::Id,
                                                                              WriteCommandType::kForceWrite, credsIssuerConfig), //
-        make_unique<WriteAttribute<uint8_t>>(Id, "occupancy", 0, UINT8_MAX, Attributes::Occupancy::Id,
-                                             WriteCommandType::kForceWrite, credsIssuerConfig), //
+        make_unique<WriteAttribute<chip::BitMask<chip::app::Clusters::Thermostat::OccupancyBitmap>>>(
+            Id, "occupancy", 0, UINT8_MAX, Attributes::Occupancy::Id, WriteCommandType::kForceWrite, credsIssuerConfig), //
         make_unique<WriteAttribute<int16_t>>(Id, "abs-min-heat-setpoint-limit", INT16_MIN, INT16_MAX,
                                              Attributes::AbsMinHeatSetpointLimit::Id, WriteCommandType::kForceWrite,
                                              credsIssuerConfig), //
@@ -23243,9 +23165,9 @@ void registerClusterThermostat(Commands & commands, CredentialIssuerCommands * c
                                              WriteCommandType::kForceWrite, credsIssuerConfig), //
         make_unique<WriteAttribute<uint8_t>>(Id, "piheating-demand", 0, UINT8_MAX, Attributes::PIHeatingDemand::Id,
                                              WriteCommandType::kForceWrite, credsIssuerConfig), //
-        make_unique<WriteAttribute<uint8_t>>(Id, "hvacsystem-type-configuration", 0, UINT8_MAX,
-                                             Attributes::HVACSystemTypeConfiguration::Id, WriteCommandType::kWrite,
-                                             credsIssuerConfig), //
+        make_unique<WriteAttribute<chip::BitMask<chip::app::Clusters::Thermostat::HVACSystemTypeBitmap>>>(
+            Id, "hvacsystem-type-configuration", 0, UINT8_MAX, Attributes::HVACSystemTypeConfiguration::Id,
+            WriteCommandType::kWrite, credsIssuerConfig), //
         make_unique<WriteAttribute<int8_t>>(Id, "local-temperature-calibration", INT8_MIN, INT8_MAX,
                                             Attributes::LocalTemperatureCalibration::Id, WriteCommandType::kWrite,
                                             credsIssuerConfig), //
@@ -23376,8 +23298,6 @@ void registerClusterThermostat(Commands & commands, CredentialIssuerCommands * c
         make_unique<WriteAttributeAsComplex<
             chip::app::DataModel::List<const chip::app::Clusters::Thermostat::Structs::ScheduleStruct::Type>>>(
             Id, "schedules", Attributes::Schedules::Id, WriteCommandType::kWrite, credsIssuerConfig), //
-        make_unique<WriteAttribute<bool>>(Id, "presets-schedules-editable", 0, 1, Attributes::PresetsSchedulesEditable::Id,
-                                          WriteCommandType::kForceWrite, credsIssuerConfig), //
         make_unique<WriteAttribute<chip::app::DataModel::Nullable<uint32_t>>>(Id, "setpoint-hold-expiry-timestamp", 0, UINT32_MAX,
                                                                               Attributes::SetpointHoldExpiryTimestamp::Id,
                                                                               WriteCommandType::kForceWrite, credsIssuerConfig), //
@@ -23474,8 +23394,6 @@ void registerClusterThermostat(Commands & commands, CredentialIssuerCommands * c
         make_unique<SubscribeAttribute>(Id, "active-schedule-handle", Attributes::ActiveScheduleHandle::Id, credsIssuerConfig), //
         make_unique<SubscribeAttribute>(Id, "presets", Attributes::Presets::Id, credsIssuerConfig),                             //
         make_unique<SubscribeAttribute>(Id, "schedules", Attributes::Schedules::Id, credsIssuerConfig),                         //
-        make_unique<SubscribeAttribute>(Id, "presets-schedules-editable", Attributes::PresetsSchedulesEditable::Id,
-                                        credsIssuerConfig), //
         make_unique<SubscribeAttribute>(Id, "setpoint-hold-expiry-timestamp", Attributes::SetpointHoldExpiryTimestamp::Id,
                                         credsIssuerConfig),                                                                     //
         make_unique<SubscribeAttribute>(Id, "generated-command-list", Attributes::GeneratedCommandList::Id, credsIssuerConfig), //

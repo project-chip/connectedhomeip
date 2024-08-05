@@ -17,6 +17,12 @@ limitations under the License.
 
 <configurator>
   <domain name="CHIP"/>
+
+  <struct name="AtomicAttributeStatusStruct">
+    <item fieldId="0" name="AttributeID" type="attrib_id" />
+    <item fieldId="1" name="StatusCode" type="status"/>
+  </struct>
+
   <struct name="LocationDescriptorStruct">
     <item fieldId="0" name="LocationName"    type="char_string" length="128" isNullable="false" optional="false"/>
     <item fieldId="1" name="FloorNumber"     type="int16s"                   isNullable="true"  optional="false"/>
@@ -27,17 +33,7 @@ limitations under the License.
     These are test global items (no cluster attached) for testing only.
     Their usage is defined for UnitTestCluster only.
   -->
-  <bitmap name="TestGlobalBitmap" type="bitmap32">
-    <field mask="0x01" name="FirstBit" />
-    <field mask="0x02" name="SecondBit" />
-  </bitmap>
-
-  <enum name="TestGlobalEnum" type="enum8">
-    <item name="SomeValue" value="0x00"/>
-    <item name="SomeOtherValue" value="0x01"/>
-    <item name="FinalValue" value="0x02"/>
-  </enum>
-
+  
   <struct name="TestGlobalStruct">
     <item fieldId="0" name="Name" type="char_string" length="128" isNullable="false" optional="false"/>
     <item fieldId="1" name="MyBitmap" type="TestGlobalBitmap" isNullable="true" optional="false"/>
