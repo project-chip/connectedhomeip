@@ -33,7 +33,7 @@ jobs:
         if: github.actor != 'restyled-io[bot]'
 
         container:
-            image: ghcr.io/project-chip/chip-build:60
+            image: ghcr.io/project-chip/chip-build:66
             volumes:
                 - "/tmp/log_output:/tmp/test_logs"
 
@@ -69,7 +69,6 @@ jobs:
     build_darwin_fuzzing:
         name: Build on Darwin
         runs-on: macos-13
-        python-version: '3.11'
         if: github.actor != 'restyled-io[bot]'
 
         steps:

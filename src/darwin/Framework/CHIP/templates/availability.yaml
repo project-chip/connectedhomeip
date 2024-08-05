@@ -9580,10 +9580,8 @@
               - ActivePresetHandle
               - Presets
               - Schedules
-              - PresetsSchedulesEditable
               - TemperatureSetpointHoldPolicy
               - SetpointHoldExpiryTimestamp
-              - QueuedPreset
               - ActiveScheduleHandle
           UnitTesting:
               # Ideally none of UnitTesting would be exposed as public API, but
@@ -9601,7 +9599,6 @@
               - StartPresetsSchedulesEditRequest
               - CancelPresetsSchedulesEditRequest
               - CommitPresetsSchedulesRequest
-              - CancelSetActivePresetRequest
               - SetTemperatureSetpointHoldPolicy
           RVCOperationalState:
               # Targeting Spring 2024 Matter release
@@ -9623,7 +9620,6 @@
               - PresetStruct
               - PresetTypeStruct
               - ScheduleTypeStruct
-              - QueuedPresetStruct
       events:
           UnitTesting:
               # Ideally none of UnitTesting would be exposed as public API, but
@@ -9670,7 +9666,6 @@
           Thermostat:
               Feature:
                   # Targeting Spring 2024 Matter release
-                  - QueuedPresetsSupported
                   - Setpoints
                   - Presets
                   - MatterScheduleConfiguration
@@ -9689,12 +9684,90 @@
   versions: "future"
   provisional:
       clusters:
-          # Targeting Fall 2024
+          # Targeting 1.4
+          - CommissionerControl
+          - EcosystemInformation
+          - ServiceArea
           - ThreadBorderRouterManagement
           - ThreadNetworkDirectory
+          - WaterHeaterManagement
+          - WaterHeaterMode
           - WiFiNetworkManagement
+      attributes:
+          GeneralCommissioning:
+              # Targeting 1.4
+              - TCAcceptedVersion
+              - TCMinRequiredVersion
+              - TCAcknowledgements
+              - TCAcknowledgementsRequired
+          OccupancySensing:
+              # Targeting 1.4
+              - HoldTime
+              - HoldTimeLimits
+          UnitTesting:
+              # Ideally none of UnitTesting would be exposed as public API, but
+              # for now just start doing that for new additions to it.
+              - GlobalEnum
+              - GlobalStruct
+              - NullableGlobalEnum
+              - NullableGlobalStruct
+      commands:
+          BridgedDeviceBasicInformation:
+              # Targeting 1.4
+              - KeepActive
+          GeneralCommissioning:
+              # Targeting 1.4
+              - SetTCAcknowledgements
+              - SetTCAcknowledgementsResponse
+          UnitTesting:
+              # Ideally none of UnitTesting would be exposed as public API, but
+              # for now just start doing that for new additions to it.
+              - GlobalEchoRequest
+              - GlobalEchoResponse
+              - StringEchoRequest
+              - StringEchoResponse
+      structs:
+          Globals:
+              # Test-only value
+              - TestGlobalStruct
+          OccupancySensing:
+              # Targeting 1.4
+              - HoldTimeLimitsStruct
+      struct fields:
+          UnitTesting:
+              # Ideally none of UnitTesting would be exposed as public API, but
+              # for now just start doing that for new additions to it.
+              SimpleStruct:
+                  - i
+              NestedStruct:
+                  - d
+      events:
+          BridgedDeviceBasicInformation:
+              # Targeting 1.4
+              - ActiveChanged
+      enums:
+          Globals:
+              # Test-only value
+              - TestGlobalEnum
+      enum values:
+          GeneralCommissioning:
+              # Targeting 1.4
+              CommissioningErrorEnum:
+                  - RequiredTCNotAccepted
+                  - TCAcknowledgementsNotReceived
+                  - TCMinVersionNotMet
+      bitmaps:
+          BridgedDeviceBasicInformation:
+              # Targeting 1.4
+              - Feature
+          GeneralCommissioning:
+              # Targeting 1.4
+              - Feature
+          OccupancySensing:
+              # Targeting 1.4
+              - Feature
       bitmap values:
           Switch:
               Feature:
-                  # Targeting Fall 2024
+                  # Targeting 1.4
                   - ActionSwitch

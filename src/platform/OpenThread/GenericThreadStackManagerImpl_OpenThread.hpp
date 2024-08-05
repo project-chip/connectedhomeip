@@ -1088,28 +1088,20 @@ CHIP_ERROR GenericThreadStackManagerImpl_OpenThread<ImplClass>::_GetPollPeriod(u
     return CHIP_NO_ERROR;
 }
 
+/**
+ * @brief Helper that sets callbacks for OpenThread state changes and configures the Thread stack.
+ * Assigns mOTInst to an instance, and configures the OT stack on a device by setting state change callbacks enabling features
+ * for IPv6 address configuration, enabling the Thread network if necessary, and handling SRP if enabled.
+ * Allows for the configuration of the Thread stack on a device where the instance and the otCLI are already initialised.
+ *
+ * @param otInst Pointer to the OT instance
+ * @return CHIP_ERROR OpenThread error mapped to CHIP_ERROR
+ */
 template <class ImplClass>
-CHIP_ERROR GenericThreadStackManagerImpl_OpenThread<ImplClass>::DoInit(otInstance * otInst)
+CHIP_ERROR GenericThreadStackManagerImpl_OpenThread<ImplClass>::ConfigureThreadStack(otInstance * otInst)
 {
     CHIP_ERROR err = CHIP_NO_ERROR;
     otError otErr  = OT_ERROR_NONE;
-
-    // Arrange for OpenThread errors to be translated to text.
-    RegisterOpenThreadErrorFormatter();
-
-    mOTInst = NULL;
-
-    // If an OpenThread instance hasn't been supplied, call otInstanceInitSingle() to
-    // create or acquire a singleton instance of OpenThread.
-    if (otInst == NULL)
-    {
-        otInst = otInstanceInitSingle();
-        VerifyOrExit(otInst != NULL, err = MapOpenThreadError(OT_ERROR_FAILED));
-    }
-
-#if !defined(PW_RPC_ENABLED) && CHIP_DEVICE_CONFIG_THREAD_ENABLE_CLI
-    otAppCliInit(otInst);
-#endif
 
     mOTInst = otInst;
 
@@ -1131,6 +1123,7 @@ CHIP_ERROR GenericThreadStackManagerImpl_OpenThread<ImplClass>::DoInit(otInstanc
     memset(&mSrpClient, 0, sizeof(mSrpClient));
 #endif // CHIP_DEVICE_CONFIG_ENABLE_THREAD_SRP_CLIENT
 
+#if CHIP_DEVICE_CONFIG_ENABLE_THREAD_AUTOSTART
     // If the Thread stack has been provisioned, but is not currently enabled, enable it now.
     if (otThreadGetDeviceRole(mOTInst) == OT_DEVICE_ROLE_DISABLED && otDatasetIsCommissioned(otInst))
     {
@@ -1143,12 +1136,41 @@ CHIP_ERROR GenericThreadStackManagerImpl_OpenThread<ImplClass>::DoInit(otInstanc
 
         ChipLogProgress(DeviceLayer, "OpenThread ifconfig up and thread start");
     }
-
-    initNetworkCommissioningThreadDriver();
+#endif
 
 exit:
 
     ChipLogProgress(DeviceLayer, "OpenThread started: %s", otThreadErrorToString(otErr));
+    return err;
+}
+
+template <class ImplClass>
+CHIP_ERROR GenericThreadStackManagerImpl_OpenThread<ImplClass>::DoInit(otInstance * otInst)
+{
+    CHIP_ERROR err = CHIP_NO_ERROR;
+
+    // Arrange for OpenThread errors to be translated to text.
+    RegisterOpenThreadErrorFormatter();
+
+    mOTInst = NULL;
+
+    // If an OpenThread instance hasn't been supplied, call otInstanceInitSingle() to
+    // create or acquire a singleton instance of OpenThread.
+    if (otInst == NULL)
+    {
+        otInst = otInstanceInitSingle();
+        VerifyOrExit(otInst != NULL, err = MapOpenThreadError(OT_ERROR_FAILED));
+    }
+
+#if !defined(PW_RPC_ENABLED) && CHIP_DEVICE_CONFIG_THREAD_ENABLE_CLI
+    otAppCliInit(otInst);
+#endif
+
+    err = ConfigureThreadStack(otInst);
+
+    initNetworkCommissioningThreadDriver();
+
+exit:
     return err;
 }
 

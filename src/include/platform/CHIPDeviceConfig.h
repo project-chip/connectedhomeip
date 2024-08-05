@@ -425,6 +425,15 @@
 #define CHIP_DEVICE_CONFIG_WIFI_STATION_IF_NAME "wlan0"
 #endif
 
+/**
+ * CHIP_DEVICE_CONFIG_ENABLE_WIFIPAF
+ *
+ * Enable support for commissioning using Wi-Fi Public Action Frame as the transport.
+ */
+#ifndef CHIP_DEVICE_CONFIG_ENABLE_WIFIPAF
+#define CHIP_DEVICE_CONFIG_ENABLE_WIFIPAF 0
+#endif
+
 // -------------------- WiFi AP Configuration --------------------
 
 /**
@@ -1099,6 +1108,15 @@ static_assert(CHIP_DEVICE_CONFIG_BLE_EXT_ADVERTISING_INTERVAL_MIN <= CHIP_DEVICE
  */
 #ifndef CHIP_DEVICE_CONFIG_ENABLE_THREAD_DNS_CLIENT
 #define CHIP_DEVICE_CONFIG_ENABLE_THREAD_DNS_CLIENT 0
+#endif
+
+/**
+ * CHIP_DEVICE_CONFIG_ENABLE_THREAD_AUTOSTART
+ *
+ * Enable starting provisioned Thread network automatically after device power-up.
+ */
+#ifndef CHIP_DEVICE_CONFIG_ENABLE_THREAD_AUTOSTART
+#define CHIP_DEVICE_CONFIG_ENABLE_THREAD_AUTOSTART 1
 #endif
 
 // -------------------- Network Telemetry Configuration --------------------

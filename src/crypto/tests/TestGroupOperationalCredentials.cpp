@@ -18,11 +18,12 @@
 
 #include <inttypes.h>
 
+#include <pw_unit_test/framework.h>
+
 #include <crypto/CHIPCryptoPAL.h>
 #include <lib/core/CHIPCore.h>
+#include <lib/core/StringBuilderAdapters.h>
 #include <lib/support/CHIPMem.h>
-
-#include <gtest/gtest.h>
 
 using namespace chip;
 using namespace chip::Crypto;

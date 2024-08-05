@@ -16,7 +16,7 @@
  *    limitations under the License.
  */
 
-#include <gtest/gtest.h>
+#include <pw_unit_test/framework.h>
 
 #include "app-common/zap-generated/ids/Attributes.h"
 #include "app-common/zap-generated/ids/Clusters.h"
@@ -38,10 +38,10 @@
 #include <controller/InvokeInteraction.h>
 #include <lib/core/CHIPCore.h>
 #include <lib/core/ErrorStr.h>
+#include <lib/core/StringBuilderAdapters.h>
 #include <lib/support/CHIPCounter.h>
 #include <lib/support/TimeUtils.h>
 #include <lib/support/logging/CHIPLogging.h>
-#include <messaging/tests/MessagingContext.h>
 
 using namespace chip;
 using namespace chip::app;
@@ -53,8 +53,6 @@ static uint8_t gDebugEventBuffer[4096];
 static uint8_t gInfoEventBuffer[4096];
 static uint8_t gCritEventBuffer[4096];
 static chip::app::CircularEventBuffer gCircularEventBuffer[3];
-
-using TestContext = chip::Test::AppContext;
 
 uint32_t gIterationCount = 0;
 
@@ -69,31 +67,8 @@ constexpr AttributeId kTestListLargeAttribute = 8; // This attribute will be lar
 // The size of the attribute which is a bit larger than the size of event used in the test.
 constexpr size_t kSizeOfLargeAttribute = 60;
 
-class TestEventChunking : public ::testing::Test
+class TestEventChunking : public chip::Test::AppContext
 {
-public:
-    // Performs shared setup for all tests in the test suite
-    static void SetUpTestSuite()
-    {
-        if (mpContext == nullptr)
-        {
-            mpContext = new TestContext();
-            ASSERT_NE(mpContext, nullptr);
-        }
-        mpContext->SetUpTestSuite();
-    }
-
-    // Performs shared teardown for all tests in the test suite
-    static void TearDownTestSuite()
-    {
-        mpContext->TearDownTestSuite();
-        if (mpContext != nullptr)
-        {
-            delete mpContext;
-            mpContext = nullptr;
-        }
-    }
-
 protected:
     // Performs setup for each test in the suite
     void SetUp()
@@ -104,13 +79,13 @@ protected:
             { &gCritEventBuffer[0], sizeof(gCritEventBuffer), chip::app::PriorityLevel::Critical },
         };
 
-        mpContext->SetUp();
+        AppContext::SetUp();
 
         CHIP_ERROR err = CHIP_NO_ERROR;
         // TODO: use ASSERT_EQ, once transition to pw_unit_test is complete
         VerifyOrDieWithMsg((err = mEventCounter.Init(0)) == CHIP_NO_ERROR, AppServer,
                            "Init EventCounter failed: %" CHIP_ERROR_FORMAT, err.Format());
-        chip::app::EventManagement::CreateEventManagement(&mpContext->GetExchangeManager(), ArraySize(logStorageResources),
+        chip::app::EventManagement::CreateEventManagement(&GetExchangeManager(), ArraySize(logStorageResources),
                                                           gCircularEventBuffer, logStorageResources, &mEventCounter);
     }
 
@@ -118,15 +93,12 @@ protected:
     void TearDown()
     {
         chip::app::EventManagement::DestroyEventManagement();
-        mpContext->TearDown();
+        AppContext::TearDown();
     }
-
-    static TestContext * mpContext;
 
 private:
     MonotonicallyIncreasingCounter<EventNumber> mEventCounter;
 };
-TestContext * TestEventChunking::mpContext = nullptr;
 
 //clang-format off
 DECLARE_DYNAMIC_ATTRIBUTE_LIST_BEGIN(testClusterAttrs)
@@ -317,7 +289,7 @@ void GenerateEvents(chip::EventNumber & firstEventNumber, chip::EventNumber & la
  */
 TEST_F(TestEventChunking, TestEventChunking)
 {
-    auto sessionHandle                   = mpContext->GetSessionBobToAlice();
+    auto sessionHandle                   = GetSessionBobToAlice();
     app::InteractionModelEngine * engine = app::InteractionModelEngine::GetInstance();
 
     // Initialize the ember side server logic
@@ -358,15 +330,15 @@ TEST_F(TestEventChunking, TestEventChunking)
 
         app::InteractionModelEngine::GetInstance()->GetReportingEngine().SetWriterReserved(static_cast<uint32_t>(800 + i));
 
-        app::ReadClient readClient(engine, &mpContext->GetExchangeManager(), readCallback.mBufferedCallback,
+        app::ReadClient readClient(engine, &GetExchangeManager(), readCallback.mBufferedCallback,
                                    app::ReadClient::InteractionType::Read);
 
         EXPECT_EQ(readClient.SendRequest(readParams), CHIP_NO_ERROR);
 
-        mpContext->DrainAndServiceIO();
+        DrainAndServiceIO();
 
         EXPECT_EQ(readCallback.mEventCount, static_cast<uint32_t>((lastEventNumber - firstEventNumber) + 1));
-        EXPECT_EQ(mpContext->GetExchangeManager().GetNumActiveExchanges(), 0u);
+        EXPECT_EQ(GetExchangeManager().GetNumActiveExchanges(), 0u);
 
         //
         // Stop the test if we detected an error. Otherwise, it'll be difficult to read the logs.
@@ -383,7 +355,7 @@ TEST_F(TestEventChunking, TestEventChunking)
 // Similar to the tests above, but it will read attributes AND events
 TEST_F(TestEventChunking, TestMixedEventsAndAttributesChunking)
 {
-    auto sessionHandle                   = mpContext->GetSessionBobToAlice();
+    auto sessionHandle                   = GetSessionBobToAlice();
     app::InteractionModelEngine * engine = app::InteractionModelEngine::GetInstance();
 
     // Initialize the ember side server logic
@@ -426,12 +398,12 @@ TEST_F(TestEventChunking, TestMixedEventsAndAttributesChunking)
 
         app::InteractionModelEngine::GetInstance()->GetReportingEngine().SetWriterReserved(static_cast<uint32_t>(800 + i));
 
-        app::ReadClient readClient(engine, &mpContext->GetExchangeManager(), readCallback.mBufferedCallback,
+        app::ReadClient readClient(engine, &GetExchangeManager(), readCallback.mBufferedCallback,
                                    app::ReadClient::InteractionType::Read);
 
         EXPECT_EQ(readClient.SendRequest(readParams), CHIP_NO_ERROR);
 
-        mpContext->DrainAndServiceIO();
+        DrainAndServiceIO();
 
         //
         // Always returns the same number of attributes read (5 + revision + GlobalAttributesNotInMetadata).
@@ -440,7 +412,7 @@ TEST_F(TestEventChunking, TestMixedEventsAndAttributesChunking)
         EXPECT_EQ(readCallback.mAttributeCount, 6 + ArraySize(GlobalAttributesNotInMetadata));
         EXPECT_EQ(readCallback.mEventCount, static_cast<uint32_t>(lastEventNumber - firstEventNumber + 1));
 
-        EXPECT_EQ(mpContext->GetExchangeManager().GetNumActiveExchanges(), 0u);
+        EXPECT_EQ(GetExchangeManager().GetNumActiveExchanges(), 0u);
 
         //
         // Stop the test if we detected an error. Otherwise, it'll be difficult to read the logs.
@@ -459,7 +431,7 @@ TEST_F(TestEventChunking, TestMixedEventsAndAttributesChunking)
 // can be encoded in to one chunk in the tests above. This test will force it by reading only one attribtue and read many events.
 TEST_F(TestEventChunking, TestMixedEventsAndLargeAttributesChunking)
 {
-    auto sessionHandle                   = mpContext->GetSessionBobToAlice();
+    auto sessionHandle                   = GetSessionBobToAlice();
     app::InteractionModelEngine * engine = app::InteractionModelEngine::GetInstance();
 
     // Initialize the ember side server logic
@@ -502,18 +474,18 @@ TEST_F(TestEventChunking, TestMixedEventsAndLargeAttributesChunking)
 
         app::InteractionModelEngine::GetInstance()->GetReportingEngine().SetWriterReserved(static_cast<uint32_t>(800 + i));
 
-        app::ReadClient readClient(engine, &mpContext->GetExchangeManager(), readCallback.mBufferedCallback,
+        app::ReadClient readClient(engine, &GetExchangeManager(), readCallback.mBufferedCallback,
                                    app::ReadClient::InteractionType::Read);
 
         EXPECT_EQ(readClient.SendRequest(readParams), CHIP_NO_ERROR);
 
-        mpContext->DrainAndServiceIO();
+        DrainAndServiceIO();
 
         EXPECT_TRUE(readCallback.mOnReportEnd);
         EXPECT_EQ(readCallback.mAttributeCount, 1u);
         EXPECT_EQ(readCallback.mEventCount, static_cast<uint32_t>(lastEventNumber - firstEventNumber + 1));
 
-        EXPECT_EQ(mpContext->GetExchangeManager().GetNumActiveExchanges(), 0u);
+        EXPECT_EQ(GetExchangeManager().GetNumActiveExchanges(), 0u);
 
         //
         // Stop the test if we detected an error. Otherwise, it'll be difficult to read the logs.

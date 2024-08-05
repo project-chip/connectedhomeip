@@ -68,6 +68,7 @@ source_set("logging_constants") {
 
 source_set("attributes") {
   sources = [
+    "Compiler.h",
     "DLLUtil.h",
     "EnforceFormat.h",
   ]
@@ -132,7 +133,10 @@ source_set("text_only_logging") {
 }
 
 source_set("verifymacros") {
-  sources = [ "CodeUtils.h" ]
+  sources = [
+    "CodeUtils.h",
+    "ObjectDump.h",
+  ]
 
   public_deps = [
     ":attributes",
@@ -299,7 +303,7 @@ static_library("support") {
 
   # Android has no 'platform' that provides logging
   if (current_os == "android") {
-    public_deps += [ "${chip_root}/src/platform/logging:android" ]
+    public_deps += [ "${chip_root}/src/platform/android:logging" ]
   }
 
   if (current_os == "mac" || current_os == "ios") {
@@ -350,6 +354,7 @@ pw_static_library("pw_tests_wrapper") {
     "$dir_pw_log:impl",
     "$dir_pw_unit_test",
     "$dir_pw_unit_test:logging",
+    "${chip_root}/src/lib/core:string-builder-adapters",
   ]
   sources = [
     "UnitTest.cpp",

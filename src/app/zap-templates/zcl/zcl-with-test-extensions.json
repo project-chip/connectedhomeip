@@ -33,6 +33,7 @@
         "channel-cluster.xml",
         "clusters-extensions.xml",
         "color-control-cluster.xml",
+        "commissioner-control-cluster.xml",
         "concentration-measurement-cluster.xml",
         "content-launch-cluster.xml",
         "content-app-observer-cluster.xml",
@@ -47,6 +48,7 @@
         "microwave-oven-mode-cluster.xml",
         "microwave-oven-control-cluster.xml",
         "door-lock-cluster.xml",
+        "ecosystem-information-cluster.xml",
         "energy-preference-cluster.xml",
         "electrical-energy-measurement-cluster.xml",
         "electrical-measurement-cluster.xml",
@@ -61,6 +63,8 @@
         "general-commissioning-cluster.xml",
         "general-diagnostics-cluster.xml",
         "global-attributes.xml",
+        "global-bitmaps.xml",
+        "global-enums.xml",
         "global-structs.xml",
         "groups-cluster.xml",
         "group-key-mgmt-cluster.xml",
@@ -129,6 +133,8 @@
         "valve-configuration-and-control-cluster.xml",
         "wake-on-lan-cluster.xml",
         "washer-controls-cluster.xml",
+        "water-heater-management-cluster.xml",
+        "water-heater-mode-cluster.xml",
         "wifi-network-diagnostics-cluster.xml",
         "wifi-network-management-cluster.xml",
         "window-covering.xml",
@@ -207,6 +213,15 @@
             "CurrentMode",
             "FeatureMap"
         ],
+        "Door Lock": [
+            "AliroReaderVerificationKey",
+            "AliroReaderGroupIdentifier",
+            "AliroReaderGroupSubIdentifier",
+            "AliroGroupResolvingKey",
+            "AliroBLEAdvertisingVersion",
+            "NumberOfAliroCredentialIssuerKeysSupported",
+            "NumberOfAliroEndpointKeysSupported"
+        ],
         "Energy EVSE": [
             "State",
             "SupplyState",
@@ -275,8 +290,10 @@
             "ActiveModeThreshold",
             "RegisteredClients",
             "ICDCounter",
-            "ClientsSupportedPerFabric"
+            "ClientsSupportedPerFabric",
+            "MaximumCheckInBackOff"
         ],
+        "Occupancy Sensing": ["HoldTimeLimits"],
         "Operational Credentials": [
             "SupportedFabrics",
             "CommissionedFabrics",
@@ -293,7 +310,17 @@
             "struct_attr",
             "nullable_struct",
             "general_error_boolean",
-            "cluster_error_boolean"
+            "cluster_error_boolean",
+            "global_struct",
+            "nullable_global_struct"
+        ],
+        "Thread Border Router Management": [
+            "BorderRouterName",
+            "BorderAgentID",
+            "ThreadVersion",
+            "InterfaceEnabled",
+            "ActiveDatasetTimestamp",
+            "FeatureMap"
         ],
         "Thread Network Diagnostics": [
             "Channel",
@@ -605,7 +632,6 @@
             "FeatureMap"
         ],
         "Air Quality": ["AirQuality", "FeatureMap"],
-        "Thermostat": ["QueuedPreset"],
         "Electrical Energy Measurement": [
             "Accuracy",
             "CumulativeEnergyImported",
@@ -640,7 +666,24 @@
         "Power Topology": ["FeatureMap"],
         "Valve Configuration and Control": ["RemainingDuration"],
         "Boolean State Configuration": ["CurrentSensitivityLevel"],
-        "Wi-Fi Network Management": ["SSID"]
+        "Water Heater Management": [
+            "HeaterTypes",
+            "HeatDemand",
+            "TankVolume",
+            "EstimatedHeatRequired",
+            "TankPercentage",
+            "BoostState",
+            "FeatureMap",
+            "ClusterRevision"
+        ],
+        "Water Heater Mode": ["SupportedModes", "CurrentMode", "FeatureMap"],
+        "Wi-Fi Network Management": ["SSID", "PassphraseSurrogate"],
+        "Thread Network Directory": [
+            "PreferredExtendedPanID",
+            "ThreadNetworks",
+            "ThreadNetworkTableSize"
+        ],
+        "Service Area": ["CurrentArea", "EstimatedEndTime", "FeatureMap"]
     },
     "defaultReportingPolicy": "mandatory",
     "ZCLDataTypes": ["ARRAY", "BITMAP", "ENUM", "NUMBER", "STRING", "STRUCT"],

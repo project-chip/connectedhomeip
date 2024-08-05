@@ -398,6 +398,10 @@ void TCPBase::CloseConnectionInternal(ActiveTCPConnectionState * connection, CHI
 
     if (connection->mConnectionState != TCPState::kClosed && connection->mEndPoint)
     {
+        char addrStr[Transport::PeerAddress::kMaxToStringSize];
+        connection->mPeerAddr.ToString(addrStr);
+        ChipLogProgress(Inet, "Closing connection with peer %s.", addrStr);
+
         if (err == CHIP_NO_ERROR)
         {
             connection->mEndPoint->Close();
@@ -574,6 +578,9 @@ void TCPBase::HandleIncomingConnection(Inet::TCPEndPoint * listenEndPoint, Inet:
         tcp->mUsedEndPointCount++;
         activeConnection->mConnectionState = TCPState::kConnected;
 
+        // Set the TCPKeepalive configurations on the received connection
+        endPoint->EnableKeepAlive(activeConnection->mTCPKeepAliveIntervalSecs, activeConnection->mTCPMaxNumKeepAliveProbes);
+
         char addrStr[Transport::PeerAddress::kMaxToStringSize];
         peerAddress.ToString(addrStr);
         ChipLogProgress(Inet, "Incoming connection established with peer at %s.", addrStr);
@@ -616,36 +623,20 @@ CHIP_ERROR TCPBase::TCPConnect(const PeerAddress & address, Transport::AppTCPCon
 
 void TCPBase::TCPDisconnect(const PeerAddress & address)
 {
-    CHIP_ERROR err = CHIP_NO_ERROR;
     // Closes an existing connection
     for (size_t i = 0; i < mActiveConnectionsSize; i++)
     {
         if (mActiveConnections[i].IsConnected())
         {
-            Inet::IPAddress ipAddress;
-            uint16_t port;
-            Inet::InterfaceId interfaceId;
+            const Inet::IPAddress & ipAddress = mActiveConnections[i].mPeerAddr.GetIPAddress();
+            uint16_t port                     = mActiveConnections[i].mPeerAddr.GetPort();
 
-            err = mActiveConnections[i].mEndPoint->GetPeerInfo(&ipAddress, &port);
-            if (err != CHIP_NO_ERROR)
+            // Ignoring the InterfaceID in the check as it may not have been provided in
+            // the PeerAddress during connection establishment. The IPAddress and Port
+            // are the necessary and sufficient set of parameters for searching
+            // through the connections.
+            if (ipAddress == address.GetIPAddress() && port == address.GetPort() && address.GetTransportType() == Type::kTcp)
             {
-                ChipLogError(Inet, "TCPDisconnect: GetPeerInfo error: %" CHIP_ERROR_FORMAT, err.Format());
-                return;
-            }
-
-            err = mActiveConnections[i].mEndPoint->GetInterfaceId(&interfaceId);
-            if (err != CHIP_NO_ERROR)
-            {
-                ChipLogError(Inet, "TCPDisconnect: GetInterfaceId error: %" CHIP_ERROR_FORMAT, err.Format());
-                return;
-            }
-            // if (address == PeerAddress::TCP(ipAddress, port, interfaceId))
-            if (ipAddress == address.GetIPAddress() && port == address.GetPort())
-            {
-                char addrStr[Transport::PeerAddress::kMaxToStringSize];
-                address.ToString(addrStr);
-                ChipLogProgress(Inet, "Disconnecting with peer %s.", addrStr);
-
                 // NOTE: this leaves the socket in TIME_WAIT.
                 // Calling Abort() would clean it since SO_LINGER would be set to 0,
                 // however this seems not to be useful.

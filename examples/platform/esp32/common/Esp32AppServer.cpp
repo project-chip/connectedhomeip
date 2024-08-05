@@ -38,6 +38,10 @@
 #endif // CONFIG_BT_ENABLED
 #endif // CHIP_DEVICE_CONFIG_ENABLE_CHIPOBLE
 
+#ifdef CONFIG_ENABLE_CHIP_SHELL
+#include <lib/shell/commands/WiFi.h>
+#endif
+
 #include <string.h>
 
 using namespace chip;
@@ -47,19 +51,6 @@ using namespace chip::DeviceLayer;
 static constexpr char TAG[] = "ESP32Appserver";
 
 namespace {
-#if CHIP_DEVICE_CONFIG_ENABLE_WIFI
-#if CHIP_DEVICE_CONFIG_ENABLE_THREAD || CHIP_DEVICE_CONFIG_ENABLE_ETHERNET
-constexpr chip::EndpointId kNetworkCommissioningEndpointWiFi = 0xFFFE;
-#else
-constexpr chip::EndpointId kNetworkCommissioningEndpointWiFi = 0;
-#endif
-app::Clusters::NetworkCommissioning::Instance
-    sWiFiNetworkCommissioningInstance(kNetworkCommissioningEndpointWiFi, &(NetworkCommissioning::ESPWiFiDriver::GetInstance()));
-#endif // CHIP_DEVICE_CONFIG_ENABLE_WIFI
-#if CHIP_DEVICE_CONFIG_ENABLE_ETHERNET
-static app::Clusters::NetworkCommissioning::Instance
-    sEthernetNetworkCommissioningInstance(0 /* Endpoint Id */, &(NetworkCommissioning::ESPEthernetDriver::GetInstance()));
-#endif
 
 #if CONFIG_TEST_EVENT_TRIGGER_ENABLED
 static uint8_t sTestEventTriggerEnableKey[TestEventTriggerDelegate::kEnableKeyLength] = { 0x00, 0x11, 0x22, 0x33, 0x44, 0x55,
@@ -146,11 +137,11 @@ void Esp32AppServer::Init(AppDelegate * sAppDelegate)
     chip::Server::GetInstance().Init(initParams);
 
 #if CHIP_DEVICE_CONFIG_ENABLE_WIFI
-    sWiFiNetworkCommissioningInstance.Init();
+#ifdef CONFIG_ENABLE_CHIP_SHELL
+    chip::Shell::SetWiFiDriver(&(chip::DeviceLayer::NetworkCommissioning::ESPWiFiDriver::GetInstance()));
 #endif
-#if CHIP_DEVICE_CONFIG_ENABLE_ETHERNET
-    sEthernetNetworkCommissioningInstance.Init();
 #endif
+
 #if CHIP_DEVICE_CONFIG_ENABLE_THREAD
     if (chip::DeviceLayer::ConnectivityMgr().IsThreadProvisioned() &&
         (chip::Server::GetInstance().GetFabricTable().FabricCount() != 0))

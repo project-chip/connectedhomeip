@@ -23,7 +23,8 @@ nxp_use_lwip = false
 nxp_use_mbedtls_port = false
 
 if (getenv("NXP_K32W0_SDK_ROOT") == "") {
-  k32w0_sdk_root = "${chip_root}/third_party/nxp/k32w0_sdk/repo/core"
+  k32w0_sdk_root =
+      "${nxp_sdk_matter_support_root}/github_sdk/k32w0_sdk/repo/core"
 } else {
   k32w0_sdk_root = getenv("NXP_K32W0_SDK_ROOT")
 }

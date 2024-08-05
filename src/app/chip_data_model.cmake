@@ -17,6 +17,7 @@
 set(CHIP_APP_BASE_DIR ${CMAKE_CURRENT_LIST_DIR})
 
 include("${CHIP_ROOT}/build/chip/chip_codegen.cmake")
+include("${CHIP_ROOT}/src/app/codegen-data-model-provider/model.cmake")
 
 # Configure ${APP_TARGET} with source files associated with ${CLUSTER} cluster
 #
@@ -132,6 +133,8 @@ function(chip_configure_data_model APP_TARGET)
     target_include_directories(${APP_TARGET} ${SCOPE} "${APP_TEMPLATES_GEN_DIR}")
     add_dependencies(${APP_TARGET} ${APP_TARGET}-zapgen)
 
+    # TODO: source for codedgen_data_model ???
+
     target_sources(${APP_TARGET} ${SCOPE}
         ${CHIP_APP_BASE_DIR}/../../zzz_generated/app-common/app-common/zap-generated/attributes/Accessors.cpp
         ${CHIP_APP_BASE_DIR}/../../zzz_generated/app-common/app-common/zap-generated/cluster-objects.cpp
@@ -149,6 +152,7 @@ function(chip_configure_data_model APP_TARGET)
         ${CHIP_APP_BASE_DIR}/util/generic-callback-stubs.cpp
         ${CHIP_APP_BASE_DIR}/util/privilege-storage.cpp
         ${CHIP_APP_BASE_DIR}/util/util.cpp
+        ${CODEGEN_DATA_MODEL_SOURCES}
         ${APP_GEN_FILES}
         ${APP_TEMPLATES_GEN_FILES}
     )

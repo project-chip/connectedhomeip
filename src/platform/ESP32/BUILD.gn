@@ -14,6 +14,7 @@
 
 import("//build_overrides/chip.gni")
 
+import("${chip_root}/src/inet/inet.gni")
 import("${chip_root}/src/platform/device.gni")
 
 assert(chip_device_platform == "esp32")
@@ -36,6 +37,7 @@ declare_args() {
 
 defines = [
   "CHIP_CONFIG_SOFTWARE_VERSION_NUMBER=${chip_config_software_version_number}",
+  "CHIP_DEVICE_CONFIG_ENABLE_IPV4=${chip_inet_config_enable_ipv4}",
 ]
 
 static_library("ESP32") {
@@ -168,6 +170,12 @@ static_library("ESP32") {
       sources += [
         "../OpenThread/OpenThreadDnssdImpl.cpp",
         "../OpenThread/OpenThreadDnssdImpl.h",
+      ]
+    }
+    if (chip_openthread_border_router) {
+      sources += [
+        "../OpenThread/GenericThreadBorderRouterDelegate.cpp",
+        "../OpenThread/GenericThreadBorderRouterDelegate.h",
       ]
     }
     configs -= [ "${chip_root}/build/config/compiler:warnings_default" ]

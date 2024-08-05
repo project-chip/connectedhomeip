@@ -18,10 +18,10 @@
 
 #include <app/icd/server/ICDServerConfig.h>
 
-#include <app-common/zap-generated/cluster-enums.h>
 #include <app/AppConfig.h>
 #include <app/SubscriptionsInfoProvider.h>
 #include <app/TestEventTriggerDelegate.h>
+#include <app/icd/server/ICDCheckInBackOffStrategy.h>
 #include <app/icd/server/ICDConfigurationData.h>
 #include <app/icd/server/ICDNotifier.h>
 #include <app/icd/server/ICDStateObserver.h>
@@ -115,8 +115,52 @@ public:
     ICDManager()  = default;
     ~ICDManager() = default;
 
-    void Init(PersistentStorageDelegate * storage, FabricTable * fabricTable, Crypto::SymmetricKeystore * symmetricKeyStore,
-              Messaging::ExchangeManager * exchangeManager, SubscriptionsInfoProvider * subInfoProvider);
+    /*
+        Builder function to set all necessary members for the ICDManager class
+    */
+
+#if CHIP_CONFIG_ENABLE_ICD_CIP
+    ICDManager & SetPersistentStorageDelegate(PersistentStorageDelegate * storage)
+    {
+        mStorage = storage;
+        return *this;
+    };
+
+    ICDManager & SetFabricTable(FabricTable * fabricTable)
+    {
+        mFabricTable = fabricTable;
+        return *this;
+    };
+
+    ICDManager & SetSymmetricKeyStore(Crypto::SymmetricKeystore * symmetricKeystore)
+    {
+        mSymmetricKeystore = symmetricKeystore;
+        return *this;
+    };
+
+    ICDManager & SetExchangeManager(Messaging::ExchangeManager * exchangeManager)
+    {
+        mExchangeManager = exchangeManager;
+        return *this;
+    };
+
+    ICDManager & SetSubscriptionsInfoProvider(SubscriptionsInfoProvider * subInfoProvider)
+    {
+        mSubInfoProvider = subInfoProvider;
+        return *this;
+    };
+
+    ICDManager & SetICDCheckInBackOffStrategy(ICDCheckInBackOffStrategy * strategy)
+    {
+        mICDCheckInBackOffStrategy = strategy;
+        return *this;
+    };
+#endif // CHIP_CONFIG_ENABLE_ICD_CIP
+
+    /**
+     * @brief Validates that the ICDManager has all the necessary members to function and initializes the class
+     */
+    void Init();
     void Shutdown();
 
     /**
@@ -319,11 +363,12 @@ private:
     bool mIsBootUpResumeSubscriptionExecuted = false;
 #endif // !CHIP_CONFIG_SUBSCRIPTION_TIMEOUT_RESUMPTION && CHIP_CONFIG_PERSIST_SUBSCRIPTIONS
 
-    PersistentStorageDelegate * mStorage           = nullptr;
-    FabricTable * mFabricTable                     = nullptr;
-    Messaging::ExchangeManager * mExchangeManager  = nullptr;
-    Crypto::SymmetricKeystore * mSymmetricKeystore = nullptr;
-    SubscriptionsInfoProvider * mSubInfoProvider   = nullptr;
+    PersistentStorageDelegate * mStorage                   = nullptr;
+    FabricTable * mFabricTable                             = nullptr;
+    Messaging::ExchangeManager * mExchangeManager          = nullptr;
+    Crypto::SymmetricKeystore * mSymmetricKeystore         = nullptr;
+    SubscriptionsInfoProvider * mSubInfoProvider           = nullptr;
+    ICDCheckInBackOffStrategy * mICDCheckInBackOffStrategy = nullptr;
     ObjectPool<ICDCheckInSender, (CHIP_CONFIG_ICD_CLIENTS_SUPPORTED_PER_FABRIC * CHIP_CONFIG_MAX_FABRICS)> mICDSenderPool;
 #endif // CHIP_CONFIG_ENABLE_ICD_CIP
 

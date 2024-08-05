@@ -16,12 +16,15 @@
  *    limitations under the License.
  */
 
-#include <gtest/gtest.h>
-#include <lib/support/Fold.h>
-
 #include <algorithm>
 #include <cstring>
 #include <initializer_list>
+
+#include <pw_unit_test/framework.h>
+
+#include <lib/core/StringBuilderAdapters.h>
+#include <lib/support/Fold.h>
+
 using namespace chip;
 
 namespace {
