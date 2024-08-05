@@ -2738,6 +2738,46 @@ PICS:
     - label: "Does the DUT(server) support the ExpiringUserTimeOut attribute?"
       id: DRLK.S.A0035
 
+    - label:
+          "Does the DUT(server) support the AliroReaderVerificationKey attribute"
+      id: DRLK.S.A0080
+
+    - label:
+          "Does the DUT(server) support the AliroReaderGroupIdentifier attribute"
+      id: DRLK.S.A0081
+
+    - label:
+          "Does the DUT(server) support the AliroReaderGroupSubIdentifier
+          attribute"
+      id: DRLK.S.A0082
+
+    - label:
+          "Does the DUT(server) support the
+          AliroExpeditedTransactionSupportedProtocolVersions attribute"
+      id: DRLK.S.A0083
+
+    - label: "Does the DUT(server) support the AliroGroupResolvingKey attribute"
+      id: DRLK.S.A0084
+
+    - label:
+          "Does the DUT(server) support the AliroSupportedBLEUWBProtocolVersions
+          attribute"
+      id: DRLK.S.A0085
+
+    - label:
+          "Does the DUT(server) support the AliroBLEAdvertisingVersion attribute"
+      id: DRLK.S.A0086
+
+    - label:
+          "Does the DUT(server) support the
+          NumberOfAliroCredentialIssuerKeysSupported attribute"
+      id: DRLK.S.A0087
+
+    - label:
+          "Does the DUT(server) support the NumberOfAliroEndpointKeysSupported
+          attribute"
+      id: DRLK.S.A0088
+
     #
     #Server ReadOnly attribute
     #
@@ -2869,6 +2909,12 @@ PICS:
     - label: "Does the DUT(server) support the Unbolt Door command?"
       id: DRLK.S.C27.Rsp
 
+    - label: "Does the DUT(server) support the SetAliroReaderConfig command?"
+      id: DRLK.S.C28.Rsp
+
+    - label: "Does the DUT(server) support the ClearAliroReaderConfig command?"
+      id: DRLK.S.C29.Rsp
+
     #
     # server / commandsGenerated
     #
@@ -2969,6 +3015,14 @@ PICS:
 
     - label: "Does the DUT(server) support the Lock supports unbolting feature?"
       id: DRLK.S.F0c
+
+    - label: "Does the DUT(server) support AliroProvisioning feature?"
+      id: DRLK.S.F0d
+
+    - label:
+          "Does the DUT(server) support Bluetooth LE + UWB Access Control Flow
+          feature?"
+      id: DRLK.S.F0e
 
     #
     # server / manually

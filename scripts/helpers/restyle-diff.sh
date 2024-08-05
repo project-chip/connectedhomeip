@@ -78,7 +78,7 @@ done
 
 if [[ -z "$ref" ]]; then
     ref="master"
-    git remote | grep -qxF upstream && ref="upstream/master" && git fetch upstream
+    git remote | grep -qxF upstream && ref="upstream/master"
 fi
 
 if [[ $pull_image -eq 1 ]]; then

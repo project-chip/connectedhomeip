@@ -6276,7 +6276,7 @@ cluster RelativeHumidityMeasurement = 1029 {
 
 /** Attributes and commands for configuring occupancy sensing, and reporting occupancy status. */
 cluster OccupancySensing = 1030 {
-  revision 4;
+  revision 5;
 
   enum OccupancySensorTypeEnum : enum8 {
     kPIR = 0;
@@ -9230,10 +9230,11 @@ endpoint 1 {
   server cluster OccupancySensing {
     ram      attribute occupancy;
     ram      attribute occupancySensorType;
-    ram      attribute occupancySensorTypeBitmap;
+    ram      attribute occupancySensorTypeBitmap default = 1;
     ram      attribute holdTime default = 10;
     callback attribute holdTimeLimits;
-    ram      attribute featureMap default = 0x01;
+    ram      attribute PIROccupiedToUnoccupiedDelay default = 10;
+    ram      attribute featureMap default = 0x02;
     ram      attribute clusterRevision default = 5;
   }
 
@@ -9707,10 +9708,11 @@ endpoint 2 {
   server cluster OccupancySensing {
     ram      attribute occupancy;
     ram      attribute occupancySensorType;
-    ram      attribute occupancySensorTypeBitmap;
+    ram      attribute occupancySensorTypeBitmap default = 1;
     ram      attribute holdTime default = 20;
     callback attribute holdTimeLimits;
-    ram      attribute featureMap default = 0x01;
+    ram      attribute PIROccupiedToUnoccupiedDelay default = 10;
+    ram      attribute featureMap default = 0x02;
     ram      attribute clusterRevision default = 5;
   }
 }
