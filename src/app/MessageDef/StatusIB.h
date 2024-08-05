@@ -60,7 +60,7 @@ struct StatusIB
         }
     }
 
-    explicit StatusIB(CHIP_ERROR error) { InitFromChipError(error); }
+    explicit StatusIB(CHIP_ERROR error);
 
     enum class Tag : uint8_t
     {
@@ -104,13 +104,6 @@ struct StatusIB
      * CHIP_NO_ERROR or test true for IsIMStatus().
      */
     CHIP_ERROR ToChipError() const;
-
-    /**
-     * Extract a CHIP_ERROR into this StatusIB.  If IsIMStatus() is false for
-     * the error, this might do a best-effort attempt to come up with a
-     * corresponding StatusIB, defaulting to a generic Status::Failure.
-     */
-    void InitFromChipError(CHIP_ERROR aError);
 
     /**
      * Test whether this status is a success.

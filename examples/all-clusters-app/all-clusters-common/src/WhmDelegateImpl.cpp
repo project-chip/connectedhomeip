@@ -294,7 +294,7 @@ void WaterHeaterManagementDelegate::SetTargetWaterTemperature(uint16_t targetWat
     CheckIfHeatNeedsToBeTurnedOnOrOff();
 }
 
-void WaterHeaterManagementDelegate::DrawOffHotWater(uint8_t percentageReplaced, uint16_t replacedWaterTemperature)
+void WaterHeaterManagementDelegate::DrawOffHotWater(Percent percentageReplaced, uint16_t replacedWaterTemperature)
 {
     // Only supported in the kTankPercent is supported.
     // Replaces percentageReplaced% of the water in the tank with water of a temperature replacedWaterTemperature
@@ -303,7 +303,7 @@ void WaterHeaterManagementDelegate::DrawOffHotWater(uint8_t percentageReplaced, 
         // See if all of the water has now been replaced with replacedWaterTemperature
         if (mTankPercentage >= percentageReplaced)
         {
-            mTankPercentage -= percentageReplaced;
+            mTankPercentage = static_cast<Percent>(mTankPercentage - percentageReplaced);
         }
         else
         {

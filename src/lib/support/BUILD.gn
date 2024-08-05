@@ -68,6 +68,7 @@ source_set("logging_constants") {
 
 source_set("attributes") {
   sources = [
+    "Compiler.h",
     "DLLUtil.h",
     "EnforceFormat.h",
   ]
@@ -132,7 +133,10 @@ source_set("text_only_logging") {
 }
 
 source_set("verifymacros") {
-  sources = [ "CodeUtils.h" ]
+  sources = [
+    "CodeUtils.h",
+    "ObjectDump.h",
+  ]
 
   public_deps = [
     ":attributes",
