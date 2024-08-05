@@ -22,7 +22,7 @@ from typing import Any, ClassVar, Dict, List, Mapping, Union
 
 from chip import ChipUtility, tlv
 from chip.clusters.Types import Nullable, NullValue
-from dacite import from_dict
+from dacite import from_dict  # type: ignore
 
 
 def GetUnionUnderlyingType(typeToCheck, matchingType=None):
@@ -52,8 +52,8 @@ def GetUnionUnderlyingType(typeToCheck, matchingType=None):
 @dataclass
 class ClusterObjectFieldDescriptor:
     Label: str = ''
-    Tag: int = None
-    Type: type = None
+    Tag: typing.Optional[int] = None
+    Type: type = type(None)
 
     def _PutSingleElementToTLV(self, tag, val, elementType, writer: tlv.TLVWriter, debugPath: str = '?'):
         if issubclass(elementType, ClusterObject):
@@ -113,13 +113,13 @@ class ClusterObjectFieldDescriptor:
 class ClusterObjectDescriptor:
     Fields: List[ClusterObjectFieldDescriptor]
 
-    def GetFieldByTag(self, tag: int) -> ClusterObjectFieldDescriptor:
+    def GetFieldByTag(self, tag: int) -> typing.Optional[ClusterObjectFieldDescriptor]:
         for _field in self.Fields:
             if _field.Tag == tag:
                 return _field
         return None
 
-    def GetFieldByLabel(self, label: str) -> ClusterObjectFieldDescriptor:
+    def GetFieldByLabel(self, label: str) -> typing.Optional[ClusterObjectFieldDescriptor]:
         for _field in self.Fields:
             if _field.Label == label:
                 return _field
@@ -140,7 +140,7 @@ class ClusterObjectDescriptor:
         return elementType.descriptor.TagDictToLabelDict(debugPath, value)
 
     def TagDictToLabelDict(self, debugPath: str, tlvData: Dict[int, Any]) -> Dict[str, Any]:
-        ret = {}
+        ret: typing.Dict[Any, Any] = {}
         for tag, value in tlvData.items():
             descriptor = self.GetFieldByTag(tag)
             if not descriptor:
@@ -156,7 +156,7 @@ class ClusterObjectDescriptor:
                 realType = GetUnionUnderlyingType(descriptor.Type)
                 if (realType is None):
                     raise ValueError(
-                        f"Field {debugPath}.{self.Label} has no valid underlying data model type")
+                        f"Field {debugPath}.{descriptor.Label} has no valid underlying data model type")
 
                 valueType = realType
             else:
@@ -175,7 +175,7 @@ class ClusterObjectDescriptor:
 
     def TLVToDict(self, tlvBuf: bytes) -> Dict[str, Any]:
         tlvData = tlv.TLVReader(tlvBuf).get().get('Any', {})
-        return self.TagDictToLabelDict([], tlvData)
+        return self.TagDictToLabelDict('', tlvData)
 
     def DictToTLVWithWriter(self, debugPath: str, tag, data: Mapping, writer: tlv.TLVWriter):
         writer.startStructure(tag)
@@ -209,11 +209,11 @@ class ClusterObject:
 
 # The below dictionaries will be filled dynamically
 # and are used for quick lookup/mapping from cluster/attribute id to the correct class
-ALL_CLUSTERS = {}
-ALL_ATTRIBUTES = {}
+ALL_CLUSTERS: typing.Dict = {}
+ALL_ATTRIBUTES: typing.Dict = {}
 # These need to be separate because there can be overlap in command ids for commands and responses.
-ALL_ACCEPTED_COMMANDS = {}
-ALL_GENERATED_COMMANDS = {}
+ALL_ACCEPTED_COMMANDS: typing.Dict = {}
+ALL_GENERATED_COMMANDS: typing.Dict = {}
 
 
 class ClusterCommand(ClusterObject):

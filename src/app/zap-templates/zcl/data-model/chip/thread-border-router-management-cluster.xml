@@ -23,7 +23,7 @@ limitations under the License.
   </bitmap>
 
   <cluster apiMaturity="provisional">
-    <domain>HRAP</domain>
+    <domain>Network Infrastructure</domain>
     <name>Thread Border Router Management</name>
     <code>0x0452</code>
     <define>THREAD_BORDER_ROUTER_MANAGEMENT_CLUSTER</define>

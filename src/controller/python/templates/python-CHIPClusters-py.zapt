@@ -70,7 +70,7 @@ class ChipClusters:
     def GetClusterInfoById(self, cluster_id: int):
         data = ChipClusters._CLUSTER_ID_DICT.get(cluster_id, None)
         if not data:
-            raise exceptions.UnknownCluster(cluster_id)
+            raise exceptions.UnknownCluster(f"Cluster ID: {cluster_id}")
         return data
 
     def ListClusterInfo(self):

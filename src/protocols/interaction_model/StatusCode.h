@@ -68,6 +68,7 @@ class ClusterStatusCode
 {
 public:
     explicit ClusterStatusCode(Status status) : mStatus(status) {}
+    explicit ClusterStatusCode(CHIP_ERROR err);
 
     // We only have simple copyable members, so we should be trivially copyable.
     ClusterStatusCode(const ClusterStatusCode & other)             = default;

@@ -211,6 +211,15 @@
             "CurrentMode",
             "FeatureMap"
         ],
+        "Door Lock": [
+            "AliroReaderVerificationKey",
+            "AliroReaderGroupIdentifier",
+            "AliroReaderGroupSubIdentifier",
+            "AliroGroupResolvingKey",
+            "AliroBLEAdvertisingVersion",
+            "NumberOfAliroCredentialIssuerKeysSupported",
+            "NumberOfAliroEndpointKeysSupported"
+        ],
         "Energy EVSE": [
             "State",
             "SupplyState",

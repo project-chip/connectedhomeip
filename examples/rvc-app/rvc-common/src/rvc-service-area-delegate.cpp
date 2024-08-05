@@ -40,32 +40,30 @@ CHIP_ERROR RvcServiceAreaDelegate::Init()
     // Location A has name, floor number, uses map XX
     GetInstance()->AddSupportedLocation(
         supportedLocationId_A, DataModel::Nullable<uint_fast8_t>(supportedMapId_XX), "My Location A"_span,
-        DataModel::Nullable<int16_t>(4), DataModel::Nullable<ServiceArea::AreaTypeTag>(),
-        DataModel::Nullable<ServiceArea::LandmarkTag>(), DataModel::Nullable<ServiceArea::PositionTag>(),
-        DataModel::Nullable<ServiceArea::FloorSurfaceTag>());
+        DataModel::Nullable<int16_t>(4), DataModel::Nullable<Globals::AreaTypeTag>(), DataModel::Nullable<Globals::LandmarkTag>(),
+        DataModel::Nullable<Globals::PositionTag>(), DataModel::Nullable<Globals::FloorSurfaceTag>());
 
     // Location B has name, uses map XX
     GetInstance()->AddSupportedLocation(
         supportedLocationId_B, DataModel::Nullable<uint_fast8_t>(supportedMapId_XX), "My Location B"_span,
-        DataModel::Nullable<int16_t>(), DataModel::Nullable<ServiceArea::AreaTypeTag>(),
-        DataModel::Nullable<ServiceArea::LandmarkTag>(), DataModel::Nullable<ServiceArea::PositionTag>(),
-        DataModel::Nullable<ServiceArea::FloorSurfaceTag>());
+        DataModel::Nullable<int16_t>(), DataModel::Nullable<Globals::AreaTypeTag>(), DataModel::Nullable<Globals::LandmarkTag>(),
+        DataModel::Nullable<Globals::PositionTag>(), DataModel::Nullable<Globals::FloorSurfaceTag>());
 
     // Location C has full SemData, no name, Map YY
     GetInstance()->AddSupportedLocation(supportedLocationId_C, DataModel::Nullable<uint_fast8_t>(supportedMapId_YY), CharSpan(),
                                         DataModel::Nullable<int16_t>(-1),
-                                        DataModel::Nullable<ServiceArea::AreaTypeTag>(ServiceArea::AreaTypeTag::kPlayRoom),
-                                        DataModel::Nullable<ServiceArea::LandmarkTag>(ServiceArea::LandmarkTag::kBackDoor),
-                                        DataModel::Nullable<ServiceArea::PositionTag>(ServiceArea::PositionTag::kNextTo),
-                                        DataModel::Nullable<ServiceArea::FloorSurfaceTag>(ServiceArea::FloorSurfaceTag::kConcrete));
+                                        DataModel::Nullable<Globals::AreaTypeTag>(Globals::AreaTypeTag::kPlayRoom),
+                                        DataModel::Nullable<Globals::LandmarkTag>(Globals::LandmarkTag::kBackDoor),
+                                        DataModel::Nullable<Globals::PositionTag>(Globals::PositionTag::kNextTo),
+                                        DataModel::Nullable<Globals::FloorSurfaceTag>(Globals::FloorSurfaceTag::kConcrete));
 
     // Location D has null values for all HomeLocationStruct fields, Map YY
     GetInstance()->AddSupportedLocation(supportedLocationId_D, DataModel::Nullable<uint_fast8_t>(supportedMapId_YY),
                                         "My Location D"_span, DataModel::Nullable<int16_t>(),
-                                        DataModel::Nullable<ServiceArea::AreaTypeTag>(),
-                                        DataModel::Nullable<ServiceArea::LandmarkTag>(ServiceArea::LandmarkTag::kCouch),
-                                        DataModel::Nullable<ServiceArea::PositionTag>(ServiceArea::PositionTag::kNextTo),
-                                        DataModel::Nullable<ServiceArea::FloorSurfaceTag>(ServiceArea::FloorSurfaceTag::kHardwood));
+                                        DataModel::Nullable<Globals::AreaTypeTag>(),
+                                        DataModel::Nullable<Globals::LandmarkTag>(Globals::LandmarkTag::kCouch),
+                                        DataModel::Nullable<Globals::PositionTag>(Globals::PositionTag::kNextTo),
+                                        DataModel::Nullable<Globals::FloorSurfaceTag>(Globals::FloorSurfaceTag::kHardwood));
 
     GetInstance()->SetCurrentLocation(supportedLocationId_C);
 

@@ -12,10 +12,13 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 import("//build_overrides/chip.gni")
+import("//build_overrides/pigweed.gni")
 
 source_set("data-model-provider") {
   sources = [
     "ActionContext.h",
+    "ActionReturnStatus.cpp",
+    "ActionReturnStatus.h",
     "Context.h",
     "EventsGenerator.h",
     "MetadataTypes.cpp",
@@ -38,5 +41,18 @@ source_set("data-model-provider") {
     "${chip_root}/src/lib/core:types",
     "${chip_root}/src/lib/support",
     "${chip_root}/src/messaging",
+  ]
+}
+
+source_set("string-builder-adapters") {
+  sources = [
+    "StringBuilderAdapters.cpp",
+    "StringBuilderAdapters.h",
+  ]
+
+  public_deps = [
+    ":data-model-provider",
+    "$dir_pw_string",
+    "${chip_root}/src/lib/core:string-builder-adapters",
   ]
 }

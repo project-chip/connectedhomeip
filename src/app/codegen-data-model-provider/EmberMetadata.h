@@ -18,6 +18,7 @@
 
 #include <app/util/af-types.h>
 #include <lib/core/CHIPError.h>
+#include <protocols/interaction_model/StatusCode.h>
 
 #include <variant>
 
@@ -31,13 +32,13 @@ namespace Ember {
 /// Possible return values:
 ///    - EmberAfCluster (NEVER null)           - Only for GlobalAttributesNotInMetaData
 ///    - EmberAfAttributeMetadata (NEVER null) - if the attribute is known to ember datastore
-///    - CHIP_ERROR, only specifically for unknown attributes, may only be one of:
-///        - CHIP_IM_GLOBAL_STATUS(UnsupportedEndpoint);
-///        - CHIP_IM_GLOBAL_STATUS(UnsupportedCluster);
-///        - CHIP_IM_GLOBAL_STATUS(UnsupportedAttribute);
-std::variant<const EmberAfCluster *,           // global attribute, data from a cluster
-             const EmberAfAttributeMetadata *, // a specific attribute stored by ember
-             CHIP_ERROR                        // error, (CHIP_IM_GLOBAL_STATUS(Unsupported*))
+///    - Status, only specifically for unknown attributes, may only be one of:
+///        - Status::UnsupportedEndpoint
+///        - Status::UnsupportedCluster
+///        - Status::UnsupportedAttribute
+std::variant<const EmberAfCluster *,             // global attribute, data from a cluster
+             const EmberAfAttributeMetadata *,   // a specific attribute stored by ember
+             Protocols::InteractionModel::Status // one of Status::Unsupported*
              >
 FindAttributeMetadata(const ConcreteAttributePath & aPath);
 
