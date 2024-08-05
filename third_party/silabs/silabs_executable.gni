@@ -63,35 +63,30 @@ template("silabs_executable") {
     flashing_image_name = output_base_name + ".rps"
   }
 
-  flashing_runtime_target = target_name + ".flashing_runtime"
-  flashing_script_inputs = [
-    "${chip_root}/scripts/flashing/silabs_firmware_utils.py",
-    "${chip_root}/scripts/flashing/firmware_utils.py",
-  ]
-
   flashing_script_generator =
       "${chip_root}/scripts/flashing/gen_flashing_script.py"
   flashing_script_name = output_base_name + ".flash.py"
-  flashing_options = [ "silabs" ]
+  _flashbundle_file = "${invoker.output_dir}/${target_name}.flashbundle.txt"
+  _platform_firmware_utils = "${chip_root}/scripts/flashing/silabs_firmware_utils.py"
+  _firmware_utils = "${chip_root}/scripts/flashing/firmware_utils.py"
+  flashing_options = [
+    "silabs",  # Use module "{this}_firmware_utils.py"
+    "--flashbundle-file",
+    rebase_path(_flashbundle_file, root_build_dir),
+    "--platform-firmware-utils",  # Platform-specific flashing module.
+    rebase_path(_platform_firmware_utils, root_build_dir),
+    "--firmware-utils",  # General flashing module.
+    rebase_path(_firmware_utils, root_build_dir),
+  ]
+  flashing_script_inputs = [
+    _platform_firmware_utils,
+    _firmware_utils,
+  ]
 
   flash_target_name = target_name + ".flash_executable"
   flashbundle_name = ""  # Stop flashable_executable from generating flashbundle.txt
   flashable_executable(flash_target_name) {
     forward_variables_from(invoker, "*")
-    data_deps = [ ":${flashing_runtime_target}" ]
-  }
-
-  # Generate TestSomething.flashbundle.txt
-  flashbundle_filepath = "${invoker.output_dir}/${target_name}.flashbundle.txt"
-  action(flashing_runtime_target) {
-    script = "${chip_root}/scripts/flashing/gen_flashbundle.py"
-    sources = flashing_script_inputs
-    args = [
-      rebase_path(flashbundle_filepath, root_build_dir),  # Write to here.
-      flashing_script_name,  # Write file name.
-      objcopy_image_name,  # Write file name.
-    ] + rebase_path(sources, root_build_dir)  # Copy files and write file names.
-    outputs = [ flashbundle_filepath ]
   }
 
   # Add a target which generates the hex file in addition to s37.

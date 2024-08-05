@@ -49,6 +49,8 @@ operations:
                         Do not reset device after flashing
 """
 
+import os
+import subprocess
 import sys
 
 import firmware_utils
@@ -168,6 +170,44 @@ class Flasher(firmware_utils.Flasher):
                 return self
 
         return self
+
+    def _platform_wrapper_args(self, args):
+        """Called from make_wrapper() to optionally manipulate arguments."""
+        # Generate the flashbundle.txt file and copy the firmware utils.
+        if args.flashbundle_file is not None:
+            # Generate the flashbundle contents.
+            # Copy the platform-specific and general firmware utils to the same directory as the wrapper.
+            flashbundle_contents = os.path.basename(args.output)
+            if args.application is not None:
+                flashbundle_contents += "\n" + os.path.basename(args.application)
+            if args.platform_firmware_utils is not None:
+                flashbundle_contents += "\n" + os.path.basename(args.platform_firmware_utils)
+                subprocess.run(["cp", args.platform_firmware_utils, os.path.dirname(args.output)])
+            if args.firmware_utils is not None:
+                flashbundle_contents += "\n" + os.path.basename(args.firmware_utils)
+                subprocess.run(["cp", args.firmware_utils, os.path.dirname(args.output)])
+
+            # Create the flashbundle file.
+            try:
+                with open(args.flashbundle_file, 'w') as flashbundle_file:
+                    flashbundle_file.write(flashbundle_contents.strip())
+            except OSError as exception:
+                print(exception, sys.stderr)
+
+    def make_wrapper(self, argv):
+        self.parser.add_argument(
+            '--flashbundle-file',
+            metavar='FILENAME',
+            help='path and name of the flashbundle text file to create')
+        self.parser.add_argument(
+            '--platform-firmware-utils',
+            metavar='FILENAME',
+            help='path and file of the platform-specific firmware utils script')
+        self.parser.add_argument(
+            '--firmware-utils',
+            metavar='FILENAME',
+            help='path and file of the general firmware utils script')
+        super().make_wrapper(argv)
 
 
 if __name__ == '__main__':
