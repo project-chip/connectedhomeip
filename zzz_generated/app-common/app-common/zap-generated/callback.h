@@ -191,6 +191,11 @@ void emberAfAdministratorCommissioningClusterInitCallback(chip::EndpointId endpo
 /**
  * @param endpoint    Endpoint that is being initialized
  */
+void emberAfJointFabricPkiClusterInitCallback(chip::EndpointId endpoint);
+
+/**
+ * @param endpoint    Endpoint that is being initialized
+ */
 void emberAfOperationalCredentialsClusterInitCallback(chip::EndpointId endpoint);
 
 /**
@@ -1857,6 +1862,45 @@ chip::Protocols::InteractionModel::Status MatterAdministratorCommissioningCluste
  * @param endpoint  Endpoint that is being served
  */
 void emberAfAdministratorCommissioningClusterServerTickCallback(chip::EndpointId endpoint);
+
+//
+// Joint Fabric Pki Cluster
+//
+
+/**
+ * @param endpoint    Endpoint that is being initialized
+ */
+void emberAfJointFabricPkiClusterServerInitCallback(chip::EndpointId endpoint);
+
+/**
+ * @param endpoint    Endpoint that is being shutdown
+ */
+void MatterJointFabricPkiClusterServerShutdownCallback(chip::EndpointId endpoint);
+
+/**
+ * @param endpoint    Endpoint that is being initialized
+ */
+void emberAfJointFabricPkiClusterClientInitCallback(chip::EndpointId endpoint);
+
+/**
+ * @param attributePath Concrete attribute path that changed
+ */
+void MatterJointFabricPkiClusterServerAttributeChangedCallback(const chip::app::ConcreteAttributePath & attributePath);
+
+/**
+ * @param attributePath Concrete attribute path to be changed
+ * @param attributeType Attribute type
+ * @param size          Attribute size
+ * @param value         Attribute value
+ */
+chip::Protocols::InteractionModel::Status
+MatterJointFabricPkiClusterServerPreAttributeChangedCallback(const chip::app::ConcreteAttributePath & attributePath,
+                                                             EmberAfAttributeType attributeType, uint16_t size, uint8_t * value);
+
+/**
+ * @param endpoint  Endpoint that is being served
+ */
+void emberAfJointFabricPkiClusterServerTickCallback(chip::EndpointId endpoint);
 
 //
 // Operational Credentials Cluster
@@ -5905,6 +5949,18 @@ bool emberAfAdministratorCommissioningClusterOpenBasicCommissioningWindowCallbac
 bool emberAfAdministratorCommissioningClusterRevokeCommissioningCallback(
     chip::app::CommandHandler * commandObj, const chip::app::ConcreteCommandPath & commandPath,
     const chip::app::Clusters::AdministratorCommissioning::Commands::RevokeCommissioning::DecodableType & commandData);
+/**
+ * @brief Joint Fabric Pki Cluster JointFabricRequest Command callback (from client)
+ */
+bool emberAfJointFabricPkiClusterJointFabricRequestCallback(
+    chip::app::CommandHandler * commandObj, const chip::app::ConcreteCommandPath & commandPath,
+    const chip::app::Clusters::JointFabricPki::Commands::JointFabricRequest::DecodableType & commandData);
+/**
+ * @brief Joint Fabric Pki Cluster SignNOCIssuerResponse Command callback (from client)
+ */
+bool emberAfJointFabricPkiClusterSignNOCIssuerResponseCallback(
+    chip::app::CommandHandler * commandObj, const chip::app::ConcreteCommandPath & commandPath,
+    const chip::app::Clusters::JointFabricPki::Commands::SignNOCIssuerResponse::DecodableType & commandData);
 /**
  * @brief Operational Credentials Cluster AttestationRequest Command callback (from client)
  */

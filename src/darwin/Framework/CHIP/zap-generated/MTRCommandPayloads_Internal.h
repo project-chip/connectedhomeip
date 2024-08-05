@@ -544,6 +544,30 @@ NS_ASSUME_NONNULL_BEGIN
 
 @end
 
+@interface MTRJointFabricPkiClusterJointFabricRequestParams (InternalMethods)
+
+- (NSDictionary<NSString *, id> * _Nullable)_encodeAsDataValue:(NSError * __autoreleasing *)error;
+
+@end
+
+@interface MTRJointFabricPkiClusterSignNOCIssuerRequestParams (InternalMethods)
+
+- (CHIP_ERROR)_setFieldsFromDecodableStruct:(const chip::app::Clusters::JointFabricPki::Commands::SignNOCIssuerRequest::DecodableType &)decodableStruct;
+
+@end
+
+@interface MTRJointFabricPkiClusterSignNOCIssuerResponseParams (InternalMethods)
+
+- (NSDictionary<NSString *, id> * _Nullable)_encodeAsDataValue:(NSError * __autoreleasing *)error;
+
+@end
+
+@interface MTRJointFabricPkiClusterJointFabricResponseParams (InternalMethods)
+
+- (CHIP_ERROR)_setFieldsFromDecodableStruct:(const chip::app::Clusters::JointFabricPki::Commands::JointFabricResponse::DecodableType &)decodableStruct;
+
+@end
+
 @interface MTROperationalCredentialsClusterAttestationRequestParams (InternalMethods)
 
 - (NSDictionary<NSString *, id> * _Nullable)_encodeAsDataValue:(NSError * __autoreleasing *)error;

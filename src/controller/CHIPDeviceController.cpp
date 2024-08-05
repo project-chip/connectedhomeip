@@ -466,7 +466,8 @@ DeviceCommissioner::DeviceCommissioner() :
     mOnDeviceConnectionRetryCallback(OnDeviceConnectionRetryFn, this),
 #endif // CHIP_DEVICE_CONFIG_ENABLE_AUTOMATIC_CASE_RETRIES
     mDeviceAttestationInformationVerificationCallback(OnDeviceAttestationInformationVerification, this),
-    mDeviceNOCChainCallback(OnDeviceNOCChainGeneration, this), mSetUpCodePairer(this)
+    mDeviceNOCChainCallback(OnDeviceNOCChainGeneration, this), mSetUpCodePairer(this),
+    mDeviceSignNOCIssuerCallback(OnDeviceNOCIssuerSignature, this)
 {}
 
 DeviceCommissioner::~DeviceCommissioner()
@@ -1785,6 +1786,121 @@ void DeviceCommissioner::OnRootCertFailureResponse(void * context, CHIP_ERROR er
     ChipLogProgress(Controller, "Device failed to receive the root certificate Response: %s", chip::ErrorStr(error));
     DeviceCommissioner * commissioner = static_cast<DeviceCommissioner *>(context);
     commissioner->CommissioningStageComplete(error);
+}
+
+CHIP_ERROR DeviceCommissioner::SendICA(DeviceProxy * device, const ByteSpan & icac, NodeId adminSubject,
+                                       Optional<System::Clock::Timeout> timeout)
+{
+    MATTER_TRACE_SCOPE("SendICA", "DeviceCommissioner");
+    VerifyOrReturnError(device != nullptr, CHIP_ERROR_INVALID_ARGUMENT);
+
+    ChipLogProgress(Controller, "Sending ICA certificate to the device");
+
+    JointFabricPki::Commands::SignNOCIssuerResponse::Type request;
+    request.NOCIssuerCert    = icac;
+    request.nodeId           = device->GetDeviceId();
+    request.fabricId         = GetFabricId();
+    request.adminVendorId    = mVendorId;
+    request.caseAdminSubject = adminSubject;
+    ReturnErrorOnFailure(
+        SendCommissioningCommand(device, request, OnICACertSuccessResponse, OnICACertFailureResponse, kRootEndpointId, timeout));
+
+    ChipLogProgress(Controller, "Sent ICA certificate to the device");
+
+    return CHIP_NO_ERROR;
+}
+
+void DeviceCommissioner::OnICACertSuccessResponse(
+    void * context, const chip::app::Clusters::JointFabricPki::Commands::JointFabricResponse::DecodableType & data)
+{
+    MATTER_TRACE_SCOPE("OnICACertSuccessResponse", "DeviceCommissioner");
+    ChipLogProgress(Controller, "Device confirmed that it has received the ICA certificate");
+    DeviceCommissioner * commissioner = static_cast<DeviceCommissioner *>(context);
+
+    // TODO: Handle result from response.
+
+    commissioner->CommissioningStageComplete(CHIP_NO_ERROR);
+}
+
+void DeviceCommissioner::OnICACertFailureResponse(void * context, CHIP_ERROR error)
+{
+    MATTER_TRACE_SCOPE("OnICACertFailureResponse", "DeviceCommissioner");
+    ChipLogProgress(Controller, "Device failed to receive the ICA certificate Response: %s", chip::ErrorStr(error));
+    DeviceCommissioner * commissioner = static_cast<DeviceCommissioner *>(context);
+    commissioner->CommissioningStageComplete(error);
+}
+
+CHIP_ERROR DeviceCommissioner::SendJointFabricRequestCommand(DeviceProxy * device, Optional<System::Clock::Timeout> timeout)
+{
+    MATTER_TRACE_SCOPE("SendJointFabricRequestCommand", "DeviceCommissioner");
+    ChipLogDetail(Controller, "Sending JointFabric request to %p device", device);
+    VerifyOrReturnError(device != nullptr, CHIP_ERROR_INVALID_ARGUMENT);
+
+    JointFabricPki::Commands::JointFabricRequest::Type request;
+
+    request.fabricIndex = mOperationalCredentialsDelegate->GetTrackingFabricIndex();
+
+    ReturnErrorOnFailure(
+        SendCommissioningCommand(device, request, OnSignNOCIssuerRequest, OnJointFabricFailureResponse, kRootEndpointId, timeout));
+    ChipLogDetail(Controller, "Sent JointFabric request, waiting for the JointFabric Information");
+    return CHIP_NO_ERROR;
+}
+
+void DeviceCommissioner::OnJointFabricFailureResponse(void * context, CHIP_ERROR error)
+{
+    MATTER_TRACE_SCOPE("OnAttestationFailureResponse", "DeviceCommissioner");
+    ChipLogProgress(Controller, "Device failed to receive the Attestation Information Response: %s", chip::ErrorStr(error));
+    DeviceCommissioner * commissioner = reinterpret_cast<DeviceCommissioner *>(context);
+    commissioner->CommissioningStageComplete(error);
+}
+
+void DeviceCommissioner::OnSignNOCIssuerRequest(void * context,
+                                                const JointFabricPki::Commands::SignNOCIssuerRequest::DecodableType & data)
+{
+    MATTER_TRACE_SCOPE("OnSignNOCIssuerRequest", "DeviceCommissioner");
+    ChipLogProgress(Controller, "Received JointFabric Information from the device");
+    DeviceCommissioner * commissioner = reinterpret_cast<DeviceCommissioner *>(context);
+
+    CommissioningDelegate::CommissioningReport report;
+    report.Set<SignNOCIssuerRequest>(SignNOCIssuerRequest(data.NOCIssuerCSR));
+    commissioner->CommissioningStageComplete(CHIP_NO_ERROR, report);
+}
+
+void DeviceCommissioner::OnDeviceNOCIssuerSignature(void * context, CHIP_ERROR status, const ByteSpan & icac)
+{
+    MATTER_TRACE_SCOPE("OnDeviceNOCIssuerSignature", "DeviceCommissioner");
+    DeviceCommissioner * commissioner = static_cast<DeviceCommissioner *>(context);
+
+    ChipLogProgress(Controller, "Received callback from the CA for NOC Issuer signature. Status %s", ErrorStr(status));
+    if (status == CHIP_NO_ERROR && commissioner->mState != State::Initialized)
+    {
+        status = CHIP_ERROR_INCORRECT_STATE;
+    }
+    if (status != CHIP_NO_ERROR)
+    {
+        ChipLogError(Controller, "Failed in signing NOC Issuer. Error %s", ErrorStr(status));
+    }
+
+    CommissioningDelegate::CommissioningReport report;
+    report.Set<JointNOCIssuerCertificate>(JointNOCIssuerCertificate(icac));
+    commissioner->CommissioningStageComplete(status, report);
+}
+
+CHIP_ERROR DeviceCommissioner::SignNOCIssuer(DeviceProxy * proxy, const ByteSpan & icaCsr)
+{
+    MATTER_TRACE_SCOPE("SignNOCIssuer", "DeviceCommissioner");
+    VerifyOrReturnError(mState == State::Initialized, CHIP_ERROR_INCORRECT_STATE);
+
+    ChipLogProgress(Controller, "Joint Fabric: Signing Device's NOC Issuer");
+
+    mOperationalCredentialsDelegate->SetNodeIdForNextNOCRequest(proxy->GetDeviceId());
+
+    if (mFabricIndex != kUndefinedFabricIndex)
+    {
+        mOperationalCredentialsDelegate->SetFabricIdForNextNOCRequest(GetFabricId());
+    }
+
+    return mOperationalCredentialsDelegate->SignNOCIssuer(icaCsr, &mDeviceSignNOCIssuerCallback);
 }
 
 CHIP_ERROR DeviceCommissioner::OnOperationalCredentialsProvisioningCompletion(DeviceProxy * device)
@@ -3357,6 +3473,53 @@ void DeviceCommissioner::PerformCommissioningStep(DeviceProxy * proxy, Commissio
         }
         break;
     }
+    case CommissioningStage::kSendJointFabricRequest: {
+        CHIP_ERROR err = SendJointFabricRequestCommand(proxy, timeout);
+        if (err != CHIP_NO_ERROR)
+        {
+            // We won't get any async callbacks here, so just complete our stage.
+            ChipLogError(Controller, "Failed to send JointFabric request: %" CHIP_ERROR_FORMAT, err.Format());
+            CommissioningStageComplete(err);
+            return;
+        }
+    }
+    break;
+    case CommissioningStage::kSignNOCIssuer: {
+        if (!params.GetIcaCsr().HasValue())
+        {
+            ChipLogError(Controller, "Joint Fabric - Unable to generate Sign ICA parameters");
+            return CommissioningStageComplete(CHIP_ERROR_INVALID_ARGUMENT);
+        }
+        CHIP_ERROR err = SignNOCIssuer(proxy, params.GetIcaCsr().Value());
+        if (err != CHIP_NO_ERROR)
+        {
+            ChipLogError(Controller, "Joint Fabric - Unable to Sign ICA");
+            // Handle error, and notify session failure to the commissioner application.
+            ChipLogError(Controller, "Joint Fabric - Failed to process the Sign ICA request");
+            // TODO: Map error status to correct error code
+            CommissioningStageComplete(err);
+            return;
+        }
+    }
+    break;
+    case CommissioningStage::kSendICA: {
+        if (!params.GetIcac().HasValue())
+        {
+            ChipLogError(Controller, "AddICA contents not specified");
+            CommissioningStageComplete(CHIP_ERROR_INVALID_ARGUMENT);
+            return;
+        }
+        CHIP_ERROR err = SendICA(proxy, params.GetIcac().Value(), params.GetAdminSubject().Value(), timeout);
+        if (err != CHIP_NO_ERROR)
+        {
+            // We won't get any async callbacks here, so just complete our stage.
+            ChipLogError(Controller, "Error sending ICA certificate: %" CHIP_ERROR_FORMAT, err.Format());
+            CommissioningStageComplete(err);
+            return;
+        }
+        break;
+    }
+    break;
     case CommissioningStage::kConfigureTrustedTimeSource: {
         if (!params.GetTrustedTimeSource().HasValue())
         {

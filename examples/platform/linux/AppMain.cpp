@@ -20,6 +20,7 @@
 #include <platform/PlatformManager.h>
 
 #include <app/InteractionModelEngine.h>
+#include <app/clusters/joint-fabric-pki-server/joint-fabric-pki-server.h>
 #include <app/clusters/network-commissioning/network-commissioning.h>
 #include <app/server/Dnssd.h>
 #include <app/server/OnboardingCodesUtil.h>
@@ -114,8 +115,12 @@
 #include <platform/Linux/NetworkCommissioningDriver.h>
 #endif // CHIP_DEVICE_LAYER_TARGET_LINUX
 
+#include <controller/ExampleOperationalCredentialsIssuer.h>
+#include <controller/ExamplePersistentStorage.h>
+
 using namespace chip;
 using namespace chip::ArgParser;
+using namespace chip::Controller;
 using namespace chip::Credentials;
 using namespace chip::DeviceLayer;
 using namespace chip::Inet;
@@ -509,6 +514,21 @@ exit:
     return 0;
 }
 
+namespace {
+static constexpr size_t kFabricId = 1;
+
+ExampleOperationalCredentialsIssuer gOpCredsIssuer(kFabricId);
+PersistentStorage gStorage;
+
+CHIP_ERROR PrepareJointFabricCluster()
+{
+    SetPersistentStorageDelegate(&gStorage);
+    SetOperationalCredentialsIssuer(&gOpCredsIssuer);
+    SetChipToolKvs(LinuxDeviceOptions::GetInstance().chipToolKvs);
+    return CHIP_NO_ERROR;
+}
+} // namespace
+
 void ChipLinuxAppMainLoop(AppMainLoopImplementation * impl)
 {
     gMainLoopImplementation = impl;
@@ -595,6 +615,8 @@ void ChipLinuxAppMainLoop(AppMainLoopImplementation * impl)
 
     // Init ZCL Data Model and CHIP App Server
     Server::GetInstance().Init(initParams);
+
+    VerifyOrDie(PrepareJointFabricCluster() == CHIP_NO_ERROR);
 
 #if CONFIG_BUILD_FOR_HOST_UNIT_TEST
     // Set ReadHandler Capacity for Subscriptions

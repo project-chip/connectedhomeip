@@ -311,6 +311,15 @@ static BOOL CommandNeedsTimedInvokeInAdministratorCommissioningCluster(Attribute
     }
     }
 }
+static BOOL CommandNeedsTimedInvokeInJointFabricPkiCluster(AttributeId aAttributeId)
+{
+    using namespace Clusters::JointFabricPki;
+    switch (aAttributeId) {
+    default: {
+        return NO;
+    }
+    }
+}
 static BOOL CommandNeedsTimedInvokeInOperationalCredentialsCluster(AttributeId aAttributeId)
 {
     using namespace Clusters::OperationalCredentials;
@@ -1298,6 +1307,9 @@ BOOL MTRCommandNeedsTimedInvoke(NSNumber * _Nonnull aClusterID, NSNumber * _Nonn
     }
     case Clusters::AdministratorCommissioning::Id: {
         return CommandNeedsTimedInvokeInAdministratorCommissioningCluster(commandID);
+    }
+    case Clusters::JointFabricPki::Id: {
+        return CommandNeedsTimedInvokeInJointFabricPkiCluster(commandID);
     }
     case Clusters::OperationalCredentials::Id: {
         return CommandNeedsTimedInvokeInOperationalCredentialsCluster(commandID);

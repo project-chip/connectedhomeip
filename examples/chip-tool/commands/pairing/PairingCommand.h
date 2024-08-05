@@ -82,6 +82,7 @@ public:
         AddArgument("icd-symmetric-key", &mICDSymmetricKey, "The 16 bytes ICD symmetric key, default: randomly generated.");
         AddArgument("icd-stay-active-duration", 0, UINT32_MAX, &mICDStayActiveDurationMsec,
                     "If set, a LIT ICD that is commissioned will be requested to stay active for this many milliseconds");
+        AddArgument("joint-fabric", 0, 1, &mJointFabric, "Enable Joint Fabric commissioning mode.");
         switch (networkType)
         {
         case PairingNetworkType::None:
@@ -265,6 +266,7 @@ private:
     chip::app::DataModel::List<chip::app::Clusters::TimeSynchronization::Structs::DSTOffsetStruct::Type> mDSTOffsetList;
     TypedComplexArgument<chip::app::DataModel::List<chip::app::Clusters::TimeSynchronization::Structs::DSTOffsetStruct::Type>>
         mComplex_DSTOffsets;
+    chip::Optional<bool> mJointFabric;
 
     uint16_t mRemotePort;
     // mDiscriminator is only used for some situations, but in those situations

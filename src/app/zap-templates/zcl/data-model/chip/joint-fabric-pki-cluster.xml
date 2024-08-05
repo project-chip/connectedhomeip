@@ -1,0 +1,80 @@
+<?xml version="1.0"?>
+<!--
+Copyright (c) 2024 Project CHIP Authors
+
+Licensed under the Apache License, Version 2.0 (the "License");
+you may not use this file except in compliance with the License.
+You may obtain a copy of the License at
+
+    http://www.apache.org/licenses/LICENSE-2.0
+
+Unless required by applicable law or agreed to in writing, software
+distributed under the License is distributed on an "AS IS" BASIS,
+WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+See the License for the specific language governing permissions and
+limitations under the License.
+-->
+<configurator>
+  <domain name="CHIP"/>
+
+  <enum name="SignNOCIssuerRequestStatusEnum" type="enum8">
+    <cluster code="0x003D"/>
+    <item name="OK" value="0x00"/>
+    <item name="FailSafeRequired" value="0x01"/>
+    <item name="InvalidNOCIssuerCSR" value="0x02"/>
+    <item name="ChainValidationFailed" value="0x03"/>
+    <item name="TrustQuotientThreshold" value="0x04"/>
+    <item name="SignNOCIssuerFailed" value="0x05"/>
+  </enum>
+
+  <enum name="JointFabricStatusEnum" type="enum8">
+    <cluster code="0x003D"/>
+    <item name="OK" value="0x00"/>
+    <item name="InvalidPublicKey" value="0x01"/>
+    <item name="InvalidNodeOpId" value="0x02"/>
+    <item name="InvalidNOC" value="0x03"/>
+    <item name="MissingCsr" value="0x04"/>
+    <item name="TableFull" value="0x05"/>
+    <item name="InvalidAdminSubject" value="0x06"/>
+    <item name="FabricConflict" value="0x09"/>
+    <item name="LabelConflict" value="0x0a"/>
+    <item name="InvalidFabricIndex" value="0x0b"/>
+  </enum>
+
+  <cluster>
+    <domain>General</domain>
+    <name>Joint Fabric Pki</name>
+    <code>0x003D</code>
+    <define>JOINT_FABRIC_PKI_CLUSTER</define>
+    <description>Joint Fabric Pki Cluster.</description>
+
+    <command source="client" code="0x00" name="JointFabricRequest" response="SignNOCIssuerRequest" optional="false">
+      <description>Client requests Server's ICA CSR and CA Chain.</description>
+      <arg name="FabricIndex" type="int64u"/>
+      <access op="invoke" privilege="administer"/>
+    </command>
+
+    <command source="server" code="0x01" name="SignNOCIssuerRequest" optional="false">
+      <description>Server requests NOC Issuer to be signed by Client's PKI.</description>
+      <arg name="NOCIssuerCSR" type="octet_string" length="400"/>
+    </command>
+
+    <command source="client" code="0x02" name="SignNOCIssuerResponse" response="JointFabricResponse" optional="false">
+      <description>Joint Fabric ICA generated.</description>
+      <arg name="StatusCode" type="SignNOCIssuerRequestStatusEnum"/>
+      <arg name="NOCIssuerCert" type="octet_string" length="400"/>
+      <arg name="NodeId" type="node_id"/>
+      <arg name="FabricId" type="fabric_id"/>
+      <arg name="AdminVendorId" type="vendor_id"/>
+      <arg name="CaseAdminSubject" type="int64u"/>
+      <access op="invoke" privilege="administer"/>
+    </command>
+
+    <command source="server" code="0x03" name="JointFabricResponse" optional="false">
+      <description>Response to SignNOCIssuerResponse command.</description>
+      <arg name="StatusCode" type="JointFabricStatusEnum"/>
+      <arg name="FabricIndex" type="fabric_idx" optional="true"/>
+      <arg name="DebugText" type="char_string" optional="true" length="128"/>
+    </command>
+  </cluster>
+</configurator>

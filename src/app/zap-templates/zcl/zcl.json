@@ -68,6 +68,7 @@
         "identify-cluster.xml",
         "illuminance-measurement-cluster.xml",
         "input-output-value-clusters.xml",
+        "joint-fabric-pki-cluster.xml",
         "keypad-input-cluster.xml",
         "laundry-washer-mode-cluster.xml",
         "laundry-dryer-controls-cluster.xml",

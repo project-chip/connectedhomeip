@@ -299,6 +299,7 @@ matter_clusters_sources = [
   "${chip_root}/src/controller/java/generated/java/matter/controller/cluster/clusters/IcdManagementCluster.kt",
   "${chip_root}/src/controller/java/generated/java/matter/controller/cluster/clusters/IdentifyCluster.kt",
   "${chip_root}/src/controller/java/generated/java/matter/controller/cluster/clusters/IlluminanceMeasurementCluster.kt",
+  "${chip_root}/src/controller/java/generated/java/matter/controller/cluster/clusters/JointFabricPkiCluster.kt",
   "${chip_root}/src/controller/java/generated/java/matter/controller/cluster/clusters/KeypadInputCluster.kt",
   "${chip_root}/src/controller/java/generated/java/matter/controller/cluster/clusters/LaundryDryerControlsCluster.kt",
   "${chip_root}/src/controller/java/generated/java/matter/controller/cluster/clusters/LaundryWasherControlsCluster.kt",

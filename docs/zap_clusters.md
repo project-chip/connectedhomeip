@@ -43,6 +43,7 @@ Generally regenerate using one of:
 |         57 |       0x39 | BridgedDeviceBasicInformation                           |
 |         59 |       0x3B | Switch                                                  |
 |         60 |       0x3C | AdministratorCommissioning                              |
+|         61 |       0x3D | JointFabricPki                                          |
 |         62 |       0x3E | OperationalCredentials                                  |
 |         63 |       0x3F | GroupKeyManagement                                      |
 |         64 |       0x40 | FixedLabel                                              |

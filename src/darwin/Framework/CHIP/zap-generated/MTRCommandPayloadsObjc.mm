@@ -8274,6 +8274,376 @@ NS_ASSUME_NONNULL_BEGIN
 }
 @end
 
+@implementation MTRJointFabricPkiClusterJointFabricRequestParams
+- (instancetype)init
+{
+    if (self = [super init]) {
+
+        _fabricIndex = @(0);
+        _timedInvokeTimeoutMs = nil;
+        _serverSideProcessingTimeout = nil;
+    }
+    return self;
+}
+
+- (id)copyWithZone:(NSZone * _Nullable)zone;
+{
+    auto other = [[MTRJointFabricPkiClusterJointFabricRequestParams alloc] init];
+
+    other.fabricIndex = self.fabricIndex;
+    other.timedInvokeTimeoutMs = self.timedInvokeTimeoutMs;
+    other.serverSideProcessingTimeout = self.serverSideProcessingTimeout;
+
+    return other;
+}
+
+- (NSString *)description
+{
+    NSString * descriptionString = [NSString stringWithFormat:@"<%@: fabricIndex:%@; >", NSStringFromClass([self class]), _fabricIndex];
+    return descriptionString;
+}
+
+@end
+
+@implementation MTRJointFabricPkiClusterJointFabricRequestParams (InternalMethods)
+
+- (CHIP_ERROR)_encodeToTLVReader:(chip::System::PacketBufferTLVReader &)reader
+{
+    chip::app::Clusters::JointFabricPki::Commands::JointFabricRequest::Type encodableStruct;
+    ListFreer listFreer;
+    {
+        encodableStruct.fabricIndex = self.fabricIndex.unsignedLongLongValue;
+    }
+
+    auto buffer = chip::System::PacketBufferHandle::New(chip::System::PacketBuffer::kMaxSizeWithoutReserve, 0);
+    if (buffer.IsNull()) {
+        return CHIP_ERROR_NO_MEMORY;
+    }
+
+    chip::System::PacketBufferTLVWriter writer;
+    // Commands never need chained buffers, since they cannot be chunked.
+    writer.Init(std::move(buffer), /* useChainedBuffers = */ false);
+
+    ReturnErrorOnFailure(chip::app::DataModel::Encode(writer, chip::TLV::AnonymousTag(), encodableStruct));
+
+    ReturnErrorOnFailure(writer.Finalize(&buffer));
+
+    reader.Init(std::move(buffer));
+    return reader.Next(chip::TLV::kTLVType_Structure, chip::TLV::AnonymousTag());
+}
+
+- (NSDictionary<NSString *, id> * _Nullable)_encodeAsDataValue:(NSError * __autoreleasing *)error
+{
+    chip::System::PacketBufferTLVReader reader;
+    CHIP_ERROR err = [self _encodeToTLVReader:reader];
+    if (err != CHIP_NO_ERROR) {
+        if (error) {
+            *error = [MTRError errorForCHIPErrorCode:err];
+        }
+        return nil;
+    }
+
+    auto decodedObj = MTRDecodeDataValueDictionaryFromCHIPTLV(&reader);
+    if (decodedObj == nil) {
+        if (error) {
+            *error = [MTRError errorForCHIPErrorCode:CHIP_ERROR_INCORRECT_STATE];
+        }
+    }
+    return decodedObj;
+}
+@end
+
+@implementation MTRJointFabricPkiClusterSignNOCIssuerRequestParams
+- (instancetype)init
+{
+    if (self = [super init]) {
+
+        _nocIssuerCSR = [NSData data];
+    }
+    return self;
+}
+
+- (id)copyWithZone:(NSZone * _Nullable)zone;
+{
+    auto other = [[MTRJointFabricPkiClusterSignNOCIssuerRequestParams alloc] init];
+
+    other.nocIssuerCSR = self.nocIssuerCSR;
+
+    return other;
+}
+
+- (NSString *)description
+{
+    NSString * descriptionString = [NSString stringWithFormat:@"<%@: nocIssuerCSR:%@; >", NSStringFromClass([self class]), [_nocIssuerCSR base64EncodedStringWithOptions:0]];
+    return descriptionString;
+}
+
+- (nullable instancetype)initWithResponseValue:(NSDictionary<NSString *, id> *)responseValue
+                                         error:(NSError * __autoreleasing *)error
+{
+    if (!(self = [super init])) {
+        return nil;
+    }
+
+    using DecodableType = chip::app::Clusters::JointFabricPki::Commands::SignNOCIssuerRequest::DecodableType;
+    chip::System::PacketBufferHandle buffer = [MTRBaseDevice _responseDataForCommand:responseValue
+                                                                           clusterID:DecodableType::GetClusterId()
+                                                                           commandID:DecodableType::GetCommandId()
+                                                                               error:error];
+    if (buffer.IsNull()) {
+        return nil;
+    }
+
+    chip::TLV::TLVReader reader;
+    reader.Init(buffer->Start(), buffer->DataLength());
+
+    CHIP_ERROR err = reader.Next(chip::TLV::AnonymousTag());
+    if (err == CHIP_NO_ERROR) {
+        DecodableType decodedStruct;
+        err = chip::app::DataModel::Decode(reader, decodedStruct);
+        if (err == CHIP_NO_ERROR) {
+            err = [self _setFieldsFromDecodableStruct:decodedStruct];
+            if (err == CHIP_NO_ERROR) {
+                return self;
+            }
+        }
+    }
+
+    NSString * errorStr = [NSString stringWithFormat:@"Command payload decoding failed: %s", err.AsString()];
+    MTR_LOG_ERROR("%s", errorStr.UTF8String);
+    if (error != nil) {
+        NSDictionary * userInfo = @{ NSLocalizedFailureReasonErrorKey : NSLocalizedString(errorStr, nil) };
+        *error = [NSError errorWithDomain:MTRErrorDomain code:MTRErrorCodeSchemaMismatch userInfo:userInfo];
+    }
+    return nil;
+}
+
+@end
+
+@implementation MTRJointFabricPkiClusterSignNOCIssuerRequestParams (InternalMethods)
+
+- (CHIP_ERROR)_setFieldsFromDecodableStruct:(const chip::app::Clusters::JointFabricPki::Commands::SignNOCIssuerRequest::DecodableType &)decodableStruct
+{
+    {
+        self.nocIssuerCSR = AsData(decodableStruct.NOCIssuerCSR);
+    }
+    return CHIP_NO_ERROR;
+}
+
+@end
+
+@implementation MTRJointFabricPkiClusterSignNOCIssuerResponseParams
+- (instancetype)init
+{
+    if (self = [super init]) {
+
+        _statusCode = @(0);
+
+        _nocIssuerCert = [NSData data];
+
+        _nodeId = @(0);
+
+        _fabricId = @(0);
+
+        _adminVendorId = @(0);
+
+        _caseAdminSubject = @(0);
+        _timedInvokeTimeoutMs = nil;
+        _serverSideProcessingTimeout = nil;
+    }
+    return self;
+}
+
+- (id)copyWithZone:(NSZone * _Nullable)zone;
+{
+    auto other = [[MTRJointFabricPkiClusterSignNOCIssuerResponseParams alloc] init];
+
+    other.statusCode = self.statusCode;
+    other.nocIssuerCert = self.nocIssuerCert;
+    other.nodeId = self.nodeId;
+    other.fabricId = self.fabricId;
+    other.adminVendorId = self.adminVendorId;
+    other.caseAdminSubject = self.caseAdminSubject;
+    other.timedInvokeTimeoutMs = self.timedInvokeTimeoutMs;
+    other.serverSideProcessingTimeout = self.serverSideProcessingTimeout;
+
+    return other;
+}
+
+- (NSString *)description
+{
+    NSString * descriptionString = [NSString stringWithFormat:@"<%@: statusCode:%@; nocIssuerCert:%@; nodeId:%@; fabricId:%@; adminVendorId:%@; caseAdminSubject:%@; >", NSStringFromClass([self class]), _statusCode, [_nocIssuerCert base64EncodedStringWithOptions:0], _nodeId, _fabricId, _adminVendorId, _caseAdminSubject];
+    return descriptionString;
+}
+
+@end
+
+@implementation MTRJointFabricPkiClusterSignNOCIssuerResponseParams (InternalMethods)
+
+- (CHIP_ERROR)_encodeToTLVReader:(chip::System::PacketBufferTLVReader &)reader
+{
+    chip::app::Clusters::JointFabricPki::Commands::SignNOCIssuerResponse::Type encodableStruct;
+    ListFreer listFreer;
+    {
+        encodableStruct.statusCode = static_cast<std::remove_reference_t<decltype(encodableStruct.statusCode)>>(self.statusCode.unsignedCharValue);
+    }
+    {
+        encodableStruct.NOCIssuerCert = AsByteSpan(self.nocIssuerCert);
+    }
+    {
+        encodableStruct.nodeId = self.nodeId.unsignedLongLongValue;
+    }
+    {
+        encodableStruct.fabricId = self.fabricId.unsignedLongLongValue;
+    }
+    {
+        encodableStruct.adminVendorId = static_cast<std::remove_reference_t<decltype(encodableStruct.adminVendorId)>>(self.adminVendorId.unsignedShortValue);
+    }
+    {
+        encodableStruct.caseAdminSubject = self.caseAdminSubject.unsignedLongLongValue;
+    }
+
+    auto buffer = chip::System::PacketBufferHandle::New(chip::System::PacketBuffer::kMaxSizeWithoutReserve, 0);
+    if (buffer.IsNull()) {
+        return CHIP_ERROR_NO_MEMORY;
+    }
+
+    chip::System::PacketBufferTLVWriter writer;
+    // Commands never need chained buffers, since they cannot be chunked.
+    writer.Init(std::move(buffer), /* useChainedBuffers = */ false);
+
+    ReturnErrorOnFailure(chip::app::DataModel::Encode(writer, chip::TLV::AnonymousTag(), encodableStruct));
+
+    ReturnErrorOnFailure(writer.Finalize(&buffer));
+
+    reader.Init(std::move(buffer));
+    return reader.Next(chip::TLV::kTLVType_Structure, chip::TLV::AnonymousTag());
+}
+
+- (NSDictionary<NSString *, id> * _Nullable)_encodeAsDataValue:(NSError * __autoreleasing *)error
+{
+    chip::System::PacketBufferTLVReader reader;
+    CHIP_ERROR err = [self _encodeToTLVReader:reader];
+    if (err != CHIP_NO_ERROR) {
+        if (error) {
+            *error = [MTRError errorForCHIPErrorCode:err];
+        }
+        return nil;
+    }
+
+    auto decodedObj = MTRDecodeDataValueDictionaryFromCHIPTLV(&reader);
+    if (decodedObj == nil) {
+        if (error) {
+            *error = [MTRError errorForCHIPErrorCode:CHIP_ERROR_INCORRECT_STATE];
+        }
+    }
+    return decodedObj;
+}
+@end
+
+@implementation MTRJointFabricPkiClusterJointFabricResponseParams
+- (instancetype)init
+{
+    if (self = [super init]) {
+
+        _statusCode = @(0);
+
+        _fabricIndex = nil;
+
+        _debugText = nil;
+    }
+    return self;
+}
+
+- (id)copyWithZone:(NSZone * _Nullable)zone;
+{
+    auto other = [[MTRJointFabricPkiClusterJointFabricResponseParams alloc] init];
+
+    other.statusCode = self.statusCode;
+    other.fabricIndex = self.fabricIndex;
+    other.debugText = self.debugText;
+
+    return other;
+}
+
+- (NSString *)description
+{
+    NSString * descriptionString = [NSString stringWithFormat:@"<%@: statusCode:%@; fabricIndex:%@; debugText:%@; >", NSStringFromClass([self class]), _statusCode, _fabricIndex, _debugText];
+    return descriptionString;
+}
+
+- (nullable instancetype)initWithResponseValue:(NSDictionary<NSString *, id> *)responseValue
+                                         error:(NSError * __autoreleasing *)error
+{
+    if (!(self = [super init])) {
+        return nil;
+    }
+
+    using DecodableType = chip::app::Clusters::JointFabricPki::Commands::JointFabricResponse::DecodableType;
+    chip::System::PacketBufferHandle buffer = [MTRBaseDevice _responseDataForCommand:responseValue
+                                                                           clusterID:DecodableType::GetClusterId()
+                                                                           commandID:DecodableType::GetCommandId()
+                                                                               error:error];
+    if (buffer.IsNull()) {
+        return nil;
+    }
+
+    chip::TLV::TLVReader reader;
+    reader.Init(buffer->Start(), buffer->DataLength());
+
+    CHIP_ERROR err = reader.Next(chip::TLV::AnonymousTag());
+    if (err == CHIP_NO_ERROR) {
+        DecodableType decodedStruct;
+        err = chip::app::DataModel::Decode(reader, decodedStruct);
+        if (err == CHIP_NO_ERROR) {
+            err = [self _setFieldsFromDecodableStruct:decodedStruct];
+            if (err == CHIP_NO_ERROR) {
+                return self;
+            }
+        }
+    }
+
+    NSString * errorStr = [NSString stringWithFormat:@"Command payload decoding failed: %s", err.AsString()];
+    MTR_LOG_ERROR("%s", errorStr.UTF8String);
+    if (error != nil) {
+        NSDictionary * userInfo = @{ NSLocalizedFailureReasonErrorKey : NSLocalizedString(errorStr, nil) };
+        *error = [NSError errorWithDomain:MTRErrorDomain code:MTRErrorCodeSchemaMismatch userInfo:userInfo];
+    }
+    return nil;
+}
+
+@end
+
+@implementation MTRJointFabricPkiClusterJointFabricResponseParams (InternalMethods)
+
+- (CHIP_ERROR)_setFieldsFromDecodableStruct:(const chip::app::Clusters::JointFabricPki::Commands::JointFabricResponse::DecodableType &)decodableStruct
+{
+    {
+        self.statusCode = [NSNumber numberWithUnsignedChar:chip::to_underlying(decodableStruct.statusCode)];
+    }
+    {
+        if (decodableStruct.fabricIndex.HasValue()) {
+            self.fabricIndex = [NSNumber numberWithUnsignedChar:decodableStruct.fabricIndex.Value()];
+        } else {
+            self.fabricIndex = nil;
+        }
+    }
+    {
+        if (decodableStruct.debugText.HasValue()) {
+            self.debugText = AsString(decodableStruct.debugText.Value());
+            if (self.debugText == nil) {
+                CHIP_ERROR err = CHIP_ERROR_INVALID_ARGUMENT;
+                return err;
+            }
+        } else {
+            self.debugText = nil;
+        }
+    }
+    return CHIP_NO_ERROR;
+}
+
+@end
+
 @implementation MTROperationalCredentialsClusterAttestationRequestParams
 - (instancetype)init
 {

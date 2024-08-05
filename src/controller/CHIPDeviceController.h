@@ -881,6 +881,14 @@ private:
        The function does not hold a reference to the device object.
      */
     CHIP_ERROR SendTrustedRootCertificate(DeviceProxy * device, const ByteSpan & rcac, Optional<System::Clock::Timeout> timeout);
+    /* This function sends a Joint Fabric request to the device.
+       The function does not hold a reference to the device object.
+     */
+    CHIP_ERROR SendJointFabricRequestCommand(DeviceProxy * device, Optional<System::Clock::Timeout> timeout);
+    /* This function sends the ICA certificate to the device.
+       The function does not hold a reference to the device object.
+     */
+    CHIP_ERROR SendICA(DeviceProxy * device, const ByteSpan & icac, NodeId adminSubject, Optional<System::Clock::Timeout> timeout);
 
     /* This function is called by the commissioner code when the device completes
        the operational credential provisioning process.
@@ -927,6 +935,17 @@ private:
     static void OnRootCertSuccessResponse(void * context, const chip::app::DataModel::NullObjectType &);
     /* Callback called when adding root cert to device results in failure */
     static void OnRootCertFailureResponse(void * context, CHIP_ERROR error);
+
+    /* Callback when the device confirms that it wants to start JointFabric flow */
+    static void OnSignNOCIssuerRequest(void * context,
+                                       const app::Clusters::JointFabricPki::Commands::SignNOCIssuerRequest::DecodableType & data);
+    /* Callback called when device fails to start JointFabric flow */
+    static void OnJointFabricFailureResponse(void * context, CHIP_ERROR error);
+
+    static void
+    OnICACertSuccessResponse(void * context,
+                             const chip::app::Clusters::JointFabricPki::Commands::JointFabricResponse::DecodableType & data);
+    static void OnICACertFailureResponse(void * context, CHIP_ERROR error);
 
     static void OnDeviceConnectedFn(void * context, Messaging::ExchangeManager & exchangeMgr, const SessionHandle & sessionHandle);
     static void OnDeviceConnectionFailureFn(void * context, const ScopedNodeId & peerId, CHIP_ERROR error);
@@ -982,6 +1001,8 @@ private:
 
     static void OnInterfaceEnableWriteSuccessResponse(void * context);
 
+    static void OnDeviceNOCIssuerSignature(void * context, CHIP_ERROR status, const ByteSpan & icac);
+
     /**
      * @brief
      *   This function processes the CSR sent by the device.
@@ -1018,6 +1039,11 @@ private:
      * @param[in] info Structure containing all the required information for validating the device attestation.
      */
     CHIP_ERROR CheckForRevokedDACChain(const Credentials::DeviceAttestationVerifier::AttestationInfo & info);
+
+    /* This function signs the intermediate CA certificate of the device.
+       The function does not hold a reference to the device object.
+     */
+    CHIP_ERROR SignNOCIssuer(DeviceProxy * device, const ByteSpan & icaCsr);
 
     CommissioneeDeviceProxy * FindCommissioneeDevice(NodeId id);
     CommissioneeDeviceProxy * FindCommissioneeDevice(const Transport::PeerAddress & peerAddress);
@@ -1093,6 +1119,8 @@ private:
     CommissioningDelegate * mCommissioningDelegate =
         nullptr; // Commissioning delegate that issued the PerformCommissioningStep command
     CompletionStatus mCommissioningCompletionStatus;
+
+    chip::Callback::Callback<OnNOCIssuerSigned> mDeviceSignNOCIssuerCallback;
 
 #if CHIP_CONFIG_ENABLE_READ_CLIENT
     Platform::UniquePtr<app::ClusterStateCache> mAttributeCache;

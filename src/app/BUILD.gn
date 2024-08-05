@@ -427,6 +427,7 @@ static_library("app") {
   output_name = "libCHIPDataModel"
 
   sources = [
+    "${chip_root}/src/controller/ExamplePersistentStorage.cpp",
     "AttributePathExpandIterator.h",
     "AttributePersistenceProvider.h",
     "ChunkedWriteCallback.cpp",
@@ -473,6 +474,7 @@ static_library("app") {
     "${chip_root}/src/messaging",
     "${chip_root}/src/protocols/interaction_model",
     "${chip_root}/src/system",
+    "${chip_root}/third_party/inipp",
   ]
 
   if (chip_use_data_model_interface == "disabled") {

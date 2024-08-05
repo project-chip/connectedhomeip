@@ -5077,6 +5077,76 @@ public class ClusterReadMapping {
      
        return result;
     }
+    private static Map<String, InteractionInfo> readJointFabricPkiInteractionInfo() {
+       Map<String, InteractionInfo> result = new LinkedHashMap<>();Map<String, CommandParameterInfo> readJointFabricPkiGeneratedCommandListCommandParams = new LinkedHashMap<String, CommandParameterInfo>();
+        InteractionInfo readJointFabricPkiGeneratedCommandListAttributeInteractionInfo = new InteractionInfo(
+          (cluster, callback, commandArguments) -> {
+            ((ChipClusters.JointFabricPkiCluster) cluster).readGeneratedCommandListAttribute(
+              (ChipClusters.JointFabricPkiCluster.GeneratedCommandListAttributeCallback) callback
+            );
+          },
+          () -> new ClusterInfoMapping.DelegatedJointFabricPkiClusterGeneratedCommandListAttributeCallback(),
+          readJointFabricPkiGeneratedCommandListCommandParams
+        );
+        result.put("readGeneratedCommandListAttribute", readJointFabricPkiGeneratedCommandListAttributeInteractionInfo);
+     Map<String, CommandParameterInfo> readJointFabricPkiAcceptedCommandListCommandParams = new LinkedHashMap<String, CommandParameterInfo>();
+        InteractionInfo readJointFabricPkiAcceptedCommandListAttributeInteractionInfo = new InteractionInfo(
+          (cluster, callback, commandArguments) -> {
+            ((ChipClusters.JointFabricPkiCluster) cluster).readAcceptedCommandListAttribute(
+              (ChipClusters.JointFabricPkiCluster.AcceptedCommandListAttributeCallback) callback
+            );
+          },
+          () -> new ClusterInfoMapping.DelegatedJointFabricPkiClusterAcceptedCommandListAttributeCallback(),
+          readJointFabricPkiAcceptedCommandListCommandParams
+        );
+        result.put("readAcceptedCommandListAttribute", readJointFabricPkiAcceptedCommandListAttributeInteractionInfo);
+     Map<String, CommandParameterInfo> readJointFabricPkiEventListCommandParams = new LinkedHashMap<String, CommandParameterInfo>();
+        InteractionInfo readJointFabricPkiEventListAttributeInteractionInfo = new InteractionInfo(
+          (cluster, callback, commandArguments) -> {
+            ((ChipClusters.JointFabricPkiCluster) cluster).readEventListAttribute(
+              (ChipClusters.JointFabricPkiCluster.EventListAttributeCallback) callback
+            );
+          },
+          () -> new ClusterInfoMapping.DelegatedJointFabricPkiClusterEventListAttributeCallback(),
+          readJointFabricPkiEventListCommandParams
+        );
+        result.put("readEventListAttribute", readJointFabricPkiEventListAttributeInteractionInfo);
+     Map<String, CommandParameterInfo> readJointFabricPkiAttributeListCommandParams = new LinkedHashMap<String, CommandParameterInfo>();
+        InteractionInfo readJointFabricPkiAttributeListAttributeInteractionInfo = new InteractionInfo(
+          (cluster, callback, commandArguments) -> {
+            ((ChipClusters.JointFabricPkiCluster) cluster).readAttributeListAttribute(
+              (ChipClusters.JointFabricPkiCluster.AttributeListAttributeCallback) callback
+            );
+          },
+          () -> new ClusterInfoMapping.DelegatedJointFabricPkiClusterAttributeListAttributeCallback(),
+          readJointFabricPkiAttributeListCommandParams
+        );
+        result.put("readAttributeListAttribute", readJointFabricPkiAttributeListAttributeInteractionInfo);
+     Map<String, CommandParameterInfo> readJointFabricPkiFeatureMapCommandParams = new LinkedHashMap<String, CommandParameterInfo>();
+        InteractionInfo readJointFabricPkiFeatureMapAttributeInteractionInfo = new InteractionInfo(
+          (cluster, callback, commandArguments) -> {
+            ((ChipClusters.JointFabricPkiCluster) cluster).readFeatureMapAttribute(
+              (ChipClusters.LongAttributeCallback) callback
+            );
+          },
+          () -> new ClusterInfoMapping.DelegatedLongAttributeCallback(),
+          readJointFabricPkiFeatureMapCommandParams
+        );
+        result.put("readFeatureMapAttribute", readJointFabricPkiFeatureMapAttributeInteractionInfo);
+     Map<String, CommandParameterInfo> readJointFabricPkiClusterRevisionCommandParams = new LinkedHashMap<String, CommandParameterInfo>();
+        InteractionInfo readJointFabricPkiClusterRevisionAttributeInteractionInfo = new InteractionInfo(
+          (cluster, callback, commandArguments) -> {
+            ((ChipClusters.JointFabricPkiCluster) cluster).readClusterRevisionAttribute(
+              (ChipClusters.IntegerAttributeCallback) callback
+            );
+          },
+          () -> new ClusterInfoMapping.DelegatedIntegerAttributeCallback(),
+          readJointFabricPkiClusterRevisionCommandParams
+        );
+        result.put("readClusterRevisionAttribute", readJointFabricPkiClusterRevisionAttributeInteractionInfo);
+     
+       return result;
+    }
     private static Map<String, InteractionInfo> readOperationalCredentialsInteractionInfo() {
        Map<String, InteractionInfo> result = new LinkedHashMap<>();Map<String, CommandParameterInfo> readOperationalCredentialsNOCsCommandParams = new LinkedHashMap<String, CommandParameterInfo>();
         InteractionInfo readOperationalCredentialsNOCsAttributeInteractionInfo = new InteractionInfo(
@@ -21508,6 +21578,7 @@ public class ClusterReadMapping {
             put("bridgedDeviceBasicInformation", readBridgedDeviceBasicInformationInteractionInfo());
             put("switch", readSwitchInteractionInfo());
             put("administratorCommissioning", readAdministratorCommissioningInteractionInfo());
+            put("jointFabricPki", readJointFabricPkiInteractionInfo());
             put("operationalCredentials", readOperationalCredentialsInteractionInfo());
             put("groupKeyManagement", readGroupKeyManagementInteractionInfo());
             put("fixedLabel", readFixedLabelInteractionInfo());

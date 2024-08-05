@@ -2646,6 +2646,68 @@ cluster AdministratorCommissioning = 60 {
   timed command access(invoke: administer) RevokeCommissioning(): DefaultSuccess = 2;
 }
 
+/** Joint Fabric Pki Cluster. */
+cluster JointFabricPki = 61 {
+  revision 1; // NOTE: Default/not specifically set
+
+  enum JointFabricStatusEnum : enum8 {
+    kOK = 0;
+    kInvalidPublicKey = 1;
+    kInvalidNodeOpId = 2;
+    kInvalidNOC = 3;
+    kMissingCsr = 4;
+    kTableFull = 5;
+    kInvalidAdminSubject = 6;
+    kFabricConflict = 9;
+    kLabelConflict = 10;
+    kInvalidFabricIndex = 11;
+  }
+
+  enum SignNOCIssuerRequestStatusEnum : enum8 {
+    kOK = 0;
+    kFailSafeRequired = 1;
+    kInvalidNOCIssuerCSR = 2;
+    kChainValidationFailed = 3;
+    kTrustQuotientThreshold = 4;
+    kSignNOCIssuerFailed = 5;
+  }
+
+  readonly attribute command_id generatedCommandList[] = 65528;
+  readonly attribute command_id acceptedCommandList[] = 65529;
+  readonly attribute event_id eventList[] = 65530;
+  readonly attribute attrib_id attributeList[] = 65531;
+  readonly attribute bitmap32 featureMap = 65532;
+  readonly attribute int16u clusterRevision = 65533;
+
+  request struct JointFabricRequestRequest {
+    int64u fabricIndex = 0;
+  }
+
+  response struct SignNOCIssuerRequest = 1 {
+    octet_string<400> NOCIssuerCSR = 0;
+  }
+
+  request struct SignNOCIssuerResponseRequest {
+    SignNOCIssuerRequestStatusEnum statusCode = 0;
+    octet_string<400> NOCIssuerCert = 1;
+    node_id nodeId = 2;
+    fabric_id fabricId = 3;
+    vendor_id adminVendorId = 4;
+    int64u caseAdminSubject = 5;
+  }
+
+  response struct JointFabricResponse = 3 {
+    JointFabricStatusEnum statusCode = 0;
+    optional fabric_idx fabricIndex = 1;
+    optional char_string<128> debugText = 2;
+  }
+
+  /** Client requests Server's ICA CSR and CA Chain. */
+  command access(invoke: administer) JointFabricRequest(JointFabricRequestRequest): SignNOCIssuerRequest = 0;
+  /** Joint Fabric ICA generated. */
+  command access(invoke: administer) SignNOCIssuerResponse(SignNOCIssuerResponseRequest): JointFabricResponse = 2;
+}
+
 /** This cluster is used to add or remove Operational Credentials on a Commissionee or Node, as well as manage the associated Fabrics. */
 cluster OperationalCredentials = 62 {
   revision 1; // NOTE: Default/not specifically set
@@ -8082,6 +8144,15 @@ endpoint 0 {
     handle command OpenCommissioningWindow;
     handle command OpenBasicCommissioningWindow;
     handle command RevokeCommissioning;
+  }
+
+  server cluster JointFabricPki {
+    ram      attribute clusterRevision default = 1;
+
+    handle command JointFabricRequest;
+    handle command SignNOCIssuerRequest;
+    handle command SignNOCIssuerResponse;
+    handle command JointFabricResponse;
   }
 
   server cluster OperationalCredentials {

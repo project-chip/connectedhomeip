@@ -397,6 +397,89 @@ CHIP_ERROR ExampleOperationalCredentialsIssuer::GenerateNOCChain(const ByteSpan 
     return CHIP_NO_ERROR;
 }
 
+CHIP_ERROR ExampleOperationalCredentialsIssuer::SignNOCIssuerAfterValidation(const ByteSpan & icaCsr, MutableByteSpan & icac)
+{
+    uint8_t rcac[Credentials::kMaxDERCertLength];
+    MutableByteSpan rcacSpan = MutableByteSpan(rcac);
+    ChipDN rcac_dn;
+    CHIP_ERROR err = CHIP_NO_ERROR;
+
+    P256PublicKey pubkey;
+    ReturnErrorOnFailure(VerifyCertificateSigningRequest(icaCsr.data(), icaCsr.size(), pubkey));
+
+    uint16_t rcacBufLen = static_cast<uint16_t>(std::min(rcacSpan.size(), static_cast<size_t>(UINT16_MAX)));
+    PERSISTENT_KEY_OP(mIndex, kOperationalCredentialsRootCertificateStorage, key,
+                      err = mStorage->SyncGetKeyValue(key, rcacSpan.data(), rcacBufLen));
+    ReturnErrorOnFailure(err);
+
+    {
+        uint64_t rcacId;
+        // Found root certificate in the storage.
+        rcacSpan.reduce_size(rcacBufLen);
+        ReturnErrorOnFailure(ExtractSubjectDNFromX509Cert(rcacSpan, rcac_dn));
+        ReturnErrorOnFailure(rcac_dn.GetCertChipId(rcacId));
+        VerifyOrReturnError(rcacId == mIssuerId, CHIP_ERROR_INTERNAL);
+    }
+
+    ChipDN icac_dn;
+    ReturnErrorOnFailure(icac_dn.AddAttribute_MatterICACId(mIntermediateIssuerId));
+
+    ChipLogProgress(Controller, "Signing ICA CSR");
+
+    ReturnErrorOnFailure(
+        IssueX509Cert(mNow, mValidity, rcac_dn, icac_dn, CertType::kIcac, mUseMaximallySizedCerts, pubkey, mIssuer, icac));
+
+    VerifyOrReturnError(CanCastTo<uint16_t>(icac.size()), CHIP_ERROR_INTERNAL);
+
+    PERSISTENT_KEY_OP(mIndex, kOperationalCredentialsIntermediateCertificateStorage, key,
+                      ReturnErrorOnFailure(mStorage->SyncSetKeyValue(key, icac.data(), static_cast<uint16_t>(icac.size()))));
+
+    return CHIP_NO_ERROR;
+}
+
+CHIP_ERROR ExampleOperationalCredentialsIssuer::SignNOCIssuer(const ByteSpan & icaCsr,
+                                                              Callback::Callback<OnNOCIssuerSigned> * onCompletion)
+{
+    VerifyOrReturnError(mInitialized, CHIP_ERROR_UNINITIALIZED);
+
+    chip::Platform::ScopedMemoryBuffer<uint8_t> icac;
+    ReturnErrorCodeIf(!icac.Alloc(kMaxDERCertLength), CHIP_ERROR_NO_MEMORY);
+    MutableByteSpan icacSpan(icac.Get(), kMaxDERCertLength);
+
+    ReturnErrorOnFailure(SignNOCIssuerAfterValidation(icaCsr, icacSpan));
+
+    // Callback onto commissioner.
+    ChipLogProgress(Controller, "Providing signed ICA to the commissioner");
+    onCompletion->mCall(onCompletion->mContext, CHIP_NO_ERROR, icacSpan);
+    return CHIP_NO_ERROR;
+}
+
+CHIP_ERROR ExampleOperationalCredentialsIssuer::SignNOC(const ByteSpan & icac, const ByteSpan & nocCsr, MutableByteSpan & noc)
+{
+    P256PublicKey pubkey;
+    ReturnErrorOnFailure(VerifyCertificateSigningRequest(nocCsr.data(), nocCsr.size(), pubkey));
+
+    ChipDN icac_dn = ChipDN{};
+    ReturnErrorOnFailure(ExtractSubjectDNFromX509Cert(icac, icac_dn));
+
+    PERSISTENT_KEY_OP(mIndex, kOperationalCredentialsIntermediateCertificateStorage, key,
+                      ReturnErrorOnFailure(mStorage->SyncSetKeyValue(key, icac.data(), static_cast<uint16_t>(icac.size()))));
+
+    ChipDN noc_dn;
+    ReturnErrorOnFailure(noc_dn.AddAttribute_MatterFabricId(mNextFabricId));
+    ReturnErrorOnFailure(noc_dn.AddAttribute_MatterNodeId(mNextRequestedNodeId));
+    ReturnErrorOnFailure(noc_dn.AddCATs(mNextCATs));
+
+    ChipLogProgress(Controller, "Generating NOC");
+    return IssueX509Cert(mNow, mValidity, icac_dn, noc_dn, CertType::kNoc, mUseMaximallySizedCerts, pubkey, mIntermediateIssuer,
+                         noc);
+}
+
+CHIP_ERROR ExampleOperationalCredentialsIssuer::ObtainIcaCsr(MutableByteSpan & icaCsr)
+{
+    return GenerateCertificateSigningRequest(&mIntermediateIssuer, icaCsr);
+}
+
 CHIP_ERROR ExampleOperationalCredentialsIssuer::GetRandomOperationalNodeId(NodeId * aNodeId)
 {
     for (int i = 0; i < 10; ++i)

@@ -4065,6 +4065,80 @@ MTR_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
 @end
 
 /**
+ * Cluster Joint Fabric Pki
+ *
+ * Joint Fabric Pki Cluster.
+ */
+MTR_PROVISIONALLY_AVAILABLE
+@interface MTRBaseClusterJointFabricPki : MTRGenericBaseCluster
+
+/**
+ * Command JointFabricRequest
+ *
+ * Client requests Server's ICA CSR and CA Chain.
+ */
+- (void)jointFabricRequestWithParams:(MTRJointFabricPkiClusterJointFabricRequestParams *)params completion:(void (^)(MTRJointFabricPkiClusterSignNOCIssuerRequestParams * _Nullable data, NSError * _Nullable error))completion MTR_PROVISIONALLY_AVAILABLE;
+/**
+ * Command SignNOCIssuerResponse
+ *
+ * Joint Fabric ICA generated.
+ */
+- (void)signNOCIssuerResponseWithParams:(MTRJointFabricPkiClusterSignNOCIssuerResponseParams *)params completion:(void (^)(MTRJointFabricPkiClusterJointFabricResponseParams * _Nullable data, NSError * _Nullable error))completion MTR_PROVISIONALLY_AVAILABLE;
+
+- (void)readAttributeGeneratedCommandListWithCompletion:(void (^)(NSArray * _Nullable value, NSError * _Nullable error))completion MTR_PROVISIONALLY_AVAILABLE;
+- (void)subscribeAttributeGeneratedCommandListWithParams:(MTRSubscribeParams *)params
+                                 subscriptionEstablished:(MTRSubscriptionEstablishedHandler _Nullable)subscriptionEstablished
+                                           reportHandler:(void (^)(NSArray * _Nullable value, NSError * _Nullable error))reportHandler MTR_PROVISIONALLY_AVAILABLE;
++ (void)readAttributeGeneratedCommandListWithClusterStateCache:(MTRClusterStateCacheContainer *)clusterStateCacheContainer endpoint:(NSNumber *)endpoint queue:(dispatch_queue_t)queue completion:(void (^)(NSArray * _Nullable value, NSError * _Nullable error))completion MTR_PROVISIONALLY_AVAILABLE;
+
+- (void)readAttributeAcceptedCommandListWithCompletion:(void (^)(NSArray * _Nullable value, NSError * _Nullable error))completion MTR_PROVISIONALLY_AVAILABLE;
+- (void)subscribeAttributeAcceptedCommandListWithParams:(MTRSubscribeParams *)params
+                                subscriptionEstablished:(MTRSubscriptionEstablishedHandler _Nullable)subscriptionEstablished
+                                          reportHandler:(void (^)(NSArray * _Nullable value, NSError * _Nullable error))reportHandler MTR_PROVISIONALLY_AVAILABLE;
++ (void)readAttributeAcceptedCommandListWithClusterStateCache:(MTRClusterStateCacheContainer *)clusterStateCacheContainer endpoint:(NSNumber *)endpoint queue:(dispatch_queue_t)queue completion:(void (^)(NSArray * _Nullable value, NSError * _Nullable error))completion MTR_PROVISIONALLY_AVAILABLE;
+
+- (void)readAttributeEventListWithCompletion:(void (^)(NSArray * _Nullable value, NSError * _Nullable error))completion MTR_PROVISIONALLY_AVAILABLE;
+- (void)subscribeAttributeEventListWithParams:(MTRSubscribeParams *)params
+                      subscriptionEstablished:(MTRSubscriptionEstablishedHandler _Nullable)subscriptionEstablished
+                                reportHandler:(void (^)(NSArray * _Nullable value, NSError * _Nullable error))reportHandler MTR_PROVISIONALLY_AVAILABLE;
++ (void)readAttributeEventListWithClusterStateCache:(MTRClusterStateCacheContainer *)clusterStateCacheContainer endpoint:(NSNumber *)endpoint queue:(dispatch_queue_t)queue completion:(void (^)(NSArray * _Nullable value, NSError * _Nullable error))completion MTR_PROVISIONALLY_AVAILABLE;
+
+- (void)readAttributeAttributeListWithCompletion:(void (^)(NSArray * _Nullable value, NSError * _Nullable error))completion MTR_PROVISIONALLY_AVAILABLE;
+- (void)subscribeAttributeAttributeListWithParams:(MTRSubscribeParams *)params
+                          subscriptionEstablished:(MTRSubscriptionEstablishedHandler _Nullable)subscriptionEstablished
+                                    reportHandler:(void (^)(NSArray * _Nullable value, NSError * _Nullable error))reportHandler MTR_PROVISIONALLY_AVAILABLE;
++ (void)readAttributeAttributeListWithClusterStateCache:(MTRClusterStateCacheContainer *)clusterStateCacheContainer endpoint:(NSNumber *)endpoint queue:(dispatch_queue_t)queue completion:(void (^)(NSArray * _Nullable value, NSError * _Nullable error))completion MTR_PROVISIONALLY_AVAILABLE;
+
+- (void)readAttributeFeatureMapWithCompletion:(void (^)(NSNumber * _Nullable value, NSError * _Nullable error))completion MTR_PROVISIONALLY_AVAILABLE;
+- (void)subscribeAttributeFeatureMapWithParams:(MTRSubscribeParams *)params
+                       subscriptionEstablished:(MTRSubscriptionEstablishedHandler _Nullable)subscriptionEstablished
+                                 reportHandler:(void (^)(NSNumber * _Nullable value, NSError * _Nullable error))reportHandler MTR_PROVISIONALLY_AVAILABLE;
++ (void)readAttributeFeatureMapWithClusterStateCache:(MTRClusterStateCacheContainer *)clusterStateCacheContainer endpoint:(NSNumber *)endpoint queue:(dispatch_queue_t)queue completion:(void (^)(NSNumber * _Nullable value, NSError * _Nullable error))completion MTR_PROVISIONALLY_AVAILABLE;
+
+- (void)readAttributeClusterRevisionWithCompletion:(void (^)(NSNumber * _Nullable value, NSError * _Nullable error))completion MTR_PROVISIONALLY_AVAILABLE;
+- (void)subscribeAttributeClusterRevisionWithParams:(MTRSubscribeParams *)params
+                            subscriptionEstablished:(MTRSubscriptionEstablishedHandler _Nullable)subscriptionEstablished
+                                      reportHandler:(void (^)(NSNumber * _Nullable value, NSError * _Nullable error))reportHandler MTR_PROVISIONALLY_AVAILABLE;
++ (void)readAttributeClusterRevisionWithClusterStateCache:(MTRClusterStateCacheContainer *)clusterStateCacheContainer endpoint:(NSNumber *)endpoint queue:(dispatch_queue_t)queue completion:(void (^)(NSNumber * _Nullable value, NSError * _Nullable error))completion MTR_PROVISIONALLY_AVAILABLE;
+
+- (instancetype)init NS_UNAVAILABLE;
++ (instancetype)new NS_UNAVAILABLE;
+
+@end
+
+@interface MTRBaseClusterJointFabricPki (Availability)
+
+/**
+ * For all instance methods (reads, writes, commands) that take a completion,
+ * the completion will be called on the provided queue.
+ */
+- (instancetype _Nullable)initWithDevice:(MTRBaseDevice *)device
+                              endpointID:(NSNumber *)endpointID
+                                   queue:(dispatch_queue_t)queue MTR_PROVISIONALLY_AVAILABLE;
+
+@end
+
+/**
  * Cluster Operational Credentials
  *
  * This cluster is used to add or remove Operational Credentials on a Commissionee or Node, as well as manage the associated Fabrics.
@@ -18417,6 +18491,28 @@ typedef NS_ENUM(uint8_t, MTRAdministratorCommissioningStatusCode) {
 typedef NS_OPTIONS(uint32_t, MTRAdministratorCommissioningFeature) {
     MTRAdministratorCommissioningFeatureBasic MTR_AVAILABLE(ios(17.4), macos(14.4), watchos(10.4), tvos(17.4)) = 0x1,
 } MTR_AVAILABLE(ios(17.4), macos(14.4), watchos(10.4), tvos(17.4));
+
+typedef NS_ENUM(uint8_t, MTRJointFabricPkiJointFabricStatus) {
+    MTRJointFabricPkiJointFabricStatusOK MTR_PROVISIONALLY_AVAILABLE = 0x00,
+    MTRJointFabricPkiJointFabricStatusInvalidPublicKey MTR_PROVISIONALLY_AVAILABLE = 0x01,
+    MTRJointFabricPkiJointFabricStatusInvalidNodeOpId MTR_PROVISIONALLY_AVAILABLE = 0x02,
+    MTRJointFabricPkiJointFabricStatusInvalidNOC MTR_PROVISIONALLY_AVAILABLE = 0x03,
+    MTRJointFabricPkiJointFabricStatusMissingCsr MTR_PROVISIONALLY_AVAILABLE = 0x04,
+    MTRJointFabricPkiJointFabricStatusTableFull MTR_PROVISIONALLY_AVAILABLE = 0x05,
+    MTRJointFabricPkiJointFabricStatusInvalidAdminSubject MTR_PROVISIONALLY_AVAILABLE = 0x06,
+    MTRJointFabricPkiJointFabricStatusFabricConflict MTR_PROVISIONALLY_AVAILABLE = 0x09,
+    MTRJointFabricPkiJointFabricStatusLabelConflict MTR_PROVISIONALLY_AVAILABLE = 0x0A,
+    MTRJointFabricPkiJointFabricStatusInvalidFabricIndex MTR_PROVISIONALLY_AVAILABLE = 0x0B,
+} MTR_PROVISIONALLY_AVAILABLE;
+
+typedef NS_ENUM(uint8_t, MTRJointFabricPkiSignNOCIssuerRequestStatus) {
+    MTRJointFabricPkiSignNOCIssuerRequestStatusOK MTR_PROVISIONALLY_AVAILABLE = 0x00,
+    MTRJointFabricPkiSignNOCIssuerRequestStatusFailSafeRequired MTR_PROVISIONALLY_AVAILABLE = 0x01,
+    MTRJointFabricPkiSignNOCIssuerRequestStatusInvalidNOCIssuerCSR MTR_PROVISIONALLY_AVAILABLE = 0x02,
+    MTRJointFabricPkiSignNOCIssuerRequestStatusChainValidationFailed MTR_PROVISIONALLY_AVAILABLE = 0x03,
+    MTRJointFabricPkiSignNOCIssuerRequestStatusTrustQuotientThreshold MTR_PROVISIONALLY_AVAILABLE = 0x04,
+    MTRJointFabricPkiSignNOCIssuerRequestStatusSignNOCIssuerFailed MTR_PROVISIONALLY_AVAILABLE = 0x05,
+} MTR_PROVISIONALLY_AVAILABLE;
 
 typedef NS_ENUM(uint8_t, MTROperationalCredentialsCertificateChainType) {
     MTROperationalCredentialsCertificateChainTypeDACCertificate MTR_AVAILABLE(ios(16.4), macos(13.3), watchos(9.4), tvos(16.4)) = 0x01,

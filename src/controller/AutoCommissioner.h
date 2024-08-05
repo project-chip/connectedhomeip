@@ -151,6 +151,9 @@ private:
     uint8_t mNOCertBuffer[Credentials::kMaxCHIPCertLength];
     uint8_t mICACertBuffer[Credentials::kMaxCHIPCertLength];
 
+    uint16_t mICACsrBufferLen = 0;
+    uint8_t mICACsrBuffer[Crypto::kMAX_CSR_Buffer_Size];
+
     uint16_t mAttestationElementsLen = 0;
     uint8_t mAttestationElements[Credentials::kMaxRspLen];
     uint16_t mAttestationSignatureLen = 0;

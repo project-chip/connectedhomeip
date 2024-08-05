@@ -12105,6 +12105,242 @@ struct TypeInfo
 };
 } // namespace Attributes
 } // namespace AdministratorCommissioning
+namespace JointFabricPki {
+
+namespace Commands {
+// Forward-declarations so we can reference these later.
+
+namespace JointFabricRequest {
+struct Type;
+struct DecodableType;
+} // namespace JointFabricRequest
+
+namespace SignNOCIssuerRequest {
+struct Type;
+struct DecodableType;
+} // namespace SignNOCIssuerRequest
+
+namespace SignNOCIssuerResponse {
+struct Type;
+struct DecodableType;
+} // namespace SignNOCIssuerResponse
+
+namespace JointFabricResponse {
+struct Type;
+struct DecodableType;
+} // namespace JointFabricResponse
+
+} // namespace Commands
+
+namespace Commands {
+namespace JointFabricRequest {
+enum class Fields : uint8_t
+{
+    kFabricIndex = 0,
+};
+
+struct Type
+{
+public:
+    // Use GetCommandId instead of commandId directly to avoid naming conflict with CommandIdentification in ExecutionOfACommand
+    static constexpr CommandId GetCommandId() { return Commands::JointFabricRequest::Id; }
+    static constexpr ClusterId GetClusterId() { return Clusters::JointFabricPki::Id; }
+
+    uint64_t fabricIndex = static_cast<uint64_t>(0);
+
+    CHIP_ERROR Encode(TLV::TLVWriter & aWriter, TLV::Tag aTag) const;
+
+    using ResponseType = Clusters::JointFabricPki::Commands::SignNOCIssuerRequest::DecodableType;
+
+    static constexpr bool MustUseTimedInvoke() { return false; }
+};
+
+struct DecodableType
+{
+public:
+    static constexpr CommandId GetCommandId() { return Commands::JointFabricRequest::Id; }
+    static constexpr ClusterId GetClusterId() { return Clusters::JointFabricPki::Id; }
+
+    uint64_t fabricIndex = static_cast<uint64_t>(0);
+    CHIP_ERROR Decode(TLV::TLVReader & reader);
+};
+}; // namespace JointFabricRequest
+namespace SignNOCIssuerRequest {
+enum class Fields : uint8_t
+{
+    kNOCIssuerCSR = 0,
+};
+
+struct Type
+{
+public:
+    // Use GetCommandId instead of commandId directly to avoid naming conflict with CommandIdentification in ExecutionOfACommand
+    static constexpr CommandId GetCommandId() { return Commands::SignNOCIssuerRequest::Id; }
+    static constexpr ClusterId GetClusterId() { return Clusters::JointFabricPki::Id; }
+
+    chip::ByteSpan NOCIssuerCSR;
+
+    CHIP_ERROR Encode(TLV::TLVWriter & aWriter, TLV::Tag aTag) const;
+
+    using ResponseType = DataModel::NullObjectType;
+
+    static constexpr bool MustUseTimedInvoke() { return false; }
+};
+
+struct DecodableType
+{
+public:
+    static constexpr CommandId GetCommandId() { return Commands::SignNOCIssuerRequest::Id; }
+    static constexpr ClusterId GetClusterId() { return Clusters::JointFabricPki::Id; }
+
+    chip::ByteSpan NOCIssuerCSR;
+    CHIP_ERROR Decode(TLV::TLVReader & reader);
+};
+}; // namespace SignNOCIssuerRequest
+namespace SignNOCIssuerResponse {
+enum class Fields : uint8_t
+{
+    kStatusCode       = 0,
+    kNOCIssuerCert    = 1,
+    kNodeId           = 2,
+    kFabricId         = 3,
+    kAdminVendorId    = 4,
+    kCaseAdminSubject = 5,
+};
+
+struct Type
+{
+public:
+    // Use GetCommandId instead of commandId directly to avoid naming conflict with CommandIdentification in ExecutionOfACommand
+    static constexpr CommandId GetCommandId() { return Commands::SignNOCIssuerResponse::Id; }
+    static constexpr ClusterId GetClusterId() { return Clusters::JointFabricPki::Id; }
+
+    SignNOCIssuerRequestStatusEnum statusCode = static_cast<SignNOCIssuerRequestStatusEnum>(0);
+    chip::ByteSpan NOCIssuerCert;
+    chip::NodeId nodeId          = static_cast<chip::NodeId>(0);
+    chip::FabricId fabricId      = static_cast<chip::FabricId>(0);
+    chip::VendorId adminVendorId = static_cast<chip::VendorId>(0);
+    uint64_t caseAdminSubject    = static_cast<uint64_t>(0);
+
+    CHIP_ERROR Encode(TLV::TLVWriter & aWriter, TLV::Tag aTag) const;
+
+    using ResponseType = Clusters::JointFabricPki::Commands::JointFabricResponse::DecodableType;
+
+    static constexpr bool MustUseTimedInvoke() { return false; }
+};
+
+struct DecodableType
+{
+public:
+    static constexpr CommandId GetCommandId() { return Commands::SignNOCIssuerResponse::Id; }
+    static constexpr ClusterId GetClusterId() { return Clusters::JointFabricPki::Id; }
+
+    SignNOCIssuerRequestStatusEnum statusCode = static_cast<SignNOCIssuerRequestStatusEnum>(0);
+    chip::ByteSpan NOCIssuerCert;
+    chip::NodeId nodeId          = static_cast<chip::NodeId>(0);
+    chip::FabricId fabricId      = static_cast<chip::FabricId>(0);
+    chip::VendorId adminVendorId = static_cast<chip::VendorId>(0);
+    uint64_t caseAdminSubject    = static_cast<uint64_t>(0);
+    CHIP_ERROR Decode(TLV::TLVReader & reader);
+};
+}; // namespace SignNOCIssuerResponse
+namespace JointFabricResponse {
+enum class Fields : uint8_t
+{
+    kStatusCode  = 0,
+    kFabricIndex = 1,
+    kDebugText   = 2,
+};
+
+struct Type
+{
+public:
+    // Use GetCommandId instead of commandId directly to avoid naming conflict with CommandIdentification in ExecutionOfACommand
+    static constexpr CommandId GetCommandId() { return Commands::JointFabricResponse::Id; }
+    static constexpr ClusterId GetClusterId() { return Clusters::JointFabricPki::Id; }
+
+    JointFabricStatusEnum statusCode = static_cast<JointFabricStatusEnum>(0);
+    Optional<chip::FabricIndex> fabricIndex;
+    Optional<chip::CharSpan> debugText;
+
+    CHIP_ERROR Encode(TLV::TLVWriter & aWriter, TLV::Tag aTag) const;
+
+    using ResponseType = DataModel::NullObjectType;
+
+    static constexpr bool MustUseTimedInvoke() { return false; }
+};
+
+struct DecodableType
+{
+public:
+    static constexpr CommandId GetCommandId() { return Commands::JointFabricResponse::Id; }
+    static constexpr ClusterId GetClusterId() { return Clusters::JointFabricPki::Id; }
+
+    JointFabricStatusEnum statusCode = static_cast<JointFabricStatusEnum>(0);
+    Optional<chip::FabricIndex> fabricIndex;
+    Optional<chip::CharSpan> debugText;
+    CHIP_ERROR Decode(TLV::TLVReader & reader);
+};
+}; // namespace JointFabricResponse
+} // namespace Commands
+
+namespace Attributes {
+
+namespace GeneratedCommandList {
+struct TypeInfo : public Clusters::Globals::Attributes::GeneratedCommandList::TypeInfo
+{
+    static constexpr ClusterId GetClusterId() { return Clusters::JointFabricPki::Id; }
+};
+} // namespace GeneratedCommandList
+namespace AcceptedCommandList {
+struct TypeInfo : public Clusters::Globals::Attributes::AcceptedCommandList::TypeInfo
+{
+    static constexpr ClusterId GetClusterId() { return Clusters::JointFabricPki::Id; }
+};
+} // namespace AcceptedCommandList
+namespace EventList {
+struct TypeInfo : public Clusters::Globals::Attributes::EventList::TypeInfo
+{
+    static constexpr ClusterId GetClusterId() { return Clusters::JointFabricPki::Id; }
+};
+} // namespace EventList
+namespace AttributeList {
+struct TypeInfo : public Clusters::Globals::Attributes::AttributeList::TypeInfo
+{
+    static constexpr ClusterId GetClusterId() { return Clusters::JointFabricPki::Id; }
+};
+} // namespace AttributeList
+namespace FeatureMap {
+struct TypeInfo : public Clusters::Globals::Attributes::FeatureMap::TypeInfo
+{
+    static constexpr ClusterId GetClusterId() { return Clusters::JointFabricPki::Id; }
+};
+} // namespace FeatureMap
+namespace ClusterRevision {
+struct TypeInfo : public Clusters::Globals::Attributes::ClusterRevision::TypeInfo
+{
+    static constexpr ClusterId GetClusterId() { return Clusters::JointFabricPki::Id; }
+};
+} // namespace ClusterRevision
+
+struct TypeInfo
+{
+    struct DecodableType
+    {
+        static constexpr ClusterId GetClusterId() { return Clusters::JointFabricPki::Id; }
+
+        CHIP_ERROR Decode(TLV::TLVReader & reader, const ConcreteAttributePath & path);
+
+        Attributes::GeneratedCommandList::TypeInfo::DecodableType generatedCommandList;
+        Attributes::AcceptedCommandList::TypeInfo::DecodableType acceptedCommandList;
+        Attributes::EventList::TypeInfo::DecodableType eventList;
+        Attributes::AttributeList::TypeInfo::DecodableType attributeList;
+        Attributes::FeatureMap::TypeInfo::DecodableType featureMap           = static_cast<uint32_t>(0);
+        Attributes::ClusterRevision::TypeInfo::DecodableType clusterRevision = static_cast<uint16_t>(0);
+    };
+};
+} // namespace Attributes
+} // namespace JointFabricPki
 namespace OperationalCredentials {
 namespace Structs {
 namespace FabricDescriptorStruct {

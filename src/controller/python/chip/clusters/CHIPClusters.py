@@ -3595,6 +3595,69 @@ class ChipClusters:
             },
         },
     }
+    _JOINT_FABRIC_PKI_CLUSTER_INFO = {
+        "clusterName": "JointFabricPki",
+        "clusterId": 0x0000003D,
+        "commands": {
+            0x00000000: {
+                "commandId": 0x00000000,
+                "commandName": "JointFabricRequest",
+                "args": {
+                    "fabricIndex": "int",
+                },
+            },
+            0x00000002: {
+                "commandId": 0x00000002,
+                "commandName": "SignNOCIssuerResponse",
+                "args": {
+                    "statusCode": "int",
+                    "NOCIssuerCert": "bytes",
+                    "nodeId": "int",
+                    "fabricId": "int",
+                    "adminVendorId": "int",
+                    "caseAdminSubject": "int",
+                },
+            },
+        },
+        "attributes": {
+            0x0000FFF8: {
+                "attributeName": "GeneratedCommandList",
+                "attributeId": 0x0000FFF8,
+                "type": "int",
+                "reportable": True,
+            },
+            0x0000FFF9: {
+                "attributeName": "AcceptedCommandList",
+                "attributeId": 0x0000FFF9,
+                "type": "int",
+                "reportable": True,
+            },
+            0x0000FFFA: {
+                "attributeName": "EventList",
+                "attributeId": 0x0000FFFA,
+                "type": "int",
+                "reportable": True,
+            },
+            0x0000FFFB: {
+                "attributeName": "AttributeList",
+                "attributeId": 0x0000FFFB,
+                "type": "int",
+                "reportable": True,
+            },
+            0x0000FFFC: {
+                "attributeName": "FeatureMap",
+                "attributeId": 0x0000FFFC,
+                "type": "int",
+                "reportable": True,
+            },
+            0x0000FFFD: {
+                "attributeName": "ClusterRevision",
+                "attributeId": 0x0000FFFD,
+                "type": "int",
+                "reportable": True,
+            },
+        },
+    }
     _OPERATIONAL_CREDENTIALS_CLUSTER_INFO = {
         "clusterName": "OperationalCredentials",
         "clusterId": 0x0000003E,
@@ -15317,6 +15380,7 @@ class ChipClusters:
         0x00000039: _BRIDGED_DEVICE_BASIC_INFORMATION_CLUSTER_INFO,
         0x0000003B: _SWITCH_CLUSTER_INFO,
         0x0000003C: _ADMINISTRATOR_COMMISSIONING_CLUSTER_INFO,
+        0x0000003D: _JOINT_FABRIC_PKI_CLUSTER_INFO,
         0x0000003E: _OPERATIONAL_CREDENTIALS_CLUSTER_INFO,
         0x0000003F: _GROUP_KEY_MANAGEMENT_CLUSTER_INFO,
         0x00000040: _FIXED_LABEL_CLUSTER_INFO,
@@ -15446,6 +15510,7 @@ class ChipClusters:
         "BridgedDeviceBasicInformation": _BRIDGED_DEVICE_BASIC_INFORMATION_CLUSTER_INFO,
         "Switch": _SWITCH_CLUSTER_INFO,
         "AdministratorCommissioning": _ADMINISTRATOR_COMMISSIONING_CLUSTER_INFO,
+        "JointFabricPki": _JOINT_FABRIC_PKI_CLUSTER_INFO,
         "OperationalCredentials": _OPERATIONAL_CREDENTIALS_CLUSTER_INFO,
         "GroupKeyManagement": _GROUP_KEY_MANAGEMENT_CLUSTER_INFO,
         "FixedLabel": _FIXED_LABEL_CLUSTER_INFO,

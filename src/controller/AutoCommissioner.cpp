@@ -422,6 +422,12 @@ CommissioningStage AutoCommissioner::GetNextCommissioningStageInternal(Commissio
     case CommissioningStage::kSendTrustedRootCert:
         return CommissioningStage::kSendNOC;
     case CommissioningStage::kSendNOC:
+        if (mParams.GetJointFabric())
+        {
+            return CommissioningStage::kSendJointFabricRequest;
+        }
+        // fallthrough
+    case CommissioningStage::kSendICA:
         if (mDeviceCommissioningInfo.requiresTrustedTimeSource && mParams.GetTrustedTimeSource().HasValue())
         {
             return CommissioningStage::kConfigureTrustedTimeSource;
@@ -430,6 +436,10 @@ CommissioningStage AutoCommissioner::GetNextCommissioningStageInternal(Commissio
         {
             return GetNextCommissioningStageInternal(CommissioningStage::kConfigureTrustedTimeSource, lastErr);
         }
+    case CommissioningStage::kSendJointFabricRequest:
+        return CommissioningStage::kSignNOCIssuer;
+    case CommissioningStage::kSignNOCIssuer:
+        return CommissioningStage::kSendICA;
     case CommissioningStage::kConfigureTrustedTimeSource:
         if (mNeedIcdRegistration)
         {
@@ -809,6 +819,7 @@ CHIP_ERROR AutoCommissioner::CommissioningStepFinished(CHIP_ERROR err, Commissio
         case CommissioningStage::kSendAttestationRequest: {
             auto & elements  = report.Get<AttestationResponse>().attestationElements;
             auto & signature = report.Get<AttestationResponse>().signature;
+
             if (elements.size() > sizeof(mAttestationElements))
             {
                 ChipLogError(Controller, "AutoCommissioner attestationElements buffer size %u larger than cache size %u",
@@ -856,6 +867,29 @@ CHIP_ERROR AutoCommissioner::CommissioningStepFinished(CHIP_ERROR err, Commissio
             // storing the returned certs, so just return here without triggering the next stage.
             return NOCChainGenerated(report.Get<NocChain>().noc, report.Get<NocChain>().icac, report.Get<NocChain>().rcac,
                                      report.Get<NocChain>().ipk, report.Get<NocChain>().adminSubject);
+        case CommissioningStage::kSendJointFabricRequest: {
+            auto & icaCsr = report.Get<SignNOCIssuerRequest>().nocIssuerCsr;
+            if (icaCsr.size() > sizeof(mICACsrBuffer))
+            {
+                ChipLogError(Controller, "AutoCommissioner icaCsr buffer size %u larger than cache size %u",
+                             static_cast<unsigned>(icaCsr.size()), static_cast<unsigned>(sizeof(mICACsrBuffer)));
+                return CHIP_ERROR_MESSAGE_TOO_LONG;
+            }
+            memcpy(mICACsrBuffer, icaCsr.data(), icaCsr.size());
+            mICACsrBufferLen = static_cast<uint16_t>(icaCsr.size());
+            mParams.SetIcaCsr(ByteSpan(mICACsrBuffer, icaCsr.size()));
+            ChipLogDetail(Controller, "AutoCommissioner setting icaCsr buffer size %u/%u", static_cast<unsigned>(icaCsr.size()),
+                          static_cast<unsigned>(mParams.GetIcaCsr().Value().size()));
+        }
+        break;
+        case CommissioningStage::kSignNOCIssuer: {
+            auto & icac = report.Get<JointNOCIssuerCertificate>().icac;
+
+            MutableByteSpan icaCert = MutableByteSpan(mICACertBuffer);
+            ReturnErrorOnFailure(Credentials::ConvertX509CertToChipCert(icac, icaCert));
+            mParams.SetIcac(icaCert);
+        }
+        break;
         case CommissioningStage::kICDGetRegistrationInfo:
             // Noting to do. The ICD registation info is handled elsewhere.
             break;

@@ -5251,6 +5251,138 @@ public class ClusterInfoMapping {
   }
 
 
+  public static class DelegatedJointFabricPkiClusterSignNOCIssuerRequestCallback implements ChipClusters.JointFabricPkiCluster.SignNOCIssuerRequestCallback, DelegatedClusterCallback {
+    private ClusterCommandCallback callback;
+    @Override
+    public void setCallbackDelegate(ClusterCommandCallback callback) {
+      this.callback = callback;
+    }
+
+    @Override
+    public void onSuccess(byte[] NOCIssuerCSR) {
+      Map<CommandResponseInfo, Object> responseValues = new LinkedHashMap<>();
+
+      CommandResponseInfo NOCIssuerCSRResponseValue = new CommandResponseInfo("NOCIssuerCSR", "byte[]");
+      responseValues.put(NOCIssuerCSRResponseValue, NOCIssuerCSR);
+      callback.onSuccess(responseValues);
+    }
+
+    @Override
+    public void onError(Exception error) {
+      callback.onFailure(error);
+    }
+  }
+
+  public static class DelegatedJointFabricPkiClusterJointFabricResponseCallback implements ChipClusters.JointFabricPkiCluster.JointFabricResponseCallback, DelegatedClusterCallback {
+    private ClusterCommandCallback callback;
+    @Override
+    public void setCallbackDelegate(ClusterCommandCallback callback) {
+      this.callback = callback;
+    }
+
+    @Override
+    public void onSuccess(Integer statusCode, Optional<Integer> fabricIndex, Optional<String> debugText) {
+      Map<CommandResponseInfo, Object> responseValues = new LinkedHashMap<>();
+
+      CommandResponseInfo statusCodeResponseValue = new CommandResponseInfo("statusCode", "Integer");
+      responseValues.put(statusCodeResponseValue, statusCode);
+      CommandResponseInfo fabricIndexResponseValue = new CommandResponseInfo("fabricIndex", "Optional<Integer>");
+      responseValues.put(fabricIndexResponseValue, fabricIndex);
+      CommandResponseInfo debugTextResponseValue = new CommandResponseInfo("debugText", "Optional<String>");
+      responseValues.put(debugTextResponseValue, debugText);
+      callback.onSuccess(responseValues);
+    }
+
+    @Override
+    public void onError(Exception error) {
+      callback.onFailure(error);
+    }
+  }
+  public static class DelegatedJointFabricPkiClusterGeneratedCommandListAttributeCallback implements ChipClusters.JointFabricPkiCluster.GeneratedCommandListAttributeCallback, DelegatedClusterCallback {
+    private ClusterCommandCallback callback;
+    @Override
+    public void setCallbackDelegate(ClusterCommandCallback callback) {
+      this.callback = callback;
+    }
+
+    @Override
+    public void onSuccess(List<Long> valueList) {
+      Map<CommandResponseInfo, Object> responseValues = new LinkedHashMap<>();
+      CommandResponseInfo commandResponseInfo = new CommandResponseInfo("valueList", "List<Long>");
+      responseValues.put(commandResponseInfo, valueList);
+      callback.onSuccess(responseValues);
+    }
+
+    @Override
+    public void onError(Exception ex) {
+      callback.onFailure(ex);
+    }
+  }
+
+  public static class DelegatedJointFabricPkiClusterAcceptedCommandListAttributeCallback implements ChipClusters.JointFabricPkiCluster.AcceptedCommandListAttributeCallback, DelegatedClusterCallback {
+    private ClusterCommandCallback callback;
+    @Override
+    public void setCallbackDelegate(ClusterCommandCallback callback) {
+      this.callback = callback;
+    }
+
+    @Override
+    public void onSuccess(List<Long> valueList) {
+      Map<CommandResponseInfo, Object> responseValues = new LinkedHashMap<>();
+      CommandResponseInfo commandResponseInfo = new CommandResponseInfo("valueList", "List<Long>");
+      responseValues.put(commandResponseInfo, valueList);
+      callback.onSuccess(responseValues);
+    }
+
+    @Override
+    public void onError(Exception ex) {
+      callback.onFailure(ex);
+    }
+  }
+
+  public static class DelegatedJointFabricPkiClusterEventListAttributeCallback implements ChipClusters.JointFabricPkiCluster.EventListAttributeCallback, DelegatedClusterCallback {
+    private ClusterCommandCallback callback;
+    @Override
+    public void setCallbackDelegate(ClusterCommandCallback callback) {
+      this.callback = callback;
+    }
+
+    @Override
+    public void onSuccess(List<Long> valueList) {
+      Map<CommandResponseInfo, Object> responseValues = new LinkedHashMap<>();
+      CommandResponseInfo commandResponseInfo = new CommandResponseInfo("valueList", "List<Long>");
+      responseValues.put(commandResponseInfo, valueList);
+      callback.onSuccess(responseValues);
+    }
+
+    @Override
+    public void onError(Exception ex) {
+      callback.onFailure(ex);
+    }
+  }
+
+  public static class DelegatedJointFabricPkiClusterAttributeListAttributeCallback implements ChipClusters.JointFabricPkiCluster.AttributeListAttributeCallback, DelegatedClusterCallback {
+    private ClusterCommandCallback callback;
+    @Override
+    public void setCallbackDelegate(ClusterCommandCallback callback) {
+      this.callback = callback;
+    }
+
+    @Override
+    public void onSuccess(List<Long> valueList) {
+      Map<CommandResponseInfo, Object> responseValues = new LinkedHashMap<>();
+      CommandResponseInfo commandResponseInfo = new CommandResponseInfo("valueList", "List<Long>");
+      responseValues.put(commandResponseInfo, valueList);
+      callback.onSuccess(responseValues);
+    }
+
+    @Override
+    public void onError(Exception ex) {
+      callback.onFailure(ex);
+    }
+  }
+
+
   public static class DelegatedOperationalCredentialsClusterAttestationResponseCallback implements ChipClusters.OperationalCredentialsCluster.AttestationResponseCallback, DelegatedClusterCallback {
     private ClusterCommandCallback callback;
     @Override
@@ -22271,6 +22403,10 @@ public class ClusterInfoMapping {
       (ptr, endpointId) -> new ChipClusters.AdministratorCommissioningCluster(ptr, endpointId), new HashMap<>());
     clusterMap.put("administratorCommissioning", administratorCommissioningClusterInfo);
 
+    ClusterInfo jointFabricPkiClusterInfo = new ClusterInfo(
+      (ptr, endpointId) -> new ChipClusters.JointFabricPkiCluster(ptr, endpointId), new HashMap<>());
+    clusterMap.put("jointFabricPki", jointFabricPkiClusterInfo);
+
     ClusterInfo operationalCredentialsClusterInfo = new ClusterInfo(
       (ptr, endpointId) -> new ChipClusters.OperationalCredentialsCluster(ptr, endpointId), new HashMap<>());
     clusterMap.put("operationalCredentials", operationalCredentialsClusterInfo);
@@ -22686,6 +22822,7 @@ public class ClusterInfoMapping {
     destination.get("bridgedDeviceBasicInformation").combineCommands(source.get("bridgedDeviceBasicInformation"));
     destination.get("switch").combineCommands(source.get("switch"));
     destination.get("administratorCommissioning").combineCommands(source.get("administratorCommissioning"));
+    destination.get("jointFabricPki").combineCommands(source.get("jointFabricPki"));
     destination.get("operationalCredentials").combineCommands(source.get("operationalCredentials"));
     destination.get("groupKeyManagement").combineCommands(source.get("groupKeyManagement"));
     destination.get("fixedLabel").combineCommands(source.get("fixedLabel"));
@@ -24483,6 +24620,76 @@ public class ClusterInfoMapping {
     administratorCommissioningClusterInteractionInfoMap.put("revokeCommissioning", administratorCommissioningrevokeCommissioningInteractionInfo);
 
     commandMap.put("administratorCommissioning", administratorCommissioningClusterInteractionInfoMap);
+
+    Map<String, InteractionInfo> jointFabricPkiClusterInteractionInfoMap = new LinkedHashMap<>();
+
+    Map<String, CommandParameterInfo> jointFabricPkijointFabricRequestCommandParams = new LinkedHashMap<String, CommandParameterInfo>();
+
+    CommandParameterInfo jointFabricPkijointFabricRequestfabricIndexCommandParameterInfo = new CommandParameterInfo("fabricIndex", Long.class, Long.class);
+    jointFabricPkijointFabricRequestCommandParams.put("fabricIndex",jointFabricPkijointFabricRequestfabricIndexCommandParameterInfo);
+    InteractionInfo jointFabricPkijointFabricRequestInteractionInfo = new InteractionInfo(
+      (cluster, callback, commandArguments) -> {
+        ((ChipClusters.JointFabricPkiCluster) cluster)
+          .jointFabricRequest((ChipClusters.JointFabricPkiCluster.SignNOCIssuerRequestCallback) callback
+           , (Long)
+             commandArguments.get("fabricIndex")
+
+            );
+        },
+        () -> new DelegatedJointFabricPkiClusterSignNOCIssuerRequestCallback(),
+        jointFabricPkijointFabricRequestCommandParams
+      );
+    jointFabricPkiClusterInteractionInfoMap.put("jointFabricRequest", jointFabricPkijointFabricRequestInteractionInfo);
+
+    Map<String, CommandParameterInfo> jointFabricPkisignNOCIssuerResponseCommandParams = new LinkedHashMap<String, CommandParameterInfo>();
+
+    CommandParameterInfo jointFabricPkisignNOCIssuerResponsestatusCodeCommandParameterInfo = new CommandParameterInfo("statusCode", Integer.class, Integer.class);
+    jointFabricPkisignNOCIssuerResponseCommandParams.put("statusCode",jointFabricPkisignNOCIssuerResponsestatusCodeCommandParameterInfo);
+
+    CommandParameterInfo jointFabricPkisignNOCIssuerResponseNOCIssuerCertCommandParameterInfo = new CommandParameterInfo("NOCIssuerCert", byte[].class, byte[].class);
+    jointFabricPkisignNOCIssuerResponseCommandParams.put("NOCIssuerCert",jointFabricPkisignNOCIssuerResponseNOCIssuerCertCommandParameterInfo);
+
+    CommandParameterInfo jointFabricPkisignNOCIssuerResponsenodeIdCommandParameterInfo = new CommandParameterInfo("nodeId", Long.class, Long.class);
+    jointFabricPkisignNOCIssuerResponseCommandParams.put("nodeId",jointFabricPkisignNOCIssuerResponsenodeIdCommandParameterInfo);
+
+    CommandParameterInfo jointFabricPkisignNOCIssuerResponsefabricIdCommandParameterInfo = new CommandParameterInfo("fabricId", Long.class, Long.class);
+    jointFabricPkisignNOCIssuerResponseCommandParams.put("fabricId",jointFabricPkisignNOCIssuerResponsefabricIdCommandParameterInfo);
+
+    CommandParameterInfo jointFabricPkisignNOCIssuerResponseadminVendorIdCommandParameterInfo = new CommandParameterInfo("adminVendorId", Integer.class, Integer.class);
+    jointFabricPkisignNOCIssuerResponseCommandParams.put("adminVendorId",jointFabricPkisignNOCIssuerResponseadminVendorIdCommandParameterInfo);
+
+    CommandParameterInfo jointFabricPkisignNOCIssuerResponsecaseAdminSubjectCommandParameterInfo = new CommandParameterInfo("caseAdminSubject", Long.class, Long.class);
+    jointFabricPkisignNOCIssuerResponseCommandParams.put("caseAdminSubject",jointFabricPkisignNOCIssuerResponsecaseAdminSubjectCommandParameterInfo);
+    InteractionInfo jointFabricPkisignNOCIssuerResponseInteractionInfo = new InteractionInfo(
+      (cluster, callback, commandArguments) -> {
+        ((ChipClusters.JointFabricPkiCluster) cluster)
+          .signNOCIssuerResponse((ChipClusters.JointFabricPkiCluster.JointFabricResponseCallback) callback
+           , (Integer)
+             commandArguments.get("statusCode")
+
+           , (byte[])
+             commandArguments.get("NOCIssuerCert")
+
+           , (Long)
+             commandArguments.get("nodeId")
+
+           , (Long)
+             commandArguments.get("fabricId")
+
+           , (Integer)
+             commandArguments.get("adminVendorId")
+
+           , (Long)
+             commandArguments.get("caseAdminSubject")
+
+            );
+        },
+        () -> new DelegatedJointFabricPkiClusterJointFabricResponseCallback(),
+        jointFabricPkisignNOCIssuerResponseCommandParams
+      );
+    jointFabricPkiClusterInteractionInfoMap.put("signNOCIssuerResponse", jointFabricPkisignNOCIssuerResponseInteractionInfo);
+
+    commandMap.put("jointFabricPki", jointFabricPkiClusterInteractionInfoMap);
 
     Map<String, InteractionInfo> operationalCredentialsClusterInteractionInfoMap = new LinkedHashMap<>();
 

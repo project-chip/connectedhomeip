@@ -499,6 +499,28 @@ static constexpr CommandId Id = 0x00000002;
 } // namespace Commands
 } // namespace AdministratorCommissioning
 
+namespace JointFabricPki {
+namespace Commands {
+
+namespace JointFabricRequest {
+static constexpr CommandId Id = 0x00000000;
+} // namespace JointFabricRequest
+
+namespace SignNOCIssuerRequest {
+static constexpr CommandId Id = 0x00000001;
+} // namespace SignNOCIssuerRequest
+
+namespace SignNOCIssuerResponse {
+static constexpr CommandId Id = 0x00000002;
+} // namespace SignNOCIssuerResponse
+
+namespace JointFabricResponse {
+static constexpr CommandId Id = 0x00000003;
+} // namespace JointFabricResponse
+
+} // namespace Commands
+} // namespace JointFabricPki
+
 namespace OperationalCredentials {
 namespace Commands {
 

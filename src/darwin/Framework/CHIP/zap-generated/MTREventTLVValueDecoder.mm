@@ -1627,6 +1627,18 @@ static id _Nullable DecodeEventPayloadForAdministratorCommissioningCluster(Event
     *aError = CHIP_ERROR_IM_MALFORMED_EVENT_PATH_IB;
     return nil;
 }
+static id _Nullable DecodeEventPayloadForJointFabricPkiCluster(EventId aEventId, TLV::TLVReader & aReader, CHIP_ERROR * aError)
+{
+    using namespace Clusters::JointFabricPki;
+    switch (aEventId) {
+    default: {
+        break;
+    }
+    }
+
+    *aError = CHIP_ERROR_IM_MALFORMED_EVENT_PATH_IB;
+    return nil;
+}
 static id _Nullable DecodeEventPayloadForOperationalCredentialsCluster(EventId aEventId, TLV::TLVReader & aReader, CHIP_ERROR * aError)
 {
     using namespace Clusters::OperationalCredentials;
@@ -4877,6 +4889,9 @@ id _Nullable MTRDecodeEventPayload(const ConcreteEventPath & aPath, TLV::TLVRead
     }
     case Clusters::AdministratorCommissioning::Id: {
         return DecodeEventPayloadForAdministratorCommissioningCluster(aPath.mEventId, aReader, aError);
+    }
+    case Clusters::JointFabricPki::Id: {
+        return DecodeEventPayloadForJointFabricPkiCluster(aPath.mEventId, aReader, aError);
     }
     case Clusters::OperationalCredentials::Id: {
         return DecodeEventPayloadForOperationalCredentialsCluster(aPath.mEventId, aReader, aError);

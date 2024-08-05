@@ -88,6 +88,18 @@ const char * StageToString(CommissioningStage stage)
     case kSendNOC:
         return "SendNOC";
 
+    case kSendJointFabricRequest:
+        return "SendJointFabricRequest";
+        break;
+
+    case kSignNOCIssuer:
+        return "SignNOCIssuer";
+        break;
+
+    case kSendICA:
+        return "SendICA";
+        break;
+
     case kConfigureTrustedTimeSource:
         return "ConfigureTrustedTimeSource";
 

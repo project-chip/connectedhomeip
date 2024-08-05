@@ -120,6 +120,9 @@ NSString * MTRClusterNameForID(MTRClusterIDType clusterID)
     case MTRClusterIDTypeAdministratorCommissioningID:
         result = @"AdministratorCommissioning";
         break;
+    case MTRClusterIDTypeJointFabricPkiID:
+        result = @"JointFabricPki";
+        break;
     case MTRClusterIDTypeOperationalCredentialsID:
         result = @"OperationalCredentials";
         break;
@@ -2570,6 +2573,40 @@ NSString * MTRAttributeNameForID(MTRClusterIDType clusterID, MTRAttributeIDType 
             break;
         }
         break;
+
+    case MTRClusterIDTypeJointFabricPkiID:
+
+        switch (attributeID) {
+
+            // Cluster JointFabricPki attributes
+        case MTRAttributeIDTypeClusterJointFabricPkiAttributeGeneratedCommandListID:
+            result = @"GeneratedCommandList";
+            break;
+
+        case MTRAttributeIDTypeClusterJointFabricPkiAttributeAcceptedCommandListID:
+            result = @"AcceptedCommandList";
+            break;
+
+        case MTRAttributeIDTypeClusterJointFabricPkiAttributeEventListID:
+            result = @"EventList";
+            break;
+
+        case MTRAttributeIDTypeClusterJointFabricPkiAttributeAttributeListID:
+            result = @"AttributeList";
+            break;
+
+        case MTRAttributeIDTypeClusterJointFabricPkiAttributeFeatureMapID:
+            result = @"FeatureMap";
+            break;
+
+        case MTRAttributeIDTypeClusterJointFabricPkiAttributeClusterRevisionID:
+            result = @"ClusterRevision";
+            break;
+
+        default:
+            result = [NSString stringWithFormat:@"<Unknown attributeID %d>", attributeID];
+            break;
+        }
 
     case MTRClusterIDTypeOperationalCredentialsID:
 

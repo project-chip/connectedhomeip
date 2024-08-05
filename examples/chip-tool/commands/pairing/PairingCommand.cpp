@@ -103,6 +103,7 @@ CommissioningParameters PairingCommand::GetCommissioningParameters()
 {
     auto params = CommissioningParameters();
     params.SetSkipCommissioningComplete(mSkipCommissioningComplete.ValueOr(false));
+    params.SetJointFabric(mJointFabric.ValueOr(false));
     if (mBypassAttestationVerifier.ValueOr(false))
     {
         params.SetDeviceAttestationDelegate(this);

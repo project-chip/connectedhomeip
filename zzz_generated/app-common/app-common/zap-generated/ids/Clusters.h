@@ -118,6 +118,9 @@ static constexpr ClusterId Id = 0x0000003B;
 namespace AdministratorCommissioning {
 static constexpr ClusterId Id = 0x0000003C;
 } // namespace AdministratorCommissioning
+namespace JointFabricPki {
+static constexpr ClusterId Id = 0x0000003D;
+} // namespace JointFabricPki
 namespace OperationalCredentials {
 static constexpr ClusterId Id = 0x0000003E;
 } // namespace OperationalCredentials

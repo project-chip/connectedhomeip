@@ -66,6 +66,7 @@
 | BridgedDeviceBasicInformation                                       | 0x0039 |
 | Switch                                                              | 0x003B |
 | AdministratorCommissioning                                          | 0x003C |
+| JointFabricPki                                                      | 0x003D |
 | OperationalCredentials                                              | 0x003E |
 | GroupKeyManagement                                                  | 0x003F |
 | FixedLabel                                                          | 0x0040 |
@@ -3723,6 +3724,105 @@ public:
 
 private:
     chip::app::Clusters::AdministratorCommissioning::Commands::RevokeCommissioning::Type mRequest;
+};
+
+/*----------------------------------------------------------------------------*\
+| Cluster JointFabricPki                                              | 0x003D |
+|------------------------------------------------------------------------------|
+| Commands:                                                           |        |
+| * JointFabricRequest                                                |   0x00 |
+| * SignNOCIssuerResponse                                             |   0x02 |
+|------------------------------------------------------------------------------|
+| Attributes:                                                         |        |
+| * GeneratedCommandList                                              | 0xFFF8 |
+| * AcceptedCommandList                                               | 0xFFF9 |
+| * EventList                                                         | 0xFFFA |
+| * AttributeList                                                     | 0xFFFB |
+| * FeatureMap                                                        | 0xFFFC |
+| * ClusterRevision                                                   | 0xFFFD |
+|------------------------------------------------------------------------------|
+| Events:                                                             |        |
+\*----------------------------------------------------------------------------*/
+
+/*
+ * Command JointFabricRequest
+ */
+class JointFabricPkiJointFabricRequest : public ClusterCommand
+{
+public:
+    JointFabricPkiJointFabricRequest(CredentialIssuerCommands * credsIssuerConfig) :
+        ClusterCommand("joint-fabric-request", credsIssuerConfig)
+    {
+        AddArgument("FabricIndex", 0, UINT64_MAX, &mRequest.fabricIndex);
+        ClusterCommand::AddArguments();
+    }
+
+    CHIP_ERROR SendCommand(chip::DeviceProxy * device, std::vector<chip::EndpointId> endpointIds) override
+    {
+        constexpr chip::ClusterId clusterId = chip::app::Clusters::JointFabricPki::Id;
+        constexpr chip::CommandId commandId = chip::app::Clusters::JointFabricPki::Commands::JointFabricRequest::Id;
+
+        ChipLogProgress(chipTool, "Sending cluster (0x%08" PRIX32 ") command (0x%08" PRIX32 ") on endpoint %u", clusterId,
+                        commandId, endpointIds.at(0));
+        return ClusterCommand::SendCommand(device, endpointIds.at(0), clusterId, commandId, mRequest);
+    }
+
+    CHIP_ERROR SendGroupCommand(chip::GroupId groupId, chip::FabricIndex fabricIndex) override
+    {
+        constexpr chip::ClusterId clusterId = chip::app::Clusters::JointFabricPki::Id;
+        constexpr chip::CommandId commandId = chip::app::Clusters::JointFabricPki::Commands::JointFabricRequest::Id;
+
+        ChipLogProgress(chipTool, "Sending cluster (0x%08" PRIX32 ") command (0x%08" PRIX32 ") on Group %u", clusterId, commandId,
+                        groupId);
+
+        return ClusterCommand::SendGroupCommand(groupId, fabricIndex, clusterId, commandId, mRequest);
+    }
+
+private:
+    chip::app::Clusters::JointFabricPki::Commands::JointFabricRequest::Type mRequest;
+};
+
+/*
+ * Command SignNOCIssuerResponse
+ */
+class JointFabricPkiSignNOCIssuerResponse : public ClusterCommand
+{
+public:
+    JointFabricPkiSignNOCIssuerResponse(CredentialIssuerCommands * credsIssuerConfig) :
+        ClusterCommand("sign-nocissuer-response", credsIssuerConfig)
+    {
+        AddArgument("StatusCode", 0, UINT8_MAX, &mRequest.statusCode);
+        AddArgument("NOCIssuerCert", &mRequest.NOCIssuerCert);
+        AddArgument("NodeId", 0, UINT64_MAX, &mRequest.nodeId);
+        AddArgument("FabricId", 0, UINT64_MAX, &mRequest.fabricId);
+        AddArgument("AdminVendorId", 0, UINT16_MAX, &mRequest.adminVendorId);
+        AddArgument("CaseAdminSubject", 0, UINT64_MAX, &mRequest.caseAdminSubject);
+        ClusterCommand::AddArguments();
+    }
+
+    CHIP_ERROR SendCommand(chip::DeviceProxy * device, std::vector<chip::EndpointId> endpointIds) override
+    {
+        constexpr chip::ClusterId clusterId = chip::app::Clusters::JointFabricPki::Id;
+        constexpr chip::CommandId commandId = chip::app::Clusters::JointFabricPki::Commands::SignNOCIssuerResponse::Id;
+
+        ChipLogProgress(chipTool, "Sending cluster (0x%08" PRIX32 ") command (0x%08" PRIX32 ") on endpoint %u", clusterId,
+                        commandId, endpointIds.at(0));
+        return ClusterCommand::SendCommand(device, endpointIds.at(0), clusterId, commandId, mRequest);
+    }
+
+    CHIP_ERROR SendGroupCommand(chip::GroupId groupId, chip::FabricIndex fabricIndex) override
+    {
+        constexpr chip::ClusterId clusterId = chip::app::Clusters::JointFabricPki::Id;
+        constexpr chip::CommandId commandId = chip::app::Clusters::JointFabricPki::Commands::SignNOCIssuerResponse::Id;
+
+        ChipLogProgress(chipTool, "Sending cluster (0x%08" PRIX32 ") command (0x%08" PRIX32 ") on Group %u", clusterId, commandId,
+                        groupId);
+
+        return ClusterCommand::SendGroupCommand(groupId, fabricIndex, clusterId, commandId, mRequest);
+    }
+
+private:
+    chip::app::Clusters::JointFabricPki::Commands::SignNOCIssuerResponse::Type mRequest;
 };
 
 /*----------------------------------------------------------------------------*\
@@ -18576,6 +18676,59 @@ void registerClusterAdministratorCommissioning(Commands & commands, CredentialIs
 
     commands.RegisterCluster(clusterName, clusterCommands);
 }
+void registerClusterJointFabricPki(Commands & commands, CredentialIssuerCommands * credsIssuerConfig)
+{
+    using namespace chip::app::Clusters::JointFabricPki;
+
+    const char * clusterName = "JointFabricPki";
+
+    commands_list clusterCommands = {
+        //
+        // Commands
+        //
+        make_unique<ClusterCommand>(Id, credsIssuerConfig),                  //
+        make_unique<JointFabricPkiJointFabricRequest>(credsIssuerConfig),    //
+        make_unique<JointFabricPkiSignNOCIssuerResponse>(credsIssuerConfig), //
+        //
+        // Attributes
+        //
+        make_unique<ReadAttribute>(Id, credsIssuerConfig),                                                                 //
+        make_unique<ReadAttribute>(Id, "generated-command-list", Attributes::GeneratedCommandList::Id, credsIssuerConfig), //
+        make_unique<ReadAttribute>(Id, "accepted-command-list", Attributes::AcceptedCommandList::Id, credsIssuerConfig),   //
+        make_unique<ReadAttribute>(Id, "event-list", Attributes::EventList::Id, credsIssuerConfig),                        //
+        make_unique<ReadAttribute>(Id, "attribute-list", Attributes::AttributeList::Id, credsIssuerConfig),                //
+        make_unique<ReadAttribute>(Id, "feature-map", Attributes::FeatureMap::Id, credsIssuerConfig),                      //
+        make_unique<ReadAttribute>(Id, "cluster-revision", Attributes::ClusterRevision::Id, credsIssuerConfig),            //
+        make_unique<WriteAttribute<>>(Id, credsIssuerConfig),                                                              //
+        make_unique<WriteAttributeAsComplex<chip::app::DataModel::List<const chip::CommandId>>>(
+            Id, "generated-command-list", Attributes::GeneratedCommandList::Id, WriteCommandType::kForceWrite,
+            credsIssuerConfig), //
+        make_unique<WriteAttributeAsComplex<chip::app::DataModel::List<const chip::CommandId>>>(
+            Id, "accepted-command-list", Attributes::AcceptedCommandList::Id, WriteCommandType::kForceWrite, credsIssuerConfig), //
+        make_unique<WriteAttributeAsComplex<chip::app::DataModel::List<const chip::EventId>>>(
+            Id, "event-list", Attributes::EventList::Id, WriteCommandType::kForceWrite, credsIssuerConfig), //
+        make_unique<WriteAttributeAsComplex<chip::app::DataModel::List<const chip::AttributeId>>>(
+            Id, "attribute-list", Attributes::AttributeList::Id, WriteCommandType::kForceWrite, credsIssuerConfig), //
+        make_unique<WriteAttribute<uint32_t>>(Id, "feature-map", 0, UINT32_MAX, Attributes::FeatureMap::Id,
+                                              WriteCommandType::kForceWrite, credsIssuerConfig), //
+        make_unique<WriteAttribute<uint16_t>>(Id, "cluster-revision", 0, UINT16_MAX, Attributes::ClusterRevision::Id,
+                                              WriteCommandType::kForceWrite, credsIssuerConfig),                                //
+        make_unique<SubscribeAttribute>(Id, credsIssuerConfig),                                                                 //
+        make_unique<SubscribeAttribute>(Id, "generated-command-list", Attributes::GeneratedCommandList::Id, credsIssuerConfig), //
+        make_unique<SubscribeAttribute>(Id, "accepted-command-list", Attributes::AcceptedCommandList::Id, credsIssuerConfig),   //
+        make_unique<SubscribeAttribute>(Id, "event-list", Attributes::EventList::Id, credsIssuerConfig),                        //
+        make_unique<SubscribeAttribute>(Id, "attribute-list", Attributes::AttributeList::Id, credsIssuerConfig),                //
+        make_unique<SubscribeAttribute>(Id, "feature-map", Attributes::FeatureMap::Id, credsIssuerConfig),                      //
+        make_unique<SubscribeAttribute>(Id, "cluster-revision", Attributes::ClusterRevision::Id, credsIssuerConfig),            //
+        //
+        // Events
+        //
+        make_unique<ReadEvent>(Id, credsIssuerConfig),      //
+        make_unique<SubscribeEvent>(Id, credsIssuerConfig), //
+    };
+
+    commands.RegisterCluster(clusterName, clusterCommands);
+}
 void registerClusterOperationalCredentials(Commands & commands, CredentialIssuerCommands * credsIssuerConfig)
 {
     using namespace chip::app::Clusters::OperationalCredentials;
@@ -28324,6 +28477,7 @@ void registerClusters(Commands & commands, CredentialIssuerCommands * credsIssue
     registerClusterBridgedDeviceBasicInformation(commands, credsIssuerConfig);
     registerClusterSwitch(commands, credsIssuerConfig);
     registerClusterAdministratorCommissioning(commands, credsIssuerConfig);
+    registerClusterJointFabricPki(commands, credsIssuerConfig);
     registerClusterOperationalCredentials(commands, credsIssuerConfig);
     registerClusterGroupKeyManagement(commands, credsIssuerConfig);
     registerClusterFixedLabel(commands, credsIssuerConfig);

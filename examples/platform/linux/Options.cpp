@@ -109,6 +109,7 @@ enum
 #if CHIP_DEVICE_CONFIG_ENABLE_WIFIPAF
     kDeviceOption_WiFi_PAF,
 #endif
+    kDeviceOption_ChipToolKvs,
 };
 
 constexpr unsigned kAppUsageLength = 64;
@@ -177,6 +178,7 @@ OptionDef sDeviceOptionDefs[] = {
 #if CHIP_WITH_NLFAULTINJECTION
     { "faults", kArgumentRequired, kDeviceOption_FaultInjection },
 #endif
+    { "chip-tool-kvs", kArgumentRequired, kDeviceOption_ChipToolKvs },
     {}
 };
 
@@ -318,6 +320,8 @@ const char * sDeviceOptionHelp =
     "  --faults <fault-string,...>\n"
     "       Inject specified fault(s) at runtime.\n"
 #endif
+    "  --chip-tool-kvs <filepath>\n"
+    "       A file to sync Key Value Store items with chip-tool.\n"
     "\n";
 
 bool Base64ArgToVector(const char * arg, size_t maxSize, std::vector<uint8_t> & outVector)
@@ -608,6 +612,9 @@ bool HandleOption(const char * aProgram, OptionSet * aOptions, int aIdentifier, 
         break;
     }
 #endif
+    case kDeviceOption_ChipToolKvs:
+        LinuxDeviceOptions::GetInstance().chipToolKvs = aValue;
+        break;
     default:
         PrintArgError("%s: INTERNAL ERROR: Unhandled option: %s\n", aProgram, aName);
         retval = false;

@@ -1540,6 +1540,43 @@ static auto __attribute__((unused)) EnsureKnownEnumValue(AdministratorCommission
     }
 }
 
+static auto __attribute__((unused)) EnsureKnownEnumValue(JointFabricPki::JointFabricStatusEnum val)
+{
+    using EnumType = JointFabricPki::JointFabricStatusEnum;
+    switch (val)
+    {
+    case EnumType::kOk:
+    case EnumType::kInvalidPublicKey:
+    case EnumType::kInvalidNodeOpId:
+    case EnumType::kInvalidNOC:
+    case EnumType::kMissingCsr:
+    case EnumType::kTableFull:
+    case EnumType::kInvalidAdminSubject:
+    case EnumType::kFabricConflict:
+    case EnumType::kLabelConflict:
+    case EnumType::kInvalidFabricIndex:
+        return val;
+    default:
+        return EnumType::kUnknownEnumValue;
+    }
+}
+static auto __attribute__((unused)) EnsureKnownEnumValue(JointFabricPki::SignNOCIssuerRequestStatusEnum val)
+{
+    using EnumType = JointFabricPki::SignNOCIssuerRequestStatusEnum;
+    switch (val)
+    {
+    case EnumType::kOk:
+    case EnumType::kFailSafeRequired:
+    case EnumType::kInvalidNOCIssuerCSR:
+    case EnumType::kChainValidationFailed:
+    case EnumType::kTrustQuotientThreshold:
+    case EnumType::kSignNOCIssuerFailed:
+        return val;
+    default:
+        return EnumType::kUnknownEnumValue;
+    }
+}
+
 static auto __attribute__((unused)) EnsureKnownEnumValue(OperationalCredentials::CertificateChainTypeEnum val)
 {
     using EnumType = OperationalCredentials::CertificateChainTypeEnum;

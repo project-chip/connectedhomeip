@@ -59,6 +59,12 @@ public:
                                 const ByteSpan & attestationChallenge, const ByteSpan & DAC, const ByteSpan & PAI,
                                 Callback::Callback<OnNOCChainGeneration> * onCompletion) override;
 
+    CHIP_ERROR SignNOCIssuer(const ByteSpan & icaCsr, Callback::Callback<OnNOCIssuerSigned> * onCompletion) override;
+
+    CHIP_ERROR SignNOC(const ByteSpan & icac, const ByteSpan & nocCsr, MutableByteSpan & noc) override;
+
+    CHIP_ERROR ObtainIcaCsr(MutableByteSpan & icaCsr) override;
+
     void SetNodeIdForNextNOCRequest(NodeId nodeId) override
     {
         mNextRequestedNodeId = nodeId;
@@ -82,7 +88,7 @@ public:
      * @return Returns a CHIP_ERROR on error, CHIP_NO_ERROR otherwise
      **/
     [[deprecated("This class stores the encryption key in clear storage. Don't use it for production code.")]] CHIP_ERROR
-    Initialize(PersistentStorageDelegate & storage);
+    Initialize(PersistentStorageDelegate & storage) override;
 
     void SetIssuerId(uint32_t id) { mIssuerId = id; }
 
@@ -107,6 +113,11 @@ public:
     CHIP_ERROR GenerateNOCChainAfterValidation(NodeId nodeId, FabricId fabricId, const CATValues & cats,
                                                const Crypto::P256PublicKey & pubkey, MutableByteSpan & rcac, MutableByteSpan & icac,
                                                MutableByteSpan & noc);
+
+    CHIP_ERROR SignNOCIssuerAfterValidation(const ByteSpan & icaCsr, MutableByteSpan & icac);
+
+    uint64_t GetTrackingFabricIndex() override { return mIndex; }
+    void SetTrackingFabricIndex(uint64_t index) override { mIndex = index; }
 
 private:
     Crypto::P256Keypair mIssuer;

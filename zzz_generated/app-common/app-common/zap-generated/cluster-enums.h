@@ -1818,6 +1818,45 @@ enum class Feature : uint32_t
 };
 } // namespace AdministratorCommissioning
 
+namespace JointFabricPki {
+
+// Enum for JointFabricStatusEnum
+enum class JointFabricStatusEnum : uint8_t
+{
+    kOk                  = 0x00,
+    kInvalidPublicKey    = 0x01,
+    kInvalidNodeOpId     = 0x02,
+    kInvalidNOC          = 0x03,
+    kMissingCsr          = 0x04,
+    kTableFull           = 0x05,
+    kInvalidAdminSubject = 0x06,
+    kFabricConflict      = 0x09,
+    kLabelConflict       = 0x0A,
+    kInvalidFabricIndex  = 0x0B,
+    // All received enum values that are not listed above will be mapped
+    // to kUnknownEnumValue. This is a helper enum value that should only
+    // be used by code to process how it handles receiving and unknown
+    // enum value. This specific should never be transmitted.
+    kUnknownEnumValue = 7,
+};
+
+// Enum for SignNOCIssuerRequestStatusEnum
+enum class SignNOCIssuerRequestStatusEnum : uint8_t
+{
+    kOk                     = 0x00,
+    kFailSafeRequired       = 0x01,
+    kInvalidNOCIssuerCSR    = 0x02,
+    kChainValidationFailed  = 0x03,
+    kTrustQuotientThreshold = 0x04,
+    kSignNOCIssuerFailed    = 0x05,
+    // All received enum values that are not listed above will be mapped
+    // to kUnknownEnumValue. This is a helper enum value that should only
+    // be used by code to process how it handles receiving and unknown
+    // enum value. This specific should never be transmitted.
+    kUnknownEnumValue = 6,
+};
+} // namespace JointFabricPki
+
 namespace OperationalCredentials {
 
 // Enum for CertificateChainTypeEnum

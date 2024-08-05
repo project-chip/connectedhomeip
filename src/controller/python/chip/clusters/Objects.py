@@ -13059,6 +13059,237 @@ class AdministratorCommissioning(Cluster):
 
 
 @dataclass
+class JointFabricPki(Cluster):
+    id: typing.ClassVar[int] = 0x0000003D
+
+    @ChipUtility.classproperty
+    def descriptor(cls) -> ClusterObjectDescriptor:
+        return ClusterObjectDescriptor(
+            Fields=[
+                ClusterObjectFieldDescriptor(Label="generatedCommandList", Tag=0x0000FFF8, Type=typing.List[uint]),
+                ClusterObjectFieldDescriptor(Label="acceptedCommandList", Tag=0x0000FFF9, Type=typing.List[uint]),
+                ClusterObjectFieldDescriptor(Label="eventList", Tag=0x0000FFFA, Type=typing.List[uint]),
+                ClusterObjectFieldDescriptor(Label="attributeList", Tag=0x0000FFFB, Type=typing.List[uint]),
+                ClusterObjectFieldDescriptor(Label="featureMap", Tag=0x0000FFFC, Type=uint),
+                ClusterObjectFieldDescriptor(Label="clusterRevision", Tag=0x0000FFFD, Type=uint),
+            ])
+
+    generatedCommandList: 'typing.List[uint]' = None
+    acceptedCommandList: 'typing.List[uint]' = None
+    eventList: 'typing.List[uint]' = None
+    attributeList: 'typing.List[uint]' = None
+    featureMap: 'uint' = None
+    clusterRevision: 'uint' = None
+
+    class Enums:
+        class JointFabricStatusEnum(MatterIntEnum):
+            kOk = 0x00
+            kInvalidPublicKey = 0x01
+            kInvalidNodeOpId = 0x02
+            kInvalidNOC = 0x03
+            kMissingCsr = 0x04
+            kTableFull = 0x05
+            kInvalidAdminSubject = 0x06
+            kFabricConflict = 0x09
+            kLabelConflict = 0x0A
+            kInvalidFabricIndex = 0x0B
+            # All received enum values that are not listed above will be mapped
+            # to kUnknownEnumValue. This is a helper enum value that should only
+            # be used by code to process how it handles receiving an unknown
+            # enum value. This specific value should never be transmitted.
+            kUnknownEnumValue = 7,
+
+        class SignNOCIssuerRequestStatusEnum(MatterIntEnum):
+            kOk = 0x00
+            kFailSafeRequired = 0x01
+            kInvalidNOCIssuerCSR = 0x02
+            kChainValidationFailed = 0x03
+            kTrustQuotientThreshold = 0x04
+            kSignNOCIssuerFailed = 0x05
+            # All received enum values that are not listed above will be mapped
+            # to kUnknownEnumValue. This is a helper enum value that should only
+            # be used by code to process how it handles receiving an unknown
+            # enum value. This specific value should never be transmitted.
+            kUnknownEnumValue = 6,
+
+    class Commands:
+        @dataclass
+        class JointFabricRequest(ClusterCommand):
+            cluster_id: typing.ClassVar[int] = 0x0000003D
+            command_id: typing.ClassVar[int] = 0x00000000
+            is_client: typing.ClassVar[bool] = True
+            response_type: typing.ClassVar[str] = 'SignNOCIssuerRequest'
+
+            @ChipUtility.classproperty
+            def descriptor(cls) -> ClusterObjectDescriptor:
+                return ClusterObjectDescriptor(
+                    Fields=[
+                        ClusterObjectFieldDescriptor(Label="fabricIndex", Tag=0, Type=uint),
+                    ])
+
+            fabricIndex: 'uint' = 0
+
+        @dataclass
+        class SignNOCIssuerRequest(ClusterCommand):
+            cluster_id: typing.ClassVar[int] = 0x0000003D
+            command_id: typing.ClassVar[int] = 0x00000001
+            is_client: typing.ClassVar[bool] = False
+            response_type: typing.ClassVar[str] = None
+
+            @ChipUtility.classproperty
+            def descriptor(cls) -> ClusterObjectDescriptor:
+                return ClusterObjectDescriptor(
+                    Fields=[
+                        ClusterObjectFieldDescriptor(Label="NOCIssuerCSR", Tag=0, Type=bytes),
+                    ])
+
+            NOCIssuerCSR: 'bytes' = b""
+
+        @dataclass
+        class SignNOCIssuerResponse(ClusterCommand):
+            cluster_id: typing.ClassVar[int] = 0x0000003D
+            command_id: typing.ClassVar[int] = 0x00000002
+            is_client: typing.ClassVar[bool] = True
+            response_type: typing.ClassVar[str] = 'JointFabricResponse'
+
+            @ChipUtility.classproperty
+            def descriptor(cls) -> ClusterObjectDescriptor:
+                return ClusterObjectDescriptor(
+                    Fields=[
+                        ClusterObjectFieldDescriptor(Label="statusCode", Tag=0, Type=JointFabricPki.Enums.SignNOCIssuerRequestStatusEnum),
+                        ClusterObjectFieldDescriptor(Label="NOCIssuerCert", Tag=1, Type=bytes),
+                        ClusterObjectFieldDescriptor(Label="nodeId", Tag=2, Type=uint),
+                        ClusterObjectFieldDescriptor(Label="fabricId", Tag=3, Type=uint),
+                        ClusterObjectFieldDescriptor(Label="adminVendorId", Tag=4, Type=uint),
+                        ClusterObjectFieldDescriptor(Label="caseAdminSubject", Tag=5, Type=uint),
+                    ])
+
+            statusCode: 'JointFabricPki.Enums.SignNOCIssuerRequestStatusEnum' = 0
+            NOCIssuerCert: 'bytes' = b""
+            nodeId: 'uint' = 0
+            fabricId: 'uint' = 0
+            adminVendorId: 'uint' = 0
+            caseAdminSubject: 'uint' = 0
+
+        @dataclass
+        class JointFabricResponse(ClusterCommand):
+            cluster_id: typing.ClassVar[int] = 0x0000003D
+            command_id: typing.ClassVar[int] = 0x00000003
+            is_client: typing.ClassVar[bool] = False
+            response_type: typing.ClassVar[str] = None
+
+            @ChipUtility.classproperty
+            def descriptor(cls) -> ClusterObjectDescriptor:
+                return ClusterObjectDescriptor(
+                    Fields=[
+                        ClusterObjectFieldDescriptor(Label="statusCode", Tag=0, Type=JointFabricPki.Enums.JointFabricStatusEnum),
+                        ClusterObjectFieldDescriptor(Label="fabricIndex", Tag=1, Type=typing.Optional[uint]),
+                        ClusterObjectFieldDescriptor(Label="debugText", Tag=2, Type=typing.Optional[str]),
+                    ])
+
+            statusCode: 'JointFabricPki.Enums.JointFabricStatusEnum' = 0
+            fabricIndex: 'typing.Optional[uint]' = None
+            debugText: 'typing.Optional[str]' = None
+
+    class Attributes:
+        @dataclass
+        class GeneratedCommandList(ClusterAttributeDescriptor):
+            @ChipUtility.classproperty
+            def cluster_id(cls) -> int:
+                return 0x0000003D
+
+            @ChipUtility.classproperty
+            def attribute_id(cls) -> int:
+                return 0x0000FFF8
+
+            @ChipUtility.classproperty
+            def attribute_type(cls) -> ClusterObjectFieldDescriptor:
+                return ClusterObjectFieldDescriptor(Type=typing.List[uint])
+
+            value: 'typing.List[uint]' = field(default_factory=lambda: [])
+
+        @dataclass
+        class AcceptedCommandList(ClusterAttributeDescriptor):
+            @ChipUtility.classproperty
+            def cluster_id(cls) -> int:
+                return 0x0000003D
+
+            @ChipUtility.classproperty
+            def attribute_id(cls) -> int:
+                return 0x0000FFF9
+
+            @ChipUtility.classproperty
+            def attribute_type(cls) -> ClusterObjectFieldDescriptor:
+                return ClusterObjectFieldDescriptor(Type=typing.List[uint])
+
+            value: 'typing.List[uint]' = field(default_factory=lambda: [])
+
+        @dataclass
+        class EventList(ClusterAttributeDescriptor):
+            @ChipUtility.classproperty
+            def cluster_id(cls) -> int:
+                return 0x0000003D
+
+            @ChipUtility.classproperty
+            def attribute_id(cls) -> int:
+                return 0x0000FFFA
+
+            @ChipUtility.classproperty
+            def attribute_type(cls) -> ClusterObjectFieldDescriptor:
+                return ClusterObjectFieldDescriptor(Type=typing.List[uint])
+
+            value: 'typing.List[uint]' = field(default_factory=lambda: [])
+
+        @dataclass
+        class AttributeList(ClusterAttributeDescriptor):
+            @ChipUtility.classproperty
+            def cluster_id(cls) -> int:
+                return 0x0000003D
+
+            @ChipUtility.classproperty
+            def attribute_id(cls) -> int:
+                return 0x0000FFFB
+
+            @ChipUtility.classproperty
+            def attribute_type(cls) -> ClusterObjectFieldDescriptor:
+                return ClusterObjectFieldDescriptor(Type=typing.List[uint])
+
+            value: 'typing.List[uint]' = field(default_factory=lambda: [])
+
+        @dataclass
+        class FeatureMap(ClusterAttributeDescriptor):
+            @ChipUtility.classproperty
+            def cluster_id(cls) -> int:
+                return 0x0000003D
+
+            @ChipUtility.classproperty
+            def attribute_id(cls) -> int:
+                return 0x0000FFFC
+
+            @ChipUtility.classproperty
+            def attribute_type(cls) -> ClusterObjectFieldDescriptor:
+                return ClusterObjectFieldDescriptor(Type=uint)
+
+            value: 'uint' = 0
+
+        @dataclass
+        class ClusterRevision(ClusterAttributeDescriptor):
+            @ChipUtility.classproperty
+            def cluster_id(cls) -> int:
+                return 0x0000003D
+
+            @ChipUtility.classproperty
+            def attribute_id(cls) -> int:
+                return 0x0000FFFD
+
+            @ChipUtility.classproperty
+            def attribute_type(cls) -> ClusterObjectFieldDescriptor:
+                return ClusterObjectFieldDescriptor(Type=uint)
+
+            value: 'uint' = 0
+
+
+@dataclass
 class OperationalCredentials(Cluster):
     id: typing.ClassVar[int] = 0x0000003E
 

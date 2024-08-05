@@ -704,6 +704,8 @@ public class ClusterWriteMapping {
     writeAttributeMap.put("switch", writeSwitchInteractionInfo);
     Map<String, InteractionInfo> writeAdministratorCommissioningInteractionInfo = new LinkedHashMap<>();
     writeAttributeMap.put("administratorCommissioning", writeAdministratorCommissioningInteractionInfo);
+    Map<String, InteractionInfo> writeJointFabricPkiInteractionInfo = new LinkedHashMap<>();
+    writeAttributeMap.put("jointFabricPki", writeJointFabricPkiInteractionInfo);
     Map<String, InteractionInfo> writeOperationalCredentialsInteractionInfo = new LinkedHashMap<>();
     writeAttributeMap.put("operationalCredentials", writeOperationalCredentialsInteractionInfo);
     Map<String, InteractionInfo> writeGroupKeyManagementInteractionInfo = new LinkedHashMap<>();

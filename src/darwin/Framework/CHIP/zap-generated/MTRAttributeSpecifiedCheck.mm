@@ -1667,6 +1667,33 @@ static BOOL AttributeIsSpecifiedInAdministratorCommissioningCluster(AttributeId 
     }
     }
 }
+static BOOL AttributeIsSpecifiedInJointFabricPkiCluster(AttributeId aAttributeId)
+{
+    using namespace Clusters::JointFabricPki;
+    switch (aAttributeId) {
+    case Attributes::GeneratedCommandList::Id: {
+        return YES;
+    }
+    case Attributes::AcceptedCommandList::Id: {
+        return YES;
+    }
+    case Attributes::EventList::Id: {
+        return YES;
+    }
+    case Attributes::AttributeList::Id: {
+        return YES;
+    }
+    case Attributes::FeatureMap::Id: {
+        return YES;
+    }
+    case Attributes::ClusterRevision::Id: {
+        return YES;
+    }
+    default: {
+        return NO;
+    }
+    }
+}
 static BOOL AttributeIsSpecifiedInOperationalCredentialsCluster(AttributeId aAttributeId)
 {
     using namespace Clusters::OperationalCredentials;
@@ -6947,6 +6974,9 @@ BOOL MTRAttributeIsSpecified(ClusterId aClusterId, AttributeId aAttributeId)
     }
     case Clusters::AdministratorCommissioning::Id: {
         return AttributeIsSpecifiedInAdministratorCommissioningCluster(aAttributeId);
+    }
+    case Clusters::JointFabricPki::Id: {
+        return AttributeIsSpecifiedInJointFabricPkiCluster(aAttributeId);
     }
     case Clusters::OperationalCredentials::Id: {
         return AttributeIsSpecifiedInOperationalCredentialsCluster(aAttributeId);

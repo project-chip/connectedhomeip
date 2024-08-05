@@ -121,6 +121,9 @@ public class ClusterIDMapping {
         if (clusterId == AdministratorCommissioning.ID) {
             return new AdministratorCommissioning();
         }
+        if (clusterId == JointFabricPki.ID) {
+            return new JointFabricPki();
+        }
         if (clusterId == OperationalCredentials.ID) {
             return new OperationalCredentials();
         }
@@ -4804,6 +4807,142 @@ public class ClusterIDMapping {
                     }
                     public static OpenBasicCommissioningWindowCommandField value(int id) throws NoSuchFieldError {
                         for (OpenBasicCommissioningWindowCommandField field : OpenBasicCommissioningWindowCommandField.values()) {
+                        if (field.getID() == id) {
+                            return field;
+                        }
+                        }
+                        throw new NoSuchFieldError();
+                    }
+                }@Override
+        public String getAttributeName(long id) throws NoSuchFieldError {
+            return Attribute.value(id).toString();
+        }
+
+        @Override
+        public String getEventName(long id) throws NoSuchFieldError {
+            return Event.value(id).toString();
+        }
+
+        @Override
+        public String getCommandName(long id) throws NoSuchFieldError {
+            return Command.value(id).toString();
+        }
+
+        @Override
+        public long getAttributeID(String name) throws IllegalArgumentException {
+            return Attribute.valueOf(name).getID();
+        }
+
+        @Override
+        public long getEventID(String name) throws IllegalArgumentException {
+            return Event.valueOf(name).getID();
+        }
+
+        @Override
+        public long getCommandID(String name) throws IllegalArgumentException {
+            return Command.valueOf(name).getID();
+        }
+    }
+    public static class JointFabricPki implements BaseCluster {
+        public static final long ID = 61L;
+        public long getID() {
+            return ID;
+        }
+
+        public enum Attribute {
+            GeneratedCommandList(65528L),
+            AcceptedCommandList(65529L),
+            EventList(65530L),
+            AttributeList(65531L),
+            FeatureMap(65532L),
+            ClusterRevision(65533L),;
+            private final long id;
+            Attribute(long id) {
+                this.id = id;
+            }
+
+            public long getID() {
+                return id;
+            }
+
+            public static Attribute value(long id) throws NoSuchFieldError {
+                for (Attribute attribute : Attribute.values()) {
+                    if (attribute.getID() == id) {
+                        return attribute;
+                    }
+                }
+                throw new NoSuchFieldError();
+            }
+        }
+
+        public enum Event {;
+            private final long id;
+            Event(long id) {
+                this.id = id;
+            }
+
+            public long getID() {
+                return id;
+            }
+
+            public static Event value(long id) throws NoSuchFieldError {
+                for (Event event : Event.values()) {
+                    if (event.getID() == id) {
+                        return event;
+                    }
+                }
+                throw new NoSuchFieldError();
+            }
+        }
+
+        public enum Command {
+            JointFabricRequest(0L),
+            SignNOCIssuerResponse(2L),;
+            private final long id;
+            Command(long id) {
+                this.id = id;
+            }
+
+            public long getID() {
+                return id;
+            }
+
+            public static Command value(long id) throws NoSuchFieldError {
+                for (Command command : Command.values()) {
+                    if (command.getID() == id) {
+                        return command;
+                    }
+                }
+                throw new NoSuchFieldError();
+            }
+        }public enum JointFabricRequestCommandField {FabricIndex(0),;
+                    private final int id;
+                    JointFabricRequestCommandField(int id) {
+                        this.id = id;
+                    }
+
+                    public int getID() {
+                        return id;
+                    }
+                    public static JointFabricRequestCommandField value(int id) throws NoSuchFieldError {
+                        for (JointFabricRequestCommandField field : JointFabricRequestCommandField.values()) {
+                        if (field.getID() == id) {
+                            return field;
+                        }
+                        }
+                        throw new NoSuchFieldError();
+                    }
+                }public enum SignNOCIssuerResponseCommandField {StatusCode(0),NOCIssuerCert(1),NodeId(2),FabricId(3),AdminVendorId(4),CaseAdminSubject(5),;
+                    private final int id;
+                    SignNOCIssuerResponseCommandField(int id) {
+                        this.id = id;
+                    }
+
+                    public int getID() {
+                        return id;
+                    }
+                    public static SignNOCIssuerResponseCommandField value(int id) throws NoSuchFieldError {
+                        for (SignNOCIssuerResponseCommandField field : SignNOCIssuerResponseCommandField.values()) {
                         if (field.getID() == id) {
                             return field;
                         }

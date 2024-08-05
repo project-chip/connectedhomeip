@@ -21,6 +21,7 @@
 #include <app/util/basic-types.h>
 #include <crypto/CHIPCryptoPAL.h>
 #include <lib/core/CHIPCallback.h>
+#include <lib/core/CHIPPersistentStorageDelegate.h>
 #include <lib/core/PeerId.h>
 #include <lib/support/DLLUtil.h>
 #include <lib/support/Span.h>
@@ -32,6 +33,7 @@ namespace Controller {
 typedef void (*OnNOCChainGeneration)(void * context, CHIP_ERROR status, const ByteSpan & noc, const ByteSpan & icac,
                                      const ByteSpan & rcac, Optional<Crypto::IdentityProtectionKeySpan> ipk,
                                      Optional<NodeId> adminSubject);
+typedef void (*OnNOCIssuerSigned)(void * context, CHIP_ERROR status, const ByteSpan & icac);
 
 inline constexpr uint32_t kMaxCHIPDERCertLength = 600;
 inline constexpr size_t kCSRNonceLength         = 32;
@@ -67,6 +69,12 @@ public:
                                         const ByteSpan & DAC, const ByteSpan & PAI,
                                         Callback::Callback<OnNOCChainGeneration> * onCompletion) = 0;
 
+    virtual CHIP_ERROR SignNOCIssuer(const ByteSpan & icaCsr, Callback::Callback<OnNOCIssuerSigned> * onCompletion) = 0;
+
+    virtual CHIP_ERROR SignNOC(const ByteSpan & icac, const ByteSpan & nocCsr, MutableByteSpan & noc) = 0;
+
+    virtual CHIP_ERROR ObtainIcaCsr(MutableByteSpan & icaCsr) = 0;
+
     /**
      *   This function sets the node ID for which the next NOC Chain would be requested. The node ID is
      *   provided as a hint, and the delegate implementation may chose to ignore it and pick node ID of
@@ -87,7 +95,37 @@ public:
         ReturnErrorOnFailure(Crypto::DRBG_get_bytes(csrNonce.data(), csrNonce.size()));
         return CHIP_NO_ERROR;
     }
+
+    virtual uint64_t GetTrackingFabricIndex() { return 0; }
+    virtual void SetTrackingFabricIndex(uint64_t index) {}
+
+    virtual CHIP_ERROR Initialize(PersistentStorageDelegate & storage) { return CHIP_ERROR_NOT_IMPLEMENTED; }
 };
+
+/**
+ * Instance getter for the global OperationalCredentialsDelegate.
+ *
+ * Callers have to externally synchronize usage of this function.
+ *
+ * @return The global operational credentials delegate. Assume never null.
+ */
+OperationalCredentialsDelegate * GetOperationalCredentialsDelegate();
+
+/**
+ * Instance setter for the global OperationalCredentialsDelegate.
+ *
+ * Callers have to externally synchronize usage of this function.
+ *
+ * If the `provider` is nullptr, no change is done.
+ *
+ * @param[in] provider the OperationalCredentialsDelegate to start returning with the getter
+ */
+void SetOperationalCredentialsDelegate(OperationalCredentialsDelegate * provider);
+
+/**
+ * Check if Instance is prepared
+ */
+bool IsOperationalCredentialsDelegateSet();
 
 } // namespace Controller
 } // namespace chip
