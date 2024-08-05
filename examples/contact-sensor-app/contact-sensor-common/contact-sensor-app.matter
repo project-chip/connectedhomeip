@@ -1902,7 +1902,7 @@ cluster BooleanState = 69 {
 
 /** Attributes and commands for configuring occupancy sensing, and reporting occupancy status. */
 cluster OccupancySensing = 1030 {
-  revision 4;
+  revision 5;
 
   enum OccupancySensorTypeEnum : enum8 {
     kPIR = 0;
@@ -2356,7 +2356,7 @@ endpoint 1 {
     ram      attribute occupancySensorType;
     ram      attribute occupancySensorTypeBitmap;
     ram      attribute featureMap default = 0;
-    ram      attribute clusterRevision default = 4;
+    ram      attribute clusterRevision default = 5;
   }
 }
 

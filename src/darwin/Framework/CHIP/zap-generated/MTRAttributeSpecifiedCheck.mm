@@ -3861,16 +3861,16 @@ static BOOL AttributeIsSpecifiedInServiceAreaCluster(AttributeId aAttributeId)
 {
     using namespace Clusters::ServiceArea;
     switch (aAttributeId) {
-    case Attributes::SupportedLocations::Id: {
+    case Attributes::SupportedAreas::Id: {
         return YES;
     }
     case Attributes::SupportedMaps::Id: {
         return YES;
     }
-    case Attributes::SelectedLocations::Id: {
+    case Attributes::SelectedAreas::Id: {
         return YES;
     }
-    case Attributes::CurrentLocation::Id: {
+    case Attributes::CurrentArea::Id: {
         return YES;
     }
     case Attributes::EstimatedEndTime::Id: {

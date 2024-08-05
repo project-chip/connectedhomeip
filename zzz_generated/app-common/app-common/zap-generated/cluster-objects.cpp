@@ -20316,7 +20316,7 @@ namespace Events {} // namespace Events
 namespace ServiceArea {
 namespace Structs {
 
-namespace LocationInfoStruct {
+namespace AreaInfoStruct {
 CHIP_ERROR Type::Encode(TLV::TLVWriter & aWriter, TLV::Tag aTag) const
 {
     DataModel::WrappedStructEncoder encoder{ aWriter, aTag };
@@ -20365,15 +20365,15 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
     }
 }
 
-} // namespace LocationInfoStruct
+} // namespace AreaInfoStruct
 
-namespace LocationStruct {
+namespace AreaStruct {
 CHIP_ERROR Type::Encode(TLV::TLVWriter & aWriter, TLV::Tag aTag) const
 {
     DataModel::WrappedStructEncoder encoder{ aWriter, aTag };
-    encoder.Encode(to_underlying(Fields::kLocationID), locationID);
+    encoder.Encode(to_underlying(Fields::kAreaID), areaID);
     encoder.Encode(to_underlying(Fields::kMapID), mapID);
-    encoder.Encode(to_underlying(Fields::kLocationInfo), locationInfo);
+    encoder.Encode(to_underlying(Fields::kAreaDesc), areaDesc);
     return encoder.Finalize();
 }
 
@@ -20391,17 +20391,17 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
         CHIP_ERROR err              = CHIP_NO_ERROR;
         const uint8_t __context_tag = std::get<uint8_t>(__element);
 
-        if (__context_tag == to_underlying(Fields::kLocationID))
+        if (__context_tag == to_underlying(Fields::kAreaID))
         {
-            err = DataModel::Decode(reader, locationID);
+            err = DataModel::Decode(reader, areaID);
         }
         else if (__context_tag == to_underlying(Fields::kMapID))
         {
             err = DataModel::Decode(reader, mapID);
         }
-        else if (__context_tag == to_underlying(Fields::kLocationInfo))
+        else if (__context_tag == to_underlying(Fields::kAreaDesc))
         {
-            err = DataModel::Decode(reader, locationInfo);
+            err = DataModel::Decode(reader, areaDesc);
         }
         else
         {
@@ -20411,7 +20411,7 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
     }
 }
 
-} // namespace LocationStruct
+} // namespace AreaStruct
 
 namespace MapStruct {
 CHIP_ERROR Type::Encode(TLV::TLVWriter & aWriter, TLV::Tag aTag) const
@@ -20458,7 +20458,7 @@ namespace ProgressStruct {
 CHIP_ERROR Type::Encode(TLV::TLVWriter & aWriter, TLV::Tag aTag) const
 {
     DataModel::WrappedStructEncoder encoder{ aWriter, aTag };
-    encoder.Encode(to_underlying(Fields::kLocationID), locationID);
+    encoder.Encode(to_underlying(Fields::kAreaID), areaID);
     encoder.Encode(to_underlying(Fields::kStatus), status);
     encoder.Encode(to_underlying(Fields::kTotalOperationalTime), totalOperationalTime);
     encoder.Encode(to_underlying(Fields::kEstimatedTime), estimatedTime);
@@ -20479,9 +20479,9 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
         CHIP_ERROR err              = CHIP_NO_ERROR;
         const uint8_t __context_tag = std::get<uint8_t>(__element);
 
-        if (__context_tag == to_underlying(Fields::kLocationID))
+        if (__context_tag == to_underlying(Fields::kAreaID))
         {
-            err = DataModel::Decode(reader, locationID);
+            err = DataModel::Decode(reader, areaID);
         }
         else if (__context_tag == to_underlying(Fields::kStatus))
         {
@@ -20507,11 +20507,11 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
 } // namespace Structs
 
 namespace Commands {
-namespace SelectLocations {
+namespace SelectAreas {
 CHIP_ERROR Type::Encode(TLV::TLVWriter & aWriter, TLV::Tag aTag) const
 {
     DataModel::WrappedStructEncoder encoder{ aWriter, aTag };
-    encoder.Encode(to_underlying(Fields::kNewLocations), newLocations);
+    encoder.Encode(to_underlying(Fields::kNewAreas), newAreas);
     return encoder.Finalize();
 }
 
@@ -20529,9 +20529,9 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
         CHIP_ERROR err              = CHIP_NO_ERROR;
         const uint8_t __context_tag = std::get<uint8_t>(__element);
 
-        if (__context_tag == to_underlying(Fields::kNewLocations))
+        if (__context_tag == to_underlying(Fields::kNewAreas))
         {
-            err = DataModel::Decode(reader, newLocations);
+            err = DataModel::Decode(reader, newAreas);
         }
         else
         {
@@ -20540,8 +20540,8 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
         ReturnErrorOnFailure(err);
     }
 }
-} // namespace SelectLocations.
-namespace SelectLocationsResponse {
+} // namespace SelectAreas.
+namespace SelectAreasResponse {
 CHIP_ERROR Type::Encode(TLV::TLVWriter & aWriter, TLV::Tag aTag) const
 {
     DataModel::WrappedStructEncoder encoder{ aWriter, aTag };
@@ -20579,8 +20579,8 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
         ReturnErrorOnFailure(err);
     }
 }
-} // namespace SelectLocationsResponse.
-namespace SkipCurrentLocation {
+} // namespace SelectAreasResponse.
+namespace SkipArea {
 CHIP_ERROR Type::Encode(TLV::TLVWriter & aWriter, TLV::Tag aTag) const
 {
     DataModel::WrappedStructEncoder encoder{ aWriter, aTag };
@@ -20599,8 +20599,8 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
         }
     }
 }
-} // namespace SkipCurrentLocation.
-namespace SkipCurrentLocationResponse {
+} // namespace SkipArea.
+namespace SkipAreaResponse {
 CHIP_ERROR Type::Encode(TLV::TLVWriter & aWriter, TLV::Tag aTag) const
 {
     DataModel::WrappedStructEncoder encoder{ aWriter, aTag };
@@ -20638,7 +20638,7 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
         ReturnErrorOnFailure(err);
     }
 }
-} // namespace SkipCurrentLocationResponse.
+} // namespace SkipAreaResponse.
 } // namespace Commands
 
 namespace Attributes {
@@ -20646,14 +20646,14 @@ CHIP_ERROR TypeInfo::DecodableType::Decode(TLV::TLVReader & reader, const Concre
 {
     switch (path.mAttributeId)
     {
-    case Attributes::SupportedLocations::TypeInfo::GetAttributeId():
-        return DataModel::Decode(reader, supportedLocations);
+    case Attributes::SupportedAreas::TypeInfo::GetAttributeId():
+        return DataModel::Decode(reader, supportedAreas);
     case Attributes::SupportedMaps::TypeInfo::GetAttributeId():
         return DataModel::Decode(reader, supportedMaps);
-    case Attributes::SelectedLocations::TypeInfo::GetAttributeId():
-        return DataModel::Decode(reader, selectedLocations);
-    case Attributes::CurrentLocation::TypeInfo::GetAttributeId():
-        return DataModel::Decode(reader, currentLocation);
+    case Attributes::SelectedAreas::TypeInfo::GetAttributeId():
+        return DataModel::Decode(reader, selectedAreas);
+    case Attributes::CurrentArea::TypeInfo::GetAttributeId():
+        return DataModel::Decode(reader, currentArea);
     case Attributes::EstimatedEndTime::TypeInfo::GetAttributeId():
         return DataModel::Decode(reader, estimatedEndTime);
     case Attributes::Progress::TypeInfo::GetAttributeId():
