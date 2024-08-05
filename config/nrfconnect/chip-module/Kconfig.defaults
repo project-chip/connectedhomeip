@@ -227,7 +227,7 @@ config NRF_WIFI_FW_PATCH_DFU
 # ==============================================================================
 
 config NET_L2_OPENTHREAD
-    default y if !WIFI_NRF700X
+    default y if !WIFI_NRF70
 
 if NET_L2_OPENTHREAD
 
@@ -252,35 +252,35 @@ endif # NET_L2_OPENTHREAD
 
 if CHIP_WIFI
 
-choice WPA_SUPP_LOG_LEVEL_CHOICE
-    default WPA_SUPP_LOG_LEVEL_ERR
+choice WIFI_NM_WPA_SUPPLICANT_LOG_LEVEL_CHOICE
+    default WIFI_NM_WPA_SUPPLICANT_LOG_LEVEL_ERR
 endchoice
 
 # it saves us 20kB of FLASH
-config WPA_SUPP_NO_DEBUG
+config WIFI_NM_WPA_SUPPLICANT_NO_DEBUG
     default y
 
-config NRF700X_LOG_VERBOSE
+config NRF70_LOG_VERBOSE
     default n
 
-choice WIFI_NRF700X_LOG_LEVEL_CHOICE
-    default WIFI_NRF700X_LOG_LEVEL_OFF
+choice WIFI_NRF70_LOG_LEVEL_CHOICE
+    default WIFI_NRF70_LOG_LEVEL_OFF
 endchoice
 
 config NRF_WIFI_LOW_POWER
     default n
 
-config NRF700X_RX_NUM_BUFS
+config NRF70_RX_NUM_BUFS
     default 16
 
-config NRF700X_MAX_TX_TOKENS
+config NRF70_MAX_TX_TOKENS
     default 10
 
-config NRF700X_MAX_TX_AGGREGATION
+config NRF70_MAX_TX_AGGREGATION
     default 1
 
 # it saves 25kB of FLASH
-config WPA_SUPP_ADVANCED_FEATURES
+config WIFI_NM_WPA_SUPPLICANT_ADVANCED_FEATURES
     default n
 
 endif # CHIP_WIFI

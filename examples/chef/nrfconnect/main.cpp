@@ -110,7 +110,7 @@ int main()
         ChipLogError(AppServer, "ConnectivityMgr().SetThreadDeviceType() failed");
         return 1;
     }
-#elif !defined(CONFIG_WIFI_NRF700X)
+#elif !defined(CONFIG_WIFI_NRF70)
     return CHIP_ERROR_INTERNAL;
 #endif
 
