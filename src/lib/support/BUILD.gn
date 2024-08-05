@@ -23,6 +23,7 @@ import("${chip_root}/build/chip/chip_version.gni")
 import("${chip_root}/build/chip/java/config.gni")
 import("${chip_root}/build/chip/tests.gni")
 import("${chip_root}/src/lib/core/core.gni")
+import("${chip_root}/src/platform/device.gni")
 
 declare_args() {
   # Set to true to run the PersistentStorageDelegate API compliance audit
@@ -251,7 +252,7 @@ static_library("support") {
     "verhoeff/Verhoeff10.cpp",
   ]
 
-  if (current_os == "android" || matter_enable_java_compilation) {
+  if (chip_device_platform == "android" || matter_enable_java_compilation) {
     if (matter_enable_java_compilation) {
       include_dirs = java_matter_controller_dependent_paths
     }
@@ -298,11 +299,11 @@ static_library("support") {
   ]
 
   # Android has no 'platform' that provides logging
-  if (current_os == "android") {
+  if (chip_device_platform == "android") {
     public_deps += [ "${chip_root}/src/platform/android:logging" ]
   }
 
-  if (current_os == "mac" || current_os == "ios") {
+  if (chip_device_platform == "darwin") {
     public_deps += [ "${chip_root}/src/platform/Darwin:logging" ]
   }
 
