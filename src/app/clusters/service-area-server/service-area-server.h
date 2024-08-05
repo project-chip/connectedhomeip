@@ -183,10 +183,11 @@ public:
      * @note if aLocationName is larger than kLocationNameMaxSize, it will be truncated.
      */
     bool AddSupportedLocation(uint32_t aLocationId, const DataModel::Nullable<uint8_t> & aMapId, const CharSpan & aLocationName,
-                              const DataModel::Nullable<int16_t> & aFloorNumber, const DataModel::Nullable<AreaTypeTag> & aAreaType,
-                              const DataModel::Nullable<LandmarkTag> & aLandmarkTag,
-                              const DataModel::Nullable<PositionTag> & aPositionTag,
-                              const DataModel::Nullable<FloorSurfaceTag> & aSurfaceTag);
+                              const DataModel::Nullable<int16_t> & aFloorNumber,
+                              const DataModel::Nullable<Globals::AreaTypeTag> & aAreaType,
+                              const DataModel::Nullable<Globals::LandmarkTag> & aLandmarkTag,
+                              const DataModel::Nullable<Globals::PositionTag> & aPositionTag,
+                              const DataModel::Nullable<Globals::FloorSurfaceTag> & aSurfaceTag);
 
     /**
      * @brief Modify/replace an existing location in the supported locations list.
@@ -207,10 +208,10 @@ public:
      */
     bool ModifySupportedLocation(uint32_t aLocationId, const DataModel::Nullable<uint8_t> & aMapId, const CharSpan & aLocationName,
                                  const DataModel::Nullable<int16_t> & aFloorNumber,
-                                 const DataModel::Nullable<AreaTypeTag> & aAreaType,
-                                 const DataModel::Nullable<LandmarkTag> & aLandmarkTag,
-                                 const DataModel::Nullable<PositionTag> & aPositionTag,
-                                 const DataModel::Nullable<FloorSurfaceTag> & aSurfaceTag);
+                                 const DataModel::Nullable<Globals::AreaTypeTag> & aAreaType,
+                                 const DataModel::Nullable<Globals::LandmarkTag> & aLandmarkTag,
+                                 const DataModel::Nullable<Globals::PositionTag> & aPositionTag,
+                                 const DataModel::Nullable<Globals::FloorSurfaceTag> & aSurfaceTag);
 
     /**
      * @return true if the SupportedLocations attribute was not already null.

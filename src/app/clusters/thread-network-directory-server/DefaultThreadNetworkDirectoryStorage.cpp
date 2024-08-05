@@ -46,7 +46,8 @@ CHIP_ERROR DefaultThreadNetworkDirectoryStorage::StoreIndex()
 {
     VerifyOrDie(mInitialized);
     StorageKeyName key = DefaultStorageKeyAllocator::ThreadNetworkDirectoryIndex();
-    return mStorage.SyncSetKeyValue(key.KeyName(), mExtendedPanIds, mCount * ExtendedPanId::size());
+    static_assert(kCapacity * ExtendedPanId::size() <= UINT16_MAX); // kCapacity >= mCount
+    return mStorage.SyncSetKeyValue(key.KeyName(), mExtendedPanIds, static_cast<uint16_t>(mCount * ExtendedPanId::size()));
 }
 
 bool DefaultThreadNetworkDirectoryStorage::FindNetwork(const ExtendedPanId & exPanId, index_t & outIndex)
