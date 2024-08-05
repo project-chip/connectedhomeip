@@ -6491,8 +6491,8 @@ PICS:
     - label: "Does the device implement the Presets attribute?"
       id: TSTAT.S.A0050
 
-    - label: "Does the device implement the PresetsSchedulesEditable attribute?"
-      id: TSTAT.S.A0052
+    - label: "Does the device implement the Schedules attribute?"
+      id: TSTAT.S.A0051
 
     #
     # server / commandsReceived
@@ -6523,19 +6523,9 @@ PICS:
       id: TSTAT.S.C06.Rsp
 
     - label:
-          "Does the device implement receiving the
-          StartPresetsSchedulesEditRequest command?"
-      id: TSTAT.S.C07.Rsp
-
-    - label:
-          "Does the device implement receiving the
-          CancelPresetsSchedulesEditRequest command?"
-      id: TSTAT.S.C08.Rsp
-
-    - label:
-          "Does the device implement receiving the CommitPresetsSchedulesRequest
-          command?"
-      id: TSTAT.S.C09.Rsp
+          "Does the device implement receiving the AtomicRequest command for
+          Thermostat?"
+      id: TSTAT.S.CFE.Rsp
 
     #
     # server / commandsGenerated
@@ -6549,6 +6539,9 @@ PICS:
           "Does the device implement sending the GetRelayStatusLogResponse
           command?"
       id: TSTAT.S.C01.Tx
+
+    - label: "Does the device implement sending the AtomicResponse command?"
+      id: TSTAT.S.CFD.Tx
 
     #
     # server / features
@@ -6622,20 +6615,8 @@ PICS:
           "Does the device implement sending the SetActivePresetRequest command?"
       id: TSTAT.C.C06.Tx
 
-    - label:
-          "Does the device implement sending the
-          StartPresetsSchedulesEditRequest command?"
-      id: TSTAT.C.C07.Tx
-
-    - label:
-          "Does the device implement sending the
-          CancelPresetsSchedulesEditRequest command?"
-      id: TSTAT.C.C08.Tx
-
-    - label:
-          "Does the device implement sending the CommitPresetsSchedulesRequest
-          command?"
-      id: TSTAT.C.C09.Tx
+    - label: "Does the device implement sending the AtomicRequest command?"
+      id: TSTAT.C.CFE.Tx
 
     #
     # client / manually
