@@ -70,12 +70,12 @@ template("silabs_executable") {
   _platform_firmware_utils = "${chip_root}/scripts/flashing/silabs_firmware_utils.py"
   _firmware_utils = "${chip_root}/scripts/flashing/firmware_utils.py"
   flashing_options = [
-    "silabs",  # Use module "{this}_firmware_utils.py"
+    "silabs",  # Use module "{platform}_firmware_utils.py"
     "--flashbundle-file",
     rebase_path(_flashbundle_file, root_build_dir),
-    "--platform-firmware-utils",  # Platform-specific flashing module.
+    "--platform-firmware-utils",  # Platform-specific firmware module.
     rebase_path(_platform_firmware_utils, root_build_dir),
-    "--firmware-utils",  # General flashing module.
+    "--firmware-utils",  # General firmware module.
     rebase_path(_firmware_utils, root_build_dir),
   ]
   flashing_script_inputs = [
