@@ -46,21 +46,24 @@ namespace ThreadBorderRouterManagement {
 
 using Protocols::InteractionModel::Status;
 
-static bool IsCommandOverCASESession(CommandHandlerInterface::HandlerContext & ctx)
+bool ServerInstance::IsCommandOverCASESession(CommandHandlerInterface::HandlerContext & ctx)
 {
+#if CONFIG_BUILD_FOR_HOST_UNIT_TEST
+    if (mSkipCASESessionCheck)
+    {
+        return true;
+    }
+#endif // CONFIG_BUILD_FOR_HOST_UNIT_TEST
     Messaging::ExchangeContext * exchangeCtx = ctx.mCommandHandler.GetExchangeContext();
     return exchangeCtx && exchangeCtx->HasSessionHandle() && exchangeCtx->GetSessionHandle()->IsSecureSession() &&
         exchangeCtx->GetSessionHandle()->AsSecureSession()->GetSecureSessionType() == Transport::SecureSession::Type::kCASE;
 }
 
-Status ServerInstance::HandleGetDatasetRequest(bool isOverCASESession, Delegate::DatasetType type,
+Status ServerInstance::HandleGetDatasetRequest(CommandHandlerInterface::HandlerContext & ctx, Delegate::DatasetType type,
                                                Thread::OperationalDataset & dataset)
 {
     VerifyOrDie(mDelegate);
-    if (!isOverCASESession)
-    {
-        return Status::UnsupportedAccess;
-    }
+    VerifyOrReturnValue(IsCommandOverCASESession(ctx), Status::UnsupportedAccess);
 
     CHIP_ERROR err = mDelegate->GetDataset(dataset, type);
     if (err != CHIP_NO_ERROR)
@@ -70,7 +73,7 @@ Status ServerInstance::HandleGetDatasetRequest(bool isOverCASESession, Delegate:
     return Status::Success;
 }
 
-Status ServerInstance::HandleSetActiveDatasetRequest(bool isOverCASESession, CommandHandler * commandHandler,
+Status ServerInstance::HandleSetActiveDatasetRequest(CommandHandlerInterface::HandlerContext & ctx,
                                                      const Commands::SetActiveDatasetRequest::DecodableType & req)
 {
     // The SetActiveDatasetRequest command SHALL be FailSafeArmed. Upon receiving this command, the Thread BR will set its
@@ -80,8 +83,8 @@ Status ServerInstance::HandleSetActiveDatasetRequest(bool isOverCASESession, Com
     // reverted. If the FailSafe timer expires before the Thread BR responds, the Thread BR will respond with a timeout status and
     // the active dataset should also be reverted.
     VerifyOrDie(mDelegate);
-    VerifyOrReturnValue(isOverCASESession, Status::UnsupportedAccess);
-    VerifyOrReturnValue(mFailsafeContext.IsFailSafeArmed(commandHandler->GetAccessingFabricIndex()), Status::FailsafeRequired);
+    VerifyOrReturnValue(IsCommandOverCASESession(ctx), Status::UnsupportedAccess);
+    VerifyOrReturnValue(mFailsafeContext.IsFailSafeArmed(ctx.mCommandHandler.GetAccessingFabricIndex()), Status::FailsafeRequired);
 
     Thread::OperationalDataset activeDataset;
     Thread::OperationalDataset currentActiveDataset;
@@ -102,19 +105,19 @@ Status ServerInstance::HandleSetActiveDatasetRequest(bool isOverCASESession, Com
     {
         return Status::Busy;
     }
-    commandHandler->FlushAcksRightAwayOnSlowCommand();
-    mAsyncCommandHandle = CommandHandler::Handle(commandHandler);
+    ctx.mCommandHandler.FlushAcksRightAwayOnSlowCommand();
+    mAsyncCommandHandle = CommandHandler::Handle(&ctx.mCommandHandler);
     mBreadcrumb         = req.breadcrumb;
     mSetActiveDatasetSequenceNumber++;
     mDelegate->SetActiveDataset(activeDataset, mSetActiveDatasetSequenceNumber, this);
     return Status::Success;
 }
 
-Status ServerInstance::HandleSetPendingDatasetRequest(bool isOverCASESession,
+Status ServerInstance::HandleSetPendingDatasetRequest(CommandHandlerInterface::HandlerContext & ctx,
                                                       const Commands::SetPendingDatasetRequest::DecodableType & req)
 {
     VerifyOrDie(mDelegate);
-    VerifyOrReturnValue(isOverCASESession, Status::UnsupportedAccess);
+    VerifyOrReturnValue(IsCommandOverCASESession(ctx), Status::UnsupportedAccess);
     if (!mDelegate->GetPanChangeSupported())
     {
         return Status::UnsupportedCommand;
@@ -146,21 +149,21 @@ void ServerInstance::InvokeCommand(HandlerContext & ctxt)
     case Commands::GetActiveDatasetRequest::Id:
         HandleCommand<Commands::GetActiveDatasetRequest::DecodableType>(ctxt, [this](HandlerContext & ctx, const auto & req) {
             Thread::OperationalDataset dataset;
-            Status status = HandleGetActiveDatasetRequest(IsCommandOverCASESession(ctx), dataset);
+            Status status = HandleGetActiveDatasetRequest(ctx, dataset);
             AddDatasetResponse(ctx, status, dataset);
         });
         break;
     case Commands::GetPendingDatasetRequest::Id:
         HandleCommand<Commands::GetPendingDatasetRequest::DecodableType>(ctxt, [this](HandlerContext & ctx, const auto & req) {
             Thread::OperationalDataset dataset;
-            Status status = HandleGetPendingDatasetRequest(IsCommandOverCASESession(ctx), dataset);
+            Status status = HandleGetPendingDatasetRequest(ctx, dataset);
             AddDatasetResponse(ctx, status, dataset);
         });
         break;
     case Commands::SetActiveDatasetRequest::Id:
         HandleCommand<Commands::SetActiveDatasetRequest::DecodableType>(ctxt, [this](HandlerContext & ctx, const auto & req) {
             mPath         = ctx.mRequestPath;
-            Status status = HandleSetActiveDatasetRequest(IsCommandOverCASESession(ctx), &ctx.mCommandHandler, req);
+            Status status = HandleSetActiveDatasetRequest(ctx, req);
             if (status != Status::Success)
             {
                 // If status is not Success, we should immediately report the status. Otherwise the async work will report the
@@ -171,7 +174,7 @@ void ServerInstance::InvokeCommand(HandlerContext & ctxt)
         break;
     case Commands::SetPendingDatasetRequest::Id:
         HandleCommand<Commands::SetPendingDatasetRequest::DecodableType>(ctxt, [this](HandlerContext & ctx, const auto & req) {
-            Status status = HandleSetPendingDatasetRequest(IsCommandOverCASESession(ctx), req);
+            Status status = HandleSetPendingDatasetRequest(ctx, req);
             ctx.mCommandHandler.AddStatus(ctx.mRequestPath, status);
         });
         break;
