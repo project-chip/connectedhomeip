@@ -481,11 +481,13 @@ bool Instance::IsValidSupportedLocation(const AreaStructureWrapper & aLocation)
             shouldMapsBeNull = true;
         }
     }
-    else {
+    else
+    {
         shouldMapsBeNull = true;
     }
 
-    if (shouldMapsBeNull) {
+    if (shouldMapsBeNull)
+    {
         if (!aLocation.mapID.IsNull())
         {
             ChipLogDetail(Zcl, "IsValidSupportedLocation %u - map Id %u is not in empty supported map list", aLocation.areaID,

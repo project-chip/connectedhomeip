@@ -39,16 +39,14 @@ CHIP_ERROR RvcServiceAreaDelegate::Init()
     uint32_t supportedAreaID_D = 0x88888888;
 
     // Location A has name, floor number, uses map XX
-    GetInstance()->AddSupportedLocation(
-        supportedAreaID_A, DataModel::Nullable<uint32_t>(supportedMapId_XX), "My Location A"_span,
-        DataModel::Nullable<int16_t>(4), DataModel::Nullable<Globals::AreaTypeTag>(), DataModel::Nullable<Globals::LandmarkTag>(),
-        DataModel::Nullable<Globals::PositionTag>());
+    GetInstance()->AddSupportedLocation(supportedAreaID_A, DataModel::Nullable<uint32_t>(supportedMapId_XX), "My Location A"_span,
+                                        DataModel::Nullable<int16_t>(4), DataModel::Nullable<Globals::AreaTypeTag>(),
+                                        DataModel::Nullable<Globals::LandmarkTag>(), DataModel::Nullable<Globals::PositionTag>());
 
     // Location B has name, uses map XX
-    GetInstance()->AddSupportedLocation(
-        supportedAreaID_B, DataModel::Nullable<uint32_t>(supportedMapId_XX), "My Location B"_span,
-        DataModel::Nullable<int16_t>(), DataModel::Nullable<Globals::AreaTypeTag>(), DataModel::Nullable<Globals::LandmarkTag>(),
-        DataModel::Nullable<Globals::PositionTag>());
+    GetInstance()->AddSupportedLocation(supportedAreaID_B, DataModel::Nullable<uint32_t>(supportedMapId_XX), "My Location B"_span,
+                                        DataModel::Nullable<int16_t>(), DataModel::Nullable<Globals::AreaTypeTag>(),
+                                        DataModel::Nullable<Globals::LandmarkTag>(), DataModel::Nullable<Globals::PositionTag>());
 
     // Location C has full SemData, no name, Map YY
     GetInstance()->AddSupportedLocation(supportedAreaID_C, DataModel::Nullable<uint32_t>(supportedMapId_YY), CharSpan(),
@@ -58,9 +56,8 @@ CHIP_ERROR RvcServiceAreaDelegate::Init()
                                         DataModel::Nullable<Globals::PositionTag>(Globals::PositionTag::kNextTo));
 
     // Location D has null values for all HomeLocationStruct fields, Map YY
-    GetInstance()->AddSupportedLocation(supportedAreaID_D, DataModel::Nullable<uint32_t>(supportedMapId_YY),
-                                        "My Location D"_span, DataModel::Nullable<int16_t>(),
-                                        DataModel::Nullable<Globals::AreaTypeTag>(),
+    GetInstance()->AddSupportedLocation(supportedAreaID_D, DataModel::Nullable<uint32_t>(supportedMapId_YY), "My Location D"_span,
+                                        DataModel::Nullable<int16_t>(), DataModel::Nullable<Globals::AreaTypeTag>(),
                                         DataModel::Nullable<Globals::LandmarkTag>(Globals::LandmarkTag::kCouch),
                                         DataModel::Nullable<Globals::PositionTag>(Globals::PositionTag::kNextTo));
 

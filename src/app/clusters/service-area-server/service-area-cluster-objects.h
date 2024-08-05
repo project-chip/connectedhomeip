@@ -86,7 +86,7 @@ struct AreaStructureWrapper : public chip::app::Clusters::ServiceArea::Structs::
     AreaStructureWrapper & operator=(const AreaStructureWrapper & aOther)
     {
         areaID = aOther.areaID;
-        mapID = aOther.mapID;
+        mapID  = aOther.mapID;
 
         if (aOther.areaDesc.locationInfo.IsNull())
         {
