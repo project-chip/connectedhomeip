@@ -120,9 +120,7 @@ k32w0_executable("contact_sensor_app") {
     "${k32w0_platform_dir}/app/support:freertos_mbedtls_utils",
   ]
 
-  defines += [
-      "CONNECTIVITY_MANAGER_THREAD_DEVICE_TYPE=ConnectivityManager::kThreadDeviceType_SleepyEndDevice"
-  ]
+  defines += [ "CONNECTIVITY_MANAGER_THREAD_DEVICE_TYPE=ConnectivityManager::kThreadDeviceType_SleepyEndDevice" ]
 
   deps += [
     "${chip_root}/third_party/openthread/repo:libopenthread-cli-mtd",

@@ -16,38 +16,38 @@ network.
 
 <hr>
 
-- [CHIP K32W061 Lighting Example Application](#chip-k32w061-lighting-example-application)
-  - [Introduction](#introduction)
-    - [SE051H Secure Element](#se051h-secure-element)
-    - [Bluetooth LE Advertising](#bluetooth-le-advertising)
-    - [Bluetooth LE Rendezvous](#bluetooth-le-rendezvous)
-    - [Thread Provisioning](#thread-provisioning)
-  - [Device UI](#device-ui)
-    - [No expansion board](#no-expansion-board)
-    - [Identify cluster LED state](#identify-cluster-led-state)
-  - [Building](#building)
-    - [Overwrite board config files](#overwrite-board-config-files)
-    - [Known issues building](#known-issues-building)
-  - [Rotating device id](#rotating-device-id)
-  - [Manufacturing data](#manufacturing-data)
-  - [Flashing and debugging](#flashing-and-debugging)
-    - [Using DK6programmer](#using-dk6programmer)
-    - [Using MCUXpresso](#using-mcuxpresso)
-  - [Pigweed tokenizer](#pigweed-tokenizer)
-    - [Detokenizer script](#detokenizer-script)
-    - [Notes](#notes)
-    - [Known issues tokenizer](#known-issues-tokenizer)
-  - [NXP Ultrafast P256 ECC Library](#nxp-ultrafast-p256-ecc-library)
-    - [Building steps](#building-steps)
-  - [Tinycrypt ECC library](#tinycrypt-ecc-library)
-    - [Building steps](#building-steps-1)
-  - [OTA](#ota)
-    - [OTA Testing](#ota-testing)
-    - [Known issues OTA](#known-issues-ota)
+-   [CHIP K32W061 Lighting Example Application](#chip-k32w061-lighting-example-application)
+    -   [Introduction](#introduction)
+        -   [SE051H Secure Element](#se051h-secure-element)
+        -   [Bluetooth LE Advertising](#bluetooth-le-advertising)
+        -   [Bluetooth LE Rendezvous](#bluetooth-le-rendezvous)
+        -   [Thread Provisioning](#thread-provisioning)
+    -   [Device UI](#device-ui)
+        -   [No expansion board](#no-expansion-board)
+        -   [Identify cluster LED state](#identify-cluster-led-state)
+    -   [Building](#building)
+        -   [Overwrite board config files](#overwrite-board-config-files)
+        -   [Known issues building](#known-issues-building)
+    -   [Rotating device id](#rotating-device-id)
+    -   [Manufacturing data](#manufacturing-data)
+    -   [Flashing and debugging](#flashing-and-debugging)
+        -   [Using DK6programmer](#using-dk6programmer)
+        -   [Using MCUXpresso](#using-mcuxpresso)
+    -   [Pigweed tokenizer](#pigweed-tokenizer)
+        -   [Detokenizer script](#detokenizer-script)
+        -   [Notes](#notes)
+        -   [Known issues tokenizer](#known-issues-tokenizer)
+    -   [NXP Ultrafast P256 ECC Library](#nxp-ultrafast-p256-ecc-library)
+        -   [Building steps](#building-steps)
+    -   [Tinycrypt ECC library](#tinycrypt-ecc-library)
+        -   [Building steps](#building-steps-1)
+    -   [OTA](#ota)
+        -   [OTA Testing](#ota-testing)
+        -   [Known issues OTA](#known-issues-ota)
 
 ## Introduction
 
-![K32W061 DK6](../../../../third_party/nxp/nxp_matter_support/examples/platform//k32w0/doc/images/k32w-dk6.jpg)
+![K32W061 DK6](../../../platform/nxp/k32w0/doc/images/k32w-dk6.jpg)
 
 The K32W061 lighting example application provides a working demonstration of a
 light bulb device, built using the Project CHIP codebase and the NXP K32W061
@@ -77,7 +77,7 @@ Deployment of this firmware configuration requires the K32W061 board setups
 using the K32W061 module board, SE051 Expansion board and Generic Expansion
 board as shown below:
 
-![SE051H  + K32W061 DK6](../../../../third_party/nxp/nxp_matter_support/examples/platform//k32w0/doc/images/k32w-se.jpg)
+![SE051H  + K32W061 DK6](../../../platform/nxp/k32w0/doc/images/k32w-se.jpg)
 
 The SE051H Secure Element extension may be used for best in class security and
 offloading some of the Project CHIP cryptographic operations. Depending on your
@@ -230,8 +230,8 @@ user@ubuntu:~/Desktop/git/connectedhomeip$ source scripts/bootstrap.sh
 user@ubuntu:~/Desktop/git/connectedhomeip$ third_party/nxp/nxp_matter_support/scripts/update_nxp_sdk.py --platform k32w0
 ```
 
-Note: By default update_nxp_sdk.py will try to initialize all NXP
-SDKs. Arg "-- help" could be used to view all available options.
+Note: By default update_nxp_sdk.py will try to initialize all NXP SDKs. Arg "--
+help" could be used to view all available options.
 
 -   Start building the application:
 
@@ -332,8 +332,8 @@ See
 [Guide for writing manufacturing data on NXP devices](../../../../docs/guides/nxp/nxp_manufacturing_flow.md).
 
 There are factory data generated binaries available in
-`third_party/nxp/nxp_matter_support/examples/platform/k32w0/scripts/demo_generated_factory_data` folder.
-These are based on the DAC, PAI and PAA certificates found in
+`third_party/nxp/nxp_matter_support/examples/platform/k32w0/scripts/demo_generated_factory_data`
+folder. These are based on the DAC, PAI and PAA certificates found in
 scripts/tools/nxp/demo_generated_certs folder. The demo_factory_data_dut1.bin
 uses the DAC certificate and private key found in
 `third_party/nxp/nxp_matter_support/examples/platform/k32w0/scripts/demo_generated_factory_data/dac/dut1`
@@ -351,7 +351,7 @@ Regarding factory data provider, there are two options:
 -   use the default factory data provider: `FactoryDataProviderImpl` by setting
     `chip_with_factory_data=1` in the gn build command.
 -   use a custom factory data provider: please see
-    [Guide for implementing a custom factory data provider](../../../../third_party/nxp/nxp_matter_support/examples/platform//k32w0/common/README.md).
+    [Guide for implementing a custom factory data provider](../../../platform/nxp/k32w0/doc/CustomFactoryDataProvider.md).
     This can be enabled when `chip_with_factory_data=1` by setting
     `use_custom_factory_provider=1` in the gn build command.
 
@@ -364,13 +364,14 @@ Instructions to program the firmware can be found also at
 
 The application binary's path is _out/debug/chip-k32w0x-light-example.bin_.
 
-DK6Programmer can be used for flashing the application. There are two available versions of the
-DK6Programmer tool.
+DK6Programmer can be used for flashing the application. There are two available
+versions of the DK6Programmer tool.
 
 The legacy version consists of a Windows executable found inside the
-[SDK](https://mcuxpresso.nxp.com/en/welcome) at path `tools/JN-SW-4407-DK6-Flash-Programmer`. This is a
-Windows application that can be installed using the .exe file. Once the
-application is installed, the COM port for K32W061 must be identified:
+[SDK](https://mcuxpresso.nxp.com/en/welcome) at path
+`tools/JN-SW-4407-DK6-Flash-Programmer`. This is a Windows application that can
+be installed using the .exe file. Once the application is installed, the COM
+port for K32W061 must be identified:
 
 ```
 C:\nxp\DK6ProductionFlashProgrammer>DK6Programmer.exe  --list
@@ -384,16 +385,20 @@ Once the COM port is identified, the required binary can be flashed:
 DK6Programmer.exe -V2 -s <COM_PORT> -P 1000000 -Y -p FLASH@0x4000="chip-k32w0x-light-example.bin"
 ```
 
-> **_Note:_** The above example takes into account that the binary uses the `chip_enable_ota_requestor=true` option.
-The address offset corresponds to the space left for the SSBL binary and the OTA space for the SSBL. If
-`chip_enable_ota_requestor` is set to `false`, then `0x4000` needs to be replaced with `0x0`.
+> **_Note:_** The above example takes into account that the binary uses the
+> `chip_enable_ota_requestor=true` option. The address offset corresponds to the
+> space left for the SSBL binary and the OTA space for the SSBL. If
+> `chip_enable_ota_requestor` is set to `false`, then `0x4000` needs to be
+> replaced with `0x0`.
 
 DK6 Flash Programmer tool has also been integrated part of
-[NXP Secure Provisioning SDK (SPSDK)](https://github.com/nxp-mcuxpresso/spsdk). This tool is supported by
-environments like Windows, Linux or Mac.
+[NXP Secure Provisioning SDK (SPSDK)](https://github.com/nxp-mcuxpresso/spsdk).
+This tool is supported by environments like Windows, Linux or Mac.
 
-SPSDK can be installed and run from a Python environment using [these instructions](https://spsdk.readthedocs.io/en/latest/usage/installation.html).
-This enables the user to have transparent access to the dk6 programming tool through SPSDK.
+`SPSDK` can be installed and run from a Python environment using
+[these instructions](https://spsdk.readthedocs.io/en/latest/usage/installation.html).
+This enables the user to have transparent access to the dk6 programming tool
+through `SPSDK`.
 
 ```
 # after specific environment installation steps
@@ -409,14 +414,17 @@ $ spsdk --help
 ...
 ```
 
-Dependencies for the dk6prog module can be installed using the following command, more details [here](https://spsdk.readthedocs.io/en/latest/usage/installation.html#dk6-tools):
+Dependencies for the `dk6prog` module can be installed using the following
+command, more details
+[here](https://spsdk.readthedocs.io/en/latest/usage/installation.html#dk6-tools):
 
 ```
 $ pip install spsdk[dk6]
 ```
 
-The SPSDK installation adds dk6prog as executable to system path, so user can use directly `dk6prog` from terminal.
-The following commands are to be used to write the chip-k32w0x-light-example binary to the board.
+The `SPSDK` installation adds `dk6prog` as executable to system path, so user
+can use directly `dk6prog` from terminal. The following commands are to be used
+to write the chip-k32w0x-light-example binary to the board.
 
 ```
 $ dk6prog listdev
@@ -429,10 +437,11 @@ $ dk6prog -d DN038ZH3 write 0x4000 ~/path/to/bin/chip-k32w0x-light-example.bin
 This is an experimental utility. Use with caution!
 
 Writing memory  [####################################]  100%
-Writen 596450 bytes to memory ID 0 at address 0x4000
+Written 596450 bytes to memory ID 0 at address 0x4000
 ```
 
-> **_Note:_** Running `dk6prog` from Windows OS command line requires an integer value for DEVICE ID.
+> **_Note:_** Running `dk6prog` from Windows OS command line requires an integer
+> value for DEVICE ID.
 
 ```
 C:\nxp\spsdk>dk6prog listdev
@@ -464,15 +473,18 @@ Detected DEVICE: UNKNOWN
   RAM1     7           0x4020000      0x10000   0x1           RAM           Write Enabled
 ```
 
-> **_Note:_** The above example takes into account that the binary uses the `chip_enable_ota_requestor=true` option.
-The address offset corresponds to the space left for the SSBL binary and the OTA space for the SSBL. If
-`chip_enable_ota_requestor` is set to `false`, then `0x4000` needs to be replaced with `0x0`.
+> **_Note:_** The above example takes into account that the binary uses the
+> `chip_enable_ota_requestor=true` option. The address offset corresponds to the
+> space left for the SSBL binary and the OTA space for the SSBL. If
+> `chip_enable_ota_requestor` is set to `false`, then `0x4000` needs to be
+> replaced with `0x0`.
 
 ### Using MCUXpresso
 
 If flashing and debugging is required, MCUXpresso can be used as instructed in
 [MCUXpresso flashing and debugging instructions](https://github.com/openthread/ot-nxp/tree/main/src/k32w0/k32w061#using-mcuxpresso-ide).
-The file needed to be used in MCUXpresso is _out/debug/chip-k32w0x-light-example_.
+The file needed to be used in MCUXpresso is
+_out/debug/chip-k32w0x-light-example_.
 
 ## Pigweed tokenizer
 
@@ -565,34 +577,37 @@ In order to use the Tinycrypt ECC library, use the following build arguments:
 
 ## OTA
 
-Over the air updates (OTA) require several software components running on the K32W0x1.
-Firstly, a Secondary Stage Bootloader (SSBL) is required written in the first part of the
-internal flash memory, usually starting at address 0x0. This enables the board to boot and 
-check if a new OTA binary has been received. If this is true, the bootloader writes the OTA
-binary to the appropriate storage, internal and/or external flash, after which it reboots
-the board. If no new OTA binaries have been found, then the bootloader gives execution control
-to the application.
+Over the air updates (OTA) require several software components running on the
+K32W0x1. Firstly, a Secondary Stage Bootloader (SSBL) is required written in the
+first part of the internal flash memory, usually starting at address 0x0. This
+enables the board to boot and check if a new OTA binary has been received. If
+this is true, the bootloader writes the OTA binary to the appropriate storage,
+internal and/or external flash, after which it reboots the board. If no new OTA
+binaries have been found, then the bootloader gives execution control to the
+application.
 
-The internal flash needs to be prepared for the OTA process. First 16K of the internal flash
-needs to be populated with SSBL related data while the last 8.5K of flash space is holding flash
-configuration related data. The space between these two zones will be filled by the application.
-More details regarding the internal flash space can be found in the 
-[linker file](../../../platform/nxp/k32w0/app/ldscripts/chip-k32w0x-linker.ld).
+The internal flash needs to be prepared for the OTA process. First 16K of the
+internal flash needs to be populated with SSBL related data while the last 8.5K
+of flash space is holding flash configuration related data. The space between
+these two zones will be filled by the application. More details regarding the
+internal flash space can be found in the
+[linker file](../../../../third_party/nxp/nxp_matter_support/examples/platform/k32w0/app/ldscripts/chip-k32w0x-linker.ld).
 
-The steps for building the SSBL binary with appropriate configuration and writing to the board
-the binary and other OTA related configurations are descrived in the
+The steps for building the SSBL binary with appropriate configuration and
+writing to the board the binary and other OTA related configurations are
+described in the
 [K32W0x1 OTA guide](../../../../docs/guides/nxp/nxp_k32w0_ota_guide.md).
 
-Note that the application needs to be built using the `chip_enable_ota_requestor=true` option.
-This is enabled in the configuration by default if no `chip_enable_ota_requestor` explicit setting
-is done.
+Note that the application needs to be built using the
+`chip_enable_ota_requestor=true` option. This is enabled in the configuration by
+default if no `chip_enable_ota_requestor` explicit setting is done.
 
 ### OTA Testing
 
 The OTA topology used for OTA testing is illustrated in the figure below.
 Topology is similar with the one used for Matter Test Events.
 
-![OTA_TOPOLOGY](../../../../third_party/nxp/nxp_matter_support/examples/platform//k32w0/doc/images/ota_topology.JPG)
+![OTA_TOPOLOGY](../../../platform/nxp/k32w0/doc/images/ota_topology.JPG)
 
 The concept for OTA is the next one:
 
@@ -681,9 +696,10 @@ A note regarding OTA image header version (`-vn` option). An application binary
 has its own software version, given by
 `CHIP_DEVICE_CONFIG_DEVICE_SOFTWARE_VERSION` (`1` by default), which can be
 overwritten. For having a correct OTA process, the OTA header version should be
-the same as the binary embedded software version. When building the update image,
-the build arguments `nxp_software_version=2` and `nxp_sofware_version_string=\"2.0\"`
-can be added to the gn gen command in order to specify the upgraded version.
+the same as the binary embedded software version. When building the update
+image, the build arguments `nxp_software_version=2` and
+`nxp_sofware_version_string=\"2.0\"` can be added to the gn gen command in order
+to specify the upgraded version.
 
 Start the OTA Provider Application:
 
