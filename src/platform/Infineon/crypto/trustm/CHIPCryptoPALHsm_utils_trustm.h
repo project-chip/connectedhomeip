@@ -51,7 +51,7 @@ extern optiga_util_t * p_local_util;
     }
 
 static const uint8_t trustm_magic_no[] = IFX_CRYPTO_KEY_MAGIC;
-static const uint8_t DA_KEY_ID[]       = { 0xE0, 0xF0 };
+static const uint8_t DA_KEY_ID[]       = { 0xF0, 0xE0 }; // OID --> 0xE0F0
 /* Open session to trustm */
 void trustm_Open(void);
 void read_certificate_from_optiga(uint16_t optiga_oid, char * cert_pem, uint16_t * cert_pem_length);
