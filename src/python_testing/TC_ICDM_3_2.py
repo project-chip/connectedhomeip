@@ -17,9 +17,8 @@
 #
 import logging
 import os
-from dataclasses import dataclass
 import time
-
+from dataclasses import dataclass
 
 import chip.clusters as Clusters
 from chip.interaction_model import InteractionModelError, Status
