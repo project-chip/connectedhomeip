@@ -40,6 +40,7 @@ CHIP_ERROR RvcServiceAreaDelegate::Init()
     // Location A has name, floor number, uses map XX
     GetInstance()->AddSupportedLocation(
         supportedAreaID_A, DataModel::Nullable<uint_fast8_t>(supportedMapId_XX), "My Location A"_span,
+        supportedLocationId_A, DataModel::Nullable<uint_fast8_t>(supportedMapId_XX), "My Location A"_span,
         DataModel::Nullable<int16_t>(4), DataModel::Nullable<Globals::AreaTypeTag>(), DataModel::Nullable<Globals::LandmarkTag>(),
         DataModel::Nullable<Globals::PositionTag>(), DataModel::Nullable<Globals::FloorSurfaceTag>());
 
