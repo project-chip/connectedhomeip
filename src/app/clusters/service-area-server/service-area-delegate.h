@@ -49,7 +49,7 @@ public:
     virtual ~Delegate() = default;
 
     /**
-     * Due to the coupling between the Delegate and Instance classes via the references they have to each other, 
+     * Due to the coupling between the Delegate and Instance classes via the references they have to each other,
      * copying a Delegate object might make things confusing.
      */
     Delegate(const Delegate &)             = delete;
