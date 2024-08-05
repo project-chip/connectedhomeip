@@ -194,6 +194,5 @@
     "[python]": {
         "editor.defaultFormatter": "ms-python.autopep8"
     },
-    "autopep8.args": ["--max-line-length", "132"],
-    "git.detectSubmodules": false,
+    "autopep8.args": ["--max-line-length", "132"]
 }
