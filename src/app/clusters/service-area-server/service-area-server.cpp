@@ -472,7 +472,7 @@ bool Instance::IsValidSupportedLocation(const AreaStructureWrapper & aLocation)
         }
     }
 
-    // The mapID field SHALL be null if the SupportedMaps is not supported on the SupportedMaps is an empty list.
+    // The mapID field SHALL be null if SupportedMaps is not supported or SupportedMaps is an empty list.
     bool shouldMapsBeNull = false;
     if (mFeature.Has(Feature::kMaps))
     {

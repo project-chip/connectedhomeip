@@ -97,11 +97,7 @@ struct AreaStructureWrapper : public chip::app::Clusters::ServiceArea::Structs::
             areaDesc.locationInfo.SetNonNull();
 
             // deep copy the name.
-            auto sizeToCopy = sizeof(mLocationNameBuffer);
-            if (aOther.areaDesc.locationInfo.Value().locationName.size() < sizeToCopy)
-            {
-                sizeToCopy = aOther.areaDesc.locationInfo.Value().locationName.size();
-            }
+            auto sizeToCopy = std::min(sizeof(mLocationNameBuffer), aOther.areaDesc.locationInfo.Value().locationName.size());
             memcpy(mLocationNameBuffer, aOther.areaDesc.locationInfo.Value().locationName.data(), sizeToCopy);
             areaDesc.locationInfo.Value().locationName = CharSpan(mLocationNameBuffer, sizeToCopy);
 
@@ -192,22 +188,9 @@ struct AreaStructureWrapper : public chip::app::Clusters::ServiceArea::Structs::
         // this assumes areaDesc structure was created above, if appropriate
         if (!areaDesc.locationInfo.IsNull())
         {
-            if (aLocationName.empty())
-            {
-                areaDesc.locationInfo.Value().locationName = CharSpan(mLocationNameBuffer, 0);
-            }
-            else if (aLocationName.size() > sizeof(mLocationNameBuffer))
-            {
-                // Save the truncated name that fits into available size.
-                memcpy(mLocationNameBuffer, aLocationName.data(), sizeof(mLocationNameBuffer));
-                areaDesc.locationInfo.Value().locationName = CharSpan(mLocationNameBuffer, sizeof(mLocationNameBuffer));
-            }
-            else
-            {
-                // Save full name.
-                memcpy(mLocationNameBuffer, aLocationName.data(), aLocationName.size());
-                areaDesc.locationInfo.Value().locationName = CharSpan(mLocationNameBuffer, aLocationName.size());
-            }
+            auto sizeToCopy = std::min(sizeof(mLocationNameBuffer), aLocationName.size());
+            memcpy(mLocationNameBuffer, aLocationName.data(), sizeToCopy);
+            areaDesc.locationInfo.Value().locationName = CharSpan(mLocationNameBuffer, sizeToCopy);
         }
     }
 

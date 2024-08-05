@@ -49,7 +49,8 @@ public:
     virtual ~Delegate() = default;
 
     /**
-     * Stop this class objects from being copied.
+     * Due to the coupling between the Delegate and Instance classes via the references they have to each other, 
+     * copying a Delegate object might make things confusing.
      */
     Delegate(const Delegate &)             = delete;
     Delegate & operator=(const Delegate &) = delete;
