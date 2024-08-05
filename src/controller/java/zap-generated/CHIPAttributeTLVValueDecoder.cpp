@@ -29898,7 +29898,7 @@ jobject DecodeAttributeValue(const app::ConcreteAttributePath & aPath, TLV::TLVR
             jobject value;
             std::string valueClassName     = "java/lang/Integer";
             std::string valueCtorSignature = "(I)V";
-            jint jnivalue                  = static_cast<jint>(cppValue);
+            jint jnivalue                  = static_cast<jint>(cppValue.Raw());
             chip::JniReferences::GetInstance().CreateBoxedObject<jint>(valueClassName.c_str(), valueCtorSignature.c_str(), jnivalue,
                                                                        value);
             return value;
@@ -30010,7 +30010,7 @@ jobject DecodeAttributeValue(const app::ConcreteAttributePath & aPath, TLV::TLVR
             jobject value;
             std::string valueClassName     = "java/lang/Integer";
             std::string valueCtorSignature = "(I)V";
-            jint jnivalue                  = static_cast<jint>(cppValue);
+            jint jnivalue                  = static_cast<jint>(cppValue.Raw());
             chip::JniReferences::GetInstance().CreateBoxedObject<jint>(valueClassName.c_str(), valueCtorSignature.c_str(), jnivalue,
                                                                        value);
             return value;
@@ -31268,28 +31268,18 @@ jobject DecodeAttributeValue(const app::ConcreteAttributePath & aPath, TLV::TLVR
                     chip::JniReferences::GetInstance().AddToList(newElement_0_transitions, newElement_2);
                 }
                 jobject newElement_0_builtIn;
-                if (!entry_0.builtIn.HasValue())
+                if (entry_0.builtIn.IsNull())
                 {
-                    chip::JniReferences::GetInstance().CreateOptional(nullptr, newElement_0_builtIn);
+                    newElement_0_builtIn = nullptr;
                 }
                 else
                 {
-                    jobject newElement_0_builtInInsideOptional;
-                    if (entry_0.builtIn.Value().IsNull())
-                    {
-                        newElement_0_builtInInsideOptional = nullptr;
-                    }
-                    else
-                    {
-                        std::string newElement_0_builtInInsideOptionalClassName     = "java/lang/Boolean";
-                        std::string newElement_0_builtInInsideOptionalCtorSignature = "(Z)V";
-                        jboolean jninewElement_0_builtInInsideOptional = static_cast<jboolean>(entry_0.builtIn.Value().Value());
-                        chip::JniReferences::GetInstance().CreateBoxedObject<jboolean>(
-                            newElement_0_builtInInsideOptionalClassName.c_str(),
-                            newElement_0_builtInInsideOptionalCtorSignature.c_str(), jninewElement_0_builtInInsideOptional,
-                            newElement_0_builtInInsideOptional);
-                    }
-                    chip::JniReferences::GetInstance().CreateOptional(newElement_0_builtInInsideOptional, newElement_0_builtIn);
+                    std::string newElement_0_builtInClassName     = "java/lang/Boolean";
+                    std::string newElement_0_builtInCtorSignature = "(Z)V";
+                    jboolean jninewElement_0_builtIn              = static_cast<jboolean>(entry_0.builtIn.Value());
+                    chip::JniReferences::GetInstance().CreateBoxedObject<jboolean>(newElement_0_builtInClassName.c_str(),
+                                                                                   newElement_0_builtInCtorSignature.c_str(),
+                                                                                   jninewElement_0_builtIn, newElement_0_builtIn);
                 }
 
                 jclass scheduleStructStructClass_1;
@@ -31304,7 +31294,7 @@ jobject DecodeAttributeValue(const app::ConcreteAttributePath & aPath, TLV::TLVR
                 jmethodID scheduleStructStructCtor_1;
                 err = chip::JniReferences::GetInstance().FindMethod(
                     env, scheduleStructStructClass_1, "<init>",
-                    "([BLjava/lang/Integer;Ljava/util/Optional;Ljava/util/Optional;Ljava/util/ArrayList;Ljava/util/Optional;)V",
+                    "([BLjava/lang/Integer;Ljava/util/Optional;Ljava/util/Optional;Ljava/util/ArrayList;Ljava/lang/Boolean;)V",
                     &scheduleStructStructCtor_1);
                 if (err != CHIP_NO_ERROR || scheduleStructStructCtor_1 == nullptr)
                 {
@@ -31317,22 +31307,6 @@ jobject DecodeAttributeValue(const app::ConcreteAttributePath & aPath, TLV::TLVR
                                               newElement_0_transitions, newElement_0_builtIn);
                 chip::JniReferences::GetInstance().AddToList(value, newElement_0);
             }
-            return value;
-        }
-        case Attributes::PresetsSchedulesEditable::Id: {
-            using TypeInfo = Attributes::PresetsSchedulesEditable::TypeInfo;
-            TypeInfo::DecodableType cppValue;
-            *aError = app::DataModel::Decode(aReader, cppValue);
-            if (*aError != CHIP_NO_ERROR)
-            {
-                return nullptr;
-            }
-            jobject value;
-            std::string valueClassName     = "java/lang/Boolean";
-            std::string valueCtorSignature = "(Z)V";
-            jboolean jnivalue              = static_cast<jboolean>(cppValue);
-            chip::JniReferences::GetInstance().CreateBoxedObject<jboolean>(valueClassName.c_str(), valueCtorSignature.c_str(),
-                                                                           jnivalue, value);
             return value;
         }
         case Attributes::SetpointHoldExpiryTimestamp::Id: {

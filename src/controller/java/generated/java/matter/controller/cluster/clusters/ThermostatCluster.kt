@@ -22,7 +22,6 @@ import java.util.logging.Level
 import java.util.logging.Logger
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.transform
-import matter.controller.BooleanSubscriptionState
 import matter.controller.ByteSubscriptionState
 import matter.controller.InvokeRequest
 import matter.controller.InvokeResponse
@@ -52,6 +51,12 @@ class ThermostatCluster(private val controller: MatterController, private val en
     val dayOfWeekForSequence: UByte,
     val modeForSequence: UByte,
     val transitions: List<ThermostatClusterWeeklyScheduleTransitionStruct>,
+  )
+
+  class AtomicResponse(
+    val statusCode: UByte,
+    val attributeStatus: List<ThermostatClusterAtomicAttributeStatusStruct>,
+    val timeout: UShort?,
   )
 
   class LocalTemperatureAttribute(val value: Short?)
@@ -522,17 +527,29 @@ class ThermostatCluster(private val controller: MatterController, private val en
     logger.log(Level.FINE, "Invoke command succeeded: ${response}")
   }
 
-  suspend fun startPresetsSchedulesEditRequest(
-    timeoutSeconds: UShort,
+  suspend fun atomicRequest(
+    requestType: UByte,
+    attributeRequests: List<UInt>,
+    timeout: UShort?,
     timedInvokeTimeout: Duration? = null,
-  ) {
-    val commandId: UInt = 7u
+  ): AtomicResponse {
+    val commandId: UInt = 254u
 
     val tlvWriter = TlvWriter()
     tlvWriter.startStructure(AnonymousTag)
 
-    val TAG_TIMEOUT_SECONDS_REQ: Int = 0
-    tlvWriter.put(ContextSpecificTag(TAG_TIMEOUT_SECONDS_REQ), timeoutSeconds)
+    val TAG_REQUEST_TYPE_REQ: Int = 0
+    tlvWriter.put(ContextSpecificTag(TAG_REQUEST_TYPE_REQ), requestType)
+
+    val TAG_ATTRIBUTE_REQUESTS_REQ: Int = 1
+    tlvWriter.startArray(ContextSpecificTag(TAG_ATTRIBUTE_REQUESTS_REQ))
+    for (item in attributeRequests.iterator()) {
+      tlvWriter.put(AnonymousTag, item)
+    }
+    tlvWriter.endArray()
+
+    val TAG_TIMEOUT_REQ: Int = 2
+    timeout?.let { tlvWriter.put(ContextSpecificTag(TAG_TIMEOUT_REQ), timeout) }
     tlvWriter.endStructure()
 
     val request: InvokeRequest =
@@ -544,42 +561,64 @@ class ThermostatCluster(private val controller: MatterController, private val en
 
     val response: InvokeResponse = controller.invoke(request)
     logger.log(Level.FINE, "Invoke command succeeded: ${response}")
-  }
 
-  suspend fun cancelPresetsSchedulesEditRequest(timedInvokeTimeout: Duration? = null) {
-    val commandId: UInt = 8u
+    val tlvReader = TlvReader(response.payload)
+    tlvReader.enterStructure(AnonymousTag)
+    val TAG_STATUS_CODE: Int = 0
+    var statusCode_decoded: UByte? = null
 
-    val tlvWriter = TlvWriter()
-    tlvWriter.startStructure(AnonymousTag)
-    tlvWriter.endStructure()
+    val TAG_ATTRIBUTE_STATUS: Int = 1
+    var attributeStatus_decoded: List<ThermostatClusterAtomicAttributeStatusStruct>? = null
 
-    val request: InvokeRequest =
-      InvokeRequest(
-        CommandPath(endpointId, clusterId = CLUSTER_ID, commandId),
-        tlvPayload = tlvWriter.getEncoded(),
-        timedRequest = timedInvokeTimeout,
-      )
+    val TAG_TIMEOUT: Int = 2
+    var timeout_decoded: UShort? = null
 
-    val response: InvokeResponse = controller.invoke(request)
-    logger.log(Level.FINE, "Invoke command succeeded: ${response}")
-  }
+    while (!tlvReader.isEndOfContainer()) {
+      val tag = tlvReader.peekElement().tag
 
-  suspend fun commitPresetsSchedulesRequest(timedInvokeTimeout: Duration? = null) {
-    val commandId: UInt = 9u
+      if (tag == ContextSpecificTag(TAG_STATUS_CODE)) {
+        statusCode_decoded = tlvReader.getUByte(tag)
+      }
 
-    val tlvWriter = TlvWriter()
-    tlvWriter.startStructure(AnonymousTag)
-    tlvWriter.endStructure()
+      if (tag == ContextSpecificTag(TAG_ATTRIBUTE_STATUS)) {
+        attributeStatus_decoded =
+          buildList<ThermostatClusterAtomicAttributeStatusStruct> {
+            tlvReader.enterArray(tag)
+            while (!tlvReader.isEndOfContainer()) {
+              add(ThermostatClusterAtomicAttributeStatusStruct.fromTlv(AnonymousTag, tlvReader))
+            }
+            tlvReader.exitContainer()
+          }
+      }
 
-    val request: InvokeRequest =
-      InvokeRequest(
-        CommandPath(endpointId, clusterId = CLUSTER_ID, commandId),
-        tlvPayload = tlvWriter.getEncoded(),
-        timedRequest = timedInvokeTimeout,
-      )
+      if (tag == ContextSpecificTag(TAG_TIMEOUT)) {
+        timeout_decoded =
+          if (tlvReader.isNull()) {
+            tlvReader.getNull(tag)
+            null
+          } else {
+            if (tlvReader.isNextTag(tag)) {
+              tlvReader.getUShort(tag)
+            } else {
+              null
+            }
+          }
+      } else {
+        tlvReader.skipElement()
+      }
+    }
 
-    val response: InvokeResponse = controller.invoke(request)
-    logger.log(Level.FINE, "Invoke command succeeded: ${response}")
+    if (statusCode_decoded == null) {
+      throw IllegalStateException("statusCode not found in TLV")
+    }
+
+    if (attributeStatus_decoded == null) {
+      throw IllegalStateException("attributeStatus not found in TLV")
+    }
+
+    tlvReader.exitContainer()
+
+    return AtomicResponse(statusCode_decoded, attributeStatus_decoded, timeout_decoded)
   }
 
   suspend fun readLocalTemperatureAttribute(): LocalTemperatureAttribute {
@@ -7437,101 +7476,8 @@ class ThermostatCluster(private val controller: MatterController, private val en
     }
   }
 
-  suspend fun readPresetsSchedulesEditableAttribute(): Boolean? {
-    val ATTRIBUTE_ID: UInt = 82u
-
-    val attributePath =
-      AttributePath(endpointId = endpointId, clusterId = CLUSTER_ID, attributeId = ATTRIBUTE_ID)
-
-    val readRequest = ReadRequest(eventPaths = emptyList(), attributePaths = listOf(attributePath))
-
-    val response = controller.read(readRequest)
-
-    if (response.successes.isEmpty()) {
-      logger.log(Level.WARNING, "Read command failed")
-      throw IllegalStateException("Read command failed with failures: ${response.failures}")
-    }
-
-    logger.log(Level.FINE, "Read command succeeded")
-
-    val attributeData =
-      response.successes.filterIsInstance<ReadData.Attribute>().firstOrNull {
-        it.path.attributeId == ATTRIBUTE_ID
-      }
-
-    requireNotNull(attributeData) { "Presetsscheduleseditable attribute not found in response" }
-
-    // Decode the TLV data into the appropriate type
-    val tlvReader = TlvReader(attributeData.data)
-    val decodedValue: Boolean? =
-      if (tlvReader.isNextTag(AnonymousTag)) {
-        tlvReader.getBoolean(AnonymousTag)
-      } else {
-        null
-      }
-
-    return decodedValue
-  }
-
-  suspend fun subscribePresetsSchedulesEditableAttribute(
-    minInterval: Int,
-    maxInterval: Int,
-  ): Flow<BooleanSubscriptionState> {
-    val ATTRIBUTE_ID: UInt = 82u
-    val attributePaths =
-      listOf(
-        AttributePath(endpointId = endpointId, clusterId = CLUSTER_ID, attributeId = ATTRIBUTE_ID)
-      )
-
-    val subscribeRequest: SubscribeRequest =
-      SubscribeRequest(
-        eventPaths = emptyList(),
-        attributePaths = attributePaths,
-        minInterval = Duration.ofSeconds(minInterval.toLong()),
-        maxInterval = Duration.ofSeconds(maxInterval.toLong()),
-      )
-
-    return controller.subscribe(subscribeRequest).transform { subscriptionState ->
-      when (subscriptionState) {
-        is SubscriptionState.SubscriptionErrorNotification -> {
-          emit(
-            BooleanSubscriptionState.Error(
-              Exception(
-                "Subscription terminated with error code: ${subscriptionState.terminationCause}"
-              )
-            )
-          )
-        }
-        is SubscriptionState.NodeStateUpdate -> {
-          val attributeData =
-            subscriptionState.updateState.successes
-              .filterIsInstance<ReadData.Attribute>()
-              .firstOrNull { it.path.attributeId == ATTRIBUTE_ID }
-
-          requireNotNull(attributeData) {
-            "Presetsscheduleseditable attribute not found in Node State update"
-          }
-
-          // Decode the TLV data into the appropriate type
-          val tlvReader = TlvReader(attributeData.data)
-          val decodedValue: Boolean? =
-            if (tlvReader.isNextTag(AnonymousTag)) {
-              tlvReader.getBoolean(AnonymousTag)
-            } else {
-              null
-            }
-
-          decodedValue?.let { emit(BooleanSubscriptionState.Success(it)) }
-        }
-        SubscriptionState.SubscriptionEstablished -> {
-          emit(BooleanSubscriptionState.SubscriptionEstablished)
-        }
-      }
-    }
-  }
-
   suspend fun readSetpointHoldExpiryTimestampAttribute(): SetpointHoldExpiryTimestampAttribute {
-    val ATTRIBUTE_ID: UInt = 83u
+    val ATTRIBUTE_ID: UInt = 82u
 
     val attributePath =
       AttributePath(endpointId = endpointId, clusterId = CLUSTER_ID, attributeId = ATTRIBUTE_ID)
@@ -7575,7 +7521,7 @@ class ThermostatCluster(private val controller: MatterController, private val en
     minInterval: Int,
     maxInterval: Int,
   ): Flow<SetpointHoldExpiryTimestampAttributeSubscriptionState> {
-    val ATTRIBUTE_ID: UInt = 83u
+    val ATTRIBUTE_ID: UInt = 82u
     val attributePaths =
       listOf(
         AttributePath(endpointId = endpointId, clusterId = CLUSTER_ID, attributeId = ATTRIBUTE_ID)
