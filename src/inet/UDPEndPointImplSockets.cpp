@@ -106,7 +106,6 @@ CHIP_ERROR IPv6Bind(int socket, const IPAddress & address, uint16_t port, Interf
     sa.sin6_scope_id = static_cast<decltype(sa.sin6_scope_id)>(interfaceId);
 
     CHIP_ERROR status = CHIP_NO_ERROR;
-    VerifyOrReturnError(socket >= 0, CHIP_ERROR_INCORRECT_STATE);
     if (bind(socket, reinterpret_cast<const sockaddr *>(&sa), static_cast<unsigned>(sizeof(sa))) != 0)
     {
         status = CHIP_ERROR_POSIX(errno);
@@ -140,7 +139,6 @@ CHIP_ERROR IPv4Bind(int socket, const IPAddress & address, uint16_t port)
     sa.sin_addr   = address.ToIPv4();
 
     CHIP_ERROR status = CHIP_NO_ERROR;
-    VerifyOrReturnError(socket >= 0, CHIP_ERROR_INCORRECT_STATE);
     if (bind(socket, reinterpret_cast<const sockaddr *>(&sa), static_cast<unsigned>(sizeof(sa))) != 0)
     {
         status = CHIP_ERROR_POSIX(errno);
@@ -187,7 +185,6 @@ CHIP_ERROR UDPEndPointImplSockets::BindImpl(IPAddressType addressType, const IPA
 #if INET_CONFIG_ENABLE_IPV4
     else if (addressType == IPAddressType::kIPv4)
     {
-        VerifyOrReturnError(mSocket >= 0, CHIP_ERROR_INVALID_ARGUMENT);
         ReturnErrorOnFailure(IPv4Bind(mSocket, addr, port));
     }
 #endif // INET_CONFIG_ENABLE_IPV4
@@ -413,7 +410,6 @@ CHIP_ERROR UDPEndPointImplSockets::SendMsgImpl(const IPPacketInfo * aPktInfo, Sy
 #endif // INET_CONFIG_UDP_SOCKET_PKTINFO
 
     // Send IP packet.
-    VerifyOrReturnError(mSocket >= 0, CHIP_ERROR_INCORRECT_STATE);
     const ssize_t lenSent = sendmsg(mSocket, &msgHeader, 0);
     if (lenSent == -1)
     {

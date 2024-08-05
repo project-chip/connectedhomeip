@@ -271,38 +271,34 @@ bool HandleOption(const char * progName, OptionSet * optSet, int id, const char 
 
 } // namespace
 
-// outFile is sometimes assigned to stdout, which should not be closed.
-// Unfortunately checking condition if outFile is stdout is not understand by clang-tidy tool
-// and will always give warning. NOLINTBEGIN and NOLINTEND are used to suppress the warning.
-// NOLINTBEGIN
 bool Cmd_GenVerifier(int argc, char * argv[])
 {
     FILE * outFile = nullptr;
+
     if (argc == 1)
     {
         gHelpOptions.PrintBriefUsage(stderr);
         return true;
     }
 
-    bool ret = true;
     bool res = ParseArgs(CMD_NAME, argc, argv, gCmdOptionSets);
-    VerifyOrExit(res, ret = false);
+    VerifyOrReturnError(res, false);
 
     if (gIterationCount == 0)
     {
         fprintf(stderr, "Please specify the iteration-count parameter.\n");
-        ExitNow(ret = false);
+        return false;
     }
 
     if (gSaltDecodedLen == 0 && gSaltLen == 0)
     {
         fprintf(stderr, "Please specify at least one of the 'salt' or 'salt-len' parameters.\n");
-        ExitNow(ret = false);
+        return false;
     }
     if (gSaltDecodedLen != 0 && gSaltLen != 0 && gSaltDecodedLen != gSaltLen)
     {
         fprintf(stderr, "The specified 'salt-len' doesn't match the length of 'salt' parameter.\n");
-        ExitNow(ret = false);
+        return false;
     }
     if (gSaltLen == 0)
     {
@@ -312,17 +308,16 @@ bool Cmd_GenVerifier(int argc, char * argv[])
     if (gOutFileName == nullptr)
     {
         fprintf(stderr, "Please specify the output file name, or - for stdout.\n");
-        ExitNow(ret = false);
+        return false;
     }
 
     if (strcmp(gOutFileName, "-") != 0)
     {
-        // NOLINTNEXTLINE
         outFile = fopen(gOutFileName, "w+b");
         if (outFile == nullptr)
         {
             fprintf(stderr, "Unable to create file %s\n%s\n", gOutFileName, strerror(errno));
-            ExitNow(ret = false);
+            return false;
         }
     }
     else
@@ -333,7 +328,7 @@ bool Cmd_GenVerifier(int argc, char * argv[])
     if (fprintf(outFile, "Index,PIN Code,Iteration Count,Salt,Verifier\n") < 0 || ferror(outFile))
     {
         fprintf(stderr, "Error writing to output file: %s\n", strerror(errno));
-        ExitNow(ret = false);
+        return false;
     }
 
     for (uint32_t i = 0; i < gCount; i++)
@@ -345,7 +340,7 @@ bool Cmd_GenVerifier(int argc, char * argv[])
             if (err != CHIP_NO_ERROR)
             {
                 fprintf(stderr, "DRBG_get_bytes() failed.\n");
-                ExitNow(ret = false);
+                return false;
             }
         }
         else
@@ -359,7 +354,7 @@ bool Cmd_GenVerifier(int argc, char * argv[])
         if (err != CHIP_NO_ERROR)
         {
             fprintf(stderr, "GeneratePASEVerifier() failed.\n");
-            ExitNow(ret = false);
+            return false;
         }
 
         Spake2pVerifierSerialized serializedVerifier;
@@ -368,7 +363,7 @@ bool Cmd_GenVerifier(int argc, char * argv[])
         if (err != CHIP_NO_ERROR)
         {
             fprintf(stderr, "Spake2pVerifier::Serialize() failed.\n");
-            ExitNow(ret = false);
+            return false;
         }
 
         char saltB64[BASE64_ENCODED_LEN(kSpake2p_Max_PBKDF_Salt_Length) + 1];
@@ -382,7 +377,7 @@ bool Cmd_GenVerifier(int argc, char * argv[])
         if (fprintf(outFile, "%d,%08d,%d,%s,%s\n", i, gPinCode, gIterationCount, saltB64, verifierB64) < 0 || ferror(outFile))
         {
             fprintf(stderr, "Error writing to output file: %s\n", strerror(errno));
-            ExitNow(ret = false);
+            return false;
         }
 
         // If the file with PIN codes is not provided, the PIN code on next iteration will be randomly generated.
@@ -390,16 +385,10 @@ bool Cmd_GenVerifier(int argc, char * argv[])
         // On the next iteration the Salt will be randomly generated.
         gSaltDecodedLen = 0;
     }
-exit:
-    if (outFile != stdout && outFile != nullptr)
-    {
-        fclose(outFile);
-    }
 
-    if (gPinCodeFile != nullptr)
+    if (gPinCodeFile)
     {
         fclose(gPinCodeFile);
     }
-    return ret;
+    return true;
 }
-// NOLINTEND
