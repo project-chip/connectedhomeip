@@ -55,6 +55,7 @@ source_set("binding-test-srcs") {
   ]
 
   public_deps = [
+    "${chip_root}/src/app/util/mock:mock_codegen_data_model",
     "${chip_root}/src/app/util/mock:mock_ember",
     "${chip_root}/src/lib/core",
   ]
@@ -65,6 +66,19 @@ source_set("ota-requestor-test-srcs") {
     "${chip_root}/src/app/clusters/ota-requestor/DefaultOTARequestorStorage.cpp",
     "${chip_root}/src/app/clusters/ota-requestor/DefaultOTARequestorStorage.h",
     "${chip_root}/src/app/clusters/ota-requestor/OTARequestorStorage.h",
+  ]
+
+  public_deps = [
+    "${chip_root}/src/app/common:cluster-objects",
+    "${chip_root}/src/lib/core",
+  ]
+}
+
+source_set("thread-network-directory-test-srcs") {
+  sources = [
+    "${chip_root}/src/app/clusters/thread-network-directory-server/DefaultThreadNetworkDirectoryStorage.cpp",
+    "${chip_root}/src/app/clusters/thread-network-directory-server/DefaultThreadNetworkDirectoryStorage.h",
+    "${chip_root}/src/app/clusters/thread-network-directory-server/ThreadNetworkDirectoryStorage.h",
   ]
 
   public_deps = [
@@ -89,6 +103,7 @@ source_set("power-cluster-test-srcs") {
 
   public_deps = [
     "${chip_root}/src/app/common:cluster-objects",
+    "${chip_root}/src/app/util/mock:mock_codegen_data_model",
     "${chip_root}/src/app/util/mock:mock_ember",
     "${chip_root}/src/lib/core",
   ]
@@ -109,6 +124,7 @@ source_set("scenes-table-test-srcs") {
   public_deps = [
     "${chip_root}/src/app",
     "${chip_root}/src/app/common:cluster-objects",
+    "${chip_root}/src/app/util/mock:mock_codegen_data_model",
     "${chip_root}/src/app/util/mock:mock_ember",
     "${chip_root}/src/lib/core",
   ]
@@ -123,16 +139,40 @@ source_set("operational-state-test-srcs") {
   ]
 }
 
+source_set("thread-border-router-management-test-srcs") {
+  sources = [
+    "${chip_root}/src/app/clusters/thread-border-router-management-server/thread-border-router-management-server.cpp",
+    "${chip_root}/src/app/clusters/thread-border-router-management-server/thread-border-router-management-server.h",
+    "${chip_root}/src/app/clusters/thread-border-router-management-server/thread-br-delegate.h",
+  ]
+
+  public_deps = [
+    "${chip_root}/src/app",
+    "${chip_root}/src/app/common:cluster-objects",
+    "${chip_root}/src/app/util/mock:mock_ember",
+    "${chip_root}/src/lib/core",
+  ]
+}
+
 source_set("app-test-stubs") {
   sources = [
     "test-ember-api.cpp",
     "test-ember-api.h",
+
+    # The overrides in these files are overrides from ember-compatibility-functions
+    # and the data model interface is NOT aware of such functionality
+    #
+    # TODO: ideally tests should have been written via mock ember, however mock ember did
+    #       not exist at that time. We should completely re-write how these tests access
+    #       the data via the DataModel interface
     "test-interaction-model-api.cpp",
     "test-interaction-model-api.h",
   ]
+
   public_configs = [ "${chip_root}/src/lib/support/pw_log_chip:config" ]
 
   public_deps = [
+    "${chip_root}/src/app/util/mock:mock_codegen_data_model",
     "${chip_root}/src/app/util/mock:mock_ember",
     "${chip_root}/src/lib/core",
     "${chip_root}/src/lib/support",
@@ -159,6 +199,7 @@ chip_test_suite("tests") {
     "TestConcreteAttributePath.cpp",
     "TestDataModelSerialization.cpp",
     "TestDefaultOTARequestorStorage.cpp",
+    "TestDefaultThreadNetworkDirectoryStorage.cpp",
     "TestEventLoggingNoUTCTime.cpp",
     "TestEventOverflow.cpp",
     "TestEventPathParams.cpp",
@@ -189,11 +230,14 @@ chip_test_suite("tests") {
     ":operational-state-test-srcs",
     ":ota-requestor-test-srcs",
     ":power-cluster-test-srcs",
+    ":thread-network-directory-test-srcs",
     ":time-sync-data-provider-test-srcs",
     "${chip_root}/src/app",
+    "${chip_root}/src/app/codegen-data-model-provider:instance-header",
     "${chip_root}/src/app/common:cluster-objects",
     "${chip_root}/src/app/icd/client:manager",
     "${chip_root}/src/app/tests:helpers",
+    "${chip_root}/src/app/util/mock:mock_codegen_data_model",
     "${chip_root}/src/app/util/mock:mock_ember",
     "${chip_root}/src/lib/core",
     "${chip_root}/src/lib/core:string-builder-adapters",
@@ -220,6 +264,9 @@ chip_test_suite("tests") {
       "${chip_root}/src/app/server",
       "${chip_root}/src/messaging/tests/echo:common",
     ]
+  } else if (!chip_fake_platform) {
+    test_sources += [ "TestThreadBorderRouterManagementCluster.cpp" ]
+    public_deps += [ ":thread-border-router-management-test-srcs" ]
   }
 
   if (!chip_fake_platform) {

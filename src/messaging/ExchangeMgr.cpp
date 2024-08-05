@@ -223,15 +223,15 @@ void ExchangeManager::OnMessageReceived(const PacketHeader & packetHeader, const
     //
     // Legend that can be used to decode this log line can be found in README.md
     //
-    ChipLogProgress(
-        ExchangeManager,
-        ">>> [E:" ChipLogFormatExchangeId " S:%u M:" ChipLogFormatMessageCounter "%s] (%s) Msg RX from %u:" ChipLogFormatX64
-        " [%04X] --- Type %s (%s:%s) (B:%u)",
-        ChipLogValueExchangeIdFromReceivedHeader(payloadHeader), session->SessionIdForLogging(), packetHeader.GetMessageCounter(),
-        ackBuf, Transport::GetSessionTypeString(session), session->GetFabricIndex(),
-        ChipLogValueX64(session->GetPeer().GetNodeId()), static_cast<uint16_t>(compressedFabricId), typeStr, protocolName,
-        msgTypeName,
-        static_cast<unsigned>(msgBuf->TotalLength() + packetHeader.EncodeSizeBytes() + payloadHeader.EncodeSizeBytes()));
+    ChipLogProgress(ExchangeManager,
+                    ">>> [E:" ChipLogFormatExchangeId " S:%u M:" ChipLogFormatMessageCounter
+                    "%s] (%s) Msg RX from %u:" ChipLogFormatX64 " [%04X] --- Type %s (%s:%s) (B:%u)",
+                    ChipLogValueExchangeIdFromReceivedHeader(payloadHeader), session->SessionIdForLogging(),
+                    packetHeader.GetMessageCounter(), ackBuf, Transport::GetSessionTypeString(session), session->GetFabricIndex(),
+                    ChipLogValueX64(session->GetPeer().GetNodeId()), static_cast<uint16_t>(compressedFabricId), typeStr,
+                    protocolName, msgTypeName,
+                    static_cast<unsigned>(msgBuf->TotalLength() + packetHeader.EncodeSizeBytes() + packetHeader.MICTagLength() +
+                                          payloadHeader.EncodeSizeBytes()));
 #endif
 
     MessageFlags msgFlags;

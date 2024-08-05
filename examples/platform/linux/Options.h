@@ -49,6 +49,10 @@ struct LinuxDeviceOptions
     bool wifiSupports5g        = false;
     bool mWiFi                 = false;
     bool mThread               = false;
+#if CHIP_DEVICE_CONFIG_ENABLE_WIFIPAF
+    bool mWiFiPAF                = false;
+    const char * mWiFiPAFExtCmds = nullptr;
+#endif
 #if CHIP_DEVICE_CONFIG_ENABLE_BOTH_COMMISSIONER_AND_COMMISSIONEE || CHIP_DEVICE_ENABLE_PORT_PARAMS
     uint16_t securedDevicePort         = CHIP_PORT;
     uint16_t unsecuredCommissionerPort = CHIP_UDC_PORT;

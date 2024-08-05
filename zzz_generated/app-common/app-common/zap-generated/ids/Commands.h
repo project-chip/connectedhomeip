@@ -159,6 +159,20 @@ static constexpr CommandId Id = 0x00000008;
 } // namespace Commands
 } // namespace LevelControl
 
+namespace AccessControl {
+namespace Commands {
+
+namespace ReviewFabricRestrictions {
+static constexpr CommandId Id = 0x00000000;
+} // namespace ReviewFabricRestrictions
+
+namespace ReviewFabricRestrictionsResponse {
+static constexpr CommandId Id = 0x00000001;
+} // namespace ReviewFabricRestrictionsResponse
+
+} // namespace Commands
+} // namespace AccessControl
+
 namespace Actions {
 namespace Commands {
 
@@ -285,6 +299,14 @@ static constexpr CommandId Id = 0x00000004;
 namespace CommissioningCompleteResponse {
 static constexpr CommandId Id = 0x00000005;
 } // namespace CommissioningCompleteResponse
+
+namespace SetTCAcknowledgements {
+static constexpr CommandId Id = 0x00000006;
+} // namespace SetTCAcknowledgements
+
+namespace SetTCAcknowledgementsResponse {
+static constexpr CommandId Id = 0x00000007;
+} // namespace SetTCAcknowledgementsResponse
 
 } // namespace Commands
 } // namespace GeneralCommissioning
@@ -448,6 +470,16 @@ static constexpr CommandId Id = 0x00000005;
 
 } // namespace Commands
 } // namespace TimeSynchronization
+
+namespace BridgedDeviceBasicInformation {
+namespace Commands {
+
+namespace KeepActive {
+static constexpr CommandId Id = 0x00000080;
+} // namespace KeepActive
+
+} // namespace Commands
+} // namespace BridgedDeviceBasicInformation
 
 namespace AdministratorCommissioning {
 namespace Commands {
@@ -1266,21 +1298,21 @@ static constexpr CommandId Id = 0x00000001;
 namespace ServiceArea {
 namespace Commands {
 
-namespace SelectLocations {
+namespace SelectAreas {
 static constexpr CommandId Id = 0x00000000;
-} // namespace SelectLocations
+} // namespace SelectAreas
 
-namespace SelectLocationsResponse {
+namespace SelectAreasResponse {
 static constexpr CommandId Id = 0x00000001;
-} // namespace SelectLocationsResponse
+} // namespace SelectAreasResponse
 
-namespace SkipCurrentLocation {
+namespace SkipArea {
 static constexpr CommandId Id = 0x00000002;
-} // namespace SkipCurrentLocation
+} // namespace SkipArea
 
-namespace SkipCurrentLocationResponse {
+namespace SkipAreaResponse {
 static constexpr CommandId Id = 0x00000003;
-} // namespace SkipCurrentLocationResponse
+} // namespace SkipAreaResponse
 
 } // namespace Commands
 } // namespace ServiceArea
@@ -1327,14 +1359,6 @@ static constexpr CommandId Id = 0x00000008;
 namespace CommitPresetsSchedulesRequest {
 static constexpr CommandId Id = 0x00000009;
 } // namespace CommitPresetsSchedulesRequest
-
-namespace CancelSetActivePresetRequest {
-static constexpr CommandId Id = 0x0000000A;
-} // namespace CancelSetActivePresetRequest
-
-namespace SetTemperatureSetpointHoldPolicy {
-static constexpr CommandId Id = 0x0000000B;
-} // namespace SetTemperatureSetpointHoldPolicy
 
 } // namespace Commands
 } // namespace Thermostat
@@ -1956,6 +1980,10 @@ namespace TestEnumsRequest {
 static constexpr CommandId Id = 0x0000000E;
 } // namespace TestEnumsRequest
 
+namespace GlobalEchoResponse {
+static constexpr CommandId Id = 0x0000000E;
+} // namespace GlobalEchoResponse
+
 namespace TestNullableOptionalRequest {
 static constexpr CommandId Id = 0x0000000F;
 } // namespace TestNullableOptionalRequest
@@ -1995,6 +2023,10 @@ static constexpr CommandId Id = 0x00000017;
 namespace StringEchoRequest {
 static constexpr CommandId Id = 0x00000018;
 } // namespace StringEchoRequest
+
+namespace GlobalEchoRequest {
+static constexpr CommandId Id = 0x00000019;
+} // namespace GlobalEchoRequest
 
 namespace TestDifferentVendorMeiRequest {
 static constexpr CommandId Id = 0xFFF200AA;

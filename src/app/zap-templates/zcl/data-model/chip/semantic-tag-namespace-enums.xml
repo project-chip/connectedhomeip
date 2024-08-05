@@ -16,16 +16,8 @@ limitations under the License.
 -->
 
 
-<!--
-TODO: Make these namespace enums global rather than defining them for each cluster.
- This depends on the ability to define global enums via XML tags.
- See issue [#29818](https://github.com/project-chip/connectedhomeip/issues/29818).
--->
-
-
 <configurator>
   <enum name="PositionTag" type="enum8">
-    <cluster code="0x0150"/>
     <item value="0x00" name="Left"/>
     <item value="0x01" name="Right"/>
     <item value="0x02" name="Top"/>
@@ -43,9 +35,6 @@ TODO: Make these namespace enums global rather than defining them for each clust
   </enum>
 
   <enum name="AreaTypeTag" type="enum8">
-    <cluster code="0x0150"/> <!-- Service Area Cluster -->
-    <!-- TODO: add Basic Information Cluster code="0x0028" -->
-
     <item value="0x00" name="Aisle"/>
     <item value="0x01" name="Attic"/>
     <item value="0x02" name="Back Door"/>
@@ -149,7 +138,6 @@ TODO: Make these namespace enums global rather than defining them for each clust
   </enum>
 
   <enum name="LandmarkTag" type="enum8">
-    <cluster code="0x0150"/>
     <item value="0x00" name="Air Conditioner"/>
     <item value="0x01" name="Air Purifier"/>
     <item value="0x02" name="Back Door"/>
@@ -207,7 +195,6 @@ TODO: Make these namespace enums global rather than defining them for each clust
   </enum>
 
   <enum name="FloorSurfaceTag" type="enum8">
-    <cluster code="0x0150"/>
     <item value="0x00" name="Carpet"/>
     <item value="0x01" name="Ceramic"/>
     <item value="0x02" name="Concrete"/>
