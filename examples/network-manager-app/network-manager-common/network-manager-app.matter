@@ -99,6 +99,12 @@ enum AreaTypeTag : enum8 {
   kWorkshop = 94;
 }
 
+enum AtomicRequestTypeEnum : enum8 {
+  kBeginWrite = 0;
+  kCommitWrite = 1;
+  kRollbackWrite = 2;
+}
+
 enum FloorSurfaceTag : enum8 {
   kCarpet = 0;
   kCeramic = 1;
@@ -218,6 +224,11 @@ struct LocationDescriptorStruct {
   char_string<128> locationName = 0;
   nullable int16s floorNumber = 1;
   nullable AreaTypeTag areaType = 2;
+}
+
+struct AtomicAttributeStatusStruct {
+  attrib_id attributeID = 0;
+  status statusCode = 1;
 }
 
 /** Attributes and commands for putting a device into Identification mode (e.g. flashing a light). */
@@ -1491,6 +1502,49 @@ provisional cluster WiFiNetworkManagement = 1105 {
   command access(invoke: manage) NetworkPassphraseRequest(): NetworkPassphraseResponse = 0;
 }
 
+/** Manage the Thread network of Thread Border Router */
+provisional cluster ThreadBorderRouterManagement = 1106 {
+  revision 1;
+
+  bitmap Feature : bitmap32 {
+    kPANChange = 0x1;
+  }
+
+  provisional readonly attribute char_string<63> borderRouterName = 0;
+  provisional readonly attribute octet_string<254> borderAgentID = 1;
+  provisional readonly attribute int16u threadVersion = 2;
+  provisional readonly attribute boolean interfaceEnabled = 3;
+  provisional readonly attribute nullable int64u activeDatasetTimestamp = 4;
+  readonly attribute command_id generatedCommandList[] = 65528;
+  readonly attribute command_id acceptedCommandList[] = 65529;
+  readonly attribute event_id eventList[] = 65530;
+  readonly attribute attrib_id attributeList[] = 65531;
+  readonly attribute bitmap32 featureMap = 65532;
+  readonly attribute int16u clusterRevision = 65533;
+
+  response struct DatasetResponse = 2 {
+    octet_string<254> dataset = 0;
+  }
+
+  request struct SetActiveDatasetRequestRequest {
+    octet_string<254> activeDataset = 0;
+    optional int64u breadcrumb = 1;
+  }
+
+  request struct SetPendingDatasetRequestRequest {
+    octet_string<254> pendingDataset = 0;
+  }
+
+  /** Command to request the active operational dataset of the Thread network to which the border router is connected. This command must be sent over a valid CASE session */
+  command access(invoke: manage) GetActiveDatasetRequest(): DatasetResponse = 0;
+  /** Command to request the pending dataset of the Thread network to which the border router is connected. This command must be sent over a valid CASE session */
+  command access(invoke: manage) GetPendingDatasetRequest(): DatasetResponse = 1;
+  /** Command to set or update the active Dataset of the Thread network to which the Border Router is connected. */
+  command access(invoke: manage) SetActiveDatasetRequest(SetActiveDatasetRequestRequest): DefaultSuccess = 3;
+  /** Command set or update the pending Dataset of the Thread network to which the Border Router is connected. */
+  command access(invoke: manage) SetPendingDatasetRequest(SetPendingDatasetRequestRequest): DefaultSuccess = 4;
+}
+
 /** Manages the names and credentials of Thread networks visible to the user. */
 provisional cluster ThreadNetworkDirectory = 1107 {
   revision 1;
@@ -1814,6 +1868,25 @@ endpoint 1 {
 
     handle command NetworkPassphraseRequest;
     handle command NetworkPassphraseResponse;
+  }
+
+  server cluster ThreadBorderRouterManagement {
+    callback attribute borderRouterName;
+    callback attribute borderAgentID;
+    callback attribute threadVersion;
+    callback attribute interfaceEnabled;
+    callback attribute activeDatasetTimestamp;
+    callback attribute generatedCommandList;
+    callback attribute acceptedCommandList;
+    callback attribute eventList;
+    callback attribute attributeList;
+    callback attribute featureMap;
+    ram      attribute clusterRevision default = 1;
+
+    handle command GetActiveDatasetRequest;
+    handle command GetPendingDatasetRequest;
+    handle command DatasetResponse;
+    handle command SetActiveDatasetRequest;
   }
 
   server cluster ThreadNetworkDirectory {

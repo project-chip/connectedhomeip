@@ -14,22 +14,22 @@
  *    See the License for the specific language governing permissions and
  *    limitations under the License.
  */
-package matter.controller.cluster.structs
+package chip.devicecontroller.cluster.structs
 
-import matter.controller.cluster.*
+import chip.devicecontroller.cluster.*
 import matter.tlv.ContextSpecificTag
 import matter.tlv.Tag
 import matter.tlv.TlvReader
 import matter.tlv.TlvWriter
 
-class ServiceAreaClusterLocationInfoStruct(
+class ServiceAreaClusterAreaInfoStruct(
   val locationInfo: ServiceAreaClusterLocationDescriptorStruct?,
-  val landmarkTag: UByte?,
-  val positionTag: UByte?,
-  val surfaceTag: UByte?,
+  val landmarkTag: UInt?,
+  val positionTag: UInt?,
+  val surfaceTag: UInt?,
 ) {
   override fun toString(): String = buildString {
-    append("ServiceAreaClusterLocationInfoStruct {\n")
+    append("ServiceAreaClusterAreaInfoStruct {\n")
     append("\tlocationInfo : $locationInfo\n")
     append("\tlandmarkTag : $landmarkTag\n")
     append("\tpositionTag : $positionTag\n")
@@ -70,7 +70,7 @@ class ServiceAreaClusterLocationInfoStruct(
     private const val TAG_POSITION_TAG = 2
     private const val TAG_SURFACE_TAG = 3
 
-    fun fromTlv(tlvTag: Tag, tlvReader: TlvReader): ServiceAreaClusterLocationInfoStruct {
+    fun fromTlv(tlvTag: Tag, tlvReader: TlvReader): ServiceAreaClusterAreaInfoStruct {
       tlvReader.enterStructure(tlvTag)
       val locationInfo =
         if (!tlvReader.isNull()) {
@@ -84,21 +84,21 @@ class ServiceAreaClusterLocationInfoStruct(
         }
       val landmarkTag =
         if (!tlvReader.isNull()) {
-          tlvReader.getUByte(ContextSpecificTag(TAG_LANDMARK_TAG))
+          tlvReader.getUInt(ContextSpecificTag(TAG_LANDMARK_TAG))
         } else {
           tlvReader.getNull(ContextSpecificTag(TAG_LANDMARK_TAG))
           null
         }
       val positionTag =
         if (!tlvReader.isNull()) {
-          tlvReader.getUByte(ContextSpecificTag(TAG_POSITION_TAG))
+          tlvReader.getUInt(ContextSpecificTag(TAG_POSITION_TAG))
         } else {
           tlvReader.getNull(ContextSpecificTag(TAG_POSITION_TAG))
           null
         }
       val surfaceTag =
         if (!tlvReader.isNull()) {
-          tlvReader.getUByte(ContextSpecificTag(TAG_SURFACE_TAG))
+          tlvReader.getUInt(ContextSpecificTag(TAG_SURFACE_TAG))
         } else {
           tlvReader.getNull(ContextSpecificTag(TAG_SURFACE_TAG))
           null
@@ -106,12 +106,7 @@ class ServiceAreaClusterLocationInfoStruct(
 
       tlvReader.exitContainer()
 
-      return ServiceAreaClusterLocationInfoStruct(
-        locationInfo,
-        landmarkTag,
-        positionTag,
-        surfaceTag,
-      )
+      return ServiceAreaClusterAreaInfoStruct(locationInfo, landmarkTag, positionTag, surfaceTag)
     }
   }
 }
