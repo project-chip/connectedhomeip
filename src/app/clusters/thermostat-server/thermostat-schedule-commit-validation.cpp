@@ -68,77 +68,6 @@ static bool IsScheduleHandleReferenced(ThermostatMatterScheduleManager & mgr, ch
     return false;
 }
 
-#if 0
-namespace ScheduleStruct {
-enum class Fields : uint8_t
-{
-    kSceduleHandle = 0,
-    kSystemMode    = 1,
-    kName          = 2,
-    kPresetHandle  = 3,
-    kTransitions   = 4,
-    kBuiltIn       = 5,
-};
-
-struct Type
-{
-public:
-    chip::ByteSpan sceduleHandle;
-    ThermostatSystemModeEnum systemMode = static_cast<ThermostatSystemModeEnum>(0);
-    DataModel::Nullable<chip::CharSpan> name;
-    chip::ByteSpan presetHandle;
-    DataModel::List<const Structs::ScheduleTransitionStruct::Type> transitions;
-    bool builtIn = static_cast<bool>(0);
-
-    static constexpr bool kIsFabricScoped = false;
-
-    CHIP_ERROR Encode(TLV::TLVWriter & aWriter, TLV::Tag aTag) const;
-};
-
-struct DecodableType
-{
-public:
-    chip::ByteSpan sceduleHandle;
-    ThermostatSystemModeEnum systemMode = static_cast<ThermostatSystemModeEnum>(0);
-    DataModel::Nullable<chip::CharSpan> name;
-    chip::ByteSpan presetHandle;
-    DataModel::DecodableList<Structs::ScheduleTransitionStruct::DecodableType> transitions;
-    bool builtIn = static_cast<bool>(0);
-
-    CHIP_ERROR Decode(TLV::TLVReader & reader);
-
-    static constexpr bool kIsFabricScoped = false;
-};
-
-} // namespace ScheduleStruct
-
-namespace ScheduleTypeStruct {
-enum class Fields : uint8_t
-{
-    kSystemMode           = 0,
-    kNumberOfSchedules    = 1,
-    kScheduleTypeFeatures = 2,
-};
-
-struct Type
-{
-public:
-    ThermostatSystemModeEnum systemMode                                = static_cast<ThermostatSystemModeEnum>(0);
-    uint8_t numberOfSchedules                                      = static_cast<uint8_t>(0);
-    chip::BitMask<ScheduleTypeFeaturesBitmap> scheduleTypeFeatures = static_cast<chip::BitMask<ScheduleTypeFeaturesBitmap>>(0);
-
-    CHIP_ERROR Decode(TLV::TLVReader & reader);
-
-    static constexpr bool kIsFabricScoped = false;
-
-    CHIP_ERROR Encode(TLV::TLVWriter & aWriter, TLV::Tag aTag) const;
-};
-
-using DecodableType = Type;
-
-} // namespace ScheduleTypeStruct
-#endif
-
 static imcode CheckScheduleTypes(ThermostatMatterScheduleManager & mgr, chip::EndpointId endpointId, ScheduleStruct::Type & schedule, Span<PresetStruct::Type> & presetList)
 {
     imcode status = imcode::ConstraintError;
@@ -308,7 +237,7 @@ imcode ThermostatMatterScheduleManager::ValidateSchedulesForCommitting(chip::End
         status = CheckScheduleTypes(*this, endpointId, new_schedule, presetlist);
         SuccessOrExit(StatusIB(status).ToChipError());
 
-        // Make sure the number of transitions does not exceed out limits
+        // Make sure the number of transitions does not exceed our limits
         status = CheckNumberOfTransitions(*this, endpointId, new_schedule);
         SuccessOrExit(StatusIB(status).ToChipError());
     }

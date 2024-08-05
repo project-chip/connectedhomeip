@@ -55,8 +55,19 @@ struct ThermostatMatterScheduleManager
     virtual CHIP_ERROR ClearSchedules(chip::EndpointId aEndpoint) { return CHIP_ERROR_NOT_IMPLEMENTED; }
     virtual chip::Protocols::InteractionModel::Status AppendSchedule(chip::EndpointId aEndpoint, const chip::app::Clusters::Thermostat::Structs::ScheduleStruct::DecodableType & schedule) { return chip::Protocols::InteractionModel::Status::UnsupportedWrite; }
 
+    // Default implmenetation provided that will do attribute writes as required by the spec once tha handle has changed.
+    // Override this with your own implementation if these writes are not necessary or will cause issues in your implemenation.
+    // Note: these are called by the thermostat server implementation on every write to the ActviePresetHandle and 
+    // ActiveScheduleHandle attriutes.
+    virtual CHIP_ERROR PresetHandleChanged(chip::EndpointId aEndpoint);
+    virtual CHIP_ERROR ScheduleHandleChanged(chip::EndpointId aEndpoint);
+
+    virtual CHIP_ERROR GetPresetStructByHandle(chip::EndpointId aEndpoint, const chip::ByteSpan &inHandle, chip::app::Clusters::Thermostat::Structs::PresetStruct::Type & outPreset) const;
+    virtual CHIP_ERROR GetScheduleStructByHandle(chip::EndpointId aEndpoint, const chip::ByteSpan &inHandle, chip::app::Clusters::Thermostat::Structs::ScheduleStruct::Type & outSchedule) const;
+
     static void SetActiveInstance(ThermostatMatterScheduleManager * inManager);
     static ThermostatMatterScheduleManager * GetActiveInstance();
+
 
 protected:
     chip::Protocols::InteractionModel::Status ValidatePresetsForCommitting(chip::EndpointId aEndpoint, chip::Span<chip::app::Clusters::Thermostat::Structs::PresetStruct::Type> & oldList, chip::Span<chip::app::Clusters::Thermostat::Structs::PresetStruct::Type> & newList);

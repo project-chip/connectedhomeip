@@ -67,42 +67,6 @@ constexpr int8_t kDefaultDeadBand                 = 25; // 2.5C is the default
 
 #define FEATURE_MAP_DEFAULT FEATURE_MAP_HEAT | FEATURE_MAP_COOL | FEATURE_MAP_AUTO
 
-// ----------------------------------------------
-// - Schedules and Presets Manager object       -
-// ----------------------------------------------
-
-// Object Tracking
-static ThermostatMatterScheduleManager * gsMatterScheduleEditor = nullptr;
-
-void 
-ThermostatMatterScheduleManager::SetActiveInstance(ThermostatMatterScheduleManager * inManager)
-{
-    if (gsMatterScheduleEditor != nullptr)
-    {
-        if (gsMatterScheduleEditor->IsEditing())
-        {
-            ChipLogError(Zcl, "Warning: Active ThermostatMatterScheduleManager was editing when swapped out");
-            gsMatterScheduleEditor->RollbackEdits();
-        }
-    }
-    gsMatterScheduleEditor = inManager;
-}
-
-ThermostatMatterScheduleManager * ThermostatMatterScheduleManager::GetActiveInstance()
-{
-    return gsMatterScheduleEditor;
-}
-
-bool 
-ThermostatMatterScheduleManager::areDescriptorsEqualAndValid(const Access::SubjectDescriptor &desc1, const Access::SubjectDescriptor &desc2)
-{
-    if (desc1.fabricIndex == kUndefinedFabricIndex || desc1.subject == kUndefinedNodeId)
-        return false;
-    if (desc2.fabricIndex == kUndefinedFabricIndex || desc2.subject == kUndefinedNodeId)
-        return false;
-    return ((desc1.fabricIndex == desc2.fabricIndex) && (desc1.subject == desc2.subject));
-}
-
 namespace {
 
 class ThermostatAttrAccess : public AttributeAccessInterface

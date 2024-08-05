@@ -370,6 +370,7 @@ template("chip_data_model") {
         sources += [
           "${_app_root}/clusters/${cluster}/${cluster}.cpp",
           "${_app_root}/clusters/${cluster}/${cluster}.h",
+          "${_app_root}/clusters/${cluster}/thermostat-matter-schedule-manager.cpp",          
           "${_app_root}/clusters/${cluster}/thermostat-preset-commit-validation.cpp",
           "${_app_root}/clusters/${cluster}/thermostat-schedule-commit-validation.cpp",
         ]

@@ -55,23 +55,6 @@ static imcode CheckPresetHandleUnique(const chip::ByteSpan & handle, Span<Preset
     return imcode::Success;
 }
 
-#if 0
-struct Type
-{
-public:
-    chip::ByteSpan sceduleHandle;
-    ThermostatSystemModeEnum systemMode = static_cast<ThermostatSystemModeEnum>(0);
-    DataModel::Nullable<chip::CharSpan> name;
-    chip::ByteSpan presetHandle;
-    DataModel::List<const Structs::ScheduleTransitionStruct::Type> transitions;
-    bool builtIn = static_cast<bool>(0);
-
-    static constexpr bool kIsFabricScoped = false;
-
-    CHIP_ERROR Encode(TLV::TLVWriter & aWriter, TLV::Tag aTag) const;
-};
-#endif
-
 static bool IsPresetHandleReferenced(ThermostatMatterScheduleManager & mgr, chip::EndpointId endpointId, const chip::ByteSpan & handle)
 {
     imcode status = imcode::Success;
@@ -107,47 +90,6 @@ static bool IsPresetHandleReferenced(ThermostatMatterScheduleManager & mgr, chip
 
     return false;
 }
-
-#if 0
-// Enum for PresetScenarioEnum
-enum class PresetScenarioEnum : uint8_t
-{
-    kUnspecified = 0x00,
-    kOccupied    = 0x01,
-    kUnoccupied  = 0x02,
-    kSleep       = 0x03,
-    kWake        = 0x04,
-    kVacation    = 0x05,
-    kUserDefined = 0x06,
-    // All received enum values that are not listed above will be mapped
-    // to kUnknownEnumValue. This is a helper enum value that should only
-    // be used by code to process how it handles receiving and unknown
-    // enum value. This specific should never be transmitted.
-    kUnknownEnumValue = 7,
-};
-
-struct Type
-{
-public:
-    PresetScenarioEnum presetScenario                          = static_cast<PresetScenarioEnum>(0);
-    uint8_t numberOfPresets                                    = static_cast<uint8_t>(0);
-    chip::BitMask<PresetTypeFeaturesBitmap> presetTypeFeatures = static_cast<chip::BitMask<PresetTypeFeaturesBitmap>>(0);
-
-    CHIP_ERROR Decode(TLV::TLVReader & reader);
-
-    static constexpr bool kIsFabricScoped = false;
-
-    CHIP_ERROR Encode(TLV::TLVWriter & aWriter, TLV::Tag aTag) const;
-};
-
-// Bitmap for PresetTypeFeaturesBitmap
-enum class PresetTypeFeaturesBitmap : uint8_t
-{
-    kAutomatic     = 0x1,
-    kSupportsNames = 0x2,
-};
-
-#endif
 
 static imcode CheckPresetType(ThermostatMatterScheduleManager & mgr, chip::EndpointId endpointId, PresetStruct::Type & preset)
 {
