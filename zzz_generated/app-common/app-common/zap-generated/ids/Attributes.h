@@ -5210,12 +5210,8 @@ namespace Schedules {
 static constexpr AttributeId Id = 0x00000051;
 } // namespace Schedules
 
-namespace PresetsSchedulesEditable {
-static constexpr AttributeId Id = 0x00000052;
-} // namespace PresetsSchedulesEditable
-
 namespace SetpointHoldExpiryTimestamp {
-static constexpr AttributeId Id = 0x00000053;
+static constexpr AttributeId Id = 0x00000052;
 } // namespace SetpointHoldExpiryTimestamp
 
 namespace GeneratedCommandList {

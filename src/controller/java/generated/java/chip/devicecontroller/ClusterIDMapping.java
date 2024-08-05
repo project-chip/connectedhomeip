@@ -11958,8 +11958,7 @@ public class ClusterIDMapping {
             ActiveScheduleHandle(79L),
             Presets(80L),
             Schedules(81L),
-            PresetsSchedulesEditable(82L),
-            SetpointHoldExpiryTimestamp(83L),
+            SetpointHoldExpiryTimestamp(82L),
             GeneratedCommandList(65528L),
             AcceptedCommandList(65529L),
             EventList(65530L),
@@ -12012,9 +12011,7 @@ public class ClusterIDMapping {
             ClearWeeklySchedule(3L),
             SetActiveScheduleRequest(5L),
             SetActivePresetRequest(6L),
-            StartPresetsSchedulesEditRequest(7L),
-            CancelPresetsSchedulesEditRequest(8L),
-            CommitPresetsSchedulesRequest(9L),;
+            AtomicRequest(254L),;
             private final long id;
             Command(long id) {
                 this.id = id;
@@ -12117,17 +12114,17 @@ public class ClusterIDMapping {
                         }
                         throw new NoSuchFieldError();
                     }
-                }public enum StartPresetsSchedulesEditRequestCommandField {TimeoutSeconds(0),;
+                }public enum AtomicRequestCommandField {RequestType(0),AttributeRequests(1),Timeout(2),;
                     private final int id;
-                    StartPresetsSchedulesEditRequestCommandField(int id) {
+                    AtomicRequestCommandField(int id) {
                         this.id = id;
                     }
 
                     public int getID() {
                         return id;
                     }
-                    public static StartPresetsSchedulesEditRequestCommandField value(int id) throws NoSuchFieldError {
-                        for (StartPresetsSchedulesEditRequestCommandField field : StartPresetsSchedulesEditRequestCommandField.values()) {
+                    public static AtomicRequestCommandField value(int id) throws NoSuchFieldError {
+                        for (AtomicRequestCommandField field : AtomicRequestCommandField.values()) {
                         if (field.getID() == id) {
                             return field;
                         }

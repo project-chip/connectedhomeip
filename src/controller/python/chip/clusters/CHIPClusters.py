@@ -8885,23 +8885,13 @@ class ChipClusters:
                     "presetHandle": "bytes",
                 },
             },
-            0x00000007: {
-                "commandId": 0x00000007,
-                "commandName": "StartPresetsSchedulesEditRequest",
+            0x000000FE: {
+                "commandId": 0x000000FE,
+                "commandName": "AtomicRequest",
                 "args": {
-                    "timeoutSeconds": "int",
-                },
-            },
-            0x00000008: {
-                "commandId": 0x00000008,
-                "commandName": "CancelPresetsSchedulesEditRequest",
-                "args": {
-                },
-            },
-            0x00000009: {
-                "commandId": 0x00000009,
-                "commandName": "CommitPresetsSchedulesRequest",
-                "args": {
+                    "requestType": "int",
+                    "attributeRequests": "int",
+                    "timeout": "int",
                 },
             },
         },
@@ -9290,14 +9280,8 @@ class ChipClusters:
                 "writable": True,
             },
             0x00000052: {
-                "attributeName": "PresetsSchedulesEditable",
-                "attributeId": 0x00000052,
-                "type": "bool",
-                "reportable": True,
-            },
-            0x00000053: {
                 "attributeName": "SetpointHoldExpiryTimestamp",
-                "attributeId": 0x00000053,
+                "attributeId": 0x00000052,
                 "type": "int",
                 "reportable": True,
             },

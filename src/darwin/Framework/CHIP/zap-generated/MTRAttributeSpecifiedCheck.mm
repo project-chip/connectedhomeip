@@ -4179,9 +4179,6 @@ static BOOL AttributeIsSpecifiedInThermostatCluster(AttributeId aAttributeId)
     case Attributes::Schedules::Id: {
         return YES;
     }
-    case Attributes::PresetsSchedulesEditable::Id: {
-        return YES;
-    }
     case Attributes::SetpointHoldExpiryTimestamp::Id: {
         return YES;
     }
