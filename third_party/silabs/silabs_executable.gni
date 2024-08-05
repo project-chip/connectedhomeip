@@ -47,8 +47,12 @@ template("generate_rps_file") {
 }
 
 template("silabs_executable") {
-  if (!defined(invoker.output_dir)) {invoker.output_dir = root_out_dir}
-  if (!defined(invoker.output_name)) {invoker.output_name = target_name + ".bin"}
+  if (!defined(invoker.output_dir)) {
+    invoker.output_dir = root_out_dir
+  }
+  if (!defined(invoker.output_name)) {
+    invoker.output_name = target_name + ".bin"
+  }
   output_base_name = get_path_info(invoker.output_name, "name")
   objcopy_image_name = output_base_name + ".s37"
   objcopy_image_format = "srec"
@@ -67,7 +71,8 @@ template("silabs_executable") {
       "${chip_root}/scripts/flashing/gen_flashing_script.py"
   flashing_script_name = output_base_name + ".flash.py"
   _flashbundle_file = "${invoker.output_dir}/${target_name}.flashbundle.txt"
-  _platform_firmware_utils = "${chip_root}/scripts/flashing/silabs_firmware_utils.py"
+  _platform_firmware_utils =
+      "${chip_root}/scripts/flashing/silabs_firmware_utils.py"
   _firmware_utils = "${chip_root}/scripts/flashing/firmware_utils.py"
   flashing_options = [
     "silabs",  # Use module "{platform}_firmware_utils.py"
@@ -84,7 +89,8 @@ template("silabs_executable") {
   ]
 
   flash_target_name = target_name + ".flash_executable"
-  flashbundle_name = ""  # Stop flashable_executable from generating flashbundle.txt
+  flashbundle_name =
+      ""  # Stop flashable_executable from generating flashbundle.txt
   flashable_executable(flash_target_name) {
     forward_variables_from(invoker, "*")
   }

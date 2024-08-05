@@ -55,8 +55,12 @@ template("chip_test_suite") {
 
   # Ensures that the common library has sources containing both common
   # and individual unit tests.
-  if (!defined(invoker.sources)) { invoker.sources = [] }
-  if (!defined(invoker.test_sources)) { invoker.test_sources = [] }
+  if (!defined(invoker.sources)) {
+    invoker.sources = []
+  }
+  if (!defined(invoker.test_sources)) {
+    invoker.test_sources = []
+  }
   invoker.sources += invoker.test_sources
 
   if (chip_build_test_static_libraries) {
@@ -97,13 +101,13 @@ template("chip_test_suite") {
     pw_test(_test_name) {
       # Forward certain variables from the invoker.
       forward_variables_from(invoker,
-                              [
-                                "deps",
-                                "public_deps",
-                                "cflags",
-                                "configs",
-                              ])
-      
+                             [
+                               "deps",
+                               "public_deps",
+                               "cflags",
+                               "configs",
+                             ])
+
       # Link to the common library for this test suite.
       if (chip_link_tests) {
         public_deps += [ ":${_suite_name}.lib" ]
@@ -111,7 +115,8 @@ template("chip_test_suite") {
 
       # Set variables that the platform executable may need.
       if (test_executable_output_name != "") {
-        output_name = test_executable_output_name + _test_name + test_executable_output_name_suffix
+        output_name = test_executable_output_name + _test_name +
+                      test_executable_output_name_suffix
       }
       ldflags = test_executable_ldflags
 
