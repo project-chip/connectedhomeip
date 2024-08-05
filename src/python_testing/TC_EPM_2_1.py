@@ -29,7 +29,7 @@
 import logging
 
 import chip.clusters as Clusters
-from matter_testing_support import MatterBaseTest, TestStep, async_test_body, default_matter_test_main
+from testing_support.matter_testing import MatterBaseTest, TestStep, async_test_body, default_matter_test_main
 from mobly import asserts
 from TC_EnergyReporting_Utils import EnergyReportingBaseTestHelper
 
@@ -135,7 +135,8 @@ class TC_EPM_2_1(MatterBaseTest, EnergyReportingBaseTestHelper):
                                  "minMeasuredValue must be the same as 1st accuracyRange rangeMin")
 
             for index, range_entry in enumerate(measurement.accuracyRanges):
-                logging.info(f"   [{index}] rangeMin:{range_entry.rangeMin} rangeMax:{range_entry.rangeMax} percentMax:{range_entry.percentMax} percentMin:{range_entry.percentMin} percentTypical:{range_entry.percentTypical} fixedMax:{range_entry.fixedMax} fixedMin:{range_entry.fixedMin} fixedTypical:{range_entry.fixedTypical}")
+                logging.info(f"   [{index}] rangeMin:{range_entry.rangeMin} rangeMax:{range_entry.rangeMax} percentMax:{range_entry.percentMax} percentMin:{
+                             range_entry.percentMin} percentTypical:{range_entry.percentTypical} fixedMax:{range_entry.fixedMax} fixedMin:{range_entry.fixedMin} fixedTypical:{range_entry.fixedTypical}")
                 asserts.assert_greater(
                     range_entry.rangeMax, range_entry.rangeMin, "rangeMax should be > rangeMin")
                 if index == 0:

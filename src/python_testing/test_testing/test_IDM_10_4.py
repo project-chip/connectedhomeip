@@ -23,10 +23,10 @@ import chip.clusters as Clusters
 from chip.clusters import Attribute
 
 try:
-    from pics_support import parse_pics_xml
+    from testing_support.pics import parse_pics_xml
 except ImportError:
     sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), '..')))
-    from pics_support import parse_pics_xml
+    from testing_support.pics import parse_pics_xml
 
 from MockTestRunner import MockTestRunner
 

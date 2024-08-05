@@ -32,8 +32,8 @@ import time
 
 import chip.clusters as Clusters
 import test_plan_support
-from matter_testing_support import (ClusterAttributeChangeAccumulator, MatterBaseTest, TestStep, default_matter_test_main,
-                                    has_cluster, per_endpoint_test)
+from testing_support.matter_testing import (ClusterAttributeChangeAccumulator, MatterBaseTest, TestStep, default_matter_test_main,
+                                            has_cluster, per_endpoint_test)
 from mobly import asserts
 
 

@@ -30,7 +30,7 @@ import ctypes
 from enum import IntEnum
 
 import chip.clusters as Clusters
-from matter_testing_support import MatterBaseTest, async_test_body, default_matter_test_main
+from testing_support.matter_testing import MatterBaseTest, async_test_body, default_matter_test_main
 from mobly import asserts
 
 # Assumes `--enable-key 000102030405060708090a0b0c0d0e0f` on Linux app command line, or a DUT

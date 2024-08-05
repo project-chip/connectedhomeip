@@ -24,10 +24,10 @@ import xml.etree.ElementTree as ET
 import chip.clusters as Clusters
 from rich.console import Console
 
-# Add the path to python_testing folder, in order to be able to import from matter_testing_support
+# Add the path to python_testing folder, in order to be able to import from testing_support.matter_testing
 sys.path.append(os.path.abspath(sys.path[0] + "/../../python_testing"))
-from matter_testing_support import MatterBaseTest, async_test_body, default_matter_test_main  # noqa: E402
-from spec_parsing_support import build_xml_clusters  # noqa: E402
+from testing_support.matter_testing import MatterBaseTest, async_test_body, default_matter_test_main  # noqa: E402
+from testing_support.spec_parsing import build_xml_clusters  # noqa: E402
 
 console = None
 xml_clusters = None

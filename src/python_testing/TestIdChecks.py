@@ -15,9 +15,9 @@
 #    limitations under the License.
 #
 
-from global_attribute_ids import (AttributeIdType, ClusterIdType, DeviceTypeIdType, attribute_id_type, cluster_id_type,
-                                  device_type_id_type, is_valid_attribute_id, is_valid_cluster_id, is_valid_device_type_id)
-from matter_testing_support import MatterBaseTest, default_matter_test_main
+from testing_support.global_attribute_ids import (AttributeIdType, ClusterIdType, DeviceTypeIdType, attribute_id_type, cluster_id_type,
+                                                  device_type_id_type, is_valid_attribute_id, is_valid_cluster_id, is_valid_device_type_id)
+from testing_support.matter_testing import MatterBaseTest, default_matter_test_main
 from mobly import asserts
 
 

@@ -36,8 +36,8 @@ import chip.clusters as Clusters
 from chip.clusters.Types import NullValue
 from chip.interaction_model import InteractionModelError
 from chip.tlv import uint
-from matter_testing_support import (MatterBaseTest, SimpleEventCallback, async_test_body, default_matter_test_main,
-                                    get_wait_seconds_from_set_time, type_matches, utc_time_in_matter_epoch)
+from testing_support.matter_testing import (MatterBaseTest, SimpleEventCallback, async_test_body, default_matter_test_main,
+                                            get_wait_seconds_from_set_time, type_matches, utc_time_in_matter_epoch)
 from mobly import asserts
 
 

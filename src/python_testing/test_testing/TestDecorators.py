@@ -32,12 +32,12 @@ import chip.clusters as Clusters
 from chip.clusters import Attribute
 
 try:
-    from matter_testing_support import (MatterBaseTest, async_test_body, get_accepted_endpoints_for_test, has_attribute,
-                                        has_cluster, has_feature, per_endpoint_test, per_node_test)
+    from testing_support.matter_testing import (MatterBaseTest, async_test_body, get_accepted_endpoints_for_test, has_attribute,
+                                                has_cluster, has_feature, per_endpoint_test, per_node_test)
 except ImportError:
     sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), '..')))
-    from matter_testing_support import (MatterBaseTest, async_test_body, get_accepted_endpoints_for_test, has_attribute,
-                                        has_cluster, has_feature, per_endpoint_test, per_node_test)
+    from testing_support.matter_testing import (MatterBaseTest, async_test_body, get_accepted_endpoints_for_test, has_attribute,
+                                                has_cluster, has_feature, per_endpoint_test, per_node_test)
 
 from typing import Optional
 

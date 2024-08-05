@@ -32,8 +32,8 @@ from datetime import timedelta
 
 import chip.clusters as Clusters
 from chip.clusters.Types import NullValue
-from matter_testing_support import (MatterBaseTest, default_matter_test_main, has_attribute, has_cluster, per_endpoint_test,
-                                    utc_time_in_matter_epoch)
+from testing_support.matter_testing import (MatterBaseTest, default_matter_test_main, has_attribute, has_cluster, per_endpoint_test,
+                                            utc_time_in_matter_epoch)
 from mobly import asserts
 
 

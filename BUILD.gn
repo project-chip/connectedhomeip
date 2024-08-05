@@ -69,7 +69,7 @@ if (current_toolchain != "${dir_pw_toolchain}/default:default") {
     "//examples/common/pigweed/rpc_console/py:chip_rpc",
     "//integrations/mobly:chip_mobly",
     "//scripts/py_matter_yamltests:matter_yamltests",
-    "//src/python_testing/matter_testing_infrastructure:metadata_parser",
+    "//src/python_testing/matter_testing_infrastructure:testing_support",
   ]
 
   pw_python_venv("matter_build_venv") {
@@ -110,7 +110,7 @@ if (current_toolchain != "${dir_pw_toolchain}/default:default") {
       deps = [
         "${chip_root}/scripts:matter_yamltests_distribution.wheel",
         "${chip_root}/src/controller/python:chip-repl",
-        "${chip_root}/src/python_testing/matter_testing_infrastructure:metadata_parser.wheel",
+        "${chip_root}/src/python_testing/matter_testing_infrastructure:testing_support.wheel",
       ]
       if (enable_pylib) {
         deps += [ "${chip_root}/src/pybindings/pycontroller" ]
@@ -239,7 +239,7 @@ if (current_toolchain != "${dir_pw_toolchain}/default:default") {
         "//scripts/py_matter_idl:matter_idl.tests",
         "//scripts/py_matter_yamltests:matter_yamltests.tests",
         "//src:tests_run",
-        "//src/python_testing/matter_testing_infrastructure:metadata_parser.tests",
+        "//src/python_testing/matter_testing_infrastructure:testing_support.tests",
       ]
 
       if (current_os == "linux" || current_os == "mac") {

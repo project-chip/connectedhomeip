@@ -32,7 +32,7 @@ import logging
 from time import sleep
 
 import chip.clusters as Clusters
-from matter_testing_support import MatterBaseTest, async_test_body, default_matter_test_main
+from testing_support.matter_testing import MatterBaseTest, async_test_body, default_matter_test_main
 from mobly import asserts
 
 
@@ -126,7 +126,8 @@ class TC_SEAR_1_3(MatterBaseTest):
             await self.send_cmd_select_areas_expect_response(step=8, new_areas=[valid_area_id], expected_response=Clusters.ServiceArea.SelectAreasStatus.kInvalidInMode)
 
         if self.check_pics("SEAR.S.M.VALID_STATE_FOR_SELECT_AREAS") and self.check_pics("SEAR.S.M.HAS_MANUAL_SELAREA_STATE_CONTROL"):
-            test_step = f"Manually intervene to put the device in a state that allows it to execute the SelectAreas({supported_area_ids}) command"
+            test_step = f"Manually intervene to put the device in a state that allows it to execute the SelectAreas({
+                supported_area_ids}) command"
             self.print_step("9", test_step)
             if not self.is_ci:
                 self.wait_for_user_input(prompt_msg=f"{test_step}, and press Enter when done.\n")
@@ -140,7 +141,8 @@ class TC_SEAR_1_3(MatterBaseTest):
             await self.send_cmd_select_areas_expect_response(step=12, new_areas=supported_area_ids, expected_response=Clusters.ServiceArea.SelectAreasStatus.kSuccess)
 
         if self.check_pics("SEAR.S.M.VALID_STATE_FOR_SELECT_AREAS") and self.check_pics("SEAR.S.M.HAS_MANUAL_SELAREA_STATE_CONTROL") and self.check_pics("SEAR.S.M.SELECT_AREAS_WHILE_NON_IDLE"):
-            test_step = f"Manually intervene to put the device in a state that allows it to execute the SelectAreas({valid_area_id}) command, and put the device in a non-idle state"
+            test_step = f"Manually intervene to put the device in a state that allows it to execute the SelectAreas({
+                valid_area_id}) command, and put the device in a non-idle state"
             self.print_step("13", test_step)
             if not self.is_ci:
                 self.wait_for_user_input(prompt_msg=f"{test_step}, and press Enter when done.\n")

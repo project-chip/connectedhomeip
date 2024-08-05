@@ -32,7 +32,7 @@ from datetime import datetime, timedelta, timezone
 import chip.clusters as Clusters
 from chip.clusters.Types import NullValue
 from chip.interaction_model import Status
-from matter_testing_support import EventChangeCallback, MatterBaseTest, TestStep, async_test_body, default_matter_test_main
+from testing_support.matter_testing import EventChangeCallback, MatterBaseTest, TestStep, async_test_body, default_matter_test_main
 from mobly import asserts
 from TC_EEVSE_Utils import EEVSEBaseTestHelper
 
@@ -175,7 +175,7 @@ class TC_EEVSE_2_3(MatterBaseTest, EEVSEBaseTestHelper):
 
         logger.info(
             f"minutesPastMidnight = {minutes_past_midnight} => "
-            f"{int(minutes_past_midnight/60)}:{int(minutes_past_midnight%60)}"
+            f"{int(minutes_past_midnight/60)}:{int(minutes_past_midnight % 60)}"
             f" Expected target_time = {target_time}")
 
         target_time_delta = target_time - \

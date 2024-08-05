@@ -34,15 +34,15 @@ from typing import Any, Callable
 import chip.clusters as Clusters
 import chip.clusters.ClusterObjects
 import chip.tlv
-from basic_composition_support import BasicCompositionTests
+from testing_support.basic_composition import BasicCompositionTests
 from chip import ChipUtility
 from chip.clusters.Attribute import ValueDecodeFailure
 from chip.clusters.ClusterObjects import ClusterAttributeDescriptor, ClusterObjectFieldDescriptor
 from chip.interaction_model import InteractionModelError, Status
 from chip.tlv import uint
-from global_attribute_ids import GlobalAttributeIds
-from matter_testing_support import (AttributePathLocation, ClusterPathLocation, CommandPathLocation, MatterBaseTest, TestStep,
-                                    async_test_body, default_matter_test_main)
+from testing_support.global_attribute_ids import GlobalAttributeIds
+from testing_support.matter_testing import (AttributePathLocation, ClusterPathLocation, CommandPathLocation, MatterBaseTest, TestStep,
+                                            async_test_body, default_matter_test_main)
 from mobly import asserts
 from taglist_and_topology_test_support import (create_device_type_list_for_root, create_device_type_lists, find_tag_list_problems,
                                                find_tree_roots, flat_list_ok, get_direct_children_of_root, parts_list_cycles,
@@ -443,12 +443,14 @@ class TC_DeviceBasicComposition(MatterBaseTest, BasicCompositionTests):
                                                      attribute_id=manufacturer_value)
                     if suffix > attribute_standard_range_max and suffix < global_range_min:
                         self.record_error(self.get_test_name(), location=location,
-                                          problem=f"Manufacturer attribute in undefined range {manufacturer_value} in cluster {cluster_id}",
+                                          problem=f"Manufacturer attribute in undefined range {
+                                              manufacturer_value} in cluster {cluster_id}",
                                           spec_location=f"Cluster {cluster_id}")
                         success = False
                     elif suffix >= global_range_min:
                         self.record_error(self.get_test_name(), location=location,
-                                          problem=f"Manufacturer attribute in global range {manufacturer_value} in cluster {cluster_id}",
+                                          problem=f"Manufacturer attribute in global range {
+                                              manufacturer_value} in cluster {cluster_id}",
                                           spec_location=f"Cluster {cluster_id}")
                         success = False
 
@@ -745,7 +747,8 @@ class TC_DeviceBasicComposition(MatterBaseTest, BasicCompositionTests):
         for ep, problem in problems.items():
             location = AttributePathLocation(endpoint_id=ep, cluster_id=Clusters.Descriptor.id,
                                              attribute_id=Clusters.Descriptor.Attributes.TagList.attribute_id)
-            msg = f'problem on ep {ep}: missing feature = {problem.missing_feature}, missing attribute = {problem.missing_attribute}, duplicates = {problem.duplicates}, same_tags = {problem.same_tag}'
+            msg = f'problem on ep {ep}: missing feature = {problem.missing_feature}, missing attribute = {
+                problem.missing_attribute}, duplicates = {problem.duplicates}, same_tags = {problem.same_tag}'
             self.record_error(self.get_test_name(), location=location, problem=msg, spec_location="Descriptor TagList")
 
         self.print_step(2, "Identify all the direct children of the root node endpoint")

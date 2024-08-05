@@ -28,7 +28,7 @@ import uuid
 import chip.clusters as Clusters
 from chip import ChipDeviceCtrl
 from chip.interaction_model import Status
-from matter_testing_support import MatterBaseTest, TestStep, async_test_body, default_matter_test_main, type_matches
+from testing_support.matter_testing import MatterBaseTest, TestStep, async_test_body, default_matter_test_main, type_matches
 from mobly import asserts
 
 
@@ -94,7 +94,8 @@ class TC_MCORE_FS_1_3(MatterBaseTest):
         self.device_for_th_eco_kvs = f'kvs_{str(uuid.uuid4())}'
         discriminator = random.randint(0, 4095)
         passcode = 20202021
-        app_args = f'--secured-device-port {self.device_for_th_eco_port} --discriminator {discriminator} --passcode {passcode} --KVS {self.device_for_th_eco_kvs}'
+        app_args = f'--secured-device-port {self.device_for_th_eco_port} --discriminator {
+            discriminator} --passcode {passcode} --KVS {self.device_for_th_eco_kvs}'
         cmd = f'{app} {app_args}'
         # TODO: Determine if we want these logs cooked or pushed to somewhere else
         logging.info("Starting TH device for TH ecosystem")

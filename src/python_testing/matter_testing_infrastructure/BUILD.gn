@@ -18,7 +18,7 @@ import("//build_overrides/chip.gni")
 import("//build_overrides/pigweed.gni")
 import("$dir_pw_build/python.gni")
 
-pw_python_package("metadata_parser") {
+pw_python_package("testing_support") {
   setup = [
     "setup.py",
     "setup.cfg",
@@ -28,9 +28,16 @@ pw_python_package("metadata_parser") {
   inputs = [ "env_test.yaml" ]
 
   sources = [
-    "metadata_parser/__init__.py",
-    "metadata_parser/metadata.py",
+    "testing_support/__init__.py",
+    "testing_support/basic_composition.py",
+    "testing_support/choice_conformance.py",
+    "testing_support/conformance.py",
+    "testing_support/global_attribute_ids.py",
+    "testing_support/matter_testing.py",
+    "testing_support/metadata.py",
+    "testing_support/pics.py",
+    "testing_support/spec_parsing.py",
   ]
 
-  tests = [ "metadata_parser/test_metadata.py" ]
+  tests = [ "testing_support/test_metadata.py" ]
 }

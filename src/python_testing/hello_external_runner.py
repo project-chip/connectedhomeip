@@ -24,7 +24,7 @@ from multiprocessing import Process
 from multiprocessing.managers import BaseManager
 
 from hello_test import HelloTest
-from matter_testing_support import MatterTestConfig, get_test_info, run_tests
+from testing_support.matter_testing import MatterTestConfig, get_test_info, run_tests
 
 try:
     from matter_yamltests.hooks import TestRunnerHooks

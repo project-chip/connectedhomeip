@@ -37,7 +37,7 @@ import chip.discovery as Discovery
 from chip import ChipUtility
 from chip.exceptions import ChipStackError
 from chip.interaction_model import InteractionModelError, Status
-from matter_testing_support import MatterBaseTest, async_test_body, default_matter_test_main, type_matches
+from testing_support.matter_testing import MatterBaseTest, async_test_body, default_matter_test_main, type_matches
 from mobly import asserts
 
 

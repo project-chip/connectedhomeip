@@ -34,8 +34,8 @@
 import logging
 
 import chip.clusters as Clusters
-from matter_testing_support import (ClusterAttributeChangeAccumulator, MatterBaseTest, TestStep, async_test_body,
-                                    await_sequence_of_reports, default_matter_test_main)
+from testing_support.matter_testing import (ClusterAttributeChangeAccumulator, MatterBaseTest, TestStep, async_test_body,
+                                            await_sequence_of_reports, default_matter_test_main)
 from mobly import asserts
 
 

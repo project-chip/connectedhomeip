@@ -31,16 +31,16 @@
 from typing import Callable
 
 import chip.clusters as Clusters
-from basic_composition_support import BasicCompositionTests
+from testing_support.basic_composition import BasicCompositionTests
 from chip.tlv import uint
-from choice_conformance_support import (evaluate_attribute_choice_conformance, evaluate_command_choice_conformance,
-                                        evaluate_feature_choice_conformance)
-from conformance_support import ConformanceDecision, conformance_allowed
-from global_attribute_ids import (ClusterIdType, DeviceTypeIdType, GlobalAttributeIds, cluster_id_type, device_type_id_type,
-                                  is_valid_device_type_id)
-from matter_testing_support import (AttributePathLocation, ClusterPathLocation, CommandPathLocation, DeviceTypePathLocation,
-                                    MatterBaseTest, ProblemNotice, ProblemSeverity, async_test_body, default_matter_test_main)
-from spec_parsing_support import CommandType, build_xml_clusters, build_xml_device_types
+from testing_support.choice_conformance import (evaluate_attribute_choice_conformance, evaluate_command_choice_conformance,
+                                                evaluate_feature_choice_conformance)
+from testing_support.conformance import ConformanceDecision, conformance_allowed
+from testing_support.global_attribute_ids import (ClusterIdType, DeviceTypeIdType, GlobalAttributeIds, cluster_id_type, device_type_id_type,
+                                                  is_valid_device_type_id)
+from testing_support.matter_testing import (AttributePathLocation, ClusterPathLocation, CommandPathLocation, DeviceTypePathLocation,
+                                            MatterBaseTest, ProblemNotice, ProblemSeverity, async_test_body, default_matter_test_main)
+from testing_support.spec_parsing import CommandType, build_xml_clusters, build_xml_device_types
 
 
 class DeviceConformanceTests(BasicCompositionTests):

@@ -30,7 +30,7 @@ import uuid
 
 import chip.clusters as Clusters
 from chip import ChipDeviceCtrl
-from matter_testing_support import MatterBaseTest, SimpleEventCallback, TestStep, async_test_body, default_matter_test_main
+from testing_support.matter_testing import MatterBaseTest, SimpleEventCallback, TestStep, async_test_body, default_matter_test_main
 from mobly import asserts
 
 logger = logging.getLogger(__name__)

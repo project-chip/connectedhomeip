@@ -80,78 +80,78 @@ file_name=${0##*/}
 
 while (($#)); do
     case $1 in
-        --help | -h)
-            help
-            exit 1
-            ;;
-        --enable_ble | -b)
-            enable_ble=$2
-            if [[ "$enable_ble" != "true" && "$enable_ble" != "false" ]]; then
-                echo "chip_detail_logging should have a true/false value, not '$enable_ble'"
-                exit
-            fi
-            shift
-            ;;
-        --chip_detail_logging | -d)
-            chip_detail_logging=$2
-            if [[ "$chip_detail_logging" != "true" && "$chip_detail_logging" != "false" ]]; then
-                echo "chip_detail_logging should have a true/false value, not '$chip_detail_logging'"
-                exit
-            fi
-            shift
-            ;;
-        --chip_mdns | -m)
-            chip_mdns=$2
-            shift
-            ;;
-        --enable_pybindings | -p)
-            enable_pybindings=$2
-            if [[ "$enable_pybindings" != "true" && "$enable_pybindings" != "false" ]]; then
-                echo "enable_pybindings should have a true/false value, not '$enable_pybindings'"
-                exit
-            fi
-            shift
-            ;;
-        --time_between_case_retries | -t)
-            chip_case_retry_delta=$2
-            shift
-            ;;
-        --install_virtual_env | -i)
-            install_virtual_env=$2
-            shift
-            ;;
-        --clean_virtual_env | -c)
-            clean_virtual_env=$2
-            if [[ "$clean_virtual_env" != "yes" && "$clean_virtual_env" != "no" ]]; then
-                echo "clean_virtual_env should have a yes/no value, not '$clean_virtual_env'"
-                exit
-            fi
-            shift
-            ;;
-        --include_pytest_deps)
-            install_pytest_requirements=$2
-            if [[ "$install_pytest_requirements" != "yes" && "$install_pytest_requirements" != "no" ]]; then
-                echo "install_pytest_requirements should have a yes/no value, not '$install_pytest_requirements'"
-                exit
-            fi
-            shift
-            ;;
-        --extra_packages)
-            extra_packages=$2
-            shift
-            ;;
-        --pregen_dir | -z)
-            pregen_dir=$2
-            shift
-            ;;
-        --jupyter-lab | -j)
-            install_jupyterlab=yes
-            ;;
-        -*)
-            help
-            echo "Unknown Option \"$1\""
-            exit 1
-            ;;
+    --help | -h)
+        help
+        exit 1
+        ;;
+    --enable_ble | -b)
+        enable_ble=$2
+        if [[ "$enable_ble" != "true" && "$enable_ble" != "false" ]]; then
+            echo "chip_detail_logging should have a true/false value, not '$enable_ble'"
+            exit
+        fi
+        shift
+        ;;
+    --chip_detail_logging | -d)
+        chip_detail_logging=$2
+        if [[ "$chip_detail_logging" != "true" && "$chip_detail_logging" != "false" ]]; then
+            echo "chip_detail_logging should have a true/false value, not '$chip_detail_logging'"
+            exit
+        fi
+        shift
+        ;;
+    --chip_mdns | -m)
+        chip_mdns=$2
+        shift
+        ;;
+    --enable_pybindings | -p)
+        enable_pybindings=$2
+        if [[ "$enable_pybindings" != "true" && "$enable_pybindings" != "false" ]]; then
+            echo "enable_pybindings should have a true/false value, not '$enable_pybindings'"
+            exit
+        fi
+        shift
+        ;;
+    --time_between_case_retries | -t)
+        chip_case_retry_delta=$2
+        shift
+        ;;
+    --install_virtual_env | -i)
+        install_virtual_env=$2
+        shift
+        ;;
+    --clean_virtual_env | -c)
+        clean_virtual_env=$2
+        if [[ "$clean_virtual_env" != "yes" && "$clean_virtual_env" != "no" ]]; then
+            echo "clean_virtual_env should have a yes/no value, not '$clean_virtual_env'"
+            exit
+        fi
+        shift
+        ;;
+    --include_pytest_deps)
+        install_pytest_requirements=$2
+        if [[ "$install_pytest_requirements" != "yes" && "$install_pytest_requirements" != "no" ]]; then
+            echo "install_pytest_requirements should have a yes/no value, not '$install_pytest_requirements'"
+            exit
+        fi
+        shift
+        ;;
+    --extra_packages)
+        extra_packages=$2
+        shift
+        ;;
+    --pregen_dir | -z)
+        pregen_dir=$2
+        shift
+        ;;
+    --jupyter-lab | -j)
+        install_jupyterlab=yes
+        ;;
+    -*)
+        help
+        echo "Unknown Option \"$1\""
+        exit 1
+        ;;
     esac
     shift
 done
@@ -213,7 +213,7 @@ else
 fi
 
 # Add the matter_testing_infrastructure wheel
-WHEEL+=("$OUTPUT_ROOT"/python/obj/src/python_testing/matter_testing_infrastructure/metadata_parser._build_wheel/metadata_parser-*.whl)
+WHEEL+=("$OUTPUT_ROOT"/python/obj/src/python_testing/matter_testing_infrastructure/testing_support._build_wheel/testing_support-*.whl)
 
 if [ -n "$extra_packages" ]; then
     WHEEL+=("$extra_packages")

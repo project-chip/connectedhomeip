@@ -32,7 +32,7 @@ import random
 import re
 
 import chip.clusters as Clusters
-from basic_composition_support import BasicCompositionTests
+from testing_support.basic_composition import BasicCompositionTests
 from chip.interaction_model import InteractionModelError, Status
 from chip.tlv import TLVReader
 from cryptography import x509
@@ -41,7 +41,7 @@ from cryptography.hazmat._oid import ExtensionOID
 from cryptography.hazmat.primitives import hashes
 from cryptography.hazmat.primitives.asymmetric import ec, utils
 from ecdsa.curves import curve_by_name
-from matter_testing_support import MatterBaseTest, TestStep, async_test_body, default_matter_test_main, hex_from_bytes, type_matches
+from testing_support.matter_testing import MatterBaseTest, TestStep, async_test_body, default_matter_test_main, hex_from_bytes, type_matches
 from mobly import asserts
 from pyasn1.codec.der.decoder import decode as der_decoder
 from pyasn1.error import PyAsn1Error
