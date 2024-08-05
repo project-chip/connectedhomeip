@@ -17,7 +17,10 @@
 #include <pw_unit_test/framework.h>
 #include <system/SystemConfig.h>
 
+// EventLoopHandlers are only supported by a select-based LayerSocketsLoop
 #if CHIP_SYSTEM_CONFIG_USE_SOCKETS && !CHIP_SYSTEM_CONFIG_USE_DISPATCH
+// The fake PlatformManagerImpl does not drive the system layer event loop
+#if !CHIP_DEVICE_LAYER_TARGET_FAKE
 
 #include <lib/support/CodeUtils.h>
 #include <platform/CHIPDeviceLayer.h>
@@ -141,4 +144,5 @@ TEST_F(TestEventLoopHandler, EventLoopHandlerWake)
     EXPECT_LE(sleepDuration.count(), 500u); // allow some slack for test machine load
 }
 
+#endif // !CHIP_DEVICE_LAYER_TARGET_FAKE
 #endif // CHIP_SYSTEM_CONFIG_USE_SOCKETS && !CHIP_SYSTEM_CONFIG_USE_DISPATCH
