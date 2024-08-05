@@ -94,8 +94,7 @@ class TC_MCORE_FS_1_3(MatterBaseTest):
         self.device_for_th_eco_kvs = f'kvs_{str(uuid.uuid4())}'
         discriminator = random.randint(0, 4095)
         passcode = 20202021
-        app_args = f'--secured-device-port {self.device_for_th_eco_port} --discriminator {
-            discriminator} --passcode {passcode} --KVS {self.device_for_th_eco_kvs}'
+        app_args = f'--secured-device-port {self.device_for_th_eco_port} --discriminator {discriminator} --passcode {passcode} --KVS {self.device_for_th_eco_kvs}'
         cmd = f'{app} {app_args}'
         # TODO: Determine if we want these logs cooked or pushed to somewhere else
         logging.info("Starting TH device for TH ecosystem")
