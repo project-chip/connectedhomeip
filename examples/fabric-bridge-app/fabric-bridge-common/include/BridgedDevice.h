@@ -27,13 +27,13 @@
 #include <string>
 #include <vector>
 
-class Device
+class BridgedDevice
 {
 public:
     static const int kDeviceNameSize = 32;
 
-    Device(chip::NodeId nodeId);
-    virtual ~Device() {}
+    BridgedDevice(chip::NodeId nodeId);
+    virtual ~BridgedDevice() {}
 
     bool IsReachable();
     void SetReachable(bool reachable);
