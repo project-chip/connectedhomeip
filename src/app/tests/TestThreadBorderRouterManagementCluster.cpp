@@ -294,7 +294,7 @@ TEST_F_FROM_FIXTURE(TestThreadBorderRouterManagementCluster, TestCommandHandle)
                                0x68, 0x72, 0x65, 0x61, 0x64, 0x01, 0x02, 0xc1, 0x15, 0x04, 0x10, 0xcb, 0x13, 0x47, 0xeb, 0x0c, 0xd4,
                                0xb3, 0x5c, 0xd1, 0x42, 0xda, 0x5e, 0x6d, 0xf1, 0x8b, 0x88, 0x0c, 0x04, 0x02, 0xa0, 0xf7, 0xf8 };
     std::optional<uint64_t> activeDatasetTimestamp = std::nullopt;
-    activeDatasetTimestamp                    = sTestSeverInstance.ReadActiveDatasetTimestamp();
+    activeDatasetTimestamp                         = sTestSeverInstance.ReadActiveDatasetTimestamp();
     EXPECT_FALSE(activeDatasetTimestamp.has_value());
     req1.activeDataset = ByteSpan(invalidDataset);
     // SetActiveDatasetRequest is FailsafeRequired.
