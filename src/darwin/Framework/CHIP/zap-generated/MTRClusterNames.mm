@@ -5872,10 +5872,6 @@ NSString * MTRAttributeNameForID(MTRClusterIDType clusterID, MTRAttributeIDType 
             result = @"Schedules";
             break;
 
-        case MTRAttributeIDTypeClusterThermostatAttributePresetsSchedulesEditableID:
-            result = @"PresetsSchedulesEditable";
-            break;
-
         case MTRAttributeIDTypeClusterThermostatAttributeSetpointHoldExpiryTimestampID:
             result = @"SetpointHoldExpiryTimestamp";
             break;
