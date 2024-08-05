@@ -89,8 +89,7 @@ template("silabs_executable") {
   ]
 
   flash_target_name = target_name + ".flash_executable"
-  flashbundle_name =
-      ""  # Stop flashable_executable from generating flashbundle.txt
+  flashbundle_name = ""  # Stop flashable_executable from making flashbundle.
   flashable_executable(flash_target_name) {
     forward_variables_from(invoker, "*")
   }
