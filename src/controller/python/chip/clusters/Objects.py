@@ -34870,8 +34870,8 @@ class ColorControl(Cluster):
             kDown = 0x03
             # All received enum values that are not listed above will be mapped
             # to kUnknownEnumValue. This is a helper enum value that should only
-            # be used by code to process how it handles receiving and unknown
-            # enum value. This specific should never be transmitted.
+            # be used by code to process how it handles receiving an unknown
+            # enum value. This specific value should never be transmitted.
             kUnknownEnumValue = 4,
 
         class DriftCompensationEnum(MatterIntEnum):
@@ -34882,8 +34882,8 @@ class ColorControl(Cluster):
             kOpticalColorMonitoringAndFeedback = 0x04
             # All received enum values that are not listed above will be mapped
             # to kUnknownEnumValue. This is a helper enum value that should only
-            # be used by code to process how it handles receiving and unknown
-            # enum value. This specific should never be transmitted.
+            # be used by code to process how it handles receiving an unknown
+            # enum value. This specific value should never be transmitted.
             kUnknownEnumValue = 5,
 
         class EnhancedColorModeEnum(MatterIntEnum):
@@ -34893,8 +34893,8 @@ class ColorControl(Cluster):
             kEnhancedCurrentHueAndCurrentSaturation = 0x03
             # All received enum values that are not listed above will be mapped
             # to kUnknownEnumValue. This is a helper enum value that should only
-            # be used by code to process how it handles receiving and unknown
-            # enum value. This specific should never be transmitted.
+            # be used by code to process how it handles receiving an unknown
+            # enum value. This specific value should never be transmitted.
             kUnknownEnumValue = 4,
 
         class MoveModeEnum(MatterIntEnum):
@@ -53080,3 +53080,4 @@ class SampleMei(Cluster):
 
             count: 'uint' = 0
             fabricIndex: 'uint' = 0
+
