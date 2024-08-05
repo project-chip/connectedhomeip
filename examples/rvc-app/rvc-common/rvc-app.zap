@@ -2885,9 +2885,10 @@
           "define": "SERVICE_AREA_CLUSTER",
           "side": "server",
           "enabled": 1,
+          "apiMaturity": "provisional",
           "commands": [
             {
-              "name": "SelectLocations",
+              "name": "SelectAreas",
               "code": 0,
               "mfgCode": null,
               "source": "client",
@@ -2895,7 +2896,7 @@
               "isEnabled": 1
             },
             {
-              "name": "SelectLocationsResponse",
+              "name": "SelectAreasResponse",
               "code": 1,
               "mfgCode": null,
               "source": "server",
@@ -2903,7 +2904,7 @@
               "isEnabled": 1
             },
             {
-              "name": "SkipCurrent",
+              "name": "SkipArea",
               "code": 2,
               "mfgCode": null,
               "source": "client",
@@ -2911,7 +2912,7 @@
               "isEnabled": 1
             },
             {
-              "name": "SkipCurrentResponse",
+              "name": "SkipAreaResponse",
               "code": 3,
               "mfgCode": null,
               "source": "server",
@@ -2921,7 +2922,7 @@
           ],
           "attributes": [
             {
-              "name": "SupportedLocations",
+              "name": "SupportedAreas",
               "code": 0,
               "mfgCode": null,
               "side": "server",
@@ -2953,7 +2954,7 @@
               "reportableChange": 0
             },
             {
-              "name": "SelectedLocations",
+              "name": "SelectedAreas",
               "code": 2,
               "mfgCode": null,
               "side": "server",
@@ -2969,7 +2970,7 @@
               "reportableChange": 0
             },
             {
-              "name": "CurrentLocation",
+              "name": "CurrentArea",
               "code": 3,
               "mfgCode": null,
               "side": "server",
@@ -2978,7 +2979,7 @@
               "storageOption": "External",
               "singleton": 0,
               "bounded": 0,
-              "defaultValue": "",
+              "defaultValue": null,
               "reportable": 1,
               "minInterval": 1,
               "maxInterval": 65534,
@@ -2994,7 +2995,7 @@
               "storageOption": "External",
               "singleton": 0,
               "bounded": 0,
-              "defaultValue": "",
+              "defaultValue": null,
               "reportable": 1,
               "minInterval": 1,
               "maxInterval": 65534,
@@ -3090,7 +3091,7 @@
               "storageOption": "External",
               "singleton": 0,
               "bounded": 0,
-              "defaultValue": "0",
+              "defaultValue": null,
               "reportable": 1,
               "minInterval": 1,
               "maxInterval": 65534,
