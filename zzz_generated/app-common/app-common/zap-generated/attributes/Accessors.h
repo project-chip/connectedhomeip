@@ -1225,6 +1225,12 @@ Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, chip::CharSpa
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, chip::CharSpan value, MarkAttributeDirty markDirty);
 } // namespace ProductName
 
+namespace ProductID {
+Protocols::InteractionModel::Status Get(chip::EndpointId endpoint, uint16_t * value); // int16u
+Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint16_t value);
+Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint16_t value, MarkAttributeDirty markDirty);
+} // namespace ProductID
+
 namespace NodeLabel {
 Protocols::InteractionModel::Status Get(chip::EndpointId endpoint, chip::MutableCharSpan & value); // char_string
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, chip::CharSpan value);
@@ -2987,66 +2993,6 @@ Protocols::InteractionModel::Status Get(chip::EndpointId endpoint, uint16_t * va
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint16_t value);
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint16_t value, MarkAttributeDirty markDirty);
 } // namespace ExpiringUserTimeout
-
-namespace AliroReaderVerificationKey {
-Protocols::InteractionModel::Status Get(chip::EndpointId endpoint,
-                                        DataModel::Nullable<chip::MutableByteSpan> & value); // octet_string
-Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, chip::ByteSpan value);
-Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, chip::ByteSpan value, MarkAttributeDirty markDirty);
-Protocols::InteractionModel::Status SetNull(chip::EndpointId endpoint);
-Protocols::InteractionModel::Status SetNull(chip::EndpointId endpoint, MarkAttributeDirty markDirty);
-Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, const chip::app::DataModel::Nullable<chip::ByteSpan> & value);
-Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, const chip::app::DataModel::Nullable<chip::ByteSpan> & value,
-                                        MarkAttributeDirty markDirty);
-} // namespace AliroReaderVerificationKey
-
-namespace AliroReaderGroupIdentifier {
-Protocols::InteractionModel::Status Get(chip::EndpointId endpoint,
-                                        DataModel::Nullable<chip::MutableByteSpan> & value); // octet_string
-Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, chip::ByteSpan value);
-Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, chip::ByteSpan value, MarkAttributeDirty markDirty);
-Protocols::InteractionModel::Status SetNull(chip::EndpointId endpoint);
-Protocols::InteractionModel::Status SetNull(chip::EndpointId endpoint, MarkAttributeDirty markDirty);
-Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, const chip::app::DataModel::Nullable<chip::ByteSpan> & value);
-Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, const chip::app::DataModel::Nullable<chip::ByteSpan> & value,
-                                        MarkAttributeDirty markDirty);
-} // namespace AliroReaderGroupIdentifier
-
-namespace AliroReaderGroupSubIdentifier {
-Protocols::InteractionModel::Status Get(chip::EndpointId endpoint, chip::MutableByteSpan & value); // octet_string
-Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, chip::ByteSpan value);
-Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, chip::ByteSpan value, MarkAttributeDirty markDirty);
-} // namespace AliroReaderGroupSubIdentifier
-
-namespace AliroGroupResolvingKey {
-Protocols::InteractionModel::Status Get(chip::EndpointId endpoint,
-                                        DataModel::Nullable<chip::MutableByteSpan> & value); // octet_string
-Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, chip::ByteSpan value);
-Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, chip::ByteSpan value, MarkAttributeDirty markDirty);
-Protocols::InteractionModel::Status SetNull(chip::EndpointId endpoint);
-Protocols::InteractionModel::Status SetNull(chip::EndpointId endpoint, MarkAttributeDirty markDirty);
-Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, const chip::app::DataModel::Nullable<chip::ByteSpan> & value);
-Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, const chip::app::DataModel::Nullable<chip::ByteSpan> & value,
-                                        MarkAttributeDirty markDirty);
-} // namespace AliroGroupResolvingKey
-
-namespace AliroBLEAdvertisingVersion {
-Protocols::InteractionModel::Status Get(chip::EndpointId endpoint, uint8_t * value); // int8u
-Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint8_t value);
-Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint8_t value, MarkAttributeDirty markDirty);
-} // namespace AliroBLEAdvertisingVersion
-
-namespace NumberOfAliroCredentialIssuerKeysSupported {
-Protocols::InteractionModel::Status Get(chip::EndpointId endpoint, uint16_t * value); // int16u
-Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint16_t value);
-Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint16_t value, MarkAttributeDirty markDirty);
-} // namespace NumberOfAliroCredentialIssuerKeysSupported
-
-namespace NumberOfAliroEndpointKeysSupported {
-Protocols::InteractionModel::Status Get(chip::EndpointId endpoint, uint16_t * value); // int16u
-Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint16_t value);
-Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint16_t value, MarkAttributeDirty markDirty);
-} // namespace NumberOfAliroEndpointKeysSupported
 
 namespace FeatureMap {
 Protocols::InteractionModel::Status Get(chip::EndpointId endpoint, uint32_t * value); // bitmap32
@@ -6939,6 +6885,14 @@ Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, bool value);
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, bool value, MarkAttributeDirty markDirty);
 } // namespace TimedWriteBoolean
 
+namespace GlobalEnum {
+Protocols::InteractionModel::Status Get(chip::EndpointId endpoint,
+                                        chip::app::Clusters::Globals::TestGlobalEnum * value); // TestGlobalEnum
+Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, chip::app::Clusters::Globals::TestGlobalEnum value);
+Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, chip::app::Clusters::Globals::TestGlobalEnum value,
+                                        MarkAttributeDirty markDirty);
+} // namespace GlobalEnum
+
 namespace Unsupported {
 Protocols::InteractionModel::Status Get(chip::EndpointId endpoint, bool * value); // boolean
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, bool value);
@@ -7343,6 +7297,21 @@ Protocols::InteractionModel::Status Get(chip::EndpointId endpoint, uint8_t * val
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint8_t value);
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint8_t value, MarkAttributeDirty markDirty);
 } // namespace WriteOnlyInt8u
+
+namespace NullableGlobalEnum {
+Protocols::InteractionModel::Status
+Get(chip::EndpointId endpoint, DataModel::Nullable<chip::app::Clusters::Globals::TestGlobalEnum> & value); // TestGlobalEnum
+Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, chip::app::Clusters::Globals::TestGlobalEnum value);
+Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, chip::app::Clusters::Globals::TestGlobalEnum value,
+                                        MarkAttributeDirty markDirty);
+Protocols::InteractionModel::Status SetNull(chip::EndpointId endpoint);
+Protocols::InteractionModel::Status SetNull(chip::EndpointId endpoint, MarkAttributeDirty markDirty);
+Protocols::InteractionModel::Status Set(chip::EndpointId endpoint,
+                                        const chip::app::DataModel::Nullable<chip::app::Clusters::Globals::TestGlobalEnum> & value);
+Protocols::InteractionModel::Status Set(chip::EndpointId endpoint,
+                                        const chip::app::DataModel::Nullable<chip::app::Clusters::Globals::TestGlobalEnum> & value,
+                                        MarkAttributeDirty markDirty);
+} // namespace NullableGlobalEnum
 
 namespace FeatureMap {
 Protocols::InteractionModel::Status Get(chip::EndpointId endpoint, uint32_t * value); // bitmap32

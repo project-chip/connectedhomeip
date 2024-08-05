@@ -50,7 +50,7 @@ void emberAfOccupancySensingClusterInitCallback(EndpointId endpointId)
         VerifyOrDie(!gOccupancySensingClusterInstances[epIndex]);
 
         gOccupancySensingClusterInstances[epIndex] =
-            std::make_unique<Instance>(BitMask<OccupancySensing::Feature, uint32_t>(OccupancySensing::Feature::kOther));
+            std::make_unique<Instance>(BitMask<OccupancySensing::Feature, uint32_t>(OccupancySensing::Feature::kPassiveInfrared));
 
         OccupancySensing::Structs::HoldTimeLimitsStruct::Type holdTimeLimits = {
             .holdTimeMin     = 1,

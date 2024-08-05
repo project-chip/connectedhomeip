@@ -1894,6 +1894,10 @@ namespace ProductName {
 static constexpr AttributeId Id = 0x00000003;
 } // namespace ProductName
 
+namespace ProductID {
+static constexpr AttributeId Id = 0x00000004;
+} // namespace ProductID
+
 namespace NodeLabel {
 static constexpr AttributeId Id = 0x00000005;
 } // namespace NodeLabel
@@ -8292,6 +8296,14 @@ namespace ClusterErrorBoolean {
 static constexpr AttributeId Id = 0x00000032;
 } // namespace ClusterErrorBoolean
 
+namespace GlobalEnum {
+static constexpr AttributeId Id = 0x00000033;
+} // namespace GlobalEnum
+
+namespace GlobalStruct {
+static constexpr AttributeId Id = 0x00000034;
+} // namespace GlobalStruct
+
 namespace Unsupported {
 static constexpr AttributeId Id = 0x000000FF;
 } // namespace Unsupported
@@ -8431,6 +8443,14 @@ static constexpr AttributeId Id = 0x00004029;
 namespace WriteOnlyInt8u {
 static constexpr AttributeId Id = 0x0000402A;
 } // namespace WriteOnlyInt8u
+
+namespace NullableGlobalEnum {
+static constexpr AttributeId Id = 0x00004033;
+} // namespace NullableGlobalEnum
+
+namespace NullableGlobalStruct {
+static constexpr AttributeId Id = 0x00004034;
+} // namespace NullableGlobalStruct
 
 namespace GeneratedCommandList {
 static constexpr AttributeId Id = Globals::Attributes::GeneratedCommandList::Id;

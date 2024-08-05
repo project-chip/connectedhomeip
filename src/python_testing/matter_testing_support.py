@@ -27,6 +27,7 @@ import queue
 import random
 import re
 import sys
+import time
 import typing
 import uuid
 from binascii import hexlify, unhexlify
@@ -257,11 +258,11 @@ class EventChangeCallback:
                 f'Got subscription report for event on cluster {self._expected_cluster}: {res.Data}')
             self._q.put(res)
 
-    def wait_for_event_report(self, expected_event: ClusterObjects.ClusterEvent, timeoutS: int = 10):
-        """This function allows a test script to block waiting for the specific event to arrive with a timeout
-           (specified in seconds). It returns the event data so that the values can be checked."""
+    def wait_for_event_report(self, expected_event: ClusterObjects.ClusterEvent, timeout_sec: float = 10.0) -> Any:
+        """This function allows a test script to block waiting for the specific event to be the next event
+           to arrive within a timeout (specified in seconds). It returns the event data so that the values can be checked."""
         try:
-            res = self._q.get(block=True, timeout=timeoutS)
+            res = self._q.get(block=True, timeout=timeout_sec)
         except queue.Empty:
             asserts.fail("Failed to receive a report for the event {}".format(expected_event))
 
@@ -269,15 +270,29 @@ class EventChangeCallback:
         asserts.assert_equal(res.Header.EventId, expected_event.event_id, "Expected event ID not found in event report")
         return res.Data
 
-    def wait_for_event_expect_no_report(self, timeoutS: int = 10):
-        """This function succceeds/returns if an event does not arrive within the timeout specified in seconds.
-           If an event does arrive, an assert is called."""
+    def wait_for_event_expect_no_report(self, timeout_sec: float = 10.0):
+        """This function returns if an event does not arrive within the timeout specified in seconds.
+           If any event does arrive, an assert failure occurs."""
         try:
-            res = self._q.get(block=True, timeout=timeoutS)
+            res = self._q.get(block=True, timeout=timeout_sec)
         except queue.Empty:
             return
 
         asserts.fail(f"Event reported when not expected {res}")
+
+    def get_last_event(self) -> Optional[Any]:
+        """Flush entire queue, returning last (newest) event only."""
+        last_event: Optional[Any] = None
+        while True:
+            try:
+                last_event = self._q.get(block=False)
+            except queue.Empty:
+                return last_event
+
+    def flush_events(self) -> None:
+        """Flush entire queue, returning nothing."""
+        _ = self.get_last_event()
+        return
 
     @property
     def event_queue(self) -> queue.Queue:
@@ -317,6 +332,58 @@ class AttributeChangeCallback:
             asserts.fail("[AttributeChangeCallback] Attribute {expected_attribute} not found in returned report")
 
 
+def await_sequence_of_reports(report_queue: queue.Queue, endpoint_id: int, attribute: TypedAttributePath, sequence: list[Any], timeout_sec: float):
+    """Given a queue.Queue hooked-up to an attribute change accumulator, await a given expected sequence of attribute reports.
+
+    Args:
+      - report_queue: the queue that receives all the reports.
+      - endpoint_id: endpoint ID to match for reports to check.
+      - attribute: attribute to match for reports to check.
+      - sequence: list of attribute values in order that are expected.
+      - timeout_sec: number of seconds to wait for.
+
+    This will fail current Mobly test with assertion failure if the data is not as expected in order.
+
+    Returns nothing on success so the test can go on.
+    """
+    start_time = time.time()
+    elapsed = 0.0
+    time_remaining = timeout_sec
+
+    sequence_idx = 0
+    actual_values = []
+
+    while time_remaining > 0:
+        expected_value = sequence[sequence_idx]
+        logging.info(f"Expecting value {expected_value} for attribute {attribute} on endpoint {endpoint_id}")
+        try:
+            item: AttributeValue = report_queue.get(block=True, timeout=time_remaining)
+
+            # Track arrival of all values for the given attribute.
+            if item.endpoint_id == endpoint_id and item.attribute == attribute:
+                actual_values.append(item.value)
+
+                if item.value == expected_value:
+                    logging.info(f"Got expected attribute change {sequence_idx+1}/{len(sequence)} for attribute {attribute}")
+                    sequence_idx += 1
+                else:
+                    asserts.assert_equal(item.value, expected_value,
+                                         msg="Did not get expected attribute value in correct sequence.")
+
+                # We are done waiting when we have accumulated all results.
+                if sequence_idx == len(sequence):
+                    logging.info("Got all attribute changes, done waiting.")
+                    return
+        except queue.Empty:
+            # No error, we update timeouts and keep going
+            pass
+
+        elapsed = time.time() - start_time
+        time_remaining = timeout_sec - elapsed
+
+    asserts.fail(f"Did not get full sequence {sequence} in {timeout_sec:.1f} seconds. Got {actual_values} before time-out.")
+
+
 @dataclass
 class AttributeValue:
     endpoint_id: int
@@ -346,7 +413,7 @@ class ClusterAttributeChangeAccumulator:
         self._subscription = await dev_ctrl.ReadAttribute(
             nodeid=node_id,
             attributes=[(endpoint, self._expected_cluster)],
-            reportInterval=(min_interval_sec, max_interval_sec),
+            reportInterval=(int(min_interval_sec), int(max_interval_sec)),
             fabricFiltered=fabric_filtered,
             keepSubscriptions=True
         )
@@ -962,6 +1029,25 @@ class MatterBaseTest(base_test.BaseTestClass):
             return None
 
         return attr_ret
+
+    async def write_single_attribute(self, attribute_value: object, endpoint_id: int = None, expect_success: bool = True) -> Status:
+        """Write a single `attribute_value` on a given `endpoint_id` and assert on failure.
+
+        If `endpoint_id` is None, the default DUT endpoint for the test is selected.
+
+        If `expect_success` is True, a test assertion fails on error status codes
+
+        Status code is returned.
+        """
+        dev_ctrl = self.default_controller
+        node_id = self.dut_node_id
+        endpoint = self.matter_test_config.endpoint if endpoint_id is None else endpoint_id
+
+        write_result = await dev_ctrl.WriteAttribute(node_id, [(endpoint, attribute_value)])
+        if expect_success:
+            asserts.assert_equal(write_result[0].Status, Status.Success,
+                                 f"Expected write success for write to attribute {attribute_value} on endpoint {endpoint}")
+        return write_result[0].Status
 
     async def send_single_cmd(
             self, cmd: Clusters.ClusterObjects.ClusterCommand,
