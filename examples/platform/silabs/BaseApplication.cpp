@@ -188,6 +188,17 @@ void BaseApplicationDelegate::OnCommissioningWindowClosed()
         }
     }
 #endif // CHIP_CONFIG_ENABLE_ICD_SERVER && SLI_SI917
+    if (BaseApplication::GetProvisionStatus())
+    {
+#ifdef DISPLAY_ENABLED
+#ifdef QR_CODE_ENABLED
+        SilabsLCD::Screen_e screen;
+        slLCD.GetScreen(screen);
+        VerifyOrReturn(screen == SilabsLCD::Screen_e::QRCodeScreen);
+        slLCD.SetScreen(SilabsLCD::Screen_e::DemoScreen);
+#endif // QR_CODE_ENABLED
+#endif // DISPLAY_ENABLED
+    }
 }
 
 void BaseApplicationDelegate::OnFabricCommitted(const FabricTable & fabricTable, FabricIndex fabricIndex)
