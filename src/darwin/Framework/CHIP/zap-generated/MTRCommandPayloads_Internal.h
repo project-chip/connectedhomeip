@@ -1498,19 +1498,13 @@ NS_ASSUME_NONNULL_BEGIN
 
 @end
 
-@interface MTRThermostatClusterStartPresetsSchedulesEditRequestParams (InternalMethods)
+@interface MTRThermostatClusterAtomicResponseParams (InternalMethods)
 
-- (NSDictionary<NSString *, id> * _Nullable)_encodeAsDataValue:(NSError * __autoreleasing *)error;
-
-@end
-
-@interface MTRThermostatClusterCancelPresetsSchedulesEditRequestParams (InternalMethods)
-
-- (NSDictionary<NSString *, id> * _Nullable)_encodeAsDataValue:(NSError * __autoreleasing *)error;
+- (CHIP_ERROR)_setFieldsFromDecodableStruct:(const chip::app::Clusters::Thermostat::Commands::AtomicResponse::DecodableType &)decodableStruct;
 
 @end
 
-@interface MTRThermostatClusterCommitPresetsSchedulesRequestParams (InternalMethods)
+@interface MTRThermostatClusterAtomicRequestParams (InternalMethods)
 
 - (NSDictionary<NSString *, id> * _Nullable)_encodeAsDataValue:(NSError * __autoreleasing *)error;
 
