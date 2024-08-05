@@ -58,6 +58,17 @@ class ThreadBorderRouterManagementCluster(
     object SubscriptionEstablished : ActiveDatasetTimestampAttributeSubscriptionState()
   }
 
+  class PendingDatasetTimestampAttribute(val value: ULong?)
+
+  sealed class PendingDatasetTimestampAttributeSubscriptionState {
+    data class Success(val value: ULong?) : PendingDatasetTimestampAttributeSubscriptionState()
+
+    data class Error(val exception: Exception) :
+      PendingDatasetTimestampAttributeSubscriptionState()
+
+    object SubscriptionEstablished : PendingDatasetTimestampAttributeSubscriptionState()
+  }
+
   class GeneratedCommandListAttribute(val value: List<UInt>)
 
   sealed class GeneratedCommandListAttributeSubscriptionState {
@@ -650,6 +661,101 @@ class ThreadBorderRouterManagementCluster(
         }
         SubscriptionState.SubscriptionEstablished -> {
           emit(ActiveDatasetTimestampAttributeSubscriptionState.SubscriptionEstablished)
+        }
+      }
+    }
+  }
+
+  suspend fun readPendingDatasetTimestampAttribute(): PendingDatasetTimestampAttribute {
+    val ATTRIBUTE_ID: UInt = 5u
+
+    val attributePath =
+      AttributePath(endpointId = endpointId, clusterId = CLUSTER_ID, attributeId = ATTRIBUTE_ID)
+
+    val readRequest = ReadRequest(eventPaths = emptyList(), attributePaths = listOf(attributePath))
+
+    val response = controller.read(readRequest)
+
+    if (response.successes.isEmpty()) {
+      logger.log(Level.WARNING, "Read command failed")
+      throw IllegalStateException("Read command failed with failures: ${response.failures}")
+    }
+
+    logger.log(Level.FINE, "Read command succeeded")
+
+    val attributeData =
+      response.successes.filterIsInstance<ReadData.Attribute>().firstOrNull {
+        it.path.attributeId == ATTRIBUTE_ID
+      }
+
+    requireNotNull(attributeData) { "Pendingdatasettimestamp attribute not found in response" }
+
+    // Decode the TLV data into the appropriate type
+    val tlvReader = TlvReader(attributeData.data)
+    val decodedValue: ULong? =
+      if (!tlvReader.isNull()) {
+        tlvReader.getULong(AnonymousTag)
+      } else {
+        tlvReader.getNull(AnonymousTag)
+        null
+      }
+
+    return PendingDatasetTimestampAttribute(decodedValue)
+  }
+
+  suspend fun subscribePendingDatasetTimestampAttribute(
+    minInterval: Int,
+    maxInterval: Int,
+  ): Flow<PendingDatasetTimestampAttributeSubscriptionState> {
+    val ATTRIBUTE_ID: UInt = 5u
+    val attributePaths =
+      listOf(
+        AttributePath(endpointId = endpointId, clusterId = CLUSTER_ID, attributeId = ATTRIBUTE_ID)
+      )
+
+    val subscribeRequest: SubscribeRequest =
+      SubscribeRequest(
+        eventPaths = emptyList(),
+        attributePaths = attributePaths,
+        minInterval = Duration.ofSeconds(minInterval.toLong()),
+        maxInterval = Duration.ofSeconds(maxInterval.toLong()),
+      )
+
+    return controller.subscribe(subscribeRequest).transform { subscriptionState ->
+      when (subscriptionState) {
+        is SubscriptionState.SubscriptionErrorNotification -> {
+          emit(
+            PendingDatasetTimestampAttributeSubscriptionState.Error(
+              Exception(
+                "Subscription terminated with error code: ${subscriptionState.terminationCause}"
+              )
+            )
+          )
+        }
+        is SubscriptionState.NodeStateUpdate -> {
+          val attributeData =
+            subscriptionState.updateState.successes
+              .filterIsInstance<ReadData.Attribute>()
+              .firstOrNull { it.path.attributeId == ATTRIBUTE_ID }
+
+          requireNotNull(attributeData) {
+            "Pendingdatasettimestamp attribute not found in Node State update"
+          }
+
+          // Decode the TLV data into the appropriate type
+          val tlvReader = TlvReader(attributeData.data)
+          val decodedValue: ULong? =
+            if (!tlvReader.isNull()) {
+              tlvReader.getULong(AnonymousTag)
+            } else {
+              tlvReader.getNull(AnonymousTag)
+              null
+            }
+
+          decodedValue?.let { emit(PendingDatasetTimestampAttributeSubscriptionState.Success(it)) }
+        }
+        SubscriptionState.SubscriptionEstablished -> {
+          emit(PendingDatasetTimestampAttributeSubscriptionState.SubscriptionEstablished)
         }
       }
     }

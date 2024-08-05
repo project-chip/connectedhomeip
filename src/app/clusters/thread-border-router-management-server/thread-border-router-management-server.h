@@ -76,14 +76,15 @@ private:
     {
         return HandleGetDatasetRequest(isOverCASESession, Delegate::DatasetType::kPending, dataset);
     }
-    Status HandleSetActiveDatasetRequest(CommandHandler * commandHandler,
+    Status HandleSetActiveDatasetRequest(bool isOverCASESession, CommandHandler * commandHandler,
                                          const Commands::SetActiveDatasetRequest::DecodableType & req);
-    Status HandleSetPendingDatasetRequest(const Commands::SetPendingDatasetRequest::DecodableType & req);
+    Status HandleSetPendingDatasetRequest(bool isOverCASESession, const Commands::SetPendingDatasetRequest::DecodableType & req);
     Status HandleGetDatasetRequest(bool isOverCASESession, Delegate::DatasetType type, Thread::OperationalDataset & dataset);
 
     // Attribute Read handlers
     void ReadFeatureMap(BitFlags<Feature> & feature);
     Optional<uint64_t> ReadActiveDatasetTimestamp();
+    Optional<uint64_t> ReadPendingDatasetTimestamp();
     CHIP_ERROR ReadBorderRouterName(MutableCharSpan & borderRouterName);
     CHIP_ERROR ReadBorderAgentID(MutableByteSpan & borderAgentId);
 

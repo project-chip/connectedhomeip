@@ -70,7 +70,7 @@ Status ServerInstance::HandleGetDatasetRequest(bool isOverCASESession, Delegate:
     return Status::Success;
 }
 
-Status ServerInstance::HandleSetActiveDatasetRequest(CommandHandler * commandHandler,
+Status ServerInstance::HandleSetActiveDatasetRequest(bool isOverCASESession, CommandHandler * commandHandler,
                                                      const Commands::SetActiveDatasetRequest::DecodableType & req)
 {
     // The SetActiveDatasetRequest command SHALL be FailSafeArmed. Upon receiving this command, the Thread BR will set its
@@ -80,6 +80,7 @@ Status ServerInstance::HandleSetActiveDatasetRequest(CommandHandler * commandHan
     // reverted. If the FailSafe timer expires before the Thread BR responds, the Thread BR will respond with a timeout status and
     // the active dataset should also be reverted.
     VerifyOrDie(mDelegate);
+    VerifyOrReturnValue(isOverCASESession, Status::UnsupportedAccess);
     VerifyOrReturnValue(mFailsafeContext.IsFailSafeArmed(commandHandler->GetAccessingFabricIndex()), Status::FailsafeRequired);
 
     Thread::OperationalDataset activeDataset;
@@ -109,9 +110,11 @@ Status ServerInstance::HandleSetActiveDatasetRequest(CommandHandler * commandHan
     return Status::Success;
 }
 
-Status ServerInstance::HandleSetPendingDatasetRequest(const Commands::SetPendingDatasetRequest::DecodableType & req)
+Status ServerInstance::HandleSetPendingDatasetRequest(bool isOverCASESession,
+                                                      const Commands::SetPendingDatasetRequest::DecodableType & req)
 {
     VerifyOrDie(mDelegate);
+    VerifyOrReturnValue(isOverCASESession, Status::UnsupportedAccess);
     if (!mDelegate->GetPanChangeSupported())
     {
         return Status::UnsupportedCommand;
@@ -157,7 +160,7 @@ void ServerInstance::InvokeCommand(HandlerContext & ctxt)
     case Commands::SetActiveDatasetRequest::Id:
         HandleCommand<Commands::SetActiveDatasetRequest::DecodableType>(ctxt, [this](HandlerContext & ctx, const auto & req) {
             mPath         = ctx.mRequestPath;
-            Status status = HandleSetActiveDatasetRequest(&ctx.mCommandHandler, req);
+            Status status = HandleSetActiveDatasetRequest(IsCommandOverCASESession(ctx), &ctx.mCommandHandler, req);
             if (status != Status::Success)
             {
                 // If status is not Success, we should immediately report the status. Otherwise the async work will report the
@@ -168,7 +171,8 @@ void ServerInstance::InvokeCommand(HandlerContext & ctxt)
         break;
     case Commands::SetPendingDatasetRequest::Id:
         HandleCommand<Commands::SetPendingDatasetRequest::DecodableType>(ctxt, [this](HandlerContext & ctx, const auto & req) {
-            ctx.mCommandHandler.AddStatus(ctx.mRequestPath, HandleSetPendingDatasetRequest(req));
+            Status status = HandleSetPendingDatasetRequest(IsCommandOverCASESession(ctx), req);
+            ctx.mCommandHandler.AddStatus(ctx.mRequestPath, status);
         });
         break;
     default:
@@ -207,6 +211,18 @@ Optional<uint64_t> ServerInstance::ReadActiveDatasetTimestamp()
         (activeDataset.GetActiveTimestamp(activeDatasetTimestampValue) == CHIP_NO_ERROR))
     {
         return MakeOptional(activeDatasetTimestampValue);
+    }
+    return NullOptional;
+}
+
+Optional<uint64_t> ServerInstance::ReadPendingDatasetTimestamp()
+{
+    uint64_t pendingDatasetTimestampValue = 0;
+    Thread::OperationalDataset pendingDataset;
+    if ((mDelegate->GetDataset(pendingDataset, Delegate::DatasetType::kPending) == CHIP_NO_ERROR) &&
+        (pendingDataset.GetActiveTimestamp(pendingDatasetTimestampValue) == CHIP_NO_ERROR))
+    {
+        return MakeOptional(pendingDatasetTimestampValue);
     }
     return NullOptional;
 }
@@ -262,6 +278,12 @@ CHIP_ERROR ServerInstance::Read(const ConcreteReadAttributePath & aPath, Attribu
         Optional<uint64_t> activeDatasetTimestamp = ReadActiveDatasetTimestamp();
         status = activeDatasetTimestamp.HasValue() ? aEncoder.Encode(DataModel::MakeNullable(activeDatasetTimestamp.Value()))
                                                    : aEncoder.EncodeNull();
+        break;
+    }
+    case Attributes::PendingDatasetTimestamp::Id: {
+        Optional<uint64_t> pendingDatasetTimestamp = ReadPendingDatasetTimestamp();
+        status = pendingDatasetTimestamp.HasValue() ? aEncoder.Encode(DataModel::MakeNullable(pendingDatasetTimestamp.Value()))
+                                                    : aEncoder.EncodeNull();
         break;
     }
     default:

@@ -14870,6 +14870,7 @@ public class ClusterIDMapping {
             ThreadVersion(2L),
             InterfaceEnabled(3L),
             ActiveDatasetTimestamp(4L),
+            PendingDatasetTimestamp(5L),
             GeneratedCommandList(65528L),
             AcceptedCommandList(65529L),
             EventList(65530L),

@@ -6830,6 +6830,10 @@ namespace ActiveDatasetTimestamp {
 static constexpr AttributeId Id = 0x00000004;
 } // namespace ActiveDatasetTimestamp
 
+namespace PendingDatasetTimestamp {
+static constexpr AttributeId Id = 0x00000005;
+} // namespace PendingDatasetTimestamp
+
 namespace GeneratedCommandList {
 static constexpr AttributeId Id = Globals::Attributes::GeneratedCommandList::Id;
 } // namespace GeneratedCommandList

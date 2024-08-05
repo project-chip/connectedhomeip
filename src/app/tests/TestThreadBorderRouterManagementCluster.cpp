@@ -287,14 +287,14 @@ TEST_F_FROM_FIXTURE(TestThreadBorderRouterManagementCluster, TestCommandHandle)
     EXPECT_FALSE(activeDatasetTimestamp.HasValue());
     req1.activeDataset = ByteSpan(invalidDataset);
     // SetActiveDatasetRequest is FailsafeRequired.
-    EXPECT_EQ(sTestSeverInstance.HandleSetActiveDatasetRequest(&sTestCommandHandler, req1), Status::FailsafeRequired);
+    EXPECT_EQ(sTestSeverInstance.HandleSetActiveDatasetRequest(true, &sTestCommandHandler, req1), Status::FailsafeRequired);
     EXPECT_EQ(sTestFailsafeContext.ArmFailSafe(kTestAccessingFabricIndex, System::Clock::Seconds16(1)), CHIP_NO_ERROR);
     // SetActiveDatasetRequest should return InvalidCommand when dataset is invalid.
-    EXPECT_EQ(sTestSeverInstance.HandleSetActiveDatasetRequest(&sTestCommandHandler, req1), Status::InvalidCommand);
+    EXPECT_EQ(sTestSeverInstance.HandleSetActiveDatasetRequest(true, &sTestCommandHandler, req1), Status::InvalidCommand);
     req1.activeDataset = ByteSpan(validDataset);
-    EXPECT_EQ(sTestSeverInstance.HandleSetActiveDatasetRequest(&sTestCommandHandler, req1), Status::Success);
+    EXPECT_EQ(sTestSeverInstance.HandleSetActiveDatasetRequest(true, &sTestCommandHandler, req1), Status::Success);
     // When the Server is handling a SetActiveDatasetRequest command, it should return Busy after receiving another one.
-    EXPECT_EQ(sTestSeverInstance.HandleSetActiveDatasetRequest(&sTestCommandHandler, req1), Status::Busy);
+    EXPECT_EQ(sTestSeverInstance.HandleSetActiveDatasetRequest(true, &sTestCommandHandler, req1), Status::Busy);
     EXPECT_FALSE(sTestDelegate.mInterfaceEnabled);
     EXPECT_EQ(sTestDelegate.mSetActiveDatasetCommandSequenceNum, static_cast<unsigned int>(1));
     // Activate the dataset.
@@ -311,21 +311,21 @@ TEST_F_FROM_FIXTURE(TestThreadBorderRouterManagementCluster, TestCommandHandle)
     EXPECT_TRUE(activeDatasetTimestamp.HasValue());
     EXPECT_EQ(sTestFailsafeContext.ArmFailSafe(kTestAccessingFabricIndex, System::Clock::Seconds16(1)), CHIP_NO_ERROR);
     // When ActiveDatasetTimestamp is not null, the set active dataset request should return InvalidInState.
-    EXPECT_EQ(sTestSeverInstance.HandleSetActiveDatasetRequest(&sTestCommandHandler, req1), Status::InvalidInState);
+    EXPECT_EQ(sTestSeverInstance.HandleSetActiveDatasetRequest(true, &sTestCommandHandler, req1), Status::InvalidInState);
     sTestFailsafeContext.DisarmFailSafe();
     // Test SetPendingDatasetRequest command
     Commands::SetPendingDatasetRequest::DecodableType req2;
     sTestDelegate.mPanChangeSupported = false;
     req2.pendingDataset               = ByteSpan(validDataset);
     // SetPendingDatasetRequest is supported when PANChange feature is enabled.
-    EXPECT_EQ(sTestSeverInstance.HandleSetPendingDatasetRequest(req2), Status::UnsupportedCommand);
+    EXPECT_EQ(sTestSeverInstance.HandleSetPendingDatasetRequest(true, req2), Status::UnsupportedCommand);
     sTestDelegate.mPanChangeSupported = true;
     req2.pendingDataset               = ByteSpan(invalidDataset);
     // SetPendingDatasetRequest should return InvalidCommand when dataset is invalid.
-    EXPECT_EQ(sTestSeverInstance.HandleSetPendingDatasetRequest(req2), Status::InvalidCommand);
+    EXPECT_EQ(sTestSeverInstance.HandleSetPendingDatasetRequest(true, req2), Status::InvalidCommand);
     req2.pendingDataset = ByteSpan(validDataset);
     // Success SetPendingDatasetRequest
-    EXPECT_EQ(sTestSeverInstance.HandleSetPendingDatasetRequest(req2), Status::Success);
+    EXPECT_EQ(sTestSeverInstance.HandleSetPendingDatasetRequest(true, req2), Status::Success);
     EXPECT_EQ(sTestSeverInstance.HandleGetDatasetRequest(true, DatasetType::kPending, dataset), Status::Success);
     EXPECT_TRUE(dataset.AsByteSpan().data_equal(ByteSpan(validDataset)));
 }

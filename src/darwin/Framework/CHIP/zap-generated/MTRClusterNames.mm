@@ -7602,6 +7602,10 @@ NSString * MTRAttributeNameForID(MTRClusterIDType clusterID, MTRAttributeIDType 
             result = @"ActiveDatasetTimestamp";
             break;
 
+        case MTRAttributeIDTypeClusterThreadBorderRouterManagementAttributePendingDatasetTimestampID:
+            result = @"PendingDatasetTimestamp";
+            break;
+
         case MTRAttributeIDTypeClusterThreadBorderRouterManagementAttributeGeneratedCommandListID:
             result = @"GeneratedCommandList";
             break;

@@ -36675,6 +36675,18 @@ struct TypeInfo
     static constexpr bool MustUseTimedWrite() { return false; }
 };
 } // namespace ActiveDatasetTimestamp
+namespace PendingDatasetTimestamp {
+struct TypeInfo
+{
+    using Type             = chip::app::DataModel::Nullable<uint64_t>;
+    using DecodableType    = chip::app::DataModel::Nullable<uint64_t>;
+    using DecodableArgType = const chip::app::DataModel::Nullable<uint64_t> &;
+
+    static constexpr ClusterId GetClusterId() { return Clusters::ThreadBorderRouterManagement::Id; }
+    static constexpr AttributeId GetAttributeId() { return Attributes::PendingDatasetTimestamp::Id; }
+    static constexpr bool MustUseTimedWrite() { return false; }
+};
+} // namespace PendingDatasetTimestamp
 namespace GeneratedCommandList {
 struct TypeInfo : public Clusters::Globals::Attributes::GeneratedCommandList::TypeInfo
 {
@@ -36725,6 +36737,7 @@ struct TypeInfo
         Attributes::ThreadVersion::TypeInfo::DecodableType threadVersion       = static_cast<uint16_t>(0);
         Attributes::InterfaceEnabled::TypeInfo::DecodableType interfaceEnabled = static_cast<bool>(0);
         Attributes::ActiveDatasetTimestamp::TypeInfo::DecodableType activeDatasetTimestamp;
+        Attributes::PendingDatasetTimestamp::TypeInfo::DecodableType pendingDatasetTimestamp;
         Attributes::GeneratedCommandList::TypeInfo::DecodableType generatedCommandList;
         Attributes::AcceptedCommandList::TypeInfo::DecodableType acceptedCommandList;
         Attributes::EventList::TypeInfo::DecodableType eventList;

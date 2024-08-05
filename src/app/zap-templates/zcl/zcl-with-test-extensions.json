@@ -309,6 +309,7 @@
             "ThreadVersion",
             "InterfaceEnabled",
             "ActiveDatasetTimestamp",
+            "PendingDatasetTimestamp",
             "FeatureMap"
         ],
         "Thread Network Diagnostics": [

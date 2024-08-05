@@ -5493,6 +5493,9 @@ static BOOL AttributeIsSpecifiedInThreadBorderRouterManagementCluster(AttributeI
     case Attributes::ActiveDatasetTimestamp::Id: {
         return YES;
     }
+    case Attributes::PendingDatasetTimestamp::Id: {
+        return YES;
+    }
     case Attributes::GeneratedCommandList::Id: {
         return YES;
     }
