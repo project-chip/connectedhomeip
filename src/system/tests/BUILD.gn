@@ -21,6 +21,7 @@ chip_test_suite("tests") {
   output_name = "libSystemLayerTests"
 
   test_sources = [
+    "TestEventLoopHandler.cpp",
     "TestSystemClock.cpp",
     "TestSystemErrorStr.cpp",
     "TestSystemPacketBuffer.cpp",
