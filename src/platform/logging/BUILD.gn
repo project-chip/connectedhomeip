@@ -76,10 +76,11 @@ source_set("default") {
       deps += [ ":stdio" ]
     } else if (chip_device_platform == "nuttx") {
       deps += [ "${chip_root}/src/platform/NuttX:logging" ]
+    } else if (chip_device_platform == "android") {
+      deps += [ "${chip_root}/src/platform/android:logging" ]
     } else {
-      assert(
-          chip_device_platform == "fake" || chip_device_platform == "android" ||
-          chip_device_platform == "external" || chip_device_platform == "none")
+      assert(chip_device_platform == "fake" ||
+             chip_device_platform == "external" || chip_device_platform == "none")
     }
   }
 }
