@@ -1446,7 +1446,6 @@ void handleAtomicBegin(CommandHandler * commandObj, const ConcreteCommandPath & 
     gThermostatAttrAccess.SetAtomicWrite(endpoint, true);
     gThermostatAttrAccess.SetAtomicWriteScopedNodeId(endpoint, GetSourceScopedNodeId(commandObj));
     sendAtomicResponse(commandObj, commandPath, imcode::Success, imcode::Success, imcode::Success, MakeOptional(timeout));
-    return;
 }
 
 imcode commitPresets(Delegate * delegate, EndpointId endpoint)
