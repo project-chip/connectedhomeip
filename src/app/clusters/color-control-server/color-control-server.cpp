@@ -268,7 +268,7 @@ public:
                 VerifyOrReturnError(decodePair.valueUnsigned8.HasValue(), CHIP_ERROR_INVALID_ARGUMENT);
                 if (decodePair.valueUnsigned8.Value() <= to_underlying(EnhancedColorMode::kEnhancedCurrentHueAndCurrentSaturation))
                 {
-                    targetColorMode = static_cast<EnhancedColorMode>(decodePair.valueUnsigned8.Value());
+                    targetColorMode = static_cast<EnhancedColorModeEnum>(decodePair.valueUnsigned8.Value());
                 }
                 break;
             default:
@@ -582,14 +582,14 @@ bool ColorControlServer::shouldExecuteIfOff(EndpointId endpoint, BitMask<Options
  * @param endpoint
  * @param newColorMode
  */
-void ColorControlServer::handleModeSwitch(EndpointId endpoint, EnhancedColorMode newColorMode)
+void ColorControlServer::handleModeSwitch(EndpointId endpoint, EnhancedColorModeEnum newColorMode)
 {
     auto oldColorMode = ColorModeEnum::kCurrentHueAndCurrentSaturation;
     Attributes::ColorMode::Get(endpoint, &oldColorMode);
 
     uint8_t colorModeTransition;
 
-    if (oldColorMode == static_cast<ColorModeEnum>(newColorMode))
+    if (static_cast<EnhancedColorModeEnum>(oldColorMode) == newColorMode)
     {
         return;
     }
@@ -2705,7 +2705,7 @@ void ColorControlServer::startUpColorTempCommand(EndpointId endpoint)
                     auto updateColorMode = ColorModeEnum::kColorTemperatureMireds;
                     Attributes::ColorMode::Set(endpoint, updateColorMode);
 
-                    Attributes::EnhancedColorMode::Set(endpoint, static_cast<EnhancedColorMode>(updateColorMode));
+                    Attributes::EnhancedColorMode::Set(endpoint, static_cast<EnhancedColorModeEnum>(updateColorMode));
                 }
             }
         }
@@ -3038,7 +3038,7 @@ void ColorControlServer::levelControlColorTempChangeCommand(EndpointId endpoint)
     auto colorMode = ColorModeEnum::kCurrentHueAndCurrentSaturation;
     Attributes::ColorMode::Get(endpoint, &colorMode);
 
-    if (static_cast<EnhancedColorMode>(colorMode) == EnhancedColorMode::kColorTemperatureMireds)
+    if (static_cast<EnhancedColorModeEnum>(colorMode) == EnhancedColorMode::kColorTemperatureMireds)
     {
         app::DataModel::Nullable<uint8_t> currentLevel;
         Status status = LevelControl::Attributes::CurrentLevel::Get(endpoint, currentLevel);
