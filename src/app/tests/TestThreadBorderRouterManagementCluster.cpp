@@ -33,6 +33,7 @@
 #include <lib/support/Span.h>
 #include <lib/support/ThreadOperationalDataset.h>
 #include <lib/support/tests/ExtraPwTestMacros.h>
+#include <optional>
 #include <protocols/interaction_model/StatusCode.h>
 #include <pw_unit_test/framework.h>
 
@@ -260,8 +261,8 @@ TEST_F_FROM_FIXTURE(TestThreadBorderRouterManagementCluster, TestAttributeRead)
     EXPECT_TRUE(agentIdSpan.data_equal(ByteSpan(sTestDelegate.kTestBorderAgentId)));
     // ActiveDatasetTimestamp attribute
     // The active dataset timestamp should be null when no active dataset is configured
-    Optional<uint64_t> timestamp = sTestSeverInstance.ReadActiveDatasetTimestamp();
-    EXPECT_FALSE(timestamp.HasValue());
+    std::optional<uint64_t> timestamp = sTestSeverInstance.ReadActiveDatasetTimestamp();
+    EXPECT_FALSE(timestamp.has_value());
 }
 
 TEST_F_FROM_FIXTURE(TestThreadBorderRouterManagementCluster, TestCommandHandle)
@@ -292,9 +293,9 @@ TEST_F_FROM_FIXTURE(TestThreadBorderRouterManagementCluster, TestCommandHandle)
                                0xc5, 0x25, 0x7f, 0x68, 0x4c, 0x54, 0x9d, 0x6a, 0x57, 0x5e, 0x03, 0x0a, 0x4f, 0x70, 0x65, 0x6e, 0x54,
                                0x68, 0x72, 0x65, 0x61, 0x64, 0x01, 0x02, 0xc1, 0x15, 0x04, 0x10, 0xcb, 0x13, 0x47, 0xeb, 0x0c, 0xd4,
                                0xb3, 0x5c, 0xd1, 0x42, 0xda, 0x5e, 0x6d, 0xf1, 0x8b, 0x88, 0x0c, 0x04, 0x02, 0xa0, 0xf7, 0xf8 };
-    Optional<uint64_t> activeDatasetTimestamp = chip::NullOptional;
+    std::optional<uint64_t> activeDatasetTimestamp = std::nullopt;
     activeDatasetTimestamp                    = sTestSeverInstance.ReadActiveDatasetTimestamp();
-    EXPECT_FALSE(activeDatasetTimestamp.HasValue());
+    EXPECT_FALSE(activeDatasetTimestamp.has_value());
     req1.activeDataset = ByteSpan(invalidDataset);
     // SetActiveDatasetRequest is FailsafeRequired.
     EXPECT_EQ(sTestSeverInstance.HandleSetActiveDatasetRequest(ctx, req1), Status::FailsafeRequired);
@@ -318,7 +319,7 @@ TEST_F_FROM_FIXTURE(TestThreadBorderRouterManagementCluster, TestCommandHandle)
     EXPECT_TRUE(sTestDelegate.mInterfaceEnabled);
     activeDatasetTimestamp = sTestSeverInstance.ReadActiveDatasetTimestamp();
     // activeDatasetTimestamp should have value.
-    EXPECT_TRUE(activeDatasetTimestamp.HasValue());
+    EXPECT_TRUE(activeDatasetTimestamp.has_value());
     EXPECT_EQ(sTestFailsafeContext.ArmFailSafe(kTestAccessingFabricIndex, System::Clock::Seconds16(1)), CHIP_NO_ERROR);
     // When ActiveDatasetTimestamp is not null, the set active dataset request should return InvalidInState.
     EXPECT_EQ(sTestSeverInstance.HandleSetActiveDatasetRequest(ctx, req1), Status::InvalidInState);

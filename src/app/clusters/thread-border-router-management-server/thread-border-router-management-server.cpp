@@ -38,6 +38,7 @@
 #include "platform/CHIPDeviceEvent.h"
 #include "platform/PlatformManager.h"
 #include "protocols/interaction_model/StatusCode.h"
+#include <optional>
 
 namespace chip {
 namespace app {
@@ -206,28 +207,28 @@ CHIP_ERROR ServerInstance::ReadBorderAgentID(MutableByteSpan & outBorderAgentId)
     return CHIP_NO_ERROR;
 }
 
-Optional<uint64_t> ServerInstance::ReadActiveDatasetTimestamp()
+std::optional<uint64_t> ServerInstance::ReadActiveDatasetTimestamp()
 {
     uint64_t activeDatasetTimestampValue = 0;
     Thread::OperationalDataset activeDataset;
     if ((mDelegate->GetDataset(activeDataset, Delegate::DatasetType::kActive) == CHIP_NO_ERROR) &&
         (activeDataset.GetActiveTimestamp(activeDatasetTimestampValue) == CHIP_NO_ERROR))
     {
-        return MakeOptional(activeDatasetTimestampValue);
+        return std::make_optional(activeDatasetTimestampValue);
     }
-    return NullOptional;
+    return std::nullopt;
 }
 
-Optional<uint64_t> ServerInstance::ReadPendingDatasetTimestamp()
+std::optional<uint64_t> ServerInstance::ReadPendingDatasetTimestamp()
 {
     uint64_t pendingDatasetTimestampValue = 0;
     Thread::OperationalDataset pendingDataset;
     if ((mDelegate->GetDataset(pendingDataset, Delegate::DatasetType::kPending) == CHIP_NO_ERROR) &&
         (pendingDataset.GetActiveTimestamp(pendingDatasetTimestampValue) == CHIP_NO_ERROR))
     {
-        return MakeOptional(pendingDatasetTimestampValue);
+        return std::make_optional(pendingDatasetTimestampValue);
     }
-    return NullOptional;
+    return std::nullopt;
 }
 
 CHIP_ERROR ServerInstance::Read(const ConcreteReadAttributePath & aPath, AttributeValueEncoder & aEncoder)
@@ -278,15 +279,13 @@ CHIP_ERROR ServerInstance::Read(const ConcreteReadAttributePath & aPath, Attribu
         break;
     }
     case Attributes::ActiveDatasetTimestamp::Id: {
-        Optional<uint64_t> activeDatasetTimestamp = ReadActiveDatasetTimestamp();
-        status = activeDatasetTimestamp.HasValue() ? aEncoder.Encode(DataModel::MakeNullable(activeDatasetTimestamp.Value()))
-                                                   : aEncoder.EncodeNull();
+        std::optional<uint64_t> activeDatasetTimestamp = ReadActiveDatasetTimestamp();
+        status = activeDatasetTimestamp.has_value() ? aEncoder.Encode(activeDatasetTimestamp.value()) : aEncoder.EncodeNull();
         break;
     }
     case Attributes::PendingDatasetTimestamp::Id: {
-        Optional<uint64_t> pendingDatasetTimestamp = ReadPendingDatasetTimestamp();
-        status = pendingDatasetTimestamp.HasValue() ? aEncoder.Encode(DataModel::MakeNullable(pendingDatasetTimestamp.Value()))
-                                                    : aEncoder.EncodeNull();
+        std::optional<uint64_t> pendingDatasetTimestamp = ReadPendingDatasetTimestamp();
+        status = pendingDatasetTimestamp.has_value() ? aEncoder.Encode(pendingDatasetTimestamp.value()) : aEncoder.EncodeNull();
         break;
     }
     default:

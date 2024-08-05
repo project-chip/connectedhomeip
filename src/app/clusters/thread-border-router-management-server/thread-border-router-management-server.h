@@ -78,8 +78,8 @@ private:
 
     // Attribute Read handlers
     void ReadFeatureMap(BitFlags<Feature> & feature);
-    Optional<uint64_t> ReadActiveDatasetTimestamp();
-    Optional<uint64_t> ReadPendingDatasetTimestamp();
+    std::optional<uint64_t> ReadActiveDatasetTimestamp();
+    std::optional<uint64_t> ReadPendingDatasetTimestamp();
     CHIP_ERROR ReadBorderRouterName(MutableCharSpan & borderRouterName);
     CHIP_ERROR ReadBorderAgentID(MutableByteSpan & borderAgentId);
 

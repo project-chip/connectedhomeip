@@ -1504,6 +1504,7 @@ provisional cluster ThreadBorderRouterManagement = 1106 {
   provisional readonly attribute int16u threadVersion = 2;
   provisional readonly attribute boolean interfaceEnabled = 3;
   provisional readonly attribute nullable int64u activeDatasetTimestamp = 4;
+  provisional readonly attribute nullable int64u pendingDatasetTimestamp = 5;
   readonly attribute command_id generatedCommandList[] = 65528;
   readonly attribute command_id acceptedCommandList[] = 65529;
   readonly attribute event_id eventList[] = 65530;
@@ -1865,6 +1866,7 @@ endpoint 1 {
     callback attribute threadVersion;
     callback attribute interfaceEnabled;
     callback attribute activeDatasetTimestamp;
+    callback attribute pendingDatasetTimestamp;
     callback attribute generatedCommandList;
     callback attribute acceptedCommandList;
     callback attribute eventList;
