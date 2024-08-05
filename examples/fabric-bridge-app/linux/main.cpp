@@ -18,9 +18,9 @@
 
 #include <AppMain.h>
 
-#include "CommissionableInit.h"
 #include "BridgedDevice.h"
 #include "BridgedDeviceManager.h"
+#include "CommissionableInit.h"
 
 #include <app/AttributeAccessInterfaceRegistry.h>
 #include <app/CommandHandlerInterfaceRegistry.h>
