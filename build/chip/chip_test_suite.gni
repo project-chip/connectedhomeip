@@ -95,7 +95,7 @@ template("chip_test_suite") {
     }
 
     pw_test(_test_name) {
-      # Forward certain varibles from the invoker.
+      # Forward certain variables from the invoker.
       forward_variables_from(invoker,
                               [
                                 "deps",
