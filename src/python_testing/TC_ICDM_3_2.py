@@ -16,7 +16,6 @@
 #    limitations under the License.
 #
 import logging
-import os
 import time
 from dataclasses import dataclass
 
@@ -220,7 +219,7 @@ class TC_ICDM_3_2(MatterBaseTest):
             # Reboot
             self.step("2c")
             if not is_ci:
-                self.wait_for_user_input(prompt_msg=f"Restart DUT. Press Enter when restart has been initiated.")
+                self.wait_for_user_input(prompt_msg="Restart DUT. Press Enter when restart has been initiated.")
 
             self.step("2d")
             if not is_ci:
