@@ -1298,21 +1298,21 @@ static constexpr CommandId Id = 0x00000001;
 namespace ServiceArea {
 namespace Commands {
 
-namespace SelectLocations {
+namespace SelectAreas {
 static constexpr CommandId Id = 0x00000000;
-} // namespace SelectLocations
+} // namespace SelectAreas
 
-namespace SelectLocationsResponse {
+namespace SelectAreasResponse {
 static constexpr CommandId Id = 0x00000001;
-} // namespace SelectLocationsResponse
+} // namespace SelectAreasResponse
 
-namespace SkipCurrentLocation {
+namespace SkipArea {
 static constexpr CommandId Id = 0x00000002;
-} // namespace SkipCurrentLocation
+} // namespace SkipArea
 
-namespace SkipCurrentLocationResponse {
+namespace SkipAreaResponse {
 static constexpr CommandId Id = 0x00000003;
-} // namespace SkipCurrentLocationResponse
+} // namespace SkipAreaResponse
 
 } // namespace Commands
 } // namespace ServiceArea

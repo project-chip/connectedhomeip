@@ -9696,25 +9696,25 @@ MTR_PROVISIONALLY_AVAILABLE
 @interface MTRBaseClusterServiceArea : MTRGenericBaseCluster
 
 /**
- * Command SelectLocations
+ * Command SelectAreas
  *
- * Command used to select a set of device locations, where the device is to operate
+ * Command used to select a set of device areas, where the device is to operate.
  */
-- (void)selectLocationsWithParams:(MTRServiceAreaClusterSelectLocationsParams *)params completion:(void (^)(MTRServiceAreaClusterSelectLocationsResponseParams * _Nullable data, NSError * _Nullable error))completion MTR_PROVISIONALLY_AVAILABLE;
+- (void)selectAreasWithParams:(MTRServiceAreaClusterSelectAreasParams *)params completion:(void (^)(MTRServiceAreaClusterSelectAreasResponseParams * _Nullable data, NSError * _Nullable error))completion MTR_PROVISIONALLY_AVAILABLE;
 /**
- * Command SkipCurrentLocation
+ * Command SkipArea
  *
- * This command is used to skip the current location where the device operates.
+ * This command is used to skip an area where the device operates.
  */
-- (void)skipCurrentLocationWithParams:(MTRServiceAreaClusterSkipCurrentLocationParams * _Nullable)params completion:(void (^)(MTRServiceAreaClusterSkipCurrentLocationResponseParams * _Nullable data, NSError * _Nullable error))completion MTR_PROVISIONALLY_AVAILABLE;
-- (void)skipCurrentLocationWithCompletion:(void (^)(MTRServiceAreaClusterSkipCurrentLocationResponseParams * _Nullable data, NSError * _Nullable error))completion
+- (void)skipAreaWithParams:(MTRServiceAreaClusterSkipAreaParams * _Nullable)params completion:(void (^)(MTRServiceAreaClusterSkipAreaResponseParams * _Nullable data, NSError * _Nullable error))completion MTR_PROVISIONALLY_AVAILABLE;
+- (void)skipAreaWithCompletion:(void (^)(MTRServiceAreaClusterSkipAreaResponseParams * _Nullable data, NSError * _Nullable error))completion
     MTR_PROVISIONALLY_AVAILABLE;
 
-- (void)readAttributeSupportedLocationsWithCompletion:(void (^)(NSArray * _Nullable value, NSError * _Nullable error))completion MTR_PROVISIONALLY_AVAILABLE;
-- (void)subscribeAttributeSupportedLocationsWithParams:(MTRSubscribeParams *)params
-                               subscriptionEstablished:(MTRSubscriptionEstablishedHandler _Nullable)subscriptionEstablished
-                                         reportHandler:(void (^)(NSArray * _Nullable value, NSError * _Nullable error))reportHandler MTR_PROVISIONALLY_AVAILABLE;
-+ (void)readAttributeSupportedLocationsWithClusterStateCache:(MTRClusterStateCacheContainer *)clusterStateCacheContainer endpoint:(NSNumber *)endpoint queue:(dispatch_queue_t)queue completion:(void (^)(NSArray * _Nullable value, NSError * _Nullable error))completion MTR_PROVISIONALLY_AVAILABLE;
+- (void)readAttributeSupportedAreasWithCompletion:(void (^)(NSArray * _Nullable value, NSError * _Nullable error))completion MTR_PROVISIONALLY_AVAILABLE;
+- (void)subscribeAttributeSupportedAreasWithParams:(MTRSubscribeParams *)params
+                           subscriptionEstablished:(MTRSubscriptionEstablishedHandler _Nullable)subscriptionEstablished
+                                     reportHandler:(void (^)(NSArray * _Nullable value, NSError * _Nullable error))reportHandler MTR_PROVISIONALLY_AVAILABLE;
++ (void)readAttributeSupportedAreasWithClusterStateCache:(MTRClusterStateCacheContainer *)clusterStateCacheContainer endpoint:(NSNumber *)endpoint queue:(dispatch_queue_t)queue completion:(void (^)(NSArray * _Nullable value, NSError * _Nullable error))completion MTR_PROVISIONALLY_AVAILABLE;
 
 - (void)readAttributeSupportedMapsWithCompletion:(void (^)(NSArray * _Nullable value, NSError * _Nullable error))completion MTR_PROVISIONALLY_AVAILABLE;
 - (void)subscribeAttributeSupportedMapsWithParams:(MTRSubscribeParams *)params
@@ -9722,17 +9722,17 @@ MTR_PROVISIONALLY_AVAILABLE
                                     reportHandler:(void (^)(NSArray * _Nullable value, NSError * _Nullable error))reportHandler MTR_PROVISIONALLY_AVAILABLE;
 + (void)readAttributeSupportedMapsWithClusterStateCache:(MTRClusterStateCacheContainer *)clusterStateCacheContainer endpoint:(NSNumber *)endpoint queue:(dispatch_queue_t)queue completion:(void (^)(NSArray * _Nullable value, NSError * _Nullable error))completion MTR_PROVISIONALLY_AVAILABLE;
 
-- (void)readAttributeSelectedLocationsWithCompletion:(void (^)(NSArray * _Nullable value, NSError * _Nullable error))completion MTR_PROVISIONALLY_AVAILABLE;
-- (void)subscribeAttributeSelectedLocationsWithParams:(MTRSubscribeParams *)params
-                              subscriptionEstablished:(MTRSubscriptionEstablishedHandler _Nullable)subscriptionEstablished
-                                        reportHandler:(void (^)(NSArray * _Nullable value, NSError * _Nullable error))reportHandler MTR_PROVISIONALLY_AVAILABLE;
-+ (void)readAttributeSelectedLocationsWithClusterStateCache:(MTRClusterStateCacheContainer *)clusterStateCacheContainer endpoint:(NSNumber *)endpoint queue:(dispatch_queue_t)queue completion:(void (^)(NSArray * _Nullable value, NSError * _Nullable error))completion MTR_PROVISIONALLY_AVAILABLE;
+- (void)readAttributeSelectedAreasWithCompletion:(void (^)(NSArray * _Nullable value, NSError * _Nullable error))completion MTR_PROVISIONALLY_AVAILABLE;
+- (void)subscribeAttributeSelectedAreasWithParams:(MTRSubscribeParams *)params
+                          subscriptionEstablished:(MTRSubscriptionEstablishedHandler _Nullable)subscriptionEstablished
+                                    reportHandler:(void (^)(NSArray * _Nullable value, NSError * _Nullable error))reportHandler MTR_PROVISIONALLY_AVAILABLE;
++ (void)readAttributeSelectedAreasWithClusterStateCache:(MTRClusterStateCacheContainer *)clusterStateCacheContainer endpoint:(NSNumber *)endpoint queue:(dispatch_queue_t)queue completion:(void (^)(NSArray * _Nullable value, NSError * _Nullable error))completion MTR_PROVISIONALLY_AVAILABLE;
 
-- (void)readAttributeCurrentLocationWithCompletion:(void (^)(NSNumber * _Nullable value, NSError * _Nullable error))completion MTR_PROVISIONALLY_AVAILABLE;
-- (void)subscribeAttributeCurrentLocationWithParams:(MTRSubscribeParams *)params
-                            subscriptionEstablished:(MTRSubscriptionEstablishedHandler _Nullable)subscriptionEstablished
-                                      reportHandler:(void (^)(NSNumber * _Nullable value, NSError * _Nullable error))reportHandler MTR_PROVISIONALLY_AVAILABLE;
-+ (void)readAttributeCurrentLocationWithClusterStateCache:(MTRClusterStateCacheContainer *)clusterStateCacheContainer endpoint:(NSNumber *)endpoint queue:(dispatch_queue_t)queue completion:(void (^)(NSNumber * _Nullable value, NSError * _Nullable error))completion MTR_PROVISIONALLY_AVAILABLE;
+- (void)readAttributeCurrentAreaWithCompletion:(void (^)(NSNumber * _Nullable value, NSError * _Nullable error))completion MTR_PROVISIONALLY_AVAILABLE;
+- (void)subscribeAttributeCurrentAreaWithParams:(MTRSubscribeParams *)params
+                        subscriptionEstablished:(MTRSubscriptionEstablishedHandler _Nullable)subscriptionEstablished
+                                  reportHandler:(void (^)(NSNumber * _Nullable value, NSError * _Nullable error))reportHandler MTR_PROVISIONALLY_AVAILABLE;
++ (void)readAttributeCurrentAreaWithClusterStateCache:(MTRClusterStateCacheContainer *)clusterStateCacheContainer endpoint:(NSNumber *)endpoint queue:(dispatch_queue_t)queue completion:(void (^)(NSNumber * _Nullable value, NSError * _Nullable error))completion MTR_PROVISIONALLY_AVAILABLE;
 
 - (void)readAttributeEstimatedEndTimeWithCompletion:(void (^)(NSNumber * _Nullable value, NSError * _Nullable error))completion MTR_PROVISIONALLY_AVAILABLE;
 - (void)subscribeAttributeEstimatedEndTimeWithParams:(MTRSubscribeParams *)params
@@ -19801,18 +19801,18 @@ typedef NS_ENUM(uint8_t, MTRServiceAreaOperationalStatus) {
     MTRServiceAreaOperationalStatusCompleted MTR_PROVISIONALLY_AVAILABLE = 0x03,
 } MTR_PROVISIONALLY_AVAILABLE;
 
-typedef NS_ENUM(uint8_t, MTRServiceAreaSelectLocationsStatus) {
-    MTRServiceAreaSelectLocationsStatusSuccess MTR_PROVISIONALLY_AVAILABLE = 0x00,
-    MTRServiceAreaSelectLocationsStatusUnsupportedLocation MTR_PROVISIONALLY_AVAILABLE = 0x01,
-    MTRServiceAreaSelectLocationsStatusDuplicatedLocations MTR_PROVISIONALLY_AVAILABLE = 0x02,
-    MTRServiceAreaSelectLocationsStatusInvalidInMode MTR_PROVISIONALLY_AVAILABLE = 0x03,
-    MTRServiceAreaSelectLocationsStatusInvalidSet MTR_PROVISIONALLY_AVAILABLE = 0x04,
+typedef NS_ENUM(uint8_t, MTRServiceAreaSelectAreasStatus) {
+    MTRServiceAreaSelectAreasStatusSuccess MTR_PROVISIONALLY_AVAILABLE = 0x00,
+    MTRServiceAreaSelectAreasStatusUnsupportedArea MTR_PROVISIONALLY_AVAILABLE = 0x01,
+    MTRServiceAreaSelectAreasStatusDuplicatedAreas MTR_PROVISIONALLY_AVAILABLE = 0x02,
+    MTRServiceAreaSelectAreasStatusInvalidInMode MTR_PROVISIONALLY_AVAILABLE = 0x03,
+    MTRServiceAreaSelectAreasStatusInvalidSet MTR_PROVISIONALLY_AVAILABLE = 0x04,
 } MTR_PROVISIONALLY_AVAILABLE;
 
-typedef NS_ENUM(uint8_t, MTRServiceAreaSkipCurrentLocationStatus) {
-    MTRServiceAreaSkipCurrentLocationStatusSuccess MTR_PROVISIONALLY_AVAILABLE = 0x00,
-    MTRServiceAreaSkipCurrentLocationStatusInvalidLocationList MTR_PROVISIONALLY_AVAILABLE = 0x01,
-    MTRServiceAreaSkipCurrentLocationStatusInvalidInMode MTR_PROVISIONALLY_AVAILABLE = 0x02,
+typedef NS_ENUM(uint8_t, MTRServiceAreaSkipAreaStatus) {
+    MTRServiceAreaSkipAreaStatusSuccess MTR_PROVISIONALLY_AVAILABLE = 0x00,
+    MTRServiceAreaSkipAreaStatusInvalidAreaList MTR_PROVISIONALLY_AVAILABLE = 0x01,
+    MTRServiceAreaSkipAreaStatusInvalidInMode MTR_PROVISIONALLY_AVAILABLE = 0x02,
 } MTR_PROVISIONALLY_AVAILABLE;
 
 typedef NS_OPTIONS(uint32_t, MTRServiceAreaFeature) {

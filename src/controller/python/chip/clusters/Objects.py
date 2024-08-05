@@ -31113,10 +31113,10 @@ class ServiceArea(Cluster):
     def descriptor(cls) -> ClusterObjectDescriptor:
         return ClusterObjectDescriptor(
             Fields=[
-                ClusterObjectFieldDescriptor(Label="supportedLocations", Tag=0x00000000, Type=typing.List[ServiceArea.Structs.LocationStruct]),
+                ClusterObjectFieldDescriptor(Label="supportedAreas", Tag=0x00000000, Type=typing.List[ServiceArea.Structs.AreaStruct]),
                 ClusterObjectFieldDescriptor(Label="supportedMaps", Tag=0x00000001, Type=typing.Union[Nullable, typing.List[ServiceArea.Structs.MapStruct]]),
-                ClusterObjectFieldDescriptor(Label="selectedLocations", Tag=0x00000002, Type=typing.Union[Nullable, typing.List[uint]]),
-                ClusterObjectFieldDescriptor(Label="currentLocation", Tag=0x00000003, Type=typing.Union[None, Nullable, uint]),
+                ClusterObjectFieldDescriptor(Label="selectedAreas", Tag=0x00000002, Type=typing.Union[Nullable, typing.List[uint]]),
+                ClusterObjectFieldDescriptor(Label="currentArea", Tag=0x00000003, Type=typing.Union[None, Nullable, uint]),
                 ClusterObjectFieldDescriptor(Label="estimatedEndTime", Tag=0x00000004, Type=typing.Union[None, Nullable, uint]),
                 ClusterObjectFieldDescriptor(Label="progress", Tag=0x00000005, Type=typing.Union[None, Nullable, typing.List[ServiceArea.Structs.ProgressStruct]]),
                 ClusterObjectFieldDescriptor(Label="generatedCommandList", Tag=0x0000FFF8, Type=typing.List[uint]),
@@ -31127,10 +31127,10 @@ class ServiceArea(Cluster):
                 ClusterObjectFieldDescriptor(Label="clusterRevision", Tag=0x0000FFFD, Type=uint),
             ])
 
-    supportedLocations: 'typing.List[ServiceArea.Structs.LocationStruct]' = None
+    supportedAreas: 'typing.List[ServiceArea.Structs.AreaStruct]' = None
     supportedMaps: 'typing.Union[Nullable, typing.List[ServiceArea.Structs.MapStruct]]' = None
-    selectedLocations: 'typing.Union[Nullable, typing.List[uint]]' = None
-    currentLocation: 'typing.Union[None, Nullable, uint]' = None
+    selectedAreas: 'typing.Union[Nullable, typing.List[uint]]' = None
+    currentArea: 'typing.Union[None, Nullable, uint]' = None
     estimatedEndTime: 'typing.Union[None, Nullable, uint]' = None
     progress: 'typing.Union[None, Nullable, typing.List[ServiceArea.Structs.ProgressStruct]]' = None
     generatedCommandList: 'typing.List[uint]' = None
@@ -31152,10 +31152,10 @@ class ServiceArea(Cluster):
             # enum value. This specific value should never be transmitted.
             kUnknownEnumValue = 4,
 
-        class SelectLocationsStatus(MatterIntEnum):
+        class SelectAreasStatus(MatterIntEnum):
             kSuccess = 0x00
-            kUnsupportedLocation = 0x01
-            kDuplicatedLocations = 0x02
+            kUnsupportedArea = 0x01
+            kDuplicatedAreas = 0x02
             kInvalidInMode = 0x03
             kInvalidSet = 0x04
             # All received enum values that are not listed above will be mapped
@@ -31164,9 +31164,9 @@ class ServiceArea(Cluster):
             # enum value. This specific value should never be transmitted.
             kUnknownEnumValue = 5,
 
-        class SkipCurrentLocationStatus(MatterIntEnum):
+        class SkipAreaStatus(MatterIntEnum):
             kSuccess = 0x00
-            kInvalidLocationList = 0x01
+            kInvalidAreaList = 0x01
             kInvalidInMode = 0x02
             # All received enum values that are not listed above will be mapped
             # to kUnknownEnumValue. This is a helper enum value that should only
@@ -31181,7 +31181,7 @@ class ServiceArea(Cluster):
 
     class Structs:
         @dataclass
-        class LocationInfoStruct(ClusterObject):
+        class AreaInfoStruct(ClusterObject):
             @ChipUtility.classproperty
             def descriptor(cls) -> ClusterObjectDescriptor:
                 return ClusterObjectDescriptor(
@@ -31198,19 +31198,19 @@ class ServiceArea(Cluster):
             surfaceTag: 'typing.Union[Nullable, Globals.Enums.FloorSurfaceTag]' = NullValue
 
         @dataclass
-        class LocationStruct(ClusterObject):
+        class AreaStruct(ClusterObject):
             @ChipUtility.classproperty
             def descriptor(cls) -> ClusterObjectDescriptor:
                 return ClusterObjectDescriptor(
                     Fields=[
-                        ClusterObjectFieldDescriptor(Label="locationID", Tag=0, Type=uint),
+                        ClusterObjectFieldDescriptor(Label="areaID", Tag=0, Type=uint),
                         ClusterObjectFieldDescriptor(Label="mapID", Tag=1, Type=typing.Union[Nullable, uint]),
-                        ClusterObjectFieldDescriptor(Label="locationInfo", Tag=2, Type=ServiceArea.Structs.LocationInfoStruct),
+                        ClusterObjectFieldDescriptor(Label="areaDesc", Tag=2, Type=ServiceArea.Structs.AreaInfoStruct),
                     ])
 
-            locationID: 'uint' = 0
+            areaID: 'uint' = 0
             mapID: 'typing.Union[Nullable, uint]' = NullValue
-            locationInfo: 'ServiceArea.Structs.LocationInfoStruct' = field(default_factory=lambda: ServiceArea.Structs.LocationInfoStruct())
+            areaDesc: 'ServiceArea.Structs.AreaInfoStruct' = field(default_factory=lambda: ServiceArea.Structs.AreaInfoStruct())
 
         @dataclass
         class MapStruct(ClusterObject):
@@ -31231,36 +31231,36 @@ class ServiceArea(Cluster):
             def descriptor(cls) -> ClusterObjectDescriptor:
                 return ClusterObjectDescriptor(
                     Fields=[
-                        ClusterObjectFieldDescriptor(Label="locationID", Tag=0, Type=uint),
+                        ClusterObjectFieldDescriptor(Label="areaID", Tag=0, Type=uint),
                         ClusterObjectFieldDescriptor(Label="status", Tag=1, Type=ServiceArea.Enums.OperationalStatusEnum),
                         ClusterObjectFieldDescriptor(Label="totalOperationalTime", Tag=2, Type=typing.Union[None, Nullable, uint]),
                         ClusterObjectFieldDescriptor(Label="estimatedTime", Tag=3, Type=typing.Union[None, Nullable, uint]),
                     ])
 
-            locationID: 'uint' = 0
+            areaID: 'uint' = 0
             status: 'ServiceArea.Enums.OperationalStatusEnum' = 0
             totalOperationalTime: 'typing.Union[None, Nullable, uint]' = None
             estimatedTime: 'typing.Union[None, Nullable, uint]' = None
 
     class Commands:
         @dataclass
-        class SelectLocations(ClusterCommand):
+        class SelectAreas(ClusterCommand):
             cluster_id: typing.ClassVar[int] = 0x00000150
             command_id: typing.ClassVar[int] = 0x00000000
             is_client: typing.ClassVar[bool] = True
-            response_type: typing.ClassVar[str] = 'SelectLocationsResponse'
+            response_type: typing.ClassVar[str] = 'SelectAreasResponse'
 
             @ChipUtility.classproperty
             def descriptor(cls) -> ClusterObjectDescriptor:
                 return ClusterObjectDescriptor(
                     Fields=[
-                        ClusterObjectFieldDescriptor(Label="newLocations", Tag=0, Type=typing.Union[Nullable, typing.List[uint]]),
+                        ClusterObjectFieldDescriptor(Label="newAreas", Tag=0, Type=typing.Union[Nullable, typing.List[uint]]),
                     ])
 
-            newLocations: 'typing.Union[Nullable, typing.List[uint]]' = NullValue
+            newAreas: 'typing.Union[Nullable, typing.List[uint]]' = NullValue
 
         @dataclass
-        class SelectLocationsResponse(ClusterCommand):
+        class SelectAreasResponse(ClusterCommand):
             cluster_id: typing.ClassVar[int] = 0x00000150
             command_id: typing.ClassVar[int] = 0x00000001
             is_client: typing.ClassVar[bool] = False
@@ -31270,19 +31270,19 @@ class ServiceArea(Cluster):
             def descriptor(cls) -> ClusterObjectDescriptor:
                 return ClusterObjectDescriptor(
                     Fields=[
-                        ClusterObjectFieldDescriptor(Label="status", Tag=0, Type=ServiceArea.Enums.SelectLocationsStatus),
+                        ClusterObjectFieldDescriptor(Label="status", Tag=0, Type=ServiceArea.Enums.SelectAreasStatus),
                         ClusterObjectFieldDescriptor(Label="statusText", Tag=1, Type=typing.Optional[str]),
                     ])
 
-            status: 'ServiceArea.Enums.SelectLocationsStatus' = 0
+            status: 'ServiceArea.Enums.SelectAreasStatus' = 0
             statusText: 'typing.Optional[str]' = None
 
         @dataclass
-        class SkipCurrentLocation(ClusterCommand):
+        class SkipArea(ClusterCommand):
             cluster_id: typing.ClassVar[int] = 0x00000150
             command_id: typing.ClassVar[int] = 0x00000002
             is_client: typing.ClassVar[bool] = True
-            response_type: typing.ClassVar[str] = 'SkipCurrentLocationResponse'
+            response_type: typing.ClassVar[str] = 'SkipAreaResponse'
 
             @ChipUtility.classproperty
             def descriptor(cls) -> ClusterObjectDescriptor:
@@ -31291,7 +31291,7 @@ class ServiceArea(Cluster):
                     ])
 
         @dataclass
-        class SkipCurrentLocationResponse(ClusterCommand):
+        class SkipAreaResponse(ClusterCommand):
             cluster_id: typing.ClassVar[int] = 0x00000150
             command_id: typing.ClassVar[int] = 0x00000003
             is_client: typing.ClassVar[bool] = False
@@ -31301,16 +31301,16 @@ class ServiceArea(Cluster):
             def descriptor(cls) -> ClusterObjectDescriptor:
                 return ClusterObjectDescriptor(
                     Fields=[
-                        ClusterObjectFieldDescriptor(Label="status", Tag=0, Type=ServiceArea.Enums.SkipCurrentLocationStatus),
+                        ClusterObjectFieldDescriptor(Label="status", Tag=0, Type=ServiceArea.Enums.SkipAreaStatus),
                         ClusterObjectFieldDescriptor(Label="statusText", Tag=1, Type=typing.Optional[str]),
                     ])
 
-            status: 'ServiceArea.Enums.SkipCurrentLocationStatus' = 0
+            status: 'ServiceArea.Enums.SkipAreaStatus' = 0
             statusText: 'typing.Optional[str]' = None
 
     class Attributes:
         @dataclass
-        class SupportedLocations(ClusterAttributeDescriptor):
+        class SupportedAreas(ClusterAttributeDescriptor):
             @ChipUtility.classproperty
             def cluster_id(cls) -> int:
                 return 0x00000150
@@ -31321,9 +31321,9 @@ class ServiceArea(Cluster):
 
             @ChipUtility.classproperty
             def attribute_type(cls) -> ClusterObjectFieldDescriptor:
-                return ClusterObjectFieldDescriptor(Type=typing.List[ServiceArea.Structs.LocationStruct])
+                return ClusterObjectFieldDescriptor(Type=typing.List[ServiceArea.Structs.AreaStruct])
 
-            value: 'typing.List[ServiceArea.Structs.LocationStruct]' = field(default_factory=lambda: [])
+            value: 'typing.List[ServiceArea.Structs.AreaStruct]' = field(default_factory=lambda: [])
 
         @dataclass
         class SupportedMaps(ClusterAttributeDescriptor):
@@ -31342,7 +31342,7 @@ class ServiceArea(Cluster):
             value: 'typing.Union[Nullable, typing.List[ServiceArea.Structs.MapStruct]]' = NullValue
 
         @dataclass
-        class SelectedLocations(ClusterAttributeDescriptor):
+        class SelectedAreas(ClusterAttributeDescriptor):
             @ChipUtility.classproperty
             def cluster_id(cls) -> int:
                 return 0x00000150
@@ -31358,7 +31358,7 @@ class ServiceArea(Cluster):
             value: 'typing.Union[Nullable, typing.List[uint]]' = NullValue
 
         @dataclass
-        class CurrentLocation(ClusterAttributeDescriptor):
+        class CurrentArea(ClusterAttributeDescriptor):
             @ChipUtility.classproperty
             def cluster_id(cls) -> int:
                 return 0x00000150

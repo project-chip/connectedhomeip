@@ -9362,14 +9362,14 @@ private:
 | Cluster ServiceArea                                                 | 0x0150 |
 |------------------------------------------------------------------------------|
 | Commands:                                                           |        |
-| * SelectLocations                                                   |   0x00 |
-| * SkipCurrentLocation                                               |   0x02 |
+| * SelectAreas                                                       |   0x00 |
+| * SkipArea                                                          |   0x02 |
 |------------------------------------------------------------------------------|
 | Attributes:                                                         |        |
-| * SupportedLocations                                                | 0x0000 |
+| * SupportedAreas                                                    | 0x0000 |
 | * SupportedMaps                                                     | 0x0001 |
-| * SelectedLocations                                                 | 0x0002 |
-| * CurrentLocation                                                   | 0x0003 |
+| * SelectedAreas                                                     | 0x0002 |
+| * CurrentArea                                                       | 0x0003 |
 | * EstimatedEndTime                                                  | 0x0004 |
 | * Progress                                                          | 0x0005 |
 | * GeneratedCommandList                                              | 0xFFF8 |
@@ -9383,22 +9383,22 @@ private:
 \*----------------------------------------------------------------------------*/
 
 /*
- * Command SelectLocations
+ * Command SelectAreas
  */
-class ServiceAreaSelectLocations : public ClusterCommand
+class ServiceAreaSelectAreas : public ClusterCommand
 {
 public:
-    ServiceAreaSelectLocations(CredentialIssuerCommands * credsIssuerConfig) :
-        ClusterCommand("select-locations", credsIssuerConfig), mComplex_NewLocations(&mRequest.newLocations)
+    ServiceAreaSelectAreas(CredentialIssuerCommands * credsIssuerConfig) :
+        ClusterCommand("select-areas", credsIssuerConfig), mComplex_NewAreas(&mRequest.newAreas)
     {
-        AddArgument("NewLocations", &mComplex_NewLocations);
+        AddArgument("NewAreas", &mComplex_NewAreas);
         ClusterCommand::AddArguments();
     }
 
     CHIP_ERROR SendCommand(chip::DeviceProxy * device, std::vector<chip::EndpointId> endpointIds) override
     {
         constexpr chip::ClusterId clusterId = chip::app::Clusters::ServiceArea::Id;
-        constexpr chip::CommandId commandId = chip::app::Clusters::ServiceArea::Commands::SelectLocations::Id;
+        constexpr chip::CommandId commandId = chip::app::Clusters::ServiceArea::Commands::SelectAreas::Id;
 
         ChipLogProgress(chipTool, "Sending cluster (0x%08" PRIX32 ") command (0x%08" PRIX32 ") on endpoint %u", clusterId,
                         commandId, endpointIds.at(0));
@@ -9408,7 +9408,7 @@ public:
     CHIP_ERROR SendGroupCommand(chip::GroupId groupId, chip::FabricIndex fabricIndex) override
     {
         constexpr chip::ClusterId clusterId = chip::app::Clusters::ServiceArea::Id;
-        constexpr chip::CommandId commandId = chip::app::Clusters::ServiceArea::Commands::SelectLocations::Id;
+        constexpr chip::CommandId commandId = chip::app::Clusters::ServiceArea::Commands::SelectAreas::Id;
 
         ChipLogProgress(chipTool, "Sending cluster (0x%08" PRIX32 ") command (0x%08" PRIX32 ") on Group %u", clusterId, commandId,
                         groupId);
@@ -9417,18 +9417,17 @@ public:
     }
 
 private:
-    chip::app::Clusters::ServiceArea::Commands::SelectLocations::Type mRequest;
-    TypedComplexArgument<chip::app::DataModel::Nullable<chip::app::DataModel::List<const uint32_t>>> mComplex_NewLocations;
+    chip::app::Clusters::ServiceArea::Commands::SelectAreas::Type mRequest;
+    TypedComplexArgument<chip::app::DataModel::Nullable<chip::app::DataModel::List<const uint32_t>>> mComplex_NewAreas;
 };
 
 /*
- * Command SkipCurrentLocation
+ * Command SkipArea
  */
-class ServiceAreaSkipCurrentLocation : public ClusterCommand
+class ServiceAreaSkipArea : public ClusterCommand
 {
 public:
-    ServiceAreaSkipCurrentLocation(CredentialIssuerCommands * credsIssuerConfig) :
-        ClusterCommand("skip-current-location", credsIssuerConfig)
+    ServiceAreaSkipArea(CredentialIssuerCommands * credsIssuerConfig) : ClusterCommand("skip-area", credsIssuerConfig)
     {
         ClusterCommand::AddArguments();
     }
@@ -9436,7 +9435,7 @@ public:
     CHIP_ERROR SendCommand(chip::DeviceProxy * device, std::vector<chip::EndpointId> endpointIds) override
     {
         constexpr chip::ClusterId clusterId = chip::app::Clusters::ServiceArea::Id;
-        constexpr chip::CommandId commandId = chip::app::Clusters::ServiceArea::Commands::SkipCurrentLocation::Id;
+        constexpr chip::CommandId commandId = chip::app::Clusters::ServiceArea::Commands::SkipArea::Id;
 
         ChipLogProgress(chipTool, "Sending cluster (0x%08" PRIX32 ") command (0x%08" PRIX32 ") on endpoint %u", clusterId,
                         commandId, endpointIds.at(0));
@@ -9446,7 +9445,7 @@ public:
     CHIP_ERROR SendGroupCommand(chip::GroupId groupId, chip::FabricIndex fabricIndex) override
     {
         constexpr chip::ClusterId clusterId = chip::app::Clusters::ServiceArea::Id;
-        constexpr chip::CommandId commandId = chip::app::Clusters::ServiceArea::Commands::SkipCurrentLocation::Id;
+        constexpr chip::CommandId commandId = chip::app::Clusters::ServiceArea::Commands::SkipArea::Id;
 
         ChipLogProgress(chipTool, "Sending cluster (0x%08" PRIX32 ") command (0x%08" PRIX32 ") on Group %u", clusterId, commandId,
                         groupId);
@@ -9455,7 +9454,7 @@ public:
     }
 
 private:
-    chip::app::Clusters::ServiceArea::Commands::SkipCurrentLocation::Type mRequest;
+    chip::app::Clusters::ServiceArea::Commands::SkipArea::Type mRequest;
 };
 
 /*----------------------------------------------------------------------------*\
@@ -22846,17 +22845,17 @@ void registerClusterServiceArea(Commands & commands, CredentialIssuerCommands * 
         //
         // Commands
         //
-        make_unique<ClusterCommand>(Id, credsIssuerConfig),             //
-        make_unique<ServiceAreaSelectLocations>(credsIssuerConfig),     //
-        make_unique<ServiceAreaSkipCurrentLocation>(credsIssuerConfig), //
+        make_unique<ClusterCommand>(Id, credsIssuerConfig),     //
+        make_unique<ServiceAreaSelectAreas>(credsIssuerConfig), //
+        make_unique<ServiceAreaSkipArea>(credsIssuerConfig),    //
         //
         // Attributes
         //
         make_unique<ReadAttribute>(Id, credsIssuerConfig),                                                                 //
-        make_unique<ReadAttribute>(Id, "supported-locations", Attributes::SupportedLocations::Id, credsIssuerConfig),      //
+        make_unique<ReadAttribute>(Id, "supported-areas", Attributes::SupportedAreas::Id, credsIssuerConfig),              //
         make_unique<ReadAttribute>(Id, "supported-maps", Attributes::SupportedMaps::Id, credsIssuerConfig),                //
-        make_unique<ReadAttribute>(Id, "selected-locations", Attributes::SelectedLocations::Id, credsIssuerConfig),        //
-        make_unique<ReadAttribute>(Id, "current-location", Attributes::CurrentLocation::Id, credsIssuerConfig),            //
+        make_unique<ReadAttribute>(Id, "selected-areas", Attributes::SelectedAreas::Id, credsIssuerConfig),                //
+        make_unique<ReadAttribute>(Id, "current-area", Attributes::CurrentArea::Id, credsIssuerConfig),                    //
         make_unique<ReadAttribute>(Id, "estimated-end-time", Attributes::EstimatedEndTime::Id, credsIssuerConfig),         //
         make_unique<ReadAttribute>(Id, "progress", Attributes::Progress::Id, credsIssuerConfig),                           //
         make_unique<ReadAttribute>(Id, "generated-command-list", Attributes::GeneratedCommandList::Id, credsIssuerConfig), //
@@ -22866,17 +22865,16 @@ void registerClusterServiceArea(Commands & commands, CredentialIssuerCommands * 
         make_unique<ReadAttribute>(Id, "feature-map", Attributes::FeatureMap::Id, credsIssuerConfig),                      //
         make_unique<ReadAttribute>(Id, "cluster-revision", Attributes::ClusterRevision::Id, credsIssuerConfig),            //
         make_unique<WriteAttribute<>>(Id, credsIssuerConfig),                                                              //
-        make_unique<WriteAttributeAsComplex<
-            chip::app::DataModel::List<const chip::app::Clusters::ServiceArea::Structs::LocationStruct::Type>>>(
-            Id, "supported-locations", Attributes::SupportedLocations::Id, WriteCommandType::kForceWrite, credsIssuerConfig), //
+        make_unique<
+            WriteAttributeAsComplex<chip::app::DataModel::List<const chip::app::Clusters::ServiceArea::Structs::AreaStruct::Type>>>(
+            Id, "supported-areas", Attributes::SupportedAreas::Id, WriteCommandType::kForceWrite, credsIssuerConfig), //
         make_unique<WriteAttributeAsComplex<chip::app::DataModel::Nullable<
             chip::app::DataModel::List<const chip::app::Clusters::ServiceArea::Structs::MapStruct::Type>>>>(
             Id, "supported-maps", Attributes::SupportedMaps::Id, WriteCommandType::kForceWrite, credsIssuerConfig), //
         make_unique<WriteAttributeAsComplex<chip::app::DataModel::Nullable<chip::app::DataModel::List<const uint32_t>>>>(
-            Id, "selected-locations", Attributes::SelectedLocations::Id, WriteCommandType::kForceWrite, credsIssuerConfig), //
-        make_unique<WriteAttribute<chip::app::DataModel::Nullable<uint32_t>>>(Id, "current-location", 0, UINT32_MAX,
-                                                                              Attributes::CurrentLocation::Id,
-                                                                              WriteCommandType::kForceWrite, credsIssuerConfig), //
+            Id, "selected-areas", Attributes::SelectedAreas::Id, WriteCommandType::kForceWrite, credsIssuerConfig), //
+        make_unique<WriteAttribute<chip::app::DataModel::Nullable<uint32_t>>>(
+            Id, "current-area", 0, UINT32_MAX, Attributes::CurrentArea::Id, WriteCommandType::kForceWrite, credsIssuerConfig), //
         make_unique<WriteAttribute<chip::app::DataModel::Nullable<uint32_t>>>(Id, "estimated-end-time", 0, UINT32_MAX,
                                                                               Attributes::EstimatedEndTime::Id,
                                                                               WriteCommandType::kForceWrite, credsIssuerConfig), //
@@ -22897,10 +22895,10 @@ void registerClusterServiceArea(Commands & commands, CredentialIssuerCommands * 
         make_unique<WriteAttribute<uint16_t>>(Id, "cluster-revision", 0, UINT16_MAX, Attributes::ClusterRevision::Id,
                                               WriteCommandType::kForceWrite, credsIssuerConfig),                                //
         make_unique<SubscribeAttribute>(Id, credsIssuerConfig),                                                                 //
-        make_unique<SubscribeAttribute>(Id, "supported-locations", Attributes::SupportedLocations::Id, credsIssuerConfig),      //
+        make_unique<SubscribeAttribute>(Id, "supported-areas", Attributes::SupportedAreas::Id, credsIssuerConfig),              //
         make_unique<SubscribeAttribute>(Id, "supported-maps", Attributes::SupportedMaps::Id, credsIssuerConfig),                //
-        make_unique<SubscribeAttribute>(Id, "selected-locations", Attributes::SelectedLocations::Id, credsIssuerConfig),        //
-        make_unique<SubscribeAttribute>(Id, "current-location", Attributes::CurrentLocation::Id, credsIssuerConfig),            //
+        make_unique<SubscribeAttribute>(Id, "selected-areas", Attributes::SelectedAreas::Id, credsIssuerConfig),                //
+        make_unique<SubscribeAttribute>(Id, "current-area", Attributes::CurrentArea::Id, credsIssuerConfig),                    //
         make_unique<SubscribeAttribute>(Id, "estimated-end-time", Attributes::EstimatedEndTime::Id, credsIssuerConfig),         //
         make_unique<SubscribeAttribute>(Id, "progress", Attributes::Progress::Id, credsIssuerConfig),                           //
         make_unique<SubscribeAttribute>(Id, "generated-command-list", Attributes::GeneratedCommandList::Id, credsIssuerConfig), //
