@@ -40,7 +40,7 @@ jobs:
         if: github.actor != 'restyled-io[bot]'
 
         container:
-            image: ghcr.io/project-chip/chip-build-esp32-qemu:54
+            image: ghcr.io/project-chip/chip-build-esp32-qemu:67
             volumes:
                 - "/tmp/log_output:/tmp/test_logs"
 
@@ -75,7 +75,12 @@ jobs:
         name: Tizen
 
         runs-on: ubuntu-latest
-        if: github.actor != 'restyled-io[bot]'
+        # NOTE: job temporarely disabled as it seems flaky. The flake does not result in usable
+        #       logs so the current theory is that we run out of space. This is unusual as
+        #       larger docker images succeed at bootstrap, however it needs more investigation
+        #       to detect an exact/real root cause.
+        if: false
+        # if: github.actor != 'restyled-io[bot]'
 
         container:
             image: ghcr.io/project-chip/chip-build-tizen-qemu:54

@@ -32,7 +32,7 @@ import typing
 import click
 import coloredlogs
 from colorama import Fore, Style
-from py.metadata import Metadata, MetadataReader
+from metadata_parser.metadata import Metadata, MetadataReader
 
 DEFAULT_CHIP_ROOT = os.path.abspath(
     os.path.join(os.path.dirname(__file__), '..', '..'))
@@ -169,7 +169,8 @@ def main_impl(app: str, factoryreset: bool, factoryreset_app_only: bool, app_arg
         app_args = [app] + shlex.split(app_args)
         logging.info(f"Execute: {app_args}")
         app_process = subprocess.Popen(
-            app_args, stdout=subprocess.PIPE, stderr=subprocess.PIPE, bufsize=0)
+            app_args, stdout=subprocess.PIPE, stderr=subprocess.PIPE, stdin=subprocess.PIPE, bufsize=0)
+        app_process.stdin.close()
         app_pid = app_process.pid
         DumpProgramOutputToQueue(
             log_cooking_threads, Fore.GREEN + "APP " + Style.RESET_ALL, app_process, stream_output, log_queue)
@@ -192,7 +193,8 @@ def main_impl(app: str, factoryreset: bool, factoryreset_app_only: bool, app_arg
 
     logging.info(f"Execute: {final_script_command}")
     test_script_process = subprocess.Popen(
-        final_script_command, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
+        final_script_command, stdout=subprocess.PIPE, stderr=subprocess.PIPE, stdin=subprocess.PIPE)
+    test_script_process.stdin.close()
     DumpProgramOutputToQueue(log_cooking_threads, Fore.GREEN + "TEST" + Style.RESET_ALL,
                              test_script_process, stream_output, log_queue)
 

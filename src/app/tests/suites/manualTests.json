@@ -119,7 +119,6 @@
     "Identify": ["Test_TC_I_3_2"],
     "IcdManagement": [
         "Test_TC_ICDM_3_2",
-        "Test_TC_ICDM_3_3",
         "Test_TC_ICDM_4_1",
         "Test_TC_ICDM_5_1"
     ],
@@ -281,7 +280,7 @@
         "Test_TC_TCCM_1_2",
         "Test_TC_TCCM_2_1"
     ],
-    "Switch": ["Test_TC_SWTCH_2_2", "Test_TC_SWTCH_3_2"],
+    "Switch": ["Test_TC_SWTCH_3_2"],
     "TemperatureControl": [],
     "TemperatureMeasurement": ["Test_TC_TMP_2_2"],
     "Thermostat": ["Test_TC_TSTAT_3_2"],

@@ -18,6 +18,7 @@
 #include "thread-network-directory-server.h"
 
 #include <app/AttributeAccessInterfaceRegistry.h>
+#include <app/CommandHandlerInterfaceRegistry.h>
 #include <app/InteractionModelEngine.h>
 #include <app/MessageDef/StatusIB.h>
 #include <app/SafeAttributePersistenceProvider.h>
@@ -47,13 +48,13 @@ ThreadNetworkDirectoryServer::ThreadNetworkDirectoryServer(EndpointId endpoint, 
 ThreadNetworkDirectoryServer::~ThreadNetworkDirectoryServer()
 {
     unregisterAttributeAccessOverride(this);
-    InteractionModelEngine::GetInstance()->UnregisterCommandHandler(this);
+    CommandHandlerInterfaceRegistry::UnregisterCommandHandler(this);
 }
 
 CHIP_ERROR ThreadNetworkDirectoryServer::Init()
 {
     VerifyOrReturnError(registerAttributeAccessOverride(this), CHIP_ERROR_INTERNAL);
-    ReturnErrorOnFailure(InteractionModelEngine::GetInstance()->RegisterCommandHandler(this));
+    ReturnErrorOnFailure(CommandHandlerInterfaceRegistry::RegisterCommandHandler(this));
     return CHIP_NO_ERROR;
 }
 
@@ -273,8 +274,10 @@ void ThreadNetworkDirectoryServer::HandleOperationalDatasetRequest(
 
     uint8_t datasetBuffer[kSizeOperationalDataset];
     MutableByteSpan datasetSpan(datasetBuffer);
+    OperationalDatasetResponse::Type response;
     SuccessOrExit(err = mStorage.GetNetworkDataset(ExtendedPanId(req.extendedPanID), datasetSpan));
-    ctx.mCommandHandler.AddStatus(ctx.mRequestPath, IMStatus::Success);
+    response.operationalDataset = datasetSpan;
+    ctx.mCommandHandler.AddResponse(ctx.mRequestPath, response);
     return;
 exit:
     ChipLogError(Zcl, "GetOperationalDataset: %" CHIP_ERROR_FORMAT, err.Format());

@@ -28,6 +28,7 @@
 #include <app/util/attribute-storage.h>
 #include <platform/PlatformManager.h>
 
+#include "ButtonEventsSimulator.h"
 #include <air-quality-instance.h>
 #include <dishwasher-mode.h>
 #include <laundry-washer-mode.h>
@@ -36,12 +37,216 @@
 #include <oven-operational-state-delegate.h>
 #include <rvc-modes.h>
 
+#include <memory>
 #include <string>
+#include <utility>
 
 using namespace chip;
 using namespace chip::app;
 using namespace chip::app::Clusters;
 using namespace chip::DeviceLayer;
+
+namespace {
+
+std::unique_ptr<ButtonEventsSimulator> sButtonSimulatorInstance{ nullptr };
+
+bool HasNumericField(Json::Value & jsonValue, const std::string & field)
+{
+    return jsonValue.isMember(field) && jsonValue[field].isNumeric();
+}
+
+/**
+ * Named pipe handler for simulated long press
+ *
+ * Usage example:
+ *   echo '{"Name": "SimulateLongPress", "EndpointId": 3, "ButtonId": 1, "LongPressDelayMillis": 800,
+ * "LongPressDurationMillis": 1000}' > /tmp/chip_all_clusters_fifo_1146610
+ *
+ * JSON Arguments:
+ *   - "Name": Must be "SimulateLongPress"
+ *   - "EndpointId": ID of endpoint having a switch cluster
+ *   - "ButtonId": switch position in the switch cluster for "down" button (not idle)
+ *   - "LongPressDelayMillis": Time in milliseconds before the LongPress
+ *   - "LongPressDurationMillis": Total duration in milliseconds from start of the press to LongRelease
+ *   - "FeatureMap": The feature map to simulate
+ *
+ * @param jsonValue - JSON payload from named pipe
+ */
+void HandleSimulateLongPress(Json::Value & jsonValue)
+{
+    if (sButtonSimulatorInstance != nullptr)
+    {
+        ChipLogError(NotSpecified, "Button simulation already in progress! Ignoring request.");
+        return;
+    }
+
+    bool hasEndpointId              = HasNumericField(jsonValue, "EndpointId");
+    bool hasButtonId                = HasNumericField(jsonValue, "ButtonId");
+    bool hasLongPressDelayMillis    = HasNumericField(jsonValue, "LongPressDelayMillis");
+    bool hasLongPressDurationMillis = HasNumericField(jsonValue, "LongPressDurationMillis");
+    bool hasFeatureMap              = HasNumericField(jsonValue, "FeatureMap");
+    if (!hasEndpointId || !hasButtonId || !hasLongPressDelayMillis || !hasLongPressDurationMillis || !hasFeatureMap)
+    {
+        std::string inputJson = jsonValue.toStyledString();
+        ChipLogError(NotSpecified,
+                     "Missing or invalid value for one of EndpointId, ButtonId, LongPressDelayMillis, LongPressDurationMillis or "
+                     "FeatureMap in %s",
+                     inputJson.c_str());
+        return;
+    }
+
+    EndpointId endpointId = static_cast<EndpointId>(jsonValue["EndpointId"].asUInt());
+    uint8_t buttonId      = static_cast<uint8_t>(jsonValue["ButtonId"].asUInt());
+    System::Clock::Milliseconds32 longPressDelayMillis{ static_cast<unsigned>(jsonValue["LongPressDelayMillis"].asUInt()) };
+    System::Clock::Milliseconds32 longPressDurationMillis{ static_cast<unsigned>(jsonValue["LongPressDurationMillis"].asUInt()) };
+    uint32_t featureMap  = static_cast<uint32_t>(jsonValue["FeatureMap"].asUInt());
+    auto buttonSimulator = std::make_unique<ButtonEventsSimulator>();
+
+    bool success = buttonSimulator->SetMode(ButtonEventsSimulator::Mode::kModeLongPress)
+                       .SetLongPressDelayMillis(longPressDelayMillis)
+                       .SetLongPressDurationMillis(longPressDurationMillis)
+                       .SetIdleButtonId(0)
+                       .SetPressedButtonId(buttonId)
+                       .SetEndpointId(endpointId)
+                       .SetFeatureMap(featureMap)
+                       .Execute([]() { sButtonSimulatorInstance.reset(); });
+
+    if (!success)
+    {
+        ChipLogError(NotSpecified, "Failed to start execution of button simulator!");
+        return;
+    }
+
+    sButtonSimulatorInstance = std::move(buttonSimulator);
+}
+
+/**
+ * Named pipe handler for simulated multi-press.
+ *
+ * Usage example:
+ *   echo '{"Name": "SimulateMultiPress", "EndpointId": 3, "ButtonId": 1, "MultiPressPressedTimeMillis": 100,
+ * "MultiPressReleasedTimeMillis": 350, "MultiPressNumPresses": 2, "FeatureMap": 58}' > /tmp/chip_all_clusters_fifo_1146610
+ *
+ * JSON Arguments:
+ *   - "Name": Must be "SimulateActionSwitchMultiPress"
+ *   - "EndpointId": ID of endpoint having a switch cluster
+ *   - "ButtonId": switch position in the switch cluster for "down" button (not idle)
+ *   - "MultiPressPressedTimeMillis": Pressed time in milliseconds for each press
+ *   - "MultiPressReleasedTimeMillis": Released time in milliseconds after each press
+ *   - "MultiPressNumPresses": Number of presses to simulate
+ *   - "FeatureMap": The feature map to simulate
+ *   - "MultiPressMax": max number of presses (from attribute).
+ *
+ * @param jsonValue - JSON payload from named pipe
+ */
+void HandleSimulateMultiPress(Json::Value & jsonValue)
+{
+    if (sButtonSimulatorInstance != nullptr)
+    {
+        ChipLogError(NotSpecified, "Button simulation already in progress! Ignoring request.");
+        return;
+    }
+
+    bool hasEndpointId                   = HasNumericField(jsonValue, "EndpointId");
+    bool hasButtonId                     = HasNumericField(jsonValue, "ButtonId");
+    bool hasMultiPressPressedTimeMillis  = HasNumericField(jsonValue, "MultiPressPressedTimeMillis");
+    bool hasMultiPressReleasedTimeMillis = HasNumericField(jsonValue, "MultiPressReleasedTimeMillis");
+    bool hasMultiPressNumPresses         = HasNumericField(jsonValue, "MultiPressNumPresses");
+    bool hasFeatureMap                   = HasNumericField(jsonValue, "FeatureMap");
+    bool hasMultiPressMax                = HasNumericField(jsonValue, "MultiPressMax");
+    if (!hasEndpointId || !hasButtonId || !hasMultiPressPressedTimeMillis || !hasMultiPressReleasedTimeMillis ||
+        !hasMultiPressNumPresses || !hasFeatureMap || !hasMultiPressMax)
+    {
+        std::string inputJson = jsonValue.toStyledString();
+        ChipLogError(NotSpecified,
+                     "Missing or invalid value for one of EndpointId, ButtonId, MultiPressPressedTimeMillis, "
+                     "MultiPressReleasedTimeMillis, MultiPressNumPresses, FeatureMap or MultiPressMax in %s",
+                     inputJson.c_str());
+        return;
+    }
+
+    EndpointId endpointId = static_cast<EndpointId>(jsonValue["EndpointId"].asUInt());
+    uint8_t buttonId      = static_cast<uint8_t>(jsonValue["ButtonId"].asUInt());
+    System::Clock::Milliseconds32 multiPressPressedTimeMillis{ static_cast<unsigned>(
+        jsonValue["MultiPressPressedTimeMillis"].asUInt()) };
+    System::Clock::Milliseconds32 multiPressReleasedTimeMillis{ static_cast<unsigned>(
+        jsonValue["MultiPressReleasedTimeMillis"].asUInt()) };
+    uint8_t multiPressNumPresses = static_cast<uint8_t>(jsonValue["MultiPressNumPresses"].asUInt());
+    uint32_t featureMap          = static_cast<uint32_t>(jsonValue["FeatureMap"].asUInt());
+    uint8_t multiPressMax        = static_cast<uint8_t>(jsonValue["MultiPressMax"].asUInt());
+    auto buttonSimulator         = std::make_unique<ButtonEventsSimulator>();
+
+    bool success = buttonSimulator->SetMode(ButtonEventsSimulator::Mode::kModeMultiPress)
+                       .SetMultiPressPressedTimeMillis(multiPressPressedTimeMillis)
+                       .SetMultiPressReleasedTimeMillis(multiPressReleasedTimeMillis)
+                       .SetMultiPressNumPresses(multiPressNumPresses)
+                       .SetIdleButtonId(0)
+                       .SetPressedButtonId(buttonId)
+                       .SetEndpointId(endpointId)
+                       .SetFeatureMap(featureMap)
+                       .SetMultiPressMax(multiPressMax)
+                       .Execute([]() { sButtonSimulatorInstance.reset(); });
+
+    if (!success)
+    {
+        ChipLogError(NotSpecified, "Failed to start execution of button simulator!");
+        return;
+    }
+
+    sButtonSimulatorInstance = std::move(buttonSimulator);
+}
+
+/**
+ * Named pipe handler for simulating a latched switch movement.
+ *
+ * Usage example:
+ *   echo '{"Name": "SimulateLatchPosition", "EndpointId": 3, "PositionId": 1}' > /tmp/chip_all_clusters_fifo_1146610
+ *
+ * JSON Arguments:
+ *   - "Name": Must be "SimulateLatchPosition"
+ *   - "EndpointId": ID of endpoint having a switch cluster
+ *   - "PositionId": switch position for new CurrentPosition to set in switch cluster
+ *
+ * @param jsonValue - JSON payload from named pipe
+ */
+
+void HandleSimulateLatchPosition(Json::Value & jsonValue)
+{
+    bool hasEndpointId = HasNumericField(jsonValue, "EndpointId");
+    bool hasPositionId = HasNumericField(jsonValue, "PositionId");
+
+    if (!hasEndpointId || !hasPositionId)
+    {
+        std::string inputJson = jsonValue.toStyledString();
+        ChipLogError(NotSpecified, "Missing or invalid value for one of EndpointId, PositionId in %s", inputJson.c_str());
+        return;
+    }
+
+    EndpointId endpointId = static_cast<EndpointId>(jsonValue["EndpointId"].asUInt());
+    uint8_t positionId    = static_cast<uint8_t>(jsonValue["PositionId"].asUInt());
+
+    uint8_t previousPositionId                 = 0;
+    Protocols::InteractionModel::Status status = Switch::Attributes::CurrentPosition::Get(endpointId, &previousPositionId);
+    VerifyOrReturn(Protocols::InteractionModel::Status::Success == status,
+                   ChipLogError(NotSpecified, "Failed to get CurrentPosition attribute"));
+
+    if (positionId != previousPositionId)
+    {
+        status = Switch::Attributes::CurrentPosition::Set(endpointId, positionId);
+        VerifyOrReturn(Protocols::InteractionModel::Status::Success == status,
+                       ChipLogError(NotSpecified, "Failed to set CurrentPosition attribute"));
+        ChipLogDetail(NotSpecified, "The latching switch is moved to a new position: %u", static_cast<unsigned>(positionId));
+
+        Clusters::SwitchServer::Instance().OnSwitchLatch(endpointId, positionId);
+    }
+    else
+    {
+        ChipLogDetail(NotSpecified, "Not moving latching switch to a new position, already at %u",
+                      static_cast<unsigned>(positionId));
+    }
+}
+
+} // namespace
 
 AllClustersAppCommandHandler * AllClustersAppCommandHandler::FromJSON(const char * json)
 {
@@ -190,9 +395,22 @@ void AllClustersAppCommandHandler::HandleCommand(intptr_t context)
         std::string operation = self->mJsonValue["Operation"].asString();
         self->OnOperationalStateChange(device, operation, self->mJsonValue["Param"]);
     }
+    else if (name == "SimulateLongPress")
+    {
+        HandleSimulateLongPress(self->mJsonValue);
+    }
+    else if (name == "SimulateMultiPress")
+    {
+        HandleSimulateMultiPress(self->mJsonValue);
+    }
+    else if (name == "SimulateLatchPosition")
+    {
+        HandleSimulateLatchPosition(self->mJsonValue);
+    }
     else
     {
-        ChipLogError(NotSpecified, "Unhandled command: Should never happens");
+        ChipLogError(NotSpecified, "Unhandled command '%s': this hould never happen", name.c_str());
+        VerifyOrDie(false && "Named pipe command not supported, see log above.");
     }
 
 exit:
@@ -449,21 +667,65 @@ void AllClustersAppCommandHandler::OnModeChangeHandler(std::string device, std::
 
 void AllClustersAppCommandHandler::OnOperationalStateChange(std::string device, std::string operation, Json::Value param)
 {
-    OperationalState::Instance * operationalStateInstance = nullptr;
     if (device == "Generic")
     {
-        operationalStateInstance = OperationalState::GetOperationalStateInstance();
+        OnGenericOperationalStateChange(device, operation, param);
     }
     else if (device == "Oven")
     {
-        operationalStateInstance = OvenCavityOperationalState::GetOperationalStateInstance();
+        OnOvenOperationalStateChange(device, operation, param);
     }
     else
     {
         ChipLogDetail(NotSpecified, "Invalid device type : %s", device.c_str());
         return;
     }
+}
 
+void AllClustersAppCommandHandler::OnGenericOperationalStateChange(std::string device, std::string operation, Json::Value param)
+{
+    OperationalState::Instance * operationalStateInstance                 = OperationalState::GetOperationalStateInstance();
+    OperationalState::OperationalStateDelegate * operationalStateDelegate = OperationalState::GetOperationalStateDelegate();
+    OperationalState::GenericOperationalError noError(to_underlying(OperationalState::ErrorStateEnum::kNoError));
+    OperationalState::OperationalStateEnum state =
+        static_cast<OperationalState::OperationalStateEnum>(operationalStateInstance->GetCurrentOperationalState());
+    if (operation == "Start")
+    {
+        operationalStateDelegate->HandleStartStateCallback(noError);
+    }
+    else if (operation == "Resume")
+    {
+        operationalStateDelegate->HandleResumeStateCallback(noError);
+    }
+    else if (operation == "Pause")
+    {
+        operationalStateDelegate->HandlePauseStateCallback(noError);
+    }
+    else if (operation == "Stop" && state == OperationalState::OperationalStateEnum::kRunning)
+    {
+        operationalStateDelegate->HandleStopStateCallback(noError);
+    }
+    else if (operation == "OnFault")
+    {
+        uint8_t event_id = to_underlying(OperationalState::ErrorStateEnum::kUnableToCompleteOperation);
+        if (!param.isNull())
+        {
+            event_id = to_underlying(static_cast<OperationalState::ErrorStateEnum>(param.asUInt()));
+        }
+
+        OperationalState::GenericOperationalError err(event_id);
+        operationalStateInstance->OnOperationalErrorDetected(err);
+    }
+    else
+    {
+        ChipLogDetail(NotSpecified, "Invalid operation : %s", operation.c_str());
+        return;
+    }
+}
+
+void AllClustersAppCommandHandler::OnOvenOperationalStateChange(std::string device, std::string operation, Json::Value param)
+{
+    OperationalState::Instance * operationalStateInstance = OvenCavityOperationalState::GetOperationalStateInstance();
     if (operation == "Start" || operation == "Resume")
     {
         operationalStateInstance->SetOperationalState(to_underlying(OperationalState::OperationalStateEnum::kRunning));
