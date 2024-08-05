@@ -38,8 +38,9 @@ struct LocationStructureWrapper : public chip::app::Clusters::ServiceArea::Struc
 {
     LocationStructureWrapper()
     {
-        Set(0, 0, CharSpan(), DataModel::Nullable<int16_t>(), DataModel::Nullable<AreaTypeTag>(),
-            DataModel::Nullable<LandmarkTag>(), DataModel::Nullable<PositionTag>(), DataModel::Nullable<FloorSurfaceTag>());
+        Set(0, 0, CharSpan(), DataModel::Nullable<int16_t>(), DataModel::Nullable<Globals::AreaTypeTag>(),
+            DataModel::Nullable<Globals::LandmarkTag>(), DataModel::Nullable<Globals::PositionTag>(),
+            DataModel::Nullable<Globals::FloorSurfaceTag>());
     }
 
     /**
@@ -61,10 +62,10 @@ struct LocationStructureWrapper : public chip::app::Clusters::ServiceArea::Struc
      */
     LocationStructureWrapper(uint32_t aLocationId, const DataModel::Nullable<uint8_t> & aMapId, const CharSpan & aLocationName,
                              const DataModel::Nullable<int16_t> & aFloorNumber,
-                             const DataModel::Nullable<AreaTypeTag> & aAreaTypeTag,
-                             const DataModel::Nullable<LandmarkTag> & aLandmarkTag,
-                             const DataModel::Nullable<PositionTag> & aPositionTag,
-                             const DataModel::Nullable<FloorSurfaceTag> & aSurfaceTag)
+                             const DataModel::Nullable<Globals::AreaTypeTag> & aAreaTypeTag,
+                             const DataModel::Nullable<Globals::LandmarkTag> & aLandmarkTag,
+                             const DataModel::Nullable<Globals::PositionTag> & aPositionTag,
+                             const DataModel::Nullable<Globals::FloorSurfaceTag> & aSurfaceTag)
     {
         Set(aLocationId, aMapId, aLocationName, aFloorNumber, aAreaTypeTag, aLandmarkTag, aPositionTag, aSurfaceTag);
     }
@@ -120,9 +121,10 @@ struct LocationStructureWrapper : public chip::app::Clusters::ServiceArea::Struc
      * @note If aLocationName is an empty string and aFloorNumber and aAreaTypeTag are null, locationInfo will be set to null.
      */
     void Set(uint32_t aLocationId, const DataModel::Nullable<uint8_t> & aMapId, const CharSpan & aLocationName,
-             const DataModel::Nullable<int16_t> & aFloorNumber, const DataModel::Nullable<AreaTypeTag> & aAreaType,
-             const DataModel::Nullable<LandmarkTag> & aLandmarkTag, const DataModel::Nullable<PositionTag> & aPositionTag,
-             const DataModel::Nullable<FloorSurfaceTag> & aSurfaceTag)
+             const DataModel::Nullable<int16_t> & aFloorNumber, const DataModel::Nullable<Globals::AreaTypeTag> & aAreaType,
+             const DataModel::Nullable<Globals::LandmarkTag> & aLandmarkTag,
+             const DataModel::Nullable<Globals::PositionTag> & aPositionTag,
+             const DataModel::Nullable<Globals::FloorSurfaceTag> & aSurfaceTag)
     {
         locationID = aLocationId;
         mapID      = aMapId;
@@ -131,7 +133,7 @@ struct LocationStructureWrapper : public chip::app::Clusters::ServiceArea::Struc
         if ((!aLocationName.empty()) || (!aFloorNumber.IsNull()) || (!aAreaType.IsNull()))
         {
             // Create a home location info structure and fill it in except for the location name. This is done below.
-            locationInfo.locationInfo.SetNonNull(Structs::LocationDescriptorStruct::Type());
+            locationInfo.locationInfo.SetNonNull(Globals::Structs::LocationDescriptorStruct::Type());
 
             locationInfo.locationInfo.Value().floorNumber = aFloorNumber;
             locationInfo.locationInfo.Value().areaType    = aAreaType;

@@ -37,6 +37,30 @@ const char * StatusName(Status status)
     return "Unallocated";
 }
 #endif // CHIP_CONFIG_IM_STATUS_CODE_VERBOSE_FORMAT
+//
+ClusterStatusCode::ClusterStatusCode(CHIP_ERROR err)
+{
+    if (err.IsPart(ChipError::SdkPart::kIMClusterStatus))
+    {
+        mStatus              = Status::Failure;
+        mClusterSpecificCode = chip::MakeOptional(err.GetSdkCode());
+        return;
+    }
+
+    if (err == CHIP_NO_ERROR)
+    {
+        mStatus = Status::Success;
+        return;
+    }
+
+    if (err.IsPart(ChipError::SdkPart::kIMGlobalStatus))
+    {
+        mStatus = static_cast<Status>(err.GetSdkCode());
+        return;
+    }
+
+    mStatus = Status::Failure;
+}
 
 } // namespace InteractionModel
 } // namespace Protocols

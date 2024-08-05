@@ -45,12 +45,15 @@
 #endif                                                               // MATTER_DM_PLUGIN_MODE_BASE
 
 #include <platform/CHIPDeviceLayer.h>
+#include <platform/DiagnosticDataProvider.h>
 #include <platform/PlatformManager.h>
 
 using namespace chip;
 using namespace chip::app::Clusters;
 using namespace chip::app::Clusters::OnOff;
 using chip::Protocols::InteractionModel::Status;
+
+using BootReasonType = GeneralDiagnostics::BootReasonEnum;
 
 namespace {
 
@@ -93,6 +96,22 @@ template <typename EnumType>
 bool IsKnownEnumValue(EnumType value)
 {
     return (EnsureKnownEnumValue(value) != EnumType::kUnknownEnumValue);
+}
+
+BootReasonType GetBootReason()
+{
+    BootReasonType bootReason = BootReasonType::kUnspecified;
+
+    CHIP_ERROR error = DeviceLayer::GetDiagnosticDataProvider().GetBootReason(bootReason);
+    if (error != CHIP_NO_ERROR)
+    {
+        ChipLogError(Zcl, "Unable to retrieve boot reason: %" CHIP_ERROR_FORMAT, error.Format());
+        bootReason = BootReasonType::kUnspecified;
+    }
+
+    ChipLogProgress(Zcl, "Boot reason: %u", to_underlying(bootReason));
+
+    return bootReason;
 }
 
 } // namespace
@@ -537,35 +556,36 @@ Status OnOffServer::getOnOffValueForStartUp(chip::EndpointId endpoint, bool & on
 {
     app::DataModel::Nullable<OnOff::StartUpOnOffEnum> startUpOnOff;
     Status status = Attributes::StartUpOnOff::Get(endpoint, startUpOnOff);
-    if (status == Status::Success)
+    VerifyOrReturnError(status == Status::Success, status);
+
+    bool currentOnOff = false;
+    status            = Attributes::OnOff::Get(endpoint, &currentOnOff);
+    VerifyOrReturnError(status == Status::Success, status);
+
+    if (startUpOnOff.IsNull() || GetBootReason() == BootReasonType::kSoftwareUpdateCompleted)
     {
-        // Initialise updated value to 0
-        bool updatedOnOff = false;
-        status            = Attributes::OnOff::Get(endpoint, &updatedOnOff);
-        if (status == Status::Success)
-        {
-            if (!startUpOnOff.IsNull())
-            {
-                switch (startUpOnOff.Value())
-                {
-                case OnOff::StartUpOnOffEnum::kOff:
-                    updatedOnOff = false; // Off
-                    break;
-                case OnOff::StartUpOnOffEnum::kOn:
-                    updatedOnOff = true; // On
-                    break;
-                case OnOff::StartUpOnOffEnum::kToggle:
-                    updatedOnOff = !updatedOnOff;
-                    break;
-                default:
-                    // All other values 0x03- 0xFE are reserved - no action.
-                    break;
-                }
-            }
-            onOffValueForStartUp = updatedOnOff;
-        }
+        onOffValueForStartUp = currentOnOff;
+        return Status::Success;
     }
-    return status;
+
+    switch (startUpOnOff.Value())
+    {
+    case OnOff::StartUpOnOffEnum::kOff:
+        onOffValueForStartUp = false; // Off
+        break;
+    case OnOff::StartUpOnOffEnum::kOn:
+        onOffValueForStartUp = true; // On
+        break;
+    case OnOff::StartUpOnOffEnum::kToggle:
+        onOffValueForStartUp = !currentOnOff;
+        break;
+    default:
+        // All other values 0x03- 0xFE are reserved - no action.
+        onOffValueForStartUp = currentOnOff;
+        break;
+    }
+
+    return Status::Success;
 }
 
 bool OnOffServer::offCommand(app::CommandHandler * commandObj, const app::ConcreteCommandPath & commandPath)

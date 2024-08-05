@@ -133,6 +133,26 @@ Status ContentAppCommandDelegate::InvokeCommand(EndpointId epId, ClusterId clust
             JniUtfString respStr(env, resp);
             ChipLogProgress(Zcl, "ContentAppCommandDelegate::InvokeCommand got response %s", respStr.c_str());
 
+            Json::CharReaderBuilder readerBuilder;
+            std::string errors;
+
+            std::unique_ptr<Json::CharReader> testReader(readerBuilder.newCharReader());
+
+            if (!testReader->parse(respStr.c_str(), respStr.c_str() + std::strlen(respStr.c_str()), &value, &errors))
+            {
+                ChipLogError(Zcl, "Failed to parse JSON: %s\n", errors.c_str());
+                env->DeleteLocalRef(resp);
+                return chip::Protocols::InteractionModel::Status::Failure;
+            }
+
+            // Validate and access JSON data safely
+            if (!value.isObject())
+            {
+                ChipLogError(Zcl, "Invalid JSON structure: not an object");
+                env->DeleteLocalRef(resp);
+                return chip::Protocols::InteractionModel::Status::Failure;
+            }
+
             Json::Reader reader;
             if (!reader.parse(respStr.c_str(), value))
             {
@@ -166,7 +186,26 @@ void ContentAppCommandDelegate::FormatResponseData(CommandHandlerInterface::Hand
 {
     handlerContext.SetCommandHandled();
     Json::Reader reader;
+
+    Json::CharReaderBuilder readerBuilder;
+    std::string errors;
+
     Json::Value value;
+    std::unique_ptr<Json::CharReader> testReader(readerBuilder.newCharReader());
+
+    if (!testReader->parse(response, response + std::strlen(response), &value, &errors))
+    {
+        ChipLogError(Zcl, "Failed to parse JSON: %s\n", errors.c_str());
+        return;
+    }
+
+    // Validate and access JSON data safely
+    if (!value.isObject())
+    {
+        ChipLogError(Zcl, "Invalid JSON structure: not an object");
+        return;
+    }
+
     if (!reader.parse(response, value))
     {
         return;

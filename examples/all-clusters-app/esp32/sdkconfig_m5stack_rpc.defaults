@@ -86,8 +86,8 @@ CONFIG_BTDM_CTRL_BLE_MAX_CONN=1
 CONFIG_BT_NIMBLE_ROLE_CENTRAL=n
 CONFIG_BT_NIMBLE_ROLE_OBSERVER=n
 
-# Reduce the event loggin buffer to reduce the DRAM overflow
-# TODO: remove this once the underlying issue is fixed
+# Reduce the event logging buffer to reduce the DRAM overflow
+# TODO: [ESP32] Fix the DRAM overflow in esp32 apps #34717
 CONFIG_EVENT_LOGGING_CRIT_BUFFER_SIZE=512
 CONFIG_EVENT_LOGGING_INFO_BUFFER_SIZE=512
 CONFIG_EVENT_LOGGING_DEBUG_BUFFER_SIZE=512

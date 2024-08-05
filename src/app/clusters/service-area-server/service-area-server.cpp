@@ -573,10 +573,10 @@ bool Instance::ReportEstimatedEndTimeChange(const DataModel::Nullable<uint32_t> 
 
 bool Instance::AddSupportedLocation(uint32_t aLocationId, const DataModel::Nullable<uint8_t> & aMapId,
                                     const CharSpan & aLocationName, const DataModel::Nullable<int16_t> & aFloorNumber,
-                                    const DataModel::Nullable<AreaTypeTag> & aAreaType,
-                                    const DataModel::Nullable<LandmarkTag> & aLandmarkTag,
-                                    const DataModel::Nullable<PositionTag> & aPositionTag,
-                                    const DataModel::Nullable<FloorSurfaceTag> & aSurfaceTag)
+                                    const DataModel::Nullable<Globals::AreaTypeTag> & aAreaType,
+                                    const DataModel::Nullable<Globals::LandmarkTag> & aLandmarkTag,
+                                    const DataModel::Nullable<Globals::PositionTag> & aPositionTag,
+                                    const DataModel::Nullable<Globals::FloorSurfaceTag> & aSurfaceTag)
 {
     // Create location object for validation.
     LocationStructureWrapper aNewLocation(aLocationId, aMapId, aLocationName, aFloorNumber, aAreaType, aLandmarkTag, aPositionTag,
@@ -625,10 +625,10 @@ bool Instance::AddSupportedLocation(uint32_t aLocationId, const DataModel::Nulla
 
 bool Instance::ModifySupportedLocation(uint32_t aLocationId, const DataModel::Nullable<uint8_t> & aMapId,
                                        const CharSpan & aLocationName, const DataModel::Nullable<int16_t> & aFloorNumber,
-                                       const DataModel::Nullable<AreaTypeTag> & aAreaType,
-                                       const DataModel::Nullable<LandmarkTag> & aLandmarkTag,
-                                       const DataModel::Nullable<PositionTag> & aPositionTag,
-                                       const DataModel::Nullable<FloorSurfaceTag> & aSurfaceTag)
+                                       const DataModel::Nullable<Globals::AreaTypeTag> & aAreaType,
+                                       const DataModel::Nullable<Globals::LandmarkTag> & aLandmarkTag,
+                                       const DataModel::Nullable<Globals::PositionTag> & aPositionTag,
+                                       const DataModel::Nullable<Globals::FloorSurfaceTag> & aSurfaceTag)
 {
     bool mapIDChanged = false;
     uint32_t listIndex;

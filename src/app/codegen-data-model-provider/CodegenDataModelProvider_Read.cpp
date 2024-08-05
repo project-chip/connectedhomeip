@@ -47,7 +47,9 @@
 namespace chip {
 namespace app {
 namespace {
+
 using namespace chip::app::Compatibility::Internal;
+using Protocols::InteractionModel::Status;
 
 /// Attempts to read via an attribute access interface (AAI)
 ///
@@ -258,7 +260,8 @@ CHIP_ERROR EncodeEmberValue(ByteSpan data, const EmberAfAttributeMetadata * meta
 ///    - validate ACL (only for non-internal requests)
 ///    - Try to read attribute via the AttributeAccessInterface
 ///    - Try to read the value from ember RAM storage
-CHIP_ERROR CodegenDataModelProvider::ReadAttribute(const DataModel::ReadAttributeRequest & request, AttributeValueEncoder & encoder)
+DataModel::ActionReturnStatus CodegenDataModelProvider::ReadAttribute(const DataModel::ReadAttributeRequest & request,
+                                                                      AttributeValueEncoder & encoder)
 {
     ChipLogDetail(DataManagement,
                   "Reading attribute: Cluster=" ChipLogFormatMEI " Endpoint=0x%x AttributeId=" ChipLogFormatMEI " (expanded=%d)",
@@ -290,12 +293,12 @@ CHIP_ERROR CodegenDataModelProvider::ReadAttribute(const DataModel::ReadAttribut
     auto metadata = Ember::FindAttributeMetadata(request.path);
 
     // Explicit failure in finding a suitable metadata
-    if (const CHIP_ERROR * err = std::get_if<CHIP_ERROR>(&metadata))
+    if (const Status * status = std::get_if<Status>(&metadata))
     {
-        VerifyOrDie((*err == CHIP_IM_GLOBAL_STATUS(UnsupportedEndpoint)) || //
-                    (*err == CHIP_IM_GLOBAL_STATUS(UnsupportedCluster)) ||  //
-                    (*err == CHIP_IM_GLOBAL_STATUS(UnsupportedAttribute)));
-        return *err;
+        VerifyOrDie((*status == Status::UnsupportedEndpoint) || //
+                    (*status == Status::UnsupportedCluster) ||  //
+                    (*status == Status::UnsupportedAttribute));
+        return *status;
     }
 
     // Read via AAI
