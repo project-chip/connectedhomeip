@@ -19,6 +19,7 @@ executable("matter-network-manager-app") {
   sources = [
     "include/CHIPProjectAppConfig.h",
     "main.cpp",
+    "tbrm.cpp",
   ]
 
   deps = [
