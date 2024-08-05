@@ -17,17 +17,13 @@
 
 #pragma once
 
-#include "thread-br-delegate.h"
-
 #include <app-common/zap-generated/cluster-objects.h>
 #include <app/AttributeAccessInterface.h>
-#include <app/AttributeValueEncoder.h>
-#include <app/CommandHandler.h>
 #include <app/CommandHandlerInterface.h>
 #include <app/ConcreteCommandPath.h>
 #include <app/FailSafeContext.h>
+#include <app/clusters/thread-border-router-management-server/thread-br-delegate.h>
 #include <app/reporting/reporting.h>
-#include <inet/UDPEndPoint.h>
 #include <lib/core/Optional.h>
 #include <lib/support/Span.h>
 
