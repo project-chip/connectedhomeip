@@ -14,38 +14,79 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
+import argparse
 import json
 import os
+import pathlib
 import shutil
 import subprocess
+from typing import Optional
 
 
 class Config:
-    def __init__(self):
-        cipd_install_dir = os.getenv("PW_PYTHON_CIPD_INSTALL_DIR")
-        self.python_exe = os.path.join(cipd_install_dir, "bin", "python3")
-        if not os.path.exists(self.python_exe):
-            self.python_exe = shutil.which("python3")
-            if not self.python_exe:
-                raise FileNotFoundError("Python3 not found")
+    def __init__(self, python_exe: Optional[pathlib.Path] = None):
+        self._paths: Optional[dict] = None
+        self._version: Optional[list] = None
 
-    def get_version(self):
-        out = subprocess.check_output(
-            [self.python_exe, "-c", "import sys; print(sys.version_info.major, sys.version_info.minor)"], text=True
-        )
-        return out.strip().split(" ")
+        if python_exe:
+            self.python_exe = python_exe
+        else:
+            cipd_install_dir = os.getenv("PW_PYTHON_CIPD_INSTALL_DIR")
+            if not cipd_install_dir:
+                raise RuntimeError("PW_PYTHON_CIPD_INSTALL_DIR not set")
+            self.python_exe = os.path.join(cipd_install_dir, "bin", "python3")
+            if not os.path.exists(self.python_exe):
+                self.python_exe = shutil.which("python3")
+                if not self.python_exe:
+                    raise FileNotFoundError("Python3 not found")
+
+    @property
+    def paths(self) -> dict:
+        if not self._paths:
+            out = subprocess.check_output(
+                [self.python_exe, "-c", "from sysconfig import get_paths; import json; print(json.dumps(get_paths()))"], text=True
+            ).strip()
+            self._paths = json.loads(out)
+        return self._paths
+
+    @property
+    def version(self) -> list[str]:
+        if not self._version:
+            self._version = (
+                subprocess.check_output(
+                    [self.python_exe, "-c", "import sys; print(sys.version_info.major, sys.version_info.minor)"], text=True
+                )
+                .strip()
+                .split(" ")
+            )
+        return self._version
+
+    @property
+    def include(self) -> str:
+        return self.paths["include"]
 
 
-if __name__ == "__main__":
-    config = Config()
-    version = config.get_version()
+def parse_args():
+    parser = argparse.ArgumentParser(description="Generate Python config")
+    parser.add_argument("--python", type=pathlib.Path, help="Python executable to use", required=False)
+    return parser.parse_args()
+
+
+def main():
+    args = parse_args()
+    config = Config(args.python)
     print(
         json.dumps(
             {
                 "version": {
-                    "major": version[0],
-                    "minor": version[1],
-                }
+                    "major": config.version[0],
+                    "minor": config.version[1],
+                },
+                "include": config.include,
             }
         )
     )
+
+
+if __name__ == "__main__":
+    main()
