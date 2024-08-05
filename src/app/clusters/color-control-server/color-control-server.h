@@ -223,7 +223,8 @@ private:
         }
     }
 
-    bool shouldExecuteIfOff(chip::EndpointId endpoint, chip::BitMask<chip::app::Clusters::ColorControl::OptionsBitmap> optionMask, chip::BitMask<chip::app::Clusters::ColorControl::OptionsBitmap> optionOverride);
+    bool shouldExecuteIfOff(chip::EndpointId endpoint, chip::BitMask<chip::app::Clusters::ColorControl::OptionsBitmap> optionMask,
+                            chip::BitMask<chip::app::Clusters::ColorControl::OptionsBitmap> optionOverride);
     void handleModeSwitch(chip::EndpointId endpoint, chip::app::Clusters::ColorControl::EnhancedColorModeEnum newColorMode);
     uint16_t computeTransitionTimeFromStateAndRate(Color16uTransitionState * p, uint16_t rate);
     EmberEventControl * getEventControl(chip::EndpointId endpoint);
