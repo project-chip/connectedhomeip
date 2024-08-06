@@ -152,12 +152,12 @@ public:
 
     /**
      * @brief Add EcosystemInformation Cluster to endpoint so we respond appropritely on endpoint
-     * 
+     *
      * EcosystemInformation cluster is only ever on dynamic bridge endpoint. If cluster is added
      * to a new endpoint, but does not contain any ecosystem information information presently,
      * this is called to let ECOINFO cluster code know it is supposed to provide blank attribute
      * information on this endpoint.
-     * 
+     *
      * This approach was intentionally taken instead of relying on emberAfDeviceTypeListFromEndpoint
      * to keep this cluster more unit testable. This does add burden to application but is worth
      * the trade-off.
