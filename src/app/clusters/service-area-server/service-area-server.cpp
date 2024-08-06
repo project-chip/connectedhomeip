@@ -56,7 +56,7 @@ Instance::Instance(Delegate * aDelegate, EndpointId aEndpointId, BitMask<Feature
 
 Instance::~Instance()
 {
-    CommandHandlerInterfaceRegistry::UnregisterCommandHandler(this);
+    CommandHandlerInterfaceRegistry::Instance().UnregisterCommandHandler(this);
     chip::app::AttributeAccessInterfaceRegistry::Instance().Unregister(this);
 }
 
@@ -68,7 +68,7 @@ CHIP_ERROR Instance::Init()
     VerifyOrReturnError(emberAfContainsServer(mEndpointId, Id), CHIP_ERROR_INVALID_ARGUMENT,
                         ChipLogError(Zcl, "Service Area: The cluster with Id %lu was not enabled in zap.", long(Id)));
 
-    ReturnErrorOnFailure(CommandHandlerInterfaceRegistry::RegisterCommandHandler(this));
+    ReturnErrorOnFailure(CommandHandlerInterfaceRegistry::Instance().RegisterCommandHandler(this));
 
     VerifyOrReturnError(chip::app::AttributeAccessInterfaceRegistry::Instance().Register(this), CHIP_ERROR_INCORRECT_STATE);
 
