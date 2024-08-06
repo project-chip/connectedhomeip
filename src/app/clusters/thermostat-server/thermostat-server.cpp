@@ -114,7 +114,7 @@ void TimerExpiredCallback(System::Layer * systemLayer, void * callbackContext)
 {
     EndpointId endpoint = static_cast<EndpointId>(reinterpret_cast<uintptr_t>(callbackContext));
 
-    auto delegate = GetDelegate(endpoint);
+    Delegate * delegate = GetDelegate(endpoint);
     VerifyOrReturn(delegate != nullptr, ChipLogError(Zcl, "Delegate is null. Unable to handle timer expired"));
 
     delegate->ClearPendingPresetList();
@@ -1290,7 +1290,7 @@ bool emberAfThermostatClusterSetActivePresetRequestCallback(
     const Clusters::Thermostat::Commands::SetActivePresetRequest::DecodableType & commandData)
 {
     EndpointId endpoint = commandPath.mEndpointId;
-    auto delegate       = GetDelegate(endpoint);
+    Delegate * delegate = GetDelegate(endpoint);
 
     if (delegate == nullptr)
     {
@@ -1380,7 +1380,7 @@ void handleAtomicBegin(CommandHandler * commandObj, const ConcreteCommandPath & 
 {
     EndpointId endpoint = commandPath.mEndpointId;
 
-    auto delegate = GetDelegate(endpoint);
+    Delegate * delegate = GetDelegate(endpoint);
 
     if (delegate == nullptr)
     {
@@ -1565,7 +1565,7 @@ void handleAtomicCommit(CommandHandler * commandObj, const ConcreteCommandPath &
         return;
     }
 
-    auto delegate = GetDelegate(endpoint);
+    Delegate * delegate = GetDelegate(endpoint);
 
     if (delegate == nullptr)
     {
@@ -1598,7 +1598,7 @@ void handleAtomicRollback(CommandHandler * commandObj, const ConcreteCommandPath
         return;
     }
 
-    auto delegate = GetDelegate(endpoint);
+    Delegate * delegate = GetDelegate(endpoint);
 
     if (delegate == nullptr)
     {
@@ -1882,7 +1882,7 @@ void MatterThermostatPluginServerInitCallback()
 void MatterThermostatClusterServerShutdownCallback(EndpointId endpoint)
 {
     ChipLogProgress(Zcl, "Shutting down thermostat server cluster on endpoint %d", endpoint);
-    auto delegate = GetDelegate(endpoint);
+    Delegate * delegate = GetDelegate(endpoint);
 
     if (delegate != nullptr)
     {
