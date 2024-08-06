@@ -1193,7 +1193,7 @@ static NSString * const sLastInitialSubscribeLatencyKey = @"lastInitialSubscribe
 {
     os_unfair_lock_lock(&self->_lock);
 
-    // If subscription had reset since this handler was scheduled, do not ececute "established" logic below
+    // If subscription had reset since this handler was scheduled, do not execute "established" logic below
     if (!HaveSubscriptionEstablishedRightNow(_internalDeviceState)) {
         MTR_LOG("%@ _handleSubscriptionEstablished run with internal state %lu - skipping subscription establishment logic", self, static_cast<unsigned long>(_internalDeviceState));
         return;
