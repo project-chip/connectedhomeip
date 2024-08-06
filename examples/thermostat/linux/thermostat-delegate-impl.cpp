@@ -149,7 +149,7 @@ CHIP_ERROR ThermostatDelegate::SetActivePresetHandle(const DataModel::Nullable<B
 }
 
 System::Clock::Milliseconds16
-ThermostatDelegate::GetAtomicWriteTimeout(DataModel::DecodableList<chip::AttributeId> attributeRequests,
+ThermostatDelegate::GetAtomicWriteTimeout(DataModel::DecodableList<AttributeId> attributeRequests,
                                           System::Clock::Milliseconds16 timeoutRequest)
 {
     auto attributeIdsIter = attributeRequests.begin();
