@@ -55,34 +55,15 @@ BdxTransfer * BdxTransferManager::Allocate()
 
     BdxTransfer * result = mTransferPool.CreateObject(mSystemLayer);
     VerifyOrReturnValue(result != nullptr, nullptr);
-    result->SetDelegate(this);
+    result->SetDelegate(mBdxTransferDelegate);
 
     --mExpectedTransfers;
     return result;
 }
 
-// This method is only called by BdxTransferServer when creating an exchange context fails.
 void BdxTransferManager::Release(BdxTransfer * bdxTransfer)
 {
-    mBdxTransferDelegate->TransferCompleted(bdxTransfer, CHIP_ERROR_CONNECTION_ABORTED);
     mTransferPool.ReleaseObject(bdxTransfer);
-}
-
-void BdxTransferManager::InitMessageReceived(BdxTransfer * transfer, TransferSession::TransferInitData init_data)
-{
-    mBdxTransferDelegate->InitMessageReceived(transfer, init_data);
-}
-
-void BdxTransferManager::DataReceived(BdxTransfer * transfer, const ByteSpan & block)
-{
-    mBdxTransferDelegate->DataReceived(transfer, block);
-}
-
-void BdxTransferManager::TransferCompleted(BdxTransfer * transfer, CHIP_ERROR result)
-{
-    mBdxTransferDelegate->TransferCompleted(transfer, result);
-    // TODO: Schedule this to happen after the transfer completes.
-    mTransferPool.ReleaseObject(transfer);
 }
 
 } // namespace bdx
