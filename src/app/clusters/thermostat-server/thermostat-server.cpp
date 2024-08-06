@@ -330,7 +330,7 @@ bool IsPresetHandlePresentInPresets(Delegate * delegate, const ByteSpan & preset
  *
  * @return count of the updated Presets attribute if the pending presets were applied to it. Return 0 for error cases.
  */
-uint8_t CountUpdatedPresetsAfterApplyingPendingPresets(Delegate * delegate)
+uint8_t CountNumberOfPendingPresets(Delegate * delegate)
 {
     uint8_t numberOfPendingPresets = 0;
 
@@ -349,7 +349,7 @@ uint8_t CountUpdatedPresetsAfterApplyingPendingPresets(Delegate * delegate)
         {
             ChipLogError(
                 Zcl,
-                "CountUpdatedPresetsAfterApplyingPendingPresets: GetPendingPresetAtIndex failed with error %" CHIP_ERROR_FORMAT,
+                "CountNumberOfPendingPresets: GetPendingPresetAtIndex failed with error %" CHIP_ERROR_FORMAT,
                 err.Format());
             return 0;
         }
@@ -1513,7 +1513,7 @@ imcode commitPresets(Delegate * delegate, EndpointId endpoint)
         }
     }
 
-    uint8_t totalCount = CountUpdatedPresetsAfterApplyingPendingPresets(delegate);
+    uint8_t totalCount = CountNumberOfPendingPresets(delegate);
 
     uint8_t numberOfPresetsSupported = delegate->GetNumberOfPresets();
 
