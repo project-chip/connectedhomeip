@@ -111,7 +111,7 @@ private:
 };
 
 // A method to release a transfer.
-void ReleaseTransfer(bdx::BdxTransfer * transfer);
+void ReleaseTransfer(System::Layer * systemLayer, bdx::BdxTransfer * transfer);
 
 // A delegate to forward events from a transfer to the appropriate Python callback and context.
 class TransferDelegate : public bdx::BdxTransfer::Delegate
@@ -119,6 +119,11 @@ class TransferDelegate : public bdx::BdxTransfer::Delegate
 public:
     TransferDelegate(TransferMap * transfers) : mTransfers(transfers) {}
     ~TransferDelegate() override = default;
+
+    void Init(System::Layer * systemLayer)
+    {
+        mSystemLayer = systemLayer;
+    }
 
     virtual void InitMessageReceived(bdx::BdxTransfer * transfer, bdx::TransferSession::TransferInitData init_data)
     {
@@ -160,11 +165,12 @@ public:
             gOnTransferCompletedCallback(transferData->OnTransferCompletedContext, ToPyChipError(result));
             mTransfers->RemoveTransferData(transferData);
         }
-        ReleaseTransfer(transfer);
+        ReleaseTransfer(mSystemLayer, transfer);
     }
 
 private:
     TransferMap * mTransfers = nullptr;
+    System::Layer * mSystemLayer = nullptr;
 };
 
 TransferMap gTransfers;
@@ -172,10 +178,14 @@ TransferDelegate gBdxTransferDelegate(&gTransfers);
 bdx::BdxTransferManager gBdxTransferManager(&gBdxTransferDelegate);
 bdx::BdxTransferServer gBdxTransferServer(gBdxTransferManager);
 
-void ReleaseTransfer(bdx::BdxTransfer * transfer)
+void ReleaseTransfer(System::Layer * systemLayer, bdx::BdxTransfer * transfer)
 {
-    // TODO: Schedule this to happen later.
-    gBdxTransferManager.Release(transfer);
+    systemLayer->ScheduleWork(
+        [](auto * theSystemLayer, auto * appState) -> void {
+            auto * theTransfer = static_cast<bdx::BdxTransfer *>(appState);
+            gBdxTransferManager.Release(theTransfer);
+        },
+        transfer);
 }
 
 } // namespace python
@@ -195,7 +205,9 @@ void pychip_Bdx_InitCallbacks(OnTransferObtainedCallback onTransferObtainedCallb
     gOnDataReceivedCallback      = onDataReceivedCallback;
     gOnTransferCompletedCallback = onTransferCompletedCallback;
     chip::Controller::DeviceControllerFactory & factory = chip::Controller::DeviceControllerFactory::GetInstance();
-    gBdxTransferManager.Init(factory.GetSystemState()->SystemLayer());
+    chip::System::Layer * systemLayer = factory.GetSystemState()->SystemLayer();
+    gBdxTransferDelegate.Init(systemLayer);
+    gBdxTransferManager.Init(systemLayer);
     gBdxTransferServer.Init(factory.GetSystemState()->ExchangeMgr());
 }
 
