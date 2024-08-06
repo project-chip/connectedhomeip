@@ -251,6 +251,17 @@ EcosystemInformationServer & EcosystemInformationServer::Instance()
     return mInstance;
 }
 
+CHIP_ERROR EcosystemInformationServer::AddEcosystemInformationClusterToEndpoint(EndpointId aEndpoint)
+{
+    VerifyOrReturnError((aEndpoint != kRootEndpointId && aEndpoint != kInvalidEndpointId), CHIP_ERROR_INVALID_ARGUMENT);
+    auto it = mDevicesMap.find(aEndpoint);
+    // We expect that the device has not been previously added.
+    VerifyOrReturnError((it == mDevicesMap.end()), CHIP_ERROR_INCORRECT_STATE);
+    // This create an empty DeviceInfo in mDevicesMap.
+    mDevicesMap[aEndpoint];
+    return CHIP_NO_ERROR;
+}
+
 CHIP_ERROR EcosystemInformationServer::AddDeviceInfo(EndpointId aEndpoint, std::unique_ptr<EcosystemDeviceStruct> aDevice)
 {
     VerifyOrReturnError(aDevice, CHIP_ERROR_INVALID_ARGUMENT);

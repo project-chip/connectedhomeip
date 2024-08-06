@@ -24,6 +24,7 @@
 
 #include <app/AttributeAccessInterfaceRegistry.h>
 #include <app/CommandHandlerInterfaceRegistry.h>
+#include <app/clusters/ecosystem-information-server/ecosystem-information-server.h>
 
 #if defined(PW_RPC_FABRIC_BRIDGE_SERVICE) && PW_RPC_FABRIC_BRIDGE_SERVICE
 #include "RpcClient.h"
@@ -34,8 +35,9 @@
 #include <sys/ioctl.h>
 #include <thread>
 
-using namespace chip;
+void MatterEcosystemInformationPluginServerInitCallback();
 
+using namespace chip;
 using namespace chip::app;
 using namespace chip::app::Clusters;
 using namespace chip::app::Clusters::AdministratorCommissioning;
@@ -174,6 +176,7 @@ void ApplicationInit()
 {
     ChipLogDetail(NotSpecified, "Fabric-Bridge: ApplicationInit()");
 
+    MatterEcosystemInformationPluginServerInitCallback();
     CommandHandlerInterfaceRegistry::RegisterCommandHandler(&gAdministratorCommissioningCommandHandler);
 
 #if defined(PW_RPC_FABRIC_BRIDGE_SERVICE) && PW_RPC_FABRIC_BRIDGE_SERVICE
