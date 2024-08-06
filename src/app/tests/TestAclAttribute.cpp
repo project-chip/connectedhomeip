@@ -118,17 +118,17 @@ public:
 
         Access::GetAccessControl().Finish();
         Access::GetAccessControl().Init(GetTestAccessControlDelegate(), gDeviceTypeResolver);
-        mOldModel = InteractionModelEngine::GetInstance()->SetDataModel(&TestImCustomDataModel::Instance());
+        mOldProvider = InteractionModelEngine::GetInstance()->SetDataModelProvider(&TestImCustomDataModel::Instance());
     }
 
     void TearDown() override
     {
         AppContext::TearDown();
-        InteractionModelEngine::GetInstance()->SetDataModel(mOldModel);
+        InteractionModelEngine::GetInstance()->SetDataModelProvider(mOldProvider);
     }
 
 private:
-    chip::app::InteractionModel::DataModel * mOldModel = nullptr;
+    chip::app::DataModel::Provider * mOldProvider = nullptr;
 };
 
 // Read Client sends a malformed subscribe request, interaction model engine fails to parse the request and generates a status

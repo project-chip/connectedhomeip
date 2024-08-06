@@ -63,6 +63,8 @@
         "general-commissioning-cluster.xml",
         "general-diagnostics-cluster.xml",
         "global-attributes.xml",
+        "global-bitmaps.xml",
+        "global-enums.xml",
         "global-structs.xml",
         "groups-cluster.xml",
         "group-key-mgmt-cluster.xml",
@@ -211,6 +213,15 @@
             "CurrentMode",
             "FeatureMap"
         ],
+        "Door Lock": [
+            "AliroReaderVerificationKey",
+            "AliroReaderGroupIdentifier",
+            "AliroReaderGroupSubIdentifier",
+            "AliroGroupResolvingKey",
+            "AliroBLEAdvertisingVersion",
+            "NumberOfAliroCredentialIssuerKeysSupported",
+            "NumberOfAliroEndpointKeysSupported"
+        ],
         "Energy EVSE": [
             "State",
             "SupplyState",
@@ -299,7 +310,9 @@
             "struct_attr",
             "nullable_struct",
             "general_error_boolean",
-            "cluster_error_boolean"
+            "cluster_error_boolean",
+            "global_struct",
+            "nullable_global_struct"
         ],
         "Thread Border Router Management": [
             "BorderRouterName",
@@ -669,7 +682,8 @@
             "PreferredExtendedPanID",
             "ThreadNetworks",
             "ThreadNetworkTableSize"
-        ]
+        ],
+        "Service Area": ["CurrentArea", "EstimatedEndTime", "FeatureMap"]
     },
     "defaultReportingPolicy": "mandatory",
     "ZCLDataTypes": ["ARRAY", "BITMAP", "ENUM", "NUMBER", "STRING", "STRUCT"],

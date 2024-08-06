@@ -900,6 +900,18 @@ static BOOL AttributeIsSpecifiedInGeneralCommissioningCluster(AttributeId aAttri
     case Attributes::SupportsConcurrentConnection::Id: {
         return YES;
     }
+    case Attributes::TCAcceptedVersion::Id: {
+        return YES;
+    }
+    case Attributes::TCMinRequiredVersion::Id: {
+        return YES;
+    }
+    case Attributes::TCAcknowledgements::Id: {
+        return YES;
+    }
+    case Attributes::TCAcknowledgementsRequired::Id: {
+        return YES;
+    }
     case Attributes::GeneratedCommandList::Id: {
         return YES;
     }
@@ -1516,6 +1528,9 @@ static BOOL AttributeIsSpecifiedInBridgedDeviceBasicInformationCluster(Attribute
         return YES;
     }
     case Attributes::ProductName::Id: {
+        return YES;
+    }
+    case Attributes::ProductID::Id: {
         return YES;
     }
     case Attributes::NodeLabel::Id: {
@@ -3846,16 +3861,16 @@ static BOOL AttributeIsSpecifiedInServiceAreaCluster(AttributeId aAttributeId)
 {
     using namespace Clusters::ServiceArea;
     switch (aAttributeId) {
-    case Attributes::SupportedLocations::Id: {
+    case Attributes::SupportedAreas::Id: {
         return YES;
     }
     case Attributes::SupportedMaps::Id: {
         return YES;
     }
-    case Attributes::SelectedLocations::Id: {
+    case Attributes::SelectedAreas::Id: {
         return YES;
     }
-    case Attributes::CurrentLocation::Id: {
+    case Attributes::CurrentArea::Id: {
         return YES;
     }
     case Attributes::EstimatedEndTime::Id: {
@@ -4162,9 +4177,6 @@ static BOOL AttributeIsSpecifiedInThermostatCluster(AttributeId aAttributeId)
         return YES;
     }
     case Attributes::Schedules::Id: {
-        return YES;
-    }
-    case Attributes::PresetsSchedulesEditable::Id: {
         return YES;
     }
     case Attributes::SetpointHoldExpiryTimestamp::Id: {
@@ -6663,6 +6675,12 @@ static BOOL AttributeIsSpecifiedInUnitTestingCluster(AttributeId aAttributeId)
     case Attributes::ClusterErrorBoolean::Id: {
         return YES;
     }
+    case Attributes::GlobalEnum::Id: {
+        return YES;
+    }
+    case Attributes::GlobalStruct::Id: {
+        return YES;
+    }
     case Attributes::Unsupported::Id: {
         return YES;
     }
@@ -6766,6 +6784,12 @@ static BOOL AttributeIsSpecifiedInUnitTestingCluster(AttributeId aAttributeId)
         return YES;
     }
     case Attributes::WriteOnlyInt8u::Id: {
+        return YES;
+    }
+    case Attributes::NullableGlobalEnum::Id: {
+        return YES;
+    }
+    case Attributes::NullableGlobalStruct::Id: {
         return YES;
     }
     case Attributes::GeneratedCommandList::Id: {

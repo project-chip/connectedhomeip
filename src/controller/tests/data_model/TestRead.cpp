@@ -56,13 +56,13 @@ protected:
     void SetUp() override
     {
         chip::Test::AppContext::SetUp();
-        mOldModel = InteractionModelEngine::GetInstance()->SetDataModel(&CustomDataModel::Instance());
+        mOldProvider = InteractionModelEngine::GetInstance()->SetDataModelProvider(&CustomDataModel::Instance());
     }
 
     // Performs teardown for each individual test in the test suite
     void TearDown() override
     {
-        InteractionModelEngine::GetInstance()->SetDataModel(mOldModel);
+        InteractionModelEngine::GetInstance()->SetDataModelProvider(mOldProvider);
         chip::Test::AppContext::TearDown();
     }
 
@@ -97,10 +97,10 @@ protected:
     // max-interval to time out.
     static System::Clock::Timeout ComputeSubscriptionTimeout(System::Clock::Seconds16 aMaxInterval);
 
-    bool mEmitSubscriptionError                        = false;
-    int32_t mNumActiveSubscriptions                    = 0;
-    bool mAlterSubscriptionIntervals                   = false;
-    chip::app::InteractionModel::DataModel * mOldModel = nullptr;
+    bool mEmitSubscriptionError                   = false;
+    int32_t mNumActiveSubscriptions               = 0;
+    bool mAlterSubscriptionIntervals              = false;
+    chip::app::DataModel::Provider * mOldProvider = nullptr;
 };
 
 uint16_t TestRead::mMaxInterval = 66;
