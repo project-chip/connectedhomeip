@@ -80,8 +80,6 @@ class TestBdxTransfer(MatterBaseTest):
         asserts.assert_equal(bdx_transfer.init_message.FileDesignator,
                              bytes(file_designator, encoding='utf8'),
                              "Invalid file designator")
-        if command_send_future in done:
-            command_response = command_send_future.result()
 
         self.step(5)
         data = await bdx_transfer.accept()
@@ -91,9 +89,11 @@ class TestBdxTransfer(MatterBaseTest):
         asserts.assert_equal(bytearray(data), data_file.read(), "Transferred data doesn't match")
 
         self.step(7)
-        if command_send_future not in done:
+        if command_send_future in done:
+            command_response = command_send_future.result()
+        else:
             command_response: Clusters.DiagnosticLogs.Commands.RetrieveLogsResponse = await command_send_future
-        print(command_response)
+        asserts.assert_equal(command_response.status, Clusters.DiagnosticLogs.Enums.StatusEnum.kSuccess, "Invalid command response")
 
 
 if __name__ == "__main__":
