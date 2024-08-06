@@ -27,6 +27,7 @@
 #include <app/CommandHandler.h>
 #include <app/ConcreteAttributePath.h>
 #include <app/ConcreteCommandPath.h>
+#include <app/server/Server.h>
 #include <lib/core/CHIPEncoding.h>
 #include <platform/internal/CHIPDeviceLayerInternal.h>
 
@@ -112,7 +113,7 @@ void TimerExpiredCallback(System::Layer * systemLayer, void * callbackContext)
 {
     EndpointId endpoint = static_cast<EndpointId>(reinterpret_cast<uintptr_t>(callbackContext));
 
-    Delegate * delegate = GetDelegate(endpoint);
+    auto delegate = GetDelegate(endpoint);
     VerifyOrReturn(delegate != nullptr, ChipLogError(Zcl, "Delegate is null. Unable to handle timer expired"));
 
     delegate->ClearPendingPresetList();
@@ -731,7 +732,7 @@ CHIP_ERROR ThermostatAttrAccess::Read(const ConcreteReadAttributePath & aPath, A
         }
         break;
     case PresetTypes::Id: {
-        Delegate * delegate = GetDelegate(aPath.mEndpointId);
+        auto delegate = GetDelegate(aPath.mEndpointId);
         VerifyOrReturnError(delegate != nullptr, CHIP_ERROR_INCORRECT_STATE, ChipLogError(Zcl, "Delegate is null"));
 
         return aEncoder.EncodeList([delegate](const auto & encoder) -> CHIP_ERROR {
@@ -750,14 +751,14 @@ CHIP_ERROR ThermostatAttrAccess::Read(const ConcreteReadAttributePath & aPath, A
     }
     break;
     case NumberOfPresets::Id: {
-        Delegate * delegate = GetDelegate(aPath.mEndpointId);
+        auto delegate = GetDelegate(aPath.mEndpointId);
         VerifyOrReturnError(delegate != nullptr, CHIP_ERROR_INCORRECT_STATE, ChipLogError(Zcl, "Delegate is null"));
 
         ReturnErrorOnFailure(aEncoder.Encode(delegate->GetNumberOfPresets()));
     }
     break;
     case Presets::Id: {
-        Delegate * delegate = GetDelegate(aPath.mEndpointId);
+        auto delegate = GetDelegate(aPath.mEndpointId);
         VerifyOrReturnError(delegate != nullptr, CHIP_ERROR_INCORRECT_STATE, ChipLogError(Zcl, "Delegate is null"));
 
         auto & subjectDescriptor = aEncoder.GetSubjectDescriptor();
@@ -793,7 +794,7 @@ CHIP_ERROR ThermostatAttrAccess::Read(const ConcreteReadAttributePath & aPath, A
     }
     break;
     case ActivePresetHandle::Id: {
-        Delegate * delegate = GetDelegate(aPath.mEndpointId);
+        auto delegate = GetDelegate(aPath.mEndpointId);
         VerifyOrReturnError(delegate != nullptr, CHIP_ERROR_INCORRECT_STATE, ChipLogError(Zcl, "Delegate is null"));
 
         uint8_t buffer[kPresetHandleSize];
@@ -839,7 +840,7 @@ CHIP_ERROR ThermostatAttrAccess::Write(const ConcreteDataAttributePath & aPath, 
     {
     case Presets::Id: {
 
-        Delegate * delegate = GetDelegate(endpoint);
+        auto delegate = GetDelegate(endpoint);
         VerifyOrReturnError(delegate != nullptr, CHIP_ERROR_INCORRECT_STATE, ChipLogError(Zcl, "Delegate is null"));
 
         // Presets are not editable, return INVALID_IN_STATE.
@@ -924,7 +925,7 @@ CHIP_ERROR ThermostatAttrAccess::Write(const ConcreteDataAttributePath & aPath, 
     return CHIP_NO_ERROR;
 }
 
-CHIP_ERROR ThermostatAttrAccess::AppendPendingPreset(Delegate * delegate, const PresetStruct::Type & preset)
+CHIP_ERROR ThermostatAttrAccess::AppendPendingPreset(Thermostat::Delegate * delegate, const PresetStruct::Type & preset)
 {
     if (!IsValidPresetEntry(preset))
     {
@@ -976,6 +977,19 @@ CHIP_ERROR ThermostatAttrAccess::AppendPendingPreset(Delegate * delegate, const 
     }
 
     return delegate->AppendToPendingPresetList(preset);
+}
+
+void ThermostatAttrAccess::OnFabricRemoved(const FabricTable & fabricTable, FabricIndex fabricIndex)
+{
+    for (size_t i = 0; i < ArraySize(mAtomicWriteNodeIds); ++i)
+    {
+        auto nodeId = mAtomicWriteNodeIds[i];
+        if (nodeId.GetFabricIndex() == fabricIndex)
+        {
+            mAtomicWriteNodeIds[i] = ScopedNodeId();
+            mAtomicWriteState[i]   = false;
+        }
+    }
 }
 
 } // namespace Thermostat
@@ -1309,7 +1323,7 @@ bool emberAfThermostatClusterSetActivePresetRequestCallback(
     const Clusters::Thermostat::Commands::SetActivePresetRequest::DecodableType & commandData)
 {
     EndpointId endpoint = commandPath.mEndpointId;
-    Delegate * delegate = GetDelegate(endpoint);
+    auto delegate       = GetDelegate(endpoint);
 
     if (delegate == nullptr)
     {
@@ -1399,7 +1413,7 @@ void handleAtomicBegin(CommandHandler * commandObj, const ConcreteCommandPath & 
 {
     EndpointId endpoint = commandPath.mEndpointId;
 
-    Delegate * delegate = GetDelegate(endpoint);
+    auto delegate = GetDelegate(endpoint);
 
     if (delegate == nullptr)
     {
@@ -1585,7 +1599,7 @@ void handleAtomicCommit(CommandHandler * commandObj, const ConcreteCommandPath &
         return;
     }
 
-    Delegate * delegate = GetDelegate(endpoint);
+    auto delegate = GetDelegate(endpoint);
 
     if (delegate == nullptr)
     {
@@ -1618,7 +1632,7 @@ void handleAtomicRollback(CommandHandler * commandObj, const ConcreteCommandPath
         return;
     }
 
-    Delegate * delegate = GetDelegate(endpoint);
+    auto delegate = GetDelegate(endpoint);
 
     if (delegate == nullptr)
     {
@@ -1895,5 +1909,6 @@ bool emberAfThermostatClusterSetpointRaiseLowerCallback(app::CommandHandler * co
 
 void MatterThermostatPluginServerInitCallback()
 {
+    Server::GetInstance().GetFabricTable().AddFabricDelegate(&gThermostatAttrAccess);
     registerAttributeAccessOverride(&gThermostatAttrAccess);
 }

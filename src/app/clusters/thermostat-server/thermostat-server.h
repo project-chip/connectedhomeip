@@ -40,7 +40,7 @@ static constexpr size_t kThermostatEndpointCount =
 /**
  * @brief  Thermostat Attribute Access Interface.
  */
-class ThermostatAttrAccess : public chip::app::AttributeAccessInterface
+class ThermostatAttrAccess : public chip::app::AttributeAccessInterface, public chip::FabricTable::Delegate
 {
 public:
     ThermostatAttrAccess() : AttributeAccessInterface(Optional<chip::EndpointId>::Missing(), Thermostat::Id) {}
@@ -105,7 +105,9 @@ public:
     bool InAtomicWrite(CommandHandler * commandObj, EndpointId endpoint);
 
 private:
-    CHIP_ERROR AppendPendingPreset(Delegate * delegate, const Structs::PresetStruct::Type & preset);
+    CHIP_ERROR AppendPendingPreset(Thermostat::Delegate * delegate, const Structs::PresetStruct::Type & preset);
+
+    void OnFabricRemoved(const FabricTable & fabricTable, FabricIndex fabricIndex) override;
 
     ScopedNodeId mAtomicWriteNodeIds[kThermostatEndpointCount];
     bool mAtomicWriteState[kThermostatEndpointCount];
