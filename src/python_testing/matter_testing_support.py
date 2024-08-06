@@ -1864,7 +1864,13 @@ async def get_accepted_endpoints_for_test(self: MatterBaseTest, accept_function:
         Returns a list of endpoints on which the test should be run given the accept_function for the test.
     """
     wildcard = await self.default_controller.Read(self.dut_node_id, [()])
-    return [e for e in wildcard.attributes.keys() if accept_function(wildcard, e)]
+    matching = [e for e in wildcard.attributes.keys() if accept_function(wildcard, e)]
+    forced_endpoint = self.user_params.get('force_endpoint', None)
+    if forced_endpoint is None:
+        return matching
+
+    asserts.assert_in(forced_endpoint, matching, "Force endpoint does not match test requirements")
+    return [forced_endpoint]
 
 
 def run_for_each_matching_endpoint(accept_function: EndpointCheckFunction):

@@ -105,6 +105,10 @@ class DecoratorTestRunnerHooks:
 
 
 class TestDecorators(MatterBaseTest):
+    def teardown_test(self):
+        if 'force_endpoint' in self.user_params.keys():
+            del self.user_params['force_endpoint']
+
     def test_checkers(self):
         has_onoff = has_cluster(Clusters.OnOff)
         has_onoff_onoff = has_attribute(Clusters.OnOff.Attributes.OnOff)
@@ -153,7 +157,31 @@ class TestDecorators(MatterBaseTest):
         endpoints = await get_accepted_endpoints_for_test(self, has_timesync_utc)
         asserts.assert_equal(endpoints, [], msg)
 
+    @async_test_body
+    async def test_force_endpoint_good(self):
+        has_onoff = has_cluster(Clusters.OnOff)
+
+        all_endpoints = await self.default_controller.Read(self.dut_node_id, [()])
+        all_endpoints = list(all_endpoints.attributes.keys())
+
+        msg = "Unexpected endpoint list returned"
+
+        for e in all_endpoints:
+            self.user_params['force_endpoint'] = e
+            endpoints = await get_accepted_endpoints_for_test(self, has_onoff)
+            asserts.assert_equal(endpoints, [e], msg)
+
+    @async_test_body
+    async def test_force_endpoint_bad(self):
+        ''' This test should cause an assertion because the forced endpoint does not match the requirements.'''
+        has_onoff = has_cluster(Clusters.OnOff)
+        all_endpoints = list(all_endpoints.attributes.keys())
+        forced = max(all_endpoints + 1)
+        self.user_params['force_endpoint'] = e
+        endpoints = await get_accepted_endpoints_for_test(self, has_onoff)
+
     # This test should cause an assertion because it has pics_ method
+
     @run_once_for_node
     async def test_whole_node_with_pics(self):
         pass
@@ -257,6 +285,18 @@ def main():
     ok = test_runner.run_test_with_mock_read(read_resp, hooks)
     if not ok:
         failures.append("Test case failure: test_endpoints")
+
+    test_runner.set_test('TestDecorators.py', 'TestDecorators', 'test_force_endpoint_good')
+    read_resp = get_clusters([0, 1])
+    ok = test_runner.run_test_with_mock_read(read_resp, hooks)
+    if not ok:
+        failures.append("Test case failure: test_force_endpoint_good")
+
+    test_runner.set_test('TestDecorators.py', 'TestDecorators', 'test_force_endpoint_bad')
+    read_resp = get_clusters([0, 1])
+    ok = test_runner.run_test_with_mock_read(read_resp, hooks)
+    if ok:
+        failures.append("Test case failure: test_force_endpoint_bad")
 
     test_name = 'test_whole_node_with_pics'
     test_runner.set_test('TestDecorators.py', 'TestDecorators', test_name)
