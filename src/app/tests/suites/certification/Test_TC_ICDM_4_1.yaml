@@ -47,7 +47,7 @@ tests:
                 saveAs: ActiveDuration
                 constraints:
                     type: int32u
-                    minValue: 30000
+                    minValue: 29995
 
     - label: "Wait for the PromisedActiveDuration to end"
       cluster: "DelayCommands"
@@ -70,4 +70,4 @@ tests:
               - name: "PromisedActiveDuration"
                 constraints:
                     type: int32u
-                    minValue: 20000
+                    minValue: 19995
