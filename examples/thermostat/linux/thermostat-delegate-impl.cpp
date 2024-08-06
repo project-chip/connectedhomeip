@@ -148,6 +148,44 @@ CHIP_ERROR ThermostatDelegate::SetActivePresetHandle(const DataModel::Nullable<B
     return CHIP_NO_ERROR;
 }
 
+System::Clock::Milliseconds16
+ThermostatDelegate::GetAtomicWriteTimeout(DataModel::DecodableList<chip::AttributeId> attributeRequests,
+                                          System::Clock::Milliseconds16 timeoutRequest)
+{
+    auto attributeIdsIter = attributeRequests.begin();
+    bool requestedPresets = false, requestedSchedules = false;
+    while (attributeIdsIter.Next())
+    {
+        auto & attributeId = attributeIdsIter.GetValue();
+
+        switch (attributeId)
+        {
+        case Attributes::Presets::Id:
+            requestedPresets = true;
+            break;
+        case Attributes::Schedules::Id:
+            requestedSchedules = true;
+            break;
+        default:
+            return System::Clock::Milliseconds16(0);
+        }
+    }
+    if (attributeIdsIter.GetStatus() != CHIP_NO_ERROR)
+    {
+        return System::Clock::Milliseconds16(0);
+    }
+    auto timeout = System::Clock::Milliseconds16(0);
+    if (requestedPresets)
+    {
+        timeout += std::chrono::milliseconds(1000);
+    }
+    if (requestedSchedules)
+    {
+        timeout += std::chrono::milliseconds(3000);
+    }
+    return std::min(timeoutRequest, timeout);
+}
+
 void ThermostatDelegate::InitializePendingPresets()
 {
     mNextFreeIndexInPendingPresetsList = 0;

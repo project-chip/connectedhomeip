@@ -1402,8 +1402,6 @@ void handleAtomicBegin(CommandHandler * commandObj, const ConcreteCommandPath & 
         return;
     }
 
-    auto timeout = commandData.timeout.Value();
-
     if (!validAtomicAttributes(commandData, false))
     {
         commandObj->AddStatus(commandPath, imcode::InvalidCommand);
@@ -1420,12 +1418,17 @@ void handleAtomicBegin(CommandHandler * commandObj, const ConcreteCommandPath & 
     // needs to keep track of a pending preset list now.
     delegate->InitializePendingPresets();
 
-    uint16_t maxTimeout = 5000;
-    timeout             = std::min(timeout, maxTimeout);
+    System::Clock::Milliseconds16 timeout =
+        delegate->GetAtomicWriteTimeout(commandData.attributeRequests, System::Clock::Milliseconds16(commandData.timeout.Value()));
 
-    ScheduleTimer(endpoint, System::Clock::Milliseconds16(timeout));
+    if (timeout == System::Clock::Milliseconds16(0))
+    {
+        commandObj->AddStatus(commandPath, imcode::InvalidCommand);
+        return;
+    }
+    ScheduleTimer(endpoint, timeout);
     gThermostatAttrAccess.SetAtomicWrite(endpoint, GetSourceScopedNodeId(commandObj), true);
-    sendAtomicResponse(commandObj, commandPath, imcode::Success, imcode::Success, imcode::Success, MakeOptional(timeout));
+    sendAtomicResponse(commandObj, commandPath, imcode::Success, imcode::Success, imcode::Success, MakeOptional(timeout.count()));
 }
 
 imcode commitPresets(Delegate * delegate, EndpointId endpoint)
