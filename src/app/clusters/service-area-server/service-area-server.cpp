@@ -249,7 +249,7 @@ void Instance::HandleSelectAreasCmd(HandlerContext & ctx, const Commands::Select
         {
             uint32_t ignoredIndex = 0;
             uint32_t oldSelectedArea;
-            uint32_t i         = 0;
+            uint32_t i     = 0;
             auto iAreaIter = req.newAreas.begin();
             while (iAreaIter.Next())
             {
@@ -264,12 +264,11 @@ void Instance::HandleSelectAreasCmd(HandlerContext & ctx, const Commands::Select
                 }
 
                 // Checking for duplicate locations.
-                uint32_t j         = 0;
+                uint32_t j     = 0;
                 auto jAreaIter = req.newAreas.begin();
                 while (j < i)
                 {
-                    jAreaIter
-                        .Next(); // Since j < i and i is valid, we can safely call Next() without checking the return value.
+                    jAreaIter.Next(); // Since j < i and i is valid, we can safely call Next() without checking the return value.
                     if (jAreaIter.GetValue() == aSelectedArea)
                     {
                         exitResponse(SelectAreasStatus::kDuplicatedAreas, ""_span);
@@ -281,8 +280,7 @@ void Instance::HandleSelectAreasCmd(HandlerContext & ctx, const Commands::Select
                 // check to see if parameter list and attribute still match
                 if (matchesCurrentSelectedAreas)
                 {
-                    if (!mDelegate->GetSelectedAreaByIndex(ignoredIndex, oldSelectedArea) ||
-                        (aSelectedArea != oldSelectedArea))
+                    if (!mDelegate->GetSelectedAreaByIndex(ignoredIndex, oldSelectedArea) || (aSelectedArea != oldSelectedArea))
                     {
                         matchesCurrentSelectedAreas = false;
                     }
@@ -464,9 +462,8 @@ bool Instance::IsValidSupportedArea(const AreaStructureWrapper & aArea)
         if (aArea.areaDesc.locationInfo.Value().locationName.empty() && aArea.areaDesc.locationInfo.Value().floorNumber.IsNull() &&
             aArea.areaDesc.locationInfo.Value().areaType.IsNull() && aArea.areaDesc.landmarkInfo.IsNull())
         {
-            ChipLogDetail(
-                Zcl, "IsValidAsSupportedArea %u - AreaName is empty string, FloorNumber, AreaType, LandmarkInfo are null",
-                aArea.areaID);
+            ChipLogDetail(Zcl, "IsValidAsSupportedArea %u - AreaName is empty string, FloorNumber, AreaType, LandmarkInfo are null",
+                          aArea.areaID);
             return false;
         }
     }

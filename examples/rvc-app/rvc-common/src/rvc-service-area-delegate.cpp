@@ -39,12 +39,14 @@ CHIP_ERROR RvcServiceAreaDelegate::Init()
     uint32_t supportedAreaID_D = 0x88888888;
 
     // Area A has name, floor number, uses map XX
-    auto areaA = AreaStructureWrapper(supportedAreaID_A, DataModel::Nullable<uint32_t>(supportedMapId_XX),DataModel::NullNullable, DataModel::NullNullable);
-    areaA.SetLocationInfo("My Location A"_span,DataModel::Nullable<int16_t>(4), DataModel::Nullable<Globals::AreaTypeTag>());
+    auto areaA = AreaStructureWrapper(supportedAreaID_A, DataModel::Nullable<uint32_t>(supportedMapId_XX), DataModel::NullNullable,
+                                      DataModel::NullNullable);
+    areaA.SetLocationInfo("My Location A"_span, DataModel::Nullable<int16_t>(4), DataModel::Nullable<Globals::AreaTypeTag>());
 
     // Area B has name, uses map XX
-    auto areaB = AreaStructureWrapper(supportedAreaID_B, DataModel::Nullable<uint32_t>(supportedMapId_XX),DataModel::NullNullable, DataModel::NullNullable);
-    areaB.SetLocationInfo("My Location B"_span,DataModel::NullNullable, DataModel::NullNullable);
+    auto areaB = AreaStructureWrapper(supportedAreaID_B, DataModel::Nullable<uint32_t>(supportedMapId_XX), DataModel::NullNullable,
+                                      DataModel::NullNullable);
+    areaB.SetLocationInfo("My Location B"_span, DataModel::NullNullable, DataModel::NullNullable);
 
     // Area C has full SemData, no name, Map YY
     auto areaC = AreaStructureWrapper();
@@ -78,8 +80,8 @@ bool RvcServiceAreaDelegate::IsSetSelectedAreasAllowed(MutableCharSpan statusTex
     return true;
 };
 
-bool RvcServiceAreaDelegate::IsValidSelectAreasSet(const Commands::SelectAreas::DecodableType & req,
-                                                   SelectAreasStatus & areaStatus, MutableCharSpan statusText)
+bool RvcServiceAreaDelegate::IsValidSelectAreasSet(const Commands::SelectAreas::DecodableType & req, SelectAreasStatus & areaStatus,
+                                                   MutableCharSpan statusText)
 {
     // TODO IMPLEMENT
     return true;
@@ -116,8 +118,7 @@ bool RvcServiceAreaDelegate::GetSupportedAreaByIndex(uint32_t listIndex, AreaStr
     return false;
 };
 
-bool RvcServiceAreaDelegate::GetSupportedAreaById(uint32_t aAreaID, uint32_t & listIndex,
-                                                      AreaStructureWrapper & supportedArea)
+bool RvcServiceAreaDelegate::GetSupportedAreaById(uint32_t aAreaID, uint32_t & listIndex, AreaStructureWrapper & supportedArea)
 {
     // We do not need to reimplement this method as it's already done by the SDK.
     // We are reimplementing this method, still using linear search, but with some optimization on the SDK implementation
@@ -166,7 +167,8 @@ bool RvcServiceAreaDelegate::ModifySupportedArea(uint32_t listIndex, const AreaS
     // Double-check that areaID's match.
     if (modifiedArea.areaID != mSupportedAreas[listIndex].areaID)
     {
-        ChipLogError(Zcl, "ModifySupportedArea - areaID's do not match, new areaID %u, existing areaID %u", modifiedArea.areaID, mSupportedAreas[listIndex].areaID);
+        ChipLogError(Zcl, "ModifySupportedArea - areaID's do not match, new areaID %u, existing areaID %u", modifiedArea.areaID,
+                     mSupportedAreas[listIndex].areaID);
         return false;
     }
 
