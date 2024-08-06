@@ -196,7 +196,7 @@ class TC_TSTAT_4_2(MatterBaseTest):
         self.step("1")
         # Commission DUT - already done
 
-        logger.info(f"Commissioning under second controller")
+        logger.info("Commissioning under second controller")
         params = await self.default_controller.OpenCommissioningWindow(
             nodeid=self.dut_node_id, timeout=600, iteration=10000, discriminator=1234, option=1)
 
