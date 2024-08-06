@@ -24,38 +24,19 @@
 using namespace chip;
 using namespace chip::app;
 
-namespace {
-
-void IncreaseClusterDataVersion(const ConcreteClusterPath & aConcreteClusterPath)
-{
-    DataVersion * version = emberAfDataVersionStorage(aConcreteClusterPath);
-    if (version == nullptr)
-    {
-        ChipLogError(DataManagement, "Endpoint %x, Cluster " ChipLogFormatMEI " not found in IncreaseClusterDataVersion!",
-                     aConcreteClusterPath.mEndpointId, ChipLogValueMEI(aConcreteClusterPath.mClusterId));
-    }
-    else
-    {
-        (*(version))++;
-        ChipLogDetail(DataManagement, "Endpoint %x, Cluster " ChipLogFormatMEI " update version to %" PRIx32,
-                      aConcreteClusterPath.mEndpointId, ChipLogValueMEI(aConcreteClusterPath.mClusterId), *(version));
-    }
-}
-
-} // namespace
-
 void MatterReportingAttributeChangeCallback(EndpointId endpoint, ClusterId clusterId, AttributeId attributeId)
 {
     // Attribute writes have asserted this already, but this assert should catch
     // applications notifying about changes from their end.
     assertChipStackLockedByCurrentThread();
 
+    emberAfIncreaseClusterDataVersion(ConcreteClusterPath(endpoint, clusterId));
+
     AttributePathParams info;
     info.mClusterId   = clusterId;
     info.mAttributeId = attributeId;
     info.mEndpointId  = endpoint;
 
-    IncreaseClusterDataVersion(ConcreteClusterPath(endpoint, clusterId));
     InteractionModelEngine::GetInstance()->GetReportingEngine().SetDirty(info);
 }
 

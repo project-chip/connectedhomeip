@@ -14,6 +14,7 @@
  *    See the License for the specific language governing permissions and
  *    limitations under the License.
  */
+#include "app/util/attribute-storage.h"
 #include <app/codegen-data-model-provider/CodegenDataModelProvider.h>
 
 #include <access/AccessControl.h>
@@ -356,6 +357,8 @@ DataModel::ActionReturnStatus CodegenDataModelProvider::WriteAttribute(const Dat
             //       however for now this is called directly because ember code does this call
             //       inside emberAfWriteAttribute.
             MatterReportingAttributeChangeCallback(request.path);
+
+            emberAfIncreaseClusterDataVersion(request.path);
             CurrentContext().dataModelChangeListener->MarkDirty(request.path);
         }
         return *aai_result;
@@ -398,6 +401,7 @@ DataModel::ActionReturnStatus CodegenDataModelProvider::WriteAttribute(const Dat
     // - This likely maps to `MatterReportingAttributeChangeCallback` HOWEVER current ember write functions
     //   will selectively call that one depending on old attribute state (i.e. calling every time is a
     //   change in behavior)
+    emberAfIncreaseClusterDataVersion(request.path);
     CurrentContext().dataModelChangeListener->MarkDirty(request.path);
     return CHIP_NO_ERROR;
 }

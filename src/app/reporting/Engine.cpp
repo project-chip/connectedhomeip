@@ -1009,8 +1009,10 @@ void Engine::MarkDirty(const ConcreteAttributePath & path)
 {
     // NOTE: original MatterReportingAttributeChangeCallback ALSO does a
     //       IncreaseClusterDataVersion. However that ties directly to ember so it is not
-    //       done here. The code should be migrated to execute this.
-
+    //       done here.
+    //
+    //       Instead the DataModel::Provider is responsible to properly increase cluster
+    //       data versions.
     AttributePathParams info(path.mEndpointId, path.mClusterId, path.mAttributeId);
     CHIP_ERROR err = SetDirty(info);
     if (err != CHIP_NO_ERROR)

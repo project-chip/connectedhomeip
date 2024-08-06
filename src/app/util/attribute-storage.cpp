@@ -15,6 +15,7 @@
  *    limitations under the License.
  */
 
+#include "app/ConcreteClusterPath.h"
 #include <app/util/attribute-storage.h>
 
 #include <app/util/attribute-storage-detail.h>
@@ -1462,3 +1463,20 @@ DataVersion * emberAfDataVersionStorage(const chip::app::ConcreteClusterPath & a
 
     return ep.dataVersions + clusterIndex;
 }
+
+void emberAfIncreaseClusterDataVersion(const chip::app::ConcreteClusterPath & aConcreteClusterPath)
+{
+    DataVersion * version = emberAfDataVersionStorage(aConcreteClusterPath);
+    if (version == nullptr)
+    {
+        ChipLogError(DataManagement, "Endpoint %x, Cluster " ChipLogFormatMEI " not found in IncreaseClusterDataVersion!",
+                     aConcreteClusterPath.mEndpointId, ChipLogValueMEI(aConcreteClusterPath.mClusterId));
+    }
+    else
+    {
+        (*(version))++;
+        ChipLogDetail(DataManagement, "Endpoint %x, Cluster " ChipLogFormatMEI " update version to %" PRIx32,
+                      aConcreteClusterPath.mEndpointId, ChipLogValueMEI(aConcreteClusterPath.mClusterId), *(version));
+    }
+}
+
