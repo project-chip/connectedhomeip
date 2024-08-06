@@ -18,7 +18,6 @@
 
 #pragma once
 
-#include <lib/support/BitFlags.h>
 #include <app/AppConfig.h>
 #include <app/AttributeAccessToken.h>
 #include <app/AttributePathParams.h>
@@ -27,6 +26,7 @@
 #include <app/data-model-provider/Provider.h>
 #include <lib/core/CHIPCore.h>
 #include <lib/core/TLVDebug.h>
+#include <lib/support/BitFlags.h>
 #include <lib/support/CodeUtils.h>
 #include <lib/support/DLLUtil.h>
 #include <lib/support/logging/CHIPLogging.h>
