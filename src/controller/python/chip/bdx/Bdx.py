@@ -103,6 +103,7 @@ def _OnDataReceivedCallback(context, dataBuffer, bufferLength: int):
 def _OnTransferCompletedCallback(transaction: AsyncTransferCompletedTransaction, result: PyChipError):
     transaction.handleResult(result)
 
+
 def PrepareToReceiveBdxData(future: Future) -> PyChipError:
     handle = chip.native.GetLibraryHandle()
     transaction = AsyncTransferObtainedTransaction(future=future, event_loop=asyncio.get_running_loop())

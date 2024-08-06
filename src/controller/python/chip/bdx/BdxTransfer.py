@@ -22,6 +22,7 @@ from dataclasses import dataclass
 
 from . import Bdx
 
+
 @dataclass
 class InitMessage:
     TransferControlFlags: int
@@ -31,8 +32,9 @@ class InitMessage:
     FileDesignator: bytes
     Metadata: bytes
 
+
 class BdxTransfer:
-    def __init__(self, bdx_transfer: c_void_p, init_message: InitMessage, data = None):
+    def __init__(self, bdx_transfer: c_void_p, init_message: InitMessage, data=None):
         self.init_message = init_message
         self._bdx_transfer = bdx_transfer
         self._data = data
