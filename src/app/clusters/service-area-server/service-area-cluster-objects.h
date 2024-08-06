@@ -37,7 +37,7 @@ inline constexpr size_t kMapNameMaxSize      = 64u;
 struct AreaStructureWrapper : public chip::app::Clusters::ServiceArea::Structs::AreaStruct::Type
 {
     /**
-     * @brief This is a default constructor that initializes the location object with the following 
+     * @brief This is a default constructor that initializes the location object with the following
      * values: areaID = 0, mapID = null, locationInfo = null, landmarkInfo = null.
     */
     AreaStructureWrapper()
@@ -159,7 +159,7 @@ struct AreaStructureWrapper : public chip::app::Clusters::ServiceArea::Structs::
 
     /**
      * @brief Set the location information form a LocationDescriptorStruct object.
-     * 
+     *
      * @note If the locationName is larger than kAreaNameMaxSize, it will be truncated.
      */
     void SetLocationInfo(DataModel::Nullable<Globals::Structs::LocationDescriptorStruct::Type> locationInfo)
