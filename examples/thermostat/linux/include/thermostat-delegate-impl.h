@@ -54,6 +54,8 @@ public:
 
     CHIP_ERROR SetActivePresetHandle(const DataModel::Nullable<ByteSpan> & newActivePresetHandle) override;
 
+    void InitializePendingPresets() override;
+
     CHIP_ERROR AppendToPendingPresetList(const Structs::PresetStruct::Type & preset) override;
 
     CHIP_ERROR GetPendingPresetAtIndex(size_t index, PresetStructWithOwnedMembers & preset) override;

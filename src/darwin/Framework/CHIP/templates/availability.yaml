@@ -9580,7 +9580,6 @@
               - ActivePresetHandle
               - Presets
               - Schedules
-              - PresetsSchedulesEditable
               - TemperatureSetpointHoldPolicy
               - SetpointHoldExpiryTimestamp
               - ActiveScheduleHandle

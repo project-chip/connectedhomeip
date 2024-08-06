@@ -32,7 +32,7 @@ PresetStructWithOwnedMembers::PresetStructWithOwnedMembers(const PresetStruct::T
     *this = other;
 }
 
-void PresetStructWithOwnedMembers::operator=(const PresetStruct::Type & other)
+PresetStructWithOwnedMembers & PresetStructWithOwnedMembers::operator=(const PresetStruct::Type & other)
 {
     SetPresetScenario(other.presetScenario);
     CHIP_ERROR err = SetPresetHandle(other.presetHandle);
@@ -48,6 +48,17 @@ void PresetStructWithOwnedMembers::operator=(const PresetStruct::Type & other)
     SetCoolingSetpoint(other.coolingSetpoint);
     SetHeatingSetpoint(other.heatingSetpoint);
     SetBuiltIn(other.builtIn);
+    return *this;
+}
+
+PresetStructWithOwnedMembers & PresetStructWithOwnedMembers::operator=(const PresetStructWithOwnedMembers & other)
+{
+    if (this == &other)
+    {
+        return *this;
+    }
+    *this = static_cast<const PresetStruct::Type &>(other);
+    return *this;
 }
 
 void PresetStructWithOwnedMembers::SetPresetScenario(PresetScenarioEnum enumValue)

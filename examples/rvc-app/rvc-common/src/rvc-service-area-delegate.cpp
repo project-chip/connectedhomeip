@@ -32,25 +32,25 @@ CHIP_ERROR RvcServiceAreaDelegate::Init()
     GetInstance()->AddSupportedMap(supportedMapId_YY, "My Map YY"_span);
 
     // hardcoded fill of SUPPORTED LOCATIONS for prototyping
-    uint32_t supportedLocationId_A = 7;
-    uint32_t supportedLocationId_B = 1234567;
-    uint32_t supportedLocationId_C = 10050;
-    uint32_t supportedLocationId_D = 0x88888888;
+    uint32_t supportedAreaID_A = 7;
+    uint32_t supportedAreaID_B = 1234567;
+    uint32_t supportedAreaID_C = 10050;
+    uint32_t supportedAreaID_D = 0x88888888;
 
     // Location A has name, floor number, uses map XX
     GetInstance()->AddSupportedLocation(
-        supportedLocationId_A, DataModel::Nullable<uint_fast8_t>(supportedMapId_XX), "My Location A"_span,
+        supportedAreaID_A, DataModel::Nullable<uint_fast8_t>(supportedMapId_XX), "My Location A"_span,
         DataModel::Nullable<int16_t>(4), DataModel::Nullable<Globals::AreaTypeTag>(), DataModel::Nullable<Globals::LandmarkTag>(),
         DataModel::Nullable<Globals::PositionTag>(), DataModel::Nullable<Globals::FloorSurfaceTag>());
 
     // Location B has name, uses map XX
     GetInstance()->AddSupportedLocation(
-        supportedLocationId_B, DataModel::Nullable<uint_fast8_t>(supportedMapId_XX), "My Location B"_span,
+        supportedAreaID_B, DataModel::Nullable<uint_fast8_t>(supportedMapId_XX), "My Location B"_span,
         DataModel::Nullable<int16_t>(), DataModel::Nullable<Globals::AreaTypeTag>(), DataModel::Nullable<Globals::LandmarkTag>(),
         DataModel::Nullable<Globals::PositionTag>(), DataModel::Nullable<Globals::FloorSurfaceTag>());
 
     // Location C has full SemData, no name, Map YY
-    GetInstance()->AddSupportedLocation(supportedLocationId_C, DataModel::Nullable<uint_fast8_t>(supportedMapId_YY), CharSpan(),
+    GetInstance()->AddSupportedLocation(supportedAreaID_C, DataModel::Nullable<uint_fast8_t>(supportedMapId_YY), CharSpan(),
                                         DataModel::Nullable<int16_t>(-1),
                                         DataModel::Nullable<Globals::AreaTypeTag>(Globals::AreaTypeTag::kPlayRoom),
                                         DataModel::Nullable<Globals::LandmarkTag>(Globals::LandmarkTag::kBackDoor),
@@ -58,14 +58,14 @@ CHIP_ERROR RvcServiceAreaDelegate::Init()
                                         DataModel::Nullable<Globals::FloorSurfaceTag>(Globals::FloorSurfaceTag::kConcrete));
 
     // Location D has null values for all HomeLocationStruct fields, Map YY
-    GetInstance()->AddSupportedLocation(supportedLocationId_D, DataModel::Nullable<uint_fast8_t>(supportedMapId_YY),
+    GetInstance()->AddSupportedLocation(supportedAreaID_D, DataModel::Nullable<uint_fast8_t>(supportedMapId_YY),
                                         "My Location D"_span, DataModel::Nullable<int16_t>(),
                                         DataModel::Nullable<Globals::AreaTypeTag>(),
                                         DataModel::Nullable<Globals::LandmarkTag>(Globals::LandmarkTag::kCouch),
                                         DataModel::Nullable<Globals::PositionTag>(Globals::PositionTag::kNextTo),
                                         DataModel::Nullable<Globals::FloorSurfaceTag>(Globals::FloorSurfaceTag::kHardwood));
 
-    GetInstance()->SetCurrentLocation(supportedLocationId_C);
+    GetInstance()->SetCurrentArea(supportedAreaID_C);
 
     return CHIP_NO_ERROR;
 }
@@ -73,20 +73,20 @@ CHIP_ERROR RvcServiceAreaDelegate::Init()
 //*************************************************************************
 // command support
 
-bool RvcServiceAreaDelegate::IsSetSelectedLocationsAllowed(MutableCharSpan statusText)
+bool RvcServiceAreaDelegate::IsSetSelectedAreasAllowed(MutableCharSpan statusText)
 {
     // TODO IMPLEMENT
     return true;
 };
 
-bool RvcServiceAreaDelegate::IsValidSelectLocationsSet(const Commands::SelectLocations::DecodableType & req,
-                                                       SelectLocationsStatus & locationStatus, MutableCharSpan statusText)
+bool RvcServiceAreaDelegate::IsValidSelectAreasSet(const Commands::SelectAreas::DecodableType & req,
+                                                   SelectAreasStatus & locationStatus, MutableCharSpan statusText)
 {
     // TODO IMPLEMENT
     return true;
 };
 
-bool RvcServiceAreaDelegate::HandleSkipCurrentLocation(MutableCharSpan skipStatusText)
+bool RvcServiceAreaDelegate::HandleSkipCurrentArea(MutableCharSpan skipStatusText)
 {
     // TODO IMPLEMENT
     return true;
@@ -95,41 +95,41 @@ bool RvcServiceAreaDelegate::HandleSkipCurrentLocation(MutableCharSpan skipStatu
 //*************************************************************************
 // Supported Locations accessors
 
-bool RvcServiceAreaDelegate::IsSupportedLocationsChangeAllowed()
+bool RvcServiceAreaDelegate::IsSupportedAreasChangeAllowed()
 {
     // TODO IMPLEMENT
     return true;
 }
 
-uint32_t RvcServiceAreaDelegate::GetNumberOfSupportedLocations()
+uint32_t RvcServiceAreaDelegate::GetNumberOfSupportedAreas()
 {
-    return static_cast<uint32_t>(mSupportedLocations.size());
+    return static_cast<uint32_t>(mSupportedAreas.size());
 }
 
-bool RvcServiceAreaDelegate::GetSupportedLocationByIndex(uint32_t listIndex, LocationStructureWrapper & aSupportedLocation)
+bool RvcServiceAreaDelegate::GetSupportedLocationByIndex(uint32_t listIndex, AreaStructureWrapper & aSupportedLocation)
 {
-    if (listIndex < mSupportedLocations.size())
+    if (listIndex < mSupportedAreas.size())
     {
-        aSupportedLocation = mSupportedLocations[listIndex];
+        aSupportedLocation = mSupportedAreas[listIndex];
         return true;
     }
 
     return false;
 };
 
-bool RvcServiceAreaDelegate::GetSupportedLocationById(uint32_t aLocationId, uint32_t & listIndex,
-                                                      LocationStructureWrapper & aSupportedLocation)
+bool RvcServiceAreaDelegate::GetSupportedLocationById(uint32_t aAreaID, uint32_t & listIndex,
+                                                      AreaStructureWrapper & aSupportedLocation)
 {
     // We do not need to reimplement this method as it's already done by the SDK.
     // We are reimplementing this method, still using linear search, but with some optimization on the SDK implementation
     // since we have direct access to the list.
     listIndex = 0;
 
-    while (listIndex < mSupportedLocations.size())
+    while (listIndex < mSupportedAreas.size())
     {
-        if (mSupportedLocations[listIndex].locationID == aLocationId)
+        if (mSupportedAreas[listIndex].areaID == aAreaID)
         {
-            aSupportedLocation = mSupportedLocations[listIndex];
+            aSupportedLocation = mSupportedAreas[listIndex];
             return true;
         }
 
@@ -139,49 +139,49 @@ bool RvcServiceAreaDelegate::GetSupportedLocationById(uint32_t aLocationId, uint
     return false;
 };
 
-bool RvcServiceAreaDelegate::AddSupportedLocation(const LocationStructureWrapper & newLocation, uint32_t & listIndex)
+bool RvcServiceAreaDelegate::AddSupportedLocation(const AreaStructureWrapper & newArea, uint32_t & listIndex)
 {
-    // The server instance (caller) is responsible for ensuring that there are no duplicate location IDs, list size not exceeded,
+    // The server instance (caller) is responsible for ensuring that there are no duplicate area IDs, list size not exceeded,
     // etc.
 
     // Double-check list size to ensure there no memory issues.
-    if (mSupportedLocations.size() < kMaxNumSupportedLocations)
+    if (mSupportedAreas.size() < kMaxNumSupportedAreas)
     {
         // not sorting list, number of locations normally expected to be small, max 255
-        mSupportedLocations.push_back(newLocation);
+        mSupportedAreas.push_back(newArea);
         listIndex = static_cast<uint32_t>(mSupportedMaps.size()) - 1; // new element is last in list
         return true;
     }
 
-    ChipLogError(Zcl, "AddSupportedLocation %u - supported locations list is already at maximum size %u", newLocation.locationID,
-                 static_cast<uint32_t>(kMaxNumSupportedLocations));
+    ChipLogError(Zcl, "AddSupportedLocation %u - supported locations list is already at maximum size %u", newArea.areaID,
+                 static_cast<uint32_t>(kMaxNumSupportedAreas));
 
     return false;
 }
 
-bool RvcServiceAreaDelegate::ModifySupportedLocation(uint32_t listIndex, const LocationStructureWrapper & modifiedLocation)
+bool RvcServiceAreaDelegate::ModifySupportedLocation(uint32_t listIndex, const AreaStructureWrapper & modifiedLocation)
 {
-    // The server instance (caller) is responsible for ensuring that there are no duplicate location IDs, list size not exceeded,
+    // The server instance (caller) is responsible for ensuring that there are no duplicate area IDs, list size not exceeded,
     // etc.
 
-    // Double-check that locationID's match.
-    if (modifiedLocation.locationID != mSupportedLocations[listIndex].locationID)
+    // Double-check that areaID's match.
+    if (modifiedLocation.areaID != mSupportedAreas[listIndex].areaID)
     {
-        ChipLogError(Zcl, "ModifySupportedLocation - locationID's do not match, new locationID %u, existing locationID %u",
-                     modifiedLocation.locationID, mSupportedLocations[listIndex].locationID);
+        ChipLogError(Zcl, "ModifySupportedLocation - areaID's do not match, new areaID %u, existing areaID %u",
+                     modifiedLocation.areaID, mSupportedAreas[listIndex].areaID);
         return false;
     }
 
     // checks passed, update the attribute
-    mSupportedLocations[listIndex] = modifiedLocation;
+    mSupportedAreas[listIndex] = modifiedLocation;
     return true;
 }
 
-bool RvcServiceAreaDelegate::ClearSupportedLocations()
+bool RvcServiceAreaDelegate::ClearSupportedAreas()
 {
-    if (!mSupportedLocations.empty())
+    if (!mSupportedAreas.empty())
     {
-        mSupportedLocations.clear();
+        mSupportedAreas.clear();
         return true;
     }
 
@@ -236,7 +236,7 @@ bool RvcServiceAreaDelegate::GetSupportedMapById(uint8_t aMapId, uint32_t & list
 
 bool RvcServiceAreaDelegate::AddSupportedMap(const MapStructureWrapper & newMap, uint32_t & listIndex)
 {
-    // The server instance (caller) is responsible for ensuring that there are no duplicate location IDs, list size not exceeded,
+    // The server instance (caller) is responsible for ensuring that there are no duplicate area IDs, list size not exceeded,
     // etc.
 
     // Double-check list size to ensure there no memory issues.
@@ -255,7 +255,7 @@ bool RvcServiceAreaDelegate::AddSupportedMap(const MapStructureWrapper & newMap,
 
 bool RvcServiceAreaDelegate::ModifySupportedMap(uint32_t listIndex, const MapStructureWrapper & modifiedMap)
 {
-    // The server instance (caller) is responsible for ensuring that there are no duplicate location IDs, list size not exceeded,
+    // The server instance (caller) is responsible for ensuring that there are no duplicate area IDs, list size not exceeded,
     // etc.
 
     // Double-check that mapID's match.
@@ -285,46 +285,46 @@ bool RvcServiceAreaDelegate::ClearSupportedMaps()
 //*************************************************************************
 // Selected Locations accessors
 
-uint32_t RvcServiceAreaDelegate::GetNumberOfSelectedLocations()
+uint32_t RvcServiceAreaDelegate::GetNumberOfSelectedAreas()
 {
-    return static_cast<uint32_t>(mSelectedLocations.size());
+    return static_cast<uint32_t>(mSelectedAreas.size());
 }
 
 bool RvcServiceAreaDelegate::GetSelectedLocationByIndex(uint32_t listIndex, uint32_t & aSelectedLocation)
 {
-    if (listIndex < mSelectedLocations.size())
+    if (listIndex < mSelectedAreas.size())
     {
-        aSelectedLocation = mSelectedLocations[listIndex];
+        aSelectedLocation = mSelectedAreas[listIndex];
         return true;
     }
 
     return false;
 };
 
-bool RvcServiceAreaDelegate::AddSelectedLocation(uint32_t aLocationId, uint32_t & listIndex)
+bool RvcServiceAreaDelegate::AddSelectedLocation(uint32_t aAreaID, uint32_t & listIndex)
 {
-    // The server instance (caller) is responsible for ensuring that there are no duplicate location IDs, list size not exceeded,
+    // The server instance (caller) is responsible for ensuring that there are no duplicate area IDs, list size not exceeded,
     // etc.
 
     // Double-check list size to ensure there no memory issues.
-    if (mSelectedLocations.size() < kMaxNumSelectedLocations)
+    if (mSelectedAreas.size() < kMaxNumSelectedAreas)
     {
         // not sorting list, number of locations normally expected to be small, max 255
-        mSelectedLocations.push_back(aLocationId);
-        listIndex = static_cast<uint32_t>(mSelectedLocations.size()) - 1; // new element is last in list
+        mSelectedAreas.push_back(aAreaID);
+        listIndex = static_cast<uint32_t>(mSelectedAreas.size()) - 1; // new element is last in list
         return true;
     }
-    ChipLogError(Zcl, "AddSelectedLocation %u - selected locations list is already at maximum size %u", aLocationId,
-                 static_cast<uint32_t>(kMaxNumSelectedLocations));
+    ChipLogError(Zcl, "AddSelectedLocation %u - selected locations list is already at maximum size %u", aAreaID,
+                 static_cast<uint32_t>(kMaxNumSelectedAreas));
 
     return false;
 }
 
-bool RvcServiceAreaDelegate::ClearSelectedLocations()
+bool RvcServiceAreaDelegate::ClearSelectedAreas()
 {
-    if (!mSelectedLocations.empty())
+    if (!mSelectedAreas.empty())
     {
-        mSelectedLocations.clear();
+        mSelectedAreas.clear();
         return true;
     }
 
@@ -350,7 +350,7 @@ bool RvcServiceAreaDelegate::GetProgressElementByIndex(uint32_t listIndex, Struc
     return false;
 };
 
-bool RvcServiceAreaDelegate::GetProgressElementById(uint32_t aLocationId, uint32_t & listIndex,
+bool RvcServiceAreaDelegate::GetProgressElementById(uint32_t aAreaID, uint32_t & listIndex,
                                                     Structs::ProgressStruct::Type & aProgressElement)
 {
     // We do not need to reimplement this method as it's already done by the SDK.
@@ -360,7 +360,7 @@ bool RvcServiceAreaDelegate::GetProgressElementById(uint32_t aLocationId, uint32
 
     while (listIndex < mProgressList.size())
     {
-        if (mProgressList[listIndex].locationID == aLocationId)
+        if (mProgressList[listIndex].areaID == aAreaID)
         {
             aProgressElement = mProgressList[listIndex];
             return true;
@@ -374,7 +374,7 @@ bool RvcServiceAreaDelegate::GetProgressElementById(uint32_t aLocationId, uint32
 
 bool RvcServiceAreaDelegate::AddProgressElement(const Structs::ProgressStruct::Type & newProgressElement, uint32_t & listIndex)
 {
-    // The server instance (caller) is responsible for ensuring that there are no duplicate location IDs, list size not exceeded,
+    // The server instance (caller) is responsible for ensuring that there are no duplicate area IDs, list size not exceeded,
     // etc.
 
     // Double-check list size to ensure there no memory issues.
@@ -385,7 +385,7 @@ bool RvcServiceAreaDelegate::AddProgressElement(const Structs::ProgressStruct::T
         listIndex = static_cast<uint32_t>(mProgressList.size()) - 1; // new element is last in list
         return true;
     }
-    ChipLogError(Zcl, "AddProgressElement %u -progress list is already at maximum size %u", newProgressElement.locationID,
+    ChipLogError(Zcl, "AddProgressElement %u -progress list is already at maximum size %u", newProgressElement.areaID,
                  static_cast<uint32_t>(kMaxNumProgressElements));
 
     return false;
