@@ -573,27 +573,24 @@ Status WriteHandler::ProcessWriteRequest(System::PacketBufferHandle && aPayload,
 #endif
     bool boolValue;
 
-    err = writeRequestParser.GetSuppressResponse(&boolValue);
-    if (err == CHIP_NO_ERROR)
-    {
-        mStateFlags.Set(StateBits::kSuppressResponse, boolValue);
-    }
-    else if (err == CHIP_END_OF_TLV)
+    boolValue = mStateFlags.Has(StateBits::kSuppressResponse);
+    err       = writeRequestParser.GetSuppressResponse(&boolValue);
+    mStateFlags.Set(StateBits::kSuppressResponse, boolValue);
+    if (err == CHIP_END_OF_TLV)
     {
         err = CHIP_NO_ERROR;
     }
     SuccessOrExit(err);
 
-    err = writeRequestParser.GetTimedRequest(&boolValue);
-    SuccessOrExit(err);
+    boolValue = mStateFlags.Has(StateBits::kIsTimedRequest);
+    err       = writeRequestParser.GetTimedRequest(&boolValue);
     mStateFlags.Set(StateBits::kIsTimedRequest, boolValue);
+    SuccessOrExit(err);
 
-    err = writeRequestParser.GetMoreChunkedMessages(&boolValue);
-    if (err == CHIP_NO_ERROR)
-    {
-        mStateFlags.Set(StateBits::kHasMoreChunks, boolValue);
-    }
-    else if (err == CHIP_ERROR_END_OF_TLV)
+    boolValue = mStateFlags.Has(StateBits::kHasMoreChunks);
+    err       = writeRequestParser.GetMoreChunkedMessages(&boolValue);
+    mStateFlags.Set(StateBits::kHasMoreChunks, boolValue);
+    if (err == CHIP_ERROR_END_OF_TLV)
     {
         err = CHIP_NO_ERROR;
     }
