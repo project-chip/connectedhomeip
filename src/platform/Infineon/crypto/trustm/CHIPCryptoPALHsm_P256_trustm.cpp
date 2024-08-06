@@ -95,9 +95,6 @@ P256Keypair::~P256Keypair()
     {
         Clear();
     }
-    else
-    {
-    }
 }
 
 CHIP_ERROR P256Keypair::Initialize(ECPKeyTarget key_target)
@@ -124,11 +121,11 @@ CHIP_ERROR P256Keypair::Initialize(ECPKeyTarget key_target)
     else
     {
 #if !ENABLE_TRUSTM_NOC_KEYGEN
-        if (CHIP_NO_ERROR == Initialize_H(this, &mPublicKey, &mKeypair))
+        error = Initialize_H(this, &mPublicKey, &mKeypair);
+        if (CHIP_NO_ERROR == error)
         {
             mInitialized = true;
         }
-        error = CHIP_NO_ERROR;
         return error;
 #else
         // Add the logic to use different keyid
@@ -199,7 +196,7 @@ CHIP_ERROR P256Keypair::ECDSA_sign_msg(const uint8_t * msg, size_t msg_length, P
     {
 #if !ENABLE_TRUSTM_NOC_KEYGEN
         // Use the mbedtls based method
-        printf("ECDSA sing msg mbedtls\n");
+        ChipLogDetail(Crypto, "ECDSA sing msg mbedtls");
         return ECDSA_sign_msg_H(&mKeypair, msg, msg_length, out_signature);
 #else
         if (keyid == OPTIGA_KEY_ID_E0F2)
