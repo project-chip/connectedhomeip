@@ -1870,6 +1870,16 @@ async def get_accepted_endpoints_for_test(self: MatterBaseTest, accept_function:
         return matching
 
     asserts.assert_in(forced_endpoint, matching, "Force endpoint does not match test requirements")
+
+    warning = """
+    --------------------------------------------------------------------------------
+    | Warning: Using a forced single endpoint on a test that is intended to be run |
+    |          on each matching endpoint. This is a development-only option.       |
+    |                                                                              |
+    | Use of this option is disallowed at certification                            |
+    --------------------------------------------------------------------------------
+    """
+    logging.warn(warning)
     return [forced_endpoint]
 
 
