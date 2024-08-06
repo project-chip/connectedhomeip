@@ -353,11 +353,6 @@ DataModel::ActionReturnStatus CodegenDataModelProvider::WriteAttribute(const Dat
     {
         if (*aai_result == CHIP_NO_ERROR)
         {
-            // TODO: change callbacks should likely be routed through the context `MarkDirty` only
-            //       however for now this is called directly because ember code does this call
-            //       inside emberAfWriteAttribute.
-            MatterReportingAttributeChangeCallback(request.path);
-
             emberAfIncreaseClusterDataVersion(request.path);
             CurrentContext().dataModelChangeListener->MarkDirty(request.path);
         }
