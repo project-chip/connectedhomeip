@@ -493,6 +493,7 @@ config("libfuzzer_fuzzing") {
 
 config("oss_fuzz") {
   cflags = string_split(getenv("CFLAGS"))
+  cflags_cc = string_split(getenv("CXXFLAGS"))
   ldflags = string_split(getenv("CXXFLAGS"))
   ldflags += [ getenv("LIB_FUZZING_ENGINE") ]
 }
