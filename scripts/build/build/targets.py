@@ -521,7 +521,7 @@ def BuildNxpTarget():
     target.AppendModifier(name="low-power", low_power=True).OnlyIfRe('contact-sensor')
     target.AppendModifier(name="lit", enable_lit=True).OnlyIfRe('contact-sensor')
     target.AppendModifier(name="fro32k", use_fro32k=True).OnlyIfRe('k32w0')
-    target.AppendModifier(name="smu2", smu2=True).OnlyIfRe('k32w1-lighting')
+    target.AppendModifier(name="smu2", smu2=True).OnlyIfRe('k32w1-freertos-lighting')
     target.AppendModifier(name="dac-conversion", convert_dac_pk=True).OnlyIfRe('factory').ExceptIfRe('(k32w0|rw61x)')
     target.AppendModifier(name="rotating-id", enable_rotating_id=True).ExceptIfRe('rw61x')
     target.AppendModifier(name="sw-v2", has_sw_version_2=True)
