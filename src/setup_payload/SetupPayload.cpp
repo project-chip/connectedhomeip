@@ -72,6 +72,7 @@ bool PayloadContents::isValidQRCodePayload(ValidationMode mode) const
 bool PayloadContents::isValidManualCode(ValidationMode mode) const
 {
     // No additional constraints apply to Manual Pairing Codes.
+//TESSS
     // (If the payload has a long discriminator it will be converted automatically.)
     return CheckPayloadCommonConstraints();
 }
