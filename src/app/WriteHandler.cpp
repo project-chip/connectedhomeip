@@ -70,7 +70,7 @@ void WriteHandler::Close()
     // successful.
     DeliverFinalListWriteEnd(false /* wasSuccessful */);
     mExchangeCtx.Release();
-    mSuppressResponse = false;
+    mStateFlags.Clear(StateBits::kSuppressResponse);
 #if CHIP_CONFIG_USE_DATA_MODEL_INTERFACE
     mDataModelProvider = nullptr;
 #endif
@@ -117,7 +117,7 @@ Status WriteHandler::OnWriteRequest(Messaging::ExchangeContext * apExchangeConte
     Status status = HandleWriteRequestMessage(apExchangeContext, std::move(aPayload), aIsTimedWrite);
 
     // The write transaction will be alive only when the message was handled successfully and there are more chunks.
-    if (!(status == Status::Success && mHasMoreChunks))
+    if (!(status == Status::Success && mStateFlags.Has(StateBits::kHasMoreChunks)))
     {
         Close();
     }
@@ -153,7 +153,7 @@ CHIP_ERROR WriteHandler::OnMessageReceived(Messaging::ExchangeContext * apExchan
     if (status == Status::Success)
     {
         // We have no more chunks, the write response has been sent in HandleWriteRequestMessage, so close directly.
-        if (!mHasMoreChunks)
+        if (!mStateFlags.Has(StateBits::kHasMoreChunks))
         {
             Close();
         }
@@ -195,8 +195,8 @@ CHIP_ERROR WriteHandler::SendWriteResponse(System::PacketBufferTLVWriter && aMes
     VerifyOrExit(mExchangeCtx, err = CHIP_ERROR_INCORRECT_STATE);
     mExchangeCtx->UseSuggestedResponseTimeout(app::kExpectedIMProcessingTime);
     err = mExchangeCtx->SendMessage(Protocols::InteractionModel::MsgType::WriteResponse, std::move(packet),
-                                    mHasMoreChunks ? Messaging::SendMessageFlags::kExpectResponse
-                                                   : Messaging::SendMessageFlags::kNone);
+                                    mStateFlags.Has(StateBits::kHasMoreChunks) ? Messaging::SendMessageFlags::kExpectResponse
+                                                                               : Messaging::SendMessageFlags::kNone);
     SuccessOrExit(err);
 
     MoveToState(State::Sending);
@@ -223,7 +223,7 @@ void WriteHandler::DeliverListWriteEnd(const ConcreteAttributePath & aPath, bool
 
 void WriteHandler::DeliverFinalListWriteEnd(bool writeWasSuccessful)
 {
-    if (mProcessingAttributePath.HasValue() && mProcessingAttributeIsList)
+    if (mProcessingAttributePath.HasValue() && mStateFlags.Has(StateBits::kProcessingAttributeIsList))
     {
         DeliverListWriteEnd(mProcessingAttributePath.Value(), writeWasSuccessful);
     }
@@ -232,7 +232,8 @@ void WriteHandler::DeliverFinalListWriteEnd(bool writeWasSuccessful)
 
 CHIP_ERROR WriteHandler::DeliverFinalListWriteEndForGroupWrite(bool writeWasSuccessful)
 {
-    VerifyOrReturnError(mProcessingAttributePath.HasValue() && mProcessingAttributeIsList, CHIP_NO_ERROR);
+    VerifyOrReturnError(mProcessingAttributePath.HasValue() && mStateFlags.Has(StateBits::kProcessingAttributeIsList),
+                        CHIP_NO_ERROR);
 
     Credentials::GroupDataProvider::GroupEndpoint mapping;
     Credentials::GroupDataProvider * groupDataProvider = Credentials::GetGroupDataProvider();
@@ -332,18 +333,20 @@ CHIP_ERROR WriteHandler::ProcessAttributeDataIBs(TLV::TLVReader & aAttributeData
             continue;
         }
 
-        if (ShouldReportListWriteEnd(mProcessingAttributePath, mProcessingAttributeIsList, dataAttributePath))
+        if (ShouldReportListWriteEnd(mProcessingAttributePath, mStateFlags.Has(StateBits::kProcessingAttributeIsList),
+                                     dataAttributePath))
         {
-            DeliverListWriteEnd(mProcessingAttributePath.Value(), mAttributeWriteSuccessful);
+            DeliverListWriteEnd(mProcessingAttributePath.Value(), mStateFlags.Has(StateBits::kAttributeWriteSuccessful));
         }
 
-        if (ShouldReportListWriteBegin(mProcessingAttributePath, mProcessingAttributeIsList, dataAttributePath))
+        if (ShouldReportListWriteBegin(mProcessingAttributePath, mStateFlags.Has(StateBits::kProcessingAttributeIsList),
+                                       dataAttributePath))
         {
             DeliverListWriteBegin(dataAttributePath);
-            mAttributeWriteSuccessful = true;
+            mStateFlags.Set(StateBits::kAttributeWriteSuccessful);
         }
 
-        mProcessingAttributeIsList = dataAttributePath.IsListOperation();
+        mStateFlags.Set(StateBits::kProcessingAttributeIsList, dataAttributePath.IsListOperation());
         mProcessingAttributePath.SetValue(dataAttributePath);
 
         DataModelCallbacks::GetInstance()->AttributeOperation(DataModelCallbacks::OperationType::Write,
@@ -381,9 +384,9 @@ CHIP_ERROR WriteHandler::ProcessAttributeDataIBs(TLV::TLVReader & aAttributeData
 
     SuccessOrExit(err);
 
-    if (!mHasMoreChunks)
+    if (!mStateFlags.Has(StateBits::kHasMoreChunks))
     {
-        DeliverFinalListWriteEnd(mAttributeWriteSuccessful);
+        DeliverFinalListWriteEnd(mStateFlags.Has(StateBits::kAttributeWriteSuccessful));
     }
 
 exit:
@@ -437,8 +440,8 @@ CHIP_ERROR WriteHandler::ProcessGroupAttributeDataIBs(TLV::TLVReader & aAttribut
         iterator = groupDataProvider->IterateEndpoints(fabric);
         VerifyOrExit(iterator != nullptr, err = CHIP_ERROR_NO_MEMORY);
 
-        bool shouldReportListWriteEnd =
-            ShouldReportListWriteEnd(mProcessingAttributePath, mProcessingAttributeIsList, dataAttributePath);
+        bool shouldReportListWriteEnd = ShouldReportListWriteEnd(
+            mProcessingAttributePath, mStateFlags.Has(StateBits::kProcessingAttributeIsList), dataAttributePath);
         bool shouldReportListWriteBegin = false; // This will be set below.
 
         const EmberAfAttributeMetadata * attributeMetadata = nullptr;
@@ -468,7 +471,8 @@ CHIP_ERROR WriteHandler::ProcessGroupAttributeDataIBs(TLV::TLVReader & aAttribut
                                                                         dataAttributePath.mEndpointId, dataAttributePath.mListOp,
                                                                         dataAttributePath.mListIndex);
                 shouldReportListWriteBegin =
-                    ShouldReportListWriteBegin(mProcessingAttributePath, mProcessingAttributeIsList, pathForCheckingListWriteBegin);
+                    ShouldReportListWriteBegin(mProcessingAttributePath, mStateFlags.Has(StateBits::kProcessingAttributeIsList),
+                                               pathForCheckingListWriteBegin);
             }
 
             if (shouldReportListWriteEnd)
@@ -522,7 +526,7 @@ CHIP_ERROR WriteHandler::ProcessGroupAttributeDataIBs(TLV::TLVReader & aAttribut
         }
 
         dataAttributePath.mEndpointId = kInvalidEndpointId;
-        mProcessingAttributeIsList    = dataAttributePath.IsListOperation();
+        mStateFlags.Set(StateBits::kProcessingAttributeIsList, dataAttributePath.IsListOperation());
         mProcessingAttributePath.SetValue(dataAttributePath);
         iterator->Release();
     }
@@ -567,24 +571,36 @@ Status WriteHandler::ProcessWriteRequest(System::PacketBufferHandle && aPayload,
 #if CHIP_CONFIG_IM_PRETTY_PRINT
     writeRequestParser.PrettyPrint();
 #endif
-    err = writeRequestParser.GetSuppressResponse(&mSuppressResponse);
-    if (err == CHIP_END_OF_TLV)
+    bool boolValue;
+
+    err = writeRequestParser.GetSuppressResponse(&boolValue);
+    if (err == CHIP_NO_ERROR)
+    {
+        mStateFlags.Set(StateBits::kSuppressResponse, boolValue);
+    }
+    else if (err == CHIP_END_OF_TLV)
     {
         err = CHIP_NO_ERROR;
     }
     SuccessOrExit(err);
 
-    err = writeRequestParser.GetTimedRequest(&mIsTimedRequest);
+    err = writeRequestParser.GetTimedRequest(&boolValue);
     SuccessOrExit(err);
+    mStateFlags.Set(StateBits::kIsTimedRequest, boolValue);
 
-    err = writeRequestParser.GetMoreChunkedMessages(&mHasMoreChunks);
-    if (err == CHIP_ERROR_END_OF_TLV)
+    err = writeRequestParser.GetMoreChunkedMessages(&boolValue);
+    if (err == CHIP_NO_ERROR)
+    {
+        mStateFlags.Set(StateBits::kHasMoreChunks, boolValue);
+    }
+    else if (err == CHIP_ERROR_END_OF_TLV)
     {
         err = CHIP_NO_ERROR;
     }
     SuccessOrExit(err);
 
-    if (mHasMoreChunks && (mExchangeCtx->IsGroupExchangeContext() || mIsTimedRequest))
+    if (mStateFlags.Has(StateBits::kHasMoreChunks) &&
+        (mExchangeCtx->IsGroupExchangeContext() || mStateFlags.Has(StateBits::kIsTimedRequest)))
     {
         // Sanity check: group exchange context should only have one chunk.
         // Also, timed requests should not have more than one chunk.
@@ -594,7 +610,7 @@ Status WriteHandler::ProcessWriteRequest(System::PacketBufferHandle && aPayload,
     err = writeRequestParser.GetWriteRequests(&AttributeDataIBsParser);
     SuccessOrExit(err);
 
-    if (mIsTimedRequest != aIsTimedWrite)
+    if (mStateFlags.Has(StateBits::kIsTimedRequest) != aIsTimedWrite)
     {
         // The message thinks it should be part of a timed interaction but it's
         // not, or vice versa.
@@ -651,7 +667,7 @@ CHIP_ERROR WriteHandler::AddStatusInternal(const ConcreteDataAttributePath & aPa
 
     if (!aStatus.IsSuccess())
     {
-        mAttributeWriteSuccessful = false;
+        mStateFlags.Clear(StateBits::kAttributeWriteSuccessful);
     }
 
     ReturnErrorOnFailure(writeResponses.GetError());
