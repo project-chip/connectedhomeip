@@ -580,12 +580,10 @@ bool Instance::AddSupportedLocation(uint32_t aAreaId, const DataModel::Nullable<
                                     const DataModel::Nullable<int16_t> & aFloorNumber,
                                     const DataModel::Nullable<Globals::AreaTypeTag> & aAreaType,
                                     const DataModel::Nullable<Globals::LandmarkTag> & aLandmarkTag,
-                                    const DataModel::Nullable<Globals::PositionTag> & aPositionTag)
+                                    const DataModel::Nullable<Globals::RelativePositionTag> & aRelativePositionTag)
 {
     // Create location object for validation.
-    AreaStructureWrapper aNewArea(aAreaId, aMapId, aLocationName, aFloorNumber, aAreaType, aLandmarkTag, aPositionTag);
-
-    ChipLogError(Zcl, "AddSupportedLocation - 1 - area name: %.*s", static_cast<int>(aLocationName.size()), aLocationName.data());
+    AreaStructureWrapper aNewArea(aAreaId, aMapId, aLocationName, aFloorNumber, aAreaType, aLandmarkTag, aRelativePositionTag);
 
     // Does device mode allow this attribute to be updated?
     if (!mDelegate->IsSupportedAreasChangeAllowed())
@@ -632,7 +630,7 @@ bool Instance::ModifySupportedLocation(uint32_t aAreaId, const DataModel::Nullab
                                        const CharSpan & aLocationName, const DataModel::Nullable<int16_t> & aFloorNumber,
                                        const DataModel::Nullable<Globals::AreaTypeTag> & aAreaType,
                                        const DataModel::Nullable<Globals::LandmarkTag> & aLandmarkTag,
-                                       const DataModel::Nullable<Globals::PositionTag> & aPositionTag)
+                                       const DataModel::Nullable<Globals::RelativePositionTag> & aRelativePositionTag)
 {
     bool mapIDChanged = false;
     uint32_t listIndex;
@@ -659,7 +657,7 @@ bool Instance::ModifySupportedLocation(uint32_t aAreaId, const DataModel::Nullab
         }
 
         // create new location object for validation
-        AreaStructureWrapper aNewArea(aAreaId, aMapId, aLocationName, aFloorNumber, aAreaType, aLandmarkTag, aPositionTag);
+        AreaStructureWrapper aNewArea(aAreaId, aMapId, aLocationName, aFloorNumber, aAreaType, aLandmarkTag, aRelativePositionTag);
 
         // verify cluster requirements concerning valid fields and field relationships
         if (!IsValidSupportedLocation(aNewArea))

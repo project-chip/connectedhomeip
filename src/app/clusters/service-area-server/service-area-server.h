@@ -177,7 +177,7 @@ public:
      * @param[in] aAreaType common namespace Area tag - indicates an association of the location with an indoor or outdoor area of a
      * home.
      * @param[in] aLandmarkTag common namespace Landmark tag - indicates an association of the location with a home landmark.
-     * @param[in] aPositionTag common namespace Position tag - indicates the position of the location with respect to the landmark.
+     * @param[in] aRelativePositionTag common namespace Relative Position tag - indicates the position of the location with respect to the landmark.
      * @return true if the new location passed validation checks and was successfully added to the list.
      *
      * @note if aLocationName is larger than kLocationNameMaxSize, it will be truncated.
@@ -186,7 +186,7 @@ public:
                               const DataModel::Nullable<int16_t> & aFloorNumber,
                               const DataModel::Nullable<Globals::AreaTypeTag> & aAreaType,
                               const DataModel::Nullable<Globals::LandmarkTag> & aLandmarkTag,
-                              const DataModel::Nullable<Globals::PositionTag> & aPositionTag);
+                              const DataModel::Nullable<Globals::RelativePositionTag> & aRelativePositionTag);
 
     /**
      * @brief Modify/replace an existing location in the supported locations list.
@@ -197,7 +197,7 @@ public:
      * @param[in] aAreaType common namespace Area tag - indicates an association of the location with an indoor or outdoor area of a
      * home.
      * @param[in] aLandmarkTag common namespace Landmark tag - indicates an association of the location with a home landmark.
-     * @param[in] aPositionTag common namespace Position tag - indicates the position of the location with respect to the landmark.
+     * @param[in] aRelativePositionTag common namespace Relative Position tag - indicates the position of the location with respect to the landmark.
      * @return true if the location is a member of supported locations, the modifications pass all validation checks and the
      * location was modified.
      *
@@ -208,7 +208,7 @@ public:
                                  const DataModel::Nullable<int16_t> & aFloorNumber,
                                  const DataModel::Nullable<Globals::AreaTypeTag> & aAreaType,
                                  const DataModel::Nullable<Globals::LandmarkTag> & aLandmarkTag,
-                                 const DataModel::Nullable<Globals::PositionTag> & aPositionTag);
+                                 const DataModel::Nullable<Globals::RelativePositionTag> & aRelativePositionTag);
 
     /**
      * @return true if the SupportedAreas attribute was not already null.

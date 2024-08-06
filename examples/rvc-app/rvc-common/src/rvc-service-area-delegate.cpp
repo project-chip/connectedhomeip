@@ -41,12 +41,12 @@ CHIP_ERROR RvcServiceAreaDelegate::Init()
     // Location A has name, floor number, uses map XX
     GetInstance()->AddSupportedLocation(supportedAreaID_A, DataModel::Nullable<uint32_t>(supportedMapId_XX), "My Location A"_span,
                                         DataModel::Nullable<int16_t>(4), DataModel::Nullable<Globals::AreaTypeTag>(),
-                                        DataModel::Nullable<Globals::LandmarkTag>(), DataModel::Nullable<Globals::PositionTag>());
+                                        DataModel::Nullable<Globals::LandmarkTag>(), DataModel::Nullable<Globals::RelativePositionTag>());
 
     // Location B has name, uses map XX
     GetInstance()->AddSupportedLocation(supportedAreaID_B, DataModel::Nullable<uint32_t>(supportedMapId_XX), "My Location B"_span,
                                         DataModel::Nullable<int16_t>(), DataModel::Nullable<Globals::AreaTypeTag>(),
-                                        DataModel::Nullable<Globals::LandmarkTag>(), DataModel::Nullable<Globals::PositionTag>());
+                                        DataModel::Nullable<Globals::LandmarkTag>(), DataModel::Nullable<Globals::RelativePositionTag>());
 
     // Location C has full SemData, no name, Map YY
     GetInstance()->AddSupportedLocation(supportedAreaID_C, DataModel::Nullable<uint32_t>(supportedMapId_YY), CharSpan(),

@@ -39,7 +39,7 @@ struct AreaStructureWrapper : public chip::app::Clusters::ServiceArea::Structs::
     AreaStructureWrapper()
     {
         Set(0, 0, CharSpan(), DataModel::Nullable<int16_t>(), DataModel::Nullable<Globals::AreaTypeTag>(),
-            DataModel::Nullable<Globals::LandmarkTag>(), DataModel::Nullable<Globals::PositionTag>());
+            DataModel::Nullable<Globals::LandmarkTag>(), DataModel::Nullable<Globals::RelativePositionTag>());
     }
 
     /**
@@ -51,7 +51,7 @@ struct AreaStructureWrapper : public chip::app::Clusters::ServiceArea::Structs::
      * @param[in] aAreaTypeTag A common namespace Area tag - indicates an association of the location with an indoor or outdoor area
      * of a home.
      * @param[in] aLandmarkTag A common namespace Landmark tag - indicates an association of the location with a home landmark.
-     * @param[in] aPositionTag A common namespace Position tag - indicates the position of the location with respect to the
+     * @param[in] aRelativePositionTag A common namespace Relative Position tag - indicates the position of the location with respect to the
      * landmark.
      *
      * @note Requirements regarding what combinations of fields and values are valid are not checked by this class.
@@ -62,9 +62,9 @@ struct AreaStructureWrapper : public chip::app::Clusters::ServiceArea::Structs::
                          const DataModel::Nullable<int16_t> & aFloorNumber,
                          const DataModel::Nullable<Globals::AreaTypeTag> & aAreaTypeTag,
                          const DataModel::Nullable<Globals::LandmarkTag> & aLandmarkTag,
-                         const DataModel::Nullable<Globals::PositionTag> & aPositionTag)
+                         const DataModel::Nullable<Globals::RelativePositionTag> & aRelativePositionTag)
     {
-        Set(aAreaID, aMapId, aLocationName, aFloorNumber, aAreaTypeTag, aLandmarkTag, aPositionTag);
+        Set(aAreaID, aMapId, aLocationName, aFloorNumber, aAreaTypeTag, aLandmarkTag, aRelativePositionTag);
     }
 
     /**
@@ -136,7 +136,7 @@ struct AreaStructureWrapper : public chip::app::Clusters::ServiceArea::Structs::
      * @param[in] aAreaTypeTag A common namespace Area tag - indicates an association of the location with an indoor or outdoor area
      * of a home.
      * @param[in] aLandmarkTag A common namespace Landmark tag - indicates an association of the location with a home landmark.
-     * @param[in] aPositionTag A common namespace Position tag - indicates the position of the location with respect to the
+     * @param[in] aRelativePositionTag A common namespace Relative Position tag - indicates the position of the location with respect to the
      * landmark.
      *
      * @note Requirements regarding what combinations of fields and values are valid are not checked by this class.
@@ -146,7 +146,7 @@ struct AreaStructureWrapper : public chip::app::Clusters::ServiceArea::Structs::
     void Set(uint32_t aAreaID, const DataModel::Nullable<uint32_t> & aMapId, const CharSpan & aLocationName,
              const DataModel::Nullable<int16_t> & aFloorNumber, const DataModel::Nullable<Globals::AreaTypeTag> & aAreaType,
              const DataModel::Nullable<Globals::LandmarkTag> & aLandmarkTag,
-             const DataModel::Nullable<Globals::PositionTag> & aPositionTag)
+             const DataModel::Nullable<Globals::RelativePositionTag> & aRelativePositionTag)
     {
         areaID = aAreaID;
         mapID  = aMapId;
@@ -174,14 +174,14 @@ struct AreaStructureWrapper : public chip::app::Clusters::ServiceArea::Structs::
         {
             areaDesc.landmarkInfo.SetNonNull();
             areaDesc.landmarkInfo.Value().landmarkTag = aLandmarkTag.Value();
-            if (aPositionTag.IsNull())
+            if (aRelativePositionTag.IsNull())
             {
                 areaDesc.landmarkInfo.Value().positionTag.SetNull();
             }
             else
             {
                 areaDesc.landmarkInfo.Value().positionTag.SetNonNull();
-                areaDesc.landmarkInfo.Value().positionTag.Value() = aPositionTag.Value();
+                areaDesc.landmarkInfo.Value().positionTag.Value() = aRelativePositionTag.Value();
             }
         }
 
