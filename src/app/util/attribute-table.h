@@ -57,6 +57,16 @@ chip::Protocols::InteractionModel::Status emberAfWriteAttribute(chip::EndpointId
                                                                 chip::app::MarkAttributeDirty markDirty);
 
 /**
+ * A version of emberAfWriteAttribute that returns back the attribute change state (i.e. if the in-memory
+ * value has actually changed or not).
+ */
+chip::Protocols::InteractionModel::Status emberAfWriteAttribute(chip::EndpointId endpoint, chip::ClusterId cluster,
+                                                                chip::AttributeId attributeID, uint8_t * dataPtr,
+                                                                EmberAfAttributeType dataType,
+                                                                chip::app::MarkAttributeDirty markDirty,
+                                                                chip::app::AttributeChanged * changed);
+
+/**
  * @brief Read the attribute value, performing all the checks.
  *
  * This function will attempt to read the attribute and store it into the

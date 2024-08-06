@@ -15,6 +15,7 @@
  *    limitations under the License.
  */
 #include "EmberReadWriteOverride.h"
+#include "app/util/af-types.h"
 
 #include <app/util/attribute-storage.h>
 #include <app/util/ember-io-storage.h>
@@ -101,7 +102,8 @@ Status emAfReadOrWriteAttribute(const EmberAfAttributeSearchRecord * attRecord, 
 }
 
 Status emAfWriteAttributeExternal(chip::EndpointId endpoint, chip::ClusterId cluster, chip::AttributeId attributeID,
-                                  uint8_t * dataPtr, EmberAfAttributeType dataType)
+                                  uint8_t * dataPtr, EmberAfAttributeType dataType, chip::app::MarkAttributeDirty markDirty,
+                                  chip::app::AttributeChanged * changed)
 {
     if (gEmberStatusCode != Status::Success)
     {
@@ -116,6 +118,13 @@ Status emAfWriteAttributeExternal(chip::EndpointId endpoint, chip::ClusterId clu
     // copy over as much data as possible
     // NOTE: we do NOT use (*metadata)->size since it is unclear if our mocks set that correctly
     size_t len = std::min<size_t>(sizeof(gEmberIoBuffer), chip::app::Compatibility::Internal::gEmberAttributeIOBufferSpan.size());
+
+    if (changed != nullptr)
+    {
+        *changed = (memcmp(gEmberIoBuffer, dataPtr, len) != 0) ? chip::app::AttributeChanged::kValueChanged
+                                                               : chip::app::AttributeChanged::kValueNotChanged;
+    }
+
     memcpy(gEmberIoBuffer, dataPtr, len);
     gEmberIoBufferFill = len;
 
@@ -123,7 +132,8 @@ Status emAfWriteAttributeExternal(chip::EndpointId endpoint, chip::ClusterId clu
 }
 
 Status emberAfWriteAttribute(chip::EndpointId endpoint, chip::ClusterId cluster, chip::AttributeId attributeID, uint8_t * dataPtr,
-                             EmberAfAttributeType dataType)
+                             EmberAfAttributeType dataType, chip::app::MarkAttributeDirty markDirty,
+                             chip::app::AttributeChanged * changed)
 {
-    return emAfWriteAttributeExternal(endpoint, cluster, attributeID, dataPtr, dataType);
+    return emAfWriteAttributeExternal(endpoint, cluster, attributeID, dataPtr, dataType, markDirty, changed);
 }

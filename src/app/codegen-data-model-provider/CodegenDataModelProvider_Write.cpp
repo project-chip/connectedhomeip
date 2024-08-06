@@ -375,18 +375,24 @@ DataModel::ActionReturnStatus CodegenDataModelProvider::WriteAttribute(const Dat
         return Status::InvalidValue;
     }
 
+    AttributeChanged attributeChanged = AttributeChanged::kValueNotChanged;
+
     if (request.operationFlags.Has(DataModel::OperationFlags::kInternal))
     {
         // Internal requests use the non-External interface that has less enforcement
         // than the external version (e.g. does not check/enforce writable settings, does not
         // validate attribute types) - see attribute-table.h documentation for details.
         status = emberAfWriteAttribute(request.path.mEndpointId, request.path.mClusterId, request.path.mAttributeId,
-                                       dataBuffer.data(), (*attributeMetadata)->attributeType);
+                                       dataBuffer.data(), (*attributeMetadata)->attributeType,
+                                       MarkAttributeDirty::kNo, // Model handles its own dirty handling
+                                       &attributeChanged);
     }
     else
     {
         status = emAfWriteAttributeExternal(request.path.mEndpointId, request.path.mClusterId, request.path.mAttributeId,
-                                            dataBuffer.data(), (*attributeMetadata)->attributeType);
+                                            dataBuffer.data(), (*attributeMetadata)->attributeType,
+                                            MarkAttributeDirty::kNo, // Model handles its own dirty handling
+                                            &attributeChanged);
     }
 
     if (status != Protocols::InteractionModel::Status::Success)
@@ -398,11 +404,11 @@ DataModel::ActionReturnStatus CodegenDataModelProvider::WriteAttribute(const Dat
     //
     // - Internal writes may need to be able to decide if to mark things dirty or not (see AAI as well)
     // - Changes-ommited paths should not be marked dirty (ember is not aware of that flag)
-    // - This likely maps to `MatterReportingAttributeChangeCallback` HOWEVER current ember write functions
-    //   will selectively call that one depending on old attribute state (i.e. calling every time is a
-    //   change in behavior)
-    emberAfIncreaseClusterDataVersion(request.path);
-    CurrentContext().dataModelChangeListener->MarkDirty(request.path);
+    if (attributeChanged == AttributeChanged::kValueChanged)
+    {
+        emberAfIncreaseClusterDataVersion(request.path);
+        CurrentContext().dataModelChangeListener->MarkDirty(request.path);
+    }
     return CHIP_NO_ERROR;
 }
 

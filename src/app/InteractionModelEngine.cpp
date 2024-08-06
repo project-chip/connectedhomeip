@@ -25,6 +25,7 @@
 
 #include "InteractionModelEngine.h"
 #include "lib/core/CHIPError.h"
+#include "platform/LockTracker.h"
 
 #include <cinttypes>
 
@@ -1749,7 +1750,8 @@ DataModel::Provider * InteractionModelEngine::GetDataModelProvider()
 #if CHIP_CONFIG_USE_DATA_MODEL_INTERFACE
     if (mDataModelProvider == nullptr)
     {
-        // Generally this is expected to be thread safe as these should be called within the CHIP processing loop.
+        // These should be called within the CHIP processing loop.
+        assertChipStackLockedByCurrentThread();
         SetDataModelProvider(CodegenDataModelProviderInstance());
     }
 #endif

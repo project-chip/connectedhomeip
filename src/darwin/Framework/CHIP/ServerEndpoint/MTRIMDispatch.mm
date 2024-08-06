@@ -40,7 +40,9 @@ void emberAfClusterInitCallback(EndpointId endpoint, ClusterId clusterId)
 }
 
 Protocols::InteractionModel::Status emAfWriteAttributeExternal(EndpointId endpoint, ClusterId cluster, AttributeId attributeID, uint8_t * dataPtr,
-    EmberAfAttributeType dataType)
+    EmberAfAttributeType dataType,
+    chip::app::MarkAttributeDirty markDirty,
+    chip::app::AttributeChanged * changed)
 {
     assertChipStackLockedByCurrentThread();
 

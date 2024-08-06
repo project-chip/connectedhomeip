@@ -15,6 +15,7 @@
  *    limitations under the License.
  */
 
+#include "lib/support/logging/TextOnlyLogging.h"
 #include <vector>
 
 #include <pw_unit_test/framework.h>
@@ -808,6 +809,24 @@ void TestEmberScalarTypeWrite(const typename NumericAttributeTraits<T>::WorkingT
         model.ChangeListener().DirtyList().clear();
     }
 
+    // nullable test: write null to make sure content of buffer changed (otherwise it will be a noop for dirty checking)
+    {
+        TestWriteRequest test(
+            kAdminSubjectDescriptor,
+            ConcreteAttributePath(kMockEndpoint3, MockClusterId(4), MOCK_ATTRIBUTE_ID_FOR_NULLABLE_TYPE(ZclType)));
+
+        using NumericType             = NumericAttributeTraits<T>;
+        using NullableType            = chip::app::DataModel::Nullable<typename NumericType::WorkingType>;
+        AttributeValueDecoder decoder = test.DecoderFor<NullableType>(NullableType());
+
+        // write should succeed
+        ASSERT_EQ(model.WriteAttribute(test.request, decoder), CHIP_NO_ERROR);
+
+        // dirty: we changed the value to null
+        ASSERT_EQ(model.ChangeListener().DirtyList().size(), 1u);
+        EXPECT_EQ(model.ChangeListener().DirtyList()[0], test.request.path);
+    }
+
     // nullable test
     {
         TestWriteRequest test(
@@ -827,8 +846,9 @@ void TestEmberScalarTypeWrite(const typename NumericAttributeTraits<T>::WorkingT
         typename NumericAttributeTraits<T>::WorkingType actual = NumericAttributeTraits<T>::StorageToWorking(storage);
 
         ASSERT_EQ(actual, value);
-        ASSERT_EQ(model.ChangeListener().DirtyList().size(), 1u);
-        EXPECT_EQ(model.ChangeListener().DirtyList()[0], test.request.path);
+        // dirty a 2nd time when we moved from null to a real value
+        ASSERT_EQ(model.ChangeListener().DirtyList().size(), 2u);
+        EXPECT_EQ(model.ChangeListener().DirtyList()[1], test.request.path);
     }
 }
 
@@ -2436,7 +2456,7 @@ TEST(TestCodegenModelViaMocks, EmberWriteAttributeAccessInterfaceTest)
     // AAI does not prevent read/write of regular attributes
     // validate that once AAI is added, we still can go through writing regular bits (i.e.
     // AAI returning "unknown" has fallback to ember)
-    TestEmberScalarTypeWrite<uint32_t, ZCL_INT32U_ATTRIBUTE_TYPE>(1234);
+    TestEmberScalarTypeWrite<uint32_t, ZCL_INT32U_ATTRIBUTE_TYPE>(4321);
     TestEmberScalarNullWrite<int64_t, ZCL_INT64S_ATTRIBUTE_TYPE>();
 }
 

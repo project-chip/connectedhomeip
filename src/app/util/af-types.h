@@ -314,5 +314,11 @@ enum class MarkAttributeDirty
     kYes,
 };
 
+enum class AttributeChanged
+{
+    kValueNotChanged,
+    kValueChanged,
+};
+
 } // namespace app
 } // namespace chip
