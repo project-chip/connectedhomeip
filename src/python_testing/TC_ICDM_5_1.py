@@ -31,10 +31,10 @@ import logging
 from dataclasses import dataclass
 
 import chip.clusters as Clusters
-from matter_testing_support import MatterBaseTest, TestStep, async_test_body, default_matter_test_main
-from mobly import asserts
 from chip.interaction_model import InteractionModelError, Status
+from matter_testing_support import MatterBaseTest, TestStep, async_test_body, default_matter_test_main
 from mdns_discovery import mdns_discovery
+from mobly import asserts
 
 cluster = Clusters.Objects.IcdManagement
 commands = cluster.Commands
