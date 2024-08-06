@@ -55,7 +55,7 @@ def main(search_directory, env_file):
 
     # Define the files and patterns to exclude
     excluded_patterns = {
-        "MinimalRepresentation.py",
+        "MinimalRepresentation.py"
         "TC_CNET_4_4.py",
         "TC_CCTRL_2_1.py",
         "TC_CCTRL_2_2.py",
