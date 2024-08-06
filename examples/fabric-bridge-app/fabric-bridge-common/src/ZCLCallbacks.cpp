@@ -15,7 +15,7 @@
  *    limitations under the License.
  */
 
-#include "DeviceManager.h"
+#include "BridgedDeviceManager.h"
 
 #include <app-common/zap-generated/cluster-objects.h>
 #include <app-common/zap-generated/ids/Attributes.h>
@@ -37,7 +37,7 @@ Protocols::InteractionModel::Status emberAfExternalAttributeReadCallback(Endpoin
 {
     AttributeId attributeId = attributeMetadata->attributeId;
 
-    Device * dev = DeviceMgr().GetDevice(endpoint);
+    BridgedDevice * dev = BridgeDeviceMgr().GetDevice(endpoint);
     if (dev == nullptr)
     {
         return Protocols::InteractionModel::Status::Failure;
@@ -101,7 +101,7 @@ Protocols::InteractionModel::Status emberAfExternalAttributeWriteCallback(Endpoi
     uint16_t endpointIndex                  = emberAfGetDynamicIndexFromEndpoint(endpoint);
     Protocols::InteractionModel::Status ret = Protocols::InteractionModel::Status::Failure;
 
-    Device * dev = DeviceMgr().GetDevice(endpointIndex);
+    BridgedDevice * dev = BridgeDeviceMgr().GetDevice(endpointIndex);
     if (dev != nullptr && dev->IsReachable())
     {
         ChipLogProgress(NotSpecified, "emberAfExternalAttributeWriteCallback: ep=%d, clusterId=%d", endpoint, clusterId);

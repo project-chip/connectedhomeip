@@ -16,7 +16,7 @@
  *    limitations under the License.
  */
 
-#include "Device.h"
+#include "BridgedDevice.h"
 
 #include <cstdio>
 #include <platform/CHIPDeviceLayer.h>
@@ -25,35 +25,35 @@
 
 using namespace chip::app::Clusters::Actions;
 
-Device::Device(chip::NodeId nodeId)
+BridgedDevice::BridgedDevice(chip::NodeId nodeId)
 {
     mReachable  = false;
     mNodeId     = nodeId;
     mEndpointId = chip::kInvalidEndpointId;
 }
 
-bool Device::IsReachable()
+bool BridgedDevice::IsReachable()
 {
     return mReachable;
 }
 
-void Device::SetReachable(bool reachable)
+void BridgedDevice::SetReachable(bool reachable)
 {
     mReachable = reachable;
 
     if (reachable)
     {
-        ChipLogProgress(NotSpecified, "Device[%s]: ONLINE", mName);
+        ChipLogProgress(NotSpecified, "BridgedDevice[%s]: ONLINE", mName);
     }
     else
     {
-        ChipLogProgress(NotSpecified, "Device[%s]: OFFLINE", mName);
+        ChipLogProgress(NotSpecified, "BridgedDevice[%s]: OFFLINE", mName);
     }
 }
 
-void Device::SetName(const char * name)
+void BridgedDevice::SetName(const char * name)
 {
-    ChipLogProgress(NotSpecified, "Device[%s]: New Name=\"%s\"", mName, name);
+    ChipLogProgress(NotSpecified, "BridgedDevice[%s]: New Name=\"%s\"", mName, name);
 
     chip::Platform::CopyString(mName, name);
 }
