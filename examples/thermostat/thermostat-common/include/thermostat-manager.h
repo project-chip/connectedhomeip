@@ -18,56 +18,88 @@
 
 #pragma once
 
-#include <app-common/zap-generated/attributes/Accessors.h>
+#include <app/clusters/thermostat-server/thermostat-delegate.h>
 
-class ThermostatManager
+namespace chip {
+namespace app {
+namespace Clusters {
+namespace Thermostat {
+
+/**
+ * The ThermostatManager class serves as the instance delegate for storing Presets related information and providing it to the
+ * Thermostat server code. It also manages the presets attribute and provides methods to write to presets, edit presets, maintain a
+ * pending presets list and either commit the presets when requested or discard the changes. It also provides APIs to get and set
+ * the attribute values.
+ *
+ */
+
+static constexpr uint8_t kMaxNumberOfPresetTypes = 6;
+
+// TODO: #34556 Support multiple presets of each type.
+// We will support only one preset of each preset type.
+static constexpr uint8_t kMaxNumberOfPresetsOfEachType = 1;
+
+class ThermostatManager : public Delegate
 {
 public:
-    CHIP_ERROR Init();
+    static inline ThermostatManager & GetInstance() { return sInstance; }
 
-    /// @brief Callback called when any attribute changed on the device
-    void AttributeChangeHandler(chip::EndpointId endpointId, chip::ClusterId clusterId, chip::AttributeId attributeId,
-                                uint8_t * value, uint16_t size);
+    System::Clock::Milliseconds16 GetAtomicWriteTimeout(DataModel::DecodableList<chip::AttributeId> attributeRequests,
+                                                        System::Clock::Milliseconds16 timeoutRequest) override;
 
-    chip::app::Clusters::Thermostat::SystemModeEnum GetSystemMode();
-    chip::app::Clusters::Thermostat::ThermostatRunningModeEnum GetRunningMode();
-    int16_t GetCurrentTemperature();
-    int16_t GetCurrentHeatingSetPoint();
-    int16_t GetCurrentCoolingSetPoint();
-    uint8_t GetNumberOfPresets();
-    CHIP_ERROR SetSystemMode(chip::app::Clusters::Thermostat::SystemModeEnum systemMode);
-    CHIP_ERROR SetRunningMode(chip::app::Clusters::Thermostat::ThermostatRunningModeEnum runningMode);
-    CHIP_ERROR SetCurrentTemperature(int16_t temperature);
-    CHIP_ERROR SetCurrentHeatingSetPoint(int16_t heatingSetpoint);
-    CHIP_ERROR SetCurrentCoolingSetPoint(int16_t coolingSetpoint);
+    CHIP_ERROR GetPresetTypeAtIndex(size_t index, Structs::PresetTypeStruct::Type & presetType) override;
+
+    uint8_t GetNumberOfPresets() override;
+
+    CHIP_ERROR GetPresetAtIndex(size_t index, PresetStructWithOwnedMembers & preset) override;
+
+    CHIP_ERROR GetActivePresetHandle(MutableByteSpan & activePresetHandle) override;
+
+    CHIP_ERROR SetActivePresetHandle(const DataModel::Nullable<ByteSpan> & newActivePresetHandle) override;
+
+    void InitializePendingPresets() override;
+
+    CHIP_ERROR AppendToPendingPresetList(const Structs::PresetStruct::Type & preset) override;
+
+    CHIP_ERROR GetPendingPresetAtIndex(size_t index, PresetStructWithOwnedMembers & preset) override;
+
+    CHIP_ERROR ApplyPendingPresets() override;
+
+    void ClearPendingPresetList() override;
 
 private:
-    friend ThermostatManager & ThermostatMgr();
+    static ThermostatManager sInstance;
 
-    chip::app::Clusters::Thermostat::SystemModeEnum mSystemMode;
-    chip::app::Clusters::Thermostat::ThermostatRunningModeEnum mRunningMode;
-    int16_t mLocalTemperature;
-    int16_t mOccupiedCoolingSetpoint;
-    int16_t mOccupiedHeatingSetpoint;
-    uint8_t mOccupiedSetback;
+    ThermostatManager();
+    ~ThermostatManager() = default;
 
-    static ThermostatManager sThermostatMgr;
+    ThermostatManager(const ThermostatManager &)             = delete;
+    ThermostatManager & operator=(const ThermostatManager &) = delete;
 
-    /// @brief attribute handler for the thermostat endpoint
-    void ThermostatEndpointAttributeChangeHandler(chip::ClusterId clusterId, chip::AttributeId attributeId, uint8_t * value,
-                                                  uint16_t size);
-    void ThermostatClusterAttributeChangeHandler(chip::AttributeId attributeId, uint8_t * value, uint16_t size);
-    void LocalTemperatureMeasurementEndpointAttributeChangeHandler(chip::ClusterId clusterId, chip::AttributeId attributeId,
-                                                                   uint8_t * value, uint16_t size);
-    void LocalTemperatureMeasurementClusterAttributeChangeHandler(chip::AttributeId attributeId, uint8_t * value, uint16_t size);
+    /**
+     * @brief Initializes the preset types array with all preset types corresponding to PresetScenarioEnum.
+     */
+    void InitializePresetTypes();
 
-    /// @brief  Main method that evaluates the current thermostat state and updates attributes
-    void EvalThermostatState();
-    void UpdateRunningModeForHeating();
-    void UpdateRunningModeForCooling();
+    /**
+     * @brief Initializes the presets array with some sample presets for testing.
+     */
+    void InitializePresets();
+
+    uint8_t mNumberOfPresets;
+
+    Structs::PresetTypeStruct::Type mPresetTypes[kMaxNumberOfPresetTypes];
+    PresetStructWithOwnedMembers mPresets[kMaxNumberOfPresetTypes * kMaxNumberOfPresetsOfEachType];
+    PresetStructWithOwnedMembers mPendingPresets[kMaxNumberOfPresetTypes * kMaxNumberOfPresetsOfEachType];
+
+    uint8_t mNextFreeIndexInPendingPresetsList;
+    uint8_t mNextFreeIndexInPresetsList;
+
+    uint8_t mActivePresetHandleData[kPresetHandleSize];
+    size_t mActivePresetHandleDataSize;
 };
 
-inline ThermostatManager & ThermostatMgr()
-{
-    return ThermostatManager::sThermostatMgr;
-}
+} // namespace Thermostat
+} // namespace Clusters
+} // namespace app
+} // namespace chip

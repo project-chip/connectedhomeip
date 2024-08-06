@@ -16,482 +16,227 @@
  *    limitations under the License.
  */
 
-/**********************************************************
- * Includes
- *********************************************************/
-
-#include <thermostat-delegate-impl.h>
 #include <thermostat-manager.h>
 
-#include <app/clusters/bindings/BindingManager.h>
-#include <app/clusters/thermostat-server/thermostat-server.h>
-#include <controller/ReadInteraction.h>
-#include <platform/PlatformManager.h>
-
-/**********************************************************
- * Defines and Constants
- *********************************************************/
+#include <app-common/zap-generated/attributes/Accessors.h>
+#include <lib/support/Span.h>
+#include <platform/internal/CHIPDeviceLayerInternal.h>
 
 using namespace chip;
 using namespace chip::app;
-using namespace chip::app::DataModel;
-using namespace chip::Controller;
-using namespace chip::app::Clusters;
 using namespace chip::app::Clusters::Thermostat;
 using namespace chip::app::Clusters::Thermostat::Structs;
-using namespace chip::app::Clusters::Thermostat::Attributes;
-using namespace chip::app::Clusters::TemperatureMeasurement;
-using namespace chip::app::Clusters::TemperatureMeasurement::Attributes;
-using namespace Protocols::InteractionModel;
 
-using namespace chip::DeviceLayer;
+ThermostatManager ThermostatManager::sInstance;
 
-static constexpr EndpointId kThermostatEndpoint = 1;
-
-static constexpr uint16_t kMaxIntervalCeilingSeconds = 3600;
-
-static const char * SystemModeString(SystemModeEnum systemMode);
-static const char * RunningModeString(ThermostatRunningModeEnum runningMode);
-
-/**********************************************************
- * Variable declarations
- *********************************************************/
-
-ThermostatManager ThermostatManager::sThermostatMgr;
-
-namespace {
-
-template <typename DecodableAttributeType>
-static void OnAttributeChangeReported(const ConcreteDataAttributePath & path, const DecodableAttributeType & value);
-
-template <>
-void OnAttributeChangeReported<MeasuredValue::TypeInfo::DecodableType>(const ConcreteDataAttributePath & path,
-                                                                       const MeasuredValue::TypeInfo::DecodableType & value)
+ThermostatManager::ThermostatManager()
 {
-    ClusterId clusterId = path.mClusterId;
-    if (clusterId != TemperatureMeasurement::Id)
+    mNumberOfPresets                   = kMaxNumberOfPresetTypes * kMaxNumberOfPresetsOfEachType;
+    mNextFreeIndexInPresetsList        = 0;
+    mNextFreeIndexInPendingPresetsList = 0;
+
+    InitializePresetTypes();
+    InitializePresets();
+
+    memset(mActivePresetHandleData, 0, sizeof(mActivePresetHandleData));
+    mActivePresetHandleDataSize = 0;
+}
+
+void ThermostatManager::InitializePresetTypes()
+{
+    PresetScenarioEnum presetScenarioEnumArray[kMaxNumberOfPresetTypes] = {
+        PresetScenarioEnum::kOccupied, PresetScenarioEnum::kUnoccupied, PresetScenarioEnum::kSleep,
+        PresetScenarioEnum::kWake,     PresetScenarioEnum::kVacation,   PresetScenarioEnum::kGoingToSleep
+    };
+    static_assert(ArraySize(presetScenarioEnumArray) <= ArraySize(mPresetTypes));
+
+    uint8_t index = 0;
+    for (PresetScenarioEnum presetScenario : presetScenarioEnumArray)
     {
-        ChipLogError(AppServer,
-                     "Attribute change reported for TemperatureMeasurement cluster on incorrect cluster id " ChipLogFormatMEI,
-                     ChipLogValueMEI(clusterId));
-        return;
+        mPresetTypes[index].presetScenario  = presetScenario;
+        mPresetTypes[index].numberOfPresets = kMaxNumberOfPresetsOfEachType;
+        mPresetTypes[index].presetTypeFeatures =
+            (presetScenario == PresetScenarioEnum::kOccupied || presetScenario == PresetScenarioEnum::kUnoccupied)
+            ? PresetTypeFeaturesBitmap::kAutomatic
+            : PresetTypeFeaturesBitmap::kSupportsNames;
+        index++;
     }
+}
 
-    AttributeId attributeId = path.mAttributeId;
-    if (attributeId != MeasuredValue::Id)
+void ThermostatManager::InitializePresets()
+{
+    // Initialize the presets with 2 built in presets - occupied and unoccupied.
+    PresetScenarioEnum presetScenarioEnumArray[2] = { PresetScenarioEnum::kOccupied, PresetScenarioEnum::kUnoccupied };
+    static_assert(ArraySize(presetScenarioEnumArray) <= ArraySize(mPresets));
+
+    uint8_t index = 0;
+    for (PresetScenarioEnum presetScenario : presetScenarioEnumArray)
     {
-        ChipLogError(AppServer,
-                     "Attribute change reported for TemperatureMeasurement cluster for incorrect attribute" ChipLogFormatMEI,
-                     ChipLogValueMEI(attributeId));
-        return;
+        mPresets[index].SetPresetScenario(presetScenario);
+
+        // Set the preset handle to the preset scenario value as a unique id.
+        const uint8_t handle[] = { static_cast<uint8_t>(presetScenario) };
+        mPresets[index].SetPresetHandle(DataModel::MakeNullable(ByteSpan(handle)));
+        mPresets[index].SetName(NullOptional);
+        int16_t coolingSetpointValue = static_cast<int16_t>(2500 + (index * 100));
+        mPresets[index].SetCoolingSetpoint(MakeOptional(coolingSetpointValue));
+
+        int16_t heatingSetpointValue = static_cast<int16_t>(2100 - (index * 100));
+        mPresets[index].SetHeatingSetpoint(MakeOptional(heatingSetpointValue));
+        mPresets[index].SetBuiltIn(DataModel::MakeNullable(true));
+        index++;
     }
 
-    if (!value.IsNull())
+    // Set the value of the next free index in the presets list.
+    mNextFreeIndexInPresetsList = index;
+}
+
+CHIP_ERROR ThermostatManager::GetPresetTypeAtIndex(size_t index, PresetTypeStruct::Type & presetType)
+{
+    if (index < ArraySize(mPresetTypes))
     {
-        ChipLogDetail(AppServer, "Attribute change reported for TemperatureMeasurement cluster - MeasuredValue is %d",
-                      value.Value());
+        presetType = mPresetTypes[index];
+        return CHIP_NO_ERROR;
     }
-}
-
-static void OnError(const ConcreteDataAttributePath * path, ChipError err)
-{
-    ChipLogError(AppServer,
-                 "Subscribing to cluster Id " ChipLogFormatMEI " and attribute Id " ChipLogFormatMEI
-                 " failed with error %" CHIP_ERROR_FORMAT,
-                 ChipLogValueMEI(path->mClusterId), ChipLogValueMEI(path->mAttributeId), err.Format());
-}
-
-static void OnSubscriptionEstablished(const ReadClient & client, unsigned int value)
-{
-    ChipLogDetail(AppServer, "OnSubscriptionEstablished with subscription Id: %d", value);
-}
-
-template <typename DecodableAttributeType>
-void SubscribeToAttribute(ClusterId clusterId, AttributeId attributeId, const EmberBindingTableEntry & binding,
-                          OperationalDeviceProxy * peer_device)
-{
-    VerifyOrReturn(peer_device->GetSecureSession().HasValue(),
-                   ChipLogError(AppServer, "SubscribeToAttribute failed. Secure session is null"));
-
-    SubscribeAttribute<DecodableAttributeType>(
-        peer_device->GetExchangeManager(), peer_device->GetSecureSession().Value(), binding.remote, clusterId, attributeId,
-        &OnAttributeChangeReported<DecodableAttributeType>, &OnError, 0, kMaxIntervalCeilingSeconds, &OnSubscriptionEstablished,
-        nullptr, true /* fabricFiltered */, false /* keepExistingSubscription */);
-}
-
-static void ThermostatBoundDeviceChangedHandler(const EmberBindingTableEntry & binding, OperationalDeviceProxy * peer_device,
-                                                void * context)
-{
-    VerifyOrReturn(binding.clusterId.has_value(), ChipLogError(AppServer, "Cluster Id is null"));
-    ClusterId clusterId = binding.clusterId.value();
-
-    switch (clusterId)
-    {
-    case TemperatureMeasurement::Id:
-
-        // Subscribe to the MeasuredValue attribute
-        SubscribeToAttribute<MeasuredValue::TypeInfo::DecodableType>(clusterId, MeasuredValue::Id, binding, peer_device);
-        break;
-    default:
-        ChipLogError(AppServer, "Unsupported Cluster Id");
-        break;
-    }
-}
-
-void NotifyBoundClusterChangedForAllClusters()
-{
-    BindingManager::GetInstance().NotifyBoundClusterChanged(kThermostatEndpoint, TemperatureMeasurement::Id, nullptr);
-}
-
-static void OnPlatformChipDeviceEvent(const DeviceLayer::ChipDeviceEvent * event, intptr_t arg)
-{
-    if (event->Type == DeviceLayer::DeviceEventType::kBindingsChangedViaCluster)
-    {
-        NotifyBoundClusterChangedForAllClusters();
-    }
-}
-
-void InitBindingManager(intptr_t context)
-{
-    auto & server    = Server::GetInstance();
-    CHIP_ERROR error = BindingManager::GetInstance().Init(
-        { &server.GetFabricTable(), server.GetCASESessionManager(), &server.GetPersistentStorage() });
-
-    if (error != CHIP_NO_ERROR)
-    {
-        ChipLogError(AppServer, "Failed to init binding manager");
-    }
-
-    BindingManager::GetInstance().RegisterBoundDeviceChangedHandler(ThermostatBoundDeviceChangedHandler);
-    NotifyBoundClusterChangedForAllClusters();
-}
-
-} // anonymous namespace
-
-CHIP_ERROR ThermostatManager::Init()
-{
-    // Init binding manager
-
-    DeviceLayer::PlatformMgr().AddEventHandler(OnPlatformChipDeviceEvent, reinterpret_cast<intptr_t>(this));
-    DeviceLayer::PlatformMgr().ScheduleWork(InitBindingManager);
-
-    mLocalTemperature        = GetCurrentTemperature();
-    mSystemMode              = GetSystemMode();
-    mRunningMode             = GetRunningMode();
-    mOccupiedCoolingSetpoint = GetCurrentCoolingSetPoint();
-    mOccupiedHeatingSetpoint = GetCurrentHeatingSetPoint();
-    // TODO: Gotta expose this properly on attribute
-    mOccupiedSetback = 5; // 0.5 C
-
-    ChipLogError(AppServer,
-                 "Initialized a thermostat with \n "
-                 "mSystemMode: %u (%s) \n mRunningMode: %u (%s) \n mLocalTemperature: %d \n mOccupiedHeatingSetpoint: %d \n "
-                 "mOccupiedCoolingSetpoint: %d"
-                 "NumberOfPresets: %d",
-                 to_underlying(mSystemMode), SystemModeString(mSystemMode), to_underlying(mRunningMode),
-                 RunningModeString(mRunningMode), mLocalTemperature, mOccupiedHeatingSetpoint, mOccupiedCoolingSetpoint,
-                 GetNumberOfPresets());
-
-    // TODO: Should this be called later?
-    EvalThermostatState();
-
-    return CHIP_NO_ERROR;
-}
-
-void ThermostatManager::AttributeChangeHandler(EndpointId endpointId, ClusterId clusterId, AttributeId attributeId, uint8_t * value,
-                                               uint16_t size)
-{
-    switch (endpointId)
-    {
-    case kThermostatEndpoint:
-        ThermostatEndpointAttributeChangeHandler(clusterId, attributeId, value, size);
-        break;
-
-    default:
-        ChipLogError(AppServer, "Attribute change reported for Thermostat on incorrect endpoint. Ignoring.");
-        break;
-    }
-}
-
-void ThermostatManager::ThermostatEndpointAttributeChangeHandler(ClusterId clusterId, AttributeId attributeId, uint8_t * value,
-                                                                 uint16_t size)
-{
-    switch (clusterId)
-    {
-    case Thermostat::Id:
-        ThermostatClusterAttributeChangeHandler(attributeId, value, size);
-        break;
-
-    default:
-        ChipLogError(AppServer,
-                     "Attribute change reported for Thermostat on incorrect cluster for the thermostat endpoint. Ignoring.");
-        break;
-    }
-}
-
-void ThermostatManager::ThermostatClusterAttributeChangeHandler(AttributeId attributeId, uint8_t * value, uint16_t size)
-{
-    switch (attributeId)
-    {
-    case LocalTemperature::Id: {
-        memcpy(&mLocalTemperature, value, size);
-        ChipLogError(AppServer, "Local temperature changed to %d", mLocalTemperature);
-        EvalThermostatState();
-    }
-    break;
-
-    case OccupiedCoolingSetpoint::Id: {
-        memcpy(&mOccupiedCoolingSetpoint, value, size);
-        ChipLogError(AppServer, "Cooling temperature changed to %d", mOccupiedCoolingSetpoint);
-        EvalThermostatState();
-    }
-    break;
-
-    case OccupiedHeatingSetpoint::Id: {
-        memcpy(&mOccupiedHeatingSetpoint, value, size);
-        ChipLogError(AppServer, "Heating temperature changed to %d", mOccupiedHeatingSetpoint);
-        EvalThermostatState();
-    }
-    break;
-
-    case SystemMode::Id: {
-        mSystemMode = static_cast<SystemModeEnum>(*value);
-        ChipLogError(AppServer, "System mode changed to %u (%s)", *value, SystemModeString(mSystemMode));
-        EvalThermostatState();
-    }
-    break;
-
-    case ThermostatRunningMode::Id: {
-        mRunningMode = static_cast<ThermostatRunningModeEnum>(*value);
-        ChipLogError(AppServer, "Running mode changed to %u (%s)", *value, RunningModeString(mRunningMode));
-    }
-    break;
-
-    default: {
-        ChipLogError(AppServer, "Unhandled thermostat attribute %u", static_cast<uint>(attributeId));
-        return;
-    }
-    break;
-    }
-}
-
-SystemModeEnum ThermostatManager::GetSystemMode()
-{
-    SystemModeEnum systemMode;
-    SystemMode::Get(kThermostatEndpoint, &systemMode);
-    return systemMode;
-}
-
-ThermostatRunningModeEnum ThermostatManager::GetRunningMode()
-{
-    ThermostatRunningModeEnum runningMode;
-    ThermostatRunningMode::Get(kThermostatEndpoint, &runningMode);
-    return runningMode;
-}
-
-int16_t ThermostatManager::GetCurrentTemperature()
-{
-    DataModel::Nullable<int16_t> currentTemperature;
-    currentTemperature.SetNull();
-    LocalTemperature::Get(kThermostatEndpoint, currentTemperature);
-    return currentTemperature.ValueOr(0);
-}
-
-int16_t ThermostatManager::GetCurrentHeatingSetPoint()
-{
-    int16_t heatingSetpoint;
-    OccupiedHeatingSetpoint::Get(kThermostatEndpoint, &heatingSetpoint);
-    return heatingSetpoint;
-}
-
-int16_t ThermostatManager::GetCurrentCoolingSetPoint()
-{
-    int16_t coolingSetpoint;
-    OccupiedCoolingSetpoint::Get(kThermostatEndpoint, &coolingSetpoint);
-    return coolingSetpoint;
+    return CHIP_ERROR_PROVIDER_LIST_EXHAUSTED;
 }
 
 uint8_t ThermostatManager::GetNumberOfPresets()
 {
-    return ThermostatDelegate::GetInstance().GetNumberOfPresets();
+    return mNumberOfPresets;
 }
 
-CHIP_ERROR ThermostatManager::SetSystemMode(SystemModeEnum systemMode)
+CHIP_ERROR ThermostatManager::GetPresetAtIndex(size_t index, PresetStructWithOwnedMembers & preset)
 {
-    uint8_t systemModeValue = to_underlying(systemMode);
-    if (mSystemMode == systemMode)
+    if (index < mNextFreeIndexInPresetsList)
     {
-        ChipLogDetail(AppServer, "Already in system mode: %u (%s)", systemModeValue, SystemModeString(systemMode));
+        preset = mPresets[index];
         return CHIP_NO_ERROR;
     }
-
-    ChipLogError(AppServer, "Setting system mode: %u (%s)", systemModeValue, SystemModeString(systemMode));
-    return CHIP_ERROR_IM_GLOBAL_STATUS_VALUE(SystemMode::Set(kThermostatEndpoint, systemMode));
+    return CHIP_ERROR_PROVIDER_LIST_EXHAUSTED;
 }
 
-CHIP_ERROR ThermostatManager::SetRunningMode(ThermostatRunningModeEnum runningMode)
+CHIP_ERROR ThermostatManager::GetActivePresetHandle(MutableByteSpan & activePresetHandle)
 {
-    uint8_t runningModeValue = to_underlying(runningMode);
-    if (mRunningMode == runningMode)
+    return CopySpanToMutableSpan(ByteSpan(mActivePresetHandleData, mActivePresetHandleDataSize), activePresetHandle);
+}
+
+CHIP_ERROR ThermostatManager::SetActivePresetHandle(const DataModel::Nullable<ByteSpan> & newActivePresetHandle)
+{
+    if (!newActivePresetHandle.IsNull())
     {
-        ChipLogDetail(AppServer, "Already in running mode: %u (%s)", runningModeValue, RunningModeString(runningMode));
-        return CHIP_NO_ERROR;
-    }
-
-    ChipLogError(AppServer, "Setting running mode: %u (%s)", runningModeValue, RunningModeString(runningMode));
-    return CHIP_ERROR_IM_GLOBAL_STATUS_VALUE(ThermostatRunningMode::Set(kThermostatEndpoint, runningMode));
-}
-
-CHIP_ERROR ThermostatManager::SetCurrentTemperature(int16_t temperature)
-{
-    return CHIP_ERROR_IM_GLOBAL_STATUS_VALUE(LocalTemperature::Set(kThermostatEndpoint, temperature));
-}
-
-CHIP_ERROR ThermostatManager::SetCurrentHeatingSetPoint(int16_t heatingSetpoint)
-{
-    return CHIP_ERROR_IM_GLOBAL_STATUS_VALUE(OccupiedHeatingSetpoint::Set(kThermostatEndpoint, heatingSetpoint));
-}
-
-CHIP_ERROR ThermostatManager::SetCurrentCoolingSetPoint(int16_t coolingSetpoint)
-{
-    return CHIP_ERROR_IM_GLOBAL_STATUS_VALUE(OccupiedCoolingSetpoint::Set(kThermostatEndpoint, coolingSetpoint));
-}
-
-void ThermostatManager::EvalThermostatState()
-{
-    ChipLogError(AppServer,
-                 "Eval Thermostat Running Mode \n "
-                 "mSystemMode: %u (%s) \n mRunningMode: %u (%s) \n mLocalTemperature: %d \n mOccupiedHeatingSetpoint: %d \n "
-                 "mOccupiedCoolingSetpoint: %d",
-                 to_underlying(mSystemMode), SystemModeString(mSystemMode), to_underlying(mRunningMode),
-                 RunningModeString(mRunningMode), mLocalTemperature, mOccupiedHeatingSetpoint, mOccupiedCoolingSetpoint);
-
-    switch (mSystemMode)
-    {
-    case SystemModeEnum::kOff: {
-        SetRunningMode(ThermostatRunningModeEnum::kOff);
-        break;
-    }
-    case SystemModeEnum::kHeat: {
-        UpdateRunningModeForHeating();
-        break;
-    }
-    case SystemModeEnum::kCool: {
-        UpdateRunningModeForCooling();
-        break;
-    }
-    case SystemModeEnum::kAuto: {
-        UpdateRunningModeForHeating();
-        UpdateRunningModeForCooling();
-        break;
-    }
-    default:
-        break;
-    }
-}
-
-void ThermostatManager::UpdateRunningModeForHeating()
-{
-    const int16_t heatingOnThreshold  = mOccupiedHeatingSetpoint - static_cast<int16_t>(mOccupiedSetback * 10);
-    const int16_t heatingOffThreshold = mOccupiedHeatingSetpoint + static_cast<int16_t>(mOccupiedSetback * 10);
-
-    if (mRunningMode == ThermostatRunningModeEnum::kHeat)
-    {
-        if (mLocalTemperature >= heatingOffThreshold)
+        size_t newActivePresetHandleSize = newActivePresetHandle.Value().size();
+        if (newActivePresetHandleSize > sizeof(mActivePresetHandleData))
         {
-            ChipLogDetail(AppServer, "Eval Heat - Turning off");
-            SetRunningMode(ThermostatRunningModeEnum::kOff);
+            ChipLogError(NotSpecified,
+                         "Failed to set ActivePresetHandle. newActivePresetHandle size %u is larger than preset handle size %u",
+                         static_cast<uint8_t>(newActivePresetHandleSize), static_cast<uint8_t>(kPresetHandleSize));
+            return CHIP_ERROR_NO_MEMORY;
         }
-        else
-        {
-            ChipLogDetail(AppServer, "Eval Heat - Keep Heating");
-        }
+        memcpy(mActivePresetHandleData, newActivePresetHandle.Value().data(), newActivePresetHandleSize);
+        mActivePresetHandleDataSize = newActivePresetHandleSize;
+        ChipLogDetail(NotSpecified, "Set ActivePresetHandle to ");
+        ChipLogByteSpan(NotSpecified, newActivePresetHandle.Value());
     }
     else
     {
-        if (mLocalTemperature <= heatingOnThreshold)
+        memset(mActivePresetHandleData, 0, sizeof(mActivePresetHandleData));
+        mActivePresetHandleDataSize = 0;
+        ChipLogDetail(NotSpecified, "Clear ActivePresetHandle");
+    }
+    return CHIP_NO_ERROR;
+}
+
+System::Clock::Milliseconds16
+ThermostatManager::GetAtomicWriteTimeout(DataModel::DecodableList<chip::AttributeId> attributeRequests,
+                                         System::Clock::Milliseconds16 timeoutRequest)
+{
+    auto attributeIdsIter = attributeRequests.begin();
+    bool requestedPresets = false, requestedSchedules = false;
+    while (attributeIdsIter.Next())
+    {
+        auto & attributeId = attributeIdsIter.GetValue();
+
+        switch (attributeId)
         {
-            ChipLogDetail(AppServer, "Eval Heat - Turn on");
-            SetRunningMode(ThermostatRunningModeEnum::kHeat);
+        case Attributes::Presets::Id:
+            requestedPresets = true;
+            break;
+        case Attributes::Schedules::Id:
+            requestedSchedules = true;
+            break;
+        default:
+            return System::Clock::Milliseconds16(0);
         }
-        else
-        {
-            ChipLogDetail(AppServer, "Eval Heat - Nothing to do");
-        }
+    }
+    if (attributeIdsIter.GetStatus() != CHIP_NO_ERROR)
+    {
+        return System::Clock::Milliseconds16(0);
+    }
+    auto timeout = System::Clock::Milliseconds16(0);
+    if (requestedPresets)
+    {
+        timeout += std::chrono::milliseconds(1000);
+    }
+    if (requestedSchedules)
+    {
+        timeout += std::chrono::milliseconds(3000);
+    }
+    return std::min(timeoutRequest, timeout);
+}
+
+void ThermostatManager::InitializePendingPresets()
+{
+    mNextFreeIndexInPendingPresetsList = 0;
+    for (uint8_t indexInPresets = 0; indexInPresets < mNextFreeIndexInPresetsList; indexInPresets++)
+    {
+        mPendingPresets[mNextFreeIndexInPendingPresetsList] = mPresets[indexInPresets];
+        mNextFreeIndexInPendingPresetsList++;
     }
 }
 
-void ThermostatManager::UpdateRunningModeForCooling()
+CHIP_ERROR ThermostatManager::AppendToPendingPresetList(const PresetStruct::Type & preset)
 {
-    const int16_t coolingOffThreshold = mOccupiedCoolingSetpoint - static_cast<int16_t>(mOccupiedSetback * 10);
-    const int16_t coolingOnThreshold  = mOccupiedCoolingSetpoint + static_cast<int16_t>(mOccupiedSetback * 10);
-
-    if (mRunningMode == ThermostatRunningModeEnum::kCool)
+    if (mNextFreeIndexInPendingPresetsList < ArraySize(mPendingPresets))
     {
-        if (mLocalTemperature <= coolingOffThreshold)
+        mPendingPresets[mNextFreeIndexInPendingPresetsList] = preset;
+        if (preset.presetHandle.IsNull())
         {
-            ChipLogDetail(AppServer, "Eval Cool - Turning off");
-            SetRunningMode(ThermostatRunningModeEnum::kOff);
+            // TODO: #34556 Since we support only one preset of each type, using the octet string containing the preset scenario
+            // suffices as the unique preset handle. Need to fix this to actually provide unique handles once multiple presets of
+            // each type are supported.
+            const uint8_t handle[] = { static_cast<uint8_t>(preset.presetScenario) };
+            mPendingPresets[mNextFreeIndexInPendingPresetsList].SetPresetHandle(DataModel::MakeNullable(ByteSpan(handle)));
         }
-        else
-        {
-            ChipLogDetail(AppServer, "Eval Cool - Keep Cooling");
-        }
+        mNextFreeIndexInPendingPresetsList++;
+        return CHIP_NO_ERROR;
     }
-    else
-    {
-        if (mLocalTemperature >= coolingOnThreshold)
-        {
-            ChipLogDetail(AppServer, "Eval Cool - Turn on");
-            SetRunningMode(ThermostatRunningModeEnum::kCool);
-        }
-        else
-        {
-            ChipLogDetail(AppServer, "Eval Cool - Nothing to do");
-        }
-    }
+    return CHIP_ERROR_WRITE_FAILED;
 }
 
-static const char * SystemModeString(SystemModeEnum systemMode)
+CHIP_ERROR ThermostatManager::GetPendingPresetAtIndex(size_t index, PresetStructWithOwnedMembers & preset)
 {
-    switch (systemMode)
+    if (index < mNextFreeIndexInPendingPresetsList)
     {
-    case SystemModeEnum::kOff:
-        return "Off";
-    case SystemModeEnum::kAuto:
-        return "Auto";
-    case SystemModeEnum::kCool:
-        return "Cool";
-    case SystemModeEnum::kHeat:
-        return "Heat";
-    default:
-        return "Unknown";
+        preset = mPendingPresets[index];
+        return CHIP_NO_ERROR;
     }
+    return CHIP_ERROR_PROVIDER_LIST_EXHAUSTED;
 }
 
-static const char * RunningModeString(ThermostatRunningModeEnum runningMode)
+CHIP_ERROR ThermostatManager::ApplyPendingPresets()
 {
-    switch (runningMode)
+    mNextFreeIndexInPresetsList = 0;
+    for (uint8_t indexInPendingPresets = 0; indexInPendingPresets < mNextFreeIndexInPendingPresetsList; indexInPendingPresets++)
     {
-    case ThermostatRunningModeEnum::kOff:
-        return "Off";
-    case ThermostatRunningModeEnum::kCool:
-        return "Cool";
-    case ThermostatRunningModeEnum::kHeat:
-        return "Heat";
-    default:
-        return "Unknown";
+        const PresetStructWithOwnedMembers & pendingPreset = mPendingPresets[indexInPendingPresets];
+        mPresets[mNextFreeIndexInPresetsList]              = pendingPreset;
+        mNextFreeIndexInPresetsList++;
     }
+    return CHIP_NO_ERROR;
 }
 
-void emberAfThermostatClusterInitCallback(EndpointId endpoint)
+void ThermostatManager::ClearPendingPresetList()
 {
-    ChipLogProgress(Zcl, "Starting Thermostat Manager");
-    ThermostatManager().Init();
-
-    // Register the delegate for the Thermostat
-    auto & delegate = ThermostatDelegate::GetInstance();
-    // Set the default delegate for endpoint kThermostatEndpoint.
-    VerifyOrDie(endpoint == kThermostatEndpoint);
-    SetDefaultDelegate(endpoint, &delegate);
+    mNextFreeIndexInPendingPresetsList = 0;
 }

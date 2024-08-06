@@ -37,7 +37,7 @@
 #include "rvc-modes.h"
 #include "rvc-operational-state-delegate-impl.h"
 #include "tcc-mode.h"
-#include "thermostat-delegate-impl.h"
+#include "thermostat-manager.h"
 #include "water-heater-mode.h"
 #include <Options.h>
 #include <app-common/zap-generated/attributes/Accessors.h>
@@ -330,7 +330,7 @@ using namespace chip::app::Clusters::Thermostat;
 void emberAfThermostatClusterInitCallback(EndpointId endpoint)
 {
     // Register the delegate for the Thermostat
-    auto & delegate = ThermostatDelegate::GetInstance();
+    auto & manager = ThermostatManager::GetInstance();
 
-    SetDefaultDelegate(endpoint, &delegate);
+    SetDefaultDelegate(endpoint, &manager);
 }
