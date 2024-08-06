@@ -140,7 +140,11 @@ source_set("operational-state-test-srcs") {
 }
 
 source_set("thread-border-router-management-test-srcs") {
-  sources = [ "${chip_root}/src/app/clusters/thread-border-router-management-server/thread-border-router-management-server.cpp" ]
+  sources = [
+    "${chip_root}/src/app/clusters/thread-border-router-management-server/thread-border-router-management-server.cpp",
+    "${chip_root}/src/app/clusters/thread-border-router-management-server/thread-border-router-management-server.h",
+    "${chip_root}/src/app/clusters/thread-border-router-management-server/thread-br-delegate.h",
+  ]
 
   public_deps = [
     "${chip_root}/src/app",
