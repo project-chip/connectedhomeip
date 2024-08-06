@@ -177,12 +177,15 @@ ThermostatDelegate::GetAtomicWriteTimeout(DataModel::DecodableList<chip::Attribu
     auto timeout = System::Clock::Milliseconds16(0);
     if (requestedPresets)
     {
-        timeout += std::chrono::milliseconds(1000);
+        // If the client expects to edit the presets, then we'll give it 3 seconds to do so
+        timeout += std::chrono::milliseconds(3000);
     }
     if (requestedSchedules)
     {
-        timeout += std::chrono::milliseconds(3000);
+        // If the client expects to edit the schedules, then we'll give it 9 seconds to do so
+        timeout += std::chrono::milliseconds(9000);
     }
+    // If the client requested an even smaller timeout, then use that one
     return std::min(timeoutRequest, timeout);
 }
 
