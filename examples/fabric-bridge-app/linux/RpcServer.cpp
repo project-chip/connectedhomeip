@@ -63,7 +63,8 @@ pw::Status FabricBridge::AddSynchronizedDevice(const chip_rpc_SynchronizedDevice
         return pw::Status::Unknown();
     }
 
-    CHIP_ERROR err = EcosystemInformation::EcosystemInformationServer::Instance().AddEcosystemInformationClusterToEndpoint(device->GetEndpointId());
+    CHIP_ERROR err = EcosystemInformation::EcosystemInformationServer::Instance().AddEcosystemInformationClusterToEndpoint(
+        device->GetEndpointId());
     VerifyOrDie(err == CHIP_NO_ERROR);
 
     return pw::OkStatus();
