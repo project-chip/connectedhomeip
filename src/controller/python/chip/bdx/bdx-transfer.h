@@ -27,7 +27,7 @@ namespace chip {
 namespace bdx {
 
 // A class that represents a BDX transfer initiated by the other end of the transfer. This implements most of the transfer,
-// but uses a delegate to determine whether the transfer should be accepted and provide the data source or sink.
+// but uses a delegate for transfer control and data handling.
 class BdxTransfer : public Responder
 {
 public:
@@ -64,7 +64,6 @@ public:
 
     void HandleTransferSessionOutput(TransferSession::OutputEvent & event) override;
     void OnExchangeClosing(Messaging::ExchangeContext * exchangeContext) override;
-
     CHIP_ERROR OnMessageReceived(chip::Messaging::ExchangeContext * exchangeContext,
                                  const chip::PayloadHeader & payloadHeader,
                                  chip::System::PacketBufferHandle && payload) override;
@@ -79,7 +78,6 @@ private:
 
     System::Layer * mSystemLayer = nullptr;
 
-    // TODO: Request the data from a data source rather than copy the data here.
     uint8_t * mData = nullptr;
     size_t mDataCount = 0;
     size_t mDataTransferredCount = 0;

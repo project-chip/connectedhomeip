@@ -31,6 +31,7 @@ using PyObject = void *;
 namespace chip {
 namespace python {
 
+// The Python callbacks to call when certain events happen.
 using OnTransferObtainedCallback = void (*)(PyObject context, PyChipError result, void * bdxTransfer,
                                             bdx::TransferControlFlags transferControlFlags, uint16_t maxBlockSize,
                                             uint64_t startOffset, uint64_t length, const uint8_t * fileDesignator,
@@ -42,6 +43,7 @@ OnTransferObtainedCallback gOnTransferObtainedCallback   = nullptr;
 OnDataReceivedCallback gOnDataReceivedCallback           = nullptr;
 OnTransferCompletedCallback gOnTransferCompletedCallback = nullptr;
 
+// The information for a single transfer.
 struct TransferData
 {
     bdx::BdxTransfer * Transfer = nullptr;
@@ -54,10 +56,11 @@ struct TransferData
     }
 };
 
+// The set of transfers.
 class TransferMap
 {
 public:
-    // This returns the transfer data associated with the given transfer.
+    // Returns the transfer data associated with the given transfer.
     TransferData * TransferDataForTransfer(bdx::BdxTransfer * transfer)
     {
         std::vector<TransferData>::iterator result = std::find_if(mTransfers.begin(), mTransfers.end(),
@@ -68,6 +71,7 @@ public:
         return &*result;
     }
 
+    // Returns the transfer data that has the given context when a transfer is obtained.
     TransferData * TransferDataForTransferObtainedContext(PyObject transferObtainedContext)
     {
         std::vector<TransferData>::iterator result = std::find_if(mTransfers.begin(), mTransfers.end(),
@@ -89,6 +93,7 @@ public:
         return &*result;
     }
 
+    // Creates a new transfer data.
     TransferData * CreateUnassociatedTransferData()
     {
         return &mTransfers.emplace_back();
@@ -105,6 +110,7 @@ private:
     std::vector<TransferData> mTransfers;
 };
 
+// A delegate to forward events from a transfer to the appropriate Python callback and context.
 class TransferDelegate : public bdx::BdxTransfer::Delegate
 {
 public:
@@ -167,8 +173,10 @@ bdx::BdxTransferServer gBdxTransferServer(gBdxTransferManager);
 
 using namespace chip::python;
 
+// These methods are expected to be called from Python.
 extern "C" {
 
+// Initialises the BDX system.
 void pychip_Bdx_InitCallbacks(OnTransferObtainedCallback onTransferObtainedCallback,
                               OnDataReceivedCallback onDataReceivedCallback,
                               OnTransferCompletedCallback onTransferCompletedCallback)
@@ -176,12 +184,12 @@ void pychip_Bdx_InitCallbacks(OnTransferObtainedCallback onTransferObtainedCallb
     gOnTransferObtainedCallback  = onTransferObtainedCallback;
     gOnDataReceivedCallback      = onDataReceivedCallback;
     gOnTransferCompletedCallback = onTransferCompletedCallback;
-    // TODO: Move this into its own method maybe.
     chip::Controller::DeviceControllerFactory & factory = chip::Controller::DeviceControllerFactory::GetInstance();
     gBdxTransferManager.Init(factory.GetSystemState()->SystemLayer());
     gBdxTransferServer.Init(factory.GetSystemState()->ExchangeMgr());
 }
 
+// Prepares the BDX system to expect a new transfer.
 PyChipError pychip_Bdx_ExpectBdxTransfer(PyObject transferObtainedContext)
 {
     TransferData * transferData = gTransfers.CreateUnassociatedTransferData();
@@ -191,6 +199,7 @@ PyChipError pychip_Bdx_ExpectBdxTransfer(PyObject transferObtainedContext)
     return ToPyChipError(CHIP_NO_ERROR);
 }
 
+// Stops expecting a transfer.
 PyChipError pychip_Bdx_StopExpectingBdxTransfer(PyObject transferObtainedContext)
 {
     TransferData * transferData = gTransfers.TransferDataForTransferObtainedContext(transferObtainedContext);
@@ -200,6 +209,7 @@ PyChipError pychip_Bdx_StopExpectingBdxTransfer(PyObject transferObtainedContext
     return ToPyChipError(CHIP_NO_ERROR);
 }
 
+// Accepts a "Send" transfer, i.e. one where the other device will send data.
 PyChipError pychip_Bdx_AcceptSendTransfer(chip::bdx::BdxTransfer * transfer, PyObject dataReceivedContext,
                                           PyObject transferCompletedContext)
 {
@@ -209,6 +219,7 @@ PyChipError pychip_Bdx_AcceptSendTransfer(chip::bdx::BdxTransfer * transfer, PyO
     return ToPyChipError(transfer->AcceptSend());
 }
 
+// Accepts a "Receive" transfer, i.e. one where the other device will receive data.
 PyChipError pychip_Bdx_AcceptReceiveTransfer(chip::bdx::BdxTransfer * transfer, const uint8_t * dataBuffer, size_t dataLength,
                                              PyObject transferCompletedContext)
 {
@@ -218,6 +229,7 @@ PyChipError pychip_Bdx_AcceptReceiveTransfer(chip::bdx::BdxTransfer * transfer, 
     return ToPyChipError(transfer->AcceptReceive(data));
 }
 
+// Rejects a transfer.
 PyChipError pychip_Bdx_RejectTransfer(chip::bdx::BdxTransfer * transfer)
 {
     return ToPyChipError(transfer->Reject());

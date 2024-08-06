@@ -117,7 +117,7 @@ void BdxTransfer::HandleTransferSessionOutput(TransferSession::OutputEvent & eve
         SendMessage(event);
         if (event.msgTypeData.HasMessageType(MessageType::BlockAckEOF))
         {
-            // TODO: Completing the session here means the ACK for the BlockAckEOF message hasn't been received.
+            // TODO: Ending the session here means the StandaloneAck for the BlockAckEOF message hasn't been received.
             EndSession(CHIP_NO_ERROR);
         }
         break;

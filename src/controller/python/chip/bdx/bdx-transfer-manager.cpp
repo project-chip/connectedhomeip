@@ -81,6 +81,7 @@ void BdxTransferManager::DataReceived(BdxTransfer * transfer, const ByteSpan & b
 void BdxTransferManager::TransferCompleted(BdxTransfer * transfer, CHIP_ERROR result)
 {
     mBdxTransferDelegate->TransferCompleted(transfer, result);
+    // TODO: Schedule this to happen after the transfer completes.
     mTransferPool.ReleaseObject(transfer);
 }
 
