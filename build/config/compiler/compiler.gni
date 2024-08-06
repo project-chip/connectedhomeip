@@ -48,6 +48,9 @@ declare_args() {
   # enable libfuzzer
   is_libfuzzer = false
 
+  # Remove all symbol table and relocation information from the binary.
+  strip_symbols = false
+
   # Generate code coverage analysis artifacts when enabled.
   use_coverage = false
 
