@@ -39,7 +39,7 @@ jobs:
         if: github.actor != 'restyled-io[bot]'
 
         container:
-            image: ghcr.io/project-chip/chip-build-k32w:65
+            image: ghcr.io/project-chip/chip-build-k32w:66
             volumes:
                 - "/tmp/bloat_reports:/tmp/bloat_reports"
         steps:
@@ -96,7 +96,71 @@ jobs:
               if: ${{ !env.ACT }}
               with:
                 platform-name: K32W
+    rw61x:
+        name: RW61X
 
+        env:
+            BUILD_TYPE: gn_rw61x
+
+        runs-on: ubuntu-latest
+        if: github.actor != 'restyled-io[bot]'
+
+        container:
+            image: ghcr.io/project-chip/chip-build-rw61x:66
+            volumes:
+                - "/tmp/bloat_reports:/tmp/bloat_reports"
+        steps:
+            - name: Checkout
+              uses: actions/checkout@v4
+            - name: Checkout submodules & Bootstrap
+              uses: ./.github/actions/checkout-submodules-and-bootstrap
+              with:
+                platform: nxp
+                extra-submodule-parameters: --recursive
+
+            - name: Set up environment for size reports
+              uses: ./.github/actions/setup-size-reports
+              if: ${{ !env.ACT }}
+              with:
+                gh-context: ${{ toJson(github) }}
+
+            - name: Build RW61X all clusters example app
+              run: |
+                  scripts/run_in_build_env.sh "\
+                      ./scripts/build/build_examples.py \
+                      --target nxp-rw61x-freertos-all-clusters-wifi \
+                      --target nxp-rw61x-freertos-all-clusters-thread \
+                      --target nxp-rw61x-freertos-all-clusters-thread-wifi \
+                      build \
+                      --copy-artifacts-to out/artifacts \
+                  "
+            
+            - name: Build RW61X thermostat example app
+              run: |
+                  scripts/run_in_build_env.sh "\
+                      ./scripts/build/build_examples.py \
+                      --target nxp-rw61x-freertos-thermostat-wifi \
+                      --target nxp-rw61x-freertos-thermostat-thread \
+                      --target nxp-rw61x-freertos-thermostat-thread-wifi \
+                      build \
+                      --copy-artifacts-to out/artifacts \
+                  "
+            
+            - name: Build RW61X laundry-washer example app
+              run: |
+                  scripts/run_in_build_env.sh "\
+                      ./scripts/build/build_examples.py \
+                      --target nxp-rw61x-freertos-laundry-washer-wifi \
+                      --target nxp-rw61x-freertos-laundry-washer-thread \
+                      --target nxp-rw61x-freertos-laundry-washer-thread-wifi \
+                      build \
+                      --copy-artifacts-to out/artifacts \
+                  "
+            - name: Uploading Size Reports
+              uses: ./.github/actions/upload-size-reports
+              if: ${{ !env.ACT }}
+              with:
+                platform-name: RW61X
     zephyr:
         name: ZEPHYR_RW61X
 
@@ -104,7 +168,7 @@ jobs:
         if: github.actor != 'restyled-io[bot]'
 
         container:
-            image: ghcr.io/project-chip/chip-build-nxp-zephyr:65
+            image: ghcr.io/project-chip/chip-build-nxp-zephyr:66
 
         steps:
             - name: Checkout

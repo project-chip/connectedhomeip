@@ -106,9 +106,8 @@ class TestIdlRendering(unittest.TestCase):
         # Files MUST be identical except the header comments which are different
         original = SkipLeadingComments(ReadMatterIdl(path), also_strip=[
                                        " // NOTE: Default/not specifically set"])
-
-        # Do not merge globals: zap generators do not generate IDLs with
-        # globals inside structures (i.e. no comments about referenced globals)
+        # Do not merge globals because ZAP generated matter files do not contain
+        # the merge global data (will not render global reference comments).
         generated = SkipLeadingComments(RenderAsIdlTxt(
             ParseMatterIdl(path, skip_meta=False, merge_globals=False)))
 

@@ -23,6 +23,9 @@ declare_args() {
 
   # Substitute fake platform when building with chip_device_platform=auto.
   chip_fake_platform = false
+
+  # Include wifi-paf to commission the device or not
+  chip_device_config_enable_wifipaf = false
 }
 
 if (chip_device_platform == "auto") {

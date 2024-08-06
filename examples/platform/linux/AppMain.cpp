@@ -90,6 +90,12 @@
 #if CHIP_DEVICE_CONFIG_ENABLE_ENERGY_REPORTING_TRIGGER
 #include <app/clusters/electrical-energy-measurement-server/EnergyReportingTestEventTriggerHandler.h>
 #endif
+#if CHIP_DEVICE_CONFIG_ENABLE_WATER_HEATER_MANAGEMENT_TRIGGER
+#include <app/clusters/water-heater-management-server/WaterHeaterManagementTestEventTriggerHandler.h>
+#endif
+#if CHIP_DEVICE_CONFIG_ENABLE_DEVICE_ENERGY_MANAGEMENT_TRIGGER
+#include <app/clusters/device-energy-management-server/DeviceEnergyManagementTestEventTriggerHandler.h>
+#endif
 #include <app/TestEventTriggerDelegate.h>
 
 #include <signal.h>
@@ -361,11 +367,14 @@ int ChipLinuxAppInit(int argc, char * const argv[], OptionSet * customOptions,
 #if CONFIG_NETWORK_LAYER_BLE
     RendezvousInformationFlags rendezvousFlags = RendezvousInformationFlag::kBLE;
 #else  // CONFIG_NETWORK_LAYER_BLE
-    RendezvousInformationFlag rendezvousFlags = RendezvousInformationFlag::kOnNetwork;
+    RendezvousInformationFlags rendezvousFlags = RendezvousInformationFlag::kOnNetwork;
 #endif // CONFIG_NETWORK_LAYER_BLE
 
 #ifdef CONFIG_RENDEZVOUS_MODE
     rendezvousFlags = static_cast<RendezvousInformationFlags>(CONFIG_RENDEZVOUS_MODE);
+#endif
+#if CHIP_DEVICE_CONFIG_ENABLE_WIFIPAF
+    rendezvousFlags.Set(RendezvousInformationFlag::kWiFiPAF);
 #endif
 
     err = Platform::MemoryInit();
@@ -465,6 +474,20 @@ int ChipLinuxAppInit(int argc, char * const argv[], OptionSet * customOptions,
         }
     }
 #endif // CHIP_DEVICE_CONFIG_ENABLE_WPA
+#if CHIP_DEVICE_CONFIG_ENABLE_WPA && CHIP_DEVICE_CONFIG_ENABLE_WIFIPAF
+    ChipLogProgress(NotSpecified, "WiFi-PAF: initialzing");
+    if (LinuxDeviceOptions::GetInstance().mWiFi)
+    {
+        if (EnsureWiFiIsStarted())
+        {
+            ChipLogProgress(NotSpecified, "Wi-Fi Management started");
+            DeviceLayer::ConnectivityManager::WiFiPAFAdvertiseParam args;
+            args.enable  = LinuxDeviceOptions::GetInstance().mWiFiPAF;
+            args.ExtCmds = LinuxDeviceOptions::GetInstance().mWiFiPAFExtCmds;
+            DeviceLayer::ConnectivityMgr().SetWiFiPAFAdvertisingEnabled(args);
+        }
+    }
+#endif
 
 #if CHIP_ENABLE_OPENTHREAD
     if (LinuxDeviceOptions::GetInstance().mThread)
@@ -552,6 +575,14 @@ void ChipLinuxAppMainLoop(AppMainLoopImplementation * impl)
 #if CHIP_DEVICE_CONFIG_ENABLE_ENERGY_REPORTING_TRIGGER
     static EnergyReportingTestEventTriggerHandler sEnergyReportingTestEventTriggerHandler;
     sTestEventTriggerDelegate.AddHandler(&sEnergyReportingTestEventTriggerHandler);
+#endif
+#if CHIP_DEVICE_CONFIG_ENABLE_WATER_HEATER_MANAGEMENT_TRIGGER
+    static WaterHeaterManagementTestEventTriggerHandler sWaterHeaterManagementTestEventTriggerHandler;
+    sTestEventTriggerDelegate.AddHandler(&sWaterHeaterManagementTestEventTriggerHandler);
+#endif
+#if CHIP_DEVICE_CONFIG_ENABLE_DEVICE_ENERGY_MANAGEMENT_TRIGGER
+    static DeviceEnergyManagementTestEventTriggerHandler sDeviceEnergyManagementTestEventTriggerHandler;
+    sTestEventTriggerDelegate.AddHandler(&sDeviceEnergyManagementTestEventTriggerHandler);
 #endif
 
     initParams.testEventTriggerDelegate = &sTestEventTriggerDelegate;

@@ -57,7 +57,7 @@ Davis, CA 95616, USA
 -->
 <deviceType xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="types types.xsd devicetype devicetype.xsd" id="0x0077" name="Cook Surface" revision="1">
   <revisionHistory>
-    <revision revision="1" summary="Initial release"/>
+    <revision revision="1" summary="Initial revision"/>
   </revisionHistory>
   <classification class="simple" scope="endpoint"/>
   <conditions/>

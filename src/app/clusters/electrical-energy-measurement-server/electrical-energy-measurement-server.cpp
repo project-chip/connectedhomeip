@@ -25,6 +25,7 @@
 #include <app/reporting/reporting.h>
 #include <app/util/attribute-storage.h>
 #include <app/util/config.h>
+#include <zap-generated/gen_config.h>
 
 using chip::Protocols::InteractionModel::Status;
 

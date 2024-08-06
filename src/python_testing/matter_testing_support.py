@@ -27,13 +27,15 @@ import queue
 import random
 import re
 import sys
+import time
 import typing
 import uuid
 from binascii import hexlify, unhexlify
 from dataclasses import asdict as dataclass_asdict
 from dataclasses import dataclass, field
 from datetime import datetime, timedelta, timezone
-from enum import Enum
+from enum import Enum, IntFlag
+from functools import partial
 from typing import Any, List, Optional, Tuple
 
 from chip.tlv import float32, uint
@@ -256,17 +258,41 @@ class EventChangeCallback:
                 f'Got subscription report for event on cluster {self._expected_cluster}: {res.Data}')
             self._q.put(res)
 
-    def wait_for_event_report(self, expected_event: ClusterObjects.ClusterEvent, timeout: int = 10):
-        """This function allows a test script to block waiting for the specific event to arrive with a timeout.
-           It returns the event data so that the values can be checked."""
+    def wait_for_event_report(self, expected_event: ClusterObjects.ClusterEvent, timeout_sec: float = 10.0) -> Any:
+        """This function allows a test script to block waiting for the specific event to be the next event
+           to arrive within a timeout (specified in seconds). It returns the event data so that the values can be checked."""
         try:
-            res = self._q.get(block=True, timeout=timeout)
+            res = self._q.get(block=True, timeout=timeout_sec)
         except queue.Empty:
             asserts.fail("Failed to receive a report for the event {}".format(expected_event))
 
         asserts.assert_equal(res.Header.ClusterId, expected_event.cluster_id, "Expected cluster ID not found in event report")
         asserts.assert_equal(res.Header.EventId, expected_event.event_id, "Expected event ID not found in event report")
         return res.Data
+
+    def wait_for_event_expect_no_report(self, timeout_sec: float = 10.0):
+        """This function returns if an event does not arrive within the timeout specified in seconds.
+           If any event does arrive, an assert failure occurs."""
+        try:
+            res = self._q.get(block=True, timeout=timeout_sec)
+        except queue.Empty:
+            return
+
+        asserts.fail(f"Event reported when not expected {res}")
+
+    def get_last_event(self) -> Optional[Any]:
+        """Flush entire queue, returning last (newest) event only."""
+        last_event: Optional[Any] = None
+        while True:
+            try:
+                last_event = self._q.get(block=False)
+            except queue.Empty:
+                return last_event
+
+    def flush_events(self) -> None:
+        """Flush entire queue, returning nothing."""
+        _ = self.get_last_event()
+        return
 
     @property
     def event_queue(self) -> queue.Queue:
@@ -306,25 +332,88 @@ class AttributeChangeCallback:
             asserts.fail("[AttributeChangeCallback] Attribute {expected_attribute} not found in returned report")
 
 
+def await_sequence_of_reports(report_queue: queue.Queue, endpoint_id: int, attribute: TypedAttributePath, sequence: list[Any], timeout_sec: float):
+    """Given a queue.Queue hooked-up to an attribute change accumulator, await a given expected sequence of attribute reports.
+
+    Args:
+      - report_queue: the queue that receives all the reports.
+      - endpoint_id: endpoint ID to match for reports to check.
+      - attribute: attribute to match for reports to check.
+      - sequence: list of attribute values in order that are expected.
+      - timeout_sec: number of seconds to wait for.
+
+    This will fail current Mobly test with assertion failure if the data is not as expected in order.
+
+    Returns nothing on success so the test can go on.
+    """
+    start_time = time.time()
+    elapsed = 0.0
+    time_remaining = timeout_sec
+
+    sequence_idx = 0
+    actual_values = []
+
+    while time_remaining > 0:
+        expected_value = sequence[sequence_idx]
+        logging.info(f"Expecting value {expected_value} for attribute {attribute} on endpoint {endpoint_id}")
+        try:
+            item: AttributeValue = report_queue.get(block=True, timeout=time_remaining)
+
+            # Track arrival of all values for the given attribute.
+            if item.endpoint_id == endpoint_id and item.attribute == attribute:
+                actual_values.append(item.value)
+
+                if item.value == expected_value:
+                    logging.info(f"Got expected attribute change {sequence_idx+1}/{len(sequence)} for attribute {attribute}")
+                    sequence_idx += 1
+                else:
+                    asserts.assert_equal(item.value, expected_value,
+                                         msg="Did not get expected attribute value in correct sequence.")
+
+                # We are done waiting when we have accumulated all results.
+                if sequence_idx == len(sequence):
+                    logging.info("Got all attribute changes, done waiting.")
+                    return
+        except queue.Empty:
+            # No error, we update timeouts and keep going
+            pass
+
+        elapsed = time.time() - start_time
+        time_remaining = timeout_sec - elapsed
+
+    asserts.fail(f"Did not get full sequence {sequence} in {timeout_sec:.1f} seconds. Got {actual_values} before time-out.")
+
+
 @dataclass
 class AttributeValue:
     endpoint_id: int
     attribute: ClusterObjects.ClusterAttributeDescriptor
     value: Any
+    timestamp_utc: datetime
 
 
 class ClusterAttributeChangeAccumulator:
     def __init__(self, expected_cluster: ClusterObjects.Cluster):
-        self._q = queue.Queue()
         self._expected_cluster = expected_cluster
         self._subscription = None
+        self.reset()
 
-    async def start(self, dev_ctrl, node_id: int, endpoint: int, fabric_filtered: bool = False, min_interval_sec: int = 0, max_interval_sec: int = 30) -> Any:
+    def reset(self):
+        self._attribute_report_counts = {}
+        attrs = [cls for name, cls in inspect.getmembers(self._expected_cluster.Attributes) if inspect.isclass(
+            cls) and issubclass(cls, ClusterObjects.ClusterAttributeDescriptor)]
+        self._attribute_reports = {}
+        for a in attrs:
+            self._attribute_report_counts[a] = 0
+            self._attribute_reports[a] = []
+        self._q = queue.Queue()
+
+    async def start(self, dev_ctrl, node_id: int, endpoint: int, fabric_filtered: bool = False, min_interval_sec: int = 0, max_interval_sec: int = 5) -> Any:
         """This starts a subscription for attributes on the specified node_id and endpoint. The cluster is specified when the class instance is created."""
         self._subscription = await dev_ctrl.ReadAttribute(
             nodeid=node_id,
             attributes=[(endpoint, self._expected_cluster)],
-            reportInterval=(min_interval_sec, max_interval_sec),
+            reportInterval=(int(min_interval_sec), int(max_interval_sec)),
             fabricFiltered=fabric_filtered,
             keepSubscriptions=True
         )
@@ -336,13 +425,24 @@ class ClusterAttributeChangeAccumulator:
            It checks the report is from the expected_cluster and then posts it into the queue for later processing."""
         if path.ClusterType == self._expected_cluster:
             data = transaction.GetAttribute(path)
-            value = AttributeValue(endpoint_id=path.Path.EndpointId, attribute=path.AttributeType, value=data)
+            value = AttributeValue(endpoint_id=path.Path.EndpointId, attribute=path.AttributeType,
+                                   value=data, timestamp_utc=datetime.now(timezone.utc))
             logging.info(f"Got subscription report for {path.AttributeType}: {data}")
             self._q.put(value)
+            self._attribute_report_counts[path.AttributeType] += 1
+            self._attribute_reports[path.AttributeType].append(value)
 
     @property
     def attribute_queue(self) -> queue.Queue:
         return self._q
+
+    @property
+    def attribute_report_counts(self) -> dict[ClusterObjects.ClusterAttributeDescriptor, int]:
+        return self._attribute_report_counts
+
+    @property
+    def attribute_reports(self) -> dict[ClusterObjects.ClusterAttributeDescriptor, AttributeValue]:
+        return self._attribute_reports
 
 
 class InternalTestRunnerHooks(TestRunnerHooks):
@@ -385,6 +485,9 @@ class InternalTestRunnerHooks(TestRunnerHooks):
                     placeholder: Optional[str] = None,
                     default_value: Optional[str] = None) -> None:
         pass
+
+    def test_skipped(self, filename: str, name: str):
+        logging.info(f"Skipping test from {filename}: {name}")
 
 
 @dataclass
@@ -815,8 +918,10 @@ class MatterBaseTest(base_test.BaseTestClass):
 
     def setup_test(self):
         self.current_step_index = 0
+        self.test_start_time = datetime.now(timezone.utc)
         self.step_start_time = datetime.now(timezone.utc)
         self.step_skipped = False
+        self.failed = False
         if self.runner_hook and not self.is_commissioning:
             test_name = self.current_test_info.name
             steps = self.get_defined_test_steps(test_name)
@@ -925,10 +1030,30 @@ class MatterBaseTest(base_test.BaseTestClass):
 
         return attr_ret
 
+    async def write_single_attribute(self, attribute_value: object, endpoint_id: int = None, expect_success: bool = True) -> Status:
+        """Write a single `attribute_value` on a given `endpoint_id` and assert on failure.
+
+        If `endpoint_id` is None, the default DUT endpoint for the test is selected.
+
+        If `expect_success` is True, a test assertion fails on error status codes
+
+        Status code is returned.
+        """
+        dev_ctrl = self.default_controller
+        node_id = self.dut_node_id
+        endpoint = self.matter_test_config.endpoint if endpoint_id is None else endpoint_id
+
+        write_result = await dev_ctrl.WriteAttribute(node_id, [(endpoint, attribute_value)])
+        if expect_success:
+            asserts.assert_equal(write_result[0].Status, Status.Success,
+                                 f"Expected write success for write to attribute {attribute_value} on endpoint {endpoint}")
+        return write_result[0].Status
+
     async def send_single_cmd(
             self, cmd: Clusters.ClusterObjects.ClusterCommand,
             dev_ctrl: ChipDeviceCtrl = None, node_id: int = None, endpoint: int = None,
-            timedRequestTimeoutMs: typing.Union[None, int] = None) -> object:
+            timedRequestTimeoutMs: typing.Union[None, int] = None,
+            payloadCapability: int = ChipDeviceCtrl.TransportPayloadCapability.MRP_PAYLOAD) -> object:
         if dev_ctrl is None:
             dev_ctrl = self.default_controller
         if node_id is None:
@@ -936,7 +1061,8 @@ class MatterBaseTest(base_test.BaseTestClass):
         if endpoint is None:
             endpoint = self.matter_test_config.endpoint
 
-        result = await dev_ctrl.SendCommand(nodeid=node_id, endpoint=endpoint, payload=cmd, timedRequestTimeoutMs=timedRequestTimeoutMs)
+        result = await dev_ctrl.SendCommand(nodeid=node_id, endpoint=endpoint, payload=cmd, timedRequestTimeoutMs=timedRequestTimeoutMs,
+                                            payloadCapability=payloadCapability)
         return result
 
     async def send_test_event_triggers(self, eventTrigger: int, enableKey: bytes = None):
@@ -993,12 +1119,11 @@ class MatterBaseTest(base_test.BaseTestClass):
 
             record is of type TestResultRecord
         '''
+        self.failed = True
         if self.runner_hook and not self.is_commissioning:
             exception = record.termination_signal.exception
             step_duration = (datetime.now(timezone.utc) - self.step_start_time) / timedelta(microseconds=1)
-            # This isn't QUITE the test duration because the commissioning is handled separately, but it's clsoe enough for now
-            # This is already given in milliseconds
-            test_duration = record.end_time - record.begin_time
+            test_duration = (datetime.now(timezone.utc) - self.test_start_time) / timedelta(microseconds=1)
             # TODO: I have no idea what logger, logs, request or received are. Hope None works because I have nothing to give
             self.runner_hook.step_failure(logger=None, logs=None, duration=step_duration, request=None, received=None)
             self.runner_hook.test_stop(exception=exception, duration=test_duration)
@@ -1012,7 +1137,7 @@ class MatterBaseTest(base_test.BaseTestClass):
             # What is request? This seems like an implementation detail for the runner
             # TODO: As with failure, I have no idea what logger, logs or request are meant to be
             step_duration = (datetime.now(timezone.utc) - self.step_start_time) / timedelta(microseconds=1)
-            test_duration = record.end_time - record.begin_time
+            test_duration = (datetime.now(timezone.utc) - self.test_start_time) / timedelta(microseconds=1)
             self.runner_hook.step_success(logger=None, logs=None, duration=step_duration, request=None)
 
         # TODO: this check could easily be annoying when doing dev. flag it somehow? Ditto with the in-order check
@@ -1028,6 +1153,18 @@ class MatterBaseTest(base_test.BaseTestClass):
             asserts.fail("Test script error: Not all required steps were run")
 
         if self.runner_hook and not self.is_commissioning:
+            self.runner_hook.test_stop(exception=None, duration=test_duration)
+
+    def on_skip(self, record):
+        ''' Called by Mobly on test skip
+
+            record is of type TestResultRecord
+        '''
+        if self.runner_hook and not self.is_commissioning:
+            test_duration = (datetime.now(timezone.utc) - self.test_start_time) / timedelta(microseconds=1)
+            test_name = self.current_test_info.name
+            filename = inspect.getfile(self.__class__)
+            self.runner_hook.test_skipped(filename, test_name)
             self.runner_hook.test_stop(exception=None, duration=test_duration)
 
     def pics_guard(self, pics_condition: bool):
@@ -1052,7 +1189,7 @@ class MatterBaseTest(base_test.BaseTestClass):
             steps = self.get_test_steps(self.current_test_info.name)
             if self.current_step_index == 0:
                 asserts.fail("Script error: mark_current_step_skipped cannot be called before step()")
-            num = steps[self.current_step_index-1].test_plan_number
+            num = steps[self.current_step_index - 1].test_plan_number
         except KeyError:
             num = self.current_step_index
 
@@ -1588,6 +1725,12 @@ def parse_matter_test_args(argv: Optional[List[str]] = None) -> MatterTestConfig
     return convert_args_to_matter_config(parser.parse_known_args(argv)[0])
 
 
+def _async_runner(body, self: MatterBaseTest, *args, **kwargs):
+    timeout = self.matter_test_config.timeout if self.matter_test_config.timeout is not None else self.default_timeout
+    runner_with_timeout = asyncio.wait_for(body(self, *args, **kwargs), timeout=timeout)
+    return asyncio.run(runner_with_timeout)
+
+
 def async_test_body(body):
     """Decorator required to be applied whenever a `test_*` method is `async def`.
 
@@ -1597,11 +1740,194 @@ def async_test_body(body):
     """
 
     def async_runner(self: MatterBaseTest, *args, **kwargs):
-        timeout = self.matter_test_config.timeout if self.matter_test_config.timeout is not None else self.default_timeout
-        runner_with_timeout = asyncio.wait_for(body(self, *args, **kwargs), timeout=timeout)
-        return asyncio.run(runner_with_timeout)
+        return _async_runner(body, self, *args, **kwargs)
 
     return async_runner
+
+
+def per_node_test(body):
+    """ Decorator to be used for PICS-free tests that apply to the entire node.
+
+    Use this decorator when your script needs to be run once to validate the whole node.
+    To use this decorator, the test must NOT have an associated pics_ method.
+    """
+
+    def whole_node_runner(self: MatterBaseTest, *args, **kwargs):
+        asserts.assert_false(self.get_test_pics(self.current_test_info.name), "pics_ method supplied for per_node_test.")
+        return _async_runner(body, self, *args, **kwargs)
+
+    return whole_node_runner
+
+
+EndpointCheckFunction = typing.Callable[[Clusters.Attribute.AsyncReadTransaction.ReadResponse, int], bool]
+
+
+def _has_cluster(wildcard, endpoint, cluster: ClusterObjects.Cluster) -> bool:
+    try:
+        return cluster in wildcard.attributes[endpoint]
+    except KeyError:
+        return False
+
+
+def has_cluster(cluster: ClusterObjects.ClusterObjectDescriptor) -> EndpointCheckFunction:
+    """ EndpointCheckFunction that can be passed as a parameter to the per_endpoint_test decorator.
+
+        Use this function with the per_endpoint_test decorator to run this test on all endpoints with
+        the specified cluster. For example, given a device with the following conformance
+
+        EP0: cluster A, B, C
+        EP1: cluster D, E
+        EP2, cluster D
+        EP3, cluster E
+
+        And the following test specification:
+        @per_endpoint_test(has_cluster(Clusters.D))
+        test_mytest(self):
+            ...
+
+        The test would be run on endpoint 1 and on endpoint 2.
+
+        If the cluster is not found on any endpoint the decorator will call the on_skip function to
+        notify the test harness that the test is not applicable to this node and the test will not be run.
+    """
+    return partial(_has_cluster, cluster=cluster)
+
+
+def _has_attribute(wildcard, endpoint, attribute: ClusterObjects.ClusterAttributeDescriptor) -> bool:
+    cluster = getattr(Clusters, attribute.__qualname__.split('.')[-3])
+    try:
+        attr_list = wildcard.attributes[endpoint][cluster][cluster.Attributes.AttributeList]
+        return attribute.attribute_id in attr_list
+    except KeyError:
+        return False
+
+
+def has_attribute(attribute: ClusterObjects.ClusterAttributeDescriptor) -> EndpointCheckFunction:
+    """ EndpointCheckFunction that can be passed as a parameter to the per_endpoint_test decorator.
+
+        Use this function with the per_endpoint_test decorator to run this test on all endpoints with
+        the specified attribute. For example, given a device with the following conformance
+
+        EP0: cluster A, B, C
+        EP1: cluster D with attribute d, E
+        EP2, cluster D with attribute d
+        EP3, cluster D without attribute d
+
+        And the following test specification:
+        @per_endpoint_test(has_attribute(Clusters.D.Attributes.d))
+        test_mytest(self):
+            ...
+
+        The test would be run on endpoint 1 and on endpoint 2.
+
+        If the cluster is not found on any endpoint the decorator will call the on_skip function to
+        notify the test harness that the test is not applicable to this node and the test will not be run.
+    """
+    return partial(_has_attribute, attribute=attribute)
+
+
+def _has_feature(wildcard, endpoint, cluster: ClusterObjects.ClusterObjectDescriptor, feature: IntFlag) -> bool:
+    try:
+        feature_map = wildcard.attributes[endpoint][cluster][cluster.Attributes.FeatureMap]
+        return (feature & feature_map) != 0
+    except KeyError:
+        return False
+
+
+def has_feature(cluster: ClusterObjects.ClusterObjectDescriptor, feature: IntFlag) -> EndpointCheckFunction:
+    """ EndpointCheckFunction that can be passed as a parameter to the per_endpoint_test decorator.
+
+        Use this function with the per_endpoint_test decorator to run this test on all endpoints with
+        the specified feature. For example, given a device with the following conformance
+
+        EP0: cluster A, B, C
+        EP1: cluster D with feature F0
+        EP2, cluster D with feature F0
+        EP3, cluster D without feature F0
+
+        And the following test specification:
+        @per_endpoint_test(has_feature(Clusters.D.Bitmaps.Feature.F0))
+        test_mytest(self):
+            ...
+
+        The test would be run on endpoint 1 and on endpoint 2.
+
+        If the cluster is not found on any endpoint the decorator will call the on_skip function to
+        notify the test harness that the test is not applicable to this node and the test will not be run.
+    """
+    return partial(_has_feature, cluster=cluster, feature=feature)
+
+
+async def get_accepted_endpoints_for_test(self: MatterBaseTest, accept_function: EndpointCheckFunction) -> list[uint]:
+    """ Helper function for the per_endpoint_test decorator.
+
+        Returns a list of endpoints on which the test should be run given the accept_function for the test.
+    """
+    wildcard = await self.default_controller.Read(self.dut_node_id, [()])
+    return [e for e in wildcard.attributes.keys() if accept_function(wildcard, e)]
+
+
+def per_endpoint_test(accept_function: EndpointCheckFunction):
+    """ Test decorator for a test that needs to be run once per endpoint that meets the accept_function criteria.
+
+        Place this decorator above the test_ method to have the test framework run this test once per endpoint.
+        This decorator takes an EndpointCheckFunction to assess whether a test needs to be run on a particular
+        endpoint.
+
+        For example, given the following device conformance:
+
+        EP0: cluster A, B, C
+        EP1: cluster D, E
+        EP2, cluster D
+        EP3, cluster E
+
+        And the following test specification:
+        @per_endpoint_test(has_cluster(Clusters.D))
+        test_mytest(self):
+            ...
+
+        The test would be run on endpoint 1 and on endpoint 2.
+
+        If the cluster is not found on any endpoint the decorator will call the on_skip function to
+        notify the test harness that the test is not applicable to this node and the test will not be run.
+
+        The decorator works by setting the self.matter_test_config.endpoint value and running the test function.
+        Therefore, tests that make use of this decorator should call controller functions against that endpoint.
+        Support functions in this file default to this endpoint.
+
+        Tests that use this decorator cannot use a pics_ method for test selection and should not reference any
+        PICS values internally.
+    """
+    def per_endpoint_test_internal(body):
+        def per_endpoint_runner(self: MatterBaseTest, *args, **kwargs):
+            asserts.assert_false(self.get_test_pics(self.current_test_info.name), "pics_ method supplied for per_endpoint_test.")
+            runner_with_timeout = asyncio.wait_for(get_accepted_endpoints_for_test(self, accept_function), timeout=30)
+            endpoints = asyncio.run(runner_with_timeout)
+            if not endpoints:
+                logging.info("No matching endpoints found - skipping test")
+                asserts.skip('No endpoints match requirements')
+                return
+            logging.info(f"Running test on the following endpoints: {endpoints}")
+            # setup_class is meant to be called once, but setup_test is expected to be run before
+            # each iteration. Mobly will run it for us the first time, but since we're running this
+            # more than one time, we want to make sure we reset everything as expected.
+            # Ditto for teardown - we want to tear down after each iteration, and we want to notify the hook that
+            # the test iteration is stopped. test_stop is called by on_pass or on_fail during the last iteration or
+            # on failure.
+            original_ep = self.matter_test_config.endpoint
+            for e in endpoints:
+                logging.info(f'Running test on endpoint {e}')
+                if e != endpoints[0]:
+                    self.setup_test()
+                self.matter_test_config.endpoint = e
+                _async_runner(body, self, *args, **kwargs)
+                if e != endpoints[-1] and not self.failed:
+                    self.teardown_test()
+                    test_duration = (datetime.now(timezone.utc) - self.test_start_time) / timedelta(microseconds=1)
+                    self.runner_hook.test_stop(exception=None, duration=test_duration)
+            self.matter_test_config.endpoint = original_ep
+        return per_endpoint_runner
+    return per_endpoint_test_internal
 
 
 class CommissionDeviceTest(MatterBaseTest):
