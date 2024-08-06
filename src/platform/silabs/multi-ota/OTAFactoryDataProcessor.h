@@ -22,8 +22,8 @@
 #include <lib/support/ScopedBuffer.h>
 #include <lib/support/Span.h>
 #include <platform/silabs/multi-ota/OTATlvProcessor.h>
-#include <provision/ProvisionStorage.h>        // nogncheck
-#include <provision/ProvisionStorageGeneric.h> // nogncheck
+#include <ProvisionStorage.h>
+#include <ProvisionManager.h>
 
 namespace chip {
 
