@@ -57,7 +57,7 @@ Instance::Instance(Delegate * aDelegate, EndpointId aEndpointId, BitMask<Feature
 Instance::~Instance()
 {
     CommandHandlerInterfaceRegistry::UnregisterCommandHandler(this);
-    unregisterAttributeAccessOverride(this);
+    chip::app::AttributeAccessInterfaceRegistry::Instance().Unregister(this);
 }
 
 CHIP_ERROR Instance::Init()
@@ -70,7 +70,7 @@ CHIP_ERROR Instance::Init()
 
     ReturnErrorOnFailure(CommandHandlerInterfaceRegistry::RegisterCommandHandler(this));
 
-    VerifyOrReturnError(registerAttributeAccessOverride(this), CHIP_ERROR_INCORRECT_STATE);
+    VerifyOrReturnError(chip::app::AttributeAccessInterfaceRegistry::Instance().Register(this), CHIP_ERROR_INCORRECT_STATE);
 
     return mDelegate->Init();
 }

@@ -391,5 +391,5 @@ chip::app::Clusters::EcosystemInformation::AttrAccess gAttrAccess;
 
 void MatterEcosystemInformationPluginServerInitCallback()
 {
-    registerAttributeAccessOverride(&gAttrAccess);
+    chip::app::AttributeAccessInterfaceRegistry::Instance().Register(&gAttrAccess);
 }

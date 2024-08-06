@@ -341,7 +341,7 @@ CHIP_ERROR ServerInstance::Init()
 {
     ReturnErrorCodeIf(!mDelegate, CHIP_ERROR_INVALID_ARGUMENT);
     ReturnErrorOnFailure(CommandHandlerInterfaceRegistry::RegisterCommandHandler(this));
-    VerifyOrReturnError(registerAttributeAccessOverride(this), CHIP_ERROR_INCORRECT_STATE);
+    VerifyOrReturnError(chip::app::AttributeAccessInterfaceRegistry::Instance().Register(this), CHIP_ERROR_INCORRECT_STATE);
     ReturnErrorOnFailure(DeviceLayer::PlatformMgrImpl().AddEventHandler(OnPlatformEventHandler, reinterpret_cast<intptr_t>(this)));
     return mDelegate->Init(this);
 }
