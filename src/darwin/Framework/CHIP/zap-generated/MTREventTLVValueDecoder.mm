@@ -304,6 +304,73 @@ static id _Nullable DecodeEventPayloadForAccessControlCluster(EventId aEventId, 
 
         return value;
     }
+    case Events::AccessRestrictionEntryChanged::Id: {
+        Events::AccessRestrictionEntryChanged::DecodableType cppValue;
+        *aError = DataModel::Decode(aReader, cppValue);
+        if (*aError != CHIP_NO_ERROR) {
+            return nil;
+        }
+
+        __auto_type * value = [MTRAccessControlClusterAccessRestrictionEntryChangedEvent new];
+
+        do {
+            NSNumber * _Nonnull memberValue;
+            memberValue = [NSNumber numberWithUnsignedChar:cppValue.fabricIndex];
+            value.fabricIndex = memberValue;
+        } while (0);
+
+        return value;
+    }
+    case Events::FabricRestrictionReviewUpdate::Id: {
+        Events::FabricRestrictionReviewUpdate::DecodableType cppValue;
+        *aError = DataModel::Decode(aReader, cppValue);
+        if (*aError != CHIP_NO_ERROR) {
+            return nil;
+        }
+
+        __auto_type * value = [MTRAccessControlClusterFabricRestrictionReviewUpdateEvent new];
+
+        do {
+            NSNumber * _Nonnull memberValue;
+            memberValue = [NSNumber numberWithUnsignedLongLong:cppValue.token];
+            value.token = memberValue;
+        } while (0);
+        do {
+            NSString * _Nullable memberValue;
+            if (cppValue.instruction.IsNull()) {
+                memberValue = nil;
+            } else {
+                memberValue = AsString(cppValue.instruction.Value());
+                if (memberValue == nil) {
+                    CHIP_ERROR err = CHIP_ERROR_INVALID_ARGUMENT;
+                    *aError = err;
+                    return nil;
+                }
+            }
+            value.instruction = memberValue;
+        } while (0);
+        do {
+            NSString * _Nullable memberValue;
+            if (cppValue.redirectURL.IsNull()) {
+                memberValue = nil;
+            } else {
+                memberValue = AsString(cppValue.redirectURL.Value());
+                if (memberValue == nil) {
+                    CHIP_ERROR err = CHIP_ERROR_INVALID_ARGUMENT;
+                    *aError = err;
+                    return nil;
+                }
+            }
+            value.redirectURL = memberValue;
+        } while (0);
+        do {
+            NSNumber * _Nonnull memberValue;
+            memberValue = [NSNumber numberWithUnsignedChar:cppValue.fabricIndex];
+            value.fabricIndex = memberValue;
+        } while (0);
+
+        return value;
+    }
     default: {
         break;
     }
@@ -4570,6 +4637,11 @@ static id _Nullable DecodeEventPayloadForUnitTestingCluster(EventId aEventId, TL
             memberValue.f = [NSNumber numberWithUnsignedChar:cppValue.arg4.f.Raw()];
             memberValue.g = [NSNumber numberWithFloat:cppValue.arg4.g];
             memberValue.h = [NSNumber numberWithDouble:cppValue.arg4.h];
+            if (cppValue.arg4.i.HasValue()) {
+                memberValue.i = [NSNumber numberWithUnsignedChar:chip::to_underlying(cppValue.arg4.i.Value())];
+            } else {
+                memberValue.i = nil;
+            }
             value.arg4 = memberValue;
         } while (0);
         do {
@@ -4594,6 +4666,11 @@ static id _Nullable DecodeEventPayloadForUnitTestingCluster(EventId aEventId, TL
                     newElement_0.f = [NSNumber numberWithUnsignedChar:entry_0.f.Raw()];
                     newElement_0.g = [NSNumber numberWithFloat:entry_0.g];
                     newElement_0.h = [NSNumber numberWithDouble:entry_0.h];
+                    if (entry_0.i.HasValue()) {
+                        newElement_0.i = [NSNumber numberWithUnsignedChar:chip::to_underlying(entry_0.i.Value())];
+                    } else {
+                        newElement_0.i = nil;
+                    }
                     [array_0 addObject:newElement_0];
                 }
                 CHIP_ERROR err = iter_0.GetStatus();

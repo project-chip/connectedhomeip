@@ -52,6 +52,69 @@ NS_ASSUME_NONNULL_BEGIN
 
 @end
 
+@implementation MTRDataTypeLocationDescriptorStruct
+- (instancetype)init
+{
+    if (self = [super init]) {
+
+        _locationName = @"";
+
+        _floorNumber = nil;
+
+        _areaType = nil;
+    }
+    return self;
+}
+
+- (id)copyWithZone:(NSZone * _Nullable)zone
+{
+    auto other = [[MTRDataTypeLocationDescriptorStruct alloc] init];
+
+    other.locationName = self.locationName;
+    other.floorNumber = self.floorNumber;
+    other.areaType = self.areaType;
+
+    return other;
+}
+
+- (NSString *)description
+{
+    NSString * descriptionString = [NSString stringWithFormat:@"<%@: locationName:%@; floorNumber:%@; areaType:%@; >", NSStringFromClass([self class]), _locationName, _floorNumber, _areaType];
+    return descriptionString;
+}
+
+@end
+
+@implementation MTRDataTypeAtomicAttributeStatusStruct
+- (instancetype)init
+{
+    if (self = [super init]) {
+
+        _attributeID = @(0);
+
+        _statusCode = @(0);
+    }
+    return self;
+}
+
+- (id)copyWithZone:(NSZone * _Nullable)zone
+{
+    auto other = [[MTRDataTypeAtomicAttributeStatusStruct alloc] init];
+
+    other.attributeID = self.attributeID;
+    other.statusCode = self.statusCode;
+
+    return other;
+}
+
+- (NSString *)description
+{
+    NSString * descriptionString = [NSString stringWithFormat:@"<%@: attributeID:%@; statusCode:%@; >", NSStringFromClass([self class]), _attributeID, _statusCode];
+    return descriptionString;
+}
+
+@end
+
 @implementation MTRDescriptorClusterDeviceTypeStruct
 - (instancetype)init
 {
@@ -166,6 +229,105 @@ NS_ASSUME_NONNULL_BEGIN
 - (NSString *)description
 {
     NSString * descriptionString = [NSString stringWithFormat:@"<%@: node:%@; group:%@; endpoint:%@; cluster:%@; fabricIndex:%@; >", NSStringFromClass([self class]), _node, _group, _endpoint, _cluster, _fabricIndex];
+    return descriptionString;
+}
+
+@end
+
+@implementation MTRAccessControlClusterAccessRestrictionStruct
+- (instancetype)init
+{
+    if (self = [super init]) {
+
+        _type = @(0);
+
+        _id = nil;
+    }
+    return self;
+}
+
+- (id)copyWithZone:(NSZone * _Nullable)zone
+{
+    auto other = [[MTRAccessControlClusterAccessRestrictionStruct alloc] init];
+
+    other.type = self.type;
+    other.id = self.id;
+
+    return other;
+}
+
+- (NSString *)description
+{
+    NSString * descriptionString = [NSString stringWithFormat:@"<%@: type:%@; id:%@; >", NSStringFromClass([self class]), _type, _id];
+    return descriptionString;
+}
+
+@end
+
+@implementation MTRAccessControlClusterCommissioningAccessRestrictionEntryStruct
+- (instancetype)init
+{
+    if (self = [super init]) {
+
+        _endpoint = @(0);
+
+        _cluster = @(0);
+
+        _restrictions = [NSArray array];
+    }
+    return self;
+}
+
+- (id)copyWithZone:(NSZone * _Nullable)zone
+{
+    auto other = [[MTRAccessControlClusterCommissioningAccessRestrictionEntryStruct alloc] init];
+
+    other.endpoint = self.endpoint;
+    other.cluster = self.cluster;
+    other.restrictions = self.restrictions;
+
+    return other;
+}
+
+- (NSString *)description
+{
+    NSString * descriptionString = [NSString stringWithFormat:@"<%@: endpoint:%@; cluster:%@; restrictions:%@; >", NSStringFromClass([self class]), _endpoint, _cluster, _restrictions];
+    return descriptionString;
+}
+
+@end
+
+@implementation MTRAccessControlClusterAccessRestrictionEntryStruct
+- (instancetype)init
+{
+    if (self = [super init]) {
+
+        _endpoint = @(0);
+
+        _cluster = @(0);
+
+        _restrictions = [NSArray array];
+
+        _fabricIndex = @(0);
+    }
+    return self;
+}
+
+- (id)copyWithZone:(NSZone * _Nullable)zone
+{
+    auto other = [[MTRAccessControlClusterAccessRestrictionEntryStruct alloc] init];
+
+    other.endpoint = self.endpoint;
+    other.cluster = self.cluster;
+    other.restrictions = self.restrictions;
+    other.fabricIndex = self.fabricIndex;
+
+    return other;
+}
+
+- (NSString *)description
+{
+    NSString * descriptionString = [NSString stringWithFormat:@"<%@: endpoint:%@; cluster:%@; restrictions:%@; fabricIndex:%@; >", NSStringFromClass([self class]), _endpoint, _cluster, _restrictions, _fabricIndex];
     return descriptionString;
 }
 
@@ -365,6 +527,69 @@ NS_ASSUME_NONNULL_BEGIN
 - (NSString *)description
 {
     NSString * descriptionString = [NSString stringWithFormat:@"<%@: adminNodeID:%@; adminPasscodeID:%@; changeType:%@; latestValue:%@; fabricIndex:%@; >", NSStringFromClass([self class]), _adminNodeID, _adminPasscodeID, _changeType, _latestValue, _fabricIndex];
+    return descriptionString;
+}
+
+@end
+
+@implementation MTRAccessControlClusterAccessRestrictionEntryChangedEvent
+- (instancetype)init
+{
+    if (self = [super init]) {
+
+        _fabricIndex = @(0);
+    }
+    return self;
+}
+
+- (id)copyWithZone:(NSZone * _Nullable)zone
+{
+    auto other = [[MTRAccessControlClusterAccessRestrictionEntryChangedEvent alloc] init];
+
+    other.fabricIndex = self.fabricIndex;
+
+    return other;
+}
+
+- (NSString *)description
+{
+    NSString * descriptionString = [NSString stringWithFormat:@"<%@: fabricIndex:%@; >", NSStringFromClass([self class]), _fabricIndex];
+    return descriptionString;
+}
+
+@end
+
+@implementation MTRAccessControlClusterFabricRestrictionReviewUpdateEvent
+- (instancetype)init
+{
+    if (self = [super init]) {
+
+        _token = @(0);
+
+        _instruction = nil;
+
+        _redirectURL = nil;
+
+        _fabricIndex = @(0);
+    }
+    return self;
+}
+
+- (id)copyWithZone:(NSZone * _Nullable)zone
+{
+    auto other = [[MTRAccessControlClusterFabricRestrictionReviewUpdateEvent alloc] init];
+
+    other.token = self.token;
+    other.instruction = self.instruction;
+    other.redirectURL = self.redirectURL;
+    other.fabricIndex = self.fabricIndex;
+
+    return other;
+}
+
+- (NSString *)description
+{
+    NSString * descriptionString = [NSString stringWithFormat:@"<%@: token:%@; instruction:%@; redirectURL:%@; fabricIndex:%@; >", NSStringFromClass([self class]), _token, _instruction, _redirectURL, _fabricIndex];
     return descriptionString;
 }
 
@@ -6415,40 +6640,7 @@ NS_ASSUME_NONNULL_BEGIN
 
 @end
 
-@implementation MTRServiceAreaClusterLocationDescriptorStruct
-- (instancetype)init
-{
-    if (self = [super init]) {
-
-        _locationName = @"";
-
-        _floorNumber = nil;
-
-        _areaType = nil;
-    }
-    return self;
-}
-
-- (id)copyWithZone:(NSZone * _Nullable)zone
-{
-    auto other = [[MTRServiceAreaClusterLocationDescriptorStruct alloc] init];
-
-    other.locationName = self.locationName;
-    other.floorNumber = self.floorNumber;
-    other.areaType = self.areaType;
-
-    return other;
-}
-
-- (NSString *)description
-{
-    NSString * descriptionString = [NSString stringWithFormat:@"<%@: locationName:%@; floorNumber:%@; areaType:%@; >", NSStringFromClass([self class]), _locationName, _floorNumber, _areaType];
-    return descriptionString;
-}
-
-@end
-
-@implementation MTRServiceAreaClusterLocationInfoStruct
+@implementation MTRServiceAreaClusterAreaInfoStruct
 - (instancetype)init
 {
     if (self = [super init]) {
@@ -6466,7 +6658,7 @@ NS_ASSUME_NONNULL_BEGIN
 
 - (id)copyWithZone:(NSZone * _Nullable)zone
 {
-    auto other = [[MTRServiceAreaClusterLocationInfoStruct alloc] init];
+    auto other = [[MTRServiceAreaClusterAreaInfoStruct alloc] init];
 
     other.locationInfo = self.locationInfo;
     other.landmarkTag = self.landmarkTag;
@@ -6484,34 +6676,34 @@ NS_ASSUME_NONNULL_BEGIN
 
 @end
 
-@implementation MTRServiceAreaClusterLocationStruct
+@implementation MTRServiceAreaClusterAreaStruct
 - (instancetype)init
 {
     if (self = [super init]) {
 
-        _locationID = @(0);
+        _areaID = @(0);
 
         _mapID = nil;
 
-        _locationInfo = [MTRServiceAreaClusterLocationInfoStruct new];
+        _areaDesc = [MTRServiceAreaClusterAreaInfoStruct new];
     }
     return self;
 }
 
 - (id)copyWithZone:(NSZone * _Nullable)zone
 {
-    auto other = [[MTRServiceAreaClusterLocationStruct alloc] init];
+    auto other = [[MTRServiceAreaClusterAreaStruct alloc] init];
 
-    other.locationID = self.locationID;
+    other.areaID = self.areaID;
     other.mapID = self.mapID;
-    other.locationInfo = self.locationInfo;
+    other.areaDesc = self.areaDesc;
 
     return other;
 }
 
 - (NSString *)description
 {
-    NSString * descriptionString = [NSString stringWithFormat:@"<%@: locationID:%@; mapID:%@; locationInfo:%@; >", NSStringFromClass([self class]), _locationID, _mapID, _locationInfo];
+    NSString * descriptionString = [NSString stringWithFormat:@"<%@: areaID:%@; mapID:%@; areaDesc:%@; >", NSStringFromClass([self class]), _areaID, _mapID, _areaDesc];
     return descriptionString;
 }
 
@@ -6552,7 +6744,7 @@ NS_ASSUME_NONNULL_BEGIN
 {
     if (self = [super init]) {
 
-        _locationID = @(0);
+        _areaID = @(0);
 
         _status = @(0);
 
@@ -6567,7 +6759,7 @@ NS_ASSUME_NONNULL_BEGIN
 {
     auto other = [[MTRServiceAreaClusterProgressStruct alloc] init];
 
-    other.locationID = self.locationID;
+    other.areaID = self.areaID;
     other.status = self.status;
     other.totalOperationalTime = self.totalOperationalTime;
     other.estimatedTime = self.estimatedTime;
@@ -6577,7 +6769,7 @@ NS_ASSUME_NONNULL_BEGIN
 
 - (NSString *)description
 {
-    NSString * descriptionString = [NSString stringWithFormat:@"<%@: locationID:%@; status:%@; totalOperationalTime:%@; estimatedTime:%@; >", NSStringFromClass([self class]), _locationID, _status, _totalOperationalTime, _estimatedTime];
+    NSString * descriptionString = [NSString stringWithFormat:@"<%@: areaID:%@; status:%@; totalOperationalTime:%@; estimatedTime:%@; >", NSStringFromClass([self class]), _areaID, _status, _totalOperationalTime, _estimatedTime];
     return descriptionString;
 }
 
@@ -8460,75 +8652,6 @@ NS_ASSUME_NONNULL_BEGIN
 
 @end
 
-@implementation MTREcosystemInformationClusterLocationDescriptorStruct
-- (instancetype)init
-{
-    if (self = [super init]) {
-
-        _locationName = @"";
-
-        _floorNumber = nil;
-
-        _areaType = nil;
-    }
-    return self;
-}
-
-- (id)copyWithZone:(NSZone * _Nullable)zone
-{
-    auto other = [[MTREcosystemInformationClusterLocationDescriptorStruct alloc] init];
-
-    other.locationName = self.locationName;
-    other.floorNumber = self.floorNumber;
-    other.areaType = self.areaType;
-
-    return other;
-}
-
-- (NSString *)description
-{
-    NSString * descriptionString = [NSString stringWithFormat:@"<%@: locationName:%@; floorNumber:%@; areaType:%@; >", NSStringFromClass([self class]), _locationName, _floorNumber, _areaType];
-    return descriptionString;
-}
-
-@end
-
-@implementation MTREcosystemInformationClusterEcosystemLocationStruct
-- (instancetype)init
-{
-    if (self = [super init]) {
-
-        _uniqueLocationID = @"";
-
-        _locationDescriptor = [MTREcosystemInformationClusterLocationDescriptorStruct new];
-
-        _locationDescriptorLastEdit = @(0);
-
-        _fabricIndex = @(0);
-    }
-    return self;
-}
-
-- (id)copyWithZone:(NSZone * _Nullable)zone
-{
-    auto other = [[MTREcosystemInformationClusterEcosystemLocationStruct alloc] init];
-
-    other.uniqueLocationID = self.uniqueLocationID;
-    other.locationDescriptor = self.locationDescriptor;
-    other.locationDescriptorLastEdit = self.locationDescriptorLastEdit;
-    other.fabricIndex = self.fabricIndex;
-
-    return other;
-}
-
-- (NSString *)description
-{
-    NSString * descriptionString = [NSString stringWithFormat:@"<%@: uniqueLocationID:%@; locationDescriptor:%@; locationDescriptorLastEdit:%@; fabricIndex:%@; >", NSStringFromClass([self class]), _uniqueLocationID, _locationDescriptor, _locationDescriptorLastEdit, _fabricIndex];
-    return descriptionString;
-}
-
-@end
-
 @implementation MTREcosystemInformationClusterDeviceTypeStruct
 - (instancetype)init
 {
@@ -8607,6 +8730,42 @@ NS_ASSUME_NONNULL_BEGIN
 
 @end
 
+@implementation MTREcosystemInformationClusterEcosystemLocationStruct
+- (instancetype)init
+{
+    if (self = [super init]) {
+
+        _uniqueLocationID = @"";
+
+        _locationDescriptor = [MTRDataTypeLocationDescriptorStruct new];
+
+        _locationDescriptorLastEdit = @(0);
+
+        _fabricIndex = @(0);
+    }
+    return self;
+}
+
+- (id)copyWithZone:(NSZone * _Nullable)zone
+{
+    auto other = [[MTREcosystemInformationClusterEcosystemLocationStruct alloc] init];
+
+    other.uniqueLocationID = self.uniqueLocationID;
+    other.locationDescriptor = self.locationDescriptor;
+    other.locationDescriptorLastEdit = self.locationDescriptorLastEdit;
+    other.fabricIndex = self.fabricIndex;
+
+    return other;
+}
+
+- (NSString *)description
+{
+    NSString * descriptionString = [NSString stringWithFormat:@"<%@: uniqueLocationID:%@; locationDescriptor:%@; locationDescriptorLastEdit:%@; fabricIndex:%@; >", NSStringFromClass([self class]), _uniqueLocationID, _locationDescriptor, _locationDescriptorLastEdit, _fabricIndex];
+    return descriptionString;
+}
+
+@end
+
 @implementation MTRCommissionerControlClusterCommissioningRequestResultEvent
 - (instancetype)init
 {
@@ -8663,6 +8822,8 @@ NS_ASSUME_NONNULL_BEGIN
         _g = @(0);
 
         _h = @(0);
+
+        _i = nil;
     }
     return self;
 }
@@ -8679,13 +8840,14 @@ NS_ASSUME_NONNULL_BEGIN
     other.f = self.f;
     other.g = self.g;
     other.h = self.h;
+    other.i = self.i;
 
     return other;
 }
 
 - (NSString *)description
 {
-    NSString * descriptionString = [NSString stringWithFormat:@"<%@: a:%@; b:%@; c:%@; d:%@; e:%@; f:%@; g:%@; h:%@; >", NSStringFromClass([self class]), _a, _b, _c, [_d base64EncodedStringWithOptions:0], _e, _f, _g, _h];
+    NSString * descriptionString = [NSString stringWithFormat:@"<%@: a:%@; b:%@; c:%@; d:%@; e:%@; f:%@; g:%@; h:%@; i:%@; >", NSStringFromClass([self class]), _a, _b, _c, [_d base64EncodedStringWithOptions:0], _e, _f, _g, _h, _i];
     return descriptionString;
 }
 
@@ -8846,6 +9008,8 @@ NS_ASSUME_NONNULL_BEGIN
         _b = @(0);
 
         _c = [MTRUnitTestingClusterSimpleStruct new];
+
+        _d = nil;
     }
     return self;
 }
@@ -8857,13 +9021,14 @@ NS_ASSUME_NONNULL_BEGIN
     other.a = self.a;
     other.b = self.b;
     other.c = self.c;
+    other.d = self.d;
 
     return other;
 }
 
 - (NSString *)description
 {
-    NSString * descriptionString = [NSString stringWithFormat:@"<%@: a:%@; b:%@; c:%@; >", NSStringFromClass([self class]), _a, _b, _c];
+    NSString * descriptionString = [NSString stringWithFormat:@"<%@: a:%@; b:%@; c:%@; d:%@; >", NSStringFromClass([self class]), _a, _b, _c, _d];
     return descriptionString;
 }
 

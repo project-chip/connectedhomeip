@@ -504,6 +504,14 @@ namespace AccessControlEntriesPerFabric {
 static constexpr AttributeId Id = 0x00000004;
 } // namespace AccessControlEntriesPerFabric
 
+namespace CommissioningARL {
+static constexpr AttributeId Id = 0x00000005;
+} // namespace CommissioningARL
+
+namespace Arl {
+static constexpr AttributeId Id = 0x00000006;
+} // namespace Arl
+
 namespace GeneratedCommandList {
 static constexpr AttributeId Id = Globals::Attributes::GeneratedCommandList::Id;
 } // namespace GeneratedCommandList
@@ -1099,6 +1107,22 @@ static constexpr AttributeId Id = 0x00000003;
 namespace SupportsConcurrentConnection {
 static constexpr AttributeId Id = 0x00000004;
 } // namespace SupportsConcurrentConnection
+
+namespace TCAcceptedVersion {
+static constexpr AttributeId Id = 0x00000005;
+} // namespace TCAcceptedVersion
+
+namespace TCMinRequiredVersion {
+static constexpr AttributeId Id = 0x00000006;
+} // namespace TCMinRequiredVersion
+
+namespace TCAcknowledgements {
+static constexpr AttributeId Id = 0x00000007;
+} // namespace TCAcknowledgements
+
+namespace TCAcknowledgementsRequired {
+static constexpr AttributeId Id = 0x00000008;
+} // namespace TCAcknowledgementsRequired
 
 namespace GeneratedCommandList {
 static constexpr AttributeId Id = Globals::Attributes::GeneratedCommandList::Id;
@@ -1869,6 +1893,10 @@ static constexpr AttributeId Id = 0x00000002;
 namespace ProductName {
 static constexpr AttributeId Id = 0x00000003;
 } // namespace ProductName
+
+namespace ProductID {
+static constexpr AttributeId Id = 0x00000004;
+} // namespace ProductID
 
 namespace NodeLabel {
 static constexpr AttributeId Id = 0x00000005;
@@ -4770,21 +4798,21 @@ static constexpr AttributeId Id = Globals::Attributes::ClusterRevision::Id;
 namespace ServiceArea {
 namespace Attributes {
 
-namespace SupportedLocations {
+namespace SupportedAreas {
 static constexpr AttributeId Id = 0x00000000;
-} // namespace SupportedLocations
+} // namespace SupportedAreas
 
 namespace SupportedMaps {
 static constexpr AttributeId Id = 0x00000001;
 } // namespace SupportedMaps
 
-namespace SelectedLocations {
+namespace SelectedAreas {
 static constexpr AttributeId Id = 0x00000002;
-} // namespace SelectedLocations
+} // namespace SelectedAreas
 
-namespace CurrentLocation {
+namespace CurrentArea {
 static constexpr AttributeId Id = 0x00000003;
-} // namespace CurrentLocation
+} // namespace CurrentArea
 
 namespace EstimatedEndTime {
 static constexpr AttributeId Id = 0x00000004;
@@ -5182,16 +5210,8 @@ namespace Schedules {
 static constexpr AttributeId Id = 0x00000051;
 } // namespace Schedules
 
-namespace PresetsSchedulesEditable {
-static constexpr AttributeId Id = 0x00000052;
-} // namespace PresetsSchedulesEditable
-
-namespace TemperatureSetpointHoldPolicy {
-static constexpr AttributeId Id = 0x00000053;
-} // namespace TemperatureSetpointHoldPolicy
-
 namespace SetpointHoldExpiryTimestamp {
-static constexpr AttributeId Id = 0x00000054;
+static constexpr AttributeId Id = 0x00000052;
 } // namespace SetpointHoldExpiryTimestamp
 
 namespace GeneratedCommandList {
@@ -6749,8 +6769,12 @@ namespace WiFiNetworkManagement {
 namespace Attributes {
 
 namespace Ssid {
-static constexpr AttributeId Id = 0x00000001;
+static constexpr AttributeId Id = 0x00000000;
 } // namespace Ssid
+
+namespace PassphraseSurrogate {
+static constexpr AttributeId Id = 0x00000001;
+} // namespace PassphraseSurrogate
 
 namespace GeneratedCommandList {
 static constexpr AttributeId Id = Globals::Attributes::GeneratedCommandList::Id;
@@ -8268,6 +8292,14 @@ namespace ClusterErrorBoolean {
 static constexpr AttributeId Id = 0x00000032;
 } // namespace ClusterErrorBoolean
 
+namespace GlobalEnum {
+static constexpr AttributeId Id = 0x00000033;
+} // namespace GlobalEnum
+
+namespace GlobalStruct {
+static constexpr AttributeId Id = 0x00000034;
+} // namespace GlobalStruct
+
 namespace Unsupported {
 static constexpr AttributeId Id = 0x000000FF;
 } // namespace Unsupported
@@ -8407,6 +8439,14 @@ static constexpr AttributeId Id = 0x00004029;
 namespace WriteOnlyInt8u {
 static constexpr AttributeId Id = 0x0000402A;
 } // namespace WriteOnlyInt8u
+
+namespace NullableGlobalEnum {
+static constexpr AttributeId Id = 0x00004033;
+} // namespace NullableGlobalEnum
+
+namespace NullableGlobalStruct {
+static constexpr AttributeId Id = 0x00004034;
+} // namespace NullableGlobalStruct
 
 namespace GeneratedCommandList {
 static constexpr AttributeId Id = Globals::Attributes::GeneratedCommandList::Id;

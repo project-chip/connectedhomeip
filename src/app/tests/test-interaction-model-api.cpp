@@ -13,18 +13,19 @@
  *    See the License for the specific language governing permissions and
  *    limitations under the License.
  */
+#include "app/data-model-provider/ActionReturnStatus.h"
 #include <app/tests/test-interaction-model-api.h>
 
 #include <app/InteractionModelEngine.h>
 #include <app/MessageDef/AttributeReportIBs.h>
-#include <app/codegen-data-model/Instance.h>
+#include <app/codegen-data-model-provider/Instance.h>
 #include <app/util/basic-types.h>
 #include <app/util/mock/Constants.h>
 #include <app/util/mock/Functions.h>
 #include <lib/core/CHIPCore.h>
 #include <messaging/ReliableMessageContext.h>
 
-using namespace chip::app::InteractionModel;
+using namespace chip::app::DataModel;
 
 namespace chip {
 uint8_t Test::attributeDataTLV[CHIP_CONFIG_DEFAULT_UDP_MTU_SIZE];
@@ -153,7 +154,7 @@ TestImCustomDataModel & TestImCustomDataModel::Instance()
     return model;
 }
 
-CHIP_ERROR TestImCustomDataModel::ReadAttribute(const ReadAttributeRequest & request, AttributeValueEncoder & encoder)
+ActionReturnStatus TestImCustomDataModel::ReadAttribute(const ReadAttributeRequest & request, AttributeValueEncoder & encoder)
 {
     AttributeEncodeState mutableState(&encoder.GetState()); // provide a state copy to start.
 
@@ -167,80 +168,80 @@ CHIP_ERROR TestImCustomDataModel::ReadAttribute(const ReadAttributeRequest & req
     return err;
 }
 
-CHIP_ERROR TestImCustomDataModel::WriteAttribute(const WriteAttributeRequest & request, AttributeValueDecoder & decoder)
+ActionReturnStatus TestImCustomDataModel::WriteAttribute(const WriteAttributeRequest & request, AttributeValueDecoder & decoder)
 {
     return CHIP_ERROR_NOT_IMPLEMENTED;
 }
 
-CHIP_ERROR TestImCustomDataModel::Invoke(const InvokeRequest & request, chip::TLV::TLVReader & input_arguments,
-                                         CommandHandler * handler)
+ActionReturnStatus TestImCustomDataModel::Invoke(const InvokeRequest & request, chip::TLV::TLVReader & input_arguments,
+                                                 CommandHandler * handler)
 {
     return CHIP_ERROR_NOT_IMPLEMENTED;
 }
 
 EndpointId TestImCustomDataModel::FirstEndpoint()
 {
-    return CodegenDataModelInstance()->FirstEndpoint();
+    return CodegenDataModelProviderInstance()->FirstEndpoint();
 }
 
 EndpointId TestImCustomDataModel::NextEndpoint(EndpointId before)
 {
-    return CodegenDataModelInstance()->NextEndpoint(before);
+    return CodegenDataModelProviderInstance()->NextEndpoint(before);
 }
 
 ClusterEntry TestImCustomDataModel::FirstCluster(EndpointId endpoint)
 {
-    return CodegenDataModelInstance()->FirstCluster(endpoint);
+    return CodegenDataModelProviderInstance()->FirstCluster(endpoint);
 }
 
 ClusterEntry TestImCustomDataModel::NextCluster(const ConcreteClusterPath & before)
 {
-    return CodegenDataModelInstance()->NextCluster(before);
+    return CodegenDataModelProviderInstance()->NextCluster(before);
 }
 
 std::optional<ClusterInfo> TestImCustomDataModel::GetClusterInfo(const ConcreteClusterPath & path)
 {
-    return CodegenDataModelInstance()->GetClusterInfo(path);
+    return CodegenDataModelProviderInstance()->GetClusterInfo(path);
 }
 
 AttributeEntry TestImCustomDataModel::FirstAttribute(const ConcreteClusterPath & cluster)
 {
-    return CodegenDataModelInstance()->FirstAttribute(cluster);
+    return CodegenDataModelProviderInstance()->FirstAttribute(cluster);
 }
 
 AttributeEntry TestImCustomDataModel::NextAttribute(const ConcreteAttributePath & before)
 {
-    return CodegenDataModelInstance()->NextAttribute(before);
+    return CodegenDataModelProviderInstance()->NextAttribute(before);
 }
 
 std::optional<AttributeInfo> TestImCustomDataModel::GetAttributeInfo(const ConcreteAttributePath & path)
 {
-    return CodegenDataModelInstance()->GetAttributeInfo(path);
+    return CodegenDataModelProviderInstance()->GetAttributeInfo(path);
 }
 
 CommandEntry TestImCustomDataModel::FirstAcceptedCommand(const ConcreteClusterPath & cluster)
 {
-    return CodegenDataModelInstance()->FirstAcceptedCommand(cluster);
+    return CodegenDataModelProviderInstance()->FirstAcceptedCommand(cluster);
 }
 
 CommandEntry TestImCustomDataModel::NextAcceptedCommand(const ConcreteCommandPath & before)
 {
-    return CodegenDataModelInstance()->NextAcceptedCommand(before);
+    return CodegenDataModelProviderInstance()->NextAcceptedCommand(before);
 }
 
 std::optional<CommandInfo> TestImCustomDataModel::GetAcceptedCommandInfo(const ConcreteCommandPath & path)
 {
-    return CodegenDataModelInstance()->GetAcceptedCommandInfo(path);
+    return CodegenDataModelProviderInstance()->GetAcceptedCommandInfo(path);
 }
 
 ConcreteCommandPath TestImCustomDataModel::FirstGeneratedCommand(const ConcreteClusterPath & cluster)
 {
-    return CodegenDataModelInstance()->FirstGeneratedCommand(cluster);
+    return CodegenDataModelProviderInstance()->FirstGeneratedCommand(cluster);
 }
 
 ConcreteCommandPath TestImCustomDataModel::NextGeneratedCommand(const ConcreteCommandPath & before)
 {
-    return CodegenDataModelInstance()->NextGeneratedCommand(before);
+    return CodegenDataModelProviderInstance()->NextGeneratedCommand(before);
 }
 
 } // namespace app

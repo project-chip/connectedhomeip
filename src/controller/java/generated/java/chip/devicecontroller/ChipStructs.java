@@ -282,6 +282,234 @@ public static class BindingClusterTargetStruct {
     return output.toString();
   }
 }
+public static class AccessControlClusterAccessRestrictionStruct {
+  public Integer type;
+  public @Nullable Long id;
+  private static final long TYPE_ID = 0L;
+  private static final long ID_ID = 1L;
+
+  public AccessControlClusterAccessRestrictionStruct(
+    Integer type,
+    @Nullable Long id
+  ) {
+    this.type = type;
+    this.id = id;
+  }
+
+  public StructType encodeTlv() {
+    ArrayList<StructElement> values = new ArrayList<>();
+    values.add(new StructElement(TYPE_ID, new UIntType(type)));
+    values.add(new StructElement(ID_ID, id != null ? new UIntType(id) : new NullType()));
+
+    return new StructType(values);
+  }
+
+  public static AccessControlClusterAccessRestrictionStruct decodeTlv(BaseTLVType tlvValue) {
+    if (tlvValue == null || tlvValue.type() != TLVType.Struct) {
+      return null;
+    }
+    Integer type = null;
+    @Nullable Long id = null;
+    for (StructElement element: ((StructType)tlvValue).value()) {
+      if (element.contextTagNum() == TYPE_ID) {
+        if (element.value(BaseTLVType.class).type() == TLVType.UInt) {
+          UIntType castingValue = element.value(UIntType.class);
+          type = castingValue.value(Integer.class);
+        }
+      } else if (element.contextTagNum() == ID_ID) {
+        if (element.value(BaseTLVType.class).type() == TLVType.UInt) {
+          UIntType castingValue = element.value(UIntType.class);
+          id = castingValue.value(Long.class);
+        }
+      }
+    }
+    return new AccessControlClusterAccessRestrictionStruct(
+      type,
+      id
+    );
+  }
+
+  @Override
+  public String toString() {
+    StringBuilder output = new StringBuilder();
+    output.append("AccessControlClusterAccessRestrictionStruct {\n");
+    output.append("\ttype: ");
+    output.append(type);
+    output.append("\n");
+    output.append("\tid: ");
+    output.append(id);
+    output.append("\n");
+    output.append("}\n");
+    return output.toString();
+  }
+}
+public static class AccessControlClusterCommissioningAccessRestrictionEntryStruct {
+  public Integer endpoint;
+  public Long cluster;
+  public ArrayList<ChipStructs.AccessControlClusterAccessRestrictionStruct> restrictions;
+  private static final long ENDPOINT_ID = 0L;
+  private static final long CLUSTER_ID = 1L;
+  private static final long RESTRICTIONS_ID = 2L;
+
+  public AccessControlClusterCommissioningAccessRestrictionEntryStruct(
+    Integer endpoint,
+    Long cluster,
+    ArrayList<ChipStructs.AccessControlClusterAccessRestrictionStruct> restrictions
+  ) {
+    this.endpoint = endpoint;
+    this.cluster = cluster;
+    this.restrictions = restrictions;
+  }
+
+  public StructType encodeTlv() {
+    ArrayList<StructElement> values = new ArrayList<>();
+    values.add(new StructElement(ENDPOINT_ID, new UIntType(endpoint)));
+    values.add(new StructElement(CLUSTER_ID, new UIntType(cluster)));
+    values.add(new StructElement(RESTRICTIONS_ID, ArrayType.generateArrayType(restrictions, (elementrestrictions) -> elementrestrictions.encodeTlv())));
+
+    return new StructType(values);
+  }
+
+  public static AccessControlClusterCommissioningAccessRestrictionEntryStruct decodeTlv(BaseTLVType tlvValue) {
+    if (tlvValue == null || tlvValue.type() != TLVType.Struct) {
+      return null;
+    }
+    Integer endpoint = null;
+    Long cluster = null;
+    ArrayList<ChipStructs.AccessControlClusterAccessRestrictionStruct> restrictions = null;
+    for (StructElement element: ((StructType)tlvValue).value()) {
+      if (element.contextTagNum() == ENDPOINT_ID) {
+        if (element.value(BaseTLVType.class).type() == TLVType.UInt) {
+          UIntType castingValue = element.value(UIntType.class);
+          endpoint = castingValue.value(Integer.class);
+        }
+      } else if (element.contextTagNum() == CLUSTER_ID) {
+        if (element.value(BaseTLVType.class).type() == TLVType.UInt) {
+          UIntType castingValue = element.value(UIntType.class);
+          cluster = castingValue.value(Long.class);
+        }
+      } else if (element.contextTagNum() == RESTRICTIONS_ID) {
+        if (element.value(BaseTLVType.class).type() == TLVType.Array) {
+          ArrayType castingValue = element.value(ArrayType.class);
+          restrictions = castingValue.map((elementcastingValue) -> ChipStructs.AccessControlClusterAccessRestrictionStruct.decodeTlv(elementcastingValue));
+        }
+      }
+    }
+    return new AccessControlClusterCommissioningAccessRestrictionEntryStruct(
+      endpoint,
+      cluster,
+      restrictions
+    );
+  }
+
+  @Override
+  public String toString() {
+    StringBuilder output = new StringBuilder();
+    output.append("AccessControlClusterCommissioningAccessRestrictionEntryStruct {\n");
+    output.append("\tendpoint: ");
+    output.append(endpoint);
+    output.append("\n");
+    output.append("\tcluster: ");
+    output.append(cluster);
+    output.append("\n");
+    output.append("\trestrictions: ");
+    output.append(restrictions);
+    output.append("\n");
+    output.append("}\n");
+    return output.toString();
+  }
+}
+public static class AccessControlClusterAccessRestrictionEntryStruct {
+  public Integer endpoint;
+  public Long cluster;
+  public ArrayList<ChipStructs.AccessControlClusterAccessRestrictionStruct> restrictions;
+  public Integer fabricIndex;
+  private static final long ENDPOINT_ID = 0L;
+  private static final long CLUSTER_ID = 1L;
+  private static final long RESTRICTIONS_ID = 2L;
+  private static final long FABRIC_INDEX_ID = 254L;
+
+  public AccessControlClusterAccessRestrictionEntryStruct(
+    Integer endpoint,
+    Long cluster,
+    ArrayList<ChipStructs.AccessControlClusterAccessRestrictionStruct> restrictions,
+    Integer fabricIndex
+  ) {
+    this.endpoint = endpoint;
+    this.cluster = cluster;
+    this.restrictions = restrictions;
+    this.fabricIndex = fabricIndex;
+  }
+
+  public StructType encodeTlv() {
+    ArrayList<StructElement> values = new ArrayList<>();
+    values.add(new StructElement(ENDPOINT_ID, new UIntType(endpoint)));
+    values.add(new StructElement(CLUSTER_ID, new UIntType(cluster)));
+    values.add(new StructElement(RESTRICTIONS_ID, ArrayType.generateArrayType(restrictions, (elementrestrictions) -> elementrestrictions.encodeTlv())));
+    values.add(new StructElement(FABRIC_INDEX_ID, new UIntType(fabricIndex)));
+
+    return new StructType(values);
+  }
+
+  public static AccessControlClusterAccessRestrictionEntryStruct decodeTlv(BaseTLVType tlvValue) {
+    if (tlvValue == null || tlvValue.type() != TLVType.Struct) {
+      return null;
+    }
+    Integer endpoint = null;
+    Long cluster = null;
+    ArrayList<ChipStructs.AccessControlClusterAccessRestrictionStruct> restrictions = null;
+    Integer fabricIndex = null;
+    for (StructElement element: ((StructType)tlvValue).value()) {
+      if (element.contextTagNum() == ENDPOINT_ID) {
+        if (element.value(BaseTLVType.class).type() == TLVType.UInt) {
+          UIntType castingValue = element.value(UIntType.class);
+          endpoint = castingValue.value(Integer.class);
+        }
+      } else if (element.contextTagNum() == CLUSTER_ID) {
+        if (element.value(BaseTLVType.class).type() == TLVType.UInt) {
+          UIntType castingValue = element.value(UIntType.class);
+          cluster = castingValue.value(Long.class);
+        }
+      } else if (element.contextTagNum() == RESTRICTIONS_ID) {
+        if (element.value(BaseTLVType.class).type() == TLVType.Array) {
+          ArrayType castingValue = element.value(ArrayType.class);
+          restrictions = castingValue.map((elementcastingValue) -> ChipStructs.AccessControlClusterAccessRestrictionStruct.decodeTlv(elementcastingValue));
+        }
+      } else if (element.contextTagNum() == FABRIC_INDEX_ID) {
+        if (element.value(BaseTLVType.class).type() == TLVType.UInt) {
+          UIntType castingValue = element.value(UIntType.class);
+          fabricIndex = castingValue.value(Integer.class);
+        }
+      }
+    }
+    return new AccessControlClusterAccessRestrictionEntryStruct(
+      endpoint,
+      cluster,
+      restrictions,
+      fabricIndex
+    );
+  }
+
+  @Override
+  public String toString() {
+    StringBuilder output = new StringBuilder();
+    output.append("AccessControlClusterAccessRestrictionEntryStruct {\n");
+    output.append("\tendpoint: ");
+    output.append(endpoint);
+    output.append("\n");
+    output.append("\tcluster: ");
+    output.append(cluster);
+    output.append("\n");
+    output.append("\trestrictions: ");
+    output.append(restrictions);
+    output.append("\n");
+    output.append("\tfabricIndex: ");
+    output.append(fabricIndex);
+    output.append("\n");
+    output.append("}\n");
+    return output.toString();
+  }
+}
 public static class AccessControlClusterAccessControlTargetStruct {
   public @Nullable Long cluster;
   public @Nullable Integer endpoint;
@@ -8943,6 +9171,325 @@ public static class DoorLockClusterCredentialStruct {
     return output.toString();
   }
 }
+public static class ServiceAreaClusterAreaInfoStruct {
+  public @Nullable ChipStructs.ServiceAreaClusterLocationDescriptorStruct locationInfo;
+  public @Nullable Integer landmarkTag;
+  public @Nullable Integer positionTag;
+  public @Nullable Integer surfaceTag;
+  private static final long LOCATION_INFO_ID = 0L;
+  private static final long LANDMARK_TAG_ID = 1L;
+  private static final long POSITION_TAG_ID = 2L;
+  private static final long SURFACE_TAG_ID = 3L;
+
+  public ServiceAreaClusterAreaInfoStruct(
+    @Nullable ChipStructs.ServiceAreaClusterLocationDescriptorStruct locationInfo,
+    @Nullable Integer landmarkTag,
+    @Nullable Integer positionTag,
+    @Nullable Integer surfaceTag
+  ) {
+    this.locationInfo = locationInfo;
+    this.landmarkTag = landmarkTag;
+    this.positionTag = positionTag;
+    this.surfaceTag = surfaceTag;
+  }
+
+  public StructType encodeTlv() {
+    ArrayList<StructElement> values = new ArrayList<>();
+    values.add(new StructElement(LOCATION_INFO_ID, locationInfo != null ? locationInfo.encodeTlv() : new NullType()));
+    values.add(new StructElement(LANDMARK_TAG_ID, landmarkTag != null ? new UIntType(landmarkTag) : new NullType()));
+    values.add(new StructElement(POSITION_TAG_ID, positionTag != null ? new UIntType(positionTag) : new NullType()));
+    values.add(new StructElement(SURFACE_TAG_ID, surfaceTag != null ? new UIntType(surfaceTag) : new NullType()));
+
+    return new StructType(values);
+  }
+
+  public static ServiceAreaClusterAreaInfoStruct decodeTlv(BaseTLVType tlvValue) {
+    if (tlvValue == null || tlvValue.type() != TLVType.Struct) {
+      return null;
+    }
+    @Nullable ChipStructs.ServiceAreaClusterLocationDescriptorStruct locationInfo = null;
+    @Nullable Integer landmarkTag = null;
+    @Nullable Integer positionTag = null;
+    @Nullable Integer surfaceTag = null;
+    for (StructElement element: ((StructType)tlvValue).value()) {
+      if (element.contextTagNum() == LOCATION_INFO_ID) {
+        if (element.value(BaseTLVType.class).type() == TLVType.Struct) {
+          StructType castingValue = element.value(StructType.class);
+          locationInfo = ChipStructs.ServiceAreaClusterLocationDescriptorStruct.decodeTlv(castingValue);
+        }
+      } else if (element.contextTagNum() == LANDMARK_TAG_ID) {
+        if (element.value(BaseTLVType.class).type() == TLVType.UInt) {
+          UIntType castingValue = element.value(UIntType.class);
+          landmarkTag = castingValue.value(Integer.class);
+        }
+      } else if (element.contextTagNum() == POSITION_TAG_ID) {
+        if (element.value(BaseTLVType.class).type() == TLVType.UInt) {
+          UIntType castingValue = element.value(UIntType.class);
+          positionTag = castingValue.value(Integer.class);
+        }
+      } else if (element.contextTagNum() == SURFACE_TAG_ID) {
+        if (element.value(BaseTLVType.class).type() == TLVType.UInt) {
+          UIntType castingValue = element.value(UIntType.class);
+          surfaceTag = castingValue.value(Integer.class);
+        }
+      }
+    }
+    return new ServiceAreaClusterAreaInfoStruct(
+      locationInfo,
+      landmarkTag,
+      positionTag,
+      surfaceTag
+    );
+  }
+
+  @Override
+  public String toString() {
+    StringBuilder output = new StringBuilder();
+    output.append("ServiceAreaClusterAreaInfoStruct {\n");
+    output.append("\tlocationInfo: ");
+    output.append(locationInfo);
+    output.append("\n");
+    output.append("\tlandmarkTag: ");
+    output.append(landmarkTag);
+    output.append("\n");
+    output.append("\tpositionTag: ");
+    output.append(positionTag);
+    output.append("\n");
+    output.append("\tsurfaceTag: ");
+    output.append(surfaceTag);
+    output.append("\n");
+    output.append("}\n");
+    return output.toString();
+  }
+}
+public static class ServiceAreaClusterAreaStruct {
+  public Long areaID;
+  public @Nullable Integer mapID;
+  public ChipStructs.ServiceAreaClusterAreaInfoStruct areaDesc;
+  private static final long AREA_I_D_ID = 0L;
+  private static final long MAP_I_D_ID = 1L;
+  private static final long AREA_DESC_ID = 2L;
+
+  public ServiceAreaClusterAreaStruct(
+    Long areaID,
+    @Nullable Integer mapID,
+    ChipStructs.ServiceAreaClusterAreaInfoStruct areaDesc
+  ) {
+    this.areaID = areaID;
+    this.mapID = mapID;
+    this.areaDesc = areaDesc;
+  }
+
+  public StructType encodeTlv() {
+    ArrayList<StructElement> values = new ArrayList<>();
+    values.add(new StructElement(AREA_I_D_ID, new UIntType(areaID)));
+    values.add(new StructElement(MAP_I_D_ID, mapID != null ? new UIntType(mapID) : new NullType()));
+    values.add(new StructElement(AREA_DESC_ID, areaDesc.encodeTlv()));
+
+    return new StructType(values);
+  }
+
+  public static ServiceAreaClusterAreaStruct decodeTlv(BaseTLVType tlvValue) {
+    if (tlvValue == null || tlvValue.type() != TLVType.Struct) {
+      return null;
+    }
+    Long areaID = null;
+    @Nullable Integer mapID = null;
+    ChipStructs.ServiceAreaClusterAreaInfoStruct areaDesc = null;
+    for (StructElement element: ((StructType)tlvValue).value()) {
+      if (element.contextTagNum() == AREA_I_D_ID) {
+        if (element.value(BaseTLVType.class).type() == TLVType.UInt) {
+          UIntType castingValue = element.value(UIntType.class);
+          areaID = castingValue.value(Long.class);
+        }
+      } else if (element.contextTagNum() == MAP_I_D_ID) {
+        if (element.value(BaseTLVType.class).type() == TLVType.UInt) {
+          UIntType castingValue = element.value(UIntType.class);
+          mapID = castingValue.value(Integer.class);
+        }
+      } else if (element.contextTagNum() == AREA_DESC_ID) {
+        if (element.value(BaseTLVType.class).type() == TLVType.Struct) {
+          StructType castingValue = element.value(StructType.class);
+          areaDesc = ChipStructs.ServiceAreaClusterAreaInfoStruct.decodeTlv(castingValue);
+        }
+      }
+    }
+    return new ServiceAreaClusterAreaStruct(
+      areaID,
+      mapID,
+      areaDesc
+    );
+  }
+
+  @Override
+  public String toString() {
+    StringBuilder output = new StringBuilder();
+    output.append("ServiceAreaClusterAreaStruct {\n");
+    output.append("\tareaID: ");
+    output.append(areaID);
+    output.append("\n");
+    output.append("\tmapID: ");
+    output.append(mapID);
+    output.append("\n");
+    output.append("\tareaDesc: ");
+    output.append(areaDesc);
+    output.append("\n");
+    output.append("}\n");
+    return output.toString();
+  }
+}
+public static class ServiceAreaClusterMapStruct {
+  public Integer mapID;
+  public String name;
+  private static final long MAP_I_D_ID = 0L;
+  private static final long NAME_ID = 1L;
+
+  public ServiceAreaClusterMapStruct(
+    Integer mapID,
+    String name
+  ) {
+    this.mapID = mapID;
+    this.name = name;
+  }
+
+  public StructType encodeTlv() {
+    ArrayList<StructElement> values = new ArrayList<>();
+    values.add(new StructElement(MAP_I_D_ID, new UIntType(mapID)));
+    values.add(new StructElement(NAME_ID, new StringType(name)));
+
+    return new StructType(values);
+  }
+
+  public static ServiceAreaClusterMapStruct decodeTlv(BaseTLVType tlvValue) {
+    if (tlvValue == null || tlvValue.type() != TLVType.Struct) {
+      return null;
+    }
+    Integer mapID = null;
+    String name = null;
+    for (StructElement element: ((StructType)tlvValue).value()) {
+      if (element.contextTagNum() == MAP_I_D_ID) {
+        if (element.value(BaseTLVType.class).type() == TLVType.UInt) {
+          UIntType castingValue = element.value(UIntType.class);
+          mapID = castingValue.value(Integer.class);
+        }
+      } else if (element.contextTagNum() == NAME_ID) {
+        if (element.value(BaseTLVType.class).type() == TLVType.String) {
+          StringType castingValue = element.value(StringType.class);
+          name = castingValue.value(String.class);
+        }
+      }
+    }
+    return new ServiceAreaClusterMapStruct(
+      mapID,
+      name
+    );
+  }
+
+  @Override
+  public String toString() {
+    StringBuilder output = new StringBuilder();
+    output.append("ServiceAreaClusterMapStruct {\n");
+    output.append("\tmapID: ");
+    output.append(mapID);
+    output.append("\n");
+    output.append("\tname: ");
+    output.append(name);
+    output.append("\n");
+    output.append("}\n");
+    return output.toString();
+  }
+}
+public static class ServiceAreaClusterProgressStruct {
+  public Long areaID;
+  public Integer status;
+  public @Nullable Optional<Long> totalOperationalTime;
+  public @Nullable Optional<Long> estimatedTime;
+  private static final long AREA_I_D_ID = 0L;
+  private static final long STATUS_ID = 1L;
+  private static final long TOTAL_OPERATIONAL_TIME_ID = 2L;
+  private static final long ESTIMATED_TIME_ID = 3L;
+
+  public ServiceAreaClusterProgressStruct(
+    Long areaID,
+    Integer status,
+    @Nullable Optional<Long> totalOperationalTime,
+    @Nullable Optional<Long> estimatedTime
+  ) {
+    this.areaID = areaID;
+    this.status = status;
+    this.totalOperationalTime = totalOperationalTime;
+    this.estimatedTime = estimatedTime;
+  }
+
+  public StructType encodeTlv() {
+    ArrayList<StructElement> values = new ArrayList<>();
+    values.add(new StructElement(AREA_I_D_ID, new UIntType(areaID)));
+    values.add(new StructElement(STATUS_ID, new UIntType(status)));
+    values.add(new StructElement(TOTAL_OPERATIONAL_TIME_ID, totalOperationalTime != null ? totalOperationalTime.<BaseTLVType>map((nonOptionaltotalOperationalTime) -> new UIntType(nonOptionaltotalOperationalTime)).orElse(new EmptyType()) : new NullType()));
+    values.add(new StructElement(ESTIMATED_TIME_ID, estimatedTime != null ? estimatedTime.<BaseTLVType>map((nonOptionalestimatedTime) -> new UIntType(nonOptionalestimatedTime)).orElse(new EmptyType()) : new NullType()));
+
+    return new StructType(values);
+  }
+
+  public static ServiceAreaClusterProgressStruct decodeTlv(BaseTLVType tlvValue) {
+    if (tlvValue == null || tlvValue.type() != TLVType.Struct) {
+      return null;
+    }
+    Long areaID = null;
+    Integer status = null;
+    @Nullable Optional<Long> totalOperationalTime = null;
+    @Nullable Optional<Long> estimatedTime = null;
+    for (StructElement element: ((StructType)tlvValue).value()) {
+      if (element.contextTagNum() == AREA_I_D_ID) {
+        if (element.value(BaseTLVType.class).type() == TLVType.UInt) {
+          UIntType castingValue = element.value(UIntType.class);
+          areaID = castingValue.value(Long.class);
+        }
+      } else if (element.contextTagNum() == STATUS_ID) {
+        if (element.value(BaseTLVType.class).type() == TLVType.UInt) {
+          UIntType castingValue = element.value(UIntType.class);
+          status = castingValue.value(Integer.class);
+        }
+      } else if (element.contextTagNum() == TOTAL_OPERATIONAL_TIME_ID) {
+        if (element.value(BaseTLVType.class).type() == TLVType.UInt) {
+          UIntType castingValue = element.value(UIntType.class);
+          totalOperationalTime = Optional.of(castingValue.value(Long.class));
+        }
+      } else if (element.contextTagNum() == ESTIMATED_TIME_ID) {
+        if (element.value(BaseTLVType.class).type() == TLVType.UInt) {
+          UIntType castingValue = element.value(UIntType.class);
+          estimatedTime = Optional.of(castingValue.value(Long.class));
+        }
+      }
+    }
+    return new ServiceAreaClusterProgressStruct(
+      areaID,
+      status,
+      totalOperationalTime,
+      estimatedTime
+    );
+  }
+
+  @Override
+  public String toString() {
+    StringBuilder output = new StringBuilder();
+    output.append("ServiceAreaClusterProgressStruct {\n");
+    output.append("\tareaID: ");
+    output.append(areaID);
+    output.append("\n");
+    output.append("\tstatus: ");
+    output.append(status);
+    output.append("\n");
+    output.append("\ttotalOperationalTime: ");
+    output.append(totalOperationalTime);
+    output.append("\n");
+    output.append("\testimatedTime: ");
+    output.append(estimatedTime);
+    output.append("\n");
+    output.append("}\n");
+    return output.toString();
+  }
+}
 public static class ServiceAreaClusterLocationDescriptorStruct {
   public String locationName;
   public @Nullable Integer floorNumber;
@@ -9014,325 +9561,6 @@ public static class ServiceAreaClusterLocationDescriptorStruct {
     output.append("\n");
     output.append("\tareaType: ");
     output.append(areaType);
-    output.append("\n");
-    output.append("}\n");
-    return output.toString();
-  }
-}
-public static class ServiceAreaClusterLocationInfoStruct {
-  public @Nullable ChipStructs.ServiceAreaClusterLocationDescriptorStruct locationInfo;
-  public @Nullable Integer landmarkTag;
-  public @Nullable Integer positionTag;
-  public @Nullable Integer surfaceTag;
-  private static final long LOCATION_INFO_ID = 0L;
-  private static final long LANDMARK_TAG_ID = 1L;
-  private static final long POSITION_TAG_ID = 2L;
-  private static final long SURFACE_TAG_ID = 3L;
-
-  public ServiceAreaClusterLocationInfoStruct(
-    @Nullable ChipStructs.ServiceAreaClusterLocationDescriptorStruct locationInfo,
-    @Nullable Integer landmarkTag,
-    @Nullable Integer positionTag,
-    @Nullable Integer surfaceTag
-  ) {
-    this.locationInfo = locationInfo;
-    this.landmarkTag = landmarkTag;
-    this.positionTag = positionTag;
-    this.surfaceTag = surfaceTag;
-  }
-
-  public StructType encodeTlv() {
-    ArrayList<StructElement> values = new ArrayList<>();
-    values.add(new StructElement(LOCATION_INFO_ID, locationInfo != null ? locationInfo.encodeTlv() : new NullType()));
-    values.add(new StructElement(LANDMARK_TAG_ID, landmarkTag != null ? new UIntType(landmarkTag) : new NullType()));
-    values.add(new StructElement(POSITION_TAG_ID, positionTag != null ? new UIntType(positionTag) : new NullType()));
-    values.add(new StructElement(SURFACE_TAG_ID, surfaceTag != null ? new UIntType(surfaceTag) : new NullType()));
-
-    return new StructType(values);
-  }
-
-  public static ServiceAreaClusterLocationInfoStruct decodeTlv(BaseTLVType tlvValue) {
-    if (tlvValue == null || tlvValue.type() != TLVType.Struct) {
-      return null;
-    }
-    @Nullable ChipStructs.ServiceAreaClusterLocationDescriptorStruct locationInfo = null;
-    @Nullable Integer landmarkTag = null;
-    @Nullable Integer positionTag = null;
-    @Nullable Integer surfaceTag = null;
-    for (StructElement element: ((StructType)tlvValue).value()) {
-      if (element.contextTagNum() == LOCATION_INFO_ID) {
-        if (element.value(BaseTLVType.class).type() == TLVType.Struct) {
-          StructType castingValue = element.value(StructType.class);
-          locationInfo = ChipStructs.ServiceAreaClusterLocationDescriptorStruct.decodeTlv(castingValue);
-        }
-      } else if (element.contextTagNum() == LANDMARK_TAG_ID) {
-        if (element.value(BaseTLVType.class).type() == TLVType.UInt) {
-          UIntType castingValue = element.value(UIntType.class);
-          landmarkTag = castingValue.value(Integer.class);
-        }
-      } else if (element.contextTagNum() == POSITION_TAG_ID) {
-        if (element.value(BaseTLVType.class).type() == TLVType.UInt) {
-          UIntType castingValue = element.value(UIntType.class);
-          positionTag = castingValue.value(Integer.class);
-        }
-      } else if (element.contextTagNum() == SURFACE_TAG_ID) {
-        if (element.value(BaseTLVType.class).type() == TLVType.UInt) {
-          UIntType castingValue = element.value(UIntType.class);
-          surfaceTag = castingValue.value(Integer.class);
-        }
-      }
-    }
-    return new ServiceAreaClusterLocationInfoStruct(
-      locationInfo,
-      landmarkTag,
-      positionTag,
-      surfaceTag
-    );
-  }
-
-  @Override
-  public String toString() {
-    StringBuilder output = new StringBuilder();
-    output.append("ServiceAreaClusterLocationInfoStruct {\n");
-    output.append("\tlocationInfo: ");
-    output.append(locationInfo);
-    output.append("\n");
-    output.append("\tlandmarkTag: ");
-    output.append(landmarkTag);
-    output.append("\n");
-    output.append("\tpositionTag: ");
-    output.append(positionTag);
-    output.append("\n");
-    output.append("\tsurfaceTag: ");
-    output.append(surfaceTag);
-    output.append("\n");
-    output.append("}\n");
-    return output.toString();
-  }
-}
-public static class ServiceAreaClusterLocationStruct {
-  public Long locationID;
-  public @Nullable Integer mapID;
-  public ChipStructs.ServiceAreaClusterLocationInfoStruct locationInfo;
-  private static final long LOCATION_I_D_ID = 0L;
-  private static final long MAP_I_D_ID = 1L;
-  private static final long LOCATION_INFO_ID = 2L;
-
-  public ServiceAreaClusterLocationStruct(
-    Long locationID,
-    @Nullable Integer mapID,
-    ChipStructs.ServiceAreaClusterLocationInfoStruct locationInfo
-  ) {
-    this.locationID = locationID;
-    this.mapID = mapID;
-    this.locationInfo = locationInfo;
-  }
-
-  public StructType encodeTlv() {
-    ArrayList<StructElement> values = new ArrayList<>();
-    values.add(new StructElement(LOCATION_I_D_ID, new UIntType(locationID)));
-    values.add(new StructElement(MAP_I_D_ID, mapID != null ? new UIntType(mapID) : new NullType()));
-    values.add(new StructElement(LOCATION_INFO_ID, locationInfo.encodeTlv()));
-
-    return new StructType(values);
-  }
-
-  public static ServiceAreaClusterLocationStruct decodeTlv(BaseTLVType tlvValue) {
-    if (tlvValue == null || tlvValue.type() != TLVType.Struct) {
-      return null;
-    }
-    Long locationID = null;
-    @Nullable Integer mapID = null;
-    ChipStructs.ServiceAreaClusterLocationInfoStruct locationInfo = null;
-    for (StructElement element: ((StructType)tlvValue).value()) {
-      if (element.contextTagNum() == LOCATION_I_D_ID) {
-        if (element.value(BaseTLVType.class).type() == TLVType.UInt) {
-          UIntType castingValue = element.value(UIntType.class);
-          locationID = castingValue.value(Long.class);
-        }
-      } else if (element.contextTagNum() == MAP_I_D_ID) {
-        if (element.value(BaseTLVType.class).type() == TLVType.UInt) {
-          UIntType castingValue = element.value(UIntType.class);
-          mapID = castingValue.value(Integer.class);
-        }
-      } else if (element.contextTagNum() == LOCATION_INFO_ID) {
-        if (element.value(BaseTLVType.class).type() == TLVType.Struct) {
-          StructType castingValue = element.value(StructType.class);
-          locationInfo = ChipStructs.ServiceAreaClusterLocationInfoStruct.decodeTlv(castingValue);
-        }
-      }
-    }
-    return new ServiceAreaClusterLocationStruct(
-      locationID,
-      mapID,
-      locationInfo
-    );
-  }
-
-  @Override
-  public String toString() {
-    StringBuilder output = new StringBuilder();
-    output.append("ServiceAreaClusterLocationStruct {\n");
-    output.append("\tlocationID: ");
-    output.append(locationID);
-    output.append("\n");
-    output.append("\tmapID: ");
-    output.append(mapID);
-    output.append("\n");
-    output.append("\tlocationInfo: ");
-    output.append(locationInfo);
-    output.append("\n");
-    output.append("}\n");
-    return output.toString();
-  }
-}
-public static class ServiceAreaClusterMapStruct {
-  public Integer mapID;
-  public String name;
-  private static final long MAP_I_D_ID = 0L;
-  private static final long NAME_ID = 1L;
-
-  public ServiceAreaClusterMapStruct(
-    Integer mapID,
-    String name
-  ) {
-    this.mapID = mapID;
-    this.name = name;
-  }
-
-  public StructType encodeTlv() {
-    ArrayList<StructElement> values = new ArrayList<>();
-    values.add(new StructElement(MAP_I_D_ID, new UIntType(mapID)));
-    values.add(new StructElement(NAME_ID, new StringType(name)));
-
-    return new StructType(values);
-  }
-
-  public static ServiceAreaClusterMapStruct decodeTlv(BaseTLVType tlvValue) {
-    if (tlvValue == null || tlvValue.type() != TLVType.Struct) {
-      return null;
-    }
-    Integer mapID = null;
-    String name = null;
-    for (StructElement element: ((StructType)tlvValue).value()) {
-      if (element.contextTagNum() == MAP_I_D_ID) {
-        if (element.value(BaseTLVType.class).type() == TLVType.UInt) {
-          UIntType castingValue = element.value(UIntType.class);
-          mapID = castingValue.value(Integer.class);
-        }
-      } else if (element.contextTagNum() == NAME_ID) {
-        if (element.value(BaseTLVType.class).type() == TLVType.String) {
-          StringType castingValue = element.value(StringType.class);
-          name = castingValue.value(String.class);
-        }
-      }
-    }
-    return new ServiceAreaClusterMapStruct(
-      mapID,
-      name
-    );
-  }
-
-  @Override
-  public String toString() {
-    StringBuilder output = new StringBuilder();
-    output.append("ServiceAreaClusterMapStruct {\n");
-    output.append("\tmapID: ");
-    output.append(mapID);
-    output.append("\n");
-    output.append("\tname: ");
-    output.append(name);
-    output.append("\n");
-    output.append("}\n");
-    return output.toString();
-  }
-}
-public static class ServiceAreaClusterProgressStruct {
-  public Long locationID;
-  public Integer status;
-  public @Nullable Optional<Long> totalOperationalTime;
-  public @Nullable Optional<Long> estimatedTime;
-  private static final long LOCATION_I_D_ID = 0L;
-  private static final long STATUS_ID = 1L;
-  private static final long TOTAL_OPERATIONAL_TIME_ID = 2L;
-  private static final long ESTIMATED_TIME_ID = 3L;
-
-  public ServiceAreaClusterProgressStruct(
-    Long locationID,
-    Integer status,
-    @Nullable Optional<Long> totalOperationalTime,
-    @Nullable Optional<Long> estimatedTime
-  ) {
-    this.locationID = locationID;
-    this.status = status;
-    this.totalOperationalTime = totalOperationalTime;
-    this.estimatedTime = estimatedTime;
-  }
-
-  public StructType encodeTlv() {
-    ArrayList<StructElement> values = new ArrayList<>();
-    values.add(new StructElement(LOCATION_I_D_ID, new UIntType(locationID)));
-    values.add(new StructElement(STATUS_ID, new UIntType(status)));
-    values.add(new StructElement(TOTAL_OPERATIONAL_TIME_ID, totalOperationalTime != null ? totalOperationalTime.<BaseTLVType>map((nonOptionaltotalOperationalTime) -> new UIntType(nonOptionaltotalOperationalTime)).orElse(new EmptyType()) : new NullType()));
-    values.add(new StructElement(ESTIMATED_TIME_ID, estimatedTime != null ? estimatedTime.<BaseTLVType>map((nonOptionalestimatedTime) -> new UIntType(nonOptionalestimatedTime)).orElse(new EmptyType()) : new NullType()));
-
-    return new StructType(values);
-  }
-
-  public static ServiceAreaClusterProgressStruct decodeTlv(BaseTLVType tlvValue) {
-    if (tlvValue == null || tlvValue.type() != TLVType.Struct) {
-      return null;
-    }
-    Long locationID = null;
-    Integer status = null;
-    @Nullable Optional<Long> totalOperationalTime = null;
-    @Nullable Optional<Long> estimatedTime = null;
-    for (StructElement element: ((StructType)tlvValue).value()) {
-      if (element.contextTagNum() == LOCATION_I_D_ID) {
-        if (element.value(BaseTLVType.class).type() == TLVType.UInt) {
-          UIntType castingValue = element.value(UIntType.class);
-          locationID = castingValue.value(Long.class);
-        }
-      } else if (element.contextTagNum() == STATUS_ID) {
-        if (element.value(BaseTLVType.class).type() == TLVType.UInt) {
-          UIntType castingValue = element.value(UIntType.class);
-          status = castingValue.value(Integer.class);
-        }
-      } else if (element.contextTagNum() == TOTAL_OPERATIONAL_TIME_ID) {
-        if (element.value(BaseTLVType.class).type() == TLVType.UInt) {
-          UIntType castingValue = element.value(UIntType.class);
-          totalOperationalTime = Optional.of(castingValue.value(Long.class));
-        }
-      } else if (element.contextTagNum() == ESTIMATED_TIME_ID) {
-        if (element.value(BaseTLVType.class).type() == TLVType.UInt) {
-          UIntType castingValue = element.value(UIntType.class);
-          estimatedTime = Optional.of(castingValue.value(Long.class));
-        }
-      }
-    }
-    return new ServiceAreaClusterProgressStruct(
-      locationID,
-      status,
-      totalOperationalTime,
-      estimatedTime
-    );
-  }
-
-  @Override
-  public String toString() {
-    StringBuilder output = new StringBuilder();
-    output.append("ServiceAreaClusterProgressStruct {\n");
-    output.append("\tlocationID: ");
-    output.append(locationID);
-    output.append("\n");
-    output.append("\tstatus: ");
-    output.append(status);
-    output.append("\n");
-    output.append("\ttotalOperationalTime: ");
-    output.append(totalOperationalTime);
-    output.append("\n");
-    output.append("\testimatedTime: ");
-    output.append(estimatedTime);
     output.append("\n");
     output.append("}\n");
     return output.toString();
@@ -9465,7 +9693,7 @@ public static class ThermostatClusterScheduleStruct {
   public Optional<String> name;
   public Optional<byte[]> presetHandle;
   public ArrayList<ChipStructs.ThermostatClusterScheduleTransitionStruct> transitions;
-  public @Nullable Optional<Boolean> builtIn;
+  public @Nullable Boolean builtIn;
   private static final long SCHEDULE_HANDLE_ID = 0L;
   private static final long SYSTEM_MODE_ID = 1L;
   private static final long NAME_ID = 2L;
@@ -9479,7 +9707,7 @@ public static class ThermostatClusterScheduleStruct {
     Optional<String> name,
     Optional<byte[]> presetHandle,
     ArrayList<ChipStructs.ThermostatClusterScheduleTransitionStruct> transitions,
-    @Nullable Optional<Boolean> builtIn
+    @Nullable Boolean builtIn
   ) {
     this.scheduleHandle = scheduleHandle;
     this.systemMode = systemMode;
@@ -9496,7 +9724,7 @@ public static class ThermostatClusterScheduleStruct {
     values.add(new StructElement(NAME_ID, name.<BaseTLVType>map((nonOptionalname) -> new StringType(nonOptionalname)).orElse(new EmptyType())));
     values.add(new StructElement(PRESET_HANDLE_ID, presetHandle.<BaseTLVType>map((nonOptionalpresetHandle) -> new ByteArrayType(nonOptionalpresetHandle)).orElse(new EmptyType())));
     values.add(new StructElement(TRANSITIONS_ID, ArrayType.generateArrayType(transitions, (elementtransitions) -> elementtransitions.encodeTlv())));
-    values.add(new StructElement(BUILT_IN_ID, builtIn != null ? builtIn.<BaseTLVType>map((nonOptionalbuiltIn) -> new BooleanType(nonOptionalbuiltIn)).orElse(new EmptyType()) : new NullType()));
+    values.add(new StructElement(BUILT_IN_ID, builtIn != null ? new BooleanType(builtIn) : new NullType()));
 
     return new StructType(values);
   }
@@ -9510,7 +9738,7 @@ public static class ThermostatClusterScheduleStruct {
     Optional<String> name = Optional.empty();
     Optional<byte[]> presetHandle = Optional.empty();
     ArrayList<ChipStructs.ThermostatClusterScheduleTransitionStruct> transitions = null;
-    @Nullable Optional<Boolean> builtIn = null;
+    @Nullable Boolean builtIn = null;
     for (StructElement element: ((StructType)tlvValue).value()) {
       if (element.contextTagNum() == SCHEDULE_HANDLE_ID) {
         if (element.value(BaseTLVType.class).type() == TLVType.ByteArray) {
@@ -9540,7 +9768,7 @@ public static class ThermostatClusterScheduleStruct {
       } else if (element.contextTagNum() == BUILT_IN_ID) {
         if (element.value(BaseTLVType.class).type() == TLVType.Boolean) {
           BooleanType castingValue = element.value(BooleanType.class);
-          builtIn = Optional.of(castingValue.value(Boolean.class));
+          builtIn = castingValue.value(Boolean.class);
         }
       }
     }
@@ -9924,6 +10152,67 @@ public static class ThermostatClusterWeeklyScheduleTransitionStruct {
     output.append("\n");
     output.append("\tcoolSetpoint: ");
     output.append(coolSetpoint);
+    output.append("\n");
+    output.append("}\n");
+    return output.toString();
+  }
+}
+public static class ThermostatClusterAtomicAttributeStatusStruct {
+  public Long attributeID;
+  public Integer statusCode;
+  private static final long ATTRIBUTE_I_D_ID = 0L;
+  private static final long STATUS_CODE_ID = 1L;
+
+  public ThermostatClusterAtomicAttributeStatusStruct(
+    Long attributeID,
+    Integer statusCode
+  ) {
+    this.attributeID = attributeID;
+    this.statusCode = statusCode;
+  }
+
+  public StructType encodeTlv() {
+    ArrayList<StructElement> values = new ArrayList<>();
+    values.add(new StructElement(ATTRIBUTE_I_D_ID, new UIntType(attributeID)));
+    values.add(new StructElement(STATUS_CODE_ID, new UIntType(statusCode)));
+
+    return new StructType(values);
+  }
+
+  public static ThermostatClusterAtomicAttributeStatusStruct decodeTlv(BaseTLVType tlvValue) {
+    if (tlvValue == null || tlvValue.type() != TLVType.Struct) {
+      return null;
+    }
+    Long attributeID = null;
+    Integer statusCode = null;
+    for (StructElement element: ((StructType)tlvValue).value()) {
+      if (element.contextTagNum() == ATTRIBUTE_I_D_ID) {
+        if (element.value(BaseTLVType.class).type() == TLVType.UInt) {
+          UIntType castingValue = element.value(UIntType.class);
+          attributeID = castingValue.value(Long.class);
+        }
+      } else if (element.contextTagNum() == STATUS_CODE_ID) {
+        if (element.value(BaseTLVType.class).type() == TLVType.UInt) {
+          UIntType castingValue = element.value(UIntType.class);
+          statusCode = castingValue.value(Integer.class);
+        }
+      }
+    }
+    return new ThermostatClusterAtomicAttributeStatusStruct(
+      attributeID,
+      statusCode
+    );
+  }
+
+  @Override
+  public String toString() {
+    StringBuilder output = new StringBuilder();
+    output.append("ThermostatClusterAtomicAttributeStatusStruct {\n");
+    output.append("\tattributeID: ");
+    output.append(attributeID);
+    output.append("\n");
+    output.append("\tstatusCode: ");
+    output.append(statusCode);
     output.append("\n");
     output.append("}\n");
     return output.toString();
@@ -12283,173 +12572,6 @@ public static class ContentControlClusterRatingNameStruct {
     return output.toString();
   }
 }
-public static class EcosystemInformationClusterLocationDescriptorStruct {
-  public String locationName;
-  public @Nullable Integer floorNumber;
-  public @Nullable Integer areaType;
-  private static final long LOCATION_NAME_ID = 0L;
-  private static final long FLOOR_NUMBER_ID = 1L;
-  private static final long AREA_TYPE_ID = 2L;
-
-  public EcosystemInformationClusterLocationDescriptorStruct(
-    String locationName,
-    @Nullable Integer floorNumber,
-    @Nullable Integer areaType
-  ) {
-    this.locationName = locationName;
-    this.floorNumber = floorNumber;
-    this.areaType = areaType;
-  }
-
-  public StructType encodeTlv() {
-    ArrayList<StructElement> values = new ArrayList<>();
-    values.add(new StructElement(LOCATION_NAME_ID, new StringType(locationName)));
-    values.add(new StructElement(FLOOR_NUMBER_ID, floorNumber != null ? new IntType(floorNumber) : new NullType()));
-    values.add(new StructElement(AREA_TYPE_ID, areaType != null ? new UIntType(areaType) : new NullType()));
-
-    return new StructType(values);
-  }
-
-  public static EcosystemInformationClusterLocationDescriptorStruct decodeTlv(BaseTLVType tlvValue) {
-    if (tlvValue == null || tlvValue.type() != TLVType.Struct) {
-      return null;
-    }
-    String locationName = null;
-    @Nullable Integer floorNumber = null;
-    @Nullable Integer areaType = null;
-    for (StructElement element: ((StructType)tlvValue).value()) {
-      if (element.contextTagNum() == LOCATION_NAME_ID) {
-        if (element.value(BaseTLVType.class).type() == TLVType.String) {
-          StringType castingValue = element.value(StringType.class);
-          locationName = castingValue.value(String.class);
-        }
-      } else if (element.contextTagNum() == FLOOR_NUMBER_ID) {
-        if (element.value(BaseTLVType.class).type() == TLVType.Int) {
-          IntType castingValue = element.value(IntType.class);
-          floorNumber = castingValue.value(Integer.class);
-        }
-      } else if (element.contextTagNum() == AREA_TYPE_ID) {
-        if (element.value(BaseTLVType.class).type() == TLVType.UInt) {
-          UIntType castingValue = element.value(UIntType.class);
-          areaType = castingValue.value(Integer.class);
-        }
-      }
-    }
-    return new EcosystemInformationClusterLocationDescriptorStruct(
-      locationName,
-      floorNumber,
-      areaType
-    );
-  }
-
-  @Override
-  public String toString() {
-    StringBuilder output = new StringBuilder();
-    output.append("EcosystemInformationClusterLocationDescriptorStruct {\n");
-    output.append("\tlocationName: ");
-    output.append(locationName);
-    output.append("\n");
-    output.append("\tfloorNumber: ");
-    output.append(floorNumber);
-    output.append("\n");
-    output.append("\tareaType: ");
-    output.append(areaType);
-    output.append("\n");
-    output.append("}\n");
-    return output.toString();
-  }
-}
-public static class EcosystemInformationClusterEcosystemLocationStruct {
-  public String uniqueLocationID;
-  public ChipStructs.EcosystemInformationClusterLocationDescriptorStruct locationDescriptor;
-  public Long locationDescriptorLastEdit;
-  public Integer fabricIndex;
-  private static final long UNIQUE_LOCATION_I_D_ID = 0L;
-  private static final long LOCATION_DESCRIPTOR_ID = 1L;
-  private static final long LOCATION_DESCRIPTOR_LAST_EDIT_ID = 2L;
-  private static final long FABRIC_INDEX_ID = 254L;
-
-  public EcosystemInformationClusterEcosystemLocationStruct(
-    String uniqueLocationID,
-    ChipStructs.EcosystemInformationClusterLocationDescriptorStruct locationDescriptor,
-    Long locationDescriptorLastEdit,
-    Integer fabricIndex
-  ) {
-    this.uniqueLocationID = uniqueLocationID;
-    this.locationDescriptor = locationDescriptor;
-    this.locationDescriptorLastEdit = locationDescriptorLastEdit;
-    this.fabricIndex = fabricIndex;
-  }
-
-  public StructType encodeTlv() {
-    ArrayList<StructElement> values = new ArrayList<>();
-    values.add(new StructElement(UNIQUE_LOCATION_I_D_ID, new StringType(uniqueLocationID)));
-    values.add(new StructElement(LOCATION_DESCRIPTOR_ID, locationDescriptor.encodeTlv()));
-    values.add(new StructElement(LOCATION_DESCRIPTOR_LAST_EDIT_ID, new UIntType(locationDescriptorLastEdit)));
-    values.add(new StructElement(FABRIC_INDEX_ID, new UIntType(fabricIndex)));
-
-    return new StructType(values);
-  }
-
-  public static EcosystemInformationClusterEcosystemLocationStruct decodeTlv(BaseTLVType tlvValue) {
-    if (tlvValue == null || tlvValue.type() != TLVType.Struct) {
-      return null;
-    }
-    String uniqueLocationID = null;
-    ChipStructs.EcosystemInformationClusterLocationDescriptorStruct locationDescriptor = null;
-    Long locationDescriptorLastEdit = null;
-    Integer fabricIndex = null;
-    for (StructElement element: ((StructType)tlvValue).value()) {
-      if (element.contextTagNum() == UNIQUE_LOCATION_I_D_ID) {
-        if (element.value(BaseTLVType.class).type() == TLVType.String) {
-          StringType castingValue = element.value(StringType.class);
-          uniqueLocationID = castingValue.value(String.class);
-        }
-      } else if (element.contextTagNum() == LOCATION_DESCRIPTOR_ID) {
-        if (element.value(BaseTLVType.class).type() == TLVType.Struct) {
-          StructType castingValue = element.value(StructType.class);
-          locationDescriptor = ChipStructs.EcosystemInformationClusterLocationDescriptorStruct.decodeTlv(castingValue);
-        }
-      } else if (element.contextTagNum() == LOCATION_DESCRIPTOR_LAST_EDIT_ID) {
-        if (element.value(BaseTLVType.class).type() == TLVType.UInt) {
-          UIntType castingValue = element.value(UIntType.class);
-          locationDescriptorLastEdit = castingValue.value(Long.class);
-        }
-      } else if (element.contextTagNum() == FABRIC_INDEX_ID) {
-        if (element.value(BaseTLVType.class).type() == TLVType.UInt) {
-          UIntType castingValue = element.value(UIntType.class);
-          fabricIndex = castingValue.value(Integer.class);
-        }
-      }
-    }
-    return new EcosystemInformationClusterEcosystemLocationStruct(
-      uniqueLocationID,
-      locationDescriptor,
-      locationDescriptorLastEdit,
-      fabricIndex
-    );
-  }
-
-  @Override
-  public String toString() {
-    StringBuilder output = new StringBuilder();
-    output.append("EcosystemInformationClusterEcosystemLocationStruct {\n");
-    output.append("\tuniqueLocationID: ");
-    output.append(uniqueLocationID);
-    output.append("\n");
-    output.append("\tlocationDescriptor: ");
-    output.append(locationDescriptor);
-    output.append("\n");
-    output.append("\tlocationDescriptorLastEdit: ");
-    output.append(locationDescriptorLastEdit);
-    output.append("\n");
-    output.append("\tfabricIndex: ");
-    output.append(fabricIndex);
-    output.append("\n");
-    output.append("}\n");
-    return output.toString();
-  }
-}
 public static class EcosystemInformationClusterDeviceTypeStruct {
   public Long deviceType;
   public Integer revision;
@@ -12662,6 +12784,173 @@ public static class EcosystemInformationClusterEcosystemDeviceStruct {
     return output.toString();
   }
 }
+public static class EcosystemInformationClusterEcosystemLocationStruct {
+  public String uniqueLocationID;
+  public ChipStructs.EcosystemInformationClusterLocationDescriptorStruct locationDescriptor;
+  public Long locationDescriptorLastEdit;
+  public Integer fabricIndex;
+  private static final long UNIQUE_LOCATION_I_D_ID = 0L;
+  private static final long LOCATION_DESCRIPTOR_ID = 1L;
+  private static final long LOCATION_DESCRIPTOR_LAST_EDIT_ID = 2L;
+  private static final long FABRIC_INDEX_ID = 254L;
+
+  public EcosystemInformationClusterEcosystemLocationStruct(
+    String uniqueLocationID,
+    ChipStructs.EcosystemInformationClusterLocationDescriptorStruct locationDescriptor,
+    Long locationDescriptorLastEdit,
+    Integer fabricIndex
+  ) {
+    this.uniqueLocationID = uniqueLocationID;
+    this.locationDescriptor = locationDescriptor;
+    this.locationDescriptorLastEdit = locationDescriptorLastEdit;
+    this.fabricIndex = fabricIndex;
+  }
+
+  public StructType encodeTlv() {
+    ArrayList<StructElement> values = new ArrayList<>();
+    values.add(new StructElement(UNIQUE_LOCATION_I_D_ID, new StringType(uniqueLocationID)));
+    values.add(new StructElement(LOCATION_DESCRIPTOR_ID, locationDescriptor.encodeTlv()));
+    values.add(new StructElement(LOCATION_DESCRIPTOR_LAST_EDIT_ID, new UIntType(locationDescriptorLastEdit)));
+    values.add(new StructElement(FABRIC_INDEX_ID, new UIntType(fabricIndex)));
+
+    return new StructType(values);
+  }
+
+  public static EcosystemInformationClusterEcosystemLocationStruct decodeTlv(BaseTLVType tlvValue) {
+    if (tlvValue == null || tlvValue.type() != TLVType.Struct) {
+      return null;
+    }
+    String uniqueLocationID = null;
+    ChipStructs.EcosystemInformationClusterLocationDescriptorStruct locationDescriptor = null;
+    Long locationDescriptorLastEdit = null;
+    Integer fabricIndex = null;
+    for (StructElement element: ((StructType)tlvValue).value()) {
+      if (element.contextTagNum() == UNIQUE_LOCATION_I_D_ID) {
+        if (element.value(BaseTLVType.class).type() == TLVType.String) {
+          StringType castingValue = element.value(StringType.class);
+          uniqueLocationID = castingValue.value(String.class);
+        }
+      } else if (element.contextTagNum() == LOCATION_DESCRIPTOR_ID) {
+        if (element.value(BaseTLVType.class).type() == TLVType.Struct) {
+          StructType castingValue = element.value(StructType.class);
+          locationDescriptor = ChipStructs.EcosystemInformationClusterLocationDescriptorStruct.decodeTlv(castingValue);
+        }
+      } else if (element.contextTagNum() == LOCATION_DESCRIPTOR_LAST_EDIT_ID) {
+        if (element.value(BaseTLVType.class).type() == TLVType.UInt) {
+          UIntType castingValue = element.value(UIntType.class);
+          locationDescriptorLastEdit = castingValue.value(Long.class);
+        }
+      } else if (element.contextTagNum() == FABRIC_INDEX_ID) {
+        if (element.value(BaseTLVType.class).type() == TLVType.UInt) {
+          UIntType castingValue = element.value(UIntType.class);
+          fabricIndex = castingValue.value(Integer.class);
+        }
+      }
+    }
+    return new EcosystemInformationClusterEcosystemLocationStruct(
+      uniqueLocationID,
+      locationDescriptor,
+      locationDescriptorLastEdit,
+      fabricIndex
+    );
+  }
+
+  @Override
+  public String toString() {
+    StringBuilder output = new StringBuilder();
+    output.append("EcosystemInformationClusterEcosystemLocationStruct {\n");
+    output.append("\tuniqueLocationID: ");
+    output.append(uniqueLocationID);
+    output.append("\n");
+    output.append("\tlocationDescriptor: ");
+    output.append(locationDescriptor);
+    output.append("\n");
+    output.append("\tlocationDescriptorLastEdit: ");
+    output.append(locationDescriptorLastEdit);
+    output.append("\n");
+    output.append("\tfabricIndex: ");
+    output.append(fabricIndex);
+    output.append("\n");
+    output.append("}\n");
+    return output.toString();
+  }
+}
+public static class EcosystemInformationClusterLocationDescriptorStruct {
+  public String locationName;
+  public @Nullable Integer floorNumber;
+  public @Nullable Integer areaType;
+  private static final long LOCATION_NAME_ID = 0L;
+  private static final long FLOOR_NUMBER_ID = 1L;
+  private static final long AREA_TYPE_ID = 2L;
+
+  public EcosystemInformationClusterLocationDescriptorStruct(
+    String locationName,
+    @Nullable Integer floorNumber,
+    @Nullable Integer areaType
+  ) {
+    this.locationName = locationName;
+    this.floorNumber = floorNumber;
+    this.areaType = areaType;
+  }
+
+  public StructType encodeTlv() {
+    ArrayList<StructElement> values = new ArrayList<>();
+    values.add(new StructElement(LOCATION_NAME_ID, new StringType(locationName)));
+    values.add(new StructElement(FLOOR_NUMBER_ID, floorNumber != null ? new IntType(floorNumber) : new NullType()));
+    values.add(new StructElement(AREA_TYPE_ID, areaType != null ? new UIntType(areaType) : new NullType()));
+
+    return new StructType(values);
+  }
+
+  public static EcosystemInformationClusterLocationDescriptorStruct decodeTlv(BaseTLVType tlvValue) {
+    if (tlvValue == null || tlvValue.type() != TLVType.Struct) {
+      return null;
+    }
+    String locationName = null;
+    @Nullable Integer floorNumber = null;
+    @Nullable Integer areaType = null;
+    for (StructElement element: ((StructType)tlvValue).value()) {
+      if (element.contextTagNum() == LOCATION_NAME_ID) {
+        if (element.value(BaseTLVType.class).type() == TLVType.String) {
+          StringType castingValue = element.value(StringType.class);
+          locationName = castingValue.value(String.class);
+        }
+      } else if (element.contextTagNum() == FLOOR_NUMBER_ID) {
+        if (element.value(BaseTLVType.class).type() == TLVType.Int) {
+          IntType castingValue = element.value(IntType.class);
+          floorNumber = castingValue.value(Integer.class);
+        }
+      } else if (element.contextTagNum() == AREA_TYPE_ID) {
+        if (element.value(BaseTLVType.class).type() == TLVType.UInt) {
+          UIntType castingValue = element.value(UIntType.class);
+          areaType = castingValue.value(Integer.class);
+        }
+      }
+    }
+    return new EcosystemInformationClusterLocationDescriptorStruct(
+      locationName,
+      floorNumber,
+      areaType
+    );
+  }
+
+  @Override
+  public String toString() {
+    StringBuilder output = new StringBuilder();
+    output.append("EcosystemInformationClusterLocationDescriptorStruct {\n");
+    output.append("\tlocationName: ");
+    output.append(locationName);
+    output.append("\n");
+    output.append("\tfloorNumber: ");
+    output.append(floorNumber);
+    output.append("\n");
+    output.append("\tareaType: ");
+    output.append(areaType);
+    output.append("\n");
+    output.append("}\n");
+    return output.toString();
+  }
+}
 public static class UnitTestingClusterSimpleStruct {
   public Integer a;
   public Boolean b;
@@ -12671,6 +12960,7 @@ public static class UnitTestingClusterSimpleStruct {
   public Integer f;
   public Float g;
   public Double h;
+  public Optional<Integer> i;
   private static final long A_ID = 0L;
   private static final long B_ID = 1L;
   private static final long C_ID = 2L;
@@ -12679,6 +12969,7 @@ public static class UnitTestingClusterSimpleStruct {
   private static final long F_ID = 5L;
   private static final long G_ID = 6L;
   private static final long H_ID = 7L;
+  private static final long I_ID = 8L;
 
   public UnitTestingClusterSimpleStruct(
     Integer a,
@@ -12688,7 +12979,8 @@ public static class UnitTestingClusterSimpleStruct {
     String e,
     Integer f,
     Float g,
-    Double h
+    Double h,
+    Optional<Integer> i
   ) {
     this.a = a;
     this.b = b;
@@ -12698,6 +12990,7 @@ public static class UnitTestingClusterSimpleStruct {
     this.f = f;
     this.g = g;
     this.h = h;
+    this.i = i;
   }
 
   public StructType encodeTlv() {
@@ -12710,6 +13003,7 @@ public static class UnitTestingClusterSimpleStruct {
     values.add(new StructElement(F_ID, new UIntType(f)));
     values.add(new StructElement(G_ID, new FloatType(g)));
     values.add(new StructElement(H_ID, new DoubleType(h)));
+    values.add(new StructElement(I_ID, i.<BaseTLVType>map((nonOptionali) -> new UIntType(nonOptionali)).orElse(new EmptyType())));
 
     return new StructType(values);
   }
@@ -12726,6 +13020,7 @@ public static class UnitTestingClusterSimpleStruct {
     Integer f = null;
     Float g = null;
     Double h = null;
+    Optional<Integer> i = Optional.empty();
     for (StructElement element: ((StructType)tlvValue).value()) {
       if (element.contextTagNum() == A_ID) {
         if (element.value(BaseTLVType.class).type() == TLVType.UInt) {
@@ -12767,6 +13062,11 @@ public static class UnitTestingClusterSimpleStruct {
           DoubleType castingValue = element.value(DoubleType.class);
           h = castingValue.value(Double.class);
         }
+      } else if (element.contextTagNum() == I_ID) {
+        if (element.value(BaseTLVType.class).type() == TLVType.UInt) {
+          UIntType castingValue = element.value(UIntType.class);
+          i = Optional.of(castingValue.value(Integer.class));
+        }
       }
     }
     return new UnitTestingClusterSimpleStruct(
@@ -12777,7 +13077,8 @@ public static class UnitTestingClusterSimpleStruct {
       e,
       f,
       g,
-      h
+      h,
+      i
     );
   }
 
@@ -12808,6 +13109,9 @@ public static class UnitTestingClusterSimpleStruct {
     output.append("\n");
     output.append("\th: ");
     output.append(h);
+    output.append("\n");
+    output.append("\ti: ");
+    output.append(i);
     output.append("\n");
     output.append("}\n");
     return output.toString();
@@ -13179,18 +13483,22 @@ public static class UnitTestingClusterNestedStruct {
   public Integer a;
   public Boolean b;
   public ChipStructs.UnitTestingClusterSimpleStruct c;
+  public Optional<ChipStructs.UnitTestingClusterTestGlobalStruct> d;
   private static final long A_ID = 0L;
   private static final long B_ID = 1L;
   private static final long C_ID = 2L;
+  private static final long D_ID = 3L;
 
   public UnitTestingClusterNestedStruct(
     Integer a,
     Boolean b,
-    ChipStructs.UnitTestingClusterSimpleStruct c
+    ChipStructs.UnitTestingClusterSimpleStruct c,
+    Optional<ChipStructs.UnitTestingClusterTestGlobalStruct> d
   ) {
     this.a = a;
     this.b = b;
     this.c = c;
+    this.d = d;
   }
 
   public StructType encodeTlv() {
@@ -13198,6 +13506,7 @@ public static class UnitTestingClusterNestedStruct {
     values.add(new StructElement(A_ID, new UIntType(a)));
     values.add(new StructElement(B_ID, new BooleanType(b)));
     values.add(new StructElement(C_ID, c.encodeTlv()));
+    values.add(new StructElement(D_ID, d.<BaseTLVType>map((nonOptionald) -> nonOptionald.encodeTlv()).orElse(new EmptyType())));
 
     return new StructType(values);
   }
@@ -13209,6 +13518,7 @@ public static class UnitTestingClusterNestedStruct {
     Integer a = null;
     Boolean b = null;
     ChipStructs.UnitTestingClusterSimpleStruct c = null;
+    Optional<ChipStructs.UnitTestingClusterTestGlobalStruct> d = Optional.empty();
     for (StructElement element: ((StructType)tlvValue).value()) {
       if (element.contextTagNum() == A_ID) {
         if (element.value(BaseTLVType.class).type() == TLVType.UInt) {
@@ -13225,12 +13535,18 @@ public static class UnitTestingClusterNestedStruct {
           StructType castingValue = element.value(StructType.class);
           c = ChipStructs.UnitTestingClusterSimpleStruct.decodeTlv(castingValue);
         }
+      } else if (element.contextTagNum() == D_ID) {
+        if (element.value(BaseTLVType.class).type() == TLVType.Struct) {
+          StructType castingValue = element.value(StructType.class);
+          d = Optional.of(ChipStructs.UnitTestingClusterTestGlobalStruct.decodeTlv(castingValue));
+        }
       }
     }
     return new UnitTestingClusterNestedStruct(
       a,
       b,
-      c
+      c,
+      d
     );
   }
 
@@ -13246,6 +13562,9 @@ public static class UnitTestingClusterNestedStruct {
     output.append("\n");
     output.append("\tc: ");
     output.append(c);
+    output.append("\n");
+    output.append("\td: ");
+    output.append(d);
     output.append("\n");
     output.append("}\n");
     return output.toString();
@@ -13489,6 +13808,82 @@ public static class UnitTestingClusterTestListStructOctet {
     output.append("\n");
     output.append("\tmember2: ");
     output.append(Arrays.toString(member2));
+    output.append("\n");
+    output.append("}\n");
+    return output.toString();
+  }
+}
+public static class UnitTestingClusterTestGlobalStruct {
+  public String name;
+  public @Nullable Long myBitmap;
+  public @Nullable Optional<Integer> myEnum;
+  private static final long NAME_ID = 0L;
+  private static final long MY_BITMAP_ID = 1L;
+  private static final long MY_ENUM_ID = 2L;
+
+  public UnitTestingClusterTestGlobalStruct(
+    String name,
+    @Nullable Long myBitmap,
+    @Nullable Optional<Integer> myEnum
+  ) {
+    this.name = name;
+    this.myBitmap = myBitmap;
+    this.myEnum = myEnum;
+  }
+
+  public StructType encodeTlv() {
+    ArrayList<StructElement> values = new ArrayList<>();
+    values.add(new StructElement(NAME_ID, new StringType(name)));
+    values.add(new StructElement(MY_BITMAP_ID, myBitmap != null ? new UIntType(myBitmap) : new NullType()));
+    values.add(new StructElement(MY_ENUM_ID, myEnum != null ? myEnum.<BaseTLVType>map((nonOptionalmyEnum) -> new UIntType(nonOptionalmyEnum)).orElse(new EmptyType()) : new NullType()));
+
+    return new StructType(values);
+  }
+
+  public static UnitTestingClusterTestGlobalStruct decodeTlv(BaseTLVType tlvValue) {
+    if (tlvValue == null || tlvValue.type() != TLVType.Struct) {
+      return null;
+    }
+    String name = null;
+    @Nullable Long myBitmap = null;
+    @Nullable Optional<Integer> myEnum = null;
+    for (StructElement element: ((StructType)tlvValue).value()) {
+      if (element.contextTagNum() == NAME_ID) {
+        if (element.value(BaseTLVType.class).type() == TLVType.String) {
+          StringType castingValue = element.value(StringType.class);
+          name = castingValue.value(String.class);
+        }
+      } else if (element.contextTagNum() == MY_BITMAP_ID) {
+        if (element.value(BaseTLVType.class).type() == TLVType.UInt) {
+          UIntType castingValue = element.value(UIntType.class);
+          myBitmap = castingValue.value(Long.class);
+        }
+      } else if (element.contextTagNum() == MY_ENUM_ID) {
+        if (element.value(BaseTLVType.class).type() == TLVType.UInt) {
+          UIntType castingValue = element.value(UIntType.class);
+          myEnum = Optional.of(castingValue.value(Integer.class));
+        }
+      }
+    }
+    return new UnitTestingClusterTestGlobalStruct(
+      name,
+      myBitmap,
+      myEnum
+    );
+  }
+
+  @Override
+  public String toString() {
+    StringBuilder output = new StringBuilder();
+    output.append("UnitTestingClusterTestGlobalStruct {\n");
+    output.append("\tname: ");
+    output.append(name);
+    output.append("\n");
+    output.append("\tmyBitmap: ");
+    output.append(myBitmap);
+    output.append("\n");
+    output.append("\tmyEnum: ");
+    output.append(myEnum);
     output.append("\n");
     output.append("}\n");
     return output.toString();

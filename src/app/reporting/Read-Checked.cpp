@@ -14,6 +14,8 @@
  *    See the License for the specific language governing permissions and
  *    limitations under the License.
  */
+#include "app/data-model-provider/ActionReturnStatus.h"
+#include "lib/support/StringBuilder.h"
 #include <app/reporting/Read-Checked.h>
 
 #include <app/reporting/Read-DataModel.h>
@@ -25,6 +27,8 @@ namespace app {
 namespace reporting {
 namespace CheckedImpl {
 namespace {
+
+using DataModel::ActionReturnStatus;
 
 /// Checkpoints and saves the state (including error state) for a
 /// AttributeReportIBs::Builder
@@ -50,16 +54,16 @@ private:
 
 } // namespace
 
-CHIP_ERROR RetrieveClusterData(InteractionModel::DataModel * dataModel, const Access::SubjectDescriptor & subjectDescriptor,
-                               bool isFabricFiltered, AttributeReportIBs::Builder & reportBuilder,
-                               const ConcreteReadAttributePath & path, AttributeEncodeState * encoderState)
+ActionReturnStatus RetrieveClusterData(DataModel::Provider * dataModel, const Access::SubjectDescriptor & subjectDescriptor,
+                                       bool isFabricFiltered, AttributeReportIBs::Builder & reportBuilder,
+                                       const ConcreteReadAttributePath & path, AttributeEncodeState * encoderState)
 {
     ChipLogDetail(DataManagement, "<RE:Run> Cluster %" PRIx32 ", Attribute %" PRIx32 " is dirty", path.mClusterId,
                   path.mAttributeId);
     DataModelCallbacks::GetInstance()->AttributeOperation(DataModelCallbacks::OperationType::Read,
                                                           DataModelCallbacks::OperationOrder::Pre, path);
 
-    CHIP_ERROR errEmber         = CHIP_NO_ERROR;
+    ActionReturnStatus statusEmber(CHIP_NO_ERROR);
     uint32_t lengthWrittenEmber = 0;
 
     // a copy for DM logic only. Ember changes state directly
@@ -68,21 +72,22 @@ CHIP_ERROR RetrieveClusterData(InteractionModel::DataModel * dataModel, const Ac
 
     {
         ScopedAttributeReportIBsBuilderState builderState(reportBuilder); // temporary only
-        errEmber =
+        statusEmber =
             EmberImpl::RetrieveClusterData(dataModel, subjectDescriptor, isFabricFiltered, reportBuilder, path, encoderState);
         lengthWrittenEmber = reportBuilder.GetWriter()->GetLengthWritten();
     }
 
-    CHIP_ERROR errDM = DataModelImpl::RetrieveClusterData(dataModel, subjectDescriptor, isFabricFiltered, reportBuilder, path,
-                                                          encoderState != nullptr ? &stateDm : nullptr);
+    ActionReturnStatus statusDm = DataModelImpl::RetrieveClusterData(dataModel, subjectDescriptor, isFabricFiltered, reportBuilder,
+                                                                     path, encoderState != nullptr ? &stateDm : nullptr);
 
-    if (errEmber != errDM)
+    if (statusEmber != statusDm)
     {
+        StringBuilder<128> buffer;
         // Note log + chipDie instead of VerifyOrDie so that breakpoints (and usage of rr)
         // is easier to debug.
         ChipLogError(Test, "Different return codes between ember and DM");
-        ChipLogError(Test, "  Ember error: %" CHIP_ERROR_FORMAT, errEmber.Format());
-        ChipLogError(Test, "  DM error: %" CHIP_ERROR_FORMAT, errDM.Format());
+        ChipLogError(Test, "  Ember status: %s", statusEmber.c_str());
+        ChipLogError(Test, "  DM status:    %s", statusDm.c_str());
 
         // For time-dependent data, we may have size differences here: one data fitting in buffer
         // while another not, resulting in different errors (success vs out of space).
@@ -120,7 +125,7 @@ CHIP_ERROR RetrieveClusterData(InteractionModel::DataModel * dataModel, const Ac
 
     // For chunked reads, the encoder state MUST be identical (since this is what controls
     // where chunking resumes).
-    if ((errEmber == CHIP_ERROR_NO_MEMORY) || (errEmber == CHIP_ERROR_BUFFER_TOO_SMALL))
+    if (statusEmber.IsOutOfSpaceEncodingResponse())
     {
         // Encoder state MUST match on partial reads (used by chunking)
         // specifically ReadViaAccessInterface in ember-compatibility-functions only
@@ -151,7 +156,7 @@ CHIP_ERROR RetrieveClusterData(InteractionModel::DataModel * dataModel, const Ac
     DataModelCallbacks::GetInstance()->AttributeOperation(DataModelCallbacks::OperationType::Read,
                                                           DataModelCallbacks::OperationOrder::Post, path);
 
-    return errDM;
+    return statusDm;
 }
 
 } // namespace CheckedImpl

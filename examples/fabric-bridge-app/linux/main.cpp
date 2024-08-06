@@ -18,9 +18,9 @@
 
 #include <AppMain.h>
 
+#include "BridgedDevice.h"
+#include "BridgedDeviceManager.h"
 #include "CommissionableInit.h"
-#include "Device.h"
-#include "DeviceManager.h"
 
 #include <app/AttributeAccessInterfaceRegistry.h>
 #include <app/CommandHandlerInterfaceRegistry.h>
@@ -141,7 +141,7 @@ void AdministratorCommissioningCommandHandler::InvokeCommand(HandlerContext & ha
     Status status = Status::Failure;
 
 #if defined(PW_RPC_FABRIC_BRIDGE_SERVICE) && PW_RPC_FABRIC_BRIDGE_SERVICE
-    Device * device = DeviceMgr().GetDevice(endpointId);
+    BridgedDevice * device = BridgeDeviceMgr().GetDevice(endpointId);
 
     // TODO: issues:#33784, need to make OpenCommissioningWindow synchronous
     if (device != nullptr &&
@@ -217,7 +217,7 @@ void ApplicationInit()
     std::thread pollingThread(BridgePollingThread);
     pollingThread.detach();
 
-    DeviceMgr().Init();
+    BridgeDeviceMgr().Init();
 }
 
 void ApplicationShutdown()
