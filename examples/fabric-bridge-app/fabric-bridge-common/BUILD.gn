@@ -25,7 +25,7 @@ chip_data_model("fabric-bridge-common-zap") {
   cflags = [ "-DDYNAMIC_ENDPOINT_COUNT=16" ]
 }
 
-# This is includes all the clusters that only exist on the dynamic endpoint.
+# This includes all the clusters that only exist on the dynamic endpoint.
 source_set("fabric-bridge-common") {
   public_configs = [ ":config" ]
 
