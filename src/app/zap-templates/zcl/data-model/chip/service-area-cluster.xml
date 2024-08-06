@@ -20,8 +20,8 @@ limitations under the License.
   Data types
   <struct name="LandmarkInfoStruct" apiMaturity="provisional">
     <cluster code="0x0150"/>
-    <item name="LandmarkTag" type="LandmarkTag" optional="false" isNullable="false"/>
-    <item name="PositionTag" type="PositionTag" optional="false" isNullable="true"/>
+    <item name="LandmarkTag" type="LandmarkTag"         optional="false" isNullable="false"/>
+    <item name="PositionTag" type="RelativePositionTag" optional="false" isNullable="true"/>
   </struct>
 
   <struct name="AreaInfoStruct" apiMaturity="provisional">
