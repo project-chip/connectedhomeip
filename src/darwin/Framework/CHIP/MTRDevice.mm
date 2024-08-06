@@ -1205,6 +1205,7 @@ static NSString * const sLastInitialSubscribeLatencyKey = @"lastInitialSubscribe
     // No need to monitor connectivity after subscription establishment
     [self _stopConnectivityMonitoring];
 
+    // reset subscription attempt wait time when subscription succeeds
     _lastSubscriptionAttemptWait = 0;
 
     auto initialSubscribeStart = _initialSubscribeStart;
@@ -2476,8 +2477,6 @@ static NSString * const sLastInitialSubscribeLatencyKey = @"lastInitialSubscribe
                                    std::lock_guard lock(self->_lock);
 
                                    // First synchronously change state
-
-                                   // reset subscription attempt wait time when subscription succeeds
                                    if (HadSubscriptionEstablishedOnce(self->_internalDeviceState)) {
                                        [self _changeInternalState:MTRInternalDeviceStateLaterSubscriptionEstablished];
                                    } else {
