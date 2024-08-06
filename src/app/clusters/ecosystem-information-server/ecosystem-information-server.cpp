@@ -58,7 +58,8 @@ CHIP_ERROR AttrAccess::Read(const ConcreteReadAttributePath & aPath, AttributeVa
 // TODO(#33223) To improve safety we could make GetEncodableLocationDescriptorStruct a private
 // memeber method where we explicitly delete member method for the parameter that matches
 // (LocationDescriptorStruct && aLocationDescriptor).
-Globals::Structs::LocationDescriptorStruct::Type GetEncodableLocationDescriptorStruct(const LocationDescriptorStruct & aLocationDescriptor)
+Globals::Structs::LocationDescriptorStruct::Type
+GetEncodableLocationDescriptorStruct(const LocationDescriptorStruct & aLocationDescriptor)
 {
     Globals::Structs::LocationDescriptorStruct::Type locationDescriptor;
     // This would imply data is either not properly validated before being
@@ -191,7 +192,8 @@ EcosystemLocationStruct::Builder & EcosystemLocationStruct::Builder::SetFloorNum
     return *this;
 }
 
-EcosystemLocationStruct::Builder & EcosystemLocationStruct::Builder::SetAreaTypeTag(std::optional<Globals::AreaTypeTag> aAreaTypeTag)
+EcosystemLocationStruct::Builder &
+EcosystemLocationStruct::Builder::SetAreaTypeTag(std::optional<Globals::AreaTypeTag> aAreaTypeTag)
 {
     VerifyOrDie(!mIsAlreadyBuilt);
     mLocationDescriptor.mAreaType = aAreaTypeTag;
@@ -285,16 +287,14 @@ CHIP_ERROR EcosystemInformationServer::ReadAttribute(const ConcreteReadAttribute
         return EcosystemInformationServer::Instance().EncodeDeviceDirectoryAttribute(aPath.mEndpointId, aEncoder);
     case Attributes::LocationDirectory::Id:
         return EcosystemInformationServer::Instance().EncodeLocationStructAttribute(aPath.mEndpointId, aEncoder);
-    case Attributes::ClusterRevision::Id:
-        {
-            uint16_t rev = ZCL_ECOSYSTEM_INFORMATION_CLUSTER_REVISION;
-            return aEncoder.Encode(rev);
-        }
-    case Attributes::FeatureMap::Id:
-        {
-            uint32_t featureMap = ZCL_ECOSYSTEM_INFORMATION_FEATURE_MAP;
-            return aEncoder.Encode(featureMap);
-        }
+    case Attributes::ClusterRevision::Id: {
+        uint16_t rev = ZCL_ECOSYSTEM_INFORMATION_CLUSTER_REVISION;
+        return aEncoder.Encode(rev);
+    }
+    case Attributes::FeatureMap::Id: {
+        uint32_t featureMap = ZCL_ECOSYSTEM_INFORMATION_FEATURE_MAP;
+        return aEncoder.Encode(featureMap);
+    }
     default:
         break;
     }
