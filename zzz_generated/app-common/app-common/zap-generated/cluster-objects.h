@@ -28487,7 +28487,7 @@ public:
     static constexpr CommandId GetCommandId() { return Commands::SelectAreas::Id; }
     static constexpr ClusterId GetClusterId() { return Clusters::ServiceArea::Id; }
 
-    DataModel::Nullable<DataModel::List<const uint32_t>> newAreas;
+    DataModel::List<const uint32_t> newAreas;
 
     CHIP_ERROR Encode(TLV::TLVWriter & aWriter, TLV::Tag aTag) const;
 
@@ -28502,7 +28502,7 @@ public:
     static constexpr CommandId GetCommandId() { return Commands::SelectAreas::Id; }
     static constexpr ClusterId GetClusterId() { return Clusters::ServiceArea::Id; }
 
-    DataModel::Nullable<DataModel::DecodableList<uint32_t>> newAreas;
+    DataModel::DecodableList<uint32_t> newAreas;
     CHIP_ERROR Decode(TLV::TLVReader & reader);
 };
 }; // namespace SelectAreas
@@ -28624,12 +28624,10 @@ struct TypeInfo
 namespace SupportedMaps {
 struct TypeInfo
 {
-    using Type = chip::app::DataModel::Nullable<
-        chip::app::DataModel::List<const chip::app::Clusters::ServiceArea::Structs::MapStruct::Type>>;
-    using DecodableType = chip::app::DataModel::Nullable<
-        chip::app::DataModel::DecodableList<chip::app::Clusters::ServiceArea::Structs::MapStruct::DecodableType>>;
-    using DecodableArgType = const chip::app::DataModel::Nullable<
-        chip::app::DataModel::DecodableList<chip::app::Clusters::ServiceArea::Structs::MapStruct::DecodableType>> &;
+    using Type          = chip::app::DataModel::List<const chip::app::Clusters::ServiceArea::Structs::MapStruct::Type>;
+    using DecodableType = chip::app::DataModel::DecodableList<chip::app::Clusters::ServiceArea::Structs::MapStruct::DecodableType>;
+    using DecodableArgType =
+        const chip::app::DataModel::DecodableList<chip::app::Clusters::ServiceArea::Structs::MapStruct::DecodableType> &;
 
     static constexpr ClusterId GetClusterId() { return Clusters::ServiceArea::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::SupportedMaps::Id; }
@@ -28639,9 +28637,9 @@ struct TypeInfo
 namespace SelectedAreas {
 struct TypeInfo
 {
-    using Type             = chip::app::DataModel::Nullable<chip::app::DataModel::List<const uint32_t>>;
-    using DecodableType    = chip::app::DataModel::Nullable<chip::app::DataModel::DecodableList<uint32_t>>;
-    using DecodableArgType = const chip::app::DataModel::Nullable<chip::app::DataModel::DecodableList<uint32_t>> &;
+    using Type             = chip::app::DataModel::List<const uint32_t>;
+    using DecodableType    = chip::app::DataModel::DecodableList<uint32_t>;
+    using DecodableArgType = const chip::app::DataModel::DecodableList<uint32_t> &;
 
     static constexpr ClusterId GetClusterId() { return Clusters::ServiceArea::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::SelectedAreas::Id; }
@@ -28675,12 +28673,11 @@ struct TypeInfo
 namespace Progress {
 struct TypeInfo
 {
-    using Type = chip::app::DataModel::Nullable<
-        chip::app::DataModel::List<const chip::app::Clusters::ServiceArea::Structs::ProgressStruct::Type>>;
-    using DecodableType = chip::app::DataModel::Nullable<
-        chip::app::DataModel::DecodableList<chip::app::Clusters::ServiceArea::Structs::ProgressStruct::DecodableType>>;
-    using DecodableArgType = const chip::app::DataModel::Nullable<
-        chip::app::DataModel::DecodableList<chip::app::Clusters::ServiceArea::Structs::ProgressStruct::DecodableType>> &;
+    using Type = chip::app::DataModel::List<const chip::app::Clusters::ServiceArea::Structs::ProgressStruct::Type>;
+    using DecodableType =
+        chip::app::DataModel::DecodableList<chip::app::Clusters::ServiceArea::Structs::ProgressStruct::DecodableType>;
+    using DecodableArgType =
+        const chip::app::DataModel::DecodableList<chip::app::Clusters::ServiceArea::Structs::ProgressStruct::DecodableType> &;
 
     static constexpr ClusterId GetClusterId() { return Clusters::ServiceArea::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::Progress::Id; }
