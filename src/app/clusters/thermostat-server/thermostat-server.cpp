@@ -974,7 +974,7 @@ void ThermostatAttrAccess::OnFabricRemoved(const FabricTable & fabricTable, Fabr
     for (size_t i = 0; i < ArraySize(mAtomicWriteStates); ++i)
     {
         auto atomicWriteState = mAtomicWriteStates[i];
-        if (atomicWriteState.nodeId.GetFabricIndex() == fabricIndex)
+        if (atomicWriteState.inProgress && atomicWriteState.nodeId.GetFabricIndex() == fabricIndex)
         {
             auto delegate = GetDelegate(atomicWriteState.endpointId);
             if (delegate == nullptr)
