@@ -21789,7 +21789,7 @@ NS_ASSUME_NONNULL_BEGIN
 {
     if (self = [super init]) {
 
-        _newAreas = nil;
+        _newAreas = [NSArray array];
         _timedInvokeTimeoutMs = nil;
         _serverSideProcessingTimeout = nil;
     }
@@ -21822,31 +21822,26 @@ NS_ASSUME_NONNULL_BEGIN
     chip::app::Clusters::ServiceArea::Commands::SelectAreas::Type encodableStruct;
     ListFreer listFreer;
     {
-        if (self.newAreas == nil) {
-            encodableStruct.newAreas.SetNull();
-        } else {
-            auto & nonNullValue_0 = encodableStruct.newAreas.SetNonNull();
-            {
-                using ListType_1 = std::remove_reference_t<decltype(nonNullValue_0)>;
-                using ListMemberType_1 = ListMemberTypeGetter<ListType_1>::Type;
-                if (self.newAreas.count != 0) {
-                    auto * listHolder_1 = new ListHolder<ListMemberType_1>(self.newAreas.count);
-                    if (listHolder_1 == nullptr || listHolder_1->mList == nullptr) {
+        {
+            using ListType_0 = std::remove_reference_t<decltype(encodableStruct.newAreas)>;
+            using ListMemberType_0 = ListMemberTypeGetter<ListType_0>::Type;
+            if (self.newAreas.count != 0) {
+                auto * listHolder_0 = new ListHolder<ListMemberType_0>(self.newAreas.count);
+                if (listHolder_0 == nullptr || listHolder_0->mList == nullptr) {
+                    return CHIP_ERROR_INVALID_ARGUMENT;
+                }
+                listFreer.add(listHolder_0);
+                for (size_t i_0 = 0; i_0 < self.newAreas.count; ++i_0) {
+                    if (![self.newAreas[i_0] isKindOfClass:[NSNumber class]]) {
+                        // Wrong kind of value.
                         return CHIP_ERROR_INVALID_ARGUMENT;
                     }
-                    listFreer.add(listHolder_1);
-                    for (size_t i_1 = 0; i_1 < self.newAreas.count; ++i_1) {
-                        if (![self.newAreas[i_1] isKindOfClass:[NSNumber class]]) {
-                            // Wrong kind of value.
-                            return CHIP_ERROR_INVALID_ARGUMENT;
-                        }
-                        auto element_1 = (NSNumber *) self.newAreas[i_1];
-                        listHolder_1->mList[i_1] = element_1.unsignedIntValue;
-                    }
-                    nonNullValue_0 = ListType_1(listHolder_1->mList, self.newAreas.count);
-                } else {
-                    nonNullValue_0 = ListType_1();
+                    auto element_0 = (NSNumber *) self.newAreas[i_0];
+                    listHolder_0->mList[i_0] = element_0.unsignedIntValue;
                 }
+                encodableStruct.newAreas = ListType_0(listHolder_0->mList, self.newAreas.count);
+            } else {
+                encodableStruct.newAreas = ListType_0();
             }
         }
     }

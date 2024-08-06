@@ -107,11 +107,6 @@ RUN set -x \
     && rm -rf /var/lib/apt/lists/ \
     && : # last line
 
-# Required for the Bouffalolab platform
-RUN set -x \
-    && pip3 install --break-system-packages bflb-iot-tool==1.8.6 \
-    && : # last line
-
 ENV PATH $PATH:/usr/lib/kotlinc/bin
 ENV AMEBA_PATH=/opt/ameba/ambd_sdk_with_chip_non_NDA
 ENV ANDROID_HOME=/opt/android/sdk

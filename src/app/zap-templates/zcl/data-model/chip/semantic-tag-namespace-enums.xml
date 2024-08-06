@@ -25,13 +25,16 @@ limitations under the License.
     <item value="0x04" name="Middle"/>
     <item value="0x05" name="Row"/>
     <item value="0x06" name="Column"/>
-    <item value="0x07" name="Under"/>
-    <item value="0x08" name="Next To"/>
-    <item value="0x09" name="Around"/>
-    <item value="0x0A" name="On"/>
-    <item value="0x0B" name="Above"/>
-    <item value="0x0C" name="Front Of"/>
-    <item value="0x0D" name="Behind"/>
+  </enum>
+
+  <enum name="RelativePositionTag" type="enum8">
+    <item value="0x00" name="Under"/>
+    <item value="0x01" name="Next To"/>
+    <item value="0x02" name="Around"/>
+    <item value="0x03" name="On"/>
+    <item value="0x04" name="Above"/>
+    <item value="0x05" name="Front Of"/>
+    <item value="0x06" name="Behind"/>
   </enum>
 
   <enum name="AreaTypeTag" type="enum8">

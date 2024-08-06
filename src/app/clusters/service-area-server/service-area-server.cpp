@@ -134,7 +134,7 @@ CHIP_ERROR Instance::ReadSupportedAreas(AttributeValueEncoder & aEncoder)
 {
     if (mDelegate->GetNumberOfSupportedAreas() == 0)
     {
-        return aEncoder.EncodeNull();
+        return aEncoder.EncodeEmptyList();
     }
 
     return aEncoder.EncodeList([this](const auto & encoder) -> CHIP_ERROR {
@@ -153,7 +153,7 @@ CHIP_ERROR Instance::ReadSupportedMaps(AttributeValueEncoder & aEncoder)
 {
     if (mDelegate->GetNumberOfSupportedMaps() == 0)
     {
-        return aEncoder.EncodeNull();
+        return aEncoder.EncodeEmptyList();
     }
 
     return aEncoder.EncodeList([this](const auto & encoder) -> CHIP_ERROR {
@@ -172,7 +172,7 @@ CHIP_ERROR Instance::ReadSelectedAreas(AttributeValueEncoder & aEncoder)
 {
     if (mDelegate->GetNumberOfSelectedAreas() == 0)
     {
-        return aEncoder.EncodeNull();
+        return aEncoder.EncodeEmptyList();
     }
 
     return aEncoder.EncodeList([this](const auto & encoder) -> CHIP_ERROR {
@@ -191,7 +191,7 @@ CHIP_ERROR Instance::ReadProgress(AttributeValueEncoder & aEncoder)
 {
     if (mDelegate->GetNumberOfProgressElements() == 0)
     {
-        return aEncoder.EncodeNull();
+        return aEncoder.EncodeEmptyList();
     }
 
     return aEncoder.EncodeList([this](const auto & encoder) -> CHIP_ERROR {
@@ -224,9 +224,8 @@ void Instance::HandleSelectAreasCmd(HandlerContext & ctx, const Commands::Select
 
     size_t numberOfLocations = 0;
     // Get the number of Selected Locations in the command parameter and check that it is valid.
-    if (!req.newAreas.IsNull())
     {
-        if (CHIP_NO_ERROR != req.newAreas.Value().ComputeSize(&numberOfLocations))
+        if (CHIP_NO_ERROR != req.newAreas.ComputeSize(&numberOfLocations))
         {
             ctx.mCommandHandler.AddStatus(ctx.mRequestPath, Status::InvalidCommand);
             return;
@@ -244,14 +243,14 @@ void Instance::HandleSelectAreasCmd(HandlerContext & ctx, const Commands::Select
     // if number of selected locations in parameter matches number in attribute - the locations *might* be the same
     bool matchesCurrentSelectedAreas = (numberOfLocations == mDelegate->GetNumberOfSelectedAreas());
 
-    if (!req.newAreas.IsNull())
+    if (numberOfLocations != 0)
     {
         // do as much parameter validation as we can
         {
             uint32_t ignoredIndex = 0;
             uint32_t oldSelectedLocation;
             uint32_t i         = 0;
-            auto iLocationIter = req.newAreas.Value().begin();
+            auto iLocationIter = req.newAreas.begin();
             while (iLocationIter.Next())
             {
                 uint32_t aSelectedLocation = iLocationIter.GetValue();
@@ -266,7 +265,7 @@ void Instance::HandleSelectAreasCmd(HandlerContext & ctx, const Commands::Select
 
                 // Checking for duplicate locations.
                 uint32_t j         = 0;
-                auto jLocationIter = req.newAreas.Value().begin();
+                auto jLocationIter = req.newAreas.begin();
                 while (j < i)
                 {
                     jLocationIter
@@ -343,9 +342,9 @@ void Instance::HandleSelectAreasCmd(HandlerContext & ctx, const Commands::Select
         // and the SelectedAreas attribute SHALL be set to the value of the newAreas field.
         mDelegate->ClearSelectedAreas();
 
-        if (!req.newAreas.IsNull())
+        if (numberOfLocations != 0)
         {
-            auto locationIter = req.newAreas.Value().begin();
+            auto locationIter = req.newAreas.begin();
             uint32_t ignored;
             while (locationIter.Next())
             {

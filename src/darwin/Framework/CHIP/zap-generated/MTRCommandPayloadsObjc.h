@@ -7639,7 +7639,7 @@ MTR_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
 MTR_PROVISIONALLY_AVAILABLE
 @interface MTRServiceAreaClusterSelectAreasParams : NSObject <NSCopying>
 
-@property (nonatomic, copy, getter=getNewAreas) NSArray * _Nullable newAreas MTR_PROVISIONALLY_AVAILABLE;
+@property (nonatomic, copy, getter=getNewAreas) NSArray * _Nonnull newAreas MTR_PROVISIONALLY_AVAILABLE;
 /**
  * Controls whether the command is a timed command (using Timed Invoke).
  *

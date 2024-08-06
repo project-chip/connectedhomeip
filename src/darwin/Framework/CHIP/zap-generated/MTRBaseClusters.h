@@ -17381,13 +17381,16 @@ typedef NS_ENUM(uint8_t, MTRDataTypePositionTag) {
     MTRDataTypePositionTagMiddle MTR_PROVISIONALLY_AVAILABLE = 0x04,
     MTRDataTypePositionTagRow MTR_PROVISIONALLY_AVAILABLE = 0x05,
     MTRDataTypePositionTagColumn MTR_PROVISIONALLY_AVAILABLE = 0x06,
-    MTRDataTypePositionTagUnder MTR_PROVISIONALLY_AVAILABLE = 0x07,
-    MTRDataTypePositionTagNextTo MTR_PROVISIONALLY_AVAILABLE = 0x08,
-    MTRDataTypePositionTagAround MTR_PROVISIONALLY_AVAILABLE = 0x09,
-    MTRDataTypePositionTagOn MTR_PROVISIONALLY_AVAILABLE = 0x0A,
-    MTRDataTypePositionTagAbove MTR_PROVISIONALLY_AVAILABLE = 0x0B,
-    MTRDataTypePositionTagFrontOf MTR_PROVISIONALLY_AVAILABLE = 0x0C,
-    MTRDataTypePositionTagBehind MTR_PROVISIONALLY_AVAILABLE = 0x0D,
+} MTR_PROVISIONALLY_AVAILABLE;
+
+typedef NS_ENUM(uint8_t, MTRDataTypeRelativePositionTag) {
+    MTRDataTypeRelativePositionTagUnder MTR_PROVISIONALLY_AVAILABLE = 0x00,
+    MTRDataTypeRelativePositionTagNextTo MTR_PROVISIONALLY_AVAILABLE = 0x01,
+    MTRDataTypeRelativePositionTagAround MTR_PROVISIONALLY_AVAILABLE = 0x02,
+    MTRDataTypeRelativePositionTagOn MTR_PROVISIONALLY_AVAILABLE = 0x03,
+    MTRDataTypeRelativePositionTagAbove MTR_PROVISIONALLY_AVAILABLE = 0x04,
+    MTRDataTypeRelativePositionTagFrontOf MTR_PROVISIONALLY_AVAILABLE = 0x05,
+    MTRDataTypeRelativePositionTagBehind MTR_PROVISIONALLY_AVAILABLE = 0x06,
 } MTR_PROVISIONALLY_AVAILABLE;
 
 typedef NS_ENUM(uint8_t, MTRDataTypeTestGlobalEnum) {

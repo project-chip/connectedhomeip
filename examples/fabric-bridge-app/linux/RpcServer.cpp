@@ -29,8 +29,8 @@
 #include "pigweed/rpc_services/FabricBridge.h"
 #endif
 
-#include "Device.h"
-#include "DeviceManager.h"
+#include "BridgedDevice.h"
+#include "BridgedDeviceManager.h"
 
 using namespace chip;
 using namespace chip::app;
@@ -51,10 +51,10 @@ pw::Status FabricBridge::AddSynchronizedDevice(const chip_rpc_SynchronizedDevice
     NodeId nodeId = request.node_id;
     ChipLogProgress(NotSpecified, "Received AddSynchronizedDevice: " ChipLogFormatX64, ChipLogValueX64(nodeId));
 
-    Device * device = new Device(nodeId);
+    BridgedDevice * device = new BridgedDevice(nodeId);
     device->SetReachable(true);
 
-    int result = DeviceMgr().AddDeviceEndpoint(device, 1);
+    int result = BridgeDeviceMgr().AddDeviceEndpoint(device, 1);
     if (result == -1)
     {
         delete device;
@@ -70,7 +70,7 @@ pw::Status FabricBridge::RemoveSynchronizedDevice(const chip_rpc_SynchronizedDev
     NodeId nodeId = request.node_id;
     ChipLogProgress(NotSpecified, "Received RemoveSynchronizedDevice: " ChipLogFormatX64, ChipLogValueX64(nodeId));
 
-    int removed_idx = DeviceMgr().RemoveDeviceByNodeId(nodeId);
+    int removed_idx = BridgeDeviceMgr().RemoveDeviceByNodeId(nodeId);
     if (removed_idx < 0)
     {
         ChipLogError(NotSpecified, "Failed to remove device with nodeId=0x" ChipLogFormatX64, ChipLogValueX64(nodeId));

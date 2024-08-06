@@ -29,11 +29,11 @@ source_set("fabric-bridge-lib") {
   public_configs = [ ":config" ]
 
   sources = [
+    "include/BridgedDevice.h",
+    "include/BridgedDeviceManager.h",
     "include/CHIPProjectAppConfig.h",
-    "include/Device.h",
-    "include/DeviceManager.h",
-    "src/Device.cpp",
-    "src/DeviceManager.cpp",
+    "src/BridgedDevice.cpp",
+    "src/BridgedDeviceManager.cpp",
     "src/ZCLCallbacks.cpp",
   ]
 
