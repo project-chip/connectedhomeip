@@ -24,12 +24,13 @@
 # test-runner-run/run1/script-args: --storage-path admin_storage.json --commissioning-method on-network --discriminator 1234 --passcode 20202021 --trace-to json:${TRACE_TEST_JSON}.json --trace-to perfetto:${TRACE_TEST_PERFETTO}.perfetto --string-arg "end_user_support_log:${END_USER_SUPPORT_LOG}"
 # === END CI TEST ARGUMENTS ===
 
-from matter_testing_support import MatterBaseTest, TestStep, async_test_body, default_matter_test_main
 import asyncio
+
 import chip.clusters as Clusters
 from chip import ChipDeviceCtrl
 from chip.bdx import BdxTransfer
 from chip.ChipDeviceCtrl import ChipDeviceController
+from matter_testing_support import MatterBaseTest, TestStep, async_test_body, default_matter_test_main
 from mobly import asserts
 
 
