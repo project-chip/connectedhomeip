@@ -26,7 +26,6 @@ from chip.native import PyChipError
 
 from . import BdxTransfer
 
-
 c_uint8_p = POINTER(c_uint8)
 
 
