@@ -53,7 +53,9 @@ CHIP_ERROR BdxTransferServer::OnUnsolicitedMessageReceived(const PayloadHeader &
 
 void BdxTransferServer::OnExchangeCreationFailed(Messaging::ExchangeDelegate * delegate)
 {
-    mBdxTransferPool->Release(static_cast<BdxTransfer *>(delegate));
+    BdxTransfer * transfer = static_cast<BdxTransfer *>(delegate);
+    transfer->mDelegate->TransferCompleted(transfer, CHIP_ERROR_CONNECTION_ABORTED);
+    mBdxTransferPool->Release(transfer);
 }
 
 } // namespace bdx

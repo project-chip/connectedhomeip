@@ -110,6 +110,9 @@ private:
     std::vector<TransferData> mTransfers;
 };
 
+// A method to release a transfer.
+void ReleaseTransfer(bdx::BdxTransfer * transfer);
+
 // A delegate to forward events from a transfer to the appropriate Python callback and context.
 class TransferDelegate : public bdx::BdxTransfer::Delegate
 {
@@ -157,6 +160,7 @@ public:
             gOnTransferCompletedCallback(transferData->OnTransferCompletedContext, ToPyChipError(result));
             mTransfers->RemoveTransferData(transferData);
         }
+        ReleaseTransfer(transfer);
     }
 
 private:
@@ -167,6 +171,12 @@ TransferMap gTransfers;
 TransferDelegate gBdxTransferDelegate(&gTransfers);
 bdx::BdxTransferManager gBdxTransferManager(&gBdxTransferDelegate);
 bdx::BdxTransferServer gBdxTransferServer(gBdxTransferManager);
+
+void ReleaseTransfer(bdx::BdxTransfer * transfer)
+{
+    // TODO: Schedule this to happen later.
+    gBdxTransferManager.Release(transfer);
+}
 
 } // namespace python
 } // namespace chip
