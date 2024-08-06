@@ -347,10 +347,8 @@ uint8_t CountNumberOfPendingPresets(Delegate * delegate)
         }
         if (err != CHIP_NO_ERROR)
         {
-            ChipLogError(
-                Zcl,
-                "CountNumberOfPendingPresets: GetPendingPresetAtIndex failed with error %" CHIP_ERROR_FORMAT,
-                err.Format());
+            ChipLogError(Zcl, "CountNumberOfPendingPresets: GetPendingPresetAtIndex failed with error %" CHIP_ERROR_FORMAT,
+                         err.Format());
             return 0;
         }
         numberOfPendingPresets++;
