@@ -34,9 +34,7 @@ source_set("fabric-bridge-common") {
     "${chip_root}/src/app/clusters/ecosystem-information-server/ecosystem-information-server.h",
   ]
 
-  public_deps = [
-    ":fabric-bridge-common-zap",
-  ]
+  public_deps = [ ":fabric-bridge-common-zap" ]
 }
 
 source_set("fabric-bridge-lib") {
