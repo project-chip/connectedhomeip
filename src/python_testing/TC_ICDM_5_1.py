@@ -79,8 +79,11 @@ class TC_ICDM_5_1(MatterBaseTest):
         localCompressedNodeId = hex(self.default_controller.GetCompressedFabricId())
         dutNodeId = hex(self.dut_node_id)
 
-        services = await discovery.get_all_services(log_output=False)
+        services = await discovery.get_all_services(log_output=False, discovery_timeout_sec=120)
         icdTxtRecord = modes.kUnknownEnumValue.value
+
+        asserts.assert_true(mdns_discovery.MdnsServiceType.OPERATIONAL.value in services,
+                            "Could not find ICD operational service information.")
 
         for service in services[mdns_discovery.MdnsServiceType.OPERATIONAL.value]:
 
