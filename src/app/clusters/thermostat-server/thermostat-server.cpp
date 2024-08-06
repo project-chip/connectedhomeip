@@ -321,45 +321,20 @@ bool IsPresetHandlePresentInPresets(Delegate * delegate, const ByteSpan & preset
 }
 
 /**
- * @brief Returns the length of the list of presets if the pending presets were to be applied. The calculation is done by
- *        adding the number of presets in Presets attribute list to the number of pending presets in the pending
- *        presets list and subtracting the number of duplicate presets. This is called before changes are actually applied.
+ * @brief Returns the length of the list of presets if the pending presets were to be applied. The size of the pending presets list
+ *        calculated, after all the constraint checks are done, is the new size of the updated Presets attribute since the pending
+ *        preset list is expected to have all existing presets with or without edits plus new presets.
+ *        This is called before changes are actually applied.
  *
  * @param[in] delegate The delegate to use.
  *
  * @return count of the updated Presets attribute if the pending presets were applied to it. Return 0 for error cases.
  */
-uint8_t CountUpdatedPresetsAfterApplyingPendingPresets(Delegate * delegate)
+uint8_t CountNumberOfPendingPresets(Delegate * delegate)
 {
-    uint8_t numberOfPresets        = 0;
-    uint8_t numberOfMatches        = 0;
     uint8_t numberOfPendingPresets = 0;
 
     VerifyOrReturnValue(delegate != nullptr, 0);
-
-    for (uint8_t i = 0; true; i++)
-    {
-        PresetStructWithOwnedMembers preset;
-        CHIP_ERROR err = delegate->GetPresetAtIndex(i, preset);
-
-        if (err == CHIP_ERROR_PROVIDER_LIST_EXHAUSTED)
-        {
-            break;
-        }
-        if (err != CHIP_NO_ERROR)
-        {
-            ChipLogError(Zcl, "GetUpdatedPresetsCount: GetPresetAtIndex failed with error %" CHIP_ERROR_FORMAT, err.Format());
-            return 0;
-        }
-        numberOfPresets++;
-
-        bool found = MatchingPendingPresetExists(delegate, preset);
-
-        if (found)
-        {
-            numberOfMatches++;
-        }
-    }
 
     for (uint8_t i = 0; true; i++)
     {
@@ -372,16 +347,14 @@ uint8_t CountUpdatedPresetsAfterApplyingPendingPresets(Delegate * delegate)
         }
         if (err != CHIP_NO_ERROR)
         {
-            ChipLogError(Zcl, "GetUpdatedPresetsCount: GetPendingPresetAtIndex failed with error %" CHIP_ERROR_FORMAT,
+            ChipLogError(Zcl, "CountNumberOfPendingPresets: GetPendingPresetAtIndex failed with error %" CHIP_ERROR_FORMAT,
                          err.Format());
             return 0;
         }
         numberOfPendingPresets++;
     }
 
-    // TODO: #34546 - Need to support deletion of presets that are removed from Presets.
-    // This API needs to modify its logic for the deletion case.
-    return static_cast<uint8_t>(numberOfPresets + numberOfPendingPresets - numberOfMatches);
+    return numberOfPendingPresets;
 }
 
 /**
@@ -1545,7 +1518,7 @@ imcode commitPresets(Delegate * delegate, EndpointId endpoint)
         }
     }
 
-    uint8_t totalCount = CountUpdatedPresetsAfterApplyingPendingPresets(delegate);
+    uint8_t totalCount = CountNumberOfPendingPresets(delegate);
 
     uint8_t numberOfPresetsSupported = delegate->GetNumberOfPresets();
 

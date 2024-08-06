@@ -31144,11 +31144,11 @@ class ServiceArea(Cluster):
         return ClusterObjectDescriptor(
             Fields=[
                 ClusterObjectFieldDescriptor(Label="supportedAreas", Tag=0x00000000, Type=typing.List[ServiceArea.Structs.AreaStruct]),
-                ClusterObjectFieldDescriptor(Label="supportedMaps", Tag=0x00000001, Type=typing.Union[Nullable, typing.List[ServiceArea.Structs.MapStruct]]),
-                ClusterObjectFieldDescriptor(Label="selectedAreas", Tag=0x00000002, Type=typing.Union[Nullable, typing.List[uint]]),
+                ClusterObjectFieldDescriptor(Label="supportedMaps", Tag=0x00000001, Type=typing.List[ServiceArea.Structs.MapStruct]),
+                ClusterObjectFieldDescriptor(Label="selectedAreas", Tag=0x00000002, Type=typing.List[uint]),
                 ClusterObjectFieldDescriptor(Label="currentArea", Tag=0x00000003, Type=typing.Union[None, Nullable, uint]),
                 ClusterObjectFieldDescriptor(Label="estimatedEndTime", Tag=0x00000004, Type=typing.Union[None, Nullable, uint]),
-                ClusterObjectFieldDescriptor(Label="progress", Tag=0x00000005, Type=typing.Union[None, Nullable, typing.List[ServiceArea.Structs.ProgressStruct]]),
+                ClusterObjectFieldDescriptor(Label="progress", Tag=0x00000005, Type=typing.Optional[typing.List[ServiceArea.Structs.ProgressStruct]]),
                 ClusterObjectFieldDescriptor(Label="generatedCommandList", Tag=0x0000FFF8, Type=typing.List[uint]),
                 ClusterObjectFieldDescriptor(Label="acceptedCommandList", Tag=0x0000FFF9, Type=typing.List[uint]),
                 ClusterObjectFieldDescriptor(Label="eventList", Tag=0x0000FFFA, Type=typing.List[uint]),
@@ -31158,11 +31158,11 @@ class ServiceArea(Cluster):
             ])
 
     supportedAreas: 'typing.List[ServiceArea.Structs.AreaStruct]' = None
-    supportedMaps: 'typing.Union[Nullable, typing.List[ServiceArea.Structs.MapStruct]]' = None
-    selectedAreas: 'typing.Union[Nullable, typing.List[uint]]' = None
+    supportedMaps: 'typing.List[ServiceArea.Structs.MapStruct]' = None
+    selectedAreas: 'typing.List[uint]' = None
     currentArea: 'typing.Union[None, Nullable, uint]' = None
     estimatedEndTime: 'typing.Union[None, Nullable, uint]' = None
-    progress: 'typing.Union[None, Nullable, typing.List[ServiceArea.Structs.ProgressStruct]]' = None
+    progress: 'typing.Optional[typing.List[ServiceArea.Structs.ProgressStruct]]' = None
     generatedCommandList: 'typing.List[uint]' = None
     acceptedCommandList: 'typing.List[uint]' = None
     eventList: 'typing.List[uint]' = None
@@ -31284,10 +31284,10 @@ class ServiceArea(Cluster):
             def descriptor(cls) -> ClusterObjectDescriptor:
                 return ClusterObjectDescriptor(
                     Fields=[
-                        ClusterObjectFieldDescriptor(Label="newAreas", Tag=0, Type=typing.Union[Nullable, typing.List[uint]]),
+                        ClusterObjectFieldDescriptor(Label="newAreas", Tag=0, Type=typing.List[uint]),
                     ])
 
-            newAreas: 'typing.Union[Nullable, typing.List[uint]]' = NullValue
+            newAreas: 'typing.List[uint]' = field(default_factory=lambda: [])
 
         @dataclass
         class SelectAreasResponse(ClusterCommand):
@@ -31367,9 +31367,9 @@ class ServiceArea(Cluster):
 
             @ChipUtility.classproperty
             def attribute_type(cls) -> ClusterObjectFieldDescriptor:
-                return ClusterObjectFieldDescriptor(Type=typing.Union[Nullable, typing.List[ServiceArea.Structs.MapStruct]])
+                return ClusterObjectFieldDescriptor(Type=typing.List[ServiceArea.Structs.MapStruct])
 
-            value: 'typing.Union[Nullable, typing.List[ServiceArea.Structs.MapStruct]]' = NullValue
+            value: 'typing.List[ServiceArea.Structs.MapStruct]' = field(default_factory=lambda: [])
 
         @dataclass
         class SelectedAreas(ClusterAttributeDescriptor):
@@ -31383,9 +31383,9 @@ class ServiceArea(Cluster):
 
             @ChipUtility.classproperty
             def attribute_type(cls) -> ClusterObjectFieldDescriptor:
-                return ClusterObjectFieldDescriptor(Type=typing.Union[Nullable, typing.List[uint]])
+                return ClusterObjectFieldDescriptor(Type=typing.List[uint])
 
-            value: 'typing.Union[Nullable, typing.List[uint]]' = NullValue
+            value: 'typing.List[uint]' = field(default_factory=lambda: [])
 
         @dataclass
         class CurrentArea(ClusterAttributeDescriptor):
@@ -31431,9 +31431,9 @@ class ServiceArea(Cluster):
 
             @ChipUtility.classproperty
             def attribute_type(cls) -> ClusterObjectFieldDescriptor:
-                return ClusterObjectFieldDescriptor(Type=typing.Union[None, Nullable, typing.List[ServiceArea.Structs.ProgressStruct]])
+                return ClusterObjectFieldDescriptor(Type=typing.Optional[typing.List[ServiceArea.Structs.ProgressStruct]])
 
-            value: 'typing.Union[None, Nullable, typing.List[ServiceArea.Structs.ProgressStruct]]' = None
+            value: 'typing.Optional[typing.List[ServiceArea.Structs.ProgressStruct]]' = None
 
         @dataclass
         class GeneratedCommandList(ClusterAttributeDescriptor):
