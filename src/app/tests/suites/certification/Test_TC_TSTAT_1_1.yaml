@@ -624,7 +624,7 @@ tests:
       response:
           constraints:
               type: list
-              contains: [6, 7, 8, 9]
+              contains: [254]
 
     - label:
           "Step 7a: TH reads from the DUT the GeneratedCommandList attribute."
@@ -632,7 +632,7 @@ tests:
       command: "readAttribute"
       attribute: "GeneratedCommandList"
       response:
-          value: []
+          value: [0xFD] # AtomicResponse
           constraints:
               type: list
 
