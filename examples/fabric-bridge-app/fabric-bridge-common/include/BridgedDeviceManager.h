@@ -20,17 +20,17 @@
 
 #include <platform/CHIPDeviceLayer.h>
 
-#include "Device.h"
+#include "BridgedDevice.h"
 
-class DeviceManager
+class BridgedDeviceManager
 {
 public:
-    DeviceManager() = default;
+    BridgedDeviceManager() = default;
 
     /**
-     * @brief Initializes the DeviceManager.
+     * @brief Initializes the BridgedDeviceManager.
      *
-     * This function sets up the initial state of the DeviceManager, clearing
+     * This function sets up the initial state of the BridgedDeviceManager, clearing
      * any existing devices and setting the starting dynamic endpoint ID.
      */
     void Init();
@@ -47,7 +47,7 @@ public:
      * @param parentEndpointId The parent endpoint ID. Defaults to an invalid endpoint ID.
      * @return int The index of the dynamic endpoint if successful, -1 otherwise.
      */
-    int AddDeviceEndpoint(Device * dev, chip::EndpointId parentEndpointId = chip::kInvalidEndpointId);
+    int AddDeviceEndpoint(BridgedDevice * dev, chip::EndpointId parentEndpointId = chip::kInvalidEndpointId);
 
     /**
      * @brief Removes a device from a dynamic endpoint.
@@ -60,7 +60,7 @@ public:
      * @param dev A pointer to the device to be removed.
      * @return int The index of the removed dynamic endpoint if successful, -1 otherwise.
      */
-    int RemoveDeviceEndpoint(Device * dev);
+    int RemoveDeviceEndpoint(BridgedDevice * dev);
 
     /**
      * @brief Gets a device from its endpoint ID.
@@ -69,9 +69,9 @@ public:
      * specified endpoint ID. If no device matches the endpoint ID, it returns nullptr.
      *
      * @param endpointId The endpoint ID of the device to be retrieved.
-     * @return Device* A pointer to the device if found, nullptr otherwise.
+     * @return BridgedDevice* A pointer to the device if found, nullptr otherwise.
      */
-    Device * GetDevice(chip::EndpointId endpointId) const;
+    BridgedDevice * GetDevice(chip::EndpointId endpointId) const;
 
     /**
      * @brief Gets a device from its NodeId.
@@ -80,9 +80,9 @@ public:
      * specified NodeId. If no device matches the NodeId, it returns nullptr.
      *
      * @param nodeId The NodeId of the device to be retrieved.
-     * @return Device* A pointer to the device if found, nullptr otherwise.
+     * @return BridgedDevice* A pointer to the device if found, nullptr otherwise.
      */
-    Device * GetDeviceByNodeId(chip::NodeId nodeId) const;
+    BridgedDevice * GetDeviceByNodeId(chip::NodeId nodeId) const;
 
     /**
      * @brief Removes a device from a dynamic endpoint by its NodeId.
@@ -98,22 +98,22 @@ public:
     int RemoveDeviceByNodeId(chip::NodeId nodeId);
 
 private:
-    friend DeviceManager & DeviceMgr();
+    friend BridgedDeviceManager & BridgeDeviceMgr();
 
-    static DeviceManager sInstance;
+    static BridgedDeviceManager sInstance;
 
     chip::EndpointId mCurrentEndpointId;
     chip::EndpointId mFirstDynamicEndpointId;
-    Device * mDevices[CHIP_DEVICE_CONFIG_DYNAMIC_ENDPOINT_COUNT + 1];
+    BridgedDevice * mDevices[CHIP_DEVICE_CONFIG_DYNAMIC_ENDPOINT_COUNT + 1];
 };
 
 /**
- * Returns the public interface of the DeviceManager singleton object.
+ * Returns the public interface of the BridgedDeviceManager singleton object.
  *
- * Applications should use this to access features of the DeviceManager
+ * Applications should use this to access features of the BridgedDeviceManager
  * object.
  */
-inline DeviceManager & DeviceMgr()
+inline BridgedDeviceManager & BridgeDeviceMgr()
 {
-    return DeviceManager::sInstance;
+    return BridgedDeviceManager::sInstance;
 }

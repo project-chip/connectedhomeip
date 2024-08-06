@@ -16,7 +16,7 @@
  *    limitations under the License.
  */
 
-#include "DeviceManager.h"
+#include "BridgedDeviceManager.h"
 
 #include <app-common/zap-generated/ids/Attributes.h>
 #include <app-common/zap-generated/ids/Clusters.h>
@@ -121,9 +121,9 @@ const EmberAfDeviceType sBridgedDeviceTypes[] = { { DEVICE_TYPE_BRIDGED_NODE, DE
 } // namespace
 
 // Define the static member
-DeviceManager DeviceManager::sInstance;
+BridgedDeviceManager BridgedDeviceManager::sInstance;
 
-void DeviceManager::Init()
+void BridgedDeviceManager::Init()
 {
     memset(mDevices, 0, sizeof(mDevices));
     mFirstDynamicEndpointId = static_cast<chip::EndpointId>(
@@ -131,7 +131,7 @@ void DeviceManager::Init()
     mCurrentEndpointId = mFirstDynamicEndpointId;
 }
 
-int DeviceManager::AddDeviceEndpoint(Device * dev, chip::EndpointId parentEndpointId)
+int BridgedDeviceManager::AddDeviceEndpoint(BridgedDevice * dev, chip::EndpointId parentEndpointId)
 {
     uint8_t index                                              = 0;
     EmberAfEndpointType * ep                                   = &sBridgedNodeEndpoint;
@@ -181,7 +181,7 @@ int DeviceManager::AddDeviceEndpoint(Device * dev, chip::EndpointId parentEndpoi
     return -1;
 }
 
-int DeviceManager::RemoveDeviceEndpoint(Device * dev)
+int BridgedDeviceManager::RemoveDeviceEndpoint(BridgedDevice * dev)
 {
     uint8_t index = 0;
     while (index < CHIP_DEVICE_CONFIG_DYNAMIC_ENDPOINT_COUNT)
@@ -201,7 +201,7 @@ int DeviceManager::RemoveDeviceEndpoint(Device * dev)
     return -1;
 }
 
-Device * DeviceManager::GetDevice(chip::EndpointId endpointId) const
+BridgedDevice * BridgedDeviceManager::GetDevice(chip::EndpointId endpointId) const
 {
     for (uint8_t index = 0; index < CHIP_DEVICE_CONFIG_DYNAMIC_ENDPOINT_COUNT; ++index)
     {
@@ -213,7 +213,7 @@ Device * DeviceManager::GetDevice(chip::EndpointId endpointId) const
     return nullptr;
 }
 
-Device * DeviceManager::GetDeviceByNodeId(chip::NodeId nodeId) const
+BridgedDevice * BridgedDeviceManager::GetDeviceByNodeId(chip::NodeId nodeId) const
 {
     for (uint8_t index = 0; index < CHIP_DEVICE_CONFIG_DYNAMIC_ENDPOINT_COUNT; ++index)
     {
@@ -225,7 +225,7 @@ Device * DeviceManager::GetDeviceByNodeId(chip::NodeId nodeId) const
     return nullptr;
 }
 
-int DeviceManager::RemoveDeviceByNodeId(chip::NodeId nodeId)
+int BridgedDeviceManager::RemoveDeviceByNodeId(chip::NodeId nodeId)
 {
     for (uint8_t index = 0; index < CHIP_DEVICE_CONFIG_DYNAMIC_ENDPOINT_COUNT; ++index)
     {
