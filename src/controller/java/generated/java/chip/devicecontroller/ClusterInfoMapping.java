@@ -13117,7 +13117,7 @@ public class ClusterInfoMapping {
   }
 
 
-  public static class DelegatedServiceAreaClusterSelectLocationsResponseCallback implements ChipClusters.ServiceAreaCluster.SelectLocationsResponseCallback, DelegatedClusterCallback {
+  public static class DelegatedServiceAreaClusterSelectAreasResponseCallback implements ChipClusters.ServiceAreaCluster.SelectAreasResponseCallback, DelegatedClusterCallback {
     private ClusterCommandCallback callback;
     @Override
     public void setCallbackDelegate(ClusterCommandCallback callback) {
@@ -13141,7 +13141,7 @@ public class ClusterInfoMapping {
     }
   }
 
-  public static class DelegatedServiceAreaClusterSkipCurrentLocationResponseCallback implements ChipClusters.ServiceAreaCluster.SkipCurrentLocationResponseCallback, DelegatedClusterCallback {
+  public static class DelegatedServiceAreaClusterSkipAreaResponseCallback implements ChipClusters.ServiceAreaCluster.SkipAreaResponseCallback, DelegatedClusterCallback {
     private ClusterCommandCallback callback;
     @Override
     public void setCallbackDelegate(ClusterCommandCallback callback) {
@@ -13164,7 +13164,7 @@ public class ClusterInfoMapping {
       callback.onFailure(error);
     }
   }
-  public static class DelegatedServiceAreaClusterSupportedLocationsAttributeCallback implements ChipClusters.ServiceAreaCluster.SupportedLocationsAttributeCallback, DelegatedClusterCallback {
+  public static class DelegatedServiceAreaClusterSupportedAreasAttributeCallback implements ChipClusters.ServiceAreaCluster.SupportedAreasAttributeCallback, DelegatedClusterCallback {
     private ClusterCommandCallback callback;
     @Override
     public void setCallbackDelegate(ClusterCommandCallback callback) {
@@ -13172,9 +13172,9 @@ public class ClusterInfoMapping {
     }
 
     @Override
-    public void onSuccess(List<ChipStructs.ServiceAreaClusterLocationStruct> valueList) {
+    public void onSuccess(List<ChipStructs.ServiceAreaClusterAreaStruct> valueList) {
       Map<CommandResponseInfo, Object> responseValues = new LinkedHashMap<>();
-      CommandResponseInfo commandResponseInfo = new CommandResponseInfo("valueList", "List<ChipStructs.ServiceAreaClusterLocationStruct>");
+      CommandResponseInfo commandResponseInfo = new CommandResponseInfo("valueList", "List<ChipStructs.ServiceAreaClusterAreaStruct>");
       responseValues.put(commandResponseInfo, valueList);
       callback.onSuccess(responseValues);
     }
@@ -13206,7 +13206,7 @@ public class ClusterInfoMapping {
     }
   }
 
-  public static class DelegatedServiceAreaClusterSelectedLocationsAttributeCallback implements ChipClusters.ServiceAreaCluster.SelectedLocationsAttributeCallback, DelegatedClusterCallback {
+  public static class DelegatedServiceAreaClusterSelectedAreasAttributeCallback implements ChipClusters.ServiceAreaCluster.SelectedAreasAttributeCallback, DelegatedClusterCallback {
     private ClusterCommandCallback callback;
     @Override
     public void setCallbackDelegate(ClusterCommandCallback callback) {
@@ -13227,7 +13227,7 @@ public class ClusterInfoMapping {
     }
   }
 
-  public static class DelegatedServiceAreaClusterCurrentLocationAttributeCallback implements ChipClusters.ServiceAreaCluster.CurrentLocationAttributeCallback, DelegatedClusterCallback {
+  public static class DelegatedServiceAreaClusterCurrentAreaAttributeCallback implements ChipClusters.ServiceAreaCluster.CurrentAreaAttributeCallback, DelegatedClusterCallback {
     private ClusterCommandCallback callback;
     @Override
     public void setCallbackDelegate(ClusterCommandCallback callback) {
@@ -26945,35 +26945,35 @@ public class ClusterInfoMapping {
 
     Map<String, InteractionInfo> serviceAreaClusterInteractionInfoMap = new LinkedHashMap<>();
 
-    Map<String, CommandParameterInfo> serviceAreaselectLocationsCommandParams = new LinkedHashMap<String, CommandParameterInfo>();
+    Map<String, CommandParameterInfo> serviceAreaselectAreasCommandParams = new LinkedHashMap<String, CommandParameterInfo>();
 
-    CommandParameterInfo serviceAreaselectLocationsnewLocationsCommandParameterInfo = new CommandParameterInfo("newLocations", ArrayList.class, ArrayList.class);
-    serviceAreaselectLocationsCommandParams.put("newLocations",serviceAreaselectLocationsnewLocationsCommandParameterInfo);
-    InteractionInfo serviceAreaselectLocationsInteractionInfo = new InteractionInfo(
+    CommandParameterInfo serviceAreaselectAreasnewAreasCommandParameterInfo = new CommandParameterInfo("newAreas", ArrayList.class, ArrayList.class);
+    serviceAreaselectAreasCommandParams.put("newAreas",serviceAreaselectAreasnewAreasCommandParameterInfo);
+    InteractionInfo serviceAreaselectAreasInteractionInfo = new InteractionInfo(
       (cluster, callback, commandArguments) -> {
         ((ChipClusters.ServiceAreaCluster) cluster)
-          .selectLocations((ChipClusters.ServiceAreaCluster.SelectLocationsResponseCallback) callback
+          .selectAreas((ChipClusters.ServiceAreaCluster.SelectAreasResponseCallback) callback
            , (ArrayList<Long>)
-             commandArguments.get("newLocations")
+             commandArguments.get("newAreas")
 
             );
         },
-        () -> new DelegatedServiceAreaClusterSelectLocationsResponseCallback(),
-        serviceAreaselectLocationsCommandParams
+        () -> new DelegatedServiceAreaClusterSelectAreasResponseCallback(),
+        serviceAreaselectAreasCommandParams
       );
-    serviceAreaClusterInteractionInfoMap.put("selectLocations", serviceAreaselectLocationsInteractionInfo);
+    serviceAreaClusterInteractionInfoMap.put("selectAreas", serviceAreaselectAreasInteractionInfo);
 
-    Map<String, CommandParameterInfo> serviceAreaskipCurrentLocationCommandParams = new LinkedHashMap<String, CommandParameterInfo>();
-    InteractionInfo serviceAreaskipCurrentLocationInteractionInfo = new InteractionInfo(
+    Map<String, CommandParameterInfo> serviceAreaskipAreaCommandParams = new LinkedHashMap<String, CommandParameterInfo>();
+    InteractionInfo serviceAreaskipAreaInteractionInfo = new InteractionInfo(
       (cluster, callback, commandArguments) -> {
         ((ChipClusters.ServiceAreaCluster) cluster)
-          .skipCurrentLocation((ChipClusters.ServiceAreaCluster.SkipCurrentLocationResponseCallback) callback
+          .skipArea((ChipClusters.ServiceAreaCluster.SkipAreaResponseCallback) callback
             );
         },
-        () -> new DelegatedServiceAreaClusterSkipCurrentLocationResponseCallback(),
-        serviceAreaskipCurrentLocationCommandParams
+        () -> new DelegatedServiceAreaClusterSkipAreaResponseCallback(),
+        serviceAreaskipAreaCommandParams
       );
-    serviceAreaClusterInteractionInfoMap.put("skipCurrentLocation", serviceAreaskipCurrentLocationInteractionInfo);
+    serviceAreaClusterInteractionInfoMap.put("skipArea", serviceAreaskipAreaInteractionInfo);
 
     commandMap.put("serviceArea", serviceAreaClusterInteractionInfoMap);
 

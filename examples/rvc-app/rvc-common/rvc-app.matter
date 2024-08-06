@@ -1432,17 +1432,17 @@ provisional cluster ServiceArea = 336 {
     kCompleted = 3;
   }
 
-  enum SelectLocationsStatus : enum8 {
+  enum SelectAreasStatus : enum8 {
     kSuccess = 0;
-    kUnsupportedLocation = 1;
-    kDuplicatedLocations = 2;
+    kUnsupportedArea = 1;
+    kDuplicatedAreas = 2;
     kInvalidInMode = 3;
     kInvalidSet = 4;
   }
 
-  enum SkipCurrentLocationStatus : enum8 {
+  enum SkipAreaStatus : enum8 {
     kSuccess = 0;
-    kInvalidLocationList = 1;
+    kInvalidAreaList = 1;
     kInvalidInMode = 2;
   }
 
@@ -1451,17 +1451,17 @@ provisional cluster ServiceArea = 336 {
     kSelectWhileRunning = 0x2;
   }
 
-  struct LocationInfoStruct {
+  struct AreaInfoStruct {
     nullable LocationDescriptorStruct locationInfo = 0;
     nullable LandmarkTag landmarkTag = 1;
     nullable PositionTag positionTag = 2;
     nullable FloorSurfaceTag surfaceTag = 3;
   }
 
-  struct LocationStruct {
-    int32u locationID = 0;
+  struct AreaStruct {
+    int32u areaID = 0;
     nullable int8u mapID = 1;
-    LocationInfoStruct locationInfo = 2;
+    AreaInfoStruct areaDesc = 2;
   }
 
   struct MapStruct {
@@ -1470,16 +1470,16 @@ provisional cluster ServiceArea = 336 {
   }
 
   struct ProgressStruct {
-    int32u locationID = 0;
+    int32u areaID = 0;
     OperationalStatusEnum status = 1;
     optional nullable elapsed_s totalOperationalTime = 2;
     optional nullable elapsed_s estimatedTime = 3;
   }
 
-  readonly attribute LocationStruct supportedLocations[] = 0;
+  readonly attribute AreaStruct supportedAreas[] = 0;
   readonly attribute nullable MapStruct supportedMaps[] = 1;
-  readonly attribute nullable int32u selectedLocations[] = 2;
-  readonly attribute optional nullable int32u currentLocation = 3;
+  readonly attribute nullable int32u selectedAreas[] = 2;
+  readonly attribute optional nullable int32u currentArea = 3;
   readonly attribute optional nullable epoch_s estimatedEndTime = 4;
   readonly attribute optional nullable ProgressStruct progress[] = 5;
   readonly attribute command_id generatedCommandList[] = 65528;
@@ -1489,24 +1489,24 @@ provisional cluster ServiceArea = 336 {
   readonly attribute bitmap32 featureMap = 65532;
   readonly attribute int16u clusterRevision = 65533;
 
-  request struct SelectLocationsRequest {
-    nullable int32u newLocations[] = 0;
+  request struct SelectAreasRequest {
+    nullable int32u newAreas[] = 0;
   }
 
-  response struct SelectLocationsResponse = 1 {
-    SelectLocationsStatus status = 0;
+  response struct SelectAreasResponse = 1 {
+    SelectAreasStatus status = 0;
     optional char_string<256> statusText = 1;
   }
 
-  response struct SkipCurrentLocationResponse = 3 {
-    SkipCurrentLocationStatus status = 0;
+  response struct SkipAreaResponse = 3 {
+    SkipAreaStatus status = 0;
     optional char_string<256> statusText = 1;
   }
 
-  /** Command used to select a set of device locations, where the device is to operate */
-  command SelectLocations(SelectLocationsRequest): SelectLocationsResponse = 0;
-  /** This command is used to skip the current location where the device operates. */
-  command SkipCurrentLocation(): SkipCurrentLocationResponse = 2;
+  /** Command used to select a set of device areas, where the device is to operate. */
+  command SelectAreas(SelectAreasRequest): SelectAreasResponse = 0;
+  /** This command is used to skip an area where the device operates. */
+  command SkipArea(): SkipAreaResponse = 2;
 }
 
 endpoint 0 {
@@ -1766,10 +1766,10 @@ endpoint 1 {
   }
 
   server cluster ServiceArea {
-    callback attribute supportedLocations;
+    callback attribute supportedAreas;
     callback attribute supportedMaps;
-    callback attribute selectedLocations;
-    callback attribute currentLocation;
+    callback attribute selectedAreas;
+    callback attribute currentArea;
     callback attribute estimatedEndTime;
     callback attribute progress;
     callback attribute generatedCommandList;
@@ -1779,10 +1779,10 @@ endpoint 1 {
     callback attribute featureMap;
     ram      attribute clusterRevision default = 1;
 
-    handle command SelectLocations;
-    handle command SelectLocationsResponse;
-    handle command SkipCurrentLocation;
-    handle command SkipCurrentLocationResponse;
+    handle command SelectAreas;
+    handle command SelectAreasResponse;
+    handle command SkipArea;
+    handle command SkipAreaResponse;
   }
 }
 

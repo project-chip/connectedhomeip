@@ -11634,10 +11634,10 @@ public class ClusterIDMapping {
         }
 
         public enum Attribute {
-            SupportedLocations(0L),
+            SupportedAreas(0L),
             SupportedMaps(1L),
-            SelectedLocations(2L),
-            CurrentLocation(3L),
+            SelectedAreas(2L),
+            CurrentArea(3L),
             EstimatedEndTime(4L),
             Progress(5L),
             GeneratedCommandList(65528L),
@@ -11686,8 +11686,8 @@ public class ClusterIDMapping {
         }
 
         public enum Command {
-            SelectLocations(0L),
-            SkipCurrentLocation(2L),;
+            SelectAreas(0L),
+            SkipArea(2L),;
             private final long id;
             Command(long id) {
                 this.id = id;
@@ -11705,17 +11705,17 @@ public class ClusterIDMapping {
                 }
                 throw new NoSuchFieldError();
             }
-        }public enum SelectLocationsCommandField {NewLocations(0),;
+        }public enum SelectAreasCommandField {NewAreas(0),;
                     private final int id;
-                    SelectLocationsCommandField(int id) {
+                    SelectAreasCommandField(int id) {
                         this.id = id;
                     }
 
                     public int getID() {
                         return id;
                     }
-                    public static SelectLocationsCommandField value(int id) throws NoSuchFieldError {
-                        for (SelectLocationsCommandField field : SelectLocationsCommandField.values()) {
+                    public static SelectAreasCommandField value(int id) throws NoSuchFieldError {
+                        for (SelectAreasCommandField field : SelectAreasCommandField.values()) {
                         if (field.getID() == id) {
                             return field;
                         }

@@ -3820,14 +3820,14 @@ enum class OperationalStatusEnum : uint8_t
     kUnknownEnumValue = 4,
 };
 
-// Enum for SelectLocationsStatus
-enum class SelectLocationsStatus : uint8_t
+// Enum for SelectAreasStatus
+enum class SelectAreasStatus : uint8_t
 {
-    kSuccess             = 0x00,
-    kUnsupportedLocation = 0x01,
-    kDuplicatedLocations = 0x02,
-    kInvalidInMode       = 0x03,
-    kInvalidSet          = 0x04,
+    kSuccess         = 0x00,
+    kUnsupportedArea = 0x01,
+    kDuplicatedAreas = 0x02,
+    kInvalidInMode   = 0x03,
+    kInvalidSet      = 0x04,
     // All received enum values that are not listed above will be mapped
     // to kUnknownEnumValue. This is a helper enum value that should only
     // be used by code to process how it handles receiving and unknown
@@ -3835,12 +3835,12 @@ enum class SelectLocationsStatus : uint8_t
     kUnknownEnumValue = 5,
 };
 
-// Enum for SkipCurrentLocationStatus
-enum class SkipCurrentLocationStatus : uint8_t
+// Enum for SkipAreaStatus
+enum class SkipAreaStatus : uint8_t
 {
-    kSuccess             = 0x00,
-    kInvalidLocationList = 0x01,
-    kInvalidInMode       = 0x02,
+    kSuccess         = 0x00,
+    kInvalidAreaList = 0x01,
+    kInvalidInMode   = 0x02,
     // All received enum values that are not listed above will be mapped
     // to kUnknownEnumValue. This is a helper enum value that should only
     // be used by code to process how it handles receiving and unknown

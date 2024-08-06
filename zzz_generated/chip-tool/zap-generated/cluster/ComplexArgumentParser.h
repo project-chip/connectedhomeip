@@ -458,15 +458,15 @@ static CHIP_ERROR Setup(const char * label, chip::app::Clusters::DoorLock::Struc
 
 static void Finalize(chip::app::Clusters::DoorLock::Structs::CredentialStruct::Type & request);
 
-static CHIP_ERROR Setup(const char * label, chip::app::Clusters::ServiceArea::Structs::LocationInfoStruct::Type & request,
+static CHIP_ERROR Setup(const char * label, chip::app::Clusters::ServiceArea::Structs::AreaInfoStruct::Type & request,
                         Json::Value & value);
 
-static void Finalize(chip::app::Clusters::ServiceArea::Structs::LocationInfoStruct::Type & request);
+static void Finalize(chip::app::Clusters::ServiceArea::Structs::AreaInfoStruct::Type & request);
 
-static CHIP_ERROR Setup(const char * label, chip::app::Clusters::ServiceArea::Structs::LocationStruct::Type & request,
+static CHIP_ERROR Setup(const char * label, chip::app::Clusters::ServiceArea::Structs::AreaStruct::Type & request,
                         Json::Value & value);
 
-static void Finalize(chip::app::Clusters::ServiceArea::Structs::LocationStruct::Type & request);
+static void Finalize(chip::app::Clusters::ServiceArea::Structs::AreaStruct::Type & request);
 
 static CHIP_ERROR Setup(const char * label, chip::app::Clusters::ServiceArea::Structs::MapStruct::Type & request,
                         Json::Value & value);

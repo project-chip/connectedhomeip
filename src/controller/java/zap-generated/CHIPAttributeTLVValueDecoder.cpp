@@ -28610,8 +28610,8 @@ jobject DecodeAttributeValue(const app::ConcreteAttributePath & aPath, TLV::TLVR
         using namespace app::Clusters::ServiceArea;
         switch (aPath.mAttributeId)
         {
-        case Attributes::SupportedLocations::Id: {
-            using TypeInfo = Attributes::SupportedLocations::TypeInfo;
+        case Attributes::SupportedAreas::Id: {
+            using TypeInfo = Attributes::SupportedAreas::TypeInfo;
             TypeInfo::DecodableType cppValue;
             *aError = app::DataModel::Decode(aReader, cppValue);
             if (*aError != CHIP_NO_ERROR)
@@ -28626,13 +28626,13 @@ jobject DecodeAttributeValue(const app::ConcreteAttributePath & aPath, TLV::TLVR
             {
                 auto & entry_0 = iter_value_0.GetValue();
                 jobject newElement_0;
-                jobject newElement_0_locationID;
-                std::string newElement_0_locationIDClassName     = "java/lang/Long";
-                std::string newElement_0_locationIDCtorSignature = "(J)V";
-                jlong jninewElement_0_locationID                 = static_cast<jlong>(entry_0.locationID);
-                chip::JniReferences::GetInstance().CreateBoxedObject<jlong>(newElement_0_locationIDClassName.c_str(),
-                                                                            newElement_0_locationIDCtorSignature.c_str(),
-                                                                            jninewElement_0_locationID, newElement_0_locationID);
+                jobject newElement_0_areaID;
+                std::string newElement_0_areaIDClassName     = "java/lang/Long";
+                std::string newElement_0_areaIDCtorSignature = "(J)V";
+                jlong jninewElement_0_areaID                 = static_cast<jlong>(entry_0.areaID);
+                chip::JniReferences::GetInstance().CreateBoxedObject<jlong>(newElement_0_areaIDClassName.c_str(),
+                                                                            newElement_0_areaIDCtorSignature.c_str(),
+                                                                            jninewElement_0_areaID, newElement_0_areaID);
                 jobject newElement_0_mapID;
                 if (entry_0.mapID.IsNull())
                 {
@@ -28647,50 +28647,48 @@ jobject DecodeAttributeValue(const app::ConcreteAttributePath & aPath, TLV::TLVR
                                                                                newElement_0_mapIDCtorSignature.c_str(),
                                                                                jninewElement_0_mapID, newElement_0_mapID);
                 }
-                jobject newElement_0_locationInfo;
-                jobject newElement_0_locationInfo_locationInfo;
-                if (entry_0.locationInfo.locationInfo.IsNull())
+                jobject newElement_0_areaDesc;
+                jobject newElement_0_areaDesc_locationInfo;
+                if (entry_0.areaDesc.locationInfo.IsNull())
                 {
-                    newElement_0_locationInfo_locationInfo = nullptr;
+                    newElement_0_areaDesc_locationInfo = nullptr;
                 }
                 else
                 {
-                    jobject newElement_0_locationInfo_locationInfo_locationName;
-                    LogErrorOnFailure(
-                        chip::JniReferences::GetInstance().CharToStringUTF(entry_0.locationInfo.locationInfo.Value().locationName,
-                                                                           newElement_0_locationInfo_locationInfo_locationName));
-                    jobject newElement_0_locationInfo_locationInfo_floorNumber;
-                    if (entry_0.locationInfo.locationInfo.Value().floorNumber.IsNull())
+                    jobject newElement_0_areaDesc_locationInfo_locationName;
+                    LogErrorOnFailure(chip::JniReferences::GetInstance().CharToStringUTF(
+                        entry_0.areaDesc.locationInfo.Value().locationName, newElement_0_areaDesc_locationInfo_locationName));
+                    jobject newElement_0_areaDesc_locationInfo_floorNumber;
+                    if (entry_0.areaDesc.locationInfo.Value().floorNumber.IsNull())
                     {
-                        newElement_0_locationInfo_locationInfo_floorNumber = nullptr;
+                        newElement_0_areaDesc_locationInfo_floorNumber = nullptr;
                     }
                     else
                     {
-                        std::string newElement_0_locationInfo_locationInfo_floorNumberClassName     = "java/lang/Integer";
-                        std::string newElement_0_locationInfo_locationInfo_floorNumberCtorSignature = "(I)V";
-                        jint jninewElement_0_locationInfo_locationInfo_floorNumber =
-                            static_cast<jint>(entry_0.locationInfo.locationInfo.Value().floorNumber.Value());
+                        std::string newElement_0_areaDesc_locationInfo_floorNumberClassName     = "java/lang/Integer";
+                        std::string newElement_0_areaDesc_locationInfo_floorNumberCtorSignature = "(I)V";
+                        jint jninewElement_0_areaDesc_locationInfo_floorNumber =
+                            static_cast<jint>(entry_0.areaDesc.locationInfo.Value().floorNumber.Value());
                         chip::JniReferences::GetInstance().CreateBoxedObject<jint>(
-                            newElement_0_locationInfo_locationInfo_floorNumberClassName.c_str(),
-                            newElement_0_locationInfo_locationInfo_floorNumberCtorSignature.c_str(),
-                            jninewElement_0_locationInfo_locationInfo_floorNumber,
-                            newElement_0_locationInfo_locationInfo_floorNumber);
+                            newElement_0_areaDesc_locationInfo_floorNumberClassName.c_str(),
+                            newElement_0_areaDesc_locationInfo_floorNumberCtorSignature.c_str(),
+                            jninewElement_0_areaDesc_locationInfo_floorNumber, newElement_0_areaDesc_locationInfo_floorNumber);
                     }
-                    jobject newElement_0_locationInfo_locationInfo_areaType;
-                    if (entry_0.locationInfo.locationInfo.Value().areaType.IsNull())
+                    jobject newElement_0_areaDesc_locationInfo_areaType;
+                    if (entry_0.areaDesc.locationInfo.Value().areaType.IsNull())
                     {
-                        newElement_0_locationInfo_locationInfo_areaType = nullptr;
+                        newElement_0_areaDesc_locationInfo_areaType = nullptr;
                     }
                     else
                     {
-                        std::string newElement_0_locationInfo_locationInfo_areaTypeClassName     = "java/lang/Integer";
-                        std::string newElement_0_locationInfo_locationInfo_areaTypeCtorSignature = "(I)V";
-                        jint jninewElement_0_locationInfo_locationInfo_areaType =
-                            static_cast<jint>(entry_0.locationInfo.locationInfo.Value().areaType.Value());
+                        std::string newElement_0_areaDesc_locationInfo_areaTypeClassName     = "java/lang/Integer";
+                        std::string newElement_0_areaDesc_locationInfo_areaTypeCtorSignature = "(I)V";
+                        jint jninewElement_0_areaDesc_locationInfo_areaType =
+                            static_cast<jint>(entry_0.areaDesc.locationInfo.Value().areaType.Value());
                         chip::JniReferences::GetInstance().CreateBoxedObject<jint>(
-                            newElement_0_locationInfo_locationInfo_areaTypeClassName.c_str(),
-                            newElement_0_locationInfo_locationInfo_areaTypeCtorSignature.c_str(),
-                            jninewElement_0_locationInfo_locationInfo_areaType, newElement_0_locationInfo_locationInfo_areaType);
+                            newElement_0_areaDesc_locationInfo_areaTypeClassName.c_str(),
+                            newElement_0_areaDesc_locationInfo_areaTypeCtorSignature.c_str(),
+                            jninewElement_0_areaDesc_locationInfo_areaType, newElement_0_areaDesc_locationInfo_areaType);
                     }
 
                     jclass locationDescriptorStructStructClass_4;
@@ -28713,105 +28711,101 @@ jobject DecodeAttributeValue(const app::ConcreteAttributePath & aPath, TLV::TLVR
                         return nullptr;
                     }
 
-                    newElement_0_locationInfo_locationInfo = env->NewObject(
-                        locationDescriptorStructStructClass_4, locationDescriptorStructStructCtor_4,
-                        newElement_0_locationInfo_locationInfo_locationName, newElement_0_locationInfo_locationInfo_floorNumber,
-                        newElement_0_locationInfo_locationInfo_areaType);
+                    newElement_0_areaDesc_locationInfo =
+                        env->NewObject(locationDescriptorStructStructClass_4, locationDescriptorStructStructCtor_4,
+                                       newElement_0_areaDesc_locationInfo_locationName,
+                                       newElement_0_areaDesc_locationInfo_floorNumber, newElement_0_areaDesc_locationInfo_areaType);
                 }
-                jobject newElement_0_locationInfo_landmarkTag;
-                if (entry_0.locationInfo.landmarkTag.IsNull())
+                jobject newElement_0_areaDesc_landmarkTag;
+                if (entry_0.areaDesc.landmarkTag.IsNull())
                 {
-                    newElement_0_locationInfo_landmarkTag = nullptr;
-                }
-                else
-                {
-                    std::string newElement_0_locationInfo_landmarkTagClassName     = "java/lang/Integer";
-                    std::string newElement_0_locationInfo_landmarkTagCtorSignature = "(I)V";
-                    jint jninewElement_0_locationInfo_landmarkTag = static_cast<jint>(entry_0.locationInfo.landmarkTag.Value());
-                    chip::JniReferences::GetInstance().CreateBoxedObject<jint>(
-                        newElement_0_locationInfo_landmarkTagClassName.c_str(),
-                        newElement_0_locationInfo_landmarkTagCtorSignature.c_str(), jninewElement_0_locationInfo_landmarkTag,
-                        newElement_0_locationInfo_landmarkTag);
-                }
-                jobject newElement_0_locationInfo_positionTag;
-                if (entry_0.locationInfo.positionTag.IsNull())
-                {
-                    newElement_0_locationInfo_positionTag = nullptr;
+                    newElement_0_areaDesc_landmarkTag = nullptr;
                 }
                 else
                 {
-                    std::string newElement_0_locationInfo_positionTagClassName     = "java/lang/Integer";
-                    std::string newElement_0_locationInfo_positionTagCtorSignature = "(I)V";
-                    jint jninewElement_0_locationInfo_positionTag = static_cast<jint>(entry_0.locationInfo.positionTag.Value());
+                    std::string newElement_0_areaDesc_landmarkTagClassName     = "java/lang/Integer";
+                    std::string newElement_0_areaDesc_landmarkTagCtorSignature = "(I)V";
+                    jint jninewElement_0_areaDesc_landmarkTag = static_cast<jint>(entry_0.areaDesc.landmarkTag.Value());
                     chip::JniReferences::GetInstance().CreateBoxedObject<jint>(
-                        newElement_0_locationInfo_positionTagClassName.c_str(),
-                        newElement_0_locationInfo_positionTagCtorSignature.c_str(), jninewElement_0_locationInfo_positionTag,
-                        newElement_0_locationInfo_positionTag);
+                        newElement_0_areaDesc_landmarkTagClassName.c_str(), newElement_0_areaDesc_landmarkTagCtorSignature.c_str(),
+                        jninewElement_0_areaDesc_landmarkTag, newElement_0_areaDesc_landmarkTag);
                 }
-                jobject newElement_0_locationInfo_surfaceTag;
-                if (entry_0.locationInfo.surfaceTag.IsNull())
+                jobject newElement_0_areaDesc_positionTag;
+                if (entry_0.areaDesc.positionTag.IsNull())
                 {
-                    newElement_0_locationInfo_surfaceTag = nullptr;
+                    newElement_0_areaDesc_positionTag = nullptr;
                 }
                 else
                 {
-                    std::string newElement_0_locationInfo_surfaceTagClassName     = "java/lang/Integer";
-                    std::string newElement_0_locationInfo_surfaceTagCtorSignature = "(I)V";
-                    jint jninewElement_0_locationInfo_surfaceTag = static_cast<jint>(entry_0.locationInfo.surfaceTag.Value());
+                    std::string newElement_0_areaDesc_positionTagClassName     = "java/lang/Integer";
+                    std::string newElement_0_areaDesc_positionTagCtorSignature = "(I)V";
+                    jint jninewElement_0_areaDesc_positionTag = static_cast<jint>(entry_0.areaDesc.positionTag.Value());
                     chip::JniReferences::GetInstance().CreateBoxedObject<jint>(
-                        newElement_0_locationInfo_surfaceTagClassName.c_str(),
-                        newElement_0_locationInfo_surfaceTagCtorSignature.c_str(), jninewElement_0_locationInfo_surfaceTag,
-                        newElement_0_locationInfo_surfaceTag);
+                        newElement_0_areaDesc_positionTagClassName.c_str(), newElement_0_areaDesc_positionTagCtorSignature.c_str(),
+                        jninewElement_0_areaDesc_positionTag, newElement_0_areaDesc_positionTag);
+                }
+                jobject newElement_0_areaDesc_surfaceTag;
+                if (entry_0.areaDesc.surfaceTag.IsNull())
+                {
+                    newElement_0_areaDesc_surfaceTag = nullptr;
+                }
+                else
+                {
+                    std::string newElement_0_areaDesc_surfaceTagClassName     = "java/lang/Integer";
+                    std::string newElement_0_areaDesc_surfaceTagCtorSignature = "(I)V";
+                    jint jninewElement_0_areaDesc_surfaceTag = static_cast<jint>(entry_0.areaDesc.surfaceTag.Value());
+                    chip::JniReferences::GetInstance().CreateBoxedObject<jint>(
+                        newElement_0_areaDesc_surfaceTagClassName.c_str(), newElement_0_areaDesc_surfaceTagCtorSignature.c_str(),
+                        jninewElement_0_areaDesc_surfaceTag, newElement_0_areaDesc_surfaceTag);
                 }
 
-                jclass locationInfoStructStructClass_2;
+                jclass areaInfoStructStructClass_2;
                 err = chip::JniReferences::GetInstance().GetLocalClassRef(
-                    env, "chip/devicecontroller/ChipStructs$ServiceAreaClusterLocationInfoStruct", locationInfoStructStructClass_2);
+                    env, "chip/devicecontroller/ChipStructs$ServiceAreaClusterAreaInfoStruct", areaInfoStructStructClass_2);
                 if (err != CHIP_NO_ERROR)
                 {
-                    ChipLogError(Zcl, "Could not find class ChipStructs$ServiceAreaClusterLocationInfoStruct");
+                    ChipLogError(Zcl, "Could not find class ChipStructs$ServiceAreaClusterAreaInfoStruct");
                     return nullptr;
                 }
 
-                jmethodID locationInfoStructStructCtor_2;
+                jmethodID areaInfoStructStructCtor_2;
                 err = chip::JniReferences::GetInstance().FindMethod(
-                    env, locationInfoStructStructClass_2, "<init>",
+                    env, areaInfoStructStructClass_2, "<init>",
                     "(Lchip/devicecontroller/ChipStructs$ServiceAreaClusterLocationDescriptorStruct;Ljava/lang/Integer;Ljava/lang/"
                     "Integer;Ljava/lang/Integer;)V",
-                    &locationInfoStructStructCtor_2);
-                if (err != CHIP_NO_ERROR || locationInfoStructStructCtor_2 == nullptr)
+                    &areaInfoStructStructCtor_2);
+                if (err != CHIP_NO_ERROR || areaInfoStructStructCtor_2 == nullptr)
                 {
-                    ChipLogError(Zcl, "Could not find ChipStructs$ServiceAreaClusterLocationInfoStruct constructor");
+                    ChipLogError(Zcl, "Could not find ChipStructs$ServiceAreaClusterAreaInfoStruct constructor");
                     return nullptr;
                 }
 
-                newElement_0_locationInfo =
-                    env->NewObject(locationInfoStructStructClass_2, locationInfoStructStructCtor_2,
-                                   newElement_0_locationInfo_locationInfo, newElement_0_locationInfo_landmarkTag,
-                                   newElement_0_locationInfo_positionTag, newElement_0_locationInfo_surfaceTag);
+                newElement_0_areaDesc = env->NewObject(areaInfoStructStructClass_2, areaInfoStructStructCtor_2,
+                                                       newElement_0_areaDesc_locationInfo, newElement_0_areaDesc_landmarkTag,
+                                                       newElement_0_areaDesc_positionTag, newElement_0_areaDesc_surfaceTag);
 
-                jclass locationStructStructClass_1;
+                jclass areaStructStructClass_1;
                 err = chip::JniReferences::GetInstance().GetLocalClassRef(
-                    env, "chip/devicecontroller/ChipStructs$ServiceAreaClusterLocationStruct", locationStructStructClass_1);
+                    env, "chip/devicecontroller/ChipStructs$ServiceAreaClusterAreaStruct", areaStructStructClass_1);
                 if (err != CHIP_NO_ERROR)
                 {
-                    ChipLogError(Zcl, "Could not find class ChipStructs$ServiceAreaClusterLocationStruct");
+                    ChipLogError(Zcl, "Could not find class ChipStructs$ServiceAreaClusterAreaStruct");
                     return nullptr;
                 }
 
-                jmethodID locationStructStructCtor_1;
-                err = chip::JniReferences::GetInstance().FindMethod(env, locationStructStructClass_1, "<init>",
-                                                                    "(Ljava/lang/Long;Ljava/lang/Integer;Lchip/devicecontroller/"
-                                                                    "ChipStructs$ServiceAreaClusterLocationInfoStruct;)V",
-                                                                    &locationStructStructCtor_1);
-                if (err != CHIP_NO_ERROR || locationStructStructCtor_1 == nullptr)
+                jmethodID areaStructStructCtor_1;
+                err = chip::JniReferences::GetInstance().FindMethod(
+                    env, areaStructStructClass_1, "<init>",
+                    "(Ljava/lang/Long;Ljava/lang/Integer;Lchip/devicecontroller/ChipStructs$ServiceAreaClusterAreaInfoStruct;)V",
+                    &areaStructStructCtor_1);
+                if (err != CHIP_NO_ERROR || areaStructStructCtor_1 == nullptr)
                 {
-                    ChipLogError(Zcl, "Could not find ChipStructs$ServiceAreaClusterLocationStruct constructor");
+                    ChipLogError(Zcl, "Could not find ChipStructs$ServiceAreaClusterAreaStruct constructor");
                     return nullptr;
                 }
 
-                newElement_0 = env->NewObject(locationStructStructClass_1, locationStructStructCtor_1, newElement_0_locationID,
-                                              newElement_0_mapID, newElement_0_locationInfo);
+                newElement_0 = env->NewObject(areaStructStructClass_1, areaStructStructCtor_1, newElement_0_areaID,
+                                              newElement_0_mapID, newElement_0_areaDesc);
                 chip::JniReferences::GetInstance().AddToList(value, newElement_0);
             }
             return value;
@@ -28873,8 +28867,8 @@ jobject DecodeAttributeValue(const app::ConcreteAttributePath & aPath, TLV::TLVR
             }
             return value;
         }
-        case Attributes::SelectedLocations::Id: {
-            using TypeInfo = Attributes::SelectedLocations::TypeInfo;
+        case Attributes::SelectedAreas::Id: {
+            using TypeInfo = Attributes::SelectedAreas::TypeInfo;
             TypeInfo::DecodableType cppValue;
             *aError = app::DataModel::Decode(aReader, cppValue);
             if (*aError != CHIP_NO_ERROR)
@@ -28905,8 +28899,8 @@ jobject DecodeAttributeValue(const app::ConcreteAttributePath & aPath, TLV::TLVR
             }
             return value;
         }
-        case Attributes::CurrentLocation::Id: {
-            using TypeInfo = Attributes::CurrentLocation::TypeInfo;
+        case Attributes::CurrentArea::Id: {
+            using TypeInfo = Attributes::CurrentArea::TypeInfo;
             TypeInfo::DecodableType cppValue;
             *aError = app::DataModel::Decode(aReader, cppValue);
             if (*aError != CHIP_NO_ERROR)
@@ -28973,13 +28967,13 @@ jobject DecodeAttributeValue(const app::ConcreteAttributePath & aPath, TLV::TLVR
                 {
                     auto & entry_1 = iter_value_1.GetValue();
                     jobject newElement_1;
-                    jobject newElement_1_locationID;
-                    std::string newElement_1_locationIDClassName     = "java/lang/Long";
-                    std::string newElement_1_locationIDCtorSignature = "(J)V";
-                    jlong jninewElement_1_locationID                 = static_cast<jlong>(entry_1.locationID);
-                    chip::JniReferences::GetInstance().CreateBoxedObject<jlong>(
-                        newElement_1_locationIDClassName.c_str(), newElement_1_locationIDCtorSignature.c_str(),
-                        jninewElement_1_locationID, newElement_1_locationID);
+                    jobject newElement_1_areaID;
+                    std::string newElement_1_areaIDClassName     = "java/lang/Long";
+                    std::string newElement_1_areaIDCtorSignature = "(J)V";
+                    jlong jninewElement_1_areaID                 = static_cast<jlong>(entry_1.areaID);
+                    chip::JniReferences::GetInstance().CreateBoxedObject<jlong>(newElement_1_areaIDClassName.c_str(),
+                                                                                newElement_1_areaIDCtorSignature.c_str(),
+                                                                                jninewElement_1_areaID, newElement_1_areaID);
                     jobject newElement_1_status;
                     std::string newElement_1_statusClassName     = "java/lang/Integer";
                     std::string newElement_1_statusCtorSignature = "(I)V";
@@ -29062,7 +29056,7 @@ jobject DecodeAttributeValue(const app::ConcreteAttributePath & aPath, TLV::TLVR
                     }
 
                     newElement_1 =
-                        env->NewObject(progressStructStructClass_2, progressStructStructCtor_2, newElement_1_locationID,
+                        env->NewObject(progressStructStructClass_2, progressStructStructCtor_2, newElement_1_areaID,
                                        newElement_1_status, newElement_1_totalOperationalTime, newElement_1_estimatedTime);
                     chip::JniReferences::GetInstance().AddToList(value, newElement_1);
                 }

@@ -8562,21 +8562,21 @@ class ChipClusters:
         "commands": {
             0x00000000: {
                 "commandId": 0x00000000,
-                "commandName": "SelectLocations",
+                "commandName": "SelectAreas",
                 "args": {
-                    "newLocations": "int",
+                    "newAreas": "int",
                 },
             },
             0x00000002: {
                 "commandId": 0x00000002,
-                "commandName": "SkipCurrentLocation",
+                "commandName": "SkipArea",
                 "args": {
                 },
             },
         },
         "attributes": {
             0x00000000: {
-                "attributeName": "SupportedLocations",
+                "attributeName": "SupportedAreas",
                 "attributeId": 0x00000000,
                 "type": "",
                 "reportable": True,
@@ -8588,13 +8588,13 @@ class ChipClusters:
                 "reportable": True,
             },
             0x00000002: {
-                "attributeName": "SelectedLocations",
+                "attributeName": "SelectedAreas",
                 "attributeId": 0x00000002,
                 "type": "int",
                 "reportable": True,
             },
             0x00000003: {
-                "attributeName": "CurrentLocation",
+                "attributeName": "CurrentArea",
                 "attributeId": 0x00000003,
                 "type": "int",
                 "reportable": True,

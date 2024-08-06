@@ -6640,7 +6640,7 @@ NS_ASSUME_NONNULL_BEGIN
 
 @end
 
-@implementation MTRServiceAreaClusterLocationInfoStruct
+@implementation MTRServiceAreaClusterAreaInfoStruct
 - (instancetype)init
 {
     if (self = [super init]) {
@@ -6658,7 +6658,7 @@ NS_ASSUME_NONNULL_BEGIN
 
 - (id)copyWithZone:(NSZone * _Nullable)zone
 {
-    auto other = [[MTRServiceAreaClusterLocationInfoStruct alloc] init];
+    auto other = [[MTRServiceAreaClusterAreaInfoStruct alloc] init];
 
     other.locationInfo = self.locationInfo;
     other.landmarkTag = self.landmarkTag;
@@ -6676,34 +6676,34 @@ NS_ASSUME_NONNULL_BEGIN
 
 @end
 
-@implementation MTRServiceAreaClusterLocationStruct
+@implementation MTRServiceAreaClusterAreaStruct
 - (instancetype)init
 {
     if (self = [super init]) {
 
-        _locationID = @(0);
+        _areaID = @(0);
 
         _mapID = nil;
 
-        _locationInfo = [MTRServiceAreaClusterLocationInfoStruct new];
+        _areaDesc = [MTRServiceAreaClusterAreaInfoStruct new];
     }
     return self;
 }
 
 - (id)copyWithZone:(NSZone * _Nullable)zone
 {
-    auto other = [[MTRServiceAreaClusterLocationStruct alloc] init];
+    auto other = [[MTRServiceAreaClusterAreaStruct alloc] init];
 
-    other.locationID = self.locationID;
+    other.areaID = self.areaID;
     other.mapID = self.mapID;
-    other.locationInfo = self.locationInfo;
+    other.areaDesc = self.areaDesc;
 
     return other;
 }
 
 - (NSString *)description
 {
-    NSString * descriptionString = [NSString stringWithFormat:@"<%@: locationID:%@; mapID:%@; locationInfo:%@; >", NSStringFromClass([self class]), _locationID, _mapID, _locationInfo];
+    NSString * descriptionString = [NSString stringWithFormat:@"<%@: areaID:%@; mapID:%@; areaDesc:%@; >", NSStringFromClass([self class]), _areaID, _mapID, _areaDesc];
     return descriptionString;
 }
 
@@ -6744,7 +6744,7 @@ NS_ASSUME_NONNULL_BEGIN
 {
     if (self = [super init]) {
 
-        _locationID = @(0);
+        _areaID = @(0);
 
         _status = @(0);
 
@@ -6759,7 +6759,7 @@ NS_ASSUME_NONNULL_BEGIN
 {
     auto other = [[MTRServiceAreaClusterProgressStruct alloc] init];
 
-    other.locationID = self.locationID;
+    other.areaID = self.areaID;
     other.status = self.status;
     other.totalOperationalTime = self.totalOperationalTime;
     other.estimatedTime = self.estimatedTime;
@@ -6769,7 +6769,7 @@ NS_ASSUME_NONNULL_BEGIN
 
 - (NSString *)description
 {
-    NSString * descriptionString = [NSString stringWithFormat:@"<%@: locationID:%@; status:%@; totalOperationalTime:%@; estimatedTime:%@; >", NSStringFromClass([self class]), _locationID, _status, _totalOperationalTime, _estimatedTime];
+    NSString * descriptionString = [NSString stringWithFormat:@"<%@: areaID:%@; status:%@; totalOperationalTime:%@; estimatedTime:%@; >", NSStringFromClass([self class]), _areaID, _status, _totalOperationalTime, _estimatedTime];
     return descriptionString;
 }
 
