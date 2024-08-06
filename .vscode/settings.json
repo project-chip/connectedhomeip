@@ -134,7 +134,9 @@
         "thread": "cpp",
         "variant": "cpp",
         "any": "cpp",
-        "future": "cpp"
+        "future": "cpp",
+        "list": "cpp",
+        "unordered_set": "cpp"
     },
     // Configure paths or glob patterns to exclude from file watching.
     "files.watcherExclude": {
