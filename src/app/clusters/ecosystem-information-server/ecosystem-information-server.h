@@ -207,7 +207,7 @@ public:
 private:
     struct DeviceInfo
     {
-        Optional<uint64_t> mRemovedOn;
+        Optional<uint64_t> mRemovedOn = NullOptional;
         std::vector<std::unique_ptr<EcosystemDeviceStruct>> mDeviceDirectory;
         // Map key is using the UniqueLocationId
         std::map<std::string, std::unique_ptr<EcosystemLocationStruct>> mLocationDirectory;

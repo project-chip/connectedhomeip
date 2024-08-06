@@ -267,7 +267,7 @@ CHIP_ERROR EcosystemInformationServer::AddDeviceInfo(EndpointId aEndpoint, std::
     VerifyOrReturnError(aDevice, CHIP_ERROR_INVALID_ARGUMENT);
     VerifyOrReturnError((aEndpoint != kRootEndpointId && aEndpoint != kInvalidEndpointId), CHIP_ERROR_INVALID_ARGUMENT);
 
-    auto & deviceInfo = mDevicesMap[aEndpoint];
+    auto & deviceInfo = mDevicesMap[aEndpoint] = DeviceInfo();
     VerifyOrReturnError((deviceInfo.mDeviceDirectory.size() < kDeviceDirectoryMaxSize), CHIP_ERROR_NO_MEMORY);
     deviceInfo.mDeviceDirectory.push_back(std::move(aDevice));
     return CHIP_NO_ERROR;
