@@ -130,6 +130,20 @@ static auto __attribute__((unused)) EnsureKnownEnumValue(Globals::AreaTypeTag va
     }
 }
 
+static auto __attribute__((unused)) EnsureKnownEnumValue(Globals::AtomicRequestTypeEnum val)
+{
+    using EnumType = Globals::AtomicRequestTypeEnum;
+    switch (val)
+    {
+    case EnumType::kBeginWrite:
+    case EnumType::kCommitWrite:
+    case EnumType::kRollbackWrite:
+        return val;
+    default:
+        return EnumType::kUnknownEnumValue;
+    }
+}
+
 static auto __attribute__((unused)) EnsureKnownEnumValue(detail::ChangeIndicationEnum val)
 {
     using EnumType = detail::ChangeIndicationEnum;
@@ -363,13 +377,6 @@ static auto __attribute__((unused)) EnsureKnownEnumValue(Globals::PositionTag va
     case EnumType::kMiddle:
     case EnumType::kRow:
     case EnumType::kColumn:
-    case EnumType::kUnder:
-    case EnumType::kNextTo:
-    case EnumType::kAround:
-    case EnumType::kOn:
-    case EnumType::kAbove:
-    case EnumType::kFrontOf:
-    case EnumType::kBehind:
         return val;
     default:
         return EnumType::kUnknownEnumValue;
@@ -391,6 +398,24 @@ static auto __attribute__((unused)) EnsureKnownEnumValue(detail::ProductIdentifi
         return EnumType::kUnknownEnumValue;
     }
 }
+static auto __attribute__((unused)) EnsureKnownEnumValue(Globals::RelativePositionTag val)
+{
+    using EnumType = Globals::RelativePositionTag;
+    switch (val)
+    {
+    case EnumType::kUnder:
+    case EnumType::kNextTo:
+    case EnumType::kAround:
+    case EnumType::kOn:
+    case EnumType::kAbove:
+    case EnumType::kFrontOf:
+    case EnumType::kBehind:
+        return val;
+    default:
+        return EnumType::kUnknownEnumValue;
+    }
+}
+
 static auto __attribute__((unused)) EnsureKnownEnumValue(Globals::TestGlobalEnum val)
 {
     using EnumType = Globals::TestGlobalEnum;
@@ -2717,7 +2742,6 @@ static auto __attribute__((unused)) EnsureKnownEnumValue(Thermostat::PresetScena
     using EnumType = Thermostat::PresetScenarioEnum;
     switch (val)
     {
-    case EnumType::kUnspecified:
     case EnumType::kOccupied:
     case EnumType::kUnoccupied:
     case EnumType::kSleep:

@@ -53,13 +53,13 @@ CHIP_ERROR RvcServiceAreaDelegate::Init()
                                         DataModel::Nullable<int16_t>(-1),
                                         DataModel::Nullable<Globals::AreaTypeTag>(Globals::AreaTypeTag::kPlayRoom),
                                         DataModel::Nullable<Globals::LandmarkTag>(Globals::LandmarkTag::kBackDoor),
-                                        DataModel::Nullable<Globals::PositionTag>(Globals::PositionTag::kNextTo));
+                                        DataModel::Nullable<Globals::RelativePositionTag>(Globals::RelativePositionTag::kNextTo));
 
     // Location D has null values for all HomeLocationStruct fields, Map YY
     GetInstance()->AddSupportedLocation(supportedAreaID_D, DataModel::Nullable<uint32_t>(supportedMapId_YY), "My Location D"_span,
                                         DataModel::Nullable<int16_t>(), DataModel::Nullable<Globals::AreaTypeTag>(),
                                         DataModel::Nullable<Globals::LandmarkTag>(Globals::LandmarkTag::kCouch),
-                                        DataModel::Nullable<Globals::PositionTag>(Globals::PositionTag::kNextTo));
+                                        DataModel::Nullable<Globals::RelativePositionTag>(Globals::RelativePositionTag::kNextTo));
 
     GetInstance()->SetCurrentArea(supportedAreaID_C);
 

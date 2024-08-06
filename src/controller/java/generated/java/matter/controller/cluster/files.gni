@@ -131,6 +131,7 @@ matter_structs_sources = [
   "${chip_root}/src/controller/java/generated/java/matter/controller/cluster/structs/ServiceAreaClusterProgressStruct.kt",
   "${chip_root}/src/controller/java/generated/java/matter/controller/cluster/structs/SoftwareDiagnosticsClusterThreadMetricsStruct.kt",
   "${chip_root}/src/controller/java/generated/java/matter/controller/cluster/structs/TargetNavigatorClusterTargetInfoStruct.kt",
+  "${chip_root}/src/controller/java/generated/java/matter/controller/cluster/structs/ThermostatClusterAtomicAttributeStatusStruct.kt",
   "${chip_root}/src/controller/java/generated/java/matter/controller/cluster/structs/ThermostatClusterPresetStruct.kt",
   "${chip_root}/src/controller/java/generated/java/matter/controller/cluster/structs/ThermostatClusterPresetTypeStruct.kt",
   "${chip_root}/src/controller/java/generated/java/matter/controller/cluster/structs/ThermostatClusterScheduleStruct.kt",
