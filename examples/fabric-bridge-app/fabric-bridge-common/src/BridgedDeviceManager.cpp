@@ -94,11 +94,11 @@ DECLARE_DYNAMIC_ATTRIBUTE(BridgedDeviceBasicInformation::Attributes::NodeLabel::
 // Declare Ecosystem Information cluster attributes
 DECLARE_DYNAMIC_ATTRIBUTE_LIST_BEGIN(ecosystemInformationBasicAttrs)
 DECLARE_DYNAMIC_ATTRIBUTE(EcosystemInformation::Attributes::RemovedOn::Id, EPOCH_US, kNodeLabelSize,
-                          ATTRIBUTE_MASK_NULLABLE), /*  */
+                          ATTRIBUTE_MASK_NULLABLE),
     DECLARE_DYNAMIC_ATTRIBUTE(EcosystemInformation::Attributes::DeviceDirectory::Id, ARRAY, kDescriptorAttributeArraySize,
-                              0), /*  */
+                              0),
     DECLARE_DYNAMIC_ATTRIBUTE(EcosystemInformation::Attributes::LocationDirectory::Id, ARRAY, kDescriptorAttributeArraySize,
-                              0), /*  */
+                              0),
     DECLARE_DYNAMIC_ATTRIBUTE_LIST_END();
 
 // Declare Administrator Commissioning cluster attributes
