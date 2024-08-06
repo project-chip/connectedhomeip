@@ -17,13 +17,14 @@ name: Tests
 on:
     push:
         branches-ignore:
-            - 'dependabot/**'
+            - "dependabot/**"
     pull_request:
     merge_group:
     workflow_dispatch:
 
 concurrency:
-    group: ${{ github.ref }}-${{ github.workflow }}-${{ (github.event_name ==
+    group:
+        ${{ github.ref }}-${{ github.workflow }}-${{ (github.event_name ==
         'pull_request' && github.event.number) || (github.event_name ==
         'workflow_dispatch' && github.run_number) || github.sha }}
     cancel-in-progress: true
@@ -42,7 +43,9 @@ jobs:
         env:
             BUILD_VARIANT: ${{matrix.build_variant}}
             CHIP_TOOL_VARIANT: ${{matrix.chip_tool}}
-            TSAN_OPTIONS: "halt_on_error=1 suppressions=scripts/tests/chiptest/tsan-linux-suppressions.txt"
+            TSAN_OPTIONS:
+                "halt_on_error=1
+                suppressions=scripts/tests/chiptest/tsan-linux-suppressions.txt"
             LSAN_OPTIONS: detect_leaks=1
 
         if: github.actor != 'restyled-io[bot]'
@@ -50,7 +53,8 @@ jobs:
 
         container:
             image: ghcr.io/project-chip/chip-build:54
-            options: --privileged --sysctl "net.ipv6.conf.all.disable_ipv6=0
+            options:
+                --privileged --sysctl "net.ipv6.conf.all.disable_ipv6=0
                 net.ipv4.conf.all.forwarding=1 net.ipv6.conf.all.forwarding=1"
 
         steps:
@@ -68,9 +72,12 @@ jobs:
             - name: Checkout submodules & Bootstrap
               uses: ./.github/actions/checkout-submodules-and-bootstrap
               with:
-                platform: linux
-                bootstrap-log-name: bootstrap-logs-linux-${{ matrix.build_variant }}${{ matrix.chip_tool }}
-            - name: Try to ensure the directories for core dumping exist and we
+                  platform: linux
+                  bootstrap-log-name:
+                      bootstrap-logs-linux-${{ matrix.build_variant }}${{
+                      matrix.chip_tool }}
+            - name:
+                  Try to ensure the directories for core dumping exist and we
                   can write them.
               run: |
                   mkdir /tmp/cores || true
@@ -231,7 +238,9 @@ jobs:
                         --copy-artifacts-to objdir-clone \
                      "
 
-            - name: Run Tests using the python parser sending commands to chip-tool
+            - name:
+                  Run Tests using the python parser sending commands to
+                  chip-tool
               run: |
                   ./scripts/run_in_build_env.sh \
                   "./scripts/tests/run_test_suite.py \
@@ -252,7 +261,9 @@ jobs:
                      --network-manager-app ./out/linux-x64-network-manager-${BUILD_VARIANT}/matter-network-manager-app \
                   "
 
-            - name: Run purposeful failure tests using the python parser sending commands to chip-tool
+            - name:
+                  Run purposeful failure tests using the python parser sending
+                  commands to chip-tool
               run: |
                   ./scripts/run_in_build_env.sh \
                   "./scripts/tests/run_test_suite.py \
@@ -317,7 +328,9 @@ jobs:
               uses: actions/upload-artifact@v4
               if: ${{ failure() && !env.ACT }}
               with:
-                  name: crash-core-linux-${{ matrix.build_variant }}${{ matrix.chip_tool }}
+                  name:
+                      crash-core-linux-${{ matrix.build_variant }}${{
+                      matrix.chip_tool }}
                   path: /tmp/cores/
                   # Cores are big; don't hold on to them too long.
                   retention-days: 5
@@ -325,7 +338,9 @@ jobs:
               uses: actions/upload-artifact@v4
               if: ${{ failure() && !env.ACT }}
               with:
-                  name: crash-objdir-linux-${{ matrix.build_variant }}${{ matrix.chip_tool }}
+                  name:
+                      crash-objdir-linux-${{ matrix.build_variant }}${{
+                      matrix.chip_tool }}
                   path: objdir-clone/
                   # objdirs are big; don't hold on to them too long.
                   retention-days: 5
@@ -341,7 +356,9 @@ jobs:
             BUILD_VARIANT: ${{matrix.build_variant}}
             CHIP_TOOL_VARIANT: ${{matrix.chip_tool}}
             TSAN_OPTIONS: "halt_on_error=1"
-            LSAN_OPTIONS: detect_leaks=1 suppressions=scripts/tests/chiptest/lsan-mac-suppressions.txt
+            LSAN_OPTIONS:
+                detect_leaks=1
+                suppressions=scripts/tests/chiptest/lsan-mac-suppressions.txt
 
         if: github.actor != 'restyled-io[bot]'
         runs-on: macos-13
@@ -362,9 +379,10 @@ jobs:
             - name: Checkout submodules & Bootstrap
               uses: ./.github/actions/checkout-submodules-and-bootstrap
               with:
-                platform: darwin
-                bootstrap-log-name: bootstrap-logs-darwin-${{ matrix.build_variant }}${{ matrix.chip_tool }}
-
+                  platform: darwin
+                  bootstrap-log-name:
+                      bootstrap-logs-darwin-${{ matrix.build_variant }}${{
+                      matrix.chip_tool }}
 
             - name: Build Apps
               run: |
@@ -385,7 +403,9 @@ jobs:
                         --copy-artifacts-to objdir-clone \
                      "
 
-            - name: Run Tests using the python parser sending commands to chip-tool
+            - name:
+                  Run Tests using the python parser sending commands to
+                  chip-tool
               run: |
                   ./scripts/run_in_build_env.sh \
                   "./scripts/tests/run_test_suite.py \
@@ -407,7 +427,9 @@ jobs:
                      --network-manager-app ./out/darwin-x64-network-manager-${BUILD_VARIANT}/matter-network-manager-app \
                   "
 
-            - name: Run purposeful failure tests using the python parser sending commands to chip-tool
+            - name:
+                  Run purposeful failure tests using the python parser sending
+                  commands to chip-tool
               run: |
                   ./scripts/run_in_build_env.sh \
                   "./scripts/tests/run_test_suite.py \
@@ -426,7 +448,9 @@ jobs:
               uses: actions/upload-artifact@v4
               if: ${{ failure() && !env.ACT }}
               with:
-                  name: crash-core-darwin-${{ matrix.build_variant }}${{ matrix.chip_tool }}
+                  name:
+                      crash-core-darwin-${{ matrix.build_variant }}${{
+                      matrix.chip_tool }}
                   path: /cores/
                   # Cores are big; don't hold on to them too long.
                   retention-days: 5
@@ -434,13 +458,17 @@ jobs:
               uses: actions/upload-artifact@v4
               if: ${{ failure() && !env.ACT }}
               with:
-                  name: crash-log-darwin-${{ matrix.build_variant }}${{ matrix.chip_tool }}
+                  name:
+                      crash-log-darwin-${{ matrix.build_variant }}${{
+                      matrix.chip_tool }}
                   path: ~/Library/Logs/DiagnosticReports/
             - name: Uploading objdir for debugging
               uses: actions/upload-artifact@v4
               if: ${{ failure() && !env.ACT }}
               with:
-                  name: crash-objdir-darwin-${{ matrix.build_variant }}${{ matrix.chip_tool }}
+                  name:
+                      crash-objdir-darwin-${{ matrix.build_variant }}${{
+                      matrix.chip_tool }}
                   path: objdir-clone/
                   # objdirs are big; don't hold on to them too long.
                   retention-days: 5
@@ -449,14 +477,17 @@ jobs:
         name: REPL Tests - Linux
 
         env:
-            TSAN_OPTIONS: "halt_on_error=1 suppressions=scripts/tests/chiptest/tsan-linux-suppressions.txt"
+            TSAN_OPTIONS:
+                "halt_on_error=1
+                suppressions=scripts/tests/chiptest/tsan-linux-suppressions.txt"
 
         if: github.actor != 'restyled-io[bot]'
         runs-on: ubuntu-latest
 
         container:
             image: ghcr.io/project-chip/chip-build:66
-            options: --privileged --sysctl "net.ipv6.conf.all.disable_ipv6=0
+            options:
+                --privileged --sysctl "net.ipv6.conf.all.disable_ipv6=0
                 net.ipv4.conf.all.forwarding=0 net.ipv6.conf.all.forwarding=0"
 
         steps:
@@ -465,9 +496,12 @@ jobs:
             - name: Checkout submodules & Bootstrap
               uses: ./.github/actions/checkout-submodules-and-bootstrap
               with:
-                platform: linux
-                bootstrap-log-name: bootstrap-logs-linux-${{ matrix.build_variant }}${{ matrix.chip_tool }}
-            - name: Try to ensure the directories for core dumping exist and we
+                  platform: linux
+                  bootstrap-log-name:
+                      bootstrap-logs-linux-${{ matrix.build_variant }}${{
+                      matrix.chip_tool }}
+            - name:
+                  Try to ensure the directories for core dumping exist and we
                   can write them.
               run: |
                   mkdir /tmp/cores || true
@@ -552,6 +586,7 @@ jobs:
                   scripts/run_in_python_env.sh out/venv './scripts/tests/run_python_test.py --load-from-env /tmp/test_env.yaml --script src/python_testing/TC_ICDM_2_1.py'
                   scripts/run_in_python_env.sh out/venv './scripts/tests/run_python_test.py --load-from-env /tmp/test_env.yaml --script src/python_testing/TC_ICDM_3_1.py'
                   scripts/run_in_python_env.sh out/venv './scripts/tests/run_python_test.py --load-from-env /tmp/test_env.yaml --script src/python_testing/TC_ICDM_3_3.py'
+                  scripts/run_in_python_env.sh out/venv './scripts/tests/run_python_test.py --load-from-env /tmp/test_env.yaml --script src/python_testing/TC_ICDM_5_1.py'
                   scripts/run_in_python_env.sh out/venv './scripts/tests/run_python_test.py --load-from-env /tmp/test_env.yaml --script src/python_testing/TC_ICDManagementCluster.py'
                   scripts/run_in_python_env.sh out/venv './scripts/tests/run_python_test.py --load-from-env /tmp/test_env.yaml --script src/python_testing/TC_IDM_1_2.py'
                   scripts/run_in_python_env.sh out/venv './scripts/tests/run_python_test.py --load-from-env /tmp/test_env.yaml --script src/python_testing/TC_IDM_1_4.py'
@@ -623,7 +658,6 @@ jobs:
                   scripts/run_in_python_env.sh out/venv 'python3 ./src/python_testing/test_testing/test_TC_SC_7_1.py'
                   scripts/run_in_python_env.sh out/venv 'python3 ./src/python_testing/test_testing/TestDecorators.py'
 
-
             - name: Uploading core files
               uses: actions/upload-artifact@v4
               if: ${{ failure() && !env.ACT }}
@@ -670,8 +704,10 @@ jobs:
             - name: Checkout submodules & Bootstrap
               uses: ./.github/actions/checkout-submodules-and-bootstrap
               with:
-                platform: darwin
-                bootstrap-log-name: bootstrap-logs-darwin-${{ matrix.build_variant }}${{ matrix.chip_tool }}
+                  platform: darwin
+                  bootstrap-log-name:
+                      bootstrap-logs-darwin-${{ matrix.build_variant }}${{
+                      matrix.chip_tool }}
 
             - name: Build Python REPL and example apps
               run: |

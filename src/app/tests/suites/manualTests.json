@@ -119,8 +119,7 @@
     "Identify": ["Test_TC_I_3_2"],
     "IcdManagement": [
         "Test_TC_ICDM_3_2",
-        "Test_TC_ICDM_4_1",
-        "Test_TC_ICDM_5_1"
+        "Test_TC_ICDM_4_1"
     ],
     "IlluminanceMeasurement": [],
     "InteractionDataModel": [
