@@ -20,8 +20,8 @@
 #include <lib/support/Pool.h>
 #include <protocols/bdx/BdxTransferSession.h>
 
-#include <controller/python/chip/bdx/bdx-transfer.h>
 #include <controller/python/chip/bdx/bdx-transfer-pool.h>
+#include <controller/python/chip/bdx/bdx-transfer.h>
 
 namespace chip {
 namespace bdx {
@@ -45,9 +45,9 @@ public:
 
 private:
     ObjectPool<BdxTransfer, 2> mTransferPool;
-    System::Layer * mSystemLayer = nullptr;
+    System::Layer * mSystemLayer                 = nullptr;
     BdxTransfer::Delegate * mBdxTransferDelegate = nullptr;
-    size_t mExpectedTransfers = 0;
+    size_t mExpectedTransfers                    = 0;
 };
 
 } // namespace bdx

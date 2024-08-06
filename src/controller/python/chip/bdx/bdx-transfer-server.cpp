@@ -20,8 +20,8 @@
 #include <messaging/ExchangeDelegate.h>
 #include <transport/raw/MessageHeader.h>
 
-#include <controller/python/chip/bdx/bdx-transfer.h>
 #include <controller/python/chip/bdx/bdx-transfer-pool.h>
+#include <controller/python/chip/bdx/bdx-transfer.h>
 
 namespace chip {
 namespace bdx {
