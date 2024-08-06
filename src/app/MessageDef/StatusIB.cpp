@@ -150,14 +150,6 @@ CHIP_ERROR StatusIB::ToChipError() const
     return ChipError(ChipError::SdkPart::kIMGlobalStatus, to_underlying(mStatus));
 }
 
-StatusIB::StatusIB(CHIP_ERROR aError)
-{
-    ClusterStatusCode statusCode(aError);
-
-    mStatus        = statusCode.GetStatus();
-    mClusterStatus = statusCode.GetClusterSpecificCode();
-}
-
 namespace {
 bool FormatStatusIBError(char * buf, uint16_t bufSize, CHIP_ERROR err)
 {
