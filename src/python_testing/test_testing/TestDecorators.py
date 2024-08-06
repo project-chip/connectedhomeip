@@ -175,10 +175,12 @@ class TestDecorators(MatterBaseTest):
     async def test_force_endpoint_bad(self):
         ''' This test should cause an assertion because the forced endpoint does not match the requirements.'''
         has_onoff = has_cluster(Clusters.OnOff)
+        all_endpoints = await self.default_controller.Read(self.dut_node_id, [()])
         all_endpoints = list(all_endpoints.attributes.keys())
-        forced = max(all_endpoints + 1)
-        self.user_params['force_endpoint'] = e
-        endpoints = await get_accepted_endpoints_for_test(self, has_onoff)
+        forced = max(all_endpoints) + 1
+        self.user_params['force_endpoint'] = forced
+
+        await get_accepted_endpoints_for_test(self, has_onoff)
 
     # This test should cause an assertion because it has pics_ method
 
