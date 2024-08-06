@@ -58,7 +58,8 @@ tests:
                 value: ActiveDuration
 
     - label:
-          "TH sends StayActiveRequest command with StayActiveDuration less than 30000 milliseconds."
+          "TH sends StayActiveRequest command with StayActiveDuration less than
+          30000 milliseconds."
       command: "StayActiveRequest"
       arguments:
           values:
