@@ -28355,7 +28355,7 @@ struct Type
 {
 public:
     Globals::LandmarkTag landmarkTag = static_cast<Globals::LandmarkTag>(0);
-    DataModel::Nullable<Globals::PositionTag> positionTag;
+    DataModel::Nullable<Globals::RelativePositionTag> positionTag;
 
     CHIP_ERROR Decode(TLV::TLVReader & reader);
 

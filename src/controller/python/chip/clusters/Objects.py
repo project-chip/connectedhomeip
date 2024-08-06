@@ -31219,11 +31219,11 @@ class ServiceArea(Cluster):
                 return ClusterObjectDescriptor(
                     Fields=[
                         ClusterObjectFieldDescriptor(Label="landmarkTag", Tag=0, Type=Globals.Enums.LandmarkTag),
-                        ClusterObjectFieldDescriptor(Label="positionTag", Tag=1, Type=typing.Union[Nullable, Globals.Enums.PositionTag]),
+                        ClusterObjectFieldDescriptor(Label="positionTag", Tag=1, Type=typing.Union[Nullable, Globals.Enums.RelativePositionTag]),
                     ])
 
             landmarkTag: 'Globals.Enums.LandmarkTag' = 0
-            positionTag: 'typing.Union[Nullable, Globals.Enums.PositionTag]' = NullValue
+            positionTag: 'typing.Union[Nullable, Globals.Enums.RelativePositionTag]' = NullValue
 
         @dataclass
         class AreaInfoStruct(ClusterObject):

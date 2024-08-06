@@ -1458,7 +1458,7 @@ provisional cluster ServiceArea = 336 {
 
   struct LandmarkInfoStruct {
     LandmarkTag landmarkTag = 0;
-    nullable PositionTag positionTag = 1;
+    nullable RelativePositionTag positionTag = 1;
   }
 
   struct AreaInfoStruct {
