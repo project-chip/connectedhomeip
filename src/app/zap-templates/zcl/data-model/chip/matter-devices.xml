@@ -2210,7 +2210,7 @@ limitations under the License.
         <class>Simple</class>
         <scope>Endpoint</scope>
         <endpointComposition>
-            <compositionType fullFamily="false", tree="true"></compositionType>
+            <compositionType fullFamily="false", tree="true"/>
             <endpoint mandatory="true" constraint="min 1">
                     <deviceType>0x0071</deviceType>
             </endpoint>
