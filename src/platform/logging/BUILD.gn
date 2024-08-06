@@ -87,17 +87,16 @@ source_set("default") {
 
 source_set("headers") {
   public = [ "LogV.h" ]
+  public_deps = [
+    "${chip_root}/src/lib/support:attributes",
+    "${chip_root}/src/lib/support:logging_constants",
+  ]
 }
 
 source_set("stdio") {
-  sources = [ "impl/stdio/Logging.cpp" ]
-
+  sources = [ "impl/Stdio.cpp" ]
   deps = [
     ":headers",
-    "${chip_root}/src/lib/core:chip_config_header",
-    "${chip_root}/src/lib/support:attributes",
-    "${chip_root}/src/lib/support:logging_constants",
-    "${chip_root}/src/platform:platform_config_header",
-    "${chip_root}/src/platform/logging:headers",
+    "${chip_root}/src/platform:platform_base",
   ]
 }
