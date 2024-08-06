@@ -3,14 +3,14 @@
 
 using namespace chip::app::Clusters::ServiceArea;
 
-bool Delegate::GetSupportedLocationById(uint32_t aAreaId, uint32_t & listIndex, AreaStructureWrapper & aSupportedLocation)
+bool Delegate::GetSupportedAreaById(uint32_t aAreaId, uint32_t & listIndex, AreaStructureWrapper & aSupportedArea)
 {
     listIndex = 0;
 
-    // simple linear iteration to find the location with the desired areaId.
-    while (GetSupportedLocationByIndex(listIndex, aSupportedLocation))
+    // simple linear iteration to find the area with the desired areaId.
+    while (GetSupportedAreaByIndex(listIndex, aSupportedArea))
     {
-        if (aSupportedLocation.areaID == aAreaId)
+        if (aSupportedArea.areaID == aAreaId)
         {
             return true;
         }
@@ -45,14 +45,14 @@ bool Delegate::GetSupportedMapById(uint32_t aMapId, uint32_t & listIndex, MapStr
     return false;
 }
 
-bool Delegate::IsSelectedLocation(uint32_t aAreaId)
+bool Delegate::IsSelectedArea(uint32_t aAreaId)
 {
     uint32_t listIndex = 0;
-    uint32_t selectedLocation;
+    uint32_t selectedArea;
 
-    while (GetSelectedLocationByIndex(listIndex, selectedLocation))
+    while (GetSelectedAreaByIndex(listIndex, selectedArea))
     {
-        if (selectedLocation == aAreaId)
+        if (selectedArea == aAreaId)
         {
             return true;
         }

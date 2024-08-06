@@ -27,7 +27,7 @@ namespace Clusters {
 namespace ServiceArea {
 
 // These limits are defined in the spec.
-inline constexpr size_t kLocationNameMaxSize = 128u;
+inline constexpr size_t kAreaNameMaxSize     = 128u;
 inline constexpr size_t kMapNameMaxSize      = 64u;
 
 /**
@@ -36,35 +36,33 @@ inline constexpr size_t kMapNameMaxSize      = 64u;
  */
 struct AreaStructureWrapper : public chip::app::Clusters::ServiceArea::Structs::AreaStruct::Type
 {
+    /**
+     * @brief This is a default constructor that initializes the location object with the following 
+     * values: areaID = 0, mapID = null, locationInfo = null, landmarkInfo = null.
+    */
     AreaStructureWrapper()
     {
-        Set(0, 0, CharSpan(), DataModel::Nullable<int16_t>(), DataModel::Nullable<Globals::AreaTypeTag>(),
-            DataModel::Nullable<Globals::LandmarkTag>(), DataModel::Nullable<Globals::RelativePositionTag>());
+        areaID = 0;
+        mapID  = DataModel::NullNullable;
+        SetLocationInfoNull();
+        SetLandmarkInfoNull();
     }
 
     /**
-     * @brief This is a full constructor that initializes the location object with the given values. All values are deep copied.
-     * @param[in] aAreaID The unique identifier of this location.
-     * @param[in] aMapId The identifier of the supported map associated with this location.
-     * @param[in] aLocationName A human readable name for this location (empty string if not used).
-     * @param[in] aFloorNumber The floor level of this location - use negative values for below ground.
-     * @param[in] aAreaTypeTag A common namespace Area tag - indicates an association of the location with an indoor or outdoor area
-     * of a home.
-     * @param[in] aLandmarkTag A common namespace Landmark tag - indicates an association of the location with a home landmark.
-     * @param[in] aRelativePositionTag A common namespace Relative Position tag - indicates the position of the location with
-     * respect to the landmark.
-     *
-     * @note Requirements regarding what combinations of fields and values are valid are not checked by this class.
-     * @note If aLocationName is larger than kLocationNameMaxSize, it will be truncated.
-     * @note If aLocationName is an empty string and aFloorNumber and aAreaTypeTag are null, locationInfo will be set to null.
-     */
-    AreaStructureWrapper(uint32_t aAreaID, const DataModel::Nullable<uint32_t> & aMapId, const CharSpan & aLocationName,
-                         const DataModel::Nullable<int16_t> & aFloorNumber,
-                         const DataModel::Nullable<Globals::AreaTypeTag> & aAreaTypeTag,
-                         const DataModel::Nullable<Globals::LandmarkTag> & aLandmarkTag,
-                         const DataModel::Nullable<Globals::RelativePositionTag> & aRelativePositionTag)
+     * @brief This is a constructor that initializes the location object with the given values. All values are deep copied.
+     * @param[in] areaId The unique identifier of this location.
+     * @param[in] mapId The identifier of the supported map associated with this location.
+     * @param[in] locationInfo The location information.
+     * @param[in] landmarkInfo The landmark information.
+    */
+    AreaStructureWrapper(uint32_t areaId, DataModel::Nullable<uint32_t> mapId,
+                         DataModel::Nullable<Globals::Structs::LocationDescriptorStruct::Type> locationInfo,
+                         DataModel::Nullable<Structs::LandmarkInfoStruct::Type> landmarkInfo)
     {
-        Set(aAreaID, aMapId, aLocationName, aFloorNumber, aAreaTypeTag, aLandmarkTag, aRelativePositionTag);
+        areaID = areaId;
+        mapID  = mapId;
+        SetLocationInfo(locationInfo);
+        SetLandmarkInfo(landmarkInfo);
     }
 
     /**
@@ -97,9 +95,9 @@ struct AreaStructureWrapper : public chip::app::Clusters::ServiceArea::Structs::
             areaDesc.locationInfo.SetNonNull();
 
             // deep copy the name.
-            auto sizeToCopy = std::min(sizeof(mLocationNameBuffer), aOther.areaDesc.locationInfo.Value().locationName.size());
-            memcpy(mLocationNameBuffer, aOther.areaDesc.locationInfo.Value().locationName.data(), sizeToCopy);
-            areaDesc.locationInfo.Value().locationName = CharSpan(mLocationNameBuffer, sizeToCopy);
+            auto sizeToCopy = std::min(sizeof(mAreaNameBuffer), aOther.areaDesc.locationInfo.Value().locationName.size());
+            memcpy(mAreaNameBuffer, aOther.areaDesc.locationInfo.Value().locationName.data(), sizeToCopy);
+            areaDesc.locationInfo.Value().locationName = CharSpan(mAreaNameBuffer, sizeToCopy);
 
             areaDesc.locationInfo.Value().floorNumber = aOther.areaDesc.locationInfo.Value().floorNumber;
             areaDesc.locationInfo.Value().areaType    = aOther.areaDesc.locationInfo.Value().areaType;
@@ -127,84 +125,94 @@ struct AreaStructureWrapper : public chip::app::Clusters::ServiceArea::Structs::
         return *this;
     }
 
-    /**
-     * @brief Set all fields of the location object. All values are deep copied.
-     * @param[in] aAreaID The unique identifier of this location.
-     * @param[in] aMapId The identifier of the supported map associated with this location.
-     * @param[in] aLocationName A human readable name for this location (empty string if not used).
-     * @param[in] aFloorNumber The floor level of this location - use negative values for below ground.
-     * @param[in] aAreaTypeTag A common namespace Area tag - indicates an association of the location with an indoor or outdoor area
-     * of a home.
-     * @param[in] aLandmarkTag A common namespace Landmark tag - indicates an association of the location with a home landmark.
-     * @param[in] aRelativePositionTag A common namespace Relative Position tag - indicates the position of the location with
-     * respect to the landmark.
-     *
-     * @note Requirements regarding what combinations of fields and values are valid are not checked by this class.
-     * @note If aLocationName is larger than kLocationNameMaxSize, it will be truncated.
-     * @note If aLocationName is an empty string and aFloorNumber and aAreaTypeTag are null, locationInfo will be set to null.
-     */
-    void Set(uint32_t aAreaID, const DataModel::Nullable<uint32_t> & aMapId, const CharSpan & aLocationName,
-             const DataModel::Nullable<int16_t> & aFloorNumber, const DataModel::Nullable<Globals::AreaTypeTag> & aAreaType,
-             const DataModel::Nullable<Globals::LandmarkTag> & aLandmarkTag,
-             const DataModel::Nullable<Globals::RelativePositionTag> & aRelativePositionTag)
+    void SetAreaId(uint32_t aAreaID)
     {
         areaID = aAreaID;
+    }
+
+    void SetMapId(const DataModel::Nullable<uint32_t> & aMapId)
+    {
         mapID  = aMapId;
+    }
 
-        // If there is at least one non-null value for locationInfo, add it to the location structure.
-        if ((!aLocationName.empty()) || (!aFloorNumber.IsNull()) || (!aAreaType.IsNull()))
-        {
-            // Create a home location desc structure and fill it in except for the location name. This is done below.
-            areaDesc.locationInfo.SetNonNull(Globals::Structs::LocationDescriptorStruct::Type());
-
-            areaDesc.locationInfo.Value().floorNumber = aFloorNumber;
-            areaDesc.locationInfo.Value().areaType    = aAreaType;
-        }
-        else
-        {
-            areaDesc.locationInfo.SetNull();
-        }
-
-        // todo improve this when addressing issue https://github.com/project-chip/connectedhomeip/issues/34519
-        if (aLandmarkTag.IsNull())
-        {
-            areaDesc.landmarkInfo.SetNull();
-        }
-        else
-        {
-            areaDesc.landmarkInfo.SetNonNull();
-            areaDesc.landmarkInfo.Value().landmarkTag = aLandmarkTag.Value();
-            if (aRelativePositionTag.IsNull())
-            {
-                areaDesc.landmarkInfo.Value().positionTag.SetNull();
-            }
-            else
-            {
-                areaDesc.landmarkInfo.Value().positionTag.SetNonNull();
-                areaDesc.landmarkInfo.Value().positionTag.Value() = aRelativePositionTag.Value();
-            }
-        }
-
-        // this assumes areaDesc structure was created above, if appropriate
-        if (!areaDesc.locationInfo.IsNull())
-        {
-            auto sizeToCopy = std::min(sizeof(mLocationNameBuffer), aLocationName.size());
-            memcpy(mLocationNameBuffer, aLocationName.data(), sizeToCopy);
-            areaDesc.locationInfo.Value().locationName = CharSpan(mLocationNameBuffer, sizeToCopy);
-        }
+    void SetLocationInfoNull()
+    {
+        areaDesc.locationInfo.SetNull();
     }
 
     /**
-     * @brief Compare the location's name with the given text.
-     * @param[in] aLocationName The name to compare.
-     * @return true if the location structure's name field matches aLocationName.
-     * False otherwise, including if the location structure's HomeLocation structure is null.
+     * @brief Set the location information.
+     * @param[in] locationName The name of the location. If the name is larger than kAreaNameMaxSize, it will be truncated.
+     * @param[in] floorNumber The floor number of the location.
+     * @param[in] areaType The type of the area.
      */
-    bool IsNameEqual(const CharSpan & aLocationName) const
+    void SetLocationInfo(const CharSpan & locationName, const DataModel::Nullable<int16_t> & floorNumber, const DataModel::Nullable<Globals::AreaTypeTag> & areaType)
+    {
+        areaDesc.locationInfo.SetNonNull();
+        // Copy the name
+        auto sizeToCopy = std::min(sizeof(mAreaNameBuffer), locationName.size());
+        memcpy(mAreaNameBuffer, locationName.data(), sizeToCopy);
+        areaDesc.locationInfo.Value().locationName = CharSpan(mAreaNameBuffer, sizeToCopy);
+        areaDesc.locationInfo.Value().floorNumber = floorNumber;
+        areaDesc.locationInfo.Value().areaType = areaType;
+    }
+
+    /**
+     * @brief Set the location information form a LocationDescriptorStruct object.
+     * 
+     * @note If the locationName is larger than kAreaNameMaxSize, it will be truncated.
+     */
+    void SetLocationInfo(DataModel::Nullable<Globals::Structs::LocationDescriptorStruct::Type> locationInfo)
+    {
+        if (locationInfo.IsNull())
+        {
+            return SetLocationInfoNull();
+        }
+
+        SetLocationInfo(locationInfo.Value().locationName, locationInfo.Value().floorNumber, locationInfo.Value().areaType);
+    }
+
+    void SetLandmarkInfoNull()
+    {
+        areaDesc.landmarkInfo.SetNull();
+    }
+
+    /**
+     * @brief Set the landmark information.
+     * @param[in] landmarkTag The landmark tag.
+     * @param[in] relativePositionTag The relative position tag.
+     */
+    void SetLandmarkInfo(const Globals::LandmarkTag & landmarkTag, const DataModel::Nullable<Globals::RelativePositionTag> & relativePositionTag)
+    {
+        areaDesc.landmarkInfo.SetNonNull();
+        areaDesc.landmarkInfo.Value().landmarkTag = landmarkTag;
+        areaDesc.landmarkInfo.Value().positionTag = relativePositionTag;
+    }
+
+    /**
+     * @brief Set the landmark information from a LandmarkInfoStruct object.
+     */
+    void SetLandmarkInfo(DataModel::Nullable<Structs::LandmarkInfoStruct::Type> landmarkInfo)
+    {
+        if (landmarkInfo.IsNull())
+        {
+            return SetLandmarkInfoNull();
+        }
+
+        SetLandmarkInfo(landmarkInfo.Value().landmarkTag, landmarkInfo.Value().positionTag);
+    }
+
+    /**
+     * @brief Compare the area's name with the given text.
+     * @param[in] aAreaName The name to compare.
+     * @return true if the area structure's name field matches aAreaName.
+     * False otherwise, including if the location structure's LocationInfo structure is null.
+     */
+    bool IsNameEqual(const CharSpan & aAreaName) const
     {
         if (!areaDesc.locationInfo.IsNull())
         {
-            return areaDesc.locationInfo.Value().locationName.data_equal(aLocationName);
+            return areaDesc.locationInfo.Value().locationName.data_equal(aAreaName);
         }
 
         return false;
@@ -291,14 +299,14 @@ struct AreaStructureWrapper : public chip::app::Clusters::ServiceArea::Structs::
     {
         if (areaDesc.locationInfo.IsNull())
         {
-            return { mLocationNameBuffer, 0 };
+            return { mAreaNameBuffer, 0 };
         }
 
         return areaDesc.locationInfo.Value().locationName;
     }
 
 private:
-    char mLocationNameBuffer[kLocationNameMaxSize] = { 0 };
+    char mAreaNameBuffer[kAreaNameMaxSize] = { 0 };
 };
 
 /**
