@@ -1479,4 +1479,3 @@ void emberAfIncreaseClusterDataVersion(const chip::app::ConcreteClusterPath & aC
                       aConcreteClusterPath.mEndpointId, ChipLogValueMEI(aConcreteClusterPath.mClusterId), *(version));
     }
 }
-
