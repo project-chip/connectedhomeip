@@ -28,6 +28,7 @@
 #include <app/ConcreteAttributePath.h>
 #include <app/ConcreteCommandPath.h>
 #include <app/server/Server.h>
+#include <app/util/endpoint-config-api.h>
 #include <lib/core/CHIPEncoding.h>
 #include <platform/internal/CHIPDeviceLayerInternal.h>
 
@@ -117,8 +118,7 @@ void TimerExpiredCallback(System::Layer * systemLayer, void * callbackContext)
     VerifyOrReturn(delegate != nullptr, ChipLogError(Zcl, "Delegate is null. Unable to handle timer expired"));
 
     delegate->ClearPendingPresetList();
-    gThermostatAttrAccess.SetAtomicWrite(endpoint, false);
-    gThermostatAttrAccess.SetAtomicWriteScopedNodeId(endpoint, ScopedNodeId());
+    gThermostatAttrAccess.SetAtomicWrite(endpoint, ScopedNodeId(), false);
 }
 
 /**
@@ -206,8 +206,7 @@ void resetAtomicWrite(Delegate * delegate, EndpointId endpoint)
         delegate->ClearPendingPresetList();
     }
     ClearTimer(endpoint);
-    gThermostatAttrAccess.SetAtomicWrite(endpoint, false);
-    gThermostatAttrAccess.SetAtomicWriteScopedNodeId(endpoint, ScopedNodeId());
+    gThermostatAttrAccess.SetAtomicWrite(endpoint, ScopedNodeId(), false);
 }
 
 /**
@@ -633,14 +632,16 @@ void SetDefaultDelegate(EndpointId endpoint, Delegate * delegate)
     }
 }
 
-void ThermostatAttrAccess::SetAtomicWrite(EndpointId endpoint, bool inProgress)
+void ThermostatAttrAccess::SetAtomicWrite(EndpointId endpoint, ScopedNodeId originatorNodeId, bool inProgress)
 {
     uint16_t ep =
         emberAfGetClusterServerEndpointIndex(endpoint, Thermostat::Id, MATTER_DM_THERMOSTAT_CLUSTER_SERVER_ENDPOINT_COUNT);
 
-    if (ep < ArraySize(mAtomicWriteState))
+    if (ep < ArraySize(mAtomicWriteStates))
     {
-        mAtomicWriteState[ep] = inProgress;
+        mAtomicWriteStates[ep].inProgress = inProgress;
+        mAtomicWriteStates[ep].endpointId = endpoint;
+        mAtomicWriteStates[ep].nodeId     = originatorNodeId;
     }
 }
 
@@ -650,9 +651,9 @@ bool ThermostatAttrAccess::InAtomicWrite(EndpointId endpoint)
     uint16_t ep =
         emberAfGetClusterServerEndpointIndex(endpoint, Thermostat::Id, MATTER_DM_THERMOSTAT_CLUSTER_SERVER_ENDPOINT_COUNT);
 
-    if (ep < ArraySize(mAtomicWriteState))
+    if (ep < ArraySize(mAtomicWriteStates))
     {
-        inAtomicWrite = mAtomicWriteState[ep];
+        inAtomicWrite = mAtomicWriteStates[ep].inProgress;
     }
     return inAtomicWrite;
 }
@@ -677,26 +678,15 @@ bool ThermostatAttrAccess::InAtomicWrite(CommandHandler * commandObj, EndpointId
     return GetAtomicWriteScopedNodeId(endpoint) == sourceNodeId;
 }
 
-void ThermostatAttrAccess::SetAtomicWriteScopedNodeId(EndpointId endpoint, ScopedNodeId originatorNodeId)
-{
-    uint16_t ep =
-        emberAfGetClusterServerEndpointIndex(endpoint, Thermostat::Id, MATTER_DM_THERMOSTAT_CLUSTER_SERVER_ENDPOINT_COUNT);
-
-    if (ep < ArraySize(mAtomicWriteNodeIds))
-    {
-        mAtomicWriteNodeIds[ep] = originatorNodeId;
-    }
-}
-
 ScopedNodeId ThermostatAttrAccess::GetAtomicWriteScopedNodeId(EndpointId endpoint)
 {
     ScopedNodeId originatorNodeId = ScopedNodeId();
     uint16_t ep =
         emberAfGetClusterServerEndpointIndex(endpoint, Thermostat::Id, MATTER_DM_THERMOSTAT_CLUSTER_SERVER_ENDPOINT_COUNT);
 
-    if (ep < ArraySize(mAtomicWriteNodeIds))
+    if (ep < ArraySize(mAtomicWriteStates))
     {
-        originatorNodeId = mAtomicWriteNodeIds[ep];
+        originatorNodeId = mAtomicWriteStates[ep].nodeId;
     }
     return originatorNodeId;
 }
@@ -981,13 +971,17 @@ CHIP_ERROR ThermostatAttrAccess::AppendPendingPreset(Thermostat::Delegate * dele
 
 void ThermostatAttrAccess::OnFabricRemoved(const FabricTable & fabricTable, FabricIndex fabricIndex)
 {
-    for (size_t i = 0; i < ArraySize(mAtomicWriteNodeIds); ++i)
+    for (size_t i = 0; i < ArraySize(mAtomicWriteStates); ++i)
     {
-        auto nodeId = mAtomicWriteNodeIds[i];
-        if (nodeId.GetFabricIndex() == fabricIndex)
+        auto atomicWriteState = mAtomicWriteStates[i];
+        if (atomicWriteState.nodeId.GetFabricIndex() == fabricIndex)
         {
-            mAtomicWriteNodeIds[i] = ScopedNodeId();
-            mAtomicWriteState[i]   = false;
+            auto delegate = GetDelegate(atomicWriteState.endpointId);
+            if (delegate == nullptr)
+            {
+                continue;
+            }
+            resetAtomicWrite(delegate, atomicWriteState.endpointId);
         }
     }
 }
@@ -1457,8 +1451,7 @@ void handleAtomicBegin(CommandHandler * commandObj, const ConcreteCommandPath & 
     timeout             = std::min(timeout, maxTimeout);
 
     ScheduleTimer(endpoint, System::Clock::Milliseconds16(timeout));
-    gThermostatAttrAccess.SetAtomicWrite(endpoint, true);
-    gThermostatAttrAccess.SetAtomicWriteScopedNodeId(endpoint, GetSourceScopedNodeId(commandObj));
+    gThermostatAttrAccess.SetAtomicWrite(endpoint, GetSourceScopedNodeId(commandObj), true);
     sendAtomicResponse(commandObj, commandPath, imcode::Success, imcode::Success, imcode::Success, MakeOptional(timeout));
 }
 
@@ -1911,4 +1904,15 @@ void MatterThermostatPluginServerInitCallback()
 {
     Server::GetInstance().GetFabricTable().AddFabricDelegate(&gThermostatAttrAccess);
     registerAttributeAccessOverride(&gThermostatAttrAccess);
+}
+
+void MatterThermostatClusterServerShutdownCallback(EndpointId endpoint)
+{
+    ChipLogProgress(Zcl, "Shutting down thermostat server cluster on endpoint %d", endpoint);
+    auto delegate = GetDelegate(endpoint);
+
+    if (delegate != nullptr)
+    {
+        resetAtomicWrite(delegate, endpoint);
+    }
 }

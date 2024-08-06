@@ -49,15 +49,6 @@ public:
     CHIP_ERROR Write(const ConcreteDataAttributePath & aPath, chip::app::AttributeValueDecoder & aDecoder) override;
 
     /**
-     * @brief Sets the scoped node id of the originator that sent the last successful
-     *        AtomicRequest of type BeginWrite for the given endpoint.
-     *
-     * @param[in] endpoint The endpoint.
-     * @param[in] originatorNodeId The originator scoped node id.
-     */
-    void SetAtomicWriteScopedNodeId(EndpointId endpoint, ScopedNodeId originatorNodeId);
-
-    /**
      * @brief Gets the scoped node id of the originator that sent the last successful
      *        AtomicRequest of type BeginWrite for the given endpoint.
      *
@@ -68,12 +59,13 @@ public:
     ScopedNodeId GetAtomicWriteScopedNodeId(EndpointId endpoint);
 
     /**
-     * @brief Sets whether an atomic write is in progress for the given endpoint
+     * @brief Sets whether an atomic write is in progress for the given endpoint and originatorNodeId
      *
      * @param[in] endpoint The endpoint.
+     * @param[in] originatorNodeId The originator scoped node id.
      * @param[in] inProgress Whether or not an atomic write is in progress.
      */
-    void SetAtomicWrite(EndpointId endpoint, bool inProgress);
+    void SetAtomicWrite(EndpointId endpoint, ScopedNodeId originatorNodeId, bool inProgress);
 
     /**
      * @brief Gets whether an atomic write is in progress for the given endpoint
@@ -109,8 +101,14 @@ private:
 
     void OnFabricRemoved(const FabricTable & fabricTable, FabricIndex fabricIndex) override;
 
-    ScopedNodeId mAtomicWriteNodeIds[kThermostatEndpointCount];
-    bool mAtomicWriteState[kThermostatEndpointCount];
+    struct AtomicWriteState
+    {
+        bool inProgress;
+        ScopedNodeId nodeId;
+        EndpointId endpointId;
+    };
+
+    AtomicWriteState mAtomicWriteStates[kThermostatEndpointCount];
 };
 
 /**
