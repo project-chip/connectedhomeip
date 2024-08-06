@@ -1745,7 +1745,7 @@ def async_test_body(body):
     return async_runner
 
 
-def per_node_test(body):
+def run_once_for_node(body):
     """ Decorator to be used for PICS-free tests that apply to the entire node.
 
     Use this decorator when your script needs to be run once to validate the whole node.
@@ -1753,7 +1753,7 @@ def per_node_test(body):
     """
 
     def whole_node_runner(self: MatterBaseTest, *args, **kwargs):
-        asserts.assert_false(self.get_test_pics(self.current_test_info.name), "pics_ method supplied for per_node_test.")
+        asserts.assert_false(self.get_test_pics(self.current_test_info.name), "pics_ method supplied for run_once_for_node.")
         return _async_runner(body, self, *args, **kwargs)
 
     return whole_node_runner
@@ -1770,9 +1770,9 @@ def _has_cluster(wildcard, endpoint, cluster: ClusterObjects.Cluster) -> bool:
 
 
 def has_cluster(cluster: ClusterObjects.ClusterObjectDescriptor) -> EndpointCheckFunction:
-    """ EndpointCheckFunction that can be passed as a parameter to the per_endpoint_test decorator.
+    """ EndpointCheckFunction that can be passed as a parameter to the run_for_each_matching_endpoint decorator.
 
-        Use this function with the per_endpoint_test decorator to run this test on all endpoints with
+        Use this function with the run_for_each_matching_endpoint decorator to run this test on all endpoints with
         the specified cluster. For example, given a device with the following conformance
 
         EP0: cluster A, B, C
@@ -1781,7 +1781,7 @@ def has_cluster(cluster: ClusterObjects.ClusterObjectDescriptor) -> EndpointChec
         EP3, cluster E
 
         And the following test specification:
-        @per_endpoint_test(has_cluster(Clusters.D))
+        @run_for_each_matching_endpoint(has_cluster(Clusters.D))
         test_mytest(self):
             ...
 
@@ -1803,9 +1803,9 @@ def _has_attribute(wildcard, endpoint, attribute: ClusterObjects.ClusterAttribut
 
 
 def has_attribute(attribute: ClusterObjects.ClusterAttributeDescriptor) -> EndpointCheckFunction:
-    """ EndpointCheckFunction that can be passed as a parameter to the per_endpoint_test decorator.
+    """ EndpointCheckFunction that can be passed as a parameter to the run_for_each_matching_endpoint decorator.
 
-        Use this function with the per_endpoint_test decorator to run this test on all endpoints with
+        Use this function with the run_for_each_matching_endpoint decorator to run this test on all endpoints with
         the specified attribute. For example, given a device with the following conformance
 
         EP0: cluster A, B, C
@@ -1814,7 +1814,7 @@ def has_attribute(attribute: ClusterObjects.ClusterAttributeDescriptor) -> Endpo
         EP3, cluster D without attribute d
 
         And the following test specification:
-        @per_endpoint_test(has_attribute(Clusters.D.Attributes.d))
+        @run_for_each_matching_endpoint(has_attribute(Clusters.D.Attributes.d))
         test_mytest(self):
             ...
 
@@ -1835,9 +1835,9 @@ def _has_feature(wildcard, endpoint, cluster: ClusterObjects.ClusterObjectDescri
 
 
 def has_feature(cluster: ClusterObjects.ClusterObjectDescriptor, feature: IntFlag) -> EndpointCheckFunction:
-    """ EndpointCheckFunction that can be passed as a parameter to the per_endpoint_test decorator.
+    """ EndpointCheckFunction that can be passed as a parameter to the run_for_each_matching_endpoint decorator.
 
-        Use this function with the per_endpoint_test decorator to run this test on all endpoints with
+        Use this function with the run_for_each_matching_endpoint decorator to run this test on all endpoints with
         the specified feature. For example, given a device with the following conformance
 
         EP0: cluster A, B, C
@@ -1846,7 +1846,7 @@ def has_feature(cluster: ClusterObjects.ClusterObjectDescriptor, feature: IntFla
         EP3, cluster D without feature F0
 
         And the following test specification:
-        @per_endpoint_test(has_feature(Clusters.D.Bitmaps.Feature.F0))
+        @run_for_each_matching_endpoint(has_feature(Clusters.D.Bitmaps.Feature.F0))
         test_mytest(self):
             ...
 
@@ -1859,7 +1859,7 @@ def has_feature(cluster: ClusterObjects.ClusterObjectDescriptor, feature: IntFla
 
 
 async def get_accepted_endpoints_for_test(self: MatterBaseTest, accept_function: EndpointCheckFunction) -> list[uint]:
-    """ Helper function for the per_endpoint_test decorator.
+    """ Helper function for the run_for_each_matching_endpoint decorator.
 
         Returns a list of endpoints on which the test should be run given the accept_function for the test.
     """
@@ -1867,7 +1867,7 @@ async def get_accepted_endpoints_for_test(self: MatterBaseTest, accept_function:
     return [e for e in wildcard.attributes.keys() if accept_function(wildcard, e)]
 
 
-def per_endpoint_test(accept_function: EndpointCheckFunction):
+def run_for_each_matching_endpoint(accept_function: EndpointCheckFunction):
     """ Test decorator for a test that needs to be run once per endpoint that meets the accept_function criteria.
 
         Place this decorator above the test_ method to have the test framework run this test once per endpoint.
@@ -1882,7 +1882,7 @@ def per_endpoint_test(accept_function: EndpointCheckFunction):
         EP3, cluster E
 
         And the following test specification:
-        @per_endpoint_test(has_cluster(Clusters.D))
+        @run_for_each_matching_endpoint(has_cluster(Clusters.D))
         test_mytest(self):
             ...
 
@@ -1898,9 +1898,10 @@ def per_endpoint_test(accept_function: EndpointCheckFunction):
         Tests that use this decorator cannot use a pics_ method for test selection and should not reference any
         PICS values internally.
     """
-    def per_endpoint_test_internal(body):
+    def run_for_each_matching_endpoint_internal(body):
         def per_endpoint_runner(self: MatterBaseTest, *args, **kwargs):
-            asserts.assert_false(self.get_test_pics(self.current_test_info.name), "pics_ method supplied for per_endpoint_test.")
+            asserts.assert_false(self.get_test_pics(self.current_test_info.name),
+                                 "pics_ method supplied for run_for_each_matching_endpoint.")
             runner_with_timeout = asyncio.wait_for(get_accepted_endpoints_for_test(self, accept_function), timeout=30)
             endpoints = asyncio.run(runner_with_timeout)
             if not endpoints:
@@ -1927,7 +1928,7 @@ def per_endpoint_test(accept_function: EndpointCheckFunction):
                     self.runner_hook.test_stop(exception=None, duration=test_duration)
             self.matter_test_config.endpoint = original_ep
         return per_endpoint_runner
-    return per_endpoint_test_internal
+    return run_for_each_matching_endpoint_internal
 
 
 class CommissionDeviceTest(MatterBaseTest):

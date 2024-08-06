@@ -33,11 +33,11 @@ from chip.clusters import Attribute
 
 try:
     from matter_testing_support import (MatterBaseTest, async_test_body, get_accepted_endpoints_for_test, has_attribute,
-                                        has_cluster, has_feature, per_endpoint_test, per_node_test)
+                                        has_cluster, has_feature, run_for_each_matching_endpoint, run_once_for_node)
 except ImportError:
     sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), '..')))
     from matter_testing_support import (MatterBaseTest, async_test_body, get_accepted_endpoints_for_test, has_attribute,
-                                        has_cluster, has_feature, per_endpoint_test, per_node_test)
+                                        has_cluster, has_feature, run_for_each_matching_endpoint, run_once_for_node)
 
 from typing import Optional
 
@@ -154,7 +154,7 @@ class TestDecorators(MatterBaseTest):
         asserts.assert_equal(endpoints, [], msg)
 
     # This test should cause an assertion because it has pics_ method
-    @per_node_test
+    @run_once_for_node
     async def test_whole_node_with_pics(self):
         pass
 
@@ -164,7 +164,7 @@ class TestDecorators(MatterBaseTest):
         return ['EXAMPLE.S']
 
     # This test should cause an assertion because it has a pics_ method
-    @per_endpoint_test(has_cluster(Clusters.OnOff))
+    @run_for_each_matching_endpoint(has_cluster(Clusters.OnOff))
     async def test_per_endpoint_with_pics(self):
         pass
 
@@ -174,66 +174,66 @@ class TestDecorators(MatterBaseTest):
         return ['EXAMPLE.S']
 
     # This test should be run once
-    @per_node_test
+    @run_once_for_node
     async def test_whole_node_ok(self):
         pass
 
     # This test should be run once per endpoint
-    @per_endpoint_test(has_cluster(Clusters.OnOff))
+    @run_for_each_matching_endpoint(has_cluster(Clusters.OnOff))
     async def test_endpoint_cluster_yes(self):
         pass
 
     # This test should be skipped since this cluster isn't on any endpoint
-    @per_endpoint_test(has_cluster(Clusters.TimeSynchronization))
+    @run_for_each_matching_endpoint(has_cluster(Clusters.TimeSynchronization))
     async def test_endpoint_cluster_no(self):
         pass
 
     # This test should be run once per endpoint
-    @per_endpoint_test(has_attribute(Clusters.OnOff.Attributes.OnOff))
+    @run_for_each_matching_endpoint(has_attribute(Clusters.OnOff.Attributes.OnOff))
     async def test_endpoint_attribute_yes(self):
         pass
 
     # This test should be skipped since this attribute isn't on the supported cluster
-    @per_endpoint_test(has_attribute(Clusters.OnOff.Attributes.OffWaitTime))
+    @run_for_each_matching_endpoint(has_attribute(Clusters.OnOff.Attributes.OffWaitTime))
     async def test_endpoint_attribute_supported_cluster_no(self):
         pass
 
     # This test should be skipped since this attribute is part of an unsupported cluster
-    @per_endpoint_test(has_attribute(Clusters.TimeSynchronization.Attributes.Granularity))
+    @run_for_each_matching_endpoint(has_attribute(Clusters.TimeSynchronization.Attributes.Granularity))
     async def test_endpoint_attribute_unsupported_cluster_no(self):
         pass
 
     # This test should be run once per endpoint
-    @per_endpoint_test(has_feature(Clusters.OnOff, Clusters.OnOff.Bitmaps.Feature.kLighting))
+    @run_for_each_matching_endpoint(has_feature(Clusters.OnOff, Clusters.OnOff.Bitmaps.Feature.kLighting))
     async def test_endpoint_feature_yes(self):
         pass
 
     # This test should be skipped since this attribute is part of an unsupported cluster
-    @per_endpoint_test(has_feature(Clusters.TimeSynchronization, Clusters.TimeSynchronization.Bitmaps.Feature.kNTPClient))
+    @run_for_each_matching_endpoint(has_feature(Clusters.TimeSynchronization, Clusters.TimeSynchronization.Bitmaps.Feature.kNTPClient))
     async def test_endpoint_feature_unsupported_cluster_no(self):
         pass
 
     # This test should be run since both are present
-    @per_endpoint_test(has_attribute(Clusters.OnOff.Attributes.OnOff) and has_cluster(Clusters.OnOff))
+    @run_for_each_matching_endpoint(has_attribute(Clusters.OnOff.Attributes.OnOff) and has_cluster(Clusters.OnOff))
     async def test_endpoint_boolean_yes(self):
         pass
 
     # This test should be skipped since we have an OnOff cluster, but no Time sync
-    @per_endpoint_test(has_cluster(Clusters.OnOff) and has_cluster(Clusters.TimeSynchronization))
+    @run_for_each_matching_endpoint(has_cluster(Clusters.OnOff) and has_cluster(Clusters.TimeSynchronization))
     async def test_endpoint_boolean_no(self):
         pass
 
-    @per_endpoint_test(has_cluster(Clusters.OnOff))
+    @run_for_each_matching_endpoint(has_cluster(Clusters.OnOff))
     async def test_fail_on_ep0(self):
         if self.matter_test_config.endpoint == 0:
             asserts.fail("Expected failure")
 
-    @per_endpoint_test(has_cluster(Clusters.OnOff))
+    @run_for_each_matching_endpoint(has_cluster(Clusters.OnOff))
     async def test_fail_on_ep1(self):
         if self.matter_test_config.endpoint == 1:
             asserts.fail("Expected failure")
 
-    @per_node_test
+    @run_once_for_node
     async def test_fail_on_whole_node(self):
         asserts.fail("Expected failure")
 

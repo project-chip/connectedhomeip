@@ -39,7 +39,7 @@ from chip.clusters import ClusterObjects as ClusterObjects
 from chip.clusters.Attribute import EventReadResult
 from chip.tlv import uint
 from matter_testing_support import (ClusterAttributeChangeAccumulator, EventChangeCallback, MatterBaseTest, TestStep,
-                                    await_sequence_of_reports, default_matter_test_main, has_feature, per_endpoint_test)
+                                    await_sequence_of_reports, default_matter_test_main, has_feature, run_for_each_matching_endpoint)
 from mobly import asserts
 
 logger = logging.getLogger(__name__)
@@ -260,7 +260,7 @@ class TC_SwitchTests(MatterBaseTest):
                 TestStep(10, "TH reads the CurrentPosition attribute from the DUT", "Verify that the value is 0"),
                 ]
 
-    @per_endpoint_test(has_feature(Clusters.Switch, Clusters.Switch.Bitmaps.Feature.kLatchingSwitch))
+    @run_for_each_matching_endpoint(has_feature(Clusters.Switch, Clusters.Switch.Bitmaps.Feature.kLatchingSwitch))
     async def test_TC_SWTCH_2_2(self):
         post_prompt_settle_delay_seconds = 10.0
 
@@ -346,7 +346,7 @@ class TC_SwitchTests(MatterBaseTest):
                 TestStep(9, "TH reads the CurrentPosition attribute from the DUT", "Verify that the value is 0"),
                 ]
 
-    @per_endpoint_test(has_feature(Clusters.Switch, Clusters.Switch.Bitmaps.Feature.kMomentarySwitch))
+    @run_for_each_matching_endpoint(has_feature(Clusters.Switch, Clusters.Switch.Bitmaps.Feature.kMomentarySwitch))
     async def test_TC_SWTCH_2_3(self):
         # Commissioning - already done
         self.step(1)
@@ -425,7 +425,7 @@ class TC_SwitchTests(MatterBaseTest):
                 """)
                 ]
 
-    @per_endpoint_test(has_feature(Clusters.Switch, Clusters.Switch.Bitmaps.Feature.kMomentarySwitch))
+    @run_for_each_matching_endpoint(has_feature(Clusters.Switch, Clusters.Switch.Bitmaps.Feature.kMomentarySwitch))
     async def test_TC_SWTCH_2_4(self):
         switch_pressed_position = self._default_pressed_position
         post_prompt_settle_delay_seconds = 10.0
@@ -598,7 +598,7 @@ class TC_SwitchTests(MatterBaseTest):
         asf = has_feature(Clusters.Switch, 0x20)
         return msm(wildcard, endpoint) and not asf(wildcard, endpoint)
 
-    @per_endpoint_test(should_run_SWTCH_2_5)
+    @run_for_each_matching_endpoint(should_run_SWTCH_2_5)
     async def test_TC_SWTCH_2_5(self):
         # Commissioning - already done
         self.step(1)
@@ -773,7 +773,7 @@ class TC_SwitchTests(MatterBaseTest):
         asf = has_feature(Clusters.Switch, 0x20)
         return msm(wildcard, endpoint) and asf(wildcard, endpoint)
 
-    @per_endpoint_test(should_run_SWTCH_2_6)
+    @run_for_each_matching_endpoint(should_run_SWTCH_2_6)
     async def test_TC_SWTCH_2_6(self):
         # Commissioning - already done
         self.step(1)
