@@ -278,7 +278,7 @@ class TC_CC_2_3(MatterBaseTest):
 
         self.step(36)
         asserts.assert_almost_equal(
-        sub_handler.attribute_reports[cc.Attributes.RemainingTime][1].value, 150, delta=10, msg="Unexpected second report")
+            sub_handler.attribute_reports[cc.Attributes.RemainingTime][1].value, 150, delta=10, msg="Unexpected second report")
 
         self.step(37)
         asserts.assert_equal(sub_handler.attribute_reports[cc.Attributes.RemainingTime][-1].value, 0, "Unexpected last report")
