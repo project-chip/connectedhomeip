@@ -391,8 +391,8 @@ static Status SetCurrentLevelQuietReport(EndpointId endpoint, EmberAfLevelContro
     if (isStartOrEndOfTransition)
     {
         // At the start or end of the movement/transition we must report
-        auto predicate = [](const decltype(state->quietCurrentLevel)::SufficientChangePredicateCandidate &) -> bool {
-            return true;
+        auto predicate = [](const decltype(state->quietCurrentLevel)::SufficientChangePredicateCandidate & candidate) -> bool {
+            return (candidate.lastDirtyValue != candidate.newValue);
         };
         dirtyState = state->quietCurrentLevel.SetValue(newValue, now, predicate);
     }
@@ -545,7 +545,7 @@ static void writeRemainingTime(EndpointId endpoint, uint16_t remainingTimeMs)
             markDirty = MarkAttributeDirty::kYes;
         }
 
-        Attributes::RemainingTime::Set(endpoint, state->quietRemainingTime.value().ValueOr(0), markDirty);
+        Attributes::RemainingTime::Set(endpoint, state->quietRemainingTime.value().Value(), markDirty);
     }
 #endif // IGNORE_LEVEL_CONTROL_CLUSTER_LEVEL_CONTROL_REMAINING_TIME
 }
