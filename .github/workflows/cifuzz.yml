@@ -17,6 +17,7 @@ jobs:
       with:
         oss-fuzz-project-name: 'connectedhomeip'
         language: c++
+        dry-run: true
     - name: Run Fuzzers
       uses: google/oss-fuzz/infra/cifuzz/actions/run_fuzzers@master
       with:
@@ -24,6 +25,7 @@ jobs:
         language: c++
         fuzz-seconds: 300
         output-sarif: true
+        dry-run: true
     - name: Upload Crash
       uses: actions/upload-artifact@v3
       if: failure() && steps.build.outcome == 'success'
