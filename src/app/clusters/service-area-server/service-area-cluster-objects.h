@@ -51,8 +51,8 @@ struct AreaStructureWrapper : public chip::app::Clusters::ServiceArea::Structs::
      * @param[in] aAreaTypeTag A common namespace Area tag - indicates an association of the location with an indoor or outdoor area
      * of a home.
      * @param[in] aLandmarkTag A common namespace Landmark tag - indicates an association of the location with a home landmark.
-     * @param[in] aRelativePositionTag A common namespace Relative Position tag - indicates the position of the location with respect to the
-     * landmark.
+     * @param[in] aRelativePositionTag A common namespace Relative Position tag - indicates the position of the location with
+     * respect to the landmark.
      *
      * @note Requirements regarding what combinations of fields and values are valid are not checked by this class.
      * @note If aLocationName is larger than kLocationNameMaxSize, it will be truncated.
@@ -136,8 +136,8 @@ struct AreaStructureWrapper : public chip::app::Clusters::ServiceArea::Structs::
      * @param[in] aAreaTypeTag A common namespace Area tag - indicates an association of the location with an indoor or outdoor area
      * of a home.
      * @param[in] aLandmarkTag A common namespace Landmark tag - indicates an association of the location with a home landmark.
-     * @param[in] aRelativePositionTag A common namespace Relative Position tag - indicates the position of the location with respect to the
-     * landmark.
+     * @param[in] aRelativePositionTag A common namespace Relative Position tag - indicates the position of the location with
+     * respect to the landmark.
      *
      * @note Requirements regarding what combinations of fields and values are valid are not checked by this class.
      * @note If aLocationName is larger than kLocationNameMaxSize, it will be truncated.
