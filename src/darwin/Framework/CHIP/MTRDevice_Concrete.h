@@ -20,7 +20,6 @@
 
 NS_ASSUME_NONNULL_BEGIN
 
-
 @interface MTRDevice_Concrete : MTRDevice
 
 @end
