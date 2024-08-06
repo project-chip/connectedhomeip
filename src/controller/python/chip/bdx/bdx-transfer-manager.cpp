@@ -20,9 +20,7 @@
 namespace chip {
 namespace bdx {
 
-BdxTransferManager::BdxTransferManager(BdxTransfer::Delegate * bdxTransferDelegate) : mBdxTransferDelegate(bdxTransferDelegate)
-{
-}
+BdxTransferManager::BdxTransferManager(BdxTransfer::Delegate * bdxTransferDelegate) : mBdxTransferDelegate(bdxTransferDelegate) {}
 
 BdxTransferManager::~BdxTransferManager()
 {

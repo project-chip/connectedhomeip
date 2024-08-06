@@ -23,11 +23,11 @@ namespace chip {
 namespace bdx {
 namespace {
 
-constexpr uint32_t kMaxBdxBlockSize = 1024;
+constexpr uint32_t kMaxBdxBlockSize               = 1024;
 constexpr System::Clock::Timeout kBdxPollInterval = System::Clock::Milliseconds32(50);
-constexpr System::Clock::Timeout kBdxTimeout = System::Clock::Seconds16(5 * 60);
+constexpr System::Clock::Timeout kBdxTimeout      = System::Clock::Seconds16(5 * 60);
 
-}  // namespace
+} // namespace
 
 void BdxTransfer::SetDelegate(BdxTransfer::Delegate * delegate)
 {
@@ -49,10 +49,10 @@ CHIP_ERROR BdxTransfer::AcceptSend()
     mAwaitingAccept = false;
 
     TransferSession::TransferAcceptData acceptData;
-    acceptData.ControlMode = TransferControlFlags::kSenderDrive;
+    acceptData.ControlMode  = TransferControlFlags::kSenderDrive;
     acceptData.MaxBlockSize = mTransfer.GetTransferBlockSize();
-    acceptData.StartOffset = mTransfer.GetStartOffset();
-    acceptData.Length = mTransfer.GetTransferLength();
+    acceptData.StartOffset  = mTransfer.GetStartOffset();
+    acceptData.Length       = mTransfer.GetTransferLength();
     return mTransfer.AcceptTransfer(acceptData);
 }
 
@@ -60,7 +60,7 @@ CHIP_ERROR BdxTransfer::AcceptReceive(const ByteSpan & data_to_send)
 {
     VerifyOrReturnError(mAwaitingAccept, CHIP_ERROR_INCORRECT_STATE);
     mAwaitingAccept = false;
-    mData = new uint8_t[data_to_send.size()];
+    mData           = new uint8_t[data_to_send.size()];
     if (mData == nullptr)
     {
         return CHIP_ERROR_NO_MEMORY;
@@ -69,10 +69,10 @@ CHIP_ERROR BdxTransfer::AcceptReceive(const ByteSpan & data_to_send)
     mDataCount = data_to_send.size();
 
     TransferSession::TransferAcceptData acceptData;
-    acceptData.ControlMode = TransferControlFlags::kReceiverDrive;
+    acceptData.ControlMode  = TransferControlFlags::kReceiverDrive;
     acceptData.MaxBlockSize = mTransfer.GetTransferBlockSize();
-    acceptData.StartOffset = mTransfer.GetStartOffset();
-    acceptData.Length = mTransfer.GetTransferLength();
+    acceptData.StartOffset  = mTransfer.GetStartOffset();
+    acceptData.Length       = mTransfer.GetTransferLength();
     return mTransfer.AcceptTransfer(acceptData);
 }
 
@@ -168,7 +168,8 @@ CHIP_ERROR BdxTransfer::SendMessage(TransferSession::OutputEvent & event)
     {
         sendFlags.Set(Messaging::SendMessageFlags::kExpectResponse);
     }
-    return mExchangeCtx->SendMessage(event.msgTypeData.ProtocolId, event.msgTypeData.MessageType, event.MsgData.Retain(), sendFlags);
+    return mExchangeCtx->SendMessage(event.msgTypeData.ProtocolId, event.msgTypeData.MessageType, event.MsgData.Retain(),
+                                     sendFlags);
 }
 
 CHIP_ERROR BdxTransfer::SendBlock()
@@ -177,9 +178,9 @@ CHIP_ERROR BdxTransfer::SendBlock()
 
     size_t dataRemaining = mDataCount - mDataTransferredCount;
     TransferSession::BlockData block;
-    block.Data = mData + mDataTransferredCount;
+    block.Data   = mData + mDataTransferredCount;
     block.Length = std::min<size_t>(mTransfer.GetTransferBlockSize(), dataRemaining);
-    block.IsEof = block.Length == dataRemaining;
+    block.IsEof  = block.Length == dataRemaining;
     ReturnErrorOnFailure(mTransfer.PrepareBlock(block));
     mDataTransferredCount += block.Length;
     ScheduleImmediatePoll();
@@ -187,30 +188,33 @@ CHIP_ERROR BdxTransfer::SendBlock()
 }
 
 CHIP_ERROR BdxTransfer::OnMessageReceived(chip::Messaging::ExchangeContext * exchangeContext,
-                                          const chip::PayloadHeader & payloadHeader,
-                                          chip::System::PacketBufferHandle && payload) {
-  if (payloadHeader.HasMessageType(MessageType::SendInit) ||
-      payloadHeader.HasMessageType(MessageType::ReceiveInit)) {
-    FabricIndex fabricIndex = exchangeContext->GetSessionHandle()->GetFabricIndex();
-    NodeId peerNodeId       = exchangeContext->GetSessionHandle()->GetPeer().GetNodeId();
-    VerifyOrReturnError(fabricIndex != kUndefinedFabricIndex, CHIP_ERROR_INVALID_ARGUMENT);
-    VerifyOrReturnError(peerNodeId != kUndefinedNodeId, CHIP_ERROR_INVALID_ARGUMENT);
+                                          const chip::PayloadHeader & payloadHeader, chip::System::PacketBufferHandle && payload)
+{
+    if (payloadHeader.HasMessageType(MessageType::SendInit) || payloadHeader.HasMessageType(MessageType::ReceiveInit))
+    {
+        FabricIndex fabricIndex = exchangeContext->GetSessionHandle()->GetFabricIndex();
+        NodeId peerNodeId       = exchangeContext->GetSessionHandle()->GetPeer().GetNodeId();
+        VerifyOrReturnError(fabricIndex != kUndefinedFabricIndex, CHIP_ERROR_INVALID_ARGUMENT);
+        VerifyOrReturnError(peerNodeId != kUndefinedNodeId, CHIP_ERROR_INVALID_ARGUMENT);
 
-    TransferControlFlags flags;
-    TransferRole role;
-    if (payloadHeader.HasMessageType(MessageType::SendInit)) {
-      flags = TransferControlFlags::kSenderDrive;
-      role = TransferRole::kReceiver;
-    } else if (payloadHeader.HasMessageType(MessageType::ReceiveInit)) {
-      flags = TransferControlFlags::kReceiverDrive;
-      role = TransferRole::kSender;
+        TransferControlFlags flags;
+        TransferRole role;
+        if (payloadHeader.HasMessageType(MessageType::SendInit))
+        {
+            flags = TransferControlFlags::kSenderDrive;
+            role  = TransferRole::kReceiver;
+        }
+        else if (payloadHeader.HasMessageType(MessageType::ReceiveInit))
+        {
+            flags = TransferControlFlags::kReceiverDrive;
+            role  = TransferRole::kSender;
+        }
+        ReturnLogErrorOnFailure(
+            Responder::PrepareForTransfer(mSystemLayer, role, flags, kMaxBdxBlockSize, kBdxTimeout, kBdxPollInterval));
     }
-    ReturnLogErrorOnFailure(
-        Responder::PrepareForTransfer(mSystemLayer, role, flags, kMaxBdxBlockSize, kBdxTimeout, kBdxPollInterval));
-  }
 
-  return Responder::OnMessageReceived(exchangeContext, payloadHeader, std::move(payload));
+    return Responder::OnMessageReceived(exchangeContext, payloadHeader, std::move(payload));
 }
 
-}  // namespace bdx
-}  // namespace chip
+} // namespace bdx
+} // namespace chip

@@ -40,7 +40,7 @@ public:
     void OnExchangeCreationFailed(Messaging::ExchangeDelegate * delegate) override;
 
 private:
-    BdxTransferPool * mBdxTransferPool = nullptr;
+    BdxTransferPool * mBdxTransferPool            = nullptr;
     Messaging::ExchangeManager * mExchangeManager = nullptr;
 };
 

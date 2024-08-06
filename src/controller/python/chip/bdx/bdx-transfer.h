@@ -64,8 +64,7 @@ public:
 
     void HandleTransferSessionOutput(TransferSession::OutputEvent & event) override;
     void OnExchangeClosing(Messaging::ExchangeContext * exchangeContext) override;
-    CHIP_ERROR OnMessageReceived(chip::Messaging::ExchangeContext * exchangeContext,
-                                 const chip::PayloadHeader & payloadHeader,
+    CHIP_ERROR OnMessageReceived(chip::Messaging::ExchangeContext * exchangeContext, const chip::PayloadHeader & payloadHeader,
                                  chip::System::PacketBufferHandle && payload) override;
 
 private:
@@ -80,10 +79,10 @@ private:
 
     System::Layer * mSystemLayer = nullptr;
 
-    uint8_t * mData = nullptr;
-    size_t mDataCount = 0;
+    uint8_t * mData              = nullptr;
+    size_t mDataCount            = 0;
     size_t mDataTransferredCount = 0;
 };
 
-}  // namespace bdx
-}  // namespace chip
+} // namespace bdx
+} // namespace chip
