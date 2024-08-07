@@ -29,6 +29,7 @@
 #include <app/util/attribute-storage.h>
 #include <app/util/endpoint-config-api.h>
 #include <app/util/util.h>
+#include <crypto/RandUtils.h>
 #include <lib/support/CHIPMem.h>
 #include <lib/support/ZclString.h>
 
@@ -160,6 +161,16 @@ std::optional<unsigned> BridgedDeviceManager::AddDeviceEndpoint(std::unique_ptr<
     const chip::Span<const EmberAfDeviceType> & deviceTypeList = Span<const EmberAfDeviceType>(sBridgedDeviceTypes);
     const chip::Span<chip::DataVersion> & dataVersionStorage   = Span<DataVersion>(sBridgedNodeDataVersions);
 
+    if (dev->GetBridgedAttributes().uniqueId.empty())
+    {
+        dev->SetUniqueId(GenerateUniqueId());
+    }
+    else if (GetDeviceByUniqueId(dev->GetBridgedAttributes().uniqueId) != nullptr)
+    {
+        ChipLogProgress(NotSpecified, "A device with unique id '%s' already exists", dev->GetBridgedAttributes().uniqueId.c_str());
+        return std::nullopt;
+    }
+
     for (unsigned index = 0; index < CHIP_DEVICE_CONFIG_DYNAMIC_ENDPOINT_COUNT; index++)
     {
         if (mDevices[index])
@@ -225,6 +236,44 @@ BridgedDevice * BridgedDeviceManager::GetDevice(chip::EndpointId endpointId) con
     for (uint8_t index = 0; index < CHIP_DEVICE_CONFIG_DYNAMIC_ENDPOINT_COUNT; ++index)
     {
         if (mDevices[index] && mDevices[index]->GetEndpointId() == endpointId)
+        {
+            return mDevices[index].get();
+        }
+    }
+    return nullptr;
+}
+
+std::string BridgedDeviceManager::GenerateUniqueId()
+{
+    char rand_buffer[kUniqueIdSize + 1];
+    memset(rand_buffer, 0, sizeof(rand_buffer));
+
+    static const char kRandCharChoices[] = "0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZ";
+
+    while (true)
+    {
+        /// for nice viewing, prefix the generated value
+        memcpy(rand_buffer, "GEN-", 4);
+        for (unsigned idx = 4; idx < kUniqueIdSize; idx++)
+        {
+            rand_buffer[idx] = kRandCharChoices[Crypto::GetRandU8() % (sizeof(kRandCharChoices) - 1)];
+        }
+
+        // we know zero-terminated due to the memset
+        std::string uniqueIdChoice = rand_buffer;
+
+        if (!GetDeviceByUniqueId(uniqueIdChoice))
+        {
+            return uniqueIdChoice;
+        }
+    }
+}
+
+BridgedDevice * BridgedDeviceManager::GetDeviceByUniqueId(const std::string & id)
+{
+    for (uint8_t index = 0; index < CHIP_DEVICE_CONFIG_DYNAMIC_ENDPOINT_COUNT; ++index)
+    {
+        if (mDevices[index] && mDevices[index]->GetBridgedAttributes().uniqueId == id)
         {
             return mDevices[index].get();
         }

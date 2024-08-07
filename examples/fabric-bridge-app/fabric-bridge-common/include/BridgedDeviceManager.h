@@ -43,7 +43,12 @@ public:
      * This function attempts to add a device to a dynamic endpoint. It tries to find an available
      * endpoint slot and retries the addition process up to a specified maximum number of times if
      * the endpoint already exists. If the addition is successful, it returns the index of the
-     * dynamic endpoint; otherwise, it returns -1.
+     * dynamic endpoint;
+     *
+     * Ensures that the device has a unique id:
+     *   - device MUST set its unique id if any BEFORE calling this method
+     *   - if no unique id (i.e. empty string), a new unique id will be generated
+     *   - Add will fail if the unique id is not unique
      *
      * @param dev A pointer to the device to be added.
      * @param parentEndpointId The parent endpoint ID. Defaults to an invalid endpoint ID.
@@ -100,8 +105,18 @@ public:
      */
     std::optional<unsigned> RemoveDeviceByNodeId(chip::NodeId nodeId);
 
+    /**
+     * Finds the device with the given unique id (if any)
+     */
+    BridgedDevice * GetDeviceByUniqueId(const std::string & id);
+
 private:
     friend BridgedDeviceManager & BridgeDeviceMgr();
+
+    /**
+     * Creates a new unique ID that is not used by any other mDevice
+     */
+    std::string GenerateUniqueId();
 
     static BridgedDeviceManager sInstance;
 

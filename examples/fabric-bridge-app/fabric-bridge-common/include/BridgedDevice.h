@@ -20,12 +20,7 @@
 
 #include <app/util/attribute-storage.h>
 
-#include <stdbool.h>
-#include <stdint.h>
-
-#include <functional>
 #include <string>
-#include <vector>
 
 class BridgedDevice
 {
@@ -46,7 +41,7 @@ public:
     };
 
     BridgedDevice(chip::NodeId nodeId);
-    virtual ~BridgedDevice() {}
+    virtual ~BridgedDevice() = default;
 
     bool IsReachable();
     void SetReachable(bool reachable);
@@ -57,8 +52,12 @@ public:
     inline void SetParentEndpointId(chip::EndpointId id) { mParentEndpointId = id; };
     inline chip::EndpointId GetParentEndpointId() { return mParentEndpointId; };
 
-    const BridgedAttributes & GetBridgedAttributes() const { return mAttributes; }
+    [[nodiscard]] const BridgedAttributes & GetBridgedAttributes() const { return mAttributes; }
     void SetBridgedAttributes(const BridgedAttributes & value) { mAttributes = value; }
+
+    /// Convenience method to set just the unique id of a bridged device as it
+    /// is one of the few attributes that is not always bulk-set
+    void SetUniqueId(const std::string &value) { mAttributes.uniqueId = value; }
 
 protected:
     bool mReachable;
