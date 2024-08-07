@@ -135,12 +135,11 @@ CHIP_ERROR OTAImageProcessorImpl::ProcessBlock(ByteSpan & block)
 }
 
 #ifdef CONFIG_ENABLE_DELTA_OTA
-bool OTAImageProcessorImpl::VerifyChipId(void * binHeaderData)
+bool OTAImageProcessorImpl::VerifyChipId(esp_chip_id_t chipId)
 {
-    esp_image_header_t * header = (esp_image_header_t *) binHeaderData;
-    if (header->chip_id != CONFIG_IDF_FIRMWARE_CHIP_ID)
+    if (chipId != CONFIG_IDF_FIRMWARE_CHIP_ID)
     {
-        ESP_LOGE(TAG, "Mismatch chip id, expected %d, found %d", CONFIG_IDF_FIRMWARE_CHIP_ID, header->chip_id);
+        ESP_LOGE(TAG, "Mismatch chip id, expected %d, found %d", CONFIG_IDF_FIRMWARE_CHIP_ID, chipId);
         return false;
     }
     return true;
@@ -259,7 +258,8 @@ esp_err_t OTAImageProcessorImpl::DeltaOTAWriteCallback(const uint8_t * buf, size
             index = IMG_HEADER_LEN - headerDataRead;
             memcpy(headerData + headerDataRead, buf, index);
 
-            if (!VerifyChipId(headerData))
+            esp_image_header_t * header = (esp_image_header_t *) headerData;
+            if (!VerifyChipId(header->chip_id))
             {
                 return ESP_ERR_INVALID_VERSION;
             }

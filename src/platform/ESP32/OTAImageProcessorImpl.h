@@ -77,7 +77,7 @@ private:
     bool chipIdVerified      = false;
 
     static void DeltaOTACleanUp(intptr_t context);
-    static bool VerifyChipId(void * binHeaderData);
+    static bool VerifyChipId(esp_chip_id_t chipId);
     static bool VerifyPatchHeader(void * imgHeaderData);
     esp_err_t VerifyHeaderData(const uint8_t * buf, size_t size, int * index);
     static esp_err_t DeltaOTAReadCallback(uint8_t * buf_p, size_t size, int src_offset);
