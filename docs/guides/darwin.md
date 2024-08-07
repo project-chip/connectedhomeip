@@ -305,15 +305,15 @@ Example:
 
 ### Release to SHA Mappings
 
-| Platform | Release Version | SHA                                      |
-| -------- | --------------- | ---------------------------------------- |
-| iOS      | 17.6.1          | 2ee90eba27676950fa2f4ef96597d9696f510d5d |
-| iPadOS   | 17.6.1          | 2ee90eba27676950fa2f4ef96597d9696f510d5d |
-| tvOS     | 17.6            | 2ee90eba27676950fa2f4ef96597d9696f510d5d |
-| macOS    | 14.6.1          | 2ee90eba27676950fa2f4ef96597d9696f510d5d |
-| iOS      | 17.5.1          | d09b5ac98f4d7d8b9f2c307f55ab5462576623a5 |
-| iPadOS   | 17.5.1          | d09b5ac98f4d7d8b9f2c307f55ab5462576623a5 |
-| tvOS     | 17.5.1          | d09b5ac98f4d7d8b9f2c307f55ab5462576623a5 |
-| macOS    | 14.5            | d09b5ac98f4d7d8b9f2c307f55ab5462576623a5 |
-| iOS      | 16.7.8          | 83f7a2fe136e0b746db09f1d19e36c693a634b66 |
-| iPadOS   | 16.7.8          | 83f7a2fe136e0b746db09f1d19e36c693a634b66 |
+| Platform | Release Version | SHA                                        |
+| -------- | --------------- | ------------------------------------------ |
+| iOS      | 17.6.1          | `2ee90eba27676950fa2f4ef96597d9696f510d5d` |
+| iPadOS   | 17.6.1          | `2ee90eba27676950fa2f4ef96597d9696f510d5d` |
+| tvOS     | 17.6            | `2ee90eba27676950fa2f4ef96597d9696f510d5d` |
+| macOS    | 14.6.1          | `2ee90eba27676950fa2f4ef96597d9696f510d5d` |
+| iOS      | 17.5.1          | `d09b5ac98f4d7d8b9f2c307f55ab5462576623a5` |
+| iPadOS   | 17.5.1          | `d09b5ac98f4d7d8b9f2c307f55ab5462576623a5` |
+| tvOS     | 17.5.1          | `d09b5ac98f4d7d8b9f2c307f55ab5462576623a5` |
+| macOS    | 14.5            | `d09b5ac98f4d7d8b9f2c307f55ab5462576623a5` |
+| iOS      | 16.7.8          | `83f7a2fe136e0b746db09f1d19e36c693a634b66` |
+| iPadOS   | 16.7.8          | `83f7a2fe136e0b746db09f1d19e36c693a634b66` |
