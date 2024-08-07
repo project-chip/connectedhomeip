@@ -39,28 +39,30 @@ CHIP_ERROR RvcServiceAreaDelegate::Init()
     uint32_t supportedAreaID_D = 0x88888888;
 
     // Area A has name, floor number, uses map XX
-    auto areaA = AreaStructureWrapper(supportedAreaID_A, DataModel::Nullable<uint32_t>(supportedMapId_XX), DataModel::NullNullable,
-                                      DataModel::NullNullable);
-    areaA.SetLocationInfo("My Location A"_span, DataModel::Nullable<int16_t>(4), DataModel::Nullable<Globals::AreaTypeTag>());
+    auto areaA = AreaStructureWrapper{}
+                     .SetAreaId(supportedAreaID_A)
+                     .SetMapId(supportedMapId_XX)
+                     .SetLocationInfo("My Location A"_span, DataModel::Nullable<int16_t>(4), DataModel::Nullable<Globals::AreaTypeTag>());
 
     // Area B has name, uses map XX
-    auto areaB = AreaStructureWrapper(supportedAreaID_B, DataModel::Nullable<uint32_t>(supportedMapId_XX), DataModel::NullNullable,
-                                      DataModel::NullNullable);
-    areaB.SetLocationInfo("My Location B"_span, DataModel::NullNullable, DataModel::NullNullable);
+    auto areaB = AreaStructureWrapper{}
+                     .SetMapId(supportedAreaID_B)
+                     .SetMapId(supportedMapId_XX)
+                     .SetLocationInfo("My Location B"_span, DataModel::NullNullable, DataModel::NullNullable);
 
     // Area C has full SemData, no name, Map YY
-    auto areaC = AreaStructureWrapper();
-    areaC.SetAreaId(supportedAreaID_C);
-    areaC.SetMapId(supportedMapId_YY);
-    areaC.SetLocationInfo(""_span, -1, Globals::AreaTypeTag::kPlayRoom);
-    areaC.SetLandmarkInfo(Globals::LandmarkTag::kBackDoor, Globals::RelativePositionTag::kNextTo);
+    auto areaC = AreaStructureWrapper{}
+                     .SetAreaId(supportedAreaID_C)
+                     .SetMapId(supportedMapId_YY)
+                     .SetLocationInfo(""_span, -1, Globals::AreaTypeTag::kPlayRoom)
+                     .SetLandmarkInfo(Globals::LandmarkTag::kBackDoor, Globals::RelativePositionTag::kNextTo);
 
     // Area D has null values for all landmark fields, Map YY
-    auto areaD = AreaStructureWrapper();
-    areaD.SetAreaId(supportedAreaID_D);
-    areaD.SetMapId(supportedMapId_YY);
-    areaD.SetLocationInfo("My Location D"_span, DataModel::NullNullable, DataModel::NullNullable);
-    areaD.SetLandmarkInfo(Globals::LandmarkTag::kCouch, Globals::RelativePositionTag::kNextTo);
+    auto areaD = AreaStructureWrapper{}
+                     .SetAreaId(supportedAreaID_D)
+                     .SetMapId(supportedMapId_YY)
+                     .SetLocationInfo("My Location D"_span, DataModel::NullNullable, DataModel::NullNullable)
+                     .SetLandmarkInfo(Globals::LandmarkTag::kCouch, Globals::RelativePositionTag::kNextTo);
 
     GetInstance()->AddSupportedArea(areaA);
     GetInstance()->AddSupportedArea(areaB);

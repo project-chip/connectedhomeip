@@ -49,23 +49,6 @@ struct AreaStructureWrapper : public chip::app::Clusters::ServiceArea::Structs::
     }
 
     /**
-     * @brief This is a constructor that initializes the location object with the given values. All values are deep copied.
-     * @param[in] areaId The unique identifier of this location.
-     * @param[in] mapId The identifier of the supported map associated with this location.
-     * @param[in] locationInfo The location information.
-     * @param[in] landmarkInfo The landmark information.
-     */
-    AreaStructureWrapper(uint32_t areaId, DataModel::Nullable<uint32_t> mapId,
-                         DataModel::Nullable<Globals::Structs::LocationDescriptorStruct::Type> locationInfo,
-                         DataModel::Nullable<Structs::LandmarkInfoStruct::Type> landmarkInfo)
-    {
-        areaID = areaId;
-        mapID  = mapId;
-        SetLocationInfo(locationInfo);
-        SetLandmarkInfo(landmarkInfo);
-    }
-
-    /**
      * @brief This is a copy constructor that initializes the location object with the values from another location object. All
      * values are deep copied.
      * @param[in] aOther The location object to copy.
@@ -125,11 +108,20 @@ struct AreaStructureWrapper : public chip::app::Clusters::ServiceArea::Structs::
         return *this;
     }
 
-    void SetAreaId(uint32_t aAreaID) { areaID = aAreaID; }
+    AreaStructureWrapper & SetAreaId(uint32_t aAreaID) {
+        areaID = aAreaID;
+        return *this;
+    }
 
-    void SetMapId(const DataModel::Nullable<uint32_t> & aMapId) { mapID = aMapId; }
+    AreaStructureWrapper & SetMapId(const DataModel::Nullable<uint32_t> & aMapId) {
+        mapID = aMapId;
+        return *this;
+    }
 
-    void SetLocationInfoNull() { areaDesc.locationInfo.SetNull(); }
+    AreaStructureWrapper & SetLocationInfoNull() {
+        areaDesc.locationInfo.SetNull();
+        return *this;
+    }
 
     /**
      * @brief Set the location information.
@@ -137,7 +129,7 @@ struct AreaStructureWrapper : public chip::app::Clusters::ServiceArea::Structs::
      * @param[in] floorNumber The floor number of the location.
      * @param[in] areaType The type of the area.
      */
-    void SetLocationInfo(const CharSpan & locationName, const DataModel::Nullable<int16_t> & floorNumber,
+    AreaStructureWrapper & SetLocationInfo(const CharSpan & locationName, const DataModel::Nullable<int16_t> & floorNumber,
                          const DataModel::Nullable<Globals::AreaTypeTag> & areaType)
     {
         areaDesc.locationInfo.SetNonNull();
@@ -147,6 +139,8 @@ struct AreaStructureWrapper : public chip::app::Clusters::ServiceArea::Structs::
         areaDesc.locationInfo.Value().locationName = CharSpan(mAreaNameBuffer, sizeToCopy);
         areaDesc.locationInfo.Value().floorNumber  = floorNumber;
         areaDesc.locationInfo.Value().areaType     = areaType;
+
+        return *this;
     }
 
     /**
@@ -154,42 +148,47 @@ struct AreaStructureWrapper : public chip::app::Clusters::ServiceArea::Structs::
      *
      * @note If the locationName is larger than kAreaNameMaxSize, it will be truncated.
      */
-    void SetLocationInfo(DataModel::Nullable<Globals::Structs::LocationDescriptorStruct::Type> locationInfo)
+    AreaStructureWrapper & SetLocationInfo(DataModel::Nullable<Globals::Structs::LocationDescriptorStruct::Type> locationInfo)
     {
         if (locationInfo.IsNull())
         {
             return SetLocationInfoNull();
         }
 
-        SetLocationInfo(locationInfo.Value().locationName, locationInfo.Value().floorNumber, locationInfo.Value().areaType);
+        return SetLocationInfo(locationInfo.Value().locationName, locationInfo.Value().floorNumber, locationInfo.Value().areaType);
     }
 
-    void SetLandmarkInfoNull() { areaDesc.landmarkInfo.SetNull(); }
+    AreaStructureWrapper & SetLandmarkInfoNull() {
+        areaDesc.landmarkInfo.SetNull();
+        return *this;
+    }
 
     /**
      * @brief Set the landmark information.
      * @param[in] landmarkTag The landmark tag.
      * @param[in] relativePositionTag The relative position tag.
      */
-    void SetLandmarkInfo(const Globals::LandmarkTag & landmarkTag,
+    AreaStructureWrapper & SetLandmarkInfo(const Globals::LandmarkTag & landmarkTag,
                          const DataModel::Nullable<Globals::RelativePositionTag> & relativePositionTag)
     {
         areaDesc.landmarkInfo.SetNonNull();
         areaDesc.landmarkInfo.Value().landmarkTag = landmarkTag;
         areaDesc.landmarkInfo.Value().positionTag = relativePositionTag;
+
+        return *this;
     }
 
     /**
      * @brief Set the landmark information from a LandmarkInfoStruct object.
      */
-    void SetLandmarkInfo(DataModel::Nullable<Structs::LandmarkInfoStruct::Type> landmarkInfo)
+    AreaStructureWrapper & SetLandmarkInfo(DataModel::Nullable<Structs::LandmarkInfoStruct::Type> landmarkInfo)
     {
         if (landmarkInfo.IsNull())
         {
             return SetLandmarkInfoNull();
         }
 
-        SetLandmarkInfo(landmarkInfo.Value().landmarkTag, landmarkInfo.Value().positionTag);
+        return SetLandmarkInfo(landmarkInfo.Value().landmarkTag, landmarkInfo.Value().positionTag);
     }
 
     /**
