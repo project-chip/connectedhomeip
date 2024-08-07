@@ -40,6 +40,26 @@ private:
     std::vector<uint32_t> mSelectedAreas;
     std::vector<ServiceArea::Structs::ProgressStruct::Type> mProgressList;
 
+    // hardcoded values for SUPPORTED MAPS.
+    const uint32_t supportedMapId_XX = 3;
+    const uint32_t supportedMapId_YY = 245;
+
+    // hardcoded values for SUPPORTED AREAS.
+    const uint32_t supportedAreaID_A = 7;
+    const uint32_t supportedAreaID_B = 1234567;
+    const uint32_t supportedAreaID_C = 10050;
+    const uint32_t supportedAreaID_D = 0x88888888;
+
+    /**
+     * Set the SupportedMaps and SupportedAreas where the SupportedMaps is not null.
+     */
+    void SetMapTopology();
+
+    /**
+     * Set the SupportedMaps and SupportedAreas where the SupportedMaps is null.
+     */
+    void SetNoMapTopology();
+
 public:
     CHIP_ERROR Init() override;
 
