@@ -120,6 +120,17 @@ CHIP_ERROR AddSynchronizedDevice(chip::NodeId nodeId)
     chip_rpc_SynchronizedDevice device = chip_rpc_SynchronizedDevice_init_default;
     device.node_id                     = nodeId;
 
+    // TODO: fill this with real data. For now we just add things for testing
+    strcpy(device.vendor_name, "Test Vendor");
+    device.vendor_id = 123;
+    strcpy(device.product_name, "Test Product");
+    device.product_id = 234;
+    strcpy(device.node_label, "Device Label");
+    device.hardware_version = 11;
+    strcpy(device.hardware_version_string, "Hardware");
+    device.software_version = 22;
+    strcpy(device.software_version_string, "Test 1.4.22");
+
     // The RPC call is kept alive until it completes. When a response is received, it will be logged by the handler
     // function and the call will complete.
     auto call = fabricBridgeClient.AddSynchronizedDevice(device, OnAddDeviceResponseCompleted);
