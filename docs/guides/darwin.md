@@ -1,8 +1,21 @@
-# Testing with Apple Devices
+# Matter Development and Testing with/on Apple Devices
 
-### Matter is the foundation for connected things.
+### Overview
 
-Learn more about Matter [here](https://buildwithmatter.com/)
+-   To develop a Matter Application, learn more about how to develop with Matter
+    on Apple's platforms [here](https://developer.apple.com/apple-home/matter/)
+
+    -   Additional documentation about the Matter Support API is
+        [here](https://developer.apple.com/documentation/mattersupport)
+
+### Filing Issues
+
+-   An issues related to Apple Home, or Development on Apple's Platforms should
+    be reported using this [feedback tool](#providing-feedback-to-apple) as
+    described in this section
+
+-   Any issues related to the Matter SDK should be reported to the project
+    [here](https://github.com/project-chip/connectedhomeip/issues)
 
 ## Source Compatibility
 
@@ -12,20 +25,18 @@ changes are present in the release for testing.
 
 Listed are the Current SHAs:
 
--   iOS/iPadOS/tvOS 16.1:
-    [`33f6a910cd9a8a0cfdd7088e2f43efd2f7f566a7`](https://github.com/project-chip/connectedhomeip/commits/33f6a910cd9a8a0cfdd7088e2f43efd2f7f566a7)
-
--   iOS/iPadOS/tvOS 16.2 and 16.3:
-    [`c279578c5bc37f117335aa96cec6c5552f070cc0`](https://github.com/project-chip/connectedhomeip/commits/c279578c5bc37f117335aa96cec6c5552f070cc0)
+-   Latest macOS/tvOS/iOS/iPadOS:
+    [`2ee90eba27676950fa2f4ef96597d9696f510d5d`](https://github.com/project-chip/connectedhomeip/commits/2ee90eba27676950fa2f4ef96597d9696f510d5d)
+-   Larger list of SHAs are [here](#release-to-sha-mappings)
 
 ## Supported Platforms for Matter Device Testing
 
 -   Matter is supported by iOS/tvOS/iPadOS/watchOS/HomePod/AppleTV starting with
     16.1
-
 -   To test your Matter device with Apple's platforms, all you need is a device
     with a supported OS
--   Pairing via QR Code or Setup Code is supported directly from the Home App
+-   Pairing via QR Code or Setup Code is supported directly from the Home App,
+    or any third party Application
 -   Please proceed to
     [this section](#testing-your-matter-device-with-apple-home) if you're
     developing a new device
@@ -45,14 +56,6 @@ For Context: This is a mapping of platform to OS
 -   AppleTV _(tvOS)_
 -   HomePod _(tvOS)_
 -   Apple Watch _(watchOS)_
-
-### Overview
-
--   To develop a Matter Application, learn more about how to develop with Matter
-    on Apple's platforms [here](https://developer.apple.com/apple-home/matter/)
-
-    -   Additional documentation about the Matter Support API is
-        [here](https://developer.apple.com/documentation/mattersupport)
 
 ### Setup Requirements for Application Development
 
@@ -122,9 +125,7 @@ For Context: This is a mapping of platform to OS
 
 ### Enable Developer Mode on your Apple Device
 
-##### Note: Developer mode is a great way to get logs from your device as well as
-
-enables other useful developer tools
+##### Note: Developer mode is a great way to get logs from your device as well as enables other useful developer tools
 
 To enable developer mode, please follow the instructions
 [here](https://developer.apple.com/documentation/xcode/enabling-developer-mode-on-a-device)
@@ -137,8 +138,7 @@ chip-tool will require installing the
 on MacOS or iOS/iPadOS.
 
 -   Download the Bluetooth Central Matter Client Developer Mode profile and
-    install it on a iOS/iPadOS 16.1 beta 3 and MacOS 13.1 beta 3 or later
-    system.
+    install it on a supported system. system.
 
     -   For _macOS_, Profile can be installed via Settings->Privacy &
         Security->Profiles
@@ -150,17 +150,33 @@ on MacOS or iOS/iPadOS.
         [this developer page](https://developer.apple.com/documentation/xcode/enabling-developer-mode-on-a-device)
 -   Compile chip-tool for macOS or CHIP Tool for iOS
 
+#### General Matter Platform Development Guide
+
+##### Getting the SDK Ready
+
+##### Note: Most platforms have very similar, if not the same configuration requirements
+
+1. Checkout and setup
+   [Matter repo](https://github.com/project-chip/connectedhomeip.git) as per the
+   instructions above.
+2. Find and edit one of the platform
+   [examples](https://github.com/project-chip/connectedhomeip/tree/master/examples)
+   to support the fixed device types above.
+3. Read the [platform guides](README.md) on how set up the hardware
+    - There is a list of more detailed guides [here](#platform-guides)
+
 ## Testing your Matter Device with Apple Home
 
-1. Clone the [Matter repo](https://github.com/project-chip/connectedhomeip.git)
+1. Clone the
+   [Matter repository](https://github.com/project-chip/connectedhomeip.git)
 2. Checkout the specific commit hash (from [above](#source-compatibility)) for
    maximum compatibility with your installed release:
-    - Example command for SHA `c279578c5bc37f117335aa96cec6c5552f070cc0`:
-      `$ git checkout c279578c5bc37f117335aa96cec6c5552f070cc0`
+    - Example command for SHA `2ee90eba27676950fa2f4ef96597d9696f510d5d`:
+      `$ git checkout 2ee90eba27676950fa2f4ef96597d9696f510d5d`
 
-In order to work with iOS/iPadOS/tvOS 16.1 or greater, device types as defined
-in the Matter Device Library spec are used to determine accessory categories.
-Ensure the right device type is set for each endpoint.
+In order to work with iOS/iPadOS/tvOS, device types as defined in the Matter
+Device Library spec are used to determine accessory categories. Ensure the right
+device type is set for each endpoint.
 
 -   For the `all-clusters-app` as an example, this can be set in
     `FIXED_DEVICE_TYPES`, `FIXED_DEVICE_TYPE_OFFSETS`, and
@@ -208,7 +224,7 @@ Example:
 | Temperature Sensor | 770     | 0302 |
 | Flow Sensor        | 774     | 0306 |
 
-#### Examples of how to setup devices
+### Examples of how to setup devices
 
 ##### Case study 1: Configuring a development M5Stack, as a multi-device to work with iOS/iPadOS/tvOS
 
@@ -235,21 +251,7 @@ Example:
    initialize your development environment, compile the firmware and flash your
    hardware.
 
-#### General Matter Platform Development Guide
-
-##### Getting the SDK Ready
-
-##### Note: Most platforms have very similar, if not the same configuration requirements
-
-1. Checkout and setup
-   [Matter repo](https://github.com/project-chip/connectedhomeip.git) as per the
-   instructions above.
-2. Find and edit one of the platform
-   [examples](https://github.com/project-chip/connectedhomeip/tree/master/examples)
-   to support the fixed device types above.
-3. Read the [platform guides](README.md) on how set up the hardware
-
-##### Guides
+### Platform Guides
 
 -   [Bouffalo Lab](/examples/lighting-app/bouffalolab/README.md)
 -   [EFR32 Window Covering](/examples/window-app/silabs/README.md)
@@ -301,25 +303,17 @@ Example:
         -   [Network Profile](https://developer.apple.com/bug-reporting/profiles-and-logs/?platform=tvos&name=network)
         -   [mDNS Profile](https://developer.apple.com/bug-reporting/profiles-and-logs/?platform=tvos&name=mdns)
 
-### Release Notes & Known Issues
+### Release to SHA Mappings
 
--   Please refer to the iOS/iPadOS 16.1
-    [Release Notes](https://developer.apple.com/documentation/ios-ipados-release-notes/ios-16_1-release-notes)
-    for currently known issues.
--   Please refer to the iOS/iPadOS 16.2
-    [Release Notes](https://developer.apple.com/documentation/ios-ipados-release-notes/ios-ipados-16_2-release-notes)
-    for currently known issues
--   Please refer to the iOS & iPadOS 16.3
-    [Release Notes](https://developer.apple.com/documentation/ios-ipados-release-notes/ios-ipados-16_3-release-notes)
-    for currently known issues
--   Please refer to the iOS & iPadOS 16.4
-    [Release Notes](https://developer.apple.com/documentation/ios-ipados-release-notes/ios-ipados-16_4-release-notes)
-    for currently known issues
--   Please refer to the iOS & iPadOS 16.5
-    [Release Notes](https://developer.apple.com/documentation/ios-ipados-release-notes/ios-ipados-16_5-release-notes)
-    for currently known issues
--   An issues related to Apple Home integration should be reported
-    [feedback](#providing-feedback-to-apple) as described in this section
-
--   Any issues related to the Matter SDK should be reported to the project
-    [here](https://github.com/project-chip/connectedhomeip/issues)
+| Platform | Release Version | SHA                                      |
+| -------- | --------------- | ---------------------------------------- |
+| iOS      | 17.6.1          | 2ee90eba27676950fa2f4ef96597d9696f510d5d |
+| iPadOS   | 17.6.1          | 2ee90eba27676950fa2f4ef96597d9696f510d5d |
+| tvOS     | 17.6            | 2ee90eba27676950fa2f4ef96597d9696f510d5d |
+| macOS    | 14.6.1          | 2ee90eba27676950fa2f4ef96597d9696f510d5d |
+| iOS      | 17.5.1          | d09b5ac98f4d7d8b9f2c307f55ab5462576623a5 |
+| iPadOS   | 17.5.1          | d09b5ac98f4d7d8b9f2c307f55ab5462576623a5 |
+| tvOS     | 17.5.1          | d09b5ac98f4d7d8b9f2c307f55ab5462576623a5 |
+| macOS    | 14.5            | d09b5ac98f4d7d8b9f2c307f55ab5462576623a5 |
+| iOS      | 16.7.8          | 83f7a2fe136e0b746db09f1d19e36c693a634b66 |
+| iPadOS   | 16.7.8          | 83f7a2fe136e0b746db09f1d19e36c693a634b66 |
