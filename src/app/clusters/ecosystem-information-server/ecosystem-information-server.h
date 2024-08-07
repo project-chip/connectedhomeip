@@ -200,9 +200,7 @@ public:
     CHIP_ERROR RemoveDevice(EndpointId aEndpoint, uint64_t aEpochUs);
     // TODO(#33223) Add removal and update counterparts to AddDeviceInfo and AddLocationInfo.
 
-    CHIP_ERROR EncodeRemovedOnAttribute(EndpointId aEndpoint, AttributeValueEncoder & aEncoder);
-    CHIP_ERROR EncodeDeviceDirectoryAttribute(EndpointId aEndpoint, AttributeValueEncoder & aEncoder);
-    CHIP_ERROR EncodeLocationStructAttribute(EndpointId aEndpoint, AttributeValueEncoder & aEncoder);
+    CHIP_ERROR ReadAttribute(const ConcreteReadAttributePath & aPath, AttributeValueEncoder & aEncoder);
 
 private:
     struct DeviceInfo
@@ -212,6 +210,11 @@ private:
         // Map key is using the UniqueLocationId
         std::map<std::string, std::unique_ptr<EcosystemLocationStruct>> mLocationDirectory;
     };
+
+    CHIP_ERROR EncodeRemovedOnAttribute(EndpointId aEndpoint, AttributeValueEncoder & aEncoder);
+    CHIP_ERROR EncodeDeviceDirectoryAttribute(EndpointId aEndpoint, AttributeValueEncoder & aEncoder);
+    CHIP_ERROR EncodeLocationStructAttribute(EndpointId aEndpoint, AttributeValueEncoder & aEncoder);
+
     std::map<EndpointId, DeviceInfo> mDevicesMap;
 
     static EcosystemInformationServer mInstance;
