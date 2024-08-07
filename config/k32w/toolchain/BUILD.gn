@@ -20,27 +20,27 @@ import("${build_root}/toolchain/arm_gcc/arm_toolchain.gni")
 arm_toolchain("k32w_lighting_app") {
   toolchain_args = {
     current_os = "freertos"
-    import("${chip_root}/examples/lighting-app/nxp/k32w/k32w0/args.gni")
+    import("${chip_root}/examples/lighting-app/nxp/k32w0/args.gni")
   }
 }
 
 arm_toolchain("k32w_lock_app") {
   toolchain_args = {
     current_os = "freertos"
-    import("${chip_root}/examples/lock-app/nxp/k32w/k32w0/args.gni")
+    import("${chip_root}/examples/lock-app/nxp/k32w0/args.gni")
   }
 }
 
 arm_toolchain("k32w_contact_sensor_app") {
   toolchain_args = {
     current_os = "freertos"
-    import("${chip_root}/examples/contact-sensor-app/nxp/k32w/k32w0/args.gni")
+    import("${chip_root}/examples/contact-sensor-app/nxp/k32w0/args.gni")
   }
 }
 
 arm_toolchain("k32w_shell_app") {
   toolchain_args = {
     current_os = "freertos"
-    import("${chip_root}/examples/shell/nxp/k32w/k32w0/args.gni")
+    import("${chip_root}/examples/shell/nxp/k32w0/args.gni")
   }
 }

@@ -3,14 +3,14 @@
 
 using namespace chip::app::Clusters::ServiceArea;
 
-bool Delegate::GetSupportedLocationById(uint32_t aLocationId, uint32_t & listIndex, LocationStructureWrapper & aSupportedLocation)
+bool Delegate::GetSupportedLocationById(uint32_t aAreaId, uint32_t & listIndex, AreaStructureWrapper & aSupportedLocation)
 {
     listIndex = 0;
 
-    // simple linear iteration to find the location with the desired locationID.
+    // simple linear iteration to find the location with the desired areaId.
     while (GetSupportedLocationByIndex(listIndex, aSupportedLocation))
     {
-        if (aSupportedLocation.locationID == aLocationId)
+        if (aSupportedLocation.areaID == aAreaId)
         {
             return true;
         }
@@ -21,10 +21,10 @@ bool Delegate::GetSupportedLocationById(uint32_t aLocationId, uint32_t & listInd
     return false;
 }
 
-void Delegate::HandleSupportedLocationsUpdated()
+void Delegate::HandleSupportedAreasUpdated()
 {
-    mInstance->ClearSelectedLocations();
-    mInstance->SetCurrentLocation(DataModel::NullNullable);
+    mInstance->ClearSelectedAreas();
+    mInstance->SetCurrentArea(DataModel::NullNullable);
     mInstance->ClearProgress();
 }
 
@@ -45,14 +45,14 @@ bool Delegate::GetSupportedMapById(uint8_t aMapId, uint32_t & listIndex, MapStru
     return false;
 }
 
-bool Delegate::IsSelectedLocation(uint32_t aLocationId)
+bool Delegate::IsSelectedLocation(uint32_t aAreaId)
 {
     uint32_t listIndex = 0;
     uint32_t selectedLocation;
 
     while (GetSelectedLocationByIndex(listIndex, selectedLocation))
     {
-        if (selectedLocation == aLocationId)
+        if (selectedLocation == aAreaId)
         {
             return true;
         }
@@ -63,14 +63,14 @@ bool Delegate::IsSelectedLocation(uint32_t aLocationId)
     return false;
 }
 
-bool Delegate::GetProgressElementById(uint32_t aLocationId, uint32_t & listIndex, Structs::ProgressStruct::Type & aProgressElement)
+bool Delegate::GetProgressElementById(uint32_t aAreaId, uint32_t & listIndex, Structs::ProgressStruct::Type & aProgressElement)
 {
     listIndex = 0;
 
-    // simple linear iteration to find the progress element with the desired locationID.
+    // simple linear iteration to find the progress element with the desired areaID.
     while (GetProgressElementByIndex(listIndex, aProgressElement))
     {
-        if (aProgressElement.locationID == aLocationId)
+        if (aProgressElement.areaID == aAreaId)
         {
             return true;
         }
@@ -81,10 +81,10 @@ bool Delegate::GetProgressElementById(uint32_t aLocationId, uint32_t & listIndex
     return false;
 }
 
-bool Delegate::IsProgressElement(uint32_t aLocationId)
+bool Delegate::IsProgressElement(uint32_t aAreaId)
 {
     uint32_t index;
     Structs::ProgressStruct::Type progressElement;
 
-    return GetProgressElementById(aLocationId, index, progressElement);
+    return GetProgressElementById(aAreaId, index, progressElement);
 }

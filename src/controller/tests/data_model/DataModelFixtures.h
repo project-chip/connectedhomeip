@@ -115,10 +115,12 @@ public:
 
     CHIP_ERROR Shutdown() override { return CHIP_NO_ERROR; }
 
-    CHIP_ERROR ReadAttribute(const DataModel::ReadAttributeRequest & request, AttributeValueEncoder & encoder) override;
-    CHIP_ERROR WriteAttribute(const DataModel::WriteAttributeRequest & request, AttributeValueDecoder & decoder) override;
-    CHIP_ERROR Invoke(const DataModel::InvokeRequest & request, chip::TLV::TLVReader & input_arguments,
-                      CommandHandler * handler) override;
+    DataModel::ActionReturnStatus ReadAttribute(const DataModel::ReadAttributeRequest & request,
+                                                AttributeValueEncoder & encoder) override;
+    DataModel::ActionReturnStatus WriteAttribute(const DataModel::WriteAttributeRequest & request,
+                                                 AttributeValueDecoder & decoder) override;
+    DataModel::ActionReturnStatus Invoke(const DataModel::InvokeRequest & request, chip::TLV::TLVReader & input_arguments,
+                                         CommandHandler * handler) override;
 
     EndpointId FirstEndpoint() override;
     EndpointId NextEndpoint(EndpointId before) override;

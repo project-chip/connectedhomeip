@@ -96,7 +96,7 @@ struct LocationDescriptorStruct
 {
     std::string mLocationName;
     std::optional<int16_t> mFloorNumber;
-    std::optional<AreaTypeTag> mAreaType;
+    std::optional<Globals::AreaTypeTag> mAreaType;
 };
 
 // This intentionally mirrors Structs::EcosystemLocationStruct::Type but has ownership
@@ -111,7 +111,7 @@ public:
 
         Builder & SetLocationName(std::string aLocationName);
         Builder & SetFloorNumber(std::optional<int16_t> aFloorNumber);
-        Builder & SetAreaTypeTag(std::optional<AreaTypeTag> aAreaTypeTag);
+        Builder & SetAreaTypeTag(std::optional<Globals::AreaTypeTag> aAreaTypeTag);
         Builder & SetLocationDescriptorLastEdit(uint64_t aLocationDescriptorLastEditEpochUs);
 
         // Upon success this object will have moved all ownership of underlying
@@ -182,9 +182,7 @@ public:
     CHIP_ERROR RemoveDevice(EndpointId aEndpoint, uint64_t aEpochUs);
     // TODO(#33223) Add removal and update counterparts to AddDeviceInfo and AddLocationInfo.
 
-    CHIP_ERROR EncodeRemovedOnAttribute(EndpointId aEndpoint, AttributeValueEncoder & aEncoder);
-    CHIP_ERROR EncodeDeviceDirectoryAttribute(EndpointId aEndpoint, AttributeValueEncoder & aEncoder);
-    CHIP_ERROR EncodeLocationStructAttribute(EndpointId aEndpoint, AttributeValueEncoder & aEncoder);
+    CHIP_ERROR ReadAttribute(const ConcreteReadAttributePath & aPath, AttributeValueEncoder & aEncoder);
 
 private:
     struct DeviceInfo
@@ -194,6 +192,11 @@ private:
         // Map key is using the UniqueLocationId
         std::map<std::string, std::unique_ptr<EcosystemLocationStruct>> mLocationDirectory;
     };
+
+    CHIP_ERROR EncodeRemovedOnAttribute(EndpointId aEndpoint, AttributeValueEncoder & aEncoder);
+    CHIP_ERROR EncodeDeviceDirectoryAttribute(EndpointId aEndpoint, AttributeValueEncoder & aEncoder);
+    CHIP_ERROR EncodeLocationStructAttribute(EndpointId aEndpoint, AttributeValueEncoder & aEncoder);
+
     std::map<EndpointId, DeviceInfo> mDevicesMap;
 
     static EcosystemInformationServer mInstance;

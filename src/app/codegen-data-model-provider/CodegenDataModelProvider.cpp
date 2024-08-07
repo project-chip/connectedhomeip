@@ -229,8 +229,8 @@ bool CodegenDataModelProvider::EmberCommandListIterator::Exists(const CommandId 
     return (*mCurrentHint == toCheck);
 }
 
-CHIP_ERROR CodegenDataModelProvider::Invoke(const DataModel::InvokeRequest & request, TLV::TLVReader & input_arguments,
-                                            CommandHandler * handler)
+DataModel::ActionReturnStatus CodegenDataModelProvider::Invoke(const DataModel::InvokeRequest & request,
+                                                               TLV::TLVReader & input_arguments, CommandHandler * handler)
 {
     // TODO: CommandHandlerInterface support is currently
     //       residing in InteractionModelEngine itself. We may want to separate this out
@@ -284,7 +284,7 @@ std::optional<unsigned> CodegenDataModelProvider::TryFindEndpointIndex(EndpointI
 
 EndpointId CodegenDataModelProvider::NextEndpoint(EndpointId before)
 {
-    const unsigned lastEndpointIndex = emberAfEndpointCount();
+    const uint16_t lastEndpointIndex = emberAfEndpointCount();
 
     std::optional<unsigned> before_idx = TryFindEndpointIndex(before);
     if (!before_idx.has_value())
