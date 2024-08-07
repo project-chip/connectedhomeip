@@ -1638,7 +1638,7 @@ def parse_matter_test_args(argv: Optional[List[str]] = None) -> MatterTestConfig
                              metavar='NODE_ID', dest='dut_node_ids', default=[_DEFAULT_DUT_NODE_ID],
                              help='Node ID for primary DUT communication, '
                              'and NodeID to assign if commissioning (default: %d)' % _DEFAULT_DUT_NODE_ID, nargs="+")
-    basic_group.add_argument('--endpoint', type=int, default=0, help="Endpoint under test")
+    basic_group.add_argument('--endpoint', type=int, default=None, help="Endpoint under test")
     basic_group.add_argument('--app-pid', type=int, default=0, help="The PID of the app against which the test is going to run")
     basic_group.add_argument('--timeout', type=int, help="Test timeout in seconds")
     basic_group.add_argument("--PICS", help="PICS file path", type=str)
