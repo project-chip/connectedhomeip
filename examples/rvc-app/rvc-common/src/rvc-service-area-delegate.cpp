@@ -39,10 +39,11 @@ CHIP_ERROR RvcServiceAreaDelegate::Init()
     uint32_t supportedAreaID_D = 0x88888888;
 
     // Area A has name, floor number, uses map XX
-    auto areaA = AreaStructureWrapper{}
-                     .SetAreaId(supportedAreaID_A)
-                     .SetMapId(supportedMapId_XX)
-                     .SetLocationInfo("My Location A"_span, DataModel::Nullable<int16_t>(4), DataModel::Nullable<Globals::AreaTypeTag>());
+    auto areaA =
+        AreaStructureWrapper{}
+            .SetAreaId(supportedAreaID_A)
+            .SetMapId(supportedMapId_XX)
+            .SetLocationInfo("My Location A"_span, DataModel::Nullable<int16_t>(4), DataModel::Nullable<Globals::AreaTypeTag>());
 
     // Area B has name, uses map XX
     auto areaB = AreaStructureWrapper{}
