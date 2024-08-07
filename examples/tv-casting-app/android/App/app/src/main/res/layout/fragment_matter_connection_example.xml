@@ -29,13 +29,6 @@
             android:layout_height="wrap_content"
             android:text="@string/matter_connection_next_button_text" />
 
-        <Button
-            android:enabled="true"
-            android:id="@+id/stopDiscoveryButton"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:text="@string/matter_stop_discovery_button_text" />
-
     </LinearLayout>
 
 </RelativeLayout>

@@ -100,13 +100,6 @@ private:
     void ClearDisconnectedCastingPlayersInternal();
 
     /**
-     * @brief Clear CastingPlayers in the specified vector with ConnectionState == CASTING_PLAYER_NOT_CONNECTED
-     *
-     * @param castingPlayers vector of CastingPlayers to clear
-     */
-    void ClearDisconnectedCastingPlayers(std::vector<std::shared_ptr<CastingPlayer>> & castingPlayers);
-
-    /**
      * @brief Clear all CastingPlayers in mCastingPlayersInternal
      */
     void ClearCastingPlayersInternal();

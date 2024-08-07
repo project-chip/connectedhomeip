@@ -31,8 +31,6 @@ import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
 import com.R;
 import com.matter.casting.core.CastingPlayer;
-import com.matter.casting.core.CastingPlayerDiscovery;
-import com.matter.casting.core.MatterCastingPlayerDiscovery;
 import com.matter.casting.support.CommissionerDeclaration;
 import com.matter.casting.support.ConnectionCallbacks;
 import com.matter.casting.support.IdentificationDeclarationOptions;
@@ -57,11 +55,6 @@ public class ConnectionExampleFragment extends Fragment {
   private final boolean useCommissionerGeneratedPasscode;
   private TextView connectionFragmentStatusTextView;
   private Button connectionFragmentNextButton;
-
-  // Get a singleton instance of the MatterCastingPlayerDiscovery. Which can be used to call
-  // stopDiscovery() during connection.
-  static final CastingPlayerDiscovery matterCastingPlayerDiscovery =
-      MatterCastingPlayerDiscovery.getInstance();
 
   public ConnectionExampleFragment(
       CastingPlayer targetCastingPlayer, boolean useCommissionerGeneratedPasscode) {
@@ -128,13 +121,6 @@ public class ConnectionExampleFragment extends Fragment {
         v -> {
           Log.i(TAG, "onViewCreated() NEXT clicked. Calling handleConnectionComplete()");
           callback.handleConnectionComplete(targetCastingPlayer, useCommissionerGeneratedPasscode);
-        });
-
-    Button stopDiscoveryButton = getView().findViewById(R.id.stopDiscoveryButton);
-    stopDiscoveryButton.setOnClickListener(
-        v -> {
-          Log.i(TAG, "onViewCreated() stopDiscoveryButton button clicked. Calling stopDiscovery()");
-          stopDiscovery();
         });
 
     Executors.newSingleThreadExecutor()
@@ -367,24 +353,6 @@ public class ConnectionExampleFragment extends Fragment {
     alertDialog
         .getWindow()
         .setLayout(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.WRAP_CONTENT);
-  }
-
-  private void stopDiscovery() {
-    Log.i(
-        TAG,
-        "ConnectionExampleFragment stopDiscovery() called, calling MatterCastingPlayerDiscovery.stopDiscovery()");
-
-    MatterError err = matterCastingPlayerDiscovery.stopDiscovery();
-    if (err.hasError()) {
-      Log.e(
-          TAG,
-          "ConnectionExampleFragment stopDiscovery() MatterCastingPlayerDiscovery.stopDiscovery() called, err Stop: "
-              + err);
-    } else {
-      Log.d(
-          TAG,
-          "ConnectionExampleFragment stopDiscovery() MatterCastingPlayerDiscovery.stopDiscovery() success");
-    }
   }
 
   /** Interface for notifying the host. */

@@ -68,12 +68,9 @@ CHIP_ERROR CastingPlayerDiscovery::StopDiscovery()
     VerifyOrReturnError(mState == DISCOVERY_RUNNING, CHIP_ERROR_INCORRECT_STATE);
     ReturnErrorOnFailure(mCommissionableNodeController.StopDiscovery());
 
-    // Clear mCastingPlayersInternal of disconnected CastingPlayers
-    ClearDisconnectedCastingPlayersInternal();
-    for (const auto & player : mCastingPlayers)
-    {
-        mCastingPlayersInternal.push_back(player);
-    }
+    // Copy mCastingPlayers to mCastingPlayersInternal
+    mCastingPlayersInternal = std::vector<memory::Strong<CastingPlayer>>(mCastingPlayers);
+
     // Clear mCastingPlayers of all CastingPlayers
     mCastingPlayers.clear();
     mState = DISCOVERY_READY;
@@ -86,22 +83,17 @@ void CastingPlayerDiscovery::ClearDisconnectedCastingPlayersInternal()
     ChipLogProgress(Discovery, "CastingPlayerDiscovery::ClearDisconnectedCastingPlayersInternal() mCastingPlayersInternal: %lu",
                     mCastingPlayersInternal.size());
     // Only clear the CastingPlayers in mCastingPlayersInternal with ConnectionState == CASTING_PLAYER_NOT_CONNECTED
-    ClearDisconnectedCastingPlayers(mCastingPlayersInternal);
-}
-
-void CastingPlayerDiscovery::ClearDisconnectedCastingPlayers(std::vector<std::shared_ptr<CastingPlayer>> & castingPlayers)
-{
-    ChipLogProgress(Discovery, "CastingPlayerDiscovery::ClearDisconnectedCastingPlayers() called");
-    for (auto it = castingPlayers.begin(); it != castingPlayers.end();)
+    for (auto it = mCastingPlayersInternal.begin(); it != mCastingPlayersInternal.end();)
     {
         auto & player = *it;
         if (player->GetConnectionState() == CASTING_PLAYER_NOT_CONNECTED)
         {
-            ChipLogProgress(Discovery,
-                            "CastingPlayerDiscovery::ClearDisconnectedCastingPlayers() Removing disconnected CastingPlayer: %s "
-                            "with reference count: %lu",
-                            player->GetDeviceName(), player.use_count());
-            it = castingPlayers.erase(it);
+            ChipLogProgress(
+                Discovery,
+                "CastingPlayerDiscovery::ClearDisconnectedCastingPlayersInternal() Removing disconnected CastingPlayer: %s "
+                "with reference count: %lu",
+                player->GetDeviceName(), player.use_count());
+            it = mCastingPlayersInternal.erase(it);
         }
         else
         {
