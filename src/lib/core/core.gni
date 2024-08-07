@@ -60,9 +60,9 @@ declare_args() {
 
 declare_args() {
   # Logging backend to use for targets that don't link a specific log
-  # backend (e.g. a command line utilites usually use 'stdio'). Options:
+  # backend (e.g. command line utilites usually use 'stdio'). Options:
   #   'platform' - The default log backend of the device platform
-  #   'external' - Externally LogV implementation (src/platform/logging/LogV.h)
+  #   'external' - External LogV implementation (src/platform/logging/LogV.h)
   #   'none'     - Discard all log output
   #   'stdio'    - Print to stdout
   #   'syslog'   - POSIX syslog()
