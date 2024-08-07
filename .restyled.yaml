@@ -72,7 +72,6 @@ exclude:
     - "scripts/tools/zap/tests/outputs/**/*" # Matches generated output 1:1
     - "examples/chef/sample_app_util/test_files/*.yaml"
     - "examples/chef/zzz_generated/**/*"
-    - "examples/platform/nxp/k32w/k32w0/scripts/demo_generated_certs/**/*"
     - "examples/tv-casting-app/darwin/MatterTvCastingBridge/MatterTvCastingBridge/zap-generated/*" # zap-generated files
     - "integrations/cloudbuild/*.yaml" # uglier long command line content
     - "scripts/run_codegen_targets.sh" # shellharden breaks for loops over command outputs
