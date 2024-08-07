@@ -50,4 +50,3 @@ void BridgedDevice::SetReachable(bool reachable)
         ChipLogProgress(NotSpecified, "BridgedDevice[%s]: OFFLINE", mAttributes.uniqueId.c_str());
     }
 }
-

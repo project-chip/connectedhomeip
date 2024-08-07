@@ -58,7 +58,7 @@ public:
     inline chip::EndpointId GetParentEndpointId() { return mParentEndpointId; };
 
     const BridgedAttributes & GetBridgedAttributes() const { return mAttributes; }
-    void SetBridgedAttributes(const BridgedAttributes& value) { mAttributes = value; }
+    void SetBridgedAttributes(const BridgedAttributes & value) { mAttributes = value; }
 
 protected:
     bool mReachable;
