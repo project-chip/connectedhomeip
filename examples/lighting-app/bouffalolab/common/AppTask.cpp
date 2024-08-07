@@ -25,6 +25,7 @@
 #include <credentials/DeviceAttestationCredsProvider.h>
 #include <credentials/examples/DeviceAttestationCredsExample.h>
 #include <system/SystemClock.h>
+#include <platform/bouffalolab/common/DiagnosticDataProviderImpl.h>
 
 #if HEAP_MONITORING
 #include "MemMonitoring.h"
@@ -134,6 +135,7 @@ void AppTask::AppTaskMain(void * pvParameter)
 {
     app_event_t appEvent;
     bool onoff = false;
+    uint64_t currentHeapFree = 0;
 
 #if !(CHIP_DEVICE_LAYER_TARGET_BL702 && CHIP_DEVICE_CONFIG_ENABLE_ETHERNET)
     sLightLED.Init();
@@ -184,7 +186,8 @@ void AppTask::AppTaskMain(void * pvParameter)
 
     vTaskSuspend(NULL);
 
-    ChipLogProgress(NotSpecified, "App Task started, with SRAM heap %d left\r\n", xPortGetFreeHeapSize());
+    DiagnosticDataProviderImpl::GetDefaultInstance().GetCurrentHeapFree(currentHeapFree);
+    ChipLogProgress(NotSpecified, "App Task started, with SRAM heap %lld left\r\n",currentHeapFree);
 
     while (true)
     {

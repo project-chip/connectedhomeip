@@ -1,6 +1,7 @@
 #include <stdbool.h>
 #include <string.h>
 
+#include <lwip/tcpip.h>
 #include "lwip/icmp6.h"
 #include "lwip/mld6.h"
 #include "lwip/netif.h"
@@ -158,17 +159,21 @@ int8_t bl_route_hook_init(void)
     uint8_t ret               = 0;
     struct netif * lwip_netif = deviceInterface_getNetif();
 
+    LOCK_TCPIP_CORE();
+
     if (lwip_netif == NULL)
     {
         printf("Invalid network interface\r\n");
-        return -1;
+        ret = -1;
+        goto exit;
     }
 
     for (bl_route_hook_t * iter = s_hooks; iter != NULL; iter++)
     {
         if (iter->netif == lwip_netif)
         {
-            return 0;
+            ret = 0;
+            break;
         }
     }
 
@@ -176,7 +181,8 @@ int8_t bl_route_hook_init(void)
     if (hook == NULL)
     {
         printf("Cannot allocate hook\r\n");
-        return -1;
+        ret = -1;
+        goto exit;
     }
 
     if (mld6_joingroup_netif(lwip_netif, ip_2_ip6(&router_group)) != ERR_OK)
@@ -202,5 +208,7 @@ exit:
     {
         free(hook);
     }
+    UNLOCK_TCPIP_CORE();
+
     return ret;
 }

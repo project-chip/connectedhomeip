@@ -64,6 +64,7 @@ if (lwip_platform == "cc13xx_26xx") {
   import("${chip_root}/src/platform/device.gni")
 } else if (lwip_platform == "bl702l") {
   import("//build_overrides/bouffalolab_iot_sdk.gni")
+  import("${chip_root}/src/platform/device.gni")
 } else if (lwip_platform == "nxp") {
   import("//build_overrides/nxp_sdk.gni")
 } else if (lwip_platform == "mw320") {
