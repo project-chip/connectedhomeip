@@ -31,8 +31,8 @@
 #  [TC-OCC-3.1] test procedure step 3, 4
 #  [TC-OCC-3.2] test precedure step 3a, 3c
 
-import time
 import logging
+import time
 
 import chip.clusters as Clusters
 from matter_testing_support import (ClusterAttributeChangeAccumulator, MatterBaseTest, TestStep, async_test_body,
