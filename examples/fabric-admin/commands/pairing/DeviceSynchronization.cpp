@@ -126,7 +126,7 @@ void DeviceSynchronizer::OnReportEnd()
     AddSynchronizedDevice(mCurrentDeviceData);
 }
 
-void DeviceSynchronizer::OnDone(chip::app::ReadClient * apReadClient) 
+void DeviceSynchronizer::OnDone(chip::app::ReadClient * apReadClient)
 {
     // Nothing to do: error reported on OnError or report ended called.
 }
@@ -167,13 +167,13 @@ void DeviceSynchronizer::OnDeviceConnectionFailure(const chip::ScopedNodeId & pe
     ChipLogError(NotSpecified, "Device Sync failed to connect to " ChipLogFormatX64, ChipLogValueX64(peerId.GetNodeId()));
 }
 
-void DeviceSynchronizer::StartDeviceSynchronization(chip::Controller::DeviceController & controller, chip::NodeId nodeId, bool deviceIsIcd)
+void DeviceSynchronizer::StartDeviceSynchronization(chip::Controller::DeviceController & controller, chip::NodeId nodeId,
+                                                    bool deviceIsIcd)
 {
-    mCurrentDeviceData         = chip_rpc_SynchronizedDevice_init_default;
-    mCurrentDeviceData.node_id = nodeId;
+    mCurrentDeviceData            = chip_rpc_SynchronizedDevice_init_default;
+    mCurrentDeviceData.node_id    = nodeId;
     mCurrentDeviceData.has_is_icd = true;
-    mCurrentDeviceData.is_icd = deviceIsIcd;
-
+    mCurrentDeviceData.is_icd     = deviceIsIcd;
 
     controller.GetConnectedDevice(nodeId, &mOnDeviceConnectedCallback, &mOnDeviceConnectionFailureCallback);
 }
