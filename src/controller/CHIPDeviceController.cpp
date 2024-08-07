@@ -746,7 +746,6 @@ CHIP_ERROR DeviceCommissioner::EstablishPASEConnection(NodeId remoteDeviceId, Re
 #if CHIP_DEVICE_CONFIG_ENABLE_WIFIPAF
     else if (params.GetPeerAddress().GetTransportType() == Transport::Type::kWiFiPAF)
     {
-        ConnectWiFiPAFTransportToSelf();
         peerAddress = Transport::PeerAddress::WiFiPAF(remoteDeviceId);
     }
 #endif // CHIP_DEVICE_CONFIG_ENABLE_WIFIPAF
@@ -1825,18 +1824,6 @@ void DeviceCommissioner::CloseBleConnection()
     // We should be able to distinguish different BLE connections if we want
     // to commission multiple devices at the same time over BLE.
     mSystemState->BleLayer()->CloseAllBleConnections();
-}
-#endif
-
-#if CHIP_DEVICE_CONFIG_ENABLE_WIFIPAF
-void DeviceCommissioner::ConnectWiFiPAFTransportToSelf()
-{
-    Transport::WiFiPAFBase & transport =
-        std::get<Transport::WiFiPAF<1>>(mSystemState->TransportMgr()->GetTransport().GetTransports());
-    if (!transport.IsWiFiPAFLayerTransportSetToSelf())
-    {
-        transport.SetWiFiPAFLayerTransportToSelf();
-    }
 }
 #endif
 

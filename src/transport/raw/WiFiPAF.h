@@ -24,7 +24,7 @@
 
 #pragma once
 
-#include "wifipaf/WiFiPAFLayer.h"
+#include <wifipaf/WiFiPAFLayer.h>
 #include <lib/core/CHIPCore.h>
 #include <lib/support/DLLUtil.h>
 #include <system/SystemPacketBuffer.h>
@@ -67,7 +67,6 @@ private:
     CHIP_ERROR SendAfterConnect(System::PacketBufferHandle && msg);
 
     WiFiPAF::WiFiPAFLayer * mWiFiPAFLayer = nullptr; ///< Associated wifipaf layer
-    // WiFiPAF::WiFiPAFLayer::State mState = WiFiPAF::WiFiPAFLayer::State::kNotReady;
 
     System::PacketBufferHandle * mPendingPackets;
     size_t mPendingPacketsSize;
