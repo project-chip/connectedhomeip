@@ -19,7 +19,7 @@ import abc
 import dataclasses
 import enum
 import os
-from typing import Set, Tuple, Union
+from typing import Optional, Set, Tuple, Union
 
 ROOT_ENDPOINT_ID = 0
 
@@ -118,8 +118,8 @@ class GetCommissioneeCredentialsResponse:
     ipk: bytes
     case_admin_node: int
     admin_vendor_id: int
-    node_id: int = None
-    fabric_id: int = None
+    node_id: Optional[int] = None
+    fabric_id: Optional[int] = None
 
 
 class CredentialProvider:
@@ -137,4 +137,4 @@ class CredentialProvider:
 
 class ExampleCredentialProvider:
     async def get_commissionee_credentials(self, request: GetCommissioneeCredentialsRequest) -> GetCommissioneeCredentialsResponse:
-        pass
+        raise NotImplementedError("This method needs to be implemented.")

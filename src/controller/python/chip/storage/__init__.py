@@ -24,7 +24,7 @@ import ctypes
 import json
 import logging
 from ctypes import CFUNCTYPE, POINTER, c_bool, c_char, c_char_p, c_uint16, c_void_p, py_object
-from typing import Dict
+from typing import IO, Dict, Optional
 
 import chip.exceptions
 import chip.native
@@ -39,12 +39,12 @@ _SyncDeleteKeyValueCbFunct = CFUNCTYPE(None, py_object, c_char_p)
 
 
 @_SyncSetKeyValueCbFunct
-def _OnSyncSetKeyValueCb(storageObj, key: str, value, size):
+def _OnSyncSetKeyValueCb(storageObj, key: bytes, value, size):
     storageObj.SetSdkKey(key.decode("utf-8"), ctypes.string_at(value, size))
 
 
 @_SyncGetKeyValueCbFunct
-def _OnSyncGetKeyValueCb(storageObj, key: str, value, size, is_found):
+def _OnSyncGetKeyValueCb(storageObj, key: bytes, value, size, is_found):
     ''' This does not adhere to the API requirements of
     PersistentStorageDelegate::SyncGetKeyValue, but that is okay since
     the C++ storage binding layer is capable of adapting results from
@@ -94,7 +94,7 @@ class PersistentStorage:
         Object must be resident before the Matter stack starts up and last past its shutdown.
     '''
 
-    def __init__(self, path: str = None, jsonData: Dict = None):
+    def __init__(self, path: Optional[str] = None, jsonData: Optional[Dict] = None):
         ''' Initializes the object with either a path to a JSON file that contains the configuration OR
             a JSON dictionary that contains an in-memory representation of the configuration.
 
@@ -118,7 +118,7 @@ class PersistentStorage:
 
         if (self._path):
             try:
-                self._file = open(path, 'r')
+                self._file: Optional[IO[str]] = open(path, 'r')
                 self._file.seek(0, 2)
                 size = self._file.tell()
                 self._file.seek(0)

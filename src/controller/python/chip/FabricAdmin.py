@@ -19,7 +19,7 @@
 from __future__ import annotations
 
 import logging
-from typing import List
+from typing import List, Optional
 
 from chip import CertificateAuthority, ChipDeviceCtrl
 from chip.crypto import p256keypair
@@ -61,9 +61,9 @@ class FabricAdmin:
         LOGGER.info(f"New FabricAdmin: FabricId: 0x{self._fabricId:016X}, VendorId = 0x{self.vendorId:04X}")
 
         self._isActive = True
-        self._activeControllers = []
+        self._activeControllers: List[ChipDeviceCtrl.ChipDeviceController] = []
 
-    def NewController(self, nodeId: int = None, paaTrustStorePath: str = "",
+    def NewController(self, nodeId: Optional[int] = None, paaTrustStorePath: str = "",
                       useTestCommissioner: bool = False, catTags: List[int] = [], keypair: p256keypair.P256Keypair = None):
         ''' Create a new chip.ChipDeviceCtrl.ChipDeviceController instance on this fabric.
 

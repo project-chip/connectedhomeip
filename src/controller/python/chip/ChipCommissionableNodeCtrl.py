@@ -26,6 +26,7 @@
 from __future__ import absolute_import, print_function
 
 from ctypes import CDLL, POINTER, c_void_p, pointer
+from typing import Any
 
 from .ChipStack import ChipStack
 from .native import PyChipError
@@ -49,7 +50,7 @@ class ChipCommissionableNodeController(object):
     def __init__(self, chipStack: ChipStack):
         self.commissionableNodeCtrl = None
         self._ChipStack = chipStack
-        self._dmLib = None
+        self._dmLib: Any = None
 
         self._InitLib()
 
