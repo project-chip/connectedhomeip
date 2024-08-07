@@ -88,7 +88,7 @@ StaticQueue_t sAppEventQueueStruct;
 
 StackType_t appStack[APP_TASK_STACK_SIZE / sizeof(StackType_t)];
 StaticTask_t appTaskStruct;
-app::Clusters::ModeSelect::StaticSupportedModesManager sStaticSupportedModesManager;
+chip::app::Clusters::ModeSelect::StaticSupportedModesManager sStaticSupportedModesManager;
 
 #if CHIP_DEVICE_CONFIG_ENABLE_OTA_REQUESTOR
 DefaultOTARequestor gRequestorCore;
@@ -140,7 +140,7 @@ static void InitServer(intptr_t context)
 #if CHIP_DEVICE_CONFIG_ENABLE_OTA_REQUESTOR
     GetAppTask().InitOTARequestor();
 #endif
-    app::Clusters::ModeSelect::setSupportedModesManager(&sStaticSupportedModesManager);
+    chip::app::Clusters::ModeSelect::setSupportedModesManager(&sStaticSupportedModesManager);
 }
 
 CHIP_ERROR AppTask::StartAppTask()

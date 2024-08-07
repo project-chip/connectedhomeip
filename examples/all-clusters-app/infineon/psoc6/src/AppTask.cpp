@@ -99,7 +99,7 @@ OTAImageProcessorImpl gImageProcessor;
 #endif
 
 chip::app::Clusters::TemperatureControl::AppSupportedTemperatureLevelsDelegate sAppSupportedTemperatureLevelsDelegate;
-app::Clusters::ModeSelect::StaticSupportedModesManager sStaticSupportedModesManager;
+chip::app::Clusters::ModeSelect::StaticSupportedModesManager sStaticSupportedModesManager;
 } // namespace
 
 using namespace ::chip;
@@ -143,7 +143,7 @@ static void InitServer(intptr_t context)
     GetAppTask().InitOTARequestor();
 #endif
     chip::app::Clusters::TemperatureControl::SetInstance(&sAppSupportedTemperatureLevelsDelegate);
-    app::Clusters::ModeSelect::setSupportedModesManager(&sStaticSupportedModesManager);
+    chip::app::Clusters::ModeSelect::setSupportedModesManager(&sStaticSupportedModesManager);
 }
 
 CHIP_ERROR AppTask::StartAppTask()
