@@ -19,6 +19,7 @@
 #include <AppMain.h>
 
 #include "BridgedDevice.h"
+#include "BridgedDeviceBasicInformationImpl.h"
 #include "BridgedDeviceManager.h"
 #include "CommissionableInit.h"
 
@@ -47,6 +48,8 @@ constexpr uint16_t kPollIntervalMs = 100;
 #if defined(PW_RPC_FABRIC_BRIDGE_SERVICE) && PW_RPC_FABRIC_BRIDGE_SERVICE
 constexpr uint16_t kRetryIntervalS = 3;
 #endif
+
+BridgedDeviceBasicInformationImpl gBridgedDeviceBasicInformationAttributes;
 
 bool KeyboardHit()
 {
@@ -175,6 +178,7 @@ void ApplicationInit()
     ChipLogDetail(NotSpecified, "Fabric-Bridge: ApplicationInit()");
 
     CommandHandlerInterfaceRegistry::RegisterCommandHandler(&gAdministratorCommissioningCommandHandler);
+    registerAttributeAccessOverride(&gBridgedDeviceBasicInformationAttributes);
 
 #if defined(PW_RPC_FABRIC_BRIDGE_SERVICE) && PW_RPC_FABRIC_BRIDGE_SERVICE
     InitRpcServer(kFabricBridgeServerPort);
