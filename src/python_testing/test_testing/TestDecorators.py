@@ -108,6 +108,7 @@ class TestDecorators(MatterBaseTest):
     def teardown_test(self):
         if 'force_endpoint' in self.user_params.keys():
             del self.user_params['force_endpoint']
+        self.matter_test_config.endpoint = None
 
     def test_checkers(self):
         has_onoff = has_cluster(Clusters.OnOff)
@@ -179,6 +180,16 @@ class TestDecorators(MatterBaseTest):
         all_endpoints = list(all_endpoints.attributes.keys())
         forced = max(all_endpoints) + 1
         self.user_params['force_endpoint'] = forced
+
+        await get_accepted_endpoints_for_test(self, has_onoff)
+
+    @async_test_body
+    async def test_endpoints_with_endpoint_flag_set_failure(self):
+        ''' This test should cause an assertion because --endpoint flag is set.'''
+        has_onoff = has_cluster(Clusters.OnOff)
+        all_endpoints = await self.default_controller.Read(self.dut_node_id, [()])
+        all_endpoints = list(all_endpoints.attributes.keys())
+        self.matter_test_config.endpoint = 0
 
         await get_accepted_endpoints_for_test(self, has_onoff)
 
@@ -299,6 +310,12 @@ def main():
     ok = test_runner.run_test_with_mock_read(read_resp, hooks)
     if ok:
         failures.append("Test case failure: test_force_endpoint_bad")
+
+    test_runner.set_test('TestDecorators.py', 'TestDecorators', 'test_endpoints_with_endpoint_flag_set_failure')
+    read_resp = get_clusters([0, 1])
+    ok = test_runner.run_test_with_mock_read(read_resp, hooks)
+    if ok:
+        failures.append("Test case failure: test_endpoints_with_endpoint_flag_set_failure")
 
     test_name = 'test_whole_node_with_pics'
     test_runner.set_test('TestDecorators.py', 'TestDecorators', test_name)
