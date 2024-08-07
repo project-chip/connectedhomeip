@@ -277,4 +277,25 @@ NS_ASSUME_NONNULL_BEGIN
 
 @end
 
+static NSString * const kDeviceControllerErrorCommissionerInit = @"Init failure while initializing a commissioner";
+static NSString * const kDeviceControllerErrorIPKInit = @"Init failure while initializing IPK";
+static NSString * const kDeviceControllerErrorSigningKeypairInit = @"Init failure while creating signing keypair bridge";
+static NSString * const kDeviceControllerErrorOperationalCredentialsInit = @"Init failure while creating operational credentials delegate";
+static NSString * const kDeviceControllerErrorOperationalKeypairInit = @"Init failure while creating operational keypair bridge";
+static NSString * const kDeviceControllerErrorPairingInit = @"Init failure while creating a pairing delegate";
+static NSString * const kDeviceControllerErrorPartialDacVerifierInit = @"Init failure while creating a partial DAC verifier";
+static NSString * const kDeviceControllerErrorPairDevice = @"Failure while pairing the device";
+static NSString * const kDeviceControllerErrorStopPairing = @"Failure while trying to stop the pairing process";
+static NSString * const kDeviceControllerErrorOpenPairingWindow = @"Open Pairing Window failed";
+static NSString * const kDeviceControllerErrorNotRunning = @"Controller is not running. Call startup first.";
+static NSString * const kDeviceControllerErrorSetupCodeGen = @"Generating Manual Pairing Code failed";
+static NSString * const kDeviceControllerErrorGenerateNOC = @"Generating operational certificate failed";
+static NSString * const kDeviceControllerErrorKeyAllocation = @"Generating new operational key failed";
+static NSString * const kDeviceControllerErrorCSRValidation = @"Extracting public key from CSR failed";
+static NSString * const kDeviceControllerErrorGetCommissionee = @"Failure obtaining device being commissioned";
+static NSString * const kDeviceControllerErrorGetAttestationChallenge = @"Failure getting attestation challenge";
+static NSString * const kDeviceControllerErrorSpake2pVerifierGenerationFailed = @"PASE verifier generation failed";
+static NSString * const kDeviceControllerErrorSpake2pVerifierSerializationFailed = @"PASE verifier serialization failed";
+static NSString * const kDeviceControllerErrorCDCertStoreInit = @"Init failure while initializing Certificate Declaration Signing Keys store";
+
 NS_ASSUME_NONNULL_END
