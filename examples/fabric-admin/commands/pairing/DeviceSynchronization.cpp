@@ -141,6 +141,7 @@ void DeviceSynchronizer::OnDeviceConnected(chip::Messaging::ExchangeManager & ex
 {
     mClient = std::make_unique<ReadClient>(app::InteractionModelEngine::GetInstance(), &exchangeMgr /* echangeMgr */,
                                            *this /* callback */, ReadClient::InteractionType::Read);
+    VerifyOrDie(mClient);
 
     AttributePathParams readPaths[1];
     readPaths[0] = AttributePathParams(kRootEndpointId, Clusters::BasicInformation::Id);
