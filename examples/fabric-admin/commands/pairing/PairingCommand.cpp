@@ -18,7 +18,10 @@
 
 #include "PairingCommand.h"
 
+#include <app-common/zap-generated/ids/Clusters.h>
 #include <commands/common/DeviceScanner.h>
+#include <commands/interactive/InteractiveCommands.h>
+#include <commands/pairing/DeviceSynchronization.h>
 #include <controller/ExampleOperationalCredentialsIssuer.h>
 #include <crypto/CHIPCryptoPAL.h>
 #include <lib/core/CHIPSafeCasts.h>
@@ -400,10 +403,8 @@ void PairingCommand::OnCommissioningComplete(NodeId nodeId, CHIP_ERROR err)
     {
         // print to console
         fprintf(stderr, "New device with Node ID: 0x%lx has been successfully added.\n", nodeId);
+        DeviceSynchronizer::Instance().StartDeviceSynchronization(ScopedNodeId(mNodeId, CurrentCommissioner().GetFabricIndex()));
 
-#if defined(PW_RPC_ENABLED)
-        AddSynchronizedDevice(nodeId);
-#endif
     }
     else
     {

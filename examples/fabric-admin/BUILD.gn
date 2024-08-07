@@ -72,6 +72,8 @@ static_library("fabric-admin-utils") {
     "commands/common/RemoteDataModelLogger.cpp",
     "commands/common/RemoteDataModelLogger.h",
     "commands/fabric-sync/FabricSyncCommand.cpp",
+    "commands/pairing/DeviceSynchronization.cpp",
+    "commands/pairing/DeviceSynchronization.h",
     "commands/pairing/OpenCommissioningWindowCommand.cpp",
     "commands/pairing/OpenCommissioningWindowCommand.h",
     "commands/pairing/PairingCommand.cpp",
