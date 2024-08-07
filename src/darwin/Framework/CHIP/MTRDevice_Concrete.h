@@ -1,6 +1,6 @@
 /**
  *
- *    Copyright (c) 2024 Project CHIP Authors
+ *    Copyright (c) 2022-2023 Project CHIP Authors
  *
  *    Licensed under the Apache License, Version 2.0 (the "License");
  *    you may not use this file except in compliance with the License.
@@ -15,15 +15,13 @@
  *    limitations under the License.
  */
 
-#import <Matter/MTRDefines.h>
+#import <Foundation/Foundation.h>
+#import <Matter/MTRDevice.h>
 
 NS_ASSUME_NONNULL_BEGIN
 
-/**
- * Calls `-[NSObject isEqual:]` but returns YES when comparing nil to nil.
- */
-MTR_EXTERN BOOL MTREqualObjects(id<NSObject> _Nullable a, id<NSObject> _Nullable b);
+@interface MTRDevice_Concrete : MTRDevice
 
-MTR_EXTERN NSNumber * MTRClampedNumber(NSNumber * aNumber, NSNumber * min, NSNumber * max);
+@end
 
 NS_ASSUME_NONNULL_END
