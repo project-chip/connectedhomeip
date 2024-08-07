@@ -139,12 +139,8 @@ void DeviceSynchronizer::OnError(CHIP_ERROR error)
 void DeviceSynchronizer::OnDeviceConnected(chip::Messaging::ExchangeManager & exchangeMgr,
                                            const chip::SessionHandle & sessionHandle)
 {
-    if (!mClient)
-    {
-        mClient = std::make_unique<ReadClient>(app::InteractionModelEngine::GetInstance(), &exchangeMgr /* echangeMgr */,
-                                               *this /* callback */, ReadClient::InteractionType::Read);
-        VerifyOrDie(mClient);
-    }
+    mClient = std::make_unique<ReadClient>(app::InteractionModelEngine::GetInstance(), &exchangeMgr /* echangeMgr */,
+                                           *this /* callback */, ReadClient::InteractionType::Read);
 
     AttributePathParams readPaths[1];
     readPaths[0] = AttributePathParams(kRootEndpointId, Clusters::BasicInformation::Id);
