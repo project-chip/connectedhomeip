@@ -99,6 +99,12 @@ enum AreaTypeTag : enum8 {
   kWorkshop = 94;
 }
 
+enum AtomicRequestTypeEnum : enum8 {
+  kBeginWrite = 0;
+  kCommitWrite = 1;
+  kRollbackWrite = 2;
+}
+
 enum FloorSurfaceTag : enum8 {
   kCarpet = 0;
   kCeramic = 1;
@@ -188,13 +194,16 @@ enum PositionTag : enum8 {
   kMiddle = 4;
   kRow = 5;
   kColumn = 6;
-  kUnder = 7;
-  kNextTo = 8;
-  kAround = 9;
-  kOn = 10;
-  kAbove = 11;
-  kFrontOf = 12;
-  kBehind = 13;
+}
+
+enum RelativePositionTag : enum8 {
+  kUnder = 0;
+  kNextTo = 1;
+  kAround = 2;
+  kOn = 3;
+  kAbove = 4;
+  kFrontOf = 5;
+  kBehind = 6;
 }
 
 enum TestGlobalEnum : enum8 {
@@ -218,6 +227,11 @@ struct LocationDescriptorStruct {
   char_string<128> locationName = 0;
   nullable int16s floorNumber = 1;
   nullable AreaTypeTag areaType = 2;
+}
+
+struct AtomicAttributeStatusStruct {
+  attrib_id attributeID = 0;
+  status statusCode = 1;
 }
 
 /** Attributes and commands for putting a device into Identification mode (e.g. flashing a light). */
@@ -1603,7 +1617,7 @@ cluster FixedLabel = 64 {
 
 /** An interface for configuring and controlling the functionality of a thermostat. */
 cluster Thermostat = 513 {
-  revision 6;
+  revision 7;
 
   enum ACCapacityFormatEnum : enum8 {
     kBTUh = 0;
@@ -1649,7 +1663,6 @@ cluster Thermostat = 513 {
   }
 
   enum PresetScenarioEnum : enum8 {
-    kUnspecified = 0;
     kOccupied = 1;
     kUnoccupied = 2;
     kSleep = 3;
@@ -1722,7 +1735,6 @@ cluster Thermostat = 513 {
     kLocalTemperatureNotExposed = 0x40;
     kMatterScheduleConfiguration = 0x80;
     kPresets = 0x100;
-    kSetpoints = 0x200;
   }
 
   bitmap HVACSystemTypeBitmap : bitmap8 {
@@ -1730,6 +1742,10 @@ cluster Thermostat = 513 {
     kHeatingStage = 0xC;
     kHeatingIsHeatPump = 0x10;
     kHeatingUsesFuel = 0x20;
+  }
+
+  bitmap OccupancyBitmap : bitmap8 {
+    kOccupied = 0x1;
   }
 
   bitmap PresetTypeFeaturesBitmap : bitmap16 {
@@ -1797,7 +1813,7 @@ cluster Thermostat = 513 {
     optional char_string<64> name = 2;
     optional octet_string<16> presetHandle = 3;
     ScheduleTransitionStruct transitions[] = 4;
-    optional nullable boolean builtIn = 5;
+    nullable boolean builtIn = 5;
   }
 
   struct PresetStruct {
@@ -1829,23 +1845,23 @@ cluster Thermostat = 513 {
 
   readonly attribute nullable temperature localTemperature = 0;
   readonly attribute optional nullable temperature outdoorTemperature = 1;
-  readonly attribute optional bitmap8 occupancy = 2;
+  readonly attribute optional OccupancyBitmap occupancy = 2;
   readonly attribute optional temperature absMinHeatSetpointLimit = 3;
   readonly attribute optional temperature absMaxHeatSetpointLimit = 4;
   readonly attribute optional temperature absMinCoolSetpointLimit = 5;
   readonly attribute optional temperature absMaxCoolSetpointLimit = 6;
   readonly attribute optional int8u PICoolingDemand = 7;
   readonly attribute optional int8u PIHeatingDemand = 8;
-  attribute access(write: manage) optional bitmap8 HVACSystemTypeConfiguration = 9;
+  attribute access(write: manage) optional HVACSystemTypeBitmap HVACSystemTypeConfiguration = 9;
   attribute access(write: manage) optional int8s localTemperatureCalibration = 16;
-  attribute optional int16s occupiedCoolingSetpoint = 17;
-  attribute optional int16s occupiedHeatingSetpoint = 18;
-  attribute optional int16s unoccupiedCoolingSetpoint = 19;
-  attribute optional int16s unoccupiedHeatingSetpoint = 20;
-  attribute access(write: manage) optional int16s minHeatSetpointLimit = 21;
-  attribute access(write: manage) optional int16s maxHeatSetpointLimit = 22;
-  attribute access(write: manage) optional int16s minCoolSetpointLimit = 23;
-  attribute access(write: manage) optional int16s maxCoolSetpointLimit = 24;
+  attribute optional temperature occupiedCoolingSetpoint = 17;
+  attribute optional temperature occupiedHeatingSetpoint = 18;
+  attribute optional temperature unoccupiedCoolingSetpoint = 19;
+  attribute optional temperature unoccupiedHeatingSetpoint = 20;
+  attribute access(write: manage) optional temperature minHeatSetpointLimit = 21;
+  attribute access(write: manage) optional temperature maxHeatSetpointLimit = 22;
+  attribute access(write: manage) optional temperature minCoolSetpointLimit = 23;
+  attribute access(write: manage) optional temperature maxCoolSetpointLimit = 24;
   attribute access(write: manage) optional int8s minSetpointDeadBand = 25;
   attribute access(write: manage) optional RemoteSensingBitmap remoteSensing = 26;
   attribute access(write: manage) ControlSequenceOfOperationEnum controlSequenceOfOperation = 27;
@@ -1886,8 +1902,7 @@ cluster Thermostat = 513 {
   readonly attribute optional nullable octet_string<16> activeScheduleHandle = 79;
   attribute access(write: manage) optional PresetStruct presets[] = 80;
   attribute access(write: manage) optional ScheduleStruct schedules[] = 81;
-  readonly attribute optional boolean presetsSchedulesEditable = 82;
-  readonly attribute optional nullable epoch_s setpointHoldExpiryTimestamp = 83;
+  readonly attribute optional nullable epoch_s setpointHoldExpiryTimestamp = 82;
   readonly attribute command_id generatedCommandList[] = 65528;
   readonly attribute command_id acceptedCommandList[] = 65529;
   readonly attribute event_id eventList[] = 65530;
@@ -1927,28 +1942,32 @@ cluster Thermostat = 513 {
     octet_string<16> presetHandle = 0;
   }
 
-  request struct StartPresetsSchedulesEditRequestRequest {
-    int16u timeoutSeconds = 0;
+  response struct AtomicResponse = 253 {
+    status statusCode = 0;
+    AtomicAttributeStatusStruct attributeStatus[] = 1;
+    optional int16u timeout = 2;
   }
 
-  /** Command description for SetpointRaiseLower */
+  request struct AtomicRequestRequest {
+    AtomicRequestTypeEnum requestType = 0;
+    attrib_id attributeRequests[] = 1;
+    optional int16u timeout = 2;
+  }
+
+  /** Upon receipt, the attributes for the indicated setpoint(s) SHALL have the amount specified in the Amount field added to them. */
   command SetpointRaiseLower(SetpointRaiseLowerRequest): DefaultSuccess = 0;
-  /** Command description for SetWeeklySchedule */
+  /** This command is used to update the thermostat weekly setpoint schedule from a management system. */
   command access(invoke: manage) SetWeeklySchedule(SetWeeklyScheduleRequest): DefaultSuccess = 1;
-  /** Command description for GetWeeklySchedule */
+  /** The Current Weekly Schedule Command is sent from the server in response to the Get Weekly Schedule Command. */
   command GetWeeklySchedule(GetWeeklyScheduleRequest): GetWeeklyScheduleResponse = 2;
-  /** This command is used to clear the weekly schedule. The ClearWeeklySchedule command has no payload. */
+  /** This command is used to clear the weekly schedule. */
   command access(invoke: manage) ClearWeeklySchedule(): DefaultSuccess = 3;
-  /** This command is used to set the active schedule. */
+  /** Upon receipt, if the Schedules attribute contains a ScheduleStruct whose ScheduleHandle field matches the value of the ScheduleHandle field, the server SHALL set the thermostat's ActiveScheduleHandle attribute to the value of the ScheduleHandle field. */
   command SetActiveScheduleRequest(SetActiveScheduleRequestRequest): DefaultSuccess = 5;
-  /** This command is used to set the active preset. */
+  /** ID */
   command SetActivePresetRequest(SetActivePresetRequestRequest): DefaultSuccess = 6;
-  /** This command is used to start editing the presets and schedules. */
-  command access(invoke: manage) StartPresetsSchedulesEditRequest(StartPresetsSchedulesEditRequestRequest): DefaultSuccess = 7;
-  /** This command is used to cancel editing presets and schedules. */
-  command access(invoke: manage) CancelPresetsSchedulesEditRequest(): DefaultSuccess = 8;
-  /** This command is used to notify the server that all edits are done and should be committed. */
-  command access(invoke: manage) CommitPresetsSchedulesRequest(): DefaultSuccess = 9;
+  /** Begins, Commits or Cancels an atomic write */
+  command access(invoke: manage) AtomicRequest(AtomicRequestRequest): AtomicResponse = 254;
 }
 
 /** An interface for controlling a fan in a heating/cooling system. */

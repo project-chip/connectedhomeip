@@ -18,12 +18,14 @@
 
 #include <AppMain.h>
 
+#include "BridgedDevice.h"
+#include "BridgedDeviceBasicInformationImpl.h"
+#include "BridgedDeviceManager.h"
 #include "CommissionableInit.h"
-#include "Device.h"
-#include "DeviceManager.h"
 
 #include <app/AttributeAccessInterfaceRegistry.h>
 #include <app/CommandHandlerInterfaceRegistry.h>
+#include <app/clusters/ecosystem-information-server/ecosystem-information-server.h>
 
 #if defined(PW_RPC_FABRIC_BRIDGE_SERVICE) && PW_RPC_FABRIC_BRIDGE_SERVICE
 #include "RpcClient.h"
@@ -34,8 +36,15 @@
 #include <sys/ioctl.h>
 #include <thread>
 
-using namespace chip;
+// This is declared here and not in a header because zap/embr assumes all clusters
+// are defined in a static endpoint in the .zap file. From there, the codegen will
+// automatically use PluginApplicationCallbacksHeader.jinja to declare and call
+// the respective Init callbacks. However, because EcosystemInformation cluster is only
+// ever on a dynamic endpoint, this doesn't get declared and called for us, so we
+// need to declare and call it ourselves where the application is initialized.
+void MatterEcosystemInformationPluginServerInitCallback();
 
+using namespace chip;
 using namespace chip::app;
 using namespace chip::app::Clusters;
 using namespace chip::app::Clusters::AdministratorCommissioning;
@@ -47,6 +56,8 @@ constexpr uint16_t kPollIntervalMs = 100;
 #if defined(PW_RPC_FABRIC_BRIDGE_SERVICE) && PW_RPC_FABRIC_BRIDGE_SERVICE
 constexpr uint16_t kRetryIntervalS = 3;
 #endif
+
+BridgedDeviceBasicInformationImpl gBridgedDeviceBasicInformationAttributes;
 
 bool KeyboardHit()
 {
@@ -140,7 +151,7 @@ void AdministratorCommissioningCommandHandler::InvokeCommand(HandlerContext & ha
     Status status = Status::Failure;
 
 #if defined(PW_RPC_FABRIC_BRIDGE_SERVICE) && PW_RPC_FABRIC_BRIDGE_SERVICE
-    Device * device = DeviceMgr().GetDevice(endpointId);
+    BridgedDevice * device = BridgeDeviceMgr().GetDevice(endpointId);
 
     // TODO: issues:#33784, need to make OpenCommissioningWindow synchronous
     if (device != nullptr &&
@@ -174,7 +185,9 @@ void ApplicationInit()
 {
     ChipLogDetail(NotSpecified, "Fabric-Bridge: ApplicationInit()");
 
+    MatterEcosystemInformationPluginServerInitCallback();
     CommandHandlerInterfaceRegistry::RegisterCommandHandler(&gAdministratorCommissioningCommandHandler);
+    registerAttributeAccessOverride(&gBridgedDeviceBasicInformationAttributes);
 
 #if defined(PW_RPC_FABRIC_BRIDGE_SERVICE) && PW_RPC_FABRIC_BRIDGE_SERVICE
     InitRpcServer(kFabricBridgeServerPort);
@@ -185,7 +198,7 @@ void ApplicationInit()
     std::thread pollingThread(BridgePollingThread);
     pollingThread.detach();
 
-    DeviceMgr().Init();
+    BridgeDeviceMgr().Init();
 }
 
 void ApplicationShutdown()

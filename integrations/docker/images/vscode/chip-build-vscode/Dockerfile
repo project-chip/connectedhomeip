@@ -5,7 +5,7 @@ FROM ghcr.io/project-chip/chip-build-efr32:${VERSION} AS efr32
 FROM ghcr.io/project-chip/chip-build-android:${VERSION} AS android
 FROM ghcr.io/project-chip/chip-build-esp32-qemu:${VERSION} as esp32
 FROM ghcr.io/project-chip/chip-build-telink:${VERSION} AS telink
-FROM ghcr.io/project-chip/chip-build-infineon:${VERSION} AS p6
+FROM ghcr.io/project-chip/chip-build-infineon:${VERSION} AS psoc6
 FROM ghcr.io/project-chip/chip-build-tizen:${VERSION} AS tizen
 FROM ghcr.io/project-chip/chip-build-crosscompile:${VERSION} AS crosscompile
 FROM ghcr.io/project-chip/chip-build-ameba:${VERSION} AS ameba
@@ -36,7 +36,7 @@ COPY --from=android /opt/android/sdk /opt/android/sdk
 COPY --from=android /opt/android/android-ndk-r23c /opt/android/android-ndk-r23c
 COPY --from=android /usr/lib/kotlinc /usr/lib/kotlinc
 
-COPY --from=p6 /opt/ModusToolbox /opt/ModusToolbox
+COPY --from=psoc6 /opt/Tools/ModusToolbox /opt/Tools/ModusToolbox
 
 COPY --from=telink /opt/telink/zephyrproject /opt/telink/zephyrproject
 COPY --from=telink /opt/telink/zephyr-sdk-0.16.1 /opt/telink/zephyr-sdk-0.16.1
@@ -107,16 +107,11 @@ RUN set -x \
     && rm -rf /var/lib/apt/lists/ \
     && : # last line
 
-# Required for the Bouffalolab platform
-RUN set -x \
-    && pip3 install --break-system-packages bflb-iot-tool==1.8.6 \
-    && : # last line
-
 ENV PATH $PATH:/usr/lib/kotlinc/bin
 ENV AMEBA_PATH=/opt/ameba/ambd_sdk_with_chip_non_NDA
 ENV ANDROID_HOME=/opt/android/sdk
 ENV ANDROID_NDK_HOME=/opt/android/android-ndk-r23c
-ENV CY_TOOLS_PATHS="/opt/ModusToolbox/tools_2.4"
+ENV CY_TOOLS_PATHS="/opt/Tools/ModusToolbox/tools_3.2"
 ENV SILABS_BOARD=BRD4186C
 # Keep GSDK_ROOT name until rename transition to SISDK is completed
 ENV GSDK_ROOT=/opt/silabs/simplicity_sdk/

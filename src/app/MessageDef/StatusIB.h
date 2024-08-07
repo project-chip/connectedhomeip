@@ -60,7 +60,7 @@ struct StatusIB
         }
     }
 
-    explicit StatusIB(CHIP_ERROR error);
+    explicit StatusIB(CHIP_ERROR error) : StatusIB(Protocols::InteractionModel::ClusterStatusCode(error)) {}
 
     enum class Tag : uint8_t
     {
