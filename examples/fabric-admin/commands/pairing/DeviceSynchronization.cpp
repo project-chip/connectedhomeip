@@ -71,9 +71,6 @@ void DeviceSynchronizer::OnAttributeData(const ConcreteDataAttributePath & path,
     VerifyOrDie(path.mEndpointId == kRootEndpointId);
     VerifyOrDie(path.mClusterId == Clusters::BasicInformation::Id);
 
-    ChipLogProgress(NotSpecified, "Attribute data");
-    path.LogPath();
-
     switch (path.mAttributeId)
     {
     case Clusters::BasicInformation::Attributes::UniqueID::Id:
@@ -115,7 +112,6 @@ void DeviceSynchronizer::OnAttributeData(const ConcreteDataAttributePath & path,
             "SoftwareVersionString");
         break;
     default:
-        ChipLogProgress(NotSpecified, "Attribute data not processed");
         break;
     }
 }
