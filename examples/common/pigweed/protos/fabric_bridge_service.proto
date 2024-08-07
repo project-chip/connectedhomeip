@@ -8,16 +8,16 @@ package chip.rpc;
 message SynchronizedDevice {
   uint64 node_id = 1;
 
-  string unique_id = 2;
-  string vendor_name = 3;
-  uint32 vendor_id = 4;
-  string product_name = 5;
-  uint32 product_id = 6;
-  string node_label = 7;
-  uint32 hardware_version = 8;
-  string hardware_version_string = 9;
-  uint32 software_version = 10;
-  string software_version_string = 11;
+  optional string unique_id = 2;
+  optional string vendor_name = 3;
+  optional uint32 vendor_id = 4;
+  optional string product_name = 5;
+  optional uint32 product_id = 6;
+  optional string node_label = 7;
+  optional uint32 hardware_version = 8;
+  optional string hardware_version_string = 9;
+  optional uint32 software_version = 10;
+  optional string software_version_string = 11;
 }
 
 service FabricBridge {

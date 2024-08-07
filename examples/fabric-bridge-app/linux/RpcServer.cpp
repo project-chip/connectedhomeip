@@ -56,16 +56,55 @@ pw::Status FabricBridge::AddSynchronizedDevice(const chip_rpc_SynchronizedDevice
 
     BridgedDevice::BridgedAttributes attributes;
 
-    attributes.uniqueId              = request.unique_id;
-    attributes.vendorName            = request.vendor_name;
-    attributes.vendorId              = request.vendor_id;
-    attributes.productName           = request.product_name;
-    attributes.productId             = request.product_id;
-    attributes.nodeLabel             = request.node_label;
-    attributes.hardwareVersion       = request.hardware_version;
-    attributes.hardwareVersionString = request.hardware_version_string;
-    attributes.softwareVersion       = request.software_version;
-    attributes.softwareVersionString = request.software_version_string;
+    if (request.has_unique_id)
+    {
+        attributes.uniqueId = request.unique_id;
+    }
+
+    if (request.has_vendor_name)
+    {
+        attributes.vendorName = request.vendor_name;
+    }
+
+    if (request.has_vendor_id)
+    {
+        attributes.vendorId = request.vendor_id;
+    }
+
+    if (request.has_product_name)
+    {
+        attributes.productName = request.product_name;
+    }
+
+    if (request.has_product_id)
+    {
+        attributes.productId = request.product_id;
+    }
+
+    if (request.has_node_label)
+    {
+        attributes.nodeLabel = request.node_label;
+    }
+
+    if (request.has_hardware_version)
+    {
+        attributes.hardwareVersion = request.hardware_version;
+    }
+
+    if (request.has_hardware_version_string)
+    {
+        attributes.hardwareVersionString = request.hardware_version_string;
+    }
+
+    if (request.has_software_version)
+    {
+        attributes.softwareVersion = request.software_version;
+    }
+
+    if (request.has_software_version_string)
+    {
+        attributes.softwareVersionString = request.software_version_string;
+    }
 
     device->SetBridgedAttributes(attributes);
 
