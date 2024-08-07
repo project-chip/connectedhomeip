@@ -6503,6 +6503,8 @@ char const * DeviceTypeIdToText(chip::DeviceTypeId id)
         return "Matter Humidity Sensor";
     case 0x0000050C:
         return "Matter EVSE";
+    case 0x0000050D:
+        return "Matter Device Energy Management";
     case 0x00000510:
         return "Matter Electrical Sensor";
     case 0x00000840:

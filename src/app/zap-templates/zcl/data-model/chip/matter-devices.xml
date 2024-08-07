@@ -2685,4 +2685,17 @@ limitations under the License.
             <include cluster="Temperature Measurement" client="false" server="false" clientLocked="true" serverLocked="false"></include>
         </clusters>
     </deviceType>
+    <deviceType>
+        <name>Device Energy Management</name>
+        <domain>CHIP</domain>
+        <typeName>Matter Device Energy Management</typeName>
+        <class>Simple</class>
+        <profileId editable="false">0x0103</profileId>
+        <deviceId editable="false">0x050D</deviceId>
+        <clusters lockOthers="true">
+            <include cluster="Descriptor" client="false" server="true" clientLocked="true" serverLocked="true"></include>
+            <include cluster="Device Energy Management" client="false" server="true" clientLocked="true" serverLocked="true"></include>
+            <include cluster="Device Energy Management Mode" client="false" server="true" clientLocked="true" serverLocked="true"></include>
+        </clusters>
+    </deviceType>
 </configurator>
