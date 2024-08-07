@@ -161,6 +161,40 @@ void RvcDevice::HandleOpStateGoHomeCallback(Clusters::OperationalState::GenericO
     }
 }
 
+bool RvcDevice::SaIsSetSelectedAreasAllowed(MutableCharSpan statusText)
+{
+    if (mOperationalStateInstance.GetCurrentOperationalState() == to_underlying(OperationalState::OperationalStateEnum::kRunning))
+    {
+        CopyCharSpanToMutableCharSpan("cannot set the Selected Areas while the device is running"_span, statusText);
+        return false;
+    }
+    return true;
+}
+
+
+bool RvcDevice::SaIsValidSelectAreasSet(const ServiceArea::Commands::SelectAreas::DecodableType & req, ServiceArea::SelectAreasStatus & areaStatus, MutableCharSpan statusText)
+{
+    // todo implement
+    return true;
+}
+
+bool RvcDevice::SaHandleSkipCurrentArea(uint32_t skippedArea, MutableCharSpan skipStatusText)
+{
+    // todo implement
+    return true;
+}
+
+bool RvcDevice::SaIsSupportedAreasChangeAllowed()
+{
+    return mOperationalStateInstance.GetCurrentOperationalState() != to_underlying(OperationalState::OperationalStateEnum::kRunning);
+}
+
+bool RvcDevice::SaIsSupportedMapChangeAllowed()
+{
+    return mOperationalStateInstance.GetCurrentOperationalState() != to_underlying(OperationalState::OperationalStateEnum::kRunning);
+}
+
+
 void RvcDevice::HandleChargedMessage()
 {
     if (mOperationalStateInstance.GetCurrentOperationalState() !=

@@ -29,6 +29,12 @@ namespace Clusters {
 
 class RvcDevice;
 
+typedef bool (RvcDevice::*IsSetSelectedAreasAllowedCallback)(MutableCharSpan statusText);
+typedef bool (RvcDevice::*IsValidSelectAreasSetCallback)(const ServiceArea::Commands::SelectAreas::DecodableType & req,
+                                                          ServiceArea::SelectAreasStatus & areaStatus, MutableCharSpan statusText);
+typedef bool (RvcDevice::*HandleSkipCurrentAreaCallback)(uint32_t skippedArea, MutableCharSpan skipStatusText);
+typedef bool (RvcDevice::*IsChangeAllowedSimpleCallback)();
+
 namespace ServiceArea {
 
 class RvcServiceAreaDelegate : public Delegate
@@ -39,6 +45,17 @@ private:
     std::vector<ServiceArea::MapStructureWrapper> mSupportedMaps;
     std::vector<uint32_t> mSelectedAreas;
     std::vector<ServiceArea::Structs::ProgressStruct::Type> mProgressList;
+
+    RvcDevice * mIsSetSelectedAreasAllowedDeviceInstance;
+    IsSetSelectedAreasAllowedCallback mIsSetSelectedAreasAllowedCallback;
+    RvcDevice * mIsValidSelectAreasSetDeviceInstance;
+    IsValidSelectAreasSetCallback mIsValidSelectAreasSetCallback;
+    RvcDevice * mHandleSkipCurrentAreaDeviceInstance;
+    HandleSkipCurrentAreaCallback mHandleSkipCurrentAreaCallback;
+    RvcDevice * mIsSupportedAreasChangeAllowedDeviceInstance;
+    IsChangeAllowedSimpleCallback mIsSupportedAreasChangeAllowedCallback;
+    RvcDevice * mIsSupportedMapChangeAllowedDeviceInstance;
+    IsChangeAllowedSimpleCallback mIsSupportedMapChangeAllowedCallback;
 
     // hardcoded values for SUPPORTED MAPS.
     const uint32_t supportedMapId_XX = 3;
@@ -132,6 +149,39 @@ public:
                                const ServiceArea::Structs::ProgressStruct::Type & modifiedProgressElement) override;
 
     bool ClearProgress() override;
+
+    //*************************************************************************
+    // RVC device callback setters
+
+    void SetIsSetSelectedAreasAllowedCallback(IsSetSelectedAreasAllowedCallback callback, RvcDevice * instance)
+    {
+        mIsSetSelectedAreasAllowedCallback = callback;
+        mIsSetSelectedAreasAllowedDeviceInstance = instance;
+    }
+
+    void SetIsValidSelectAreasSetCallback(IsValidSelectAreasSetCallback callback, RvcDevice * instance)
+    {
+        mIsValidSelectAreasSetCallback = callback;
+        mIsValidSelectAreasSetDeviceInstance = instance;
+    }
+
+    void SetHandleSkipCurrentAreaCallback(HandleSkipCurrentAreaCallback callback, RvcDevice * instance)
+    {
+        mHandleSkipCurrentAreaCallback = callback;
+        mHandleSkipCurrentAreaDeviceInstance = instance;
+    }
+
+    void SetIsSupportedAreasChangeAllowedCallback(IsChangeAllowedSimpleCallback callback, RvcDevice * instance)
+    {
+        mIsSupportedAreasChangeAllowedCallback = callback;
+        mIsSupportedAreasChangeAllowedDeviceInstance = instance;
+    }
+
+    void SetIsSupportedMapChangeAllowedCallback(IsChangeAllowedSimpleCallback callback, RvcDevice * instance)
+    {
+        mIsSupportedMapChangeAllowedCallback = callback;
+        mIsSupportedMapChangeAllowedDeviceInstance = instance;
+    }
 };
 
 } // namespace ServiceArea

@@ -59,6 +59,14 @@ public:
         mOperationalStateDelegate.SetPauseCallback(&RvcDevice::HandleOpStatePauseCallback, this);
         mOperationalStateDelegate.SetResumeCallback(&RvcDevice::HandleOpStateResumeCallback, this);
         mOperationalStateDelegate.SetGoHomeCallback(&RvcDevice::HandleOpStateGoHomeCallback, this);
+
+        mServiceAreaDelegate.SetIsSetSelectedAreasAllowedCallback(&RvcDevice::SaIsSetSelectedAreasAllowed, this);
+        mServiceAreaDelegate.SetIsValidSelectAreasSetCallback(&RvcDevice::SaIsValidSelectAreasSet, this);
+        mServiceAreaDelegate.SetHandleSkipCurrentAreaCallback(&RvcDevice::SaHandleSkipCurrentArea, this);
+        mServiceAreaDelegate.SetIsSupportedAreasChangeAllowedCallback(&RvcDevice::SaIsSupportedAreasChangeAllowed, this);
+        mServiceAreaDelegate.SetIsSupportedMapChangeAllowedCallback(&RvcDevice::SaIsSupportedMapChangeAllowed, this);
+
+
     }
 
     /**
@@ -96,6 +104,18 @@ public:
      * Handles the RvcOperationalState GoHome command.
      */
     void HandleOpStateGoHomeCallback(Clusters::OperationalState::GenericOperationalError & err);
+
+
+    bool SaIsSetSelectedAreasAllowed(MutableCharSpan statusText);
+
+    bool SaIsValidSelectAreasSet(const ServiceArea::Commands::SelectAreas::DecodableType & req, ServiceArea::SelectAreasStatus & areaStatus, MutableCharSpan statusText);
+
+    bool SaHandleSkipCurrentArea(uint32_t skippedArea, MutableCharSpan skipStatusText);
+
+    bool SaIsSupportedAreasChangeAllowed();
+
+    bool SaIsSupportedMapChangeAllowed();
+
 
     /**
      * Updates the state machine when the device becomes fully-charged.

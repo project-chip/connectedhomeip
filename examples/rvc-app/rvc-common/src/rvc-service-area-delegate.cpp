@@ -110,21 +110,18 @@ CHIP_ERROR RvcServiceAreaDelegate::Init()
 
 bool RvcServiceAreaDelegate::IsSetSelectedAreasAllowed(MutableCharSpan statusText)
 {
-    // TODO IMPLEMENT
-    return true;
+    return (mIsSetSelectedAreasAllowedDeviceInstance->*mIsSetSelectedAreasAllowedCallback)(statusText);
 };
 
 bool RvcServiceAreaDelegate::IsValidSelectAreasSet(const Commands::SelectAreas::DecodableType & req, SelectAreasStatus & areaStatus,
                                                    MutableCharSpan statusText)
 {
-    // TODO IMPLEMENT
-    return true;
+    return (mIsValidSelectAreasSetDeviceInstance->*mIsValidSelectAreasSetCallback)(req, areaStatus, statusText);
 };
 
 bool RvcServiceAreaDelegate::HandleSkipCurrentArea(uint32_t skippedArea, MutableCharSpan skipStatusText)
 {
-    // TODO IMPLEMENT
-    return true;
+    return (mHandleSkipCurrentAreaDeviceInstance->*mHandleSkipCurrentAreaCallback)(skippedArea, skipStatusText);
 };
 
 //*************************************************************************
@@ -132,8 +129,7 @@ bool RvcServiceAreaDelegate::HandleSkipCurrentArea(uint32_t skippedArea, Mutable
 
 bool RvcServiceAreaDelegate::IsSupportedAreasChangeAllowed()
 {
-    // TODO IMPLEMENT
-    return true;
+    return (mIsSupportedAreasChangeAllowedDeviceInstance->*mIsSupportedAreasChangeAllowedCallback)();
 }
 
 uint32_t RvcServiceAreaDelegate::GetNumberOfSupportedAreas()
@@ -227,8 +223,7 @@ bool RvcServiceAreaDelegate::ClearSupportedAreas()
 
 bool RvcServiceAreaDelegate::IsSupportedMapChangeAllowed()
 {
-    // TODO IMPLEMENT
-    return true;
+    return (mIsSupportedMapChangeAllowedDeviceInstance->*mIsSupportedMapChangeAllowedCallback)();
 }
 
 uint32_t RvcServiceAreaDelegate::GetNumberOfSupportedMaps()
@@ -428,8 +423,15 @@ bool RvcServiceAreaDelegate::AddProgressElement(const Structs::ProgressStruct::T
 bool RvcServiceAreaDelegate::ModifyProgressElement(uint32_t listIndex,
                                                    const Structs::ProgressStruct::Type & modifiedProgressElement)
 {
-    // TODO IMPLEMENT
-    return false;
+    if (modifiedProgressElement.areaID != mProgressList[listIndex].areaID)
+    {
+        ChipLogError(Zcl, "ModifyProgressElement - areaID's do not match, new areaID %u, existing areaID %u",
+                     modifiedProgressElement.areaID, mProgressList[listIndex].areaID);
+        return false;
+    }
+
+    mProgressList[listIndex] = modifiedProgressElement;
+    return true;
 }
 
 bool RvcServiceAreaDelegate::ClearProgress()
