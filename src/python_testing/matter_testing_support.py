@@ -49,6 +49,7 @@ from chip.ChipDeviceCtrl import CommissioningParameters
 
 # isort: on
 import chip.clusters as Clusters
+from chip.clusters import Attribute
 import chip.logging
 import chip.native
 from chip import discovery
@@ -1863,7 +1864,7 @@ async def get_accepted_endpoints_for_test(self: MatterBaseTest, accept_function:
 
         Returns a list of endpoints on which the test should be run given the accept_function for the test.
     """
-    wildcard = await self.default_controller.Read(self.dut_node_id, [()])
+    wildcard = await self.default_controller.Read(self.dut_node_id, [(Clusters.Descriptor), Attribute.AttributePath(None, None, GlobalAttributeIds.ATTRIBUTE_LIST_ID), Attribute.AttributePath(None, None, GlobalAttributeIds.FEATURE_MAP_ID), Attribute.AttributePath(None, None, GlobalAttributeIds.ACCEPTED_COMMAND_LIST_ID)])
     return [e for e in wildcard.attributes.keys() if accept_function(wildcard, e)]
 
 
