@@ -88,7 +88,7 @@ void OnOpenCommissioningWindowCompleted(const chip_rpc_OperationStatus & respons
 }
 
 // Callback function to be called when the RPC response is received for generic empty response.
-void GenericRpcCompletedWithPwStatus(const pw_protobuf_Empty & response, pw::Status status)
+void RpcCompletedWithEmptyResponse(const pw_protobuf_Empty & response, pw::Status status)
 {
     std::lock_guard<std::mutex> lock(responseMutex);
     responseReceived = true;
@@ -170,7 +170,7 @@ CHIP_ERROR KeepActive(chip::NodeId nodeId, uint32_t stayActiveDuration)
 
     // The RPC call is kept alive until it completes. When a response is received, it will be logged by the handler
     // function and the call will complete.
-    auto call = fabricAdminClient.KeepActive(params, GenericRpcCompletedWithPwStatus);
+    auto call = fabricAdminClient.KeepActive(params, RpcCompletedWithEmptyResponse);
 
     if (!call.active())
     {

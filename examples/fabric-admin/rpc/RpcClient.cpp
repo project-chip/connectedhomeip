@@ -105,7 +105,7 @@ void OnRemoveDeviceResponseCompleted(const pw_protobuf_Empty & response, pw::Sta
     }
 }
 
-void GenericResponseCompletedWithNoParameters(const pw_protobuf_Empty & response, pw::Status status)
+void RpcCompletedWithEmptyResponse(const pw_protobuf_Empty & response, pw::Status status)
 {
     std::lock_guard<std::mutex> lock(responseMutex);
     responseReceived = true;
@@ -180,7 +180,7 @@ CHIP_ERROR ActiveChanged(chip::NodeId nodeId, uint32_t promisedActiveDuration)
 
     // The RPC call is kept alive until it completes. When a response is received, it will be logged by the handler
     // function and the call will complete.
-    auto call = fabricBridgeClient.ActiveChanged(parameters, GenericResponseCompletedWithNoParameters);
+    auto call = fabricBridgeClient.ActiveChanged(parameters, RpcCompletedWithEmptyResponse);
 
     if (!call.active())
     {

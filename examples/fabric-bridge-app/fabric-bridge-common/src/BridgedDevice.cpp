@@ -40,7 +40,6 @@ static void ActiveChangeEventWork(intptr_t arg)
     event.promisedActiveDuration  = data->mPromisedActiveDuration;
     chip::EventNumber eventNumber = 0;
 
-    // TODO DNS this is not called from Matter event loop so it will crash
     CHIP_ERROR err = chip::app::LogEvent(event, data->mEndpointId, eventNumber);
     if (err != CHIP_NO_ERROR)
     {
