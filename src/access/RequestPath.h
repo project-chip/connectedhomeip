@@ -40,7 +40,7 @@ struct RequestPath
     EndpointId endpoint     = 0;
     RequestType requestType = RequestType::kRequestTypeUnknown;
 
-    //entityId represents an attribute, command, or event ID, which is determined by the requestType. Wildcard if omitted.
+    // entityId represents an attribute, command, or event ID, which is determined by the requestType. Wildcard if omitted.
     std::optional<uint32_t> entityId;
 };
 
