@@ -1,0 +1,83 @@
+# Copyright (c) 2024 Project CHIP Authors
+#
+# Licensed under the Apache License, Version 2.0 (the "License");
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
+#
+# http://www.apache.org/licenses/LICENSE-2.0
+#
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
+
+name: "[TC-TBRM-2.1] Attributes with Server as DUT"
+
+PICS:
+    - TBRM.S
+
+config:
+    nodeId: 0x12344321
+    cluster: Thread Border Router Management
+    endpoint: 1
+
+tests:
+    - label: "Wait for the commissioned device to be retrieved"
+      cluster: DelayCommands
+      command: WaitForCommissionee
+      arguments:
+          values:
+              - name: nodeId
+                value: nodeId
+
+    - label: "TH reads the BorderRouterName attribute from the DUT"
+      command: readAttribute
+      attribute: BorderRouterName
+      response:
+          constraints:
+              type: char_string
+              hasValue: true
+              minLength: 1
+              maxLength: 63
+
+    - label: "TH reads the BorderAgentID attribute from the DUT"
+      command: readAttribute
+      attribute: BorderAgentID
+      response:
+          constraints:
+              type: octet_string
+              hasValue: true
+              minLength: 16
+              maxLength: 16
+
+    - label: "TH reads the ThreadVersion attribute from the DUT"
+      command: readAttribute
+      attribute: ThreadVersion
+      response:
+          constraints:
+              type: int16u
+              hasValue: true
+              minValue: 4
+
+    - label: "TH reads the InterfaceEnabled attribute from the DUT"
+      command: readAttribute
+      attribute: InterfaceEnabled
+      response:
+          constraints:
+              type: boolean
+              hasValue: true
+
+    - label: "TH reads the ActiveDatasetTimestamp attribute from the DUT"
+      command: readAttribute
+      attribute: ActiveDatasetTimestamp
+      response:
+          constraints:
+              type: int64u
+
+    - label: "TH reads the PendingDatasetTimestamp attribute from the DUT"
+      command: readAttribute
+      attribute: PendingDatasetTimestamp
+      response:
+          constraints:
+              type: int64u

@@ -59,7 +59,7 @@ Davis, CA 95616, USA
 -->
 <cluster xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="types types.xsd cluster cluster.xsd" id="0x0506" name="Media Playback Cluster" revision="2">
   <revisionHistory>
-    <revision revision="1" summary="Initial Release"/>
+    <revision revision="1" summary="Initial revision"/>
     <revision revision="2" summary="Added Text/Audio tracks support, Audio-while-advancing (AA) feature, StateChanged event"/>
   </revisionHistory>
   <clusterIds>
@@ -223,7 +223,7 @@ Davis, CA 95616, USA
     </attribute>
     <attribute id="0x0001" name="StartTime" type="epoch-us" default="null">
       <access read="true" readPrivilege="view"/>
-      <quality changeOmitted="false" nullable="true" scene="false" persistence="volatile" reportable="false"/>
+      <quality changeOmitted="false" nullable="true" scene="false" persistence="volatile" reportable="false" sourceAttribution="false" quieterReporting="false"/>
       <mandatoryConform>
         <feature name="AS"/>
       </mandatoryConform>
@@ -231,7 +231,7 @@ Davis, CA 95616, USA
     </attribute>
     <attribute id="0x0002" name="Duration" type="uint64" default="null">
       <access read="true" readPrivilege="view"/>
-      <quality changeOmitted="false" nullable="true" scene="false" persistence="volatile" reportable="false"/>
+      <quality changeOmitted="false" nullable="true" scene="false" persistence="volatile" reportable="false" sourceAttribution="false" quieterReporting="false"/>
       <mandatoryConform>
         <feature name="AS"/>
       </mandatoryConform>
@@ -239,7 +239,7 @@ Davis, CA 95616, USA
     </attribute>
     <attribute id="0x0003" name="SampledPosition" type="PlaybackPositionStruct" default="null">
       <access read="true" readPrivilege="view"/>
-      <quality changeOmitted="false" nullable="true" scene="false" persistence="volatile" reportable="false"/>
+      <quality changeOmitted="false" nullable="true" scene="false" persistence="volatile" reportable="false" sourceAttribution="false" quieterReporting="false"/>
       <mandatoryConform>
         <feature name="AS"/>
       </mandatoryConform>
@@ -254,7 +254,7 @@ Davis, CA 95616, USA
     </attribute>
     <attribute id="0x0005" name="SeekRangeEnd" type="uint64" default="null">
       <access read="true" readPrivilege="view"/>
-      <quality changeOmitted="false" nullable="true" scene="false" persistence="volatile" reportable="false"/>
+      <quality changeOmitted="false" nullable="true" scene="false" persistence="volatile" reportable="false" sourceAttribution="false" quieterReporting="false"/>
       <mandatoryConform>
         <feature name="AS"/>
       </mandatoryConform>
@@ -262,7 +262,7 @@ Davis, CA 95616, USA
     </attribute>
     <attribute id="0x0006" name="SeekRangeStart" type="uint64" default="null">
       <access read="true" readPrivilege="view"/>
-      <quality changeOmitted="false" nullable="true" scene="false" persistence="volatile" reportable="false"/>
+      <quality changeOmitted="false" nullable="true" scene="false" persistence="volatile" reportable="false" sourceAttribution="false" quieterReporting="false"/>
       <mandatoryConform>
         <feature name="AS"/>
       </mandatoryConform>
@@ -270,7 +270,7 @@ Davis, CA 95616, USA
     </attribute>
     <attribute id="0x0007" name="ActiveAudioTrack" type="TrackStruct" default="null">
       <access read="true" readPrivilege="view"/>
-      <quality changeOmitted="false" nullable="true" scene="false" persistence="volatile" reportable="false"/>
+      <quality changeOmitted="false" nullable="true" scene="false" persistence="volatile" reportable="false" sourceAttribution="false" quieterReporting="false"/>
       <mandatoryConform>
         <feature name="AT"/>
       </mandatoryConform>
@@ -279,7 +279,7 @@ Davis, CA 95616, USA
     <attribute id="0x0008" name="AvailableAudioTracks" type="list" default="null">
       <entry type="TrackStruct"/>
       <access read="true" readPrivilege="view"/>
-      <quality changeOmitted="false" nullable="true" scene="false" persistence="volatile" reportable="false"/>
+      <quality changeOmitted="false" nullable="true" scene="false" persistence="volatile" reportable="false" sourceAttribution="false" quieterReporting="false"/>
       <mandatoryConform>
         <feature name="AT"/>
       </mandatoryConform>
@@ -287,7 +287,7 @@ Davis, CA 95616, USA
     </attribute>
     <attribute id="0x0009" name="ActiveTextTrack" type="TrackStruct" default="null">
       <access read="true" readPrivilege="view"/>
-      <quality changeOmitted="false" nullable="true" scene="false" persistence="volatile" reportable="false"/>
+      <quality changeOmitted="false" nullable="true" scene="false" persistence="volatile" reportable="false" sourceAttribution="false" quieterReporting="false"/>
       <mandatoryConform>
         <feature name="TT"/>
       </mandatoryConform>
@@ -296,7 +296,7 @@ Davis, CA 95616, USA
     <attribute id="0x000A" name="AvailableTextTracks" type="list" default="null">
       <entry type="TrackStruct"/>
       <access read="true" readPrivilege="view"/>
-      <quality changeOmitted="false" nullable="true" scene="false" persistence="volatile" reportable="false"/>
+      <quality changeOmitted="false" nullable="true" scene="false" persistence="volatile" reportable="false" sourceAttribution="false" quieterReporting="false"/>
       <mandatoryConform>
         <feature name="TT"/>
       </mandatoryConform>

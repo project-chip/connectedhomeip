@@ -51,39 +51,6 @@ static constexpr uint8_t DOOR_LOCK_ALIRO_CREDENTIAL_SIZE = 65;
 
 static constexpr uint32_t DOOR_LOCK_MAX_LOCK_TIMEOUT_SEC = MAX_INT32U_VALUE / MILLISECOND_TICKS_PER_SECOND;
 
-static constexpr size_t kDoorLockDelegateTableSize =
-    MATTER_DM_DOOR_LOCK_CLUSTER_SERVER_ENDPOINT_COUNT + CHIP_DEVICE_CONFIG_DYNAMIC_ENDPOINT_COUNT;
-
-static_assert(kDoorLockDelegateTableSize <= kEmberInvalidEndpointIndex, "Door Lock Delegate table size error");
-
-namespace chip {
-namespace app {
-namespace Clusters {
-namespace DoorLock {
-
-Delegate * gDelegateTable[kDoorLockDelegateTableSize] = { nullptr };
-
-Delegate * GetDelegate(EndpointId endpoint)
-{
-    uint16_t ep = emberAfGetClusterServerEndpointIndex(endpoint, DoorLock::Id, MATTER_DM_DOOR_LOCK_CLUSTER_SERVER_ENDPOINT_COUNT);
-    return (ep >= kDoorLockDelegateTableSize ? nullptr : gDelegateTable[ep]);
-}
-
-void SetDefaultDelegate(EndpointId endpoint, Delegate * delegate)
-{
-    uint16_t ep = emberAfGetClusterServerEndpointIndex(endpoint, DoorLock::Id, MATTER_DM_DOOR_LOCK_CLUSTER_SERVER_ENDPOINT_COUNT);
-    // if endpoint is found
-    if (ep < ArraySize(gDelegateTable))
-    {
-        gDelegateTable[ep] = delegate;
-    }
-}
-
-} // namespace DoorLock
-} // namespace Clusters
-} // namespace app
-} // namespace chip
-
 DoorLockServer DoorLockServer::instance;
 
 class DoorLockClusterFabricDelegate : public chip::FabricTable::Delegate
@@ -117,7 +84,18 @@ DoorLockServer & DoorLockServer::Instance()
  *
  * @param endpointId
  */
-void DoorLockServer::InitServer(chip::EndpointId endpointId)
+void DoorLockServer::InitServer(EndpointId endpointId)
+{
+    CHIP_ERROR err = InitEndpoint(endpointId);
+
+    // We have no way to communicate this error, so just log it.
+    if (err != CHIP_NO_ERROR)
+    {
+        ChipLogError(Zcl, "Door Lock cluster initialization on endpoint %d failed: %" CHIP_ERROR_FORMAT, endpointId, err.Format());
+    }
+}
+
+CHIP_ERROR DoorLockServer::InitEndpoint(EndpointId endpointId, Delegate * delegate)
 {
     ChipLogProgress(Zcl, "Door Lock cluster initialized at endpoint #%u", endpointId);
 
@@ -128,11 +106,48 @@ void DoorLockServer::InitServer(chip::EndpointId endpointId)
     }
     SetActuatorEnabled(endpointId, true);
 
-    for (auto & ep : mEndpointCtx)
+    auto * endpointContext = getContext(endpointId);
+    if (!endpointContext)
     {
-        ep.lockoutEndTimestamp    = ep.lockoutEndTimestamp.zero();
-        ep.wrongCodeEntryAttempts = 0;
+        ChipLogError(Zcl, "Invalid endpoint %d for initializing lock server: no endpoint context available", endpointId);
+        return CHIP_ERROR_INVALID_ARGUMENT;
     }
+
+    endpointContext->lockoutEndTimestamp    = endpointContext->lockoutEndTimestamp.zero();
+    endpointContext->wrongCodeEntryAttempts = 0;
+    endpointContext->delegate               = delegate;
+    return CHIP_NO_ERROR;
+}
+
+void DoorLockServer::ShutdownEndpoint(EndpointId endpointId)
+{
+    auto * endpointContext = getContext(endpointId);
+    if (!endpointContext)
+    {
+        ChipLogError(Zcl, "Invalid endpoint %d for shutting down lock server: no endpoint context available", endpointId);
+        return;
+    }
+
+    endpointContext->delegate = nullptr;
+}
+
+CHIP_ERROR DoorLockServer::SetDelegate(chip::EndpointId endpointId, chip::app::Clusters::DoorLock::Delegate * delegate)
+{
+    if (!delegate)
+    {
+        ChipLogError(Zcl, "Trying to set a null DoorLock::Delegate on endpoint %d", endpointId);
+        return CHIP_ERROR_INVALID_ARGUMENT;
+    }
+
+    auto * endpointContext = getContext(endpointId);
+    if (!endpointContext)
+    {
+        ChipLogError(Zcl, "Invalid endpoint %d for setting a delegate: no endpoint context available", endpointId);
+        return CHIP_ERROR_INVALID_ARGUMENT;
+    }
+
+    endpointContext->delegate = delegate;
+    return CHIP_NO_ERROR;
 }
 
 bool DoorLockServer::SetLockState(chip::EndpointId endpointId, DlLockState newLockState)
@@ -942,7 +957,18 @@ void DoorLockServer::clearCredentialCommandHandler(
     }
 
     // Remove all the credentials of the particular type.
-    auto credentialType  = credential.Value().credentialType;
+    auto credentialType = credential.Value().credentialType;
+
+    if (!credentialTypeSupported(commandPath.mEndpointId, credentialType))
+    {
+        ChipLogProgress(Zcl,
+                        "[ClearCredential] Credential type is not supported [endpointId=%d,credentialType=%u"
+                        "]",
+                        commandPath.mEndpointId, to_underlying(credentialType));
+        commandObj->AddStatus(commandPath, Status::InvalidCommand);
+        return;
+    }
+
     auto credentialIndex = credential.Value().credentialIndex;
     if (0xFFFE == credentialIndex)
     {
@@ -2395,6 +2421,42 @@ DlStatus DoorLockServer::createCredential(chip::EndpointId endpointId, chip::Fab
         return DlStatus::kInvalidField;
     }
 
+    // For Aliro endpoint keys, there is a single shared count for the total
+    // count of evictable and non-evictable keys that can be stored.  This needs
+    // to be enforced specially, because none of the other logic we have handles that.
+    if (credentialType == CredentialTypeEnum::kAliroEvictableEndpointKey ||
+        credentialType == CredentialTypeEnum::kAliroNonEvictableEndpointKey)
+    {
+        Delegate * delegate = GetDelegate(endpointId);
+        if (delegate == nullptr)
+        {
+            ChipLogError(Zcl, "Door lock delegate is null, can't handle Aliro credentials");
+            return DlStatus::kFailure;
+        }
+
+        size_t maxEndpointKeys = delegate->GetNumberOfAliroEndpointKeysSupported();
+        size_t evictableEndpointKeys, nonEvictableEndpointKeys;
+
+        if (!countOccupiedCredentials(endpointId, CredentialTypeEnum::kAliroEvictableEndpointKey, evictableEndpointKeys))
+        {
+            ChipLogError(Zcl, "Unable to count Aliro evictable endpoint keys.");
+            return DlStatus::kFailure;
+        }
+
+        if (!countOccupiedCredentials(endpointId, CredentialTypeEnum::kAliroNonEvictableEndpointKey, nonEvictableEndpointKeys))
+        {
+            ChipLogError(Zcl, "Unable to count Aliro non-evictable endpoint keys.");
+            return DlStatus::kFailure;
+        }
+
+        if (evictableEndpointKeys + nonEvictableEndpointKeys >= maxEndpointKeys)
+        {
+            // We have no space for another credential here.
+            ChipLogError(Zcl, "Unable to create Aliro endpoint key credential; too many exist already [endpointId=%d]", endpointId);
+            return DlStatus::kResourceExhausted;
+        }
+    }
+
     CredentialStruct credential{ credentialType, credentialIndex };
     // appclusters, 5.2.4.40: if userIndex is not provided we should create new user
     DlStatus status = DlStatus::kSuccess;
@@ -2430,6 +2492,42 @@ DlStatus DoorLockServer::createCredential(chip::EndpointId endpointId, chip::Fab
     }
 
     return status;
+}
+
+bool DoorLockServer::countOccupiedCredentials(chip::EndpointId endpointId, CredentialTypeEnum credentialType,
+                                              size_t & occupiedCount)
+{
+    uint16_t maxCredentialCount;
+
+    if (!getMaxNumberOfCredentials(endpointId, credentialType, maxCredentialCount))
+    {
+        return false;
+    }
+
+    uint16_t startIndex = 1;
+    // Programming PIN is a special case -- it is unique and its index assumed to be 0.
+    if (CredentialTypeEnum::kProgrammingPIN == credentialType)
+    {
+        startIndex = 0;
+        maxCredentialCount--;
+    }
+
+    occupiedCount = 0;
+    for (uint16_t credentialIndex = startIndex; credentialIndex <= maxCredentialCount; ++credentialIndex)
+    {
+        EmberAfPluginDoorLockCredentialInfo credential;
+        if (!emberAfPluginDoorLockGetCredential(endpointId, credentialIndex, credentialType, credential))
+        {
+            return false;
+        }
+
+        if (credential.status == DlCredentialStatus::kOccupied)
+        {
+            ++occupiedCount;
+        }
+    }
+
+    return true;
 }
 
 DlStatus DoorLockServer::modifyProgrammingPIN(chip::EndpointId endpointId, chip::FabricIndex modifierFabricIndex,
@@ -2905,28 +3003,6 @@ Status DoorLockServer::clearCredential(chip::EndpointId endpointId, chip::Fabric
                      "[clearCredential] Unable to clear credential - couldn't write new credential to database "
                      "[endpointId=%d,credentialType=%u,credentialIndex=%d,modifier=%d]",
                      endpointId, to_underlying(credentialType), credentialIndex, modifier);
-        return Status::Failure;
-    }
-
-    uint8_t maxCredentialsPerUser;
-    if (!GetNumberOfCredentialsSupportedPerUser(endpointId, maxCredentialsPerUser))
-    {
-        ChipLogError(Zcl,
-                     "[clearCredential] Unable to get the number of available credentials per user: internal error "
-                     "[endpointId=%d,credentialType=%d,credentialIndex=%d]",
-                     endpointId, to_underlying(credentialType), credentialIndex);
-        return Status::Failure;
-    }
-
-    // Should never happen, only possible if the implementation of application is incorrect
-    if (relatedUser.credentials.size() > maxCredentialsPerUser)
-    {
-        ChipLogError(Zcl,
-                     "[clearCredential] Unable to clear credential for related user - user has too many credentials associated"
-                     "[endpointId=%d,credentialType=%u,credentialIndex=%d,modifier=%d,userIndex=%d,credentialsCount=%u]",
-                     endpointId, to_underlying(credentialType), credentialIndex, modifier, relatedUserIndex,
-                     static_cast<unsigned int>(relatedUser.credentials.size()));
-
         return Status::Failure;
     }
 
@@ -3445,6 +3521,17 @@ EmberAfDoorLockEndpointContext * DoorLockServer::getContext(chip::EndpointId end
     return nullptr;
 }
 
+Delegate * DoorLockServer::GetDelegate(EndpointId endpointId)
+{
+    auto * endpointContext = getContext(endpointId);
+    if (!endpointContext)
+    {
+        return nullptr;
+    }
+
+    return endpointContext->delegate;
+}
+
 bool DoorLockServer::HandleRemoteLockOperation(chip::app::CommandHandler * commandObj,
                                                const chip::app::ConcreteCommandPath & commandPath, LockOperationTypeEnum opType,
                                                RemoteLockOpHandler opHandler, const Optional<ByteSpan> & pinCode)
@@ -3918,14 +4005,6 @@ void DoorLockServer::setAliroReaderConfigCommandHandler(CommandHandler * command
     EndpointId endpointID = commandPath.mEndpointId;
     ChipLogProgress(Zcl, "[SetAliroReaderConfig] Incoming command [endpointId=%d]", endpointID);
 
-    // If Aliro Provisioning feature is not supported, return UNSUPPORTED_COMMAND.
-    if (!SupportsAliroProvisioning(endpointID))
-    {
-        ChipLogProgress(Zcl, "[SetAliroReaderConfig] Aliro Provisioning is not supported [endpointId=%d]", endpointID);
-        commandObj->AddStatus(commandPath, Status::UnsupportedCommand);
-        return;
-    }
-
     Delegate * delegate = GetDelegate(endpointID);
     if (!delegate)
     {
@@ -3988,10 +4067,7 @@ void DoorLockServer::setAliroReaderConfigCommandHandler(CommandHandler * command
         // Various attributes changed; mark them dirty.
         MatterReportingAttributeChangeCallback(endpointID, Clusters::DoorLock::Id, AliroReaderVerificationKey::Id);
         MatterReportingAttributeChangeCallback(endpointID, Clusters::DoorLock::Id, AliroReaderGroupIdentifier::Id);
-        if (supportsAliroBLEUWB)
-        {
-            MatterReportingAttributeChangeCallback(endpointID, Clusters::DoorLock::Id, AliroGroupResolvingKey::Id);
-        }
+        MatterReportingAttributeChangeCallback(endpointID, Clusters::DoorLock::Id, AliroGroupResolvingKey::Id);
     }
     sendClusterResponse(commandObj, commandPath, ClusterStatusCode(StatusIB(err).mStatus));
 }
@@ -4000,14 +4076,6 @@ void DoorLockServer::clearAliroReaderConfigCommandHandler(CommandHandler * comma
 {
     EndpointId endpointID = commandPath.mEndpointId;
     ChipLogProgress(Zcl, "[ClearAliroReaderConfig] Incoming command [endpointId=%d]", endpointID);
-
-    // If Aliro Provisioning feature is not supported, return UNSUPPORTED_COMMAND.
-    if (!SupportsAliroProvisioning(endpointID))
-    {
-        ChipLogProgress(Zcl, "[ClearAliroReaderConfig] Aliro Provisioning is not supported [endpointId=%d]", endpointID);
-        commandObj->AddStatus(commandPath, Status::UnsupportedCommand);
-        return;
-    }
 
     Delegate * delegate = GetDelegate(endpointID);
     if (!delegate)
@@ -4038,10 +4106,7 @@ void DoorLockServer::clearAliroReaderConfigCommandHandler(CommandHandler * comma
         // Various attributes changed; mark them dirty.
         MatterReportingAttributeChangeCallback(endpointID, Clusters::DoorLock::Id, AliroReaderVerificationKey::Id);
         MatterReportingAttributeChangeCallback(endpointID, Clusters::DoorLock::Id, AliroReaderGroupIdentifier::Id);
-        if (SupportsAliroBLEUWB(endpointID))
-        {
-            MatterReportingAttributeChangeCallback(endpointID, Clusters::DoorLock::Id, AliroGroupResolvingKey::Id);
-        }
+        MatterReportingAttributeChangeCallback(endpointID, Clusters::DoorLock::Id, AliroGroupResolvingKey::Id);
     }
     sendClusterResponse(commandObj, commandPath, ClusterStatusCode(StatusIB(err).mStatus));
 }
@@ -4203,8 +4268,7 @@ void DoorLockServer::DoorLockOnAutoRelockCallback(System::Layer *, void * callba
     }
 }
 
-CHIP_ERROR DoorLockServer::ReadAliroExpeditedTransactionSupportedProtocolVersions(const ConcreteReadAttributePath & aPath,
-                                                                                  AttributeValueEncoder & aEncoder,
+CHIP_ERROR DoorLockServer::ReadAliroExpeditedTransactionSupportedProtocolVersions(AttributeValueEncoder & aEncoder,
                                                                                   Delegate * delegate)
 {
     VerifyOrReturnValue(delegate != nullptr, aEncoder.EncodeEmptyList());
@@ -4225,8 +4289,7 @@ CHIP_ERROR DoorLockServer::ReadAliroExpeditedTransactionSupportedProtocolVersion
     });
 }
 
-CHIP_ERROR DoorLockServer::ReadAliroSupportedBLEUWBProtocolVersions(const ConcreteReadAttributePath & aPath,
-                                                                    AttributeValueEncoder & aEncoder, Delegate * delegate)
+CHIP_ERROR DoorLockServer::ReadAliroSupportedBLEUWBProtocolVersions(AttributeValueEncoder & aEncoder, Delegate * delegate)
 {
     VerifyOrReturnValue(delegate != nullptr, aEncoder.EncodeEmptyList());
 
@@ -4296,7 +4359,7 @@ CHIP_ERROR DoorLockServer::Read(const ConcreteReadAttributePath & aPath, Attribu
                                           AttributeNullabilityType::kNotNullable);
     }
     case AliroExpeditedTransactionSupportedProtocolVersions::Id: {
-        return ReadAliroExpeditedTransactionSupportedProtocolVersions(aPath, aEncoder, delegate);
+        return ReadAliroExpeditedTransactionSupportedProtocolVersions(aEncoder, delegate);
     }
     case AliroGroupResolvingKey::Id: {
         uint8_t buffer[kAliroGroupResolvingKeySize];
@@ -4305,7 +4368,7 @@ CHIP_ERROR DoorLockServer::Read(const ConcreteReadAttributePath & aPath, Attribu
                                           AttributeNullabilityType::kNullable);
     }
     case AliroSupportedBLEUWBProtocolVersions::Id: {
-        return ReadAliroSupportedBLEUWBProtocolVersions(aPath, aEncoder, delegate);
+        return ReadAliroSupportedBLEUWBProtocolVersions(aEncoder, delegate);
     }
     case AliroBLEAdvertisingVersion::Id: {
         uint8_t bleAdvertisingVersion = delegate->GetAliroBLEAdvertisingVersion();

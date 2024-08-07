@@ -15,6 +15,9 @@
  *    See the License for the specific language governing permissions and
  *    limitations under the License.
  */
+
+#include <pw_unit_test/framework.h>
+
 #include <crypto/CHIPCryptoPAL.h>
 
 #include <credentials/CHIPCert.h>
@@ -22,18 +25,20 @@
 #include <credentials/DeviceAttestationCredsProvider.h>
 #include <credentials/attestation_verifier/DefaultDeviceAttestationVerifier.h>
 #include <credentials/attestation_verifier/DeviceAttestationVerifier.h>
+#include <credentials/attestation_verifier/TestDACRevocationDelegateImpl.h>
 #include <credentials/attestation_verifier/TestPAAStore.h>
 #include <credentials/examples/DeviceAttestationCredsExample.h>
 #include <credentials/examples/ExampleDACs.h>
 #include <credentials/examples/ExamplePAI.h>
 
 #include <lib/core/CHIPError.h>
+#include <lib/core/StringBuilderAdapters.h>
 #include <lib/support/CHIPMem.h>
 #include <lib/support/Span.h>
 
-#include <gtest/gtest.h>
-
 #include "CHIPAttCert_test_vectors.h"
+
+#include <fstream>
 
 using namespace chip;
 using namespace chip::Crypto;
@@ -410,4 +415,161 @@ TEST_F(TestDeviceAttestationCredentials, TestAttestationTrustStore)
             EXPECT_TRUE(paaCertSpan.data_equal(testCase.expectedCertSpan));
         }
     }
+}
+
+static void WriteTestRevokedData(const char * jsonData, const char * fileName)
+{
+    // TODO: Add option to load test data from the test without using file. #34588
+
+    // write data to /tmp/sample_revoked_set.json using fstream APIs
+    std::ofstream file;
+    file.open(fileName, std::ofstream::out | std::ofstream::trunc);
+    file << jsonData;
+    file.close();
+}
+
+TEST_F(TestDeviceAttestationCredentials, TestDACRevocationDelegateImpl)
+{
+    uint8_t attestationElementsTestVector[]  = { 0 };
+    uint8_t attestationChallengeTestVector[] = { 0 };
+    uint8_t attestationSignatureTestVector[] = { 0 };
+    uint8_t attestationNonceTestVector[]     = { 0 };
+
+    // Details for TestCerts::sTestCert_DAC_FFF1_8000_0004_Cert
+    //    Issuer: MEYxGDAWBgNVBAMMD01hdHRlciBUZXN0IFBBSTEUMBIGCisGAQQBgqJ8AgEMBEZGRjExFDASBgorBgEEAYKifAICDAQ4MDAw
+    //    AKID: AF42B7094DEBD515EC6ECF33B81115225F325288
+    //    Serial Number: 0C694F7F866067B2
+    //
+    // Details for TestCerts::sTestCert_PAI_FFF1_8000_Cert
+    //    Issuer: MDAxGDAWBgNVBAMMD01hdHRlciBUZXN0IFBBQTEUMBIGCisGAQQBgqJ8AgEMBEZGRjE=
+    //    AKID: 6AFD22771F511FECBF1641976710DCDC31A1717E
+    //    Serial Number: 3E6CE6509AD840CD1
+    Credentials::DeviceAttestationVerifier::AttestationInfo info(
+        ByteSpan(attestationElementsTestVector), ByteSpan(attestationChallengeTestVector), ByteSpan(attestationSignatureTestVector),
+        TestCerts::sTestCert_PAI_FFF1_8000_Cert, TestCerts::sTestCert_DAC_FFF1_8000_0004_Cert, ByteSpan(attestationNonceTestVector),
+        static_cast<VendorId>(0xFFF1), 0x8000);
+
+    AttestationVerificationResult attestationResult = AttestationVerificationResult::kNotImplemented;
+
+    Callback::Callback<DeviceAttestationVerifier::OnAttestationInformationVerification> attestationInformationVerificationCallback(
+        OnAttestationInformationVerificationCallback, &attestationResult);
+
+    TestDACRevocationDelegateImpl revocationDelegateImpl;
+
+    // Test without revocation set
+    revocationDelegateImpl.CheckForRevokedDACChain(info, &attestationInformationVerificationCallback);
+    EXPECT_EQ(attestationResult, AttestationVerificationResult::kSuccess);
+
+    const char * tmpJsonFile = "/tmp/sample_revoked_set.json";
+    revocationDelegateImpl.SetDeviceAttestationRevocationSetPath(tmpJsonFile);
+
+    // Test empty json
+    WriteTestRevokedData("", tmpJsonFile);
+    revocationDelegateImpl.CheckForRevokedDACChain(info, &attestationInformationVerificationCallback);
+    EXPECT_EQ(attestationResult, AttestationVerificationResult::kSuccess);
+
+    // Test DAC is revoked
+    const char * jsonData = R"(
+    [{
+        "type": "revocation_set",
+        "issuer_subject_key_id": "AF42B7094DEBD515EC6ECF33B81115225F325288",
+        "issuer_name": "MEYxGDAWBgNVBAMMD01hdHRlciBUZXN0IFBBSTEUMBIGCisGAQQBgqJ8AgEMBEZGRjExFDASBgorBgEEAYKifAICDAQ4MDAw",
+        "revoked_serial_numbers": ["0C694F7F866067B2"]
+    }]
+    )";
+    WriteTestRevokedData(jsonData, tmpJsonFile);
+    revocationDelegateImpl.CheckForRevokedDACChain(info, &attestationInformationVerificationCallback);
+    EXPECT_EQ(attestationResult, AttestationVerificationResult::kDacRevoked);
+
+    // Test PAI is revoked
+    jsonData = R"(
+    [{
+        "type": "revocation_set",
+        "issuer_subject_key_id": "6AFD22771F511FECBF1641976710DCDC31A1717E",
+        "issuer_name": "MDAxGDAWBgNVBAMMD01hdHRlciBUZXN0IFBBQTEUMBIGCisGAQQBgqJ8AgEMBEZGRjE=",
+        "revoked_serial_numbers": ["3E6CE6509AD840CD"]
+    }]
+    )";
+    WriteTestRevokedData(jsonData, tmpJsonFile);
+    revocationDelegateImpl.CheckForRevokedDACChain(info, &attestationInformationVerificationCallback);
+    EXPECT_EQ(attestationResult, AttestationVerificationResult::kPaiRevoked);
+
+    // Test DAC and PAI both revoked
+    jsonData = R"(
+    [{
+        "type": "revocation_set",
+        "issuer_subject_key_id": "AF42B7094DEBD515EC6ECF33B81115225F325288",
+        "issuer_name": "MEYxGDAWBgNVBAMMD01hdHRlciBUZXN0IFBBSTEUMBIGCisGAQQBgqJ8AgEMBEZGRjExFDASBgorBgEEAYKifAICDAQ4MDAw",
+        "revoked_serial_numbers": ["0C694F7F866067B2"]
+    },
+    {
+        "type": "revocation_set",
+        "issuer_subject_key_id": "6AFD22771F511FECBF1641976710DCDC31A1717E",
+        "issuer_name": "MDAxGDAWBgNVBAMMD01hdHRlciBUZXN0IFBBQTEUMBIGCisGAQQBgqJ8AgEMBEZGRjE=",
+        "revoked_serial_numbers": ["3E6CE6509AD840CD"]
+    }]
+    )";
+    WriteTestRevokedData(jsonData, tmpJsonFile);
+    revocationDelegateImpl.CheckForRevokedDACChain(info, &attestationInformationVerificationCallback);
+    EXPECT_EQ(attestationResult, AttestationVerificationResult::kPaiAndDacRevoked);
+
+    // Test with another test DAC and PAI
+    Credentials::DeviceAttestationVerifier::AttestationInfo FFF2_8001_info(
+        ByteSpan(attestationElementsTestVector), ByteSpan(attestationChallengeTestVector), ByteSpan(attestationSignatureTestVector),
+        TestCerts::sTestCert_PAI_FFF2_8001_Cert, TestCerts::sTestCert_DAC_FFF2_8001_0008_Cert, ByteSpan(attestationNonceTestVector),
+        static_cast<VendorId>(0xFFF2), 0x8001);
+    revocationDelegateImpl.CheckForRevokedDACChain(FFF2_8001_info, &attestationInformationVerificationCallback);
+    EXPECT_EQ(attestationResult, AttestationVerificationResult::kSuccess);
+
+    // Test issuer does not match
+    jsonData = R"(
+    [{
+        "type": "revocation_set",
+        "issuer_subject_key_id": "BF42B7094DEBD515EC6ECF33B81115225F325289",
+        "issuer_name": "MEYxGDAWBgNVBAMMD01hdHRlciBUZXN0IFBBSTEUMBIGCisGAQQBgqJ8AgEMBEZGRjExFDASBgorBgEEAYKifAICDAQ4MDAw",
+        "revoked_serial_numbers": ["0C694F7F866067B2"]
+    }]
+    )";
+    WriteTestRevokedData(jsonData, tmpJsonFile);
+    revocationDelegateImpl.CheckForRevokedDACChain(info, &attestationInformationVerificationCallback);
+    EXPECT_EQ(attestationResult, AttestationVerificationResult::kSuccess);
+
+    // Test subject key ID does not match
+    jsonData = R"(
+    [{
+        "type": "revocation_set",
+        "issuer_subject_key_id": "BF42B7094DEBD515EC6ECF33B81115225F325289",
+        "issuer_name": "MEYxGDAWBgNVBAMMD01hdHRlciBUZXN0IFBBSTEUMBIGCisGAQQBgqJ8AgEMBEZGRjExFDASBgorBgEEAYKifAICDAQ4MDAw",
+        "revoked_serial_numbers": ["0C694F7F866067B2"]
+    }]
+    )";
+    WriteTestRevokedData(jsonData, tmpJsonFile);
+    revocationDelegateImpl.CheckForRevokedDACChain(info, &attestationInformationVerificationCallback);
+    EXPECT_EQ(attestationResult, AttestationVerificationResult::kSuccess);
+
+    // Test serial number does not match
+    jsonData = R"(
+    [{
+        "type": "revocation_set",
+        "issuer_subject_key_id": "AF42B7094DEBD515EC6ECF33B81115225F325288",
+        "issuer_name": "MEYxGDAWBgNVBAMMD01hdHRlciBUZXN0IFBBSTEUMBIGCisGAQQBgqJ8AgEMBEZGRjExFDASBgorBgEEAYKifAICDAQ4MDAw",
+        "revoked_serial_numbers": ["3E6CE6509AD840CD1", "BC694F7F866067B1"]
+    }]
+    )";
+    WriteTestRevokedData(jsonData, tmpJsonFile);
+    revocationDelegateImpl.CheckForRevokedDACChain(info, &attestationInformationVerificationCallback);
+    EXPECT_EQ(attestationResult, AttestationVerificationResult::kSuccess);
+
+    // Test starting serial number bytes match but not all
+    jsonData = R"(
+    [{
+        "type": "revocation_set",
+        "issuer_subject_key_id": "AF42B7094DEBD515EC6ECF33B81115225F325288",
+        "issuer_name": "MEYxGDAWBgNVBAMMD01hdHRlciBUZXN0IFBBSTEUMBIGCisGAQQBgqJ8AgEMBEZGRjExFDASBgorBgEEAYKifAICDAQ4MDAw",
+        "revoked_serial_numbers": ["0C694F7F866067B21234"]
+    }]
+    )";
+    WriteTestRevokedData(jsonData, tmpJsonFile);
+    revocationDelegateImpl.CheckForRevokedDACChain(info, &attestationInformationVerificationCallback);
+    EXPECT_EQ(attestationResult, AttestationVerificationResult::kSuccess);
 }

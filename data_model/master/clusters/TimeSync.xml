@@ -60,7 +60,7 @@ Davis, CA 95616, USA
 -->
 <cluster xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="types types.xsd cluster cluster.xsd" id="0x0038" name="Time Synchronization Cluster" revision="2">
   <revisionHistory>
-    <revision revision="1" summary="Initial Release"/>
+    <revision revision="1" summary="Initial revision"/>
     <revision revision="2" summary="Make TrustedTimeSource fabric-aware, add TSC feature, define list max sizes, change writable attributes to commands, remote port, add attribute for DNS support"/>
   </revisionHistory>
   <clusterIds>
@@ -213,7 +213,7 @@ Davis, CA 95616, USA
   <attributes>
     <attribute id="0x0000" name="UTCTime" type="epoch-us" default="null">
       <access read="true" readPrivilege="view"/>
-      <quality changeOmitted="true" nullable="true" scene="false" persistence="volatile" reportable="false"/>
+      <quality changeOmitted="true" nullable="true" scene="false" persistence="volatile" reportable="false" sourceAttribution="false" quieterReporting="false"/>
       <mandatoryConform/>
     </attribute>
     <attribute id="0x0001" name="Granularity" type="GranularityEnum" default="NoTimeGranularity">
@@ -228,14 +228,14 @@ Davis, CA 95616, USA
     </attribute>
     <attribute id="0x0003" name="TrustedTimeSource" type="TrustedTimeSourceStruct" default="null">
       <access read="true" readPrivilege="view"/>
-      <quality changeOmitted="false" nullable="true" scene="false" persistence="nonVolatile" reportable="false"/>
+      <quality changeOmitted="false" nullable="true" scene="false" persistence="nonVolatile" reportable="false" sourceAttribution="false" quieterReporting="false"/>
       <mandatoryConform>
         <feature name="TSC"/>
       </mandatoryConform>
     </attribute>
     <attribute id="0x0004" name="DefaultNTP" type="string" default="null">
       <access read="true" readPrivilege="view"/>
-      <quality changeOmitted="false" nullable="true" scene="false" persistence="nonVolatile" reportable="false"/>
+      <quality changeOmitted="false" nullable="true" scene="false" persistence="nonVolatile" reportable="false" sourceAttribution="false" quieterReporting="false"/>
       <mandatoryConform>
         <feature name="NTPC"/>
       </mandatoryConform>
@@ -244,7 +244,7 @@ Davis, CA 95616, USA
     <attribute id="0x0005" name="TimeZone" type="list" default="[{0,0}]">
       <entry type="TimeZoneStruct"/>
       <access read="true" readPrivilege="view"/>
-      <quality changeOmitted="false" nullable="false" scene="false" persistence="nonVolatile" reportable="false"/>
+      <quality changeOmitted="false" nullable="false" scene="false" persistence="nonVolatile" reportable="false" sourceAttribution="false" quieterReporting="false"/>
       <mandatoryConform>
         <feature name="TZ"/>
       </mandatoryConform>
@@ -253,21 +253,21 @@ Davis, CA 95616, USA
     <attribute id="0x0006" name="DSTOffset" type="list" default="[]">
       <entry type="DSTOffsetStruct"/>
       <access read="true" readPrivilege="view"/>
-      <quality changeOmitted="false" nullable="false" scene="false" persistence="nonVolatile" reportable="false"/>
+      <quality changeOmitted="false" nullable="false" scene="false" persistence="nonVolatile" reportable="false" sourceAttribution="false" quieterReporting="false"/>
       <mandatoryConform>
         <feature name="TZ"/>
       </mandatoryConform>
     </attribute>
     <attribute id="0x0007" name="LocalTime" type="epoch-us" default="null">
       <access read="true" readPrivilege="view"/>
-      <quality changeOmitted="true" nullable="true" scene="false" persistence="volatile" reportable="false"/>
+      <quality changeOmitted="true" nullable="true" scene="false" persistence="volatile" reportable="false" sourceAttribution="false" quieterReporting="false"/>
       <mandatoryConform>
         <feature name="TZ"/>
       </mandatoryConform>
     </attribute>
     <attribute id="0x0008" name="TimeZoneDatabase" type="TimeZoneDatabaseEnum" default="None">
       <access read="true" readPrivilege="view"/>
-      <quality changeOmitted="false" nullable="false" scene="false" persistence="fixed" reportable="false"/>
+      <quality changeOmitted="false" nullable="false" scene="false" persistence="fixed" reportable="false" sourceAttribution="false" quieterReporting="false"/>
       <mandatoryConform>
         <feature name="TZ"/>
       </mandatoryConform>
@@ -280,7 +280,7 @@ Davis, CA 95616, USA
     </attribute>
     <attribute id="0x000A" name="TimeZoneListMaxSize" type="uint8">
       <access read="true" readPrivilege="view"/>
-      <quality changeOmitted="false" nullable="false" scene="false" persistence="fixed" reportable="false"/>
+      <quality changeOmitted="false" nullable="false" scene="false" persistence="fixed" reportable="false" sourceAttribution="false" quieterReporting="false"/>
       <mandatoryConform>
         <feature name="TZ"/>
       </mandatoryConform>
@@ -288,7 +288,7 @@ Davis, CA 95616, USA
     </attribute>
     <attribute id="0x000B" name="DSTOffsetListMaxSize" type="uint8">
       <access read="true" readPrivilege="view"/>
-      <quality changeOmitted="false" nullable="false" scene="false" persistence="fixed" reportable="false"/>
+      <quality changeOmitted="false" nullable="false" scene="false" persistence="fixed" reportable="false" sourceAttribution="false" quieterReporting="false"/>
       <mandatoryConform>
         <feature name="TZ"/>
       </mandatoryConform>
@@ -296,7 +296,7 @@ Davis, CA 95616, USA
     </attribute>
     <attribute id="0x000C" name="SupportsDNSResolve" type="bool" default="False">
       <access read="true" readPrivilege="view"/>
-      <quality changeOmitted="false" nullable="false" scene="false" persistence="fixed" reportable="false"/>
+      <quality changeOmitted="false" nullable="false" scene="false" persistence="fixed" reportable="false" sourceAttribution="false" quieterReporting="false"/>
       <mandatoryConform>
         <feature name="NTPC"/>
       </mandatoryConform>

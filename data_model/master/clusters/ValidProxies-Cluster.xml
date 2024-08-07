@@ -57,10 +57,12 @@ Davis, CA 95616, USA
 -->
 <cluster xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="types types.xsd cluster cluster.xsd" id="0x0044" name="Valid Proxies Cluster" revision="1">
   <revisionHistory>
-    <revision revision="1" summary="Initial Release"/>
+    <revision revision="1" summary="Initial revision"/>
   </revisionHistory>
   <clusterIds>
-    <clusterId id="0x0044" name="ValidProxies"/>
+    <clusterId id="0x0044" name="ValidProxies">
+      <provisionalConform/>
+    </clusterId>
   </clusterIds>
   <classification hierarchy="base" role="utility" picsCode="PXVALID" scope="Node"/>
   <dataTypes>
@@ -75,7 +77,7 @@ Davis, CA 95616, USA
     <attribute id="0x0000" name="ValidProxyList" type="list" default="empty">
       <entry type="ValidProxyStruct"/>
       <access read="true" write="true" readPrivilege="view" writePrivilege="operate"/>
-      <quality changeOmitted="false" nullable="false" scene="false" persistence="nonVolatile" reportable="false"/>
+      <quality changeOmitted="false" nullable="false" scene="false" persistence="nonVolatile" reportable="false" sourceAttribution="false" quieterReporting="false"/>
       <mandatoryConform/>
       <constraint type="allowed" value="N/A"/>
     </attribute>

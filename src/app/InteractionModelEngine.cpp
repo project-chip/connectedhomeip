@@ -27,9 +27,10 @@
 
 #include <cinttypes>
 
-#include "access/RequestPath.h"
-#include "access/SubjectDescriptor.h"
+#include <access/RequestPath.h>
+#include <access/SubjectDescriptor.h>
 #include <app/AppConfig.h>
+#include <app/CommandHandlerInterfaceRegistry.h>
 #include <app/RequiredPrivilege.h>
 #include <app/util/IMClusterCommandHandler.h>
 #include <app/util/af-types.h>
@@ -40,6 +41,10 @@
 #include <lib/support/CHIPFaultInjection.h>
 #include <lib/support/CodeUtils.h>
 #include <lib/support/FibonacciUtils.h>
+
+#if CHIP_CONFIG_USE_DATA_MODEL_INTERFACE
+#include <app/codegen-data-model-provider/Instance.h>
+#endif
 
 namespace chip {
 namespace app {
@@ -88,6 +93,15 @@ CHIP_ERROR InteractionModelEngine::Init(Messaging::ExchangeManager * apExchangeM
 
     StatusIB::RegisterErrorFormatter();
 
+#if CHIP_CONFIG_USE_EMBER_DATA_MODEL && CHIP_CONFIG_USE_DATA_MODEL_INTERFACE
+    ChipLogError(InteractionModel, "WARNING ┌────────────────────────────────────────────────────");
+    ChipLogError(InteractionModel, "WARNING │ Interaction Model Engine running in 'Checked' mode.");
+    ChipLogError(InteractionModel, "WARNING │ This executes BOTH ember and data-model code paths.");
+    ChipLogError(InteractionModel, "WARNING │ which is inefficient and consumes more flash space.");
+    ChipLogError(InteractionModel, "WARNING │ This should be done for testing only.");
+    ChipLogError(InteractionModel, "WARNING └────────────────────────────────────────────────────");
+#endif
+
     return CHIP_NO_ERROR;
 }
 
@@ -95,20 +109,9 @@ void InteractionModelEngine::Shutdown()
 {
     mpExchangeMgr->GetSessionManager()->SystemLayer()->CancelTimer(ResumeSubscriptionsTimerCallback, this);
 
-    CommandHandlerInterface * handlerIter = mCommandHandlerList;
-
-    //
-    // Walk our list of command handlers and de-register them, before finally
-    // nulling out the list entirely.
-    //
-    while (handlerIter)
-    {
-        CommandHandlerInterface * nextHandler = handlerIter->GetNext();
-        handlerIter->SetNext(nullptr);
-        handlerIter = nextHandler;
-    }
-
-    mCommandHandlerList = nullptr;
+    // TODO: individual object clears the entire command handler interface registry.
+    //       This may not be expected.
+    CommandHandlerInterfaceRegistry::UnregisterAllHandlers();
 
     mCommandResponderObjs.ReleaseAll();
 
@@ -482,7 +485,7 @@ CHIP_ERROR InteractionModelEngine::ParseAttributePaths(const Access::SubjectDesc
 
         if (paramsList.mValue.IsWildcardPath())
         {
-            AttributePathExpandIterator pathIterator(&paramsList);
+            AttributePathExpandIterator pathIterator(GetDataModelProvider(), &paramsList);
             ConcreteAttributePath readPath;
 
             // The definition of "valid path" is "path exists and ACL allows access". The "path exists" part is handled by
@@ -845,7 +848,8 @@ Protocols::InteractionModel::Status InteractionModelEngine::OnReadInitialRequest
 
     // We have already reserved enough resources for read requests, and have granted enough resources for current subscriptions, so
     // we should be able to allocate resources requested by this request.
-    ReadHandler * handler = mReadHandlers.CreateObject(*this, apExchangeContext, aInteractionType, mReportScheduler);
+    ReadHandler * handler =
+        mReadHandlers.CreateObject(*this, apExchangeContext, aInteractionType, mReportScheduler, GetDataModelProvider());
     if (handler == nullptr)
     {
         ChipLogProgress(InteractionModel, "no resource for %s interaction",
@@ -1677,7 +1681,8 @@ CHIP_ERROR InteractionModelEngine::PushFront(SingleLinkedListNode<T> *& aObjectL
 void InteractionModelEngine::DispatchCommand(CommandHandlerImpl & apCommandObj, const ConcreteCommandPath & aCommandPath,
                                              TLV::TLVReader & apPayload)
 {
-    CommandHandlerInterface * handler = FindCommandHandler(aCommandPath.mEndpointId, aCommandPath.mClusterId);
+    CommandHandlerInterface * handler =
+        CommandHandlerInterfaceRegistry::GetCommandHandler(aCommandPath.mEndpointId, aCommandPath.mClusterId);
 
     if (handler)
     {
@@ -1701,91 +1706,23 @@ Protocols::InteractionModel::Status InteractionModelEngine::CommandExists(const 
     return ServerClusterCommandExists(aCommandPath);
 }
 
-CHIP_ERROR InteractionModelEngine::RegisterCommandHandler(CommandHandlerInterface * handler)
+DataModel::Provider * InteractionModelEngine::SetDataModelProvider(DataModel::Provider * model)
 {
-    VerifyOrReturnError(handler != nullptr, CHIP_ERROR_INVALID_ARGUMENT);
+    // Alternting data model should not be done while IM is actively handling requests.
+    VerifyOrDie(mReadHandlers.begin() == mReadHandlers.end());
 
-    for (auto * cur = mCommandHandlerList; cur; cur = cur->GetNext())
-    {
-        if (cur->Matches(*handler))
-        {
-            ChipLogError(InteractionModel, "Duplicate command handler registration failed");
-            return CHIP_ERROR_INCORRECT_STATE;
-        }
-    }
-
-    handler->SetNext(mCommandHandlerList);
-    mCommandHandlerList = handler;
-
-    return CHIP_NO_ERROR;
+    DataModel::Provider * oldModel = GetDataModelProvider();
+    mDataModelProvider             = model;
+    return oldModel;
 }
 
-void InteractionModelEngine::UnregisterCommandHandlers(EndpointId endpointId)
+DataModel::Provider * InteractionModelEngine::GetDataModelProvider() const
 {
-    CommandHandlerInterface * prev = nullptr;
-
-    for (auto * cur = mCommandHandlerList; cur; cur = cur->GetNext())
-    {
-        if (cur->MatchesEndpoint(endpointId))
-        {
-            if (prev == nullptr)
-            {
-                mCommandHandlerList = cur->GetNext();
-            }
-            else
-            {
-                prev->SetNext(cur->GetNext());
-            }
-
-            cur->SetNext(nullptr);
-        }
-        else
-        {
-            prev = cur;
-        }
-    }
-}
-
-CHIP_ERROR InteractionModelEngine::UnregisterCommandHandler(CommandHandlerInterface * handler)
-{
-    VerifyOrReturnError(handler != nullptr, CHIP_ERROR_INVALID_ARGUMENT);
-    CommandHandlerInterface * prev = nullptr;
-
-    for (auto * cur = mCommandHandlerList; cur; cur = cur->GetNext())
-    {
-        if (cur->Matches(*handler))
-        {
-            if (prev == nullptr)
-            {
-                mCommandHandlerList = cur->GetNext();
-            }
-            else
-            {
-                prev->SetNext(cur->GetNext());
-            }
-
-            cur->SetNext(nullptr);
-
-            return CHIP_NO_ERROR;
-        }
-
-        prev = cur;
-    }
-
-    return CHIP_ERROR_KEY_NOT_FOUND;
-}
-
-CommandHandlerInterface * InteractionModelEngine::FindCommandHandler(EndpointId endpointId, ClusterId clusterId)
-{
-    for (auto * cur = mCommandHandlerList; cur; cur = cur->GetNext())
-    {
-        if (cur->Matches(endpointId, clusterId))
-        {
-            return cur;
-        }
-    }
-
-    return nullptr;
+#if CHIP_CONFIG_USE_DATA_MODEL_INTERFACE
+    // TODO: this should be temporary, we should fully inject the data model
+    VerifyOrReturnValue(mDataModelProvider != nullptr, CodegenDataModelProviderInstance());
+#endif
+    return mDataModelProvider;
 }
 
 void InteractionModelEngine::OnTimedInteractionFailed(TimedHandler * apTimedHandler)

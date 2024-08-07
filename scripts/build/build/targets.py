@@ -28,10 +28,9 @@ from builders.mbed import MbedApp, MbedBoard, MbedBuilder, MbedProfile
 from builders.mw320 import MW320App, MW320Builder
 from builders.nrf import NrfApp, NrfBoard, NrfConnectBuilder
 from builders.nuttx import NuttXApp, NuttXBoard, NuttXBuilder
-from builders.nxp import NxpApp, NxpBoard, NxpBuilder
+from builders.nxp import NxpApp, NxpBoard, NxpBuilder, NxpOsUsed
 from builders.openiotsdk import OpenIotSdkApp, OpenIotSdkBuilder, OpenIotSdkCryptoBackend
 from builders.qpg import QpgApp, QpgBoard, QpgBuilder
-from builders.rw61x import RW61XApp, RW61XBuilder
 from builders.stm32 import stm32App, stm32Board, stm32Builder
 from builders.telink import TelinkApp, TelinkBoard, TelinkBuilder
 from builders.ti import TIApp, TIBoard, TIBuilder
@@ -499,23 +498,37 @@ def BuildNxpTarget():
     # boards
     target.AppendFixedTargets([
         TargetPart('k32w0', board=NxpBoard.K32W0),
-        TargetPart('k32w1', board=NxpBoard.K32W1)
+        TargetPart('k32w1', board=NxpBoard.K32W1),
+        TargetPart('rw61x', board=NxpBoard.RW61X)
+    ])
+
+    # OS
+    target.AppendFixedTargets([
+        TargetPart('zephyr', os_env=NxpOsUsed.ZEPHYR).OnlyIfRe('rw61x'),
+        TargetPart('freertos', os_env=NxpOsUsed.FREERTOS),
     ])
 
     # apps
     target.AppendFixedTargets([
         TargetPart('lighting', app=NxpApp.LIGHTING).OnlyIfRe('(k32w0|k32w1)'),
-        TargetPart('contact-sensor', app=NxpApp.CONTACT).OnlyIfRe('(k32w0|k32w1)')
+        TargetPart('contact-sensor', app=NxpApp.CONTACT).OnlyIfRe('(k32w0|k32w1)'),
+        TargetPart('all-clusters', app=NxpApp.ALLCLUSTERS).OnlyIfRe('rw61x'),
+        TargetPart('laundry-washer', app=NxpApp.LAUNDRYWASHER).OnlyIfRe('rw61x'),
+        TargetPart('thermostat', app=NxpApp.THERMOSTAT).OnlyIfRe('rw61x')
     ])
 
     target.AppendModifier(name="factory", enable_factory_data=True)
     target.AppendModifier(name="low-power", low_power=True).OnlyIfRe('contact-sensor')
     target.AppendModifier(name="lit", enable_lit=True).OnlyIfRe('contact-sensor')
     target.AppendModifier(name="fro32k", use_fro32k=True).OnlyIfRe('k32w0')
-    target.AppendModifier(name="smu2", smu2=True).OnlyIfRe('k32w1-lighting')
-    target.AppendModifier(name="dac-conversion", convert_dac_pk=True).OnlyIfRe('factory').ExceptIfRe('k32w0')
-    target.AppendModifier(name="rotating-id", enable_rotating_id=True)
+    target.AppendModifier(name="smu2", smu2=True).OnlyIfRe('k32w1-freertos-lighting')
+    target.AppendModifier(name="dac-conversion", convert_dac_pk=True).OnlyIfRe('factory').ExceptIfRe('(k32w0|rw61x)')
+    target.AppendModifier(name="rotating-id", enable_rotating_id=True).ExceptIfRe('rw61x')
     target.AppendModifier(name="sw-v2", has_sw_version_2=True)
+    target.AppendModifier(name="ota", enable_ota=True).ExceptIfRe('zephyr')
+    target.AppendModifier(name="wifi", enable_wifi=True).OnlyIfRe('rw61x')
+    target.AppendModifier(name="thread", enable_thread=True).ExceptIfRe('zephyr')
+    target.AppendModifier(name="matter-shell", enable_shell=True).ExceptIfRe('k32w0|k32w1')
 
     return target
 
@@ -710,25 +723,6 @@ def BuildMW320Target():
     return target
 
 
-def BuildRW61XTarget():
-    target = BuildTarget('rw61x', RW61XBuilder)
-
-    # apps
-    target.AppendFixedTargets([
-        TargetPart('all-clusters-app', app=RW61XApp.ALL_CLUSTERS, release=True),
-        TargetPart('thermostat', app=RW61XApp.THERMOSTAT, release=True),
-        TargetPart('laundry-washer', app=RW61XApp.LAUNDRY_WASHER, release=True),
-    ])
-
-    target.AppendModifier(name="ota", enable_ota=True)
-    target.AppendModifier(name="wifi", enable_wifi=True)
-    target.AppendModifier(name="thread", enable_thread=True)
-    target.AppendModifier(name="factory-data", enable_factory_data=True)
-    target.AppendModifier(name="matter-shell", enable_shell=True)
-
-    return target
-
-
 def BuildGenioTarget():
     target = BuildTarget('genio', GenioBuilder)
     target.AppendFixedTargets([TargetPart('lighting-app', app=GenioApp.LIGHT)])
@@ -774,6 +768,7 @@ def BuildTelinkTarget():
     target.AppendModifier('factory-data', enable_factory_data=True)
     target.AppendModifier('4mb', enable_4mb_flash=True)
     target.AppendModifier('mars', mars_board_config=True)
+    target.AppendModifier('usb', usb_board_config=True)
 
     return target
 
@@ -809,7 +804,6 @@ BUILD_TARGETS = [
     BuildHostTestRunnerTarget(),
     BuildIMXTarget(),
     BuildInfineonTarget(),
-    BuildRW61XTarget(),
     BuildNxpTarget(),
     BuildMbedTarget(),
     BuildMW320Target(),

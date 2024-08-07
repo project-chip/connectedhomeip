@@ -157,6 +157,7 @@ def _GetInDevelopmentTests() -> Set[str]:
                                              # TestEventTriggersEnabled is true, which it's not in CI.
         "Test_TC_SMOKECO_2_6.yaml",          # chip-repl does not support local timeout (07/20/2023) and test assumes
                                              # TestEventTriggersEnabled is true, which it's not in CI.
+        "TestFabricSyncBridgedNode.yaml",    # [TODO] fabric-bridge-app lacks some feature so this test currently fails
     }
 
 
@@ -188,6 +189,7 @@ def _GetDarwinFrameworkToolUnsupportedTests() -> Set[str]:
         "TestIcdManagementCluster",  # darwin-framework-tool does not support ICD registration
         "TestUnitTestingClusterMei",  # darwin-framework-tool does not currently support reading or subscribing to Events
         "TestReadNoneSubscribeNone",  # darwin-framework-tool does not supports those commands.
+        "TestDiagnosticLogsDownloadCommand",  # test is flaky in darwin. Please see #32636
 
         "Test_TC_ACE_1_6",  # darwin-framework-tool does not support group commands.
         "Test_TC_ACL_2_5",  # darwin-framework-tool does not currently support reading or subscribing to Events
@@ -275,6 +277,8 @@ def target_for_name(name: str):
         return TestTarget.TV
     if name.startswith("DL_") or name.startswith("Test_TC_DRLK_"):
         return TestTarget.LOCK
+    if name.startswith("TestFabricSync"):
+        return TestTarget.FABRIC_SYNC
     if name.startswith("OTA_"):
         return TestTarget.OTA
     if name.startswith("Test_TC_BRBINFO_") or name.startswith("Test_TC_ACT_"):
@@ -285,6 +289,8 @@ def target_for_name(name: str):
         return TestTarget.MWO
     if name.startswith("Test_TC_RVCRUNM_") or name.startswith("Test_TC_RVCCLEANM_") or name.startswith("Test_TC_RVCOPSTATE_"):
         return TestTarget.RVC
+    if name.startswith("Test_TC_TBRM_") or name.startswith("Test_TC_THNETDIR_") or name.startswith("Test_TC_WIFINM_"):
+        return TestTarget.NETWORK_MANAGER
     return TestTarget.ALL_CLUSTERS
 
 

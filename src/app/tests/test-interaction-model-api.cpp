@@ -13,24 +13,38 @@
  *    See the License for the specific language governing permissions and
  *    limitations under the License.
  */
-
-#include "lib/support/CHIPMem.h"
+#include "app/data-model-provider/ActionReturnStatus.h"
 #include <app/tests/test-interaction-model-api.h>
-#include <app/util/basic-types.h>
 
 #include <app/InteractionModelEngine.h>
 #include <app/MessageDef/AttributeReportIBs.h>
+#include <app/codegen-data-model-provider/Instance.h>
 #include <app/util/basic-types.h>
 #include <app/util/mock/Constants.h>
 #include <app/util/mock/Functions.h>
 #include <lib/core/CHIPCore.h>
 #include <messaging/ReliableMessageContext.h>
 
+using namespace chip::app::DataModel;
+
 namespace chip {
 uint8_t Test::attributeDataTLV[CHIP_CONFIG_DEFAULT_UDP_MTU_SIZE];
 size_t Test::attributeDataTLVLen = 0;
 
 namespace app {
+
+class TestOnlyAttributeValueEncoderAccessor
+{
+public:
+    TestOnlyAttributeValueEncoderAccessor(AttributeValueEncoder & encoder) : mEncoder(encoder) {}
+
+    AttributeReportIBs::Builder & Builder() { return mEncoder.mAttributeReportIBsBuilder; }
+
+    void SetState(const AttributeEncodeState & state) { mEncoder.mEncodeState = state; }
+
+private:
+    AttributeValueEncoder & mEncoder;
+};
 
 // Used by the code in TestWriteInteraction.cpp (and generally tests that interact with the WriteHandler may need this).
 const EmberAfAttributeMetadata * GetAttributeMetadata(const ConcreteAttributePath & aConcreteClusterPath)
@@ -134,6 +148,101 @@ CHIP_ERROR ReadSingleClusterData(const Access::SubjectDescriptor & aSubjectDescr
     return AttributeValueEncoder(aAttributeReports, aSubjectDescriptor, aPath, 0 /* dataVersion */).Encode(Test::kTestFieldValue1);
 }
 
-} // namespace app
+TestImCustomDataModel & TestImCustomDataModel::Instance()
+{
+    static TestImCustomDataModel model;
+    return model;
+}
 
+ActionReturnStatus TestImCustomDataModel::ReadAttribute(const ReadAttributeRequest & request, AttributeValueEncoder & encoder)
+{
+    AttributeEncodeState mutableState(&encoder.GetState()); // provide a state copy to start.
+
+    CHIP_ERROR err = ReadSingleClusterData(request.subjectDescriptor.value_or(Access::SubjectDescriptor()),
+                                           request.readFlags.Has(ReadFlags::kFabricFiltered), request.path,
+                                           TestOnlyAttributeValueEncoderAccessor(encoder).Builder(), &mutableState);
+
+    // state must survive CHIP_ERRORs as it is used for chunking
+    TestOnlyAttributeValueEncoderAccessor(encoder).SetState(mutableState);
+
+    return err;
+}
+
+ActionReturnStatus TestImCustomDataModel::WriteAttribute(const WriteAttributeRequest & request, AttributeValueDecoder & decoder)
+{
+    return CHIP_ERROR_NOT_IMPLEMENTED;
+}
+
+ActionReturnStatus TestImCustomDataModel::Invoke(const InvokeRequest & request, chip::TLV::TLVReader & input_arguments,
+                                                 CommandHandler * handler)
+{
+    return CHIP_ERROR_NOT_IMPLEMENTED;
+}
+
+EndpointId TestImCustomDataModel::FirstEndpoint()
+{
+    return CodegenDataModelProviderInstance()->FirstEndpoint();
+}
+
+EndpointId TestImCustomDataModel::NextEndpoint(EndpointId before)
+{
+    return CodegenDataModelProviderInstance()->NextEndpoint(before);
+}
+
+ClusterEntry TestImCustomDataModel::FirstCluster(EndpointId endpoint)
+{
+    return CodegenDataModelProviderInstance()->FirstCluster(endpoint);
+}
+
+ClusterEntry TestImCustomDataModel::NextCluster(const ConcreteClusterPath & before)
+{
+    return CodegenDataModelProviderInstance()->NextCluster(before);
+}
+
+std::optional<ClusterInfo> TestImCustomDataModel::GetClusterInfo(const ConcreteClusterPath & path)
+{
+    return CodegenDataModelProviderInstance()->GetClusterInfo(path);
+}
+
+AttributeEntry TestImCustomDataModel::FirstAttribute(const ConcreteClusterPath & cluster)
+{
+    return CodegenDataModelProviderInstance()->FirstAttribute(cluster);
+}
+
+AttributeEntry TestImCustomDataModel::NextAttribute(const ConcreteAttributePath & before)
+{
+    return CodegenDataModelProviderInstance()->NextAttribute(before);
+}
+
+std::optional<AttributeInfo> TestImCustomDataModel::GetAttributeInfo(const ConcreteAttributePath & path)
+{
+    return CodegenDataModelProviderInstance()->GetAttributeInfo(path);
+}
+
+CommandEntry TestImCustomDataModel::FirstAcceptedCommand(const ConcreteClusterPath & cluster)
+{
+    return CodegenDataModelProviderInstance()->FirstAcceptedCommand(cluster);
+}
+
+CommandEntry TestImCustomDataModel::NextAcceptedCommand(const ConcreteCommandPath & before)
+{
+    return CodegenDataModelProviderInstance()->NextAcceptedCommand(before);
+}
+
+std::optional<CommandInfo> TestImCustomDataModel::GetAcceptedCommandInfo(const ConcreteCommandPath & path)
+{
+    return CodegenDataModelProviderInstance()->GetAcceptedCommandInfo(path);
+}
+
+ConcreteCommandPath TestImCustomDataModel::FirstGeneratedCommand(const ConcreteClusterPath & cluster)
+{
+    return CodegenDataModelProviderInstance()->FirstGeneratedCommand(cluster);
+}
+
+ConcreteCommandPath TestImCustomDataModel::NextGeneratedCommand(const ConcreteCommandPath & before)
+{
+    return CodegenDataModelProviderInstance()->NextGeneratedCommand(before);
+}
+
+} // namespace app
 } // namespace chip

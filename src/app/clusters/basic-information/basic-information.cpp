@@ -342,7 +342,7 @@ CHIP_ERROR BasicAttrAccess::Write(const ConcreteDataAttributePath & aPath, Attri
 
     switch (aPath.mAttributeId)
     {
-    case Location::Id: {
+    case Attributes::Location::Id: {
         CHIP_ERROR err = WriteLocation(aDecoder);
 
         return err;

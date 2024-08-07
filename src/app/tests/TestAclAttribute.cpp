@@ -109,50 +109,41 @@ public:
 namespace chip {
 namespace app {
 
-class TestAclAttribute : public ::testing::Test
+class TestAclAttribute : public Test::AppContext
 {
 public:
-    static void SetUpTestSuite()
-    {
-
-        mpTestContext = new chip::Test::AppContext;
-        mpTestContext->SetUpTestSuite();
-    }
-    static void TearDownTestSuite()
-    {
-        mpTestContext->TearDownTestSuite();
-        delete mpTestContext;
-    }
-
     void SetUp() override
     {
-        mpTestContext->SetUp();
+        AppContext::SetUp();
 
         Access::GetAccessControl().Finish();
         Access::GetAccessControl().Init(GetTestAccessControlDelegate(), gDeviceTypeResolver);
+        mOldProvider = InteractionModelEngine::GetInstance()->SetDataModelProvider(&TestImCustomDataModel::Instance());
     }
-    void TearDown() override { mpTestContext->TearDown(); }
 
-    static chip::Test::AppContext * mpTestContext;
+    void TearDown() override
+    {
+        AppContext::TearDown();
+        InteractionModelEngine::GetInstance()->SetDataModelProvider(mOldProvider);
+    }
+
+private:
+    chip::app::DataModel::Provider * mOldProvider = nullptr;
 };
-
-chip::Test::AppContext * TestAclAttribute::mpTestContext = nullptr;
 
 // Read Client sends a malformed subscribe request, interaction model engine fails to parse the request and generates a status
 // report to client, and client is closed.
 TEST_F(TestAclAttribute, TestACLDeniedAttribute)
 {
-    Messaging::ReliableMessageMgr * rm = mpTestContext->GetExchangeManager().GetReliableMessageMgr();
+    Messaging::ReliableMessageMgr * rm = GetExchangeManager().GetReliableMessageMgr();
     EXPECT_EQ(rm->TestGetCountRetransTable(), 0);
 
     MockInteractionModelApp delegate;
     auto * engine = chip::app::InteractionModelEngine::GetInstance();
-    EXPECT_EQ(engine->Init(&mpTestContext->GetExchangeManager(), &mpTestContext->GetFabricTable(),
-                           app::reporting::GetDefaultReportScheduler()),
-              CHIP_NO_ERROR);
+    EXPECT_EQ(engine->Init(&GetExchangeManager(), &GetFabricTable(), app::reporting::GetDefaultReportScheduler()), CHIP_NO_ERROR);
 
     {
-        app::ReadClient readClient(chip::app::InteractionModelEngine::GetInstance(), &mpTestContext->GetExchangeManager(), delegate,
+        app::ReadClient readClient(chip::app::InteractionModelEngine::GetInstance(), &GetExchangeManager(), delegate,
                                    chip::app::ReadClient::InteractionType::Subscribe);
 
         chip::app::AttributePathParams attributePathParams[2];
@@ -164,13 +155,13 @@ TEST_F(TestAclAttribute, TestACLDeniedAttribute)
         attributePathParams[1].mClusterId   = chip::Test::kTestDeniedClusterId1;
         attributePathParams[1].mAttributeId = 2;
 
-        ReadPrepareParams readPrepareParams(mpTestContext->GetSessionBobToAlice());
+        ReadPrepareParams readPrepareParams(GetSessionBobToAlice());
         readPrepareParams.mpAttributePathParamsList    = attributePathParams;
         readPrepareParams.mAttributePathParamsListSize = 2;
 
         EXPECT_EQ(readClient.SendRequest(readPrepareParams), CHIP_NO_ERROR);
 
-        mpTestContext->DrainAndServiceIO();
+        DrainAndServiceIO();
         EXPECT_EQ(delegate.mError, CHIP_IM_GLOBAL_STATUS(InvalidAction));
         EXPECT_FALSE(delegate.mGotReport);
         delegate.mError     = CHIP_NO_ERROR;
@@ -178,7 +169,7 @@ TEST_F(TestAclAttribute, TestACLDeniedAttribute)
     }
 
     {
-        app::ReadClient readClient(chip::app::InteractionModelEngine::GetInstance(), &mpTestContext->GetExchangeManager(), delegate,
+        app::ReadClient readClient(chip::app::InteractionModelEngine::GetInstance(), &GetExchangeManager(), delegate,
                                    chip::app::ReadClient::InteractionType::Subscribe);
 
         chip::app::AttributePathParams attributePathParams[2];
@@ -189,13 +180,13 @@ TEST_F(TestAclAttribute, TestACLDeniedAttribute)
         attributePathParams[1].mClusterId   = chip::Test::kTestDeniedClusterId2;
         attributePathParams[1].mAttributeId = 2;
 
-        ReadPrepareParams readPrepareParams(mpTestContext->GetSessionBobToAlice());
+        ReadPrepareParams readPrepareParams(GetSessionBobToAlice());
         readPrepareParams.mpAttributePathParamsList    = attributePathParams;
         readPrepareParams.mAttributePathParamsListSize = 2;
 
         EXPECT_EQ(readClient.SendRequest(readPrepareParams), CHIP_NO_ERROR);
 
-        mpTestContext->DrainAndServiceIO();
+        DrainAndServiceIO();
         EXPECT_EQ(delegate.mError, CHIP_IM_GLOBAL_STATUS(InvalidAction));
         EXPECT_FALSE(delegate.mGotReport);
         delegate.mError     = CHIP_NO_ERROR;
@@ -203,7 +194,7 @@ TEST_F(TestAclAttribute, TestACLDeniedAttribute)
     }
 
     {
-        app::ReadClient readClient(chip::app::InteractionModelEngine::GetInstance(), &mpTestContext->GetExchangeManager(), delegate,
+        app::ReadClient readClient(chip::app::InteractionModelEngine::GetInstance(), &GetExchangeManager(), delegate,
                                    chip::app::ReadClient::InteractionType::Subscribe);
 
         chip::app::AttributePathParams attributePathParams[2];
@@ -215,13 +206,13 @@ TEST_F(TestAclAttribute, TestACLDeniedAttribute)
         attributePathParams[1].mClusterId   = chip::Test::kTestClusterId;
         attributePathParams[1].mAttributeId = 2;
 
-        ReadPrepareParams readPrepareParams(mpTestContext->GetSessionBobToAlice());
+        ReadPrepareParams readPrepareParams(GetSessionBobToAlice());
         readPrepareParams.mpAttributePathParamsList    = attributePathParams;
         readPrepareParams.mAttributePathParamsListSize = 2;
 
         EXPECT_EQ(readClient.SendRequest(readPrepareParams), CHIP_NO_ERROR);
 
-        mpTestContext->DrainAndServiceIO();
+        DrainAndServiceIO();
         EXPECT_EQ(delegate.mError, CHIP_NO_ERROR);
         EXPECT_TRUE(delegate.mGotReport);
         EXPECT_EQ(engine->GetNumActiveReadHandlers(ReadHandler::InteractionType::Subscribe), 1u);
@@ -231,7 +222,7 @@ TEST_F(TestAclAttribute, TestACLDeniedAttribute)
 
     EXPECT_EQ(engine->GetNumActiveReadClients(), 0u);
     engine->Shutdown();
-    EXPECT_EQ(mpTestContext->GetExchangeManager().GetNumActiveExchanges(), 0u);
+    EXPECT_EQ(GetExchangeManager().GetNumActiveExchanges(), 0u);
 }
 } // namespace app
 } // namespace chip
