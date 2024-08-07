@@ -1875,6 +1875,7 @@ async def get_accepted_endpoints_for_test(self: MatterBaseTest, accept_function:
               """
         asserts.fail(msg)
 
+    wildcard = await self.default_controller.Read(self.dut_node_id, [()])
     matching = [e for e in wildcard.attributes.keys() if accept_function(wildcard, e)]
     forced_endpoint = self.user_params.get('force_endpoint', None)
     if forced_endpoint is None:
